@@ -4,6 +4,7 @@ Proyecto para desarrollar módulos de Universidad Virtual por proveedores extern
 Proyecto: minoraciones docentes.
 
 Acrónimo bbdd: MRD
+
 paquete java: minoraciones
 
 ## 1. Método de trabajo
