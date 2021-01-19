@@ -2,6 +2,7 @@
 Proyecto para desarrollar módulos de Universidad Virtual por proveedores externos.
 
 Acronimo BD: BEP
+paquete java: bolsaEmpleo
 
 ## 1. Método de trabajo
 ### Código fuente en GIT
