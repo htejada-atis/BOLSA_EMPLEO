@@ -1,0 +1,34 @@
+version: '3'
+ 
+services:
+  memcached:
+    image: memcached:latest
+
+  oracledb:
+    image: oracle/database:18.4.0-xe
+    environment:
+      - ORACLE_PWD=pwd123
+      - ORACLE_CHARACTERSET=AL32UTF8
+    ports:
+      - 1521:1521 
+      - 5500:5500
+    volumes:
+      - /home/usuario/Documentos/oracle-docker/volumes/oradata:/opt/oracle/oradata
+      - /home/usuario/git/uv-desarrollo/Documentos/docker/init-oracle:/opt/oracle/scripts/startup
+
+  uvirtual:
+    build: .
+    depends_on:
+      - memcached
+      - oracledb
+    environment:
+      - TZ='CST'
+      - SHOW="a"
+      - dbUrl=127.0.0.1
+      - memcacheUrl=127.0.0.1
+    ports:
+      - 8888:8080
+    entrypoint: ["/wait-for-it.sh","oracledb:1521","--timeout=0","--strict", "--", "catalina.sh", "run" ]
+    links:
+      - memcached
+      - oracledb

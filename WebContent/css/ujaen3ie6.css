@@ -1,0 +1,11 @@
+#search { right: 0.2em; }
+#content { padding-bottom: 1em;}
+#mainContent { width:70.5em; margin: 1em 0 0 .8em;  }
+#home #mainModule { margin-left: 0.2em; margin-bottom: 1em;}
+.breadcrumb { margin: 0.5em 0 0 1em; }
+#home #mainModule .mcontent { margin: 1em 1.2em .5em .6em; }
+#home #secondaryContent { float: right; width: 24.8em; margin: 0 0.2em 0 0; padding: 1em 0 0 0; }
+#home #secondaryContent .banner1 { margin-left: 0.4em; }
+#news .mcontent{position:relative;float:left;display:block;}
+hr.z{display:block;position:relative;clear:left; float:left;}
+div.gmNavigation{display:block;width:65%;}

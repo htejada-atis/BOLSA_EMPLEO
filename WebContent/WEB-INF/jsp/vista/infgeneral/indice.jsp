@@ -1,0 +1,1 @@
+<h2>Informaci&oacute;n General</h2>

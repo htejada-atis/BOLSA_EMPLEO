@@ -1,0 +1,10 @@
+h1 { width: 96.5em; margin-left:1em; }
+.langNav { width: 94.5em; margin-left:1em; }
+.perfiles { right: 1.4em; top: 9.9em; }
+#header .mainNav { width: 66em; overflow: hidden; }
+#search { position: absolute; bottom: 0em; right: 0.4em; width: 25em; height: 2.7em; background: url(images3/bgsearch.png) top left repeat-x; border-left: 1px solid #A47E00; }
+#search #submit { top:.2em; }
+#home #secondaryContent { float: right; width: 24.9em; margin: 0 0.3em 0 0; padding: 1em 0 0 0; }
+#micrositeMultimedia #multiBox{display:block;width:400px;height:300px;float:left;margin:1em 0.5em;}
+#micrositeMultimedia #multiText{display:block;width:18em;float:left;margin:1em;overflow:hidden;}
+/* hr{display:block;position:relative;clear:left; float:left;} */

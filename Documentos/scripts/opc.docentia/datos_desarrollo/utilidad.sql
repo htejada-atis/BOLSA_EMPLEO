@@ -1,0 +1,10 @@
+delete from dct_ficheros;
+delete from dct_expedientes;
+delete from dct_autoinformes;
+delete from dct_solicitudes;
+delete from dct_solicitudes_hto;
+drop table dct_ficheros;
+drop table dct_expedientes;
+drop table dct_autoinformes;
+drop table dct_solicitudes;
+drop table dct_solicitudes_hto;

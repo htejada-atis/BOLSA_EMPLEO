@@ -1,0 +1,211 @@
+<!-- build.xml -->
+<!DOCTYPE project>
+<project name="uv-desarrollo" default="war" basedir="." xmlns:sonar="antlib:org.sonar.ant" xmlns:jacoco="antlib:org.jacoco.ant">
+
+	<taskdef resource="net/sf/antcontrib/antlib.xml"/>
+	
+	<taskdef uri="antlib:org.jacoco.ant" resource="org/jacoco/ant/antlib.xml">
+		<classpath path="Documentos/jacoco/libs/jacocoant.jar"/>
+	</taskdef>
+
+	<description>
+		uv-desarrollo
+	</description>
+
+	<!-- propiedades globales -->
+	<property name="src" 		location="src"/>
+	<property name="test" 		location="test"/>
+	<property name="webdir"		location="WebContent"/>
+ 	<property name="buildbase" 	location="builds/build"/>
+	<property name="dist"  		location="builds/dist"/>
+	<property name="backupdes"	location="builds/desarrollo"/>
+	<property name="git.l.cmd"	location="/usr/bin/git"/>
+	
+	<property name="build" location="${buildbase}/rama" />	
+	<property name="build.test" location="${buildbase}/test" />	
+	
+	<property name="lib" value="WebContent/WEB-INF/lib"/>
+	<!--<property name="tomcatlib" value="${user.home}/Software/tomcat/lib" />-->	
+	<property name="tomcatlib" value="Documentos/tomcat_lib" />
+	
+	<path id="classpath">
+		<fileset dir="${lib}">
+			<include name="**/*.jar"/>
+		</fileset>
+		<fileset dir="${tomcatlib}">
+			<include name="**/*.jar"/>
+		</fileset>		
+	</path>	
+
+	<path id="classpath.test">
+		<fileset dir="Documentos/selenium">
+			<include name="**/*.jar"/>
+		</fileset>		
+		<fileset dir="Documentos/selenium/libs">
+			<include name="**/*.jar"/>
+		</fileset>		
+		<fileset dir="Documentos/junit">
+			<include name="**/*.jar"/>
+		</fileset>		
+	</path>	
+	
+	<!-- Define the Jacoco project properties -->
+	<property name="result.dir" location="${build}"/>
+	<property name="result.classes.dir" location="${result.dir}"/>
+	<property name="result.classes.instr.dir" location="${result.dir}"/>
+	<property name="result.report.dir" location="${result.dir}/site/jacoco"/>
+	<property name="result.exec.file" location="${result.dir}/jacoco.exec"/>
+
+	
+	<!-- Define the SonarQube global properties (the most usual way is to pass these properties via the command line) -->
+	<property name="sonar.host.url" value="http://192.168.56.10:9000" />
+
+	<!-- Define the SonarQube project properties -->
+	<property name="sonar.projectKey" value="org.sonarqube:sonarqube-scanner-ant" />
+	<property name="sonar.projectName" value="uv-externo" />
+	<property name="sonar.projectVersion" value="1.0" />
+	<property name="sonar.sources" value="src,Webcontent" />
+	<property name="sonar.tests" value="test" />
+	<property name="sonar.java.test.libraries" value="Documentos/junit" />
+	<property name="sonar.java.test.binaries" value="${build.test}" />
+	<property name="sonar.java.binaries" value="build" />
+	<property name="sonar.java.libraries" value="WebContent/WEB-INF/lib/*.jar" />
+	<property name="sonar.java.source" value="11" />
+	<property name="sonar.sourceEncoding" value="utf-8" />
+	<property name="sonar.coverage.jacoco.xmlReportPaths" value="${result.report.dir}/report.xml" />
+	<property name="sonar.junit.reportsPaths" value="${result.report.dir}"/>
+	<property name="sonar.testExecutionReportPaths" value="builds/jest-tests/test-reporter.xml"/>
+	
+	<!--<property name="sonar.scm.provider" value="git" />-->
+	
+	<target name="init">
+		<!-- time stamp -->
+	 	<tstamp>
+			<format property="build.date" pattern="yyyyMMddHHmmss" />
+		</tstamp>
+
+		<!-- Crea el directorio de compilacion -->
+		<mkdir dir="${build}"/>
+		<mkdir dir="${build.test}"/>
+		<mkdir dir="${result.report.dir}"/>
+		
+  	</target>
+
+	<target name="compile" depends="init" description="compilación del código fuente " >
+		<property name="myclasspath" refid="classpath"/>
+		<!-- echo message="Classpath = ${myclasspath}"/ -->
+		<javac srcdir="${src}" destdir="${build}" includeantruntime="false" debug="true" debuglevel="lines,vars,source">
+			<classpath refid="classpath"/>
+			<compilerarg value="-Xlint:unchecked"/>
+		</javac>
+		<javac srcdir="${test}" destdir="${build.test}" includeantruntime="false" debug="true" debuglevel="lines,vars,source">
+			<classpath refid="classpath"/>
+			<classpath refid="classpath.test"/>
+			<classpath>
+			    <path refid="classpath"/>
+		        <path location="${build}"/>
+			</classpath>
+			<compilerarg value="-Xlint:unchecked"/>
+		</javac>
+	</target>
+
+	<target name="desarrollo-build" depends="compile" description="generación común de la estructura del war" >
+		<!-- Crea el directorio de distribución -->
+		<mkdir dir="${dist}"/>
+		
+		<!-- copiamos el contenido WEB -->
+		<copy todir="${dist}">
+			<fileset dir="${webdir}"/>
+		</copy>
+
+		<!-- copiamos las clases compiladas -->
+		<copy todir="${dist}/WEB-INF/classes">
+			<fileset dir="${build}"/>
+		</copy>
+	</target>	
+
+	<target name="war" depends="desarrollo-build" description="generación del fichero final de desarrollo" >
+		<exec executable="${git.l.cmd}" osfamily="unix" outputproperty="build.number">
+			<arg value="rev-parse"/>
+			<arg value="HEAD"/>
+		</exec>
+	  
+		<manifest file="${dist}/META-INF/MANIFEST.MF">
+			<attribute name="Built-By" value="${user.name}"/>
+			<attribute name="Built-Date" value="${build.date}"/>
+			<attribute name="Implementation-Version" value="${build.number}"/>
+			<attribute name="Implementation-Vendor" value="Universidad de Jaén"/>
+		</manifest>
+
+		<!-- Crea el fichero war de backup -->
+		<war destfile="${backupdes}/uv-desarrollo.war" webxml="${dist}/WEB-INF/web.xml" basedir="${dist}" manifest="${dist}/META-INF/MANIFEST.MF" />
+		
+		<!-- hacemos limpieza -->
+		<antcall target="clean" />
+
+	</target>	
+	<target name="clean" description="borrado de datos de la distribución previa" >
+		<!-- Borra la compilación previa -->
+		<!-- <delete dir="${dist}"/> -->
+	</target>
+
+	<target name="cleanall" description="borrado de datos de compilaciones previas" >
+		<!-- Borra la compilación previa -->
+		<delete dir="${buildbase}"/>
+		<delete dir="${dist}"/>
+	</target>
+	
+	
+	<!-- Define SonarScanner for Ant Target -->
+	<target name="sonar" depends="report">
+		<taskdef uri="antlib:org.sonar.ant" resource="org/sonar/ant/antlib.xml">
+			<classpath path="Documentos/sonar/sonarqube-ant-task-2.7.0.1612.jar" />
+		</taskdef>
+
+		<!-- Execute SonarScanner for Ant Analysis -->
+		<sonar:sonar />
+	</target>
+	
+	<target name="test" depends="compile">
+	    <jacoco:coverage destfile="${result.exec.file}" xmlns:jacoco="antlib:org.jacoco.ant" exclclassloader="sun.reflect.DelegatingClassLoader:javassist.Loader" >
+	        <junit haltonfailure="no" fork="true" forkmode="once" printsummary="on" showoutput="true" logfailedtests="true">
+				<classpath>
+				    <path refid="classpath"/>
+					<path refid="classpath.test"/>
+			        <path location="${build}"/>
+					<path location="${build.test}"/>
+					<path location="Documentos/junit"/>
+				</classpath>
+	            <formatter type="brief"/>
+	            <batchtest fork="yes" todir="${result.report.dir}">
+	            	<fileset dir="${test}">
+	            		<include name="basicos/Test*.java"/>
+	            		<include name="unitarios/Test*.java"/>
+	            		<include name="controlador/Test*.java"/>
+	            	</fileset>
+	            </batchtest>
+	        </junit>
+	    </jacoco:coverage>
+	</target>
+	<target name="report" depends="test">
+		<!-- Step 3: Create coverage report -->
+		<jacoco:report>
+			<executiondata>
+				<file file="${result.exec.file}"/>
+			</executiondata>
+			<!-- the class files and optional source files ... -->
+			<structure name="JaCoCo Ant uvirtual">
+				<classfiles>
+					<fileset dir="${result.classes.dir}"/>
+				</classfiles>
+				<sourcefiles encoding="UTF-8">
+					<fileset dir="${src}"/>
+				</sourcefiles>
+			</structure>
+			<!-- to produce reports in different formats. -->
+			<html destdir="${result.report.dir}"/>
+			<csv destfile="${result.report.dir}/report.csv"/>
+			<xml destfile="${result.report.dir}/report.xml"/>
+		</jacoco:report>
+	</target>	
+</project>

@@ -1,0 +1,86 @@
+#mainContent{clear:left;float:left;width:67em;margin:1em 0em 1em 2em;font-size:1em;font-size:1.1em;}
+#micrositeA #mainContent,#micrositeB #mainContent{float:left;padding:0 0 0 0em;width:96%;}
+.bluetable {
+    table-layout: fixed;
+    height: auto;
+    overflow: hidden;
+}
+.bluetable th {
+    font-size: 11px;
+}
+.bluetable .ancho150 {
+    display: table-column;
+    width: 140px;
+    overflow: hidden;
+}
+.bluetable .ancho50 {
+    display: table-column;
+    width: 50px;
+    overflow: hidden;
+}
+.bluetable2 select {
+    width: 140px;
+    overflow: hidden;
+    font-size: 12px;
+}
+
+.bluetable input[type="1text"] {
+    width: 40px;
+    overflow: hidden;
+    font-size: 12px;
+    margin: 5px 0px;
+}
+.bluetable input[type="1button"] {
+    width: 90px;
+    overflow: hidden;
+    font-size: 12px;
+    margin: 5px 0px;
+}
+
+.bluetable .fecha {
+	width: 80px;	
+    overflow: hidden;
+    font-size: 12px;
+    margin: 5px 0px;
+}
+
+.boton80 {
+	width: 80px;	
+    overflow: hidden;
+    font-size: 12px;
+    margin: 5px 0px;
+}
+
+.select40em {
+	width: 40em;	
+    overflow: hidden;
+    font-size: 12px;
+    margin: 5px 0px;
+}
+.select35em {
+	width: 35em;	
+    overflow: hidden;
+    font-size: 12px;
+    margin: 5px 0px;
+}
+.select30em {
+	width: 30em;	
+    overflow: hidden;
+    font-size: 12px;
+    margin: 5px 0px;
+}
+.select5em {
+	width: 5em;	
+    overflow: hidden;
+    font-size: 12px;
+    margin: 5px 0px;
+}
+.selectVarem {
+    overflow: hidden;
+    font-size: 12px;
+    margin: 5px 0px;
+}
+
+#mainContent h3 {
+    margin-top: 0.5em;
+}
