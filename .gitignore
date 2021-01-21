@@ -4,8 +4,6 @@
 build/
 dist/
 builds
-WebContent/META-INF/context.xml
-WebContent/META-INF/context*
 WebContent/WEB-INF/web.xml.*
 WebContent/WEB-INF/classes/global.properties.*
 WebContent/WEB-INF/classes/configuracion.properties
