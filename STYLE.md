@@ -86,7 +86,6 @@ Por ejemplo: KBEP_GESTION_SOLICITUDES
 
 ## JAVA
 El código java debe estar formateado siguiendo las reglas definidas en el fichero checkstyle.xml y los ejemplos proporcionados.
-Para el proyecto tiene que estar activo propiedades -> Java Compiler -> Error/Warning -> Enable '@SuppressWarnings' annotations
 
 Si surge alguna duda, se seguiran las recomendaciones de 
 1. [JavaSE](https://www.oracle.com/java/technologies/javase/codeconventions-contents.html)
