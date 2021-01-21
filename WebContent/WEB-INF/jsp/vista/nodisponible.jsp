@@ -47,27 +47,27 @@ if (atributoError != null) {
 	<!--[if IE 6]>
 	<link href="/css/ujaen3ie6.css" rel="stylesheet" type="text/css" media="screen, print" />
 	<![endif]-->
-	<title>Universidad virtual de la Universidad de Ja&eacute;n - Inicio - srv106</title>
+	<title>Universidad virtual de la Universidad de Jaén - Inicio - srv106</title>
 </head>
 <body id="micrositeA">
 	<div id="wrapper">
 		<div id="header">
 			<a href="#content" class="skip" title="Ir al principio del contenido de esta p&aacute;gina.">Saltar al contenido principal</a>
 			<ul class="langNav">
-				<li id="spanish">Espa&ntilde;ol</li>
+				<li id="spanish">Español</li>
 				<li id="english">English version not available</li>
 				</ul>
-			<h1><a href="http://www.ujaen.es/" accesskey="h"><span>Universidad de Ja&eacute;n</span></a></h1>
-			<p class="slogan">Calidad e innovaci&oacute;n al servicio de la sociedad</p>
+			<h1><a href="http://www.ujaen.es/" accesskey="h"><span>Universidad de Jaén</span></a></h1>
+			<p class="slogan">Calidad e innovación al servicio de la sociedad</p>
 
-			<h2 class="skip">Men&uacute; principal</h2>
+			<h2 class="skip">Menú principal</h2>
 			<ul class="mainNav">
 				<li><a href="/srv/es/index"><span id="pageHome">&nbsp;</span></a></li>
-				<li><a href="/srv/es/informaciongeneral" accesskey="1"> Informaci&#243;n general</a></li> 
+				<li><a href="/srv/es/informaciongeneral" accesskey="1"> Información general</a></li> 
 					</ul>
-			<h2 class="skip">Informaci&oacute;n de usuario y servicios</h2>
+			<h2 class="skip">Información de usuario y servicios</h2>
 			<ul class="secondaryNav">
-				<li><a href="/srv/es/index" style="background:#FF0000;color:#FFFFFF" accesskey="s"> Iniciar sesi&oacute;n </a></li>
+				<li><a href="/srv/es/index" style="background:#FF0000;color:#FFFFFF" accesskey="s"> Iniciar sesión </a></li>
 					<li class="intranet"><a href="https://www.ujaen.es/home/intranet.html" accesskey="i">U. Virtual</a></li>
 					</ul>
 		</div>
@@ -83,13 +83,13 @@ if (atributoError != null) {
 			</ul>
 
 		<div id="mainContent">
-		<h2 class="skip">Men&uacute; local</h2>
+		<h2 class="skip">Menú local</h2>
 			<ul class="localNav" style="display=block;">
 				<li class="active"><a href="/pub/es/index">Inicio</a></li>
 				<li>
 					<ul>
 						<li>
-							<a href="/pub/es/informaciongeneral">Informaci&#243;n general</a>
+							<a href="/pub/es/informaciongeneral">Información general</a>
 						</li>
 					</ul>
 				</li>
@@ -112,15 +112,15 @@ if (mostrarVolver) {
 		</div>
 	</div>
 	<div id="footer">
-				<h2>Universidad de Ja&eacute;n</h2>
+				<h2>Universidad de Jaén</h2>
 	
 				<p>
-					Campus Las Lagunillas s/n | 23071 - Ja&eacute;n<br />
+					Campus Las Lagunillas s/n | 23071 - Jaén<br />
 					Soporte: <a href="mailto:gestion@ujaen.es">gestion@ujaen.es</a> <br /> <a href="http://www10.ujaen.es/aviso-legal">Aviso legal</a> | <a href="http://administracionelectronica.ujaen.es/node/129">Sugerencias</a></p>
-				<h2 class="skip">Men&uacute; principal</h2>
+				<h2 class="skip">Menú principal</h2>
 	
 				<ul class="mainNav">
-					<li><a href="/srv/es/informaciongeneral" accesskey="1"> Informaci&#243;n general</a></li> 
+					<li><a href="/srv/es/informaciongeneral" accesskey="1"> Información general</a></li> 
 						</ul>			
 			</div>
 		</div> </body>
