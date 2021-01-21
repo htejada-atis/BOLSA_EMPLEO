@@ -1,5 +1,4 @@
-<%@ page contentType="text/html; charset=UTF-8" %>
-<%@ page language="java" contentType="text/html; charset=UTF-8"  pageEncoding="UTF-8"%>
+﻿<%@ page language="java" contentType="text/html; charset=UTF-8"  pageEncoding="UTF-8"%>
 <%
 Throwable throwable = (Throwable) request.getAttribute("javax.servlet.error.exception");
 Integer statusCode = (Integer) request.getAttribute("javax.servlet.error.status_code");
@@ -27,21 +26,21 @@ String requestURI = (String) request.getAttribute("javax.servlet.error.request_u
 		<div id="header">
 			<a href="#content" class="skip" title="Ir al principio del contenido de esta p&aacute;gina.">Saltar al contenido principal</a>
 			<ul class="langNav">
-				<li id="spanish">Espa&ntilde;ol</li>
+				<li id="spanish">Español</li>
 				<li id="english"><a href="/pub/en/index" lang="en" accesskey="l">English</a></li>
 
 					</ul>
-			<h1><a href="http://www.ujaen.es/" accesskey="h"><span>Universidad de Ja&eacute;n</span></a></h1>
-			<p class="slogan">Calidad e innovaci&oacute;n al servicio de la sociedad</p>
+			<h1><a href="http://www.ujaen.es/" accesskey="h"><span>Universidad de Jaén</span></a></h1>
+			<p class="slogan">Calidad e innovación al servicio de la sociedad</p>
 
-			<h2 class="skip">Men&uacute; principal</h2>
+			<h2 class="skip">Menú principal</h2>
 			<ul class="mainNav">
 
 				<li><a href="/srv/es/index"><span id="pageHome">&nbsp;</span></a></li>
 			</ul>
-			<h2 class="skip">Informaci&oacute;n de usuario y servicios</h2>
+			<h2 class="skip">Información de usuario y servicios</h2>
 			<ul class="secondaryNav">
-				<li><a href="/srv/es/index" style="background:#FF0000;color:#FFFFFF" accesskey="s"> Iniciar sesi&oacute;n </a></li>
+				<li><a href="/srv/es/index" style="background:#FF0000;color:#FFFFFF" accesskey="s"> Iniciar sesión </a></li>
 			</ul>
 		</div>
 	
@@ -54,7 +53,7 @@ String requestURI = (String) request.getAttribute("javax.servlet.error.request_u
 
 		<div id="mainContent">
 	
-		<h2>Error en la aplicaci&oacute;n</h2>
+		<h2>Error en la aplicación</h2>
 		<div id="itemsmainContent">
 		<%
 		if (statusCode != null) {
@@ -65,28 +64,29 @@ String requestURI = (String) request.getAttribute("javax.servlet.error.request_u
 		}
 		%>
 		</div>
-		<h2 class="skip">Men&uacute; local</h2>
+		<h2 class="skip">Menú local</h2>
 
 			<ul class="localNav">
 				<li class="active"><a href="#">Error</a></li>
 			</ul>			
 		</div>
 	</div>
-<div id="footer">
-				<h2>Universidad de Ja&eacute;n</h2>
+	<div id="footer">
+				<h2>Universidad de Jaén</h2>
 	
 				<p>
-					Campus Las Lagunillas s/n | 23071 - Ja&eacute;n<br />
+					Campus Las Lagunillas s/n | 23071 - Jaén<br />
 
 					Tlf: +34 953 21 21 21 | 
 					Fax: +34 953 21 22 39 | 
 					<a href="mailto:gestion@ujaen.es">gestion@ujaen.es</a><br /> <a href="../copy.html">Aviso legal</a> | <a href="http://administracionelectronica.ujaen.es/node/129">Sugerencias</a></p>
-				<h2 class="skip">Men&uacute; principal</h2>
+				<h2 class="skip">Menú principal</h2>
 	
 				<ul class="mainNav">
 					<li>.</li> 
 						</ul>			
 			</div>
 
-		</div> </body>
+		</div> 
+</body>
 </html>

@@ -44,6 +44,9 @@ Doble click -> open lauch configuracion -> arguments -> VM arguments
  -DdbUrl=<ip de la db> -DmemcacheUrl=<ip de memcache>
 - Incluimos el proyecto uv-externo en el servidor tomcat
 - Doble click en tomcat -> modules -> edit. El path debe ser /
+- Para el proyecto tiene que estar activo propiedades -> Java Compiler -> Error/Warning -> Enable '@SuppressWarnings' annotations
+- Incluir en build path las librerias junit v4 que proporciona eclipse 
+- Incluir en el buid path las librerias de selenium de Documentos/selenium y Documentos/selenium/libs
 
 ### Contrucción del war
 ejecutar ant war.

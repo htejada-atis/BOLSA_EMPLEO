@@ -26,5 +26,4 @@ WebContent/WEB-INF/classes/devel.properties
 WebContent/WEB-INF/classes/configuracion.properties
 /bin
 /.scannerwork/
-junit*
 node_modules
