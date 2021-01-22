@@ -91,7 +91,7 @@ Si surge alguna duda, se seguiran las recomendaciones de
 1. [JavaSE](https://www.oracle.com/java/technologies/javase/codeconventions-contents.html)
 2. [Google](https://google.github.io/styleguide/javaguide.html)
 
-El código no debe tener errores o warnings.
+El código no debe tener errores o warnings (incluir nuevos warnings o errores en el código).
 
 El código no debe tener bloques duplicados (copiar y pegar).
 
