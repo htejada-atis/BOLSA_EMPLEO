@@ -24,8 +24,9 @@ services:
     environment:
       - TZ='CST'
       - SHOW="a"
-      - dbUrl=127.0.0.1
-      - memcacheUrl=127.0.0.1
+      - dbUrl=oracledb
+      - memcacheUrl=memcached
+      - CATALINA_OPTS=-DdbUrl=oracledb -DmemcacheUrl=memcached
     ports:
       - 8888:8080
     entrypoint: ["/wait-for-it.sh","oracledb:1521","--timeout=0","--strict", "--", "catalina.sh", "run" ]
