@@ -25,3 +25,4 @@ WebContent/WEB-INF/classes/configuracion.properties
 /bin
 /.scannerwork/
 node_modules
+.env
