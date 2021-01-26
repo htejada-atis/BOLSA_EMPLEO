@@ -3,6 +3,8 @@ version: '3'
 services:
   memcached:
     image: memcached:latest
+    ports:
+      - 11211:11211 
 
   oracledb:
     image: oracle/database:18.4.0-xe
