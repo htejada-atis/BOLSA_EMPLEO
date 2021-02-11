@@ -22,7 +22,7 @@ public class BbddRunner {
 	private static final String NOMBREDEESTACLASE = BbddRunner.class.getName();
 	private static final Logger LOGGER = Logger.getLogger(NOMBREDEESTACLASE);
 	
-    private static String cadenaConexion = "jdbc:oracle:thin:@192.168.56.10:1521:XE";
+    private static String cadenaConexion = "jdbc:oracle:thin:@127.0.0.1:1521:XE";
     private static String usuarioBdUv = "uvirtual";
     private static String usuarioBdArcos = "arcos";
     private static String usuarioBdRh = "uxxirrhh";
@@ -33,9 +33,9 @@ public class BbddRunner {
     private static OracleDataSource odsRh = null;
     private static OracleDataSource odsAc = null;
     
-    private static String servidorMemcache = "192.168.56.10";
+    private static String servidorMemcache = "127.0.0.1:11211";
 
-    public static final boolean VERBOSE = false;
+    public static final boolean VERBOSE = true;
 	
     private BbddRunner() { }
 	
