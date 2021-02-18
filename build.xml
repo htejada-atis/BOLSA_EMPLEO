@@ -58,7 +58,7 @@
 
 	
 	<!-- Define the SonarQube global properties (the most usual way is to pass these properties via the command line) -->
-	<property name="sonar.host.url" value="http://192.168.56.10:9000" />
+	<property name="sonar.host.url" value="http://jenkins.ujaen.es:9000" />
 
 	<!-- Define the SonarQube project properties -->
 	<property name="sonar.projectKey" value="org.sonarqube:sonarqube-scanner-ant" />
