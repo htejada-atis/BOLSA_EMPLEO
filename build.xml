@@ -74,7 +74,7 @@
 	<property name="sonar.sourceEncoding" value="utf-8" />
 	<property name="sonar.coverage.jacoco.xmlReportPaths" value="${result.report.dir}/report.xml" />
 	<property name="sonar.junit.reportsPaths" value="${result.report.dir}"/>
-	<property name="sonar.testExecutionReportPaths" value="builds/jest-tests/test-reporter.xml"/>
+	<!--<property name="sonar.testExecutionReportPaths" value="builds/jest-tests/test-reporter.xml"/> -->
 	
 	<!--<property name="sonar.scm.provider" value="git" />-->
 	
