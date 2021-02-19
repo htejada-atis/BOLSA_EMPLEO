@@ -68,7 +68,7 @@
 	<property name="sonar.tests" value="test" />
 	<property name="sonar.java.test.libraries" value="Documentos/junit" />
 	<property name="sonar.java.test.binaries" value="${build.test}" />
-	<property name="sonar.java.binaries" value="build" />
+	<property name="sonar.java.binaries" value="${build}" />
 	<property name="sonar.java.libraries" value="WebContent/WEB-INF/lib/*.jar" />
 	<property name="sonar.java.source" value="11" />
 	<property name="sonar.sourceEncoding" value="utf-8" />
