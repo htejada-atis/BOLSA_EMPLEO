@@ -49,7 +49,6 @@ pipeline {
 	    stage('sonar') {
 	    	steps {
 		        echo 'Inicio sonar'
-		        def scannerHome = tool 'sonaquebe scanner';
 		        withSonarQubeEnv('sonar docker') { 
 		            withAnt(installation: 'LocalAnt') {
 		               sh "ant sonar"
