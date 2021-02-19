@@ -10,43 +10,57 @@ pipeline {
 
     stages {
 		stage('Compile') {
-        	mail bcc: '', 
-            	 body: "Subida nueva version de uv-externo \n Construccion en: ${BUILD_URL}",
-             	cc: '', from: '', replyTo: '', 
-             	subject: "Iniciando jenkins pipeline ${JOB_NAME} (${BUILD_NUMBER}) ",
-             	to: 'jmoral@ujaen.es'
-        	echo 'Inicio compile'
-        	git credentialsId: 'gitlab-jenkins', url: 'https://gitujap.ujaen.es/isoin/uv-externo.git'
-        	withAnt(installation: 'LocalAnt') {
-	            sh "ant compile"
+			steps {
+	        	mail bcc: '', 
+	            	 body: "Subida nueva version de uv-externo \n Construccion en: ${BUILD_URL}",
+	             	 cc: '', from: '', replyTo: '', 
+	             	 subject: "Iniciando jenkins pipeline ${JOB_NAME} (${BUILD_NUMBER}) ",
+	             	 to: 'jmoral@ujaen.es'
+	        	echo 'Inicio compile'
+	        	git credentialsId: 'gitlab-jenkins', url: 'https://gitujap.ujaen.es/isoin/uv-externo.git'
+	        	withAnt(installation: 'LocalAnt') {
+		            sh "ant compile"
+	        	}
         	}
     	}
     	stage('Unit tests') {
-        	echo 'Inicio unittest'
-	        //withAnt(installation: 'LocalAnt') {
-	        //    sh "ant test"
-	        //}
+			steps {
+				echo 'Inicio unittest'
+	        	//withAnt(installation: 'LocalAnt') {
+	        	//    sh "ant test"
+	        	//}
+	        }
 	    }
 	    stage('Package') {
-	        echo 'Inicio package'
+	    	steps {
+	        	echo 'Inicio package'
+	        }
 	    }
 	    stage('Build docker') {
-	        echo 'Inicio build docker'
+	    	steps {
+	        	echo 'Inicio build docker'
+	        }
 	    }
 	    stage('Test usuario') {
-	        echo 'Inicio test usuario'
+	    	steps {
+	        	echo 'Inicio test usuario'
+	        }
 	    }
 	    stage('sonar') {
-	        echo 'Inicio sonar'
-	        def scannerHome = tool 'sonaquebe scanner';
-	        withSonarQubeEnv('sonar docker') { 
-	            withAnt(installation: 'LocalAnt') {
-	               sh "ant sonar"
-	            }
+	    	steps {
+		        echo 'Inicio sonar'
+		        def scannerHome = tool 'sonaquebe scanner';
+		        withSonarQubeEnv('sonar docker') { 
+		            withAnt(installation: 'LocalAnt') {
+		               sh "ant sonar"
+		            }
+		        }
 	        }        
 	    }
 	    stage('push docker') {
-	        echo 'Inicio push docker'
+	    	steps {
+	        	echo 'Inicio push docker'
+	       	}
     	}        
     }
 
