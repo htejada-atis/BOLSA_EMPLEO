@@ -51,7 +51,7 @@ pipeline {
 		        echo 'Inicio sonar'
 		        withSonarQubeEnv('sonar docker') { 
 		            withAnt(installation: 'LocalAnt') {
-		               sh "ant sonar"
+		               sh "ant sonar -Dsonar.projectName=${JOB_BASE_NAME}"
 		            }
 		        }
 	        }        
