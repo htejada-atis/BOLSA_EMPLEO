@@ -5,6 +5,7 @@ pipeline {
 
     environment {
     	SONAR_LOGIN = "5930772e8594b769aece20c43aa3ceb3b4f4bf24"
+    	SONAR_PROYECTKEY = "uv-externo-isoin"
         APP_LISTENING_PORT = "8080"
         TEST_CONTAINER_NAME = "ci-${APP_NAME}-${BUILD_NUMBER}"
     }
@@ -52,7 +53,7 @@ pipeline {
 		        echo 'Inicio sonar'
 		        withSonarQubeEnv('sonar docker') { 
 		            withAnt(installation: 'LocalAnt') {
-		               sh "ant sonar -Dsonar.projectName=${JOB_BASE_NAME} -Dsonar.login=${SONAR_LOGIN}"
+		               sh "ant sonar -Dsonar.projectName=${JOB_BASE_NAME} -Dsonar.login=${SONAR_LOGIN} -Dsonar.projectKey=${SONAR_PROYECTKEY}"
 		            }
 		        }
 	        }        
