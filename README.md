@@ -1,6 +1,12 @@
 # Universidad virtual para proveedores externos
 Proyecto para desarrollar módulos de Universidad Virtual por proveedores externos.
 
+Proyecto: minoraciones docentes.
+
+Acrónimo bbdd: MRD
+
+paquete java: minoraciones
+
 ## 1. Método de trabajo
 ### Código fuente en GIT
 Todo el código se deposita en gitujap.ujaen.es en las ramas asignada al proyecto.
