@@ -78,7 +78,7 @@
 	<property name="sonar.junit.reportsPaths" value="${result.report.dir}"/>
 	<!--<property name="sonar.testExecutionReportPaths" value="builds/jest-tests/test-reporter.xml"/> -->
 	
-	<!--<property name="sonar.scm.provider" value="git" />-->
+	<property name="sonar.scm.provider" value="git" />
 	
 	<target name="init">
 		<!-- time stamp -->

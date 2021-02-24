@@ -15,7 +15,7 @@ pipeline {
 		stage('Compile') {
 			steps {
 	        	mail bcc: '', 
-	            	 body: "Subida nueva version de uv-externo \n Construccion en: ${BUILD_URL}",
+	            	 body: "Subida nueva version de uv-externo ${BRANCH_NAME}\n Construccion en: ${BUILD_URL}",
 	             	 cc: '', from: '', replyTo: '', 
 	             	 subject: "Iniciando jenkins pipeline ${JOB_NAME} (${BUILD_NUMBER}) ",
 	             	 to: 'jmoral@ujaen.es'
@@ -54,7 +54,7 @@ pipeline {
 		        echo 'Inicio sonar'
 		        withSonarQubeEnv('sonar docker') { 
 		            withAnt(installation: 'LocalAnt') {
-		               sh "ant sonar -Dsonar.projectKey=${SONAR_PROYECTKEY}"
+		               sh "ant sonar -Dsonar.projectKey=${SONAR_PROYECTKEY} -Dsonar.branch.name=${BRANCH_NAME}"
 		            }
 		        }
 	        }        
