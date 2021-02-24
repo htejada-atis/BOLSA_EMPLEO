@@ -1,0 +1,74 @@
+#!groovy
+
+pipeline {
+    agent any
+
+    environment {
+    	SONAR_LOGIN = "5930772e8594b769aece20c43aa3ceb3b4f4bf24"
+    	SONAR_PROYECTKEY = "uv-externo-isoin"
+        APP_LISTENING_PORT = "8080"
+        TEST_CONTAINER_NAME = "ci-${APP_NAME}-${BUILD_NUMBER}"
+        SERVIDOR_ARGO_KUBERNETES = "jenkins.ujaen.es:5463"
+    }
+
+    stages {
+		stage('Compile') {
+			steps {
+	        	mail bcc: '', 
+	            	 body: "Subida nueva version de uv-externo \n Construccion en: ${BUILD_URL}",
+	             	 cc: '', from: '', replyTo: '', 
+	             	 subject: "Iniciando jenkins pipeline ${JOB_NAME} (${BUILD_NUMBER}) ",
+	             	 to: 'jmoral@ujaen.es'
+	        	echo 'Inicio compile'
+	        	git credentialsId: 'gitlab-jenkins', url: 'https://gitujap.ujaen.es/isoin/uv-externo.git'
+	        	withAnt(installation: 'LocalAnt') {
+		            sh "ant compile"
+	        	}
+        	}
+    	}
+    	stage('Unit tests') {
+			steps {
+				echo 'Inicio unittest'
+	        	//withAnt(installation: 'LocalAnt') {
+	        	//    sh "ant test"
+	        	//}
+	        }
+	    }
+	    stage('test mutantes') {
+	    	steps {
+	        	echo 'Inicio test mutantes'
+	        }
+	    }
+	    stage('Package') {
+	    	steps {
+	        	echo 'Inicio package'
+	        }
+	    }
+	    stage('Build docker') {
+	    	steps {
+	        	echo 'Inicio build docker'
+	        }
+	    }
+	    stage('sonar') {
+	    	steps {
+		        echo 'Inicio sonar'
+		        withSonarQubeEnv('sonar docker') { 
+		            withAnt(installation: 'LocalAnt') {
+		               sh "ant sonar -Dsonar.projectKey=${SONAR_PROYECTKEY}"
+		            }
+		        }
+	        }        
+	    }
+	    stage('push docker') {
+	    	steps {
+	        	echo 'Inicio push docker'
+	       	}
+    	}        
+    }
+
+    post {
+        always {
+            echo "-=- fin -=-"
+        }
+    }
+}

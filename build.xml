@@ -61,8 +61,10 @@
 	<property name="sonar.host.url" value="http://jenkins.ujaen.es:9000" />
 
 	<!-- Define the SonarQube project properties -->
-	<property name="sonar.projectKey" value="org.sonarqube:sonarqube-scanner-ant" />
-	<property name="sonar.projectName" value="uv-externo" />
+	<!--<property name="sonar.projectKey" value="org.sonarqube:sonarqube-scanner-ant" />-->
+	<!--<property name="sonar.projectName" value="uv-externo" />-->
+	<property name="sonar.login" value="usuario_jenkins" />
+	<property name="sonar.password" value="usuario_jenkins" />
 	<property name="sonar.projectVersion" value="1.0" />
 	<property name="sonar.sources" value="src,WebContent" />
 	<property name="sonar.tests" value="test" />
