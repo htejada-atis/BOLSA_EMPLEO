@@ -20,7 +20,7 @@ pipeline {
 	             	 subject: "Iniciando jenkins pipeline ${JOB_NAME} (${BUILD_NUMBER}) ",
 	             	 to: 'jmoral@ujaen.es'
 	        	echo 'Inicio compile'
-	        	git credentialsId: 'gitlab-jenkins', url: 'https://gitujap.ujaen.es/isoin/uv-externo.git'
+	        	git branch: ${BRANCH_NAME}, credentialsId:'gitlab-jenkins', url: 'https://gitujap.ujaen.es/isoin/uv-externo.git'
 	        	withAnt(installation: 'LocalAnt') {
 		            sh "ant compile"
 	        	}
