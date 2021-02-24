@@ -8,6 +8,7 @@ pipeline {
     	SONAR_PROYECTKEY = "uv-externo-isoin"
         APP_LISTENING_PORT = "8080"
         TEST_CONTAINER_NAME = "ci-${APP_NAME}-${BUILD_NUMBER}"
+        SERVIDOR_ARGO_KUBERNETES = "jenkins.ujaen.es:5463"
     }
 
     stages {
@@ -33,6 +34,11 @@ pipeline {
 	        	//}
 	        }
 	    }
+	    stage('test mutantes') {
+	    	steps {
+	        	echo 'Inicio test mutantes'
+	        }
+	    }
 	    stage('Package') {
 	    	steps {
 	        	echo 'Inicio package'
@@ -43,17 +49,12 @@ pipeline {
 	        	echo 'Inicio build docker'
 	        }
 	    }
-	    stage('Test usuario') {
-	    	steps {
-	        	echo 'Inicio test usuario'
-	        }
-	    }
 	    stage('sonar') {
 	    	steps {
 		        echo 'Inicio sonar'
 		        withSonarQubeEnv('sonar docker') { 
 		            withAnt(installation: 'LocalAnt') {
-		               sh "ant sonar -v -Dsonar.login=5930772e8594b769aece20c43aa3ceb3b4f4bf24 -Dsonar.password= -Dsonar.projectKey=uv-externo-isoin"
+		               sh "ant sonar -Dsonar.projectKey=${SONAR_PROYECTKEY}"
 		            }
 		        }
 	        }        
