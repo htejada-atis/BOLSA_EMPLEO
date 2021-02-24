@@ -54,7 +54,7 @@ pipeline {
 		        echo 'Inicio sonar'
 		        withSonarQubeEnv('sonar docker') { 
 		            withAnt(installation: 'LocalAnt') {
-		               sh "ant sonar -Dsonar.projectKey=${SONAR_PROYECTKEY} -Dsonar.branch.name=${BRANCH_NAME}"
+		               sh "ant sonar -Dsonar.projectKey=${SONAR_PROYECTKEY}"
 		            }
 		        }
 	        }        
