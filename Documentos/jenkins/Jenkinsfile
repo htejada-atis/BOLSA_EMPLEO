@@ -53,7 +53,7 @@ pipeline {
 		        echo 'Inicio sonar'
 		        withSonarQubeEnv('sonar docker') { 
 		            withAnt(installation: 'LocalAnt') {
-		               sh "ant sonar -v -Dsonar.login=${SONAR_LOGIN} -Dsonar.projectKey=${SONAR_PROYECTKEY}"
+		               sh "ant sonar -v -Dsonar.login=5930772e8594b769aece20c43aa3ceb3b4f4bf24 -Dsonar.projectKey=uv-externo-isoin"
 		            }
 		        }
 	        }        
