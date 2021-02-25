@@ -98,6 +98,10 @@ public class BbddRunner {
 	private static Connection obtenerConexionUvirtual() throws SQLException {
 		return odsUv.getConnection();
 	}
+
+	private static Connection obtenerConexionArcos() throws SQLException {
+		return odsArcos.getConnection();
+	}
 	
 	/** conectar a todas las db.
 	 */
@@ -117,7 +121,9 @@ public class BbddRunner {
     	Memcache.disable();
 	}
 	
-	/** ejecuta instrucciones SQL del fichero separadas por ;.
+	/** ejecuta instrucciones SQL del fichero separadas por ; en bbdd uvirtual.
+	 * 
+	 * <p>los comentarios deben empezar por -- y terminar en la misma linea en ;.</p>
 	 * @param rutaFichero ruta del fichero a cargar
 	 * @throws SQLException si error en bd
 	 * @throws FileNotFoundException si no existe fichero
@@ -126,62 +132,121 @@ public class BbddRunner {
 		try (Connection con = obtenerConexionUvirtual();
 			 Statement statement = con.createStatement()) {
 			try (Scanner s = new Scanner(new BufferedReader(new FileReader(rutaFichero)))) {
-				s.useDelimiter(";");
-				while (s.hasNext()) {
-					String instruccion = s.next().trim();
-					if (VERBOSE) {
-						LOGGER.log(Level.INFO, instruccion);
-						LOGGER.log(Level.INFO, "-------------------------------------------------");
-					}
-					statement.execute(instruccion);
-				}
+				procesarLineaInsertMasivo(s, statement);
 			}
 		}
 	}
 	
-	/** ejecutar fichero con instrucciones SQL separada por el delimitador.
+	/** ejecuta instrucciones SQL del fichero separadas por ; en bbdd arcos.
+	 * 
+	 * <p>los comentarios deben empezar por -- y terminar en la misma linea en ;.</p>
+	 * @param rutaFichero ruta del fichero a cargar
+	 * @throws SQLException si error en bd
+	 * @throws FileNotFoundException si no existe fichero
+	 */
+	public static void insertMasivoArcos(String rutaFichero) throws SQLException, FileNotFoundException {
+		try (Connection con = obtenerConexionArcos();
+			 Statement statement = con.createStatement()) {
+			try (Scanner s = new Scanner(new BufferedReader(new FileReader(rutaFichero)))) {
+				procesarLineaInsertMasivo(s, statement);
+			}
+		}
+	}
+	
+	private static void procesarLineaInsertMasivo(Scanner s, Statement statement) throws SQLException {
+		s.useDelimiter(";");
+		while (s.hasNext()) {
+			String instruccion = s.next().trim();
+			if (VERBOSE) {
+				LOGGER.log(Level.INFO, instruccion);
+				LOGGER.log(Level.INFO, "-------------------------------------------------");
+			}
+			if (instruccion.startsWith("--")) {
+				LOGGER.log(Level.INFO, instruccion);
+			} else {
+				statement.execute(instruccion);
+			}
+		}
+	}
+	
+	private static void procesarLineaEjecutar(Scanner s, Statement statement) throws SQLException {
+		final int longitudMinimaIntruccion = 10;
+		s.useDelimiter("--/////////////////////");
+		while (s.hasNext()) {
+			boolean ejecutado = false;
+			boolean quitarFinal = true;
+			String instruccion = s.next().trim();
+			instruccion = limpiaComentarios(instruccion);
+			instruccion = instruccion.trim();
+			instruccion = instruccion.replace("CREATE TRIGGER", "create trigger");
+			instruccion = instruccion.replace("DROP", "drop");
+			if (instruccion.startsWith("create trigger")) {
+				quitarFinal = false;
+			}
+			if (quitarFinal && instruccion.endsWith(";")) {
+				instruccion = instruccion.substring(0, instruccion.length() - 1);
+			}
+			if (VERBOSE) {
+				LOGGER.log(Level.INFO, instruccion);
+				LOGGER.log(Level.INFO, "-------------------------------------------------");
+			}
+			if (instruccion.startsWith("drop")) {
+				String[] partes = instruccion.split(" ");
+				drop(partes[1], partes[2]);
+				ejecutado = true;
+			}
+			if (instruccion.startsWith("--")) {
+				ejecutado = true;
+			}
+			if (!ejecutado && instruccion.length() > longitudMinimaIntruccion) {
+					statement.execute(instruccion);
+			}
+		}
+	}
+	
+	private static String limpiaComentarios(String cadena) {
+		StringBuilder salida = new StringBuilder();
+		String[] lineas = cadena.split("\\r?\\n");
+		for (String linea : lineas) {
+			int offset = linea.indexOf("--");
+			if (-1 != offset) {
+			    salida.append(linea.substring(0, offset));
+			} else {
+				salida.append(linea);
+			}
+			salida.append(System.lineSeparator());
+		}
+		return salida.toString();
+	}
+
+	/** ejecutar fichero con instrucciones SQL separada por el delimitadoren bd uvirtual.
 	 * @param rutaFichero ruta del fichero a cargar en la bd
 	 * @throws IOException si error lectura fichero
 	 * @throws SQLException si error en bd
 	 */
 	public static void ejecutar(String rutaFichero) throws IOException, SQLException {
-		final int longitudMinimaIntruccion = 10;
 		try (Connection con = obtenerConexionUvirtual();
 			 Statement statement = con.createStatement()) {
 			try (Scanner s = new Scanner(new BufferedReader(new FileReader(rutaFichero)))) {
-				s.useDelimiter("--/////////////////////");
-				while (s.hasNext()) {
-					boolean ejecutado = false;
-					boolean quitarFinal = true;
-					String instruccion = s.next().trim();
-					instruccion = instruccion.replace("CREATE TRIGGER", "create trigger");
-					instruccion = instruccion.replace("DROP", "drop");
-					if (instruccion.startsWith("create trigger")) {
-						quitarFinal = false;
-					}
-					if (quitarFinal && instruccion.endsWith(";")) {
-						instruccion = instruccion.substring(0, instruccion.length() - 1);
-					}
-					if (VERBOSE) {
-						LOGGER.log(Level.INFO, instruccion);
-						LOGGER.log(Level.INFO, "-------------------------------------------------");
-					}
-					if (instruccion.startsWith("drop")) {
-						String[] partes = instruccion.split(" ");
-						drop(partes[1], partes[2]);
-						ejecutado = true;
-					}
-					if (instruccion.startsWith("--")) {
-						ejecutado = true;
-					}
-					if (!ejecutado && instruccion.length() > longitudMinimaIntruccion) {
-							statement.execute(instruccion);
-					}
-				}
+				procesarLineaEjecutar(s, statement);
 			}
 		}
 	}
 	
+	/** ejecutar fichero con instrucciones SQL separada por el delimitadoren bd Arcos.
+	 * @param rutaFichero ruta del fichero a cargar en la bd
+	 * @throws IOException si error lectura fichero
+	 * @throws SQLException si error en bd
+	 */
+	public static void ejecutarArcos(String rutaFichero) throws IOException, SQLException {
+		try (Connection con = obtenerConexionArcos();
+			 Statement statement = con.createStatement()) {
+			try (Scanner s = new Scanner(new BufferedReader(new FileReader(rutaFichero)))) {
+				procesarLineaEjecutar(s, statement);
+			}
+		}
+	}
+
 	/** Borrar elemento de la bbdd.
 	 * @param tipo tipo de elemento, como tabla, secuencia, etc
 	 * @param nombre nombre del elemento a borrar
