@@ -68,11 +68,9 @@ pipeline {
 
     post {
     	success {
-			steps {
-				emailext mimeType: "text/html", to: 'jmoral@ujaen.es',
-				body: '${FILE,path="builds/build/rama/site/jacoco/index.html"}', 
-				subject: "Job ${env.JOB_NAME}"
-			}    	 
+			emailext mimeType: "text/html", to: 'jmoral@ujaen.es',
+			body: '${FILE,path="builds/build/rama/site/jacoco/index.html"}', 
+			subject: "Job ${env.JOB_NAME}"
     	}
         always {
             echo "-=- fin -=-"
