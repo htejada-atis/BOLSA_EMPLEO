@@ -68,11 +68,14 @@ pipeline {
 
     post {
     	success {
-			emailext mimeType: "text/html", to: 'jmoral@ujaen.es',
-			body: '${FILE,path="builds/build/rama/site/jacoco/index.html"}', 
-			subject: "Job ${env.JOB_NAME}"
+            echo "-=- fin correcto -=-"
     	}
         always {
+    		zip zipFile: 'builds/build/rama/site/jacoco/unittest.zip', archive: false, dir: 'builds/build/rama/site/jacoco/'
+			emailext mimeType: "text/html", to: 'jmoral@ujaen.es',
+				attachLog: true, attachmentsPattern: 'builds/build/rama/site/jacoco/unittest.zip',
+				body: '${FILE,path="builds/build/rama/site/jacoco/index.html"}', 
+				subject: "Job ${env.JOB_NAME}"
             echo "-=- fin -=-"
         }
     }
