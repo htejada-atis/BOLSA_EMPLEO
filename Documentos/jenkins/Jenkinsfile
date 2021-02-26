@@ -72,7 +72,7 @@ pipeline {
     	}
         always {
         	script {
-	    		zip zipFile: 'builds/build/rama/site/jacoco/unittest.zip', archive: false, dir: 'builds/build/rama/site/jacoco/', overwrite: true
+	    		zip zipFile: 'builds/build/rama/site/jacoco/unittest.zip', archive: false, dir: 'builds/build/rama/site/jacoco/', overwrite: true, glob: '**/*.txt'
         	}
 			emailext to: 'jmoral@ujaen.es',
 				attachLog: true, attachmentsPattern: 'builds/build/rama/site/jacoco/unittest.zip',
