@@ -71,7 +71,9 @@ pipeline {
             echo "-=- fin correcto -=-"
     	}
         always {
-    		zip zipFile: 'builds/build/rama/site/jacoco/unittest.zip', archive: false, dir: 'builds/build/rama/site/jacoco/'
+        	script {
+	    		zip zipFile: 'builds/build/rama/site/jacoco/unittest.zip', archive: false, dir: 'builds/build/rama/site/jacoco/'
+        	}
 			emailext mimeType: "text/html", to: 'jmoral@ujaen.es',
 				attachLog: true, attachmentsPattern: 'builds/build/rama/site/jacoco/unittest.zip',
 				body: '${FILE,path="builds/build/rama/site/jacoco/index.html"}', 
