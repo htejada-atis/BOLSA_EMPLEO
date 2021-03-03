@@ -5,7 +5,7 @@ pipeline {
 
     environment {
     	SONAR_LOGIN = "5930772e8594b769aece20c43aa3ceb3b4f4bf24"
-    	SONAR_PROYECTKEY = "${JOB_NAME}"
+    	SONAR_PROYECTKEY = "${JOB_NAME}".replace("\\", "-")
         APP_LISTENING_PORT = "8080"
         TEST_CONTAINER_NAME = "ci-${APP_NAME}-${BUILD_NUMBER}"
         SERVIDOR_ARGO_KUBERNETES = "jenkins.ujaen.es:5463"
