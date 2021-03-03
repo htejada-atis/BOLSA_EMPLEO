@@ -1,7 +1,7 @@
 #!groovy
 
 pipeline {
-    agent any
+    agent { label 'usig-jenkins'}
 
     environment {
     	SONAR_LOGIN = "5930772e8594b769aece20c43aa3ceb3b4f4bf24"
