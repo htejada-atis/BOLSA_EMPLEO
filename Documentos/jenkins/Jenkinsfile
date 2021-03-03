@@ -6,6 +6,7 @@ pipeline {
     environment {
     	SONAR_LOGIN = "5930772e8594b769aece20c43aa3ceb3b4f4bf24"
     	SONAR_PROYECTKEY = "uv-externo-isoin"
+    	FORK_NAME = "isoin"
         APP_LISTENING_PORT = "8080"
         TEST_CONTAINER_NAME = "ci-${APP_NAME}-${BUILD_NUMBER}"
         SERVIDOR_ARGO_KUBERNETES = "jenkins.ujaen.es:5463"
@@ -20,33 +21,37 @@ pipeline {
 	             	 subject: "Iniciando jenkins pipeline ${JOB_NAME} (${BUILD_NUMBER}) ",
 	             	 to: 'jmoral@ujaen.es'
 	        	echo 'Inicio compile'
-	        	git branch: "${BRANCH_NAME}", credentialsId:'gitlab-jenkins', url: 'https://gitujap.ujaen.es/isoin/uv-externo.git'
+	        	git branch: "${BRANCH_NAME}", credentialsId:'gitlab-jenkins', url: "https://gitujap.ujaen.es/${FORK_NAME}/uv-externo.git"
 	        	withAnt(installation: 'LocalAnt') {
-		            sh "ant compile"
+		            sh "ant war"
 	        	}
         	}
     	}
-    	stage('Unit tests') {
+    	stage('sidecards') {
 			steps {
 				echo 'Inicio unittest'
-	        	//withAnt(installation: 'LocalAnt') {
-	        	//    sh "ant test"
-	        	//}
-	        }
-	    }
-	    stage('test mutantes') {
-	    	steps {
-	        	echo 'Inicio test mutantes'
-	        }
-	    }
-	    stage('Package') {
-	    	steps {
-	        	echo 'Inicio package'
+				script {
+                    docker.withRegistry( 'https://usig-registrydocker.ujaen.es:5044', 'portus-jenkins' ) {
+                        sh '''
+                            chmod a+x ${WORKSPACE}/Documentos/docker/wait-for-it.sh
+                            export ORACLE_SCRIPTS_STARTUP=${WORKSPACE}/Documentos/docker/init-oracle
+                            export ORACLE_DATA=/home/jenkins-nodo/oracledata
+                            docker-compose build
+                            docker-compose up -d
+                           '''
+                    }
+	        	}
 	        }
 	    }
 	    stage('Build docker') {
 	    	steps {
 	        	echo 'Inicio build docker'
+	        	script {
+                    docker.withRegistry( 'https://usig-registrydocker.ujaen.es:5044', 'portus-jenkins' ) {
+    	        	    def dockerImage = docker.build("usig-registrydocker.ujaen.es:5044/uvirtual/uv-desarrollo-ci", ".") 
+                        dockerImage.push()
+                    }
+	        	}
 	        }
 	    }
 	    stage('sonar') {
@@ -54,7 +59,7 @@ pipeline {
 		        echo 'Inicio sonar'
 		        withSonarQubeEnv('sonar docker') { 
 		            withAnt(installation: 'LocalAnt') {
-		               sh "ant sonar -Dsonar.projectKey=${SONAR_PROYECTKEY}"
+		               sh "ant sonar -Dsonar.projectKey=${SONAR_PROYECTKEY} -DdbUrl=127.0.0.1 -DmemcacheUrl=127.0.0.1"
 		            }
 		        }
 	        }        

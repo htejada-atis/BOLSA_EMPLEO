@@ -22,7 +22,7 @@ public class BbddRunner {
 	private static final String NOMBREDEESTACLASE = BbddRunner.class.getName();
 	private static final Logger LOGGER = Logger.getLogger(NOMBREDEESTACLASE);
 	
-    private static String cadenaConexion = "jdbc:oracle:thin:@jenkins.ujaen.es:1521:XE";
+    private static String cadenaConexionDefecto = "jdbc:oracle:thin:@jenkins.ujaen.es:1521:XE";
     private static String usuarioBdUv = "uvirtual";
     private static String usuarioBdArcos = "arcos";
     private static String usuarioBdRh = "uxxirrhh";
@@ -33,7 +33,7 @@ public class BbddRunner {
     private static OracleDataSource odsRh = null;
     private static OracleDataSource odsAc = null;
     
-    private static String servidorMemcache = "jenkins.ujaen.es";
+    private static String servidorMemcacheDefecto = "jenkins.ujaen.es";
 
     public static final boolean VERBOSE = false;
 	
@@ -43,22 +43,22 @@ public class BbddRunner {
     	LOGGER.log(Level.INFO, "inicializacion de oracle");
 		try {
 			odsUv = new OracleDataSource();
-			odsUv.setURL(cadenaConexion);
+			odsUv.setURL(getCadenaConexionBd());
 			odsUv.setUser(usuarioBdUv);
 			odsUv.setPassword(pwBd);
 
 			odsArcos = new OracleDataSource();
-			odsArcos.setURL(cadenaConexion);
+			odsArcos.setURL(getCadenaConexionBd());
 			odsArcos.setUser(usuarioBdArcos);
 			odsArcos.setPassword(pwBd);
 
 			odsRh = new OracleDataSource();
-			odsRh.setURL(cadenaConexion);
+			odsRh.setURL(getCadenaConexionBd());
 			odsRh.setUser(usuarioBdRh);
 			odsRh.setPassword(pwBd);
 
 			odsAc = new OracleDataSource();
-			odsAc.setURL(cadenaConexion);
+			odsAc.setURL(getCadenaConexionBd());
 			odsAc.setUser(usuarioBdAc);
 			odsAc.setPassword(pwBd);
 			
@@ -267,7 +267,22 @@ public class BbddRunner {
 		}
 	}
 	
+	/** devuelve el servidor memcache.
+	 * @return servidor memcache a usar
+	 */
 	public static String getServidorMemcache() {
-		return servidorMemcache;
+		String memcacheSystem = System.getProperty("memcacheUrl");
+		if (memcacheSystem != null && !"".equals(memcacheSystem)) {
+			return memcacheSystem;
+		}
+		return servidorMemcacheDefecto;
+	}
+	
+	private static String getCadenaConexionBd() {
+		String urlDbSystem = System.getProperty("dbUrl");
+		if (urlDbSystem != null && !"".equals(urlDbSystem)) {
+			return "jdbc:oracle:thin:@" + urlDbSystem + ":1521:XE";
+		}
+		return cadenaConexionDefecto;
 	}
 }
