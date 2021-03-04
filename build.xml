@@ -186,6 +186,7 @@
 	            		<include name="basicos/Test*.java"/>
 	            		<include name="unitarios/Test*.java"/>
 	            		<include name="controlador/Test*.java"/>
+	            		<include name="usuario/Test*.java"/>
 	            	</fileset>
 	            </batchtest>
 	        </junit>
