@@ -76,6 +76,7 @@ pipeline {
     	}
         always {
         	script {
+        	    sh "touch builds/build/rama/site/jacoco/unittest.zip"
 	    		zip zipFile: 'builds/build/rama/site/jacoco/unittest.zip', archive: false, dir: 'builds/build/rama/site/jacoco/', overwrite: true, glob: '**/*.txt'
         	}
 			emailext to: 'jmoral@ujaen.es',
