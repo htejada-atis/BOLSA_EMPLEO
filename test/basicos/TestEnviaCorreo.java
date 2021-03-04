@@ -1,5 +1,6 @@
 package basicos;
 
+import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 
 import java.io.IOException;
@@ -67,6 +68,7 @@ public class TestEnviaCorreo {
 	@Test
 	public void testA2() {
 		EnviaCorreo.recargarConfiguracion();
+		assertTrue(true);
 	}
 
 }
