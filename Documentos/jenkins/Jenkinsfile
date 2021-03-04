@@ -79,14 +79,10 @@ pipeline {
         	    sh "touch builds/build/rama/site/jacoco/unittest.zip"
 	    		zip zipFile: 'builds/build/rama/site/jacoco/unittest.zip', archive: false, dir: 'builds/build/rama/site/jacoco/', overwrite: true, glob: '**/*.txt'
         	}
-			emailext to: 'jmoral@ujaen.es',
-				attachLog: true, attachmentsPattern: 'builds/build/rama/site/jacoco/unittest.zip',
-				body: "Subida nueva version de uv-externo ${BRANCH_NAME}\n Construccion en: ${BUILD_URL}", 
-				subject: "Job ${env.JOB_NAME}"
 			emailext mimeType: "text/html", to: 'jmoral@ujaen.es',
-				attachLog: true,
+				attachLog: true, attachmentsPattern: 'builds/build/rama/site/jacoco/unittest.zip',
 				body: '${FILE,path="builds/build/rama/site/jacoco/index.html"}', 
-				subject: "Job ${env.JOB_NAME}"
+				subject: "Iniciando jenkins pipeline ${JOB_NAME} (${BUILD_NUMBER}) "
             echo "-=- fin -=-"
         }
     }
