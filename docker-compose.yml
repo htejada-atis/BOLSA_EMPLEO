@@ -5,7 +5,7 @@ services:
     image: memcached:latest
 
   oracledb:
-    image: oracle/database:18.4.0-xe
+    image: usig-registrydocker.ujaen.es:5044/uvirtual/oracle/database:18.4.0-xe
     environment:
       - ORACLE_PWD=pwd123
       - ORACLE_CHARACTERSET=AL32UTF8
@@ -13,8 +13,8 @@ services:
       - 1521:1521 
       - 5500:5500
     volumes:
-      - /home/usuario/Documentos/oracle-docker/volumes/oradata:/opt/oracle/oradata
-      - /home/usuario/git/uv-desarrollo/Documentos/docker/init-oracle:/opt/oracle/scripts/startup
+      - '${ORACLE_DATA}:/opt/oracle/oradata'
+      - '${ORACLE_SCRIPTS_STARTUP}:/opt/oracle/scripts/startup'
 
   uvirtual:
     build: .
