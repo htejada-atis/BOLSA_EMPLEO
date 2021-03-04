@@ -82,7 +82,7 @@ pipeline {
 			emailext mimeType: "text/html", to: 'jmoral@ujaen.es',
 				attachLog: true, attachmentsPattern: 'builds/build/rama/site/jacoco/unittest.zip',
 				body: '${FILE,path="builds/build/rama/site/jacoco/index.html"}', 
-				subject: "Iniciando jenkins pipeline ${JOB_NAME} (${BUILD_NUMBER}) "
+				subject: "Completado jenkins pipeline ${JOB_NAME} (${BUILD_NUMBER}) "
             echo "-=- fin -=-"
         }
     }
