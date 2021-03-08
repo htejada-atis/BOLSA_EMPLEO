@@ -20,14 +20,14 @@ public class DriverUv {
 	
 	/** inicializa el driver. */
 	public static void inicializaDriver() {
-		System.setProperty("webdriver.gecko.driver", "Documentos/selenium/drivers/geckodriver.exe");
+		System.setProperty("webdriver.gecko.driver", "Documentos/selenium/drivers/geckodriver");
 		driver = new FirefoxDriver();
 		driver.manage().timeouts().pageLoadTimeout(TIEMPO_MAXIMO_ESPERA, TimeUnit.SECONDS);
 	}
 	
 	/** realiza el login del usuario. */
 	public static void login() {
-		driver.get("http://localhost:8080/srv/es/index");
+		driver.get("http://localhost:8888/srv/es/index");
 		WebElement username = driver.findElement(By.name("usuario"));
 		username.sendKeys("usig");
 		username.submit();

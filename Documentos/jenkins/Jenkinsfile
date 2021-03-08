@@ -1,0 +1,94 @@
+#!groovy
+
+pipeline {
+    agent { label 'usig-jenkins'}
+
+    environment {
+    	SONAR_LOGIN = "5930772e8594b769aece20c43aa3ceb3b4f4bf24"
+    	SONAR_PROYECTKEY = "${JOB_NAME}".replace("/", "-")
+        APP_LISTENING_PORT = "8080"
+        TEST_CONTAINER_NAME = "ci-${APP_NAME}-${BUILD_NUMBER}"
+        SERVIDOR_ARGO_KUBERNETES = "jenkins.ujaen.es:5463"
+    }
+
+    stages {
+		stage('Compile') {
+			steps {
+	        	mail bcc: '', 
+	            	 body: "Subida nueva version de uv-externo ${BRANCH_NAME}\n Construccion en: ${BUILD_URL}",
+	             	 cc: '', from: '', replyTo: '', 
+	             	 subject: "Iniciando jenkins pipeline ${JOB_NAME} (${BUILD_NUMBER}) ",
+	             	 to: 'jmoral@ujaen.es'
+	        	echo 'Inicio compile'
+	        	git branch: "${BRANCH_NAME}", credentialsId:'gitlab-jenkins', url: "${GIT_URL}"
+	        	withAnt(installation: 'LocalAnt') {
+		            sh "ant war"
+	        	}
+        	}
+    	}
+    	stage('sidecards') {
+			steps {
+				echo 'Inicio unittest'
+				script {
+                    docker.withRegistry( 'https://usig-registrydocker.ujaen.es:5044', 'portus-jenkins' ) {
+                        sh '''
+                            chmod a+x ${WORKSPACE}/Documentos/docker/wait-for-it.sh
+                            export ORACLE_SCRIPTS_STARTUP=${WORKSPACE}/Documentos/docker/init-oracle
+                            export ORACLE_DATA=/home/jenkins-nodo/oracledata
+                            docker-compose build
+                            docker-compose up -d
+                           '''
+                        sleep(time:5,unit:"MINUTES")
+                    }
+	        	}
+	        }
+	    }
+	    stage('Build docker') {
+	    	steps {
+	        	echo 'Inicio build docker'
+	        	script {
+                    docker.withRegistry( 'https://usig-registrydocker.ujaen.es:5044', 'portus-jenkins' ) {
+    	        	    def dockerImage = docker.build("usig-registrydocker.ujaen.es:5044/uvirtual/uv-desarrollo-ci", ".") 
+                        dockerImage.push()
+                    }
+	        	}
+	        }
+	    }
+	    stage('sonar') {
+	    	steps {
+		        echo 'Inicio sonar'
+		        withSonarQubeEnv('sonar docker') { 
+		            withAnt(installation: 'LocalAnt') {
+		               sh "ant sonar -Dsonar.projectKey=${SONAR_PROYECTKEY} -DdbUrl=127.0.0.1 -DmemcacheUrl=127.0.0.1"
+		            }
+		        }
+	        }        
+	    }
+	    stage('push docker') {
+	    	steps {
+	        	echo 'Inicio push docker'
+	       	}
+    	}        
+    }
+
+    post {
+    	success {
+            echo "-=- fin correcto -=-"
+    	}
+    	failure {
+            echo "-=- fin ERROR -=-"
+    	}
+        always {
+        	script {
+        	    sh "touch builds/build/rama/site/jacoco/unittest.zip"
+	    		zip zipFile: 'builds/build/rama/site/jacoco/unittest.zip', archive: false, dir: 'builds/build/rama/site/jacoco/', overwrite: true, glob: '**/*.txt'
+        	}
+			emailext mimeType: "text/html", to: 'jmoral@ujaen.es',
+				attachLog: true, attachmentsPattern: 'builds/build/rama/site/jacoco/unittest.zip',
+				body: '${FILE,path="builds/build/rama/site/jacoco/index.html"}', 
+				subject: "Completado jenkins pipeline ${JOB_NAME} (${BUILD_NUMBER}) "
+    		sh "docker-compose down || true"
+            echo "-=- fin -=-"
+        }
+    }
+}
