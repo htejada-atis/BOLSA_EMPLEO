@@ -58,25 +58,27 @@
 
 	
 	<!-- Define the SonarQube global properties (the most usual way is to pass these properties via the command line) -->
-	<property name="sonar.host.url" value="http://192.168.56.10:9000" />
+	<property name="sonar.host.url" value="http://jenkins.ujaen.es:9000" />
 
 	<!-- Define the SonarQube project properties -->
-	<property name="sonar.projectKey" value="org.sonarqube:sonarqube-scanner-ant" />
-	<property name="sonar.projectName" value="uv-externo" />
+	<!--<property name="sonar.projectKey" value="org.sonarqube:sonarqube-scanner-ant" />-->
+	<!--<property name="sonar.projectName" value="uv-externo" />-->
+	<property name="sonar.login" value="usuario_jenkins" />
+	<property name="sonar.password" value="usuario_jenkins" />
 	<property name="sonar.projectVersion" value="1.0" />
-	<property name="sonar.sources" value="src,Webcontent" />
+	<property name="sonar.sources" value="src,WebContent" />
 	<property name="sonar.tests" value="test" />
 	<property name="sonar.java.test.libraries" value="Documentos/junit" />
 	<property name="sonar.java.test.binaries" value="${build.test}" />
-	<property name="sonar.java.binaries" value="build" />
+	<property name="sonar.java.binaries" value="${build}" />
 	<property name="sonar.java.libraries" value="WebContent/WEB-INF/lib/*.jar" />
 	<property name="sonar.java.source" value="11" />
 	<property name="sonar.sourceEncoding" value="utf-8" />
 	<property name="sonar.coverage.jacoco.xmlReportPaths" value="${result.report.dir}/report.xml" />
 	<property name="sonar.junit.reportsPaths" value="${result.report.dir}"/>
-	<property name="sonar.testExecutionReportPaths" value="builds/jest-tests/test-reporter.xml"/>
+	<!--<property name="sonar.testExecutionReportPaths" value="builds/jest-tests/test-reporter.xml"/> -->
 	
-	<!--<property name="sonar.scm.provider" value="git" />-->
+	<property name="sonar.scm.provider" value="git" />
 	
 	<target name="init">
 		<!-- time stamp -->
@@ -169,6 +171,8 @@
 	<target name="test" depends="compile">
 	    <jacoco:coverage destfile="${result.exec.file}" xmlns:jacoco="antlib:org.jacoco.ant" exclclassloader="sun.reflect.DelegatingClassLoader:javassist.Loader" >
 	        <junit haltonfailure="no" fork="true" forkmode="once" printsummary="on" showoutput="true" logfailedtests="true">
+	        	<sysproperty key="dbUrl" value="${dbUrl}"/>
+	        	<sysproperty key="memcacheUrl" value="${memcacheUrl}"/>
 				<classpath>
 				    <path refid="classpath"/>
 					<path refid="classpath.test"/>
@@ -182,6 +186,7 @@
 	            		<include name="basicos/Test*.java"/>
 	            		<include name="unitarios/Test*.java"/>
 	            		<include name="controlador/Test*.java"/>
+	            		<include name="usuario/Test*.java"/>
 	            	</fileset>
 	            </batchtest>
 	        </junit>

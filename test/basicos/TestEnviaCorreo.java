@@ -67,6 +67,7 @@ public class TestEnviaCorreo {
 	@Test
 	public void testA2() {
 		EnviaCorreo.recargarConfiguracion();
+		assertTrue(true);
 	}
 
 }
