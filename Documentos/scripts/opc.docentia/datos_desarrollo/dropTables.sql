@@ -1,4 +1,5 @@
-DROP TABLE dct_convocatorias_hto;
+--Drop de todas las tablas y secuencias
+DROP TABLE dct_convocatorias_hto; --comentario
 --/////////////////////
 DROP TABLE dct_convocatorias;
 --/////////////////////

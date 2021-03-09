@@ -7,7 +7,7 @@ services:
       - 11211:11211 
 
   oracledb:
-    image: oracle/database:18.4.0-xe
+    image: usig-registrydocker.ujaen.es:5044/uvirtual/oracle/database:18.4.0-xe
     environment:
       - ORACLE_PWD=pwd123
       - ORACLE_CHARACTERSET=AL32UTF8
