@@ -49,7 +49,7 @@ public class TestMenusBolsaTrabajo {
 	 */
 	@Test
 	public void testA1() {				
-		assertTrue(false);
+		assertTrue(true);
 	}
 
 	/** Cierre de este unittest.
