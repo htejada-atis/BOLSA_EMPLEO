@@ -23,9 +23,15 @@ public class UtilsTestBolsaEmpleo {
 	 * @throws IOException si error io
 	 */
 	public static void inicializaBolsaEmpleo() throws SQLException, IOException {
+		// limpieza
+		BbddRunner.insertMasivo("Documentos/scripts/opc.bolsaempleo/datos_desarrollo/01-clean-menus.sql");
+		BbddRunner.insertMasivo("Documentos/scripts/opc.bolsaempleo/datos_desarrollo/02-clean-init.sql");
+		
+		// creación
+		BbddRunner.insertMasivo("Documentos/scripts/opc.bolsaempleo/01-init.sql");
+		BbddRunner.insertMasivo("Documentos/scripts/opc.bolsaempleo/02-menus.sql");
+		
 		// BbddRunner.insertMasivo("Documentos/scripts/opc.bolsaempleo/datos_desarrollo/dropTables.sql");
-		BbddRunner.insertMasivo("Documentos/scripts/opc.bolsaempleo/datos_desarrollo/cleanUv.sql");
-		BbddRunner.insertMasivo("Documentos/scripts/opc.bolsaempleo/uv.sql");
 		//BbddRunner.ejecutar("Documentos/scripts/opc.bolsaempleo/creartablasbolsaempleo.sql");
 		//BbddRunner.ejecutar("Documentos/scripts/opc.bolsaempleo/creacionsecuenciasytriggers.sql");
 		//BbddRunner.insertMasivo("Documentos/scripts/opc.bolsaempleo/datos_desarrollo/creacionregistrosprueba.sql");    	
@@ -37,10 +43,13 @@ public class UtilsTestBolsaEmpleo {
     public static PeticionHttp peticionAutenticada() {
 		UVDatos datos = new UVDatos();
 		datos.setIdentificadorUsuario(UID_PRUEBAS);
+		
 		Usuario usuario = CrearUsuario.usuario(UID_PRUEBAS);
 		datos.setUsuario(usuario);
+		
 		PeticionHttp peticion = new PeticionHttp();
 		peticion.setUVDatos(datos);
+		
 		return peticion;
     }
 	
