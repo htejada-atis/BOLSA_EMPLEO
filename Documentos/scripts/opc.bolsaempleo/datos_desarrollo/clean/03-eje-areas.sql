@@ -1,6 +1,6 @@
-DROP TABLE UVIRTUAL.TBEP_HTO_AREAS;
+DROP TABLE TBEP_HTO_AREAS;
 --/////////////////////
-DROP TABLE UVIRTUAL.TBEP_AREAS;
+DROP TABLE TBEP_AREAS;
 --/////////////////////
 DROP SEQUENCE QBEP_ARE;
 --/////////////////////
