@@ -1,40 +1,46 @@
 package bbdd;
 
+import java.io.File;
 import java.io.IOException;
 import java.sql.SQLException;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import controlador.implementacion.PeticionHttp;
 import es.ujaen.uvirtual.adm.CrearUsuario;
 import es.ujaen.uvirtual.beans.UVDatos;
 import es.ujaen.uvirtual.beans.Usuario;
 
-/** 
- * Utilidades para los test bolsa de empleo
+/** Utilidades para los test bolsa de empleo.
  */
 public class UtilsTestBolsaEmpleo {
-	
+	private static final String NOMBREDEESTACLASE = UtilsTestBolsaEmpleo.class.getName();
+	private static final Logger LOGGER = Logger.getLogger(NOMBREDEESTACLASE);
 	private static final String UID_PRUEBAS = "usig";
+	private static final int LONGITUD_NAME_SQL = 3;
 
 	private UtilsTestBolsaEmpleo() { }
 	
 	/** 
-	 * Inicializa la bd para BolsaEmpleo.
-	 * @throws SQLException si error sql
-	 * @throws IOException si error io
+	 * Inicializa la bd para BolsaEmpleo. 
 	 */
 	public static void inicializaBolsaEmpleo() throws SQLException, IOException {
+		File directoryPath;
+		File filesList[];
+		
 		// limpieza
-		BbddRunner.insertMasivo("Documentos/scripts/opc.bolsaempleo/datos_desarrollo/01-clean-menus.sql");
-		BbddRunner.insertMasivo("Documentos/scripts/opc.bolsaempleo/datos_desarrollo/02-clean-init.sql");
-		
+		directoryPath = new File("Documentos/scripts/opc.bolsaempleo/datos_desarrollo/clean");
+		filesList = directoryPath.listFiles();		
+		for (int i = filesList.length - 1; i >= 0; i--) {
+			UtilsTestBolsaEmpleo.ejecutarFile(filesList[i]);					
+	    }
+				
 		// creación
-		BbddRunner.insertMasivo("Documentos/scripts/opc.bolsaempleo/01-init.sql");
-		BbddRunner.insertMasivo("Documentos/scripts/opc.bolsaempleo/02-menus.sql");
-		
-		// BbddRunner.insertMasivo("Documentos/scripts/opc.bolsaempleo/datos_desarrollo/dropTables.sql");
-		//BbddRunner.ejecutar("Documentos/scripts/opc.bolsaempleo/creartablasbolsaempleo.sql");
-		//BbddRunner.ejecutar("Documentos/scripts/opc.bolsaempleo/creacionsecuenciasytriggers.sql");
-		//BbddRunner.insertMasivo("Documentos/scripts/opc.bolsaempleo/datos_desarrollo/creacionregistrosprueba.sql");    	
+		directoryPath = new File("Documentos/scripts/opc.bolsaempleo");
+		filesList = directoryPath.listFiles();
+		for (File file : filesList) {
+			UtilsTestBolsaEmpleo.ejecutarFile(file);
+		}
 	}
 	
     /** obtiene una peticion autenticada con el usuario de pruebas de BolsaEmpleo.
@@ -51,6 +57,30 @@ public class UtilsTestBolsaEmpleo {
 		peticion.setUVDatos(datos);
 		
 		return peticion;
+    }
+    
+    private static void ejecutarFile(File file) throws SQLException, IOException {
+    	String name = file.getName();
+    	String[] nameSplit = name.split("-");
+    	
+    	if (file.isDirectory() || nameSplit.length != LONGITUD_NAME_SQL) {
+    		LOGGER.log(Level.WARNING, "El nombre de sql no válido: " + name);
+    		return;
+    	}
+    	    	
+    	LOGGER.log(Level.INFO, "Ejecutando sql: " + file.getAbsolutePath());
+    	    	
+    	String methodKey = nameSplit[1];		
+		switch (methodKey) {
+		case "im":
+			BbddRunner.insertMasivo(file.getAbsolutePath());
+			break;
+		case "eje":
+			BbddRunner.ejecutar(file.getAbsolutePath());
+			break;
+		default:
+			LOGGER.log(Level.WARNING, "Error ejecutando fichero. No entiendo el tipo: " + name);						
+		}
     }
 	
 }
