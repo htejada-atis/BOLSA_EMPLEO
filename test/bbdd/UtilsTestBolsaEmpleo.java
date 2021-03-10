@@ -17,6 +17,7 @@ public class UtilsTestBolsaEmpleo {
 	private static final String NOMBREDEESTACLASE = UtilsTestBolsaEmpleo.class.getName();
 	private static final Logger LOGGER = Logger.getLogger(NOMBREDEESTACLASE);
 	private static final String UID_PRUEBAS = "usig";
+	private static final int LONGITUD_NAME_SQL = 3;
 
 	private UtilsTestBolsaEmpleo() { }
 	
@@ -60,14 +61,16 @@ public class UtilsTestBolsaEmpleo {
     
     private static void ejecutarFile(File file) throws SQLException, IOException {
     	String name = file.getName();
+    	String[] nameSplit = name.split("-");
     	
-    	if (file.isDirectory()) {
+    	if (file.isDirectory() || nameSplit.length != LONGITUD_NAME_SQL) {
+    		LOGGER.log(Level.WARNING, "El nombre de sql no válido: " + name);
     		return;
     	}
     	    	
-    	LOGGER.log(Level.INFO, "Ejecutando: " + file.getAbsolutePath());
+    	LOGGER.log(Level.INFO, "Ejecutando sql: " + file.getAbsolutePath());
     	    	
-    	String methodKey = name.split("-")[1];		
+    	String methodKey = nameSplit[1];		
 		switch (methodKey) {
 		case "im":
 			BbddRunner.insertMasivo(file.getAbsolutePath());
