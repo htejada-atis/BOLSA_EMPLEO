@@ -3,6 +3,7 @@ package bbdd;
 import java.io.File;
 import java.io.IOException;
 import java.sql.SQLException;
+import java.util.Arrays;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -30,14 +31,16 @@ public class UtilsTestBolsaEmpleo {
 		
 		// limpieza
 		directoryPath = new File("Documentos/scripts/opc.bolsaempleo/datos_desarrollo/clean");
-		filesList = directoryPath.listFiles();		
+		filesList = directoryPath.listFiles();
+		Arrays.sort(filesList);
 		for (int i = filesList.length - 1; i >= 0; i--) {
 			UtilsTestBolsaEmpleo.ejecutarFile(filesList[i]);					
 	    }
-				
+		
 		// creación
 		directoryPath = new File("Documentos/scripts/opc.bolsaempleo");
 		filesList = directoryPath.listFiles();
+		Arrays.sort(filesList);
 		for (File file : filesList) {
 			UtilsTestBolsaEmpleo.ejecutarFile(file);
 		}
