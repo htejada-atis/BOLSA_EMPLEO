@@ -1,7 +1,6 @@
 -- creación registros de prueba noticias;
 INSERT INTO TBEP_NOTICIAS (ENLACE,TEXTO)
-VALUES ('http://bcontratacion.ujaen.es/files/report_Resolucion_bolsa_PSI_2020.pdf','Resolución del Rectorado de la Universidad de Jaén, de 13 de abril de 2020, relativa a la bolsa de
-sustituciones del Personal Docente e Investigador. Curso 2020-2021');
+VALUES ('http://bcontratacion.ujaen.es/files/report_Resolucion_bolsa_PSI_2020.pdf','Resolución del Rectorado de la Universidad de Jaén, de 13 de abril de 2020, relativa a la bolsa de sustituciones del Personal Docente e Investigador. Curso 2020-2021');
 INSERT INTO TBEP_NOTICIAS (ENLACE,TEXTO)
 VALUES ('http://bcontratacion.ujaen.es/files/resolucion definitiva 191219_Firmada.pdf','Resolución del Vicerrectorado de Profesorado y Ordenación Académica por la que se publica el resultado definitivo de la baremación de las bolsas de sustitución de PDI de la Universidad de Jaén. Curso 2019/2020.');
 INSERT INTO TBEP_NOTICIAS (ENLACE,TEXTO)
