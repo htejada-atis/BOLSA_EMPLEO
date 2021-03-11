@@ -44,6 +44,14 @@ public class UtilsTestBolsaEmpleo {
 		for (File file : filesList) {
 			UtilsTestBolsaEmpleo.ejecutarFile(file);
 		}
+		
+		// datos de prueba
+		directoryPath = new File("Documentos/scripts/opc.bolsaempleo/datos_desarrollo/datos_prueba");
+		filesList = directoryPath.listFiles();
+		Arrays.sort(filesList);
+		for (File file : filesList) {
+			UtilsTestBolsaEmpleo.ejecutarFile(file);
+		}
 	}
 	
     /** obtiene una peticion autenticada con el usuario de pruebas de BolsaEmpleo.

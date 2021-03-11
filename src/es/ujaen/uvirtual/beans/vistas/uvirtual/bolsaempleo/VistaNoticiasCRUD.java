@@ -1,9 +1,9 @@
 package es.ujaen.uvirtual.beans.vistas.uvirtual.bolsaempleo;
 
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.List;
-
-import es.ujaen.uvirtual.beans.uvirtual.docentia.Convocatoria;
+import es.ujaen.uvirtual.beans.uvirtual.bolsaempleo.Noticia;
 import es.ujaen.uvirtual.beans.vistas.Vista;
 
 /** Bean para la vista.
@@ -11,16 +11,16 @@ import es.ujaen.uvirtual.beans.vistas.Vista;
  */
 public class VistaNoticiasCRUD extends Vista implements Serializable {
 	private static final long serialVersionUID = 1L;
-	private List<Convocatoria> convocatorias;
-	private Convocatoria convocatoria;
+	private List<Noticia> noticias = new ArrayList<>();
+	private Noticia noticia;
 	private String vista;
 	
-	public List<Convocatoria> getConvocatorias() {
-		return convocatorias;
+	public List<Noticia> getNoticias() {
+		return noticias;
 	}
 	
-	public void setConvocatorias(List<Convocatoria> convocatorias) {
-		this.convocatorias = convocatorias;
+	public void setNoticias(List<Noticia> noticias) {
+		this.noticias = noticias;
 	}
 	
 	public String getVista() {
@@ -31,12 +31,12 @@ public class VistaNoticiasCRUD extends Vista implements Serializable {
 		this.vista = vista;
 	}
 	
-	public Convocatoria getConvocatoria() {
-		return convocatoria;
+	public Noticia getNoticia() {
+		return noticia;
 	}
 	
-	public void setConvocatoria(Convocatoria convocatoria) {
-		this.convocatoria = convocatoria;
+	public void setNoticia(Noticia noticia) {
+		this.noticia = noticia;
 	}
 	
 }
