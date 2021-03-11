@@ -45,7 +45,7 @@ public class TestMenusBolsaTrabajo {
 		DriverUv.getDriver().get("http://localhost:8080/srv/es/informacionadministrativa/bolsaempleo");		
 	}
 	
-	/** Comprueba correcta navegación
+	/** Comprueba correcta navegación.
 	 */
 	@Test
 	public void testA1() {				
