@@ -39,9 +39,10 @@ VistaEstadoBolsas bean = (VistaEstadoBolsas) uvdatos.getVistas().get(VistaEstado
 				<td><%=bolsa.getIdBolsa()%></td>
 				<td><%=EscapaHTML.escapaHTML(bolsa.getArea().getNombre())%></td>
 				<td><%=bolsa.getEstado()%></td>
-				<td><%=Formateador.formatoFecha(bolsa.getFechaActualizacion(), Formateador.FORMATO_FECHA_DDMMYYYY)%></td>
-				<td><%=Formateador.formatoFecha(bolsa.getFechaBloqueo(), Formateador.FORMATO_FECHA_DDMMYYYY)%></td>
-				<td><%=Formateador.formatoFecha(bolsa.getFechaDesBloqueo(), Formateador.FORMATO_FECHA_DDMMYYYY)%></td>				
+				<td><%=bolsa.getFechaActualizacion() != null ? Formateador.formatoFecha(bolsa.getFechaActualizacion(), Formateador.FORMATO_FECHA_DDMMYYYY) : ""%></td>
+				<td><%=bolsa.getFechaBloqueo() != null ? Formateador.formatoFecha(bolsa.getFechaBloqueo(), Formateador.FORMATO_FECHA_DDMMYYYY) : ""%></td>
+				<td><%=bolsa.getFechaDesBloqueo() != null ? Formateador.formatoFecha(bolsa.getFechaDesBloqueo(), Formateador.FORMATO_FECHA_DDMMYYYY) : ""%></td>				
+				<td><%=bolsa.getBaremable()%></td>
 			</tr>
 		<% } %>
 	</table>

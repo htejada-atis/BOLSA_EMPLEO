@@ -53,7 +53,7 @@ public class ModeloBolsa {
 					bolsa.setEstado(rs.getString("ESTADO"));
 					bolsa.setFechaActualizacion(rs.getTimestamp("FECHAACTUALIZACION"));
 					bolsa.setFechaBloqueo(rs.getTimestamp("FECHABLOQUEO"));
-					bolsa.setFechaDesBloqueo(rs.getTimestamp(""));
+					bolsa.setFechaDesBloqueo(rs.getTimestamp("FECHADEBLOQUEO"));
 					
 					bolsas.add(bolsa);					
 				}

@@ -29,9 +29,10 @@ public class ModeloArea {
 	public Area getAreaById(int idArea) throws SQLException, UVException {
 		String consulta = "SELECT bepare.* FROM TBEP_AREAS bepare WHERE bepare.CODNUM = ?";				
 			
-		try (Connection conexion = ConexionUvirtual.obtenerInstancia(); 
-			 PreparedStatement stmt = conexion.prepareStatement(consulta);) {
-			
+		try (Connection conexion = ConexionUvirtual.obtenerInstancia();
+				PreparedStatement stmt = conexion.prepareStatement(consulta);) {
+			stmt.setInt(1, idArea);
+						
 			try (ResultSet rs = stmt.executeQuery()) {
 				if (!rs.next()) {
 					throw new UVException("No existe el area con id " + idArea);
