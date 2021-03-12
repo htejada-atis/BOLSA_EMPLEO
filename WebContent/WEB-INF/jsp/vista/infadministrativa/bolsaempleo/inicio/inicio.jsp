@@ -1,0 +1,115 @@
+<%@ page trimDirectiveWhitespaces="true"%>
+<%@	page import="es.ujaen.uvirtual.controlador.infadministrativa.bolsaempleo.ControladorIndice"%>
+<%@ page import="es.ujaen.uvirtual.beans.vistas.uvirtual.bolsaempleo.VistaNoticiasCRUD" %>
+<%@ page import="es.ujaen.uvirtual.beans.uvirtual.bolsaempleo.Noticia" %>
+<%@ page import="es.ujaen.uvirtual.beans.UVDatos"%>
+<%@ page import="es.ujaen.uvirtual.utilidades.Formateador"%>
+
+<% 
+UVDatos uvdatos = (UVDatos)request.getAttribute(UVDatos.NOMBRE_ATRIBUTO);
+VistaNoticiasCRUD bean = (VistaNoticiasCRUD)uvdatos.getVistas().get(VistaNoticiasCRUD.class.getName());
+%>
+
+<div class="bolsa-empleo">
+    <h2>Bolsa de empleo para PDI de la Universidad de Jaén</h2>
+    
+    <div class="nav-bolsa-empleo">
+        <%@ include file="includes/menu.jsp" %>
+    </div>
+    
+    <div class="descripcion-bolsa-empleo">
+    	<p>
+		  	 Lorem ipsum dolor sit amet, consectetur adipiscing elit.Praesent pellentesque nisi sit amet ultricies ultricies. Pellentesque at laoreet felis.
+		  	  Donec eros eros, scelerisque a lorem a, mollis placerat dui. In hac habitasse platea dictumst. Sed sed tempus sem.
+		  	   Quisque ut urna ut dolor cursus pretium. Proin vulputate vehicula tempus. Sed malesuada mi nec orci posuere, eget malesuada libero scelerisque. 
+		  	   Duis vitae sem pulvinar diam rutrum iaculis ac eget eros. Quisque nec nisl eu orci tristique facilisis vehicula eu justo.
+		  	    Vestibulum id leo luctus dui scelerisque dapibus. Ut eget ante lacus.
+			<br/><br/>
+			Morbi rhoncus fringilla nisl id egestas. Praesent venenatis bibendum felis, in fermentum neque. Nulla ornare sollicitudin consectetur.
+			 Pellentesque habitant morbi tristique senectus et netus et malesuada fames ac turpis egestas. Mauris luctus in leo ut euismod.
+			  Mauris sollicitudin quis ex sit amet dictum. Duis sit amet libero in ex imperdiet lacinia ac nec erat. Vivamus vitae lacinia odio, vitae bibendum arcu.
+			   Quisque eleifend nec quam a lacinia. Phasellus scelerisque elit mi, in faucibus nisl ullamcorper tempus. Donec posuere quam id vestibulum suscipit. 
+    	</p>
+    </div>
+    
+    <div class="noticias-bolsa-empleo">
+       	<h4>Noticias y Novedades</h4>
+		<ul>
+			<% for(Noticia noticia:bean.getNoticias()) { %>
+				<%@ include file="includes/noticia.jsp" %>
+			<% } %>
+		</ul>
+		<div class="row-ver-todas" id="view_all"> (<a href="#">Ver todas</a>) </div>
+    </div>
+
+</div>
+
+<script type="text/javascript">
+	$(document).ready(function(){
+		var ids_noticias = new Array();
+		
+		function comprobarNoticiasCargadas() {
+			$(".noticias-bolsa-empleo ul").children("li").each(function() {
+				ids_noticias.push($(this).attr("id").split("_")[1])
+			});
+		}
+		
+		function obtenerRestoDeNoticias() {
+			ids_noticias = []
+			comprobarNoticiasCargadas();
+			
+			var params = {'a':'listar_todas_noticias', 'ids_noticias': JSON.stringify(ids_noticias)}
+			console.log(params);
+			$.ajax({
+		        type: "GET",
+		        url: "<%= request.getRequestURI() %>",
+		        contentType: "application/json",
+		        dataType: "json",
+		        data: params,
+		        success: function(response) {
+		            console.log(response);
+		            response.noticias.forEach((noticia) => {
+		            	var element = $(".noticias-bolsa-empleo li").first().clone();
+		            	element.attr("id", "id_"+noticia.idNoticia);
+		            	element.find("a").attr("href", noticia.enlace);
+		            	element.find("a").text(noticia.texto);
+		            	element.find(".feacha-noticia").text(noticia.fecha);
+		            	console.log(element);
+		            	$(".noticias-bolsa-empleo ul").append(element);
+		            	$("#view_all a").text("Ver menos");
+		            	view_all = false;
+		            });
+		        },
+		        error: function(response) {
+		            console.log(response);
+		        }
+		    });
+		}
+		
+		var view_all = true;
+		document.getElementById("view_all").addEventListener("click", function(event){
+			event.preventDefault();
+			if(view_all) {
+				obtenerRestoDeNoticias();
+			} else {
+				console.log("entra acá")
+				$(".noticias-bolsa-empleo ul").children("li").each(function(i) {
+					if(i > 2) {
+						$(this).remove();
+					}
+				});
+				$("#view_all a").text("Ver mas");
+				view_all = true;
+			}
+			
+		});
+		
+		comprobarNoticiasCargadas();
+		
+		if(!ids_noticias.length > 0) {
+			$("#view_all").hide();
+		}
+		
+	});
+
+</script>
