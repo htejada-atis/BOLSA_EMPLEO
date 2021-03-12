@@ -5,7 +5,7 @@
         </a>
     </li>
     <li>
-        <a id="menu_acerca_de" href="<%= request.getRequestURI() %>?a=acerca_de" rel="history" title="Acerca de la bolsa">
+        <a id="menu_acercade" href="<%= request.getRequestURI() %>?a=acercade" rel="history" title="Acerca de la bolsa">
             Acerca de la bolsa
         </a>
     </li>

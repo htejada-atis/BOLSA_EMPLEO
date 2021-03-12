@@ -37,7 +37,7 @@ public class ControladorIndice extends HttpServlet {
 	public static final String PARAM_ACCION = "a";
 	
 	// acciones
-	public static final String ACCION_ACERCA_DE = "acerca_de";
+	public static final String ACCION_ACERCA_DE = "acercade";
 	public static final String ACCION_AYUDA = "ayuda";
 	public static final String ACCION_DOCUMENTOS = "documentos";
 	public static final String ACCION_FAQ = "faq";
@@ -63,7 +63,7 @@ public class ControladorIndice extends HttpServlet {
 		try {
 			switch (nombreAccion) {
 				case ACCION_ACERCA_DE:
-					bean.setVista(RUTA_BEP_INICIO + "acerca_de.jsp");
+					bean.setVista(RUTA_BEP_INICIO + "acercade.jsp");
 					break;
 				case ACCION_AYUDA:
 					bean.setVista(RUTA_BEP_INICIO + "ayuda.jsp");

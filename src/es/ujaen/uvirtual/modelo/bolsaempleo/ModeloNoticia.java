@@ -51,8 +51,6 @@ public class ModeloNoticia {
 			}
 		}
 		
-		System.out.println(consulta);
-		
 		try (Connection conexion = ConexionUvirtual.obtenerInstancia();
 			PreparedStatement stmt = conexion.prepareStatement(consulta);) {
 				try (ResultSet rs = stmt.executeQuery()) {
