@@ -1,6 +1,7 @@
 package es.ujaen.uvirtual.controlador.infadministrativa.bolsaempleo;
 
 import java.io.IOException;
+import java.io.PrintWriter;
 import java.sql.SQLException;
 import java.util.List;
 import java.util.logging.Logger;
@@ -9,11 +10,14 @@ import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
 import es.ujaen.uvirtual.beans.UVDatos;
-import es.ujaen.uvirtual.beans.Usuario;
 import es.ujaen.uvirtual.beans.uvirtual.bolsaempleo.Noticia;
 import es.ujaen.uvirtual.beans.vistas.uvirtual.bolsaempleo.VistaNoticiasCRUD;
 import es.ujaen.uvirtual.modelo.bolsaempleo.ModeloNoticia;
+import es.ujaen.uvirtual.utilidades.EscapaHTML;
 
 
 /**
@@ -31,29 +35,84 @@ public class ControladorIndice extends HttpServlet {
 	private static final String NOMBREDEESTACLASE = ControladorIndice.class.getName();
 	private static final Logger LOGGER = Logger.getLogger(NOMBREDEESTACLASE);
 	public static final String PARAM_ACCION = "a";
+	
+	// acciones
+	public static final String ACCION_ACERCA_DE = "acerca_de";
+	public static final String ACCION_AYUDA = "ayuda";
+	public static final String ACCION_DOCUMENTOS = "documentos";
+	public static final String ACCION_FAQ = "faq";
+	public static final String ACCION_LISTAR_NOTICIAS = "listar_noticias";
+	public static final String ACCION_LISTAR_TODAS_NOTICIAS = "listar_todas_noticias";
+	
+	// ruta vistas
+	public static final String RUTA_BEP_INICIO = "/WEB-INF/jsp/vista/infadministrativa/bolsaempleo/inicio/";
 
 	/** Peticion GET.
 	 * @see HttpServlet#doGet(HttpServletRequest request, HttpServletResponse response)
 	 */
 	@Override
-	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+	public void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 		UVDatos datos = (UVDatos) request.getAttribute(UVDatos.NOMBRE_ATRIBUTO);
-		datos.setDocType("<!DOCTYPE html>");
-		datos.setContentType("text/html");	
-		VistaNoticiasCRUD bean = new VistaNoticiasCRUD();
-		Usuario usuario = datos.getUsuario();
 		
-		bean.setVista("/WEB-INF/jsp/vista/infadministrativa/bolsaempleo/indice.jsp");
+		VistaNoticiasCRUD bean = new VistaNoticiasCRUD();
+		
+		String nombreAccion = EscapaHTML.ajustaCodificacion(request.getParameter(PARAM_ACCION));
+		if (nombreAccion == null) {
+			nombreAccion = ACCION_LISTAR_NOTICIAS;
+		}
 		try {
-			obtenerNoticias(bean);
+			switch (nombreAccion) {
+				case ACCION_ACERCA_DE:
+					bean.setVista(RUTA_BEP_INICIO + "acerca_de.jsp");
+					break;
+				case ACCION_AYUDA:
+					bean.setVista(RUTA_BEP_INICIO + "ayuda.jsp");
+					break;
+				case ACCION_DOCUMENTOS:
+					bean.setVista(RUTA_BEP_INICIO + "documentos.jsp");
+					break;
+				case ACCION_FAQ:
+					bean.setVista(RUTA_BEP_INICIO + "faq.jsp");
+					break;
+				case ACCION_LISTAR_NOTICIAS:
+					bean.setVista(RUTA_BEP_INICIO + "inicio.jsp");
+					obtenerNoticias(bean);
+					break;
+				case ACCION_LISTAR_TODAS_NOTICIAS:
+					bean.setVista(RUTA_BEP_INICIO + "inicio.jsp");
+					response.setContentType("application/json");
+					response.setCharacterEncoding("UTF-8");
+					
+					PrintWriter printWriter = response.getWriter();
+					JSONObject json = new JSONObject();
+					try {
+						JSONArray ids = new JSONArray(request.getParameter("ids_noticias"));
+						
+						List<Noticia> listaNoticias = obtenerTodasNoticias(ids);
+						
+						json.put("result", "ok");
+						json.put("noticias", listaNoticias);
+					} catch (JSONException e) {
+						e.printStackTrace();
+					}
+					
+			        printWriter.print(json);
+			        printWriter.close();
+					return;
+				default:
+					obtenerNoticias(bean);
+					break;
+			}
 		} catch (SQLException e) {
 			bean.getMensajesDeError().add("Error al acceder a la base de datos");
 		} finally {
+			
 			datos.getVistas().put(bean.getClass().getName(), bean);
 			datos.getFicherosJSP().add(bean.getVista());
 			datos.getFicherosJS().add("/js/jquery-1.latest.min.js");
 			datos.getFicherosJS().add("/js/jquery-ui-1.10.4.min.js");
 			datos.getFicherosJS().add("/js/jquery.ui.datepicker-es.js");
+			datos.getFicherosJS().add("/js/bolsaempleo/menu.js");
 			datos.getFicherosCSS().add("/css/intranet.css");
 			datos.getFicherosCSS().add("/css/jqueryujaen/jquery-ui-1.8.16.custom.css");
 			datos.getFicherosCSS().add("/css/ujaen_bolsa_empleo.css");
@@ -64,9 +123,18 @@ public class ControladorIndice extends HttpServlet {
 	 * @param bean bean de la vista a la que poner los valores.
 	 * @throws SQLException excepcion de bbdd.
 	 */
+	private List<Noticia> obtenerTodasNoticias(JSONArray noticias_iniciales) throws SQLException {
+		ModeloNoticia modelo = new ModeloNoticia();
+		return modelo.listaNoticias(noticias_iniciales);
+	}
+	
+	/** muestra las 3 primeras noticias.
+	 * @param bean bean de la vista a la que poner los valores.
+	 * @throws SQLException excepcion de bbdd.
+	 */
 	private void obtenerNoticias(VistaNoticiasCRUD bean) throws SQLException {
 		ModeloNoticia modelo = new ModeloNoticia();
-		List<Noticia> noticias = modelo.listaNoticias();
+		List<Noticia> noticias = modelo.listaNoticiasIniciales();
 		bean.setNoticias(noticias);
 	}
 }
