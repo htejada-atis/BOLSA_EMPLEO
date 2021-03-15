@@ -34,23 +34,20 @@ public class ModeloBolsa {
 		List<Bolsa> bolsas = new ArrayList<>();
 		
 		String consulta =
-			"SELECT bepbol.CODNUM bepbolid, bepbol.ESTADO, bepbol.FLGBAREMABLE, bepbol.FECHAACTUALIZACION, bepbol.FECHABLOQUEO, "
-		  + "       bepbol.FECHADEBLOQUEO, bepare.CODNUM bepareid, bepare.NOMBRE, bepare.CODIGO "
+			"SELECT bepbol.* "
 		  + "FROM TBEP_BOLSAS bepbol "
-		  + "JOIN TBEP_AREAS bepare ON bepare.CODNUM = bepbol.BEPARE_CODNUM "
-		  + "WHERE 1=1 ";				
+		  + "WHERE 1=1 ";
 		
 		try (Connection conexion = ConexionUvirtual.obtenerInstancia(); 
 			 PreparedStatement stmt = conexion.prepareStatement(consulta);) {
 			
 			try (ResultSet rs = stmt.executeQuery()) {
 				while (rs.next()) {
-					Area area = modeloArea.getAreaById(rs.getInt("bepareid"));
 					Bolsa bolsa = new Bolsa();
-					bolsa.setIdBolsa(rs.getInt("bepbolid"));
-					bolsa.setArea(area);
-					bolsa.setBaremable(rs.getString("FLGBAREMABLE").equals("S"));
+					bolsa.setIdBolsa(rs.getInt("CODNUM"));
+					bolsa.setArea(modeloArea.getAreaById(rs.getInt("BEPARE_CODNUM")));
 					bolsa.setEstado(rs.getString("ESTADO"));
+					bolsa.setBaremable(rs.getString("FLGBAREMABLE").equals("S"));					
 					bolsa.setFechaActualizacion(rs.getTimestamp("FECHAACTUALIZACION"));
 					bolsa.setFechaBloqueo(rs.getTimestamp("FECHABLOQUEO"));
 					bolsa.setFechaDesBloqueo(rs.getTimestamp("FECHADEBLOQUEO"));

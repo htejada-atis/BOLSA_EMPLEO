@@ -1,0 +1,7 @@
+DROP TABLE TBEP_HTO_DEPARTAMENTOS;
+--/////////////////////
+DROP TABLE TBEP_DEPARTAMENTOS;
+--/////////////////////
+DROP SEQUENCE QBEP_DEP;
+--/////////////////////
+DROP SEQUENCE QBEP_HTO_DEP;
