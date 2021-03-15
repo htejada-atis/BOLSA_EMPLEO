@@ -3,8 +3,8 @@ package es.ujaen.uvirtual.controlador.infadministrativa.bolsaempleo;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.List;
-import java.util.logging.Logger;
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
@@ -17,6 +17,7 @@ import es.ujaen.uvirtual.beans.UVDatos;
 import es.ujaen.uvirtual.beans.uvirtual.bolsaempleo.Noticia;
 import es.ujaen.uvirtual.beans.vistas.uvirtual.bolsaempleo.VistaNoticiasCRUD;
 import es.ujaen.uvirtual.modelo.bolsaempleo.ModeloNoticia;
+import es.ujaen.uvirtual.utilidades.BolsaEmpleoUtils;
 import es.ujaen.uvirtual.utilidades.EscapaHTML;
 
 
@@ -32,8 +33,6 @@ import es.ujaen.uvirtual.utilidades.EscapaHTML;
 		})
 public class ControladorIndice extends HttpServlet {
 	private static final long serialVersionUID = 1L;
-	private static final String NOMBREDEESTACLASE = ControladorIndice.class.getName();
-	private static final Logger LOGGER = Logger.getLogger(NOMBREDEESTACLASE);
 	public static final String PARAM_ACCION = "a";
 	
 	// acciones
@@ -75,29 +74,10 @@ public class ControladorIndice extends HttpServlet {
 					bean.setVista(RUTA_BEP_INICIO + "faq.jsp");
 					break;
 				case ACCION_LISTAR_NOTICIAS:
-					bean.setVista(RUTA_BEP_INICIO + "inicio.jsp");
 					obtenerNoticias(bean);
 					break;
 				case ACCION_LISTAR_TODAS_NOTICIAS:
-					bean.setVista(RUTA_BEP_INICIO + "inicio.jsp");
-					response.setContentType("application/json");
-					response.setCharacterEncoding("UTF-8");
-					
-					PrintWriter printWriter = response.getWriter();
-					JSONObject json = new JSONObject();
-					try {
-						JSONArray ids = new JSONArray(request.getParameter("ids_noticias"));
-						
-						List<Noticia> listaNoticias = obtenerTodasNoticias(ids);
-						
-						json.put("result", "ok");
-						json.put("noticias", listaNoticias);
-					} catch (JSONException e) {
-						e.printStackTrace();
-					}
-					
-			        printWriter.print(json);
-			        printWriter.close();
+					obtenerTodasNoticias(bean, request, response);
 					return;
 				default:
 					obtenerNoticias(bean);
@@ -106,7 +86,6 @@ public class ControladorIndice extends HttpServlet {
 		} catch (SQLException e) {
 			bean.getMensajesDeError().add("Error al acceder a la base de datos");
 		} finally {
-			
 			datos.getVistas().put(bean.getClass().getName(), bean);
 			datos.getFicherosJSP().add(bean.getVista());
 			datos.getFicherosJS().add("/js/jquery-1.latest.min.js");
@@ -121,11 +100,39 @@ public class ControladorIndice extends HttpServlet {
 	
 	/** muestra todas las noticias.
 	 * @param bean bean de la vista a la que poner los valores.
+	 * @param request de la petición del servidor
+	 * @param response de la respuesta del servidor
 	 * @throws SQLException excepcion de bbdd.
 	 */
-	private List<Noticia> obtenerTodasNoticias(JSONArray noticias_iniciales) throws SQLException {
+	private void obtenerTodasNoticias(VistaNoticiasCRUD bean, HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException, SQLException {
 		ModeloNoticia modelo = new ModeloNoticia();
-		return modelo.listaNoticias(noticias_iniciales);
+		
+		bean.setVista(RUTA_BEP_INICIO + "inicio.jsp");
+		response.setContentType("application/json");
+		response.setCharacterEncoding("UTF-8");
+		
+		PrintWriter printWriter = response.getWriter();
+		JSONObject json = new JSONObject();
+		try {
+			JSONArray ids = new JSONArray(request.getParameter("ids_noticias"));
+			
+			List<String> idsNoticias = new ArrayList<>();
+			if (ids != null) {
+				for (int i = 0; i < ids.length(); i++) {
+					idsNoticias.add(ids.getString(0));
+				}
+			}
+			
+			List<Noticia> listaNoticias = modelo.listaNoticias(BolsaEmpleoUtils.consultaNotIn("CODNUM", idsNoticias) + " ORDER BY fecha");
+			
+			json.put("result", "ok");
+			json.put("noticias", listaNoticias);
+		} catch (JSONException e) {
+			e.printStackTrace();
+		}
+		
+        printWriter.print(json);
+        printWriter.close();
 	}
 	
 	/** muestra las 3 primeras noticias.
@@ -133,6 +140,7 @@ public class ControladorIndice extends HttpServlet {
 	 * @throws SQLException excepcion de bbdd.
 	 */
 	private void obtenerNoticias(VistaNoticiasCRUD bean) throws SQLException {
+		bean.setVista(RUTA_BEP_INICIO + "inicio.jsp");
 		ModeloNoticia modelo = new ModeloNoticia();
 		List<Noticia> noticias = modelo.listaNoticiasIniciales();
 		bean.setNoticias(noticias);
