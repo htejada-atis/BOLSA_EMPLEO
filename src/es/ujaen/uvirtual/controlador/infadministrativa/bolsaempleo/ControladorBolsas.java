@@ -13,7 +13,6 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -89,7 +88,7 @@ public class ControladorBolsas extends HttpServlet {
 			datos.getFicherosJS().add("/js/jquery-1.latest.min.js");
 			datos.getFicherosJS().add("/js/jquery-ui-1.10.4.min.js");
 			datos.getFicherosJS().add("/js/jquery.ui.datepicker-es.js");
-			datos.getFicherosJS().add("/js/bolsa-empleo.js");
+			datos.getFicherosJS().add("/js/bolsaempleo/datatable.js");
 			datos.getFicherosCSS().add("/css/intranet.css");
 			datos.getFicherosCSS().add("/css/ujaen_bolsa_empleo.css");
 			datos.getFicherosCSS().add("/css/jqueryujaen/jquery-ui-1.8.16.custom.css");

@@ -4,13 +4,8 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
 
 import es.ujaen.uvirtual.beans.uvirtual.bolsaempleo.Area;
-import es.ujaen.uvirtual.beans.uvirtual.bolsaempleo.Bolsa;
-import es.ujaen.uvirtual.beans.uvirtual.docentia.Convocatoria;
 import es.ujaen.uvirtual.modelo.conexion.ConexionUvirtual;
 import es.ujaen.uvirtual.utilidades.UVException;
 
@@ -40,7 +35,7 @@ public class ModeloArea {
 				}
 				
 				Area area = new Area();
-				area.setCodNum(rs.getInt("CODNUM"));				
+				area.setCodNum(rs.getInt("CODNUM"));
 				area.setDepartamento(modeloDepartamento.getDepartamentoById(rs.getInt("BEPDEP_CODNUM")));
 				area.setIdAreaExterno(rs.getString("ID_AREA_CONOCIMIENTO"));
 				area.setIdSeccion(rs.getString("ID_SECCION"));

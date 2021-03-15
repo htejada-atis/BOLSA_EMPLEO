@@ -57,7 +57,7 @@ VistaEstadoBolsas bean = (VistaEstadoBolsas) uvdatos.getVistas().get(VistaEstado
 		    "columns": [
 		    	{'data': 'idBolsa', 'selectable': true},
 		        {'data': 'idBolsa'},
-		        {'data': 'area.nombre'},
+		        {'data': 'area.descripcion'},
 		        {'data': 'estado'},
 		        {'data': 'fechaActualizacion'},
 		        {'data': 'fechaBloqueo'},

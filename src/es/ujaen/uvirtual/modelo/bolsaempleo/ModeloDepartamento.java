@@ -4,14 +4,8 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
 
-import es.ujaen.uvirtual.beans.uvirtual.bolsaempleo.Area;
-import es.ujaen.uvirtual.beans.uvirtual.bolsaempleo.Bolsa;
 import es.ujaen.uvirtual.beans.uvirtual.bolsaempleo.Departamento;
-import es.ujaen.uvirtual.beans.uvirtual.docentia.Convocatoria;
 import es.ujaen.uvirtual.modelo.conexion.ConexionUvirtual;
 import es.ujaen.uvirtual.utilidades.UVException;
 
