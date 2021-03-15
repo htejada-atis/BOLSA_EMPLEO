@@ -1,8 +1,8 @@
 # Universidad virtual para proveedores externos
 Proyecto para desarrollar módulos de Universidad Virtual por proveedores externos.
 
-Acronimo BD: BEP
-paquete java: bolsaEmpleo
+Acronimo BD: 
+paquete java: 
 
 ## 1. Método de trabajo
 ### Código fuente en GIT
