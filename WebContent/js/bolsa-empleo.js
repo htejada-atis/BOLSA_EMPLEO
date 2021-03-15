@@ -65,10 +65,15 @@ function DataTable(id, config) {
     	self.loading(false);
     	self.checkUncheckAll(false);
     	self.renderFooter();
-    	    	    	
-    	response.data.forEach(function(row, index) {    		
-    		self.addRow(row, index);	    	    		    
-    	});    	
+    	
+    	if (response.data.length > 0) {
+	    	response.data.forEach(function(row, index) {    		
+	    		self.addRow(row, index);	    	    		    
+	    	});
+    	} else {
+    		// sin resultados
+    		$(self.tbody).append('<tr><td colSpan="'+ self.config.columns.length + '">Sin resultados</tr>');	
+        }    	
     }
     
     this.addRow = function(row, index) {

@@ -9,10 +9,12 @@ import java.util.Date;
 public class Area implements Serializable {
 
 	private static final long serialVersionUID = 1L;
-	private Integer idArea;
-	private String nombre;
-	private String codigo;
-		
+	private Integer codNum;	// CODNUM
+	private Departamento departamento; // BEPDEP_CODNUM
+	private String idAreaExterno; // ID_AREA_CONOCIMIENTO id externo del area de conocimento
+	private String idSeccion; // ID_SECCION
+	private String descripcion; // DES_AREA_CONOCIMIENTO
+			
 	/** Constructor por defecto.
 	 */
 	public Area() {
@@ -20,62 +22,88 @@ public class Area implements Serializable {
 	}
 	
 	/** Constructor con parametros.
-	 * @param pidAreaConocimiento .
-	 * @param pnombre .
-	 * @param pcodigo .
+	 * @param pCodNum .
+	 * @param pdepartamento .
+	 * @param pidAreaExterno .
+	 * @param pidSeccion .
+	 * @param pdescripcion .
 	 */
-	public Area(Integer pidAreaConocimiento, String pnombre, String pcodigo) {
+	public Area(Integer pCodNum, Departamento pdepartamento, String pidAreaExterno, String pidSeccion, String pdescripcion) {
 		super();
-		this.idArea = pidAreaConocimiento;
-		this.nombre = pnombre;
-		this.codigo = pcodigo;		
+		this.codNum = pCodNum;
+		this.departamento = pdepartamento;
+		this.idAreaExterno = pidAreaExterno;		
+		this.idSeccion = pidSeccion;
+		this.descripcion = pdescripcion;
 	}
 	
 	/** Constructor copia.
 	 * @param copia AreaConocimiento a copiar
 	 */
 	public Area(Area copia) {
-		this.idArea = copia.idArea;
-		this.nombre = copia.nombre;
-		this.codigo = copia.codigo;		
+		this.codNum = copia.codNum;
+		this.departamento = copia.departamento;
+		this.idAreaExterno = copia.idAreaExterno;		
+		this.idSeccion = copia.idSeccion;
+		this.descripcion = copia.descripcion;		
 	}
 	
-	public Integer getIdAreaConocimiento() {
-		return idArea;
+	public Integer getCodNum() {
+		return codNum;
 	}
 	
-	public void setIdAreaConocimiento(Integer idAreaConocimiento) {
-		this.idArea = idAreaConocimiento;
+	public void setCodNum(Integer codNum) {
+		this.codNum = codNum;
 	}
 	
-	public String getNombre() {
-		return nombre;
+	public Departamento getDepartamento() {
+		return departamento;
 	}
 	
-	public void setNombre(String nombre) {
-		this.nombre = nombre;
+	public void setDepartamento(Departamento departamento) {
+		this.departamento = departamento;
 	}
 	
-	public String getCodigo() {
-		return codigo;
+	public String getIdAreaExterno() {
+		return idAreaExterno;
 	}
 	
-	public void setCodigo(String codigo) {
-		this.codigo = codigo;
+	public void setIdAreaExterno(String idAreaExterno) {
+		this.idAreaExterno = idAreaExterno;
+	}
+	
+	public String getIdSeccion() {
+		return idSeccion;
+	}
+	
+	public void setIdSeccion(String idSeccion) {
+		this.idSeccion = idSeccion;
+	}
+	
+	public String getDescripcion() {
+		return descripcion;
+	}
+	
+	public void setDescripcion(String descripcion) {
+		this.descripcion = descripcion;
 	}
 	
 	@Override
 	public String toString() {
-		return "Area Conocimiento [idAreaConocimiento=" + idArea + ", nombre=" + nombre
-				+ ", codigo=" + codigo + "]";
+		return "Area Conocimiento [idArea=" + codNum + ", departamento=" + departamento
+				+ ", idAreaExterno=" + idAreaExterno + ", idSeccion=" + idSeccion  
+				+ ", descripcion=" + descripcion + "]";
 	}
 	
 	@Override
 	public int hashCode() {
 		final int prime = 31;
 		int result = 1;
-		result = prime * result + ((nombre == null) ? 0 : nombre.hashCode());
-		result = prime * result + ((codigo == null) ? 0 : codigo.hashCode());		
+		result = prime * result + ((codNum == null) ? 0 : codNum.hashCode());
+		result = prime * result + ((departamento == null) ? 0 : departamento.hashCode());		
+		result = prime * result + ((idAreaExterno == null) ? 0 : idAreaExterno.hashCode());
+		result = prime * result + ((idSeccion == null) ? 0 : idSeccion.hashCode());
+		result = prime * result + ((descripcion == null) ? 0 : descripcion.hashCode());
 		return result;
 	}
 
@@ -92,18 +120,39 @@ public class Area implements Serializable {
 			return false;
 		}
 		Area other = (Area) obj;
-		if (nombre == null) {
-			if (other.nombre != null) {
+		if (codNum == null) {
+			if (other.codNum != null) {
 				return false;
 			}
-		} else if (!nombre.equals(other.nombre)) {
+		} else if (!codNum.equals(other.codNum)) {
 			return false;
 		}
-		if (codigo == null) {
-			if (other.codigo != null) {
+		if (departamento == null) {
+			if (other.departamento != null) {
 				return false;
 			}
-		} else if (!codigo.equals(other.codigo)) {
+		} else if (!departamento.equals(other.departamento)) {
+			return false;
+		}
+		if (idAreaExterno == null) {
+			if (other.idAreaExterno != null) {
+				return false;
+			}
+		} else if (!idAreaExterno.equals(other.idAreaExterno)) {
+			return false;
+		}
+		if (idSeccion == null) {
+			if (other.idSeccion != null) {
+				return false;
+			}
+		} else if (!idSeccion.equals(other.idSeccion)) {
+			return false;
+		}
+		if (descripcion == null) {
+			if (other.descripcion != null) {
+				return false;
+			}
+		} else if (!descripcion.equals(other.descripcion)) {
 			return false;
 		}
 		return true;
