@@ -23,29 +23,54 @@ VistaEstadoBolsas bean = (VistaEstadoBolsas) uvdatos.getVistas().get(VistaEstado
 	<% } else { %>
 	<h2>Estado de las bolsas</h2>
 	
-	<table class="bluetable">
+	<table class="bluetable bolsaempleo" id="table">
 		<tr>
+			<th scope="col" style="width:5%"></th>
 			<th scope="col" style="width:5%" title="Id de la convocatoria">Id</th>
 			<th scope="col" style="width:25%">Area</th>
-			<th scope="col" style="width:10%">Estado</th>
+			<th scope="col" style="width:15%">Estado</th>
 			<th scope="col" style="width:15%">Actualizada</th>
 			<th scope="col" style="width:15%">Bloqueo</th>
-			<th scope="col" style="width:30%">Desbloqueo</th>
+			<th scope="col" style="width:15%">Desbloqueo</th>
 			<th scope="col" style="width:15%">Baremable</th>
+			<th scope="col" style="width:10%"></th>
 		</tr>
-		
-		<% for(Bolsa bolsa:bean.getBolsasEmpleo()){ %>
-			<tr id="row_<%=bolsa.getIdBolsa()%>">
-				<td><%=bolsa.getIdBolsa()%></td>
-				<td><%=EscapaHTML.escapaHTML(bolsa.getArea().getNombre())%></td>
-				<td><%=bolsa.getEstado()%></td>
-				<td><%=bolsa.getFechaActualizacion() != null ? Formateador.formatoFecha(bolsa.getFechaActualizacion(), Formateador.FORMATO_FECHA_DDMMYYYY) : ""%></td>
-				<td><%=bolsa.getFechaBloqueo() != null ? Formateador.formatoFecha(bolsa.getFechaBloqueo(), Formateador.FORMATO_FECHA_DDMMYYYY) : ""%></td>
-				<td><%=bolsa.getFechaDesBloqueo() != null ? Formateador.formatoFecha(bolsa.getFechaDesBloqueo(), Formateador.FORMATO_FECHA_DDMMYYYY) : ""%></td>				
-				<td><%=bolsa.getBaremable()%></td>
+		<tbody>				
+		</tbody>
+		<tfoot>
+			<tr>
+				<th colSpan="9" style="width:100%"></th>
 			</tr>
-		<% } %>
+		</tfoot>
 	</table>
 	<% } %>
+	
+	<script>
+	$(document).ready(function() {
+		function clickRow(row) {
+			console.log("row", row);
+		}
+		
+		var table = new DataTable('#table', {
+		    "ajax": { url: "<%= request.getRequestURI() %>" },
+		    "selectable": true,
+		    "columns": [
+		    	{'data': 'idBolsa', 'selectable': true},
+		        {'data': 'idBolsa'},
+		        {'data': 'area.nombre'},
+		        {'data': 'estado'},
+		        {'data': 'fechaActualizacion'},
+		        {'data': 'fechaBloqueo'},
+		        {'data': 'fechaDesBloqueo'},
+		        {'data': 'baremable'},
+		        {'data': 'idBolsa', 'buttons': [{'label': 'Click', 'onClick': function(row) {console.log("row", row);}}]}		        
+		    ],
+		});
+		
+		setInterval(function() {
+			//console.log(table.getChecked())
+		}, 5000)
+	}); 
+	</script>
 </div>
 	

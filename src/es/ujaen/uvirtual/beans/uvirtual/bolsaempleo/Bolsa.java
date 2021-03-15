@@ -9,7 +9,7 @@ import java.util.Date;
 public class Bolsa implements Serializable {
 
 	private static final long serialVersionUID = 1L;
-	private Integer idBolsa;
+	private Integer codNum;
 	private Area area;
 	private String estado;
 	private Boolean baremable;
@@ -35,7 +35,7 @@ public class Bolsa implements Serializable {
 	public Bolsa(Integer pidBolsaEmpleo, Area parea, String pestado, Boolean pbaremable, 
 			Date pfechaActualizacion, Date pfechaBloqueo, Date pfechaDesBloqueo) {
 		super();
-		this.idBolsa = pidBolsaEmpleo;
+		this.codNum = pidBolsaEmpleo;
 		this.area = parea;
 		this.estado = pestado;
 		this.baremable = pbaremable;
@@ -48,7 +48,7 @@ public class Bolsa implements Serializable {
 	 * @param copia Convocatoria a copiar
 	 */
 	public Bolsa(Bolsa copia) {
-		this.idBolsa = copia.idBolsa;
+		this.codNum = copia.codNum;
 		this.area = copia.area;
 		this.estado = copia.estado;
 		this.baremable = copia.baremable;
@@ -58,11 +58,11 @@ public class Bolsa implements Serializable {
 	}
 	
 	public Integer getIdBolsa() {
-		return idBolsa;
+		return codNum;
 	}
 	
 	public void setIdBolsa(Integer idBolsa) {
-		this.idBolsa = idBolsa;
+		this.codNum = idBolsa;
 	}
 	
 	public Area getArea() {
@@ -115,7 +115,7 @@ public class Bolsa implements Serializable {
 	
 	@Override
 	public String toString() {
-		return "BolsaEmpleo [idBolsaEmpleo=" + idBolsa + ", area=" + area.getNombre()
+		return "BolsaEmpleo [idBolsaEmpleo=" + codNum + ", area=" + area.getDescripcion()
 				+ ", estado=" + estado + ", baremable=" + baremable + ", fechaActualizacion=" + fechaActualizacion
 				+ ", fechaBloqueo=" + fechaBloqueo + ", fechaDesBloqueo=" + fechaDesBloqueo + "]";
 	}
@@ -124,6 +124,7 @@ public class Bolsa implements Serializable {
 	public int hashCode() {
 		final int prime = 31;
 		int result = 1;
+		result = prime * result + ((codNum == null) ? 0 : codNum.hashCode());
 		result = prime * result + ((area == null) ? 0 : area.hashCode());
 		result = prime * result + ((estado == null) ? 0 : estado.hashCode());
 		result = prime * result + ((baremable == null) ? 0 : baremable.hashCode());
@@ -148,6 +149,13 @@ public class Bolsa implements Serializable {
 		
 		Bolsa other = (Bolsa) obj;
 		
+		if (codNum == null) {
+			if (other.codNum != null) {
+				return false;
+			}
+		} else if (!codNum.equals(other.codNum)) {
+			return false;
+		}
 		if (area == null) {
 			if (other.area != null) {
 				return false;
@@ -155,7 +163,6 @@ public class Bolsa implements Serializable {
 		} else if (!area.equals(other.area)) {
 			return false;
 		}
-		
 		if (estado == null) {
 			if (other.estado != null) {
 				return false;
@@ -163,7 +170,6 @@ public class Bolsa implements Serializable {
 		} else if (!estado.equals(other.estado)) {
 			return false;
 		}
-		
 		if (baremable == null) {
 			if (other.baremable != null) {
 				return false;
@@ -171,7 +177,6 @@ public class Bolsa implements Serializable {
 		} else if (!baremable.equals(other.baremable)) {
 			return false;
 		}
-		
 		if (fechaActualizacion == null) {
 			if (other.fechaActualizacion != null) {
 				return false;
@@ -179,7 +184,6 @@ public class Bolsa implements Serializable {
 		} else if (!fechaActualizacion.equals(other.fechaActualizacion)) {
 			return false;
 		}
-		
 		if (fechaBloqueo == null) {
 			if (other.fechaBloqueo != null) {
 				return false;
@@ -187,7 +191,6 @@ public class Bolsa implements Serializable {
 		} else if (!fechaBloqueo.equals(other.fechaBloqueo)) {
 			return false;
 		}
-		
 		if (fechaDesBloqueo == null) {
 			if (other.fechaDesBloqueo != null) {
 				return false;
