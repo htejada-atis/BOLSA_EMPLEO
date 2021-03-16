@@ -108,7 +108,7 @@ public class ControladorBolsas extends HttpServlet {
 	
 	private void datatable(HttpServletRequest request, HttpServletResponse response) throws SQLException, UVException, IOException {
 		ModeloBolsa modelo = new ModeloBolsa();
-		List<Bolsa> bolsas = modelo.listaBolsaEmpleo();
+		List<Bolsa> bolsas = modelo.listaBolsaEmpleo(new DataTable(request));
 		
 		PrintWriter out = response.getWriter();
 		JSONObject json = new JSONObject();

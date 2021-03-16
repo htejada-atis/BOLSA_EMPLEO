@@ -29,7 +29,8 @@ function DataTable(id, config) {
     this.tfoot = $('tfoot', this.node).last();
     this.config = config;
     this.params = {
-        'a': 'datatable'
+        'a': 'datatable',
+        'page': 1
     };
     this.lastResponse = null;
     this.checked = {};
@@ -51,7 +52,7 @@ function DataTable(id, config) {
 	        }
 	    });   
     };
-    
+        
     this.loading = function(on) {
     	if (on) {
     		$(self.tbody).append('<p class="loading">Loading...</p>');
@@ -127,8 +128,13 @@ function DataTable(id, config) {
     	var selected = self.getCheckedItems();  
         var labelTotal = 'Total ' + this.lastResponse.recordsTotal;
         var labelSelected = selected.length > 0 ? ' (Seleccionados ' + selected.length + ')' : ''
+        var textoTotal = '<span class="total">' + labelTotal + labelSelected +'</span>';
+        var pagination = '<span class="pagination">P&aacute;gina ' + this.params.page + ' / ' + this.lastResponse.recordsTotal + '</span>';
 
-    	$('th', self.tfoot).html('<span class="total">' + labelTotal + labelSelected +'</span>');    	
+        $('th', self.tfoot).empty();        
+
+    	$('th', self.tfoot).append($(pagination));
+        $('th', self.tfoot).append($(textoTotal));
     };
     
     this.prepareTable = function() {
