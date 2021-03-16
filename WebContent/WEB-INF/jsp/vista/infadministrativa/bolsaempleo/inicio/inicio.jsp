@@ -73,7 +73,7 @@ VistaNoticiasCRUD bean = (VistaNoticiasCRUD)uvdatos.getVistas().get(VistaNoticia
 		            	element.attr("id", "id_"+noticia.idNoticia);
 		            	element.find("a").attr("href", noticia.enlace);
 		            	element.find("a").text(noticia.texto);
-		            	element.find(".feacha-noticia").text(noticia.fecha);
+		            	element.find(".fecha-noticia").text(formatearFecha(noticia.fecha));
 		            	console.log(element);
 		            	$(".noticias-bolsa-empleo ul").append(element);
 		            	$("#view_all a").text("Ver menos");
