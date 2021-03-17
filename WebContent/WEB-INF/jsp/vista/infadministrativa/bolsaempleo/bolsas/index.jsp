@@ -26,13 +26,13 @@ VistaEstadoBolsas bean = (VistaEstadoBolsas) uvdatos.getVistas().get(VistaEstado
 	<table class="bluetable bolsaempleo" id="table">
 		<tr>
 			<th scope="col" style="width:5%"></th>
-			<th scope="col" style="width:5%" title="Id de la convocatoria">Id</th>
+			<th scope="col" style="width:10%" title="Id de la convocatoria">Id</th>
 			<th scope="col" style="width:25%">Area</th>
 			<th scope="col" style="width:15%">Estado</th>
-			<th scope="col" style="width:15%">Actualizada</th>
-			<th scope="col" style="width:15%">Bloqueo</th>
-			<th scope="col" style="width:15%">Desbloqueo</th>
-			<th scope="col" style="width:15%">Baremable</th>
+			<th scope="col" style="width:20%">Actualizada</th>
+			<th scope="col" style="width:18%">Bloqueo</th>
+			<th scope="col" style="width:19%">Desbloqueo</th>
+			<th scope="col" style="width:18%">Baremable</th>
 			<th scope="col" style="width:10%"></th>
 		</tr>
 		<tbody>				
@@ -52,7 +52,7 @@ VistaEstadoBolsas bean = (VistaEstadoBolsas) uvdatos.getVistas().get(VistaEstado
 		}
 		
 		var table = new DataTable('#table', {
-		    "ajax": { url: "<%= request.getRequestURI() %>" },
+		    "ajax": { url: "/srv/es/ajax/informacionadministrativa/bolsaempleo/bolsas" },
 		    "selectable": true,
 		    "columns": [
 		    	{'data': 'idBolsa', 'selectable': true},

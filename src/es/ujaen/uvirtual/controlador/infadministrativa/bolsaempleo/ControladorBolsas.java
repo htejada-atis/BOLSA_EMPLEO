@@ -4,7 +4,6 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.sql.SQLException;
 import java.util.logging.Logger;
-import java.util.List;
 import java.util.logging.Level;
 
 import javax.servlet.ServletException;
@@ -21,6 +20,7 @@ import es.ujaen.uvirtual.beans.Usuario;
 import es.ujaen.uvirtual.beans.uvirtual.bolsaempleo.Bolsa;
 import es.ujaen.uvirtual.beans.vistas.uvirtual.bolsaempleo.VistaEstadoBolsas;
 import es.ujaen.uvirtual.modelo.bolsaempleo.ModeloBolsa;
+import es.ujaen.uvirtual.utilidades.DataTable;
 import es.ujaen.uvirtual.utilidades.EscapaHTML;
 import es.ujaen.uvirtual.utilidades.Formateador;
 import es.ujaen.uvirtual.utilidades.UVException;
@@ -33,7 +33,8 @@ import es.ujaen.uvirtual.utilidades.UVException;
 		description = "Gestión de estados de bolsas", 
 		urlPatterns = { 
 				"/srv/es/informacionadministrativa/bolsaempleo/bolsas", 
-				"/srv/en/informacionadministrativa/bolsaempleo/bolsas"
+				"/srv/en/informacionadministrativa/bolsaempleo/bolsas",
+				"/srv/es/ajax/informacionadministrativa/bolsaempleo/bolsas"
 		})
 public class ControladorBolsas extends HttpServlet {
 	private static final long serialVersionUID = 1L;
@@ -63,25 +64,20 @@ public class ControladorBolsas extends HttpServlet {
 		if (nombreAccion == null) {
 			nombreAccion = ACCION_LISTAR_BOLSAS;
 		}
+		
+		// respuesta ajax
+		boolean ajax = "XMLHttpRequest".equals(request.getHeader("X-Requested-With"));
+		if (ajax) {
+			this.responseAjax(nombreAccion, request, response);
+			return;
+		} 
+		
+		// respuesta normal
 		try {
 			switch (nombreAccion) {
 				case ACCION_LISTAR_BOLSAS:
-					listadoBolsasEmpleo(bean);
 					break;
-				case ACCION_DATATABLE:
-					datatable(request, response);
-					return;
-				default:
-					listadoBolsasEmpleo(bean);
-					break;
-			}
-		} catch (UVException e) {
-			LOGGER.log(Level.WARNING, e.toString());
-			bean.getMensajesDeError().add(e.toString());
-		} catch (SQLException e) {
-			LOGGER.log(Level.SEVERE, Formateador.getStackTrace(e));
-			LOGGER.log(Level.SEVERE, e.toString());
-			bean.getMensajesDeError().add("Error al acceder a la base de datos");
+			}			
 		} finally {
 			datos.getVistas().put(bean.getClass().getName(), bean);
 			datos.getFicherosJSP().add(bean.getVista());
@@ -92,39 +88,53 @@ public class ControladorBolsas extends HttpServlet {
 			datos.getFicherosCSS().add("/css/intranet.css");
 			datos.getFicherosCSS().add("/css/ujaen_bolsa_empleo.css");
 			datos.getFicherosCSS().add("/css/jqueryujaen/jquery-ui-1.8.16.custom.css");
-		}
+		}	
+			
 	}
 	
-	/** Listado de bolsas de empleo y su estado.
-	 * @param bean bean de la vista a la que poner los valores.
-	 * @throws SQLException excepcion de bbdd.
-	 * @throws UVException error al cargar las bolsas
-	 */
-	private void listadoBolsasEmpleo(VistaEstadoBolsas bean) throws SQLException, UVException {
-		ModeloBolsa modelo = new ModeloBolsa();
-		List<Bolsa> bolsas = modelo.listaBolsaEmpleo();
-		bean.setBolsasEmpleo(bolsas);
-	}
-	
-	private void datatable(HttpServletRequest request, HttpServletResponse response) throws SQLException, UVException, IOException {
-		ModeloBolsa modelo = new ModeloBolsa();
-		List<Bolsa> bolsas = modelo.listaBolsaEmpleo(new DataTable(request));
-		
+	private void responseAjax(String nombreAccion, HttpServletRequest request, HttpServletResponse response) throws IOException {
 		PrintWriter out = response.getWriter();
-		JSONObject json = new JSONObject();
-		
-		try {
-			json.put("recordsTotal", bolsas.size());
-			json.put("recordsFiltered", bolsas.size());
-			json.put("data", bolsas);
-		} catch (JSONException e) {
-			LOGGER.log(Level.SEVERE, "Error creando json {0}", e);
-			throw new UVException("Error creando json");
-		}
 		
 		response.setContentType("application/json");
 		response.setCharacterEncoding("UTF-8");
 		
+		try {
+			switch (nombreAccion) {
+				case ACCION_DATATABLE:
+					datatable(out, request);
+					break;
+			}				
+		} catch (Exception e) {
+			LOGGER.log(Level.WARNING, e.toString());
+			JSONObject json = new JSONObject();
+			response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+			
+			try {
+				json.put("error", e.getMessage());
+				out.print(json);
+			} catch (JSONException err) {
+				err.printStackTrace();
+			}				
+		} finally {
+			out.close();
+		}
+	}
+	
+	private void datatable(PrintWriter out, HttpServletRequest request) throws SQLException, UVException, IOException {		
+		ModeloBolsa modelo = new ModeloBolsa();
+		DataTable<Bolsa> dataTable = modelo.listaBolsaEmpleo(request);
+		
+		JSONObject json = new JSONObject();
+		
+		try {
+			json.put("recordsTotal", dataTable.getRecordsTotal());
+			json.put("pagesTotal", dataTable.getPagesTotal());
+			json.put("data", dataTable.getData());
+		} catch (JSONException e) {
+			LOGGER.log(Level.SEVERE, "Error creando json {0}", e);
+			throw new UVException("Error creando json");
+		}
+				
         out.print(json);
         out.close();		
 	}
