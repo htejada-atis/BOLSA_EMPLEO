@@ -12,12 +12,20 @@ table.bluetable.bolsaempleo button.btn {
 	cursor: pointer; /* Mouse pointer on hover */
 }
 
+table.bluetable.bolsaempleo th img.order {
+	height: 12px;
+}
+
 table.bluetable.bolsaempleo tfoot span.total {
 	float: right;
 }
 
 table.bluetable.bolsaempleo button.btn:hover {
 	background-color: #83a8ff;
+}
+
+table.bluetable.bolsaempleo p.loading {
+	width: max-content;	
 }
 
 :root {
