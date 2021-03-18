@@ -13,7 +13,7 @@ import bbdd.BbddRunner;
 import bbdd.UtilsTestBolsaEmpleo;
 import controlador.implementacion.PeticionHttp;
 import controlador.implementacion.RespuestaHttp;
-import es.ujaen.uvirtual.beans.vistas.uvirtual.bolsaempleo.VistaNoticias;
+import es.ujaen.uvirtual.beans.vistas.uvirtual.bolsaempleo.VistaNoticiasCRUD;
 import es.ujaen.uvirtual.controlador.infadministrativa.bolsaempleo.ControladorIndice;
 import es.ujaen.uvirtual.utilidades.UVException;
 
@@ -21,7 +21,7 @@ import es.ujaen.uvirtual.utilidades.UVException;
  * @author jmoral
  *
  */
-public class TestControladorInicio {
+public class TestControladorNoticias {
 	private static final String MENSAJE_NOTICIAS_DEVUELTAS = "Debe devolver noticias";
 	private static final String MENSAJE_SIN_ERROR = "No debe devolver error";
 	private static final String MENSAJE_CON_ERROR = "Debe devolver error";
@@ -31,7 +31,7 @@ public class TestControladorInicio {
 	private static final String FECHA_CORRECTA = "01/01/2030";
 	
 	
-    /** Prepara la bd con los datos iniciales.
+    /** prepara la bd con los datos iniciales.
      * @throws SQLException si error en bd
      * @throws IOException si error en ficheros
      */
@@ -42,14 +42,14 @@ public class TestControladorInicio {
     }
     
     
-    private VistaNoticias obtenerNoticias() throws ServletException, IOException {
+    private VistaNoticiasCRUD obtenerNoticias() throws ServletException, IOException {
     	PeticionHttp peticion = UtilsTestBolsaEmpleo.peticionAutenticada();
 		peticion.setParameter(ControladorIndice.PARAM_ACCION, ControladorIndice.ACCION_LISTAR_NOTICIAS);
 
 		RespuestaHttp respuesta = new RespuestaHttp();
 		ControladorIndice controlador = new ControladorIndice();
 		controlador.doGet(peticion, respuesta);
-		return (VistaNoticias) peticion.getUVDatos().getVistas().get(VistaNoticias.class.getName());
+		return (VistaNoticiasCRUD) peticion.getUVDatos().getVistas().get(VistaNoticiasCRUD.class.getName());
     }
     
 	/** obtener noticias.
@@ -59,7 +59,7 @@ public class TestControladorInicio {
 	 */
 	@Test
 	public void testA01Obtener() throws SQLException, ServletException, IOException {
-		VistaNoticias bean = obtenerNoticias();
+		VistaNoticiasCRUD bean = obtenerNoticias();
 
 		assertNotEquals(MENSAJE_NOTICIAS_DEVUELTAS, 0, bean.getNoticias().size());
 		assertEquals(MENSAJE_SIN_ERROR, 0, bean.getMensajesDeError().size());
