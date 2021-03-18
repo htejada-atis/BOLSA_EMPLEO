@@ -144,6 +144,87 @@ nav-bolsa-empleo a:active, nav-bolsa-empleo a:hover {
 	line-height: 1.5;
 }
 
+/* Noticias */
 
+.titulo-noticias {
+	display: flex;
+	flex-wrap: wrap;
+	justify-content: space-between;
+}
 
+.titulo-noticias h4 {
+	margin-left: 32px;
+}
+
+.titulo-noticias .link-btn {
+	margin-top: 24px;
+}
+
+/* Botón añadir */
+
+.bolsa-empleo .link-btn {
+	display: flex;
+	color: #fff;
+	background-color: var(--principal);
+	border-color: #005cbf;
+	padding: 9px 8px 4px;
+	font-size: 15px;
+	border-radius: .3rem;
+    font-weight: 400;
+    text-align: center;
+    white-space: nowrap;
+    align-items: center;
+    justify-content: center;
+    user-select: none;
+    border: 1px solid transparent;
+}
+
+.link-btn:hover, .link-btn:focus {
+	text-decoration: none;
+}
+
+.bolsa-empleo #nueva_noticia span {
+	display: inline-block;
+	padding: .6em;
+	line-height: 2.4em;
+	text-align: center;
+	background-color: #fff;
+	-webkit-mask: url(../img/md/add.svg) no-repeat center;
+	mask: url(../img/md/add.svg) no-repeat center;
+}
+
+/* Formularios */
+
+.bolsa-empleo label {
+	width: unset !important;
+}
+
+.form-group, .form-check, .form-btn {
+	display: inline-block;
+	width: 100% !important;
+	margin-bottom: 1rem;
+}
+
+.form-group label, .form-check label {
+	display: inline-block;
+	font-size: .9rem;
+}
+
+.form-group label {
+	width: 100% !important;
+	text-align: left !important;
+	margin-bottom: .5rem;
+}
+
+.form-group input {
+	display: block;
+}
+
+.form-group {
+	margin-bottom: 1rem;
+}
+
+.form-check label, .form-check input {
+	vertical-align: middle;
+}
 

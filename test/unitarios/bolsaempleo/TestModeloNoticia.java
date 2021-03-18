@@ -24,6 +24,7 @@ public class TestModeloNoticia {
     private static final String FECHA_STRING_EJEMPLO = "31/12/2028";
     private static final String ENLACE_NOTICIA = "enlace noticia";
     private static final String TEXTO_NOTICIA = "texto noticia";
+    private static final Boolean PUBLICA_NOTICIA = true;
     private static java.util.Date fechaEjemplo;
     
 	/** prepara la bd con los datos iniciales.
@@ -50,6 +51,7 @@ public class TestModeloNoticia {
     	noticia.setEnlace(ENLACE_NOTICIA);
     	noticia.setTexto(ENLACE_NOTICIA);
     	noticia.setFecha(fechaEjemplo);
+    	noticia.setPublica(PUBLICA_NOTICIA);
     	ModeloNoticia modelo = new ModeloNoticia();
     	modelo.insertaNoticia(noticia);
     	List<Noticia> noticias = modelo.listaNoticias("");
@@ -114,6 +116,7 @@ public class TestModeloNoticia {
     	Noticia noticia = new Noticia();
     	noticia.setTexto(TEXTO_NOTICIA);
     	noticia.setFecha(fechaEjemplo);
+    	noticia.setPublica(PUBLICA_NOTICIA);
     	ModeloNoticia modelo = new ModeloNoticia();
     	modelo.insertaNoticia(noticia);
     	fail();
@@ -129,6 +132,7 @@ public class TestModeloNoticia {
     	Noticia noticia = new Noticia();
     	noticia.setEnlace(ENLACE_NOTICIA);
     	noticia.setFecha(fechaEjemplo);
+    	noticia.setPublica(PUBLICA_NOTICIA);
     	ModeloNoticia modelo = new ModeloNoticia();
     	modelo.insertaNoticia(noticia);
     	fail();
@@ -143,6 +147,7 @@ public class TestModeloNoticia {
     	Noticia noticia = new Noticia();
     	noticia.setEnlace(ENLACE_NOTICIA);
     	noticia.setTexto(TEXTO_NOTICIA);
+    	noticia.setPublica(PUBLICA_NOTICIA);
     	ModeloNoticia modelo = new ModeloNoticia();
     	modelo.insertaNoticia(noticia);
     	fail();

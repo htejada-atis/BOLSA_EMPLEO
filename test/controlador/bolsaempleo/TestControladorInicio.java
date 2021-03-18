@@ -13,7 +13,7 @@ import bbdd.BbddRunner;
 import bbdd.UtilsTestBolsaEmpleo;
 import controlador.implementacion.PeticionHttp;
 import controlador.implementacion.RespuestaHttp;
-import es.ujaen.uvirtual.beans.vistas.uvirtual.bolsaempleo.VistaNoticiasCRUD;
+import es.ujaen.uvirtual.beans.vistas.uvirtual.bolsaempleo.VistaNoticias;
 import es.ujaen.uvirtual.controlador.infadministrativa.bolsaempleo.ControladorIndice;
 import es.ujaen.uvirtual.utilidades.UVException;
 
@@ -42,14 +42,14 @@ public class TestControladorInicio {
     }
     
     
-    private VistaNoticiasCRUD obtenerNoticias() throws ServletException, IOException {
+    private VistaNoticias obtenerNoticias() throws ServletException, IOException {
     	PeticionHttp peticion = UtilsTestBolsaEmpleo.peticionAutenticada();
 		peticion.setParameter(ControladorIndice.PARAM_ACCION, ControladorIndice.ACCION_LISTAR_NOTICIAS);
 
 		RespuestaHttp respuesta = new RespuestaHttp();
 		ControladorIndice controlador = new ControladorIndice();
 		controlador.doGet(peticion, respuesta);
-		return (VistaNoticiasCRUD) peticion.getUVDatos().getVistas().get(VistaNoticiasCRUD.class.getName());
+		return (VistaNoticias) peticion.getUVDatos().getVistas().get(VistaNoticias.class.getName());
     }
     
 	/** obtener noticias.
@@ -59,7 +59,7 @@ public class TestControladorInicio {
 	 */
 	@Test
 	public void testA01Obtener() throws SQLException, ServletException, IOException {
-		VistaNoticiasCRUD bean = obtenerNoticias();
+		VistaNoticias bean = obtenerNoticias();
 
 		assertNotEquals(MENSAJE_NOTICIAS_DEVUELTAS, 0, bean.getNoticias().size());
 		assertEquals(MENSAJE_SIN_ERROR, 0, bean.getMensajesDeError().size());

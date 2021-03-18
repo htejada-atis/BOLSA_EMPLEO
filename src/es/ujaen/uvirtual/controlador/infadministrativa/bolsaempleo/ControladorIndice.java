@@ -15,7 +15,7 @@ import org.json.JSONException;
 import org.json.JSONObject;
 import es.ujaen.uvirtual.beans.UVDatos;
 import es.ujaen.uvirtual.beans.uvirtual.bolsaempleo.Noticia;
-import es.ujaen.uvirtual.beans.vistas.uvirtual.bolsaempleo.VistaNoticiasCRUD;
+import es.ujaen.uvirtual.beans.vistas.uvirtual.bolsaempleo.VistaNoticias;
 import es.ujaen.uvirtual.modelo.bolsaempleo.ModeloNoticia;
 import es.ujaen.uvirtual.utilidades.BolsaEmpleoUtils;
 import es.ujaen.uvirtual.utilidades.EscapaHTML;
@@ -36,7 +36,6 @@ public class ControladorIndice extends HttpServlet {
 	public static final String PARAM_ACCION = "a";
 	
 	// acciones
-	public static final String ACCION_ACERCA_DE = "acercade";
 	public static final String ACCION_AYUDA = "ayuda";
 	public static final String ACCION_DOCUMENTOS = "documentos";
 	public static final String ACCION_FAQ = "faq";
@@ -53,7 +52,7 @@ public class ControladorIndice extends HttpServlet {
 	public void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 		UVDatos datos = (UVDatos) request.getAttribute(UVDatos.NOMBRE_ATRIBUTO);
 		
-		VistaNoticiasCRUD bean = new VistaNoticiasCRUD();
+		VistaNoticias bean = new VistaNoticias();
 		
 		String nombreAccion = EscapaHTML.ajustaCodificacion(request.getParameter(PARAM_ACCION));
 		if (nombreAccion == null) {
@@ -61,9 +60,6 @@ public class ControladorIndice extends HttpServlet {
 		}
 		try {
 			switch (nombreAccion) {
-				case ACCION_ACERCA_DE:
-					bean.setVista(RUTA_BEP_INICIO + "acercade.jsp");
-					break;
 				case ACCION_AYUDA:
 					bean.setVista(RUTA_BEP_INICIO + "ayuda.jsp");
 					break;
@@ -92,11 +88,18 @@ public class ControladorIndice extends HttpServlet {
 			datos.getFicherosJS().add("/js/jquery-ui-1.10.4.min.js");
 			datos.getFicherosJS().add("/js/jquery.ui.datepicker-es.js");
 			datos.getFicherosJS().add("/js/bolsaempleo/utils.js");
-			datos.getFicherosJS().add("/js/bolsaempleo/menu.js");
 			datos.getFicherosCSS().add("/css/intranet.css");
 			datos.getFicherosCSS().add("/css/jqueryujaen/jquery-ui-1.8.16.custom.css");
 			datos.getFicherosCSS().add("/css/ujaen_bolsa_empleo.css");
 		}
+	}
+	
+	/** redireccion de do post.
+	 * @see HttpServlet#doPost(HttpServletRequest request, HttpServletResponse response)
+	 */
+	@Override
+	public void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+		doGet(request, response);
 	}
 	
 	/** muestra todas las noticias.
@@ -105,10 +108,10 @@ public class ControladorIndice extends HttpServlet {
 	 * @param response de la respuesta del servidor
 	 * @throws SQLException excepcion de bbdd.
 	 */
-	private void obtenerTodasNoticias(VistaNoticiasCRUD bean, HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException, SQLException {
+	private void obtenerTodasNoticias(VistaNoticias bean, HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException, SQLException {
 		ModeloNoticia modelo = new ModeloNoticia();
 		
-		bean.setVista(RUTA_BEP_INICIO + "inicio.jsp");
+		bean.setVista(RUTA_BEP_INICIO + "indice.jsp");
 		response.setContentType("application/json");
 		response.setCharacterEncoding("UTF-8");
 		
@@ -120,11 +123,11 @@ public class ControladorIndice extends HttpServlet {
 			List<String> idsNoticias = new ArrayList<>();
 			if (ids != null) {
 				for (int i = 0; i < ids.length(); i++) {
-					idsNoticias.add(ids.getString(0));
+					idsNoticias.add(ids.getString(i));
 				}
 			}
 			
-			List<Noticia> listaNoticias = modelo.listaNoticias(BolsaEmpleoUtils.consultaNotIn("CODNUM", idsNoticias) + " ORDER BY fecha");
+			List<Noticia> listaNoticias = modelo.listaNoticiasInicioRestantes(BolsaEmpleoUtils.consultaNotIn("CODNUM", idsNoticias));
 			
 			json.put("result", "ok");
 			json.put("noticias", listaNoticias);
@@ -140,10 +143,10 @@ public class ControladorIndice extends HttpServlet {
 	 * @param bean bean de la vista a la que poner los valores.
 	 * @throws SQLException excepcion de bbdd.
 	 */
-	private void obtenerNoticias(VistaNoticiasCRUD bean) throws SQLException {
-		bean.setVista(RUTA_BEP_INICIO + "inicio.jsp");
+	private void obtenerNoticias(VistaNoticias bean) throws SQLException {
+		bean.setVista(RUTA_BEP_INICIO + "indice.jsp");
 		ModeloNoticia modelo = new ModeloNoticia();
-		List<Noticia> noticias = modelo.listaNoticiasIniciales();
+		List<Noticia> noticias = modelo.listaNoticiasInicio();
 		bean.setNoticias(noticias);
 	}
 }

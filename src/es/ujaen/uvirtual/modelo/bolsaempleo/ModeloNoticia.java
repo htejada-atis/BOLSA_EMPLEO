@@ -4,9 +4,7 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.sql.SQLIntegrityConstraintViolationException;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 import es.ujaen.uvirtual.beans.uvirtual.bolsaempleo.Noticia;
 import es.ujaen.uvirtual.modelo.conexion.ConexionUvirtual;
@@ -30,24 +28,23 @@ public class ModeloNoticia {
 	 * @return todas las noticias de la base de datos
 	 * @throws SQLException en caso de error de base de datos
 	 */
-	public List<Noticia> listaNoticias(String clausulaWhere) throws SQLException {
+	private List<Noticia> listaNoticias(String clausula) throws SQLException {
 		List<Noticia> noticias = new ArrayList<>();
-		String consulta = "SELECT n.* FROM tbep_noticias n " + clausulaWhere;
+		String consulta = "SELECT n.* FROM tbep_noticias n " + clausula;
+		System.out.println(consulta);
 		
 		try (Connection conexion = ConexionUvirtual.obtenerInstancia();
 			PreparedStatement stmt = conexion.prepareStatement(consulta);) {
 				try (ResultSet rs = stmt.executeQuery()) {
 					while (rs.next()) {
 						try {
-							int idNoticia = rs.getInt("codnum");
-							String enlace = rs.getString("enlace");
-							String texto = rs.getString("texto");
-							Date fecha = rs.getTimestamp("fecha");
 							Noticia not = new Noticia();
-							not.setCodNum(idNoticia);
-							not.setEnlace(enlace);
-							not.setTexto(texto);
-							not.setFecha(fecha);
+							not.setCodNum(rs.getInt("CODNUM"));
+							not.setEnlace(rs.getString("ENLACE"));
+							not.setTexto(rs.getString("TEXTO"));
+							not.setFecha(rs.getTimestamp("FECHA"));
+							not.setPublica(rs.getString("FLGPUBLICA").equals("S"));
+							not.setActiva(rs.getString("FLGACTIVA").equals("S"));
 							noticias.add(not);
 						} catch (Exception e) {
 							e.printStackTrace();
@@ -59,36 +56,28 @@ public class ModeloNoticia {
 		return noticias;
 	}
 	
+	/** lista todas las noticias.
+	 * @return vector con todas las convocatorias(abiertas,cerradas y creadas)
+	 * @throws SQLException si hay un error en la base de datos
+	 */
+	public List<Noticia> listaNoticias() throws SQLException {
+		return listaNoticias(" ORDER BY fecha");
+	}
+	
+	/** lista todas las noticias.
+	 * @return vector con todas las convocatorias(abiertas,cerradas y creadas)
+	 * @throws SQLException si hay un error en la base de datos
+	 */
+	public List<Noticia> listaNoticiasInicioRestantes(String clausula) throws SQLException {
+		return listaNoticias(clausula + " AND flgpublica = 'S' ORDER BY fecha");
+	}
+	
 	/** Consulta noticias en BBDD y las devuelve.
 	 * @return las 3 noticias más recientes de la base de datos
 	 * @throws SQLException en caso de error de base de datos
 	 */
-	public List<Noticia> listaNoticiasIniciales() throws SQLException {
-		List<Noticia> noticias = new ArrayList<>();
-		String consulta = "SELECT n.* FROM tbep_noticias n ORDER BY fecha FETCH FIRST 3 ROWS ONLY";
-		try (Connection conexion = ConexionUvirtual.obtenerInstancia();
-			PreparedStatement stmt = conexion.prepareStatement(consulta);) {
-				try (ResultSet rs = stmt.executeQuery()) {
-					while (rs.next()) {
-						try {
-							int idNoticia = rs.getInt("codnum");
-							String enlace = rs.getString("enlace");
-							String texto = rs.getString("texto");
-							Date fecha = rs.getTimestamp("fecha");
-							Noticia not = new Noticia(); 
-							not.setCodNum(idNoticia);
-							not.setEnlace(enlace);
-							not.setTexto(texto);
-							not.setFecha(fecha);
-							noticias.add(not);
-						} catch (Exception e) {
-							e.printStackTrace();
-						}
-						
-					}
-				}
-			}
-		return noticias;
+	public List<Noticia> listaNoticiasInicio() throws SQLException {
+		return listaNoticias("WHERE flgpublica = 'S' ORDER BY fecha FETCH FIRST 3 ROWS ONLY");
 	}
 	
 	/** obtiene una noticia a partir de su id.
@@ -97,8 +86,8 @@ public class ModeloNoticia {
 	 * @throws SQLException en caso de error en la BD
 	 */
 	public Noticia listaNoticia(int id) throws SQLException, UVException {
-		String clausulaWhere = "WHERE codnum = " +id;
-		List<Noticia> noticias = listaNoticias("");
+		String clausulaWhere = "WHERE codnum = " + id;
+		List<Noticia> noticias = listaNoticias(clausulaWhere);
 		if (noticias.isEmpty()) {
 			throw new UVException("No existe noticia");
 		}
@@ -124,14 +113,15 @@ public class ModeloNoticia {
 		}
 		
 		String consulta = "INSERT INTO tbep_noticias " 
-						+ " (ENLACE,TEXTO,FECHA) "
-						+ "VALUES (?, ?, ?)";
+						+ " (ENLACE,TEXTO,FECHA,FLGPUBLICA) "
+						+ "VALUES (?, ?, ?, ?)";
 		try (Connection conexion = ConexionUvirtual.obtenerInstancia();
 			 PreparedStatement stmt = conexion.prepareStatement(consulta);) {
 			int parameterIndex = 1;
 			stmt.setString(parameterIndex++, noticia.getEnlace());
 			stmt.setString(parameterIndex++, noticia.getTexto());
 			stmt.setDate(parameterIndex++, new java.sql.Date(noticia.getFecha().getTime()));
+			stmt.setBoolean(parameterIndex++, noticia.isPublica());
 			stmt.executeUpdate();
 		}
 	}
@@ -178,10 +168,13 @@ public class ModeloNoticia {
 		if (noticia.getFecha() == null) {
 			throw new UVException("fecha obligatoria");
 		}
+		if (noticia.isPublica() == null) {
+			throw new UVException("publica obligatoria");
+		}
 		
 		String consulta = "UPDATE tbep_noticias "
 						+ "   SET enlace=?, texto=?, "
-						+ "       fecha=? "
+						+ "       fecha=?, flgpublica=? "
 						+ " WHERE codnum=?";
 		try (Connection conexion = ConexionUvirtual.obtenerInstancia();
 			 PreparedStatement stmt = conexion.prepareStatement(consulta);) {
@@ -189,6 +182,7 @@ public class ModeloNoticia {
 			stmt.setString(parameterIndex++, noticia.getEnlace());
 			stmt.setString(parameterIndex++, noticia.getTexto());
 			stmt.setDate(parameterIndex++, new java.sql.Date(noticia.getFecha().getTime()));
+			stmt.setString(parameterIndex++, noticia.isPublica() ? "S" : "N");
 			stmt.setInt(parameterIndex++, noticia.getCodNum());
 			stmt.executeUpdate();
 		}

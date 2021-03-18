@@ -1,13 +1,13 @@
 <%@ page trimDirectiveWhitespaces="true"%>
 <%@	page import="es.ujaen.uvirtual.controlador.infadministrativa.bolsaempleo.ControladorIndice"%>
-<%@ page import="es.ujaen.uvirtual.beans.vistas.uvirtual.bolsaempleo.VistaNoticiasCRUD" %>
+<%@ page import="es.ujaen.uvirtual.beans.vistas.uvirtual.bolsaempleo.VistaNoticias" %>
 <%@ page import="es.ujaen.uvirtual.beans.uvirtual.bolsaempleo.Noticia" %>
 <%@ page import="es.ujaen.uvirtual.beans.UVDatos"%>
 <%@ page import="es.ujaen.uvirtual.utilidades.Formateador"%>
 
 <% 
 UVDatos uvdatos = (UVDatos)request.getAttribute(UVDatos.NOMBRE_ATRIBUTO);
-VistaNoticiasCRUD bean = (VistaNoticiasCRUD)uvdatos.getVistas().get(VistaNoticiasCRUD.class.getName());
+VistaNoticias bean = (VistaNoticias)uvdatos.getVistas().get(VistaNoticias.class.getName());
 %>
 
 <div class="bolsa-empleo">
@@ -50,16 +50,15 @@ VistaNoticiasCRUD bean = (VistaNoticiasCRUD)uvdatos.getVistas().get(VistaNoticia
 		
 		function comprobarNoticiasCargadas() {
 			$(".noticias-bolsa-empleo ul").children("li").each(function() {
-				ids_noticias.push($(this).attr("id").split("_")[1])
+				ids_noticias.push($(this).attr("id").split("_")[1]);
 			});
 		}
 		
 		function obtenerRestoDeNoticias() {
 			ids_noticias = []
 			comprobarNoticiasCargadas();
-			
 			var params = {'a':'listar_todas_noticias', 'ids_noticias': JSON.stringify(ids_noticias)}
-			console.log(params);
+			
 			$.ajax({
 		        type: "GET",
 		        url: "<%= request.getRequestURI() %>",
@@ -67,14 +66,13 @@ VistaNoticiasCRUD bean = (VistaNoticiasCRUD)uvdatos.getVistas().get(VistaNoticia
 		        dataType: "json",
 		        data: params,
 		        success: function(response) {
-		            console.log(response);
 		            response.noticias.forEach((noticia) => {
 		            	var element = $(".noticias-bolsa-empleo li").first().clone();
 		            	element.attr("id", "id_"+noticia.idNoticia);
 		            	element.find("a").attr("href", noticia.enlace);
 		            	element.find("a").text(noticia.texto);
-		            	element.find(".fecha-noticia").text(formatearFecha(noticia.fecha));
-		            	console.log(element);
+		            	element.find(".fecha-noticia").text(noticia.fechaFormato);
+
 		            	$(".noticias-bolsa-empleo ul").append(element);
 		            	$("#view_all a").text("Ver menos");
 		            	view_all = false;
@@ -92,7 +90,6 @@ VistaNoticiasCRUD bean = (VistaNoticiasCRUD)uvdatos.getVistas().get(VistaNoticia
 			if(view_all) {
 				obtenerRestoDeNoticias();
 			} else {
-				console.log("entra acá")
 				$(".noticias-bolsa-empleo ul").children("li").each(function(i) {
 					if(i > 2) {
 						$(this).remove();
@@ -106,7 +103,9 @@ VistaNoticiasCRUD bean = (VistaNoticiasCRUD)uvdatos.getVistas().get(VistaNoticia
 		
 		comprobarNoticiasCargadas();
 		
-		if(!ids_noticias.length > 0) {
+		console.log(ids_noticias.length);
+		if(!ids_noticias.length > 3) {
+			console.log("entra");
 			$("#view_all").hide();
 		}
 		
