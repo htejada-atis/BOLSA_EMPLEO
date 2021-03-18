@@ -24,7 +24,7 @@ public class ModeloNoticia {
 	/********************************************** METODOS PÚBLICOS PARA CONSULTAS   ********************************************/
 
 	/** Consulta noticias en BBDD y las devuelve.
-	 * @param clausulaWhere clausula para filtrar las noticias de la bd
+	 * @param clausula para filtrar las noticias de la bd
 	 * @return todas las noticias de la base de datos
 	 * @throws SQLException en caso de error de base de datos
 	 */
@@ -57,16 +57,17 @@ public class ModeloNoticia {
 	}
 	
 	/** lista todas las noticias.
-	 * @return vector con todas las convocatorias(abiertas,cerradas y creadas)
+	 * @return lista de todas las noticias
 	 * @throws SQLException si hay un error en la base de datos
 	 */
 	public List<Noticia> listaNoticias() throws SQLException {
 		return listaNoticias(" ORDER BY fecha");
 	}
 	
-	/** lista todas las noticias.
-	 * @return vector con todas las convocatorias(abiertas,cerradas y creadas)
-	 * @throws SQLException si hay un error en la base de datos
+	/** lista de noticias excluyendo las ya cargadas.
+	 * @param clausula sentencia sql que excluye las noticias ya mostradas .
+	 * @return lista de noticias filtradas .
+	 * @throws SQLException si hay un error en la base de datos .
 	 */
 	public List<Noticia> listaNoticiasInicioRestantes(String clausula) throws SQLException {
 		return listaNoticias(clausula + " AND flgpublica = 'S' ORDER BY fecha");

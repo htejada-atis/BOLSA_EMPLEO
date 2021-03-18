@@ -54,7 +54,7 @@ public class TestModeloNoticia {
     	noticia.setPublica(PUBLICA_NOTICIA);
     	ModeloNoticia modelo = new ModeloNoticia();
     	modelo.insertaNoticia(noticia);
-    	List<Noticia> noticias = modelo.listaNoticias("");
+    	List<Noticia> noticias = modelo.listaNoticias();
     	assertTrue("noticia insertada debe ser listada", noticias.contains(noticia));
     }
 
@@ -65,7 +65,7 @@ public class TestModeloNoticia {
     @Test
     public void testA02BorraNoticia() throws SQLException, UVException {
     	ModeloNoticia modelo = new ModeloNoticia();
-    	List<Noticia> noticias = modelo.listaNoticias("");
+    	List<Noticia> noticias = modelo.listaNoticias();
     	Noticia noticia = noticias.get(0);
     	modelo.borraNoticia(noticia);
     	try {
@@ -74,7 +74,7 @@ public class TestModeloNoticia {
     	} catch (UVException e) {
     		//se expera excepcion
     	} 
-    	List<Noticia> noticiasFiltradas = modelo.listaNoticias("");
+    	List<Noticia> noticiasFiltradas = modelo.listaNoticias();
     	assertTrue("noticia borrada no debe ser listada", !noticiasFiltradas.contains(noticia));
     	assertTrue("noticias debe tener un elemento menos", noticias.size() - 1 == noticiasFiltradas.size());
     }
@@ -86,7 +86,7 @@ public class TestModeloNoticia {
     @Test
     public void testA03EditarNoticia() throws SQLException, UVException {
     	ModeloNoticia modelo = new ModeloNoticia();
-    	List<Noticia> noticias = modelo.listaNoticias("");
+    	List<Noticia> noticias = modelo.listaNoticias();
     	Noticia noticia = noticias.get(0);
     	noticia.setTexto("texto actualizado");
     	modelo.actualizaNoticia(noticia); 

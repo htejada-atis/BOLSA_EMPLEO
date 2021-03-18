@@ -31,7 +31,7 @@ import es.ujaen.uvirtual.utilidades.EscapaHTML;
 				"/srv/es/informacionadministrativa/bolsaempleo", 
 				"/srv/en/informacionadministrativa/bolsaempleo"
 		})
-public class ControladorIndice extends HttpServlet {
+public class ControladorInicio extends HttpServlet {
 	private static final long serialVersionUID = 1L;
 	public static final String PARAM_ACCION = "a";
 	

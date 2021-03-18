@@ -13,7 +13,6 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
-
 import org.json.JSONException;
 import org.json.JSONObject;
 import es.ujaen.uvirtual.beans.UVDatos;
@@ -191,6 +190,7 @@ public class ControladorGestionNoticias extends HttpServlet {
 			json.put("recordsTotal", listaNoticias.size());
 			json.put("recordsFiltered", listaNoticias.size());
 			json.put("data", listaNoticias);
+			System.out.print(json);
 		} catch (JSONException e) {
 			LOGGER.log(Level.SEVERE, "Error creando json {0}", e);
 			throw new UVException("Error creando json");

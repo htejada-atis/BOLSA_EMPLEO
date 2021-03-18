@@ -175,7 +175,7 @@ nav-bolsa-empleo a:active, nav-bolsa-empleo a:hover {
 	color: #fff;
 	background-color: var(--principal);
 	border-color: #005cbf;
-	padding: 9px 8px 4px;
+	padding: 8px;
 	font-size: 15px;
 	border-radius: .3rem;
     font-weight: 400;

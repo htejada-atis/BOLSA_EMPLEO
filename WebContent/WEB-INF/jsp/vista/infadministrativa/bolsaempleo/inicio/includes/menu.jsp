@@ -1,4 +1,4 @@
-<%@	page import="es.ujaen.uvirtual.controlador.infadministrativa.bolsaempleo.ControladorIndice"%>
+<%@	page import="es.ujaen.uvirtual.controlador.infadministrativa.bolsaempleo.ControladorInicio"%>
 
 
 <ul>
@@ -27,11 +27,11 @@
 <script>
 
 	$(function() {
-		if("<%= request.getParameter(ControladorIndice.PARAM_ACCION) %>" == "null") {
+		if("<%=request.getParameter(ControladorInicio.PARAM_ACCION)%>" == "null" || "<%=request.getParameter(ControladorInicio.PARAM_ACCION)%>" == "") {
 			$("#menu_inicio").addClass("active");
 		} else {
 			$(".nav-bolsa-empleo ul").children("li").each(function() {
-				if($(this).find("a").attr("id").split("_")[1] == "<%= request.getParameter(ControladorIndice.PARAM_ACCION) %>") {
+				if($(this).find("a").attr("id").split("_")[1] == "<%=request.getParameter(ControladorInicio.PARAM_ACCION)%>") {
 					$(this).find("a").addClass("active");
 				}
 			});
