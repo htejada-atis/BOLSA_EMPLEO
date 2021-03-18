@@ -32,14 +32,13 @@ VistaEstadoBolsas bean = (VistaEstadoBolsas) uvdatos.getVistas().get(VistaEstado
 			<th scope="col" style="width:20%">Actualizada</th>
 			<th scope="col" style="width:18%">Bloqueo</th>
 			<th scope="col" style="width:19%">Desbloqueo</th>
-			<th scope="col" style="width:18%">Baremable</th>
-			<th scope="col" style="width:10%"></th>
+			<th scope="col" style="width:18%">Baremable</th>			
 		</tr>
 		<tbody>				
 		</tbody>
 		<tfoot>
 			<tr>
-				<th colSpan="9" style="width:100%"></th>
+				<th colSpan="8" style="width:100%"></th>
 			</tr>
 		</tfoot>
 	</table>
@@ -47,10 +46,6 @@ VistaEstadoBolsas bean = (VistaEstadoBolsas) uvdatos.getVistas().get(VistaEstado
 	
 	<script>
 	$(document).ready(function() {
-		function clickRow(row) {
-			console.log("row", row);
-		}
-		
 		var table = new DataTable('#table', {
 		    "ajax": { url: "/srv/es/ajax/informacionadministrativa/bolsaempleo/bolsas" },
 		    "selectable": true,
@@ -64,9 +59,30 @@ VistaEstadoBolsas bean = (VistaEstadoBolsas) uvdatos.getVistas().get(VistaEstado
 		        {'data': 'fechaBloqueo'},
 		        {'data': 'fechaDesBloqueo'},
 		        {'data': 'baremable'},
-		        {'data': 'codNum', 'buttons': [{'label': 'Click', 'onClick': function(row) {console.log("row", row);}}]}		        
 		    ],
-		});		
+		    "actions": [
+		    	{'label': 'Bloquear', 'onClick': function(selected) { enviaAccion("bloquear", selected); } },
+		    	{'label': 'Revisión', 'onClick': function(selected) { enviaAccion("revision", selected); } },
+		    	{'label': 'Baremación', 'onClick': function(selected) { enviaAccion("baremacion", selected); } },
+		    	{'label': 'Alegación', 'onClick': function(selected) { enviaAccion("alegacion", selected); } },
+		    	{'label': 'Desbloquear', 'onClick': function(selected) { enviaAccion("desbloquear", selected); } },
+		    	{'label': 'Baremar', 'onClick': function(selected) { enviaAccion("baremar", selected); } },
+		    ]
+		});	
+		
+		function enviaAccion(accion, selected) {
+			$.ajax({
+		        type: "POST",
+		        url: "/srv/es/ajax/informacionadministrativa/bolsaempleo/bolsas",
+		        contentType: "application/json",
+		        dataType: "text",
+		        data: {"a": "cambiarestadobolsa", "estado": accion, "selected": selected },
+		        success: function(response) {
+		        	table.refresh();
+		        },
+		        error: function(response) { alert(Atis.getErrorResponse(response)); }            
+		    });	 		
+		}
 	}); 
 	</script>
 </div>
