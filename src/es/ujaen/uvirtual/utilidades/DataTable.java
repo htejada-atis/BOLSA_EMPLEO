@@ -1,5 +1,6 @@
 package es.ujaen.uvirtual.utilidades;
 
+import java.io.IOException;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -10,6 +11,11 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import javax.servlet.http.HttpServletRequest;
+
+import org.junit.BeforeClass;
+
+import bbdd.BbddRunner;
+import es.ujaen.uvirtual.adm.CrearUsuario;
 
 /**
  * Utilidad para la gestión de los parámetros del datatable.
@@ -42,21 +48,21 @@ public class DataTable<T> {
 	private List<T> data;
 		
 	/**
-	 * Crear un DT a partir del request.
-	 * @param request .
+	 * Crear un DT a partir de los parámetros del request.
+	 * @param params .
 	 * @throws UVException .
 	 */
-	public DataTable(HttpServletRequest request) throws UVException {
+	public DataTable(Map<String, String[]> params) throws UVException {
 		try {
-			this.currentPage = Integer.parseInt(request.getParameter(DataTable.PARAM_CURRENT_PAGE));
-			this.pageSize = Integer.parseInt(request.getParameter(DataTable.PARAM_PAGE_SIZE));
+			this.currentPage = Integer.parseInt(String.join("", params.get(PARAM_CURRENT_PAGE)));
+			this.pageSize = Integer.parseInt(String.join("", params.get(PARAM_PAGE_SIZE)));
 			
-			String paramOrderBy = request.getParameter(DataTable.PARAM_ORDER_BY);
+			String paramOrderBy = String.join("", params.get(PARAM_ORDER_BY));
 			if (!paramOrderBy.isBlank()) {
 				this.orderBy = Integer.parseInt(paramOrderBy);
 			}
 			
-			this.orderDirection = request.getParameter(DataTable.PARAM_ORDER_DIRECTION);			
+			this.orderDirection = String.join("", params.get(PARAM_ORDER_DIRECTION));
 		} catch (NumberFormatException err) {
 			LOGGER.log(Level.WARNING, "Error Datatable" + err);
 			throw new UVException("Datatable parámetro no válido");
@@ -97,6 +103,18 @@ public class DataTable<T> {
 	
 	public Integer getCurrentPage() {
 		return this.currentPage;
+	}
+	
+	public Integer getPageSize() {
+		return this.pageSize;
+	}
+	
+	public Integer getOrderBy() {
+		return this.orderBy;
+	}
+	
+	public String getOrderDirection() {
+		return this.orderDirection;
 	}
 	
 	/**
@@ -157,7 +175,6 @@ public class DataTable<T> {
 		
 		return pconsulta + consultaResult;
 	}
-
 	
 }
 
