@@ -6,7 +6,7 @@
 function getProp( object, keys, defaultVal ){
   keys = Array.isArray( keys )? keys : keys.split('.');
   object = object[keys[0]];
-  if( object && keys.length>1 ){
+  if( object && keys.length > 1 ){
     return getProp( object, keys.slice(1) );
   }
   return object === undefined? defaultVal : object;
@@ -14,7 +14,7 @@ function getProp( object, keys, defaultVal ){
 
 function setProp( object, keys, val ){
   keys = Array.isArray( keys )? keys : keys.split('.');
-  if( keys.length>1 ){
+  if( keys.length > 1 ){
     object[keys[0]] = object[keys[0]] || {};
     return setProp( object[keys[0]], keys.slice(1), val );
   }
@@ -31,7 +31,7 @@ function DataTable(id, config) {
     this.params = {
         'a': 'datatable',
         'page': 0,
-        'pageSize': 5,
+        'pageSize': getProp(config, 'pageSize', 10),
         'orderBy': null,
         'orderDirection': 'asc'
     };
