@@ -58,8 +58,7 @@ public class ControladorBolsas extends HttpServlet {
 		VistaEstadoBolsas bean = new VistaEstadoBolsas();		
 		Usuario usuario = datos.getUsuario();
 		LOGGER.log(Level.FINEST, "usuario que ha entrado en el servlet es {0}", usuario.getUid());
-		
-		bean.setVista("/WEB-INF/jsp/vista/infadministrativa/bolsaempleo/bolsas/index.jsp");
+				
 		String nombreAccion = EscapaHTML.ajustaCodificacion(request.getParameter(PARAM_ACCION));
 		if (nombreAccion == null) {
 			nombreAccion = ACCION_LISTAR_BOLSAS;
@@ -76,6 +75,7 @@ public class ControladorBolsas extends HttpServlet {
 		try {
 			switch (nombreAccion) {
 				case ACCION_LISTAR_BOLSAS:
+					bean.setVista("/WEB-INF/jsp/vista/infadministrativa/bolsaempleo/bolsas/index.jsp");
 					break;
 			}			
 		} finally {
@@ -122,8 +122,7 @@ public class ControladorBolsas extends HttpServlet {
 	
 	private void datatable(PrintWriter out, HttpServletRequest request) throws SQLException, UVException, IOException {		
 		ModeloBolsa modelo = new ModeloBolsa();
-		DataTable<Bolsa> dataTable = modelo.listaBolsaEmpleo(request);
-		
+		DataTable<Bolsa> dataTable = modelo.listaBolsaEmpleo(request);		
 		JSONObject json = new JSONObject();
 		
 		try {

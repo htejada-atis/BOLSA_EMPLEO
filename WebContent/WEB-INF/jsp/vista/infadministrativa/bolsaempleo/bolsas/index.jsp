@@ -54,22 +54,19 @@ VistaEstadoBolsas bean = (VistaEstadoBolsas) uvdatos.getVistas().get(VistaEstado
 		var table = new DataTable('#table', {
 		    "ajax": { url: "/srv/es/ajax/informacionadministrativa/bolsaempleo/bolsas" },
 		    "selectable": true,
+		    "pageSize": 10,
 		    "columns": [
-		    	{'data': 'idBolsa', 'selectable': true},
-		        {'data': 'idBolsa'},
+		    	{'data': 'codNum', 'selectable': true},
+		        {'data': 'codNum'},
 		        {'data': 'area.descripcion'},
 		        {'data': 'estado'},
 		        {'data': 'fechaActualizacion'},
 		        {'data': 'fechaBloqueo'},
 		        {'data': 'fechaDesBloqueo'},
 		        {'data': 'baremable'},
-		        {'data': 'idBolsa', 'buttons': [{'label': 'Click', 'onClick': function(row) {console.log("row", row);}}]}		        
+		        {'data': 'codNum', 'buttons': [{'label': 'Click', 'onClick': function(row) {console.log("row", row);}}]}		        
 		    ],
-		});
-		
-		setInterval(function() {
-			//console.log(table.getChecked())
-		}, 5000)
+		});		
 	}); 
 	</script>
 </div>
