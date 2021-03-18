@@ -57,11 +57,11 @@ public class Bolsa implements Serializable {
 		this.fechaDesBloqueo = copia.fechaDesBloqueo;
 	}
 	
-	public Integer getIdBolsa() {
+	public Integer getCodNum() {
 		return codNum;
 	}
 	
-	public void setIdBolsa(Integer idBolsa) {
+	public void setCodNum(Integer idBolsa) {
 		this.codNum = idBolsa;
 	}
 	

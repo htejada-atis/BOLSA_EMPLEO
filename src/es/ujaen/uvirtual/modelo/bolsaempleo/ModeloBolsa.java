@@ -41,7 +41,7 @@ public class ModeloBolsa {
 	public DataTable<Bolsa> listaBolsaEmpleo(HttpServletRequest request) throws SQLException, UVException {
 		List<Bolsa> bolsas = new ArrayList<>();
 		ModeloArea modeloArea = new ModeloArea();
-		DataTable<Bolsa> dataTable = new DataTable<Bolsa>(request);
+		DataTable<Bolsa> dataTable = new DataTable<Bolsa>(request.getParameterMap());
 		
 		String consulta =
 			"SELECT bepbol.* "
@@ -65,7 +65,7 @@ public class ModeloBolsa {
 			try (ResultSet rs = stmt.executeQuery()) {
 				while (rs.next()) {
 					Bolsa bolsa = new Bolsa();
-					bolsa.setIdBolsa(rs.getInt("CODNUM"));
+					bolsa.setCodNum(rs.getInt("CODNUM"));
 					bolsa.setArea(modeloArea.getAreaById(rs.getInt("BEPARE_CODNUM")));
 					bolsa.setEstado(rs.getString("ESTADO"));
 					bolsa.setBaremable(rs.getString("FLGBAREMABLE").equals("S"));					
