@@ -50,7 +50,7 @@ function DataTable(id, config) {
 	        dataType: "json",
 	        data: self.params,
 	        success: this.parseResponse.bind(self),
-	        error: this.errorResponse.bind(self)            
+	        error: this.errorResponse.bind(self)
 	    });	      
     };
         
@@ -61,7 +61,7 @@ function DataTable(id, config) {
     	} else {
     		$('p.loading', self.tbody).remove();
     		$('tr', self.tbody).show();    		
-    	}    	
+    	}
     };
     
     this.parseResponse = function(response) {
@@ -118,7 +118,8 @@ function DataTable(id, config) {
     		var buttons = $('<span class="btns"></span>');
     		
     		columnDef.buttons.forEach(function(buttonDef) {
-    			var btn = $('<button class="btn" type="button">'+buttonDef.label+'</button>');
+                var label = isFunction(buttonDef.label) ? buttonDef.label(row) : buttonDef.label;
+    			var btn = $('<button class="btn" type="button">'+label+'</button>');
     			$(btn).on("click", function() { buttonDef.onClick(row, self); });
     			$(buttons).append(btn);
     		});
