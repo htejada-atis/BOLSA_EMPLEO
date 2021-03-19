@@ -1,5 +1,6 @@
-
-
+function isFunction(functionToCheck) {
+ return functionToCheck && {}.toString.call(functionToCheck) === '[object Function]';
+}
   
 function sendForm(url, params) {
 	var form = document.createElement("form");
