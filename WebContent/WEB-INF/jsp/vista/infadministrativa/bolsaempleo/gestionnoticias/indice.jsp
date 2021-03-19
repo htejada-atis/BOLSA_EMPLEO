@@ -89,14 +89,14 @@ VistaNoticias bean = (VistaNoticias) uvdatos.getVistas().get(VistaNoticias.class
 		    "columns": [
 		    	{'data': 'fechaFormato'},
 		    	{'data': 'texto'},
-		        {'data': 'enlace'},
+		        {'data': 'enlace', 'render': function(row) { return "mi enlace"; }},
 		        {'data': 'publica'},
 		        {'data': 'activa'},
 		        {'data': 'codnum', 'buttons': [{'label': 'Editar', 'onClick': function(row) {
 			        		var params = {'a': '<%= ControladorGestionNoticias.ACCION_EDITAR_NOTICIA %>', 'id': row.codNum};
 			        		sendForm("<%= request.getRequestURI() %>", params);
 			        	}
-			        }, {'label': 'Borrar', 'onClick': function(row) {
+			        }, {'label': function(row) { return "Borrar u otra cosa"; }, 'onClick': function(row) {
 			        	var mensaje = "¿Desea borrar la noticia seleccionada?";
 			        	var titulo = "Borrar noticia";
 			        	if(!row.activa) {
