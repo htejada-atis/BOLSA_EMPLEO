@@ -15,6 +15,7 @@ import es.ujaen.uvirtual.beans.uvirtual.bolsaempleo.Noticia;
 public class TestBeanNoticia {
 
 	private static final String CADENA = "cadena";
+	private static final Boolean BOOLEANO = true;
 	
 	/** test constructor.
 	 * 
@@ -28,10 +29,14 @@ public class TestBeanNoticia {
     	java.sql.Date ahora = new java.sql.Date(Calendar.getInstance().getTime().getTime());
     	noticia.setTexto(CADENA);
 		noticia.setFecha(ahora);
+		noticia.setPublica(BOOLEANO);
+		noticia.setActiva(BOOLEANO);
 		assertEquals(id, noticia.getCodNum());
 		assertEquals(CADENA, noticia.getEnlace());
 		assertEquals(CADENA, noticia.getTexto());
 		assertEquals(ahora, noticia.getFecha());
+		assertEquals(BOOLEANO, noticia.isPublica());
+		assertEquals(BOOLEANO, noticia.isActiva());
 		assertNotNull(noticia.toString());
 	}
 	
@@ -41,16 +46,20 @@ public class TestBeanNoticia {
 	public void testA02() {
 		Integer id = 1;
     	java.sql.Date ahora = new java.sql.Date(Calendar.getInstance().getTime().getTime());
-		Noticia noticia2 = new Noticia(id, CADENA, CADENA, ahora);
+		Noticia noticia2 = new Noticia(id, CADENA, CADENA, ahora, BOOLEANO, BOOLEANO);
 		Noticia noticia = new Noticia(noticia2);
 		noticia.setCodNum(id);
 		noticia.setEnlace(CADENA);
 		noticia.setTexto(CADENA);
 		noticia.setFecha(ahora);
+		noticia.setPublica(BOOLEANO);
+		noticia.setActiva(BOOLEANO);
 		assertEquals(id, noticia.getCodNum());
 		assertEquals(CADENA, noticia.getEnlace());
 		assertEquals(CADENA, noticia.getTexto());
 		assertEquals(ahora, noticia.getFecha());
+		assertEquals(BOOLEANO, noticia.isPublica());
+		assertEquals(BOOLEANO, noticia.isActiva());
 		assertNotNull(noticia.toString());
 		assertTrue(noticia.equals(noticia2));
 		assertTrue(noticia.hashCode() == noticia2.hashCode());
@@ -64,7 +73,7 @@ public class TestBeanNoticia {
 	public void testA03() {
 		Integer id = 1;
     	java.sql.Date ahora = new java.sql.Date(Calendar.getInstance().getTime().getTime());
-    	Noticia noticia3 = new Noticia(id, CADENA, CADENA, ahora);
+    	Noticia noticia3 = new Noticia(id, CADENA, CADENA, ahora, BOOLEANO, BOOLEANO);
     	Noticia noticia2 = new Noticia();
     	Noticia noticia = new Noticia();
 		assertTrue(noticia.equals(noticia2));

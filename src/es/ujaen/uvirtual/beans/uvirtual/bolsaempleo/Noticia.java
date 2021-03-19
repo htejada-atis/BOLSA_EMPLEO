@@ -3,6 +3,8 @@ package es.ujaen.uvirtual.beans.uvirtual.bolsaempleo;
 import java.io.Serializable;
 import java.util.Date;
 
+import es.ujaen.uvirtual.utilidades.Formateador;
+
 
 /** Clase convocatoria de docentia.
  * @author jlopez
@@ -15,6 +17,8 @@ public class Noticia implements Serializable {
 	private String enlace;
 	private String texto;
 	private Date fecha;
+	private Boolean publica;
+	private Boolean activa;
 	
 	
 	/** Constructor por defecto.
@@ -28,13 +32,33 @@ public class Noticia implements Serializable {
 	 * @param penlace .
 	 * @param ptexto .
 	 * @param pfecha .
+	 * @param ppublica .
+	 * @param pactiva .
 	 */
-	public Noticia(Integer pcodNum, String penlace, String ptexto, Date pfecha) {
+	public Noticia(Integer pcodNum, String penlace, String ptexto, Date pfecha, Boolean ppublica, Boolean pactiva) {
 		super();
 		this.codNum = pcodNum;
 		this.enlace = penlace;
 		this.texto = ptexto;
 		this.fecha = pfecha;
+		this.publica = ppublica;
+		this.activa = pactiva;
+	}
+	
+	/** Constructor con parametros.
+	 * @param penlace .
+	 * @param ptexto .
+	 * @param pfecha .
+	 * @param ppublica .
+	 * @param pactiva .
+	 */
+	public Noticia(String penlace, String ptexto, Date pfecha, Boolean ppublica, Boolean pactiva) {
+		super();
+		this.enlace = penlace;
+		this.texto = ptexto;
+		this.fecha = pfecha;
+		this.publica = ppublica;
+		this.activa = pactiva;
 	}
 	
 	/** Constructor copia.
@@ -45,6 +69,7 @@ public class Noticia implements Serializable {
 		this.enlace = copia.enlace;
 		this.texto = copia.texto;
 		this.fecha = copia.fecha;
+		this.publica = copia.publica;
 	}
 	
 	public Integer getCodNum() {
@@ -74,19 +99,46 @@ public class Noticia implements Serializable {
 	public Date getFecha() {
 		return fecha;
 	}
+	
+	public String getFechaFormato() {
+		return Formateador.formatoFecha(fecha, Formateador.FORMATO_FECHA_DDMMYYYY);
+	}
+	
+	public String getFechaHoraFormato() {
+		return Formateador.formatoFecha(fecha, Formateador.FORMATO_FECHA_DDMMYYYY_HHMMSS);
+	}
 
 	public void setFecha(Date fecha) {
 		this.fecha = fecha;
+	}
+	
+	public Boolean isPublica() {
+		return publica;
+	}
+
+	public void setPublica(Boolean publica) {
+		this.publica = publica;
+	}
+	
+	public Boolean isActiva() {
+		return activa;
+	}
+
+	public void setActiva(Boolean activa) {
+		this.activa = activa;
 	}
 
 	public static long getSerialversionuid() {
 		return serialVersionUID;
 	}
 	
+	
+	
 	@Override
 	public String toString() {
 		return "Noticia [codNum=" + codNum + ", enlace=" + enlace
-				+ ", texto=" + texto + ", fecha=" + fecha + "]";
+				+ ", texto=" + texto + ", fecha=" + fecha 
+				+ ", publica=" + publica + ", activa=" + activa + "]";
 	}
 	
 	@Override
@@ -132,6 +184,20 @@ public class Noticia implements Serializable {
 				return false;
 			}
 		} else if (!fecha.equals(other.fecha)) {
+			return false;
+		}
+		if (publica == null) {
+			if (other.publica != null) {
+				return false;
+			}
+		} else if (!publica.equals(other.publica)) {
+			return false;
+		}
+		if (activa == null) {
+			if (other.activa != null) {
+				return false;
+			}
+		} else if (!activa.equals(other.activa)) {
 			return false;
 		}
 		
