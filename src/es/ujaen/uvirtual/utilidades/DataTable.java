@@ -3,11 +3,16 @@ package es.ujaen.uvirtual.utilidades;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+
+import com.google.gson.ExclusionStrategy;
+import com.google.gson.FieldAttributes;
+import com.google.gson.annotations.Expose;
 
 /**
  * Utilidad para la gestión de los parámetros del datatable.
@@ -36,15 +41,34 @@ public class DataTable<T> {
 	private String consulta;
 	private String query;
 	private String queryCount;
-		
+	
 	private Integer pageSize;
-	private Integer currentPage;	
+	private Integer currentPage;
 	private Integer recordsTotal; // número de filas totales de la consulta
+	private Integer pagesTotal;
 	private Integer orderBy;
-	private String orderDirection;
+	private String orderDirection;	
+	private List<T> data;
+	
 	private Map<Integer, String> orderColumns = new HashMap<Integer, String>();
 	
-	private List<T> data;
+	public static final ExclusionStrategy GSONEXCLUSIONSTRATEGY = new ExclusionStrategy() {
+		@Override
+		public boolean shouldSkipClass(Class<?> arg0) {
+			return false;
+		}
+
+		@Override
+		public boolean shouldSkipField(FieldAttributes arg0) {
+			List<String> list = Arrays.asList(new String[]{"consulta", "query", "queryCount"});
+			
+			if (list.contains(arg0.getName())) {
+				return true;
+	        }
+			
+			return false;
+		}		
+	};
 		
 	/**
 	 * Crear un DT a partir de los parámetros del request.
@@ -130,6 +154,7 @@ public class DataTable<T> {
 				throw new UVException("Error obteniendo número total de filas");
 			}
 			this.recordsTotal = rs.getInt("count");
+			this.pagesTotal = this.recordsTotal / this.pageSize;
 		}		
 	}	
 	
@@ -139,14 +164,6 @@ public class DataTable<T> {
 	
 	public List<T> getData() {
 		return this.data;
-	}
-	
-	public Integer getRecordsTotal() {
-		return recordsTotal;
-	}
-
-	public Integer getPagesTotal() {
-		return this.recordsTotal / this.pageSize;
 	}
 		
 	public Boolean isOrderable() {

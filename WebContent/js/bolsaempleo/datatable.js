@@ -168,7 +168,6 @@ function DataTable(id, config) {
         $(pagination).append(btnLast);
 
         $('th', self.tfoot).empty();        
-
     	$('th', self.tfoot).append($(pagination));
         $('th', self.tfoot).append($(textoTotal));
     };
