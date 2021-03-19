@@ -1,5 +1,20 @@
-function formatearFecha(fecha) {
-	var sin_hora = fecha.split(" ")[0];
-	var sin_guiones = sin_hora.split("-");
-	return sin_guiones[2] + "/" + sin_guiones[1] + "/" +sin_guiones[0];
+
+
+  
+function sendForm(url, params) {
+	var form = document.createElement("form");
+  	form.method = "POST";
+	form.action = url;
+	document.body.appendChild(form);
+	
+	for(key in params) {
+		var element = document.createElement("input");
+		element.type = "hidden";
+		element.name = key;
+		element.value = params[key];
+		form.appendChild(element);
+	}
+  	
+	form.submit();
 }
+  
