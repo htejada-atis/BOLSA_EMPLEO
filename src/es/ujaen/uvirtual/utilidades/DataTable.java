@@ -1,6 +1,5 @@
 package es.ujaen.uvirtual.utilidades;
 
-import java.io.IOException;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -9,13 +8,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-
-import javax.servlet.http.HttpServletRequest;
-
-import org.junit.BeforeClass;
-
-import bbdd.BbddRunner;
-import es.ujaen.uvirtual.adm.CrearUsuario;
 
 /**
  * Utilidad para la gestión de los parámetros del datatable.
@@ -33,6 +25,9 @@ public class DataTable<T> {
 	public static final String PARAM_ORDER_DIRECTION = "orderDirection";
 	public static final String PARAM_ORDER_DIRECTION_VALUE_ASC = "asc";
 	public static final String PARAM_ORDER_DIRECTION_VALUE_DESC = "desc";
+	
+	public static final String PARAM_CURRENT_PAGE_VALUE_DEFAULT = "0";
+	public static final String PARAM_PAGE_SIZE_VALUE_DEFAULT = "10";
 	
 	private String consulta;
 	private String query;
@@ -54,22 +49,24 @@ public class DataTable<T> {
 	 */
 	public DataTable(Map<String, String[]> params) throws UVException {
 		try {
-			this.currentPage = Integer.parseInt(String.join("", params.get(PARAM_CURRENT_PAGE)));
-			this.pageSize = Integer.parseInt(String.join("", params.get(PARAM_PAGE_SIZE)));
+			this.currentPage = Integer.parseInt(String.join("", params.getOrDefault(PARAM_CURRENT_PAGE, new String[] {PARAM_CURRENT_PAGE_VALUE_DEFAULT})));
+			this.pageSize = Integer.parseInt(String.join("", params.getOrDefault(PARAM_PAGE_SIZE, new String[] {PARAM_PAGE_SIZE_VALUE_DEFAULT})));
 			
-			String paramOrderBy = String.join("", params.get(PARAM_ORDER_BY));
+			String paramOrderBy = String.join("", params.getOrDefault(PARAM_ORDER_BY, new String[] {""}));
 			if (!paramOrderBy.isBlank()) {
 				this.orderBy = Integer.parseInt(paramOrderBy);
 			}
 			
-			this.orderDirection = String.join("", params.get(PARAM_ORDER_DIRECTION));
+			this.orderDirection = String.join("", params.getOrDefault(PARAM_ORDER_DIRECTION, new String[] {""}));			
 		} catch (NumberFormatException err) {
 			LOGGER.log(Level.WARNING, "Error Datatable" + err);
 			throw new UVException("Datatable parámetro no válido");
 		}
-		
-		if (!this.orderDirection.equals(PARAM_ORDER_DIRECTION_VALUE_ASC) && !this.orderDirection.equals(PARAM_ORDER_DIRECTION_VALUE_DESC)) {
-			throw new UVException("Datatable tipo de ordenación no válido");
+				
+		if (!this.orderDirection.isBlank()) {
+			if (!this.orderDirection.equals(PARAM_ORDER_DIRECTION_VALUE_ASC) && !this.orderDirection.equals(PARAM_ORDER_DIRECTION_VALUE_DESC)) {
+				throw new UVException("Datatable tipo de ordenación no válido");
+			}
 		}
 	}
 		
