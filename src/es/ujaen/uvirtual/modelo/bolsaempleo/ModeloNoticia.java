@@ -31,7 +31,6 @@ public class ModeloNoticia {
 	private List<Noticia> listaNoticias(String clausula) throws SQLException {
 		List<Noticia> noticias = new ArrayList<>();
 		String consulta = "SELECT n.* FROM tbep_noticias n " + clausula;
-		System.out.println(consulta);
 		
 		try (Connection conexion = ConexionUvirtual.obtenerInstancia();
 			PreparedStatement stmt = conexion.prepareStatement(consulta);) {
@@ -122,7 +121,7 @@ public class ModeloNoticia {
 			stmt.setString(parameterIndex++, noticia.getEnlace());
 			stmt.setString(parameterIndex++, noticia.getTexto());
 			stmt.setDate(parameterIndex++, new java.sql.Date(noticia.getFecha().getTime()));
-			stmt.setBoolean(parameterIndex++, noticia.isPublica());
+			stmt.setString(parameterIndex++, noticia.isPublica() ? "S" : "N");
 			stmt.executeUpdate();
 		}
 	}
@@ -143,6 +142,28 @@ public class ModeloNoticia {
 		try (Connection conexion = ConexionUvirtual.obtenerInstancia();
 			 PreparedStatement stmt = conexion.prepareStatement(consulta);) {
 			int parameterIndex = 1;
+			stmt.setInt(parameterIndex++, noticia.getCodNum());
+			stmt.executeUpdate();
+		}
+	}
+	
+	/** Borra o restaura una noticia.
+	 * @param noticia a borrar
+	 * @throws SQLException en caso de error en la BD
+	 * @throws UVException si noticia no es valida
+	 */
+	public void borraRestauraNoticia(Noticia noticia) throws SQLException, UVException {
+		if (noticia == null) {
+			throw new UVException("No se puede eliminar una noticia vacía");
+		}
+		if (noticia.getCodNum() == null) {
+			throw new UVException("No se puede eliminar una noticia con id vacío");
+		}
+		String consulta = "UPDATE tbep_noticias SET flgactiva=? WHERE codnum=?";
+		try (Connection conexion = ConexionUvirtual.obtenerInstancia();
+			 PreparedStatement stmt = conexion.prepareStatement(consulta);) {
+			int parameterIndex = 1;
+			stmt.setString(parameterIndex++, noticia.isActiva() ? "S" : "N");
 			stmt.setInt(parameterIndex++, noticia.getCodNum());
 			stmt.executeUpdate();
 		}

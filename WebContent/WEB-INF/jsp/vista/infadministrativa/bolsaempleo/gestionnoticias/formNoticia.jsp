@@ -2,6 +2,7 @@
 <%@ page import="es.ujaen.uvirtual.beans.UVDatos"%>
 <%@	page import="es.ujaen.uvirtual.controlador.infadministrativa.bolsaempleo.ControladorGestionNoticias"%>
 <%@ page import="es.ujaen.uvirtual.beans.vistas.uvirtual.bolsaempleo.VistaNoticias"%>
+<%@ page import="es.ujaen.uvirtual.utilidades.EscapaHTML" %>
 <%@ page import="es.ujaen.uvirtual.utilidades.Formateador"%>
 
 <% 
@@ -47,8 +48,7 @@ VistaNoticias bean = (VistaNoticias) uvdatos.getVistas().get(VistaNoticias.class
     	</div>
     	<div class="form-group">
     		<label>Fecha</label>
-    		<input type="text" name="fecha" id="noticia_fecha" value="<%= fecha %>"/>
-    		<input type="text" id="fechaCampoFormulario" value="<%=Formateador.formatoFecha(bean.getNoticia().getFecha(), "DDMMYYYY")%>"/>
+    		<input type="text" name="fecha" id="noticia_fecha" autocomplete="off" value="<%= fecha %>"/>
     	</div>
     	<div class="form-check">
     		<label><input type="checkbox" id="noticia_publica" name="publica" value="<%= publica %>" <%= (publica ? "checked=''" : "") %>/>Pública</label>
@@ -82,7 +82,6 @@ VistaNoticias bean = (VistaNoticias) uvdatos.getVistas().get(VistaNoticias.class
 
 	$(document).ready(function() {
 		$("#noticia_fecha").datepicker();
-		$("#fechaCampoFormulario").datepicker();
 		
 		document.getElementById("noticia_enviar").addEventListener("click", function(event) {
 			enviarNoticia(event, this);

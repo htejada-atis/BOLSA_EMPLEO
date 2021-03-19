@@ -12,12 +12,12 @@ VistaNoticias bean = (VistaNoticias) uvdatos.getVistas().get(VistaNoticias.class
 
 <div class="bolsa-empleo">
 
-	<% if (session.getAttribute("exito") != null) { %>
+	<% if (session.getAttribute(ControladorGestionNoticias.MENSAJE_ENVIADO) != null) { %>
 		<div id="exito" class="success">
-			<%= session.getAttribute("exito") %>
+			<%= session.getAttribute(ControladorGestionNoticias.MENSAJE_ENVIADO) %>
 		</div>
 	<% 
-			session.removeAttribute("exito");
+			session.removeAttribute(ControladorGestionNoticias.MENSAJE_ENVIADO);
 		} 
 	%>
 
@@ -35,6 +35,7 @@ VistaNoticias bean = (VistaNoticias) uvdatos.getVistas().get(VistaNoticias.class
 			<th scope="col"	style="width:30%">Texto</th>
 			<th scope="col" style="width:30%">Enlace</th>
 			<th scope="col" style="width:10%">Pública</th>
+			<th scope="col" style="width:10%">Activa</th>
 			<th scope="col" style="width:10%"></th>
 		</tr>
 		<tbody>				
@@ -50,37 +51,38 @@ VistaNoticias bean = (VistaNoticias) uvdatos.getVistas().get(VistaNoticias.class
 <script>
 	$(document).ready(function() {
 		
-		function confirmDialog(message) {
-			console.log(
+		function confirmDialog(message, id, activa) {
 			$('<div></div>').appendTo('body')
 		    	.html('<div><h6>' + message + '?</h6></div>')
 		    	.dialog({
 			      modal: true,
-			      title: 'Delete message',
+			      title: 'Borrar noticias',
 			      zIndex: 10000,
 			      autoOpen: true,
 			      width: 'auto',
 			      resizable: false,
 			      buttons: {
-			        Yes: function() {
-			          // $(obj).removeAttr('onclick');                                
-			          // $(obj).parents('.Parent').remove();
-	
-			          $('body').append('<h1>Confirm Dialog Result: <i>Yes</i></h1>');
-	
-			          $(this).dialog("close");
+			        Si: function() {
+			        	var params = {'a': '<%= ControladorGestionNoticias.ACCION_ELIMINAR_NOTICIA %>',
+			        			'id': id,
+			        			'<%= ControladorGestionNoticias.PARAM_ACTIVA %>': !activa};
+		        		sendForm("<%= request.getRequestURI() %>", params);
+			          	$(this).dialog("close");
 			        },
 			        No: function() {
-			          $('body').append('<h1>Confirm Dialog Result: <i>No</i></h1>');
-	
-			          $(this).dialog("close");
+			          	$(this).dialog("close");
 			        }
 			      },
 			      close: function(event, ui) {
 			        $(this).remove();
 			      }
-			}));
+			});
 		}
+		
+		document.getElementById("nueva_noticia").addEventListener("click", function(event) {
+			event.preventDefault();
+			sendForm("<%= request.getRequestURI() %>", {'a': '<%= ControladorGestionNoticias.ACCION_AGREGAR_NOTICIA %>'});
+		});
 
 		var table = new DataTable('#table_noticias_insertadas', {
 		    "ajax": { url: "<%= request.getRequestURI() %>" },
@@ -89,12 +91,18 @@ VistaNoticias bean = (VistaNoticias) uvdatos.getVistas().get(VistaNoticias.class
 		    	{'data': 'texto'},
 		        {'data': 'enlace'},
 		        {'data': 'publica'},
+		        {'data': 'activa'},
 		        {'data': 'codnum', 'buttons': [{'label': 'Editar', 'onClick': function(row) {
 			        		var params = {'a': '<%= ControladorGestionNoticias.ACCION_EDITAR_NOTICIA %>', 'id': row.codNum};
-			        		sendForm("<%= request.getRequestURI() %>", params)
+			        		sendForm("<%= request.getRequestURI() %>", params);
 			        	}
 			        }, {'label': 'Borrar', 'onClick': function(row) {
-			        	confirmDialog("aaaaa");
+			        	var mensaje = "¿Desea borrar la noticia seleccionada?";
+			        	if(!row.activa) {
+			        		mensaje = "¿Desea restaurar la noticia seleccionada?";
+			        	}
+			        	
+			        	confirmDialog(mensaje, row.codNum, row.activa);
 			        } }]}		        
 			    ],
 			});
@@ -102,11 +110,6 @@ VistaNoticias bean = (VistaNoticias) uvdatos.getVistas().get(VistaNoticias.class
 			setInterval(function() {
 				//console.log(table.getChecked())
 			}, 5000)
-		}); 
-	
-		document.getElementById("nueva_noticia").addEventListener("click", function(event) {
-			event.preventDefault();
-			sendForm("<%= request.getRequestURI() %>", {'a': '<%= ControladorGestionNoticias.ACCION_AGREGAR_NOTICIA %>'});
 		});
 	
 	</script>

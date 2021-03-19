@@ -51,6 +51,8 @@ public class ControladorInicio extends HttpServlet {
 	@Override
 	public void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 		UVDatos datos = (UVDatos) request.getAttribute(UVDatos.NOMBRE_ATRIBUTO);
+		datos.setDocType("<!DOCTYPE html>");
+		datos.setContentType("text/html");
 		
 		VistaNoticias bean = new VistaNoticias();
 		

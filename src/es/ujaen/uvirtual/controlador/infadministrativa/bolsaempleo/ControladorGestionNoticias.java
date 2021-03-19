@@ -44,20 +44,24 @@ public class ControladorGestionNoticias extends HttpServlet {
 	public static final String ACCION_AGREGAR_NOTICIA = "agregarnoticia";
 	public static final String ACCION_DATATABLE = "datatable";
 	public static final String ACCION_EDITAR_NOTICIA = "editarnoticia";
+	public static final String ACCION_ELIMINAR_NOTICIA = "eliminarnoticia";
 	public static final String ACCION_LISTAR_NOTICIAS = "listar_noticias";
 	
 	// Parámetros
 	public static final String PARAM_ACCION = "a";
-	public static final String PARAM_ID = "id";
+	public static final String PARAM_ACTIVA = "activa";
 	public static final String PARAM_ENLACE = "enlace";
-	public static final String PARAM_TEXTO = "texto";
-	public static final String PARAM_PUBLICA = "publica";
-	public static final String PARAM_FECHA = "fecha";
 	public static final String PARAM_ENVIAR = "enviar";
+	public static final String PARAM_FECHA = "fecha";
+	public static final String PARAM_ID = "id";
+	public static final String PARAM_PUBLICA = "publica";
+	public static final String PARAM_TEXTO = "texto";
 	
 	// Mensajes
+	public static final String MENSAJE_ENVIADO = "mensaje";
 	public static final String MENSAJE_EXITO_AGREGAR = "noticia creada correctamente";
 	public static final String MENSAJE_EXITO_EDITAR = "noticia editada correctamente";
+	public static final String MENSAJE_EXITO_ELIMINAR = "noticia eliminada correctamente";
 	
 	// ruta vistas
 	public static final String RUTA_BEP_NOTICIAS = "/WEB-INF/jsp/vista/infadministrativa/bolsaempleo/gestionnoticias/";
@@ -68,6 +72,8 @@ public class ControladorGestionNoticias extends HttpServlet {
 	@Override
 	public void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 		UVDatos datos = (UVDatos) request.getAttribute(UVDatos.NOMBRE_ATRIBUTO);
+		datos.setDocType("<!DOCTYPE html>");
+		datos.setContentType("text/html");
 		
 		VistaNoticias bean = new VistaNoticias();
 		bean.setVista(RUTA_BEP_NOTICIAS + "indice.jsp");
@@ -86,6 +92,9 @@ public class ControladorGestionNoticias extends HttpServlet {
 					return;
 				case ACCION_EDITAR_NOTICIA:
 					editarNoticia(request, response, bean);
+					break;
+				case ACCION_ELIMINAR_NOTICIA:
+					eliminarNoticia(request, response, bean);
 					break;
 				case ACCION_LISTAR_NOTICIAS:
 					obtenerNoticias(bean);
@@ -134,12 +143,12 @@ public class ControladorGestionNoticias extends HttpServlet {
 			ModeloNoticia modelo = new ModeloNoticia();
 			String enlace = EscapaHTML.ajustaCodificacion(request.getParameter(PARAM_ENLACE));
 			String texto = EscapaHTML.ajustaCodificacion(request.getParameter(PARAM_TEXTO));
-			Boolean publica = EscapaHTML.ajustaCodificacion(request.getParameter(PARAM_PUBLICA)).equals("true");
+			Boolean publica = request.getParameter(PARAM_PUBLICA) != null && EscapaHTML.ajustaCodificacion(request.getParameter(PARAM_PUBLICA)).equals("true");
 			Date fecha = Formateador.leeParametroFecha(request.getParameter(PARAM_FECHA), Formateador.FORMATO_FECHA_DDMMYYYY, "/");
 			Noticia noticia = new Noticia(enlace, texto, fecha, publica, true);
 			modelo.insertaNoticia(noticia);
 			HttpSession session = request.getSession(false);
-			session.setAttribute("exito", MENSAJE_EXITO_AGREGAR);
+			session.setAttribute(MENSAJE_ENVIADO, MENSAJE_EXITO_AGREGAR);
 			response.sendRedirect(request.getServletPath());
 		}
 	}
@@ -158,15 +167,33 @@ public class ControladorGestionNoticias extends HttpServlet {
 			Integer codNum = Formateador.leeParametroInteger(request.getParameter(PARAM_ID));
 			String enlace = EscapaHTML.ajustaCodificacion(request.getParameter(PARAM_ENLACE));
 			String texto = EscapaHTML.ajustaCodificacion(request.getParameter(PARAM_TEXTO));
-			Boolean publica = EscapaHTML.ajustaCodificacion(request.getParameter(PARAM_PUBLICA)).equals("true");
+			Boolean publica = request.getParameter(PARAM_PUBLICA) != null && EscapaHTML.ajustaCodificacion(request.getParameter(PARAM_PUBLICA)).equals("true");
 			Date fecha = Formateador.leeParametroFecha(request.getParameter(PARAM_FECHA), Formateador.FORMATO_FECHA_DDMMYYYY, "/");
 			Noticia noticia = new Noticia(codNum, enlace, texto, fecha, publica, true);
 			modelo.actualizaNoticia(noticia);
 			HttpSession session = request.getSession(false);
-			session.setAttribute("exito", MENSAJE_EXITO_EDITAR);
+			session.setAttribute(MENSAJE_ENVIADO, MENSAJE_EXITO_EDITAR);
 			response.sendRedirect(request.getServletPath());
 		}
-		
+	}
+	
+	/** eliminar una noticia.
+	 * @param request .
+	 * @param response .
+	 * @param bean bean de la vista a la que poner los valores .
+	 * @throws SQLException excepcion de bbdd.
+	 */
+	private void eliminarNoticia(HttpServletRequest request, HttpServletResponse response, VistaNoticias bean) throws SQLException, UVException, IOException {
+		ModeloNoticia modelo = new ModeloNoticia();
+		Integer codNum = Formateador.leeParametroInteger(request.getParameter(PARAM_ID));
+		Noticia noticia = new Noticia();
+		noticia.setCodNum(codNum);
+		Boolean activa = request.getParameter(PARAM_ACTIVA) != null && EscapaHTML.ajustaCodificacion(request.getParameter(PARAM_ACTIVA)).equals("true");
+		noticia.setActiva(activa);
+		modelo.borraRestauraNoticia(noticia);
+		HttpSession session = request.getSession(false);
+		session.setAttribute(MENSAJE_ENVIADO, MENSAJE_EXITO_EDITAR);
+		response.sendRedirect(request.getServletPath());
 	}
 	
 	/** muestra todas las noticias.
@@ -190,7 +217,6 @@ public class ControladorGestionNoticias extends HttpServlet {
 			json.put("recordsTotal", listaNoticias.size());
 			json.put("recordsFiltered", listaNoticias.size());
 			json.put("data", listaNoticias);
-			System.out.print(json);
 		} catch (JSONException e) {
 			LOGGER.log(Level.SEVERE, "Error creando json {0}", e);
 			throw new UVException("Error creando json");
