@@ -53,7 +53,7 @@ VistaNoticias bean = (VistaNoticias) uvdatos.getVistas().get(VistaNoticias.class
 		
 		function confirmDialog(title, message, id, activa) {
 			$('<div></div>').appendTo('body')
-		    	.html('<div><h6>' + message + '?</h6></div>')
+		    	.html('<div><h6>' + message + '</h6></div>')
 		    	.dialog({
 			      modal: true,
 			      title: title,

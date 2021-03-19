@@ -1,4 +1,4 @@
-package es.ujaen.uvirtual.controlador.infadministrativa.bolsaempleo;
+package es.ujaen.uvirtual.controlador.infadministrativa.bolsaempleo.configuracion;
 
 import javax.servlet.annotation.WebServlet;
 import es.ujaen.uvirtual.controlador.ControladorIndiceBase;
@@ -8,17 +8,17 @@ import es.ujaen.uvirtual.controlador.ControladorIndiceBase;
  */
 @WebServlet(
 		name = "informacionadministrativa.bolsaempleo.configuracion", 
-		description = "Ficheros", 
+		description = "Controlador de configuración de bolsa empleo", 
 		urlPatterns = { 
 				"/srv/es/informacionadministrativa/bolsaempleo/configuracion", 
 				"/srv/en/informacionadministrativa/bolsaempleo/configuracion"
 		})
-public class ControladorFicheros extends ControladorIndiceBase {
+public class ControladorConfiguracion extends ControladorIndiceBase {
 	private static final long serialVersionUID = 1L;
 
 	/** Contructor por defecto.
 	 */
-	public ControladorFicheros() {
-		super("/WEB-INF/jsp/vista/infadministrativa/bolsaempleo/configuracion/ficheros.jsp");
+	public ControladorConfiguracion() {
+		super("/WEB-INF/jsp/vista/infadministrativa/bolsaempleo/configuracion/indice.jsp");
 	}
 }

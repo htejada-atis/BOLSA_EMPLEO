@@ -36,7 +36,7 @@ import es.ujaen.uvirtual.utilidades.UVException;
 		})
 public class ControladorGestionNoticias extends HttpServlet {
 	private static final long serialVersionUID = 1L;
-	private static final String NOMBREDEESTACLASE = ControladorBolsas.class.getName();
+	private static final String NOMBREDEESTACLASE = ControladorGestionNoticias.class.getName();
 	private static final Logger LOGGER = Logger.getLogger(NOMBREDEESTACLASE);
 	
 	
@@ -135,6 +135,7 @@ public class ControladorGestionNoticias extends HttpServlet {
 	 * @param response .
 	 * @param bean bean de la vista a la que poner los valores.
 	 * @throws SQLException excepcion de bbdd.
+	 * @throws UVException en caso de error en bd
 	 */
 	private void agregarNoticia(HttpServletRequest request, HttpServletResponse response, VistaNoticias bean) throws SQLException, UVException, IOException {
 		bean.setVista(RUTA_BEP_NOTICIAS + "formNoticia.jsp");
@@ -158,6 +159,8 @@ public class ControladorGestionNoticias extends HttpServlet {
 	 * @param response .
 	 * @param bean bean de la vista a la que poner los valores .
 	 * @throws SQLException excepcion de bbdd.
+	 * @throws UVException en caso de error en bd
+	 * @throws IOException en caso de error de IO.
 	 */
 	private void editarNoticia(HttpServletRequest request, HttpServletResponse response, VistaNoticias bean) throws SQLException, UVException, IOException {
 		bean.setVista(RUTA_BEP_NOTICIAS + "formNoticia.jsp");
@@ -182,6 +185,8 @@ public class ControladorGestionNoticias extends HttpServlet {
 	 * @param response .
 	 * @param bean bean de la vista a la que poner los valores .
 	 * @throws SQLException excepcion de bbdd.
+	 * @throws UVException en caso de error en bd
+	 * @throws IOException en caso de error de IO.
 	 */
 	private void eliminarNoticia(HttpServletRequest request, HttpServletResponse response, VistaNoticias bean) throws SQLException, UVException, IOException {
 		ModeloNoticia modelo = new ModeloNoticia();
@@ -206,6 +211,13 @@ public class ControladorGestionNoticias extends HttpServlet {
 		bean.setNoticias(noticias);
 	}
 	
+	/** carga las noticias en una tabla .
+	 * @param request .
+	 * @param response .
+	 * @throws SQLException excepcion de bbdd.
+	 * @throws UVException en caso de error en bd.
+	 * @throws IOException en caso de error de IO.
+	 */
 	private void datatableNoticias(HttpServletRequest request, HttpServletResponse response) throws SQLException, UVException, IOException {
 		ModeloNoticia modelo = new ModeloNoticia();
 		List<Noticia> listaNoticias = modelo.listaNoticias();
