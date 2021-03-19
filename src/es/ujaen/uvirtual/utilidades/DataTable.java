@@ -29,6 +29,10 @@ public class DataTable<T> {
 	public static final String PARAM_CURRENT_PAGE_VALUE_DEFAULT = "0";
 	public static final String PARAM_PAGE_SIZE_VALUE_DEFAULT = "10";
 	
+	public static final String ERROR_MSG_PARAMETRO_NO_VALIDO = "Datatable parámetro no válido";
+	public static final String ERROR_MSG_PARAMETRO_TIPO_ORDENACION_NO_VALIDO = "Datatable tipo de ordenación no válido";
+	public static final String ERROR_MSG_COLUMNA_ORDENACION_NO_VALIDA = "La columna de ordenación es no válida";
+	
 	private String consulta;
 	private String query;
 	private String queryCount;
@@ -60,12 +64,12 @@ public class DataTable<T> {
 			this.orderDirection = String.join("", params.getOrDefault(PARAM_ORDER_DIRECTION, new String[] {""}));			
 		} catch (NumberFormatException err) {
 			LOGGER.log(Level.WARNING, "Error Datatable" + err);
-			throw new UVException("Datatable parámetro no válido");
+			throw new UVException(ERROR_MSG_PARAMETRO_NO_VALIDO);
 		}
 				
 		if (!this.orderDirection.isBlank()) {
 			if (!this.orderDirection.equals(PARAM_ORDER_DIRECTION_VALUE_ASC) && !this.orderDirection.equals(PARAM_ORDER_DIRECTION_VALUE_DESC)) {
-				throw new UVException("Datatable tipo de ordenación no válido");
+				throw new UVException(ERROR_MSG_PARAMETRO_TIPO_ORDENACION_NO_VALIDO);
 			}
 		}
 	}
@@ -164,7 +168,7 @@ public class DataTable<T> {
 		if (this.isOrderable()) {
 			String column = this.orderColumns.get(this.orderBy);
 			if (column == null) {
-				throw new UVException("La columna de ordenación es no válida");
+				throw new UVException(ERROR_MSG_COLUMNA_ORDENACION_NO_VALIDA);
 			}
 			
 			consultaResult += " ORDER BY " + column + " " + this.orderDirection;

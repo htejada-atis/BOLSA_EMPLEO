@@ -2,6 +2,7 @@ package basicos;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertThrows;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -24,6 +25,8 @@ public class TestDataTable {
 	 * Class mock para testear datatable.
 	 */
 	class Mock { }
+	
+	class MockPreparedStatement { }
 	
     /** Creación de dt correcta.
      * @throws UVException .
@@ -85,11 +88,11 @@ public class TestDataTable {
     	assertEquals("", dt.getOrderDirection());    	
     }
     
-    /** Parámetro current page incorrecto.
+    /** Error, parámetro current page incorrecto.
      * @throws UVException .
      */
-    @Test(expected = UVException.class) 
-    public void testA04() throws UVException {
+    @Test 
+    public void testA04() {
     	HashMap<String, String[]> params = new HashMap<String, String[]>();
     	
     	params.put(DataTable.PARAM_CURRENT_PAGE, new String[] {"dummy"});
@@ -97,14 +100,18 @@ public class TestDataTable {
     	params.put(DataTable.PARAM_ORDER_BY, new String[] {ORDER_BY.toString()});
     	params.put(DataTable.PARAM_ORDER_DIRECTION, new String[] {ORDER_DIRECTION});
     	
-    	new DataTable<Mock>(params);
+    	Throwable throwable = assertThrows(Throwable.class, () -> { 
+    		new DataTable<Mock>(params); 
+    	});
+    	assertEquals(UVException.class, throwable.getClass());
+    	assertEquals(DataTable.ERROR_MSG_PARAMETRO_NO_VALIDO, throwable.getMessage());
     }
     
-    /** Creación de dt incorrecta.
+    /** Error, parámetro current page vacio.
      * @throws UVException .
      */
-    @Test(expected = UVException.class) 
-    public void testA05() throws UVException {
+    @Test 
+    public void testA05() {
     	HashMap<String, String[]> params = new HashMap<String, String[]>();
     	
     	params.put(DataTable.PARAM_CURRENT_PAGE, new String[] {""});
@@ -112,14 +119,18 @@ public class TestDataTable {
     	params.put(DataTable.PARAM_ORDER_BY, new String[] {ORDER_BY.toString()});
     	params.put(DataTable.PARAM_ORDER_DIRECTION, new String[] {ORDER_DIRECTION});
     	
-    	new DataTable<Mock>(params);
+    	Throwable throwable = assertThrows(Throwable.class, () -> { 
+    		new DataTable<Mock>(params); 
+    	});
+    	assertEquals(UVException.class, throwable.getClass());
+    	assertEquals(DataTable.ERROR_MSG_PARAMETRO_NO_VALIDO, throwable.getMessage());
     }
     
     /** Creación de dt incorrecta.
      * @throws UVException .
      */
-    @Test(expected = UVException.class) 
-    public void testA06() throws UVException {
+    @Test
+    public void testA06() {
     	HashMap<String, String[]> params = new HashMap<String, String[]>();
     	
     	params.put(DataTable.PARAM_CURRENT_PAGE, new String[] {CURRENT_PAGE.toString()});
@@ -127,14 +138,18 @@ public class TestDataTable {
     	params.put(DataTable.PARAM_ORDER_BY, new String[] {ORDER_BY.toString()});
     	params.put(DataTable.PARAM_ORDER_DIRECTION, new String[] {ORDER_DIRECTION});
     	
-    	new DataTable<Mock>(params);
+    	Throwable throwable = assertThrows(Throwable.class, () -> { 
+    		new DataTable<Mock>(params); 
+    	});
+    	assertEquals(UVException.class, throwable.getClass());
+    	assertEquals(DataTable.ERROR_MSG_PARAMETRO_NO_VALIDO, throwable.getMessage());
     }
     
     /** Creación de dt incorrecta.
      * @throws UVException .
      */
-    @Test(expected = UVException.class) 
-    public void testA07() throws UVException {
+    @Test
+    public void testA07() {
     	HashMap<String, String[]> params = new HashMap<String, String[]>();
     	
     	params.put(DataTable.PARAM_CURRENT_PAGE, new String[] {CURRENT_PAGE.toString()});
@@ -142,14 +157,18 @@ public class TestDataTable {
     	params.put(DataTable.PARAM_ORDER_BY, new String[] {ORDER_BY.toString()});
     	params.put(DataTable.PARAM_ORDER_DIRECTION, new String[] {ORDER_DIRECTION});
     	
-    	new DataTable<Mock>(params);
+    	Throwable throwable = assertThrows(Throwable.class, () -> { 
+    		new DataTable<Mock>(params); 
+    	});
+    	assertEquals(UVException.class, throwable.getClass());
+    	assertEquals(DataTable.ERROR_MSG_PARAMETRO_NO_VALIDO, throwable.getMessage());
     }
     
     /** Creación de dt incorrecta.
      * @throws UVException .
      */
-    @Test(expected = UVException.class) 
-    public void testA08() throws UVException {
+    @Test
+    public void testA08() {
     	HashMap<String, String[]> params = new HashMap<String, String[]>();
     	
     	params.put(DataTable.PARAM_CURRENT_PAGE, new String[] {CURRENT_PAGE.toString()});
@@ -157,14 +176,18 @@ public class TestDataTable {
     	params.put(DataTable.PARAM_ORDER_BY, new String[] {"dfdfddfd"});
     	params.put(DataTable.PARAM_ORDER_DIRECTION, new String[] {ORDER_DIRECTION});
     	
-    	new DataTable<Mock>(params);
+    	Throwable throwable = assertThrows(Throwable.class, () -> { 
+    		new DataTable<Mock>(params); 
+    	});
+    	assertEquals(UVException.class, throwable.getClass());
+    	assertEquals(DataTable.ERROR_MSG_PARAMETRO_NO_VALIDO, throwable.getMessage());
     }
         
     /** Creación de dt incorrecta.
      * @throws UVException .
      */
-    @Test(expected = UVException.class) 
-    public void testA09() throws UVException {
+    @Test
+    public void testA09() {
     	HashMap<String, String[]> params = new HashMap<String, String[]>();
     	
     	params.put(DataTable.PARAM_CURRENT_PAGE, new String[] {CURRENT_PAGE.toString()});
@@ -172,13 +195,17 @@ public class TestDataTable {
     	params.put(DataTable.PARAM_ORDER_BY, new String[] {ORDER_BY.toString()});
     	params.put(DataTable.PARAM_ORDER_DIRECTION, new String[] {"dddd"});
     	
-    	new DataTable<Mock>(params);
+    	Throwable throwable = assertThrows(Throwable.class, () -> { 
+    		new DataTable<Mock>(params); 
+    	});
+    	assertEquals(UVException.class, throwable.getClass());
+    	assertEquals(DataTable.ERROR_MSG_PARAMETRO_TIPO_ORDENACION_NO_VALIDO, throwable.getMessage());
     }
    
-    /** Error al no poner ordenación.
+    /** Error al no poner la columna de ordenacion ordenación.
      * @throws UVException .
      */
-    @Test(expected = UVException.class)  
+    @Test
     public void testA10() throws UVException {
     	String sql = "SELECT 'c1' AS C1, 'c2' AS C2"
     			+ "FROM DUAL"
@@ -191,25 +218,18 @@ public class TestDataTable {
     	params.put(DataTable.PARAM_ORDER_BY, new String[] {ORDER_BY.toString()});
     	params.put(DataTable.PARAM_ORDER_DIRECTION, new String[] {ORDER_DIRECTION});
     	
-    	DataTable<Mock> dt = new DataTable<Mock>(params);    	
-    	dt.setQuery(sql);
-    	
-    	assertNotNull(dt.getQuery());
-    	assertNotNull(dt.getQueryCount());
-    	
-    	ArrayList<Mock> lista = new ArrayList();
-    	lista.add(new Mock());
-    	lista.add(new Mock());
-    	lista.add(new Mock());
-    	
-    	dt.setData(lista);
-    	
-    	assertEquals(lista.size(), dt.getData().size());
+    	Throwable throwable = assertThrows(Throwable.class, () -> { 
+    		DataTable<Mock> dt = new DataTable<Mock>(params);
+    		dt.setQuery(sql);
+    	});
+    	assertEquals(UVException.class, throwable.getClass());
+    	assertEquals(DataTable.ERROR_MSG_COLUMNA_ORDENACION_NO_VALIDA, throwable.getMessage());
     }
     
     /** Asignación de query correcta.
      * @throws UVException .
      */
+    @Test
     public void testA11() throws UVException {
     	final String sql = "SELECT 'c1' AS C1, 'c2' AS C2"
     			+ "FROM DUAL"
@@ -260,23 +280,63 @@ public class TestDataTable {
     	assertEquals(DataTable.PARAM_ORDER_DIRECTION_VALUE_DESC, dt.getOrderDirection());    	
     }
     
-    /** Dt setquery.
+    /** Asignación de query correcta.
      * @throws UVException .
      */
-    @Test 
-    public void testA13() {
-    	HashMap<String, String[]> params = new HashMap<String, String[]>();
+    @Test
+    public void testA13() throws UVException {
+    	final String sql = "SELECT 'c1' AS C1, 'c2' AS C2"
+    			+ "FROM DUAL"
+    			+ "connect by level <= 100";
     	
-    	params.put(DataTable.PARAM_CURRENT_PAGE, new String[] {CURRENT_PAGE.toString()});
-    	params.put(DataTable.PARAM_PAGE_SIZE, new String[] {PAGE_SIZE.toString()});
-    	params.put(DataTable.PARAM_ORDER_BY, new String[] {ORDER_BY.toString()});
-    	params.put(DataTable.PARAM_ORDER_DIRECTION, new String[] {ORDER_DIRECTION});
-    	
+    	HashMap<String, String[]> params = new HashMap<String, String[]>();    	
     	DataTable<Mock> dt = new DataTable<Mock>(params);
+    	dt.setOrderColumn(ORDER_BY, "C1");
+    	dt.setOrderColumn(ORDER_BY + 1, "C2");
+    	dt.setQuery(sql);
     	
-    	assertEquals(CURRENT_PAGE, dt.getCurrentPage());
-    	assertEquals(PAGE_SIZE, dt.getPageSize());
-    	assertEquals(ORDER_BY, dt.getOrderBy());
-    	assertEquals(ORDER_DIRECTION, dt.getOrderDirection());    
+    	assertNotNull(dt.getQuery());
+    	assertNotNull(dt.getQueryCount());
+    	
+    	ArrayList<Mock> lista = new ArrayList<Mock>();
+    	lista.add(new Mock());
+    	lista.add(new Mock());
+    	lista.add(new Mock());
+    	
+    	dt.setData(lista);
+    	
+    	assertEquals(lista.size(), dt.getData().size());
     }
+    
+    /** Ejecutar consulta para obtener el total de filas.
+     * @throws UVException .
+     */
+    @Test
+    public void testA14() throws UVException {
+    	final String sql = "SELECT 'c1' AS C1, 'c2' AS C2"
+    			+ "FROM DUAL"
+    			+ "connect by level <= 100";
+    	
+    	HashMap<String, String[]> params = new HashMap<String, String[]>();    	
+    	DataTable<Mock> dt = new DataTable<Mock>(params);
+    	dt.setOrderColumn(ORDER_BY, "C1");
+    	dt.setOrderColumn(ORDER_BY + 1, "C2");
+    	dt.setQuery(sql);
+    	
+    	assertNotNull(dt.getQuery());
+    	assertNotNull(dt.getQueryCount());
+    	
+    	MockPreparedStatement ps = new MockPreparedStatement();
+    	dt.setRecordsTotalFromQuery(ps);
+    	
+    	ArrayList<Mock> lista = new ArrayList<Mock>();
+    	lista.add(new Mock());
+    	lista.add(new Mock());
+    	lista.add(new Mock());
+    	
+    	dt.setData(lista);
+    	
+    	assertEquals(lista.size(), dt.getData().size());
+    }
+    
 }
