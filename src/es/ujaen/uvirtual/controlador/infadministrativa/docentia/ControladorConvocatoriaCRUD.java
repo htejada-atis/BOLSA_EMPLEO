@@ -1,6 +1,7 @@
 package es.ujaen.uvirtual.controlador.infadministrativa.docentia;
 
 import java.io.IOException;
+import java.io.PrintWriter;
 import java.sql.SQLException;
 import java.util.Date;
 import java.util.List;
@@ -13,6 +14,9 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import com.google.gson.Gson;
+
+import es.ujaen.uvirtual.beans.CodigoDescripcion;
 import es.ujaen.uvirtual.beans.ConfiguracionGlobal;
 import es.ujaen.uvirtual.beans.UVDatos;
 import es.ujaen.uvirtual.beans.Usuario;
@@ -32,7 +36,9 @@ import es.ujaen.uvirtual.utilidades.UVException;
 		description = "Docentia mantenimiento convocatorias", 
 		urlPatterns = { 
 				"/srv/es/informacionadministrativa/docentia/convocatoriacrud", 
-				"/srv/en/informacionadministrativa/docentia/convocatoriacrud"
+				"/srv/en/informacionadministrativa/docentia/convocatoriacrud",
+				"/srv/es/ajax/informacionadministrativa/docentia/convocatoriacrud", 
+				"/srv/en/ajax/informacionadministrativa/docentia/convocatoriacrud" 
 		})
 public class ControladorConvocatoriaCRUD extends HttpServlet {
 	private static final long serialVersionUID = 1L;
@@ -46,6 +52,7 @@ public class ControladorConvocatoriaCRUD extends HttpServlet {
 	public static final String ACCION_ELIMINAR_CONVOCATORIA = "eliminarconvocatoria";
 	public static final String ACCION_EDITAR_CONVOCATORIA = "editarconvocatoria";
 	public static final String ACCION_CAMBIAR_CONVOCATORIA = "cambiarConvocatoria";
+	public static final String ACCION_EJEMPLO_AJAX = "ejemploAjax";
 	
 	//Posibles parametros
 	public static final String PARAM_NOMBRE_CONVOCATORIA = "nombreConvocatoria";
@@ -93,6 +100,9 @@ public class ControladorConvocatoriaCRUD extends HttpServlet {
 					break;
 				case ACCION_CAMBIAR_CONVOCATORIA:
 					cambiarConvocatoria(request, bean);
+					break;
+				case ACCION_EJEMPLO_AJAX:
+					ejemploAjax(datos, response);
 					break;
 				default:
 					obtenerConvocatorias(bean);
@@ -209,5 +219,19 @@ public class ControladorConvocatoriaCRUD extends HttpServlet {
 		Convocatoria convocatoria = new Convocatoria(idConvocatoria, nombreConvocatoria, estado, observaciones, fechaLimite, fechaComision);
 		modelo.actualizaConvocatoria(convocatoria);
 		obtenerConvocatorias(bean);
+	}
+	
+	/** ejemplo para mandar respuestas json por ajax.
+	 * @param datos datos de u virtual
+	 * @param response respuesta del servlet
+	 * @throws IOException si error io
+	 */
+	private void ejemploAjax(UVDatos datos, HttpServletResponse response) throws IOException {
+		datos.setContentType("application/json");
+		CodigoDescripcion mensaje = new CodigoDescripcion("1", "Mensaje desde /srv/es/ajax/informacionadministrativa/docentia/convocatoriacrud?a=ejemploAjax");
+		try (PrintWriter writer = response.getWriter()) {
+			writer.write(new Gson().toJson(mensaje));
+		}
+		datos.setRespuestaEnviada(true);
 	}
 }

@@ -10,7 +10,7 @@ services:
     image: usig-registrydocker.ujaen.es:5044/uvirtual/oracle/database:18.4.0-xe
     environment:
       - ORACLE_PWD=pwd123
-      - ORACLE_CHARACTERSET=AL32UTF8
+      - ORACLE_CHARACTERSET=WE8ISO8859P15
     ports:
       - 1521:1521 
       - 5500:5500
