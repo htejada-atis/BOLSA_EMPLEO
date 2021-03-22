@@ -1,3 +1,8 @@
+/**
+ * Datatable
+ * @copyright ATISoluciones 2021
+ */
+
 function getProp( object, keys, defaultVal ){
 	keys = Array.isArray( keys )? keys : keys.split('.');
 	object = object[keys[0]];
@@ -46,27 +51,60 @@ function isFunction(functionToCheck) {
 }
 
 function sendForm(url, params) {
-		var form = document.createElement("form");
-			form.method = "POST";
-		form.action = url;
-		document.body.appendChild(form);
+	var form = document.createElement("form");		
+	form.method = "POST";
+	form.action = url;
+	document.body.appendChild(form);
 		
-		for(key in params) {
-				var element = document.createElement("input");
-				element.type = "hidden";
-				element.name = key;
-				element.value = params[key];
-				form.appendChild(element);
-		}
+	for(key in params) {
+		var element = document.createElement("input");
+		element.type = "hidden";
+		element.name = key;
+		element.value = params[key];
+		form.appendChild(element);
+	}
 			
-		form.submit();
+	form.submit();
+}
+
+function alertDialog(title, message) {
+	$('<div class="atisDialog"></div>')
+		.appendTo('body')
+		.html('<div><h6>' + message + '</h6></div>')
+		.dialog({
+			modal: true,
+			title: title,
+			zIndex: 10000,
+			autoOpen: true,
+			width: 'auto',
+			resizable: false,
+			buttons: {
+				Ok: function() {
+					$(this).dialog("close");
+				}
+			},
+			close: function(event, ui) {
+				$(this).remove();
+			}
+	});
+}
+
+function object2Json(object) { 
+	return JSON.stringify(object);
+}
+
+function json2Object(json) {
+	return JSON.parse(json);
 }
 
 window.Atis = {
-	"getErrorResponse": getErrorResponse,
 	"getProp": getProp,
+	"setProp": setProp,
+	"alertDialog": alertDialog,
+	"getErrorResponse": getErrorResponse,
 	"isFunction": isFunction,
 	"formatearFecha": formatearFecha,
 	"sendForm": sendForm,
-	"setProp": setProp
+	"object2Json": object2Json,
+	"json2Object": json2Object
 };

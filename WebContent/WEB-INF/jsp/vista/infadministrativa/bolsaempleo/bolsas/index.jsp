@@ -1,5 +1,6 @@
 <%@ page trimDirectiveWhitespaces="true"%>
 <%@ page import="es.ujaen.uvirtual.beans.UVDatos"%>
+<%@	page import="es.ujaen.uvirtual.controlador.infadministrativa.bolsaempleo.ControladorBolsas"%>
 <%@ page import="es.ujaen.uvirtual.beans.vistas.uvirtual.bolsaempleo.VistaEstadoBolsas"%>
 <%@ page import="es.ujaen.uvirtual.beans.uvirtual.bolsaempleo.Bolsa"%>
 <%@ page import="es.ujaen.uvirtual.utilidades.EscapaHTML" %>
@@ -61,27 +62,27 @@ VistaEstadoBolsas bean = (VistaEstadoBolsas) uvdatos.getVistas().get(VistaEstado
 		        {'data': 'baremable'},
 		    ],
 		    "actions": [
-		    	{'label': 'Bloquear', 'onClick': function(selected) { enviaAccion("bloquear", selected); } },
-		    	{'label': 'Revisión', 'onClick': function(selected) { enviaAccion("revision", selected); } },
-		    	{'label': 'Baremación', 'onClick': function(selected) { enviaAccion("baremacion", selected); } },
-		    	{'label': 'Alegación', 'onClick': function(selected) { enviaAccion("alegacion", selected); } },
-		    	{'label': 'Desbloquear', 'onClick': function(selected) { enviaAccion("desbloquear", selected); } },
-		    	{'label': 'Baremar', 'onClick': function(selected) { enviaAccion("baremar", selected); } },
+		    	{'label': 'Bloquear', 'onClick': function(selected) { enviaAccion("<%=ControladorBolsas.ACCION_BOLSAS_BLOQUEAR%>", selected); } },
+		    	{'label': 'Revisión', 'onClick': function(selected) { enviaAccion("<%=ControladorBolsas.ACCION_BOLSAS_REVISION%>", selected); } },
+		    	{'label': 'Baremación', 'onClick': function(selected) { enviaAccion("<%=ControladorBolsas.ACCION_BOLSAS_BAREMACION%>", selected); } },
+		    	{'label': 'Alegación', 'onClick': function(selected) { enviaAccion("<%=ControladorBolsas.ACCION_BOLSAS_ALEGACION%>", selected); } },
+		    	{'label': 'Desbloquear', 'onClick': function(selected) { enviaAccion("<%=ControladorBolsas.ACCION_BOLSAS_DESBLOQUEAR%>", selected); } },
+		    	{'label': 'Baremar', 'onClick': function(selected) { enviaAccion("<%=ControladorBolsas.ACCION_BOLSAS_BAREMAR%>", selected); } },
 		    ]
 		});	
 		
 		function enviaAccion(accion, selected) {
-			$.ajax({
-		        type: "POST",
-		        url: "/srv/es/ajax/informacionadministrativa/bolsaempleo/bolsas",
-		        contentType: "application/json",
-		        dataType: "text",
-		        data: {"a": "cambiarestadobolsa", "estado": accion, "selected": selected },
-		        success: function(response) {
-		        	table.refresh();
-		        },
-		        error: function(response) { alert(Atis.getErrorResponse(response)); }            
-		    });	 		
+			if (selected.length == 0) {
+				Atis.alertDialog('Estado de las bolsas', 'Seleccione al menos una bolsa para cambiar su estado.');
+				return;
+			}
+			
+			var params = {
+				'a': '<%=ControladorBolsas.ACCION_BOLSA%>', 
+				'<%=ControladorBolsas.PARAM_ACCION_BOLSA%>': accion, 
+				'<%=ControladorBolsas.PARAM_BOLSAS_SELECCIONADAS%>': Atis.object2Json(selected)
+			};
+    		Atis.sendForm("<%= request.getRequestURI() %>", params);
 		}
 	}); 
 	</script>
