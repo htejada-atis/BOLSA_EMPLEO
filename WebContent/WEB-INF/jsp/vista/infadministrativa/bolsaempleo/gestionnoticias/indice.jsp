@@ -86,17 +86,18 @@ VistaNoticias bean = (VistaNoticias) uvdatos.getVistas().get(VistaNoticias.class
 
 		var table = new DataTable('#table_noticias_insertadas', {
 		    "ajax": { url: "<%= request.getRequestURI() %>" },
+		    "pageSize": 10,
 		    "columns": [
 		    	{'data': 'fechaFormato'},
 		    	{'data': 'texto'},
-		        {'data': 'enlace', 'render': function(row) { return "mi enlace"; }},
+		        {'data': 'enlace', 'render': function(row) { return "<a href='" +row.enlace +"'>" +row.enlace +"</a>"; }},
 		        {'data': 'publica'},
 		        {'data': 'activa'},
 		        {'data': 'codnum', 'buttons': [{'label': 'Editar', 'onClick': function(row) {
 			        		var params = {'a': '<%= ControladorGestionNoticias.ACCION_EDITAR_NOTICIA %>', 'id': row.codNum};
 			        		Atis.sendForm("<%= request.getRequestURI() %>", params);
 			        	}
-			        }, {'label': function(row) { return "Borrar u otra cosa"; }, 'onClick': function(row) {
+			        }, {'label': function(row) { return row.activa ? "Borrar" : "Restaurar"; }, 'onClick': function(row) {
 			        	var mensaje = "¿Desea borrar la noticia seleccionada?";
 			        	var titulo = "Borrar noticia";
 			        	if(!row.activa) {

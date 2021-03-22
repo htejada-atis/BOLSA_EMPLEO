@@ -7,8 +7,11 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import es.ujaen.uvirtual.beans.uvirtual.bolsaempleo.Fichero;
 import es.ujaen.uvirtual.modelo.conexion.ConexionUvirtual;
+import es.ujaen.uvirtual.utilidades.DataTable;
+import es.ujaen.uvirtual.utilidades.UVException;
 
 
 /**
@@ -20,6 +23,9 @@ import es.ujaen.uvirtual.modelo.conexion.ConexionUvirtual;
  *
  */
 public class ModeloFichero {
+	
+	public static final int ORDER_COLUMN_INDEX_ID = 1;
+	public static final int ORDER_COLUMN_INDEX_NOMBRE = 2;
 	
 	/********************************************** METODOS PÚBLICOS PARA CONSULTAS   ********************************************/
 	
@@ -67,6 +73,44 @@ public class ModeloFichero {
 			stmt.setBinaryStream(parameterIndex++, in);
 			stmt.executeUpdate();
 		}
+	}
+		
+	/**
+	 * Listado de ficheros . 
+	 * @param params para leer los parametros de paginación, ordenacion, etc .
+	 * @return listado de ficheros .
+	 * @throws SQLException en caso de error de base de datos .
+	 * @throws UVException si el fichero no es valido .
+	 */
+	public DataTable<Fichero> listaFicherosDatatable(Map<String, String[]> params) throws SQLException, UVException {
+		List<Fichero> ficheros = new ArrayList<>();
+		DataTable<Fichero> dataTable = new DataTable<Fichero>(params);
+		
+		String consulta = "SELECT bepfich.codnum, bepfich.nombre  FROM tbep_ficheros bepfich WHERE 1=1 ";
+		
+		dataTable.setOrderColumn(ORDER_COLUMN_INDEX_ID, "bepfich.CODNUM");
+		dataTable.setOrderColumn(ORDER_COLUMN_INDEX_NOMBRE, "bepfich.NOMBRE");
+		dataTable.setQuery(consulta);
+				
+		try (Connection conexion = ConexionUvirtual.obtenerInstancia();
+				PreparedStatement stmtCount = conexion.prepareStatement(dataTable.getQueryCount());
+				PreparedStatement stmt = conexion.prepareStatement(dataTable.getQuery());
+		) {					
+			try (ResultSet rs = stmt.executeQuery()) {
+				while (rs.next()) {
+					Fichero fichero = new Fichero();
+					fichero.setCodNum(rs.getInt("CODNUM"));
+					fichero.setNombre(rs.getString("NOMBRE"));
+					
+					ficheros.add(fichero);					
+				}				
+			}	
+			
+			dataTable.setRecordsTotalFromQuery(stmtCount);
+			dataTable.setData(ficheros);
+		}
+		
+		return dataTable;
 	}
 	
 }

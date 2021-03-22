@@ -30,17 +30,17 @@ VistaFicheros bean = (VistaFicheros) uvdatos.getVistas().get(VistaFicheros.class
 		} 
 	%>
 
-    <table class="bluetable bolsaempleo" id="table_noticias_insertadas">
+    <table class="bluetable bolsaempleo" id="table_ficheros">
 		<tr>
 			<th scope="col" style="width:20%">Id</th>
-			<th scope="col"	style="width:30%">Nombre</th>
-			<th scope="col" style="width:10%"></th>
+			<th scope="col"	style="width:70%">Nombre</th>
+			<th scope="col" style="width:10%">Descargar</th>
 		</tr>
 		<tbody>				
 		</tbody>
 		<tfoot>
 			<tr>
-				<th colspan="6" style="width:100%"></th>
+				<th colspan="3" style="width:100%"></th>
 			</tr>
 		</tfoot>
 	</table>
@@ -49,18 +49,33 @@ VistaFicheros bean = (VistaFicheros) uvdatos.getVistas().get(VistaFicheros.class
 
 <script>
 
-function enviarNoticia(event, submit_input) {
-	event.preventDefault();
-	
-	input_accion = document.getElementById("accion_formulario");
-	input_accion.value = '<%= ControladorGestionFicheros.ACCION_AGREGAR_FICHERO %>';
-	
-	submit_input.form.submit();
-}
+	function subirFichero(event, submit_input) {
+		event.preventDefault();
+		
+		input_accion = document.getElementById("accion_formulario");
+		input_accion.value = '<%= ControladorGestionFicheros.ACCION_AGREGAR_FICHERO %>';
+		
+		submit_input.form.submit();
+	}
 
 	$(document).ready(function() {
+		
+		var table = new DataTable('#table_ficheros', {
+		    "ajax": { url: "<%= request.getRequestURI() %>" },
+		    "pageSize": 10,
+		    "columns": [
+		        {'data': 'codNum'},
+		        {'data': 'nombre'},
+		        {'data': 'codnum', 'buttons': [{'label': 'Borrar', 'onClick': function(row) {
+		        		var params = {'a': '<%= ControladorGestionFicheros.ACCION_BORRAR_FICHERO %>', 'id': row.codNum};
+		        		Atis.sendForm("<%= request.getRequestURI() %>", params);
+		        	}
+		        }]}
+		    ],
+		});	
+		
 		document.getElementById("fichero_enviar").addEventListener("click", function(event) {
-			enviarNoticia(event, this);
+			subirFichero(event, this);
 		});
 	});
 

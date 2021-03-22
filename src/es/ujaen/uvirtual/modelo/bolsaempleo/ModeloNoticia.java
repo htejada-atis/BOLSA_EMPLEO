@@ -6,8 +6,12 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
+
+import es.ujaen.uvirtual.beans.uvirtual.bolsaempleo.Bolsa;
 import es.ujaen.uvirtual.beans.uvirtual.bolsaempleo.Noticia;
 import es.ujaen.uvirtual.modelo.conexion.ConexionUvirtual;
+import es.ujaen.uvirtual.utilidades.DataTable;
 import es.ujaen.uvirtual.utilidades.UVException;
 
 
@@ -20,6 +24,13 @@ import es.ujaen.uvirtual.utilidades.UVException;
  *
  */
 public class ModeloNoticia {
+	
+	public static final int ORDER_COLUMN_INDEX_ID = 1;
+	public static final int ORDER_COLUMN_INDEX_ENLACE = 2;
+	public static final int ORDER_COLUMN_INDEX_TEXTO = 3;
+	public static final int ORDER_COLUMN_INDEX_FECHA = 4;
+	public static final int ORDER_COLUMN_INDEX_FLGPUBLICA = 5;
+	public static final int ORDER_COLUMN_INDEX_FLGACTIVA = 6;
 	
 	/********************************************** METODOS PÚBLICOS PARA CONSULTAS   ********************************************/
 
@@ -62,6 +73,51 @@ public class ModeloNoticia {
 	public List<Noticia> listaNoticias() throws SQLException {
 		return listaNoticias(" ORDER BY fecha");
 	}
+	
+	/**
+	 * Listado de noticias . 
+	 * @param params para leer los parametros de paginación, ordenacion, etc
+	 * @return listado de bolsas de empleo
+	 * @throws SQLException en caso de error de base de datos
+	 * @throws UVException error si no existe la area
+	 */
+	public DataTable<Noticia> listaNoticiasDatatable(Map<String, String[]> params) throws SQLException, UVException {
+		List<Noticia> noticias = new ArrayList<>();
+		DataTable<Noticia> dataTable = new DataTable<Noticia>(params);
+		
+		String consulta = "SELECT bepnot.* FROM tbep_noticias bepnot WHERE 1=1 ";
+		
+		dataTable.setOrderColumn(ORDER_COLUMN_INDEX_ID, "bepnot.CODNUM");
+		dataTable.setOrderColumn(ORDER_COLUMN_INDEX_ENLACE, "bepnot.ENLACE");
+		dataTable.setOrderColumn(ORDER_COLUMN_INDEX_TEXTO, "bepnot.TEXTO");
+		dataTable.setOrderColumn(ORDER_COLUMN_INDEX_FECHA, "bepnot.FECHA");
+		dataTable.setOrderColumn(ORDER_COLUMN_INDEX_FLGPUBLICA, "bepnot.FLGPUBLICA");
+		dataTable.setOrderColumn(ORDER_COLUMN_INDEX_FLGACTIVA, "bepnot.FLGACTIVA");
+		dataTable.setQuery(consulta);
+				
+		try (Connection conexion = ConexionUvirtual.obtenerInstancia();
+				PreparedStatement stmtCount = conexion.prepareStatement(dataTable.getQueryCount());
+				PreparedStatement stmt = conexion.prepareStatement(dataTable.getQuery());
+		) {					
+			try (ResultSet rs = stmt.executeQuery()) {
+				while (rs.next()) {
+					Noticia not = new Noticia();
+					not.setCodNum(rs.getInt("CODNUM"));
+					not.setEnlace(rs.getString("ENLACE"));
+					not.setTexto(rs.getString("TEXTO"));
+					not.setFecha(rs.getTimestamp("FECHA"));
+					not.setPublica(rs.getString("FLGPUBLICA").equals("S"));
+					not.setActiva(rs.getString("FLGACTIVA").equals("S"));
+					noticias.add(not);
+				}				
+			}	
+			
+			dataTable.setRecordsTotalFromQuery(stmtCount);
+			dataTable.setData(noticias);
+		}
+		
+		return dataTable;
+	}	
 	
 	/** lista de noticias excluyendo las ya cargadas.
 	 * @param clausula sentencia sql que excluye las noticias ya mostradas .

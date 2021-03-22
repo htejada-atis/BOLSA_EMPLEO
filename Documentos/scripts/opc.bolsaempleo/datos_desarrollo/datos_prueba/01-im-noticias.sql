@@ -10,7 +10,7 @@ VALUES ('http://bcontratacion.ujaen.es/files/RESOLUCION PROVISIONAL DE BIOLOGIA.
 INSERT INTO TBEP_NOTICIAS (ENLACE,TEXTO,FLGPUBLICA)
 VALUES ('http://bcontratacion.ujaen.es/files/RESOLUCION PROVISIONAL DE LA BOLSA 270619.pdf','Resolución del Vicerrectorado de Profesorado y Ordenación Académica por la que se publica el resultado provisional de la bolsa de sustitución de profesorado para el curso 2019-2020', 'S');
 INSERT INTO TBEP_NOTICIAS (ENLACE,TEXTO,FLGPUBLICA)
-VALUES ('http://bcontratacion.ujaen.es/files/Orientaciones Autobaremacion Curso 2019-2020.pdf','ORIENTACIONES PARA EL PROCESO DE AUTOBAREMACION 2019-2020');
+VALUES ('http://bcontratacion.ujaen.es/files/Orientaciones Autobaremacion Curso 2019-2020.pdf','ORIENTACIONES PARA EL PROCESO DE AUTOBAREMACION 2019-2020', 'S');
 INSERT INTO TBEP_NOTICIAS (ENLACE,TEXTO,FLGPUBLICA)
 VALUES ('http://bcontratacion.ujaen.es/files/Resolucion de apertura 020519.pdf','Resolucion del Vicerrectorado de Profsorado y Ordenación Académica por la que se anuncia la apertura de la bolsa de sustitución de profesorado para el curso 2019-2020', 'S');
 INSERT INTO TBEP_NOTICIAS (ENLACE,TEXTO,FLGPUBLICA)
