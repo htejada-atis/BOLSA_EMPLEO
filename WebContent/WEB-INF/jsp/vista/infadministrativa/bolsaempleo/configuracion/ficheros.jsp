@@ -9,7 +9,7 @@ UVDatos uvdatos = (UVDatos) request.getAttribute(UVDatos.NOMBRE_ATRIBUTO);
 VistaFicheros bean = (VistaFicheros) uvdatos.getVistas().get(VistaFicheros.class.getName());
 %>
 <div class="bolsa-empleo">
-	<h2>Ficheros</h2>
+	<h2>Documentos del sistema</h2>
 	
 	<form id="subir_fichero" class="be-form" method="post" action="<%= request.getRequestURI() %>" enctype="multipart/form-data">
 		<input type="hidden" name="<%= ControladorGestionFicheros.PARAM_ACCION %>" id="accion_formulario" value="" />
@@ -32,15 +32,16 @@ VistaFicheros bean = (VistaFicheros) uvdatos.getVistas().get(VistaFicheros.class
 
     <table class="bluetable bolsaempleo" id="table_ficheros">
 		<tr>
-			<th scope="col" style="width:20%">Id</th>
-			<th scope="col"	style="width:70%">Nombre</th>
-			<th scope="col" style="width:10%">Descargar</th>
+			<th scope="col" style="width:10%">Id</th>
+			<th scope="col"	style="width:60%">Nombre</th>
+			<th scope="col" style="width:20%">Descargar</th>
+			<th scope="col" style="width:10%"></th>
 		</tr>
 		<tbody>				
 		</tbody>
 		<tfoot>
 			<tr>
-				<th colspan="3" style="width:100%"></th>
+				<th colspan="4" style="width:100%"></th>
 			</tr>
 		</tfoot>
 	</table>
@@ -53,9 +54,18 @@ VistaFicheros bean = (VistaFicheros) uvdatos.getVistas().get(VistaFicheros.class
 		event.preventDefault();
 		
 		input_accion = document.getElementById("accion_formulario");
-		input_accion.value = '<%= ControladorGestionFicheros.ACCION_AGREGAR_FICHERO %>';
+		input_accion.value = '<%= ControladorGestionFicheros.ACCION_SUBIR_FICHERO %>';
 		
 		submit_input.form.submit();
+	}
+	
+	function consultarFichero(event, id) {
+		event.preventDefault();
+		var params = {
+				'a': '<%= ControladorGestionFicheros.ACCION_DESCARGAR_FICHERO %>',
+				'<%= ControladorGestionFicheros.PARAM_ID %>': id
+		}
+		Atis.sendForm("<%= request.getRequestURI() %>", params);
 	}
 
 	$(document).ready(function() {
@@ -66,6 +76,7 @@ VistaFicheros bean = (VistaFicheros) uvdatos.getVistas().get(VistaFicheros.class
 		    "columns": [
 		        {'data': 'codNum'},
 		        {'data': 'nombre'},
+		        {'data': 'codnum', 'render': function(row) { return "<a class='consultar-fichero' href='<%= request.getRequestURI() %>/" +row.codNum +"' target='_blank'>Consultar fichero</a>"; }},
 		        {'data': 'codnum', 'buttons': [{'label': 'Borrar', 'onClick': function(row) {
 		        		var params = {'a': '<%= ControladorGestionFicheros.ACCION_BORRAR_FICHERO %>', 'id': row.codNum};
 		        		Atis.sendForm("<%= request.getRequestURI() %>", params);
@@ -76,6 +87,11 @@ VistaFicheros bean = (VistaFicheros) uvdatos.getVistas().get(VistaFicheros.class
 		
 		document.getElementById("fichero_enviar").addEventListener("click", function(event) {
 			subirFichero(event, this);
+		});
+		
+		$("#table_ficheros").on("click", ".consultar-fichero", function(event) {
+			var href = $(this).attr("href").split("/");
+			consultarFichero(event, href[parseInt(href.length) - 1]);
 		});
 	});
 

@@ -13,8 +13,11 @@ import com.google.gson.Gson;
 import com.google.gson.JsonObject;
 import com.google.gson.reflect.TypeToken;
 import es.ujaen.uvirtual.beans.UVDatos;
+import es.ujaen.uvirtual.beans.uvirtual.bolsaempleo.Fichero;
 import es.ujaen.uvirtual.beans.uvirtual.bolsaempleo.Noticia;
+import es.ujaen.uvirtual.beans.vistas.uvirtual.bolsaempleo.VistaFicheros;
 import es.ujaen.uvirtual.beans.vistas.uvirtual.bolsaempleo.VistaNoticias;
+import es.ujaen.uvirtual.modelo.bolsaempleo.ModeloFichero;
 import es.ujaen.uvirtual.modelo.bolsaempleo.ModeloNoticia;
 import es.ujaen.uvirtual.utilidades.BolsaEmpleoUtils;
 import es.ujaen.uvirtual.utilidades.EscapaHTML;
@@ -116,11 +119,12 @@ public class ControladorInicio extends HttpServlet {
 		response.setContentType("application/json");
 		response.setCharacterEncoding("UTF-8");
 		
+		Gson gson = new Gson();
 		JsonObject json = new JsonObject();
-		List<String> idsNoticias = new Gson().fromJson(request.getParameter("ids_noticias"), new TypeToken<List<String>>() { }.getType());
+		List<String> idsNoticias = gson.fromJson(request.getParameter("ids_noticias"), new TypeToken<List<String>>() { }.getType());
 		List<Noticia> listaNoticias = modelo.listaNoticiasInicioRestantes(BolsaEmpleoUtils.consultaNotIn("CODNUM", idsNoticias));
 		json.addProperty("result", "ok");
-		json.addProperty("noticias", new Gson().toJson(listaNoticias, new TypeToken<List<Noticia>>() { }.getType()));
+		json.addProperty("noticias", gson.toJson(listaNoticias, new TypeToken<List<Noticia>>() { }.getType()));
 		
 		PrintWriter printWriter = response.getWriter();
         printWriter.print(json);
@@ -136,5 +140,12 @@ public class ControladorInicio extends HttpServlet {
 		ModeloNoticia modelo = new ModeloNoticia();
 		List<Noticia> noticias = modelo.listaNoticiasInicio();
 		bean.setNoticias(noticias);
+	}
+	
+	private void obtenerFicheros(VistaFicheros bean) throws SQLException {
+		bean.setVista(RUTA_BEP_INICIO + "documentos.jsp");
+		ModeloFichero modelo = new ModeloFichero();
+		List<Fichero> ficheros = modelo.listaFicheros();
+		bean.setFicheros(ficheros);
 	}
 }

@@ -88,7 +88,7 @@ VistaNoticias bean = (VistaNoticias) uvdatos.getVistas().get(VistaNoticias.class
 		    "ajax": { url: "<%= request.getRequestURI() %>" },
 		    "pageSize": 10,
 		    "columns": [
-		    	{'data': 'fechaFormato'},
+		    	{'data': 'fecha'},
 		    	{'data': 'texto'},
 		        {'data': 'enlace', 'render': function(row) { return "<a href='" +row.enlace +"'>" +row.enlace +"</a>"; }},
 		        {'data': 'publica'},

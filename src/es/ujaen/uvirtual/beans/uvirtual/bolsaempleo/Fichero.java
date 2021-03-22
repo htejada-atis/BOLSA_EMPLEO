@@ -1,5 +1,6 @@
 package es.ujaen.uvirtual.beans.uvirtual.bolsaempleo;
 
+import java.io.InputStream;
 import java.io.Serializable;
 
 
@@ -12,6 +13,7 @@ public class Fichero implements Serializable {
 	private static final long serialVersionUID = 1L;
 	private Integer codNum;
 	private String nombre;
+	private InputStream archivo;
 	
 	
 	/** Constructor por defecto.
@@ -30,6 +32,18 @@ public class Fichero implements Serializable {
 		this.nombre = pnombre;
 	}
 	
+	/** Constructor con parametros.
+	 * @param pcodNum .
+	 * @param pnombre .
+	 * @param parchivo .
+	 */
+	public Fichero(Integer pcodNum, String pnombre, InputStream parchivo) {
+		super();
+		this.codNum = pcodNum;
+		this.nombre = pnombre;
+		this.archivo = parchivo;
+	}
+	
 	
 	/** Constructor copia.
 	 * @param copia Fichero a copiar
@@ -37,6 +51,7 @@ public class Fichero implements Serializable {
 	public Fichero(Fichero copia) {
 		this.codNum = copia.codNum;
 		this.nombre = copia.nombre;
+		this.archivo = copia.archivo;
 	}
 	
 	public Integer getCodNum() {
@@ -53,6 +68,14 @@ public class Fichero implements Serializable {
 
 	public void setNombre(String nombre) {
 		this.nombre = nombre;
+	}
+	
+	public InputStream getArchivo() {
+		return archivo;
+	}
+	
+	public void setArchivo(InputStream archivo) {
+		this.archivo = archivo;
 	}
 
 	public static long getSerialversionuid() {

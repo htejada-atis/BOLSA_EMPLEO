@@ -1,5 +1,6 @@
 package es.ujaen.uvirtual.controlador.infadministrativa.bolsaempleo;
 
+import java.io.BufferedInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.PrintWriter;
@@ -7,6 +8,7 @@ import java.sql.SQLException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.servlet.ServletException;
+import javax.servlet.ServletOutputStream;
 import javax.servlet.annotation.MultipartConfig;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
@@ -23,6 +25,7 @@ import es.ujaen.uvirtual.modelo.bolsaempleo.ModeloFichero;
 import es.ujaen.uvirtual.utilidades.BolsaEmpleoUtils;
 import es.ujaen.uvirtual.utilidades.DataTable;
 import es.ujaen.uvirtual.utilidades.EscapaHTML;
+import es.ujaen.uvirtual.utilidades.Formateador;
 import es.ujaen.uvirtual.utilidades.UVException;
 
 
@@ -44,15 +47,17 @@ public class ControladorGestionFicheros extends HttpServlet {
 	
 	
 	// Acciones
-	public static final String ACCION_AGREGAR_FICHERO = "agregarfichero";
-	public static final String ACCION_LISTAR_FICHEROS = "listarficheros";
-	public static final String ACCION_DATATABLE = "datatable";
+	public static final String ACCION_SUBIR_FICHERO = "subirfichero";
 	public static final String ACCION_BORRAR_FICHERO = "borrarfichero";
+	public static final String ACCION_DATATABLE = "datatable";
+	public static final String ACCION_DESCARGAR_FICHERO = "descargarfichero";
+	public static final String ACCION_LISTAR_FICHEROS = "listarficheros";
 	
 	// Parámetros
 	public static final String PARAM_ACCION = "a";
 	public static final String PARAM_ENVIAR = "enviar";
 	public static final String PARAM_FICHERO = "fichero";
+	public static final String PARAM_ID = "id";
 	
 	// Mensajes
 	public static final String MENSAJE_ENVIADO = "mensaje";
@@ -82,16 +87,22 @@ public class ControladorGestionFicheros extends HttpServlet {
 		
 		try {
 			switch (nombreAccion) {
-				case ACCION_AGREGAR_FICHERO:
+				case ACCION_SUBIR_FICHERO:
 					agregarFichero(request, response, bean);
 					break;
 				case ACCION_DATATABLE:
 					listadoFicheros(datos, request, response);
 					return;
+				case ACCION_DESCARGAR_FICHERO:
+					descargarFichero(datos, request, response);
+					break;
 			}
 		} catch (SQLException e) {
 			bean.getMensajesDeError().add("Error al acceder a la base de datos");
 		} catch (ServletException e) {
+			LOGGER.log(Level.WARNING, e.toString());
+			bean.getMensajesDeError().add(e.toString());
+		} catch (UVException e) {
 			LOGGER.log(Level.WARNING, e.toString());
 			bean.getMensajesDeError().add(e.toString());
 		} finally {
@@ -116,7 +127,7 @@ public class ControladorGestionFicheros extends HttpServlet {
 		doGet(request, response);
 	}
 	
-	/** agrega una nueva noticia.
+	/** agrega un nuevo fichero .
 	 * @param request .
 	 * @param response .
 	 * @param bean bean de la vista a la que poner los valores.
@@ -137,6 +148,33 @@ public class ControladorGestionFicheros extends HttpServlet {
 			}
 			
 			response.sendRedirect(request.getServletPath());
+		}
+	}
+	
+	/** descarga un fichero .
+	 * @param datos .
+	 * @param request .
+	 * @param response .
+	 * @throws SQLException excepcion de bbdd.
+	 * @throws UVException en caso de error en bd .
+	 * @throws IOException en caso de error de IO .
+	 */
+	private void descargarFichero(UVDatos datos, HttpServletRequest request, HttpServletResponse response) throws SQLException, UVException, IOException {
+		ModeloFichero modelo = new ModeloFichero();
+		if (EscapaHTML.ajustaCodificacion(request.getParameter(PARAM_ID)) != null) {
+			Fichero fichero = modelo.listaFichero(Formateador.leeParametroInteger(request.getParameter(PARAM_ID)));
+			response.setContentType("application/pdf");
+	        response.setHeader("Content-Disposition", "attachment;filename=" + fichero.getNombre());
+	        datos.setRespuestaEnviada(true);
+	        
+	        try (ServletOutputStream stream = response.getOutputStream();
+	             BufferedInputStream buf = new BufferedInputStream(fichero.getArchivo());) {
+	            int readBytes = 0;
+	            while ((readBytes = buf.read()) != -1) {
+	                stream.write(readBytes);
+	            }
+	            stream.flush();
+	        }
 		}
 	}
 	

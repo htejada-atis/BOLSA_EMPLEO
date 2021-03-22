@@ -29,14 +29,42 @@ public class ModeloFichero {
 	
 	/********************************************** METODOS PÚBLICOS PARA CONSULTAS   ********************************************/
 	
+	/** Consulta ficheros en BBDD y los devuelve .
+	 * @param clausula para filtrar los ficheros de la bd .
+	 * @return todos los ficheros de la base de datos .
+	 * @throws SQLException en caso de error de base de datos .
+	 */
+	private List<Fichero> listaFicheros(String clausula) throws SQLException {
+		List<Fichero> ficheros = new ArrayList<>();
+		String consulta = "SELECT bepfich.* FROM tbep_ficheros bepfich " + clausula;
+		
+		try (Connection conexion = ConexionUvirtual.obtenerInstancia();
+			PreparedStatement stmt = conexion.prepareStatement(consulta);) {
+				try (ResultSet rs = stmt.executeQuery()) {
+					while (rs.next()) {
+						try {
+							Fichero fich = new Fichero();
+							fich.setCodNum(rs.getInt("CODNUM"));
+							fich.setNombre(rs.getString("NOMBRE"));
+							fich.setArchivo(rs.getBlob("ARCHIVO").getBinaryStream());
+							ficheros.add(fich);
+						} catch (Exception e) {
+							e.printStackTrace();
+						}
+						
+					}
+				}
+			}
+		return ficheros;
+	}
 	
-	/** lista todos los ficheros.
+	/** lista todos los ficheros .
 	 * @return lista de todos los ficheros .
 	 * @throws SQLException si hay un error en la base de datos .
 	 */
 	public List<Fichero> listaFicheros() throws SQLException {
 		List<Fichero> ficheros = new ArrayList<>();
-		String consulta = "SELECT f.nombre FROM tbep_ficheros f";
+		String consulta = "SELECT bepfich.nombre FROM tbep_ficheros bepfich";
 		
 		try (Connection conexion = ConexionUvirtual.obtenerInstancia();
 			PreparedStatement stmt = conexion.prepareStatement(consulta);) {
@@ -64,7 +92,7 @@ public class ModeloFichero {
 	 */
 	public void insertaFichero(InputStream in, String nombre) throws SQLException {
 		String consulta = "INSERT INTO tbep_ficheros " 
-				+ " (NOMBRE,FICHERO) "
+				+ " (NOMBRE,ARCHIVO) "
 				+ "VALUES (?,?)";
 		try (Connection conexion = ConexionUvirtual.obtenerInstancia();
 			 PreparedStatement stmt = conexion.prepareStatement(consulta);) {
@@ -73,6 +101,20 @@ public class ModeloFichero {
 			stmt.setBinaryStream(parameterIndex++, in);
 			stmt.executeUpdate();
 		}
+	}
+	
+	/** obtiene un archivo a partir de su id.
+	 * @param id codigo del fichero .
+	 * @return archivo con el id especificado .
+	 * @throws SQLException en caso de error en la BD .
+	 */
+	public Fichero listaFichero(int id) throws SQLException, UVException {
+		String clausulaWhere = "WHERE codnum = " + id;
+		List<Fichero> ficheros = listaFicheros(clausulaWhere);
+		if (ficheros.isEmpty()) {
+			throw new UVException("No existe fichero");
+		}
+		return ficheros.get(0);
 	}
 		
 	/**
