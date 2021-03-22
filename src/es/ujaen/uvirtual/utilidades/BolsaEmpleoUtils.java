@@ -32,5 +32,22 @@ public class BolsaEmpleoUtils {
 		
 		return consulta;
 	}
+	
+	/**
+	 * Devuelve un string de un número '?' separadas por ',' para usarlo en consultas
+	 * de tipo where in.
+	 * Por ejemplo si numParams, devuelve "?,?,?"
+	 * @param numParams número de interrograciones
+	 * @return string con un número de ? separadas por coma
+	 */
+	public static String consultaMultiplesParametros(int numParams) {
+		StringBuilder builder = new StringBuilder();
+
+		for (int i = 0; i < numParams; i++) {
+		    builder.append("?,");
+		}
+		
+		return builder.deleteCharAt(builder.length() - 1).toString();
+	} 
 
 }
