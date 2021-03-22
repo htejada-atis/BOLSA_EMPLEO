@@ -3,24 +3,6 @@
  * @copyright ATISoluciones 2021
  */
 
-function getProp( object, keys, defaultVal ){
-  keys = Array.isArray( keys )? keys : keys.split('.');
-  object = object[keys[0]];
-  if( object && keys.length > 1 ){
-    return getProp( object, keys.slice(1) );
-  }
-  return object === undefined? defaultVal : object;
-}
-
-function setProp( object, keys, val ){
-  keys = Array.isArray( keys )? keys : keys.split('.');
-  if( keys.length > 1 ){
-    object[keys[0]] = object[keys[0]] || {};
-    return setProp( object[keys[0]], keys.slice(1), val );
-  }
-  object[keys[0]] = val;
-}
-
 function DataTable(id, config) {
     this.id = id;
     this.node = $(id);
@@ -31,7 +13,7 @@ function DataTable(id, config) {
     this.params = {
         'a': 'datatable',
         'page': 0,
-        'pageSize': getProp(config, 'pageSize', 10),
+        'pageSize': Atis.getProp(config, 'pageSize', 10),
         'orderBy': null,
         'orderDirection': 'asc'
     };
@@ -49,8 +31,8 @@ function DataTable(id, config) {
 	        contentType: "application/json",
 	        dataType: "json",
 	        data: self.params,
-	        success: this.parseResponse.bind(self),
-	        error: this.errorResponse.bind(self)            
+	        success: self.parseResponse.bind(self),
+            error: self.errorResponse.bind(self)
 	    });	      
     };
         
@@ -61,7 +43,7 @@ function DataTable(id, config) {
     	} else {
     		$('p.loading', self.tbody).remove();
     		$('tr', self.tbody).show();    		
-    	}    	
+    	}
     };
     
     this.parseResponse = function(response) {
@@ -87,11 +69,9 @@ function DataTable(id, config) {
     this.errorResponse = function(err) {
     	self.loading(false);
     
-    	var error = $.parseJSON(err.responseText);
-    	var errorText = getProp(error, 'error', 'Sin definir');
-        
-        $('tr', self.tbody).hide();
+    	$('tr', self.tbody).hide();
         $(self.tbody).append('<p class="loading">Error: ' + errorText + '</p>');
+        $(self.tbody).append('<p class="loading">Error: ' + Atis.getErrorResponse(err) + '</p>');
     };
     
     this.addRow = function(row, index) {
@@ -108,7 +88,7 @@ function DataTable(id, config) {
     
     this.renderCol = function(row, columnDef) {
     	var data = columnDef.data;
-    	var value = getProp(row, data);
+    	var value = Atis.getProp(row, data);
     	
     	if (columnDef.hasOwnProperty('render')) {
     		return columnDef.render(row);
@@ -118,7 +98,8 @@ function DataTable(id, config) {
     		var buttons = $('<span class="btns"></span>');
     		
     		columnDef.buttons.forEach(function(buttonDef) {
-    			var btn = $('<button class="btn" type="button">'+buttonDef.label+'</button>');
+                var label = isFunction(buttonDef.label) ? buttonDef.label(row) : buttonDef.label;
+    			var btn = $('<button class="btn" type="button">'+label+'</button>');
     			$(btn).on("click", function() { buttonDef.onClick(row, self); });
     			$(buttons).append(btn);
     		});
@@ -142,21 +123,21 @@ function DataTable(id, config) {
     
     this.renderFooter = function() {
     	if (!self.lastResponse) { return ''; }    	
-    	var selected = self.getCheckedItems();  
+    	
+        // texto total
+        var selected = self.getCheckedItems();  
         var labelTotal = 'Total ' + self.lastResponse.recordsTotal;
         var labelSelected = selected.length > 0 ? ' (Seleccionados ' + selected.length + ')' : ''
         var textoTotal = '<span class="total">' + labelTotal + labelSelected +'</span>';
         
-        var btnFirst = $('<button class="btn" type="button">&lt;&lt;</button>');
+        // pagination
+        var btnFirst = $('<button class="btn first" type="button">&lt;&lt;</button>');
         $(btnFirst).on("click", function() { self.paginateFirst(); });
-
-        var btnBack = $('<button class="btn" type="button">&lt;</button>');
+        var btnBack = $('<button class="btn back" type="button">&lt;</button>');
         $(btnBack).on("click", function() { self.paginationPrevious(); });
-
-        var btnNext = $('<button class="btn" type="button">&gt;</button>');
+        var btnNext = $('<button class="btn next" type="button">&gt;</button>');
         $(btnNext).on("click", function() { self.paginationNext(); });
-
-        var btnLast = $('<button class="btn" type="button">&gt;&gt;</button>');
+        var btnLast = $('<button class="btn last" type="button">&gt;&gt;</button>');
         $(btnLast).on("click", function() { self.paginationLast(); });
 
         var pagination = $('<span class="pagination"></span>');
@@ -166,9 +147,20 @@ function DataTable(id, config) {
         $(pagination).append(btnNext);
         $(pagination).append(btnLast);
 
-        $('th', self.tfoot).empty();        
+        // acciones
+        var actions = $('<span class="actions"></span>');;
+        if (self.config.actions) {
+            for (var i = 0; i < self.config.actions.length; i++) {
+                var action = self.config.actions[i];
+                var btn = $('<button class="btn" type="button">' + action.label + '</button>');
+                $(btn).on("click", action.onClick.bind(self, selected));
+                $(actions).append(btn);
+            }
+        }
 
+        $('th', self.tfoot).empty();
     	$('th', self.tfoot).append($(pagination));
+        $('th', self.tfoot).append($(actions));
         $('th', self.tfoot).append($(textoTotal));
     };
     
@@ -181,9 +173,9 @@ function DataTable(id, config) {
     	}
 
         self.config.columns.forEach(function(columnDef, index) {
-            var orderable = getProp(columnDef, 'orderable', true);
-            var selectable = getProp(columnDef, 'selectable');
-            var buttons = getProp(columnDef, 'buttons');
+            var orderable = Atis.getProp(columnDef, 'orderable', true);
+            var selectable = Atis.getProp(columnDef, 'selectable');
+            var buttons = Atis.getProp(columnDef, 'buttons');
 
             columnDef.node = $('th', self.thead).get(index);
             
@@ -202,10 +194,10 @@ function DataTable(id, config) {
     	if (self.lastResponse.data) {
 			self.lastResponse.data.forEach(function (row) {
 				var firstColumnDef = self.config.columns[0];
-				var value = getProp(row, firstColumnDef.data);
+				var value = Atis.getProp(row, firstColumnDef.data);
 				
 				$("input[type='checkbox']", self.tbody).prop('checked', check);
-				self.checked[value] = check;    					
+				self.checked[value] = check;
 			});
 		}
 		self.renderFooter();

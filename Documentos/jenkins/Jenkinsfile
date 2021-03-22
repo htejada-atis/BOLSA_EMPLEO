@@ -32,13 +32,14 @@ pipeline {
 				script {
                     docker.withRegistry( 'https://usig-registrydocker.ujaen.es:5044', 'portus-jenkins' ) {
                         sh '''
+                        	chmod a+x ${WORKSPACE}/Documentos/selenium/drivers/geckodriver
                             chmod a+x ${WORKSPACE}/Documentos/docker/wait-for-it.sh
                             export ORACLE_SCRIPTS_STARTUP=${WORKSPACE}/Documentos/docker/init-oracle
                             export ORACLE_DATA=/home/jenkins-nodo/oracledata
                             docker-compose build
                             docker-compose up -d
                            '''
-                        sleep(time:5,unit:"MINUTES")
+                        sleep(time:2,unit:"MINUTES")
                     }
 	        	}
 	        }
