@@ -10,6 +10,7 @@ import java.util.Map;
 
 import es.ujaen.uvirtual.beans.uvirtual.bolsaempleo.Bolsa;
 import es.ujaen.uvirtual.modelo.conexion.ConexionUvirtual;
+import es.ujaen.uvirtual.utilidades.BolsaEmpleoUtils;
 import es.ujaen.uvirtual.utilidades.DataTable;
 import es.ujaen.uvirtual.utilidades.UVException;
 
@@ -149,15 +150,7 @@ public class ModeloBolsa {
 		 * Estado por defecto de las bolsas. Los candidatos NO PUEDEN añadir nuevo méritos.
 		 * La bolsa se puede baremas (si es baremable)
 		 */
-		
-		Object[] ids = bolsas.stream().map(Bolsa::getCodNum).toArray();
-		String query = "UPDATE TBEP_BOLSAS SET ESTADO = ? WHERE ID IN (?)";		
-				
-		try (Connection conexion = ConexionUvirtual.obtenerInstancia(); PreparedStatement stmt = conexion.prepareStatement(query)) {
-			stmt.setString(1, BOLSA_ESTADO_BLOQUEADA);			
-			stmt.setArray(2, conexion.createArrayOf("integer", ids));
-			stmt.executeUpdate();
-		}		
+		this.cambiarEstadoBolsas(bolsas, BOLSA_ESTADO_BLOQUEADA);			
 	}
 	
 	/**
@@ -170,14 +163,7 @@ public class ModeloBolsa {
 		 * Se está revisando la bolsa. Usuarios no pueden introducir méritos y los miembros de la comisión
 		 * no pueden evaluar. Se utiliza para un primer filtrado de candidatos apuntados a las bolsas
 		 */
-		Object[] ids = bolsas.stream().map(Bolsa::getCodNum).toArray();
-		String query = "UPDATE TBEP_BOLSAS SET ESTADO = ? WHERE ID IN (?)";		
-				
-		try (Connection conexion = ConexionUvirtual.obtenerInstancia(); PreparedStatement stmt = conexion.prepareStatement(query)) {
-			stmt.setString(1, BOLSA_ESTADO_REVISION);			
-			stmt.setArray(2, conexion.createArrayOf("integer", ids));
-			stmt.executeUpdate();
-		}
+		this.cambiarEstadoBolsas(bolsas, BOLSA_ESTADO_REVISION);
 	}
 	
 	/**
@@ -189,14 +175,7 @@ public class ModeloBolsa {
 		/*
 		 * Las comisiones pueden evaluar méritos (solo en este estado)
 		 */
-		Object[] ids = bolsas.stream().map(Bolsa::getCodNum).toArray();
-		String query = "UPDATE TBEP_BOLSAS SET ESTADO = ? WHERE ID IN (?)";		
-				
-		try (Connection conexion = ConexionUvirtual.obtenerInstancia(); PreparedStatement stmt = conexion.prepareStatement(query)) {
-			stmt.setString(1, BOLSA_ESTADO_BAREMACION);			
-			stmt.setArray(2, conexion.createArrayOf("integer", ids));
-			stmt.executeUpdate();
-		}
+		this.cambiarEstadoBolsas(bolsas, BOLSA_ESTADO_BAREMACION);		
 	}
 	
 	/**
@@ -209,14 +188,7 @@ public class ModeloBolsa {
 		 * Evaluar méritos después del proceso de evaluación. Se resuelven las alegaciones.
 		 * Las comisiones no pueden acceder a evaluar méritos.
 		 */
-		Object[] ids = bolsas.stream().map(Bolsa::getCodNum).toArray();
-		String query = "UPDATE TBEP_BOLSAS SET ESTADO = ? WHERE ID IN (?)";		
-				
-		try (Connection conexion = ConexionUvirtual.obtenerInstancia(); PreparedStatement stmt = conexion.prepareStatement(query)) {
-			stmt.setString(1, BOLSA_ESTADO_ALEGACIONES);			
-			stmt.setArray(2, conexion.createArrayOf("integer", ids));
-			stmt.executeUpdate();
-		}
+		this.cambiarEstadoBolsas(bolsas, BOLSA_ESTADO_ALEGACIONES);		
 	}
 	
 	/**
@@ -229,16 +201,9 @@ public class ModeloBolsa {
 		 * Se pueden introducir nuevos méritos por los candidatos. Para que esto ocurra,
 		 * TODAS LAS BOLSAS DEBEN ESTAR EN ESTE ESTADO
 		 */
-		Object[] ids = bolsas.stream().map(Bolsa::getCodNum).toArray();
-		String query = "UPDATE TBEP_BOLSAS SET ESTADO = ? WHERE ID IN (?)";		
-				
-		try (Connection conexion = ConexionUvirtual.obtenerInstancia(); PreparedStatement stmt = conexion.prepareStatement(query)) {
-			stmt.setString(1, BOLSA_ESTADO_DESBLOQUEADA);			
-			stmt.setArray(2, conexion.createArrayOf("integer", ids));
-			stmt.executeUpdate();
-		}	
+		this.cambiarEstadoBolsas(bolsas, BOLSA_ESTADO_DESBLOQUEADA);		
 	}
-	
+			
 	/**
 	 * Baremar bolsas.
 	 * @param bolsas .
@@ -259,5 +224,19 @@ public class ModeloBolsa {
 	 */
 	public void baremarBolsa(Bolsa bolsa) {
 		
+	}
+	
+	private void cambiarEstadoBolsas(List<Bolsa> bolsas, String estado) throws SQLException {
+		String params = BolsaEmpleoUtils.consultaMultiplesParametros(bolsas.size());
+		String query = "UPDATE TBEP_BOLSAS SET ESTADO = ? WHERE CODNUM IN (" + params + ")";		
+				
+		try (Connection conexion = ConexionUvirtual.obtenerInstancia(); PreparedStatement stmt = conexion.prepareStatement(query)) {
+			int indexParam = 1;
+			stmt.setString(indexParam++, estado);
+			for (Bolsa bolsa : bolsas) {
+				stmt.setInt(indexParam++, bolsa.getCodNum()); 				
+			}
+			stmt.executeUpdate();
+		}
 	}
 }

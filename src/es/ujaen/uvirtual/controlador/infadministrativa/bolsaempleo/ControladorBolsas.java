@@ -60,7 +60,8 @@ public class ControladorBolsas extends HttpServlet {
 	public static final String ACCION_BOLSAS_BAREMAR = "baremar";	
 	
 	// mensajes
-	public static final String MENSAJE_ERROR_ACCION_BOLSA_NO_VALIDA = "Acción no válida"; 
+	public static final String MENSAJE_ERROR_ACCION_BOLSA_NO_VALIDA = "Acción no válida";
+	public static final String MENSAJE_EXITO_BOLSA_MODIFICADA_CORRECTAMENTE = "Bolsa/s modificada/s correctamente"; 
 
 	/** Peticion GET.
 	 * @see HttpServlet#doGet(HttpServletRequest request, HttpServletResponse response)
@@ -142,56 +143,39 @@ public class ControladorBolsas extends HttpServlet {
 		datos.setRespuestaEnviada(true);
 	}
 	
-	private void accionSobreBolsas(VistaEstadoBolsas bean, UVDatos datos, HttpServletRequest request) throws UVException {
+	private void accionSobreBolsas(VistaEstadoBolsas bean, UVDatos datos, HttpServletRequest request) throws UVException, SQLException {
+		ModeloBolsa modelo = new ModeloBolsa();
+		
 		String nombreAccionBolsa = EscapaHTML.ajustaCodificacion(request.getParameter(PARAM_ACCION_BOLSA));
 		String selectedJson = EscapaHTML.ajustaCodificacion(request.getParameter(PARAM_BOLSAS_SELECCIONADAS));
-		List<Integer> selected = (new Gson()).fromJson(selectedJson, new TypeToken<List<Integer>>() { }.getType());
+		int[] selected = (new Gson()).fromJson(selectedJson, new TypeToken<int[]>() { }.getType());
+		
+		List<Bolsa> bolsas = modelo.getBolsasByIds(selected);
 
 		switch (nombreAccionBolsa) {
 		case ACCION_BOLSAS_BLOQUEAR:
-			bloquearBolsas(bean, datos, selected);					
+			modelo.bloquearBolsas(bolsas);							
 			break;
 		case ACCION_BOLSAS_REVISION:
-			pasarBolsaARevision(bean, datos, selected);
+			modelo.ponerBolsasEnRevision(bolsas);
 			break;
 		case ACCION_BOLSAS_BAREMACION:
-			pasarBolsasABaremacion(bean, datos, selected);
+			modelo.ponerBolsasEnBaremacion(bolsas);
 			break;
 		case ACCION_BOLSAS_ALEGACION:
-			pasarBolsasAAlegaciones(bean, datos, selected);
+			modelo.ponerBolsasEnAlegaciones(bolsas);
 			break;
 		case ACCION_BOLSAS_DESBLOQUEAR:
-			desbloquearBolsas(bean, datos, selected);
+			modelo.desbloquearBolsas(bolsas);
 			break;
 		case ACCION_BOLSAS_BAREMAR:
-			baremarBolsas(bean, datos, selected);
+			modelo.baremarBolsas(bolsas);
 			break;
 		default:
-			bean.getMensajesDeError().add(MENSAJE_ERROR_ACCION_BOLSA_NO_VALIDA);			
+			bean.getMensajesDeError().add(MENSAJE_ERROR_ACCION_BOLSA_NO_VALIDA);
+			return;
 		}
-	}
-
-	private void bloquearBolsas(VistaEstadoBolsas bean, UVDatos datos, List<Integer> selected) {
 		
-	}
-
-	private void pasarBolsaARevision(VistaEstadoBolsas bean, UVDatos datos, List<Integer> selected) {
-		
-	}
-
-	private void pasarBolsasABaremacion(VistaEstadoBolsas bean, UVDatos datos, List<Integer> selected) {
-		
-	}
-
-	private void pasarBolsasAAlegaciones(VistaEstadoBolsas bean, UVDatos datos, List<Integer> selected) {
-		
-	}
-	
-	private void desbloquearBolsas(VistaEstadoBolsas bean, UVDatos datos, List<Integer> selected) {
-		
-	}
-	
-	private void baremarBolsas(VistaEstadoBolsas bean, UVDatos datos, List<Integer> selected) {
-		
+		bean.getMensajesDeExito().add(MENSAJE_EXITO_BOLSA_MODIFICADA_CORRECTAMENTE);
 	}
 }
