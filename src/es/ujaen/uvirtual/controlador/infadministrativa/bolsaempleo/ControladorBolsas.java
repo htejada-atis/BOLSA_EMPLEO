@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.sql.SQLException;
 import java.util.logging.Logger;
+import java.util.List;
 import java.util.logging.Level;
 
 import javax.servlet.ServletException;
@@ -14,6 +15,7 @@ import javax.servlet.http.HttpServletResponse;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+import com.google.gson.reflect.TypeToken;
 
 import es.ujaen.uvirtual.beans.CodigoDescripcion;
 import es.ujaen.uvirtual.beans.UVDatos;
@@ -43,10 +45,22 @@ public class ControladorBolsas extends HttpServlet {
 	private static final String NOMBREDEESTACLASE = ControladorBolsas.class.getName();
 	private static final Logger LOGGER = Logger.getLogger(NOMBREDEESTACLASE);
 	public static final String PARAM_ACCION = "a";
+	public static final String PARAM_ACCION_BOLSA = "ab";
+	public static final String PARAM_BOLSAS_SELECCIONADAS = "bolsasselected";
 	
 	// acciones
 	public static final String ACCION_LISTAR_BOLSAS = "listar";
 	public static final String ACCION_DATATABLE = "datatable";
+	public static final String ACCION_BOLSA = "accionbolsa";
+	public static final String ACCION_BOLSAS_BLOQUEAR = "bloquear";
+	public static final String ACCION_BOLSAS_REVISION = "revision";
+	public static final String ACCION_BOLSAS_BAREMACION = "baremacion";
+	public static final String ACCION_BOLSAS_ALEGACION = "alegacion";
+	public static final String ACCION_BOLSAS_DESBLOQUEAR = "desbloquear";
+	public static final String ACCION_BOLSAS_BAREMAR = "baremar";	
+	
+	// mensajes
+	public static final String MENSAJE_ERROR_ACCION_BOLSA_NO_VALIDA = "Acción no válida"; 
 
 	/** Peticion GET.
 	 * @see HttpServlet#doGet(HttpServletRequest request, HttpServletResponse response)
@@ -66,15 +80,20 @@ public class ControladorBolsas extends HttpServlet {
 			nombreAccion = ACCION_LISTAR_BOLSAS;
 		}
 		
+		bean.setVista("/WEB-INF/jsp/vista/infadministrativa/bolsaempleo/bolsas/index.jsp");
+		
 		try {
 			switch (nombreAccion) {
-				case ACCION_LISTAR_BOLSAS:
-					bean.setVista("/WEB-INF/jsp/vista/infadministrativa/bolsaempleo/bolsas/index.jsp");
-					break;
 				case ACCION_DATATABLE:
-					datatable(datos, request, response);
+					listadoBolsas(datos, request, response);
 					break;
+				case ACCION_BOLSA:
+					accionSobreBolsas(bean, datos, request);					
+					break;				
 			}			
+		} catch (UVException e) {
+			LOGGER.log(Level.WARNING, e.toString());
+			bean.getMensajesDeError().add(e.toString());
 		} catch (SQLException e) {
 			LOGGER.log(Level.SEVERE, Formateador.getStackTrace(e));
 			LOGGER.log(Level.SEVERE, e.toString());
@@ -92,8 +111,16 @@ public class ControladorBolsas extends HttpServlet {
 			datos.getFicherosCSS().add("/css/jqueryujaen/jquery-ui-1.8.16.custom.css");
 		}
 	}
+	
+	/** redireccion de do post.
+	 * @see HttpServlet#doPost(HttpServletRequest request, HttpServletResponse response)
+	 */
+	@Override
+	public void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+		doGet(request, response);
+	}
 		
-	private void datatable(UVDatos datos, HttpServletRequest request, HttpServletResponse response) throws IOException, SQLException {
+	private void listadoBolsas(UVDatos datos, HttpServletRequest request, HttpServletResponse response) throws IOException, SQLException {
 		ModeloBolsa modelo = new ModeloBolsa();
 		
 		datos.setContentType("application/json");
@@ -101,10 +128,10 @@ public class ControladorBolsas extends HttpServlet {
 		response.setCharacterEncoding("UTF-8");
 		
 		try (PrintWriter writer = response.getWriter()) {
-			try {				
-				DataTable<Bolsa> dataTable = modelo.listaBolsaEmpleo(request);
+			try {
+				DataTable<Bolsa> dataTable = modelo.listaBolsaEmpleoDatatable(request.getParameterMap());
 				Gson gson = new GsonBuilder().setExclusionStrategies(DataTable.GSONEXCLUSIONSTRATEGY).create();
-				
+
 				writer.write(gson.toJson(dataTable));
 			} catch (UVException ex) {
 				CodigoDescripcion mensaje = new CodigoDescripcion("error", ex.getMessage());
@@ -113,5 +140,58 @@ public class ControladorBolsas extends HttpServlet {
 		}
 		
 		datos.setRespuestaEnviada(true);
+	}
+	
+	private void accionSobreBolsas(VistaEstadoBolsas bean, UVDatos datos, HttpServletRequest request) throws UVException {
+		String nombreAccionBolsa = EscapaHTML.ajustaCodificacion(request.getParameter(PARAM_ACCION_BOLSA));
+		String selectedJson = EscapaHTML.ajustaCodificacion(request.getParameter(PARAM_BOLSAS_SELECCIONADAS));
+		List<Integer> selected = (new Gson()).fromJson(selectedJson, new TypeToken<List<Integer>>() { }.getType());
+
+		switch (nombreAccionBolsa) {
+		case ACCION_BOLSAS_BLOQUEAR:
+			bloquearBolsas(bean, datos, selected);					
+			break;
+		case ACCION_BOLSAS_REVISION:
+			pasarBolsaARevision(bean, datos, selected);
+			break;
+		case ACCION_BOLSAS_BAREMACION:
+			pasarBolsasABaremacion(bean, datos, selected);
+			break;
+		case ACCION_BOLSAS_ALEGACION:
+			pasarBolsasAAlegaciones(bean, datos, selected);
+			break;
+		case ACCION_BOLSAS_DESBLOQUEAR:
+			desbloquearBolsas(bean, datos, selected);
+			break;
+		case ACCION_BOLSAS_BAREMAR:
+			baremarBolsas(bean, datos, selected);
+			break;
+		default:
+			bean.getMensajesDeError().add(MENSAJE_ERROR_ACCION_BOLSA_NO_VALIDA);			
+		}
+	}
+
+	private void bloquearBolsas(VistaEstadoBolsas bean, UVDatos datos, List<Integer> selected) {
+		
+	}
+
+	private void pasarBolsaARevision(VistaEstadoBolsas bean, UVDatos datos, List<Integer> selected) {
+		
+	}
+
+	private void pasarBolsasABaremacion(VistaEstadoBolsas bean, UVDatos datos, List<Integer> selected) {
+		
+	}
+
+	private void pasarBolsasAAlegaciones(VistaEstadoBolsas bean, UVDatos datos, List<Integer> selected) {
+		
+	}
+	
+	private void desbloquearBolsas(VistaEstadoBolsas bean, UVDatos datos, List<Integer> selected) {
+		
+	}
+	
+	private void baremarBolsas(VistaEstadoBolsas bean, UVDatos datos, List<Integer> selected) {
+		
 	}
 }

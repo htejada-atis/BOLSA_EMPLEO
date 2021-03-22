@@ -1,5 +1,6 @@
 <%@ page trimDirectiveWhitespaces="true"%>
 <%@ page import="es.ujaen.uvirtual.beans.UVDatos"%>
+<%@	page import="es.ujaen.uvirtual.controlador.infadministrativa.bolsaempleo.ControladorBolsas"%>
 <%@ page import="es.ujaen.uvirtual.beans.vistas.uvirtual.bolsaempleo.VistaEstadoBolsas"%>
 <%@ page import="es.ujaen.uvirtual.beans.uvirtual.bolsaempleo.Bolsa"%>
 <%@ page import="es.ujaen.uvirtual.utilidades.EscapaHTML" %>
@@ -32,14 +33,13 @@ VistaEstadoBolsas bean = (VistaEstadoBolsas) uvdatos.getVistas().get(VistaEstado
 			<th scope="col" style="width:20%">Actualizada</th>
 			<th scope="col" style="width:18%">Bloqueo</th>
 			<th scope="col" style="width:19%">Desbloqueo</th>
-			<th scope="col" style="width:18%">Baremable</th>
-			<th scope="col" style="width:10%"></th>
+			<th scope="col" style="width:18%">Baremable</th>			
 		</tr>
 		<tbody>				
 		</tbody>
 		<tfoot>
 			<tr>
-				<th colSpan="9" style="width:100%"></th>
+				<th colSpan="8" style="width:100%"></th>
 			</tr>
 		</tfoot>
 	</table>
@@ -47,10 +47,6 @@ VistaEstadoBolsas bean = (VistaEstadoBolsas) uvdatos.getVistas().get(VistaEstado
 	
 	<script>
 	$(document).ready(function() {
-		function clickRow(row) {
-			console.log("row", row);
-		}
-		
 		var table = new DataTable('#table', {
 		    "ajax": { url: "/srv/es/ajax/informacionadministrativa/bolsaempleo/bolsas" },
 		    "selectable": true,
@@ -64,9 +60,30 @@ VistaEstadoBolsas bean = (VistaEstadoBolsas) uvdatos.getVistas().get(VistaEstado
 		        {'data': 'fechaBloqueo'},
 		        {'data': 'fechaDesBloqueo'},
 		        {'data': 'baremable'},
-		        {'data': 'codNum', 'buttons': [{'label': 'Click', 'onClick': function(row) {console.log("row", row);}}]}		        
 		    ],
-		});		
+		    "actions": [
+		    	{'label': 'Bloquear', 'onClick': function(selected) { enviaAccion("<%=ControladorBolsas.ACCION_BOLSAS_BLOQUEAR%>", selected); } },
+		    	{'label': 'Revisión', 'onClick': function(selected) { enviaAccion("<%=ControladorBolsas.ACCION_BOLSAS_REVISION%>", selected); } },
+		    	{'label': 'Baremación', 'onClick': function(selected) { enviaAccion("<%=ControladorBolsas.ACCION_BOLSAS_BAREMACION%>", selected); } },
+		    	{'label': 'Alegación', 'onClick': function(selected) { enviaAccion("<%=ControladorBolsas.ACCION_BOLSAS_ALEGACION%>", selected); } },
+		    	{'label': 'Desbloquear', 'onClick': function(selected) { enviaAccion("<%=ControladorBolsas.ACCION_BOLSAS_DESBLOQUEAR%>", selected); } },
+		    	{'label': 'Baremar', 'onClick': function(selected) { enviaAccion("<%=ControladorBolsas.ACCION_BOLSAS_BAREMAR%>", selected); } },
+		    ]
+		});	
+		
+		function enviaAccion(accion, selected) {
+			if (selected.length == 0) {
+				Atis.alertDialog('Estado de las bolsas', 'Seleccione al menos una bolsa para cambiar su estado.');
+				return;
+			}
+			
+			var params = {
+				'a': '<%=ControladorBolsas.ACCION_BOLSA%>', 
+				'<%=ControladorBolsas.PARAM_ACCION_BOLSA%>': accion, 
+				'<%=ControladorBolsas.PARAM_BOLSAS_SELECCIONADAS%>': Atis.object2Json(selected)
+			};
+    		Atis.sendForm("<%= request.getRequestURI() %>", params);
+		}
 	}); 
 	</script>
 </div>
