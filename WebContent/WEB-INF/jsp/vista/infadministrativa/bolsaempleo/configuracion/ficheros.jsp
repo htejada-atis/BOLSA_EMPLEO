@@ -21,6 +21,30 @@ VistaFicheros bean = (VistaFicheros) uvdatos.getVistas().get(VistaFicheros.class
     	</div>
 	</form>
 	
+	<% if (session.getAttribute(ControladorGestionFicheros.MENSAJE_ENVIADO) != null) { %>
+		<div id="exito" class="success">
+			<%= session.getAttribute(ControladorGestionFicheros.MENSAJE_ENVIADO) %>
+		</div>
+	<% 
+			session.removeAttribute(ControladorGestionFicheros.MENSAJE_ENVIADO);
+		} 
+	%>
+
+    <table class="bluetable bolsaempleo" id="table_noticias_insertadas">
+		<tr>
+			<th scope="col" style="width:20%">Id</th>
+			<th scope="col"	style="width:30%">Nombre</th>
+			<th scope="col" style="width:10%"></th>
+		</tr>
+		<tbody>				
+		</tbody>
+		<tfoot>
+			<tr>
+				<th colspan="6" style="width:100%"></th>
+			</tr>
+		</tfoot>
+	</table>
+	
 </div>
 
 <script>

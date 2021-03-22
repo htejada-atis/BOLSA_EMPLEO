@@ -26,6 +26,7 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import es.ujaen.uvirtual.beans.UVDatos;
+import es.ujaen.uvirtual.beans.uvirtual.bolsaempleo.Fichero;
 import es.ujaen.uvirtual.beans.uvirtual.bolsaempleo.Noticia;
 import es.ujaen.uvirtual.beans.vistas.uvirtual.bolsaempleo.VistaFicheros;
 import es.ujaen.uvirtual.modelo.bolsaempleo.ModeloFichero;
@@ -160,16 +161,16 @@ public class ControladorGestionFicheros extends HttpServlet {
 	 * @throws IOException en caso de error de IO.
 	 */
 	private void datatableFicheros(HttpServletRequest request, HttpServletResponse response) throws SQLException, UVException, IOException {
-		ModeloNoticia modelo = new ModeloNoticia();
-		List<Noticia> listaNoticias = modelo.listaNoticias();
+		ModeloFichero modelo = new ModeloFichero();
+		List<Fichero> listaFicheros = modelo.listaFicheros();
 		
 		PrintWriter out = response.getWriter();
 		JSONObject json = new JSONObject();
 		
 		try {
-			json.put("recordsTotal", listaNoticias.size());
-			json.put("recordsFiltered", listaNoticias.size());
-			json.put("data", listaNoticias);
+			json.put("recordsTotal", listaFicheros.size());
+			json.put("recordsFiltered", listaFicheros.size());
+			json.put("data", listaFicheros);
 		} catch (JSONException e) {
 			LOGGER.log(Level.SEVERE, "Error creando json {0}", e);
 			throw new UVException("Error creando json");
