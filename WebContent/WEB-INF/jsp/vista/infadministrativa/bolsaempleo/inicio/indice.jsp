@@ -66,7 +66,8 @@ VistaNoticias bean = (VistaNoticias)uvdatos.getVistas().get(VistaNoticias.class.
 		        dataType: "json",
 		        data: params,
 		        success: function(response) {
-		            response.noticias.forEach((noticia) => {
+		        	
+		        	JSON.parse(response.noticias).forEach((noticia) => {
 		            	var element = $(".noticias-bolsa-empleo li").first().clone();
 		            	element.attr("id", "id_"+noticia.idNoticia);
 		            	element.find("a").attr("href", noticia.enlace);

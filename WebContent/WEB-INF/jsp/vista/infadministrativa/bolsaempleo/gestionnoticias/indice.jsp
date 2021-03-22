@@ -42,7 +42,7 @@ VistaNoticias bean = (VistaNoticias) uvdatos.getVistas().get(VistaNoticias.class
 		</tbody>
 		<tfoot>
 			<tr>
-				<th colspan="5" style="width:100%"></th>
+				<th colspan="6" style="width:100%"></th>
 			</tr>
 		</tfoot>
 	</table>
@@ -51,12 +51,12 @@ VistaNoticias bean = (VistaNoticias) uvdatos.getVistas().get(VistaNoticias.class
 <script>
 	$(document).ready(function() {
 		
-		function confirmDialog(message, id, activa) {
+		function confirmDialog(title, message, id, activa) {
 			$('<div></div>').appendTo('body')
-		    	.html('<div><h6>' + message + '?</h6></div>')
+		    	.html('<div><h6>' + message + '</h6></div>')
 		    	.dialog({
 			      modal: true,
-			      title: 'Borrar noticias',
+			      title: title,
 			      zIndex: 10000,
 			      autoOpen: true,
 			      width: 'auto',
@@ -86,23 +86,26 @@ VistaNoticias bean = (VistaNoticias) uvdatos.getVistas().get(VistaNoticias.class
 
 		var table = new DataTable('#table_noticias_insertadas', {
 		    "ajax": { url: "<%= request.getRequestURI() %>" },
+		    "pageSize": 10,
 		    "columns": [
-		    	{'data': 'fechaFormato'},
+		    	{'data': 'fecha'},
 		    	{'data': 'texto'},
-		        {'data': 'enlace', 'render': function(row) { return "mi enlace"; }},
+		        {'data': 'enlace', 'render': function(row) { return "<a href='" +row.enlace +"'>" +row.enlace +"</a>"; }},
 		        {'data': 'publica'},
 		        {'data': 'activa'},
 		        {'data': 'codnum', 'buttons': [{'label': 'Editar', 'onClick': function(row) {
 			        		var params = {'a': '<%= ControladorGestionNoticias.ACCION_EDITAR_NOTICIA %>', 'id': row.codNum};
 			        		Atis.sendForm("<%= request.getRequestURI() %>", params);
 			        	}
-			        }, {'label': function(row) { return "Borrar u otra cosa"; }, 'onClick': function(row) {
+			        }, {'label': function(row) { return row.activa ? "Borrar" : "Restaurar"; }, 'onClick': function(row) {
 			        	var mensaje = "¿Desea borrar la noticia seleccionada?";
+			        	var titulo = "Borrar noticia";
 			        	if(!row.activa) {
+			        		titulo = "Restaurar noticia";
 			        		mensaje = "¿Desea restaurar la noticia seleccionada?";
 			        	}
 			        	
-			        	confirmDialog(mensaje, row.codNum, row.activa);
+			        	confirmDialog(titulo, mensaje, row.codNum, row.activa);
 			        } }]}		        
 			    ],
 			});

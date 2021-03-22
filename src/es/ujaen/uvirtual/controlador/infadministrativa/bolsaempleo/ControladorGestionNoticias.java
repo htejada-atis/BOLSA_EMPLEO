@@ -4,7 +4,6 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.sql.SQLException;
 import java.util.Date;
-import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.servlet.ServletException;
@@ -13,12 +12,14 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
-import org.json.JSONException;
-import org.json.JSONObject;
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
+import es.ujaen.uvirtual.beans.CodigoDescripcion;
 import es.ujaen.uvirtual.beans.UVDatos;
 import es.ujaen.uvirtual.beans.uvirtual.bolsaempleo.Noticia;
 import es.ujaen.uvirtual.beans.vistas.uvirtual.bolsaempleo.VistaNoticias;
 import es.ujaen.uvirtual.modelo.bolsaempleo.ModeloNoticia;
+import es.ujaen.uvirtual.utilidades.DataTable;
 import es.ujaen.uvirtual.utilidades.EscapaHTML;
 import es.ujaen.uvirtual.utilidades.Formateador;
 import es.ujaen.uvirtual.utilidades.UVException;
@@ -36,7 +37,7 @@ import es.ujaen.uvirtual.utilidades.UVException;
 		})
 public class ControladorGestionNoticias extends HttpServlet {
 	private static final long serialVersionUID = 1L;
-	private static final String NOMBREDEESTACLASE = ControladorBolsas.class.getName();
+	private static final String NOMBREDEESTACLASE = ControladorGestionNoticias.class.getName();
 	private static final Logger LOGGER = Logger.getLogger(NOMBREDEESTACLASE);
 	
 	
@@ -88,19 +89,13 @@ public class ControladorGestionNoticias extends HttpServlet {
 					agregarNoticia(request, response, bean);
 					break;
 				case ACCION_DATATABLE:
-					datatableNoticias(request, response);
+					listadoNoticias(datos, request, response);
 					return;
 				case ACCION_EDITAR_NOTICIA:
 					editarNoticia(request, response, bean);
 					break;
 				case ACCION_ELIMINAR_NOTICIA:
 					eliminarNoticia(request, response, bean);
-					break;
-				case ACCION_LISTAR_NOTICIAS:
-					obtenerNoticias(bean);
-					break;
-				default:
-					obtenerNoticias(bean);
 					break;
 			}
 		} catch (UVException e) {
@@ -114,8 +109,8 @@ public class ControladorGestionNoticias extends HttpServlet {
 			datos.getFicherosJS().add("/js/jquery-1.latest.min.js");
 			datos.getFicherosJS().add("/js/jquery-ui-1.10.4.min.js");
 			datos.getFicherosJS().add("/js/jquery.ui.datepicker-es.js");
-			datos.getFicherosJS().add("/js/bolsaempleo/datatable.js");
 			datos.getFicherosJS().add("/js/bolsaempleo/utils.js");
+			datos.getFicherosJS().add("/js/bolsaempleo/datatable.js");
 			datos.getFicherosCSS().add("/css/intranet.css");
 			datos.getFicherosCSS().add("/css/jqueryujaen/jquery-ui-1.8.16.custom.css");
 			datos.getFicherosCSS().add("/css/ujaen_bolsa_empleo.css");
@@ -135,6 +130,7 @@ public class ControladorGestionNoticias extends HttpServlet {
 	 * @param response .
 	 * @param bean bean de la vista a la que poner los valores.
 	 * @throws SQLException excepcion de bbdd.
+	 * @throws UVException en caso de error en bd
 	 */
 	private void agregarNoticia(HttpServletRequest request, HttpServletResponse response, VistaNoticias bean) throws SQLException, UVException, IOException {
 		bean.setVista(RUTA_BEP_NOTICIAS + "formNoticia.jsp");
@@ -158,6 +154,8 @@ public class ControladorGestionNoticias extends HttpServlet {
 	 * @param response .
 	 * @param bean bean de la vista a la que poner los valores .
 	 * @throws SQLException excepcion de bbdd.
+	 * @throws UVException en caso de error en bd
+	 * @throws IOException en caso de error de IO.
 	 */
 	private void editarNoticia(HttpServletRequest request, HttpServletResponse response, VistaNoticias bean) throws SQLException, UVException, IOException {
 		bean.setVista(RUTA_BEP_NOTICIAS + "formNoticia.jsp");
@@ -182,6 +180,8 @@ public class ControladorGestionNoticias extends HttpServlet {
 	 * @param response .
 	 * @param bean bean de la vista a la que poner los valores .
 	 * @throws SQLException excepcion de bbdd.
+	 * @throws UVException en caso de error en bd
+	 * @throws IOException en caso de error de IO.
 	 */
 	private void eliminarNoticia(HttpServletRequest request, HttpServletResponse response, VistaNoticias bean) throws SQLException, UVException, IOException {
 		ModeloNoticia modelo = new ModeloNoticia();
@@ -196,36 +196,33 @@ public class ControladorGestionNoticias extends HttpServlet {
 		response.sendRedirect(request.getServletPath());
 	}
 	
-	/** muestra todas las noticias.
-	 * @param bean bean de la vista a la que poner los valores.
+	/** carga las noticias en una tabla .
+	 * @param datos .
+	 * @param request .
+	 * @param response .
+	 * @throws IOException en caso de error de IO .
 	 * @throws SQLException excepcion de bbdd.
 	 */
-	private void obtenerNoticias(VistaNoticias bean) throws SQLException {
+	private void listadoNoticias(UVDatos datos, HttpServletRequest request, HttpServletResponse response) throws IOException, SQLException {
 		ModeloNoticia modelo = new ModeloNoticia();
-		List<Noticia> noticias = modelo.listaNoticias();
-		bean.setNoticias(noticias);
-	}
-	
-	private void datatableNoticias(HttpServletRequest request, HttpServletResponse response) throws SQLException, UVException, IOException {
-		ModeloNoticia modelo = new ModeloNoticia();
-		List<Noticia> listaNoticias = modelo.listaNoticias();
 		
-		PrintWriter out = response.getWriter();
-		JSONObject json = new JSONObject();
-		
-		try {
-			json.put("recordsTotal", listaNoticias.size());
-			json.put("recordsFiltered", listaNoticias.size());
-			json.put("data", listaNoticias);
-		} catch (JSONException e) {
-			LOGGER.log(Level.SEVERE, "Error creando json {0}", e);
-			throw new UVException("Error creando json");
-		}
-		
+		datos.setContentType("application/json");
 		response.setContentType("application/json");
 		response.setCharacterEncoding("UTF-8");
 		
-        out.print(json);
-        out.close();
+		try (PrintWriter writer = response.getWriter()) {
+			try {
+				DataTable<Noticia> dataTable = modelo.listaNoticiasDatatable(request.getParameterMap());
+				Gson gson = new GsonBuilder().setExclusionStrategies(DataTable.GSONEXCLUSIONSTRATEGY).create();
+				System.out.println(gson.toJson(dataTable));
+				writer.write(gson.toJson(dataTable));
+			} catch (UVException ex) {
+				CodigoDescripcion mensaje = new CodigoDescripcion("error", ex.getMessage());
+				writer.write(new Gson().toJson(mensaje));
+			}
+		}
+		
+		datos.setRespuestaEnviada(true);
 	}
+	
 }

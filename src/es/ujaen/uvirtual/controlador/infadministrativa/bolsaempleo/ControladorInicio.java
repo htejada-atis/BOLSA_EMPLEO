@@ -3,19 +3,21 @@ package es.ujaen.uvirtual.controlador.infadministrativa.bolsaempleo;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.sql.SQLException;
-import java.util.ArrayList;
 import java.util.List;
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import org.json.JSONArray;
-import org.json.JSONException;
-import org.json.JSONObject;
+import com.google.gson.Gson;
+import com.google.gson.JsonObject;
+import com.google.gson.reflect.TypeToken;
 import es.ujaen.uvirtual.beans.UVDatos;
+import es.ujaen.uvirtual.beans.uvirtual.bolsaempleo.Fichero;
 import es.ujaen.uvirtual.beans.uvirtual.bolsaempleo.Noticia;
+import es.ujaen.uvirtual.beans.vistas.uvirtual.bolsaempleo.VistaFicheros;
 import es.ujaen.uvirtual.beans.vistas.uvirtual.bolsaempleo.VistaNoticias;
+import es.ujaen.uvirtual.modelo.bolsaempleo.ModeloFichero;
 import es.ujaen.uvirtual.modelo.bolsaempleo.ModeloNoticia;
 import es.ujaen.uvirtual.utilidades.BolsaEmpleoUtils;
 import es.ujaen.uvirtual.utilidades.EscapaHTML;
@@ -117,26 +119,14 @@ public class ControladorInicio extends HttpServlet {
 		response.setContentType("application/json");
 		response.setCharacterEncoding("UTF-8");
 		
-		PrintWriter printWriter = response.getWriter();
-		JSONObject json = new JSONObject();
-		try {
-			JSONArray ids = new JSONArray(request.getParameter("ids_noticias"));
-			
-			List<String> idsNoticias = new ArrayList<>();
-			if (ids != null) {
-				for (int i = 0; i < ids.length(); i++) {
-					idsNoticias.add(ids.getString(i));
-				}
-			}
-			
-			List<Noticia> listaNoticias = modelo.listaNoticiasInicioRestantes(BolsaEmpleoUtils.consultaNotIn("CODNUM", idsNoticias));
-			
-			json.put("result", "ok");
-			json.put("noticias", listaNoticias);
-		} catch (JSONException e) {
-			e.printStackTrace();
-		}
+		Gson gson = new Gson();
+		JsonObject json = new JsonObject();
+		List<String> idsNoticias = gson.fromJson(request.getParameter("ids_noticias"), new TypeToken<List<String>>() { }.getType());
+		List<Noticia> listaNoticias = modelo.listaNoticiasInicioRestantes(BolsaEmpleoUtils.consultaNotIn("CODNUM", idsNoticias));
+		json.addProperty("result", "ok");
+		json.addProperty("noticias", gson.toJson(listaNoticias, new TypeToken<List<Noticia>>() { }.getType()));
 		
+		PrintWriter printWriter = response.getWriter();
         printWriter.print(json);
         printWriter.close();
 	}
@@ -150,5 +140,12 @@ public class ControladorInicio extends HttpServlet {
 		ModeloNoticia modelo = new ModeloNoticia();
 		List<Noticia> noticias = modelo.listaNoticiasInicio();
 		bean.setNoticias(noticias);
+	}
+	
+	private void obtenerFicheros(VistaFicheros bean) throws SQLException {
+		bean.setVista(RUTA_BEP_INICIO + "documentos.jsp");
+		ModeloFichero modelo = new ModeloFichero();
+		List<Fichero> ficheros = modelo.listaFicheros();
+		bean.setFicheros(ficheros);
 	}
 }

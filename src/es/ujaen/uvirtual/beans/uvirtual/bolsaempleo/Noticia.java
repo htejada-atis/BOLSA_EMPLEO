@@ -6,7 +6,7 @@ import java.util.Date;
 import es.ujaen.uvirtual.utilidades.Formateador;
 
 
-/** Clase convocatoria de docentia.
+/** Clase noticia de bolsa empleo.
  * @author jlopez
  *
  */
