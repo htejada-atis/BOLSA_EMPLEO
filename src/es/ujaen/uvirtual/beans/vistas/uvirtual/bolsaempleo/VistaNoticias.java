@@ -9,7 +9,7 @@ import es.ujaen.uvirtual.beans.vistas.Vista;
 /** Bean para la vista.
  * @author jlopez
  */
-public class VistaNoticiasCRUD extends Vista implements Serializable {
+public class VistaNoticias extends Vista implements Serializable {
 	private static final long serialVersionUID = 1L;
 	private List<Noticia> noticias = new ArrayList<>();
 	private Noticia noticia;

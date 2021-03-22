@@ -1,19 +1,19 @@
 function getProp( object, keys, defaultVal ){
-  keys = Array.isArray( keys )? keys : keys.split('.');
-  object = object[keys[0]];
-  if( object && keys.length > 1 ){
-    return getProp( object, keys.slice(1) );
-  }
-  return object === undefined? defaultVal : object;
+	keys = Array.isArray( keys )? keys : keys.split('.');
+	object = object[keys[0]];
+	if( object && keys.length > 1 ){
+		return getProp( object, keys.slice(1) );
+	}
+	return object === undefined? defaultVal : object;
 }
 
 function setProp( object, keys, val ){
-  keys = Array.isArray( keys )? keys : keys.split('.');
-  if( keys.length > 1 ){
-    object[keys[0]] = object[keys[0]] || {};
-    return setProp( object[keys[0]], keys.slice(1), val );
-  }
-  object[keys[0]] = val;
+	keys = Array.isArray( keys )? keys : keys.split('.');
+	if( keys.length > 1 ){
+		object[keys[0]] = object[keys[0]] || {};
+		return setProp( object[keys[0]], keys.slice(1), val );
+	}
+	object[keys[0]] = val;
 }
 
 function formatearFecha(fecha) {
@@ -31,19 +31,42 @@ function getErrorResponse(response) {
 			}
 			
 			var error = $.parseJSON(response.responseText);
-	    	return getProp(error, 'error', 'Sin definir');
+				return getProp(error, 'error', 'Sin definir');
 		} else {
 			console.log(response);
 			return getProp(response, 'status', '999') + ": " + getProp(response, 'statusText', 'Sin definir');
-		}			
-	} catch (err) {	
+		}     
+	} catch (err) { 
 		console.error("Error procesando error", response, err);
 	}
 }
 
+function isFunction(functionToCheck) {
+ return functionToCheck && {}.toString.call(functionToCheck) === '[object Function]';
+}
+
+function sendForm(url, params) {
+		var form = document.createElement("form");
+			form.method = "POST";
+		form.action = url;
+		document.body.appendChild(form);
+		
+		for(key in params) {
+				var element = document.createElement("input");
+				element.type = "hidden";
+				element.name = key;
+				element.value = params[key];
+				form.appendChild(element);
+		}
+			
+		form.submit();
+}
+
 window.Atis = {
-	"formatearFecha": formatearFecha,
 	"getErrorResponse": getErrorResponse,
 	"getProp": getProp,
+	"isFunction": isFunction,
+	"formatearFecha": formatearFecha,
+	"sendForm": sendForm,
 	"setProp": setProp
 };
