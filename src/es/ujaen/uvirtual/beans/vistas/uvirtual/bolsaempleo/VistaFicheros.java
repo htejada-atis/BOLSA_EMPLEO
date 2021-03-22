@@ -3,6 +3,7 @@ package es.ujaen.uvirtual.beans.vistas.uvirtual.bolsaempleo;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
+import es.ujaen.uvirtual.beans.uvirtual.bolsaempleo.Fichero;
 import es.ujaen.uvirtual.beans.vistas.Vista;
 
 /** Bean para la vista.
@@ -10,15 +11,15 @@ import es.ujaen.uvirtual.beans.vistas.Vista;
  */
 public class VistaFicheros extends Vista implements Serializable {
 	private static final long serialVersionUID = 1L;
-	private List<String> ficheros = new ArrayList<>();
-	private String fichero;
+	private List<Fichero> ficheros = new ArrayList<>();
+	private Fichero fichero;
 	private String vista;
 	
-	public List<String> getFicheros() {
+	public List<Fichero> getFicheros() {
 		return ficheros;
 	}
 	
-	public void setFicheros(List<String> ficheros) {
+	public void setFicheros(List<Fichero> ficheros) {
 		this.ficheros = ficheros;
 	}
 	
@@ -30,11 +31,11 @@ public class VistaFicheros extends Vista implements Serializable {
 		this.vista = vista;
 	}
 	
-	public String getFichero() {
+	public Fichero getFichero() {
 		return fichero;
 	}
 	
-	public void setFichero(String fichero) {
+	public void setFichero(Fichero fichero) {
 		this.fichero = fichero;
 	}
 	

@@ -1,4 +1,4 @@
-package es.ujaen.uvirtual.controlador.infadministrativa.bolsaempleo.configuracion;
+package es.ujaen.uvirtual.controlador.infadministrativa.bolsaempleo;
 
 import javax.servlet.annotation.WebServlet;
 import es.ujaen.uvirtual.controlador.ControladorIndiceBase;

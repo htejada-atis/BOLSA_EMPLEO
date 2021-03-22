@@ -1,46 +1,72 @@
-package es.ujaen.uvirtual.controlador.infadministrativa.bolsaempleo.configuracion;
+package es.ujaen.uvirtual.controlador.infadministrativa.bolsaempleo;
 
+import java.io.File;
+import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
 import java.io.PrintWriter;
+import java.nio.file.Files;
 import java.sql.SQLException;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.servlet.ServletException;
+import javax.servlet.annotation.MultipartConfig;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.Part;
+
+import org.apache.tomcat.util.http.fileupload.FileItem;
+import org.apache.tomcat.util.http.fileupload.disk.DiskFileItemFactory;
+import org.apache.tomcat.util.http.fileupload.servlet.ServletFileUpload;
 import org.json.JSONException;
 import org.json.JSONObject;
+
 import es.ujaen.uvirtual.beans.UVDatos;
 import es.ujaen.uvirtual.beans.uvirtual.bolsaempleo.Noticia;
 import es.ujaen.uvirtual.beans.vistas.uvirtual.bolsaempleo.VistaFicheros;
-import es.ujaen.uvirtual.beans.vistas.uvirtual.bolsaempleo.VistaNoticias;
+import es.ujaen.uvirtual.modelo.bolsaempleo.ModeloFichero;
 import es.ujaen.uvirtual.modelo.bolsaempleo.ModeloNoticia;
+import es.ujaen.uvirtual.utilidades.BolsaEmpleoUtils;
 import es.ujaen.uvirtual.utilidades.EscapaHTML;
 import es.ujaen.uvirtual.utilidades.UVException;
 
 
-/**
- * Clase controlador para obtener, cambiar, eliminar y agregar ficheros.
- */
+/** Clase controlador para obtener, cambiar, eliminar y agregar noticias.
+ * Controlador - Opers. con nombres: obtener,  cambiar,    eliminar, agregar
+ * */
 @WebServlet(
 		name = "informacionadministrativa.bolsaempleo.configuracion.ficheros", 
-		description = "Configuración de ficheros de la bolsa de empleo", 
+		description = "Gestión de noticias", 
 		urlPatterns = { 
-				"/srv/en/informacionadministrativa/bolsaempleo/configuracion/ficheros", 
+				"/srv/es/informacionadministrativa/bolsaempleo/configuracion/ficheros", 
 				"/srv/en/informacionadministrativa/bolsaempleo/configuracion/ficheros"
 		})
-public class ControladorFicheros extends HttpServlet {
+@MultipartConfig
+public class ControladorGestionFicheros extends HttpServlet {
 	private static final long serialVersionUID = 1L;
-	private static final String NOMBREDEESTACLASE = ControladorFicheros.class.getName();
+	private static final String NOMBREDEESTACLASE = ControladorGestionFicheros.class.getName();
 	private static final Logger LOGGER = Logger.getLogger(NOMBREDEESTACLASE);
-	public static final String PARAM_ACCION = "a";
 	
-	// acciones
-	public static final String ACCION_DATATABLE = "datatable";
+	
+	// Acciones
+	public static final String ACCION_AGREGAR_FICHERO = "agregarfichero";
 	public static final String ACCION_LISTAR_FICHEROS = "listar_ficheros";
+	public static final String ACCION_DATATABLE = "datatable";
+	
+	// Parámetros
+	public static final String PARAM_ACCION = "a";
+	public static final String PARAM_ENVIAR = "enviar";
+	public static final String PARAM_FICHERO = "fichero";
+	
+	// Mensajes
+	public static final String MENSAJE_ENVIADO = "mensaje";
+	public static final String MENSAJE_EXITO_AGREGAR = "fichero creado correctamente";
+	public static final String MENSAJE_EXITO_EDITAR = "fichero editado correctamente";
+	public static final String MENSAJE_EXITO_ELIMINAR = "fichero eliminado correctamente";
 	
 	// ruta vistas
 	public static final String RUTA_BEP_CONF = "/WEB-INF/jsp/vista/infadministrativa/bolsaempleo/configuracion/";
@@ -55,6 +81,7 @@ public class ControladorFicheros extends HttpServlet {
 		datos.setContentType("text/html");
 		
 		VistaFicheros bean = new VistaFicheros();
+		bean.setVista(RUTA_BEP_CONF + "ficheros.jsp");
 		
 		String nombreAccion = EscapaHTML.ajustaCodificacion(request.getParameter(PARAM_ACCION));
 		if (nombreAccion == null) {
@@ -62,14 +89,13 @@ public class ControladorFicheros extends HttpServlet {
 		}
 		try {
 			switch (nombreAccion) {
-				case ACCION_LISTAR_FICHEROS:
-					bean.setVista(RUTA_BEP_CONF + "ficheros.jsp");
+				case ACCION_AGREGAR_FICHERO:
+					agregarFichero(request, response, bean);
 					break;
 				case ACCION_DATATABLE:
 					datatableFicheros(request, response);
 					return;
 				default:
-					bean.setVista(RUTA_BEP_CONF + "ficheros.jsp");
 					break;
 			}
 		} catch (UVException e) {
@@ -77,6 +103,9 @@ public class ControladorFicheros extends HttpServlet {
 			bean.getMensajesDeError().add(e.toString());
 		} catch (SQLException e) {
 			bean.getMensajesDeError().add("Error al acceder a la base de datos");
+		} catch (ServletException e) {
+			LOGGER.log(Level.WARNING, e.toString());
+			bean.getMensajesDeError().add(e.toString());
 		} finally {
 			datos.getVistas().put(bean.getClass().getName(), bean);
 			datos.getFicherosJSP().add(bean.getVista());
@@ -99,7 +128,31 @@ public class ControladorFicheros extends HttpServlet {
 		doGet(request, response);
 	}
 	
-	/** carga los ficheros en una tabla .
+	/** agrega una nueva noticia.
+	 * @param request .
+	 * @param response .
+	 * @param bean bean de la vista a la que poner los valores.
+	 * @throws SQLException excepcion de bbdd.
+	 * @throws UVException en caso de error en bd
+	 */
+	private void agregarFichero(HttpServletRequest request, HttpServletResponse response, VistaFicheros bean) throws SQLException, ServletException, IOException {
+		ModeloFichero modelo = new ModeloFichero();
+		if (request.getPart(PARAM_FICHERO) != null) {
+			try {
+				Part uploadedFile = request.getPart(PARAM_FICHERO);
+				InputStream input = uploadedFile.getInputStream();
+				modelo.insertaFichero(input, BolsaEmpleoUtils.obtenerNombreFichero(uploadedFile));
+			} catch (IOException e) {
+				e.printStackTrace();
+			} catch (ServletException e) {
+				e.printStackTrace();
+			}
+			
+			response.sendRedirect(request.getServletPath());
+		}
+	}
+	
+	/** carga las ficheros en una tabla .
 	 * @param request .
 	 * @param response .
 	 * @throws SQLException excepcion de bbdd.
@@ -128,4 +181,7 @@ public class ControladorFicheros extends HttpServlet {
         out.print(json);
         out.close();
 	}
+	
+	
+	
 }
