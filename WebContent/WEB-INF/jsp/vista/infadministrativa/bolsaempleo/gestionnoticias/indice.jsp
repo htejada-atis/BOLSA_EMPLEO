@@ -66,7 +66,7 @@ VistaNoticias bean = (VistaNoticias) uvdatos.getVistas().get(VistaNoticias.class
 			        	var params = {'a': '<%= ControladorGestionNoticias.ACCION_ELIMINAR_NOTICIA %>',
 			        			'id': id,
 			        			'<%= ControladorGestionNoticias.PARAM_ACTIVA %>': !activa};
-		        		sendForm("<%= request.getRequestURI() %>", params);
+		        		Atis.sendForm("<%= request.getRequestURI() %>", params);
 			          	$(this).dialog("close");
 			        },
 			        No: function() {
@@ -81,7 +81,7 @@ VistaNoticias bean = (VistaNoticias) uvdatos.getVistas().get(VistaNoticias.class
 		
 		document.getElementById("nueva_noticia").addEventListener("click", function(event) {
 			event.preventDefault();
-			sendForm("<%= request.getRequestURI() %>", {'a': '<%= ControladorGestionNoticias.ACCION_AGREGAR_NOTICIA %>'});
+			Atis.sendForm("<%= request.getRequestURI() %>", {'a': '<%= ControladorGestionNoticias.ACCION_AGREGAR_NOTICIA %>'});
 		});
 
 		var table = new DataTable('#table_noticias_insertadas', {
@@ -94,7 +94,7 @@ VistaNoticias bean = (VistaNoticias) uvdatos.getVistas().get(VistaNoticias.class
 		        {'data': 'activa'},
 		        {'data': 'codnum', 'buttons': [{'label': 'Editar', 'onClick': function(row) {
 			        		var params = {'a': '<%= ControladorGestionNoticias.ACCION_EDITAR_NOTICIA %>', 'id': row.codNum};
-			        		sendForm("<%= request.getRequestURI() %>", params);
+			        		Atis.sendForm("<%= request.getRequestURI() %>", params);
 			        	}
 			        }, {'label': function(row) { return "Borrar u otra cosa"; }, 'onClick': function(row) {
 			        	var mensaje = "¿Desea borrar la noticia seleccionada?";

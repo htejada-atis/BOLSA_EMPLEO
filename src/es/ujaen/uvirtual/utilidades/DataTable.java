@@ -20,7 +20,7 @@ import com.google.gson.annotations.Expose;
  * @param <T> Modelo que gestiona el datatable.
  */
 public class DataTable<T> {
-	public static final boolean VERBOSE = true;
+	public static final boolean VERBOSE = false;
 	private static final String NOMBREDEESTACLASE = DataTable.class.getName();	
 	private static final Logger LOGGER = Logger.getLogger(NOMBREDEESTACLASE);
 	

@@ -41,7 +41,7 @@
 			var a = $(this).find("a");
 			a.on("click", function(event) {
 				event.preventDefault();
-				sendForm("<%= request.getRequestURI() %>", {'a': a.attr("href")});
+				Atis.sendForm("<%= request.getRequestURI() %>", {'a': a.attr("href")});
 			});
 		
 		});
