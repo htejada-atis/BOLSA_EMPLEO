@@ -1,7 +1,6 @@
 package es.ujaen.uvirtual.beans.uvirtual.bolsaempleo;
 
 import java.io.Serializable;
-import java.util.Date;
 
 /** Clase area de conocimiento de bolsaempleo.
  * @author atis

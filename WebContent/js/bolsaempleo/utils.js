@@ -29,16 +29,15 @@ function formatearFecha(fecha) {
 
 function getErrorResponse(response) {
 	try {
-		var contentType = response.getResponseHeader('content-type').split(';')[0];
-		if (contentType == 'application/json') {
+		var contentType = response.getResponseHeader('content-type').split(';')[0];		
+		if (contentType == 'application/json') {					
 			if (!response.responseText) {
 				return getProp(response, 'status', '999') + ": respuesta vacia";
 			}
 			
-			var error = $.parseJSON(response.responseText);
-				return getProp(error, 'error', 'Sin definir');
+			var error = Atis.json2Object(response.responseText);
+			return getProp(error, 'descripcion', 'Sin definir');
 		} else {
-			console.log(response);
 			return getProp(response, 'status', '999') + ": " + getProp(response, 'statusText', 'Sin definir');
 		}     
 	} catch (err) { 

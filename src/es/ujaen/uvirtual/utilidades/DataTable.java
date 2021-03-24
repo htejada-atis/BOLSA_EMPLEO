@@ -12,7 +12,6 @@ import java.util.logging.Logger;
 
 import com.google.gson.ExclusionStrategy;
 import com.google.gson.FieldAttributes;
-import com.google.gson.annotations.Expose;
 
 /**
  * Utilidad para la gestión de los parámetros del datatable.
@@ -60,7 +59,7 @@ public class DataTable<T> {
 
 		@Override
 		public boolean shouldSkipField(FieldAttributes arg0) {
-			List<String> list = Arrays.asList(new String[]{"consulta", "query", "queryCount"});
+			List<String> list = Arrays.asList(new String[]{"consulta", "query", "queryCount", "orderDirection"});
 			
 			if (list.contains(arg0.getName())) {
 				return true;
@@ -142,6 +141,10 @@ public class DataTable<T> {
 		return this.orderDirection;
 	}
 	
+	public Integer getPagesTotal() {
+		return this.pagesTotal;
+	} 
+		
 	/**
 	 * Ejecuta la consulta para obtener el total de filas.
 	 * @param stmt .

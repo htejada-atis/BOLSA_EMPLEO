@@ -11,7 +11,7 @@ function DataTable(id, config) {
     this.tfoot = $('tfoot', this.node).last();
     this.config = config;
     this.params = {
-        'a': 'datatable',
+        'a': Atis.getProp(config, 'action', 'datatable'),
         'page': 0,
         'pageSize': Atis.getProp(config, 'pageSize', 10),
         'orderBy': null,
@@ -68,9 +68,8 @@ function DataTable(id, config) {
 
     this.errorResponse = function(err) {
     	self.loading(false);
-    
+    	
     	$('tr', self.tbody).hide();
-        $(self.tbody).append('<p class="loading">Error: ' + errorText + '</p>');
         $(self.tbody).append('<p class="loading">Error: ' + Atis.getErrorResponse(err) + '</p>');
     };
     

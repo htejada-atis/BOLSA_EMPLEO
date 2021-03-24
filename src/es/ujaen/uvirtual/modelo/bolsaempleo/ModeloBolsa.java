@@ -35,6 +35,9 @@ public class ModeloBolsa {
 	public static final String BOLSA_ESTADO_BAREMACION = "BAREMACION";
 	public static final String BOLSA_ESTADO_ALEGACIONES = "ALEGACIONES";
 	public static final String BOLSA_ESTADO_DESBLOQUEADA = "DESBLOQUEADA";
+	
+	public static final String BOLSA_BAREMABLE = "S";
+	public static final String BOLSA_NO_BAREMABLE = "N";
 		
 	/**
 	 * Listado de bolsas de empleo. 
@@ -226,6 +229,24 @@ public class ModeloBolsa {
 		
 	}
 	
+	/**
+	 * Establece la area asociada a la bolsa como baremable. 
+	 * @param bolsas .
+	 * @throws SQLException .
+	 */
+	public void ponerAreaComoBaremable(List<Bolsa> bolsas) throws SQLException {
+		this.cambiarFlagBaremableBolsas(bolsas, BOLSA_BAREMABLE);
+	}
+
+	/**
+	 * Establece la area asociada a la bolsa como baremable. 
+	 * @param bolsas .
+	 * @throws SQLException .
+	 */
+	public void ponerAreaComoNoBaremable(List<Bolsa> bolsas) throws SQLException {
+		this.cambiarFlagBaremableBolsas(bolsas, BOLSA_NO_BAREMABLE);		
+	}
+	
 	private void cambiarEstadoBolsas(List<Bolsa> bolsas, String estado) throws SQLException {
 		String params = BolsaEmpleoUtils.consultaMultiplesParametros(bolsas.size());
 		String query = "UPDATE TBEP_BOLSAS SET ESTADO = ? WHERE CODNUM IN (" + params + ")";		
@@ -233,6 +254,20 @@ public class ModeloBolsa {
 		try (Connection conexion = ConexionUvirtual.obtenerInstancia(); PreparedStatement stmt = conexion.prepareStatement(query)) {
 			int indexParam = 1;
 			stmt.setString(indexParam++, estado);
+			for (Bolsa bolsa : bolsas) {
+				stmt.setInt(indexParam++, bolsa.getCodNum()); 				
+			}
+			stmt.executeUpdate();
+		}
+	}
+	
+	private void cambiarFlagBaremableBolsas(List<Bolsa> bolsas, String baremable) throws SQLException {
+		String params = BolsaEmpleoUtils.consultaMultiplesParametros(bolsas.size());
+		String query = "UPDATE TBEP_BOLSAS SET FLGBAREMABLE = ? WHERE CODNUM IN (" + params + ")";		
+				
+		try (Connection conexion = ConexionUvirtual.obtenerInstancia(); PreparedStatement stmt = conexion.prepareStatement(query)) {
+			int indexParam = 1;
+			stmt.setString(indexParam++, baremable);
 			for (Bolsa bolsa : bolsas) {
 				stmt.setInt(indexParam++, bolsa.getCodNum()); 				
 			}
