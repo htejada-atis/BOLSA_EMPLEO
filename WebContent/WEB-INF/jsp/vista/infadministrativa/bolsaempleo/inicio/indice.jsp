@@ -1,13 +1,13 @@
 <%@ page trimDirectiveWhitespaces="true"%>
 <%@	page import="es.ujaen.uvirtual.controlador.infadministrativa.bolsaempleo.ControladorInicio"%>
-<%@ page import="es.ujaen.uvirtual.beans.vistas.uvirtual.bolsaempleo.VistaNoticias" %>
+<%@ page import="es.ujaen.uvirtual.beans.vistas.uvirtual.bolsaempleo.VistaInicio" %>
 <%@ page import="es.ujaen.uvirtual.beans.uvirtual.bolsaempleo.Noticia" %>
 <%@ page import="es.ujaen.uvirtual.beans.UVDatos"%>
 <%@ page import="es.ujaen.uvirtual.utilidades.Formateador"%>
 
 <% 
 UVDatos uvdatos = (UVDatos)request.getAttribute(UVDatos.NOMBRE_ATRIBUTO);
-VistaNoticias bean = (VistaNoticias)uvdatos.getVistas().get(VistaNoticias.class.getName());
+VistaInicio bean = (VistaInicio)uvdatos.getVistas().get(VistaInicio.class.getName());
 %>
 
 <div class="bolsa-empleo">
@@ -66,13 +66,13 @@ VistaNoticias bean = (VistaNoticias)uvdatos.getVistas().get(VistaNoticias.class.
 		        dataType: "json",
 		        data: params,
 		        success: function(response) {
-		        	
-		        	JSON.parse(response.noticias).forEach((noticia) => {
+		        	console.log(response);
+		        	response.forEach((noticia) => {
 		            	var element = $(".noticias-bolsa-empleo li").first().clone();
 		            	element.attr("id", "id_"+noticia.idNoticia);
 		            	element.find("a").attr("href", noticia.enlace);
 		            	element.find("a").text(noticia.texto);
-		            	element.find(".fecha-noticia").text(noticia.fechaFormato);
+		            	element.find(".fecha-noticia").text(noticia.fecha);
 
 		            	$(".noticias-bolsa-empleo ul").append(element);
 		            	$("#view_all a").text("Ver menos");
@@ -80,7 +80,7 @@ VistaNoticias bean = (VistaNoticias)uvdatos.getVistas().get(VistaNoticias.class.
 		            });
 		        },
 		        error: function(response) {
-		            console.log(response);
+		        	alert(response);
 		        }
 		    });
 		}

@@ -13,6 +13,7 @@ public class Fichero implements Serializable {
 	private static final long serialVersionUID = 1L;
 	private Integer codNum;
 	private String nombre;
+	private String titulo;
 	private InputStream archivo;
 	
 	
@@ -25,22 +26,38 @@ public class Fichero implements Serializable {
 	/** Constructor con parametros.
 	 * @param pcodNum .
 	 * @param pnombre .
+	 * @param ptitulo .
 	 */
-	public Fichero(Integer pcodNum, String pnombre) {
+	public Fichero(Integer pcodNum, String pnombre, String ptitulo) {
 		super();
 		this.codNum = pcodNum;
 		this.nombre = pnombre;
+		this.titulo = ptitulo;
+	}
+	
+	/** Constructor con parametros.
+	 * @param pnombre .
+	 * @param ptitulo .
+	 * @param parchivo .
+	 */
+	public Fichero(String pnombre, String ptitulo, InputStream parchivo) {
+		super();
+		this.nombre = pnombre;
+		this.titulo = ptitulo;
+		this.archivo = parchivo;
 	}
 	
 	/** Constructor con parametros.
 	 * @param pcodNum .
 	 * @param pnombre .
+	 * @param ptitulo .
 	 * @param parchivo .
 	 */
-	public Fichero(Integer pcodNum, String pnombre, InputStream parchivo) {
+	public Fichero(Integer pcodNum, String pnombre, String ptitulo, InputStream parchivo) {
 		super();
 		this.codNum = pcodNum;
 		this.nombre = pnombre;
+		this.titulo = ptitulo;
 		this.archivo = parchivo;
 	}
 	
@@ -51,6 +68,7 @@ public class Fichero implements Serializable {
 	public Fichero(Fichero copia) {
 		this.codNum = copia.codNum;
 		this.nombre = copia.nombre;
+		this.titulo = copia.titulo;
 		this.archivo = copia.archivo;
 	}
 	
@@ -68,6 +86,14 @@ public class Fichero implements Serializable {
 
 	public void setNombre(String nombre) {
 		this.nombre = nombre;
+	}
+	
+	public String getTitulo() {
+		return titulo;
+	}
+	
+	public void setTitulo(String titulo) {
+		this.titulo = titulo;
 	}
 	
 	public InputStream getArchivo() {
@@ -91,8 +117,10 @@ public class Fichero implements Serializable {
 	public int hashCode() {
 		final int prime = 31;
 		int result = 1;
-		result = prime * result + ((nombre == null) ? 0 : nombre.hashCode());
 		result = prime * result + ((codNum == null) ? 0 : codNum.hashCode());
+		result = prime * result + ((nombre == null) ? 0 : nombre.hashCode());
+		result = prime * result + ((titulo == null) ? 0 : titulo.hashCode());
+		result = prime * result + ((archivo == null) ? 0 : archivo.hashCode());
 		return result;
 	}
 	
@@ -109,11 +137,32 @@ public class Fichero implements Serializable {
 			return false;
 		}
 		Fichero other = (Fichero) obj;
+		if (codNum == null) {
+			if (other.codNum != null) {
+				return false;
+			}
+		} else if (!codNum.equals(other.codNum)) {
+			return false;
+		}
 		if (nombre == null) {
 			if (other.nombre != null) {
 				return false;
 			}
 		} else if (!nombre.equals(other.nombre)) {
+			return false;
+		}
+		if (titulo == null) {
+			if (other.titulo != null) {
+				return false;
+			}
+		} else if (!titulo.equals(other.titulo)) {
+			return false;
+		}
+		if (archivo == null) {
+			if (other.archivo != null) {
+				return false;
+			}
+		} else if (!archivo.equals(other.archivo)) {
 			return false;
 		}
 		

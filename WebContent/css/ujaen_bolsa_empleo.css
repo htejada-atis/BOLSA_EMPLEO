@@ -1,3 +1,13 @@
+
+:root {
+  --principal: #049FE1;
+  --gris: #F1F1F1;
+}
+
+.bolsa-empleo {
+	padding: 0px 8px;
+}
+
 /* datatable */
 table.bluetable.bolsaempleo {
 	width: 100%;		
@@ -29,14 +39,19 @@ table.bluetable.bolsaempleo p.loading {
 	width: max-content;	
 }
 
-:root {
-  --principal: #049FE1;
-  --gris: #F1F1F1;
+/* datatable td */
+
+.overflow-ellipsis {
+	white-space: nowrap;
+	overflow: hidden;
+	text-overflow: ellipsis;
 }
 
-.bolsa-empleo {
-	padding: 0px 8px;
+.overflow-auto {
+	white-space: nowrap;
+	overflow: auto;
 }
+
 
 /* Nav bolsa empleo */
 
@@ -74,7 +89,6 @@ table.bluetable.bolsaempleo p.loading {
 nav-bolsa-empleo a:active, nav-bolsa-empleo a:hover {
     outline: 0;
 }
-
 
 
 /* Descripción bolsa empleo */
@@ -150,19 +164,19 @@ nav-bolsa-empleo a:active, nav-bolsa-empleo a:hover {
 	line-height: 1.5;
 }
 
-/* Noticias */
+/* Títulos bolsa empleo */
 
-.titulo-noticias {
+.titulo-bolsa-empleo {
 	display: flex;
 	flex-wrap: wrap;
 	justify-content: space-between;
 }
 
-.titulo-noticias h4 {
+.titulo-bolsa-empleo h4 {
 	margin-left: 32px;
 }
 
-.titulo-noticias .link-btn {
+.titulo-bolsa-empleo .link-btn {
 	margin-top: 24px;
 }
 
@@ -205,13 +219,13 @@ nav-bolsa-empleo a:active, nav-bolsa-empleo a:hover {
 	width: unset !important;
 }
 
-.form-group, .form-check, .form-btn {
+.form-group, .form-check, .form-btn, .form-file {
 	display: inline-block;
 	width: 100% !important;
 	margin-bottom: 1rem;
 }
 
-.form-group label, .form-check label {
+.form-group label, .form-check label, .form-file label {
 	display: inline-block;
 	font-size: .9rem;
 }
@@ -226,11 +240,66 @@ nav-bolsa-empleo a:active, nav-bolsa-empleo a:hover {
 	display: block;
 }
 
-.form-group {
-	margin-bottom: 1rem;
-}
-
 .form-check label, .form-check input {
 	vertical-align: middle;
+}
+
+.form-file {
+	display: flex;
+	align-items: center;
+}
+
+.form-file label {
+	font-size: 15px;
+}
+
+/* Listas bolsa empleo */
+
+.lista-bolsa-empleo {
+	font-size: 14px;	
+}
+
+.lista-bolsa-empleo li {
+	margin-bottom: 12px;
+}
+
+/* tooltip clipboard */
+
+.tooltip {
+  position: relative;
+  display: inline-block;
+}
+
+.tooltip .tooltiptext {
+  visibility: hidden;
+  width: 140px;
+  background-color: #555;
+  color: #fff;
+  text-align: center;
+  border-radius: 6px;
+  padding: 5px;
+  position: absolute;
+  z-index: 1;
+  bottom: 160%;
+  left: 110%;
+  margin-left: -50px;
+  opacity: 0;
+  transition: opacity 0.35s;
+}
+
+.tooltip .tooltiptext::after {
+  content: "";
+  position: absolute;
+  top: 100%;
+  left: 50%;
+  margin-left: -5px;
+  border-width: 5px;
+  border-style: solid;
+  border-color: #555 transparent transparent transparent;
+}
+
+.tooltip:hover .tooltiptext {
+  visibility: visible;
+  opacity: 1;
 }
 

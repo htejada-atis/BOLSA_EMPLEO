@@ -79,6 +79,11 @@ function DataTable(id, config) {
     	
     	self.config.columns.forEach(function(columnDef) {
     		var td = $('<td></td>');
+    		
+    		if (columnDef.hasOwnProperty('class')) {
+	    		$(td).addClass(columnDef.class);
+	    	}
+    		
     		$(td).append(self.renderCol(row, columnDef));
     		$(tr).append(td);
         });
@@ -100,7 +105,12 @@ function DataTable(id, config) {
     		columnDef.buttons.forEach(function(buttonDef) {
                 var label = isFunction(buttonDef.label) ? buttonDef.label(row) : buttonDef.label;
     			var btn = $('<button class="btn" type="button">'+label+'</button>');
-    			$(btn).on("click", function() { buttonDef.onClick(row, self); });
+    			
+    			if (buttonDef.hasOwnProperty('class')) {
+    				$(btn).addClass(buttonDef.class);
+    			}
+    			
+    			$(btn).on("click", buttonDef.onClick.bind($(btn), row, self));
     			$(buttons).append(btn);
     		});
 

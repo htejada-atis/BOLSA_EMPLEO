@@ -14,6 +14,7 @@ import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
 import javax.servlet.http.Part;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
@@ -44,9 +45,11 @@ public class ControladorGestionFicheros extends HttpServlet {
 	private static final long serialVersionUID = 1L;
 	private static final String NOMBREDEESTACLASE = ControladorGestionFicheros.class.getName();
 	private static final Logger LOGGER = Logger.getLogger(NOMBREDEESTACLASE);
+	public static final String URL_PATTERN = "/srv/es/informacionadministrativa/bolsaempleo/configuracion/ficheros";
 	
 	
 	// Acciones
+	
 	public static final String ACCION_SUBIR_FICHERO = "subirfichero";
 	public static final String ACCION_BORRAR_FICHERO = "borrarfichero";
 	public static final String ACCION_DATATABLE = "datatable";
@@ -58,11 +61,11 @@ public class ControladorGestionFicheros extends HttpServlet {
 	public static final String PARAM_ENVIAR = "enviar";
 	public static final String PARAM_FICHERO = "fichero";
 	public static final String PARAM_ID = "id";
+	public static final String PARAM_TITULO = "titulo";
 	
 	// Mensajes
 	public static final String MENSAJE_ENVIADO = "mensaje";
-	public static final String MENSAJE_EXITO_AGREGAR = "fichero creado correctamente";
-	public static final String MENSAJE_EXITO_EDITAR = "fichero editado correctamente";
+	public static final String MENSAJE_EXITO_AGREGAR = "fichero subido correctamente";
 	public static final String MENSAJE_EXITO_ELIMINAR = "fichero eliminado correctamente";
 	
 	// ruta vistas
@@ -87,8 +90,8 @@ public class ControladorGestionFicheros extends HttpServlet {
 		
 		try {
 			switch (nombreAccion) {
-				case ACCION_SUBIR_FICHERO:
-					agregarFichero(request, response, bean);
+				case ACCION_BORRAR_FICHERO:
+					eliminarFichero(request, response);
 					break;
 				case ACCION_DATATABLE:
 					listadoFicheros(datos, request, response);
@@ -96,12 +99,15 @@ public class ControladorGestionFicheros extends HttpServlet {
 				case ACCION_DESCARGAR_FICHERO:
 					descargarFichero(datos, request, response);
 					break;
+				case ACCION_SUBIR_FICHERO:
+					agregarFichero(request, response, bean);
+					break;
 			}
 		} catch (SQLException e) {
 			bean.getMensajesDeError().add("Error al acceder a la base de datos");
 		} catch (ServletException e) {
 			LOGGER.log(Level.WARNING, e.toString());
-			bean.getMensajesDeError().add(e.toString());
+			e.printStackTrace();
 		} catch (UVException e) {
 			LOGGER.log(Level.WARNING, e.toString());
 			bean.getMensajesDeError().add(e.toString());
@@ -134,20 +140,34 @@ public class ControladorGestionFicheros extends HttpServlet {
 	 * @throws SQLException excepcion de bbdd.
 	 * @throws UVException en caso de error en bd
 	 */
-	private void agregarFichero(HttpServletRequest request, HttpServletResponse response, VistaFicheros bean) throws SQLException, ServletException, IOException {
+	private void agregarFichero(HttpServletRequest request, HttpServletResponse response, VistaFicheros bean) throws SQLException, ServletException, IOException, UVException {
+		bean.setVista(RUTA_BEP_CONF + "formFichero.jsp");
+		
 		ModeloFichero modelo = new ModeloFichero();
-		if (request.getPart(PARAM_FICHERO) != null) {
-			try {
-				Part uploadedFile = request.getPart(PARAM_FICHERO);
+		Part uploadedFile = request.getPart(PARAM_FICHERO);
+		if (uploadedFile != null) {
+			if (uploadedFile.getSize() > 0) {
+				String nombre = BolsaEmpleoUtils.obtenerNombreFichero(uploadedFile);
+				
+				int i = nombre.lastIndexOf('.');
+				if (i > 0) {
+				    String extension = nombre.substring(i + 1);
+				    if (!extension.toLowerCase().equals("pdf")) {
+				    	throw new UVException("No se puede subir un fichero que sea distinto de pdf");
+				    }
+				}
+				
 				InputStream input = uploadedFile.getInputStream();
-				modelo.insertaFichero(input, BolsaEmpleoUtils.obtenerNombreFichero(uploadedFile));
-			} catch (IOException e) {
-				e.printStackTrace();
-			} catch (ServletException e) {
-				e.printStackTrace();
+				String titulo = EscapaHTML.ajustaCodificacion(request.getParameter(PARAM_TITULO));
+				Fichero fichero = new Fichero(nombre, titulo, input);
+				modelo.insertaFichero(fichero);
+				HttpSession session = request.getSession(false);
+				session.setAttribute(MENSAJE_ENVIADO, MENSAJE_EXITO_AGREGAR);
+				response.sendRedirect(request.getServletPath());
+			} else {
+				throw new UVException("No se puede subir un fichero sin archivo");
 			}
 			
-			response.sendRedirect(request.getServletPath());
 		}
 	}
 	
@@ -164,7 +184,6 @@ public class ControladorGestionFicheros extends HttpServlet {
 		if (EscapaHTML.ajustaCodificacion(request.getParameter(PARAM_ID)) != null) {
 			Fichero fichero = modelo.listaFichero(Formateador.leeParametroInteger(request.getParameter(PARAM_ID)));
 			response.setContentType("application/pdf");
-	        response.setHeader("Content-Disposition", "attachment;filename=" + fichero.getNombre());
 	        datos.setRespuestaEnviada(true);
 	        
 	        try (ServletOutputStream stream = response.getOutputStream();
@@ -176,6 +195,24 @@ public class ControladorGestionFicheros extends HttpServlet {
 	            stream.flush();
 	        }
 		}
+	}
+	
+	/** eliminar un fichero .
+	 * @param request .
+	 * @param response .
+	 * @throws SQLException excepcion de bbdd .
+	 * @throws UVException en caso de error en bd .
+	 * @throws IOException en caso de error de IO.
+	 */
+	private void eliminarFichero(HttpServletRequest request, HttpServletResponse response) throws SQLException, UVException, IOException {
+		ModeloFichero modelo = new ModeloFichero();
+		Integer codNum = Formateador.leeParametroInteger(request.getParameter(PARAM_ID));
+		Fichero fichero = new Fichero();
+		fichero.setCodNum(codNum);
+		modelo.borraFichero(fichero);
+		HttpSession session = request.getSession(false);
+		session.setAttribute(MENSAJE_ENVIADO, MENSAJE_EXITO_ELIMINAR);
+		response.sendRedirect(request.getServletPath());
 	}
 	
 	/**

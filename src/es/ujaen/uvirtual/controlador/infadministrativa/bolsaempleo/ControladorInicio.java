@@ -10,17 +10,19 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import com.google.gson.Gson;
-import com.google.gson.JsonObject;
+import com.google.gson.GsonBuilder;
+import com.google.gson.JsonArray;
 import com.google.gson.reflect.TypeToken;
+import es.ujaen.uvirtual.beans.CodigoDescripcion;
 import es.ujaen.uvirtual.beans.UVDatos;
 import es.ujaen.uvirtual.beans.uvirtual.bolsaempleo.Fichero;
 import es.ujaen.uvirtual.beans.uvirtual.bolsaempleo.Noticia;
-import es.ujaen.uvirtual.beans.vistas.uvirtual.bolsaempleo.VistaFicheros;
-import es.ujaen.uvirtual.beans.vistas.uvirtual.bolsaempleo.VistaNoticias;
+import es.ujaen.uvirtual.beans.vistas.uvirtual.bolsaempleo.VistaInicio;
 import es.ujaen.uvirtual.modelo.bolsaempleo.ModeloFichero;
 import es.ujaen.uvirtual.modelo.bolsaempleo.ModeloNoticia;
 import es.ujaen.uvirtual.utilidades.BolsaEmpleoUtils;
 import es.ujaen.uvirtual.utilidades.EscapaHTML;
+import es.ujaen.uvirtual.utilidades.UVException;
 
 
 /**
@@ -46,6 +48,9 @@ public class ControladorInicio extends HttpServlet {
 	
 	// ruta vistas
 	public static final String RUTA_BEP_INICIO = "/WEB-INF/jsp/vista/infadministrativa/bolsaempleo/inicio/";
+	
+	// errors
+	public static final Integer RESPONSE_HTTP_CODE_ERROR_400 = 400;
 
 	/** Peticion GET.
 	 * @see HttpServlet#doGet(HttpServletRequest request, HttpServletResponse response)
@@ -56,7 +61,7 @@ public class ControladorInicio extends HttpServlet {
 		datos.setDocType("<!DOCTYPE html>");
 		datos.setContentType("text/html");
 		
-		VistaNoticias bean = new VistaNoticias();
+		VistaInicio bean = new VistaInicio();
 		
 		String nombreAccion = EscapaHTML.ajustaCodificacion(request.getParameter(PARAM_ACCION));
 		if (nombreAccion == null) {
@@ -68,7 +73,7 @@ public class ControladorInicio extends HttpServlet {
 					bean.setVista(RUTA_BEP_INICIO + "ayuda.jsp");
 					break;
 				case ACCION_DOCUMENTOS:
-					bean.setVista(RUTA_BEP_INICIO + "documentos.jsp");
+					obtenerFicheros(bean);
 					break;
 				case ACCION_FAQ:
 					bean.setVista(RUTA_BEP_INICIO + "faq.jsp");
@@ -77,8 +82,8 @@ public class ControladorInicio extends HttpServlet {
 					obtenerNoticias(bean);
 					break;
 				case ACCION_LISTAR_TODAS_NOTICIAS:
-					obtenerTodasNoticias(bean, request, response);
-					return;
+					obtenerTodasNoticias(bean, request, response, datos);
+					break;
 				default:
 					obtenerNoticias(bean);
 					break;
@@ -112,37 +117,43 @@ public class ControladorInicio extends HttpServlet {
 	 * @param response de la respuesta del servidor
 	 * @throws SQLException excepcion de bbdd.
 	 */
-	private void obtenerTodasNoticias(VistaNoticias bean, HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException, SQLException {
+	private void obtenerTodasNoticias(VistaInicio bean, HttpServletRequest request, HttpServletResponse response, UVDatos datos) 
+			throws ServletException, IOException, SQLException {
 		ModeloNoticia modelo = new ModeloNoticia();
 		
 		bean.setVista(RUTA_BEP_INICIO + "indice.jsp");
 		response.setContentType("application/json");
 		response.setCharacterEncoding("UTF-8");
+		datos.setRespuestaEnviada(true);
 		
-		Gson gson = new Gson();
-		JsonObject json = new JsonObject();
-		List<String> idsNoticias = gson.fromJson(request.getParameter("ids_noticias"), new TypeToken<List<String>>() { }.getType());
-		List<Noticia> listaNoticias = modelo.listaNoticiasInicioRestantes(BolsaEmpleoUtils.consultaNotIn("CODNUM", idsNoticias));
-		json.addProperty("result", "ok");
-		json.addProperty("noticias", gson.toJson(listaNoticias, new TypeToken<List<Noticia>>() { }.getType()));
-		
-		PrintWriter printWriter = response.getWriter();
-        printWriter.print(json);
-        printWriter.close();
+		try (PrintWriter writer = response.getWriter()) {
+			try {
+				Gson gson = new GsonBuilder().setDateFormat("dd/M/yyyy").create();
+				List<String> idsNoticias = gson.fromJson(request.getParameter("ids_noticias"), new TypeToken<List<String>>() { }.getType());
+				List<Noticia> listaNoticias = modelo.listaNoticiasInicioRestantes(BolsaEmpleoUtils.consultaNotIn("CODNUM", idsNoticias));
+				
+				JsonArray result = (JsonArray) gson.toJsonTree(listaNoticias, new TypeToken<List<Noticia>>() { }.getType());
+				writer.print(result);
+			} catch (UVException ex) {
+				CodigoDescripcion mensaje = new CodigoDescripcion("error", ex.getMessage());
+				writer.write(new Gson().toJson(mensaje));
+				response.setStatus(RESPONSE_HTTP_CODE_ERROR_400);
+			}
+		}
 	}
 	
 	/** muestra las 3 primeras noticias.
 	 * @param bean bean de la vista a la que poner los valores.
 	 * @throws SQLException excepcion de bbdd.
 	 */
-	private void obtenerNoticias(VistaNoticias bean) throws SQLException {
+	private void obtenerNoticias(VistaInicio bean) throws SQLException {
 		bean.setVista(RUTA_BEP_INICIO + "indice.jsp");
 		ModeloNoticia modelo = new ModeloNoticia();
 		List<Noticia> noticias = modelo.listaNoticiasInicio();
 		bean.setNoticias(noticias);
 	}
 	
-	private void obtenerFicheros(VistaFicheros bean) throws SQLException {
+	private void obtenerFicheros(VistaInicio bean) throws SQLException {
 		bean.setVista(RUTA_BEP_INICIO + "documentos.jsp");
 		ModeloFichero modelo = new ModeloFichero();
 		List<Fichero> ficheros = modelo.listaFicheros();

@@ -9,17 +9,6 @@ UVDatos uvdatos = (UVDatos) request.getAttribute(UVDatos.NOMBRE_ATRIBUTO);
 VistaFicheros bean = (VistaFicheros) uvdatos.getVistas().get(VistaFicheros.class.getName());
 %>
 <div class="bolsa-empleo">
-	<h2>Documentos del sistema</h2>
-	
-	<form id="subir_fichero" class="be-form" method="post" action="<%= request.getRequestURI() %>" enctype="multipart/form-data">
-		<input type="hidden" name="<%= ControladorGestionFicheros.PARAM_ACCION %>" id="accion_formulario" value="" />
-		<div class="form-file">
-			<input type="file" name="<%= ControladorGestionFicheros.PARAM_FICHERO %>"/>
-		</div>
-		<div class="form-btn">
-    		<input id="fichero_enviar" type="submit" name="<%= ControladorGestionFicheros.PARAM_ENVIAR %>" value="Enviar"/>
-    	</div>
-	</form>
 	
 	<% if (session.getAttribute(ControladorGestionFicheros.MENSAJE_ENVIADO) != null) { %>
 		<div id="exito" class="success">
@@ -29,19 +18,27 @@ VistaFicheros bean = (VistaFicheros) uvdatos.getVistas().get(VistaFicheros.class
 			session.removeAttribute(ControladorGestionFicheros.MENSAJE_ENVIADO);
 		} 
 	%>
+	
+	<div class="titulo-bolsa-empleo">
+		<h2>Documentos del sistema</h2>
+    
+	    <a class="link-btn" id="nuevo_fichero" href="<%= request.getRequestURI() %>">
+	    	 Nuevo documento
+	    </a>
+	</div>
 
     <table class="bluetable bolsaempleo" id="table_ficheros">
 		<tr>
-			<th scope="col" style="width:10%">Id</th>
-			<th scope="col"	style="width:60%">Nombre</th>
-			<th scope="col" style="width:20%">Descargar</th>
+			<th scope="col"	style="width:25%">Nombre</th>
+			<th scope="col"	style="width:30%">Título</th>
+			<th scope="col" style="width:35%">Ruta del fichero</th>
 			<th scope="col" style="width:10%"></th>
 		</tr>
 		<tbody>				
 		</tbody>
 		<tfoot>
 			<tr>
-				<th colspan="4" style="width:100%"></th>
+				<th colspan="5" style="width:100%"></th>
 			</tr>
 		</tfoot>
 	</table>
@@ -50,22 +47,30 @@ VistaFicheros bean = (VistaFicheros) uvdatos.getVistas().get(VistaFicheros.class
 
 <script>
 
-	function subirFichero(event, submit_input) {
-		event.preventDefault();
-		
-		input_accion = document.getElementById("accion_formulario");
-		input_accion.value = '<%= ControladorGestionFicheros.ACCION_SUBIR_FICHERO %>';
-		
-		submit_input.form.submit();
-	}
-	
-	function consultarFichero(event, id) {
-		event.preventDefault();
-		var params = {
-				'a': '<%= ControladorGestionFicheros.ACCION_DESCARGAR_FICHERO %>',
-				'<%= ControladorGestionFicheros.PARAM_ID %>': id
-		}
-		Atis.sendForm("<%= request.getRequestURI() %>", params);
+	function confirmDialog(title, message, id) {
+		$('<div></div>').appendTo('body')
+	    	.html('<div><h6>' + message + '</h6></div>')
+	    	.dialog({
+		      modal: true,
+		      title: title,
+		      zIndex: 10000,
+		      autoOpen: true,
+		      width: 'auto',
+		      resizable: false,
+		      buttons: {
+		        Si: function() {
+		        	var params = {'a': '<%= ControladorGestionFicheros.ACCION_BORRAR_FICHERO %>', '<%= ControladorGestionFicheros.PARAM_ID %>': id};
+	        		Atis.sendForm("<%= request.getRequestURI() %>", params);
+		          	$(this).dialog("close");
+		        },
+		        No: function() {
+		          	$(this).dialog("close");
+		        }
+		      },
+		      close: function(event, ui) {
+		        $(this).remove();
+		      }
+		});
 	}
 
 	$(document).ready(function() {
@@ -74,25 +79,36 @@ VistaFicheros bean = (VistaFicheros) uvdatos.getVistas().get(VistaFicheros.class
 		    "ajax": { url: "<%= request.getRequestURI() %>" },
 		    "pageSize": 10,
 		    "columns": [
-		        {'data': 'codNum'},
-		        {'data': 'nombre'},
-		        {'data': 'codnum', 'render': function(row) { return "<a class='consultar-fichero' href='<%= request.getRequestURI() %>/" +row.codNum +"' target='_blank'>Consultar fichero</a>"; }},
-		        {'data': 'codnum', 'buttons': [{'label': 'Borrar', 'onClick': function(row) {
-		        		var params = {'a': '<%= ControladorGestionFicheros.ACCION_BORRAR_FICHERO %>', 'id': row.codNum};
-		        		Atis.sendForm("<%= request.getRequestURI() %>", params);
+		        {'data': 'nombre', 'class': 'overflow-auto'},
+		        {'data': 'titulo', 'class': 'overflow-auto'},
+		        {'data': 'codnum', 'class': 'overflow-ellipsis', 'render': function(row) {
+		        	var link = "<%= request.getRequestURI() %>?a=<%= ControladorGestionFicheros.ACCION_DESCARGAR_FICHERO %>&<%= ControladorGestionFicheros.PARAM_ID %>=" + row.codNum;
+		        	return "<a class='consultar-fichero' href='" +link +"' target='_blank'>" +link +"</a>"; 
 		        	}
-		        }]}
+		        },
+		        {'data': 'codnum', 'buttons': [{'label': 'Borrar', 'onClick': function(row) {
+			        		confirmDialog("Borrar fichero", "¿Desea borrar el fichero seleccionado?", row.codNum);
+			        	}
+			        },{'label': '<label class="tooltiptext">Copiar enlace</label>Copiar', 'class': 'tooltip', 'onClick': function(row) {
+			        	console.log($(this).parent().parent().parent().find(".tooltiptext").text("¡Enlace copiado!"));
+			        	
+			        	var link = "<%= request.getRequestURI() %>?a=<%= ControladorGestionFicheros.ACCION_DESCARGAR_FICHERO %>&<%= ControladorGestionFicheros.PARAM_ID %>=" + row.codNum;
+			        	navigator.clipboard.writeText(link);
+			        	}
+			        }]}
 		    ],
-		});	
-		
-		document.getElementById("fichero_enviar").addEventListener("click", function(event) {
-			subirFichero(event, this);
 		});
 		
-		$("#table_ficheros").on("click", ".consultar-fichero", function(event) {
-			var href = $(this).attr("href").split("/");
-			consultarFichero(event, href[parseInt(href.length) - 1]);
+		document.getElementById("nuevo_fichero").addEventListener("click", function(event) {
+			event.preventDefault();
+			Atis.sendForm("<%= request.getRequestURI() %>", {'a': '<%= ControladorGestionFicheros.ACCION_SUBIR_FICHERO %>'});
 		});
+		
+		$("#table_ficheros").on("mouseover", ".tooltip", function() {
+			console.log("oiga")
+			$(this).find(".tooltiptext").text("Copiar enlace");
+		})
+		
 	});
 
 </script>
