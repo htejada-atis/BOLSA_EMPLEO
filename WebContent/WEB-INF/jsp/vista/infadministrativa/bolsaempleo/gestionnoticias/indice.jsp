@@ -21,7 +21,7 @@ VistaNoticias bean = (VistaNoticias) uvdatos.getVistas().get(VistaNoticias.class
 		} 
 	%>
 
-	<div class="titulo-noticias">
+	<div class="titulo-bolsa-empleo">
 		<h2>Noticias</h2>
     
 	    <a class="link-btn" id="nueva_noticia" href="<%= request.getRequestURI() %>">
@@ -31,7 +31,7 @@ VistaNoticias bean = (VistaNoticias) uvdatos.getVistas().get(VistaNoticias.class
     
     <table class="bluetable bolsaempleo" id="table_noticias_insertadas">
 		<tr>
-			<th scope="col" style="width:20%">Fecha</th>
+			<th scope="col" style="width:12%">Fecha</th>
 			<th scope="col"	style="width:30%">Texto</th>
 			<th scope="col" style="width:30%">Enlace</th>
 			<th scope="col" style="width:10%">Pública</th>
@@ -89,8 +89,8 @@ VistaNoticias bean = (VistaNoticias) uvdatos.getVistas().get(VistaNoticias.class
 		    "pageSize": 10,
 		    "columns": [
 		    	{'data': 'fecha'},
-		    	{'data': 'texto'},
-		        {'data': 'enlace', 'render': function(row) { return "<a href='" +row.enlace +"'>" +row.enlace +"</a>"; }},
+		    	{'data': 'texto', 'class': 'overflow-auto'},
+		        {'data': 'enlace', 'class': 'overflow-ellipsis', 'render': function(row) { return "<a href='" +row.enlace +"' target='_blank'>" +row.enlace +"</a>"; }},
 		        {'data': 'publica'},
 		        {'data': 'activa'},
 		        {'data': 'codnum', 'buttons': [{'label': 'Editar', 'onClick': function(row) {

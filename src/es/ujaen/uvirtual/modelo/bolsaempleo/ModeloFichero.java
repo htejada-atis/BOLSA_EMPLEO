@@ -46,6 +46,7 @@ public class ModeloFichero {
 							Fichero fich = new Fichero();
 							fich.setCodNum(rs.getInt("CODNUM"));
 							fich.setNombre(rs.getString("NOMBRE"));
+							fich.setTitulo(rs.getString("TITULO"));
 							fich.setArchivo(rs.getBlob("ARCHIVO").getBinaryStream());
 							ficheros.add(fich);
 						} catch (Exception e) {
@@ -64,7 +65,7 @@ public class ModeloFichero {
 	 */
 	public List<Fichero> listaFicheros() throws SQLException {
 		List<Fichero> ficheros = new ArrayList<>();
-		String consulta = "SELECT bepfich.nombre FROM tbep_ficheros bepfich";
+		String consulta = "SELECT bepfich.codnum, bepfich.nombre, bepfich.titulo FROM tbep_ficheros bepfich";
 		
 		try (Connection conexion = ConexionUvirtual.obtenerInstancia();
 			PreparedStatement stmt = conexion.prepareStatement(consulta);) {
@@ -74,6 +75,7 @@ public class ModeloFichero {
 							Fichero fich = new Fichero();
 							fich.setCodNum(rs.getInt("CODNUM"));
 							fich.setNombre(rs.getString("NOMBRE"));
+							fich.setTitulo(rs.getString("TITULO"));
 							ficheros.add(fich);
 						} catch (Exception e) {
 							e.printStackTrace();
@@ -85,20 +87,41 @@ public class ModeloFichero {
 		return ficheros;
 	}
 	
-	/**	Función que inserta un fichero .
-	 * @param in fichero a insertar en la BD .
-	 * @param nombre nombre del fichero insertado .
-	 * @throws SQLException en caso de error en la BD .
+	/** Elimina un fichero .
+	 * @param fichero a borrar
+	 * @throws SQLException en caso de error en la BD
+	 * @throws UVException si fichero no es válido
 	 */
-	public void insertaFichero(InputStream in, String nombre) throws SQLException {
-		String consulta = "INSERT INTO tbep_ficheros " 
-				+ " (NOMBRE,ARCHIVO) "
-				+ "VALUES (?,?)";
+	public void borraFichero(Fichero fichero) throws SQLException, UVException {
+		if (fichero == null) {
+			throw new UVException("No se puede eliminar un fichero vacío");
+		}
+		if (fichero.getCodNum() == null) {
+			throw new UVException("No se puede eliminar un fichero con id vacío");
+		}
+		String consulta = "DELETE FROM tbep_ficheros WHERE codnum = ? ";
 		try (Connection conexion = ConexionUvirtual.obtenerInstancia();
 			 PreparedStatement stmt = conexion.prepareStatement(consulta);) {
 			int parameterIndex = 1;
-			stmt.setString(parameterIndex++, nombre);
-			stmt.setBinaryStream(parameterIndex++, in);
+			stmt.setInt(parameterIndex++, fichero.getCodNum());
+			stmt.executeUpdate();
+		}
+	}
+	
+	/**	Función que inserta un fichero .
+	 * @param fichero fichero a insertar .
+	 * @throws SQLException en caso de error en la BD .
+	 */
+	public void insertaFichero(Fichero fichero) throws SQLException {
+		String consulta = "INSERT INTO tbep_ficheros " 
+				+ " (NOMBRE,TITULO,ARCHIVO) "
+				+ "VALUES (?,?,?)";
+		try (Connection conexion = ConexionUvirtual.obtenerInstancia();
+			 PreparedStatement stmt = conexion.prepareStatement(consulta);) {
+			int parameterIndex = 1;
+			stmt.setString(parameterIndex++, fichero.getNombre());
+			stmt.setString(parameterIndex++, fichero.getTitulo());
+			stmt.setBinaryStream(parameterIndex++, fichero.getArchivo());
 			stmt.executeUpdate();
 		}
 	}
@@ -128,10 +151,11 @@ public class ModeloFichero {
 		List<Fichero> ficheros = new ArrayList<>();
 		DataTable<Fichero> dataTable = new DataTable<Fichero>(params);
 		
-		String consulta = "SELECT bepfich.codnum, bepfich.nombre  FROM tbep_ficheros bepfich WHERE 1=1 ";
+		String consulta = "SELECT bepfich.codnum, bepfich.nombre, bepfich.titulo FROM tbep_ficheros bepfich WHERE 1=1 ";
 		
 		dataTable.setOrderColumn(ORDER_COLUMN_INDEX_ID, "bepfich.CODNUM");
 		dataTable.setOrderColumn(ORDER_COLUMN_INDEX_NOMBRE, "bepfich.NOMBRE");
+		dataTable.setOrderColumn(ORDER_COLUMN_INDEX_NOMBRE, "bepfich.TITULO");
 		dataTable.setQuery(consulta);
 				
 		try (Connection conexion = ConexionUvirtual.obtenerInstancia();
@@ -143,7 +167,7 @@ public class ModeloFichero {
 					Fichero fichero = new Fichero();
 					fichero.setCodNum(rs.getInt("CODNUM"));
 					fichero.setNombre(rs.getString("NOMBRE"));
-					
+					fichero.setTitulo(rs.getString("TITULO"));
 					ficheros.add(fichero);					
 				}				
 			}	

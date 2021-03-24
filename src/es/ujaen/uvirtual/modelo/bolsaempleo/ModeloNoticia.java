@@ -124,7 +124,7 @@ public class ModeloNoticia {
 	 * @return lista de noticias filtradas .
 	 * @throws SQLException si hay un error en la base de datos .
 	 */
-	public List<Noticia> listaNoticiasInicioRestantes(String clausula) throws SQLException {
+	public List<Noticia> listaNoticiasInicioRestantes(String clausula) throws SQLException, UVException {
 		return listaNoticias(clausula + " AND flgpublica = 'S' ORDER BY fecha");
 	}
 	

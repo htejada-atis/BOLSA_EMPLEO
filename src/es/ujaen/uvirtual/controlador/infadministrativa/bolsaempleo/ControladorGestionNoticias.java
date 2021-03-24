@@ -95,7 +95,7 @@ public class ControladorGestionNoticias extends HttpServlet {
 					editarNoticia(request, response, bean);
 					break;
 				case ACCION_ELIMINAR_NOTICIA:
-					eliminarNoticia(request, response, bean);
+					eliminarNoticia(request, response);
 					break;
 			}
 		} catch (UVException e) {
@@ -178,12 +178,11 @@ public class ControladorGestionNoticias extends HttpServlet {
 	/** eliminar una noticia.
 	 * @param request .
 	 * @param response .
-	 * @param bean bean de la vista a la que poner los valores .
 	 * @throws SQLException excepcion de bbdd.
 	 * @throws UVException en caso de error en bd
 	 * @throws IOException en caso de error de IO.
 	 */
-	private void eliminarNoticia(HttpServletRequest request, HttpServletResponse response, VistaNoticias bean) throws SQLException, UVException, IOException {
+	private void eliminarNoticia(HttpServletRequest request, HttpServletResponse response) throws SQLException, UVException, IOException {
 		ModeloNoticia modelo = new ModeloNoticia();
 		Integer codNum = Formateador.leeParametroInteger(request.getParameter(PARAM_ID));
 		Noticia noticia = new Noticia();
@@ -192,7 +191,7 @@ public class ControladorGestionNoticias extends HttpServlet {
 		noticia.setActiva(activa);
 		modelo.borraRestauraNoticia(noticia);
 		HttpSession session = request.getSession(false);
-		session.setAttribute(MENSAJE_ENVIADO, MENSAJE_EXITO_EDITAR);
+		session.setAttribute(MENSAJE_ENVIADO, MENSAJE_EXITO_ELIMINAR);
 		response.sendRedirect(request.getServletPath());
 	}
 	
@@ -213,8 +212,7 @@ public class ControladorGestionNoticias extends HttpServlet {
 		try (PrintWriter writer = response.getWriter()) {
 			try {
 				DataTable<Noticia> dataTable = modelo.listaNoticiasDatatable(request.getParameterMap());
-				Gson gson = new GsonBuilder().setExclusionStrategies(DataTable.GSONEXCLUSIONSTRATEGY).create();
-				System.out.println(gson.toJson(dataTable));
+				Gson gson = new GsonBuilder().setDateFormat("dd/M/yyyy").setExclusionStrategies(DataTable.GSONEXCLUSIONSTRATEGY).create();
 				writer.write(gson.toJson(dataTable));
 			} catch (UVException ex) {
 				CodigoDescripcion mensaje = new CodigoDescripcion("error", ex.getMessage());
