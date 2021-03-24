@@ -16,7 +16,7 @@ COMMENT ON COLUMN TBEP_BOLSAS.BEPARE_CODNUM IS 'Llave externa a la area de traba
 --/////////////////////
 COMMENT ON COLUMN TBEP_BOLSAS.ESTADO IS 'En que estado está la bolsa de empleo';
 --/////////////////////
-COMMENT ON COLUMN TBEP_BOLSAS.FLGBAREMABLE IS 'Indica si la bolsa es bareblame o no. Para que una area se pueda baremar el estado de esta debe ser bloqueada y tener el campo bariblema a S';
+COMMENT ON COLUMN TBEP_BOLSAS.FLGBAREMABLE IS 'Indica si la bolsa es bareblame o no. Para que una area se pueda baremar el estado de esta debe ser bloqueada y tener el campo baremable a S';
 --/////////////////////
 COMMENT ON COLUMN TBEP_BOLSAS.FECHAACTUALIZACION IS 'La última fecha de actualaización de la bolsa';
 --/////////////////////

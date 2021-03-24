@@ -21,6 +21,7 @@ import es.ujaen.uvirtual.beans.CodigoDescripcion;
 import es.ujaen.uvirtual.beans.UVDatos;
 import es.ujaen.uvirtual.beans.Usuario;
 import es.ujaen.uvirtual.beans.uvirtual.bolsaempleo.Bolsa;
+import es.ujaen.uvirtual.beans.vistas.uvirtual.bolsaempleo.VistaAreasBaremar;
 import es.ujaen.uvirtual.beans.vistas.uvirtual.bolsaempleo.VistaEstadoBolsas;
 import es.ujaen.uvirtual.modelo.bolsaempleo.ModeloBolsa;
 import es.ujaen.uvirtual.utilidades.DataTable;
@@ -29,42 +30,36 @@ import es.ujaen.uvirtual.utilidades.Formateador;
 import es.ujaen.uvirtual.utilidades.UVException;
 
 /**
- * Listado de bolsas y su estado.
+ * Gestión de las áreas a baremar.
  */
 @WebServlet(
-		name = "informacionadministrativa.bolsaempleo.bolsas", 
-		description = "Gestión de estados de bolsas", 
+		name = "informacionadministrativa.bolsaempleo.configuracion.areasbaremar", 
+		description = "Gestión de las áreas a baremar", 
 		urlPatterns = { 
-				"/srv/es/informacionadministrativa/bolsaempleo/bolsas", 
-				"/srv/en/informacionadministrativa/bolsaempleo/bolsas",
-				"/srv/es/ajax/informacionadministrativa/bolsaempleo/bolsas",
-				"/srv/en/ajax/informacionadministrativa/bolsaempleo/bolsas"
+				"/srv/es/informacionadministrativa/bolsaempleo/configuracion/areasbaremar", 
+				"/srv/en/informacionadministrativa/bolsaempleo/configuracion/areasbaremar",
+				"/srv/es/ajax/informacionadministrativa/bolsaempleo/configuracion/areasbaremar",
+				"/srv/en/ajax/informacionadministrativa/bolsaempleo/configuracion/areasbaremar"
 		})
-public class ControladorBolsas extends HttpServlet {
+public class ControladorAreasABaremar extends HttpServlet {
 	private static final long serialVersionUID = 1L;
-	private static final String NOMBREDEESTACLASE = ControladorBolsas.class.getName();
+	private static final String NOMBREDEESTACLASE = ControladorAreasABaremar.class.getName();
 	private static final Logger LOGGER = Logger.getLogger(NOMBREDEESTACLASE);
 	public static final String PARAM_ACCION = "a";
-	public static final String PARAM_ACCION_BOLSA = "ab";
-	public static final String PARAM_BOLSAS_SELECCIONADAS = "bolsasselected";
+	public static final String PARAM_ACCION_AREA = "aa";
+	public static final String PARAM_AREAS_SELECCIONADAS = "areasselected";
 	
 	// acciones
-	public static final String ACCION_LISTAR_BOLSAS = "listar";
+	public static final String ACCION_LISTAR = "listar";
 	public static final String ACCION_DATATABLE = "datatable";
-	public static final String ACCION_BOLSA = "accionbolsa";
-	public static final String ACCION_BOLSAS_BLOQUEAR = "bloquear";
-	public static final String ACCION_BOLSAS_REVISION = "revision";
-	public static final String ACCION_BOLSAS_BAREMACION = "baremacion";
-	public static final String ACCION_BOLSAS_ALEGACION = "alegacion";
-	public static final String ACCION_BOLSAS_DESBLOQUEAR = "desbloquear";
-	public static final String ACCION_BOLSAS_BAREMAR = "baremar";	
+	public static final String ACCION_AREA = "accionarea";
+	public static final String ACCION_AREA_PASAR_A_BAREMALE = "accionareabaremable";
+	public static final String ACCION_AREA_PASAR_A_NO_BAREMALE = "accionareanobaremable";
 	
 	// mensajes
-	public static final String MENSAJE_ERROR_ACCION_BOLSA_NO_VALIDA = "Acción no válida";
-	public static final String MENSAJE_EXITO_BOLSA_MODIFICADA_CORRECTAMENTE = "Bolsa/s modificada/s correctamente"; 
+	public static final String MENSAJE_ERROR_ACCION_AREA_NO_VALIDA = "Acción no válida";
+	public static final String MENSAJE_EXITO_AREA_MODIFICADA_CORRECTAMENTE = "Area/s modificada/s correctamente"; 
 
-	public static final int RESPONSE_HTTP_CODE_ERROR = 400;
-	
 	/** Peticion GET.
 	 * @see HttpServlet#doGet(HttpServletRequest request, HttpServletResponse response)
 	 */
@@ -74,33 +69,33 @@ public class ControladorBolsas extends HttpServlet {
 		datos.setDocType("<!DOCTYPE html>");
 		datos.setContentType("text/html");
 		
-		VistaEstadoBolsas bean = new VistaEstadoBolsas();		
+		VistaAreasBaremar bean = new VistaAreasBaremar();		
 		Usuario usuario = datos.getUsuario();
 		LOGGER.log(Level.FINEST, "usuario que ha entrado en el servlet es {0}", usuario.getUid());
 				
-		String nombreAccion = EscapaHTML.ajustaCodificacion(request.getParameter(PARAM_ACCION));		
+		String nombreAccion = EscapaHTML.ajustaCodificacion(request.getParameter(PARAM_ACCION));
 		if (nombreAccion == null) {
-			nombreAccion = ACCION_LISTAR_BOLSAS;
+			nombreAccion = ACCION_LISTAR;
 		}
 		
-		bean.setVista("/WEB-INF/jsp/vista/infadministrativa/bolsaempleo/bolsas/index.jsp");
+		bean.setVista("/WEB-INF/jsp/vista/infadministrativa/bolsaempleo/configuracion/areasbaremar.jsp");
 		
 		try {
 			switch (nombreAccion) {
 				case ACCION_DATATABLE:
 					listado(datos, request, response);
 					break;
-				case ACCION_BOLSA:
-					accionSobreBolsas(bean, datos, request);					
+				case ACCION_AREA:
+					accionSobreArea(bean, datos, request);
 					break;
-			}			
-		} catch (UVException e) {
-			LOGGER.log(Level.WARNING, e.toString());
-			bean.getMensajesDeError().add(e.toString());
+			}
 		} catch (SQLException e) {
 			LOGGER.log(Level.SEVERE, Formateador.getStackTrace(e));
 			LOGGER.log(Level.SEVERE, e.toString());
 			bean.getMensajesDeError().add("Error al acceder a la base de datos");
+		} catch (UVException e) {
+			LOGGER.log(Level.WARNING, e.toString());
+			bean.getMensajesDeError().add(e.toString());
 		} finally {
 			datos.getVistas().put(bean.getClass().getName(), bean);
 			datos.getFicherosJSP().add(bean.getVista());
@@ -115,7 +110,7 @@ public class ControladorBolsas extends HttpServlet {
 		}
 	}
 	
-	/** redireccion de do post.
+	/** Redireccion de do post.
 	 * @see HttpServlet#doPost(HttpServletRequest request, HttpServletResponse response)
 	 */
 	@Override
@@ -123,11 +118,18 @@ public class ControladorBolsas extends HttpServlet {
 		doGet(request, response);
 	}
 		
+	/**
+	 * AJAX para devolver listado de areas (bolsas).
+	 * @param datos .
+	 * @param request .
+	 * @param response .
+	 * @throws IOException .
+	 * @throws SQLException .
+	 */
 	private void listado(UVDatos datos, HttpServletRequest request, HttpServletResponse response) throws IOException, SQLException {
 		ModeloBolsa modelo = new ModeloBolsa();
 		
 		datos.setContentType("application/json");
-		datos.setRespuestaEnviada(true);
 		response.setContentType("application/json");
 		response.setCharacterEncoding("UTF-8");
 		
@@ -135,49 +137,38 @@ public class ControladorBolsas extends HttpServlet {
 			try {
 				DataTable<Bolsa> dataTable = modelo.listaBolsaEmpleoDatatable(request.getParameterMap());
 				Gson gson = new GsonBuilder().setExclusionStrategies(DataTable.GSONEXCLUSIONSTRATEGY).create();
-				
+
 				writer.write(gson.toJson(dataTable));
 			} catch (UVException ex) {
 				CodigoDescripcion mensaje = new CodigoDescripcion("error", ex.getMessage());
 				writer.write(new Gson().toJson(mensaje));
-				response.setStatus(RESPONSE_HTTP_CODE_ERROR);
 			}
 		}
+		
+		datos.setRespuestaEnviada(true);
 	}
 	
-	private void accionSobreBolsas(VistaEstadoBolsas bean, UVDatos datos, HttpServletRequest request) throws UVException, SQLException {
+	private void accionSobreArea(VistaAreasBaremar bean, UVDatos datos, HttpServletRequest request) throws UVException, SQLException {
 		ModeloBolsa modelo = new ModeloBolsa();
 		
-		String nombreAccionBolsa = EscapaHTML.ajustaCodificacion(request.getParameter(PARAM_ACCION_BOLSA));
-		String selectedJson = EscapaHTML.ajustaCodificacion(request.getParameter(PARAM_BOLSAS_SELECCIONADAS));
+		String nombreAccionBolsa = EscapaHTML.ajustaCodificacion(request.getParameter(PARAM_ACCION_AREA));
+		String selectedJson = EscapaHTML.ajustaCodificacion(request.getParameter(PARAM_AREAS_SELECCIONADAS));
 		int[] selected = (new Gson()).fromJson(selectedJson, new TypeToken<int[]>() { }.getType());
 		
 		List<Bolsa> bolsas = modelo.getBolsasByIds(selected);
 
 		switch (nombreAccionBolsa) {
-		case ACCION_BOLSAS_BLOQUEAR:
-			modelo.bloquearBolsas(bolsas);							
+		case ACCION_AREA_PASAR_A_BAREMALE:
+			modelo.ponerAreaComoBaremable(bolsas);							
 			break;
-		case ACCION_BOLSAS_REVISION:
-			modelo.ponerBolsasEnRevision(bolsas);
-			break;
-		case ACCION_BOLSAS_BAREMACION:
-			modelo.ponerBolsasEnBaremacion(bolsas);
-			break;
-		case ACCION_BOLSAS_ALEGACION:
-			modelo.ponerBolsasEnAlegaciones(bolsas);
-			break;
-		case ACCION_BOLSAS_DESBLOQUEAR:
-			modelo.desbloquearBolsas(bolsas);
-			break;
-		case ACCION_BOLSAS_BAREMAR:
-			modelo.baremarBolsas(bolsas);
+		case ACCION_AREA_PASAR_A_NO_BAREMALE:
+			modelo.ponerAreaComoNoBaremable(bolsas);
 			break;
 		default:
-			bean.getMensajesDeError().add(MENSAJE_ERROR_ACCION_BOLSA_NO_VALIDA);
+			bean.getMensajesDeError().add(MENSAJE_ERROR_ACCION_AREA_NO_VALIDA);
 			return;
 		}
 		
-		bean.getMensajesDeExito().add(MENSAJE_EXITO_BOLSA_MODIFICADA_CORRECTAMENTE);
+		bean.getMensajesDeExito().add(MENSAJE_EXITO_AREA_MODIFICADA_CORRECTAMENTE);
 	}
 }
