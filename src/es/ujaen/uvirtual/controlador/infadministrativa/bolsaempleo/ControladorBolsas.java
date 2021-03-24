@@ -61,6 +61,7 @@ public class ControladorBolsas extends HttpServlet {
 	
 	// mensajes
 	public static final String MENSAJE_ERROR_ACCION_BOLSA_NO_VALIDA = "Acción no válida";
+	public static final String MENSAJE_ERROR_BOLSAS_SELECCIONADAS_INCORRECTAS = "No hay bolsas seleccionadas válidas";
 	public static final String MENSAJE_EXITO_BOLSA_MODIFICADA_CORRECTAMENTE = "Bolsa/s modificada/s correctamente"; 
 
 	public static final int RESPONSE_HTTP_CODE_ERROR = 400;
@@ -88,7 +89,7 @@ public class ControladorBolsas extends HttpServlet {
 		try {
 			switch (nombreAccion) {
 				case ACCION_DATATABLE:
-					listado(datos, request, response);
+					listado(bean, datos, request, response);
 					break;
 				case ACCION_BOLSA:
 					accionSobreBolsas(bean, datos, request);					
@@ -123,7 +124,7 @@ public class ControladorBolsas extends HttpServlet {
 		doGet(request, response);
 	}
 		
-	private void listado(UVDatos datos, HttpServletRequest request, HttpServletResponse response) throws IOException, SQLException {
+	private void listado(VistaEstadoBolsas bean, UVDatos datos, HttpServletRequest request, HttpServletResponse response) throws IOException, SQLException {
 		ModeloBolsa modelo = new ModeloBolsa();
 		
 		datos.setContentType("application/json");
@@ -134,10 +135,13 @@ public class ControladorBolsas extends HttpServlet {
 		try (PrintWriter writer = response.getWriter()) {
 			try {
 				DataTable<Bolsa> dataTable = modelo.listaBolsaEmpleoDatatable(request.getParameterMap());
-				Gson gson = new GsonBuilder().setExclusionStrategies(DataTable.GSONEXCLUSIONSTRATEGY).create();
+				bean.setDatatableBolsas(dataTable);
 				
+				Gson gson = new GsonBuilder().setExclusionStrategies(DataTable.GSONEXCLUSIONSTRATEGY).create();				
 				writer.write(gson.toJson(dataTable));
 			} catch (UVException ex) {
+				bean.getMensajesDeError().add(ex.getMessage());
+				
 				CodigoDescripcion mensaje = new CodigoDescripcion("error", ex.getMessage());
 				writer.write(new Gson().toJson(mensaje));
 				response.setStatus(RESPONSE_HTTP_CODE_ERROR);
@@ -150,13 +154,19 @@ public class ControladorBolsas extends HttpServlet {
 		
 		String nombreAccionBolsa = EscapaHTML.ajustaCodificacion(request.getParameter(PARAM_ACCION_BOLSA));
 		String selectedJson = EscapaHTML.ajustaCodificacion(request.getParameter(PARAM_BOLSAS_SELECCIONADAS));
-		int[] selected = (new Gson()).fromJson(selectedJson, new TypeToken<int[]>() { }.getType());
+		int[] selected;
+		List<Bolsa> bolsas;
 		
-		List<Bolsa> bolsas = modelo.getBolsasByIds(selected);
-
+		try {
+			selected = (new Gson()).fromJson(selectedJson, new TypeToken<int[]>() { }.getType());
+			bolsas = modelo.getBolsasByIds(selected);
+		} catch (Exception ex) {
+			throw new UVException(MENSAJE_ERROR_BOLSAS_SELECCIONADAS_INCORRECTAS);
+		}
+				
 		switch (nombreAccionBolsa) {
 		case ACCION_BOLSAS_BLOQUEAR:
-			modelo.bloquearBolsas(bolsas);							
+			modelo.bloquearBolsas(bolsas);
 			break;
 		case ACCION_BOLSAS_REVISION:
 			modelo.ponerBolsasEnRevision(bolsas);
