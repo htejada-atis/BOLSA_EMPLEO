@@ -3,8 +3,9 @@ package usuario.bolsaempleo;
 import static org.junit.Assert.assertTrue;
 
 import java.io.IOException;
+import java.lang.reflect.Type;
+import java.net.MalformedURLException;
 import java.sql.SQLException;
-import java.util.function.Function;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -13,12 +14,16 @@ import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.openqa.selenium.By;
-import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.WebDriverWait;
 
+import com.google.gson.Gson;
+import com.google.gson.reflect.TypeToken;
+
+import es.ujaen.uvirtual.beans.uvirtual.bolsaempleo.Bolsa;
 import es.ujaen.uvirtual.controlador.infadministrativa.bolsaempleo.ControladorBolsas;
+import es.ujaen.uvirtual.utilidades.DataTable;
 
 /** Clase para probar solicitudCrud.
  * @author usig
@@ -132,11 +137,23 @@ public class TestMenusBolsaTrabajo {
 		assertTrue(alert.equals(MENSAJE_DIALOGO_SELECCIONAR_FILAS));
 	}
 	
+	/**
+	 * Probamos petición datatable .
+	 * @throws MalformedURLException .
+	 * @throws IOException .
+	 */
 	@Test
-	public void testA2() {
-		DriverUv.getDriver().get("view-source:http://localhost:8080/srv/es/informacionadministrativa/bolsaempleo/bolsas?a=" + ControladorBolsas.ACCION_DATATABLE);
-		String json = DriverUv.getDriver().getWindowHandle();
+	public void testA2() throws MalformedURLException, IOException {
+		String url = "http://localhost:8080/srv/es/informacionadministrativa/bolsaempleo/bolsas?a=" + ControladorBolsas.ACCION_DATATABLE;
+		String json = DriverUv.getAjaxRequestJson(url);
 		
+		Type typeDt = new TypeToken<DataTable<Bolsa>>() { }.getType();
+		DataTable<Bolsa> dt = new Gson().fromJson(json, typeDt);
+		
+		assertTrue(dt.getData().size() > 0);
+		
+		//DriverUv.getDriver().get();
+		//String json = DriverUv.getDriver().getPageSource();
 		
 	}
 	
