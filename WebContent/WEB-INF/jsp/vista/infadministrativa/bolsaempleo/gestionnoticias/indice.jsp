@@ -85,7 +85,7 @@ VistaNoticias bean = (VistaNoticias) uvdatos.getVistas().get(VistaNoticias.class
 		});
 
 		var table = new DataTable('#table_noticias_insertadas', {
-		    "ajax": { url: "<%= request.getRequestURI() %>" },
+		    "ajax": { url: "<%= ControladorGestionNoticias.URL_PATTERN_AJAX %>" },
 		    "pageSize": 10,
 		    "columns": [
 		    	{'data': 'fecha'},

@@ -19,8 +19,8 @@ VistaInicio bean = (VistaInicio)uvdatos.getVistas().get(VistaInicio.class.getNam
     
     <div class="lista-bolsa-empleo">
     	<ul>
-    		<% for(Fichero fichero:bean.getFicheros()) { 
-    			String link = ControladorGestionFicheros.URL_PATTERN + "?a=" + ControladorGestionFicheros.ACCION_DESCARGAR_FICHERO + "&" + ControladorGestionFicheros.PARAM_ID + "=" + fichero.getCodNum();
+    		<% for(Fichero fichero: bean.getFicheros()) { 
+    			String link = ControladorGestionFicheros.URL_PATTERN_FILES + "?a=" + ControladorGestionFicheros.ACCION_DESCARGAR_FICHERO + "&" + ControladorGestionFicheros.PARAM_ID + "=" + fichero.getCodNum();
     			String titulo = "";
     			
     			if(fichero.getTitulo() != null) {

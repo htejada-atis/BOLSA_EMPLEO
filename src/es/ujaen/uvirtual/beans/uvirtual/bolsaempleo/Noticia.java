@@ -166,6 +166,13 @@ public class Noticia implements Serializable {
 			return false;
 		}
 		Noticia other = (Noticia) obj;
+		if (codNum == null) {
+			if (other.codNum != null) {
+				return false;
+			}
+		} else if (!codNum.equals(other.codNum)) {
+			return false;
+		}
 		if (enlace == null) {
 			if (other.enlace != null) {
 				return false;

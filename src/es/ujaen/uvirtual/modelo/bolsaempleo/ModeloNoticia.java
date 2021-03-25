@@ -7,8 +7,6 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-
-import es.ujaen.uvirtual.beans.uvirtual.bolsaempleo.Bolsa;
 import es.ujaen.uvirtual.beans.uvirtual.bolsaempleo.Noticia;
 import es.ujaen.uvirtual.modelo.conexion.ConexionUvirtual;
 import es.ujaen.uvirtual.utilidades.DataTable;
@@ -77,9 +75,9 @@ public class ModeloNoticia {
 	/**
 	 * Listado de noticias . 
 	 * @param params para leer los parametros de paginación, ordenacion, etc
-	 * @return listado de bolsas de empleo
+	 * @return listado de noticias
 	 * @throws SQLException en caso de error de base de datos
-	 * @throws UVException error si no existe la area
+	 * @throws UVException error si no existe noticia
 	 */
 	public DataTable<Noticia> listaNoticiasDatatable(Map<String, String[]> params) throws SQLException, UVException {
 		List<Noticia> noticias = new ArrayList<>();

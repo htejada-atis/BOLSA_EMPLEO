@@ -1,0 +1,7 @@
+DROP TABLE TBEP_HTO_TITULACIONESAREA;
+--/////////////////////
+DROP TABLE TBEP_TITULACIONESAREA;
+--/////////////////////
+DROP SEQUENCE QBEP_TIAR;
+--/////////////////////
+DROP SEQUENCE QBEP_HTO_TIAR;
