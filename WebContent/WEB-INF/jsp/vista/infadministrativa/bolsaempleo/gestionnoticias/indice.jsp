@@ -89,7 +89,9 @@ VistaNoticias bean = (VistaNoticias) uvdatos.getVistas().get(VistaNoticias.class
 		    "pageSize": 10,
 		    "columns": [
 		    	{'data': 'fecha'},
-		    	{'data': 'texto', 'class': 'overflow-auto'},
+		    	{'data': 'texto', 'render': function(row) {
+		    		return "<div class='overflow-auto'>" +row.texto +"</div>";
+		    	}},
 		        {'data': 'enlace', 'class': 'overflow-ellipsis', 'render': function(row) { return "<a href='" +row.enlace +"' target='_blank'>" +row.enlace +"</a>"; }},
 		        {'data': 'publica'},
 		        {'data': 'activa'},
