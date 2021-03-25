@@ -29,9 +29,9 @@ VistaFicheros bean = (VistaFicheros) uvdatos.getVistas().get(VistaFicheros.class
 
     <table class="bluetable bolsaempleo" id="table_ficheros">
 		<tr>
-			<th scope="col"	style="width:25%">Nombre</th>
+			<th scope="col"	style="width:30%">Nombre</th>
 			<th scope="col"	style="width:30%">Título</th>
-			<th scope="col" style="width:35%">Ruta del fichero</th>
+			<th scope="col" style="width:30%">Ruta del fichero</th>
 			<th scope="col" style="width:10%"></th>
 		</tr>
 		<tbody>				
@@ -79,8 +79,12 @@ VistaFicheros bean = (VistaFicheros) uvdatos.getVistas().get(VistaFicheros.class
 		    "ajax": { url: "<%= ControladorGestionFicheros.URL_PATTERN_AJAX %>" },
 		    "pageSize": 10,
 		    "columns": [
-		        {'data': 'nombre', 'class': 'overflow-auto'},
-		        {'data': 'titulo', 'class': 'overflow-auto'},
+		        {'data': 'nombre', 'render': function(row) {
+		    		return "<div class='overflow-auto'>" +row.nombre +"</div>";
+		    	}},
+		        {'data': 'titulo', 'render': function(row) {
+		    		return "<div class='overflow-auto'>" +row.titulo +"</div>";
+		    	}},
 		        {'data': 'codnum', 'class': 'overflow-ellipsis', 'render': function(row) {
 		        	var link = "<%= request.getRequestURI() %>?a=<%= ControladorGestionFicheros.ACCION_DESCARGAR_FICHERO %>&<%= ControladorGestionFicheros.PARAM_ID %>=" + row.codNum;
 		        	return "<a class='consultar-fichero' href='" +link +"' target='_blank'>" +link +"</a>"; 
