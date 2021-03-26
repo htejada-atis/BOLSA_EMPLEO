@@ -169,6 +169,10 @@
 	</target>
 	
 	<target name="test" depends="compile">
+		<copy todir="${build.test}">
+			<fileset dir="${webdir}/WEB-INF/classes"
+		    	includes="**/*.properties" />
+		</copy>		
 	    <jacoco:coverage destfile="${result.exec.file}" xmlns:jacoco="antlib:org.jacoco.ant" exclclassloader="sun.reflect.DelegatingClassLoader:javassist.Loader" >
 	        <junit haltonfailure="no" fork="true" forkmode="once" printsummary="on" showoutput="true" logfailedtests="true">
 	        	<sysproperty key="dbUrl" value="${dbUrl}"/>
