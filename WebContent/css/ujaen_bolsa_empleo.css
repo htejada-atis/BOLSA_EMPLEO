@@ -219,13 +219,13 @@ nav-bolsa-empleo a:active, nav-bolsa-empleo a:hover {
 	width: unset !important;
 }
 
-.form-group, .form-check, .form-btn, .form-file {
+.form-group, .form-check, .form-btn, .form-file, .form-select {
 	display: inline-block;
 	width: 100% !important;
 	margin-bottom: 1rem;
 }
 
-.form-group label, .form-check label, .form-file label {
+.form-group label, .form-check label, .form-file label, .form-select label {
 	display: inline-block;
 	font-size: .9rem;
 }
@@ -244,12 +244,12 @@ nav-bolsa-empleo a:active, nav-bolsa-empleo a:hover {
 	vertical-align: middle;
 }
 
-.form-file {
+.form-file, .form-select {
 	display: flex;
 	align-items: center;
 }
 
-.form-file label {
+.form-file label, .form-select {
 	font-size: 15px;
 }
 

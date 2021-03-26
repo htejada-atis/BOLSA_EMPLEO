@@ -88,6 +88,23 @@ function alertDialog(title, message) {
 	});
 }
 
+function confirmDialog(title, message, buttons) {
+	$('<div></div>').appendTo('body')
+	    	.html('<div><h6>' + message + '</h6></div>')
+	    	.dialog({
+		      modal: true,
+		      title: title,
+		      zIndex: 10000,
+		      autoOpen: true,
+		      width: 'auto',
+		      resizable: false,
+		      buttons: buttons,
+		      close: function(event, ui) {
+		        $(this).remove();
+		      }
+		});
+}
+
 function object2Json(object) { 
 	return JSON.stringify(object);
 }
@@ -100,6 +117,7 @@ window.Atis = {
 	"getProp": getProp,
 	"setProp": setProp,
 	"alertDialog": alertDialog,
+	"confirmDialog": confirmDialog,
 	"getErrorResponse": getErrorResponse,
 	"isFunction": isFunction,
 	"formatearFecha": formatearFecha,

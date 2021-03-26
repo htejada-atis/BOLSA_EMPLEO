@@ -80,7 +80,7 @@ public class DataTable<T> {
 			this.pageSize = Integer.parseInt(String.join("", params.getOrDefault(PARAM_PAGE_SIZE, new String[] {PARAM_PAGE_SIZE_VALUE_DEFAULT})));
 			
 			String paramOrderBy = String.join("", params.getOrDefault(PARAM_ORDER_BY, new String[] {""}));
-			if (!paramOrderBy.isBlank()) {
+			if (!paramOrderBy.isBlank() && paramOrderBy != null) {
 				this.orderBy = Integer.parseInt(paramOrderBy);
 			}
 			
@@ -90,7 +90,7 @@ public class DataTable<T> {
 			throw new UVException(ERROR_MSG_PARAMETRO_NO_VALIDO);
 		}
 				
-		if (!this.orderDirection.isBlank()) {
+		if (!this.orderDirection.isBlank() && this.orderDirection != null) {
 			if (!this.orderDirection.equals(PARAM_ORDER_DIRECTION_VALUE_ASC) && !this.orderDirection.equals(PARAM_ORDER_DIRECTION_VALUE_DESC)) {
 				throw new UVException(ERROR_MSG_PARAMETRO_TIPO_ORDENACION_NO_VALIDO);
 			}

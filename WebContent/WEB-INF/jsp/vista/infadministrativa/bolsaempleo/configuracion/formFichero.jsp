@@ -22,7 +22,7 @@ VistaFicheros bean = (VistaFicheros) uvdatos.getVistas().get(VistaFicheros.class
 	
 	<h2>Nuevo documento</h2>
     
-    <form id="actualizar_noticia" class="be-form" method="post" action="<%= request.getRequestURI() %>" enctype="multipart/form-data">
+    <form id="subir_fichero" class="be-form" method="post" action="<%= request.getRequestURI() %>" enctype="multipart/form-data">
     	<input type="hidden" name="<%= ControladorGestionFicheros.PARAM_ACCION %>" id="accion_formulario" value="" />
     	<div class="form-group">
     		<label for="fichero_titulo">Título</label>

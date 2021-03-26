@@ -36,6 +36,14 @@ public class Area implements Serializable {
 		this.descripcion = pdescripcion;
 	}
 	
+	/** Constructor con parametros.
+	 * @param pCodNum .
+	 */
+	public Area(Integer pCodNum) {
+		super();
+		this.codNum = pCodNum;
+	}
+	
 	/** Constructor copia.
 	 * @param copia AreaConocimiento a copiar
 	 */

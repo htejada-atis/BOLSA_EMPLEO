@@ -76,7 +76,7 @@ VistaFicheros bean = (VistaFicheros) uvdatos.getVistas().get(VistaFicheros.class
 	$(document).ready(function() {
 		
 		var table = new DataTable('#table_ficheros', {
-		    "ajax": { url: "<%= request.getRequestURI() %>" },
+		    "ajax": { url: "<%= ControladorGestionFicheros.URL_PATTERN_AJAX %>" },
 		    "pageSize": 10,
 		    "columns": [
 		        {'data': 'nombre', 'render': function(row) {
