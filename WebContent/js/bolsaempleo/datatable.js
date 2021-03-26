@@ -24,8 +24,8 @@ function DataTable(id, config) {
 
     this.refresh = function() {
     	self.loading(true);
-    	
     	$.ajax({
+            async: Atis.getProp(self.config.ajax, 'async', true),
 	        type: Atis.getProp(self.config.ajax, 'method', 'GET'),
 	        url: self.config.ajax.url,
 	        contentType: "application/json",
@@ -34,6 +34,10 @@ function DataTable(id, config) {
 	        success: self.parseResponse.bind(self),
             error: self.errorResponse.bind(self)
 	    });	      
+    };
+    
+    this.setParam = function(key, value) {
+    	self.params[key] = value;
     };
         
     this.loading = function(on) {
@@ -179,6 +183,12 @@ function DataTable(id, config) {
     		var check = $('<input type="checkbox"/>')
     		$(check).on('change', function() { self.checkUncheckAll(this.checked); });
     		$('th', self.thead).first().append(check);
+    	}
+    	
+    	if(self.config.params) {
+    		for(var param in self.config.params) {
+    			this.setParam(param, self.config.params[param]);
+    		}
     	}
 
         self.config.columns.forEach(function(columnDef, index) {

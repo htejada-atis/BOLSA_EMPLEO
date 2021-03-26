@@ -30,25 +30,25 @@ import es.ujaen.uvirtual.utilidades.Formateador;
 import es.ujaen.uvirtual.utilidades.UVException;
 
 
-/** Clase controlador para obtener, cambiar, eliminar y agregar noticias.
- * Controlador - Opers. con nombres: obtener,  cambiar,    eliminar, agregar
+/** Clase controlador para obtener, eliminar y agregar ficheros.
+ * Controlador - Opers. con nombres: obtener, eliminar, agregar
  * */
 @WebServlet(
 		name = "informacionadministrativa.bolsaempleo.configuracion.ficheros", 
-		description = "Gestión de noticias", 
+		description = "Gestión de ficheros", 
 		urlPatterns = { 
 				"/srv/es/informacionadministrativa/bolsaempleo/configuracion/ficheros", 
-				"/srv/en/informacionadministrativa/bolsaempleo/configuracion/ficheros"
+				"/srv/en/informacionadministrativa/bolsaempleo/configuracion/ficheros",
+				"/srv/es/ajax/informacionadministrativa/bolsaempleo/configuracion/ficheros",
+				"/srv/en/ajax/informacionadministrativa/bolsaempleo/configuracion/ficheros"
 		})
 @MultipartConfig
 public class ControladorGestionFicheros extends HttpServlet {
 	private static final long serialVersionUID = 1L;
 	private static final String NOMBREDEESTACLASE = ControladorGestionFicheros.class.getName();
 	private static final Logger LOGGER = Logger.getLogger(NOMBREDEESTACLASE);
-	public static final String URL_PATTERN = "/srv/es/informacionadministrativa/bolsaempleo/configuracion/ficheros";
 	
 	// Acciones
-	
 	public static final String ACCION_SUBIR_FICHERO = "subirfichero";
 	public static final String ACCION_BORRAR_FICHERO = "borrarfichero";
 	public static final String ACCION_DATATABLE = "datatable";
@@ -69,6 +69,10 @@ public class ControladorGestionFicheros extends HttpServlet {
 	
 	// ruta vistas
 	public static final String RUTA_BEP_CONF = "/WEB-INF/jsp/vista/infadministrativa/bolsaempleo/configuracion/";
+	
+	// urls
+	public static final String URL_PATTERN_FILES = "/srv/es/informacionadministrativa/bolsaempleo/configuracion/ficheros";
+	public static final String URL_PATTERN_AJAX = "/srv/es/ajax/informacionadministrativa/bolsaempleo/configuracion/ficheros";
 
 	public static final int RESPONSE_HTTP_CODE_ERROR = 400;
 	
@@ -117,7 +121,6 @@ public class ControladorGestionFicheros extends HttpServlet {
 			datos.getFicherosJSP().add(bean.getVista());
 			datos.getFicherosJS().add("/js/jquery-1.latest.min.js");
 			datos.getFicherosJS().add("/js/jquery-ui-1.10.4.min.js");
-			datos.getFicherosJS().add("/js/jquery.ui.datepicker-es.js");
 			datos.getFicherosJS().add("/js/bolsaempleo/utils.js");
 			datos.getFicherosJS().add("/js/bolsaempleo/datatable.js");
 			datos.getFicherosCSS().add("/css/intranet.css");

@@ -26,19 +26,22 @@ import es.ujaen.uvirtual.utilidades.UVException;
 
 
 /** Clase controlador para obtener, cambiar, eliminar y agregar noticias.
- * Controlador - Opers. con nombres: obtener,  cambiar,    eliminar, agregar
+ * Controlador - Opers. con nombres: obtener,  cambiar, eliminar, agregar
  * */
 @WebServlet(
 		name = "informacionadministrativa.bolsaempleo.noticias", 
 		description = "Gestión de noticias", 
 		urlPatterns = { 
 				"/srv/es/informacionadministrativa/bolsaempleo/noticias", 
-				"/srv/en/informacionadministrativa/bolsaempleo/noticias"
+				"/srv/en/informacionadministrativa/bolsaempleo/noticias",
+				"/srv/es/ajax/informacionadministrativa/bolsaempleo/noticias",
+				"/srv/en/ajax/informacionadministrativa/bolsaempleo/noticias"
 		})
 public class ControladorGestionNoticias extends HttpServlet {
 	private static final long serialVersionUID = 1L;
 	private static final String NOMBREDEESTACLASE = ControladorGestionNoticias.class.getName();
 	private static final Logger LOGGER = Logger.getLogger(NOMBREDEESTACLASE);
+	
 	
 	// Acciones
 	public static final String ACCION_AGREGAR_NOTICIA = "agregarnoticia";
@@ -63,10 +66,13 @@ public class ControladorGestionNoticias extends HttpServlet {
 	public static final String MENSAJE_EXITO_EDITAR = "noticia editada correctamente";
 	public static final String MENSAJE_EXITO_ELIMINAR = "noticia eliminada correctamente";
 	
+	public static final int RESPONSE_HTTP_CODE_ERROR = 400;
+	
 	// ruta vistas
 	public static final String RUTA_BEP_NOTICIAS = "/WEB-INF/jsp/vista/infadministrativa/bolsaempleo/gestionnoticias/";
 	
-	public static final int RESPONSE_HTTP_CODE_ERROR = 400;
+	// urls
+	public static final String URL_PATTERN_AJAX = "/srv/es/ajax/informacionadministrativa/bolsaempleo/noticias";
 
 	/** Peticion GET.
 	 * @see HttpServlet#doGet(HttpServletRequest request, HttpServletResponse response)
@@ -90,7 +96,7 @@ public class ControladorGestionNoticias extends HttpServlet {
 					agregarNoticia(request, response, bean);
 					break;
 				case ACCION_DATATABLE:
-					listadoNoticias(datos, request, response, bean);
+					listadoNoticias(datos, request, response);
 					return;
 				case ACCION_EDITAR_NOTICIA:
 					editarNoticia(request, response, bean);
@@ -200,11 +206,10 @@ public class ControladorGestionNoticias extends HttpServlet {
 	 * @param datos .
 	 * @param request .
 	 * @param response .
-	 * @param bean .
 	 * @throws IOException en caso de error de IO .
 	 * @throws SQLException excepcion de bbdd.
 	 */
-	private void listadoNoticias(UVDatos datos, HttpServletRequest request, HttpServletResponse response, VistaNoticias bean) throws IOException, SQLException {
+	private void listadoNoticias(UVDatos datos, HttpServletRequest request, HttpServletResponse response) throws IOException, SQLException {
 		ModeloNoticia modelo = new ModeloNoticia();
 		
 		datos.setContentType("application/json");
@@ -216,9 +221,7 @@ public class ControladorGestionNoticias extends HttpServlet {
 				DataTable<Noticia> dataTable = modelo.listaNoticiasDatatable(request.getParameterMap());
 				Gson gson = new GsonBuilder().setDateFormat("dd/M/yyyy").setExclusionStrategies(DataTable.GSONEXCLUSIONSTRATEGY).create();
 				writer.write(gson.toJson(dataTable));
-			} catch (Exception ex) {
-				bean.getMensajesDeError().add(ex.getMessage());
-				
+			} catch (UVException ex) {
 				CodigoDescripcion mensaje = new CodigoDescripcion("error", ex.getMessage());
 				writer.write(new Gson().toJson(mensaje));
 				response.setStatus(RESPONSE_HTTP_CODE_ERROR);
