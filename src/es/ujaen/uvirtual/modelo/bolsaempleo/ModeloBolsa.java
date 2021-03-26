@@ -255,7 +255,7 @@ public class ModeloBolsa {
 			int indexParam = 1;
 			stmt.setString(indexParam++, estado);
 			for (Bolsa bolsa : bolsas) {
-				stmt.setInt(indexParam++, bolsa.getCodNum()); 				
+				stmt.setInt(indexParam++, bolsa.getCodNum());
 			}
 			stmt.executeUpdate();
 		}

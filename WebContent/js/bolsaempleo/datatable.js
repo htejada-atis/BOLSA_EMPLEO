@@ -26,7 +26,7 @@ function DataTable(id, config) {
     	self.loading(true);
     	
     	$.ajax({
-	        type: "GET",
+	        type: Atis.getProp(self.config.ajax, 'method', 'GET'),
 	        url: self.config.ajax.url,
 	        contentType: "application/json",
 	        dataType: "json",

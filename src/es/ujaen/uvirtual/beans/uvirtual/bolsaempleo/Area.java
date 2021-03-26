@@ -98,7 +98,6 @@ public class Area implements Serializable {
 	public int hashCode() {
 		final int prime = 31;
 		int result = 1;
-		result = prime * result + ((codNum == null) ? 0 : codNum.hashCode());
 		result = prime * result + ((departamento == null) ? 0 : departamento.hashCode());		
 		result = prime * result + ((idAreaExterno == null) ? 0 : idAreaExterno.hashCode());
 		result = prime * result + ((idSeccion == null) ? 0 : idSeccion.hashCode());
@@ -119,13 +118,6 @@ public class Area implements Serializable {
 			return false;
 		}
 		Area other = (Area) obj;
-		if (codNum == null) {
-			if (other.codNum != null) {
-				return false;
-			}
-		} else if (!codNum.equals(other.codNum)) {
-			return false;
-		}
 		if (departamento == null) {
 			if (other.departamento != null) {
 				return false;

@@ -83,7 +83,7 @@ public class TestControladorBolsas {
 	public void testA03() throws SQLException, ServletException, IOException {
 		VistaEstadoBolsas bean = getVistaBolsasEmpleo(ControladorBolsas.ACCION_DATATABLE);
 		
-		assertNotEquals(0, bean.getDatatableBolsas().getData().size());	
+		assertNotEquals(0, bean.getDatatableBolsas().getData().size());
 		assertEquals(0, bean.getMensajesDeError().size());
 		assertEquals(0, bean.getMensajesDeAdvertencia().size());
 	}

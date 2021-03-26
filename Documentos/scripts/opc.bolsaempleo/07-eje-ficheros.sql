@@ -12,6 +12,8 @@ COMMENT ON COLUMN TBEP_FICHEROS.TITULO IS 'titulo del fichero que aparecerá en 
 --/////////////////////
 COMMENT ON COLUMN TBEP_FICHEROS.ARCHIVO IS 'archivo blob que se almacena en la bd';
 --/////////////////////
+COMMENT ON TABLE TBEP_FICHEROS IS 'Ficheros. ALIAS: [bepfic] ACRONIMO: [FIC]';
+--/////////////////////
 CREATE TABLE UVIRTUAL.TBEP_HTO_FICHEROS (
  	CODCAMBIO NUMBER(11,0) NOT NULL,
  	LOG VARCHAR(50) NOT NULL,
