@@ -12,8 +12,7 @@ public class Titulacion implements Serializable {
 	private static final long serialVersionUID = 1L;
 	private Integer codNum;
 	private String nombre;
-	private Boolean requerida;
-	
+
 	
 	/** Constructor por defecto.
 	 */
@@ -32,15 +31,19 @@ public class Titulacion implements Serializable {
 	}
 	
 	/** Constructor con parametros.
-	 * @param pcodNum .
 	 * @param pnombre .
-	 * @param prequerida .
 	 */
-	public Titulacion(Integer pcodNum, String pnombre, Boolean prequerida) {
+	public Titulacion(String pnombre) {
+		super();
+		this.nombre = pnombre;
+	}
+	
+	/** Constructor con parametros.
+	 * @param pcodNum .
+	 */
+	public Titulacion(Integer pcodNum) {
 		super();
 		this.codNum = pcodNum;
-		this.nombre = pnombre;
-		this.requerida = prequerida;
 	}
 	
 	public Integer getCodNum() {
@@ -58,14 +61,6 @@ public class Titulacion implements Serializable {
 	public void setNombre(String nombre) {
 		this.nombre = nombre;
 	}
-	
-	public Boolean isRequerida() {
-		return requerida;
-	}
-	
-	public void setRequerida(Boolean requerida) {
-		this.requerida = requerida;
-	}
 
 	public static long getSerialversionuid() {
 		return serialVersionUID;
@@ -73,7 +68,7 @@ public class Titulacion implements Serializable {
 	
 	@Override
 	public String toString() {
-		return "Titulación [codNum=" + codNum + ", nombre=" + nombre + ", requerida=" + requerida + "]";
+		return "Titulación [codNum=" + codNum + ", nombre=" + nombre + "]";
 	}
 	
 	@Override
@@ -82,7 +77,6 @@ public class Titulacion implements Serializable {
 		int result = 1;
 		result = prime * result + ((nombre == null) ? 0 : nombre.hashCode());
 		result = prime * result + ((codNum == null) ? 0 : codNum.hashCode());
-		result = prime * result + ((requerida == null) ? 0 : requerida.hashCode());
 		return result;
 	}
 	
@@ -111,13 +105,6 @@ public class Titulacion implements Serializable {
 				return false;
 			}
 		} else if (!nombre.equals(other.nombre)) {
-			return false;
-		}
-		if (requerida == null) {
-			if (other.requerida != null) {
-				return false;
-			}
-		} else if (!requerida.equals(other.requerida)) {
 			return false;
 		}
 		

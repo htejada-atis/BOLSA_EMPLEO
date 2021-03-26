@@ -3,6 +3,7 @@ package es.ujaen.uvirtual.controlador.infadministrativa.bolsaempleo;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.sql.SQLException;
+import java.sql.SQLIntegrityConstraintViolationException;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -12,8 +13,10 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
+
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+import com.google.gson.reflect.TypeToken;
 import es.ujaen.uvirtual.beans.CodigoDescripcion;
 import es.ujaen.uvirtual.beans.UVDatos;
 import es.ujaen.uvirtual.beans.uvirtual.bolsaempleo.Area;
@@ -27,26 +30,24 @@ import es.ujaen.uvirtual.utilidades.Formateador;
 import es.ujaen.uvirtual.utilidades.UVException;
 
 
-/** Clase controlador para obtener, cambiar, eliminar y agregar titulaciones .
- * Controlador - Opers. con nombres: obtener, cambiar, eliminar, agregar .
+/** Clase controlador para obtener, incluir y eliminar titulaciones preferentes por área .
+ * Controlador - Opers. con nombres: obtener, incluir, eliminar .
  * */
 @WebServlet(
 		name = "informacionadministrativa.bolsaempleo.configuracion.titulacionesarea", 
-		description = "Gestión de titulaciones por área", 
+		description = "Gestión de titulaciones preferentes por área", 
 		urlPatterns = { 
 				"/srv/es/informacionadministrativa/bolsaempleo/configuracion/titulacionesarea", 
 				"/srv/en/informacionadministrativa/bolsaempleo/configuracion/titulacionesarea",
 				"/srv/es/ajax/informacionadministrativa/bolsaempleo/configuracion/titulacionesarea",
 				"/srv/en/ajax/informacionadministrativa/bolsaempleo/configuracion/titulacionesarea"
 		})
-public class ControladorGestionTitulacionesArea extends HttpServlet {
+public class ControladorGestionTitulacionesPreferentesArea extends HttpServlet {
 	private static final long serialVersionUID = 1L;
-	private static final String NOMBREDEESTACLASE = ControladorGestionTitulacionesArea.class.getName();
+	private static final String NOMBREDEESTACLASE = ControladorGestionTitulacionesPreferentesArea.class.getName();
 	private static final Logger LOGGER = Logger.getLogger(NOMBREDEESTACLASE);
 	
 	// Acciones
-	public static final String ACCION_AGREGAR_TITULACION = "agregartitulacion";
-	public static final String ACCION_BORRAR_TITULACION = "borrartitulacion";
 	public static final String ACCION_DATATABLE_TITULACIONES = "datatabletitulaciones";
 	public static final String ACCION_DATATABLE_TITULACIONES_AREA = "datatabletitulacionesarea";
 	public static final String ACCION_ELIMINAR_TITULACION_AREA = "eliminartitulacionarea";
@@ -55,16 +56,16 @@ public class ControladorGestionTitulacionesArea extends HttpServlet {
 	
 	// Parámetros
 	public static final String PARAM_ACCION = "a";
+	public static final String PARAM_AREA = "area";
 	public static final String PARAM_ENVIAR = "enviar";
 	public static final String PARAM_ID = "id";
 	public static final String PARAM_NOMBRE = "nombre";
-	public static final String PARAM_AREA = "area";
+	public static final String PARAM_TITULACIONES = "titulaciones";
 	
 	// Mensajes
 	public static final String MENSAJE_ENVIADO = "mensaje";
-	public static final String MENSAJE_EXITO_AGREGAR = "titulación agregada correctamente";
-	public static final String MENSAJE_EXITO_ELIMINAR = "titulación eliminada correctamente";
 	
+	// Respuesta error
 	public static final int RESPONSE_HTTP_CODE_ERROR = 400;
 	
 	// ruta vistas
@@ -83,7 +84,7 @@ public class ControladorGestionTitulacionesArea extends HttpServlet {
 		datos.setContentType("text/html");
 		
 		VistaTitulacionesArea bean = new VistaTitulacionesArea();
-		bean.setVista(RUTA_BEP_CONF + "titulacionesarea.jsp");
+		bean.setVista(RUTA_BEP_CONF + "titulacionespreferentesarea.jsp");
 		
 		String nombreAccion = EscapaHTML.ajustaCodificacion(request.getParameter(PARAM_ACCION));
 		if (nombreAccion == null) {
@@ -92,14 +93,11 @@ public class ControladorGestionTitulacionesArea extends HttpServlet {
 		
 		try {
 			switch (nombreAccion) {
-			case ACCION_AGREGAR_TITULACION:
-				agregarTitulacion(request, response, bean);
-				break;
 			case ACCION_ELIMINAR_TITULACION_AREA:
-				eliminarTitulacionesArea(request, response);
+				eliminarTitulacionesArea(request, response, bean);
 				break;
 			case ACCION_INCLUIR_TITULACION_AREA:
-				incluirTitulacionesArea(request, response);
+				incluirTitulacionesPreferentesArea(request, response, bean);
 				break;
 			case ACCION_LISTAR_TITULACIONES:
 				obtenerAreas(bean);
@@ -112,10 +110,8 @@ public class ControladorGestionTitulacionesArea extends HttpServlet {
 				break;
 			}
 		} catch (SQLException e) {
-			bean.getMensajesDeError().add("Error al acceder a la base de datos");
-		} catch (UVException e) {
 			LOGGER.log(Level.WARNING, e.toString());
-			bean.getMensajesDeError().add(e.toString());
+			bean.getMensajesDeError().add("Error al acceder a la base de datos");
 		} finally {
 			datos.getVistas().put(bean.getClass().getName(), bean);
 			datos.getFicherosJSP().add(bean.getVista());
@@ -137,42 +133,41 @@ public class ControladorGestionTitulacionesArea extends HttpServlet {
 		doGet(request, response);
 	}
 	
-	/** agrega una nueva titulación .
-	 * @param request .
-	 * @param response .
-	 * @param bean bean de la vista a la que poner los valores.
-	 * @throws SQLException excepcion de bbdd.
-	 * @throws UVException en caso de error en bd
-	 */
-	private void agregarTitulacion(HttpServletRequest request, HttpServletResponse response, VistaTitulacionesArea bean) throws SQLException, UVException, IOException {
-		bean.setVista(RUTA_BEP_CONF + "formTitulacion.jsp");
-		
-		if (EscapaHTML.ajustaCodificacion(request.getParameter(PARAM_NOMBRE)) != null) {
-			ModeloTitulacion modelo = new ModeloTitulacion();
-			String nombre = EscapaHTML.ajustaCodificacion(request.getParameter(PARAM_NOMBRE));
-			
-			HttpSession session = request.getSession(false);
-			session.setAttribute(MENSAJE_ENVIADO, MENSAJE_EXITO_AGREGAR);
-			response.sendRedirect(request.getServletPath());
-		}
-	}
-	
 	/** elimina una lista de titulaciones afines a un área .
 	 * @param request .
 	 * @param response .
-	 * @throws SQLException excepcion de bbdd.
+	 * @param bean .
+	 * @throws IOException en caso de error de IO .
 	 */
-	private void eliminarTitulacionesArea(HttpServletRequest request, HttpServletResponse response) throws SQLException {
-		
+	private void eliminarTitulacionesArea(HttpServletRequest request, HttpServletResponse response, VistaTitulacionesArea bean) throws SQLException, IOException {
+		int area = Formateador.leeParametroInteger(request.getParameter(PARAM_AREA));
+		Gson gson = new GsonBuilder().create();
+		List<String> titulaciones = gson.fromJson(request.getParameter(PARAM_TITULACIONES), new TypeToken<List<String>>() { }.getType());
+		new ModeloTitulacion().eliminarTitulacionesPreferentesArea(titulaciones, area);
+		bean.setAreas(new ModeloArea().listaAreas());
+		bean.setArea(new Area(area));
 	}
 	
 	/** incluye una lista de titulaciones en las afines a un área .
 	 * @param request .
 	 * @param response .
-	 * @throws SQLException excepcion de bbdd.
+	 * @param bean .
+	 * @throws IOException en caso de error de IO .
 	 */
-	private void incluirTitulacionesArea(HttpServletRequest request, HttpServletResponse response) throws SQLException {
-		
+	private void incluirTitulacionesPreferentesArea(HttpServletRequest request, HttpServletResponse response, VistaTitulacionesArea bean) throws SQLException, IOException {
+		try {
+			int area = Formateador.leeParametroInteger(request.getParameter(PARAM_AREA));
+			Gson gson = new GsonBuilder().create();
+			List<String> titulaciones = gson.fromJson(request.getParameter(PARAM_TITULACIONES), new TypeToken<List<String>>() { }.getType());
+			new ModeloTitulacion().incluirTitulacionesPreferentesArea(titulaciones, area);
+			bean.setAreas(new ModeloArea().listaAreas());
+			bean.setArea(new Area(area));
+		} catch (SQLIntegrityConstraintViolationException ex) {
+			LOGGER.log(Level.WARNING, ex.toString());
+			HttpSession session = request.getSession(false);
+			session.setAttribute(MENSAJE_ENVIADO, ex.toString());
+			response.sendRedirect(request.getServletPath());
+		}
 	}
 	
 	/** muestra todas las areas en un select .

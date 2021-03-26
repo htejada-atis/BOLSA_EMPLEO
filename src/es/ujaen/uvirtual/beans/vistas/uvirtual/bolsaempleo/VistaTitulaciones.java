@@ -3,27 +3,18 @@ package es.ujaen.uvirtual.beans.vistas.uvirtual.bolsaempleo;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
-import es.ujaen.uvirtual.beans.uvirtual.bolsaempleo.Area;
 import es.ujaen.uvirtual.beans.uvirtual.bolsaempleo.Titulacion;
 import es.ujaen.uvirtual.beans.vistas.Vista;
 
 /** Bean para la vista.
  * @author jlopez
  */
-public class VistaTitulacionesArea extends Vista implements Serializable {
+public class VistaTitulaciones extends Vista implements Serializable {
 	private static final long serialVersionUID = 1L;
-	private List<Area> areas = new ArrayList<>();
 	private List<Titulacion> titulaciones = new ArrayList<>();
-	private Area area;
+	private Titulacion titulacion;
 	private String vista;
 	
-	public List<Area> getAreas() {
-		return areas;
-	}
-	
-	public void setAreas(List<Area> areas) {
-		this.areas = areas;
-	}
 	
 	public List<Titulacion> getTitulaciones() {
 		return titulaciones;
@@ -33,12 +24,12 @@ public class VistaTitulacionesArea extends Vista implements Serializable {
 		this.titulaciones = titulaciones;
 	}
 	
-	public Area getArea() {
-		return area;
+	public Titulacion getTitulacion() {
+		return titulacion;
 	}
 	
-	public void setArea(Area area) {
-		this.area = area;
+	public void setTitulacion(Titulacion titulacion) {
+		this.titulacion = titulacion;
 	}
 	
 	public String getVista() {

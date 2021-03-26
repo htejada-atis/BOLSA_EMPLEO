@@ -19,18 +19,25 @@ VistaInicio bean = (VistaInicio)uvdatos.getVistas().get(VistaInicio.class.getNam
     
     <div class="lista-bolsa-empleo">
     	<ul>
-    		<% for(Fichero fichero: bean.getFicheros()) { 
-    			String link = ControladorGestionFicheros.URL_PATTERN_FILES + "?a=" + ControladorGestionFicheros.ACCION_DESCARGAR_FICHERO + "&" + ControladorGestionFicheros.PARAM_ID + "=" + fichero.getCodNum();
-    			String titulo = "";
-    			
-    			if(fichero.getTitulo() != null) {
-    				titulo = fichero.getTitulo();
-    			} else {
-    				titulo = link;
-    			}
+    		<% 
+    			if(bean.getFicheros().size() > 0) {
+    				for(Fichero fichero: bean.getFicheros()) { 
+    	    			String link = ControladorGestionFicheros.URL_PATTERN_FILES + "?a=" + ControladorGestionFicheros.ACCION_DESCARGAR_FICHERO + "&" + ControladorGestionFicheros.PARAM_ID + "=" + fichero.getCodNum();
+    	    			String titulo = "";
+    	    			
+    	    			if(fichero.getTitulo() != null) {
+    	    				titulo = fichero.getTitulo();
+    	    			} else {
+    	    				titulo = link;
+    	    			}
+        		%>
+    				<li><a href="<%= link %>" target="_blank"><%= titulo %></a></li>
+    			<% }
+    			} else { %>
+    				<p>No hay documentos disponibles.</p>
+    		 <% }
     		%>
-				<li><a href="<%= link %>" target="_blank"><%= titulo %></a></li>
-			<% } %>
+    			
     	</ul>
     </div>
 	

@@ -57,16 +57,15 @@ VistaInicio bean = (VistaInicio)uvdatos.getVistas().get(VistaInicio.class.getNam
 		function obtenerRestoDeNoticias() {
 			ids_noticias = []
 			comprobarNoticiasCargadas();
-			var params = {'a':'listar_todas_noticias', 'ids_noticias': JSON.stringify(ids_noticias)}
+			var params = {'a':'listar_todas_noticias', <%= ControladorInicio.PARAM_NOTICIAS %>: JSON.stringify(ids_noticias)}
 			
 			$.ajax({
 		        type: "GET",
-		        url: "<%= request.getRequestURI() %>",
+		        url: "<%= ControladorInicio.URL_PATTERN_AJAX %>",
 		        contentType: "application/json",
 		        dataType: "json",
 		        data: params,
 		        success: function(response) {
-		        	console.log(response);
 		        	response.forEach((noticia) => {
 		            	var element = $(".noticias-bolsa-empleo li").first().clone();
 		            	element.attr("id", "id_"+noticia.idNoticia);
@@ -104,9 +103,7 @@ VistaInicio bean = (VistaInicio)uvdatos.getVistas().get(VistaInicio.class.getNam
 		
 		comprobarNoticiasCargadas();
 		
-		console.log(ids_noticias.length);
 		if(!ids_noticias.length > 3) {
-			console.log("entra");
 			$("#view_all").hide();
 		}
 		

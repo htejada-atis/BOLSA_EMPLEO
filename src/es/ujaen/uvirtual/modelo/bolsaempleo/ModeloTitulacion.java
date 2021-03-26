@@ -4,11 +4,13 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.SQLIntegrityConstraintViolationException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import es.ujaen.uvirtual.beans.uvirtual.bolsaempleo.Titulacion;
 import es.ujaen.uvirtual.modelo.conexion.ConexionUvirtual;
+import es.ujaen.uvirtual.utilidades.BolsaEmpleoUtils;
 import es.ujaen.uvirtual.utilidades.DataTable;
 import es.ujaen.uvirtual.utilidades.UVException;
 
@@ -21,8 +23,197 @@ public class ModeloTitulacion {
 	public static final int ORDER_COLUMN_INDEX_NOMBRE = 2;
 	public static final int ORDER_COLUMN_INDEX_REQUERIDA = 3;
 	
+	
+	/** Consulta titulaciones en BBDD y las devuelve.
+	 * @param clausula para filtrar las titulaciones de la bd
+	 * @return todas las titulaciones de la base de datos
+	 * @throws SQLException en caso de error de base de datos
+	 */
+	private List<Titulacion> listaTitulaciones(String clausula) throws SQLException {
+		List<Titulacion> titulaciones = new ArrayList<>();
+		String consulta = "SELECT beptit.* FROM tbep_titulaciones beptit " + clausula;
+		
+		try (Connection conexion = ConexionUvirtual.obtenerInstancia();
+			PreparedStatement stmt = conexion.prepareStatement(consulta);) {
+				try (ResultSet rs = stmt.executeQuery()) {
+					while (rs.next()) {
+						try {
+							Titulacion tit = new Titulacion();
+							tit.setCodNum(rs.getInt("CODNUM"));
+							tit.setNombre(rs.getString("NOMBRE"));
+							titulaciones.add(tit);
+						} catch (Exception e) {
+							e.printStackTrace();
+						}
+						
+					}
+				}
+			}
+		return titulaciones;
+	}
+	
+	/** obtiene una titulación a partir de su id.
+	 * @param id codigo de la titulación
+	 * @return titulación con el id especificado
+	 * @throws SQLException en caso de error en la BD
+	 */
+	public Titulacion listaTitulacion(int id) throws SQLException, UVException {
+		String clausulaWhere = "WHERE codnum = " + id;
+		List<Titulacion> titulaciones = listaTitulaciones(clausulaWhere);
+		if (titulaciones.isEmpty()) {
+			throw new UVException("No existe titulación");
+		}
+		return titulaciones.get(0);
+	}
+	
+	/** Actualiza una titulación.
+	 * @param titulacion Titulación con los datos nuevos a actualizar
+	 * @throws SQLException en caso de error en la BD
+	 * @throws UVException en caso de errores de validacion
+	 */
+	public void actualizaTitulacion(Titulacion titulacion) throws SQLException, UVException {
+		if (titulacion == null) {
+			throw new UVException("titulación obligatoria");
+		}
+		if (titulacion.getCodNum() == null) {
+			throw new UVException("id titulación no válido");
+		}
+		if (titulacion.getNombre() == null) {
+			throw new UVException("nombre obligatorio");
+		}
+		
+		String consulta = "UPDATE tbep_titulaciones "
+						+ "   SET nombre=?"
+						+ " WHERE codnum=?";
+		try (Connection conexion = ConexionUvirtual.obtenerInstancia(); PreparedStatement stmt = conexion.prepareStatement(consulta);) {
+			int parameterIndex = 1;
+			stmt.setString(parameterIndex++, titulacion.getNombre());
+			stmt.setInt(parameterIndex++, titulacion.getCodNum());
+			stmt.executeUpdate();
+		}
+	}
+	
+	/** Elimina una titulación .
+	 * @param titulacion a borrar
+	 * @throws SQLException en caso de error en la BD
+	 * @throws UVException si titulación no es valida
+	 */
+	public void borraTitulacion(Titulacion titulacion) throws SQLException, UVException {
+		if (titulacion == null) {
+			throw new UVException("No se puede eliminar una titulación vacía");
+		}
+		if (titulacion.getCodNum() == null) {
+			throw new UVException("No se puede eliminar una titulación con id vacío");
+		}
+		String consulta = "DELETE FROM tbep_titulaciones WHERE codnum = ? ";
+		try (Connection conexion = ConexionUvirtual.obtenerInstancia(); PreparedStatement stmt = conexion.prepareStatement(consulta);) {
+			int parameterIndex = 1;
+			stmt.setInt(parameterIndex++, titulacion.getCodNum());
+			stmt.executeUpdate();
+		}
+	}
+	
+	/**	Función que inserta una titulacion en la BD.
+	 * @param titulacion a insertar en la BD
+	 * @throws SQLException en caso de error en la BD
+	 */
+	public void insertaTitulacion(Titulacion titulacion) throws SQLException, UVException {
+		if (titulacion == null) {
+			throw new UVException("No se puede insertar una titulacion vacia");
+		}
+		if (titulacion.getNombre() == null || titulacion.getNombre().equals("")) {
+			throw new UVException("No se puede insertar una titulación sin nombre");
+		}
+		
+		String consulta = "INSERT INTO tbep_titulaciones " 
+						+ " (NOMBRE) "
+						+ "VALUES (?)";
+		try (Connection conexion = ConexionUvirtual.obtenerInstancia();
+			 PreparedStatement stmt = conexion.prepareStatement(consulta);) {
+			int parameterIndex = 1;
+			stmt.setString(parameterIndex++, titulacion.getNombre());
+			stmt.executeUpdate();
+		}
+	}
+	
+	/**	Función que inserta titulaciones preferentes a un area .
+	 * @param titulaciones a insertar en las titulaciones preferentes por area .
+	 * @param area id del area por el que se va a filtrar
+	 * @throws SQLException en caso de error en la BD
+	 */
+	public void incluirTitulacionesPreferentesArea(List<String> titulaciones, Integer area) throws SQLException, SQLIntegrityConstraintViolationException {
+		String params = BolsaEmpleoUtils.consultaMultiplesParametros(titulaciones.size());
+		String consulta = "INSERT INTO TBEP_TITULACIONESPREFERENTESAREA (BEPARE_CODNUM, BEPTIT_CODNUM)"
+				+ " SELECT bepare.CODNUM AS BEPARE_CODNUM, beptit.CODNUM AS BEPTIT_CODNUM"
+				+ " FROM TBEP_TITULACIONES beptit, TBEP_AREAS bepare WHERE bepare.CODNUM = ? AND "
+				+ " beptit.CODNUM IN (" + params + ")";
+		try (Connection conexion = ConexionUvirtual.obtenerInstancia(); PreparedStatement stmt = conexion.prepareStatement(consulta)) {
+			int indexParam = 1;
+			stmt.setInt(indexParam++, area);
+			for (String titulacion: titulaciones) {
+				stmt.setString(indexParam++, titulacion);		
+			}
+			stmt.executeUpdate();
+		}
+	}
+	
+	/**	Función que elimina titulaciones preferentes a un area .
+	 * @param titulaciones a eliminar en las titulaciones preferentes por area .
+	 * @param area id del area por el que se va a filtrar
+	 * @throws SQLException en caso de error en la BD
+	 */
+	public void eliminarTitulacionesPreferentesArea(List<String> titulaciones, Integer area) throws SQLException {
+		String params = BolsaEmpleoUtils.consultaMultiplesParametros(titulaciones.size());
+		String consulta = "DELETE FROM TBEP_TITULACIONESPREFERENTESAREA WHERE BEPARE_CODNUM = ? AND BEPTIT_CODNUM IN (" + params + ")";
+		try (Connection conexion = ConexionUvirtual.obtenerInstancia(); PreparedStatement stmt = conexion.prepareStatement(consulta)) {
+			int indexParam = 1;
+			stmt.setInt(indexParam++, area);
+			for (String titulacion: titulaciones) {
+				stmt.setString(indexParam++, titulacion);	
+			}
+			stmt.executeUpdate();
+		}
+	}
+	
 	/**
 	 * Listado de titulaciones en una tabla .
+	 * @param params para leer los parametros de paginación, ordenacion, etc
+	 * @return listado de titulaciones
+	 * @throws SQLException en caso de error de base de datos
+	 * @throws UVException error si no existe titulación
+	 */
+	public DataTable<Titulacion> listaTitulacionesDatatable(Map<String, String[]> params) throws SQLException, UVException {
+		List<Titulacion> titulaciones = new ArrayList<>();
+		DataTable<Titulacion> dataTable = new DataTable<Titulacion>(params);
+		
+		String consulta = "SELECT beptit.* FROM tbep_titulaciones beptit WHERE 1=1 ";
+		
+		dataTable.setOrderColumn(ORDER_COLUMN_INDEX_ID, "beptit.CODNUM");
+		dataTable.setOrderColumn(ORDER_COLUMN_INDEX_NOMBRE, "beptit.NOMBRE");
+		dataTable.setQuery(consulta);
+				
+		try (Connection conexion = ConexionUvirtual.obtenerInstancia();
+				PreparedStatement stmtCount = conexion.prepareStatement(dataTable.getQueryCount());
+				PreparedStatement stmt = conexion.prepareStatement(dataTable.getQuery());
+		) {				
+			try (ResultSet rs = stmt.executeQuery()) {
+				while (rs.next()) {
+					Titulacion tit = new Titulacion();
+					tit.setCodNum(rs.getInt("CODNUM"));
+					tit.setNombre(rs.getString("NOMBRE"));
+					titulaciones.add(tit);
+				}
+			}
+			
+			dataTable.setRecordsTotalFromQuery(stmtCount);
+			dataTable.setData(titulaciones);
+		}
+		
+		return dataTable;
+	}
+	
+	/**
+	 * Listado de titulaciones en una tabla excluyendo las de un área .
 	 * @param params para leer los parametros de paginación, ordenacion, etc
 	 * @param area id del area por el que se va a filtrar
 	 * @return listado de titulaciones
@@ -34,8 +225,8 @@ public class ModeloTitulacion {
 		DataTable<Titulacion> dataTable = new DataTable<Titulacion>(params);
 		
 		String consultaNotIn = "SELECT beptit.CODNUM FROM tbep_titulaciones beptit "
-				+ "INNER JOIN tbep_titulacionesarea beptiar ON beptit.codnum = beptiar.beptit_codnum "
-				+ "INNER JOIN TBEP_AREAS bepare ON bepare.codnum = beptiar.bepare_codnum "
+				+ "INNER JOIN tbep_titulacionespreferentesarea beptpa ON beptit.codnum = beptpa.beptit_codnum "
+				+ "INNER JOIN TBEP_AREAS bepare ON bepare.codnum = beptpa.bepare_codnum "
 				+ "WHERE bepare.CODNUM = " + area;
 		String consulta = "SELECT beptit.* FROM tbep_titulaciones beptit WHERE beptit.CODNUM NOT IN (" + consultaNotIn + ")";
 		
@@ -46,7 +237,7 @@ public class ModeloTitulacion {
 		try (Connection conexion = ConexionUvirtual.obtenerInstancia();
 				PreparedStatement stmtCount = conexion.prepareStatement(dataTable.getQueryCount());
 				PreparedStatement stmt = conexion.prepareStatement(dataTable.getQuery());
-		) {					
+		) {
 			try (ResultSet rs = stmt.executeQuery()) {
 				while (rs.next()) {
 					Titulacion tit = new Titulacion();
@@ -75,26 +266,25 @@ public class ModeloTitulacion {
 		List<Titulacion> titulaciones = new ArrayList<>();
 		DataTable<Titulacion> dataTable = new DataTable<Titulacion>(params);
 		
-		String consulta = "SELECT beptit.CODNUM, beptit.NOMBRE beptiar.FLGREQUERIDA, FROM tbep_titulaciones beptit "
-				+ "INNER JOIN tbep_titulacionesarea beptiar ON beptit.codnum = beptiar.beptit_codnum "
-				+ "INNER JOIN TBEP_AREAS bepare ON bepare.codnum = beptiar.bepare_codnum "
+		String consulta = "SELECT beptit.CODNUM, beptit.NOMBRE FROM tbep_titulaciones beptit "
+				+ "INNER JOIN tbep_titulacionespreferentesarea beptpa ON beptit.codnum = beptpa.beptit_codnum "
+				+ "INNER JOIN TBEP_AREAS bepare ON bepare.codnum = beptpa.bepare_codnum "
 				+ "WHERE bepare.CODNUM = " + area;
 		
 		dataTable.setOrderColumn(ORDER_COLUMN_INDEX_ID, "beptit.CODNUM");
 		dataTable.setOrderColumn(ORDER_COLUMN_INDEX_NOMBRE, "beptit.NOMBRE");
-		dataTable.setOrderColumn(ORDER_COLUMN_INDEX_REQUERIDA, "beptiar.FLGREQUERIDA");
+		dataTable.setOrderColumn(ORDER_COLUMN_INDEX_REQUERIDA, "beptpa.FLGREQUERIDA");
 		dataTable.setQuery(consulta);
 				
 		try (Connection conexion = ConexionUvirtual.obtenerInstancia();
 				PreparedStatement stmtCount = conexion.prepareStatement(dataTable.getQueryCount());
 				PreparedStatement stmt = conexion.prepareStatement(dataTable.getQuery());
-		) {					
+		) {
 			try (ResultSet rs = stmt.executeQuery()) {
 				while (rs.next()) {
 					Titulacion tit = new Titulacion();
 					tit.setCodNum(rs.getInt("CODNUM"));
 					tit.setNombre(rs.getString("NOMBRE"));
-					tit.setRequerida(rs.getString("FLGREQUERIDA").equals("S"));
 					titulaciones.add(tit);
 				}
 			}

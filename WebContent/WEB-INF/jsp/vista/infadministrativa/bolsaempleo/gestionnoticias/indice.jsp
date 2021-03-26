@@ -51,34 +51,6 @@ VistaNoticias bean = (VistaNoticias) uvdatos.getVistas().get(VistaNoticias.class
 <script>
 	$(document).ready(function() {
 		
-		function confirmDialog(title, message, id, activa) {
-			$('<div></div>').appendTo('body')
-		    	.html('<div><h6>' + message + '</h6></div>')
-		    	.dialog({
-			      modal: true,
-			      title: title,
-			      zIndex: 10000,
-			      autoOpen: true,
-			      width: 'auto',
-			      resizable: false,
-			      buttons: {
-			        Si: function() {
-			        	var params = {'a': '<%= ControladorGestionNoticias.ACCION_ELIMINAR_NOTICIA %>',
-			        			'id': id,
-			        			'<%= ControladorGestionNoticias.PARAM_ACTIVA %>': !activa};
-		        		Atis.sendForm("<%= request.getRequestURI() %>", params);
-			          	$(this).dialog("close");
-			        },
-			        No: function() {
-			          	$(this).dialog("close");
-			        }
-			      },
-			      close: function(event, ui) {
-			        $(this).remove();
-			      }
-			});
-		}
-		
 		document.getElementById("nueva_noticia").addEventListener("click", function(event) {
 			event.preventDefault();
 			Atis.sendForm("<%= request.getRequestURI() %>", {'a': '<%= ControladorGestionNoticias.ACCION_AGREGAR_NOTICIA %>'});
@@ -107,7 +79,19 @@ VistaNoticias bean = (VistaNoticias) uvdatos.getVistas().get(VistaNoticias.class
 			        		mensaje = "¿Desea restaurar la noticia seleccionada?";
 			        	}
 			        	
-			        	confirmDialog(titulo, mensaje, row.codNum, row.activa);
+			        	Atis.confirmDialog(titulo, mensaje, {
+					        Si: function() {
+					        	var params = {'a': '<%= ControladorGestionNoticias.ACCION_ELIMINAR_NOTICIA %>',
+					        			'id': row.codNum,
+					        			'<%= ControladorGestionNoticias.PARAM_ACTIVA %>': !row.activa};
+				        		Atis.sendForm("<%= request.getRequestURI() %>", params);
+					          	$(this).dialog("close");
+					        },
+					        No: function() {
+					          	$(this).dialog("close");
+					        }
+					      });
+			        	
 			        } }]}		        
 			    ],
 			});

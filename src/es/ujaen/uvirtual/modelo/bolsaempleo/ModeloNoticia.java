@@ -9,6 +9,7 @@ import java.util.List;
 import java.util.Map;
 import es.ujaen.uvirtual.beans.uvirtual.bolsaempleo.Noticia;
 import es.ujaen.uvirtual.modelo.conexion.ConexionUvirtual;
+import es.ujaen.uvirtual.utilidades.BolsaEmpleoUtils;
 import es.ujaen.uvirtual.utilidades.DataTable;
 import es.ujaen.uvirtual.utilidades.UVException;
 
@@ -118,12 +119,40 @@ public class ModeloNoticia {
 	}	
 	
 	/** lista de noticias excluyendo las ya cargadas.
-	 * @param clausula sentencia sql que excluye las noticias ya mostradas .
+	 * @param noticias_excluidas noticias ya mostradas a excluir de la consulta.
 	 * @return lista de noticias filtradas .
 	 * @throws SQLException si hay un error en la base de datos .
 	 */
-	public List<Noticia> listaNoticiasInicioRestantes(String clausula) throws SQLException, UVException {
-		return listaNoticias(clausula + " AND flgpublica = 'S' ORDER BY fecha");
+	public List<Noticia> listaNoticiasInicioRestantes(List<String> noticias_excluidas) throws SQLException, UVException {
+		List<Noticia> noticias = new ArrayList<>();
+		String params = BolsaEmpleoUtils.consultaMultiplesParametros(noticias_excluidas.size());
+		String consulta = "SELECT n.* FROM tbep_noticias n WHERE codnum NOT IN (" + params + ") AND flgpublica = 'S' AND flgactiva = 'S' ORDER BY fecha";
+		
+		try (Connection conexion = ConexionUvirtual.obtenerInstancia();
+			PreparedStatement stmt = conexion.prepareStatement(consulta);) {
+			int indexParam = 1;
+			for (String noticia: noticias_excluidas) {
+				stmt.setString(indexParam++, noticia);
+			}
+			
+			try (ResultSet rs = stmt.executeQuery()) {
+				while (rs.next()) {
+					try {
+						Noticia not = new Noticia();
+						not.setCodNum(rs.getInt("CODNUM"));
+						not.setEnlace(rs.getString("ENLACE"));
+						not.setTexto(rs.getString("TEXTO"));
+						not.setFecha(rs.getTimestamp("FECHA"));
+						not.setPublica(rs.getString("FLGPUBLICA").equals("S"));
+						not.setActiva(rs.getString("FLGACTIVA").equals("S"));
+						noticias.add(not);
+					} catch (Exception e) {
+						e.printStackTrace();
+					}
+				}
+			}
+		}
+		return noticias;
 	}
 	
 	/** Consulta noticias en BBDD y las devuelve.
@@ -131,7 +160,7 @@ public class ModeloNoticia {
 	 * @throws SQLException en caso de error de base de datos
 	 */
 	public List<Noticia> listaNoticiasInicio() throws SQLException {
-		return listaNoticias("WHERE flgpublica = 'S' ORDER BY fecha FETCH FIRST 3 ROWS ONLY");
+		return listaNoticias("WHERE flgpublica = 'S' AND flgactiva = 'S' ORDER BY fecha FETCH FIRST 3 ROWS ONLY");
 	}
 	
 	/** obtiene una noticia a partir de su id.
