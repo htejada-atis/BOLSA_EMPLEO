@@ -25,6 +25,39 @@ public class ModeloArea {
 	public static final int ORDER_COLUMN_INDEX_AREA = 3;
 	public static final int ORDER_COLUMN_INDEX_BAREMALE = 4;
 	
+	/** Consulta areas en BBDD y las devuelve.
+	 * @param clausula para filtrar las areas de la bd
+	 * @return areas de la base de datos
+	 * @throws SQLException en caso de error de base de datos
+	 */
+	private List<Area> listaAreas(String clausula) throws SQLException {
+		ModeloDepartamento modeloDepartamento = new ModeloDepartamento();
+		List<Area> areas = new ArrayList<>();
+		String consulta = "SELECT bepare.* FROM TBEP_AREAS bepare " + clausula;
+		
+		try (Connection conexion = ConexionUvirtual.obtenerInstancia();
+			PreparedStatement stmt = conexion.prepareStatement(consulta);) {
+				try (ResultSet rs = stmt.executeQuery()) {
+					while (rs.next()) {
+						try {
+							Area are = new Area();
+							are.setCodNum(rs.getInt("CODNUM"));
+							are.setDepartamento(modeloDepartamento.getDepartamentoById(rs.getInt("BEPDEP_CODNUM")));
+							are.setIdAreaExterno(rs.getString("ID_AREA_CONOCIMIENTO"));
+							are.setIdSeccion(rs.getString("ID_SECCION"));
+							are.setDescripcion(rs.getString("DES_AREA_CONOCIMIENTO"));
+							areas.add(are);
+						} catch (Exception e) {
+							e.printStackTrace();
+						}
+						
+					}
+				}
+			}
+		return areas;
+	}
+	
+	
 	/**
 	 * Devuelve un area por su id.
 	 * @param codNum id de area
