@@ -129,8 +129,7 @@ public class ControladorAreasABaremar extends HttpServlet {
 	 * @throws SQLException .
 	 */
 	private void listado(VistaAreasBaremar bean, UVDatos datos, HttpServletRequest request, HttpServletResponse response) throws IOException, SQLException {
-		ModeloBolsa modelo = new ModeloBolsa();
-		
+		ModeloBolsa modelo = new ModeloBolsa();		
 		datos.setContentType("application/json");
 		datos.setRespuestaEnviada(true);
 		response.setContentType("application/json");
