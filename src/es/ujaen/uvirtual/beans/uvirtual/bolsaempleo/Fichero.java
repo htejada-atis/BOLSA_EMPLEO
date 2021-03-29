@@ -3,7 +3,6 @@ package es.ujaen.uvirtual.beans.uvirtual.bolsaempleo;
 import java.io.InputStream;
 import java.io.Serializable;
 
-
 /** Clase fichero de bolsa empleo.
  * @author jlopez
  *
@@ -117,7 +116,6 @@ public class Fichero implements Serializable {
 	public int hashCode() {
 		final int prime = 31;
 		int result = 1;
-		result = prime * result + ((codNum == null) ? 0 : codNum.hashCode());
 		result = prime * result + ((nombre == null) ? 0 : nombre.hashCode());
 		result = prime * result + ((titulo == null) ? 0 : titulo.hashCode());
 		result = prime * result + ((archivo == null) ? 0 : archivo.hashCode());
@@ -137,13 +135,6 @@ public class Fichero implements Serializable {
 			return false;
 		}
 		Fichero other = (Fichero) obj;
-		if (codNum == null) {
-			if (other.codNum != null) {
-				return false;
-			}
-		} else if (!codNum.equals(other.codNum)) {
-			return false;
-		}
 		if (nombre == null) {
 			if (other.nombre != null) {
 				return false;

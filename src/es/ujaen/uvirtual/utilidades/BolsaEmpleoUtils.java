@@ -1,7 +1,5 @@
 package es.ujaen.uvirtual.utilidades;
 
-import java.util.List;
-
 import javax.servlet.http.Part;
 
 /**

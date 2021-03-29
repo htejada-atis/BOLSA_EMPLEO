@@ -1,7 +1,6 @@
 package es.ujaen.uvirtual.beans.uvirtual.bolsaempleo;
 
 import java.io.Serializable;
-import java.util.Date;
 
 /** Clase departamento de una area de conocimiento.
  * @author atis
@@ -73,7 +72,6 @@ public class Departamento implements Serializable {
 	public int hashCode() {
 		final int prime = 31;
 		int result = 1;
-		result = prime * result + ((codNum == null) ? 0 : codNum.hashCode());
 		result = prime * result + ((idDepartamentoExterno == null) ? 0 : idDepartamentoExterno.hashCode());
 		result = prime * result + ((descripcion == null) ? 0 : descripcion.hashCode());
 		return result;
@@ -92,13 +90,6 @@ public class Departamento implements Serializable {
 			return false;
 		}
 		Departamento other = (Departamento) obj;
-		if (codNum == null) {
-			if (other.codNum != null) {
-				return false;
-			}
-		} else if (!codNum.equals(other.codNum)) {
-			return false;
-		}
 		if (idDepartamentoExterno == null) {
 			if (other.idDepartamentoExterno != null) {
 				return false;

@@ -4,7 +4,6 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.sql.SQLException;
 import java.util.logging.Logger;
-import java.util.List;
 import java.util.logging.Level;
 
 import javax.servlet.ServletException;
@@ -15,52 +14,48 @@ import javax.servlet.http.HttpServletResponse;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
-import com.google.gson.reflect.TypeToken;
 
 import es.ujaen.uvirtual.beans.CodigoDescripcion;
 import es.ujaen.uvirtual.beans.UVDatos;
 import es.ujaen.uvirtual.beans.Usuario;
-import es.ujaen.uvirtual.beans.uvirtual.bolsaempleo.Bolsa;
-import es.ujaen.uvirtual.beans.vistas.uvirtual.bolsaempleo.VistaAreasBaremar;
-import es.ujaen.uvirtual.modelo.bolsaempleo.ModeloBolsa;
+import es.ujaen.uvirtual.beans.uvirtual.bolsaempleo.ApartadoBaremacion;
+import es.ujaen.uvirtual.beans.uvirtual.bolsaempleo.BloqueBaremacion;
+import es.ujaen.uvirtual.beans.vistas.uvirtual.bolsaempleo.VistaItemsBaremacion;
+import es.ujaen.uvirtual.modelo.bolsaempleo.ModeloBaremacion;
 import es.ujaen.uvirtual.utilidades.DataTable;
 import es.ujaen.uvirtual.utilidades.EscapaHTML;
 import es.ujaen.uvirtual.utilidades.Formateador;
-import es.ujaen.uvirtual.utilidades.UVException;
 
 /**
- * Gestión de las áreas a baremar.
+ * Gestión de los items de baremación.
  */
 @WebServlet(
-		name = "informacionadministrativa.bolsaempleo.configuracion.areasbaremar", 
-		description = "Gestión de las áreas a baremar", 
+		name = "informacionadministrativa.bolsaempleo.configuracion.itemsbaremacion", 
+		description = "Gestión de los items de baremación", 
 		urlPatterns = { 
-				"/srv/es/informacionadministrativa/bolsaempleo/configuracion/areasbaremar", 
-				"/srv/en/informacionadministrativa/bolsaempleo/configuracion/areasbaremar",
-				"/srv/es/ajax/informacionadministrativa/bolsaempleo/configuracion/areasbaremar",
-				"/srv/en/ajax/informacionadministrativa/bolsaempleo/configuracion/areasbaremar"
+				"/srv/es/informacionadministrativa/bolsaempleo/configuracion/itemsbaremacion", 
+				"/srv/en/informacionadministrativa/bolsaempleo/configuracion/itemsbaremacion",
+				"/srv/es/ajax/informacionadministrativa/bolsaempleo/configuracion/itemsbaremacion", 
+				"/srv/en/ajax/informacionadministrativa/bolsaempleo/configuracion/itemsbaremacion"
 		})
-public class ControladorAreasABaremar extends HttpServlet {
+public class ControladorItemsBaremacion extends HttpServlet {
 	private static final long serialVersionUID = 1L;
-	private static final String NOMBREDEESTACLASE = ControladorAreasABaremar.class.getName();
+	private static final String NOMBREDEESTACLASE = ControladorItemsBaremacion.class.getName();
 	private static final Logger LOGGER = Logger.getLogger(NOMBREDEESTACLASE);
 	public static final String PARAM_ACCION = "a";
-	public static final String PARAM_ACCION_AREA = "aa";
-	public static final String PARAM_AREAS_SELECCIONADAS = "areasselected";
 	
 	// acciones
 	public static final String ACCION_LISTAR = "listar";
-	public static final String ACCION_DATATABLE = "datatable";
-	public static final String ACCION_AREA = "accionarea";
-	public static final String ACCION_AREA_PASAR_A_BAREMALE = "accionareabaremable";
-	public static final String ACCION_AREA_PASAR_A_NO_BAREMALE = "accionareanobaremable";
+	public static final String ACCION_DATATABLE_APARTADOS = "datatable_apartados";
+	public static final String ACCION_DATATABLE_BLOQUES = "datatable_bloques";
+	public static final String ACCION_DATATABLE_ITEMS = "datatable_items";
 	
 	// mensajes
 	public static final String MENSAJE_ERROR_ACCION_AREA_NO_VALIDA = "Acción no válida";
-	public static final String MENSAJE_EXITO_AREA_MODIFICADA_CORRECTAMENTE = "Area/s modificada/s correctamente"; 
-
-	public static final int RESPONSE_HTTP_CODE_ERROR = 400;
+	public static final String MENSAJE_EXITO_AREA_MODIFICADA_CORRECTAMENTE = "Area/s modificada/s correctamente";
 	
+	public static final int RESPONSE_HTTP_CODE_ERROR = 400;
+
 	/** Peticion GET.
 	 * @see HttpServlet#doGet(HttpServletRequest request, HttpServletResponse response)
 	 */
@@ -70,7 +65,7 @@ public class ControladorAreasABaremar extends HttpServlet {
 		datos.setDocType("<!DOCTYPE html>");
 		datos.setContentType("text/html");
 		
-		VistaAreasBaremar bean = new VistaAreasBaremar();		
+		VistaItemsBaremacion bean = new VistaItemsBaremacion();		
 		Usuario usuario = datos.getUsuario();
 		LOGGER.log(Level.FINEST, "usuario que ha entrado en el servlet es {0}", usuario.getUid());
 				
@@ -79,24 +74,24 @@ public class ControladorAreasABaremar extends HttpServlet {
 			nombreAccion = ACCION_LISTAR;
 		}
 		
-		bean.setVista("/WEB-INF/jsp/vista/infadministrativa/bolsaempleo/configuracion/areasbaremar.jsp");
+		bean.setVista("/WEB-INF/jsp/vista/infadministrativa/bolsaempleo/configuracion/itemsbaremacion.jsp");
 		
 		try {
 			switch (nombreAccion) {
-				case ACCION_DATATABLE:
-					listado(bean, datos, request, response);
+				case ACCION_DATATABLE_APARTADOS:
+					listadoApartados(bean, datos, request, response);
+					break;				
+				case ACCION_DATATABLE_BLOQUES:
+					listadoBloques(bean, datos, request, response);
 					break;
-				case ACCION_AREA:
-					accionSobreArea(bean, datos, request);
+				case ACCION_DATATABLE_ITEMS:
+					listadoItems(bean, datos, request, response);
 					break;
 			}
 		} catch (SQLException e) {
 			LOGGER.log(Level.SEVERE, Formateador.getStackTrace(e));
 			LOGGER.log(Level.SEVERE, e.toString());
 			bean.getMensajesDeError().add("Error al acceder a la base de datos");
-		} catch (UVException e) {
-			LOGGER.log(Level.WARNING, e.toString());
-			bean.getMensajesDeError().add(e.toString());
 		} finally {
 			datos.getVistas().put(bean.getClass().getName(), bean);
 			datos.getFicherosJSP().add(bean.getVista());
@@ -120,16 +115,17 @@ public class ControladorAreasABaremar extends HttpServlet {
 	}
 		
 	/**
-	 * AJAX para devolver listado de areas (bolsas).
-	 * @param bean .
+	 * Listado de apartados de items baremación.
+     * @param bean .
 	 * @param datos .
 	 * @param request .
 	 * @param response .
 	 * @throws IOException .
 	 * @throws SQLException .
 	 */
-	private void listado(VistaAreasBaremar bean, UVDatos datos, HttpServletRequest request, HttpServletResponse response) throws IOException, SQLException {
-		ModeloBolsa modelo = new ModeloBolsa();		
+	private void listadoApartados(VistaItemsBaremacion bean, UVDatos datos, HttpServletRequest request, HttpServletResponse response) throws IOException, SQLException {
+		ModeloBaremacion modelo = new ModeloBaremacion();
+		
 		datos.setContentType("application/json");
 		datos.setRespuestaEnviada(true);
 		response.setContentType("application/json");
@@ -137,7 +133,7 @@ public class ControladorAreasABaremar extends HttpServlet {
 		
 		try (PrintWriter writer = response.getWriter()) {
 			try {
-				DataTable<Bolsa> dataTable = modelo.listaBolsaEmpleoDatatable(request.getParameterMap());
+				DataTable<ApartadoBaremacion> dataTable = modelo.listadoApartadosGeneralesBaremacionDatatable(request.getParameterMap());
 				Gson gson = new GsonBuilder().setExclusionStrategies(DataTable.GSONEXCLUSIONSTRATEGY).create();
 
 				writer.write(gson.toJson(dataTable));
@@ -151,27 +147,49 @@ public class ControladorAreasABaremar extends HttpServlet {
 		}
 	}
 	
-	private void accionSobreArea(VistaAreasBaremar bean, UVDatos datos, HttpServletRequest request) throws UVException, SQLException {
-		ModeloBolsa modelo = new ModeloBolsa();
+	/**
+	 * Listado de bloques.
+	 * @param bean .
+	 * @param datos .
+	 * @param request .
+	 * @param response .
+	 * @throws IOException .
+	 * @throws SQLException .
+	 */
+	private void listadoBloques(VistaItemsBaremacion bean, UVDatos datos, HttpServletRequest request, HttpServletResponse response) throws IOException, SQLException {
+		ModeloBaremacion modelo = new ModeloBaremacion();
 		
-		String nombreAccionBolsa = EscapaHTML.ajustaCodificacion(request.getParameter(PARAM_ACCION_AREA));
-		String selectedJson = EscapaHTML.ajustaCodificacion(request.getParameter(PARAM_AREAS_SELECCIONADAS));
-		int[] selected = (new Gson()).fromJson(selectedJson, new TypeToken<int[]>() { }.getType());
+		datos.setContentType("application/json");
+		datos.setRespuestaEnviada(true);
+		response.setContentType("application/json");
+		response.setCharacterEncoding("UTF-8");
 		
-		List<Bolsa> bolsas = modelo.getBolsasByIds(selected);
+		try (PrintWriter writer = response.getWriter()) {
+			try {
+				DataTable<BloqueBaremacion> dataTable = modelo.listadoBloquesBaremacionDatatable(request.getParameterMap());
+				Gson gson = new GsonBuilder().setExclusionStrategies(DataTable.GSONEXCLUSIONSTRATEGY).create();
 
-		switch (nombreAccionBolsa) {
-		case ACCION_AREA_PASAR_A_BAREMALE:
-			modelo.ponerAreaComoBaremable(bolsas);							
-			break;
-		case ACCION_AREA_PASAR_A_NO_BAREMALE:
-			modelo.ponerAreaComoNoBaremable(bolsas);
-			break;
-		default:
-			bean.getMensajesDeError().add(MENSAJE_ERROR_ACCION_AREA_NO_VALIDA);
-			return;
+				writer.write(gson.toJson(dataTable));
+			} catch (Exception ex) {
+				bean.getMensajesDeError().add(ex.getMessage());
+				
+				CodigoDescripcion mensaje = new CodigoDescripcion("error", ex.getMessage());
+				writer.write(new Gson().toJson(mensaje));
+				response.setStatus(RESPONSE_HTTP_CODE_ERROR);
+			}
 		}
+	}
+	
+	/**
+	 * Listado de items.
+	 * @param bean .
+	 * @param datos .
+	 * @param request .
+	 * @param response .
+	 * @throws IOException .
+	 * @throws SQLException .
+	 */
+	private void listadoItems(VistaItemsBaremacion bean, UVDatos datos, HttpServletRequest request, HttpServletResponse response) throws IOException, SQLException {
 		
-		bean.getMensajesDeExito().add(MENSAJE_EXITO_AREA_MODIFICADA_CORRECTAMENTE);
 	}
 }

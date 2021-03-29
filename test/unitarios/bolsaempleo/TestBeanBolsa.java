@@ -13,17 +13,11 @@ import org.junit.Test;
 import es.ujaen.uvirtual.beans.uvirtual.bolsaempleo.Area;
 import es.ujaen.uvirtual.beans.uvirtual.bolsaempleo.Bolsa;
 import es.ujaen.uvirtual.beans.uvirtual.bolsaempleo.Departamento;
-import es.ujaen.uvirtual.beans.uvirtual.bolsaempleo.Noticia;
 
 /** test bolsas.
  *
  */
-public class TestBeanBolsa {
-	
-	private static final String ID_AREA_EXTERNO = "area externo";
-	private static final String SECCION = "area seccion";
-	private static final String DESCRIPCION = "mi area";
-	
+public class TestBeanBolsa {	
 	private static final String ESTADO = "BLOQUEADA";
 	private static final Boolean BAREAMABLE = true;
 	private static final Date FECHAATUALIZACION = new java.sql.Date(Calendar.getInstance().getTime().getTime());

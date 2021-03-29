@@ -25,8 +25,8 @@ function DataTable(id, config) {
     this.refresh = function() {
     	self.loading(true);
     	$.ajax({
-    		async: Atis.getProp(self.config.ajax, 'async', true),
-	        type: "GET",
+            async: Atis.getProp(self.config.ajax, 'async', true),
+	        type: Atis.getProp(self.config.ajax, 'method', 'GET'),
 	        url: self.config.ajax.url,
 	        contentType: "application/json",
 	        dataType: "json",

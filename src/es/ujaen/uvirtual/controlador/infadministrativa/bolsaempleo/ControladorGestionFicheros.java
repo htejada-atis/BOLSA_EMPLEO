@@ -48,7 +48,6 @@ public class ControladorGestionFicheros extends HttpServlet {
 	private static final String NOMBREDEESTACLASE = ControladorGestionFicheros.class.getName();
 	private static final Logger LOGGER = Logger.getLogger(NOMBREDEESTACLASE);
 	
-	
 	// Acciones
 	public static final String ACCION_SUBIR_FICHERO = "subirfichero";
 	public static final String ACCION_BORRAR_FICHERO = "borrarfichero";
@@ -68,8 +67,6 @@ public class ControladorGestionFicheros extends HttpServlet {
 	public static final String MENSAJE_EXITO_AGREGAR = "fichero subido correctamente";
 	public static final String MENSAJE_EXITO_ELIMINAR = "fichero eliminado correctamente";
 	
-	public static final int RESPONSE_HTTP_CODE_ERROR = 400;
-	
 	// ruta vistas
 	public static final String RUTA_BEP_CONF = "/WEB-INF/jsp/vista/infadministrativa/bolsaempleo/configuracion/";
 	
@@ -77,6 +74,8 @@ public class ControladorGestionFicheros extends HttpServlet {
 	public static final String URL_PATTERN_FILES = "/srv/es/informacionadministrativa/bolsaempleo/configuracion/ficheros";
 	public static final String URL_PATTERN_AJAX = "/srv/es/ajax/informacionadministrativa/bolsaempleo/configuracion/ficheros";
 
+	public static final int RESPONSE_HTTP_CODE_ERROR = 400;
+	
 	/** Peticion GET.
 	 * @see HttpServlet#doGet(HttpServletRequest request, HttpServletResponse response)
 	 */
@@ -232,6 +231,7 @@ public class ControladorGestionFicheros extends HttpServlet {
 		ModeloFichero modelo = new ModeloFichero();
 		
 		datos.setContentType("application/json");
+		datos.setRespuestaEnviada(true);
 		response.setContentType("application/json");
 		response.setCharacterEncoding("UTF-8");
 		
@@ -242,14 +242,13 @@ public class ControladorGestionFicheros extends HttpServlet {
 				Gson gson = new GsonBuilder().setExclusionStrategies(DataTable.GSONEXCLUSIONSTRATEGY).create();
 
 				writer.write(gson.toJson(dataTable));
-			} catch (UVException ex) {
+			} catch (Exception ex) {
+				bean.getMensajesDeError().add(ex.getMessage());
+				
 				CodigoDescripcion mensaje = new CodigoDescripcion("error", ex.getMessage());
 				writer.write(new Gson().toJson(mensaje));
 				response.setStatus(RESPONSE_HTTP_CODE_ERROR);
 			}
 		}
-		
-		datos.setRespuestaEnviada(true);
 	}
-	
 }
