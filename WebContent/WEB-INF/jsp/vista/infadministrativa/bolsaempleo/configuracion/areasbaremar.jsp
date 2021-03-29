@@ -20,7 +20,7 @@ VistaAreasBaremar bean = (VistaAreasBaremar) uvdatos.getVistas().get(VistaAreasB
 			<%= bean.formatearMensajesDeError() %>
 		</div>
 	<% } else { %>
-	<h2>Gestión de areas a baremar</h2>
+	<h2>Bolsas baremables</h2>
 	
 	<table class="bluetable bolsaempleo" id="table">
 		<tr>
@@ -52,7 +52,7 @@ $(document).ready(function() {
 	    	{'data': 'codNum', 'selectable': true},
 	        {'data': 'codNum'},
 	        {'data': 'area.idAreaExterno'},
-	        {'data': 'area.descripcion'},	        
+	        {'data': 'area.descripcion'},
 	        {'data': 'baremable'},
 	    ],
 	    "actions": [
