@@ -26,14 +26,16 @@ import es.ujaen.uvirtual.utilidades.UVException;
 
 
 /** Clase controlador para obtener, cambiar, eliminar y agregar noticias.
- * Controlador - Opers. con nombres: obtener,  cambiar,    eliminar, agregar
+ * Controlador - Opers. con nombres: obtener,  cambiar, eliminar, agregar
  * */
 @WebServlet(
 		name = "informacionadministrativa.bolsaempleo.noticias", 
 		description = "Gestión de noticias", 
 		urlPatterns = { 
 				"/srv/es/informacionadministrativa/bolsaempleo/noticias", 
-				"/srv/en/informacionadministrativa/bolsaempleo/noticias"
+				"/srv/en/informacionadministrativa/bolsaempleo/noticias",
+				"/srv/es/ajax/informacionadministrativa/bolsaempleo/noticias",
+				"/srv/en/ajax/informacionadministrativa/bolsaempleo/noticias"
 		})
 public class ControladorGestionNoticias extends HttpServlet {
 	private static final long serialVersionUID = 1L;
@@ -64,8 +66,13 @@ public class ControladorGestionNoticias extends HttpServlet {
 	public static final String MENSAJE_EXITO_EDITAR = "noticia editada correctamente";
 	public static final String MENSAJE_EXITO_ELIMINAR = "noticia eliminada correctamente";
 	
+	public static final int RESPONSE_HTTP_CODE_ERROR = 400;
+	
 	// ruta vistas
 	public static final String RUTA_BEP_NOTICIAS = "/WEB-INF/jsp/vista/infadministrativa/bolsaempleo/gestionnoticias/";
+	
+	// urls
+	public static final String URL_PATTERN_AJAX = "/srv/es/ajax/informacionadministrativa/bolsaempleo/noticias";
 
 	/** Peticion GET.
 	 * @see HttpServlet#doGet(HttpServletRequest request, HttpServletResponse response)
@@ -217,6 +224,7 @@ public class ControladorGestionNoticias extends HttpServlet {
 			} catch (UVException ex) {
 				CodigoDescripcion mensaje = new CodigoDescripcion("error", ex.getMessage());
 				writer.write(new Gson().toJson(mensaje));
+				response.setStatus(RESPONSE_HTTP_CODE_ERROR);
 			}
 		}
 		

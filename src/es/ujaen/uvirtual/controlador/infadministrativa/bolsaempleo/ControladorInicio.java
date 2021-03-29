@@ -20,7 +20,6 @@ import es.ujaen.uvirtual.beans.uvirtual.bolsaempleo.Noticia;
 import es.ujaen.uvirtual.beans.vistas.uvirtual.bolsaempleo.VistaInicio;
 import es.ujaen.uvirtual.modelo.bolsaempleo.ModeloFichero;
 import es.ujaen.uvirtual.modelo.bolsaempleo.ModeloNoticia;
-import es.ujaen.uvirtual.utilidades.BolsaEmpleoUtils;
 import es.ujaen.uvirtual.utilidades.EscapaHTML;
 import es.ujaen.uvirtual.utilidades.UVException;
 
@@ -33,11 +32,12 @@ import es.ujaen.uvirtual.utilidades.UVException;
 		description = "Informacion bolsa empleo, raiz", 
 		urlPatterns = { 
 				"/srv/es/informacionadministrativa/bolsaempleo", 
-				"/srv/en/informacionadministrativa/bolsaempleo"
+				"/srv/en/informacionadministrativa/bolsaempleo",
+				"/srv/es/ajax/informacionadministrativa/bolsaempleo",
+				"/srv/en/ajax/informacionadministrativa/bolsaempleo"
 		})
 public class ControladorInicio extends HttpServlet {
 	private static final long serialVersionUID = 1L;
-	public static final String PARAM_ACCION = "a";
 	
 	// acciones
 	public static final String ACCION_AYUDA = "ayuda";
@@ -46,11 +46,18 @@ public class ControladorInicio extends HttpServlet {
 	public static final String ACCION_LISTAR_NOTICIAS = "listar_noticias";
 	public static final String ACCION_LISTAR_TODAS_NOTICIAS = "listar_todas_noticias";
 	
+	// Parámetros
+	public static final String PARAM_ACCION = "a";
+	public static final String PARAM_NOTICIAS = "noticias";
+	
 	// ruta vistas
 	public static final String RUTA_BEP_INICIO = "/WEB-INF/jsp/vista/infadministrativa/bolsaempleo/inicio/";
 	
 	// errors
 	public static final Integer RESPONSE_HTTP_CODE_ERROR_400 = 400;
+	
+	// urls
+	public static final String URL_PATTERN_AJAX = "/srv/es/ajax/informacionadministrativa/bolsaempleo";
 
 	/** Peticion GET.
 	 * @see HttpServlet#doGet(HttpServletRequest request, HttpServletResponse response)
@@ -113,8 +120,9 @@ public class ControladorInicio extends HttpServlet {
 	
 	/** muestra todas las noticias.
 	 * @param bean bean de la vista a la que poner los valores.
-	 * @param request de la petición del servidor
-	 * @param response de la respuesta del servidor
+	 * @param request de la petición del servidor .
+	 * @param response de la respuesta del servidor .
+	 * @param datos .
 	 * @throws SQLException excepcion de bbdd.
 	 */
 	private void obtenerTodasNoticias(VistaInicio bean, HttpServletRequest request, HttpServletResponse response, UVDatos datos) 
@@ -129,8 +137,8 @@ public class ControladorInicio extends HttpServlet {
 		try (PrintWriter writer = response.getWriter()) {
 			try {
 				Gson gson = new GsonBuilder().setDateFormat("dd/M/yyyy").create();
-				List<String> idsNoticias = gson.fromJson(request.getParameter("ids_noticias"), new TypeToken<List<String>>() { }.getType());
-				List<Noticia> listaNoticias = modelo.listaNoticiasInicioRestantes(BolsaEmpleoUtils.consultaNotIn("CODNUM", idsNoticias));
+				List<String> idsNoticias = gson.fromJson(request.getParameter(PARAM_NOTICIAS), new TypeToken<List<String>>() { }.getType());
+				List<Noticia> listaNoticias = modelo.listaNoticiasInicioRestantes(idsNoticias);
 				
 				JsonArray result = (JsonArray) gson.toJsonTree(listaNoticias, new TypeToken<List<Noticia>>() { }.getType());
 				writer.print(result);
