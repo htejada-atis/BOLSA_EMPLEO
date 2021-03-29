@@ -52,6 +52,14 @@ public class ModeloTitulacion {
 		return titulaciones;
 	}
 	
+	/** lista todas las titulaciones.
+	 * @return lista de todas las titulaciones
+	 * @throws SQLException si hay un error en la base de datos
+	 */
+	public List<Titulacion> listaTitulaciones() throws SQLException {
+		return listaTitulaciones(" ORDER BY nombre");
+	}
+	
 	/** obtiene una titulación a partir de su id.
 	 * @param id codigo de la titulación
 	 * @return titulación con el id especificado
