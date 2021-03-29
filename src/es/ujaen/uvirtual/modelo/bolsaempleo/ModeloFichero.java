@@ -1,6 +1,5 @@
 package es.ujaen.uvirtual.modelo.bolsaempleo;
 
-import java.io.InputStream;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;

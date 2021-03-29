@@ -124,7 +124,6 @@ public class Bolsa implements Serializable {
 	public int hashCode() {
 		final int prime = 31;
 		int result = 1;
-		result = prime * result + ((codNum == null) ? 0 : codNum.hashCode());
 		result = prime * result + ((area == null) ? 0 : area.hashCode());
 		result = prime * result + ((estado == null) ? 0 : estado.hashCode());
 		result = prime * result + ((baremable == null) ? 0 : baremable.hashCode());
@@ -148,14 +147,6 @@ public class Bolsa implements Serializable {
 		}
 		
 		Bolsa other = (Bolsa) obj;
-		
-		if (codNum == null) {
-			if (other.codNum != null) {
-				return false;
-			}
-		} else if (!codNum.equals(other.codNum)) {
-			return false;
-		}
 		if (area == null) {
 			if (other.area != null) {
 				return false;

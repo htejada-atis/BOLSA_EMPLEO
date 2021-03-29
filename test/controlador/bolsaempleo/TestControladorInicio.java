@@ -2,8 +2,6 @@ package controlador.bolsaempleo;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
 import java.io.IOException;
 import java.sql.SQLException;
 import javax.servlet.ServletException;
@@ -15,7 +13,6 @@ import controlador.implementacion.PeticionHttp;
 import controlador.implementacion.RespuestaHttp;
 import es.ujaen.uvirtual.beans.vistas.uvirtual.bolsaempleo.VistaNoticias;
 import es.ujaen.uvirtual.controlador.infadministrativa.bolsaempleo.ControladorInicio;
-import es.ujaen.uvirtual.utilidades.UVException;
 
 /** test controlador convocatoria crud.
  * @author jmoral
@@ -24,13 +21,8 @@ import es.ujaen.uvirtual.utilidades.UVException;
 public class TestControladorInicio {
 	private static final String MENSAJE_NOTICIAS_DEVUELTAS = "Debe devolver noticias";
 	private static final String MENSAJE_SIN_ERROR = "No debe devolver error";
-	private static final String MENSAJE_CON_ERROR = "Debe devolver error";
 	private static final String MENSAJE_SIN_ADVERTENCIAS = "No debe mostrar advertencias";
-	private static final String MENSAJE_CON_EXITO_ESPERADO = "El mensaje de exito debe coincidir";
-	private static final String MENSAJE_SIN_EXITO = "No debe exito";
-	private static final String FECHA_CORRECTA = "01/01/2030";
-	
-	
+		
     /** Prepara la bd con los datos iniciales.
      * @throws SQLException si error en bd
      * @throws IOException si error en ficheros

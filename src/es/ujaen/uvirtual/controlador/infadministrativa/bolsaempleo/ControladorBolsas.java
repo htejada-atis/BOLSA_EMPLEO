@@ -139,7 +139,7 @@ public class ControladorBolsas extends HttpServlet {
 				
 				Gson gson = new GsonBuilder().setExclusionStrategies(DataTable.GSONEXCLUSIONSTRATEGY).create();				
 				writer.write(gson.toJson(dataTable));
-			} catch (UVException ex) {
+			} catch (Exception ex) {
 				bean.getMensajesDeError().add(ex.getMessage());
 				
 				CodigoDescripcion mensaje = new CodigoDescripcion("error", ex.getMessage());

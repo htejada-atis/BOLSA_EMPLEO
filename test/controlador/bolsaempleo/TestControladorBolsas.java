@@ -38,7 +38,7 @@ public class TestControladorBolsas {
     	PeticionHttp peticion = UtilsTestBolsaEmpleo.peticionAutenticada();
     	
     	if (action != null) {
-    		peticion.setParameter(ControladorBolsas.PARAM_ACCION, action);	
+    		peticion.setParameter(ControladorBolsas.PARAM_ACCION, action);
     	}
 		
 		RespuestaHttp respuesta = new RespuestaHttp();
@@ -83,7 +83,7 @@ public class TestControladorBolsas {
 	public void testA03() throws SQLException, ServletException, IOException {
 		VistaEstadoBolsas bean = getVistaBolsasEmpleo(ControladorBolsas.ACCION_DATATABLE);
 		
-		assertNotEquals(0, bean.getDatatableBolsas().getData().size());	
+		assertNotEquals(0, bean.getDatatableBolsas().getData().size());
 		assertEquals(0, bean.getMensajesDeError().size());
 		assertEquals(0, bean.getMensajesDeAdvertencia().size());
 	}

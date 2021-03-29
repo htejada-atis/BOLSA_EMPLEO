@@ -1,0 +1,7 @@
+DROP TABLE TBEP_HTO_CATEGORIABAREMACION;
+--/////////////////////
+DROP TABLE TBEP_CATEGORIABAREMACION;
+--/////////////////////
+DROP SEQUENCE QBEP_CAT;
+--/////////////////////
+DROP SEQUENCE QBEP_HTO_CAT;

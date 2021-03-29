@@ -57,7 +57,14 @@ public class ModeloArea {
 		return areas;
 	}
 	
-	
+	/** lista todas las areas.
+	 * @return lista de todas las areas
+	 * @throws SQLException si hay un error en la base de datos
+	 */
+	public List<Area> listaAreas() throws SQLException {
+		return listaAreas(" ORDER BY DES_AREA_CONOCIMIENTO");
+	}
+		
 	/**
 	 * Devuelve un area por su id.
 	 * @param codNum id de area

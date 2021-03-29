@@ -1,0 +1,7 @@
+DROP TABLE TBEP_HTO_APARTADOSBAREMACION;
+--/////////////////////
+DROP TABLE TBEP_APARTADOSBAREMACION;
+--/////////////////////
+DROP SEQUENCE QBEP_APA;
+--/////////////////////
+DROP SEQUENCE QBEP_HTO_APA;

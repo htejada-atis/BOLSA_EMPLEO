@@ -3,7 +3,6 @@ package es.ujaen.uvirtual.beans.uvirtual.bolsaempleo;
 import java.io.Serializable;
 import java.util.Date;
 
-
 import es.ujaen.uvirtual.utilidades.Formateador;
 
 
