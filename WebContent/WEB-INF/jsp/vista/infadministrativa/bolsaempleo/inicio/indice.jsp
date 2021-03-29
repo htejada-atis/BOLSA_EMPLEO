@@ -36,7 +36,10 @@ VistaInicio bean = (VistaInicio)uvdatos.getVistas().get(VistaInicio.class.getNam
        	<h4>Noticias y Novedades</h4>
 		<ul>
 			<% for(Noticia noticia:bean.getNoticias()) { %>
-				<%@ include file="includes/noticia.jsp" %>
+				<li class="row-noticia" id="noticia_<%=noticia.getCodNum()%>">
+					<div class="fecha-noticia"><%=Formateador.formatoFecha(noticia.getFecha(), Formateador.FORMATO_FECHA_DDMMYYYY)%></div>
+					<a href="<%=noticia.getEnlace()%>" target="_blank"><%=noticia.getTexto()%></a>
+				</li>
 			<% } %>
 		</ul>
 		<div class="row-ver-todas" id="view_all"> (<a href="#">Ver todas</a>) </div>

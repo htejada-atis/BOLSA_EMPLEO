@@ -46,6 +46,14 @@ public class Titulacion implements Serializable {
 		this.codNum = pcodNum;
 	}
 	
+	/** Constructor copia.
+	 * @param copia Titulación a copiar
+	 */
+	public Titulacion(Titulacion copia) {
+		this.codNum = copia.codNum;
+		this.nombre = copia.nombre;
+	}
+	
 	public Integer getCodNum() {
 		return codNum;
 	}

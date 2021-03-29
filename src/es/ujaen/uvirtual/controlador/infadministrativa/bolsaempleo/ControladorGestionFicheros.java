@@ -100,7 +100,7 @@ public class ControladorGestionFicheros extends HttpServlet {
 					eliminarFichero(request, response);
 					break;
 				case ACCION_DATATABLE:
-					listadoFicheros(datos, request, response);
+					listadoFicheros(bean, datos, request, response);
 					return;
 				case ACCION_DESCARGAR_FICHERO:
 					descargarFichero(datos, request, response);
@@ -228,7 +228,7 @@ public class ControladorGestionFicheros extends HttpServlet {
 	 * @throws SQLException en caso de error de base de datos .
 	 * @throws IOException en caso de error de IO .
 	 */
-	private void listadoFicheros(UVDatos datos, HttpServletRequest request, HttpServletResponse response) throws IOException, SQLException {
+	private void listadoFicheros(VistaFicheros bean, UVDatos datos, HttpServletRequest request, HttpServletResponse response) throws IOException, SQLException {
 		ModeloFichero modelo = new ModeloFichero();
 		
 		datos.setContentType("application/json");
@@ -238,6 +238,7 @@ public class ControladorGestionFicheros extends HttpServlet {
 		try (PrintWriter writer = response.getWriter()) {
 			try {
 				DataTable<Fichero> dataTable = modelo.listaFicherosDatatable(request.getParameterMap());
+				bean.setDatatableFicheros(dataTable);
 				Gson gson = new GsonBuilder().setExclusionStrategies(DataTable.GSONEXCLUSIONSTRATEGY).create();
 
 				writer.write(gson.toJson(dataTable));

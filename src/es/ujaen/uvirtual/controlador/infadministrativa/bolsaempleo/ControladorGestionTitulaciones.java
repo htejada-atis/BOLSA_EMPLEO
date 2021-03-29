@@ -17,7 +17,6 @@ import es.ujaen.uvirtual.beans.CodigoDescripcion;
 import es.ujaen.uvirtual.beans.UVDatos;
 import es.ujaen.uvirtual.beans.uvirtual.bolsaempleo.Titulacion;
 import es.ujaen.uvirtual.beans.vistas.uvirtual.bolsaempleo.VistaTitulaciones;
-import es.ujaen.uvirtual.modelo.bolsaempleo.ModeloNoticia;
 import es.ujaen.uvirtual.modelo.bolsaempleo.ModeloTitulacion;
 import es.ujaen.uvirtual.utilidades.DataTable;
 import es.ujaen.uvirtual.utilidades.EscapaHTML;
@@ -100,7 +99,7 @@ public class ControladorGestionTitulaciones extends HttpServlet {
 				eliminarTitulacion(request, response);
 				break;
 			case ACCION_DATATABLE_TITULACIONES:
-				listadoTitulaciones(datos, request, response);
+				listadoTitulaciones(bean, datos, request, response);
 				break;
 			}
 		} catch (SQLException e) {
@@ -159,7 +158,6 @@ public class ControladorGestionTitulaciones extends HttpServlet {
 	 * @throws IOException en caso de error de IO.
 	 */
 	private void eliminarTitulacion(HttpServletRequest request, HttpServletResponse response) throws SQLException, UVException, IOException {
-		ModeloNoticia modelo = new ModeloNoticia();
 		Integer codNum = Formateador.leeParametroInteger(request.getParameter(PARAM_ID));
 		new ModeloTitulacion().borraTitulacion(new Titulacion(codNum));
 		HttpSession session = request.getSession(false);
@@ -186,13 +184,14 @@ public class ControladorGestionTitulaciones extends HttpServlet {
 	}
 	
 	/** carga las titulaciones en una tabla .
+	 * @param bean .
 	 * @param datos .
 	 * @param request .
 	 * @param response .
 	 * @throws IOException en caso de error de IO .
 	 * @throws SQLException excepcion de bbdd.
 	 */
-	private void listadoTitulaciones(UVDatos datos, HttpServletRequest request, HttpServletResponse response) throws IOException, SQLException {
+	private void listadoTitulaciones(VistaTitulaciones bean, UVDatos datos, HttpServletRequest request, HttpServletResponse response) throws IOException, SQLException {
 		ModeloTitulacion modelo = new ModeloTitulacion();
 		datos.setContentType("application/json");
 		response.setContentType("application/json");
@@ -201,6 +200,7 @@ public class ControladorGestionTitulaciones extends HttpServlet {
 		try (PrintWriter writer = response.getWriter()) {
 			try {
 				DataTable<Titulacion> dataTable = modelo.listaTitulacionesDatatable(request.getParameterMap());
+				bean.setDatatableTitulaciones(dataTable);
 				Gson gson = new GsonBuilder().setExclusionStrategies(DataTable.GSONEXCLUSIONSTRATEGY).create();
 				writer.write(gson.toJson(dataTable));
 			} catch (UVException ex) {

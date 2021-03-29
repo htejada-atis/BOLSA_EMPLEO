@@ -96,7 +96,7 @@ public class ControladorGestionNoticias extends HttpServlet {
 					agregarNoticia(request, response, bean);
 					break;
 				case ACCION_DATATABLE:
-					listadoNoticias(datos, request, response);
+					listadoNoticias(bean, datos, request, response);
 					return;
 				case ACCION_EDITAR_NOTICIA:
 					editarNoticia(request, response, bean);
@@ -209,7 +209,7 @@ public class ControladorGestionNoticias extends HttpServlet {
 	 * @throws IOException en caso de error de IO .
 	 * @throws SQLException excepcion de bbdd.
 	 */
-	private void listadoNoticias(UVDatos datos, HttpServletRequest request, HttpServletResponse response) throws IOException, SQLException {
+	private void listadoNoticias(VistaNoticias bean, UVDatos datos, HttpServletRequest request, HttpServletResponse response) throws IOException, SQLException {
 		ModeloNoticia modelo = new ModeloNoticia();
 		
 		datos.setContentType("application/json");
@@ -219,6 +219,7 @@ public class ControladorGestionNoticias extends HttpServlet {
 		try (PrintWriter writer = response.getWriter()) {
 			try {
 				DataTable<Noticia> dataTable = modelo.listaNoticiasDatatable(request.getParameterMap());
+				bean.setDatatableNoticias(dataTable);
 				Gson gson = new GsonBuilder().setDateFormat("dd/M/yyyy").setExclusionStrategies(DataTable.GSONEXCLUSIONSTRATEGY).create();
 				writer.write(gson.toJson(dataTable));
 			} catch (UVException ex) {

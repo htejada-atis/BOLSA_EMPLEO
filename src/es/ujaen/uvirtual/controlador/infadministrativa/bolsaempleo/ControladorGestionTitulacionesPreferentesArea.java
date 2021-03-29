@@ -13,7 +13,6 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
-
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.reflect.TypeToken;
@@ -52,7 +51,7 @@ public class ControladorGestionTitulacionesPreferentesArea extends HttpServlet {
 	public static final String ACCION_DATATABLE_TITULACIONES_AREA = "datatabletitulacionesarea";
 	public static final String ACCION_ELIMINAR_TITULACION_AREA = "eliminartitulacionarea";
 	public static final String ACCION_INCLUIR_TITULACION_AREA = "incluirtitulacionarea";
-	public static final String ACCION_LISTAR_TITULACIONES = "listartitulaciones";
+	public static final String ACCION_LISTAR_AREAS = "listarareas";
 	
 	// Parámetros
 	public static final String PARAM_ACCION = "a";
@@ -88,7 +87,7 @@ public class ControladorGestionTitulacionesPreferentesArea extends HttpServlet {
 		
 		String nombreAccion = EscapaHTML.ajustaCodificacion(request.getParameter(PARAM_ACCION));
 		if (nombreAccion == null) {
-			nombreAccion = ACCION_LISTAR_TITULACIONES;
+			nombreAccion = ACCION_LISTAR_AREAS;
 		}
 		
 		try {
@@ -99,14 +98,14 @@ public class ControladorGestionTitulacionesPreferentesArea extends HttpServlet {
 			case ACCION_INCLUIR_TITULACION_AREA:
 				incluirTitulacionesPreferentesArea(request, response, bean);
 				break;
-			case ACCION_LISTAR_TITULACIONES:
+			case ACCION_LISTAR_AREAS:
 				obtenerAreas(bean);
 				break;
 			case ACCION_DATATABLE_TITULACIONES:
-				listadoTitulaciones(datos, request, response);
+				listadoTitulaciones(bean, datos, request, response);
 				break;
 			case ACCION_DATATABLE_TITULACIONES_AREA:
-				listadoTitulacionesArea(datos, request, response);
+				listadoTitulacionesArea(bean, datos, request, response);
 				break;
 			}
 		} catch (SQLException e) {
@@ -181,13 +180,15 @@ public class ControladorGestionTitulacionesPreferentesArea extends HttpServlet {
 	}
 	
 	/** carga las titulaciones en una tabla .
+	 * @param bean .
 	 * @param datos .
 	 * @param request .
 	 * @param response .
 	 * @throws IOException en caso de error de IO .
 	 * @throws SQLException excepcion de bbdd.
 	 */
-	private void listadoTitulaciones(UVDatos datos, HttpServletRequest request, HttpServletResponse response) throws IOException, SQLException {
+	private void listadoTitulaciones(VistaTitulacionesArea bean, UVDatos datos, HttpServletRequest request, HttpServletResponse response)
+			throws IOException, SQLException {
 		ModeloTitulacion modelo = new ModeloTitulacion();
 		datos.setContentType("application/json");
 		response.setContentType("application/json");
@@ -197,6 +198,7 @@ public class ControladorGestionTitulacionesPreferentesArea extends HttpServlet {
 			try {
 				Integer area = Formateador.leeParametroInteger(request.getParameter(PARAM_AREA));
 				DataTable<Titulacion> dataTable = modelo.listaTitulacionesDatatable(request.getParameterMap(), area);
+				bean.setDatatableTitulaciones(dataTable);
 				Gson gson = new GsonBuilder().setExclusionStrategies(DataTable.GSONEXCLUSIONSTRATEGY).create();
 				writer.write(gson.toJson(dataTable));
 			} catch (UVException ex) {
@@ -210,13 +212,15 @@ public class ControladorGestionTitulacionesPreferentesArea extends HttpServlet {
 	}
 	
 	/** carga las titulaciones de un área en una tabla .
+	 * @param bean .
 	 * @param datos .
 	 * @param request .
 	 * @param response .
 	 * @throws IOException en caso de error de IO .
 	 * @throws SQLException excepcion de bbdd.
 	 */
-	private void listadoTitulacionesArea(UVDatos datos, HttpServletRequest request, HttpServletResponse response) throws IOException, SQLException {
+	private void listadoTitulacionesArea(VistaTitulacionesArea bean, UVDatos datos, HttpServletRequest request, HttpServletResponse response)
+			throws IOException, SQLException {
 		ModeloTitulacion modelo = new ModeloTitulacion();
 		datos.setContentType("application/json");
 		response.setContentType("application/json");
@@ -226,6 +230,7 @@ public class ControladorGestionTitulacionesPreferentesArea extends HttpServlet {
 			try {
 				Integer area = Formateador.leeParametroInteger(request.getParameter(PARAM_AREA));
 				DataTable<Titulacion> dataTable = modelo.listaTitulacionesAreaDatatable(request.getParameterMap(), area);
+				bean.setDatatableTitulaciones(dataTable);
 				Gson gson = new GsonBuilder().setExclusionStrategies(DataTable.GSONEXCLUSIONSTRATEGY).create();
 				writer.write(gson.toJson(dataTable));
 			} catch (UVException ex) {
