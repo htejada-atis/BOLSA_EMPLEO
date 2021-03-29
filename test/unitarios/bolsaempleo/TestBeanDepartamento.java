@@ -5,11 +5,9 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
-import java.util.Calendar;
 import org.junit.Test;
 
 import es.ujaen.uvirtual.beans.uvirtual.bolsaempleo.Departamento;
-import es.ujaen.uvirtual.beans.uvirtual.bolsaempleo.Noticia;
 
 /** test departamentos.
  *

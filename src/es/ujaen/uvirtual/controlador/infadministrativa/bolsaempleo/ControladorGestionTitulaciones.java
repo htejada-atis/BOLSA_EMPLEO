@@ -17,7 +17,6 @@ import es.ujaen.uvirtual.beans.CodigoDescripcion;
 import es.ujaen.uvirtual.beans.UVDatos;
 import es.ujaen.uvirtual.beans.uvirtual.bolsaempleo.Titulacion;
 import es.ujaen.uvirtual.beans.vistas.uvirtual.bolsaempleo.VistaTitulaciones;
-import es.ujaen.uvirtual.modelo.bolsaempleo.ModeloNoticia;
 import es.ujaen.uvirtual.modelo.bolsaempleo.ModeloTitulacion;
 import es.ujaen.uvirtual.utilidades.DataTable;
 import es.ujaen.uvirtual.utilidades.EscapaHTML;
@@ -159,7 +158,6 @@ public class ControladorGestionTitulaciones extends HttpServlet {
 	 * @throws IOException en caso de error de IO.
 	 */
 	private void eliminarTitulacion(HttpServletRequest request, HttpServletResponse response) throws SQLException, UVException, IOException {
-		ModeloNoticia modelo = new ModeloNoticia();
 		Integer codNum = Formateador.leeParametroInteger(request.getParameter(PARAM_ID));
 		new ModeloTitulacion().borraTitulacion(new Titulacion(codNum));
 		HttpSession session = request.getSession(false);
