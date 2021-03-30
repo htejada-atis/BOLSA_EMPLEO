@@ -23,6 +23,7 @@ import es.ujaen.uvirtual.beans.Usuario;
 import es.ujaen.uvirtual.beans.uvirtual.bolsaempleo.Bolsa;
 import es.ujaen.uvirtual.beans.vistas.uvirtual.bolsaempleo.VistaAreasBaremar;
 import es.ujaen.uvirtual.modelo.bolsaempleo.ModeloBolsa;
+import es.ujaen.uvirtual.modelo.bolsaempleo.ModeloArea;
 import es.ujaen.uvirtual.utilidades.DataTable;
 import es.ujaen.uvirtual.utilidades.EscapaHTML;
 import es.ujaen.uvirtual.utilidades.Formateador;
@@ -129,7 +130,7 @@ public class ControladorAreasABaremar extends HttpServlet {
 	 * @throws SQLException .
 	 */
 	private void listado(VistaAreasBaremar bean, UVDatos datos, HttpServletRequest request, HttpServletResponse response) throws IOException, SQLException {
-		ModeloBolsa modelo = new ModeloBolsa();		
+		ModeloArea modelo = new ModeloArea();		
 		datos.setContentType("application/json");
 		datos.setRespuestaEnviada(true);
 		response.setContentType("application/json");
@@ -137,7 +138,7 @@ public class ControladorAreasABaremar extends HttpServlet {
 		
 		try (PrintWriter writer = response.getWriter()) {
 			try {
-				DataTable<Bolsa> dataTable = modelo.listaBolsaEmpleoDatatable(request.getParameterMap());
+				DataTable<Bolsa> dataTable = modelo.listaAreaDatatable(request.getParameterMap());
 				Gson gson = new GsonBuilder().setExclusionStrategies(DataTable.GSONEXCLUSIONSTRATEGY).create();
 
 				writer.write(gson.toJson(dataTable));
