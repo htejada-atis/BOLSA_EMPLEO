@@ -101,13 +101,6 @@ public class Titulacion implements Serializable {
 			return false;
 		}
 		Titulacion other = (Titulacion) obj;
-		if (codNum == null) {
-			if (other.codNum != null) {
-				return false;
-			}
-		} else if (!codNum.equals(other.codNum)) {
-			return false;
-		}
 		if (nombre == null) {
 			if (other.nombre != null) {
 				return false;

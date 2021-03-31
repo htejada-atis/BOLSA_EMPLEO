@@ -79,7 +79,7 @@ public class TestControladorInicio {
 	@Test
 	public void testA03Post() throws ServletException, IOException {
 		PeticionHttp peticion = UtilsTestBolsaEmpleo.peticionAutenticada();
-		peticion.setAttribute(ControladorInicio.PARAM_ACCION, ControladorInicio.ACCION_AYUDA);
+		peticion.setParameter(ControladorInicio.PARAM_ACCION, ControladorInicio.ACCION_AYUDA);
 		
 		RespuestaHttp respuesta = new RespuestaHttp();
 		ControladorInicio controlador = new ControladorInicio();
@@ -97,7 +97,7 @@ public class TestControladorInicio {
 	@Test
 	public void testA04Post() throws ServletException, IOException {
 		PeticionHttp peticion = UtilsTestBolsaEmpleo.peticionAutenticada();
-		peticion.setAttribute(ControladorInicio.PARAM_ACCION, ControladorInicio.ACCION_FAQ);
+		peticion.setParameter(ControladorInicio.PARAM_ACCION, ControladorInicio.ACCION_FAQ);
 		
 		RespuestaHttp respuesta = new RespuestaHttp();
 		ControladorInicio controlador = new ControladorInicio();
@@ -114,16 +114,22 @@ public class TestControladorInicio {
 	 */
 	@Test
 	public void testA05Obtener() throws ServletException, IOException {
+		VistaInicio bean = obtenerInicio(ControladorInicio.ACCION_LISTAR_NOTICIAS);
+		
 		PeticionHttp peticion = UtilsTestBolsaEmpleo.peticionAutenticada();
-		peticion.setAttribute(ControladorInicio.PARAM_ACCION, ControladorInicio.ACCION_LISTAR_TODAS_NOTICIAS);
+		peticion.setParameter(ControladorInicio.PARAM_ACCION, ControladorInicio.ACCION_LISTAR_TODAS_NOTICIAS);
+		peticion.setParameter(ControladorInicio.PARAM_NOTICIAS, 
+				"[" + bean.getNoticias().get(0).getCodNum().toString() + "]");
 		
 		RespuestaHttp respuesta = new RespuestaHttp();
 		ControladorInicio controlador = new ControladorInicio();
 		controlador.doPost(peticion, respuesta);
-		VistaInicio bean = (VistaInicio) peticion.getUVDatos().getVistas().get(VistaInicio.class.getName());
+		VistaInicio bean2 = (VistaInicio) peticion.getUVDatos().getVistas().get(VistaInicio.class.getName());
 		
-		assertEquals(MENSAJE_SIN_ERROR, 0, bean.getMensajesDeError().size());
-		assertEquals(MENSAJE_SIN_ADVERTENCIAS, 0, bean.getMensajesDeAdvertencia().size());
+		assertNotEquals(MENSAJE_NOTICIAS_DEVUELTAS, 0, bean2.getNoticias().size());
+		assertEquals(MENSAJE_SIN_ERROR, 0, bean2.getMensajesDeError().size());
+		assertEquals(MENSAJE_SIN_ADVERTENCIAS, 0, bean2.getMensajesDeAdvertencia().size());
+		assertNotEquals("texto no vacio", "", bean2.getNoticias().get(0).getTexto());
 	}
 	
 	/** post documentos.
@@ -133,12 +139,13 @@ public class TestControladorInicio {
 	@Test
 	public void testA06Post() throws ServletException, IOException {
 		PeticionHttp peticion = UtilsTestBolsaEmpleo.peticionAutenticada();
-		peticion.setAttribute(ControladorInicio.PARAM_ACCION, ControladorInicio.ACCION_DOCUMENTOS);
+		peticion.setParameter(ControladorInicio.PARAM_ACCION, ControladorInicio.ACCION_DOCUMENTOS);
 		
 		RespuestaHttp respuesta = new RespuestaHttp();
 		ControladorInicio controlador = new ControladorInicio();
 		controlador.doPost(peticion, respuesta);
 		VistaInicio bean = (VistaInicio) peticion.getUVDatos().getVistas().get(VistaInicio.class.getName());
+		
 		
 		assertEquals(MENSAJE_SIN_ERROR, 0, bean.getMensajesDeError().size());
 		assertEquals(MENSAJE_SIN_ADVERTENCIAS, 0, bean.getMensajesDeAdvertencia().size());

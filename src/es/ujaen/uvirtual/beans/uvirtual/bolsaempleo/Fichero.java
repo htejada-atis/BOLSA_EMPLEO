@@ -23,18 +23,6 @@ public class Fichero implements Serializable {
 	}
 	
 	/** Constructor con parametros.
-	 * @param pcodNum .
-	 * @param pnombre .
-	 * @param ptitulo .
-	 */
-	public Fichero(Integer pcodNum, String pnombre, String ptitulo) {
-		super();
-		this.codNum = pcodNum;
-		this.nombre = pnombre;
-		this.titulo = ptitulo;
-	}
-	
-	/** Constructor con parametros.
 	 * @param pnombre .
 	 * @param ptitulo .
 	 * @param parchivo .

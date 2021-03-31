@@ -5,6 +5,10 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
+
+import java.io.ByteArrayInputStream;
+import java.io.InputStream;
+
 import org.junit.Test;
 import es.ujaen.uvirtual.beans.uvirtual.bolsaempleo.Fichero;
 
@@ -14,6 +18,7 @@ import es.ujaen.uvirtual.beans.uvirtual.bolsaempleo.Fichero;
 public class TestBeanFichero {
 
 	private static final String CADENA = "cadena";
+	private static final InputStream ARCHIVO = new ByteArrayInputStream("archivo de prueba".getBytes());
 	
 	/** test constructor.
 	 * 
@@ -25,9 +30,11 @@ public class TestBeanFichero {
 		fichero.setCodNum(id);
 		fichero.setNombre(CADENA);
 		fichero.setTitulo(CADENA);
+		fichero.setArchivo(ARCHIVO);
 		assertEquals(id, fichero.getCodNum());
 		assertEquals(CADENA, fichero.getNombre());
 		assertEquals(CADENA, fichero.getTitulo());
+		assertEquals(ARCHIVO, fichero.getArchivo());
 		assertNotNull(fichero.toString());
 	}
 	
@@ -36,14 +43,16 @@ public class TestBeanFichero {
 	@Test
 	public void testA02() {
 		Integer id = 1;
-    	Fichero fichero2 = new Fichero(id, CADENA, CADENA);
+    	Fichero fichero2 = new Fichero(id, CADENA, CADENA, ARCHIVO);
     	Fichero fichero = new Fichero(fichero2);
     	fichero.setCodNum(id);
     	fichero.setNombre(CADENA);
     	fichero.setTitulo(CADENA);
+    	fichero.setArchivo(ARCHIVO);
 		assertEquals(id, fichero.getCodNum());
 		assertEquals(CADENA, fichero.getNombre());
 		assertEquals(CADENA, fichero.getTitulo());
+		assertEquals(ARCHIVO, fichero.getArchivo());
 		assertNotNull(fichero.toString());
 		assertTrue(fichero.equals(fichero2));
 		assertTrue(fichero.hashCode() == fichero2.hashCode());
@@ -56,7 +65,7 @@ public class TestBeanFichero {
 	@SuppressWarnings("java:S2159")
 	public void testA03() {
 		Integer id = 1;
-    	Fichero fichero3 = new Fichero(id, CADENA, CADENA);
+    	Fichero fichero3 = new Fichero(id, CADENA, CADENA, ARCHIVO);
     	Fichero fichero2 = new Fichero();
     	Fichero fichero = new Fichero();
 		assertTrue(fichero.equals(fichero2));

@@ -119,19 +119,20 @@ public class ModeloNoticia {
 	}	
 	
 	/** lista de noticias excluyendo las ya cargadas.
-	 * @param noticias_excluidas noticias ya mostradas a excluir de la consulta.
+	 * @param noticiasExcluidas noticias ya mostradas a excluir de la consulta.
 	 * @return lista de noticias filtradas .
 	 * @throws SQLException si hay un error en la base de datos .
+	 * @throws UVException en caso de error de parametros .
 	 */
-	public List<Noticia> listaNoticiasInicioRestantes(List<String> noticias_excluidas) throws SQLException, UVException {
+	public List<Noticia> listaNoticiasInicioRestantes(List<String> noticiasExcluidas) throws SQLException, UVException {
 		List<Noticia> noticias = new ArrayList<>();
-		String params = BolsaEmpleoUtils.consultaMultiplesParametros(noticias_excluidas.size());
+		String params = BolsaEmpleoUtils.consultaMultiplesParametros(noticiasExcluidas.size());
 		String consulta = "SELECT n.* FROM tbep_noticias n WHERE codnum NOT IN (" + params + ") AND flgpublica = 'S' AND flgactiva = 'S' ORDER BY fecha";
 		
 		try (Connection conexion = ConexionUvirtual.obtenerInstancia();
 			PreparedStatement stmt = conexion.prepareStatement(consulta);) {
 			int indexParam = 1;
-			for (String noticia: noticias_excluidas) {
+			for (String noticia: noticiasExcluidas) {
 				stmt.setString(indexParam++, noticia);
 			}
 			
@@ -167,8 +168,13 @@ public class ModeloNoticia {
 	 * @param id codigo de la noticia
 	 * @return noticia con el id especificado
 	 * @throws SQLException en caso de error en la BD
+	 * @throws UVException en caso de error de parametros .
 	 */
-	public Noticia listaNoticia(int id) throws SQLException, UVException {
+	public Noticia listaNoticia(Integer id) throws SQLException, UVException {
+		if (id == null) {
+			throw new UVException("No se puede listar una noticia sin id");
+		}
+		
 		String clausulaWhere = "WHERE codnum = " + id;
 		List<Noticia> noticias = listaNoticias(clausulaWhere);
 		if (noticias.isEmpty()) {
@@ -180,6 +186,7 @@ public class ModeloNoticia {
 	/**	Función que inserta una noticia en la BD.
 	 * @param noticia a insertar en la BD
 	 * @throws SQLException en caso de error en la BD
+	 * @throws UVException en caso de error de parametros .
 	 */
 	public void insertaNoticia(Noticia noticia) throws SQLException, UVException {
 		if (noticia == null) {
@@ -222,18 +229,17 @@ public class ModeloNoticia {
 			throw new UVException("No se puede eliminar una noticia con id vacío");
 		}
 		String consulta = "DELETE FROM tbep_noticias WHERE codnum = ? ";
-		try (Connection conexion = ConexionUvirtual.obtenerInstancia();
-			 PreparedStatement stmt = conexion.prepareStatement(consulta);) {
+		try (Connection conexion = ConexionUvirtual.obtenerInstancia(); PreparedStatement stmt = conexion.prepareStatement(consulta);) {
 			int parameterIndex = 1;
 			stmt.setInt(parameterIndex++, noticia.getCodNum());
 			stmt.executeUpdate();
 		}
 	}
 	
-	/** Borra o restaura una noticia.
-	 * @param noticia a borrar
-	 * @throws SQLException en caso de error en la BD
-	 * @throws UVException si noticia no es valida
+	/** Borra o restaura una noticia .
+	 * @param noticia a borrar .
+	 * @throws SQLException en caso de error en la BD .
+	 * @throws UVException si noticia no es valida .
 	 */
 	public void borraRestauraNoticia(Noticia noticia) throws SQLException, UVException {
 		if (noticia == null) {
@@ -253,9 +259,9 @@ public class ModeloNoticia {
 	}
 	
 	/** Actualiza una noticia.
-	 * @param noticia Noticia con los datos nuevos a actualizar
-	 * @throws SQLException en caso de error en la BD
-	 * @throws UVException en caso de errores de validacion
+	 * @param noticia Noticia con los datos nuevos a actualizar .
+	 * @throws SQLException en caso de error en la BD .
+	 * @throws UVException en caso de errores de validacion .
 	 */
 	public void actualizaNoticia(Noticia noticia) throws SQLException, UVException {
 		if (noticia == null) {

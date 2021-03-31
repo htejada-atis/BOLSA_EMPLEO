@@ -133,8 +133,8 @@ public class ControladorGestionTitulaciones extends HttpServlet {
 	 * @param response .
 	 * @param bean bean de la vista a la que poner los valores.
 	 * @throws SQLException excepcion de bbdd.
-	 * @throws UVException en caso de error en bd
-	 * @throws IOException en caso de error de IO.
+	 * @throws UVException en caso de error de parametros .
+	 * @throws IOException en caso de error de input u output .
 	 */
 	private void editarTitulacion(HttpServletRequest request, HttpServletResponse response, VistaTitulaciones bean) throws SQLException, UVException, IOException {
 		bean.setVista(RUTA_BEP_CONF + "formTitulacion.jsp");
@@ -154,8 +154,8 @@ public class ControladorGestionTitulaciones extends HttpServlet {
 	 * @param request .
 	 * @param response .
 	 * @throws SQLException excepcion de bbdd.
-	 * @throws UVException en caso de error en bd
-	 * @throws IOException en caso de error de IO.
+	 * @throws UVException en caso de error de parametros .
+	 * @throws IOException en caso de error de input u output .
 	 */
 	private void eliminarTitulacion(HttpServletRequest request, HttpServletResponse response) throws SQLException, UVException, IOException {
 		Integer codNum = Formateador.leeParametroInteger(request.getParameter(PARAM_ID));
@@ -170,7 +170,8 @@ public class ControladorGestionTitulaciones extends HttpServlet {
 	 * @param response .
 	 * @param bean bean de la vista a la que poner los valores.
 	 * @throws SQLException excepcion de bbdd.
-	 * @throws UVException en caso de error en bd
+	 * @throws UVException en caso de error de parametros .
+	 * @throws IOException en caso de error de input u output .
 	 */
 	private void agregarTitulacion(HttpServletRequest request, HttpServletResponse response, VistaTitulaciones bean) throws SQLException, UVException, IOException {
 		bean.setVista(RUTA_BEP_CONF + "formTitulacion.jsp");
@@ -188,7 +189,7 @@ public class ControladorGestionTitulaciones extends HttpServlet {
 	 * @param datos .
 	 * @param request .
 	 * @param response .
-	 * @throws IOException en caso de error de IO .
+	 * @throws IOException en caso de error de input u output .
 	 * @throws SQLException excepcion de bbdd.
 	 */
 	private void listadoTitulaciones(VistaTitulaciones bean, UVDatos datos, HttpServletRequest request, HttpServletResponse response) throws IOException, SQLException {

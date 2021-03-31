@@ -2,6 +2,9 @@ package controlador.bolsaempleo;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotEquals;
+import static org.junit.Assert.assertNotNull;
+
+import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.sql.SQLException;
 import javax.servlet.ServletException;
@@ -19,8 +22,11 @@ import es.ujaen.uvirtual.controlador.infadministrativa.bolsaempleo.ControladorGe
  *
  */
 public class TestControladorGestionFicheros {
+	
+	private static final String MENSAJE_FICHERO_DEVUELTO = "Debe devolver fichero";
 	private static final String MENSAJE_SIN_ERROR = "No debe devolver error";
 	private static final String MENSAJE_SIN_ADVERTENCIAS = "No debe mostrar advertencias";
+	private static final String TITULO_FICHERO = "titulo";
 	
 	
     /** prepara la bd con los datos iniciales.
@@ -105,12 +111,32 @@ public class TestControladorGestionFicheros {
 		assertEquals(MENSAJE_SIN_ADVERTENCIAS, 0, bean2.getMensajesDeAdvertencia().size());
 	}
 	
+	/** subir fichero.
+	 * @throws ServletException si error de servlet
+	 * @throws IOException si error de io
+	 */
+	@Test
+	public void testA05Agregar() throws ServletException, IOException {
+		PeticionHttp peticion = UtilsTestBolsaEmpleo.peticionAutenticada();
+		peticion.setParameter(ControladorGestionFicheros.PARAM_ACCION, ControladorGestionFicheros.ACCION_SUBIR_FICHERO);
+		peticion.setParameter(ControladorGestionFicheros.PARAM_FICHERO, "");
+		peticion.setParameter(ControladorGestionFicheros.PARAM_TITULO, TITULO_FICHERO);
+		
+		RespuestaHttp respuesta = new RespuestaHttp();
+		ControladorGestionFicheros controlador = new ControladorGestionFicheros();
+		controlador.doPost(peticion, respuesta);
+		VistaFicheros bean = (VistaFicheros) peticion.getUVDatos().getVistas().get(VistaFicheros.class.getName());
+		
+		assertEquals(MENSAJE_SIN_ERROR, 0, bean.getMensajesDeError().size());
+		assertEquals(MENSAJE_SIN_ADVERTENCIAS, 0, bean.getMensajesDeAdvertencia().size());
+	}
+	
 	/** descargar fichero.
 	 * @throws ServletException si error de servlet
 	 * @throws IOException si error de io
 	 */
 	@Test
-	public void testA04Descargar() throws ServletException, IOException {
+	public void testA06Descargar() throws ServletException, IOException {
 		VistaFicheros bean = obtenerFicheros(ControladorGestionFicheros.ACCION_DATATABLE);
 		
 		PeticionHttp peticion = UtilsTestBolsaEmpleo.peticionAutenticada();
@@ -122,6 +148,7 @@ public class TestControladorGestionFicheros {
 		controlador.doPost(peticion, respuesta);
 		VistaFicheros bean2 = (VistaFicheros) peticion.getUVDatos().getVistas().get(VistaFicheros.class.getName());
 		
+		assertNotNull(MENSAJE_FICHERO_DEVUELTO, bean2.getFichero());
 		assertEquals(MENSAJE_SIN_ERROR, 0, bean2.getMensajesDeError().size());
 		assertEquals(MENSAJE_SIN_ADVERTENCIAS, 0, bean2.getMensajesDeAdvertencia().size());
 	}

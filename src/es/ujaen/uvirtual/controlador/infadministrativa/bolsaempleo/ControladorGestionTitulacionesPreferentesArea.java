@@ -63,6 +63,8 @@ public class ControladorGestionTitulacionesPreferentesArea extends HttpServlet {
 	
 	// Mensajes
 	public static final String MENSAJE_ENVIADO = "mensaje";
+	public static final String MENSAJE_ERROR_TITULACIONES_SELECCIONADAS_INCORRECTAS = "No hay titulaciones seleccionadas válidas";
+	public static final String MENSAJE_ERROR_TITULACIONES_PREFERENTES_YA_SELECCIONADAS_PREVIAMENTE = "Las titulaciones ya han sido incluidas para éste área";
 	
 	// Respuesta error
 	public static final int RESPONSE_HTTP_CODE_ERROR = 400;
@@ -108,9 +110,19 @@ public class ControladorGestionTitulacionesPreferentesArea extends HttpServlet {
 				listadoTitulacionesArea(bean, datos, request, response);
 				break;
 			}
+			
+		} catch (SQLIntegrityConstraintViolationException e) {
+			LOGGER.log(Level.WARNING, e.toString());
+			bean.getMensajesDeError().add(MENSAJE_ERROR_TITULACIONES_PREFERENTES_YA_SELECCIONADAS_PREVIAMENTE);
+			HttpSession session = request.getSession(false);
+			session.setAttribute(MENSAJE_ENVIADO, e.toString());
+			response.sendRedirect(request.getServletPath());
 		} catch (SQLException e) {
 			LOGGER.log(Level.WARNING, e.toString());
 			bean.getMensajesDeError().add("Error al acceder a la base de datos");
+		} catch (UVException e) {
+			LOGGER.log(Level.WARNING, e.toString());
+			bean.getMensajesDeError().add(e.toString());
 		} finally {
 			datos.getVistas().put(bean.getClass().getName(), bean);
 			datos.getFicherosJSP().add(bean.getVista());
@@ -138,11 +150,17 @@ public class ControladorGestionTitulacionesPreferentesArea extends HttpServlet {
 	 * @param bean .
 	 * @throws IOException en caso de error de IO .
 	 */
-	private void eliminarTitulacionesArea(HttpServletRequest request, HttpServletResponse response, VistaTitulacionesArea bean) throws SQLException, IOException {
-		int area = Formateador.leeParametroInteger(request.getParameter(PARAM_AREA));
+	private void eliminarTitulacionesArea(HttpServletRequest request, HttpServletResponse response, VistaTitulacionesArea bean) throws SQLException, IOException, UVException {
+		Integer area = Formateador.leeParametroInteger(request.getParameter(PARAM_AREA));
 		Gson gson = new GsonBuilder().create();
-		List<String> titulaciones = gson.fromJson(request.getParameter(PARAM_TITULACIONES), new TypeToken<List<String>>() { }.getType());
-		new ModeloTitulacion().eliminarTitulacionesPreferentesArea(titulaciones, area);
+		
+		try {
+			List<String> titulaciones = gson.fromJson(request.getParameter(PARAM_TITULACIONES), new TypeToken<List<String>>() { }.getType());
+			new ModeloTitulacion().eliminarTitulacionesPreferentesArea(titulaciones, area);
+		} catch (Exception ex) {
+			throw new UVException(MENSAJE_ERROR_TITULACIONES_SELECCIONADAS_INCORRECTAS);
+		}
+		
 		bean.setAreas(new ModeloArea().listaAreas());
 		bean.setArea(new Area(area));
 	}
@@ -151,22 +169,28 @@ public class ControladorGestionTitulacionesPreferentesArea extends HttpServlet {
 	 * @param request .
 	 * @param response .
 	 * @param bean .
+	 * @throws SQLException excepcion de bbdd .
 	 * @throws IOException en caso de error de IO .
+	 * @throws UVException en caso de error de parametros .
+	 * @throws SQLIntegrityConstraintViolationException error de repetición de id ya existente .
 	 */
-	private void incluirTitulacionesPreferentesArea(HttpServletRequest request, HttpServletResponse response, VistaTitulacionesArea bean) throws SQLException, IOException {
+	private void incluirTitulacionesPreferentesArea(HttpServletRequest request, HttpServletResponse response, VistaTitulacionesArea bean)
+			throws SQLException, IOException, UVException, SQLIntegrityConstraintViolationException {
+		
+		Integer area = Formateador.leeParametroInteger(request.getParameter(PARAM_AREA));
+		Gson gson = new GsonBuilder().create();
+		
 		try {
-			int area = Formateador.leeParametroInteger(request.getParameter(PARAM_AREA));
-			Gson gson = new GsonBuilder().create();
 			List<String> titulaciones = gson.fromJson(request.getParameter(PARAM_TITULACIONES), new TypeToken<List<String>>() { }.getType());
 			new ModeloTitulacion().incluirTitulacionesPreferentesArea(titulaciones, area);
-			bean.setAreas(new ModeloArea().listaAreas());
-			bean.setArea(new Area(area));
 		} catch (SQLIntegrityConstraintViolationException ex) {
-			LOGGER.log(Level.WARNING, ex.toString());
-			HttpSession session = request.getSession(false);
-			session.setAttribute(MENSAJE_ENVIADO, ex.toString());
-			response.sendRedirect(request.getServletPath());
+			throw new SQLIntegrityConstraintViolationException(MENSAJE_ERROR_TITULACIONES_SELECCIONADAS_INCORRECTAS);
+		} catch (Exception ex) {
+			throw new UVException(MENSAJE_ERROR_TITULACIONES_SELECCIONADAS_INCORRECTAS);
 		}
+		
+		bean.setAreas(new ModeloArea().listaAreas());
+		bean.setArea(new Area(area));
 	}
 	
 	/** muestra todas las areas en un select .
@@ -203,6 +227,7 @@ public class ControladorGestionTitulacionesPreferentesArea extends HttpServlet {
 				writer.write(gson.toJson(dataTable));
 			} catch (UVException ex) {
 				CodigoDescripcion mensaje = new CodigoDescripcion("error", ex.getMessage());
+				bean.getMensajesDeError().add(mensaje.toString());
 				writer.write(new Gson().toJson(mensaje));
 				response.setStatus(RESPONSE_HTTP_CODE_ERROR);
 			}
@@ -235,6 +260,7 @@ public class ControladorGestionTitulacionesPreferentesArea extends HttpServlet {
 				writer.write(gson.toJson(dataTable));
 			} catch (UVException ex) {
 				CodigoDescripcion mensaje = new CodigoDescripcion("error", ex.getMessage());
+				bean.getMensajesDeError().add(mensaje.toString());
 				writer.write(new Gson().toJson(mensaje));
 				response.setStatus(RESPONSE_HTTP_CODE_ERROR);
 			}

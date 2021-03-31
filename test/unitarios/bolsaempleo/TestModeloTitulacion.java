@@ -16,7 +16,7 @@ import es.ujaen.uvirtual.modelo.bolsaempleo.ModeloTitulacion;
 import es.ujaen.uvirtual.modelo.conexion.Conexion;
 import es.ujaen.uvirtual.utilidades.UVException;
 
-/** Clase para probar el modelo noticia. */
+/** Clase para probar el modelo titulación. */
 public class TestModeloTitulacion {
 	
     private static final String NOMBRE_TITULACION = "nombre titulacion";
@@ -67,4 +67,44 @@ public class TestModeloTitulacion {
     	assertTrue("titulación borrada no debe ser listada", !titulacionesFiltradas.contains(titulacion));
     	assertTrue("titulaciones debe tener un elemento menos", titulaciones.size() - 1 == titulacionesFiltradas.size());
     }
+    
+    /** test acierto editar titulación.
+     * @throws SQLException si error en bd
+     * @throws UVException si error el validar titulación
+     */
+    @Test
+    public void testA03EditarTitulacion() throws SQLException, UVException {
+    	ModeloTitulacion modelo = new ModeloTitulacion();
+    	List<Titulacion> titulaciones = modelo.listaTitulaciones();
+    	Titulacion titulacion = titulaciones.get(0);
+    	titulacion.setNombre("nombre actualizado");
+    	modelo.actualizaTitulacion(titulacion); 
+    	Titulacion titulacionActualizada = modelo.listaTitulacion(titulacion.getCodNum());
+    	assertTrue("titulación debe ser actualizada", titulacion.equals(titulacionActualizada)); 
+    }
+    
+    /** test error inserta titulación null.
+     * @throws SQLException si error bd
+     * @throws UVException error experado
+     */
+    @Test(expected = UVException.class)
+    public void testE01InsertaTitulacionNull() throws SQLException, UVException {
+    	Titulacion titulacion = null;
+    	ModeloTitulacion modelo = new ModeloTitulacion();
+    	modelo.insertaTitulacion(titulacion);
+    	fail();
+    }
+    
+    /** test error inserta titulación sin nombre.
+     * @throws SQLException si error bd
+     * @throws UVException error experado
+     */
+    @Test(expected = UVException.class)
+    public void testE02InsertaTitulacionSinNombre() throws SQLException, UVException {
+    	Titulacion titulacion = new Titulacion();
+    	ModeloTitulacion modelo = new ModeloTitulacion();
+    	modelo.insertaTitulacion(titulacion);
+    	fail();
+    }
+    
 }

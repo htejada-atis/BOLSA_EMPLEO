@@ -3,7 +3,6 @@ package controlador.bolsaempleo;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotEquals;
 import static org.junit.Assert.assertNotNull;
-
 import java.io.IOException;
 import java.sql.SQLException;
 import javax.servlet.ServletException;
@@ -23,11 +22,14 @@ import es.ujaen.uvirtual.utilidades.UVException;
  */
 public class TestControladorGestionNoticias {
 	
-	private static final String MENSAJE_NOTICIAS_DEVUELTAS = "Debe devolver noticias";
+	private static final String MENSAJE_CON_ERROR = "Debe devolver error";
+	private static final String MENSAJE_CON_EXITO_ESPERADO = "El mensaje de exito debe coincidir";
 	private static final String MENSAJE_NOTICIA_DEVUELTA = "Debe devolver noticia";
-	private static final String MENSAJE_SIN_ERROR = "No debe devolver error";
+	private static final String MENSAJE_NOTICIAS_DEVUELTAS = "Debe devolver noticias";
 	private static final String MENSAJE_SIN_ADVERTENCIAS = "No debe mostrar advertencias";
-	private static final String ACTIVA_NOTICIA = "S";
+	private static final String MENSAJE_SIN_ERROR = "No debe devolver error";
+	private static final String MENSAJE_SIN_EXITO = "No debe exito";
+	
 	private static final String ENLACE_NOTICIA = "enlace";
 	private static final String FECHA_NOTICIA = "01/01/2030";
 	private static final String PUBLICA_NOTICIA = "N";
@@ -116,6 +118,7 @@ public class TestControladorGestionNoticias {
 		
 		assertEquals(0, bean.getMensajesDeError().size());
 		assertEquals(0, bean.getMensajesDeAdvertencia().size());
+		assertEquals(MENSAJE_CON_EXITO_ESPERADO, ControladorGestionNoticias.MENSAJE_EXITO_AGREGAR, bean.getMensajesDeExito().get(0));
 	}
 	
 	/** editar noticia.
@@ -142,6 +145,7 @@ public class TestControladorGestionNoticias {
 		assertNotNull(MENSAJE_NOTICIA_DEVUELTA, bean2.getNoticia());
 		assertEquals(MENSAJE_SIN_ERROR, 0, bean2.getMensajesDeError().size());
 		assertEquals(MENSAJE_SIN_ADVERTENCIAS, 0, bean2.getMensajesDeAdvertencia().size());
+		assertEquals(MENSAJE_CON_EXITO_ESPERADO, ControladorGestionNoticias.MENSAJE_EXITO_EDITAR, bean2.getMensajesDeExito().get(0));
 	}
 	
 	/** eliminar noticia.
@@ -163,6 +167,25 @@ public class TestControladorGestionNoticias {
 		
 		assertEquals(MENSAJE_SIN_ERROR, 0, bean2.getMensajesDeError().size());
 		assertEquals(MENSAJE_SIN_ADVERTENCIAS, 0, bean2.getMensajesDeAdvertencia().size());
+		assertEquals(MENSAJE_CON_EXITO_ESPERADO, ControladorGestionNoticias.MENSAJE_EXITO_ELIMINAR, bean2.getMensajesDeExito().get(0));
+	}
+	
+	/** accion no valida.
+	 * @throws ServletException si error de servlet
+	 * @throws IOException si error de io
+	 */
+	@Test
+	public void testE01EditarVacio() throws ServletException, IOException {
+		PeticionHttp peticion = UtilsTestBolsaEmpleo.peticionAutenticada();
+		peticion.setParameter(ControladorGestionNoticias.PARAM_ACCION, ControladorGestionNoticias.ACCION_EDITAR_NOTICIA);
+
+		RespuestaHttp respuesta = new RespuestaHttp();
+		ControladorGestionNoticias controlador = new ControladorGestionNoticias();
+		controlador.doPost(peticion, respuesta);
+		VistaNoticias bean = (VistaNoticias) peticion.getUVDatos().getVistas().get(VistaNoticias.class.getName());
+		
+		assertEquals(MENSAJE_CON_ERROR, 1, bean.getMensajesDeError().size());
+		assertEquals(MENSAJE_SIN_EXITO, 0, bean.getMensajesDeExito().size());
 	}
 	
 }
