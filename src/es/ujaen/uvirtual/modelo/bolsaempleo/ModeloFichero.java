@@ -110,8 +110,22 @@ public class ModeloFichero {
 	/**	Función que inserta un fichero .
 	 * @param fichero fichero a insertar .
 	 * @throws SQLException en caso de error en la BD .
+	 * @throws UVException en caso de error de parametros .
 	 */
-	public void insertaFichero(Fichero fichero) throws SQLException {
+	public void insertaFichero(Fichero fichero) throws SQLException, UVException {
+		if (fichero == null) {
+			throw new UVException("No se puede insertar un fichero vacío");
+		}
+		if (fichero.getNombre() == null || fichero.getNombre().equals("")) {
+			throw new UVException("No se puede insertar un fichero sin nombre");
+		}
+		if (fichero.getTitulo() == null || fichero.getTitulo().equals("")) {
+			throw new UVException("No se puede insertar un fichero sin título");
+		}
+		if (fichero.getArchivo() == null) {
+			throw new UVException("No se puede insertar un fichero sin archivo");
+		}
+		
 		String consulta = "INSERT INTO tbep_ficheros " 
 				+ " (NOMBRE,TITULO,ARCHIVO) "
 				+ "VALUES (?,?,?)";
@@ -129,6 +143,7 @@ public class ModeloFichero {
 	 * @param id codigo del fichero .
 	 * @return archivo con el id especificado .
 	 * @throws SQLException en caso de error en la BD .
+	 * @throws UVException en caso de error de parametros .
 	 */
 	public Fichero listaFichero(int id) throws SQLException, UVException {
 		String clausulaWhere = "WHERE codnum = " + id;

@@ -99,7 +99,7 @@ public class ControladorGestionTitulaciones extends HttpServlet {
 				eliminarTitulacion(request, response);
 				break;
 			case ACCION_DATATABLE_TITULACIONES:
-				listadoTitulaciones(datos, request, response);
+				listadoTitulaciones(bean, datos, request, response);
 				break;
 			}
 		} catch (SQLException e) {
@@ -133,8 +133,8 @@ public class ControladorGestionTitulaciones extends HttpServlet {
 	 * @param response .
 	 * @param bean bean de la vista a la que poner los valores.
 	 * @throws SQLException excepcion de bbdd.
-	 * @throws UVException en caso de error en bd
-	 * @throws IOException en caso de error de IO.
+	 * @throws UVException en caso de error de parametros .
+	 * @throws IOException en caso de error de input u output .
 	 */
 	private void editarTitulacion(HttpServletRequest request, HttpServletResponse response, VistaTitulaciones bean) throws SQLException, UVException, IOException {
 		bean.setVista(RUTA_BEP_CONF + "formTitulacion.jsp");
@@ -154,8 +154,8 @@ public class ControladorGestionTitulaciones extends HttpServlet {
 	 * @param request .
 	 * @param response .
 	 * @throws SQLException excepcion de bbdd.
-	 * @throws UVException en caso de error en bd
-	 * @throws IOException en caso de error de IO.
+	 * @throws UVException en caso de error de parametros .
+	 * @throws IOException en caso de error de input u output .
 	 */
 	private void eliminarTitulacion(HttpServletRequest request, HttpServletResponse response) throws SQLException, UVException, IOException {
 		Integer codNum = Formateador.leeParametroInteger(request.getParameter(PARAM_ID));
@@ -170,7 +170,8 @@ public class ControladorGestionTitulaciones extends HttpServlet {
 	 * @param response .
 	 * @param bean bean de la vista a la que poner los valores.
 	 * @throws SQLException excepcion de bbdd.
-	 * @throws UVException en caso de error en bd
+	 * @throws UVException en caso de error de parametros .
+	 * @throws IOException en caso de error de input u output .
 	 */
 	private void agregarTitulacion(HttpServletRequest request, HttpServletResponse response, VistaTitulaciones bean) throws SQLException, UVException, IOException {
 		bean.setVista(RUTA_BEP_CONF + "formTitulacion.jsp");
@@ -184,13 +185,14 @@ public class ControladorGestionTitulaciones extends HttpServlet {
 	}
 	
 	/** carga las titulaciones en una tabla .
+	 * @param bean .
 	 * @param datos .
 	 * @param request .
 	 * @param response .
-	 * @throws IOException en caso de error de IO .
+	 * @throws IOException en caso de error de input u output .
 	 * @throws SQLException excepcion de bbdd.
 	 */
-	private void listadoTitulaciones(UVDatos datos, HttpServletRequest request, HttpServletResponse response) throws IOException, SQLException {
+	private void listadoTitulaciones(VistaTitulaciones bean, UVDatos datos, HttpServletRequest request, HttpServletResponse response) throws IOException, SQLException {
 		ModeloTitulacion modelo = new ModeloTitulacion();
 		datos.setContentType("application/json");
 		response.setContentType("application/json");
@@ -199,6 +201,7 @@ public class ControladorGestionTitulaciones extends HttpServlet {
 		try (PrintWriter writer = response.getWriter()) {
 			try {
 				DataTable<Titulacion> dataTable = modelo.listaTitulacionesDatatable(request.getParameterMap());
+				bean.setDatatableTitulaciones(dataTable);
 				Gson gson = new GsonBuilder().setExclusionStrategies(DataTable.GSONEXCLUSIONSTRATEGY).create();
 				writer.write(gson.toJson(dataTable));
 			} catch (UVException ex) {

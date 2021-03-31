@@ -1,0 +1,133 @@
+package unitarios.bolsaempleo;
+
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
+
+import java.io.ByteArrayInputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.sql.SQLException;
+import java.text.ParseException;
+import java.util.List;
+import javax.sql.DataSource;
+import org.junit.BeforeClass;
+import org.junit.Test;
+import bbdd.BbddRunner;
+import bbdd.UtilsTestBolsaEmpleo;
+import es.ujaen.uvirtual.beans.uvirtual.bolsaempleo.Fichero;
+import es.ujaen.uvirtual.modelo.bolsaempleo.ModeloFichero;
+import es.ujaen.uvirtual.modelo.conexion.Conexion;
+import es.ujaen.uvirtual.utilidades.UVException;
+
+
+/** Clase para probar el modelo fichero. */
+public class TestModeloFichero {
+	
+    private static final String NOMBRE_FICHERO = "nombre fichero";
+    private static final String TITULO_FICHERO = "titulo fichero";
+    private static final InputStream ARCHIVO_FICHERO = new ByteArrayInputStream("archivo de prueba".getBytes());
+    
+	/** prepara la bd con los datos iniciales.
+     * @throws SQLException si error en bd
+     * @throws IOException si error en ficheros
+	 * @throws ParseException si error fecha
+     */
+    @BeforeClass
+    public static void preparaBd() throws SQLException, IOException, ParseException {
+    	DataSource ds = BbddRunner.obtenerDataSourceUv();
+    	Conexion.setConexionUvirtual(ds);
+    	UtilsTestBolsaEmpleo.inicializaBolsaEmpleo();
+    }
+    
+    /** test acierto insertar fichero.
+     * @throws SQLException si error en bd
+     * @throws UVException si error al validar fichero
+     */
+    @Test
+    public void testA01InsertaFichero() throws SQLException, UVException {
+    	Fichero fichero = new Fichero();
+    	fichero.setNombre(NOMBRE_FICHERO);
+    	fichero.setTitulo(TITULO_FICHERO);
+    	fichero.setArchivo(ARCHIVO_FICHERO);
+    	ModeloFichero modelo = new ModeloFichero();
+    	modelo.insertaFichero(fichero);
+    	List<Fichero> ficheros = modelo.listaFicheros();
+    	assertTrue("fichero insertado debe ser listado", ficheros.contains(fichero));
+    }
+    
+    /** test acierto borrar fichero.
+     * @throws SQLException si error en bd
+     * @throws UVException si error al validar fichero 
+     */
+    @Test
+    public void testA02BorraFichero() throws SQLException, UVException {
+    	ModeloFichero modelo = new ModeloFichero();
+    	List<Fichero> ficheros = modelo.listaFicheros();
+    	Fichero fichero = ficheros.get(0);
+    	modelo.borraFichero(fichero);
+    	try {
+    		modelo.listaFichero(fichero.getCodNum());
+    		fail();
+    	} catch (UVException e) {
+    		//se expera excepcion
+    	}
+    	List<Fichero> ficherosFiltrados = modelo.listaFicheros();
+    	assertTrue("fichero borrado no debe ser listado", !ficherosFiltrados.contains(fichero));
+    	assertTrue("ficheros debe tener un elemento menos", ficheros.size() - 1 == ficherosFiltrados.size());
+    }
+    
+    /** test error inserta fichero null.
+     * @throws SQLException si error bd
+     * @throws UVException error experado
+     */
+    @Test(expected = UVException.class)
+    public void testE01InsertaFicheroNull() throws SQLException, UVException {
+    	Fichero fichero = null;
+    	ModeloFichero modelo = new ModeloFichero();
+    	modelo.insertaFichero(fichero);
+    	fail();
+    }
+    
+    /** test error inserta fichero sin nombre.
+     * @throws SQLException si error bd
+     * @throws UVException error experado
+     */
+    @Test(expected = UVException.class)
+    public void testE02InsertaFicheroSinNombre() throws SQLException, UVException {
+    	Fichero fichero = new Fichero();
+    	fichero.setTitulo(TITULO_FICHERO);
+    	fichero.setArchivo(ARCHIVO_FICHERO);
+    	ModeloFichero modelo = new ModeloFichero();
+    	modelo.insertaFichero(fichero);
+    	fail();
+    }
+    
+    /** test error inserta fichero sin título.
+     * @throws SQLException si error bd
+     * @throws UVException error experado
+     */
+    @Test(expected = UVException.class)
+    public void testE03InsertaFicheroSinTitulo() throws SQLException, UVException {
+    	Fichero fichero = new Fichero();
+    	fichero.setNombre(NOMBRE_FICHERO);
+    	fichero.setArchivo(ARCHIVO_FICHERO);
+    	ModeloFichero modelo = new ModeloFichero();
+    	modelo.insertaFichero(fichero);
+    	fail();
+    }
+    
+    /** test error inserta fichero sin título.
+     * @throws SQLException si error bd
+     * @throws UVException error experado
+     */
+    @Test(expected = UVException.class)
+    public void testE04InsertaFicheroSinArchivo() throws SQLException, UVException {
+    	Fichero fichero = new Fichero();
+    	fichero.setNombre(NOMBRE_FICHERO);
+    	fichero.setTitulo(TITULO_FICHERO);
+    	ModeloFichero modelo = new ModeloFichero();
+    	modelo.insertaFichero(fichero);
+    	fail();
+    }
+    
+}

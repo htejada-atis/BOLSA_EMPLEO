@@ -40,10 +40,25 @@ public class TestBeanNoticia {
 		assertNotNull(noticia.toString());
 	}
 	
-	/** test equals.
+	/** test constructor.
+	 * 
 	 */
 	@Test
 	public void testA02() {
+		java.sql.Date ahora = new java.sql.Date(Calendar.getInstance().getTime().getTime());
+		Noticia noticia = new Noticia(CADENA, CADENA, ahora, BOOLEANO, BOOLEANO);
+		assertEquals(CADENA, noticia.getEnlace());
+		assertEquals(CADENA, noticia.getTexto());
+		assertEquals(ahora, noticia.getFecha());
+		assertEquals(BOOLEANO, noticia.isPublica());
+		assertEquals(BOOLEANO, noticia.isActiva());
+		assertNotNull(noticia.toString());
+	}
+	
+	/** test equals.
+	 */
+	@Test
+	public void testA03() {
 		Integer id = 1;
     	java.sql.Date ahora = new java.sql.Date(Calendar.getInstance().getTime().getTime());
 		Noticia noticia2 = new Noticia(id, CADENA, CADENA, ahora, BOOLEANO, BOOLEANO);
@@ -70,7 +85,7 @@ public class TestBeanNoticia {
 	 */
 	@Test
 	@SuppressWarnings("java:S2159")
-	public void testA03() {
+	public void testA04() {
 		Integer id = 1;
     	java.sql.Date ahora = new java.sql.Date(Calendar.getInstance().getTime().getTime());
     	Noticia noticia3 = new Noticia(id, CADENA, CADENA, ahora, BOOLEANO, BOOLEANO);

@@ -11,7 +11,7 @@ import bbdd.BbddRunner;
 import bbdd.UtilsTestBolsaEmpleo;
 import controlador.implementacion.PeticionHttp;
 import controlador.implementacion.RespuestaHttp;
-import es.ujaen.uvirtual.beans.vistas.uvirtual.bolsaempleo.VistaNoticias;
+import es.ujaen.uvirtual.beans.vistas.uvirtual.bolsaempleo.VistaInicio;
 import es.ujaen.uvirtual.controlador.infadministrativa.bolsaempleo.ControladorInicio;
 
 /** test controlador convocatoria crud.
@@ -19,6 +19,7 @@ import es.ujaen.uvirtual.controlador.infadministrativa.bolsaempleo.ControladorIn
  *
  */
 public class TestControladorInicio {
+	private static final String MENSAJE_DOCUMENTOS_DEVUELTOS = "Debe devolver documentos";
 	private static final String MENSAJE_NOTICIAS_DEVUELTAS = "Debe devolver noticias";
 	private static final String MENSAJE_SIN_ERROR = "No debe devolver error";
 	private static final String MENSAJE_SIN_ADVERTENCIAS = "No debe mostrar advertencias";
@@ -33,16 +34,28 @@ public class TestControladorInicio {
     	UtilsTestBolsaEmpleo.inicializaBolsaEmpleo();
     }
     
-    
-    private VistaNoticias obtenerNoticias() throws ServletException, IOException {
+    private VistaInicio obtenerInicio(String accion) throws ServletException, IOException {
     	PeticionHttp peticion = UtilsTestBolsaEmpleo.peticionAutenticada();
-		peticion.setParameter(ControladorInicio.PARAM_ACCION, ControladorInicio.ACCION_LISTAR_NOTICIAS);
+		peticion.setParameter(ControladorInicio.PARAM_ACCION, accion);
 
 		RespuestaHttp respuesta = new RespuestaHttp();
 		ControladorInicio controlador = new ControladorInicio();
 		controlador.doGet(peticion, respuesta);
-		return (VistaNoticias) peticion.getUVDatos().getVistas().get(VistaNoticias.class.getName());
+		return (VistaInicio) peticion.getUVDatos().getVistas().get(VistaInicio.class.getName());
     }
+    
+    /** Obtener noticias, sin parametro definido .
+	 * @throws SQLException si fallo bd  .
+	 * @throws IOException si error io .
+	 * @throws ServletException  si error servlet .
+	 */
+	@Test
+	public void testA01Obtener() throws SQLException, ServletException, IOException {
+		VistaInicio bean = obtenerInicio(null);
+		
+		assertEquals(0, bean.getMensajesDeError().size());
+		assertEquals(0, bean.getMensajesDeAdvertencia().size());
+	}
     
 	/** obtener noticias.
 	 * @throws SQLException si fallo bd 
@@ -50,8 +63,8 @@ public class TestControladorInicio {
 	 * @throws ServletException  si error servlet
 	 */
 	@Test
-	public void testA01Obtener() throws SQLException, ServletException, IOException {
-		VistaNoticias bean = obtenerNoticias();
+	public void testA02Obtener() throws SQLException, ServletException, IOException {
+		VistaInicio bean = obtenerInicio(ControladorInicio.ACCION_LISTAR_NOTICIAS);
 
 		assertNotEquals(MENSAJE_NOTICIAS_DEVUELTAS, 0, bean.getNoticias().size());
 		assertEquals(MENSAJE_SIN_ERROR, 0, bean.getMensajesDeError().size());
@@ -59,59 +72,97 @@ public class TestControladorInicio {
 		assertNotEquals("texto no vacio", "", bean.getNoticias().get(0).getTexto());
 	}
 	
-	/** post.
-	 * @throws ServletException si error de servlet
-	 * @throws IOException si error de io
-	 */
-	@Test
-	public void testA01Post() throws ServletException, IOException {
-		PeticionHttp peticion = UtilsTestBolsaEmpleo.peticionAutenticada();
-		peticion.setAttribute(ControladorInicio.PARAM_ACCION, ControladorInicio.ACCION_AYUDA);
-		
-		RespuestaHttp respuesta = new RespuestaHttp();
-		ControladorInicio controlador = new ControladorInicio();
-		controlador.doPost(peticion, respuesta);
-		VistaNoticias bean = (VistaNoticias) peticion.getUVDatos().getVistas().get(VistaNoticias.class.getName());
-		
-		assertNotEquals(MENSAJE_NOTICIAS_DEVUELTAS, 0, bean.getNoticias().size());
-		assertEquals(MENSAJE_SIN_ERROR, 0, bean.getMensajesDeError().size());
-		assertEquals(MENSAJE_SIN_ADVERTENCIAS, 0, bean.getMensajesDeAdvertencia().size());
-	}
-	
-	/** post.
-	 * @throws ServletException si error de servlet
-	 * @throws IOException si error de io
-	 */
-	@Test
-	public void testA02Post() throws ServletException, IOException {
-		PeticionHttp peticion = UtilsTestBolsaEmpleo.peticionAutenticada();
-		peticion.setAttribute(ControladorInicio.PARAM_ACCION, ControladorInicio.ACCION_FAQ);
-		
-		RespuestaHttp respuesta = new RespuestaHttp();
-		ControladorInicio controlador = new ControladorInicio();
-		controlador.doPost(peticion, respuesta);
-		VistaNoticias bean = (VistaNoticias) peticion.getUVDatos().getVistas().get(VistaNoticias.class.getName());
-		
-		assertEquals(MENSAJE_SIN_ERROR, 0, bean.getMensajesDeError().size());
-		assertEquals(MENSAJE_SIN_ADVERTENCIAS, 0, bean.getMensajesDeAdvertencia().size());
-	}
-	
-	/** post.
+	/** post ayuda.
 	 * @throws ServletException si error de servlet
 	 * @throws IOException si error de io
 	 */
 	@Test
 	public void testA03Post() throws ServletException, IOException {
 		PeticionHttp peticion = UtilsTestBolsaEmpleo.peticionAutenticada();
-		peticion.setAttribute(ControladorInicio.PARAM_ACCION, ControladorInicio.ACCION_AYUDA);
+		peticion.setParameter(ControladorInicio.PARAM_ACCION, ControladorInicio.ACCION_AYUDA);
 		
 		RespuestaHttp respuesta = new RespuestaHttp();
 		ControladorInicio controlador = new ControladorInicio();
 		controlador.doPost(peticion, respuesta);
-		VistaNoticias bean = (VistaNoticias) peticion.getUVDatos().getVistas().get(VistaNoticias.class.getName());
+		VistaInicio bean = (VistaInicio) peticion.getUVDatos().getVistas().get(VistaInicio.class.getName());
 		
 		assertEquals(MENSAJE_SIN_ERROR, 0, bean.getMensajesDeError().size());
 		assertEquals(MENSAJE_SIN_ADVERTENCIAS, 0, bean.getMensajesDeAdvertencia().size());
+	}
+	
+	/** post faq.
+	 * @throws ServletException si error de servlet
+	 * @throws IOException si error de io
+	 */
+	@Test
+	public void testA04Post() throws ServletException, IOException {
+		PeticionHttp peticion = UtilsTestBolsaEmpleo.peticionAutenticada();
+		peticion.setParameter(ControladorInicio.PARAM_ACCION, ControladorInicio.ACCION_FAQ);
+		
+		RespuestaHttp respuesta = new RespuestaHttp();
+		ControladorInicio controlador = new ControladorInicio();
+		controlador.doPost(peticion, respuesta);
+		VistaInicio bean = (VistaInicio) peticion.getUVDatos().getVistas().get(VistaInicio.class.getName());
+		
+		assertEquals(MENSAJE_SIN_ERROR, 0, bean.getMensajesDeError().size());
+		assertEquals(MENSAJE_SIN_ADVERTENCIAS, 0, bean.getMensajesDeAdvertencia().size());
+	}
+	
+	/** obtener noticias restantes .
+	 * @throws ServletException si error de servlet
+	 * @throws IOException si error de io
+	 */
+	@Test
+	public void testA05Obtener() throws ServletException, IOException {
+		VistaInicio bean = obtenerInicio(ControladorInicio.ACCION_LISTAR_NOTICIAS);
+		
+		PeticionHttp peticion = UtilsTestBolsaEmpleo.peticionAutenticada();
+		peticion.setParameter(ControladorInicio.PARAM_ACCION, ControladorInicio.ACCION_LISTAR_TODAS_NOTICIAS);
+		peticion.setParameter(ControladorInicio.PARAM_NOTICIAS, 
+				"[" + bean.getNoticias().get(0).getCodNum().toString() + "]");
+		
+		RespuestaHttp respuesta = new RespuestaHttp();
+		ControladorInicio controlador = new ControladorInicio();
+		controlador.doPost(peticion, respuesta);
+		VistaInicio bean2 = (VistaInicio) peticion.getUVDatos().getVistas().get(VistaInicio.class.getName());
+		
+		assertNotEquals(MENSAJE_NOTICIAS_DEVUELTAS, 0, bean2.getNoticias().size());
+		assertEquals(MENSAJE_SIN_ERROR, 0, bean2.getMensajesDeError().size());
+		assertEquals(MENSAJE_SIN_ADVERTENCIAS, 0, bean2.getMensajesDeAdvertencia().size());
+		assertNotEquals("texto no vacio", "", bean2.getNoticias().get(0).getTexto());
+	}
+	
+	/** post documentos.
+	 * @throws ServletException si error de servlet
+	 * @throws IOException si error de io
+	 */
+	@Test
+	public void testA06Post() throws ServletException, IOException {
+		PeticionHttp peticion = UtilsTestBolsaEmpleo.peticionAutenticada();
+		peticion.setParameter(ControladorInicio.PARAM_ACCION, ControladorInicio.ACCION_DOCUMENTOS);
+		
+		RespuestaHttp respuesta = new RespuestaHttp();
+		ControladorInicio controlador = new ControladorInicio();
+		controlador.doPost(peticion, respuesta);
+		VistaInicio bean = (VistaInicio) peticion.getUVDatos().getVistas().get(VistaInicio.class.getName());
+		
+		
+		assertEquals(MENSAJE_SIN_ERROR, 0, bean.getMensajesDeError().size());
+		assertEquals(MENSAJE_SIN_ADVERTENCIAS, 0, bean.getMensajesDeAdvertencia().size());
+	}
+	
+	/** obtener documentos.
+	 * @throws ServletException si error de servlet
+	 * @throws IOException si error de io
+	 */
+	@Test
+	public void testA07Obtener() throws ServletException, IOException {
+		VistaInicio bean = obtenerInicio(ControladorInicio.ACCION_DOCUMENTOS);
+
+		assertNotEquals(MENSAJE_DOCUMENTOS_DEVUELTOS, 0, bean.getFicheros().size());
+		assertEquals(MENSAJE_SIN_ERROR, 0, bean.getMensajesDeError().size());
+		assertEquals(MENSAJE_SIN_ADVERTENCIAS, 0, bean.getMensajesDeAdvertencia().size());
+		assertNotEquals("titulo no vacio", "", bean.getFicheros().get(0).getTitulo());
 	}
 
 }

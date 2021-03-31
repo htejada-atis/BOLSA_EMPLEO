@@ -6,6 +6,8 @@ CREATE TABLE UVIRTUAL.TBEP_TITULACIONES (
 --/////////////////////
 COMMENT ON COLUMN TBEP_TITULACIONES.NOMBRE IS 'nombre de la titulación';
 --/////////////////////
+COMMENT ON TABLE TBEP_TITULACIONES IS 'Titulaciones de los candidatos. ALIAS: [beptit] ACRONIMO: [TIT]';
+--/////////////////////
 CREATE TABLE UVIRTUAL.TBEP_HTO_TITULACIONES (
  	CODCAMBIO NUMBER(11,0) NOT NULL,
  	LOG VARCHAR(50) NOT NULL,
