@@ -1,5 +1,6 @@
 <%@ page trimDirectiveWhitespaces="true"%>
 <%@ page import="es.ujaen.uvirtual.beans.UVDatos"%>
+<%@ page import="es.ujaen.uvirtual.beans.Rol"%>
 <%@	page import="es.ujaen.uvirtual.controlador.infadministrativa.bolsaempleo.ControladorUsuarioBolsaEmpleo"%>
 <%@ page import="es.ujaen.uvirtual.beans.vistas.uvirtual.bolsaempleo.VistaUsuarioBolsaEmpleo"%>
 <%@ page import="es.ujaen.uvirtual.utilidades.EscapaHTML" %>
@@ -32,16 +33,30 @@ VistaUsuarioBolsaEmpleo bean = (VistaUsuarioBolsaEmpleo) uvdatos.getVistas().get
 	    <form id="actualizar_usuario" class="be-form" method="post" action="<%= request.getRequestURI() %>">
     		<input type="hidden" name="<%= ControladorUsuarioBolsaEmpleo.PARAM_ACCION %>" id="accion_formulario" value="" />
 			<input type="hidden" name="<%= ControladorUsuarioBolsaEmpleo.PARAM_ID%>" id="usuario_id" value="" />
-    		<div class="form-group">
-    			<label for="usuario_nombre">Nombre</label>
-    			<input type="text" name="nombre" id="usuario_nombre" value="<%= nombre %>"/>
-    		</div>
-    		<div class="form-select">
+			<div class="form-select">
+				<label><%if(bean.getUsuario()!=null) {%>Usuario asociado<%}else{%>Elija el usuario para asociar<%}%></label>
+				<select id="select_area">
+					<option value="0"> - </option>
+					<%
+					for(Rol role: bean.getRoles()) {
+					%>
+    					<option value="<%=role.getCodNum()%>"><%=role.getDescripcion()%></option>
+    				<%
+    				}
+    				%>
+				</select>
+			</div>
+			<div class="form-select">
 				<label>Elija el rol para asociar</label>
 				<select id="select_area">
-					<option value="0">Usuarios</option>
-					<option value="0">Elija el role</option>
-
+					<option value="0"> - </option>
+					<%
+					for(Rol role: bean.getRoles()) {
+					%>
+    					<option value="<%=role.getCodNum()%>"><%=role.getDescripcion()%></option>
+    				<%
+    				}
+    				%>
 				</select>
 			</div>
     		<div class="form-btn">
@@ -59,8 +74,6 @@ VistaUsuarioBolsaEmpleo bean = (VistaUsuarioBolsaEmpleo) uvdatos.getVistas().get
 		console.log(document.getElementById("usuario_nombre").value);
 		Atis.sendForm("<%= request.getRequestURI() %>", {'a': '<%= ControladorUsuarioBolsaEmpleo.ACCION_BUSCAR_USUARIO %>',
 			'nombre': document.getElementById("usuario_nombre").value});
-		
-		$('#respuesta').modal('show');
 	});
 
 </script>

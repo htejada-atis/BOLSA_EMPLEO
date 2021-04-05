@@ -9,9 +9,6 @@ import java.util.List;
 import java.util.Map;
 
 import es.ujaen.uvirtual.beans.uvirtual.bolsaempleo.UsuarioBolsaEmpleo;
-import es.ujaen.uvirtual.beans.uvirtual.bolsaempleo.Area;
-import es.ujaen.uvirtual.beans.uvirtual.bolsaempleo.Bolsa;
-import es.ujaen.uvirtual.beans.uvirtual.bolsaempleo.Noticia;
 import es.ujaen.uvirtual.modelo.conexion.ConexionUvirtual;
 import es.ujaen.uvirtual.utilidades.DataTable;
 import es.ujaen.uvirtual.utilidades.UVException;
@@ -25,18 +22,19 @@ import es.ujaen.uvirtual.utilidades.UVException;
 public class ModeloUsuarioBolsaEmpleo {
 	
 	public static final int ORDER_COLUMN_INDEX_ID = 1;
-	public static final int ORDER_COLUMN_INDEX_DNI = 2;
-	public static final int ORDER_COLUMN_INDEX_NOMBRE = 3;
-	public static final int ORDER_COLUMN_INDEX_TELEFONO = 4;
-	public static final int ORDER_COLUMN_INDEX_MOVIL = 5;
-	public static final int ORDER_COLUMN_INDEX_EMAIL = 6;
-	public static final int ORDER_COLUMN_INDEX_ROL = 7;
-	public static final int ORDER_COLUMN_INDEX_LISTA_DIST = 8;
-	public static final int ORDER_COLUMN_INDEX_EXCLUIDO = 9;
-	public static final int ORDER_COLUMN_INDEX_RAZON_EXCLUSION = 10;
-	public static final int ORDER_COLUMN_INDEX_FECHA_EXCLUSION = 11;
-	public static final int ORDER_COLUMN_INDEX_BORRADO = 12;
-	public static final int ORDER_COLUMN_INDEX_FECHA_BORRADO = 13;
+	public static final int ORDER_COLUMN_INDEX_ADM_USU_ID = 2;
+	public static final int ORDER_COLUMN_INDEX_DNI = 3;
+	public static final int ORDER_COLUMN_INDEX_NOMBRE = 4;
+	public static final int ORDER_COLUMN_INDEX_TELEFONO = 5;
+	public static final int ORDER_COLUMN_INDEX_MOVIL = 6;
+	public static final int ORDER_COLUMN_INDEX_EMAIL = 7;
+	public static final int ORDER_COLUMN_INDEX_ROL = 8;
+	public static final int ORDER_COLUMN_INDEX_LISTA_DIST = 9;
+	public static final int ORDER_COLUMN_INDEX_EXCLUIDO = 10;
+	public static final int ORDER_COLUMN_INDEX_RAZON_EXCLUSION = 11;
+	public static final int ORDER_COLUMN_INDEX_FECHA_EXCLUSION = 12;
+	public static final int ORDER_COLUMN_INDEX_BORRADO = 13;
+	public static final int ORDER_COLUMN_INDEX_FECHA_BORRADO = 14;
 		
 	
 	/** Consulta usuarios en BBDD y las devuelve.
@@ -194,16 +192,20 @@ public class ModeloUsuarioBolsaEmpleo {
 	 * @param rs resultado de la consulta
 	 * @return usuario
 	 * @throws SQLException en caso de error de base de datos
+	 * @throws UVException 
 	 */	
-	public UsuarioBolsaEmpleo setUsuario(ResultSet rs) throws SQLException {
+	public UsuarioBolsaEmpleo setUsuario(ResultSet rs) throws SQLException, UVException {
+		ModeloRol modeloRol = new ModeloRol();
+		
 		UsuarioBolsaEmpleo usuario = new UsuarioBolsaEmpleo();
 		usuario.setCodNum(rs.getInt("CODNUM"));
+		usuario.setAdmUsuCodNum(rs.getInt("ADM_USU_CODNUM"));
 		usuario.setDni(rs.getString("DNI"));
 		usuario.setNombre(rs.getString("NOMBRE"));
 		usuario.setTelefono(rs.getString("TELEFONO"));					
 		usuario.setMovil(rs.getString("MOVIL"));
 		usuario.setEmail(rs.getString("EMAIL"));
-		usuario.setRol(rs.getString("ROL"));
+		usuario.setRol(modeloRol.getRoleById(rs.getInt("ROL")));
 		usuario.setListaDist(rs.getString("FLGLISTADISTRIBUCION").equals("S"));
 		usuario.setExcluido(rs.getString("FLGEXCLUIDO").equals("S"));
 		usuario.setRazonExcluido(rs.getString("RAZON_EXCLUSION"));
@@ -226,6 +228,7 @@ public class ModeloUsuarioBolsaEmpleo {
 		DataTable<UsuarioBolsaEmpleo> dataTable = new DataTable<UsuarioBolsaEmpleo>(params);
 		
 		dataTable.setOrderColumn(ORDER_COLUMN_INDEX_ID, "bepusu.CODNUM");
+		dataTable.setOrderColumn(ORDER_COLUMN_INDEX_ADM_USU_ID, "bepusu.ADM_USU_CODNUM");
 		dataTable.setOrderColumn(ORDER_COLUMN_INDEX_DNI, "bepusu.DNI");
 		dataTable.setOrderColumn(ORDER_COLUMN_INDEX_NOMBRE, "bepusu.NOMBRE");
 		dataTable.setOrderColumn(ORDER_COLUMN_INDEX_TELEFONO, "bepusu.TELEFONO");

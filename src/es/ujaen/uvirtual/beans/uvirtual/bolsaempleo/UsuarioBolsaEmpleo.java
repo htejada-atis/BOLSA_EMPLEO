@@ -3,6 +3,8 @@ package es.ujaen.uvirtual.beans.uvirtual.bolsaempleo;
 import java.io.Serializable;
 import java.util.Date;
 
+import es.ujaen.uvirtual.beans.Rol;
+
 /** Clase usuario de UVIRTUAL.
  * @author ATISoluciones
  *
@@ -10,12 +12,13 @@ import java.util.Date;
 public class UsuarioBolsaEmpleo implements Serializable {
 	private static final long serialVersionUID = 1L;
 	private Integer codNum;
+	private Integer adm_usu_codNum;
 	private String dni;
 	private String nombre;
 	private String telefono;
 	private String movil;
 	private String email;
-	private String rol;
+	private Rol rol;
 	private Boolean listaDist;
 	private Boolean excluido;
 	private String razonExclusion;
@@ -64,6 +67,14 @@ public class UsuarioBolsaEmpleo implements Serializable {
 		this.codNum = codNum;
 	}
 	
+	public Integer getAdmUsuCodNum() {
+		return adm_usu_codNum;
+	}
+
+	public void setAdmUsuCodNum(Integer admusucodNum) {
+		this.adm_usu_codNum = admusucodNum;
+	}
+	
 	public String getDni() {
 		return dni;
 	}
@@ -104,11 +115,11 @@ public class UsuarioBolsaEmpleo implements Serializable {
 		this.email = email;
 	}
 	
-	public String getRol() {
+	public Rol getRol() {
 		return rol;
 	}
 
-	public void setRol(String rol) {
+	public void setRol(Rol rol) {
 		this.rol = rol;
 	}
 	
