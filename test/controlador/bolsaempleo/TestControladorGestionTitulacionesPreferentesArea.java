@@ -21,6 +21,7 @@ import es.ujaen.uvirtual.controlador.infadministrativa.bolsaempleo.ControladorGe
 public class TestControladorGestionTitulacionesPreferentesArea {
 	
 	private static final String MENSAJE_AREAS_DEVUELTAS = "Debe devolver areas";
+	private static final String MENSAJE_TITULACIONES_DEVUELTAS = "Debe devolver titulaciones";
 	private static final String MENSAJE_CON_ERROR = "Debe devolver error";
 	private static final String MENSAJE_SIN_ADVERTENCIAS = "No debe mostrar advertencias";
 	private static final String MENSAJE_SIN_ERROR = "No debe devolver error";
@@ -99,8 +100,8 @@ public class TestControladorGestionTitulacionesPreferentesArea {
 		VistaTitulacionesArea bean = (VistaTitulacionesArea) peticion.getUVDatos().getVistas().get(VistaTitulacionesArea.class.getName());
 		
 		assertNotEquals(MENSAJE_AREAS_DEVUELTAS, 0, bean.getAreas().size());
-		assertEquals(0, bean.getMensajesDeError().size());
-		assertEquals(0, bean.getMensajesDeAdvertencia().size());
+		assertEquals(MENSAJE_SIN_ERROR, 0, bean.getMensajesDeError().size());
+		assertEquals(MENSAJE_SIN_ADVERTENCIAS, 0, bean.getMensajesDeAdvertencia().size());
 	}
 	
 	/** Obtener listado de areas .
@@ -113,8 +114,8 @@ public class TestControladorGestionTitulacionesPreferentesArea {
 		VistaTitulacionesArea bean = getVistaConAreas();
 		
 		assertNotEquals(MENSAJE_AREAS_DEVUELTAS, 0, bean.getAreas().size());
-		assertEquals(0, bean.getMensajesDeError().size());
-		assertEquals(0, bean.getMensajesDeAdvertencia().size());
+		assertEquals(MENSAJE_SIN_ERROR, 0, bean.getMensajesDeError().size());
+		assertEquals(MENSAJE_SIN_ADVERTENCIAS, 0, bean.getMensajesDeAdvertencia().size());
 	}
 	
 	/** Obtener datatable titulaciones .
@@ -126,9 +127,9 @@ public class TestControladorGestionTitulacionesPreferentesArea {
 	public void testA03ObtenerTitulaciones() throws SQLException, ServletException, IOException {
 		VistaTitulacionesArea bean = getVistaConTitulaciones(ControladorGestionTitulacionesPreferentesArea.ACCION_DATATABLE_TITULACIONES, true);
 		
-		assertNotEquals(0, bean.getDatatableTitulaciones().getData().size());	
-		assertEquals(0, bean.getMensajesDeError().size());
-		assertEquals(0, bean.getMensajesDeAdvertencia().size());
+		assertNotEquals(MENSAJE_TITULACIONES_DEVUELTAS, 0, bean.getDatatableTitulaciones().getData().size());
+		assertEquals(MENSAJE_SIN_ERROR, 0, bean.getMensajesDeError().size());
+		assertEquals(MENSAJE_SIN_ADVERTENCIAS, 0, bean.getMensajesDeAdvertencia().size());
 	}
 	
 	/** Obtener datatable titulaciones preferentes por área .
@@ -140,9 +141,9 @@ public class TestControladorGestionTitulacionesPreferentesArea {
 	public void testA04ObtenerTitulacionesPreferentesArea() throws SQLException, ServletException, IOException {
 		VistaTitulacionesArea bean = getVistaConTitulaciones(ControladorGestionTitulacionesPreferentesArea.ACCION_DATATABLE_TITULACIONES_AREA, true);
 		
-		assertNotEquals(0, bean.getDatatableTitulaciones().getData().size());	
-		assertEquals(0, bean.getMensajesDeError().size());
-		assertEquals(0, bean.getMensajesDeAdvertencia().size());
+		assertNotEquals(MENSAJE_TITULACIONES_DEVUELTAS, 0, bean.getDatatableTitulaciones().getData().size());	
+		assertEquals(MENSAJE_SIN_ERROR, 0, bean.getMensajesDeError().size());
+		assertEquals(MENSAJE_SIN_ADVERTENCIAS, 0, bean.getMensajesDeAdvertencia().size());
 	}
 	
 	/** eliminar una titulaciones preferentes dentro de un área .

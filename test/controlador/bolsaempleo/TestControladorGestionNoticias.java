@@ -37,7 +37,7 @@ public class TestControladorGestionNoticias {
 	
     /** prepara la bd con los datos iniciales.
      * @throws SQLException si error en bd
-     * @throws IOException si error en ficheros
+     * @throws IOException si error en io
      */
     @BeforeClass
     public static void preparaBd() throws IOException, SQLException {

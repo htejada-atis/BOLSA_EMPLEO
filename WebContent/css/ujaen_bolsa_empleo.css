@@ -41,6 +41,15 @@ table.bluetable.bolsaempleo p.loading {
 	width: max-content;	
 }
 
+table.bluetable.bolsaempleo .selected {
+	background: none repeat scroll 0 0 #FFDA84;
+	color: #333399;
+}
+
+table.bluetable.bolsaempleo .clickable:hover {
+	cursor: pointer;
+}
+
 /* overflow */
 
 .overflow-ellipsis {
