@@ -56,8 +56,6 @@ public class ControladorItemsBaremacion extends HttpServlet {
 	public static final String PARAM_BLOQUE = "bloque";
 	
 	// mensajes
-	public static final String MENSAJE_ERROR_ACCION_AREA_NO_VALIDA = "Acción no válida";
-	public static final String MENSAJE_EXITO_AREA_MODIFICADA_CORRECTAMENTE = "Area/s modificada/s correctamente";
 	
 	// urls
 	public static final String URL_PATTERN_AJAX = "/srv/es/ajax/informacionadministrativa/bolsaempleo/configuracion/itemsbaremacion";

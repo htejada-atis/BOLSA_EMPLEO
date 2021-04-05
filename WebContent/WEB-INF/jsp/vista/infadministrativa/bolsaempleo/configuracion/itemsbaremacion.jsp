@@ -127,9 +127,6 @@ VistaItemsBaremacion bean = (VistaItemsBaremacion) uvdatos.getVistas().get(Vista
 				    "params": {"<%=ControladorItemsBaremacion.PARAM_BLOQUE%>": <%= bean.getBloqueBaremacion().getCodNum() %>},
 				    "pageSize": 10,
 				    "action": "<%=ControladorItemsBaremacion.ACCION_DATATABLE_ITEMS%>",
-				    "clickable": {'onClick': function(row) {
-				    	
-				    }},
 				    "columns": [
 				    	{'data': 'codigo'},
 				        {'data': 'nombre'},

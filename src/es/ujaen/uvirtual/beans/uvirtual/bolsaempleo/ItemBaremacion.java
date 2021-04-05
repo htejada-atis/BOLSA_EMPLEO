@@ -94,7 +94,7 @@ public class ItemBaremacion implements Serializable {
 	
 	@Override
 	public String toString() {
-		return "ApartadoBaremacion [codNum=" + codNum + ", apartado=" + bloque + ", codigo=" + codigo
+		return "ApartadoBaremacion [codNum=" + codNum + ", bloque=" + bloque + ", codigo=" + codigo
 				+ ", nombre=" + nombre + ", activo=" + activo + "]";
 	}
 	
