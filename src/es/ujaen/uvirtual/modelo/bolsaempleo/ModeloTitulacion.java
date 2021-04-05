@@ -209,7 +209,7 @@ public class ModeloTitulacion {
 		try (Connection conexion = ConexionUvirtual.obtenerInstancia();
 				PreparedStatement stmtCount = conexion.prepareStatement(dataTable.getQueryCount());
 				PreparedStatement stmt = conexion.prepareStatement(dataTable.getQuery());
-		) {				
+		) {		
 			try (ResultSet rs = stmt.executeQuery()) {
 				while (rs.next()) {
 					Titulacion tit = new Titulacion();
@@ -246,7 +246,7 @@ public class ModeloTitulacion {
 		String consultaNotIn = "SELECT beptit.CODNUM FROM tbep_titulaciones beptit "
 				+ "INNER JOIN tbep_titulacionespreferentesarea beptpa ON beptit.codnum = beptpa.beptit_codnum "
 				+ "INNER JOIN TBEP_AREAS bepare ON bepare.codnum = beptpa.bepare_codnum "
-				+ "WHERE bepare.CODNUM = " + area;
+				+ "WHERE bepare.CODNUM = ? ";
 		String consulta = "SELECT beptit.* FROM tbep_titulaciones beptit WHERE beptit.CODNUM NOT IN (" + consultaNotIn + ")";
 		
 		dataTable.setOrderColumn(ORDER_COLUMN_INDEX_ID, "beptit.CODNUM");
@@ -257,6 +257,9 @@ public class ModeloTitulacion {
 				PreparedStatement stmtCount = conexion.prepareStatement(dataTable.getQueryCount());
 				PreparedStatement stmt = conexion.prepareStatement(dataTable.getQuery());
 		) {
+			int indexParam = 1;
+			stmt.setInt(indexParam, area);
+			stmtCount.setInt(indexParam++, area);
 			try (ResultSet rs = stmt.executeQuery()) {
 				while (rs.next()) {
 					Titulacion tit = new Titulacion();
@@ -293,7 +296,7 @@ public class ModeloTitulacion {
 		String consulta = "SELECT beptit.CODNUM, beptit.NOMBRE FROM tbep_titulaciones beptit "
 				+ "INNER JOIN tbep_titulacionespreferentesarea beptpa ON beptit.codnum = beptpa.beptit_codnum "
 				+ "INNER JOIN TBEP_AREAS bepare ON bepare.codnum = beptpa.bepare_codnum "
-				+ "WHERE bepare.CODNUM = " + area;
+				+ "WHERE bepare.CODNUM = ? ";
 		
 		dataTable.setOrderColumn(ORDER_COLUMN_INDEX_ID, "beptit.CODNUM");
 		dataTable.setOrderColumn(ORDER_COLUMN_INDEX_NOMBRE, "beptit.NOMBRE");
@@ -304,6 +307,9 @@ public class ModeloTitulacion {
 				PreparedStatement stmtCount = conexion.prepareStatement(dataTable.getQueryCount());
 				PreparedStatement stmt = conexion.prepareStatement(dataTable.getQuery());
 		) {
+			int indexParam = 1;
+			stmt.setInt(indexParam, area);
+			stmtCount.setInt(indexParam++, area);
 			try (ResultSet rs = stmt.executeQuery()) {
 				while (rs.next()) {
 					Titulacion tit = new Titulacion();
