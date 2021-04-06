@@ -3,6 +3,7 @@ package es.ujaen.uvirtual.controlador.infadministrativa.bolsaempleo;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.sql.SQLException;
+import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -17,12 +18,12 @@ import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 
 import es.ujaen.uvirtual.beans.CodigoDescripcion;
+import es.ujaen.uvirtual.beans.Rol;
 import es.ujaen.uvirtual.beans.UVDatos;
 import es.ujaen.uvirtual.beans.Usuario;
-import es.ujaen.uvirtual.beans.uvirtual.bolsaempleo.Titulacion;
 import es.ujaen.uvirtual.beans.uvirtual.bolsaempleo.UsuarioBolsaEmpleo;
 import es.ujaen.uvirtual.beans.vistas.uvirtual.bolsaempleo.VistaUsuarioBolsaEmpleo;
-import es.ujaen.uvirtual.modelo.bolsaempleo.ModeloTitulacion;
+import es.ujaen.uvirtual.modelo.bolsaempleo.ModeloRol;
 import es.ujaen.uvirtual.modelo.bolsaempleo.ModeloUsuarioBolsaEmpleo;
 import es.ujaen.uvirtual.utilidades.DataTable;
 import es.ujaen.uvirtual.utilidades.EscapaHTML;
@@ -65,6 +66,7 @@ public class ControladorUsuarioBolsaEmpleo extends HttpServlet {
 	public static final String ACCION_EDITAR_USUARIO = "editarusuario";
 	public static final String ACCION_ELIMINAR_USUARIO = "eliminarusuario";
 	public static final String ACCION_LISTAR_USUARIOS = "listar_usuarios";
+	public static final String ACCION_LISTAR_ROLES = "listar_roles";
 	
 	public static final String ACCION_DATATABLE_USUARIOS = "datatableusuarios";
 	public static final String ACCION_DATATABLE_USUARIOS_BORRADOS = "datatableusuariosborrados";
@@ -123,6 +125,9 @@ public class ControladorUsuarioBolsaEmpleo extends HttpServlet {
 				break;
 			case ACCION_USUARIO:
 				accionSobreUsuario(bean, datos, request);
+				break;
+			case ACCION_LISTAR_ROLES:
+				obtenerRoles(bean);
 				break;
 			}
 		} catch (SQLException e) {
@@ -269,10 +274,11 @@ public class ControladorUsuarioBolsaEmpleo extends HttpServlet {
 		ModeloUsuarioBolsaEmpleo modelo = new ModeloUsuarioBolsaEmpleo();
 		
 		try {
+			obtenerRoles(bean);
 			UsuarioBolsaEmpleo usu = modelo.listaUsuario(Formateador.leeParametroString(request.getParameter(PARAM_NOMBRE)));
 			bean.setUsuario(usu);
 		} catch (UVException e) {
-			
+
 		}
 	}
 	
@@ -312,6 +318,17 @@ public class ControladorUsuarioBolsaEmpleo extends HttpServlet {
 	 */
 	private void formularioUsuario(HttpServletRequest request, HttpServletResponse response, VistaUsuarioBolsaEmpleo bean) throws SQLException, UVException, IOException {
 		bean.setVista("/WEB-INF/jsp/vista/infadministrativa/bolsaempleo/configuracion/buscarUsuario.jsp");
+	}
+	
+	
+	/** muestra todos los roles en un select .
+	 * @param bean bean de la vista a la que poner los valores.
+	 * @throws SQLException excepcion de bbdd.
+	 */
+	private void obtenerRoles(VistaUsuarioBolsaEmpleo bean) throws SQLException {
+		ModeloRol modelo = new ModeloRol();
+		List<Rol> roles = modelo.listaRoles();
+		bean.setRoles(roles);
 	}
 	
 }

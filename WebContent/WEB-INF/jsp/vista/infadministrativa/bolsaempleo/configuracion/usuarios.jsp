@@ -33,18 +33,14 @@ VistaUsuarioBolsaEmpleo bean = (VistaUsuarioBolsaEmpleo) uvdatos.getVistas().get
 		<tr>
 			<th scope="col" style="width:5%"></th>
 			<th scope="col" style="width:5%" title="Id del usuario">Id</th>
-			<th scope="col" style="width:5%" title="DNI del usuario">DNI</th>
-			<th scope="col" style="width:5%" title="Nombre del usuario">Nombre</th>
-			<th scope="col" style="width:5%" title="Teléfono del usuario">Teléfono</th>
-			<th scope="col" style="width:5%" title="Móvil del usuario">Móvil</th>
-			<th scope="col" style="width:5%" title="Email del usuario">Email</th>
-			<th scope="col" style="width:5%" title="Rol del usuario">Rol</th>
-			<th scope="col" style="width:5%" title="Lista del usuario">Lista de Distribución</th>
-			<th scope="col" style="width:5%" title="Excluido del usuario">Excluido</th>
-			<th scope="col" style="width:5%" title="Razon exclusion del usuario">Razon Exclusion</th>
-			<th scope="col" style="width:5%" title="Fecha exclusion usuario">Fecha Exclusion</th>
-			<th scope="col" style="width:5%" title="Borrado del usuario">Borrado</th>
-			<th scope="col" style="width:35%" title="Fecha borrado del usuario">Fecha Borrado</th>
+			<th scope="col" style="width:5%" title="Id de usuario enlazado">Usuario</th>
+			<th scope="col" style="width:10%" title="DNI del usuario">DNI</th>
+			<th scope="col" style="width:10%" title="Nombre del usuario">Nombre</th>
+			<th scope="col" style="width:10%" title="Teléfono del usuario">Teléfono</th>
+			<th scope="col" style="width:10%" title="Móvil del usuario">Móvil</th>
+			<th scope="col" style="width:25%" title="Email del usuario">Email</th>
+			<th scope="col" style="width:10%" title="Rol del usuario">Rol</th>
+			<th scope="col" style="width:10%" title="Lista del usuario">Lista de Distribución</th>
 		</tr>
 		<tbody>				
 		</tbody>
@@ -60,18 +56,16 @@ VistaUsuarioBolsaEmpleo bean = (VistaUsuarioBolsaEmpleo) uvdatos.getVistas().get
 		<tr>
 			<th scope="col" style="width:5%"></th>
 			<th scope="col" style="width:5%" title="Id del usuario">Id</th>
-			<th scope="col" style="width:5%" title="DNI del usuario">DNI</th>
-			<th scope="col" style="width:5%" title="Nombre del usuario">Nombre</th>
-			<th scope="col" style="width:5%" title="Teléfono del usuario">Teléfono</th>
-			<th scope="col" style="width:5%" title="Móvil del usuario">Móvil</th>
-			<th scope="col" style="width:5%" title="Email del usuario">Email</th>
-			<th scope="col" style="width:5%" title="Rol del usuario">Rol</th>
-			<th scope="col" style="width:5%" title="Lista del usuario">Lista de Distribución</th>
-			<th scope="col" style="width:5%" title="Excluido del usuario">Excluido</th>
-			<th scope="col" style="width:5%" title="Razon exclusion del usuario">Razon Exclusion</th>
-			<th scope="col" style="width:5%" title="Fecha exclusion usuario">Fecha Exclusion</th>
-			<th scope="col" style="width:5%" title="Borrado del usuario">Borrado</th>
-			<th scope="col" style="width:35%" title="Fecha borrado del usuario">Fecha Borrado</th>
+			<th scope="col" style="width:5%" title="Id de usuario enlazado">Usuario</th>
+			<th scope="col" style="width:10%" title="DNI del usuario">DNI</th>
+			<th scope="col" style="width:10%" title="Nombre del usuario">Nombre</th>
+			<th scope="col" style="width:10%" title="Teléfono del usuario">Teléfono</th>
+			<th scope="col" style="width:10%" title="Móvil del usuario">Móvil</th>
+			<th scope="col" style="width:10%" title="Email del usuario">Email</th>
+			<th scope="col" style="width:10%" title="Rol del usuario">Rol</th>
+			<th scope="col" style="width:10%" title="Lista del usuario">Lista de Distribución</th>
+			<th scope="col" style="width:10%" title="Borrado del usuario">Borrado</th>
+			<th scope="col" style="width:5%" title="Fecha borrado del usuario">Fecha Borrado</th>
 		</tr>
 		<tbody>				
 		</tbody>
@@ -87,18 +81,17 @@ VistaUsuarioBolsaEmpleo bean = (VistaUsuarioBolsaEmpleo) uvdatos.getVistas().get
 		<tr>
 			<th scope="col" style="width:5%"></th>
 			<th scope="col" style="width:5%" title="Id del usuario">Id</th>
-			<th scope="col" style="width:5%" title="DNI del usuario">DNI</th>
-			<th scope="col" style="width:5%" title="Nombre del usuario">Nombre</th>
-			<th scope="col" style="width:5%" title="Teléfono del usuario">Teléfono</th>
-			<th scope="col" style="width:5%" title="Móvil del usuario">Móvil</th>
-			<th scope="col" style="width:5%" title="Email del usuario">Email</th>
-			<th scope="col" style="width:5%" title="Rol del usuario">Rol</th>
-			<th scope="col" style="width:5%" title="Lista del usuario">Lista de Distribución</th>
-			<th scope="col" style="width:5%" title="Excluido del usuario">Excluido</th>
-			<th scope="col" style="width:5%" title="Razon exclusion del usuario">Razon Exclusion</th>
-			<th scope="col" style="width:5%" title="Fecha exclusion usuario">Fecha Exclusion</th>
-			<th scope="col" style="width:5%" title="Borrado del usuario">Borrado</th>
-			<th scope="col" style="width:35%" title="Fecha borrado del usuario">Fecha Borrado</th>
+			<th scope="col" style="width:5%" title="Id de usuario enlazado">Usuario</th>
+			<th scope="col" style="width:10%" title="DNI del usuario">DNI</th>
+			<th scope="col" style="width:10%" title="Nombre del usuario">Nombre</th>
+			<th scope="col" style="width:10%" title="Teléfono del usuario">Teléfono</th>
+			<th scope="col" style="width:10%" title="Móvil del usuario">Móvil</th>
+			<th scope="col" style="width:10%" title="Email del usuario">Email</th>
+			<th scope="col" style="width:10%" title="Rol del usuario">Rol</th>
+			<th scope="col" style="width:10%" title="Lista del usuario">Lista de Distribución</th>
+			<th scope="col" style="width:10%" title="Excluido del usuario">Excluido</th>
+			<th scope="col" style="width:10%" title="Razon exclusion del usuario">Razon Exclusion</th>
+			<th scope="col" style="width:10%" title="Fecha exclusion usuario">Fecha Exclusion</th>
 		</tr>
 		<tbody>				
 		</tbody>
@@ -113,7 +106,7 @@ VistaUsuarioBolsaEmpleo bean = (VistaUsuarioBolsaEmpleo) uvdatos.getVistas().get
 	
 <script>
 $(document).ready(function() {
-	document.getElementById("nuevo_usuario").addEventListener("click", function(event) {
+	document.getElementById('nuevo_usuario').addEventListener("click", function(event) {
 		event.preventDefault();
 		Atis.sendForm("<%= request.getRequestURI() %>", {'a': '<%= ControladorUsuarioBolsaEmpleo.ACCION_FORMULARIO_USUARIO %>'});
 	});
@@ -127,18 +120,21 @@ $(document).ready(function() {
 	    "columns": [
 	    	{'data': 'codNum', 'selectable': true},
 	        {'data': 'codNum'},
+	        {'data': 'adm_usu_codNum'},
 	        {'data': 'dni'},
 	        {'data': 'nombre'},
 	        {'data': 'telefono'},
 	        {'data': 'movil'},
 	        {'data': 'email'},
-	        {'data': 'rol'},
-	        {'data': 'listaDist'},
-	        {'data': 'excluido'},
-	        {'data': 'razonExclusion'},
-	        {'data': 'fechaExclusion'},
-	        {'data': 'borrado'},
-	        {'data': 'fechaBorrado'}
+	        {'data': 'rol.descripcion'},
+	        {'data': 'listaDist', 'render': function(row) {
+        		if(row.listaDist==true){
+        			return "<center><img style='width:20px; height:20px' src='/img/md/check_box.svg'/></center>"; 
+        		}
+        		else{
+        			return "<center><img style='width:20px; height:20px' src='/img/md/cancel.svg'/></center>"; 
+        		}
+        	}}
 	    ]
 	});
 	
@@ -150,18 +146,31 @@ $(document).ready(function() {
 	    "columns": [
 	    	{'data': 'codNum', 'selectable': true},
 	        {'data': 'codNum'},
+	        {'data': 'adm_usu_codNum'},
 	        {'data': 'dni'},
 	        {'data': 'nombre'},
 	        {'data': 'telefono'},
 	        {'data': 'movil'},
 	        {'data': 'email'},
 	        {'data': 'rol'},
-	        {'data': 'listaDist'},
-	        {'data': 'excluido'},
+	        {'data': 'listaDist', 'render': function(row) {
+        		if(row.listaDist==true){
+        			return "<center><img style='width:20px; height:20px' src='/img/md/check_box.svg'/></center>"; 
+        		}
+        		else{
+        			return "<center><img style='width:20px; height:20px' src='/img/md/cancel.svg'/></center>"; 
+        		}
+        	}},
+	        {'data': 'excluido', 'render': function(row) {
+        		if(row.excluido==true){
+        			return "<center><img style='width:20px; height:20px' src='/img/md/check_box.svg'/></center>"; 
+        		}
+        		else{
+        			return "<center><img style='width:20px; height:20px' src='/img/md/cancel.svg'/></center>"; 
+        		}
+        	}},
 	        {'data': 'razonExclusion'},
-	        {'data': 'fechaExclusion'},
-	        {'data': 'borrado'},
-	        {'data': 'fechaBorrado'}
+	        {'data': 'fechaExclusion'}
 	    ]
 	});
 	
@@ -174,33 +183,32 @@ $(document).ready(function() {
 	    "columns": [
 	    	{'data': 'codNum', 'selectable': true},
 	        {'data': 'codNum'},
+	        {'data': 'adm_usu_codNum'},
 	        {'data': 'dni'},
 	        {'data': 'nombre'},
 	        {'data': 'telefono'},
 	        {'data': 'movil'},
 	        {'data': 'email'},
 	        {'data': 'rol'},
-	        {'data': 'listaDist'},
-	        {'data': 'excluido'},
-	        {'data': 'razonExclusion'},
-	        {'data': 'fechaExclusion'},
-	        {'data': 'borrado'},
+	        {'data': 'listaDist', 'render': function(row) {
+        		if(row.listaDist==true){
+        			return "<center><img style='width:20px; height:20px' src='/img/md/check_box.svg'/></center>"; 
+        		}
+        		else{
+        			return "<center><img style='width:20px; height:20px' src='/img/md/cancel.svg'/></center>"; 
+        		}
+        	}},
+	        {'data': 'borrado', 'render': function(row) {
+        		if(row.borrado==true){
+        			return "<center><img style='width:20px; height:20px' src='/img/md/check_box.svg'/></center>"; 
+        		}
+        		else{
+        			return "<center><img style='width:20px; height:20px' src='/img/md/cancel.svg'/></center>"; 
+        		}
+        	}},
 	        {'data': 'fechaBorrado'}
 	    ]
 	});
-	
-	function enviaAccion(accion, selected) {
-		if (selected.length == 0) {
-			Atis.alertDialog('Estado de las áreas', 'Seleccione al menos un área.');
-			return;
-		}
-		
-		var params = {
-			'a': '<%=ControladorUsuarioBolsaEmpleo.ACCION_USUARIO%>', 
-			'<%=ControladorUsuarioBolsaEmpleo.PARAM_ACCION_USUARIO%>': accion
-		};
-		
-   		Atis.sendForm("<%= request.getRequestURI() %>", params);
-	}
+
 }); 
 </script>
