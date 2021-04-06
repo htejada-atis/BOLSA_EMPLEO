@@ -29,14 +29,20 @@ VistaUsuarioBolsaEmpleo bean = (VistaUsuarioBolsaEmpleo) uvdatos.getVistas().get
 		    out.print("<h2>Nuevo Usuario</h2>");
 		}
 	%>
-    
-	    <form id="actualizar_usuario" class="be-form" method="post" action="<%= request.getRequestURI() %>">
-    		<input type="hidden" name="<%= ControladorUsuarioBolsaEmpleo.PARAM_ACCION %>" id="accion_formulario" value="" />
-			<input type="hidden" name="<%= ControladorUsuarioBolsaEmpleo.PARAM_ID%>" id="usuario_id" value="" />
-			<div class="form-select">
-				<label><%if(bean.getUsuario()!=null) {%>Usuario asociado<%}else{%>Elija el usuario para asociar<%}%></label>
-				<select id="select_area">
-					<option value="0"> - </option>
+	
+	<form id="actualizar_usuario" class="be-form" method="post" action="<%= request.getRequestURI() %>">
+    	<input type="hidden" name="<%= ControladorUsuarioBolsaEmpleo.PARAM_ACCION %>" id="accion_formulario" value="" />
+		<input type="hidden" name="<%= ControladorUsuarioBolsaEmpleo.PARAM_ID%>" id="usuario_id" value="" />
+	   	<div class="form-group">
+    		<label for="nombre_usuario">Nombre: </label>
+    		<input id="fichero_titulo" type="text" name="<%= ControladorUsuarioBolsaEmpleo.PARAM_NOMBRE %>" value="<%= nombre %>"/>
+    	</div>
+
+		
+		<div class="form-select">
+			<label>Elija el rol para asociar</label>
+			<select id="select_area">
+				<option value="0"> - </option>
 					<%
 					for(Rol role: bean.getRoles()) {
 					%>
@@ -44,26 +50,12 @@ VistaUsuarioBolsaEmpleo bean = (VistaUsuarioBolsaEmpleo) uvdatos.getVistas().get
     				<%
     				}
     				%>
-				</select>
-			</div>
-			<div class="form-select">
-				<label>Elija el rol para asociar</label>
-				<select id="select_area">
-					<option value="0"> - </option>
-					<%
-					for(Rol role: bean.getRoles()) {
-					%>
-    					<option value="<%=role.getCodNum()%>"><%=role.getDescripcion()%></option>
-    				<%
-    				}
-    				%>
-				</select>
-			</div>
-    		<div class="form-btn">
-    			<input id="usuario_enviar" type="submit" name="<%= ControladorUsuarioBolsaEmpleo.ACCION_BUSCAR_USUARIO %>" value="<%if(bean.getUsuario()!=null) {%>Guardar usuario<%}else{%>Añadir usuario<%}%>"/>
-    		</div>
-    	</form>
-    
+			</select>
+		</div>
+    	<div class="form-btn">
+    		<input id="usuario_enviar" type="submit" name="<%= ControladorUsuarioBolsaEmpleo.ACCION_BUSCAR_USUARIO %>" value="<%if(bean.getUsuario()!=null) {%>Guardar usuario<%}else{%>Añadir usuario<%}%>"/>
+    	</div>
+    </form>
 </div>
 
 <script>
