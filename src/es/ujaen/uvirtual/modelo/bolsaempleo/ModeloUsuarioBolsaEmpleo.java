@@ -10,6 +10,7 @@ import java.util.Map;
 
 import es.ujaen.uvirtual.beans.uvirtual.bolsaempleo.UsuarioBolsaEmpleo;
 import es.ujaen.uvirtual.modelo.conexion.ConexionUvirtual;
+import es.ujaen.uvirtual.modelo.conexion.ConexionArcos;
 import es.ujaen.uvirtual.utilidades.DataTable;
 import es.ujaen.uvirtual.utilidades.UVException;
 
@@ -23,18 +24,21 @@ public class ModeloUsuarioBolsaEmpleo {
 	
 	public static final int ORDER_COLUMN_INDEX_ID = 1;
 	public static final int ORDER_COLUMN_INDEX_ADM_USU_ID = 2;
-	public static final int ORDER_COLUMN_INDEX_DNI = 3;
-	public static final int ORDER_COLUMN_INDEX_NOMBRE = 4;
-	public static final int ORDER_COLUMN_INDEX_TELEFONO = 5;
-	public static final int ORDER_COLUMN_INDEX_MOVIL = 6;
-	public static final int ORDER_COLUMN_INDEX_EMAIL = 7;
-	public static final int ORDER_COLUMN_INDEX_ROL = 8;
-	public static final int ORDER_COLUMN_INDEX_LISTA_DIST = 9;
-	public static final int ORDER_COLUMN_INDEX_EXCLUIDO = 10;
-	public static final int ORDER_COLUMN_INDEX_RAZON_EXCLUSION = 11;
-	public static final int ORDER_COLUMN_INDEX_FECHA_EXCLUSION = 12;
-	public static final int ORDER_COLUMN_INDEX_BORRADO = 13;
-	public static final int ORDER_COLUMN_INDEX_FECHA_BORRADO = 14;
+	public static final int ORDER_COLUMN_INDEX_TIPO_DOCUMENTO = 3;
+	public static final int ORDER_COLUMN_INDEX_NUMDOCUMENTO = 4;
+	public static final int ORDER_COLUMN_INDEX_UJAENDNI = 5;
+	public static final int ORDER_COLUMN_INDEX_NOMBRE = 6;
+	public static final int ORDER_COLUMN_INDEX_PRIMER_APELLIDO = 7;
+	public static final int ORDER_COLUMN_INDEX_SEGUNDO_APELLIDO = 8;
+	public static final int ORDER_COLUMN_INDEX_SEXO = 9;
+	public static final int ORDER_COLUMN_INDEX_EMAIL = 10;
+	public static final int ORDER_COLUMN_INDEX_ROL = 11;
+	public static final int ORDER_COLUMN_INDEX_LISTA_DIST = 12;
+	public static final int ORDER_COLUMN_INDEX_EXCLUIDO = 13;
+	public static final int ORDER_COLUMN_INDEX_RAZON_EXCLUSION = 14;
+	public static final int ORDER_COLUMN_INDEX_FECHA_EXCLUSION = 15;
+	public static final int ORDER_COLUMN_INDEX_BORRADO = 16;
+	public static final int ORDER_COLUMN_INDEX_FECHA_BORRADO = 17;
 		
 	
 	/** Consulta usuarios en BBDD y las devuelve.
@@ -62,6 +66,31 @@ public class ModeloUsuarioBolsaEmpleo {
 		return usuarios;
 	}
 	
+	/** Consulta usuarios en BBDD y las devuelve.
+	 * @param clausula para filtrar los usuarios de la bd
+	 * @return todos los usuarios de la base de datos
+	 * @throws SQLException en caso de error de base de datos
+	 */
+	private List<UsuarioBolsaEmpleo> listaUsuariosArcos(String clausula) throws SQLException {
+		List<UsuarioBolsaEmpleo> usuarios = new ArrayList<>();
+		String consulta = "SELECT * FROM ARCOS.V_CUENTAS_INTRANET  " + clausula;
+		
+		try (Connection conexion = ConexionArcos.obtenerInstancia();
+			PreparedStatement stmt = conexion.prepareStatement(consulta);) {
+				try (ResultSet rs = stmt.executeQuery()) {
+					while (rs.next()) {
+						try {
+							UsuarioBolsaEmpleo usuario = setUsuario(rs);
+							usuarios.add(usuario);		
+						} catch (Exception e) {
+							e.printStackTrace();
+						}
+					}
+				}
+			}
+		return usuarios;
+	}
+	
 	
 	/** obtiene un usuario a partir de su nombre.
 	 * @param nombre del usuario
@@ -71,6 +100,20 @@ public class ModeloUsuarioBolsaEmpleo {
 	public UsuarioBolsaEmpleo listaUsuario(String nombre) throws SQLException, UVException {
 		String clausulaWhere = "WHERE n.nombre = '" + nombre + "'";
 		List<UsuarioBolsaEmpleo> usuarios = listaUsuarios(clausulaWhere);
+		if (usuarios.isEmpty()) {
+			throw new UVException("No existe el usuario");
+		}
+		return usuarios.get(0);
+	}
+	
+	/** obtiene un usuario a partir de su nombre en el esquema Arcos.
+	 * @param nombre del usuario
+	 * @return usuario con el nombre especificado
+	 * @throws SQLException en caso de error en la BD
+	 */
+	public UsuarioBolsaEmpleo listaUsuarioArcos(String nombre) throws SQLException, UVException {
+		String clausulaWhere = "WHERE IDIDENTIFICADOR = '" + nombre + "'";
+		List<UsuarioBolsaEmpleo> usuarios = listaUsuariosArcos(clausulaWhere);
 		if (usuarios.isEmpty()) {
 			throw new UVException("No existe el usuario");
 		}
@@ -192,18 +235,21 @@ public class ModeloUsuarioBolsaEmpleo {
 	 * @param rs resultado de la consulta
 	 * @return usuario
 	 * @throws SQLException en caso de error de base de datos
-	 * @throws UVException 
+	 * @throws UVException en caso de no poder crear el usuario
 	 */	
 	public UsuarioBolsaEmpleo setUsuario(ResultSet rs) throws SQLException, UVException {
 		ModeloRol modeloRol = new ModeloRol();
 		
 		UsuarioBolsaEmpleo usuario = new UsuarioBolsaEmpleo();
 		usuario.setCodNum(rs.getInt("CODNUM"));
-		usuario.setAdmUsuCodNum(rs.getInt("ADM_USU_CODNUM"));
-		usuario.setDni(rs.getString("DNI"));
+		usuario.setAdmUsuCodNum(rs.getString("ADM_USU_CODNUM"));
+		usuario.setTipoDocumento(rs.getString("TIPO_DOCUMENTO"));
+		usuario.setNumDocumento(rs.getString("NUMDOCUMENTO"));
+		usuario.setUjaEnDni(rs.getString("UJAENDNI"));
 		usuario.setNombre(rs.getString("NOMBRE"));
-		usuario.setTelefono(rs.getString("TELEFONO"));					
-		usuario.setMovil(rs.getString("MOVIL"));
+		usuario.setPrimerApellido(rs.getString("APELLIDO1"));
+		usuario.setSegundoApellido(rs.getString("APELLIDO2"));
+		usuario.setSexo(rs.getString("SEXO"));
 		usuario.setEmail(rs.getString("EMAIL"));
 		usuario.setRol(modeloRol.getRoleById(rs.getInt("ROL")));
 		usuario.setListaDist(rs.getString("FLGLISTADISTRIBUCION").equals("S"));
@@ -229,10 +275,13 @@ public class ModeloUsuarioBolsaEmpleo {
 		
 		dataTable.setOrderColumn(ORDER_COLUMN_INDEX_ID, "bepusu.CODNUM");
 		dataTable.setOrderColumn(ORDER_COLUMN_INDEX_ADM_USU_ID, "bepusu.ADM_USU_CODNUM");
-		dataTable.setOrderColumn(ORDER_COLUMN_INDEX_DNI, "bepusu.DNI");
+		dataTable.setOrderColumn(ORDER_COLUMN_INDEX_TIPO_DOCUMENTO, "bepusu.TIPO_DOCUMENTO");
+		dataTable.setOrderColumn(ORDER_COLUMN_INDEX_NUMDOCUMENTO, "bepusu.ADM_USU_NUMDOCUMENTO");
+		dataTable.setOrderColumn(ORDER_COLUMN_INDEX_UJAENDNI, "bepusu.UJAENDNI");
 		dataTable.setOrderColumn(ORDER_COLUMN_INDEX_NOMBRE, "bepusu.NOMBRE");
-		dataTable.setOrderColumn(ORDER_COLUMN_INDEX_TELEFONO, "bepusu.TELEFONO");
-		dataTable.setOrderColumn(ORDER_COLUMN_INDEX_MOVIL, "bepusu.MOVIL");
+		dataTable.setOrderColumn(ORDER_COLUMN_INDEX_PRIMER_APELLIDO, "bepusu.APELLIDO1");
+		dataTable.setOrderColumn(ORDER_COLUMN_INDEX_SEGUNDO_APELLIDO, "bepusu.APELLIDO2");
+		dataTable.setOrderColumn(ORDER_COLUMN_INDEX_SEXO, "bepusu.SEXO");
 		dataTable.setOrderColumn(ORDER_COLUMN_INDEX_EMAIL, "bepusu.EMAIL");
 		dataTable.setOrderColumn(ORDER_COLUMN_INDEX_ROL, "bepusu.ROL");
 		dataTable.setOrderColumn(ORDER_COLUMN_INDEX_LISTA_DIST, "bepusu.FLGLISTADISTRIBUCION");

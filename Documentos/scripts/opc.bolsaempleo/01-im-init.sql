@@ -3,3 +3,5 @@ INSERT INTO ADM_ROL (rol_codnum, descripcion, valor) VALUES(1050, 'Integrantes d
 INSERT INTO ADM_ROL (rol_codnum, descripcion, valor) VALUES(1051, 'Candidatos', 'bolempcandidato');
 INSERT INTO ADM_ROL (rol_codnum, descripcion, valor) VALUES(1052, 'Miembro de la Comision', 'bolempcomision');
 INSERT INTO ADM_USUARIO_ROL (USERUID, ROL_CODNUM, FLG_ADMIN) VALUES ('usig', 1050, 'N');
+INSERT INTO ADM_USUARIO_ROL (USERUID, ROL_CODNUM, FLG_ADMIN) VALUES ('atis', 1051, 'N');
+INSERT INTO ADM_USUARIO_ROL (USERUID, ROL_CODNUM, FLG_ADMIN) VALUES ('estudiante1', 1052, 'N');
