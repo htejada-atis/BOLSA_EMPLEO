@@ -36,6 +36,13 @@ public class ItemBaremacion implements Serializable {
 		this.nombre = pnombre;
 		this.activo = pactivo;		
 	}
+	
+	/** Constructor con parametros.
+	 * @param pcodNum .
+	 */
+	public ItemBaremacion(Integer pcodNum) {
+		this.codNum = pcodNum;
+	}
 		
 	/** Constructor copia.
 	 * @param copia .
@@ -94,7 +101,7 @@ public class ItemBaremacion implements Serializable {
 	
 	@Override
 	public String toString() {
-		return "ApartadoBaremacion [codNum=" + codNum + ", apartado=" + bloque + ", codigo=" + codigo
+		return "ApartadoBaremacion [codNum=" + codNum + ", bloque=" + bloque + ", codigo=" + codigo
 				+ ", nombre=" + nombre + ", activo=" + activo + "]";
 	}
 	

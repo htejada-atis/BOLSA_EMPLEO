@@ -94,7 +94,7 @@ VistaFicheros bean = (VistaFicheros) uvdatos.getVistas().get(VistaFicheros.class
 			        		confirmDialog("Borrar fichero", "¿Desea borrar el fichero seleccionado?", row.codNum);
 			        	}
 			        },{'label': '<label class="tooltiptext">Copiar enlace</label>Copiar', 'class': 'tooltip', 'onClick': function(row) {
-			        	console.log($(this).parent().parent().parent().find(".tooltiptext").text("¡Enlace copiado!"));
+			        	$(this).parent().parent().parent().find(".tooltiptext").text("¡Enlace copiado!");
 			        	
 			        	var link = "<%= request.getRequestURI() %>?a=<%= ControladorGestionFicheros.ACCION_DESCARGAR_FICHERO %>&<%= ControladorGestionFicheros.PARAM_ID %>=" + row.codNum;
 			        	navigator.clipboard.writeText(link);

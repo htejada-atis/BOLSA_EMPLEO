@@ -30,8 +30,8 @@ public class VistaTitulacionesArea extends Vista implements Serializable {
 		return dataTable;
 	}
 	
-	public void setDatatableTitulaciones(DataTable<Titulacion> dataTable) {
-		this.dataTable = dataTable;
+	public void setDatatableTitulaciones(DataTable<Titulacion> dt) {
+		this.dataTable = dt;
 	}
 	
 	public Area getArea() {

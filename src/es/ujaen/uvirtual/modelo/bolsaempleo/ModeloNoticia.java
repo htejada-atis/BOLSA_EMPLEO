@@ -1,6 +1,7 @@
 package es.ujaen.uvirtual.modelo.bolsaempleo;
 
 import java.sql.Connection;
+import java.sql.Date;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -34,35 +35,63 @@ public class ModeloNoticia {
 	/********************************************** METODOS PÚBLICOS PARA CONSULTAS   ********************************************/
 
 	/** Consulta noticias en BBDD y las devuelve.
-	 * @param clausula para filtrar las noticias de la bd
+	 * @param clausula para filtrar las noticias de la bd .
+	 * @param id id de la noticia .
 	 * @return todas las noticias de la base de datos
 	 * @throws SQLException en caso de error de base de datos
 	 */
-	private List<Noticia> listaNoticias(String clausula) throws SQLException {
+	private List<Noticia> listaNoticias(String clausula, Integer id) throws SQLException {
 		List<Noticia> noticias = new ArrayList<>();
-		String consulta = "SELECT n.* FROM tbep_noticias n " + clausula;
+		String consulta = "SELECT n.* FROM tbep_noticias n ";
 		
-		try (Connection conexion = ConexionUvirtual.obtenerInstancia();
-			PreparedStatement stmt = conexion.prepareStatement(consulta);) {
-				try (ResultSet rs = stmt.executeQuery()) {
-					while (rs.next()) {
-						try {
-							Noticia not = new Noticia();
-							not.setCodNum(rs.getInt("CODNUM"));
-							not.setEnlace(rs.getString("ENLACE"));
-							not.setTexto(rs.getString("TEXTO"));
-							not.setFecha(rs.getTimestamp("FECHA"));
-							not.setPublica(rs.getString("FLGPUBLICA").equals("S"));
-							not.setActiva(rs.getString("FLGACTIVA").equals("S"));
-							noticias.add(not);
-						} catch (Exception e) {
-							e.printStackTrace();
-						}
-						
+		if (id != null) {
+			consulta += "WHERE codnum = ?";
+		}
+		
+		consulta += clausula;
+		
+		try (Connection conexion = ConexionUvirtual.obtenerInstancia(); PreparedStatement stmt = conexion.prepareStatement(consulta);) {
+			if (id != null) {
+				int parameterIndex = 1; 
+				stmt.setInt(parameterIndex++, id);
+			}
+			try (ResultSet rs = stmt.executeQuery()) {
+				while (rs.next()) {
+					try {
+						Noticia not = new Noticia();
+						not.setCodNum(rs.getInt("CODNUM"));
+						not.setEnlace(rs.getString("ENLACE"));
+						not.setTexto(rs.getString("TEXTO"));
+						not.setFecha(rs.getTimestamp("FECHA"));
+						not.setPublica(rs.getString("FLGPUBLICA").equals("S"));
+						not.setActiva(rs.getString("FLGACTIVA").equals("S"));
+						noticias.add(not);
+					} catch (Exception e) {
+						e.printStackTrace();
 					}
+					
 				}
 			}
+			}
 		return noticias;
+	}
+	
+	/** obtiene una noticia a partir de su id.
+	 * @param id codigo de la noticia
+	 * @return noticia con el id especificado
+	 * @throws SQLException en caso de error en la BD
+	 * @throws UVException en caso de error de parametros .
+	 */
+	public Noticia listaNoticia(Integer id) throws SQLException, UVException {
+		if (id == null) {
+			throw new UVException("No se puede listar una noticia sin id");
+		}
+		
+		List<Noticia> noticias = listaNoticias("", id);
+		if (noticias.isEmpty()) {
+			throw new UVException("No existe noticia");
+		}
+		return noticias.get(0);
 	}
 	
 	/** lista todas las noticias.
@@ -70,7 +99,15 @@ public class ModeloNoticia {
 	 * @throws SQLException si hay un error en la base de datos
 	 */
 	public List<Noticia> listaNoticias() throws SQLException {
-		return listaNoticias(" ORDER BY fecha");
+		return listaNoticias(" ORDER BY fecha", null);
+	}
+	
+	/** Consulta noticias en BBDD y las devuelve.
+	 * @return las 3 noticias más recientes de la base de datos
+	 * @throws SQLException en caso de error de base de datos
+	 */
+	public List<Noticia> listaNoticiasInicio() throws SQLException {
+		return listaNoticias("WHERE flgpublica = 'S' AND flgactiva = 'S' ORDER BY fecha FETCH FIRST 3 ROWS ONLY", null);
 	}
 	
 	/**
@@ -154,33 +191,6 @@ public class ModeloNoticia {
 			}
 		}
 		return noticias;
-	}
-	
-	/** Consulta noticias en BBDD y las devuelve.
-	 * @return las 3 noticias más recientes de la base de datos
-	 * @throws SQLException en caso de error de base de datos
-	 */
-	public List<Noticia> listaNoticiasInicio() throws SQLException {
-		return listaNoticias("WHERE flgpublica = 'S' AND flgactiva = 'S' ORDER BY fecha FETCH FIRST 3 ROWS ONLY");
-	}
-	
-	/** obtiene una noticia a partir de su id.
-	 * @param id codigo de la noticia
-	 * @return noticia con el id especificado
-	 * @throws SQLException en caso de error en la BD
-	 * @throws UVException en caso de error de parametros .
-	 */
-	public Noticia listaNoticia(Integer id) throws SQLException, UVException {
-		if (id == null) {
-			throw new UVException("No se puede listar una noticia sin id");
-		}
-		
-		String clausulaWhere = "WHERE codnum = " + id;
-		List<Noticia> noticias = listaNoticias(clausulaWhere);
-		if (noticias.isEmpty()) {
-			throw new UVException("No existe noticia");
-		}
-		return noticias.get(0);
 	}
 	
 	/**	Función que inserta una noticia en la BD.
@@ -292,7 +302,7 @@ public class ModeloNoticia {
 			int parameterIndex = 1;
 			stmt.setString(parameterIndex++, noticia.getEnlace());
 			stmt.setString(parameterIndex++, noticia.getTexto());
-			stmt.setDate(parameterIndex++, new java.sql.Date(noticia.getFecha().getTime()));
+			stmt.setDate(parameterIndex++, new Date(noticia.getFecha().getTime()));
 			stmt.setString(parameterIndex++, noticia.isPublica() ? "S" : "N");
 			stmt.setInt(parameterIndex++, noticia.getCodNum());
 			stmt.executeUpdate();

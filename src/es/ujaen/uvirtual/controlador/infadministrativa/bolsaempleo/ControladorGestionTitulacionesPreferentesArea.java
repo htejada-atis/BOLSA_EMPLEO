@@ -113,7 +113,7 @@ public class ControladorGestionTitulacionesPreferentesArea extends HttpServlet {
 			
 		} catch (SQLIntegrityConstraintViolationException e) {
 			LOGGER.log(Level.WARNING, e.toString());
-			bean.getMensajesDeError().add(MENSAJE_ERROR_TITULACIONES_PREFERENTES_YA_SELECCIONADAS_PREVIAMENTE);
+			bean.getMensajesDeError().add(e.toString());
 			HttpSession session = request.getSession(false);
 			session.setAttribute(MENSAJE_ENVIADO, e.toString());
 			response.sendRedirect(request.getServletPath());
@@ -184,7 +184,7 @@ public class ControladorGestionTitulacionesPreferentesArea extends HttpServlet {
 			List<String> titulaciones = gson.fromJson(request.getParameter(PARAM_TITULACIONES), new TypeToken<List<String>>() { }.getType());
 			new ModeloTitulacion().incluirTitulacionesPreferentesArea(titulaciones, area);
 		} catch (SQLIntegrityConstraintViolationException ex) {
-			throw new SQLIntegrityConstraintViolationException(MENSAJE_ERROR_TITULACIONES_SELECCIONADAS_INCORRECTAS);
+			throw new SQLIntegrityConstraintViolationException(MENSAJE_ERROR_TITULACIONES_PREFERENTES_YA_SELECCIONADAS_PREVIAMENTE);
 		} catch (Exception ex) {
 			throw new UVException(MENSAJE_ERROR_TITULACIONES_SELECCIONADAS_INCORRECTAS);
 		}
