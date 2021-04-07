@@ -64,6 +64,14 @@ public class ModeloMerito {
 		return meritos;
 	}
 	
+	/** lista todos los méritos de la BBDD .
+	 * @return .
+	 * @throws SQLException .
+	 */
+	public List<Merito> listaMeritos() throws SQLException {
+		return listaMeritos(null);
+	}
+	
 	/** obtiene un mérito a partir de su id.
 	 * @param id del mérito .
 	 * @return archivo con el id especificado .
@@ -112,6 +120,12 @@ public class ModeloMerito {
 		}
 		if (merito.getArchivo() == null) {
 			throw new UVException("No se puede insertar un mérito sin archivo");
+		}
+		if (merito.getItemBaremacion().getCodNum() == null) {
+			throw new UVException("No se puede insertar un mérito sin ítem de baremación");
+		}
+		if (usuarioId == null) {
+			throw new UVException("No se puede insertar un mérito sin usuario");
 		}
 		
 		String consulta = "INSERT INTO tbep_meritos " 

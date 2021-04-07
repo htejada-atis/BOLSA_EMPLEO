@@ -30,31 +30,38 @@ public class ModeloFichero {
 	/********************************************** METODOS PÚBLICOS PARA CONSULTAS   ********************************************/
 	
 	/** Consulta ficheros en BBDD y los devuelve .
-	 * @param clausula para filtrar los ficheros de la bd .
+	 * @param id para filtrar ficheros por id .
 	 * @return lista todos los ficheros de la base de datos .
 	 * @throws SQLException en caso de error de base de datos .
 	 */
-	private List<Fichero> listaFicheros(String clausula) throws SQLException {
+	private List<Fichero> listaFicheros(Integer id) throws SQLException {
 		List<Fichero> ficheros = new ArrayList<>();
-		String consulta = "SELECT bepfich.* FROM tbep_ficheros bepfich " + clausula;
+		String consulta = "SELECT bepfich.* FROM tbep_ficheros bepfich ";
 		
-		try (Connection conexion = ConexionUvirtual.obtenerInstancia();
-			PreparedStatement stmt = conexion.prepareStatement(consulta);) {
-				try (ResultSet rs = stmt.executeQuery()) {
-					while (rs.next()) {
-						try {
-							Fichero fich = new Fichero();
-							fich.setCodNum(rs.getInt("CODNUM"));
-							fich.setNombre(rs.getString("NOMBRE"));
-							fich.setTitulo(rs.getString("TITULO"));
-							fich.setArchivo(rs.getBlob("ARCHIVO").getBinaryStream());
-							ficheros.add(fich);
-						} catch (Exception e) {
-							e.printStackTrace();
-						}
-						
+		if (id != null) {
+			consulta += "WHERE codnum = ?";
+		}
+		
+		try (Connection conexion = ConexionUvirtual.obtenerInstancia(); PreparedStatement stmt = conexion.prepareStatement(consulta);) {
+			if (id != null) {
+				int parameterIndex = 1; 
+				stmt.setInt(parameterIndex++, id);
+			}
+			try (ResultSet rs = stmt.executeQuery()) {
+				while (rs.next()) {
+					try {
+						Fichero fich = new Fichero();
+						fich.setCodNum(rs.getInt("CODNUM"));
+						fich.setNombre(rs.getString("NOMBRE"));
+						fich.setTitulo(rs.getString("TITULO"));
+						fich.setArchivo(rs.getBlob("ARCHIVO").getBinaryStream());
+						ficheros.add(fich);
+					} catch (Exception e) {
+						e.printStackTrace();
 					}
+					
 				}
+			}
 			}
 		return ficheros;
 	}
@@ -64,27 +71,21 @@ public class ModeloFichero {
 	 * @throws SQLException si hay un error en la base de datos .
 	 */
 	public List<Fichero> listaFicheros() throws SQLException {
-		List<Fichero> ficheros = new ArrayList<>();
-		String consulta = "SELECT bepfich.codnum, bepfich.nombre, bepfich.titulo FROM tbep_ficheros bepfich";
-		
-		try (Connection conexion = ConexionUvirtual.obtenerInstancia();
-			PreparedStatement stmt = conexion.prepareStatement(consulta);) {
-				try (ResultSet rs = stmt.executeQuery()) {
-					while (rs.next()) {
-						try {
-							Fichero fich = new Fichero();
-							fich.setCodNum(rs.getInt("CODNUM"));
-							fich.setNombre(rs.getString("NOMBRE"));
-							fich.setTitulo(rs.getString("TITULO"));
-							ficheros.add(fich);
-						} catch (Exception e) {
-							e.printStackTrace();
-						}
-						
-					}
-				}
-			}
-		return ficheros;
+		return listaFicheros(null);
+	}
+	
+	/** obtiene un archivo a partir de su id.
+	 * @param id codigo del fichero .
+	 * @return archivo con el id especificado .
+	 * @throws SQLException en caso de error en la BD .
+	 * @throws UVException en caso de error de parametros .
+	 */
+	public Fichero listaFichero(Integer id) throws SQLException, UVException {
+		List<Fichero> ficheros = listaFicheros(id);
+		if (ficheros.isEmpty()) {
+			throw new UVException("No existe fichero");
+		}
+		return ficheros.get(0);
 	}
 	
 	/** Elimina un fichero .
@@ -138,21 +139,6 @@ public class ModeloFichero {
 			stmt.setBinaryStream(parameterIndex++, fichero.getArchivo());
 			stmt.executeUpdate();
 		}
-	}
-	
-	/** obtiene un archivo a partir de su id.
-	 * @param id codigo del fichero .
-	 * @return archivo con el id especificado .
-	 * @throws SQLException en caso de error en la BD .
-	 * @throws UVException en caso de error de parametros .
-	 */
-	public Fichero listaFichero(int id) throws SQLException, UVException {
-		String clausulaWhere = "WHERE codnum = " + id;
-		List<Fichero> ficheros = listaFicheros(clausulaWhere);
-		if (ficheros.isEmpty()) {
-			throw new UVException("No existe fichero");
-		}
-		return ficheros.get(0);
 	}
 		
 	/**

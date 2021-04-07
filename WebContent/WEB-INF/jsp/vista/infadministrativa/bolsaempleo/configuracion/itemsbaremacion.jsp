@@ -95,6 +95,13 @@ VistaItemsBaremacion bean = (VistaItemsBaremacion) uvdatos.getVistas().get(Vista
 		        {'data': 'nombre'},
 		        {'data': 'activo'},
 		    ]
+		    "actions": [
+		    	{'label': 'Activar', 'onClick': function(selected) {
+		    		var params = {'a': '<%=ControladorItemsBaremacion.ACCION_LISTAR%>', 
+		    				'': JSON.stringify(selected)};
+	        		Atis.sendForm("<%=request.getRequestURI()%>", params);
+		    	}},
+		    ]
 		});
 		
 		document.getElementById("tableBloques").style.visibility = "hidden";
