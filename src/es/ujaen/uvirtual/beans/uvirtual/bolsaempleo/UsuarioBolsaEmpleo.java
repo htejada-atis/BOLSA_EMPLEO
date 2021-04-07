@@ -12,11 +12,14 @@ import es.ujaen.uvirtual.beans.Rol;
 public class UsuarioBolsaEmpleo implements Serializable {
 	private static final long serialVersionUID = 1L;
 	private Integer codNum;
-	private Integer adm_usu_codNum;
-	private String dni;
+	private String admusucodNum;
+	private String tipodocumento;
+	private String numdocumento;
+	private String ujaendni;
 	private String nombre;
-	private String telefono;
-	private String movil;
+	private String apellido1;
+	private String apellido2;
+	private String sexo;
 	private String email;
 	private Rol rol;
 	private Boolean listaDist;
@@ -67,20 +70,36 @@ public class UsuarioBolsaEmpleo implements Serializable {
 		this.codNum = codNum;
 	}
 	
-	public Integer getAdmUsuCodNum() {
-		return adm_usu_codNum;
+	public String getAdmUsuCodNum() {
+		return admusucodNum;
 	}
 
-	public void setAdmUsuCodNum(Integer admusucodNum) {
-		this.adm_usu_codNum = admusucodNum;
+	public void setAdmUsuCodNum(String padmusucodNum) {
+		this.admusucodNum = padmusucodNum;
 	}
 	
-	public String getDni() {
-		return dni;
+	public String getTipoDocumento() {
+		return tipodocumento;
 	}
 
-	public void setDni(String dni) {
-		this.dni = dni;
+	public void setTipoDocumento(String ptipodocumento) {
+		this.tipodocumento = ptipodocumento;
+	}
+	
+	public String getNumDocumento() {
+		return numdocumento;
+	}
+
+	public void setNumDocumento(String pnumdocumento) {
+		this.numdocumento = pnumdocumento;
+	}
+	
+	public String getUjaEnDni() {
+		return ujaendni;
+	}
+
+	public void setUjaEnDni(String pujaendni) {
+		this.ujaendni = pujaendni;
 	}
 	
 	public String getNombre() {
@@ -90,23 +109,31 @@ public class UsuarioBolsaEmpleo implements Serializable {
 	public void setNombre(String nombre) {
 		this.nombre = nombre;
 	}
-
-	public String getTelefono() {
-		return telefono;
+	
+	public String getPrimerApellido() {
+		return apellido1;
 	}
 
-	public void setTelefono(String telefono) {
-		this.telefono = telefono;
+	public void setPrimerApellido(String papellido1) {
+		this.apellido1 = papellido1;
 	}
 	
-	public String getMovil() {
-		return movil;
+	public String getSegundoApellido() {
+		return apellido2;
 	}
 
-	public void setMovil(String movil) {
-		this.movil = movil;
+	public void setSegundoApellido(String papellido2) {
+		this.apellido2 = papellido2;
 	}
 	
+	public String getSexo() {
+		return sexo;
+	}
+
+	public void setSexo(String psexo) {
+		this.sexo = psexo;
+	}
+
 	public String getEmail() {
 		return email;
 	}

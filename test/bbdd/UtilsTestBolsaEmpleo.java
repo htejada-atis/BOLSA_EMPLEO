@@ -27,7 +27,7 @@ public class UtilsTestBolsaEmpleo {
 	 */
 	public static void inicializaBolsaEmpleo() throws SQLException, IOException {
 		File directoryPath;
-		File filesList[];
+		File filesList[];				
 		
 		// limpieza
 		directoryPath = new File("Documentos/scripts/opc.bolsaempleo/datos_desarrollo/clean");
@@ -83,6 +83,12 @@ public class UtilsTestBolsaEmpleo {
     	    	
     	String methodKey = nameSplit[1];		
 		switch (methodKey) {
+		case "arcosim":
+			BbddRunner.insertMasivoArcos(file.getAbsolutePath());
+			break;
+		case "arcoseje":
+			BbddRunner.ejecutarArcos(file.getAbsolutePath());
+			break;
 		case "im":
 			BbddRunner.insertMasivo(file.getAbsolutePath());
 			break;

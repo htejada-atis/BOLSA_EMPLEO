@@ -21,6 +21,7 @@ import es.ujaen.uvirtual.beans.CodigoDescripcion;
 import es.ujaen.uvirtual.beans.Rol;
 import es.ujaen.uvirtual.beans.UVDatos;
 import es.ujaen.uvirtual.beans.Usuario;
+import es.ujaen.uvirtual.adm.CrearUsuario;
 import es.ujaen.uvirtual.beans.uvirtual.bolsaempleo.UsuarioBolsaEmpleo;
 import es.ujaen.uvirtual.beans.vistas.uvirtual.bolsaempleo.VistaUsuarioBolsaEmpleo;
 import es.ujaen.uvirtual.modelo.bolsaempleo.ModeloRol;
@@ -52,6 +53,8 @@ public class ControladorUsuarioBolsaEmpleo extends HttpServlet {
 	public static final String PARAM_ACCION_USUARIO = "aa";
 	public static final String PARAM_USUARIOS_SELECCIONADOS = "usuariosselected";
 	public static final String PARAM_NOMBRE = "nombre";
+	public static final String PARAM_PRIMER_APELLIDO = "nombre";
+	public static final String PARAM_SEGUNDO_APELLIDO = "nombre";
 	public static final String PARAM_ENVIAR = "enviar";
 	public static final String PARAM_ID = "id";
 	
@@ -274,6 +277,9 @@ public class ControladorUsuarioBolsaEmpleo extends HttpServlet {
 		ModeloUsuarioBolsaEmpleo modelo = new ModeloUsuarioBolsaEmpleo();
 		
 		try {
+			Usuario usuArcos = CrearUsuario.usuario(request.getParameter(PARAM_NOMBRE));
+			
+			
 			obtenerRoles(bean);
 			UsuarioBolsaEmpleo usu = modelo.listaUsuario(Formateador.leeParametroString(request.getParameter(PARAM_NOMBRE)));
 			bean.setUsuario(usu);
