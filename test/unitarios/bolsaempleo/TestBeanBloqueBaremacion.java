@@ -9,7 +9,7 @@ import org.junit.Test;
 import es.ujaen.uvirtual.beans.uvirtual.bolsaempleo.ApartadoBaremacion;
 import es.ujaen.uvirtual.beans.uvirtual.bolsaempleo.BloqueBaremacion;
 
-/** test apartado.
+/** test bloque.
  *
  */
 public class TestBeanBloqueBaremacion {

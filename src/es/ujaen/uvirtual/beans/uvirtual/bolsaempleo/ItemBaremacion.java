@@ -36,6 +36,13 @@ public class ItemBaremacion implements Serializable {
 		this.nombre = pnombre;
 		this.activo = pactivo;		
 	}
+	
+	/** Constructor con parametros.
+	 * @param pcodNum .
+	 */
+	public ItemBaremacion(Integer pcodNum) {
+		this.codNum = pcodNum;
+	}
 		
 	/** Constructor copia.
 	 * @param copia .

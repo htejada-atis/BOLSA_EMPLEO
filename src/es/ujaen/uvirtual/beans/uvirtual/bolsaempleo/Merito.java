@@ -1,5 +1,6 @@
 package es.ujaen.uvirtual.beans.uvirtual.bolsaempleo;
 
+import java.io.InputStream;
 import java.io.Serializable;
 
 
@@ -15,6 +16,7 @@ public class Merito implements Serializable {
 	private String descripcion;
 	private String observacion;
 	private ItemBaremacion item;
+	private InputStream archivo;
 	
 	/** Constructor por defecto.
 	 */
@@ -28,14 +30,32 @@ public class Merito implements Serializable {
 	 * @param pdescripcion .
 	 * @param pobservacion .
 	 * @param pitem .
+	 * @param parchivo .
 	 */
-	public Merito(Integer pcodNum, Float pvalor, String pdescripcion, String pobservacion, ItemBaremacion pitem) {
+	public Merito(Integer pcodNum, Float pvalor, String pdescripcion, String pobservacion, ItemBaremacion pitem, InputStream parchivo) {
 		super();
 		this.codNum = pcodNum;
 		this.valor = pvalor;
 		this.descripcion = pdescripcion;
 		this.observacion = pobservacion;
 		this.item = pitem;
+		this.archivo = parchivo;
+	}
+	
+	/** Constructor con parametros.
+	 * @param pvalor .
+	 * @param pdescripcion .
+	 * @param pobservacion .
+	 * @param pitem .
+	 * @param parchivo .
+	 */
+	public Merito(Float pvalor, String pdescripcion, String pobservacion, ItemBaremacion pitem, InputStream parchivo) {
+		super();
+		this.valor = pvalor;
+		this.descripcion = pdescripcion;
+		this.observacion = pobservacion;
+		this.item = pitem;
+		this.archivo = parchivo;
 	}
 	
 	/** Constructor copia.
@@ -47,6 +67,7 @@ public class Merito implements Serializable {
 		this.descripcion = copia.descripcion;
 		this.observacion = copia.observacion;
 		this.item = copia.item;
+		this.archivo = copia.archivo;
 	}
 	
 	public Integer getCodNum() {
@@ -80,6 +101,22 @@ public class Merito implements Serializable {
 	public void setObservacion(String observacion) {
 		this.observacion = observacion;
 	}
+	
+	public ItemBaremacion getItemBaremacion() {
+		return item;
+	}
+	
+	public void setItemBaremacion(ItemBaremacion item) {
+		this.item = item;
+	}
+	
+	public InputStream getArchivo() {
+		return archivo;
+	}
+	
+	public void setArchivo(InputStream archivo) {
+		this.archivo = archivo;
+	}
 
 	public static long getSerialversionuid() {
 		return serialVersionUID;
@@ -100,6 +137,7 @@ public class Merito implements Serializable {
 		result = prime * result + ((descripcion == null) ? 0 : descripcion.hashCode());
 		result = prime * result + ((observacion == null) ? 0 : observacion.hashCode());
 		result = prime * result + ((item == null) ? 0 : item.hashCode());
+		result = prime * result + ((archivo == null) ? 0 : archivo.hashCode());
 		return result;
 	}
 	
@@ -142,6 +180,13 @@ public class Merito implements Serializable {
 				return false;
 			}
 		} else if (!item.equals(other.item)) {
+			return false;
+		}
+		if (archivo == null) {
+			if (other.archivo != null) {
+				return false;
+			}
+		} else if (!archivo.equals(other.archivo)) {
 			return false;
 		}
 		

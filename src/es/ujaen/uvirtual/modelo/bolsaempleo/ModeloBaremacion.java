@@ -7,7 +7,6 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-
 import es.ujaen.uvirtual.beans.uvirtual.bolsaempleo.ApartadoBaremacion;
 import es.ujaen.uvirtual.beans.uvirtual.bolsaempleo.BloqueBaremacion;
 import es.ujaen.uvirtual.beans.uvirtual.bolsaempleo.ItemBaremacion;
@@ -38,6 +37,190 @@ public class ModeloBaremacion {
 	
 	public static final String APARTADO_ACTIVO = "S";
 	public static final String APARTADO_NO_ACTIVO = "N";
+	
+	
+	/** Consulta apartados en la BBDD y los devuelve .
+	 * @param id .
+	 * @return lista de apartados .
+	 * @throws SQLException .
+	 */
+	private List<ApartadoBaremacion> listaApartados(Integer id) throws SQLException {
+		List<ApartadoBaremacion> apartados = new ArrayList<>();
+		String consulta = "SELECT bepapa.* FROM TBEP_APARTADOSBAREMACION bepapa ";
+		
+		if (id != null) {
+			consulta += "WHERE bepapa.CODNUM = ?";
+		}
+		
+		try (Connection conexion = ConexionUvirtual.obtenerInstancia(); PreparedStatement stmt = conexion.prepareStatement(consulta);) {
+			if (id != null) {
+				int parameterIndex = 1; 
+				stmt.setInt(parameterIndex++, id);
+			}
+			try (ResultSet rs = stmt.executeQuery()) {
+				while (rs.next()) {
+					try {
+						ApartadoBaremacion ap = new ApartadoBaremacion();
+						ap.setCodNum(rs.getInt("CODNUM"));
+						ap.setCodigo(rs.getString("CODIGO"));
+						ap.setNombre(rs.getString("NOMBRE"));
+						ap.setActivo(rs.getString("FLGACTIVO").equals("S"));	
+						apartados.add(ap);
+					} catch (Exception e) {
+						e.printStackTrace();
+					}
+					
+				}
+			}
+			}
+		return apartados;
+	}
+	
+	/** Consulta bloques en la BBDD y los devuelve .
+	 * @param id .
+	 * @return lista de bloques .
+	 * @throws SQLException .
+	 */
+	private List<BloqueBaremacion> listaBloques(Integer id) throws SQLException {
+		List<BloqueBaremacion> bloques = new ArrayList<>();
+		String consulta = "SELECT bepblo.* FROM TBEP_BLOQUESBAREMACION bepblo ";
+		
+		if (id != null) {
+			consulta += "WHERE bepblo.CODNUM = ?";
+		}
+		
+		try (Connection conexion = ConexionUvirtual.obtenerInstancia(); PreparedStatement stmt = conexion.prepareStatement(consulta);) {
+			if (id != null) {
+				int parameterIndex = 1; 
+				stmt.setInt(parameterIndex++, id);
+			}
+			try (ResultSet rs = stmt.executeQuery()) {
+				while (rs.next()) {
+					try {
+						BloqueBaremacion blo = new BloqueBaremacion();
+						blo.setCodNum(rs.getInt("CODNUM"));
+						blo.setCodigo(rs.getString("CODIGO"));
+						blo.setNombre(rs.getString("NOMBRE"));
+						blo.setActivo(rs.getString("FLGACTIVO").equals("S"));					
+						blo.setApartadoBaremacion(this.getApartadoBaremacionById(rs.getInt("BEPAPA_CODNUM")));
+						bloques.add(blo);
+					} catch (Exception e) {
+						e.printStackTrace();
+					}
+					
+				}
+			}
+			}
+		return bloques;
+	}
+	
+	/** Consulta items en la BBDD y los devuelve .
+	 * @param id .
+	 * @param apartado booleano para indicar si el id es del apartado o del ítem .
+	 * @return lista de items .
+	 * @throws SQLException .
+	 */
+	private List<ItemBaremacion> listaItems(Integer id, boolean apartado) throws SQLException {
+		List<ItemBaremacion> items = new ArrayList<>();
+		String consulta = "SELECT bepite.* FROM TBEP_ITEMSBAREMACION bepite ";
+		
+		if (id != null) {
+			if (apartado) {
+				consulta += "INNER JOIN TBEP_BLOQUESBAREMACION bepblo"
+						+ " ON bepblo.CODNUM = bepite.BEPBLO_CODNUM "
+						+ " INNER JOIN TBEP_APARTADOSBAREMACION bepapa "
+						+ " ON bepapa.CODNUM = bepblo.BEPAPA_CODNUM "
+						+ " WHERE bepapa.CODNUM = ?";
+			} else {
+				consulta += "WHERE bepite.CODNUM = ?";
+			}
+		}
+		
+		try (Connection conexion = ConexionUvirtual.obtenerInstancia(); PreparedStatement stmt = conexion.prepareStatement(consulta);) {
+			if (id != null) {
+				int parameterIndex = 1; 
+				stmt.setInt(parameterIndex++, id);
+			}
+			try (ResultSet rs = stmt.executeQuery()) {
+				while (rs.next()) {
+					try {
+						ItemBaremacion it = new ItemBaremacion();
+						it.setCodNum(rs.getInt("CODNUM"));
+						it.setCodigo(rs.getString("CODIGO"));
+						it.setNombre(rs.getString("NOMBRE"));
+						it.setActivo(rs.getString("FLGACTIVO").equals("S"));					
+						it.setBloqueBaremacion(this.getBloqueBaremacionById(rs.getInt("BEPBLO_CODNUM")));
+						items.add(it);
+					} catch (Exception e) {
+						e.printStackTrace();
+					}
+					
+				}
+			}
+			}
+		return items;
+	}
+	
+	/** lista todos los apartados.
+	 * @return vector con todos los apartados .
+	 * @throws SQLException si hay un error en la base de datos .
+	 */
+	public List<ApartadoBaremacion> listaApartados() throws SQLException {
+		return listaApartados(null);
+	}
+	
+	/** lista todos los ítems de un apartado.
+	 * @return vector con todos los ítems .
+	 * @throws SQLException si hay un error en la base de datos .
+	 */
+	public List<ItemBaremacion> listaItemsApartado(Integer id) throws SQLException {
+		return listaItems(id, true);
+	}
+	
+	/**
+	 * Devuelve un apartado de baremación por su id.
+	 * @param codNum .
+	 * @return .
+	 * @throws SQLException en caso de error en la BD
+	 * @throws UVException si bolsa no es existe
+	 */
+	public ApartadoBaremacion getApartadoBaremacionById(int codNum) throws SQLException, UVException {
+		List<ApartadoBaremacion> apartados = listaApartados(codNum);
+		if (apartados.isEmpty()) {
+			throw new UVException("No existe apartado");
+		}
+		return apartados.get(0);
+	}
+	
+	/**
+	 * Devuelve un bloque de baremación por su id.
+	 * @param codNum .
+	 * @return .
+	 * @throws SQLException en caso de error en la BD
+	 * @throws UVException si bolsa no es existe
+	 */
+	public BloqueBaremacion getBloqueBaremacionById(int codNum) throws SQLException, UVException {
+		List<BloqueBaremacion> bloques = listaBloques(codNum);
+		if (bloques.isEmpty()) {
+			throw new UVException("No existe bloque");
+		}
+		return bloques.get(0);
+	}
+	
+	/**
+	 * Devuelve un ítem de baremación por su id.
+	 * @param codNum .
+	 * @return .
+	 * @throws SQLException en caso de error en la BD .
+	 * @throws UVException si bolsa no es existe .
+	 */
+	public ItemBaremacion getItemBaremacionById(int codNum) throws SQLException, UVException {
+		List<ItemBaremacion> items = listaItems(codNum, false);
+		if (items.isEmpty()) {
+			throw new UVException("No existe ítem");
+		}
+		return items.get(0);
+	}
 		
 	/**
 	 * Listado de apartados generales de baremación. 
@@ -186,66 +369,6 @@ public class ModeloBaremacion {
 		}
 		
 		return dataTable;
-	}
-	
-	/**
-	 * Devuelve un apartado de baremación por su id.
-	 * @param codNum .
-	 * @return .
-	 * @throws SQLException en caso de error en la BD
-	 * @throws UVException si bolsa no es existe
-	 */
-	public ApartadoBaremacion getApartadoBaremacionById(int codNum) throws SQLException, UVException {
-		String consulta = "SELECT bepapa.* FROM TBEP_APARTADOSBAREMACION bepapa WHERE bepapa.CODNUM = ?";
-			
-		try (Connection conexion = ConexionUvirtual.obtenerInstancia();
-				PreparedStatement stmt = conexion.prepareStatement(consulta);) {
-			stmt.setInt(1, codNum);
-						
-			try (ResultSet rs = stmt.executeQuery()) {
-				if (!rs.next()) {
-					throw new UVException("No existe el apartado con id " + codNum);
-				}
-				
-				ApartadoBaremacion apartado = new ApartadoBaremacion();
-				apartado.setCodNum(rs.getInt("CODNUM"));
-				apartado.setCodigo(rs.getString("CODIGO"));
-				apartado.setNombre(rs.getString("NOMBRE"));
-				apartado.setActivo(rs.getString("FLGACTIVO").equals("S"));					
-								
-				return apartado;
-			}
-		}
-	}
-	
-	/**
-	 * Devuelve un bloque de baremación por su id.
-	 * @param codNum .
-	 * @return .
-	 * @throws SQLException en caso de error en la BD
-	 * @throws UVException si bolsa no es existe
-	 */
-	public BloqueBaremacion getBloqueBaremacionById(int codNum) throws SQLException, UVException {
-		String consulta = "SELECT bepblo.* FROM TBEP_BLOQUESBAREMACION bepblo WHERE bepblo.CODNUM = ?";
-			
-		try (Connection conexion = ConexionUvirtual.obtenerInstancia();
-				PreparedStatement stmt = conexion.prepareStatement(consulta);) {
-			stmt.setInt(1, codNum);
-						
-			try (ResultSet rs = stmt.executeQuery()) {
-				if (!rs.next()) {
-					throw new UVException("No existe el bloque con id " + codNum);
-				}
-				
-				BloqueBaremacion bloque = new BloqueBaremacion();
-				bloque.setCodNum(rs.getInt("CODNUM"));
-				bloque.setCodigo(rs.getString("CODIGO"));
-				bloque.setNombre(rs.getString("NOMBRE"));
-				bloque.setActivo(rs.getString("FLGACTIVO").equals("S"));					
-				bloque.setApartadoBaremacion(this.getApartadoBaremacionById(rs.getInt("BEPAPA_CODNUM")));
-				return bloque;
-			}
-		}
 	}
 	
 }

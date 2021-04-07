@@ -25,12 +25,13 @@ public class ModeloFichero {
 	
 	public static final int ORDER_COLUMN_INDEX_ID = 1;
 	public static final int ORDER_COLUMN_INDEX_NOMBRE = 2;
+	public static final int ORDER_COLUMN_INDEX_TITULO = 3;
 	
 	/********************************************** METODOS PÚBLICOS PARA CONSULTAS   ********************************************/
 	
 	/** Consulta ficheros en BBDD y los devuelve .
 	 * @param clausula para filtrar los ficheros de la bd .
-	 * @return todos los ficheros de la base de datos .
+	 * @return lista todos los ficheros de la base de datos .
 	 * @throws SQLException en caso de error de base de datos .
 	 */
 	private List<Fichero> listaFicheros(String clausula) throws SQLException {
@@ -169,7 +170,7 @@ public class ModeloFichero {
 		
 		dataTable.setOrderColumn(ORDER_COLUMN_INDEX_ID, "bepfich.CODNUM");
 		dataTable.setOrderColumn(ORDER_COLUMN_INDEX_NOMBRE, "bepfich.NOMBRE");
-		dataTable.setOrderColumn(ORDER_COLUMN_INDEX_NOMBRE, "bepfich.TITULO");
+		dataTable.setOrderColumn(ORDER_COLUMN_INDEX_TITULO, "bepfich.TITULO");
 		dataTable.setQuery(consulta);
 				
 		try (Connection conexion = ConexionUvirtual.obtenerInstancia();
