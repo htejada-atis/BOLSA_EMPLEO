@@ -106,8 +106,8 @@ public class Merito implements Serializable {
 		return item;
 	}
 	
-	public void setItemBaremacion(ItemBaremacion item) {
-		this.item = item;
+	public void setItemBaremacion(ItemBaremacion pitem) {
+		this.item = pitem;
 	}
 	
 	public InputStream getArchivo() {
@@ -138,6 +138,7 @@ public class Merito implements Serializable {
 		result = prime * result + ((observacion == null) ? 0 : observacion.hashCode());
 		result = prime * result + ((item == null) ? 0 : item.hashCode());
 		result = prime * result + ((archivo == null) ? 0 : archivo.hashCode());
+		result = prime * result + ((codNum == null) ? 0 : codNum.hashCode());
 		return result;
 	}
 	
