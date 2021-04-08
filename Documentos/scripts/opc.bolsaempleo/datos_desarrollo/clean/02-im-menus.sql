@@ -134,4 +134,3 @@ DELETE FROM ADM_MENU WHERE MNU_CODNUM = 1115;
 
 DELETE FROM ADM_USUARIO_ROL WHERE USERUID = 'usig';
 DELETE FROM ADM_ROL WHERE rol_codnum IN (1050, 1051, 1052);
-Impulsado por Gitea Versión: 1.12.1 Página: 330ms Plantilla: 13ms JavaScript licenses API Página web Go1.14.4
