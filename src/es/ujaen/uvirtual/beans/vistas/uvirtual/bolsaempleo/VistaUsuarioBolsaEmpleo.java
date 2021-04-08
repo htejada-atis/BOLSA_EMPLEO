@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import es.ujaen.uvirtual.beans.Rol;
+import es.ujaen.uvirtual.beans.Usuario;
 import es.ujaen.uvirtual.beans.uvirtual.bolsaempleo.Area;
 import es.ujaen.uvirtual.beans.uvirtual.bolsaempleo.UsuarioBolsaEmpleo;
 import es.ujaen.uvirtual.beans.vistas.Vista;
@@ -16,6 +17,7 @@ public class VistaUsuarioBolsaEmpleo extends Vista implements Serializable {
 	 private static final long serialVersionUID = 1L;
 	 private List<UsuarioBolsaEmpleo> usuarios = new ArrayList<>();
 	 private UsuarioBolsaEmpleo usuario;
+	 private Usuario usuarioArcos;
 	 private String vista;
 	 private Rol role;
 	 private List<Rol> roles = new ArrayList<>();
@@ -58,5 +60,13 @@ public class VistaUsuarioBolsaEmpleo extends Vista implements Serializable {
 	 
 	 public void setUsuario(UsuarioBolsaEmpleo usuario) {
 		 this.usuario = usuario;
+	 }
+	 
+	 public Usuario getUsuarioArcos() {
+		 return usuarioArcos;
+	 }
+	 
+	 public void setUsuarioArcos(Usuario pusuario) {
+		 this.usuarioArcos = pusuario;
 	 }
 }

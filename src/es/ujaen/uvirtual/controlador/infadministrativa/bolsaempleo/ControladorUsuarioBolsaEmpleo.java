@@ -3,6 +3,9 @@ package es.ujaen.uvirtual.controlador.infadministrativa.bolsaempleo;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.sql.SQLException;
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
+import java.util.Date;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -22,8 +25,11 @@ import es.ujaen.uvirtual.beans.Rol;
 import es.ujaen.uvirtual.beans.UVDatos;
 import es.ujaen.uvirtual.beans.Usuario;
 import es.ujaen.uvirtual.adm.CrearUsuario;
+import es.ujaen.uvirtual.beans.uvirtual.bolsaempleo.Noticia;
 import es.ujaen.uvirtual.beans.uvirtual.bolsaempleo.UsuarioBolsaEmpleo;
+import es.ujaen.uvirtual.beans.vistas.uvirtual.bolsaempleo.VistaNoticias;
 import es.ujaen.uvirtual.beans.vistas.uvirtual.bolsaempleo.VistaUsuarioBolsaEmpleo;
+import es.ujaen.uvirtual.modelo.bolsaempleo.ModeloNoticia;
 import es.ujaen.uvirtual.modelo.bolsaempleo.ModeloRol;
 import es.ujaen.uvirtual.modelo.bolsaempleo.ModeloUsuarioBolsaEmpleo;
 import es.ujaen.uvirtual.utilidades.DataTable;
@@ -53,8 +59,11 @@ public class ControladorUsuarioBolsaEmpleo extends HttpServlet {
 	public static final String PARAM_ACCION_USUARIO = "aa";
 	public static final String PARAM_USUARIOS_SELECCIONADOS = "usuariosselected";
 	public static final String PARAM_NOMBRE = "nombre";
-	public static final String PARAM_PRIMER_APELLIDO = "nombre";
-	public static final String PARAM_SEGUNDO_APELLIDO = "nombre";
+	public static final String PARAM_NOMBRE_USUARIO = "nombreusuario";
+	public static final String PARAM_LISTA = "listadist";
+	public static final String PARAM_EXCLUIDO = "excluido";
+	public static final String PARAM_RAZON_EXCLUIDO = "razonexcluido";
+	public static final String PARAM_ROLE = "rol";
 	public static final String PARAM_ENVIAR = "enviar";
 	public static final String PARAM_ID = "id";
 	
@@ -79,8 +88,12 @@ public class ControladorUsuarioBolsaEmpleo extends HttpServlet {
 	// mensajes
 	public static final String MENSAJE_ENVIADO = "mensaje";
 	public static final String MENSAJE_EXITO_AGREGAR = "usuario creado correctamente";
+	public static final String MENSAJE_EXITO_EDITAR = "usuario editadi correctamente";
+	public static final String MENSAJE_EXITO_ELIMINAR = "usuario eliminado correctamente";
 	public static final String MENSAJE_ERROR_ACCION_USUARIO_NO_VALIDA = "Acción no válida";
 	public static final String MENSAJE_EXITO_USUARIO_MODIFICADO_CORRECTAMENTE = "Usuario/s modificado/s correctamente"; 
+	
+
 
 	public static final int RESPONSE_HTTP_CODE_ERROR = 400;
 	
@@ -131,6 +144,12 @@ public class ControladorUsuarioBolsaEmpleo extends HttpServlet {
 				break;
 			case ACCION_LISTAR_ROLES:
 				obtenerRoles(bean);
+				break;
+			case ACCION_AGREGAR_USUARIO:
+				agregarUsuario(request, response, bean);
+				break;
+			case ACCION_EDITAR_USUARIO:
+				editarUsuario(request, response, bean);
 				break;
 			}
 		} catch (SQLException e) {
@@ -264,7 +283,7 @@ public class ControladorUsuarioBolsaEmpleo extends HttpServlet {
 	}
 	
 	
-	/** agrega un nuevo usuario.
+	/** Busca un usuario.
 	 * @param request .
 	 * @param response .
 	 * @param bean bean de la vista a la que poner los valores.
@@ -272,19 +291,27 @@ public class ControladorUsuarioBolsaEmpleo extends HttpServlet {
 	 * @throws UVException en caso de error en bd
 	 */
 	private void buscarUsuario(HttpServletRequest request, HttpServletResponse response, VistaUsuarioBolsaEmpleo bean) throws SQLException, UVException, IOException {
-		bean.setVista("/WEB-INF/jsp/vista/infadministrativa/bolsaempleo/configuracion/formUsuario.jsp");
-		String nombre = Formateador.leeParametroString(request.getParameter(PARAM_NOMBRE));
 		ModeloUsuarioBolsaEmpleo modelo = new ModeloUsuarioBolsaEmpleo();
 		
+		obtenerRoles(bean);
 		try {
+			UsuarioBolsaEmpleo usu = modelo.listaUsuario(Formateador.leeParametroString(request.getParameter(PARAM_NOMBRE)));
 			Usuario usuArcos = CrearUsuario.usuario(request.getParameter(PARAM_NOMBRE));
 			
-			
-			obtenerRoles(bean);
-			UsuarioBolsaEmpleo usu = modelo.listaUsuario(Formateador.leeParametroString(request.getParameter(PARAM_NOMBRE)));
+			bean.setUsuarioArcos(usuArcos);
 			bean.setUsuario(usu);
+			bean.setRol(usu.getRol());
+			
+			bean.setVista("/WEB-INF/jsp/vista/infadministrativa/bolsaempleo/configuracion/formUsuario.jsp");
 		} catch (UVException e) {
-
+			Usuario usuArcos = CrearUsuario.usuario(request.getParameter(PARAM_NOMBRE));
+			if (usuArcos != null) {
+				bean.setUsuarioArcos(usuArcos);
+				bean.setVista("/WEB-INF/jsp/vista/infadministrativa/bolsaempleo/configuracion/formUsuario.jsp");
+			} else {
+				bean.setVista("/WEB-INF/jsp/vista/infadministrativa/bolsaempleo/configuracion/buscarUsuario.jsp");
+				throw new UVException("No existe el usuario");
+			}
 		}
 	}
 	
@@ -300,16 +327,71 @@ public class ControladorUsuarioBolsaEmpleo extends HttpServlet {
 	private void agregarUsuario(HttpServletRequest request, HttpServletResponse response, VistaUsuarioBolsaEmpleo bean) throws SQLException, UVException, IOException {
 		bean.setVista("/WEB-INF/jsp/vista/infadministrativa/bolsaempleo/configuracion/formUsuario.jsp");
 		
-		if (EscapaHTML.ajustaCodificacion(request.getParameter(PARAM_NOMBRE)) != null) {
-			/*ModeloUsuarioBolsaEmpleo modelo = new ModeloUsuarioBolsaEmpleo();
-			String enlace = EscapaHTML.ajustaCodificacion(request.getParameter(PARAM_ENLACE));
-			String texto = EscapaHTML.ajustaCodificacion(request.getParameter(PARAM_NOMBRE));
-			Boolean publica = request.getParameter(PARAM_PUBLICA) != null && EscapaHTML.ajustaCodificacion(request.getParameter(PARAM_PUBLICA)).equals("true");
-			Date fecha = Formateador.leeParametroFecha(request.getParameter(PARAM_FECHA), Formateador.FORMATO_FECHA_DDMMYYYY, "/");
-			Noticia noticia = new Noticia(enlace, texto, fecha, publica, true);
-			modelo.insertaNoticia(noticia);*/
+			ModeloUsuarioBolsaEmpleo modelo = new ModeloUsuarioBolsaEmpleo();
+			Boolean listadist = request.getParameter(PARAM_LISTA) != null && EscapaHTML.ajustaCodificacion(request.getParameter(PARAM_LISTA)).equals("true");
+			Boolean excluido = request.getParameter(PARAM_EXCLUIDO) != null && EscapaHTML.ajustaCodificacion(request.getParameter(PARAM_EXCLUIDO)).equals("true");
+					
+			String razonexcluido = EscapaHTML.ajustaCodificacion(request.getParameter(PARAM_RAZON_EXCLUIDO));
+			
+			ModeloRol modeloRol = new ModeloRol();
+			Rol role = modeloRol.getRoleById(Formateador.leeParametroInteger(request.getParameter(PARAM_ROLE)));
+			
+			SimpleDateFormat formatter = new SimpleDateFormat("dd/MM/YYYY HH:mm:ss");
+			Date date = new Date(System.currentTimeMillis());
+			
+			String usu = EscapaHTML.ajustaCodificacion(request.getParameter(PARAM_ID));
+			
+			UsuarioBolsaEmpleo usuario = new UsuarioBolsaEmpleo(usu, role, listadist, excluido, razonexcluido, date);
+			
+			modelo.insertaUsuario(usuario);
+			
 			HttpSession session = request.getSession(false);
 			session.setAttribute(MENSAJE_ENVIADO, MENSAJE_EXITO_AGREGAR);
+			response.sendRedirect(request.getServletPath());
+	}
+	
+	/** edita un usuario .
+	 * @param request .
+	 * @param response .
+	 * @param bean bean de la vista a la que poner los valores .
+	 * @throws SQLException excepcion de bbdd.
+	 * @throws UVException en caso de error en bd
+	 * @throws IOException en caso de error de IO.
+	 */
+	private void editarUsuario(HttpServletRequest request, HttpServletResponse response, VistaUsuarioBolsaEmpleo bean) throws SQLException, UVException, IOException {
+		bean.setVista("/WEB-INF/jsp/vista/infadministrativa/bolsaempleo/configuracion/formUsuario.jsp");
+		
+		ModeloUsuarioBolsaEmpleo modelo = new ModeloUsuarioBolsaEmpleo();
+		
+		obtenerRoles(bean);
+		
+		UsuarioBolsaEmpleo usu = modelo.listaUsuario(Formateador.leeParametroString(request.getParameter(PARAM_NOMBRE_USUARIO)));
+		Usuario usuArcos = CrearUsuario.usuario(request.getParameter(PARAM_NOMBRE_USUARIO));
+		
+		bean.setUsuarioArcos(usuArcos);
+		bean.setUsuario(usu);
+		bean.setRol(usu.getRol());
+		
+		if (EscapaHTML.ajustaCodificacion(request.getParameter(PARAM_ROLE)) != null) {
+			Integer codNum = Formateador.leeParametroInteger(request.getParameter(PARAM_ID));
+			Boolean listadist = request.getParameter(PARAM_LISTA) != null && EscapaHTML.ajustaCodificacion(request.getParameter(PARAM_LISTA)).equals("true");
+			Boolean excluido = request.getParameter(PARAM_EXCLUIDO) != null && EscapaHTML.ajustaCodificacion(request.getParameter(PARAM_EXCLUIDO)).equals("true");
+					
+			String razonexcluido = EscapaHTML.ajustaCodificacion(request.getParameter(PARAM_RAZON_EXCLUIDO));
+			
+			ModeloRol modeloRol = new ModeloRol();
+			Rol role = modeloRol.getRoleById(Formateador.leeParametroInteger(request.getParameter(PARAM_ROLE)));
+			
+			SimpleDateFormat formatter = new SimpleDateFormat("dd/MM/YYYY HH:mm:ss");
+			Date date = new Date(System.currentTimeMillis());
+			
+			String usua = EscapaHTML.ajustaCodificacion(request.getParameter(PARAM_ID));
+			
+			UsuarioBolsaEmpleo usuario = new UsuarioBolsaEmpleo(codNum, usua, role, listadist, excluido, razonexcluido, date);
+			
+			modelo.insertaUsuario(usuario);
+			HttpSession session = request.getSession(false);
+			session.setAttribute(MENSAJE_ENVIADO, MENSAJE_EXITO_EDITAR);
 			response.sendRedirect(request.getServletPath());
 		}
 	}

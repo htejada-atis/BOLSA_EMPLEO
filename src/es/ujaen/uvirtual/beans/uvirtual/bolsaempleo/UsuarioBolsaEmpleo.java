@@ -4,6 +4,8 @@ import java.io.Serializable;
 import java.util.Date;
 
 import es.ujaen.uvirtual.beans.Rol;
+import es.ujaen.uvirtual.beans.Usuario;
+import es.ujaen.uvirtual.utilidades.Formateador;
 
 /** Clase usuario de UVIRTUAL.
  * @author ATISoluciones
@@ -12,15 +14,15 @@ import es.ujaen.uvirtual.beans.Rol;
 public class UsuarioBolsaEmpleo implements Serializable {
 	private static final long serialVersionUID = 1L;
 	private Integer codNum;
-	private String admusucodNum;
+	private String admusuidentificador;
 	private String tipodocumento;
 	private String numdocumento;
-	private String ujaendni;
 	private String nombre;
 	private String apellido1;
 	private String apellido2;
 	private String sexo;
 	private String email;
+	private Usuario usuarioArcos;
 	private Rol rol;
 	private Boolean listaDist;
 	private Boolean excluido;
@@ -46,12 +48,43 @@ public class UsuarioBolsaEmpleo implements Serializable {
 		this.nombre = pnombre;
 	}
 	
+	
 	/** Constructor con parametros.
-	 * @param pnombre .
+	 * @param prol .
+	 * @param plistaDist .
+	 * @param pexcluido .
+	 * @param prazonexcluido .
+	 * @param pfechaexclusion .
+	 * @param pusu .
+	 * @param pcodNum .
 	 */
-	public UsuarioBolsaEmpleo(String pnombre) {
+	public UsuarioBolsaEmpleo(Integer pcodNum, String pusu, Rol prol, Boolean plistaDist, Boolean pexcluido, String prazonexcluido, Date pfechaexclusion) {
 		super();
-		this.nombre = pnombre;
+		this.codNum = pcodNum;
+		this.admusuidentificador = pusu;
+		this.rol = prol;
+		this.listaDist = plistaDist;
+		this.excluido = pexcluido;
+		this.razonExclusion = prazonexcluido;
+		this.fechaExclusion = pfechaexclusion;
+	}
+	
+	/** Constructor con parametros.
+	 * @param prol .
+	 * @param plistaDist .
+	 * @param pexcluido .
+	 * @param prazonexcluido .
+	 * @param pfechaexclusion .
+	 * @param pusu .
+	 */
+	public UsuarioBolsaEmpleo(String pusu, Rol prol, Boolean plistaDist, Boolean pexcluido, String prazonexcluido, Date pfechaexclusion) {
+		super();
+		this.admusuidentificador = pusu;
+		this.rol = prol;
+		this.listaDist = plistaDist;
+		this.excluido = pexcluido;
+		this.razonExclusion = prazonexcluido;
+		this.fechaExclusion = pfechaexclusion;
 	}
 	
 	/** Constructor con parametros.
@@ -70,12 +103,12 @@ public class UsuarioBolsaEmpleo implements Serializable {
 		this.codNum = codNum;
 	}
 	
-	public String getAdmUsuCodNum() {
-		return admusucodNum;
+	public String getAdmUsuIdentificador() {
+		return admusuidentificador;
 	}
 
-	public void setAdmUsuCodNum(String padmusucodNum) {
-		this.admusucodNum = padmusucodNum;
+	public void setAdmUsuIdentificador(String padmusuidentificador) {
+		this.admusuidentificador = padmusuidentificador;
 	}
 	
 	public String getTipoDocumento() {
@@ -92,14 +125,6 @@ public class UsuarioBolsaEmpleo implements Serializable {
 
 	public void setNumDocumento(String pnumdocumento) {
 		this.numdocumento = pnumdocumento;
-	}
-	
-	public String getUjaEnDni() {
-		return ujaendni;
-	}
-
-	public void setUjaEnDni(String pujaendni) {
-		this.ujaendni = pujaendni;
 	}
 	
 	public String getNombre() {
@@ -142,6 +167,14 @@ public class UsuarioBolsaEmpleo implements Serializable {
 		this.email = email;
 	}
 	
+	public Usuario getUsuarioArcos() {
+		return usuarioArcos;
+	}
+
+	public void setUsuarioArcos(Usuario pusuarioArcos) {
+		this.usuarioArcos = pusuarioArcos;
+	}
+	
 	public Rol getRol() {
 		return rol;
 	}
@@ -181,6 +214,15 @@ public class UsuarioBolsaEmpleo implements Serializable {
 	public void setFechaExclusion(Date fechaExclusion) {
 		this.fechaExclusion = fechaExclusion;
 	}
+	
+	public String getFechaExclusionFormato() {
+		return Formateador.formatoFecha(fechaExclusion, Formateador.FORMATO_FECHA_DDMMYYYY);
+	}
+	
+	public String getFechaHoraExclusionFormato() {
+		return Formateador.formatoFecha(fechaExclusion, Formateador.FORMATO_FECHA_DDMMYYYY_HHMMSS);
+	}
+	
 	
 	public Boolean getBorrado() {
 		return borrado;
