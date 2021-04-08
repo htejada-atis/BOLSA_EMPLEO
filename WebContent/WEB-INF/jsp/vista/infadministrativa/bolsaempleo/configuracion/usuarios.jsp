@@ -9,7 +9,7 @@ UVDatos uvdatos = (UVDatos) request.getAttribute(UVDatos.NOMBRE_ATRIBUTO);
 VistaUsuarioBolsaEmpleo bean = (VistaUsuarioBolsaEmpleo) uvdatos.getVistas().get(VistaUsuarioBolsaEmpleo.class.getName());
 %>
 
-<div class='bolsas'>
+<div class='bolsa-empleo'>
 	<% if (bean.getMensajesDeExito().size() > 0) { %>
 		<div id="exito" class="success">
 			<%= bean.formatearMensajesDeExito() %>
@@ -25,22 +25,22 @@ VistaUsuarioBolsaEmpleo bean = (VistaUsuarioBolsaEmpleo) uvdatos.getVistas().get
 		<h2>Usuarios</h2>
     
 	    <a class="link-btn" id="nuevo_usuario" href="<%= request.getRequestURI() %>">
-	    	 Nuevo usuario
+	    	 Buscar usuario
 	    </a>
 	</div>
 	
 	<table class="bluetable bolsaempleo" id="table_usuarios">
 		<tr>
-			<th scope="col" style="width:3%"></th>
-			<th scope="col" style="width:3%" title="Id del usuario">Id</th>
-			<th scope="col" style="width:5%" title="DNI del usuario">Tipo</th>
-			<th scope="col" style="width:10%" title="DNI del usuario">Documento</th>
-			<th scope="col" style="width:10%" title="DNI del usuario">UJA</th>
-			<th scope="col" style="width:13%" title="Nombre del usuario">Nombre</th>
-			<th scope="col" style="width:22%" title="DNI del usuario">Apellidos</th>
-			<th scope="col" style="width:10%" title="Email del usuario">Email</th>
-			<th scope="col" style="width:10%" title="Rol del usuario">Rol</th>
+			<th scope="col" style="width:5%"></th>
+			<th scope="col" style="width:5%" title="Id del usuario">Id</th>
+			<th scope="col" style="width:5%" title="Tipo de documento">Tipo</th>
+			<th scope="col" style="width:10%" title="Nº Documento">Documento</th>
+			<th scope="col" style="width:10%" title="Nombre de usuario">Usuario</th>
+			<th scope="col" style="width:25%" title="Nombre y apellidos">Nombre y Apellidos</th>
+			<th scope="col" style="width:15%" title="Email del usuario">Email</th>
+			<th scope="col" style="width:20%" title="Rol del usuario">Rol</th>
 			<th scope="col" style="width:5%" title="Lista del usuario">Lista</th>
+			<th scope="col" style="width:10%"></th>
 		</tr>
 		<tbody>				
 		</tbody>
@@ -54,24 +54,22 @@ VistaUsuarioBolsaEmpleo bean = (VistaUsuarioBolsaEmpleo) uvdatos.getVistas().get
 		<h2>Usuarios Borrados</h2>
 		<table class="bluetable bolsaempleo" id="table_usuarios_borrados">
 		<tr>
-			<th scope="col" style="width:3%"></th>
-			<th scope="col" style="width:3%" title="Id del usuario">Id</th>
-			<th scope="col" style="width:5%" title="DNI del usuario">Tipo</th>
-			<th scope="col" style="width:10%" title="DNI del usuario">Documento</th>
-			<th scope="col" style="width:10%" title="DNI del usuario">UJA</th>
-			<th scope="col" style="width:13%" title="Nombre del usuario">Nombre</th>
-			<th scope="col" style="width:22%" title="DNI del usuario">Apellidos</th>
-			<th scope="col" style="width:10%" title="Email del usuario">Email</th>
-			<th scope="col" style="width:10%" title="Rol del usuario">Rol</th>
+			<th scope="col" style="width:5%"></th>
+			<th scope="col" style="width:5%" title="Id del usuario">Id</th>
+			<th scope="col" style="width:5%" title="Tipo de documento">Tipo</th>
+			<th scope="col" style="width:10%" title="Nº Documento">Documento</th>
+			<th scope="col" style="width:10%" title="Nombre de usuario">Usuario</th>
+			<th scope="col" style="width:20%" title="Nombre y apellidos">Nombre y Apellidos</th>
+			<th scope="col" style="width:20%" title="Email del usuario">Email</th>
+			<th scope="col" style="width:20%" title="Rol del usuario">Rol</th>
 			<th scope="col" style="width:5%" title="Lista del usuario">Lista</th>
-			<th scope="col" style="width:10%" title="Borrado del usuario">Borrado</th>
-			<th scope="col" style="width:5%" title="Fecha borrado del usuario">Fecha Borrado</th>
+			<th scope="col" style="width:10%"></th>
 		</tr>
 		<tbody>				
 		</tbody>
 		<tfoot>
 			<tr>
-				<th colSpan="14" style="width:100%"></th>
+				<th colSpan="10" style="width:100%"></th>
 			</tr>
 		</tfoot>
 	</table>
@@ -79,25 +77,23 @@ VistaUsuarioBolsaEmpleo bean = (VistaUsuarioBolsaEmpleo) uvdatos.getVistas().get
 		<h2>Usuarios Excluidos</h2>
 		<table class="bluetable bolsaempleo" id="table_usuarios_excluidos">
 		<tr>
-			<th scope="col" style="width:3%"></th>
-			<th scope="col" style="width:3%" title="Id del usuario">Id</th>
-			<th scope="col" style="width:5%" title="DNI del usuario">Tipo</th>
-			<th scope="col" style="width:10%" title="DNI del usuario">Documento</th>
-			<th scope="col" style="width:10%" title="DNI del usuario">UJA</th>
-			<th scope="col" style="width:13%" title="Nombre del usuario">Nombre</th>
-			<th scope="col" style="width:22%" title="DNI del usuario">Apellidos</th>
-			<th scope="col" style="width:10%" title="Email del usuario">Email</th>
-			<th scope="col" style="width:10%" title="Rol del usuario">Rol</th>
-			<th scope="col" style="width:5%" title="Lista del usuario">Lista</th>
-			<th scope="col" style="width:10%" title="Excluido del usuario">Excluido</th>
+			<th scope="col" style="width:5%"></th>
+			<th scope="col" style="width:5%" title="Id del usuario">Id</th>
+			<th scope="col" style="width:5%" title="Tipo de documento">Tipo</th>
+			<th scope="col" style="width:10%" title="Nº Documento">Documento</th>
+			<th scope="col" style="width:9%" title="Nombre de usuario">Usuario</th>
+			<th scope="col" style="width:24%" title="Nombre y apellidos">Nombre y Apellidos</th>
+			<th scope="col" style="width:14%" title="Email del usuario">Email</th>
+			<th scope="col" style="width:17%" title="Rol del usuario">Rol</th>
 			<th scope="col" style="width:10%" title="Razon exclusion del usuario">Razon Exclusion</th>
-			<th scope="col" style="width:10%" title="Fecha exclusion usuario">Fecha Exclusion</th>
+			<th scope="col" style="width:5%" title="Lista del usuario">Lista</th>
+			<th scope="col" style="width:10%"></th>
 		</tr>
 		<tbody>				
 		</tbody>
 		<tfoot>
 			<tr>
-				<th colSpan="14" style="width:100%"></th>
+				<th colSpan="15" style="width:100%"></th>
 			</tr>
 		</tfoot>
 	</table>
@@ -122,11 +118,8 @@ $(document).ready(function() {
 	        {'data': 'codNum'},
 	        {'data': 'tipodocumento'},
 	        {'data': 'numdocumento'},
-	        {'data': 'ujaendni'},
+	        {'data': 'apellido1'},
 	        {'data': 'nombre'},
-	        {'data': 'apellido1', 'render': function(row) {
-        			return "<p>"+row.apellido1+" "+row.apellido2+"</p>"; 
-        	}},
 	        {'data': 'email'},
 	        {'data': 'rol.descripcion'},
 	        {'data': 'listaDist', 'render': function(row) {
@@ -136,9 +129,28 @@ $(document).ready(function() {
         		else{
         			return "<center><img style='width:20px; height:20px' src='/img/md/cancel.svg'/></center>"; 
         		}
-        	}}
+        	}},
+        	{'data': 'codnum', 'buttons': [{'label': 'Editar', 'onClick': function(row) {
+        		var params = {'a': '<%= ControladorUsuarioBolsaEmpleo.ACCION_EDITAR_USUARIO %>', 'nombreusuario': row.admusuidentificador};
+        		Atis.sendForm("<%= request.getRequestURI() %>", params);
+        	}}, 
+        	{'label': function(row) { return "Borrar"; }, 'onClick': function(row) {
+        		var mensaje = "¿Desea borrar el usuario seleccionado?";
+        		var titulo = "Borrar Usuario";
 
-
+        		Atis.confirmDialog(titulo, mensaje, {
+		        	Si: function() {
+		        		var params = {'a': '<%= ControladorUsuarioBolsaEmpleo.ACCION_ELIMINAR_USUARIO %>',
+		        			'id': row.codNum};
+	        			Atis.sendForm("<%= request.getRequestURI() %>", params);
+		          		$(this).dialog("close");
+		        	},
+		        	No: function() {
+		          		$(this).dialog("close");
+		        	}
+		      	});
+        	
+        	}}]}	
 	    ]
 	});
 	
@@ -152,11 +164,8 @@ $(document).ready(function() {
 	        {'data': 'codNum'},
 	        {'data': 'tipodocumento'},
 	        {'data': 'numdocumento'},
-	        {'data': 'ujaendni'},
+	        {'data': 'apellido1'},
 	        {'data': 'nombre'},
-	        {'data': 'apellido1', 'render': function(row) {
-        			return "<p>"+row.apellido1+" "+row.apellido2+"</p>"; 
-        	}},
 	        {'data': 'email'},
 	        {'data': 'rol.descripcion'},
 	        {'data': 'listaDist', 'render': function(row) {
@@ -167,15 +176,27 @@ $(document).ready(function() {
         			return "<center><img style='width:20px; height:20px' src='/img/md/cancel.svg'/></center>"; 
         		}
         	}},
-	        {'data': 'borrado', 'render': function(row) {
-        		if(row.borrado==true){
-        			return "<center><img style='width:20px; height:20px' src='/img/md/check_box.svg'/></center>"; 
-        		}
-        		else{
-        			return "<center><img style='width:20px; height:20px' src='/img/md/cancel.svg'/></center>"; 
-        		}
-        	}},
-	        {'data': 'fechaBorrado'}
+        	{'data': 'codnum', 'buttons': [{'label': 'Editar', 'onClick': function(row) {
+        		var params = {'a': '<%= ControladorUsuarioBolsaEmpleo.ACCION_EDITAR_USUARIO %>', 'nombreusuario': row.admusuidentificador};
+        		Atis.sendForm("<%= request.getRequestURI() %>", params);
+        	}}, 
+        	{'label': function(row) { return "Borrar"; }, 'onClick': function(row) {
+        		var mensaje = "¿Desea borrar el usuario seleccionado?";
+        		var titulo = "Borrar Usuario";
+
+        		Atis.confirmDialog(titulo, mensaje, {
+		        	Si: function() {
+		        		var params = {'a': '<%= ControladorUsuarioBolsaEmpleo.ACCION_ELIMINAR_USUARIO %>',
+		        			'id': row.codNum};
+	        			Atis.sendForm("<%= request.getRequestURI() %>", params);
+		          		$(this).dialog("close");
+		        	},
+		        	No: function() {
+		          		$(this).dialog("close");
+		        	}
+		      	});
+        	
+        	}}]}	
 	    ]
 	});
 	
@@ -190,13 +211,11 @@ $(document).ready(function() {
 	        {'data': 'codNum'},
 	        {'data': 'tipodocumento'},
 	        {'data': 'numdocumento'},
-	        {'data': 'ujaendni'},
+	        {'data': 'apellido1'},
 	        {'data': 'nombre'},
-	        {'data': 'apellido1', 'render': function(row) {
-        			return "<p>"+row.apellido1+" "+row.apellido2+"</p>"; 
-        	}},
 	        {'data': 'email'},
 	        {'data': 'rol.descripcion'},
+	        {'data': 'razonExclusion'},
 	        {'data': 'listaDist', 'render': function(row) {
         		if(row.listaDist==true){
         			return "<center><img style='width:20px; height:20px' src='/img/md/check_box.svg'/></center>"; 
@@ -205,16 +224,27 @@ $(document).ready(function() {
         			return "<center><img style='width:20px; height:20px' src='/img/md/cancel.svg'/></center>"; 
         		}
         	}},
-	        {'data': 'excluido', 'render': function(row) {
-        		if(row.excluido==true){
-        			return "<center><img style='width:20px; height:20px' src='/img/md/check_box.svg'/></center>"; 
-        		}
-        		else{
-        			return "<center><img style='width:20px; height:20px' src='/img/md/cancel.svg'/></center>"; 
-        		}
-        	}},
-	        {'data': 'razonExclusion'},
-	        {'data': 'fechaExclusion'}
+        	{'data': 'codnum', 'buttons': [{'label': 'Editar', 'onClick': function(row) {
+        		var params = {'a': '<%= ControladorUsuarioBolsaEmpleo.ACCION_EDITAR_USUARIO %>', 'nombreusuario': row.admusuidentificador};
+        		Atis.sendForm("<%= request.getRequestURI() %>", params);
+        	}}, 
+        	{'label': function(row) { return "Borrar"; }, 'onClick': function(row) {
+        		var mensaje = "¿Desea borrar el usuario seleccionado?";
+        		var titulo = "Borrar Usuario";
+
+        		Atis.confirmDialog(titulo, mensaje, {
+		        	Si: function() {
+		        		var params = {'a': '<%= ControladorUsuarioBolsaEmpleo.ACCION_ELIMINAR_USUARIO %>',
+		        			'id': row.codNum};
+	        			Atis.sendForm("<%= request.getRequestURI() %>", params);
+		          		$(this).dialog("close");
+		        	},
+		        	No: function() {
+		          		$(this).dialog("close");
+		        	}
+		      	});
+        	
+        	}}]}	
 	    ]
 	});
 

@@ -224,6 +224,16 @@ nav-bolsa-empleo a:active, nav-bolsa-empleo a:hover {
 	mask: url(../img/md/add.svg) no-repeat center;
 }
 
+#nuevo_usuario span {
+	display: inline-block;
+	padding: .6em;
+	line-height: 2.4em;
+	text-align: center;
+	background-color: #fff;
+	-webkit-mask: url(../img/md/add.svg) no-repeat center;
+	mask: url(../img/md/add.svg) no-repeat center;
+}
+
 /* Formularios */
 
 .bolsa-empleo label {
