@@ -35,28 +35,57 @@ public class ModeloBaremacion {
 	public static final int ORDER_COLUMN_INDEX_ITEMS_NOMBRE = 1;
 	public static final int ORDER_COLUMN_INDEX_ITEMS_ACTIVO = 2;
 	
-	public static final String APARTADO_ACTIVO = "S";
-	public static final String APARTADO_NO_ACTIVO = "N";
+	// opción de consulta por defecto devuelve la lista con todas las filas de la tabla
+	public static final int OPCION_DEFAULT = 0;
+	// opción de consulta que filtra la lista con un id dado
+	public static final int OPCION_1 = 1;
+	// opción de consulta para comprobar si ya existe un código
+	public static final int OPCION_2 = 2;
+	// opción de consulta para obtener todos los ítems de un apartado
+	public static final int OPCION_3 = 3;
 	
+	
+	/********************************************** METODOS PÚBLICOS PARA CONSULTAS APARTADOBAREMACION  ********************************************/
 	
 	/** Consulta apartados en la BBDD y los devuelve .
-	 * @param id .
+	 * @param apartado .
+	 * @param opcion opción según la consulta .
 	 * @return lista de apartados .
 	 * @throws SQLException .
+	 * @throws UVException .
 	 */
-	private List<ApartadoBaremacion> listaApartados(Integer id) throws SQLException {
+	private List<ApartadoBaremacion> listaApartados(ApartadoBaremacion apartado, int opcion) throws SQLException, UVException {
 		List<ApartadoBaremacion> apartados = new ArrayList<>();
 		String consulta = "SELECT bepapa.* FROM TBEP_APARTADOSBAREMACION bepapa ";
 		
-		if (id != null) {
-			consulta += "WHERE bepapa.CODNUM = ?";
+		if (opcion == OPCION_1 && opcion == OPCION_2) {
+			if (apartado == null) {
+				throw new UVException("apartado obligatorio");
+			}
+			if (apartado.getCodNum() == null) {
+				throw new UVException("id apartado no válido");
+			}
+			
+			consulta += "WHERE bepapa.CODNUM = ? ";
+		}
+		if (opcion == OPCION_2) {
+			if (apartado.getCodigo() == null || apartado.getCodigo().equals("")) {
+				throw new UVException("código de apartado no válido");
+			}
+			
+			consulta += "AND bepapa.CODIGO != ? ";
 		}
 		
 		try (Connection conexion = ConexionUvirtual.obtenerInstancia(); PreparedStatement stmt = conexion.prepareStatement(consulta);) {
-			if (id != null) {
-				int parameterIndex = 1; 
-				stmt.setInt(parameterIndex++, id);
+			
+			int parameterIndex = 1;
+			if (opcion == OPCION_1 && opcion == OPCION_2) {
+				stmt.setInt(parameterIndex++, apartado.getCodNum());
 			}
+			if (opcion == OPCION_2) {
+				stmt.setString(parameterIndex++, apartado.getCodigo());
+			}
+			
 			try (ResultSet rs = stmt.executeQuery()) {
 				while (rs.next()) {
 					try {
@@ -64,117 +93,24 @@ public class ModeloBaremacion {
 						ap.setCodNum(rs.getInt("CODNUM"));
 						ap.setCodigo(rs.getString("CODIGO"));
 						ap.setNombre(rs.getString("NOMBRE"));
-						ap.setActivo(rs.getString("FLGACTIVO").equals("S"));	
+						ap.setActivo(rs.getString("FLGACTIVO").equals("S"));
 						apartados.add(ap);
 					} catch (Exception e) {
 						e.printStackTrace();
 					}
-					
 				}
 			}
-			}
+		}
 		return apartados;
-	}
-	
-	/** Consulta bloques en la BBDD y los devuelve .
-	 * @param id .
-	 * @return lista de bloques .
-	 * @throws SQLException .
-	 */
-	private List<BloqueBaremacion> listaBloques(Integer id) throws SQLException {
-		List<BloqueBaremacion> bloques = new ArrayList<>();
-		String consulta = "SELECT bepblo.* FROM TBEP_BLOQUESBAREMACION bepblo ";
-		
-		if (id != null) {
-			consulta += "WHERE bepblo.CODNUM = ?";
-		}
-		
-		try (Connection conexion = ConexionUvirtual.obtenerInstancia(); PreparedStatement stmt = conexion.prepareStatement(consulta);) {
-			if (id != null) {
-				int parameterIndex = 1; 
-				stmt.setInt(parameterIndex++, id);
-			}
-			try (ResultSet rs = stmt.executeQuery()) {
-				while (rs.next()) {
-					try {
-						BloqueBaremacion blo = new BloqueBaremacion();
-						blo.setCodNum(rs.getInt("CODNUM"));
-						blo.setCodigo(rs.getString("CODIGO"));
-						blo.setNombre(rs.getString("NOMBRE"));
-						blo.setActivo(rs.getString("FLGACTIVO").equals("S"));					
-						blo.setApartadoBaremacion(this.getApartadoBaremacionById(rs.getInt("BEPAPA_CODNUM")));
-						bloques.add(blo);
-					} catch (Exception e) {
-						e.printStackTrace();
-					}
-					
-				}
-			}
-			}
-		return bloques;
-	}
-	
-	/** Consulta items en la BBDD y los devuelve .
-	 * @param id .
-	 * @param apartado booleano para indicar si el id es del apartado o del ítem .
-	 * @return lista de items .
-	 * @throws SQLException .
-	 */
-	private List<ItemBaremacion> listaItems(Integer id, boolean apartado) throws SQLException {
-		List<ItemBaremacion> items = new ArrayList<>();
-		String consulta = "SELECT bepite.* FROM TBEP_ITEMSBAREMACION bepite ";
-		
-		if (id != null) {
-			if (apartado) {
-				consulta += "INNER JOIN TBEP_BLOQUESBAREMACION bepblo"
-						+ " ON bepblo.CODNUM = bepite.BEPBLO_CODNUM "
-						+ " INNER JOIN TBEP_APARTADOSBAREMACION bepapa "
-						+ " ON bepapa.CODNUM = bepblo.BEPAPA_CODNUM "
-						+ " WHERE bepapa.CODNUM = ?";
-			} else {
-				consulta += "WHERE bepite.CODNUM = ?";
-			}
-		}
-		
-		try (Connection conexion = ConexionUvirtual.obtenerInstancia(); PreparedStatement stmt = conexion.prepareStatement(consulta);) {
-			if (id != null) {
-				int parameterIndex = 1; 
-				stmt.setInt(parameterIndex++, id);
-			}
-			try (ResultSet rs = stmt.executeQuery()) {
-				while (rs.next()) {
-					try {
-						ItemBaremacion it = new ItemBaremacion();
-						it.setCodNum(rs.getInt("CODNUM"));
-						it.setCodigo(rs.getString("CODIGO"));
-						it.setNombre(rs.getString("NOMBRE"));
-						it.setActivo(rs.getString("FLGACTIVO").equals("S"));					
-						it.setBloqueBaremacion(this.getBloqueBaremacionById(rs.getInt("BEPBLO_CODNUM")));
-						items.add(it);
-					} catch (Exception e) {
-						e.printStackTrace();
-					}
-					
-				}
-			}
-			}
-		return items;
 	}
 	
 	/** lista todos los apartados.
 	 * @return vector con todos los apartados .
 	 * @throws SQLException si hay un error en la base de datos .
+	 * @throws UVException .
 	 */
-	public List<ApartadoBaremacion> listaApartados() throws SQLException {
-		return listaApartados(null);
-	}
-	
-	/** lista todos los ítems de un apartado.
-	 * @return vector con todos los ítems .
-	 * @throws SQLException si hay un error en la base de datos .
-	 */
-	public List<ItemBaremacion> listaItemsApartado(Integer id) throws SQLException {
-		return listaItems(id, true);
+	public List<ApartadoBaremacion> listaApartados() throws SQLException, UVException {
+		return listaApartados(null, OPCION_DEFAULT);
 	}
 	
 	/**
@@ -182,46 +118,16 @@ public class ModeloBaremacion {
 	 * @param codNum .
 	 * @return .
 	 * @throws SQLException en caso de error en la BD
-	 * @throws UVException si bolsa no es existe
+	 * @throws UVException si apartado no es existe
 	 */
 	public ApartadoBaremacion getApartadoBaremacionById(int codNum) throws SQLException, UVException {
-		List<ApartadoBaremacion> apartados = listaApartados(codNum);
+		List<ApartadoBaremacion> apartados = listaApartados(new ApartadoBaremacion(codNum), OPCION_1);
 		if (apartados.isEmpty()) {
 			throw new UVException("No existe apartado");
 		}
 		return apartados.get(0);
 	}
 	
-	/**
-	 * Devuelve un bloque de baremación por su id.
-	 * @param codNum .
-	 * @return .
-	 * @throws SQLException en caso de error en la BD
-	 * @throws UVException si bolsa no es existe
-	 */
-	public BloqueBaremacion getBloqueBaremacionById(int codNum) throws SQLException, UVException {
-		List<BloqueBaremacion> bloques = listaBloques(codNum);
-		if (bloques.isEmpty()) {
-			throw new UVException("No existe bloque");
-		}
-		return bloques.get(0);
-	}
-	
-	/**
-	 * Devuelve un ítem de baremación por su id.
-	 * @param codNum .
-	 * @return .
-	 * @throws SQLException en caso de error en la BD .
-	 * @throws UVException si bolsa no es existe .
-	 */
-	public ItemBaremacion getItemBaremacionById(int codNum) throws SQLException, UVException {
-		List<ItemBaremacion> items = listaItems(codNum, false);
-		if (items.isEmpty()) {
-			throw new UVException("No existe ítem");
-		}
-		return items.get(0);
-	}
-		
 	/**
 	 * Listado de apartados generales de baremación. 
 	 * @param params para leer los parametros de paginación, ordenacion, etc
@@ -263,6 +169,137 @@ public class ModeloBaremacion {
 		}
 		
 		return dataTable;
+	}
+	
+	/** Actualiza un apartado .
+	 * @param apartado con los datos nuevos a actualizar .
+	 * @throws SQLException en caso de error en la BD .
+	 * @throws UVException en caso de errores de validacion .
+	 */
+	public void actualizaApartado(ApartadoBaremacion apartado, int opcion) throws SQLException, UVException {
+		
+		String consulta = "UPDATE TBEP_APARTADOSBAREMACION SET ";
+		
+		if (apartado == null) {
+			throw new UVException("apartado obligatorio");
+		}
+		if (apartado.getCodNum() == null) {
+			throw new UVException("id apartado no válido");
+		}
+		
+		if (opcion == OPCION_1) {
+			consulta += " codigo=?, nombre=?";
+			
+			if (apartado.getCodigo() == null) {
+				throw new UVException("código obligatorio");
+			}
+			if (apartado.getNombre() == null) {
+				throw new UVException("nombre obligatorio");
+			}
+			
+			if (listaApartados(apartado, OPCION_2).size() > 0) {
+				throw new UVException("ya existe un apartado con éste código");
+			}
+		}
+		
+		if (opcion == OPCION_2) {
+			consulta += " flgactivo=?";
+			
+			if (apartado.isActivo() == null) {
+				throw new UVException("activo obligatorio");
+			}
+		}
+		
+		consulta += " WHERE codnum=?";
+		
+		try (Connection conexion = ConexionUvirtual.obtenerInstancia(); PreparedStatement stmt = conexion.prepareStatement(consulta);) {
+			int parameterIndex = 1;
+			
+			if (opcion == 1) {
+				stmt.setString(parameterIndex++, apartado.getCodigo());
+				stmt.setString(parameterIndex++, apartado.getNombre());
+			}
+			if (opcion == 2) {
+				stmt.setString(parameterIndex++, apartado.isActivo() ? "S" : "N");
+			}
+			
+			stmt.setInt(parameterIndex++, apartado.getCodNum());
+			stmt.executeUpdate();
+		}
+	}
+	
+	/********************************************** METODOS PÚBLICOS PARA CONSULTAS BLOQUEBAREMACION  ********************************************/
+	
+	/** Consulta bloques en la BBDD y los devuelve .
+	 * @param bloque .
+	 * @param opcion opción según la consulta .
+	 * @return lista de bloques .
+	 * @throws SQLException .
+	 * @throws UVException .
+	 */
+	private List<BloqueBaremacion> listaBloques(BloqueBaremacion bloque, int opcion) throws SQLException, UVException {
+		List<BloqueBaremacion> bloques = new ArrayList<>();
+		String consulta = "SELECT bepblo.* FROM TBEP_BLOQUESBAREMACION bepblo ";
+		
+		if (opcion == OPCION_1 && opcion == OPCION_2) {
+			if (bloque == null) {
+				throw new UVException("bloque obligatorio");
+			}
+			if (bloque.getCodNum() == null) {
+				throw new UVException("id bloque no válido");
+			}
+			
+			consulta += "WHERE bepblo.CODNUM = ? ";
+		}
+		if (opcion == OPCION_2) {
+			if (bloque.getCodigo() == null || bloque.getCodigo().equals("")) {
+				throw new UVException("código de bloque no válido");
+			}
+			
+			consulta += "AND bepblo.CODIGO != ? ";
+		}
+		
+		try (Connection conexion = ConexionUvirtual.obtenerInstancia(); PreparedStatement stmt = conexion.prepareStatement(consulta);) {
+			int parameterIndex = 1;
+			if (opcion == OPCION_1 && opcion == OPCION_2) {
+				stmt.setInt(parameterIndex++, bloque.getCodNum());
+			}
+			if (opcion == OPCION_2) {
+				stmt.setString(parameterIndex++, bloque.getCodigo());
+			}
+			try (ResultSet rs = stmt.executeQuery()) {
+				while (rs.next()) {
+					try {
+						BloqueBaremacion blo = new BloqueBaremacion();
+						blo.setCodNum(rs.getInt("CODNUM"));
+						blo.setCodigo(rs.getString("CODIGO"));
+						blo.setNombre(rs.getString("NOMBRE"));
+						blo.setActivo(rs.getString("FLGACTIVO").equals("S"));					
+						blo.setApartadoBaremacion(this.getApartadoBaremacionById(rs.getInt("BEPAPA_CODNUM")));
+						bloques.add(blo);
+					} catch (Exception e) {
+						e.printStackTrace();
+					}
+					
+				}
+			}
+		}
+		return bloques;
+	}
+	
+	/**
+	 * Devuelve un bloque de baremación por su id.
+	 * @param codNum .
+	 * @return .
+	 * @throws SQLException en caso de error en la BD
+	 * @throws UVException si bloque no es existe
+	 */
+	public BloqueBaremacion getBloqueBaremacionById(int codNum) throws SQLException, UVException {
+		List<BloqueBaremacion> bloques = listaBloques(new BloqueBaremacion(codNum), OPCION_DEFAULT);
+		if (bloques.isEmpty()) {
+			throw new UVException("No existe bloque");
+		}
+		return bloques.get(0);
 	}
 	
 	/**
@@ -318,6 +355,159 @@ public class ModeloBaremacion {
 		return dataTable;
 	}
 	
+	/** Actualiza un bloque .
+	 * @param bloque con los datos nuevos a actualizar .
+	 * @throws SQLException en caso de error en la BD .
+	 * @throws UVException en caso de errores de validacion .
+	 */
+	public void actualizaBloque(BloqueBaremacion bloque, int opcion) throws SQLException, UVException {
+		
+		String consulta = "UPDATE TBEP_BLOQUESBAREMACION SET ";
+		
+		if (bloque == null) {
+			throw new UVException("bloque obligatorio");
+		}
+		if (bloque.getCodNum() == null) {
+			throw new UVException("id bloque no válido");
+		}
+		
+		if (opcion == OPCION_1) {
+			consulta += " codigo=?, nombre=?";
+			
+			if (bloque.getCodigo() == null) {
+				throw new UVException("código obligatorio");
+			}
+			if (bloque.getNombre() == null) {
+				throw new UVException("nombre obligatorio");
+			}
+			
+			if (listaBloques(bloque, OPCION_2).size() > 0) {
+				throw new UVException("ya existe un bloque con éste código");
+			}
+		}
+		
+		if (opcion == OPCION_2) {
+			consulta += " flgactivo=?";
+			
+			if (bloque.isActivo() == null) {
+				throw new UVException("activo obligatorio");
+			}
+		}
+		
+		consulta += " WHERE codnum=?";
+		
+		try (Connection conexion = ConexionUvirtual.obtenerInstancia(); PreparedStatement stmt = conexion.prepareStatement(consulta);) {
+			int parameterIndex = 1;
+			
+			if (opcion == 1) {
+				stmt.setString(parameterIndex++, bloque.getCodigo());
+				stmt.setString(parameterIndex++, bloque.getNombre());
+			}
+			if (opcion == 2) {
+				stmt.setString(parameterIndex++, bloque.isActivo() ? "S" : "N");
+			}
+			
+			stmt.setInt(parameterIndex++, bloque.getCodNum());
+			stmt.executeUpdate();
+		}
+	}
+	
+	/********************************************** METODOS PÚBLICOS PARA CONSULTAS ITEMBAREMACION  ********************************************/
+	
+	/** Consulta items en la BBDD y los devuelve .
+	 * @param item .
+	 * @param opcion opción según la consulta .
+	 * @return lista de items .
+	 * @throws SQLException .
+	 * @throws UVException .
+	 */
+	private List<ItemBaremacion> listaItems(ItemBaremacion item, int opcion) throws SQLException, UVException {
+		List<ItemBaremacion> items = new ArrayList<>();
+		String consulta = "SELECT bepite.* FROM TBEP_ITEMSBAREMACION bepite ";
+		
+		
+		if (opcion == OPCION_1 || opcion == OPCION_2) {
+			if (item == null) {
+				throw new UVException("item obligatorio");
+			}
+			if (item.getCodNum() == null) {
+				throw new UVException("id item no válido");
+			}
+			
+			consulta += "WHERE bepite.CODNUM = ? ";
+		}
+		if (opcion == OPCION_2) {
+			if (item.getCodigo() == null || item.getCodigo().equals("")) {
+				throw new UVException("código de item no válido");
+			}
+			
+			consulta += "AND bepite.CODIGO != ? ";
+		}
+		if (opcion == OPCION_3) {
+			if (item.getCodNum() == null) {
+				throw new UVException("id apartado no válido");
+			}
+			
+			consulta += "INNER JOIN TBEP_BLOQUESBAREMACION bepblo"
+					+ " ON bepblo.CODNUM = bepite.BEPBLO_CODNUM "
+					+ " INNER JOIN TBEP_APARTADOSBAREMACION bepapa "
+					+ " ON bepapa.CODNUM = bepblo.BEPAPA_CODNUM "
+					+ " WHERE bepapa.CODNUM = ?";
+		}
+		
+		try (Connection conexion = ConexionUvirtual.obtenerInstancia(); PreparedStatement stmt = conexion.prepareStatement(consulta);) {
+			int parameterIndex = 1;
+			if (opcion == OPCION_1 || opcion == OPCION_2 || opcion == OPCION_3) {
+				stmt.setInt(parameterIndex++, item.getCodNum());
+			}
+			if (opcion == OPCION_2) {
+				stmt.setString(parameterIndex++, item.getCodigo());
+			}
+			try (ResultSet rs = stmt.executeQuery()) {
+				while (rs.next()) {
+					try {
+						ItemBaremacion it = new ItemBaremacion();
+						it.setCodNum(rs.getInt("CODNUM"));
+						it.setCodigo(rs.getString("CODIGO"));
+						it.setNombre(rs.getString("NOMBRE"));
+						it.setActivo(rs.getString("FLGACTIVO").equals("S"));					
+						it.setBloqueBaremacion(this.getBloqueBaremacionById(rs.getInt("BEPBLO_CODNUM")));
+						items.add(it);
+					} catch (Exception e) {
+						e.printStackTrace();
+					}
+					
+				}
+			}
+			}
+		return items;
+	}
+	
+	/** lista todos los ítems de un apartado.
+	 * @param id .
+	 * @return vector con todos los ítems .
+	 * @throws SQLException si hay un error en la base de datos .
+	 * @throws UVException .
+	 */
+	public List<ItemBaremacion> listaItemsApartado(Integer id) throws SQLException, UVException {
+		return listaItems(new ItemBaremacion(id), OPCION_3);
+	}
+	
+	/**
+	 * Devuelve un ítem de baremación por su id.
+	 * @param codNum .
+	 * @return .
+	 * @throws SQLException en caso de error en la BD .
+	 * @throws UVException si ítem no es existe .
+	 */
+	public ItemBaremacion getItemBaremacionById(int codNum) throws SQLException, UVException {
+		List<ItemBaremacion> items = listaItems(new ItemBaremacion(codNum), OPCION_1);
+		if (items.isEmpty()) {
+			throw new UVException("No existe ítem");
+		}
+		return items.get(0);
+	}
+	
 	/**
 	 * Listado de ítems de baremación . 
 	 * @param params para leer los parametros de paginación, ordenacion, etc
@@ -369,6 +559,63 @@ public class ModeloBaremacion {
 		}
 		
 		return dataTable;
+	}
+	
+	/** Actualiza un item .
+	 * @param item con los datos nuevos a actualizar .
+	 * @throws SQLException en caso de error en la BD .
+	 * @throws UVException en caso de errores de validacion .
+	 */
+	public void actualizaItem(ItemBaremacion item, int opcion) throws SQLException, UVException {
+		
+		String consulta = "UPDATE TBEP_ITEMSBAREMACION SET ";
+		
+		if (item == null) {
+			throw new UVException("item obligatorio");
+		}
+		if (item.getCodNum() == null) {
+			throw new UVException("id item no válido");
+		}
+		
+		if (opcion == OPCION_1) {
+			consulta += " codigo=?, nombre=?";
+			
+			if (item.getCodigo() == null) {
+				throw new UVException("código obligatorio");
+			}
+			if (item.getNombre() == null) {
+				throw new UVException("nombre obligatorio");
+			}
+			
+			if (listaItems(item, OPCION_2).size() > 0) {
+				throw new UVException("ya existe un item con éste código");
+			}
+		}
+		
+		if (opcion == OPCION_2) {
+			consulta += " flgactivo=?";
+			
+			if (item.isActivo() == null) {
+				throw new UVException("activo obligatorio");
+			}
+		}
+		
+		consulta += " WHERE codnum=?";
+		
+		try (Connection conexion = ConexionUvirtual.obtenerInstancia(); PreparedStatement stmt = conexion.prepareStatement(consulta);) {
+			int parameterIndex = 1;
+			
+			if (opcion == 1) {
+				stmt.setString(parameterIndex++, item.getCodigo());
+				stmt.setString(parameterIndex++, item.getNombre());
+			}
+			if (opcion == 2) {
+				stmt.setString(parameterIndex++, item.isActivo() ? "S" : "N");
+			}
+			
+			stmt.setInt(parameterIndex++, item.getCodNum());
+			stmt.executeUpdate();
+		}
 	}
 	
 }

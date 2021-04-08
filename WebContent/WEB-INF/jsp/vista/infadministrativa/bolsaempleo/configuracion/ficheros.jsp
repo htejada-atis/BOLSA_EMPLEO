@@ -47,32 +47,6 @@ VistaFicheros bean = (VistaFicheros) uvdatos.getVistas().get(VistaFicheros.class
 
 <script>
 
-	function confirmDialog(title, message, id) {
-		$('<div></div>').appendTo('body')
-	    	.html('<div><h6>' + message + '</h6></div>')
-	    	.dialog({
-		      modal: true,
-		      title: title,
-		      zIndex: 10000,
-		      autoOpen: true,
-		      width: 'auto',
-		      resizable: false,
-		      buttons: {
-		        Si: function() {
-		        	var params = {'a': '<%= ControladorGestionFicheros.ACCION_BORRAR_FICHERO %>', '<%= ControladorGestionFicheros.PARAM_ID %>': id};
-	        		Atis.sendForm("<%= request.getRequestURI() %>", params);
-		          	$(this).dialog("close");
-		        },
-		        No: function() {
-		          	$(this).dialog("close");
-		        }
-		      },
-		      close: function(event, ui) {
-		        $(this).remove();
-		      }
-		});
-	}
-
 	$(document).ready(function() {
 		
 		var table = new DataTable('#table_ficheros', {
@@ -91,7 +65,16 @@ VistaFicheros bean = (VistaFicheros) uvdatos.getVistas().get(VistaFicheros.class
 		        	}
 		        },
 		        {'data': 'codnum', 'buttons': [{'label': 'Borrar', 'onClick': function(row) {
-			        		confirmDialog("Borrar fichero", "¿Desea borrar el fichero seleccionado?", row.codNum);
+				        	Atis.confirmDialog("Borrar fichero", "¿Desea borrar el fichero seleccionado?", {
+				        		Si: function() {
+				        			var params = {'a': '<%= ControladorGestionFicheros.ACCION_BORRAR_FICHERO %>', '<%= ControladorGestionFicheros.PARAM_ID %>': row.codNum};
+					        		Atis.sendForm("<%= request.getRequestURI() %>", params);
+						          	$(this).dialog("close");
+						        },
+						        No: function() {
+						          	$(this).dialog("close");
+						    	}
+						    });
 			        	}
 			        },{'label': '<label class="tooltiptext">Copiar enlace</label>Copiar', 'class': 'tooltip', 'onClick': function(row) {
 			        	$(this).parent().parent().parent().find(".tooltiptext").text("¡Enlace copiado!");

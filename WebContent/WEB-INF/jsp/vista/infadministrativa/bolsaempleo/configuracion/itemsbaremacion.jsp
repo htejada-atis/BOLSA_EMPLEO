@@ -79,6 +79,24 @@ VistaItemsBaremacion bean = (VistaItemsBaremacion) uvdatos.getVistas().get(Vista
 
 	$(document).ready(function() {
 		
+		var activatorApartado = false;
+		
+		<% 
+    	if (bean.getApartadoBaremacion() != null) {
+    		if(bean.getApartadoBaremacion().isActivo()) {
+    	%>
+    			activatorApartado = false;
+    	<%
+    		} else {
+    	%>
+    			activatorApartado = true;
+    	<%
+    		}
+    	}
+    	%>
+    	
+    	var activatorApartadoName = activatorApartado ? "Activar" : "Desactivar";
+		
 		var tableApartados = new DataTable('#tableApartadosGenerales', {
 		    "ajax": { url: "<%= ControladorItemsBaremacion.URL_PATTERN_AJAX %>", async: false },
 		    "pageSize": 10,
@@ -94,13 +112,33 @@ VistaItemsBaremacion bean = (VistaItemsBaremacion) uvdatos.getVistas().get(Vista
 		    	{'data': 'codigo'},
 		        {'data': 'nombre'},
 		        {'data': 'activo'},
-		    ]
+		    ],
 		    "actions": [
-		    	{'label': 'Activar', 'onClick': function(selected) {
+		    	{'label': activatorApartadoName, 'showWhenSelected': true, 'onClick': function(selected) {
+	        		Atis.confirmDialog(activatorApartadoName + " apartado", "¿Desea " + activatorApartadoName + " el apartado seleccionado?", {
+		        		Si: function() {
+		        			var params = {
+			    				'a': activatorApartado ? '<%=ControladorItemsBaremacion.ACCION_ACTIVAR_APARTADO%>' : '<%=ControladorItemsBaremacion.ACCION_DESACTIVAR_APARTADO%>' , 
+			    				'<%=ControladorItemsBaremacion.PARAM_APARTADO%>': selected
+			    			};
+			        		Atis.sendForm("<%=request.getRequestURI()%>", params);
+				          	$(this).dialog("close");
+				        },
+				        No: function() {
+				          	$(this).dialog("close");
+				    	}
+				    });
+		    	}},
+		    	{'label': 'Añadir', 'showWhenSelected': true, 'onClick': function(selected) {
 		    		var params = {'a': '<%=ControladorItemsBaremacion.ACCION_LISTAR%>', 
-		    				'': JSON.stringify(selected)};
+		    				'<%=ControladorItemsBaremacion.PARAM_APARTADO%>': selected};
 	        		Atis.sendForm("<%=request.getRequestURI()%>", params);
 		    	}},
+		    	{'label': 'Editar', 'showWhenSelected': true, 'onClick': function(selected) {
+		    		var params = {'a': '<%=ControladorItemsBaremacion.ACCION_LISTAR%>', 
+		    				'<%=ControladorItemsBaremacion.PARAM_APARTADO%>': selected};
+	        		Atis.sendForm("<%=request.getRequestURI()%>", params);
+		    	}}
 		    ]
 		});
 		

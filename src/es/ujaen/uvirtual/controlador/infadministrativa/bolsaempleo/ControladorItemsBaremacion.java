@@ -10,6 +10,7 @@ import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import es.ujaen.uvirtual.beans.CodigoDescripcion;
@@ -43,20 +44,38 @@ public class ControladorItemsBaremacion extends HttpServlet {
 	private static final Logger LOGGER = Logger.getLogger(NOMBREDEESTACLASE);
 	
 	// acciones
+	public static final String ACCION_ACTIVAR_APARTADO = "activarapartado";
+	public static final String ACCION_ACTIVAR_BLOQUE = "activarabloque";
+	public static final String ACCION_ACTIVAR_ITEM = "activaraitem";
+	public static final String ACCION_AGREGAR_APARTADO = "agregarapartado";
+	public static final String ACCION_AGREGAR_BLOQUE = "agregarbloque";
+	public static final String ACCION_EDITAR_APARTADO = "editarapartado";
+	public static final String ACCION_EDITAR_BLOQUE = "editarbloque";
 	public static final String ACCION_APARTADO_SELECCIONADO = "apartadoseleccionado";
 	public static final String ACCION_BLOQUE_SELECCIONADO = "bloqueseleccionado";
 	public static final String ACCION_LISTAR = "listar";
 	public static final String ACCION_DATATABLE_APARTADOS = "datatable_apartados";
 	public static final String ACCION_DATATABLE_BLOQUES = "datatable_bloques";
 	public static final String ACCION_DATATABLE_ITEMS = "datatable_items";
+	public static final String ACCION_DESACTIVAR_APARTADO = "desactivarapartado";
+	public static final String ACCION_DESACTIVAR_BLOQUE = "desactivarabloque";
+	public static final String ACCION_DESACTIVAR_ITEM = "desactivaraitem";
 	
 	// parámetros
 	public static final String PARAM_ACCION = "a";
 	public static final String PARAM_APARTADO = "apartado";
 	public static final String PARAM_BLOQUE = "bloque";
+	public static final String PARAM_ITEM = "item";
 	
 	// mensajes
-	
+	public static final String MENSAJE_ENVIADO = "mensaje";
+	public static final String MENSAJE_EXITO_ACTIVAR_APARTADO = "apartado activado correctamente";
+	public static final String MENSAJE_EXITO_ACTIVAR_BLOQUE = "bloque activado correctamente";
+	public static final String MENSAJE_EXITO_ACTIVAR_ITEM = "ítem activado correctamente";
+	public static final String MENSAJE_EXITO_DESACTIVAR_APARTADO = "apartado desactivado correctamente";
+	public static final String MENSAJE_EXITO_DESACTIVAR_BLOQUE = "bloque desactivado correctamente";
+	public static final String MENSAJE_EXITO_DESACTIVAR_ITEM = "ítem desactivado correctamente";
+
 	// urls
 	public static final String URL_PATTERN_AJAX = "/srv/es/ajax/informacionadministrativa/bolsaempleo/configuracion/itemsbaremacion";
 	
@@ -84,6 +103,15 @@ public class ControladorItemsBaremacion extends HttpServlet {
 		
 		try {
 			switch (nombreAccion) {
+				case ACCION_ACTIVAR_APARTADO:
+					actualizaActivoApartado(bean, request, response, true);
+					break;
+				case ACCION_ACTIVAR_BLOQUE:
+					actualizaActivoApartado(bean, request, response, true);
+					break;
+				case ACCION_ACTIVAR_ITEM:
+					actualizaActivoItem(bean, request, response, true);
+					break;
 				case ACCION_APARTADO_SELECCIONADO:
 					seleccionarApartado(bean, request);
 					break;
@@ -98,6 +126,15 @@ public class ControladorItemsBaremacion extends HttpServlet {
 					break;
 				case ACCION_DATATABLE_ITEMS:
 					listadoItems(bean, datos, request, response);
+					break;
+				case ACCION_DESACTIVAR_APARTADO:
+					actualizaActivoApartado(bean, request, response, false);
+					break;
+				case ACCION_DESACTIVAR_BLOQUE:
+					actualizaActivoBloque(bean, request, response, false);
+					break;
+				case ACCION_DESACTIVAR_ITEM:
+					actualizaActivoItem(bean, request, response, false);
 					break;
 			}
 		} catch (SQLException e) {
@@ -127,6 +164,69 @@ public class ControladorItemsBaremacion extends HttpServlet {
 	@Override
 	public void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 		doGet(request, response);
+	}
+	
+	/** desactiva o activa un apartado .
+	 * @param bean .
+	 * @param request .
+	 * @param response .
+	 * @param activo .
+	 * @throws SQLException .
+	 * @throws UVException .
+	 * @throws IOException .
+	 */
+	private void actualizaActivoApartado(VistaItemsBaremacion bean, HttpServletRequest request, HttpServletResponse response, boolean activo)
+			throws SQLException, UVException, IOException {
+		ModeloBaremacion modelo = new ModeloBaremacion();
+		Integer codNum = Formateador.leeParametroInteger(request.getParameter(PARAM_APARTADO));
+		ApartadoBaremacion apartado = new ApartadoBaremacion(codNum, activo);
+		modelo.actualizaApartado(apartado, ModeloBaremacion.OPCION_2);
+		bean.getMensajesDeExito().add(activo ? MENSAJE_EXITO_ACTIVAR_APARTADO : MENSAJE_EXITO_DESACTIVAR_APARTADO);
+		HttpSession session = request.getSession(false);
+		session.setAttribute(MENSAJE_ENVIADO, activo ? MENSAJE_EXITO_ACTIVAR_APARTADO : MENSAJE_EXITO_DESACTIVAR_APARTADO);
+		response.sendRedirect(request.getServletPath());
+	}
+	
+	/** desactiva o activa un bloque .
+	 * @param bean .
+	 * @param request .
+	 * @param response .
+	 * @param activo .
+	 * @throws SQLException .
+	 * @throws UVException .
+	 * @throws IOException .
+	 */
+	private void actualizaActivoBloque(VistaItemsBaremacion bean, HttpServletRequest request, HttpServletResponse response, boolean activo)
+			throws SQLException, UVException, IOException {
+		ModeloBaremacion modelo = new ModeloBaremacion();
+		Integer codNum = Formateador.leeParametroInteger(request.getParameter(PARAM_BLOQUE));
+		BloqueBaremacion bloque = new BloqueBaremacion(codNum, activo);
+		modelo.actualizaBloque(bloque, ModeloBaremacion.OPCION_2);
+		bean.getMensajesDeExito().add(activo ? MENSAJE_EXITO_ACTIVAR_BLOQUE : MENSAJE_EXITO_ACTIVAR_BLOQUE);
+		HttpSession session = request.getSession(false);
+		session.setAttribute(MENSAJE_ENVIADO, activo ? MENSAJE_EXITO_ACTIVAR_BLOQUE : MENSAJE_EXITO_DESACTIVAR_BLOQUE);
+		response.sendRedirect(request.getServletPath());
+	}
+	
+	/** desactiva o activa un item .
+	 * @param bean .
+	 * @param request .
+	 * @param response .
+	 * @param activo .
+	 * @throws SQLException .
+	 * @throws UVException .
+	 * @throws IOException .
+	 */
+	private void actualizaActivoItem(VistaItemsBaremacion bean, HttpServletRequest request, HttpServletResponse response, boolean activo)
+			throws SQLException, UVException, IOException {
+		ModeloBaremacion modelo = new ModeloBaremacion();
+		Integer codNum = Formateador.leeParametroInteger(request.getParameter(PARAM_ITEM));
+		ItemBaremacion item = new ItemBaremacion(codNum, activo);
+		modelo.actualizaItem(item, ModeloBaremacion.OPCION_2);
+		bean.getMensajesDeExito().add(activo ? MENSAJE_EXITO_ACTIVAR_ITEM : MENSAJE_EXITO_DESACTIVAR_ITEM);
+		HttpSession session = request.getSession(false);
+		session.setAttribute(MENSAJE_ENVIADO, activo ? MENSAJE_EXITO_ACTIVAR_ITEM : MENSAJE_EXITO_DESACTIVAR_ITEM);
+		response.sendRedirect(request.getServletPath());
 	}
 	
 	/** Devuelve un apartado con id dado a la vista .

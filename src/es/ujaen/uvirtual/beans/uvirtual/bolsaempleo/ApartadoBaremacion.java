@@ -34,6 +34,24 @@ public class ApartadoBaremacion implements Serializable {
 		this.nombre = pnombre;
 		this.activo = pactivo;		
 	}
+	
+	/** Constructor con parametros.
+	 * @param pcodNum .
+	 * @param pactivo .
+	 */
+	public ApartadoBaremacion(Integer pcodNum, Boolean pactivo) {
+		super();
+		this.codNum = pcodNum;
+		this.activo = pactivo;		
+	}
+	
+	/** Constructor con parametros.
+	 * @param pcodNum .
+	 */
+	public ApartadoBaremacion(Integer pcodNum) {
+		super();
+		this.codNum = pcodNum;
+	}
 		
 	/** Constructor copia.
 	 * @param copia .

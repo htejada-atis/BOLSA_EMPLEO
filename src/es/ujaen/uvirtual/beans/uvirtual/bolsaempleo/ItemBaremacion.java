@@ -39,6 +39,16 @@ public class ItemBaremacion implements Serializable {
 	
 	/** Constructor con parametros.
 	 * @param pcodNum .
+	 * @param pactivo .
+	 */
+	public ItemBaremacion(Integer pcodNum, Boolean pactivo) {
+		super();
+		this.codNum = pcodNum;
+		this.activo = pactivo;		
+	}
+	
+	/** Constructor con parametros.
+	 * @param pcodNum .
 	 */
 	public ItemBaremacion(Integer pcodNum) {
 		this.codNum = pcodNum;
