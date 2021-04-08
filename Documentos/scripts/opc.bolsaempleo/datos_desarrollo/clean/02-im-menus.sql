@@ -1,3 +1,39 @@
+
+Panel de control
+Incidencias
+Pull Requests
+Hitos
+Explorar
+ Notificaciones8
+ Crear…
+ Perfil y ajustes…
+ P_UJA / BOLSA_EMPLEO
+Seguir
+2
+Destacar
+0
+Fork
+0
+Código
+Incidencias
+0
+Pull Requests
+1
+Lanzamientos
+0
+Wiki
+Actividad
+ 227 Commits
+ 12 Ramas
+ 30 MiB
+ Árbol: 6556f4a55e 
+BOLSA_EMPLEO/Documentos/scripts/opc.bolsaempleo/datos_desarrollo/clean/02-im-menus.sql
+100 líneas
+5.3 KiB
+Original
+Blame
+Histórico
+  
 DELETE FROM ADM_MENU_ROL WHERE MNU_CODNUM = 1114 AND ROL_CODNUM IN (1050, 1051, 1052);
 DELETE FROM ADM_MENU_DOM WHERE MNU_CODNUM = 1114;
 DELETE FROM ADM_MENU_IDM WHERE MNU_CODNUM = 1114;
@@ -97,7 +133,5 @@ DELETE FROM ADM_MENU_RED WHERE MNU_CODNUM = 1115;
 DELETE FROM ADM_MENU WHERE MNU_CODNUM = 1115;
 
 DELETE FROM ADM_USUARIO_ROL WHERE USERUID = 'usig';
-DELETE FROM ADM_USUARIO_ROL WHERE USERUID = 'atis';
-DELETE FROM ADM_USUARIO_ROL WHERE USERUID = 'estudiante1';
-
 DELETE FROM ADM_ROL WHERE rol_codnum IN (1050, 1051, 1052);
+Impulsado por Gitea Versión: 1.12.1 Página: 330ms Plantilla: 13ms JavaScript licenses API Página web Go1.14.4
