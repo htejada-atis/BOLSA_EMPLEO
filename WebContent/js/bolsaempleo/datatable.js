@@ -79,6 +79,18 @@ function DataTable(id, config) {
     
     this.addRow = function(row, index) {
     	var tr = $('<tr id="' + this.id + '_row_' + index + '"></tr>');
+
+        if (self.config.clickable || self.config.selectable) {
+            $(tr).addClass("clickable");
+        }
+
+        if (self.config.clickable) {
+            $(tr).on("click", self.config.clickable.onClick.bind($(tr), row, self));
+        }
+        
+        if (self.config.selected && self.config.selected == row.codNum) {
+        	$(tr).addClass("selected");
+        }
     	
     	self.config.columns.forEach(function(columnDef) {
     		var td = $('<td></td>');

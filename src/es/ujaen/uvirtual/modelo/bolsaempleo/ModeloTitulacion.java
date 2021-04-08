@@ -52,6 +52,14 @@ public class ModeloTitulacion {
 		return titulaciones;
 	}
 	
+	/** lista todas las titulaciones.
+	 * @return lista de todas las titulaciones
+	 * @throws SQLException si hay un error en la base de datos
+	 */
+	public List<Titulacion> listaTitulaciones() throws SQLException {
+		return listaTitulaciones(" ORDER BY nombre");
+	}
+	
 	/** obtiene una titulación a partir de su id.
 	 * @param id codigo de la titulación
 	 * @return titulación con el id especificado
@@ -119,7 +127,7 @@ public class ModeloTitulacion {
 	 */
 	public void insertaTitulacion(Titulacion titulacion) throws SQLException, UVException {
 		if (titulacion == null) {
-			throw new UVException("No se puede insertar una titulacion vacia");
+			throw new UVException("No se puede insertar una titulación vacia");
 		}
 		if (titulacion.getNombre() == null || titulacion.getNombre().equals("")) {
 			throw new UVException("No se puede insertar una titulación sin nombre");
@@ -138,10 +146,16 @@ public class ModeloTitulacion {
 	
 	/**	Función que inserta titulaciones preferentes a un area .
 	 * @param titulaciones a insertar en las titulaciones preferentes por area .
-	 * @param area id del area por el que se va a filtrar
-	 * @throws SQLException en caso de error en la BD
+	 * @param area id del area por el que se va a filtrar .
+	 * @throws SQLException en caso de error en la BD .
+	 * @throws UVException en caso de error de parámetros .
 	 */
-	public void incluirTitulacionesPreferentesArea(List<String> titulaciones, Integer area) throws SQLException, SQLIntegrityConstraintViolationException {
+	public void incluirTitulacionesPreferentesArea(List<String> titulaciones, Integer area) throws SQLException, SQLIntegrityConstraintViolationException, UVException {
+		
+		if (area == null) {
+			throw new UVException("No se puede incluir titulación sin el id del área");
+		}
+		
 		String params = BolsaEmpleoUtils.consultaMultiplesParametros(titulaciones.size());
 		String consulta = "INSERT INTO TBEP_TITULACIONESPREFERENTESAREA (BEPARE_CODNUM, BEPTIT_CODNUM)"
 				+ " SELECT bepare.CODNUM AS BEPARE_CODNUM, beptit.CODNUM AS BEPTIT_CODNUM"
@@ -159,8 +173,8 @@ public class ModeloTitulacion {
 	
 	/**	Función que elimina titulaciones preferentes a un area .
 	 * @param titulaciones a eliminar en las titulaciones preferentes por area .
-	 * @param area id del area por el que se va a filtrar
-	 * @throws SQLException en caso de error en la BD
+	 * @param area id del area por el que se va a filtrar .
+	 * @throws SQLException en caso de error en la BD .
 	 */
 	public void eliminarTitulacionesPreferentesArea(List<String> titulaciones, Integer area) throws SQLException {
 		String params = BolsaEmpleoUtils.consultaMultiplesParametros(titulaciones.size());
@@ -195,7 +209,7 @@ public class ModeloTitulacion {
 		try (Connection conexion = ConexionUvirtual.obtenerInstancia();
 				PreparedStatement stmtCount = conexion.prepareStatement(dataTable.getQueryCount());
 				PreparedStatement stmt = conexion.prepareStatement(dataTable.getQuery());
-		) {				
+		) {		
 			try (ResultSet rs = stmt.executeQuery()) {
 				while (rs.next()) {
 					Titulacion tit = new Titulacion();
@@ -221,13 +235,18 @@ public class ModeloTitulacion {
 	 * @throws UVException error si no existe titulación
 	 */
 	public DataTable<Titulacion> listaTitulacionesDatatable(Map<String, String[]> params, Integer area) throws SQLException, UVException {
+		
+		if (area == null) {
+			throw new UVException("No se pueden listar titulaciones sin el id del área");
+		}
+		
 		List<Titulacion> titulaciones = new ArrayList<>();
 		DataTable<Titulacion> dataTable = new DataTable<Titulacion>(params);
 		
 		String consultaNotIn = "SELECT beptit.CODNUM FROM tbep_titulaciones beptit "
 				+ "INNER JOIN tbep_titulacionespreferentesarea beptpa ON beptit.codnum = beptpa.beptit_codnum "
 				+ "INNER JOIN TBEP_AREAS bepare ON bepare.codnum = beptpa.bepare_codnum "
-				+ "WHERE bepare.CODNUM = " + area;
+				+ "WHERE bepare.CODNUM = ? ";
 		String consulta = "SELECT beptit.* FROM tbep_titulaciones beptit WHERE beptit.CODNUM NOT IN (" + consultaNotIn + ")";
 		
 		dataTable.setOrderColumn(ORDER_COLUMN_INDEX_ID, "beptit.CODNUM");
@@ -238,6 +257,9 @@ public class ModeloTitulacion {
 				PreparedStatement stmtCount = conexion.prepareStatement(dataTable.getQueryCount());
 				PreparedStatement stmt = conexion.prepareStatement(dataTable.getQuery());
 		) {
+			int indexParam = 1;
+			stmt.setInt(indexParam, area);
+			stmtCount.setInt(indexParam++, area);
 			try (ResultSet rs = stmt.executeQuery()) {
 				while (rs.next()) {
 					Titulacion tit = new Titulacion();
@@ -263,13 +285,18 @@ public class ModeloTitulacion {
 	 * @throws UVException error si no existe titulación
 	 */
 	public DataTable<Titulacion> listaTitulacionesAreaDatatable(Map<String, String[]> params, Integer area) throws SQLException, UVException {
+		
+		if (area == null) {
+			throw new UVException("No se pueden listar titulaciones sin el id del área");
+		}
+		
 		List<Titulacion> titulaciones = new ArrayList<>();
 		DataTable<Titulacion> dataTable = new DataTable<Titulacion>(params);
 		
 		String consulta = "SELECT beptit.CODNUM, beptit.NOMBRE FROM tbep_titulaciones beptit "
 				+ "INNER JOIN tbep_titulacionespreferentesarea beptpa ON beptit.codnum = beptpa.beptit_codnum "
 				+ "INNER JOIN TBEP_AREAS bepare ON bepare.codnum = beptpa.bepare_codnum "
-				+ "WHERE bepare.CODNUM = " + area;
+				+ "WHERE bepare.CODNUM = ? ";
 		
 		dataTable.setOrderColumn(ORDER_COLUMN_INDEX_ID, "beptit.CODNUM");
 		dataTable.setOrderColumn(ORDER_COLUMN_INDEX_NOMBRE, "beptit.NOMBRE");
@@ -280,6 +307,9 @@ public class ModeloTitulacion {
 				PreparedStatement stmtCount = conexion.prepareStatement(dataTable.getQueryCount());
 				PreparedStatement stmt = conexion.prepareStatement(dataTable.getQuery());
 		) {
+			int indexParam = 1;
+			stmt.setInt(indexParam, area);
+			stmtCount.setInt(indexParam++, area);
 			try (ResultSet rs = stmt.executeQuery()) {
 				while (rs.next()) {
 					Titulacion tit = new Titulacion();

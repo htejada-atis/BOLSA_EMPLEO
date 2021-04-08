@@ -25,6 +25,7 @@ public class TestModeloNoticia {
     private static final String ENLACE_NOTICIA = "enlace noticia";
     private static final String TEXTO_NOTICIA = "texto noticia";
     private static final Boolean PUBLICA_NOTICIA = true;
+    private static final Boolean ACTIVA_NOTICIA = true;
     private static java.util.Date fechaEjemplo;
     
 	/** prepara la bd con los datos iniciales.
@@ -49,9 +50,10 @@ public class TestModeloNoticia {
     public void testA01InsertaNoticia() throws SQLException, ParseException, UVException {
     	Noticia noticia = new Noticia();
     	noticia.setEnlace(ENLACE_NOTICIA);
-    	noticia.setTexto(ENLACE_NOTICIA);
+    	noticia.setTexto(TEXTO_NOTICIA);
     	noticia.setFecha(fechaEjemplo);
     	noticia.setPublica(PUBLICA_NOTICIA);
+    	noticia.setActiva(ACTIVA_NOTICIA);
     	ModeloNoticia modelo = new ModeloNoticia();
     	modelo.insertaNoticia(noticia);
     	List<Noticia> noticias = modelo.listaNoticias();
@@ -89,9 +91,10 @@ public class TestModeloNoticia {
     	List<Noticia> noticias = modelo.listaNoticias();
     	Noticia noticia = noticias.get(0);
     	noticia.setTexto("texto actualizado");
-    	modelo.actualizaNoticia(noticia); 
+    	modelo.actualizaNoticia(noticia);
     	Noticia noticiaActualizada = modelo.listaNoticia(noticia.getCodNum());
-    	assertTrue("noticia debe ser actualizada", noticia.equals(noticiaActualizada)); 
+    	
+    	assertTrue("noticia debe ser actualizada", noticia.equals(noticiaActualizada));
     }
 
     /** test error inserta noticia null.

@@ -23,18 +23,6 @@ public class Fichero implements Serializable {
 	}
 	
 	/** Constructor con parametros.
-	 * @param pcodNum .
-	 * @param pnombre .
-	 * @param ptitulo .
-	 */
-	public Fichero(Integer pcodNum, String pnombre, String ptitulo) {
-		super();
-		this.codNum = pcodNum;
-		this.nombre = pnombre;
-		this.titulo = ptitulo;
-	}
-	
-	/** Constructor con parametros.
 	 * @param pnombre .
 	 * @param ptitulo .
 	 * @param parchivo .
@@ -109,7 +97,8 @@ public class Fichero implements Serializable {
 	
 	@Override
 	public String toString() {
-		return "Fichero [codNum=" + codNum + ", nombre=" + nombre + "]";
+		return "Fichero [codNum=" + codNum + ", nombre=" + nombre 
+				+ ", titulo=" + titulo + ", archivo=" + archivo + "]";
 	}
 	
 	@Override
@@ -119,6 +108,7 @@ public class Fichero implements Serializable {
 		result = prime * result + ((nombre == null) ? 0 : nombre.hashCode());
 		result = prime * result + ((titulo == null) ? 0 : titulo.hashCode());
 		result = prime * result + ((archivo == null) ? 0 : archivo.hashCode());
+		result = prime * result + ((codNum == null) ? 0 : codNum.hashCode());
 		return result;
 	}
 	

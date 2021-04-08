@@ -46,6 +46,14 @@ public class Titulacion implements Serializable {
 		this.codNum = pcodNum;
 	}
 	
+	/** Constructor copia.
+	 * @param copia Titulación a copiar
+	 */
+	public Titulacion(Titulacion copia) {
+		this.codNum = copia.codNum;
+		this.nombre = copia.nombre;
+	}
+	
 	public Integer getCodNum() {
 		return codNum;
 	}
@@ -93,13 +101,6 @@ public class Titulacion implements Serializable {
 			return false;
 		}
 		Titulacion other = (Titulacion) obj;
-		if (codNum == null) {
-			if (other.codNum != null) {
-				return false;
-			}
-		} else if (!codNum.equals(other.codNum)) {
-			return false;
-		}
 		if (nombre == null) {
 			if (other.nombre != null) {
 				return false;

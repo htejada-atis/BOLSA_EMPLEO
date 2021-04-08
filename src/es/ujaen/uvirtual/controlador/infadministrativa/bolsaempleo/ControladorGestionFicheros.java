@@ -99,10 +99,10 @@ public class ControladorGestionFicheros extends HttpServlet {
 					eliminarFichero(request, response);
 					break;
 				case ACCION_DATATABLE:
-					listadoFicheros(datos, request, response, bean);
+					listadoFicheros(bean, datos, request, response);
 					return;
 				case ACCION_DESCARGAR_FICHERO:
-					descargarFichero(datos, request, response);
+					descargarFichero(bean, datos, request, response);
 					break;
 				case ACCION_SUBIR_FICHERO:
 					agregarFichero(request, response, bean);
@@ -112,7 +112,7 @@ public class ControladorGestionFicheros extends HttpServlet {
 			bean.getMensajesDeError().add("Error al acceder a la base de datos");
 		} catch (ServletException e) {
 			LOGGER.log(Level.WARNING, e.toString());
-			e.printStackTrace();
+			bean.getMensajesDeError().add(e.toString());
 		} catch (UVException e) {
 			LOGGER.log(Level.WARNING, e.toString());
 			bean.getMensajesDeError().add(e.toString());
@@ -142,62 +142,77 @@ public class ControladorGestionFicheros extends HttpServlet {
 	 * @param response .
 	 * @param bean bean de la vista a la que poner los valores.
 	 * @throws SQLException excepcion de bbdd.
-	 * @throws UVException en caso de error en bd
+	 * @throws ServltetException .
+	 * @throws IOException en caso de error de input u output .
+	 * @throws UVException en caso de error de parametros .
 	 */
 	private void agregarFichero(HttpServletRequest request, HttpServletResponse response, VistaFicheros bean) throws SQLException, ServletException, IOException, UVException {
 		bean.setVista(RUTA_BEP_CONF + "formFichero.jsp");
 		
-		ModeloFichero modelo = new ModeloFichero();
-		Part uploadedFile = request.getPart(PARAM_FICHERO);
-		if (uploadedFile != null) {
-			if (uploadedFile.getSize() > 0) {
-				String nombre = BolsaEmpleoUtils.obtenerNombreFichero(uploadedFile);
-				
-				int i = nombre.lastIndexOf('.');
-				if (i > 0) {
-				    String extension = nombre.substring(i + 1);
-				    if (!extension.toLowerCase().equals("pdf")) {
-				    	throw new UVException("No se puede subir un fichero que sea distinto de pdf");
-				    }
+		if (request.getParameter(PARAM_TITULO) != null) {
+			ModeloFichero modelo = new ModeloFichero();
+			Part uploadedFile = request.getPart(PARAM_FICHERO);
+			if (uploadedFile != null) {
+				if (uploadedFile.getSize() > 0) {
+					String nombre = BolsaEmpleoUtils.obtenerNombreFichero(uploadedFile);
+					
+					int i = nombre.lastIndexOf('.');
+					if (i > 0) {
+					    String extension = nombre.substring(i + 1);
+					    if (!extension.toLowerCase().equals("pdf")) {
+					    	throw new UVException("No se puede subir un fichero que sea distinto de pdf");
+					    }
+					}
+					
+					InputStream input = uploadedFile.getInputStream();
+					String titulo = EscapaHTML.ajustaCodificacion(request.getParameter(PARAM_TITULO));
+					Fichero fichero = new Fichero(nombre, titulo, input);
+					modelo.insertaFichero(fichero);
+					HttpSession session = request.getSession(false);
+					session.setAttribute(MENSAJE_ENVIADO, MENSAJE_EXITO_AGREGAR);
+					response.sendRedirect(request.getServletPath());
+				} else {
+					throw new UVException("No se puede subir un fichero sin archivo");
 				}
-				
-				InputStream input = uploadedFile.getInputStream();
-				String titulo = EscapaHTML.ajustaCodificacion(request.getParameter(PARAM_TITULO));
-				Fichero fichero = new Fichero(nombre, titulo, input);
-				modelo.insertaFichero(fichero);
-				HttpSession session = request.getSession(false);
-				session.setAttribute(MENSAJE_ENVIADO, MENSAJE_EXITO_AGREGAR);
-				response.sendRedirect(request.getServletPath());
-			} else {
-				throw new UVException("No se puede subir un fichero sin archivo");
 			}
-			
 		}
 	}
 	
 	/** descarga un fichero .
+	 * @param bean .
 	 * @param datos .
 	 * @param request .
 	 * @param response .
 	 * @throws SQLException excepcion de bbdd.
-	 * @throws UVException en caso de error en bd .
-	 * @throws IOException en caso de error de IO .
+	 * @throws UVException en caso de error de parametros .
+	 * @throws IOException en caso de error de input u output .
 	 */
-	private void descargarFichero(UVDatos datos, HttpServletRequest request, HttpServletResponse response) throws SQLException, UVException, IOException {
+	private void descargarFichero(VistaFicheros bean, UVDatos datos, HttpServletRequest request, HttpServletResponse response) throws SQLException, UVException, IOException {
 		ModeloFichero modelo = new ModeloFichero();
 		if (EscapaHTML.ajustaCodificacion(request.getParameter(PARAM_ID)) != null) {
 			Fichero fichero = modelo.listaFichero(Formateador.leeParametroInteger(request.getParameter(PARAM_ID)));
-			response.setContentType("application/pdf");
-	        datos.setRespuestaEnviada(true);
-	        
-	        try (ServletOutputStream stream = response.getOutputStream();
-	             BufferedInputStream buf = new BufferedInputStream(fichero.getArchivo());) {
-	            int readBytes = 0;
-	            while ((readBytes = buf.read()) != -1) {
-	                stream.write(readBytes);
-	            }
-	            stream.flush();
-	        }
+			bean.setFichero(fichero);
+			
+			int i = fichero.getNombre().lastIndexOf('.');
+			if (i > 0) {
+			    String extension = fichero.getNombre().substring(i + 1);
+			    if (extension.toLowerCase().equals("pdf")) {
+			    	response.setContentType("application/pdf");
+			        datos.setRespuestaEnviada(true);
+			        
+			        try (ServletOutputStream stream = response.getOutputStream();
+			             BufferedInputStream buf = new BufferedInputStream(fichero.getArchivo());) {
+			            int readBytes = 0;
+			            while ((readBytes = buf.read()) != -1) {
+			                stream.write(readBytes);
+			            }
+			            stream.flush();
+			        }
+			    } else {
+			    	response.sendRedirect(request.getServletPath());
+			    }
+			}
+			
 		}
 	}
 	
@@ -205,8 +220,8 @@ public class ControladorGestionFicheros extends HttpServlet {
 	 * @param request .
 	 * @param response .
 	 * @throws SQLException excepcion de bbdd .
-	 * @throws UVException en caso de error en bd .
-	 * @throws IOException en caso de error de IO.
+	 * @throws UVException en caso de error de parametros .
+	 * @throws IOException en caso de error de IO .
 	 */
 	private void eliminarFichero(HttpServletRequest request, HttpServletResponse response) throws SQLException, UVException, IOException {
 		ModeloFichero modelo = new ModeloFichero();
@@ -221,14 +236,14 @@ public class ControladorGestionFicheros extends HttpServlet {
 	
 	/**
 	 * Listado de ficheros .
+	 * @param bean .
 	 * @param datos .
 	 * @param request .
 	 * @param response .
-	 * @param bean .
 	 * @throws SQLException en caso de error de base de datos .
 	 * @throws IOException en caso de error de IO .
 	 */
-	private void listadoFicheros(UVDatos datos, HttpServletRequest request, HttpServletResponse response, VistaFicheros bean) throws IOException, SQLException {
+	private void listadoFicheros(VistaFicheros bean, UVDatos datos, HttpServletRequest request, HttpServletResponse response) throws IOException, SQLException {
 		ModeloFichero modelo = new ModeloFichero();
 		
 		datos.setContentType("application/json");
@@ -239,8 +254,8 @@ public class ControladorGestionFicheros extends HttpServlet {
 		try (PrintWriter writer = response.getWriter()) {
 			try {
 				DataTable<Fichero> dataTable = modelo.listaFicherosDatatable(request.getParameterMap());
+				bean.setDatatableFicheros(dataTable);
 				Gson gson = new GsonBuilder().setExclusionStrategies(DataTable.GSONEXCLUSIONSTRATEGY).create();
-
 				writer.write(gson.toJson(dataTable));
 			} catch (Exception ex) {
 				bean.getMensajesDeError().add(ex.getMessage());

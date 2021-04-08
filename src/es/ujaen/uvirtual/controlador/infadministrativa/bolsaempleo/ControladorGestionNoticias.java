@@ -93,16 +93,16 @@ public class ControladorGestionNoticias extends HttpServlet {
 		try {
 			switch (nombreAccion) {
 				case ACCION_AGREGAR_NOTICIA:
-					agregarNoticia(request, response, bean);
+					agregarNoticia(bean, request, response);
 					break;
 				case ACCION_DATATABLE:
-					listadoNoticias(datos, request, response);
+					listadoNoticias(bean, datos, request, response);
 					return;
 				case ACCION_EDITAR_NOTICIA:
-					editarNoticia(request, response, bean);
+					editarNoticia(bean, request, response);
 					break;
 				case ACCION_ELIMINAR_NOTICIA:
-					eliminarNoticia(request, response);
+					eliminarNoticia(bean, request, response);
 					break;
 			}
 		} catch (UVException e) {
@@ -133,13 +133,14 @@ public class ControladorGestionNoticias extends HttpServlet {
 	}
 	
 	/** agrega una nueva noticia.
+	 * @param bean .
 	 * @param request .
 	 * @param response .
-	 * @param bean bean de la vista a la que poner los valores.
 	 * @throws SQLException excepcion de bbdd.
-	 * @throws UVException en caso de error en bd
+	 * @throws UVException en caso de error de parametros .
+	 * @throws IOException en caso de error de input u output .
 	 */
-	private void agregarNoticia(HttpServletRequest request, HttpServletResponse response, VistaNoticias bean) throws SQLException, UVException, IOException {
+	private void agregarNoticia(VistaNoticias bean, HttpServletRequest request, HttpServletResponse response) throws SQLException, UVException, IOException {
 		bean.setVista(RUTA_BEP_NOTICIAS + "formNoticia.jsp");
 		
 		if (EscapaHTML.ajustaCodificacion(request.getParameter(PARAM_TEXTO)) != null) {
@@ -150,6 +151,7 @@ public class ControladorGestionNoticias extends HttpServlet {
 			Date fecha = Formateador.leeParametroFecha(request.getParameter(PARAM_FECHA), Formateador.FORMATO_FECHA_DDMMYYYY, "/");
 			Noticia noticia = new Noticia(enlace, texto, fecha, publica, true);
 			modelo.insertaNoticia(noticia);
+			bean.getMensajesDeExito().add(MENSAJE_EXITO_AGREGAR);
 			HttpSession session = request.getSession(false);
 			session.setAttribute(MENSAJE_ENVIADO, MENSAJE_EXITO_AGREGAR);
 			response.sendRedirect(request.getServletPath());
@@ -157,14 +159,14 @@ public class ControladorGestionNoticias extends HttpServlet {
 	}
 	
 	/** edita una noticia.
+	 * @param bean .
 	 * @param request .
 	 * @param response .
-	 * @param bean bean de la vista a la que poner los valores .
 	 * @throws SQLException excepcion de bbdd.
-	 * @throws UVException en caso de error en bd
-	 * @throws IOException en caso de error de IO.
+	 * @throws UVException en caso de error de parametros .
+	 * @throws IOException en caso de error de input u output .
 	 */
-	private void editarNoticia(HttpServletRequest request, HttpServletResponse response, VistaNoticias bean) throws SQLException, UVException, IOException {
+	private void editarNoticia(VistaNoticias bean, HttpServletRequest request, HttpServletResponse response) throws SQLException, UVException, IOException {
 		bean.setVista(RUTA_BEP_NOTICIAS + "formNoticia.jsp");
 		ModeloNoticia modelo = new ModeloNoticia();
 		bean.setNoticia(modelo.listaNoticia(Formateador.leeParametroInteger(request.getParameter(PARAM_ID))));
@@ -176,6 +178,7 @@ public class ControladorGestionNoticias extends HttpServlet {
 			Date fecha = Formateador.leeParametroFecha(request.getParameter(PARAM_FECHA), Formateador.FORMATO_FECHA_DDMMYYYY, "/");
 			Noticia noticia = new Noticia(codNum, enlace, texto, fecha, publica, true);
 			modelo.actualizaNoticia(noticia);
+			bean.getMensajesDeExito().add(MENSAJE_EXITO_EDITAR);
 			HttpSession session = request.getSession(false);
 			session.setAttribute(MENSAJE_ENVIADO, MENSAJE_EXITO_EDITAR);
 			response.sendRedirect(request.getServletPath());
@@ -183,13 +186,14 @@ public class ControladorGestionNoticias extends HttpServlet {
 	}
 	
 	/** eliminar una noticia.
+	 * @param bean .
 	 * @param request .
 	 * @param response .
 	 * @throws SQLException excepcion de bbdd.
-	 * @throws UVException en caso de error en bd
-	 * @throws IOException en caso de error de IO.
+	 * @throws UVException en caso de error de parametros .
+	 * @throws IOException en caso de error de input u output .
 	 */
-	private void eliminarNoticia(HttpServletRequest request, HttpServletResponse response) throws SQLException, UVException, IOException {
+	private void eliminarNoticia(VistaNoticias bean, HttpServletRequest request, HttpServletResponse response) throws SQLException, UVException, IOException {
 		ModeloNoticia modelo = new ModeloNoticia();
 		Integer codNum = Formateador.leeParametroInteger(request.getParameter(PARAM_ID));
 		Noticia noticia = new Noticia();
@@ -197,19 +201,21 @@ public class ControladorGestionNoticias extends HttpServlet {
 		Boolean activa = request.getParameter(PARAM_ACTIVA) != null && EscapaHTML.ajustaCodificacion(request.getParameter(PARAM_ACTIVA)).equals("true");
 		noticia.setActiva(activa);
 		modelo.borraRestauraNoticia(noticia);
+		bean.getMensajesDeExito().add(MENSAJE_EXITO_ELIMINAR);
 		HttpSession session = request.getSession(false);
 		session.setAttribute(MENSAJE_ENVIADO, MENSAJE_EXITO_ELIMINAR);
 		response.sendRedirect(request.getServletPath());
 	}
 	
 	/** carga las noticias en una tabla .
+	 * @param bean .
 	 * @param datos .
 	 * @param request .
 	 * @param response .
-	 * @throws IOException en caso de error de IO .
+	 * @throws IOException en caso de error de input u output .
 	 * @throws SQLException excepcion de bbdd.
 	 */
-	private void listadoNoticias(UVDatos datos, HttpServletRequest request, HttpServletResponse response) throws IOException, SQLException {
+	private void listadoNoticias(VistaNoticias bean, UVDatos datos, HttpServletRequest request, HttpServletResponse response) throws IOException, SQLException {
 		ModeloNoticia modelo = new ModeloNoticia();
 		
 		datos.setContentType("application/json");
@@ -219,6 +225,7 @@ public class ControladorGestionNoticias extends HttpServlet {
 		try (PrintWriter writer = response.getWriter()) {
 			try {
 				DataTable<Noticia> dataTable = modelo.listaNoticiasDatatable(request.getParameterMap());
+				bean.setDatatableNoticias(dataTable);
 				Gson gson = new GsonBuilder().setDateFormat("dd/M/yyyy").setExclusionStrategies(DataTable.GSONEXCLUSIONSTRATEGY).create();
 				writer.write(gson.toJson(dataTable));
 			} catch (UVException ex) {

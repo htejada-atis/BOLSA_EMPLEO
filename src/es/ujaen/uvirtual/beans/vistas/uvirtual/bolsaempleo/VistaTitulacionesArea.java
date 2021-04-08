@@ -6,6 +6,7 @@ import java.util.List;
 import es.ujaen.uvirtual.beans.uvirtual.bolsaempleo.Area;
 import es.ujaen.uvirtual.beans.uvirtual.bolsaempleo.Titulacion;
 import es.ujaen.uvirtual.beans.vistas.Vista;
+import es.ujaen.uvirtual.utilidades.DataTable;
 
 /** Bean para la vista.
  * @author jlopez
@@ -13,7 +14,7 @@ import es.ujaen.uvirtual.beans.vistas.Vista;
 public class VistaTitulacionesArea extends Vista implements Serializable {
 	private static final long serialVersionUID = 1L;
 	private List<Area> areas = new ArrayList<>();
-	private List<Titulacion> titulaciones = new ArrayList<>();
+	private DataTable<Titulacion> dataTable;
 	private Area area;
 	private String vista;
 	
@@ -25,12 +26,12 @@ public class VistaTitulacionesArea extends Vista implements Serializable {
 		this.areas = areas;
 	}
 	
-	public List<Titulacion> getTitulaciones() {
-		return titulaciones;
+	public DataTable<Titulacion> getDatatableTitulaciones() {
+		return dataTable;
 	}
 	
-	public void setTitulaciones(List<Titulacion> titulaciones) {
-		this.titulaciones = titulaciones;
+	public void setDatatableTitulaciones(DataTable<Titulacion> dt) {
+		this.dataTable = dt;
 	}
 	
 	public Area getArea() {

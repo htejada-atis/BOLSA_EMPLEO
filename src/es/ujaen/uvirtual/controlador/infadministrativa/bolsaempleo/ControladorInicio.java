@@ -71,7 +71,7 @@ public class ControladorInicio extends HttpServlet {
 		VistaInicio bean = new VistaInicio();
 		
 		String nombreAccion = EscapaHTML.ajustaCodificacion(request.getParameter(PARAM_ACCION));
-		if (nombreAccion == null) {
+		if (nombreAccion == null || nombreAccion.isEmpty()) {
 			nombreAccion = ACCION_LISTAR_NOTICIAS;
 		}
 		try {
@@ -90,9 +90,6 @@ public class ControladorInicio extends HttpServlet {
 					break;
 				case ACCION_LISTAR_TODAS_NOTICIAS:
 					obtenerTodasNoticias(bean, request, response, datos);
-					break;
-				default:
-					obtenerNoticias(bean);
 					break;
 			}
 		} catch (SQLException e) {
@@ -123,6 +120,8 @@ public class ControladorInicio extends HttpServlet {
 	 * @param request de la petición del servidor .
 	 * @param response de la respuesta del servidor .
 	 * @param datos .
+	 * @throws ServletException .
+	 * @throws IOException  en caso de error de input u output .
 	 * @throws SQLException excepcion de bbdd.
 	 */
 	private void obtenerTodasNoticias(VistaInicio bean, HttpServletRequest request, HttpServletResponse response, UVDatos datos) 
@@ -139,6 +138,7 @@ public class ControladorInicio extends HttpServlet {
 				Gson gson = new GsonBuilder().setDateFormat("dd/M/yyyy").create();
 				List<String> idsNoticias = gson.fromJson(request.getParameter(PARAM_NOTICIAS), new TypeToken<List<String>>() { }.getType());
 				List<Noticia> listaNoticias = modelo.listaNoticiasInicioRestantes(idsNoticias);
+				bean.setNoticias(listaNoticias);
 				
 				JsonArray result = (JsonArray) gson.toJsonTree(listaNoticias, new TypeToken<List<Noticia>>() { }.getType());
 				writer.print(result);

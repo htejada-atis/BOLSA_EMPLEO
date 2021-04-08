@@ -2,6 +2,7 @@
 <%@ page import="es.ujaen.uvirtual.beans.UVDatos"%>
 <%@	page import="es.ujaen.uvirtual.controlador.infadministrativa.bolsaempleo.ControladorItemsBaremacion"%>
 <%@ page import="es.ujaen.uvirtual.beans.vistas.uvirtual.bolsaempleo.VistaItemsBaremacion"%>
+<%@ page import="es.ujaen.uvirtual.beans.uvirtual.bolsaempleo.ApartadoBaremacion" %>
 <%@ page import="es.ujaen.uvirtual.utilidades.EscapaHTML" %>
 
 <% 
@@ -27,7 +28,7 @@ VistaItemsBaremacion bean = (VistaItemsBaremacion) uvdatos.getVistas().get(Vista
 		<caption>APARTADOS GENERALES</caption>
 		<tr>
 			<th scope="col" style="width:15%" title="Código apartado">Código</th>
-			<th scope="col" style="width:70%" title="Código de area">Nombre del apartado</th>
+			<th scope="col" style="width:70%" title="Cï¿½digo de area">Nombre del apartado</th>
 			<th scope="col" style="width:15%">Activo</th>
 		</tr>
 		<tbody>				
@@ -42,8 +43,8 @@ VistaItemsBaremacion bean = (VistaItemsBaremacion) uvdatos.getVistas().get(Vista
 	<table class="bluetable bolsaempleo" id="tableBloques">
 		<caption>BLOQUES</caption>
 		<tr>
-			<th scope="col" style="width:15%" title="Código apartado">Código</th>
-			<th scope="col" style="width:70%" title="Código de area">Nombre del apartado</th>
+			<th scope="col" style="width:15%" title="Código bloque">Código</th>
+			<th scope="col" style="width:70%" title="Código de area">Nombre del bloque</th>
 			<th scope="col" style="width:15%">Activo</th>
 		</tr>
 		<tbody>				
@@ -54,31 +55,97 @@ VistaItemsBaremacion bean = (VistaItemsBaremacion) uvdatos.getVistas().get(Vista
 			</tr>
 		</tfoot>
 	</table>
+	
+	<table class="bluetable bolsaempleo" id="tableItems">
+		<caption>ÍTEMS</caption>
+		<tr>
+			<th scope="col" style="width:15%" title="Código ítem">Código</th>
+			<th scope="col" style="width:70%" title="Código de area">Nombre del ítem</th>
+			<th scope="col" style="width:15%">Activo</th>
+		</tr>
+		<tbody>				
+		</tbody>
+		<tfoot>
+			<tr>
+				<th colSpan="4" style="width:100%"></th>
+			</tr>
+		</tfoot>
+	</table>
+	
 	<% } %>
 </div>
 	
 <script>
-$(document).ready(function() {
-	var tableApartados = new DataTable('#table', {
-	    "ajax": { url: "/srv/es/ajax/informacionadministrativa/bolsaempleo/configuracion/itemsbaremacion", method: "POST" },
-	    "pageSize": 10,
-	    "action": "<%=ControladorItemsBaremacion.ACCION_DATATABLE_APARTADOS%>",
-	    "columns": [
-	    	{'data': 'codigo'},
-	        {'data': 'nombre'},
-	        {'data': 'activo'},
-	    ]
+
+	$(document).ready(function() {
+		
+		var tableApartados = new DataTable('#tableApartadosGenerales', {
+		    "ajax": { url: "<%= ControladorItemsBaremacion.URL_PATTERN_AJAX %>", async: false },
+		    "pageSize": 10,
+		    "action": "<%= ControladorItemsBaremacion.ACCION_DATATABLE_APARTADOS %>",
+		    "clickable": {'onClick': function(row) {
+		    	var params = {
+	    				'a': '<%= ControladorItemsBaremacion.ACCION_APARTADO_SELECCIONADO %>', 
+	    				'<%= ControladorItemsBaremacion.PARAM_APARTADO %>': row.codNum};
+        		Atis.sendForm("<%= request.getRequestURI() %>", params);
+		    }},
+		    <% if (bean.getApartadoBaremacion() != null) { %> "selected": <%= bean.getApartadoBaremacion().getCodNum() %> ,<% } %>
+		    "columns": [
+		    	{'data': 'codigo'},
+		        {'data': 'nombre'},
+		        {'data': 'activo'},
+		    ]
+		    "actions": [
+		    	{'label': 'Activar', 'onClick': function(selected) {
+		    		var params = {'a': '<%=ControladorItemsBaremacion.ACCION_LISTAR%>', 
+		    				'': JSON.stringify(selected)};
+	        		Atis.sendForm("<%=request.getRequestURI()%>", params);
+		    	}},
+		    ]
+		});
+		
+		document.getElementById("tableBloques").style.visibility = "hidden";
+		document.getElementById("tableItems").style.visibility = "hidden";
+		
+		<% if (bean.getApartadoBaremacion() != null) { %>
+			var tableBloques = new DataTable('#tableBloques', {
+			    "ajax": { url: "<%= ControladorItemsBaremacion.URL_PATTERN_AJAX %>", async: false },
+			    "params": {"<%=ControladorItemsBaremacion.PARAM_APARTADO%>": <%= bean.getApartadoBaremacion().getCodNum() %>},
+			    "pageSize": 10,
+			    "action": "<%=ControladorItemsBaremacion.ACCION_DATATABLE_BLOQUES%>",
+			    "clickable": {'onClick': function(row) {
+			    	var params = {
+		    				'a': '<%= ControladorItemsBaremacion.ACCION_BLOQUE_SELECCIONADO %>', 
+		    				'<%= ControladorItemsBaremacion.PARAM_BLOQUE %>': row.codNum};
+	        		Atis.sendForm("<%= request.getRequestURI() %>", params);
+			    }},
+			    <% if (bean.getBloqueBaremacion() != null) { %> "selected": <%= bean.getBloqueBaremacion().getCodNum() %> ,<% } %>
+			    "columns": [
+			    	{'data': 'codigo'},
+			        {'data': 'nombre'},
+			        {'data': 'activo'},
+			    ]
+			});
+			document.getElementById("tableBloques").style.visibility = "visible";
+			
+			<% if (bean.getBloqueBaremacion() != null) { %>
+				var tableItems = new DataTable('#tableItems', {
+				    "ajax": { url: "<%= ControladorItemsBaremacion.URL_PATTERN_AJAX %>", async: false },
+				    "params": {"<%=ControladorItemsBaremacion.PARAM_BLOQUE%>": <%= bean.getBloqueBaremacion().getCodNum() %>},
+				    "pageSize": 10,
+				    "action": "<%=ControladorItemsBaremacion.ACCION_DATATABLE_ITEMS%>",
+				    "columns": [
+				    	{'data': 'codigo'},
+				        {'data': 'nombre'},
+				        {'data': 'activo'},
+				    ]
+				});
+				
+				document.getElementById("tableItems").style.visibility = "visible";
+			<% } %>
+			
+		<% } %>
+		
 	});
-	
-	var tableBloques = new DataTable('#table', {
-	    "ajax": { url: "/srv/es/ajax/informacionadministrativa/bolsaempleo/configuracion/itemsbaremacion" },
-	    "pageSize": 10,
-	    "action": "<%=ControladorItemsBaremacion.ACCION_DATATABLE_BLOQUES%>",
-	    "columns": [
-	    	{'data': 'codigo'},
-	        {'data': 'nombre'},
-	        {'data': 'activo'},
-	    ]
-	});
-}); 
+
 </script>

@@ -1,6 +1,7 @@
 package es.ujaen.uvirtual.beans.uvirtual.bolsaempleo;
 
 import java.io.Serializable;
+import java.text.SimpleDateFormat;
 import java.util.Date;
 
 import es.ujaen.uvirtual.utilidades.Formateador;
@@ -148,6 +149,8 @@ public class Noticia implements Serializable {
 		result = prime * result + ((enlace == null) ? 0 : enlace.hashCode());
 		result = prime * result + ((texto == null) ? 0 : texto.hashCode());
 		result = prime * result + ((fecha == null) ? 0 : fecha.hashCode());
+		result = prime * result + ((publica == null) ? 0 : publica.hashCode());
+		result = prime * result + ((publica == null) ? 0 : publica.hashCode());
 		result = prime * result + ((codNum == null) ? 0 : codNum.hashCode());
 		return result;
 	}
@@ -165,13 +168,6 @@ public class Noticia implements Serializable {
 			return false;
 		}
 		Noticia other = (Noticia) obj;
-		if (codNum == null) {
-			if (other.codNum != null) {
-				return false;
-			}
-		} else if (!codNum.equals(other.codNum)) {
-			return false;
-		}
 		if (enlace == null) {
 			if (other.enlace != null) {
 				return false;
@@ -186,11 +182,12 @@ public class Noticia implements Serializable {
 		} else if (!texto.equals(other.texto)) {
 			return false;
 		}
+		SimpleDateFormat formater = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 		if (fecha == null) {
 			if (other.fecha != null) {
 				return false;
 			}
-		} else if (!fecha.equals(other.fecha)) {
+		} else if (formater.format(fecha).compareTo(formater.format(other.fecha)) != 0) {
 			return false;
 		}
 		if (publica == null) {
