@@ -14,7 +14,8 @@ import es.ujaen.uvirtual.utilidades.Formateador;
 public class UsuarioBolsaEmpleo implements Serializable {
 	private static final long serialVersionUID = 1L;
 	private Integer codNum;
-	private String admusuidentificador;
+	private Integer codpersona;
+	private String codcuenta;
 	private String tipodocumento;
 	private String numdocumento;
 	private String nombre;
@@ -48,6 +49,22 @@ public class UsuarioBolsaEmpleo implements Serializable {
 		this.nombre = pnombre;
 	}
 	
+	/** Constructor con parametros para Bolsa Empleo.
+	 * @param pcodpersona .
+	 * @param prol .
+	 * @param plistaDist .
+	 * @param pexcluido .
+	 * @param pusu .
+	 */
+	public UsuarioBolsaEmpleo(Integer pcodpersona, String pusu, Rol prol, Boolean plistaDist, Boolean pexcluido) {
+		super();
+		this.codpersona = pcodpersona;
+		this.codcuenta = pusu;
+		this.rol = prol;
+		this.listaDist = plistaDist;
+		this.excluido = pexcluido;
+	}
+	
 	
 	/** Constructor con parametros.
 	 * @param prol .
@@ -55,13 +72,11 @@ public class UsuarioBolsaEmpleo implements Serializable {
 	 * @param pexcluido .
 	 * @param prazonexcluido .
 	 * @param pfechaexclusion .
-	 * @param pusu .
 	 * @param pcodNum .
 	 */
-	public UsuarioBolsaEmpleo(Integer pcodNum, String pusu, Rol prol, Boolean plistaDist, Boolean pexcluido, String prazonexcluido, Date pfechaexclusion) {
+	public UsuarioBolsaEmpleo(Integer pcodNum, Rol prol, Boolean plistaDist, Boolean pexcluido, String prazonexcluido, Date pfechaexclusion) {
 		super();
 		this.codNum = pcodNum;
-		this.admusuidentificador = pusu;
 		this.rol = prol;
 		this.listaDist = plistaDist;
 		this.excluido = pexcluido;
@@ -76,10 +91,12 @@ public class UsuarioBolsaEmpleo implements Serializable {
 	 * @param prazonexcluido .
 	 * @param pfechaexclusion .
 	 * @param pusu .
+	 * @param pcodpersona .
 	 */
-	public UsuarioBolsaEmpleo(String pusu, Rol prol, Boolean plistaDist, Boolean pexcluido, String prazonexcluido, Date pfechaexclusion) {
+	public UsuarioBolsaEmpleo(Integer pcodpersona, String pusu, Rol prol, Boolean plistaDist, Boolean pexcluido, String prazonexcluido, Date pfechaexclusion) {
 		super();
-		this.admusuidentificador = pusu;
+		this.codpersona = pcodpersona;
+		this.codcuenta = pusu;
 		this.rol = prol;
 		this.listaDist = plistaDist;
 		this.excluido = pexcluido;
@@ -103,12 +120,20 @@ public class UsuarioBolsaEmpleo implements Serializable {
 		this.codNum = codNum;
 	}
 	
-	public String getAdmUsuIdentificador() {
-		return admusuidentificador;
+	public Integer getCodPersona() {
+		return codpersona;
 	}
 
-	public void setAdmUsuIdentificador(String padmusuidentificador) {
-		this.admusuidentificador = padmusuidentificador;
+	public void setCodPersona(Integer pcodpersona) {
+		this.codpersona = pcodpersona;
+	}
+	
+	public String getCodCuenta() {
+		return codcuenta;
+	}
+
+	public void setCodCuenta(String pcodcuenta) {
+		this.codcuenta = pcodcuenta;
 	}
 	
 	public String getTipoDocumento() {

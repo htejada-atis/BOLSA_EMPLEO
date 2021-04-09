@@ -36,12 +36,24 @@ VistaUsuarioBolsaEmpleo bean = (VistaUsuarioBolsaEmpleo) uvdatos.getVistas().get
 			email = bean.getUsuarioArcos().getEmailCalculado();
 			tipo_documento = bean.getUsuarioArcos().getDocumentoTipo();
 			n_documento = bean.getUsuarioArcos().getDocumentoNumero();
+			
 			if(bean.getUsuario() != null){
 				lista_dist = bean.getUsuario().getListaDist();
 				excluido = bean.getUsuario().getExcluido();
-				razon_excluido = bean.getUsuario().getRazonExcluido();
+
+				if(bean.getUsuario().getRazonExcluido()!=null){
+					razon_excluido = bean.getUsuario().getRazonExcluido();
+				}
+				else{
+					razon_excluido ="";
+				}
 				
-		    	out.print("<h2>Editar Usuario</h2>");
+				if(bean.getBusqueda()){
+			    	out.print("<h2>El usuario ya existe</h2>");
+				}
+				else{
+			    	out.print("<h2>Editar Usuario</h2>");
+				}
 			}
 			else{
 			    out.print("<h2>Nuevo Usuario</h2>");
@@ -61,44 +73,47 @@ VistaUsuarioBolsaEmpleo bean = (VistaUsuarioBolsaEmpleo) uvdatos.getVistas().get
     		<input id="nickname" type="text" name="<%= ControladorUsuarioBolsaEmpleo.PARAM_NOMBRE_USUARIO%>" value="<%= usuario %>" disabled/>
     	</div>
 	   	<div class="form-group">
-    		<label for="nombre_usuario">Nombre: </label>
-    		<input id="fichero_titulo" type="text" name="<%= ControladorUsuarioBolsaEmpleo.PARAM_NOMBRE %>" value="<%= nombre %>" disabled/>
+    		<label for="nombre">Nombre: </label>
+    		<input id="nombre" type="text" name="<%= ControladorUsuarioBolsaEmpleo.PARAM_NOMBRE %>" value="<%= nombre %>" disabled/>
     	</div>
     	<div class="form-group">
-    		<label for="nombre_usuario">Apellidos: </label>
-    		<input id="fichero_titulo" type="text" name="<%= ControladorUsuarioBolsaEmpleo.PARAM_NOMBRE %>" value="<%= apellidos %>" disabled/>
+    		<label for="apellidos">Apellidos: </label>
+    		<input id="apellidos" type="text" name="<%= ControladorUsuarioBolsaEmpleo.PARAM_NOMBRE %>" value="<%= apellidos %>" disabled/>
     	</div>
     	<div class="form-group">
-    		<label for="nombre_usuario">Email: </label>
-    		<input id="fichero_titulo" type="text" name="<%= ControladorUsuarioBolsaEmpleo.PARAM_NOMBRE %>" value="<%= email %>" disabled/>
+    		<label for="email">Email: </label>
+    		<input id="email" type="text" name="<%= ControladorUsuarioBolsaEmpleo.PARAM_NOMBRE %>" value="<%= email %>" disabled/>
     	</div>
     	<div class="form-group">
-    		<label for="nombre_usuario">Tipo de documento: </label>
-    		<input id="fichero_titulo" type="text" name="<%= ControladorUsuarioBolsaEmpleo.PARAM_NOMBRE %>" value="<%= tipo_documento %>" disabled/>
+    		<label for="tipo_documento">Tipo de documento: </label>
+    		<input id="tipo_documento" type="text" name="<%= ControladorUsuarioBolsaEmpleo.PARAM_NOMBRE %>" value="<%= tipo_documento %>" disabled/>
     	</div>
     	<div class="form-group">
-    		<label for="nombre_usuario">Nº de documento: </label>
-    		<input id="fichero_titulo" type="text" name="<%= ControladorUsuarioBolsaEmpleo.PARAM_NOMBRE %>" value="<%= n_documento %>" disabled/>
+    		<label for="n_documento">Nº de documento: </label>
+    		<input id="n_documento" type="text" name="<%= ControladorUsuarioBolsaEmpleo.PARAM_NOMBRE %>" value="<%= n_documento %>" disabled/>
     	</div>
     	<div class="form-check">
-    		<label for="usuario_lista_dist"><input type="checkbox" id="usuario_lista_dist" name="<%= ControladorUsuarioBolsaEmpleo.PARAM_LISTA %>" value="<%= lista_dist %>" <%= (lista_dist ? "checked=''" : "") %>/>Lista Distribución</label>
+    		<label for="usuario_lista_dist"><input class="params" type="checkbox" id="usuario_lista_dist" name="<%= ControladorUsuarioBolsaEmpleo.PARAM_LISTA %>" value="<%= lista_dist %>" <%= (lista_dist ? "checked=''" : "") %>/>Lista Distribución</label>
     	</div>
     	<div class="form-check">
-    		<label for="usuario_excluido"><input type="checkbox" id="usuario_excluido" name="<%= ControladorUsuarioBolsaEmpleo.PARAM_EXCLUIDO %>" value="<%= excluido %>" <%= (excluido ? "checked=''" : "") %>/>Excluido</label>
+    		<label for="usuario_excluido"><input class="params" type="checkbox" id="usuario_excluido" name="<%= ControladorUsuarioBolsaEmpleo.PARAM_EXCLUIDO %>" value="<%= excluido %>" <%= (excluido ? "checked=''" : "") %>/>Excluido</label>
     	</div>
     	<div class="form-group">
     		<label for="razon_exclusion">Razón exclusión</label>
-    		<textarea id="razon_exclusion" name="<%= ControladorUsuarioBolsaEmpleo.PARAM_RAZON_EXCLUIDO %>" rows="3" cols="50"><%= razon_excluido %></textarea>
+    		<textarea class="params" id="razon_exclusion" name="<%= ControladorUsuarioBolsaEmpleo.PARAM_RAZON_EXCLUIDO %>" rows="3" cols="50"><%= razon_excluido %></textarea>
     	</div>
 		
 		<div class="form-group">
 			<label for="select_role">Elija el rol para asociar</label>
-			<select id="select_role" name="<%= ControladorUsuarioBolsaEmpleo.PARAM_ROLE %>">
+			<select class="params" id="select_role" name="<%= ControladorUsuarioBolsaEmpleo.PARAM_ROLE %>">
 				<option value="0"> - </option>
     				<%for(Rol role: bean.getRoles()){
-    					if(bean.getUsuario() != null){
-    						if(bean.getRol().getCodNum().equals(role.getCodNum())){%>
-								<option value="<%=role.getCodNum()%>" selected="selected"><%=role.getDescripcion()%></option>
+    					if(bean.getUsuario()!=null){
+            				if(bean.getRol().getCodNum().equals(role.getCodNum())){%>
+        						<option value="<%=role.getCodNum()%>" selected="selected"><%=role.getDescripcion()%></option>
+        					<%}
+    						else{%>
+								<option value="<%=role.getCodNum()%>"><%=role.getDescripcion()%></option>
 							<%}
     					}
 						else{%>
@@ -109,7 +124,7 @@ VistaUsuarioBolsaEmpleo bean = (VistaUsuarioBolsaEmpleo) uvdatos.getVistas().get
 			</select>
 		</div>
     	<div class="form-btn">
-    		<input id="usuario_enviar" type="submit" name="<%= ControladorUsuarioBolsaEmpleo.PARAM_ENVIAR %> " value="<%if(bean.getUsuario()!=null) {%>Guardar usuario<%}else{%>Añadir usuario<%}%>"/>
+    		<input id="usuario_enviar" type="submit" name="<%= ControladorUsuarioBolsaEmpleo.PARAM_ENVIAR %> " value="<%if(bean.getUsuario()!=null){%><%if(bean.getBusqueda()){%>Volver<%}else{%>Guardar usuario<%}%><%}else{%>Añadir usuario<%}%>"/>
     	</div>
     </form>
 </div>
@@ -119,13 +134,20 @@ VistaUsuarioBolsaEmpleo bean = (VistaUsuarioBolsaEmpleo) uvdatos.getVistas().get
 	function enviarUsuario(event, submit_input) {
 		event.preventDefault();
 	
-		<% if(bean.getUsuario() != null) { %>
-			input_accion = document.getElementById("accion_formulario");
-			input_accion.value = '<%= ControladorUsuarioBolsaEmpleo.ACCION_EDITAR_USUARIO %>';
-			input_id = document.getElementById("usuario_id");
-			input_id.value = '<%= bean.getUsuario().getCodNum() %>';
-			input_nombre_usuario = document.getElementById("usuario_nombre");
-			input_nombre_usuario.value = '<%= bean.getUsuario().getAdmUsuIdentificador() %>';
+		<% if(bean.getUsuario() != null) { 
+			
+			if(bean.getBusqueda()) {%>
+				input_accion = document.getElementById("accion_formulario");
+				input_accion.value = '<%= ControladorUsuarioBolsaEmpleo.ACCION_VOLVER_USUARIO %>';
+			<%}else{%>
+				input_accion = document.getElementById("accion_formulario");
+				input_accion.value = '<%= ControladorUsuarioBolsaEmpleo.ACCION_EDITAR_USUARIO %>';
+				input_id = document.getElementById("usuario_id");
+				input_id.value = '<%= bean.getUsuario().getCodNum() %>';
+				input_nombre_usuario = document.getElementById("usuario_nombre");
+				input_nombre_usuario.value = '<%= bean.getUsuario().getCodCuenta()%>';
+			<%}%>
+			
 		<% } else { %>
 			input_id = document.getElementById("usuario_id");
 			input_id.value = '<%= bean.getUsuarioArcos().getUid() %>';
@@ -142,6 +164,15 @@ VistaUsuarioBolsaEmpleo bean = (VistaUsuarioBolsaEmpleo) uvdatos.getVistas().get
 		submit_input.form.submit();
 	}
 
+	$(document).ready(function() {
+		<% if(bean.getBusqueda()) {%>
+		params = document.getElementsByClassName("params");
+		for (var i = 0; i < params.length; i++) { 
+			params[i].disabled = true;
+		}
+		<%}%>
+	});
+	
 	document.getElementById("usuario_enviar").addEventListener("click", function(event) {
 		enviarUsuario(event, this);
 	});

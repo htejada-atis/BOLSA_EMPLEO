@@ -21,6 +21,7 @@ public class VistaUsuarioBolsaEmpleo extends Vista implements Serializable {
 	 private String vista;
 	 private Rol role;
 	 private List<Rol> roles = new ArrayList<>();
+	 private Boolean busqueda;
 	    
 	 public List<UsuarioBolsaEmpleo> getUsuarios() {
 		 return usuarios;
@@ -68,5 +69,13 @@ public class VistaUsuarioBolsaEmpleo extends Vista implements Serializable {
 	 
 	 public void setUsuarioArcos(Usuario pusuario) {
 		 this.usuarioArcos = pusuario;
+	 }
+	 
+	 public void setBusqueda(Boolean busqueda) {
+		this.busqueda = busqueda;
+	 }
+		
+	 public Boolean getBusqueda() {
+		 return busqueda;
 	 }
 }
