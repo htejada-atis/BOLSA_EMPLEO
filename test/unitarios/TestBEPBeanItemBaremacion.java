@@ -1,4 +1,4 @@
-package unitarios.bolsaempleo;
+package unitarios;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
@@ -12,7 +12,7 @@ import es.ujaen.uvirtual.beans.uvirtual.bolsaempleo.ItemBaremacion;
 /** test apartado.
  *
  */
-public class TestBeanItemBaremacion {
+public class TestBEPBeanItemBaremacion {
 
 	private static final String CADENA = "cadena";
 	private static final Boolean BOOLEANO = true;

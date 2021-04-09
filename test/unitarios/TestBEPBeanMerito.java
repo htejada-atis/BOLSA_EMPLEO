@@ -1,4 +1,4 @@
-package unitarios.bolsaempleo;
+package unitarios;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
@@ -14,7 +14,7 @@ import es.ujaen.uvirtual.beans.uvirtual.bolsaempleo.Merito;
 /** test merito.
  *
  */
-public class TestBeanMerito {
+public class TestBEPBeanMerito {
 
 	private static final String CADENA = "cadena";
 	private static final Float FLOAT = 1.1f;

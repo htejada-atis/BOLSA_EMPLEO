@@ -1,4 +1,4 @@
-package controlador.bolsaempleo;
+package controlador;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotEquals;
@@ -20,7 +20,7 @@ import es.ujaen.uvirtual.utilidades.UVException;
  * @author jmoral
  *
  */
-public class TestControladorMisMeritos {
+public class TestBEPControladorMisMeritos {
 	
 	private static final String MENSAJE_APARTADO_DEVUELTO = "Debe devolver apartado";
 	private static final String MENSAJE_APARTADOS_DEVUELTOS = "Debe devolver apartados";

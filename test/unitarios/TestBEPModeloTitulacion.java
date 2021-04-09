@@ -1,4 +1,4 @@
-package unitarios.bolsaempleo;
+package unitarios;
 
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
@@ -17,7 +17,7 @@ import es.ujaen.uvirtual.modelo.conexion.Conexion;
 import es.ujaen.uvirtual.utilidades.UVException;
 
 /** Clase para probar el modelo titulación. */
-public class TestModeloTitulacion {
+public class TestBEPModeloTitulacion {
 	
     private static final String NOMBRE_TITULACION = "nombre titulacion";
     

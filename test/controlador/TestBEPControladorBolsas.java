@@ -1,4 +1,4 @@
-package controlador.bolsaempleo;
+package controlador;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotEquals;
@@ -23,7 +23,7 @@ import es.ujaen.uvirtual.utilidades.DataTable;
 /** test controlador convocatoria crud.
  * @author ATISoluciones 
  */
-public class TestControladorBolsas {	
+public class TestBEPControladorBolsas {	
     /** prepara la bd con los datos iniciales.
      * @throws SQLException si error en bd
      * @throws IOException si error en ficheros

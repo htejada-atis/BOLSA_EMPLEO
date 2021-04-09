@@ -1,4 +1,4 @@
-package unitarios.bolsaempleo;
+package unitarios;
 
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
@@ -21,7 +21,7 @@ import es.ujaen.uvirtual.utilidades.UVException;
 
 
 /** Clase para probar el modelo fichero. */
-public class TestModeloFichero {
+public class TestBEPModeloFichero {
 	
     private static final String NOMBRE_FICHERO = "nombre fichero";
     private static final String TITULO_FICHERO = "titulo fichero";

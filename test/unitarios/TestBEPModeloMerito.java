@@ -1,4 +1,4 @@
-package unitarios.bolsaempleo;
+package unitarios;
 
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
@@ -23,7 +23,7 @@ import es.ujaen.uvirtual.utilidades.UVException;
 
 
 /** Clase para probar el modelo fichero. */
-public class TestModeloMerito {
+public class TestBEPModeloMerito {
 	
     private static final String DESCRIPCION_MERITO = "descripcion merito";
     private static final String OBSERVACION_MERITO = "observacion merito";

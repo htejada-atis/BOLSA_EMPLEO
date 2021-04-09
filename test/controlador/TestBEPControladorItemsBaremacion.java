@@ -1,4 +1,4 @@
-package controlador.bolsaempleo;
+package controlador;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotEquals;
@@ -22,7 +22,7 @@ import es.ujaen.uvirtual.controlador.infadministrativa.bolsaempleo.ControladorIt
  * @author jmoral
  *
  */
-public class TestControladorItemsBaremacion {
+public class TestBEPControladorItemsBaremacion {
 	
 	private static final String MENSAJE_CON_ERROR = "Debe devolver error";
 	private static final String MENSAJE_CON_EXITO_ESPERADO = "El mensaje de exito debe coincidir";
