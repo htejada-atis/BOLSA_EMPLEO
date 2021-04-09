@@ -32,7 +32,29 @@ public class ApartadoBaremacion implements Serializable {
 		this.codNum = pcodNum;
 		this.codigo = pcodigo;
 		this.nombre = pnombre;
-		this.activo = pactivo;		
+		this.activo = pactivo;
+	}
+	
+	/** Constructor con parametros.
+	 * @param pcodNum .
+	 * @param pcodigo .
+	 * @param pnombre .
+	 */
+	public ApartadoBaremacion(Integer pcodNum, String pcodigo, String pnombre) {
+		super();
+		this.codNum = pcodNum;
+		this.codigo = pcodigo;
+		this.nombre = pnombre;
+	}
+	
+	/** Constructor con parametros.
+	 * @param pcodigo .
+	 * @param pnombre .
+	 */
+	public ApartadoBaremacion(String pcodigo, String pnombre) {
+		super();
+		this.codigo = pcodigo;
+		this.nombre = pnombre;
 	}
 	
 	/** Constructor con parametros.

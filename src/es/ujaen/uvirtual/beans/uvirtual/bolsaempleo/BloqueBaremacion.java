@@ -39,6 +39,32 @@ public class BloqueBaremacion implements Serializable {
 	
 	/** Constructor con parametros.
 	 * @param pcodNum .
+	 * @param papartado .
+	 * @param pcodigo .
+	 * @param pnombre .
+	 */
+	public BloqueBaremacion(Integer pcodNum, ApartadoBaremacion papartado, String pcodigo, String pnombre) {
+		super();
+		this.apartado = papartado;
+		this.codNum = pcodNum;
+		this.codigo = pcodigo;
+		this.nombre = pnombre;
+	}
+	
+	/** Constructor con parametros.
+	 * @param papartado .
+	 * @param pcodigo .
+	 * @param pnombre .
+	 */
+	public BloqueBaremacion(ApartadoBaremacion papartado, String pcodigo, String pnombre) {
+		super();
+		this.apartado = papartado;
+		this.codigo = pcodigo;
+		this.nombre = pnombre;
+	}
+	
+	/** Constructor con parametros.
+	 * @param pcodNum .
 	 * @param pactivo .
 	 */
 	public BloqueBaremacion(Integer pcodNum, Boolean pactivo) {

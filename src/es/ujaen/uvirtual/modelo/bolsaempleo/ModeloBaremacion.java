@@ -39,10 +39,16 @@ public class ModeloBaremacion {
 	public static final int OPCION_DEFAULT = 0;
 	// opción de consulta que filtra la lista con un id dado
 	public static final int OPCION_1 = 1;
-	// opción de consulta para comprobar si ya existe un código
+	// opción de consulta para comprobar si ya existe un código al editar
 	public static final int OPCION_2 = 2;
-	// opción de consulta para obtener todos los ítems de un apartado
+	// opción de consulta para comprobar si ya existe un código al agregar
 	public static final int OPCION_3 = 3;
+	// opción de consulta para obtener todos los ítems de un apartado
+	public static final int OPCION_4 = 4;
+	// opción de consulta para editar campos
+	public static final int OPCION_5 = 5;
+	// opción de consulta para desactivar o activar
+	public static final int OPCION_6 = 6;
 	
 	
 	/********************************************** METODOS PÚBLICOS PARA CONSULTAS APARTADOBAREMACION  ********************************************/
@@ -58,32 +64,37 @@ public class ModeloBaremacion {
 		List<ApartadoBaremacion> apartados = new ArrayList<>();
 		String consulta = "SELECT bepapa.* FROM TBEP_APARTADOSBAREMACION bepapa ";
 		
-		if (opcion == OPCION_1 && opcion == OPCION_2) {
+		if (opcion == OPCION_1 || opcion == OPCION_2 || opcion == OPCION_3) {
 			if (apartado == null) {
 				throw new UVException("apartado obligatorio");
 			}
+		}
+		if (opcion == OPCION_1 || opcion == OPCION_2) {
 			if (apartado.getCodNum() == null) {
 				throw new UVException("id apartado no válido");
 			}
-			
-			consulta += "WHERE bepapa.CODNUM = ? ";
 		}
-		if (opcion == OPCION_2) {
+		if (opcion == OPCION_2 || opcion == OPCION_3) {
 			if (apartado.getCodigo() == null || apartado.getCodigo().equals("")) {
 				throw new UVException("código de apartado no válido");
 			}
 			
-			consulta += "AND bepapa.CODIGO != ? ";
+			consulta += "WHERE bepapa.CODIGO = ? ";
+		}
+		if (opcion == OPCION_1) {
+			consulta += "WHERE bepapa.CODNUM = ? ";
+		}
+		if (opcion == OPCION_2) {
+			consulta += "AND bepapa.CODNUM != ? ";
 		}
 		
 		try (Connection conexion = ConexionUvirtual.obtenerInstancia(); PreparedStatement stmt = conexion.prepareStatement(consulta);) {
-			
 			int parameterIndex = 1;
-			if (opcion == OPCION_1 && opcion == OPCION_2) {
-				stmt.setInt(parameterIndex++, apartado.getCodNum());
-			}
-			if (opcion == OPCION_2) {
+			if (opcion == OPCION_2 || opcion == OPCION_3) {
 				stmt.setString(parameterIndex++, apartado.getCodigo());
+			}
+			if (opcion == OPCION_1 || opcion == OPCION_2) {
+				stmt.setInt(parameterIndex++, apartado.getCodNum());
 			}
 			
 			try (ResultSet rs = stmt.executeQuery()) {
@@ -104,6 +115,30 @@ public class ModeloBaremacion {
 		return apartados;
 	}
 	
+	/** Consulta para obtener el último código de los apartados .
+	 * @return bloque .
+	 * @throws SQLException .
+	 * @throws UVException .
+	 */
+	public ApartadoBaremacion getUltimoCodigoApartado() throws SQLException, UVException {
+		ApartadoBaremacion apartado = new ApartadoBaremacion();
+		String consulta = "SELECT bepapa.CODIGO FROM TBEP_APARTADOSBAREMACION bepapa "
+				+ " ORDER BY bepapa.CODIGO DESC"
+				+ " FETCH FIRST 1 ROW ONLY";
+		
+		try (Connection conexion = ConexionUvirtual.obtenerInstancia(); PreparedStatement stmt = conexion.prepareStatement(consulta);) {
+			try (ResultSet rs = stmt.executeQuery()) {
+				if (!rs.next()) {
+					apartado.setCodigo("1");
+				} else {
+					apartado.setCodigo(rs.getString("CODIGO"));
+				}
+			}
+		}
+		
+		return apartado;
+	}
+	
 	/** lista todos los apartados.
 	 * @return vector con todos los apartados .
 	 * @throws SQLException si hay un error en la base de datos .
@@ -120,7 +155,7 @@ public class ModeloBaremacion {
 	 * @throws SQLException en caso de error en la BD
 	 * @throws UVException si apartado no es existe
 	 */
-	public ApartadoBaremacion getApartadoBaremacionById(int codNum) throws SQLException, UVException {
+	public ApartadoBaremacion getApartadoBaremacionById(Integer codNum) throws SQLException, UVException {
 		List<ApartadoBaremacion> apartados = listaApartados(new ApartadoBaremacion(codNum), OPCION_1);
 		if (apartados.isEmpty()) {
 			throw new UVException("No existe apartado");
@@ -187,7 +222,7 @@ public class ModeloBaremacion {
 			throw new UVException("id apartado no válido");
 		}
 		
-		if (opcion == OPCION_1) {
+		if (opcion == OPCION_5) {
 			consulta += " codigo=?, nombre=?";
 			
 			if (apartado.getCodigo() == null) {
@@ -202,7 +237,7 @@ public class ModeloBaremacion {
 			}
 		}
 		
-		if (opcion == OPCION_2) {
+		if (opcion == OPCION_6) {
 			consulta += " flgactivo=?";
 			
 			if (apartado.isActivo() == null) {
@@ -215,15 +250,47 @@ public class ModeloBaremacion {
 		try (Connection conexion = ConexionUvirtual.obtenerInstancia(); PreparedStatement stmt = conexion.prepareStatement(consulta);) {
 			int parameterIndex = 1;
 			
-			if (opcion == 1) {
+			if (opcion == OPCION_5) {
 				stmt.setString(parameterIndex++, apartado.getCodigo());
 				stmt.setString(parameterIndex++, apartado.getNombre());
 			}
-			if (opcion == 2) {
+			if (opcion == OPCION_6) {
 				stmt.setString(parameterIndex++, apartado.isActivo() ? "S" : "N");
 			}
 			
 			stmt.setInt(parameterIndex++, apartado.getCodNum());
+			stmt.executeUpdate();
+		}
+	}
+	
+	/** Función que inserta un apartado en la BD.
+	 * @param apartado .
+	 * @throws SQLException .
+	 * @throws UVException .
+	 */
+	public void insertaApartado(ApartadoBaremacion apartado) throws SQLException, UVException {
+		if (apartado == null) {
+			throw new UVException("No se puede insertar un apartado vacío");
+		}
+		if (apartado.getCodigo() == null) {
+			throw new UVException("código obligatorio");
+		}
+		if (apartado.getNombre() == null) {
+			throw new UVException("nombre obligatorio");
+		}
+		
+		if (listaApartados(apartado, OPCION_3).size() > 0) {
+			throw new UVException("ya existe un apartado con éste código");
+		}
+		
+		String consulta = "INSERT INTO TBEP_APARTADOSBAREMACION " 
+				+ " (CODIGO,NOMBRE)"
+				+ " VALUES (?, ?)";
+		
+		try (Connection conexion = ConexionUvirtual.obtenerInstancia(); PreparedStatement stmt = conexion.prepareStatement(consulta);) {
+			int parameterIndex = 1;
+			stmt.setString(parameterIndex++, apartado.getCodigo());
+			stmt.setString(parameterIndex++, apartado.getNombre());
 			stmt.executeUpdate();
 		}
 	}
@@ -241,31 +308,38 @@ public class ModeloBaremacion {
 		List<BloqueBaremacion> bloques = new ArrayList<>();
 		String consulta = "SELECT bepblo.* FROM TBEP_BLOQUESBAREMACION bepblo ";
 		
-		if (opcion == OPCION_1 && opcion == OPCION_2) {
+		if (opcion == OPCION_1 || opcion == OPCION_2 || opcion == OPCION_3) {
 			if (bloque == null) {
 				throw new UVException("bloque obligatorio");
 			}
+		}
+		if (opcion == OPCION_1 || opcion == OPCION_2) {
 			if (bloque.getCodNum() == null) {
 				throw new UVException("id bloque no válido");
 			}
-			
-			consulta += "WHERE bepblo.CODNUM = ? ";
 		}
-		if (opcion == OPCION_2) {
+		if (opcion == OPCION_2 || opcion == OPCION_3) {
 			if (bloque.getCodigo() == null || bloque.getCodigo().equals("")) {
 				throw new UVException("código de bloque no válido");
 			}
 			
-			consulta += "AND bepblo.CODIGO != ? ";
+			consulta += "WHERE bepblo.CODIGO = ? AND bepblo.BEPAPA_CODNUM = ? ";
+		}
+		if (opcion == OPCION_1) {
+			consulta += "WHERE bepblo.CODNUM = ? ";
+		}
+		if (opcion == OPCION_2) {
+			consulta += "AND bepblo.CODNUM != ? ";
 		}
 		
 		try (Connection conexion = ConexionUvirtual.obtenerInstancia(); PreparedStatement stmt = conexion.prepareStatement(consulta);) {
 			int parameterIndex = 1;
-			if (opcion == OPCION_1 && opcion == OPCION_2) {
-				stmt.setInt(parameterIndex++, bloque.getCodNum());
-			}
-			if (opcion == OPCION_2) {
+			if (opcion == OPCION_2 || opcion == OPCION_3) {
 				stmt.setString(parameterIndex++, bloque.getCodigo());
+				stmt.setInt(parameterIndex++, bloque.getApartadoBaremacion().getCodNum());
+			}
+			if (opcion == OPCION_1 || opcion == OPCION_2) {
+				stmt.setInt(parameterIndex++, bloque.getCodNum());
 			}
 			try (ResultSet rs = stmt.executeQuery()) {
 				while (rs.next()) {
@@ -287,6 +361,39 @@ public class ModeloBaremacion {
 		return bloques;
 	}
 	
+	/** Consulta para obtener el último código de los bloques de un apartado .
+	 * @param apartadoId .
+	 * @return bloque .
+	 * @throws SQLException .
+	 * @throws UVException .
+	 */
+	public BloqueBaremacion getUltimoCodigoBloque(Integer apartadoId) throws SQLException, UVException {
+		if (apartadoId == null) {
+			throw new UVException("id de apartado requerido");
+		}
+		
+		BloqueBaremacion bloque = new BloqueBaremacion();
+		String consulta = "SELECT bepblo.CODIGO, bepblo.BEPAPA_CODNUM FROM TBEP_BLOQUESBAREMACION bepblo "
+				+ " WHERE bepblo.BEPAPA_CODNUM = ? ORDER BY bepblo.CODIGO DESC"
+				+ " FETCH FIRST 1 ROW ONLY";
+		
+		try (Connection conexion = ConexionUvirtual.obtenerInstancia(); PreparedStatement stmt = conexion.prepareStatement(consulta);) {
+			int parameterIndex = 1;
+			stmt.setInt(parameterIndex++, apartadoId);
+			try (ResultSet rs = stmt.executeQuery()) {
+				if (!rs.next()) {
+					bloque.setCodigo("1");
+					bloque.setApartadoBaremacion(this.getApartadoBaremacionById(apartadoId));
+				} else {
+					bloque.setCodigo(rs.getString("CODIGO"));
+					bloque.setApartadoBaremacion(this.getApartadoBaremacionById(rs.getInt("BEPAPA_CODNUM")));
+				}
+			}
+		}
+		
+		return bloque;
+	}
+	
 	/**
 	 * Devuelve un bloque de baremación por su id.
 	 * @param codNum .
@@ -294,8 +401,8 @@ public class ModeloBaremacion {
 	 * @throws SQLException en caso de error en la BD
 	 * @throws UVException si bloque no es existe
 	 */
-	public BloqueBaremacion getBloqueBaremacionById(int codNum) throws SQLException, UVException {
-		List<BloqueBaremacion> bloques = listaBloques(new BloqueBaremacion(codNum), OPCION_DEFAULT);
+	public BloqueBaremacion getBloqueBaremacionById(Integer codNum) throws SQLException, UVException {
+		List<BloqueBaremacion> bloques = listaBloques(new BloqueBaremacion(codNum), OPCION_1);
 		if (bloques.isEmpty()) {
 			throw new UVException("No existe bloque");
 		}
@@ -371,8 +478,8 @@ public class ModeloBaremacion {
 			throw new UVException("id bloque no válido");
 		}
 		
-		if (opcion == OPCION_1) {
-			consulta += " codigo=?, nombre=?";
+		if (opcion == OPCION_5) {
+			consulta += " codigo=?, nombre=?, bepapa_codnum=?";
 			
 			if (bloque.getCodigo() == null) {
 				throw new UVException("código obligatorio");
@@ -381,12 +488,16 @@ public class ModeloBaremacion {
 				throw new UVException("nombre obligatorio");
 			}
 			
+			if (bloque.getApartadoBaremacion().getCodNum() == null) {
+				throw new UVException("apartado obligatorio");
+			}
+			
 			if (listaBloques(bloque, OPCION_2).size() > 0) {
 				throw new UVException("ya existe un bloque con éste código");
 			}
 		}
 		
-		if (opcion == OPCION_2) {
+		if (opcion == OPCION_6) {
 			consulta += " flgactivo=?";
 			
 			if (bloque.isActivo() == null) {
@@ -399,15 +510,49 @@ public class ModeloBaremacion {
 		try (Connection conexion = ConexionUvirtual.obtenerInstancia(); PreparedStatement stmt = conexion.prepareStatement(consulta);) {
 			int parameterIndex = 1;
 			
-			if (opcion == 1) {
+			if (opcion == OPCION_5) {
 				stmt.setString(parameterIndex++, bloque.getCodigo());
 				stmt.setString(parameterIndex++, bloque.getNombre());
+				stmt.setInt(parameterIndex++, bloque.getApartadoBaremacion().getCodNum());
 			}
-			if (opcion == 2) {
+			if (opcion == OPCION_6) {
 				stmt.setString(parameterIndex++, bloque.isActivo() ? "S" : "N");
 			}
 			
 			stmt.setInt(parameterIndex++, bloque.getCodNum());
+			stmt.executeUpdate();
+		}
+	}
+	
+	/** Función que inserta un bloque en la BD.
+	 * @param bloque .
+	 * @throws SQLException .
+	 * @throws UVException .
+	 */
+	public void insertaBloque(BloqueBaremacion bloque) throws SQLException, UVException {
+		if (bloque == null) {
+			throw new UVException("No se puede insertar un bloque vacío");
+		}
+		if (bloque.getCodigo() == null) {
+			throw new UVException("codigo obligatorio");
+		}
+		if (bloque.getNombre() == null) {
+			throw new UVException("nombre obligatorio");
+		}
+		
+		if (listaBloques(bloque, OPCION_3).size() > 0) {
+			throw new UVException("ya existe un bloque con éste código");
+		}
+		
+		String consulta = "INSERT INTO TBEP_BLOQUESBAREMACION " 
+				+ " (CODIGO,NOMBRE,BEPAPA_CODNUM)"
+				+ " VALUES (?,?,?)";
+		
+		try (Connection conexion = ConexionUvirtual.obtenerInstancia(); PreparedStatement stmt = conexion.prepareStatement(consulta);) {
+			int parameterIndex = 1;
+			stmt.setString(parameterIndex++, bloque.getCodigo());
+			stmt.setString(parameterIndex++, bloque.getNombre());
+			stmt.setInt(parameterIndex++, bloque.getApartadoBaremacion().getCodNum());
 			stmt.executeUpdate();
 		}
 	}
@@ -425,25 +570,30 @@ public class ModeloBaremacion {
 		List<ItemBaremacion> items = new ArrayList<>();
 		String consulta = "SELECT bepite.* FROM TBEP_ITEMSBAREMACION bepite ";
 		
-		
-		if (opcion == OPCION_1 || opcion == OPCION_2) {
+		if (opcion == OPCION_1 || opcion == OPCION_2 || opcion == OPCION_3) {
 			if (item == null) {
 				throw new UVException("item obligatorio");
 			}
+		}
+		if (opcion == OPCION_1 || opcion == OPCION_2) {
 			if (item.getCodNum() == null) {
 				throw new UVException("id item no válido");
 			}
-			
-			consulta += "WHERE bepite.CODNUM = ? ";
 		}
-		if (opcion == OPCION_2) {
+		if (opcion == OPCION_2 || opcion == OPCION_3) {
 			if (item.getCodigo() == null || item.getCodigo().equals("")) {
 				throw new UVException("código de item no válido");
 			}
 			
-			consulta += "AND bepite.CODIGO != ? ";
+			consulta += "WHERE bepite.CODIGO = ? AND bepite.BEPBLO_CODNUM = ? ";
 		}
-		if (opcion == OPCION_3) {
+		if (opcion == OPCION_1) {
+			consulta += "WHERE bepite.CODNUM = ? ";
+		}
+		if (opcion == OPCION_2) {
+			consulta += "AND bepite.CODNUM != ? ";
+		}
+		if (opcion == OPCION_4) {
 			if (item.getCodNum() == null) {
 				throw new UVException("id apartado no válido");
 			}
@@ -457,11 +607,12 @@ public class ModeloBaremacion {
 		
 		try (Connection conexion = ConexionUvirtual.obtenerInstancia(); PreparedStatement stmt = conexion.prepareStatement(consulta);) {
 			int parameterIndex = 1;
-			if (opcion == OPCION_1 || opcion == OPCION_2 || opcion == OPCION_3) {
-				stmt.setInt(parameterIndex++, item.getCodNum());
-			}
-			if (opcion == OPCION_2) {
+			if (opcion == OPCION_2 || opcion == OPCION_3) {
 				stmt.setString(parameterIndex++, item.getCodigo());
+				stmt.setInt(parameterIndex++, item.getBloqueBaremacion().getCodNum());
+			}
+			if (opcion == OPCION_1 || opcion == OPCION_2 || opcion == OPCION_4) {
+				stmt.setInt(parameterIndex++, item.getCodNum());
 			}
 			try (ResultSet rs = stmt.executeQuery()) {
 				while (rs.next()) {
@@ -483,6 +634,39 @@ public class ModeloBaremacion {
 		return items;
 	}
 	
+	/** Consulta para obtener el último código de los ítems de un bloque .
+	 * @param bloqueId .
+	 * @return bloque .
+	 * @throws SQLException .
+	 * @throws UVException .
+	 */
+	public ItemBaremacion getUltimoCodigoItem(Integer bloqueId) throws SQLException, UVException {
+		if (bloqueId == null) {
+			throw new UVException("id de bloque requerido");
+		}
+		
+		ItemBaremacion item = new ItemBaremacion();
+		String consulta = "SELECT bepite.CODIGO, bepite.BEPBLO_CODNUM FROM TBEP_ITEMSBAREMACION bepite "
+				+ " WHERE bepite.BEPBLO_CODNUM = ? ORDER BY bepite.CODIGO DESC"
+				+ " FETCH FIRST 1 ROW ONLY";
+		
+		try (Connection conexion = ConexionUvirtual.obtenerInstancia(); PreparedStatement stmt = conexion.prepareStatement(consulta);) {
+			int parameterIndex = 1;
+			stmt.setInt(parameterIndex++, bloqueId);
+			try (ResultSet rs = stmt.executeQuery()) {
+				if (!rs.next()) {
+					item.setCodigo("1");
+					item.setBloqueBaremacion(this.getBloqueBaremacionById(bloqueId));
+				} else {
+					item.setCodigo(rs.getString("CODIGO"));
+					item.setBloqueBaremacion(this.getBloqueBaremacionById(rs.getInt("BEPBLO_CODNUM")));
+				}
+			}
+		}
+		
+		return item;
+	}
+	
 	/** lista todos los ítems de un apartado.
 	 * @param id .
 	 * @return vector con todos los ítems .
@@ -490,7 +674,7 @@ public class ModeloBaremacion {
 	 * @throws UVException .
 	 */
 	public List<ItemBaremacion> listaItemsApartado(Integer id) throws SQLException, UVException {
-		return listaItems(new ItemBaremacion(id), OPCION_3);
+		return listaItems(new ItemBaremacion(id), OPCION_4);
 	}
 	
 	/**
@@ -500,7 +684,7 @@ public class ModeloBaremacion {
 	 * @throws SQLException en caso de error en la BD .
 	 * @throws UVException si ítem no es existe .
 	 */
-	public ItemBaremacion getItemBaremacionById(int codNum) throws SQLException, UVException {
+	public ItemBaremacion getItemBaremacionById(Integer codNum) throws SQLException, UVException {
 		List<ItemBaremacion> items = listaItems(new ItemBaremacion(codNum), OPCION_1);
 		if (items.isEmpty()) {
 			throw new UVException("No existe ítem");
@@ -577,8 +761,8 @@ public class ModeloBaremacion {
 			throw new UVException("id item no válido");
 		}
 		
-		if (opcion == OPCION_1) {
-			consulta += " codigo=?, nombre=?";
+		if (opcion == OPCION_5) {
+			consulta += " codigo=?, nombre=?, bepblo_codnum=?";
 			
 			if (item.getCodigo() == null) {
 				throw new UVException("código obligatorio");
@@ -586,13 +770,16 @@ public class ModeloBaremacion {
 			if (item.getNombre() == null) {
 				throw new UVException("nombre obligatorio");
 			}
+			if (item.getBloqueBaremacion().getCodNum() == null) {
+				throw new UVException("bloque obligatorio");
+			}
 			
 			if (listaItems(item, OPCION_2).size() > 0) {
 				throw new UVException("ya existe un item con éste código");
 			}
 		}
 		
-		if (opcion == OPCION_2) {
+		if (opcion == OPCION_6) {
 			consulta += " flgactivo=?";
 			
 			if (item.isActivo() == null) {
@@ -605,15 +792,49 @@ public class ModeloBaremacion {
 		try (Connection conexion = ConexionUvirtual.obtenerInstancia(); PreparedStatement stmt = conexion.prepareStatement(consulta);) {
 			int parameterIndex = 1;
 			
-			if (opcion == 1) {
+			if (opcion == OPCION_5) {
 				stmt.setString(parameterIndex++, item.getCodigo());
 				stmt.setString(parameterIndex++, item.getNombre());
+				stmt.setInt(parameterIndex++, item.getBloqueBaremacion().getCodNum());
 			}
-			if (opcion == 2) {
+			if (opcion == OPCION_6) {
 				stmt.setString(parameterIndex++, item.isActivo() ? "S" : "N");
 			}
 			
 			stmt.setInt(parameterIndex++, item.getCodNum());
+			stmt.executeUpdate();
+		}
+	}
+	
+	/** Función que inserta un ítem en la BD.
+	 * @param item .
+	 * @throws SQLException .
+	 * @throws UVException .
+	 */
+	public void insertaItem(ItemBaremacion item) throws SQLException, UVException {
+		if (item == null) {
+			throw new UVException("No se puede insertar un item vacío");
+		}
+		if (item.getCodigo() == null) {
+			throw new UVException("código obligatorio");
+		}
+		if (item.getNombre() == null) {
+			throw new UVException("nombre obligatorio");
+		}
+		
+		if (listaItems(item, OPCION_3).size() > 0) {
+			throw new UVException("ya existe un item con éste código");
+		}
+		
+		String consulta = "INSERT INTO TBEP_ITEMSBAREMACION "
+				+ " (CODIGO,NOMBRE,BEPBLO_CODNUM)"
+				+ " VALUES (?,?,?)";
+		
+		try (Connection conexion = ConexionUvirtual.obtenerInstancia(); PreparedStatement stmt = conexion.prepareStatement(consulta);) {
+			int parameterIndex = 1;
+			stmt.setString(parameterIndex++, item.getCodigo());
+			stmt.setString(parameterIndex++, item.getNombre());
+			stmt.setInt(parameterIndex++, item.getBloqueBaremacion().getCodNum());
 			stmt.executeUpdate();
 		}
 	}
