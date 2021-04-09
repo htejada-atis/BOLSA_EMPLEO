@@ -1,4 +1,4 @@
-package unitarios.bolsaempleo;
+package unitarios;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
@@ -13,7 +13,7 @@ import es.ujaen.uvirtual.beans.uvirtual.bolsaempleo.Departamento;
 /** test areas.
  *
  */
-public class TestBeanArea {
+public class TestBEPBeanArea {
 	
 	private static final String ID_AREA_EXTERNO = "area externo";
 	private static final String SECCION = "area seccion";

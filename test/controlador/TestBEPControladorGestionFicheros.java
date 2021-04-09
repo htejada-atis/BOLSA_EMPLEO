@@ -1,4 +1,4 @@
-package controlador.bolsaempleo;
+package controlador;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotEquals;
@@ -21,7 +21,7 @@ import es.ujaen.uvirtual.controlador.infadministrativa.bolsaempleo.ControladorGe
  * @author jmoral
  *
  */
-public class TestControladorGestionFicheros {
+public class TestBEPControladorGestionFicheros {
 	
 	private static final String MENSAJE_FICHERO_DEVUELTO = "Debe devolver fichero";
 	private static final String MENSAJE_SIN_ERROR = "No debe devolver error";

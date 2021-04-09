@@ -1,4 +1,4 @@
-package unitarios.bolsaempleo;
+package unitarios;
 
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
@@ -18,7 +18,7 @@ import es.ujaen.uvirtual.modelo.conexion.Conexion;
 import es.ujaen.uvirtual.utilidades.UVException;
 
 /** Clase para probar el modelo noticia. */
-public class TestModeloNoticia {
+public class TestBEPModeloNoticia {
 	
     private static final String FORMATO_FECHA = "dd/MM/yyyy";
     private static final String FECHA_STRING_EJEMPLO = "31/12/2028";

@@ -1,4 +1,4 @@
-package controlador.bolsaempleo;
+package controlador;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotEquals;
@@ -18,7 +18,7 @@ import es.ujaen.uvirtual.controlador.infadministrativa.bolsaempleo.ControladorGe
 /** test controlador titulacion.
  * @author ATISoluciones 
  */
-public class TestControladorGestionTitulacionesPreferentesArea {
+public class TestBEPControladorGestionTitulacionesPreferentesArea {
 	
 	private static final String MENSAJE_AREAS_DEVUELTAS = "Debe devolver areas";
 	private static final String MENSAJE_TITULACIONES_DEVUELTAS = "Debe devolver titulaciones";

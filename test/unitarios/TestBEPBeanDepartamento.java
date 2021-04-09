@@ -1,4 +1,4 @@
-package unitarios.bolsaempleo;
+package unitarios;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
@@ -12,7 +12,7 @@ import es.ujaen.uvirtual.beans.uvirtual.bolsaempleo.Departamento;
 /** test departamentos.
  *
  */
-public class TestBeanDepartamento {
+public class TestBEPBeanDepartamento {
 
 	private static final String COD_DEPARTAMENTO = "dep01";
 	private static final String DES_DEPARTAMENTO = "Departamento física y química";

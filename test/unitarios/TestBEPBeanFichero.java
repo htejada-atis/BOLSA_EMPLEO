@@ -1,4 +1,4 @@
-package unitarios.bolsaempleo;
+package unitarios;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
@@ -15,7 +15,7 @@ import es.ujaen.uvirtual.beans.uvirtual.bolsaempleo.Fichero;
 /** test fichero.
  *
  */
-public class TestBeanFichero {
+public class TestBEPBeanFichero {
 
 	private static final String CADENA = "cadena";
 	private static final InputStream ARCHIVO = new ByteArrayInputStream("archivo de prueba".getBytes());

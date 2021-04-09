@@ -1,4 +1,4 @@
-package usuario.bolsaempleo;
+package usuario;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -20,13 +20,13 @@ import org.openqa.selenium.remote.DesiredCapabilities;
 import bbdd.UtilsTestBolsaEmpleo;
 
 /** Clase para obtener el driver de firefox. */
-public class DriverUv {
+public class DriverUvBEP {
 	private static WebDriver driver;
 	private static final int TIEMPO_MAXIMO_ESPERA = 10;
 	private static final int RESPONSE_CODE_200 = 200;
 	private static final int RESPONSE_CODE_201 = 201;
 	
-	private DriverUv() { }
+	private DriverUvBEP() { }
 	
 	/** inicializa el driver. */
 	public static void inicializaDriver() {

@@ -1,4 +1,4 @@
-package controlador.bolsaempleo;
+package controlador;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotEquals;
@@ -21,7 +21,7 @@ import es.ujaen.uvirtual.utilidades.UVException;
 /** test controlador gestión titulaciones.
  * @author ATISoluciones
  */
-public class TestControladorGestionTitulaciones {
+public class TestBEPControladorGestionTitulaciones {
 	
 	private static final String MENSAJE_TITULACIONES_DEVUELTAS = "Debe devolver titulaciones";
 	private static final String MENSAJE_TITULACION_DEVUELTA = "Debe devolver titulación";

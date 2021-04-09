@@ -1,4 +1,4 @@
-package unitarios.bolsaempleo;
+package unitarios;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
@@ -17,7 +17,7 @@ import es.ujaen.uvirtual.beans.uvirtual.bolsaempleo.Departamento;
 /** test bolsas.
  *
  */
-public class TestBeanBolsa {	
+public class TestBEPBeanBolsa {	
 	private static final String ESTADO = "BLOQUEADA";
 	private static final Boolean BAREAMABLE = true;
 	private static final Date FECHAATUALIZACION = new java.sql.Date(Calendar.getInstance().getTime().getTime());

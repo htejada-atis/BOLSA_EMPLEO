@@ -1,4 +1,4 @@
-package usuario.bolsaempleo;
+package usuario;
 
 import static org.junit.Assert.assertTrue;
 
@@ -29,8 +29,8 @@ import es.ujaen.uvirtual.utilidades.DataTable;
  * @author usig
  *
  */
-public class TestMenusBolsaTrabajo {
-	private static final String NOMBREDEESTACLASE = TestMenusBolsaTrabajo.class.getName();
+public class TestBEPMenusBolsaTrabajo {
+	private static final String NOMBREDEESTACLASE = TestBEPMenusBolsaTrabajo.class.getName();
 
 	private static final Logger LOGGER = Logger.getLogger(NOMBREDEESTACLASE);
 	private static final Integer WAIT_ELEMENT = 5; // segundos
@@ -56,9 +56,9 @@ public class TestMenusBolsaTrabajo {
 	@BeforeClass
 	public static void setUp() throws IOException, SQLException {
 		LOGGER.log(Level.INFO, "inicio");
-		DriverUv.inicializaBd();
-		DriverUv.inicializaDriver();
-		DriverUv.login();
+		DriverUvBEP.inicializaBd();
+		DriverUvBEP.inicializaDriver();
+		DriverUvBEP.login();
 	}
 
 	/** Se ejecuta antes de cada test.
@@ -66,17 +66,17 @@ public class TestMenusBolsaTrabajo {
 	 */
 	@Before
 	public void navegaOpcion() {
-		DriverUv.getDriver().get("http://localhost:8080/srv/es/index");
-		DriverUv.getDriver().get("http://localhost:8080/srv/es/informacionadministrativa");
-		DriverUv.getDriver().get("http://localhost:8080/srv/es/informacionadministrativa/bolsaempleo");		
-		DriverUv.getDriver().get("http://localhost:8080/srv/es/informacionadministrativa/bolsaempleo/bolsas");
+		DriverUvBEP.getDriver().get("http://localhost:8080/srv/es/index");
+		DriverUvBEP.getDriver().get("http://localhost:8080/srv/es/informacionadministrativa");
+		DriverUvBEP.getDriver().get("http://localhost:8080/srv/es/informacionadministrativa/bolsaempleo");		
+		DriverUvBEP.getDriver().get("http://localhost:8080/srv/es/informacionadministrativa/bolsaempleo/bolsas");
 	}
 	
 	/** Listado de bolsas de empleo.
 	 */
 	@Test
 	public void testA1() {
-		WebDriverWait wait = new WebDriverWait(DriverUv.getDriver(), WAIT_ELEMENT);
+		WebDriverWait wait = new WebDriverWait(DriverUvBEP.getDriver(), WAIT_ELEMENT);
 		
 		// esperamos div principal
 		WebElement main = wait.until(ExpectedConditions.visibilityOfElementLocated(By.className(DIV_MAIN_BOLSAS)));		
@@ -145,7 +145,7 @@ public class TestMenusBolsaTrabajo {
 	@Test
 	public void testA2() throws MalformedURLException, IOException {
 		String url = "http://localhost:8080/srv/es/informacionadministrativa/bolsaempleo/bolsas?a=" + ControladorBolsas.ACCION_DATATABLE;
-		String json = DriverUv.getAjaxRequestJson(url);
+		String json = DriverUvBEP.getAjaxRequestJson(url);
 		
 		Type typeDt = new TypeToken<DataTable<Bolsa>>() { }.getType();
 		DataTable<Bolsa> dt = new Gson().fromJson(json, typeDt);
@@ -158,7 +158,7 @@ public class TestMenusBolsaTrabajo {
 	}
 	
 	private String getDialogText() {
-		WebElement dialogo = DriverUv.getDriver().findElement(By.className(CLASS_DIALOGO));
+		WebElement dialogo = DriverUvBEP.getDriver().findElement(By.className(CLASS_DIALOGO));
 		WebElement content = dialogo.findElement(By.className(CLASS_DIALOGO_CONTENT));
 		
 		return content.findElement(By.tagName("h6")).getText();
@@ -169,6 +169,6 @@ public class TestMenusBolsaTrabajo {
 	@AfterClass
 	public static void cerrar() {
 		LOGGER.log(Level.INFO, "final");
-		DriverUv.getDriver().quit();
+		DriverUvBEP.getDriver().quit();
 	}
 }
