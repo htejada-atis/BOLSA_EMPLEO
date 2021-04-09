@@ -28,6 +28,7 @@ import es.ujaen.uvirtual.beans.uvirtual.bolsaempleo.Merito;
 import es.ujaen.uvirtual.beans.vistas.uvirtual.bolsaempleo.VistaMeritos;
 import es.ujaen.uvirtual.modelo.bolsaempleo.ModeloBaremacion;
 import es.ujaen.uvirtual.modelo.bolsaempleo.ModeloMerito;
+import es.ujaen.uvirtual.modelo.bolsaempleo.ModeloUsuarioBolsaEmpleo;
 import es.ujaen.uvirtual.utilidades.BolsaEmpleoUtils;
 import es.ujaen.uvirtual.utilidades.DataTable;
 import es.ujaen.uvirtual.utilidades.EscapaHTML;
@@ -108,7 +109,7 @@ public class ControladorMisMeritos extends HttpServlet {
 		try {
 			switch (nombreAccion) {
 				case ACCION_AGREGAR_MERITO:
-					agregarMerito(bean, request, response);
+					agregarMerito(bean, datos, request, response);
 					break;
 				case ACCION_DATATABLE:
 					listadoMeritos(bean, datos, request, response);
@@ -153,6 +154,7 @@ public class ControladorMisMeritos extends HttpServlet {
 	
 	/** agrega un nuevo mérito.
 	 * @param bean .
+	 * @param datos .
 	 * @param request .
 	 * @param response .
 	 * @throws SQLException excepcion de bbdd.
@@ -160,7 +162,7 @@ public class ControladorMisMeritos extends HttpServlet {
 	 * @throws IOException en caso de error de input u output .
 	 * @throws ServletException .
 	 */
-	private void agregarMerito(VistaMeritos bean, HttpServletRequest request, HttpServletResponse response)
+	private void agregarMerito(VistaMeritos bean, UVDatos datos, HttpServletRequest request, HttpServletResponse response)
 			throws SQLException, UVException, IOException, ServletException {
 		bean.setVista(RUTA_BEP_MERITOS + "formMerito.jsp");
 		
@@ -191,9 +193,11 @@ public class ControladorMisMeritos extends HttpServlet {
 						String descripcion = EscapaHTML.ajustaCodificacion(request.getParameter(PARAM_DESCRIPCION));
 						String observacion = EscapaHTML.ajustaCodificacion(request.getParameter(PARAM_OBSERVACION));
 						Integer itemId = Formateador.leeParametroInteger(request.getParameter(PARAM_ITEM));
+						Usuario usuArcos = datos.getUsuario();
+						Integer idUsuario = new ModeloUsuarioBolsaEmpleo().listaUsuario(usuArcos.getUid()).getCodNum();
 						
 						Merito merito = new Merito(valor, descripcion, observacion, new ItemBaremacion(itemId), input);
-						new ModeloMerito().insertaMerito(merito, 1);
+						new ModeloMerito().insertaMerito(merito, idUsuario);
 						
 						HttpSession session = request.getSession(false);
 						session.setAttribute(MENSAJE_ENVIADO, MENSAJE_EXITO_AGREGAR);
@@ -277,8 +281,9 @@ public class ControladorMisMeritos extends HttpServlet {
 		
 		try (PrintWriter writer = response.getWriter()) {
 			try {
-				Integer usuario = 1;
-				DataTable<Merito> dataTable = modelo.listaMeritosDatatable(request.getParameterMap(), usuario);
+				Usuario usuArcos = datos.getUsuario();
+				Integer idUsuario = new ModeloUsuarioBolsaEmpleo().listaUsuario(usuArcos.getUid()).getCodNum();
+				DataTable<Merito> dataTable = modelo.listaMeritosDatatable(request.getParameterMap(), idUsuario);
 				bean.setDatatable(dataTable);
 				Gson gson = new GsonBuilder().setExclusionStrategies(DataTable.GSONEXCLUSIONSTRATEGY).create();
 				writer.write(gson.toJson(dataTable));
