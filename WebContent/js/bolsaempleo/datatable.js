@@ -173,13 +173,20 @@ function DataTable(id, config) {
         $(pagination).append(btnLast);
 
         // acciones
-        var actions = $('<span class="actions"></span>');;
+        var actions = $('<span class="actions"></span>');
         if (self.config.actions) {
             for (var i = 0; i < self.config.actions.length; i++) {
-                var action = self.config.actions[i];
-                var btn = $('<button class="btn" type="button">' + action.label + '</button>');
-                $(btn).on("click", action.onClick.bind(self, selected));
-                $(actions).append(btn);
+            	var action = self.config.actions[i];
+            	if (action.showWhenSelected == null || action.showWhenSelected == (self.config.selected > 0)) {
+	            	var btn = $('<button class="btn" type="button">' + action.label + '</button>');
+	            	
+	            	if (self.config.selected) {
+	            		selected = self.config.selected;
+	            	}
+	            	
+	            	$(btn).on("click", action.onClick.bind(self, selected));
+	            	$(actions).append(btn);
+	            }
             }
         }
 

@@ -34,6 +34,42 @@ public class ItemBaremacion implements Serializable {
 		this.codNum = pcodNum;
 		this.codigo = pcodigo;
 		this.nombre = pnombre;
+		this.activo = pactivo;
+	}
+	
+	/** Constructor con parametros.
+	 * @param pcodNum .
+	 * @param pbloque .
+	 * @param pcodigo .
+	 * @param pnombre .
+	 */
+	public ItemBaremacion(Integer pcodNum, BloqueBaremacion pbloque, String pcodigo, String pnombre) {
+		super();
+		this.bloque = pbloque;
+		this.codNum = pcodNum;
+		this.codigo = pcodigo;
+		this.nombre = pnombre;
+	}
+	
+	/** Constructor con parametros.
+	 * @param pbloque .
+	 * @param pcodigo .
+	 * @param pnombre .
+	 */
+	public ItemBaremacion(BloqueBaremacion pbloque, String pcodigo, String pnombre) {
+		super();
+		this.bloque = pbloque;
+		this.codigo = pcodigo;
+		this.nombre = pnombre;
+	}
+	
+	/** Constructor con parametros.
+	 * @param pcodNum .
+	 * @param pactivo .
+	 */
+	public ItemBaremacion(Integer pcodNum, Boolean pactivo) {
+		super();
+		this.codNum = pcodNum;
 		this.activo = pactivo;		
 	}
 	
