@@ -21,12 +21,12 @@ VistaUsuarioBolsaEmpleo bean = (VistaUsuarioBolsaEmpleo) uvdatos.getVistas().get
 		</div>
 	<% } else { %>
 	
-		<div class="titulo-bolsa-empleo">
+		<div class="titulo-bolsa-empleo" style="float:right;">
+			<a class="link-btn" id="nuevo_usuario" href="<%= request.getRequestURI() %>" style="margin-top:0">Nuevo usuario</a>
+		</div>
+	
+	<div class="titulo-bolsa-empleo" style="margin-top:1rem;">
 		<h2>Usuarios</h2>
-    
-	    <a class="link-btn" id="nuevo_usuario" href="<%= request.getRequestURI() %>">
-	    	 Buscar usuario
-	    </a>
 	</div>
 	
 	<table class="bluetable bolsaempleo" id="table_usuarios">
@@ -51,7 +51,10 @@ VistaUsuarioBolsaEmpleo bean = (VistaUsuarioBolsaEmpleo) uvdatos.getVistas().get
 		</tfoot>
 	</table>
 	
+	<div class="titulo-bolsa-empleo" style="margin-top:1rem;">
 		<h2>Usuarios Borrados</h2>
+	</div>
+	
 		<table class="bluetable bolsaempleo" id="table_usuarios_borrados">
 		<tr>
 			<th scope="col" style="width:5%"></th>
@@ -74,7 +77,11 @@ VistaUsuarioBolsaEmpleo bean = (VistaUsuarioBolsaEmpleo) uvdatos.getVistas().get
 		</tfoot>
 	</table>
 	
+		<div class="titulo-bolsa-empleo" style="margin-top:1rem;">
 		<h2>Usuarios Excluidos</h2>
+
+	</div>
+
 		<table class="bluetable bolsaempleo" id="table_usuarios_excluidos">
 		<tr>
 			<th scope="col" style="width:5%"></th>
@@ -131,7 +138,7 @@ $(document).ready(function() {
         		}
         	}},
         	{'data': 'codnum', 'buttons': [{'label': 'Editar', 'onClick': function(row) {
-        		var params = {'a': '<%= ControladorUsuarioBolsaEmpleo.ACCION_EDITAR_USUARIO %>', 'nombreusuario': row.admusuidentificador};
+        		var params = {'a': '<%= ControladorUsuarioBolsaEmpleo.ACCION_EDITAR_USUARIO %>', '<%= ControladorUsuarioBolsaEmpleo.PARAM_NOMBRE_USUARIO %>': row.codcuenta};
         		Atis.sendForm("<%= request.getRequestURI() %>", params);
         	}}, 
         	{'label': function(row) { return "Borrar"; }, 'onClick': function(row) {
@@ -141,7 +148,8 @@ $(document).ready(function() {
         		Atis.confirmDialog(titulo, mensaje, {
 		        	Si: function() {
 		        		var params = {'a': '<%= ControladorUsuarioBolsaEmpleo.ACCION_ELIMINAR_USUARIO %>',
-		        			'id': row.codNum};
+		        			'id': row.codNum,
+		        			'<%= ControladorUsuarioBolsaEmpleo.PARAM_BORRADO %>': !row.borrado}
 	        			Atis.sendForm("<%= request.getRequestURI() %>", params);
 		          		$(this).dialog("close");
 		        	},
@@ -177,7 +185,7 @@ $(document).ready(function() {
         		}
         	}},
         	{'data': 'codnum', 'buttons': [{'label': 'Editar', 'onClick': function(row) {
-        		var params = {'a': '<%= ControladorUsuarioBolsaEmpleo.ACCION_EDITAR_USUARIO %>', 'nombreusuario': row.admusuidentificador};
+        		var params = {'a': '<%= ControladorUsuarioBolsaEmpleo.ACCION_EDITAR_USUARIO %>', '<%= ControladorUsuarioBolsaEmpleo.PARAM_NOMBRE_USUARIO %>': row.codcuenta};
         		Atis.sendForm("<%= request.getRequestURI() %>", params);
         	}}, 
         	{'label': function(row) { return "Borrar"; }, 'onClick': function(row) {
@@ -187,7 +195,8 @@ $(document).ready(function() {
         		Atis.confirmDialog(titulo, mensaje, {
 		        	Si: function() {
 		        		var params = {'a': '<%= ControladorUsuarioBolsaEmpleo.ACCION_ELIMINAR_USUARIO %>',
-		        			'id': row.codNum};
+		        			'id': row.codNum,
+		        			'<%= ControladorUsuarioBolsaEmpleo.PARAM_BORRADO %>': !row.borrado}
 	        			Atis.sendForm("<%= request.getRequestURI() %>", params);
 		          		$(this).dialog("close");
 		        	},
@@ -225,7 +234,7 @@ $(document).ready(function() {
         		}
         	}},
         	{'data': 'codnum', 'buttons': [{'label': 'Editar', 'onClick': function(row) {
-        		var params = {'a': '<%= ControladorUsuarioBolsaEmpleo.ACCION_EDITAR_USUARIO %>', 'nombreusuario': row.admusuidentificador};
+        		var params = {'a': '<%= ControladorUsuarioBolsaEmpleo.ACCION_EDITAR_USUARIO %>', '<%= ControladorUsuarioBolsaEmpleo.PARAM_NOMBRE_USUARIO %>': row.codcuenta};
         		Atis.sendForm("<%= request.getRequestURI() %>", params);
         	}}, 
         	{'label': function(row) { return "Borrar"; }, 'onClick': function(row) {
@@ -235,7 +244,8 @@ $(document).ready(function() {
         		Atis.confirmDialog(titulo, mensaje, {
 		        	Si: function() {
 		        		var params = {'a': '<%= ControladorUsuarioBolsaEmpleo.ACCION_ELIMINAR_USUARIO %>',
-		        			'id': row.codNum};
+		        			'id': row.codNum,
+		        			'<%= ControladorUsuarioBolsaEmpleo.PARAM_BORRADO %>': !row.borrado}
 	        			Atis.sendForm("<%= request.getRequestURI() %>", params);
 		          		$(this).dialog("close");
 		        	},
