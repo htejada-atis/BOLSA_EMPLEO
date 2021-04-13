@@ -12,7 +12,7 @@ VistaUsuarioBolsaEmpleo bean = (VistaUsuarioBolsaEmpleo) uvdatos.getVistas().get
 %>
 
 
-<div class="bolsa-empleo">
+<div class="bolsa-empleo usuarios-form">
 
 	<% 
 		if(bean.getMensajesDeError().size()>0) {
@@ -68,44 +68,55 @@ VistaUsuarioBolsaEmpleo bean = (VistaUsuarioBolsaEmpleo) uvdatos.getVistas().get
     	<input type="hidden" name="<%= ControladorUsuarioBolsaEmpleo.PARAM_ACCION %>" id="accion_formulario" value="" />
 		<input type="hidden" name="<%= ControladorUsuarioBolsaEmpleo.PARAM_ID%>" id="usuario_id" value="" />
 		<input type="hidden" name="<%= ControladorUsuarioBolsaEmpleo.PARAM_NOMBRE_USUARIO%>" id="usuario_nombre" value="" />
+		<div class="form-group-container">
+    		<div class="form-group">
+    			<label for="nickname">Usuario: </label>
+    			<input class="form-input-custom" id="nickname" type="text" name="<%= ControladorUsuarioBolsaEmpleo.PARAM_NOMBRE_USUARIO%>" value="<%= usuario %>" disabled/>
+    		</div>
+	   		<div class="form-group">
+    			<label for="nombre">Nombre: </label>
+    			<input class="form-input-custom" id="nombre" type="text" name="<%= ControladorUsuarioBolsaEmpleo.PARAM_NOMBRE %>" value="<%= nombre %>" disabled/>
+    		</div>
+    	</div>
+    	
+    	<div class="form-group-container">
+    	    <div class="form-group">
+    			<label for="apellidos">Apellidos: </label>
+    			<input class="form-input-custom" id="apellidos" type="text" name="<%= ControladorUsuarioBolsaEmpleo.PARAM_NOMBRE %>" value="<%= apellidos %>" disabled/>
+    		</div>
+    		<div class="form-group">
+    			<label for="email">Email: </label>
+    			<input class="form-input-custom" id="email" type="text" name="<%= ControladorUsuarioBolsaEmpleo.PARAM_NOMBRE %>" value="<%= email %>" disabled/>
+    		</div>
+    	</div>
+
+		<div class="form-group-container">
+	    	<div class="form-group">
+    			<label for="tipo_documento">Tipo de documento: </label>
+    			<input class="form-input-custom" id="tipo_documento" type="text" name="<%= ControladorUsuarioBolsaEmpleo.PARAM_NOMBRE %>" value="<%= tipo_documento %>" disabled/>
+    		</div>
+    		<div class="form-group">
+    			<label for="n_documento">Nº de documento: </label>
+    			<input class="form-input-custom" id="n_documento" type="text" name="<%= ControladorUsuarioBolsaEmpleo.PARAM_NOMBRE %>" value="<%= n_documento %>" disabled/>
+    		</div>
+		</div>
+		<div class="form-group-container">
+	    	<div class="form-check">
+    			<label for="usuario_lista_dist"><input class="params" type="checkbox" id="usuario_lista_dist" name="<%= ControladorUsuarioBolsaEmpleo.PARAM_LISTA %>" value="<%= lista_dist %>" <%= (lista_dist ? "checked=''" : "") %>/>Lista Distribución</label>
+    		</div>
+    		<div class="form-check">
+    			<label for="usuario_excluido"><input class="params" type="checkbox" id="usuario_excluido" name="<%= ControladorUsuarioBolsaEmpleo.PARAM_EXCLUIDO %>" value="<%= excluido %>" <%= (excluido ? "checked=''" : "") %>/>Excluido</label>
+    		</div>
+		</div>
+	
 		<div class="form-group">
-    		<label for="nickname">Usuario: </label>
-    		<input id="nickname" type="text" name="<%= ControladorUsuarioBolsaEmpleo.PARAM_NOMBRE_USUARIO%>" value="<%= usuario %>" disabled/>
-    	</div>
-	   	<div class="form-group">
-    		<label for="nombre">Nombre: </label>
-    		<input id="nombre" type="text" name="<%= ControladorUsuarioBolsaEmpleo.PARAM_NOMBRE %>" value="<%= nombre %>" disabled/>
-    	</div>
-    	<div class="form-group">
-    		<label for="apellidos">Apellidos: </label>
-    		<input id="apellidos" type="text" name="<%= ControladorUsuarioBolsaEmpleo.PARAM_NOMBRE %>" value="<%= apellidos %>" disabled/>
-    	</div>
-    	<div class="form-group">
-    		<label for="email">Email: </label>
-    		<input id="email" type="text" name="<%= ControladorUsuarioBolsaEmpleo.PARAM_NOMBRE %>" value="<%= email %>" disabled/>
-    	</div>
-    	<div class="form-group">
-    		<label for="tipo_documento">Tipo de documento: </label>
-    		<input id="tipo_documento" type="text" name="<%= ControladorUsuarioBolsaEmpleo.PARAM_NOMBRE %>" value="<%= tipo_documento %>" disabled/>
-    	</div>
-    	<div class="form-group">
-    		<label for="n_documento">Nº de documento: </label>
-    		<input id="n_documento" type="text" name="<%= ControladorUsuarioBolsaEmpleo.PARAM_NOMBRE %>" value="<%= n_documento %>" disabled/>
-    	</div>
-    	<div class="form-check">
-    		<label for="usuario_lista_dist"><input class="params" type="checkbox" id="usuario_lista_dist" name="<%= ControladorUsuarioBolsaEmpleo.PARAM_LISTA %>" value="<%= lista_dist %>" <%= (lista_dist ? "checked=''" : "") %>/>Lista Distribución</label>
-    	</div>
-    	<div class="form-check">
-    		<label for="usuario_excluido"><input class="params" type="checkbox" id="usuario_excluido" name="<%= ControladorUsuarioBolsaEmpleo.PARAM_EXCLUIDO %>" value="<%= excluido %>" <%= (excluido ? "checked=''" : "") %>/>Excluido</label>
-    	</div>
-    	<div class="form-group">
     		<label for="razon_exclusion">Razón exclusión</label>
-    		<textarea class="params" id="razon_exclusion" name="<%= ControladorUsuarioBolsaEmpleo.PARAM_RAZON_EXCLUIDO %>" rows="3" cols="50"><%= razon_excluido %></textarea>
-    	</div>
+    		<textarea class="params form-input-custom" id="razon_exclusion" name="<%= ControladorUsuarioBolsaEmpleo.PARAM_RAZON_EXCLUIDO %>" rows="3" cols="60"><%= razon_excluido %></textarea>
+   		</div>
 		
 		<div class="form-group">
 			<label for="select_role">Elija el rol para asociar</label>
-			<select class="params" id="select_role" name="<%= ControladorUsuarioBolsaEmpleo.PARAM_ROLE %>">
+			<select class="params" id="select_role" name="<%= ControladorUsuarioBolsaEmpleo.PARAM_ROLE %>" style="width:100%;">
 				<option value="0"> - </option>
     				<%for(Rol role: bean.getRoles()){
     					if(bean.getUsuario()!=null){
@@ -123,6 +134,7 @@ VistaUsuarioBolsaEmpleo bean = (VistaUsuarioBolsaEmpleo) uvdatos.getVistas().get
 					}%>
 			</select>
 		</div>
+		
     	<div class="form-btn">
     		<input id="usuario_enviar" type="submit" name="<%= ControladorUsuarioBolsaEmpleo.PARAM_ENVIAR %> " value="<%if(bean.getUsuario()!=null){%><%if(bean.getBusqueda()){%>Volver<%}else{%>Guardar usuario<%}%><%}else{%>Añadir usuario<%}%>"/>
     	</div>

@@ -19,16 +19,19 @@ import javax.servlet.http.HttpSession;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+import com.google.gson.reflect.TypeToken;
 
 import es.ujaen.uvirtual.beans.CodigoDescripcion;
 import es.ujaen.uvirtual.beans.Rol;
 import es.ujaen.uvirtual.beans.UVDatos;
 import es.ujaen.uvirtual.beans.Usuario;
 import es.ujaen.uvirtual.adm.CrearUsuario;
+import es.ujaen.uvirtual.beans.uvirtual.bolsaempleo.Bolsa;
 import es.ujaen.uvirtual.beans.uvirtual.bolsaempleo.Noticia;
 import es.ujaen.uvirtual.beans.uvirtual.bolsaempleo.UsuarioBolsaEmpleo;
 import es.ujaen.uvirtual.beans.vistas.uvirtual.bolsaempleo.VistaNoticias;
 import es.ujaen.uvirtual.beans.vistas.uvirtual.bolsaempleo.VistaUsuarioBolsaEmpleo;
+import es.ujaen.uvirtual.modelo.bolsaempleo.ModeloBolsa;
 import es.ujaen.uvirtual.modelo.bolsaempleo.ModeloNoticia;
 import es.ujaen.uvirtual.modelo.bolsaempleo.ModeloRol;
 import es.ujaen.uvirtual.modelo.bolsaempleo.ModeloUsuarioBolsaEmpleo;
@@ -67,6 +70,7 @@ public class ControladorUsuarioBolsaEmpleo extends HttpServlet {
 	public static final String PARAM_ENVIAR = "enviar";
 	public static final String PARAM_ID = "id";
 	public static final String PARAM_BORRADO = "borrar";
+	public static final String PARAM_EMAIL = "email";
 	
 	// acciones
 	public static final String ACCION_LISTAR = "listar";
@@ -81,6 +85,9 @@ public class ControladorUsuarioBolsaEmpleo extends HttpServlet {
 	public static final String ACCION_ELIMINAR_USUARIO = "eliminarusuario";
 	public static final String ACCION_LISTAR_USUARIOS = "listar_usuarios";
 	public static final String ACCION_LISTAR_ROLES = "listar_roles";
+	public static final String ACCION_EXCLUIR_USUARIO = "excluirusuario";
+	public static final String ACCION_RECUPERAR_USUARIO = "recuperarusuario";
+	public static final String ACCION_INCLUIR_USUARIO = "incluirusuario";
 	
 	public static final String ACCION_DATATABLE_USUARIOS = "datatableusuarios";
 	public static final String ACCION_DATATABLE_USUARIOS_BORRADOS = "datatableusuariosborrados";
@@ -111,7 +118,7 @@ public class ControladorUsuarioBolsaEmpleo extends HttpServlet {
 		VistaUsuarioBolsaEmpleo bean = new VistaUsuarioBolsaEmpleo();		
 		Usuario usuario = datos.getUsuario();
 		LOGGER.log(Level.FINEST, "usuario que ha entrado en el servlet es {0}", usuario.getUid());
-				
+		
 		String nombreAccion = EscapaHTML.ajustaCodificacion(request.getParameter(PARAM_ACCION));
 		if (nombreAccion == null) {
 			nombreAccion = ACCION_LISTAR;
@@ -136,9 +143,6 @@ public class ControladorUsuarioBolsaEmpleo extends HttpServlet {
 			case ACCION_DATATABLE_USUARIOS_EXCLUIDOS:
 				listadoExcluidos(bean, datos, request, response);
 				break;
-			case ACCION_DATATABLE:
-				listado(bean, datos, request, response);
-				break;
 			case ACCION_LISTAR_ROLES:
 				obtenerRoles(bean);
 				break;
@@ -148,8 +152,11 @@ public class ControladorUsuarioBolsaEmpleo extends HttpServlet {
 			case ACCION_EDITAR_USUARIO:
 				editarUsuario(request, response, bean);
 				break;
-			case ACCION_ELIMINAR_USUARIO:
-				eliminarUsuario(bean, request, response);
+			case ACCION_EXCLUIR_USUARIO:
+				excluirUsuario(request, response, bean);
+				break;
+			case ACCION_USUARIO:
+				accionSobreUsuario(request, response, bean);						
 				break;
 			case ACCION_VOLVER_USUARIO:
 				volverUsuario(request, response, bean);
@@ -190,10 +197,10 @@ public class ControladorUsuarioBolsaEmpleo extends HttpServlet {
 	 * @param datos .
 	 * @param request .
 	 * @param response .
-	 * @throws IOException .
+	 * @throws IOException . 
 	 * @throws SQLException .
 	 */
-	private void listado(VistaUsuarioBolsaEmpleo bean, UVDatos datos, HttpServletRequest request, HttpServletResponse response) throws IOException, SQLException {
+	private void listado(VistaUsuarioBolsaEmpleo bean, UVDatos datos, HttpServletRequest request, HttpServletResponse response) throws IOException {
 		ModeloUsuarioBolsaEmpleo modelo = new ModeloUsuarioBolsaEmpleo();		
 		datos.setContentType("application/json");
 		datos.setRespuestaEnviada(true);
@@ -204,7 +211,7 @@ public class ControladorUsuarioBolsaEmpleo extends HttpServlet {
 			try {
 				DataTable<UsuarioBolsaEmpleo> dataTable = modelo.listaUsuarioBolsaEmpleoDatatable(request.getParameterMap());
 				Gson gson = new GsonBuilder().setExclusionStrategies(DataTable.GSONEXCLUSIONSTRATEGY).create();
-
+				bean.setDatatable(dataTable);
 				writer.write(gson.toJson(dataTable));
 			} catch (Exception ex) {
 				bean.getMensajesDeError().add(ex.getMessage());
@@ -223,9 +230,8 @@ public class ControladorUsuarioBolsaEmpleo extends HttpServlet {
 	 * @param request .
 	 * @param response .
 	 * @throws IOException .
-	 * @throws SQLException .
 	 */
-	public void listadoBorrados(VistaUsuarioBolsaEmpleo bean, UVDatos datos, HttpServletRequest request, HttpServletResponse response) throws IOException, SQLException {
+	public void listadoBorrados(VistaUsuarioBolsaEmpleo bean, UVDatos datos, HttpServletRequest request, HttpServletResponse response) throws IOException {
 		ModeloUsuarioBolsaEmpleo modelo = new ModeloUsuarioBolsaEmpleo();		
 		datos.setContentType("application/json");
 		datos.setRespuestaEnviada(true);
@@ -236,7 +242,7 @@ public class ControladorUsuarioBolsaEmpleo extends HttpServlet {
 			try {
 				DataTable<UsuarioBolsaEmpleo> dataTable = modelo.listaUsuarioBorradoBolsaEmpleoDatatable(request.getParameterMap());
 				Gson gson = new GsonBuilder().setExclusionStrategies(DataTable.GSONEXCLUSIONSTRATEGY).create();
-
+				bean.setDatatable(dataTable);
 				writer.write(gson.toJson(dataTable));
 			} catch (Exception ex) {
 				bean.getMensajesDeError().add(ex.getMessage());
@@ -255,9 +261,9 @@ public class ControladorUsuarioBolsaEmpleo extends HttpServlet {
 	 * @param request .
 	 * @param response .
 	 * @throws IOException .
-	 * @throws SQLException .
+
 	 */
-	public void listadoExcluidos(VistaUsuarioBolsaEmpleo bean, UVDatos datos, HttpServletRequest request, HttpServletResponse response) throws IOException, SQLException {
+	public void listadoExcluidos(VistaUsuarioBolsaEmpleo bean, UVDatos datos, HttpServletRequest request, HttpServletResponse response) throws IOException {
 		ModeloUsuarioBolsaEmpleo modelo = new ModeloUsuarioBolsaEmpleo();		
 		datos.setContentType("application/json");
 		datos.setRespuestaEnviada(true);
@@ -268,7 +274,7 @@ public class ControladorUsuarioBolsaEmpleo extends HttpServlet {
 			try {
 				DataTable<UsuarioBolsaEmpleo> dataTable = modelo.listaUsuarioExcluidoBolsaEmpleoDatatable(request.getParameterMap());
 				Gson gson = new GsonBuilder().setExclusionStrategies(DataTable.GSONEXCLUSIONSTRATEGY).create();
-
+				bean.setDatatable(dataTable);
 				writer.write(gson.toJson(dataTable));
 			} catch (Exception ex) {
 				bean.getMensajesDeError().add(ex.getMessage());
@@ -280,6 +286,38 @@ public class ControladorUsuarioBolsaEmpleo extends HttpServlet {
 		}
 	}
 	
+	
+	
+	private void accionSobreUsuario(HttpServletRequest request, HttpServletResponse response, VistaUsuarioBolsaEmpleo bean) throws SQLException, UVException, IOException {
+		String selectedJson = EscapaHTML.ajustaCodificacion(request.getParameter(PARAM_USUARIOS_SELECCIONADOS));
+		String nombreAccionUsuario = EscapaHTML.ajustaCodificacion(request.getParameter(PARAM_ACCION_USUARIO));
+		int[] selected = (new Gson()).fromJson(selectedJson, new TypeToken<int[]>() { }.getType());
+		
+		ModeloUsuarioBolsaEmpleo modelo = new ModeloUsuarioBolsaEmpleo();
+		
+		List<UsuarioBolsaEmpleo> usuarios = modelo.getUsuariosByIds(selected);
+
+		switch (nombreAccionUsuario) {
+		case ACCION_ELIMINAR_USUARIO:
+			modelo.ponerUsuarioComoBorrado(usuarios);							
+			break;
+		case ACCION_RECUPERAR_USUARIO:
+			modelo.ponerUsuarioComoNoBorrado(usuarios);
+			break;
+		case ACCION_INCLUIR_USUARIO:
+			modelo.ponerUsuarioComoNoExcluido(usuarios);
+			break;
+		default:
+			bean.getMensajesDeError().add(MENSAJE_ERROR_ACCION_USUARIO_NO_VALIDA);
+			return;
+		}
+		
+		bean.getMensajesDeExito().add(MENSAJE_EXITO_USUARIO_MODIFICADO_CORRECTAMENTE);
+	}
+	
+	
+	
+	
 	/** Busca un usuario.
 	 * @param request .
 	 * @param response .
@@ -287,7 +325,7 @@ public class ControladorUsuarioBolsaEmpleo extends HttpServlet {
 	 * @throws SQLException excepcion de bbdd.
 	 * @throws UVException en caso de error en bd
 	 */
-	private void buscarUsuario(HttpServletRequest request, HttpServletResponse response, VistaUsuarioBolsaEmpleo bean) throws SQLException, UVException, IOException {
+	private void buscarUsuario(HttpServletRequest request, HttpServletResponse response, VistaUsuarioBolsaEmpleo bean) throws SQLException, UVException {
 		ModeloUsuarioBolsaEmpleo modelo = new ModeloUsuarioBolsaEmpleo();
 		
 		obtenerRoles(bean);
@@ -402,27 +440,46 @@ public class ControladorUsuarioBolsaEmpleo extends HttpServlet {
 		}
 	}
 	
-	
-	/** eliminar un usuario.
-	 * @param bean .
+	/** excluir un usuario .
 	 * @param request .
 	 * @param response .
+	 * @param bean bean de la vista a la que poner los valores .
 	 * @throws SQLException excepcion de bbdd.
-	 * @throws UVException en caso de error de parametros .
-	 * @throws IOException en caso de error de input u output .
+	 * @throws UVException en caso de error en bd
+	 * @throws IOException en caso de error de IO.
 	 */
-	private void eliminarUsuario(VistaUsuarioBolsaEmpleo bean, HttpServletRequest request, HttpServletResponse response) throws SQLException, UVException, IOException {
+	private void excluirUsuario(HttpServletRequest request, HttpServletResponse response, VistaUsuarioBolsaEmpleo bean) throws SQLException, UVException, IOException {
+		bean.setVista("/WEB-INF/jsp/vista/infadministrativa/bolsaempleo/configuracion/buscarUsuario.jsp");
+		
 		ModeloUsuarioBolsaEmpleo modelo = new ModeloUsuarioBolsaEmpleo();
-		Integer codNum = Formateador.leeParametroInteger(request.getParameter(PARAM_ID));
-		UsuarioBolsaEmpleo usuario = new UsuarioBolsaEmpleo();
-		usuario.setCodNum(codNum);
-		Boolean borrado = request.getParameter(PARAM_BORRADO) != null && EscapaHTML.ajustaCodificacion(request.getParameter(PARAM_BORRADO)).equals("true");
-		usuario.setBorrado(borrado);
-		modelo.borraRestauraUsuario(usuario);
-		bean.getMensajesDeExito().add(MENSAJE_EXITO_ELIMINAR);
-		HttpSession session = request.getSession(false);
-		session.setAttribute(MENSAJE_ENVIADO, MENSAJE_EXITO_ELIMINAR);
-		response.sendRedirect(request.getServletPath());
+		
+		obtenerRoles(bean);
+		
+		UsuarioBolsaEmpleo usu = modelo.listaUsuario(Formateador.leeParametroString(request.getParameter(PARAM_NOMBRE_USUARIO)));
+		Usuario usuArcos = CrearUsuario.usuario(request.getParameter(PARAM_NOMBRE_USUARIO));
+		
+		bean.setBusqueda(true);
+		
+		bean.setUsuarioArcos(usuArcos);
+		bean.setUsuario(usu);
+		bean.setRol(usu.getRol());
+		
+		if (EscapaHTML.ajustaCodificacion(request.getParameter(PARAM_RAZON_EXCLUIDO)) != null) {
+			Integer codNum = Formateador.leeParametroInteger(request.getParameter(PARAM_ID));
+			Boolean excluido = true;
+					
+			String razonexcluido = EscapaHTML.ajustaCodificacion(request.getParameter(PARAM_RAZON_EXCLUIDO));
+			
+			SimpleDateFormat formatter = new SimpleDateFormat("dd/MM/YYYY HH:mm:ss");
+			Date date = new Date(System.currentTimeMillis());
+			
+			UsuarioBolsaEmpleo usuario = new UsuarioBolsaEmpleo(codNum, excluido, razonexcluido, date);
+			
+			modelo.ponerUsuarioComoExcluido(usuario);
+			HttpSession session = request.getSession(false);
+			session.setAttribute(MENSAJE_ENVIADO, MENSAJE_EXITO_EDITAR);
+			response.sendRedirect(request.getServletPath());
+		}
 	}
 	
 	
@@ -433,8 +490,9 @@ public class ControladorUsuarioBolsaEmpleo extends HttpServlet {
 	 * @throws SQLException excepcion de bbdd.
 	 * @throws UVException en caso de error en bd
 	 */
-	private void formularioUsuario(HttpServletRequest request, HttpServletResponse response, VistaUsuarioBolsaEmpleo bean) throws SQLException, UVException, IOException {
+	private void formularioUsuario(HttpServletRequest request, HttpServletResponse response, VistaUsuarioBolsaEmpleo bean) {
 		bean.setVista("/WEB-INF/jsp/vista/infadministrativa/bolsaempleo/configuracion/buscarUsuario.jsp");
+		bean.setBusqueda(false);
 	}
 	
 	
