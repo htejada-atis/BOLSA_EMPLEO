@@ -56,7 +56,7 @@ function DataTable(id, config) {
         self.loading(false);
     	self.checkUncheckAll(false);
     	self.renderFooter();
-
+    	
         // limpiamos
         $('tr', self.tbody).empty();
     	

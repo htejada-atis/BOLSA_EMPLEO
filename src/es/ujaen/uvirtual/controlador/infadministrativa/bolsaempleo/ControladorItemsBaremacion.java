@@ -4,7 +4,6 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.sql.SQLException;
 import java.util.logging.Logger;
-import java.util.Date;
 import java.util.logging.Level;
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
@@ -20,11 +19,8 @@ import es.ujaen.uvirtual.beans.Usuario;
 import es.ujaen.uvirtual.beans.uvirtual.bolsaempleo.ApartadoBaremacion;
 import es.ujaen.uvirtual.beans.uvirtual.bolsaempleo.BloqueBaremacion;
 import es.ujaen.uvirtual.beans.uvirtual.bolsaempleo.ItemBaremacion;
-import es.ujaen.uvirtual.beans.uvirtual.bolsaempleo.Noticia;
 import es.ujaen.uvirtual.beans.vistas.uvirtual.bolsaempleo.VistaItemsBaremacion;
-import es.ujaen.uvirtual.beans.vistas.uvirtual.bolsaempleo.VistaNoticias;
 import es.ujaen.uvirtual.modelo.bolsaempleo.ModeloBaremacion;
-import es.ujaen.uvirtual.modelo.bolsaempleo.ModeloNoticia;
 import es.ujaen.uvirtual.utilidades.DataTable;
 import es.ujaen.uvirtual.utilidades.EscapaHTML;
 import es.ujaen.uvirtual.utilidades.Formateador;
@@ -504,6 +500,7 @@ public class ControladorItemsBaremacion extends HttpServlet {
 	/** Devuelve un bloque con id dado a la vista .
 	 * @param bean .
 	 * @param request .
+	 * @param idBloque .
 	 * @throws SQLException .
 	 * @throws UVException .
 	 */
@@ -516,6 +513,7 @@ public class ControladorItemsBaremacion extends HttpServlet {
 	/** Devuelve un ítem con id dado a la vista .
 	 * @param bean .
 	 * @param request .
+	 * @param idItem .
 	 * @throws SQLException .
 	 * @throws UVException .
 	 */

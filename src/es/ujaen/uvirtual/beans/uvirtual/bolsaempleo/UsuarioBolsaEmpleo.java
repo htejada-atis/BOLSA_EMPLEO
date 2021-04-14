@@ -112,6 +112,30 @@ public class UsuarioBolsaEmpleo implements Serializable {
 		this.codNum = pcodNum;
 	}
 	
+	/** Constructor copia.
+	 * @param copia Usuario a copiar
+	 */
+	public UsuarioBolsaEmpleo(UsuarioBolsaEmpleo copia) {
+		this.codNum = copia.codNum;
+		this.codpersona = copia.codpersona;
+		this.codcuenta = copia.codcuenta;
+		this.tipodocumento = copia.tipodocumento;
+		this.numdocumento = copia.numdocumento;
+		this.nombre = copia.nombre;
+		this.apellido1 = copia.apellido1;
+		this.apellido2 = copia.apellido2;
+		this.sexo = copia.sexo;
+		this.email = copia.email;
+		this.usuarioArcos = copia.usuarioArcos;
+		this.rol = copia.rol;
+		this.listaDist = copia.listaDist;
+		this.excluido = copia.excluido;
+		this.razonExclusion = copia.razonExclusion;
+		this.fechaExclusion = copia.fechaExclusion;
+		this.borrado = copia.borrado;
+		this.fechaBorrado = copia.fechaBorrado;
+	}
+	
 	public Integer getCodNum() {
 		return codNum;
 	}

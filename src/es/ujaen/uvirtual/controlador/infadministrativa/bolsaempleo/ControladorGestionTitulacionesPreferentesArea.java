@@ -94,21 +94,21 @@ public class ControladorGestionTitulacionesPreferentesArea extends HttpServlet {
 		
 		try {
 			switch (nombreAccion) {
-			case ACCION_ELIMINAR_TITULACION_AREA:
-				eliminarTitulacionesArea(request, response, bean);
-				break;
-			case ACCION_INCLUIR_TITULACION_AREA:
-				incluirTitulacionesPreferentesArea(request, response, bean);
-				break;
-			case ACCION_LISTAR_AREAS:
-				obtenerAreas(bean);
-				break;
-			case ACCION_DATATABLE_TITULACIONES:
-				listadoTitulaciones(bean, datos, request, response);
-				break;
-			case ACCION_DATATABLE_TITULACIONES_AREA:
-				listadoTitulacionesArea(bean, datos, request, response);
-				break;
+				case ACCION_ELIMINAR_TITULACION_AREA:
+					eliminarTitulacionesArea(request, response, bean);
+					break;
+				case ACCION_INCLUIR_TITULACION_AREA:
+					incluirTitulacionesPreferentesArea(request, response, bean);
+					break;
+				case ACCION_LISTAR_AREAS:
+					obtenerAreas(bean);
+					break;
+				case ACCION_DATATABLE_TITULACIONES:
+					listadoTitulaciones(bean, datos, request, response);
+					break;
+				case ACCION_DATATABLE_TITULACIONES_AREA:
+					listadoTitulacionesArea(bean, datos, request, response);
+					break;
 			}
 			
 		} catch (SQLIntegrityConstraintViolationException e) {

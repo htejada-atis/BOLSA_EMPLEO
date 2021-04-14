@@ -150,7 +150,7 @@ public class Noticia implements Serializable {
 		result = prime * result + ((texto == null) ? 0 : texto.hashCode());
 		result = prime * result + ((fecha == null) ? 0 : fecha.hashCode());
 		result = prime * result + ((publica == null) ? 0 : publica.hashCode());
-		result = prime * result + ((publica == null) ? 0 : publica.hashCode());
+		result = prime * result + ((activa == null) ? 0 : activa.hashCode());
 		result = prime * result + ((codNum == null) ? 0 : codNum.hashCode());
 		return result;
 	}
