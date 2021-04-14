@@ -40,7 +40,9 @@ import es.ujaen.uvirtual.utilidades.UVException;
 				"/srv/es/informacionadministrativa/bolsaempleo", 
 				"/srv/en/informacionadministrativa/bolsaempleo",
 				"/srv/es/ajax/informacionadministrativa/bolsaempleo",
-				"/srv/en/ajax/informacionadministrativa/bolsaempleo"
+				"/srv/en/ajax/informacionadministrativa/bolsaempleo",
+				"/pub/es/informacionadministrativa/bolsaempleo", 
+				"/pub/en/informacionadministrativa/bolsaempleo"
 		})
 public class ControladorInicio extends HttpServlet {
 	private static final long serialVersionUID = 1L;

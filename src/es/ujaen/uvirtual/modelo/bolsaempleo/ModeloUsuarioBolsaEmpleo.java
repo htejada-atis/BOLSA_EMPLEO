@@ -14,6 +14,7 @@ import es.ujaen.uvirtual.adm.CrearUsuario;
 import es.ujaen.uvirtual.beans.Rol;
 import es.ujaen.uvirtual.beans.UVDatos;
 import es.ujaen.uvirtual.beans.Usuario;
+import es.ujaen.uvirtual.beans.uvirtual.bolsaempleo.Evaluador;
 import es.ujaen.uvirtual.beans.uvirtual.bolsaempleo.Bolsa;
 import es.ujaen.uvirtual.beans.uvirtual.bolsaempleo.Noticia;
 import es.ujaen.uvirtual.beans.uvirtual.bolsaempleo.UsuarioBolsaEmpleo;
@@ -43,6 +44,7 @@ public class ModeloUsuarioBolsaEmpleo {
 	public static final int ORDER_COLUMN_INDEX_EXCLUIDO = 9;
 	public static final int ORDER_COLUMN_INDEX_RAZON_EXCLUSION = 10;
 	public static final int ORDER_COLUMN_INDEX_FECHA_EXCLUSION = 11;
+	public static final int ORDER_COLUMN_INDEX_ACTIVO = 12;
 	
 	public static final String USUARIO_BORRADO = "S";
 	public static final String USUARIO_NO_BORRADO = "N";
@@ -175,8 +177,7 @@ public class ModeloUsuarioBolsaEmpleo {
 		}
 		
 		return dataTable;
-	}	
-	
+	}
 	
 	/**
 	 * Listado de areas. 
@@ -254,6 +255,131 @@ public class ModeloUsuarioBolsaEmpleo {
 		
 		return dataTable;
 	}	
+	
+	/** Listado de usuarios en función de un área . 
+	 * @param params para leer los parametros de paginación, ordenacion, etc .
+	 * @param area .
+	 * @param evaluadores .
+	 * @return listado de usuarios .
+	 * @throws SQLException en caso de error de base de datos .
+	 * @throws UVException error si no existe la area .
+	 */
+	public DataTable<Evaluador> listaEvaluadoresDatatable(Map<String, String[]> params, Integer area, boolean evaluadores) throws SQLException, UVException {
+		
+		if (area == null) {
+			throw new UVException("No se pueden listar evaluadores sin area");
+		}
+		
+		List<Evaluador> usuarios = new ArrayList<>();
+		DataTable<Evaluador> dataTable = new DataTable<Evaluador>(params);
+		
+		String consulta = "SELECT * FROM TBEP_USUARIOS bepusu "
+				+ "INNER JOIN VUJA_NET_BEP_AR_PERSONA uvpersona ON uvpersona.CODINT=bepusu.CODPERSONA "
+				+ (evaluadores ? "INNER JOIN TBEP_EVALUADORES bepeva ON bepusu.CODNUM = bepeva.BEPUSU_CODNUM " : "")
+				+ "WHERE FLGBORRADO!='S' "
+				+ "AND FLGEXCLUIDO!='S' ";
+		
+		String consultaEvaluadores = "SELECT bepeva.BEPUSU_CODNUM FROM TBEP_EVALUADORES bepeva "
+				+ "INNER JOIN TBEP_USUARIOS bepusu ON bepusu.CODNUM = bepeva.BEPUSU_CODNUM "
+				+ "WHERE bepusu.FLGBORRADO!='S' "
+				+ "AND bepusu.FLGEXCLUIDO!='S' "
+				+ "AND bepeva.BEPARE_CODNUM = ? ";
+		
+		if (evaluadores) {
+			consulta += "AND bepusu.CODNUM IN (" + consultaEvaluadores + ")";
+			dataTable.setOrderColumn(ORDER_COLUMN_INDEX_ACTIVO, "bepeva.FLGACTIVO");
+		} else {
+			consulta += "AND bepusu.CODNUM NOT IN (" + consultaEvaluadores + ") "
+					+ "AND bepusu.ROL = 1052 ";
+		}
+		
+		dataTable.setOrderColumn(ORDER_COLUMN_INDEX_NUMDOCUMENTO, "uvpersona.IDNIF");
+		dataTable.setOrderColumn(ORDER_COLUMN_INDEX_ROL, "bepusu.ROL");
+		dataTable.setOrderColumn(ORDER_COLUMN_INDEX_NOMBRE_Y_APELLIDOS, "uvpersona.STRAPELLIDO1");
+		dataTable.setQuery(consulta);
+				
+		try (Connection conexion = ConexionUvirtual.obtenerInstancia();
+				PreparedStatement stmtCount = conexion.prepareStatement(dataTable.getQueryCount());
+				PreparedStatement stmt = conexion.prepareStatement(dataTable.getQuery());
+		) {
+			int indexParam = 1;
+			stmt.setInt(indexParam, area);
+			stmtCount.setInt(indexParam++, area);
+			try (ResultSet rs = stmt.executeQuery()) {
+				while (rs.next()) {
+					UsuarioBolsaEmpleo usuario = setUsuario(rs);
+					
+					if (evaluadores) {
+						Integer codNumArea = rs.getInt("BEPARE_CODNUM");
+						Boolean activo = rs.getString("FLGACTIVO").equals("S");
+						Evaluador evaluador = new Evaluador(usuario, codNumArea, activo);
+						usuarios.add(evaluador);
+					} else {
+						usuarios.add(new Evaluador(usuario));
+					}
+				}				
+			}	
+			
+			dataTable.setRecordsTotalFromQuery(stmtCount);
+			dataTable.setData(usuarios);
+		}
+		
+		return dataTable;
+	}
+	
+	/**	Función que agrega evaluadores a un área .
+	 * @param usuarios .
+	 * @param area id del area por el que se va a filtrar .
+	 * @throws SQLException en caso de error en la BD .
+	 * @throws UVException en caso de error de parámetros .
+	 */
+	public void insertaEvaluadores(List<String> usuarios, Integer area) throws SQLException, UVException {
+		
+		if (area == null) {
+			throw new UVException("No se puede agregar un evaluador sin el id del área");
+		}
+		
+		String params = BolsaEmpleoUtils.consultaMultiplesParametros(usuarios.size());
+		String consulta = "INSERT INTO TBEP_EVALUADORES (BEPARE_CODNUM, BEPUSU_CODNUM)"
+				+ " SELECT bepare.CODNUM AS BEPARE_CODNUM, bepusu.CODNUM AS BEPUSU_CODNUM"
+				+ " FROM TBEP_USUARIOS bepusu, TBEP_AREAS bepare WHERE bepare.CODNUM = ? AND "
+				+ " bepusu.CODNUM IN (" + params + ")";
+		
+		try (Connection conexion = ConexionUvirtual.obtenerInstancia(); PreparedStatement stmt = conexion.prepareStatement(consulta)) {
+			int indexParam = 1;
+			stmt.setInt(indexParam++, area);
+			for (String usuario: usuarios) {
+				stmt.setString(indexParam++, usuario);
+			}
+			stmt.executeUpdate();
+		}
+	}
+	
+	/** Borra o restaura un evaluador .
+	 * @param evaluador a borrar .
+	 * @throws SQLException en caso de error en la BD .
+	 * @throws UVException si noticia no es valida .
+	 */
+	public void borraRestauraEvaluador(Evaluador evaluador) throws SQLException, UVException {
+		if (evaluador == null) {
+			throw new UVException("No se puede eliminar un evaluador vacío");
+		}
+		if (evaluador.getCodNum() == null) {
+			throw new UVException("No se puede eliminar un evaluador con id de usuario vacío");
+		}
+		if (evaluador.getCodNumArea() == null) {
+			throw new UVException("No se puede eliminar un evaluador con id de area vacío");
+		}
+		String consulta = "UPDATE TBEP_EVALUADORES SET flgactivo=? WHERE bepusu_codnum=? AND bepare_codnum=? ";
+		try (Connection conexion = ConexionUvirtual.obtenerInstancia();
+			 PreparedStatement stmt = conexion.prepareStatement(consulta);) {
+			int parameterIndex = 1;
+			stmt.setString(parameterIndex++, evaluador.isActivo() ? "S" : "N");
+			stmt.setInt(parameterIndex++, evaluador.getCodNum());
+			stmt.setInt(parameterIndex++, evaluador.getCodNumArea());
+			stmt.executeUpdate();
+		}
+	}
 	
 	
 	/**
