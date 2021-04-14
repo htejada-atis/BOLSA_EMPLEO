@@ -16,6 +16,7 @@ public class Merito implements Serializable {
 	private String descripcion;
 	private String observacion;
 	private ItemBaremacion item;
+	private UsuarioBolsaEmpleo user;
 	private InputStream archivo;
 	
 	/** Constructor por defecto.
@@ -116,6 +117,14 @@ public class Merito implements Serializable {
 	
 	public void setArchivo(InputStream archivo) {
 		this.archivo = archivo;
+	}
+	
+	public UsuarioBolsaEmpleo getUsuario() {
+		return user;
+	}
+	
+	public void setUsuario(UsuarioBolsaEmpleo pusu) {
+		this.user = pusu;
 	}
 
 	public static long getSerialversionuid() {

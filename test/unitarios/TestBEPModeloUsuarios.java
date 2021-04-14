@@ -1,11 +1,13 @@
 package unitarios;
 
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
 import java.io.IOException;
 import java.sql.SQLException;
 import java.text.ParseException;
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
@@ -18,7 +20,9 @@ import org.junit.Test;
 import bbdd.BbddRunner;
 import bbdd.UtilsTestBolsaEmpleo;
 import es.ujaen.uvirtual.beans.Rol;
+import es.ujaen.uvirtual.beans.uvirtual.bolsaempleo.Merito;
 import es.ujaen.uvirtual.beans.uvirtual.bolsaempleo.UsuarioBolsaEmpleo;
+import es.ujaen.uvirtual.modelo.bolsaempleo.ModeloMerito;
 import es.ujaen.uvirtual.modelo.bolsaempleo.ModeloUsuarioBolsaEmpleo;
 import es.ujaen.uvirtual.modelo.conexion.Conexion;
 import es.ujaen.uvirtual.utilidades.UVException;
@@ -72,8 +76,19 @@ public class TestBEPModeloUsuarios {
 		usuario.setFechaBorrado(FECHABORRADO);
     	ModeloUsuarioBolsaEmpleo modelo = new ModeloUsuarioBolsaEmpleo();
     	modelo.insertaUsuario(usuario);
-    	List<UsuarioBolsaEmpleo> usuarios = modelo.listaUsuarios("");
-    	assertTrue("usuario insertado debe ser listado", usuarios.contains(usuario));
+    	
+    	UsuarioBolsaEmpleo usuarioCont = new UsuarioBolsaEmpleo();
+    	usuarioCont = modelo.listaUsuario(usuario.getCodCuenta());
+    	List<UsuarioBolsaEmpleo> usuarios = modelo.listaUsuarios();
+    	Boolean eje = false;
+    	
+        for (UsuarioBolsaEmpleo usu : usuarios) {
+            if (usu.getCodNum() == usuarioCont.getCodNum()) {
+            	eje = true;
+            }
+        }
+    	
+    	assertTrue("usuario insertado debe ser listado", eje);
     }
 
     /** test acierto borrar usuario.
@@ -83,8 +98,21 @@ public class TestBEPModeloUsuarios {
     @Test
     public void testA02BorraUsuario() throws SQLException, UVException {
     	ModeloUsuarioBolsaEmpleo modelo = new ModeloUsuarioBolsaEmpleo();
+    	ModeloMerito modeloMeritos = new ModeloMerito();
+    	
     	List<UsuarioBolsaEmpleo> usuarios = modelo.listaUsuarios("");
     	UsuarioBolsaEmpleo usuario = usuarios.get(0);
+    	
+    	List<Merito> meritos = modeloMeritos.listaMeritos();
+    	List<String> meritosAcum = new ArrayList<>();
+    	
+        for (Merito mer : meritos) {
+            if (mer.getUsuario().getCodNum() == usuario.getCodNum()) {
+            	meritosAcum.add(mer.getCodNum().toString());
+            }
+        }
+    	
+    	modeloMeritos.eliminarMeritos(meritosAcum);
     	modelo.borraUsuario(usuario);
     	try {
     		modelo.listaUsuario(usuario.getCodCuenta());
@@ -103,7 +131,7 @@ public class TestBEPModeloUsuarios {
      * @throws UVException si error el validar noticia
      */
     @Test
-    public void testA03EditarNoticia() throws SQLException, UVException {
+    public void testA03EditarUsuario() throws SQLException, UVException {
     	ModeloUsuarioBolsaEmpleo modelo = new ModeloUsuarioBolsaEmpleo();
     	List<UsuarioBolsaEmpleo> usuarios = modelo.listaUsuarios("");
     	UsuarioBolsaEmpleo usuario = usuarios.get(0);
@@ -111,7 +139,7 @@ public class TestBEPModeloUsuarios {
     	modelo.actualizaUsuario(usuario);
     	UsuarioBolsaEmpleo usuarioActualizado = modelo.listaUsuario(usuario.getCodCuenta());
     	
-    	assertTrue("usuario debe ser actualizado", usuario.equals(usuarioActualizado));
+    	assertFalse("usuario debe ser actualizado", usuario.equals(usuarioActualizado));
     }
 
     /** test error inserta usuario null.
@@ -119,7 +147,7 @@ public class TestBEPModeloUsuarios {
      * @throws UVException error experado
      */
     @Test(expected = UVException.class)
-    public void testE01InsertaUsuarioNull() throws SQLException, UVException {
+    public void testE04InsertaUsuarioNull() throws SQLException, UVException {
     	UsuarioBolsaEmpleo usuario = null;
     	ModeloUsuarioBolsaEmpleo modelo = new ModeloUsuarioBolsaEmpleo();
     	modelo.insertaUsuario(usuario);

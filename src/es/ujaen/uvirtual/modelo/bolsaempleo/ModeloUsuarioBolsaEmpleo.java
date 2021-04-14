@@ -7,8 +7,10 @@ import java.sql.SQLException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.logging.Level;
 
 import es.ujaen.uvirtual.adm.CrearUsuario;
 import es.ujaen.uvirtual.beans.Rol;
@@ -22,6 +24,7 @@ import es.ujaen.uvirtual.modelo.ModeloAdministracion;
 import es.ujaen.uvirtual.modelo.conexion.ConexionArcos;
 import es.ujaen.uvirtual.utilidades.BolsaEmpleoUtils;
 import es.ujaen.uvirtual.utilidades.DataTable;
+import es.ujaen.uvirtual.utilidades.Memcache;
 import es.ujaen.uvirtual.utilidades.UVException;
 
 /**
@@ -60,7 +63,6 @@ public class ModeloUsuarioBolsaEmpleo {
 	public List<UsuarioBolsaEmpleo> listaUsuarios(String clausula) throws SQLException {
 		List<UsuarioBolsaEmpleo> usuarios = new ArrayList<>();
 		String consulta = "SELECT * FROM tbep_usuarios bepusu INNER JOIN VUJA_NET_BEP_AR_PERSONA uvpersona ON uvpersona.CODINT=bepusu.CODPERSONA " + clausula;
-		
 		try (Connection conexion = ConexionUvirtual.obtenerInstancia();
 			PreparedStatement stmt = conexion.prepareStatement(consulta);) {
 				try (ResultSet rs = stmt.executeQuery()) {
@@ -76,6 +78,15 @@ public class ModeloUsuarioBolsaEmpleo {
 			}
 		return usuarios;
 	}
+	
+	/** lista todas las noticias.
+	 * @return lista de todas las noticias
+	 * @throws SQLException si hay un error en la base de datos
+	 */
+	public List<UsuarioBolsaEmpleo> listaUsuarios() throws SQLException {
+		return listaUsuarios(" ORDER BY bepusu.CODCUENTA");
+	}
+	
 	
 	/** obtiene un usuario a partir de su nombre.
 	 * @param nombre del usuario
@@ -491,47 +502,37 @@ public class ModeloUsuarioBolsaEmpleo {
 	
 	/** Comprueba si el usuario candidato se encuentra en UVIRTUAL .
 	 * @param  datos .
+	 * @return Boolean s .
 	 * @throws SQLException en caso de error en la BD .
 	 * @throws UVException si noticia no es valida .
 	 */
-	public void checkUser(UVDatos datos) {
+	public Boolean checkUser(UVDatos datos) {
 		Usuario usuArcos = datos.getUsuario();
-		try {
-			UsuarioBolsaEmpleo usu = listaUsuario(usuArcos.getUid());
-		} catch (UVException e) {
-			ModeloRol modeloRol = new ModeloRol();
-			Rol role;
-			
+
+		if (usuArcos != null) {
 			try {
-				role = modeloRol.getRoleById(PARAM_ROL_ID);
-				UsuarioBolsaEmpleo usuarioFinal = new UsuarioBolsaEmpleo(usuArcos.getCodigoPersonaArcos(), usuArcos.getUid(), role, true, false);
-				insertaUsuario(usuarioFinal);
+				UsuarioBolsaEmpleo usu = listaUsuario(usuArcos.getUid());
+			} catch (UVException e) {
+				ModeloRol modeloRol = new ModeloRol();
+				Rol role;
 				
-			} catch (SQLException | UVException ex) {
-				ex.printStackTrace();
-			}
-		} catch (SQLException e) {
-			e.printStackTrace();
+				try {
+					role = modeloRol.getRoleById(PARAM_ROL_ID);
+					UsuarioBolsaEmpleo usuarioFinal = new UsuarioBolsaEmpleo(usuArcos.getCodigoPersonaArcos(), usuArcos.getUid(), role, true, false);
+					insertaUsuario(usuarioFinal);
+				
+					CrearUsuario.refrescarUsuario(usuarioFinal.getCodCuenta());
+				} catch (SQLException | UVException ex) {
+					ex.printStackTrace();
+				}
+			} catch (SQLException e) {
+				e.printStackTrace();
+			}	
+			return true;
+		} else {
+			return false;
 		}
 	}
-	
-	
-	/** Almacen ROLE UVIRTUAL en usuario ArcosL .
-	 * @param  datos .
-	 * @throws SQLException en caso de error en la BD .
-	 * @throws UVException si usuario no es valido .
-	 */
-	public void setRoleArcos(UVDatos datos) throws SQLException, UVException {
-		Usuario usuArcos = datos.getUsuario();
-		UsuarioBolsaEmpleo usu = listaUsuario(usuArcos.getUid());
-		
-		ArrayList<String> rolesDelUsuario = new ArrayList<>();
-		
-		rolesDelUsuario.add(usu.getRol().getValor());
-		
-		usuArcos.setRolesUvirtual(rolesDelUsuario);
-	}
-	
 	
 	/** Elimina un usuario.
 	 * @param usuario a borrar
