@@ -63,6 +63,7 @@ public class Usuario implements Serializable {
 	// datos de administración
 	protected ArrayList<String> roles = null;
 	protected ArrayList<String> rolesAdministrados = null;
+	protected ArrayList<String> rolesUvirtual = null;
 	
 	// Roles por dominio
 	protected HashMap<String, ArrayList<String>> rolesPorDominio = null;
@@ -183,10 +184,18 @@ public class Usuario implements Serializable {
 		return rolesPorDominio;
 	}
 	
+	public ArrayList<String> getRolesUvirtual() {
+		return rolesUvirtual;
+	}
+	
+	public void setRolesUvirtual(ArrayList<String> proles) {
+		this.rolesUvirtual = proles;
+	}
+	
 	public void setRolesPorDominio(HashMap<String, ArrayList<String>> rolesPorDominio) {
 		this.rolesPorDominio = rolesPorDominio;
 	}
-
+	
 	public String getEmailCuentaPersona() {
 		return emailCuentaPersona;
 	}

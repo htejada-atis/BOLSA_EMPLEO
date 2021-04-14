@@ -4,7 +4,9 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
@@ -13,9 +15,11 @@ import es.ujaen.uvirtual.beans.Rol;
 import es.ujaen.uvirtual.beans.UVDatos;
 import es.ujaen.uvirtual.beans.Usuario;
 import es.ujaen.uvirtual.beans.uvirtual.bolsaempleo.Evaluador;
+import es.ujaen.uvirtual.beans.uvirtual.bolsaempleo.Bolsa;
 import es.ujaen.uvirtual.beans.uvirtual.bolsaempleo.Noticia;
 import es.ujaen.uvirtual.beans.uvirtual.bolsaempleo.UsuarioBolsaEmpleo;
 import es.ujaen.uvirtual.modelo.conexion.ConexionUvirtual;
+import es.ujaen.uvirtual.modelo.ModeloAdministracion;
 import es.ujaen.uvirtual.modelo.conexion.ConexionArcos;
 import es.ujaen.uvirtual.utilidades.BolsaEmpleoUtils;
 import es.ujaen.uvirtual.utilidades.DataTable;
@@ -42,6 +46,11 @@ public class ModeloUsuarioBolsaEmpleo {
 	public static final int ORDER_COLUMN_INDEX_FECHA_EXCLUSION = 11;
 	public static final int ORDER_COLUMN_INDEX_ACTIVO = 12;
 	
+	public static final String USUARIO_BORRADO = "S";
+	public static final String USUARIO_NO_BORRADO = "N";
+	public static final String USUARIO_EXCLUIDO = "S";
+	public static final String USUARIO_NO_EXCLUIDO = "N";
+	
 	public static final Integer PARAM_ROL_ID = 1051;
 		
 	
@@ -50,7 +59,7 @@ public class ModeloUsuarioBolsaEmpleo {
 	 * @return todos los usuarios de la base de datos
 	 * @throws SQLException en caso de error de base de datos
 	 */
-	private List<UsuarioBolsaEmpleo> listaUsuarios(String clausula) throws SQLException {
+	public List<UsuarioBolsaEmpleo> listaUsuarios(String clausula) throws SQLException {
 		List<UsuarioBolsaEmpleo> usuarios = new ArrayList<>();
 		String consulta = "SELECT * FROM tbep_usuarios bepusu INNER JOIN VUJA_NET_BEP_AR_PERSONA uvpersona ON uvpersona.CODINT=bepusu.CODPERSONA " + clausula;
 		
@@ -83,6 +92,53 @@ public class ModeloUsuarioBolsaEmpleo {
 		}
 		return usuarios.get(0);
 	}	
+	
+	/**
+	 * Devuelve un usuario por su id.
+	 * @param codNum id de usuario
+	 * @return usuarioBolsaEmpleo
+	 * @throws SQLException en caso de error en la BD
+	 * @throws UVException si bolsa no es existe
+	 */
+	public UsuarioBolsaEmpleo getUsuarioById(int codNum) throws SQLException, UVException {
+		String consulta = "SELECT * "
+				+ "FROM TBEP_USUARIOS bepusu "
+				+ "INNER JOIN VUJA_NET_BEP_AR_PERSONA uvpersona ON uvpersona.CODINT=bepusu.CODPERSONA "
+				+ "WHERE bepusu.CODNUM = ?";
+			
+		try (Connection conexion = ConexionUvirtual.obtenerInstancia();
+				PreparedStatement stmt = conexion.prepareStatement(consulta);) {
+				stmt.setInt(1, codNum);
+						
+			try (ResultSet rs = stmt.executeQuery()) {
+				if (!rs.next()) {
+					throw new UVException("No existe el usuario con id " + codNum);
+				}
+	
+				UsuarioBolsaEmpleo usuario = setUsuario(rs);
+				
+				return usuario;
+			}
+		}
+	}
+	
+	
+	/**
+	 * Devuelve un listado de usuarios por su id.
+	 * @param ids codnum de usurios
+	 * @return listado de usuarios
+	 * @throws UVException .
+	 * @throws SQLException .
+	 */
+	public List<UsuarioBolsaEmpleo> getUsuariosByIds(int[] ids) throws SQLException, UVException {
+		List<UsuarioBolsaEmpleo> usuarios = new ArrayList<>();
+		
+		for (int i = 0; i < ids.length; i++) {
+			usuarios.add(this.getUsuarioById(ids[i]));
+	    }
+		
+		return usuarios;
+	}
 	
 	/**
 	 * Listado de areas. 
@@ -479,29 +535,85 @@ public class ModeloUsuarioBolsaEmpleo {
 		}
 	}
 	
-	
-	/** Borra o restaura una noticia .
-	 * @param usuario a borrar .
-	 * @throws SQLException en caso de error en la BD .
-	 * @throws UVException si noticia no es valida .
+	/**
+	 * Establece el usuario como excluido. 
+	 * @param usuario .
+	 * @throws SQLException .
 	 */
-	public void borraRestauraUsuario(UsuarioBolsaEmpleo usuario) throws SQLException, UVException {
-		if (usuario == null) {
-			throw new UVException("No se puede eliminar un usuario vacía");
-		}
-		if (usuario.getCodNum() == null) {
-			throw new UVException("No se puede eliminar un usuario con id vacío");
-		}
-		String consulta = "UPDATE tbep_usuarios SET FLGBORRADO=? WHERE codnum=?";
-		try (Connection conexion = ConexionUvirtual.obtenerInstancia();
-			 PreparedStatement stmt = conexion.prepareStatement(consulta);) {
-			int parameterIndex = 1;
-			stmt.setString(parameterIndex++, usuario.getBorrado() ? "S" : "N");
-			stmt.setInt(parameterIndex++, usuario.getCodNum());
+	public void ponerUsuarioComoExcluido(UsuarioBolsaEmpleo usuario) throws SQLException {
+		String query = "UPDATE TBEP_USUARIOS SET FLGEXCLUIDO = ?, RAZON_EXCLUSION = ?, FECHA_EXCLUSION = ? WHERE CODNUM IN ?";		
+		
+		try (Connection conexion = ConexionUvirtual.obtenerInstancia(); PreparedStatement stmt = conexion.prepareStatement(query)) {
+			int indexParam = 1;
+			stmt.setString(indexParam++, USUARIO_EXCLUIDO);
+			stmt.setString(indexParam++, usuario.getRazonExcluido());
+			stmt.setDate(indexParam++, new java.sql.Date(usuario.getFechaExclusion().getTime()));
+			stmt.setInt(indexParam++, usuario.getCodNum());
 			stmt.executeUpdate();
 		}
 	}
 	
+	/**
+	 * Establece el usuario como NO excluido. 
+	 * @param usuarios .
+	 * @throws SQLException .
+	 */
+	public void ponerUsuarioComoNoExcluido(List<UsuarioBolsaEmpleo> usuarios) throws SQLException {
+		String params = BolsaEmpleoUtils.consultaMultiplesParametros(usuarios.size());
+		String query = "UPDATE TBEP_USUARIOS SET FLGEXCLUIDO = ?, RAZON_EXCLUSION = ? , FECHA_EXCLUSION = ? WHERE CODNUM IN (" + params + ")";		
+				
+		try (Connection conexion = ConexionUvirtual.obtenerInstancia(); PreparedStatement stmt = conexion.prepareStatement(query)) {
+			int indexParam = 1;
+			stmt.setString(indexParam++, "N");
+			stmt.setString(indexParam++, "");
+			stmt.setString(indexParam++, null);
+			for (UsuarioBolsaEmpleo usuario : usuarios) {
+
+				stmt.setInt(indexParam++, usuario.getCodNum()); 	
+			}
+			stmt.executeUpdate();
+		}
+	}
+	
+	/**
+	 * Establece el usuario como borrado. 
+	 * @param usuarios .
+	 * @throws SQLException .
+	 */
+	public void ponerUsuarioComoBorrado(List<UsuarioBolsaEmpleo> usuarios) throws SQLException {
+		this.cambiarFlagBorradoUsuario(usuarios, USUARIO_BORRADO);
+	}
+	
+	/**
+	 * Establece el usuario como NO borrado. 
+	 * @param usuarios .
+	 * @throws SQLException .
+	 */
+	public void ponerUsuarioComoNoBorrado(List<UsuarioBolsaEmpleo> usuarios) throws SQLException {
+		this.cambiarFlagBorradoUsuario(usuarios, USUARIO_NO_BORRADO);
+	}
+	
+	private void cambiarFlagBorradoUsuario(List<UsuarioBolsaEmpleo> usuarios, String borrado) throws SQLException {
+		String params = BolsaEmpleoUtils.consultaMultiplesParametros(usuarios.size());
+		String query = "UPDATE TBEP_USUARIOS SET FLGBORRADO = ?, FECHA_BORRADO = ? WHERE CODNUM IN  (" + params + ")";		
+				
+		try (Connection conexion = ConexionUvirtual.obtenerInstancia(); PreparedStatement stmt = conexion.prepareStatement(query)) {
+			int indexParam = 1;
+
+			
+			stmt.setString(indexParam++, borrado);
+			
+			SimpleDateFormat formatter = new SimpleDateFormat("dd/MM/YYYY HH:mm:ss");
+			Date date = new Date(System.currentTimeMillis());
+			
+			stmt.setDate(indexParam++, new java.sql.Date(date.getTime()));
+			
+			for (UsuarioBolsaEmpleo usuario : usuarios) {
+				stmt.setInt(indexParam++, usuario.getCodNum()); 
+			}
+			stmt.executeUpdate();
+		}	
+	}
 	
 	/** Comprueba si el usuario candidato se encuentra en UVIRTUAL .
 	 * @param  datos .
@@ -520,11 +632,50 @@ public class ModeloUsuarioBolsaEmpleo {
 				role = modeloRol.getRoleById(PARAM_ROL_ID);
 				UsuarioBolsaEmpleo usuarioFinal = new UsuarioBolsaEmpleo(usuArcos.getCodigoPersonaArcos(), usuArcos.getUid(), role, true, false);
 				insertaUsuario(usuarioFinal);
+				
 			} catch (SQLException | UVException ex) {
 				ex.printStackTrace();
 			}
 		} catch (SQLException e) {
 			e.printStackTrace();
+		}
+	}
+	
+	
+	/** Almacen ROLE UVIRTUAL en usuario ArcosL .
+	 * @param  datos .
+	 * @throws SQLException en caso de error en la BD .
+	 * @throws UVException si usuario no es valido .
+	 */
+	public void setRoleArcos(UVDatos datos) throws SQLException, UVException {
+		Usuario usuArcos = datos.getUsuario();
+		UsuarioBolsaEmpleo usu = listaUsuario(usuArcos.getUid());
+		
+		ArrayList<String> rolesDelUsuario = new ArrayList<>();
+		
+		rolesDelUsuario.add(usu.getRol().getValor());
+		
+		usuArcos.setRolesUvirtual(rolesDelUsuario);
+	}
+	
+	
+	/** Elimina un usuario.
+	 * @param usuario a borrar
+	 * @throws SQLException en caso de error en la BD
+	 * @throws UVException si noticia no es valida
+	 */
+	public void borraUsuario(UsuarioBolsaEmpleo usuario) throws SQLException, UVException {
+		if (usuario == null) {
+			throw new UVException("No se puede eliminar un usuario vacía");
+		}
+		if (usuario.getCodNum() == null) {
+			throw new UVException("No se puede eliminar un usuario con id vacío");
+		}
+		String consulta = "DELETE FROM tbep_usuarios WHERE codnum = ? ";
+		try (Connection conexion = ConexionUvirtual.obtenerInstancia(); PreparedStatement stmt = conexion.prepareStatement(consulta);) {
+			int parameterIndex = 1;
+			stmt.setInt(parameterIndex++, usuario.getCodNum());
+			stmt.executeUpdate();
 		}
 	}
 }

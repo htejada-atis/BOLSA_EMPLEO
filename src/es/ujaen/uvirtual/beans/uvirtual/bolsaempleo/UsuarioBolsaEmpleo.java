@@ -39,16 +39,6 @@ public class UsuarioBolsaEmpleo implements Serializable {
 		
 	}
 	
-	/** Constructor con parametros.
-	 * @param pcodNum .
-	 * @param pnombre .
-	 */
-	public UsuarioBolsaEmpleo(Integer pcodNum, String pnombre) {
-		super();
-		this.codNum = pcodNum;
-		this.nombre = pnombre;
-	}
-	
 	/** Constructor con parametros para Bolsa Empleo.
 	 * @param pcodpersona .
 	 * @param prol .
@@ -63,6 +53,20 @@ public class UsuarioBolsaEmpleo implements Serializable {
 		this.rol = prol;
 		this.listaDist = plistaDist;
 		this.excluido = pexcluido;
+	}
+	
+	/** Constructor con parametros para Bolsa Empleo excluir usuario.
+	 * @param pcodNum .
+	 * @param pexcluido .
+	 * @param prazonexcluido .
+	 * @param pfechaexclusion .
+	 */
+	public UsuarioBolsaEmpleo(Integer pcodNum, Boolean pexcluido, String prazonexcluido, Date pfechaexclusion) {
+		super();
+		this.codNum = pcodNum;
+		this.excluido = pexcluido;
+		this.razonExclusion = prazonexcluido;
+		this.fechaExclusion = pfechaexclusion;
 	}
 	
 	
@@ -102,14 +106,6 @@ public class UsuarioBolsaEmpleo implements Serializable {
 		this.excluido = pexcluido;
 		this.razonExclusion = prazonexcluido;
 		this.fechaExclusion = pfechaexclusion;
-	}
-	
-	/** Constructor con parametros.
-	 * @param pcodNum .
-	 */
-	public UsuarioBolsaEmpleo(Integer pcodNum) {
-		super();
-		this.codNum = pcodNum;
 	}
 	
 	/** Constructor copia.

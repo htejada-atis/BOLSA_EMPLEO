@@ -9,6 +9,7 @@ import es.ujaen.uvirtual.beans.Usuario;
 import es.ujaen.uvirtual.beans.uvirtual.bolsaempleo.Area;
 import es.ujaen.uvirtual.beans.uvirtual.bolsaempleo.UsuarioBolsaEmpleo;
 import es.ujaen.uvirtual.beans.vistas.Vista;
+import es.ujaen.uvirtual.utilidades.DataTable;
 
 /** Bean para la vista.
  * @author ATISoluciones
@@ -22,6 +23,7 @@ public class VistaUsuarioBolsaEmpleo extends Vista implements Serializable {
 	 private Rol role;
 	 private List<Rol> roles = new ArrayList<>();
 	 private Boolean busqueda;
+	 private DataTable<UsuarioBolsaEmpleo> dataTable;
 	    
 	 public List<UsuarioBolsaEmpleo> getUsuarios() {
 		 return usuarios;
@@ -77,5 +79,13 @@ public class VistaUsuarioBolsaEmpleo extends Vista implements Serializable {
 		
 	 public Boolean getBusqueda() {
 		 return busqueda;
+	 }
+	 
+	 public DataTable<UsuarioBolsaEmpleo> getDatatable() {
+		 return dataTable;
+	 }
+	 
+	 public void setDatatable(DataTable<UsuarioBolsaEmpleo> dt) {
+		 this.dataTable = dt;
 	 }
 }

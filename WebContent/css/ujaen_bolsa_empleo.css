@@ -324,3 +324,38 @@ nav-bolsa-empleo a:active, nav-bolsa-empleo a:hover {
   opacity: 1;
 }
 
+
+
+
+
+.form-group-custom, .form-check-custom, .form-btn, .form-file, .form-select {
+	display: inline-block;
+	width: 50% !important;
+	margin-bottom: 1rem;
+}
+
+.form-group-custom label, .form-check-custom label, .form-file label, .form-select label {
+	display: inline-block;
+	font-size: .9rem;
+}
+
+.form-group-custom label {
+	width: 100% !important;
+	text-align: left !important;
+	margin-bottom: .5rem;
+}
+
+.form-group-custom input {
+	display: block;
+}
+
+.form-group-container {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    grid-gap: 20px;
+}
+
+
+.form-input-custom{
+	width:100%;
+}
