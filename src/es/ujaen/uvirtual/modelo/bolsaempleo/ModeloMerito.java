@@ -48,6 +48,7 @@ public class ModeloMerito {
 					try {
 						Merito mer = new Merito();
 						mer.setCodNum(rs.getInt("CODNUM"));
+						mer.setUsuario(new ModeloUsuarioBolsaEmpleo().getUsuarioById(rs.getInt("BEPUSU_CODNUM")));
 						mer.setItemBaremacion(new ModeloBaremacion().getItemBaremacionById(rs.getInt("BEPITE_CODNUM")));
 						mer.setDescripcion(rs.getString("DESCRIPCION"));
 						mer.setObservacion(rs.getString("OBSERVACION"));
