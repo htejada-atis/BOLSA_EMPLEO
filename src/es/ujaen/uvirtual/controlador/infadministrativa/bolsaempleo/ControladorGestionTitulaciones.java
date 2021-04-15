@@ -28,13 +28,13 @@ import es.ujaen.uvirtual.utilidades.UVException;
  * Controlador - Opers. con nombres: obtener, modificar, eliminar .
  * */
 @WebServlet(
-		name = "informacionadministrativa.bolsaempleo.configuracion.titulaciones", 
+		name = "informacionadministrativa.bolsaempleo.convocatorias.titulaciones", 
 		description = "Gestión de titulaciones", 
 		urlPatterns = { 
-				"/srv/es/informacionadministrativa/bolsaempleo/configuracion/titulaciones", 
-				"/srv/en/informacionadministrativa/bolsaempleo/configuracion/titulaciones",
-				"/srv/es/ajax/informacionadministrativa/bolsaempleo/configuracion/titulaciones",
-				"/srv/en/ajax/informacionadministrativa/bolsaempleo/configuracion/titulaciones"
+				"/srv/es/informacionadministrativa/bolsaempleo/convocatorias/titulaciones", 
+				"/srv/en/informacionadministrativa/bolsaempleo/convocatorias/titulaciones",
+				"/srv/es/ajax/informacionadministrativa/bolsaempleo/convocatorias/titulaciones",
+				"/srv/en/ajax/informacionadministrativa/bolsaempleo/convocatorias/titulaciones"
 		})
 public class ControladorGestionTitulaciones extends HttpServlet {
 	private static final long serialVersionUID = 1L;
@@ -55,8 +55,7 @@ public class ControladorGestionTitulaciones extends HttpServlet {
 	public static final String PARAM_ID = "id";
 	public static final String PARAM_NOMBRE = "nombre";
 	public static final String PARAM_TITULACIONES = "titulaciones";
-	
-	
+
 	// Mensajes
 	public static final String MENSAJE_ENVIADO = "mensaje";
 	public static final String MENSAJE_EXITO_AGREGAR = "titulación agregada correctamente";
@@ -65,10 +64,10 @@ public class ControladorGestionTitulaciones extends HttpServlet {
 	public static final int RESPONSE_HTTP_CODE_ERROR = 400;
 	
 	// ruta vistas
-	public static final String RUTA_BEP_CONF = "/WEB-INF/jsp/vista/infadministrativa/bolsaempleo/configuracion/";
+	public static final String RUTA_BEP_CONF = "/WEB-INF/jsp/vista/infadministrativa/bolsaempleo/convocatorias/titulaciones/";
 	
 	// urls
-	public static final String URL_PATTERN_AJAX = "/srv/es/ajax/informacionadministrativa/bolsaempleo/configuracion/titulaciones";
+	public static final String URL_PATTERN_AJAX = "/srv/es/ajax/informacionadministrativa/bolsaempleo/convocatorias/titulaciones";
 
 	/** Peticion GET.
 	 * @see HttpServlet#doGet(HttpServletRequest request, HttpServletResponse response)

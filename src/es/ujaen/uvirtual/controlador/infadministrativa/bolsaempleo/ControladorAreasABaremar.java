@@ -33,13 +33,13 @@ import es.ujaen.uvirtual.utilidades.UVException;
  * Gestión de las áreas a baremar.
  */
 @WebServlet(
-		name = "informacionadministrativa.bolsaempleo.configuracion.areasbaremar", 
+		name = "informacionadministrativa.bolsaempleo.convocatorias.areasbaremar", 
 		description = "Gestión de las áreas a baremar", 
 		urlPatterns = { 
-				"/srv/es/informacionadministrativa/bolsaempleo/configuracion/areasbaremar", 
-				"/srv/en/informacionadministrativa/bolsaempleo/configuracion/areasbaremar",
-				"/srv/es/ajax/informacionadministrativa/bolsaempleo/configuracion/areasbaremar",
-				"/srv/en/ajax/informacionadministrativa/bolsaempleo/configuracion/areasbaremar"
+				"/srv/es/informacionadministrativa/bolsaempleo/convocatorias/areasbaremar", 
+				"/srv/en/informacionadministrativa/bolsaempleo/convocatorias/areasbaremar",
+				"/srv/es/ajax/informacionadministrativa/bolsaempleo/convocatorias/areasbaremar",
+				"/srv/en/ajax/informacionadministrativa/bolsaempleo/convocatorias/areasbaremar"
 		})
 public class ControladorAreasABaremar extends HttpServlet {
 	private static final long serialVersionUID = 1L;

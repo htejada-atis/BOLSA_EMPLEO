@@ -30,13 +30,13 @@ import es.ujaen.uvirtual.utilidades.UVException;
  * Gestión de los items de baremación.
  */
 @WebServlet(
-		name = "informacionadministrativa.bolsaempleo.configuracion.itemsbaremacion", 
+		name = "informacionadministrativa.bolsaempleo.convocatorias.itemsbaremacion", 
 		description = "Gestión de los items de baremación", 
 		urlPatterns = { 
-				"/srv/es/informacionadministrativa/bolsaempleo/configuracion/itemsbaremacion", 
-				"/srv/en/informacionadministrativa/bolsaempleo/configuracion/itemsbaremacion",
-				"/srv/es/ajax/informacionadministrativa/bolsaempleo/configuracion/itemsbaremacion", 
-				"/srv/en/ajax/informacionadministrativa/bolsaempleo/configuracion/itemsbaremacion"
+				"/srv/es/informacionadministrativa/bolsaempleo/convocatorias/itemsbaremacion", 
+				"/srv/en/informacionadministrativa/bolsaempleo/convocatorias/itemsbaremacion",
+				"/srv/es/ajax/informacionadministrativa/bolsaempleo/convocatorias/itemsbaremacion", 
+				"/srv/en/ajax/informacionadministrativa/bolsaempleo/convocatorias/itemsbaremacion"
 		})
 public class ControladorItemsBaremacion extends HttpServlet {
 	private static final long serialVersionUID = 1L;
@@ -93,10 +93,10 @@ public class ControladorItemsBaremacion extends HttpServlet {
 	public static final String MENSAJE_EXITO_EDITAR_ITEM = "ítem editado correctamente";
 	
 	// urls
-	public static final String URL_PATTERN_AJAX = "/srv/es/ajax/informacionadministrativa/bolsaempleo/configuracion/itemsbaremacion";
+	public static final String URL_PATTERN_AJAX = "/srv/es/ajax/informacionadministrativa/bolsaempleo/convocatorias/itemsbaremacion";
 	
 	// ruta vistas
-	public static final String RUTA_BEP_CONF = "/WEB-INF/jsp/vista/infadministrativa/bolsaempleo/configuracion/";
+	public static final String RUTA_BEP_CONF = "/WEB-INF/jsp/vista/infadministrativa/bolsaempleo/convocatorias/itemsbaremacion/";
 	
 	public static final int RESPONSE_HTTP_CODE_ERROR = 400;
 

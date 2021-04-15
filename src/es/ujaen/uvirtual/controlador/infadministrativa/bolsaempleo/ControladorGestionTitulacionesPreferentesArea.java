@@ -33,13 +33,13 @@ import es.ujaen.uvirtual.utilidades.UVException;
  * Controlador - Opers. con nombres: obtener, incluir, eliminar .
  * */
 @WebServlet(
-		name = "informacionadministrativa.bolsaempleo.configuracion.titulacionespreferentesarea", 
+		name = "informacionadministrativa.bolsaempleo.convocatorias.titulacionespreferentesarea", 
 		description = "Gestión de titulaciones preferentes por área", 
 		urlPatterns = { 
-				"/srv/es/informacionadministrativa/bolsaempleo/configuracion/titulacionespreferentesarea", 
-				"/srv/en/informacionadministrativa/bolsaempleo/configuracion/titulacionespreferentesarea",
-				"/srv/es/ajax/informacionadministrativa/bolsaempleo/configuracion/titulacionespreferentesarea",
-				"/srv/en/ajax/informacionadministrativa/bolsaempleo/configuracion/titulacionespreferentesarea"
+				"/srv/es/informacionadministrativa/bolsaempleo/convocatorias/titulacionespreferentesarea", 
+				"/srv/en/informacionadministrativa/bolsaempleo/convocatorias/titulacionespreferentesarea",
+				"/srv/es/ajax/informacionadministrativa/bolsaempleo/convocatorias/titulacionespreferentesarea",
+				"/srv/en/ajax/informacionadministrativa/bolsaempleo/convocatorias/titulacionespreferentesarea"
 		})
 public class ControladorGestionTitulacionesPreferentesArea extends HttpServlet {
 	private static final long serialVersionUID = 1L;
@@ -70,10 +70,10 @@ public class ControladorGestionTitulacionesPreferentesArea extends HttpServlet {
 	public static final int RESPONSE_HTTP_CODE_ERROR = 400;
 	
 	// ruta vistas
-	public static final String RUTA_BEP_CONF = "/WEB-INF/jsp/vista/infadministrativa/bolsaempleo/configuracion/";
+	public static final String RUTA_BEP_CONF = "/WEB-INF/jsp/vista/infadministrativa/bolsaempleo/convocatorias/";
 	
 	// urls
-	public static final String URL_PATTERN_AJAX = "/srv/es/ajax/informacionadministrativa/bolsaempleo/configuracion/titulacionespreferentesarea";
+	public static final String URL_PATTERN_AJAX = "/srv/es/ajax/informacionadministrativa/bolsaempleo/convocatorias/titulacionespreferentesarea";
 
 	/** Peticion GET.
 	 * @see HttpServlet#doGet(HttpServletRequest request, HttpServletResponse response)
