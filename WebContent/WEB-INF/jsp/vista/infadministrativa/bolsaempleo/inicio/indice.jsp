@@ -64,7 +64,7 @@ VistaInicio bean = (VistaInicio)uvdatos.getVistas().get(VistaInicio.class.getNam
 			
 			$.ajax({
 		        type: "GET",
-		        url: "<%= ControladorInicio.URL_PATTERN_AJAX %>",
+		        url: "<%= ControladorInicio.anonimo ? ControladorInicio.URL_PATTERN_AJAX_PUBLICA : ControladorInicio.URL_PATTERN_AJAX_PRIVADA %>",
 		        contentType: "application/json",
 		        dataType: "json",
 		        data: params,

@@ -30,8 +30,11 @@ VistaFicheros bean = (VistaFicheros) uvdatos.getVistas().get(VistaFicheros.class
     	</div>
     	<div class="form-file">
 			<label for="fichero_archivo">Fichero:</label>
-			<input id="fichero_archivo" type="file" name="<%= ControladorGestionFicheros.PARAM_FICHERO %>"/>
+			<input id="fichero_archivo" type="file" name="<%= ControladorGestionFicheros.PARAM_ARCHIVO %>"/>
 		</div>
+		<div class="form-check">
+    		<label for="fichero_publico"><input type="checkbox" id="fichero_publico" name="<%= ControladorGestionFicheros.PARAM_PUBLICO %>"/>Público</label>
+    	</div>
     	<div class="form-btn">
     		<input id="fichero_enviar" type="submit" name="<%= ControladorGestionFicheros.PARAM_ENVIAR %>" value="Subir fichero"/>
     	</div>

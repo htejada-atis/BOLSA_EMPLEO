@@ -64,7 +64,8 @@ VistaFicheros bean = (VistaFicheros) uvdatos.getVistas().get(VistaFicheros.class
 		    		return "<div class='overflow-auto'>" +row.titulo +"</div>";
 		    	}},
 		        {'data': 'codnum', 'class': 'overflow-ellipsis', 'render': function(row) {
-		        	var link = "<%= request.getRequestURI() %>?a=<%= ControladorGestionFicheros.ACCION_DESCARGAR_FICHERO %>&<%= ControladorGestionFicheros.PARAM_ID %>=" + row.codNum;
+		        	var link = "<%= ControladorGestionFicheros.URL_PATTERN_FILES_PRIVADA %>"
+		        	+ "?a=<%= ControladorGestionFicheros.ACCION_DESCARGAR_FICHERO %>&<%= ControladorGestionFicheros.PARAM_FICHERO %>=" + row.codNum;
 		        	return "<a class='consultar-fichero' href='" +link +"' target='_blank'>" +link +"</a>"; 
 		        	}
 		        },
@@ -72,16 +73,17 @@ VistaFicheros bean = (VistaFicheros) uvdatos.getVistas().get(VistaFicheros.class
 		        {'data': 'codnum', 'buttons': [{'label': '<label class="tooltiptext">Copiar enlace</label>Copiar', 'class': 'tooltip', 'onClick': function(row) {
 			        	$(this).parent().parent().parent().find(".tooltiptext").text("¡Enlace copiado!");
 			        	
-			        	var link = "<%= request.getRequestURI() %>?a=<%= ControladorGestionFicheros.ACCION_DESCARGAR_FICHERO %>&<%= ControladorGestionFicheros.PARAM_ID %>=" + row.codNum;
+			        	var link = "<%= ControladorGestionFicheros.URL_PATTERN_FILES_PRIVADA %>"
+				        	+ "?a=<%= ControladorGestionFicheros.ACCION_DESCARGAR_FICHERO %>&<%= ControladorGestionFicheros.PARAM_FICHERO %>=" + row.codNum;
 			        	navigator.clipboard.writeText(link);
-			        	}
+			        }
 			    }]}
 		    ],
 		    "actions": [
 		    	{'label': 'Eliminar', 'onClick': function(selected) {
 		    		if(selected.length) {
-		    			var titulo = selected.length > 1 ? "Borrar ficheros" : "Borrar fichero";
-		    			var mensaje = selected.length > 1 ? "¿Desea borrar los ficheros seleccionados?" : "¿Desea borrar el fichero seleccionado?";
+		    			var titulo = selected.length > 1 ? "Eliminar ficheros" : "Eliminar fichero";
+		    			var mensaje = selected.length > 1 ? "¿Desea eliminar los ficheros seleccionados?" : "¿Desea eliminar el fichero seleccionado?";
 		    			
 		    			Atis.confirmDialog(titulo, mensaje, {
 			        		Si: function() {
@@ -96,6 +98,42 @@ VistaFicheros bean = (VistaFicheros) uvdatos.getVistas().get(VistaFicheros.class
 					    });
 		    		}
 		    	}},
+		    	{'label': 'Hacer público', 'onClick': function(selected) {
+		    		if(selected.length) {
+		    			var titulo = selected.length > 1 ? "Hacer ficheros públicos" : "Hacer fichero público";
+		    			var mensaje = selected.length > 1 ? "¿Desea hacer publicos los ficheros seleccionados?" : "¿Desea hacer público el fichero seleccionado?";
+		    			
+		    			Atis.confirmDialog(titulo, mensaje, {
+			        		Si: function() {
+			        			var params = {'a': '<%= ControladorGestionFicheros.ACCION_HACER_FICHEROS_PUBLICOS %>',
+			        					'<%= ControladorGestionFicheros.PARAM_FICHEROS %>': JSON.stringify(selected)};
+				        		Atis.sendForm("<%= request.getRequestURI() %>", params);
+					          	$(this).dialog("close");
+					        },
+					        No: function() {
+					          	$(this).dialog("close");
+					    	}
+					    });
+		    		}
+		    	}},
+		    	{'label': 'Hacer privado', 'onClick': function(selected) {
+		    		if(selected.length) {
+		    			var titulo = selected.length > 1 ? "Hacer ficheros privados" : "Hacer fichero privado";
+		    			var mensaje = selected.length > 1 ? "¿Desea hacer privados los ficheros seleccionados?" : "¿Desea hacer privado el fichero seleccionado?";
+		    			
+		    			Atis.confirmDialog(titulo, mensaje, {
+			        		Si: function() {
+			        			var params = {'a': '<%= ControladorGestionFicheros.ACCION_HACER_FICHEROS_PRIVADOS %>',
+			        					'<%= ControladorGestionFicheros.PARAM_FICHEROS %>': JSON.stringify(selected)};
+				        		Atis.sendForm("<%= request.getRequestURI() %>", params);
+					          	$(this).dialog("close");
+					        },
+					        No: function() {
+					          	$(this).dialog("close");
+					    	}
+					    });
+		    		}
+		    	}}
 		    ]
 		});
 		

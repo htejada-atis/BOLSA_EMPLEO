@@ -27,12 +27,14 @@ public class Fichero implements Serializable {
 	 * @param pnombre .
 	 * @param ptitulo .
 	 * @param parchivo .
+	 * @param ppublico .
 	 */
-	public Fichero(String pnombre, String ptitulo, InputStream parchivo) {
+	public Fichero(String pnombre, String ptitulo, InputStream parchivo, Boolean ppublico) {
 		super();
 		this.nombre = pnombre;
 		this.titulo = ptitulo;
 		this.archivo = parchivo;
+		this.publico = ppublico;
 	}
 	
 	/** Constructor con parametros.
@@ -40,13 +42,15 @@ public class Fichero implements Serializable {
 	 * @param pnombre .
 	 * @param ptitulo .
 	 * @param parchivo .
+	 * @param ppublico .
 	 */
-	public Fichero(Integer pcodNum, String pnombre, String ptitulo, InputStream parchivo) {
+	public Fichero(Integer pcodNum, String pnombre, String ptitulo, InputStream parchivo, Boolean ppublico) {
 		super();
 		this.codNum = pcodNum;
 		this.nombre = pnombre;
 		this.titulo = ptitulo;
 		this.archivo = parchivo;
+		this.publico = ppublico;
 	}
 	
 	/** Constructor con parametros.
@@ -55,6 +59,15 @@ public class Fichero implements Serializable {
 	public Fichero(Integer pcodNum) {
 		super();
 		this.codNum = pcodNum;
+	}
+	
+	/** Constructor con parametros.
+	 * @param pcodNum .
+	 */
+	public Fichero(Integer pcodNum, Boolean ppublico) {
+		super();
+		this.codNum = pcodNum;
+		this.publico = ppublico;
 	}
 	
 	/** Constructor copia.
@@ -106,7 +119,7 @@ public class Fichero implements Serializable {
 	public void setPublico(Boolean publico) {
 		this.publico = publico;
 	}
-
+	
 	public static long getSerialversionuid() {
 		return serialVersionUID;
 	}
@@ -161,6 +174,13 @@ public class Fichero implements Serializable {
 				return false;
 			}
 		} else if (!archivo.equals(other.archivo)) {
+			return false;
+		}
+		if (publico == null) {
+			if (other.archivo != null) {
+				return false;
+			}
+		} else if (!publico.equals(other.publico)) {
 			return false;
 		}
 		

@@ -103,11 +103,13 @@ public class ModeloNoticia {
 	}
 	
 	/** Consulta noticias en BBDD y las devuelve.
+	 * @param anonimo .
 	 * @return las 3 noticias más recientes de la base de datos
 	 * @throws SQLException en caso de error de base de datos
 	 */
-	public List<Noticia> listaNoticiasInicio() throws SQLException {
-		return listaNoticias("WHERE flgpublica = 'S' AND flgactiva = 'S' ORDER BY fecha FETCH FIRST 3 ROWS ONLY", null);
+	public List<Noticia> listaNoticiasInicio(boolean anonimo) throws SQLException {
+		return listaNoticias("WHERE flgactiva = 'S' " + (anonimo ? " AND flgpublica = 'S' " : "")
+				+ " ORDER BY fecha FETCH FIRST 3 ROWS ONLY", null);
 	}
 	
 	/**
@@ -157,14 +159,17 @@ public class ModeloNoticia {
 	
 	/** lista de noticias excluyendo las ya cargadas.
 	 * @param noticiasExcluidas noticias ya mostradas a excluir de la consulta.
+	 * @param anonimo .
 	 * @return lista de noticias filtradas .
 	 * @throws SQLException si hay un error en la base de datos .
 	 * @throws UVException en caso de error de parametros .
 	 */
-	public List<Noticia> listaNoticiasInicioRestantes(List<String> noticiasExcluidas) throws SQLException, UVException {
+	public List<Noticia> listaNoticiasInicioRestantes(List<String> noticiasExcluidas, boolean anonimo) throws SQLException, UVException {
 		List<Noticia> noticias = new ArrayList<>();
 		String params = BolsaEmpleoUtils.consultaMultiplesParametros(noticiasExcluidas.size());
-		String consulta = "SELECT n.* FROM tbep_noticias n WHERE codnum NOT IN (" + params + ") AND flgpublica = 'S' AND flgactiva = 'S' ORDER BY fecha";
+		String consulta = "SELECT n.* FROM tbep_noticias n WHERE codnum NOT IN (" + params + ") "
+				+ (anonimo ? " AND flgpublica = 'S' " : "")
+				+ " AND flgactiva = 'S' ORDER BY fecha";
 		
 		try (Connection conexion = ConexionUvirtual.obtenerInstancia();
 			PreparedStatement stmt = conexion.prepareStatement(consulta);) {

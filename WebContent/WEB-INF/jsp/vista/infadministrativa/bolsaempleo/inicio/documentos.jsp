@@ -22,7 +22,9 @@ VistaInicio bean = (VistaInicio)uvdatos.getVistas().get(VistaInicio.class.getNam
     		<% 
     			if(bean.getFicheros().size() > 0) {
     				for(Fichero fichero: bean.getFicheros()) { 
-    	    			String link = ControladorGestionFicheros.URL_PATTERN_FILES + "?a=" + ControladorGestionFicheros.ACCION_DESCARGAR_FICHERO + "&" + ControladorGestionFicheros.PARAM_ID + "=" + fichero.getCodNum();
+    	    			String link = (fichero.isPublico() ? ControladorInicio.URL_PATTERN_FILES_PUBLICA : ControladorInicio.URL_PATTERN_FILES_PRIVADA)
+    	    					+ "?a=" + ControladorInicio.ACCION_DESCARGAR_FICHERO + "&" + ControladorInicio.PARAM_FICHERO
+    	    					+ "=" + fichero.getCodNum();
     	    			String titulo = "";
     	    			
     	    			if(fichero.getTitulo() != null) {

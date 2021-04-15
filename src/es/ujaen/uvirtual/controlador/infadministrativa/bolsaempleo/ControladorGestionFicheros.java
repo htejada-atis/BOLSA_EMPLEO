@@ -20,13 +20,11 @@ import javax.servlet.http.Part;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.reflect.TypeToken;
-
 import es.ujaen.uvirtual.beans.CodigoDescripcion;
 import es.ujaen.uvirtual.beans.UVDatos;
 import es.ujaen.uvirtual.beans.uvirtual.bolsaempleo.Fichero;
 import es.ujaen.uvirtual.beans.vistas.uvirtual.bolsaempleo.VistaFicheros;
 import es.ujaen.uvirtual.modelo.bolsaempleo.ModeloFichero;
-import es.ujaen.uvirtual.modelo.bolsaempleo.ModeloTitulacion;
 import es.ujaen.uvirtual.utilidades.BolsaEmpleoUtils;
 import es.ujaen.uvirtual.utilidades.DataTable;
 import es.ujaen.uvirtual.utilidades.EscapaHTML;
@@ -53,23 +51,28 @@ public class ControladorGestionFicheros extends HttpServlet {
 	private static final Logger LOGGER = Logger.getLogger(NOMBREDEESTACLASE);
 	
 	// Acciones
-	public static final String ACCION_SUBIR_FICHERO = "subirfichero";
+	
 	public static final String ACCION_BORRAR_FICHEROS = "borrarficheros";
 	public static final String ACCION_DATATABLE = "datatable";
 	public static final String ACCION_DESCARGAR_FICHERO = "descargarfichero";
+	public static final String ACCION_HACER_FICHEROS_PUBLICOS = "ficherospublicos";
+	public static final String ACCION_HACER_FICHEROS_PRIVADOS = "ficherosprivados";
 	public static final String ACCION_LISTAR_FICHEROS = "listarficheros";
+	public static final String ACCION_SUBIR_FICHERO = "subirfichero";
 	
 	// Parámetros
 	public static final String PARAM_ACCION = "a";
+	public static final String PARAM_ARCHIVO = "archivo";
 	public static final String PARAM_ENVIAR = "enviar";
 	public static final String PARAM_FICHERO = "fichero";
 	public static final String PARAM_FICHEROS = "ficheros";
-	public static final String PARAM_ID = "id";
+	public static final String PARAM_PUBLICO = "publico";
 	public static final String PARAM_TITULO = "titulo";
 	
 	// Mensajes
 	public static final String MENSAJE_ENVIADO = "mensaje";
 	public static final String MENSAJE_EXITO_AGREGAR = "fichero subido correctamente";
+	public static final String MENSAJE_EXITO_CAMBIAR_PUBLICO = "fichero publico cambiado correctamente";
 	public static final String MENSAJE_EXITO_ELIMINAR_FICHERO = "fichero eliminado correctamente";
 	public static final String MENSAJE_EXITO_ELIMINAR_FICHEROS = "ficheros eliminados correctamente";
 	public static final String MENSAJE_ERROR_FICHEROS_SELECCIONADOS_INCORRECTOS = "ficheros seleccionados no válidos";
@@ -78,7 +81,7 @@ public class ControladorGestionFicheros extends HttpServlet {
 	public static final String RUTA_BEP_CONF = "/WEB-INF/jsp/vista/infadministrativa/bolsaempleo/configuracion/";
 	
 	// urls
-	public static final String URL_PATTERN_FILES = "/srv/es/informacionadministrativa/bolsaempleo/configuracion/ficheros";
+	public static final String URL_PATTERN_FILES_PRIVADA = "/srv/es/informacionadministrativa/bolsaempleo/configuracion/ficheros";
 	public static final String URL_PATTERN_AJAX = "/srv/es/ajax/informacionadministrativa/bolsaempleo/configuracion/ficheros";
 
 	public static final int RESPONSE_HTTP_CODE_ERROR = 400;
@@ -110,6 +113,12 @@ public class ControladorGestionFicheros extends HttpServlet {
 					return;
 				case ACCION_DESCARGAR_FICHERO:
 					descargarFichero(bean, datos, request, response);
+					break;
+				case ACCION_HACER_FICHEROS_PUBLICOS:
+					cambiarFicherosPublico(request, response, true);
+					break;
+				case ACCION_HACER_FICHEROS_PRIVADOS:
+					cambiarFicherosPublico(request, response, false);
 					break;
 				case ACCION_SUBIR_FICHERO:
 					agregarFichero(request, response, bean);
@@ -158,7 +167,7 @@ public class ControladorGestionFicheros extends HttpServlet {
 		
 		if (request.getParameter(PARAM_TITULO) != null) {
 			ModeloFichero modelo = new ModeloFichero();
-			Part uploadedFile = request.getPart(PARAM_FICHERO);
+			Part uploadedFile = request.getPart(PARAM_ARCHIVO);
 			if (uploadedFile != null) {
 				if (uploadedFile.getSize() > 0) {
 					String nombre = BolsaEmpleoUtils.obtenerNombreFichero(uploadedFile);
@@ -173,7 +182,9 @@ public class ControladorGestionFicheros extends HttpServlet {
 					
 					InputStream input = uploadedFile.getInputStream();
 					String titulo = EscapaHTML.ajustaCodificacion(request.getParameter(PARAM_TITULO));
-					Fichero fichero = new Fichero(nombre, titulo, input);
+					Boolean publico = request.getParameter(PARAM_PUBLICO) != null 
+							&& EscapaHTML.ajustaCodificacion(request.getParameter(PARAM_PUBLICO)).equals("on");
+					Fichero fichero = new Fichero(nombre, titulo, input, publico);
 					modelo.insertaFichero(fichero);
 					HttpSession session = request.getSession(false);
 					session.setAttribute(MENSAJE_ENVIADO, MENSAJE_EXITO_AGREGAR);
@@ -182,6 +193,34 @@ public class ControladorGestionFicheros extends HttpServlet {
 					throw new UVException("No se puede subir un fichero sin archivo");
 				}
 			}
+		}
+	}
+	
+	/** cambia ficheros a publicos .
+	 * @param request .
+	 * @param response .
+	 * @param publico .
+	 * @throws SQLException .
+	 * @throws UVException .
+	 */
+	private void cambiarFicherosPublico(HttpServletRequest request, HttpServletResponse response, Boolean publico) throws SQLException, UVException {
+		ModeloFichero modelo = new ModeloFichero();
+		Integer codNum = Formateador.leeParametroInteger(request.getParameter(PARAM_FICHERO));
+		
+		Gson gson = new GsonBuilder().create();
+		
+		try {
+			List<Integer> ficheros = gson.fromJson(request.getParameter(PARAM_FICHEROS), new TypeToken<List<Integer>>() { }.getType());
+			
+			for (Integer fichero: ficheros) {
+				modelo.modificarPublicoFichero(new Fichero(fichero, publico));
+			}
+			
+			HttpSession session = request.getSession(false);
+			session.setAttribute(MENSAJE_ENVIADO, MENSAJE_EXITO_CAMBIAR_PUBLICO);
+			response.sendRedirect(request.getServletPath());
+		} catch (Exception ex) {
+			throw new UVException(MENSAJE_ERROR_FICHEROS_SELECCIONADOS_INCORRECTOS);
 		}
 	}
 	
@@ -196,8 +235,8 @@ public class ControladorGestionFicheros extends HttpServlet {
 	 */
 	private void descargarFichero(VistaFicheros bean, UVDatos datos, HttpServletRequest request, HttpServletResponse response) throws SQLException, UVException, IOException {
 		ModeloFichero modelo = new ModeloFichero();
-		if (EscapaHTML.ajustaCodificacion(request.getParameter(PARAM_ID)) != null) {
-			Fichero fichero = modelo.listaFichero(Formateador.leeParametroInteger(request.getParameter(PARAM_ID)));
+		if (EscapaHTML.ajustaCodificacion(request.getParameter(PARAM_FICHERO)) != null) {
+			Fichero fichero = modelo.listaFichero(Formateador.leeParametroInteger(request.getParameter(PARAM_FICHERO)));
 			bean.setFichero(fichero);
 			
 			int i = fichero.getNombre().lastIndexOf('.');
@@ -232,7 +271,7 @@ public class ControladorGestionFicheros extends HttpServlet {
 	 */
 	private void eliminarFicheros(HttpServletRequest request, HttpServletResponse response) throws SQLException, UVException, IOException {
 		ModeloFichero modelo = new ModeloFichero();
-		Integer codNum = Formateador.leeParametroInteger(request.getParameter(PARAM_ID));
+		Integer codNum = Formateador.leeParametroInteger(request.getParameter(PARAM_FICHERO));
 		
 		Gson gson = new GsonBuilder().create();
 		
