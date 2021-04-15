@@ -70,19 +70,9 @@ public class ControladorInicio extends HttpServlet {
 		datos.setContentType("text/html");
 		
 		VistaInicio bean = new VistaInicio();
+		ModeloUsuarioBolsaEmpleo modelo = new ModeloUsuarioBolsaEmpleo();
 		
-//		ModeloUsuarioBolsaEmpleo modelo = new ModeloUsuarioBolsaEmpleo();
-//		
-//		modelo.checkUser(datos);
-//		try {
-//			modelo.setRoleArcos(datos);
-//		} catch (SQLException | UVException e1) {
-//			// TODO Auto-generated catch block
-//			e1.printStackTrace();
-//		}
-//		
-//		Usuario usuArcos = datos.getUsuario();
-//		usuArcos.setRoles(null);
+		modelo.checkUser(datos);
 		
 		String nombreAccion = EscapaHTML.ajustaCodificacion(request.getParameter(PARAM_ACCION));
 		if (nombreAccion == null || nombreAccion.isEmpty()) {

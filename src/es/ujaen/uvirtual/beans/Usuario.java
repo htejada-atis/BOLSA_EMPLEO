@@ -184,14 +184,6 @@ public class Usuario implements Serializable {
 		return rolesPorDominio;
 	}
 	
-	public ArrayList<String> getRolesUvirtual() {
-		return rolesUvirtual;
-	}
-	
-	public void setRolesUvirtual(ArrayList<String> proles) {
-		this.rolesUvirtual = proles;
-	}
-	
 	public void setRolesPorDominio(HashMap<String, ArrayList<String>> rolesPorDominio) {
 		this.rolesPorDominio = rolesPorDominio;
 	}
