@@ -44,6 +44,16 @@ public class TestBEPControladorInicio {
 		return (VistaInicio) peticion.getUVDatos().getVistas().get(VistaInicio.class.getName());
     }
     
+    private VistaInicio obtenerInicioPublico(String accion) throws ServletException, IOException {
+    	PeticionHttp peticion = UtilsTestBolsaEmpleo.peticionAnonima();
+		peticion.setParameter(ControladorInicio.PARAM_ACCION, accion);
+
+		RespuestaHttp respuesta = new RespuestaHttp();
+		ControladorInicio controlador = new ControladorInicio();
+		controlador.doGet(peticion, respuesta);
+		return (VistaInicio) peticion.getUVDatos().getVistas().get(VistaInicio.class.getName());
+    }
+    
     /** Obtener noticias, sin parametro definido .
 	 * @throws SQLException si fallo bd  .
 	 * @throws IOException si error io .
@@ -63,7 +73,7 @@ public class TestBEPControladorInicio {
 	 * @throws ServletException  si error servlet
 	 */
 	@Test
-	public void testA02Obtener() throws SQLException, ServletException, IOException {
+	public void testA02ObtenerNoticias() throws SQLException, ServletException, IOException {
 		VistaInicio bean = obtenerInicio(ControladorInicio.ACCION_LISTAR_NOTICIAS);
 
 		assertNotEquals(MENSAJE_NOTICIAS_DEVUELTAS, 0, bean.getNoticias().size());
@@ -163,6 +173,34 @@ public class TestBEPControladorInicio {
 		assertEquals(MENSAJE_SIN_ERROR, 0, bean.getMensajesDeError().size());
 		assertEquals(MENSAJE_SIN_ADVERTENCIAS, 0, bean.getMensajesDeAdvertencia().size());
 		assertNotEquals("titulo no vacio", "", bean.getFicheros().get(0).getTitulo());
+	}
+	
+	/** Obtener noticias, sin parametro definido con usuario anónimo .
+	 * @throws SQLException si fallo bd  .
+	 * @throws IOException si error io .
+	 * @throws ServletException  si error servlet .
+	 */
+	@Test
+	public void testA08ObtenerPublico() throws SQLException, ServletException, IOException {
+		VistaInicio bean = obtenerInicioPublico(null);
+		
+		assertEquals(0, bean.getMensajesDeError().size());
+		assertEquals(0, bean.getMensajesDeAdvertencia().size());
+	}
+	
+	/** obtener noticias con usuario anónimo .
+	 * @throws SQLException si fallo bd 
+	 * @throws IOException si error io
+	 * @throws ServletException  si error servlet
+	 */
+	@Test
+	public void testA02ObtenerNoticiasPublico() throws SQLException, ServletException, IOException {
+		VistaInicio bean = obtenerInicioPublico(ControladorInicio.ACCION_LISTAR_NOTICIAS);
+
+		assertNotEquals(MENSAJE_NOTICIAS_DEVUELTAS, 0, bean.getNoticias().size());
+		assertEquals(MENSAJE_SIN_ERROR, 0, bean.getMensajesDeError().size());
+		assertEquals(MENSAJE_SIN_ADVERTENCIAS, 0, bean.getMensajesDeAdvertencia().size());
+		assertNotEquals("texto no vacio", "", bean.getNoticias().get(0).getTexto());
 	}
 
 }

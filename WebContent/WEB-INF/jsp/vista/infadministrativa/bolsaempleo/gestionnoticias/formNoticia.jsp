@@ -40,18 +40,18 @@ VistaNoticias bean = (VistaNoticias) uvdatos.getVistas().get(VistaNoticias.class
 		<input type="hidden" name="<%= ControladorGestionNoticias.PARAM_ID%>" id="noticia_id" value="" />
     	<div class="form-group">
     		<label for="noticia_texto">Texto</label>
-    		<input type="text" name="texto" id="noticia_texto" value="<%= texto %>"/>
+    		<input type="text" name="<%= ControladorGestionNoticias.PARAM_TEXTO %>" id="noticia_texto" value="<%= texto %>"/>
     	</div>
     	<div class="form-group">
     		<label for="noticia_enlace">Enlace</label>
-    		<input type="text" name="enlace" id="noticia_enlace" value="<%= enlace %>"/>
+    		<input type="text" name="<%= ControladorGestionNoticias.PARAM_ENLACE %>" id="noticia_enlace" value="<%= enlace %>"/>
     	</div>
     	<div class="form-group">
     		<label for="noticia_fecha">Fecha</label>
-    		<input type="text" name="fecha" id="noticia_fecha" autocomplete="off" value="<%= fecha %>"/>
+    		<input type="text" name="<%= ControladorGestionNoticias.PARAM_FECHA %>" id="noticia_fecha" autocomplete="off" value="<%= fecha %>"/>
     	</div>
     	<div class="form-check">
-    		<label for="noticia_publica"><input type="checkbox" id="noticia_publica" name="publica" value="<%= publica %>" <%= (publica ? "checked=''" : "") %>/>Pública</label>
+    		<label for="noticia_publica"><input type="checkbox" id="noticia_publica" name="<%= ControladorGestionNoticias.PARAM_PUBLICA %>" value="<%= publica %>" <%= (publica ? "checked=''" : "") %>/>Pública</label>
     	</div>
     	<div class="form-btn">
     		<input id="noticia_enviar" type="submit" name="<%= ControladorGestionNoticias.PARAM_ENVIAR %>" value="<%= bean.getNoticia() != null ? "Guardar cambios" : "Insertar noticia" %>"/>

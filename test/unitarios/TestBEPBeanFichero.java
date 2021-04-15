@@ -18,6 +18,7 @@ import es.ujaen.uvirtual.beans.uvirtual.bolsaempleo.Fichero;
 public class TestBEPBeanFichero {
 
 	private static final String CADENA = "cadena";
+	private static final Boolean BOOLEANO = true;
 	private static final InputStream ARCHIVO = new ByteArrayInputStream("archivo de prueba".getBytes());
 	
 	/** test constructor.
@@ -31,10 +32,12 @@ public class TestBEPBeanFichero {
 		fichero.setNombre(CADENA);
 		fichero.setTitulo(CADENA);
 		fichero.setArchivo(ARCHIVO);
+		fichero.setPublico(BOOLEANO);
 		assertEquals(id, fichero.getCodNum());
 		assertEquals(CADENA, fichero.getNombre());
 		assertEquals(CADENA, fichero.getTitulo());
 		assertEquals(ARCHIVO, fichero.getArchivo());
+		assertEquals(BOOLEANO, fichero.isPublico());
 		assertNotNull(fichero.toString());
 	}
 	
@@ -43,7 +46,7 @@ public class TestBEPBeanFichero {
 	@Test
 	public void testA02() {
 		Integer id = 1;
-    	Fichero fichero2 = new Fichero(id, CADENA, CADENA, ARCHIVO);
+    	Fichero fichero2 = new Fichero(id, CADENA, CADENA, ARCHIVO, BOOLEANO);
     	Fichero fichero = new Fichero(fichero2);
     	fichero.setCodNum(id);
     	fichero.setNombre(CADENA);
@@ -53,6 +56,7 @@ public class TestBEPBeanFichero {
 		assertEquals(CADENA, fichero.getNombre());
 		assertEquals(CADENA, fichero.getTitulo());
 		assertEquals(ARCHIVO, fichero.getArchivo());
+		assertEquals(BOOLEANO, fichero.isPublico());
 		assertNotNull(fichero.toString());
 		assertTrue(fichero.equals(fichero2));
 		assertTrue(fichero.hashCode() == fichero2.hashCode());
@@ -65,7 +69,7 @@ public class TestBEPBeanFichero {
 	@SuppressWarnings("java:S2159")
 	public void testA03() {
 		Integer id = 1;
-    	Fichero fichero3 = new Fichero(id, CADENA, CADENA, ARCHIVO);
+    	Fichero fichero3 = new Fichero(id, CADENA, CADENA, ARCHIVO, BOOLEANO);
     	Fichero fichero2 = new Fichero();
     	Fichero fichero = new Fichero();
 		assertTrue(fichero.equals(fichero2));

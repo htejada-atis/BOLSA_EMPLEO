@@ -25,6 +25,7 @@ public class TestBEPModeloFichero {
 	
     private static final String NOMBRE_FICHERO = "nombre fichero";
     private static final String TITULO_FICHERO = "titulo fichero";
+    private static final Boolean PUBLICO_FICHERO = true;
     private static final InputStream ARCHIVO_FICHERO = new ByteArrayInputStream("archivo de prueba".getBytes());
     
 	/** prepara la bd con los datos iniciales.
@@ -49,6 +50,7 @@ public class TestBEPModeloFichero {
     	fichero.setNombre(NOMBRE_FICHERO);
     	fichero.setTitulo(TITULO_FICHERO);
     	fichero.setArchivo(ARCHIVO_FICHERO);
+    	fichero.setPublico(PUBLICO_FICHERO);
     	ModeloFichero modelo = new ModeloFichero();
     	modelo.insertaFichero(fichero);
     	List<Fichero> ficheros = modelo.listaFicheros();

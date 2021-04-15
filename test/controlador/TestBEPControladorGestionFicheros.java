@@ -27,6 +27,7 @@ public class TestBEPControladorGestionFicheros {
 	private static final String MENSAJE_SIN_ERROR = "No debe devolver error";
 	private static final String MENSAJE_SIN_ADVERTENCIAS = "No debe mostrar advertencias";
 	private static final String TITULO_FICHERO = "titulo";
+	private static final String PUBLICO_FICHERO = "N";
 	
 	
     /** prepara la bd con los datos iniciales.
@@ -99,8 +100,8 @@ public class TestBEPControladorGestionFicheros {
 		VistaFicheros bean = obtenerFicheros(ControladorGestionFicheros.ACCION_DATATABLE);
 		
 		PeticionHttp peticion = UtilsTestBolsaEmpleo.peticionAutenticada();
-		peticion.setParameter(ControladorGestionFicheros.PARAM_ACCION, ControladorGestionFicheros.ACCION_BORRAR_FICHERO);
-		peticion.setParameter(ControladorGestionFicheros.PARAM_ID, bean.getDatatableFicheros().getData().get(0).getCodNum().toString());
+		peticion.setParameter(ControladorGestionFicheros.PARAM_ACCION, ControladorGestionFicheros.ACCION_BORRAR_FICHEROS);
+		peticion.setParameter(ControladorGestionFicheros.PARAM_FICHEROS, "[" + bean.getDatatableFicheros().getData().get(0).getCodNum().toString() + "]");
 		
 		RespuestaHttp respuesta = new RespuestaHttp();
 		ControladorGestionFicheros controlador = new ControladorGestionFicheros();
@@ -121,6 +122,7 @@ public class TestBEPControladorGestionFicheros {
 		peticion.setParameter(ControladorGestionFicheros.PARAM_ACCION, ControladorGestionFicheros.ACCION_SUBIR_FICHERO);
 		peticion.setParameter(ControladorGestionFicheros.PARAM_FICHERO, "");
 		peticion.setParameter(ControladorGestionFicheros.PARAM_TITULO, TITULO_FICHERO);
+		peticion.setParameter(ControladorGestionFicheros.PARAM_PUBLICO, PUBLICO_FICHERO);
 		
 		RespuestaHttp respuesta = new RespuestaHttp();
 		ControladorGestionFicheros controlador = new ControladorGestionFicheros();
@@ -141,7 +143,7 @@ public class TestBEPControladorGestionFicheros {
 		
 		PeticionHttp peticion = UtilsTestBolsaEmpleo.peticionAutenticada();
 		peticion.setParameter(ControladorGestionFicheros.PARAM_ACCION, ControladorGestionFicheros.ACCION_DESCARGAR_FICHERO);
-		peticion.setParameter(ControladorGestionFicheros.PARAM_ID, bean.getDatatableFicheros().getData().get(0).getCodNum().toString());
+		peticion.setParameter(ControladorGestionFicheros.PARAM_FICHERO, bean.getDatatableFicheros().getData().get(0).getCodNum().toString());
 		
 		RespuestaHttp respuesta = new RespuestaHttp();
 		ControladorGestionFicheros controlador = new ControladorGestionFicheros();
@@ -149,6 +151,48 @@ public class TestBEPControladorGestionFicheros {
 		VistaFicheros bean2 = (VistaFicheros) peticion.getUVDatos().getVistas().get(VistaFicheros.class.getName());
 		
 		assertNotNull(MENSAJE_FICHERO_DEVUELTO, bean2.getFichero());
+		assertEquals(MENSAJE_SIN_ERROR, 0, bean2.getMensajesDeError().size());
+		assertEquals(MENSAJE_SIN_ADVERTENCIAS, 0, bean2.getMensajesDeAdvertencia().size());
+	}
+	
+	/** hacer publico fichero.
+	 * @throws ServletException si error de servlet
+	 * @throws IOException si error de io
+	 */
+	@Test
+	public void testA07HacerPublico() throws ServletException, IOException {
+		VistaFicheros bean = obtenerFicheros(ControladorGestionFicheros.ACCION_DATATABLE);
+		
+		PeticionHttp peticion = UtilsTestBolsaEmpleo.peticionAutenticada();
+		peticion.setParameter(ControladorGestionFicheros.PARAM_ACCION, ControladorGestionFicheros.ACCION_HACER_FICHEROS_PUBLICOS);
+		peticion.setParameter(ControladorGestionFicheros.PARAM_FICHEROS, "[" + bean.getDatatableFicheros().getData().get(0).getCodNum().toString() + "]");
+		
+		RespuestaHttp respuesta = new RespuestaHttp();
+		ControladorGestionFicheros controlador = new ControladorGestionFicheros();
+		controlador.doPost(peticion, respuesta);
+		VistaFicheros bean2 = (VistaFicheros) peticion.getUVDatos().getVistas().get(VistaFicheros.class.getName());
+		
+		assertEquals(MENSAJE_SIN_ERROR, 0, bean2.getMensajesDeError().size());
+		assertEquals(MENSAJE_SIN_ADVERTENCIAS, 0, bean2.getMensajesDeAdvertencia().size());
+	}
+	
+	/** hacer privado fichero.
+	 * @throws ServletException si error de servlet
+	 * @throws IOException si error de io
+	 */
+	@Test
+	public void testA08HacerPrivado() throws ServletException, IOException {
+		VistaFicheros bean = obtenerFicheros(ControladorGestionFicheros.ACCION_DATATABLE);
+		
+		PeticionHttp peticion = UtilsTestBolsaEmpleo.peticionAutenticada();
+		peticion.setParameter(ControladorGestionFicheros.PARAM_ACCION, ControladorGestionFicheros.ACCION_HACER_FICHEROS_PRIVADOS);
+		peticion.setParameter(ControladorGestionFicheros.PARAM_FICHEROS, "[" + bean.getDatatableFicheros().getData().get(0).getCodNum().toString() + "]");
+		
+		RespuestaHttp respuesta = new RespuestaHttp();
+		ControladorGestionFicheros controlador = new ControladorGestionFicheros();
+		controlador.doPost(peticion, respuesta);
+		VistaFicheros bean2 = (VistaFicheros) peticion.getUVDatos().getVistas().get(VistaFicheros.class.getName());
+		
 		assertEquals(MENSAJE_SIN_ERROR, 0, bean2.getMensajesDeError().size());
 		assertEquals(MENSAJE_SIN_ADVERTENCIAS, 0, bean2.getMensajesDeAdvertencia().size());
 	}

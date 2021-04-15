@@ -13,6 +13,7 @@ public class Fichero implements Serializable {
 	private Integer codNum;
 	private String nombre;
 	private String titulo;
+	private Boolean publico;
 	private InputStream archivo;
 	
 	
@@ -26,12 +27,14 @@ public class Fichero implements Serializable {
 	 * @param pnombre .
 	 * @param ptitulo .
 	 * @param parchivo .
+	 * @param ppublico .
 	 */
-	public Fichero(String pnombre, String ptitulo, InputStream parchivo) {
+	public Fichero(String pnombre, String ptitulo, InputStream parchivo, Boolean ppublico) {
 		super();
 		this.nombre = pnombre;
 		this.titulo = ptitulo;
 		this.archivo = parchivo;
+		this.publico = ppublico;
 	}
 	
 	/** Constructor con parametros.
@@ -39,15 +42,33 @@ public class Fichero implements Serializable {
 	 * @param pnombre .
 	 * @param ptitulo .
 	 * @param parchivo .
+	 * @param ppublico .
 	 */
-	public Fichero(Integer pcodNum, String pnombre, String ptitulo, InputStream parchivo) {
+	public Fichero(Integer pcodNum, String pnombre, String ptitulo, InputStream parchivo, Boolean ppublico) {
 		super();
 		this.codNum = pcodNum;
 		this.nombre = pnombre;
 		this.titulo = ptitulo;
 		this.archivo = parchivo;
+		this.publico = ppublico;
 	}
 	
+	/** Constructor con parametros.
+	 * @param pcodNum .
+	 */
+	public Fichero(Integer pcodNum) {
+		super();
+		this.codNum = pcodNum;
+	}
+	
+	/** Constructor con parametros.
+	 * @param pcodNum .
+	 */
+	public Fichero(Integer pcodNum, Boolean ppublico) {
+		super();
+		this.codNum = pcodNum;
+		this.publico = ppublico;
+	}
 	
 	/** Constructor copia.
 	 * @param copia Fichero a copiar
@@ -90,7 +111,15 @@ public class Fichero implements Serializable {
 	public void setArchivo(InputStream archivo) {
 		this.archivo = archivo;
 	}
+	
+	public Boolean isPublico() {
+		return publico;
+	}
 
+	public void setPublico(Boolean publico) {
+		this.publico = publico;
+	}
+	
 	public static long getSerialversionuid() {
 		return serialVersionUID;
 	}
@@ -98,7 +127,7 @@ public class Fichero implements Serializable {
 	@Override
 	public String toString() {
 		return "Fichero [codNum=" + codNum + ", nombre=" + nombre 
-				+ ", titulo=" + titulo + ", archivo=" + archivo + "]";
+				+ ", titulo=" + titulo + ", archivo=" + archivo + ", publico=" + publico + "]";
 	}
 	
 	@Override
@@ -108,6 +137,7 @@ public class Fichero implements Serializable {
 		result = prime * result + ((nombre == null) ? 0 : nombre.hashCode());
 		result = prime * result + ((titulo == null) ? 0 : titulo.hashCode());
 		result = prime * result + ((archivo == null) ? 0 : archivo.hashCode());
+		result = prime * result + ((publico == null) ? 0 : publico.hashCode());
 		result = prime * result + ((codNum == null) ? 0 : codNum.hashCode());
 		return result;
 	}
@@ -144,6 +174,13 @@ public class Fichero implements Serializable {
 				return false;
 			}
 		} else if (!archivo.equals(other.archivo)) {
+			return false;
+		}
+		if (publico == null) {
+			if (other.archivo != null) {
+				return false;
+			}
+		} else if (!publico.equals(other.publico)) {
 			return false;
 		}
 		
