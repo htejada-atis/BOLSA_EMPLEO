@@ -143,7 +143,6 @@ VistaFicheros bean = (VistaFicheros) uvdatos.getVistas().get(VistaFicheros.class
 		});
 		
 		$("#table_ficheros").on("mouseover", ".tooltip", function() {
-			console.log("oiga")
 			$(this).find(".tooltiptext").text("Copiar enlace");
 		})
 		

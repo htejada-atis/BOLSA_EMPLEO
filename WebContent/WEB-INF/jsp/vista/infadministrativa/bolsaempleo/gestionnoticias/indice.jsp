@@ -95,10 +95,6 @@ VistaNoticias bean = (VistaNoticias) uvdatos.getVistas().get(VistaNoticias.class
 			        } }]}		        
 			    ],
 			});
-			
-			setInterval(function() {
-				//console.log(table.getChecked())
-			}, 5000)
 		});
 	
 	</script>
