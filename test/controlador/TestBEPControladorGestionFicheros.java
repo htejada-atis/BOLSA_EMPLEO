@@ -99,8 +99,8 @@ public class TestBEPControladorGestionFicheros {
 		VistaFicheros bean = obtenerFicheros(ControladorGestionFicheros.ACCION_DATATABLE);
 		
 		PeticionHttp peticion = UtilsTestBolsaEmpleo.peticionAutenticada();
-		peticion.setParameter(ControladorGestionFicheros.PARAM_ACCION, ControladorGestionFicheros.ACCION_BORRAR_FICHERO);
-		peticion.setParameter(ControladorGestionFicheros.PARAM_ID, bean.getDatatableFicheros().getData().get(0).getCodNum().toString());
+		peticion.setParameter(ControladorGestionFicheros.PARAM_ACCION, ControladorGestionFicheros.ACCION_BORRAR_FICHEROS);
+		peticion.setParameter(ControladorGestionFicheros.PARAM_FICHEROS, "[" + bean.getDatatableFicheros().getData().get(0).getCodNum().toString() + "]");
 		
 		RespuestaHttp respuesta = new RespuestaHttp();
 		ControladorGestionFicheros controlador = new ControladorGestionFicheros();

@@ -5,6 +5,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.PrintWriter;
 import java.sql.SQLException;
+import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.servlet.ServletException;
@@ -18,11 +19,14 @@ import javax.servlet.http.HttpSession;
 import javax.servlet.http.Part;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+import com.google.gson.reflect.TypeToken;
+
 import es.ujaen.uvirtual.beans.CodigoDescripcion;
 import es.ujaen.uvirtual.beans.UVDatos;
 import es.ujaen.uvirtual.beans.uvirtual.bolsaempleo.Fichero;
 import es.ujaen.uvirtual.beans.vistas.uvirtual.bolsaempleo.VistaFicheros;
 import es.ujaen.uvirtual.modelo.bolsaempleo.ModeloFichero;
+import es.ujaen.uvirtual.modelo.bolsaempleo.ModeloTitulacion;
 import es.ujaen.uvirtual.utilidades.BolsaEmpleoUtils;
 import es.ujaen.uvirtual.utilidades.DataTable;
 import es.ujaen.uvirtual.utilidades.EscapaHTML;
@@ -50,7 +54,7 @@ public class ControladorGestionFicheros extends HttpServlet {
 	
 	// Acciones
 	public static final String ACCION_SUBIR_FICHERO = "subirfichero";
-	public static final String ACCION_BORRAR_FICHERO = "borrarfichero";
+	public static final String ACCION_BORRAR_FICHEROS = "borrarficheros";
 	public static final String ACCION_DATATABLE = "datatable";
 	public static final String ACCION_DESCARGAR_FICHERO = "descargarfichero";
 	public static final String ACCION_LISTAR_FICHEROS = "listarficheros";
@@ -59,13 +63,16 @@ public class ControladorGestionFicheros extends HttpServlet {
 	public static final String PARAM_ACCION = "a";
 	public static final String PARAM_ENVIAR = "enviar";
 	public static final String PARAM_FICHERO = "fichero";
+	public static final String PARAM_FICHEROS = "ficheros";
 	public static final String PARAM_ID = "id";
 	public static final String PARAM_TITULO = "titulo";
 	
 	// Mensajes
 	public static final String MENSAJE_ENVIADO = "mensaje";
 	public static final String MENSAJE_EXITO_AGREGAR = "fichero subido correctamente";
-	public static final String MENSAJE_EXITO_ELIMINAR = "fichero eliminado correctamente";
+	public static final String MENSAJE_EXITO_ELIMINAR_FICHERO = "fichero eliminado correctamente";
+	public static final String MENSAJE_EXITO_ELIMINAR_FICHEROS = "ficheros eliminados correctamente";
+	public static final String MENSAJE_ERROR_FICHEROS_SELECCIONADOS_INCORRECTOS = "ficheros seleccionados no válidos";
 	
 	// ruta vistas
 	public static final String RUTA_BEP_CONF = "/WEB-INF/jsp/vista/infadministrativa/bolsaempleo/configuracion/";
@@ -95,8 +102,8 @@ public class ControladorGestionFicheros extends HttpServlet {
 		
 		try {
 			switch (nombreAccion) {
-				case ACCION_BORRAR_FICHERO:
-					eliminarFichero(request, response);
+				case ACCION_BORRAR_FICHEROS:
+					eliminarFicheros(request, response);
 					break;
 				case ACCION_DATATABLE:
 					listadoFicheros(bean, datos, request, response);
@@ -216,22 +223,32 @@ public class ControladorGestionFicheros extends HttpServlet {
 		}
 	}
 	
-	/** eliminar un fichero .
+	/** eliminar ficheros .
 	 * @param request .
 	 * @param response .
 	 * @throws SQLException excepcion de bbdd .
 	 * @throws UVException en caso de error de parametros .
 	 * @throws IOException en caso de error de IO .
 	 */
-	private void eliminarFichero(HttpServletRequest request, HttpServletResponse response) throws SQLException, UVException, IOException {
+	private void eliminarFicheros(HttpServletRequest request, HttpServletResponse response) throws SQLException, UVException, IOException {
 		ModeloFichero modelo = new ModeloFichero();
 		Integer codNum = Formateador.leeParametroInteger(request.getParameter(PARAM_ID));
-		Fichero fichero = new Fichero();
-		fichero.setCodNum(codNum);
-		modelo.borraFichero(fichero);
-		HttpSession session = request.getSession(false);
-		session.setAttribute(MENSAJE_ENVIADO, MENSAJE_EXITO_ELIMINAR);
-		response.sendRedirect(request.getServletPath());
+		
+		Gson gson = new GsonBuilder().create();
+		
+		try {
+			List<Integer> ficheros = gson.fromJson(request.getParameter(PARAM_FICHEROS), new TypeToken<List<Integer>>() { }.getType());
+			
+			for (Integer fichero: ficheros) {
+				modelo.borraFichero(new Fichero(fichero));
+			}
+			
+			HttpSession session = request.getSession(false);
+			session.setAttribute(MENSAJE_ENVIADO, ficheros.size() > 1 ? MENSAJE_EXITO_ELIMINAR_FICHEROS : MENSAJE_EXITO_ELIMINAR_FICHERO);
+			response.sendRedirect(request.getServletPath());
+		} catch (Exception ex) {
+			throw new UVException(MENSAJE_ERROR_FICHEROS_SELECCIONADOS_INCORRECTOS);
+		}
 	}
 	
 	/**

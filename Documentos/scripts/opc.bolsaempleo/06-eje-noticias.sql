@@ -14,7 +14,7 @@ COMMENT ON COLUMN TBEP_NOTICIAS.TEXTO IS 'Contenido o titular de la noticia';
 --/////////////////////
 COMMENT ON COLUMN TBEP_NOTICIAS.FECHA IS 'Fecha de creación de la noticia';
 --/////////////////////
-COMMENT ON COLUMN TBEP_NOTICIAS.FLGPUBLICA IS 'Indica si la noticia es visible en la página inicial de la plataforma';
+COMMENT ON COLUMN TBEP_NOTICIAS.FLGPUBLICA IS 'Indica si la noticia es visible para anónimos en la página inicial de la bolsa de empleo';
 --/////////////////////
 COMMENT ON COLUMN TBEP_NOTICIAS.FLGACTIVA IS 'Indica si la noticia está borrada o no';
 --/////////////////////

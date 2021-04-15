@@ -70,6 +70,18 @@ public class UtilsTestBolsaEmpleo {
 		return peticion;
     }
     
+    /** obtiene una peticion sin usuario logueado .
+     * @return peticion autenticada
+     */
+    public static PeticionHttp peticionAnonima() {
+		UVDatos datos = new UVDatos();
+		
+		PeticionHttp peticion = new PeticionHttp();
+		peticion.setUVDatos(datos);
+		
+		return peticion;
+    }
+    
     private static void ejecutarFile(File file) throws SQLException, IOException {
     	String name = file.getName();
     	String[] nameSplit = name.split("-");

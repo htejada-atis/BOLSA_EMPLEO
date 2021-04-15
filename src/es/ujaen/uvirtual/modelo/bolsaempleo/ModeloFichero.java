@@ -26,6 +26,7 @@ public class ModeloFichero {
 	public static final int ORDER_COLUMN_INDEX_ID = 1;
 	public static final int ORDER_COLUMN_INDEX_NOMBRE = 2;
 	public static final int ORDER_COLUMN_INDEX_TITULO = 3;
+	public static final int ORDER_COLUMN_INDEX_PUBLICO = 4;
 	
 	/********************************************** METODOS PÚBLICOS PARA CONSULTAS   ********************************************/
 	
@@ -55,6 +56,7 @@ public class ModeloFichero {
 						fich.setNombre(rs.getString("NOMBRE"));
 						fich.setTitulo(rs.getString("TITULO"));
 						fich.setArchivo(rs.getBlob("ARCHIVO").getBinaryStream());
+						fich.setPublico(rs.getString("FLGPUBLICO").equals("S"));
 						ficheros.add(fich);
 					} catch (Exception e) {
 						e.printStackTrace();
@@ -62,7 +64,7 @@ public class ModeloFichero {
 					
 				}
 			}
-			}
+		}
 		return ficheros;
 	}
 	
@@ -152,26 +154,28 @@ public class ModeloFichero {
 		List<Fichero> ficheros = new ArrayList<>();
 		DataTable<Fichero> dataTable = new DataTable<Fichero>(params);
 		
-		String consulta = "SELECT bepfich.codnum, bepfich.nombre, bepfich.titulo FROM tbep_ficheros bepfich WHERE 1=1 ";
+		String consulta = "SELECT bepfich.codnum, bepfich.nombre, bepfich.titulo, bepfich.FLGPUBLICO FROM tbep_ficheros bepfich WHERE 1=1 ";
 		
 		dataTable.setOrderColumn(ORDER_COLUMN_INDEX_ID, "bepfich.CODNUM");
 		dataTable.setOrderColumn(ORDER_COLUMN_INDEX_NOMBRE, "bepfich.NOMBRE");
 		dataTable.setOrderColumn(ORDER_COLUMN_INDEX_TITULO, "bepfich.TITULO");
+		dataTable.setOrderColumn(ORDER_COLUMN_INDEX_PUBLICO, "bepfich.FLGPUBLICO");
 		dataTable.setQuery(consulta);
 				
 		try (Connection conexion = ConexionUvirtual.obtenerInstancia();
 				PreparedStatement stmtCount = conexion.prepareStatement(dataTable.getQueryCount());
 				PreparedStatement stmt = conexion.prepareStatement(dataTable.getQuery());
-		) {					
+		) {
 			try (ResultSet rs = stmt.executeQuery()) {
 				while (rs.next()) {
-					Fichero fichero = new Fichero();
-					fichero.setCodNum(rs.getInt("CODNUM"));
-					fichero.setNombre(rs.getString("NOMBRE"));
-					fichero.setTitulo(rs.getString("TITULO"));
-					ficheros.add(fichero);					
-				}				
-			}	
+					Fichero fich = new Fichero();
+					fich.setCodNum(rs.getInt("CODNUM"));
+					fich.setNombre(rs.getString("NOMBRE"));
+					fich.setTitulo(rs.getString("TITULO"));
+					fich.setPublico(rs.getString("FLGPUBLICO").equals("S"));
+					ficheros.add(fich);		
+				}
+			}
 			
 			dataTable.setRecordsTotalFromQuery(stmtCount);
 			dataTable.setData(ficheros);
