@@ -33,7 +33,7 @@ import es.ujaen.uvirtual.utilidades.UVException;
 */
 public class TestBEPModeloUsuarios {
 
-	private static final Integer CODPERSONA = 5;
+	private static final Integer CODPERSONA = 100;
 	private static final String CODCUENTA = "test2";
 	private static final Rol ROL = new Rol(1050);
 	private static final String EMAIL = "test@test";
@@ -142,16 +142,32 @@ public class TestBEPModeloUsuarios {
     	assertFalse("usuario debe ser actualizado", usuario.equals(usuarioActualizado));
     }
 
+    /** test edicion datos personales usuario.
+     * @throws SQLException si error bd
+     * @throws UVException error experado
+     */
+    @Test
+    public void testA04EditarDatosPersonalesUsuario() throws SQLException, UVException {
+    	ModeloUsuarioBolsaEmpleo modelo = new ModeloUsuarioBolsaEmpleo();
+    	List<UsuarioBolsaEmpleo> usuarios = modelo.listaUsuarios("");
+    	UsuarioBolsaEmpleo usuario = usuarios.get(0);
+    	usuario.setDireccion("test");
+    	modelo.actualizaUsuarioMisDatos(usuario);
+    	UsuarioBolsaEmpleo usuarioActualizado = modelo.listaUsuario(usuario.getCodCuenta());
+    	
+    	assertFalse("usuario debe ser actualizado", usuario.equals(usuarioActualizado));
+    }
+    
+    
     /** test error inserta usuario null.
      * @throws SQLException si error bd
      * @throws UVException error experado
      */
     @Test(expected = UVException.class)
-    public void testE04InsertaUsuarioNull() throws SQLException, UVException {
+    public void testE01InsertaUsuarioNull() throws SQLException, UVException {
     	UsuarioBolsaEmpleo usuario = null;
     	ModeloUsuarioBolsaEmpleo modelo = new ModeloUsuarioBolsaEmpleo();
     	modelo.insertaUsuario(usuario);
     	fail();
     }
-  
 }
