@@ -14,6 +14,7 @@ public class VistaInicio extends Vista implements Serializable {
 	private static final long serialVersionUID = 1L;
 	private List<Noticia> noticias = new ArrayList<>();
 	private List<Fichero> ficheros = new ArrayList<>();
+	private Fichero fichero;
 	private String vista;
 	
 	public List<Noticia> getNoticias() {
@@ -30,6 +31,14 @@ public class VistaInicio extends Vista implements Serializable {
 	
 	public void setFicheros(List<Fichero> ficheros) {
 		this.ficheros = ficheros;
+	}
+	
+	public Fichero getFichero() {
+		return fichero;
+	}
+
+	public void setFichero(Fichero fich) {
+		this.fichero = fich;
 	}
 	
 	public String getVista() {

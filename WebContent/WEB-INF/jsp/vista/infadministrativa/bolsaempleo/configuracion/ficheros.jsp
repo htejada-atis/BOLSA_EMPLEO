@@ -29,16 +29,18 @@ VistaFicheros bean = (VistaFicheros) uvdatos.getVistas().get(VistaFicheros.class
 
     <table class="bluetable bolsaempleo" id="table_ficheros">
 		<tr>
-			<th scope="col"	style="width:30%">Nombre</th>
-			<th scope="col"	style="width:30%">Título</th>
-			<th scope="col" style="width:30%">Ruta del fichero</th>
+			<th scope="col" style="width:10%"></th>
+			<th scope="col"	style="width:20%">Nombre</th>
+			<th scope="col"	style="width:25%">Título</th>
+			<th scope="col" style="width:35%">Ruta del fichero</th>
+			<th scope="col" style="width:10%">Público</th>
 			<th scope="col" style="width:10%"></th>
 		</tr>
 		<tbody>				
 		</tbody>
 		<tfoot>
 			<tr>
-				<th colspan="5" style="width:100%"></th>
+				<th colspan="6" style="width:100%"></th>
 			</tr>
 		</tfoot>
 	</table>
@@ -52,7 +54,9 @@ VistaFicheros bean = (VistaFicheros) uvdatos.getVistas().get(VistaFicheros.class
 		var table = new DataTable('#table_ficheros', {
 		    "ajax": { url: "<%= ControladorGestionFicheros.URL_PATTERN_AJAX %>" },
 		    "pageSize": 10,
+		    "selectable": true,
 		    "columns": [
+		    	{'data': 'codNum', 'selectable': true},
 		        {'data': 'nombre', 'render': function(row) {
 		    		return "<div class='overflow-auto'>" +row.nombre +"</div>";
 		    	}},
@@ -60,30 +64,77 @@ VistaFicheros bean = (VistaFicheros) uvdatos.getVistas().get(VistaFicheros.class
 		    		return "<div class='overflow-auto'>" +row.titulo +"</div>";
 		    	}},
 		        {'data': 'codnum', 'class': 'overflow-ellipsis', 'render': function(row) {
-		        	var link = "<%= request.getRequestURI() %>?a=<%= ControladorGestionFicheros.ACCION_DESCARGAR_FICHERO %>&<%= ControladorGestionFicheros.PARAM_ID %>=" + row.codNum;
+		        	var link = "<%= ControladorGestionFicheros.URL_PATTERN_FILES_PRIVADA %>"
+		        	+ "?a=<%= ControladorGestionFicheros.ACCION_DESCARGAR_FICHERO %>&<%= ControladorGestionFicheros.PARAM_FICHERO %>=" + row.codNum;
 		        	return "<a class='consultar-fichero' href='" +link +"' target='_blank'>" +link +"</a>"; 
 		        	}
 		        },
-		        {'data': 'codnum', 'buttons': [{'label': 'Borrar', 'onClick': function(row) {
-				        	Atis.confirmDialog("Borrar fichero", "¿Desea borrar el fichero seleccionado?", {
-				        		Si: function() {
-				        			var params = {'a': '<%= ControladorGestionFicheros.ACCION_BORRAR_FICHERO %>', '<%= ControladorGestionFicheros.PARAM_ID %>': row.codNum};
-					        		Atis.sendForm("<%= request.getRequestURI() %>", params);
-						          	$(this).dialog("close");
-						        },
-						        No: function() {
-						          	$(this).dialog("close");
-						    	}
-						    });
-			        	}
-			        },{'label': '<label class="tooltiptext">Copiar enlace</label>Copiar', 'class': 'tooltip', 'onClick': function(row) {
+		        {'data': 'publico'},
+		        {'data': 'codnum', 'buttons': [{'label': '<label class="tooltiptext">Copiar enlace</label>Copiar', 'class': 'tooltip', 'onClick': function(row) {
 			        	$(this).parent().parent().parent().find(".tooltiptext").text("¡Enlace copiado!");
 			        	
-			        	var link = "<%= request.getRequestURI() %>?a=<%= ControladorGestionFicheros.ACCION_DESCARGAR_FICHERO %>&<%= ControladorGestionFicheros.PARAM_ID %>=" + row.codNum;
+			        	var link = "<%= ControladorGestionFicheros.URL_PATTERN_FILES_PRIVADA %>"
+				        	+ "?a=<%= ControladorGestionFicheros.ACCION_DESCARGAR_FICHERO %>&<%= ControladorGestionFicheros.PARAM_FICHERO %>=" + row.codNum;
 			        	navigator.clipboard.writeText(link);
-			        	}
-			        }]}
+			        }
+			    }]}
 		    ],
+		    "actions": [
+		    	{'label': 'Eliminar', 'onClick': function(selected) {
+		    		if(selected.length) {
+		    			var titulo = selected.length > 1 ? "Eliminar ficheros" : "Eliminar fichero";
+		    			var mensaje = selected.length > 1 ? "¿Desea eliminar los ficheros seleccionados?" : "¿Desea eliminar el fichero seleccionado?";
+		    			
+		    			Atis.confirmDialog(titulo, mensaje, {
+			        		Si: function() {
+			        			var params = {'a': '<%= ControladorGestionFicheros.ACCION_BORRAR_FICHEROS %>',
+			        					'<%= ControladorGestionFicheros.PARAM_FICHEROS %>': JSON.stringify(selected)};
+				        		Atis.sendForm("<%= request.getRequestURI() %>", params);
+					          	$(this).dialog("close");
+					        },
+					        No: function() {
+					          	$(this).dialog("close");
+					    	}
+					    });
+		    		}
+		    	}},
+		    	{'label': 'Hacer público', 'onClick': function(selected) {
+		    		if(selected.length) {
+		    			var titulo = selected.length > 1 ? "Hacer ficheros públicos" : "Hacer fichero público";
+		    			var mensaje = selected.length > 1 ? "¿Desea hacer publicos los ficheros seleccionados?" : "¿Desea hacer público el fichero seleccionado?";
+		    			
+		    			Atis.confirmDialog(titulo, mensaje, {
+			        		Si: function() {
+			        			var params = {'a': '<%= ControladorGestionFicheros.ACCION_HACER_FICHEROS_PUBLICOS %>',
+			        					'<%= ControladorGestionFicheros.PARAM_FICHEROS %>': JSON.stringify(selected)};
+				        		Atis.sendForm("<%= request.getRequestURI() %>", params);
+					          	$(this).dialog("close");
+					        },
+					        No: function() {
+					          	$(this).dialog("close");
+					    	}
+					    });
+		    		}
+		    	}},
+		    	{'label': 'Hacer privado', 'onClick': function(selected) {
+		    		if(selected.length) {
+		    			var titulo = selected.length > 1 ? "Hacer ficheros privados" : "Hacer fichero privado";
+		    			var mensaje = selected.length > 1 ? "¿Desea hacer privados los ficheros seleccionados?" : "¿Desea hacer privado el fichero seleccionado?";
+		    			
+		    			Atis.confirmDialog(titulo, mensaje, {
+			        		Si: function() {
+			        			var params = {'a': '<%= ControladorGestionFicheros.ACCION_HACER_FICHEROS_PRIVADOS %>',
+			        					'<%= ControladorGestionFicheros.PARAM_FICHEROS %>': JSON.stringify(selected)};
+				        		Atis.sendForm("<%= request.getRequestURI() %>", params);
+					          	$(this).dialog("close");
+					        },
+					        No: function() {
+					          	$(this).dialog("close");
+					    	}
+					    });
+		    		}
+		    	}}
+		    ]
 		});
 		
 		document.getElementById("nuevo_fichero").addEventListener("click", function(event) {

@@ -33,13 +33,13 @@ import es.ujaen.uvirtual.utilidades.UVException;
  * Controlador - Opers. con nombres: obtener, incluir, eliminar .
  * */
 @WebServlet(
-		name = "informacionadministrativa.bolsaempleo.configuracion.titulacionesarea", 
+		name = "informacionadministrativa.bolsaempleo.configuracion.titulacionespreferentesarea", 
 		description = "Gestión de titulaciones preferentes por área", 
 		urlPatterns = { 
-				"/srv/es/informacionadministrativa/bolsaempleo/configuracion/titulacionesarea", 
-				"/srv/en/informacionadministrativa/bolsaempleo/configuracion/titulacionesarea",
-				"/srv/es/ajax/informacionadministrativa/bolsaempleo/configuracion/titulacionesarea",
-				"/srv/en/ajax/informacionadministrativa/bolsaempleo/configuracion/titulacionesarea"
+				"/srv/es/informacionadministrativa/bolsaempleo/configuracion/titulacionespreferentesarea", 
+				"/srv/en/informacionadministrativa/bolsaempleo/configuracion/titulacionespreferentesarea",
+				"/srv/es/ajax/informacionadministrativa/bolsaempleo/configuracion/titulacionespreferentesarea",
+				"/srv/en/ajax/informacionadministrativa/bolsaempleo/configuracion/titulacionespreferentesarea"
 		})
 public class ControladorGestionTitulacionesPreferentesArea extends HttpServlet {
 	private static final long serialVersionUID = 1L;
@@ -48,7 +48,7 @@ public class ControladorGestionTitulacionesPreferentesArea extends HttpServlet {
 	
 	// Acciones
 	public static final String ACCION_DATATABLE_TITULACIONES = "datatabletitulaciones";
-	public static final String ACCION_DATATABLE_TITULACIONES_AREA = "datatabletitulacionesarea";
+	public static final String ACCION_DATATABLE_TITULACIONES_PREFERENTES_AREA = "datatabletitulacionespreferentesarea";
 	public static final String ACCION_ELIMINAR_TITULACION_AREA = "eliminartitulacionarea";
 	public static final String ACCION_INCLUIR_TITULACION_AREA = "incluirtitulacionarea";
 	public static final String ACCION_LISTAR_AREAS = "listarareas";
@@ -73,7 +73,7 @@ public class ControladorGestionTitulacionesPreferentesArea extends HttpServlet {
 	public static final String RUTA_BEP_CONF = "/WEB-INF/jsp/vista/infadministrativa/bolsaempleo/configuracion/";
 	
 	// urls
-	public static final String URL_PATTERN_AJAX = "/srv/es/ajax/informacionadministrativa/bolsaempleo/configuracion/titulacionesarea";
+	public static final String URL_PATTERN_AJAX = "/srv/es/ajax/informacionadministrativa/bolsaempleo/configuracion/titulacionespreferentesarea";
 
 	/** Peticion GET.
 	 * @see HttpServlet#doGet(HttpServletRequest request, HttpServletResponse response)
@@ -106,8 +106,8 @@ public class ControladorGestionTitulacionesPreferentesArea extends HttpServlet {
 				case ACCION_DATATABLE_TITULACIONES:
 					listadoTitulaciones(bean, datos, request, response);
 					break;
-				case ACCION_DATATABLE_TITULACIONES_AREA:
-					listadoTitulacionesArea(bean, datos, request, response);
+				case ACCION_DATATABLE_TITULACIONES_PREFERENTES_AREA:
+					listadoTitulacionesPreferentesArea(bean, datos, request, response);
 					break;
 			}
 			
@@ -244,7 +244,7 @@ public class ControladorGestionTitulacionesPreferentesArea extends HttpServlet {
 	 * @throws IOException en caso de error de IO .
 	 * @throws SQLException excepcion de bbdd.
 	 */
-	private void listadoTitulacionesArea(VistaTitulacionesArea bean, UVDatos datos, HttpServletRequest request, HttpServletResponse response)
+	private void listadoTitulacionesPreferentesArea(VistaTitulacionesArea bean, UVDatos datos, HttpServletRequest request, HttpServletResponse response)
 			throws IOException, SQLException {
 		ModeloTitulacion modelo = new ModeloTitulacion();
 		datos.setContentType("application/json");

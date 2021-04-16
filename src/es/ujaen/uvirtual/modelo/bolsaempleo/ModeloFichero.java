@@ -26,17 +26,19 @@ public class ModeloFichero {
 	public static final int ORDER_COLUMN_INDEX_ID = 1;
 	public static final int ORDER_COLUMN_INDEX_NOMBRE = 2;
 	public static final int ORDER_COLUMN_INDEX_TITULO = 3;
+	public static final int ORDER_COLUMN_INDEX_PUBLICO = 4;
 	
 	/********************************************** METODOS PÚBLICOS PARA CONSULTAS   ********************************************/
 	
 	/** Consulta ficheros en BBDD y los devuelve .
+	 * @param clausula para filtrar los ficheros de la bd .
 	 * @param id para filtrar ficheros por id .
 	 * @return lista todos los ficheros de la base de datos .
 	 * @throws SQLException en caso de error de base de datos .
 	 */
-	private List<Fichero> listaFicheros(Integer id) throws SQLException {
+	private List<Fichero> listaFicheros(String clausula, Integer id) throws SQLException {
 		List<Fichero> ficheros = new ArrayList<>();
-		String consulta = "SELECT bepfich.* FROM tbep_ficheros bepfich ";
+		String consulta = "SELECT bepfich.* FROM tbep_ficheros bepfich " + clausula;
 		
 		if (id != null) {
 			consulta += "WHERE codnum = ?";
@@ -55,23 +57,33 @@ public class ModeloFichero {
 						fich.setNombre(rs.getString("NOMBRE"));
 						fich.setTitulo(rs.getString("TITULO"));
 						fich.setArchivo(rs.getBlob("ARCHIVO").getBinaryStream());
+						fich.setPublico(rs.getString("FLGPUBLICO").equals("S"));
 						ficheros.add(fich);
 					} catch (Exception e) {
 						e.printStackTrace();
 					}
-					
 				}
 			}
-			}
+		}
 		return ficheros;
 	}
 	
+	/** lista todos los ficheros de inicio .
+	 * @param anonimo .
+	 * @return lista de todos los ficheros .
+	 * @throws SQLException si hay un error en la base de datos .
+	 */
+	public List<Fichero> listaFicherosInicio(boolean anonimo) throws SQLException {
+		return listaFicheros(anonimo ? "WHERE flgpublico = 'S' " : "", null);
+	}
+	
 	/** lista todos los ficheros .
+	 * @param anonimo .
 	 * @return lista de todos los ficheros .
 	 * @throws SQLException si hay un error en la base de datos .
 	 */
 	public List<Fichero> listaFicheros() throws SQLException {
-		return listaFicheros(null);
+		return listaFicheros("", null);
 	}
 	
 	/** obtiene un archivo a partir de su id.
@@ -81,7 +93,7 @@ public class ModeloFichero {
 	 * @throws UVException en caso de error de parametros .
 	 */
 	public Fichero listaFichero(Integer id) throws SQLException, UVException {
-		List<Fichero> ficheros = listaFicheros(id);
+		List<Fichero> ficheros = listaFicheros("", id);
 		if (ficheros.isEmpty()) {
 			throw new UVException("No existe fichero");
 		}
@@ -127,16 +139,46 @@ public class ModeloFichero {
 		if (fichero.getArchivo() == null) {
 			throw new UVException("No se puede insertar un fichero sin archivo");
 		}
+		if (fichero.isPublico() == null) {
+			throw new UVException("No se puede insertar un fichero sin parámetro público");
+		}
 		
 		String consulta = "INSERT INTO tbep_ficheros " 
-				+ " (NOMBRE,TITULO,ARCHIVO) "
-				+ "VALUES (?,?,?)";
+				+ " (NOMBRE,TITULO,ARCHIVO,FLGPUBLICO) "
+				+ "VALUES (?,?,?,?)";
 		try (Connection conexion = ConexionUvirtual.obtenerInstancia();
 			 PreparedStatement stmt = conexion.prepareStatement(consulta);) {
 			int parameterIndex = 1;
 			stmt.setString(parameterIndex++, fichero.getNombre());
 			stmt.setString(parameterIndex++, fichero.getTitulo());
 			stmt.setBinaryStream(parameterIndex++, fichero.getArchivo());
+			stmt.setString(parameterIndex++, fichero.isPublico() ? "S" : "N");
+			stmt.executeUpdate();
+		}
+	}
+	
+	/** Cambia booleano publico de un fichero .
+	 * @param fichero a modificar .
+	 * @throws SQLException en caso de error en la BD .
+	 * @throws UVException si fichero no es válido .
+	 */
+	public void modificarPublicoFichero(Fichero fichero) throws SQLException, UVException {
+		if (fichero == null) {
+			throw new UVException("No se puede editar un fichero vacío");
+		}
+		if (fichero.getCodNum() == null) {
+			throw new UVException("No se puede editar un fichero con id vacío");
+		}
+		if (fichero.isPublico() == null) {
+			throw new UVException("No se puede cambiar un publico vacío");
+		}
+		
+		String consulta = "UPDATE tbep_ficheros SET flgpublico=? WHERE codnum=?";
+		try (Connection conexion = ConexionUvirtual.obtenerInstancia();
+			 PreparedStatement stmt = conexion.prepareStatement(consulta);) {
+			int parameterIndex = 1;
+			stmt.setString(parameterIndex++, fichero.isPublico() ? "S" : "N");
+			stmt.setInt(parameterIndex++, fichero.getCodNum());
 			stmt.executeUpdate();
 		}
 	}
@@ -152,26 +194,28 @@ public class ModeloFichero {
 		List<Fichero> ficheros = new ArrayList<>();
 		DataTable<Fichero> dataTable = new DataTable<Fichero>(params);
 		
-		String consulta = "SELECT bepfich.codnum, bepfich.nombre, bepfich.titulo FROM tbep_ficheros bepfich WHERE 1=1 ";
+		String consulta = "SELECT bepfich.codnum, bepfich.nombre, bepfich.titulo, bepfich.FLGPUBLICO FROM tbep_ficheros bepfich WHERE 1=1 ";
 		
 		dataTable.setOrderColumn(ORDER_COLUMN_INDEX_ID, "bepfich.CODNUM");
 		dataTable.setOrderColumn(ORDER_COLUMN_INDEX_NOMBRE, "bepfich.NOMBRE");
 		dataTable.setOrderColumn(ORDER_COLUMN_INDEX_TITULO, "bepfich.TITULO");
+		dataTable.setOrderColumn(ORDER_COLUMN_INDEX_PUBLICO, "bepfich.FLGPUBLICO");
 		dataTable.setQuery(consulta);
 				
 		try (Connection conexion = ConexionUvirtual.obtenerInstancia();
 				PreparedStatement stmtCount = conexion.prepareStatement(dataTable.getQueryCount());
 				PreparedStatement stmt = conexion.prepareStatement(dataTable.getQuery());
-		) {					
+		) {
 			try (ResultSet rs = stmt.executeQuery()) {
 				while (rs.next()) {
-					Fichero fichero = new Fichero();
-					fichero.setCodNum(rs.getInt("CODNUM"));
-					fichero.setNombre(rs.getString("NOMBRE"));
-					fichero.setTitulo(rs.getString("TITULO"));
-					ficheros.add(fichero);					
-				}				
-			}	
+					Fichero fich = new Fichero();
+					fich.setCodNum(rs.getInt("CODNUM"));
+					fich.setNombre(rs.getString("NOMBRE"));
+					fich.setTitulo(rs.getString("TITULO"));
+					fich.setPublico(rs.getString("FLGPUBLICO").equals("S"));
+					ficheros.add(fich);		
+				}
+			}
 			
 			dataTable.setRecordsTotalFromQuery(stmtCount);
 			dataTable.setData(ficheros);
