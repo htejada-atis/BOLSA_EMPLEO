@@ -21,8 +21,16 @@ public class UsuarioBolsaEmpleo implements Serializable {
 	private String nombre;
 	private String apellido1;
 	private String apellido2;
-	private String sexo;
 	private String email;
+	private String direccion;
+	private String codigopostal;
+	private String localidad;
+	private String provincia;
+	private String movil;
+	private String telefono;
+	private String nacionalidad;
+	private String sexo;
+	
 	private Usuario usuarioArcos;
 	private Rol rol;
 	private Boolean listaDist;
@@ -107,6 +115,35 @@ public class UsuarioBolsaEmpleo implements Serializable {
 		this.razonExclusion = prazonexcluido;
 		this.fechaExclusion = pfechaexclusion;
 	}
+	
+	/** Constructor con parametros para envio de datos personales.
+	 * @param pcodNum .
+	 * @param pemail .
+	 * @param pdireccion .
+	 * @param pcodigopostal .
+	 * @param plocalidad .
+	 * @param pprovincia .
+	 * @param pmovil .
+	 * @param ptelefono .
+	 * @param pnacionalidad .
+	 * @param psexo .
+	 */
+	public UsuarioBolsaEmpleo(Integer pcodNum, String pemail, String pdireccion, String pcodigopostal,
+			String plocalidad, String pprovincia, String pmovil, String ptelefono, String pnacionalidad, String psexo) {
+		super();
+		this.codNum = pcodNum;
+		this.email = pemail;
+		this.direccion = pdireccion;
+		this.codigopostal = pcodigopostal;
+		this.localidad = plocalidad;
+		this.provincia = pprovincia;
+		this.movil = pmovil;
+		this.telefono = ptelefono;
+		this.nacionalidad = pnacionalidad;
+		this.sexo = psexo;
+	}
+	
+	
 	
 	/** Constructor copia.
 	 * @param copia Usuario a copiar
@@ -210,6 +247,62 @@ public class UsuarioBolsaEmpleo implements Serializable {
 
 	public void setEmail(String email) {
 		this.email = email;
+	}
+	
+	public String getDireccion() {
+		return direccion;
+	}
+
+	public void setDireccion(String pdireccion) {
+		this.direccion = pdireccion;
+	}
+	
+	public String getCodigoPostal() {
+		return codigopostal;
+	}
+
+	public void setCodigoPostal(String pcodigopostal) {
+		this.codigopostal = pcodigopostal;
+	}
+	
+	public String getLocalidad() {
+		return localidad;
+	}
+
+	public void setLocalidad(String plocalidad) {
+		this.localidad = plocalidad;
+	}
+	
+	public String getProvincia() {
+		return provincia;
+	}
+
+	public void setProvincia(String pprovincia) {
+		this.provincia = pprovincia;
+	}
+	
+	public String getMovil() {
+		return movil;
+	}
+
+	public void setMovil(String pmovil) {
+		this.movil = pmovil;
+	}
+	
+	public String getTelefono() {
+		return telefono;
+	}
+
+	public void setTelefono(String ptelefono) {
+		this.telefono = ptelefono;
+	}
+	
+	public String getNacionalidad() {
+		return nacionalidad;
+	}
+
+	public void setNacionalidad(String pnacionalidad) {
+		this.nacionalidad = pnacionalidad;
 	}
 	
 	public Usuario getUsuarioArcos() {

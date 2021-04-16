@@ -385,6 +385,7 @@ public class ControladorUsuarioBolsaEmpleo extends HttpServlet {
 		UsuarioBolsaEmpleo usuarioFinal = new UsuarioBolsaEmpleo(usuArcos.getCodigoPersonaArcos(), usu, role, listadist, excluido, razonexcluido, date);
 			
 		modelo.insertaUsuario(usuarioFinal);
+		modelo.insertaRol(usuarioFinal, false);
 		
 		bean.getMensajesDeExito().add(MENSAJE_EXITO_AGREGAR);
 		HttpSession session = request.getSession(false);

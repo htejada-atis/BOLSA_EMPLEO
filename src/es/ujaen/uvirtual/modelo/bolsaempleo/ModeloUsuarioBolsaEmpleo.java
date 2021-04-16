@@ -412,7 +412,15 @@ public class ModeloUsuarioBolsaEmpleo {
 		usuario.setNombre(rs.getString("STRNOMBRE"));
 		usuario.setPrimerApellido(rs.getString("STRAPELLIDO1"));
 		usuario.setSegundoApellido(rs.getString("STRAPELLIDO2"));
-		usuario.setEmail(rs.getString("EMAIL_ALTA"));
+		usuario.setEmail(rs.getString("EMAIL"));
+		usuario.setDireccion(rs.getString("DIRECCION"));
+		usuario.setCodigoPostal(rs.getString("CODIGOPOSTAL"));
+		usuario.setLocalidad(rs.getString("LOCALIDAD"));
+		usuario.setProvincia(rs.getString("PROVINCIA"));
+		usuario.setMovil(rs.getString("MOVIL"));
+		usuario.setTelefono(rs.getString("TELEFONO"));
+		usuario.setNacionalidad(rs.getString("NACIONALIDAD"));
+		usuario.setSexo(rs.getString("SEXO"));
 		usuario.setRol(modeloRol.getRoleById(rs.getInt("ROL")));
 		usuario.setListaDist(rs.getString("FLGLISTADISTRIBUCION").equals("S"));
 		usuario.setExcluido(rs.getString("FLGEXCLUIDO").equals("S"));
@@ -496,6 +504,8 @@ public class ModeloUsuarioBolsaEmpleo {
 					stmt.setString(parameterIndex++, usuario.getListaDist() ? "S" : "N");
 					stmt.executeUpdate();
 				}
+			
+			insertaRol(usuario, false);
 		} else {
 			String consulta = "INSERT INTO tbep_usuarios " 
 					+ " (CODPERSONA,CODCUENTA,ROL,EMAIL,FLGLISTADISTRIBUCION,FLGEXCLUIDO,RAZON_EXCLUSION,FECHA_EXCLUSION) "
@@ -514,7 +524,34 @@ public class ModeloUsuarioBolsaEmpleo {
 					stmt.setDate(parameterIndex++, new java.sql.Date(usuario.getFechaExclusion().getTime()));
 					stmt.executeUpdate();
 				}
+			insertaRol(usuario, false);
 		}
+	}
+	
+	/**	Función que inserta un rol y usuario en la BD.
+	 * @param usuario ya existente
+	 * @param admin .
+	 * @throws SQLException en caso de error en la BD
+	 */
+	public void insertaRol(UsuarioBolsaEmpleo usuario, Boolean admin) throws SQLException, UVException {
+		if (usuario == null) {
+			throw new UVException("No se puede insertar un usuario vacio");
+		}
+		if (usuario.getRol() == null || usuario.getRol().equals("")) {
+			throw new UVException("No se puede insertar un usuario sin role");
+		}
+		String consulta = "INSERT INTO adm_usuario_rol " 
+				+ " (USERUID,ROL_CODNUM,FLG_ADMIN) "
+				+ "VALUES (?, ?, ?)";
+		
+		try (Connection conexion = ConexionUvirtual.obtenerInstancia();
+				PreparedStatement stmt = conexion.prepareStatement(consulta);) {
+				int parameterIndex = 1;
+				stmt.setString(parameterIndex++, usuario.getCodCuenta());
+				stmt.setInt(parameterIndex++, usuario.getRol().getCodNum());
+				stmt.setString(parameterIndex++, admin ? "S" : "N");
+				stmt.executeUpdate();
+			}
 	}
 	
 	/** Actualiza un usuario.
@@ -534,13 +571,49 @@ public class ModeloUsuarioBolsaEmpleo {
 			+ " SET ROL=?, FLGLISTADISTRIBUCION=?, FLGEXCLUIDO=?, RAZON_EXCLUSION=?, FECHA_EXCLUSION=? "
 			+ " WHERE codnum=?";
 		try (Connection conexion = ConexionUvirtual.obtenerInstancia();
-			PreparedStatement stmt = conexion.prepareStatement(consulta);) {
+		PreparedStatement stmt = conexion.prepareStatement(consulta);) {
 			int parameterIndex = 1;
 			stmt.setInt(parameterIndex++, usuario.getRol().getCodNum());
 			stmt.setString(parameterIndex++, usuario.getListaDist() ? "S" : "N");
 			stmt.setString(parameterIndex++, usuario.getExcluido() ? "S" : "N");
 			stmt.setString(parameterIndex++, usuario.getRazonExcluido());
 			stmt.setDate(parameterIndex++, new java.sql.Date(usuario.getFechaExclusion().getTime()));
+			stmt.setInt(parameterIndex++, usuario.getCodNum());
+			stmt.executeUpdate();
+		}
+		
+		actualizaRol(usuario);
+	}
+	
+	
+	/** Actualiza los datos personale de un usuario.
+	 * @param usuario UsuarioBolsaEmpleo con los datos nuevos a actualizar
+	 * @throws SQLException en caso de error en la BD
+	 * @throws UVException en caso de errores de validacion
+	 */
+	public void actualizaUsuarioMisDatos(UsuarioBolsaEmpleo usuario) throws SQLException, UVException {
+		if (usuario == null) {
+			throw new UVException("usuario obligatorio");
+		}
+		if (usuario.getCodNum() == null) {
+			throw new UVException("id usuario no válido");
+		}
+		
+		String consulta = "UPDATE tbep_usuarios "
+			+ " SET EMAIL=?, DIRECCION=?, CODIGOPOSTAL=?, LOCALIDAD=?, PROVINCIA=?, MOVIL=?, TELEFONO=?, NACIONALIDAD=?, SEXO=?"
+			+ " WHERE codnum=?";
+		try (Connection conexion = ConexionUvirtual.obtenerInstancia();
+			PreparedStatement stmt = conexion.prepareStatement(consulta);) {
+			int parameterIndex = 1;
+			stmt.setString(parameterIndex++, usuario.getEmail());
+			stmt.setString(parameterIndex++, usuario.getDireccion());
+			stmt.setString(parameterIndex++, usuario.getCodigoPostal());
+			stmt.setString(parameterIndex++, usuario.getLocalidad());
+			stmt.setString(parameterIndex++, usuario.getProvincia());
+			stmt.setString(parameterIndex++, usuario.getMovil());
+			stmt.setString(parameterIndex++, usuario.getTelefono());
+			stmt.setString(parameterIndex++, usuario.getNacionalidad());
+			stmt.setString(parameterIndex++, usuario.getSexo());
 			stmt.setInt(parameterIndex++, usuario.getCodNum());
 			stmt.executeUpdate();
 		}
@@ -633,8 +706,8 @@ public class ModeloUsuarioBolsaEmpleo {
 	 * @throws UVException si noticia no es valida .
 	 */
 	public Boolean checkUser(UVDatos datos) {
-		Usuario usuArcos = datos.getUsuario();
-
+		Usuario usuArcos = datos.getUsuario();		
+		
 		if (usuArcos != null) {
 			try {
 				UsuarioBolsaEmpleo usu = listaUsuario(usuArcos.getUid());
@@ -679,4 +752,24 @@ public class ModeloUsuarioBolsaEmpleo {
 			stmt.executeUpdate();
 		}
 	}
+	
+	/** Actualiza Rol usuario.
+	 * @param usu para asociar
+	 * @throws SQLException en caso de error en la BD
+	 * @throws UVException si noticia no es valida
+	 */
+	public void actualizaRol(UsuarioBolsaEmpleo usu) throws SQLException {
+		String consultaRol = "UPDATE ADM_USUARIO_ROL "
+				+ " SET ROL_CODNUM=?, FLG_ADMIN=?"
+				+ " WHERE USERUID=?";
+			try (Connection conexion = ConexionUvirtual.obtenerInstancia();
+			PreparedStatement stmt = conexion.prepareStatement(consultaRol);) {
+				int parameterIndex = 1;
+				stmt.setInt(parameterIndex++, usu.getRol().getCodNum());
+				stmt.setString(parameterIndex++, "N");
+				stmt.setString(parameterIndex++, usu.getCodCuenta());
+				stmt.executeUpdate();
+			}
+	}	
+	
 }
