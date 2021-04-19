@@ -41,8 +41,8 @@ VistaTitulacionesArea bean = (VistaTitulacionesArea) uvdatos.getVistas().get(Vis
 	</div>
 	
 	<div id="tablas_titulaciones">
-		<h4 id="title_titulaciones_preferentes_area">Titulaciones preferentes al área</h4>
 		<table class="bluetable bolsaempleo" id="table_titulaciones_preferentes_area">
+		<caption class="table-title">Titulaciones preferentes al área</caption>  
 			<tr>
 				<th scope="col" style="width:5%"></th>
 				<th scope="col" style="width:10%" title="Id de la titulaciï¿½n">Id</th>
@@ -57,8 +57,9 @@ VistaTitulacionesArea bean = (VistaTitulacionesArea) uvdatos.getVistas().get(Vis
 			</tfoot>
 		</table>
 	
-		<h4>Titulaciones</h4>
+		
 	    <table class="bluetable bolsaempleo" id="table_titulaciones">
+	    <caption class="table-title">Titulaciones</caption>  
 			<tr>
 				<th scope="col" style="width:5%"></th>
 				<th scope="col" style="width:10%" title="Id de la titulaciï¿½n">Id</th>

@@ -28,9 +28,11 @@ public class TestBEPControladorUsuariosBolsaEmpleo {
 	private static final String MENSAJE_BLOQUES_DEVUELTOS = "Debe devolver bloques";
 	private static final String MENSAJE_SIN_ADVERTENCIAS = "No debe mostrar advertencias";
 	private static final String MENSAJE_SIN_ERROR = "No debe devolver error";
+	private static final String MENSAJE_CON_ERROR = "Debe devolver error";
+	private static final String MENSAJE_SIN_EXITO = "No debe exito";
 	
-	private static final String CODNUM = "4";
-	private static final String CODCUENTA = "prueba";
+	private static final String CODNUM = "3";
+	private static final String CODCUENTA = "pruebas1";
 	private static final String ROL = "1050";
 	private static final String EMAIL = "test@test";
 	private static final String LISTADIST = "S";
@@ -394,7 +396,7 @@ public class TestBEPControladorUsuariosBolsaEmpleo {
 		controlador.doPost(peticion, respuesta);
 		VistaUsuarioBolsaEmpleo bean = (VistaUsuarioBolsaEmpleo) peticion.getUVDatos().getVistas().get(VistaUsuarioBolsaEmpleo.class.getName());
 		
-		assertEquals(MENSAJE_SIN_ERROR, 0, bean.getMensajesDeError().size());
-		assertEquals(MENSAJE_SIN_ADVERTENCIAS, 0, bean.getMensajesDeAdvertencia().size());
+		assertEquals(MENSAJE_CON_ERROR, 1, bean.getMensajesDeError().size());
+		assertEquals(MENSAJE_SIN_EXITO, 0, bean.getMensajesDeExito().size());
 	}
 }
