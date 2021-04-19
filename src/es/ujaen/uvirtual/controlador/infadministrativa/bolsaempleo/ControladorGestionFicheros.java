@@ -78,7 +78,7 @@ public class ControladorGestionFicheros extends HttpServlet {
 	public static final String MENSAJE_ERROR_FICHEROS_SELECCIONADOS_INCORRECTOS = "ficheros seleccionados no válidos";
 	
 	// ruta vistas
-	public static final String RUTA_BEP_CONF = "/WEB-INF/jsp/vista/infadministrativa/bolsaempleo/configuracion/";
+	public static final String RUTA_BEP_CONF = "/WEB-INF/jsp/vista/infadministrativa/bolsaempleo/configuracion/ficheros/";
 	
 	// urls
 	public static final String URL_PATTERN_FILES_PRIVADA = "/srv/es/informacionadministrativa/bolsaempleo/configuracion/ficheros";

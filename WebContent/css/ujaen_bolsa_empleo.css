@@ -350,10 +350,17 @@ nav-bolsa-empleo a:active, nav-bolsa-empleo a:hover {
 
 .form-group-container {
     display: grid;
-    grid-template-columns: 1fr 1fr;
+    grid-template-columns: 1fr 1fr 1fr;
     grid-gap: 20px;
 }
 
+.form-group-container.col1 {
+	grid-template-columns: 1fr;
+}
+
+.form-group-container.col2 {
+	grid-template-columns: 1fr 1fr;
+}
 
 .form-input-custom{
 	width:100%;

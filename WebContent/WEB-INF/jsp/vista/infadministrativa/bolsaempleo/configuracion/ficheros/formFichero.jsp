@@ -52,12 +52,10 @@ VistaFicheros bean = (VistaFicheros) uvdatos.getVistas().get(VistaFicheros.class
 		submit_input.form.submit();
 	}
 
-	$(document).ready(function() {
-		
+	$(document).ready(function() {		
 		document.getElementById("fichero_enviar").addEventListener("click", function(event) {
 			subirFichero(event, this);
-		});
-		
+		});		
 	});
 
 </script>

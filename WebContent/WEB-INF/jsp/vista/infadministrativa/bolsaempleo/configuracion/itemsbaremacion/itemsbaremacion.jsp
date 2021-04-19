@@ -26,7 +26,7 @@ VistaItemsBaremacion bean = (VistaItemsBaremacion) uvdatos.getVistas().get(Vista
 		<caption class="table-title">Apartados Generales</caption>  
 		<tr>
 			<th scope="col" style="width:15%" title="Código apartado">Código</th>
-			<th scope="col" style="width:70%" title="Cï¿½digo de area">Nombre del apartado</th>
+			<th scope="col" style="width:70%" title="Código de area">Nombre del apartado</th>
 			<th scope="col" style="width:15%">Activo</th>
 		</tr>
 		<tbody>				
