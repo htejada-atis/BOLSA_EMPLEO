@@ -340,7 +340,6 @@ nav-bolsa-empleo a:active, nav-bolsa-empleo a:hover {
 }
 
 .form-group-custom label {
-	width: 100% !important;
 	text-align: left !important;
 	margin-bottom: .5rem;
 }
@@ -366,3 +365,9 @@ nav-bolsa-empleo a:active, nav-bolsa-empleo a:hover {
 .form-input-custom{
 	width:100%;
 }
+
+form-label-custom{
+	width: 10px !important;
+}
+
+
