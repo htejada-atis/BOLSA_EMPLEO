@@ -214,13 +214,15 @@ function DataTable(id, config) {
         }
 
         var searchable = Atis.getProp(self.config, 'searchable', false);
-        if (searchable) {
-            var tr = $('<tr></tr>');
+
+        if (searchable && !$('tbody', this.node).find('.searchable').length) {
+            var tr = $('<tr class="searchable"></tr>');
             self.config.columns.forEach(function(columnDef, index) {
                 var th = $('<th></th>');
 
                 if (columnDef.searchable) {
-                    var input = $('<input type="' + columnDef.searchable.type + '" name="' + columnDef.data + '" />');
+                    var type = columnDef.searchable.type ? columnDef.searchable.type : 'text';
+                    var input = $('<input type="' + type + '" name="' + columnDef.data + '" />');
 
                     $(input).on('input', function() {
                         self.filterBy(index, this.value);

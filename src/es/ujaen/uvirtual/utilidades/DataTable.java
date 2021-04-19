@@ -54,7 +54,44 @@ public class DataTable<T> {
 	private String filterValue;
 	private List<T> data;
 	
-	private Map<Integer, String> orderColumns = new HashMap<Integer, String>();
+	/** clase .
+	 * @author javier
+	 */
+	public class DataTableColumn {
+		private String columnName;
+		private int columnType;
+		
+		public static final int COLUMN_TYPE_TEXT = 0;
+		public static final int COLUMN_TYPE_NUMBER = 1;
+		public static final int COLUMN_TYPE_DATE = 2;
+		
+		/** Constructor por parámetros .
+		 * @param pcolumnName .
+		 */
+		public DataTableColumn(String pcolumnName) {
+			this.columnName = pcolumnName;
+			this.columnType = COLUMN_TYPE_TEXT;
+		}
+		
+		/** Constructor por parámetros .
+		 * @param pcolumnName .
+		 * @param pcolumnType .
+		 */
+		public DataTableColumn(String pcolumnName, int pcolumnType) {
+			this.columnName = pcolumnName;
+			this.columnType = pcolumnType;
+		}
+		
+		public String getName() {
+			return columnName;
+		}
+		
+		public int getType() {
+			return columnType;
+		}
+	}
+	
+	private Map<Integer, DataTableColumn> columns = new HashMap<Integer, DataTableColumn>();
 	
 	public static final ExclusionStrategy GSONEXCLUSIONSTRATEGY = new ExclusionStrategy() {
 		@Override
@@ -91,7 +128,7 @@ public class DataTable<T> {
 			
 			String paramFilterBy = String.join("", params.getOrDefault(PARAM_FILTER_BY, new String[] {""}));
 			if (!paramFilterBy.isBlank() && paramFilterBy != null) {
-				this.filterBy = Integer.parseInt(paramOrderBy);
+				this.filterBy = Integer.parseInt(paramFilterBy);
 			}
 			
 			this.filterValue = String.join("", params.getOrDefault(PARAM_FILTER_VALUE, new String[] {""}));
@@ -192,24 +229,34 @@ public class DataTable<T> {
 	 * Establece la lista de columnas ordenables, con su columna para la ordenación.
 	 * @param index .
 	 * @param column .
+	 * @param type .
 	 */
-	public void setOrderColumn(Integer index, String column) {
-		orderColumns.put(index, column);		
+	public void setColumn(Integer index, String column) {
+		columns.put(index, new DataTableColumn(column));	
+	}
+	
+	/**
+	 * Establece la lista de columnas ordenables, con su columna para la ordenación.
+	 * @param index .
+	 * @param column .
+	 * @param type .
+	 */
+	public void setColumn(Integer index, String column, int type) {
+		columns.put(index, new DataTableColumn(column, type));	
 	}
 	
 	private String prepareQuery(String pconsulta) throws UVException {
 		String consultaResult = "";
 		if (this.isFilterable()) {
-			String column = this.orderColumns.get(this.filterBy);
+			String column = this.columns.get(this.filterBy).getName();
 			if (column == null) {
 				throw new UVException(ERROR_MSG_COLUMNA_FILTRADO_NO_VALIDA);
 			}
 			
-			System.out.println("llegando");
-			consultaResult += " AND " + filterBy + "=" + filterValue + " ";
+			consultaResult += " AND lower(" + column + ") LIKE lower('%" + filterValue + "%') ";
 		}
 		if (this.isOrderable()) {
-			String column = this.orderColumns.get(this.orderBy);
+			String column = this.columns.get(this.orderBy).getName();
 			if (column == null) {
 				throw new UVException(ERROR_MSG_COLUMNA_ORDENACION_NO_VALIDA);
 			}

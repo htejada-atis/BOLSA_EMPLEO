@@ -126,11 +126,11 @@ public class ModeloNoticia {
 		
 		String consulta = "SELECT bepnot.* FROM tbep_noticias bepnot WHERE 1=1 ";
 		
-		dataTable.setOrderColumn(ORDER_COLUMN_INDEX_ENLACE, "bepnot.ENLACE");
-		dataTable.setOrderColumn(ORDER_COLUMN_INDEX_TEXTO, "bepnot.TEXTO");
-		dataTable.setOrderColumn(ORDER_COLUMN_INDEX_FECHA, "bepnot.FECHA");
-		dataTable.setOrderColumn(ORDER_COLUMN_INDEX_FLGPUBLICA, "bepnot.FLGPUBLICA");
-		dataTable.setOrderColumn(ORDER_COLUMN_INDEX_FLGACTIVA, "bepnot.FLGACTIVA");
+		dataTable.setColumn(ORDER_COLUMN_INDEX_ENLACE, "bepnot.ENLACE");
+		dataTable.setColumn(ORDER_COLUMN_INDEX_TEXTO, "bepnot.TEXTO");
+		dataTable.setColumn(ORDER_COLUMN_INDEX_FECHA, "bepnot.FECHA");
+		dataTable.setColumn(ORDER_COLUMN_INDEX_FLGPUBLICA, "bepnot.FLGPUBLICA");
+		dataTable.setColumn(ORDER_COLUMN_INDEX_FLGACTIVA, "bepnot.FLGACTIVA");
 		dataTable.setQuery(consulta);
 				
 		try (Connection conexion = ConexionUvirtual.obtenerInstancia();

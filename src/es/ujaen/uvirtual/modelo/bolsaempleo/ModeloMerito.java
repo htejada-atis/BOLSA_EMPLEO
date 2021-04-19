@@ -170,13 +170,13 @@ public class ModeloMerito {
 				+ " ON bepblo.CODNUM = bepite.BEPBLO_CODNUM"
 				+ " WHERE bepmer.BEPUSU_CODNUM = ? ";
 		
-		dataTable.setOrderColumn(ORDER_COLUMN_INDEX_ID, "bepmer.CODNUM");
-		dataTable.setOrderColumn(ORDER_COLUMN_INDEX_APARTADO, "bepblo.BEPAPA_CODNUM");
-		dataTable.setOrderColumn(ORDER_COLUMN_INDEX_ITEM, "bepmer.BEPITE_CODNUM");
-		dataTable.setOrderColumn(ORDER_COLUMN_INDEX_DESCRIPCION, "bepmer.DESCRIPCION");
-		dataTable.setOrderColumn(ORDER_COLUMN_INDEX_VALOR, "bepmer.VALOR");
-		dataTable.setOrderColumn(ORDER_COLUMN_INDEX_OBSERVACION, "bepmer.OBSERVACION");
-		dataTable.setOrderColumn(ORDER_COLUMN_INDEX_FICHERO, "bepmer.ARCHIVO");
+		dataTable.setColumn(ORDER_COLUMN_INDEX_ID, "bepmer.CODNUM");
+		dataTable.setColumn(ORDER_COLUMN_INDEX_APARTADO, "bepblo.BEPAPA_CODNUM");
+		dataTable.setColumn(ORDER_COLUMN_INDEX_ITEM, "bepmer.BEPITE_CODNUM");
+		dataTable.setColumn(ORDER_COLUMN_INDEX_DESCRIPCION, "bepmer.DESCRIPCION");
+		dataTable.setColumn(ORDER_COLUMN_INDEX_VALOR, "bepmer.VALOR");
+		dataTable.setColumn(ORDER_COLUMN_INDEX_OBSERVACION, "bepmer.OBSERVACION");
+		dataTable.setColumn(ORDER_COLUMN_INDEX_FICHERO, "bepmer.ARCHIVO");
 		dataTable.setQuery(consulta);
 				
 		try (Connection conexion = ConexionUvirtual.obtenerInstancia();
