@@ -14,8 +14,10 @@ import javax.servlet.http.HttpServletResponse;
 import es.ujaen.uvirtual.beans.UVDatos;
 import es.ujaen.uvirtual.beans.Usuario;
 import es.ujaen.uvirtual.beans.vistas.uvirtual.bolsaempleo.VistaEstadoBolsas;
+import es.ujaen.uvirtual.modelo.bolsaempleo.ModeloUsuarioBolsaEmpleo;
 import es.ujaen.uvirtual.utilidades.EscapaHTML;
 import es.ujaen.uvirtual.utilidades.Formateador;
+import es.ujaen.uvirtual.utilidades.UVException;
 
 /**
  * Listado de bolsas y su estado.
@@ -40,6 +42,9 @@ public class ControladorResultados extends HttpServlet {
 	public static final String MENSAJE_ERROR_FOO = "Mensaje de error";
 	public static final String MENSAJE_EXITO_BAR = "Mensaje de exito"; 
 
+	// variables
+	public static boolean anonimo = true;
+	
 	/** Peticion GET.
 	 * @see HttpServlet#doGet(HttpServletRequest request, HttpServletResponse response)
 	 */
@@ -51,8 +56,15 @@ public class ControladorResultados extends HttpServlet {
 		
 		VistaEstadoBolsas bean = new VistaEstadoBolsas();		
 		Usuario usuario = datos.getUsuario();
+		ModeloUsuarioBolsaEmpleo modelo = new ModeloUsuarioBolsaEmpleo();
 		LOGGER.log(Level.FINEST, "usuario que ha entrado en el servlet es {0}", usuario.getUid());
-				
+
+		try {
+			anonimo = !modelo.checkUser(datos);
+		} catch (SQLException | UVException e) {
+			bean.getMensajesDeError().add(e.getMessage());
+		}
+		
 		String nombreAccion = EscapaHTML.ajustaCodificacion(request.getParameter(PARAM_ACCION));
 		if (nombreAccion == null) {
 			nombreAccion = ACCION_LISTAR;

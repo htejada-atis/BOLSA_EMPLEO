@@ -11,6 +11,17 @@ VistaInicio bean = (VistaInicio)uvdatos.getVistas().get(VistaInicio.class.getNam
 %>
 
 <div class="bolsa-empleo">
+	<% if (bean.getMensajesDeExito().size() > 0) { %>
+		<div id="exito" class="success">
+			<%= bean.formatearMensajesDeExito() %>
+		</div>
+	<% } %>
+	<% if (bean.getMensajesDeError().size() > 0) { %>
+		<div id="error" class="error">
+			<%= bean.formatearMensajesDeError() %>
+		</div>
+	<% } else {%>
+
     <h2>Bolsa de empleo para PDI de la Universidad de Jaén</h2>
     
     <div class="nav-bolsa-empleo">
@@ -44,7 +55,7 @@ VistaInicio bean = (VistaInicio)uvdatos.getVistas().get(VistaInicio.class.getNam
 		</ul>
 		<div class="row-ver-todas" id="view_all"> (<a href="#">Ver todas</a>) </div>
     </div>
-
+<% } %>
 </div>
 
 <script type="text/javascript">

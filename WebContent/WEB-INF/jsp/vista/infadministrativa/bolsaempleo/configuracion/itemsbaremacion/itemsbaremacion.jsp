@@ -11,18 +11,20 @@ VistaItemsBaremacion bean = (VistaItemsBaremacion) uvdatos.getVistas().get(Vista
 %>
 
 <div class='bolsas'>
-	<% if (session.getAttribute(ControladorItemsBaremacion.MENSAJE_ENVIADO) != null) { %>
+	<% if (bean.getMensajesDeExito().size() > 0) { %>
 		<div id="exito" class="success">
-			<%= session.getAttribute(ControladorItemsBaremacion.MENSAJE_ENVIADO) %>
+			<%= bean.formatearMensajesDeExito() %>
 		</div>
-	<% 
-			session.removeAttribute(ControladorItemsBaremacion.MENSAJE_ENVIADO);
-		} 
-	%>
+	<% } %>
+	<% if (bean.getMensajesDeError().size() > 0) { %>
+		<div id="error" class="error">
+			<%= bean.formatearMensajesDeError() %>
+		</div>
+	<% } else {%>
 	
 	<h2>Items para las baremaciones</h2>
 	
-	<table class="bluetable bolsaempleo" id="tableApartadosGenerales">
+	<table class="bluetable bolsaempleo" id="tableApartadosGenerales" style="table-layout: auto;">
 		<caption class="table-title">Apartados Generales</caption>  
 		<tr>
 			<th scope="col" style="width:15%" title="Código apartado">Código</th>
@@ -38,8 +40,8 @@ VistaItemsBaremacion bean = (VistaItemsBaremacion) uvdatos.getVistas().get(Vista
 		</tfoot>
 	</table>
 	
-	<table class="bluetable bolsaempleo" id="tableBloques">
-		<caption>BLOQUES</caption>
+	<table class="bluetable bolsaempleo" id="tableBloques" style="table-layout: auto;">
+		<caption class="table-title">Bloques</caption>  	
 		<tr>
 			<th scope="col" style="width:15%" title="Código bloque">Código</th>
 			<th scope="col" style="width:70%" title="Código de area">Nombre del bloque</th>
@@ -54,8 +56,8 @@ VistaItemsBaremacion bean = (VistaItemsBaremacion) uvdatos.getVistas().get(Vista
 		</tfoot>
 	</table>
 	
-	<table class="bluetable bolsaempleo" id="tableItems">
-		<caption>ÍTEMS</caption>
+	<table class="bluetable bolsaempleo" id="tableItems" style="table-layout: auto;">
+		<caption class="table-title">Items</caption>
 		<tr>
 			<th scope="col" style="width:15%" title="Código ítem">Código</th>
 			<th scope="col" style="width:70%" title="Código de area">Nombre del ítem</th>
@@ -69,7 +71,7 @@ VistaItemsBaremacion bean = (VistaItemsBaremacion) uvdatos.getVistas().get(Vista
 			</tr>
 		</tfoot>
 	</table>
-	
+	<% } %>
 </div>
 	
 <script>
@@ -136,7 +138,14 @@ VistaItemsBaremacion bean = (VistaItemsBaremacion) uvdatos.getVistas().get(Vista
 		    "columns": [
 		    	{'data': 'codigo'},
 		        {'data': 'nombre'},
-		        {'data': 'activo'},
+		        {'data': 'activo', 'render': function(row) {
+	        		if(row.activo){
+	        			return "<div class='circle-true'></div>"; 
+	        		}
+	        		else{
+	        			return "<div class='circle-false'></div>"; 
+	        		}
+	        	}},
 		    ],
 		    "actions": [
 		    	{'label': activatorApartadoName, 'showWhenSelected': true, 'onClick': function(selected) {
@@ -187,7 +196,14 @@ VistaItemsBaremacion bean = (VistaItemsBaremacion) uvdatos.getVistas().get(Vista
 			    		return row.apartado.codigo + "." + row.codigo;
 			    	}},
 			        {'data': 'nombre'},
-			        {'data': 'activo'},
+			        {'data': 'activo', 'render': function(row) {
+		        		if(row.activo){
+		        			return "<div class='circle-true'></div>"; 
+		        		}
+		        		else{
+		        			return "<div class='circle-false'></div>"; 
+		        		}
+		        	}},
 			    ],
 			    "actions": [
 			    	{'label': activatorBloqueName, 'showWhenSelected': true, 'onClick': function(selected) {
@@ -237,7 +253,14 @@ VistaItemsBaremacion bean = (VistaItemsBaremacion) uvdatos.getVistas().get(Vista
 				    		return row.bloque.apartado.codigo + "." + row.bloque.codigo + "." + row.codigo;
 				    	}},
 				        {'data': 'nombre'},
-				        {'data': 'activo'},
+				        {'data': 'activo', 'render': function(row) {
+			        		if(row.activo){
+			        			return "<div class='circle-true'></div>"; 
+			        		}
+			        		else{
+			        			return "<div class='circle-false'></div>"; 
+			        		}
+			        	}},
 				    ],
 				    "actions": [
 				    	{'label': activatorItemName, 'showWhenSelected': true, 'onClick': function(selected) {

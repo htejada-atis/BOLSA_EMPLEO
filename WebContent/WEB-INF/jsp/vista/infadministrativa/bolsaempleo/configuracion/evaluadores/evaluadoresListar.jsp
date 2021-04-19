@@ -12,16 +12,16 @@ VistaEvaluadores bean = (VistaEvaluadores) uvdatos.getVistas().get(VistaEvaluado
 
 <div class="bolsa-empleo">
 	
-	<%
-		if (session.getAttribute(ControladorGestionEvaluadores.MENSAJE_ENVIADO) != null) {
-		%>
+	<% if (bean.getMensajesDeExito().size() > 0) { %>
 		<div id="exito" class="success">
-			<%=session.getAttribute(ControladorGestionEvaluadores.MENSAJE_ENVIADO)%>
+			<%= bean.formatearMensajesDeExito() %>
 		</div>
-	<%
-	session.removeAttribute(ControladorGestionEvaluadores.MENSAJE_ENVIADO);
-			}
-	%>
+	<% } %>
+	<% if (bean.getMensajesDeError().size() > 0) { %>
+		<div id="error" class="error">
+			<%= bean.formatearMensajesDeError() %>
+		</div>
+	<% } else {%>
 	
 	<h2>Evaluadores de un área</h2>
 	
@@ -61,7 +61,7 @@ VistaEvaluadores bean = (VistaEvaluadores) uvdatos.getVistas().get(VistaEvaluado
 			</tfoot>
 		</table>
 	</div>
-	
+		<% } %>
 </div>
 
 <script>
@@ -82,7 +82,14 @@ VistaEvaluadores bean = (VistaEvaluadores) uvdatos.getVistas().get(VistaEvaluado
 			    	{'data': 'apellido1', 'render': function(row) {
 		        		return "<div class='overflow-auto'>" + row.nombre + "\n" + row.apellido1 + "\n" + row.apellido2 + "</div>"; 
 		        	}},
-		        	{'data': 'activo'},
+		        	{'data': 'activo', 'render': function(row) {
+		        		if(row.activo){
+		        			return "<div class='circle-true'></div>"; 
+		        		}
+		        		else{
+		        			return "<div class='circle-false'></div>"; 
+		        		}
+		        	}},
 		        	{'data': 'codnum', 'buttons': [{'label': function(row) { return row.activo ? "Borrar" : "Restaurar"; }, 'onClick': function(row) {
 			        		var mensaje = "¿Desea borrar el evaluador seleccionado?";
 				        	var titulo = "Borrar evaluador";

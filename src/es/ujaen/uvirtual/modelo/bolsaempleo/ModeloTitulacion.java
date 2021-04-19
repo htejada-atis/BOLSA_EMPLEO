@@ -310,7 +310,7 @@ public class ModeloTitulacion {
 		) {
 			int indexParam = 1;
 			stmt.setInt(indexParam, area);
-			stmtCount.setInt(indexParam, area);
+			stmtCount.setInt(indexParam++, area);
 			try (ResultSet rs = stmt.executeQuery()) {
 				while (rs.next()) {
 					Titulacion tit = new Titulacion();

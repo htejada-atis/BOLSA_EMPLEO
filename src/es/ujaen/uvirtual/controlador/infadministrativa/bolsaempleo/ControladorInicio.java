@@ -66,6 +66,8 @@ public class ControladorInicio extends HttpServlet {
 	public static final String PARAM_FICHERO = "fichero";
 	public static final String PARAM_NOTICIAS = "noticias";
 	
+	public static final String MENSAJE_ERROR_BORRADO = "usuario ";
+	
 	// ruta vistas
 	public static final String RUTA_BEP_INICIO = "/WEB-INF/jsp/vista/infadministrativa/bolsaempleo/inicio/";
 	
@@ -94,7 +96,11 @@ public class ControladorInicio extends HttpServlet {
 		VistaInicio bean = new VistaInicio();
 		ModeloUsuarioBolsaEmpleo modelo = new ModeloUsuarioBolsaEmpleo();
 		
-		anonimo = !modelo.checkUser(datos);
+		try {
+			anonimo = !modelo.checkUser(datos);
+		} catch (SQLException | UVException e) {
+			bean.getMensajesDeError().add(e.getMessage());
+		}
 		
 		String nombreAccion = EscapaHTML.ajustaCodificacion(request.getParameter(PARAM_ACCION));
 		if (nombreAccion == null || nombreAccion.isEmpty()) {
