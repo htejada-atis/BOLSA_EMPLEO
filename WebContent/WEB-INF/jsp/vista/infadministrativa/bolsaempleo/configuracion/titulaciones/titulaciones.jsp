@@ -60,9 +60,7 @@ VistaTitulaciones bean = (VistaTitulaciones) uvdatos.getVistas().get(VistaTitula
 		    	{'data': 'codNum'},
 		        {'data': 'nombre', 'class': 'overflow-auto'},
 		        {'data': 'codnum', 'buttons': [{'label': 'Editar', 'onClick': function(row) {
-		        	var params = {
-		    				'a': '<%=ControladorGestionTitulaciones.ACCION_EDITAR_TITULACION %>', 
-		    				'<%=ControladorGestionTitulaciones.PARAM_ID%>': row.codNum};
+		        	var params = {'a': '<%= ControladorGestionTitulaciones.ACCION_EDITAR_TITULACION %>', '<%= ControladorGestionTitulaciones.PARAM_ID %>': row.codNum};
 	        		Atis.sendForm("<%=request.getRequestURI()%>", params);
 		        	}
 		        }, {'label': 'Borrar', 'onClick': function(row) {
