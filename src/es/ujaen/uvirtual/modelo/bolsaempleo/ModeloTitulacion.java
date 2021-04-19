@@ -9,6 +9,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import es.ujaen.uvirtual.beans.uvirtual.bolsaempleo.Titulacion;
+import es.ujaen.uvirtual.beans.uvirtual.bolsaempleo.UsuarioBolsaEmpleo;
 import es.ujaen.uvirtual.modelo.conexion.ConexionUvirtual;
 import es.ujaen.uvirtual.utilidades.BolsaEmpleoUtils;
 import es.ujaen.uvirtual.utilidades.DataTable;
@@ -309,7 +310,7 @@ public class ModeloTitulacion {
 		) {
 			int indexParam = 1;
 			stmt.setInt(indexParam, area);
-			stmtCount.setInt(indexParam++, area);
+			stmtCount.setInt(indexParam, area);
 			try (ResultSet rs = stmt.executeQuery()) {
 				while (rs.next()) {
 					Titulacion tit = new Titulacion();
@@ -318,7 +319,6 @@ public class ModeloTitulacion {
 					titulaciones.add(tit);
 				}
 			}
-			
 			dataTable.setRecordsTotalFromQuery(stmtCount);
 			dataTable.setData(titulaciones);
 		}
