@@ -21,6 +21,7 @@ VistaEvaluadores bean = (VistaEvaluadores) uvdatos.getVistas().get(VistaEvaluado
 	<h2>Evaluadores de un área</h2>
 	
 	<table class="bluetable bolsaempleo" id="table_usuarios">
+		<caption class="table-title">Agregar nuevo evaluador al Área <%= bean.getArea().getDescripcion() %></caption>  
 		<tr>
 			<th scope="col" style="width:10%"></th>
 			<th scope="col" style="width:20%">D.N.I</th>

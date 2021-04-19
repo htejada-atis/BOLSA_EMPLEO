@@ -215,6 +215,8 @@ public class CrearUsuario {
 				usuario.setRolesPorDominio(rolesPorDominio);
 				usuario.setRoles(rolesPorDominio.get(usuario.getDominio()));
 				usuario.setRolesAdministrados(rolesAdministrados);
+				
+				System.out.print(usuario);
 			}
 			
 			if (erroresArcos || erroresUvirtual || erroresRrhh || erroresAc || erroresDominio || usuario == null) {

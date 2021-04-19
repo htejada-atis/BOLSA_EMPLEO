@@ -21,16 +21,16 @@ VistaUsuarioBolsaEmpleo bean = (VistaUsuarioBolsaEmpleo) uvdatos.getVistas().get
 		</div>
 	<% } else { %>
 	
-		<div class="titulo-bolsa-empleo" style="float:right; margin-top:1.2rem">
-			<a class="link-btn" id="nuevo_usuario" href="<%= request.getRequestURI() %>" style="margin-top:0">Nuevo usuario</a>
-		</div>
+	<div class="titulo-bolsa-empleo" style="float:right; margin-top:1.2rem">
+		<a class="link-btn" id="nuevo_usuario" href="<%= request.getRequestURI() %>" style="margin-top:0">Nuevo usuario</a>
+	</div>
 	
 	<div class="titulo-bolsa-empleo" style="margin-top:1rem;">
 		<h2>Usuarios del sistema</h2>
 	</div>
 	
 	<table class="bluetable bolsaempleo" id="table_usuarios">
-	  	<caption style="background-color:#B9C9FE; font-size: 13px; color:#003399; padding:0.5rem;">Usuarios</caption>  
+	  	<caption class="table-title">Usuarios</caption>  
 		<tr>
 			<th scope="col" style="width:5%"></th>
 			<th scope="col" style="width:5%" title="Id del usuario">Id</th>
@@ -53,7 +53,7 @@ VistaUsuarioBolsaEmpleo bean = (VistaUsuarioBolsaEmpleo) uvdatos.getVistas().get
 	</table>
 	
 	<table class="bluetable bolsaempleo" id="table_usuarios_borrados" style="margin-top:2rem">
-		<caption style="background-color:#B9C9FE; font-size: 13px; color:#003399; padding:0.5rem;">Usuarios Borrados</caption>  
+		<caption class="table-title">Usuarios Borrados</caption>  
 		<tr>
 			<th scope="col" style="width:5%"></th>
 			<th scope="col" style="width:5%" title="Id del usuario">Id</th>
@@ -76,7 +76,7 @@ VistaUsuarioBolsaEmpleo bean = (VistaUsuarioBolsaEmpleo) uvdatos.getVistas().get
 	</table>
 
 	<table class="bluetable bolsaempleo" id="table_usuarios_excluidos" style="margin-top:2rem">
-		<caption style="background-color:#B9C9FE; font-size: 13px; color:#003399; padding:0.5rem;">Usuarios Excluidos</caption>  
+		<caption class="table-title">Usuarios Excluidos</caption>  
 		<tr>
 			<th scope="col" style="width:5%"></th>
 			<th scope="col" style="width:5%" title="Id del usuario">Id</th>
@@ -126,11 +126,11 @@ $(document).ready(function() {
 	        {'data': 'email'},
 	        {'data': 'rol.descripcion'},
 	        {'data': 'listaDist', 'render': function(row) {
-        		if(row.listaDist==true){
-        			return "<center><img style='width:20px; height:20px' src='/img/md/check_box.svg'/></center>"; 
+	        	if(row.listaDist==true){
+        			return "<div class='circle-true'></div>"; 
         		}
         		else{
-        			return "<center><img style='width:20px; height:20px' src='/img/md/cancel.svg'/></center>"; 
+        			return "<div class='circle-false'></div>"; 
         		}
         	}},
         	{'data': 'codnum', 'buttons': [{'label': 'Editar', 'onClick': function(row) {
@@ -164,11 +164,11 @@ $(document).ready(function() {
 	        {'data': 'email'},
 	        {'data': 'rol.descripcion'},
 	        {'data': 'listaDist', 'render': function(row) {
-        		if(row.listaDist==true){
-        			return "<center><img style='width:20px; height:20px' src='/img/md/check_box.svg'/></center>"; 
+	        	if(row.listaDist==true){
+        			return "<div class='circle-true'></div>"; 
         		}
         		else{
-        			return "<center><img style='width:20px; height:20px' src='/img/md/cancel.svg'/></center>"; 
+        			return "<div class='circle-false'></div>"; 
         		}
         	}},
         	{'data': 'codnum', 'buttons': [{'label': 'Editar', 'onClick': function(row) {
@@ -201,10 +201,10 @@ $(document).ready(function() {
 	        {'data': 'razonExclusion'},
 	        {'data': 'listaDist', 'render': function(row) {
         		if(row.listaDist==true){
-        			return "<center><img style='width:20px; height:20px' src='/img/md/check_box.svg'/></center>"; 
+        			return "<div class='circle-true'></div>"; 
         		}
         		else{
-        			return "<center><img style='width:20px; height:20px' src='/img/md/cancel.svg'/></center>"; 
+        			return "<div class='circle-false'></div>"; 
         		}
         	}},
         	{'data': 'codnum', 'buttons': [{'label': 'Editar', 'onClick': function(row) {
