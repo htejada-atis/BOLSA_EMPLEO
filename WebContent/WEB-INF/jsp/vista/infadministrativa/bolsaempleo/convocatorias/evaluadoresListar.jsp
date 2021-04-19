@@ -39,15 +39,12 @@ VistaEvaluadores bean = (VistaEvaluadores) uvdatos.getVistas().get(VistaEvaluado
 		</select>
 	</div>
 	
-	<div id="tablas_evaluadores">
-		<div class="titulo-bolsa-empleo">
-			<h4 id="title_evaluadores">Evaluadores del Área</h4>
-	    
-		    <a class="link-btn" id="nuevo_evaluador" href="<%=request.getRequestURI()%>">
+	<div id="tablas_evaluadores">    
+		    <a class="link-btn" id="nuevo_evaluador" href="<%=request.getRequestURI()%>" style="float:right; margin-bottom:1rem;">
 		    	 Añadir evaluador
 		    </a>
-		</div>
 		<table class="bluetable bolsaempleo" id="table_evaluadores_area">
+		<caption class="table-title">Evaluadores del Área</caption>  
 			<tr>
 				<th scope="col" style="width:20%">D.N.I</th>
 				<th scope="col"	style="width:35%">Tipo</th>

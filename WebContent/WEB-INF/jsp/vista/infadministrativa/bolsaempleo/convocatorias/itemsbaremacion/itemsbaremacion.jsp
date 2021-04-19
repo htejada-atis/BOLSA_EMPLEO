@@ -23,7 +23,7 @@ VistaItemsBaremacion bean = (VistaItemsBaremacion) uvdatos.getVistas().get(Vista
 	<h2>Items para las baremaciones</h2>
 	
 	<table class="bluetable bolsaempleo" id="tableApartadosGenerales">
-		<caption>APARTADOS GENERALES</caption>
+		<caption class="table-title">Apartados Generales</caption>  
 		<tr>
 			<th scope="col" style="width:15%" title="Código apartado">Código</th>
 			<th scope="col" style="width:70%" title="Código de area">Nombre del apartado</th>

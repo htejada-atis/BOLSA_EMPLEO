@@ -366,8 +366,31 @@ nav-bolsa-empleo a:active, nav-bolsa-empleo a:hover {
 	width:100%;
 }
 
-form-label-custom{
+.form-label-custom{
 	width: 10px !important;
 }
 
+.circle-true{
+	 width: 10px;
+     height: 10px;
+     -moz-border-radius: 50%;
+     -webkit-border-radius: 50%;
+     border-radius: 50%;
+     background: #5cb85c;
+}
 
+.circle-false{
+	 width: 10px;
+     height: 10px;
+     -moz-border-radius: 50%;
+     -webkit-border-radius: 50%;
+     border-radius: 50%;
+     background: #cc0000;
+}
+
+.table-title{
+	background-color:#B9C9FE;
+	font-size: 13px;
+	color:#003399;
+	padding:0.5rem;
+}
