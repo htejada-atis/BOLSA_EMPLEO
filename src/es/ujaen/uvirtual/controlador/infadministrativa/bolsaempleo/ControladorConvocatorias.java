@@ -57,6 +57,7 @@ public class ControladorConvocatorias extends HttpServlet {
 	public static final String ACCION_DATATABLE = "datatable";
 	public static final String ACCION_FORMULARIO_CONVOCATORIA = "formConvocatoria";
 	public static final String ACCION_AGREGAR_CONVOCATORIA = "addConvocatoria";
+	public static final String ACCION_FORMULARIO_EDITAR_CONVOCATORIA = "formEditarConvocatoria";
 	public static final String ACCION_MODIFICAR_CONVOCATORIA = "editConvocatoria";
 	
 	// mensajes
@@ -236,16 +237,4 @@ public class ControladorConvocatorias extends HttpServlet {
 		
 		return validator;
 	}
-
-//	private boolean chequearFormularioCovocatoria(VistaConvocatorias bean, HttpServletRequest request) {
-//		String descripcion = EscapaHTML.ajustaCodificacion(request.getParameter(PARAM_CONVOCATORIA_DESCRIPCION));
-//		if (descripcion.length() > ModeloConvocatoria.COLUMN_DESCRIPCION_MAXLENGTH) {
-//			bean.getMensajesDeError().add(String.format(MENSAJE_ERROR_DESCRIPCION_LARGA, ModeloConvocatoria.COLUMN_DESCRIPCION_MAXLENGTH));
-//			return false;
-//		}
-//		if (descripcion.isBlank()) {
-//			bean.getMensajesDeError().add(MENSAJE_ERROR_DESCRIPCION_VACIA);
-//			return false;
-//		}
-//	}
 }
