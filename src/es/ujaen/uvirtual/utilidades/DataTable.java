@@ -25,6 +25,8 @@ public class DataTable<T> {
 	
 	public static final String PARAM_CURRENT_PAGE = "page";
 	public static final String PARAM_PAGE_SIZE = "pageSize";
+	public static final String PARAM_FILTER_BY = "filterBy";
+	public static final String PARAM_FILTER_VALUE = "filterValue";
 	public static final String PARAM_ORDER_BY = "orderBy";
 	public static final String PARAM_ORDER_DIRECTION = "orderDirection";
 	public static final String PARAM_ORDER_DIRECTION_VALUE_ASC = "asc";
@@ -36,6 +38,7 @@ public class DataTable<T> {
 	public static final String ERROR_MSG_PARAMETRO_NO_VALIDO = "Datatable parámetro no válido";
 	public static final String ERROR_MSG_PARAMETRO_TIPO_ORDENACION_NO_VALIDO = "Datatable tipo de ordenación no válido";
 	public static final String ERROR_MSG_COLUMNA_ORDENACION_NO_VALIDA = "La columna de ordenación es no válida";
+	public static final String ERROR_MSG_COLUMNA_FILTRADO_NO_VALIDA = "La columna de filtrado es no válida";
 	
 	private String consulta;
 	private String query;
@@ -46,7 +49,9 @@ public class DataTable<T> {
 	private Integer recordsTotal; // número de filas totales de la consulta
 	private Integer pagesTotal;
 	private Integer orderBy;
-	private String orderDirection;	
+	private String orderDirection;
+	private Integer filterBy;
+	private String filterValue;
 	private List<T> data;
 	
 	private Map<Integer, String> orderColumns = new HashMap<Integer, String>();
@@ -84,6 +89,12 @@ public class DataTable<T> {
 				this.orderBy = Integer.parseInt(paramOrderBy);
 			}
 			
+			String paramFilterBy = String.join("", params.getOrDefault(PARAM_FILTER_BY, new String[] {""}));
+			if (!paramFilterBy.isBlank() && paramFilterBy != null) {
+				this.filterBy = Integer.parseInt(paramOrderBy);
+			}
+			
+			this.filterValue = String.join("", params.getOrDefault(PARAM_FILTER_VALUE, new String[] {""}));
 			this.orderDirection = String.join("", params.getOrDefault(PARAM_ORDER_DIRECTION, new String[] {""}));			
 		} catch (NumberFormatException err) {
 			LOGGER.log(Level.WARNING, "Error Datatable" + err);
@@ -173,6 +184,10 @@ public class DataTable<T> {
 		return this.orderBy != null;
 	}
 	
+	public Boolean isFilterable() {
+		return this.filterBy != null;
+	}
+	
 	/**
 	 * Establece la lista de columnas ordenables, con su columna para la ordenación.
 	 * @param index .
@@ -184,7 +199,15 @@ public class DataTable<T> {
 	
 	private String prepareQuery(String pconsulta) throws UVException {
 		String consultaResult = "";
-		
+		if (this.isFilterable()) {
+			String column = this.orderColumns.get(this.filterBy);
+			if (column == null) {
+				throw new UVException(ERROR_MSG_COLUMNA_FILTRADO_NO_VALIDA);
+			}
+			
+			System.out.println("llegando");
+			consultaResult += " AND " + filterBy + "=" + filterValue + " ";
+		}
 		if (this.isOrderable()) {
 			String column = this.orderColumns.get(this.orderBy);
 			if (column == null) {
@@ -193,6 +216,8 @@ public class DataTable<T> {
 			
 			consultaResult += " ORDER BY " + column + " " + this.orderDirection;
 		}
+		
+		System.out.print(pconsulta + consultaResult);
 		
 		return pconsulta + consultaResult;
 	}

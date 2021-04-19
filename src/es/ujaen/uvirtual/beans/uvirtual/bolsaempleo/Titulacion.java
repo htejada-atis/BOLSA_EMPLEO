@@ -12,6 +12,7 @@ public class Titulacion implements Serializable {
 	private static final long serialVersionUID = 1L;
 	private Integer codNum;
 	private String nombre;
+	private Area area;
 
 	
 	/** Constructor por defecto.
@@ -28,6 +29,18 @@ public class Titulacion implements Serializable {
 		super();
 		this.codNum = pcodNum;
 		this.nombre = pnombre;
+	}
+	
+	/** Constructor con parametros.
+	 * @param pcodNum .
+	 * @param pnombre .
+	 * @param parea .
+	 */
+	public Titulacion(Integer pcodNum, String pnombre, Area parea) {
+		super();
+		this.codNum = pcodNum;
+		this.nombre = pnombre;
+		this.area = parea;
 	}
 	
 	/** Constructor con parametros.
@@ -52,6 +65,7 @@ public class Titulacion implements Serializable {
 	public Titulacion(Titulacion copia) {
 		this.codNum = copia.codNum;
 		this.nombre = copia.nombre;
+		this.area = copia.area;
 	}
 	
 	public Integer getCodNum() {
@@ -69,6 +83,14 @@ public class Titulacion implements Serializable {
 	public void setNombre(String nombre) {
 		this.nombre = nombre;
 	}
+	
+	public Area getArea() {
+		return area;
+	}
+	
+	public void setArea(Area area) {
+		this.area = area;
+	}
 
 	public static long getSerialversionuid() {
 		return serialVersionUID;
@@ -85,6 +107,7 @@ public class Titulacion implements Serializable {
 		int result = 1;
 		result = prime * result + ((nombre == null) ? 0 : nombre.hashCode());
 		result = prime * result + ((codNum == null) ? 0 : codNum.hashCode());
+		result = prime * result + ((area == null) ? 0 : area.hashCode());
 		return result;
 	}
 	
@@ -106,6 +129,13 @@ public class Titulacion implements Serializable {
 				return false;
 			}
 		} else if (!nombre.equals(other.nombre)) {
+			return false;
+		}
+		if (area == null) {
+			if (other.area != null) {
+				return false;
+			}
+		} else if (!area.equals(other.area)) {
 			return false;
 		}
 		

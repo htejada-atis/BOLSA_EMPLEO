@@ -15,8 +15,11 @@ function DataTable(id, config) {
         'page': 0,
         'pageSize': Atis.getProp(config, 'pageSize', 10),
         'orderBy': null,
-        'orderDirection': 'asc'
+        'orderDirection': 'asc',
+        'filterBy': null,
+        'filterValue': null
     };
+    this.title = Atis.getProp(config, 'title', undefined);
     this.lastResponse = null;
     this.checked = {};
 
@@ -39,6 +42,10 @@ function DataTable(id, config) {
     this.setParam = function(key, value) {
     	self.params[key] = value;
     };
+
+    this.setTitle = function(tit) {
+        self.title = tit;
+    };
         
     this.loading = function(on) {
     	if (on) {
@@ -52,10 +59,11 @@ function DataTable(id, config) {
     
     this.parseResponse = function(response) {
     	self.lastResponse = response;
-    	
+
         self.loading(false);
     	self.checkUncheckAll(false);
     	self.renderFooter();
+        self.renderHeader();
     	
         // limpiamos
         $('tr', self.tbody).empty();
@@ -103,7 +111,7 @@ function DataTable(id, config) {
     		$(tr).append(td);
         });
     	
-    	$(self.tbody).append(tr); 
+    	$(self.tbody).append(tr);
     };
     
     this.renderCol = function(row, columnDef) {
@@ -119,7 +127,8 @@ function DataTable(id, config) {
     		
     		columnDef.buttons.forEach(function(buttonDef) {
                 var label = isFunction(buttonDef.label) ? buttonDef.label(row) : buttonDef.label;
-    			var btn = $('<button class="btn" type="button">'+label+'</button>');
+                var title = isFunction(buttonDef.title) ? buttonDef.title(row) : buttonDef.title;
+    			var btn = $('<button class="btn"' + (title ? 'title="' + title + '"' : '') + ' type="button">'+label+'</button>');
     			
     			if (buttonDef.hasOwnProperty('class')) {
     				$(btn).addClass(buttonDef.class);
@@ -133,11 +142,12 @@ function DataTable(id, config) {
     	}
     	
     	if (columnDef.hasOwnProperty('selectable') && columnDef.selectable) {
-    		var check = $('<input type="checkbox"/>')
+    		var check = $('<input type="checkbox"/>');
     		
     		$(check).on('change', function() {
     			self.checked[value] = this.checked;
-    			self.renderFooter();    			
+                this.checked ? $(this).parent().parent().addClass("selected") : $(this).parent().parent().removeClass("selected");
+    			self.renderFooter();
     		});
     		
     		return check;
@@ -147,7 +157,7 @@ function DataTable(id, config) {
     };
     
     this.renderFooter = function() {
-    	if (!self.lastResponse) { return ''; }    	
+    	if (!self.lastResponse) { return ''; } 
     	
         // texto total
         var selected = self.getCheckedItems();  
@@ -178,7 +188,7 @@ function DataTable(id, config) {
             for (var i = 0; i < self.config.actions.length; i++) {
             	var action = self.config.actions[i];
             	if (action.showWhenSelected == null || action.showWhenSelected == (self.config.selected > 0)) {
-	            	var btn = $('<button class="btn" type="button">' + action.label + '</button>');
+	            	var btn = $('<button class="btn"' + (action.title ? 'title="' + action.title + '"' : '') + ' type="button">' + action.label + '</button>');
 	            	
 	            	if (self.config.selected) {
 	            		selected = self.config.selected;
@@ -194,6 +204,37 @@ function DataTable(id, config) {
     	$('th', self.tfoot).append($(pagination));
         $('th', self.tfoot).append($(actions));
         $('th', self.tfoot).append($(textoTotal));
+    };
+
+    this.renderHeader = function(row) {
+        if (self.title) {
+            var header = $('<caption>' + self.title + '</caption>');
+            $(self.node).find('caption').remove();
+            $(self.node).prepend(header);
+        }
+
+        var searchable = Atis.getProp(self.config, 'searchable', false);
+        if (searchable) {
+            var tr = $('<tr></tr>');
+            self.config.columns.forEach(function(columnDef, index) {
+                var th = $('<th></th>');
+
+                if (columnDef.searchable) {
+                    var input = $('<input type="' + columnDef.searchable.type + '" name="' + columnDef.data + '" />');
+
+                    $(input).on('input', function() {
+                        self.filterBy(index, this.value);
+                    });
+
+                    th.append(input);
+                }
+
+                tr.append(th);
+            });
+
+            $('tbody', this.node).first().children().eq(1).remove();
+            $('tbody', this.node).first().append(tr);
+        }
     };
     
     this.prepareTable = function() {
@@ -225,7 +266,7 @@ function DataTable(id, config) {
                 $(columnDef.node).css('cursor', 'pointer');
                 $(columnDef.node).on('click', function() { self.orderBy(columnDef, index); });
             }
-        })
+        });
     };
     
     this.checkUncheckAll = function(check) {
@@ -236,6 +277,8 @@ function DataTable(id, config) {
 				
 				$("input[type='checkbox']", self.tbody).prop('checked', check);
 				self.checked[value] = check;
+                
+                check ? $("tr", self.tbody).addClass("selected") : $("tr", self.tbody).removeClass("selected");
 			});
 		}
 		self.renderFooter();
@@ -293,6 +336,14 @@ function DataTable(id, config) {
         self.params.orderBy = indexColumnDef;
         $(columnDef.node).prepend('<img src="/img/iconos/' + (this.params.orderDirection === 'asc' ? 'down.png' : 'up.png') + '" class="order"/>');        
 
+        self.refresh();
+    }
+
+    this.filterBy = function(indexColumnDef, value) {
+        self.params.filterBy = indexColumnDef;
+        self.params.filterValue = value;
+        
+        console.log(self.params);
         self.refresh();
     }
     

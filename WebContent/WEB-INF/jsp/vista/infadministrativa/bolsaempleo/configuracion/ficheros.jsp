@@ -55,6 +55,7 @@ VistaFicheros bean = (VistaFicheros) uvdatos.getVistas().get(VistaFicheros.class
 		    "ajax": { url: "<%= ControladorGestionFicheros.URL_PATTERN_AJAX %>" },
 		    "pageSize": 10,
 		    "selectable": true,
+		    "title": "Ficheros",
 		    "columns": [
 		    	{'data': 'codNum', 'selectable': true},
 		        {'data': 'nombre', 'render': function(row) {
@@ -70,7 +71,7 @@ VistaFicheros bean = (VistaFicheros) uvdatos.getVistas().get(VistaFicheros.class
 		        	}
 		        },
 		        {'data': 'publico'},
-		        {'data': 'codnum', 'buttons': [{'label': '<label class="tooltiptext">Copiar enlace</label>Copiar', 'class': 'tooltip', 'onClick': function(row) {
+		        {'data': 'codnum', 'buttons': [{'label': '<label class="tooltiptext">Copiar enlace</label>Copiar', 'title': 'Copiar enlace fichero', 'class': 'tooltip', 'onClick': function(row) {
 			        	$(this).parent().parent().parent().find(".tooltiptext").text("¡Enlace copiado!");
 			        	
 			        	var link = "<%= ControladorGestionFicheros.URL_PATTERN_FILES_PRIVADA %>"
@@ -80,7 +81,7 @@ VistaFicheros bean = (VistaFicheros) uvdatos.getVistas().get(VistaFicheros.class
 			    }]}
 		    ],
 		    "actions": [
-		    	{'label': 'Eliminar', 'onClick': function(selected) {
+		    	{'label': 'Eliminar', 'title': 'Eliminar ficheros seleccionados', 'onClick': function(selected) {
 		    		if(selected.length) {
 		    			var titulo = selected.length > 1 ? "Eliminar ficheros" : "Eliminar fichero";
 		    			var mensaje = selected.length > 1 ? "¿Desea eliminar los ficheros seleccionados?" : "¿Desea eliminar el fichero seleccionado?";
@@ -98,7 +99,7 @@ VistaFicheros bean = (VistaFicheros) uvdatos.getVistas().get(VistaFicheros.class
 					    });
 		    		}
 		    	}},
-		    	{'label': 'Hacer público', 'onClick': function(selected) {
+		    	{'label': 'Hacer públicos', 'title': 'Los ficheros seleccionados serán visibles para todos', 'onClick': function(selected) {
 		    		if(selected.length) {
 		    			var titulo = selected.length > 1 ? "Hacer ficheros públicos" : "Hacer fichero público";
 		    			var mensaje = selected.length > 1 ? "¿Desea hacer publicos los ficheros seleccionados?" : "¿Desea hacer público el fichero seleccionado?";
@@ -116,7 +117,7 @@ VistaFicheros bean = (VistaFicheros) uvdatos.getVistas().get(VistaFicheros.class
 					    });
 		    		}
 		    	}},
-		    	{'label': 'Hacer privado', 'onClick': function(selected) {
+		    	{'label': 'Hacer privados', 'title': 'Los ficheros seleccionados sólo serán visibles para usuarios logueados', 'onClick': function(selected) {
 		    		if(selected.length) {
 		    			var titulo = selected.length > 1 ? "Hacer ficheros privados" : "Hacer fichero privado";
 		    			var mensaje = selected.length > 1 ? "¿Desea hacer privados los ficheros seleccionados?" : "¿Desea hacer privado el fichero seleccionado?";

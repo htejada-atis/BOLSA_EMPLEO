@@ -24,6 +24,7 @@ public class ModeloMerito {
 	public static final int ORDER_COLUMN_INDEX_DESCRIPCION = 4;
 	public static final int ORDER_COLUMN_INDEX_VALOR = 5;
 	public static final int ORDER_COLUMN_INDEX_OBSERVACION = 6;
+	public static final int ORDER_COLUMN_INDEX_FICHERO = 7;
 	
 	/** Consulta méritos en BBDD y los devuelve .
 	 * @param id para devolver un mérito .
@@ -175,6 +176,7 @@ public class ModeloMerito {
 		dataTable.setOrderColumn(ORDER_COLUMN_INDEX_DESCRIPCION, "bepmer.DESCRIPCION");
 		dataTable.setOrderColumn(ORDER_COLUMN_INDEX_VALOR, "bepmer.VALOR");
 		dataTable.setOrderColumn(ORDER_COLUMN_INDEX_OBSERVACION, "bepmer.OBSERVACION");
+		dataTable.setOrderColumn(ORDER_COLUMN_INDEX_FICHERO, "bepmer.ARCHIVO");
 		dataTable.setQuery(consulta);
 				
 		try (Connection conexion = ConexionUvirtual.obtenerInstancia();

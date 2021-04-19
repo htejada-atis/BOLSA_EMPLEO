@@ -20,7 +20,6 @@ VistaEvaluadores bean = (VistaEvaluadores) uvdatos.getVistas().get(VistaEvaluado
 	
 	<h2>Evaluadores de un área</h2>
 	
-	<h4 id="title_evaluadores">Agregar nuevo evaluador al Área <%= bean.getArea().getDescripcion() %></h4>
 	<table class="bluetable bolsaempleo" id="table_usuarios">
 		<tr>
 			<th scope="col" style="width:10%"></th>
@@ -47,6 +46,7 @@ VistaEvaluadores bean = (VistaEvaluadores) uvdatos.getVistas().get(VistaEvaluado
 		    "ajax": { url: "<%=ControladorGestionEvaluadores.URL_PATTERN_AJAX%>" },
 		    "params": {"<%=ControladorGestionEvaluadores.PARAM_AREA%>": "<%= bean.getArea().getCodNum() %>"},
 		    "pageSize": 10,
+		    "title": 'Agregar Nuevo Evaluador al Área: <%= bean.getArea().getDescripcion() %>',
 		    "action": "<%=ControladorGestionEvaluadores.ACCION_DATATABLE_USUARIOS%>",
 		    "selectable": true,
 		    "columns": [
@@ -58,7 +58,7 @@ VistaEvaluadores bean = (VistaEvaluadores) uvdatos.getVistas().get(VistaEvaluado
 	        	}},
 		    ],
 		    "actions": [
-		    	{'label': 'Agregar', 'onClick': function(selected) {
+		    	{'label': 'Agregar', 'title': 'Agregar usuario como evaluador en este área', 'onClick': function(selected) {
 		    		if(selected.length) {
 		    			var params = {
 			    				'a': '<%= ControladorGestionEvaluadores.ACCION_AGREGAR_EVALUADORES %>', 

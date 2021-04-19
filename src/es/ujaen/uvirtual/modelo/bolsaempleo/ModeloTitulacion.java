@@ -315,6 +315,7 @@ public class ModeloTitulacion {
 					Titulacion tit = new Titulacion();
 					tit.setCodNum(rs.getInt("CODNUM"));
 					tit.setNombre(rs.getString("NOMBRE"));
+					tit.setArea(new ModeloArea().getAreaById(area));
 					titulaciones.add(tit);
 				}
 			}

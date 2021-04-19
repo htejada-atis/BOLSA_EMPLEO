@@ -25,12 +25,13 @@ import es.ujaen.uvirtual.utilidades.UVException;
  */
 public class ModeloNoticia {
 	
-	public static final int ORDER_COLUMN_INDEX_ID = 1;
+	public static final int ORDER_COLUMN_INDEX_FECHA = 0;
+	public static final int ORDER_COLUMN_INDEX_TEXTO = 1;
 	public static final int ORDER_COLUMN_INDEX_ENLACE = 2;
-	public static final int ORDER_COLUMN_INDEX_TEXTO = 3;
-	public static final int ORDER_COLUMN_INDEX_FECHA = 4;
-	public static final int ORDER_COLUMN_INDEX_FLGPUBLICA = 5;
-	public static final int ORDER_COLUMN_INDEX_FLGACTIVA = 6;
+	public static final int ORDER_COLUMN_INDEX_FLGPUBLICA = 3;
+	public static final int ORDER_COLUMN_INDEX_FLGACTIVA = 4;
+	public static final int ORDER_COLUMN_INDEX_ID = 5;
+	
 	
 	/********************************************** METODOS PÚBLICOS PARA CONSULTAS   ********************************************/
 
@@ -125,7 +126,6 @@ public class ModeloNoticia {
 		
 		String consulta = "SELECT bepnot.* FROM tbep_noticias bepnot WHERE 1=1 ";
 		
-		dataTable.setOrderColumn(ORDER_COLUMN_INDEX_ID, "bepnot.CODNUM");
 		dataTable.setOrderColumn(ORDER_COLUMN_INDEX_ENLACE, "bepnot.ENLACE");
 		dataTable.setOrderColumn(ORDER_COLUMN_INDEX_TEXTO, "bepnot.TEXTO");
 		dataTable.setOrderColumn(ORDER_COLUMN_INDEX_FECHA, "bepnot.FECHA");

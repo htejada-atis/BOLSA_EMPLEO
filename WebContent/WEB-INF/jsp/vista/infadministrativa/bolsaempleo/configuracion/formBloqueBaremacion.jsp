@@ -40,7 +40,7 @@ String nombre = "";
 		<input type="hidden" name="<%= ControladorItemsBaremacion.PARAM_APARTADO%>" id="apartado_id" value="" />
 		<div class="form-group">
     		<label for="bloque_apartado_codigo">Código completo</label>
-    		<input type="text" name="<%= ControladorItemsBaremacion.PARAM_APARTADO_CODIGO %>" id="bloque_apartado_codigo" value="<%= codigoCompleto %>" readonly/>
+    		<input type="text" name="<%= ControladorItemsBaremacion.PARAM_APARTADO_CODIGO %>" id="bloque_apartado_codigo" value="<%= codigoCompleto %>" disabled/>
     	</div>
     	<div class="form-group">
     		<label for="bloque_codigo">Código</label>
