@@ -63,6 +63,8 @@ public class ControladorAreasABaremar extends HttpServlet {
 
 	public static final int RESPONSE_HTTP_CODE_ERROR = 400;
 	
+	// ruta vistas
+	public static final String RUTA_BEP_CONF = "/WEB-INF/jsp/vista/infadministrativa/bolsaempleo/configuracion/";
 	// variables
 	public static boolean anonimo = true;
 	
@@ -92,7 +94,7 @@ public class ControladorAreasABaremar extends HttpServlet {
 			nombreAccion = ACCION_LISTAR;
 		}
 		
-		bean.setVista("/WEB-INF/jsp/vista/infadministrativa/bolsaempleo/configuracion/areasbaremar.jsp");
+		bean.setVista(RUTA_BEP_CONF + "areasbaremar.jsp");
 		
 		try {
 			switch (nombreAccion) {
