@@ -183,10 +183,10 @@ VistaUsuarioBolsaEmpleo bean = (VistaUsuarioBolsaEmpleo) uvdatos.getVistas().get
 			params[i].disabled = true;
 		}
 		<%}%>
+		
+		document.getElementById("usuario_enviar").addEventListener("click", function(event) {
+			enviarUsuario(event, this);
+		});
 	});
 	
-	document.getElementById("usuario_enviar").addEventListener("click", function(event) {
-		enviarUsuario(event, this);
-	});
-
 </script>

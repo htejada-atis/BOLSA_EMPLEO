@@ -56,8 +56,7 @@ public class ControladorGestionTitulaciones extends HttpServlet {
 	public static final String PARAM_ID = "id";
 	public static final String PARAM_NOMBRE = "nombre";
 	public static final String PARAM_TITULACIONES = "titulaciones";
-	
-	
+
 	// Mensajes
 	public static final String MENSAJE_ENVIADO = "mensaje";
 	public static final String MENSAJE_EXITO_AGREGAR = "titulación agregada correctamente";
@@ -66,7 +65,7 @@ public class ControladorGestionTitulaciones extends HttpServlet {
 	public static final int RESPONSE_HTTP_CODE_ERROR = 400;
 	
 	// ruta vistas
-	public static final String RUTA_BEP_CONF = "/WEB-INF/jsp/vista/infadministrativa/bolsaempleo/configuracion/";
+	public static final String RUTA_BEP_CONF = "/WEB-INF/jsp/vista/infadministrativa/bolsaempleo/configuracion/titulaciones/";
 	
 	// urls
 	public static final String URL_PATTERN_AJAX = "/srv/es/ajax/informacionadministrativa/bolsaempleo/configuracion/titulaciones";
