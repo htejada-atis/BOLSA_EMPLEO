@@ -28,13 +28,13 @@ import es.ujaen.uvirtual.utilidades.UVException;
  * Controlador - Opers. con nombres: obtener, modificar, eliminar .
  * */
 @WebServlet(
-		name = "informacionadministrativa.bolsaempleo.convocatorias.titulaciones", 
+		name = "informacionadministrativa.bolsaempleo.configuracion.titulaciones", 
 		description = "Gestión de titulaciones", 
 		urlPatterns = { 
-				"/srv/es/informacionadministrativa/bolsaempleo/convocatorias/titulaciones", 
-				"/srv/en/informacionadministrativa/bolsaempleo/convocatorias/titulaciones",
-				"/srv/es/ajax/informacionadministrativa/bolsaempleo/convocatorias/titulaciones",
-				"/srv/en/ajax/informacionadministrativa/bolsaempleo/convocatorias/titulaciones"
+				"/srv/es/informacionadministrativa/bolsaempleo/configuracion/titulaciones", 
+				"/srv/en/informacionadministrativa/bolsaempleo/configuracion/titulaciones",
+				"/srv/es/ajax/informacionadministrativa/bolsaempleo/configuracion/titulaciones",
+				"/srv/en/ajax/informacionadministrativa/bolsaempleo/configuracion/titulaciones"
 		})
 public class ControladorGestionTitulaciones extends HttpServlet {
 	private static final long serialVersionUID = 1L;
@@ -64,10 +64,10 @@ public class ControladorGestionTitulaciones extends HttpServlet {
 	public static final int RESPONSE_HTTP_CODE_ERROR = 400;
 	
 	// ruta vistas
-	public static final String RUTA_BEP_CONF = "/WEB-INF/jsp/vista/infadministrativa/bolsaempleo/convocatorias/titulaciones/";
+	public static final String RUTA_BEP_CONF = "/WEB-INF/jsp/vista/infadministrativa/bolsaempleo/configuracion/titulaciones/";
 	
 	// urls
-	public static final String URL_PATTERN_AJAX = "/srv/es/ajax/informacionadministrativa/bolsaempleo/convocatorias/titulaciones";
+	public static final String URL_PATTERN_AJAX = "/srv/es/ajax/informacionadministrativa/bolsaempleo/configuracion/titulaciones";
 
 	/** Peticion GET.
 	 * @see HttpServlet#doGet(HttpServletRequest request, HttpServletResponse response)

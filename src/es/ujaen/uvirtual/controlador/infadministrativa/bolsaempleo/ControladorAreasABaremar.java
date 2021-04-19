@@ -33,13 +33,13 @@ import es.ujaen.uvirtual.utilidades.UVException;
  * Gestión de las áreas a baremar.
  */
 @WebServlet(
-		name = "informacionadministrativa.bolsaempleo.convocatorias.areasbaremar", 
+		name = "informacionadministrativa.bolsaempleo.configuracion.areasbaremar", 
 		description = "Gestión de las áreas a baremar", 
 		urlPatterns = { 
-				"/srv/es/informacionadministrativa/bolsaempleo/convocatorias/areasbaremar", 
-				"/srv/en/informacionadministrativa/bolsaempleo/convocatorias/areasbaremar",
-				"/srv/es/ajax/informacionadministrativa/bolsaempleo/convocatorias/areasbaremar",
-				"/srv/en/ajax/informacionadministrativa/bolsaempleo/convocatorias/areasbaremar"
+				"/srv/es/informacionadministrativa/bolsaempleo/configuracion/areasbaremar", 
+				"/srv/en/informacionadministrativa/bolsaempleo/configuracion/areasbaremar",
+				"/srv/es/ajax/informacionadministrativa/bolsaempleo/configuracion/areasbaremar",
+				"/srv/en/ajax/informacionadministrativa/bolsaempleo/configuracion/areasbaremar"
 		})
 public class ControladorAreasABaremar extends HttpServlet {
 	private static final long serialVersionUID = 1L;
@@ -62,6 +62,9 @@ public class ControladorAreasABaremar extends HttpServlet {
 
 	public static final int RESPONSE_HTTP_CODE_ERROR = 400;
 	
+	// ruta vistas
+	public static final String RUTA_BEP_CONF = "/WEB-INF/jsp/vista/infadministrativa/bolsaempleo/configuracion/";
+	
 	/** Peticion GET.
 	 * @see HttpServlet#doGet(HttpServletRequest request, HttpServletResponse response)
 	 */
@@ -80,7 +83,7 @@ public class ControladorAreasABaremar extends HttpServlet {
 			nombreAccion = ACCION_LISTAR;
 		}
 		
-		bean.setVista("/WEB-INF/jsp/vista/infadministrativa/bolsaempleo/configuracion/areasbaremar.jsp");
+		bean.setVista(RUTA_BEP_CONF + "areasbaremar.jsp");
 		
 		try {
 			switch (nombreAccion) {

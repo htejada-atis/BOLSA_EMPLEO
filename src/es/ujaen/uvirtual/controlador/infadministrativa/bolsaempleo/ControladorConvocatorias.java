@@ -32,13 +32,13 @@ import es.ujaen.uvirtual.utilidades.UVException;
  * Listado de bolsas y su estado.
  */
 @WebServlet(
-	name = "informacionadministrativa.bolsaempleo.convocatorias.convocatorias", 
+	name = "informacionadministrativa.bolsaempleo.configuracion.convocatorias", 
 	description = "Gestión de estados de bolsas", 
 	urlPatterns = { 
-			"/srv/es/informacionadministrativa/bolsaempleo/convocatorias/convocatorias", 
-			"/srv/en/informacionadministrativa/bolsaempleo/convocatorias/convocatorias",
-			"/srv/es/ajax/informacionadministrativa/bolsaempleo/convocatorias/convocatorias",
-			"/srv/en/ajax/informacionadministrativa/bolsaempleo/convocatorias/convocatorias"
+			"/srv/es/informacionadministrativa/bolsaempleo/configuracion/convocatorias", 
+			"/srv/en/informacionadministrativa/bolsaempleo/configuracion/convocatorias",
+			"/srv/es/ajax/informacionadministrativa/bolsaempleo/configuracion/convocatorias",
+			"/srv/en/ajax/informacionadministrativa/bolsaempleo/configuracion/convocatorias"
 })
 public class ControladorConvocatorias extends HttpServlet {
 	private static final long serialVersionUID = 1L;
@@ -77,10 +77,10 @@ public class ControladorConvocatorias extends HttpServlet {
 	public static final int RESPONSE_HTTP_CODE_ERROR = 400;
 	
 	// ruta vistas
-	public static final String RUTA_BEP_CON = "/WEB-INF/jsp/vista/infadministrativa/bolsaempleo/convocatorias/convocatorias/";
+	public static final String RUTA_BEP_CON = "/WEB-INF/jsp/vista/infadministrativa/bolsaempleo/configuracion/convocatorias/";
 	
 	// urls
-	public static final String URL_PATTERN_AJAX = "/srv/es/ajax/informacionadministrativa/bolsaempleo/convocatorias/convocatorias";
+	public static final String URL_PATTERN_AJAX = "/srv/es/ajax/informacionadministrativa/bolsaempleo/configuracion/convocatorias";
 	
 	/** Peticion GET.
 	 * @see HttpServlet#doGet(HttpServletRequest request, HttpServletResponse response)
