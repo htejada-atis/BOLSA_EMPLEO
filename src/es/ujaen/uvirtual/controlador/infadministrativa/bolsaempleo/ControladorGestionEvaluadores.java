@@ -82,6 +82,9 @@ public class ControladorGestionEvaluadores extends HttpServlet {
 	
 	// urls
 	public static final String URL_PATTERN_AJAX = "/srv/es/ajax/informacionadministrativa/bolsaempleo/configuracion/evaluadores";
+	
+	// variables
+	public static boolean anonimo = true;
 
 	/** Peticion GET.
 	 * @see HttpServlet#doGet(HttpServletRequest request, HttpServletResponse response)
@@ -94,6 +97,14 @@ public class ControladorGestionEvaluadores extends HttpServlet {
 		
 		VistaEvaluadores bean = new VistaEvaluadores();
 		bean.setVista(RUTA_BEP_CONF + "evaluadoresListar.jsp");
+		
+		ModeloUsuarioBolsaEmpleo modelo = new ModeloUsuarioBolsaEmpleo();
+		
+		try {
+			anonimo = !modelo.checkUser(datos);
+		} catch (SQLException | UVException e) {
+			bean.getMensajesDeError().add(e.getMessage());
+		}
 		
 		String nombreAccion = EscapaHTML.ajustaCodificacion(request.getParameter(PARAM_ACCION));
 		if (nombreAccion == null) {

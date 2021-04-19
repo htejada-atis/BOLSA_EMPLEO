@@ -13,7 +13,6 @@ VistaUsuarioBolsaEmpleo bean = (VistaUsuarioBolsaEmpleo) uvdatos.getVistas().get
 
 
 <div class="bolsa-empleo misdatos-form">
-	<h2>Datos Personales</h2>
 	<% if (bean.getMensajesDeExito().size() > 0) { %>
 		<div id="exito" class="success">
 			<%= bean.formatearMensajesDeExito() %>
@@ -23,7 +22,7 @@ VistaUsuarioBolsaEmpleo bean = (VistaUsuarioBolsaEmpleo) uvdatos.getVistas().get
 		<div id="error" class="error">
 			<%= bean.formatearMensajesDeError() %>
 		</div>
-	<% } 
+	<% } else {
 
 	String nombre = "";
 	String primer_apellido = "";
@@ -41,21 +40,22 @@ VistaUsuarioBolsaEmpleo bean = (VistaUsuarioBolsaEmpleo) uvdatos.getVistas().get
 	String nacionalidad = "";
 	String sexo = "";
 		
-	nombre = bean.getUsuarioArcos().getNombre();
-	primer_apellido = bean.getUsuarioArcos().getApellido1();
-	segundo_apellido = bean.getUsuarioArcos().getApellido2();
-	email = bean.getUsuario().getEmail();
-	tipo_documento = bean.getUsuarioArcos().getDocumentoTipo();
-	n_documento = bean.getUsuarioArcos().getDocumentoNumero();
-	direccion = bean.getUsuario().getDireccion();
-	codigo_postal = bean.getUsuario().getCodigoPostal();
-	localidad = bean.getUsuario().getLocalidad();
-	provincia = bean.getUsuario().getProvincia();
-	movil = bean.getUsuario().getMovil();
-	telefono = bean.getUsuario().getTelefono();
-	nacionalidad = bean.getUsuario().getNacionalidad();
-	sexo = bean.getUsuario().getSexo();
 	
+	if(bean.getUsuarioArcos().getNombre()!=null) nombre = bean.getUsuarioArcos().getNombre();
+	if(bean.getUsuarioArcos().getApellido1()!=null) primer_apellido = bean.getUsuarioArcos().getApellido1();
+	if(bean.getUsuarioArcos().getApellido2()!=null) segundo_apellido = bean.getUsuarioArcos().getApellido2();
+	if(bean.getUsuario().getEmail()!=null) email = bean.getUsuario().getEmail();
+	if(bean.getUsuarioArcos().getDocumentoTipo()!=null) tipo_documento = bean.getUsuarioArcos().getDocumentoTipo();
+	if(bean.getUsuarioArcos().getDocumentoNumero()!=null) n_documento = bean.getUsuarioArcos().getDocumentoNumero();
+	if(bean.getUsuario().getDireccion()!=null) direccion = bean.getUsuario().getDireccion();
+	if(bean.getUsuario().getCodigoPostal()!=null) codigo_postal = bean.getUsuario().getCodigoPostal();
+	if(bean.getUsuario().getLocalidad()!=null) localidad = bean.getUsuario().getLocalidad();
+	if(bean.getUsuario().getProvincia()!=null) provincia = bean.getUsuario().getProvincia();
+	if(bean.getUsuario().getMovil()!=null) movil = bean.getUsuario().getMovil();
+	if(bean.getUsuario().getTelefono()!=null) telefono = bean.getUsuario().getTelefono();
+	if(bean.getUsuario().getNacionalidad()!=null) nacionalidad = bean.getUsuario().getNacionalidad();
+	if(bean.getUsuario().getSexo()!=null) sexo = bean.getUsuario().getSexo();
+
 	%>
 	
 	<form id="actualizar_usuario" class="be-form" method="post" action="<%= request.getRequestURI() %>">
@@ -146,9 +146,7 @@ VistaUsuarioBolsaEmpleo bean = (VistaUsuarioBolsaEmpleo) uvdatos.getVistas().get
     	</div>
     </form>
 </div>
-
 <script>
-
 
 <% if(sexo=="Masculino") { %>
 	document.getElementById("masculino").checked = true;
@@ -175,3 +173,5 @@ document.getElementById("usuario_enviar").addEventListener("click", function(eve
 
 
 </script>
+
+<% } %>

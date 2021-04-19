@@ -157,7 +157,11 @@ public class DataTable<T> {
 				throw new UVException("Error obteniendo número total de filas");
 			}
 			this.recordsTotal = rs.getInt("count");
-			this.pagesTotal = this.recordsTotal / this.pageSize;
+			if (this.recordsTotal == this.pageSize) {
+				this.pagesTotal = 0;
+			} else {
+				this.pagesTotal = this.recordsTotal / this.pageSize;
+			}
 		}		
 	}	
 	

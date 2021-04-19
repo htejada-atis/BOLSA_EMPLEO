@@ -152,6 +152,35 @@ public class ModeloUsuarioBolsaEmpleo {
 	}
 	
 	/**
+	 * Devuelve un listado de usuarios por su id.
+	 * @param codcuenta codcuenta de usuarios
+	 * @return listado de usuarios
+	 * @throws SQLException .
+	 * @throws UVException .
+	 */
+	public UsuarioBolsaEmpleo getUsuarioByCodCuenta(String codcuenta) throws SQLException, UVException {
+		String consulta = "SELECT * "
+				+ "FROM TBEP_USUARIOS bepusu "
+				+ "INNER JOIN VUJA_NET_BEP_AR_PERSONA uvpersona ON uvpersona.CODINT=bepusu.CODPERSONA "
+				+ "WHERE bepusu.CODCUENTA = ?";
+			
+		try (Connection conexion = ConexionUvirtual.obtenerInstancia();
+				PreparedStatement stmt = conexion.prepareStatement(consulta);) {
+				stmt.setString(1, codcuenta);
+						
+			try (ResultSet rs = stmt.executeQuery()) {
+				if (!rs.next()) {
+					throw new UVException("No existe el usuario con codcuenta = " + codcuenta);
+				}
+	
+				UsuarioBolsaEmpleo usuario = setUsuario(rs);
+				
+				return usuario;
+			}
+		}
+	}
+	
+	/**
 	 * Listado de areas. 
 	 * @param params para leer los parametros de paginación, ordenacion, etc
 	 * @return listado de areas
@@ -705,31 +734,44 @@ public class ModeloUsuarioBolsaEmpleo {
 	 * @throws SQLException en caso de error en la BD .
 	 * @throws UVException si noticia no es valida .
 	 */
-	public Boolean checkUser(UVDatos datos) {
+	public Boolean checkUser(UVDatos datos) throws SQLException, UVException {
 		Usuario usuArcos = datos.getUsuario();		
 		
-		if (usuArcos != null) {
-			try {
-				UsuarioBolsaEmpleo usu = listaUsuario(usuArcos.getUid());
-			} catch (UVException e) {
-				ModeloRol modeloRol = new ModeloRol();
-				Rol role;
-				
-				try {
-					role = modeloRol.getRoleById(PARAM_ROL_ID);
-					UsuarioBolsaEmpleo usuarioFinal = new UsuarioBolsaEmpleo(usuArcos.getCodigoPersonaArcos(), usuArcos.getUid(), role, true, false);
-					insertaUsuario(usuarioFinal);
-				
-					CrearUsuario.refrescarUsuario(usuarioFinal.getCodCuenta());
-				} catch (SQLException | UVException ex) {
-					ex.printStackTrace();
-				}
-			} catch (SQLException e) {
-				e.printStackTrace();
-			}	
-			return true;
+		UsuarioBolsaEmpleo usuario = getUsuarioByCodCuenta(usuArcos.getUid());
+	
+		if (usuario.getExcluido()) {
+			throw new UVException("No puede acceder, su perfil ha sido excluido por los siguientes motivos: " + usuario.getRazonExcluido());
 		} else {
-			return false;
+			if (usuario.getBorrado()) {
+				throw new UVException("No puede acceder, su perfil ha sido borrado de la base de datos");
+			} else {
+				if (usuArcos != null) {
+					try {
+						UsuarioBolsaEmpleo usu = listaUsuario(usuArcos.getUid());
+					} catch (UVException e) {
+						ModeloRol modeloRol = new ModeloRol();
+						Rol role;
+						
+						try {
+							role = modeloRol.getRoleById(PARAM_ROL_ID);
+							
+							UsuarioBolsaEmpleo usuarioFinal = 
+							new UsuarioBolsaEmpleo(usuArcos.getCodigoPersonaArcos(), usuArcos.getUid(), role, true, false);
+							
+							insertaUsuario(usuarioFinal);
+						
+							CrearUsuario.refrescarUsuario(usuarioFinal.getCodCuenta());
+						} catch (SQLException | UVException ex) {
+							ex.printStackTrace();
+						}
+					} catch (SQLException e) {
+						e.printStackTrace();
+					}	
+					return true;
+				} else {
+					return false;
+				}
+			}
 		}
 	}
 	

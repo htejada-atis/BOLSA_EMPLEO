@@ -10,14 +10,16 @@ VistaFicheros bean = (VistaFicheros) uvdatos.getVistas().get(VistaFicheros.class
 %>
 <div class="bolsa-empleo">
 	
-	<% if (session.getAttribute(ControladorGestionFicheros.MENSAJE_ENVIADO) != null) { %>
+	<% if (bean.getMensajesDeExito().size() > 0) { %>
 		<div id="exito" class="success">
-			<%= session.getAttribute(ControladorGestionFicheros.MENSAJE_ENVIADO) %>
+			<%= bean.formatearMensajesDeExito() %>
 		</div>
-	<% 
-			session.removeAttribute(ControladorGestionFicheros.MENSAJE_ENVIADO);
-		} 
-	%>
+	<% } %>
+	<% if (bean.getMensajesDeError().size() > 0) { %>
+		<div id="error" class="error">
+			<%= bean.formatearMensajesDeError() %>
+		</div>
+	<% } else {%>
 	
 	<div class="titulo-bolsa-empleo">
 		<h2>Documentos del sistema</h2>
@@ -44,7 +46,7 @@ VistaFicheros bean = (VistaFicheros) uvdatos.getVistas().get(VistaFicheros.class
 			</tr>
 		</tfoot>
 	</table>
-	
+	<% } %>
 </div>
 
 <script>
@@ -69,7 +71,14 @@ VistaFicheros bean = (VistaFicheros) uvdatos.getVistas().get(VistaFicheros.class
 		        	return "<a class='consultar-fichero' href='" +link +"' target='_blank'>" +link +"</a>"; 
 		        	}
 		        },
-		        {'data': 'publico'},
+		        {'data': 'publico', 'render': function(row) {
+	        		if(row.publico){
+	        			return "<div class='circle-true'></div>"; 
+	        		}
+	        		else{
+	        			return "<div class='circle-false'></div>"; 
+	        		}
+	        	}},
 		        {'data': 'codnum', 'buttons': [{'label': '<label class="tooltiptext">Copiar enlace</label>Copiar', 'class': 'tooltip', 'onClick': function(row) {
 			        	$(this).parent().parent().parent().find(".tooltiptext").text("¡Enlace copiado!");
 			        	

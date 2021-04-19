@@ -12,11 +12,16 @@ VistaEvaluadores bean = (VistaEvaluadores) uvdatos.getVistas().get(VistaEvaluado
 
 <div class="bolsa-empleo">
 	
-	<%
-		if(bean.getMensajesDeError().size() > 0) {
-			out.print("<div class='error'>" + bean.formatearMensajesDeError() + "</div>");
-		}
-	%>
+	<% if (bean.getMensajesDeExito().size() > 0) { %>
+		<div id="exito" class="success">
+			<%= bean.formatearMensajesDeExito() %>
+		</div>
+	<% } %>
+	<% if (bean.getMensajesDeError().size() > 0) { %>
+		<div id="error" class="error">
+			<%= bean.formatearMensajesDeError() %>
+		</div>
+	<% } else {%>
 	
 	<h2>Evaluadores de un área</h2>
 	
@@ -36,7 +41,7 @@ VistaEvaluadores bean = (VistaEvaluadores) uvdatos.getVistas().get(VistaEvaluado
 			</tr>
 		</tfoot>
 	</table>
-	
+	<% } %>
 </div>
 
 <script>
