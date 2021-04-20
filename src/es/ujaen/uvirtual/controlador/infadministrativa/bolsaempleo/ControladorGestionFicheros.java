@@ -25,6 +25,7 @@ import es.ujaen.uvirtual.beans.UVDatos;
 import es.ujaen.uvirtual.beans.uvirtual.bolsaempleo.Fichero;
 import es.ujaen.uvirtual.beans.vistas.uvirtual.bolsaempleo.VistaFicheros;
 import es.ujaen.uvirtual.modelo.bolsaempleo.ModeloFichero;
+import es.ujaen.uvirtual.modelo.bolsaempleo.ModeloUsuarioBolsaEmpleo;
 import es.ujaen.uvirtual.utilidades.BolsaEmpleoUtils;
 import es.ujaen.uvirtual.utilidades.BolsaEmpleoDataTable;
 import es.ujaen.uvirtual.utilidades.EscapaHTML;
@@ -78,13 +79,16 @@ public class ControladorGestionFicheros extends HttpServlet {
 	public static final String MENSAJE_ERROR_FICHEROS_SELECCIONADOS_INCORRECTOS = "ficheros seleccionados no válidos";
 	
 	// ruta vistas
-	public static final String RUTA_BEP_CONF = "/WEB-INF/jsp/vista/infadministrativa/bolsaempleo/configuracion/";
+	public static final String RUTA_BEP_CONF = "/WEB-INF/jsp/vista/infadministrativa/bolsaempleo/configuracion/ficheros/";
 	
 	// urls
 	public static final String URL_PATTERN_FILES_PRIVADA = "/srv/es/informacionadministrativa/bolsaempleo/configuracion/ficheros";
 	public static final String URL_PATTERN_AJAX = "/srv/es/ajax/informacionadministrativa/bolsaempleo/configuracion/ficheros";
 
 	public static final int RESPONSE_HTTP_CODE_ERROR = 400;
+	
+	// variables
+	public static boolean anonimo = true;
 	
 	/** Peticion GET.
 	 * @see HttpServlet#doGet(HttpServletRequest request, HttpServletResponse response)
@@ -97,6 +101,14 @@ public class ControladorGestionFicheros extends HttpServlet {
 		
 		VistaFicheros bean = new VistaFicheros();
 		bean.setVista(RUTA_BEP_CONF + "ficheros.jsp");
+		
+		ModeloUsuarioBolsaEmpleo modelo = new ModeloUsuarioBolsaEmpleo();
+		
+		try {
+			anonimo = !modelo.checkUser(datos);
+		} catch (SQLException | UVException e) {
+			bean.getMensajesDeError().add(e.getMessage());
+		}
 		
 		String nombreAccion = EscapaHTML.ajustaCodificacion(request.getParameter(PARAM_ACCION));
 		if (nombreAccion == null) {

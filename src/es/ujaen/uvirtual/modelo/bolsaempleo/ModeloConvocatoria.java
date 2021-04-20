@@ -1,0 +1,126 @@
+package es.ujaen.uvirtual.modelo.bolsaempleo;
+
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
+import java.util.Map;
+
+import es.ujaen.uvirtual.beans.uvirtual.bolsaempleo.Convocatoria;
+import es.ujaen.uvirtual.modelo.conexion.ConexionUvirtual;
+import es.ujaen.uvirtual.utilidades.DataTable;
+import es.ujaen.uvirtual.utilidades.UVException;
+
+/**
+ * Clase de modelo para la gestión de convocatorias 
+ * Modelo - Operaciones con nombres: lista,    actualiza,  borra,    inserta
+ * Controlador - Opers. con nombres: obtener,  cambiar,    eliminar, agregar
+ * 
+ * @author ATISoluciones 2021 
+ */
+public class ModeloConvocatoria {	
+	public static final int ORDER_COLUMN_INDEX_ID = 0;
+	public static final int ORDER_COLUMN_INDEX_DESCRIPCION = 1;
+	public static final int ORDER_COLUMN_INDEX_FECHACIERRE = 2;
+	public static final int ORDER_COLUMN_INDEX_ESTADO = 3;
+	
+	public static final String CONVOCATORIA_ESTADO_ABIERTA = "ABIERTA";
+	public static final String CONVOCATORIA_ESTADO_CERRADA = "CERRADA";
+	
+	public static final int COLUMN_DESCRIPCION_MAXLENGTH = 150;
+		
+	/**
+	 * Listado de bolsas de convocatorias. 
+	 * @param params para leer los parametros de paginación, ordenacion, etc
+	 * @return listado de bolsas de empleo
+	 * @throws SQLException en caso de error de base de datos
+	 * @throws UVException error si no existe la area
+	 */
+	public DataTable<Convocatoria> listaConvocatoriasDatatable(Map<String, String[]> params) throws SQLException, UVException {
+		List<Convocatoria> data = new ArrayList<>();
+		DataTable<Convocatoria> dataTable = new DataTable<Convocatoria>(params);
+		
+		String consulta =
+			"SELECT bepcon.* "
+		  + "FROM TBEP_CONVOCATORIAS bepcon "		  
+		  + "WHERE 1=1 ";
+		
+		dataTable.setOrderColumn(ORDER_COLUMN_INDEX_ID, "bepcon.CODNUM");
+		dataTable.setOrderColumn(ORDER_COLUMN_INDEX_DESCRIPCION, "bepcon.DESCRIPCION");
+		dataTable.setOrderColumn(ORDER_COLUMN_INDEX_FECHACIERRE, "bepcon.FECHACIERRE");
+		dataTable.setOrderColumn(ORDER_COLUMN_INDEX_ESTADO, "bepcon.ESTADO");		
+		dataTable.setQuery(consulta);
+				
+		try (Connection conexion = ConexionUvirtual.obtenerInstancia();
+				PreparedStatement stmtCount = conexion.prepareStatement(dataTable.getQueryCount());
+				PreparedStatement stmt = conexion.prepareStatement(dataTable.getQuery());
+		) {					
+			try (ResultSet rs = stmt.executeQuery()) {
+				while (rs.next()) {
+					Convocatoria convocatoria = new Convocatoria();
+					convocatoria.setCodNum(rs.getInt("CODNUM"));
+					convocatoria.setDescripcion(rs.getString("DESCRIPCION"));
+					convocatoria.setFechaCierre(rs.getDate("FECHACIERRE"));
+					convocatoria.setEstado(rs.getString("ESTADO"));					
+					data.add(convocatoria);					
+				}				
+			}	
+			
+			dataTable.setRecordsTotalFromQuery(stmtCount);
+			dataTable.setData(data);
+		}
+		
+		return dataTable;
+	}	
+	
+	/**
+	 * Comprueba si hay convocatorias abiertas.
+	 * @return .
+	 * @throws SQLException .
+	 */
+	public boolean hayConvocatoriaAbierta() throws SQLException {
+		String consulta =
+				"SELECT COUNT(1) numero_convocatorias_abiertas "
+			  + "FROM TBEP_CONVOCATORIAS bepcon "		  
+			  + "WHERE bepcon.ESTADO = ?";
+		
+		try (Connection conexion = ConexionUvirtual.obtenerInstancia(); 
+				PreparedStatement stmt = conexion.prepareStatement(consulta);) {
+			stmt.setString(1, CONVOCATORIA_ESTADO_ABIERTA);
+    		try (ResultSet rs = stmt.executeQuery();) {
+	    		if (rs.next()) {
+	    			if (rs.getInt("numero_convocatorias_abiertas") > 0) {
+	    				return true;
+	    			}
+	    		}
+    		}
+		}
+		
+		return false;
+	}
+	
+	/**
+	 * Añade una convocatoria al sistema cerrada.
+	 * @param convocatoria .	 
+	 * @throws SQLException .
+	 */
+	public void nuevaConvocatoria(Convocatoria convocatoria) throws SQLException {
+		String consulta =
+			"INSERT INTO TBEP_CONVOCATORIAS (DESCRIPCION, FECHACIERRE, ESTADO, NUMBOLSASMAXIMO, NUMMERITOSPORBLOQUE) " 
+			+ "VALUES (?, ?, ?, ?, ?)";
+		
+		try (Connection conexion = ConexionUvirtual.obtenerInstancia();
+				 PreparedStatement stmt = conexion.prepareStatement(consulta);) {
+			int parameterIndex = 1;
+			stmt.setString(parameterIndex++, convocatoria.getDescripcion());
+			stmt.setDate(parameterIndex++, new java.sql.Date(convocatoria.getFechaCierre().getTime()));
+			stmt.setString(parameterIndex++, convocatoria.getEstado());
+			stmt.setInt(parameterIndex++, convocatoria.getNumBolsasMaximo());
+			stmt.setInt(parameterIndex++, convocatoria.getNumMeritosPorBloque());			
+			stmt.executeUpdate();
+		}		
+	}
+}

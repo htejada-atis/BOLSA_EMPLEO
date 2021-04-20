@@ -366,10 +366,17 @@ nav-bolsa-empleo a:active, nav-bolsa-empleo a:hover {
 
 .form-group-container {
     display: grid;
-    grid-template-columns: 1fr 1fr;
+    grid-template-columns: 1fr 1fr 1fr;
     grid-gap: 20px;
 }
 
+.form-group-container.col1 {
+	grid-template-columns: 1fr;
+}
+
+.form-group-container.col2 {
+	grid-template-columns: 1fr 1fr;
+}
 
 .form-input-custom{
 	width:100%;
@@ -386,6 +393,7 @@ nav-bolsa-empleo a:active, nav-bolsa-empleo a:hover {
      -webkit-border-radius: 50%;
      border-radius: 50%;
      background: #5cb85c;
+     margin: 0 auto;
 }
 
 .circle-false{
@@ -395,6 +403,7 @@ nav-bolsa-empleo a:active, nav-bolsa-empleo a:hover {
      -webkit-border-radius: 50%;
      border-radius: 50%;
      background: #cc0000;
+     margin: 0 auto;
 }
 
 .table-title{

@@ -19,6 +19,17 @@ VistaItemsBaremacion bean = (VistaItemsBaremacion) uvdatos.getVistas().get(Vista
 			session.removeAttribute(ControladorItemsBaremacion.MENSAJE_ENVIADO);
 		} 
 	%>
+
+	<% if (bean.getMensajesDeExito().size() > 0) { %>
+		<div id="exito" class="success">
+			<%= bean.formatearMensajesDeExito() %>
+		</div>
+	<% } %>
+	<% if (bean.getMensajesDeError().size() > 0) { %>
+		<div id="error" class="error">
+			<%= bean.formatearMensajesDeError() %>
+		</div>
+	<% } else {%>
 	
 	<h2>Items para las baremaciones</h2>
 	
@@ -66,7 +77,7 @@ VistaItemsBaremacion bean = (VistaItemsBaremacion) uvdatos.getVistas().get(Vista
 			</tr>
 		</tfoot>
 	</table>
-	
+	<% } %>
 </div>
 	
 <script>
@@ -134,7 +145,14 @@ VistaItemsBaremacion bean = (VistaItemsBaremacion) uvdatos.getVistas().get(Vista
 		    "columns": [
 		    	{'data': 'codigo'},
 		        {'data': 'nombre'},
-		        {'data': 'activo'},
+		        {'data': 'activo', 'render': function(row) {
+	        		if(row.activo){
+	        			return "<div class='circle-true'></div>"; 
+	        		}
+	        		else{
+	        			return "<div class='circle-false'></div>"; 
+	        		}
+	        	}},
 		    ],
 		    "actions": [
 		    	{'label': activatorApartadoName, 'showWhenSelected': true, 'title': activatorApartadoName + ' apartado seleccionado', 'onClick': function(selected) {
@@ -186,7 +204,14 @@ VistaItemsBaremacion bean = (VistaItemsBaremacion) uvdatos.getVistas().get(Vista
 			    		return row.apartado.codigo + "." + row.codigo;
 			    	}},
 			        {'data': 'nombre'},
-			        {'data': 'activo'},
+			        {'data': 'activo', 'render': function(row) {
+		        		if(row.activo){
+		        			return "<div class='circle-true'></div>"; 
+		        		}
+		        		else{
+		        			return "<div class='circle-false'></div>"; 
+		        		}
+		        	}},
 			    ],
 			    "actions": [
 			    	{'label': activatorBloqueName, 'showWhenSelected': true, 'title': activatorBloqueName + ' bloque seleccionado', 'onClick': function(selected) {
@@ -237,7 +262,14 @@ VistaItemsBaremacion bean = (VistaItemsBaremacion) uvdatos.getVistas().get(Vista
 				    		return row.bloque.apartado.codigo + "." + row.bloque.codigo + "." + row.codigo;
 				    	}},
 				        {'data': 'nombre'},
-				        {'data': 'activo'},
+				        {'data': 'activo', 'render': function(row) {
+			        		if(row.activo){
+			        			return "<div class='circle-true'></div>"; 
+			        		}
+			        		else{
+			        			return "<div class='circle-false'></div>"; 
+			        		}
+			        	}},
 				    ],
 				    "actions": [
 				    	{'label': activatorItemName, 'showWhenSelected': true, 'title': activatorItemName + ' ítem seleccionado', 'onClick': function(selected) {

@@ -1,5 +1,6 @@
 package es.ujaen.uvirtual.utilidades;
 
+import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.Part;
 
 /**
@@ -42,5 +43,22 @@ public class BolsaEmpleoUtils {
 		
 		return builder.deleteCharAt(builder.length() - 1).toString();
 	} 
+	
+	/**
+	 * adfadf.
+	 * @param request .
+	 * @param param .
+	 * @param defaultParam .
+	 * @return .
+	 */
+	public static String getParamForm(HttpServletRequest request, String param, String defaultParam) {
+		String value = request.getParameter(param);
+		
+		if (value != null) {
+			return value;
+		}
+		
+		return defaultParam;
+	}
 
 }

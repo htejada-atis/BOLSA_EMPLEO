@@ -1,0 +1,7 @@
+DROP TABLE TBEP_HTO_CONVOCATORIAS;
+--/////////////////////
+DROP TABLE TBEP_CONVOCATORIAS;
+--/////////////////////
+DROP SEQUENCE QBEP_CON;
+--/////////////////////
+DROP SEQUENCE QBEP_HTO_CON;

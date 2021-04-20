@@ -21,6 +21,17 @@ VistaNoticias bean = (VistaNoticias) uvdatos.getVistas().get(VistaNoticias.class
 		} 
 	%>
 
+	<% if (bean.getMensajesDeExito().size() > 0) { %>
+		<div id="exito" class="success">
+			<%= bean.formatearMensajesDeExito() %>
+		</div>
+	<% } %>
+	<% if (bean.getMensajesDeError().size() > 0) { %>
+		<div id="error" class="error">
+			<%= bean.formatearMensajesDeError() %>
+		</div>
+	<% } else {%>
+
 	<div class="titulo-bolsa-empleo">
 		<h2>Noticias</h2>
     
@@ -46,6 +57,8 @@ VistaNoticias bean = (VistaNoticias) uvdatos.getVistas().get(VistaNoticias.class
 			</tr>
 		</tfoot>
 	</table>
+	
+	<% } %>
 </div>
 
 <script>
@@ -65,10 +78,24 @@ VistaNoticias bean = (VistaNoticias) uvdatos.getVistas().get(VistaNoticias.class
 		    	{'data': 'texto', 'filter': true, 'render': function(row) {
 		    		return "<div class='overflow-auto'>" +row.texto +"</div>";
 		    	}},
-		        {'data': 'enlace', 'class': 'overflow-ellipsis', 'filter': true, 'order': {'active': false}, 'render': function(row) { return "<a href='" +row.enlace +"' target='_blank'>" +row.enlace +"</a>"; }},
-		        {'data': 'publica', 'order': {'active': false}, 'filter': {'type': 'selectBoolean'}},
-		        {'data': 'activa', 'order': {'active': false}, 'filter': {'type': 'selectBoolean'}},
-		        {'data': 'codnum', 'buttons': [{'label': 'Editar', 'title': 'Editar noticia', 'onClick': function(row) {
+		        {'data': 'enlace', 'order': {'active': false}, 'filter': true, 'class': 'overflow-ellipsis', 'render': function(row) { return "<a href='" +row.enlace +"' target='_blank'>" +row.enlace +"</a>"; }},
+		        {'data': 'publica', 'order': {'active': false}, 'filter': {'type': 'selectBoolean'}, 'render': function(row) {
+	        		if(row.publica){
+	        			return "<div class='circle-true'></div>"; 
+	        		}
+	        		else{
+	        			return "<div class='circle-false'></div>"; 
+	        		}
+	        	}},
+		        {'data': 'activa', 'render': function(row) {
+	        		if(row.activa){
+	        			return "<div class='circle-true'></div>"; 
+	        		}
+	        		else{
+	        			return "<div class='circle-false'></div>"; 
+	        		}
+	        	}},
+		        {'data': 'codnum', 'buttons': [{'label': 'Editar', 'onClick': function(row) {
 			        		var params = {'a': '<%= ControladorGestionNoticias.ACCION_EDITAR_NOTICIA %>', 'id': row.codNum};
 			        		Atis.sendForm("<%= request.getRequestURI() %>", params);
 			        	}

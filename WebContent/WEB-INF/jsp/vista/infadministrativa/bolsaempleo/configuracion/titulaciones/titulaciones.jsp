@@ -11,7 +11,7 @@ VistaTitulaciones bean = (VistaTitulaciones) uvdatos.getVistas().get(VistaTitula
 %>
 
 <div class="bolsa-empleo">
-	
+
 	<%
 		if (session.getAttribute(ControladorGestionTitulaciones.MENSAJE_ENVIADO) != null) {
 		%>
@@ -22,6 +22,17 @@ VistaTitulaciones bean = (VistaTitulaciones) uvdatos.getVistas().get(VistaTitula
 			session.removeAttribute(ControladorGestionTitulaciones.MENSAJE_ENVIADO);
 		}
 	%>
+	
+	<% if (bean.getMensajesDeExito().size() > 0) { %>
+		<div id="exito" class="success">
+			<%= bean.formatearMensajesDeExito() %>
+		</div>
+	<% } %>
+	<% if (bean.getMensajesDeError().size() > 0) { %>
+		<div id="error" class="error">
+			<%= bean.formatearMensajesDeError() %>
+		</div>
+	<% } else {%>
 	
 	<div class="titulo-bolsa-empleo">
 		<h2>Titulaciones</h2>
@@ -45,7 +56,7 @@ VistaTitulaciones bean = (VistaTitulaciones) uvdatos.getVistas().get(VistaTitula
 			</tr>
 		</tfoot>
 	</table>
-	
+	<% } %>
 </div>
 
 <script>

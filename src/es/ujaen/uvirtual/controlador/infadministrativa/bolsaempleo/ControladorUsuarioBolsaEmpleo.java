@@ -106,6 +106,9 @@ public class ControladorUsuarioBolsaEmpleo extends HttpServlet {
 	
 	public static final String URL_PATTERN_AJAX = "/srv/es/ajax/informacionadministrativa/bolsaempleo/configuracion/usuarios";
 	
+	// variables
+	public static boolean anonimo = true;
+	
 	/** Peticion GET.
 	 * @see HttpServlet#doGet(HttpServletRequest request, HttpServletResponse response)
 	 */
@@ -118,6 +121,14 @@ public class ControladorUsuarioBolsaEmpleo extends HttpServlet {
 		VistaUsuarioBolsaEmpleo bean = new VistaUsuarioBolsaEmpleo();		
 		Usuario usuario = datos.getUsuario();
 		LOGGER.log(Level.FINEST, "usuario que ha entrado en el servlet es {0}", usuario.getUid());
+		
+		ModeloUsuarioBolsaEmpleo modelo = new ModeloUsuarioBolsaEmpleo();
+		
+		try {
+			anonimo = !modelo.checkUser(datos);
+		} catch (SQLException | UVException e) {
+			bean.getMensajesDeError().add(e.getMessage());
+		}
 		
 		String nombreAccion = EscapaHTML.ajustaCodificacion(request.getParameter(PARAM_ACCION));
 		if (nombreAccion == null) {

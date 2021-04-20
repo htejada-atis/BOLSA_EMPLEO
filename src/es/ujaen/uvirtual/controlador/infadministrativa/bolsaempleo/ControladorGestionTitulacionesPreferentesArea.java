@@ -24,6 +24,7 @@ import es.ujaen.uvirtual.beans.vistas.uvirtual.bolsaempleo.VistaTitulacionesArea
 import es.ujaen.uvirtual.modelo.bolsaempleo.ModeloArea;
 import es.ujaen.uvirtual.modelo.bolsaempleo.ModeloTitulacion;
 import es.ujaen.uvirtual.utilidades.BolsaEmpleoDataTable;
+import es.ujaen.uvirtual.modelo.bolsaempleo.ModeloUsuarioBolsaEmpleo;
 import es.ujaen.uvirtual.utilidades.EscapaHTML;
 import es.ujaen.uvirtual.utilidades.Formateador;
 import es.ujaen.uvirtual.utilidades.UVException;
@@ -75,6 +76,9 @@ public class ControladorGestionTitulacionesPreferentesArea extends HttpServlet {
 	// urls
 	public static final String URL_PATTERN_AJAX = "/srv/es/ajax/informacionadministrativa/bolsaempleo/configuracion/titulacionespreferentesarea";
 
+	// variables
+	public static boolean anonimo = true;
+	
 	/** Peticion GET.
 	 * @see HttpServlet#doGet(HttpServletRequest request, HttpServletResponse response)
 	 */
@@ -86,6 +90,14 @@ public class ControladorGestionTitulacionesPreferentesArea extends HttpServlet {
 		
 		VistaTitulacionesArea bean = new VistaTitulacionesArea();
 		bean.setVista(RUTA_BEP_CONF + "titulacionespreferentesarea.jsp");
+		
+		ModeloUsuarioBolsaEmpleo modelo = new ModeloUsuarioBolsaEmpleo();
+		
+		try {
+			anonimo = !modelo.checkUser(datos);
+		} catch (SQLException | UVException e) {
+			bean.getMensajesDeError().add(e.getMessage());
+		}
 		
 		String nombreAccion = EscapaHTML.ajustaCodificacion(request.getParameter(PARAM_ACCION));
 		if (nombreAccion == null) {

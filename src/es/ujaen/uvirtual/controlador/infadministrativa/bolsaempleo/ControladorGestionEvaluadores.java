@@ -78,10 +78,13 @@ public class ControladorGestionEvaluadores extends HttpServlet {
 	public static final int RESPONSE_HTTP_CODE_ERROR = 400;
 	
 	// ruta vistas
-	public static final String RUTA_BEP_CONF = "/WEB-INF/jsp/vista/infadministrativa/bolsaempleo/configuracion/";
+	public static final String RUTA_BEP_CONF = "/WEB-INF/jsp/vista/infadministrativa/bolsaempleo/configuracion/evaluadores/";
 	
 	// urls
 	public static final String URL_PATTERN_AJAX = "/srv/es/ajax/informacionadministrativa/bolsaempleo/configuracion/evaluadores";
+	
+	// variables
+	public static boolean anonimo = true;
 
 	/** Peticion GET.
 	 * @see HttpServlet#doGet(HttpServletRequest request, HttpServletResponse response)
@@ -94,6 +97,14 @@ public class ControladorGestionEvaluadores extends HttpServlet {
 		
 		VistaEvaluadores bean = new VistaEvaluadores();
 		bean.setVista(RUTA_BEP_CONF + "evaluadoresListar.jsp");
+		
+		ModeloUsuarioBolsaEmpleo modelo = new ModeloUsuarioBolsaEmpleo();
+		
+		try {
+			anonimo = !modelo.checkUser(datos);
+		} catch (SQLException | UVException e) {
+			bean.getMensajesDeError().add(e.getMessage());
+		}
 		
 		String nombreAccion = EscapaHTML.ajustaCodificacion(request.getParameter(PARAM_ACCION));
 		if (nombreAccion == null) {

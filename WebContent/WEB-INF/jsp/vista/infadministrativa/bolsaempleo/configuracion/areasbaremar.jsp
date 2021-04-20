@@ -54,11 +54,11 @@ $(document).ready(function() {
 	        {'data': 'area.idAreaExterno'},
 	        {'data': 'area.descripcion'},
 	        {'data': 'baremable', 'render': function(row) {
-        		if(row.baremable==true){
-        			return "<center><img style='width:20px; height:20px' src='/img/md/check_box.svg'/></center>"; 
+        		if(row.baremable){
+        			return "<div class='circle-true'></div>"; 
         		}
         		else{
-        			return "<center><img style='width:20px; height:20px' src='/img/md/cancel.svg'/></center>"; 
+        			return "<div class='circle-false'></div>"; 
         		}
         	}},
 	    ],

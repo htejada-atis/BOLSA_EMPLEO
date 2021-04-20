@@ -81,6 +81,8 @@ public class ControladorMisDatos extends HttpServlet {
 	
 	public static final String URL_PATTERN_AJAX = "/srv/es/ajax/informacionadministrativa/bolsaempleo/misdatos";
 	
+	public static boolean anonimo = true;
+	
 	/** Peticion GET.
 	 * @see HttpServlet#doGet(HttpServletRequest request, HttpServletResponse response)
 	 */
@@ -92,7 +94,14 @@ public class ControladorMisDatos extends HttpServlet {
 		
 		VistaUsuarioBolsaEmpleo bean = new VistaUsuarioBolsaEmpleo();		
 		Usuario usuario = datos.getUsuario();
+		ModeloUsuarioBolsaEmpleo modelo = new ModeloUsuarioBolsaEmpleo();
 		LOGGER.log(Level.FINEST, "usuario que ha entrado en el servlet es {0}", usuario.getUid());
+		
+		try {
+			anonimo = !modelo.checkUser(datos);
+		} catch (SQLException | UVException e) {
+			bean.getMensajesDeError().add(e.getMessage());
+		}
 		
 		String nombreAccion = EscapaHTML.ajustaCodificacion(request.getParameter(PARAM_ACCION));
 		if (nombreAccion == null) {
@@ -100,8 +109,6 @@ public class ControladorMisDatos extends HttpServlet {
 		}
 		
 		bean.setVista("/WEB-INF/jsp/vista/infadministrativa/bolsaempleo/misdatos/index.jsp");
-		
-		ModeloUsuarioBolsaEmpleo modelo = new ModeloUsuarioBolsaEmpleo();
 		
 		Usuario usuArcos = CrearUsuario.usuario(usuario.getUid());
 		

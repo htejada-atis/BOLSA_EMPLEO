@@ -11,7 +11,7 @@ VistaEvaluadores bean = (VistaEvaluadores) uvdatos.getVistas().get(VistaEvaluado
 %>
 
 <div class="bolsa-empleo">
-	
+
 	<%
 		if (session.getAttribute(ControladorGestionEvaluadores.MENSAJE_ENVIADO) != null) {
 		%>
@@ -22,6 +22,17 @@ VistaEvaluadores bean = (VistaEvaluadores) uvdatos.getVistas().get(VistaEvaluado
 	session.removeAttribute(ControladorGestionEvaluadores.MENSAJE_ENVIADO);
 			}
 	%>
+	
+	<% if (bean.getMensajesDeExito().size() > 0) { %>
+		<div id="exito" class="success">
+			<%= bean.formatearMensajesDeExito() %>
+		</div>
+	<% } %>
+	<% if (bean.getMensajesDeError().size() > 0) { %>
+		<div id="error" class="error">
+			<%= bean.formatearMensajesDeError() %>
+		</div>
+	<% } else {%>
 	
 	<h2>Evaluadores de un área</h2>
 	
@@ -58,9 +69,16 @@ VistaEvaluadores bean = (VistaEvaluadores) uvdatos.getVistas().get(VistaEvaluado
 			<tr>
 				<th colspan="5" style="width:100%"></th>
 			</tr>
-		</tfoot>
-	</table>
-	
+			<tbody>		
+			</tbody>
+			<tfoot>
+				<tr>
+					<th colspan="5" style="width:100%"></th>
+				</tr>
+			</tfoot>
+		</table>
+	</div>
+		<% } %>
 </div>
 
 <script>
@@ -92,9 +110,15 @@ VistaEvaluadores bean = (VistaEvaluadores) uvdatos.getVistas().get(VistaEvaluado
 			    	{'data': 'apellido1', 'render': function(row) {
 		        		return "<div class='overflow-auto'>" + row.nombre + "\n" + row.apellido1 + "\n" + row.apellido2 + "</div>"; 
 		        	}},
-		        	{'data': 'activo'},
-		        	{'data': 'codnum', 'buttons': [{'label': function(row) { return row.activo ? "Borrar" : "Restaurar"; },
-		        		'title': function(row) { return row.activo ? "Borrar evaluador" : "Restaurar evaluador"; }, 'onClick': function(row) {
+		        	{'data': 'activo', 'render': function(row) {
+		        		if(row.activo){
+		        			return "<div class='circle-true'></div>"; 
+		        		}
+		        		else{
+		        			return "<div class='circle-false'></div>"; 
+		        		}
+		        	}},
+		        	{'data': 'codnum', 'buttons': [{'label': function(row) { return row.activo ? "Borrar" : "Restaurar"; }, 'onClick': function(row) {
 			        		var mensaje = "¿Desea borrar el evaluador seleccionado?";
 				        	var titulo = "Borrar evaluador";
 				        	if(!row.activo) {

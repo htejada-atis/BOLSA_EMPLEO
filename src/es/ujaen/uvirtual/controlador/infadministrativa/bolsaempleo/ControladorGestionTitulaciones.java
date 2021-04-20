@@ -18,6 +18,7 @@ import es.ujaen.uvirtual.beans.UVDatos;
 import es.ujaen.uvirtual.beans.uvirtual.bolsaempleo.Titulacion;
 import es.ujaen.uvirtual.beans.vistas.uvirtual.bolsaempleo.VistaTitulaciones;
 import es.ujaen.uvirtual.modelo.bolsaempleo.ModeloTitulacion;
+import es.ujaen.uvirtual.modelo.bolsaempleo.ModeloUsuarioBolsaEmpleo;
 import es.ujaen.uvirtual.utilidades.BolsaEmpleoDataTable;
 import es.ujaen.uvirtual.utilidades.EscapaHTML;
 import es.ujaen.uvirtual.utilidades.Formateador;
@@ -55,8 +56,7 @@ public class ControladorGestionTitulaciones extends HttpServlet {
 	public static final String PARAM_ID = "id";
 	public static final String PARAM_NOMBRE = "nombre";
 	public static final String PARAM_TITULACIONES = "titulaciones";
-	
-	
+
 	// Mensajes
 	public static final String MENSAJE_ENVIADO = "mensaje";
 	public static final String MENSAJE_EXITO_AGREGAR = "titulación agregada correctamente";
@@ -65,11 +65,14 @@ public class ControladorGestionTitulaciones extends HttpServlet {
 	public static final int RESPONSE_HTTP_CODE_ERROR = 400;
 	
 	// ruta vistas
-	public static final String RUTA_BEP_CONF = "/WEB-INF/jsp/vista/infadministrativa/bolsaempleo/configuracion/";
+	public static final String RUTA_BEP_CONF = "/WEB-INF/jsp/vista/infadministrativa/bolsaempleo/configuracion/titulaciones/";
 	
 	// urls
 	public static final String URL_PATTERN_AJAX = "/srv/es/ajax/informacionadministrativa/bolsaempleo/configuracion/titulaciones";
 
+	// variables
+	public static boolean anonimo = true;
+	
 	/** Peticion GET.
 	 * @see HttpServlet#doGet(HttpServletRequest request, HttpServletResponse response)
 	 */
@@ -81,6 +84,14 @@ public class ControladorGestionTitulaciones extends HttpServlet {
 		
 		VistaTitulaciones bean = new VistaTitulaciones();
 		bean.setVista(RUTA_BEP_CONF + "titulaciones.jsp");
+		
+		ModeloUsuarioBolsaEmpleo modelo = new ModeloUsuarioBolsaEmpleo();
+		
+		try {
+			anonimo = !modelo.checkUser(datos);
+		} catch (SQLException | UVException e) {
+			bean.getMensajesDeError().add(e.getMessage());
+		}
 		
 		String nombreAccion = EscapaHTML.ajustaCodificacion(request.getParameter(PARAM_ACCION));
 		if (nombreAccion == null) {
