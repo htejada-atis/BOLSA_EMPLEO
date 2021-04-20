@@ -62,10 +62,8 @@ public class ControladorMisSolicitudes extends HttpServlet {
 	
 	// mensajes
 	public static final String MENSAJE_ERROR_CONVOCATORIA_ID_REQUERIDA = "El id de la convocatoria es requerído";
-	public static final String MENSAJE_ERROR_SOLICITUDES_ABIERTAS = "Ya existen solicitides abiertas";
-	public static final String MENSAJE_ERROR_NO_EXISTE_CONVOCATORIA = "No existe la convocatoria";
-	public static final String MENSAJE_ERROR_CONVOCATORIA_NO_ABIERTA = "Convocatoria no abierta";
-	
+	public static final String MENSAJE_ERROR_CONVOCATORIA_ID_NUMERO = "El id de la convocatoria debe ser un número";
+		
 //	public static final String MENSAJE_ERROR_DESCRIPCION_LARGA = "La descripción no puede ser superior a %d";
 //	public static final String MENSAJE_ERROR_DESCRIPCION_VACIA = "La descripción no puede estar vacia";
 //	public static final String MENSAJE_ERROR_FECHACIERRE_INCORRECTA = "La fecha de cierre no tiene el formato DD/MM/YYYY";
@@ -117,10 +115,10 @@ public class ControladorMisSolicitudes extends HttpServlet {
 				case ACCION_CREAR_SOLICITUD:
 					crearSolicitud(bean, datos, request, response);
 					break;				
-			}			
+			}
 		} catch (UVException e) {
 			LOGGER.log(Level.WARNING, e.toString());
-			bean.getMensajesDeError().add(e.toString());
+			bean.getMensajesDeError().add(e.getMessage());
 		} catch (SQLException e) {
 			LOGGER.log(Level.SEVERE, Formateador.getStackTrace(e));
 			LOGGER.log(Level.SEVERE, e.toString());
@@ -179,7 +177,6 @@ public class ControladorMisSolicitudes extends HttpServlet {
 	
 	private void crearSolicitud(VistaSolicitudes bean, UVDatos datos, HttpServletRequest request, HttpServletResponse response) throws UVException, SQLException {
 		ModeloSolicitud modeloSolicitud = new ModeloSolicitud();
-		ModeloConvocatoria modeloConvocatoria = new ModeloConvocatoria();
 		
 		BolsaEmpleoValidator validator = new BolsaEmpleoValidator(request);
 		validator.addParamInteger(PARAM_CONVOCATORIA_ID);
@@ -192,20 +189,11 @@ public class ControladorMisSolicitudes extends HttpServlet {
 				}
 			}				
 		} else {
-			Convocatoria convocatoria = modeloConvocatoria.getConvocatoriaById(validator.getValueInteger(PARAM_CONVOCATORIA_ID));
-			if (convocatoria == null) {
-				bean.getMensajesDeError().add(MENSAJE_ERROR_NO_EXISTE_CONVOCATORIA);				
-			} else if (!convocatoria.getEstado().equals(ModeloConvocatoria.CONVOCATORIA_ESTADO_ABIERTA)) {
-				bean.getMensajesDeError().add(MENSAJE_ERROR_CONVOCATORIA_NO_ABIERTA);				
-			} else if (modeloSolicitud.haySolicitudAbiertaParaConvocatoria(convocatoria)) {
-				bean.getMensajesDeError().add(MENSAJE_ERROR_SOLICITUDES_ABIERTAS);				
-			} else {
-				// creamos solicitud
-				Solicitud solicitud = modeloSolicitud.nuevaSolicitud(convocatoria);
-					
-				bean.setSolicitud(solicitud);
-				bean.setVista(RUTA_BEP_SOL + "paso1.jsp");
-			}
+			// creamos solicitud
+			Solicitud solicitud = modeloSolicitud.nuevaSolicitud(validator.getValueInteger(PARAM_CONVOCATORIA_ID));
+				
+			bean.setSolicitud(solicitud);
+			bean.setVista(RUTA_BEP_SOL + "paso1.jsp");			
 		}
 	}
 }
