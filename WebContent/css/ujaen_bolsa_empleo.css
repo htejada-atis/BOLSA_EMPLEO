@@ -368,7 +368,7 @@ nav-bolsa-empleo a:active, nav-bolsa-empleo a:hover {
 
 .form-group-container {
     display: grid;
-    grid-template-columns: 1fr 1fr 1fr;
+    grid-template-columns: 1fr 1fr;
     grid-gap: 20px;
 }
 

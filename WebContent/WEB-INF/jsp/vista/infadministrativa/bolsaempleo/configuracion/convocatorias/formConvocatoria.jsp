@@ -88,6 +88,24 @@ Convocatoria convocatoria = bean.getConvocatoria();
 
 	$(document).ready(function() {		
 		$("#fechaCierre").datepicker();		
+		
+		document.getElementById("convocatoria_enviar").addEventListener("click", function(event) {
+			enviarConvocatoria(event, this);
+		});
 	})
+	
+	function enviarConvocatoria(event, submit_input) {
+		event.preventDefault();
+	
+		<% if(bean.getConvocatoria() != null) { %>
+				input_accion = document.getElementById("accion_formulario");
+				input_accion.value = '<%= ControladorConvocatorias.ACCION_MODIFICAR_CONVOCATORIA %>';
+				input_id = document.getElementById("convocatoria_id");
+				input_id.value = '<%= bean.getConvocatoria().getCodNum() %>';
+		<%}%>
+	
+		submit_input.form.submit();
+	}
+
 
 </script>

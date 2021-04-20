@@ -3,6 +3,7 @@ package es.ujaen.uvirtual.controlador.infadministrativa.bolsaempleo;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.sql.SQLException;
+import java.text.SimpleDateFormat;
 import java.util.logging.Logger;
 import java.util.Date;
 import java.util.logging.Level;
@@ -12,16 +13,22 @@ import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 
+import es.ujaen.uvirtual.adm.CrearUsuario;
 import es.ujaen.uvirtual.beans.CodigoDescripcion;
+import es.ujaen.uvirtual.beans.Rol;
 import es.ujaen.uvirtual.beans.UVDatos;
 import es.ujaen.uvirtual.beans.Usuario;
 import es.ujaen.uvirtual.beans.uvirtual.bolsaempleo.Convocatoria;
+import es.ujaen.uvirtual.beans.uvirtual.bolsaempleo.UsuarioBolsaEmpleo;
 import es.ujaen.uvirtual.beans.vistas.uvirtual.bolsaempleo.VistaConvocatorias;
 import es.ujaen.uvirtual.modelo.bolsaempleo.ModeloConvocatoria;
+import es.ujaen.uvirtual.modelo.bolsaempleo.ModeloRol;
+import es.ujaen.uvirtual.modelo.bolsaempleo.ModeloUsuarioBolsaEmpleo;
 import es.ujaen.uvirtual.utilidades.BolsaEmpleoValidator;
 import es.ujaen.uvirtual.utilidades.DataTable;
 import es.ujaen.uvirtual.utilidades.EscapaHTML;
@@ -74,6 +81,7 @@ public class ControladorConvocatorias extends HttpServlet {
 	public static final String MENSAJE_ERROR_NUMMERITOSBLOQUE_MINIMO = "El número de méritos por bloque debe ser al menos uno";
 	public static final String MENSAJE_ERROR_CONVOCATORIAS_ABIERTAS = "Ya existen convocatorias abiertas.";
 	public static final String MENSAJE_INFO_CONVOCATORIAS_INSERTADA_CORRECTAMENTE = "Convocatoria insertada correctamente.";
+	public static final String MENSAJE_INFO_CONVOCATORIA_ACTUALIZADA_CORRECTAMENTE = "Convocatoria actualizada correctamente.";
 
 	public static final int RESPONSE_HTTP_CODE_ERROR = 400;
 	
@@ -118,6 +126,9 @@ public class ControladorConvocatorias extends HttpServlet {
 				case ACCION_MODIFICAR_CONVOCATORIA:
 					editarConvocatoria(bean, datos, request, response);
 					break;
+				case ACCION_FORMULARIO_EDITAR_CONVOCATORIA:
+					cambiarEstadoConvocatoria(bean, datos, request, response);
+					break;	
 			}			
 		} catch (UVException e) {
 			LOGGER.log(Level.WARNING, e.toString());
@@ -212,7 +223,75 @@ public class ControladorConvocatorias extends HttpServlet {
 		}			
 	}
 		
-	private void editarConvocatoria(VistaConvocatorias bean, UVDatos datos, HttpServletRequest request, HttpServletResponse response) { }
+	private void editarConvocatoria(VistaConvocatorias bean, UVDatos datos, HttpServletRequest request, HttpServletResponse response) throws UVException, SQLException { 
+		bean.setVista(RUTA_BEP_CON + "formConvocatoria.jsp");
+		
+		BolsaEmpleoValidator validator = this.getValidatorConvocatoria(request); 							
+		ModeloConvocatoria modelo = new ModeloConvocatoria();
+		
+		Convocatoria convocatoria = modelo.getConvocatoriaById(Formateador.leeParametroInteger(request.getParameter(PARAM_CONVOCATORIA_ID)));
+		bean.setConvocatoria(convocatoria);
+		
+		if (EscapaHTML.ajustaCodificacion(request.getParameter(PARAM_CONVOCATORIA_DESCRIPCION)) != null) {
+			if (!validator.isValid()) {
+				for (String param : validator.getErrors().keySet()) {
+					for (String paramError : validator.getErrors().get(param)) {
+						bean.getMensajesDeError().add(paramError);
+					}
+				}
+			} else {
+				
+				Integer codNum = Formateador.leeParametroInteger(request.getParameter(PARAM_CONVOCATORIA_ID));
+				String descripcion = EscapaHTML.ajustaCodificacion(request.getParameter(PARAM_CONVOCATORIA_DESCRIPCION));
+				Integer nbolsas = Formateador.leeParametroInteger(request.getParameter(PARAM_CONVOCATORIA_NUMEROBOLSASMAXIMO));
+				Integer nmeritos = Formateador.leeParametroInteger(request.getParameter(PARAM_CONVOCATORIA_NUMEROMERITOSPORBLOQUE));
+				Date fechacierre = Formateador.leeParametroFecha(request.getParameter(PARAM_CONVOCATORIA_FECHACIERRE), Formateador.FORMATO_FECHA_DDMMYYYY, "/");
+				
+				Convocatoria conFinal = new Convocatoria(codNum, descripcion, fechacierre, ModeloConvocatoria.CONVOCATORIA_ESTADO_CERRADA, nbolsas, nmeritos); 
+				modelo.actualizaConvocatoria(conFinal);	
+				
+				bean.getMensajesDeExito().add(MENSAJE_INFO_CONVOCATORIA_ACTUALIZADA_CORRECTAMENTE);
+				
+				this.index(bean, datos, request, response);
+			}	
+		}	
+	}
+	
+	private void cambiarEstadoConvocatoria(VistaConvocatorias bean, UVDatos datos,
+		HttpServletRequest request, HttpServletResponse response) throws UVException, SQLException {		
+		BolsaEmpleoValidator validator = this.getValidatorConvocatoria(request); 							
+		ModeloConvocatoria modelo = new ModeloConvocatoria();
+		
+		Convocatoria convocatoria = modelo.getConvocatoriaById(Formateador.leeParametroInteger(request.getParameter(PARAM_CONVOCATORIA_ID)));
+		bean.setConvocatoria(convocatoria);
+		
+		if (convocatoria.getEstado().equals("ABIERTA")) {
+			Integer codNum = Formateador.leeParametroInteger(request.getParameter(PARAM_CONVOCATORIA_ID));
+			Convocatoria conFinal = new Convocatoria(codNum, ModeloConvocatoria.CONVOCATORIA_ESTADO_CERRADA); 
+			modelo.cambiaEstadoConvocatoria(conFinal);	
+
+			bean.getMensajesDeExito().add(MENSAJE_INFO_CONVOCATORIA_ACTUALIZADA_CORRECTAMENTE);
+		} else {
+			if (modelo.hayConvocatoriaAbierta()) {
+				bean.getMensajesDeError().add(MENSAJE_ERROR_CONVOCATORIAS_ABIERTAS);
+			} else {
+				
+				Integer codNum = Formateador.leeParametroInteger(request.getParameter(PARAM_CONVOCATORIA_ID));
+				if (convocatoria.getEstado().equals("CERRADA")) {
+					Convocatoria conFinal = new Convocatoria(codNum, ModeloConvocatoria.CONVOCATORIA_ESTADO_ABIERTA); 
+					modelo.cambiaEstadoConvocatoria(conFinal);	
+				} else {
+					Convocatoria conFinal = new Convocatoria(codNum, ModeloConvocatoria.CONVOCATORIA_ESTADO_CERRADA); 
+					modelo.cambiaEstadoConvocatoria(conFinal);	
+				}
+				
+				bean.getMensajesDeExito().add(MENSAJE_INFO_CONVOCATORIA_ACTUALIZADA_CORRECTAMENTE);
+			}	
+		}
+		
+		
+		this.index(bean, datos, request, response);
+	}
 	
 	private BolsaEmpleoValidator getValidatorConvocatoria(HttpServletRequest request) throws UVException {
 		BolsaEmpleoValidator validator = new BolsaEmpleoValidator(request);

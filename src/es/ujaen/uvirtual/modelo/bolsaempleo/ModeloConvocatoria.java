@@ -10,6 +10,7 @@ import java.util.List;
 import java.util.Map;
 
 import es.ujaen.uvirtual.beans.uvirtual.bolsaempleo.Convocatoria;
+import es.ujaen.uvirtual.beans.uvirtual.bolsaempleo.UsuarioBolsaEmpleo;
 import es.ujaen.uvirtual.modelo.conexion.ConexionUvirtual;
 import es.ujaen.uvirtual.utilidades.BolsaEmpleoDataTable;
 import es.ujaen.uvirtual.utilidades.UVException;
@@ -32,6 +33,42 @@ public class ModeloConvocatoria {
 	
 	public static final int COLUMN_DESCRIPCION_MAXLENGTH = 150;
 		
+	/**
+	 * Devuelve una convocatoria por su id.
+	 * @param codNum id de convocatoria
+	 * @return Convocatoria
+	 * @throws SQLException en caso de error en la BD
+	 * @throws UVException si bolsa no es existe
+	 */
+	public Convocatoria getConvocatoriaById(int codNum) throws SQLException, UVException {
+		String consulta = "SELECT * "
+				+ "FROM TBEP_CONVOCATORIAS bepcon "
+				+ "WHERE bepcon.CODNUM = ?";
+			
+		try (Connection conexion = ConexionUvirtual.obtenerInstancia();
+				PreparedStatement stmt = conexion.prepareStatement(consulta);) {
+				stmt.setInt(1, codNum);
+						
+			try (ResultSet rs = stmt.executeQuery()) {
+				if (!rs.next()) {
+					throw new UVException("No existe la convocatoria con id " + codNum);
+				}
+				
+				Convocatoria convocatoria = new Convocatoria();
+				convocatoria.setCodNum(rs.getInt("CODNUM"));
+				convocatoria.setDescripcion(rs.getString("DESCRIPCION"));
+				convocatoria.setFechaCierre(rs.getDate("FECHACIERRE"));
+				convocatoria.setEstado(rs.getString("ESTADO"));
+				convocatoria.setNumBolsasMaximo(rs.getInt("NUMBOLSASMAXIMO"));
+				convocatoria.setNumMeritosPorBloque(rs.getInt("NUMMERITOSPORBLOQUE"));
+				
+				return convocatoria;
+			}
+		}
+	}
+	
+	
+	
 	/**
 	 * Listado de bolsas de convocatorias. 
 	 * @param params para leer los parametros de paginación, ordenacion, etc
@@ -122,5 +159,60 @@ public class ModeloConvocatoria {
 			stmt.setInt(parameterIndex++, convocatoria.getNumMeritosPorBloque());			
 			stmt.executeUpdate();
 		}		
+	}
+	
+	
+	/** Actualiza una convocatoria.
+	 * @param conv Convocatoria con los datos nuevos a actualizar
+	 * @throws SQLException en caso de error en la BD
+	 * @throws UVException en caso de errores de validacion
+	 */
+	public void actualizaConvocatoria(Convocatoria conv) throws SQLException, UVException {
+		if (conv == null) {
+			throw new UVException("Convocatoria obligatorio");
+		}
+		if (conv.getCodNum() == null) {
+			throw new UVException("id convocatoria no válido");
+		}
+		
+		String consulta = "UPDATE tbep_convocatorias "
+			+ " SET DESCRIPCION=?, FECHACIERRE=?, ESTADO=?, NUMBOLSASMAXIMO=?, NUMMERITOSPORBLOQUE=? "
+			+ " WHERE codnum=?";
+		try (Connection conexion = ConexionUvirtual.obtenerInstancia();
+		PreparedStatement stmt = conexion.prepareStatement(consulta);) {
+			int parameterIndex = 1;
+			stmt.setString(parameterIndex++, conv.getDescripcion());
+			stmt.setDate(parameterIndex++, new java.sql.Date(conv.getFechaCierre().getTime()));
+			stmt.setString(parameterIndex++, conv.getEstado());
+			stmt.setInt(parameterIndex++, conv.getNumBolsasMaximo());
+			stmt.setInt(parameterIndex++, conv.getNumMeritosPorBloque());
+			stmt.setInt(parameterIndex++, conv.getCodNum());
+			stmt.executeUpdate();
+		}
+	}
+	
+	/** Cambia el estado de una convocatoria.
+	 * @param conv Convocatoria con los datos a actualizar
+	 * @throws SQLException en caso de error en la BD
+	 * @throws UVException en caso de errores de validacion
+	 */
+	public void cambiaEstadoConvocatoria(Convocatoria conv) throws SQLException, UVException {
+		if (conv == null) {
+			throw new UVException("Convocatoria obligatorio");
+		}
+		if (conv.getCodNum() == null) {
+			throw new UVException("id convocatoria no válido");
+		}
+		
+		String consulta = "UPDATE tbep_convocatorias "
+			+ " SET ESTADO=? "
+			+ " WHERE codnum=?";
+		try (Connection conexion = ConexionUvirtual.obtenerInstancia();
+		PreparedStatement stmt = conexion.prepareStatement(consulta);) {
+			int parameterIndex = 1;
+			stmt.setString(parameterIndex++, conv.getEstado());
+			stmt.setInt(parameterIndex++, conv.getCodNum());
+			stmt.executeUpdate();
+		}
 	}
 }

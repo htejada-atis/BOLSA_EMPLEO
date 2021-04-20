@@ -7,22 +7,16 @@ import java.sql.SQLException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.logging.Level;
 
 import es.ujaen.uvirtual.adm.CrearUsuario;
 import es.ujaen.uvirtual.beans.Rol;
 import es.ujaen.uvirtual.beans.UVDatos;
 import es.ujaen.uvirtual.beans.Usuario;
 import es.ujaen.uvirtual.beans.uvirtual.bolsaempleo.Evaluador;
-import es.ujaen.uvirtual.beans.uvirtual.bolsaempleo.Bolsa;
-import es.ujaen.uvirtual.beans.uvirtual.bolsaempleo.Noticia;
 import es.ujaen.uvirtual.beans.uvirtual.bolsaempleo.UsuarioBolsaEmpleo;
 import es.ujaen.uvirtual.modelo.conexion.ConexionUvirtual;
-import es.ujaen.uvirtual.modelo.ModeloAdministracion;
-import es.ujaen.uvirtual.modelo.conexion.ConexionArcos;
 import es.ujaen.uvirtual.utilidades.BolsaEmpleoUtils;
 import es.ujaen.uvirtual.utilidades.BolsaEmpleoDataTable;
 import es.ujaen.uvirtual.utilidades.Memcache;
@@ -55,7 +49,19 @@ public class ModeloUsuarioBolsaEmpleo {
 	public static final String USUARIO_NO_EXCLUIDO = "N";
 	
 	public static final Integer PARAM_ROL_ID = 1051;
-		
+	
+	public static final int COLUMN_NOMBRE_MAXLENGTH = 20;
+	public static final int COLUMN_PRIMER_APELLIDO_MAXLENGTH = 40;
+	public static final int COLUMN_SEGUNDO_APELLIDO_MAXLENGTH = 40;
+	public static final int COLUMN_DIRECCION_MAXLENGTH = 50;
+	public static final int COLUMN_CODIGO_POSTAL_MAXLENGTH = 5;
+	public static final int COLUMN_LOCALIDAD_MAXLENGTH = 50;
+	public static final int COLUMN_PROVINCIA_MAXLENGTH = 20;
+	public static final int COLUMN_MOVIL_MAXLENGTH = 9;
+	public static final int COLUMN_TELEFONO_MAXLENGTH = 9;
+	public static final int COLUMN_NACIONALIDAD_MAXLENGTH = 20;
+	public static final int COLUMN_EMAIL_MAXLENGTH = 50;
+	public static final int COLUMN_RAZON_EXCLUSION_MAXLENGTH = 200;
 	
 	/** Consulta usuarios en BBDD y las devuelve.
 	 * @param clausula para filtrar los usuarios de la bd
@@ -646,6 +652,20 @@ public class ModeloUsuarioBolsaEmpleo {
 			stmt.setInt(parameterIndex++, usuario.getCodNum());
 			stmt.executeUpdate();
 		}
+		
+		String consulta2 = "UPDATE VUJA_NET_BEP_AR_PERSONA "
+				+ " SET STRNOMBRE=?, STRAPELLIDO1=?, STRAPELLIDO2=?, EMAIL_ALTA=?"
+				+ " WHERE codint=?";
+			try (Connection conexion = ConexionUvirtual.obtenerInstancia();
+				PreparedStatement stmt = conexion.prepareStatement(consulta2);) {
+				int parameterIndex = 1;
+				stmt.setString(parameterIndex++, usuario.getNombre());
+				stmt.setString(parameterIndex++, usuario.getPrimerApellido());
+				stmt.setString(parameterIndex++, usuario.getSegundoApellido());
+				stmt.setString(parameterIndex++, usuario.getEmail());
+				stmt.setInt(parameterIndex++, usuario.getCodPersona());
+				stmt.executeUpdate();
+		}
 	}
 	
 	/**
@@ -720,7 +740,6 @@ public class ModeloUsuarioBolsaEmpleo {
 			Date date = new Date(System.currentTimeMillis());
 			
 			stmt.setDate(indexParam++, new java.sql.Date(date.getTime()));
-			
 			for (UsuarioBolsaEmpleo usuario : usuarios) {
 				stmt.setInt(indexParam++, usuario.getCodNum()); 
 			}
