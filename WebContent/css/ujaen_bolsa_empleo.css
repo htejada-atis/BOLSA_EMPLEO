@@ -64,6 +64,8 @@ table.bluetable.bolsaempleo .filterable input {
 /* datatable buttons */
 table.bluetable.bolsaempleo .btns .btn {
 	width: 50px;
+	border: 1px solid #83a8ff;
+	margin-bottom: 1px;
 }
 
 /* overflow */

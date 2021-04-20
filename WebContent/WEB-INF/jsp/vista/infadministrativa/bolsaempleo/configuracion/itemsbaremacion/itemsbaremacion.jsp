@@ -36,8 +36,8 @@ VistaItemsBaremacion bean = (VistaItemsBaremacion) uvdatos.getVistas().get(Vista
 	<table class="bluetable bolsaempleo" id="tableApartadosGenerales">
 		<tr>
 			<th scope="col" style="width:15%" title="Código apartado">Código</th>
-			<th scope="col" style="width:70%" title="Código de area">Nombre del apartado</th>
-			<th scope="col" style="width:15%">Activo</th>
+			<th scope="col" style="width:75%" title="Código de area">Nombre del apartado</th>
+			<th scope="col" style="width:10%">Activo</th>
 		</tr>
 		<tbody>				
 		</tbody>
@@ -51,8 +51,8 @@ VistaItemsBaremacion bean = (VistaItemsBaremacion) uvdatos.getVistas().get(Vista
 	<table class="bluetable bolsaempleo" id="tableBloques">
 		<tr>
 			<th scope="col" style="width:15%" title="Código bloque">Código</th>
-			<th scope="col" style="width:70%" title="Código de area">Nombre del bloque</th>
-			<th scope="col" style="width:15%">Activo</th>
+			<th scope="col" style="width:75%" title="Código de area">Nombre del bloque</th>
+			<th scope="col" style="width:10%">Activo</th>
 		</tr>
 		<tbody>				
 		</tbody>
@@ -66,8 +66,8 @@ VistaItemsBaremacion bean = (VistaItemsBaremacion) uvdatos.getVistas().get(Vista
 	<table class="bluetable bolsaempleo" id="tableItems">
 		<tr>
 			<th scope="col" style="width:15%" title="Código ítem">Código</th>
-			<th scope="col" style="width:70%" title="Código de area">Nombre del ítem</th>
-			<th scope="col" style="width:15%">Activo</th>
+			<th scope="col" style="width:75%" title="Código de area">Nombre del ítem</th>
+			<th scope="col" style="width:10%">Activo</th>
 		</tr>
 		<tbody>				
 		</tbody>

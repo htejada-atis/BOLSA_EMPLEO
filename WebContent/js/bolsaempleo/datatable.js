@@ -370,7 +370,7 @@ function DataTable(id, config) {
         self.config.columns.forEach(function(columnDef) {
             $('img.order', columnDef.node).remove();
         });
-                
+        
         if (self.params.orderBy === indexColumnDef) {
             self.params.orderDirection = self.params.orderDirection === 'asc' ? 'desc' : 'asc';
         } else {
@@ -378,8 +378,8 @@ function DataTable(id, config) {
         }
         
         self.params.orderBy = indexColumnDef;
-        $(columnDef.node).prepend('<img src="/img/iconos/' + (this.params.orderDirection === 'asc' ? 'down.png' : 'up.png') + '" class="order"/>');        
-
+        $(columnDef.node).prepend('<img src="/img/iconos/' + (this.params.orderDirection === 'asc' ? 'down.png' : 'up.png') + '" class="order"/>');
+        
         self.refresh();
     }
 
@@ -389,7 +389,7 @@ function DataTable(id, config) {
         if (value == "" || value == 0) {
             delete self.filterParams[indexColumnDef];
         }
-
+        
         self.params.filter = JSON.stringify(self.filterParams);
         self.refresh();
     }
