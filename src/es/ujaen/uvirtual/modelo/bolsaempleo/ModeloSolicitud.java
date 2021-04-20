@@ -13,7 +13,7 @@ import java.util.Map;
 import es.ujaen.uvirtual.beans.uvirtual.bolsaempleo.Convocatoria;
 import es.ujaen.uvirtual.beans.uvirtual.bolsaempleo.Solicitud;
 import es.ujaen.uvirtual.modelo.conexion.ConexionUvirtual;
-import es.ujaen.uvirtual.utilidades.DataTable;
+import es.ujaen.uvirtual.utilidades.BolsaEmpleoDataTable;
 import es.ujaen.uvirtual.utilidades.UVException;
 import oracle.jdbc.OraclePreparedStatement;
 
@@ -35,10 +35,10 @@ public class ModeloSolicitud {
 	 * @throws SQLException en caso de error de base de datos
 	 * @throws UVException error si no existe la area
 	 */
-	public DataTable<Solicitud> listaSolicitudesDatatable(Map<String, String[]> params) throws SQLException, UVException {
+	public BolsaEmpleoDataTable<Solicitud> listaSolicitudesDatatable(Map<String, String[]> params) throws SQLException, UVException {
 		ModeloConvocatoria modeloConvocatoria = new ModeloConvocatoria(); 
 		List<Solicitud> data = new ArrayList<>();
-		DataTable<Solicitud> dataTable = new DataTable<Solicitud>(params);
+		BolsaEmpleoDataTable<Solicitud> dataTable = new BolsaEmpleoDataTable<Solicitud>(params);
 		
 		String consulta =
 			"SELECT bepcon.CODNUM, bepcon.DESCRIPCION, bepcon.FECHACIERRE, bepcon.ESTADO ESTADO_CONVOCATORIA, "
