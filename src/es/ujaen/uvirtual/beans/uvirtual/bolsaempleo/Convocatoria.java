@@ -41,7 +41,7 @@ public class Convocatoria implements Serializable {
 	}
 		
 	/** Constructor copia.
-	 * @param copia Titulación a copiar
+	 * @param copia Convocatoria a copiar
 	 */
 	public Convocatoria(Convocatoria copia) {
 		this.codNum = copia.codNum;

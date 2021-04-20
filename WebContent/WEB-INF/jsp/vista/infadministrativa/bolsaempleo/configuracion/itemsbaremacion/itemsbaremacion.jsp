@@ -122,7 +122,7 @@ VistaItemsBaremacion bean = (VistaItemsBaremacion) uvdatos.getVistas().get(Vista
     	var activatorBloqueName = activatorBloque ? "Activar" : "Desactivar";
     	var activatorItemName = activatorItem ? "Activar" : "Desactivar";
 		
-		var tableApartados = new DataTable('#tableApartadosGenerales', {
+		var tableApartados = new Atis.DataTable('#tableApartadosGenerales', {
 		    "ajax": { url: "<%= ControladorItemsBaremacion.URL_PATTERN_AJAX %>", async: false },
 		    "pageSize": 10,
 		    "action": "<%= ControladorItemsBaremacion.ACCION_DATATABLE_APARTADOS %>",
@@ -170,7 +170,7 @@ VistaItemsBaremacion bean = (VistaItemsBaremacion) uvdatos.getVistas().get(Vista
 		document.getElementById("tableItems").style.visibility = "hidden";
 		
 		<% if (bean.getApartadoBaremacion() != null) { %>
-			var tableBloques = new DataTable('#tableBloques', {
+			var tableBloques = new Atis.DataTable('#tableBloques', {
 			    "ajax": { url: "<%= ControladorItemsBaremacion.URL_PATTERN_AJAX %>", async: false },
 			    "params": {"<%=ControladorItemsBaremacion.PARAM_APARTADO%>": <%= bean.getApartadoBaremacion().getCodNum() %>},
 			    "pageSize": 10,
@@ -220,7 +220,7 @@ VistaItemsBaremacion bean = (VistaItemsBaremacion) uvdatos.getVistas().get(Vista
 			document.getElementById("tableBloques").style.visibility = "visible";
 			
 			<% if (bean.getBloqueBaremacion() != null) { %>
-				var tableItems = new DataTable('#tableItems', {
+				var tableItems = new Atis.DataTable('#tableItems', {
 				    "ajax": { url: "<%= ControladorItemsBaremacion.URL_PATTERN_AJAX %>", async: false },
 				    "params": {"<%=ControladorItemsBaremacion.PARAM_BLOQUE%>": <%= bean.getBloqueBaremacion().getCodNum() %>},
 				    "pageSize": 10,

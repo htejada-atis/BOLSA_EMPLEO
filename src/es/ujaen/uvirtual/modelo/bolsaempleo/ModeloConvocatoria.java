@@ -9,6 +9,7 @@ import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
+import es.ujaen.uvirtual.beans.uvirtual.bolsaempleo.Bolsa;
 import es.ujaen.uvirtual.beans.uvirtual.bolsaempleo.Convocatoria;
 import es.ujaen.uvirtual.modelo.conexion.ConexionUvirtual;
 import es.ujaen.uvirtual.utilidades.DataTable;
@@ -123,4 +124,36 @@ public class ModeloConvocatoria {
 			stmt.executeUpdate();
 		}		
 	}
+	
+	/**
+	 * Devuelve un convocatoria por su pk.
+	 * @param codNum .
+	 * @return Convocatoria o null si no existe
+	 * @throws SQLException .
+	 */
+	public Convocatoria getConvocatoriaById(int codNum) throws SQLException, UVException {
+		String consulta = "SELECT bepcon.* FROM TBEP_CONVOCATORIAS bepcon WHERE bepcon.CODNUM = ?";
+			
+		try (Connection conexion = ConexionUvirtual.obtenerInstancia();
+				PreparedStatement stmt = conexion.prepareStatement(consulta);) {
+			stmt.setInt(1, codNum);
+						
+			try (ResultSet rs = stmt.executeQuery()) {
+				if (!rs.next()) {
+					return null;
+				}
+				
+				Convocatoria convocatoria = new Convocatoria();
+				convocatoria.setCodNum(rs.getInt("CODNUM"));
+				convocatoria.setDescripcion(rs.getString("DESCRIPCION"));
+				convocatoria.setEstado(rs.getString("ESTADO"));
+				convocatoria.setFechaCierre(rs.getDate("FECHACIERRE"));
+				convocatoria.setNumBolsasMaximo(rs.getInt("NUMBOLSASMAXIMO"));
+				convocatoria.setNumMeritosPorBloque(rs.getInt("NUMMERITOSPORBLOQUE"));
+				
+				return convocatoria;
+			}
+		}
+	}
 }
+

@@ -33,7 +33,7 @@ import es.ujaen.uvirtual.utilidades.UVException;
  */
 @WebServlet(
 	name = "informacionadministrativa.bolsaempleo.configuracion.convocatorias", 
-	description = "Gestión de estados de bolsas", 
+	description = "Gestión de convocatorias", 
 	urlPatterns = { 
 			"/srv/es/informacionadministrativa/bolsaempleo/configuracion/convocatorias", 
 			"/srv/en/informacionadministrativa/bolsaempleo/configuracion/convocatorias",
@@ -205,8 +205,8 @@ public class ControladorConvocatorias extends HttpServlet {
 			convocatoria.setNumBolsasMaximo(validator.getValueInteger(PARAM_CONVOCATORIA_NUMEROBOLSASMAXIMO));
 			convocatoria.setNumMeritosPorBloque(validator.getValueInteger(PARAM_CONVOCATORIA_NUMEROMERITOSPORBLOQUE));		 
 			modelo.nuevaConvocatoria(convocatoria);	
-			
-			bean.getMensajesDeExito().add(MENSAJE_INFO_CONVOCATORIAS_INSERTADA_CORRECTAMENTE);
+						
+			bean.getMensajesDeExito().add(MENSAJE_INFO_CONVOCATORIAS_INSERTADA_CORRECTAMENTE);			
 			
 			this.index(bean, datos, request, response);
 		}			

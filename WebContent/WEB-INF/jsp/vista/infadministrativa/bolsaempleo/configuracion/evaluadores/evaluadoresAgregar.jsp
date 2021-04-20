@@ -43,7 +43,7 @@ VistaEvaluadores bean = (VistaEvaluadores) uvdatos.getVistas().get(VistaEvaluado
 
 	$(document).ready(function() {
 		
-		var table_usuarios = new DataTable('#table_usuarios', {
+		var table_usuarios = new Atis.DataTable('#table_usuarios', {
 		    "ajax": { url: "<%=ControladorGestionEvaluadores.URL_PATTERN_AJAX%>" },
 		    "params": {"<%=ControladorGestionEvaluadores.PARAM_AREA%>": "<%= bean.getArea().getCodNum() %>"},
 		    "pageSize": 10,
