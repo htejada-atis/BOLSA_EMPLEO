@@ -57,6 +57,10 @@ function DataTable(id, config) {
     	self.checkUncheckAll(false);
     	self.renderFooter();
     	
+    	// evento before render
+    	var beforeRender = Atis.getProp(config, 'beforeRender');
+        beforeRender && beforeRender(self);
+    	
         // limpiamos
         $('tr', self.tbody).empty();
     	
@@ -67,7 +71,11 @@ function DataTable(id, config) {
     	} else {
     		// sin resultados
     		$(self.tbody).append('<tr><td colSpan="'+ self.config.columns.length + '">Sin resultados</tr>');	
-        }    	
+        }   
+
+        // eventos after render
+        var afterRender = Atis.getProp(config, 'afterRender');
+        afterRender && afterRender(self);
     }
 
     this.errorResponse = function(err) {
@@ -299,3 +307,5 @@ function DataTable(id, config) {
     this.prepareTable();
     this.refresh();
 }
+
+window.Atis = $.extend(window.Atis ? window.Atis : {}, {"DataTable": DataTable});

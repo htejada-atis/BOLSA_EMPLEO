@@ -109,7 +109,7 @@ $(document).ready(function() {
 	});
 	
 	
-	var table_usuarios = new DataTable('#table_usuarios', {
+	var table_usuarios = new Atis.DataTable('#table_usuarios', {
 	    "ajax": { url: "<%=ControladorUsuarioBolsaEmpleo.URL_PATTERN_AJAX%>", async: false },
 	    "selectable": true,
 	    "pageSize": 5,
@@ -147,7 +147,7 @@ $(document).ready(function() {
 	    ]
 	});
 	
-	var table_usuarios_borrados = new DataTable('#table_usuarios_borrados', {
+	var table_usuarios_borrados = new Atis.DataTable('#table_usuarios_borrados', {
 	    "ajax": { url: "<%=ControladorUsuarioBolsaEmpleo.URL_PATTERN_AJAX%>", async: false },
 	    "selectable": true,
 	    "pageSize": 5,
@@ -182,7 +182,7 @@ $(document).ready(function() {
 	});
 	
 	
-	var table_usuarios_excluidos = new DataTable('#table_usuarios_excluidos', {
+	var table_usuarios_excluidos = new Atis.DataTable('#table_usuarios_excluidos', {
 	    "ajax": { url: "<%=ControladorUsuarioBolsaEmpleo.URL_PATTERN_AJAX%>", async: false },
 	    "selectable": true,
 	    "pageSize": 5,

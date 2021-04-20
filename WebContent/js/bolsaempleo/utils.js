@@ -113,7 +113,7 @@ function json2Object(json) {
 	return JSON.parse(json);
 }
 
-window.Atis = {
+window.Atis = $.extend(window.Atis ? window.Atis : {}, {
 	"getProp": getProp,
 	"setProp": setProp,
 	"alertDialog": alertDialog,
@@ -124,4 +124,4 @@ window.Atis = {
 	"sendForm": sendForm,
 	"object2Json": object2Json,
 	"json2Object": json2Object
-};
+});

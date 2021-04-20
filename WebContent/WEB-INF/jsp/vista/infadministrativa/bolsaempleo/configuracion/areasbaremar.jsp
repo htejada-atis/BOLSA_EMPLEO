@@ -43,7 +43,7 @@ VistaAreasBaremar bean = (VistaAreasBaremar) uvdatos.getVistas().get(VistaAreasB
 	
 <script>
 $(document).ready(function() {
-	var table = new DataTable('#table', {
+	var table = new Atis.DataTable('#table', {
 	    "ajax": { url: "/srv/es/ajax/informacionadministrativa/bolsaempleo/configuracion/areasbaremar" },
 	    "selectable": true,
 	    "pageSize": 10,
