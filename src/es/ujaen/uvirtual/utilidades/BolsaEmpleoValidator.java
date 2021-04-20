@@ -3,6 +3,8 @@ package es.ujaen.uvirtual.utilidades;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import javax.servlet.http.HttpServletRequest;
 
@@ -23,7 +25,8 @@ public class BolsaEmpleoValidator {
 	public static final String MENSAJE_ERROR_PAMETRORULEENTERO = "Parámetro de rule debe ser un entero";
 	public static final String MENSAJE_ERROR_MAXSTRINGNUMERICOS = "La regla max solo es válida para string y numéricos";
 	public static final String MENSAJE_ERROR_MINSTRINGNUMERICOS = "La regla min solo es válida para string y numéricos";
-	
+	public static final String MENSAJE_ERROR_SELECTNEGATIVO = "Debe seleccionar una opción válida";
+
 	private HttpServletRequest request;
 	private HashMap<String, String> params;
 	private HashMap<String, Object> values;
@@ -163,7 +166,13 @@ public class BolsaEmpleoValidator {
 				throw new UVException(MENSAJE_ERROR_REGLAREQUIEREPARAMETRO);
 			}
 			this.checkRuleMin(param, type, value, mensajeError, ruleSplit[1]);
+			break;	
+		case "number":
+			this.checkRuleNum(param, type, value, mensajeError);			
 			break;		
+		case "select":
+			this.checkSelect(param, type, value, mensajeError);			
+			break;	
 		default:
 			throw new UVException(MENSAJE_ERROR_TIPOREGLANOVALIDA);			
 		}
@@ -286,5 +295,49 @@ public class BolsaEmpleoValidator {
 				throw new UVException(MENSAJE_ERROR_MINSTRINGNUMERICOS);
 			}	
 		}			
+	}
+	
+	/**
+	 * Checkea si un string es un numero o texto plano.
+	 * @param param .
+	 * @param type .
+	 * @param value .
+	 * @param mensajeError .
+	 * @throws UVException .
+	 */
+	public void checkRuleNum(String param, String type, Object value, String mensajeError) throws UVException {
+		if (value == null) {
+			this.addError(param, mensajeError);
+		} else {
+			String regex = "[0-9]+";
+	        Pattern p = Pattern.compile(regex);
+	        Matcher m = p.matcher((String) value);
+
+	        if (!m.matches()) {
+	        	this.addError(param, mensajeError);		
+	        }
+		}	
+	}
+	
+	/**
+	 * Checkea si un select no tiene ninguna opcion seleccionada.
+	 * @param param .
+	 * @param type .
+	 * @param value .
+	 * @param mensajeError .
+	 * @throws UVException .
+	 */
+	public void checkSelect(String param, String type, Object value, String mensajeError) throws UVException {
+		if (value == null) {
+			this.addError(param, mensajeError);
+		} else {
+			if (value.equals("-1")) {
+				throw new UVException(MENSAJE_ERROR_SELECTNEGATIVO);	
+			}
+			
+			if (((String) value).isBlank()) {
+				this.addError(param, mensajeError);				
+			}
+		}	
 	}
 }
