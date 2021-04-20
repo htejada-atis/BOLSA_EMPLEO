@@ -119,12 +119,6 @@ public class ControladorMisDatos extends HttpServlet {
 		ModeloUsuarioBolsaEmpleo modelo = new ModeloUsuarioBolsaEmpleo();
 		LOGGER.log(Level.FINEST, "usuario que ha entrado en el servlet es {0}", usuario.getUid());
 		
-		try {
-			anonimo = !modelo.checkUser(datos);
-		} catch (SQLException | UVException e) {
-			bean.getMensajesDeError().add(e.getMessage());
-		}
-		
 		String nombreAccion = EscapaHTML.ajustaCodificacion(request.getParameter(PARAM_ACCION));
 		if (nombreAccion == null) {
 			nombreAccion = PARAM_ACCION;
@@ -145,6 +139,7 @@ public class ControladorMisDatos extends HttpServlet {
 		}	
 		
 		try {
+			anonimo = !modelo.checkUser(datos);
 			switch (nombreAccion) {
 			case ACCION_ENVIAR_MISDATOS:
 				enviarMisDatos(request, response, bean, usuario);
@@ -156,7 +151,7 @@ public class ControladorMisDatos extends HttpServlet {
 			bean.getMensajesDeError().add("Error al acceder a la base de datos");
 		} catch (UVException e) {
 			LOGGER.log(Level.WARNING, e.toString());
-			bean.getMensajesDeError().add(e.toString());
+			bean.getMensajesDeError().add(e.getMessage());
 		} finally {
 			datos.getVistas().put(bean.getClass().getName(), bean);
 			datos.getFicherosJSP().add(bean.getVista());

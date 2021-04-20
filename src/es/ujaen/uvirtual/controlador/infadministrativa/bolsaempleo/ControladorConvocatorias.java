@@ -66,6 +66,9 @@ public class ControladorConvocatorias extends HttpServlet {
 	public static final String ACCION_AGREGAR_CONVOCATORIA = "addConvocatoria";
 	public static final String ACCION_FORMULARIO_EDITAR_CONVOCATORIA = "formEditarConvocatoria";
 	public static final String ACCION_MODIFICAR_CONVOCATORIA = "editConvocatoria";
+	public static final String ACCION_ABRIR_CONVOCATORIA = "abrirConvocatoria";
+	public static final String ACCION_CERRAR_CONVOCATORIA = "cerrarConvocatoria";
+
 	
 	// mensajes
 	public static final String MENSAJE_ERROR_DESCRIPCION_LARGA = "La descripción no puede ser superior a %d";
@@ -91,6 +94,9 @@ public class ControladorConvocatorias extends HttpServlet {
 	// urls
 	public static final String URL_PATTERN_AJAX = "/srv/es/ajax/informacionadministrativa/bolsaempleo/configuracion/convocatorias";
 	
+	// variables
+	public static boolean anonimo = true;
+	
 	/** Peticion GET.
 	 * @see HttpServlet#doGet(HttpServletRequest request, HttpServletResponse response)
 	 */
@@ -102,6 +108,7 @@ public class ControladorConvocatorias extends HttpServlet {
 		
 		VistaConvocatorias bean = new VistaConvocatorias();		
 		Usuario usuario = datos.getUsuario();
+		ModeloUsuarioBolsaEmpleo modelo = new ModeloUsuarioBolsaEmpleo();
 		LOGGER.log(Level.FINEST, "usuario que ha entrado en el servlet es {0}", usuario.getUid());
 				
 		String nombreAccion = EscapaHTML.ajustaCodificacion(request.getParameter(PARAM_ACCION));		
@@ -110,6 +117,7 @@ public class ControladorConvocatorias extends HttpServlet {
 		}
 					
 		try {
+			anonimo = !modelo.checkUser(datos);
 			switch (nombreAccion) {
 				case ACCION_LISTAR_CONVOCATORIAS:
 					index(bean, datos, request, response);
@@ -126,13 +134,16 @@ public class ControladorConvocatorias extends HttpServlet {
 				case ACCION_MODIFICAR_CONVOCATORIA:
 					editarConvocatoria(bean, datos, request, response);
 					break;
-				case ACCION_FORMULARIO_EDITAR_CONVOCATORIA:
-					cambiarEstadoConvocatoria(bean, datos, request, response);
+				case ACCION_ABRIR_CONVOCATORIA:
+					abrirConvocatoria(bean, datos, request, response);
+					break;	
+				case ACCION_CERRAR_CONVOCATORIA:
+					cerrarConvocatoria(bean, datos, request, response);
 					break;	
 			}			
 		} catch (UVException e) {
 			LOGGER.log(Level.WARNING, e.toString());
-			bean.getMensajesDeError().add(e.toString());
+			bean.getMensajesDeError().add(e.getMessage());
 		} catch (SQLException e) {
 			LOGGER.log(Level.SEVERE, Formateador.getStackTrace(e));
 			LOGGER.log(Level.SEVERE, e.toString());
@@ -255,43 +266,51 @@ public class ControladorConvocatorias extends HttpServlet {
 				this.index(bean, datos, request, response);
 			}	
 		}	
-	}
+	}	
 	
-	private void cambiarEstadoConvocatoria(VistaConvocatorias bean, UVDatos datos,
-		HttpServletRequest request, HttpServletResponse response) throws UVException, SQLException {		
+	
+	private void abrirConvocatoria(VistaConvocatorias bean, UVDatos datos,
+			HttpServletRequest request, HttpServletResponse response) throws UVException, SQLException {
+				
 		BolsaEmpleoValidator validator = this.getValidatorConvocatoria(request); 							
 		ModeloConvocatoria modelo = new ModeloConvocatoria();
 		
 		Convocatoria convocatoria = modelo.getConvocatoriaById(Formateador.leeParametroInteger(request.getParameter(PARAM_CONVOCATORIA_ID)));
 		bean.setConvocatoria(convocatoria);
 		
-		if (convocatoria.getEstado().equals("ABIERTA")) {
+		if (modelo.hayConvocatoriaAbierta()) {
+			bean.getMensajesDeError().add(MENSAJE_ERROR_CONVOCATORIAS_ABIERTAS);
+		} else {
 			Integer codNum = Formateador.leeParametroInteger(request.getParameter(PARAM_CONVOCATORIA_ID));
-			Convocatoria conFinal = new Convocatoria(codNum, ModeloConvocatoria.CONVOCATORIA_ESTADO_CERRADA); 
+			Convocatoria conFinal = new Convocatoria(codNum, ModeloConvocatoria.CONVOCATORIA_ESTADO_ABIERTA); 
 			modelo.cambiaEstadoConvocatoria(conFinal);	
 
 			bean.getMensajesDeExito().add(MENSAJE_INFO_CONVOCATORIA_ACTUALIZADA_CORRECTAMENTE);
-		} else {
-			if (modelo.hayConvocatoriaAbierta()) {
-				bean.getMensajesDeError().add(MENSAJE_ERROR_CONVOCATORIAS_ABIERTAS);
-			} else {
-				
-				Integer codNum = Formateador.leeParametroInteger(request.getParameter(PARAM_CONVOCATORIA_ID));
-				if (convocatoria.getEstado().equals("CERRADA")) {
-					Convocatoria conFinal = new Convocatoria(codNum, ModeloConvocatoria.CONVOCATORIA_ESTADO_ABIERTA); 
-					modelo.cambiaEstadoConvocatoria(conFinal);	
-				} else {
-					Convocatoria conFinal = new Convocatoria(codNum, ModeloConvocatoria.CONVOCATORIA_ESTADO_CERRADA); 
-					modelo.cambiaEstadoConvocatoria(conFinal);	
-				}
-				
-				bean.getMensajesDeExito().add(MENSAJE_INFO_CONVOCATORIA_ACTUALIZADA_CORRECTAMENTE);
-			}	
-		}
-		
+		}	
 		
 		this.index(bean, datos, request, response);
 	}
+	
+	
+	private void cerrarConvocatoria(VistaConvocatorias bean, UVDatos datos,
+			HttpServletRequest request, HttpServletResponse response) throws UVException, SQLException {
+				
+		BolsaEmpleoValidator validator = this.getValidatorConvocatoria(request); 							
+		ModeloConvocatoria modelo = new ModeloConvocatoria();
+		
+		Convocatoria convocatoria = modelo.getConvocatoriaById(Formateador.leeParametroInteger(request.getParameter(PARAM_CONVOCATORIA_ID)));
+		bean.setConvocatoria(convocatoria);
+		
+		Integer codNum = Formateador.leeParametroInteger(request.getParameter(PARAM_CONVOCATORIA_ID));
+		Convocatoria conFinal = new Convocatoria(codNum, ModeloConvocatoria.CONVOCATORIA_ESTADO_CERRADA); 
+		modelo.cambiaEstadoConvocatoria(conFinal);	
+
+		bean.getMensajesDeExito().add(MENSAJE_INFO_CONVOCATORIA_ACTUALIZADA_CORRECTAMENTE);	
+		
+		this.index(bean, datos, request, response);
+	}
+	
+	
 	
 	private BolsaEmpleoValidator getValidatorConvocatoria(HttpServletRequest request) throws UVException {
 		BolsaEmpleoValidator validator = new BolsaEmpleoValidator(request);

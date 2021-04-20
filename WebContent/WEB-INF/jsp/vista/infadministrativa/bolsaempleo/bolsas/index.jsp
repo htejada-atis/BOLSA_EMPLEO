@@ -33,7 +33,7 @@ VistaEstadoBolsas bean = (VistaEstadoBolsas) uvdatos.getVistas().get(VistaEstado
 			<th scope="col" style="width:20%">Actualizada</th>
 			<th scope="col" style="width:18%">Bloqueo</th>
 			<th scope="col" style="width:19%">Desbloqueo</th>
-			<th scope="col" style="width:18%">Baremable</th>			
+			<th scope="col" class="center" style="width:18%">Baremable</th>			
 		</tr>
 		<tbody>				
 		</tbody>
@@ -63,10 +63,10 @@ $(document).ready(function() {
 	        {'data': 'fechaDesBloqueo'},
 	        {'data': 'baremable', 'render': function(row) {
         		if(row.baremable){
-        			return "<div class='circle-true'></div>"; 
+        			return "<div title='Baremable' class='circle-true'></div>"; 
         		}
         		else{
-        			return "<div class='circle-false'></div>"; 
+        			return "<div title='No Baremable' class='circle-false'></div>"; 
         		}
         	}},
 	    ],
