@@ -12,16 +12,16 @@ VistaTitulacionesArea bean = (VistaTitulacionesArea) uvdatos.getVistas().get(Vis
 
 <div class="bolsa-empleo">
 	
-	<%
-		if (session.getAttribute(ControladorGestionTitulacionesPreferentesArea.MENSAJE_ENVIADO) != null) {
-		%>
+	<% if (bean.getMensajesDeExito().size() > 0) { %>
 		<div id="exito" class="success">
-			<%=session.getAttribute(ControladorGestionTitulacionesPreferentesArea.MENSAJE_ENVIADO)%>
+			<%= bean.formatearMensajesDeExito() %>
 		</div>
-	<%
-			session.removeAttribute(ControladorGestionTitulacionesPreferentesArea.MENSAJE_ENVIADO);
-		}
-	%>
+	<% } %>
+	<% if (bean.getMensajesDeError().size() > 0) { %>
+		<div id="error" class="error">
+			<%= bean.formatearMensajesDeError() %>
+		</div>
+	<% } else {%>
 	
 	<h2>Titulaciones preferentes por área</h2>
 	
@@ -74,7 +74,7 @@ VistaTitulacionesArea bean = (VistaTitulacionesArea) uvdatos.getVistas().get(Vis
 			</tfoot>
 		</table>
 	</div>
-	
+	<% } %>
 </div>
 
 <script>

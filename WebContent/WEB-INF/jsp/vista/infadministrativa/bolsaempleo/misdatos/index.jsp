@@ -40,21 +40,21 @@ VistaUsuarioBolsaEmpleo bean = (VistaUsuarioBolsaEmpleo) uvdatos.getVistas().get
 	String telefono = "";
 	String nacionalidad = "";
 	String sexo = "";
-		
-	nombre = bean.getUsuarioArcos().getNombre();
-	primer_apellido = bean.getUsuarioArcos().getApellido1();
-	segundo_apellido = bean.getUsuarioArcos().getApellido2();
-	email = bean.getUsuario().getEmail();
-	tipo_documento = bean.getUsuarioArcos().getDocumentoTipo();
-	n_documento = bean.getUsuarioArcos().getDocumentoNumero();
-	direccion = bean.getUsuario().getDireccion();
-	codigo_postal = bean.getUsuario().getCodigoPostal();
-	localidad = bean.getUsuario().getLocalidad();
-	provincia = bean.getUsuario().getProvincia();
-	movil = bean.getUsuario().getMovil();
-	telefono = bean.getUsuario().getTelefono();
-	nacionalidad = bean.getUsuario().getNacionalidad();
-	sexo = bean.getUsuario().getSexo();
+	
+	if(bean.getUsuario().getNombre()!=null) nombre = bean.getUsuario().getNombre();
+	if(bean.getUsuario().getPrimerApellido()!=null) primer_apellido = bean.getUsuario().getPrimerApellido();
+	if(bean.getUsuario().getSegundoApellido()!=null) segundo_apellido = bean.getUsuario().getSegundoApellido();
+	if(bean.getUsuario().getEmail()!=null) email = bean.getUsuario().getEmail();
+	if(bean.getUsuarioArcos().getDocumentoTipo()!=null) tipo_documento = bean.getUsuarioArcos().getDocumentoTipo();
+	if(bean.getUsuarioArcos().getDocumentoNumero()!=null) n_documento = bean.getUsuarioArcos().getDocumentoNumero();
+	if(bean.getUsuario().getDireccion()!=null) direccion = bean.getUsuario().getDireccion();
+	if(bean.getUsuario().getCodigoPostal()!=null) codigo_postal = bean.getUsuario().getCodigoPostal();
+	if(bean.getUsuario().getLocalidad()!=null) localidad = bean.getUsuario().getLocalidad();
+	if(bean.getUsuario().getProvincia()!=null) provincia = bean.getUsuario().getProvincia();
+	if(bean.getUsuario().getMovil()!=null) movil = bean.getUsuario().getMovil();
+	if(bean.getUsuario().getTelefono()!=null) telefono = bean.getUsuario().getTelefono();
+	if(bean.getUsuario().getNacionalidad()!=null) nacionalidad = bean.getUsuario().getNacionalidad();
+	if(bean.getUsuario().getSexo()!=null) sexo = bean.getUsuario().getSexo();
 	
 	%>
 	
@@ -86,7 +86,7 @@ VistaUsuarioBolsaEmpleo bean = (VistaUsuarioBolsaEmpleo) uvdatos.getVistas().get
     	
     	<div class="form-group-container">
     	    <div class="form-group">
-    			<label for="direccion">Dirección: </label>
+    			<label for="direccion">Direcci&oacute;n: </label>
     			<input class="form-input-custom" id="direccion" type="text" name="<%= ControladorMisDatos.PARAM_DIRECCION %>" value="<%= direccion %>"/>
     		</div>
     		<div class="form-group">
@@ -108,11 +108,11 @@ VistaUsuarioBolsaEmpleo bean = (VistaUsuarioBolsaEmpleo) uvdatos.getVistas().get
     	
     	<div class="form-group-container">
     	    <div class="form-group">
-    			<label for="movil">Móvil: </label>
+    			<label for="movil">M&oacute;vil: </label>
     			<input class="form-input-custom" id="movil" type="text" name="<%= ControladorMisDatos.PARAM_MOVIL %>" value="<%= movil %>"/>
     		</div>
     		<div class="form-group">
-    			<label for="telefono">Teléfono: </label>
+    			<label for="telefono">Tel&eacute;fono: </label>
     			<input class="form-input-custom" id="telefono" type="text" name="<%= ControladorMisDatos.PARAM_TELEFONO %>" value="<%= telefono %>"/>
     		</div>
     	</div>
@@ -132,10 +132,10 @@ VistaUsuarioBolsaEmpleo bean = (VistaUsuarioBolsaEmpleo) uvdatos.getVistas().get
     		<div class="form-group-custom">
     			<label>Sexo: </label>
     			<br><br>
-				<input class="form-input" type="radio" id="masculino" name="<%= ControladorMisDatos.PARAM_SEXO %>" style="display: inline;" <%if(sexo=="Masculino"){%>checked<%}%> >
+				<input class="form-input" type="radio" id="masculino" name="<%= ControladorMisDatos.PARAM_SEXO %>" style="display: inline;">
 				<label class="form-label-custom" for="male" style="float: none; margin-right:0px">Masculino</label>
 				<br>
-    			<input class="form-input" type="radio" id="femenino" name="<%= ControladorMisDatos.PARAM_SEXO %>" style="display: inline;" <%if(sexo=="Femenino"){%>checked<%}%> >
+    			<input class="form-input" type="radio" id="femenino" name="<%= ControladorMisDatos.PARAM_SEXO %>" style="display: inline;">
 				<label class="form-label-custom" for="female" style="float: none; margin-right:0px;">Femenino</label>
     		</div>
     	</div>
@@ -148,15 +148,19 @@ VistaUsuarioBolsaEmpleo bean = (VistaUsuarioBolsaEmpleo) uvdatos.getVistas().get
 </div>
 
 <script>
-
-
-<% if(sexo=="Masculino") { %>
+$(document).ready(function() {	
+	
+	<% String acum = bean.getUsuario().getSexo();
+	
+	if(bean.getUsuario().getSexo().equals("M")) { %>
 	document.getElementById("masculino").checked = true;
-<%} else { 
-	if(sexo=="Femenino") { %>
-		document.getElementById("femenino").checked = true;
+	<%} else { 
+		if(bean.getUsuario().getSexo().equals("F")) { %>
+			document.getElementById("femenino").checked = true;
+		<%}%>
 	<%}%>
-<%}%>
+	
+});
 
 function enviarUsuario(event, submit_input) {
 	event.preventDefault();
@@ -165,6 +169,17 @@ function enviarUsuario(event, submit_input) {
 	input_accion.value = '<%= ControladorMisDatos.ACCION_ENVIAR_MISDATOS %>';
 	input_id = document.getElementById("usuario_id");
 	input_id.value = '<%= bean.getUsuario().getCodNum() %>';
+	input_sexo_m = document.getElementById("masculino");
+	input_sexo_f = document.getElementById("femenino");
+	
+	if(input_sexo_m.checked){
+		input_sexo_m.value = "M";
+		input_sexo_f.value = "M";
+	}
+	else{
+		input_sexo_m.value = "F";
+		input_sexo_f.value = "F";
+	}
 
 	submit_input.form.submit();
 }

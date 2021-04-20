@@ -23,6 +23,7 @@ import es.ujaen.uvirtual.beans.Usuario;
 import es.ujaen.uvirtual.beans.uvirtual.bolsaempleo.Bolsa;
 import es.ujaen.uvirtual.beans.vistas.uvirtual.bolsaempleo.VistaAreasBaremar;
 import es.ujaen.uvirtual.modelo.bolsaempleo.ModeloBolsa;
+import es.ujaen.uvirtual.modelo.bolsaempleo.ModeloUsuarioBolsaEmpleo;
 import es.ujaen.uvirtual.modelo.bolsaempleo.ModeloArea;
 import es.ujaen.uvirtual.utilidades.DataTable;
 import es.ujaen.uvirtual.utilidades.EscapaHTML;
@@ -64,6 +65,8 @@ public class ControladorAreasABaremar extends HttpServlet {
 	
 	// ruta vistas
 	public static final String RUTA_BEP_CONF = "/WEB-INF/jsp/vista/infadministrativa/bolsaempleo/configuracion/";
+	// variables
+	public static boolean anonimo = true;
 	
 	/** Peticion GET.
 	 * @see HttpServlet#doGet(HttpServletRequest request, HttpServletResponse response)
@@ -78,6 +81,8 @@ public class ControladorAreasABaremar extends HttpServlet {
 		Usuario usuario = datos.getUsuario();
 		LOGGER.log(Level.FINEST, "usuario que ha entrado en el servlet es {0}", usuario.getUid());
 				
+		ModeloUsuarioBolsaEmpleo modelo = new ModeloUsuarioBolsaEmpleo();
+		
 		String nombreAccion = EscapaHTML.ajustaCodificacion(request.getParameter(PARAM_ACCION));
 		if (nombreAccion == null) {
 			nombreAccion = ACCION_LISTAR;
@@ -86,6 +91,7 @@ public class ControladorAreasABaremar extends HttpServlet {
 		bean.setVista(RUTA_BEP_CONF + "areasbaremar.jsp");
 		
 		try {
+			anonimo = !modelo.checkUser(datos);
 			switch (nombreAccion) {
 				case ACCION_DATATABLE:
 					listado(bean, datos, request, response);
@@ -100,7 +106,7 @@ public class ControladorAreasABaremar extends HttpServlet {
 			bean.getMensajesDeError().add("Error al acceder a la base de datos");
 		} catch (UVException e) {
 			LOGGER.log(Level.WARNING, e.toString());
-			bean.getMensajesDeError().add(e.toString());
+			bean.getMensajesDeError().add(e.getMessage());
 		} finally {
 			datos.getVistas().put(bean.getClass().getName(), bean);
 			datos.getFicherosJSP().add(bean.getVista());

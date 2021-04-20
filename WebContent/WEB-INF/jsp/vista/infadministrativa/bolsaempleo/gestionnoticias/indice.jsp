@@ -12,14 +12,16 @@ VistaNoticias bean = (VistaNoticias) uvdatos.getVistas().get(VistaNoticias.class
 
 <div class="bolsa-empleo">
 
-	<% if (session.getAttribute(ControladorGestionNoticias.MENSAJE_ENVIADO) != null) { %>
+	<% if (bean.getMensajesDeExito().size() > 0) { %>
 		<div id="exito" class="success">
-			<%= session.getAttribute(ControladorGestionNoticias.MENSAJE_ENVIADO) %>
+			<%= bean.formatearMensajesDeExito() %>
 		</div>
-	<% 
-			session.removeAttribute(ControladorGestionNoticias.MENSAJE_ENVIADO);
-		} 
-	%>
+	<% } %>
+	<% if (bean.getMensajesDeError().size() > 0) { %>
+		<div id="error" class="error">
+			<%= bean.formatearMensajesDeError() %>
+		</div>
+	<% } else {%>
 
 	<div class="titulo-bolsa-empleo">
 		<h2>Noticias</h2>
@@ -46,6 +48,8 @@ VistaNoticias bean = (VistaNoticias) uvdatos.getVistas().get(VistaNoticias.class
 			</tr>
 		</tfoot>
 	</table>
+	
+	<% } %>
 </div>
 
 <script>
@@ -65,8 +69,22 @@ VistaNoticias bean = (VistaNoticias) uvdatos.getVistas().get(VistaNoticias.class
 		    		return "<div class='overflow-auto'>" +row.texto +"</div>";
 		    	}},
 		        {'data': 'enlace', 'class': 'overflow-ellipsis', 'render': function(row) { return "<a href='" +row.enlace +"' target='_blank'>" +row.enlace +"</a>"; }},
-		        {'data': 'publica'},
-		        {'data': 'activa'},
+		        {'data': 'publica', 'render': function(row) {
+	        		if(row.publica){
+	        			return "<div class='circle-true'></div>"; 
+	        		}
+	        		else{
+	        			return "<div class='circle-false'></div>"; 
+	        		}
+	        	}},
+		        {'data': 'activa', 'render': function(row) {
+	        		if(row.activa){
+	        			return "<div class='circle-true'></div>"; 
+	        		}
+	        		else{
+	        			return "<div class='circle-false'></div>"; 
+	        		}
+	        	}},
 		        {'data': 'codnum', 'buttons': [{'label': 'Editar', 'onClick': function(row) {
 			        		var params = {'a': '<%= ControladorGestionNoticias.ACCION_EDITAR_NOTICIA %>', 'id': row.codNum};
 			        		Atis.sendForm("<%= request.getRequestURI() %>", params);

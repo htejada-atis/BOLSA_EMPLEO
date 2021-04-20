@@ -39,6 +39,16 @@ public class Convocatoria implements Serializable {
 		this.numBolsasMaximo = pnumBolsasMaximo;
 		this.numMeritosPorBloque = pnumMeritosPorBloque;
 	}
+	
+	/** Constructor con parametros.
+	 * @param pcodNum .
+	 * @param pestado .
+	 */
+	public Convocatoria(Integer pcodNum, String pestado) {
+		super();
+		this.codNum = pcodNum;
+		this.estado = pestado;
+	}
 		
 	/** Constructor copia.
 	 * @param copia Convocatoria a copiar

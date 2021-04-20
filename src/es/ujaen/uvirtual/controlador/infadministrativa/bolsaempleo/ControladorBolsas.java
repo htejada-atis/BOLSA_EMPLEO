@@ -23,6 +23,7 @@ import es.ujaen.uvirtual.beans.Usuario;
 import es.ujaen.uvirtual.beans.uvirtual.bolsaempleo.Bolsa;
 import es.ujaen.uvirtual.beans.vistas.uvirtual.bolsaempleo.VistaEstadoBolsas;
 import es.ujaen.uvirtual.modelo.bolsaempleo.ModeloBolsa;
+import es.ujaen.uvirtual.modelo.bolsaempleo.ModeloUsuarioBolsaEmpleo;
 import es.ujaen.uvirtual.utilidades.DataTable;
 import es.ujaen.uvirtual.utilidades.EscapaHTML;
 import es.ujaen.uvirtual.utilidades.Formateador;
@@ -66,6 +67,9 @@ public class ControladorBolsas extends HttpServlet {
 
 	public static final int RESPONSE_HTTP_CODE_ERROR = 400;
 	
+	// variables
+	public static boolean anonimo = true;
+	
 	/** Peticion GET.
 	 * @see HttpServlet#doGet(HttpServletRequest request, HttpServletResponse response)
 	 */
@@ -77,8 +81,15 @@ public class ControladorBolsas extends HttpServlet {
 		
 		VistaEstadoBolsas bean = new VistaEstadoBolsas();		
 		Usuario usuario = datos.getUsuario();
+		ModeloUsuarioBolsaEmpleo modelo = new ModeloUsuarioBolsaEmpleo();
 		LOGGER.log(Level.FINEST, "usuario que ha entrado en el servlet es {0}", usuario.getUid());
-				
+
+		try {
+			anonimo = !modelo.checkUser(datos);
+		} catch (SQLException | UVException e) {
+			bean.getMensajesDeError().add(e.getMessage());
+		}
+		
 		String nombreAccion = EscapaHTML.ajustaCodificacion(request.getParameter(PARAM_ACCION));		
 		if (nombreAccion == null) {
 			nombreAccion = ACCION_LISTAR_BOLSAS;

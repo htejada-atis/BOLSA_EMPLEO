@@ -35,6 +35,7 @@ import es.ujaen.uvirtual.modelo.bolsaempleo.ModeloBolsa;
 import es.ujaen.uvirtual.modelo.bolsaempleo.ModeloNoticia;
 import es.ujaen.uvirtual.modelo.bolsaempleo.ModeloRol;
 import es.ujaen.uvirtual.modelo.bolsaempleo.ModeloUsuarioBolsaEmpleo;
+import es.ujaen.uvirtual.utilidades.BolsaEmpleoValidator;
 import es.ujaen.uvirtual.utilidades.DataTable;
 import es.ujaen.uvirtual.utilidades.EscapaHTML;
 import es.ujaen.uvirtual.utilidades.Formateador;
@@ -101,10 +102,18 @@ public class ControladorUsuarioBolsaEmpleo extends HttpServlet {
 	public static final String MENSAJE_EXITO_ELIMINAR = "usuario eliminado correctamente";
 	public static final String MENSAJE_ERROR_ACCION_USUARIO_NO_VALIDA = "Acción no válida";
 	public static final String MENSAJE_EXITO_USUARIO_MODIFICADO_CORRECTAMENTE = "Usuario/s modificado/s correctamente"; 
+	
+	public static final String MENSAJE_ERROR_RAZON_EXCLUSION_VACIO = "Si excluye al usuario, debe especificar una razón";
+	public static final String MENSAJE_ERROR_RAZON_EXCLUSION_LARGO = "La razón de exclusión no puede contener mas de %d caracteres";
+	public static final String MENSAJE_ERROR_ROL_VACIO = "El rol no puede estar vacio";
+	public static final String MENSAJE_ERROR_ROL_NEGATIVO = "Debe seleccionar un role válido";
 
 	public static final int RESPONSE_HTTP_CODE_ERROR = 400;
 	
 	public static final String URL_PATTERN_AJAX = "/srv/es/ajax/informacionadministrativa/bolsaempleo/configuracion/usuarios";
+	
+	// variables
+	public static boolean anonimo = true;
 	
 	/** Peticion GET.
 	 * @see HttpServlet#doGet(HttpServletRequest request, HttpServletResponse response)
@@ -118,6 +127,14 @@ public class ControladorUsuarioBolsaEmpleo extends HttpServlet {
 		VistaUsuarioBolsaEmpleo bean = new VistaUsuarioBolsaEmpleo();		
 		Usuario usuario = datos.getUsuario();
 		LOGGER.log(Level.FINEST, "usuario que ha entrado en el servlet es {0}", usuario.getUid());
+		
+		ModeloUsuarioBolsaEmpleo modelo = new ModeloUsuarioBolsaEmpleo();
+		
+		try {
+			anonimo = !modelo.checkUser(datos);
+		} catch (SQLException | UVException e) {
+			bean.getMensajesDeError().add(e.getMessage());
+		}
 		
 		String nombreAccion = EscapaHTML.ajustaCodificacion(request.getParameter(PARAM_ACCION));
 		if (nombreAccion == null) {
@@ -417,26 +434,38 @@ public class ControladorUsuarioBolsaEmpleo extends HttpServlet {
 		bean.setRol(usu.getRol());
 		
 		if (EscapaHTML.ajustaCodificacion(request.getParameter(PARAM_ROLE)) != null) {
-			Integer codNum = Formateador.leeParametroInteger(request.getParameter(PARAM_ID));
-			Boolean listadist = request.getParameter(PARAM_LISTA) != null && EscapaHTML.ajustaCodificacion(request.getParameter(PARAM_LISTA)).equals("true");
-			Boolean excluido = request.getParameter(PARAM_EXCLUIDO) != null && EscapaHTML.ajustaCodificacion(request.getParameter(PARAM_EXCLUIDO)).equals("true");
-					
-			String razonexcluido = EscapaHTML.ajustaCodificacion(request.getParameter(PARAM_RAZON_EXCLUIDO));
+			BolsaEmpleoValidator validator = this.getValidatorUsuarios(request); 							
 			
-			ModeloRol modeloRol = new ModeloRol();
-			Rol role = modeloRol.getRoleById(Formateador.leeParametroInteger(request.getParameter(PARAM_ROLE)));
-			
-			SimpleDateFormat formatter = new SimpleDateFormat("dd/MM/YYYY HH:mm:ss");
-			Date date = new Date(System.currentTimeMillis());
-			
-			String usua = EscapaHTML.ajustaCodificacion(request.getParameter(PARAM_NOMBRE_USUARIO));
-			
-			UsuarioBolsaEmpleo usuario = new UsuarioBolsaEmpleo(codNum, role, listadist, excluido, razonexcluido, date);
-			
-			modelo.actualizaUsuario(usuario);
-			HttpSession session = request.getSession(false);
-			session.setAttribute(MENSAJE_ENVIADO, MENSAJE_EXITO_EDITAR);
-			response.sendRedirect(request.getServletPath());
+			if (!validator.isValid()) {
+				for (String param : validator.getErrors().keySet()) {
+					for (String paramError : validator.getErrors().get(param)) {
+						bean.getMensajesDeError().add(paramError);
+					}
+				}
+			} else {
+				Integer codNum = Formateador.leeParametroInteger(request.getParameter(PARAM_ID));
+				Boolean listadist = request.getParameter(PARAM_LISTA) != null && EscapaHTML.ajustaCodificacion(request.getParameter(PARAM_LISTA)).equals("true");
+				
+				Boolean excluido = 
+						request.getParameter(PARAM_EXCLUIDO) != null && EscapaHTML.ajustaCodificacion(request.getParameter(PARAM_EXCLUIDO)).equals("true");
+						
+				String razonexcluido = EscapaHTML.ajustaCodificacion(request.getParameter(PARAM_RAZON_EXCLUIDO));
+				
+				ModeloRol modeloRol = new ModeloRol();
+				Rol role = modeloRol.getRoleById(Formateador.leeParametroInteger(request.getParameter(PARAM_ROLE)));
+				
+				SimpleDateFormat formatter = new SimpleDateFormat("dd/MM/YYYY HH:mm:ss");
+				Date date = new Date(System.currentTimeMillis());
+				
+				String usua = EscapaHTML.ajustaCodificacion(request.getParameter(PARAM_NOMBRE_USUARIO));
+				
+				UsuarioBolsaEmpleo usuario = new UsuarioBolsaEmpleo(codNum, role, listadist, excluido, razonexcluido, date);
+				
+				modelo.actualizaUsuario(usuario);
+				HttpSession session = request.getSession(false);
+				session.setAttribute(MENSAJE_ENVIADO, MENSAJE_EXITO_EDITAR);
+				response.sendRedirect(request.getServletPath());	
+			}
 		}
 	}
 	
@@ -515,6 +544,34 @@ public class ControladorUsuarioBolsaEmpleo extends HttpServlet {
 	 */
 	private void volverUsuario(HttpServletRequest request, HttpServletResponse response, VistaUsuarioBolsaEmpleo bean) throws SQLException, UVException, IOException {
 		bean.setVista("/WEB-INF/jsp/vista/infadministrativa/bolsaempleo/configuracion/usuarios.jsp");
+	}
+	
+	
+	/** Valida el formulario de Usuarios.
+	 * @param request .
+	 * @return validator
+	 * @throws UVException .
+	 * @throws SQLException .
+	 * @throws IOException .
+	 * @throws IOException .
+	 */
+	private BolsaEmpleoValidator getValidatorUsuarios(HttpServletRequest request) throws UVException {
+		BolsaEmpleoValidator validator = new BolsaEmpleoValidator(request);
+		
+		if (request.getParameter(PARAM_EXCLUIDO) != null) {
+			validator.addParamString(PARAM_RAZON_EXCLUIDO);
+			validator.addRule(PARAM_RAZON_EXCLUIDO, "required", MENSAJE_ERROR_RAZON_EXCLUSION_VACIO);
+			validator.addRule(PARAM_RAZON_EXCLUIDO, "noBlank", MENSAJE_ERROR_RAZON_EXCLUSION_VACIO);
+			validator.addRule(PARAM_RAZON_EXCLUIDO, "max:" + ModeloUsuarioBolsaEmpleo.COLUMN_RAZON_EXCLUSION_MAXLENGTH, 
+					String.format(MENSAJE_ERROR_RAZON_EXCLUSION_LARGO, ModeloUsuarioBolsaEmpleo.COLUMN_RAZON_EXCLUSION_MAXLENGTH));
+		}
+		
+		validator.addParamString(PARAM_ROLE);
+		validator.addRule(PARAM_ROLE, "required", MENSAJE_ERROR_ROL_VACIO);
+		validator.addRule(PARAM_ROLE, "noBlank", MENSAJE_ERROR_ROL_VACIO);
+		validator.addRule(PARAM_ROLE, "select", MENSAJE_ERROR_ROL_NEGATIVO);
+		
+		return validator;
 	}
 	
 }

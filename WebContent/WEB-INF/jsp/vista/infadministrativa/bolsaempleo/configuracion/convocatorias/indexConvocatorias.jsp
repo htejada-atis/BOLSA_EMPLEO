@@ -64,12 +64,23 @@ VistaConvocatorias bean = (VistaConvocatorias) uvdatos.getVistas().get(VistaConv
 		        {'data': 'estado'},
 		        {'data': 'codNum', 'buttons': [
 		        	{'label': 'Editar', 'onClick': function(row) {
-			    		var params = {'a': '<%= ControladorConvocatorias.ACCION_FORMULARIO_EDITAR_CONVOCATORIA %>', '<%= ControladorConvocatorias.PARAM_CONVOCATORIA_ID %>': row.codNum};
+			    		var params = {'a': '<%= ControladorConvocatorias.ACCION_MODIFICAR_CONVOCATORIA %>', '<%= ControladorConvocatorias.PARAM_CONVOCATORIA_ID %>': row.codNum};
 		        		Atis.sendForm("<%=request.getRequestURI()%>", params);
 			    	}}, 
 			    	{'label': 'Abrir ó Cerrar', 'onClick': function(row) {
-				    	var params = {'a': '<%= ControladorConvocatorias.ACCION_FORMULARIO_EDITAR_CONVOCATORIA %>', '<%= ControladorConvocatorias.PARAM_CONVOCATORIA_ID %>': row.codNum};
-			        	Atis.sendForm("<%=request.getRequestURI()%>", params);
+			    		Atis.confirmDialog("¿Desea cerrar o abrir la convocatoria?", "Cambio de estado", {
+			            	Si: function() {
+			            		var params = {
+			            				'a': '<%=ControladorConvocatorias.ACCION_FORMULARIO_EDITAR_CONVOCATORIA%>', 
+			            				'<%=ControladorConvocatorias.PARAM_CONVOCATORIA_ID%>': row.codNum
+			            			};
+			        			Atis.sendForm("<%= request.getRequestURI() %>", params);
+			              		$(this).dialog("close");
+			            	},
+			            	No: function() {
+			              		$(this).dialog("close");
+			            	}
+			          	});
 				    }}]
 		       	}
 		    ],

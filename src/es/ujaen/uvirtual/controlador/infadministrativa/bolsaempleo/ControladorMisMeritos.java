@@ -86,6 +86,9 @@ public class ControladorMisMeritos extends HttpServlet {
 	
 	public static final int RESPONSE_HTTP_CODE_ERROR = 400;
 
+	// variables
+	public static boolean anonimo = true;
+	
 	/** Peticion GET.
 	 * @see HttpServlet#doGet(HttpServletRequest request, HttpServletResponse response)
 	 */
@@ -99,6 +102,14 @@ public class ControladorMisMeritos extends HttpServlet {
 		Usuario usuario = datos.getUsuario();
 		LOGGER.log(Level.FINEST, "usuario que ha entrado en el servlet es {0}", usuario.getUid());
 				
+		ModeloUsuarioBolsaEmpleo modelo = new ModeloUsuarioBolsaEmpleo();
+		
+		try {
+			anonimo = !modelo.checkUser(datos);
+		} catch (SQLException | UVException e) {
+			bean.getMensajesDeError().add(e.getMessage());
+		}
+		
 		String nombreAccion = EscapaHTML.ajustaCodificacion(request.getParameter(PARAM_ACCION));
 		if (nombreAccion == null) {
 			nombreAccion = ACCION_LISTAR;

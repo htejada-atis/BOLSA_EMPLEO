@@ -61,7 +61,14 @@ $(document).ready(function() {
 	        {'data': 'fechaActualizacion'},
 	        {'data': 'fechaBloqueo'},
 	        {'data': 'fechaDesBloqueo'},
-	        {'data': 'baremable'},
+	        {'data': 'baremable', 'render': function(row) {
+        		if(row.baremable){
+        			return "<div class='circle-true'></div>"; 
+        		}
+        		else{
+        			return "<div class='circle-false'></div>"; 
+        		}
+        	}},
 	    ],
 	    "actions": [
 	    	{'label': 'Bloquear', 'onClick': function(selected) { enviaAccion("<%=ControladorBolsas.ACCION_BOLSAS_BLOQUEAR%>", selected); } },
