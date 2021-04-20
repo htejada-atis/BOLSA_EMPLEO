@@ -29,8 +29,10 @@ public class ModeloSolicitud {
 	public static final String SOLICITUD_ESTADO_ABIERTA = "ABIERTA";
 	public static final String SOLICITUD_ESTADO_CERRADA = "CERRADA";
 	
-	public static final String MENSAJE_ERROR_CONVOCATORIA_NO_ABIERTA = "Convocatoria no abierta";
+	public static final String MENSAJE_ERROR_CONVOCATORIA_NO_ABIERTA = "La convocatoria no está abierta";
 	public static final String MENSAJE_ERROR_SOLICITUDES_ABIERTAS = "Ya existen solicitides abiertas";
+	public static final String MENSAJE_ERROR_SOLICITUDE_NO_EXISTE = "No existe la solicitud";
+	
 		
 	/**
 	 * Listado de solicitudes. 
@@ -49,7 +51,7 @@ public class ModeloSolicitud {
 		  + "       bepsol.CODNUM SOLICITUD_CODNUM, bepsol.ESTADO ESTADO_SOLICITUD "
 		  + "FROM TBEP_CONVOCATORIAS bepcon "
 		  + "LEFT JOIN TBEP_SOLICITUDES bepsol ON bepsol.BEPCON_CODNUM = bepcon.CODNUM "
-		  + "WHERE bepcon.ESTADO = ? ";
+		  + "ORDER BY bepcon.CODNUM desc";
 		
 		dataTable.setQuery(consulta);
 				
@@ -57,8 +59,8 @@ public class ModeloSolicitud {
 				PreparedStatement stmtCount = conexion.prepareStatement(dataTable.getQueryCount());
 				PreparedStatement stmt = conexion.prepareStatement(dataTable.getQuery());
 		) {					
-			stmtCount.setString(1, ModeloConvocatoria.CONVOCATORIA_ESTADO_ABIERTA);
-			stmt.setString(1, ModeloConvocatoria.CONVOCATORIA_ESTADO_ABIERTA);
+			//stmtCount.setString(1, ModeloConvocatoria.CONVOCATORIA_ESTADO_ABIERTA);
+			//stmt.setString(1, ModeloConvocatoria.CONVOCATORIA_ESTADO_ABIERTA);
 			
 			try (ResultSet rs = stmt.executeQuery()) {
 				while (rs.next()) {
@@ -165,7 +167,7 @@ public class ModeloSolicitud {
 	 * @throws UVException  .
 	 * @throws SQLException .
 	 */
-	public Solicitud getSolicitudById(int codNum) throws SQLException, UVException {
+	public Solicitud getSolicitudById(int codNum) throws SQLException, UVException {		
 		ModeloConvocatoria modeloConvocatoria = new ModeloConvocatoria();
 		String consulta = "SELECT bepsol.* FROM TBEP_SOLICITUDES bepsol WHERE bepsol.CODNUM = ?";
 			
