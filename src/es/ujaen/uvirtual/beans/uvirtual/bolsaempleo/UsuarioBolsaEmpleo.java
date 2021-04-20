@@ -128,10 +128,13 @@ public class UsuarioBolsaEmpleo implements Serializable {
 	 * @param pnacionalidad .
 	 * @param psexo .
 	 */
-	public UsuarioBolsaEmpleo(Integer pcodNum, String pemail, String pdireccion, String pcodigopostal,
+	public UsuarioBolsaEmpleo(Integer pcodNum, String pnombre, String primer_apellido, String segundo_apellido, String pemail, String pdireccion, String pcodigopostal,
 			String plocalidad, String pprovincia, String pmovil, String ptelefono, String pnacionalidad, String psexo) {
 		super();
 		this.codNum = pcodNum;
+		this.nombre = pnombre;
+		this.apellido1 = primer_apellido;
+		this.apellido2 = segundo_apellido;
 		this.email = pemail;
 		this.direccion = pdireccion;
 		this.codigopostal = pcodigopostal;

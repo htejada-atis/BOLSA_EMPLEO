@@ -117,7 +117,7 @@ VistaUsuarioBolsaEmpleo bean = (VistaUsuarioBolsaEmpleo) uvdatos.getVistas().get
 		<div class="form-group">
 			<label for="select_role">Elija el rol para asociar</label>
 			<select class="params" id="select_role" name="<%= ControladorUsuarioBolsaEmpleo.PARAM_ROLE %>" style="width:100%;">
-				<option value="0"> - </option>
+				<option value="-1"> - </option>
     				<%for(Rol role: bean.getRoles()){
     					if(bean.getUsuario()!=null){
             				if(bean.getRol().getCodNum().equals(role.getCodNum())){%>
