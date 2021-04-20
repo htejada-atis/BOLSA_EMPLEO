@@ -53,6 +53,8 @@ $(document).ready(function() {
 	    "selectable": true,
 	    "pageSize": 10,
 	    "action": "<%= ControladorBolsas.ACCION_DATATABLE %>",
+	    "defaultOrderBy": 2,
+	    "defaultOrderDirection": 'desc'.
 	    "columns": [
 	    	{'data': 'codNum', 'selectable': true},
 	        {'data': 'codNum'},

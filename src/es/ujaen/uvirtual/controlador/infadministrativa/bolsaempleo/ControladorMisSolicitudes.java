@@ -4,7 +4,6 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.sql.SQLException;
 import java.util.logging.Logger;
-import java.util.Date;
 import java.util.logging.Level;
 
 import javax.servlet.ServletException;
@@ -19,9 +18,7 @@ import com.google.gson.GsonBuilder;
 import es.ujaen.uvirtual.beans.CodigoDescripcion;
 import es.ujaen.uvirtual.beans.UVDatos;
 import es.ujaen.uvirtual.beans.Usuario;
-import es.ujaen.uvirtual.beans.uvirtual.bolsaempleo.Convocatoria;
 import es.ujaen.uvirtual.beans.uvirtual.bolsaempleo.Solicitud;
-import es.ujaen.uvirtual.beans.vistas.uvirtual.bolsaempleo.VistaConvocatorias;
 import es.ujaen.uvirtual.beans.vistas.uvirtual.bolsaempleo.VistaSolicitudes;
 import es.ujaen.uvirtual.modelo.bolsaempleo.ModeloConvocatoria;
 import es.ujaen.uvirtual.modelo.bolsaempleo.ModeloSolicitud;
@@ -50,6 +47,7 @@ public class ControladorMisSolicitudes extends HttpServlet {
 	public static final String PARAM_ACCION = "a";
 	public static final String PARAM_ACCION_ENVIAR = "enviar"; 
 	public static final String PARAM_CONVOCATORIA_ID = "idConvocatoria";
+	public static final String PARAM_SOLICITUD_ID = "idSolicitud";
 //	public static final String PARAM_CONVOCATORIA_DESCRIPCION = "descripcion";
 //	public static final String PARAM_CONVOCATORIA_FECHACIERRE = "fechaCierre";
 //	public static final String PARAM_CONVOCATORIA_NUMEROBOLSASMAXIMO = "numBolsasMaximo";
@@ -59,27 +57,12 @@ public class ControladorMisSolicitudes extends HttpServlet {
 	public static final String ACCION_LISTAR_SOLICITUDES = "listar";
 	public static final String ACCION_DATATABLE = "datatable";
 	public static final String ACCION_CREAR_SOLICITUD = "crearSolicitud";
+	public static final String ACCION_CONSULTAR_SOLICITUD = "consultarSolicitud";
 	
 	// mensajes
 	public static final String MENSAJE_ERROR_CONVOCATORIA_ID_REQUERIDA = "El id de la convocatoria es requerído";
-	public static final String MENSAJE_ERROR_SOLICITUDES_ABIERTAS = "Ya existen solicitides abiertas";
-	public static final String MENSAJE_ERROR_NO_EXISTE_CONVOCATORIA = "No existe la convocatoria";
-	public static final String MENSAJE_ERROR_CONVOCATORIA_NO_ABIERTA = "Convocatoria no abierta";
-	
-//	public static final String MENSAJE_ERROR_DESCRIPCION_LARGA = "La descripción no puede ser superior a %d";
-//	public static final String MENSAJE_ERROR_DESCRIPCION_VACIA = "La descripción no puede estar vacia";
-//	public static final String MENSAJE_ERROR_FECHACIERRE_INCORRECTA = "La fecha de cierre no tiene el formato DD/MM/YYYY";
-//	public static final String MENSAJE_ERROR_FECHACIERRE_REQUERIDA = "La fecha de cierre es requerida";
-//	public static final String MENSAJE_ERROR_FECHACIERRE_MINIMA = "La fecha de cierre debe ser mayor que la fecha actual";
-//	public static final String MENSAJE_ERROR_NUMBOLSASMAXIMAS_REQUERIDA = "El número de bolsas máximas es requerido";
-//	public static final String MENSAJE_ERROR_NUMBOLSASMAXIMAS_INCORRECTA = "El número de bolsas máximas debe ser un entero";
-//	public static final String MENSAJE_ERROR_NUMBOLSASMAXIMAS_MINIMO = "El número de bolsas máximas debe ser al menos una";
-//	public static final String MENSAJE_ERROR_NUMMERITOSBLOQUE_REQUERIDA = "El número de méritos por bloque es requerido";
-//	public static final String MENSAJE_ERROR_NUMMERITOSBLOQUE_INCORRECTA = "El número de méritos por bloque debe ser un entero";
-//	public static final String MENSAJE_ERROR_NUMMERITOSBLOQUE_MINIMO = "El número de méritos por bloque debe ser al menos uno";
-//	public static final String MENSAJE_ERROR_CONVOCATORIAS_ABIERTAS = "Ya existen convocatorias abiertas.";
-//	public static final String MENSAJE_INFO_CONVOCATORIAS_INSERTADA_CORRECTAMENTE = "Convocatoria insertada correctamente.";
-
+	public static final String MENSAJE_ERROR_SOLICITUD_ID_REQUERIDO = "El id de la solicitud es requerído";
+		
 	public static final int RESPONSE_HTTP_CODE_ERROR = 400;
 	
 	// ruta vistas
@@ -116,8 +99,11 @@ public class ControladorMisSolicitudes extends HttpServlet {
 					break;
 				case ACCION_CREAR_SOLICITUD:
 					crearSolicitud(bean, datos, request, response);
-					break;				
-			}			
+					break;	
+				case ACCION_CONSULTAR_SOLICITUD:
+					consultarSolicitud(bean, datos, request, response);
+					break;
+			}
 		} catch (UVException e) {
 			LOGGER.log(Level.WARNING, e.toString());
 			bean.getMensajesDeError().add(e.getMessage());
@@ -179,33 +165,37 @@ public class ControladorMisSolicitudes extends HttpServlet {
 	
 	private void crearSolicitud(VistaSolicitudes bean, UVDatos datos, HttpServletRequest request, HttpServletResponse response) throws UVException, SQLException {
 		ModeloSolicitud modeloSolicitud = new ModeloSolicitud();
-		ModeloConvocatoria modeloConvocatoria = new ModeloConvocatoria();
 		
-		BolsaEmpleoValidator validator = new BolsaEmpleoValidator(request);
-		validator.addParamInteger(PARAM_CONVOCATORIA_ID);
-		validator.addRule(PARAM_CONVOCATORIA_ID, "required", MENSAJE_ERROR_CONVOCATORIA_ID_REQUERIDA);
+		Integer idConvocatoria = Formateador.leeParametroInteger(request.getParameter(PARAM_CONVOCATORIA_ID));
+		if (idConvocatoria == null) {
+			bean.setVista(RUTA_BEP_SOL + "indexSolicitudes.jsp");
+			throw new UVException(MENSAJE_ERROR_CONVOCATORIA_ID_REQUERIDA);
+		}
+		Solicitud solicitud = modeloSolicitud.nuevaSolicitud(idConvocatoria);
+				
+		bean.setSolicitud(solicitud);
+		bean.setVista(RUTA_BEP_SOL + "paso1.jsp");					
+	}
+	
+	private void consultarSolicitud(VistaSolicitudes bean, UVDatos datos, HttpServletRequest request, HttpServletResponse response) throws UVException, SQLException {
+		ModeloSolicitud modeloSolicitud = new ModeloSolicitud();
 		
-		if (!validator.isValid()) {
-			for (String param : validator.getErrors().keySet()) {
-				for (String paramError : validator.getErrors().get(param)) {
-					bean.getMensajesDeError().add(paramError);
-				}
-			}				
+		Integer idSolicitud = Formateador.leeParametroInteger(request.getParameter(PARAM_SOLICITUD_ID));
+		if (idSolicitud == null) {
+			bean.setVista(RUTA_BEP_SOL + "indexSolicitudes.jsp");
+			throw new UVException(MENSAJE_ERROR_SOLICITUD_ID_REQUERIDO);
+		}
+		Solicitud solicitud = modeloSolicitud.getSolicitudById(idSolicitud);
+		bean.setSolicitud(solicitud);
+		
+		if (solicitud.getConvocatoria().getEstado().equals(ModeloConvocatoria.CONVOCATORIA_ESTADO_CERRADA)) {
+			throw new UVException(ModeloSolicitud.MENSAJE_ERROR_CONVOCATORIA_NO_ABIERTA);
+		}
+		
+		if (solicitud.getEstado().equals(ModeloSolicitud.SOLICITUD_ESTADO_ABIERTA)) {
+			bean.setVista(RUTA_BEP_SOL + "paso1.jsp");
 		} else {
-			Convocatoria convocatoria = modeloConvocatoria.getConvocatoriaById(validator.getValueInteger(PARAM_CONVOCATORIA_ID));
-			if (convocatoria == null) {
-				bean.getMensajesDeError().add(MENSAJE_ERROR_NO_EXISTE_CONVOCATORIA);				
-			} else if (!convocatoria.getEstado().equals(ModeloConvocatoria.CONVOCATORIA_ESTADO_ABIERTA)) {
-				bean.getMensajesDeError().add(MENSAJE_ERROR_CONVOCATORIA_NO_ABIERTA);				
-			} else if (modeloSolicitud.haySolicitudAbiertaParaConvocatoria(convocatoria)) {
-				bean.getMensajesDeError().add(MENSAJE_ERROR_SOLICITUDES_ABIERTAS);				
-			} else {
-				// creamos solicitud
-				Solicitud solicitud = modeloSolicitud.nuevaSolicitud(convocatoria);
-					
-				bean.setSolicitud(solicitud);
-				bean.setVista(RUTA_BEP_SOL + "paso1.jsp");
-			}
+			bean.setVista(RUTA_BEP_SOL + "paso3.jsp");
 		}
 	}
 }

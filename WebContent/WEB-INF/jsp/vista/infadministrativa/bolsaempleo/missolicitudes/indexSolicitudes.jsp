@@ -60,7 +60,7 @@ VistaSolicitudes bean = (VistaSolicitudes) uvdatos.getVistas().get(VistaSolicitu
 			var convocatoriaAbierta = row.convocatoria.estado == '<%= ModeloConvocatoria.CONVOCATORIA_ESTADO_ABIERTA %>';
 			var convocatoriaCerrada = row.convocatoria.estado == '<%= ModeloConvocatoria.CONVOCATORIA_ESTADO_CERRADA %>';
 			var btnCrear = '<button class="create-solicitud" data-rowid="' + row.convocatoria.codNum + '" title="Crear una nueva solicitud para: ' + row.convocatoria.descripcion + '">Abrir una solicitud</button>';
-			var btnConsultar = '<button class="consultar-solicitud" data-rowid="' + row.convocatoria.codNum + '" title="Consultar solicitud para: ' + row.convocatoria.descripcion + '">Consultar una solicitud</button>';
+			var btnConsultar = '<button class="consultar-solicitud" data-rowid="' + row.codNum + '" title="Consultar solicitud para: ' + row.convocatoria.descripcion + '">Consultar solicitud</button>';
 			
 			if (convocatoriaAbierta && solicitudNoCreada) {
 				// convocatoria abierta, solicitud no creada
@@ -69,7 +69,7 @@ VistaSolicitudes bean = (VistaSolicitudes) uvdatos.getVistas().get(VistaSolicitu
 			} else if (convocatoriaAbierta && solicitudAbierta) {
 				// convocatoria abierta, solicitud abierta
 				console.log("convocatoria abierta, solicitud abierta");
-				html = 'Tiene un solicitud abierta. No olvide CERRAR antes de la fecha de cierre de la convocatoria.';
+				html = 'Tiene un solicitud abierta. No olvide CERRAR antes de la fecha de cierre de la convocatoria. ' + btnConsultar;
 			} else if (convocatoriaCerrada && solicitudNoCreada) {
 				// convocatoria cerrada, solicitud no creada
 				console.log("convocatoria cerrada, solicitud no creada");
@@ -98,7 +98,11 @@ VistaSolicitudes bean = (VistaSolicitudes) uvdatos.getVistas().get(VistaSolicitu
 		
 		var consultarSolicitud = function() {
 			var id = $(this).data('rowid')
-			console.log("consultarSolicitud", id);
+			var params = {
+				'<%= ControladorMisSolicitudes.PARAM_ACCION %>': '<%= ControladorMisSolicitudes.ACCION_CONSULTAR_SOLICITUD %>', 
+				'<%= ControladorMisSolicitudes.PARAM_SOLICITUD_ID %>': id
+			};
+			Atis.sendForm('<%= request.getRequestURI() %>', params);	
 		}; 
 					
 		var beforeRender = function(table) {
@@ -118,10 +122,10 @@ VistaSolicitudes bean = (VistaSolicitudes) uvdatos.getVistas().get(VistaSolicitu
 		    "beforeRender": beforeRender,
 		    "afterRender": afterRender,
 		    "columns": [
-		    	{'data': 'convocatoria.descripcion'},
-		        {'data': 'convocatoria.fechaCierre'},
-		        {'data': 'convocatoria.estado'},
-		        {'data': 'codNum', render: renderSolicitud},		        
+		    	{'data': 'convocatoria.descripcion', order: {'active': false}},
+		        {'data': 'convocatoria.fechaCierre', order: {'active': false}},
+		        {'data': 'convocatoria.estado', order: {'active': false}},
+		        {'data': 'codNum', order: {'active': false}, render: renderSolicitud},		        
 		    ],
 		});		
 	});
