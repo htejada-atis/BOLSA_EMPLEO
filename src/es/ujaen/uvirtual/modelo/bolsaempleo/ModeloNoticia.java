@@ -11,7 +11,8 @@ import java.util.Map;
 import es.ujaen.uvirtual.beans.uvirtual.bolsaempleo.Noticia;
 import es.ujaen.uvirtual.modelo.conexion.ConexionUvirtual;
 import es.ujaen.uvirtual.utilidades.BolsaEmpleoUtils;
-import es.ujaen.uvirtual.utilidades.DataTable;
+import es.ujaen.uvirtual.utilidades.BolsaEmpleoDataTable;
+import es.ujaen.uvirtual.utilidades.BolsaEmpleoDataTable.DataTableColumn;
 import es.ujaen.uvirtual.utilidades.UVException;
 
 
@@ -25,12 +26,13 @@ import es.ujaen.uvirtual.utilidades.UVException;
  */
 public class ModeloNoticia {
 	
-	public static final int ORDER_COLUMN_INDEX_ID = 1;
+	public static final int ORDER_COLUMN_INDEX_FECHA = 0;
+	public static final int ORDER_COLUMN_INDEX_TEXTO = 1;
 	public static final int ORDER_COLUMN_INDEX_ENLACE = 2;
-	public static final int ORDER_COLUMN_INDEX_TEXTO = 3;
-	public static final int ORDER_COLUMN_INDEX_FECHA = 4;
-	public static final int ORDER_COLUMN_INDEX_FLGPUBLICA = 5;
-	public static final int ORDER_COLUMN_INDEX_FLGACTIVA = 6;
+	public static final int ORDER_COLUMN_INDEX_FLGPUBLICA = 3;
+	public static final int ORDER_COLUMN_INDEX_FLGACTIVA = 4;
+	public static final int ORDER_COLUMN_INDEX_ID = 5;
+	
 	
 	/********************************************** METODOS PÚBLICOS PARA CONSULTAS   ********************************************/
 
@@ -119,18 +121,17 @@ public class ModeloNoticia {
 	 * @throws SQLException en caso de error de base de datos
 	 * @throws UVException error si no existe noticia
 	 */
-	public DataTable<Noticia> listaNoticiasDatatable(Map<String, String[]> params) throws SQLException, UVException {
+	public BolsaEmpleoDataTable<Noticia> listaNoticiasDatatable(Map<String, String[]> params) throws SQLException, UVException {
 		List<Noticia> noticias = new ArrayList<>();
-		DataTable<Noticia> dataTable = new DataTable<Noticia>(params);
+		BolsaEmpleoDataTable<Noticia> dataTable = new BolsaEmpleoDataTable<Noticia>(params);
 		
 		String consulta = "SELECT bepnot.* FROM tbep_noticias bepnot WHERE 1=1 ";
 		
-		dataTable.setOrderColumn(ORDER_COLUMN_INDEX_ID, "bepnot.CODNUM");
-		dataTable.setOrderColumn(ORDER_COLUMN_INDEX_ENLACE, "bepnot.ENLACE");
-		dataTable.setOrderColumn(ORDER_COLUMN_INDEX_TEXTO, "bepnot.TEXTO");
-		dataTable.setOrderColumn(ORDER_COLUMN_INDEX_FECHA, "bepnot.FECHA");
-		dataTable.setOrderColumn(ORDER_COLUMN_INDEX_FLGPUBLICA, "bepnot.FLGPUBLICA");
-		dataTable.setOrderColumn(ORDER_COLUMN_INDEX_FLGACTIVA, "bepnot.FLGACTIVA");
+		dataTable.setColumn(ORDER_COLUMN_INDEX_FECHA, "bepnot.FECHA", DataTableColumn.COLUMN_TYPE_DATE);
+		dataTable.setColumn(ORDER_COLUMN_INDEX_ENLACE, "bepnot.ENLACE");
+		dataTable.setColumn(ORDER_COLUMN_INDEX_TEXTO, "bepnot.TEXTO");
+		dataTable.setColumn(ORDER_COLUMN_INDEX_FLGPUBLICA, "bepnot.FLGPUBLICA", DataTableColumn.COLUMN_TYPE_BOOLEAN);
+		dataTable.setColumn(ORDER_COLUMN_INDEX_FLGACTIVA, "bepnot.FLGACTIVA", DataTableColumn.COLUMN_TYPE_BOOLEAN);
 		dataTable.setQuery(consulta);
 				
 		try (Connection conexion = ConexionUvirtual.obtenerInstancia();

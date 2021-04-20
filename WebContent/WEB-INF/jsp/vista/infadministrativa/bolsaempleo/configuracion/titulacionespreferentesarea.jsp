@@ -42,10 +42,9 @@ VistaTitulacionesArea bean = (VistaTitulacionesArea) uvdatos.getVistas().get(Vis
 	
 	<div id="tablas_titulaciones">
 		<table class="bluetable bolsaempleo" id="table_titulaciones_preferentes_area">
-		<caption class="table-title">Titulaciones preferentes al área</caption>  
 			<tr>
 				<th scope="col" style="width:5%"></th>
-				<th scope="col" style="width:10%" title="Id de la titulaciï¿½n">Id</th>
+				<th scope="col" style="width:10%" title="Id de la titulación">Id</th>
 				<th scope="col"	style="width:70%">Nombre</th>
 			</tr>
 			<tbody>		
@@ -57,12 +56,10 @@ VistaTitulacionesArea bean = (VistaTitulacionesArea) uvdatos.getVistas().get(Vis
 			</tfoot>
 		</table>
 	
-		
 	    <table class="bluetable bolsaempleo" id="table_titulaciones">
-	    <caption class="table-title">Titulaciones</caption>  
 			<tr>
 				<th scope="col" style="width:5%"></th>
-				<th scope="col" style="width:10%" title="Id de la titulaciï¿½n">Id</th>
+				<th scope="col" style="width:10%" title="Id de la titulación">Id</th>
 				<th scope="col"	style="width:85%">Nombre</th>
 			</tr>
 			<tbody>
@@ -84,24 +81,27 @@ VistaTitulacionesArea bean = (VistaTitulacionesArea) uvdatos.getVistas().get(Vis
 		var table_titulaciones_area;
 		var table_titulaciones;
 		
-		function inicializarTablas(id) {
+		function inicializarTablas(id, title) {
 			table_titulaciones_area = new Atis.DataTable('#table_titulaciones_preferentes_area', {
 			    "ajax": { url: "<%=ControladorGestionTitulacionesPreferentesArea.URL_PATTERN_AJAX%>", async: false },
 			    "params": {"<%=ControladorGestionTitulacionesPreferentesArea.PARAM_AREA%>": id},
 			    "selectable": true,
+			    "filterable": true,
 			    "pageSize": 5,
+			    "title": title,
 			    "action": "<%=ControladorGestionTitulacionesPreferentesArea.ACCION_DATATABLE_TITULACIONES_PREFERENTES_AREA%>",
 			    "columns": [
-			    	{'data': 'codNum', 'selectable': true},
-			    	{'data': 'codNum'},
-			        {'data': 'nombre', 'class': 'overflow-auto'},
+			    	{'data': 'codNum', 'filterable': true},
+			    	{'data': 'codNum', 'filter': {'type': 'number'}},
+			        {'data': 'nombre', 'class': 'overflow-auto', 'filter': {'type': 'text'}},
 			    ],
 			    "actions": [
-			    	{'label': 'Eliminar', 'onClick': function(selected) {
+			    	{'label': 'Eliminar', 'title': 'Eliminar titulación del área', 'onClick': function(selected) {
 			    		var params = {
-			    				'a': '<%=ControladorGestionTitulacionesPreferentesArea.ACCION_ELIMINAR_TITULACION_AREA%>', 
+			    				'a': '<%=ControladorGestionTitulacionesPreferentesArea.ACCION_ELIMINAR_TITULACION_AREA%>',
 			    				'<%=ControladorGestionTitulacionesPreferentesArea.PARAM_TITULACIONES%>': JSON.stringify(selected),
-			    				'<%=ControladorGestionTitulacionesPreferentesArea.PARAM_AREA%>': id};
+			    				'<%=ControladorGestionTitulacionesPreferentesArea.PARAM_AREA%>': id
+			    				};
 		        		Atis.sendForm("<%=request.getRequestURI()%>", params);
 			    	} },
 			    ]
@@ -111,20 +111,23 @@ VistaTitulacionesArea bean = (VistaTitulacionesArea) uvdatos.getVistas().get(Vis
 			    "ajax": { url: "<%=ControladorGestionTitulacionesPreferentesArea.URL_PATTERN_AJAX%>", async: false },
 			    "params": {"<%=ControladorGestionTitulacionesPreferentesArea.PARAM_AREA%>": id},
 			    "selectable": true,
+			    "filterable": true,
 			    "pageSize": 5,
+			    "title": 'Titulaciones Disponibles',
 			    "action": "<%=ControladorGestionTitulacionesPreferentesArea.ACCION_DATATABLE_TITULACIONES%>",
 			    "columns": [
 			    	{'data': 'codNum', 'selectable': true},
-			    	{'data': 'codNum'},
-			        {'data': 'nombre', 'class': 'overflow-auto'},
+			    	{'data': 'codNum', 'filter': {'type': 'number'}},
+			        {'data': 'nombre', 'class': 'overflow-auto', 'filter': {'type': 'text'}},
 			    ],
 			    "actions": [
-			    	{'label': 'Incluir', 'onClick': function(selected) {
+			    	{'label': 'Incluir', 'title': 'Incluir titulación en el área', 'onClick': function(selected) {
 			    		if(selected.length) {
 			    			var params = {
-				    				'a': '<%=ControladorGestionTitulacionesPreferentesArea.ACCION_INCLUIR_TITULACION_AREA%>', 
+				    				'a': '<%=ControladorGestionTitulacionesPreferentesArea.ACCION_INCLUIR_TITULACION_AREA%>',
 				    				'<%=ControladorGestionTitulacionesPreferentesArea.PARAM_TITULACIONES%>': JSON.stringify(selected),
-				    				'<%=ControladorGestionTitulacionesPreferentesArea.PARAM_AREA%>': id};
+				    				'<%=ControladorGestionTitulacionesPreferentesArea.PARAM_AREA%>': id
+				    				};
 			        		Atis.sendForm("<%=request.getRequestURI()%>", params);
 			    		}
 			    	} },
@@ -132,10 +135,11 @@ VistaTitulacionesArea bean = (VistaTitulacionesArea) uvdatos.getVistas().get(Vis
 			});
 		}
 		
-		function cargarTablas(id) {
+		function cargarTablas(id, title) {
 			table_titulaciones.setParam("<%=ControladorGestionTitulacionesPreferentesArea.PARAM_AREA%>", id);
 			table_titulaciones.refresh();
 			table_titulaciones_area.setParam("<%=ControladorGestionTitulacionesPreferentesArea.PARAM_AREA%>", id);
+			table_titulaciones_area.setTitle(title);
 			table_titulaciones_area.refresh();
 		}
 		
@@ -143,15 +147,13 @@ VistaTitulacionesArea bean = (VistaTitulacionesArea) uvdatos.getVistas().get(Vis
 		
 		document.getElementById("select_area").onchange = function () {
 			if(this.value != 0) {
+				var title_titulaciones_area = "Titulaciones Preferentes al Área: " + $(this).children("option").filter(":selected").text();
 				if(document.getElementById("tablas_titulaciones").style.visibility == "hidden") {
 					document.getElementById("tablas_titulaciones").style.visibility = "visible";
-					inicializarTablas(this.value);
-					$("#title_titulaciones_preferentes_area").text("Titulaciones preferentes al área " + $(this).children("option").filter(":selected").text());
+					inicializarTablas(this.value, title_titulaciones_area);
 				} else {
-					cargarTablas(this.value);
-					$("#title_titulaciones_preferentes_area").text("Titulaciones preferentes al área " + $(this).children("option").filter(":selected").text());
+					cargarTablas(this.value, title_titulaciones_area);
 				}
-				
 			}
 		}
 		

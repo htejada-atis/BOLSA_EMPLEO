@@ -26,7 +26,7 @@ import es.ujaen.uvirtual.beans.vistas.uvirtual.bolsaempleo.VistaSolicitudes;
 import es.ujaen.uvirtual.modelo.bolsaempleo.ModeloConvocatoria;
 import es.ujaen.uvirtual.modelo.bolsaempleo.ModeloSolicitud;
 import es.ujaen.uvirtual.utilidades.BolsaEmpleoValidator;
-import es.ujaen.uvirtual.utilidades.DataTable;
+import es.ujaen.uvirtual.utilidades.BolsaEmpleoDataTable;
 import es.ujaen.uvirtual.utilidades.EscapaHTML;
 import es.ujaen.uvirtual.utilidades.Formateador;
 import es.ujaen.uvirtual.utilidades.UVException;
@@ -161,11 +161,11 @@ public class ControladorMisSolicitudes extends HttpServlet {
 		
 		try (PrintWriter writer = response.getWriter()) {
 			try {
-				DataTable<Solicitud> dataTable = modelo.listaSolicitudesDatatable(request.getParameterMap());
+				BolsaEmpleoDataTable<Solicitud> dataTable = modelo.listaSolicitudesDatatable(request.getParameterMap());
 				bean.setDatatableSolicitudes(dataTable);
 				
 				Gson gson = new GsonBuilder().setDateFormat("dd/M/yyyy").
-						setExclusionStrategies(DataTable.GSONEXCLUSIONSTRATEGY).create();				
+						setExclusionStrategies(BolsaEmpleoDataTable.GSONEXCLUSIONSTRATEGY).create();				
 				writer.write(gson.toJson(dataTable));
 			} catch (Exception ex) {
 				bean.getMensajesDeError().add(ex.getMessage());

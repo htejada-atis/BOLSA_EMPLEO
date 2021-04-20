@@ -52,6 +52,7 @@ VistaEvaluadores bean = (VistaEvaluadores) uvdatos.getVistas().get(VistaEvaluado
 		    "ajax": { url: "<%=ControladorGestionEvaluadores.URL_PATTERN_AJAX%>" },
 		    "params": {"<%=ControladorGestionEvaluadores.PARAM_AREA%>": "<%= bean.getArea().getCodNum() %>"},
 		    "pageSize": 10,
+		    "title": 'Agregar Nuevo Evaluador al Área: <%= bean.getArea().getDescripcion() %>',
 		    "action": "<%=ControladorGestionEvaluadores.ACCION_DATATABLE_USUARIOS%>",
 		    "selectable": true,
 		    "columns": [
@@ -63,7 +64,7 @@ VistaEvaluadores bean = (VistaEvaluadores) uvdatos.getVistas().get(VistaEvaluado
 	        	}},
 		    ],
 		    "actions": [
-		    	{'label': 'Agregar', 'onClick': function(selected) {
+		    	{'label': 'Agregar', 'title': 'Agregar usuario como evaluador en este área', 'onClick': function(selected) {
 		    		if(selected.length) {
 		    			var params = {
 			    				'a': '<%= ControladorGestionEvaluadores.ACCION_AGREGAR_EVALUADORES %>', 

@@ -18,7 +18,8 @@ import es.ujaen.uvirtual.beans.uvirtual.bolsaempleo.Evaluador;
 import es.ujaen.uvirtual.beans.uvirtual.bolsaempleo.UsuarioBolsaEmpleo;
 import es.ujaen.uvirtual.modelo.conexion.ConexionUvirtual;
 import es.ujaen.uvirtual.utilidades.BolsaEmpleoUtils;
-import es.ujaen.uvirtual.utilidades.DataTable;
+import es.ujaen.uvirtual.utilidades.BolsaEmpleoDataTable;
+import es.ujaen.uvirtual.utilidades.Memcache;
 import es.ujaen.uvirtual.utilidades.UVException;
 
 /**
@@ -192,7 +193,7 @@ public class ModeloUsuarioBolsaEmpleo {
 	 * @throws SQLException en caso de error de base de datos
 	 * @throws UVException error si no existe la area
 	 */
-	public DataTable<UsuarioBolsaEmpleo> listaUsuarioBolsaEmpleoDatatable(Map<String, String[]> params) throws SQLException, UVException {
+	public BolsaEmpleoDataTable<UsuarioBolsaEmpleo> listaUsuarioBolsaEmpleoDatatable(Map<String, String[]> params) throws SQLException, UVException {
 		List<UsuarioBolsaEmpleo> usuarios = new ArrayList<>();
 		
 		String consulta =
@@ -204,7 +205,7 @@ public class ModeloUsuarioBolsaEmpleo {
 		
 		String tipo = "general";
 		
-		DataTable<UsuarioBolsaEmpleo> dataTable = setDatatable(params, consulta, tipo);
+		BolsaEmpleoDataTable<UsuarioBolsaEmpleo> dataTable = setDatatable(params, consulta, tipo);
 				
 		try (Connection conexion = ConexionUvirtual.obtenerInstancia();
 				PreparedStatement stmtCount = conexion.prepareStatement(dataTable.getQueryCount());
@@ -231,7 +232,7 @@ public class ModeloUsuarioBolsaEmpleo {
 	 * @throws SQLException en caso de error de base de datos
 	 * @throws UVException error si no existe la area
 	 */	
-	public DataTable<UsuarioBolsaEmpleo> listaUsuarioBorradoBolsaEmpleoDatatable(Map<String, String[]> params) throws SQLException, UVException {
+	public BolsaEmpleoDataTable<UsuarioBolsaEmpleo> listaUsuarioBorradoBolsaEmpleoDatatable(Map<String, String[]> params) throws SQLException, UVException {
 		List<UsuarioBolsaEmpleo> usuarios = new ArrayList<>();
 		
 		String consulta =
@@ -242,7 +243,7 @@ public class ModeloUsuarioBolsaEmpleo {
 		
 		String tipo = "borrado";
 		
-		DataTable<UsuarioBolsaEmpleo> dataTable = setDatatable(params, consulta, tipo);
+		BolsaEmpleoDataTable<UsuarioBolsaEmpleo> dataTable = setDatatable(params, consulta, tipo);
 				
 		try (Connection conexion = ConexionUvirtual.obtenerInstancia();
 				PreparedStatement stmtCount = conexion.prepareStatement(dataTable.getQueryCount());
@@ -269,7 +270,7 @@ public class ModeloUsuarioBolsaEmpleo {
 	 * @throws SQLException en caso de error de base de datos
 	 * @throws UVException error si no existe la area
 	 */	
-	public DataTable<UsuarioBolsaEmpleo> listaUsuarioExcluidoBolsaEmpleoDatatable(Map<String, String[]> params) throws SQLException, UVException {
+	public BolsaEmpleoDataTable<UsuarioBolsaEmpleo> listaUsuarioExcluidoBolsaEmpleoDatatable(Map<String, String[]> params) throws SQLException, UVException {
 		List<UsuarioBolsaEmpleo> usuarios = new ArrayList<>();
 		
 		String consulta =
@@ -281,7 +282,7 @@ public class ModeloUsuarioBolsaEmpleo {
 		
 		String tipo = "excluido";
 		
-		DataTable<UsuarioBolsaEmpleo> dataTable = setDatatable(params, consulta, tipo);
+		BolsaEmpleoDataTable<UsuarioBolsaEmpleo> dataTable = setDatatable(params, consulta, tipo);
 			
 		try (Connection conexion = ConexionUvirtual.obtenerInstancia();
 				PreparedStatement stmtCount = conexion.prepareStatement(dataTable.getQueryCount());
@@ -309,14 +310,14 @@ public class ModeloUsuarioBolsaEmpleo {
 	 * @throws SQLException en caso de error de base de datos .
 	 * @throws UVException error si no existe la area .
 	 */
-	public DataTable<Evaluador> listaEvaluadoresDatatable(Map<String, String[]> params, Integer area, boolean evaluadores) throws SQLException, UVException {
+	public BolsaEmpleoDataTable<Evaluador> listaEvaluadoresDatatable(Map<String, String[]> params, Integer area, boolean evaluadores) throws SQLException, UVException {
 		
 		if (area == null) {
 			throw new UVException("No se pueden listar evaluadores sin area");
 		}
 		
 		List<Evaluador> usuarios = new ArrayList<>();
-		DataTable<Evaluador> dataTable = new DataTable<Evaluador>(params);
+		BolsaEmpleoDataTable<Evaluador> dataTable = new BolsaEmpleoDataTable<Evaluador>(params);
 		
 		String consulta = "SELECT * FROM TBEP_USUARIOS bepusu "
 				+ "INNER JOIN VUJA_NET_BEP_AR_PERSONA uvpersona ON uvpersona.CODINT=bepusu.CODPERSONA "
@@ -332,15 +333,15 @@ public class ModeloUsuarioBolsaEmpleo {
 		
 		if (evaluadores) {
 			consulta += "AND bepusu.CODNUM IN (" + consultaEvaluadores + ")";
-			dataTable.setOrderColumn(ORDER_COLUMN_INDEX_ACTIVO, "bepeva.FLGACTIVO");
+			dataTable.setColumn(ORDER_COLUMN_INDEX_ACTIVO, "bepeva.FLGACTIVO");
 		} else {
 			consulta += "AND bepusu.CODNUM NOT IN (" + consultaEvaluadores + ") "
 					+ "AND bepusu.ROL = 1052 ";
 		}
 		
-		dataTable.setOrderColumn(ORDER_COLUMN_INDEX_NUMDOCUMENTO, "uvpersona.IDNIF");
-		dataTable.setOrderColumn(ORDER_COLUMN_INDEX_ROL, "bepusu.ROL");
-		dataTable.setOrderColumn(ORDER_COLUMN_INDEX_NOMBRE_Y_APELLIDOS, "uvpersona.STRAPELLIDO1");
+		dataTable.setColumn(ORDER_COLUMN_INDEX_NUMDOCUMENTO, "uvpersona.IDNIF");
+		dataTable.setColumn(ORDER_COLUMN_INDEX_ROL, "bepusu.ROL");
+		dataTable.setColumn(ORDER_COLUMN_INDEX_NOMBRE_Y_APELLIDOS, "uvpersona.STRAPELLIDO1");
 		dataTable.setQuery(consulta);
 				
 		try (Connection conexion = ConexionUvirtual.obtenerInstancia();
@@ -475,34 +476,34 @@ public class ModeloUsuarioBolsaEmpleo {
 	 * @return usuario
 	 * @throws UVException en caso de error de paquete datatables
 	 */	
-	public DataTable<UsuarioBolsaEmpleo> setDatatable(Map<String, String[]> params, String consulta, String tipo) throws UVException {
-		DataTable<UsuarioBolsaEmpleo> dataTable = new DataTable<UsuarioBolsaEmpleo>(params);
+	public BolsaEmpleoDataTable<UsuarioBolsaEmpleo> setDatatable(Map<String, String[]> params, String consulta, String tipo) throws UVException {
+		BolsaEmpleoDataTable<UsuarioBolsaEmpleo> dataTable = new BolsaEmpleoDataTable<UsuarioBolsaEmpleo>(params);
 		
 		switch (tipo) {
 			case "excluido":
-				dataTable.setOrderColumn(ORDER_COLUMN_INDEX_ID, "bepusu.CODNUM");
-				dataTable.setOrderColumn(ORDER_COLUMN_INDEX_TIPO_DOCUMENTO, "uvpersona.STRTIPODOCUMENTO");
-				dataTable.setOrderColumn(ORDER_COLUMN_INDEX_NUMDOCUMENTO, "uvpersona.IDNIF");
-				dataTable.setOrderColumn(ORDER_COLUMN_INDEX_COD_CUENTA, "bepusu.CODCUENTA");
-				dataTable.setOrderColumn(ORDER_COLUMN_INDEX_NOMBRE_Y_APELLIDOS, "uvpersona.STRAPELLIDO1");
-				dataTable.setOrderColumn(ORDER_COLUMN_INDEX_EMAIL, "bepusu.EMAIL");
-				dataTable.setOrderColumn(ORDER_COLUMN_INDEX_ROL, "bepusu.ROL");
-				dataTable.setOrderColumn(ORDER_COLUMN_INDEX_RAZON_EXCLUSION, "bepusu.RAZON_EXCLUSION");
-				dataTable.setOrderColumn(ORDER_COLUMN_INDEX_FECHA_EXCLUSION, "bepusu.FECHA_EXCLUSION");
-				dataTable.setOrderColumn(ORDER_COLUMN_INDEX_LISTA_DIST, "bepusu.FLGLISTADISTRIBUCION");
+				dataTable.setColumn(ORDER_COLUMN_INDEX_ID, "bepusu.CODNUM");
+				dataTable.setColumn(ORDER_COLUMN_INDEX_TIPO_DOCUMENTO, "uvpersona.STRTIPODOCUMENTO");
+				dataTable.setColumn(ORDER_COLUMN_INDEX_NUMDOCUMENTO, "uvpersona.IDNIF");
+				dataTable.setColumn(ORDER_COLUMN_INDEX_COD_CUENTA, "bepusu.CODCUENTA");
+				dataTable.setColumn(ORDER_COLUMN_INDEX_NOMBRE_Y_APELLIDOS, "uvpersona.STRAPELLIDO1");
+				dataTable.setColumn(ORDER_COLUMN_INDEX_EMAIL, "bepusu.EMAIL");
+				dataTable.setColumn(ORDER_COLUMN_INDEX_ROL, "bepusu.ROL");
+				dataTable.setColumn(ORDER_COLUMN_INDEX_RAZON_EXCLUSION, "bepusu.RAZON_EXCLUSION");
+				dataTable.setColumn(ORDER_COLUMN_INDEX_FECHA_EXCLUSION, "bepusu.FECHA_EXCLUSION");
+				dataTable.setColumn(ORDER_COLUMN_INDEX_LISTA_DIST, "bepusu.FLGLISTADISTRIBUCION");
 				dataTable.setQuery(consulta);
 				
 				return dataTable;
 				
 			default:
-				dataTable.setOrderColumn(ORDER_COLUMN_INDEX_ID, "bepusu.CODNUM");
-				dataTable.setOrderColumn(ORDER_COLUMN_INDEX_TIPO_DOCUMENTO, "uvpersona.STRTIPODOCUMENTO");
-				dataTable.setOrderColumn(ORDER_COLUMN_INDEX_NUMDOCUMENTO, "uvpersona.IDNIF");
-				dataTable.setOrderColumn(ORDER_COLUMN_INDEX_COD_CUENTA, "bepusu.CODCUENTA");
-				dataTable.setOrderColumn(ORDER_COLUMN_INDEX_NOMBRE_Y_APELLIDOS, "uvpersona.STRAPELLIDO1");
-				dataTable.setOrderColumn(ORDER_COLUMN_INDEX_EMAIL, "bepusu.EMAIL");
-				dataTable.setOrderColumn(ORDER_COLUMN_INDEX_ROL, "bepusu.ROL");
-				dataTable.setOrderColumn(ORDER_COLUMN_INDEX_LISTA_DIST, "bepusu.FLGLISTADISTRIBUCION");
+				dataTable.setColumn(ORDER_COLUMN_INDEX_ID, "bepusu.CODNUM");
+				dataTable.setColumn(ORDER_COLUMN_INDEX_TIPO_DOCUMENTO, "uvpersona.STRTIPODOCUMENTO");
+				dataTable.setColumn(ORDER_COLUMN_INDEX_NUMDOCUMENTO, "uvpersona.IDNIF");
+				dataTable.setColumn(ORDER_COLUMN_INDEX_COD_CUENTA, "bepusu.CODCUENTA");
+				dataTable.setColumn(ORDER_COLUMN_INDEX_NOMBRE_Y_APELLIDOS, "uvpersona.STRAPELLIDO1");
+				dataTable.setColumn(ORDER_COLUMN_INDEX_EMAIL, "bepusu.EMAIL");
+				dataTable.setColumn(ORDER_COLUMN_INDEX_ROL, "bepusu.ROL");
+				dataTable.setColumn(ORDER_COLUMN_INDEX_LISTA_DIST, "bepusu.FLGLISTADISTRIBUCION");
 				dataTable.setQuery(consulta);
 				
 				return dataTable;

@@ -11,7 +11,7 @@ import es.ujaen.uvirtual.beans.uvirtual.bolsaempleo.ApartadoBaremacion;
 import es.ujaen.uvirtual.beans.uvirtual.bolsaempleo.BloqueBaremacion;
 import es.ujaen.uvirtual.beans.uvirtual.bolsaempleo.ItemBaremacion;
 import es.ujaen.uvirtual.modelo.conexion.ConexionUvirtual;
-import es.ujaen.uvirtual.utilidades.DataTable;
+import es.ujaen.uvirtual.utilidades.BolsaEmpleoDataTable;
 import es.ujaen.uvirtual.utilidades.UVException;
 
 /**
@@ -170,18 +170,18 @@ public class ModeloBaremacion {
 	 * @throws SQLException en caso de error de base de datos
 	 * @throws UVException error si no existe la area
 	 */
-	public DataTable<ApartadoBaremacion> listadoApartadosGeneralesBaremacionDatatable(Map<String, String[]> params) throws SQLException, UVException {
+	public BolsaEmpleoDataTable<ApartadoBaremacion> listadoApartadosGeneralesBaremacionDatatable(Map<String, String[]> params) throws SQLException, UVException {
 		List<ApartadoBaremacion> apartados = new ArrayList<>();
-		DataTable<ApartadoBaremacion> dataTable = new DataTable<ApartadoBaremacion>(params);
+		BolsaEmpleoDataTable<ApartadoBaremacion> dataTable = new BolsaEmpleoDataTable<ApartadoBaremacion>(params);
 		
 		String consulta =
 			"SELECT bepapa.* "
 		  + "FROM TBEP_APARTADOSBAREMACION bepapa "		  
 		  + "WHERE 1=1 ";
 		
-		dataTable.setOrderColumn(ORDER_COLUMN_INDEX_APARTADOS_CODIGO, "bepapa.CODIGO");
-		dataTable.setOrderColumn(ORDER_COLUMN_INDEX_APARTADOS_NOMBRE, "bepapa.NOMBRE");
-		dataTable.setOrderColumn(ORDER_COLUMN_INDEX_APARTADOS_ACTIVO, "bepapa.FLGACTIVO");
+		dataTable.setColumn(ORDER_COLUMN_INDEX_APARTADOS_CODIGO, "bepapa.CODIGO");
+		dataTable.setColumn(ORDER_COLUMN_INDEX_APARTADOS_NOMBRE, "bepapa.NOMBRE");
+		dataTable.setColumn(ORDER_COLUMN_INDEX_APARTADOS_ACTIVO, "bepapa.FLGACTIVO");
 		dataTable.setQuery(consulta);
 				
 		try (Connection conexion = ConexionUvirtual.obtenerInstancia();
@@ -417,23 +417,23 @@ public class ModeloBaremacion {
 	 * @throws SQLException en caso de error de base de datos .
 	 * @throws UVException error si no existe la area .
 	 */
-	public DataTable<BloqueBaremacion> listadoBloquesBaremacionDatatable(Map<String, String[]> params, Integer apartado) throws SQLException, UVException {
+	public BolsaEmpleoDataTable<BloqueBaremacion> listadoBloquesBaremacionDatatable(Map<String, String[]> params, Integer apartado) throws SQLException, UVException {
 		
 		if (apartado == null) {
 			throw new UVException("No se pueden listar bloques sin el id del apartado");
 		}
 		
 		List<BloqueBaremacion> bloques = new ArrayList<>();
-		DataTable<BloqueBaremacion> dataTable = new DataTable<BloqueBaremacion>(params);
+		BolsaEmpleoDataTable<BloqueBaremacion> dataTable = new BolsaEmpleoDataTable<BloqueBaremacion>(params);
 		
 		String consulta = "SELECT bepblo.* FROM TBEP_BLOQUESBAREMACION bepblo"
 				+ " INNER JOIN TBEP_APARTADOSBAREMACION bepapa"
 				+ " ON bepapa.CODNUM = bepblo.CODNUM"
 				+ " WHERE bepblo.BEPAPA_CODNUM = ? ";
 		
-		dataTable.setOrderColumn(ORDER_COLUMN_INDEX_BLOQUES_CODIGO, "bepblo.CODIGO");
-		dataTable.setOrderColumn(ORDER_COLUMN_INDEX_BLOQUES_NOMBRE, "bepblo.NOMBRE");
-		dataTable.setOrderColumn(ORDER_COLUMN_INDEX_BLOQUES_ACTIVO, "bepblo.FLGACTIVO");
+		dataTable.setColumn(ORDER_COLUMN_INDEX_BLOQUES_CODIGO, "bepblo.CODIGO");
+		dataTable.setColumn(ORDER_COLUMN_INDEX_BLOQUES_NOMBRE, "bepblo.NOMBRE");
+		dataTable.setColumn(ORDER_COLUMN_INDEX_BLOQUES_ACTIVO, "bepblo.FLGACTIVO");
 		dataTable.setQuery(consulta);
 				
 		try (Connection conexion = ConexionUvirtual.obtenerInstancia();
@@ -700,23 +700,23 @@ public class ModeloBaremacion {
 	 * @throws SQLException en caso de error de base de datos .
 	 * @throws UVException error si no existe la area .
 	 */
-	public DataTable<ItemBaremacion> listadoItemsBaremacionDatatable(Map<String, String[]> params, Integer bloque) throws SQLException, UVException {
+	public BolsaEmpleoDataTable<ItemBaremacion> listadoItemsBaremacionDatatable(Map<String, String[]> params, Integer bloque) throws SQLException, UVException {
 		
 		if (bloque == null) {
 			throw new UVException("No se pueden listar ítems sin el id del bloque");
 		}
 		
 		List<ItemBaremacion> items = new ArrayList<>();
-		DataTable<ItemBaremacion> dataTable = new DataTable<ItemBaremacion>(params);
+		BolsaEmpleoDataTable<ItemBaremacion> dataTable = new BolsaEmpleoDataTable<ItemBaremacion>(params);
 		
 		String consulta = "SELECT bepite.* FROM TBEP_ITEMSBAREMACION bepite"
 				+ " INNER JOIN TBEP_BLOQUESBAREMACION bepblo"
 				+ " ON bepblo.CODNUM = bepite.CODNUM"
 				+ " WHERE bepite.BEPBLO_CODNUM = ? ";
 		
-		dataTable.setOrderColumn(ORDER_COLUMN_INDEX_ITEMS_CODIGO, "bepite.CODIGO");
-		dataTable.setOrderColumn(ORDER_COLUMN_INDEX_ITEMS_NOMBRE, "bepite.NOMBRE");
-		dataTable.setOrderColumn(ORDER_COLUMN_INDEX_ITEMS_ACTIVO, "bepite.FLGACTIVO");
+		dataTable.setColumn(ORDER_COLUMN_INDEX_ITEMS_CODIGO, "bepite.CODIGO");
+		dataTable.setColumn(ORDER_COLUMN_INDEX_ITEMS_NOMBRE, "bepite.NOMBRE");
+		dataTable.setColumn(ORDER_COLUMN_INDEX_ITEMS_ACTIVO, "bepite.FLGACTIVO");
 		dataTable.setQuery(consulta);
 				
 		try (Connection conexion = ConexionUvirtual.obtenerInstancia();

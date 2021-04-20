@@ -10,7 +10,7 @@ import java.util.Map;
 import es.ujaen.uvirtual.beans.uvirtual.bolsaempleo.Merito;
 import es.ujaen.uvirtual.modelo.conexion.ConexionUvirtual;
 import es.ujaen.uvirtual.utilidades.BolsaEmpleoUtils;
-import es.ujaen.uvirtual.utilidades.DataTable;
+import es.ujaen.uvirtual.utilidades.BolsaEmpleoDataTable;
 import es.ujaen.uvirtual.utilidades.UVException;
 
 /**
@@ -24,6 +24,7 @@ public class ModeloMerito {
 	public static final int ORDER_COLUMN_INDEX_DESCRIPCION = 4;
 	public static final int ORDER_COLUMN_INDEX_VALOR = 5;
 	public static final int ORDER_COLUMN_INDEX_OBSERVACION = 6;
+	public static final int ORDER_COLUMN_INDEX_FICHERO = 7;
 	
 	/** Consulta méritos en BBDD y los devuelve .
 	 * @param id para devolver un mérito .
@@ -153,14 +154,14 @@ public class ModeloMerito {
 	 * @throws SQLException en caso de error de base de datos .
 	 * @throws UVException error si no existe titulación .
 	 */
-	public DataTable<Merito> listaMeritosDatatable(Map<String, String[]> params, Integer usuario) throws SQLException, UVException {
+	public BolsaEmpleoDataTable<Merito> listaMeritosDatatable(Map<String, String[]> params, Integer usuario) throws SQLException, UVException {
 		
 		if (usuario == null) {
 			throw new UVException("No se pueden listar méritos sin el id del usuario");
 		}
 		
 		List<Merito> meritos = new ArrayList<>();
-		DataTable<Merito> dataTable = new DataTable<Merito>(params);
+		BolsaEmpleoDataTable<Merito> dataTable = new BolsaEmpleoDataTable<Merito>(params);
 		
 		String consulta = "SELECT bepmer.*, bepblo.BEPAPA_CODNUM FROM tbep_meritos bepmer"
 				+ " INNER JOIN tbep_itemsbaremacion bepite"
@@ -169,12 +170,13 @@ public class ModeloMerito {
 				+ " ON bepblo.CODNUM = bepite.BEPBLO_CODNUM"
 				+ " WHERE bepmer.BEPUSU_CODNUM = ? ";
 		
-		dataTable.setOrderColumn(ORDER_COLUMN_INDEX_ID, "bepmer.CODNUM");
-		dataTable.setOrderColumn(ORDER_COLUMN_INDEX_APARTADO, "bepblo.BEPAPA_CODNUM");
-		dataTable.setOrderColumn(ORDER_COLUMN_INDEX_ITEM, "bepmer.BEPITE_CODNUM");
-		dataTable.setOrderColumn(ORDER_COLUMN_INDEX_DESCRIPCION, "bepmer.DESCRIPCION");
-		dataTable.setOrderColumn(ORDER_COLUMN_INDEX_VALOR, "bepmer.VALOR");
-		dataTable.setOrderColumn(ORDER_COLUMN_INDEX_OBSERVACION, "bepmer.OBSERVACION");
+		dataTable.setColumn(ORDER_COLUMN_INDEX_ID, "bepmer.CODNUM");
+		dataTable.setColumn(ORDER_COLUMN_INDEX_APARTADO, "bepblo.BEPAPA_CODNUM");
+		dataTable.setColumn(ORDER_COLUMN_INDEX_ITEM, "bepmer.BEPITE_CODNUM");
+		dataTable.setColumn(ORDER_COLUMN_INDEX_DESCRIPCION, "bepmer.DESCRIPCION");
+		dataTable.setColumn(ORDER_COLUMN_INDEX_VALOR, "bepmer.VALOR");
+		dataTable.setColumn(ORDER_COLUMN_INDEX_OBSERVACION, "bepmer.OBSERVACION");
+		dataTable.setColumn(ORDER_COLUMN_INDEX_FICHERO, "bepmer.ARCHIVO");
 		dataTable.setQuery(consulta);
 				
 		try (Connection conexion = ConexionUvirtual.obtenerInstancia();

@@ -23,7 +23,7 @@ import com.google.gson.reflect.TypeToken;
 
 import es.ujaen.uvirtual.beans.uvirtual.bolsaempleo.UsuarioBolsaEmpleo;
 import es.ujaen.uvirtual.controlador.infadministrativa.bolsaempleo.ControladorUsuarioBolsaEmpleo;
-import es.ujaen.uvirtual.utilidades.DataTable;
+import es.ujaen.uvirtual.utilidades.BolsaEmpleoDataTable;
 
 /** Clase para probar configuracion.usuarios BEP .
  * @author fcampos
@@ -116,8 +116,8 @@ public class TestBEPUsuariosBolsaEmpleo {
 		String u = "http://localhost:8080/srv/es/informacionadministrativa/bolsaempleo/configuracion/usuarios?a=" + ControladorUsuarioBolsaEmpleo.ACCION_DATATABLE_USUARIOS;
 		String json = DriverUvBEP.getAjaxRequestJson(u);
 		
-		Type typeDt = new TypeToken<DataTable<UsuarioBolsaEmpleo>>() { }.getType();
-		DataTable<UsuarioBolsaEmpleo> dt = new Gson().fromJson(json, typeDt);
+		Type typeDt = new TypeToken<BolsaEmpleoDataTable<UsuarioBolsaEmpleo>>() { }.getType();
+		BolsaEmpleoDataTable<UsuarioBolsaEmpleo> dt = new Gson().fromJson(json, typeDt);
 		
 		assertTrue(dt.getData().size() > 0);
 		

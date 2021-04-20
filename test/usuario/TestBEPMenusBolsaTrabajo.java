@@ -23,7 +23,7 @@ import com.google.gson.reflect.TypeToken;
 
 import es.ujaen.uvirtual.beans.uvirtual.bolsaempleo.Bolsa;
 import es.ujaen.uvirtual.controlador.infadministrativa.bolsaempleo.ControladorBolsas;
-import es.ujaen.uvirtual.utilidades.DataTable;
+import es.ujaen.uvirtual.utilidades.BolsaEmpleoDataTable;
 
 /** Clase para probar solicitudCrud.
  * @author usig
@@ -147,8 +147,8 @@ public class TestBEPMenusBolsaTrabajo {
 		String url = "http://localhost:8080/srv/es/informacionadministrativa/bolsaempleo/bolsas?a=" + ControladorBolsas.ACCION_DATATABLE;
 		String json = DriverUvBEP.getAjaxRequestJson(url);
 		
-		Type typeDt = new TypeToken<DataTable<Bolsa>>() { }.getType();
-		DataTable<Bolsa> dt = new Gson().fromJson(json, typeDt);
+		Type typeDt = new TypeToken<BolsaEmpleoDataTable<Bolsa>>() { }.getType();
+		BolsaEmpleoDataTable<Bolsa> dt = new Gson().fromJson(json, typeDt);
 		
 		assertTrue(dt.getData().size() > 0);
 		

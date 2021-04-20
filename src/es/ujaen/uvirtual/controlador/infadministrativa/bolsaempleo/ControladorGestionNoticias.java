@@ -20,7 +20,7 @@ import es.ujaen.uvirtual.beans.uvirtual.bolsaempleo.Noticia;
 import es.ujaen.uvirtual.beans.vistas.uvirtual.bolsaempleo.VistaNoticias;
 import es.ujaen.uvirtual.modelo.bolsaempleo.ModeloNoticia;
 import es.ujaen.uvirtual.modelo.bolsaempleo.ModeloUsuarioBolsaEmpleo;
-import es.ujaen.uvirtual.utilidades.DataTable;
+import es.ujaen.uvirtual.utilidades.BolsaEmpleoDataTable;
 import es.ujaen.uvirtual.utilidades.EscapaHTML;
 import es.ujaen.uvirtual.utilidades.Formateador;
 import es.ujaen.uvirtual.utilidades.UVException;
@@ -235,9 +235,9 @@ public class ControladorGestionNoticias extends HttpServlet {
 		
 		try (PrintWriter writer = response.getWriter()) {
 			try {
-				DataTable<Noticia> dataTable = modelo.listaNoticiasDatatable(request.getParameterMap());
+				BolsaEmpleoDataTable<Noticia> dataTable = modelo.listaNoticiasDatatable(request.getParameterMap());
 				bean.setDatatableNoticias(dataTable);
-				Gson gson = new GsonBuilder().setDateFormat("dd/M/yyyy").setExclusionStrategies(DataTable.GSONEXCLUSIONSTRATEGY).create();
+				Gson gson = new GsonBuilder().setDateFormat("dd/M/yyyy").setExclusionStrategies(BolsaEmpleoDataTable.GSONEXCLUSIONSTRATEGY).create();
 				writer.write(gson.toJson(dataTable));
 			} catch (UVException ex) {
 				CodigoDescripcion mensaje = new CodigoDescripcion("error", ex.getMessage());
