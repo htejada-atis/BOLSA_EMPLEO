@@ -45,8 +45,8 @@ VistaNoticias bean = (VistaNoticias) uvdatos.getVistas().get(VistaNoticias.class
 			<th scope="col" style="width:12%">Fecha</th>
 			<th scope="col"	style="width:30%">Texto</th>
 			<th scope="col" style="width:30%">Enlace</th>
-			<th scope="col" style="width:10%">Pública</th>
-			<th scope="col" style="width:10%">Activa</th>
+			<th scope="col" class="center" style="width:10%">Pública</th>
+			<th scope="col" class="center" style="width:10%">Activa</th>
 			<th scope="col" style="width:10%"></th>
 		</tr>
 		<tbody>				
@@ -81,18 +81,18 @@ VistaNoticias bean = (VistaNoticias) uvdatos.getVistas().get(VistaNoticias.class
 		        {'data': 'enlace', 'order': {'active': false}, 'filter': true, 'class': 'overflow-ellipsis', 'render': function(row) { return "<a href='" +row.enlace +"' target='_blank'>" +row.enlace +"</a>"; }},
 		        {'data': 'publica', 'order': {'active': false}, 'filter': {'type': 'selectBoolean'}, 'render': function(row) {
 	        		if(row.publica){
-	        			return "<div class='circle-true'></div>"; 
+	        			return "<div title='Pública' class='circle-true'></div>"; 
 	        		}
 	        		else{
-	        			return "<div class='circle-false'></div>"; 
+	        			return "<div title='Privada' class='circle-false'></div>"; 
 	        		}
 	        	}},
 		        {'data': 'activa', 'render': function(row) {
 	        		if(row.activa){
-	        			return "<div class='circle-true'></div>"; 
+	        			return "<div title='Activa' class='circle-true'></div>"; 
 	        		}
 	        		else{
-	        			return "<div class='circle-false'></div>"; 
+	        			return "<div title='Desactivada' class='circle-false'></div>"; 
 	        		}
 	        	}},
 		        {'data': 'codnum', 'buttons': [{'label': 'Editar', 'onClick': function(row) {

@@ -28,7 +28,7 @@ VistaAreasBaremar bean = (VistaAreasBaremar) uvdatos.getVistas().get(VistaAreasB
 			<th scope="col" style="width:5%" title="Id de la area">Id</th>
 			<th scope="col" style="width:25%" title="Código de area">Código</th>
 			<th scope="col" style="width:65%">Area</th>
-			<th scope="col" style="width:15%">Baremable</th>			
+			<th scope="col" class="center" style="width:15%">Baremable</th>			
 		</tr>
 		<tbody>				
 		</tbody>
@@ -55,10 +55,10 @@ $(document).ready(function() {
 	        {'data': 'area.descripcion'},
 	        {'data': 'baremable', 'render': function(row) {
         		if(row.baremable){
-        			return "<div class='circle-true'></div>"; 
+        			return "<div title='Baremable' class='circle-true'></div>"; 
         		}
         		else{
-        			return "<div class='circle-false'></div>"; 
+        			return "<div title='No Baremable' class='circle-false'></div>"; 
         		}
         	}},
 	    ],

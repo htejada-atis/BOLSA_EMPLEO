@@ -119,18 +119,13 @@ public class ControladorItemsBaremacion extends HttpServlet {
 				
 		ModeloUsuarioBolsaEmpleo modelo = new ModeloUsuarioBolsaEmpleo();
 		
-		try {
-			anonimo = !modelo.checkUser(datos);
-		} catch (SQLException | UVException e) {
-			bean.getMensajesDeError().add(e.getMessage());
-		}
-		
 		String nombreAccion = EscapaHTML.ajustaCodificacion(request.getParameter(PARAM_ACCION));
 		if (nombreAccion == null) {
 			nombreAccion = ACCION_LISTAR;
 		}
 		
 		try {
+			anonimo = !modelo.checkUser(datos);
 			switch (nombreAccion) {
 				case ACCION_ACTIVAR_APARTADO:
 					actualizaActivoApartado(bean, request, response, true);
@@ -190,7 +185,7 @@ public class ControladorItemsBaremacion extends HttpServlet {
 			bean.getMensajesDeError().add(e.toString());
 		} catch (UVException e) {
 			LOGGER.log(Level.WARNING, e.toString());
-			bean.getMensajesDeError().add(e.toString());
+			bean.getMensajesDeError().add(e.getMessage());
 		} finally {
 			datos.getVistas().put(bean.getClass().getName(), bean);
 			datos.getFicherosJSP().add(bean.getVista());

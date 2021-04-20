@@ -35,7 +35,7 @@ VistaFicheros bean = (VistaFicheros) uvdatos.getVistas().get(VistaFicheros.class
 			<th scope="col"	style="width:20%">Nombre</th>
 			<th scope="col"	style="width:25%">Título</th>
 			<th scope="col" style="width:35%">Ruta del fichero</th>
-			<th scope="col" style="width:10%">Público</th>
+			<th scope="col" class="center" style="width:10%">Público</th>
 			<th scope="col" style="width:10%"></th>
 		</tr>
 		<tbody>				
@@ -75,10 +75,10 @@ VistaFicheros bean = (VistaFicheros) uvdatos.getVistas().get(VistaFicheros.class
 		        },
 		        {'data': 'publico', 'filter': {'type': 'selectBoolean'}, 'order': {'active': false}, 'render': function(row) {
 	        		if(row.publico){
-	        			return "<div class='circle-true'></div>"; 
+	        			return "<div title='Público' class='circle-true'></div>"; 
 	        		}
 	        		else{
-	        			return "<div class='circle-false'></div>"; 
+	        			return "<div title='Privado' class='circle-false'></div>"; 
 	        		}
 	        	}},
 		        {'data': 'codnum', 'buttons': [{'label': '<label class="tooltiptext">Copiar enlace</label>Copiar', 'class': 'tooltip', 'onClick': function(row) {

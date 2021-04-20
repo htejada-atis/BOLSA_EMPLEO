@@ -40,7 +40,7 @@ VistaUsuarioBolsaEmpleo bean = (VistaUsuarioBolsaEmpleo) uvdatos.getVistas().get
 			<th scope="col" style="width:30%" title="Nombre y apellidos">Nombre y Apellidos</th>
 			<th scope="col" style="width:35%" title="Email del usuario">Email</th>
 			<th scope="col" style="width:20%" title="Rol del usuario" class="rol">Rol</th>
-			<th scope="col" style="width:5%" title="Lista del usuario">Lista</th>
+			<th scope="col" style="width:5%" class="center" title="Lista del usuario">Lista</th>
 			<th scope="col" style="width:10%"></th>
 		</tr>
 		<tbody>				
@@ -63,7 +63,7 @@ VistaUsuarioBolsaEmpleo bean = (VistaUsuarioBolsaEmpleo) uvdatos.getVistas().get
 			<th scope="col" style="width:30%" title="Nombre y apellidos">Nombre y Apellidos</th>
 			<th scope="col" style="width:35%" title="Email del usuario">Email</th>
 			<th scope="col" style="width:20%" title="Rol del usuario" class="rol">Rol</th>
-			<th scope="col" style="width:5%" title="Lista del usuario">Lista</th>
+			<th scope="col" style="width:5%" class="center" title="Lista del usuario">Lista</th>
 			<th scope="col" style="width:10%"></th>
 		</tr>
 		<tbody>				
@@ -87,7 +87,7 @@ VistaUsuarioBolsaEmpleo bean = (VistaUsuarioBolsaEmpleo) uvdatos.getVistas().get
 			<th scope="col" style="width:35%" title="Email del usuario">Email</th>
 			<th scope="col" style="width:20%" title="Rol del usuario" class="rol">Rol</th>
 			<th scope="col" style="width:10%" title="Razon exclusion del usuario">Razon Exclusion</th>
-			<th scope="col" style="width:5%" title="Lista del usuario">Lista</th>
+			<th scope="col" style="width:5%" class="center" title="Lista del usuario">Lista</th>
 			<th scope="col" style="width:10%"></th>
 		</tr>
 		<tbody>				
@@ -127,10 +127,10 @@ $(document).ready(function() {
 	        {'data': 'rol.descripcion'},
 	        {'data': 'listaDist', 'render': function(row) {
 	        	if(row.listaDist==true){
-        			return "<div class='circle-true'></div>"; 
+        			return "<div title='En lista distribución' class='circle-true'></div>"; 
         		}
         		else{
-        			return "<div class='circle-false'></div>"; 
+        			return "<div title='Excluido de lista distribución' class='circle-false'></div>"; 
         		}
         	}},
         	{'data': 'codnum', 'buttons': [{'label': 'Editar', 'onClick': function(row) {

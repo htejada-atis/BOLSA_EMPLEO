@@ -96,17 +96,12 @@ public class ControladorInicio extends HttpServlet {
 		VistaInicio bean = new VistaInicio();
 		ModeloUsuarioBolsaEmpleo modelo = new ModeloUsuarioBolsaEmpleo();
 		
-		try {
-			anonimo = !modelo.checkUser(datos);
-		} catch (SQLException | UVException e) {
-			bean.getMensajesDeError().add(e.getMessage());
-		}
-		
 		String nombreAccion = EscapaHTML.ajustaCodificacion(request.getParameter(PARAM_ACCION));
 		if (nombreAccion == null || nombreAccion.isEmpty()) {
 			nombreAccion = ACCION_LISTAR_NOTICIAS;
 		}
 		try {
+			anonimo = !modelo.checkUser(datos);
 			switch (nombreAccion) {
 				case ACCION_AYUDA:
 					bean.setVista(RUTA_BEP_INICIO + "ayuda.jsp");
@@ -131,7 +126,7 @@ public class ControladorInicio extends HttpServlet {
 			bean.getMensajesDeError().add("Error al acceder a la base de datos");
 		} catch (UVException e) {
 			LOGGER.log(Level.WARNING, e.toString());
-			bean.getMensajesDeError().add(e.toString());
+			bean.getMensajesDeError().add(e.getMessage());
 		} finally {
 			datos.getVistas().put(bean.getClass().getName(), bean);
 			datos.getFicherosJSP().add(bean.getVista());
