@@ -91,17 +91,12 @@ public class ControladorGestionNoticias extends HttpServlet {
 		bean.setVista(RUTA_BEP_NOTICIAS + "indice.jsp");
 		ModeloUsuarioBolsaEmpleo modelo = new ModeloUsuarioBolsaEmpleo();
 
-		try {
-			anonimo = !modelo.checkUser(datos);
-		} catch (SQLException | UVException e) {
-			bean.getMensajesDeError().add(e.getMessage());
-		}
-		
 		String nombreAccion = EscapaHTML.ajustaCodificacion(request.getParameter(PARAM_ACCION));
 		if (nombreAccion == null) {
 			nombreAccion = ACCION_LISTAR_NOTICIAS;
 		}
 		try {
+			anonimo = !modelo.checkUser(datos);
 			switch (nombreAccion) {
 				case ACCION_AGREGAR_NOTICIA:
 					agregarNoticia(bean, request, response);
@@ -118,7 +113,7 @@ public class ControladorGestionNoticias extends HttpServlet {
 			}
 		} catch (UVException e) {
 			LOGGER.log(Level.WARNING, e.toString());
-			bean.getMensajesDeError().add(e.toString());
+			bean.getMensajesDeError().add(e.getMessage());
 		} catch (SQLException e) {
 			bean.getMensajesDeError().add("Error al acceder a la base de datos");
 		} finally {

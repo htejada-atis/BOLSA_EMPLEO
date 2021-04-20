@@ -17,6 +17,9 @@ table.bluetable.bolsaempleo {
 table.bluetable.bolsaempleo th {
 	padding-left: 5px;
 }
+table.bluetable.bolsaempleo th.center {
+	text-align: center;
+}
 table.bluetable.bolsaempleo button.btn {
 	border: none; /* Remove borders */
 	font-size: 11px; /* Set a font size */
