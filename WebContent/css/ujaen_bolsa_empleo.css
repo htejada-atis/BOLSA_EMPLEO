@@ -49,6 +49,24 @@ table.bluetable.bolsaempleo .selected {
 table.bluetable.bolsaempleo .clickable:hover {
 	cursor: pointer;
 }
+/* datatable header */
+table.bluetable.bolsaempleo caption {
+	background-color:#B9C9FE;
+	font-size: 13px;
+	color:#003399;
+	padding:0.5rem;
+}
+table.bluetable.bolsaempleo .filterable input {
+	display: block;
+	width: 100%;
+	max-width: 150px;
+}
+/* datatable buttons */
+table.bluetable.bolsaempleo .btns .btn {
+	width: 50px;
+	border: 1px solid #83a8ff;
+	margin-bottom: 1px;
+}
 
 /* overflow */
 

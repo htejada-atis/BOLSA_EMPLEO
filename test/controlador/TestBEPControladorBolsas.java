@@ -17,7 +17,7 @@ import controlador.implementacion.RespuestaHttp;
 import es.ujaen.uvirtual.beans.vistas.uvirtual.bolsaempleo.VistaEstadoBolsas;
 import es.ujaen.uvirtual.controlador.infadministrativa.bolsaempleo.ControladorBolsas;
 import es.ujaen.uvirtual.modelo.bolsaempleo.ModeloBolsa;
-import es.ujaen.uvirtual.utilidades.DataTable;
+import es.ujaen.uvirtual.utilidades.BolsaEmpleoDataTable;
 
 
 /** test controlador convocatoria crud.
@@ -226,14 +226,14 @@ public class TestBEPControladorBolsas {
 	public void testA12() throws SQLException, ServletException, IOException {
 		PeticionHttp peticion = UtilsTestDocentia.peticionAutenticada();
 		peticion.setParameter(ControladorBolsas.PARAM_ACCION, ControladorBolsas.ACCION_DATATABLE);
-		peticion.setParameter(DataTable.PARAM_ORDER_BY, "ddd");
+		peticion.setParameter(BolsaEmpleoDataTable.PARAM_ORDER_BY, "ddd");
     	RespuestaHttp respuesta = new RespuestaHttp();
     	ControladorBolsas controlador = new ControladorBolsas();
     	controlador.doGet(peticion, respuesta);
     	VistaEstadoBolsas bean = (VistaEstadoBolsas) peticion.getUVDatos().getVistas().get(VistaEstadoBolsas.class.getName());
     	assertNotEquals(0, bean.getMensajesDeError().size());
 		assertEquals(0, bean.getMensajesDeAdvertencia().size());
-		assertEquals(DataTable.ERROR_MSG_PARAMETRO_NO_VALIDO, bean.getMensajesDeError().get(0));		
+		assertEquals(BolsaEmpleoDataTable.ERROR_MSG_PARAMETRO_NO_VALIDO, bean.getMensajesDeError().get(0));		
 	}
 	
 	/** Ids de bolsas no válidos.

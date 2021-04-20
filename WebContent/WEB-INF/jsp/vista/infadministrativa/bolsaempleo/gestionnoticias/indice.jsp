@@ -12,6 +12,15 @@ VistaNoticias bean = (VistaNoticias) uvdatos.getVistas().get(VistaNoticias.class
 
 <div class="bolsa-empleo">
 
+	<% if (session.getAttribute(ControladorGestionNoticias.MENSAJE_ENVIADO) != null) { %>
+		<div id="exito" class="success">
+			<%= session.getAttribute(ControladorGestionNoticias.MENSAJE_ENVIADO) %>
+		</div>
+	<% 
+			session.removeAttribute(ControladorGestionNoticias.MENSAJE_ENVIADO);
+		} 
+	%>
+
 	<% if (bean.getMensajesDeExito().size() > 0) { %>
 		<div id="exito" class="success">
 			<%= bean.formatearMensajesDeExito() %>
@@ -60,16 +69,17 @@ VistaNoticias bean = (VistaNoticias) uvdatos.getVistas().get(VistaNoticias.class
 			Atis.sendForm("<%= request.getRequestURI() %>", {'a': '<%= ControladorGestionNoticias.ACCION_AGREGAR_NOTICIA %>'});
 		});
 
-		var table = new DataTable('#table_noticias_insertadas', {
+		var table = new Atis.DataTable('#table_noticias_insertadas', {
 		    "ajax": { url: "<%= ControladorGestionNoticias.URL_PATTERN_AJAX %>" },
 		    "pageSize": 10,
+		    "filterable": true,
 		    "columns": [
-		    	{'data': 'fecha'},
-		    	{'data': 'texto', 'render': function(row) {
+		    	{'data': 'fecha', 'filter': {'type': 'date'}},
+		    	{'data': 'texto', 'filter': true, 'render': function(row) {
 		    		return "<div class='overflow-auto'>" +row.texto +"</div>";
 		    	}},
-		        {'data': 'enlace', 'class': 'overflow-ellipsis', 'render': function(row) { return "<a href='" +row.enlace +"' target='_blank'>" +row.enlace +"</a>"; }},
-		        {'data': 'publica', 'render': function(row) {
+		        {'data': 'enlace', 'order': {'active': false}, 'filter': true, 'class': 'overflow-ellipsis', 'render': function(row) { return "<a href='" +row.enlace +"' target='_blank'>" +row.enlace +"</a>"; }},
+		        {'data': 'publica', 'order': {'active': false}, 'filter': {'type': 'selectBoolean'}, 'render': function(row) {
 	        		if(row.publica){
 	        			return "<div class='circle-true'></div>"; 
 	        		}
@@ -89,7 +99,8 @@ VistaNoticias bean = (VistaNoticias) uvdatos.getVistas().get(VistaNoticias.class
 			        		var params = {'a': '<%= ControladorGestionNoticias.ACCION_EDITAR_NOTICIA %>', 'id': row.codNum};
 			        		Atis.sendForm("<%= request.getRequestURI() %>", params);
 			        	}
-			        }, {'label': function(row) { return row.activa ? "Borrar" : "Restaurar"; }, 'onClick': function(row) {
+			        }, {'label': function(row) { return row.activa ? "Borrar" : "Restaurar"; }, 
+			        	'title':  function(row) { return row.activa ? "Borrar noticia" : "Restaurar noticia"; }, 'onClick': function(row) {
 			        	var mensaje = "¿Desea borrar la noticia seleccionada?";
 			        	var titulo = "Borrar noticia";
 			        	if(!row.activa) {
@@ -113,10 +124,6 @@ VistaNoticias bean = (VistaNoticias) uvdatos.getVistas().get(VistaNoticias.class
 			        } }]}		        
 			    ],
 			});
-			
-			setInterval(function() {
-				//console.log(table.getChecked())
-			}, 5000)
 		});
 	
 	</script>

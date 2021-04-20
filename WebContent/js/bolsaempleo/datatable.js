@@ -15,8 +15,12 @@ function DataTable(id, config) {
         'page': 0,
         'pageSize': Atis.getProp(config, 'pageSize', 10),
         'orderBy': null,
-        'orderDirection': 'asc'
+        'orderDirection': 'asc',
+        'filter': ''
     };
+    this.pageSizeOptions = Atis.getProp(config, 'pageSizeOptions', [5,10,20,100]);
+    this.filterParams = {}
+    this.title = Atis.getProp(config, 'title', undefined);
     this.lastResponse = null;
     this.checked = {};
 
@@ -39,6 +43,10 @@ function DataTable(id, config) {
     this.setParam = function(key, value) {
     	self.params[key] = value;
     };
+
+    this.setTitle = function(tit) {
+        self.title = tit;
+    };
         
     this.loading = function(on) {
     	if (on) {
@@ -52,10 +60,15 @@ function DataTable(id, config) {
     
     this.parseResponse = function(response) {
     	self.lastResponse = response;
-    	
+
         self.loading(false);
     	self.checkUncheckAll(false);
     	self.renderFooter();
+        self.renderHeader();
+    	
+    	// evento before render
+    	var beforeRender = Atis.getProp(config, 'beforeRender');
+        beforeRender && beforeRender(self);
     	
         // limpiamos
         $('tr', self.tbody).empty();
@@ -67,7 +80,11 @@ function DataTable(id, config) {
     	} else {
     		// sin resultados
     		$(self.tbody).append('<tr><td colSpan="'+ self.config.columns.length + '">Sin resultados</tr>');	
-        }    	
+        }   
+
+        // eventos after render
+        var afterRender = Atis.getProp(config, 'afterRender');
+        afterRender && afterRender(self);
     }
 
     this.errorResponse = function(err) {
@@ -103,7 +120,7 @@ function DataTable(id, config) {
     		$(tr).append(td);
         });
     	
-    	$(self.tbody).append(tr); 
+    	$(self.tbody).append(tr);
     };
     
     this.renderCol = function(row, columnDef) {
@@ -119,7 +136,8 @@ function DataTable(id, config) {
     		
     		columnDef.buttons.forEach(function(buttonDef) {
                 var label = isFunction(buttonDef.label) ? buttonDef.label(row) : buttonDef.label;
-    			var btn = $('<button class="btn" type="button">'+label+'</button>');
+                var title = isFunction(buttonDef.title) ? buttonDef.title(row) : buttonDef.title;
+    			var btn = $('<button class="btn"' + (title ? 'title="' + title + '"' : '') + ' type="button">'+label+'</button>');
     			
     			if (buttonDef.hasOwnProperty('class')) {
     				$(btn).addClass(buttonDef.class);
@@ -133,11 +151,12 @@ function DataTable(id, config) {
     	}
     	
     	if (columnDef.hasOwnProperty('selectable') && columnDef.selectable) {
-    		var check = $('<input type="checkbox"/>')
+    		var check = $('<input type="checkbox"/>');
     		
     		$(check).on('change', function() {
     			self.checked[value] = this.checked;
-    			self.renderFooter();    			
+                this.checked ? $(this).parent().parent().addClass("selected") : $(this).parent().parent().removeClass("selected");
+    			self.renderFooter();
     		});
     		
     		return check;
@@ -147,7 +166,7 @@ function DataTable(id, config) {
     };
     
     this.renderFooter = function() {
-    	if (!self.lastResponse) { return ''; }    	
+    	if (!self.lastResponse) { return ''; }
     	
         // texto total
         var selected = self.getCheckedItems();  
@@ -172,13 +191,29 @@ function DataTable(id, config) {
         $(pagination).append(btnNext);
         $(pagination).append(btnLast);
 
+        // page size select
+        var selectSize = $('<select></select>');
+
+        self.pageSizeOptions.forEach(function(option) {
+            var option = $('<option ' + (self.params.pageSize == option ? 'selected' : '') + '>' + option + '</option>');
+            selectSize.append(option);
+        });
+
+        selectSize.on('change', function() {
+            self.params.pageSize = this.value;
+            self.refresh();
+        });
+
+        var pageSize = $('<span class="page-size"></span>');
+        $(pageSize).append(selectSize);
+
         // acciones
         var actions = $('<span class="actions"></span>');
         if (self.config.actions) {
             for (var i = 0; i < self.config.actions.length; i++) {
             	var action = self.config.actions[i];
             	if (action.showWhenSelected == null || action.showWhenSelected == (self.config.selected > 0)) {
-	            	var btn = $('<button class="btn" type="button">' + action.label + '</button>');
+	            	var btn = $('<button class="btn"' + (action.title ? 'title="' + action.title + '"' : '') + ' type="button">' + action.label + '</button>');
 	            	
 	            	if (self.config.selected) {
 	            		selected = self.config.selected;
@@ -192,8 +227,17 @@ function DataTable(id, config) {
 
         $('th', self.tfoot).empty();
     	$('th', self.tfoot).append($(pagination));
+        $('th', self.tfoot).append($(pageSize));
         $('th', self.tfoot).append($(actions));
         $('th', self.tfoot).append($(textoTotal));
+    };
+
+    this.renderHeader = function(row) {
+        if (self.title) {
+            var header = $('<caption>' + self.title + '</caption>');
+            $(self.node).find('caption').remove();
+            $(self.node).prepend(header);
+        }
     };
     
     this.prepareTable = function() {
@@ -211,7 +255,7 @@ function DataTable(id, config) {
     	}
 
         self.config.columns.forEach(function(columnDef, index) {
-            var orderable = Atis.getProp(columnDef, 'orderable', true);
+            var order = Atis.getProp(columnDef, 'order', {'active': true});
             var selectable = Atis.getProp(columnDef, 'selectable');
             var buttons = Atis.getProp(columnDef, 'buttons');
 
@@ -221,11 +265,60 @@ function DataTable(id, config) {
                 return;
             }
             
-            if (orderable) {
+            if (order.active) {
                 $(columnDef.node).css('cursor', 'pointer');
                 $(columnDef.node).on('click', function() { self.orderBy(columnDef, index); });
             }
-        })
+        });
+
+        var filterable = Atis.getProp(self.config, 'filterable', false);
+
+        if (filterable && !$('tbody', this.node).find('.filterable').length) {
+            var tr = $('<tr class="filterable"></tr>');
+            self.config.columns.forEach(function(columnDef, index) {
+                var th = $('<th></th>');
+
+                if (columnDef.filter) {
+                    var filter;
+                    var type = columnDef.filter.type ? columnDef.filter.type : 'text';
+                    var name = '" name="' + columnDef.data + '"';
+                    switch(type) {
+                        case 'selectBoolean':
+                            filter = $('<select ' + name + '></select>');
+                            filter.append($('<option value="0">-----</option>'));
+                            filter.append($('<option>' + true + '</option>'));
+                            filter.append($('<option>' + false + '</option>'));
+                            break;
+                        case 'select':
+                            filter = $('<select ' + name + '></select>');
+                            filter.append($('<option value="0">----------</option>'));
+                            filter.options.forEach(function (option) {
+                                filter.append($('<option>' + option + '</option>'));
+                            });
+                            break;
+                        default:
+                            filter = $('<input type="' + type + name + ' autocomplete="off" />');
+                            $(filter).bind("enterKey", e => self.filterBy(index, this.value));
+                            break;
+                    }
+
+                    $(filter).on('change', function() {
+                        self.filterBy(index, this.value);
+                    });
+
+                    th.append(filter);
+                }
+
+                tr.append(th);
+            });
+
+            $('tbody', this.node).first().children().eq(1).remove();
+            $('tbody', this.node).first().append(tr);
+            $('tbody', this.node).find('input[type="date"]').each(function() {
+               	this.type = 'text';
+                $(this).datepicker();
+            });
+        }
     };
     
     this.checkUncheckAll = function(check) {
@@ -236,6 +329,8 @@ function DataTable(id, config) {
 				
 				$("input[type='checkbox']", self.tbody).prop('checked', check);
 				self.checked[value] = check;
+                
+                check ? $("tr", self.tbody).addClass("selected") : $("tr", self.tbody).removeClass("selected");
 			});
 		}
 		self.renderFooter();
@@ -283,7 +378,7 @@ function DataTable(id, config) {
         self.config.columns.forEach(function(columnDef) {
             $('img.order', columnDef.node).remove();
         });
-                
+        
         if (self.params.orderBy === indexColumnDef) {
             self.params.orderDirection = self.params.orderDirection === 'asc' ? 'desc' : 'asc';
         } else {
@@ -291,11 +386,24 @@ function DataTable(id, config) {
         }
         
         self.params.orderBy = indexColumnDef;
-        $(columnDef.node).prepend('<img src="/img/iconos/' + (this.params.orderDirection === 'asc' ? 'down.png' : 'up.png') + '" class="order"/>');        
+        $(columnDef.node).prepend('<img src="/img/iconos/' + (this.params.orderDirection === 'asc' ? 'down.png' : 'up.png') + '" class="order"/>');
+        
+        self.refresh();
+    }
 
+    this.filterBy = function(indexColumnDef, value) {
+        self.filterParams[indexColumnDef] = value;
+        
+        if (value == "" || value == 0) {
+            delete self.filterParams[indexColumnDef];
+        }
+        
+        self.params.filter = JSON.stringify(self.filterParams);
         self.refresh();
     }
     
     this.prepareTable();
     this.refresh();
 }
+
+window.Atis = $.extend(window.Atis ? window.Atis : {}, {"DataTable": DataTable});

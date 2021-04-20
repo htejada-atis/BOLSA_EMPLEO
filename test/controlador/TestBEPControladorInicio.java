@@ -20,7 +20,9 @@ import es.ujaen.uvirtual.controlador.infadministrativa.bolsaempleo.ControladorIn
  */
 public class TestBEPControladorInicio {
 	private static final String MENSAJE_DOCUMENTOS_DEVUELTOS = "Debe devolver documentos";
+	private static final String MENSAJE_FICHERO_PUBLICO = "Fichero debe ser público";
 	private static final String MENSAJE_NOTICIAS_DEVUELTAS = "Debe devolver noticias";
+	private static final String MENSAJE_NOTICIA_PUBLICA = "Noticia debe ser pública";
 	private static final String MENSAJE_SIN_ERROR = "No debe devolver error";
 	private static final String MENSAJE_SIN_ADVERTENCIAS = "No debe mostrar advertencias";
 		
@@ -166,7 +168,7 @@ public class TestBEPControladorInicio {
 	 * @throws IOException si error de io
 	 */
 	@Test
-	public void testA07Obtener() throws ServletException, IOException {
+	public void testA07ObtenerDocumentos() throws ServletException, IOException {
 		VistaInicio bean = obtenerInicio(ControladorInicio.ACCION_DOCUMENTOS);
 
 		assertNotEquals(MENSAJE_DOCUMENTOS_DEVUELTOS, 0, bean.getFicheros().size());
@@ -188,19 +190,33 @@ public class TestBEPControladorInicio {
 		assertEquals(0, bean.getMensajesDeAdvertencia().size());
 	}
 	
-	/** obtener noticias con usuario anónimo .
+	/** obtener noticia con usuario anónimo .
 	 * @throws SQLException si fallo bd 
 	 * @throws IOException si error io
 	 * @throws ServletException  si error servlet
 	 */
 	@Test
-	public void testA02ObtenerNoticiasPublico() throws SQLException, ServletException, IOException {
+	public void testA09ObtenerNoticiaPublica() throws SQLException, ServletException, IOException {
 		VistaInicio bean = obtenerInicioPublico(ControladorInicio.ACCION_LISTAR_NOTICIAS);
 
 		assertNotEquals(MENSAJE_NOTICIAS_DEVUELTAS, 0, bean.getNoticias().size());
 		assertEquals(MENSAJE_SIN_ERROR, 0, bean.getMensajesDeError().size());
 		assertEquals(MENSAJE_SIN_ADVERTENCIAS, 0, bean.getMensajesDeAdvertencia().size());
-		assertNotEquals("texto no vacio", "", bean.getNoticias().get(0).getTexto());
+		assertEquals(MENSAJE_NOTICIA_PUBLICA, true, bean.getNoticias().get(0).isPublica());
+	}
+	
+	/** obtener documento con usuario anónimo .
+	 * @throws ServletException si error de servlet
+	 * @throws IOException si error de io
+	 */
+	@Test
+	public void testA07ObtenerDocumentoPublico() throws ServletException, IOException {
+		VistaInicio bean = obtenerInicioPublico(ControladorInicio.ACCION_DOCUMENTOS);
+
+		assertNotEquals(MENSAJE_DOCUMENTOS_DEVUELTOS, 0, bean.getFicheros().size());
+		assertEquals(MENSAJE_SIN_ERROR, 0, bean.getMensajesDeError().size());
+		assertEquals(MENSAJE_SIN_ADVERTENCIAS, 0, bean.getMensajesDeAdvertencia().size());
+		assertEquals(MENSAJE_FICHERO_PUBLICO, true, bean.getFicheros().get(0).isPublico());
 	}
 
 }

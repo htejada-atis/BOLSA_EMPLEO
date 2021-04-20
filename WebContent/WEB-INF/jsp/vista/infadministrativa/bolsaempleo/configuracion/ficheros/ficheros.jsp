@@ -53,25 +53,27 @@ VistaFicheros bean = (VistaFicheros) uvdatos.getVistas().get(VistaFicheros.class
 
 	$(document).ready(function() {
 		
-		var table = new DataTable('#table_ficheros', {
+		var table = new Atis.DataTable('#table_ficheros', {
 		    "ajax": { url: "<%= ControladorGestionFicheros.URL_PATTERN_AJAX %>" },
 		    "pageSize": 10,
 		    "selectable": true,
+		    "filterable": true,
+		    "title": "Ficheros",
 		    "columns": [
 		    	{'data': 'codNum', 'selectable': true},
 		        {'data': 'nombre', 'render': function(row) {
 		    		return "<div class='overflow-auto'>" +row.nombre +"</div>";
 		    	}},
-		        {'data': 'titulo', 'render': function(row) {
+		        {'data': 'titulo', 'filter': true, 'render': function(row) {
 		    		return "<div class='overflow-auto'>" +row.titulo +"</div>";
 		    	}},
-		        {'data': 'codnum', 'class': 'overflow-ellipsis', 'render': function(row) {
+		        {'data': 'codnum', 'order': {'active': false}, 'class': 'overflow-ellipsis', 'render': function(row) {
 		        	var link = "<%= ControladorGestionFicheros.URL_PATTERN_FILES_PRIVADA %>"
 		        	+ "?a=<%= ControladorGestionFicheros.ACCION_DESCARGAR_FICHERO %>&<%= ControladorGestionFicheros.PARAM_FICHERO %>=" + row.codNum;
 		        	return "<a class='consultar-fichero' href='" +link +"' target='_blank'>" +link +"</a>"; 
 		        	}
 		        },
-		        {'data': 'publico', 'render': function(row) {
+		        {'data': 'publico', 'filter': {'type': 'selectBoolean'}, 'order': {'active': false}, 'render': function(row) {
 	        		if(row.publico){
 	        			return "<div class='circle-true'></div>"; 
 	        		}
@@ -89,7 +91,7 @@ VistaFicheros bean = (VistaFicheros) uvdatos.getVistas().get(VistaFicheros.class
 			    }]}
 		    ],
 		    "actions": [
-		    	{'label': 'Eliminar', 'onClick': function(selected) {
+		    	{'label': 'Eliminar', 'title': 'Eliminar ficheros seleccionados', 'onClick': function(selected) {
 		    		if(selected.length) {
 		    			var titulo = selected.length > 1 ? "Eliminar ficheros" : "Eliminar fichero";
 		    			var mensaje = selected.length > 1 ? "¿Desea eliminar los ficheros seleccionados?" : "¿Desea eliminar el fichero seleccionado?";
@@ -107,7 +109,7 @@ VistaFicheros bean = (VistaFicheros) uvdatos.getVistas().get(VistaFicheros.class
 					    });
 		    		}
 		    	}},
-		    	{'label': 'Hacer público', 'onClick': function(selected) {
+		    	{'label': 'Hacer públicos', 'title': 'Los ficheros seleccionados serán visibles para todos', 'onClick': function(selected) {
 		    		if(selected.length) {
 		    			var titulo = selected.length > 1 ? "Hacer ficheros públicos" : "Hacer fichero público";
 		    			var mensaje = selected.length > 1 ? "¿Desea hacer publicos los ficheros seleccionados?" : "¿Desea hacer público el fichero seleccionado?";
@@ -125,7 +127,7 @@ VistaFicheros bean = (VistaFicheros) uvdatos.getVistas().get(VistaFicheros.class
 					    });
 		    		}
 		    	}},
-		    	{'label': 'Hacer privado', 'onClick': function(selected) {
+		    	{'label': 'Hacer privados', 'title': 'Los ficheros seleccionados sólo serán visibles para usuarios logueados', 'onClick': function(selected) {
 		    		if(selected.length) {
 		    			var titulo = selected.length > 1 ? "Hacer ficheros privados" : "Hacer fichero privado";
 		    			var mensaje = selected.length > 1 ? "¿Desea hacer privados los ficheros seleccionados?" : "¿Desea hacer privado el fichero seleccionado?";
@@ -152,7 +154,6 @@ VistaFicheros bean = (VistaFicheros) uvdatos.getVistas().get(VistaFicheros.class
 		});
 		
 		$("#table_ficheros").on("mouseover", ".tooltip", function() {
-			console.log("oiga")
 			$(this).find(".tooltiptext").text("Copiar enlace");
 		})
 		

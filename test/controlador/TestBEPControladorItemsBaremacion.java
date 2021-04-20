@@ -77,14 +77,14 @@ public class TestBEPControladorItemsBaremacion {
 		return (VistaItemsBaremacion) peticion.getUVDatos().getVistas().get(VistaItemsBaremacion.class.getName());
     }
     
- // método para obtener la vista con una lista de ítems .
+	// método para obtener la vista con una lista de ítems .
     private VistaItemsBaremacion obtenerItems() throws ServletException, IOException {
     	VistaItemsBaremacion bean = obtenerBloques();
     	
     	PeticionHttp peticion = UtilsTestBolsaEmpleo.peticionAutenticada();
 		peticion.setParameter(ControladorItemsBaremacion.PARAM_ACCION, ControladorItemsBaremacion.ACCION_DATATABLE_ITEMS);
-		BloqueBaremacion apartado = (BloqueBaremacion) bean.getDatatable().getData().get(0);
-		peticion.setParameter(ControladorItemsBaremacion.PARAM_BLOQUE, apartado.getCodNum().toString());
+		BloqueBaremacion bloque = (BloqueBaremacion) bean.getDatatable().getData().get(0);
+		peticion.setParameter(ControladorItemsBaremacion.PARAM_BLOQUE, bloque.getCodNum().toString());
     	
 		RespuestaHttp respuesta = new RespuestaHttp();
 		ControladorItemsBaremacion controlador = new ControladorItemsBaremacion();
@@ -213,13 +213,38 @@ public class TestBEPControladorItemsBaremacion {
 		assertEquals(MENSAJE_SIN_ADVERTENCIAS, 0, bean2.getMensajesDeAdvertencia().size());
 	}
 	
+	/** seleccionar item .
+	 * @throws SQLException .
+	 * @throws ServletException .
+	 * @throws IOException .
+	 */
+	@Test
+	public void testA07SeleccionarItem() throws SQLException, ServletException, IOException {
+		VistaItemsBaremacion bean = obtenerItems();
+		
+		PeticionHttp peticion = UtilsTestBolsaEmpleo.peticionAutenticada();
+		peticion.setParameter(ControladorItemsBaremacion.PARAM_ACCION, ControladorItemsBaremacion.ACCION_ITEM_SELECCIONADO);
+		ItemBaremacion item = (ItemBaremacion) bean.getDatatable().getData().get(0);
+		peticion.setParameter(ControladorItemsBaremacion.PARAM_ITEM, item.getCodNum().toString());
+		RespuestaHttp respuesta = new RespuestaHttp();
+		ControladorItemsBaremacion controlador = new ControladorItemsBaremacion();
+		controlador.doPost(peticion, respuesta);
+		
+		VistaItemsBaremacion bean2 = (VistaItemsBaremacion) peticion.getUVDatos().getVistas().get(VistaItemsBaremacion.class.getName());
+		
+		assertNotNull(MENSAJE_ITEM_DEVUELTO, bean2.getItemBaremacion());
+		assertNotNull(MENSAJE_BLOQUE_DEVUELTO, bean2.getBloqueBaremacion());
+		assertEquals(MENSAJE_SIN_ERROR, 0, bean2.getMensajesDeError().size());
+		assertEquals(MENSAJE_SIN_ADVERTENCIAS, 0, bean2.getMensajesDeAdvertencia().size());
+	}
+	
 	/** activar apartado .
 	 * @throws SQLException .
 	 * @throws ServletException .
 	 * @throws IOException .
 	 */
 	@Test
-	public void testA07ActivarApartado() throws SQLException, ServletException, IOException {
+	public void testA08ActivarApartado() throws SQLException, ServletException, IOException {
 		VistaItemsBaremacion bean = obtenerApartados();
 		
 		PeticionHttp peticion = UtilsTestBolsaEmpleo.peticionAutenticada();
@@ -243,7 +268,7 @@ public class TestBEPControladorItemsBaremacion {
 	 * @throws IOException .
 	 */
 	@Test
-	public void testA08ActivarBloque() throws SQLException, ServletException, IOException {
+	public void testA09ActivarBloque() throws SQLException, ServletException, IOException {
 		VistaItemsBaremacion bean = obtenerBloques();
 		
 		PeticionHttp peticion = UtilsTestBolsaEmpleo.peticionAutenticada();
@@ -267,7 +292,7 @@ public class TestBEPControladorItemsBaremacion {
 	 * @throws IOException .
 	 */
 	@Test
-	public void testA09ActivarItem() throws SQLException, ServletException, IOException {
+	public void testA10ActivarItem() throws SQLException, ServletException, IOException {
 		VistaItemsBaremacion bean = obtenerItems();
 		
 		PeticionHttp peticion = UtilsTestBolsaEmpleo.peticionAutenticada();
@@ -291,7 +316,7 @@ public class TestBEPControladorItemsBaremacion {
 	 * @throws IOException .
 	 */
 	@Test
-	public void testA10DesactivarApartado() throws SQLException, ServletException, IOException {
+	public void testA11DesactivarApartado() throws SQLException, ServletException, IOException {
 		VistaItemsBaremacion bean = obtenerApartados();
 		
 		PeticionHttp peticion = UtilsTestBolsaEmpleo.peticionAutenticada();
@@ -315,7 +340,7 @@ public class TestBEPControladorItemsBaremacion {
 	 * @throws IOException .
 	 */
 	@Test
-	public void testA11DesactivarBloque() throws SQLException, ServletException, IOException {
+	public void testA12DesactivarBloque() throws SQLException, ServletException, IOException {
 		VistaItemsBaremacion bean = obtenerBloques();
 		
 		PeticionHttp peticion = UtilsTestBolsaEmpleo.peticionAutenticada();
@@ -339,7 +364,7 @@ public class TestBEPControladorItemsBaremacion {
 	 * @throws IOException .
 	 */
 	@Test
-	public void testA12DesactivarItem() throws SQLException, ServletException, IOException {
+	public void testA13DesactivarItem() throws SQLException, ServletException, IOException {
 		VistaItemsBaremacion bean = obtenerItems();
 		
 		PeticionHttp peticion = UtilsTestBolsaEmpleo.peticionAutenticada();
@@ -363,7 +388,7 @@ public class TestBEPControladorItemsBaremacion {
 	 * @throws IOException .
 	 */
 	@Test
-	public void testA13EditarApartado() throws SQLException, ServletException, IOException {
+	public void testA14EditarApartado() throws SQLException, ServletException, IOException {
 		VistaItemsBaremacion bean = obtenerApartados();
 		
 		PeticionHttp peticion = UtilsTestBolsaEmpleo.peticionAutenticada();
@@ -390,7 +415,7 @@ public class TestBEPControladorItemsBaremacion {
 	 * @throws IOException .
 	 */
 	@Test
-	public void testA14EditarBloque() throws SQLException, ServletException, IOException {
+	public void testA15EditarBloque() throws SQLException, ServletException, IOException {
 		VistaItemsBaremacion bean = obtenerBloques();
 		
 		PeticionHttp peticion = UtilsTestBolsaEmpleo.peticionAutenticada();
@@ -417,7 +442,7 @@ public class TestBEPControladorItemsBaremacion {
 	 * @throws IOException .
 	 */
 	@Test
-	public void testA15EditarItem() throws SQLException, ServletException, IOException {
+	public void testA16EditarItem() throws SQLException, ServletException, IOException {
 		VistaItemsBaremacion bean = obtenerItems();
 		
 		PeticionHttp peticion = UtilsTestBolsaEmpleo.peticionAutenticada();
@@ -444,7 +469,7 @@ public class TestBEPControladorItemsBaremacion {
 	 * @throws IOException .
 	 */
 	@Test
-	public void testA16AgregarApartado() throws SQLException, ServletException, IOException {
+	public void testA17AgregarApartado() throws SQLException, ServletException, IOException {
 		PeticionHttp peticion = UtilsTestBolsaEmpleo.peticionAutenticada();
 		peticion.setParameter(ControladorItemsBaremacion.PARAM_ACCION, ControladorItemsBaremacion.ACCION_AGREGAR_APARTADO);
 		peticion.setParameter(ControladorItemsBaremacion.PARAM_APARTADO_CODIGO, CODIGO_2);
@@ -466,7 +491,7 @@ public class TestBEPControladorItemsBaremacion {
 	 * @throws IOException .
 	 */
 	@Test
-	public void testA17AgregarBloque() throws SQLException, ServletException, IOException {
+	public void testA18AgregarBloque() throws SQLException, ServletException, IOException {
 		VistaItemsBaremacion bean = obtenerApartados();
 		
 		PeticionHttp peticion = UtilsTestBolsaEmpleo.peticionAutenticada();
@@ -492,7 +517,7 @@ public class TestBEPControladorItemsBaremacion {
 	 * @throws IOException .
 	 */
 	@Test
-	public void testA18AgregarItem() throws SQLException, ServletException, IOException {
+	public void testA19AgregarItem() throws SQLException, ServletException, IOException {
 		VistaItemsBaremacion bean = obtenerBloques();
 		
 		PeticionHttp peticion = UtilsTestBolsaEmpleo.peticionAutenticada();

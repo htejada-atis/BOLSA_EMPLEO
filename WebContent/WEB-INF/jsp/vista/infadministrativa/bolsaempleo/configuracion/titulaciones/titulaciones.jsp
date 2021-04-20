@@ -11,6 +11,17 @@ VistaTitulaciones bean = (VistaTitulaciones) uvdatos.getVistas().get(VistaTitula
 %>
 
 <div class="bolsa-empleo">
+
+	<%
+		if (session.getAttribute(ControladorGestionTitulaciones.MENSAJE_ENVIADO) != null) {
+		%>
+		<div id="exito" class="success">
+			<%=session.getAttribute(ControladorGestionTitulaciones.MENSAJE_ENVIADO)%>
+		</div>
+	<%
+			session.removeAttribute(ControladorGestionTitulaciones.MENSAJE_ENVIADO);
+		}
+	%>
 	
 	<% if (bean.getMensajesDeExito().size() > 0) { %>
 		<div id="exito" class="success">
@@ -52,18 +63,20 @@ VistaTitulaciones bean = (VistaTitulaciones) uvdatos.getVistas().get(VistaTitula
 
 	$(document).ready(function() {
 		
-		var table_titulaciones = new DataTable('#table_titulaciones', {
+		var table_titulaciones = new Atis.DataTable('#table_titulaciones', {
 		    "ajax": { url: "<%=ControladorGestionTitulaciones.URL_PATTERN_AJAX%>" },
 		    "pageSize": 10,
 		    "action": "<%=ControladorGestionTitulaciones.ACCION_DATATABLE_TITULACIONES%>",
 		    "columns": [
 		    	{'data': 'codNum'},
 		        {'data': 'nombre', 'class': 'overflow-auto'},
-		        {'data': 'codnum', 'buttons': [{'label': 'Editar', 'onClick': function(row) {
-		        	var params = {'a': '<%= ControladorGestionTitulaciones.ACCION_EDITAR_TITULACION %>', '<%= ControladorGestionTitulaciones.PARAM_ID %>': row.codNum};
+		        {'data': 'codnum', 'buttons': [{'label': 'Editar', 'title': 'Editar titulación', 'onClick': function(row) {
+		        	var params = {
+		    				'a': '<%=ControladorGestionTitulaciones.ACCION_EDITAR_TITULACION %>', 
+		    				'<%=ControladorGestionTitulaciones.PARAM_ID%>': row.codNum};
 	        		Atis.sendForm("<%=request.getRequestURI()%>", params);
 		        	}
-		        }, {'label': 'Borrar', 'onClick': function(row) {
+		        }, {'label': 'Borrar', 'title': 'Borrar titulación', 'onClick': function(row) {
 		        	Atis.confirmDialog("Borrar titulación", "¿Desea borrar la titulación seleccionada?", {
 				        Si: function() {
 				        	var params = {

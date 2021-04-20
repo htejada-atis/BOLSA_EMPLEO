@@ -4,7 +4,7 @@ import java.io.Serializable;
 
 import es.ujaen.uvirtual.beans.uvirtual.bolsaempleo.Bolsa;
 import es.ujaen.uvirtual.beans.vistas.Vista;
-import es.ujaen.uvirtual.utilidades.DataTable;
+import es.ujaen.uvirtual.utilidades.BolsaEmpleoDataTable;
 
 /** Bean para la vista.
  * @author atis
@@ -12,7 +12,7 @@ import es.ujaen.uvirtual.utilidades.DataTable;
 public class VistaEstadoBolsas extends Vista implements Serializable {
     private static final long serialVersionUID = 1L;
     private String vista;
-    private DataTable<Bolsa> dataTable;
+    private BolsaEmpleoDataTable<Bolsa> dataTable;
     
     public String getVista() {
         return vista;
@@ -22,11 +22,11 @@ public class VistaEstadoBolsas extends Vista implements Serializable {
         this.vista = vista;
     }
     
-    public DataTable<Bolsa> getDatatableBolsas() {
+    public BolsaEmpleoDataTable<Bolsa> getDatatableBolsas() {
     	return dataTable;
     }
     
-    public void setDatatableBolsas(DataTable<Bolsa> dt) {
+    public void setDatatableBolsas(BolsaEmpleoDataTable<Bolsa> dt) {
     	this.dataTable = dt;    	
     }
 }

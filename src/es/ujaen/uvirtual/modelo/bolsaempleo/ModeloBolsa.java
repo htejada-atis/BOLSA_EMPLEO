@@ -11,7 +11,7 @@ import java.util.Map;
 import es.ujaen.uvirtual.beans.uvirtual.bolsaempleo.Bolsa;
 import es.ujaen.uvirtual.modelo.conexion.ConexionUvirtual;
 import es.ujaen.uvirtual.utilidades.BolsaEmpleoUtils;
-import es.ujaen.uvirtual.utilidades.DataTable;
+import es.ujaen.uvirtual.utilidades.BolsaEmpleoDataTable;
 import es.ujaen.uvirtual.utilidades.UVException;
 
 /**
@@ -46,10 +46,10 @@ public class ModeloBolsa {
 	 * @throws SQLException en caso de error de base de datos
 	 * @throws UVException error si no existe la area
 	 */
-	public DataTable<Bolsa> listaBolsaEmpleoDatatable(Map<String, String[]> params) throws SQLException, UVException {
+	public BolsaEmpleoDataTable<Bolsa> listaBolsaEmpleoDatatable(Map<String, String[]> params) throws SQLException, UVException {
 		List<Bolsa> bolsas = new ArrayList<>();
 		ModeloArea modeloArea = new ModeloArea();
-		DataTable<Bolsa> dataTable = new DataTable<Bolsa>(params);
+		BolsaEmpleoDataTable<Bolsa> dataTable = new BolsaEmpleoDataTable<Bolsa>(params);
 		
 		String consulta =
 			"SELECT bepbol.* "
@@ -57,13 +57,13 @@ public class ModeloBolsa {
 		  + "INNER JOIN TBEP_AREAS bepare ON bepare.CODNUM = bepbol.BEPARE_CODNUM "
 		  + "WHERE 1=1 ";
 		
-		dataTable.setOrderColumn(ORDER_COLUMN_INDEX_ID, "bepbol.CODNUM");
-		dataTable.setOrderColumn(ORDER_COLUMN_INDEX_AREA, "bepare.DES_AREA_CONOCIMIENTO");
-		dataTable.setOrderColumn(ORDER_COLUMN_INDEX_ESTADO, "bepbol.ESTADO");
-		dataTable.setOrderColumn(ORDER_COLUMN_INDEX_ACTUALIZADA, "bepbol.FECHAACTUALIZACION");
-		dataTable.setOrderColumn(ORDER_COLUMN_INDEX_BLOQUEO, "bepbol.FECHABLOQUEO");
-		dataTable.setOrderColumn(ORDER_COLUMN_INDEX_DESBLOQUEO, "bepbol.FECHADEBLOQUEO");
-		dataTable.setOrderColumn(ORDER_COLUMN_INDEX_BAREMALE, "bepbol.FLGBAREMABLE");
+		dataTable.setColumn(ORDER_COLUMN_INDEX_ID, "bepbol.CODNUM");
+		dataTable.setColumn(ORDER_COLUMN_INDEX_AREA, "bepare.DES_AREA_CONOCIMIENTO");
+		dataTable.setColumn(ORDER_COLUMN_INDEX_ESTADO, "bepbol.ESTADO");
+		dataTable.setColumn(ORDER_COLUMN_INDEX_ACTUALIZADA, "bepbol.FECHAACTUALIZACION");
+		dataTable.setColumn(ORDER_COLUMN_INDEX_BLOQUEO, "bepbol.FECHABLOQUEO");
+		dataTable.setColumn(ORDER_COLUMN_INDEX_DESBLOQUEO, "bepbol.FECHADEBLOQUEO");
+		dataTable.setColumn(ORDER_COLUMN_INDEX_BAREMALE, "bepbol.FLGBAREMABLE");
 		dataTable.setQuery(consulta);
 				
 		try (Connection conexion = ConexionUvirtual.obtenerInstancia();

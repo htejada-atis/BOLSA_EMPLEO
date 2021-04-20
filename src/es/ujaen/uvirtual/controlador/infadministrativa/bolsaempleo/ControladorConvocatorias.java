@@ -30,7 +30,7 @@ import es.ujaen.uvirtual.modelo.bolsaempleo.ModeloConvocatoria;
 import es.ujaen.uvirtual.modelo.bolsaempleo.ModeloRol;
 import es.ujaen.uvirtual.modelo.bolsaempleo.ModeloUsuarioBolsaEmpleo;
 import es.ujaen.uvirtual.utilidades.BolsaEmpleoValidator;
-import es.ujaen.uvirtual.utilidades.DataTable;
+import es.ujaen.uvirtual.utilidades.BolsaEmpleoDataTable;
 import es.ujaen.uvirtual.utilidades.EscapaHTML;
 import es.ujaen.uvirtual.utilidades.Formateador;
 import es.ujaen.uvirtual.utilidades.UVException;
@@ -40,7 +40,7 @@ import es.ujaen.uvirtual.utilidades.UVException;
  */
 @WebServlet(
 	name = "informacionadministrativa.bolsaempleo.configuracion.convocatorias", 
-	description = "Gestión de estados de bolsas", 
+	description = "Gestión de convocatorias", 
 	urlPatterns = { 
 			"/srv/es/informacionadministrativa/bolsaempleo/configuracion/convocatorias", 
 			"/srv/en/informacionadministrativa/bolsaempleo/configuracion/convocatorias",
@@ -173,10 +173,10 @@ public class ControladorConvocatorias extends HttpServlet {
 		
 		try (PrintWriter writer = response.getWriter()) {
 			try {
-				DataTable<Convocatoria> dataTable = modelo.listaConvocatoriasDatatable(request.getParameterMap());
+				BolsaEmpleoDataTable<Convocatoria> dataTable = modelo.listaConvocatoriasDatatable(request.getParameterMap());
 				bean.setDatatableConvocatorias(dataTable);
 				
-				Gson gson = new GsonBuilder().setExclusionStrategies(DataTable.GSONEXCLUSIONSTRATEGY).create();				
+				Gson gson = new GsonBuilder().setExclusionStrategies(BolsaEmpleoDataTable.GSONEXCLUSIONSTRATEGY).create();				
 				writer.write(gson.toJson(dataTable));
 			} catch (Exception ex) {
 				bean.getMensajesDeError().add(ex.getMessage());
@@ -216,8 +216,8 @@ public class ControladorConvocatorias extends HttpServlet {
 			convocatoria.setNumBolsasMaximo(validator.getValueInteger(PARAM_CONVOCATORIA_NUMEROBOLSASMAXIMO));
 			convocatoria.setNumMeritosPorBloque(validator.getValueInteger(PARAM_CONVOCATORIA_NUMEROMERITOSPORBLOQUE));		 
 			modelo.nuevaConvocatoria(convocatoria);	
-			
-			bean.getMensajesDeExito().add(MENSAJE_INFO_CONVOCATORIAS_INSERTADA_CORRECTAMENTE);
+						
+			bean.getMensajesDeExito().add(MENSAJE_INFO_CONVOCATORIAS_INSERTADA_CORRECTAMENTE);			
 			
 			this.index(bean, datos, request, response);
 		}			

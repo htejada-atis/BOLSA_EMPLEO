@@ -11,6 +11,17 @@ VistaEvaluadores bean = (VistaEvaluadores) uvdatos.getVistas().get(VistaEvaluado
 %>
 
 <div class="bolsa-empleo">
+
+	<%
+		if (session.getAttribute(ControladorGestionEvaluadores.MENSAJE_ENVIADO) != null) {
+		%>
+		<div id="exito" class="success">
+			<%=session.getAttribute(ControladorGestionEvaluadores.MENSAJE_ENVIADO)%>
+		</div>
+	<%
+	session.removeAttribute(ControladorGestionEvaluadores.MENSAJE_ENVIADO);
+			}
+	%>
 	
 	<% if (bean.getMensajesDeExito().size() > 0) { %>
 		<div id="exito" class="success">
@@ -25,32 +36,38 @@ VistaEvaluadores bean = (VistaEvaluadores) uvdatos.getVistas().get(VistaEvaluado
 	
 	<h2>Evaluadores de un área</h2>
 	
-	<div class="form-select">
-		<label>Área</label>
-		<select id="select_area">
-			<option value="0">Elija el área</option>
-			<%
-			for(Area area: bean.getAreas()) {
-			%>
-    			<option value="<%=area.getCodNum()%>"><%=area.getDescripcion()%></option>
-    		<%
-    		}
-    		%>
-		</select>
+	<div class="titulo-bolsa-empleo">
+		<div class="form-select">
+			<label>Área</label>
+			<select id="select_area">
+				<option value="0">Elija el área</option>
+				<%
+				for(Area area: bean.getAreas()) {
+				%>
+	    			<option value="<%=area.getCodNum()%>"><%=area.getDescripcion()%></option>
+	    		<%
+	    		}
+	    		%>
+			</select>
+		</div>
+    
+	    <a class="link-btn" id="nuevo_evaluador" href="<%=request.getRequestURI()%>">
+	    	 Añadir evaluador
+	    </a>
 	</div>
-	
-	<div id="tablas_evaluadores">    
-		    <a class="link-btn" id="nuevo_evaluador" href="<%=request.getRequestURI()%>" style="float:right; margin-bottom:1rem;">
-		    	 Añadir evaluador
-		    </a>
-		<table class="bluetable bolsaempleo" id="table_evaluadores_area">
-		<caption class="table-title">Evaluadores del Área</caption>  
+	<table class="bluetable bolsaempleo" id="table_evaluadores_area">
+		<tr>
+			<th scope="col" style="width:20%">D.N.I</th>
+			<th scope="col"	style="width:35%">Tipo</th>
+			<th scope="col"	style="width:35%">Nombre</th>
+			<th scope="col" style="width:10%">Activo</th>
+			<th scope="col" style="width:10%"></th>
+		</tr>
+		<tbody>		
+		</tbody>
+		<tfoot>
 			<tr>
-				<th scope="col" style="width:20%">D.N.I</th>
-				<th scope="col"	style="width:35%">Tipo</th>
-				<th scope="col"	style="width:35%">Nombre</th>
-				<th scope="col" style="width:10%">Activo</th>
-				<th scope="col" style="width:10%"></th>
+				<th colspan="5" style="width:100%"></th>
 			</tr>
 			<tbody>		
 			</tbody>
@@ -70,11 +87,22 @@ VistaEvaluadores bean = (VistaEvaluadores) uvdatos.getVistas().get(VistaEvaluado
 		
 		var table_evaluadores;
 		
-		function inicializarTablas(id) {
-			table_evaluadores = new DataTable('#table_evaluadores_area', {
-			    "ajax": { url: "<%=ControladorGestionEvaluadores.URL_PATTERN_AJAX%>", async: false },
+		function checkVisibility() {
+			return document.getElementById("table_evaluadores_area").style.visibility == "hidden";
+		}
+		
+		function toggleVisibility() {
+			var visibility = checkVisibility() ? "visible" : "hidden";
+			document.getElementById("table_evaluadores_area").style.visibility = visibility;
+			document.getElementById("nuevo_evaluador").style.visibility = visibility;
+		}
+		
+		function inicializarTablas(id, title) {
+			table_evaluadores = new Atis.DataTable('#table_evaluadores_area', {
+			    "ajax": { url: "<%=ControladorGestionEvaluadores.URL_PATTERN_AJAX%>" },
 			    "params": {"<%=ControladorGestionEvaluadores.PARAM_AREA%>": id},
 			    "pageSize": 10,
+			    "title": title,
 			    "action": "<%=ControladorGestionEvaluadores.ACCION_DATATABLE_EVALUADORES%>",
 			    "columns": [
 			    	{'data': 'numdocumento'},
@@ -103,7 +131,8 @@ VistaEvaluadores bean = (VistaEvaluadores) uvdatos.getVistas().get(VistaEvaluado
 						        	var params = {'a': '<%= ControladorGestionEvaluadores.ACCION_ELIMINAR_EVALUADOR %>',
 						        			'<%= ControladorGestionEvaluadores.PARAM_USUARIO %>': row.codNum,
 						        			'<%= ControladorGestionEvaluadores.PARAM_AREA %>': row.codNumArea,
-						        			'<%= ControladorGestionEvaluadores.PARAM_ACTIVO %>': !row.activo};
+						        			'<%= ControladorGestionEvaluadores.PARAM_ACTIVO %>': !row.activo
+						        			};
 					        		Atis.sendForm("<%= request.getRequestURI() %>", params);
 						          	$(this).dialog("close");
 						        },
@@ -117,23 +146,23 @@ VistaEvaluadores bean = (VistaEvaluadores) uvdatos.getVistas().get(VistaEvaluado
 			});
 		}
 		
-		function cargarTablas(id) {
+		function cargarTablas(id, title) {
 			table_evaluadores.setParam("<%=ControladorGestionEvaluadores.PARAM_AREA%>", id);
+			table_evaluadores.setTitle(title);
 			table_evaluadores.refresh();
 		}
 		
 		function onChangeArea(select) {
-			if(document.getElementById("tablas_evaluadores").style.visibility == "hidden") {
-				document.getElementById("tablas_evaluadores").style.visibility = "visible";
-				inicializarTablas(select.value);
-				$("#title_evaluadores").text("Evaluadores del Área " + $(select).children("option").filter(":selected").text());
+			var title_evaluadores = "Evaluadores del Área: " + $(select).children("option").filter(":selected").text();
+			if(checkVisibility()) {
+				toggleVisibility();
+				inicializarTablas(select.value, title_evaluadores);
 			} else {
-				cargarTablas(select.value);
-				$("#title_evaluadores").text("Evaluadores del Área " + $(select).children("option").filter(":selected").text());
+				cargarTablas(select.value, title_evaluadores);
 			}
 		}
 		
-		document.getElementById("tablas_evaluadores").style.visibility = "hidden";
+		toggleVisibility();
 		
 		document.getElementById("select_area").onchange = function () {
 			if(this.value != 0) {
@@ -152,7 +181,7 @@ VistaEvaluadores bean = (VistaEvaluadores) uvdatos.getVistas().get(VistaEvaluado
 		
 		<% if(bean.getArea() != null) { %>
 			document.getElementById("select_area").value = "<%= bean.getArea().getCodNum() %>";
-			document.getElementById("tablas_evaluadores").style.visibility = "visible";
+			toggleVisibility();
 			inicializarTablas("<%= bean.getArea().getCodNum() %>");
 		<%} %>
 		

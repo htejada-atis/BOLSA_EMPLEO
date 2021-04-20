@@ -5,7 +5,7 @@ import es.ujaen.uvirtual.beans.uvirtual.bolsaempleo.ApartadoBaremacion;
 import es.ujaen.uvirtual.beans.uvirtual.bolsaempleo.BloqueBaremacion;
 import es.ujaen.uvirtual.beans.uvirtual.bolsaempleo.ItemBaremacion;
 import es.ujaen.uvirtual.beans.vistas.Vista;
-import es.ujaen.uvirtual.utilidades.DataTable;
+import es.ujaen.uvirtual.utilidades.BolsaEmpleoDataTable;
 
 /** Bean para la vista.
  * @author atis
@@ -13,7 +13,7 @@ import es.ujaen.uvirtual.utilidades.DataTable;
 public class VistaItemsBaremacion extends Vista implements Serializable {
     private static final long serialVersionUID = 1L;
     private String vista;
-    private DataTable<?> dataTable;
+    private BolsaEmpleoDataTable<?> dataTable;
     private ApartadoBaremacion apartado;
     private BloqueBaremacion bloque;
     private ItemBaremacion item;
@@ -26,11 +26,11 @@ public class VistaItemsBaremacion extends Vista implements Serializable {
         this.vista = vista;
     }
     
-    public DataTable<?> getDatatable() {
+    public BolsaEmpleoDataTable<?> getDatatable() {
 		return dataTable;
 	}
 	
-	public void setDatatable(DataTable<?> dt) {
+	public void setDatatable(BolsaEmpleoDataTable<?> dt) {
 		this.dataTable = dt;
 	}
 	

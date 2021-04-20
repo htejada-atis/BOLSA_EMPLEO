@@ -3,22 +3,22 @@ package es.ujaen.uvirtual.beans.vistas.uvirtual.bolsaempleo;
 import java.io.Serializable;
 import es.ujaen.uvirtual.beans.uvirtual.bolsaempleo.Fichero;
 import es.ujaen.uvirtual.beans.vistas.Vista;
-import es.ujaen.uvirtual.utilidades.DataTable;
+import es.ujaen.uvirtual.utilidades.BolsaEmpleoDataTable;
 
 /** Bean para la vista.
  * @author jlopez
  */
 public class VistaFicheros extends Vista implements Serializable {
 	private static final long serialVersionUID = 1L;
-	private DataTable<Fichero> dataTable;
+	private BolsaEmpleoDataTable<Fichero> dataTable;
 	private Fichero fichero;
 	private String vista;
 	
-	public DataTable<Fichero> getDatatableFicheros() {
+	public BolsaEmpleoDataTable<Fichero> getDatatableFicheros() {
 		return dataTable;
 	}
 	
-	public void setDatatableFicheros(DataTable<Fichero> dt) {
+	public void setDatatableFicheros(BolsaEmpleoDataTable<Fichero> dt) {
 		this.dataTable = dt;
 	}
 	

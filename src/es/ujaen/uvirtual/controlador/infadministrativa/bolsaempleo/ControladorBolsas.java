@@ -23,8 +23,8 @@ import es.ujaen.uvirtual.beans.Usuario;
 import es.ujaen.uvirtual.beans.uvirtual.bolsaempleo.Bolsa;
 import es.ujaen.uvirtual.beans.vistas.uvirtual.bolsaempleo.VistaEstadoBolsas;
 import es.ujaen.uvirtual.modelo.bolsaempleo.ModeloBolsa;
+import es.ujaen.uvirtual.utilidades.BolsaEmpleoDataTable;
 import es.ujaen.uvirtual.modelo.bolsaempleo.ModeloUsuarioBolsaEmpleo;
-import es.ujaen.uvirtual.utilidades.DataTable;
 import es.ujaen.uvirtual.utilidades.EscapaHTML;
 import es.ujaen.uvirtual.utilidades.Formateador;
 import es.ujaen.uvirtual.utilidades.UVException;
@@ -145,10 +145,10 @@ public class ControladorBolsas extends HttpServlet {
 		
 		try (PrintWriter writer = response.getWriter()) {
 			try {
-				DataTable<Bolsa> dataTable = modelo.listaBolsaEmpleoDatatable(request.getParameterMap());
+				BolsaEmpleoDataTable<Bolsa> dataTable = modelo.listaBolsaEmpleoDatatable(request.getParameterMap());
 				bean.setDatatableBolsas(dataTable);
 				
-				Gson gson = new GsonBuilder().setExclusionStrategies(DataTable.GSONEXCLUSIONSTRATEGY).create();				
+				Gson gson = new GsonBuilder().setExclusionStrategies(BolsaEmpleoDataTable.GSONEXCLUSIONSTRATEGY).create();				
 				writer.write(gson.toJson(dataTable));
 			} catch (Exception ex) {
 				bean.getMensajesDeError().add(ex.getMessage());
