@@ -16,9 +16,10 @@ function DataTable(id, config) {
         'pageSize': Atis.getProp(config, 'pageSize', 10),
         'orderBy': null,
         'orderDirection': 'asc',
-        'filterBy': null,
-        'filterValue': null
+        'filter': ''
     };
+    this.pageSizeOptions = Atis.getProp(config, 'pageSizeOptions', [5,10,20,100]);
+    this.filterParams = {}
     this.title = Atis.getProp(config, 'title', undefined);
     this.lastResponse = null;
     this.checked = {};
@@ -157,7 +158,7 @@ function DataTable(id, config) {
     };
     
     this.renderFooter = function() {
-    	if (!self.lastResponse) { return ''; } 
+    	if (!self.lastResponse) { return ''; }
     	
         // texto total
         var selected = self.getCheckedItems();  
@@ -182,6 +183,22 @@ function DataTable(id, config) {
         $(pagination).append(btnNext);
         $(pagination).append(btnLast);
 
+        // page size select
+        var selectSize = $('<select></select>');
+
+        self.pageSizeOptions.forEach(function(option) {
+            var option = $('<option ' + (self.params.pageSize == option ? 'selected' : '') + '>' + option + '</option>');
+            selectSize.append(option);
+        });
+
+        selectSize.on('change', function() {
+            self.params.pageSize = this.value;
+            self.refresh();
+        });
+
+        var pageSize = $('<span class="page-size"></span>');
+        $(pageSize).append(selectSize);
+
         // acciones
         var actions = $('<span class="actions"></span>');
         if (self.config.actions) {
@@ -202,6 +219,7 @@ function DataTable(id, config) {
 
         $('th', self.tfoot).empty();
     	$('th', self.tfoot).append($(pagination));
+        $('th', self.tfoot).append($(pageSize));
         $('th', self.tfoot).append($(actions));
         $('th', self.tfoot).append($(textoTotal));
     };
@@ -211,31 +229,6 @@ function DataTable(id, config) {
             var header = $('<caption>' + self.title + '</caption>');
             $(self.node).find('caption').remove();
             $(self.node).prepend(header);
-        }
-
-        var searchable = Atis.getProp(self.config, 'searchable', false);
-
-        if (searchable && !$('tbody', this.node).find('.searchable').length) {
-            var tr = $('<tr class="searchable"></tr>');
-            self.config.columns.forEach(function(columnDef, index) {
-                var th = $('<th></th>');
-
-                if (columnDef.searchable) {
-                    var type = columnDef.searchable.type ? columnDef.searchable.type : 'text';
-                    var input = $('<input type="' + type + '" name="' + columnDef.data + '" />');
-
-                    $(input).on('input', function() {
-                        self.filterBy(index, this.value);
-                    });
-
-                    th.append(input);
-                }
-
-                tr.append(th);
-            });
-
-            $('tbody', this.node).first().children().eq(1).remove();
-            $('tbody', this.node).first().append(tr);
         }
     };
     
@@ -254,7 +247,7 @@ function DataTable(id, config) {
     	}
 
         self.config.columns.forEach(function(columnDef, index) {
-            var orderable = Atis.getProp(columnDef, 'orderable', true);
+            var order = Atis.getProp(columnDef, 'order', {'active': true});
             var selectable = Atis.getProp(columnDef, 'selectable');
             var buttons = Atis.getProp(columnDef, 'buttons');
 
@@ -264,11 +257,60 @@ function DataTable(id, config) {
                 return;
             }
             
-            if (orderable) {
+            if (order.active) {
                 $(columnDef.node).css('cursor', 'pointer');
                 $(columnDef.node).on('click', function() { self.orderBy(columnDef, index); });
             }
         });
+
+        var filterable = Atis.getProp(self.config, 'filterable', false);
+
+        if (filterable && !$('tbody', this.node).find('.filterable').length) {
+            var tr = $('<tr class="filterable"></tr>');
+            self.config.columns.forEach(function(columnDef, index) {
+                var th = $('<th></th>');
+
+                if (columnDef.filter) {
+                    var filter;
+                    var type = columnDef.filter.type ? columnDef.filter.type : 'text';
+                    var name = '" name="' + columnDef.data + '"';
+                    switch(type) {
+                        case 'selectBoolean':
+                            filter = $('<select ' + name + '></select>');
+                            filter.append($('<option value="0">-----</option>'));
+                            filter.append($('<option>' + true + '</option>'));
+                            filter.append($('<option>' + false + '</option>'));
+                            break;
+                        case 'select':
+                            filter = $('<select ' + name + '></select>');
+                            filter.append($('<option value="0">----------</option>'));
+                            filter.options.forEach(function (option) {
+                                filter.append($('<option>' + option + '</option>'));
+                            });
+                            break;
+                        default:
+                            filter = $('<input type="' + type + name + ' autocomplete="off" />');
+                            $(filter).bind("enterKey", e => self.filterBy(index, this.value));
+                            break;
+                    }
+
+                    $(filter).on('change', function() {
+                        self.filterBy(index, this.value);
+                    });
+
+                    th.append(filter);
+                }
+
+                tr.append(th);
+            });
+
+            $('tbody', this.node).first().children().eq(1).remove();
+            $('tbody', this.node).first().append(tr);
+            $('tbody', this.node).find('input[type="date"]').each(function() {
+               	this.type = 'text';
+                $(this).datepicker();
+            });
+        }
     };
     
     this.checkUncheckAll = function(check) {
@@ -342,10 +384,13 @@ function DataTable(id, config) {
     }
 
     this.filterBy = function(indexColumnDef, value) {
-        self.params.filterBy = indexColumnDef;
-        self.params.filterValue = value;
+        self.filterParams[indexColumnDef] = value;
         
-        console.log(self.params);
+        if (value == "" || value == 0) {
+            delete self.filterParams[indexColumnDef];
+        }
+
+        self.params.filter = JSON.stringify(self.filterParams);
         self.refresh();
     }
     

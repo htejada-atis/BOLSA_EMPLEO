@@ -26,7 +26,7 @@ import es.ujaen.uvirtual.beans.uvirtual.bolsaempleo.Fichero;
 import es.ujaen.uvirtual.beans.vistas.uvirtual.bolsaempleo.VistaFicheros;
 import es.ujaen.uvirtual.modelo.bolsaempleo.ModeloFichero;
 import es.ujaen.uvirtual.utilidades.BolsaEmpleoUtils;
-import es.ujaen.uvirtual.utilidades.DataTable;
+import es.ujaen.uvirtual.utilidades.BolsaEmpleoDataTable;
 import es.ujaen.uvirtual.utilidades.EscapaHTML;
 import es.ujaen.uvirtual.utilidades.Formateador;
 import es.ujaen.uvirtual.utilidades.UVException;
@@ -309,9 +309,9 @@ public class ControladorGestionFicheros extends HttpServlet {
 		
 		try (PrintWriter writer = response.getWriter()) {
 			try {
-				DataTable<Fichero> dataTable = modelo.listaFicherosDatatable(request.getParameterMap());
+				BolsaEmpleoDataTable<Fichero> dataTable = modelo.listaFicherosDatatable(request.getParameterMap());
 				bean.setDatatableFicheros(dataTable);
-				Gson gson = new GsonBuilder().setExclusionStrategies(DataTable.GSONEXCLUSIONSTRATEGY).create();
+				Gson gson = new GsonBuilder().setExclusionStrategies(BolsaEmpleoDataTable.GSONEXCLUSIONSTRATEGY).create();
 				writer.write(gson.toJson(dataTable));
 			} catch (Exception ex) {
 				bean.getMensajesDeError().add(ex.getMessage());

@@ -23,7 +23,7 @@ import es.ujaen.uvirtual.beans.uvirtual.bolsaempleo.Titulacion;
 import es.ujaen.uvirtual.beans.vistas.uvirtual.bolsaempleo.VistaTitulacionesArea;
 import es.ujaen.uvirtual.modelo.bolsaempleo.ModeloArea;
 import es.ujaen.uvirtual.modelo.bolsaempleo.ModeloTitulacion;
-import es.ujaen.uvirtual.utilidades.DataTable;
+import es.ujaen.uvirtual.utilidades.BolsaEmpleoDataTable;
 import es.ujaen.uvirtual.utilidades.EscapaHTML;
 import es.ujaen.uvirtual.utilidades.Formateador;
 import es.ujaen.uvirtual.utilidades.UVException;
@@ -221,9 +221,9 @@ public class ControladorGestionTitulacionesPreferentesArea extends HttpServlet {
 		try (PrintWriter writer = response.getWriter()) {
 			try {
 				Integer area = Formateador.leeParametroInteger(request.getParameter(PARAM_AREA));
-				DataTable<Titulacion> dataTable = modelo.listaTitulacionesDatatable(request.getParameterMap(), area);
+				BolsaEmpleoDataTable<Titulacion> dataTable = modelo.listaTitulacionesDatatable(request.getParameterMap(), area);
 				bean.setDatatableTitulaciones(dataTable);
-				Gson gson = new GsonBuilder().setExclusionStrategies(DataTable.GSONEXCLUSIONSTRATEGY).create();
+				Gson gson = new GsonBuilder().setExclusionStrategies(BolsaEmpleoDataTable.GSONEXCLUSIONSTRATEGY).create();
 				writer.write(gson.toJson(dataTable));
 			} catch (UVException ex) {
 				CodigoDescripcion mensaje = new CodigoDescripcion("error", ex.getMessage());
@@ -254,9 +254,9 @@ public class ControladorGestionTitulacionesPreferentesArea extends HttpServlet {
 		try (PrintWriter writer = response.getWriter()) {
 			try {
 				Integer area = Formateador.leeParametroInteger(request.getParameter(PARAM_AREA));
-				DataTable<Titulacion> dataTable = modelo.listaTitulacionesAreaDatatable(request.getParameterMap(), area);
+				BolsaEmpleoDataTable<Titulacion> dataTable = modelo.listaTitulacionesAreaDatatable(request.getParameterMap(), area);
 				bean.setDatatableTitulaciones(dataTable);
-				Gson gson = new GsonBuilder().setExclusionStrategies(DataTable.GSONEXCLUSIONSTRATEGY).create();
+				Gson gson = new GsonBuilder().setExclusionStrategies(BolsaEmpleoDataTable.GSONEXCLUSIONSTRATEGY).create();
 				writer.write(gson.toJson(dataTable));
 			} catch (UVException ex) {
 				CodigoDescripcion mensaje = new CodigoDescripcion("error", ex.getMessage());

@@ -1,5 +1,6 @@
 package es.ujaen.uvirtual.utilidades;
 
+import java.sql.Date;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -12,21 +13,25 @@ import java.util.logging.Logger;
 
 import com.google.gson.ExclusionStrategy;
 import com.google.gson.FieldAttributes;
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
+import com.google.gson.reflect.TypeToken;
+
+import es.ujaen.uvirtual.modelo.bolsaempleo.ModeloTitulacion;
 
 /**
  * Utilidad para la gestión de los parámetros del datatable.
  * @author ATISoluciones
  * @param <T> Modelo que gestiona el datatable.
  */
-public class DataTable<T> {
+public class BolsaEmpleoDataTable<T> {
 	public static final boolean VERBOSE = false;
-	private static final String NOMBREDEESTACLASE = DataTable.class.getName();	
+	private static final String NOMBREDEESTACLASE = BolsaEmpleoDataTable.class.getName();	
 	private static final Logger LOGGER = Logger.getLogger(NOMBREDEESTACLASE);
 	
 	public static final String PARAM_CURRENT_PAGE = "page";
 	public static final String PARAM_PAGE_SIZE = "pageSize";
-	public static final String PARAM_FILTER_BY = "filterBy";
-	public static final String PARAM_FILTER_VALUE = "filterValue";
+	public static final String PARAM_FILTER = "filter";
 	public static final String PARAM_ORDER_BY = "orderBy";
 	public static final String PARAM_ORDER_DIRECTION = "orderDirection";
 	public static final String PARAM_ORDER_DIRECTION_VALUE_ASC = "asc";
@@ -36,6 +41,7 @@ public class DataTable<T> {
 	public static final String PARAM_PAGE_SIZE_VALUE_DEFAULT = "10";
 	
 	public static final String ERROR_MSG_PARAMETRO_NO_VALIDO = "Datatable parámetro no válido";
+	public static final String ERROR_MSG_PARAMETRO_BUSQUEDA_NO_VALIDO = "Datatable parámetro búsqueda no válido";
 	public static final String ERROR_MSG_PARAMETRO_TIPO_ORDENACION_NO_VALIDO = "Datatable tipo de ordenación no válido";
 	public static final String ERROR_MSG_COLUMNA_ORDENACION_NO_VALIDA = "La columna de ordenación es no válida";
 	public static final String ERROR_MSG_COLUMNA_FILTRADO_NO_VALIDA = "La columna de filtrado es no válida";
@@ -50,12 +56,10 @@ public class DataTable<T> {
 	private Integer pagesTotal;
 	private Integer orderBy;
 	private String orderDirection;
-	private Integer filterBy;
-	private String filterValue;
+	private Map<Integer, String> filters;
 	private List<T> data;
 	
 	/** clase .
-	 * @author javier
 	 */
 	public class DataTableColumn {
 		private String columnName;
@@ -64,6 +68,8 @@ public class DataTable<T> {
 		public static final int COLUMN_TYPE_TEXT = 0;
 		public static final int COLUMN_TYPE_NUMBER = 1;
 		public static final int COLUMN_TYPE_DATE = 2;
+		public static final int COLUMN_TYPE_BOOLEAN = 3;
+		public static final int COLUMN_TYPE_OPTION = 4;
 		
 		/** Constructor por parámetros .
 		 * @param pcolumnName .
@@ -116,7 +122,7 @@ public class DataTable<T> {
 	 * @param params .
 	 * @throws UVException .
 	 */
-	public DataTable(Map<String, String[]> params) throws UVException {
+	public BolsaEmpleoDataTable(Map<String, String[]> params) throws UVException {
 		try {
 			this.currentPage = Integer.parseInt(String.join("", params.getOrDefault(PARAM_CURRENT_PAGE, new String[] {PARAM_CURRENT_PAGE_VALUE_DEFAULT})));
 			this.pageSize = Integer.parseInt(String.join("", params.getOrDefault(PARAM_PAGE_SIZE, new String[] {PARAM_PAGE_SIZE_VALUE_DEFAULT})));
@@ -126,18 +132,22 @@ public class DataTable<T> {
 				this.orderBy = Integer.parseInt(paramOrderBy);
 			}
 			
-			String paramFilterBy = String.join("", params.getOrDefault(PARAM_FILTER_BY, new String[] {""}));
-			if (!paramFilterBy.isBlank() && paramFilterBy != null) {
-				this.filterBy = Integer.parseInt(paramFilterBy);
-			}
-			
-			this.filterValue = String.join("", params.getOrDefault(PARAM_FILTER_VALUE, new String[] {""}));
 			this.orderDirection = String.join("", params.getOrDefault(PARAM_ORDER_DIRECTION, new String[] {""}));			
 		} catch (NumberFormatException err) {
 			LOGGER.log(Level.WARNING, "Error Datatable" + err);
 			throw new UVException(ERROR_MSG_PARAMETRO_NO_VALIDO);
 		}
-				
+		
+		try {
+			String paramFilters = String.join("", params.getOrDefault(PARAM_FILTER, new String[] {""}));
+			if (!paramFilters.isBlank() && paramFilters != null) {
+				filters = new GsonBuilder().create().fromJson(paramFilters, new TypeToken<HashMap<Integer, String>>() { }.getType());
+			}
+		} catch (Exception ex) {
+			LOGGER.log(Level.WARNING, "Error Datatable" + ex);
+			throw new UVException(ERROR_MSG_PARAMETRO_BUSQUEDA_NO_VALIDO);
+		}
+		
 		if (!this.orderDirection.isBlank() && this.orderDirection != null) {
 			if (!this.orderDirection.equals(PARAM_ORDER_DIRECTION_VALUE_ASC) && !this.orderDirection.equals(PARAM_ORDER_DIRECTION_VALUE_DESC)) {
 				throw new UVException(ERROR_MSG_PARAMETRO_TIPO_ORDENACION_NO_VALIDO);
@@ -206,8 +216,11 @@ public class DataTable<T> {
 			}
 			this.recordsTotal = rs.getInt("count");
 			this.pagesTotal = this.recordsTotal / this.pageSize;
-		}		
-	}	
+			if (this.recordsTotal % this.pageSize == 0) {
+				this.pagesTotal -= 1;
+			}
+		}
+	}
 	
 	public void setData(List<T> data) {
 		this.data = data;
@@ -222,14 +235,13 @@ public class DataTable<T> {
 	}
 	
 	public Boolean isFilterable() {
-		return this.filterBy != null;
+		return this.filters != null;
 	}
 	
 	/**
 	 * Establece la lista de columnas ordenables, con su columna para la ordenación.
 	 * @param index .
 	 * @param column .
-	 * @param type .
 	 */
 	public void setColumn(Integer index, String column) {
 		columns.put(index, new DataTableColumn(column));	
@@ -248,12 +260,34 @@ public class DataTable<T> {
 	private String prepareQuery(String pconsulta) throws UVException {
 		String consultaResult = "";
 		if (this.isFilterable()) {
-			String column = this.columns.get(this.filterBy).getName();
-			if (column == null) {
-				throw new UVException(ERROR_MSG_COLUMNA_FILTRADO_NO_VALIDA);
-			}
-			
-			consultaResult += " AND lower(" + column + ") LIKE lower('%" + filterValue + "%') ";
+			for (Map.Entry<Integer, String> filter : filters.entrySet()) {
+		        Integer key = filter.getKey();
+		        String value = filter.getValue();
+				String column = this.columns.get(key).getName();
+				
+				if (column == null) {
+					throw new UVException(ERROR_MSG_COLUMNA_FILTRADO_NO_VALIDA);
+				}
+				
+				switch (this.columns.get(key).getType()) {
+					case DataTableColumn.COLUMN_TYPE_DATE:
+						consultaResult += " AND TO_CHAR(" + column + ",'yyyy-mm-dd') LIKE "
+								+ "'%" + new Date(Formateador.leeParametroFecha(value, Formateador.FORMATO_FECHA_DDMMYYYY, "/").getTime()) + "' ";
+						break;
+					case DataTableColumn.COLUMN_TYPE_NUMBER:
+						consultaResult += " AND " + column + " LIKE '%" + value + "%' ";
+						break;
+					case DataTableColumn.COLUMN_TYPE_BOOLEAN:
+						consultaResult += " AND " + column + " = '" + (Boolean.parseBoolean(value) ? "S" : "N") + "' ";
+						break;
+					case DataTableColumn.COLUMN_TYPE_OPTION:
+						consultaResult += " AND " + column + " = '" + value + "' ";
+						break;
+					default:
+						consultaResult += " AND lower(" + column + ") LIKE lower('%" + value + "%') ";
+						break;
+				}
+		    }
 		}
 		if (this.isOrderable()) {
 			String column = this.columns.get(this.orderBy).getName();
@@ -264,7 +298,7 @@ public class DataTable<T> {
 			consultaResult += " ORDER BY " + column + " " + this.orderDirection;
 		}
 		
-		System.out.print(pconsulta + consultaResult);
+		System.out.println(pconsulta + consultaResult);
 		
 		return pconsulta + consultaResult;
 	}

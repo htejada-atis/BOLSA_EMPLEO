@@ -9,10 +9,9 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import es.ujaen.uvirtual.beans.uvirtual.bolsaempleo.Titulacion;
-import es.ujaen.uvirtual.beans.uvirtual.bolsaempleo.UsuarioBolsaEmpleo;
 import es.ujaen.uvirtual.modelo.conexion.ConexionUvirtual;
 import es.ujaen.uvirtual.utilidades.BolsaEmpleoUtils;
-import es.ujaen.uvirtual.utilidades.DataTable;
+import es.ujaen.uvirtual.utilidades.BolsaEmpleoDataTable;
 import es.ujaen.uvirtual.utilidades.UVException;
 
 /**
@@ -20,9 +19,11 @@ import es.ujaen.uvirtual.utilidades.UVException;
  * @author ATISoluciones
  */
 public class ModeloTitulacion {
-	public static final int ORDER_COLUMN_INDEX_ID = 1;
-	public static final int ORDER_COLUMN_INDEX_NOMBRE = 2;
-	public static final int ORDER_COLUMN_INDEX_REQUERIDA = 3;
+	public static final int ORDER_COLUMN_INDEX_ID = 0;
+	public static final int ORDER_COLUMN_INDEX_NOMBRE = 1;
+	
+	public static final int ORDER_COLUMN_INDEX_ID_SELECTABLE = 1;
+	public static final int ORDER_COLUMN_INDEX_NOMBRE_SELECTABLE = 2;
 	
 	
 	/** Consulta titulaciones en BBDD y las devuelve.
@@ -197,14 +198,14 @@ public class ModeloTitulacion {
 	 * @throws SQLException en caso de error de base de datos
 	 * @throws UVException error si no existe titulación
 	 */
-	public DataTable<Titulacion> listaTitulacionesDatatable(Map<String, String[]> params) throws SQLException, UVException {
+	public BolsaEmpleoDataTable<Titulacion> listaTitulacionesDatatable(Map<String, String[]> params) throws SQLException, UVException {
 		List<Titulacion> titulaciones = new ArrayList<>();
-		DataTable<Titulacion> dataTable = new DataTable<Titulacion>(params);
+		BolsaEmpleoDataTable<Titulacion> dataTable = new BolsaEmpleoDataTable<Titulacion>(params);
 		
 		String consulta = "SELECT beptit.* FROM tbep_titulaciones beptit WHERE 1=1 ";
 		
-		dataTable.setOrderColumn(ORDER_COLUMN_INDEX_ID, "beptit.CODNUM");
-		dataTable.setOrderColumn(ORDER_COLUMN_INDEX_NOMBRE, "beptit.NOMBRE");
+		dataTable.setColumn(ORDER_COLUMN_INDEX_ID, "beptit.CODNUM");
+		dataTable.setColumn(ORDER_COLUMN_INDEX_NOMBRE, "beptit.NOMBRE");
 		dataTable.setQuery(consulta);
 				
 		try (Connection conexion = ConexionUvirtual.obtenerInstancia();
@@ -235,14 +236,14 @@ public class ModeloTitulacion {
 	 * @throws SQLException en caso de error de base de datos
 	 * @throws UVException error si no existe titulación
 	 */
-	public DataTable<Titulacion> listaTitulacionesDatatable(Map<String, String[]> params, Integer area) throws SQLException, UVException {
+	public BolsaEmpleoDataTable<Titulacion> listaTitulacionesDatatable(Map<String, String[]> params, Integer area) throws SQLException, UVException {
 		
 		if (area == null) {
 			throw new UVException("No se pueden listar titulaciones sin el id del área");
 		}
 		
 		List<Titulacion> titulaciones = new ArrayList<>();
-		DataTable<Titulacion> dataTable = new DataTable<Titulacion>(params);
+		BolsaEmpleoDataTable<Titulacion> dataTable = new BolsaEmpleoDataTable<Titulacion>(params);
 		
 		String consultaNotIn = "SELECT beptit.CODNUM FROM tbep_titulaciones beptit "
 				+ "INNER JOIN tbep_titulacionespreferentesarea beptpa ON beptit.codnum = beptpa.beptit_codnum "
@@ -250,8 +251,8 @@ public class ModeloTitulacion {
 				+ "WHERE bepare.CODNUM = ? ";
 		String consulta = "SELECT beptit.* FROM tbep_titulaciones beptit WHERE beptit.CODNUM NOT IN (" + consultaNotIn + ")";
 		
-		dataTable.setOrderColumn(ORDER_COLUMN_INDEX_ID, "beptit.CODNUM");
-		dataTable.setOrderColumn(ORDER_COLUMN_INDEX_NOMBRE, "beptit.NOMBRE");
+		dataTable.setColumn(ORDER_COLUMN_INDEX_ID_SELECTABLE, "beptit.CODNUM");
+		dataTable.setColumn(ORDER_COLUMN_INDEX_NOMBRE_SELECTABLE, "beptit.NOMBRE");
 		dataTable.setQuery(consulta);
 				
 		try (Connection conexion = ConexionUvirtual.obtenerInstancia();
@@ -285,23 +286,22 @@ public class ModeloTitulacion {
 	 * @throws SQLException en caso de error de base de datos
 	 * @throws UVException error si no existe titulación
 	 */
-	public DataTable<Titulacion> listaTitulacionesAreaDatatable(Map<String, String[]> params, Integer area) throws SQLException, UVException {
+	public BolsaEmpleoDataTable<Titulacion> listaTitulacionesAreaDatatable(Map<String, String[]> params, Integer area) throws SQLException, UVException {
 		
 		if (area == null) {
 			throw new UVException("No se pueden listar titulaciones sin el id del área");
 		}
 		
 		List<Titulacion> titulaciones = new ArrayList<>();
-		DataTable<Titulacion> dataTable = new DataTable<Titulacion>(params);
+		BolsaEmpleoDataTable<Titulacion> dataTable = new BolsaEmpleoDataTable<Titulacion>(params);
 		
 		String consulta = "SELECT beptit.CODNUM, beptit.NOMBRE FROM tbep_titulaciones beptit "
 				+ "INNER JOIN tbep_titulacionespreferentesarea beptpa ON beptit.codnum = beptpa.beptit_codnum "
 				+ "INNER JOIN TBEP_AREAS bepare ON bepare.codnum = beptpa.bepare_codnum "
 				+ "WHERE bepare.CODNUM = ? ";
 		
-		dataTable.setOrderColumn(ORDER_COLUMN_INDEX_ID, "beptit.CODNUM");
-		dataTable.setOrderColumn(ORDER_COLUMN_INDEX_NOMBRE, "beptit.NOMBRE");
-		dataTable.setOrderColumn(ORDER_COLUMN_INDEX_REQUERIDA, "beptpa.FLGREQUERIDA");
+		dataTable.setColumn(ORDER_COLUMN_INDEX_ID_SELECTABLE, "beptit.CODNUM");
+		dataTable.setColumn(ORDER_COLUMN_INDEX_NOMBRE_SELECTABLE, "beptit.NOMBRE");
 		dataTable.setQuery(consulta);
 				
 		try (Connection conexion = ConexionUvirtual.obtenerInstancia();

@@ -3,22 +3,22 @@ package es.ujaen.uvirtual.beans.vistas.uvirtual.bolsaempleo;
 import java.io.Serializable;
 import es.ujaen.uvirtual.beans.uvirtual.bolsaempleo.Noticia;
 import es.ujaen.uvirtual.beans.vistas.Vista;
-import es.ujaen.uvirtual.utilidades.DataTable;
+import es.ujaen.uvirtual.utilidades.BolsaEmpleoDataTable;
 
 /** Bean para la vista.
  * @author jlopez
  */
 public class VistaNoticias extends Vista implements Serializable {
 	private static final long serialVersionUID = 1L;
-	private DataTable<Noticia> dataTable;
+	private BolsaEmpleoDataTable<Noticia> dataTable;
 	private Noticia noticia;
 	private String vista;
 	
-	public DataTable<Noticia> getDatatableNoticias() {
+	public BolsaEmpleoDataTable<Noticia> getDatatableNoticias() {
 		return dataTable;
 	}
 	
-	public void setDatatableNoticias(DataTable<Noticia> dt) {
+	public void setDatatableNoticias(BolsaEmpleoDataTable<Noticia> dt) {
 		this.dataTable = dt;
 	}
 	

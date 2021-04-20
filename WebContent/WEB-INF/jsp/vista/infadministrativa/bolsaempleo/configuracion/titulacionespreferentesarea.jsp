@@ -86,14 +86,14 @@ VistaTitulacionesArea bean = (VistaTitulacionesArea) uvdatos.getVistas().get(Vis
 			    "ajax": { url: "<%=ControladorGestionTitulacionesPreferentesArea.URL_PATTERN_AJAX%>", async: false },
 			    "params": {"<%=ControladorGestionTitulacionesPreferentesArea.PARAM_AREA%>": id},
 			    "selectable": true,
-			    "searchable": true,
+			    "filterable": true,
 			    "pageSize": 5,
 			    "title": title,
 			    "action": "<%=ControladorGestionTitulacionesPreferentesArea.ACCION_DATATABLE_TITULACIONES_PREFERENTES_AREA%>",
 			    "columns": [
-			    	{'data': 'codNum', 'selectable': true},
-			    	{'data': 'codNum', 'searchable': {'type': 'number'}},
-			        {'data': 'nombre', 'class': 'overflow-auto', 'searchable': {'type': 'text'}},
+			    	{'data': 'codNum', 'filterable': true},
+			    	{'data': 'codNum', 'filter': {'type': 'number'}},
+			        {'data': 'nombre', 'class': 'overflow-auto', 'filter': {'type': 'text'}},
 			    ],
 			    "actions": [
 			    	{'label': 'Eliminar', 'title': 'Eliminar titulación del área', 'onClick': function(selected) {
@@ -116,8 +116,8 @@ VistaTitulacionesArea bean = (VistaTitulacionesArea) uvdatos.getVistas().get(Vis
 			    "action": "<%=ControladorGestionTitulacionesPreferentesArea.ACCION_DATATABLE_TITULACIONES%>",
 			    "columns": [
 			    	{'data': 'codNum', 'selectable': true},
-			    	{'data': 'codNum'},
-			        {'data': 'nombre', 'class': 'overflow-auto'},
+			    	{'data': 'codNum', 'filter': {'type': 'number'}},
+			        {'data': 'nombre', 'class': 'overflow-auto', 'filter': {'type': 'text'}},
 			    ],
 			    "actions": [
 			    	{'label': 'Incluir', 'title': 'Incluir titulación en el área', 'onClick': function(selected) {

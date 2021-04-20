@@ -56,11 +56,15 @@ table.bluetable.bolsaempleo caption {
 	color:#003399;
 	padding:0.5rem;
 }
-table.bluetable.bolsaempleo .searchable input {
+table.bluetable.bolsaempleo .filterable input {
 	display: block;
 	width: 100%;
 	max-width: 150px;
-} 
+}
+/* datatable buttons */
+table.bluetable.bolsaempleo .btns .btn {
+	width: 50px;
+}
 
 /* overflow */
 

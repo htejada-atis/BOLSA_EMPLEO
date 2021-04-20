@@ -7,7 +7,7 @@ import es.ujaen.uvirtual.beans.uvirtual.bolsaempleo.ApartadoBaremacion;
 import es.ujaen.uvirtual.beans.uvirtual.bolsaempleo.ItemBaremacion;
 import es.ujaen.uvirtual.beans.uvirtual.bolsaempleo.Merito;
 import es.ujaen.uvirtual.beans.vistas.Vista;
-import es.ujaen.uvirtual.utilidades.DataTable;
+import es.ujaen.uvirtual.utilidades.BolsaEmpleoDataTable;
 
 /** Bean para la vista.
  * @author atis
@@ -15,7 +15,7 @@ import es.ujaen.uvirtual.utilidades.DataTable;
 public class VistaMeritos extends Vista implements Serializable {
     private static final long serialVersionUID = 1L;
     private String vista;
-    private DataTable<Merito> dataTable;
+    private BolsaEmpleoDataTable<Merito> dataTable;
     private List<ApartadoBaremacion> apartados = new ArrayList<>();
     private List<ItemBaremacion> items = new ArrayList<>();
     private ApartadoBaremacion apartado;
@@ -30,11 +30,11 @@ public class VistaMeritos extends Vista implements Serializable {
         this.vista = vista;
     }
     
-    public DataTable<Merito> getDatatable() {
+    public BolsaEmpleoDataTable<Merito> getDatatable() {
 		return dataTable;
 	}
 	
-	public void setDatatable(DataTable<Merito> dt) {
+	public void setDatatable(BolsaEmpleoDataTable<Merito> dt) {
 		this.dataTable = dt;
 	}
 	

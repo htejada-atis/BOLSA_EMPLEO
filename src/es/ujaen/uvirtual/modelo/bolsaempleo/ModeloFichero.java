@@ -9,7 +9,7 @@ import java.util.List;
 import java.util.Map;
 import es.ujaen.uvirtual.beans.uvirtual.bolsaempleo.Fichero;
 import es.ujaen.uvirtual.modelo.conexion.ConexionUvirtual;
-import es.ujaen.uvirtual.utilidades.DataTable;
+import es.ujaen.uvirtual.utilidades.BolsaEmpleoDataTable;
 import es.ujaen.uvirtual.utilidades.UVException;
 
 
@@ -190,16 +190,16 @@ public class ModeloFichero {
 	 * @throws SQLException en caso de error de base de datos .
 	 * @throws UVException si el fichero no es valido .
 	 */
-	public DataTable<Fichero> listaFicherosDatatable(Map<String, String[]> params) throws SQLException, UVException {
+	public BolsaEmpleoDataTable<Fichero> listaFicherosDatatable(Map<String, String[]> params) throws SQLException, UVException {
 		List<Fichero> ficheros = new ArrayList<>();
-		DataTable<Fichero> dataTable = new DataTable<Fichero>(params);
+		BolsaEmpleoDataTable<Fichero> dataTable = new BolsaEmpleoDataTable<Fichero>(params);
 		
 		String consulta = "SELECT bepfich.codnum, bepfich.nombre, bepfich.titulo, bepfich.FLGPUBLICO FROM tbep_ficheros bepfich WHERE 1=1 ";
 		
-		dataTable.setOrderColumn(ORDER_COLUMN_INDEX_ID, "bepfich.CODNUM");
-		dataTable.setOrderColumn(ORDER_COLUMN_INDEX_NOMBRE, "bepfich.NOMBRE");
-		dataTable.setOrderColumn(ORDER_COLUMN_INDEX_TITULO, "bepfich.TITULO");
-		dataTable.setOrderColumn(ORDER_COLUMN_INDEX_PUBLICO, "bepfich.FLGPUBLICO");
+		dataTable.setColumn(ORDER_COLUMN_INDEX_ID, "bepfich.CODNUM");
+		dataTable.setColumn(ORDER_COLUMN_INDEX_NOMBRE, "bepfich.NOMBRE");
+		dataTable.setColumn(ORDER_COLUMN_INDEX_TITULO, "bepfich.TITULO");
+		dataTable.setColumn(ORDER_COLUMN_INDEX_PUBLICO, "bepfich.FLGPUBLICO");
 		dataTable.setQuery(consulta);
 				
 		try (Connection conexion = ConexionUvirtual.obtenerInstancia();

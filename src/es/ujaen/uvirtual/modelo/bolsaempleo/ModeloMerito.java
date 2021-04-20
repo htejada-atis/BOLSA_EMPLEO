@@ -10,7 +10,7 @@ import java.util.Map;
 import es.ujaen.uvirtual.beans.uvirtual.bolsaempleo.Merito;
 import es.ujaen.uvirtual.modelo.conexion.ConexionUvirtual;
 import es.ujaen.uvirtual.utilidades.BolsaEmpleoUtils;
-import es.ujaen.uvirtual.utilidades.DataTable;
+import es.ujaen.uvirtual.utilidades.BolsaEmpleoDataTable;
 import es.ujaen.uvirtual.utilidades.UVException;
 
 /**
@@ -154,14 +154,14 @@ public class ModeloMerito {
 	 * @throws SQLException en caso de error de base de datos .
 	 * @throws UVException error si no existe titulación .
 	 */
-	public DataTable<Merito> listaMeritosDatatable(Map<String, String[]> params, Integer usuario) throws SQLException, UVException {
+	public BolsaEmpleoDataTable<Merito> listaMeritosDatatable(Map<String, String[]> params, Integer usuario) throws SQLException, UVException {
 		
 		if (usuario == null) {
 			throw new UVException("No se pueden listar méritos sin el id del usuario");
 		}
 		
 		List<Merito> meritos = new ArrayList<>();
-		DataTable<Merito> dataTable = new DataTable<Merito>(params);
+		BolsaEmpleoDataTable<Merito> dataTable = new BolsaEmpleoDataTable<Merito>(params);
 		
 		String consulta = "SELECT bepmer.*, bepblo.BEPAPA_CODNUM FROM tbep_meritos bepmer"
 				+ " INNER JOIN tbep_itemsbaremacion bepite"

@@ -59,14 +59,15 @@ VistaNoticias bean = (VistaNoticias) uvdatos.getVistas().get(VistaNoticias.class
 		var table = new DataTable('#table_noticias_insertadas', {
 		    "ajax": { url: "<%= ControladorGestionNoticias.URL_PATTERN_AJAX %>" },
 		    "pageSize": 10,
+		    "filterable": true,
 		    "columns": [
-		    	{'data': 'fecha'},
-		    	{'data': 'texto', 'render': function(row) {
+		    	{'data': 'fecha', 'filter': {'type': 'date'}},
+		    	{'data': 'texto', 'filter': true, 'render': function(row) {
 		    		return "<div class='overflow-auto'>" +row.texto +"</div>";
 		    	}},
-		        {'data': 'enlace', 'class': 'overflow-ellipsis', 'render': function(row) { return "<a href='" +row.enlace +"' target='_blank'>" +row.enlace +"</a>"; }},
-		        {'data': 'publica'},
-		        {'data': 'activa'},
+		        {'data': 'enlace', 'class': 'overflow-ellipsis', 'filter': true, 'order': {'active': false}, 'render': function(row) { return "<a href='" +row.enlace +"' target='_blank'>" +row.enlace +"</a>"; }},
+		        {'data': 'publica', 'order': {'active': false}, 'filter': {'type': 'selectBoolean'}},
+		        {'data': 'activa', 'order': {'active': false}, 'filter': {'type': 'selectBoolean'}},
 		        {'data': 'codnum', 'buttons': [{'label': 'Editar', 'title': 'Editar noticia', 'onClick': function(row) {
 			        		var params = {'a': '<%= ControladorGestionNoticias.ACCION_EDITAR_NOTICIA %>', 'id': row.codNum};
 			        		Atis.sendForm("<%= request.getRequestURI() %>", params);
