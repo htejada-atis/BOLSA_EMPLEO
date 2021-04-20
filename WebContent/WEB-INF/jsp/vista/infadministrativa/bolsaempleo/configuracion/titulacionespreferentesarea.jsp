@@ -111,6 +111,7 @@ VistaTitulacionesArea bean = (VistaTitulacionesArea) uvdatos.getVistas().get(Vis
 			    "ajax": { url: "<%=ControladorGestionTitulacionesPreferentesArea.URL_PATTERN_AJAX%>", async: false },
 			    "params": {"<%=ControladorGestionTitulacionesPreferentesArea.PARAM_AREA%>": id},
 			    "selectable": true,
+			    "filterable": true,
 			    "pageSize": 5,
 			    "title": 'Titulaciones Disponibles',
 			    "action": "<%=ControladorGestionTitulacionesPreferentesArea.ACCION_DATATABLE_TITULACIONES%>",
