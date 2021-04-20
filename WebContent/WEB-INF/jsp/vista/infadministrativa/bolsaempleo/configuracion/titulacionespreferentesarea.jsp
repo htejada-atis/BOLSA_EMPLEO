@@ -82,7 +82,7 @@ VistaTitulacionesArea bean = (VistaTitulacionesArea) uvdatos.getVistas().get(Vis
 		var table_titulaciones;
 		
 		function inicializarTablas(id, title) {
-			table_titulaciones_area = new DataTable('#table_titulaciones_preferentes_area', {
+			table_titulaciones_area = new Atis.DataTable('#table_titulaciones_preferentes_area', {
 			    "ajax": { url: "<%=ControladorGestionTitulacionesPreferentesArea.URL_PATTERN_AJAX%>", async: false },
 			    "params": {"<%=ControladorGestionTitulacionesPreferentesArea.PARAM_AREA%>": id},
 			    "selectable": true,
@@ -107,7 +107,7 @@ VistaTitulacionesArea bean = (VistaTitulacionesArea) uvdatos.getVistas().get(Vis
 			    ]
 			});
 			
-			table_titulaciones = new DataTable('#table_titulaciones', {
+			table_titulaciones = new Atis.DataTable('#table_titulaciones', {
 			    "ajax": { url: "<%=ControladorGestionTitulacionesPreferentesArea.URL_PATTERN_AJAX%>", async: false },
 			    "params": {"<%=ControladorGestionTitulacionesPreferentesArea.PARAM_AREA%>": id},
 			    "selectable": true,

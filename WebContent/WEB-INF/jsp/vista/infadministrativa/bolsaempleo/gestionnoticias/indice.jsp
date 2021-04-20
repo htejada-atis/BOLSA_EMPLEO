@@ -69,7 +69,7 @@ VistaNoticias bean = (VistaNoticias) uvdatos.getVistas().get(VistaNoticias.class
 			Atis.sendForm("<%= request.getRequestURI() %>", {'a': '<%= ControladorGestionNoticias.ACCION_AGREGAR_NOTICIA %>'});
 		});
 
-		var table = new DataTable('#table_noticias_insertadas', {
+		var table = new Atis.DataTable('#table_noticias_insertadas', {
 		    "ajax": { url: "<%= ControladorGestionNoticias.URL_PATTERN_AJAX %>" },
 		    "pageSize": 10,
 		    "filterable": true,

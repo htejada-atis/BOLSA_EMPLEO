@@ -63,7 +63,7 @@ VistaTitulaciones bean = (VistaTitulaciones) uvdatos.getVistas().get(VistaTitula
 
 	$(document).ready(function() {
 		
-		var table_titulaciones = new DataTable('#table_titulaciones', {
+		var table_titulaciones = new Atis.DataTable('#table_titulaciones', {
 		    "ajax": { url: "<%=ControladorGestionTitulaciones.URL_PATTERN_AJAX%>" },
 		    "pageSize": 10,
 		    "action": "<%=ControladorGestionTitulaciones.ACCION_DATATABLE_TITULACIONES%>",

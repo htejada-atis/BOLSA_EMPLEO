@@ -9,6 +9,7 @@ import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
+import es.ujaen.uvirtual.beans.uvirtual.bolsaempleo.Bolsa;
 import es.ujaen.uvirtual.beans.uvirtual.bolsaempleo.Convocatoria;
 import es.ujaen.uvirtual.beans.uvirtual.bolsaempleo.UsuarioBolsaEmpleo;
 import es.ujaen.uvirtual.modelo.conexion.ConexionUvirtual;
@@ -33,42 +34,6 @@ public class ModeloConvocatoria {
 	
 	public static final int COLUMN_DESCRIPCION_MAXLENGTH = 150;
 		
-	/**
-	 * Devuelve una convocatoria por su id.
-	 * @param codNum id de convocatoria
-	 * @return Convocatoria
-	 * @throws SQLException en caso de error en la BD
-	 * @throws UVException si bolsa no es existe
-	 */
-	public Convocatoria getConvocatoriaById(int codNum) throws SQLException, UVException {
-		String consulta = "SELECT * "
-				+ "FROM TBEP_CONVOCATORIAS bepcon "
-				+ "WHERE bepcon.CODNUM = ?";
-			
-		try (Connection conexion = ConexionUvirtual.obtenerInstancia();
-				PreparedStatement stmt = conexion.prepareStatement(consulta);) {
-				stmt.setInt(1, codNum);
-						
-			try (ResultSet rs = stmt.executeQuery()) {
-				if (!rs.next()) {
-					throw new UVException("No existe la convocatoria con id " + codNum);
-				}
-				
-				Convocatoria convocatoria = new Convocatoria();
-				convocatoria.setCodNum(rs.getInt("CODNUM"));
-				convocatoria.setDescripcion(rs.getString("DESCRIPCION"));
-				convocatoria.setFechaCierre(rs.getDate("FECHACIERRE"));
-				convocatoria.setEstado(rs.getString("ESTADO"));
-				convocatoria.setNumBolsasMaximo(rs.getInt("NUMBOLSASMAXIMO"));
-				convocatoria.setNumMeritosPorBloque(rs.getInt("NUMMERITOSPORBLOQUE"));
-				
-				return convocatoria;
-			}
-		}
-	}
-	
-	
-	
 	/**
 	 * Listado de bolsas de convocatorias. 
 	 * @param params para leer los parametros de paginación, ordenacion, etc
@@ -161,6 +126,36 @@ public class ModeloConvocatoria {
 		}		
 	}
 	
+	/**
+	 * Devuelve un convocatoria por su pk.
+	 * @param codNum .
+	 * @return Convocatoria o null si no existe
+	 * @throws SQLException .
+	 */
+	public Convocatoria getConvocatoriaById(int codNum) throws SQLException, UVException {
+		String consulta = "SELECT bepcon.* FROM TBEP_CONVOCATORIAS bepcon WHERE bepcon.CODNUM = ?";
+			
+		try (Connection conexion = ConexionUvirtual.obtenerInstancia();
+				PreparedStatement stmt = conexion.prepareStatement(consulta);) {
+			stmt.setInt(1, codNum);
+						
+			try (ResultSet rs = stmt.executeQuery()) {
+				if (!rs.next()) {
+					return null;
+				}
+				
+				Convocatoria convocatoria = new Convocatoria();
+				convocatoria.setCodNum(rs.getInt("CODNUM"));
+				convocatoria.setDescripcion(rs.getString("DESCRIPCION"));
+				convocatoria.setEstado(rs.getString("ESTADO"));
+				convocatoria.setFechaCierre(rs.getDate("FECHACIERRE"));
+				convocatoria.setNumBolsasMaximo(rs.getInt("NUMBOLSASMAXIMO"));
+				convocatoria.setNumMeritosPorBloque(rs.getInt("NUMMERITOSPORBLOQUE"));
+				
+				return convocatoria;
+			}
+		}
+	}
 	
 	/** Actualiza una convocatoria.
 	 * @param conv Convocatoria con los datos nuevos a actualizar
@@ -216,3 +211,4 @@ public class ModeloConvocatoria {
 		}
 	}
 }
+

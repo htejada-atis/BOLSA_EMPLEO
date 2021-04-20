@@ -53,7 +53,7 @@ VistaFicheros bean = (VistaFicheros) uvdatos.getVistas().get(VistaFicheros.class
 
 	$(document).ready(function() {
 		
-		var table = new DataTable('#table_ficheros', {
+		var table = new Atis.DataTable('#table_ficheros', {
 		    "ajax": { url: "<%= ControladorGestionFicheros.URL_PATTERN_AJAX %>" },
 		    "pageSize": 10,
 		    "selectable": true,

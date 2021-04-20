@@ -98,7 +98,7 @@ VistaEvaluadores bean = (VistaEvaluadores) uvdatos.getVistas().get(VistaEvaluado
 		}
 		
 		function inicializarTablas(id, title) {
-			table_evaluadores = new DataTable('#table_evaluadores_area', {
+			table_evaluadores = new Atis.DataTable('#table_evaluadores_area', {
 			    "ajax": { url: "<%=ControladorGestionEvaluadores.URL_PATTERN_AJAX%>" },
 			    "params": {"<%=ControladorGestionEvaluadores.PARAM_AREA%>": id},
 			    "pageSize": 10,

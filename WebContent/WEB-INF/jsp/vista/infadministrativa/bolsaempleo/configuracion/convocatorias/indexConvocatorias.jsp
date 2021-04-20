@@ -53,7 +53,7 @@ VistaConvocatorias bean = (VistaConvocatorias) uvdatos.getVistas().get(VistaConv
 <script>
 
 	$(document).ready(function() {		
-		var table_titulaciones = new DataTable('#table_convocatorias', {
+		var table_titulaciones = new Atis.DataTable('#table_convocatorias', {
 		    "ajax": { url: "<%=  ControladorConvocatorias.URL_PATTERN_AJAX %>" },
 		    "pageSize": 10,
 		    "action": "<%= ControladorConvocatorias.ACCION_DATATABLE %>",

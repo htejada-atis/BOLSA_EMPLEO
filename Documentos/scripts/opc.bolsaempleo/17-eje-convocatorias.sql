@@ -13,7 +13,7 @@ COMMENT ON COLUMN TBEP_CONVOCATORIAS.DESCRIPCION IS 'Descripción de la convocat
 --/////////////////////
 COMMENT ON COLUMN TBEP_CONVOCATORIAS.FECHACIERRE IS 'Fecha de cierre de la convocatoria';
 --/////////////////////
-COMMENT ON COLUMN TBEP_CONVOCATORIAS.ESTADO IS 'Estado de la bolsa';
+COMMENT ON COLUMN TBEP_CONVOCATORIAS.ESTADO IS 'Estado de la convocatoria';
 --/////////////////////
 COMMENT ON COLUMN TBEP_CONVOCATORIAS.NUMBOLSASMAXIMO IS 'Número máximo de bolsas donde se puede apuntar el candidato';
 --/////////////////////

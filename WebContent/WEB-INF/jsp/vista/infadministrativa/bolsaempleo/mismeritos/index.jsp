@@ -60,7 +60,7 @@ VistaMeritos bean = (VistaMeritos) uvdatos.getVistas().get(VistaMeritos.class.ge
 			Atis.sendForm("<%= request.getRequestURI() %>", {'a': '<%= ControladorMisMeritos.ACCION_AGREGAR_MERITO %>'});
 		});
 		
-		var table = new DataTable('#tableMeritos', {
+		var table = new Atis.DataTable('#tableMeritos', {
 		    "ajax": { url: "<%= ControladorMisMeritos.URL_PATTERN_AJAX %>" },
 		    "pageSize": 10,
 		    "action": "<%=ControladorMisMeritos.ACCION_DATATABLE%>",
