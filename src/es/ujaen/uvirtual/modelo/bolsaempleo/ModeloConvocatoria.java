@@ -11,7 +11,7 @@ import java.util.Map;
 
 import es.ujaen.uvirtual.beans.uvirtual.bolsaempleo.Convocatoria;
 import es.ujaen.uvirtual.modelo.conexion.ConexionUvirtual;
-import es.ujaen.uvirtual.utilidades.DataTable;
+import es.ujaen.uvirtual.utilidades.BolsaEmpleoDataTable;
 import es.ujaen.uvirtual.utilidades.UVException;
 
 /**
@@ -39,19 +39,19 @@ public class ModeloConvocatoria {
 	 * @throws SQLException en caso de error de base de datos
 	 * @throws UVException error si no existe la area
 	 */
-	public DataTable<Convocatoria> listaConvocatoriasDatatable(Map<String, String[]> params) throws SQLException, UVException {
+	public BolsaEmpleoDataTable<Convocatoria> listaConvocatoriasDatatable(Map<String, String[]> params) throws SQLException, UVException {
 		List<Convocatoria> data = new ArrayList<>();
-		DataTable<Convocatoria> dataTable = new DataTable<Convocatoria>(params);
+		BolsaEmpleoDataTable<Convocatoria> dataTable = new BolsaEmpleoDataTable<Convocatoria>(params);
 		
 		String consulta =
 			"SELECT bepcon.* "
 		  + "FROM TBEP_CONVOCATORIAS bepcon "		  
 		  + "WHERE 1=1 ";
 		
-		dataTable.setOrderColumn(ORDER_COLUMN_INDEX_ID, "bepcon.CODNUM");
-		dataTable.setOrderColumn(ORDER_COLUMN_INDEX_DESCRIPCION, "bepcon.DESCRIPCION");
-		dataTable.setOrderColumn(ORDER_COLUMN_INDEX_FECHACIERRE, "bepcon.FECHACIERRE");
-		dataTable.setOrderColumn(ORDER_COLUMN_INDEX_ESTADO, "bepcon.ESTADO");		
+		dataTable.setColumn(ORDER_COLUMN_INDEX_ID, "bepcon.CODNUM");
+		dataTable.setColumn(ORDER_COLUMN_INDEX_DESCRIPCION, "bepcon.DESCRIPCION");
+		dataTable.setColumn(ORDER_COLUMN_INDEX_FECHACIERRE, "bepcon.FECHACIERRE");
+		dataTable.setColumn(ORDER_COLUMN_INDEX_ESTADO, "bepcon.ESTADO");		
 		dataTable.setQuery(consulta);
 				
 		try (Connection conexion = ConexionUvirtual.obtenerInstancia();

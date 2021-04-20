@@ -57,22 +57,23 @@ VistaFicheros bean = (VistaFicheros) uvdatos.getVistas().get(VistaFicheros.class
 		    "ajax": { url: "<%= ControladorGestionFicheros.URL_PATTERN_AJAX %>" },
 		    "pageSize": 10,
 		    "selectable": true,
+		    "filterable": true,
 		    "title": "Ficheros",
 		    "columns": [
 		    	{'data': 'codNum', 'selectable': true},
 		        {'data': 'nombre', 'render': function(row) {
 		    		return "<div class='overflow-auto'>" +row.nombre +"</div>";
 		    	}},
-		        {'data': 'titulo', 'render': function(row) {
+		        {'data': 'titulo', 'filter': true, 'render': function(row) {
 		    		return "<div class='overflow-auto'>" +row.titulo +"</div>";
 		    	}},
-		        {'data': 'codnum', 'class': 'overflow-ellipsis', 'render': function(row) {
+		        {'data': 'codnum', 'order': {'active': false}, 'class': 'overflow-ellipsis', 'render': function(row) {
 		        	var link = "<%= ControladorGestionFicheros.URL_PATTERN_FILES_PRIVADA %>"
 		        	+ "?a=<%= ControladorGestionFicheros.ACCION_DESCARGAR_FICHERO %>&<%= ControladorGestionFicheros.PARAM_FICHERO %>=" + row.codNum;
 		        	return "<a class='consultar-fichero' href='" +link +"' target='_blank'>" +link +"</a>"; 
 		        	}
 		        },
-		        {'data': 'publico', 'render': function(row) {
+		        {'data': 'publico', 'filter': {'type': 'selectBoolean'}, 'order': {'active': false}, 'render': function(row) {
 	        		if(row.publico){
 	        			return "<div class='circle-true'></div>"; 
 	        		}

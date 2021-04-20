@@ -11,6 +11,7 @@ import es.ujaen.uvirtual.beans.uvirtual.bolsaempleo.Fichero;
 import es.ujaen.uvirtual.modelo.conexion.ConexionUvirtual;
 import es.ujaen.uvirtual.utilidades.BolsaEmpleoDataTable;
 import es.ujaen.uvirtual.utilidades.UVException;
+import es.ujaen.uvirtual.utilidades.BolsaEmpleoDataTable.DataTableColumn;
 
 
 /**
@@ -23,9 +24,9 @@ import es.ujaen.uvirtual.utilidades.UVException;
  */
 public class ModeloFichero {
 	
-	public static final int ORDER_COLUMN_INDEX_ID = 1;
-	public static final int ORDER_COLUMN_INDEX_NOMBRE = 2;
-	public static final int ORDER_COLUMN_INDEX_TITULO = 3;
+	public static final int ORDER_COLUMN_INDEX_ID = 0;
+	public static final int ORDER_COLUMN_INDEX_NOMBRE = 1;
+	public static final int ORDER_COLUMN_INDEX_TITULO = 2;
 	public static final int ORDER_COLUMN_INDEX_PUBLICO = 4;
 	
 	/********************************************** METODOS PÚBLICOS PARA CONSULTAS   ********************************************/
@@ -199,7 +200,7 @@ public class ModeloFichero {
 		dataTable.setColumn(ORDER_COLUMN_INDEX_ID, "bepfich.CODNUM");
 		dataTable.setColumn(ORDER_COLUMN_INDEX_NOMBRE, "bepfich.NOMBRE");
 		dataTable.setColumn(ORDER_COLUMN_INDEX_TITULO, "bepfich.TITULO");
-		dataTable.setColumn(ORDER_COLUMN_INDEX_PUBLICO, "bepfich.FLGPUBLICO");
+		dataTable.setColumn(ORDER_COLUMN_INDEX_PUBLICO, "bepfich.FLGPUBLICO", DataTableColumn.COLUMN_TYPE_BOOLEAN);
 		dataTable.setQuery(consulta);
 				
 		try (Connection conexion = ConexionUvirtual.obtenerInstancia();
