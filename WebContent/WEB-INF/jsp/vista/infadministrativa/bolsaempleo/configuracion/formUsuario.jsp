@@ -2,6 +2,7 @@
 <%@ page import="es.ujaen.uvirtual.beans.UVDatos"%>
 <%@ page import="es.ujaen.uvirtual.beans.Rol"%>
 <%@	page import="es.ujaen.uvirtual.controlador.infadministrativa.bolsaempleo.ControladorUsuarioBolsaEmpleo"%>
+<%@	page import="es.ujaen.uvirtual.controlador.infadministrativa.bolsaempleo.ControladorAreasABaremar"%>
 <%@ page import="es.ujaen.uvirtual.beans.vistas.uvirtual.bolsaempleo.VistaUsuarioBolsaEmpleo"%>
 <%@ page import="es.ujaen.uvirtual.utilidades.EscapaHTML" %>
 <%@ page import="es.ujaen.uvirtual.utilidades.Formateador"%>
@@ -139,6 +140,47 @@ VistaUsuarioBolsaEmpleo bean = (VistaUsuarioBolsaEmpleo) uvdatos.getVistas().get
     		<input id="usuario_enviar" type="submit" name="<%= ControladorUsuarioBolsaEmpleo.PARAM_ENVIAR %> " value="<%if(bean.getUsuario()!=null){%><%if(bean.getBusqueda()){%>Volver<%}else{%>Guardar usuario<%}%><%}else{%>Añadir usuario<%}%>"/>
     	</div>
     </form>
+    
+    
+	<% 
+		if(bean.getUsuario().getRol().getValor().equals("bolempcandidato")) { %>
+			<table class="bluetable bolsaempleo" id="table_areas_excluidas">
+	  			<caption class="table-title">Áreas excluidas para el usuario</caption>  
+				<tr>
+					<th scope="col" style="width:5%" title="Id de la area">Id</th>
+					<th scope="col" style="width:25%" title="Código de area">Código</th>
+					<th scope="col" style="width:65%">Area</th>
+					<th scope="col" class="center" style="width:15%">Baremable</th>	
+					<th scope="col" style="width:10%"></th>
+				</tr>
+				<tbody>				
+				</tbody>
+				<tfoot>
+					<tr>
+						<th colSpan="10" style="width:100%"></th>
+					</tr>
+				</tfoot>
+			</table>
+			
+			
+			<table class="bluetable bolsaempleo" id="table_areas">
+	  			<caption class="table-title">Listado de áreas</caption>  
+				<tr>
+					<th scope="col" style="width:5%"></th>
+					<th scope="col" style="width:5%" title="Id de la area">Id</th>
+					<th scope="col" style="width:25%" title="Código de area">Código</th>
+					<th scope="col" style="width:65%">Area</th>
+					<th scope="col" class="center" style="width:15%">Baremable</th>	
+				</tr>
+				<tbody>				
+				</tbody>
+				<tfoot>
+					<tr>
+						<th colSpan="10" style="width:100%"></th>
+					</tr>
+				</tfoot>
+			</table>		
+		<%}%>   
 </div>
 
 <script>
@@ -177,6 +219,10 @@ VistaUsuarioBolsaEmpleo bean = (VistaUsuarioBolsaEmpleo) uvdatos.getVistas().get
 	}
 
 	$(document).ready(function() {
+		document.getElementById("usuario_enviar").addEventListener("click", function(event) {
+			enviarUsuario(event, this);
+		});
+		
 		<% if(bean.getBusqueda()) {%>
 		params = document.getElementsByClassName("params");
 		for (var i = 0; i < params.length; i++) { 
@@ -184,9 +230,56 @@ VistaUsuarioBolsaEmpleo bean = (VistaUsuarioBolsaEmpleo) uvdatos.getVistas().get
 		}
 		<%}%>
 		
-		document.getElementById("usuario_enviar").addEventListener("click", function(event) {
-			enviarUsuario(event, this);
-		});
+		var table = new Atis.DataTable('#table_areas', {
+		    "ajax": { url: "/srv/es/ajax/informacionadministrativa/bolsaempleo/configuracion/areasbaremar" },
+		    "selectable": true,
+		    "pageSize": 10,
+		    "action": "<%= ControladorAreasABaremar.ACCION_DATATABLE %>",
+		    "columns": [
+		    	{'data': 'codNum', 'selectable': true},
+		        {'data': 'codNum'},
+		        {'data': 'area.idAreaExterno'},
+		        {'data': 'area.descripcion'},
+		        {'data': 'baremable', 'render': function(row) {
+	        		if(row.baremable){
+	        			return "<div title='Baremable' class='circle-true'></div>"; 
+	        		}
+	        		else{
+	        			return "<div title='No Baremable' class='circle-false'></div>"; 
+	        		}
+	        	}},
+		    ],
+		    "actions": [
+		    	{'label': 'Excluir', 'onClick': function(selected) { enviaAccion("<%=ControladorUsuarioBolsaEmpleo.ACCION_EXCLUIR_USUARIO_AREA%>", selected); } }
+		    ]
+		});	
+		
+		
+		
 	});
+	
+	function enviaAccion(accion, selected) {
+		if (selected.length == 0) {
+			Atis.alertDialog('Estado de los usuarios', 'Seleccione al menos un usuario.');
+			return;
+		}
+		console.log(accion,selected);
+
+		Atis.confirmDialog(titulo, mensaje, {
+        	Si: function() {
+        		var params = {
+        				'a': '<%=ControladorUsuarioBolsaEmpleo.ACCION_EXCLUIR_USUARIO_AREA%>', 
+        				'<%=ControladorUsuarioBolsaEmpleo.PARAM_ACCION_USUARIO%>': accion, 
+        				'<%=ControladorUsuarioBolsaEmpleo.PARAM_ID%>': <%= bean.getUsuario().getCodNum() %>, 
+        				'<%=ControladorUsuarioBolsaEmpleo.PARAM_USUARIOS_SELECCIONADOS%>': Atis.object2Json(selected)
+        			};
+    			Atis.sendForm("<%= request.getRequestURI() %>", params);
+          		$(this).dialog("close");
+        	},
+        	No: function() {
+          		$(this).dialog("close");
+        	}
+      	});
+	}
 	
 </script>
