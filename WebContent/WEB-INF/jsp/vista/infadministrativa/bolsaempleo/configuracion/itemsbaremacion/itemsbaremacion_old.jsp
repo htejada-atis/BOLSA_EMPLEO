@@ -10,7 +10,16 @@ UVDatos uvdatos = (UVDatos) request.getAttribute(UVDatos.NOMBRE_ATRIBUTO);
 VistaItemsBaremacion bean = (VistaItemsBaremacion) uvdatos.getVistas().get(VistaItemsBaremacion.class.getName());
 %>
 
-<div class='bolsas'>	
+<div class='bolsas'>
+	<% if (session.getAttribute(ControladorItemsBaremacion.MENSAJE_ENVIADO) != null) { %>
+		<div id="exito" class="success">
+			<%= session.getAttribute(ControladorItemsBaremacion.MENSAJE_ENVIADO) %>
+		</div>
+	<% 
+			session.removeAttribute(ControladorItemsBaremacion.MENSAJE_ENVIADO);
+		} 
+	%>
+
 	<% if (bean.getMensajesDeExito().size() > 0) { %>
 		<div id="exito" class="success">
 			<%= bean.formatearMensajesDeExito() %>
@@ -26,17 +35,15 @@ VistaItemsBaremacion bean = (VistaItemsBaremacion) uvdatos.getVistas().get(Vista
 	
 	<table class="bluetable bolsaempleo" id="tableApartadosGenerales">
 		<tr>
-			<th scope="col" style="width:10%" title="Código apartado">Código</th>
-			<th scope="col" style="width:50%" title="Código de area">Nombre del bloque</th>
-			<th scope="col" style="width:15%" title="Puntuación máxima por bloque">Puntuación max.</th>
-			<th scope="col" style="width:15%" title="Porcentaje máximo por bloque">Porcentaje max.</th>
+			<th scope="col" style="width:15%" title="Código apartado">Código</th>
+			<th scope="col" style="width:75%" title="Código de area">Nombre del bloque</th>
 			<th scope="col" class="center" style="width:10%">Activo</th>
 		</tr>
 		<tbody>				
 		</tbody>
 		<tfoot>
 			<tr>
-				<th colSpan="5" style="width:100%"></th>
+				<th colSpan="4" style="width:100%"></th>
 			</tr>
 		</tfoot>
 	</table>
@@ -138,8 +145,6 @@ VistaItemsBaremacion bean = (VistaItemsBaremacion) uvdatos.getVistas().get(Vista
 		    "columns": [
 		    	{'data': 'codigo', 'filter': true},
 		        {'data': 'nombre', 'filter': true},
-		        {'data': 'puntuacionMaxima'},
-		        {'data': 'porcentajeMaximo'},
 		        {'data': 'activo', 'filter': {'type': 'selectBoolean'}, 'render': function(row) {
 	        		if(row.activo){
 	        			return "<div title='Activo' class='circle-true'></div>"; 

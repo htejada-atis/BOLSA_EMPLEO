@@ -319,8 +319,6 @@ public class ControladorConvocatorias extends HttpServlet {
 		this.index(bean, datos, request, response);
 	}
 	
-	
-	
 	private BolsaEmpleoValidator getValidatorConvocatoria(HttpServletRequest request) throws UVException {
 		BolsaEmpleoValidator validator = new BolsaEmpleoValidator(request);
 		validator.addParamString(PARAM_CONVOCATORIA_DESCRIPCION);

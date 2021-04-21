@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.sql.SQLException;
 import java.util.logging.Logger;
+import java.util.Date;
 import java.util.logging.Level;
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
@@ -21,7 +22,9 @@ import es.ujaen.uvirtual.beans.uvirtual.bolsaempleo.BloqueBaremacion;
 import es.ujaen.uvirtual.beans.uvirtual.bolsaempleo.ItemBaremacion;
 import es.ujaen.uvirtual.beans.vistas.uvirtual.bolsaempleo.VistaItemsBaremacion;
 import es.ujaen.uvirtual.modelo.bolsaempleo.ModeloBaremacion;
+import es.ujaen.uvirtual.modelo.bolsaempleo.ModeloConvocatoria;
 import es.ujaen.uvirtual.utilidades.BolsaEmpleoDataTable;
+import es.ujaen.uvirtual.utilidades.BolsaEmpleoValidator;
 import es.ujaen.uvirtual.modelo.bolsaempleo.ModeloUsuarioBolsaEmpleo;
 import es.ujaen.uvirtual.utilidades.EscapaHTML;
 import es.ujaen.uvirtual.utilidades.Formateador;
@@ -44,32 +47,43 @@ public class ControladorItemsBaremacion extends HttpServlet {
 	private static final String NOMBREDEESTACLASE = ControladorItemsBaremacion.class.getName();
 	private static final Logger LOGGER = Logger.getLogger(NOMBREDEESTACLASE);
 	
-	// acciones
-	public static final String ACCION_ACTIVAR_APARTADO = "activarapartado";
-	public static final String ACCION_ACTIVAR_BLOQUE = "activarabloque";
-	public static final String ACCION_ACTIVAR_ITEM = "activaraitem";
+	// acciones apartados
 	public static final String ACCION_AGREGAR_APARTADO = "agregarapartado";
-	public static final String ACCION_AGREGAR_BLOQUE = "agregarbloque";
-	public static final String ACCION_AGREGAR_ITEM = "agregaritem";
+	public static final String ACCION_AGREGAR_APARTADO_CONFIRM = "agregarapartadoconfirm";
+	public static final String ACCION_EDITAR_APARTADO_CONFIRM = "editarapartadoconfirm";
+	public static final String MENSAJE_EXITO_AGREGAR_APARTADO = "Apartado agregado correctamente";
+
+	public static final String ACCION_ACTIVAR_APARTADO = "activarapartado";	
 	public static final String ACCION_EDITAR_APARTADO = "editarapartado";
-	public static final String ACCION_EDITAR_BLOQUE = "editarbloque";
-	public static final String ACCION_EDITAR_ITEM = "editaritem";
 	public static final String ACCION_APARTADO_SELECCIONADO = "apartadoseleccionado";
-	public static final String ACCION_BLOQUE_SELECCIONADO = "bloqueseleccionado";
-	public static final String ACCION_ITEM_SELECCIONADO = "itemseleccionado";
-	public static final String ACCION_LISTAR = "listar";
 	public static final String ACCION_DATATABLE_APARTADOS = "datatable_apartados";
-	public static final String ACCION_DATATABLE_BLOQUES = "datatable_bloques";
-	public static final String ACCION_DATATABLE_ITEMS = "datatable_items";
 	public static final String ACCION_DESACTIVAR_APARTADO = "desactivarapartado";
+	
+	// acciones bloques
+	public static final String ACCION_ACTIVAR_BLOQUE = "activarabloque";
+	public static final String ACCION_AGREGAR_BLOQUE = "agregarbloque";
+	public static final String ACCION_EDITAR_BLOQUE = "editarbloque";
+	public static final String ACCION_BLOQUE_SELECCIONADO = "bloqueseleccionado";
+	public static final String ACCION_DATATABLE_BLOQUES = "datatable_bloques";
 	public static final String ACCION_DESACTIVAR_BLOQUE = "desactivarabloque";
+	
+	// acciones items
+	public static final String ACCION_ACTIVAR_ITEM = "activaraitem";
+	public static final String ACCION_AGREGAR_ITEM = "agregaritem";	
+	public static final String ACCION_EDITAR_ITEM = "editaritem";
+	public static final String ACCION_ITEM_SELECCIONADO = "itemseleccionado";
+	public static final String ACCION_DATATABLE_ITEMS = "datatable_items";
 	public static final String ACCION_DESACTIVAR_ITEM = "desactivaraitem";
+
+	public static final String ACCION_INDEX = "indice";	
 	
 	// parámetros
 	public static final String PARAM_ACCION = "a";
 	public static final String PARAM_APARTADO = "apartado";
 	public static final String PARAM_APARTADO_NOMBRE = "nombreapartado";
 	public static final String PARAM_APARTADO_CODIGO = "codigoapartado";
+	public static final String PARAM_APARTADO_PUNTUACIONMAXIMA = "puntuaacionmaxima";
+	public static final String PARAM_APARTADO_PORCENTAJEMAXIMO = "porcentajemaximo";
 	public static final String PARAM_BLOQUE = "bloque";
 	public static final String PARAM_BLOQUE_NOMBRE = "nombrebloque";
 	public static final String PARAM_BLOQUE_CODIGO = "codigobloque";
@@ -78,12 +92,18 @@ public class ControladorItemsBaremacion extends HttpServlet {
 	public static final String PARAM_ITEM_NOMBRE = "nombreitem";
 	public static final String PARAM_ITEM_CODIGO = "codigoitem";
 	
+	
 	// mensajes
+	public static final String MENSAJE_ERROR_CODIGO_VACIO = "El código no puede estar vacio";
+	public static final String MENSAJE_ERROR_CODIGO_MAXIMO = "El código no puede ser mayor que ";
+	public static final String MENSAJE_ERROR_NOMBRE_VACIO = "El nombre no puede estar vacio";
+	public static final String MENSAJE_ERROR_NOMBRE_MAXIMO = "El nombre no puede ser mayor que ";
+
+
 	public static final String MENSAJE_ENVIADO = "mensaje";
 	public static final String MENSAJE_EXITO_ACTIVAR_APARTADO = "apartado activado correctamente";
 	public static final String MENSAJE_EXITO_ACTIVAR_BLOQUE = "bloque activado correctamente";
 	public static final String MENSAJE_EXITO_ACTIVAR_ITEM = "ítem activado correctamente";
-	public static final String MENSAJE_EXITO_AGREGAR_APARTADO = "apartado agregado correctamente";
 	public static final String MENSAJE_EXITO_AGREGAR_BLOQUE = "bloque agregado correctamente";
 	public static final String MENSAJE_EXITO_AGREGAR_ITEM = "ítem agregado correctamente";
 	public static final String MENSAJE_EXITO_DESACTIVAR_APARTADO = "apartado desactivado correctamente";
@@ -121,12 +141,23 @@ public class ControladorItemsBaremacion extends HttpServlet {
 		
 		String nombreAccion = EscapaHTML.ajustaCodificacion(request.getParameter(PARAM_ACCION));
 		if (nombreAccion == null) {
-			nombreAccion = ACCION_LISTAR;
+			nombreAccion = ACCION_INDEX;
 		}
 		
 		try {
 			anonimo = !modelo.checkUser(datos);
 			switch (nombreAccion) {
+				case ACCION_INDEX:
+					indice(bean, request, response);
+					break;
+				case ACCION_DATATABLE_APARTADOS:
+				case ACCION_AGREGAR_APARTADO:
+				case ACCION_EDITAR_APARTADO_CONFIRM:				
+					accionesApartados(bean, datos, request, response, nombreAccion);					
+					break;
+									
+					
+					
 				case ACCION_ACTIVAR_APARTADO:
 					actualizaActivoApartado(bean, request, response, true);
 					break;
@@ -136,23 +167,18 @@ public class ControladorItemsBaremacion extends HttpServlet {
 				case ACCION_ACTIVAR_ITEM:
 					actualizaActivoItem(bean, request, response, true);
 					break;
-				case ACCION_LISTAR:
 				case ACCION_APARTADO_SELECCIONADO:
 				case ACCION_BLOQUE_SELECCIONADO:
 				case ACCION_ITEM_SELECCIONADO:
 					listarItemsBaremacion(bean, request, response, nombreAccion);
 					break;
-				case ACCION_AGREGAR_APARTADO:
-					agregarApartado(bean, request, response);
-					break;
+				
 				case ACCION_AGREGAR_BLOQUE:
 					agregarBloque(bean, request, response);
 					break;
 				case ACCION_AGREGAR_ITEM:
 					agregarItem(bean, request, response);
-					break;
-				case ACCION_DATATABLE_APARTADOS:
-					listadoApartados(bean, datos, request, response);
+				
 					break;
 				case ACCION_DATATABLE_BLOQUES:
 					listadoBloques(bean, datos, request, response);
@@ -208,6 +234,110 @@ public class ControladorItemsBaremacion extends HttpServlet {
 		doGet(request, response);
 	}
 	
+	private void indice(VistaItemsBaremacion bean, HttpServletRequest request, HttpServletResponse response) {
+		bean.setVista(RUTA_BEP_CONF + "itemsbaremacion.jsp");
+	}
+	
+	///////////////////////////////////////////////////////////////////////////////////////////////////////////
+	// APARTADOS
+	///////////////////////////////////////////////////////////////////////////////////////////////////////////
+	
+	private void accionesApartados(VistaItemsBaremacion bean, UVDatos datos, HttpServletRequest request, HttpServletResponse response, String nombreAccion) 
+			throws SQLException, UVException, IOException {
+		switch (nombreAccion) {
+			case ACCION_DATATABLE_APARTADOS:
+				this.listadoApartados(bean, datos, request, response);
+				break;	
+			case ACCION_AGREGAR_APARTADO:
+				this.agregarApartado(bean, request, response);
+				break;
+			case ACCION_EDITAR_APARTADO_CONFIRM:
+				this.agregarApartadoConfirm(bean, request, response);
+				break;
+		}
+	}
+	
+	private void listadoApartados(VistaItemsBaremacion bean, UVDatos datos, HttpServletRequest request, HttpServletResponse response) throws IOException, SQLException {
+		datos.setContentType("application/json");
+		datos.setRespuestaEnviada(true);
+		response.setContentType("application/json");
+		response.setCharacterEncoding("UTF-8");
+		
+		try (PrintWriter writer = response.getWriter()) {
+			try {
+				BolsaEmpleoDataTable<ApartadoBaremacion> dataTable = ModeloBaremacion.obtenerInstancia().
+						listadoApartadosGeneralesBaremacionDatatable(request.getParameterMap());
+				Gson gson = new GsonBuilder().setExclusionStrategies(BolsaEmpleoDataTable.GSONEXCLUSIONSTRATEGY).create();
+				bean.setDatatable(dataTable);
+				writer.write(gson.toJson(dataTable));
+			} catch (Exception ex) {
+				bean.getMensajesDeError().add(ex.getMessage());
+				
+				CodigoDescripcion mensaje = new CodigoDescripcion("error", ex.getMessage());
+				writer.write(new Gson().toJson(mensaje));
+				response.setStatus(RESPONSE_HTTP_CODE_ERROR);
+			}
+		}
+	}
+	
+	private void agregarApartado(VistaItemsBaremacion bean, HttpServletRequest request, HttpServletResponse response) throws SQLException, UVException, IOException {
+		bean.setVista(RUTA_BEP_CONF + "formApartadoBaremacion.jsp");
+		bean.setApartadoBaremacion(null);
+		bean.setUltimoCodigo(ModeloBaremacion.obtenerInstancia().getUltimoCodigoApartado());
+	}
+	
+	private void agregarApartadoConfirm(VistaItemsBaremacion bean, HttpServletRequest request, HttpServletResponse response) throws SQLException, UVException, IOException {
+		bean.setVista(RUTA_BEP_CONF + "formApartadoBaremacion.jsp");
+		
+		BolsaEmpleoValidator validator = this.getValidatorApartado(request);		
+		if (!validator.isValid()) {
+			for (String param : validator.getErrors().keySet()) {
+				for (String paramError : validator.getErrors().get(param)) {
+					bean.getMensajesDeError().add(paramError);
+				}
+			}
+			return;
+		}
+		
+		// agregamos
+		ApartadoBaremacion apartado = new ApartadoBaremacion();
+		apartado.setCodigo(validator.getValueString(PARAM_APARTADO_CODIGO));
+		apartado.setNombre(validator.getValueString(PARAM_APARTADO_NOMBRE));
+		apartado.setActivo(true);
+		apartado.setPuntuacionMaxima(validator.getValueFloat(PARAM_APARTADO_PUNTUACIONMAXIMA));
+		apartado.setPorcentajeMaximo(validator.getValueFloat(PARAM_APARTADO_PORCENTAJEMAXIMO));
+		
+		ModeloBaremacion.obtenerInstancia().insertaApartado(apartado);
+		
+		bean.getMensajesDeExito().add(MENSAJE_EXITO_AGREGAR_APARTADO);
+		request.removeAttribute(PARAM_ACCION);
+		
+		this.indice(bean, request, response);		
+	}
+	
+	private BolsaEmpleoValidator getValidatorApartado(HttpServletRequest request) throws UVException {
+		BolsaEmpleoValidator validator = new BolsaEmpleoValidator(request);
+		validator.addParamString(PARAM_APARTADO_CODIGO);
+		validator.addRule(PARAM_APARTADO_CODIGO, "required", MENSAJE_ERROR_CODIGO_VACIO);
+		validator.addRule(PARAM_APARTADO_CODIGO, "noBlank", MENSAJE_ERROR_CODIGO_VACIO);
+		validator.addRule(PARAM_APARTADO_CODIGO, "max:" + ModeloBaremacion.COLUMN_CODIGO_MAXLENGTH, 
+				String.format(MENSAJE_ERROR_CODIGO_MAXIMO, ModeloBaremacion.COLUMN_CODIGO_MAXLENGTH));
+		
+		validator.addParamString(PARAM_APARTADO_NOMBRE);
+		validator.addRule(PARAM_APARTADO_NOMBRE, "required", MENSAJE_ERROR_NOMBRE_VACIO);
+		validator.addRule(PARAM_APARTADO_NOMBRE, "noBlank", MENSAJE_ERROR_NOMBRE_VACIO);
+		validator.addRule(PARAM_APARTADO_NOMBRE, "max:" + ModeloBaremacion.COLUMN_NOMBRE_MAXLENGTH, 
+				String.format(MENSAJE_ERROR_NOMBRE_MAXIMO, ModeloBaremacion.COLUMN_NOMBRE_MAXLENGTH));
+		
+		validator.addParamFloat(PARAM_APARTADO_PUNTUACIONMAXIMA);
+		validator.addParamFloat(PARAM_APARTADO_PORCENTAJEMAXIMO);
+				
+		return validator;
+	}
+	
+	
+	
+	
 	/** asda.
 	 * @param bean .
 	 * @param request .
@@ -221,12 +351,12 @@ public class ControladorItemsBaremacion extends HttpServlet {
 		bean.setVista(RUTA_BEP_CONF + "itemsbaremacion.jsp");
 		
 		switch (accion) {
-			case ACCION_LISTAR:
+			case ACCION_INDEX:
 				HttpSession session = request.getSession(false);
 				String mensaje = (String) session.getAttribute(MENSAJE_ENVIADO);
 				
 				if (mensaje == null) {
-					mensaje = ACCION_LISTAR;
+					mensaje = ACCION_INDEX;
 				}
 				
 				switch (mensaje) {
@@ -414,31 +544,6 @@ public class ControladorItemsBaremacion extends HttpServlet {
 		}
 	}
 	
-	/** agrega un nuevo apartado .
-	 * @param bean .
-	 * @param request .
-	 * @param response .
-	 * @throws SQLException .
-	 * @throws UVException .
-	 * @throws IOException .
-	 */
-	private void agregarApartado(VistaItemsBaremacion bean, HttpServletRequest request, HttpServletResponse response) throws SQLException, UVException, IOException {
-		bean.setVista(RUTA_BEP_CONF + "formApartadoBaremacion.jsp");
-		ModeloBaremacion modelo = ModeloBaremacion.obtenerInstancia();
-		ApartadoBaremacion apartado = modelo.getUltimoCodigoApartado();
-		bean.setApartadoBaremacion(apartado);
-		if (EscapaHTML.ajustaCodificacion(request.getParameter(PARAM_APARTADO_NOMBRE)) != null) {
-			String codigo = EscapaHTML.ajustaCodificacion(request.getParameter(PARAM_APARTADO_CODIGO));
-			String nombre = EscapaHTML.ajustaCodificacion(request.getParameter(PARAM_APARTADO_NOMBRE));
-			ApartadoBaremacion apartadoNuevo = new ApartadoBaremacion(codigo, nombre);
-			modelo.insertaApartado(apartadoNuevo);
-			bean.getMensajesDeExito().add(MENSAJE_EXITO_AGREGAR_APARTADO);
-			HttpSession session = request.getSession(false);
-			session.setAttribute(MENSAJE_ENVIADO, MENSAJE_EXITO_AGREGAR_APARTADO);
-			response.sendRedirect(request.getServletPath());
-		}
-	}
-	
 	/** agrega un nuevo bloque .
 	 * @param bean .
 	 * @param request .
@@ -534,38 +639,7 @@ public class ControladorItemsBaremacion extends HttpServlet {
 		bean.setApartadoBaremacion(item.getBloqueBaremacion().getApartadoBaremacion());
 	}
 	
-	/**
-	 * Listado de apartados de items baremación.
-     * @param bean .
-	 * @param datos .
-	 * @param request .
-	 * @param response .
-	 * @throws IOException .
-	 * @throws SQLException .
-	 */
-	private void listadoApartados(VistaItemsBaremacion bean, UVDatos datos, HttpServletRequest request, HttpServletResponse response) throws IOException, SQLException {
-		ModeloBaremacion modelo = ModeloBaremacion.obtenerInstancia();
-		
-		datos.setContentType("application/json");
-		datos.setRespuestaEnviada(true);
-		response.setContentType("application/json");
-		response.setCharacterEncoding("UTF-8");
-		
-		try (PrintWriter writer = response.getWriter()) {
-			try {
-				BolsaEmpleoDataTable<ApartadoBaremacion> dataTable = modelo.listadoApartadosGeneralesBaremacionDatatable(request.getParameterMap());
-				Gson gson = new GsonBuilder().setExclusionStrategies(BolsaEmpleoDataTable.GSONEXCLUSIONSTRATEGY).create();
-				bean.setDatatable(dataTable);
-				writer.write(gson.toJson(dataTable));
-			} catch (Exception ex) {
-				bean.getMensajesDeError().add(ex.getMessage());
-				
-				CodigoDescripcion mensaje = new CodigoDescripcion("error", ex.getMessage());
-				writer.write(new Gson().toJson(mensaje));
-				response.setStatus(RESPONSE_HTTP_CODE_ERROR);
-			}
-		}
-	}
+	
 	
 	/**
 	 * Listado de bloques.
