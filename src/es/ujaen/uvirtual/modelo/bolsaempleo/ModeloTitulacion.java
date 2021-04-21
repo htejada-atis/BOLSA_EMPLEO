@@ -13,6 +13,7 @@ import es.ujaen.uvirtual.modelo.conexion.ConexionUvirtual;
 import es.ujaen.uvirtual.utilidades.BolsaEmpleoUtils;
 import es.ujaen.uvirtual.utilidades.BolsaEmpleoDataTable;
 import es.ujaen.uvirtual.utilidades.UVException;
+import es.ujaen.uvirtual.utilidades.BolsaEmpleoDataTable.DataTableColumn;
 
 /**
  * Clase de modelo para la gestión de titulaciones. 
@@ -206,14 +207,15 @@ public class ModeloTitulacion {
 		
 		String consulta = "SELECT beptit.* FROM tbep_titulaciones beptit WHERE 1=1 ";
 		
-		dataTable.setColumn(ORDER_COLUMN_INDEX_ID, "beptit.CODNUM");
+		dataTable.setColumn(ORDER_COLUMN_INDEX_ID, "beptit.CODNUM", DataTableColumn.COLUMN_TYPE_NUMBER);
 		dataTable.setColumn(ORDER_COLUMN_INDEX_NOMBRE, "beptit.NOMBRE");
 		dataTable.setQuery(consulta);
 				
 		try (Connection conexion = ConexionUvirtual.obtenerInstancia();
 				PreparedStatement stmtCount = conexion.prepareStatement(dataTable.getQueryCount());
 				PreparedStatement stmt = conexion.prepareStatement(dataTable.getQuery());
-		) {		
+		) {
+			dataTable.setFiltersParams(stmt, stmtCount, 1);
 			try (ResultSet rs = stmt.executeQuery()) {
 				while (rs.next()) {
 					Titulacion tit = new Titulacion();
@@ -253,7 +255,7 @@ public class ModeloTitulacion {
 				+ "WHERE bepare.CODNUM = ? ";
 		String consulta = "SELECT beptit.* FROM tbep_titulaciones beptit WHERE beptit.CODNUM NOT IN (" + consultaNotIn + ")";
 		
-		dataTable.setColumn(ORDER_COLUMN_INDEX_ID_SELECTABLE, "beptit.CODNUM");
+		dataTable.setColumn(ORDER_COLUMN_INDEX_ID_SELECTABLE, "beptit.CODNUM", DataTableColumn.COLUMN_TYPE_NUMBER);
 		dataTable.setColumn(ORDER_COLUMN_INDEX_NOMBRE_SELECTABLE, "beptit.NOMBRE");
 		dataTable.setQuery(consulta);
 				
@@ -264,6 +266,7 @@ public class ModeloTitulacion {
 			int indexParam = 1;
 			stmt.setInt(indexParam, area);
 			stmtCount.setInt(indexParam++, area);
+			dataTable.setFiltersParams(stmt, stmtCount, indexParam);
 			try (ResultSet rs = stmt.executeQuery()) {
 				while (rs.next()) {
 					Titulacion tit = new Titulacion();
@@ -302,7 +305,7 @@ public class ModeloTitulacion {
 				+ "INNER JOIN TBEP_AREAS bepare ON bepare.codnum = beptpa.bepare_codnum "
 				+ "WHERE bepare.CODNUM = ? ";
 		
-		dataTable.setColumn(ORDER_COLUMN_INDEX_ID_SELECTABLE, "beptit.CODNUM");
+		dataTable.setColumn(ORDER_COLUMN_INDEX_ID_SELECTABLE, "beptit.CODNUM", DataTableColumn.COLUMN_TYPE_NUMBER);
 		dataTable.setColumn(ORDER_COLUMN_INDEX_NOMBRE_SELECTABLE, "beptit.NOMBRE");
 		dataTable.setQuery(consulta);
 				
@@ -313,6 +316,7 @@ public class ModeloTitulacion {
 			int indexParam = 1;
 			stmt.setInt(indexParam, area);
 			stmtCount.setInt(indexParam++, area);
+			dataTable.setFiltersParams(stmt, stmtCount, indexParam);
 			try (ResultSet rs = stmt.executeQuery()) {
 				while (rs.next()) {
 					Titulacion tit = new Titulacion();

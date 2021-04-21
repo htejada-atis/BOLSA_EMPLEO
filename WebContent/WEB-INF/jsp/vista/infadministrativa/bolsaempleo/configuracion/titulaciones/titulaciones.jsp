@@ -67,9 +67,10 @@ VistaTitulaciones bean = (VistaTitulaciones) uvdatos.getVistas().get(VistaTitula
 		    "ajax": { url: "<%=ControladorGestionTitulaciones.URL_PATTERN_AJAX%>" },
 		    "pageSize": 10,
 		    "action": "<%=ControladorGestionTitulaciones.ACCION_DATATABLE_TITULACIONES%>",
+		    "filterable": true,
 		    "columns": [
-		    	{'data': 'codNum'},
-		        {'data': 'nombre', 'class': 'overflow-auto'},
+		    	{'data': 'codNum', 'filter': {'type': 'number'}},
+		        {'data': 'nombre', 'filter': true, 'class': 'overflow-auto'},
 		        {'data': 'codnum', 'buttons': [{'label': 'Editar', 'title': 'Editar titulación', 'onClick': function(row) {
 		        	var params = {
 		    				'a': '<%=ControladorGestionTitulaciones.ACCION_EDITAR_TITULACION %>', 

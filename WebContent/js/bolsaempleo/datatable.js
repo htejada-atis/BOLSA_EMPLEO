@@ -279,34 +279,34 @@ function DataTable(id, config) {
                 var th = $('<th></th>');
 
                 if (columnDef.filter) {
-                    var filter;
+                    var filterElement;
                     var type = columnDef.filter.type ? columnDef.filter.type : 'text';
                     var name = '" name="' + columnDef.data + '"';
                     switch(type) {
                         case 'selectBoolean':
-                            filter = $('<select ' + name + '></select>');
-                            filter.append($('<option value="0">-----</option>'));
-                            filter.append($('<option>' + true + '</option>'));
-                            filter.append($('<option>' + false + '</option>'));
+                            filterElement = $('<select ' + name + '></select>');
+                            filterElement.append($('<option value="0">-----</option>'));
+                            filterElement.append($('<option>' + true + '</option>'));
+                            filterElement.append($('<option>' + false + '</option>'));
                             break;
                         case 'select':
-                            filter = $('<select ' + name + '></select>');
-                            filter.append($('<option value="0">----------</option>'));
-                            filter.options.forEach(function (option) {
-                                filter.append($('<option>' + option + '</option>'));
+                            filterElement = $('<select ' + name + '></select>');
+                            filterElement.append($('<option value="0">----------</option>'));
+                            columnDef.filter.options.forEach(function (option) {
+                                filterElement.append($('<option>' + option + '</option>'));
                             });
                             break;
                         default:
-                            filter = $('<input type="' + type + name + ' autocomplete="off" />');
-                            $(filter).bind("enterKey", e => self.filterBy(index, this.value));
+                            filterElement = $('<input type="' + type + name + ' autocomplete="off" />');
+                            $(filterElement).bind("enterKey", e => self.filterBy(index, this.value));
                             break;
                     }
 
-                    $(filter).on('change', function() {
+                    $(filterElement).on('change', function() {
                         self.filterBy(index, this.value);
                     });
 
-                    th.append(filter);
+                    th.append(filterElement);
                 }
 
                 tr.append(th);
@@ -397,7 +397,7 @@ function DataTable(id, config) {
         if (value == "" || value == 0) {
             delete self.filterParams[indexColumnDef];
         }
-        
+        console.log(self.params)
         self.params.filter = JSON.stringify(self.filterParams);
         self.refresh();
     }

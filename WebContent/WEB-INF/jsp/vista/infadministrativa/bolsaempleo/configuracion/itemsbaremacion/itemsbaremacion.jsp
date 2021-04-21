@@ -134,6 +134,7 @@ VistaItemsBaremacion bean = (VistaItemsBaremacion) uvdatos.getVistas().get(Vista
 		    "ajax": { url: "<%= ControladorItemsBaremacion.URL_PATTERN_AJAX %>", async: false },
 		    "pageSize": 10,
 		    "action": "<%= ControladorItemsBaremacion.ACCION_DATATABLE_APARTADOS %>",
+		    "filterable": true,
 		    "title": "APARTADOS GENERALES",
 		    "clickable": {'onClick': function(row) {
 		    	var params = {
@@ -143,9 +144,9 @@ VistaItemsBaremacion bean = (VistaItemsBaremacion) uvdatos.getVistas().get(Vista
 		    }},
 		    <% if (bean.getApartadoBaremacion() != null) { %> "selected": <%= bean.getApartadoBaremacion().getCodNum() %> ,<% } %>
 		    "columns": [
-		    	{'data': 'codigo'},
-		        {'data': 'nombre'},
-		        {'data': 'activo', 'render': function(row) {
+		    	{'data': 'codigo', 'filter': true},
+		        {'data': 'nombre', 'filter': true},
+		        {'data': 'activo', 'filter': {'type': 'selectBoolean'}, 'render': function(row) {
 	        		if(row.activo){
 	        			return "<div title='Activo' class='circle-true'></div>"; 
 	        		}
@@ -191,6 +192,7 @@ VistaItemsBaremacion bean = (VistaItemsBaremacion) uvdatos.getVistas().get(Vista
 			    "params": {"<%=ControladorItemsBaremacion.PARAM_APARTADO%>": <%= bean.getApartadoBaremacion().getCodNum() %>},
 			    "pageSize": 10,
 			    "title": "BLOQUES",
+			    "filterable": true,
 			    "action": "<%=ControladorItemsBaremacion.ACCION_DATATABLE_BLOQUES%>",
 			    "clickable": {'onClick': function(row) {
 			    	var params = {
@@ -200,11 +202,11 @@ VistaItemsBaremacion bean = (VistaItemsBaremacion) uvdatos.getVistas().get(Vista
 			    }},
 			    <% if (bean.getBloqueBaremacion() != null) { %> "selected": <%= bean.getBloqueBaremacion().getCodNum() %> ,<% } %>
 			    "columns": [
-			    	{'data': 'codigo', 'render': function(row) {
+			    	{'data': 'codigo', 'filter': true, 'render': function(row) {
 			    		return row.apartado.codigo + "." + row.codigo;
 			    	}},
-			        {'data': 'nombre'},
-			        {'data': 'activo', 'render': function(row) {
+			        {'data': 'nombre', 'filter': true},
+			        {'data': 'activo', 'filter': {'type': 'selectBoolean'}, 'render': function(row) {
 		        		if(row.activo){
 		        			return "<div class='circle-true'></div>"; 
 		        		}
@@ -249,6 +251,7 @@ VistaItemsBaremacion bean = (VistaItemsBaremacion) uvdatos.getVistas().get(Vista
 				    "params": {"<%=ControladorItemsBaremacion.PARAM_BLOQUE%>": <%= bean.getBloqueBaremacion().getCodNum() %>},
 				    "pageSize": 10,
 				    "title": "ÍTEMS",
+				    "filterable": true,
 				    "action": "<%=ControladorItemsBaremacion.ACCION_DATATABLE_ITEMS%>",
 				    "clickable": {'onClick': function(row) {
 				    	var params = {
@@ -258,11 +261,11 @@ VistaItemsBaremacion bean = (VistaItemsBaremacion) uvdatos.getVistas().get(Vista
 				    }},
 				    <% if (bean.getItemBaremacion() != null) { %> "selected": <%= bean.getItemBaremacion().getCodNum() %> ,<% } %>
 				    "columns": [
-				    	{'data': 'codigo', 'render': function(row) {
+				    	{'data': 'codigo', 'filter': true, 'render': function(row) {
 				    		return row.bloque.apartado.codigo + "." + row.bloque.codigo + "." + row.codigo;
 				    	}},
-				        {'data': 'nombre'},
-				        {'data': 'activo', 'render': function(row) {
+				        {'data': 'nombre', 'filter': true},
+				        {'data': 'activo', 'filter': {'type': 'selectBoolean'}, 'render': function(row) {
 			        		if(row.activo){
 			        			return "<div class='circle-true'></div>"; 
 			        		}
