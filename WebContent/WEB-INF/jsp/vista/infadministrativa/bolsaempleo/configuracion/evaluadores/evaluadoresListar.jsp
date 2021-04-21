@@ -102,7 +102,7 @@ VistaEvaluadores bean = (VistaEvaluadores) uvdatos.getVistas().get(VistaEvaluado
 			    	{'data': 'apellido1', 'filter': true, 'render': function(row) {
 		        		return "<div class='overflow-auto'>" + row.nombre + "\n" + row.apellido1 + "\n" + row.apellido2 + "</div>"; 
 		        	}},
-		        	{'data': 'activo', 'filter': {'type': 'selectBoolean'}, 'order': {'active': false}, 'render': function(row) {
+		        	{'data': 'activo', 'filter': {'type': 'selectBoolean', 'true': 'Activo', 'false': 'Inactivo'}, 'order': {'active': false}, 'render': function(row) {
 		        		if (row.activo) {
 		        			return "<div title='Activo' class='circle-true'></div>";
 		        		} else {
