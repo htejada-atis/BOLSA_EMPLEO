@@ -137,7 +137,9 @@ public class ModeloNoticia {
 		try (Connection conexion = ConexionUvirtual.obtenerInstancia();
 				PreparedStatement stmtCount = conexion.prepareStatement(dataTable.getQueryCount());
 				PreparedStatement stmt = conexion.prepareStatement(dataTable.getQuery());
-		) {					
+		) {
+			dataTable.setFiltersParams(stmt, stmtCount, 1);
+			
 			try (ResultSet rs = stmt.executeQuery()) {
 				while (rs.next()) {
 					Noticia not = new Noticia();

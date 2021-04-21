@@ -55,24 +55,26 @@ VistaEvaluadores bean = (VistaEvaluadores) uvdatos.getVistas().get(VistaEvaluado
 		    "title": 'Agregar Nuevo Evaluador al Área: <%= bean.getArea().getDescripcion() %>',
 		    "action": "<%=ControladorGestionEvaluadores.ACCION_DATATABLE_USUARIOS%>",
 		    "selectable": true,
+		    "filterable": true,
 		    "columns": [
 		    	{'data': 'codNum', 'selectable': true},
-		    	{'data': 'numdocumento'},
-		    	{'data': 'rol.descripcion'},
-		    	{'data': 'apellido1', 'render': function(row) {
+		    	{'data': 'numdocumento', 'filter': true},
+		    	{'data': 'rol.descripcion', 'filter': {'type': 'select', 'options': ['Miembro de la Comision', 'Personal de adm. y servicios']}},
+		    	{'data': 'apellido1', 'filter': true, 'render': function(row) {
 	        		return "<div class='overflow-auto'>" + row.nombre + "\n" + row.apellido1 + "\n" + row.apellido2 + "</div>"; 
 	        	}},
 		    ],
 		    "actions": [
 		    	{'label': 'Agregar', 'title': 'Agregar usuario como evaluador en este área', 'onClick': function(selected) {
-		    		if(selected.length) {
-		    			var params = {
-			    				'a': '<%= ControladorGestionEvaluadores.ACCION_AGREGAR_EVALUADORES %>', 
-			    				'<%= ControladorGestionEvaluadores.PARAM_USUARIOS %>': JSON.stringify(selected),
-			    				'<%= ControladorGestionEvaluadores.PARAM_AREA %>': '<%= bean.getArea().getCodNum() %>'};
-		        		Atis.sendForm("<%= request.getRequestURI() %>", params);
-		    		}
-		    	} },
+			    		if(selected.length) {
+			    			var params = {
+				    				'a': '<%= ControladorGestionEvaluadores.ACCION_AGREGAR_EVALUADORES %>', 
+				    				'<%= ControladorGestionEvaluadores.PARAM_USUARIOS %>': JSON.stringify(selected),
+				    				'<%= ControladorGestionEvaluadores.PARAM_AREA %>': '<%= bean.getArea().getCodNum() %>'};
+			        		Atis.sendForm("<%= request.getRequestURI() %>", params);
+			    		}
+			    	}
+		    	},
 		    ]
 		});
 		
