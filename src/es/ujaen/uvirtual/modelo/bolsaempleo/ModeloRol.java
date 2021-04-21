@@ -22,6 +22,28 @@ public class ModeloRol {
 	public static final int ORDER_COLUMN_INDEX_DESCRIPCION = 2;
 	public static final int ORDER_COLUMN_INDEX_VALOR = 3;
 	
+    protected static ModeloRol eInstancia = null;
+	
+	/** Crea una instancia del objeto.
+	 *  de forma sincronizada para protegerse de posibles problemas multi-hilo
+	 */
+	private static synchronized void crearInstancia() {
+		if (eInstancia == null) {
+			eInstancia = new ModeloRol();
+		}
+	}
+
+    /**
+     * Obtiene una instancia de la conexión.
+     * @return instancia
+     */
+    public static ModeloRol obtenerInstancia() {
+        if (eInstancia == null) {
+        	crearInstancia();
+        }
+        return eInstancia;
+    }
+	
 	/** Consulta areas en BBDD y las devuelve.
 	 * @return areas de la base de datos
 	 * @throws SQLException en caso de error de base de datos
@@ -58,7 +80,7 @@ public class ModeloRol {
 	 * @throws UVException si area no es existe
 	 */
 	public Area getAreaById(int codNum) throws SQLException, UVException {
-		ModeloDepartamento modeloDepartamento = new ModeloDepartamento();
+		ModeloDepartamento modeloDepartamento = ModeloDepartamento.obtenerInstancia();
 		String consulta = "SELECT bepare.* FROM TBEP_AREAS bepare WHERE bepare.CODNUM = ?";				
 			
 		try (Connection conexion = ConexionUvirtual.obtenerInstancia();

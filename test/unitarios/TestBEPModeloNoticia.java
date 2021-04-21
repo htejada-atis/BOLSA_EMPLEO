@@ -54,7 +54,7 @@ public class TestBEPModeloNoticia {
     	noticia.setFecha(fechaEjemplo);
     	noticia.setPublica(PUBLICA_NOTICIA);
     	noticia.setActiva(ACTIVA_NOTICIA);
-    	ModeloNoticia modelo = new ModeloNoticia();
+    	ModeloNoticia modelo = ModeloNoticia.obtenerInstancia();
     	modelo.insertaNoticia(noticia);
     	List<Noticia> noticias = modelo.listaNoticias();
     	assertTrue("noticia insertada debe ser listada", noticias.contains(noticia));
@@ -66,7 +66,7 @@ public class TestBEPModeloNoticia {
      */
     @Test
     public void testA02BorraNoticia() throws SQLException, UVException {
-    	ModeloNoticia modelo = new ModeloNoticia();
+    	ModeloNoticia modelo = ModeloNoticia.obtenerInstancia();
     	List<Noticia> noticias = modelo.listaNoticias();
     	Noticia noticia = noticias.get(0);
     	modelo.borraNoticia(noticia);
@@ -87,7 +87,7 @@ public class TestBEPModeloNoticia {
      */
     @Test
     public void testA03EditarNoticia() throws SQLException, UVException {
-    	ModeloNoticia modelo = new ModeloNoticia();
+    	ModeloNoticia modelo = ModeloNoticia.obtenerInstancia();
     	List<Noticia> noticias = modelo.listaNoticias();
     	Noticia noticia = noticias.get(0);
     	noticia.setTexto("texto actualizado");
@@ -104,7 +104,7 @@ public class TestBEPModeloNoticia {
     @Test(expected = UVException.class)
     public void testE01InsertaNoticiaNull() throws SQLException, UVException {
     	Noticia noticia = null;
-    	ModeloNoticia modelo = new ModeloNoticia();
+    	ModeloNoticia modelo = ModeloNoticia.obtenerInstancia();
     	modelo.insertaNoticia(noticia);
     	fail();
     }
@@ -120,7 +120,7 @@ public class TestBEPModeloNoticia {
     	noticia.setTexto(TEXTO_NOTICIA);
     	noticia.setFecha(fechaEjemplo);
     	noticia.setPublica(PUBLICA_NOTICIA);
-    	ModeloNoticia modelo = new ModeloNoticia();
+    	ModeloNoticia modelo = ModeloNoticia.obtenerInstancia();
     	modelo.insertaNoticia(noticia);
     	fail();
     }
@@ -136,7 +136,7 @@ public class TestBEPModeloNoticia {
     	noticia.setEnlace(ENLACE_NOTICIA);
     	noticia.setFecha(fechaEjemplo);
     	noticia.setPublica(PUBLICA_NOTICIA);
-    	ModeloNoticia modelo = new ModeloNoticia();
+    	ModeloNoticia modelo = ModeloNoticia.obtenerInstancia();
     	modelo.insertaNoticia(noticia);
     	fail();
     }
@@ -151,7 +151,7 @@ public class TestBEPModeloNoticia {
     	noticia.setEnlace(ENLACE_NOTICIA);
     	noticia.setTexto(TEXTO_NOTICIA);
     	noticia.setPublica(PUBLICA_NOTICIA);
-    	ModeloNoticia modelo = new ModeloNoticia();
+    	ModeloNoticia modelo = ModeloNoticia.obtenerInstancia();
     	modelo.insertaNoticia(noticia);
     	fail();
     }

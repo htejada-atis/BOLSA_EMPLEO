@@ -108,46 +108,31 @@ VistaConvocatorias bean = (VistaConvocatorias) uvdatos.getVistas().get(VistaConv
 					          	});
 				    		}
 			    		}
-		        	}
-		        ]}
-		    ]
-		 });
+		        	},
+		        	{'label': 'Borrar', 'onClick': function(row) {
+		        		Atis.confirmDialog("¿Desea borrar la convocatoria?", "Borrado de convocatoria", {
+			            	Si: function() {
+			            		var params = {
+			            				'a': '<%=ControladorConvocatorias.ACCION_BORRAR_CONVOCATORIA%>',
+			            				'<%=ControladorConvocatorias.PARAM_CONVOCATORIA_ID%>': row.codNum
+			            			};
+			        			Atis.sendForm("<%= request.getRequestURI() %>", params);
+			              		$(this).dialog("close");
+			            	},
+			            	No: function() {
+			              		$(this).dialog("close");
+			            	}
+			          	});
+		    			}
+	        		}
+				]}
+			]
+		});
 	});
 		
-		document.getElementById("nueva_convocatoria").addEventListener("click", function(event) {
-			event.preventDefault();
-			Atis.sendForm("<%= request.getRequestURI() %>", {'a': '<%= ControladorConvocatorias.ACCION_FORMULARIO_CONVOCATORIA %>'});
-		});	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-
-	
-	
-	
-	
-	
-	
+	document.getElementById("nueva_convocatoria").addEventListener("click", function(event) {
+		event.preventDefault();
+		Atis.sendForm("<%= request.getRequestURI() %>", {'a': '<%= ControladorConvocatorias.ACCION_FORMULARIO_CONVOCATORIA %>'});
+	});	
 	
 </script>

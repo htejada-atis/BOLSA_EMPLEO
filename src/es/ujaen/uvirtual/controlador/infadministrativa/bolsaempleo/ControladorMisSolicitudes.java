@@ -138,7 +138,7 @@ public class ControladorMisSolicitudes extends HttpServlet {
 	}
 		
 	private void listado(VistaSolicitudes bean, UVDatos datos, HttpServletRequest request, HttpServletResponse response) throws IOException, SQLException {
-		ModeloSolicitud modelo = new ModeloSolicitud(); 
+		ModeloSolicitud modelo = ModeloSolicitud.obtenerInstancia(); 
 		
 		datos.setContentType("application/json");
 		datos.setRespuestaEnviada(true);
@@ -164,7 +164,8 @@ public class ControladorMisSolicitudes extends HttpServlet {
 	}
 	
 	private void crearSolicitud(VistaSolicitudes bean, UVDatos datos, HttpServletRequest request, HttpServletResponse response) throws UVException, SQLException {
-		ModeloSolicitud modeloSolicitud = new ModeloSolicitud();
+		ModeloSolicitud modeloSolicitud = ModeloSolicitud.obtenerInstancia();
+		ModeloConvocatoria modeloConvocatoria = ModeloConvocatoria.obtenerInstancia();
 		
 		Integer idConvocatoria = Formateador.leeParametroInteger(request.getParameter(PARAM_CONVOCATORIA_ID));
 		if (idConvocatoria == null) {

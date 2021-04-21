@@ -69,6 +69,30 @@ public class ModeloUsuarioBolsaEmpleo {
 	public static final int COLUMN_EMAIL_MAXLENGTH = 50;
 	public static final int COLUMN_RAZON_EXCLUSION_MAXLENGTH = 200;
 	
+	
+    protected static ModeloUsuarioBolsaEmpleo eInstancia = null;
+	
+	/** Crea una instancia del objeto.
+	 *  de forma sincronizada para protegerse de posibles problemas multi-hilo
+	 */
+	private static synchronized void crearInstancia() {
+		if (eInstancia == null) {
+			eInstancia = new ModeloUsuarioBolsaEmpleo();
+		}
+	}
+
+    /**
+     * Obtiene una instancia de la conexión.
+     * @return instancia
+     */
+    public static ModeloUsuarioBolsaEmpleo obtenerInstancia() {
+        if (eInstancia == null) {
+        	crearInstancia();
+        }
+        return eInstancia;
+    }
+	
+	
 	/** Consulta usuarios en BBDD y las devuelve.
 	 * @param clausula para filtrar los usuarios de la bd
 	 * @return todos los usuarios de la base de datos
@@ -216,7 +240,8 @@ public class ModeloUsuarioBolsaEmpleo {
 		try (Connection conexion = ConexionUvirtual.obtenerInstancia();
 				PreparedStatement stmtCount = conexion.prepareStatement(dataTable.getQueryCount());
 				PreparedStatement stmt = conexion.prepareStatement(dataTable.getQuery());
-		) {					
+		) {		
+			
 			try (ResultSet rs = stmt.executeQuery()) {
 				while (rs.next()) {
 					UsuarioBolsaEmpleo usuario = setUsuario(rs);
@@ -447,7 +472,7 @@ public class ModeloUsuarioBolsaEmpleo {
 	 * @throws UVException en caso de no poder crear el usuario
 	 */	
 	public UsuarioBolsaEmpleo setUsuario(ResultSet rs) throws SQLException, UVException {
-		ModeloRol modeloRol = new ModeloRol();
+		ModeloRol modeloRol = ModeloRol.obtenerInstancia();
 		
 		UsuarioBolsaEmpleo usuario = new UsuarioBolsaEmpleo();
 		usuario.setCodNum(rs.getInt("CODNUM"));
@@ -783,7 +808,7 @@ public class ModeloUsuarioBolsaEmpleo {
 					try {
 						UsuarioBolsaEmpleo usu = listaUsuario(usuArcos.getUid());
 					} catch (UVException e) {
-						ModeloRol modeloRol = new ModeloRol();
+						ModeloRol modeloRol = ModeloRol.obtenerInstancia();
 						Rol role;
 						
 						try {

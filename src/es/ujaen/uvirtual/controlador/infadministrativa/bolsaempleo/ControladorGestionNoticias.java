@@ -89,7 +89,7 @@ public class ControladorGestionNoticias extends HttpServlet {
 		
 		VistaNoticias bean = new VistaNoticias();
 		bean.setVista(RUTA_BEP_NOTICIAS + "indice.jsp");
-		ModeloUsuarioBolsaEmpleo modelo = new ModeloUsuarioBolsaEmpleo();
+		ModeloUsuarioBolsaEmpleo modelo = ModeloUsuarioBolsaEmpleo.obtenerInstancia();
 
 		String nombreAccion = EscapaHTML.ajustaCodificacion(request.getParameter(PARAM_ACCION));
 		if (nombreAccion == null) {
@@ -150,7 +150,7 @@ public class ControladorGestionNoticias extends HttpServlet {
 		bean.setVista(RUTA_BEP_NOTICIAS + "formNoticia.jsp");
 		
 		if (EscapaHTML.ajustaCodificacion(request.getParameter(PARAM_TEXTO)) != null) {
-			ModeloNoticia modelo = new ModeloNoticia();
+			ModeloNoticia modelo = ModeloNoticia.obtenerInstancia();
 			String enlace = EscapaHTML.ajustaCodificacion(request.getParameter(PARAM_ENLACE));
 			String texto = EscapaHTML.ajustaCodificacion(request.getParameter(PARAM_TEXTO));
 			Boolean publica = request.getParameter(PARAM_PUBLICA) != null && EscapaHTML.ajustaCodificacion(request.getParameter(PARAM_PUBLICA)).equals("true");
@@ -174,7 +174,7 @@ public class ControladorGestionNoticias extends HttpServlet {
 	 */
 	private void editarNoticia(VistaNoticias bean, HttpServletRequest request, HttpServletResponse response) throws SQLException, UVException, IOException {
 		bean.setVista(RUTA_BEP_NOTICIAS + "formNoticia.jsp");
-		ModeloNoticia modelo = new ModeloNoticia();
+		ModeloNoticia modelo = ModeloNoticia.obtenerInstancia();
 		bean.setNoticia(modelo.listaNoticia(Formateador.leeParametroInteger(request.getParameter(PARAM_ID))));
 		if (EscapaHTML.ajustaCodificacion(request.getParameter(PARAM_TEXTO)) != null) {
 			Integer codNum = Formateador.leeParametroInteger(request.getParameter(PARAM_ID));
@@ -200,7 +200,7 @@ public class ControladorGestionNoticias extends HttpServlet {
 	 * @throws IOException en caso de error de input u output .
 	 */
 	private void eliminarNoticia(VistaNoticias bean, HttpServletRequest request, HttpServletResponse response) throws SQLException, UVException, IOException {
-		ModeloNoticia modelo = new ModeloNoticia();
+		ModeloNoticia modelo = ModeloNoticia.obtenerInstancia();
 		Integer codNum = Formateador.leeParametroInteger(request.getParameter(PARAM_ID));
 		Noticia noticia = new Noticia();
 		noticia.setCodNum(codNum);
@@ -222,7 +222,7 @@ public class ControladorGestionNoticias extends HttpServlet {
 	 * @throws SQLException excepcion de bbdd.
 	 */
 	private void listadoNoticias(VistaNoticias bean, UVDatos datos, HttpServletRequest request, HttpServletResponse response) throws IOException, SQLException {
-		ModeloNoticia modelo = new ModeloNoticia();
+		ModeloNoticia modelo = ModeloNoticia.obtenerInstancia();
 		
 		datos.setContentType("application/json");
 		response.setContentType("application/json");
