@@ -65,6 +65,7 @@ VistaMeritos bean = (VistaMeritos) uvdatos.getVistas().get(VistaMeritos.class.ge
 		    "pageSize": 10,
 		    "action": "<%=ControladorMisMeritos.ACCION_DATATABLE%>",
 		    "selectable": true,
+		    "filterable": true,
 		    "columns": [
 		    	{'data': 'codNum', 'selectable': true},
 		    	{'data': 'codNum'},
@@ -73,7 +74,7 @@ VistaMeritos bean = (VistaMeritos) uvdatos.getVistas().get(VistaMeritos.class.ge
 		        {'data': 'descripcion', 'class': 'overflow-auto'},
 		        {'data': 'valor', 'class': 'overflow-auto'},
 		        {'data': 'observacion', 'class': 'overflow-auto'},
-		        {'data': 'codnum', 'class': 'overflow-ellipsis', 'render': function(row) {
+		        {'data': 'codnum', 'order': {'active': false}, 'class': 'overflow-ellipsis', 'render': function(row) {
 		        	var link = "<%= request.getRequestURI() %>?a=<%= ControladorMisMeritos.ACCION_DESCARGAR_FICHERO %>&<%= ControladorMisMeritos.PARAM_ID %>=" + row.codNum;
 		        	return "<a class='consultar-fichero' href='" +link +"' target='_blank'>" +link +"</a>"; 
 		        	}
