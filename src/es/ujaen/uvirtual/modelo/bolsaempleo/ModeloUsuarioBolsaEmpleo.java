@@ -566,15 +566,12 @@ public class ModeloUsuarioBolsaEmpleo {
 		try (Connection conexion = ConexionUvirtual.obtenerInstancia(); PreparedStatement stmt = conexion.prepareStatement(query)) {
 			int indexParam = 1;
 			
-			stmt.setString(indexParam++, borrado);
 			
 			SimpleDateFormat formatter = new SimpleDateFormat("dd/MM/YYYY HH:mm:ss");
 			Date date = new Date(System.currentTimeMillis());
 			
 			stmt.setDate(indexParam++, new java.sql.Date(date.getTime()));
-			for (UsuarioBolsaEmpleo usuario : usuarios) {
-				stmt.setInt(indexParam++, usuario.getCodNum()); 
-			}
+			
 			stmt.executeUpdate();
 		}	
 	}
