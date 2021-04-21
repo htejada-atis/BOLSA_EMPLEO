@@ -50,8 +50,74 @@ public class ModeloBaremacion {
 	// opción de consulta para desactivar o activar
 	public static final int OPCION_6 = 6;
 	
+	// errores
+	public static final String ERROR_APARATADO_NOEXITE = "Apartado no encontrado";
+	public static final String ERROR_PUNTUACION_PORCENTAJE_MAXIMO = "Debe introducir una puntuación o un porcentaje máximo, pero no ambos";
+	
 	
 	/********************************************** METODOS PÚBLICOS PARA CONSULTAS APARTADOBAREMACION  ********************************************/
+	
+	/**
+	 * Devuelve un apartado de baremación por su id.
+	 * @param codNum .
+	 * @return .
+	 * @throws SQLException en caso de error en la BD
+	 * @throws UVException si apartado no es existe
+	 */
+	public ApartadoBaremacion getApartadoBaremacionById(Integer codNum) throws SQLException, UVException {
+		String sql = "SELECT bepapa.* FROM TBEP_APARTADOSBAREMACION bepapa WHERE bepapa.CODNUM = ?";
+		
+		try (Connection con = ConexionUvirtual.obtenerInstancia(); PreparedStatement stmt = con.prepareStatement(sql);) {
+			int parameterIndex = 1;
+			stmt.setInt(parameterIndex++, codNum);
+			
+			try (ResultSet rs = stmt.executeQuery()) {
+				while (rs.next()) {
+					ApartadoBaremacion ap = new ApartadoBaremacion();
+					ap.setCodNum(rs.getInt("CODNUM"));
+					ap.setCodigo(rs.getString("CODIGO"));
+					ap.setNombre(rs.getString("NOMBRE"));
+					ap.setActivo(rs.getString("FLGACTIVO").equals("S"));
+					ap.setPorcentajeMaximo(rs.getFloat("PUNTUACIONMAXIMA"));
+					ap.setPuntuacionMaxima(rs.getFloat("PORCENTAJEMAXIMO"));					
+					return ap;					
+				}
+			}
+		}
+		
+		throw new UVException(ERROR_APARATADO_NOEXITE);		
+	}
+	
+	/**
+	 * Devuelve el primer apartado que tiene el código pasado.
+	 * @param codigo .
+	 * @return apartado o excepción si no encontrado
+	 * @throws SQLException . 
+	 * @throws UVException .
+	 */
+	public ApartadoBaremacion getApartadoBareamacionByCodigo(String codigo) throws SQLException, UVException {
+		String sql = "SELECT bepapa.* FROM TBEP_APARTADOSBAREMACION bepapa WHERE bepapa.CODIGO = ?";
+		
+		try (Connection con = ConexionUvirtual.obtenerInstancia(); PreparedStatement stmt = con.prepareStatement(sql);) {
+			int parameterIndex = 1;
+			stmt.setString(parameterIndex++, codigo);
+			
+			try (ResultSet rs = stmt.executeQuery()) {
+				while (rs.next()) {
+					ApartadoBaremacion ap = new ApartadoBaremacion();
+					ap.setCodNum(rs.getInt("CODNUM"));
+					ap.setCodigo(rs.getString("CODIGO"));
+					ap.setNombre(rs.getString("NOMBRE"));
+					ap.setActivo(rs.getString("FLGACTIVO").equals("S"));
+					ap.setPorcentajeMaximo(rs.getFloat("PUNTUACIONMAXIMA"));
+					ap.setPuntuacionMaxima(rs.getFloat("PORCENTAJEMAXIMO"));					
+					return ap;					
+				}
+			}
+		}
+		
+		throw new UVException(ERROR_APARATADO_NOEXITE);
+	}
 	
 	/** Consulta apartados en la BBDD y los devuelve .
 	 * @param apartado .
@@ -149,21 +215,6 @@ public class ModeloBaremacion {
 	}
 	
 	/**
-	 * Devuelve un apartado de baremación por su id.
-	 * @param codNum .
-	 * @return .
-	 * @throws SQLException en caso de error en la BD
-	 * @throws UVException si apartado no es existe
-	 */
-	public ApartadoBaremacion getApartadoBaremacionById(Integer codNum) throws SQLException, UVException {
-		List<ApartadoBaremacion> apartados = listaApartados(new ApartadoBaremacion(codNum), OPCION_1);
-		if (apartados.isEmpty()) {
-			throw new UVException("No existe apartado");
-		}
-		return apartados.get(0);
-	}
-	
-	/**
 	 * Listado de apartados generales de baremación. 
 	 * @param params para leer los parametros de paginación, ordenacion, etc
 	 * @return listado 
@@ -211,9 +262,17 @@ public class ModeloBaremacion {
 	 * @throws SQLException en caso de error en la BD .
 	 * @throws UVException en caso de errores de validacion .
 	 */
-	public void actualizaApartado(ApartadoBaremacion apartado, int opcion) throws SQLException, UVException {
+	public void actualizaApartado(ApartadoBaremacion apartado) throws SQLException, UVException {
+		// comprobamos que no existe un mismo apartado con el código y que esté activo
+		try {
+			
+		} catch (UVException e) {
+			
+		}
 		
 		String consulta = "UPDATE TBEP_APARTADOSBAREMACION SET ";
+		
+		
 		
 		if (apartado == null) {
 			throw new UVException("apartado obligatorio");
@@ -223,13 +282,16 @@ public class ModeloBaremacion {
 		}
 		
 		if (opcion == OPCION_5) {
-			consulta += " codigo=?, nombre=?";
+			consulta += " CODIGO = ?, NOMBRE = ?, PUNTUACIONMAXIMA = ?, PORCENTAJEMAXIMO = ? ";
 			
 			if (apartado.getCodigo() == null) {
 				throw new UVException("código obligatorio");
 			}
 			if (apartado.getNombre() == null) {
 				throw new UVException("nombre obligatorio");
+			}
+			if (apartado.getPuntuacionMaxima() != null && apartado.getPorcentajeMaximo() != null) {
+				throw new UVException(ERROR_PUNTUACION_PORCENTAJE_MAXIMO);
 			}
 			
 			if (listaApartados(apartado, OPCION_2).size() > 0) {
@@ -258,6 +320,22 @@ public class ModeloBaremacion {
 				stmt.setString(parameterIndex++, apartado.isActivo() ? "S" : "N");
 			}
 			
+			stmt.setInt(parameterIndex++, apartado.getCodNum());
+			stmt.executeUpdate();
+		}
+	}
+	
+	/**
+	 * Activa o desactiva un apartado.
+	 * @param apartado .
+	 * @throws SQLException .
+	 */
+	public void activaDesactivaApartado(ApartadoBaremacion apartado) throws SQLException {
+		String sql = "UPDATE TBEP_APARTADOSBAREMACION bepapa SET bepapa.FLGACTIVO = ? WHERE bepapa.CODNUM = ?"; 
+				
+		try (Connection conexion = ConexionUvirtual.obtenerInstancia(); PreparedStatement stmt = conexion.prepareStatement(sql);) {
+			int parameterIndex = 1;
+			stmt.setString(parameterIndex, apartado.isActivo() ? "S" : "N");			
 			stmt.setInt(parameterIndex++, apartado.getCodNum());
 			stmt.executeUpdate();
 		}

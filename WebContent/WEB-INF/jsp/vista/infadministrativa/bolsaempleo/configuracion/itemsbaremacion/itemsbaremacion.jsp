@@ -36,7 +36,7 @@ VistaItemsBaremacion bean = (VistaItemsBaremacion) uvdatos.getVistas().get(Vista
 	<table class="bluetable bolsaempleo" id="tableApartadosGenerales">
 		<tr>
 			<th scope="col" style="width:15%" title="Código apartado">Código</th>
-			<th scope="col" style="width:75%" title="Código de area">Nombre del apartado</th>
+			<th scope="col" style="width:75%" title="Código de area">Nombre del bloque</th>
 			<th scope="col" class="center" style="width:10%">Activo</th>
 		</tr>
 		<tbody>				
@@ -51,7 +51,7 @@ VistaItemsBaremacion bean = (VistaItemsBaremacion) uvdatos.getVistas().get(Vista
 	<table class="bluetable bolsaempleo" id="tableBloques">
 		<tr>
 			<th scope="col" style="width:15%" title="Código bloque">Código</th>
-			<th scope="col" style="width:75%" title="Código de area">Nombre del bloque</th>
+			<th scope="col" style="width:75%" title="Código de area">Nombre del apartado</th>
 			<th scope="col" style="width:10%">Activo</th>
 		</tr>
 		<tbody>				
@@ -134,7 +134,7 @@ VistaItemsBaremacion bean = (VistaItemsBaremacion) uvdatos.getVistas().get(Vista
 		    "ajax": { url: "<%= ControladorItemsBaremacion.URL_PATTERN_AJAX %>", async: false },
 		    "pageSize": 10,
 		    "action": "<%= ControladorItemsBaremacion.ACCION_DATATABLE_APARTADOS %>",
-		    "title": "APARTADOS GENERALES",
+		    "title": "BLOQUES",
 		    "clickable": {'onClick': function(row) {
 		    	var params = {
 	    				'a': '<%= ControladorItemsBaremacion.ACCION_APARTADO_SELECCIONADO %>', 
@@ -154,7 +154,11 @@ VistaItemsBaremacion bean = (VistaItemsBaremacion) uvdatos.getVistas().get(Vista
 	        		}
 	        	}},
 		    ],
-		    "actions": [
+		    "actions": [		    	
+		    	{'label': 'Añadir', 'title': 'Añadir un nuevo apartado', 'onClick': function(selected) {
+		    		var params = {'a': '<%=ControladorItemsBaremacion.ACCION_AGREGAR_APARTADO%>'};
+	        		Atis.sendForm("<%=request.getRequestURI()%>", params);
+		    	}},
 		    	{'label': activatorApartadoName, 'showWhenSelected': true, 'title': activatorApartadoName + ' apartado seleccionado', 'onClick': function(selected) {
 	        		Atis.confirmDialog(activatorApartadoName + " apartado", "¿Desea " + activatorApartadoName + " el apartado seleccionado?", {
 		        		Si: function() {
@@ -169,10 +173,6 @@ VistaItemsBaremacion bean = (VistaItemsBaremacion) uvdatos.getVistas().get(Vista
 				          	$(this).dialog("close");
 				    	}
 				    });
-		    	}},
-		    	{'label': 'Añadir', 'title': 'Añadir un nuevo apartado', 'onClick': function(selected) {
-		    		var params = {'a': '<%=ControladorItemsBaremacion.ACCION_AGREGAR_APARTADO%>'};
-	        		Atis.sendForm("<%=request.getRequestURI()%>", params);
 		    	}},
 		    	{'label': 'Editar', 'showWhenSelected': true, 'title': 'Editar apartado seleccionado', 'onClick': function(selected) {
 		    		var params = {'a': '<%=ControladorItemsBaremacion.ACCION_EDITAR_APARTADO%>', 
@@ -190,7 +190,7 @@ VistaItemsBaremacion bean = (VistaItemsBaremacion) uvdatos.getVistas().get(Vista
 			    "ajax": { url: "<%= ControladorItemsBaremacion.URL_PATTERN_AJAX %>", async: false },
 			    "params": {"<%=ControladorItemsBaremacion.PARAM_APARTADO%>": <%= bean.getApartadoBaremacion().getCodNum() %>},
 			    "pageSize": 10,
-			    "title": "BLOQUES",
+			    "title": "APARTADOS",
 			    "action": "<%=ControladorItemsBaremacion.ACCION_DATATABLE_BLOQUES%>",
 			    "clickable": {'onClick': function(row) {
 			    	var params = {
