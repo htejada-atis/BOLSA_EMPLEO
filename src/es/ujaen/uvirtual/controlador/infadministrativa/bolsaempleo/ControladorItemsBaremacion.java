@@ -282,12 +282,12 @@ public class ControladorItemsBaremacion extends HttpServlet {
 		ModeloBaremacion modelo = ModeloBaremacion.obtenerInstancia();
 		Integer codNum = Formateador.leeParametroInteger(request.getParameter(PARAM_APARTADO));
 		ApartadoBaremacion apartado = new ApartadoBaremacion(codNum, activo);
-		modelo.actualizaApartado(apartado, ModeloBaremacion.OPCION_6);
-		bean.getMensajesDeExito().add(activo ? MENSAJE_EXITO_ACTIVAR_APARTADO : MENSAJE_EXITO_DESACTIVAR_APARTADO);
-		HttpSession session = request.getSession(false);
-		session.setAttribute(MENSAJE_ENVIADO, activo ? MENSAJE_EXITO_ACTIVAR_APARTADO : MENSAJE_EXITO_DESACTIVAR_APARTADO);
-		session.setAttribute(PARAM_APARTADO, codNum);
-		response.sendRedirect(request.getServletPath());
+//		modelo.actualizaApartado(apartado, ModeloBaremacion.OPCION_6);
+//		bean.getMensajesDeExito().add(activo ? MENSAJE_EXITO_ACTIVAR_APARTADO : MENSAJE_EXITO_DESACTIVAR_APARTADO);
+//		HttpSession session = request.getSession(false);
+//		session.setAttribute(MENSAJE_ENVIADO, activo ? MENSAJE_EXITO_ACTIVAR_APARTADO : MENSAJE_EXITO_DESACTIVAR_APARTADO);
+//		session.setAttribute(PARAM_APARTADO, codNum);
+//		response.sendRedirect(request.getServletPath());
 	}
 	
 	/** desactiva o activa un bloque .
@@ -348,15 +348,15 @@ public class ControladorItemsBaremacion extends HttpServlet {
 		Integer codNum = Formateador.leeParametroInteger(request.getParameter(PARAM_APARTADO));
 		bean.setApartadoBaremacion(modelo.getApartadoBaremacionById(codNum));
 		if (EscapaHTML.ajustaCodificacion(request.getParameter(PARAM_APARTADO_NOMBRE)) != null) {
-			String codigo = EscapaHTML.ajustaCodificacion(request.getParameter(PARAM_APARTADO_CODIGO));
-			String nombre = EscapaHTML.ajustaCodificacion(request.getParameter(PARAM_APARTADO_NOMBRE));
-			ApartadoBaremacion apartado = new ApartadoBaremacion(codNum, codigo, nombre);
-			modelo.actualizaApartado(apartado, ModeloBaremacion.OPCION_5);
-			bean.getMensajesDeExito().add(MENSAJE_EXITO_EDITAR_APARTADO);
-			HttpSession session = request.getSession(false);
-			session.setAttribute(MENSAJE_ENVIADO, MENSAJE_EXITO_EDITAR_APARTADO);
-			session.setAttribute(PARAM_APARTADO, codNum);
-			response.sendRedirect(request.getServletPath());
+//			String codigo = EscapaHTML.ajustaCodificacion(request.getParameter(PARAM_APARTADO_CODIGO));
+//			String nombre = EscapaHTML.ajustaCodificacion(request.getParameter(PARAM_APARTADO_NOMBRE));
+//			ApartadoBaremacion apartado = new ApartadoBaremacion(codNum, codigo, nombre);
+//			modelo.actualizaApartado(apartado, ModeloBaremacion.OPCION_5);
+//			bean.getMensajesDeExito().add(MENSAJE_EXITO_EDITAR_APARTADO);
+//			HttpSession session = request.getSession(false);
+//			session.setAttribute(MENSAJE_ENVIADO, MENSAJE_EXITO_EDITAR_APARTADO);
+//			session.setAttribute(PARAM_APARTADO, codNum);
+//			response.sendRedirect(request.getServletPath());
 		}
 	}
 	
