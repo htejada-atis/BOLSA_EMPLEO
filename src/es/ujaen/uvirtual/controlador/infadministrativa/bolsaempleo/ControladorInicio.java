@@ -94,7 +94,7 @@ public class ControladorInicio extends HttpServlet {
 		datos.setContentType("text/html");
 		
 		VistaInicio bean = new VistaInicio();
-		ModeloUsuarioBolsaEmpleo modelo = new ModeloUsuarioBolsaEmpleo();
+		ModeloUsuarioBolsaEmpleo modelo = ModeloUsuarioBolsaEmpleo.obtenerInstancia();
 		
 		String nombreAccion = EscapaHTML.ajustaCodificacion(request.getParameter(PARAM_ACCION));
 		if (nombreAccion == null || nombreAccion.isEmpty()) {
@@ -159,7 +159,7 @@ public class ControladorInicio extends HttpServlet {
 	 */
 	private void descargarFichero(VistaInicio bean, UVDatos datos, HttpServletRequest request, HttpServletResponse response) throws SQLException, UVException, IOException {
 		bean.setVista(RUTA_BEP_INICIO + "documentos.jsp");
-		ModeloFichero modelo = new ModeloFichero();
+		ModeloFichero modelo = ModeloFichero.obtenerInstancia();
 		if (EscapaHTML.ajustaCodificacion(request.getParameter(PARAM_FICHERO)) != null) {
 			Fichero fichero = modelo.listaFichero(Formateador.leeParametroInteger(request.getParameter(PARAM_FICHERO)));
 			bean.setFichero(fichero);
@@ -198,7 +198,7 @@ public class ControladorInicio extends HttpServlet {
 	 */
 	private void obtenerTodasNoticias(VistaInicio bean, HttpServletRequest request, HttpServletResponse response, UVDatos datos) 
 			throws ServletException, IOException, SQLException {
-		ModeloNoticia modelo = new ModeloNoticia();
+		ModeloNoticia modelo = ModeloNoticia.obtenerInstancia();
 		
 		bean.setVista(RUTA_BEP_INICIO + "indice.jsp");
 		response.setContentType("application/json");
@@ -228,14 +228,14 @@ public class ControladorInicio extends HttpServlet {
 	 */
 	private void obtenerNoticias(VistaInicio bean) throws SQLException {
 		bean.setVista(RUTA_BEP_INICIO + "indice.jsp");
-		ModeloNoticia modelo = new ModeloNoticia();
+		ModeloNoticia modelo = ModeloNoticia.obtenerInstancia();
 		List<Noticia> noticias = modelo.listaNoticiasInicio(anonimo);
 		bean.setNoticias(noticias);
 	}
 	
 	private void obtenerFicheros(VistaInicio bean) throws SQLException {
 		bean.setVista(RUTA_BEP_INICIO + "documentos.jsp");
-		ModeloFichero modelo = new ModeloFichero();
+		ModeloFichero modelo = ModeloFichero.obtenerInstancia();
 		List<Fichero> ficheros = modelo.listaFicherosInicio(anonimo);
 		bean.setFicheros(ficheros);
 	}

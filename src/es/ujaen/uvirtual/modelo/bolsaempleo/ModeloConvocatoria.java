@@ -11,6 +11,7 @@ import java.util.Map;
 
 import es.ujaen.uvirtual.beans.uvirtual.bolsaempleo.Bolsa;
 import es.ujaen.uvirtual.beans.uvirtual.bolsaempleo.Convocatoria;
+import es.ujaen.uvirtual.beans.uvirtual.bolsaempleo.Noticia;
 import es.ujaen.uvirtual.beans.uvirtual.bolsaempleo.UsuarioBolsaEmpleo;
 import es.ujaen.uvirtual.modelo.conexion.ConexionUvirtual;
 import es.ujaen.uvirtual.utilidades.BolsaEmpleoDataTable;
@@ -34,6 +35,29 @@ public class ModeloConvocatoria {
 	
 	public static final int COLUMN_DESCRIPCION_MAXLENGTH = 150;
 		
+    protected static ModeloConvocatoria eInstancia = null;
+	
+	/** Crea una instancia del objeto.
+	 *  de forma sincronizada para protegerse de posibles problemas multi-hilo
+	 */
+	private static synchronized void crearInstancia() {
+		if (eInstancia == null) {
+			eInstancia = new ModeloConvocatoria();
+		}
+	}
+
+    /**
+     * Obtiene una instancia de la conexión.
+     * @return instancia
+     */
+    public static ModeloConvocatoria obtenerInstancia() {
+        if (eInstancia == null) {
+        	crearInstancia();
+        }
+        return eInstancia;
+    }
+	
+	
 	/**
 	 * Listado de bolsas de convocatorias. 
 	 * @param params para leer los parametros de paginación, ordenacion, etc
@@ -210,5 +234,26 @@ public class ModeloConvocatoria {
 			stmt.executeUpdate();
 		}
 	}
+	
+	/** Elimina una convocatoria.
+	 * @param conv convocatoria a borrar
+	 * @throws SQLException en caso de error en la BD
+	 * @throws UVException si convocatoria no es valida
+	 */
+	public void borraConvocatoria(Convocatoria conv) throws SQLException, UVException {
+		if (conv == null) {
+			throw new UVException("No se puede eliminar una convocatoria vacía");
+		}
+		if (conv.getCodNum() == null) {
+			throw new UVException("No se puede eliminar una convocatoria con id vacío");
+		}
+		String consulta = "DELETE FROM tbep_convocatorias WHERE codnum = ? ";
+		try (Connection conexion = ConexionUvirtual.obtenerInstancia(); PreparedStatement stmt = conexion.prepareStatement(consulta);) {
+			int parameterIndex = 1;
+			stmt.setInt(parameterIndex++, conv.getCodNum());
+			stmt.executeUpdate();
+		}
+	}
+	
 }
 

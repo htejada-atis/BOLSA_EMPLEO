@@ -81,7 +81,7 @@ public class ControladorAreasABaremar extends HttpServlet {
 		Usuario usuario = datos.getUsuario();
 		LOGGER.log(Level.FINEST, "usuario que ha entrado en el servlet es {0}", usuario.getUid());
 				
-		ModeloUsuarioBolsaEmpleo modelo = new ModeloUsuarioBolsaEmpleo();
+		ModeloUsuarioBolsaEmpleo modelo = ModeloUsuarioBolsaEmpleo.obtenerInstancia();		
 		
 		String nombreAccion = EscapaHTML.ajustaCodificacion(request.getParameter(PARAM_ACCION));
 		if (nombreAccion == null) {
@@ -139,7 +139,7 @@ public class ControladorAreasABaremar extends HttpServlet {
 	 * @throws SQLException .
 	 */
 	private void listado(VistaAreasBaremar bean, UVDatos datos, HttpServletRequest request, HttpServletResponse response) throws IOException, SQLException {
-		ModeloArea modelo = new ModeloArea();		
+		ModeloArea modelo = ModeloArea.obtenerInstancia();		
 		datos.setContentType("application/json");
 		datos.setRespuestaEnviada(true);
 		response.setContentType("application/json");
@@ -162,7 +162,7 @@ public class ControladorAreasABaremar extends HttpServlet {
 	}
 	
 	private void accionSobreArea(VistaAreasBaremar bean, UVDatos datos, HttpServletRequest request) throws UVException, SQLException {
-		ModeloBolsa modelo = new ModeloBolsa();
+		ModeloBolsa modelo = ModeloBolsa.obtenerInstancia();
 		
 		String nombreAccionBolsa = EscapaHTML.ajustaCodificacion(request.getParameter(PARAM_ACCION_AREA));
 		String selectedJson = EscapaHTML.ajustaCodificacion(request.getParameter(PARAM_AREAS_SELECCIONADAS));

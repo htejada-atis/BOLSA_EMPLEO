@@ -27,6 +27,28 @@ public class ModeloTitulacion {
 	
 	public static final int COLUMN_NOMBRE_MAXLENGTH = 50;
 	
+    protected static ModeloTitulacion eInstancia = null;
+	
+	/** Crea una instancia del objeto.
+	 *  de forma sincronizada para protegerse de posibles problemas multi-hilo
+	 */
+	private static synchronized void crearInstancia() {
+		if (eInstancia == null) {
+			eInstancia = new ModeloTitulacion();
+		}
+	}
+
+    /**
+     * Obtiene una instancia de la conexión.
+     * @return instancia
+     */
+    public static ModeloTitulacion obtenerInstancia() {
+        if (eInstancia == null) {
+        	crearInstancia();
+        }
+        return eInstancia;
+    }
+	
 	
 	/** Consulta titulaciones en BBDD y las devuelve.
 	 * @param clausula para filtrar las titulaciones de la bd
@@ -318,7 +340,8 @@ public class ModeloTitulacion {
 					Titulacion tit = new Titulacion();
 					tit.setCodNum(rs.getInt("CODNUM"));
 					tit.setNombre(rs.getString("NOMBRE"));
-					tit.setArea(new ModeloArea().getAreaById(area));
+					ModeloArea modeloArea = ModeloArea.obtenerInstancia();	
+					tit.setArea(modeloArea.getAreaById(area));
 					titulaciones.add(tit);
 				}
 			}

@@ -41,7 +41,7 @@ public class TestBEPModeloTitulacion {
     public void testA01InsertaTitulacion() throws SQLException, UVException {
     	Titulacion titulacion = new Titulacion();
     	titulacion.setNombre(NOMBRE_TITULACION);
-    	ModeloTitulacion modelo = new ModeloTitulacion();
+    	ModeloTitulacion modelo = ModeloTitulacion.obtenerInstancia();
     	modelo.insertaTitulacion(titulacion);
     	List<Titulacion> titulaciones = modelo.listaTitulaciones();
     	assertTrue("titulacion insertada debe ser listada", titulaciones.contains(titulacion));
@@ -53,7 +53,7 @@ public class TestBEPModeloTitulacion {
      */
     @Test
     public void testA02BorraTitulacion() throws SQLException, UVException {
-    	ModeloTitulacion modelo = new ModeloTitulacion();
+    	ModeloTitulacion modelo = ModeloTitulacion.obtenerInstancia();
     	List<Titulacion> titulaciones = modelo.listaTitulaciones();
     	Titulacion titulacion = titulaciones.get(0);
     	modelo.borraTitulacion(titulacion);
@@ -74,7 +74,7 @@ public class TestBEPModeloTitulacion {
      */
     @Test
     public void testA03EditarTitulacion() throws SQLException, UVException {
-    	ModeloTitulacion modelo = new ModeloTitulacion();
+    	ModeloTitulacion modelo = ModeloTitulacion.obtenerInstancia();
     	List<Titulacion> titulaciones = modelo.listaTitulaciones();
     	Titulacion titulacion = titulaciones.get(0);
     	titulacion.setNombre("nombre actualizado");
@@ -90,7 +90,7 @@ public class TestBEPModeloTitulacion {
     @Test(expected = UVException.class)
     public void testE01InsertaTitulacionNull() throws SQLException, UVException {
     	Titulacion titulacion = null;
-    	ModeloTitulacion modelo = new ModeloTitulacion();
+    	ModeloTitulacion modelo = ModeloTitulacion.obtenerInstancia();
     	modelo.insertaTitulacion(titulacion);
     	fail();
     }
@@ -102,7 +102,7 @@ public class TestBEPModeloTitulacion {
     @Test(expected = UVException.class)
     public void testE02InsertaTitulacionSinNombre() throws SQLException, UVException {
     	Titulacion titulacion = new Titulacion();
-    	ModeloTitulacion modelo = new ModeloTitulacion();
+    	ModeloTitulacion modelo = ModeloTitulacion.obtenerInstancia();
     	modelo.insertaTitulacion(titulacion);
     	fail();
     }

@@ -39,6 +39,30 @@ public class ModeloBolsa {
 	public static final String BOLSA_BAREMABLE = "S";
 	public static final String BOLSA_NO_BAREMABLE = "N";
 		
+    protected static ModeloBolsa eInstancia = null;
+	
+	/** Crea una instancia del objeto.
+	 *  de forma sincronizada para protegerse de posibles problemas multi-hilo
+	 */
+	private static synchronized void crearInstancia() {
+		if (eInstancia == null) {
+			eInstancia = new ModeloBolsa();
+		}
+	}
+
+    /**
+     * Obtiene una instancia de la conexión.
+     * @return instancia
+     */
+    public static ModeloBolsa obtenerInstancia() {
+        if (eInstancia == null) {
+        	crearInstancia();
+        }
+        return eInstancia;
+    }
+	
+	
+	
 	/**
 	 * Listado de bolsas de empleo. 
 	 * @param params para leer los parametros de paginación, ordenacion, etc
@@ -48,7 +72,7 @@ public class ModeloBolsa {
 	 */
 	public BolsaEmpleoDataTable<Bolsa> listaBolsaEmpleoDatatable(Map<String, String[]> params) throws SQLException, UVException {
 		List<Bolsa> bolsas = new ArrayList<>();
-		ModeloArea modeloArea = new ModeloArea();
+		ModeloArea modeloArea = ModeloArea.obtenerInstancia();	
 		BolsaEmpleoDataTable<Bolsa> dataTable = new BolsaEmpleoDataTable<Bolsa>(params);
 		
 		String consulta =
@@ -100,7 +124,8 @@ public class ModeloBolsa {
 	 * @throws UVException si bolsa no es existe
 	 */
 	public Bolsa getBolsaById(int codNum) throws SQLException, UVException {
-		ModeloArea modeloArea = new ModeloArea();
+		ModeloArea modeloArea = ModeloArea.obtenerInstancia();	
+
 		String consulta = "SELECT bepbol.* FROM TBEP_BOLSAS bepbol WHERE bepbol.CODNUM = ?";
 			
 		try (Connection conexion = ConexionUvirtual.obtenerInstancia();
