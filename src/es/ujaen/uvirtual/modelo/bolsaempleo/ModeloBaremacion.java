@@ -13,6 +13,7 @@ import es.ujaen.uvirtual.beans.uvirtual.bolsaempleo.ItemBaremacion;
 import es.ujaen.uvirtual.modelo.conexion.ConexionUvirtual;
 import es.ujaen.uvirtual.utilidades.BolsaEmpleoDataTable;
 import es.ujaen.uvirtual.utilidades.UVException;
+import es.ujaen.uvirtual.utilidades.BolsaEmpleoDataTable.DataTableColumn;
 
 /**
  * Clase de modelo para la gestión de items de baremación.
@@ -204,13 +205,14 @@ public class ModeloBaremacion {
 		
 		dataTable.setColumn(ORDER_COLUMN_INDEX_APARTADOS_CODIGO, "bepapa.CODIGO");
 		dataTable.setColumn(ORDER_COLUMN_INDEX_APARTADOS_NOMBRE, "bepapa.NOMBRE");
-		dataTable.setColumn(ORDER_COLUMN_INDEX_APARTADOS_ACTIVO, "bepapa.FLGACTIVO");
+		dataTable.setColumn(ORDER_COLUMN_INDEX_APARTADOS_ACTIVO, "bepapa.FLGACTIVO", DataTableColumn.COLUMN_TYPE_BOOLEAN);
 		dataTable.setQuery(consulta);
 				
 		try (Connection conexion = ConexionUvirtual.obtenerInstancia();
 				PreparedStatement stmtCount = conexion.prepareStatement(dataTable.getQueryCount());
 				PreparedStatement stmt = conexion.prepareStatement(dataTable.getQuery());
-		) {					
+		) {
+			dataTable.setFiltersParams(stmt, stmtCount, 1);
 			try (ResultSet rs = stmt.executeQuery()) {
 				while (rs.next()) {
 					ApartadoBaremacion apartado = new ApartadoBaremacion();
@@ -456,7 +458,7 @@ public class ModeloBaremacion {
 		
 		dataTable.setColumn(ORDER_COLUMN_INDEX_BLOQUES_CODIGO, "bepblo.CODIGO");
 		dataTable.setColumn(ORDER_COLUMN_INDEX_BLOQUES_NOMBRE, "bepblo.NOMBRE");
-		dataTable.setColumn(ORDER_COLUMN_INDEX_BLOQUES_ACTIVO, "bepblo.FLGACTIVO");
+		dataTable.setColumn(ORDER_COLUMN_INDEX_BLOQUES_ACTIVO, "bepblo.FLGACTIVO", DataTableColumn.COLUMN_TYPE_BOOLEAN);
 		dataTable.setQuery(consulta);
 				
 		try (Connection conexion = ConexionUvirtual.obtenerInstancia();
@@ -466,6 +468,9 @@ public class ModeloBaremacion {
 			int indexParam = 1;
 			stmt.setInt(indexParam, apartado);
 			stmtCount.setInt(indexParam++, apartado);
+			
+			dataTable.setFiltersParams(stmt, stmtCount, indexParam);
+			
 			try (ResultSet rs = stmt.executeQuery()) {
 				while (rs.next()) {
 					BloqueBaremacion bloque = new BloqueBaremacion();
@@ -749,6 +754,9 @@ public class ModeloBaremacion {
 			int indexParam = 1;
 			stmt.setInt(indexParam, bloque);
 			stmtCount.setInt(indexParam++, bloque);
+			
+			dataTable.setFiltersParams(stmt, stmtCount, indexParam);
+			
 			try (ResultSet rs = stmt.executeQuery()) {
 				while (rs.next()) {
 					ItemBaremacion item = new ItemBaremacion();

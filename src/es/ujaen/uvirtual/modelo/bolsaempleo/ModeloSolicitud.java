@@ -4,6 +4,7 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.Statement;
 import java.sql.Types;
 import java.util.ArrayList;
 import java.util.Date;
@@ -27,6 +28,11 @@ import oracle.jdbc.OraclePreparedStatement;
 public class ModeloSolicitud {	
 	public static final String SOLICITUD_ESTADO_ABIERTA = "ABIERTA";
 	public static final String SOLICITUD_ESTADO_CERRADA = "CERRADA";
+	
+	public static final String MENSAJE_ERROR_CONVOCATORIA_NO_ABIERTA = "La convocatoria no está abierta";
+	public static final String MENSAJE_ERROR_SOLICITUDES_ABIERTAS = "Ya existen solicitides abiertas";
+	public static final String MENSAJE_ERROR_SOLICITUDE_NO_EXISTE = "No existe la solicitud";
+	
 		
     protected static ModeloSolicitud eInstancia = null;
 	
@@ -68,7 +74,7 @@ public class ModeloSolicitud {
 		  + "       bepsol.CODNUM SOLICITUD_CODNUM, bepsol.ESTADO ESTADO_SOLICITUD "
 		  + "FROM TBEP_CONVOCATORIAS bepcon "
 		  + "LEFT JOIN TBEP_SOLICITUDES bepsol ON bepsol.BEPCON_CODNUM = bepcon.CODNUM "
-		  + "WHERE bepcon.ESTADO = ? ";
+		  + "ORDER BY bepcon.CODNUM desc";
 		
 		dataTable.setQuery(consulta);
 				
@@ -76,8 +82,8 @@ public class ModeloSolicitud {
 				PreparedStatement stmtCount = conexion.prepareStatement(dataTable.getQueryCount());
 				PreparedStatement stmt = conexion.prepareStatement(dataTable.getQuery());
 		) {					
-			stmtCount.setString(1, ModeloConvocatoria.CONVOCATORIA_ESTADO_ABIERTA);
-			stmt.setString(1, ModeloConvocatoria.CONVOCATORIA_ESTADO_ABIERTA);
+			//stmtCount.setString(1, ModeloConvocatoria.CONVOCATORIA_ESTADO_ABIERTA);
+			//stmt.setString(1, ModeloConvocatoria.CONVOCATORIA_ESTADO_ABIERTA);
 			
 			try (ResultSet rs = stmt.executeQuery()) {
 				while (rs.next()) {
@@ -131,34 +137,50 @@ public class ModeloSolicitud {
 	
 	/**
 	 * Crea una nueva solicitud para una convocatoria.
-	 * @param convocatoria .
+	 * @param idConvocatoria .
 	 * @return solicitud creada	 
 	 * @throws UVException .
 	 * @throws SQLException .
 	 */
-	public Solicitud nuevaSolicitud(Convocatoria convocatoria) throws SQLException, UVException {
-		String consulta =
-			"INSERT INTO TBEP_SOLICITUDES (BEPCON_CODNUM, ESTADO) " 
-			+ "VALUES (?, ?) "
-			+ "RETURNING CODNUM INTO ? ";
+	public Solicitud nuevaSolicitud(Integer idConvocatoria) throws SQLException, UVException {
+		ModeloConvocatoria modeloConvocatoria = new ModeloConvocatoria();
+		Convocatoria convocatoria = modeloConvocatoria.getConvocatoriaById(idConvocatoria);
 		
-		try (Connection conexion = ConexionUvirtual.obtenerInstancia();
-				OraclePreparedStatement stmt = (OraclePreparedStatement) conexion.prepareStatement(consulta);) {
-			int parameterIndex = 1;
-			stmt.setInt(parameterIndex++, convocatoria.getCodNum());
-			stmt.setString(parameterIndex++, ModeloSolicitud.SOLICITUD_ESTADO_ABIERTA);
-			stmt.registerReturnParameter(parameterIndex++, Types.INTEGER);
-			stmt.executeUpdate();
-			
-			try (ResultSet rs = stmt.getReturnResultSet();) {
-				if (rs.last()) {
-					Integer idSolicitud = rs.getInt(1);
-					return this.getSolicitudById(idSolicitud);
-				}
-			}			
+		if (!convocatoria.getEstado().equals(ModeloConvocatoria.CONVOCATORIA_ESTADO_ABIERTA)) {
+			throw new UVException(MENSAJE_ERROR_CONVOCATORIA_NO_ABIERTA);
 		}
 		
-		return null;		
+		if (this.haySolicitudAbiertaParaConvocatoria(convocatoria)) {
+			throw new UVException(MENSAJE_ERROR_SOLICITUDES_ABIERTAS);
+		}
+				
+		String consulta =
+			"INSERT INTO TBEP_SOLICITUDES (BEPCON_CODNUM, ESTADO) " 
+			+ "VALUES (?, ?)";
+		
+		try (Connection conexion = ConexionUvirtual.obtenerInstancia()) {
+			conexion.setAutoCommit(false);
+		
+			try (PreparedStatement stmt = conexion.prepareStatement(consulta, new String[]{"CODNUM"})) {
+				int parameterIndex = 1;
+				stmt.setInt(parameterIndex++, convocatoria.getCodNum());
+				stmt.setString(parameterIndex++, ModeloSolicitud.SOLICITUD_ESTADO_ABIERTA);
+				stmt.executeUpdate();
+				
+				ResultSet rs = stmt.getGeneratedKeys();
+				rs.next();
+				Integer idSolucitud = rs.getInt(1);
+
+				conexion.commit();
+				
+				return this.getSolicitudById(idSolucitud); 
+			} catch (SQLException | UVException e) {
+				if (conexion != null) { 
+					conexion.rollback();
+				}
+				throw e;
+			}
+		}
 	}
 	
 	/**

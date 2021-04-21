@@ -26,9 +26,10 @@ VistaSolicitudes bean = (VistaSolicitudes) uvdatos.getVistas().get(VistaSolicitu
 	<% } %>
 	
 	<div class="titulo-bolsa-empleo">
-		<h2>Paso 1: Selección de bolsas de empleo</h2>
+		<h2>Paso 2: Asignación de méritos a bolsas</h2>
 		<h3><%= bean.getSolicitud().getConvocatoria().getDescripcion() %></h3>
-		<p>Seleccione las bolsas donde desee participar, hasta un máximo de [X].</p>
+		
+		<p>Para cada bolsa de empleo selecciona hasta un máximo de [X] méritos</p>
 	</div>	
 </div>
 

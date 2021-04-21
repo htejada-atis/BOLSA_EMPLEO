@@ -22,6 +22,7 @@ import es.ujaen.uvirtual.utilidades.BolsaEmpleoUtils;
 import es.ujaen.uvirtual.utilidades.BolsaEmpleoDataTable;
 import es.ujaen.uvirtual.utilidades.Memcache;
 import es.ujaen.uvirtual.utilidades.UVException;
+import es.ujaen.uvirtual.utilidades.BolsaEmpleoDataTable.DataTableColumn;
 
 /**
  * Clase para obtener la información de usuarios de UVIRTUAL.
@@ -42,7 +43,11 @@ public class ModeloUsuarioBolsaEmpleo {
 	public static final int ORDER_COLUMN_INDEX_EXCLUIDO = 9;
 	public static final int ORDER_COLUMN_INDEX_RAZON_EXCLUSION = 10;
 	public static final int ORDER_COLUMN_INDEX_FECHA_EXCLUSION = 11;
-	public static final int ORDER_COLUMN_INDEX_ACTIVO = 12;
+	
+	public static final int ORDER_COLUMN_INDEX_NUMDOCUMENTO_EVALUADORES = 0;
+	public static final int ORDER_COLUMN_INDEX_ROL_EVALUADORES = 1;
+	public static final int ORDER_COLUMN_INDEX_NOMBRE_Y_APELLIDOS_EVALUADORES = 2;
+	public static final int ORDER_COLUMN_INDEX_ACTIVO_EVALUADORES = 3;
 	
 	public static final String USUARIO_BORRADO = "S";
 	public static final String USUARIO_NO_BORRADO = "N";
@@ -359,15 +364,19 @@ public class ModeloUsuarioBolsaEmpleo {
 		
 		if (evaluadores) {
 			consulta += "AND bepusu.CODNUM IN (" + consultaEvaluadores + ")";
-			dataTable.setColumn(ORDER_COLUMN_INDEX_ACTIVO, "bepeva.FLGACTIVO");
+			dataTable.setColumn(ORDER_COLUMN_INDEX_ACTIVO_EVALUADORES, "bepeva.FLGACTIVO", DataTableColumn.COLUMN_TYPE_BOOLEAN);
 		} else {
 			consulta += "AND bepusu.CODNUM NOT IN (" + consultaEvaluadores + ") "
 					+ "AND bepusu.ROL = 1052 ";
 		}
 		
-		dataTable.setColumn(ORDER_COLUMN_INDEX_NUMDOCUMENTO, "uvpersona.IDNIF");
-		dataTable.setColumn(ORDER_COLUMN_INDEX_ROL, "bepusu.ROL");
-		dataTable.setColumn(ORDER_COLUMN_INDEX_NOMBRE_Y_APELLIDOS, "uvpersona.STRAPELLIDO1");
+		dataTable.setColumn(evaluadores ? ORDER_COLUMN_INDEX_NUMDOCUMENTO_EVALUADORES : ORDER_COLUMN_INDEX_NUMDOCUMENTO_EVALUADORES + 1,
+				"uvpersona.IDNIF");
+		dataTable.setColumn(evaluadores ? ORDER_COLUMN_INDEX_ROL_EVALUADORES : ORDER_COLUMN_INDEX_ROL_EVALUADORES + 1,
+				"bepusu.ROL", DataTableColumn.COLUMN_TYPE_OPTION);
+		dataTable.setColumn(evaluadores ? ORDER_COLUMN_INDEX_NOMBRE_Y_APELLIDOS_EVALUADORES : ORDER_COLUMN_INDEX_NOMBRE_Y_APELLIDOS_EVALUADORES + 1,
+				"uvpersona.STRAPELLIDO1");
+		
 		dataTable.setQuery(consulta);
 				
 		try (Connection conexion = ConexionUvirtual.obtenerInstancia();
@@ -377,6 +386,7 @@ public class ModeloUsuarioBolsaEmpleo {
 			int indexParam = 1;
 			stmt.setInt(indexParam, area);
 			stmtCount.setInt(indexParam++, area);
+			dataTable.setFiltersParams(stmt, stmtCount, indexParam);
 			try (ResultSet rs = stmt.executeQuery()) {
 				while (rs.next()) {
 					UsuarioBolsaEmpleo usuario = setUsuario(rs);
