@@ -31,7 +31,7 @@ table.bluetable.bolsaempleo tfoot span.total {
 table.bluetable.bolsaempleo tfoot button.btn.last {
 	margin-right: 5px;
 }
-table.bluetable.bolsaempleo button.btn:hover {
+table.bluetable.bolsaempleo button.btn:hover:enabled {
 	background-color: #83a8ff;
 	border: 1px solid #83a8ff;
 }
@@ -48,6 +48,10 @@ table.bluetable.bolsaempleo .selected {
 table.bluetable.bolsaempleo .clickable:hover {
 	cursor: pointer;
 }
+table.bluetable.bolsaempleo .page-size select {
+	margin-right: 5px;
+	border-radius: unset;
+}
 /* datatable header */
 table.bluetable.bolsaempleo caption {
 	background-color:#B9C9FE;
@@ -60,10 +64,11 @@ table.bluetable.bolsaempleo .filterable input {
 	width: 100%;
 	max-width: 150px;
 }
-table.bluetable.bolsaempleo .page-size select {
-	margin-right: 5px;
-	border-radius: unset;
+table.bluetable.bolsaempleo .filterable select {
+	width: 100%;
+	max-width: 150px;
 }
+
 
 /* datatable buttons */
 table.bluetable.bolsaempleo .btns .btn {

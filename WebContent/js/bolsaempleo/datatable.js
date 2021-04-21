@@ -14,8 +14,8 @@ function DataTable(id, config) {
         'a': Atis.getProp(config, 'action', 'datatable'),
         'page': 0,
         'pageSize': Atis.getProp(config, 'pageSize', 10),
-        'orderBy': null,
-        'orderDirection': 'asc',
+        'orderBy': Atis.getProp(config, 'defaultOrderBy', null),
+        'orderDirection': Atis.getProp(config, 'defaultOrderDirection', 'asc'),
         'filter': ''
     };
     this.pageSizeOptions = Atis.getProp(config, 'pageSizeOptions', [5,10,20,100]);
@@ -175,15 +175,23 @@ function DataTable(id, config) {
         var textoTotal = '<span class="total">' + labelTotal + labelSelected +'</span>';
         
         // pagination
-        var btnFirst = $('<button class="btn first" type="button">&lt;&lt;</button>');
-        $(btnFirst).on("click", function() { self.paginateFirst(); });
-        var btnBack = $('<button class="btn back" type="button">&lt;</button>');
-        $(btnBack).on("click", function() { self.paginationPrevious(); });
-        var btnNext = $('<button class="btn next" type="button">&gt;</button>');
-        $(btnNext).on("click", function() { self.paginationNext(); });
-        var btnLast = $('<button class="btn last" type="button">&gt;&gt;</button>');
-        $(btnLast).on("click", function() { self.paginationLast(); });
+        var btnFirst = $('<button class="btn first" title="Ir a la primera p&aacute;gina" type="button">&lt;&lt;</button>');
+        var btnBack = $('<button class="btn back" title="Ir a la p&aacute;gina anterior" type="button">&lt;</button>');
+        var btnNext = $('<button class="btn next" title="Ir a la p&aacute;gina siguiente" type="button">&gt;</button>');
+        var btnLast = $('<button class="btn last" title="Ir a la &uacute;ltima p&aacute;gina" type="button">&gt;&gt;</button>');
 
+        if ((self.lastResponse.pagesTotal + 1) > 1) {
+            $(btnFirst).on("click", function() { self.paginateFirst(); });
+            $(btnBack).on("click", function() { self.paginationPrevious(); });
+            $(btnNext).on("click", function() { self.paginationNext(); });
+            $(btnLast).on("click", function() { self.paginationLast(); });
+        } else {
+            $(btnFirst).prop("disabled",true);
+            $(btnBack).prop("disabled",true);
+            $(btnNext).prop("disabled",true);
+            $(btnLast).prop("disabled",true);
+        }
+        
         var pagination = $('<span class="pagination"></span>');
         $(pagination).append(btnFirst);
         $(pagination).append(btnBack);
@@ -266,6 +274,10 @@ function DataTable(id, config) {
             }
             
             if (order.active) {
+                if(self.params.orderBy != null && self.params.orderBy == index) {
+                    $(columnDef.node).prepend('<img src="/img/iconos/' + (self.params.orderDirection === 'asc' ? 'down.png' : 'up.png') + '" class="order"/>');
+                }
+
                 $(columnDef.node).css('cursor', 'pointer');
                 $(columnDef.node).on('click', function() { self.orderBy(columnDef, index); });
             }
@@ -286,8 +298,19 @@ function DataTable(id, config) {
                         case 'selectBoolean':
                             filterElement = $('<select ' + name + '></select>');
                             filterElement.append($('<option value="0">-----</option>'));
-                            filterElement.append($('<option>' + true + '</option>'));
-                            filterElement.append($('<option>' + false + '</option>'));
+
+                            if (columnDef.filter.true) {
+                                filterElement.append($('<option value="true">' + columnDef.filter.true + '</option>'));
+                            } else {
+                                filterElement.append($('<option>' + true + '</option>'));
+                            }
+
+                            if (columnDef.filter.false) {
+                                filterElement.append($('<option value="false">' + columnDef.filter.false + '</option>'));
+                            } else {
+                                filterElement.append($('<option>' + false + '</option>'));
+                            }
+                            
                             break;
                         case 'select':
                             filterElement = $('<select ' + name + '></select>');
