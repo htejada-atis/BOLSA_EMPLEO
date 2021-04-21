@@ -207,6 +207,7 @@ public class ModeloFichero {
 				PreparedStatement stmtCount = conexion.prepareStatement(dataTable.getQueryCount());
 				PreparedStatement stmt = conexion.prepareStatement(dataTable.getQuery());
 		) {
+			dataTable.setFiltersParams(stmt, stmtCount, 1);
 			try (ResultSet rs = stmt.executeQuery()) {
 				while (rs.next()) {
 					Fichero fich = new Fichero();

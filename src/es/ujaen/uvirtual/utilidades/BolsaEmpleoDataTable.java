@@ -201,8 +201,48 @@ public class BolsaEmpleoDataTable<T> {
 	
 	public Integer getPagesTotal() {
 		return this.pagesTotal;
-	} 
-		
+	}
+	
+	/** Método para agregar parámetros de los filtros a la consulta .
+	 * @param stmt .
+	 * @param stmtCount .
+	 * @param index .
+	 * @throws SQLException .
+	 * @throws UVException .
+	 */
+	public void setFiltersParams(PreparedStatement stmt, PreparedStatement stmtCount, int index) throws SQLException, UVException {
+		if (this.isFilterable()) {
+			for (Map.Entry<Integer, String> filter : filters.entrySet()) {
+				Integer key = filter.getKey();
+				String value = filter.getValue();
+				
+				switch (this.columns.get(key).getType()) {
+					case DataTableColumn.COLUMN_TYPE_DATE:
+						stmt.setString(index, "%"
+								+ new Date(Formateador.leeParametroFecha(value, Formateador.FORMATO_FECHA_DDMMYYYY, "/").getTime()));
+						stmtCount.setString(index++, "%"
+								+ new Date(Formateador.leeParametroFecha(value, Formateador.FORMATO_FECHA_DDMMYYYY, "/").getTime()));
+						break;
+					case DataTableColumn.COLUMN_TYPE_NUMBER:
+						stmt.setInt(index, Integer.parseInt(value));
+						stmtCount.setInt(index++, Integer.parseInt(value));
+						break;
+					case DataTableColumn.COLUMN_TYPE_BOOLEAN:
+						stmt.setString(index, Boolean.parseBoolean(value) ? "S" : "N");
+						stmtCount.setString(index++, Boolean.parseBoolean(value) ? "S" : "N");
+						break;
+					case DataTableColumn.COLUMN_TYPE_OPTION:
+						stmt.setString(index, value);
+						stmtCount.setString(index++, value);
+					case DataTableColumn.COLUMN_TYPE_TEXT:
+						stmt.setString(index, "%" + value + "%");
+						stmtCount.setString(index++, "%" + value + "%");
+						break;
+				}
+			}
+		}
+	}
+	
 	/**
 	 * Ejecuta la consulta para obtener el total de filas.
 	 * @param stmt .
@@ -262,7 +302,7 @@ public class BolsaEmpleoDataTable<T> {
 		if (this.isFilterable()) {
 			for (Map.Entry<Integer, String> filter : filters.entrySet()) {
 		        Integer key = filter.getKey();
-		        String value = filter.getValue();
+		        System.out.println("key: " + key);
 				String column = this.columns.get(key).getName();
 				
 				if (column == null) {
@@ -271,20 +311,19 @@ public class BolsaEmpleoDataTable<T> {
 				
 				switch (this.columns.get(key).getType()) {
 					case DataTableColumn.COLUMN_TYPE_DATE:
-						consultaResult += " AND TO_CHAR(" + column + ",'yyyy-mm-dd') LIKE "
-								+ "'%" + new Date(Formateador.leeParametroFecha(value, Formateador.FORMATO_FECHA_DDMMYYYY, "/").getTime()) + "' ";
+						consultaResult += " AND TO_CHAR(" + column + ",'yyyy-mm-dd') LIKE ? ";
 						break;
 					case DataTableColumn.COLUMN_TYPE_NUMBER:
-						consultaResult += " AND " + column + " LIKE '%" + value + "%' ";
-						break;
 					case DataTableColumn.COLUMN_TYPE_BOOLEAN:
-						consultaResult += " AND " + column + " = '" + (Boolean.parseBoolean(value) ? "S" : "N") + "' ";
-						break;
 					case DataTableColumn.COLUMN_TYPE_OPTION:
-						consultaResult += " AND " + column + " = '" + value + "' ";
+						consultaResult += " AND " + column + " = ? ";
+						break;
+						
+					case DataTableColumn.COLUMN_TYPE_TEXT:
+						consultaResult += " AND lower(" + column + ") LIKE lower(?) ";
 						break;
 					default:
-						consultaResult += " AND lower(" + column + ") LIKE lower('%" + value + "%') ";
+						consultaResult += " AND lower(" + column + ") LIKE lower(?) ";
 						break;
 				}
 		    }

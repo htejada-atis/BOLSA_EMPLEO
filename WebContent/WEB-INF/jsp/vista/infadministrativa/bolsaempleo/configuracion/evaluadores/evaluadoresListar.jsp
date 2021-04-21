@@ -14,13 +14,13 @@ VistaEvaluadores bean = (VistaEvaluadores) uvdatos.getVistas().get(VistaEvaluado
 
 	<%
 		if (session.getAttribute(ControladorGestionEvaluadores.MENSAJE_ENVIADO) != null) {
-		%>
-		<div id="exito" class="success">
-			<%=session.getAttribute(ControladorGestionEvaluadores.MENSAJE_ENVIADO)%>
-		</div>
+	%>
+			<div id="exito" class="success">
+				<%=session.getAttribute(ControladorGestionEvaluadores.MENSAJE_ENVIADO)%>
+			</div>
 	<%
-	session.removeAttribute(ControladorGestionEvaluadores.MENSAJE_ENVIADO);
-			}
+			session.removeAttribute(ControladorGestionEvaluadores.MENSAJE_ENVIADO);
+		}
 	%>
 	
 	<% if (bean.getMensajesDeExito().size() > 0) { %>
@@ -39,7 +39,7 @@ VistaEvaluadores bean = (VistaEvaluadores) uvdatos.getVistas().get(VistaEvaluado
 	<div class="titulo-bolsa-empleo">
 		<div class="form-select">
 			<label>Área</label>
-			<select id="select_area">
+			<select id="select_area" autocomplete="off">
 				<option value="0">Elija el área</option>
 				<%
 				for(Area area: bean.getAreas()) {
@@ -58,8 +58,8 @@ VistaEvaluadores bean = (VistaEvaluadores) uvdatos.getVistas().get(VistaEvaluado
 	<table class="bluetable bolsaempleo" id="table_evaluadores_area">
 		<tr>
 			<th scope="col" style="width:20%">D.N.I</th>
-			<th scope="col"	style="width:35%">Tipo</th>
-			<th scope="col"	style="width:35%">Nombre</th>
+			<th scope="col"	style="width:30%">Tipo</th>
+			<th scope="col"	style="width:30%">Nombre</th>
 			<th scope="col" style="width:10%">Activo</th>
 			<th scope="col" style="width:10%"></th>
 		</tr>
@@ -69,16 +69,9 @@ VistaEvaluadores bean = (VistaEvaluadores) uvdatos.getVistas().get(VistaEvaluado
 			<tr>
 				<th colspan="5" style="width:100%"></th>
 			</tr>
-			<tbody>		
-			</tbody>
-			<tfoot>
-				<tr>
-					<th colspan="5" style="width:100%"></th>
-				</tr>
-			</tfoot>
-		</table>
-	</div>
-		<% } %>
+		</tfoot>
+	</table>
+	<% } %>
 </div>
 
 <script>
@@ -103,22 +96,23 @@ VistaEvaluadores bean = (VistaEvaluadores) uvdatos.getVistas().get(VistaEvaluado
 			    "params": {"<%=ControladorGestionEvaluadores.PARAM_AREA%>": id},
 			    "pageSize": 10,
 			    "title": title,
+			    "filterable": true,
 			    "action": "<%=ControladorGestionEvaluadores.ACCION_DATATABLE_EVALUADORES%>",
 			    "columns": [
-			    	{'data': 'numdocumento'},
-			    	{'data': 'rol.descripcion'},
-			    	{'data': 'apellido1', 'render': function(row) {
+			    	{'data': 'numdocumento', 'filter': true},
+			    	{'data': 'rol.descripcion', 'filter': {'type': 'select', 'options': ['Miembro de la Comision', 'Personal de adm. y servicios']}},
+			    	{'data': 'apellido1', 'filter': true, 'render': function(row) {
 		        		return "<div class='overflow-auto'>" + row.nombre + "\n" + row.apellido1 + "\n" + row.apellido2 + "</div>"; 
 		        	}},
-		        	{'data': 'activo', 'render': function(row) {
-		        		if(row.activo){
+		        	{'data': 'activo', 'filter': {'type': 'selectBoolean'}, 'order': {'active': false}, 'render': function(row) {
+		        		if (row.activo) {
 		        			return "<div class='circle-true'></div>"; 
-		        		}
-		        		else{
+		        		} else {
 		        			return "<div class='circle-false'></div>"; 
 		        		}
 		        	}},
-		        	{'data': 'codnum', 'buttons': [{'label': function(row) { return row.activo ? "Borrar" : "Restaurar"; }, 'onClick': function(row) {
+		        	{'data': 'codnum', 'buttons': [{'label': function(row) { return row.activo ? "Borrar" : "Restaurar"; }, 
+		        		'title':  function(row) { return row.activo ? "Desactivar evaluador" : "Activar evaluador"; }, 'onClick': function(row) {
 			        		var mensaje = "¿Desea borrar el evaluador seleccionado?";
 				        	var titulo = "Borrar evaluador";
 				        	if(!row.activo) {
@@ -180,9 +174,11 @@ VistaEvaluadores bean = (VistaEvaluadores) uvdatos.getVistas().get(VistaEvaluado
 		});
 		
 		<% if(bean.getArea() != null) { %>
-			document.getElementById("select_area").value = "<%= bean.getArea().getCodNum() %>";
+			document.getElementById("select_area").options[<%= bean.getArea().getCodNum() %>].selected = true;
 			toggleVisibility();
 			inicializarTablas("<%= bean.getArea().getCodNum() %>");
+		<%} else { %>
+			document.getElementById("select_area").options[0].selected = true;
 		<%} %>
 		
 	});

@@ -61,7 +61,7 @@ VistaFicheros bean = (VistaFicheros) uvdatos.getVistas().get(VistaFicheros.class
 		    "title": "Ficheros",
 		    "columns": [
 		    	{'data': 'codNum', 'selectable': true},
-		        {'data': 'nombre', 'render': function(row) {
+		        {'data': 'nombre', 'filter': true, 'render': function(row) {
 		    		return "<div class='overflow-auto'>" +row.nombre +"</div>";
 		    	}},
 		        {'data': 'titulo', 'filter': true, 'render': function(row) {
