@@ -75,8 +75,8 @@ public class ControladorMisMeritos extends HttpServlet {
 	// mensajes
 	public static final String MENSAJE_ENVIADO = "mensaje";
 	public static final String MENSAJE_ERROR_MERITOS_SELECCIONADOS_INCORRECTOS = "No hay méritos seleccionados válidos";
-	public static final String MENSAJE_EXITO_AGREGAR = "mérito agregado correctamente";
-	public static final String MENSAJE_EXITO_ELIMINAR = "mérito eliminado correctamente";
+	public static final String MENSAJE_EXITO_AGREGAR = "Mérito agregado correctamente";
+	public static final String MENSAJE_EXITO_ELIMINAR = "Mérito eliminado correctamente";
 	
 	// ruta vistas
 	public static final String RUTA_BEP_MERITOS = "/WEB-INF/jsp/vista/infadministrativa/bolsaempleo/mismeritos/";

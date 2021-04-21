@@ -24,9 +24,8 @@ import es.ujaen.uvirtual.utilidades.BolsaEmpleoDataTable.DataTableColumn;
 public class ModeloEvaluador {
 	
 	public static final int ORDER_COLUMN_INDEX_NUMDOCUMENTO_EVALUADORES = 0;
-	public static final int ORDER_COLUMN_INDEX_ROL_EVALUADORES = 1;
-	public static final int ORDER_COLUMN_INDEX_NOMBRE_Y_APELLIDOS_EVALUADORES = 2;
-	public static final int ORDER_COLUMN_INDEX_ACTIVO_EVALUADORES = 3;
+	public static final int ORDER_COLUMN_INDEX_NOMBRE_Y_APELLIDOS_EVALUADORES = 1;
+	public static final int ORDER_COLUMN_INDEX_ACTIVO_EVALUADORES = 2;
 	
 	public static final String USUARIO_BORRADO = "S";
 	public static final String USUARIO_NO_BORRADO = "N";
@@ -55,10 +54,10 @@ public class ModeloEvaluador {
 		String consulta = "SELECT * FROM TBEP_USUARIOS bepusu "
 				+ "INNER JOIN VUJA_NET_BEP_AR_PERSONA uvpersona ON uvpersona.CODINT=bepusu.CODPERSONA "
 				+ "INNER JOIN TBEP_EVALUADORES bepeva ON bepusu.CODNUM = bepeva.BEPUSU_CODNUM "
-				+ "WHERE FLGBORRADO!='S' AND FLGEXCLUIDO!='S' AND bepeva.BEPARE_CODNUM = ? ";
+				+ "WHERE FLGBORRADO!='S' AND FLGEXCLUIDO!='S' AND bepeva.BEPARE_CODNUM = ? "
+				+ "AND bepusu.ROL = " + PARAM_ROL_ID;
 		
 		dataTable.setColumn(ORDER_COLUMN_INDEX_NUMDOCUMENTO_EVALUADORES, "uvpersona.IDNIF");
-		dataTable.setColumn(ORDER_COLUMN_INDEX_ROL_EVALUADORES, "bepusu.ROL", DataTableColumn.COLUMN_TYPE_OPTION);
 		dataTable.setColumn(ORDER_COLUMN_INDEX_NOMBRE_Y_APELLIDOS_EVALUADORES, "uvpersona.STRAPELLIDO1");
 		dataTable.setColumn(ORDER_COLUMN_INDEX_ACTIVO_EVALUADORES, "bepeva.FLGACTIVO", DataTableColumn.COLUMN_TYPE_BOOLEAN);
 		
@@ -81,7 +80,6 @@ public class ModeloEvaluador {
 					usuario.setNombre(rs.getString("STRNOMBRE"));
 					usuario.setPrimerApellido(rs.getString("STRAPELLIDO1"));
 					usuario.setSegundoApellido(rs.getString("STRAPELLIDO2"));
-					usuario.setRol(new ModeloRol().getRoleById(rs.getInt("ROL")));
 					
 					Integer codNumArea = rs.getInt("BEPARE_CODNUM");
 					Boolean activo = rs.getString("FLGACTIVO").equals("S");
@@ -126,7 +124,6 @@ public class ModeloEvaluador {
 				+ "AND bepusu.ROL = " + PARAM_ROL_ID;
 		
 		dataTable.setColumn(ORDER_COLUMN_INDEX_NUMDOCUMENTO_EVALUADORES + 1, "uvpersona.IDNIF");
-		dataTable.setColumn(ORDER_COLUMN_INDEX_ROL_EVALUADORES + 1, "bepusu.ROL", DataTableColumn.COLUMN_TYPE_OPTION);
 		dataTable.setColumn(ORDER_COLUMN_INDEX_NOMBRE_Y_APELLIDOS_EVALUADORES + 1, "uvpersona.STRAPELLIDO1");
 		
 		dataTable.setQuery(consulta);
@@ -148,7 +145,6 @@ public class ModeloEvaluador {
 					usuario.setNombre(rs.getString("STRNOMBRE"));
 					usuario.setPrimerApellido(rs.getString("STRAPELLIDO1"));
 					usuario.setSegundoApellido(rs.getString("STRAPELLIDO2"));
-					usuario.setRol(new ModeloRol().getRoleById(rs.getInt("ROL")));
 					
 					usuarios.add(new Evaluador(usuario));
 				}				

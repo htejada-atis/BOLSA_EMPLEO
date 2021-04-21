@@ -57,9 +57,8 @@ VistaEvaluadores bean = (VistaEvaluadores) uvdatos.getVistas().get(VistaEvaluado
 	</div>
 	<table class="bluetable bolsaempleo" id="table_evaluadores_area">
 		<tr>
-			<th scope="col" style="width:20%">D.N.I</th>
-			<th scope="col"	style="width:30%">Tipo</th>
-			<th scope="col"	style="width:30%">Nombre</th>
+			<th scope="col" style="width:25%">D.N.I</th>
+			<th scope="col"	style="width:55%">Nombre</th>
 			<th scope="col" class="center" style="width:10%">Activo</th>
 			<th scope="col" style="width:10%"></th>
 		</tr>
@@ -67,7 +66,7 @@ VistaEvaluadores bean = (VistaEvaluadores) uvdatos.getVistas().get(VistaEvaluado
 		</tbody>
 		<tfoot>
 			<tr>
-				<th colspan="5" style="width:100%"></th>
+				<th colspan="4" style="width:100%"></th>
 			</tr>
 		</tfoot>
 	</table>
@@ -100,15 +99,14 @@ VistaEvaluadores bean = (VistaEvaluadores) uvdatos.getVistas().get(VistaEvaluado
 			    "action": "<%=ControladorGestionEvaluadores.ACCION_DATATABLE_EVALUADORES%>",
 			    "columns": [
 			    	{'data': 'numdocumento', 'filter': true},
-			    	{'data': 'rol.descripcion', 'filter': {'type': 'select', 'options': ['Miembro de la Comision', 'Personal de adm. y servicios']}},
 			    	{'data': 'apellido1', 'filter': true, 'render': function(row) {
 		        		return "<div class='overflow-auto'>" + row.nombre + "\n" + row.apellido1 + "\n" + row.apellido2 + "</div>"; 
 		        	}},
 		        	{'data': 'activo', 'filter': {'type': 'selectBoolean'}, 'order': {'active': false}, 'render': function(row) {
 		        		if (row.activo) {
-		        			return "<div title='Activo' class='circle-true'></div>"; 
+		        			return "<div title='Activo' class='circle-true'></div>";
 		        		} else {
-		        			return "<div title='Desactivado' class='circle-false'></div>"; 
+		        			return "<div title='Desactivado' class='circle-false'></div>";
 		        		}
 		        	}},
 		        	{'data': 'codnum', 'buttons': [{'label': function(row) { return row.activo ? "Borrar" : "Restaurar"; }, 
@@ -174,7 +172,7 @@ VistaEvaluadores bean = (VistaEvaluadores) uvdatos.getVistas().get(VistaEvaluado
 		});
 		
 		<% if(bean.getArea() != null) { %>
-			document.getElementById("select_area").options[<%= bean.getArea().getCodNum() %>].selected = true;
+			document.getElementById("select_area").value = "<%= bean.getArea().getCodNum() %>";
 			toggleVisibility();
 			inicializarTablas("<%= bean.getArea().getCodNum() %>");
 		<%} else { %>

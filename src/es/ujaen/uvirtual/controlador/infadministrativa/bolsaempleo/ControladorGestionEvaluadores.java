@@ -12,23 +12,17 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
-
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.reflect.TypeToken;
-
 import es.ujaen.uvirtual.beans.CodigoDescripcion;
 import es.ujaen.uvirtual.beans.UVDatos;
 import es.ujaen.uvirtual.beans.uvirtual.bolsaempleo.Area;
 import es.ujaen.uvirtual.beans.uvirtual.bolsaempleo.Evaluador;
-import es.ujaen.uvirtual.beans.uvirtual.bolsaempleo.Noticia;
-import es.ujaen.uvirtual.beans.uvirtual.bolsaempleo.UsuarioBolsaEmpleo;
 import es.ujaen.uvirtual.beans.vistas.uvirtual.bolsaempleo.VistaEvaluadores;
-import es.ujaen.uvirtual.beans.vistas.uvirtual.bolsaempleo.VistaNoticias;
 import es.ujaen.uvirtual.modelo.bolsaempleo.ModeloArea;
-import es.ujaen.uvirtual.modelo.bolsaempleo.ModeloNoticia;
-import es.ujaen.uvirtual.modelo.bolsaempleo.ModeloTitulacion;
 import es.ujaen.uvirtual.modelo.bolsaempleo.ModeloUsuarioBolsaEmpleo;
+import es.ujaen.uvirtual.modelo.bolsaempleo.ModeloEvaluador;
 import es.ujaen.uvirtual.utilidades.BolsaEmpleoDataTable;
 import es.ujaen.uvirtual.utilidades.EscapaHTML;
 import es.ujaen.uvirtual.utilidades.Formateador;
@@ -69,10 +63,10 @@ public class ControladorGestionEvaluadores extends HttpServlet {
 	
 	// Mensajes
 	public static final String MENSAJE_ENVIADO = "mensaje";
-	public static final String MENSAJE_ERROR_USUARIOS_SELECCIONADOS_INCORRECTOS = "usuarios seleccionados incorrectos";
-	public static final String MENSAJE_EXITO_AGREGAR_EVALUADORES = "evaluadores agregados correctamente";
-	public static final String MENSAJE_EXITO_BORRAR = "evaluador borrado correctamente";
-	public static final String MENSAJE_EXITO_RESTAURAR = "evaluador restaurado correctamente";
+	public static final String MENSAJE_ERROR_USUARIOS_SELECCIONADOS_INCORRECTOS = "Usuarios seleccionados incorrectos";
+	public static final String MENSAJE_EXITO_AGREGAR_EVALUADORES = "Evaluadores agregados correctamente";
+	public static final String MENSAJE_EXITO_BORRAR = "Evaluador borrado correctamente";
+	public static final String MENSAJE_EXITO_RESTAURAR = "Evaluador restaurado correctamente";
 	
 	// Respuesta error
 	public static final int RESPONSE_HTTP_CODE_ERROR = 400;
@@ -96,7 +90,6 @@ public class ControladorGestionEvaluadores extends HttpServlet {
 		datos.setContentType("text/html");
 		
 		VistaEvaluadores bean = new VistaEvaluadores();
-		bean.setVista(RUTA_BEP_CONF + "evaluadoresListar.jsp");
 		
 		ModeloUsuarioBolsaEmpleo modelo = new ModeloUsuarioBolsaEmpleo();
 		
@@ -172,7 +165,7 @@ public class ControladorGestionEvaluadores extends HttpServlet {
 			
 			try {
 				List<String> usuarios = gson.fromJson(request.getParameter(PARAM_USUARIOS), new TypeToken<List<String>>() { }.getType());
-				new ModeloUsuarioBolsaEmpleo().insertaEvaluadores(usuarios, idArea);
+				new ModeloEvaluador().insertaEvaluadores(usuarios, idArea);
 				bean.getMensajesDeExito().add(MENSAJE_EXITO_AGREGAR_EVALUADORES);
 				HttpSession session = request.getSession(false);
 				session.setAttribute(MENSAJE_ENVIADO, MENSAJE_EXITO_AGREGAR_EVALUADORES);
@@ -193,7 +186,7 @@ public class ControladorGestionEvaluadores extends HttpServlet {
 	 * @throws IOException en caso de error de input u output .
 	 */
 	private void eliminarEvaluador(VistaEvaluadores bean, HttpServletRequest request, HttpServletResponse response) throws SQLException, UVException, IOException {
-		ModeloUsuarioBolsaEmpleo modelo = new ModeloUsuarioBolsaEmpleo();
+		ModeloEvaluador modelo = new ModeloEvaluador();
 		Integer codNum = Formateador.leeParametroInteger(request.getParameter(PARAM_USUARIO));
 		Integer codNumArea = Formateador.leeParametroInteger(request.getParameter(PARAM_AREA));
 		Boolean activo = request.getParameter(PARAM_ACTIVO) != null && EscapaHTML.ajustaCodificacion(request.getParameter(PARAM_ACTIVO)).equals("true");
@@ -214,13 +207,15 @@ public class ControladorGestionEvaluadores extends HttpServlet {
 	 * @throws UVException .
 	 */
 	private void obtenerAreas(VistaEvaluadores bean, HttpServletRequest request) throws SQLException, UVException {
+		bean.setVista(RUTA_BEP_CONF + "evaluadoresListar.jsp");
+		
 		ModeloArea modelo = new ModeloArea();
 		List<Area> areas = modelo.listaAreas();
 		bean.setAreas(areas);
 		
 		HttpSession session = request.getSession(false);
 		String mensaje = (String) session.getAttribute(MENSAJE_ENVIADO);
-		
+		System.out.println("mensaje: " + mensaje);
 		if (mensaje != null) {
 			switch (mensaje) {
 				case MENSAJE_EXITO_AGREGAR_EVALUADORES:
@@ -244,7 +239,7 @@ public class ControladorGestionEvaluadores extends HttpServlet {
 	 */
 	private void listadoEvaluadores(VistaEvaluadores bean, UVDatos datos, HttpServletRequest request, HttpServletResponse response)
 			throws IOException, SQLException {
-		ModeloUsuarioBolsaEmpleo modelo = new ModeloUsuarioBolsaEmpleo();
+		ModeloEvaluador modelo = new ModeloEvaluador();
 		datos.setContentType("application/json");
 		response.setContentType("application/json");
 		response.setCharacterEncoding("UTF-8");
@@ -252,7 +247,7 @@ public class ControladorGestionEvaluadores extends HttpServlet {
 		try (PrintWriter writer = response.getWriter()) {
 			try {
 				Integer area = Formateador.leeParametroInteger(request.getParameter(PARAM_AREA));
-				BolsaEmpleoDataTable<Evaluador> dataTable = modelo.listaEvaluadoresDatatable(request.getParameterMap(), area, true);
+				BolsaEmpleoDataTable<Evaluador> dataTable = modelo.listaEvaluadoresDatatable(request.getParameterMap(), area);
 				bean.setDatatableUsuarios(dataTable);
 				Gson gson = new GsonBuilder().setExclusionStrategies(BolsaEmpleoDataTable.GSONEXCLUSIONSTRATEGY).create();
 				writer.write(gson.toJson(dataTable));
@@ -277,7 +272,7 @@ public class ControladorGestionEvaluadores extends HttpServlet {
 	 */
 	private void listadoUsuarios(VistaEvaluadores bean, UVDatos datos, HttpServletRequest request, HttpServletResponse response)
 			throws IOException, SQLException {
-		ModeloUsuarioBolsaEmpleo modelo = new ModeloUsuarioBolsaEmpleo();
+		ModeloEvaluador modelo = new ModeloEvaluador();
 		datos.setContentType("application/json");
 		response.setContentType("application/json");
 		response.setCharacterEncoding("UTF-8");
@@ -285,7 +280,7 @@ public class ControladorGestionEvaluadores extends HttpServlet {
 		try (PrintWriter writer = response.getWriter()) {
 			try {
 				Integer area = Formateador.leeParametroInteger(request.getParameter(PARAM_AREA));
-				BolsaEmpleoDataTable<Evaluador> dataTable = modelo.listaEvaluadoresDatatable(request.getParameterMap(), area, false);
+				BolsaEmpleoDataTable<Evaluador> dataTable = modelo.listaUsuariosRestantesDatatable(request.getParameterMap(), area);
 				bean.setDatatableUsuarios(dataTable);
 				Gson gson = new GsonBuilder().setExclusionStrategies(BolsaEmpleoDataTable.GSONEXCLUSIONSTRATEGY).create();
 				writer.write(gson.toJson(dataTable));

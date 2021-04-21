@@ -72,11 +72,11 @@ public class ControladorGestionFicheros extends HttpServlet {
 	
 	// Mensajes
 	public static final String MENSAJE_ENVIADO = "mensaje";
-	public static final String MENSAJE_EXITO_AGREGAR = "fichero subido correctamente";
-	public static final String MENSAJE_EXITO_CAMBIAR_PUBLICO = "fichero publico cambiado correctamente";
-	public static final String MENSAJE_EXITO_ELIMINAR_FICHERO = "fichero eliminado correctamente";
-	public static final String MENSAJE_EXITO_ELIMINAR_FICHEROS = "ficheros eliminados correctamente";
-	public static final String MENSAJE_ERROR_FICHEROS_SELECCIONADOS_INCORRECTOS = "ficheros seleccionados no válidos";
+	public static final String MENSAJE_EXITO_AGREGAR = "Fichero subido correctamente";
+	public static final String MENSAJE_EXITO_CAMBIAR_PUBLICO = "Fichero publico cambiado correctamente";
+	public static final String MENSAJE_EXITO_ELIMINAR_FICHERO = "Fichero eliminado correctamente";
+	public static final String MENSAJE_EXITO_ELIMINAR_FICHEROS = "Ficheros eliminados correctamente";
+	public static final String MENSAJE_ERROR_FICHEROS_SELECCIONADOS_INCORRECTOS = "Ficheros seleccionados no válidos";
 	
 	// ruta vistas
 	public static final String RUTA_BEP_CONF = "/WEB-INF/jsp/vista/infadministrativa/bolsaempleo/configuracion/ficheros/";

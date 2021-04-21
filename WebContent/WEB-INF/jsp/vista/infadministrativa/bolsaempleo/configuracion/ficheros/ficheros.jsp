@@ -58,7 +58,6 @@ VistaFicheros bean = (VistaFicheros) uvdatos.getVistas().get(VistaFicheros.class
 		    "pageSize": 10,
 		    "selectable": true,
 		    "filterable": true,
-		    "title": "Ficheros",
 		    "columns": [
 		    	{'data': 'codNum', 'selectable': true},
 		        {'data': 'nombre', 'filter': true, 'render': function(row) {
@@ -70,7 +69,7 @@ VistaFicheros bean = (VistaFicheros) uvdatos.getVistas().get(VistaFicheros.class
 		        {'data': 'codnum', 'order': {'active': false}, 'class': 'overflow-ellipsis', 'render': function(row) {
 		        	var link = "<%= ControladorGestionFicheros.URL_PATTERN_FILES_PRIVADA %>"
 		        	+ "?a=<%= ControladorGestionFicheros.ACCION_DESCARGAR_FICHERO %>&<%= ControladorGestionFicheros.PARAM_FICHERO %>=" + row.codNum;
-		        	return "<a class='consultar-fichero' href='" +link +"' target='_blank'>" +link +"</a>"; 
+		        	return "<a class='consultar-fichero' title='Descargar fichero' href='" +link +"' target='_blank'>" +link +"</a>"; 
 		        	}
 		        },
 		        {'data': 'publico', 'filter': {'type': 'selectBoolean'}, 'order': {'active': false}, 'render': function(row) {
