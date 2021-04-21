@@ -15,6 +15,7 @@ import es.ujaen.uvirtual.adm.CrearUsuario;
 import es.ujaen.uvirtual.beans.Rol;
 import es.ujaen.uvirtual.beans.UVDatos;
 import es.ujaen.uvirtual.beans.Usuario;
+import es.ujaen.uvirtual.beans.uvirtual.bolsaempleo.Area;
 import es.ujaen.uvirtual.beans.uvirtual.bolsaempleo.Evaluador;
 import es.ujaen.uvirtual.beans.uvirtual.bolsaempleo.UsuarioBolsaEmpleo;
 import es.ujaen.uvirtual.modelo.conexion.ConexionUvirtual;
@@ -237,6 +238,8 @@ public class ModeloUsuarioBolsaEmpleo {
 				PreparedStatement stmt = conexion.prepareStatement(dataTable.getQuery());
 		) {		
 			
+			dataTable.setFiltersParams(stmt, stmtCount, 1);
+			
 			try (ResultSet rs = stmt.executeQuery()) {
 				while (rs.next()) {
 					UsuarioBolsaEmpleo usuario = setUsuario(rs);
@@ -275,6 +278,9 @@ public class ModeloUsuarioBolsaEmpleo {
 				PreparedStatement stmtCount = conexion.prepareStatement(dataTable.getQueryCount());
 				PreparedStatement stmt = conexion.prepareStatement(dataTable.getQuery());
 		) {					
+			
+			dataTable.setFiltersParams(stmt, stmtCount, 1);
+			
 			try (ResultSet rs = stmt.executeQuery()) {
 				while (rs.next()) {
 					UsuarioBolsaEmpleo usuario = setUsuario(rs);
@@ -314,6 +320,9 @@ public class ModeloUsuarioBolsaEmpleo {
 				PreparedStatement stmtCount = conexion.prepareStatement(dataTable.getQueryCount());
 				PreparedStatement stmt = conexion.prepareStatement(dataTable.getQuery());
 		) {					
+			
+			dataTable.setFiltersParams(stmt, stmtCount, 1);
+			
 			try (ResultSet rs = stmt.executeQuery()) {
 				while (rs.next()) {			
 					UsuarioBolsaEmpleo usuario = setUsuario(rs);
@@ -439,8 +448,6 @@ public class ModeloUsuarioBolsaEmpleo {
 					stmt.setString(parameterIndex++, usuario.getListaDist() ? "S" : "N");
 					stmt.executeUpdate();
 				}
-			
-			insertaRol(usuario, false);
 		} else {
 			String consulta = "INSERT INTO tbep_usuarios " 
 					+ " (CODPERSONA,CODCUENTA,ROL,EMAIL,FLGLISTADISTRIBUCION,FLGEXCLUIDO,RAZON_EXCLUSION,FECHA_EXCLUSION) "
@@ -459,34 +466,7 @@ public class ModeloUsuarioBolsaEmpleo {
 					stmt.setDate(parameterIndex++, new java.sql.Date(usuario.getFechaExclusion().getTime()));
 					stmt.executeUpdate();
 				}
-			insertaRol(usuario, false);
 		}
-	}
-	
-	/**	Función que inserta un rol y usuario en la BD.
-	 * @param usuario ya existente
-	 * @param admin .
-	 * @throws SQLException en caso de error en la BD
-	 */
-	public void insertaRol(UsuarioBolsaEmpleo usuario, Boolean admin) throws SQLException, UVException {
-		if (usuario == null) {
-			throw new UVException("No se puede insertar un usuario vacio");
-		}
-		if (usuario.getRol() == null || usuario.getRol().equals("")) {
-			throw new UVException("No se puede insertar un usuario sin role");
-		}
-		String consulta = "INSERT INTO adm_usuario_rol " 
-				+ " (USERUID,ROL_CODNUM,FLG_ADMIN) "
-				+ "VALUES (?, ?, ?)";
-		
-		try (Connection conexion = ConexionUvirtual.obtenerInstancia();
-				PreparedStatement stmt = conexion.prepareStatement(consulta);) {
-				int parameterIndex = 1;
-				stmt.setString(parameterIndex++, usuario.getCodCuenta());
-				stmt.setInt(parameterIndex++, usuario.getRol().getCodNum());
-				stmt.setString(parameterIndex++, admin ? "S" : "N");
-				stmt.executeUpdate();
-			}
 	}
 	
 	/** Actualiza un usuario.
@@ -567,6 +547,35 @@ public class ModeloUsuarioBolsaEmpleo {
 				stmt.executeUpdate();
 		}
 	}
+	
+	
+	/**
+	 * Establece el usuario como borrado. 
+	 * @param usu .
+	 * @param areas .
+	 * @throws SQLException .
+	 */
+	public void excluirUsuarioArea(UsuarioBolsaEmpleo usu, List<Area> areas) throws SQLException {
+		this.excluirUsuarioAreas(areas, usu);
+	}
+	
+	private void excluirUsuarioAreas(List<Area> areas, UsuarioBolsaEmpleo usu) throws SQLException {
+		String params = BolsaEmpleoUtils.consultaMultiplesParametros(areas.size());
+		String query = "UPDATE TBEP_USUARIOS SET FLGBORRADO = ?, FECHA_BORRADO = ? WHERE CODNUM IN  (" + params + ")";		
+				
+		try (Connection conexion = ConexionUvirtual.obtenerInstancia(); PreparedStatement stmt = conexion.prepareStatement(query)) {
+			int indexParam = 1;
+			
+			
+			SimpleDateFormat formatter = new SimpleDateFormat("dd/MM/YYYY HH:mm:ss");
+			Date date = new Date(System.currentTimeMillis());
+			
+			stmt.setDate(indexParam++, new java.sql.Date(date.getTime()));
+			
+			stmt.executeUpdate();
+		}	
+	}
+	
 	
 	/**
 	 * Establece el usuario como excluido. 
