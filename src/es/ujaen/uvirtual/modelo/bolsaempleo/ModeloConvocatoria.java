@@ -33,6 +33,8 @@ public class ModeloConvocatoria {
 	public static final String CONVOCATORIA_ESTADO_CERRADA = "CERRADA";
 	
 	public static final int COLUMN_DESCRIPCION_MAXLENGTH = 150;
+	
+	public static final String MENSAJE_ERROR_NO_EXISTE_CONVOCATORIA = "No existe la convocatoria";
 		
 	/**
 	 * Listado de bolsas de convocatorias. 
@@ -141,7 +143,7 @@ public class ModeloConvocatoria {
 						
 			try (ResultSet rs = stmt.executeQuery()) {
 				if (!rs.next()) {
-					return null;
+					throw new UVException(MENSAJE_ERROR_NO_EXISTE_CONVOCATORIA);
 				}
 				
 				Convocatoria convocatoria = new Convocatoria();

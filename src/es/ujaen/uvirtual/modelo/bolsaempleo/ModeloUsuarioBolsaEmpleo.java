@@ -9,6 +9,7 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
+import java.util.logging.Level;
 
 import es.ujaen.uvirtual.adm.CrearUsuario;
 import es.ujaen.uvirtual.beans.Rol;
@@ -766,6 +767,10 @@ public class ModeloUsuarioBolsaEmpleo {
 	public Boolean checkUser(UVDatos datos) throws SQLException, UVException {
 		Usuario usuArcos = datos.getUsuario();		
 		
+		if (usuArcos == null) {
+			return false;
+		} 
+		
 		UsuarioBolsaEmpleo usuario = getUsuarioByCodCuenta(usuArcos.getUid());
 	
 		if (usuario.getExcluido()) {
@@ -790,6 +795,7 @@ public class ModeloUsuarioBolsaEmpleo {
 							insertaUsuario(usuarioFinal);
 						
 							CrearUsuario.refrescarUsuario(usuarioFinal.getCodCuenta());
+							
 						} catch (SQLException | UVException ex) {
 							ex.printStackTrace();
 						}
@@ -842,5 +848,32 @@ public class ModeloUsuarioBolsaEmpleo {
 				stmt.executeUpdate();
 			}
 	}	
+	
+	
+	/** Devuelve una lista con los roles de un usuario .
+	 * @param uid del usuario
+	 * @return Lista de roles del usuario
+	 * @throws SQLException en caso de error en la BD
+	 * @throws UVException si noticia no es valida
+	 */
+	public List<String> listaRolesUsuario(String uid) throws SQLException {
+		ArrayList<String> roles = new ArrayList<>();
+		String consultaRol = "SELECT admrol.valor "
+				+ "FROM TBEP_USUARIOS bepusu "
+				+ "LEFT JOIN ADM_ROL admrol ON admrol.ROL_CODNUM=bepusu.ROL "
+				+ "WHERE bepusu.CODCUENTA= ? ";
+		
+	    	try (Connection conexion = ConexionUvirtual.obtenerInstancia();
+	    		 PreparedStatement stmt = conexion.prepareStatement(consultaRol);) {
+	    		int parameterIndex = 1;
+	    		stmt.setString(parameterIndex++, uid);
+	    		try (ResultSet rs = stmt.executeQuery();) {
+		    		while (rs.next()) {
+		    			roles.add(rs.getString("valor"));
+		    		}
+	    		}
+	    	}
+			return roles;
+	}
 	
 }

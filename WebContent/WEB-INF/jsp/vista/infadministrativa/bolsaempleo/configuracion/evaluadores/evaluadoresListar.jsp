@@ -60,7 +60,7 @@ VistaEvaluadores bean = (VistaEvaluadores) uvdatos.getVistas().get(VistaEvaluado
 			<th scope="col" style="width:20%">D.N.I</th>
 			<th scope="col"	style="width:30%">Tipo</th>
 			<th scope="col"	style="width:30%">Nombre</th>
-			<th scope="col" style="width:10%">Activo</th>
+			<th scope="col" class="center" style="width:10%">Activo</th>
 			<th scope="col" style="width:10%"></th>
 		</tr>
 		<tbody>		
@@ -106,9 +106,9 @@ VistaEvaluadores bean = (VistaEvaluadores) uvdatos.getVistas().get(VistaEvaluado
 		        	}},
 		        	{'data': 'activo', 'filter': {'type': 'selectBoolean'}, 'order': {'active': false}, 'render': function(row) {
 		        		if (row.activo) {
-		        			return "<div class='circle-true'></div>"; 
+		        			return "<div title='Activo' class='circle-true'></div>"; 
 		        		} else {
-		        			return "<div class='circle-false'></div>"; 
+		        			return "<div title='Desactivado' class='circle-false'></div>"; 
 		        		}
 		        	}},
 		        	{'data': 'codnum', 'buttons': [{'label': function(row) { return row.activo ? "Borrar" : "Restaurar"; }, 

@@ -26,6 +26,8 @@ public class ModeloTitulacion {
 	public static final int ORDER_COLUMN_INDEX_ID_SELECTABLE = 1;
 	public static final int ORDER_COLUMN_INDEX_NOMBRE_SELECTABLE = 2;
 	
+	public static final int COLUMN_NOMBRE_MAXLENGTH = 50;
+	
 	
 	/** Consulta titulaciones en BBDD y las devuelve.
 	 * @param clausula para filtrar las titulaciones de la bd

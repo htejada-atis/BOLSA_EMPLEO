@@ -58,12 +58,6 @@ public class ControladorFiltrar extends HttpServlet {
 		Usuario usuario = datos.getUsuario();
 		ModeloUsuarioBolsaEmpleo modelo = new ModeloUsuarioBolsaEmpleo();
 		LOGGER.log(Level.FINEST, "usuario que ha entrado en el servlet es {0}", usuario.getUid());
-
-		try {
-			anonimo = !modelo.checkUser(datos);
-		} catch (SQLException | UVException e) {
-			bean.getMensajesDeError().add(e.getMessage());
-		}
 		
 		
 		String nombreAccion = EscapaHTML.ajustaCodificacion(request.getParameter(PARAM_ACCION));
@@ -74,6 +68,7 @@ public class ControladorFiltrar extends HttpServlet {
 		bean.setVista("/WEB-INF/jsp/vista/infadministrativa/bolsaempleo/filtrar/index.jsp");
 		
 		try {
+			anonimo = !modelo.checkUser(datos);
 			switch (nombreAccion) {
 				case ACCION_LISTAR:
 					listado(datos, request, response);
@@ -83,6 +78,9 @@ public class ControladorFiltrar extends HttpServlet {
 			LOGGER.log(Level.SEVERE, Formateador.getStackTrace(e));
 			LOGGER.log(Level.SEVERE, e.toString());
 			bean.getMensajesDeError().add("Error al acceder a la base de datos");
+		} catch (UVException e) {
+			LOGGER.log(Level.WARNING, e.toString());
+			bean.getMensajesDeError().add(e.getMessage());
 		} finally {
 			datos.getVistas().put(bean.getClass().getName(), bean);
 			datos.getFicherosJSP().add(bean.getVista());

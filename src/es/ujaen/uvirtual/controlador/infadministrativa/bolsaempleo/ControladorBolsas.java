@@ -83,12 +83,6 @@ public class ControladorBolsas extends HttpServlet {
 		Usuario usuario = datos.getUsuario();
 		ModeloUsuarioBolsaEmpleo modelo = new ModeloUsuarioBolsaEmpleo();
 		LOGGER.log(Level.FINEST, "usuario que ha entrado en el servlet es {0}", usuario.getUid());
-
-		try {
-			anonimo = !modelo.checkUser(datos);
-		} catch (SQLException | UVException e) {
-			bean.getMensajesDeError().add(e.getMessage());
-		}
 		
 		String nombreAccion = EscapaHTML.ajustaCodificacion(request.getParameter(PARAM_ACCION));		
 		if (nombreAccion == null) {
@@ -98,6 +92,7 @@ public class ControladorBolsas extends HttpServlet {
 		bean.setVista("/WEB-INF/jsp/vista/infadministrativa/bolsaempleo/bolsas/index.jsp");
 		
 		try {
+			anonimo = !modelo.checkUser(datos);
 			switch (nombreAccion) {
 				case ACCION_DATATABLE:
 					listado(bean, datos, request, response);
@@ -108,7 +103,7 @@ public class ControladorBolsas extends HttpServlet {
 			}			
 		} catch (UVException e) {
 			LOGGER.log(Level.WARNING, e.toString());
-			bean.getMensajesDeError().add(e.toString());
+			bean.getMensajesDeError().add(e.getMessage());
 		} catch (SQLException e) {
 			LOGGER.log(Level.SEVERE, Formateador.getStackTrace(e));
 			LOGGER.log(Level.SEVERE, e.toString());

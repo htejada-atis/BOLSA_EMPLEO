@@ -17,6 +17,9 @@ table.bluetable.bolsaempleo {
 table.bluetable.bolsaempleo th {
 	padding-left: 5px;
 }
+table.bluetable.bolsaempleo th.center {
+	text-align: center;
+}
 /* datatable ordenacion */
 table.bluetable.bolsaempleo th img.order {
 	height: 12px;

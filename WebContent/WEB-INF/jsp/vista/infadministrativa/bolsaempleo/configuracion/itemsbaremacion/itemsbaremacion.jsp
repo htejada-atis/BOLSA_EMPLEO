@@ -37,7 +37,7 @@ VistaItemsBaremacion bean = (VistaItemsBaremacion) uvdatos.getVistas().get(Vista
 		<tr>
 			<th scope="col" style="width:15%" title="Código apartado">Código</th>
 			<th scope="col" style="width:75%" title="Código de area">Nombre del apartado</th>
-			<th scope="col" style="width:10%">Activo</th>
+			<th scope="col" class="center" style="width:10%">Activo</th>
 		</tr>
 		<tbody>				
 		</tbody>
@@ -148,10 +148,10 @@ VistaItemsBaremacion bean = (VistaItemsBaremacion) uvdatos.getVistas().get(Vista
 		        {'data': 'nombre', 'filter': true},
 		        {'data': 'activo', 'filter': {'type': 'selectBoolean'}, 'render': function(row) {
 	        		if(row.activo){
-	        			return "<div class='circle-true'></div>"; 
+	        			return "<div title='Activo' class='circle-true'></div>"; 
 	        		}
 	        		else{
-	        			return "<div class='circle-false'></div>"; 
+	        			return "<div title='Desactivado' class='circle-false'></div>"; 
 	        		}
 	        	}},
 		    ],

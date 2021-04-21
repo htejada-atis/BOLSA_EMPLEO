@@ -20,6 +20,7 @@ import es.ujaen.uvirtual.beans.vistas.uvirtual.bolsaempleo.VistaTitulaciones;
 import es.ujaen.uvirtual.modelo.bolsaempleo.ModeloTitulacion;
 import es.ujaen.uvirtual.modelo.bolsaempleo.ModeloUsuarioBolsaEmpleo;
 import es.ujaen.uvirtual.utilidades.BolsaEmpleoDataTable;
+import es.ujaen.uvirtual.utilidades.BolsaEmpleoValidator;
 import es.ujaen.uvirtual.utilidades.EscapaHTML;
 import es.ujaen.uvirtual.utilidades.Formateador;
 import es.ujaen.uvirtual.utilidades.UVException;
@@ -61,6 +62,8 @@ public class ControladorGestionTitulaciones extends HttpServlet {
 	public static final String MENSAJE_ENVIADO = "mensaje";
 	public static final String MENSAJE_EXITO_AGREGAR = "titulación agregada correctamente";
 	public static final String MENSAJE_EXITO_ELIMINAR = "titulación eliminada correctamente";
+	public static final String MENSAJE_ERROR_NOMBRE_VACIO = "El nombre es obligatorio para almacenar una titulación";
+	public static final String MENSAJE_ERROR_NOMBRE_LARGO = "El nombre no puede contener mas de %d caracteres";
 	
 	public static final int RESPONSE_HTTP_CODE_ERROR = 400;
 	
@@ -87,18 +90,13 @@ public class ControladorGestionTitulaciones extends HttpServlet {
 		
 		ModeloUsuarioBolsaEmpleo modelo = new ModeloUsuarioBolsaEmpleo();
 		
-		try {
-			anonimo = !modelo.checkUser(datos);
-		} catch (SQLException | UVException e) {
-			bean.getMensajesDeError().add(e.getMessage());
-		}
-		
 		String nombreAccion = EscapaHTML.ajustaCodificacion(request.getParameter(PARAM_ACCION));
 		if (nombreAccion == null) {
 			nombreAccion = ACCION_LISTAR_TITULACIONES;
 		}
 		
 		try {
+			anonimo = !modelo.checkUser(datos);
 			switch (nombreAccion) {
 			case ACCION_AGREGAR_TITULACION:
 				agregarTitulacion(request, response, bean);
@@ -117,7 +115,7 @@ public class ControladorGestionTitulaciones extends HttpServlet {
 			bean.getMensajesDeError().add("Error al acceder a la base de datos");
 		} catch (UVException e) {
 			LOGGER.log(Level.WARNING, e.toString());
-			bean.getMensajesDeError().add(e.toString());
+			bean.getMensajesDeError().add(e.getMessage());
 		} finally {
 			datos.getVistas().put(bean.getClass().getName(), bean);
 			datos.getFicherosJSP().add(bean.getVista());
@@ -152,12 +150,22 @@ public class ControladorGestionTitulaciones extends HttpServlet {
 		ModeloTitulacion modelo = new ModeloTitulacion();
 		bean.setTitulacion(modelo.listaTitulacion(Formateador.leeParametroInteger(request.getParameter(PARAM_ID))));
 		if (EscapaHTML.ajustaCodificacion(request.getParameter(PARAM_NOMBRE)) != null) {
-			Integer codNum = Formateador.leeParametroInteger(request.getParameter(PARAM_ID));
-			String nombre = EscapaHTML.ajustaCodificacion(request.getParameter(PARAM_NOMBRE));
-			modelo.actualizaTitulacion(new Titulacion(codNum, nombre));
-			HttpSession session = request.getSession(false);
-			session.setAttribute(MENSAJE_ENVIADO, MENSAJE_EXITO_AGREGAR);
-			response.sendRedirect(request.getServletPath());
+			BolsaEmpleoValidator validator = this.getValidatorTitulaciones(request); 							
+			
+			if (!validator.isValid()) {
+				for (String param : validator.getErrors().keySet()) {
+					for (String paramError : validator.getErrors().get(param)) {
+						bean.getMensajesDeError().add(paramError);
+					}
+				}
+			} else {
+				Integer codNum = Formateador.leeParametroInteger(request.getParameter(PARAM_ID));
+				String nombre = EscapaHTML.ajustaCodificacion(request.getParameter(PARAM_NOMBRE));
+				modelo.actualizaTitulacion(new Titulacion(codNum, nombre));
+				HttpSession session = request.getSession(false);
+				session.setAttribute(MENSAJE_ENVIADO, MENSAJE_EXITO_AGREGAR);
+				response.sendRedirect(request.getServletPath());
+			}
 		}
 	}
 	
@@ -187,11 +195,21 @@ public class ControladorGestionTitulaciones extends HttpServlet {
 	private void agregarTitulacion(HttpServletRequest request, HttpServletResponse response, VistaTitulaciones bean) throws SQLException, UVException, IOException {
 		bean.setVista(RUTA_BEP_CONF + "formTitulacion.jsp");
 		if (EscapaHTML.ajustaCodificacion(request.getParameter(PARAM_NOMBRE)) != null) {
-			String nombre = EscapaHTML.ajustaCodificacion(request.getParameter(PARAM_NOMBRE));
-			new ModeloTitulacion().insertaTitulacion(new Titulacion(nombre));
-			HttpSession session = request.getSession(false);
-			session.setAttribute(MENSAJE_ENVIADO, MENSAJE_EXITO_AGREGAR);
-			response.sendRedirect(request.getServletPath());
+			BolsaEmpleoValidator validator = this.getValidatorTitulaciones(request); 							
+			
+			if (!validator.isValid()) {
+				for (String param : validator.getErrors().keySet()) {
+					for (String paramError : validator.getErrors().get(param)) {
+						bean.getMensajesDeError().add(paramError);
+					}
+				}
+			} else {
+				String nombre = EscapaHTML.ajustaCodificacion(request.getParameter(PARAM_NOMBRE));
+				new ModeloTitulacion().insertaTitulacion(new Titulacion(nombre));
+				HttpSession session = request.getSession(false);
+				session.setAttribute(MENSAJE_ENVIADO, MENSAJE_EXITO_AGREGAR);
+				response.sendRedirect(request.getServletPath());
+			}
 		}
 	}
 	
@@ -223,6 +241,26 @@ public class ControladorGestionTitulaciones extends HttpServlet {
 		}
 		
 		datos.setRespuestaEnviada(true);
+	}
+	
+	/** Valida el formulario de Titulaciones.
+	 * @param request .
+	 * @return validator
+	 * @throws UVException .
+	 * @throws SQLException .
+	 * @throws IOException .
+	 * @throws IOException .
+	 */
+	private BolsaEmpleoValidator getValidatorTitulaciones(HttpServletRequest request) throws UVException {
+		BolsaEmpleoValidator validator = new BolsaEmpleoValidator(request);
+		
+		validator.addParamString(PARAM_NOMBRE);
+		validator.addRule(PARAM_NOMBRE, "required", MENSAJE_ERROR_NOMBRE_VACIO);
+		validator.addRule(PARAM_NOMBRE, "noBlank", MENSAJE_ERROR_NOMBRE_VACIO);
+		validator.addRule(PARAM_NOMBRE, "max:" + ModeloTitulacion.COLUMN_NOMBRE_MAXLENGTH, 
+				String.format(MENSAJE_ERROR_NOMBRE_LARGO, ModeloTitulacion.COLUMN_NOMBRE_MAXLENGTH));
+
+		return validator;
 	}
 	
 }
