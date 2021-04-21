@@ -48,14 +48,15 @@ public class TestBEPModeloMerito {
      */
     @Test
     public void testA01InsertaMerito() throws SQLException, UVException {
-    	ItemBaremacion item = new ModeloBaremacion().getItemBaremacionById(1);
+		ModeloBaremacion modeloBar = ModeloBaremacion.obtenerInstancia();
+    	ItemBaremacion item = modeloBar.getItemBaremacionById(1);
     	Merito merito = new Merito();
     	merito.setDescripcion(DESCRIPCION_MERITO);
     	merito.setObservacion(OBSERVACION_MERITO);
     	merito.setValor(VALOR_MERITO);
     	merito.setArchivo(ARCHIVO_MERITO);
     	merito.setItemBaremacion(item);
-    	ModeloMerito modelo = new ModeloMerito();
+    	ModeloMerito modelo = ModeloMerito.obtenerInstancia();
     	modelo.insertaMerito(merito, 1);
     	List<Merito> meritos = modelo.listaMeritos();
     	assertTrue("mérito insertado debe ser listado", meritos.contains(merito));
@@ -67,7 +68,7 @@ public class TestBEPModeloMerito {
      */
     @Test
     public void testA02BorraMerito() throws SQLException, UVException {
-    	ModeloMerito modelo = new ModeloMerito();
+    	ModeloMerito modelo = ModeloMerito.obtenerInstancia();
     	List<Merito> meritos = modelo.listaMeritos();
     	Merito merito = meritos.get(0);
     	List<String> idsMeritos = new ArrayList<>();
@@ -91,7 +92,7 @@ public class TestBEPModeloMerito {
     @Test(expected = UVException.class)
     public void testE01InsertaMeritoNull() throws SQLException, UVException {
     	Merito merito = null;
-    	ModeloMerito modelo = new ModeloMerito();
+    	ModeloMerito modelo = ModeloMerito.obtenerInstancia();
     	modelo.insertaMerito(merito, 1);
     	fail();
     }
@@ -109,7 +110,7 @@ public class TestBEPModeloMerito {
     	merito.setValor(VALOR_MERITO);
     	merito.setArchivo(ARCHIVO_MERITO);
     	merito.setItemBaremacion(item);
-    	ModeloMerito modelo = new ModeloMerito();
+    	ModeloMerito modelo = ModeloMerito.obtenerInstancia();
     	modelo.insertaMerito(merito, null);
     	fail();
     }

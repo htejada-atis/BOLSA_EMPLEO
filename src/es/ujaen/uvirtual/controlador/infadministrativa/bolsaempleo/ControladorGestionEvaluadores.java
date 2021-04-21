@@ -91,7 +91,7 @@ public class ControladorGestionEvaluadores extends HttpServlet {
 		
 		VistaEvaluadores bean = new VistaEvaluadores();
 		
-		ModeloUsuarioBolsaEmpleo modelo = new ModeloUsuarioBolsaEmpleo();
+		ModeloUsuarioBolsaEmpleo modelo = ModeloUsuarioBolsaEmpleo.obtenerInstancia();	
 		
 		String nombreAccion = EscapaHTML.ajustaCodificacion(request.getParameter(PARAM_ACCION));
 		if (nombreAccion == null) {
@@ -155,7 +155,7 @@ public class ControladorGestionEvaluadores extends HttpServlet {
 	private void agregarEvaluadores(VistaEvaluadores bean, HttpServletRequest request, HttpServletResponse response) throws SQLException, UVException, IOException {
 		bean.setVista(RUTA_BEP_CONF + "evaluadoresAgregar.jsp");
 		
-		ModeloArea modelo = new ModeloArea();
+		ModeloArea modelo = ModeloArea.obtenerInstancia();	
 		Integer idArea = Formateador.leeParametroInteger(request.getParameter(PARAM_AREA));
 		Area area = modelo.getAreaById(idArea);
 		bean.setArea(area);
@@ -165,7 +165,8 @@ public class ControladorGestionEvaluadores extends HttpServlet {
 			
 			try {
 				List<String> usuarios = gson.fromJson(request.getParameter(PARAM_USUARIOS), new TypeToken<List<String>>() { }.getType());
-				new ModeloEvaluador().insertaEvaluadores(usuarios, idArea);
+				ModeloEvaluador modeloEvaluador = ModeloEvaluador.obtenerInstancia();
+				modeloEvaluador.insertaEvaluadores(usuarios, idArea);
 				bean.getMensajesDeExito().add(MENSAJE_EXITO_AGREGAR_EVALUADORES);
 				HttpSession session = request.getSession(false);
 				session.setAttribute(MENSAJE_ENVIADO, MENSAJE_EXITO_AGREGAR_EVALUADORES);
@@ -186,7 +187,7 @@ public class ControladorGestionEvaluadores extends HttpServlet {
 	 * @throws IOException en caso de error de input u output .
 	 */
 	private void eliminarEvaluador(VistaEvaluadores bean, HttpServletRequest request, HttpServletResponse response) throws SQLException, UVException, IOException {
-		ModeloEvaluador modelo = new ModeloEvaluador();
+		ModeloEvaluador modelo = ModeloEvaluador.obtenerInstancia();
 		Integer codNum = Formateador.leeParametroInteger(request.getParameter(PARAM_USUARIO));
 		Integer codNumArea = Formateador.leeParametroInteger(request.getParameter(PARAM_AREA));
 		Boolean activo = request.getParameter(PARAM_ACTIVO) != null && EscapaHTML.ajustaCodificacion(request.getParameter(PARAM_ACTIVO)).equals("true");
@@ -209,13 +210,13 @@ public class ControladorGestionEvaluadores extends HttpServlet {
 	private void obtenerAreas(VistaEvaluadores bean, HttpServletRequest request) throws SQLException, UVException {
 		bean.setVista(RUTA_BEP_CONF + "evaluadoresListar.jsp");
 		
-		ModeloArea modelo = new ModeloArea();
+		ModeloArea modelo = ModeloArea.obtenerInstancia();
 		List<Area> areas = modelo.listaAreas();
 		bean.setAreas(areas);
 		
 		HttpSession session = request.getSession(false);
 		String mensaje = (String) session.getAttribute(MENSAJE_ENVIADO);
-		System.out.println("mensaje: " + mensaje);
+
 		if (mensaje != null) {
 			switch (mensaje) {
 				case MENSAJE_EXITO_AGREGAR_EVALUADORES:
@@ -226,7 +227,6 @@ public class ControladorGestionEvaluadores extends HttpServlet {
 					session.removeAttribute(PARAM_AREA);
 					break;
 			}
-		}
 	}
 	
 	/** carga los evaluadores en una tabla .
@@ -239,7 +239,7 @@ public class ControladorGestionEvaluadores extends HttpServlet {
 	 */
 	private void listadoEvaluadores(VistaEvaluadores bean, UVDatos datos, HttpServletRequest request, HttpServletResponse response)
 			throws IOException, SQLException {
-		ModeloEvaluador modelo = new ModeloEvaluador();
+		ModeloEvaluador modelo = new ModeloEvaluador.obtenerInstancia();
 		datos.setContentType("application/json");
 		response.setContentType("application/json");
 		response.setCharacterEncoding("UTF-8");
@@ -272,7 +272,7 @@ public class ControladorGestionEvaluadores extends HttpServlet {
 	 */
 	private void listadoUsuarios(VistaEvaluadores bean, UVDatos datos, HttpServletRequest request, HttpServletResponse response)
 			throws IOException, SQLException {
-		ModeloEvaluador modelo = new ModeloEvaluador();
+		ModeloEvaluador modelo = new ModeloEvaluador.obtenerInstancia();
 		datos.setContentType("application/json");
 		response.setContentType("application/json");
 		response.setCharacterEncoding("UTF-8");

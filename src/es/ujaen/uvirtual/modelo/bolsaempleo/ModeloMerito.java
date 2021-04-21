@@ -26,6 +26,28 @@ public class ModeloMerito {
 	public static final int ORDER_COLUMN_INDEX_OBSERVACION = 6;
 	public static final int ORDER_COLUMN_INDEX_FICHERO = 7;
 	
+    protected static ModeloMerito eInstancia = null;
+	
+	/** Crea una instancia del objeto.
+	 *  de forma sincronizada para protegerse de posibles problemas multi-hilo
+	 */
+	private static synchronized void crearInstancia() {
+		if (eInstancia == null) {
+			eInstancia = new ModeloMerito();
+		}
+	}
+
+    /**
+     * Obtiene una instancia de la conexión.
+     * @return instancia
+     */
+    public static ModeloMerito obtenerInstancia() {
+        if (eInstancia == null) {
+        	crearInstancia();
+        }
+        return eInstancia;
+    }
+	
 	/** Consulta méritos en BBDD y los devuelve .
 	 * @param id para devolver un mérito .
 	 * @return lista de los méritos de la base de datos .
@@ -49,8 +71,10 @@ public class ModeloMerito {
 					try {
 						Merito mer = new Merito();
 						mer.setCodNum(rs.getInt("CODNUM"));
-						mer.setUsuario(new ModeloUsuarioBolsaEmpleo().getUsuarioById(rs.getInt("BEPUSU_CODNUM")));
-						mer.setItemBaremacion(new ModeloBaremacion().getItemBaremacionById(rs.getInt("BEPITE_CODNUM")));
+						ModeloUsuarioBolsaEmpleo modelo = ModeloUsuarioBolsaEmpleo.obtenerInstancia();
+						mer.setUsuario(modelo.getUsuarioById(rs.getInt("BEPUSU_CODNUM")));
+						ModeloBaremacion modeloBar = ModeloBaremacion.obtenerInstancia();
+						mer.setItemBaremacion(modeloBar.getItemBaremacionById(rs.getInt("BEPITE_CODNUM")));
 						mer.setDescripcion(rs.getString("DESCRIPCION"));
 						mer.setObservacion(rs.getString("OBSERVACION"));
 						mer.setValor(rs.getFloat("VALOR"));
@@ -190,7 +214,8 @@ public class ModeloMerito {
 				while (rs.next()) {
 					Merito mer = new Merito();
 					mer.setCodNum(rs.getInt("CODNUM"));
-					mer.setItemBaremacion(new ModeloBaremacion().getItemBaremacionById(rs.getInt("BEPITE_CODNUM")));
+					ModeloBaremacion modeloBar = ModeloBaremacion.obtenerInstancia();
+					mer.setItemBaremacion(modeloBar.getItemBaremacionById(rs.getInt("BEPITE_CODNUM")));
 					mer.setDescripcion(rs.getString("DESCRIPCION"));
 					mer.setObservacion(rs.getString("OBSERVACION"));
 					mer.setValor(rs.getFloat("VALOR"));

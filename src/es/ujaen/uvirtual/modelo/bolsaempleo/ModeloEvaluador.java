@@ -27,13 +27,30 @@ public class ModeloEvaluador {
 	public static final int ORDER_COLUMN_INDEX_NOMBRE_Y_APELLIDOS_EVALUADORES = 1;
 	public static final int ORDER_COLUMN_INDEX_ACTIVO_EVALUADORES = 2;
 	
-	public static final String USUARIO_BORRADO = "S";
-	public static final String USUARIO_NO_BORRADO = "N";
-	public static final String USUARIO_EXCLUIDO = "S";
-	public static final String USUARIO_NO_EXCLUIDO = "N";
+	protected static ModeloEvaluador eInstancia = null;
 	
 	public static final Integer PARAM_ROL_ID = 1052;
 	
+	
+	/** Crea una instancia del objeto.
+	 *  de forma sincronizada para protegerse de posibles problemas multi-hilo
+	 */
+	private static synchronized void crearInstancia() {
+		if (eInstancia == null) {
+			eInstancia = new ModeloEvaluador();
+		}
+	}
+	
+	/**
+     * Obtiene una instancia de la conexión.
+     * @return instancia
+     */
+    public static ModeloEvaluador obtenerInstancia() {
+        if (eInstancia == null) {
+        	crearInstancia();
+        }
+        return eInstancia;
+    }
 	
 	/** Listado de usuarios en función de un área . 
 	 * @param params para leer los parametros de paginación, ordenacion, etc .

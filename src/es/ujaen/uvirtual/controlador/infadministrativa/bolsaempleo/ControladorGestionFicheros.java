@@ -102,7 +102,7 @@ public class ControladorGestionFicheros extends HttpServlet {
 		VistaFicheros bean = new VistaFicheros();
 		bean.setVista(RUTA_BEP_CONF + "ficheros.jsp");
 		
-		ModeloUsuarioBolsaEmpleo modelo = new ModeloUsuarioBolsaEmpleo();
+		ModeloUsuarioBolsaEmpleo modelo = ModeloUsuarioBolsaEmpleo.obtenerInstancia();
 		
 		String nombreAccion = EscapaHTML.ajustaCodificacion(request.getParameter(PARAM_ACCION));
 		if (nombreAccion == null) {
@@ -173,7 +173,7 @@ public class ControladorGestionFicheros extends HttpServlet {
 		bean.setVista(RUTA_BEP_CONF + "formFichero.jsp");
 		
 		if (request.getParameter(PARAM_TITULO) != null) {
-			ModeloFichero modelo = new ModeloFichero();
+			ModeloFichero modelo = ModeloFichero.obtenerInstancia();
 			Part uploadedFile = request.getPart(PARAM_ARCHIVO);
 			if (uploadedFile != null) {
 				if (uploadedFile.getSize() > 0) {
@@ -211,7 +211,7 @@ public class ControladorGestionFicheros extends HttpServlet {
 	 * @throws UVException .
 	 */
 	private void cambiarFicherosPublico(HttpServletRequest request, HttpServletResponse response, Boolean publico) throws SQLException, UVException {
-		ModeloFichero modelo = new ModeloFichero();
+		ModeloFichero modelo = ModeloFichero.obtenerInstancia();
 		Integer codNum = Formateador.leeParametroInteger(request.getParameter(PARAM_FICHERO));
 		
 		Gson gson = new GsonBuilder().create();
@@ -241,7 +241,7 @@ public class ControladorGestionFicheros extends HttpServlet {
 	 * @throws IOException en caso de error de input u output .
 	 */
 	private void descargarFichero(VistaFicheros bean, UVDatos datos, HttpServletRequest request, HttpServletResponse response) throws SQLException, UVException, IOException {
-		ModeloFichero modelo = new ModeloFichero();
+		ModeloFichero modelo = ModeloFichero.obtenerInstancia();
 		if (EscapaHTML.ajustaCodificacion(request.getParameter(PARAM_FICHERO)) != null) {
 			Fichero fichero = modelo.listaFichero(Formateador.leeParametroInteger(request.getParameter(PARAM_FICHERO)));
 			bean.setFichero(fichero);
@@ -277,7 +277,7 @@ public class ControladorGestionFicheros extends HttpServlet {
 	 * @throws IOException en caso de error de IO .
 	 */
 	private void eliminarFicheros(HttpServletRequest request, HttpServletResponse response) throws SQLException, UVException, IOException {
-		ModeloFichero modelo = new ModeloFichero();
+		ModeloFichero modelo = ModeloFichero.obtenerInstancia();
 		Integer codNum = Formateador.leeParametroInteger(request.getParameter(PARAM_FICHERO));
 		
 		Gson gson = new GsonBuilder().create();
@@ -307,7 +307,7 @@ public class ControladorGestionFicheros extends HttpServlet {
 	 * @throws IOException en caso de error de IO .
 	 */
 	private void listadoFicheros(VistaFicheros bean, UVDatos datos, HttpServletRequest request, HttpServletResponse response) throws IOException, SQLException {
-		ModeloFichero modelo = new ModeloFichero();
+		ModeloFichero modelo = ModeloFichero.obtenerInstancia();
 		
 		datos.setContentType("application/json");
 		datos.setRespuestaEnviada(true);

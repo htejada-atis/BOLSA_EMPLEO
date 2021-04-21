@@ -91,7 +91,7 @@ public class ControladorGestionTitulacionesPreferentesArea extends HttpServlet {
 		VistaTitulacionesArea bean = new VistaTitulacionesArea();
 		bean.setVista(RUTA_BEP_CONF + "titulacionespreferentesarea.jsp");
 		
-		ModeloUsuarioBolsaEmpleo modelo = new ModeloUsuarioBolsaEmpleo();
+		ModeloUsuarioBolsaEmpleo modelo = ModeloUsuarioBolsaEmpleo.obtenerInstancia();
 	
 		String nombreAccion = EscapaHTML.ajustaCodificacion(request.getParameter(PARAM_ACCION));
 		if (nombreAccion == null) {
@@ -160,15 +160,18 @@ public class ControladorGestionTitulacionesPreferentesArea extends HttpServlet {
 	private void eliminarTitulacionesArea(HttpServletRequest request, HttpServletResponse response, VistaTitulacionesArea bean) throws SQLException, IOException, UVException {
 		Integer area = Formateador.leeParametroInteger(request.getParameter(PARAM_AREA));
 		Gson gson = new GsonBuilder().create();
+		ModeloTitulacion modeloTit = ModeloTitulacion.obtenerInstancia();
 		
 		try {
 			List<String> titulaciones = gson.fromJson(request.getParameter(PARAM_TITULACIONES), new TypeToken<List<String>>() { }.getType());
-			new ModeloTitulacion().eliminarTitulacionesPreferentesArea(titulaciones, area);
+			modeloTit.eliminarTitulacionesPreferentesArea(titulaciones, area);
 		} catch (Exception ex) {
 			throw new UVException(MENSAJE_ERROR_TITULACIONES_SELECCIONADAS_INCORRECTAS);
 		}
 		
-		bean.setAreas(new ModeloArea().listaAreas());
+		ModeloArea modelo = ModeloArea.obtenerInstancia();	
+		
+		bean.setAreas(modelo.listaAreas());
 		bean.setArea(new Area(area));
 	}
 	
@@ -186,17 +189,19 @@ public class ControladorGestionTitulacionesPreferentesArea extends HttpServlet {
 		
 		Integer area = Formateador.leeParametroInteger(request.getParameter(PARAM_AREA));
 		Gson gson = new GsonBuilder().create();
+		ModeloTitulacion modeloTit = ModeloTitulacion.obtenerInstancia();
 		
 		try {
 			List<String> titulaciones = gson.fromJson(request.getParameter(PARAM_TITULACIONES), new TypeToken<List<String>>() { }.getType());
-			new ModeloTitulacion().incluirTitulacionesPreferentesArea(titulaciones, area);
+			modeloTit.incluirTitulacionesPreferentesArea(titulaciones, area);
 		} catch (SQLIntegrityConstraintViolationException ex) {
 			throw new SQLIntegrityConstraintViolationException(MENSAJE_ERROR_TITULACIONES_PREFERENTES_YA_SELECCIONADAS_PREVIAMENTE);
 		} catch (Exception ex) {
 			throw new UVException(MENSAJE_ERROR_TITULACIONES_SELECCIONADAS_INCORRECTAS);
 		}
 		
-		bean.setAreas(new ModeloArea().listaAreas());
+		ModeloArea modelo = ModeloArea.obtenerInstancia();	
+		bean.setAreas(modelo.listaAreas());
 		bean.setArea(new Area(area));
 	}
 	
@@ -205,7 +210,7 @@ public class ControladorGestionTitulacionesPreferentesArea extends HttpServlet {
 	 * @throws SQLException excepcion de bbdd.
 	 */
 	private void obtenerAreas(VistaTitulacionesArea bean) throws SQLException {
-		ModeloArea modelo = new ModeloArea();
+		ModeloArea modelo = ModeloArea.obtenerInstancia();	
 		List<Area> areas = modelo.listaAreas();
 		bean.setAreas(areas);
 	}
@@ -220,7 +225,7 @@ public class ControladorGestionTitulacionesPreferentesArea extends HttpServlet {
 	 */
 	private void listadoTitulaciones(VistaTitulacionesArea bean, UVDatos datos, HttpServletRequest request, HttpServletResponse response)
 			throws IOException, SQLException {
-		ModeloTitulacion modelo = new ModeloTitulacion();
+		ModeloTitulacion modelo = ModeloTitulacion.obtenerInstancia();
 		datos.setContentType("application/json");
 		response.setContentType("application/json");
 		response.setCharacterEncoding("UTF-8");
@@ -253,7 +258,7 @@ public class ControladorGestionTitulacionesPreferentesArea extends HttpServlet {
 	 */
 	private void listadoTitulacionesPreferentesArea(VistaTitulacionesArea bean, UVDatos datos, HttpServletRequest request, HttpServletResponse response)
 			throws IOException, SQLException {
-		ModeloTitulacion modelo = new ModeloTitulacion();
+		ModeloTitulacion modelo = ModeloTitulacion.obtenerInstancia();
 		datos.setContentType("application/json");
 		response.setContentType("application/json");
 		response.setCharacterEncoding("UTF-8");

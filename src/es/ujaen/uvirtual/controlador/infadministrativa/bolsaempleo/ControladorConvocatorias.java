@@ -24,9 +24,12 @@ import es.ujaen.uvirtual.beans.Rol;
 import es.ujaen.uvirtual.beans.UVDatos;
 import es.ujaen.uvirtual.beans.Usuario;
 import es.ujaen.uvirtual.beans.uvirtual.bolsaempleo.Convocatoria;
+import es.ujaen.uvirtual.beans.uvirtual.bolsaempleo.Noticia;
 import es.ujaen.uvirtual.beans.uvirtual.bolsaempleo.UsuarioBolsaEmpleo;
 import es.ujaen.uvirtual.beans.vistas.uvirtual.bolsaempleo.VistaConvocatorias;
+import es.ujaen.uvirtual.beans.vistas.uvirtual.bolsaempleo.VistaNoticias;
 import es.ujaen.uvirtual.modelo.bolsaempleo.ModeloConvocatoria;
+import es.ujaen.uvirtual.modelo.bolsaempleo.ModeloNoticia;
 import es.ujaen.uvirtual.modelo.bolsaempleo.ModeloRol;
 import es.ujaen.uvirtual.modelo.bolsaempleo.ModeloUsuarioBolsaEmpleo;
 import es.ujaen.uvirtual.utilidades.BolsaEmpleoValidator;
@@ -68,9 +71,12 @@ public class ControladorConvocatorias extends HttpServlet {
 	public static final String ACCION_MODIFICAR_CONVOCATORIA = "editConvocatoria";
 	public static final String ACCION_ABRIR_CONVOCATORIA = "abrirConvocatoria";
 	public static final String ACCION_CERRAR_CONVOCATORIA = "cerrarConvocatoria";
+	public static final String ACCION_BORRAR_CONVOCATORIA = "borrarConvocatoria";
 
 	
 	// mensajes
+	public static final String MENSAJE_ENVIADO = "mensaje";
+	public static final String MENSAJE_EXITO_ELIMINAR = "Convocatoria eliminada correctamente";
 	public static final String MENSAJE_ERROR_DESCRIPCION_LARGA = "La descripción no puede ser superior a %d";
 	public static final String MENSAJE_ERROR_DESCRIPCION_VACIA = "La descripción no puede estar vacia";
 	public static final String MENSAJE_ERROR_FECHACIERRE_INCORRECTA = "La fecha de cierre no tiene el formato DD/MM/YYYY";
@@ -108,7 +114,7 @@ public class ControladorConvocatorias extends HttpServlet {
 		
 		VistaConvocatorias bean = new VistaConvocatorias();		
 		Usuario usuario = datos.getUsuario();
-		ModeloUsuarioBolsaEmpleo modelo = new ModeloUsuarioBolsaEmpleo();
+		ModeloUsuarioBolsaEmpleo modelo = ModeloUsuarioBolsaEmpleo.obtenerInstancia();	
 		LOGGER.log(Level.FINEST, "usuario que ha entrado en el servlet es {0}", usuario.getUid());
 				
 		String nombreAccion = EscapaHTML.ajustaCodificacion(request.getParameter(PARAM_ACCION));		
@@ -139,6 +145,9 @@ public class ControladorConvocatorias extends HttpServlet {
 					break;	
 				case ACCION_CERRAR_CONVOCATORIA:
 					cerrarConvocatoria(bean, datos, request, response);
+					break;	
+				case ACCION_BORRAR_CONVOCATORIA:
+					borrarConvocatoria(bean, request, response);
 					break;	
 			}			
 		} catch (UVException e) {
@@ -175,7 +184,7 @@ public class ControladorConvocatorias extends HttpServlet {
 	}
 		
 	private void listado(VistaConvocatorias bean, UVDatos datos, HttpServletRequest request, HttpServletResponse response) throws IOException, SQLException {
-		ModeloConvocatoria modelo = new ModeloConvocatoria(); 
+		ModeloConvocatoria modelo = ModeloConvocatoria.obtenerInstancia(); 
 		
 		datos.setContentType("application/json");
 		datos.setRespuestaEnviada(true);
@@ -207,7 +216,7 @@ public class ControladorConvocatorias extends HttpServlet {
 		bean.setVista(RUTA_BEP_CON + "formConvocatoria.jsp");
 		
 		BolsaEmpleoValidator validator = this.getValidatorConvocatoria(request); 							
-		ModeloConvocatoria modelo = new ModeloConvocatoria();
+		ModeloConvocatoria modelo = ModeloConvocatoria.obtenerInstancia();
 		
 		if (!validator.isValid()) {
 			for (String param : validator.getErrors().keySet()) {
@@ -238,7 +247,7 @@ public class ControladorConvocatorias extends HttpServlet {
 		bean.setVista(RUTA_BEP_CON + "formConvocatoria.jsp");
 		
 		BolsaEmpleoValidator validator = this.getValidatorConvocatoria(request); 							
-		ModeloConvocatoria modelo = new ModeloConvocatoria();
+		ModeloConvocatoria modelo = ModeloConvocatoria.obtenerInstancia();
 		
 		Convocatoria convocatoria = modelo.getConvocatoriaById(Formateador.leeParametroInteger(request.getParameter(PARAM_CONVOCATORIA_ID)));
 		bean.setConvocatoria(convocatoria);
@@ -273,7 +282,7 @@ public class ControladorConvocatorias extends HttpServlet {
 			HttpServletRequest request, HttpServletResponse response) throws UVException, SQLException {
 				
 		BolsaEmpleoValidator validator = this.getValidatorConvocatoria(request); 							
-		ModeloConvocatoria modelo = new ModeloConvocatoria();
+		ModeloConvocatoria modelo = ModeloConvocatoria.obtenerInstancia();
 		
 		Convocatoria convocatoria = modelo.getConvocatoriaById(Formateador.leeParametroInteger(request.getParameter(PARAM_CONVOCATORIA_ID)));
 		bean.setConvocatoria(convocatoria);
@@ -296,7 +305,7 @@ public class ControladorConvocatorias extends HttpServlet {
 			HttpServletRequest request, HttpServletResponse response) throws UVException, SQLException {
 				
 		BolsaEmpleoValidator validator = this.getValidatorConvocatoria(request); 							
-		ModeloConvocatoria modelo = new ModeloConvocatoria();
+		ModeloConvocatoria modelo = ModeloConvocatoria.obtenerInstancia();
 		
 		Convocatoria convocatoria = modelo.getConvocatoriaById(Formateador.leeParametroInteger(request.getParameter(PARAM_CONVOCATORIA_ID)));
 		bean.setConvocatoria(convocatoria);
@@ -335,4 +344,25 @@ public class ControladorConvocatorias extends HttpServlet {
 		
 		return validator;
 	}
+	
+	/** eliminar una convocatoria.
+	 * @param bean .
+	 * @param request .
+	 * @param response .
+	 * @throws SQLException excepcion de bbdd.
+	 * @throws UVException en caso de error de parametros .
+	 * @throws IOException en caso de error de input u output .
+	 */
+	private void borrarConvocatoria(VistaConvocatorias bean, HttpServletRequest request, HttpServletResponse response) throws SQLException, UVException, IOException {
+		ModeloConvocatoria modelo = ModeloConvocatoria.obtenerInstancia();
+		Integer codNum = Formateador.leeParametroInteger(request.getParameter(PARAM_CONVOCATORIA_ID));
+		Convocatoria convocatoria = new Convocatoria();
+		convocatoria.setCodNum(codNum);
+		modelo.borraConvocatoria(convocatoria);
+		bean.getMensajesDeExito().add(MENSAJE_EXITO_ELIMINAR);
+		HttpSession session = request.getSession(false);
+		session.setAttribute(MENSAJE_ENVIADO, MENSAJE_EXITO_ELIMINAR);
+		response.sendRedirect(request.getServletPath());
+	}
+	
 }

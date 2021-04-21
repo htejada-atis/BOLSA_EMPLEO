@@ -76,7 +76,7 @@ VistaUsuarioBolsaEmpleo bean = (VistaUsuarioBolsaEmpleo) uvdatos.getVistas().get
 	</table>
 
 	<table class="bluetable bolsaempleo" id="table_usuarios_excluidos" style="margin-top:2rem">
-		<caption class="table-title">Usuarios Excluidos</caption>  
+		<caption class="table-title">Usuarios Excluidos de la bolsa de empleo</caption>  
 		<tr>
 			<th scope="col" style="width:5%"></th>
 			<th scope="col" style="width:5%" title="Id del usuario">Id</th>
@@ -113,6 +113,7 @@ $(document).ready(function() {
 	    "ajax": { url: "<%=ControladorUsuarioBolsaEmpleo.URL_PATTERN_AJAX%>", async: false },
 	    "selectable": true,
 	    "pageSize": 5,
+	    "filterable": true,
 	    "action": "<%=ControladorUsuarioBolsaEmpleo.ACCION_DATATABLE_USUARIOS%>",
 	    "columns": [
 	    	{'data': 'codNum', 'selectable': true},
@@ -124,7 +125,7 @@ $(document).ready(function() {
         		return row.nombre + "\n" + row.apellido1 + "\n" + row.apellido2; 
         	}},
 	        {'data': 'email'},
-	        {'data': 'rol.descripcion'},
+	        {'data': 'rol.descripcion', 'filter': {'type': 'select', 'options': ['Comision', 'Personal de adm. y servicios']} , 'order': {'active': false}},
 	        {'data': 'listaDist', 'render': function(row) {
 	        	if(row.listaDist==true){
         			return "<div title='En lista distribución' class='circle-true'></div>"; 

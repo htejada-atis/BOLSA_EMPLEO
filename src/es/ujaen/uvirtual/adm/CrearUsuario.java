@@ -45,7 +45,7 @@ public class CrearUsuario {
 		try {
 			String uid = usuario.getUid();
 			ModeloAdministracion modeloAdministracion = ModeloAdministracion.obtenerInstancia();
-			ModeloUsuarioBolsaEmpleo modeloBolsaEmpleo = new ModeloUsuarioBolsaEmpleo();
+			ModeloUsuarioBolsaEmpleo modeloBolsaEmpleo = ModeloUsuarioBolsaEmpleo.obtenerInstancia();
 			List<String> rolesAdministradosUV = modeloAdministracion.listaRolesUsuario(uid, true);
 			List<String> rolesDelUsuarioUV = modeloAdministracion.listaRolesUsuario(uid, false);
 			List<String> rolesDelUsuarioBolsaEmpleo = modeloBolsaEmpleo.listaRolesUsuario(uid);
