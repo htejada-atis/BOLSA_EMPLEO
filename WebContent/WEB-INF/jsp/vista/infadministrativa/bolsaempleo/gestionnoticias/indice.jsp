@@ -47,7 +47,7 @@ VistaNoticias bean = (VistaNoticias) uvdatos.getVistas().get(VistaNoticias.class
 			<th scope="col" style="width:30%">Enlace</th>
 			<th scope="col" class="center" style="width:10%">Pública</th>
 			<th scope="col" class="center" style="width:10%">Activa</th>
-			<th scope="col" style="width:10%"></th>
+			<th scope="col" style="width:11%"></th>
 		</tr>
 		<tbody>				
 		</tbody>

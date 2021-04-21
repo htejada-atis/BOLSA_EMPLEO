@@ -60,7 +60,7 @@ VistaEvaluadores bean = (VistaEvaluadores) uvdatos.getVistas().get(VistaEvaluado
 			<th scope="col" style="width:25%">D.N.I</th>
 			<th scope="col"	style="width:55%">Nombre</th>
 			<th scope="col" class="center" style="width:10%">Activo</th>
-			<th scope="col" style="width:10%"></th>
+			<th scope="col" style="width:11%"></th>
 		</tr>
 		<tbody>		
 		</tbody>

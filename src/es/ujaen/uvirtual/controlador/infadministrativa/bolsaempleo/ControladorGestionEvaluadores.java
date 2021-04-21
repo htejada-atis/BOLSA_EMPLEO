@@ -227,6 +227,7 @@ public class ControladorGestionEvaluadores extends HttpServlet {
 					session.removeAttribute(PARAM_AREA);
 					break;
 			}
+		}
 	}
 	
 	/** carga los evaluadores en una tabla .
@@ -239,7 +240,7 @@ public class ControladorGestionEvaluadores extends HttpServlet {
 	 */
 	private void listadoEvaluadores(VistaEvaluadores bean, UVDatos datos, HttpServletRequest request, HttpServletResponse response)
 			throws IOException, SQLException {
-		ModeloEvaluador modelo = new ModeloEvaluador.obtenerInstancia();
+		ModeloEvaluador modelo = ModeloEvaluador.obtenerInstancia();
 		datos.setContentType("application/json");
 		response.setContentType("application/json");
 		response.setCharacterEncoding("UTF-8");
@@ -272,7 +273,7 @@ public class ControladorGestionEvaluadores extends HttpServlet {
 	 */
 	private void listadoUsuarios(VistaEvaluadores bean, UVDatos datos, HttpServletRequest request, HttpServletResponse response)
 			throws IOException, SQLException {
-		ModeloEvaluador modelo = new ModeloEvaluador.obtenerInstancia();
+		ModeloEvaluador modelo = ModeloEvaluador.obtenerInstancia();
 		datos.setContentType("application/json");
 		response.setContentType("application/json");
 		response.setCharacterEncoding("UTF-8");
