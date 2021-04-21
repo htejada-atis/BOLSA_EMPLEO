@@ -60,8 +60,8 @@ public class ControladorGestionTitulaciones extends HttpServlet {
 
 	// Mensajes
 	public static final String MENSAJE_ENVIADO = "mensaje";
-	public static final String MENSAJE_EXITO_AGREGAR = "titulación agregada correctamente";
-	public static final String MENSAJE_EXITO_ELIMINAR = "titulación eliminada correctamente";
+	public static final String MENSAJE_EXITO_AGREGAR = "Titulación agregada correctamente";
+	public static final String MENSAJE_EXITO_ELIMINAR = "Titulación eliminada correctamente";
 	public static final String MENSAJE_ERROR_NOMBRE_VACIO = "El nombre es obligatorio para almacenar una titulación";
 	public static final String MENSAJE_ERROR_NOMBRE_LARGO = "El nombre no puede contener mas de %d caracteres";
 	

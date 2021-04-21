@@ -91,7 +91,7 @@ VistaTitulacionesArea bean = (VistaTitulacionesArea) uvdatos.getVistas().get(Vis
 			    "title": title,
 			    "action": "<%=ControladorGestionTitulacionesPreferentesArea.ACCION_DATATABLE_TITULACIONES_PREFERENTES_AREA%>",
 			    "columns": [
-			    	{'data': 'codNum', 'filterable': true},
+			    	{'data': 'codNum', 'selectable': true, 'filterable': true},
 			    	{'data': 'codNum', 'filter': {'type': 'number'}},
 			        {'data': 'nombre', 'class': 'overflow-auto', 'filter': {'type': 'text'}},
 			    ],
