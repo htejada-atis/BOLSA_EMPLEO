@@ -14,6 +14,31 @@ import es.ujaen.uvirtual.utilidades.UVException;
  * @author ATISoluciones
  */
 public class ModeloDepartamento {	
+	
+	
+    protected static ModeloDepartamento eInstancia = null;
+	
+	/** Crea una instancia del objeto.
+	 *  de forma sincronizada para protegerse de posibles problemas multi-hilo
+	 */
+	private static synchronized void crearInstancia() {
+		if (eInstancia == null) {
+			eInstancia = new ModeloDepartamento();
+		}
+	}
+
+    /**
+     * Obtiene una instancia de la conexión.
+     * @return instancia
+     */
+    public static ModeloDepartamento obtenerInstancia() {
+        if (eInstancia == null) {
+        	crearInstancia();
+        }
+        return eInstancia;
+    }
+	
+	
 	/**
 	 * Devuelve un departamento por su id.
 	 * @param idDepartamento id del departamento

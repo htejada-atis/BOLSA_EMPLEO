@@ -76,7 +76,7 @@ public class TestBEPModeloUsuarios {
 		usuario.setBorrado(BORRADO);
 		usuario.setFechaBorrado(FECHABORRADO);
 		usuario.setSexo(SEXO);
-    	ModeloUsuarioBolsaEmpleo modelo = new ModeloUsuarioBolsaEmpleo();
+		ModeloUsuarioBolsaEmpleo modelo = ModeloUsuarioBolsaEmpleo.obtenerInstancia();
     	modelo.insertaUsuario(usuario);
     	
     	UsuarioBolsaEmpleo usuarioCont = new UsuarioBolsaEmpleo();
@@ -99,8 +99,8 @@ public class TestBEPModeloUsuarios {
      */
     @Test
     public void testA02BorraUsuario() throws SQLException, UVException {
-    	ModeloUsuarioBolsaEmpleo modelo = new ModeloUsuarioBolsaEmpleo();
-    	ModeloMerito modeloMeritos = new ModeloMerito();
+		ModeloUsuarioBolsaEmpleo modelo = ModeloUsuarioBolsaEmpleo.obtenerInstancia();
+    	ModeloMerito modeloMeritos = ModeloMerito.obtenerInstancia();
     	
     	List<UsuarioBolsaEmpleo> usuarios = modelo.listaUsuarios("");
     	UsuarioBolsaEmpleo usuario = usuarios.get(0);
@@ -134,7 +134,7 @@ public class TestBEPModeloUsuarios {
      */
     @Test
     public void testA03EditarUsuario() throws SQLException, UVException {
-    	ModeloUsuarioBolsaEmpleo modelo = new ModeloUsuarioBolsaEmpleo();
+		ModeloUsuarioBolsaEmpleo modelo = ModeloUsuarioBolsaEmpleo.obtenerInstancia();
     	List<UsuarioBolsaEmpleo> usuarios = modelo.listaUsuarios("");
     	UsuarioBolsaEmpleo usuario = usuarios.get(0);
     	usuario.setExcluido(EXCLUIDO);
@@ -150,7 +150,7 @@ public class TestBEPModeloUsuarios {
      */
     @Test
     public void testA04EditarDatosPersonalesUsuario() throws SQLException, UVException {
-    	ModeloUsuarioBolsaEmpleo modelo = new ModeloUsuarioBolsaEmpleo();
+		ModeloUsuarioBolsaEmpleo modelo = ModeloUsuarioBolsaEmpleo.obtenerInstancia();
     	List<UsuarioBolsaEmpleo> usuarios = modelo.listaUsuarios("");
     	UsuarioBolsaEmpleo usuario = usuarios.get(0);
     	usuario.setDireccion("test");
@@ -168,7 +168,7 @@ public class TestBEPModeloUsuarios {
     @Test(expected = UVException.class)
     public void testE01InsertaUsuarioNull() throws SQLException, UVException {
     	UsuarioBolsaEmpleo usuario = null;
-    	ModeloUsuarioBolsaEmpleo modelo = new ModeloUsuarioBolsaEmpleo();
+		ModeloUsuarioBolsaEmpleo modelo = ModeloUsuarioBolsaEmpleo.obtenerInstancia();
     	modelo.insertaUsuario(usuario);
     	fail();
     }

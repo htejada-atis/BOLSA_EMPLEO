@@ -15,6 +15,7 @@ import es.ujaen.uvirtual.adm.CrearUsuario;
 import es.ujaen.uvirtual.beans.Rol;
 import es.ujaen.uvirtual.beans.UVDatos;
 import es.ujaen.uvirtual.beans.Usuario;
+import es.ujaen.uvirtual.beans.uvirtual.bolsaempleo.Area;
 import es.ujaen.uvirtual.beans.uvirtual.bolsaempleo.Evaluador;
 import es.ujaen.uvirtual.beans.uvirtual.bolsaempleo.UsuarioBolsaEmpleo;
 import es.ujaen.uvirtual.modelo.conexion.ConexionUvirtual;
@@ -44,11 +45,6 @@ public class ModeloUsuarioBolsaEmpleo {
 	public static final int ORDER_COLUMN_INDEX_RAZON_EXCLUSION = 10;
 	public static final int ORDER_COLUMN_INDEX_FECHA_EXCLUSION = 11;
 	
-	public static final int ORDER_COLUMN_INDEX_NUMDOCUMENTO_EVALUADORES = 0;
-	public static final int ORDER_COLUMN_INDEX_ROL_EVALUADORES = 1;
-	public static final int ORDER_COLUMN_INDEX_NOMBRE_Y_APELLIDOS_EVALUADORES = 2;
-	public static final int ORDER_COLUMN_INDEX_ACTIVO_EVALUADORES = 3;
-	
 	public static final String USUARIO_BORRADO = "S";
 	public static final String USUARIO_NO_BORRADO = "N";
 	public static final String USUARIO_EXCLUIDO = "S";
@@ -68,6 +64,30 @@ public class ModeloUsuarioBolsaEmpleo {
 	public static final int COLUMN_NACIONALIDAD_MAXLENGTH = 20;
 	public static final int COLUMN_EMAIL_MAXLENGTH = 50;
 	public static final int COLUMN_RAZON_EXCLUSION_MAXLENGTH = 200;
+	
+	
+    protected static ModeloUsuarioBolsaEmpleo eInstancia = null;
+	
+	/** Crea una instancia del objeto.
+	 *  de forma sincronizada para protegerse de posibles problemas multi-hilo
+	 */
+	private static synchronized void crearInstancia() {
+		if (eInstancia == null) {
+			eInstancia = new ModeloUsuarioBolsaEmpleo();
+		}
+	}
+
+    /**
+     * Obtiene una instancia de la conexión.
+     * @return instancia
+     */
+    public static ModeloUsuarioBolsaEmpleo obtenerInstancia() {
+        if (eInstancia == null) {
+        	crearInstancia();
+        }
+        return eInstancia;
+    }
+	
 	
 	/** Consulta usuarios en BBDD y las devuelve.
 	 * @param clausula para filtrar los usuarios de la bd
@@ -216,7 +236,10 @@ public class ModeloUsuarioBolsaEmpleo {
 		try (Connection conexion = ConexionUvirtual.obtenerInstancia();
 				PreparedStatement stmtCount = conexion.prepareStatement(dataTable.getQueryCount());
 				PreparedStatement stmt = conexion.prepareStatement(dataTable.getQuery());
-		) {					
+		) {		
+			
+			dataTable.setFiltersParams(stmt, stmtCount, 1);
+			
 			try (ResultSet rs = stmt.executeQuery()) {
 				while (rs.next()) {
 					UsuarioBolsaEmpleo usuario = setUsuario(rs);
@@ -255,6 +278,9 @@ public class ModeloUsuarioBolsaEmpleo {
 				PreparedStatement stmtCount = conexion.prepareStatement(dataTable.getQueryCount());
 				PreparedStatement stmt = conexion.prepareStatement(dataTable.getQuery());
 		) {					
+			
+			dataTable.setFiltersParams(stmt, stmtCount, 1);
+			
 			try (ResultSet rs = stmt.executeQuery()) {
 				while (rs.next()) {
 					UsuarioBolsaEmpleo usuario = setUsuario(rs);
@@ -294,6 +320,9 @@ public class ModeloUsuarioBolsaEmpleo {
 				PreparedStatement stmtCount = conexion.prepareStatement(dataTable.getQueryCount());
 				PreparedStatement stmt = conexion.prepareStatement(dataTable.getQuery());
 		) {					
+			
+			dataTable.setFiltersParams(stmt, stmtCount, 1);
+			
 			try (ResultSet rs = stmt.executeQuery()) {
 				while (rs.next()) {			
 					UsuarioBolsaEmpleo usuario = setUsuario(rs);
@@ -306,138 +335,7 @@ public class ModeloUsuarioBolsaEmpleo {
 		}
 		
 		return dataTable;
-	}	
-	
-	/** Listado de usuarios en función de un área . 
-	 * @param params para leer los parametros de paginación, ordenacion, etc .
-	 * @param area .
-	 * @param evaluadores .
-	 * @return listado de usuarios .
-	 * @throws SQLException en caso de error de base de datos .
-	 * @throws UVException error si no existe la area .
-	 */
-	public BolsaEmpleoDataTable<Evaluador> listaEvaluadoresDatatable(Map<String, String[]> params, Integer area, boolean evaluadores) throws SQLException, UVException {
-		
-		if (area == null) {
-			throw new UVException("No se pueden listar evaluadores sin area");
-		}
-		
-		List<Evaluador> usuarios = new ArrayList<>();
-		BolsaEmpleoDataTable<Evaluador> dataTable = new BolsaEmpleoDataTable<Evaluador>(params);
-		
-		String consulta = "SELECT * FROM TBEP_USUARIOS bepusu "
-				+ "INNER JOIN VUJA_NET_BEP_AR_PERSONA uvpersona ON uvpersona.CODINT=bepusu.CODPERSONA "
-				+ (evaluadores ? "INNER JOIN TBEP_EVALUADORES bepeva ON bepusu.CODNUM = bepeva.BEPUSU_CODNUM " : "")
-				+ "WHERE FLGBORRADO!='S' "
-				+ "AND FLGEXCLUIDO!='S' ";
-		
-		String consultaEvaluadores = "SELECT bepeva.BEPUSU_CODNUM FROM TBEP_EVALUADORES bepeva "
-				+ "INNER JOIN TBEP_USUARIOS bepusu ON bepusu.CODNUM = bepeva.BEPUSU_CODNUM "
-				+ "WHERE bepusu.FLGBORRADO!='S' "
-				+ "AND bepusu.FLGEXCLUIDO!='S' "
-				+ "AND bepeva.BEPARE_CODNUM = ? ";
-		
-		if (evaluadores) {
-			consulta += "AND bepusu.CODNUM IN (" + consultaEvaluadores + ")";
-			dataTable.setColumn(ORDER_COLUMN_INDEX_ACTIVO_EVALUADORES, "bepeva.FLGACTIVO", DataTableColumn.COLUMN_TYPE_BOOLEAN);
-		} else {
-			consulta += "AND bepusu.CODNUM NOT IN (" + consultaEvaluadores + ") "
-					+ "AND bepusu.ROL = 1052 ";
-		}
-		
-		dataTable.setColumn(evaluadores ? ORDER_COLUMN_INDEX_NUMDOCUMENTO_EVALUADORES : ORDER_COLUMN_INDEX_NUMDOCUMENTO_EVALUADORES + 1,
-				"uvpersona.IDNIF");
-		dataTable.setColumn(evaluadores ? ORDER_COLUMN_INDEX_ROL_EVALUADORES : ORDER_COLUMN_INDEX_ROL_EVALUADORES + 1,
-				"bepusu.ROL", DataTableColumn.COLUMN_TYPE_OPTION);
-		dataTable.setColumn(evaluadores ? ORDER_COLUMN_INDEX_NOMBRE_Y_APELLIDOS_EVALUADORES : ORDER_COLUMN_INDEX_NOMBRE_Y_APELLIDOS_EVALUADORES + 1,
-				"uvpersona.STRAPELLIDO1");
-		
-		dataTable.setQuery(consulta);
-				
-		try (Connection conexion = ConexionUvirtual.obtenerInstancia();
-				PreparedStatement stmtCount = conexion.prepareStatement(dataTable.getQueryCount());
-				PreparedStatement stmt = conexion.prepareStatement(dataTable.getQuery());
-		) {
-			int indexParam = 1;
-			stmt.setInt(indexParam, area);
-			stmtCount.setInt(indexParam++, area);
-			dataTable.setFiltersParams(stmt, stmtCount, indexParam);
-			try (ResultSet rs = stmt.executeQuery()) {
-				while (rs.next()) {
-					UsuarioBolsaEmpleo usuario = setUsuario(rs);
-					
-					if (evaluadores) {
-						Integer codNumArea = rs.getInt("BEPARE_CODNUM");
-						Boolean activo = rs.getString("FLGACTIVO").equals("S");
-						Evaluador evaluador = new Evaluador(usuario, codNumArea, activo);
-						usuarios.add(evaluador);
-					} else {
-						usuarios.add(new Evaluador(usuario));
-					}
-				}				
-			}	
-			
-			dataTable.setRecordsTotalFromQuery(stmtCount);
-			dataTable.setData(usuarios);
-		}
-		
-		return dataTable;
 	}
-	
-	/**	Función que agrega evaluadores a un área .
-	 * @param usuarios .
-	 * @param area id del area por el que se va a filtrar .
-	 * @throws SQLException en caso de error en la BD .
-	 * @throws UVException en caso de error de parámetros .
-	 */
-	public void insertaEvaluadores(List<String> usuarios, Integer area) throws SQLException, UVException {
-		
-		if (area == null) {
-			throw new UVException("No se puede agregar un evaluador sin el id del área");
-		}
-		
-		String params = BolsaEmpleoUtils.consultaMultiplesParametros(usuarios.size());
-		String consulta = "INSERT INTO TBEP_EVALUADORES (BEPARE_CODNUM, BEPUSU_CODNUM)"
-				+ " SELECT bepare.CODNUM AS BEPARE_CODNUM, bepusu.CODNUM AS BEPUSU_CODNUM"
-				+ " FROM TBEP_USUARIOS bepusu, TBEP_AREAS bepare WHERE bepare.CODNUM = ? AND "
-				+ " bepusu.CODNUM IN (" + params + ")";
-		
-		try (Connection conexion = ConexionUvirtual.obtenerInstancia(); PreparedStatement stmt = conexion.prepareStatement(consulta)) {
-			int indexParam = 1;
-			stmt.setInt(indexParam++, area);
-			for (String usuario: usuarios) {
-				stmt.setString(indexParam++, usuario);
-			}
-			stmt.executeUpdate();
-		}
-	}
-	
-	/** Borra o restaura un evaluador .
-	 * @param evaluador a borrar .
-	 * @throws SQLException en caso de error en la BD .
-	 * @throws UVException si noticia no es valida .
-	 */
-	public void borraRestauraEvaluador(Evaluador evaluador) throws SQLException, UVException {
-		if (evaluador == null) {
-			throw new UVException("No se puede eliminar un evaluador vacío");
-		}
-		if (evaluador.getCodNum() == null) {
-			throw new UVException("No se puede eliminar un evaluador con id de usuario vacío");
-		}
-		if (evaluador.getCodNumArea() == null) {
-			throw new UVException("No se puede eliminar un evaluador con id de area vacío");
-		}
-		String consulta = "UPDATE TBEP_EVALUADORES SET flgactivo=? WHERE bepusu_codnum=? AND bepare_codnum=? ";
-		try (Connection conexion = ConexionUvirtual.obtenerInstancia();
-			 PreparedStatement stmt = conexion.prepareStatement(consulta);) {
-			int parameterIndex = 1;
-			stmt.setString(parameterIndex++, evaluador.isActivo() ? "S" : "N");
-			stmt.setInt(parameterIndex++, evaluador.getCodNum());
-			stmt.setInt(parameterIndex++, evaluador.getCodNumArea());
-			stmt.executeUpdate();
-		}
-	}
-	
 	
 	/**
 	 * Set usuario. 
@@ -447,7 +345,7 @@ public class ModeloUsuarioBolsaEmpleo {
 	 * @throws UVException en caso de no poder crear el usuario
 	 */	
 	public UsuarioBolsaEmpleo setUsuario(ResultSet rs) throws SQLException, UVException {
-		ModeloRol modeloRol = new ModeloRol();
+		ModeloRol modeloRol = ModeloRol.obtenerInstancia();
 		
 		UsuarioBolsaEmpleo usuario = new UsuarioBolsaEmpleo();
 		usuario.setCodNum(rs.getInt("CODNUM"));
@@ -550,8 +448,6 @@ public class ModeloUsuarioBolsaEmpleo {
 					stmt.setString(parameterIndex++, usuario.getListaDist() ? "S" : "N");
 					stmt.executeUpdate();
 				}
-			
-			insertaRol(usuario, false);
 		} else {
 			String consulta = "INSERT INTO tbep_usuarios " 
 					+ " (CODPERSONA,CODCUENTA,ROL,EMAIL,FLGLISTADISTRIBUCION,FLGEXCLUIDO,RAZON_EXCLUSION,FECHA_EXCLUSION) "
@@ -570,34 +466,7 @@ public class ModeloUsuarioBolsaEmpleo {
 					stmt.setDate(parameterIndex++, new java.sql.Date(usuario.getFechaExclusion().getTime()));
 					stmt.executeUpdate();
 				}
-			insertaRol(usuario, false);
 		}
-	}
-	
-	/**	Función que inserta un rol y usuario en la BD.
-	 * @param usuario ya existente
-	 * @param admin .
-	 * @throws SQLException en caso de error en la BD
-	 */
-	public void insertaRol(UsuarioBolsaEmpleo usuario, Boolean admin) throws SQLException, UVException {
-		if (usuario == null) {
-			throw new UVException("No se puede insertar un usuario vacio");
-		}
-		if (usuario.getRol() == null || usuario.getRol().equals("")) {
-			throw new UVException("No se puede insertar un usuario sin role");
-		}
-		String consulta = "INSERT INTO adm_usuario_rol " 
-				+ " (USERUID,ROL_CODNUM,FLG_ADMIN) "
-				+ "VALUES (?, ?, ?)";
-		
-		try (Connection conexion = ConexionUvirtual.obtenerInstancia();
-				PreparedStatement stmt = conexion.prepareStatement(consulta);) {
-				int parameterIndex = 1;
-				stmt.setString(parameterIndex++, usuario.getCodCuenta());
-				stmt.setInt(parameterIndex++, usuario.getRol().getCodNum());
-				stmt.setString(parameterIndex++, admin ? "S" : "N");
-				stmt.executeUpdate();
-			}
 	}
 	
 	/** Actualiza un usuario.
@@ -678,6 +547,38 @@ public class ModeloUsuarioBolsaEmpleo {
 				stmt.executeUpdate();
 		}
 	}
+	
+	
+	/**
+	 * Establece el usuario como borrado. 
+	 * @param usu .
+	 * @param areas .
+	 * @throws SQLException .
+	 */
+	public void excluirUsuarioArea(UsuarioBolsaEmpleo usu, List<Area> areas) throws SQLException {
+		this.excluirUsuarioAreas(areas, usu);
+	}
+	
+	private void excluirUsuarioAreas(List<Area> areas, UsuarioBolsaEmpleo usu) throws SQLException {
+		String params = BolsaEmpleoUtils.consultaMultiplesParametros(areas.size());
+		String query = "UPDATE TBEP_USUARIOS SET FLGBORRADO = ?, FECHA_BORRADO = ? WHERE CODNUM IN  (" + params + ")";		
+				
+		try (Connection conexion = ConexionUvirtual.obtenerInstancia(); PreparedStatement stmt = conexion.prepareStatement(query)) {
+			int indexParam = 1;
+			
+			stmt.setString(indexParam++, borrado);
+			
+			SimpleDateFormat formatter = new SimpleDateFormat("dd/MM/YYYY HH:mm:ss");
+			Date date = new Date(System.currentTimeMillis());
+			
+			stmt.setDate(indexParam++, new java.sql.Date(date.getTime()));
+			for (UsuarioBolsaEmpleo usuario : usuarios) {
+				stmt.setInt(indexParam++, usuario.getCodNum()); 
+			}
+			stmt.executeUpdate();
+		}	
+	}
+	
 	
 	/**
 	 * Establece el usuario como excluido. 
@@ -783,7 +684,7 @@ public class ModeloUsuarioBolsaEmpleo {
 					try {
 						UsuarioBolsaEmpleo usu = listaUsuario(usuArcos.getUid());
 					} catch (UVException e) {
-						ModeloRol modeloRol = new ModeloRol();
+						ModeloRol modeloRol = ModeloRol.obtenerInstancia();
 						Rol role;
 						
 						try {

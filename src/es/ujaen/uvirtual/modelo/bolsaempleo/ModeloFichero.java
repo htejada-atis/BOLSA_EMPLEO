@@ -29,6 +29,29 @@ public class ModeloFichero {
 	public static final int ORDER_COLUMN_INDEX_TITULO = 2;
 	public static final int ORDER_COLUMN_INDEX_PUBLICO = 4;
 	
+    protected static ModeloFichero eInstancia = null;
+	
+	/** Crea una instancia del objeto.
+	 *  de forma sincronizada para protegerse de posibles problemas multi-hilo
+	 */
+	private static synchronized void crearInstancia() {
+		if (eInstancia == null) {
+			eInstancia = new ModeloFichero();
+		}
+	}
+
+    /**
+     * Obtiene una instancia de la conexión.
+     * @return instancia
+     */
+    public static ModeloFichero obtenerInstancia() {
+        if (eInstancia == null) {
+        	crearInstancia();
+        }
+        return eInstancia;
+    }
+	
+	
 	/********************************************** METODOS PÚBLICOS PARA CONSULTAS   ********************************************/
 	
 	/** Consulta ficheros en BBDD y los devuelve .

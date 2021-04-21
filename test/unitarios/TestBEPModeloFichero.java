@@ -51,7 +51,7 @@ public class TestBEPModeloFichero {
     	fichero.setTitulo(TITULO_FICHERO);
     	fichero.setArchivo(ARCHIVO_FICHERO);
     	fichero.setPublico(PUBLICO_FICHERO);
-    	ModeloFichero modelo = new ModeloFichero();
+    	ModeloFichero modelo = ModeloFichero.obtenerInstancia();
     	modelo.insertaFichero(fichero);
     	List<Fichero> ficheros = modelo.listaFicheros();
     	assertTrue("fichero insertado debe ser listado", ficheros.contains(fichero));
@@ -63,7 +63,7 @@ public class TestBEPModeloFichero {
      */
     @Test
     public void testA02BorraFichero() throws SQLException, UVException {
-    	ModeloFichero modelo = new ModeloFichero();
+    	ModeloFichero modelo = ModeloFichero.obtenerInstancia();
     	List<Fichero> ficheros = modelo.listaFicheros();
     	Fichero fichero = ficheros.get(0);
     	modelo.borraFichero(fichero);
@@ -85,7 +85,7 @@ public class TestBEPModeloFichero {
     @Test(expected = UVException.class)
     public void testE01InsertaFicheroNull() throws SQLException, UVException {
     	Fichero fichero = null;
-    	ModeloFichero modelo = new ModeloFichero();
+    	ModeloFichero modelo = ModeloFichero.obtenerInstancia();
     	modelo.insertaFichero(fichero);
     	fail();
     }
@@ -99,7 +99,7 @@ public class TestBEPModeloFichero {
     	Fichero fichero = new Fichero();
     	fichero.setTitulo(TITULO_FICHERO);
     	fichero.setArchivo(ARCHIVO_FICHERO);
-    	ModeloFichero modelo = new ModeloFichero();
+    	ModeloFichero modelo = ModeloFichero.obtenerInstancia();
     	modelo.insertaFichero(fichero);
     	fail();
     }
@@ -113,7 +113,7 @@ public class TestBEPModeloFichero {
     	Fichero fichero = new Fichero();
     	fichero.setNombre(NOMBRE_FICHERO);
     	fichero.setArchivo(ARCHIVO_FICHERO);
-    	ModeloFichero modelo = new ModeloFichero();
+    	ModeloFichero modelo = ModeloFichero.obtenerInstancia();
     	modelo.insertaFichero(fichero);
     	fail();
     }
@@ -127,7 +127,7 @@ public class TestBEPModeloFichero {
     	Fichero fichero = new Fichero();
     	fichero.setNombre(NOMBRE_FICHERO);
     	fichero.setTitulo(TITULO_FICHERO);
-    	ModeloFichero modelo = new ModeloFichero();
+    	ModeloFichero modelo = ModeloFichero.obtenerInstancia();
     	modelo.insertaFichero(fichero);
     	fail();
     }

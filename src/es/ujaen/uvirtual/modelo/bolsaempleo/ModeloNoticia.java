@@ -32,7 +32,29 @@ public class ModeloNoticia {
 	public static final int ORDER_COLUMN_INDEX_FLGPUBLICA = 3;
 	public static final int ORDER_COLUMN_INDEX_FLGACTIVA = 4;
 	public static final int ORDER_COLUMN_INDEX_ID = 5;
+
 	
+    protected static ModeloNoticia eInstancia = null;
+	
+	/** Crea una instancia del objeto.
+	 *  de forma sincronizada para protegerse de posibles problemas multi-hilo
+	 */
+	private static synchronized void crearInstancia() {
+		if (eInstancia == null) {
+			eInstancia = new ModeloNoticia();
+		}
+	}
+
+    /**
+     * Obtiene una instancia de la conexión.
+     * @return instancia
+     */
+    public static ModeloNoticia obtenerInstancia() {
+        if (eInstancia == null) {
+        	crearInstancia();
+        }
+        return eInstancia;
+    }
 	
 	/********************************************** METODOS PÚBLICOS PARA CONSULTAS   ********************************************/
 

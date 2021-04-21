@@ -81,7 +81,7 @@ public class ControladorBolsas extends HttpServlet {
 		
 		VistaEstadoBolsas bean = new VistaEstadoBolsas();		
 		Usuario usuario = datos.getUsuario();
-		ModeloUsuarioBolsaEmpleo modelo = new ModeloUsuarioBolsaEmpleo();
+		ModeloUsuarioBolsaEmpleo modelo = ModeloUsuarioBolsaEmpleo.obtenerInstancia();	
 		LOGGER.log(Level.FINEST, "usuario que ha entrado en el servlet es {0}", usuario.getUid());
 		
 		String nombreAccion = EscapaHTML.ajustaCodificacion(request.getParameter(PARAM_ACCION));		
@@ -131,7 +131,7 @@ public class ControladorBolsas extends HttpServlet {
 	}
 		
 	private void listado(VistaEstadoBolsas bean, UVDatos datos, HttpServletRequest request, HttpServletResponse response) throws IOException, SQLException {
-		ModeloBolsa modelo = new ModeloBolsa();
+		ModeloBolsa modelo = ModeloBolsa.obtenerInstancia();
 		
 		datos.setContentType("application/json");
 		datos.setRespuestaEnviada(true);
@@ -156,7 +156,7 @@ public class ControladorBolsas extends HttpServlet {
 	}
 	
 	private void accionSobreBolsas(VistaEstadoBolsas bean, UVDatos datos, HttpServletRequest request) throws UVException, SQLException {
-		ModeloBolsa modelo = new ModeloBolsa();
+		ModeloBolsa modelo = ModeloBolsa.obtenerInstancia();
 		
 		String nombreAccionBolsa = EscapaHTML.ajustaCodificacion(request.getParameter(PARAM_ACCION_BOLSA));
 		String selectedJson = EscapaHTML.ajustaCodificacion(request.getParameter(PARAM_BOLSAS_SELECCIONADAS));

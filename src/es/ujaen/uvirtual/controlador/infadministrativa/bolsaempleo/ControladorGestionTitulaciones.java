@@ -60,8 +60,8 @@ public class ControladorGestionTitulaciones extends HttpServlet {
 
 	// Mensajes
 	public static final String MENSAJE_ENVIADO = "mensaje";
-	public static final String MENSAJE_EXITO_AGREGAR = "titulación agregada correctamente";
-	public static final String MENSAJE_EXITO_ELIMINAR = "titulación eliminada correctamente";
+	public static final String MENSAJE_EXITO_AGREGAR = "Titulación agregada correctamente";
+	public static final String MENSAJE_EXITO_ELIMINAR = "Titulación eliminada correctamente";
 	public static final String MENSAJE_ERROR_NOMBRE_VACIO = "El nombre es obligatorio para almacenar una titulación";
 	public static final String MENSAJE_ERROR_NOMBRE_LARGO = "El nombre no puede contener mas de %d caracteres";
 	
@@ -88,7 +88,7 @@ public class ControladorGestionTitulaciones extends HttpServlet {
 		VistaTitulaciones bean = new VistaTitulaciones();
 		bean.setVista(RUTA_BEP_CONF + "titulaciones.jsp");
 		
-		ModeloUsuarioBolsaEmpleo modelo = new ModeloUsuarioBolsaEmpleo();
+		ModeloUsuarioBolsaEmpleo modelo = ModeloUsuarioBolsaEmpleo.obtenerInstancia();
 		
 		String nombreAccion = EscapaHTML.ajustaCodificacion(request.getParameter(PARAM_ACCION));
 		if (nombreAccion == null) {
@@ -147,7 +147,7 @@ public class ControladorGestionTitulaciones extends HttpServlet {
 	 */
 	private void editarTitulacion(HttpServletRequest request, HttpServletResponse response, VistaTitulaciones bean) throws SQLException, UVException, IOException {
 		bean.setVista(RUTA_BEP_CONF + "formTitulacion.jsp");
-		ModeloTitulacion modelo = new ModeloTitulacion();
+		ModeloTitulacion modelo = ModeloTitulacion.obtenerInstancia();
 		bean.setTitulacion(modelo.listaTitulacion(Formateador.leeParametroInteger(request.getParameter(PARAM_ID))));
 		if (EscapaHTML.ajustaCodificacion(request.getParameter(PARAM_NOMBRE)) != null) {
 			BolsaEmpleoValidator validator = this.getValidatorTitulaciones(request); 							
@@ -178,7 +178,8 @@ public class ControladorGestionTitulaciones extends HttpServlet {
 	 */
 	private void eliminarTitulacion(HttpServletRequest request, HttpServletResponse response) throws SQLException, UVException, IOException {
 		Integer codNum = Formateador.leeParametroInteger(request.getParameter(PARAM_ID));
-		new ModeloTitulacion().borraTitulacion(new Titulacion(codNum));
+		ModeloTitulacion modelo = ModeloTitulacion.obtenerInstancia();
+		modelo.borraTitulacion(new Titulacion(codNum));
 		HttpSession session = request.getSession(false);
 		session.setAttribute(MENSAJE_ENVIADO, MENSAJE_EXITO_ELIMINAR);
 		response.sendRedirect(request.getServletPath());
@@ -204,8 +205,9 @@ public class ControladorGestionTitulaciones extends HttpServlet {
 					}
 				}
 			} else {
+				ModeloTitulacion modelo = ModeloTitulacion.obtenerInstancia();
 				String nombre = EscapaHTML.ajustaCodificacion(request.getParameter(PARAM_NOMBRE));
-				new ModeloTitulacion().insertaTitulacion(new Titulacion(nombre));
+				modelo.insertaTitulacion(new Titulacion(nombre));
 				HttpSession session = request.getSession(false);
 				session.setAttribute(MENSAJE_ENVIADO, MENSAJE_EXITO_AGREGAR);
 				response.sendRedirect(request.getServletPath());
@@ -222,7 +224,7 @@ public class ControladorGestionTitulaciones extends HttpServlet {
 	 * @throws SQLException excepcion de bbdd.
 	 */
 	private void listadoTitulaciones(VistaTitulaciones bean, UVDatos datos, HttpServletRequest request, HttpServletResponse response) throws IOException, SQLException {
-		ModeloTitulacion modelo = new ModeloTitulacion();
+		ModeloTitulacion modelo = ModeloTitulacion.obtenerInstancia();
 		datos.setContentType("application/json");
 		response.setContentType("application/json");
 		response.setCharacterEncoding("UTF-8");

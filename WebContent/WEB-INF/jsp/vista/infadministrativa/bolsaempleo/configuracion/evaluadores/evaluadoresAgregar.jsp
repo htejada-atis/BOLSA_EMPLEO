@@ -29,15 +29,14 @@ VistaEvaluadores bean = (VistaEvaluadores) uvdatos.getVistas().get(VistaEvaluado
 		<caption class="table-title">Agregar nuevo evaluador al Área <%= bean.getArea().getDescripcion() %></caption>  
 		<tr>
 			<th scope="col" style="width:10%"></th>
-			<th scope="col" style="width:20%">D.N.I</th>
-			<th scope="col"	style="width:40%">Tipo</th>
-			<th scope="col"	style="width:40%">Nombre</th>
+			<th scope="col" style="width:25%">D.N.I</th>
+			<th scope="col"	style="width:65%">Nombre</th>
 		</tr>
 		<tbody>
 		</tbody>
 		<tfoot>
 			<tr>
-				<th colspan="4" style="width:100%"></th>
+				<th colspan="3" style="width:100%"></th>
 			</tr>
 		</tfoot>
 	</table>
@@ -59,7 +58,6 @@ VistaEvaluadores bean = (VistaEvaluadores) uvdatos.getVistas().get(VistaEvaluado
 		    "columns": [
 		    	{'data': 'codNum', 'selectable': true},
 		    	{'data': 'numdocumento', 'filter': true},
-		    	{'data': 'rol.descripcion', 'filter': {'type': 'select', 'options': ['Miembro de la Comision', 'Personal de adm. y servicios']}},
 		    	{'data': 'apellido1', 'filter': true, 'render': function(row) {
 	        		return "<div class='overflow-auto'>" + row.nombre + "\n" + row.apellido1 + "\n" + row.apellido2 + "</div>"; 
 	        	}},

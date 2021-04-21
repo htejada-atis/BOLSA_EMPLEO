@@ -26,11 +26,13 @@ import es.ujaen.uvirtual.beans.Rol;
 import es.ujaen.uvirtual.beans.UVDatos;
 import es.ujaen.uvirtual.beans.Usuario;
 import es.ujaen.uvirtual.adm.CrearUsuario;
+import es.ujaen.uvirtual.beans.uvirtual.bolsaempleo.Area;
 import es.ujaen.uvirtual.beans.uvirtual.bolsaempleo.Bolsa;
 import es.ujaen.uvirtual.beans.uvirtual.bolsaempleo.Noticia;
 import es.ujaen.uvirtual.beans.uvirtual.bolsaempleo.UsuarioBolsaEmpleo;
 import es.ujaen.uvirtual.beans.vistas.uvirtual.bolsaempleo.VistaNoticias;
 import es.ujaen.uvirtual.beans.vistas.uvirtual.bolsaempleo.VistaUsuarioBolsaEmpleo;
+import es.ujaen.uvirtual.modelo.bolsaempleo.ModeloArea;
 import es.ujaen.uvirtual.modelo.bolsaempleo.ModeloBolsa;
 import es.ujaen.uvirtual.modelo.bolsaempleo.ModeloNoticia;
 import es.ujaen.uvirtual.modelo.bolsaempleo.ModeloRol;
@@ -94,6 +96,7 @@ public class ControladorUsuarioBolsaEmpleo extends HttpServlet {
 	public static final String ACCION_DATATABLE_USUARIOS_BORRADOS = "datatableusuariosborrados";
 	public static final String ACCION_DATATABLE_USUARIOS_EXCLUIDOS = "datatableusuariosexcluidos";
 	
+	public static final String ACCION_EXCLUIR_USUARIO_AREA = "excluirusuarioarea";
 	
 	// mensajes
 	public static final String MENSAJE_ENVIADO = "mensaje";
@@ -128,7 +131,7 @@ public class ControladorUsuarioBolsaEmpleo extends HttpServlet {
 		Usuario usuario = datos.getUsuario();
 		LOGGER.log(Level.FINEST, "usuario que ha entrado en el servlet es {0}", usuario.getUid());
 		
-		ModeloUsuarioBolsaEmpleo modelo = new ModeloUsuarioBolsaEmpleo();
+		ModeloUsuarioBolsaEmpleo modelo = ModeloUsuarioBolsaEmpleo.obtenerInstancia();
 		
 		String nombreAccion = EscapaHTML.ajustaCodificacion(request.getParameter(PARAM_ACCION));
 		if (nombreAccion == null) {
@@ -173,6 +176,7 @@ public class ControladorUsuarioBolsaEmpleo extends HttpServlet {
 			case ACCION_VOLVER_USUARIO:
 				volverUsuario(request, response, bean);
 				break;
+				
 			}
 		} catch (SQLException e) {
 			LOGGER.log(Level.SEVERE, Formateador.getStackTrace(e));
@@ -213,7 +217,7 @@ public class ControladorUsuarioBolsaEmpleo extends HttpServlet {
 	 * @throws SQLException .
 	 */
 	private void listado(VistaUsuarioBolsaEmpleo bean, UVDatos datos, HttpServletRequest request, HttpServletResponse response) throws IOException {
-		ModeloUsuarioBolsaEmpleo modelo = new ModeloUsuarioBolsaEmpleo();		
+		ModeloUsuarioBolsaEmpleo modelo = ModeloUsuarioBolsaEmpleo.obtenerInstancia();	
 		datos.setContentType("application/json");
 		datos.setRespuestaEnviada(true);
 		response.setContentType("application/json");
@@ -244,7 +248,7 @@ public class ControladorUsuarioBolsaEmpleo extends HttpServlet {
 	 * @throws IOException .
 	 */
 	public void listadoBorrados(VistaUsuarioBolsaEmpleo bean, UVDatos datos, HttpServletRequest request, HttpServletResponse response) throws IOException {
-		ModeloUsuarioBolsaEmpleo modelo = new ModeloUsuarioBolsaEmpleo();		
+		ModeloUsuarioBolsaEmpleo modelo = ModeloUsuarioBolsaEmpleo.obtenerInstancia();	
 		datos.setContentType("application/json");
 		datos.setRespuestaEnviada(true);
 		response.setContentType("application/json");
@@ -276,7 +280,7 @@ public class ControladorUsuarioBolsaEmpleo extends HttpServlet {
 
 	 */
 	public void listadoExcluidos(VistaUsuarioBolsaEmpleo bean, UVDatos datos, HttpServletRequest request, HttpServletResponse response) throws IOException {
-		ModeloUsuarioBolsaEmpleo modelo = new ModeloUsuarioBolsaEmpleo();		
+		ModeloUsuarioBolsaEmpleo modelo = ModeloUsuarioBolsaEmpleo.obtenerInstancia();
 		datos.setContentType("application/json");
 		datos.setRespuestaEnviada(true);
 		response.setContentType("application/json");
@@ -303,11 +307,16 @@ public class ControladorUsuarioBolsaEmpleo extends HttpServlet {
 	private void accionSobreUsuario(HttpServletRequest request, HttpServletResponse response, VistaUsuarioBolsaEmpleo bean) throws SQLException, UVException, IOException {
 		String selectedJson = EscapaHTML.ajustaCodificacion(request.getParameter(PARAM_USUARIOS_SELECCIONADOS));
 		String nombreAccionUsuario = EscapaHTML.ajustaCodificacion(request.getParameter(PARAM_ACCION_USUARIO));
+		Integer codNum = Formateador.leeParametroInteger(request.getParameter(PARAM_ID));
 		int[] selected = (new Gson()).fromJson(selectedJson, new TypeToken<int[]>() { }.getType());
 		
-		ModeloUsuarioBolsaEmpleo modelo = new ModeloUsuarioBolsaEmpleo();
+		ModeloUsuarioBolsaEmpleo modelo = ModeloUsuarioBolsaEmpleo.obtenerInstancia();
+		ModeloArea modeloArea = ModeloArea.obtenerInstancia();
+		
+		UsuarioBolsaEmpleo usu = modelo.getUsuarioById(codNum);
 		
 		List<UsuarioBolsaEmpleo> usuarios = modelo.getUsuariosByIds(selected);
+		List<Area> areas = modeloArea.getAreasByIds(selected);
 
 		switch (nombreAccionUsuario) {
 		case ACCION_ELIMINAR_USUARIO:
@@ -319,6 +328,10 @@ public class ControladorUsuarioBolsaEmpleo extends HttpServlet {
 		case ACCION_INCLUIR_USUARIO:
 			modelo.ponerUsuarioComoNoExcluido(usuarios);
 			break;
+		case ACCION_EXCLUIR_USUARIO_AREA:
+			modelo.excluirUsuarioArea(usu, areas);
+			break;
+			
 		default:
 			bean.getMensajesDeError().add(MENSAJE_ERROR_ACCION_USUARIO_NO_VALIDA);
 			return;
@@ -338,7 +351,7 @@ public class ControladorUsuarioBolsaEmpleo extends HttpServlet {
 	 * @throws UVException en caso de error en bd
 	 */
 	private void buscarUsuario(HttpServletRequest request, HttpServletResponse response, VistaUsuarioBolsaEmpleo bean) throws SQLException, UVException {
-		ModeloUsuarioBolsaEmpleo modelo = new ModeloUsuarioBolsaEmpleo();
+		ModeloUsuarioBolsaEmpleo modelo = ModeloUsuarioBolsaEmpleo.obtenerInstancia();
 		
 		obtenerRoles(bean);
 		try {
@@ -378,13 +391,13 @@ public class ControladorUsuarioBolsaEmpleo extends HttpServlet {
 		UVDatos datos = (UVDatos) request.getAttribute(UVDatos.NOMBRE_ATRIBUTO);
 		bean.setVista("/WEB-INF/jsp/vista/infadministrativa/bolsaempleo/configuracion/usuarios.jsp");
 		
-		ModeloUsuarioBolsaEmpleo modelo = new ModeloUsuarioBolsaEmpleo();
+		ModeloUsuarioBolsaEmpleo modelo = ModeloUsuarioBolsaEmpleo.obtenerInstancia();
 		Boolean listadist = request.getParameter(PARAM_LISTA) != null && EscapaHTML.ajustaCodificacion(request.getParameter(PARAM_LISTA)).equals("true");
 		Boolean excluido = request.getParameter(PARAM_EXCLUIDO) != null && EscapaHTML.ajustaCodificacion(request.getParameter(PARAM_EXCLUIDO)).equals("true");
 					
 		String razonexcluido = EscapaHTML.ajustaCodificacion(request.getParameter(PARAM_RAZON_EXCLUIDO));
 			
-		ModeloRol modeloRol = new ModeloRol();
+		ModeloRol modeloRol = ModeloRol.obtenerInstancia();
 		Rol role = modeloRol.getRoleById(Formateador.leeParametroInteger(request.getParameter(PARAM_ROLE)));
 			
 		SimpleDateFormat formatter = new SimpleDateFormat("dd/MM/YYYY HH:mm:ss");
@@ -415,7 +428,7 @@ public class ControladorUsuarioBolsaEmpleo extends HttpServlet {
 	private void editarUsuario(HttpServletRequest request, HttpServletResponse response, VistaUsuarioBolsaEmpleo bean) throws SQLException, UVException, IOException {
 		bean.setVista("/WEB-INF/jsp/vista/infadministrativa/bolsaempleo/configuracion/formUsuario.jsp");
 		
-		ModeloUsuarioBolsaEmpleo modelo = new ModeloUsuarioBolsaEmpleo();
+		ModeloUsuarioBolsaEmpleo modelo = ModeloUsuarioBolsaEmpleo.obtenerInstancia();
 		
 		obtenerRoles(bean);
 		
@@ -446,7 +459,7 @@ public class ControladorUsuarioBolsaEmpleo extends HttpServlet {
 						
 				String razonexcluido = EscapaHTML.ajustaCodificacion(request.getParameter(PARAM_RAZON_EXCLUIDO));
 				
-				ModeloRol modeloRol = new ModeloRol();
+				ModeloRol modeloRol = ModeloRol.obtenerInstancia();
 				Rol role = modeloRol.getRoleById(Formateador.leeParametroInteger(request.getParameter(PARAM_ROLE)));
 				
 				SimpleDateFormat formatter = new SimpleDateFormat("dd/MM/YYYY HH:mm:ss");
@@ -475,7 +488,7 @@ public class ControladorUsuarioBolsaEmpleo extends HttpServlet {
 	private void excluirUsuario(HttpServletRequest request, HttpServletResponse response, VistaUsuarioBolsaEmpleo bean) throws SQLException, UVException, IOException {
 		bean.setVista("/WEB-INF/jsp/vista/infadministrativa/bolsaempleo/configuracion/buscarUsuario.jsp");
 		
-		ModeloUsuarioBolsaEmpleo modelo = new ModeloUsuarioBolsaEmpleo();
+		ModeloUsuarioBolsaEmpleo modelo = ModeloUsuarioBolsaEmpleo.obtenerInstancia();
 		
 		obtenerRoles(bean);
 		
@@ -506,7 +519,6 @@ public class ControladorUsuarioBolsaEmpleo extends HttpServlet {
 		}
 	}
 	
-	
 	/** dirige al formulario de busqueda de un usuario.
 	 * @param request .
 	 * @param response .
@@ -525,7 +537,7 @@ public class ControladorUsuarioBolsaEmpleo extends HttpServlet {
 	 * @throws SQLException excepcion de bbdd.
 	 */
 	private void obtenerRoles(VistaUsuarioBolsaEmpleo bean) throws SQLException {
-		ModeloRol modelo = new ModeloRol();
+		ModeloRol modelo = ModeloRol.obtenerInstancia();
 		List<Rol> roles = modelo.listaRoles();
 		bean.setRoles(roles);
 	}

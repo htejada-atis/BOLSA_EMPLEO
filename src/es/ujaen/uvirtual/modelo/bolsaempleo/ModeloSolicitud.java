@@ -34,6 +34,29 @@ public class ModeloSolicitud {
 	public static final String MENSAJE_ERROR_SOLICITUDE_NO_EXISTE = "No existe la solicitud";
 	
 		
+    protected static ModeloSolicitud eInstancia = null;
+	
+	/** Crea una instancia del objeto.
+	 *  de forma sincronizada para protegerse de posibles problemas multi-hilo
+	 */
+	private static synchronized void crearInstancia() {
+		if (eInstancia == null) {
+			eInstancia = new ModeloSolicitud();
+		}
+	}
+
+    /**
+     * Obtiene una instancia de la conexión.
+     * @return instancia
+     */
+    public static ModeloSolicitud obtenerInstancia() {
+        if (eInstancia == null) {
+        	crearInstancia();
+        }
+        return eInstancia;
+    }
+	
+	
 	/**
 	 * Listado de solicitudes. 
 	 * @param params para leer los parametros de paginación, ordenacion, etc
@@ -42,7 +65,7 @@ public class ModeloSolicitud {
 	 * @throws UVException error si no existe la area
 	 */
 	public BolsaEmpleoDataTable<Solicitud> listaSolicitudesDatatable(Map<String, String[]> params) throws SQLException, UVException {
-		ModeloConvocatoria modeloConvocatoria = new ModeloConvocatoria(); 
+		ModeloConvocatoria modeloConvocatoria = ModeloConvocatoria.obtenerInstancia(); 
 		List<Solicitud> data = new ArrayList<>();
 		BolsaEmpleoDataTable<Solicitud> dataTable = new BolsaEmpleoDataTable<Solicitud>(params);
 		
@@ -167,8 +190,8 @@ public class ModeloSolicitud {
 	 * @throws UVException  .
 	 * @throws SQLException .
 	 */
-	public Solicitud getSolicitudById(int codNum) throws SQLException, UVException {		
-		ModeloConvocatoria modeloConvocatoria = new ModeloConvocatoria();
+	public Solicitud getSolicitudById(int codNum) throws SQLException, UVException {
+		ModeloConvocatoria modeloConvocatoria = ModeloConvocatoria.obtenerInstancia();
 		String consulta = "SELECT bepsol.* FROM TBEP_SOLICITUDES bepsol WHERE bepsol.CODNUM = ?";
 			
 		try (Connection conexion = ConexionUvirtual.obtenerInstancia();

@@ -10,6 +10,8 @@ import java.util.Map;
 
 import es.ujaen.uvirtual.beans.uvirtual.bolsaempleo.Area;
 import es.ujaen.uvirtual.beans.uvirtual.bolsaempleo.Bolsa;
+import es.ujaen.uvirtual.beans.uvirtual.bolsaempleo.UsuarioBolsaEmpleo;
+import es.ujaen.uvirtual.modelo.ModeloAdministracion;
 import es.ujaen.uvirtual.modelo.conexion.ConexionUvirtual;
 import es.ujaen.uvirtual.utilidades.BolsaEmpleoDataTable;
 import es.ujaen.uvirtual.utilidades.UVException;
@@ -25,13 +27,36 @@ public class ModeloArea {
 	public static final int ORDER_COLUMN_INDEX_AREA = 3;
 	public static final int ORDER_COLUMN_INDEX_BAREMALE = 4;
 	
+    protected static ModeloArea eInstancia = null;
+	
+	/** Crea una instancia del objeto.
+	 *  de forma sincronizada para protegerse de posibles problemas multi-hilo
+	 */
+	private static synchronized void crearInstancia() {
+		if (eInstancia == null) {
+			eInstancia = new ModeloArea();
+		}
+	}
+
+    /**
+     * Obtiene una instancia de la conexión.
+     * @return instancia
+     */
+    public static ModeloArea obtenerInstancia() {
+        if (eInstancia == null) {
+        	crearInstancia();
+        }
+        return eInstancia;
+    }
+	
+	
 	/** Consulta areas en BBDD y las devuelve.
 	 * @param clausula para filtrar las areas de la bd
 	 * @return areas de la base de datos
 	 * @throws SQLException en caso de error de base de datos
 	 */
 	private List<Area> listaAreas(String clausula) throws SQLException {
-		ModeloDepartamento modeloDepartamento = new ModeloDepartamento();
+		ModeloDepartamento modeloDepartamento = ModeloDepartamento.obtenerInstancia();
 		List<Area> areas = new ArrayList<>();
 		String consulta = "SELECT bepare.* FROM TBEP_AREAS bepare " + clausula;
 		
@@ -73,7 +98,7 @@ public class ModeloArea {
 	 * @throws UVException si area no es existe
 	 */
 	public Area getAreaById(int codNum) throws SQLException, UVException {
-		ModeloDepartamento modeloDepartamento = new ModeloDepartamento();
+		ModeloDepartamento modeloDepartamento = ModeloDepartamento.obtenerInstancia();
 		String consulta = "SELECT bepare.* FROM TBEP_AREAS bepare WHERE bepare.CODNUM = ?";				
 			
 		try (Connection conexion = ConexionUvirtual.obtenerInstancia();
@@ -97,6 +122,23 @@ public class ModeloArea {
 		}
 	}
 	
+	/**
+	 * Devuelve un listado de areas por su id.
+	 * @param ids codnum de areas
+	 * @return listado de areas
+	 * @throws UVException .
+	 * @throws SQLException .
+	 */
+	public List<Area> getAreasByIds(int[] ids) throws SQLException, UVException {
+		List<Area> areas = new ArrayList<>();
+		
+		for (int i = 0; i < ids.length; i++) {
+			areas.add(this.getAreaById(ids[i]));
+	    }
+		
+		return areas;
+	}
+	
 	
 	
 	/**
@@ -108,7 +150,7 @@ public class ModeloArea {
 	 */
 	public BolsaEmpleoDataTable<Bolsa> listaAreaDatatable(Map<String, String[]> params) throws SQLException, UVException {
 		List<Bolsa> bolsas = new ArrayList<>();
-		ModeloArea modeloArea = new ModeloArea();
+		ModeloArea modeloArea = ModeloArea.obtenerInstancia();	
 		BolsaEmpleoDataTable<Bolsa> dataTable = new BolsaEmpleoDataTable<Bolsa>(params);
 		
 		String consulta =
