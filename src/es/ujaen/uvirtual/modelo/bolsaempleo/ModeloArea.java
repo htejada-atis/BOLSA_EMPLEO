@@ -10,6 +10,7 @@ import java.util.Map;
 
 import es.ujaen.uvirtual.beans.uvirtual.bolsaempleo.Area;
 import es.ujaen.uvirtual.beans.uvirtual.bolsaempleo.Bolsa;
+import es.ujaen.uvirtual.beans.uvirtual.bolsaempleo.UsuarioBolsaEmpleo;
 import es.ujaen.uvirtual.modelo.ModeloAdministracion;
 import es.ujaen.uvirtual.modelo.conexion.ConexionUvirtual;
 import es.ujaen.uvirtual.utilidades.BolsaEmpleoDataTable;
@@ -119,6 +120,23 @@ public class ModeloArea {
 				return area;
 			}
 		}
+	}
+	
+	/**
+	 * Devuelve un listado de areas por su id.
+	 * @param ids codnum de areas
+	 * @return listado de areas
+	 * @throws UVException .
+	 * @throws SQLException .
+	 */
+	public List<Area> getAreasByIds(int[] ids) throws SQLException, UVException {
+		List<Area> areas = new ArrayList<>();
+		
+		for (int i = 0; i < ids.length; i++) {
+			areas.add(this.getAreaById(ids[i]));
+	    }
+		
+		return areas;
 	}
 	
 	

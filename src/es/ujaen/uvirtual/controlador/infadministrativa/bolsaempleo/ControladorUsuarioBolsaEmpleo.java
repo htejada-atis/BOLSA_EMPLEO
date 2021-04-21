@@ -26,11 +26,13 @@ import es.ujaen.uvirtual.beans.Rol;
 import es.ujaen.uvirtual.beans.UVDatos;
 import es.ujaen.uvirtual.beans.Usuario;
 import es.ujaen.uvirtual.adm.CrearUsuario;
+import es.ujaen.uvirtual.beans.uvirtual.bolsaempleo.Area;
 import es.ujaen.uvirtual.beans.uvirtual.bolsaempleo.Bolsa;
 import es.ujaen.uvirtual.beans.uvirtual.bolsaempleo.Noticia;
 import es.ujaen.uvirtual.beans.uvirtual.bolsaempleo.UsuarioBolsaEmpleo;
 import es.ujaen.uvirtual.beans.vistas.uvirtual.bolsaempleo.VistaNoticias;
 import es.ujaen.uvirtual.beans.vistas.uvirtual.bolsaempleo.VistaUsuarioBolsaEmpleo;
+import es.ujaen.uvirtual.modelo.bolsaempleo.ModeloArea;
 import es.ujaen.uvirtual.modelo.bolsaempleo.ModeloBolsa;
 import es.ujaen.uvirtual.modelo.bolsaempleo.ModeloNoticia;
 import es.ujaen.uvirtual.modelo.bolsaempleo.ModeloRol;
@@ -94,6 +96,7 @@ public class ControladorUsuarioBolsaEmpleo extends HttpServlet {
 	public static final String ACCION_DATATABLE_USUARIOS_BORRADOS = "datatableusuariosborrados";
 	public static final String ACCION_DATATABLE_USUARIOS_EXCLUIDOS = "datatableusuariosexcluidos";
 	
+	public static final String ACCION_EXCLUIR_USUARIO_AREA = "excluirusuarioarea";
 	
 	// mensajes
 	public static final String MENSAJE_ENVIADO = "mensaje";
@@ -173,6 +176,7 @@ public class ControladorUsuarioBolsaEmpleo extends HttpServlet {
 			case ACCION_VOLVER_USUARIO:
 				volverUsuario(request, response, bean);
 				break;
+				
 			}
 		} catch (SQLException e) {
 			LOGGER.log(Level.SEVERE, Formateador.getStackTrace(e));
@@ -303,11 +307,16 @@ public class ControladorUsuarioBolsaEmpleo extends HttpServlet {
 	private void accionSobreUsuario(HttpServletRequest request, HttpServletResponse response, VistaUsuarioBolsaEmpleo bean) throws SQLException, UVException, IOException {
 		String selectedJson = EscapaHTML.ajustaCodificacion(request.getParameter(PARAM_USUARIOS_SELECCIONADOS));
 		String nombreAccionUsuario = EscapaHTML.ajustaCodificacion(request.getParameter(PARAM_ACCION_USUARIO));
+		Integer codNum = Formateador.leeParametroInteger(request.getParameter(PARAM_ID));
 		int[] selected = (new Gson()).fromJson(selectedJson, new TypeToken<int[]>() { }.getType());
 		
 		ModeloUsuarioBolsaEmpleo modelo = ModeloUsuarioBolsaEmpleo.obtenerInstancia();
+		ModeloArea modeloArea = ModeloArea.obtenerInstancia();
+		
+		UsuarioBolsaEmpleo usu = modelo.getUsuarioById(codNum);
 		
 		List<UsuarioBolsaEmpleo> usuarios = modelo.getUsuariosByIds(selected);
+		List<Area> areas = modeloArea.getAreasByIds(selected);
 
 		switch (nombreAccionUsuario) {
 		case ACCION_ELIMINAR_USUARIO:
@@ -319,6 +328,10 @@ public class ControladorUsuarioBolsaEmpleo extends HttpServlet {
 		case ACCION_INCLUIR_USUARIO:
 			modelo.ponerUsuarioComoNoExcluido(usuarios);
 			break;
+		case ACCION_EXCLUIR_USUARIO_AREA:
+			modelo.excluirUsuarioArea(usu, areas);
+			break;
+			
 		default:
 			bean.getMensajesDeError().add(MENSAJE_ERROR_ACCION_USUARIO_NO_VALIDA);
 			return;
@@ -505,7 +518,6 @@ public class ControladorUsuarioBolsaEmpleo extends HttpServlet {
 			response.sendRedirect(request.getServletPath());
 		}
 	}
-	
 	
 	/** dirige al formulario de busqueda de un usuario.
 	 * @param request .
