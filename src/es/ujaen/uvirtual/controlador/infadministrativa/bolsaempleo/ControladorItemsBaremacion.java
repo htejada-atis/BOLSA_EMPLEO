@@ -289,8 +289,7 @@ public class ControladorItemsBaremacion extends HttpServlet {
 			HttpServletResponse response, boolean activo) throws SQLException, UVException, IOException {
 
 		ModeloBaremacion modelo = new ModeloBaremacion();
-		ApartadoBaremacion apartado = modelo
-				.getApartadoBaremacionById(Formateador.leeParametroInteger(request.getParameter(PARAM_APARTADO)));
+		ApartadoBaremacion apartado = modelo.getApartadoBaremacionById(Formateador.leeParametroInteger(request.getParameter(PARAM_APARTADO)));
 		modelo.activaDesactivaApartado(apartado);
 
 		bean.getMensajesDeExito().add(activo ? MENSAJE_EXITO_ACTIVAR_APARTADO : MENSAJE_EXITO_DESACTIVAR_APARTADO);
@@ -548,7 +547,7 @@ public class ControladorItemsBaremacion extends HttpServlet {
 	 * @param request    .
 	 * @param idApartado .
 	 * @throws SQLException .
-	 * @throws UVException  .
+	 * @throws UVException .
 	 */
 	private void seleccionarApartado(VistaItemsBaremacion bean, HttpServletRequest request, Integer idApartado)
 			throws SQLException, UVException {
@@ -610,10 +609,8 @@ public class ControladorItemsBaremacion extends HttpServlet {
 
 		try (PrintWriter writer = response.getWriter()) {
 			try {
-				BolsaEmpleoDataTable<ApartadoBaremacion> dataTable = modelo
-						.listadoApartadosGeneralesBaremacionDatatable(request.getParameterMap());
-				Gson gson = new GsonBuilder().setExclusionStrategies(BolsaEmpleoDataTable.GSONEXCLUSIONSTRATEGY)
-						.create();
+				BolsaEmpleoDataTable<ApartadoBaremacion> dataTable = modelo.listadoApartadosGeneralesBaremacionDatatable(request.getParameterMap());
+				Gson gson = new GsonBuilder().setExclusionStrategies(BolsaEmpleoDataTable.GSONEXCLUSIONSTRATEGY).create();
 				bean.setDatatable(dataTable);
 				writer.write(gson.toJson(dataTable));
 			} catch (Exception ex) {
