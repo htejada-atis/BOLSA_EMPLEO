@@ -235,13 +235,14 @@ VistaUsuarioBolsaEmpleo bean = (VistaUsuarioBolsaEmpleo) uvdatos.getVistas().get
 		    "params": {"<%=ControladorUsuarioBolsaEmpleo.PARAM_ID%>": <%= bean.getUsuario().getCodNum() %>},
 		    "selectable": true,
 		    "pageSize": 10,
+		    "filterable": true,
 		    "action": "<%= ControladorAreasABaremar.ACCION_DATATABLE_EXCLUIDOS %>",
 		    "columns": [
 		    	{'data': 'area.codNum', 'selectable': true},
 		        {'data': 'area.codNum'},
 		        {'data': 'area.idAreaExterno'},
 		        {'data': 'area.descripcion'},
-		        {'data': 'baremable', 'render': function(row) {
+		        {'data': 'baremable', 'filter': {'type': 'selectBoolean', 'true': 'Activo', 'false': 'Inactivo'} , 'order': {'active': false}, 'render': function(row) {
 	        		if(row.baremable){
 	        			return "<div title='Baremable' class='circle-true'></div>"; 
 	        		}
@@ -260,18 +261,19 @@ VistaUsuarioBolsaEmpleo bean = (VistaUsuarioBolsaEmpleo) uvdatos.getVistas().get
 		    "params": {"<%=ControladorUsuarioBolsaEmpleo.PARAM_ID%>": <%= bean.getUsuario().getCodNum() %>},
 		    "selectable": true,
 		    "pageSize": 10,
+		    "filterable": true,
 		    "action": "<%= ControladorUsuarioBolsaEmpleo.ACCION_DATATABLE_USUARIOS_EXCLUIDOS_AREA %>",
 		    "columns": [
 		    	{'data': 'area.codNum', 'selectable': true},
 		        {'data': 'area.codNum'},
 		        {'data': 'area.idAreaExterno'},
 		        {'data': 'area.descripcion'},
-		        {'data': 'baremable', 'render': function(row) {
+		        {'data': 'baremable', 'filter': {'type': 'selectBoolean', 'true': 'Baremable', 'false': 'No Baremable'} , 'order': {'active': false},'render': function(row) {
 	        		if(row.baremable){
-	        			return "<div title='Baremable' class='circle-true'></div>"; 
+	        			return "<div title='Baremable' class='circle-true'></div>";
 	        		}
 	        		else{
-	        			return "<div title='No Baremable' class='circle-false'></div>"; 
+	        			return "<div title='No Baremable' class='circle-false'></div>";
 	        		}
 	        	}},
 		    ],
