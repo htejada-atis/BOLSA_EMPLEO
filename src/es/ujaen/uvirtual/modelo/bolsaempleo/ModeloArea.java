@@ -15,6 +15,7 @@ import es.ujaen.uvirtual.modelo.ModeloAdministracion;
 import es.ujaen.uvirtual.modelo.conexion.ConexionUvirtual;
 import es.ujaen.uvirtual.utilidades.BolsaEmpleoDataTable;
 import es.ujaen.uvirtual.utilidades.UVException;
+import es.ujaen.uvirtual.utilidades.BolsaEmpleoDataTable.DataTableColumn;
 
 /**
  * Clase de modelo para la gestión de areas. 
@@ -213,10 +214,10 @@ public class ModeloArea {
 		+ "ON bepare.CODNUM = bepusuexc.AREA AND bepusuexc.USUARIO = ? "
 		+ "WHERE bepusuexc.USUARIO IS NULL";
 		
-		dataTable.setColumn(ORDER_COLUMN_INDEX_ID, "bepbol.CODNUM");
+		dataTable.setColumn(ORDER_COLUMN_INDEX_ID, "bepare.CODNUM", DataTableColumn.COLUMN_TYPE_NUMBER);
 		dataTable.setColumn(ORDER_COLUMN_INDEX_CODIGO, "bepare.ID_AREA_CONOCIMIENTO");
 		dataTable.setColumn(ORDER_COLUMN_INDEX_AREA, "bepare.DES_AREA_CONOCIMIENTO");
-		dataTable.setColumn(ORDER_COLUMN_INDEX_BAREMALE, "bepbol.FLGBAREMABLE");
+		dataTable.setColumn(ORDER_COLUMN_INDEX_BAREMALE, "bepbol.FLGBAREMABLE", DataTableColumn.COLUMN_TYPE_BOOLEAN);
 		dataTable.setQuery(consulta);
 				
 		try (Connection conexion = ConexionUvirtual.obtenerInstancia();
@@ -228,7 +229,7 @@ public class ModeloArea {
 			stmt.setInt(indexParam, codnum);
 			stmtCount.setInt(indexParam++, codnum);
 			
-			dataTable.setFiltersParams(stmt, stmtCount, 2);
+			dataTable.setFiltersParams(stmt, stmtCount, indexParam);
 			
 			try (ResultSet rs = stmt.executeQuery()) {
 				while (rs.next()) {

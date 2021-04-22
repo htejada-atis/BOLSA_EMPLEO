@@ -200,7 +200,7 @@ $(document).ready(function() {
         		return row.nombre + "\n" + row.apellido1 + "\n" + row.apellido2; 
         	}},
 	        {'data': 'email'},
-	        {'data': 'rol.descripcion', 'filter': {'type': 'select', 'options': ['1050':'Personal', '1051':'Comision', '1052':'Candidato']} , 'order': {'active': false}},
+	        {'data': 'rol.descripcion', 'filter': {'type': 'select', 'options': ['1050', '1051', '1052']} , 'order': {'active': false}},
 	        {'data': 'razonExclusion'},
 	        {'data': 'listaDist', 'render': function(row) {
         		if(row.listaDist==true){
