@@ -400,7 +400,7 @@ public class ModeloUsuarioBolsaEmpleo {
 		}
 		
 		return dataTable;
-	}	
+	}
 	
 	/**
 	 * Set usuario. 
