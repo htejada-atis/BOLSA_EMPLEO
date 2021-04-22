@@ -37,7 +37,7 @@ function DataTable(id, config) {
 	        data: self.params,
 	        success: self.parseResponse.bind(self),
             error: self.errorResponse.bind(self)
-	    });	      
+	    });
     };
     
     this.setParam = function(key, value) {
@@ -158,6 +158,10 @@ function DataTable(id, config) {
                 this.checked ? $(this).parent().parent().addClass("selected") : $(this).parent().parent().removeClass("selected");
     			self.renderFooter();
     		});
+
+            if (columnDef.selectable.exclude && Atis.getProp(row, columnDef.selectable.exclude)) {
+                $(check).prop( "disabled", true);
+            }
     		
     		return check;
     	}
@@ -323,8 +327,17 @@ function DataTable(id, config) {
                                 });
                             } else {
                                 for (option in options) {
-                                    filterElement.append($('<option value="' + option + '">' + options[option] + '</option>'));
+                                    if (columnDef.filter.optionDefault && columnDef.filter.optionDefault == option) {
+                                        filterElement.append($('<option value="' + option + '" selected>' + options[option] + '</option>'));
+                                    } else {
+                                        filterElement.append($('<option value="' + option + '">' + options[option] + '</option>'));
+                                    }
                                 }
+                            }
+
+                            if (columnDef.filter.optionDefault) {
+                                self.filterParams[index] = $(filterElement).val();
+                                self.params.filter = JSON.stringify(self.filterParams);
                             }
                             
                             break;
@@ -429,7 +442,7 @@ function DataTable(id, config) {
         if (value == "" || value == 0) {
             delete self.filterParams[indexColumnDef];
         }
-        console.log(self.params)
+
         self.params.filter = JSON.stringify(self.filterParams);
         self.refresh();
     }
