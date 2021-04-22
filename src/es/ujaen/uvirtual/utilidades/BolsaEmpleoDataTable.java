@@ -67,6 +67,7 @@ public class BolsaEmpleoDataTable<T> {
 		public static final int COLUMN_TYPE_DATE = 2;
 		public static final int COLUMN_TYPE_BOOLEAN = 3;
 		public static final int COLUMN_TYPE_OPTION = 4;
+		public static final int COLUMN_TYPE_IS_NULL = 5;
 		
 		/** Constructor por parámetros .
 		 * @param pcolumnName .
@@ -297,46 +298,60 @@ public class BolsaEmpleoDataTable<T> {
 	private String prepareQuery(String pconsulta) throws UVException {
 		String consultaResult = "";
 		if (this.isFilterable()) {
-			for (Map.Entry<Integer, String> filter : filters.entrySet()) {
-		        Integer key = filter.getKey();
-		        System.out.println("key: " + key);
-				String column = this.columns.get(key).getName();
-				
-				if (column == null) {
-					throw new UVException(ERROR_MSG_COLUMNA_FILTRADO_NO_VALIDA);
-				}
-				
-				switch (this.columns.get(key).getType()) {
-					case DataTableColumn.COLUMN_TYPE_DATE:
-						consultaResult += " AND TO_CHAR(" + column + ",'yyyy-mm-dd') LIKE ? ";
-						break;
-					case DataTableColumn.COLUMN_TYPE_NUMBER:
-					case DataTableColumn.COLUMN_TYPE_BOOLEAN:
-					case DataTableColumn.COLUMN_TYPE_OPTION:
-						consultaResult += " AND " + column + " = ? ";
-						break;
-						
-					case DataTableColumn.COLUMN_TYPE_TEXT:
-						consultaResult += " AND lower(" + column + ") LIKE lower(?) ";
-						break;
-					default:
-						consultaResult += " AND lower(" + column + ") LIKE lower(?) ";
-						break;
-				}
-		    }
+			consultaResult += filterByQuery();
 		}
+		
 		if (this.isOrderable()) {
-			String column = this.columns.get(this.orderBy).getName();
-			if (column == null) {
-				throw new UVException(ERROR_MSG_COLUMNA_ORDENACION_NO_VALIDA);
-			}
-			
-			consultaResult += " ORDER BY " + column + " " + this.orderDirection;
+			consultaResult += orderByQuery();
 		}
+		
 		
 		System.out.println(pconsulta + consultaResult);
 		
 		return pconsulta + consultaResult;
+	}
+	
+	private String orderByQuery() throws UVException {
+		String column = this.columns.get(this.orderBy).getName();
+		if (column == null) {
+			throw new UVException(ERROR_MSG_COLUMNA_ORDENACION_NO_VALIDA);
+		}
+		
+		return " ORDER BY " + column + " " + this.orderDirection;
+	}
+	
+	private String filterByQuery() throws UVException {
+		String consultaResult = "";
+		for (Map.Entry<Integer, String> filter : filters.entrySet()) {
+	        Integer key = filter.getKey();
+	        System.out.println("key: " + key);
+			String column = this.columns.get(key).getName();
+			
+			if (column == null) {
+				throw new UVException(ERROR_MSG_COLUMNA_FILTRADO_NO_VALIDA);
+			}
+			
+			switch (this.columns.get(key).getType()) {
+				case DataTableColumn.COLUMN_TYPE_DATE:
+					consultaResult += " AND TO_CHAR(" + column + ",'yyyy-mm-dd') LIKE ? ";
+					break;
+				case DataTableColumn.COLUMN_TYPE_NUMBER:
+				case DataTableColumn.COLUMN_TYPE_BOOLEAN:
+				case DataTableColumn.COLUMN_TYPE_OPTION:
+					consultaResult += " AND " + column + " = ? ";
+					break;
+				case DataTableColumn.COLUMN_TYPE_IS_NULL:
+					consultaResult += " AND " + column + " IS" + (Boolean.parseBoolean(filter.getValue()) ? " NOT" : "") + " NULL";
+					break;
+				case DataTableColumn.COLUMN_TYPE_TEXT:
+					consultaResult += " AND lower(" + column + ") LIKE lower(?) ";
+					break;
+				default:
+					consultaResult += " AND lower(" + column + ") LIKE lower(?) ";
+					break;
+			}
+	    }
+		return consultaResult;
 	}
 	
 }

@@ -313,11 +313,20 @@ function DataTable(id, config) {
                             
                             break;
                         case 'select':
+                            var options = columnDef.filter.options;
                             filterElement = $('<select ' + name + '></select>');
                             filterElement.append($('<option value="0">----------</option>'));
-                            columnDef.filter.options.forEach(function (option) {
-                                filterElement.append($('<option>' + option + '</option>'));
-                            });
+
+                            if (Array.isArray(options)) {
+                                options.forEach(function (option, index) {
+                                    filterElement.append($('<option>' + option + '</option>'));
+                                });
+                            } else {
+                                for (option in options) {
+                                    filterElement.append($('<option value="' + option + '">' + options[option] + '</option>'));
+                                }
+                            }
+                            
                             break;
                         default:
                             filterElement = $('<input type="' + type + name + ' autocomplete="off" />');
