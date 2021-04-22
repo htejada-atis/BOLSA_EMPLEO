@@ -33,13 +33,18 @@ String nombre = "";
     <form id="actualizar_apartado" class="be-form" method="post" action="<%= request.getRequestURI() %>">
     	<input type="hidden" name="<%= ControladorItemsBaremacion.PARAM_ACCION %>" id="accion_formulario" value="" />
 		<input type="hidden" name="<%= ControladorItemsBaremacion.PARAM_APARTADO%>" id="apartado_id" value="" />
-    	<div class="form-group">
-    		<label for="apartado_codigo">Código</label>
-    		<input type="text" name="<%= ControladorItemsBaremacion.PARAM_APARTADO_CODIGO %>" id="apartado_codigo" value="<%= codigo %>"/>
+		<div class="form-group-container col2">
+	    	<div class="form-group">
+	    		<label for="apartado_codigo">Código:</label>
+	    		<input class="form-input-custom" type="text" name="<%= ControladorItemsBaremacion.PARAM_APARTADO_CODIGO %>" id="apartado_codigo" value="<%= codigo %>"/>
+	    	</div>
+	    	
     	</div>
-    	<div class="form-group">
-    		<label for="apartado_nombre">Nombre</label>
-    		<input type="text" name="<%= ControladorItemsBaremacion.PARAM_APARTADO_NOMBRE %>" id="apartado_nombre" value="<%= nombre %>"/>
+    	<div class="form-group-container col2">
+    		<div class="form-group">
+	    		<label for="apartado_nombre">Nombre:</label>
+	    		<input class="form-input-custom" type="text" name="<%= ControladorItemsBaremacion.PARAM_APARTADO_NOMBRE %>" id="apartado_nombre" value="<%= nombre %>"/>
+	    	</div>
     	</div>
     	<div class="form-btn">
     		<input id="apartado_enviar" type="submit" name="<%= ControladorItemsBaremacion.PARAM_ENVIAR %>" value="<%= bean.getApartadoBaremacion().getCodNum() != null ? "Guardar cambios" : "Insertar apartado" %>"/>
