@@ -142,7 +142,7 @@ VistaItemsBaremacion bean = (VistaItemsBaremacion) uvdatos.getVistas().get(Vista
 		        {'data': 'nombre', 'filter': true},
 		        {'data': 'puntuacionMaxima'},
 		        {'data': 'porcentajeMaximo'},
-		        {'data': 'activo', 'filter': {'type': 'selectBoolean'}, 'render': function(row) {
+		        {'data': 'activo', 'filter': {'type': 'selectBoolean', 'true': 'Activo', 'false': 'Inactivo'}, 'render': function(row) {
 	        		if(row.activo){
 	        			return "<div title='Activo' class='circle-true'></div>"; 
 	        		}
@@ -204,7 +204,7 @@ VistaItemsBaremacion bean = (VistaItemsBaremacion) uvdatos.getVistas().get(Vista
 			    		return row.apartado.codigo + "." + row.codigo;
 			    	}},
 			        {'data': 'nombre', 'filter': true},
-			        {'data': 'activo', 'filter': {'type': 'selectBoolean'}, 'render': function(row) {
+			        {'data': 'activo', 'filter': {'type': 'selectBoolean', 'true': 'Activo', 'false': 'Inactivo'}, 'render': function(row) {
 		        		if(row.activo){
 		        			return "<div class='circle-true'></div>"; 
 		        		}
@@ -265,7 +265,7 @@ VistaItemsBaremacion bean = (VistaItemsBaremacion) uvdatos.getVistas().get(Vista
 				    		return row.bloque.apartado.codigo + "." + row.bloque.codigo + "." + row.codigo;
 				    	}},
 				        {'data': 'nombre', 'filter': true},
-				        {'data': 'activo', 'filter': {'type': 'selectBoolean'}, 'render': function(row) {
+				        {'data': 'activo', 'filter': {'type': 'selectBoolean', 'true': 'Activo', 'false': 'Inactivo'}, 'render': function(row) {
 			        		if(row.activo){
 			        			return "<div class='circle-true'></div>"; 
 			        		}

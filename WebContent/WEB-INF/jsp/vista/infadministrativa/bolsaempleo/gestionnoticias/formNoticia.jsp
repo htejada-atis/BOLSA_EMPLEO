@@ -38,17 +38,21 @@ VistaNoticias bean = (VistaNoticias) uvdatos.getVistas().get(VistaNoticias.class
     <form id="actualizar_noticia" class="be-form" method="post" action="<%= request.getRequestURI() %>">
     	<input type="hidden" name="<%= ControladorGestionNoticias.PARAM_ACCION %>" id="accion_formulario" value="" />
 		<input type="hidden" name="<%= ControladorGestionNoticias.PARAM_ID%>" id="noticia_id" value="" />
-    	<div class="form-group">
-    		<label for="noticia_texto">Texto</label>
-    		<input type="text" name="<%= ControladorGestionNoticias.PARAM_TEXTO %>" id="noticia_texto" value="<%= texto %>"/>
-    	</div>
-    	<div class="form-group">
-    		<label for="noticia_enlace">Enlace</label>
-    		<input type="text" name="<%= ControladorGestionNoticias.PARAM_ENLACE %>" id="noticia_enlace" value="<%= enlace %>"/>
-    	</div>
-    	<div class="form-group">
-    		<label for="noticia_fecha">Fecha</label>
-    		<input type="text" name="<%= ControladorGestionNoticias.PARAM_FECHA %>" id="noticia_fecha" autocomplete="off" value="<%= fecha %>"/>
+		<div class="form-group-container col2">
+			<div class="form-group">
+	    		<label for="noticia_texto">Texto:</label>
+	    		<input class="form-input-custom" type="text" name="<%= ControladorGestionNoticias.PARAM_TEXTO %>" id="noticia_texto" value="<%= texto %>"/>
+	    	</div>
+	    	<div class="form-group">
+	    		<label for="noticia_enlace">Enlace:</label>
+	    		<input class="form-input-custom" type="text" name="<%= ControladorGestionNoticias.PARAM_ENLACE %>" id="noticia_enlace" value="<%= enlace %>"/>
+	    	</div>
+		</div>
+    	<div class="form-group-container col2">
+	    	<div class="form-group">
+	    		<label for="noticia_fecha">Fecha:</label>
+	    		<input class="form-input-custom" type="text" name="<%= ControladorGestionNoticias.PARAM_FECHA %>" id="noticia_fecha" autocomplete="off" value="<%= fecha %>"/>
+	    	</div>
     	</div>
     	<div class="form-check">
     		<label for="noticia_publica"><input type="checkbox" id="noticia_publica" name="<%= ControladorGestionNoticias.PARAM_PUBLICA %>" value="<%= publica %>" <%= (publica ? "checked=''" : "") %>/>Pública</label>

@@ -24,16 +24,22 @@ VistaFicheros bean = (VistaFicheros) uvdatos.getVistas().get(VistaFicheros.class
     
     <form id="subir_fichero" class="be-form" method="post" action="<%= request.getRequestURI() %>" enctype="multipart/form-data">
     	<input type="hidden" name="<%= ControladorGestionFicheros.PARAM_ACCION %>" id="accion_formulario" value="" />
-    	<div class="form-group">
-    		<label for="fichero_titulo">Título</label>
-    		<textarea id="fichero_titulo" name="<%= ControladorGestionFicheros.PARAM_TITULO %>" rows="3" cols="50"></textarea>
+    	<div class="form-group-container col1">
+	    	<div class="form-group">
+	    		<label for="fichero_titulo">Título:</label>
+	    		<input class="form-input-custom" id="fichero_titulo" name="<%= ControladorGestionFicheros.PARAM_TITULO %>"/>
+	    	</div>
     	</div>
-    	<div class="form-file">
-			<label for="fichero_archivo">Fichero:</label>
-			<input id="fichero_archivo" type="file" name="<%= ControladorGestionFicheros.PARAM_ARCHIVO %>"/>
+    	<div class="form-group-container col1">
+	    	<div class="form-file">
+				<label for="fichero_archivo">Fichero:</label>
+				<input id="fichero_archivo" type="file" name="<%= ControladorGestionFicheros.PARAM_ARCHIVO %>"/>
+			</div>
 		</div>
-		<div class="form-check">
-    		<label for="fichero_publico"><input type="checkbox" id="fichero_publico" name="<%= ControladorGestionFicheros.PARAM_PUBLICO %>"/>Público</label>
+		<div class="form-group-container col1">
+			<div class="form-check">
+	    		<label for="fichero_publico"><input type="checkbox" id="fichero_publico" name="<%= ControladorGestionFicheros.PARAM_PUBLICO %>"/>Público</label>
+	    	</div>
     	</div>
     	<div class="form-btn">
     		<input id="fichero_enviar" type="submit" name="<%= ControladorGestionFicheros.PARAM_ENVIAR %>" value="Subir fichero"/>
