@@ -190,4 +190,63 @@ public class ModeloArea {
 		
 		return dataTable;
 	}	
+	
+	
+	/**
+	 * Listado de areas excluidas de un usuario. 
+	 * @param params para leer los parametros de paginación, ordenacion, etc
+	 * @param codnum .
+	 * @return listado de areas
+	 * @throws SQLException en caso de error de base de datos
+	 * @throws UVException error si no existe la area
+	 */
+	public BolsaEmpleoDataTable<Bolsa> listaAreaExcluidasUsuarioDatatable(Map<String, String[]> params, Integer codnum) throws SQLException, UVException {
+		List<Bolsa> bolsas = new ArrayList<>();
+		ModeloArea modeloArea = ModeloArea.obtenerInstancia();	
+		BolsaEmpleoDataTable<Bolsa> dataTable = new BolsaEmpleoDataTable<Bolsa>(params);
+		
+		String consulta =
+		"SELECT bepbol.* "
+		+ "FROM TBEP_BOLSAS bepbol "
+		+ "INNER JOIN TBEP_AREAS bepare ON bepare.CODNUM = bepbol.BEPARE_CODNUM "
+		+ "LEFT JOIN UVIRTUAL.TBEP_USUARIOS_EXCLUIDOS_AREA bepusuexc "
+		+ "ON bepare.CODNUM = bepusuexc.AREA AND bepusuexc.USUARIO = ? "
+		+ "WHERE bepusuexc.USUARIO IS NULL";
+		
+		dataTable.setColumn(ORDER_COLUMN_INDEX_ID, "bepbol.CODNUM");
+		dataTable.setColumn(ORDER_COLUMN_INDEX_CODIGO, "bepare.ID_AREA_CONOCIMIENTO");
+		dataTable.setColumn(ORDER_COLUMN_INDEX_AREA, "bepare.DES_AREA_CONOCIMIENTO");
+		dataTable.setColumn(ORDER_COLUMN_INDEX_BAREMALE, "bepbol.FLGBAREMABLE");
+		dataTable.setQuery(consulta);
+				
+		try (Connection conexion = ConexionUvirtual.obtenerInstancia();
+				PreparedStatement stmtCount = conexion.prepareStatement(dataTable.getQueryCount());
+				PreparedStatement stmt = conexion.prepareStatement(dataTable.getQuery());
+		) {					
+			
+			int indexParam = 1;
+			stmt.setInt(indexParam, codnum);
+			stmtCount.setInt(indexParam, codnum);
+			
+			try (ResultSet rs = stmt.executeQuery()) {
+				while (rs.next()) {
+					Bolsa bolsa = new Bolsa();
+					bolsa.setCodNum(rs.getInt("CODNUM"));
+					bolsa.setArea(modeloArea.getAreaById(rs.getInt("BEPARE_CODNUM")));
+					bolsa.setEstado(rs.getString("ESTADO"));
+					bolsa.setBaremable(rs.getString("FLGBAREMABLE").equals("S"));					
+					bolsa.setFechaActualizacion(rs.getTimestamp("FECHAACTUALIZACION"));
+					bolsa.setFechaBloqueo(rs.getTimestamp("FECHABLOQUEO"));
+					bolsa.setFechaDesBloqueo(rs.getTimestamp("FECHADEBLOQUEO"));
+					
+					bolsas.add(bolsa);					
+				}				
+			}	
+			
+			dataTable.setRecordsTotalFromQuery(stmtCount);
+			dataTable.setData(bolsas);
+		}
+		
+		return dataTable;
+	}	
 }

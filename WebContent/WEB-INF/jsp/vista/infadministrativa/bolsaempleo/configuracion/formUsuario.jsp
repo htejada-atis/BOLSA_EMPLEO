@@ -147,11 +147,11 @@ VistaUsuarioBolsaEmpleo bean = (VistaUsuarioBolsaEmpleo) uvdatos.getVistas().get
 			<table class="bluetable bolsaempleo" id="table_areas_excluidas">
 	  			<caption class="table-title">Áreas excluidas para el usuario</caption>  
 				<tr>
+					<th scope="col" style="width:5%"></th>
 					<th scope="col" style="width:5%" title="Id de la area">Id</th>
 					<th scope="col" style="width:25%" title="Código de area">Código</th>
 					<th scope="col" style="width:65%">Area</th>
 					<th scope="col" class="center" style="width:15%">Baremable</th>	
-					<th scope="col" style="width:10%"></th>
 				</tr>
 				<tbody>				
 				</tbody>
@@ -232,12 +232,13 @@ VistaUsuarioBolsaEmpleo bean = (VistaUsuarioBolsaEmpleo) uvdatos.getVistas().get
 		
 		var table = new Atis.DataTable('#table_areas', {
 		    "ajax": { url: "/srv/es/ajax/informacionadministrativa/bolsaempleo/configuracion/areasbaremar" },
+		    "params": {"<%=ControladorUsuarioBolsaEmpleo.PARAM_ID%>": <%= bean.getUsuario().getCodNum() %>},
 		    "selectable": true,
 		    "pageSize": 10,
-		    "action": "<%= ControladorAreasABaremar.ACCION_DATATABLE %>",
+		    "action": "<%= ControladorAreasABaremar.ACCION_DATATABLE_EXCLUIDOS %>",
 		    "columns": [
-		    	{'data': 'codNum', 'selectable': true},
-		        {'data': 'codNum'},
+		    	{'data': 'area.codNum', 'selectable': true},
+		        {'data': 'area.codNum'},
 		        {'data': 'area.idAreaExterno'},
 		        {'data': 'area.descripcion'},
 		        {'data': 'baremable', 'render': function(row) {
@@ -250,7 +251,32 @@ VistaUsuarioBolsaEmpleo bean = (VistaUsuarioBolsaEmpleo) uvdatos.getVistas().get
 	        	}},
 		    ],
 		    "actions": [
-		    	{'label': 'Excluir', 'onClick': function(selected) { enviaAccion("<%=ControladorUsuarioBolsaEmpleo.ACCION_EXCLUIR_USUARIO_AREA%>", selected); } }
+		    	{'label': 'Excluir Areas', 'onClick': function(selected) { enviaAccion("<%=ControladorUsuarioBolsaEmpleo.ACCION_EXCLUIR_USUARIO_AREA%>", selected); } }
+		    ]
+		});	
+		
+		var table = new Atis.DataTable('#table_areas_excluidas', {
+		    "ajax": { url: "/srv/es/ajax/informacionadministrativa/bolsaempleo/configuracion/usuarios" },
+		    "params": {"<%=ControladorUsuarioBolsaEmpleo.PARAM_ID%>": <%= bean.getUsuario().getCodNum() %>},
+		    "selectable": true,
+		    "pageSize": 10,
+		    "action": "<%= ControladorUsuarioBolsaEmpleo.ACCION_DATATABLE_USUARIOS_EXCLUIDOS_AREA %>",
+		    "columns": [
+		    	{'data': 'area.codNum', 'selectable': true},
+		        {'data': 'area.codNum'},
+		        {'data': 'area.idAreaExterno'},
+		        {'data': 'area.descripcion'},
+		        {'data': 'baremable', 'render': function(row) {
+	        		if(row.baremable){
+	        			return "<div title='Baremable' class='circle-true'></div>"; 
+	        		}
+	        		else{
+	        			return "<div title='No Baremable' class='circle-false'></div>"; 
+	        		}
+	        	}},
+		    ],
+		    "actions": [
+		    	{'label': 'Borrar Areas excluidas', 'onClick': function(selected) { enviaAccion("<%=ControladorUsuarioBolsaEmpleo.ACCION_EXCLUIR_USUARIO_AREA%>", selected); } }
 		    ]
 		});	
 		
@@ -265,10 +291,11 @@ VistaUsuarioBolsaEmpleo bean = (VistaUsuarioBolsaEmpleo) uvdatos.getVistas().get
 		}
 		console.log(accion,selected);
 
-		Atis.confirmDialog(titulo, mensaje, {
+		Atis.confirmDialog("Exclusión de areas", "¿ Desea excluir las areas seleccionadas del usuario ?", {
         	Si: function() {
         		var params = {
-        				'a': '<%=ControladorUsuarioBolsaEmpleo.ACCION_EXCLUIR_USUARIO_AREA%>', 
+        				'a': '<%=ControladorUsuarioBolsaEmpleo.ACCION_USUARIO%>', 
+        				'aa': '<%=ControladorUsuarioBolsaEmpleo.ACCION_EXCLUIR_USUARIO_AREA%>', 
         				'<%=ControladorUsuarioBolsaEmpleo.PARAM_ACCION_USUARIO%>': accion, 
         				'<%=ControladorUsuarioBolsaEmpleo.PARAM_ID%>': <%= bean.getUsuario().getCodNum() %>, 
         				'<%=ControladorUsuarioBolsaEmpleo.PARAM_USUARIOS_SELECCIONADOS%>': Atis.object2Json(selected)

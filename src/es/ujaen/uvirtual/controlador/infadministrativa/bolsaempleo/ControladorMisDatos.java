@@ -63,7 +63,7 @@ public class ControladorMisDatos extends HttpServlet {
 	
 	// mensajes
 	public static final String MENSAJE_ENVIADO = "mensaje";
-	public static final String MENSAJE_EXITO_ENVIAR = "datos personales actualizados correctamente";
+	public static final String MENSAJE_EXITO_ENVIAR = "Datos personales actualizados correctamente";
 	
 	public static final String MENSAJE_ERROR_PRIMER_APELLIDO_VACIO = "El primer apellido no puede estar vacio";
 	public static final String MENSAJE_ERROR_NACIONALIDAD_VACIO = "La nacionalidad no puede estar vacia";

@@ -78,7 +78,7 @@ VistaConvocatorias bean = (VistaConvocatorias) uvdatos.getVistas().get(VistaConv
 			    		},
 			    	'onClick': function(row) {
 				    		if(row.estado=="CERRADA"){
-				    			Atis.confirmDialog("¿Desea abrir la convocatoria?", "Cambio de estado", {
+				    			Atis.confirmDialog("Cambio de estado", "¿Desea abrir la convocatoria? Recuerde revisar áreas a baremar, titulaciones, etc ...", {
 					            	Si: function() {
 					            		var params = {
 					            				'a': '<%=ControladorConvocatorias.ACCION_ABRIR_CONVOCATORIA%>', 
@@ -93,7 +93,7 @@ VistaConvocatorias bean = (VistaConvocatorias) uvdatos.getVistas().get(VistaConv
 					          	});
 				    		}
 				    		else{
-				    			Atis.confirmDialog("¿Desea cerrar la convocatoria?", "Cambio de estado", {
+				    			Atis.confirmDialog("Cambio de estado", "¿Desea cerrar la convocatoria? Recuerde revisar áreas a baremar, titulaciones, etc ...", {
 					            	Si: function() {
 					            		var params = {
 					            				'a': '<%=ControladorConvocatorias.ACCION_CERRAR_CONVOCATORIA%>',

@@ -24,7 +24,7 @@ VistaItemsBaremacion bean = (VistaItemsBaremacion) uvdatos.getVistas().get(Vista
 	
 	<h2>Items para las baremaciones</h2>
 	
-	<table class="bluetable bolsaempleo" id="tableApartadosGenerales">
+	<table class="bluetable bolsaempleo custom" id="tableApartadosGenerales">
 		<tr>
 			<th scope="col" style="width:10%" title="Código apartado">Código</th>
 			<th scope="col" style="width:50%" title="Código de area">Nombre del bloque</th>
@@ -41,7 +41,7 @@ VistaItemsBaremacion bean = (VistaItemsBaremacion) uvdatos.getVistas().get(Vista
 		</tfoot>
 	</table>
 	
-	<table class="bluetable bolsaempleo" id="tableBloques">
+	<table class="bluetable bolsaempleo custom" id="tableBloques">
 		<tr>
 			<th scope="col" style="width:15%" title="Código bloque">Código</th>
 			<th scope="col" style="width:75%" title="Código de area">Nombre del apartado</th>
@@ -56,7 +56,7 @@ VistaItemsBaremacion bean = (VistaItemsBaremacion) uvdatos.getVistas().get(Vista
 		</tfoot>
 	</table>
 	
-	<table class="bluetable bolsaempleo" id="tableItems">
+	<table class="bluetable bolsaempleo custom" id="tableItems">
 		<tr>
 			<th scope="col" style="width:15%" title="Código ítem">Código</th>
 			<th scope="col" style="width:75%" title="Código de area">Nombre del ítem</th>
