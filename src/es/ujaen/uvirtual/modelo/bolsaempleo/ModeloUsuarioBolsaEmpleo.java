@@ -9,7 +9,6 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
-import java.util.logging.Level;
 
 import es.ujaen.uvirtual.adm.CrearUsuario;
 import es.ujaen.uvirtual.beans.Rol;
@@ -17,12 +16,10 @@ import es.ujaen.uvirtual.beans.UVDatos;
 import es.ujaen.uvirtual.beans.Usuario;
 import es.ujaen.uvirtual.beans.uvirtual.bolsaempleo.Area;
 import es.ujaen.uvirtual.beans.uvirtual.bolsaempleo.Bolsa;
-import es.ujaen.uvirtual.beans.uvirtual.bolsaempleo.Evaluador;
 import es.ujaen.uvirtual.beans.uvirtual.bolsaempleo.UsuarioBolsaEmpleo;
 import es.ujaen.uvirtual.modelo.conexion.ConexionUvirtual;
 import es.ujaen.uvirtual.utilidades.BolsaEmpleoUtils;
 import es.ujaen.uvirtual.utilidades.BolsaEmpleoDataTable;
-import es.ujaen.uvirtual.utilidades.Memcache;
 import es.ujaen.uvirtual.utilidades.UVException;
 import es.ujaen.uvirtual.utilidades.BolsaEmpleoDataTable.DataTableColumn;
 
@@ -89,7 +86,6 @@ public class ModeloUsuarioBolsaEmpleo {
         return eInstancia;
     }
 	
-	
 	/** Consulta usuarios en BBDD y las devuelve.
 	 * @param clausula para filtrar los usuarios de la bd
 	 * @return todos los usuarios de la base de datos
@@ -121,7 +117,6 @@ public class ModeloUsuarioBolsaEmpleo {
 	public List<UsuarioBolsaEmpleo> listaUsuarios() throws SQLException {
 		return listaUsuarios(" ORDER BY bepusu.CODCUENTA");
 	}
-	
 	
 	/** obtiene un usuario a partir de su nombre.
 	 * @param nombre del usuario
@@ -166,6 +161,34 @@ public class ModeloUsuarioBolsaEmpleo {
 		}
 	}
 	
+	/**
+	 * Devuelve el usuario de bolsa de empleo logeado en el sistema. 
+	 * Si el usuario está borrado o excluido de la bolsa saltará un excepción.
+	 * 
+	 * @param datos .
+	 * @return usuario o null si hay login
+	 * @throws UVException .
+	 * @throws SQLException .
+	 */
+	public UsuarioBolsaEmpleo getUsuarioLogeado(UVDatos datos) throws SQLException, UVException {
+		Usuario usuario = datos.getUsuario();
+		
+		if (usuario == null) {
+			return null;			
+		}
+		
+		UsuarioBolsaEmpleo usuarioBolsa = getUsuarioByCodCuenta(usuario.getUid());
+		
+		if (usuarioBolsa.getBorrado()) {
+			throw new UVException("El usuario está borrado de la bolsa de empleo");
+		}
+		
+		if (usuarioBolsa.getExcluido()) {
+			throw new UVException("El usuario está excluido de la bolsa de empleo");			
+		}
+		
+		return usuarioBolsa;
+	}
 	
 	/**
 	 * Devuelve un listado de usuarios por su id.
@@ -338,7 +361,6 @@ public class ModeloUsuarioBolsaEmpleo {
 		return dataTable;
 	}	
 	
-	
 	/**
 	 * Listado de areas excluidas de un usuario. 
 	 * @param params para leer los parametros de paginación, ordenacion, etc
@@ -441,7 +463,6 @@ public class ModeloUsuarioBolsaEmpleo {
 		return usuario;
 	}
 	
-	
 	/**
 	 * Set usuario excluido de area. 
 	 * @param rs resultado de la consulta
@@ -480,7 +501,6 @@ public class ModeloUsuarioBolsaEmpleo {
 		
 		return usuario;
 	}
-	
 	
 	/**
 	 * Get datatable. 
@@ -523,8 +543,6 @@ public class ModeloUsuarioBolsaEmpleo {
 				return dataTable;
 		}
 	}
-	
-	
 	
 	/**	Función que inserta un usuario en la BD.
 	 * @param usuario a insertar en la BD
@@ -605,7 +623,6 @@ public class ModeloUsuarioBolsaEmpleo {
 		actualizaRol(usuario);
 	}
 	
-	
 	/** Actualiza los datos personale de un usuario.
 	 * @param usuario UsuarioBolsaEmpleo con los datos nuevos a actualizar
 	 * @throws SQLException en caso de error en la BD
@@ -653,7 +670,6 @@ public class ModeloUsuarioBolsaEmpleo {
 		}
 	}
 	
-	
 	/**
 	 * Establece el usuario como borrado. 
 	 * @param usu .
@@ -677,7 +693,6 @@ public class ModeloUsuarioBolsaEmpleo {
 		}
 	}
 	
-	
 	/**
 	 * Establece el usuario como borrado. 
 	 * @param usu .
@@ -700,7 +715,6 @@ public class ModeloUsuarioBolsaEmpleo {
 			}
 		}
 	}
-	
 	
 	/**
 	 * Establece el usuario como excluido. 
@@ -783,7 +797,7 @@ public class ModeloUsuarioBolsaEmpleo {
 	
 	/** 
 	 * Si hay usuario logeado, comprueba si está registrado en sistema. 
-	 * Si tenemos usuario en nuestro sistema, comprueba si está exluido o borrado (lanzando una excepción). 
+	 * Si tenemos usuario en nuestro sistema, comprueba si está excluido o borrado (lanzando una excepción). 
 	 * Si no tenemos usuario en nuestro sistema, lo crea como candidato.
 	 *  
 	 * @param  datos .
@@ -914,7 +928,6 @@ public class ModeloUsuarioBolsaEmpleo {
 				stmt.executeUpdate();
 			}
 	}	
-	
 	
 	/** Devuelve una lista con los roles de un usuario .
 	 * @param uid del usuario

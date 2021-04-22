@@ -62,8 +62,6 @@ public class ModeloBolsa {
         return eInstancia;
     }
 	
-	
-	
 	/**
 	 * Listado de bolsas de empleo. 
 	 * @param params para leer los parametros de paginación, ordenacion, etc
@@ -194,8 +192,6 @@ public class ModeloBolsa {
 		
 	}
 	
-	
-	
 	/**
 	 * Bloquea bolsas.
 	 * @param bolsas .
@@ -299,7 +295,7 @@ public class ModeloBolsa {
 	public void ponerAreaComoNoBaremable(List<Bolsa> bolsas) throws SQLException {
 		this.cambiarFlagBaremableBolsas(bolsas, BOLSA_NO_BAREMABLE);		
 	}
-	
+		
 	private void cambiarEstadoBolsas(List<Bolsa> bolsas, String estado) throws SQLException {
 		String params = BolsaEmpleoUtils.consultaMultiplesParametros(bolsas.size());
 		String query = "UPDATE TBEP_BOLSAS SET ESTADO = ? WHERE CODNUM IN (" + params + ")";		
