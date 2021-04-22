@@ -42,7 +42,7 @@ public class BbddRunner {
     static {
     	LOGGER.log(Level.INFO, "inicializacion de oracle");
 		try {
-			LOGGER.log(Level.INFO, "Conexión BBDD: " + getCadenaConexionBd());
+			LOGGER.log(Level.INFO, "Conexión BBDD: {0}", getCadenaConexionBd());
 			odsUv = new OracleDataSource();
 			odsUv.setURL(getCadenaConexionBd());
 			odsUv.setUser(usuarioBdUv);
