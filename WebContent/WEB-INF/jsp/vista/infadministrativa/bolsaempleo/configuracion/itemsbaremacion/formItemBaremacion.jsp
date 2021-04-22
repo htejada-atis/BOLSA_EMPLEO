@@ -38,17 +38,21 @@ String nombre = "";
     	<input type="hidden" name="<%= ControladorItemsBaremacion.PARAM_ACCION %>" id="accion_formulario" value="" />
 		<input type="hidden" name="<%= ControladorItemsBaremacion.PARAM_ITEM%>" id="item_id" value="" />
 		<input type="hidden" name="<%= ControladorItemsBaremacion.PARAM_BLOQUE%>" id="bloque_id" value="" />
-		<div class="form-group">
-    		<label for="item_bloque_codigo">Código completo</label>
-    		<input type="text" name="<%= ControladorItemsBaremacion.PARAM_BLOQUE_CODIGO %>" id="item_bloque_codigo" value="<%= codigoCompleto %>" disabled/>
+		<div class="form-group-container col2">
+			<div class="form-group">
+	    		<label for="item_bloque_codigo">Código completo:</label>
+	    		<input class="form-input-custom" type="text" name="<%= ControladorItemsBaremacion.PARAM_BLOQUE_CODIGO %>" id="item_bloque_codigo" value="<%= codigoCompleto %>" disabled/>
+	    	</div>
+	    	<div class="form-group">
+	    		<label for="item_codigo">Código:</label>
+	    		<input class="form-input-custom" type="text" name="<%= ControladorItemsBaremacion.PARAM_ITEM_CODIGO %>" id="item_codigo" value="<%= codigoItem %>"/>
+	    	</div>
     	</div>
-    	<div class="form-group">
-    		<label for="item_codigo">Código</label>
-    		<input type="text" name="<%= ControladorItemsBaremacion.PARAM_ITEM_CODIGO %>" id="item_codigo" value="<%= codigoItem %>"/>
-    	</div>
-    	<div class="form-group">
-    		<label for="item_nombre">Nombre</label>
-    		<input type="text" name="<%= ControladorItemsBaremacion.PARAM_ITEM_NOMBRE %>" id="item_nombre" value="<%= nombre %>"/>
+    	<div class="form-group-container col2">
+	    	<div class="form-group">
+	    		<label for="item_nombre">Nombre:</label>
+	    		<input class="form-input-custom" type="text" name="<%= ControladorItemsBaremacion.PARAM_ITEM_NOMBRE %>" id="item_nombre" value="<%= nombre %>"/>
+	    	</div>
     	</div>
     	<div class="form-btn">
     		<input id="item_enviar" type="submit" name="<%= ControladorItemsBaremacion.PARAM_ENVIAR %>" value="<%= bean.getItemBaremacion().getCodNum() != null ? "Guardar cambios" : "Insertar item" %>"/>

@@ -32,9 +32,11 @@ VistaTitulaciones bean = (VistaTitulaciones) uvdatos.getVistas().get(VistaTitula
     <form id="agregar_titulacion" class="be-form" method="post" action="<%=request.getRequestURI()%>">
     	<input type="hidden" name="<%= ControladorGestionTitulaciones.PARAM_ACCION %>" id="accion_formulario" value="" />
     	<input type="hidden" name="<%= ControladorGestionTitulaciones.PARAM_ID%>" id="titulacion_id" value="" />
-    	<div class="form-group">
-    		<label for="titulacion_nombre">Nombre</label>
-    		<textarea id="titulacion_nombre" name="<%=ControladorGestionTitulaciones.PARAM_NOMBRE%>" rows="1" cols="60"><%= nombre %></textarea>
+    	<div class="form-group-container col1">
+	    	<div class="form-group">
+	    		<label for="titulacion_nombre">Nombre</label>
+	    		<input class="form-input-custom" id="titulacion_nombre" name="<%=ControladorGestionTitulaciones.PARAM_NOMBRE%>" value="<%= nombre %>"/>
+	    	</div>
     	</div>
     	<div class="form-btn">
     		<input id="titulacion_enviar" type="submit" name="<%=ControladorGestionTitulaciones.PARAM_ENVIAR%>"

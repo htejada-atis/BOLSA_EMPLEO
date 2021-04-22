@@ -38,17 +38,21 @@ String nombre = "";
     	<input type="hidden" name="<%= ControladorItemsBaremacion.PARAM_ACCION %>" id="accion_formulario" value="" />
 		<input type="hidden" name="<%= ControladorItemsBaremacion.PARAM_BLOQUE%>" id="bloque_id" value="" />
 		<input type="hidden" name="<%= ControladorItemsBaremacion.PARAM_APARTADO%>" id="apartado_id" value="" />
-		<div class="form-group">
-    		<label for="bloque_apartado_codigo">Código completo</label>
-    		<input type="text" name="<%= ControladorItemsBaremacion.PARAM_APARTADO_CODIGO %>" id="bloque_apartado_codigo" value="<%= codigoCompleto %>" disabled/>
+		<div class="form-group-container col2">
+			<div class="form-group">
+	    		<label for="bloque_apartado_codigo">Código completo:</label>
+	    		<input class="form-input-custom" type="text" name="<%= ControladorItemsBaremacion.PARAM_APARTADO_CODIGO %>" id="bloque_apartado_codigo" value="<%= codigoCompleto %>" disabled/>
+	    	</div>
+	    	<div class="form-group">
+	    		<label for="bloque_codigo">Código:</label>
+	    		<input class="form-input-custom" type="text" name="<%= ControladorItemsBaremacion.PARAM_BLOQUE_CODIGO %>" id="bloque_codigo" value="<%= codigoBloque %>"/>
+	    	</div>
     	</div>
-    	<div class="form-group">
-    		<label for="bloque_codigo">Código</label>
-    		<input type="text" name="<%= ControladorItemsBaremacion.PARAM_BLOQUE_CODIGO %>" id="bloque_codigo" value="<%= codigoBloque %>"/>
-    	</div>
-    	<div class="form-group">
-    		<label for="bloque_nombre">Nombre</label>
-    		<input type="text" name="<%= ControladorItemsBaremacion.PARAM_BLOQUE_NOMBRE %>" id="bloque_nombre" value="<%= nombre %>"/>
+    	<div class="form-group-container col2">
+	    	<div class="form-group">
+	    		<label for="bloque_nombre">Nombre:</label>
+	    		<input class="form-input-custom" type="text" name="<%= ControladorItemsBaremacion.PARAM_BLOQUE_NOMBRE %>" id="bloque_nombre" value="<%= nombre %>"/>
+	    	</div>
     	</div>
     	<div class="form-btn">
     		<input id="bloque_enviar" type="submit" name="<%= ControladorItemsBaremacion.PARAM_ENVIAR %>" value="<%= bean.getBloqueBaremacion().getCodNum() != null ? "Guardar cambios" : "Insertar bloque" %>"/>
