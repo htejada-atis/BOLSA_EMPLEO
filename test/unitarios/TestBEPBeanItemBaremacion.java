@@ -33,7 +33,7 @@ public class TestBEPBeanItemBaremacion {
 		assertEquals(id, item.getCodNum());
 		assertEquals(CADENA, item.getCodigo());
 		assertEquals(CADENA, item.getNombre());
-		assertEquals(BOOLEANO, item.isActivo());
+		assertEquals(BOOLEANO, item.getActivo());
 		assertEquals(bloque, item.getBloqueBaremacion());
 		assertNotNull(item.toString());
 	}
@@ -49,7 +49,7 @@ public class TestBEPBeanItemBaremacion {
 		assertEquals(id, item.getCodNum());
 		assertEquals(CADENA, item.getCodigo());
 		assertEquals(CADENA, item.getNombre());
-		assertEquals(BOOLEANO, item.isActivo());
+		assertEquals(BOOLEANO, item.getActivo());
 		assertEquals(bloque, item.getBloqueBaremacion());
 		assertNotNull(item.toString());
 	}
@@ -69,7 +69,7 @@ public class TestBEPBeanItemBaremacion {
 		assertEquals(id, item.getCodNum());
 		assertEquals(CADENA, item.getCodigo());
 		assertEquals(CADENA, item.getNombre());
-		assertEquals(BOOLEANO, item.isActivo());
+		assertEquals(BOOLEANO, item.getActivo());
 		assertNotNull(item.toString());
 		assertTrue(item.equals(item2));
 		assertTrue(item.hashCode() == item2.hashCode());

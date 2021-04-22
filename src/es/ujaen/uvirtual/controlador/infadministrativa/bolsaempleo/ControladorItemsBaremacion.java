@@ -56,10 +56,10 @@ public class ControladorItemsBaremacion extends HttpServlet {
 	public static final String ACCION_DESACTIVAR_APARTADO = "desactivarapartado";
 	public static final String ACCION_ACTIVAR_APARTADO = "activarapartado";
 	public static final String ACCION_APARTADO_SELECCIONADO = "apartadoseleccionado";
-	public static final String MENSAJE_EXITO_AGREGAR_APARTADO = "Apartado agregado correctamente";
-	public static final String MENSAJE_EXITO_EDITAR_APARTADO = "Apartado editado correctamente";
-	public static final String MENSAJE_EXITO_DESACTIVAR_APARTADO = "Apartado desactivado correctamente";
-	public static final String MENSAJE_EXITO_ACTIVAR_APARTADO = "Apartado activado correctamente";
+	public static final String MENSAJE_EXITO_APARTADO_AGREGAR = "Bloque agregado correctamente";
+	public static final String MENSAJE_EXITO_APARTADO_EDITAR = "Bloque editado correctamente";
+	public static final String MENSAJE_EXITO_APARTADO_DESACTIVAR = "Bloque desactivado correctamente";
+	public static final String MENSAJE_EXITO_APARTADO_ACTIVAR = "Bloque activado correctamente";
 	
 	// acciones bloques
 	public static final String ACCION_DATATABLE_BLOQUES = "datatable_bloques";
@@ -70,10 +70,12 @@ public class ControladorItemsBaremacion extends HttpServlet {
 	public static final String ACCION_DESACTIVAR_BLOQUE = "desactivarabloque";
 	public static final String ACCION_ACTIVAR_BLOQUE = "activarabloque";	
 	public static final String ACCION_BLOQUE_SELECCIONADO = "bloqueseleccionado";
-	public static final String MENSAJE_EXITO_AGREGAR_BLOQUE = "Bloque agregado correctamente";
-	public static final String MENSAJE_EXITO_EDITAR_BLOQUE = "Bloque editado correctamente";
-	public static final String MENSAJE_EXITO_DESACTIVAR_BLOQUE = "Bloque desactivado correctamente";
-	public static final String MENSAJE_EXITO_ACTIVAR_BLOQUE = "Bloque activado correctamente";	
+	public static final String MENSAJE_EXITO_BLOQUE_AGREGAR = "Apartado agregado correctamente";
+	public static final String MENSAJE_EXITO_BLOQUE_EDITAR = "Apartado editado correctamente";
+	public static final String MENSAJE_EXITO_BLOQUE_DESACTIVAR = "Apartado desactivado correctamente";
+	public static final String MENSAJE_EXITO_BLOQUE_ACTIVAR = "Apartado activado correctamente";
+	public static final String MENSAJE_ERROR_BLOQUE_NUMMAXMERITOS_NUMERICO = "El número máximo de méritos debe ser un número";
+	public static final String MENSAJE_ERROR_BLOQUE_NUMMAXMERITOS_MINIMO = "El número máximo de méritos debe ser al menos uno";
 	
 	// acciones items
 	public static final String ACCION_DATATABLE_ITEMS = "datatable_items";
@@ -84,10 +86,10 @@ public class ControladorItemsBaremacion extends HttpServlet {
 	public static final String ACCION_DESACTIVAR_ITEM = "desactivaraitem";
 	public static final String ACCION_ACTIVAR_ITEM = "activaraitem";	
 	public static final String ACCION_ITEM_SELECCIONADO = "itemseleccionado";
-	public static final String MENSAJE_EXITO_AGREGAR_ITEM = "Item agregado correctamente";
-	public static final String MENSAJE_EXITO_EDITAR_ITEM = "Item editado correctamente";
-	public static final String MENSAJE_EXITO_DESACTIVAR_ITEM = "Item desactivado correctamente";
-	public static final String MENSAJE_EXITO_ACTIVAR_ITEM = "Item activado correctamente";	
+	public static final String MENSAJE_EXITO_ITEM_AGREGAR = "Item agregado correctamente";
+	public static final String MENSAJE_EXITO_ITEM_EDITAR = "Item editado correctamente";
+	public static final String MENSAJE_EXITO_ITEM_DESACTIVAR = "Item desactivado correctamente";
+	public static final String MENSAJE_EXITO_ITEM_ACTIVAR = "Item activado correctamente";	
 		
 	public static final String ACCION_INDEX = "indice";	
 	
@@ -98,9 +100,12 @@ public class ControladorItemsBaremacion extends HttpServlet {
 	public static final String PARAM_APARTADO_CODIGO = "codigoapartado";
 	public static final String PARAM_APARTADO_PUNTUACIONMAXIMA = "puntuaacionmaxima";
 	public static final String PARAM_APARTADO_PORCENTAJEMAXIMO = "porcentajemaximo";
+	public static final String PARAM_APARTADO_MERITOSPREFERENTES = "meritospreferentes";
+	public static final String PARAM_APARTADO_FACTORMERITOPREFERENTE = "factormeritopreferente";
 	public static final String PARAM_BLOQUE = "bloque";
 	public static final String PARAM_BLOQUE_NOMBRE = "nombrebloque";
 	public static final String PARAM_BLOQUE_CODIGO = "codigobloque";
+	public static final String PARAM_BLOQUE_NUMEROMAXIMOMERITOS = "numeromaximomeritos";
 	public static final String PARAM_ENVIAR = "enviar";
 	public static final String PARAM_ITEM = "item";
 	public static final String PARAM_ITEM_NOMBRE = "nombreitem";
@@ -113,6 +118,7 @@ public class ControladorItemsBaremacion extends HttpServlet {
 	public static final String MENSAJE_ERROR_CODIGO_NUMERO = "El código debe ser un número";
 	public static final String MENSAJE_ERROR_NOMBRE_VACIO = "El nombre no puede estar vacio";
 	public static final String MENSAJE_ERROR_NOMBRE_MAXIMO = "El nombre no puede ser mayor que ";
+	public static final String MENSAJE_ERROR_VALOR_NO_VALIDO = "Valor no válido";
 	
 	// urls
 	public static final String URL_PATTERN_AJAX = "/srv/es/ajax/informacionadministrativa/bolsaempleo/configuracion/itemsbaremacion";
@@ -288,18 +294,19 @@ public class ControladorItemsBaremacion extends HttpServlet {
 			return;
 		}
 		
-		// agregamos
-		ModeloBaremacion modelo = ModeloBaremacion.obtenerInstancia();
+		// agregamos		
 		ApartadoBaremacion apartado = new ApartadoBaremacion();
 		apartado.setCodigo(validator.getValueString(PARAM_APARTADO_CODIGO));
 		apartado.setNombre(validator.getValueString(PARAM_APARTADO_NOMBRE));
 		apartado.setActivo(true);
 		apartado.setPuntuacionMaxima(validator.getValueFloat(PARAM_APARTADO_PUNTUACIONMAXIMA));
 		apartado.setPorcentajeMaximo(validator.getValueFloat(PARAM_APARTADO_PORCENTAJEMAXIMO));
+		apartado.setMeritosPreferentes(validator.getValueBoolean(PARAM_APARTADO_MERITOSPREFERENTES));
+		apartado.setFactorMeritoPreferente(validator.getValueFloat(PARAM_APARTADO_PUNTUACIONMAXIMA));
 		
-		modelo.insertaApartado(apartado);
+		ModeloBaremacion.obtenerInstancia().insertaApartado(apartado);
 		
-		bean.getMensajesDeExito().add(MENSAJE_EXITO_AGREGAR_APARTADO);
+		bean.getMensajesDeExito().add(MENSAJE_EXITO_APARTADO_AGREGAR);
 		bean.setVista(RUTA_BEP_CONF + "itemsbaremacion.jsp");				
 	}
 	
@@ -312,7 +319,7 @@ public class ControladorItemsBaremacion extends HttpServlet {
 		
 		modelo.desactivarApartado(apartado);
 		
-		bean.getMensajesDeExito().add(MENSAJE_EXITO_DESACTIVAR_APARTADO);
+		bean.getMensajesDeExito().add(MENSAJE_EXITO_APARTADO_DESACTIVAR);
 	}
 	
 	private void activarApartado(VistaItemsBaremacion bean, HttpServletRequest request, HttpServletResponse response)
@@ -325,7 +332,7 @@ public class ControladorItemsBaremacion extends HttpServlet {
 		
 		modelo.activarApartado(apartado);
 		
-		bean.getMensajesDeExito().add(MENSAJE_EXITO_ACTIVAR_APARTADO);	
+		bean.getMensajesDeExito().add(MENSAJE_EXITO_APARTADO_ACTIVAR);	
 	}
 	
 	private void editarApartado(VistaItemsBaremacion bean, HttpServletRequest request, HttpServletResponse response) throws SQLException, UVException, IOException {
@@ -360,10 +367,12 @@ public class ControladorItemsBaremacion extends HttpServlet {
 		apartado.setNombre(validator.getValueString(PARAM_APARTADO_NOMBRE));
 		apartado.setPuntuacionMaxima(validator.getValueFloat(PARAM_APARTADO_PUNTUACIONMAXIMA));
 		apartado.setPorcentajeMaximo(validator.getValueFloat(PARAM_APARTADO_PORCENTAJEMAXIMO));
+		apartado.setMeritosPreferentes(validator.getValueBoolean(PARAM_APARTADO_MERITOSPREFERENTES));
+		apartado.setFactorMeritoPreferente(validator.getValueFloat(PARAM_APARTADO_FACTORMERITOPREFERENTE));
 		
 		modelo.actualizaApartado(apartado);
 		
-		bean.getMensajesDeExito().add(MENSAJE_EXITO_EDITAR_APARTADO);
+		bean.getMensajesDeExito().add(MENSAJE_EXITO_APARTADO_EDITAR);
 		
 		bean.setVista(RUTA_BEP_CONF + "itemsbaremacion.jsp");
 	}
@@ -393,6 +402,9 @@ public class ControladorItemsBaremacion extends HttpServlet {
 		
 		validator.addParamFloat(PARAM_APARTADO_PUNTUACIONMAXIMA);
 		validator.addParamFloat(PARAM_APARTADO_PORCENTAJEMAXIMO);
+		validator.addParamFloat(PARAM_APARTADO_FACTORMERITOPREFERENTE);
+		
+		validator.addParamBoolean(PARAM_APARTADO_MERITOSPREFERENTES);
 				
 		return validator;
 	}
@@ -495,12 +507,13 @@ public class ControladorItemsBaremacion extends HttpServlet {
 		BloqueBaremacion bloque = new BloqueBaremacion();
 		bloque.setCodigo(validator.getValueString(PARAM_BLOQUE_CODIGO));
 		bloque.setNombre(validator.getValueString(PARAM_BLOQUE_NOMBRE));
+		bloque.setNumeroMaximoMeritos(validator.getValueInteger(PARAM_BLOQUE_NUMEROMAXIMOMERITOS));
 		bloque.setActivo(true);
 		bloque.setApartadoBaremacion(apartado);
 		
 		modelo.insertaBloque(bloque);
 		
-		bean.getMensajesDeExito().add(MENSAJE_EXITO_AGREGAR_BLOQUE);
+		bean.getMensajesDeExito().add(MENSAJE_EXITO_BLOQUE_AGREGAR);
 		bean.setVista(RUTA_BEP_CONF + "itemsbaremacion.jsp");	
 	}
 	
@@ -512,7 +525,7 @@ public class ControladorItemsBaremacion extends HttpServlet {
 		
 		modelo.desactivarBloque(bloque);		
 		
-		bean.getMensajesDeExito().add(MENSAJE_EXITO_DESACTIVAR_BLOQUE);
+		bean.getMensajesDeExito().add(MENSAJE_EXITO_BLOQUE_DESACTIVAR);
 		this.seleccionarBloque(bean, request, response);
 	}
 	
@@ -525,7 +538,7 @@ public class ControladorItemsBaremacion extends HttpServlet {
 		
 		modelo.activarBloque(bloque);
 		
-		bean.getMensajesDeExito().add(MENSAJE_EXITO_ACTIVAR_BLOQUE);
+		bean.getMensajesDeExito().add(MENSAJE_EXITO_BLOQUE_ACTIVAR);
 		this.seleccionarBloque(bean, request, response);			
 	}
 	
@@ -561,10 +574,11 @@ public class ControladorItemsBaremacion extends HttpServlet {
 		// agregamos
 		bloque.setCodigo(validator.getValueString(PARAM_BLOQUE_CODIGO));
 		bloque.setNombre(validator.getValueString(PARAM_BLOQUE_NOMBRE));
+		bloque.setNumeroMaximoMeritos(validator.getValueInteger(PARAM_BLOQUE_NUMEROMAXIMOMERITOS));
 		
 		modelo.actualizaBloque(bloque);
 		
-		bean.getMensajesDeExito().add(MENSAJE_EXITO_EDITAR_BLOQUE);
+		bean.getMensajesDeExito().add(MENSAJE_EXITO_BLOQUE_EDITAR);
 		
 		bean.setVista(RUTA_BEP_CONF + "itemsbaremacion.jsp");
 	}
@@ -592,6 +606,9 @@ public class ControladorItemsBaremacion extends HttpServlet {
 		validator.addRule(PARAM_BLOQUE_NOMBRE, "noBlank", MENSAJE_ERROR_NOMBRE_VACIO);
 		validator.addRule(PARAM_BLOQUE_NOMBRE, "max:" + ModeloBaremacion.COLUMN_NOMBRE_MAXLENGTH, 
 				String.format(MENSAJE_ERROR_NOMBRE_MAXIMO, ModeloBaremacion.COLUMN_NOMBRE_MAXLENGTH));
+		
+		validator.addParamInteger(PARAM_BLOQUE_NUMEROMAXIMOMERITOS);
+		validator.addRule(PARAM_BLOQUE_NUMEROMAXIMOMERITOS, "min:1", MENSAJE_ERROR_BLOQUE_NUMMAXMERITOS_MINIMO);
 					
 		return validator;
 	}
@@ -700,7 +717,7 @@ public class ControladorItemsBaremacion extends HttpServlet {
 		
 		modelo.insertaItem(item);
 		
-		bean.getMensajesDeExito().add(MENSAJE_EXITO_AGREGAR_ITEM);
+		bean.getMensajesDeExito().add(MENSAJE_EXITO_ITEM_AGREGAR);
 		bean.setVista(RUTA_BEP_CONF + "itemsbaremacion.jsp");
 	}
 	
@@ -741,7 +758,7 @@ public class ControladorItemsBaremacion extends HttpServlet {
 		
 		modelo.actualizaItem(item);
 		
-		bean.getMensajesDeExito().add(MENSAJE_EXITO_EDITAR_ITEM);
+		bean.getMensajesDeExito().add(MENSAJE_EXITO_ITEM_EDITAR);
 		
 		bean.setVista(RUTA_BEP_CONF + "itemsbaremacion.jsp");
 	}
@@ -754,7 +771,7 @@ public class ControladorItemsBaremacion extends HttpServlet {
 		
 		modelo.desactivarItem(item);		
 		
-		bean.getMensajesDeExito().add(MENSAJE_EXITO_DESACTIVAR_ITEM);
+		bean.getMensajesDeExito().add(MENSAJE_EXITO_ITEM_DESACTIVAR);
 		this.seleccionarItem(bean, request, response);
 	}
 	
@@ -767,7 +784,7 @@ public class ControladorItemsBaremacion extends HttpServlet {
 		
 		modelo.activarItem(item);
 		
-		bean.getMensajesDeExito().add(MENSAJE_EXITO_ACTIVAR_ITEM);
+		bean.getMensajesDeExito().add(MENSAJE_EXITO_ITEM_ACTIVAR);
 		this.seleccionarItem(bean, request, response);			
 	}
 	

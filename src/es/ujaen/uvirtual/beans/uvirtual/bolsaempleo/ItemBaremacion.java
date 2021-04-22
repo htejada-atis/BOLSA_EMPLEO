@@ -14,6 +14,11 @@ public class ItemBaremacion implements Serializable {
 	private String nombre;
 	private Boolean activo;
 	private BloqueBaremacion bloque;
+	private String unidades;
+	private Float valor;
+	private Float valorMinimo;
+	private Float valorMaximo;
+	private String afinidad;
 	
 	/** Constructor por defecto.
 	 */
@@ -27,57 +32,25 @@ public class ItemBaremacion implements Serializable {
 	 * @param pcodigo .
 	 * @param pnombre .
 	 * @param pactivo .
+	 * @param punidades .
+	 * @param pvalor .
+	 * @param pvalorMinimo .
+	 * @param pvalorMaximo .
+	 * @param pafinidad .
 	 */
-	public ItemBaremacion(Integer pcodNum, BloqueBaremacion pbloque, String pcodigo, String pnombre, Boolean pactivo) {
+	public ItemBaremacion(Integer pcodNum, BloqueBaremacion pbloque, String pcodigo, String pnombre, Boolean pactivo, 
+			String punidades, Float pvalor, Float pvalorMinimo, Float pvalorMaximo, String pafinidad) {
 		super();
 		this.bloque = pbloque;
 		this.codNum = pcodNum;
 		this.codigo = pcodigo;
 		this.nombre = pnombre;
 		this.activo = pactivo;
-	}
-	
-	/** Constructor con parametros.
-	 * @param pcodNum .
-	 * @param pbloque .
-	 * @param pcodigo .
-	 * @param pnombre .
-	 */
-	public ItemBaremacion(Integer pcodNum, BloqueBaremacion pbloque, String pcodigo, String pnombre) {
-		super();
-		this.bloque = pbloque;
-		this.codNum = pcodNum;
-		this.codigo = pcodigo;
-		this.nombre = pnombre;
-	}
-	
-	/** Constructor con parametros.
-	 * @param pbloque .
-	 * @param pcodigo .
-	 * @param pnombre .
-	 */
-	public ItemBaremacion(BloqueBaremacion pbloque, String pcodigo, String pnombre) {
-		super();
-		this.bloque = pbloque;
-		this.codigo = pcodigo;
-		this.nombre = pnombre;
-	}
-	
-	/** Constructor con parametros.
-	 * @param pcodNum .
-	 * @param pactivo .
-	 */
-	public ItemBaremacion(Integer pcodNum, Boolean pactivo) {
-		super();
-		this.codNum = pcodNum;
-		this.activo = pactivo;		
-	}
-	
-	/** Constructor con parametros.
-	 * @param pcodNum .
-	 */
-	public ItemBaremacion(Integer pcodNum) {
-		this.codNum = pcodNum;
+		this.unidades = punidades;
+		this.valor = pvalor;
+		this.valorMinimo = pvalorMinimo;
+		this.valorMaximo = pvalorMaximo;
+		this.afinidad = pafinidad;
 	}
 		
 	/** Constructor copia.
@@ -89,6 +62,11 @@ public class ItemBaremacion implements Serializable {
 		this.codigo = copia.codigo;
 		this.nombre = copia.nombre;
 		this.activo = copia.activo;
+		this.unidades = copia.unidades;
+		this.valor = copia.valor;
+		this.valorMinimo = copia.valorMinimo;
+		this.valorMaximo = copia.valorMaximo;
+		this.afinidad = copia.afinidad;
 	}
 	
 	public Integer getCodNum() {
@@ -123,12 +101,52 @@ public class ItemBaremacion implements Serializable {
 		this.nombre = nombre;
 	}
 	
-	public Boolean isActivo() {
+	public Boolean getActivo() {
 		return activo;
 	}
 
 	public void setActivo(Boolean activo) {
 		this.activo = activo;
+	}
+	
+	public String getUnidades() {
+		return this.unidades;
+	}
+
+	public void setUnidades(String unidades) {
+		this.unidades = unidades;
+	}
+	
+	public Float getValor() {
+		return this.valor;
+	}
+
+	public void setValor(Float valor) {
+		this.valor = valor;
+	}
+	
+	public Float getValorMinimo() {
+		return this.valorMinimo;
+	}
+
+	public void setValorMinimo(Float valorMinimo) {
+		this.valorMinimo = valorMinimo;
+	}
+	
+	public Float getValorMaximo() {
+		return this.valorMaximo;
+	}
+
+	public void setValorMaximo(Float valorMaximo) {
+		this.valorMaximo = valorMaximo;
+	}
+	
+	public String getAfinidad() {
+		return this.afinidad;
+	}
+
+	public void setAfinidad(String afinidad) {
+		this.afinidad = afinidad;
 	}
 	
 	public static long getSerialversionuid() {
@@ -138,7 +156,8 @@ public class ItemBaremacion implements Serializable {
 	@Override
 	public String toString() {
 		return "ApartadoBaremacion [codNum=" + codNum + ", bloque=" + bloque + ", codigo=" + codigo
-				+ ", nombre=" + nombre + ", activo=" + activo + "]";
+				+ ", nombre=" + nombre + ", activo=" + activo + ", unidades=" + unidades + ", valorMinimo=" + valorMinimo 
+				+ ", valorMaximo=" + valorMaximo + ", afinidad=" + afinidad + "]";
 	}
 	
 	@Override
@@ -149,6 +168,10 @@ public class ItemBaremacion implements Serializable {
 		result = prime * result + ((bloque == null) ? 0 : bloque.hashCode());
 		result = prime * result + ((nombre == null) ? 0 : nombre.hashCode());	
 		result = prime * result + ((activo == null) ? 0 : activo.hashCode());
+		result = prime * result + ((unidades == null) ? 0 : unidades.hashCode());
+		result = prime * result + ((valorMinimo == null) ? 0 : valorMinimo.hashCode());
+		result = prime * result + ((valorMaximo == null) ? 0 : valorMaximo.hashCode());
+		result = prime * result + ((afinidad == null) ? 0 : afinidad.hashCode());
 		return result;
 	}
 	
@@ -191,6 +214,34 @@ public class ItemBaremacion implements Serializable {
 				return false;
 			}
 		} else if (!activo.equals(other.activo)) {
+			return false;
+		}
+		if (unidades == null) {
+			if (other.unidades != null) {
+				return false;
+			}
+		} else if (!unidades.equals(other.unidades)) {
+			return false;
+		}
+		if (valorMinimo == null) {
+			if (other.valorMinimo != null) {
+				return false;
+			}
+		} else if (!valorMinimo.equals(other.valorMinimo)) {
+			return false;
+		}
+		if (valorMaximo == null) {
+			if (other.valorMaximo != null) {
+				return false;
+			}
+		} else if (!valorMaximo.equals(other.valorMaximo)) {
+			return false;
+		}
+		if (afinidad == null) {
+			if (other.afinidad != null) {
+				return false;
+			}
+		} else if (!afinidad.equals(other.afinidad)) {
 			return false;
 		}
 		

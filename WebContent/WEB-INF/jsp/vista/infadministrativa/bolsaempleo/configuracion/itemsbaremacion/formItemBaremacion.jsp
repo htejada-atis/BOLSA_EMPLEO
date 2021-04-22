@@ -67,9 +67,8 @@ String codigoCompleto = apartado.getCodigo() + "." + bloque.getCodigo() + "." + 
 
 <script>
 	$(document).ready(function() {
-		document.getElementById("item_codigo").addEventListener("input", function(event) {
+		document.getElementById("bloque_codigo").addEventListener("input", function(event) {
 			document.getElementById("item_bloque_codigo").value = <%= apartado.getCodigo() + "." + bloque.getCodigo() %>  + "." + this.value;
 		});
 	});
-
 </script>

@@ -27,10 +27,28 @@ VistaItemsBaremacion bean = (VistaItemsBaremacion) uvdatos.getVistas().get(Vista
 	<table class="bluetable bolsaempleo custom" id="tableApartadosGenerales">
 		<tr>
 			<th scope="col" style="width:10%" title="Código apartado">Código</th>
-			<th scope="col" style="width:50%" title="Código de area">Nombre del bloque</th>
-			<th scope="col" style="width:15%" title="Puntuación máxima por bloque">Puntuación max.</th>
-			<th scope="col" style="width:15%" title="Porcentaje máximo por bloque">Porcentaje max.</th>
+			<th scope="col" style="width:40%" title="Nombre del bloque">Nombre del bloque</th>
+			<th scope="col" style="width:10%" title="Puntuación máxima por bloque">Puntuación max.</th>
+			<th scope="col" style="width:10%" title="Porcentaje máximo por bloque">Porcentaje max.</th>
+			<th scope="col" style="width:10%" title="Méritos preferentes">M. Preferentes</th>
+			<th scope="col" style="width:10%" title="Factor mérito preferente">Factor M. Pref.</th>
 			<th scope="col" class="center" style="width:10%">Activo</th>
+		</tr>
+		<tbody>				
+		</tbody>
+		<tfoot>
+			<tr>
+				<th colSpan="7" style="width:100%"></th>
+			</tr>
+		</tfoot>
+	</table>
+	
+	<table class="bluetable bolsaempleo custom" id="tableBloques">
+		<tr>
+			<th scope="col" style="width:10%" title="Código bloque">Código</th>
+			<th scope="col" style="width:70%" title="Nombre de apartado">Nombre del apartado</th>
+			<th scope="col" style="width:10%" title="Número máximo de méritos por apartado">Num. Max. Méritos</th>
+			<th scope="col" style="width:10%">Activo</th>
 		</tr>
 		<tbody>				
 		</tbody>
@@ -41,32 +59,22 @@ VistaItemsBaremacion bean = (VistaItemsBaremacion) uvdatos.getVistas().get(Vista
 		</tfoot>
 	</table>
 	
-	<table class="bluetable bolsaempleo custom" id="tableBloques">
-		<tr>
-			<th scope="col" style="width:15%" title="Código bloque">Código</th>
-			<th scope="col" style="width:75%" title="Código de area">Nombre del apartado</th>
-			<th scope="col" style="width:10%">Activo</th>
-		</tr>
-		<tbody>				
-		</tbody>
-		<tfoot>
-			<tr>
-				<th colSpan="4" style="width:100%"></th>
-			</tr>
-		</tfoot>
-	</table>
-	
 	<table class="bluetable bolsaempleo custom" id="tableItems">
 		<tr>
-			<th scope="col" style="width:15%" title="Código ítem">Código</th>
-			<th scope="col" style="width:75%" title="Código de area">Nombre del ítem</th>
+			<th scope="col" style="width:10%" title="Código ítem">Código</th>
+			<th scope="col" style="width:30%" title="Nombre del ítem">Nombre del ítem</th>
+			<th scope="col" style="width:10%" title="Tipo de unidad para los valores del ítem">Unidades</th>
+			<th scope="col" style="width:10%" title="Valor del ítem">Valor</th>
+			<th scope="col" style="width:10%" title="Valor mínimo para los méritos">Valor Min.</th>
+			<th scope="col" style="width:10%" title="Valor máximo para los méritos">Valor Max.</th>
+			<th scope="col" style="width:10%" title="Afinidad con el área de conocimiento">Afinidad</th>
 			<th scope="col" style="width:10%">Activo</th>
 		</tr>
 		<tbody>				
 		</tbody>
 		<tfoot>
 			<tr>
-				<th colSpan="4" style="width:100%"></th>
+				<th colSpan="8" style="width:100%"></th>
 			</tr>
 		</tfoot>
 	</table>
@@ -80,10 +88,8 @@ VistaItemsBaremacion bean = (VistaItemsBaremacion) uvdatos.getVistas().get(Vista
 		var activatorBloque = false;
 		var activatorItem = false;
 		
-		<% 
-    	if (bean.getApartadoBaremacion() != null) {
-    		if (bean.getApartadoBaremacion().isActivo()) {
-    	%>
+		<%if (bean.getApartadoBaremacion() != null) {
+    		if (bean.getApartadoBaremacion().getActivo()) {%>
     			activatorApartado = false;
     	<%
     		} else {
@@ -100,12 +106,10 @@ VistaItemsBaremacion bean = (VistaItemsBaremacion) uvdatos.getVistas().get(Vista
         		} else {
         %>
         			activatorBloque = true;
-        <%
-        		}
+        <%}
     			
     			if (bean.getItemBaremacion() != null) {
-    				if (bean.getItemBaremacion().isActivo()) {
-    	%>
+    				if (bean.getItemBaremacion().getActivo()) {%>
     					activatorItem = false;
         <%
     				} else {
@@ -142,6 +146,15 @@ VistaItemsBaremacion bean = (VistaItemsBaremacion) uvdatos.getVistas().get(Vista
 		        {'data': 'nombre', 'filter': true},
 		        {'data': 'puntuacionMaxima'},
 		        {'data': 'porcentajeMaximo'},
+		        {'data': 'meritosPreferentes', 'filter': {'type': 'selectBoolean', 'true': 'Si', 'false': 'No'}, 'render': function(row) {
+	        		if(row.meritosPreferentes){
+	        			return "<div title='Ponderado por méritos preferentes' class='circle-true'></div>"; 
+	        		}
+	        		else{
+	        			return "<div title='Sin ponderación por méritos preferentes' class='circle-false'></div>"; 
+	        		}
+	        	}},
+	        	{'data': 'factorMeritoPrefente'},
 		        {'data': 'activo', 'filter': {'type': 'selectBoolean', 'true': 'Activo', 'false': 'Inactivo'}, 'render': function(row) {
 	        		if(row.activo){
 	        			return "<div title='Activo' class='circle-true'></div>"; 
@@ -187,7 +200,7 @@ VistaItemsBaremacion bean = (VistaItemsBaremacion) uvdatos.getVistas().get(Vista
 			    "ajax": { url: "<%= ControladorItemsBaremacion.URL_PATTERN_AJAX %>", async: false },
 			    "params": {"<%=ControladorItemsBaremacion.PARAM_APARTADO%>": <%= bean.getApartadoBaremacion().getCodNum() %>},
 			    "pageSize": 10,
-			    "title": "APARTADOS [<%= bean.getApartadoBaremacion().getNombre() %>]",
+			    "title": "APARTADOS: <%= bean.getApartadoBaremacion().getNombre() %>",
 			    "filterable": true,
 			    "defaultOrderBy": 0,
 			    "defaultOrderDirection": "asc",
@@ -204,6 +217,7 @@ VistaItemsBaremacion bean = (VistaItemsBaremacion) uvdatos.getVistas().get(Vista
 			    		return row.apartado.codigo + "." + row.codigo;
 			    	}},
 			        {'data': 'nombre', 'filter': true},
+			        {'data': 'numeroMaximoMeritos'},			        
 			        {'data': 'activo', 'filter': {'type': 'selectBoolean', 'true': 'Activo', 'false': 'Inactivo'}, 'render': function(row) {
 		        		if(row.activo){
 		        			return "<div class='circle-true'></div>"; 
@@ -248,7 +262,7 @@ VistaItemsBaremacion bean = (VistaItemsBaremacion) uvdatos.getVistas().get(Vista
 				    "ajax": { url: "<%= ControladorItemsBaremacion.URL_PATTERN_AJAX %>", async: false },
 				    "params": {"<%=ControladorItemsBaremacion.PARAM_BLOQUE%>": <%= bean.getBloqueBaremacion().getCodNum() %>},
 				    "pageSize": 10,
-				    "title": "ÍTEMS [<%= bean.getBloqueBaremacion().getNombre() %>]",
+				    "title": "ÍTEMS: <%= bean.getBloqueBaremacion().getNombre() %>",
 				    "filterable": true,
 				    "defaultOrderBy": 0,
 				    "defaultOrderDirection": "asc",
@@ -265,6 +279,11 @@ VistaItemsBaremacion bean = (VistaItemsBaremacion) uvdatos.getVistas().get(Vista
 				    		return row.bloque.apartado.codigo + "." + row.bloque.codigo + "." + row.codigo;
 				    	}},
 				        {'data': 'nombre', 'filter': true},
+				        {'data': 'unidades'},
+				        {'data': 'valor'},
+				        {'data': 'valorMinimo'},
+				        {'data': 'valorMaximo'},				        
+				        {'data': 'afinidad'},
 				        {'data': 'activo', 'filter': {'type': 'selectBoolean', 'true': 'Activo', 'false': 'Inactivo'}, 'render': function(row) {
 			        		if(row.activo){
 			        			return "<div class='circle-true'></div>"; 

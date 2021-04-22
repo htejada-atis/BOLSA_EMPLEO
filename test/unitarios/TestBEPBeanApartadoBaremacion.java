@@ -30,7 +30,7 @@ public class TestBEPBeanApartadoBaremacion {
 		assertEquals(id, apartado.getCodNum());
 		assertEquals(CADENA, apartado.getCodigo());
 		assertEquals(CADENA, apartado.getNombre());
-		assertEquals(BOOLEANO, apartado.isActivo());
+		assertEquals(BOOLEANO, apartado.getActivo());
 		assertNotNull(apartado.toString());
 	}
 	
