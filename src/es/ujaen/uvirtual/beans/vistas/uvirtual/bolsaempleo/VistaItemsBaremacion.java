@@ -17,7 +17,8 @@ public class VistaItemsBaremacion extends Vista implements Serializable {
     private ApartadoBaremacion apartado;
     private BloqueBaremacion bloque;
     private ItemBaremacion item;
-    
+    private String ultimoCodigo; 
+        
     public String getVista() {
         return vista;
     }
@@ -57,5 +58,12 @@ public class VistaItemsBaremacion extends Vista implements Serializable {
 	public void setItemBaremacion(ItemBaremacion pitem) {
 		this.item = pitem;
 	}
-    
+	
+	public String getUltimoCodigo() {
+		return this.ultimoCodigo;
+	}
+	
+	public void setUltimoCodigo(String codigo) {
+		this.ultimoCodigo = codigo;
+	}    
 }

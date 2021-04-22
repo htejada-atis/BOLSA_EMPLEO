@@ -50,7 +50,7 @@ public class ModeloUsuarioBolsaEmpleo {
 	public static final String USUARIO_EXCLUIDO = "S";
 	public static final String USUARIO_NO_EXCLUIDO = "N";
 	
-	public static final Integer PARAM_ROL_ID = 1051;
+	public static final Integer PARAM_ROL_CANDIDATO_ID = 1051;
 	
 	public static final int COLUMN_NOMBRE_MAXLENGTH = 20;
 	public static final int COLUMN_PRIMER_APELLIDO_MAXLENGTH = 40;
@@ -656,11 +656,15 @@ public class ModeloUsuarioBolsaEmpleo {
 		}	
 	}
 	
-	/** Comprueba si el usuario candidato se encuentra en UVIRTUAL .
+	/** 
+	 * Si hay usuario logeado, comprueba si está registrado en sistema. 
+	 * Si tenemos usuario en nuestro sistema, comprueba si está exluido o borrado (lanzando una excepción). 
+	 * Si no tenemos usuario en nuestro sistema, lo crea como candidato.
+	 *  
 	 * @param  datos .
-	 * @return Boolean s .
-	 * @throws SQLException en caso de error en la BD .
-	 * @throws UVException si noticia no es valida .
+	 * @return Boolean true si hay usuario logeado en el sistema o false en otro caso.
+	 * @throws SQLException en caso de error en la BD.
+	 * @throws UVException si noticia no es valida.
 	 */
 	public Boolean checkUser(UVDatos datos) throws SQLException, UVException {
 		Usuario usuArcos = datos.getUsuario();		
@@ -685,7 +689,7 @@ public class ModeloUsuarioBolsaEmpleo {
 						Rol role;
 						
 						try {
-							role = modeloRol.getRoleById(PARAM_ROL_ID);
+							role = modeloRol.getRoleById(PARAM_ROL_CANDIDATO_ID);
 							
 							UsuarioBolsaEmpleo usuarioFinal = 
 							new UsuarioBolsaEmpleo(usuArcos.getCodigoPersonaArcos(), usuArcos.getUid(), role, true, false);
@@ -706,6 +710,45 @@ public class ModeloUsuarioBolsaEmpleo {
 				}
 			}
 		}
+
+		
+//		Usuario usuArcos = datos.getUsuario();		
+		
+//		// no hay usuario logeado, salimos
+//		if (usuArcos == null) {
+//			return false;
+//		} 
+//		
+//		// comprobamos si el usuario existe en uvirtual (excepción si no existe)
+//		UsuarioBolsaEmpleo usuario = getUsuarioByCodCuenta(usuArcos.getUid());
+//		
+//		if (usuario.getExcluido()) {
+//			throw new UVException("No puede acceder, su perfil ha sido excluido por los siguientes motivos: " + usuario.getRazonExcluido());
+//		} else if (usuario.getBorrado()) {
+//			throw new UVException("No puede acceder, su perfil ha sido borrado de la base de datos");		
+//		} else if (usuArcos != null) {
+//			UsuarioBolsaEmpleo usuarioFinal = null;
+//			
+//			try {
+//				usuarioFinal = listaUsuario(usuArcos.getUid());
+//			} catch (UVException e) {
+//				// no existe el usuario en nuestras tablas, lo creamos como candidato
+//				ModeloRol modeloRol = ModeloRol.obtenerInstancia();
+//				Rol role = modeloRol.getRoleById(PARAM_ROL_CANDIDATO_ID);
+//					
+//				usuarioFinal = new UsuarioBolsaEmpleo(usuArcos.getCodigoPersonaArcos(), usuArcos.getUid(), role, true, false);
+//				insertaUsuario(usuarioFinal);
+//				
+//				return true;
+//			} finally {
+//				// refresamos los roles del usuario
+//				if (usuarioFinal != null) {
+//					CrearUsuario.refrescarUsuario(usuarioFinal.getCodCuenta());	
+//				}				
+//			}
+//			
+//			return false;
+//		}		
 	}
 	
 	/** Elimina un usuario.
