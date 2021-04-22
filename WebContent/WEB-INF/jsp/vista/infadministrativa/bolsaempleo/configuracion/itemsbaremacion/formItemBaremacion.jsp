@@ -7,6 +7,7 @@
 <%@ page import="es.ujaen.uvirtual.beans.uvirtual.bolsaempleo.ItemBaremacion" %>
 <%@ page import="es.ujaen.uvirtual.utilidades.EscapaHTML" %>
 <%@ page import="es.ujaen.uvirtual.utilidades.BolsaEmpleoUtils" %>
+<%@ page import="es.ujaen.uvirtual.modelo.bolsaempleo.ModeloBaremacion" %>
 
 <% 
 UVDatos uvdatos = (UVDatos) request.getAttribute(UVDatos.NOMBRE_ATRIBUTO);
@@ -58,6 +59,51 @@ String codigoCompleto = apartado.getCodigo() + "." + bloque.getCodigo() + "." + 
 	    			   value="<%= BolsaEmpleoUtils.getParamForm(request, ControladorItemsBaremacion.PARAM_ITEM_NOMBRE, item != null ? item.getNombre() : "") %>"/>
 	    	</div>
 		</div>
+		<div class="form-group-container col2">
+			<div class="form-group">
+				<%
+					String unidadesSelected = BolsaEmpleoUtils.getParamForm(request, ControladorItemsBaremacion.PARAM_ITEM_UNIDADES, item != null ? item.getUnidades() : ModeloBaremacion.ITEM_UNIDADES_UNIDADES); 
+				%>
+	    		<label for="item_unidades">Unidades</label>
+	    		<select class="params" id="item_unidades" name="<%= ControladorItemsBaremacion.PARAM_ITEM_UNIDADES %>" style="width:100%;">
+					<option value="<%= ModeloBaremacion.ITEM_UNIDADES_UNIDADES %>" <%= unidadesSelected.equals(ModeloBaremacion.ITEM_UNIDADES_UNIDADES) ? "selected=\"selected\"" : "" %>>Unidades</option>
+					<option value="<%= ModeloBaremacion.ITEM_UNIDADES_PUNTOS %>" <%= unidadesSelected.equals(ModeloBaremacion.ITEM_UNIDADES_PUNTOS) ? "selected=\"selected\"" : "" %>>Puntos</option>
+					<option value="<%= ModeloBaremacion.ITEM_UNIDADES_CREDITOS %>" <%= unidadesSelected.equals(ModeloBaremacion.ITEM_UNIDADES_CREDITOS) ? "selected=\"selected\"" : "" %>>Créditos</option>
+					<option value="<%= ModeloBaremacion.ITEM_UNIDADES_MESES %>" <%= unidadesSelected.equals(ModeloBaremacion.ITEM_UNIDADES_MESES) ? "selected=\"selected\"" : "" %>>Meses</option>
+					<option value="<%= ModeloBaremacion.ITEM_UNIDADES_ANIOS %>" <%= unidadesSelected.equals(ModeloBaremacion.ITEM_UNIDADES_ANIOS) ? "selected=\"selected\"" : "" %>>Años</option>
+				</select>				
+	    	</div>	    	
+		</div>
+		<div class="form-group-container col2">
+			<div class="form-group">
+	    		<label for="item_valor">Valor unitario</label>
+	    		<input class="form-input-custom" type="text" name="<%= ControladorItemsBaremacion.PARAM_ITEM_VALOR %>" id="item_valor" 
+	    			   value="<%= BolsaEmpleoUtils.getParamForm(request, ControladorItemsBaremacion.PARAM_ITEM_VALOR, item != null ? item.getValor().toString() : "") %>"/>
+	    	</div>
+	    	<div class="form-group">
+	    		<%
+					String afinidadSelected = BolsaEmpleoUtils.getParamForm(request, ControladorItemsBaremacion.PARAM_ITEM_AFINIDAD, item != null ? item.getAfinidad() : ModeloBaremacion.ITEM_AFINIDADES_SIN_MODULACION); 
+				%>
+	    		<label for="item_afinida">Afinidad</label>
+	    		<select class="params" id="item_unidades" name="<%= ControladorItemsBaremacion.PARAM_ITEM_AFINIDAD %>" style="width:100%;">
+					<option value="<%= ModeloBaremacion.ITEM_AFINIDADES_SIN_MODULACION %>" <%= unidadesSelected.equals(ModeloBaremacion.ITEM_AFINIDADES_SIN_MODULACION) ? "selected=\"selected\"" : "" %>>N - Las contribuciones no se someten a modulación</option>
+					<option value="<%= ModeloBaremacion.ITEM_AFINIDADES_PROPIAS_AL_AREA %>" <%= unidadesSelected.equals(ModeloBaremacion.ITEM_AFINIDADES_PROPIAS_AL_AREA) ? "selected=\"selected\"" : "" %>>AA - Solo se valoran las contribuaciones propias del area, sometidas a modulación</option>
+					<option value="<%= ModeloBaremacion.ITEM_AFINIDADES_PROPIAS_AL_PERFIL_INVERSTIGADOR %>" <%= unidadesSelected.equals(ModeloBaremacion.ITEM_AFINIDADES_PROPIAS_AL_PERFIL_INVERSTIGADOR) ? "selected=\"selected\"" : "" %>>AI - Solo se valoran las contribuaciones asociadas al perfil investigador, sometidas a modulación</option>
+				</select>
+	    	</div>
+		</div>
+		<div class="form-group-container col2">
+			<div class="form-group">
+	    		<label for="bloque_valor_minimo">Valor mínimo</label>
+	    		<input class="form-input-custom" type="text" name="<%= ControladorItemsBaremacion.PARAM_ITEM_VALOR_MINIMO %>" id="bloque_valor_minimo" 
+	    			   value="<%= BolsaEmpleoUtils.getParamForm(request, ControladorItemsBaremacion.PARAM_ITEM_VALOR_MINIMO, item != null ? item.getValorMinimo().toString() : "0.1") %>"/>
+	    	</div>
+	    	<div class="form-group">
+	    		<label for="bloque_valor_maximo">Valor máximo</label>
+	    		<input class="form-input-custom" type="text" name="<%= ControladorItemsBaremacion.PARAM_ITEM_VALOR_MAXIMO %>" id="bloque_valor_maximo" 
+	    			   value="<%= BolsaEmpleoUtils.getParamForm(request, ControladorItemsBaremacion.PARAM_ITEM_VALOR_MAXIMO, item != null ? item.getValorMaximo().toString() : "1000") %>"/>
+	    	</div>
+		</div>
 		<div class="form-btn">
     		<input id="item_enviar" type="submit" name="<%= ControladorItemsBaremacion.PARAM_ENVIAR %>" 
     			   value="<%= item != null ? "Guardar cambios" : "Insertar item" %>"/>
@@ -67,9 +113,8 @@ String codigoCompleto = apartado.getCodigo() + "." + bloque.getCodigo() + "." + 
 
 <script>
 	$(document).ready(function() {
-		document.getElementById("item_codigo").addEventListener("input", function(event) {
+		document.getElementById("bloque_codigo").addEventListener("input", function(event) {
 			document.getElementById("item_bloque_codigo").value = <%= apartado.getCodigo() + "." + bloque.getCodigo() %>  + "." + this.value;
 		});
 	});
-
 </script>

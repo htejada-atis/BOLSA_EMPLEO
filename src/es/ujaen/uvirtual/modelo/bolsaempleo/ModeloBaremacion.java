@@ -27,33 +27,37 @@ public class ModeloBaremacion {
 	public static final int ORDER_COLUMN_INDEX_APARTADOS_NOMBRE = 1;
 	public static final int ORDER_COLUMN_INDEX_APARTADOS_PUNTUACIONMAXIMA = 2;
 	public static final int ORDER_COLUMN_INDEX_APARTADOS_PORCENTAJEMAXIMO = 3;
-	public static final int ORDER_COLUMN_INDEX_APARTADOS_ACTIVO = 4;
+	public static final int ORDER_COLUMN_INDEX_APARTADOS_MERITOSPREFERENTES = 4;
+	public static final int ORDER_COLUMN_INDEX_APARTADOS_ACTIVO = 5;
 	
 	// ordenación bloques de baremación
 	public static final int ORDER_COLUMN_INDEX_BLOQUES_CODIGO = 0;
 	public static final int ORDER_COLUMN_INDEX_BLOQUES_NOMBRE = 1;
-	public static final int ORDER_COLUMN_INDEX_BLOQUES_ACTIVO = 2;
-	
+	public static final int ORDER_COLUMN_INDEX_BLOQUES_NUMERO_MAXIMO_MERITOS = 2;
+	public static final int ORDER_COLUMN_INDEX_BLOQUES_ACTIVO = 3;
+	 
 	// ordenación ítems de baremación
 	public static final int ORDER_COLUMN_INDEX_ITEMS_CODIGO = 0;
 	public static final int ORDER_COLUMN_INDEX_ITEMS_NOMBRE = 1;
-	public static final int ORDER_COLUMN_INDEX_ITEMS_ACTIVO = 2;
+	public static final int ORDER_COLUMN_INDEX_ITEMS_UNIDADES = 2;
+	public static final int ORDER_COLUMN_INDEX_ITEMS_VALOR = 3;
+	public static final int ORDER_COLUMN_INDEX_ITEMS_VALOR_MINIMO = 4; 
+	public static final int ORDER_COLUMN_INDEX_ITEMS_VALOR_MAXIMO = 5;
+	public static final int ORDER_COLUMN_INDEX_ITEMS_AFINIDAD = 6;
+	public static final int ORDER_COLUMN_INDEX_ITEMS_ACTIVO = 7;
 	
-	// opción de consulta por defecto devuelve la lista con todas las filas de la tabla
-	public static final int OPCION_DEFAULT = 0;
-	// opción de consulta que filtra la lista con un id dado
-	public static final int OPCION_1 = 1;
-	// opción de consulta para comprobar si ya existe un código al editar
-	public static final int OPCION_2 = 2;
-	// opción de consulta para comprobar si ya existe un código al agregar
-	public static final int OPCION_3 = 3;
-	// opción de consulta para obtener todos los ítems de un apartado
-	public static final int OPCION_4 = 4;
-	// opción de consulta para editar campos
-	public static final int OPCION_5 = 5;
-	// opción de consulta para desactivar o activar
-	public static final int OPCION_6 = 6;
+	// tipos de unidades de los items
+	public static final String ITEM_UNIDADES_UNIDADES = "UNIDADES";
+	public static final String ITEM_UNIDADES_PUNTOS = "PUNTOS";
+	public static final String ITEM_UNIDADES_CREDITOS = "CREDITOS";
+	public static final String ITEM_UNIDADES_MESES = "MESES";
+	public static final String ITEM_UNIDADES_ANIOS = "ANIOS";
 	
+	// tipos de afinidades de los items
+	public static final String ITEM_AFINIDADES_SIN_MODULACION = "N";
+	public static final String ITEM_AFINIDADES_PROPIAS_AL_AREA = "AA";
+	public static final String ITEM_AFINIDADES_PROPIAS_AL_PERFIL_INVERSTIGADOR = "AI";
+		
 	// errores
 	public static final String ERROR_APARTADO_NOEXITE = "Apartado no encontrado";
 	public static final String ERROR_ITEM_NOEXITE = "Item no encontrado";
@@ -67,6 +71,8 @@ public class ModeloBaremacion {
 	
 	public static final Integer COLUMN_CODIGO_MAXLENGTH = 3; // logitud máxima de los códigos
 	public static final Integer COLUMN_NOMBRE_MAXLENGTH = 100; // logitud máxima de los nombres
+	
+	public static final Float MINIMO_VALOR_FLOAT = (float) 0.01;
 	
     protected static ModeloBaremacion eInstancia = null;
 	
@@ -161,7 +167,9 @@ public class ModeloBaremacion {
 		dataTable.setColumn(ORDER_COLUMN_INDEX_APARTADOS_NOMBRE, "bepapa.NOMBRE");
 		dataTable.setColumn(ORDER_COLUMN_INDEX_APARTADOS_PUNTUACIONMAXIMA, "bepapa.PUNTUACIONMAXIMA");
 		dataTable.setColumn(ORDER_COLUMN_INDEX_APARTADOS_PORCENTAJEMAXIMO, "bepapa.PORCENTAJEMAXIMO");
+		dataTable.setColumn(ORDER_COLUMN_INDEX_APARTADOS_MERITOSPREFERENTES, "bepapa.MERITOS_PREFERENTES", DataTableColumn.COLUMN_TYPE_BOOLEAN);
 		dataTable.setColumn(ORDER_COLUMN_INDEX_APARTADOS_ACTIVO, "bepapa.FLGACTIVO", DataTableColumn.COLUMN_TYPE_BOOLEAN);
+		
 		dataTable.setQuery(consulta);
 				
 		try (Connection conexion = ConexionUvirtual.obtenerInstancia();
@@ -191,14 +199,14 @@ public class ModeloBaremacion {
 	public void insertaApartado(ApartadoBaremacion apartado) throws SQLException, UVException {
 		this.chequearApartadoParaInsertarOActualizar(apartado);
 		
-		String consulta = "INSERT INTO TBEP_APARTADOSBAREMACION (CODIGO,NOMBRE,FLGACTIVO,PUNTUACIONMAXIMA,PORCENTAJEMAXIMO) "
-				+ " VALUES (?,?,?,?,?)";
+		String consulta = "INSERT INTO TBEP_APARTADOSBAREMACION (CODIGO,NOMBRE,FLGACTIVO,PUNTUACIONMAXIMA,PORCENTAJEMAXIMO,MERITOS_PREFERENTES,FACTOR_MERITO_PREFERENTE) "
+				+ " VALUES (?,?,?,?,?,?,?)";
 		
 		try (Connection conexion = ConexionUvirtual.obtenerInstancia(); PreparedStatement stmt = conexion.prepareStatement(consulta);) {
 			int parameterIndex = 1;
 			stmt.setString(parameterIndex++, apartado.getCodigo());
 			stmt.setString(parameterIndex++, apartado.getNombre());
-			stmt.setString(parameterIndex++, apartado.isActivo() ? "S" : "N");
+			stmt.setString(parameterIndex++, apartado.getActivo() ? "S" : "N");
 			
 			if (apartado.getPuntuacionMaxima() != null) {
 				stmt.setFloat(parameterIndex++, apartado.getPuntuacionMaxima());
@@ -210,7 +218,15 @@ public class ModeloBaremacion {
 				stmt.setNull(parameterIndex++, Types.NULL);
 				stmt.setNull(parameterIndex++, Types.NULL);				
 			}
-						
+			
+			stmt.setString(parameterIndex++, apartado.getMeritosPreferentes() ? "S" : "N");
+			
+			if (apartado.getFactorMeritoPreferente() != null) {
+				stmt.setFloat(parameterIndex++, apartado.getFactorMeritoPreferente());
+			} else {
+				stmt.setNull(parameterIndex++, Types.NULL);
+			}
+			
 			stmt.executeUpdate();
 		}
 	}
@@ -248,14 +264,16 @@ public class ModeloBaremacion {
 				+ "NOMBRE = ?, "
 				+ "FLGACTIVO = ?, "
 				+ "PUNTUACIONMAXIMA = ?, "
-				+ "PORCENTAJEMAXIMO = ? "
+				+ "PORCENTAJEMAXIMO = ?, "
+				+ "MERITOS_PREFERENTES = ?, "
+				+ "FACTOR_MERITO_PREFERENTE = ? "
 				+ "WHERE CODNUM = ?";
 		
 		try (Connection conexion = ConexionUvirtual.obtenerInstancia(); PreparedStatement stmt = conexion.prepareStatement(consulta);) {
 			int parameterIndex = 1;
 			stmt.setString(parameterIndex++, apartado.getCodigo());
 			stmt.setString(parameterIndex++, apartado.getNombre());
-			stmt.setString(parameterIndex++, apartado.isActivo() ? "S" : "N");
+			stmt.setString(parameterIndex++, apartado.getActivo() ? "S" : "N");
 			
 			if (apartado.getPuntuacionMaxima() != null) {
 				stmt.setFloat(parameterIndex++, apartado.getPuntuacionMaxima());
@@ -267,6 +285,14 @@ public class ModeloBaremacion {
 				stmt.setNull(parameterIndex++, Types.NULL);
 				stmt.setNull(parameterIndex++, Types.NULL);				
 			}
+			stmt.setString(parameterIndex++, apartado.getMeritosPreferentes() ? "S" : "N");
+			
+			if (apartado.getFactorMeritoPreferente() != null) {
+				stmt.setFloat(parameterIndex++, apartado.getFactorMeritoPreferente());
+			} else {
+				stmt.setNull(parameterIndex++, Types.NULL);
+			}
+			
 			stmt.setInt(parameterIndex++, apartado.getCodNum());
 			stmt.executeUpdate();
 		}		
@@ -305,6 +331,8 @@ public class ModeloBaremacion {
 		apartado.setPuntuacionMaxima(rs.getFloat("PUNTUACIONMAXIMA") == 0 ? null : rs.getFloat("PUNTUACIONMAXIMA"));
 		apartado.setPorcentajeMaximo(rs.getFloat("PORCENTAJEMAXIMO") == 0 ? null : rs.getFloat("PORCENTAJEMAXIMO"));
 		apartado.setActivo(rs.getString("FLGACTIVO").equals("S"));
+		apartado.setMeritosPreferentes(rs.getString("MERITOS_PREFERENTES").equals("S"));
+		apartado.setFactorMeritoPreferente(rs.getFloat("FACTOR_MERITO_PREFERENTE") == 0 ? null : rs.getFloat("FACTOR_MERITO_PREFERENTE"));
 		return apartado;
 	}
 	
@@ -373,6 +401,12 @@ public class ModeloBaremacion {
 		// si este apartado tiene porcentaje, el resto tb con porcentaje
 		if (apartado.getPorcentajeMaximo() != null && !this.todosLosApartadosConPorcentaje()) {
 			throw new UVException(ERROR_APARTADO_EXISTEN_APARTADOS_CON_PUNTUACION);
+		}
+		
+		if (apartado.getMeritosPreferentes()) {
+			if (apartado.getFactorMeritoPreferente() == null || apartado.getFactorMeritoPreferente() <= 0) {
+				throw new UVException("Introduce un factor por mérito preferente");
+			}			
 		}
 	}
 	
@@ -460,11 +494,11 @@ public class ModeloBaremacion {
 		
 		String consulta = "SELECT bepblo.* "
 				+ "FROM TBEP_BLOQUESBAREMACION bepblo "
-				+ "INNER JOIN TBEP_APARTADOSBAREMACION bepapa ON bepapa.CODNUM = bepblo.BEPAPA_CODNUM "
 				+ "WHERE bepblo.BEPAPA_CODNUM = ? ";
 		
 		dataTable.setColumn(ORDER_COLUMN_INDEX_BLOQUES_CODIGO, "bepblo.CODIGO");
 		dataTable.setColumn(ORDER_COLUMN_INDEX_BLOQUES_NOMBRE, "bepblo.NOMBRE");
+		dataTable.setColumn(ORDER_COLUMN_INDEX_BLOQUES_NUMERO_MAXIMO_MERITOS, "bepblo.NUMERO_MAXIMO_MERITOS");
 		dataTable.setColumn(ORDER_COLUMN_INDEX_BLOQUES_ACTIVO, "bepblo.FLGACTIVO", DataTableColumn.COLUMN_TYPE_BOOLEAN);
 		dataTable.setQuery(consulta);
 				
@@ -522,7 +556,8 @@ public class ModeloBaremacion {
 		String consulta = "UPDATE TBEP_BLOQUESBAREMACION SET "
 				+ "CODIGO = ?, "
 				+ "NOMBRE = ?, "
-				+ "FLGACTIVO = ? "
+				+ "FLGACTIVO = ?, "
+				+ "NUMERO_MAXIMO_MERITOS = ? "
 				+ "WHERE CODNUM = ?";
 		
 		try (Connection conexion = ConexionUvirtual.obtenerInstancia(); PreparedStatement stmt = conexion.prepareStatement(consulta);) {
@@ -530,6 +565,13 @@ public class ModeloBaremacion {
 			stmt.setString(parameterIndex++, bloque.getCodigo());
 			stmt.setString(parameterIndex++, bloque.getNombre());
 			stmt.setString(parameterIndex++, bloque.isActivo() ? "S" : "N");
+			
+			if (bloque.getNumeroMaximoMeritos() != null) {
+				stmt.setInt(parameterIndex++, bloque.getNumeroMaximoMeritos());
+			} else {
+				stmt.setNull(parameterIndex++, Types.NULL);
+			}
+			
 			stmt.setInt(parameterIndex++, bloque.getCodNum());
 			stmt.executeUpdate();
 		}
@@ -544,14 +586,19 @@ public class ModeloBaremacion {
 		this.chequearBloqueParaInsertarOActualizar(bloque);
 		
 		String consulta = "INSERT INTO TBEP_BLOQUESBAREMACION " 
-				+ " (CODIGO,NOMBRE,BEPAPA_CODNUM)"
-				+ " VALUES (?,?,?)";
+				+ " (CODIGO,NOMBRE,BEPAPA_CODNUM,NUMERO_MAXIMO_MERITOS)"
+				+ " VALUES (?,?,?,?)";
 		
 		try (Connection conexion = ConexionUvirtual.obtenerInstancia(); PreparedStatement stmt = conexion.prepareStatement(consulta);) {
 			int parameterIndex = 1;
 			stmt.setString(parameterIndex++, bloque.getCodigo());
 			stmt.setString(parameterIndex++, bloque.getNombre());
 			stmt.setInt(parameterIndex++, bloque.getApartadoBaremacion().getCodNum());
+			if (bloque.getNumeroMaximoMeritos() != null) {
+				stmt.setInt(parameterIndex++, bloque.getNumeroMaximoMeritos());
+			} else {
+				stmt.setNull(parameterIndex++, Types.NULL);
+			}
 			stmt.executeUpdate();
 		}
 	}
@@ -586,6 +633,7 @@ public class ModeloBaremacion {
 		obj.setCodigo(rs.getString("CODIGO"));
 		obj.setNombre(rs.getString("NOMBRE"));
 		obj.setActivo(rs.getString("FLGACTIVO").equals("S"));
+		obj.setNumeroMaximoMeritos(rs.getInt("NUMERO_MAXIMO_MERITOS") == 0 ? null : rs.getInt("NUMERO_MAXIMO_MERITOS"));
 		obj.setApartadoBaremacion(this.getApartadoBaremacionById(rs.getInt("BEPAPA_CODNUM")));
 		return obj;
 	}
@@ -681,11 +729,15 @@ public class ModeloBaremacion {
 		
 		String consulta = "SELECT bepite.* "
 				+ "FROM TBEP_ITEMSBAREMACION bepite "
-				+ "INNER JOIN TBEP_BLOQUESBAREMACION bepblo ON bepblo.CODNUM = bepite.BEPBLO_CODNUM "
 				+ "WHERE bepite.BEPBLO_CODNUM = ? ";
 		
 		dataTable.setColumn(ORDER_COLUMN_INDEX_ITEMS_CODIGO, "bepite.CODIGO");
 		dataTable.setColumn(ORDER_COLUMN_INDEX_ITEMS_NOMBRE, "bepite.NOMBRE");
+		dataTable.setColumn(ORDER_COLUMN_INDEX_ITEMS_UNIDADES, "bepite.UNIDADES");
+		dataTable.setColumn(ORDER_COLUMN_INDEX_ITEMS_VALOR, "bepite.VALOR");
+		dataTable.setColumn(ORDER_COLUMN_INDEX_ITEMS_VALOR_MINIMO, "bepite.VALOR_MINIMO");
+		dataTable.setColumn(ORDER_COLUMN_INDEX_ITEMS_VALOR_MAXIMO, "bepite.VALOR_MAXIMO");
+		dataTable.setColumn(ORDER_COLUMN_INDEX_ITEMS_AFINIDAD, "bepite.VALOR_AFINIDAD");		
 		dataTable.setColumn(ORDER_COLUMN_INDEX_ITEMS_ACTIVO, "bepite.FLGACTIVO", DataTableColumn.COLUMN_TYPE_BOOLEAN);
 		dataTable.setQuery(consulta);
 				
@@ -749,14 +801,24 @@ public class ModeloBaremacion {
 		String consulta = "UPDATE TBEP_ITEMSBAREMACION SET "
 				+ "CODIGO = ?, "
 				+ "NOMBRE = ?, "
-				+ "FLGACTIVO = ? "
+				+ "FLGACTIVO = ?, "
+				+ "UNIDADES = ?, "
+				+ "VALOR = ?, "
+				+ "VALOR_MINIMO = ?, "
+				+ "VALOR_MAXIMO = ?, "
+				+ "AFINIDAD = ? "
 				+ "WHERE CODNUM = ?";
 		
 		try (Connection conexion = ConexionUvirtual.obtenerInstancia(); PreparedStatement stmt = conexion.prepareStatement(consulta);) {
 			int parameterIndex = 1;
 			stmt.setString(parameterIndex++, item.getCodigo());
 			stmt.setString(parameterIndex++, item.getNombre());
-			stmt.setString(parameterIndex++, item.isActivo() ? "S" : "N");
+			stmt.setString(parameterIndex++, item.getActivo() ? "S" : "N");
+			stmt.setString(parameterIndex++, item.getUnidades());
+			stmt.setFloat(parameterIndex++, item.getValor());
+			stmt.setFloat(parameterIndex++, item.getValorMinimo());
+			stmt.setFloat(parameterIndex++, item.getValorMaximo());
+			stmt.setString(parameterIndex++, item.getAfinidad());			
 			stmt.setInt(parameterIndex++, item.getCodNum());
 			stmt.executeUpdate();
 		}
@@ -791,14 +853,19 @@ public class ModeloBaremacion {
 		this.chequearItemParaInsertarOActualizar(item);
 		
 		String consulta = "INSERT INTO TBEP_ITEMSBAREMACION "
-				+ " (CODIGO,NOMBRE,BEPBLO_CODNUM)"
-				+ " VALUES (?,?,?)";
+				+ " (CODIGO,NOMBRE,BEPBLO_CODNUM,UNIDADES,VALOR,VALOR_MINIMO,VALOR_MAXIMO,AFINIDAD)"
+				+ " VALUES (?,?,?,?,?,?,?,?)";
 		
 		try (Connection conexion = ConexionUvirtual.obtenerInstancia(); PreparedStatement stmt = conexion.prepareStatement(consulta);) {
 			int parameterIndex = 1;
 			stmt.setString(parameterIndex++, item.getCodigo());
 			stmt.setString(parameterIndex++, item.getNombre());
 			stmt.setInt(parameterIndex++, item.getBloqueBaremacion().getCodNum());
+			stmt.setString(parameterIndex++, item.getUnidades());
+			stmt.setFloat(parameterIndex++, item.getValor());
+			stmt.setFloat(parameterIndex++, item.getValorMinimo());
+			stmt.setFloat(parameterIndex++, item.getValorMaximo());
+			stmt.setString(parameterIndex++, item.getAfinidad());
 			stmt.executeUpdate();
 		}
 	}
@@ -845,6 +912,11 @@ public class ModeloBaremacion {
 		item.setNombre(rs.getString("NOMBRE"));
 		item.setActivo(rs.getString("FLGACTIVO").equals("S"));
 		item.setBloqueBaremacion(this.getBloqueBaremacionById(rs.getInt("BEPBLO_CODNUM")));
+		item.setUnidades(rs.getString("UNIDADES"));
+		item.setValor(rs.getFloat("VALOR"));
+		item.setValorMinimo(rs.getFloat("VALOR_MINIMO"));
+		item.setValorMaximo(rs.getFloat("VALOR_MAXIMO"));
+		item.setAfinidad(rs.getString("AFINIDAD"));
 		return item;
 	}
 	
@@ -863,6 +935,38 @@ public class ModeloBaremacion {
 	private void chequearItemParaInsertarOActualizar(ItemBaremacion item) throws SQLException, UVException {
 		if (this.existeOtroItemActivoPorCodigo(item)) {
 			throw new UVException("Ya existe un item con el código introducido");
+		}
+		
+		ArrayList<String> unidades = new ArrayList<String>();
+		unidades.add(ITEM_UNIDADES_UNIDADES);
+		unidades.add(ITEM_UNIDADES_PUNTOS);
+		unidades.add(ITEM_UNIDADES_CREDITOS);
+		unidades.add(ITEM_UNIDADES_MESES);
+		unidades.add(ITEM_UNIDADES_ANIOS);
+			
+		if (!unidades.contains(item.getUnidades())) {
+			throw new UVException("Tipo de unidad no válida");
+		}
+					
+		ArrayList<String> afinidades = new ArrayList<String>();
+		afinidades.add(ITEM_AFINIDADES_SIN_MODULACION);
+		afinidades.add(ITEM_AFINIDADES_PROPIAS_AL_AREA);
+		afinidades.add(ITEM_AFINIDADES_PROPIAS_AL_PERFIL_INVERSTIGADOR);
+			
+		if (!afinidades.contains(item.getAfinidad())) {
+			throw new UVException("Tipo de afinidad no válida");
+		}
+		
+		if (item.getValorMinimo() < MINIMO_VALOR_FLOAT) {
+			throw new UVException("El valor mínimo deber al menos " + MINIMO_VALOR_FLOAT);
+		}
+		
+		if (item.getValorMaximo() < MINIMO_VALOR_FLOAT) {
+			throw new UVException("El valor máximo deber al menos " + MINIMO_VALOR_FLOAT);
+		}
+		
+		if (item.getValorMinimo() > item.getValorMaximo()) {
+			throw new UVException("El valor máximo deber mayor que el valor mínimo");
 		}
 	}
 

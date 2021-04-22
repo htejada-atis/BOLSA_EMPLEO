@@ -103,16 +103,17 @@ public class TestBEPModeloMerito {
      */
     @Test(expected = UVException.class)
     public void testE02InsertaMeritoUsuarioNull() throws SQLException, UVException {
-    	ItemBaremacion item = new ItemBaremacion(1);
-    	Merito merito = new Merito();
-    	merito.setDescripcion(DESCRIPCION_MERITO);
-    	merito.setObservacion(OBSERVACION_MERITO);
-    	merito.setValor(VALOR_MERITO);
-    	merito.setArchivo(ARCHIVO_MERITO);
-    	merito.setItemBaremacion(item);
-    	ModeloMerito modelo = ModeloMerito.obtenerInstancia();
-    	modelo.insertaMerito(merito, null);
-    	fail();
+//    	ItemBaremacion item = new ItemBaremacion(1);
+//    	Merito merito = new Merito();
+//    	merito.setDescripcion(DESCRIPCION_MERITO);
+//    	merito.setObservacion(OBSERVACION_MERITO);
+//    	merito.setValor(VALOR_MERITO);
+//    	merito.setArchivo(ARCHIVO_MERITO);
+//    	merito.setItemBaremacion(item);
+//    	ModeloMerito modelo = ModeloMerito.obtenerInstancia();
+//    	modelo.insertaMerito(merito, null);
+//    	fail();
+    	assertTrue(false);
     }
     
 }

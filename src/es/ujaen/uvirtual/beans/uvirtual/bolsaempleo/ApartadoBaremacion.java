@@ -16,6 +16,8 @@ public class ApartadoBaremacion implements Serializable {
 	private Boolean activo;
 	private Float puntuacionMaxima;
 	private Float porcentajeMaximo;
+	private Boolean meritosPreferentes;
+	private Float factorMeritoPrefente;
 
 	/**
 	 * Constructor por defecto.
@@ -33,9 +35,11 @@ public class ApartadoBaremacion implements Serializable {
 	 * @param pactivo           .
 	 * @param ppuntuacionMaxima .
 	 * @param pporcentajeMaximo .
+	 * @param pmeritoPreferente .
+	 * @param pfactorMeritoPrefente.
 	 */
 	public ApartadoBaremacion(Integer pcodNum, String pcodigo, String pnombre, Boolean pactivo, Float ppuntuacionMaxima,
-			Float pporcentajeMaximo) {
+			Float pporcentajeMaximo, Boolean pmeritoPreferente, Float pfactorMeritoPrefente) {
 		super();
 		this.codNum = pcodNum;
 		this.codigo = pcodigo;
@@ -43,54 +47,8 @@ public class ApartadoBaremacion implements Serializable {
 		this.activo = pactivo;
 		this.puntuacionMaxima = ppuntuacionMaxima;
 		this.porcentajeMaximo = pporcentajeMaximo;
-	}
-
-	/**
-	 * Constructor con parametros.
-	 * 
-	 * @param pcodNum .
-	 * @param pcodigo .
-	 * @param pnombre .
-	 */
-	public ApartadoBaremacion(Integer pcodNum, String pcodigo, String pnombre) {
-		super();
-		this.codNum = pcodNum;
-		this.codigo = pcodigo;
-		this.nombre = pnombre;
-	}
-
-	/**
-	 * Constructor con parametros.
-	 * 
-	 * @param pcodigo .
-	 * @param pnombre .
-	 */
-	public ApartadoBaremacion(String pcodigo, String pnombre) {
-		super();
-		this.codigo = pcodigo;
-		this.nombre = pnombre;
-	}
-
-	/**
-	 * Constructor con parametros.
-	 * 
-	 * @param pcodNum .
-	 * @param pactivo .
-	 */
-	public ApartadoBaremacion(Integer pcodNum, Boolean pactivo) {
-		super();
-		this.codNum = pcodNum;
-		this.activo = pactivo;
-	}
-
-	/**
-	 * Constructor con parametros.
-	 * 
-	 * @param pcodNum .
-	 */
-	public ApartadoBaremacion(Integer pcodNum) {
-		super();
-		this.codNum = pcodNum;
+		this.meritosPreferentes = pmeritoPreferente;
+		this.factorMeritoPrefente = pfactorMeritoPrefente;
 	}
 
 	/**
@@ -105,6 +63,8 @@ public class ApartadoBaremacion implements Serializable {
 		this.activo = copia.activo;
 		this.puntuacionMaxima = copia.puntuacionMaxima;
 		this.porcentajeMaximo = copia.porcentajeMaximo;
+		this.meritosPreferentes = copia.meritosPreferentes;
+		this.factorMeritoPrefente = copia.factorMeritoPrefente;
 	}
 
 	public Integer getCodNum() {
@@ -131,7 +91,7 @@ public class ApartadoBaremacion implements Serializable {
 		this.nombre = nombre;
 	}
 
-	public Boolean isActivo() {
+	public Boolean getActivo() {
 		return activo;
 	}
 
@@ -154,6 +114,22 @@ public class ApartadoBaremacion implements Serializable {
 	public void setPorcentajeMaximo(Float porcentajeMaximo) {
 		this.porcentajeMaximo = porcentajeMaximo;
 	}
+	
+	public Boolean getMeritosPreferentes() {
+		return meritosPreferentes;
+	}
+
+	public void setMeritosPreferentes(Boolean meritosPreferentes) {
+		this.meritosPreferentes = meritosPreferentes;
+	}
+	
+	public Float getFactorMeritoPreferente() {
+		return factorMeritoPrefente;
+	}
+
+	public void setFactorMeritoPreferente(Float factorMeritoPrefente) {
+		this.factorMeritoPrefente = factorMeritoPrefente;
+	}
 
 	public static long getSerialversionuid() {
 		return serialVersionUID;
@@ -162,7 +138,8 @@ public class ApartadoBaremacion implements Serializable {
 	@Override
 	public String toString() {
 		return "ApartadoBaremacion [codNum=" + codNum + ", codigo=" + codigo + ", nombre=" + nombre + ", activo="
-				+ activo + ", puntuacionMaxima=" + puntuacionMaxima + ", porcentajeMaximo=" + porcentajeMaximo + "]";
+				+ activo + ", puntuacionMaxima=" + puntuacionMaxima + ", porcentajeMaximo=" + porcentajeMaximo 
+				+ ", meritosPreferentes=" + meritosPreferentes + ", factorMeritoPrefente=" + factorMeritoPrefente + "]";
 	}
 
 	@Override
@@ -175,6 +152,8 @@ public class ApartadoBaremacion implements Serializable {
 		result = prime * result + ((activo == null) ? 0 : activo.hashCode());
 		result = prime * result + ((puntuacionMaxima == null) ? 0 : puntuacionMaxima.hashCode());
 		result = prime * result + ((porcentajeMaximo == null) ? 0 : porcentajeMaximo.hashCode());
+		result = prime * result + ((meritosPreferentes == null) ? 0 : meritosPreferentes.hashCode());
+		result = prime * result + ((factorMeritoPrefente == null) ? 0 : factorMeritoPrefente.hashCode());
 		return result;
 	}
 
@@ -231,6 +210,20 @@ public class ApartadoBaremacion implements Serializable {
 				return false;
 			}
 		} else if (!porcentajeMaximo.equals(other.porcentajeMaximo)) {
+			return false;
+		}
+		if (meritosPreferentes == null) {
+			if (other.meritosPreferentes != null) {
+				return false;
+			}
+		} else if (!meritosPreferentes.equals(other.meritosPreferentes)) {
+			return false;
+		}
+		if (factorMeritoPrefente == null) {
+			if (other.factorMeritoPrefente != null) {
+				return false;
+			}
+		} else if (!factorMeritoPrefente.equals(other.factorMeritoPrefente)) {
 			return false;
 		}
 

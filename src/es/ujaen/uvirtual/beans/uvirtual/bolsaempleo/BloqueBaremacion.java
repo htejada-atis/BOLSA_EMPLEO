@@ -14,6 +14,7 @@ public class BloqueBaremacion implements Serializable {
 	private String nombre;
 	private Boolean activo;
 	private ApartadoBaremacion apartado;
+	private Integer numeroMaximoMeritos;
 	
 	/** Constructor por defecto.
 	 */
@@ -27,58 +28,16 @@ public class BloqueBaremacion implements Serializable {
 	 * @param pcodigo .
 	 * @param pnombre .
 	 * @param pactivo .
+	 * @param pnumeroMaximoMeritos .
 	 */
-	public BloqueBaremacion(Integer pcodNum, ApartadoBaremacion papartado, String pcodigo, String pnombre, Boolean pactivo) {
+	public BloqueBaremacion(Integer pcodNum, ApartadoBaremacion papartado, String pcodigo, String pnombre, Boolean pactivo, Integer pnumeroMaximoMeritos) {
 		super();
 		this.apartado = papartado;
 		this.codNum = pcodNum;
 		this.codigo = pcodigo;
 		this.nombre = pnombre;
 		this.activo = pactivo;		
-	}
-	
-	/** Constructor con parametros.
-	 * @param pcodNum .
-	 * @param papartado .
-	 * @param pcodigo .
-	 * @param pnombre .
-	 */
-	public BloqueBaremacion(Integer pcodNum, ApartadoBaremacion papartado, String pcodigo, String pnombre) {
-		super();
-		this.apartado = papartado;
-		this.codNum = pcodNum;
-		this.codigo = pcodigo;
-		this.nombre = pnombre;
-	}
-	
-	/** Constructor con parametros.
-	 * @param papartado .
-	 * @param pcodigo .
-	 * @param pnombre .
-	 */
-	public BloqueBaremacion(ApartadoBaremacion papartado, String pcodigo, String pnombre) {
-		super();
-		this.apartado = papartado;
-		this.codigo = pcodigo;
-		this.nombre = pnombre;
-	}
-	
-	/** Constructor con parametros.
-	 * @param pcodNum .
-	 * @param pactivo .
-	 */
-	public BloqueBaremacion(Integer pcodNum, Boolean pactivo) {
-		super();
-		this.codNum = pcodNum;
-		this.activo = pactivo;		
-	}
-	
-	/** Constructor con parametros.
-	 * @param pcodNum .
-	 */
-	public BloqueBaremacion(Integer pcodNum) {
-		super();
-		this.codNum = pcodNum;
+		this.numeroMaximoMeritos = pnumeroMaximoMeritos;
 	}
 		
 	/** Constructor copia.
@@ -90,6 +49,7 @@ public class BloqueBaremacion implements Serializable {
 		this.codigo = copia.codigo;
 		this.nombre = copia.nombre;
 		this.activo = copia.activo;
+		this.numeroMaximoMeritos = copia.numeroMaximoMeritos;
 	}
 	
 	public Integer getCodNum() {
@@ -132,6 +92,14 @@ public class BloqueBaremacion implements Serializable {
 		this.activo = activo;
 	}
 	
+	public Integer getNumeroMaximoMeritos() {
+		return numeroMaximoMeritos;
+	}
+
+	public void setNumeroMaximoMeritos(Integer numeroMaximoMeritos) {
+		this.numeroMaximoMeritos = numeroMaximoMeritos;
+	}
+	
 	public static long getSerialversionuid() {
 		return serialVersionUID;
 	}
@@ -139,7 +107,7 @@ public class BloqueBaremacion implements Serializable {
 	@Override
 	public String toString() {
 		return "ApartadoBaremacion [codNum=" + codNum + ", apartado=" + apartado + ", codigo=" + codigo
-				+ ", nombre=" + nombre + ", activo=" + activo + "]";
+				+ ", nombre=" + nombre + ", activo=" + activo + ", numeroMaximoMeritos=" + numeroMaximoMeritos + "]";
 	}
 	
 	@Override
@@ -150,6 +118,7 @@ public class BloqueBaremacion implements Serializable {
 		result = prime * result + ((apartado == null) ? 0 : apartado.hashCode());
 		result = prime * result + ((nombre == null) ? 0 : nombre.hashCode());	
 		result = prime * result + ((activo == null) ? 0 : activo.hashCode());
+		result = prime * result + ((numeroMaximoMeritos == null) ? 0 : numeroMaximoMeritos.hashCode());
 		return result;
 	}
 	
@@ -192,6 +161,13 @@ public class BloqueBaremacion implements Serializable {
 				return false;
 			}
 		} else if (!activo.equals(other.activo)) {
+			return false;
+		}
+		if (numeroMaximoMeritos == null) {
+			if (other.numeroMaximoMeritos != null) {
+				return false;
+			}
+		} else if (!numeroMaximoMeritos.equals(other.numeroMaximoMeritos)) {
 			return false;
 		}
 		

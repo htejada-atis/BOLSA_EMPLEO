@@ -259,7 +259,7 @@ public class TestBEPControladorItemsBaremacion {
 		
 		assertEquals(MENSAJE_SIN_ERROR, 0, bean2.getMensajesDeError().size());
 		assertEquals(MENSAJE_SIN_ADVERTENCIAS, 0, bean2.getMensajesDeAdvertencia().size());
-		assertEquals(MENSAJE_CON_EXITO_ESPERADO, ControladorItemsBaremacion.MENSAJE_EXITO_ACTIVAR_APARTADO, bean2.getMensajesDeExito().get(0));
+		assertEquals(MENSAJE_CON_EXITO_ESPERADO, ControladorItemsBaremacion.MENSAJE_EXITO_APARTADO_ACTIVAR, bean2.getMensajesDeExito().get(0));
 	}
 	
 	/** activar bloque .
@@ -283,7 +283,7 @@ public class TestBEPControladorItemsBaremacion {
 		
 		assertEquals(MENSAJE_SIN_ERROR, 0, bean2.getMensajesDeError().size());
 		assertEquals(MENSAJE_SIN_ADVERTENCIAS, 0, bean2.getMensajesDeAdvertencia().size());
-		assertEquals(MENSAJE_CON_EXITO_ESPERADO, ControladorItemsBaremacion.MENSAJE_EXITO_ACTIVAR_BLOQUE, bean2.getMensajesDeExito().get(0));
+		assertEquals(MENSAJE_CON_EXITO_ESPERADO, ControladorItemsBaremacion.MENSAJE_EXITO_BLOQUE_ACTIVAR, bean2.getMensajesDeExito().get(0));
 	}
 	
 	/** activar item .
@@ -307,7 +307,7 @@ public class TestBEPControladorItemsBaremacion {
 		
 		assertEquals(MENSAJE_SIN_ERROR, 0, bean2.getMensajesDeError().size());
 		assertEquals(MENSAJE_SIN_ADVERTENCIAS, 0, bean2.getMensajesDeAdvertencia().size());
-		assertEquals(MENSAJE_CON_EXITO_ESPERADO, ControladorItemsBaremacion.MENSAJE_EXITO_ACTIVAR_ITEM, bean2.getMensajesDeExito().get(0));
+		assertEquals(MENSAJE_CON_EXITO_ESPERADO, ControladorItemsBaremacion.MENSAJE_EXITO_ITEM_ACTIVAR, bean2.getMensajesDeExito().get(0));
 	}
 	
 	/** desactivar apartado .
@@ -331,7 +331,7 @@ public class TestBEPControladorItemsBaremacion {
 		
 		assertEquals(MENSAJE_SIN_ERROR, 0, bean2.getMensajesDeError().size());
 		assertEquals(MENSAJE_SIN_ADVERTENCIAS, 0, bean2.getMensajesDeAdvertencia().size());
-		assertEquals(MENSAJE_CON_EXITO_ESPERADO, ControladorItemsBaremacion.MENSAJE_EXITO_DESACTIVAR_APARTADO, bean2.getMensajesDeExito().get(0));
+		assertEquals(MENSAJE_CON_EXITO_ESPERADO, ControladorItemsBaremacion.MENSAJE_EXITO_APARTADO_DESACTIVAR, bean2.getMensajesDeExito().get(0));
 	}
 	
 	/** desactivar bloque .
@@ -355,7 +355,7 @@ public class TestBEPControladorItemsBaremacion {
 		
 		assertEquals(MENSAJE_SIN_ERROR, 0, bean2.getMensajesDeError().size());
 		assertEquals(MENSAJE_SIN_ADVERTENCIAS, 0, bean2.getMensajesDeAdvertencia().size());
-		assertEquals(MENSAJE_CON_EXITO_ESPERADO, ControladorItemsBaremacion.MENSAJE_EXITO_DESACTIVAR_BLOQUE, bean2.getMensajesDeExito().get(0));
+		assertEquals(MENSAJE_CON_EXITO_ESPERADO, ControladorItemsBaremacion.MENSAJE_EXITO_BLOQUE_DESACTIVAR, bean2.getMensajesDeExito().get(0));
 	}
 	
 	/** desactivar item .
@@ -379,7 +379,7 @@ public class TestBEPControladorItemsBaremacion {
 		
 		assertEquals(MENSAJE_SIN_ERROR, 0, bean2.getMensajesDeError().size());
 		assertEquals(MENSAJE_SIN_ADVERTENCIAS, 0, bean2.getMensajesDeAdvertencia().size());
-		assertEquals(MENSAJE_CON_EXITO_ESPERADO, ControladorItemsBaremacion.MENSAJE_EXITO_DESACTIVAR_ITEM, bean2.getMensajesDeExito().get(0));
+		assertEquals(MENSAJE_CON_EXITO_ESPERADO, ControladorItemsBaremacion.MENSAJE_EXITO_ITEM_DESACTIVAR, bean2.getMensajesDeExito().get(0));
 	}
 	
 	/** editar apartado .
@@ -406,7 +406,7 @@ public class TestBEPControladorItemsBaremacion {
 		assertNotNull(MENSAJE_APARTADO_DEVUELTO, bean2.getApartadoBaremacion());
 		assertEquals(MENSAJE_SIN_ERROR, 0, bean2.getMensajesDeError().size());
 		assertEquals(MENSAJE_SIN_ADVERTENCIAS, 0, bean2.getMensajesDeAdvertencia().size());
-		assertEquals(MENSAJE_CON_EXITO_ESPERADO, ControladorItemsBaremacion.MENSAJE_EXITO_EDITAR_APARTADO, bean2.getMensajesDeExito().get(0));
+		assertEquals(MENSAJE_CON_EXITO_ESPERADO, ControladorItemsBaremacion.MENSAJE_EXITO_APARTADO_EDITAR, bean2.getMensajesDeExito().get(0));
 	}
 	
 	/** editar bloque .
@@ -433,7 +433,7 @@ public class TestBEPControladorItemsBaremacion {
 		assertNotNull(MENSAJE_BLOQUE_DEVUELTO, bean2.getBloqueBaremacion());
 		assertEquals(MENSAJE_SIN_ERROR, 0, bean2.getMensajesDeError().size());
 		assertEquals(MENSAJE_SIN_ADVERTENCIAS, 0, bean2.getMensajesDeAdvertencia().size());
-		assertEquals(MENSAJE_CON_EXITO_ESPERADO, ControladorItemsBaremacion.MENSAJE_EXITO_EDITAR_BLOQUE, bean2.getMensajesDeExito().get(0));
+		assertEquals(MENSAJE_CON_EXITO_ESPERADO, ControladorItemsBaremacion.MENSAJE_EXITO_BLOQUE_EDITAR, bean2.getMensajesDeExito().get(0));
 	}
 	
 	/** editar ítem .
@@ -460,7 +460,7 @@ public class TestBEPControladorItemsBaremacion {
 		assertNotNull(MENSAJE_ITEM_DEVUELTO, bean2.getItemBaremacion());
 		assertEquals(MENSAJE_SIN_ERROR, 0, bean2.getMensajesDeError().size());
 		assertEquals(MENSAJE_SIN_ADVERTENCIAS, 0, bean2.getMensajesDeAdvertencia().size());
-		assertEquals(MENSAJE_CON_EXITO_ESPERADO, ControladorItemsBaremacion.MENSAJE_EXITO_EDITAR_ITEM, bean2.getMensajesDeExito().get(0));
+		assertEquals(MENSAJE_CON_EXITO_ESPERADO, ControladorItemsBaremacion.MENSAJE_EXITO_ITEM_EDITAR, bean2.getMensajesDeExito().get(0));
 	}
 	
 	/** agregar apartado .
@@ -482,7 +482,7 @@ public class TestBEPControladorItemsBaremacion {
 		
 		assertEquals(MENSAJE_SIN_ERROR, 0, bean.getMensajesDeError().size());
 		assertEquals(MENSAJE_SIN_ADVERTENCIAS, 0, bean.getMensajesDeAdvertencia().size());
-		assertEquals(MENSAJE_CON_EXITO_ESPERADO, ControladorItemsBaremacion.MENSAJE_EXITO_AGREGAR_APARTADO, bean.getMensajesDeExito().get(0));
+		assertEquals(MENSAJE_CON_EXITO_ESPERADO, ControladorItemsBaremacion.MENSAJE_EXITO_APARTADO_AGREGAR, bean.getMensajesDeExito().get(0));
 	}
 	
 	/** agregar bloque .
@@ -508,7 +508,7 @@ public class TestBEPControladorItemsBaremacion {
 		
 		assertEquals(MENSAJE_SIN_ERROR, 0, bean2.getMensajesDeError().size());
 		assertEquals(MENSAJE_SIN_ADVERTENCIAS, 0, bean2.getMensajesDeAdvertencia().size());
-		assertEquals(MENSAJE_CON_EXITO_ESPERADO, ControladorItemsBaremacion.MENSAJE_EXITO_AGREGAR_BLOQUE, bean2.getMensajesDeExito().get(0));
+		assertEquals(MENSAJE_CON_EXITO_ESPERADO, ControladorItemsBaremacion.MENSAJE_EXITO_BLOQUE_AGREGAR, bean2.getMensajesDeExito().get(0));
 	}
 	
 	/** agregar ítem .
@@ -534,7 +534,7 @@ public class TestBEPControladorItemsBaremacion {
 		
 		assertEquals(MENSAJE_SIN_ERROR, 0, bean2.getMensajesDeError().size());
 		assertEquals(MENSAJE_SIN_ADVERTENCIAS, 0, bean2.getMensajesDeAdvertencia().size());
-		assertEquals(MENSAJE_CON_EXITO_ESPERADO, ControladorItemsBaremacion.MENSAJE_EXITO_AGREGAR_ITEM, bean2.getMensajesDeExito().get(0));
+		assertEquals(MENSAJE_CON_EXITO_ESPERADO, ControladorItemsBaremacion.MENSAJE_EXITO_ITEM_AGREGAR, bean2.getMensajesDeExito().get(0));
 	}
 	
 	/** obtener bloques sin apartado definido .
