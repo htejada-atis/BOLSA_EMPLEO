@@ -11,6 +11,7 @@ import es.ujaen.uvirtual.beans.uvirtual.bolsaempleo.Area;
 import es.ujaen.uvirtual.beans.uvirtual.bolsaempleo.Bolsa;
 import es.ujaen.uvirtual.modelo.conexion.ConexionUvirtual;
 import es.ujaen.uvirtual.utilidades.BolsaEmpleoDataTable;
+import es.ujaen.uvirtual.utilidades.BolsaEmpleoUtils;
 import es.ujaen.uvirtual.utilidades.UVException;
 import es.ujaen.uvirtual.utilidades.BolsaEmpleoDataTable.DataTableColumn;
 
@@ -312,4 +313,32 @@ public class ModeloArea {
 		
 		return dataTable;
 	}
+	
+	/** Seleccionar bolsas .
+	 * @param bolsas .
+	 * @param solicitud .
+	 * @throws UVException .
+	 * @throws SQLException .
+	 */
+	public void seleccionarBolsasSolicitud(List<String> bolsas, Integer solicitud) throws SQLException, UVException {
+		if (solicitud == null) {
+			throw new UVException("No se puede incluir bolsas en la solicitud sin el id de la solicitud");
+		}
+		
+		String params = BolsaEmpleoUtils.consultaMultiplesParametros(bolsas.size());
+		String consulta = "INSERT INTO TBEP_SOLICITUDBOLSAS (BEPBOL_CODNUM, BEPSOL_CODNUM)"
+				+ " SELECT bepbol.CODNUM AS BEPBOL_CODNUM, bepsol.CODNUM AS BEPSOL_CODNUM"
+				+ " FROM TBEP_BOLSAS bepbol, TBEP_SOLICITUDES bepsol WHERE bepsol.CODNUM = ? AND "
+				+ " bepbol.CODNUM IN (" + params + ")";
+		try (Connection conexion = ConexionUvirtual.obtenerInstancia(); PreparedStatement stmt = conexion.prepareStatement(consulta)) {
+			int indexParam = 1;
+			stmt.setInt(indexParam++, solicitud);
+			for (String bolsa: bolsas) {
+				stmt.setString(indexParam++, bolsa);		
+			}
+			stmt.executeUpdate();
+		}
+	}
+	
+	
 }
