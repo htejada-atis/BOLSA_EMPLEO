@@ -128,6 +128,8 @@ VistaItemsBaremacion bean = (VistaItemsBaremacion) uvdatos.getVistas().get(Vista
 		    "action": "<%= ControladorItemsBaremacion.ACCION_DATATABLE_APARTADOS %>",
 		    "filterable": true,
 		    "title": "BLOQUES",
+		    "defaultOrderBy": 0,
+		    "defaultOrderDirection": "asc",
 		    "clickable": {'onClick': function(row) {
 		    	var params = {
 	    				'a': '<%= ControladorItemsBaremacion.ACCION_APARTADO_SELECCIONADO %>', 
@@ -185,8 +187,10 @@ VistaItemsBaremacion bean = (VistaItemsBaremacion) uvdatos.getVistas().get(Vista
 			    "ajax": { url: "<%= ControladorItemsBaremacion.URL_PATTERN_AJAX %>", async: false },
 			    "params": {"<%=ControladorItemsBaremacion.PARAM_APARTADO%>": <%= bean.getApartadoBaremacion().getCodNum() %>},
 			    "pageSize": 10,
-			    "title": "APARTADOS",
+			    "title": "APARTADOS [<%= bean.getApartadoBaremacion().getNombre() %>]",
 			    "filterable": true,
+			    "defaultOrderBy": 0,
+			    "defaultOrderDirection": "asc",
 			    "action": "<%=ControladorItemsBaremacion.ACCION_DATATABLE_BLOQUES%>",
 			    "clickable": {'onClick': function(row) {
 			    	var params = {
@@ -210,6 +214,11 @@ VistaItemsBaremacion bean = (VistaItemsBaremacion) uvdatos.getVistas().get(Vista
 		        	}},
 			    ],
 			    "actions": [
+			    	{'label': 'Añadir', 'title': 'Añadir un nuevo bloque', 'onClick': function(selected) {
+			    		var params = {'a': '<%=ControladorItemsBaremacion.ACCION_AGREGAR_BLOQUE%>', 
+			    				'<%=ControladorItemsBaremacion.PARAM_APARTADO%>': '<%=bean.getApartadoBaremacion().getCodNum()%>'};
+		        		Atis.sendForm("<%=request.getRequestURI()%>", params);
+			    	}},
 			    	{'label': activatorBloqueName, 'showWhenSelected': true, 'title': activatorBloqueName + ' bloque seleccionado', 'onClick': function(selected) {
 		        		Atis.confirmDialog(activatorBloqueName + " bloque", "¿Desea " + activatorBloqueName + " el bloque seleccionado?", {
 			        		Si: function() {
@@ -224,12 +233,7 @@ VistaItemsBaremacion bean = (VistaItemsBaremacion) uvdatos.getVistas().get(Vista
 					          	$(this).dialog("close");
 					    	}
 					    });
-			    	}},
-			    	{'label': 'Añadir', 'title': 'Añadir un nuevo bloque', 'onClick': function(selected) {
-			    		var params = {'a': '<%=ControladorItemsBaremacion.ACCION_AGREGAR_BLOQUE%>', 
-			    				'<%=ControladorItemsBaremacion.PARAM_APARTADO%>': '<%=bean.getApartadoBaremacion().getCodNum()%>'};
-		        		Atis.sendForm("<%=request.getRequestURI()%>", params);
-			    	}},
+			    	}},			    	
 			    	{'label': 'Editar', 'showWhenSelected': true, 'title': 'Editar bloque seleccionado', 'onClick': function(selected) {
 			    		var params = {'a': '<%=ControladorItemsBaremacion.ACCION_EDITAR_BLOQUE%>', 
 			    				'<%=ControladorItemsBaremacion.PARAM_BLOQUE%>': selected};
@@ -244,8 +248,10 @@ VistaItemsBaremacion bean = (VistaItemsBaremacion) uvdatos.getVistas().get(Vista
 				    "ajax": { url: "<%= ControladorItemsBaremacion.URL_PATTERN_AJAX %>", async: false },
 				    "params": {"<%=ControladorItemsBaremacion.PARAM_BLOQUE%>": <%= bean.getBloqueBaremacion().getCodNum() %>},
 				    "pageSize": 10,
-				    "title": "ÍTEMS",
+				    "title": "ÍTEMS [<%= bean.getBloqueBaremacion().getNombre() %>]",
 				    "filterable": true,
+				    "defaultOrderBy": 0,
+				    "defaultOrderDirection": "asc",
 				    "action": "<%=ControladorItemsBaremacion.ACCION_DATATABLE_ITEMS%>",
 				    "clickable": {'onClick': function(row) {
 				    	var params = {
@@ -269,6 +275,11 @@ VistaItemsBaremacion bean = (VistaItemsBaremacion) uvdatos.getVistas().get(Vista
 			        	}},
 				    ],
 				    "actions": [
+				    	{'label': 'Añadir', 'title': 'Añadir un nuevo ítem', 'onClick': function(selected) {
+				    		var params = {'a': '<%=ControladorItemsBaremacion.ACCION_AGREGAR_ITEM%>', 
+				    				'<%=ControladorItemsBaremacion.PARAM_BLOQUE%>': '<%=bean.getBloqueBaremacion().getCodNum()%>'};
+			        		Atis.sendForm("<%=request.getRequestURI()%>", params);
+				    	}},
 				    	{'label': activatorItemName, 'showWhenSelected': true, 'title': activatorItemName + ' ítem seleccionado', 'onClick': function(selected) {
 			        		Atis.confirmDialog(activatorItemName + " ítem", "¿Desea " + activatorItemName + " el ítem seleccionado?", {
 				        		Si: function() {
@@ -283,12 +294,7 @@ VistaItemsBaremacion bean = (VistaItemsBaremacion) uvdatos.getVistas().get(Vista
 						          	$(this).dialog("close");
 						    	}
 						    });
-				    	}},
-				    	{'label': 'Añadir', 'title': 'Añadir un nuevo ítem', 'onClick': function(selected) {
-				    		var params = {'a': '<%=ControladorItemsBaremacion.ACCION_AGREGAR_ITEM%>', 
-				    				'<%=ControladorItemsBaremacion.PARAM_BLOQUE%>': '<%=bean.getBloqueBaremacion().getCodNum()%>'};
-			        		Atis.sendForm("<%=request.getRequestURI()%>", params);
-				    	}},
+				    	}},				    	
 				    	{'label': 'Editar', 'title': 'Editar ítem seleccionado', 'showWhenSelected': true, 'onClick': function(selected) {
 				    		var params = {'a': '<%=ControladorItemsBaremacion.ACCION_EDITAR_ITEM%>', 
 				    				'<%=ControladorItemsBaremacion.PARAM_ITEM%>': selected};

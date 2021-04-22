@@ -2,91 +2,74 @@
 <%@ page import="es.ujaen.uvirtual.beans.UVDatos"%>
 <%@	page import="es.ujaen.uvirtual.controlador.infadministrativa.bolsaempleo.ControladorItemsBaremacion"%>
 <%@ page import="es.ujaen.uvirtual.beans.vistas.uvirtual.bolsaempleo.VistaItemsBaremacion"%>
+<%@ page import="es.ujaen.uvirtual.beans.uvirtual.bolsaempleo.ApartadoBaremacion" %>
+<%@ page import="es.ujaen.uvirtual.beans.uvirtual.bolsaempleo.BloqueBaremacion" %>
 <%@ page import="es.ujaen.uvirtual.beans.uvirtual.bolsaempleo.ItemBaremacion" %>
 <%@ page import="es.ujaen.uvirtual.utilidades.EscapaHTML" %>
+<%@ page import="es.ujaen.uvirtual.utilidades.BolsaEmpleoUtils" %>
 
 <% 
 UVDatos uvdatos = (UVDatos) request.getAttribute(UVDatos.NOMBRE_ATRIBUTO);
 VistaItemsBaremacion bean = (VistaItemsBaremacion) uvdatos.getVistas().get(VistaItemsBaremacion.class.getName());
 
-String codigoApartado = bean.getItemBaremacion().getBloqueBaremacion().getApartadoBaremacion().getCodigo();
-String codigoBloque = bean.getItemBaremacion().getBloqueBaremacion().getCodigo();
-String codigoItem = bean.getItemBaremacion().getCodigo();
-String codigoCompleto = codigoApartado + "." + codigoBloque + "." + bean.getItemBaremacion().getCodigo();
-String nombre = "";
-
+ApartadoBaremacion apartado = bean.getApartadoBaremacion();
+BloqueBaremacion bloque = bean.getBloqueBaremacion();
+ItemBaremacion item = bean.getItemBaremacion();
+String codigoCompleto = apartado.getCodigo() + "." + bloque.getCodigo() + "." + (item != null ? item.getCodigo() : bean.getUltimoCodigo());
 %>
 
 
 <div class="bolsa-empleo">
-
-	<% 
-		if(bean.getMensajesDeError().size()>0) {
-			out.print("<div class='error'>" + bean.formatearMensajesDeError() + "</div>");
-		}
+	<% if (bean.getMensajesDeExito().size() > 0) { %>
+		<div id="exito" class="success">
+			<%= bean.formatearMensajesDeExito() %>
+		</div>
+	<% } %>
+	<% if (bean.getMensajesDeError().size() > 0) { %>
+		<div id="error" class="error">
+			<%= bean.formatearMensajesDeError() %>
+		</div>
+	<% } %>
 	
-		if(bean.getItemBaremacion().getCodNum() != null) {
-			nombre = bean.getItemBaremacion().getNombre();
-	    	out.print("<h2>Editar item</h2>");
-		} else {
-		    out.print("<h2>Nuevo item</h2>");
-		}
-	%>
-    
-    
+	<h2><%= item != null ? "Editar item" : "Nuevo item" %></h2>
+	
     <form id="actualizar_item" class="be-form" method="post" action="<%= request.getRequestURI() %>">
-    	<input type="hidden" name="<%= ControladorItemsBaremacion.PARAM_ACCION %>" id="accion_formulario" value="" />
-		<input type="hidden" name="<%= ControladorItemsBaremacion.PARAM_ITEM%>" id="item_id" value="" />
-		<input type="hidden" name="<%= ControladorItemsBaremacion.PARAM_BLOQUE%>" id="bloque_id" value="" />
-		<div class="form-group">
-    		<label for="item_bloque_codigo">Código completo</label>
-    		<input type="text" name="<%= ControladorItemsBaremacion.PARAM_BLOQUE_CODIGO %>" id="item_bloque_codigo" value="<%= codigoCompleto %>" disabled/>
-    	</div>
-    	<div class="form-group">
-    		<label for="item_codigo">Código</label>
-    		<input type="text" name="<%= ControladorItemsBaremacion.PARAM_ITEM_CODIGO %>" id="item_codigo" value="<%= codigoItem %>"/>
-    	</div>
-    	<div class="form-group">
-    		<label for="item_nombre">Nombre</label>
-    		<input type="text" name="<%= ControladorItemsBaremacion.PARAM_ITEM_NOMBRE %>" id="item_nombre" value="<%= nombre %>"/>
-    	</div>
-    	<div class="form-btn">
-    		<input id="item_enviar" type="submit" name="<%= ControladorItemsBaremacion.PARAM_ENVIAR %>" value="<%= bean.getItemBaremacion().getCodNum() != null ? "Guardar cambios" : "Insertar item" %>"/>
-    	</div>
+    	<input type="hidden" name="<%= ControladorItemsBaremacion.PARAM_ACCION %>" id="accion_formulario"
+    		   value="<%= item != null ? ControladorItemsBaremacion.ACCION_EDITAR_ITEM_CONFIRM : ControladorItemsBaremacion.ACCION_AGREGAR_ITEM_CONFIRM %>" /> 
+		<input type="hidden" name="<%= ControladorItemsBaremacion.PARAM_APARTADO %>" id="apartado_id" value="<%= apartado.getCodNum() %>" />			  
+		<input type="hidden" name="<%= ControladorItemsBaremacion.PARAM_BLOQUE %>" id="bloque_id" value="<%= bloque.getCodNum() %>" />
+		<input type="hidden" name="<%= ControladorItemsBaremacion.PARAM_ITEM %>" id="item_id" value="<%= item != null ? item.getCodNum() : "" %>" />
+		
+		<div class="form-group-container col1">
+			<div class="form-group">
+	    		<label for="bloque_apartado_codigo">Código completo</label>
+	    		<input class="form-input-custom" type="text" name="<%= ControladorItemsBaremacion.PARAM_BLOQUE_CODIGO %>" id="item_bloque_codigo" value="<%= codigoCompleto %>" disabled/>
+	    	</div>
+		</div>
+		<div class="form-group-container col2">
+			<div class="form-group">
+	    		<label for="bloque_codigo">Código</label>
+	    		<input class="form-input-custom" type="text" name="<%= ControladorItemsBaremacion.PARAM_ITEM_CODIGO %>" id="bloque_codigo" 
+	    			   value="<%= BolsaEmpleoUtils.getParamForm(request, ControladorItemsBaremacion.PARAM_ITEM_CODIGO, item != null ? item.getCodigo() : bean.getUltimoCodigo()) %>"/>
+	    	</div>
+	    	<div class="form-group">
+	    		<label for="bloque_nombre">Nombre</label>
+	    		<input class="form-input-custom" type="text" name="<%= ControladorItemsBaremacion.PARAM_ITEM_NOMBRE %>" id="bloque_nombre" 
+	    			   value="<%= BolsaEmpleoUtils.getParamForm(request, ControladorItemsBaremacion.PARAM_ITEM_NOMBRE, item != null ? item.getNombre() : "") %>"/>
+	    	</div>
+		</div>
+		<div class="form-btn">
+    		<input id="item_enviar" type="submit" name="<%= ControladorItemsBaremacion.PARAM_ENVIAR %>" 
+    			   value="<%= item != null ? "Guardar cambios" : "Insertar item" %>"/>
+    	</div>    	
     </form>
-    
 </div>
 
 <script>
-
-	function enviarItemBaremacion(event, submit_input) {
-		event.preventDefault();
-		
-		<% if (bean.getItemBaremacion().getCodNum() != null) { %>
-			input_accion = document.getElementById("accion_formulario");
-			input_accion.value = '<%= ControladorItemsBaremacion.ACCION_EDITAR_ITEM %>';
-			input_id = document.getElementById("item_id");
-			input_id.value = '<%= bean.getItemBaremacion().getCodNum() %>';
-		<% } else { %>
-			input_accion = document.getElementById("accion_formulario");
-			input_accion.value = '<%= ControladorItemsBaremacion.ACCION_AGREGAR_ITEM %>';
-			input_id = document.getElementById("bloque_id");
-			input_id.value = '<%= bean.getItemBaremacion().getBloqueBaremacion().getCodNum() %>';
-		<% } %>
-		
-		submit_input.form.submit();
-	}
-
 	$(document).ready(function() {
-		
-		document.getElementById("item_enviar").addEventListener("click", function(event) {
-			enviarItemBaremacion(event, this);
-		});
-		
 		document.getElementById("item_codigo").addEventListener("input", function(event) {
-			document.getElementById("item_bloque_codigo").value = <%= codigoApartado %> + "." + <%= codigoBloque %> + "." + this.value;
+			document.getElementById("item_bloque_codigo").value = <%= apartado.getCodigo() + "." + bloque.getCodigo() %>  + "." + this.value;
 		});
-		
 	});
 
 </script>

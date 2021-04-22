@@ -31,7 +31,8 @@ ApartadoBaremacion apartado = bean.getApartadoBaremacion();
 		<input type="hidden" 
 			   name="<%= ControladorItemsBaremacion.PARAM_ACCION %>" 
 			   id="accion_formulario" 
-			   value="<%= apartado != null ? ControladorItemsBaremacion.ACCION_AGREGAR_APARTADO_CONFIRM : ControladorItemsBaremacion.ACCION_EDITAR_APARTADO_CONFIRM %>" /> 
+			   value="<%= apartado != null ? 
+					   ControladorItemsBaremacion.ACCION_EDITAR_APARTADO_CONFIRM : ControladorItemsBaremacion.ACCION_AGREGAR_APARTADO_CONFIRM %>" /> 
 		<input type="hidden" 
 			   name="<%= ControladorItemsBaremacion.PARAM_APARTADO %>" 
 			   id="apartado_id" 
@@ -40,42 +41,30 @@ ApartadoBaremacion apartado = bean.getApartadoBaremacion();
 		<div class="form-group-container col2">
 			<div class="form-group">
 				<label for="apartado_codigo">Código</label> 
-				<input type="text"
-					class="form-input-custom"
-					name="<%= ControladorItemsBaremacion.PARAM_APARTADO_CODIGO %>"
-					id="apartado_codigo" 
+				<input type="text" class="form-input-custom" name="<%= ControladorItemsBaremacion.PARAM_APARTADO_CODIGO %>" id="apartado_codigo" 
 					value="<%= BolsaEmpleoUtils.getParamForm(request, ControladorItemsBaremacion.PARAM_APARTADO_CODIGO, apartado != null ? apartado.getCodigo() : bean.getUltimoCodigo()) %>" />
 			</div>
 			<div class="form-group">
 				<label for="apartado_nombre">Nombre</label>
-				<input type="text"
-					class="form-input-custom"
-					name="<%= ControladorItemsBaremacion.PARAM_APARTADO_NOMBRE %>"
-					id="apartado_nombre" 
+				<input type="text" class="form-input-custom" name="<%= ControladorItemsBaremacion.PARAM_APARTADO_NOMBRE %>" id="apartado_nombre" 
 					value="<%= BolsaEmpleoUtils.getParamForm(request, ControladorItemsBaremacion.PARAM_APARTADO_NOMBRE, apartado != null ? apartado.getNombre() : "") %>" />
 			</div>
 		</div>
 		<div class="form-group-container col2">
 			<div class="form-group">
 				<label for="apartado_puntuacionmaxima">Puntuación máxima del bloque</label> 
-				<input type="text" class="form-input-custom"
-					name="<%= ControladorItemsBaremacion.PARAM_APARTADO_PUNTUACIONMAXIMA %>"
-					id="apartado_puntuacionmaxima"
+				<input type="text" class="form-input-custom" name="<%= ControladorItemsBaremacion.PARAM_APARTADO_PUNTUACIONMAXIMA %>" id="apartado_puntuacionmaxima"
 					value="<%= BolsaEmpleoUtils.getParamForm(request, ControladorItemsBaremacion.PARAM_APARTADO_PUNTUACIONMAXIMA, apartado != null && apartado.getCodNum() != null && apartado.getPuntuacionMaxima() != null ? apartado.getPuntuacionMaxima().toString() : "") %>"/>
 			</div>
 			<div class="form-group">
 				<label for="apartado_porcentajemaximo">Porcentaje máximo del bloque</label> 
-				<input
-					type="text" class="form-input-custom"
-					name="<%=ControladorItemsBaremacion.PARAM_APARTADO_PORCENTAJEMAXIMO%>"
-					id="apartado_porcentajemaximo" 
+				<input type="text" class="form-input-custom" name="<%=ControladorItemsBaremacion.PARAM_APARTADO_PORCENTAJEMAXIMO%>" id="apartado_porcentajemaximo" 
 					value="<%= BolsaEmpleoUtils.getParamForm(request, ControladorItemsBaremacion.PARAM_APARTADO_PORCENTAJEMAXIMO, apartado != null && apartado.getCodNum() != null && apartado.getPorcentajeMaximo() != null ? apartado.getPorcentajeMaximo().toString() : "") %>"/>
 			</div>
 		</div>
 
 		<div class="form-btn">
-			<input id="apartado_enviar" type="submit"
-				name="<%= ControladorItemsBaremacion.PARAM_ENVIAR %>"
+			<input id="apartado_enviar" type="submit" name="<%= ControladorItemsBaremacion.PARAM_ENVIAR %>"
 				value="<%= apartado != null ? "Guardar cambios" : "Insertar apartado" %>" />
 		</div>
 	</form>
