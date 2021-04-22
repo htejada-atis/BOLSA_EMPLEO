@@ -7,14 +7,12 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-
 import es.ujaen.uvirtual.beans.uvirtual.bolsaempleo.Area;
 import es.ujaen.uvirtual.beans.uvirtual.bolsaempleo.Bolsa;
-import es.ujaen.uvirtual.beans.uvirtual.bolsaempleo.UsuarioBolsaEmpleo;
-import es.ujaen.uvirtual.modelo.ModeloAdministracion;
 import es.ujaen.uvirtual.modelo.conexion.ConexionUvirtual;
 import es.ujaen.uvirtual.utilidades.BolsaEmpleoDataTable;
 import es.ujaen.uvirtual.utilidades.UVException;
+import es.ujaen.uvirtual.utilidades.BolsaEmpleoDataTable.DataTableColumn;
 
 /**
  * Clase de modelo para la gestión de areas. 
@@ -26,6 +24,10 @@ public class ModeloArea {
 	public static final int ORDER_COLUMN_INDEX_CODIGO = 2;
 	public static final int ORDER_COLUMN_INDEX_AREA = 3;
 	public static final int ORDER_COLUMN_INDEX_BAREMALE = 4;
+	
+	public static final int ORDER_COLUMN_INDEX_CODIGO_SOLICITUDES = 1;
+	public static final int ORDER_COLUMN_INDEX_AREA_SOLICITUDES = 2;
+	public static final int ORDER_COLUMN_INDEX_BAREMABLE_SOLICITUDES = 4;
 	
     protected static ModeloArea eInstancia = null;
 	
@@ -189,5 +191,58 @@ public class ModeloArea {
 		}
 		
 		return dataTable;
-	}	
+	}
+	
+	/**
+	 * Listado de areas disponibles en la solicitud datatable. 
+	 * @param params para leer los parametros de paginación, ordenacion, etc .
+	 * @param usuario id del usuario .
+	 * @return listado de areas .
+	 * @throws SQLException en caso de error de base de datos .
+	 * @throws UVException error si no existe la area .
+	 */
+	public BolsaEmpleoDataTable<Bolsa> listaAreaSolicitudDatatable(Map<String, String[]> params, Integer usuario) throws SQLException, UVException {
+		List<Bolsa> bolsas = new ArrayList<>();
+		ModeloArea modeloArea = ModeloArea.obtenerInstancia();	
+		BolsaEmpleoDataTable<Bolsa> dataTable = new BolsaEmpleoDataTable<Bolsa>(params);
+		
+		String consulta =
+		"SELECT bepbol.* "
+		+ "FROM TBEP_BOLSAS bepbol "
+		+ "INNER JOIN TBEP_AREAS bepare ON bepare.CODNUM = bepbol.BEPARE_CODNUM "
+		+ "WHERE 1=1 ";
+		
+		dataTable.setColumn(ORDER_COLUMN_INDEX_ID, "bepbol.CODNUM");
+		dataTable.setColumn(ORDER_COLUMN_INDEX_CODIGO, "bepare.ID_AREA_CONOCIMIENTO");
+		dataTable.setColumn(ORDER_COLUMN_INDEX_AREA, "bepare.DES_AREA_CONOCIMIENTO");
+		dataTable.setColumn(ORDER_COLUMN_INDEX_BAREMALE, "bepbol.FLGBAREMABLE", DataTableColumn.COLUMN_TYPE_BOOLEAN);
+		dataTable.setQuery(consulta);
+				
+		try (Connection conexion = ConexionUvirtual.obtenerInstancia();
+				PreparedStatement stmtCount = conexion.prepareStatement(dataTable.getQueryCount());
+				PreparedStatement stmt = conexion.prepareStatement(dataTable.getQuery());
+		) {
+			int indexParam = 1;
+			dataTable.setFiltersParams(stmt, stmtCount, indexParam);
+			try (ResultSet rs = stmt.executeQuery()) {
+				while (rs.next()) {
+					Bolsa bolsa = new Bolsa();
+					bolsa.setCodNum(rs.getInt("CODNUM"));
+					bolsa.setArea(modeloArea.getAreaById(rs.getInt("BEPARE_CODNUM")));
+					bolsa.setEstado(rs.getString("ESTADO"));
+					bolsa.setBaremable(rs.getString("FLGBAREMABLE").equals("S"));					
+					bolsa.setFechaActualizacion(rs.getTimestamp("FECHAACTUALIZACION"));
+					bolsa.setFechaBloqueo(rs.getTimestamp("FECHABLOQUEO"));
+					bolsa.setFechaDesBloqueo(rs.getTimestamp("FECHADEBLOQUEO"));
+					
+					bolsas.add(bolsa);					
+				}				
+			}	
+			
+			dataTable.setRecordsTotalFromQuery(stmtCount);
+			dataTable.setData(bolsas);
+		}
+		
+		return dataTable;
+	}
 }

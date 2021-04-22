@@ -5,24 +5,23 @@ import java.io.PrintWriter;
 import java.sql.SQLException;
 import java.util.logging.Logger;
 import java.util.logging.Level;
-
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
-
 import es.ujaen.uvirtual.beans.CodigoDescripcion;
 import es.ujaen.uvirtual.beans.UVDatos;
 import es.ujaen.uvirtual.beans.Usuario;
+import es.ujaen.uvirtual.beans.uvirtual.bolsaempleo.Bolsa;
 import es.ujaen.uvirtual.beans.uvirtual.bolsaempleo.Solicitud;
 import es.ujaen.uvirtual.beans.vistas.uvirtual.bolsaempleo.VistaSolicitudes;
+import es.ujaen.uvirtual.modelo.bolsaempleo.ModeloArea;
 import es.ujaen.uvirtual.modelo.bolsaempleo.ModeloConvocatoria;
 import es.ujaen.uvirtual.modelo.bolsaempleo.ModeloSolicitud;
-import es.ujaen.uvirtual.utilidades.BolsaEmpleoValidator;
+import es.ujaen.uvirtual.modelo.bolsaempleo.ModeloUsuarioBolsaEmpleo;
 import es.ujaen.uvirtual.utilidades.BolsaEmpleoDataTable;
 import es.ujaen.uvirtual.utilidades.EscapaHTML;
 import es.ujaen.uvirtual.utilidades.Formateador;
@@ -56,6 +55,7 @@ public class ControladorMisSolicitudes extends HttpServlet {
 	// acciones
 	public static final String ACCION_LISTAR_SOLICITUDES = "listar";
 	public static final String ACCION_DATATABLE = "datatable";
+	public static final String ACCION_DATATABLE_AREAS = "datatableareas";
 	public static final String ACCION_CREAR_SOLICITUD = "crearSolicitud";
 	public static final String ACCION_CONSULTAR_SOLICITUD = "consultarSolicitud";
 	
@@ -96,6 +96,9 @@ public class ControladorMisSolicitudes extends HttpServlet {
 					break;
 				case ACCION_DATATABLE:
 					listado(bean, datos, request, response);
+					break;
+				case ACCION_DATATABLE_AREAS:
+					listadoAreas(bean, datos, request, response);
 					break;
 				case ACCION_CREAR_SOLICITUD:
 					crearSolicitud(bean, datos, request, response);
@@ -199,4 +202,38 @@ public class ControladorMisSolicitudes extends HttpServlet {
 			bean.setVista(RUTA_BEP_SOL + "paso3.jsp");
 		}
 	}
+	
+	/** Listado de areas .
+     * @param bean .
+	 * @param datos .
+	 * @param request .
+	 * @param response .
+	 * @throws IOException .
+	 * @throws SQLException .
+	 */
+	private void listadoAreas(VistaSolicitudes bean, UVDatos datos, HttpServletRequest request, HttpServletResponse response) throws IOException, SQLException{
+		ModeloArea modelo = ModeloArea.obtenerInstancia();
+		datos.setContentType("application/json");
+		datos.setRespuestaEnviada(true);
+		response.setContentType("application/json");
+		response.setCharacterEncoding("UTF-8");
+		
+		try (PrintWriter writer = response.getWriter()) {
+			try {
+				Usuario usuArcos = datos.getUsuario();
+				ModeloUsuarioBolsaEmpleo modeloUsuarioBolsaEmpleo = ModeloUsuarioBolsaEmpleo.obtenerInstancia();
+				Integer idUsuario = modeloUsuarioBolsaEmpleo.listaUsuario(usuArcos.getUid()).getCodNum();
+				BolsaEmpleoDataTable<Bolsa> dataTable = modelo.listaAreaSolicitudDatatable(request.getParameterMap(), idUsuario);
+				Gson gson = new GsonBuilder().setExclusionStrategies(BolsaEmpleoDataTable.GSONEXCLUSIONSTRATEGY).create();
+				bean.setDatatableAreas(dataTable);
+				writer.write(gson.toJson(dataTable));
+			} catch (Exception ex) {
+				bean.getMensajesDeError().add(ex.getMessage());
+				CodigoDescripcion mensaje = new CodigoDescripcion("error", ex.getMessage());
+				writer.write(new Gson().toJson(mensaje));
+				response.setStatus(RESPONSE_HTTP_CODE_ERROR);
+			}
+		}
+	}
+	
 }

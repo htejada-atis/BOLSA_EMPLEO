@@ -1,7 +1,7 @@
 package es.ujaen.uvirtual.beans.vistas.uvirtual.bolsaempleo;
 
 import java.io.Serializable;
-
+import es.ujaen.uvirtual.beans.uvirtual.bolsaempleo.Bolsa;
 import es.ujaen.uvirtual.beans.uvirtual.bolsaempleo.Solicitud;
 import es.ujaen.uvirtual.beans.vistas.Vista;
 import es.ujaen.uvirtual.utilidades.BolsaEmpleoDataTable;
@@ -13,6 +13,7 @@ public class VistaSolicitudes extends Vista implements Serializable {
 	private static final long serialVersionUID = 1L;
 	private String vista;
 	private BolsaEmpleoDataTable<Solicitud> dataTable;
+	private BolsaEmpleoDataTable<Bolsa> dataTableAreas;
 	private Solicitud solicitud;
 			
 	public String getVista() {
@@ -29,6 +30,14 @@ public class VistaSolicitudes extends Vista implements Serializable {
 	
 	public void setDatatableSolicitudes(BolsaEmpleoDataTable<Solicitud> dt) {
 		this.dataTable = dt;
+	}
+	
+	public BolsaEmpleoDataTable<Bolsa> getDatatableAreas() {
+		return dataTableAreas;
+	}
+	
+	public void setDatatableAreas(BolsaEmpleoDataTable<Bolsa> dt) {
+		this.dataTableAreas = dt;
 	}
 	
 	public Solicitud getSolicitud() {
