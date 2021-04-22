@@ -223,10 +223,12 @@ public class ModeloArea {
 				PreparedStatement stmtCount = conexion.prepareStatement(dataTable.getQueryCount());
 				PreparedStatement stmt = conexion.prepareStatement(dataTable.getQuery());
 		) {					
-			
+		
 			int indexParam = 1;
 			stmt.setInt(indexParam, codnum);
-			stmtCount.setInt(indexParam, codnum);
+			stmtCount.setInt(indexParam++, codnum);
+			
+			dataTable.setFiltersParams(stmt, stmtCount, 2);
 			
 			try (ResultSet rs = stmt.executeQuery()) {
 				while (rs.next()) {
