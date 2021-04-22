@@ -342,7 +342,7 @@ public class ModeloUsuarioBolsaEmpleo {
 	/**
 	 * Listado de areas excluidas de un usuario. 
 	 * @param params para leer los parametros de paginación, ordenacion, etc
-	 * @param usu .
+	 * @param codnum .
 	 * @return listado de areas
 	 * @throws SQLException en caso de error de base de datos
 	 * @throws UVException error si no existe la area
@@ -364,10 +364,10 @@ public class ModeloUsuarioBolsaEmpleo {
 		
 		BolsaEmpleoDataTable<Bolsa> dataTable = new BolsaEmpleoDataTable<Bolsa>(params);
 		
-		dataTable.setColumn(ORDER_COLUMN_INDEX_ID, "bepbol.CODNUM");
+		dataTable.setColumn(ORDER_COLUMN_INDEX_ID, "bepare.CODNUM", DataTableColumn.COLUMN_TYPE_NUMBER);
 		dataTable.setColumn(ModeloArea.ORDER_COLUMN_INDEX_CODIGO, "bepare.ID_AREA_CONOCIMIENTO");
 		dataTable.setColumn(ModeloArea.ORDER_COLUMN_INDEX_AREA, "bepare.DES_AREA_CONOCIMIENTO");
-		dataTable.setColumn(ModeloArea.ORDER_COLUMN_INDEX_BAREMALE, "bepbol.FLGBAREMABLE");
+		dataTable.setColumn(ModeloArea.ORDER_COLUMN_INDEX_BAREMALE, "bepbol.FLGBAREMABLE", DataTableColumn.COLUMN_TYPE_BOOLEAN);
 		dataTable.setQuery(consulta);
 
 		try (Connection conexion = ConexionUvirtual.obtenerInstancia();
@@ -376,7 +376,9 @@ public class ModeloUsuarioBolsaEmpleo {
 		) {					
 			int indexParam = 1;
 			stmt.setInt(indexParam, codnum);
-			stmtCount.setInt(indexParam, codnum);
+			stmtCount.setInt(indexParam++, codnum);
+		
+			dataTable.setFiltersParams(stmt, stmtCount, indexParam);
 			
 			try (ResultSet rs = stmt.executeQuery()) {
 				while (rs.next()) {			
@@ -395,82 +397,6 @@ public class ModeloUsuarioBolsaEmpleo {
 			
 			dataTable.setRecordsTotalFromQuery(stmtCount);
 			dataTable.setData(bolsas);
-		}
-		
-		return dataTable;
-	}	
-	
-	/** Listado de usuarios en función de un área . 
-	 * @param params para leer los parametros de paginación, ordenacion, etc .
-	 * @param area .
-	 * @param evaluadores .
-	 * @return listado de usuarios .
-	 * @throws SQLException en caso de error de base de datos .
-	 * @throws UVException error si no existe la area .
-	 */
-	public BolsaEmpleoDataTable<Evaluador> listaEvaluadoresDatatable(Map<String, String[]> params, Integer area, boolean evaluadores) throws SQLException, UVException {
-		
-		if (area == null) {
-			throw new UVException("No se pueden listar evaluadores sin area");
-		}
-		
-		List<Evaluador> usuarios = new ArrayList<>();
-		BolsaEmpleoDataTable<Evaluador> dataTable = new BolsaEmpleoDataTable<Evaluador>(params);
-		
-		String consulta = "SELECT * FROM TBEP_USUARIOS bepusu "
-				+ "INNER JOIN VUJA_NET_BEP_AR_PERSONA uvpersona ON uvpersona.CODINT=bepusu.CODPERSONA "
-				+ (evaluadores ? "INNER JOIN TBEP_EVALUADORES bepeva ON bepusu.CODNUM = bepeva.BEPUSU_CODNUM " : "")
-				+ "WHERE FLGBORRADO!='S' "
-				+ "AND FLGEXCLUIDO!='S' ";
-		
-		String consultaEvaluadores = "SELECT bepeva.BEPUSU_CODNUM FROM TBEP_EVALUADORES bepeva "
-				+ "INNER JOIN TBEP_USUARIOS bepusu ON bepusu.CODNUM = bepeva.BEPUSU_CODNUM "
-				+ "WHERE bepusu.FLGBORRADO!='S' "
-				+ "AND bepusu.FLGEXCLUIDO!='S' "
-				+ "AND bepeva.BEPARE_CODNUM = ? ";
-		
-		if (evaluadores) {
-			consulta += "AND bepusu.CODNUM IN (" + consultaEvaluadores + ")";
-			dataTable.setColumn(ORDER_COLUMN_INDEX_ACTIVO_EVALUADORES, "bepeva.FLGACTIVO", DataTableColumn.COLUMN_TYPE_BOOLEAN);
-		} else {
-			consulta += "AND bepusu.CODNUM NOT IN (" + consultaEvaluadores + ") "
-					+ "AND bepusu.ROL = 1052 ";
-		}
-		
-		dataTable.setColumn(evaluadores ? ORDER_COLUMN_INDEX_NUMDOCUMENTO_EVALUADORES : ORDER_COLUMN_INDEX_NUMDOCUMENTO_EVALUADORES + 1,
-				"uvpersona.IDNIF");
-		dataTable.setColumn(evaluadores ? ORDER_COLUMN_INDEX_ROL_EVALUADORES : ORDER_COLUMN_INDEX_ROL_EVALUADORES + 1,
-				"bepusu.ROL", DataTableColumn.COLUMN_TYPE_OPTION);
-		dataTable.setColumn(evaluadores ? ORDER_COLUMN_INDEX_NOMBRE_Y_APELLIDOS_EVALUADORES : ORDER_COLUMN_INDEX_NOMBRE_Y_APELLIDOS_EVALUADORES + 1,
-				"uvpersona.STRAPELLIDO1");
-		
-		dataTable.setQuery(consulta);
-				
-		try (Connection conexion = ConexionUvirtual.obtenerInstancia();
-				PreparedStatement stmtCount = conexion.prepareStatement(dataTable.getQueryCount());
-				PreparedStatement stmt = conexion.prepareStatement(dataTable.getQuery());
-		) {
-			int indexParam = 1;
-			stmt.setInt(indexParam, area);
-			stmtCount.setInt(indexParam++, area);
-			dataTable.setFiltersParams(stmt, stmtCount, indexParam);
-			try (ResultSet rs = stmt.executeQuery()) {
-				while (rs.next()) {
-					UsuarioBolsaEmpleo usuario = setUsuario(rs);
-					
-					if (evaluadores) {
-						Integer codNumArea = rs.getInt("BEPARE_CODNUM");
-						Boolean activo = rs.getString("FLGACTIVO").equals("S");
-						Evaluador evaluador = new Evaluador(usuario, codNumArea, activo);
-						usuarios.add(evaluador);
-					} else {
-						usuarios.add(new Evaluador(usuario));
-					}
-				}				
-			}	
-			
-			dataTable.setRecordsTotalFromQuery(stmtCount);
-			dataTable.setData(usuarios);
 		}
 		
 		return dataTable;
@@ -575,7 +501,7 @@ public class ModeloUsuarioBolsaEmpleo {
 				dataTable.setColumn(ORDER_COLUMN_INDEX_COD_CUENTA, "bepusu.CODCUENTA");
 				dataTable.setColumn(ORDER_COLUMN_INDEX_NOMBRE_Y_APELLIDOS, "uvpersona.STRAPELLIDO1");
 				dataTable.setColumn(ORDER_COLUMN_INDEX_EMAIL, "bepusu.EMAIL");
-				dataTable.setColumn(ORDER_COLUMN_INDEX_ROL, "bepusu.ROL");
+				dataTable.setColumn(ORDER_COLUMN_INDEX_ROL, "bepusu.ROL", DataTableColumn.COLUMN_TYPE_NUMBER);
 				dataTable.setColumn(ORDER_COLUMN_INDEX_RAZON_EXCLUSION, "bepusu.RAZON_EXCLUSION");
 				dataTable.setColumn(ORDER_COLUMN_INDEX_FECHA_EXCLUSION, "bepusu.FECHA_EXCLUSION");
 				dataTable.setColumn(ORDER_COLUMN_INDEX_LISTA_DIST, "bepusu.FLGLISTADISTRIBUCION");
@@ -590,7 +516,7 @@ public class ModeloUsuarioBolsaEmpleo {
 				dataTable.setColumn(ORDER_COLUMN_INDEX_COD_CUENTA, "bepusu.CODCUENTA");
 				dataTable.setColumn(ORDER_COLUMN_INDEX_NOMBRE_Y_APELLIDOS, "uvpersona.STRAPELLIDO1");
 				dataTable.setColumn(ORDER_COLUMN_INDEX_EMAIL, "bepusu.EMAIL");
-				dataTable.setColumn(ORDER_COLUMN_INDEX_ROL, "bepusu.ROL");
+				dataTable.setColumn(ORDER_COLUMN_INDEX_ROL, "bepusu.ROL", DataTableColumn.COLUMN_TYPE_NUMBER);
 				dataTable.setColumn(ORDER_COLUMN_INDEX_LISTA_DIST, "bepusu.FLGLISTADISTRIBUCION");
 				dataTable.setQuery(consulta);
 				
@@ -740,6 +666,30 @@ public class ModeloUsuarioBolsaEmpleo {
 	
 	private void excluirUsuarioAreas(List<Area> areas, UsuarioBolsaEmpleo usu) throws SQLException {
 		String query = "INSERT INTO TBEP_USUARIOS_EXCLUIDOS_AREA (USUARIO,AREA) VALUES (?,?)";		
+		
+		try (Connection conexion = ConexionUvirtual.obtenerInstancia(); PreparedStatement stmt = conexion.prepareStatement(query)) {
+
+			for (Area area : areas) {
+				stmt.setInt(1, usu.getCodNum());
+				stmt.setInt(2, area.getCodNum());	
+				stmt.executeUpdate();
+			}
+		}
+	}
+	
+	
+	/**
+	 * Establece el usuario como borrado. 
+	 * @param usu .
+	 * @param areas .
+	 * @throws SQLException .
+	 */
+	public void incluirUsuarioArea(UsuarioBolsaEmpleo usu, List<Area> areas) throws SQLException {
+		this.incluirUsuarioAreas(areas, usu);
+	}
+	
+	private void incluirUsuarioAreas(List<Area> areas, UsuarioBolsaEmpleo usu) throws SQLException {
+		String query = "DELETE FROM TBEP_USUARIOS_EXCLUIDOS_AREA WHERE usuario = ? AND area = ?";		
 		
 		try (Connection conexion = ConexionUvirtual.obtenerInstancia(); PreparedStatement stmt = conexion.prepareStatement(query)) {
 
