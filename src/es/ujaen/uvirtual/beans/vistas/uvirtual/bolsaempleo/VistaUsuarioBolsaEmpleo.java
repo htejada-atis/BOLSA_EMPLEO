@@ -6,6 +6,7 @@ import java.util.List;
 
 import es.ujaen.uvirtual.beans.Rol;
 import es.ujaen.uvirtual.beans.Usuario;
+import es.ujaen.uvirtual.beans.uvirtual.bolsaempleo.Bolsa;
 import es.ujaen.uvirtual.beans.uvirtual.bolsaempleo.UsuarioBolsaEmpleo;
 import es.ujaen.uvirtual.beans.vistas.Vista;
 import es.ujaen.uvirtual.utilidades.BolsaEmpleoDataTable;
@@ -23,7 +24,8 @@ public class VistaUsuarioBolsaEmpleo extends Vista implements Serializable {
 	 private List<Rol> roles = new ArrayList<>();
 	 private Boolean busqueda;
 	 private BolsaEmpleoDataTable<UsuarioBolsaEmpleo> dataTable;
-	    
+	 private BolsaEmpleoDataTable<Bolsa> dataTableBolsa;
+
 	 public List<UsuarioBolsaEmpleo> getUsuarios() {
 		 return usuarios;
 	 }
@@ -86,5 +88,9 @@ public class VistaUsuarioBolsaEmpleo extends Vista implements Serializable {
 	 
 	 public void setDatatable(BolsaEmpleoDataTable<UsuarioBolsaEmpleo> dt) {
 		 this.dataTable = dt;
+	 }
+	 
+	 public void setDatatableBolsa(BolsaEmpleoDataTable<Bolsa> dt) {
+		 this.dataTableBolsa = dt;
 	 }
 }

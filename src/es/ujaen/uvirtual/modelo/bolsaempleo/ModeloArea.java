@@ -194,14 +194,14 @@ public class ModeloArea {
 	}
 	
 	/**
-	 * Listado de areas disponibles en la solicitud datatable. 
-	 * @param params para leer los parametros de paginación, ordenacion, etc .
-	 * @param usuario id del usuario .
-	 * @return listado de areas .
-	 * @throws SQLException en caso de error de base de datos .
-	 * @throws UVException error si no existe la area .
+	 * Listado de areas excluidas de un usuario. 
+	 * @param params para leer los parametros de paginación, ordenacion, etc
+	 * @param codnum .
+	 * @return listado de areas
+	 * @throws SQLException en caso de error de base de datos
+	 * @throws UVException error si no existe la area
 	 */
-	public BolsaEmpleoDataTable<Bolsa> listaAreaSolicitudDatatable(Map<String, String[]> params, Integer usuario) throws SQLException, UVException {
+	public BolsaEmpleoDataTable<Bolsa> listaAreaExcluidasUsuarioDatatable(Map<String, String[]> params, Integer codnum) throws SQLException, UVException {
 		List<Bolsa> bolsas = new ArrayList<>();
 		ModeloArea modeloArea = ModeloArea.obtenerInstancia();	
 		BolsaEmpleoDataTable<Bolsa> dataTable = new BolsaEmpleoDataTable<Bolsa>(params);
@@ -210,20 +210,25 @@ public class ModeloArea {
 		"SELECT bepbol.* "
 		+ "FROM TBEP_BOLSAS bepbol "
 		+ "INNER JOIN TBEP_AREAS bepare ON bepare.CODNUM = bepbol.BEPARE_CODNUM "
-		+ "WHERE 1=1 ";
+		+ "LEFT JOIN UVIRTUAL.TBEP_USUARIOS_EXCLUIDOS_AREA bepusuexc "
+		+ "ON bepare.CODNUM = bepusuexc.AREA AND bepusuexc.USUARIO = ? "
+		+ "WHERE bepusuexc.USUARIO IS NULL";
 		
 		dataTable.setColumn(ORDER_COLUMN_INDEX_ID, "bepbol.CODNUM");
 		dataTable.setColumn(ORDER_COLUMN_INDEX_CODIGO, "bepare.ID_AREA_CONOCIMIENTO");
 		dataTable.setColumn(ORDER_COLUMN_INDEX_AREA, "bepare.DES_AREA_CONOCIMIENTO");
-		dataTable.setColumn(ORDER_COLUMN_INDEX_BAREMALE, "bepbol.FLGBAREMABLE", DataTableColumn.COLUMN_TYPE_BOOLEAN);
+		dataTable.setColumn(ORDER_COLUMN_INDEX_BAREMALE, "bepbol.FLGBAREMABLE");
 		dataTable.setQuery(consulta);
 				
 		try (Connection conexion = ConexionUvirtual.obtenerInstancia();
 				PreparedStatement stmtCount = conexion.prepareStatement(dataTable.getQueryCount());
 				PreparedStatement stmt = conexion.prepareStatement(dataTable.getQuery());
-		) {
+		) {					
+			
 			int indexParam = 1;
-			dataTable.setFiltersParams(stmt, stmtCount, indexParam);
+			stmt.setInt(indexParam, codnum);
+			stmtCount.setInt(indexParam, codnum);
+			
 			try (ResultSet rs = stmt.executeQuery()) {
 				while (rs.next()) {
 					Bolsa bolsa = new Bolsa();
