@@ -141,6 +141,8 @@ public class ControladorBolsas extends HttpServlet {
 		try (PrintWriter writer = response.getWriter()) {
 			try {
 				BolsaEmpleoDataTable<Bolsa> dataTable = modelo.listaBolsaEmpleoDatatable(request.getParameterMap());
+				Integer bolsas = modelo.getBolsasBloqueadas();
+				
 				bean.setDatatableBolsas(dataTable);
 				
 				Gson gson = new GsonBuilder().setExclusionStrategies(BolsaEmpleoDataTable.GSONEXCLUSIONSTRATEGY).create();				

@@ -148,7 +148,7 @@ VistaUsuarioBolsaEmpleo bean = (VistaUsuarioBolsaEmpleo) uvdatos.getVistas().get
 	  			<caption class="table-title">Áreas excluidas para el usuario</caption>  
 				<tr>
 					<th scope="col" style="width:5%"></th>
-					<th scope="col" style="width:5%" title="Id de la area">Id</th>
+					<th scope="col" style="width:20%" title="Id de la area">Id</th>
 					<th scope="col" style="width:25%" title="Código de area">Código</th>
 					<th scope="col" style="width:65%">Area</th>
 					<th scope="col" class="center" style="width:15%">Baremable</th>	
@@ -167,7 +167,7 @@ VistaUsuarioBolsaEmpleo bean = (VistaUsuarioBolsaEmpleo) uvdatos.getVistas().get
 	  			<caption class="table-title">Listado de áreas</caption>  
 				<tr>
 					<th scope="col" style="width:5%"></th>
-					<th scope="col" style="width:5%" title="Id de la area">Id</th>
+					<th scope="col" style="width:20%" title="Id de la area">Id</th>
 					<th scope="col" style="width:25%" title="Código de area">Código</th>
 					<th scope="col" style="width:65%">Area</th>
 					<th scope="col" class="center" style="width:15%">Baremable</th>	
@@ -239,10 +239,10 @@ VistaUsuarioBolsaEmpleo bean = (VistaUsuarioBolsaEmpleo) uvdatos.getVistas().get
 		    "action": "<%= ControladorAreasABaremar.ACCION_DATATABLE_EXCLUIDOS %>",
 		    "columns": [
 		    	{'data': 'area.codNum', 'selectable': true},
-		        {'data': 'area.codNum'},
-		        {'data': 'area.idAreaExterno'},
-		        {'data': 'area.descripcion'},
-		        {'data': 'baremable', 'filter': {'type': 'selectBoolean', 'true': 'Activo', 'false': 'Inactivo'} , 'order': {'active': false}, 'render': function(row) {
+		        {'data': 'area.codNum', 'filter': {'type': 'number'}},
+		        {'data': 'area.idAreaExterno' , 'filter': true, 'class': 'overflow-auto'},
+		        {'data': 'area.descripcion', 'filter': true, 'class': 'overflow-auto'},
+		        {'data': 'baremable', 'filter': {'type': 'selectBoolean', 'true': 'Baremable', 'false': 'No Baremable'} , 'order': {'active': false}, 'render': function(row) {
 	        		if(row.baremable){
 	        			return "<div title='Baremable' class='circle-true'></div>"; 
 	        		}
@@ -265,9 +265,9 @@ VistaUsuarioBolsaEmpleo bean = (VistaUsuarioBolsaEmpleo) uvdatos.getVistas().get
 		    "action": "<%= ControladorUsuarioBolsaEmpleo.ACCION_DATATABLE_USUARIOS_EXCLUIDOS_AREA %>",
 		    "columns": [
 		    	{'data': 'area.codNum', 'selectable': true},
-		        {'data': 'area.codNum'},
-		        {'data': 'area.idAreaExterno'},
-		        {'data': 'area.descripcion'},
+		        {'data': 'area.codNum', 'filter': {'type': 'number'}},
+		        {'data': 'area.idAreaExterno', 'filter': true, 'class': 'overflow-auto'},
+		        {'data': 'area.descripcion', 'filter': true, 'class': 'overflow-auto'},
 		        {'data': 'baremable', 'filter': {'type': 'selectBoolean', 'true': 'Baremable', 'false': 'No Baremable'} , 'order': {'active': false},'render': function(row) {
 	        		if(row.baremable){
 	        			return "<div title='Baremable' class='circle-true'></div>";
@@ -278,7 +278,7 @@ VistaUsuarioBolsaEmpleo bean = (VistaUsuarioBolsaEmpleo) uvdatos.getVistas().get
 	        	}},
 		    ],
 		    "actions": [
-		    	{'label': 'Borrar Areas excluidas', 'onClick': function(selected) { enviaAccion("<%=ControladorUsuarioBolsaEmpleo.ACCION_EXCLUIR_USUARIO_AREA%>", selected); } }
+		    	{'label': 'Borrar Areas excluidas', 'onClick': function(selected) { enviaAccion("<%=ControladorUsuarioBolsaEmpleo.ACCION_INCLUIR_USUARIO_AREA%>", selected); } }
 		    ]
 		});	
 		

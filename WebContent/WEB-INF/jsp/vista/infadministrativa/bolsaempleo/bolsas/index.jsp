@@ -65,18 +65,19 @@ $(document).ready(function() {
 	    "ajax": { url: "/srv/es/ajax/informacionadministrativa/bolsaempleo/bolsas" },
 	    "selectable": true,
 	    "pageSize": 10,
+	    "filterable": true,
 	    "action": "<%= ControladorBolsas.ACCION_DATATABLE %>",
 	    "defaultOrderBy": 2,
 	    "defaultOrderDirection": 'desc',
 	    "columns": [
 	    	{'data': 'codNum', 'selectable': true},
-	        {'data': 'codNum'},
-	        {'data': 'area.descripcion'},
-	        {'data': 'estado'},
-	        {'data': 'fechaActualizacion'},
-	        {'data': 'fechaBloqueo'},
-	        {'data': 'fechaDesBloqueo'},
-	        {'data': 'baremable', 'render': function(row) {
+	        {'data': 'codNum', 'filter': {'type': 'number'}},
+	        {'data': 'area.descripcion', 'filter': true, 'class': 'overflow-auto'},
+	        {'data': 'estado', 'filter': {'type': 'select', 'options': ['1050', '1051', '1052']} },
+	        {'data': 'fechaActualizacion', 'filter': true, 'class': 'overflow-auto'},
+	        {'data': 'fechaBloqueo', 'filter': true, 'class': 'overflow-auto'},
+	        {'data': 'fechaDesBloqueo', 'filter': true, 'class': 'overflow-auto'},
+	        {'data': 'baremable', 'filter': {'type': 'selectBoolean', 'true': 'Baremable', 'false': 'No Baremable'} , 'render': function(row) {
         		if(row.baremable){
         			return "<div title='Baremable' class='circle-true'></div>"; 
         		}
