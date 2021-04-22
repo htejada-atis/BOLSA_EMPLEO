@@ -58,9 +58,9 @@ VistaSolicitudes bean = (VistaSolicitudes) uvdatos.getVistas().get(VistaSolicitu
 		    "filterable": true,
 		    "action": "<%=ControladorMisSolicitudes.ACCION_DATATABLE_AREAS%>",
 		    "columns": [
-		    	{'data': 'codnum', 'selectable': true},
-		    	{'data': 'codigo', 'filter': true},
-		    	{'data': 'nombre', 'filter': true},
+		    	{'data': 'codNum', 'selectable': true},
+		    	{'data': 'area.idAreaExterno', 'filter': true},
+		    	{'data': 'area.descripcion', 'filter': true},
 		        {'data': 'excluido', 'order': {'active': false}, 'filter': {'type': 'selectBoolean', 'true': 'Excluido', 'false': 'No excluido'}, 'render': function(row) {
 	        		if (row.excluido) {
 	        			return "<div title='No tienes acceso a ésta bolsa' class='circle-false'></div>";

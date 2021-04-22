@@ -27,6 +27,7 @@ public class ModeloArea {
 	
 	public static final int ORDER_COLUMN_INDEX_CODIGO_SOLICITUDES = 1;
 	public static final int ORDER_COLUMN_INDEX_AREA_SOLICITUDES = 2;
+	public static final int ORDER_COLUMN_INDEX_EXCLUIDO_SOLICITUDES = 3;
 	public static final int ORDER_COLUMN_INDEX_BAREMABLE_SOLICITUDES = 4;
 	
     protected static ModeloArea eInstancia = null;
@@ -239,6 +240,65 @@ public class ModeloArea {
 					bolsa.setFechaActualizacion(rs.getTimestamp("FECHAACTUALIZACION"));
 					bolsa.setFechaBloqueo(rs.getTimestamp("FECHABLOQUEO"));
 					bolsa.setFechaDesBloqueo(rs.getTimestamp("FECHADEBLOQUEO"));
+					
+					bolsas.add(bolsa);					
+				}				
+			}	
+			
+			dataTable.setRecordsTotalFromQuery(stmtCount);
+			dataTable.setData(bolsas);
+		}
+		
+		return dataTable;
+	}
+	
+	/**
+	 * Listado de areas solicitudes . 
+	 * @param params para leer los parametros de paginación, ordenacion, etc
+	 * @param codnum .
+	 * @return listado de areas
+	 * @throws SQLException en caso de error de base de datos
+	 * @throws UVException error si no existe la area
+	 */
+	public BolsaEmpleoDataTable<Bolsa> listaAreaSolicitudDatatable(Map<String, String[]> params, Integer codnum) throws SQLException, UVException {
+		List<Bolsa> bolsas = new ArrayList<>();
+		ModeloArea modeloArea = ModeloArea.obtenerInstancia();	
+		BolsaEmpleoDataTable<Bolsa> dataTable = new BolsaEmpleoDataTable<Bolsa>(params);
+		
+		String consulta =
+		"SELECT bepbol.*, bepusuexc.USUARIO "
+		+ "FROM TBEP_BOLSAS bepbol "
+		+ "INNER JOIN TBEP_AREAS bepare ON bepare.CODNUM = bepbol.BEPARE_CODNUM "
+		+ "LEFT JOIN UVIRTUAL.TBEP_USUARIOS_EXCLUIDOS_AREA bepusuexc "
+		+ "ON bepare.CODNUM = bepusuexc.AREA AND bepusuexc.USUARIO = ? "
+		+ "WHERE 1=1 ";
+		
+		dataTable.setColumn(ORDER_COLUMN_INDEX_CODIGO_SOLICITUDES, "bepare.ID_AREA_CONOCIMIENTO");
+		dataTable.setColumn(ORDER_COLUMN_INDEX_AREA_SOLICITUDES, "bepare.DES_AREA_CONOCIMIENTO");
+		dataTable.setColumn(ORDER_COLUMN_INDEX_EXCLUIDO_SOLICITUDES, "bepusuexc.USUARIO", DataTableColumn.COLUMN_TYPE_IS_NULL);
+		dataTable.setColumn(ORDER_COLUMN_INDEX_BAREMABLE_SOLICITUDES, "bepbol.FLGBAREMABLE", DataTableColumn.COLUMN_TYPE_BOOLEAN);
+		dataTable.setQuery(consulta);
+				
+		try (Connection conexion = ConexionUvirtual.obtenerInstancia();
+				PreparedStatement stmtCount = conexion.prepareStatement(dataTable.getQueryCount());
+				PreparedStatement stmt = conexion.prepareStatement(dataTable.getQuery());
+		) {					
+			int indexParam = 1;
+			stmt.setInt(indexParam, codnum);
+			stmtCount.setInt(indexParam++, codnum);
+			dataTable.setFiltersParams(stmt, stmtCount, indexParam);
+			
+			try (ResultSet rs = stmt.executeQuery()) {
+				while (rs.next()) {
+					Bolsa bolsa = new Bolsa();
+					bolsa.setCodNum(rs.getInt("CODNUM"));
+					bolsa.setArea(modeloArea.getAreaById(rs.getInt("BEPARE_CODNUM")));
+					bolsa.setEstado(rs.getString("ESTADO"));
+					bolsa.setBaremable(rs.getString("FLGBAREMABLE").equals("S"));		
+					bolsa.setFechaActualizacion(rs.getTimestamp("FECHAACTUALIZACION"));
+					bolsa.setFechaBloqueo(rs.getTimestamp("FECHABLOQUEO"));
+					bolsa.setFechaDesBloqueo(rs.getTimestamp("FECHADEBLOQUEO"));
+					bolsa.setExcluido(rs.getString("USUARIO") != null);
 					
 					bolsas.add(bolsa);					
 				}				
