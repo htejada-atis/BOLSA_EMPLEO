@@ -342,7 +342,7 @@ public class ModeloUsuarioBolsaEmpleo {
 	/**
 	 * Listado de areas excluidas de un usuario. 
 	 * @param params para leer los parametros de paginación, ordenacion, etc
-	 * @param usu .
+	 * @param codnum .
 	 * @return listado de areas
 	 * @throws SQLException en caso de error de base de datos
 	 * @throws UVException error si no existe la area
@@ -367,7 +367,7 @@ public class ModeloUsuarioBolsaEmpleo {
 		dataTable.setColumn(ORDER_COLUMN_INDEX_ID, "bepbol.CODNUM");
 		dataTable.setColumn(ModeloArea.ORDER_COLUMN_INDEX_CODIGO, "bepare.ID_AREA_CONOCIMIENTO");
 		dataTable.setColumn(ModeloArea.ORDER_COLUMN_INDEX_AREA, "bepare.DES_AREA_CONOCIMIENTO");
-		dataTable.setColumn(ModeloArea.ORDER_COLUMN_INDEX_BAREMALE, "bepbol.FLGBAREMABLE");
+		dataTable.setColumn(ModeloArea.ORDER_COLUMN_INDEX_BAREMALE, "bepbol.FLGBAREMABLE", DataTableColumn.COLUMN_TYPE_BOOLEAN);
 		dataTable.setQuery(consulta);
 
 		try (Connection conexion = ConexionUvirtual.obtenerInstancia();
@@ -376,7 +376,9 @@ public class ModeloUsuarioBolsaEmpleo {
 		) {					
 			int indexParam = 1;
 			stmt.setInt(indexParam, codnum);
-			stmtCount.setInt(indexParam, codnum);
+			stmtCount.setInt(indexParam++, codnum);
+		
+			dataTable.setFiltersParams(stmt, stmtCount, indexParam);
 			
 			try (ResultSet rs = stmt.executeQuery()) {
 				while (rs.next()) {			
@@ -499,7 +501,7 @@ public class ModeloUsuarioBolsaEmpleo {
 				dataTable.setColumn(ORDER_COLUMN_INDEX_COD_CUENTA, "bepusu.CODCUENTA");
 				dataTable.setColumn(ORDER_COLUMN_INDEX_NOMBRE_Y_APELLIDOS, "uvpersona.STRAPELLIDO1");
 				dataTable.setColumn(ORDER_COLUMN_INDEX_EMAIL, "bepusu.EMAIL");
-				dataTable.setColumn(ORDER_COLUMN_INDEX_ROL, "bepusu.ROL");
+				dataTable.setColumn(ORDER_COLUMN_INDEX_ROL, "bepusu.ROL", DataTableColumn.COLUMN_TYPE_NUMBER);
 				dataTable.setColumn(ORDER_COLUMN_INDEX_RAZON_EXCLUSION, "bepusu.RAZON_EXCLUSION");
 				dataTable.setColumn(ORDER_COLUMN_INDEX_FECHA_EXCLUSION, "bepusu.FECHA_EXCLUSION");
 				dataTable.setColumn(ORDER_COLUMN_INDEX_LISTA_DIST, "bepusu.FLGLISTADISTRIBUCION");
@@ -514,7 +516,7 @@ public class ModeloUsuarioBolsaEmpleo {
 				dataTable.setColumn(ORDER_COLUMN_INDEX_COD_CUENTA, "bepusu.CODCUENTA");
 				dataTable.setColumn(ORDER_COLUMN_INDEX_NOMBRE_Y_APELLIDOS, "uvpersona.STRAPELLIDO1");
 				dataTable.setColumn(ORDER_COLUMN_INDEX_EMAIL, "bepusu.EMAIL");
-				dataTable.setColumn(ORDER_COLUMN_INDEX_ROL, "bepusu.ROL");
+				dataTable.setColumn(ORDER_COLUMN_INDEX_ROL, "bepusu.ROL", DataTableColumn.COLUMN_TYPE_NUMBER);
 				dataTable.setColumn(ORDER_COLUMN_INDEX_LISTA_DIST, "bepusu.FLGLISTADISTRIBUCION");
 				dataTable.setQuery(consulta);
 				
