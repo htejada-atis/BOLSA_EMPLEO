@@ -16,6 +16,7 @@ import es.ujaen.uvirtual.beans.Rol;
 import es.ujaen.uvirtual.beans.UVDatos;
 import es.ujaen.uvirtual.beans.Usuario;
 import es.ujaen.uvirtual.beans.uvirtual.bolsaempleo.Area;
+import es.ujaen.uvirtual.beans.uvirtual.bolsaempleo.Bolsa;
 import es.ujaen.uvirtual.beans.uvirtual.bolsaempleo.Evaluador;
 import es.ujaen.uvirtual.beans.uvirtual.bolsaempleo.UsuarioBolsaEmpleo;
 import es.ujaen.uvirtual.modelo.conexion.ConexionUvirtual;
@@ -342,6 +343,68 @@ public class ModeloUsuarioBolsaEmpleo {
 		return dataTable;
 	}	
 	
+	
+	/**
+	 * Listado de areas excluidas de un usuario. 
+	 * @param params para leer los parametros de paginación, ordenacion, etc
+	 * @param usu .
+	 * @return listado de areas
+	 * @throws SQLException en caso de error de base de datos
+	 * @throws UVException error si no existe la area
+	 */	
+	public BolsaEmpleoDataTable<Bolsa> listaAreasExcluidasPorUsuarioDatatable(Map<String, String[]> params, 
+			Integer codnum) throws SQLException, UVException {
+		
+		List<Bolsa> bolsas = new ArrayList<>();
+		ModeloArea modeloArea = ModeloArea.obtenerInstancia();	
+		
+		String consulta = "SELECT bepare.CODNUM as CODNUMAREA, bepbol.CODNUM AS CODNUMBOLSA, bepare.ID_AREA_CONOCIMIENTO, "
+		+ "bepare.DES_AREA_CONOCIMIENTO, bepbol.FLGBAREMABLE , bepbol.BEPARE_CODNUM, "
+		+ "bepbol.ESTADO, bepbol.FECHAACTUALIZACION , bepbol.FECHABLOQUEO ,bepbol.FECHADEBLOQUEO "
+		+ "FROM UVIRTUAL.TBEP_USUARIOS_EXCLUIDOS_AREA bepusuexc "
+		+ "INNER JOIN UVIRTUAL.TBEP_AREAS bepare ON bepusuexc.AREA=bepare.CODNUM "
+		+ "INNER JOIN TBEP_BOLSAS bepbol ON bepare.CODNUM = bepbol.BEPARE_CODNUM "
+		+ "INNER JOIN uvirtual.TBEP_USUARIOS bepusu ON bepusuexc.USUARIO = bepusu.CODNUM "
+		+ "WHERE bepusuexc.USUARIO = ? ";
+		
+		BolsaEmpleoDataTable<Bolsa> dataTable = new BolsaEmpleoDataTable<Bolsa>(params);
+		
+		dataTable.setColumn(ORDER_COLUMN_INDEX_ID, "bepbol.CODNUM");
+		dataTable.setColumn(ModeloArea.ORDER_COLUMN_INDEX_CODIGO, "bepare.ID_AREA_CONOCIMIENTO");
+		dataTable.setColumn(ModeloArea.ORDER_COLUMN_INDEX_AREA, "bepare.DES_AREA_CONOCIMIENTO");
+		dataTable.setColumn(ModeloArea.ORDER_COLUMN_INDEX_BAREMALE, "bepbol.FLGBAREMABLE");
+		dataTable.setQuery(consulta);
+
+		try (Connection conexion = ConexionUvirtual.obtenerInstancia();
+				PreparedStatement stmtCount = conexion.prepareStatement(dataTable.getQueryCount());
+				PreparedStatement stmt = conexion.prepareStatement(dataTable.getQuery());
+		) {					
+			int indexParam = 1;
+			stmt.setInt(indexParam, codnum);
+			stmtCount.setInt(indexParam, codnum);
+			
+			try (ResultSet rs = stmt.executeQuery()) {
+				while (rs.next()) {			
+					Bolsa bolsa = new Bolsa();
+					bolsa.setCodNum(rs.getInt("CODNUMBOLSA"));
+					bolsa.setArea(modeloArea.getAreaById(rs.getInt("BEPARE_CODNUM")));
+					bolsa.setEstado(rs.getString("ESTADO"));
+					bolsa.setBaremable(rs.getString("FLGBAREMABLE").equals("S"));					
+					bolsa.setFechaActualizacion(rs.getTimestamp("FECHAACTUALIZACION"));
+					bolsa.setFechaBloqueo(rs.getTimestamp("FECHABLOQUEO"));
+					bolsa.setFechaDesBloqueo(rs.getTimestamp("FECHADEBLOQUEO"));
+					
+					bolsas.add(bolsa);					
+				}				
+			}
+			
+			dataTable.setRecordsTotalFromQuery(stmtCount);
+			dataTable.setData(bolsas);
+		}
+		
+		return dataTable;
+	}	
+	
 	/** Listado de usuarios en función de un área . 
 	 * @param params para leer los parametros de paginación, ordenacion, etc .
 	 * @param area .
@@ -481,6 +544,46 @@ public class ModeloUsuarioBolsaEmpleo {
 	 * @throws UVException en caso de no poder crear el usuario
 	 */	
 	public UsuarioBolsaEmpleo setUsuario(ResultSet rs) throws SQLException, UVException {
+		ModeloRol modeloRol = ModeloRol.obtenerInstancia();
+		
+		UsuarioBolsaEmpleo usuario = new UsuarioBolsaEmpleo();
+		usuario.setCodNum(rs.getInt("CODNUM"));
+		usuario.setCodPersona(rs.getInt("CODPERSONA"));
+		usuario.setCodCuenta(rs.getString("CODCUENTA"));
+		usuario.setTipoDocumento(rs.getString("STRTIPODOCUMENTO"));
+		usuario.setNumDocumento(rs.getString("IDNIF") + rs.getString("LETRANIF"));
+		usuario.setNombre(rs.getString("STRNOMBRE"));
+		usuario.setPrimerApellido(rs.getString("STRAPELLIDO1"));
+		usuario.setSegundoApellido(rs.getString("STRAPELLIDO2"));
+		usuario.setEmail(rs.getString("EMAIL"));
+		usuario.setDireccion(rs.getString("DIRECCION"));
+		usuario.setCodigoPostal(rs.getString("CODIGOPOSTAL"));
+		usuario.setLocalidad(rs.getString("LOCALIDAD"));
+		usuario.setProvincia(rs.getString("PROVINCIA"));
+		usuario.setMovil(rs.getString("MOVIL"));
+		usuario.setTelefono(rs.getString("TELEFONO"));
+		usuario.setNacionalidad(rs.getString("NACIONALIDAD"));
+		usuario.setSexo(rs.getString("SEXO"));
+		usuario.setRol(modeloRol.getRoleById(rs.getInt("ROL")));
+		usuario.setListaDist(rs.getString("FLGLISTADISTRIBUCION").equals("S"));
+		usuario.setExcluido(rs.getString("FLGEXCLUIDO").equals("S"));
+		usuario.setRazonExcluido(rs.getString("RAZON_EXCLUSION"));
+		usuario.setFechaExclusion(rs.getTimestamp("FECHA_EXCLUSION"));
+		usuario.setBorrado(rs.getString("FLGBORRADO").equals("S"));
+		usuario.setFechaBorrado(rs.getTimestamp("FECHA_BORRADO"));
+		
+		return usuario;
+	}
+	
+	
+	/**
+	 * Set usuario excluido de area. 
+	 * @param rs resultado de la consulta
+	 * @return usuario
+	 * @throws SQLException en caso de error de base de datos
+	 * @throws UVException en caso de no poder crear el usuario
+	 */	
+	public UsuarioBolsaEmpleo setUsuarioExcluidoArea(ResultSet rs) throws SQLException, UVException {
 		ModeloRol modeloRol = ModeloRol.obtenerInstancia();
 		
 		UsuarioBolsaEmpleo usuario = new UsuarioBolsaEmpleo();
@@ -696,20 +799,16 @@ public class ModeloUsuarioBolsaEmpleo {
 	}
 	
 	private void excluirUsuarioAreas(List<Area> areas, UsuarioBolsaEmpleo usu) throws SQLException {
-		String params = BolsaEmpleoUtils.consultaMultiplesParametros(areas.size());
-		String query = "UPDATE TBEP_USUARIOS SET FLGBORRADO = ?, FECHA_BORRADO = ? WHERE CODNUM IN  (" + params + ")";		
-				
+		String query = "INSERT INTO TBEP_USUARIOS_EXCLUIDOS_AREA (USUARIO,AREA) VALUES (?,?)";		
+		
 		try (Connection conexion = ConexionUvirtual.obtenerInstancia(); PreparedStatement stmt = conexion.prepareStatement(query)) {
-			int indexParam = 1;
-			
-			
-			SimpleDateFormat formatter = new SimpleDateFormat("dd/MM/YYYY HH:mm:ss");
-			Date date = new Date(System.currentTimeMillis());
-			
-			stmt.setDate(indexParam++, new java.sql.Date(date.getTime()));
-			
-			stmt.executeUpdate();
-		}	
+
+			for (Area area : areas) {
+				stmt.setInt(1, usu.getCodNum());
+				stmt.setInt(2, area.getCodNum());	
+				stmt.executeUpdate();
+			}
+		}
 	}
 	
 	

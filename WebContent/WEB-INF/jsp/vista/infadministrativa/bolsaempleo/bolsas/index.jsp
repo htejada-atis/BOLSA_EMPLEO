@@ -24,6 +24,19 @@ VistaEstadoBolsas bean = (VistaEstadoBolsas) uvdatos.getVistas().get(VistaEstado
 	<% } else { %>
 	<h2>Estado de las bolsas</h2>
 	
+	
+	<div class="form-group-container">
+	    	<div class="form-group">
+    				<p>Total de bolsas bloqueadas:</p>
+    		</div>
+    		<div class="form-group">
+    				<p>Total de bolsas revisadas:</p>
+    		</div>
+		</div>
+
+	
+	
+	
 	<table class="bluetable bolsaempleo" id="table">
 		<tr>
 			<th scope="col" style="width:5%"></th>
@@ -54,7 +67,7 @@ $(document).ready(function() {
 	    "pageSize": 10,
 	    "action": "<%= ControladorBolsas.ACCION_DATATABLE %>",
 	    "defaultOrderBy": 2,
-	    "defaultOrderDirection": 'desc'.
+	    "defaultOrderDirection": 'desc',
 	    "columns": [
 	    	{'data': 'codNum', 'selectable': true},
 	        {'data': 'codNum'},

@@ -21,6 +21,7 @@ import es.ujaen.uvirtual.beans.CodigoDescripcion;
 import es.ujaen.uvirtual.beans.UVDatos;
 import es.ujaen.uvirtual.beans.Usuario;
 import es.ujaen.uvirtual.beans.uvirtual.bolsaempleo.Bolsa;
+import es.ujaen.uvirtual.beans.uvirtual.bolsaempleo.UsuarioBolsaEmpleo;
 import es.ujaen.uvirtual.beans.vistas.uvirtual.bolsaempleo.VistaAreasBaremar;
 import es.ujaen.uvirtual.modelo.bolsaempleo.ModeloBolsa;
 import es.ujaen.uvirtual.modelo.bolsaempleo.ModeloUsuarioBolsaEmpleo;
@@ -49,10 +50,12 @@ public class ControladorAreasABaremar extends HttpServlet {
 	public static final String PARAM_ACCION = "a";
 	public static final String PARAM_ACCION_AREA = "aa";
 	public static final String PARAM_AREAS_SELECCIONADAS = "areasselected";
+	public static final String PARAM_ID = "id";
 	
 	// acciones
 	public static final String ACCION_LISTAR = "listar";
 	public static final String ACCION_DATATABLE = "datatable";
+	public static final String ACCION_DATATABLE_EXCLUIDOS = "datatableexcluidos";
 	public static final String ACCION_AREA = "accionarea";
 	public static final String ACCION_AREA_PASAR_A_BAREMALE = "accionareabaremable";
 	public static final String ACCION_AREA_PASAR_A_NO_BAREMALE = "accionareanobaremable";
@@ -95,6 +98,9 @@ public class ControladorAreasABaremar extends HttpServlet {
 			switch (nombreAccion) {
 				case ACCION_DATATABLE:
 					listado(bean, datos, request, response);
+					break;
+				case ACCION_DATATABLE_EXCLUIDOS:
+					listadoAreasExcluidasUsuario(bean, datos, request, response);
 					break;
 				case ACCION_AREA:
 					accionSobreArea(bean, datos, request);
@@ -148,6 +154,43 @@ public class ControladorAreasABaremar extends HttpServlet {
 		try (PrintWriter writer = response.getWriter()) {
 			try {
 				BolsaEmpleoDataTable<Bolsa> dataTable = modelo.listaAreaDatatable(request.getParameterMap());
+				Gson gson = new GsonBuilder().setExclusionStrategies(BolsaEmpleoDataTable.GSONEXCLUSIONSTRATEGY).create();
+
+				writer.write(gson.toJson(dataTable));
+			} catch (Exception ex) {
+				bean.getMensajesDeError().add(ex.getMessage());
+				
+				CodigoDescripcion mensaje = new CodigoDescripcion("error", ex.getMessage());
+				writer.write(new Gson().toJson(mensaje));
+				response.setStatus(RESPONSE_HTTP_CODE_ERROR);
+			}
+		}
+	}
+	
+	
+	/**
+	 * AJAX para devolver listado de areas excluidas de un usuario(bolsas).
+	 * @param bean .
+	 * @param datos .
+	 * @param request .
+	 * @param response .
+	 * @throws IOException .
+	 * @throws SQLException .
+	 */
+	private void listadoAreasExcluidasUsuario(VistaAreasBaremar bean, UVDatos datos, 
+			HttpServletRequest request, HttpServletResponse response) throws IOException, SQLException {
+		ModeloArea modelo = ModeloArea.obtenerInstancia();	
+		ModeloUsuarioBolsaEmpleo modeloUsuario = ModeloUsuarioBolsaEmpleo.obtenerInstancia();
+		datos.setContentType("application/json");
+		datos.setRespuestaEnviada(true);
+		response.setContentType("application/json");
+		response.setCharacterEncoding("UTF-8");
+		
+		Integer codNum = Formateador.leeParametroInteger(request.getParameter(PARAM_ID));
+		
+		try (PrintWriter writer = response.getWriter()) {
+			try {
+				BolsaEmpleoDataTable<Bolsa> dataTable = modelo.listaAreaExcluidasUsuarioDatatable(request.getParameterMap(), codNum);
 				Gson gson = new GsonBuilder().setExclusionStrategies(BolsaEmpleoDataTable.GSONEXCLUSIONSTRATEGY).create();
 
 				writer.write(gson.toJson(dataTable));
