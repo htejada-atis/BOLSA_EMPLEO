@@ -26,29 +26,29 @@ VistaMeritos bean = (VistaMeritos) uvdatos.getVistas().get(VistaMeritos.class.ge
     
     <form id="agregar_merito" class="be-form" method="post" action="<%= request.getRequestURI() %>" enctype="multipart/form-data">
     	<input type="hidden" name="<%= ControladorMisMeritos.PARAM_ACCION %>" id="accion_formulario" value="" />
-    	<div class="form-group">
-			<label>Apartado</label>
-			<select id="select_apartado" name="<%= ControladorMisMeritos.PARAM_APARTADO %>">
-				<option value="0">Elija el apartado</option>
-				<%
-				for(ApartadoBaremacion apartado: bean.getApartados()) {
-				%>	
-					<% if (bean.getApartado() != null && bean.getApartado().equals(apartado)) { %>
-	    				<option value="<%=apartado.getCodNum()%>" selected><%=apartado.getCodigo()%> - <%=apartado.getNombre()%></option>
-	    			<% } else { %>
-	    				<option value="<%=apartado.getCodNum()%>"><%=apartado.getCodigo()%> - <%=apartado.getNombre()%></option>
-	    			<% } %>
-	    		<%
-	    		}
-	    		%>
-			</select>
-		</div>
+    	<div class="form-group-container col2">
+	    	<div class="form-group">
+				<label>Apartado:</label>
+				<select class="form-input-custom" id="select_apartado" name="<%= ControladorMisMeritos.PARAM_APARTADO %>">
+					<option value="0">Elija el apartado</option>
+					<%
+					for(ApartadoBaremacion apartado: bean.getApartados()) {
+					%>	
+						<% if (bean.getApartado() != null && bean.getApartado().equals(apartado)) { %>
+		    				<option value="<%=apartado.getCodNum()%>" selected><%=apartado.getCodigo()%> - <%=apartado.getNombre()%></option>
+		    			<% } else { %>
+		    				<option value="<%=apartado.getCodNum()%>"><%=apartado.getCodigo()%> - <%=apartado.getNombre()%></option>
+		    			<% } %>
+		    		<%
+		    		}
+		    		%>
+				</select>
+			</div>
 		
 		<% if (bean.getApartado() != null) { %>
-		
 			<div class="form-group">
-				<label>Ítem</label>
-				<select id="select_item" name="<%= ControladorMisMeritos.PARAM_ITEM %>">
+				<label>Ítem:</label>
+				<select class="form-input-custom" id="select_item" name="<%= ControladorMisMeritos.PARAM_ITEM %>">
 					<option value="0">Elija el ítem</option>
 					<%
 					for(ItemBaremacion item: bean.getItems()) {
@@ -60,23 +60,29 @@ VistaMeritos bean = (VistaMeritos) uvdatos.getVistas().get(VistaMeritos.class.ge
 				</select>
 			</div>
 		
-		<% } %>	
+		<% } %>
 		
-    	<div class="form-group">
-    		<label for="merito_valor">Valor</label>
-    		<input id="merito_valor" type="text" name="<%= ControladorMisMeritos.PARAM_VALOR %>"/>
+		</div>
+		
+		<div class="form-group-container col2">
+	    	<div class="form-group">
+	    		<label for="merito_valor">Valor:</label>
+	    		<input class="form-input-custom" id="merito_valor" type="text" name="<%= ControladorMisMeritos.PARAM_VALOR %>"/>
+	    	</div>
+	    	<div class="form-group">
+	    		<label for="merito_descripcion">Descripción:</label>
+	    		<input class="form-input-custom" id="merito_descripcion" type="text" name="<%= ControladorMisMeritos.PARAM_DESCRIPCION %>"></input>
+	    	</div>
     	</div>
     	<div class="form-file">
 			<label for="merito_archivo">Fichero:</label>
 			<input id="merito_archivo" type="file" name="<%= ControladorMisMeritos.PARAM_ARCHIVO %>"/>
 		</div>
-    	<div class="form-group">
-    		<label for="merito_descripcion">Descripción</label>
-    		<input id="merito_descripcion" type="text" name="<%= ControladorMisMeritos.PARAM_DESCRIPCION %>"></input>
-    	</div>
-    	<div class="form-group">
-    		<label for="merito_observacion">Observación para la comisión</label>
-    		<textarea id="merito_observacion" name="<%= ControladorMisMeritos.PARAM_OBSERVACION %>" rows="3" cols="50"></textarea>
+    	<div class="form-group-container col1">
+	    	<div class="form-group">
+	    		<label for="merito_observacion">Observación para la comisión:</label>
+	    		<textarea class="form-input-custom" id="merito_observacion" name="<%= ControladorMisMeritos.PARAM_OBSERVACION %>" rows="2" cols="50"></textarea>
+	    	</div>
     	</div>
     	<div class="form-btn">
     		<input id="merito_enviar" type="submit" name="<%= ControladorMisMeritos.PARAM_ENVIAR %>" value="Agregar mérito"/>

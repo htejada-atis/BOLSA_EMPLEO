@@ -13,13 +13,24 @@ VistaTitulaciones bean = (VistaTitulaciones) uvdatos.getVistas().get(VistaTitula
 <div class="bolsa-empleo">
 
 	<%
-		if (session.getAttribute(ControladorGestionTitulaciones.MENSAJE_ENVIADO) != null) {
+		if (session.getAttribute(ControladorGestionTitulaciones.MENSAJE_ENVIADO_CORRECTO) != null) {
 		%>
 		<div id="exito" class="success">
-			<%=session.getAttribute(ControladorGestionTitulaciones.MENSAJE_ENVIADO)%>
+			<%=session.getAttribute(ControladorGestionTitulaciones.MENSAJE_ENVIADO_CORRECTO)%>
 		</div>
 	<%
-			session.removeAttribute(ControladorGestionTitulaciones.MENSAJE_ENVIADO);
+			session.removeAttribute(ControladorGestionTitulaciones.MENSAJE_ENVIADO_CORRECTO);
+		}
+	%>
+	
+	<%
+		if (session.getAttribute(ControladorGestionTitulaciones.MENSAJE_ENVIADO_ERROR) != null) {
+		%>
+		<div id="error" class="error">
+			<%=session.getAttribute(ControladorGestionTitulaciones.MENSAJE_ENVIADO_ERROR)%>
+		</div>
+	<%
+			session.removeAttribute(ControladorGestionTitulaciones.MENSAJE_ENVIADO_ERROR);
 		}
 	%>
 	

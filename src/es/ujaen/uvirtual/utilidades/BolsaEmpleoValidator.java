@@ -15,6 +15,7 @@ import javax.servlet.http.HttpServletRequest;
 public class BolsaEmpleoValidator {
 	public static final String PARAM_STRING = "string";
 	public static final String PARAM_INTEGER = "integer";
+	public static final String PARAM_FLOAT = "float";
 	public static final String PARAM_DATE = "date";
 	
 	public static final String MENSAJE_ERROR_PARSEANDO = "Tipo no válido";
@@ -62,6 +63,15 @@ public class BolsaEmpleoValidator {
 	}
 	
 	/**
+	 * Añade un parametro de tipo float.
+	 * @param param .
+	 * @throws UVException .
+	 */
+	public void addParamFloat(String param) throws UVException {
+		this.addParam(param, PARAM_FLOAT);
+	}
+	
+	/**
 	 * Añade un parametro de tipo date.
 	 * @param param .
 	 * @throws UVException .
@@ -76,7 +86,7 @@ public class BolsaEmpleoValidator {
 	 * @return .
 	 * @throws UVException .
 	 */
-	public String getValueString(String param) throws UVException {
+	public String getValueString(String param) {
 		return (String) this.values.get(param);
 	}
 	
@@ -86,7 +96,7 @@ public class BolsaEmpleoValidator {
 	 * @return .
 	 * @throws UVException .
 	 */
-	public Integer getValueInteger(String param) throws UVException {
+	public Integer getValueInteger(String param) {
 		return (Integer) this.values.get(param);
 	}
 	
@@ -96,8 +106,18 @@ public class BolsaEmpleoValidator {
 	 * @return .
 	 * @throws UVException .
 	 */
-	public Date getValueDate(String param) throws UVException {
+	public Date getValueDate(String param) {
 		return (Date) this.values.get(param);
+	}
+	
+	/**
+	 * Devuelve el valor del parámetro de tipo float.
+	 * @param param .
+	 * @return .
+	 * @throws UVException .
+	 */
+	public Float getValueFloat(String param) {
+		return (Float) this.values.get(param);
 	}
 		
 	/**
@@ -116,6 +136,9 @@ public class BolsaEmpleoValidator {
 			break;
 		case PARAM_INTEGER:
 			value = Formateador.leeParametroInteger(this.request.getParameter(param));
+			break;
+		case PARAM_FLOAT:
+			value = Formateador.leeParametroFloat(this.request.getParameter(param));
 			break;
 		case PARAM_DATE:
 			try {
@@ -169,7 +192,10 @@ public class BolsaEmpleoValidator {
 			break;	
 		case "number":
 			this.checkRuleNum(param, type, value, mensajeError);			
-			break;		
+			break;	
+		case "float":
+			this.checkRuleFloat(param, type, value, mensajeError);			
+			break;			
 		case "select":
 			this.checkSelect(param, type, value, mensajeError);			
 			break;	
@@ -222,9 +248,7 @@ public class BolsaEmpleoValidator {
 	}
 	
 	private void checkRuleNoBlank(String param, String type, Object value, String mensajeError) throws UVException {
-		if (value == null) {
-			this.addError(param, mensajeError);
-		} else {
+		if (value != null) {			
 			if (!"string".equals(type)) {
 				throw new UVException(MENSAJE_ERROR_NOBLANKSTRING);
 			}
@@ -236,9 +260,7 @@ public class BolsaEmpleoValidator {
 	}
 	
 	private void checkRuleMax(String param, String type, Object value, String mensajeError, String paramRule) throws UVException {
-		if (value == null) {
-			this.addError(param, mensajeError);
-		} else {
+		if (value != null) {			
 			switch (type) {
 			case PARAM_STRING:		
 				Integer paramRuleString = this.getParamInteger(paramRule);
@@ -267,9 +289,7 @@ public class BolsaEmpleoValidator {
 	}
 	
 	private void checkRuleMin(String param, String type, Object value, String mensajeError, String paramRule) throws UVException {
-		if (value == null) {
-			this.addError(param, mensajeError);
-		} else {
+		if (value != null) {
 			switch (type) {
 			case PARAM_STRING:	
 				Integer paramRuleString = this.getParamInteger(paramRule);				
@@ -306,9 +326,7 @@ public class BolsaEmpleoValidator {
 	 * @throws UVException .
 	 */
 	public void checkRuleNum(String param, String type, Object value, String mensajeError) throws UVException {
-		if (value == null) {
-			this.addError(param, mensajeError);
-		} else {
+		if (value != null) {
 			String regex = "[0-9]+";
 	        Pattern p = Pattern.compile(regex);
 	        Matcher m = p.matcher((String) value);
@@ -317,6 +335,18 @@ public class BolsaEmpleoValidator {
 	        	this.addError(param, mensajeError);		
 	        }
 		}	
+	}
+	
+	private void checkRuleFloat(String param, String type, Object value, String mensajeError) throws UVException {
+		if (value != null) {
+			String regex = "[0-9]+(,[0-9])?";
+	        Pattern p = Pattern.compile(regex);
+	        Matcher m = p.matcher((String) value);
+
+	        if (!m.matches()) {
+	        	this.addError(param, mensajeError);		
+	        }
+		}
 	}
 	
 	/**

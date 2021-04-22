@@ -3,6 +3,7 @@ package es.ujaen.uvirtual.controlador.infadministrativa.bolsaempleo;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.sql.SQLException;
+import java.sql.SQLIntegrityConstraintViolationException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.servlet.ServletException;
@@ -59,9 +60,11 @@ public class ControladorGestionTitulaciones extends HttpServlet {
 	public static final String PARAM_TITULACIONES = "titulaciones";
 
 	// Mensajes
-	public static final String MENSAJE_ENVIADO = "mensaje";
-	public static final String MENSAJE_EXITO_AGREGAR = "titulación agregada correctamente";
-	public static final String MENSAJE_EXITO_ELIMINAR = "titulación eliminada correctamente";
+	public static final String MENSAJE_ENVIADO_CORRECTO = "mensajecorrecto";
+	public static final String MENSAJE_ENVIADO_ERROR = "mensajeerror";
+	public static final String MENSAJE_EXITO_AGREGAR = "Titulación agregada correctamente";
+	public static final String MENSAJE_EXITO_ELIMINAR = "Titulación eliminada correctamente";
+	public static final String MENSAJE_ERROR_ELIMINAR_TITULACION = "No se puede eliminar una titulación que está asignada a un área";
 	public static final String MENSAJE_ERROR_NOMBRE_VACIO = "El nombre es obligatorio para almacenar una titulación";
 	public static final String MENSAJE_ERROR_NOMBRE_LARGO = "El nombre no puede contener mas de %d caracteres";
 	
@@ -86,7 +89,6 @@ public class ControladorGestionTitulaciones extends HttpServlet {
 		datos.setContentType("text/html");
 		
 		VistaTitulaciones bean = new VistaTitulaciones();
-		bean.setVista(RUTA_BEP_CONF + "titulaciones.jsp");
 		
 		ModeloUsuarioBolsaEmpleo modelo = ModeloUsuarioBolsaEmpleo.obtenerInstancia();
 		
@@ -110,8 +112,12 @@ public class ControladorGestionTitulaciones extends HttpServlet {
 			case ACCION_DATATABLE_TITULACIONES:
 				listadoTitulaciones(bean, datos, request, response);
 				break;
+			case ACCION_LISTAR_TITULACIONES:
+				bean.setVista(RUTA_BEP_CONF + "titulaciones.jsp");
+				break;
 			}
 		} catch (SQLException e) {
+			System.out.println("error: " + e);
 			bean.getMensajesDeError().add("Error al acceder a la base de datos");
 		} catch (UVException e) {
 			LOGGER.log(Level.WARNING, e.toString());
@@ -163,7 +169,7 @@ public class ControladorGestionTitulaciones extends HttpServlet {
 				String nombre = EscapaHTML.ajustaCodificacion(request.getParameter(PARAM_NOMBRE));
 				modelo.actualizaTitulacion(new Titulacion(codNum, nombre));
 				HttpSession session = request.getSession(false);
-				session.setAttribute(MENSAJE_ENVIADO, MENSAJE_EXITO_AGREGAR);
+				session.setAttribute(MENSAJE_ENVIADO_CORRECTO, MENSAJE_EXITO_AGREGAR);
 				response.sendRedirect(request.getServletPath());
 			}
 		}
@@ -179,10 +185,16 @@ public class ControladorGestionTitulaciones extends HttpServlet {
 	private void eliminarTitulacion(HttpServletRequest request, HttpServletResponse response) throws SQLException, UVException, IOException {
 		Integer codNum = Formateador.leeParametroInteger(request.getParameter(PARAM_ID));
 		ModeloTitulacion modelo = ModeloTitulacion.obtenerInstancia();
-		modelo.borraTitulacion(new Titulacion(codNum));
-		HttpSession session = request.getSession(false);
-		session.setAttribute(MENSAJE_ENVIADO, MENSAJE_EXITO_ELIMINAR);
-		response.sendRedirect(request.getServletPath());
+		try {
+			modelo.borraTitulacion(new Titulacion(codNum));
+			HttpSession session = request.getSession(false);
+			session.setAttribute(MENSAJE_ENVIADO_CORRECTO, MENSAJE_EXITO_ELIMINAR);
+			response.sendRedirect(request.getServletPath());
+		} catch (SQLIntegrityConstraintViolationException e) {
+			HttpSession session = request.getSession(false);
+			session.setAttribute(MENSAJE_ENVIADO_ERROR, MENSAJE_ERROR_ELIMINAR_TITULACION);
+			response.sendRedirect(request.getServletPath());
+		}
 	}
 	
 	/** agrega una nueva titulación .
@@ -209,7 +221,7 @@ public class ControladorGestionTitulaciones extends HttpServlet {
 				String nombre = EscapaHTML.ajustaCodificacion(request.getParameter(PARAM_NOMBRE));
 				modelo.insertaTitulacion(new Titulacion(nombre));
 				HttpSession session = request.getSession(false);
-				session.setAttribute(MENSAJE_ENVIADO, MENSAJE_EXITO_AGREGAR);
+				session.setAttribute(MENSAJE_ENVIADO_CORRECTO, MENSAJE_EXITO_AGREGAR);
 				response.sendRedirect(request.getServletPath());
 			}
 		}

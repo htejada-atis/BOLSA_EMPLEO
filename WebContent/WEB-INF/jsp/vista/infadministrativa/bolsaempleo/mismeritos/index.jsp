@@ -33,19 +33,18 @@ VistaMeritos bean = (VistaMeritos) uvdatos.getVistas().get(VistaMeritos.class.ge
 		<!--<caption>MÉRITOS QUE LA COMISIÓN EVALUARÁ</caption>-->
 		<tr>
 			<th scope="col" style="width:5%"></th>
-			<th scope="col" style="width:8%" title="Id del mérito">Id</th>
-			<th scope="col"	style="width:10%">Apartado</th>
-			<th scope="col"	style="width:10%">Ítem</th>
+			<th scope="col"	style="width:15%">Código ítem</th>
+			<th scope="col"	style="width:15%">Nombre ítem</th>
 			<th scope="col"	style="width:20%">Descripción</th>
 			<th scope="col"	style="width:10%">Valor</th>
-			<th scope="col"	style="width:20%">Observación</th>
-			<th scope="col"	style="width:20%">Fichero</th>
+			<th scope="col"	style="width:15%">Observación</th>
+			<th scope="col"	style="width:15%">Fichero</th>
 		</tr>
 		<tbody>		
 		</tbody>
 		<tfoot>
 			<tr>
-				<th colspan="8" style="width:100%"></th>
+				<th colspan="7" style="width:100%"></th>
 			</tr>
 		</tfoot>
 	</table>
@@ -65,22 +64,24 @@ VistaMeritos bean = (VistaMeritos) uvdatos.getVistas().get(VistaMeritos.class.ge
 		    "pageSize": 10,
 		    "action": "<%=ControladorMisMeritos.ACCION_DATATABLE%>",
 		    "selectable": true,
+		    "filterable": true,
 		    "columns": [
 		    	{'data': 'codNum', 'selectable': true},
-		    	{'data': 'codNum'},
-		        {'data': 'item.bloque.apartado.codigo'},
-		        {'data': 'item.codigo'},
-		        {'data': 'descripcion', 'class': 'overflow-auto'},
-		        {'data': 'valor', 'class': 'overflow-auto'},
-		        {'data': 'observacion', 'class': 'overflow-auto'},
-		        {'data': 'codnum', 'class': 'overflow-ellipsis', 'render': function(row) {
+		        {'data': 'item', 'filter': true, 'render': function(row) {
+		        	return row.item.bloque.apartado.codigo + "." + row.item.bloque.codigo + "." + row.item.codigo;
+	        	}},
+		        {'data': 'item.nombre', 'filter': true},
+		        {'data': 'descripcion', 'filter': true, 'class': 'overflow-auto'},
+		        {'data': 'valor', 'filter': true, 'class': 'overflow-auto'},
+		        {'data': 'observacion', 'filter': true, 'class': 'overflow-auto'},
+		        {'data': 'codnum', 'order': {'active': false}, 'class': 'overflow-ellipsis', 'render': function(row) {
 		        	var link = "<%= request.getRequestURI() %>?a=<%= ControladorMisMeritos.ACCION_DESCARGAR_FICHERO %>&<%= ControladorMisMeritos.PARAM_ID %>=" + row.codNum;
-		        	return "<a class='consultar-fichero' href='" +link +"' target='_blank'>" +link +"</a>"; 
+		        	return "<a class='consultar-fichero' title='Descargar fichero' href='" +link +"' target='_blank'>" +link +"</a>"; 
 		        	}
 		        },
 		    ],
 		    "actions": [
-		    	{'label': 'Eliminar', 'onClick': function(selected) {
+		    	{'label': 'Eliminar', 'title': 'Eliminar méritos seleccionados', 'onClick': function(selected) {
 		    		if(selected.length) {
 		    			var mensaje = "¿Desea borrar el mérito seleccionado?";
 			        	var titulo = "Borrar mérito";

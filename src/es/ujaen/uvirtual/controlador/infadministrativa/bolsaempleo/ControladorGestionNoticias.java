@@ -63,9 +63,10 @@ public class ControladorGestionNoticias extends HttpServlet {
 	
 	// Mensajes
 	public static final String MENSAJE_ENVIADO = "mensaje";
-	public static final String MENSAJE_EXITO_AGREGAR = "noticia creada correctamente";
-	public static final String MENSAJE_EXITO_EDITAR = "noticia editada correctamente";
-	public static final String MENSAJE_EXITO_ELIMINAR = "noticia eliminada correctamente";
+	public static final String MENSAJE_EXITO_AGREGAR = "Noticia creada correctamente";
+	public static final String MENSAJE_EXITO_EDITAR = "Noticia editada correctamente";
+	public static final String MENSAJE_EXITO_ELIMINAR = "Noticia eliminada correctamente";
+	public static final String MENSAJE_EXITO_RESTAURAR = "Noticia restaurada correctamente";
 	
 	public static final int RESPONSE_HTTP_CODE_ERROR = 400;
 	
@@ -88,7 +89,6 @@ public class ControladorGestionNoticias extends HttpServlet {
 		datos.setContentType("text/html");
 		
 		VistaNoticias bean = new VistaNoticias();
-		bean.setVista(RUTA_BEP_NOTICIAS + "indice.jsp");
 		ModeloUsuarioBolsaEmpleo modelo = ModeloUsuarioBolsaEmpleo.obtenerInstancia();
 
 		String nombreAccion = EscapaHTML.ajustaCodificacion(request.getParameter(PARAM_ACCION));
@@ -109,6 +109,9 @@ public class ControladorGestionNoticias extends HttpServlet {
 					break;
 				case ACCION_ELIMINAR_NOTICIA:
 					eliminarNoticia(bean, request, response);
+					break;
+				case ACCION_LISTAR_NOTICIAS:
+					bean.setVista(RUTA_BEP_NOTICIAS + "indice.jsp");
 					break;
 			}
 		} catch (UVException e) {
@@ -209,7 +212,7 @@ public class ControladorGestionNoticias extends HttpServlet {
 		modelo.borraRestauraNoticia(noticia);
 		bean.getMensajesDeExito().add(MENSAJE_EXITO_ELIMINAR);
 		HttpSession session = request.getSession(false);
-		session.setAttribute(MENSAJE_ENVIADO, MENSAJE_EXITO_ELIMINAR);
+		session.setAttribute(MENSAJE_ENVIADO, activa ? MENSAJE_EXITO_RESTAURAR : MENSAJE_EXITO_ELIMINAR);
 		response.sendRedirect(request.getServletPath());
 	}
 	

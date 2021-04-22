@@ -39,33 +39,36 @@ public class TestBEPBeanApartadoBaremacion {
 	 */
 	@Test
 	public void testA02() {
-		Integer id = 1;
-		ApartadoBaremacion apartado = new ApartadoBaremacion(id, CADENA, CADENA, BOOLEANO);
-		assertEquals(id, apartado.getCodNum());
-		assertEquals(CADENA, apartado.getCodigo());
-		assertEquals(CADENA, apartado.getNombre());
-		assertEquals(BOOLEANO, apartado.isActivo());
-		assertNotNull(apartado.toString());
+//		Integer id = 1;
+//		ApartadoBaremacion apartado = new ApartadoBaremacion(id, CADENA, CADENA, BOOLEANO);
+//		assertEquals(id, apartado.getCodNum());
+//		assertEquals(CADENA, apartado.getCodigo());
+//		assertEquals(CADENA, apartado.getNombre());
+//		assertEquals(BOOLEANO, apartado.isActivo());
+//		assertNotNull(apartado.toString());
+		assertNotNull(null);
 	}
 	
 	/** test equals.
 	 */
 	@Test
 	public void testA03() {
-		Integer id = 1;
-		ApartadoBaremacion apartado2 = new ApartadoBaremacion(id, CADENA, CADENA, BOOLEANO);
-		ApartadoBaremacion apartado = new ApartadoBaremacion(apartado2);
-		apartado.setCodNum(id);
-		apartado.setCodigo(CADENA);
-		apartado.setNombre(CADENA);
-		apartado.setActivo(BOOLEANO);
-		assertEquals(id, apartado.getCodNum());
-		assertEquals(CADENA, apartado.getCodigo());
-		assertEquals(CADENA, apartado.getNombre());
-		assertEquals(BOOLEANO, apartado.isActivo());
-		assertNotNull(apartado.toString());
-		assertTrue(apartado.equals(apartado2));
-		assertTrue(apartado.hashCode() == apartado2.hashCode());
+//		Integer id = 1;
+//		ApartadoBaremacion apartado2 = new ApartadoBaremacion(id, CADENA, CADENA, BOOLEANO);
+//		ApartadoBaremacion apartado = new ApartadoBaremacion(apartado2);
+//		apartado.setCodNum(id);
+//		apartado.setCodigo(CADENA);
+//		apartado.setNombre(CADENA);
+//		apartado.setActivo(BOOLEANO);
+//		assertEquals(id, apartado.getCodNum());
+//		assertEquals(CADENA, apartado.getCodigo());
+//		assertEquals(CADENA, apartado.getNombre());
+//		assertEquals(BOOLEANO, apartado.isActivo());
+//		assertNotNull(apartado.toString());
+//		assertTrue(apartado.equals(apartado2));
+//		assertTrue(apartado.hashCode() == apartado2.hashCode());
+		
+		assertNotNull(null);
 	}
 	
 	/** test equals.
@@ -74,16 +77,18 @@ public class TestBEPBeanApartadoBaremacion {
 	@Test
 	@SuppressWarnings("java:S2159")
 	public void testA04() {
-		Integer id = 1;
-    	ApartadoBaremacion apartado3 = new ApartadoBaremacion(id, CADENA, CADENA, BOOLEANO);
-    	ApartadoBaremacion apartado2 = new ApartadoBaremacion();
-    	ApartadoBaremacion apartado = new ApartadoBaremacion();
-		assertTrue(apartado.equals(apartado2));
-		assertTrue(apartado2.equals(apartado));
-		assertEquals(apartado.hashCode(), apartado2.hashCode());
-		assertFalse(apartado.equals(null));
-		assertFalse(apartado.equals(apartado3));
-		assertFalse(apartado3.equals(apartado));
-		assertNotEquals(apartado.hashCode(), apartado3.hashCode());
+//		Integer id = 1;
+//    	ApartadoBaremacion apartado3 = new ApartadoBaremacion(id, CADENA, CADENA, BOOLEANO);
+//    	ApartadoBaremacion apartado2 = new ApartadoBaremacion();
+//    	ApartadoBaremacion apartado = new ApartadoBaremacion();
+//		assertTrue(apartado.equals(apartado2));
+//		assertTrue(apartado2.equals(apartado));
+//		assertEquals(apartado.hashCode(), apartado2.hashCode());
+//		assertFalse(apartado.equals(null));
+//		assertFalse(apartado.equals(apartado3));
+//		assertFalse(apartado3.equals(apartado));
+//		assertNotEquals(apartado.hashCode(), apartado3.hashCode());
+		
+		assertNotNull(null);
 	}
 }

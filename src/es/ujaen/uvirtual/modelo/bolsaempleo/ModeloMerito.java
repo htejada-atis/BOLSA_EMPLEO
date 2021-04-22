@@ -18,13 +18,12 @@ import es.ujaen.uvirtual.utilidades.UVException;
  * @author ATISoluciones
  */
 public class ModeloMerito {
-	public static final int ORDER_COLUMN_INDEX_ID = 1;
-	public static final int ORDER_COLUMN_INDEX_APARTADO = 2;
-	public static final int ORDER_COLUMN_INDEX_ITEM = 3;
-	public static final int ORDER_COLUMN_INDEX_DESCRIPCION = 4;
-	public static final int ORDER_COLUMN_INDEX_VALOR = 5;
-	public static final int ORDER_COLUMN_INDEX_OBSERVACION = 6;
-	public static final int ORDER_COLUMN_INDEX_FICHERO = 7;
+	public static final int ORDER_COLUMN_INDEX_ID = 0;
+	public static final int ORDER_COLUMN_INDEX_ITEM = 1;
+	public static final int ORDER_COLUMN_INDEX_NOMBRE_ITEM = 2;
+	public static final int ORDER_COLUMN_INDEX_DESCRIPCION = 3;
+	public static final int ORDER_COLUMN_INDEX_VALOR = 4;
+	public static final int ORDER_COLUMN_INDEX_OBSERVACION = 5;
 	
     protected static ModeloMerito eInstancia = null;
 	
@@ -63,7 +62,7 @@ public class ModeloMerito {
 		
 		try (Connection conexion = ConexionUvirtual.obtenerInstancia(); PreparedStatement stmt = conexion.prepareStatement(consulta);) {
 			if (id != null) {
-				int parameterIndex = 1; 
+				int parameterIndex = 1;
 				stmt.setInt(parameterIndex++, id);
 			}
 			try (ResultSet rs = stmt.executeQuery()) {
@@ -195,12 +194,11 @@ public class ModeloMerito {
 				+ " WHERE bepmer.BEPUSU_CODNUM = ? ";
 		
 		dataTable.setColumn(ORDER_COLUMN_INDEX_ID, "bepmer.CODNUM");
-		dataTable.setColumn(ORDER_COLUMN_INDEX_APARTADO, "bepblo.BEPAPA_CODNUM");
 		dataTable.setColumn(ORDER_COLUMN_INDEX_ITEM, "bepmer.BEPITE_CODNUM");
+		dataTable.setColumn(ORDER_COLUMN_INDEX_NOMBRE_ITEM, "bepite.NOMBRE");
 		dataTable.setColumn(ORDER_COLUMN_INDEX_DESCRIPCION, "bepmer.DESCRIPCION");
 		dataTable.setColumn(ORDER_COLUMN_INDEX_VALOR, "bepmer.VALOR");
 		dataTable.setColumn(ORDER_COLUMN_INDEX_OBSERVACION, "bepmer.OBSERVACION");
-		dataTable.setColumn(ORDER_COLUMN_INDEX_FICHERO, "bepmer.ARCHIVO");
 		dataTable.setQuery(consulta);
 				
 		try (Connection conexion = ConexionUvirtual.obtenerInstancia();
@@ -210,6 +208,7 @@ public class ModeloMerito {
 			int indexParam = 1;
 			stmt.setInt(indexParam, usuario);
 			stmtCount.setInt(indexParam++, usuario);
+			dataTable.setFiltersParams(stmt, stmtCount, indexParam);
 			try (ResultSet rs = stmt.executeQuery()) {
 				while (rs.next()) {
 					Merito mer = new Merito();

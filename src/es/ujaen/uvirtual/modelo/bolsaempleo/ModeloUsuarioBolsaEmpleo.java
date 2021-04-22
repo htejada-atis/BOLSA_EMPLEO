@@ -46,17 +46,12 @@ public class ModeloUsuarioBolsaEmpleo {
 	public static final int ORDER_COLUMN_INDEX_RAZON_EXCLUSION = 10;
 	public static final int ORDER_COLUMN_INDEX_FECHA_EXCLUSION = 11;
 	
-	public static final int ORDER_COLUMN_INDEX_NUMDOCUMENTO_EVALUADORES = 0;
-	public static final int ORDER_COLUMN_INDEX_ROL_EVALUADORES = 1;
-	public static final int ORDER_COLUMN_INDEX_NOMBRE_Y_APELLIDOS_EVALUADORES = 2;
-	public static final int ORDER_COLUMN_INDEX_ACTIVO_EVALUADORES = 3;
-	
 	public static final String USUARIO_BORRADO = "S";
 	public static final String USUARIO_NO_BORRADO = "N";
 	public static final String USUARIO_EXCLUIDO = "S";
 	public static final String USUARIO_NO_EXCLUIDO = "N";
 	
-	public static final Integer PARAM_ROL_ID = 1051;
+	public static final Integer PARAM_ROL_CANDIDATO_ID = 1051;
 	
 	public static final int COLUMN_NOMBRE_MAXLENGTH = 20;
 	public static final int COLUMN_PRIMER_APELLIDO_MAXLENGTH = 40;
@@ -481,61 +476,6 @@ public class ModeloUsuarioBolsaEmpleo {
 		return dataTable;
 	}
 	
-	/**	Función que agrega evaluadores a un área .
-	 * @param usuarios .
-	 * @param area id del area por el que se va a filtrar .
-	 * @throws SQLException en caso de error en la BD .
-	 * @throws UVException en caso de error de parámetros .
-	 */
-	public void insertaEvaluadores(List<String> usuarios, Integer area) throws SQLException, UVException {
-		
-		if (area == null) {
-			throw new UVException("No se puede agregar un evaluador sin el id del área");
-		}
-		
-		String params = BolsaEmpleoUtils.consultaMultiplesParametros(usuarios.size());
-		String consulta = "INSERT INTO TBEP_EVALUADORES (BEPARE_CODNUM, BEPUSU_CODNUM)"
-				+ " SELECT bepare.CODNUM AS BEPARE_CODNUM, bepusu.CODNUM AS BEPUSU_CODNUM"
-				+ " FROM TBEP_USUARIOS bepusu, TBEP_AREAS bepare WHERE bepare.CODNUM = ? AND "
-				+ " bepusu.CODNUM IN (" + params + ")";
-		
-		try (Connection conexion = ConexionUvirtual.obtenerInstancia(); PreparedStatement stmt = conexion.prepareStatement(consulta)) {
-			int indexParam = 1;
-			stmt.setInt(indexParam++, area);
-			for (String usuario: usuarios) {
-				stmt.setString(indexParam++, usuario);
-			}
-			stmt.executeUpdate();
-		}
-	}
-	
-	/** Borra o restaura un evaluador .
-	 * @param evaluador a borrar .
-	 * @throws SQLException en caso de error en la BD .
-	 * @throws UVException si noticia no es valida .
-	 */
-	public void borraRestauraEvaluador(Evaluador evaluador) throws SQLException, UVException {
-		if (evaluador == null) {
-			throw new UVException("No se puede eliminar un evaluador vacío");
-		}
-		if (evaluador.getCodNum() == null) {
-			throw new UVException("No se puede eliminar un evaluador con id de usuario vacío");
-		}
-		if (evaluador.getCodNumArea() == null) {
-			throw new UVException("No se puede eliminar un evaluador con id de area vacío");
-		}
-		String consulta = "UPDATE TBEP_EVALUADORES SET flgactivo=? WHERE bepusu_codnum=? AND bepare_codnum=? ";
-		try (Connection conexion = ConexionUvirtual.obtenerInstancia();
-			 PreparedStatement stmt = conexion.prepareStatement(consulta);) {
-			int parameterIndex = 1;
-			stmt.setString(parameterIndex++, evaluador.isActivo() ? "S" : "N");
-			stmt.setInt(parameterIndex++, evaluador.getCodNum());
-			stmt.setInt(parameterIndex++, evaluador.getCodNumArea());
-			stmt.executeUpdate();
-		}
-	}
-	
-	
 	/**
 	 * Set usuario. 
 	 * @param rs resultado de la consulta
@@ -891,11 +831,15 @@ public class ModeloUsuarioBolsaEmpleo {
 		}	
 	}
 	
-	/** Comprueba si el usuario candidato se encuentra en UVIRTUAL .
+	/** 
+	 * Si hay usuario logeado, comprueba si está registrado en sistema. 
+	 * Si tenemos usuario en nuestro sistema, comprueba si está exluido o borrado (lanzando una excepción). 
+	 * Si no tenemos usuario en nuestro sistema, lo crea como candidato.
+	 *  
 	 * @param  datos .
-	 * @return Boolean s .
-	 * @throws SQLException en caso de error en la BD .
-	 * @throws UVException si noticia no es valida .
+	 * @return Boolean true si hay usuario logeado en el sistema o false en otro caso.
+	 * @throws SQLException en caso de error en la BD.
+	 * @throws UVException si noticia no es valida.
 	 */
 	public Boolean checkUser(UVDatos datos) throws SQLException, UVException {
 		Usuario usuArcos = datos.getUsuario();		
@@ -920,7 +864,7 @@ public class ModeloUsuarioBolsaEmpleo {
 						Rol role;
 						
 						try {
-							role = modeloRol.getRoleById(PARAM_ROL_ID);
+							role = modeloRol.getRoleById(PARAM_ROL_CANDIDATO_ID);
 							
 							UsuarioBolsaEmpleo usuarioFinal = 
 							new UsuarioBolsaEmpleo(usuArcos.getCodigoPersonaArcos(), usuArcos.getUid(), role, true, false);
@@ -941,6 +885,45 @@ public class ModeloUsuarioBolsaEmpleo {
 				}
 			}
 		}
+
+		
+//		Usuario usuArcos = datos.getUsuario();		
+		
+//		// no hay usuario logeado, salimos
+//		if (usuArcos == null) {
+//			return false;
+//		} 
+//		
+//		// comprobamos si el usuario existe en uvirtual (excepción si no existe)
+//		UsuarioBolsaEmpleo usuario = getUsuarioByCodCuenta(usuArcos.getUid());
+//		
+//		if (usuario.getExcluido()) {
+//			throw new UVException("No puede acceder, su perfil ha sido excluido por los siguientes motivos: " + usuario.getRazonExcluido());
+//		} else if (usuario.getBorrado()) {
+//			throw new UVException("No puede acceder, su perfil ha sido borrado de la base de datos");		
+//		} else if (usuArcos != null) {
+//			UsuarioBolsaEmpleo usuarioFinal = null;
+//			
+//			try {
+//				usuarioFinal = listaUsuario(usuArcos.getUid());
+//			} catch (UVException e) {
+//				// no existe el usuario en nuestras tablas, lo creamos como candidato
+//				ModeloRol modeloRol = ModeloRol.obtenerInstancia();
+//				Rol role = modeloRol.getRoleById(PARAM_ROL_CANDIDATO_ID);
+//					
+//				usuarioFinal = new UsuarioBolsaEmpleo(usuArcos.getCodigoPersonaArcos(), usuArcos.getUid(), role, true, false);
+//				insertaUsuario(usuarioFinal);
+//				
+//				return true;
+//			} finally {
+//				// refresamos los roles del usuario
+//				if (usuarioFinal != null) {
+//					CrearUsuario.refrescarUsuario(usuarioFinal.getCodCuenta());	
+//				}				
+//			}
+//			
+//			return false;
+//		}		
 	}
 	
 	/** Elimina un usuario.

@@ -23,6 +23,7 @@ import com.google.gson.reflect.TypeToken;
 import es.ujaen.uvirtual.beans.CodigoDescripcion;
 import es.ujaen.uvirtual.beans.UVDatos;
 import es.ujaen.uvirtual.beans.Usuario;
+import es.ujaen.uvirtual.beans.uvirtual.bolsaempleo.ApartadoBaremacion;
 import es.ujaen.uvirtual.beans.uvirtual.bolsaempleo.ItemBaremacion;
 import es.ujaen.uvirtual.beans.uvirtual.bolsaempleo.Merito;
 import es.ujaen.uvirtual.beans.vistas.uvirtual.bolsaempleo.VistaMeritos;
@@ -75,8 +76,8 @@ public class ControladorMisMeritos extends HttpServlet {
 	// mensajes
 	public static final String MENSAJE_ENVIADO = "mensaje";
 	public static final String MENSAJE_ERROR_MERITOS_SELECCIONADOS_INCORRECTOS = "No hay méritos seleccionados válidos";
-	public static final String MENSAJE_EXITO_AGREGAR = "mérito agregado correctamente";
-	public static final String MENSAJE_EXITO_ELIMINAR = "mérito eliminado correctamente";
+	public static final String MENSAJE_EXITO_AGREGAR = "Mérito agregado correctamente";
+	public static final String MENSAJE_EXITO_ELIMINAR = "Mérito eliminado correctamente";
 	
 	// ruta vistas
 	public static final String RUTA_BEP_MERITOS = "/WEB-INF/jsp/vista/infadministrativa/bolsaempleo/mismeritos/";
@@ -173,12 +174,13 @@ public class ControladorMisMeritos extends HttpServlet {
 		bean.setVista(RUTA_BEP_MERITOS + "formMerito.jsp");
 		
 		ModeloBaremacion modelo = ModeloBaremacion.obtenerInstancia();
-		bean.setApartados(modelo.listaApartados());
+		bean.setApartados(modelo.getApartadosActivos());
 		
 		if (request.getParameter(PARAM_APARTADO) != null) {
 			Integer apartadoId = Formateador.leeParametroInteger(request.getParameter(PARAM_APARTADO));
-			bean.setApartado(modelo.getApartadoBaremacionById(apartadoId));
-			bean.setItems(modelo.listaItemsApartado(apartadoId));
+			ApartadoBaremacion apartado = modelo.getApartadoBaremacionById(apartadoId); 
+			bean.setApartado(apartado);
+			bean.setItems(modelo.getItemsDeApartado(apartado));
 			
 			if (request.getParameter(PARAM_ITEM) != null) {
 				Part uploadedFile = request.getPart(PARAM_ARCHIVO);
