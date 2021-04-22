@@ -98,6 +98,7 @@ public class ControladorUsuarioBolsaEmpleo extends HttpServlet {
 	public static final String ACCION_DATATABLE_USUARIOS_EXCLUIDOS_AREA = "datatableusuariosexcluidosarea";
 	
 	public static final String ACCION_EXCLUIR_USUARIO_AREA = "excluirusuarioarea";
+	public static final String ACCION_INCLUIR_USUARIO_AREA = "incluirusuarioarea";
 	
 	// mensajes
 	public static final String MENSAJE_ENVIADO = "mensaje";
@@ -356,6 +357,7 @@ public class ControladorUsuarioBolsaEmpleo extends HttpServlet {
 		ModeloArea modeloArea = ModeloArea.obtenerInstancia();
 		
 		UsuarioBolsaEmpleo usu = modelo.getUsuarioById(codNum);
+		Usuario usuArcos = CrearUsuario.usuario(usu.getCodCuenta());
 		
 		List<UsuarioBolsaEmpleo> usuarios = modelo.getUsuariosByIds(selected);
 		List<Area> areas = modeloArea.getAreasByIds(selected);
@@ -372,13 +374,28 @@ public class ControladorUsuarioBolsaEmpleo extends HttpServlet {
 			break;
 		case ACCION_EXCLUIR_USUARIO_AREA:
 			modelo.excluirUsuarioArea(usu, areas);
-			break;
 			
+			bean.setUsuarioArcos(usuArcos);
+			
+			bean.setBusqueda(false);
+			
+			bean.setUsuario(usu);
+			bean.setVista("/WEB-INF/jsp/vista/infadministrativa/bolsaempleo/configuracion/formUsuario.jsp");
+			break;
+		case ACCION_INCLUIR_USUARIO_AREA:
+			modelo.incluirUsuarioArea(usu, areas);
+
+			bean.setUsuarioArcos(usuArcos);
+			bean.setBusqueda(false);
+			
+			bean.setUsuario(usu);
+			bean.setVista("/WEB-INF/jsp/vista/infadministrativa/bolsaempleo/configuracion/formUsuario.jsp");
+			break;
 		default:
 			bean.getMensajesDeError().add(MENSAJE_ERROR_ACCION_USUARIO_NO_VALIDA);
 			return;
 		}
-		
+
 		bean.getMensajesDeExito().add(MENSAJE_EXITO_USUARIO_MODIFICADO_CORRECTAMENTE);
 	}
 	

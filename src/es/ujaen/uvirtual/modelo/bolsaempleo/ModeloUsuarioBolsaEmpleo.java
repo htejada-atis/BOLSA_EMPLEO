@@ -364,7 +364,7 @@ public class ModeloUsuarioBolsaEmpleo {
 		
 		BolsaEmpleoDataTable<Bolsa> dataTable = new BolsaEmpleoDataTable<Bolsa>(params);
 		
-		dataTable.setColumn(ORDER_COLUMN_INDEX_ID, "bepbol.CODNUM");
+		dataTable.setColumn(ORDER_COLUMN_INDEX_ID, "bepare.CODNUM", DataTableColumn.COLUMN_TYPE_NUMBER);
 		dataTable.setColumn(ModeloArea.ORDER_COLUMN_INDEX_CODIGO, "bepare.ID_AREA_CONOCIMIENTO");
 		dataTable.setColumn(ModeloArea.ORDER_COLUMN_INDEX_AREA, "bepare.DES_AREA_CONOCIMIENTO");
 		dataTable.setColumn(ModeloArea.ORDER_COLUMN_INDEX_BAREMALE, "bepbol.FLGBAREMABLE", DataTableColumn.COLUMN_TYPE_BOOLEAN);
@@ -666,6 +666,30 @@ public class ModeloUsuarioBolsaEmpleo {
 	
 	private void excluirUsuarioAreas(List<Area> areas, UsuarioBolsaEmpleo usu) throws SQLException {
 		String query = "INSERT INTO TBEP_USUARIOS_EXCLUIDOS_AREA (USUARIO,AREA) VALUES (?,?)";		
+		
+		try (Connection conexion = ConexionUvirtual.obtenerInstancia(); PreparedStatement stmt = conexion.prepareStatement(query)) {
+
+			for (Area area : areas) {
+				stmt.setInt(1, usu.getCodNum());
+				stmt.setInt(2, area.getCodNum());	
+				stmt.executeUpdate();
+			}
+		}
+	}
+	
+	
+	/**
+	 * Establece el usuario como borrado. 
+	 * @param usu .
+	 * @param areas .
+	 * @throws SQLException .
+	 */
+	public void incluirUsuarioArea(UsuarioBolsaEmpleo usu, List<Area> areas) throws SQLException {
+		this.incluirUsuarioAreas(areas, usu);
+	}
+	
+	private void incluirUsuarioAreas(List<Area> areas, UsuarioBolsaEmpleo usu) throws SQLException {
+		String query = "DELETE FROM TBEP_USUARIOS_EXCLUIDOS_AREA WHERE usuario = ? AND area = ?";		
 		
 		try (Connection conexion = ConexionUvirtual.obtenerInstancia(); PreparedStatement stmt = conexion.prepareStatement(query)) {
 
