@@ -283,7 +283,15 @@ VistaItemsBaremacion bean = (VistaItemsBaremacion) uvdatos.getVistas().get(Vista
 				        {'data': 'valor'},
 				        {'data': 'valorMinimo'},
 				        {'data': 'valorMaximo'},				        
-				        {'data': 'afinidad'},
+				        {'data': 'afinidad', 'render': function(row) {
+				        	var titles = {
+				        		'N': 'N - Las contribuciones no se someten a modulación',
+				        		'AA': 'AA - Solo se valoran las contribuaciones propias del area, sometidas a modulación',
+				        		'AI': 'AI - Solo se valoran las contribuaciones asociadas al perfil investigador, sometidas a modulación'
+				        	};
+				        	
+				        	return '<span title="' + Atis.getProp(titles, row.afinidad) +'">' + row.afinidad + '</span>';
+				        }},
 				        {'data': 'activo', 'filter': {'type': 'selectBoolean', 'true': 'Activo', 'false': 'Inactivo'}, 'render': function(row) {
 			        		if(row.activo){
 			        			return "<div class='circle-true'></div>"; 

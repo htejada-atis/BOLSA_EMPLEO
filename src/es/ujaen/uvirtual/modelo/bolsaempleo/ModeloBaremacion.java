@@ -36,7 +36,6 @@ public class ModeloBaremacion {
 	public static final int ORDER_COLUMN_INDEX_BLOQUES_NUMERO_MAXIMO_MERITOS = 2;
 	public static final int ORDER_COLUMN_INDEX_BLOQUES_ACTIVO = 3;
 	 
-	
 	// ordenación ítems de baremación
 	public static final int ORDER_COLUMN_INDEX_ITEMS_CODIGO = 0;
 	public static final int ORDER_COLUMN_INDEX_ITEMS_NOMBRE = 1;
@@ -47,21 +46,18 @@ public class ModeloBaremacion {
 	public static final int ORDER_COLUMN_INDEX_ITEMS_AFINIDAD = 6;
 	public static final int ORDER_COLUMN_INDEX_ITEMS_ACTIVO = 7;
 	
-	// opción de consulta por defecto devuelve la lista con todas las filas de la tabla
-	public static final int OPCION_DEFAULT = 0;
-	// opción de consulta que filtra la lista con un id dado
-	public static final int OPCION_1 = 1;
-	// opción de consulta para comprobar si ya existe un código al editar
-	public static final int OPCION_2 = 2;
-	// opción de consulta para comprobar si ya existe un código al agregar
-	public static final int OPCION_3 = 3;
-	// opción de consulta para obtener todos los ítems de un apartado
-	public static final int OPCION_4 = 4;
-	// opción de consulta para editar campos
-	public static final int OPCION_5 = 5;
-	// opción de consulta para desactivar o activar
-	public static final int OPCION_6 = 6;
+	// tipos de unidades de los items
+	public static final String ITEM_UNIDADES_UNIDADES = "UNIDADES";
+	public static final String ITEM_UNIDADES_PUNTOS = "PUNTOS";
+	public static final String ITEM_UNIDADES_CREDITOS = "CREDITOS";
+	public static final String ITEM_UNIDADES_MESES = "MESES";
+	public static final String ITEM_UNIDADES_ANIOS = "ANIOS";
 	
+	// tipos de afinidades de los items
+	public static final String ITEM_AFINIDADES_SIN_MODULACION = "N";
+	public static final String ITEM_AFINIDADES_PROPIAS_AL_AREA = "AA";
+	public static final String ITEM_AFINIDADES_PROPIAS_AL_PERFIL_INVERSTIGADOR = "AI";
+		
 	// errores
 	public static final String ERROR_APARTADO_NOEXITE = "Apartado no encontrado";
 	public static final String ERROR_ITEM_NOEXITE = "Item no encontrado";
@@ -75,6 +71,8 @@ public class ModeloBaremacion {
 	
 	public static final Integer COLUMN_CODIGO_MAXLENGTH = 3; // logitud máxima de los códigos
 	public static final Integer COLUMN_NOMBRE_MAXLENGTH = 100; // logitud máxima de los nombres
+	
+	public static final Float MINIMO_VALOR_FLOAT = (float) 0.01;
 	
     protected static ModeloBaremacion eInstancia = null;
 	
@@ -803,7 +801,12 @@ public class ModeloBaremacion {
 		String consulta = "UPDATE TBEP_ITEMSBAREMACION SET "
 				+ "CODIGO = ?, "
 				+ "NOMBRE = ?, "
-				+ "FLGACTIVO = ? "
+				+ "FLGACTIVO = ?, "
+				+ "UNIDADES = ?, "
+				+ "VALOR = ?, "
+				+ "VALOR_MINIMO = ?, "
+				+ "VALOR_MAXIMO = ?, "
+				+ "AFINIDAD = ? "
 				+ "WHERE CODNUM = ?";
 		
 		try (Connection conexion = ConexionUvirtual.obtenerInstancia(); PreparedStatement stmt = conexion.prepareStatement(consulta);) {
@@ -811,6 +814,11 @@ public class ModeloBaremacion {
 			stmt.setString(parameterIndex++, item.getCodigo());
 			stmt.setString(parameterIndex++, item.getNombre());
 			stmt.setString(parameterIndex++, item.getActivo() ? "S" : "N");
+			stmt.setString(parameterIndex++, item.getUnidades());
+			stmt.setFloat(parameterIndex++, item.getValor());
+			stmt.setFloat(parameterIndex++, item.getValorMinimo());
+			stmt.setFloat(parameterIndex++, item.getValorMaximo());
+			stmt.setString(parameterIndex++, item.getAfinidad());			
 			stmt.setInt(parameterIndex++, item.getCodNum());
 			stmt.executeUpdate();
 		}
@@ -845,14 +853,19 @@ public class ModeloBaremacion {
 		this.chequearItemParaInsertarOActualizar(item);
 		
 		String consulta = "INSERT INTO TBEP_ITEMSBAREMACION "
-				+ " (CODIGO,NOMBRE,BEPBLO_CODNUM)"
-				+ " VALUES (?,?,?)";
+				+ " (CODIGO,NOMBRE,BEPBLO_CODNUM,UNIDADES,VALOR,VALOR_MINIMO,VALOR_MAXIMO,AFINIDAD)"
+				+ " VALUES (?,?,?,?,?,?,?,?)";
 		
 		try (Connection conexion = ConexionUvirtual.obtenerInstancia(); PreparedStatement stmt = conexion.prepareStatement(consulta);) {
 			int parameterIndex = 1;
 			stmt.setString(parameterIndex++, item.getCodigo());
 			stmt.setString(parameterIndex++, item.getNombre());
 			stmt.setInt(parameterIndex++, item.getBloqueBaremacion().getCodNum());
+			stmt.setString(parameterIndex++, item.getUnidades());
+			stmt.setFloat(parameterIndex++, item.getValor());
+			stmt.setFloat(parameterIndex++, item.getValorMinimo());
+			stmt.setFloat(parameterIndex++, item.getValorMaximo());
+			stmt.setString(parameterIndex++, item.getAfinidad());
 			stmt.executeUpdate();
 		}
 	}
@@ -922,6 +935,38 @@ public class ModeloBaremacion {
 	private void chequearItemParaInsertarOActualizar(ItemBaremacion item) throws SQLException, UVException {
 		if (this.existeOtroItemActivoPorCodigo(item)) {
 			throw new UVException("Ya existe un item con el código introducido");
+		}
+		
+		ArrayList<String> unidades = new ArrayList<String>();
+		unidades.add(ITEM_UNIDADES_UNIDADES);
+		unidades.add(ITEM_UNIDADES_PUNTOS);
+		unidades.add(ITEM_UNIDADES_CREDITOS);
+		unidades.add(ITEM_UNIDADES_MESES);
+		unidades.add(ITEM_UNIDADES_ANIOS);
+			
+		if (!unidades.contains(item.getUnidades())) {
+			throw new UVException("Tipo de unidad no válida");
+		}
+					
+		ArrayList<String> afinidades = new ArrayList<String>();
+		afinidades.add(ITEM_AFINIDADES_SIN_MODULACION);
+		afinidades.add(ITEM_AFINIDADES_PROPIAS_AL_AREA);
+		afinidades.add(ITEM_AFINIDADES_PROPIAS_AL_PERFIL_INVERSTIGADOR);
+			
+		if (!afinidades.contains(item.getAfinidad())) {
+			throw new UVException("Tipo de afinidad no válida");
+		}
+		
+		if (item.getValorMinimo() < MINIMO_VALOR_FLOAT) {
+			throw new UVException("El valor mínimo deber al menos " + MINIMO_VALOR_FLOAT);
+		}
+		
+		if (item.getValorMaximo() < MINIMO_VALOR_FLOAT) {
+			throw new UVException("El valor máximo deber al menos " + MINIMO_VALOR_FLOAT);
+		}
+		
+		if (item.getValorMinimo() > item.getValorMaximo()) {
+			throw new UVException("El valor máximo deber mayor que el valor mínimo");
 		}
 	}
 

@@ -205,7 +205,8 @@ public class ControladorMisMeritos extends HttpServlet {
 						ModeloUsuarioBolsaEmpleo modeloUsuarioBolsaEmpleo = ModeloUsuarioBolsaEmpleo.obtenerInstancia();
 						Integer idUsuario = modeloUsuarioBolsaEmpleo.listaUsuario(usuArcos.getUid()).getCodNum();
 						
-						Merito merito = new Merito(valor, descripcion, observacion, new ItemBaremacion(itemId), input);
+						ItemBaremacion itemBaremacion = ModeloBaremacion.obtenerInstancia().getItemBaremacionById(itemId);
+						Merito merito = new Merito(valor, descripcion, observacion, itemBaremacion, input);
 						ModeloMerito modeloMer = ModeloMerito.obtenerInstancia();
 						modeloMer.insertaMerito(merito, idUsuario);
 						

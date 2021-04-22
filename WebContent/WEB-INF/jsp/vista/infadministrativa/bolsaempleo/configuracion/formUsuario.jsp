@@ -278,7 +278,7 @@ VistaUsuarioBolsaEmpleo bean = (VistaUsuarioBolsaEmpleo) uvdatos.getVistas().get
 	        	}},
 		    ],
 		    "actions": [
-		    	{'label': 'Borrar Areas excluidas', 'onClick': function(selected) { enviaAccion("<%=ControladorUsuarioBolsaEmpleo.ACCION_INCLUIR_USUARIO_AREA%>", selected); } }
+		    	{'label': 'Borrar Areas excluidas', 'onClick': function(selected) { enviaAccion("<%= ControladorUsuarioBolsaEmpleo.ACCION_INCLUIR_USUARIO_AREA %>", selected); } }
 		    ]
 		});	
 		

@@ -110,7 +110,11 @@ public class ControladorItemsBaremacion extends HttpServlet {
 	public static final String PARAM_ITEM = "item";
 	public static final String PARAM_ITEM_NOMBRE = "nombreitem";
 	public static final String PARAM_ITEM_CODIGO = "codigoitem";
-	
+	public static final String PARAM_ITEM_UNIDADES = "unidades";
+	public static final String PARAM_ITEM_VALOR = "valor";
+	public static final String PARAM_ITEM_VALOR_MINIMO = "valorminimo";
+	public static final String PARAM_ITEM_VALOR_MAXIMO = "valormaximo";
+	public static final String PARAM_ITEM_AFINIDAD = "afinidad";
 	
 	// mensajes
 	public static final String MENSAJE_ERROR_CODIGO_VACIO = "El código no puede estar vacio";
@@ -710,10 +714,16 @@ public class ControladorItemsBaremacion extends HttpServlet {
 		
 		// agregamos
 		ItemBaremacion item = new ItemBaremacion();
-		item.setCodigo(validator.getValueString(PARAM_ITEM_CODIGO));
-		item.setNombre(validator.getValueString(PARAM_ITEM_NOMBRE));
-		item.setActivo(true);
 		item.setBloqueBaremacion(bloque);
+		item.setActivo(true);
+		item.setCodigo(validator.getValueString(PARAM_ITEM_CODIGO));
+		item.setNombre(validator.getValueString(PARAM_ITEM_NOMBRE));				
+		item.setUnidades(validator.getValueString(PARAM_ITEM_UNIDADES));
+		item.setAfinidad(validator.getValueString(PARAM_ITEM_AFINIDAD));
+		item.setValor(validator.getValueFloat(PARAM_ITEM_VALOR));
+		item.setValorMinimo(validator.getValueFloat(PARAM_ITEM_VALOR_MINIMO));
+		item.setValorMaximo(validator.getValueFloat(PARAM_ITEM_VALOR_MAXIMO));
+		item.setValorMaximo(validator.getValueFloat(PARAM_ITEM_VALOR_MAXIMO));
 		
 		modelo.insertaItem(item);
 		
@@ -737,7 +747,7 @@ public class ControladorItemsBaremacion extends HttpServlet {
 		ModeloBaremacion modelo = ModeloBaremacion.obtenerInstancia();
 		ItemBaremacion item = modelo.getItemBaremacionById(Formateador.leeParametroInteger(request.getParameter(PARAM_ITEM)));
 		
-		bean.setVista(RUTA_BEP_CONF + "formBloqueBaremacion.jsp");
+		bean.setVista(RUTA_BEP_CONF + "formItemBaremacion.jsp");
 		bean.setApartadoBaremacion(item.getBloqueBaremacion().getApartadoBaremacion());
 		bean.setBloqueBaremacion(item.getBloqueBaremacion());
 		bean.setItemBaremacion(item);
@@ -754,7 +764,12 @@ public class ControladorItemsBaremacion extends HttpServlet {
 		
 		// agregamos
 		item.setCodigo(validator.getValueString(PARAM_ITEM_CODIGO));
-		item.setNombre(validator.getValueString(PARAM_ITEM_NOMBRE));
+		item.setNombre(validator.getValueString(PARAM_ITEM_NOMBRE));				
+		item.setUnidades(validator.getValueString(PARAM_ITEM_UNIDADES));
+		item.setAfinidad(validator.getValueString(PARAM_ITEM_AFINIDAD));
+		item.setValor(validator.getValueFloat(PARAM_ITEM_VALOR));
+		item.setValorMinimo(validator.getValueFloat(PARAM_ITEM_VALOR_MINIMO));
+		item.setValorMaximo(validator.getValueFloat(PARAM_ITEM_VALOR_MAXIMO));
 		
 		modelo.actualizaItem(item);
 		
@@ -813,127 +828,19 @@ public class ControladorItemsBaremacion extends HttpServlet {
 		validator.addRule(PARAM_ITEM_NOMBRE, "noBlank", MENSAJE_ERROR_NOMBRE_VACIO);
 		validator.addRule(PARAM_ITEM_NOMBRE, "max:" + ModeloBaremacion.COLUMN_NOMBRE_MAXLENGTH, 
 				String.format(MENSAJE_ERROR_NOMBRE_MAXIMO, ModeloBaremacion.COLUMN_NOMBRE_MAXLENGTH));
-					
+		
+		validator.addParamString(PARAM_ITEM_UNIDADES);
+		validator.addParamString(PARAM_ITEM_AFINIDAD);		
+		
+		validator.addParamFloat(PARAM_ITEM_VALOR);		
+		validator.addRule(PARAM_ITEM_VALOR, "required", "El valor unitario no puede estar vacio");
+		
+		validator.addParamFloat(PARAM_ITEM_VALOR_MINIMO);
+		validator.addRule(PARAM_ITEM_VALOR_MINIMO, "required", "El valor mínimo no puede estar vacio");
+		
+		validator.addParamFloat(PARAM_ITEM_VALOR_MAXIMO);
+		validator.addRule(PARAM_ITEM_VALOR_MAXIMO, "required", "El valor máximo no puede estar vacio");
+		
 		return validator;
 	}
-	
-	
-	
-	
-	/** asda.
-	 * @param bean .
-	 * @param request .
-	 * @param response .
-	 * @param accion .
-	 * @throws SQLException .
-	 * @throws UVException .
-	 */
-//	private void listarItemsBaremacion(VistaItemsBaremacion bean, HttpServletRequest request, HttpServletResponse response, String accion)
-//			throws SQLException, UVException {
-//		bean.setVista(RUTA_BEP_CONF + "itemsbaremacion.jsp");
-//		
-//		switch (accion) {
-//			case ACCION_INDEX:
-//				HttpSession session = request.getSession(false);
-//				String mensaje = (String) session.getAttribute(MENSAJE_ENVIADO);
-//				
-//				if (mensaje == null) {
-//					mensaje = ACCION_INDEX;
-//				}
-//				
-//				switch (mensaje) {
-//					case MENSAJE_EXITO_AGREGAR_BLOQUE:
-//					case MENSAJE_EXITO_EDITAR_APARTADO:
-//					case MENSAJE_EXITO_ACTIVAR_APARTADO:
-//					case MENSAJE_EXITO_DESACTIVAR_APARTADO:
-//						//seleccionarApartado(bean, request, (Integer) session.getAttribute(PARAM_APARTADO));
-//						session.removeAttribute(PARAM_APARTADO);
-//						break;
-//					case MENSAJE_EXITO_AGREGAR_ITEM:
-//					case MENSAJE_EXITO_EDITAR_BLOQUE:
-//					case MENSAJE_EXITO_ACTIVAR_BLOQUE:
-//					case MENSAJE_EXITO_DESACTIVAR_BLOQUE:
-//						seleccionarBloque(bean, request, (Integer) session.getAttribute(PARAM_BLOQUE));
-//						session.removeAttribute(PARAM_BLOQUE);
-//						break;
-//					case MENSAJE_EXITO_EDITAR_ITEM:
-//					case MENSAJE_EXITO_ACTIVAR_ITEM:
-//					case MENSAJE_EXITO_DESACTIVAR_ITEM:
-//						seleccionarItem(bean, request, (Integer) session.getAttribute(PARAM_ITEM));
-//						session.removeAttribute(PARAM_ITEM);
-//						break;
-//					default:
-//						break;
-//				}
-//				
-//				break;
-//			
-//			case ACCION_BLOQUE_SELECCIONADO:
-//				seleccionarBloque(bean, request, Formateador.leeParametroInteger(request.getParameter(PARAM_BLOQUE)));
-//				break;
-//			case ACCION_ITEM_SELECCIONADO:
-//				seleccionarItem(bean, request, Formateador.leeParametroInteger(request.getParameter(PARAM_ITEM)));
-//				break;
-//		}
-//		
-//	}
-//	
-	
-//	private void actualizaActivoBloque(VistaItemsBaremacion bean, HttpServletRequest request, HttpServletResponse response, boolean activo)
-//			throws SQLException, UVException, IOException {
-//		ModeloBaremacion modelo = ModeloBaremacion.obtenerInstancia();
-//		Integer codNum = Formateador.leeParametroInteger(request.getParameter(PARAM_BLOQUE));
-//		BloqueBaremacion bloque = new BloqueBaremacion(codNum, activo);
-//		modelo.actualizaBloque(bloque, ModeloBaremacion.OPCION_6);
-//		bean.getMensajesDeExito().add(activo ? MENSAJE_EXITO_ACTIVAR_BLOQUE : MENSAJE_EXITO_DESACTIVAR_BLOQUE);
-//		HttpSession session = request.getSession(false);
-//		session.setAttribute(MENSAJE_ENVIADO, activo ? MENSAJE_EXITO_ACTIVAR_BLOQUE : MENSAJE_EXITO_DESACTIVAR_BLOQUE);
-//		session.setAttribute(PARAM_BLOQUE, codNum);
-//		response.sendRedirect(request.getServletPath());
-//	}
-//	
-//	private void actualizaActivoItem(VistaItemsBaremacion bean, HttpServletRequest request, HttpServletResponse response, boolean activo)
-//			throws SQLException, UVException, IOException {
-//		ModeloBaremacion modelo = ModeloBaremacion.obtenerInstancia();
-//		Integer codNum = Formateador.leeParametroInteger(request.getParameter(PARAM_ITEM));
-//		ItemBaremacion item = new ItemBaremacion(codNum, activo);
-//		modelo.actualizaItem(item, ModeloBaremacion.OPCION_6);
-//		bean.getMensajesDeExito().add(activo ? MENSAJE_EXITO_ACTIVAR_ITEM : MENSAJE_EXITO_DESACTIVAR_ITEM);
-//		HttpSession session = request.getSession(false);
-//		session.setAttribute(MENSAJE_ENVIADO, activo ? MENSAJE_EXITO_ACTIVAR_ITEM : MENSAJE_EXITO_DESACTIVAR_ITEM);
-//		session.setAttribute(PARAM_ITEM, codNum);
-//		response.sendRedirect(request.getServletPath());
-//	}
-	
-	
-
-//	private void agregarBloque(VistaItemsBaremacion bean, HttpServletRequest request, HttpServletResponse response) throws SQLException, UVException, IOException {
-//		bean.setVista(RUTA_BEP_CONF + "formBloqueBaremacion.jsp");
-//		ModeloBaremacion modelo = ModeloBaremacion.obtenerInstancia();
-//		Integer codNum = Formateador.leeParametroInteger(request.getParameter(PARAM_APARTADO));
-//		BloqueBaremacion bloque = modelo.getUltimoCodigoBloque(codNum);
-//		bean.setBloqueBaremacion(bloque);
-//		if (EscapaHTML.ajustaCodificacion(request.getParameter(PARAM_BLOQUE_NOMBRE)) != null) {
-//			String codigo = EscapaHTML.ajustaCodificacion(request.getParameter(PARAM_BLOQUE_CODIGO));
-//			String nombre = EscapaHTML.ajustaCodificacion(request.getParameter(PARAM_BLOQUE_NOMBRE));
-//			BloqueBaremacion bloqueNuevo = new BloqueBaremacion(bloque.getApartadoBaremacion(), codigo, nombre);
-//			modelo.insertaBloque(bloqueNuevo);
-//			bean.getMensajesDeExito().add(MENSAJE_EXITO_AGREGAR_BLOQUE);
-//			HttpSession session = request.getSession(false);
-//			session.setAttribute(MENSAJE_ENVIADO, MENSAJE_EXITO_AGREGAR_BLOQUE);
-//			session.setAttribute(PARAM_APARTADO, codNum);
-//			response.sendRedirect(request.getServletPath());
-//		}
-//	}
-	
-	
-//	private void seleccionarBloque(VistaItemsBaremacion bean, HttpServletRequest request, Integer idBloque) throws SQLException, UVException {
-//		ModeloBaremacion modelo = ModeloBaremacion.obtenerInstancia();
-//		BloqueBaremacion bloque = modelo.getBloqueBaremacionById(idBloque);
-//		bean.setBloqueBaremacion(bloque);
-//		bean.setApartadoBaremacion(bloque.getApartadoBaremacion());
-//	}
-	
-	
-	
 }
