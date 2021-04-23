@@ -27,7 +27,7 @@ VistaSolicitudes bean = (VistaSolicitudes) uvdatos.getVistas().get(VistaSolicitu
 	
 	<h2>Paso 1: Selección de bolsas de empleo</h2>
 	<h3><%= bean.getSolicitud().getConvocatoria().getDescripcion() %></h3>
-	<p>Seleccione las bolsas donde desee participar, hasta un máximo de [X].</p>
+	<p>Seleccione las bolsas donde desee participar, hasta un máximo de [<%=bean.getSolicitud().getConvocatoria().getNumBolsasMaximo()%>].</p>
 	
 	<table class="bluetable bolsaempleo" id="tableAreas">
 		<tr>
@@ -46,28 +46,40 @@ VistaSolicitudes bean = (VistaSolicitudes) uvdatos.getVistas().get(VistaSolicitu
 		</tfoot>
 	</table>
 	
+	<div class="btns-by-steps">
+		<a class="link-btn" id="paso1_volver" href="<%= request.getRequestURI() %>">
+	    	 Volver
+	    </a>
+	    <a class="link-btn" id="paso1_siguiente" href="<%= request.getRequestURI() %>">
+	    	 Siguiente
+	    </a>
+	</div>
+	
 </div>
 
 <script>
 
 	$(document).ready(function() {
-		var table = new Atis.DataTable('#tableAreas', {
+		var tableAreas = new Atis.DataTable('#tableAreas', {
 			"ajax": { url: "<%= ControladorMisSolicitudes.URL_PATTERN_AJAX %>" },
 		    "pageSize": 10,
 		    "selectable": true,
 		    "filterable": true,
+		    "title": 'Lista de bolsas',
 		    "action": "<%=ControladorMisSolicitudes.ACCION_DATATABLE_AREAS%>",
 		    "columns": [
-		    	{'data': 'codNum', 'selectable': true},
+		    	{'data': 'codNum', 'selectable': {'exclude': 'excluido'}},
 		    	{'data': 'area.idAreaExterno', 'filter': true},
 		    	{'data': 'area.descripcion', 'filter': true},
-		        {'data': 'excluido', 'order': {'active': false}, 'filter': {'type': 'selectBoolean', 'true': 'Excluido', 'false': 'No excluido'}, 'render': function(row) {
-	        		if (row.excluido) {
-	        			return "<div title='No tienes acceso a ésta bolsa' class='circle-false'></div>";
-	        		} else {
-	        			return "<div class='circle-true'></div>";
+		        {'data': 'excluido', 'order': {'active': false}, 'filter': {'type': 'select', 'options':{'true': 'Excluido', 'false': 'No excluido'}, 'optionDefault': 'false'},
+		    		'render': function(row) {
+		        		if (row.excluido) {
+		        			return "<div title='No tienes acceso a ésta bolsa' class='circle-false'></div>";
+		        		} else {
+		        			return "<div class='circle-true'></div>";
+		        		}
 	        		}
-	        	}},
+		        },
 		        {'data': 'baremable', 'order': {'active': false}, 'filter': {'type': 'selectBoolean', 'true': 'Baremable', 'false': 'No baremable'}, 'render': function(row) {
 	        		if (row.baremable) {
 	        			return "<div title='Baremable' class='circle-true'></div>"; 
@@ -77,6 +89,27 @@ VistaSolicitudes bean = (VistaSolicitudes) uvdatos.getVistas().get(VistaSolicitu
 	        	}},
 	        ],
 		});
+		
+		document.getElementById("paso1_volver").addEventListener("click", function(event) {
+			
+		});
+		
+		document.getElementById("paso1_siguiente").addEventListener("click", function(event) {
+			event.preventDefault();
+			if (tableAreas.getCheckedItems().length < 1) {
+				Atis.alertDialog("Seleccionar bolsas", "Debes seleccionar al menos una bolsa para continuar");
+			} else if (tableAreas.getCheckedItems().length > <%= bean.getSolicitud().getConvocatoria().getNumBolsasMaximo() %>) {
+				Atis.alertDialog("Seleccionar bolsas", "No puedes superar el número máximo de bolsas permitido de la convocatoria");
+			} else {
+				var params = {
+						'a': '<%= ControladorMisSolicitudes.ACCION_SELECCIONAR_BOLSAS %>',
+						'<%= ControladorMisSolicitudes.PARAM_SOLICITUD_ID %>': '<%= bean.getSolicitud().getCodNum() %>',
+						'<%= ControladorMisSolicitudes.PARAM_BOLSAS %>': JSON.stringify(tableAreas.getCheckedItems())
+				};
+				Atis.sendForm("<%= request.getRequestURI() %>", params);
+			}
+		});
+		
 	});
 	
 </script>

@@ -54,12 +54,32 @@ ApartadoBaremacion apartado = bean.getApartadoBaremacion();
 			<div class="form-group">
 				<label for="apartado_puntuacionmaxima">Puntuación máxima del bloque</label> 
 				<input type="text" class="form-input-custom" name="<%= ControladorItemsBaremacion.PARAM_APARTADO_PUNTUACIONMAXIMA %>" id="apartado_puntuacionmaxima"
-					value="<%= BolsaEmpleoUtils.getParamForm(request, ControladorItemsBaremacion.PARAM_APARTADO_PUNTUACIONMAXIMA, apartado != null && apartado.getCodNum() != null && apartado.getPuntuacionMaxima() != null ? apartado.getPuntuacionMaxima().toString() : "") %>"/>
+					value="<%= BolsaEmpleoUtils.getParamForm(request, ControladorItemsBaremacion.PARAM_APARTADO_PUNTUACIONMAXIMA, apartado != null && apartado.getPuntuacionMaxima() != null ? apartado.getPuntuacionMaxima().toString() : "") %>"/>
 			</div>
 			<div class="form-group">
 				<label for="apartado_porcentajemaximo">Porcentaje máximo del bloque</label> 
 				<input type="text" class="form-input-custom" name="<%=ControladorItemsBaremacion.PARAM_APARTADO_PORCENTAJEMAXIMO%>" id="apartado_porcentajemaximo" 
-					value="<%= BolsaEmpleoUtils.getParamForm(request, ControladorItemsBaremacion.PARAM_APARTADO_PORCENTAJEMAXIMO, apartado != null && apartado.getCodNum() != null && apartado.getPorcentajeMaximo() != null ? apartado.getPorcentajeMaximo().toString() : "") %>"/>
+					value="<%= BolsaEmpleoUtils.getParamForm(request, ControladorItemsBaremacion.PARAM_APARTADO_PORCENTAJEMAXIMO, apartado != null && apartado.getPorcentajeMaximo() != null ? apartado.getPorcentajeMaximo().toString() : "") %>"/>
+			</div>
+		</div>
+		<div class="form-group-container col2">
+			<div class="form-group">
+				<%
+					String meritosPreferentesSelected = BolsaEmpleoUtils.getParamForm(request, ControladorItemsBaremacion.PARAM_APARTADO_MERITOSPREFERENTES, 
+							apartado != null && apartado.getMeritosPreferentes() ? "1" :
+								apartado != null && !apartado.getMeritosPreferentes() ? "0" : "0"
+					); 
+				%>
+				<label for="apartado_meritospreferentes">Méritos preferentes</label> 
+				<select class="params" id="apartado_meritospreferentes" name="<%= ControladorItemsBaremacion.PARAM_APARTADO_MERITOSPREFERENTES %>" style="width:100%;">
+					<option value="1" <%= meritosPreferentesSelected.equals("1") ? "selected=\"selected\"" : "" %>>Si</option>
+					<option value="0" <%= meritosPreferentesSelected.equals("0") ? "selected=\"selected\"" : "" %>>No</option>
+				</select>				
+			</div>
+			<div class="form-group">
+				<label for="apartado_puntuacionmaxima">Factor mérito preferente</label> 
+				<input type="text" class="form-input-custom" name="<%= ControladorItemsBaremacion.PARAM_APARTADO_FACTORMERITOPREFERENTE %>" id="apartado_puntuacionmaxima"
+					value="<%= BolsaEmpleoUtils.getParamForm(request, ControladorItemsBaremacion.PARAM_APARTADO_FACTORMERITOPREFERENTE, apartado != null && apartado.getFactorMeritoPreferente() != null ? apartado.getFactorMeritoPreferente().toString() : "") %>"/>
 			</div>
 		</div>
 
@@ -68,5 +88,13 @@ ApartadoBaremacion apartado = bean.getApartadoBaremacion();
 				value="<%= apartado != null ? "Guardar cambios" : "Insertar apartado" %>" />
 		</div>
 	</form>
-
 </div>
+
+<script>
+	$(document).ready(function() {
+		document.getElementById("apartado_meritospreferentes").addEventListener("change", function(event) {
+			console.log("apartado_meritospreferentes", event.target)
+		});
+	});
+</script>
+

@@ -43,36 +43,38 @@ public class TestBEPBeanBloqueBaremacion {
 	 */
 	@Test
 	public void testA02() {
-		Integer id = 1;
-		ApartadoBaremacion apartado = new ApartadoBaremacion();
-		BloqueBaremacion bloque = new BloqueBaremacion(id, apartado, CADENA, CADENA, BOOLEANO);
-		assertEquals(id, bloque.getCodNum());
-		assertEquals(CADENA, bloque.getCodigo());
-		assertEquals(CADENA, bloque.getNombre());
-		assertEquals(BOOLEANO, bloque.isActivo());
-		assertEquals(apartado, bloque.getApartadoBaremacion());
-		assertNotNull(bloque.toString());
+//		Integer id = 1;
+//		ApartadoBaremacion apartado = new ApartadoBaremacion();
+//		BloqueBaremacion bloque = new BloqueBaremacion(id, apartado, CADENA, CADENA, BOOLEANO);
+//		assertEquals(id, bloque.getCodNum());
+//		assertEquals(CADENA, bloque.getCodigo());
+//		assertEquals(CADENA, bloque.getNombre());
+//		assertEquals(BOOLEANO, bloque.isActivo());
+//		assertEquals(apartado, bloque.getApartadoBaremacion());
+//		assertNotNull(bloque.toString());
+		assertTrue(false);
 	}
 	
 	/** test equals.
 	 */
 	@Test
 	public void testA03() {
-		Integer id = 1;
-		ApartadoBaremacion apartado = new ApartadoBaremacion();
-		BloqueBaremacion bloque2 = new BloqueBaremacion(id, apartado, CADENA, CADENA, BOOLEANO);
-		BloqueBaremacion bloque = new BloqueBaremacion(bloque2);
-		bloque.setCodNum(id);
-		bloque.setCodigo(CADENA);
-		bloque.setNombre(CADENA);
-		bloque.setActivo(BOOLEANO);
-		assertEquals(id, bloque.getCodNum());
-		assertEquals(CADENA, bloque.getCodigo());
-		assertEquals(CADENA, bloque.getNombre());
-		assertEquals(BOOLEANO, bloque.isActivo());
-		assertNotNull(bloque.toString());
-		assertTrue(bloque.equals(bloque2));
-		assertTrue(bloque.hashCode() == bloque2.hashCode());
+//		Integer id = 1;
+//		ApartadoBaremacion apartado = new ApartadoBaremacion();
+//		BloqueBaremacion bloque2 = new BloqueBaremacion(id, apartado, CADENA, CADENA, BOOLEANO);
+//		BloqueBaremacion bloque = new BloqueBaremacion(bloque2);
+//		bloque.setCodNum(id);
+//		bloque.setCodigo(CADENA);
+//		bloque.setNombre(CADENA);
+//		bloque.setActivo(BOOLEANO);
+//		assertEquals(id, bloque.getCodNum());
+//		assertEquals(CADENA, bloque.getCodigo());
+//		assertEquals(CADENA, bloque.getNombre());
+//		assertEquals(BOOLEANO, bloque.isActivo());
+//		assertNotNull(bloque.toString());
+//		assertTrue(bloque.equals(bloque2));
+//		assertTrue(bloque.hashCode() == bloque2.hashCode());
+		assertTrue(false);
 	}
 	
 	/** test equals.
@@ -81,17 +83,18 @@ public class TestBEPBeanBloqueBaremacion {
 	@Test
 	@SuppressWarnings("java:S2159")
 	public void testA04() {
-		Integer id = 1;
-		ApartadoBaremacion apartado = new ApartadoBaremacion();
-		BloqueBaremacion bloque3 = new BloqueBaremacion(id, apartado, CADENA, CADENA, BOOLEANO);
-		BloqueBaremacion bloque2 = new BloqueBaremacion();
-		BloqueBaremacion bloque = new BloqueBaremacion();
-		assertTrue(bloque.equals(bloque2));
-		assertTrue(bloque2.equals(bloque));
-		assertEquals(bloque.hashCode(), bloque2.hashCode());
-		assertFalse(bloque.equals(null));
-		assertFalse(bloque.equals(bloque3));
-		assertFalse(bloque3.equals(bloque));
-		assertNotEquals(bloque.hashCode(), bloque3.hashCode());
+//		Integer id = 1;
+//		ApartadoBaremacion apartado = new ApartadoBaremacion();
+//		BloqueBaremacion bloque3 = new BloqueBaremacion(id, apartado, CADENA, CADENA, BOOLEANO);
+//		BloqueBaremacion bloque2 = new BloqueBaremacion();
+//		BloqueBaremacion bloque = new BloqueBaremacion();
+//		assertTrue(bloque.equals(bloque2));
+//		assertTrue(bloque2.equals(bloque));
+//		assertEquals(bloque.hashCode(), bloque2.hashCode());
+//		assertFalse(bloque.equals(null));
+//		assertFalse(bloque.equals(bloque3));
+//		assertFalse(bloque3.equals(bloque));
+//		assertNotEquals(bloque.hashCode(), bloque3.hashCode());
+		assertTrue(false);
 	}
 }

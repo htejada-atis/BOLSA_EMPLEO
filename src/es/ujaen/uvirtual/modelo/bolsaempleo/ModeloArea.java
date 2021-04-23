@@ -9,8 +9,10 @@ import java.util.List;
 import java.util.Map;
 import es.ujaen.uvirtual.beans.uvirtual.bolsaempleo.Area;
 import es.ujaen.uvirtual.beans.uvirtual.bolsaempleo.Bolsa;
+import es.ujaen.uvirtual.beans.uvirtual.bolsaempleo.UsuarioBolsaEmpleo;
 import es.ujaen.uvirtual.modelo.conexion.ConexionUvirtual;
 import es.ujaen.uvirtual.utilidades.BolsaEmpleoDataTable;
+import es.ujaen.uvirtual.utilidades.BolsaEmpleoUtils;
 import es.ujaen.uvirtual.utilidades.UVException;
 import es.ujaen.uvirtual.utilidades.BolsaEmpleoDataTable.DataTableColumn;
 
@@ -51,7 +53,6 @@ public class ModeloArea {
         }
         return eInstancia;
     }
-	
 	
 	/** Consulta areas en BBDD y las devuelve.
 	 * @param clausula para filtrar las areas de la bd
@@ -141,9 +142,7 @@ public class ModeloArea {
 		
 		return areas;
 	}
-	
-	
-	
+		
 	/**
 	 * Listado de areas. 
 	 * @param params para leer los parametros de paginación, ordenacion, etc
@@ -311,5 +310,58 @@ public class ModeloArea {
 		}
 		
 		return dataTable;
+	}
+	
+//	/** Seleccionar bolsas .
+//	 * @param bolsas .
+//	 * @param solicitud .
+//	 * @throws UVException .
+//	 * @throws SQLException .
+//	 */
+//	public void seleccionarBolsasSolicitud(List<String> bolsas, Integer solicitud) throws SQLException, UVException {
+//		if (solicitud == null) {
+//			throw new UVException("No se puede incluir bolsas en la solicitud sin el id de la solicitud");
+//		}
+//		
+//		String params = BolsaEmpleoUtils.consultaMultiplesParametros(bolsas.size());
+//		String consulta = "INSERT INTO TBEP_SOLICITUDBOLSAS (BEPBOL_CODNUM, BEPSOL_CODNUM)"
+//				+ " SELECT bepbol.CODNUM AS BEPBOL_CODNUM, bepsol.CODNUM AS BEPSOL_CODNUM"
+//				+ " FROM TBEP_BOLSAS bepbol, TBEP_SOLICITUDES bepsol WHERE bepsol.CODNUM = ? AND "
+//				+ " bepbol.CODNUM IN (" + params + ")";
+//		try (Connection conexion = ConexionUvirtual.obtenerInstancia(); PreparedStatement stmt = conexion.prepareStatement(consulta)) {
+//			int indexParam = 1;
+//			stmt.setInt(indexParam++, solicitud);
+//			for (String bolsa: bolsas) {
+//				stmt.setString(indexParam++, bolsa);		
+//			}
+//			stmt.executeUpdate();
+//		}
+//	}
+//	
+	/**
+	 * Devuelve si el usuario está excluido de la area.
+	 * @param usuario .
+	 * @param area .
+	 * @return true o false si está excluido o no
+	 * @throws SQLException .
+	 */
+	public Boolean isUsuarioExcluidoBolsa(UsuarioBolsaEmpleo usuario, Area area) throws SQLException {
+		String query = "SELECT COUNT(*) as count FROM TBEP_USUARIOS_EXCLUIDOS_AREA WHERE USUARIO = ? AND AREA = ?";		
+		
+		try (Connection con = ConexionUvirtual.obtenerInstancia(); PreparedStatement stmt = con.prepareStatement(query);) {
+			int param = 1;
+			stmt.setInt(param++, usuario.getCodNum());
+			stmt.setInt(param++, area.getCodNum());
+			
+			try (ResultSet rs = stmt.executeQuery()) {
+				rs.next();
+				
+				if (rs.getInt("count") > 0) {
+					return true;
+				}
+			}
+		}
+		
+		return false;
 	}
 }

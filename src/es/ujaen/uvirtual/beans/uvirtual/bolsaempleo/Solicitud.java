@@ -1,7 +1,6 @@
 package es.ujaen.uvirtual.beans.uvirtual.bolsaempleo;
 
 import java.io.Serializable;
-import java.util.Date;
 
 
 /** Clase solicitud de bolsa empleo.
@@ -10,6 +9,7 @@ import java.util.Date;
 public class Solicitud implements Serializable {
 	private static final long serialVersionUID = 1L;
 	private Integer codNum;
+	private UsuarioBolsaEmpleo usuario;
 	private Convocatoria convocatoria;
 	private String estado;
 	
@@ -21,12 +21,14 @@ public class Solicitud implements Serializable {
 	
 	/** Constructor con parametros.
 	 * @param pcodNum .
+	 * @param pusuario .
 	 * @param pconvocatoria .
 	 * @param pestado .
 	 */
-	public Solicitud(Integer pcodNum, Convocatoria pconvocatoria, String pestado) {
+	public Solicitud(Integer pcodNum, UsuarioBolsaEmpleo pusuario, Convocatoria pconvocatoria, String pestado) {
 		super();
 		this.codNum = pcodNum;
+		this.usuario = pusuario;
 		this.convocatoria = pconvocatoria;
 		this.estado = pestado;		
 	}
@@ -37,6 +39,7 @@ public class Solicitud implements Serializable {
 	public Solicitud(Solicitud copia) {
 		this.codNum = copia.codNum;
 		this.estado = copia.estado;
+		this.usuario = new UsuarioBolsaEmpleo(copia.usuario);
 		this.convocatoria = new Convocatoria(copia.convocatoria);
 	}
 	
@@ -46,6 +49,14 @@ public class Solicitud implements Serializable {
 
 	public void setCodNum(Integer codNum) {
 		this.codNum = codNum;
+	}
+	
+	public UsuarioBolsaEmpleo getUsuario() {
+		return usuario;
+	}
+
+	public void setUsuario(UsuarioBolsaEmpleo usuario) {
+		this.usuario = usuario;
 	}
 
 	public Convocatoria getConvocatoria() {
@@ -70,7 +81,7 @@ public class Solicitud implements Serializable {
 	
 	@Override
 	public String toString() {
-		return "Solicitud [codNum=" + codNum + ", convocatoria=" + convocatoria + ", estado=" + estado + "]";
+		return "Solicitud [codNum=" + codNum + ", usuario=" + usuario + ", convocatoria=" + convocatoria + ", estado=" + estado + "]";
 	}
 	
 	@Override
@@ -78,6 +89,7 @@ public class Solicitud implements Serializable {
 		final int prime = 31;
 		int result = 1;		
 		result = prime * result + ((codNum == null) ? 0 : codNum.hashCode());
+		result = prime * result + ((usuario == null) ? 0 : usuario.hashCode());
 		result = prime * result + ((convocatoria == null) ? 0 : convocatoria.hashCode());
 		result = prime * result + ((estado == null) ? 0 : estado.hashCode());		
 		return result;
@@ -101,6 +113,13 @@ public class Solicitud implements Serializable {
 				return false;
 			}
 		} else if (!codNum.equals(other.codNum)) {
+			return false;
+		}
+		if (usuario == null) {
+			if (other.usuario != null) {
+				return false;
+			}
+		} else if (!usuario.equals(other.usuario)) {
 			return false;
 		}
 		if (convocatoria == null) {

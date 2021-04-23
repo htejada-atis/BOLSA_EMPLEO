@@ -17,6 +17,7 @@ public class BolsaEmpleoValidator {
 	public static final String PARAM_INTEGER = "integer";
 	public static final String PARAM_FLOAT = "float";
 	public static final String PARAM_DATE = "date";
+	public static final String PARAM_BOOLEAN = "boolean";
 	
 	public static final String MENSAJE_ERROR_PARSEANDO = "Tipo no válido";
 	public static final String MENSAJE_ERROR_TIPOPARAMETRONOVALIDO = "Tipo de parámetro no válido";
@@ -81,6 +82,15 @@ public class BolsaEmpleoValidator {
 	}
 	
 	/**
+	 * Añade un parametro de tipo boolean.
+	 * @param param .
+	 * @throws UVException .
+	 */
+	public void addParamBoolean(String param) throws UVException {
+		this.addParam(param, PARAM_BOOLEAN);
+	}
+	
+	/**
 	 * Devuelve el valor de parametro de tipo string.
 	 * @param param .
 	 * @return .
@@ -119,6 +129,16 @@ public class BolsaEmpleoValidator {
 	public Float getValueFloat(String param) {
 		return (Float) this.values.get(param);
 	}
+	
+	/**
+	 * Devuelve el valor de parametro de tipo boolean.
+	 * @param param .
+	 * @return .
+	 * @throws UVException .
+	 */
+	public Boolean getValueBoolean(String param) {
+		return (Boolean) this.values.get(param);
+	}
 		
 	/**
 	 * Añade un párametro que será validado por la rules.
@@ -140,13 +160,16 @@ public class BolsaEmpleoValidator {
 		case PARAM_FLOAT:
 			value = Formateador.leeParametroFloat(this.request.getParameter(param));
 			break;
+		case PARAM_BOOLEAN:
+			value = Formateador.leeParametroBoolean(this.request.getParameter(param), "1", "0");
+			break;
 		case PARAM_DATE:
 			try {
 				value = Formateador.leeParametroFecha(this.request.getParameter(param), Formateador.FORMATO_FECHA_DDMMYYYY, "/");
 			} catch (UVException err) {
 				value = null;
 			}
-			break;			
+			break;				
 		default: 
 			throw new UVException(MENSAJE_ERROR_TIPOPARAMETRONOVALIDO);
 		}
@@ -358,9 +381,7 @@ public class BolsaEmpleoValidator {
 	 * @throws UVException .
 	 */
 	public void checkSelect(String param, String type, Object value, String mensajeError) throws UVException {
-		if (value == null) {
-			this.addError(param, mensajeError);
-		} else {
+		if (value != null) {
 			if (value.equals("-1")) {
 				throw new UVException(MENSAJE_ERROR_SELECTNEGATIVO);	
 			}

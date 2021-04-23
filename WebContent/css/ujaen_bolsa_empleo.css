@@ -434,3 +434,12 @@ nav-bolsa-empleo a:active, nav-bolsa-empleo a:hover {
 	color:#003399;
 	padding:0.5rem;
 }
+
+/* Botones por pasos */
+.btns-by-steps {
+	display: flex;
+	justify-content: space-between;
+	margin: 10px 0px;
+}
+
+

@@ -4,6 +4,8 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.sql.SQLException;
 import java.util.logging.Logger;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.logging.Level;
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
@@ -12,13 +14,18 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+import com.google.gson.reflect.TypeToken;
+
 import es.ujaen.uvirtual.beans.CodigoDescripcion;
 import es.ujaen.uvirtual.beans.UVDatos;
 import es.ujaen.uvirtual.beans.Usuario;
 import es.ujaen.uvirtual.beans.uvirtual.bolsaempleo.Bolsa;
+import es.ujaen.uvirtual.beans.uvirtual.bolsaempleo.Convocatoria;
 import es.ujaen.uvirtual.beans.uvirtual.bolsaempleo.Solicitud;
+import es.ujaen.uvirtual.beans.uvirtual.bolsaempleo.UsuarioBolsaEmpleo;
 import es.ujaen.uvirtual.beans.vistas.uvirtual.bolsaempleo.VistaSolicitudes;
 import es.ujaen.uvirtual.modelo.bolsaempleo.ModeloArea;
+import es.ujaen.uvirtual.modelo.bolsaempleo.ModeloBolsa;
 import es.ujaen.uvirtual.modelo.bolsaempleo.ModeloConvocatoria;
 import es.ujaen.uvirtual.modelo.bolsaempleo.ModeloSolicitud;
 import es.ujaen.uvirtual.modelo.bolsaempleo.ModeloUsuarioBolsaEmpleo;
@@ -47,10 +54,7 @@ public class ControladorMisSolicitudes extends HttpServlet {
 	public static final String PARAM_ACCION_ENVIAR = "enviar"; 
 	public static final String PARAM_CONVOCATORIA_ID = "idConvocatoria";
 	public static final String PARAM_SOLICITUD_ID = "idSolicitud";
-//	public static final String PARAM_CONVOCATORIA_DESCRIPCION = "descripcion";
-//	public static final String PARAM_CONVOCATORIA_FECHACIERRE = "fechaCierre";
-//	public static final String PARAM_CONVOCATORIA_NUMEROBOLSASMAXIMO = "numBolsasMaximo";
-//	public static final String PARAM_CONVOCATORIA_NUMEROMERITOSPORBLOQUE = "numMeritosPorBloque";
+	public static final String PARAM_BOLSAS = "bolsas";
 	
 	// acciones
 	public static final String ACCION_LISTAR_SOLICITUDES = "listar";
@@ -58,8 +62,11 @@ public class ControladorMisSolicitudes extends HttpServlet {
 	public static final String ACCION_DATATABLE_AREAS = "datatableareas";
 	public static final String ACCION_CREAR_SOLICITUD = "crearSolicitud";
 	public static final String ACCION_CONSULTAR_SOLICITUD = "consultarSolicitud";
+	public static final String ACCION_SELECCIONAR_BOLSAS = "seleccionarbolsas";
+	public static final String ACCION_DATATABLE_BOLSAS_SELECCIONADAS = "datatableBolsasSolicitud";
 	
 	// mensajes
+	public static final String MENSAJE_ERROR_BOLSAS_SELECCIONADAS_INCORRECTAS = "No hay bolsas seleccionadas válidas";
 	public static final String MENSAJE_ERROR_CONVOCATORIA_ID_REQUERIDA = "El id de la convocatoria es requerído";
 	public static final String MENSAJE_ERROR_SOLICITUD_ID_REQUERIDO = "El id de la solicitud es requerído";
 		
@@ -71,6 +78,8 @@ public class ControladorMisSolicitudes extends HttpServlet {
 	// urls
 	public static final String URL_PATTERN_AJAX = "/srv/es/ajax/informacionadministrativa/bolsaempleo/missolicitudes";
 	
+	private UsuarioBolsaEmpleo usuario = null;
+	
 	/** Peticion GET.
 	 * @see HttpServlet#doGet(HttpServletRequest request, HttpServletResponse response)
 	 */
@@ -78,18 +87,18 @@ public class ControladorMisSolicitudes extends HttpServlet {
 	public void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 		UVDatos datos = (UVDatos) request.getAttribute(UVDatos.NOMBRE_ATRIBUTO);
 		datos.setDocType("<!DOCTYPE html>");
-		datos.setContentType("text/html");
+		datos.setContentType("text/html");		
 
 		VistaSolicitudes bean = new VistaSolicitudes();
-		Usuario usuario = datos.getUsuario();
-		LOGGER.log(Level.FINEST, "usuario que ha entrado en el servlet es {0}", usuario.getUid());
-
+		
 		String nombreAccion = EscapaHTML.ajustaCodificacion(request.getParameter(PARAM_ACCION));
 		if (nombreAccion == null) {
 			nombreAccion = ACCION_LISTAR_SOLICITUDES;
 		}
 					
 		try {
+			this.usuario = ModeloUsuarioBolsaEmpleo.obtenerInstancia().getUsuarioLogeado(datos);
+			
 			switch (nombreAccion) {
 				case ACCION_LISTAR_SOLICITUDES:
 					index(bean, datos, request, response);
@@ -105,6 +114,12 @@ public class ControladorMisSolicitudes extends HttpServlet {
 					break;	
 				case ACCION_CONSULTAR_SOLICITUD:
 					consultarSolicitud(bean, datos, request, response);
+					break;
+				case ACCION_SELECCIONAR_BOLSAS:
+					seleccionarBolsas(bean, datos, request, response);
+					break;
+				case ACCION_DATATABLE_BOLSAS_SELECCIONADAS:
+					listadoBolsasSolicitud(bean, datos, request, response);
 					break;
 			}
 		} catch (UVException e) {
@@ -150,7 +165,7 @@ public class ControladorMisSolicitudes extends HttpServlet {
 		
 		try (PrintWriter writer = response.getWriter()) {
 			try {
-				BolsaEmpleoDataTable<Solicitud> dataTable = modelo.listaSolicitudesDatatable(request.getParameterMap());
+				BolsaEmpleoDataTable<Solicitud> dataTable = modelo.listaSolicitudesDatatable(usuario, request.getParameterMap());
 				bean.setDatatableSolicitudes(dataTable);
 				
 				Gson gson = new GsonBuilder().setDateFormat("dd/M/yyyy").
@@ -170,12 +185,10 @@ public class ControladorMisSolicitudes extends HttpServlet {
 		ModeloSolicitud modeloSolicitud = ModeloSolicitud.obtenerInstancia();
 		ModeloConvocatoria modeloConvocatoria = ModeloConvocatoria.obtenerInstancia();
 		
-		Integer idConvocatoria = Formateador.leeParametroInteger(request.getParameter(PARAM_CONVOCATORIA_ID));
-		if (idConvocatoria == null) {
-			bean.setVista(RUTA_BEP_SOL + "indexSolicitudes.jsp");
-			throw new UVException(MENSAJE_ERROR_CONVOCATORIA_ID_REQUERIDA);
-		}
-		Solicitud solicitud = modeloSolicitud.nuevaSolicitud(idConvocatoria);
+		bean.setVista(RUTA_BEP_SOL + "indexSolicitudes.jsp");
+		
+		Convocatoria convocatoria = modeloConvocatoria.getConvocatoriaById(Formateador.leeParametroInteger(request.getParameter(PARAM_CONVOCATORIA_ID)));		
+		Solicitud solicitud = modeloSolicitud.nuevaSolicitud(usuario, convocatoria);
 				
 		bean.setSolicitud(solicitud);
 		bean.setVista(RUTA_BEP_SOL + "paso1.jsp");					
@@ -184,12 +197,9 @@ public class ControladorMisSolicitudes extends HttpServlet {
 	private void consultarSolicitud(VistaSolicitudes bean, UVDatos datos, HttpServletRequest request, HttpServletResponse response) throws UVException, SQLException {
 		ModeloSolicitud modeloSolicitud = new ModeloSolicitud();
 		
-		Integer idSolicitud = Formateador.leeParametroInteger(request.getParameter(PARAM_SOLICITUD_ID));
-		if (idSolicitud == null) {
-			bean.setVista(RUTA_BEP_SOL + "indexSolicitudes.jsp");
-			throw new UVException(MENSAJE_ERROR_SOLICITUD_ID_REQUERIDO);
-		}
-		Solicitud solicitud = modeloSolicitud.getSolicitudById(idSolicitud);
+		bean.setVista(RUTA_BEP_SOL + "indexSolicitudes.jsp");
+		
+		Solicitud solicitud = modeloSolicitud.getSolicitudById(Formateador.leeParametroInteger(request.getParameter(PARAM_SOLICITUD_ID)));
 		bean.setSolicitud(solicitud);
 		
 		if (solicitud.getConvocatoria().getEstado().equals(ModeloConvocatoria.CONVOCATORIA_ESTADO_CERRADA)) {
@@ -203,14 +213,52 @@ public class ControladorMisSolicitudes extends HttpServlet {
 		}
 	}
 	
-	/** Listado de areas .
-     * @param bean .
-	 * @param datos .
-	 * @param request .
-	 * @param response .
-	 * @throws IOException .
-	 * @throws SQLException .
-	 */
+	private void seleccionarBolsas(VistaSolicitudes bean, UVDatos datos, HttpServletRequest request, HttpServletResponse response) throws UVException, SQLException {
+		bean.setVista(RUTA_BEP_SOL + "paso1.jsp");
+		
+		Gson gson = new GsonBuilder().create();
+		ModeloSolicitud modeloSolicitud = ModeloSolicitud.obtenerInstancia();
+		ModeloBolsa modeloBolsa = ModeloBolsa.obtenerInstancia();
+		ModeloArea modeloArea = ModeloArea.obtenerInstancia();
+		
+		Solicitud solicitud = modeloSolicitud.getSolicitudById(Formateador.leeParametroInteger(request.getParameter(PARAM_SOLICITUD_ID)));
+		bean.setSolicitud(solicitud);
+		
+		List<String> idBolsas = null;
+			
+		// parseamos json bolsas
+		try {			
+			idBolsas = gson.fromJson(request.getParameter(PARAM_BOLSAS), new TypeToken<List<String>>() { }.getType());					
+		} catch (Exception e) {
+			throw new UVException(MENSAJE_ERROR_BOLSAS_SELECCIONADAS_INCORRECTAS);
+		}
+		
+		// comprobamos si son bolsas válidas
+		List<Bolsa> bolsas = new ArrayList<Bolsa>();
+		for (String idBolsa : idBolsas) {
+			Bolsa bolsa = modeloBolsa.getBolsaById(Integer.parseInt(idBolsa));
+			
+			if (!bolsa.getBaremable()) {
+				throw new UVException("Ha selecciona una bolsa no baremable");
+			}
+			
+			if (modeloArea.isUsuarioExcluidoBolsa(usuario, bolsa.getArea())) {
+				throw new UVException("Usuario excluido de la bolsa");
+			}
+							
+			bolsas.add(bolsa);
+		}
+		
+		if (bolsas.size() > solicitud.getConvocatoria().getNumBolsasMaximo()) {
+			throw new UVException("Número de bolsas seleccionada no valido");
+		}
+		
+		// añadimos las bolsas a la solicitud
+		modeloSolicitud.asignarBolsasASolicitud(solicitud, bolsas);
+		
+		bean.setVista(RUTA_BEP_SOL + "paso2.jsp");
+	}
+	
 	private void listadoAreas(VistaSolicitudes bean, UVDatos datos, HttpServletRequest request, HttpServletResponse response) throws IOException, SQLException{
 		ModeloArea modelo = ModeloArea.obtenerInstancia();
 		datos.setContentType("application/json");
@@ -236,4 +284,28 @@ public class ControladorMisSolicitudes extends HttpServlet {
 		}
 	}
 	
+	private void listadoBolsasSolicitud(VistaSolicitudes bean, UVDatos datos, HttpServletRequest request, HttpServletResponse response) 
+			throws SQLException, UVException, IOException {
+		ModeloSolicitud modelo = ModeloSolicitud.obtenerInstancia();
+		datos.setContentType("application/json");
+		datos.setRespuestaEnviada(true);
+		response.setContentType("application/json");
+		response.setCharacterEncoding("UTF-8");
+		
+		Solicitud solicitud = modelo.getSolicitudById(Formateador.leeParametroInteger(request.getParameter(PARAM_SOLICITUD_ID)));
+		
+		try (PrintWriter writer = response.getWriter()) {
+			try {
+				BolsaEmpleoDataTable<Bolsa> dataTable = modelo.listaBolsasSolicitudesDatatable(solicitud, request.getParameterMap());
+				bean.setDatatableAreas(dataTable);
+				Gson gson = new GsonBuilder().setExclusionStrategies(BolsaEmpleoDataTable.GSONEXCLUSIONSTRATEGY).create();				
+				writer.write(gson.toJson(dataTable));
+			} catch (Exception ex) {
+				bean.getMensajesDeError().add(ex.getMessage());
+				CodigoDescripcion mensaje = new CodigoDescripcion("error", ex.getMessage());
+				writer.write(new Gson().toJson(mensaje));
+				response.setStatus(RESPONSE_HTTP_CODE_ERROR);
+			}
+		}
+	}
 }

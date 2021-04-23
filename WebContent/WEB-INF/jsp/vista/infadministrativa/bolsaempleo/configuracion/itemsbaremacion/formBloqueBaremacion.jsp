@@ -54,6 +54,13 @@ String codigoCompleto = apartado.getCodigo() + "." + (bloque != null ? bloque.ge
 	    			   value="<%= BolsaEmpleoUtils.getParamForm(request, ControladorItemsBaremacion.PARAM_BLOQUE_NOMBRE, bloque != null ? bloque.getNombre() : "") %>"/>
 	    	</div>
 		</div>
+		<div class="form-group-container col2">
+			<div class="form-group">
+	    		<label for="bloque_num_maximo_meritos">Número máximo de meritos por apartado</label>
+	    		<input class="form-input-custom" type="number" name="<%= ControladorItemsBaremacion.PARAM_BLOQUE_NUMEROMAXIMOMERITOS %>" id="bloque_num_maximo_meritos" 
+	    			value="<%= BolsaEmpleoUtils.getParamForm(request, ControladorItemsBaremacion.PARAM_BLOQUE_NUMEROMAXIMOMERITOS, bloque != null && bloque.getNumeroMaximoMeritos() != null ? bloque.getNumeroMaximoMeritos().toString() : "") %>"/>
+	    	</div>
+	    </div>
 				    	
     	<div class="form-btn">
     		<input id="bloque_enviar" type="submit" name="<%= ControladorItemsBaremacion.PARAM_ENVIAR %>" 
