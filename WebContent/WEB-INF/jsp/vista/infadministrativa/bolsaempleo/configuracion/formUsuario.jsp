@@ -142,45 +142,46 @@ VistaUsuarioBolsaEmpleo bean = (VistaUsuarioBolsaEmpleo) uvdatos.getVistas().get
     </form>
     
     
-	<% 
+	<% if(bean.getUsuario()!=null){
 		if(bean.getUsuario().getRol().getValor().equals("bolempcandidato")) { %>
-			<table class="bluetable bolsaempleo" id="table_areas_excluidas">
-	  			<caption class="table-title">Áreas excluidas para el usuario</caption>  
+		<table class="bluetable bolsaempleo" id="table_areas_excluidas">
+  			<caption class="table-title">Áreas excluidas para el usuario</caption>  
+			<tr>
+				<th scope="col" style="width:5%"></th>
+				<th scope="col" style="width:20%" title="Id de la area">Id</th>
+				<th scope="col" style="width:25%" title="Código de area">Código</th>
+				<th scope="col" style="width:65%">Area</th>
+				<th scope="col" class="center" style="width:15%">Baremable</th>	
+			</tr>
+			<tbody>				
+			</tbody>
+			<tfoot>
 				<tr>
-					<th scope="col" style="width:5%"></th>
-					<th scope="col" style="width:20%" title="Id de la area">Id</th>
-					<th scope="col" style="width:25%" title="Código de area">Código</th>
-					<th scope="col" style="width:65%">Area</th>
-					<th scope="col" class="center" style="width:15%">Baremable</th>	
+					<th colSpan="10" style="width:100%"></th>
 				</tr>
-				<tbody>				
-				</tbody>
-				<tfoot>
-					<tr>
-						<th colSpan="10" style="width:100%"></th>
-					</tr>
-				</tfoot>
-			</table>
-			
-			
-			<table class="bluetable bolsaempleo" id="table_areas">
-	  			<caption class="table-title">Listado de áreas</caption>  
+			</tfoot>
+		</table>
+		
+		
+		<table class="bluetable bolsaempleo" id="table_areas">
+  			<caption class="table-title">Listado de áreas</caption>  
+			<tr>
+				<th scope="col" style="width:5%"></th>
+				<th scope="col" style="width:20%" title="Id de la area">Id</th>
+				<th scope="col" style="width:25%" title="Código de area">Código</th>
+				<th scope="col" style="width:65%">Area</th>
+				<th scope="col" class="center" style="width:15%">Baremable</th>	
+			</tr>
+			<tbody>				
+			</tbody>
+			<tfoot>
 				<tr>
-					<th scope="col" style="width:5%"></th>
-					<th scope="col" style="width:20%" title="Id de la area">Id</th>
-					<th scope="col" style="width:25%" title="Código de area">Código</th>
-					<th scope="col" style="width:65%">Area</th>
-					<th scope="col" class="center" style="width:15%">Baremable</th>	
+					<th colSpan="10" style="width:100%"></th>
 				</tr>
-				<tbody>				
-				</tbody>
-				<tfoot>
-					<tr>
-						<th colSpan="10" style="width:100%"></th>
-					</tr>
-				</tfoot>
-			</table>		
-		<%}%>   
+			</tfoot>
+		</table>		
+	<%}	}%>   
+
 </div>
 
 <script>
@@ -230,6 +231,7 @@ VistaUsuarioBolsaEmpleo bean = (VistaUsuarioBolsaEmpleo) uvdatos.getVistas().get
 		}
 		<%}%>
 		
+		<% if(bean.getUsuario()!=null) {%>
 		var table = new Atis.DataTable('#table_areas', {
 		    "ajax": { url: "/srv/es/ajax/informacionadministrativa/bolsaempleo/configuracion/areasbaremar" },
 		    "params": {"<%=ControladorUsuarioBolsaEmpleo.PARAM_ID%>": <%= bean.getUsuario().getCodNum() %>},
@@ -283,32 +285,34 @@ VistaUsuarioBolsaEmpleo bean = (VistaUsuarioBolsaEmpleo) uvdatos.getVistas().get
 		});	
 		
 		
+		function enviaAccion(accion, selected) {
+			if (selected.length == 0) {
+				Atis.alertDialog('Estado de los usuarios', 'Seleccione al menos un usuario.');
+				return;
+			}
+			console.log(accion,selected);
+
+			Atis.confirmDialog("Exclusión de areas", "¿ Desea excluir las areas seleccionadas del usuario ?", {
+	        	Si: function() {
+	        		var params = {
+	        				'a': '<%=ControladorUsuarioBolsaEmpleo.ACCION_USUARIO%>', 
+	        				'aa': '<%=ControladorUsuarioBolsaEmpleo.ACCION_EXCLUIR_USUARIO_AREA%>', 
+	        				'<%=ControladorUsuarioBolsaEmpleo.PARAM_ACCION_USUARIO%>': accion, 
+	        				'<%=ControladorUsuarioBolsaEmpleo.PARAM_ID%>': <%= bean.getUsuario().getCodNum() %>, 
+	        				'<%=ControladorUsuarioBolsaEmpleo.PARAM_USUARIOS_SELECCIONADOS%>': Atis.object2Json(selected)
+	        			};
+	    			Atis.sendForm("<%= request.getRequestURI() %>", params);
+	          		$(this).dialog("close");
+	        	},
+	        	No: function() {
+	          		$(this).dialog("close");
+	        	}
+	      	});
+		}
 		
+		<%}%>
 	});
 	
-	function enviaAccion(accion, selected) {
-		if (selected.length == 0) {
-			Atis.alertDialog('Estado de los usuarios', 'Seleccione al menos un usuario.');
-			return;
-		}
-		console.log(accion,selected);
-
-		Atis.confirmDialog("Exclusión de areas", "¿ Desea excluir las areas seleccionadas del usuario ?", {
-        	Si: function() {
-        		var params = {
-        				'a': '<%=ControladorUsuarioBolsaEmpleo.ACCION_USUARIO%>', 
-        				'aa': '<%=ControladorUsuarioBolsaEmpleo.ACCION_EXCLUIR_USUARIO_AREA%>', 
-        				'<%=ControladorUsuarioBolsaEmpleo.PARAM_ACCION_USUARIO%>': accion, 
-        				'<%=ControladorUsuarioBolsaEmpleo.PARAM_ID%>': <%= bean.getUsuario().getCodNum() %>, 
-        				'<%=ControladorUsuarioBolsaEmpleo.PARAM_USUARIOS_SELECCIONADOS%>': Atis.object2Json(selected)
-        			};
-    			Atis.sendForm("<%= request.getRequestURI() %>", params);
-          		$(this).dialog("close");
-        	},
-        	No: function() {
-          		$(this).dialog("close");
-        	}
-      	});
-	}
+	
 	
 </script>
