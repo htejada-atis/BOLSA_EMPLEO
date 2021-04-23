@@ -50,7 +50,7 @@ public class ModeloRol {
 	 */
 	public List<Rol> listaRoles() throws SQLException {
 		List<Rol> roles = new ArrayList<Rol>();
-		String consulta = "SELECT admrol.* FROM ADM_ROL admrol";
+		String consulta = "SELECT admrol.* FROM ADM_ROL admrol WHERE ROL_CODNUM>1049";
 		
 		try (Connection conexion = ConexionUvirtual.obtenerInstancia();
 			PreparedStatement stmt = conexion.prepareStatement(consulta);) {

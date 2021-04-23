@@ -200,9 +200,10 @@ public class ControladorMisDatos extends HttpServlet {
 			String telefono = EscapaHTML.ajustaCodificacion(request.getParameter(PARAM_TELEFONO));
 			String nacionalidad = EscapaHTML.ajustaCodificacion(request.getParameter(PARAM_NACIONALIDAD));
 			String sexo = EscapaHTML.ajustaCodificacion(request.getParameter(PARAM_SEXO));
+			Boolean listadist = request.getParameter(PARAM_LISTA) != null && EscapaHTML.ajustaCodificacion(request.getParameter(PARAM_LISTA)).equals("true");
 			
 			UsuarioBolsaEmpleo usuarioFinal = new UsuarioBolsaEmpleo(codNum, nombre, primerapellido, 
-					segundoapellido, email, direccion, codigopostal, localidad, provincia, movil, telefono, nacionalidad, sexo);
+					segundoapellido, email, direccion, codigopostal, localidad, provincia, movil, telefono, nacionalidad, sexo, listadist);
 			
 			UsuarioBolsaEmpleo usua = modelo.getUsuarioById(codNum);
 			usuarioFinal.setCodPersona(usua.getCodPersona());
