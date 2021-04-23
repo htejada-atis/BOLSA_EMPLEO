@@ -77,8 +77,8 @@ ApartadoBaremacion apartado = bean.getApartadoBaremacion();
 				</select>				
 			</div>
 			<div class="form-group">
-				<label for="apartado_puntuacionmaxima">Factor mérito preferente</label> 
-				<input type="text" class="form-input-custom" name="<%= ControladorItemsBaremacion.PARAM_APARTADO_FACTORMERITOPREFERENTE %>" id="apartado_puntuacionmaxima"
+				<label for="apartado_factor_merito">Factor mérito preferente</label> 
+				<input type="text" class="form-input-custom" name="<%= ControladorItemsBaremacion.PARAM_APARTADO_FACTORMERITOPREFERENTE %>" id="apartado_factor_merito"
 					value="<%= BolsaEmpleoUtils.getParamForm(request, ControladorItemsBaremacion.PARAM_APARTADO_FACTORMERITOPREFERENTE, apartado != null && apartado.getFactorMeritoPreferente() != null ? apartado.getFactorMeritoPreferente().toString() : "") %>"/>
 			</div>
 		</div>
@@ -92,8 +92,24 @@ ApartadoBaremacion apartado = bean.getApartadoBaremacion();
 
 <script>
 	$(document).ready(function() {
+		
+		<%
+			if(meritosPreferentesSelected.equals("0")){%>
+				document.getElementById("apartado_factor_merito").value="";
+				document.getElementById("apartado_factor_merito").disabled=true;
+			<%}
+		%>
+		
+		
 		document.getElementById("apartado_meritospreferentes").addEventListener("change", function(event) {
-			console.log("apartado_meritospreferentes", event.target)
+			if(event.target.value==0){
+				document.getElementById("apartado_factor_merito").value="";
+				document.getElementById("apartado_factor_merito").disabled=true;
+			}
+			else{
+				document.getElementById("apartado_factor_merito").value="";
+				document.getElementById("apartado_factor_merito").disabled=false;
+			}
 		});
 	});
 </script>

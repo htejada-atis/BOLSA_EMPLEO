@@ -91,36 +91,24 @@ VistaItemsBaremacion bean = (VistaItemsBaremacion) uvdatos.getVistas().get(Vista
 		<%if (bean.getApartadoBaremacion() != null) {
     		if (bean.getApartadoBaremacion().getActivo()) {%>
     			activatorApartado = false;
-    	<%
-    		} else {
-    	%>
+    	<% } else { %>
     			activatorApartado = true;
-    	<%
-    		}
-    		
+    	<% }
     		if (bean.getBloqueBaremacion() != null) {
-    			if (bean.getBloqueBaremacion().isActivo()) {
-        %>
+    			if (bean.getBloqueBaremacion().isActivo()) {%>
         			activatorBloque = false;
-        <%
-        		} else {
-        %>
+        	<% } else { %>
         			activatorBloque = true;
-        <%}
-    			
+        	<% }
     			if (bean.getItemBaremacion() != null) {
     				if (bean.getItemBaremacion().getActivo()) {%>
     					activatorItem = false;
-        <%
-    				} else {
-    	%>
+        		<% } else { %>
     					activatorItem = true;
-        <%
-    				}
+        		<% }
     			}
     		}
-    	}
-    	%>
+    	} %>
     	
     	var activatorApartadoName = activatorApartado ? "Activar" : "Desactivar";
     	var activatorBloqueName = activatorBloque ? "Activar" : "Desactivar";
@@ -331,6 +319,7 @@ VistaItemsBaremacion bean = (VistaItemsBaremacion) uvdatos.getVistas().get(Vista
 				});
 				
 				document.getElementById("tableItems").style.visibility = "visible";
+				window.scrollTo(0,document.body.scrollHeight);
 			<% } %>
 			
 		<% } %>
