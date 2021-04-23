@@ -630,7 +630,7 @@ public class ModeloUsuarioBolsaEmpleo {
 		}
 		
 		String consulta = "UPDATE tbep_usuarios "
-			+ " SET EMAIL=?, DIRECCION=?, CODIGOPOSTAL=?, LOCALIDAD=?, PROVINCIA=?, MOVIL=?, TELEFONO=?, NACIONALIDAD=?, SEXO=?"
+			+ " SET EMAIL=?, DIRECCION=?, CODIGOPOSTAL=?, LOCALIDAD=?, PROVINCIA=?, MOVIL=?, TELEFONO=?, NACIONALIDAD=?, SEXO=?, FLGLISTADISTRIBUCION=?"
 			+ " WHERE codnum=?";
 		try (Connection conexion = ConexionUvirtual.obtenerInstancia();
 			PreparedStatement stmt = conexion.prepareStatement(consulta);) {
@@ -644,6 +644,7 @@ public class ModeloUsuarioBolsaEmpleo {
 			stmt.setString(parameterIndex++, usuario.getTelefono());
 			stmt.setString(parameterIndex++, usuario.getNacionalidad());
 			stmt.setString(parameterIndex++, usuario.getSexo());
+			stmt.setString(parameterIndex++, usuario.getListaDist() ? "S" : "N");
 			stmt.setInt(parameterIndex++, usuario.getCodNum());
 			stmt.executeUpdate();
 		}
@@ -801,10 +802,12 @@ public class ModeloUsuarioBolsaEmpleo {
 	public Boolean checkUser(UVDatos datos) throws SQLException, UVException {
 		Usuario usuArcos = datos.getUsuario();		
 		
+		// no hay usuario logeado, salimos
 		if (usuArcos == null) {
 			return false;
 		} 
 		
+		// comprobamos si el usuario existe en uvirtual (excepción si no existe)
 		UsuarioBolsaEmpleo usuario = getUsuarioByCodCuenta(usuArcos.getUid());
 	
 		if (usuario.getExcluido()) {
@@ -842,45 +845,6 @@ public class ModeloUsuarioBolsaEmpleo {
 				}
 			}
 		}
-
-		
-//		Usuario usuArcos = datos.getUsuario();		
-		
-//		// no hay usuario logeado, salimos
-//		if (usuArcos == null) {
-//			return false;
-//		} 
-//		
-//		// comprobamos si el usuario existe en uvirtual (excepción si no existe)
-//		UsuarioBolsaEmpleo usuario = getUsuarioByCodCuenta(usuArcos.getUid());
-//		
-//		if (usuario.getExcluido()) {
-//			throw new UVException("No puede acceder, su perfil ha sido excluido por los siguientes motivos: " + usuario.getRazonExcluido());
-//		} else if (usuario.getBorrado()) {
-//			throw new UVException("No puede acceder, su perfil ha sido borrado de la base de datos");		
-//		} else if (usuArcos != null) {
-//			UsuarioBolsaEmpleo usuarioFinal = null;
-//			
-//			try {
-//				usuarioFinal = listaUsuario(usuArcos.getUid());
-//			} catch (UVException e) {
-//				// no existe el usuario en nuestras tablas, lo creamos como candidato
-//				ModeloRol modeloRol = ModeloRol.obtenerInstancia();
-//				Rol role = modeloRol.getRoleById(PARAM_ROL_CANDIDATO_ID);
-//					
-//				usuarioFinal = new UsuarioBolsaEmpleo(usuArcos.getCodigoPersonaArcos(), usuArcos.getUid(), role, true, false);
-//				insertaUsuario(usuarioFinal);
-//				
-//				return true;
-//			} finally {
-//				// refresamos los roles del usuario
-//				if (usuarioFinal != null) {
-//					CrearUsuario.refrescarUsuario(usuarioFinal.getCodCuenta());	
-//				}				
-//			}
-//			
-//			return false;
-//		}		
 	}
 	
 	/** Elimina un usuario.

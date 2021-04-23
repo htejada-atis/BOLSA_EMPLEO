@@ -127,9 +127,10 @@ public class UsuarioBolsaEmpleo implements Serializable {
 	 * @param ptelefono .
 	 * @param pnacionalidad .
 	 * @param psexo .
+	 * @param plistaDist .
 	 */
 	public UsuarioBolsaEmpleo(Integer pcodNum, String pnombre, String primer_apellido, String segundo_apellido, String pemail, String pdireccion, String pcodigopostal,
-			String plocalidad, String pprovincia, String pmovil, String ptelefono, String pnacionalidad, String psexo) {
+			String plocalidad, String pprovincia, String pmovil, String ptelefono, String pnacionalidad, String psexo, Boolean plistaDist) {
 		super();
 		this.codNum = pcodNum;
 		this.nombre = pnombre;
@@ -144,6 +145,7 @@ public class UsuarioBolsaEmpleo implements Serializable {
 		this.telefono = ptelefono;
 		this.nacionalidad = pnacionalidad;
 		this.sexo = psexo;
+		this.listaDist = plistaDist;
 	}
 	
 	
