@@ -4,9 +4,7 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
@@ -174,47 +172,24 @@ public class ModeloBolsa {
 	}
 
 	/**
-	 * Devuelve el total de bolsas bloqueadas .
-	 * @return num bolsas
+	 * Devuelve una bolsa por su id.
+	 * @return bolsa
 	 * @throws SQLException en caso de error en la BD
 	 * @throws UVException si bolsa no es existe
 	 */
 	public Integer getBolsasBloqueadas() throws SQLException, UVException {
-		String consulta = "SELECT COUNT(*) AS total "
+		String consulta = "SELECT * "
 				+ "FROM TBEP_BOLSAS "
 				+ "WHERE ESTADO='BLOQUEADA'";
 			
 		try (Connection conexion = ConexionUvirtual.obtenerInstancia();
 				PreparedStatement stmt = conexion.prepareStatement(consulta);) {
 			try (ResultSet rs = stmt.executeQuery()) {
-				while (rs.next()) {
-					return rs.getInt("total");				
-				}	
+				
+				return rs.getMetaData().getColumnCount();
 			}
-		}
-		return null;		
-	}
-	
-	/**
-	 * Devuelve el total de bolsas revisadas .
-	 * @return num bolsas
-	 * @throws SQLException en caso de error en la BD
-	 * @throws UVException si bolsa no es existe
-	 */
-	public Integer getBolsasRevisadas() throws SQLException, UVException {
-		String consulta = "SELECT COUNT(*) AS total "
-				+ "FROM TBEP_BOLSAS "
-				+ "WHERE ESTADO='REVISION'";
-			
-		try (Connection conexion = ConexionUvirtual.obtenerInstancia();
-				PreparedStatement stmt = conexion.prepareStatement(consulta);) {
-			try (ResultSet rs = stmt.executeQuery()) {
-				while (rs.next()) {
-					return rs.getInt("total");				
-				}	
-			}
-		}
-		return null;		
+		}		
+		
 	}
 	
 	/**
@@ -323,58 +298,15 @@ public class ModeloBolsa {
 		
 	private void cambiarEstadoBolsas(List<Bolsa> bolsas, String estado) throws SQLException {
 		String params = BolsaEmpleoUtils.consultaMultiplesParametros(bolsas.size());
-		if (estado.equals(BOLSA_ESTADO_BLOQUEADA)) {
-			String query = "UPDATE TBEP_BOLSAS SET ESTADO = ?, FECHABLOQUEO = ?, FECHADEBLOQUEO = ? WHERE CODNUM IN (" + params + ")";	
-			
-			try (Connection conexion = ConexionUvirtual.obtenerInstancia(); PreparedStatement stmt = conexion.prepareStatement(query)) {
-				int indexParam = 1;
-
-				stmt.setString(indexParam++, estado);
-				SimpleDateFormat formatter = new SimpleDateFormat("dd/MM/YYYY HH:mm:ss");
-				Date date = new Date(System.currentTimeMillis());
+		String query = "UPDATE TBEP_BOLSAS SET ESTADO = ? WHERE CODNUM IN (" + params + ")";		
 				
-				stmt.setDate(indexParam++, new java.sql.Date(date.getTime()));
-				stmt.setDate(indexParam++, null);
-				
-				for (Bolsa bolsa : bolsas) {
-					stmt.setInt(indexParam++, bolsa.getCodNum());
-				}
-				stmt.executeUpdate();
+		try (Connection conexion = ConexionUvirtual.obtenerInstancia(); PreparedStatement stmt = conexion.prepareStatement(query)) {
+			int indexParam = 1;
+			stmt.setString(indexParam++, estado);
+			for (Bolsa bolsa : bolsas) {
+				stmt.setInt(indexParam++, bolsa.getCodNum());
 			}
-			
-			
-		} else {
-			if (estado.equals(BOLSA_ESTADO_DESBLOQUEADA)) {
-				String query = "UPDATE TBEP_BOLSAS SET ESTADO = ?, FECHABLOQUEO = ?, FECHADEBLOQUEO = ? WHERE CODNUM IN (" + params + ")";
-				
-				try (Connection conexion = ConexionUvirtual.obtenerInstancia(); PreparedStatement stmt = conexion.prepareStatement(query)) {
-					int indexParam = 1;
-
-					stmt.setString(indexParam++, estado);
-					SimpleDateFormat formatter = new SimpleDateFormat("dd/MM/YYYY HH:mm:ss");
-					Date date = new Date(System.currentTimeMillis());
-					
-					stmt.setDate(indexParam++, null);
-					stmt.setDate(indexParam++, new java.sql.Date(date.getTime()));
-
-					for (Bolsa bolsa : bolsas) {
-						stmt.setInt(indexParam++, bolsa.getCodNum());
-					}
-					stmt.executeUpdate();
-				}
-			} else {
-				String query = "UPDATE TBEP_BOLSAS SET ESTADO = ?, WHERE CODNUM IN (" + params + ")";
-				
-				try (Connection conexion = ConexionUvirtual.obtenerInstancia(); PreparedStatement stmt = conexion.prepareStatement(query)) {
-					int indexParam = 1;
-
-					stmt.setString(indexParam++, estado);
-					for (Bolsa bolsa : bolsas) {
-						stmt.setInt(indexParam++, bolsa.getCodNum());
-					}
-					stmt.executeUpdate();
-				}
-			}
+			stmt.executeUpdate();
 		}
 	}
 	
