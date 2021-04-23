@@ -3,6 +3,7 @@ package es.ujaen.uvirtual.controlador.infadministrativa.bolsaempleo;
 import java.io.IOException;
 import java.sql.SQLException;
 import java.util.logging.Logger;
+import java.util.List;
 import java.util.logging.Level;
 
 import javax.servlet.ServletException;
@@ -10,10 +11,15 @@ import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
 
 import es.ujaen.uvirtual.beans.UVDatos;
 import es.ujaen.uvirtual.beans.Usuario;
+import es.ujaen.uvirtual.beans.uvirtual.bolsaempleo.Area;
 import es.ujaen.uvirtual.beans.vistas.uvirtual.bolsaempleo.VistaEstadoBolsas;
+import es.ujaen.uvirtual.beans.vistas.uvirtual.bolsaempleo.VistaEvaluadores;
+import es.ujaen.uvirtual.beans.vistas.uvirtual.bolsaempleo.VistaValidar;
+import es.ujaen.uvirtual.modelo.bolsaempleo.ModeloArea;
 import es.ujaen.uvirtual.modelo.bolsaempleo.ModeloUsuarioBolsaEmpleo;
 import es.ujaen.uvirtual.utilidades.EscapaHTML;
 import es.ujaen.uvirtual.utilidades.Formateador;
@@ -37,6 +43,7 @@ public class ControladorValidar extends HttpServlet {
 	
 	// acciones
 	public static final String ACCION_LISTAR = "listar";
+	public static final String ACCION_LISTAR_AREAS = "listarareas";
 	
 	// mensajes
 	public static final String MENSAJE_ERROR_FOO = "Mensaje de error";
@@ -54,14 +61,14 @@ public class ControladorValidar extends HttpServlet {
 		datos.setDocType("<!DOCTYPE html>");
 		datos.setContentType("text/html");
 		
-		VistaEstadoBolsas bean = new VistaEstadoBolsas();		
+		VistaValidar bean = new VistaValidar();		
 		Usuario usuario = datos.getUsuario();
 		ModeloUsuarioBolsaEmpleo modelo = ModeloUsuarioBolsaEmpleo.obtenerInstancia();
 		LOGGER.log(Level.FINEST, "usuario que ha entrado en el servlet es {0}", usuario.getUid());
 		
 		String nombreAccion = EscapaHTML.ajustaCodificacion(request.getParameter(PARAM_ACCION));
 		if (nombreAccion == null) {
-			nombreAccion = ACCION_LISTAR;
+			nombreAccion = ACCION_LISTAR_AREAS;
 		}
 		
 		bean.setVista("/WEB-INF/jsp/vista/infadministrativa/bolsaempleo/validar/index.jsp");
@@ -71,6 +78,9 @@ public class ControladorValidar extends HttpServlet {
 			switch (nombreAccion) {
 				case ACCION_LISTAR:
 					listado(datos, request, response);
+					break;
+				case ACCION_LISTAR_AREAS:
+					obtenerAreas(bean, request);
 					break;
 			}
 		} catch (SQLException e) {
@@ -105,4 +115,21 @@ public class ControladorValidar extends HttpServlet {
 	private void listado(UVDatos datos, HttpServletRequest request, HttpServletResponse response) throws IOException, SQLException {
 		
 	}
+	
+	
+	/** muestra todas las areas en un select .
+	 * @param bean bean de la vista a la que poner los valores.
+	 * @param request .
+	 * @throws SQLException excepcion de bbdd.
+	 * @throws UVException .
+	 */
+	private void obtenerAreas(VistaValidar bean, HttpServletRequest request) throws SQLException, UVException {
+		bean.setVista("/WEB-INF/jsp/vista/infadministrativa/bolsaempleo/validar/index.jsp");
+		
+		ModeloArea modelo = ModeloArea.obtenerInstancia();
+		List<Area> areas = modelo.listaAreas();
+		bean.setAreas(areas);
+	}
+	
+	
 }

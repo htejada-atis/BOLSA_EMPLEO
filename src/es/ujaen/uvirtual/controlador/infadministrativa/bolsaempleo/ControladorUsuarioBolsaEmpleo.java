@@ -356,9 +356,6 @@ public class ControladorUsuarioBolsaEmpleo extends HttpServlet {
 		ModeloUsuarioBolsaEmpleo modelo = ModeloUsuarioBolsaEmpleo.obtenerInstancia();
 		ModeloArea modeloArea = ModeloArea.obtenerInstancia();
 		
-		UsuarioBolsaEmpleo usu = modelo.getUsuarioById(codNum);
-		Usuario usuArcos = CrearUsuario.usuario(usu.getCodCuenta());
-		
 		List<UsuarioBolsaEmpleo> usuarios = modelo.getUsuariosByIds(selected);
 		List<Area> areas = modeloArea.getAreasByIds(selected);
 
@@ -373,6 +370,8 @@ public class ControladorUsuarioBolsaEmpleo extends HttpServlet {
 			modelo.ponerUsuarioComoNoExcluido(usuarios);
 			break;
 		case ACCION_EXCLUIR_USUARIO_AREA:
+			UsuarioBolsaEmpleo usu = modelo.getUsuarioById(codNum);
+			Usuario usuArcos = CrearUsuario.usuario(usu.getCodCuenta());
 			modelo.excluirUsuarioArea(usu, areas);
 			
 			bean.setUsuarioArcos(usuArcos);
@@ -383,12 +382,14 @@ public class ControladorUsuarioBolsaEmpleo extends HttpServlet {
 			bean.setVista("/WEB-INF/jsp/vista/infadministrativa/bolsaempleo/configuracion/formUsuario.jsp");
 			break;
 		case ACCION_INCLUIR_USUARIO_AREA:
-			modelo.incluirUsuarioArea(usu, areas);
+			UsuarioBolsaEmpleo usuCont = modelo.getUsuarioById(codNum);
+			Usuario usuArcosCont = CrearUsuario.usuario(usuCont.getCodCuenta());
+			modelo.incluirUsuarioArea(usuCont, areas);
 
-			bean.setUsuarioArcos(usuArcos);
+			bean.setUsuarioArcos(usuArcosCont);
 			bean.setBusqueda(false);
 			
-			bean.setUsuario(usu);
+			bean.setUsuario(usuCont);
 			bean.setVista("/WEB-INF/jsp/vista/infadministrativa/bolsaempleo/configuracion/formUsuario.jsp");
 			break;
 		default:
