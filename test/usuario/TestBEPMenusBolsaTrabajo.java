@@ -35,7 +35,7 @@ public class TestBEPMenusBolsaTrabajo {
 	private static final Logger LOGGER = Logger.getLogger(NOMBREDEESTACLASE);
 	private static final Integer WAIT_ELEMENT = 5; // segundos
 	
-	private static final String DIV_MAIN_BOLSAS = "bolsas";
+	private static final String DIV_MAIN_BOLSAS = "bolsa-empleo";
 	private static final String ID_TABLE = "table";
 	private static final String CLASS_PAGINATION = "pagination";
 	private static final String CLASS_PAGINATION_NEXT = "next";
