@@ -12,6 +12,16 @@ VistaEstadoBolsas bean = (VistaEstadoBolsas) uvdatos.getVistas().get(VistaEstado
 %>
 
 <div class='bolsa-empleo'>
+	<% 
+
+		Integer bloqueadas = null;
+		Integer revisadas = null;
+
+		bloqueadas = bean.getTotalBolsasBloqueadas();
+		revisadas = bean.getTotalBolsasRevisadas();
+	%>
+
+
 	<% if (bean.getMensajesDeExito().size() > 0) { %>
 		<div id="exito" class="success">
 			<%= bean.formatearMensajesDeExito() %>
@@ -28,12 +38,12 @@ VistaEstadoBolsas bean = (VistaEstadoBolsas) uvdatos.getVistas().get(VistaEstado
 		<div class="form-group-container">
 	    	<div class="form-group">
     				<p>Total de bolsas bloqueadas:
-    					<% bean.getTotalBolsasBloqueadas(); %>
+    					<%= bloqueadas %>
     				</p>
     		</div>
     		<div class="form-group">
     				<p>Total de bolsas revisadas:
-    				   <% bean.getTotalBolsasRevisadas(); %>
+    				   <%= revisadas %>
     				</p>
     		</div>
 		</div>
