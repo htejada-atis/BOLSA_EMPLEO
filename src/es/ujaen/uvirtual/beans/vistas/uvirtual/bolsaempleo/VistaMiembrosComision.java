@@ -10,7 +10,7 @@ import es.ujaen.uvirtual.beans.vistas.Vista;
 /** Bean para la vista.
  * @author fcampos
  */
-public class VistaValidar extends Vista implements Serializable {
+public class VistaMiembrosComision extends Vista implements Serializable {
 	private static final long serialVersionUID = 1L;
 	private String vista;
 	private List<Area> areas = new ArrayList<>();

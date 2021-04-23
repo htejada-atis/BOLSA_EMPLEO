@@ -13,6 +13,8 @@ public class VistaEstadoBolsas extends Vista implements Serializable {
     private static final long serialVersionUID = 1L;
     private String vista;
     private BolsaEmpleoDataTable<Bolsa> dataTable;
+    private Integer totalBolsasBloqueadas; 
+    private Integer totalBolsasRevisadas; 
     
     public String getVista() {
         return vista;
@@ -20,6 +22,22 @@ public class VistaEstadoBolsas extends Vista implements Serializable {
     
     public void setVista(String vista) {
         this.vista = vista;
+    }
+    
+    public Integer getTotalBolsasBloqueadas() {
+        return totalBolsasBloqueadas;
+    }
+    
+    public void setTotalBolsasBloqueadas(Integer num) {
+        this.totalBolsasBloqueadas = num;
+    }
+    
+    public Integer getTotalBolsasRevisadas() {
+        return totalBolsasRevisadas;
+    }
+    
+    public void setTotalBolsasRevisadas(Integer num) {
+        this.totalBolsasRevisadas = num;
     }
     
     public BolsaEmpleoDataTable<Bolsa> getDatatableBolsas() {

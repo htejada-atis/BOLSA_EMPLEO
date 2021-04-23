@@ -82,6 +82,7 @@ public class ControladorBolsas extends HttpServlet {
 		VistaEstadoBolsas bean = new VistaEstadoBolsas();		
 		Usuario usuario = datos.getUsuario();
 		ModeloUsuarioBolsaEmpleo modelo = ModeloUsuarioBolsaEmpleo.obtenerInstancia();	
+		ModeloBolsa modeloBolsa = ModeloBolsa.obtenerInstancia();
 		LOGGER.log(Level.FINEST, "usuario que ha entrado en el servlet es {0}", usuario.getUid());
 		
 		String nombreAccion = EscapaHTML.ajustaCodificacion(request.getParameter(PARAM_ACCION));		
@@ -92,6 +93,8 @@ public class ControladorBolsas extends HttpServlet {
 		bean.setVista("/WEB-INF/jsp/vista/infadministrativa/bolsaempleo/bolsas/index.jsp");
 		
 		try {
+			bean.setTotalBolsasBloqueadas(modeloBolsa.getBolsasBloqueadas());
+			bean.setTotalBolsasRevisadas(modeloBolsa.getBolsasRevisadas());
 			anonimo = !modelo.checkUser(datos);
 			switch (nombreAccion) {
 				case ACCION_DATATABLE:
@@ -141,11 +144,10 @@ public class ControladorBolsas extends HttpServlet {
 		try (PrintWriter writer = response.getWriter()) {
 			try {
 				BolsaEmpleoDataTable<Bolsa> dataTable = modelo.listaBolsaEmpleoDatatable(request.getParameterMap());
-				Integer bolsas = modelo.getBolsasBloqueadas();
 				
 				bean.setDatatableBolsas(dataTable);
 				
-				Gson gson = new GsonBuilder().setExclusionStrategies(BolsaEmpleoDataTable.GSONEXCLUSIONSTRATEGY).create();				
+				Gson gson = new GsonBuilder().setDateFormat("dd/M/yyyy").setExclusionStrategies(BolsaEmpleoDataTable.GSONEXCLUSIONSTRATEGY).create();
 				writer.write(gson.toJson(dataTable));
 			} catch (Exception ex) {
 				bean.getMensajesDeError().add(ex.getMessage());
