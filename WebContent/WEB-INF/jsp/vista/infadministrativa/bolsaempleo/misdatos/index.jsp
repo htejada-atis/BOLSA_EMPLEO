@@ -40,9 +40,11 @@ VistaUsuarioBolsaEmpleo bean = (VistaUsuarioBolsaEmpleo) uvdatos.getVistas().get
 	String telefono = "";
 	String nacionalidad = "";
 	String sexo = "";
+	Boolean lista_dist = false;
 	
 	if(bean.getUsuario().getNombre()!=null) nombre = bean.getUsuario().getNombre();
 	if(bean.getUsuario().getPrimerApellido()!=null) primer_apellido = bean.getUsuario().getPrimerApellido();
+	if(bean.getUsuario().getSegundoApellido()!=null) segundo_apellido = bean.getUsuario().getSegundoApellido();
 	if(bean.getUsuario().getSegundoApellido()!=null) segundo_apellido = bean.getUsuario().getSegundoApellido();
 	if(bean.getUsuario().getEmail()!=null) email = bean.getUsuario().getEmail();
 	if(bean.getUsuarioArcos().getDocumentoTipo()!=null) tipo_documento = bean.getUsuarioArcos().getDocumentoTipo();
@@ -55,6 +57,7 @@ VistaUsuarioBolsaEmpleo bean = (VistaUsuarioBolsaEmpleo) uvdatos.getVistas().get
 	if(bean.getUsuario().getTelefono()!=null) telefono = bean.getUsuario().getTelefono();
 	if(bean.getUsuario().getNacionalidad()!=null) nacionalidad = bean.getUsuario().getNacionalidad();
 	if(bean.getUsuario().getSexo()!=null) sexo = bean.getUsuario().getSexo();
+	if(bean.getUsuario()!=null) lista_dist = bean.getUsuario().getListaDist();
 	
 	%>
 	
@@ -138,7 +141,11 @@ VistaUsuarioBolsaEmpleo bean = (VistaUsuarioBolsaEmpleo) uvdatos.getVistas().get
     			<input class="form-input" type="radio" id="femenino" name="<%= ControladorMisDatos.PARAM_SEXO %>" style="display: inline;">
 				<label class="form-label-custom" for="female" style="float: none; margin-right:0px;">Femenino</label>
     		</div>
+    		<div class="form-check">
+    			<label for="usuario_lista_dist"><input class="params" type="checkbox" id="usuario_lista_dist" name="<%= ControladorMisDatos.PARAM_LISTA %>" value="<%= lista_dist %>" <%= (lista_dist ? "checked=''" : "") %>/>Lista Distribucion</label>
+    		</div>
     	</div>
+
 		
     	<div class="form-group">
     		<input id="usuario_enviar" type="submit" name="<%= ControladorMisDatos.PARAM_ENVIAR %> " 

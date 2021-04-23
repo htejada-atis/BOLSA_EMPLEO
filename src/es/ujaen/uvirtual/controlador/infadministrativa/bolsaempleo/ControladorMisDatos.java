@@ -46,6 +46,7 @@ public class ControladorMisDatos extends HttpServlet {
 	public static final String PARAM_NOMBRE = "nombre";
 	public static final String PARAM_EMAIL = "email";
 	public static final String PARAM_DOCUMENTO = "documento";
+	public static final String PARAM_LISTA = "listadist";
 	
 	public static final String PARAM_PRIMER_APELLIDO = "primer_apellido";
 	public static final String PARAM_SEGUNDO_APELLIDO = "segundo_apellido";
