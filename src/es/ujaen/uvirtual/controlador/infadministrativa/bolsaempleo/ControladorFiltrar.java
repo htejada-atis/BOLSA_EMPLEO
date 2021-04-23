@@ -1,6 +1,7 @@
 package es.ujaen.uvirtual.controlador.infadministrativa.bolsaempleo;
 
 import java.io.IOException;
+import java.io.PrintWriter;
 import java.sql.SQLException;
 import java.util.logging.Logger;
 import java.util.logging.Level;
@@ -11,10 +12,18 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
+
+import es.ujaen.uvirtual.beans.CodigoDescripcion;
 import es.ujaen.uvirtual.beans.UVDatos;
 import es.ujaen.uvirtual.beans.Usuario;
+import es.ujaen.uvirtual.beans.uvirtual.bolsaempleo.Bolsa;
 import es.ujaen.uvirtual.beans.vistas.uvirtual.bolsaempleo.VistaEstadoBolsas;
+import es.ujaen.uvirtual.beans.vistas.uvirtual.bolsaempleo.VistaFiltrar;
+import es.ujaen.uvirtual.modelo.bolsaempleo.ModeloBolsa;
 import es.ujaen.uvirtual.modelo.bolsaempleo.ModeloUsuarioBolsaEmpleo;
+import es.ujaen.uvirtual.utilidades.BolsaEmpleoDataTable;
 import es.ujaen.uvirtual.utilidades.EscapaHTML;
 import es.ujaen.uvirtual.utilidades.Formateador;
 import es.ujaen.uvirtual.utilidades.UVException;
@@ -27,7 +36,9 @@ import es.ujaen.uvirtual.utilidades.UVException;
 		description = "Filtrar candidatos de las bolsas", 
 		urlPatterns = { 
 				"/srv/es/informacionadministrativa/bolsaempleo/filtrar", 
-				"/srv/en/informacionadministrativa/bolsaempleo/filtrar"
+				"/srv/en/informacionadministrativa/bolsaempleo/filtrar",
+				"/srv/es/ajax/informacionadministrativa/bolsaempleo/filtrar", 
+				"/srv/en/ajax/informacionadministrativa/bolsaempleo/filtrar"
 		})
 public class ControladorFiltrar extends HttpServlet {
 	private static final long serialVersionUID = 1L;
@@ -37,13 +48,13 @@ public class ControladorFiltrar extends HttpServlet {
 	
 	// acciones
 	public static final String ACCION_LISTAR = "listar";
+	public static final String ACCION_DATATABLE = "datatable";
 	
 	// mensajes
 	public static final String MENSAJE_ERROR_FOO = "Mensaje de error";
 	public static final String MENSAJE_EXITO_BAR = "Mensaje de exito"; 
-
-	// variables
-	public static boolean anonimo = true;
+	
+	public static final int RESPONSE_HTTP_CODE_ERROR = 400;
 	
 	/** Peticion GET.
 	 * @see HttpServlet#doGet(HttpServletRequest request, HttpServletResponse response)
@@ -54,11 +65,10 @@ public class ControladorFiltrar extends HttpServlet {
 		datos.setDocType("<!DOCTYPE html>");
 		datos.setContentType("text/html");
 		
-		VistaEstadoBolsas bean = new VistaEstadoBolsas();		
+		VistaFiltrar bean = new VistaFiltrar();		
 		Usuario usuario = datos.getUsuario();
 		ModeloUsuarioBolsaEmpleo modelo = ModeloUsuarioBolsaEmpleo.obtenerInstancia();	
 		LOGGER.log(Level.FINEST, "usuario que ha entrado en el servlet es {0}", usuario.getUid());
-		
 		
 		String nombreAccion = EscapaHTML.ajustaCodificacion(request.getParameter(PARAM_ACCION));
 		if (nombreAccion == null) {
@@ -68,11 +78,11 @@ public class ControladorFiltrar extends HttpServlet {
 		bean.setVista("/WEB-INF/jsp/vista/infadministrativa/bolsaempleo/filtrar/index.jsp");
 		
 		try {
-			anonimo = !modelo.checkUser(datos);
+			modelo.checkUser(datos);
 			switch (nombreAccion) {
-				case ACCION_LISTAR:
-					listado(datos, request, response);
-					break;							
+				case ACCION_DATATABLE:
+					listado(bean, datos, request, response);
+					break;
 			}			
 		} catch (SQLException e) {
 			LOGGER.log(Level.SEVERE, Formateador.getStackTrace(e));
@@ -103,7 +113,30 @@ public class ControladorFiltrar extends HttpServlet {
 		doGet(request, response);
 	}
 		
-	private void listado(UVDatos datos, HttpServletRequest request, HttpServletResponse response) throws IOException, SQLException {
+	private void listado(VistaFiltrar bean, UVDatos datos, HttpServletRequest request, HttpServletResponse response) throws IOException, SQLException {
+		ModeloBolsa modelo = ModeloBolsa.obtenerInstancia();
 		
+		datos.setContentType("application/json");
+		datos.setRespuestaEnviada(true);
+		response.setContentType("application/json");
+		response.setCharacterEncoding("UTF-8");
+		
+		try (PrintWriter writer = response.getWriter()) {
+			try {
+				BolsaEmpleoDataTable<Bolsa> dataTable = modelo.listaBolsaEmpleoDatatable(request.getParameterMap());
+				Integer bolsas = modelo.getBolsasBloqueadas();
+				
+				//bean.setDatatableBolsas(dataTable);
+				
+				Gson gson = new GsonBuilder().setExclusionStrategies(BolsaEmpleoDataTable.GSONEXCLUSIONSTRATEGY).create();				
+				writer.write(gson.toJson(dataTable));
+			} catch (Exception ex) {
+				bean.getMensajesDeError().add(ex.getMessage());
+				
+				CodigoDescripcion mensaje = new CodigoDescripcion("error", ex.getMessage());
+				writer.write(new Gson().toJson(mensaje));
+				response.setStatus(RESPONSE_HTTP_CODE_ERROR);
+			}
+		}
 	}	
 }
