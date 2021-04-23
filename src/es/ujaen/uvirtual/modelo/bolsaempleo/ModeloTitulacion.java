@@ -26,6 +26,8 @@ public class ModeloTitulacion {
 	public static final int ORDER_COLUMN_INDEX_ID_SELECTABLE = 1;
 	public static final int ORDER_COLUMN_INDEX_NOMBRE_SELECTABLE = 2;
 	
+	public static final int ORDER_COLUMN_INDEX_NOMBRE_CANDIDATO = 0;
+	
 	public static final int COLUMN_NOMBRE_MAXLENGTH = 50;
 	
     protected static ModeloTitulacion eInstancia = null;
@@ -329,6 +331,56 @@ public class ModeloTitulacion {
 		
 		dataTable.setColumn(ORDER_COLUMN_INDEX_ID_SELECTABLE, "beptit.CODNUM", DataTableColumn.COLUMN_TYPE_NUMBER);
 		dataTable.setColumn(ORDER_COLUMN_INDEX_NOMBRE_SELECTABLE, "beptit.NOMBRE");
+		dataTable.setQuery(consulta);
+				
+		try (Connection conexion = ConexionUvirtual.obtenerInstancia();
+				PreparedStatement stmtCount = conexion.prepareStatement(dataTable.getQueryCount());
+				PreparedStatement stmt = conexion.prepareStatement(dataTable.getQuery());
+		) {
+			int indexParam = 1;
+			stmt.setInt(indexParam, area);
+			stmtCount.setInt(indexParam++, area);
+			dataTable.setFiltersParams(stmt, stmtCount, indexParam);
+			try (ResultSet rs = stmt.executeQuery()) {
+				while (rs.next()) {
+					Titulacion tit = new Titulacion();
+					tit.setCodNum(rs.getInt("CODNUM"));
+					tit.setNombre(rs.getString("NOMBRE"));
+					ModeloArea modeloArea = ModeloArea.obtenerInstancia();	
+					tit.setArea(modeloArea.getAreaById(area));
+					titulaciones.add(tit);
+				}
+			}
+			dataTable.setRecordsTotalFromQuery(stmtCount);
+			dataTable.setData(titulaciones);
+		}
+		
+		return dataTable;
+	}
+	
+	/**
+	 * Listado de titulaciones de un area en una tabla .
+	 * @param params para leer los parametros de paginación, ordenacion, etc
+	 * @param area id del area por el que se va a filtrar
+	 * @return listado de titulaciones
+	 * @throws SQLException en caso de error de base de datos
+	 * @throws UVException error si no existe titulación
+	 */
+	public BolsaEmpleoDataTable<Titulacion> listaTitulacionesAreaCandidatoDatatable(Map<String, String[]> params, Integer area) throws SQLException, UVException {
+		
+		if (area == null) {
+			throw new UVException("No se pueden listar titulaciones sin el id del área");
+		}
+		
+		List<Titulacion> titulaciones = new ArrayList<>();
+		BolsaEmpleoDataTable<Titulacion> dataTable = new BolsaEmpleoDataTable<Titulacion>(params);
+		
+		String consulta = "SELECT beptit.CODNUM, beptit.NOMBRE FROM tbep_titulaciones beptit "
+				+ "INNER JOIN tbep_titulacionespreferentesarea beptpa ON beptit.codnum = beptpa.beptit_codnum "
+				+ "INNER JOIN TBEP_AREAS bepare ON bepare.codnum = beptpa.bepare_codnum "
+				+ "WHERE bepare.CODNUM = ? ";
+		
+		dataTable.setColumn(ORDER_COLUMN_INDEX_NOMBRE_CANDIDATO, "beptit.NOMBRE");
 		dataTable.setQuery(consulta);
 				
 		try (Connection conexion = ConexionUvirtual.obtenerInstancia();

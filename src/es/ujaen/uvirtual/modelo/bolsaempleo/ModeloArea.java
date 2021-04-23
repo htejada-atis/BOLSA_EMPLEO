@@ -32,6 +32,9 @@ public class ModeloArea {
 	public static final int ORDER_COLUMN_INDEX_EXCLUIDO_SOLICITUDES = 3;
 	public static final int ORDER_COLUMN_INDEX_BAREMABLE_SOLICITUDES = 4;
 	
+	public static final int ORDER_COLUMN_INDEX_CODIGO_CANDIDATO = 0;
+	public static final int ORDER_COLUMN_INDEX_AREA_CANDIDATO = 1;
+	
     protected static ModeloArea eInstancia = null;
 	
 	/** Crea una instancia del objeto.
@@ -170,7 +173,57 @@ public class ModeloArea {
 		try (Connection conexion = ConexionUvirtual.obtenerInstancia();
 				PreparedStatement stmtCount = conexion.prepareStatement(dataTable.getQueryCount());
 				PreparedStatement stmt = conexion.prepareStatement(dataTable.getQuery());
-		) {					
+		) {
+			dataTable.setFiltersParams(stmt, stmtCount, 1);
+			try (ResultSet rs = stmt.executeQuery()) {
+				while (rs.next()) {
+					Bolsa bolsa = new Bolsa();
+					bolsa.setCodNum(rs.getInt("CODNUM"));
+					bolsa.setArea(modeloArea.getAreaById(rs.getInt("BEPARE_CODNUM")));
+					bolsa.setEstado(rs.getString("ESTADO"));
+					bolsa.setBaremable(rs.getString("FLGBAREMABLE").equals("S"));					
+					bolsa.setFechaActualizacion(rs.getTimestamp("FECHAACTUALIZACION"));
+					bolsa.setFechaBloqueo(rs.getTimestamp("FECHABLOQUEO"));
+					bolsa.setFechaDesBloqueo(rs.getTimestamp("FECHADEBLOQUEO"));
+					
+					bolsas.add(bolsa);					
+				}				
+			}	
+			
+			dataTable.setRecordsTotalFromQuery(stmtCount);
+			dataTable.setData(bolsas);
+		}
+		
+		return dataTable;
+	}
+	
+	/**
+	 * Listado de areas. 
+	 * @param params para leer los parametros de paginación, ordenacion, etc
+	 * @return listado de areas
+	 * @throws SQLException en caso de error de base de datos
+	 * @throws UVException error si no existe la area
+	 */
+	public BolsaEmpleoDataTable<Bolsa> listaAreaCandidatoDatatable(Map<String, String[]> params) throws SQLException, UVException {
+		List<Bolsa> bolsas = new ArrayList<>();
+		ModeloArea modeloArea = ModeloArea.obtenerInstancia();	
+		BolsaEmpleoDataTable<Bolsa> dataTable = new BolsaEmpleoDataTable<Bolsa>(params);
+		
+		String consulta =
+		"SELECT bepbol.* "
+		+ "FROM TBEP_BOLSAS bepbol "
+		+ "INNER JOIN TBEP_AREAS bepare ON bepare.CODNUM = bepbol.BEPARE_CODNUM "
+		+ "WHERE 1=1 ";
+		
+		dataTable.setColumn(ORDER_COLUMN_INDEX_CODIGO_CANDIDATO, "bepare.ID_AREA_CONOCIMIENTO");
+		dataTable.setColumn(ORDER_COLUMN_INDEX_AREA_CANDIDATO, "bepare.DES_AREA_CONOCIMIENTO");
+		dataTable.setQuery(consulta);
+				
+		try (Connection conexion = ConexionUvirtual.obtenerInstancia();
+				PreparedStatement stmtCount = conexion.prepareStatement(dataTable.getQueryCount());
+				PreparedStatement stmt = conexion.prepareStatement(dataTable.getQuery());
+		) {
+			dataTable.setFiltersParams(stmt, stmtCount, 1);
 			try (ResultSet rs = stmt.executeQuery()) {
 				while (rs.next()) {
 					Bolsa bolsa = new Bolsa();
