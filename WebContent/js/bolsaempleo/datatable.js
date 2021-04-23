@@ -286,6 +286,7 @@ function DataTable(id, config) {
                     $(columnDef.node).prepend('<img src="/img/iconos/' + (self.params.orderDirection === 'asc' ? 'down.png' : 'up.png') + '" class="order"/>');
                 }
 
+                $(columnDef.node).prop('title', 'Ordenar por ' + $(columnDef.node).text());
                 $(columnDef.node).css('cursor', 'pointer');
                 $(columnDef.node).on('click', function() { self.orderBy(columnDef, index); });
             }
