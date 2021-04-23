@@ -11,7 +11,7 @@ UVDatos uvdatos = (UVDatos) request.getAttribute(UVDatos.NOMBRE_ATRIBUTO);
 VistaEstadoBolsas bean = (VistaEstadoBolsas) uvdatos.getVistas().get(VistaEstadoBolsas.class.getName());
 %>
 
-<div class='bolsas'>
+<div class='bolsa-empleo'>
 	<% if (bean.getMensajesDeExito().size() > 0) { %>
 		<div id="exito" class="success">
 			<%= bean.formatearMensajesDeExito() %>
@@ -24,17 +24,23 @@ VistaEstadoBolsas bean = (VistaEstadoBolsas) uvdatos.getVistas().get(VistaEstado
 	<% } else { %>
 	<h2>Estado de las bolsas</h2>
 	
-	
-	<div class="form-group-container">
+	<div class="titulo-bolsa-empleo">
+		<div class="form-group-container">
 	    	<div class="form-group">
-    				<p>Total de bolsas bloqueadas:</p>
+    				<p>Total de bolsas bloqueadas:
+    					<% bean.getTotalBolsasBloqueadas(); %>
+    				</p>
     		</div>
     		<div class="form-group">
-    				<p>Total de bolsas revisadas:</p>
+    				<p>Total de bolsas revisadas:
+    				   <% bean.getTotalBolsasRevisadas(); %>
+    				</p>
     		</div>
 		</div>
-
-	
+		<a class="link-btn" id="nuevo_evaluador" href="<%=request.getRequestURI()%>">
+	    	Importar bolsas U Virtual
+	    </a>
+	</div>
 	
 	
 	<table class="bluetable bolsaempleo" id="table">
@@ -72,11 +78,11 @@ $(document).ready(function() {
 	    "columns": [
 	    	{'data': 'codNum', 'selectable': true},
 	        {'data': 'codNum', 'filter': {'type': 'number'}},
-	        {'data': 'area.descripcion', 'filter': true},
-	        {'data': 'estado', 'filter': {'type': 'select', 'options': {'BLOQUEADA': 'Bloqueada', 'REVISION': 'Revisión', 'BAREMACION': 'Baremación', 'ALEGACIONES': 'Alegaciones', 'DESBLOQUEADA': 'Desbloqueada'}} },
-	        {'data': 'fechaActualizacion', 'filter': true},
-	        {'data': 'fechaBloqueo', 'filter': true},
-	        {'data': 'fechaDesBloqueo', 'filter': true},
+	        {'data': 'area.descripcion', 'filter': true, 'class': 'overflow-auto'},
+	        {'data': 'estado', 'filter': {'type': 'select', 'options': {'BLOQUEADA':'Bloqueada', 'REVISION':'Revisión', 'BAREMACION':'Baremación', 'ALEGACIONES':'Alegaciones', 'DESBLOQUEADA':'Desbloqueada'}} },
+	        {'data': 'fechaActualizacion', 'filter': {'type': 'date'}},
+	        {'data': 'fechaBloqueo', 'filter': {'type': 'date'}},
+	        {'data': 'fechaDesBloqueo', 'filter': {'type': 'date'}},
 	        {'data': 'baremable', 'filter': {'type': 'selectBoolean', 'true': 'Baremable', 'false': 'No Baremable'} , 'render': function(row) {
         		if(row.baremable){
         			return "<div title='Baremable' class='circle-true'></div>"; 
