@@ -60,8 +60,8 @@ public class ControladorGestionTitulaciones extends HttpServlet {
 	public static final String PARAM_TITULACIONES = "titulaciones";
 
 	// Mensajes
-	public static final String MENSAJE_ENVIADO_CORRECTO = "mensajecorrecto";
-	public static final String MENSAJE_ENVIADO_ERROR = "mensajeerror";
+	public static final String MENSAJE_ENVIADO_CORRECTO = "mensajecorrectogt";
+	public static final String MENSAJE_ENVIADO_ERROR = "mensajeerrorgt";
 	public static final String MENSAJE_EXITO_AGREGAR = "Titulación agregada correctamente";
 	public static final String MENSAJE_EXITO_ELIMINAR = "Titulación eliminada correctamente";
 	public static final String MENSAJE_ERROR_ELIMINAR_TITULACION = "No se puede eliminar una titulación que está asignada a un área";

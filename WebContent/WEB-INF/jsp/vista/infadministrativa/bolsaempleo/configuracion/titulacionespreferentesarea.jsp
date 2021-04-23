@@ -21,7 +21,7 @@ VistaTitulacionesArea bean = (VistaTitulacionesArea) uvdatos.getVistas().get(Vis
 		<div id="error" class="error">
 			<%= bean.formatearMensajesDeError() %>
 		</div>
-	<% } else {%>
+	<% } %>
 	
 	<h2>Titulaciones preferentes por área</h2>
 	
@@ -71,7 +71,6 @@ VistaTitulacionesArea bean = (VistaTitulacionesArea) uvdatos.getVistas().get(Vis
 			</tfoot>
 		</table>
 	</div>
-	<% } %>
 </div>
 
 <script>
@@ -97,12 +96,15 @@ VistaTitulacionesArea bean = (VistaTitulacionesArea) uvdatos.getVistas().get(Vis
 			    ],
 			    "actions": [
 			    	{'label': 'Eliminar', 'title': 'Eliminar titulación del área', 'onClick': function(selected) {
-			    		var params = {
-			    				'a': '<%=ControladorGestionTitulacionesPreferentesArea.ACCION_ELIMINAR_TITULACION_AREA%>',
-			    				'<%=ControladorGestionTitulacionesPreferentesArea.PARAM_TITULACIONES%>': JSON.stringify(selected),
-			    				'<%=ControladorGestionTitulacionesPreferentesArea.PARAM_AREA%>': id
-			    				};
-		        		Atis.sendForm("<%=request.getRequestURI()%>", params);
+			    		if(selected.length) {
+				    		var idArea = this.getParam("<%=ControladorGestionTitulacionesPreferentesArea.PARAM_AREA%>");
+				    		var params = {
+				    				'a': '<%=ControladorGestionTitulacionesPreferentesArea.ACCION_ELIMINAR_TITULACION_AREA%>',
+				    				'<%=ControladorGestionTitulacionesPreferentesArea.PARAM_TITULACIONES%>': JSON.stringify(selected),
+				    				'<%=ControladorGestionTitulacionesPreferentesArea.PARAM_AREA%>': idArea
+				    				};
+			        		Atis.sendForm("<%=request.getRequestURI()%>", params);
+			    		}
 			    	} },
 			    ]
 			});
@@ -123,10 +125,11 @@ VistaTitulacionesArea bean = (VistaTitulacionesArea) uvdatos.getVistas().get(Vis
 			    "actions": [
 			    	{'label': 'Incluir', 'title': 'Incluir titulación en el área', 'onClick': function(selected) {
 			    		if(selected.length) {
+			    			var idArea = this.getParam("<%=ControladorGestionTitulacionesPreferentesArea.PARAM_AREA%>");
 			    			var params = {
 				    				'a': '<%=ControladorGestionTitulacionesPreferentesArea.ACCION_INCLUIR_TITULACION_AREA%>',
 				    				'<%=ControladorGestionTitulacionesPreferentesArea.PARAM_TITULACIONES%>': JSON.stringify(selected),
-				    				'<%=ControladorGestionTitulacionesPreferentesArea.PARAM_AREA%>': id
+				    				'<%=ControladorGestionTitulacionesPreferentesArea.PARAM_AREA%>': idArea
 				    				};
 			        		Atis.sendForm("<%=request.getRequestURI()%>", params);
 			    		}
