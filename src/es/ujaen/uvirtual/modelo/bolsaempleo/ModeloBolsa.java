@@ -322,8 +322,8 @@ public class ModeloBolsa {
 	}
 		
 	private void cambiarEstadoBolsas(List<Bolsa> bolsas, String estado) throws SQLException {
-		String params = BolsaEmpleoUtils.consultaMultiplesParametros(bolsas.size());
 		if (estado.equals(BOLSA_ESTADO_BLOQUEADA)) {
+			String params = BolsaEmpleoUtils.consultaMultiplesParametros(bolsas.size());
 			String query = "UPDATE TBEP_BOLSAS SET ESTADO = ?, FECHABLOQUEO = ?, FECHADEBLOQUEO = ? WHERE CODNUM IN (" + params + ")";	
 			
 			try (Connection conexion = ConexionUvirtual.obtenerInstancia(); PreparedStatement stmt = conexion.prepareStatement(query)) {
@@ -345,6 +345,7 @@ public class ModeloBolsa {
 			
 		} else {
 			if (estado.equals(BOLSA_ESTADO_DESBLOQUEADA)) {
+				String params = BolsaEmpleoUtils.consultaMultiplesParametros(bolsas.size());
 				String query = "UPDATE TBEP_BOLSAS SET ESTADO = ?, FECHABLOQUEO = ?, FECHADEBLOQUEO = ? WHERE CODNUM IN (" + params + ")";
 				
 				try (Connection conexion = ConexionUvirtual.obtenerInstancia(); PreparedStatement stmt = conexion.prepareStatement(query)) {
@@ -363,11 +364,11 @@ public class ModeloBolsa {
 					stmt.executeUpdate();
 				}
 			} else {
-				String query = "UPDATE TBEP_BOLSAS SET ESTADO = ?, WHERE CODNUM IN (" + params + ")";
-				
+				String params = BolsaEmpleoUtils.consultaMultiplesParametros(bolsas.size());
+				String query = "UPDATE TBEP_BOLSAS SET ESTADO = ? WHERE CODNUM IN (" + params + ")";		
+						
 				try (Connection conexion = ConexionUvirtual.obtenerInstancia(); PreparedStatement stmt = conexion.prepareStatement(query)) {
 					int indexParam = 1;
-
 					stmt.setString(indexParam++, estado);
 					for (Bolsa bolsa : bolsas) {
 						stmt.setInt(indexParam++, bolsa.getCodNum());
