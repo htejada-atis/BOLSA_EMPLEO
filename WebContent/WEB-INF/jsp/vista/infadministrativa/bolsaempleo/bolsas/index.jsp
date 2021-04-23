@@ -72,11 +72,11 @@ $(document).ready(function() {
 	    "columns": [
 	    	{'data': 'codNum', 'selectable': true},
 	        {'data': 'codNum', 'filter': {'type': 'number'}},
-	        {'data': 'area.descripcion', 'filter': true, 'class': 'overflow-auto'},
-	        {'data': 'estado', 'filter': {'type': 'select', 'options': ['1050', '1051', '1052']} },
-	        {'data': 'fechaActualizacion', 'filter': true, 'class': 'overflow-auto'},
-	        {'data': 'fechaBloqueo', 'filter': true, 'class': 'overflow-auto'},
-	        {'data': 'fechaDesBloqueo', 'filter': true, 'class': 'overflow-auto'},
+	        {'data': 'area.descripcion', 'filter': true},
+	        {'data': 'estado', 'filter': {'type': 'select', 'options': {'BLOQUEADA': 'Bloqueada', 'REVISION': 'Revisión', 'BAREMACION': 'Baremación', 'ALEGACIONES': 'Alegaciones', 'DESBLOQUEADA': 'Desbloqueada'}} },
+	        {'data': 'fechaActualizacion', 'filter': true},
+	        {'data': 'fechaBloqueo', 'filter': true},
+	        {'data': 'fechaDesBloqueo', 'filter': true},
 	        {'data': 'baremable', 'filter': {'type': 'selectBoolean', 'true': 'Baremable', 'false': 'No Baremable'} , 'render': function(row) {
         		if(row.baremable){
         			return "<div title='Baremable' class='circle-true'></div>"; 
