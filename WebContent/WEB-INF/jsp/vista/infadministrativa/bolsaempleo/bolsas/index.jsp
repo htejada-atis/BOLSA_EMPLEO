@@ -37,9 +37,7 @@ VistaEstadoBolsas bean = (VistaEstadoBolsas) uvdatos.getVistas().get(VistaEstado
     				</p>
     		</div>
 		</div>
-		<a class="link-btn" id="nuevo_evaluador" href="<%=request.getRequestURI()%>">
-	    	Importar bolsas U Virtual
-	    </a>
+		
 	</div>
 	
 	
