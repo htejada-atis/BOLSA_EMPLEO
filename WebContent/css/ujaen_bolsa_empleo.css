@@ -362,9 +362,10 @@ nav-bolsa-empleo a:active, nav-bolsa-empleo a:hover {
   opacity: 1;
 }
 
-
-
-
+/* Formularios */
+.bold-label {
+	font-weight: bold;
+}
 
 .form-group-custom, .form-check-custom, .form-btn, .form-file, .form-select {
 	display: inline-block;

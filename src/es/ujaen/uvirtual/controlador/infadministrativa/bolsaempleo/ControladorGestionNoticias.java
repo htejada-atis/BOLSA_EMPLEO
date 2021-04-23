@@ -21,6 +21,7 @@ import es.ujaen.uvirtual.beans.vistas.uvirtual.bolsaempleo.VistaNoticias;
 import es.ujaen.uvirtual.modelo.bolsaempleo.ModeloNoticia;
 import es.ujaen.uvirtual.modelo.bolsaempleo.ModeloUsuarioBolsaEmpleo;
 import es.ujaen.uvirtual.utilidades.BolsaEmpleoDataTable;
+import es.ujaen.uvirtual.utilidades.BolsaEmpleoValidator;
 import es.ujaen.uvirtual.utilidades.EscapaHTML;
 import es.ujaen.uvirtual.utilidades.Formateador;
 import es.ujaen.uvirtual.utilidades.UVException;
@@ -63,6 +64,9 @@ public class ControladorGestionNoticias extends HttpServlet {
 	
 	// Mensajes
 	public static final String MENSAJE_ENVIADO = "mensaje";
+	
+	public static final String MENSAJE_ERROR_TEXTO_VACIO = "El texto no puede estar vacio";
+	
 	public static final String MENSAJE_EXITO_AGREGAR = "Noticia creada correctamente";
 	public static final String MENSAJE_EXITO_EDITAR = "Noticia editada correctamente";
 	public static final String MENSAJE_EXITO_ELIMINAR = "Noticia eliminada correctamente";
@@ -245,6 +249,23 @@ public class ControladorGestionNoticias extends HttpServlet {
 		}
 		
 		datos.setRespuestaEnviada(true);
+	}
+	
+	/** Valida el formulario de Gestión Noticias.
+	 * @param request .
+	 * @throws UVException .
+	 * @throws SQLException .
+	 * @throws IOException .
+	 * @throws IOException .
+	 */
+	private BolsaEmpleoValidator getValidatorGestionNoticias(HttpServletRequest request) throws UVException {
+		BolsaEmpleoValidator validator = new BolsaEmpleoValidator(request);
+		
+		validator.addParamString(PARAM_TEXTO);
+		validator.addRule(PARAM_TEXTO, "required", MENSAJE_ERROR_TEXTO_VACIO);
+		validator.addRule(PARAM_TEXTO, "noBlank", MENSAJE_ERROR_TEXTO_VACIO);
+		
+		return validator;
 	}
 	
 }

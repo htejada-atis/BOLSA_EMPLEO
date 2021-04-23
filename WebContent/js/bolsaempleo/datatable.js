@@ -44,6 +44,10 @@ function DataTable(id, config) {
     	self.params[key] = value;
     };
 
+    this.getParam = function(key) {
+    	return self.params[key];
+    };
+
     this.setTitle = function(tit) {
         self.title = tit;
     };

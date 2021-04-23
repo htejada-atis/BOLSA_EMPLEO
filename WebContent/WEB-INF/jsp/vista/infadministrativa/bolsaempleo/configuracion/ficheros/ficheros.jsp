@@ -72,7 +72,7 @@ VistaFicheros bean = (VistaFicheros) uvdatos.getVistas().get(VistaFicheros.class
 		        	return "<a class='consultar-fichero' title='Descargar fichero' href='" +link +"' target='_blank'>" +link +"</a>"; 
 		        	}
 		        },
-		        {'data': 'publico', 'filter': {'type': 'selectBoolean'}, 'order': {'active': false}, 'render': function(row) {
+		        {'data': 'publico', 'filter': {'type': 'select', 'options': {'true': 'Públicos', 'false': 'Privados'}}, 'order': {'active': false}, 'render': function(row) {
 	        		if(row.publico){
 	        			return "<div title='Público' class='circle-true'></div>"; 
 	        		}
