@@ -33,14 +33,12 @@ VistaUsuarioBolsaEmpleo bean = (VistaUsuarioBolsaEmpleo) uvdatos.getVistas().get
 	  	<caption class="table-title">Usuarios</caption>  
 		<tr>
 			<th scope="col" style="width:5%"></th>
-			<th scope="col" style="width:5%" title="Id del usuario">Id</th>
-			<th scope="col" style="width:5%" title="Tipo de documento">Tipo</th>
-			<th scope="col" style="width:12%" title="N Documento">Documento</th>
-			<th scope="col" style="width:12%" title="Nombre de usuario">Usuario</th>
+			<th scope="col" style="width:6%" title="Tipo de documento">Tipo</th>
+			<th scope="col" style="width:13%" title="N Documento">Documento</th>
+			<th scope="col" style="width:14%" title="Nombre de usuario">Usuario</th>
 			<th scope="col" style="width:30%" title="Nombre y apellidos">Nombre y Apellidos</th>
-			<th scope="col" style="width:35%" title="Email del usuario">Email</th>
 			<th scope="col" style="width:20%" title="Rol del usuario" class="rol">Rol</th>
-			<th scope="col" style="width:5%" class="center" title="Lista del usuario">Lista</th>
+			<th scope="col" style="width:10%" class="center" title="Lista del usuario">Lista</th>
 			<th scope="col" style="width:15%"></th>
 		</tr>
 		<tbody>				
@@ -56,14 +54,12 @@ VistaUsuarioBolsaEmpleo bean = (VistaUsuarioBolsaEmpleo) uvdatos.getVistas().get
 		<caption class="table-title">Usuarios Borrados</caption>  
 		<tr>
 			<th scope="col" style="width:5%"></th>
-			<th scope="col" style="width:5%" title="Id del usuario">Id</th>
-			<th scope="col" style="width:5%" title="Tipo de documento">Tipo</th>
-			<th scope="col" style="width:12%" title="N Documento">Documento</th>
-			<th scope="col" style="width:12%" title="Nombre de usuario">Usuario</th>
+			<th scope="col" style="width:6%" title="Tipo de documento">Tipo</th>
+			<th scope="col" style="width:13%" title="N Documento">Documento</th>
+			<th scope="col" style="width:14%" title="Nombre de usuario">Usuario</th>
 			<th scope="col" style="width:30%" title="Nombre y apellidos">Nombre y Apellidos</th>
-			<th scope="col" style="width:35%" title="Email del usuario">Email</th>
 			<th scope="col" style="width:20%" title="Rol del usuario" class="rol">Rol</th>
-			<th scope="col" style="width:5%" class="center" title="Lista del usuario">Lista</th>
+			<th scope="col" style="width:10%" class="center" title="Lista del usuario">Lista</th>
 			<th scope="col" style="width:15%"></th>
 		</tr>
 		<tbody>				
@@ -79,15 +75,13 @@ VistaUsuarioBolsaEmpleo bean = (VistaUsuarioBolsaEmpleo) uvdatos.getVistas().get
 		<caption class="table-title">Usuarios Excluidos de la bolsa de empleo</caption>  
 		<tr>
 			<th scope="col" style="width:5%"></th>
-			<th scope="col" style="width:5%" title="Id del usuario">Id</th>
-			<th scope="col" style="width:5%" title="Tipo de documento">Tipo</th>
-			<th scope="col" style="width:12%" title="N Documento">Documento</th>
-			<th scope="col" style="width:12%" title="Nombre de usuario">Usuario</th>
+			<th scope="col" style="width:6%" title="Tipo de documento">Tipo</th>
+			<th scope="col" style="width:14%" title="N Documento">Documento</th>
+			<th scope="col" style="width:15%" title="Nombre de usuario">Usuario</th>
 			<th scope="col" style="width:30%" title="Nombre y apellidos">Nombre y Apellidos</th>
-			<th scope="col" style="width:35%" title="Email del usuario">Email</th>
 			<th scope="col" style="width:20%" title="Rol del usuario" class="rol">Rol</th>
 			<th scope="col" style="width:10%" title="Razon exclusion del usuario">Razon Exclusion</th>
-			<th scope="col" style="width:5%" class="center" title="Lista del usuario">Lista</th>
+			<th scope="col" style="width:10%" class="center" title="Lista del usuario">Lista</th>
 			<th scope="col" style="width:15%"></th>
 		</tr>
 		<tbody>				
@@ -117,16 +111,14 @@ $(document).ready(function() {
 	    "action": "<%=ControladorUsuarioBolsaEmpleo.ACCION_DATATABLE_USUARIOS%>",
 	    "columns": [
 	    	{'data': 'codNum', 'selectable': true},
-	        {'data': 'codNum'},
-	        {'data': 'tipodocumento'},
-	        {'data': 'numdocumento'},
-	        {'data': 'codcuenta'},
-	        {'data': 'apellido1', 'render': function(row) {
+	        {'data': 'tipodocumento', 'filter': true, 'class': 'overflow-auto'},
+	        {'data': 'numdocumento', 'filter': true, 'class': 'overflow-auto'},
+	        {'data': 'codcuenta', 'filter': true, 'class': 'overflow-auto'},
+	        {'data': 'apellido1', 'filter': true, 'class': 'overflow-auto', 'render': function(row) {
         		return row.nombre + "\n" + row.apellido1 + "\n" + row.apellido2; 
         	}},
-	        {'data': 'email'},
 	        {'data': 'rol.descripcion', 'filter': {'type': 'select', 'options': {'1050':'Personal', '1051':'Comision', '1052':'Candidato'}}  , 'order': {'active': false}},
-	        {'data': 'listaDist', 'render': function(row) {
+	        {'data': 'listaDist', 'filter': {'type': 'selectBoolean', 'true': 'En Lista', 'false': 'Sin Lista'}, 'render': function(row) {
 	        	if(row.listaDist==true){
         			return "<div title='En lista distribución' class='circle-true'></div>"; 
         		}
@@ -156,16 +148,14 @@ $(document).ready(function() {
 	    "action": "<%=ControladorUsuarioBolsaEmpleo.ACCION_DATATABLE_USUARIOS_BORRADOS%>",
 	    "columns": [
 	    	{'data': 'codNum', 'selectable': true},
-	        {'data': 'codNum'},
-	        {'data': 'tipodocumento'},
-	        {'data': 'numdocumento'},
-	        {'data': 'codcuenta'},
-	        {'data': 'apellido1', 'render': function(row) {
+	        {'data': 'tipodocumento', 'filter': true, 'class': 'overflow-auto'},
+	        {'data': 'numdocumento', 'filter': true, 'class': 'overflow-auto'},
+	        {'data': 'codcuenta', 'filter': true, 'class': 'overflow-auto'},
+	        {'data': 'apellido1', 'filter': true, 'class': 'overflow-auto', 'render': function(row) {
         		return row.nombre + "\n" + row.apellido1 + "\n" + row.apellido2; 
         	}},
-	        {'data': 'email'},
 	        {'data': 'rol.descripcion', 'filter': {'type': 'select', 'options': {'1050':'Personal', '1051':'Comision', '1052':'Candidato'}}  , 'order': {'active': false}},
-	        {'data': 'listaDist', 'render': function(row) {
+	        {'data': 'listaDist', 'filter': {'type': 'selectBoolean', 'true': 'En Lista', 'false': 'Sin Lista'}, 'render': function(row) {
 	        	if(row.listaDist==true){
         			return "<div title='En lista distribución' class='circle-true'></div>"; 
         		}
@@ -192,17 +182,15 @@ $(document).ready(function() {
 	    "action": "<%=ControladorUsuarioBolsaEmpleo.ACCION_DATATABLE_USUARIOS_EXCLUIDOS%>",
 	    "columns": [
 	    	{'data': 'codNum', 'selectable': true},
-	        {'data': 'codNum'},
-	        {'data': 'tipodocumento'},
-	        {'data': 'numdocumento'},
-	        {'data': 'codcuenta'},
-	        {'data': 'apellido1', 'render': function(row) {
+	        {'data': 'tipodocumento', 'filter': true, 'class': 'overflow-auto'},
+	        {'data': 'numdocumento', 'filter': true, 'class': 'overflow-auto'},
+	        {'data': 'codcuenta', 'filter': true, 'class': 'overflow-auto'},
+	        {'data': 'apellido1', 'filter': true, 'class': 'overflow-auto', 'render': function(row) {
         		return row.nombre + "\n" + row.apellido1 + "\n" + row.apellido2; 
         	}},
-	        {'data': 'email'},
 	        {'data': 'rol.descripcion', 'filter': {'type': 'select', 'options': {'1050':'Personal', '1051':'Comision', '1052':'Candidato'}} , 'order': {'active': false}},
 	        {'data': 'razonExclusion'},
-	        {'data': 'listaDist', 'render': function(row) {
+	        {'data': 'listaDist', 'filter': {'type': 'selectBoolean', 'true': 'En Lista', 'false': 'Sin Lista'}, 'render': function(row) {
         		if(row.listaDist==true){
         			return "<div title='En lista distribución' class='circle-true'></div>"; 
         		}
@@ -249,7 +237,7 @@ $(document).ready(function() {
         	Si: function() {
         		var params = {
         				'a': '<%=ControladorUsuarioBolsaEmpleo.ACCION_USUARIO%>', 
-        				'<%=ControladorUsuarioBolsaEmpleo.PARAM_ACCION_USUARIO%>': accion, 
+        				'<%=ControladorUsuarioBolsaEmpleo.PARAM_ACCION_USUARIO%>': accion,
         				'<%=ControladorUsuarioBolsaEmpleo.PARAM_USUARIOS_SELECCIONADOS%>': Atis.object2Json(selected)
         			};
     			Atis.sendForm("<%= request.getRequestURI() %>", params);

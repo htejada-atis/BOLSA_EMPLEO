@@ -31,17 +31,15 @@ import es.ujaen.uvirtual.utilidades.BolsaEmpleoDataTable.DataTableColumn;
  */
 public class ModeloUsuarioBolsaEmpleo {
 	
-	public static final int ORDER_COLUMN_INDEX_ID = 1;
-	public static final int ORDER_COLUMN_INDEX_TIPO_DOCUMENTO = 2;
-	public static final int ORDER_COLUMN_INDEX_NUMDOCUMENTO = 3;
-	public static final int ORDER_COLUMN_INDEX_COD_CUENTA = 4;
-	public static final int ORDER_COLUMN_INDEX_NOMBRE_Y_APELLIDOS = 5;
-	public static final int ORDER_COLUMN_INDEX_EMAIL = 6;
-	public static final int ORDER_COLUMN_INDEX_ROL = 7;
-	public static final int ORDER_COLUMN_INDEX_LISTA_DIST = 8;
-	public static final int ORDER_COLUMN_INDEX_EXCLUIDO = 9;
-	public static final int ORDER_COLUMN_INDEX_RAZON_EXCLUSION = 10;
-	public static final int ORDER_COLUMN_INDEX_FECHA_EXCLUSION = 11;
+	public static final int ORDER_COLUMN_INDEX_TIPO_DOCUMENTO = 1;
+	public static final int ORDER_COLUMN_INDEX_NUMDOCUMENTO = 2;
+	public static final int ORDER_COLUMN_INDEX_COD_CUENTA = 3;
+	public static final int ORDER_COLUMN_INDEX_NOMBRE_Y_APELLIDOS = 4;
+	public static final int ORDER_COLUMN_INDEX_ROL = 5;
+	public static final int ORDER_COLUMN_INDEX_LISTA_DIST = 6;
+	public static final int ORDER_COLUMN_INDEX_RAZON_EXCLUSION = 6;
+	public static final int ORDER_COLUMN_INDEX_LISTA_DIST_EXCLUIDO = 7;
+	
 	
 	public static final String USUARIO_BORRADO = "S";
 	public static final String USUARIO_NO_BORRADO = "N";
@@ -386,7 +384,7 @@ public class ModeloUsuarioBolsaEmpleo {
 		
 		BolsaEmpleoDataTable<Bolsa> dataTable = new BolsaEmpleoDataTable<Bolsa>(params);
 		
-		dataTable.setColumn(ORDER_COLUMN_INDEX_ID, "bepare.CODNUM", DataTableColumn.COLUMN_TYPE_NUMBER);
+		dataTable.setColumn(ModeloArea.ORDER_COLUMN_INDEX_ID, "bepare.CODNUM", DataTableColumn.COLUMN_TYPE_NUMBER);
 		dataTable.setColumn(ModeloArea.ORDER_COLUMN_INDEX_CODIGO, "bepare.ID_AREA_CONOCIMIENTO");
 		dataTable.setColumn(ModeloArea.ORDER_COLUMN_INDEX_AREA, "bepare.DES_AREA_CONOCIMIENTO");
 		dataTable.setColumn(ModeloArea.ORDER_COLUMN_INDEX_BAREMALE, "bepbol.FLGBAREMABLE", DataTableColumn.COLUMN_TYPE_BOOLEAN);
@@ -515,29 +513,24 @@ public class ModeloUsuarioBolsaEmpleo {
 		
 		switch (tipo) {
 			case "excluido":
-				dataTable.setColumn(ORDER_COLUMN_INDEX_ID, "bepusu.CODNUM");
 				dataTable.setColumn(ORDER_COLUMN_INDEX_TIPO_DOCUMENTO, "uvpersona.STRTIPODOCUMENTO");
 				dataTable.setColumn(ORDER_COLUMN_INDEX_NUMDOCUMENTO, "uvpersona.IDNIF");
 				dataTable.setColumn(ORDER_COLUMN_INDEX_COD_CUENTA, "bepusu.CODCUENTA");
 				dataTable.setColumn(ORDER_COLUMN_INDEX_NOMBRE_Y_APELLIDOS, "uvpersona.STRAPELLIDO1");
-				dataTable.setColumn(ORDER_COLUMN_INDEX_EMAIL, "bepusu.EMAIL");
 				dataTable.setColumn(ORDER_COLUMN_INDEX_ROL, "bepusu.ROL", DataTableColumn.COLUMN_TYPE_NUMBER);
 				dataTable.setColumn(ORDER_COLUMN_INDEX_RAZON_EXCLUSION, "bepusu.RAZON_EXCLUSION");
-				dataTable.setColumn(ORDER_COLUMN_INDEX_FECHA_EXCLUSION, "bepusu.FECHA_EXCLUSION");
-				dataTable.setColumn(ORDER_COLUMN_INDEX_LISTA_DIST, "bepusu.FLGLISTADISTRIBUCION");
+				dataTable.setColumn(ORDER_COLUMN_INDEX_LISTA_DIST_EXCLUIDO, "bepusu.FLGLISTADISTRIBUCION", DataTableColumn.COLUMN_TYPE_BOOLEAN);
 				dataTable.setQuery(consulta);
 				
 				return dataTable;
 				
 			default:
-				dataTable.setColumn(ORDER_COLUMN_INDEX_ID, "bepusu.CODNUM");
 				dataTable.setColumn(ORDER_COLUMN_INDEX_TIPO_DOCUMENTO, "uvpersona.STRTIPODOCUMENTO");
 				dataTable.setColumn(ORDER_COLUMN_INDEX_NUMDOCUMENTO, "uvpersona.IDNIF");
 				dataTable.setColumn(ORDER_COLUMN_INDEX_COD_CUENTA, "bepusu.CODCUENTA");
 				dataTable.setColumn(ORDER_COLUMN_INDEX_NOMBRE_Y_APELLIDOS, "uvpersona.STRAPELLIDO1");
-				dataTable.setColumn(ORDER_COLUMN_INDEX_EMAIL, "bepusu.EMAIL");
 				dataTable.setColumn(ORDER_COLUMN_INDEX_ROL, "bepusu.ROL", DataTableColumn.COLUMN_TYPE_NUMBER);
-				dataTable.setColumn(ORDER_COLUMN_INDEX_LISTA_DIST, "bepusu.FLGLISTADISTRIBUCION");
+				dataTable.setColumn(ORDER_COLUMN_INDEX_LISTA_DIST, "bepusu.FLGLISTADISTRIBUCION", DataTableColumn.COLUMN_TYPE_BOOLEAN);
 				dataTable.setQuery(consulta);
 				
 				return dataTable;
