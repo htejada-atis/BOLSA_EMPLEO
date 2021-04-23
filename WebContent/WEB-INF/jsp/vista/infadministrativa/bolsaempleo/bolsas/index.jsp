@@ -86,7 +86,7 @@ $(document).ready(function() {
 	    "columns": [
 	    	{'data': 'codNum', 'selectable': true},
 	        {'data': 'codNum', 'filter': {'type': 'number'}},
-	        {'data': 'area.descripcion', 'filter': true, 'class': 'overflow-auto'},
+	        {'data': 'area.descripcion', 'filter': true},
 	        {'data': 'estado', 'filter': {'type': 'select', 'options': {'BLOQUEADA':'Bloqueada', 'REVISION':'Revisión', 'BAREMACION':'Baremación', 'ALEGACIONES':'Alegaciones', 'DESBLOQUEADA':'Desbloqueada'}} },
 	        {'data': 'fechaActualizacion', 'filter': {'type': 'date'}},
 	        {'data': 'fechaBloqueo', 'filter': {'type': 'date'}},
