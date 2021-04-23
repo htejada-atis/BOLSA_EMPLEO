@@ -217,6 +217,7 @@ function DataTable(id, config) {
 
         selectSize.on('change', function() {
             self.params.pageSize = this.value;
+            self.params.page = 0;
             self.refresh();
         });
 
@@ -443,6 +444,7 @@ function DataTable(id, config) {
 
     this.filterBy = function(indexColumnDef, value) {
         self.filterParams[indexColumnDef] = value;
+        self.params.page = 0;
         
         if (value == "" || value == 0) {
             delete self.filterParams[indexColumnDef];
