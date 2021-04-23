@@ -44,6 +44,10 @@ function DataTable(id, config) {
     	self.params[key] = value;
     };
 
+    this.getParam = function(key) {
+    	return self.params[key];
+    };
+
     this.setTitle = function(tit) {
         self.title = tit;
     };
@@ -213,6 +217,7 @@ function DataTable(id, config) {
 
         selectSize.on('change', function() {
             self.params.pageSize = this.value;
+            self.params.page = 0;
             self.refresh();
         });
 
@@ -282,6 +287,7 @@ function DataTable(id, config) {
                     $(columnDef.node).prepend('<img src="/img/iconos/' + (self.params.orderDirection === 'asc' ? 'down.png' : 'up.png') + '" class="order"/>');
                 }
 
+                $(columnDef.node).prop('title', 'Ordenar por ' + $(columnDef.node).text());
                 $(columnDef.node).css('cursor', 'pointer');
                 $(columnDef.node).on('click', function() { self.orderBy(columnDef, index); });
             }
@@ -438,6 +444,7 @@ function DataTable(id, config) {
 
     this.filterBy = function(indexColumnDef, value) {
         self.filterParams[indexColumnDef] = value;
+        self.params.page = 0;
         
         if (value == "" || value == 0) {
             delete self.filterParams[indexColumnDef];

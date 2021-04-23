@@ -63,7 +63,6 @@ public class ControladorGestionTitulacionesPreferentesArea extends HttpServlet {
 	public static final String PARAM_TITULACIONES = "titulaciones";
 	
 	// Mensajes
-	public static final String MENSAJE_ENVIADO = "mensaje";
 	public static final String MENSAJE_ERROR_TITULACIONES_SELECCIONADAS_INCORRECTAS = "No hay titulaciones seleccionadas válidas";
 	public static final String MENSAJE_ERROR_TITULACIONES_PREFERENTES_YA_SELECCIONADAS_PREVIAMENTE = "Las titulaciones ya han sido incluidas para éste área";
 	
@@ -118,12 +117,6 @@ public class ControladorGestionTitulacionesPreferentesArea extends HttpServlet {
 					break;
 			}
 			
-		} catch (SQLIntegrityConstraintViolationException e) {
-			LOGGER.log(Level.WARNING, e.toString());
-			bean.getMensajesDeError().add(e.toString());
-			HttpSession session = request.getSession(false);
-			session.setAttribute(MENSAJE_ENVIADO, e.toString());
-			response.sendRedirect(request.getServletPath());
 		} catch (SQLException e) {
 			LOGGER.log(Level.WARNING, e.toString());
 			bean.getMensajesDeError().add("Error al acceder a la base de datos");
@@ -159,6 +152,11 @@ public class ControladorGestionTitulacionesPreferentesArea extends HttpServlet {
 	 */
 	private void eliminarTitulacionesArea(HttpServletRequest request, HttpServletResponse response, VistaTitulacionesArea bean) throws SQLException, IOException, UVException {
 		Integer area = Formateador.leeParametroInteger(request.getParameter(PARAM_AREA));
+		
+		ModeloArea modelo = ModeloArea.obtenerInstancia();
+		bean.setAreas(modelo.listaAreas());
+		bean.setArea(new Area(area));
+		
 		Gson gson = new GsonBuilder().create();
 		ModeloTitulacion modeloTit = ModeloTitulacion.obtenerInstancia();
 		
@@ -168,11 +166,6 @@ public class ControladorGestionTitulacionesPreferentesArea extends HttpServlet {
 		} catch (Exception ex) {
 			throw new UVException(MENSAJE_ERROR_TITULACIONES_SELECCIONADAS_INCORRECTAS);
 		}
-		
-		ModeloArea modelo = ModeloArea.obtenerInstancia();	
-		
-		bean.setAreas(modelo.listaAreas());
-		bean.setArea(new Area(area));
 	}
 	
 	/** incluye una lista de titulaciones en las afines a un área .
@@ -185,24 +178,25 @@ public class ControladorGestionTitulacionesPreferentesArea extends HttpServlet {
 	 * @throws SQLIntegrityConstraintViolationException error de repetición de id ya existente .
 	 */
 	private void incluirTitulacionesPreferentesArea(HttpServletRequest request, HttpServletResponse response, VistaTitulacionesArea bean)
-			throws SQLException, IOException, UVException, SQLIntegrityConstraintViolationException {
-		
+			throws SQLException, IOException, UVException {
 		Integer area = Formateador.leeParametroInteger(request.getParameter(PARAM_AREA));
+		
+		ModeloArea modelo = ModeloArea.obtenerInstancia();	
+		bean.setAreas(modelo.listaAreas());
+		bean.setArea(new Area(area));
+		
 		Gson gson = new GsonBuilder().create();
 		ModeloTitulacion modeloTit = ModeloTitulacion.obtenerInstancia();
 		
 		try {
 			List<String> titulaciones = gson.fromJson(request.getParameter(PARAM_TITULACIONES), new TypeToken<List<String>>() { }.getType());
 			modeloTit.incluirTitulacionesPreferentesArea(titulaciones, area);
-		} catch (SQLIntegrityConstraintViolationException ex) {
-			throw new SQLIntegrityConstraintViolationException(MENSAJE_ERROR_TITULACIONES_PREFERENTES_YA_SELECCIONADAS_PREVIAMENTE);
+		} catch (SQLIntegrityConstraintViolationException e) {
+			LOGGER.log(Level.WARNING, e.toString());
+			bean.getMensajesDeError().add(e.toString());
 		} catch (Exception ex) {
 			throw new UVException(MENSAJE_ERROR_TITULACIONES_SELECCIONADAS_INCORRECTAS);
 		}
-		
-		ModeloArea modelo = ModeloArea.obtenerInstancia();	
-		bean.setAreas(modelo.listaAreas());
-		bean.setArea(new Area(area));
 	}
 	
 	/** muestra todas las areas en un select .

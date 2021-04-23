@@ -190,7 +190,7 @@ public class TestBEPUsuariosBolsaEmpleo {
 	 */
 	public void comprobarOrdenacion(WebElement tabla) {
 		System.out.print(tabla);
-		WebElement th = tabla.findElement(By.className("rol"));
+		WebElement th = tabla.findElement(By.className("user"));
 		th.click();
 		WebElement img = th.findElement(By.className("order"));
 		assertTrue(img.getAttribute("src").indexOf("down.png") != -1);

@@ -50,7 +50,7 @@ public class DriverUvBEP {
 	public static void login() {
 		driver.get("http://localhost:8080/srv/es/index");
 		WebElement username = driver.findElement(By.name("usuario"));
-		username.sendKeys("usig");
+		username.sendKeys("personal4");
 		username.submit();
 	}
 	

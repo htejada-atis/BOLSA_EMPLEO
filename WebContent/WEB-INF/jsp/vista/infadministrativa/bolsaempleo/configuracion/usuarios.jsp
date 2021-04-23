@@ -35,9 +35,9 @@ VistaUsuarioBolsaEmpleo bean = (VistaUsuarioBolsaEmpleo) uvdatos.getVistas().get
 			<th scope="col" style="width:5%"></th>
 			<th scope="col" style="width:6%" title="Tipo de documento">Tipo</th>
 			<th scope="col" style="width:13%" title="N Documento">Documento</th>
-			<th scope="col" style="width:14%" title="Nombre de usuario">Usuario</th>
+			<th scope="col" style="width:14%" title="Nombre de usuario" class="user">Usuario</th>
 			<th scope="col" style="width:30%" title="Nombre y apellidos">Nombre y Apellidos</th>
-			<th scope="col" style="width:20%" title="Rol del usuario" class="rol">Rol</th>
+			<th scope="col" style="width:20%" title="Rol del usuario">Rol</th>
 			<th scope="col" style="width:10%" class="center" title="Lista del usuario">Lista</th>
 			<th scope="col" style="width:15%"></th>
 		</tr>
@@ -56,9 +56,9 @@ VistaUsuarioBolsaEmpleo bean = (VistaUsuarioBolsaEmpleo) uvdatos.getVistas().get
 			<th scope="col" style="width:5%"></th>
 			<th scope="col" style="width:6%" title="Tipo de documento">Tipo</th>
 			<th scope="col" style="width:13%" title="N Documento">Documento</th>
-			<th scope="col" style="width:14%" title="Nombre de usuario">Usuario</th>
+			<th scope="col" style="width:14%" title="Nombre de usuario" class="user">Usuario</th>
 			<th scope="col" style="width:30%" title="Nombre y apellidos">Nombre y Apellidos</th>
-			<th scope="col" style="width:20%" title="Rol del usuario" class="rol">Rol</th>
+			<th scope="col" style="width:20%" title="Rol del usuario">Rol</th>
 			<th scope="col" style="width:10%" class="center" title="Lista del usuario">Lista</th>
 			<th scope="col" style="width:15%"></th>
 		</tr>
@@ -77,9 +77,9 @@ VistaUsuarioBolsaEmpleo bean = (VistaUsuarioBolsaEmpleo) uvdatos.getVistas().get
 			<th scope="col" style="width:5%"></th>
 			<th scope="col" style="width:6%" title="Tipo de documento">Tipo</th>
 			<th scope="col" style="width:14%" title="N Documento">Documento</th>
-			<th scope="col" style="width:15%" title="Nombre de usuario">Usuario</th>
+			<th scope="col" style="width:15%" title="Nombre de usuario" class="user">Usuario</th>
 			<th scope="col" style="width:30%" title="Nombre y apellidos">Nombre y Apellidos</th>
-			<th scope="col" style="width:20%" title="Rol del usuario" class="rol">Rol</th>
+			<th scope="col" style="width:20%" title="Rol del usuario">Rol</th>
 			<th scope="col" style="width:10%" title="Razon exclusion del usuario">Razon Exclusion</th>
 			<th scope="col" style="width:10%" class="center" title="Lista del usuario">Lista</th>
 			<th scope="col" style="width:15%"></th>
