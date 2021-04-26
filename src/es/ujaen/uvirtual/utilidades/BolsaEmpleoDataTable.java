@@ -105,7 +105,7 @@ public class BolsaEmpleoDataTable<T> {
 
 		@Override
 		public boolean shouldSkipField(FieldAttributes arg0) {
-			List<String> list = Arrays.asList(new String[]{"consulta", "query", "queryCount", "orderDirection"});
+			List<String> list = Arrays.asList(new String[]{"consulta", "query", "queryCount", "orderDirection", "columns"});
 			
 			if (list.contains(arg0.getName())) {
 				return true;

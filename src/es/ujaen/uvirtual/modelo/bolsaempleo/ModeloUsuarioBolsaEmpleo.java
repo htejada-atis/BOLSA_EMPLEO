@@ -60,9 +60,6 @@ public class ModeloUsuarioBolsaEmpleo {
 	public static final int COLUMN_NACIONALIDAD_MAXLENGTH = 20;
 	public static final int COLUMN_EMAIL_MAXLENGTH = 50;
 	public static final int COLUMN_RAZON_EXCLUSION_MAXLENGTH = 200;
-	public static final int COLUMN_NOTICIA_TEXTO_MAXLENGTH = 300;
-	public static final int COLUMN_NOTICIA_ENLACE_MAXLENGTH = 200;
-	public static final int COLUMN_FICHERO_TITULO_MAXLENGTH = 300;
 	
 	
     protected static ModeloUsuarioBolsaEmpleo eInstancia = null;

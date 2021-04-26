@@ -134,6 +134,17 @@ function DataTable(id, config) {
     	if (columnDef.hasOwnProperty('render')) {
     		return columnDef.render(row);
     	}
+
+        if (columnDef.hasOwnProperty('overflow')) {
+            var overflow;
+
+            if (columnDef.overflow == 'auto') {
+                overflow = $('<div></div>');
+                overflow.addClass('overflow-auto');
+            }
+
+            return overflow.append(typeof value !== 'undefined' ? '' + value : '');
+        }
     	
     	if (columnDef.hasOwnProperty('buttons')) {
     		var buttons = $('<span class="btns"></span>');

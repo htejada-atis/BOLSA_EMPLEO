@@ -75,9 +75,7 @@ VistaNoticias bean = (VistaNoticias) uvdatos.getVistas().get(VistaNoticias.class
 		    "filterable": true,
 		    "columns": [
 		    	{'data': 'fecha', 'filter': {'type': 'date'}},
-		    	{'data': 'texto', 'filter': true, 'render': function(row) {
-		    		return "<div class='overflow-auto'>" +row.texto +"</div>";
-		    	}},
+		    	{'data': 'texto', 'filter': true, 'overflow': 'auto'},
 		        {'data': 'enlace', 'order': {'active': false}, 'class': 'overflow-ellipsis', 'render': function(row) {
 		        		return row.enlace ? "<a href='" +row.enlace +"' target='_blank'>" +row.enlace +"</a>" : "";
 		        	}

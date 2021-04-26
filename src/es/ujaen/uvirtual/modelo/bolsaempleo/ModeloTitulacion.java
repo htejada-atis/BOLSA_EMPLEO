@@ -28,7 +28,7 @@ public class ModeloTitulacion {
 	
 	public static final int ORDER_COLUMN_INDEX_NOMBRE_CANDIDATO = 0;
 	
-	public static final int COLUMN_NOMBRE_MAXLENGTH = 50;
+	public static final int COLUMN_NOMBRE_MAXLENGTH = 150;
 	
     protected static ModeloTitulacion eInstancia = null;
 	
