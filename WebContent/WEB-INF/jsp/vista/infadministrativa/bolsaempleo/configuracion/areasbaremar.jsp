@@ -9,7 +9,7 @@ UVDatos uvdatos = (UVDatos) request.getAttribute(UVDatos.NOMBRE_ATRIBUTO);
 VistaAreasBaremar bean = (VistaAreasBaremar) uvdatos.getVistas().get(VistaAreasBaremar.class.getName());
 %>
 
-<div class='bolsas'>
+<div class='bolsa-empleo'>
 	<% if (bean.getMensajesDeExito().size() > 0) { %>
 		<div id="exito" class="success">
 			<%= bean.formatearMensajesDeExito() %>
@@ -20,7 +20,14 @@ VistaAreasBaremar bean = (VistaAreasBaremar) uvdatos.getVistas().get(VistaAreasB
 			<%= bean.formatearMensajesDeError() %>
 		</div>
 	<% } else { %>
-	<h2>Bolsas baremables</h2>
+	
+	<div class="titulo-bolsa-empleo">
+		<h2>Bolsas baremables</h2>
+    
+	    <a class="link-btn" id="nueva_convocatoria" href="#">
+	    	Importar Areas UVirtual
+	    </a>
+	</div>
 	
 	<table class="bluetable bolsaempleo" id="table">
 		<tr>

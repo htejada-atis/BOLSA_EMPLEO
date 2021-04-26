@@ -53,7 +53,7 @@ VistaMeritos bean = (VistaMeritos) uvdatos.getVistas().get(VistaMeritos.class.ge
 					<%
 					for(ItemBaremacion item: bean.getItems()) {
 					%>
-		    			<option value="<%=item.getCodNum()%>"><%=item.getCodigo()%> - <%=item.getNombre()%></option>
+		    			<option value="<%=item.getCodNum()%>" data-unidades="<%= item.getUnidades() %>"><%=item.getCodigo()%> - <%=item.getNombre()%></option>
 		    		<%
 		    		}
 		    		%>
@@ -66,7 +66,7 @@ VistaMeritos bean = (VistaMeritos) uvdatos.getVistas().get(VistaMeritos.class.ge
 		
 		<div class="form-group-container col2">
 	    	<div class="form-group">
-	    		<label for="merito_valor">Valor:</label>
+	    		<label for="merito_valor" id="merito_valor_label">Valor:</label>
 	    		<input class="form-input-custom" id="merito_valor" type="text" name="<%= ControladorMisMeritos.PARAM_VALOR %>"/>
 	    	</div>
 	    	<div class="form-group">
@@ -112,6 +112,18 @@ VistaMeritos bean = (VistaMeritos) uvdatos.getVistas().get(VistaMeritos.class.ge
 					'<%= ControladorMisMeritos.PARAM_APARTADO %>': this.value};
 			Atis.sendForm("<%= request.getRequestURI() %>", params);
 		}
+		
+		$('#select_item').on('change', function() {			
+			var unidades = $(this).children("option:selected").data('unidades');
+			//var selected = $(this).children("option:selected").val();
+						
+			if (unidades) {
+				$('#merito_valor_label').text('Valor (' + unidades + ')');
+			} else {
+				$('#merito_valor_label').text('Valor');
+			}			
+		})
+		
 		
 	});
 

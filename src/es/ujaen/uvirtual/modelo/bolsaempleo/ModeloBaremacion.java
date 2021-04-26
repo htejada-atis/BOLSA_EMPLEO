@@ -891,12 +891,7 @@ public class ModeloBaremacion {
 			
 			try (ResultSet rs = stmt.executeQuery()) {
 				while (rs.next()) {
-					ItemBaremacion item = new ItemBaremacion();
-					item.setCodNum(rs.getInt("CODNUM"));
-					item.setCodigo(rs.getString("CODIGO"));
-					item.setNombre(rs.getString("NOMBRE"));
-					item.setActivo(rs.getString("FLGACTIVO").equals("S"));
-					item.setBloqueBaremacion(this.getBloqueBaremacionById(rs.getInt("BEPBLO_CODNUM")));
+					ItemBaremacion item = this.getItemBaremacionById(rs.getInt("CODNUM")); 							
 					items.add(item);
 				}
 			}
