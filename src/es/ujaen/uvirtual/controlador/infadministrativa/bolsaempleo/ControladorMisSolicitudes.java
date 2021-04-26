@@ -259,7 +259,7 @@ public class ControladorMisSolicitudes extends HttpServlet {
 		bean.setVista(RUTA_BEP_SOL + "paso2.jsp");
 	}
 	
-	private void listadoAreas(VistaSolicitudes bean, UVDatos datos, HttpServletRequest request, HttpServletResponse response) throws IOException, SQLException{
+	private void listadoAreas(VistaSolicitudes bean, UVDatos datos, HttpServletRequest request, HttpServletResponse response) throws IOException, SQLException {
 		ModeloArea modelo = ModeloArea.obtenerInstancia();
 		datos.setContentType("application/json");
 		datos.setRespuestaEnviada(true);
