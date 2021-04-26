@@ -26,10 +26,10 @@ VistaSolicitudes bean = (VistaSolicitudes) uvdatos.getVistas().get(VistaSolicitu
 	<% } %>
 	
 	<div class="titulo-bolsa-empleo">
-		<h2>Paso 2: Asignación de méritos a bolsas</h2>
+		<h2>Paso 2: Asignación de méritos a áreas</h2>
 		<h3><%= bean.getSolicitud().getConvocatoria().getDescripcion() %></h3>
 		
-		<p>Para cada bolsa de empleo selecciona hasta un máximo de [<%= bean.getSolicitud().getConvocatoria().getNumMeritosPorBloque() %>] méritos por bloque</p>
+		<p>Para cada área seleccione hasta un máximo de [<%= bean.getSolicitud().getConvocatoria().getNumMeritosPorBloque() %>] méritos por bloque</p>
 	</div>
 	
 	<table class="bluetable bolsaempleo" id="tableAreas">
@@ -65,7 +65,7 @@ VistaSolicitudes bean = (VistaSolicitudes) uvdatos.getVistas().get(VistaSolicitu
 		    "pageSize": 10,
 		    "selectable": true,
 		    "filterable": true,
-		    "title": 'Mis bolsas para esta convocatoria',
+		    "title": 'Mis Áreas para esta convocatoria',
 		    "action": "<%= ControladorMisSolicitudes.ACCION_DATATABLE_BOLSAS_SELECCIONADAS %>",
 		    "params": {"<%= ControladorMisSolicitudes.PARAM_SOLICITUD_ID %>": <%= bean.getSolicitud().getCodNum() %>},
 		    "columns": [

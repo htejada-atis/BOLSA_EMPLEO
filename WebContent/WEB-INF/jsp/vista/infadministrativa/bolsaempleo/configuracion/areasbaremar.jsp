@@ -20,7 +20,7 @@ VistaAreasBaremar bean = (VistaAreasBaremar) uvdatos.getVistas().get(VistaAreasB
 			<%= bean.formatearMensajesDeError() %>
 		</div>
 	<% } else { %>
-	<h2>Bolsas baremables</h2>
+	<h2>Áreas baremables</h2>
 	
 	<table class="bluetable bolsaempleo" id="table">
 		<tr>

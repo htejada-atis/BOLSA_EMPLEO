@@ -3,9 +3,9 @@ package es.ujaen.uvirtual.controlador.infadministrativa.bolsaempleo;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.sql.SQLException;
-import java.util.logging.Logger;
 import java.util.Date;
 import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
@@ -20,30 +20,33 @@ import com.google.gson.GsonBuilder;
 import es.ujaen.uvirtual.beans.CodigoDescripcion;
 import es.ujaen.uvirtual.beans.UVDatos;
 import es.ujaen.uvirtual.beans.Usuario;
+import es.ujaen.uvirtual.beans.uvirtual.bolsaempleo.Afinidad;
 import es.ujaen.uvirtual.beans.uvirtual.bolsaempleo.Convocatoria;
+import es.ujaen.uvirtual.beans.vistas.uvirtual.bolsaempleo.VistaAfinidades;
 import es.ujaen.uvirtual.beans.vistas.uvirtual.bolsaempleo.VistaConvocatorias;
+import es.ujaen.uvirtual.modelo.bolsaempleo.ModeloAfinidad;
 import es.ujaen.uvirtual.modelo.bolsaempleo.ModeloBolsa;
 import es.ujaen.uvirtual.modelo.bolsaempleo.ModeloConvocatoria;
 import es.ujaen.uvirtual.modelo.bolsaempleo.ModeloUsuarioBolsaEmpleo;
-import es.ujaen.uvirtual.utilidades.BolsaEmpleoValidator;
 import es.ujaen.uvirtual.utilidades.BolsaEmpleoDataTable;
+import es.ujaen.uvirtual.utilidades.BolsaEmpleoValidator;
 import es.ujaen.uvirtual.utilidades.EscapaHTML;
 import es.ujaen.uvirtual.utilidades.Formateador;
 import es.ujaen.uvirtual.utilidades.UVException;
 
 /**
- * Listado de bolsas y su estado.
+ * Gestión de las afinidades.
  */
 @WebServlet(
-	name = "informacionadministrativa.bolsaempleo.configuracion.convocatorias", 
+	name = "informacionadministrativa.bolsaempleo.configuracion.afinidades", 
 	description = "Gestión de convocatorias", 
 	urlPatterns = { 
-			"/srv/es/informacionadministrativa/bolsaempleo/configuracion/convocatorias", 
-			"/srv/en/informacionadministrativa/bolsaempleo/configuracion/convocatorias",
-			"/srv/es/ajax/informacionadministrativa/bolsaempleo/configuracion/convocatorias",
-			"/srv/en/ajax/informacionadministrativa/bolsaempleo/configuracion/convocatorias"
+			"/srv/es/informacionadministrativa/bolsaempleo/configuracion/afinidades", 
+			"/srv/en/informacionadministrativa/bolsaempleo/configuracion/afinidades",
+			"/srv/es/ajax/informacionadministrativa/bolsaempleo/configuracion/afinidades",
+			"/srv/en/ajax/informacionadministrativa/bolsaempleo/configuracion/afinidades"
 })
-public class ControladorConvocatorias extends HttpServlet {
+public class ControladorAfinidades extends HttpServlet {
 	private static final long serialVersionUID = 1L;
 	private static final String NOMBREDEESTACLASE = ControladorConvocatorias.class.getName();
 	private static final Logger LOGGER = Logger.getLogger(NOMBREDEESTACLASE);
@@ -56,7 +59,7 @@ public class ControladorConvocatorias extends HttpServlet {
 	public static final String PARAM_CONVOCATORIA_NUMEROMERITOSPORBLOQUE = "numMeritosPorBloque";
 	
 	// acciones
-	public static final String ACCION_LISTAR_CONVOCATORIAS = "listar";
+	public static final String ACCION_LISTAR_AFINIDADES = "listar";
 	public static final String ACCION_DATATABLE = "datatable";
 	public static final String ACCION_FORMULARIO_CONVOCATORIA = "formConvocatoria";
 	public static final String ACCION_AGREGAR_CONVOCATORIA = "addConvocatoria";
@@ -89,10 +92,10 @@ public class ControladorConvocatorias extends HttpServlet {
 	public static final int RESPONSE_HTTP_CODE_ERROR = 400;
 	
 	// ruta vistas
-	public static final String RUTA_BEP_CON = "/WEB-INF/jsp/vista/infadministrativa/bolsaempleo/configuracion/convocatorias/";
+	public static final String RUTA_BEP_CON = "/WEB-INF/jsp/vista/infadministrativa/bolsaempleo/configuracion/afinidades/";
 	
 	// urls
-	public static final String URL_PATTERN_AJAX = "/srv/es/ajax/informacionadministrativa/bolsaempleo/configuracion/convocatorias";
+	public static final String URL_PATTERN_AJAX = "/srv/es/ajax/informacionadministrativa/bolsaempleo/configuracion/afinidades";
 	
 	// variables
 	public static boolean anonimo = true;
@@ -106,43 +109,25 @@ public class ControladorConvocatorias extends HttpServlet {
 		datos.setDocType("<!DOCTYPE html>");
 		datos.setContentType("text/html");
 		
-		VistaConvocatorias bean = new VistaConvocatorias();		
+		VistaAfinidades bean = new VistaAfinidades();		
 		Usuario usuario = datos.getUsuario();
 		ModeloUsuarioBolsaEmpleo modelo = ModeloUsuarioBolsaEmpleo.obtenerInstancia();	
 		LOGGER.log(Level.FINEST, "usuario que ha entrado en el servlet es {0}", usuario.getUid());
 				
 		String nombreAccion = EscapaHTML.ajustaCodificacion(request.getParameter(PARAM_ACCION));		
 		if (nombreAccion == null) {
-			nombreAccion = ACCION_LISTAR_CONVOCATORIAS;
+			nombreAccion = ACCION_LISTAR_AFINIDADES;
 		}
 					
 		try {
 			anonimo = !modelo.checkUser(datos);
 			switch (nombreAccion) {
-				case ACCION_LISTAR_CONVOCATORIAS:
+				case ACCION_LISTAR_AFINIDADES:
 					index(bean, datos, request, response);
 					break;				
 				case ACCION_DATATABLE:
 					listado(bean, datos, request, response);
-					break;	
-				case ACCION_FORMULARIO_CONVOCATORIA:
-					formConvocatoria(bean, datos, request, response);
 					break;
-				case ACCION_AGREGAR_CONVOCATORIA:
-					nuevaConvocatoria(bean, datos, request, response);
-					break;
-				case ACCION_MODIFICAR_CONVOCATORIA:
-					editarConvocatoria(bean, datos, request, response);
-					break;
-				case ACCION_ABRIR_CONVOCATORIA:
-					abrirConvocatoria(bean, datos, request, response);
-					break;	
-				case ACCION_CERRAR_CONVOCATORIA:
-					cerrarConvocatoria(bean, datos, request, response);
-					break;	
-				case ACCION_BORRAR_CONVOCATORIA:
-					borrarConvocatoria(bean, request, response);
-					break;	
 			}			
 		} catch (UVException e) {
 			LOGGER.log(Level.WARNING, e.toString());
@@ -173,12 +158,12 @@ public class ControladorConvocatorias extends HttpServlet {
 		doGet(request, response);
 	}
 	
-	private void index(VistaConvocatorias bean, UVDatos datos, HttpServletRequest request, HttpServletResponse response) {
-		bean.setVista(RUTA_BEP_CON + "indexConvocatorias.jsp");
+	private void index(VistaAfinidades bean, UVDatos datos, HttpServletRequest request, HttpServletResponse response) {
+		bean.setVista(RUTA_BEP_CON + "index.jsp");
 	}
 		
-	private void listado(VistaConvocatorias bean, UVDatos datos, HttpServletRequest request, HttpServletResponse response) throws IOException, SQLException {
-		ModeloConvocatoria modelo = ModeloConvocatoria.obtenerInstancia(); 
+	private void listado(VistaAfinidades bean, UVDatos datos, HttpServletRequest request, HttpServletResponse response) throws IOException, SQLException {
+		ModeloAfinidad modelo = ModeloAfinidad.obtenerInstancia(); 
 		
 		datos.setContentType("application/json");
 		datos.setRespuestaEnviada(true);
@@ -187,8 +172,8 @@ public class ControladorConvocatorias extends HttpServlet {
 		
 		try (PrintWriter writer = response.getWriter()) {
 			try {
-				BolsaEmpleoDataTable<Convocatoria> dataTable = modelo.listaConvocatoriasDatatable(request.getParameterMap());
-				bean.setDatatableConvocatorias(dataTable);
+				BolsaEmpleoDataTable<Afinidad> dataTable = modelo.listaAfinidadesDatatable(request.getParameterMap());
+				bean.setDatatableAfinidades(dataTable);
 				
 				Gson gson = new GsonBuilder().setExclusionStrategies(BolsaEmpleoDataTable.GSONEXCLUSIONSTRATEGY).create();				
 				writer.write(gson.toJson(dataTable));
@@ -202,8 +187,8 @@ public class ControladorConvocatorias extends HttpServlet {
 		}
 	}
 	
-	private void formConvocatoria(VistaConvocatorias bean, UVDatos datos, HttpServletRequest request, HttpServletResponse response) {
-		bean.setVista(RUTA_BEP_CON + "formConvocatoria.jsp");
+	private void formAfinidad(VistaConvocatorias bean, UVDatos datos, HttpServletRequest request, HttpServletResponse response) {
+		bean.setVista(RUTA_BEP_CON + "formAfinidades.jsp");
 	}
 	
 	private void nuevaConvocatoria(VistaConvocatorias bean, UVDatos datos, HttpServletRequest request, HttpServletResponse response) throws UVException, SQLException {

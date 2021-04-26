@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import es.ujaen.uvirtual.beans.uvirtual.bolsaempleo.Area;
+import es.ujaen.uvirtual.beans.uvirtual.bolsaempleo.Convocatoria;
 import es.ujaen.uvirtual.beans.vistas.Vista;
 
 /** Bean para la vista.
@@ -14,6 +15,7 @@ public class VistaValidar extends Vista implements Serializable {
 	private static final long serialVersionUID = 1L;
 	private String vista;
 	private List<Area> areas = new ArrayList<>();
+	private Convocatoria conv;
 	
 	public String getVista() {
 		return vista;
@@ -29,5 +31,13 @@ public class VistaValidar extends Vista implements Serializable {
 	
 	public void setAreas(List<Area> areas) {
 		this.areas = areas;
+	}
+	
+	public Convocatoria getConvocatoria() {
+		return conv;
+	}
+	
+	public void setConvocatoria(Convocatoria pconv) {
+		this.conv = pconv;
 	}
 }
