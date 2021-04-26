@@ -6,6 +6,7 @@
 <%@ page import="es.ujaen.uvirtual.beans.vistas.uvirtual.bolsaempleo.VistaSolicitudes" %>
 <%@ page import="es.ujaen.uvirtual.beans.uvirtual.bolsaempleo.Solicitud" %>
 <%@ page import="es.ujaen.uvirtual.utilidades.EscapaHTML" %>
+<%@	page import="es.ujaen.uvirtual.beans.uvirtual.bolsaempleo.Bolsa" %>
 
 <%
 UVDatos uvdatos = (UVDatos) request.getAttribute(UVDatos.NOMBRE_ATRIBUTO);
@@ -25,9 +26,15 @@ VistaSolicitudes bean = (VistaSolicitudes) uvdatos.getVistas().get(VistaSolicitu
 		</div>
 	<% } %>
 	
-	<h2>Paso 1: Selección de bolsas de empleo</h2>
+	<h2>Paso 1: Selección de áreas</h2>
 	<h3><%= bean.getSolicitud().getConvocatoria().getDescripcion() %></h3>
-	<p>Seleccione las bolsas donde desee participar, hasta un máximo de [<%=bean.getSolicitud().getConvocatoria().getNumBolsasMaximo()%>].</p>
+	<p>Seleccione las áreas donde desee participar, hasta un máximo de [<%=bean.getSolicitud().getConvocatoria().getNumBolsasMaximo()%>].</p>
+	
+	<div class="btn-align-right">
+		<a class="link-btn" id="gestion_meritos" href="/srv/es/informacionadministrativa/bolsaempleo/mismeritos">
+	    	 Ir a la gestión de méritos
+	    </a>
+	</div>
 	
 	<table class="bluetable bolsaempleo" id="tableAreas">
 		<tr>
@@ -60,13 +67,25 @@ VistaSolicitudes bean = (VistaSolicitudes) uvdatos.getVistas().get(VistaSolicitu
 <script>
 
 	$(document).ready(function() {
+		
+		var bolsasSolicitud = [];
+		
+		<%  if (bean.getListaBolsas() != null) {
+				for (Bolsa bolsa: bean.getListaBolsas()) { %>
+					bolsasSolicitud.push("<%=bolsa.getCodNum()%>");
+				<% }
+			} %>
+		
+		console.log(bolsasSolicitud);
+		
 		var tableAreas = new Atis.DataTable('#tableAreas', {
 			"ajax": { url: "<%= ControladorMisSolicitudes.URL_PATTERN_AJAX %>" },
 		    "pageSize": 10,
 		    "selectable": true,
 		    "filterable": true,
-		    "title": 'Lista de bolsas',
+		    "title": 'Lista de Áreas',
 		    "action": "<%=ControladorMisSolicitudes.ACCION_DATATABLE_AREAS%>",
+		    "selected": bolsasSolicitud,
 		    "columns": [
 		    	{'data': 'codNum', 'selectable': {'exclude': 'excluido'}},
 		    	{'data': 'area.idAreaExterno', 'filter': true},
@@ -74,7 +93,7 @@ VistaSolicitudes bean = (VistaSolicitudes) uvdatos.getVistas().get(VistaSolicitu
 		        {'data': 'excluido', 'order': {'active': false}, 'filter': {'type': 'select', 'options':{'true': 'Excluido', 'false': 'No excluido'}, 'optionDefault': 'false'},
 		    		'render': function(row) {
 		        		if (row.excluido) {
-		        			return "<div title='No tienes acceso a ésta bolsa' class='circle-false'></div>";
+		        			return "<div title='No tienes acceso a éste área' class='circle-false'></div>";
 		        		} else {
 		        			return "<div class='circle-true'></div>";
 		        		}
@@ -97,9 +116,9 @@ VistaSolicitudes bean = (VistaSolicitudes) uvdatos.getVistas().get(VistaSolicitu
 		document.getElementById("paso1_siguiente").addEventListener("click", function(event) {
 			event.preventDefault();
 			if (tableAreas.getCheckedItems().length < 1) {
-				Atis.alertDialog("Seleccionar bolsas", "Debes seleccionar al menos una bolsa para continuar");
+				Atis.alertDialog("Seleccionar áreas", "Debes seleccionar al menos un área para continuar");
 			} else if (tableAreas.getCheckedItems().length > <%= bean.getSolicitud().getConvocatoria().getNumBolsasMaximo() %>) {
-				Atis.alertDialog("Seleccionar bolsas", "No puedes superar el número máximo de bolsas permitido de la convocatoria");
+				Atis.alertDialog("Seleccionar áreas", "No puedes superar el número máximo de áreas permitido de la convocatoria");
 			} else {
 				var params = {
 						'a': '<%= ControladorMisSolicitudes.ACCION_SELECCIONAR_BOLSAS %>',

@@ -12,10 +12,10 @@ UVDatos uvdatos = (UVDatos) request.getAttribute(UVDatos.NOMBRE_ATRIBUTO);
 VistaNoticias bean = (VistaNoticias) uvdatos.getVistas().get(VistaNoticias.class.getName());
 Noticia noticia = bean.getNoticia();
 
-String textoVal = BolsaEmpleoUtils.getParamForm(request, ControladorGestionNoticias.PARAM_TEXTO, noticia != null ? noticia.getTexto() : "");
-String enlaceVal = BolsaEmpleoUtils.getParamForm(request, ControladorGestionNoticias.PARAM_ENLACE, noticia != null && noticia.getEnlace() != null ? noticia.getEnlace() : "");
-String fechaVal = BolsaEmpleoUtils.getParamForm(request, ControladorGestionNoticias.PARAM_FECHA, noticia != null ? Formateador.formatoFecha(noticia.getFecha(), Formateador.FORMATO_FECHA_DDMMYYYY) : "");
-Boolean publicaVal = noticia != null ? noticia.isPublica() : false;
+String texto = BolsaEmpleoUtils.getParamForm(request, ControladorGestionNoticias.PARAM_TEXTO, noticia != null ? noticia.getTexto() : "");
+String enlace = BolsaEmpleoUtils.getParamForm(request, ControladorGestionNoticias.PARAM_ENLACE, noticia != null && noticia.getEnlace() != null ? noticia.getEnlace() : "");
+String fecha = BolsaEmpleoUtils.getParamForm(request, ControladorGestionNoticias.PARAM_FECHA, noticia != null ? Formateador.formatoFecha(noticia.getFecha(), Formateador.FORMATO_FECHA_DDMMYYYY) : "");
+Boolean publica = noticia != null ? noticia.isPublica() : false;
 
 %>
 
@@ -41,21 +41,21 @@ Boolean publicaVal = noticia != null ? noticia.isPublica() : false;
 		<div class="form-group-container col1">
 			<div class="form-group">
 	    		<label for="noticia_texto" class="bold-label">Texto:</label>
-	    		<input class="form-input-custom" type="text" name="<%= ControladorGestionNoticias.PARAM_TEXTO %>" id="noticia_texto" value="<%= textoVal %>"/>
+	    		<input class="form-input-custom" type="text" name="<%= ControladorGestionNoticias.PARAM_TEXTO %>" id="noticia_texto" value="<%= texto %>"/>
 	    	</div>
 		</div>
     	<div class="form-group-container col2">
     		<div class="form-group">
 	    		<label for="noticia_enlace">Enlace:</label>
-	    		<input class="form-input-custom" type="text" name="<%= ControladorGestionNoticias.PARAM_ENLACE %>" id="noticia_enlace" value="<%= enlaceVal %>"/>
+	    		<input class="form-input-custom" type="text" name="<%= ControladorGestionNoticias.PARAM_ENLACE %>" id="noticia_enlace" value="<%= enlace %>"/>
 	    	</div>
 	    	<div class="form-group">
 	    		<label for="noticia_fecha"><b>Fecha</b>:</label>
-	    		<input class="form-input-custom" type="text" name="<%= ControladorGestionNoticias.PARAM_FECHA %>" id="noticia_fecha" autocomplete="off" value="<%= fechaVal %>"/>
+	    		<input class="form-input-custom" type="text" name="<%= ControladorGestionNoticias.PARAM_FECHA %>" id="noticia_fecha" autocomplete="off" value="<%= fecha %>"/>
 	    	</div>
     	</div>
     	<div class="form-check">
-    		<label for="noticia_publica" class="bold-label"><input type="checkbox" id="noticia_publica" name="<%= ControladorGestionNoticias.PARAM_PUBLICA %>" value="<%= publicaVal %>" <%= (publicaVal ? "checked=''" : "") %>/>Pública</label>
+    		<label for="noticia_publica" class="bold-label"><input type="checkbox" id="noticia_publica" name="<%= ControladorGestionNoticias.PARAM_PUBLICA %>" value="<%= publica %>" <%= (publica ? "checked=''" : "") %>/>Pública</label>
     	</div>
     	<div class="form-btn">
     		<input id="noticia_enviar" type="submit" name="<%= ControladorGestionNoticias.PARAM_ENVIAR %>" value="<%= noticia != null ? "Guardar cambios" : "Insertar noticia" %>"/>

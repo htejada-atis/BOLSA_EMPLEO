@@ -1,6 +1,6 @@
 <%@ page trimDirectiveWhitespaces="true"%>
 <%@ page import="es.ujaen.uvirtual.beans.UVDatos"%>
-<%@	page import="es.ujaen.uvirtual.controlador.infadministrativa.bolsaempleo.ControladorUsuarioBolsaEmpleo"%>
+<%@	page import="es.ujaen.uvirtual.controlador.infadministrativa.bolsaempleo.ControladorUsuarioCandidato"%>
 <%@ page import="es.ujaen.uvirtual.beans.vistas.uvirtual.bolsaempleo.VistaUsuarioBolsaEmpleo"%>
 <%@ page import="es.ujaen.uvirtual.utilidades.EscapaHTML" %>
 
@@ -26,11 +26,10 @@ VistaUsuarioBolsaEmpleo bean = (VistaUsuarioBolsaEmpleo) uvdatos.getVistas().get
 	</div>
 	
 	<div class="titulo-bolsa-empleo" style="margin-top:1rem;">
-		<h2>Usuarios del sistema</h2>
+		<h2>Usuarios Candidatos</h2>
 	</div>
 	
 	<table class="bluetable bolsaempleo" id="table_usuarios">
-	  	<caption class="table-title">Usuarios</caption>  
 		<tr>
 			<th scope="col" style="width:5%"></th>
 			<th scope="col" style="width:6%" title="Tipo de documento">Tipo</th>
@@ -58,16 +57,16 @@ VistaUsuarioBolsaEmpleo bean = (VistaUsuarioBolsaEmpleo) uvdatos.getVistas().get
 $(document).ready(function() {
 	document.getElementById('nuevo_usuario').addEventListener("click", function(event) {
 		event.preventDefault();
-		Atis.sendForm("<%= request.getRequestURI() %>", {'a': '<%= ControladorUsuarioBolsaEmpleo.ACCION_FORMULARIO_USUARIO %>'});
+		Atis.sendForm("<%= request.getRequestURI() %>", {'a': '<%= ControladorUsuarioCandidato.ACCION_FORMULARIO_USUARIO %>'});
 	});
 	
 	
 	var table_usuarios = new Atis.DataTable('#table_usuarios', {
-	    "ajax": { url: "<%=ControladorUsuarioBolsaEmpleo.URL_PATTERN_AJAX%>", async: false },
+	    "ajax": { url: "<%=ControladorUsuarioCandidato.URL_PATTERN_AJAX%>", async: false },
 	    "selectable": true,
 	    "pageSize": 10,
 	    "filterable": true,
-	    "action": "<%=ControladorUsuarioBolsaEmpleo.ACCION_DATATABLE_USUARIOS%>",
+	    "action": "<%=ControladorUsuarioCandidato.ACCION_DATATABLE_USUARIOS_CANDIDATOS%>",
 	    "columns": [
 	    	{'data': 'codNum', 'selectable': true},
 	        {'data': 'tipodocumento', 'filter': true, 'class': 'overflow-auto'},
@@ -76,60 +75,36 @@ $(document).ready(function() {
 	        {'data': 'apellido1', 'filter': true, 'class': 'overflow-auto', 'render': function(row) {
         		return row.nombre + "\n" + row.apellido1 + "\n" + row.apellido2; 
         	}},
-	        {'data': 'rol.descripcion', 'filter': {'type': 'select', 'options': {'1050':'Personal', '1051':'Comision'}}  , 'order': {'active': false}},
+	        {'data': 'rol.descripcion', 'order': {'active': false}},
 	        {'data': 'listaDist', 'filter': {'type': 'selectBoolean', 'true': 'En Lista', 'false': 'Sin Lista'}, 'render': function(row) {
 	        	if(row.listaDist==true){
-        			return "<div title='En lista distribuciÃ³n' class='circle-true'></div>"; 
+        			return "<div title='En lista distribución' class='circle-true'></div>"; 
         		}
         		else{
-        			return "<div title='Excluido de lista distribuciÃ³n' class='circle-false'></div>"; 
+        			return "<div title='Excluido de lista distribución' class='circle-false'></div>"; 
         		}
         	}},
         	{'data': 'excluido', 'filter': {'type': 'selectBoolean', 'true': 'Excluido', 'false': 'Incluido'}, 'render': function(row) {
 	        	if(row.excluido==true){
-        			return "<div title='Excluido' class='circle-true'></div>"; 
+        			return "<div title='En lista distribución' class='circle-true'></div>"; 
         		}
         	}},
         	{'data': 'borrado', 'filter': {'type': 'selectBoolean', 'true': 'Borrado', 'false': 'No Borrado'}, 'render': function(row) {
 	        	if(row.borrado==true){
-        			return "<div title='Eliminado' class='circle-true'></div>"; 
+        			return "<div title='En lista distribución' class='circle-true'></div>"; 
         		}
         	}},
-        	{'data': 'codnum', 'buttons': [
-        		{'label': 'Editar', 'onClick': function(row) {
-        		var params = {'a': '<%= ControladorUsuarioBolsaEmpleo.ACCION_EDITAR_USUARIO %>', '<%= ControladorUsuarioBolsaEmpleo.PARAM_NOMBRE_USUARIO %>': row.codcuenta};
+        	{'data': 'codnum', 'buttons': [{'label': 'Editar', 'onClick': function(row) {
+        		var params = {'a': '<%= ControladorUsuarioCandidato.ACCION_EDITAR_USUARIO %>', '<%= ControladorUsuarioCandidato.PARAM_NOMBRE_USUARIO %>': row.codcuenta};
         		Atis.sendForm("<%= request.getRequestURI() %>", params);
-        		}},
-        		{'label': function(row) { 
-        					if(row.excluido) return "Incluir"
-        					else return "Excluir"; 
-        				},
-        		'onClick': function(row) {
-    	    		if(row.excluido){
-    	    			Atis.confirmDialog("Incluir usuario", "Â¿Desea incluir a este usuario en la base de datos?", {
-    		            	Si: function() {
-    		            		var params = {
-    		            				'a': '<%=ControladorUsuarioBolsaEmpleo.ACCION_INCLUIR_USUARIO%>', 
-    		            				'<%=ControladorUsuarioBolsaEmpleo.PARAM_NOMBRE_USUARIO%>': row.codNum
-    		            			};
-    		        			Atis.sendForm("<%= request.getRequestURI() %>", params);
-    		              		$(this).dialog("close");
-    		            	},
-    		            	No: function() {
-    		              		$(this).dialog("close");
-    		            	}
-    		          	});
-    	    		}
-    	    		else{
-    	    			var params = {'a': '<%= ControladorUsuarioBolsaEmpleo.ACCION_EXCLUIR_USUARIO %>', '<%= ControladorUsuarioBolsaEmpleo.PARAM_NOMBRE_USUARIO %>': row.codcuenta};
-    	        		Atis.sendForm("<%= request.getRequestURI() %>", params);
-    	    		}
-        		}
-        		}
-   			]}	
+        	}},
+        	{'label': 'Excluir', 'onClick': function(row) {
+        		var params = {'a': '<%= ControladorUsuarioCandidato.ACCION_EXCLUIR_USUARIO %>', '<%= ControladorUsuarioCandidato.PARAM_NOMBRE_USUARIO %>': row.codcuenta};
+        		Atis.sendForm("<%= request.getRequestURI() %>", params);
+        	}}]}	
 	    ],
 	    "actions": [
-	    	{'label': 'Borrar', 'onClick': function(selected) { enviaAccion("<%=ControladorUsuarioBolsaEmpleo.ACCION_ELIMINAR_USUARIO%>", selected); } }   	
+	    	{'label': 'Borrar', 'onClick': function(selected) { enviaAccion("<%=ControladorUsuarioCandidato.ACCION_ELIMINAR_USUARIO%>", selected); } }   	
 	    ]
 	});
 	
@@ -142,26 +117,26 @@ $(document).ready(function() {
 		
 		switch(accion){
 			case('eliminarusuario'):
-        		var mensaje = "Â¿Desea borrar los usuarios seleccionados?";
+        		var mensaje = "¿Desea borrar los usuarios seleccionados?";
     			var titulo = "Borrar Usuarios";
 			break;
 			case('excluirusuario'):
-        		var mensaje = "Â¿Desea excluir los usuarios seleccionados?";
+        		var mensaje = "¿Desea excluir los usuarios seleccionados?";
     			var titulo = "Excluir Usuarios";
 			case('incluirusuario'):
-        		var mensaje = "Â¿Desea incluir los usuarios seleccionados?";
+        		var mensaje = "¿Desea incluir los usuarios seleccionados?";
     			var titulo = "Incluir Usuarios";
 			case('recuperarusuario'):
-        		var mensaje = "Â¿Desea recuperar los usuarios seleccionados?";
+        		var mensaje = "¿Desea recuperar los usuarios seleccionados?";
     			var titulo = "Recuperar Usuarios";
 			break;
 		}
 		Atis.confirmDialog(titulo, mensaje, {
         	Si: function() {
         		var params = {
-        				'a': '<%=ControladorUsuarioBolsaEmpleo.ACCION_USUARIO%>', 
-        				'<%=ControladorUsuarioBolsaEmpleo.PARAM_ACCION_USUARIO%>': accion,
-        				'<%=ControladorUsuarioBolsaEmpleo.PARAM_USUARIOS_SELECCIONADOS%>': Atis.object2Json(selected)
+        				'a': '<%=ControladorUsuarioCandidato.ACCION_USUARIO%>', 
+        				'<%=ControladorUsuarioCandidato.PARAM_ACCION_USUARIO%>': accion,
+        				'<%=ControladorUsuarioCandidato.PARAM_USUARIOS_SELECCIONADOS%>': Atis.object2Json(selected)
         			};
     			Atis.sendForm("<%= request.getRequestURI() %>", params);
           		$(this).dialog("close");

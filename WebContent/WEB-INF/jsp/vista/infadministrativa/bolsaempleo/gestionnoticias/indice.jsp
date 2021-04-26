@@ -72,12 +72,11 @@ VistaNoticias bean = (VistaNoticias) uvdatos.getVistas().get(VistaNoticias.class
 		var table = new Atis.DataTable('#table_noticias_insertadas', {
 		    "ajax": { url: "<%= ControladorGestionNoticias.URL_PATTERN_AJAX %>" },
 		    "pageSize": 10,
+	    	"defaultOrderBy": 0,
 		    "filterable": true,
 		    "columns": [
 		    	{'data': 'fecha', 'filter': {'type': 'date'}},
-		    	{'data': 'texto', 'filter': true, 'render': function(row) {
-		    		return "<div class='overflow-auto'>" +row.texto +"</div>";
-		    	}},
+		    	{'data': 'texto', 'filter': true, 'overflow': 'auto'},
 		        {'data': 'enlace', 'order': {'active': false}, 'class': 'overflow-ellipsis', 'render': function(row) {
 		        		return row.enlace ? "<a href='" +row.enlace +"' target='_blank'>" +row.enlace +"</a>" : "";
 		        	}

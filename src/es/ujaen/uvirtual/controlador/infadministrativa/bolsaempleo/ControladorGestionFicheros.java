@@ -357,8 +357,8 @@ public class ControladorGestionFicheros extends HttpServlet {
 		BolsaEmpleoValidator validator = new BolsaEmpleoValidator(request);
 		
 		validator.addParamString(PARAM_TITULO);
-		validator.addRule(PARAM_TITULO, "max:" + ModeloUsuarioBolsaEmpleo.COLUMN_FICHERO_TITULO_MAXLENGTH, 
-				String.format(MENSAJE_ERROR_TITULO_LARGO, ModeloUsuarioBolsaEmpleo.COLUMN_FICHERO_TITULO_MAXLENGTH));
+		validator.addRule(PARAM_TITULO, "max:" + ModeloFichero.COLUMN_TITULO_MAXLENGTH, 
+				String.format(MENSAJE_ERROR_TITULO_LARGO, ModeloFichero.COLUMN_TITULO_MAXLENGTH));
 		
 		return validator;
 	}

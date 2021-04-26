@@ -29,6 +29,8 @@ public class ModeloFichero {
 	public static final int ORDER_COLUMN_INDEX_TITULO = 2;
 	public static final int ORDER_COLUMN_INDEX_PUBLICO = 4;
 	
+	public static final int COLUMN_TITULO_MAXLENGTH = 300;
+	
     protected static ModeloFichero eInstancia = null;
 	
 	/** Crea una instancia del objeto.

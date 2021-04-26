@@ -9,6 +9,7 @@ import java.util.List;
 import java.util.Map;
 import es.ujaen.uvirtual.beans.uvirtual.bolsaempleo.Area;
 import es.ujaen.uvirtual.beans.uvirtual.bolsaempleo.Bolsa;
+import es.ujaen.uvirtual.beans.uvirtual.bolsaempleo.BolsaCandidato;
 import es.ujaen.uvirtual.beans.uvirtual.bolsaempleo.UsuarioBolsaEmpleo;
 import es.ujaen.uvirtual.modelo.conexion.ConexionUvirtual;
 import es.ujaen.uvirtual.utilidades.BolsaEmpleoDataTable;
@@ -314,10 +315,10 @@ public class ModeloArea {
 	 * @throws SQLException en caso de error de base de datos
 	 * @throws UVException error si no existe la area
 	 */
-	public BolsaEmpleoDataTable<Bolsa> listaAreaSolicitudDatatable(Map<String, String[]> params, Integer codnum) throws SQLException, UVException {
-		List<Bolsa> bolsas = new ArrayList<>();
+	public BolsaEmpleoDataTable<BolsaCandidato> listaAreaSolicitudDatatable(Map<String, String[]> params, Integer codnum) throws SQLException, UVException {
+		List<BolsaCandidato> bolsas = new ArrayList<>();
 		ModeloArea modeloArea = ModeloArea.obtenerInstancia();	
-		BolsaEmpleoDataTable<Bolsa> dataTable = new BolsaEmpleoDataTable<Bolsa>(params);
+		BolsaEmpleoDataTable<BolsaCandidato> dataTable = new BolsaEmpleoDataTable<BolsaCandidato>(params);
 		
 		String consulta =
 		"SELECT bepbol.*, bepusuexc.USUARIO "
@@ -336,7 +337,7 @@ public class ModeloArea {
 		try (Connection conexion = ConexionUvirtual.obtenerInstancia();
 				PreparedStatement stmtCount = conexion.prepareStatement(dataTable.getQueryCount());
 				PreparedStatement stmt = conexion.prepareStatement(dataTable.getQuery());
-		) {					
+		) {
 			int indexParam = 1;
 			stmt.setInt(indexParam, codnum);
 			stmtCount.setInt(indexParam++, codnum);
@@ -348,15 +349,15 @@ public class ModeloArea {
 					bolsa.setCodNum(rs.getInt("CODNUM"));
 					bolsa.setArea(modeloArea.getAreaById(rs.getInt("BEPARE_CODNUM")));
 					bolsa.setEstado(rs.getString("ESTADO"));
-					bolsa.setBaremable(rs.getString("FLGBAREMABLE").equals("S"));		
+					bolsa.setBaremable(rs.getString("FLGBAREMABLE").equals("S"));
 					bolsa.setFechaActualizacion(rs.getTimestamp("FECHAACTUALIZACION"));
 					bolsa.setFechaBloqueo(rs.getTimestamp("FECHABLOQUEO"));
 					bolsa.setFechaDesBloqueo(rs.getTimestamp("FECHADEBLOQUEO"));
-					bolsa.setExcluido(rs.getString("USUARIO") != null);
-					
-					bolsas.add(bolsa);					
-				}				
-			}	
+					Boolean excluido = rs.getString("USUARIO") != null;
+					BolsaCandidato bolsaCandidato = new BolsaCandidato(bolsa, excluido);
+					bolsas.add(bolsaCandidato);
+				}
+			}
 			
 			dataTable.setRecordsTotalFromQuery(stmtCount);
 			dataTable.setData(bolsas);

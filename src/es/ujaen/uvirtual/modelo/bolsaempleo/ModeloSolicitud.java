@@ -309,7 +309,7 @@ public class ModeloSolicitud {
 		ModeloBolsa modeloBolsa = ModeloBolsa.obtenerInstancia();
 		ArrayList<Bolsa> bolsas = new ArrayList<Bolsa>();
 		
-		String consulta = "SELECT bepsbo.* FROM TBEP_SOLICITUDBOLSAS WHERE bepsbo.BEPSOL_CODNUM = ?";
+		String consulta = "SELECT bepsbo.* FROM TBEP_SOLICITUDBOLSAS bepsbo WHERE bepsbo.BEPSOL_CODNUM = ?";
 		
 		try (Connection conexion = ConexionUvirtual.obtenerInstancia(); PreparedStatement stmt = conexion.prepareStatement(consulta)) {
 			int indexParam = 1;

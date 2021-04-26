@@ -37,9 +37,8 @@ public class ModeloUsuarioBolsaEmpleo {
 	public static final int ORDER_COLUMN_INDEX_NOMBRE_Y_APELLIDOS = 4;
 	public static final int ORDER_COLUMN_INDEX_ROL = 5;
 	public static final int ORDER_COLUMN_INDEX_LISTA_DIST = 6;
-	public static final int ORDER_COLUMN_INDEX_RAZON_EXCLUSION = 6;
-	public static final int ORDER_COLUMN_INDEX_LISTA_DIST_EXCLUIDO = 7;
-	
+	public static final int ORDER_COLUMN_INDEX_EXCLUIDO = 7;
+	public static final int ORDER_COLUMN_INDEX_BORRADO = 8;
 	
 	public static final String USUARIO_BORRADO = "S";
 	public static final String USUARIO_NO_BORRADO = "N";
@@ -60,9 +59,6 @@ public class ModeloUsuarioBolsaEmpleo {
 	public static final int COLUMN_NACIONALIDAD_MAXLENGTH = 20;
 	public static final int COLUMN_EMAIL_MAXLENGTH = 50;
 	public static final int COLUMN_RAZON_EXCLUSION_MAXLENGTH = 200;
-	public static final int COLUMN_NOTICIA_TEXTO_MAXLENGTH = 300;
-	public static final int COLUMN_NOTICIA_ENLACE_MAXLENGTH = 200;
-	public static final int COLUMN_FICHERO_TITULO_MAXLENGTH = 300;
 	
 	
     protected static ModeloUsuarioBolsaEmpleo eInstancia = null;
@@ -251,12 +247,48 @@ public class ModeloUsuarioBolsaEmpleo {
 		"SELECT * "
 		+ "FROM TBEP_USUARIOS bepusu "
 		+ "INNER JOIN VUJA_NET_BEP_AR_PERSONA uvpersona ON uvpersona.CODINT=bepusu.CODPERSONA "
-		+ "WHERE FLGBORRADO!='S' "
-		+ "AND FLGEXCLUIDO!='S'";
+		+ "WHERE bepusu.rol != 1052";
 		
-		String tipo = "general";
+		BolsaEmpleoDataTable<UsuarioBolsaEmpleo> dataTable = setDatatable(params, consulta);
+				
+		try (Connection conexion = ConexionUvirtual.obtenerInstancia();
+				PreparedStatement stmtCount = conexion.prepareStatement(dataTable.getQueryCount());
+				PreparedStatement stmt = conexion.prepareStatement(dataTable.getQuery());
+		) {		
+			
+			dataTable.setFiltersParams(stmt, stmtCount, 1);
+			
+			try (ResultSet rs = stmt.executeQuery()) {
+				while (rs.next()) {
+					UsuarioBolsaEmpleo usuario = setUsuario(rs);
+					usuarios.add(usuario);					
+				}				
+			}	
+			
+			dataTable.setRecordsTotalFromQuery(stmtCount);
+			dataTable.setData(usuarios);
+		}
 		
-		BolsaEmpleoDataTable<UsuarioBolsaEmpleo> dataTable = setDatatable(params, consulta, tipo);
+		return dataTable;
+	}
+	
+	/**
+	 * Listado de areas. 
+	 * @param params para leer los parametros de paginación, ordenacion, etc
+	 * @return listado de areas
+	 * @throws SQLException en caso de error de base de datos
+	 * @throws UVException error si no existe la area
+	 */
+	public BolsaEmpleoDataTable<UsuarioBolsaEmpleo> listaUsuarioCandidatosBolsaEmpleoDatatable(Map<String, String[]> params) throws SQLException, UVException {
+		List<UsuarioBolsaEmpleo> usuarios = new ArrayList<>();
+		
+		String consulta =
+		"SELECT * "
+		+ "FROM TBEP_USUARIOS bepusu "
+		+ "INNER JOIN VUJA_NET_BEP_AR_PERSONA uvpersona ON uvpersona.CODINT=bepusu.CODPERSONA "
+		+ "WHERE bepusu.rol = 1052";
+		
+		BolsaEmpleoDataTable<UsuarioBolsaEmpleo> dataTable = setDatatable(params, consulta);
 				
 		try (Connection conexion = ConexionUvirtual.obtenerInstancia();
 				PreparedStatement stmtCount = conexion.prepareStatement(dataTable.getQueryCount());
@@ -295,9 +327,7 @@ public class ModeloUsuarioBolsaEmpleo {
 		+ "INNER JOIN VUJA_NET_BEP_AR_PERSONA uvpersona ON uvpersona.CODINT=bepusu.CODPERSONA "
 		+ "WHERE bepusu.FLGBORRADO='S'";
 		
-		String tipo = "borrado";
-		
-		BolsaEmpleoDataTable<UsuarioBolsaEmpleo> dataTable = setDatatable(params, consulta, tipo);
+		BolsaEmpleoDataTable<UsuarioBolsaEmpleo> dataTable = setDatatable(params, consulta);
 				
 		try (Connection conexion = ConexionUvirtual.obtenerInstancia();
 				PreparedStatement stmtCount = conexion.prepareStatement(dataTable.getQueryCount());
@@ -337,9 +367,7 @@ public class ModeloUsuarioBolsaEmpleo {
 		+ "WHERE FLGEXCLUIDO='S' "
 		+ "AND FLGBORRADO!='S'";
 		
-		String tipo = "excluido";
-		
-		BolsaEmpleoDataTable<UsuarioBolsaEmpleo> dataTable = setDatatable(params, consulta, tipo);
+		BolsaEmpleoDataTable<UsuarioBolsaEmpleo> dataTable = setDatatable(params, consulta);
 			
 		try (Connection conexion = ConexionUvirtual.obtenerInstancia();
 				PreparedStatement stmtCount = conexion.prepareStatement(dataTable.getQueryCount());
@@ -507,37 +535,23 @@ public class ModeloUsuarioBolsaEmpleo {
 	 * Get datatable. 
 	 * @param params parametrospara tabla
 	 * @param consulta query de la consulta
-	 * @param tipo .
 	 * @return usuario
 	 * @throws UVException en caso de error de paquete datatables
 	 */	
-	public BolsaEmpleoDataTable<UsuarioBolsaEmpleo> setDatatable(Map<String, String[]> params, String consulta, String tipo) throws UVException {
+	public BolsaEmpleoDataTable<UsuarioBolsaEmpleo> setDatatable(Map<String, String[]> params, String consulta) throws UVException {
 		BolsaEmpleoDataTable<UsuarioBolsaEmpleo> dataTable = new BolsaEmpleoDataTable<UsuarioBolsaEmpleo>(params);
 		
-		switch (tipo) {
-			case "excluido":
-				dataTable.setColumn(ORDER_COLUMN_INDEX_TIPO_DOCUMENTO, "uvpersona.STRTIPODOCUMENTO");
-				dataTable.setColumn(ORDER_COLUMN_INDEX_NUMDOCUMENTO, "uvpersona.IDNIF");
-				dataTable.setColumn(ORDER_COLUMN_INDEX_COD_CUENTA, "bepusu.CODCUENTA");
-				dataTable.setColumn(ORDER_COLUMN_INDEX_NOMBRE_Y_APELLIDOS, "uvpersona.STRAPELLIDO1");
-				dataTable.setColumn(ORDER_COLUMN_INDEX_ROL, "bepusu.ROL", DataTableColumn.COLUMN_TYPE_NUMBER);
-				dataTable.setColumn(ORDER_COLUMN_INDEX_RAZON_EXCLUSION, "bepusu.RAZON_EXCLUSION");
-				dataTable.setColumn(ORDER_COLUMN_INDEX_LISTA_DIST_EXCLUIDO, "bepusu.FLGLISTADISTRIBUCION", DataTableColumn.COLUMN_TYPE_BOOLEAN);
-				dataTable.setQuery(consulta);
-				
-				return dataTable;
-				
-			default:
-				dataTable.setColumn(ORDER_COLUMN_INDEX_TIPO_DOCUMENTO, "uvpersona.STRTIPODOCUMENTO");
-				dataTable.setColumn(ORDER_COLUMN_INDEX_NUMDOCUMENTO, "uvpersona.IDNIF");
-				dataTable.setColumn(ORDER_COLUMN_INDEX_COD_CUENTA, "bepusu.CODCUENTA");
-				dataTable.setColumn(ORDER_COLUMN_INDEX_NOMBRE_Y_APELLIDOS, "uvpersona.STRAPELLIDO1");
-				dataTable.setColumn(ORDER_COLUMN_INDEX_ROL, "bepusu.ROL", DataTableColumn.COLUMN_TYPE_NUMBER);
-				dataTable.setColumn(ORDER_COLUMN_INDEX_LISTA_DIST, "bepusu.FLGLISTADISTRIBUCION", DataTableColumn.COLUMN_TYPE_BOOLEAN);
-				dataTable.setQuery(consulta);
-				
-				return dataTable;
-		}
+		dataTable.setColumn(ORDER_COLUMN_INDEX_TIPO_DOCUMENTO, "uvpersona.STRTIPODOCUMENTO");
+		dataTable.setColumn(ORDER_COLUMN_INDEX_NUMDOCUMENTO, "uvpersona.IDNIF");
+		dataTable.setColumn(ORDER_COLUMN_INDEX_COD_CUENTA, "bepusu.CODCUENTA");
+		dataTable.setColumn(ORDER_COLUMN_INDEX_NOMBRE_Y_APELLIDOS, "uvpersona.STRAPELLIDO1");
+		dataTable.setColumn(ORDER_COLUMN_INDEX_ROL, "bepusu.ROL", DataTableColumn.COLUMN_TYPE_NUMBER);
+		dataTable.setColumn(ORDER_COLUMN_INDEX_LISTA_DIST, "bepusu.FLGLISTADISTRIBUCION", DataTableColumn.COLUMN_TYPE_BOOLEAN);
+		dataTable.setColumn(ORDER_COLUMN_INDEX_EXCLUIDO, "bepusu.FLGEXCLUIDO", DataTableColumn.COLUMN_TYPE_BOOLEAN);
+		dataTable.setColumn(ORDER_COLUMN_INDEX_BORRADO, "bepusu.FLGBORRADO", DataTableColumn.COLUMN_TYPE_BOOLEAN);
+		dataTable.setQuery(consulta);
+		
+		return dataTable;
 	}
 	
 	/**	Función que inserta un usuario en la BD.
