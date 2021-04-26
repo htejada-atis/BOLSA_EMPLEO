@@ -146,7 +146,6 @@ VistaUsuarioBolsaEmpleo bean = (VistaUsuarioBolsaEmpleo) uvdatos.getVistas().get
     		</div>
     	</div>
 
-		
     	<div class="form-group">
     		<input id="usuario_enviar" type="submit" name="<%= ControladorMisDatos.PARAM_ENVIAR %> " 
     		value="Enviar" style="float:right;"/>

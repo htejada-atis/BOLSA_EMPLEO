@@ -8,24 +8,22 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
+import es.ujaen.uvirtual.beans.uvirtual.bolsaempleo.Afinidad;
 import es.ujaen.uvirtual.beans.uvirtual.bolsaempleo.Convocatoria;
-import es.ujaen.uvirtual.beans.uvirtual.bolsaempleo.Titulacion;
 import es.ujaen.uvirtual.modelo.conexion.ConexionUvirtual;
 import es.ujaen.uvirtual.utilidades.BolsaEmpleoDataTable;
 import es.ujaen.uvirtual.utilidades.UVException;
 
 /**
- * Clase de modelo para la gestión de convocatorias 
- * Modelo - Operaciones con nombres: lista,    actualiza,  borra,    inserta
- * Controlador - Opers. con nombres: obtener,  cambiar,    eliminar, agregar
+ * Clase de modelo para la gestión de afinidades .
  * 
- * @author ATISoluciones 2021 
+ * @author fcampos
  */
-public class ModeloConvocatoria {	
+public class ModeloAfinidad {
 	public static final int ORDER_COLUMN_INDEX_ID = 0;
-	public static final int ORDER_COLUMN_INDEX_DESCRIPCION = 1;
-	public static final int ORDER_COLUMN_INDEX_FECHACIERRE = 2;
-	public static final int ORDER_COLUMN_INDEX_ESTADO = 3;
+	public static final int ORDER_COLUMN_INDEX_CODIGO = 1;
+	public static final int ORDER_COLUMN_INDEX_DESCRIPCION = 2;
+	public static final int ORDER_COLUMN_INDEX_MODULACION = 3;
 	
 	public static final String CONVOCATORIA_ESTADO_ABIERTA = "ABIERTA";
 	public static final String CONVOCATORIA_ESTADO_CERRADA = "CERRADA";
@@ -34,14 +32,14 @@ public class ModeloConvocatoria {
 	
 	public static final String MENSAJE_ERROR_NO_EXISTE_CONVOCATORIA = "No existe la convocatoria";
 		
-    protected static ModeloConvocatoria eInstancia = null;
+    protected static ModeloAfinidad eInstancia = null;
 	
 	/** Crea una instancia del objeto.
 	 *  de forma sincronizada para protegerse de posibles problemas multi-hilo
 	 */
 	private static synchronized void crearInstancia() {
 		if (eInstancia == null) {
-			eInstancia = new ModeloConvocatoria();
+			eInstancia = new ModeloAfinidad();
 		}
 	}
 
@@ -49,7 +47,7 @@ public class ModeloConvocatoria {
      * Obtiene una instancia de la conexión.
      * @return instancia
      */
-    public static ModeloConvocatoria obtenerInstancia() {
+    public static ModeloAfinidad obtenerInstancia() {
         if (eInstancia == null) {
         	crearInstancia();
         }
@@ -58,25 +56,25 @@ public class ModeloConvocatoria {
 	
 	
 	/**
-	 * Listado de bolsas de convocatorias. 
+	 * Listado de afinidades. 
 	 * @param params para leer los parametros de paginación, ordenacion, etc
-	 * @return listado de bolsas de empleo
+	 * @return listado de afinidades
 	 * @throws SQLException en caso de error de base de datos
 	 * @throws UVException error si no existe la area
 	 */
-	public BolsaEmpleoDataTable<Convocatoria> listaConvocatoriasDatatable(Map<String, String[]> params) throws SQLException, UVException {
-		List<Convocatoria> data = new ArrayList<>();
-		BolsaEmpleoDataTable<Convocatoria> dataTable = new BolsaEmpleoDataTable<Convocatoria>(params);
+	public BolsaEmpleoDataTable<Afinidad> listaAfinidadesDatatable(Map<String, String[]> params) throws SQLException, UVException {
+		List<Afinidad> afinidades = new ArrayList<>();
+		BolsaEmpleoDataTable<Afinidad> dataTable = new BolsaEmpleoDataTable<Afinidad>(params);
 		
 		String consulta =
-			"SELECT bepcon.* "
-		  + "FROM TBEP_CONVOCATORIAS bepcon "		  
-		  + "WHERE 1=1 ";
+			"SELECT bepafi.* "
+		  + "FROM TBEP_AFINIDADES bepafi "		  
+		  + "WHERE FLGBORRADO!='S'";
 		
-		dataTable.setColumn(ORDER_COLUMN_INDEX_ID, "bepcon.CODNUM");
-		dataTable.setColumn(ORDER_COLUMN_INDEX_DESCRIPCION, "bepcon.DESCRIPCION");
-		dataTable.setColumn(ORDER_COLUMN_INDEX_FECHACIERRE, "bepcon.FECHACIERRE");
-		dataTable.setColumn(ORDER_COLUMN_INDEX_ESTADO, "bepcon.ESTADO");		
+		dataTable.setColumn(ORDER_COLUMN_INDEX_ID, "bepafi.CODNUM");
+		dataTable.setColumn(ORDER_COLUMN_INDEX_CODIGO, "bepafi.CODIGO");
+		dataTable.setColumn(ORDER_COLUMN_INDEX_DESCRIPCION, "bepafi.DESCRIPCION");
+		dataTable.setColumn(ORDER_COLUMN_INDEX_MODULACION, "bepafi.MODULACION");		
 		dataTable.setQuery(consulta);
 				
 		try (Connection conexion = ConexionUvirtual.obtenerInstancia();
@@ -85,17 +83,17 @@ public class ModeloConvocatoria {
 		) {					
 			try (ResultSet rs = stmt.executeQuery()) {
 				while (rs.next()) {
-					Convocatoria convocatoria = new Convocatoria();
-					convocatoria.setCodNum(rs.getInt("CODNUM"));
-					convocatoria.setDescripcion(rs.getString("DESCRIPCION"));
-					convocatoria.setFechaCierre(rs.getDate("FECHACIERRE"));
-					convocatoria.setEstado(rs.getString("ESTADO"));					
-					data.add(convocatoria);					
+					Afinidad afinidad = new Afinidad();
+					afinidad.setCodNum(rs.getInt("CODNUM"));
+					afinidad.setCodigo(rs.getString("CODIGO"));
+					afinidad.setDescripcion(rs.getString("DESCRIPCION"));
+					afinidad.setModulacion(rs.getFloat("MODULACION"));					
+					afinidades.add(afinidad);					
 				}				
 			}	
 			
 			dataTable.setRecordsTotalFromQuery(stmtCount);
-			dataTable.setData(data);
+			dataTable.setData(afinidades);
 		}
 		
 		return dataTable;
@@ -284,6 +282,4 @@ public class ModeloConvocatoria {
 			stmt.executeUpdate();
 		}
 	}
-	
 }
-

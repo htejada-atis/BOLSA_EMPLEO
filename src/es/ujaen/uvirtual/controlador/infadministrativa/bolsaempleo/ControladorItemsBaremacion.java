@@ -720,7 +720,6 @@ public class ControladorItemsBaremacion extends HttpServlet {
 		item.setValor(validator.getValueFloat(PARAM_ITEM_VALOR));
 		item.setValorMinimo(validator.getValueFloat(PARAM_ITEM_VALOR_MINIMO));
 		item.setValorMaximo(validator.getValueFloat(PARAM_ITEM_VALOR_MAXIMO));
-		item.setValorMaximo(validator.getValueFloat(PARAM_ITEM_VALOR_MAXIMO));
 		
 		modelo.insertaItem(item);
 		

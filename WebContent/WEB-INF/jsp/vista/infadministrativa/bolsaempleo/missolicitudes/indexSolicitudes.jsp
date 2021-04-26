@@ -28,7 +28,7 @@ VistaSolicitudes bean = (VistaSolicitudes) uvdatos.getVistas().get(VistaSolicitu
 	<div class="titulo-bolsa-empleo">
 		<h2>Solicitudes</h2>
     
-	    <p>A continuación se muestran las convocatorias disponibles para poder introducir méritos y poder seleccionar las bolsas en las que desee participar.</p>
+	    <p>A continuación se muestran las convocatorias disponibles para poder introducir méritos y poder seleccionar las áreas en las que desee participar.</p>
 	</div>
 	
 	<table class="bluetable bolsaempleo" id="table">
