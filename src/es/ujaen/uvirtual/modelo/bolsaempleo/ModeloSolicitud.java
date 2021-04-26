@@ -354,7 +354,7 @@ public class ModeloSolicitud {
 			
 			try (ResultSet rs = stmt.executeQuery()) {
 				while (rs.next()) {
-					Bolsa bolsa = modeloBolsa.getBolsaById(rs.getInt("BEPBOL_CODNUM"));
+					Bolsa bolsa = modeloBolsa.getBolsaById(rs.getInt("BEPBOL_CODNUM"));					
 					data.add(bolsa);
 				}
 			}

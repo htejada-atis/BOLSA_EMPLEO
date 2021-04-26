@@ -11,6 +11,7 @@ import java.util.Map;
 import es.ujaen.uvirtual.beans.uvirtual.bolsaempleo.ApartadoBaremacion;
 import es.ujaen.uvirtual.beans.uvirtual.bolsaempleo.BloqueBaremacion;
 import es.ujaen.uvirtual.beans.uvirtual.bolsaempleo.ItemBaremacion;
+import es.ujaen.uvirtual.beans.uvirtual.bolsaempleo.Titulacion;
 import es.ujaen.uvirtual.modelo.conexion.ConexionUvirtual;
 import es.ujaen.uvirtual.utilidades.BolsaEmpleoDataTable;
 import es.ujaen.uvirtual.utilidades.UVException;
@@ -323,6 +324,31 @@ public class ModeloBaremacion {
 		return apartados;
 	}
 
+	/**
+	 * Devuelve los apartados de bareamación activos.
+	 * @return .
+	 * @throws UVException .
+	 * @throws SQLException .
+	 */
+	public List<ApartadoBaremacion> listaApartadoBaremacion() throws SQLException, UVException {
+		return listaApartadoBaremacion(" WHERE FLGACTIVO = 'S' ORDER BY nombre");
+	} 
+	
+	private List<ApartadoBaremacion> listaApartadoBaremacion(String clausula) throws SQLException, UVException {
+		List<ApartadoBaremacion> items = new ArrayList<>();
+		String consulta = "SELECT bepapa.* FROM TBEP_APARTADOSBAREMACION bepapa " + clausula;
+		
+		try (Connection conexion = ConexionUvirtual.obtenerInstancia();
+			PreparedStatement stmt = conexion.prepareStatement(consulta);) {
+				try (ResultSet rs = stmt.executeQuery()) {
+					while (rs.next()) {
+						items.add(this.createApartadoFromResultSet(rs));
+					}
+				}
+			}
+		return items;
+	}
+	
 	private ApartadoBaremacion createApartadoFromResultSet(ResultSet rs) throws SQLException {
 		ApartadoBaremacion apartado = new ApartadoBaremacion();
 		apartado.setCodNum(rs.getInt("CODNUM"));
@@ -627,6 +653,31 @@ public class ModeloBaremacion {
 		}
 	}
 	
+	/**
+	 * Devuelve los bloques de bareamación activos.
+	 * @return .
+	 * @throws UVException .
+	 * @throws SQLException .
+	 */
+	public List<BloqueBaremacion> listaBloqueBaremacion() throws SQLException, UVException {
+		return listaBloqueBaremacion(" WHERE FLGACTIVO = 'S' ORDER BY nombre");
+	} 
+	
+	private List<BloqueBaremacion> listaBloqueBaremacion(String clausula) throws SQLException, UVException {
+		List<BloqueBaremacion> items = new ArrayList<>();
+		String consulta = "SELECT bepblo.* FROM TBEP_BLOQUESBAREMACION bepblo " + clausula;
+		
+		try (Connection conexion = ConexionUvirtual.obtenerInstancia();
+			PreparedStatement stmt = conexion.prepareStatement(consulta);) {
+				try (ResultSet rs = stmt.executeQuery()) {
+					while (rs.next()) {
+						items.add(this.createBloqueFromResultSet(rs));
+					}
+				}
+			}
+		return items;
+	}
+	
 	private BloqueBaremacion createBloqueFromResultSet(ResultSet rs) throws SQLException, UVException {
 		BloqueBaremacion obj = new BloqueBaremacion();
 		obj.setCodNum(rs.getInt("CODNUM"));
@@ -900,6 +951,31 @@ public class ModeloBaremacion {
 		return items;
 	}
 
+	/**
+	 * Devuelve los items de bareamación activos.
+	 * @return .
+	 * @throws UVException .
+	 * @throws SQLException .
+	 */
+	public List<ItemBaremacion> listaItemBaremacion() throws SQLException, UVException {
+		return listaItemBaremacion(" WHERE FLGACTIVO = 'S' ORDER BY nombre");
+	} 
+	
+	private List<ItemBaremacion> listaItemBaremacion(String clausula) throws SQLException, UVException {
+		List<ItemBaremacion> items = new ArrayList<>();
+		String consulta = "SELECT bepite.* FROM TBEP_ITEMSBAREMACION bepite " + clausula;
+		
+		try (Connection conexion = ConexionUvirtual.obtenerInstancia();
+			PreparedStatement stmt = conexion.prepareStatement(consulta);) {
+				try (ResultSet rs = stmt.executeQuery()) {
+					while (rs.next()) {
+						items.add(this.createItemFromResultSet(rs));
+					}
+				}
+			}
+		return items;
+	}
+	
 	private ItemBaremacion createItemFromResultSet(ResultSet rs) throws SQLException, UVException {
 		ItemBaremacion item = new ItemBaremacion();
 		item.setCodNum(rs.getInt("CODNUM"));
