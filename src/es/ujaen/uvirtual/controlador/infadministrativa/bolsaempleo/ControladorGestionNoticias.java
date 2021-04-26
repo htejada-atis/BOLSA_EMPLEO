@@ -65,6 +65,7 @@ public class ControladorGestionNoticias extends HttpServlet {
 	// Mensajes
 	public static final String MENSAJE_ENVIADO = "mensaje";
 	
+	public static final String MENSAJE_ERROR_FECHA_REQUERIDA = "La fecha es requerida";
 	public static final String MENSAJE_ERROR_TEXTO_VACIO = "El texto no puede estar vacio";
 	
 	public static final String MENSAJE_ERROR_TEXTO_LARGO = "El texto no puede contener mas de %d caracteres";
@@ -295,6 +296,9 @@ public class ControladorGestionNoticias extends HttpServlet {
 		validator.addParamString(PARAM_ENLACE);
 		validator.addRule(PARAM_ENLACE, "max:" + ModeloUsuarioBolsaEmpleo.COLUMN_NOTICIA_ENLACE_MAXLENGTH, 
 				String.format(MENSAJE_ERROR_ENLACE_LARGO, ModeloUsuarioBolsaEmpleo.COLUMN_NOTICIA_ENLACE_MAXLENGTH));
+		
+		validator.addParamDate(PARAM_FECHA);
+		validator.addRule(PARAM_FECHA, "required", MENSAJE_ERROR_FECHA_REQUERIDA);
 		
 		return validator;
 	}

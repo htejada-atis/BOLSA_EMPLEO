@@ -78,7 +78,10 @@ VistaNoticias bean = (VistaNoticias) uvdatos.getVistas().get(VistaNoticias.class
 		    	{'data': 'texto', 'filter': true, 'render': function(row) {
 		    		return "<div class='overflow-auto'>" +row.texto +"</div>";
 		    	}},
-		        {'data': 'enlace', 'order': {'active': false}, 'class': 'overflow-ellipsis', 'render': function(row) { return "<a href='" +row.enlace +"' target='_blank'>" +row.enlace +"</a>"; }},
+		        {'data': 'enlace', 'order': {'active': false}, 'class': 'overflow-ellipsis', 'render': function(row) {
+		        		return row.enlace ? "<a href='" +row.enlace +"' target='_blank'>" +row.enlace +"</a>" : "";
+		        	}
+		        },
 		        {'data': 'publica', 'order': {'active': false}, 'filter': {'type': 'selectBoolean', 'true': 'Pública', 'false': 'Privada'}, 'render': function(row) {
 	        		if(row.publica){
 	        			return "<div title='Pública' class='circle-true'></div>";
