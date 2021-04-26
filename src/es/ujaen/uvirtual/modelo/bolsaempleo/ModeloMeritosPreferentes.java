@@ -1,0 +1,221 @@
+package es.ujaen.uvirtual.modelo.bolsaempleo;
+
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Types;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+import es.ujaen.uvirtual.beans.uvirtual.bolsaempleo.MeritoPreferente;
+import es.ujaen.uvirtual.modelo.conexion.ConexionUvirtual;
+import es.ujaen.uvirtual.utilidades.BolsaEmpleoDataTable;
+import es.ujaen.uvirtual.utilidades.UVException;
+
+/**
+ * Clase de modelo para la gestión de méritos preferentes.
+ * 
+ * @author ATISoluciones 2021 
+ */
+public class ModeloMeritosPreferentes {
+	// ordenación 
+	public static final int ORDER_COLUMN_INDEX_CODIGO = 0;
+	public static final int ORDER_COLUMN_INDEX_APARTADOS_NOMBRE = 1;
+	public static final int ORDER_COLUMN_INDEX_APARTADOS_PUNTUACIONMAXIMA = 2;
+	public static final int ORDER_COLUMN_INDEX_APARTADOS_PORCENTAJEMAXIMO = 3;
+	public static final int ORDER_COLUMN_INDEX_APARTADOS_MERITOSPREFERENTES = 4;
+	public static final int ORDER_COLUMN_INDEX_APARTADOS_ACTIVO = 5;
+	
+	public static final int MAX_LENGTH_COLUMN_DESCRIPCION = 1000;
+	public static final int MAX_LENGTH_COLUMN_FACTOR = 20;
+	
+	// tipo de meritos preferentes
+	public static final String TIPO_TITULACION_PREFERENTE = "TITULACION_PREFERENTE";
+	public static final String TIPO_MERITO = "MERITO";
+	
+	// tipos de aplicable
+	public static final String APLICABLE_BLOQUE = "BLOQUE";
+	public static final String APLICABLE_APARTADO = "APARTADO";
+	public static final String APLICABLE_ITEM = "ITEM"; 
+	
+	public static final String ERROR_MERITO_NOEXITE = "El mérito no existe";
+		
+    protected static ModeloMeritosPreferentes eInstancia = null;
+	
+	/** Crea una instancia del objeto.
+	 *  de forma sincronizada para protegerse de posibles problemas multi-hilo
+	 */
+	private static synchronized void crearInstancia() {
+		if (eInstancia == null) {
+			eInstancia = new ModeloMeritosPreferentes();
+		}
+	}
+
+    /**
+     * Obtiene una instancia de la conexión.
+     * @return instancia
+     */
+    public static ModeloMeritosPreferentes obtenerInstancia() {
+        if (eInstancia == null) {
+        	crearInstancia();
+        }
+        return eInstancia;
+    }
+		
+    /**
+	 * Devuelve un mérito preferente por su id.
+	 * @param codNum .
+	 * @return merito o excepción si no existe
+	 * @throws SQLException en caso de error en la BD
+	 * @throws UVException .
+	 */
+	public MeritoPreferente getMeritoPreferenteById(Integer codNum) throws SQLException, UVException {
+		String sql = "SELECT bepmep.* FROM TBEP_MERITOSPREFERENTES bepmep WHERE bepmep.CODNUM = ?";
+		
+		try (Connection con = ConexionUvirtual.obtenerInstancia(); PreparedStatement stmt = con.prepareStatement(sql);) {
+			int parameterIndex = 1;
+			stmt.setInt(parameterIndex++, codNum);
+			
+			try (ResultSet rs = stmt.executeQuery()) {
+				while (rs.next()) {
+					return this.createApartadoFromResultSet(rs);					
+				}
+			}
+		}
+		
+		throw new UVException(ERROR_MERITO_NOEXITE);		
+	}
+    
+	/**
+	 * Listado. 
+	 * @param params .
+	 * @return . 
+	 * @throws SQLException .
+	 * @throws UVException .
+	 */
+	public BolsaEmpleoDataTable<MeritoPreferente> listadoMeritosPreferentes(Map<String, String[]> params) throws SQLException, UVException {
+		List<MeritoPreferente> apartados = new ArrayList<>();
+		BolsaEmpleoDataTable<MeritoPreferente> dataTable = new BolsaEmpleoDataTable<MeritoPreferente>(params);
+		
+		String consulta =
+			"SELECT bepmep.* "
+		  + "FROM TBEP_MERITOSPREFERENTES bepmep "		  
+		  + "WHERE 1=1 ";
+		
+		dataTable.setColumn(ORDER_COLUMN_INDEX_CODIGO, "bepmep.CODIGO");
+//		dataTable.setColumn(ORDER_COLUMN_INDEX_APARTADOS_NOMBRE, "bepapa.NOMBRE");
+//		dataTable.setColumn(ORDER_COLUMN_INDEX_APARTADOS_PUNTUACIONMAXIMA, "bepapa.PUNTUACIONMAXIMA");
+//		dataTable.setColumn(ORDER_COLUMN_INDEX_APARTADOS_PORCENTAJEMAXIMO, "bepapa.PORCENTAJEMAXIMO");
+//		dataTable.setColumn(ORDER_COLUMN_INDEX_APARTADOS_MERITOSPREFERENTES, "bepapa.MERITOS_PREFERENTES", DataTableColumn.COLUMN_TYPE_BOOLEAN);
+//		dataTable.setColumn(ORDER_COLUMN_INDEX_APARTADOS_ACTIVO, "bepapa.FLGACTIVO", DataTableColumn.COLUMN_TYPE_BOOLEAN);
+		
+		dataTable.setQuery(consulta);
+				
+		try (Connection conexion = ConexionUvirtual.obtenerInstancia();
+				PreparedStatement stmtCount = conexion.prepareStatement(dataTable.getQueryCount());
+				PreparedStatement stmt = conexion.prepareStatement(dataTable.getQuery());
+		) {
+			dataTable.setFiltersParams(stmt, stmtCount, 1);
+			try (ResultSet rs = stmt.executeQuery()) {
+				while (rs.next()) {
+					MeritoPreferente row = this.createApartadoFromResultSet(rs);
+					apartados.add(row);					
+				}				
+			}	
+			
+			dataTable.setRecordsTotalFromQuery(stmtCount);
+			dataTable.setData(apartados);
+		}
+		
+		return dataTable;
+	}
+
+	/**
+	 * Inserta un merito en la db.
+	 * @param merito .
+	 * @throws SQLException .
+	 * @throws UVException .
+	 */
+	public void crearMeritoPreferente(MeritoPreferente merito) throws UVException, SQLException {
+		this.validateMeritoPreferente(merito);
+						
+		String sql = "INSERT INTO TBEP_MERITOSPREFERENTES ("
+				+ "DESCRIPCION,TIPO,APLICABLE,FACTOR,VALOR_MAXIMO,"
+				+ "BEPITE_TIPO_CODNUM,BEPBLO_APLICABLE_CODNUM,BEPAPA_APLICABLE_CODNUM,BEPITE_APLICABLE_CODNUM) "
+				+ "VALUES (?,?,?,?,?,?,?,?,?)";
+		
+		try (Connection conexion = ConexionUvirtual.obtenerInstancia(); PreparedStatement stmt = conexion.prepareStatement(sql);) {
+			int parameterIndex = 1;
+			stmt.setString(parameterIndex++, merito.getDescripcion());
+			stmt.setString(parameterIndex++, merito.getTipo());
+			stmt.setString(parameterIndex++, merito.getAplicable());
+			stmt.setString(parameterIndex++, merito.getFactor());
+						
+			if (merito.getValorMaximo() != null) {
+				stmt.setFloat(parameterIndex++, merito.getValorMaximo());
+			} else {
+				stmt.setNull(parameterIndex++, Types.NULL);
+			}
+			
+			if (merito.getTipoItemBaremacion() != null) {
+				stmt.setInt(parameterIndex++, merito.getTipoItemBaremacion().getCodNum());				
+			} else {
+				stmt.setNull(parameterIndex++, Types.NULL);
+			}
+			
+			if (merito.getAplicableBloqueBaremacion() != null) {
+				stmt.setInt(parameterIndex++, merito.getAplicableBloqueBaremacion().getCodNum());				
+			} else {
+				stmt.setNull(parameterIndex++, Types.NULL);
+			}
+			if (merito.getAplicableApartadoBaremacion() != null) {
+				stmt.setInt(parameterIndex++, merito.getAplicableApartadoBaremacion().getCodNum());				
+			} else {
+				stmt.setNull(parameterIndex++, Types.NULL);
+			}
+			if (merito.getAplicableItemBaremacion() != null) {
+				stmt.setInt(parameterIndex++, merito.getAplicableItemBaremacion().getCodNum());				
+			} else {
+				stmt.setNull(parameterIndex++, Types.NULL);
+			}
+						
+			stmt.executeUpdate();
+		}
+	} 
+	
+	private void validateMeritoPreferente(MeritoPreferente merito) throws UVException {
+		if (merito.getDescripcion().isBlank()) {
+			throw new UVException("La descripción es requerida");
+		}
+		if (merito.getDescripcion().length() > MAX_LENGTH_COLUMN_DESCRIPCION) {
+			throw new UVException("La descripción debe ser como máximo " + MAX_LENGTH_COLUMN_DESCRIPCION);
+		}		
+		
+		if (merito.getFactor().isBlank()) {
+			throw new UVException("El factor es requerido");
+		} 
+		if (merito.getFactor().length() > MAX_LENGTH_COLUMN_FACTOR) { 
+			throw new UVException("El factor debe ser como máximo " + MAX_LENGTH_COLUMN_FACTOR);
+		}
+	}
+	
+	private MeritoPreferente createApartadoFromResultSet(ResultSet rs) throws SQLException, UVException {
+		MeritoPreferente obj = new MeritoPreferente();
+		obj.setCodNum(rs.getInt("CODNUM"));
+		obj.setDescripcion(rs.getString("DESCRIPCION"));
+		obj.setTipo(rs.getString("TIPO"));		
+		obj.setAplicable(rs.getString("APLICABLE"));
+		obj.setFactor(rs.getString("FACTOR"));
+		obj.setValorMaximo(rs.getFloat("VALOR_MAXIMO") == 0 ? null : rs.getFloat("VALOR_MAXIMO"));
+		obj.setTipoItemBaremacion(rs.getInt("BEPITE_TIPO_CODNUM") == 0 ? null 
+			: ModeloBaremacion.obtenerInstancia().getItemBaremacionById(rs.getInt("BEPITE_TIPO_CODNUM")));
+		obj.setAplicableApartadoBaremacion(rs.getInt("BEPAPA_APLICABLE_CODNUM") == 0 ? null 
+			: ModeloBaremacion.obtenerInstancia().getApartadoBaremacionById(rs.getInt("BEPAPA_APLICABLE_CODNUM")));
+		obj.setAplicableBloqueBaremacion(rs.getInt("BEPBLO_APLICABLE_CODNUM") == 0 ? null 
+			: ModeloBaremacion.obtenerInstancia().getBloqueBaremacionById(rs.getInt("BEPBLO_APLICABLE_CODNUM")));
+		obj.setAplicableItemBaremacion(rs.getInt("BEPITE_APLICABLE_CODNUM") == 0 ? null 
+			: ModeloBaremacion.obtenerInstancia().getItemBaremacionById(rs.getInt("BEPITE_APLICABLE_CODNUM")));
+		return obj;
+	}		
+}
