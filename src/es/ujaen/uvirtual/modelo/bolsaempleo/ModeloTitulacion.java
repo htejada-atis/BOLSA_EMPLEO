@@ -31,6 +31,7 @@ public class ModeloTitulacion {
 	public static final int COLUMN_NOMBRE_MAXLENGTH = 50;
 	
 	public static final String ERROR_TITULACION_NOEXITE = "No existe la titulación";
+	public static final String ERROR_TITULACION_REQUERIDA = "La titulación es requerida";
 	
     protected static ModeloTitulacion eInstancia = null;
     	
@@ -414,6 +415,10 @@ public class ModeloTitulacion {
 	 * @throws SQLException .
 	 */
 	public Titulacion getTitulacionById(Integer codNum) throws SQLException, UVException {
+		if (codNum == null) {
+			throw new UVException(ERROR_TITULACION_REQUERIDA);
+		} 
+		
 		String consulta = "SELECT beptit.* FROM TBEP_TITULACIONES beptit WHERE beptit.CODNUM = ?";
 		
 		try (Connection con = ConexionUvirtual.obtenerInstancia(); PreparedStatement stmt = con.prepareStatement(consulta);) {
@@ -424,7 +429,9 @@ public class ModeloTitulacion {
 				while (rs.next()) {
 					Titulacion t = new Titulacion();
 					t.setCodNum(rs.getInt("CODNUM"));
-					t.setNombre(rs.getString("NOMBRE"));					
+					t.setNombre(rs.getString("NOMBRE"));
+					
+					return t;
 				}
 			}
 		}

@@ -11,7 +11,6 @@ import java.util.Map;
 import es.ujaen.uvirtual.beans.uvirtual.bolsaempleo.ApartadoBaremacion;
 import es.ujaen.uvirtual.beans.uvirtual.bolsaempleo.BloqueBaremacion;
 import es.ujaen.uvirtual.beans.uvirtual.bolsaempleo.ItemBaremacion;
-import es.ujaen.uvirtual.beans.uvirtual.bolsaempleo.Titulacion;
 import es.ujaen.uvirtual.modelo.conexion.ConexionUvirtual;
 import es.ujaen.uvirtual.utilidades.BolsaEmpleoDataTable;
 import es.ujaen.uvirtual.utilidades.UVException;
@@ -108,6 +107,10 @@ public class ModeloBaremacion {
 	 * @throws UVException si apartado no es existe
 	 */
 	public ApartadoBaremacion getApartadoBaremacionById(Integer codNum) throws SQLException, UVException {
+		if (codNum == null) {
+			throw new UVException("El bloque es requerido");	
+		}
+			
 		String sql = "SELECT bepapa.* FROM TBEP_APARTADOSBAREMACION bepapa WHERE bepapa.CODNUM = ?";
 		
 		try (Connection con = ConexionUvirtual.obtenerInstancia(); PreparedStatement stmt = con.prepareStatement(sql);) {
@@ -488,6 +491,10 @@ public class ModeloBaremacion {
 	 * @throws UVException si bloque no es existe
 	 */
 	public BloqueBaremacion getBloqueBaremacionById(Integer codNum) throws SQLException, UVException {
+		if (codNum == null) {
+			throw new UVException("El bloque de baremación es requerido");
+		}
+		
 		String sql = "SELECT bepblo.* FROM TBEP_BLOQUESBAREMACION bepblo WHERE bepblo.CODNUM = ?";
 		
 		try (Connection con = ConexionUvirtual.obtenerInstancia(); PreparedStatement stmt = con.prepareStatement(sql);) {

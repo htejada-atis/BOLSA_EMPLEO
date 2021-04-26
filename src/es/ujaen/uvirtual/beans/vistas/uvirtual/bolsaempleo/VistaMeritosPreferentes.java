@@ -19,7 +19,6 @@ public class VistaMeritosPreferentes extends Vista implements Serializable {
     private String vista;
     private BolsaEmpleoDataTable<MeritoPreferente> dataTable;
     private MeritoPreferente merito;
-    private List<Titulacion> titulaciones;
     private List<ItemBaremacion> itemsBaremacion;
     private List<ApartadoBaremacion> apartadoBaremacion;
     private List<BloqueBaremacion> bloqueBaremacion;
@@ -39,15 +38,7 @@ public class VistaMeritosPreferentes extends Vista implements Serializable {
     public void setMeritoPreferente(MeritoPreferente pmerito) {
     	this.merito = pmerito;
     }
-    
-    public List<Titulacion> getTitulaciones() {
-    	return this.titulaciones;
-    }
-    
-    public void setTitulaciones(List<Titulacion> titulaciones) {
-    	this.titulaciones = titulaciones;
-    }
-    
+        
     public List<ItemBaremacion> getItemsBaremacion() {
     	return this.itemsBaremacion;
     }

@@ -14,11 +14,8 @@ public class MeritoPreferente implements Serializable {
 	private String tipo;
 	private String aplicable;
 	private String factor;
-	private Float valorMaximo;
-	
-	private Titulacion tipoTitulacion;
-	private ItemBaremacion tipoItemBaremacion;
-	
+	private Float valorMaximo;	
+	private ItemBaremacion tipoItemBaremacion;	
 	private BloqueBaremacion aplicableBloqueBaremacion;
 	private ApartadoBaremacion aplicableApartadoBaremacion;
 	private ItemBaremacion aplicableItemBareamcion;
@@ -36,15 +33,14 @@ public class MeritoPreferente implements Serializable {
 	 * @param paplicable .
 	 * @param pfactor .
 	 * @param pvalorMaximo .	 
-	 * @param ptipoTitulacion .
 	 * @param ptipoItemBaremacion .
 	 * @param paplicableBloqueBaremacion .
 	 * @param paplicableApartadoBaremacion .
 	 * @param paplicableItemBareamcion .
 	 */
 	public MeritoPreferente(Integer pcodNum, String pdescripcion, String ptipo, String paplicable, String pfactor, Float pvalorMaximo, 
-			Titulacion ptipoTitulacion, ItemBaremacion ptipoItemBaremacion, BloqueBaremacion paplicableBloqueBaremacion,
-			ApartadoBaremacion paplicableApartadoBaremacion, ItemBaremacion paplicableItemBareamcion) {
+			ItemBaremacion ptipoItemBaremacion, BloqueBaremacion paplicableBloqueBaremacion, ApartadoBaremacion paplicableApartadoBaremacion, 
+			ItemBaremacion paplicableItemBareamcion) {
 		super();
 		this.codNum = pcodNum;
 		this.descripcion = pdescripcion;
@@ -52,7 +48,6 @@ public class MeritoPreferente implements Serializable {
 		this.aplicable = paplicable;
 		this.factor = pfactor;
 		this.valorMaximo = pvalorMaximo;
-		this.tipoTitulacion = ptipoTitulacion;
 		this.tipoItemBaremacion = ptipoItemBaremacion;
 		this.aplicableBloqueBaremacion = paplicableBloqueBaremacion;
 		this.aplicableApartadoBaremacion = paplicableApartadoBaremacion;
@@ -69,7 +64,6 @@ public class MeritoPreferente implements Serializable {
 		this.aplicable = copia.aplicable;
 		this.factor = copia.factor;
 		this.valorMaximo = copia.valorMaximo;		
-		this.tipoTitulacion = copia.tipoTitulacion;
 		this.tipoItemBaremacion = copia.tipoItemBaremacion;
 		this.aplicableBloqueBaremacion = copia.aplicableBloqueBaremacion;
 		this.aplicableApartadoBaremacion = copia.aplicableApartadoBaremacion;
@@ -123,15 +117,7 @@ public class MeritoPreferente implements Serializable {
 	public void setValorMaximo(Float valorMaximo) {
 		this.valorMaximo = valorMaximo;
 	}
-	
-	public Titulacion getTipoTitulacion() {
-		return this.tipoTitulacion;
-	}
-
-	public void setTipoTitulacion(Titulacion titulacion) {
-		this.tipoTitulacion = titulacion;
-	}
-	
+		
 	public ItemBaremacion getTipoItemBaremacion() {
 		return this.tipoItemBaremacion;
 	}
@@ -171,9 +157,9 @@ public class MeritoPreferente implements Serializable {
 	@Override
 	public String toString() {		
 		return "ApartadoBaremacion [codNum=" + codNum + ", descripcion=" + descripcion + ", tipo=" + tipo
-				+ ", aplicable=" + aplicable + ", factor=" + factor + ", valorMaximo=" + valorMaximo + ", tipoTitulacion=" 
-				+ tipoTitulacion + ", tipoItemBaremacion=" + tipoItemBaremacion + ", aplicableBloqueBaremacion" + aplicableBloqueBaremacion 
-				+ ", aplicableApartadoBaremacion=" + aplicableApartadoBaremacion + ", aplicableItemBareamcion=" + aplicableItemBareamcion + "]";
+				+ ", aplicable=" + aplicable + ", factor=" + factor + ", valorMaximo=" + valorMaximo + ", tipoItemBaremacion=" + tipoItemBaremacion 
+				+ ", aplicableBloqueBaremacion" + aplicableBloqueBaremacion + ", aplicableApartadoBaremacion=" + aplicableApartadoBaremacion 
+				+ ", aplicableItemBareamcion=" + aplicableItemBareamcion + "]";
 	}
 	
 	@Override
@@ -186,7 +172,6 @@ public class MeritoPreferente implements Serializable {
 		result = prime * result + ((aplicable == null) ? 0 : aplicable.hashCode());
 		result = prime * result + ((factor == null) ? 0 : factor.hashCode());
 		result = prime * result + ((valorMaximo == null) ? 0 : valorMaximo.hashCode());		
-		result = prime * result + ((tipoTitulacion == null) ? 0 : tipoTitulacion.hashCode());
 		result = prime * result + ((tipoItemBaremacion == null) ? 0 : tipoItemBaremacion.hashCode());
 		result = prime * result + ((aplicableBloqueBaremacion == null) ? 0 : aplicableBloqueBaremacion.hashCode());
 		result = prime * result + ((aplicableApartadoBaremacion == null) ? 0 : aplicableApartadoBaremacion.hashCode());
@@ -247,13 +232,6 @@ public class MeritoPreferente implements Serializable {
 				return false;
 			}
 		} else if (!valorMaximo.equals(other.valorMaximo)) {
-			return false;
-		}
-		if (tipoTitulacion == null) {
-			if (other.tipoTitulacion != null) {
-				return false;
-			}
-		} else if (!tipoTitulacion.equals(other.tipoTitulacion)) {
 			return false;
 		}
 		if (tipoItemBaremacion == null) {

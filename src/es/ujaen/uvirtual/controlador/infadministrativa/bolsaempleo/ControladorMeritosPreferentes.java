@@ -19,9 +19,7 @@ import es.ujaen.uvirtual.beans.uvirtual.bolsaempleo.MeritoPreferente;
 import es.ujaen.uvirtual.beans.vistas.uvirtual.bolsaempleo.VistaMeritosPreferentes;
 import es.ujaen.uvirtual.modelo.bolsaempleo.ModeloBaremacion;
 import es.ujaen.uvirtual.modelo.bolsaempleo.ModeloMeritosPreferentes;
-import es.ujaen.uvirtual.modelo.bolsaempleo.ModeloTitulacion;
 import es.ujaen.uvirtual.utilidades.BolsaEmpleoDataTable;
-import es.ujaen.uvirtual.utilidades.BolsaEmpleoValidator;
 import es.ujaen.uvirtual.modelo.bolsaempleo.ModeloUsuarioBolsaEmpleo;
 import es.ujaen.uvirtual.utilidades.EscapaHTML;
 import es.ujaen.uvirtual.utilidades.Formateador;
@@ -171,7 +169,6 @@ public class ControladorMeritosPreferentes extends HttpServlet {
 	
 	private void nuevoMerito(VistaMeritosPreferentes bean, UVDatos datos, HttpServletRequest request, HttpServletResponse response) throws SQLException, UVException {
 		bean.setMeritoPreferente(null);
-		bean.setTitulaciones(ModeloTitulacion.obtenerInstancia().listaTitulaciones());
 		bean.setItemsBaremacion(ModeloBaremacion.obtenerInstancia().listaItemBaremacion());
 		bean.setBloqueBaremacion(ModeloBaremacion.obtenerInstancia().listaBloqueBaremacion());
 		bean.setApartadoBaremacion(ModeloBaremacion.obtenerInstancia().listaApartadoBaremacion());
@@ -180,48 +177,51 @@ public class ControladorMeritosPreferentes extends HttpServlet {
 	
 	private void nuevoMeritoConfirm(VistaMeritosPreferentes bean, UVDatos datos, HttpServletRequest request, HttpServletResponse response) throws SQLException, UVException {
 		bean.setMeritoPreferente(null);
-		bean.setTitulaciones(ModeloTitulacion.obtenerInstancia().listaTitulaciones());
 		bean.setItemsBaremacion(ModeloBaremacion.obtenerInstancia().listaItemBaremacion());
 		bean.setBloqueBaremacion(ModeloBaremacion.obtenerInstancia().listaBloqueBaremacion());
 		bean.setApartadoBaremacion(ModeloBaremacion.obtenerInstancia().listaApartadoBaremacion());
 		bean.setVista(RUTA_BEP_CONF + "formMeritosPreferentes.jsp");
 		
-		BolsaEmpleoValidator validator = this.getValidator(request);		
-		if (!validator.isValid()) {
-			for (String param : validator.getErrors().keySet()) {
-				for (String paramError : validator.getErrors().get(param)) {
-					bean.getMensajesDeError().add(paramError);
-				}
-			}
-			return;
-		}
+		ModeloMeritosPreferentes.obtenerInstancia().crearMeritoPreferente(this.validate(request));
+		bean.getMensajesDeExito().add("Mérito preferente añadido correctamente");
+		bean.setVista(RUTA_BEP_CONF + "indexMeritosPreferentes.jsp");
 	}
 	
-	private BolsaEmpleoValidator getValidator(HttpServletRequest request) throws UVException {
-		BolsaEmpleoValidator validator = new BolsaEmpleoValidator(request);
-		validator.addParamString(PARAM_MERITO_DESCRIPCION);
-		validator.addRule(PARAM_MERITO_DESCRIPCION, "required", "Introduce la descripción");
-		validator.addRule(PARAM_MERITO_DESCRIPCION, "noBlank", "Introduce la descripción");
+	private MeritoPreferente validate(HttpServletRequest request) throws UVException, SQLException {
+		MeritoPreferente merito = new MeritoPreferente();
+		merito.setDescripcion(EscapaHTML.ajustaCodificacion(request.getParameter(PARAM_MERITO_DESCRIPCION)));
+		if (merito.getDescripcion().isBlank()) {
+			throw new UVException("La descripción del mérito es requerida");
+		}
 		
-		validator.addParamString(PARAM_MERITO_TIPO);
-		validator.addRule(PARAM_MERITO_TIPO, "required", "Introduce el tipo de mérito");
-		validator.addRule(PARAM_MERITO_TIPO, "noBlank", "Introduce la descripción");
-		validator.addParamString(PARAM_MERITO_TIPO_TITULACION);
-		validator.addParamString(PARAM_MERITO_TIPO_ITEMBAREMACION);
+		merito.setTipo(EscapaHTML.ajustaCodificacion(request.getParameter(PARAM_MERITO_TIPO)));		
+		if (merito.getTipo().equals(ModeloMeritosPreferentes.TIPO_MERITO)) {
+			merito.setTipoItemBaremacion(ModeloBaremacion.obtenerInstancia().getItemBaremacionById(
+					Formateador.leeParametroInteger(request.getParameter(PARAM_MERITO_TIPO_ITEMBAREMACION))));
+		} else if (!merito.getTipo().equals(ModeloMeritosPreferentes.TIPO_TITULACION_PREFERENTE)) {
+			throw new UVException("Introduce un tipo de mérito");
+		}
 		
-		validator.addParamString(PARAM_MERITO_APLICABLE);
-		validator.addRule(PARAM_MERITO_APLICABLE, "required", "Introduce el campo aplicable");
-		validator.addRule(PARAM_MERITO_APLICABLE, "noBlank", "Introduce el campo aplicable");
-		validator.addParamString(PARAM_MERITO_APLICABLE_BLOQUE);
-		validator.addParamString(PARAM_MERITO_APLICABLE_APARTADO);
-		validator.addParamString(PARAM_MERITO_APLICABLE_ITEM);
-		
-		validator.addParamString(PARAM_MERITO_FACTOR);
-		validator.addRule(PARAM_MERITO_FACTOR, "required", "Introduce factor");
-		validator.addRule(PARAM_MERITO_FACTOR, "noBlank", "Introduce factor");
+		merito.setAplicable(EscapaHTML.ajustaCodificacion(request.getParameter(PARAM_MERITO_APLICABLE)));
+		if (merito.getAplicable().equals(ModeloMeritosPreferentes.APLICABLE_BLOQUE)) {
+			merito.setAplicableBloqueBaremacion(ModeloBaremacion.obtenerInstancia().getBloqueBaremacionById(
+					Formateador.leeParametroInteger(request.getParameter(PARAM_MERITO_APLICABLE_BLOQUE))));	
+		} else if (merito.getAplicable().equals(ModeloMeritosPreferentes.APLICABLE_APARTADO)) {
+			merito.setAplicableApartadoBaremacion(ModeloBaremacion.obtenerInstancia().getApartadoBaremacionById(
+					Formateador.leeParametroInteger(request.getParameter(PARAM_MERITO_APLICABLE_APARTADO))));
+		} else if (merito.getAplicable().equals(ModeloMeritosPreferentes.APLICABLE_ITEM)) {
+			merito.setAplicableItemBaremacion(ModeloBaremacion.obtenerInstancia().getItemBaremacionById(
+					Formateador.leeParametroInteger(request.getParameter(PARAM_MERITO_APLICABLE_ITEM))));
+		} else {
+			throw new UVException("Introduce el campo aplicable");
+		}
 				
-		validator.addParamFloat(PARAM_MERITO_VALORMAXIMO);
-				
-		return validator;
+		merito.setFactor(EscapaHTML.ajustaCodificacion(request.getParameter(PARAM_MERITO_FACTOR)));
+		if (merito.getFactor().isBlank()) {
+			throw new UVException("El factor es requerido");
+		}
+		merito.setValorMaximo(Formateador.leeParametroFloat(request.getParameter(PARAM_MERITO_VALORMAXIMO)));
+		
+		return merito;
 	}
 }
