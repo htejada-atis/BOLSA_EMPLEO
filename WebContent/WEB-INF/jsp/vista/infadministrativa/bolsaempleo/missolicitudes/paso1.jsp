@@ -6,6 +6,7 @@
 <%@ page import="es.ujaen.uvirtual.beans.vistas.uvirtual.bolsaempleo.VistaSolicitudes" %>
 <%@ page import="es.ujaen.uvirtual.beans.uvirtual.bolsaempleo.Solicitud" %>
 <%@ page import="es.ujaen.uvirtual.utilidades.EscapaHTML" %>
+<%@	page import="es.ujaen.uvirtual.beans.uvirtual.bolsaempleo.Bolsa" %>
 
 <%
 UVDatos uvdatos = (UVDatos) request.getAttribute(UVDatos.NOMBRE_ATRIBUTO);
@@ -28,6 +29,12 @@ VistaSolicitudes bean = (VistaSolicitudes) uvdatos.getVistas().get(VistaSolicitu
 	<h2>Paso 1: Selección de bolsas de empleo</h2>
 	<h3><%= bean.getSolicitud().getConvocatoria().getDescripcion() %></h3>
 	<p>Seleccione las bolsas donde desee participar, hasta un máximo de [<%=bean.getSolicitud().getConvocatoria().getNumBolsasMaximo()%>].</p>
+	
+	<div class="btn-align-right">
+		<a class="link-btn" id="gestion_meritos" href="/srv/es/informacionadministrativa/bolsaempleo/mismeritos">
+	    	 Ir a la gestión de méritos
+	    </a>
+	</div>
 	
 	<table class="bluetable bolsaempleo" id="tableAreas">
 		<tr>
@@ -60,6 +67,17 @@ VistaSolicitudes bean = (VistaSolicitudes) uvdatos.getVistas().get(VistaSolicitu
 <script>
 
 	$(document).ready(function() {
+		
+		var bolsasSolicitud = [];
+		
+		<%  if (bean.getListaBolsas() != null) {
+				for (Bolsa bolsa: bean.getListaBolsas()) { %>
+					bolsasSolicitud.push("<%=bolsa.getCodNum()%>");
+				<% }
+			} %>
+		
+		console.log(bolsasSolicitud);
+		
 		var tableAreas = new Atis.DataTable('#tableAreas', {
 			"ajax": { url: "<%= ControladorMisSolicitudes.URL_PATTERN_AJAX %>" },
 		    "pageSize": 10,
@@ -67,6 +85,7 @@ VistaSolicitudes bean = (VistaSolicitudes) uvdatos.getVistas().get(VistaSolicitu
 		    "filterable": true,
 		    "title": 'Lista de bolsas',
 		    "action": "<%=ControladorMisSolicitudes.ACCION_DATATABLE_AREAS%>",
+		    "selected": bolsasSolicitud,
 		    "columns": [
 		    	{'data': 'codNum', 'selectable': {'exclude': 'excluido'}},
 		    	{'data': 'area.idAreaExterno', 'filter': true},

@@ -324,7 +324,6 @@ public class BolsaEmpleoDataTable<T> {
 		String consultaResult = "";
 		for (Map.Entry<Integer, String> filter : filters.entrySet()) {
 	        Integer key = filter.getKey();
-	        System.out.println("key: " + key);
 			String column = this.columns.get(key).getName();
 			
 			if (column == null) {

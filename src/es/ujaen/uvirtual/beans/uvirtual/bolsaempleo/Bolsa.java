@@ -16,7 +16,6 @@ public class Bolsa implements Serializable {
 	private Date fechaActualizacion;
 	private Date fechaBloqueo;
 	private Date fechaDesBloqueo;
-	private Boolean excluido;
 	
 	/** Constructor por defecto.
 	 */
@@ -56,7 +55,6 @@ public class Bolsa implements Serializable {
 		this.fechaActualizacion = copia.fechaActualizacion;
 		this.fechaBloqueo = copia.fechaBloqueo;
 		this.fechaDesBloqueo = copia.fechaDesBloqueo;
-		this.excluido = copia.excluido;
 	}
 	
 	public Integer getCodNum() {
@@ -115,20 +113,11 @@ public class Bolsa implements Serializable {
 		this.fechaDesBloqueo = fechaDesBloqueo;
 	}
 	
-	public Boolean getExcluido() {
-		return excluido;
-	}
-	
-	public void setExcluido(Boolean excluido) {
-		this.excluido = excluido;
-	}
-	
 	@Override
 	public String toString() {
 		return "BolsaEmpleo [idBolsaEmpleo=" + codNum + ", area=" + area.getDescripcion()
 				+ ", estado=" + estado + ", baremable=" + baremable + ", fechaActualizacion=" + fechaActualizacion
-				+ ", fechaBloqueo=" + fechaBloqueo + ", fechaDesBloqueo=" + fechaDesBloqueo 
-				+ ", excluido=" + excluido + "]";
+				+ ", fechaBloqueo=" + fechaBloqueo + ", fechaDesBloqueo=" + fechaDesBloqueo + "]";
 	}
 	
 	@Override
@@ -142,7 +131,6 @@ public class Bolsa implements Serializable {
 		result = prime * result + ((fechaActualizacion == null) ? 0 : fechaActualizacion.hashCode());
 		result = prime * result + ((fechaBloqueo == null) ? 0 : fechaBloqueo.hashCode());
 		result = prime * result + ((fechaDesBloqueo == null) ? 0 : fechaDesBloqueo.hashCode());
-		result = prime * result + ((excluido == null) ? 0 : excluido.hashCode());
 		return result;
 	}
 
@@ -207,13 +195,6 @@ public class Bolsa implements Serializable {
 				return false;
 			}
 		} else if (!fechaDesBloqueo.equals(other.fechaDesBloqueo)) {
-			return false;
-		}
-		if (excluido == null) {
-			if (other.excluido != null) {
-				return false;
-			}
-		} else if (!excluido.equals(other.excluido)) {
 			return false;
 		}
 		

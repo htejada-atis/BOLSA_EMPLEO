@@ -433,7 +433,12 @@ nav-bolsa-empleo a:active, nav-bolsa-empleo a:hover {
 	padding:0.5rem;
 }
 
-/* Botones por pasos */
+/* Botones */
+.btn-align-right {
+	display: flex;
+	flex-direction: row-reverse;
+}
+
 .btns-by-steps {
 	display: flex;
 	justify-content: space-between;

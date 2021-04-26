@@ -20,6 +20,7 @@ import es.ujaen.uvirtual.beans.CodigoDescripcion;
 import es.ujaen.uvirtual.beans.UVDatos;
 import es.ujaen.uvirtual.beans.Usuario;
 import es.ujaen.uvirtual.beans.uvirtual.bolsaempleo.Bolsa;
+import es.ujaen.uvirtual.beans.uvirtual.bolsaempleo.BolsaCandidato;
 import es.ujaen.uvirtual.beans.uvirtual.bolsaempleo.Convocatoria;
 import es.ujaen.uvirtual.beans.uvirtual.bolsaempleo.Solicitud;
 import es.ujaen.uvirtual.beans.uvirtual.bolsaempleo.UsuarioBolsaEmpleo;
@@ -191,7 +192,7 @@ public class ControladorMisSolicitudes extends HttpServlet {
 		Solicitud solicitud = modeloSolicitud.nuevaSolicitud(usuario, convocatoria);
 				
 		bean.setSolicitud(solicitud);
-		bean.setVista(RUTA_BEP_SOL + "paso1.jsp");					
+		listaBolsasCandidato(bean, solicitud);
 	}
 	
 	private void consultarSolicitud(VistaSolicitudes bean, UVDatos datos, HttpServletRequest request, HttpServletResponse response) throws UVException, SQLException {
@@ -207,7 +208,7 @@ public class ControladorMisSolicitudes extends HttpServlet {
 		}
 		
 		if (solicitud.getEstado().equals(ModeloSolicitud.SOLICITUD_ESTADO_ABIERTA)) {
-			bean.setVista(RUTA_BEP_SOL + "paso1.jsp");
+			listaBolsasCandidato(bean, solicitud);
 		} else {
 			bean.setVista(RUTA_BEP_SOL + "paso3.jsp");
 		}
@@ -259,7 +260,15 @@ public class ControladorMisSolicitudes extends HttpServlet {
 		bean.setVista(RUTA_BEP_SOL + "paso2.jsp");
 	}
 	
-	private void listadoAreas(VistaSolicitudes bean, UVDatos datos, HttpServletRequest request, HttpServletResponse response) throws IOException, SQLException{
+	private void listaBolsasCandidato(VistaSolicitudes bean, Solicitud solicitud) throws UVException, SQLException {
+		bean.setVista(RUTA_BEP_SOL + "paso1.jsp");
+		
+		ModeloSolicitud modelo = ModeloSolicitud.obtenerInstancia();
+		List<Bolsa> listaBolsas = modelo.getBolsasSolicitud(solicitud);
+		bean.setListaBolsas(listaBolsas);
+	}
+	
+	private void listadoAreas(VistaSolicitudes bean, UVDatos datos, HttpServletRequest request, HttpServletResponse response) throws IOException, SQLException {
 		ModeloArea modelo = ModeloArea.obtenerInstancia();
 		datos.setContentType("application/json");
 		datos.setRespuestaEnviada(true);
@@ -271,9 +280,9 @@ public class ControladorMisSolicitudes extends HttpServlet {
 				Usuario usuArcos = datos.getUsuario();
 				ModeloUsuarioBolsaEmpleo modeloUsuarioBolsaEmpleo = ModeloUsuarioBolsaEmpleo.obtenerInstancia();
 				Integer idUsuario = modeloUsuarioBolsaEmpleo.listaUsuario(usuArcos.getUid()).getCodNum();
-				BolsaEmpleoDataTable<Bolsa> dataTable = modelo.listaAreaSolicitudDatatable(request.getParameterMap(), idUsuario);
+				BolsaEmpleoDataTable<BolsaCandidato> dataTable = modelo.listaAreaSolicitudDatatable(request.getParameterMap(), idUsuario);
 				Gson gson = new GsonBuilder().setExclusionStrategies(BolsaEmpleoDataTable.GSONEXCLUSIONSTRATEGY).create();
-				bean.setDatatableAreas(dataTable);
+				bean.setDataTableBolsasCandidato(dataTable);
 				writer.write(gson.toJson(dataTable));
 			} catch (Exception ex) {
 				bean.getMensajesDeError().add(ex.getMessage());
