@@ -81,7 +81,7 @@ VistaTitulaciones bean = (VistaTitulaciones) uvdatos.getVistas().get(VistaTitula
 		    "filterable": true,
 		    "columns": [
 		    	{'data': 'codNum', 'filter': {'type': 'number'}},
-		        {'data': 'nombre', 'filter': true, 'class': 'overflow-auto'},
+		        {'data': 'nombre', 'filter': true, 'overflow': 'auto'},
 		        {'data': 'codnum', 'buttons': [{'label': 'Editar', 'title': 'Editar titulación', 'onClick': function(row) {
 		        	var params = {
 		    				'a': '<%=ControladorGestionTitulaciones.ACCION_EDITAR_TITULACION %>', 

@@ -25,6 +25,9 @@ public class ModeloMerito {
 	public static final int ORDER_COLUMN_INDEX_VALOR = 4;
 	public static final int ORDER_COLUMN_INDEX_OBSERVACION = 5;
 	
+	public static final int COLUMN_DESCRIPCION_MAXLENGTH = 200;
+	public static final int COLUMN_OBSERVACION_MAXLENGTH = 300;
+	
     protected static ModeloMerito eInstancia = null;
 	
 	/** Crea una instancia del objeto.

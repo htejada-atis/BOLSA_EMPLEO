@@ -32,6 +32,9 @@ public class ModeloNoticia {
 	public static final int ORDER_COLUMN_INDEX_FLGPUBLICA = 3;
 	public static final int ORDER_COLUMN_INDEX_FLGACTIVA = 4;
 	public static final int ORDER_COLUMN_INDEX_ID = 5;
+	
+	public static final int COLUMN_TEXTO_MAXLENGTH = 300;
+	public static final int COLUMN_ENLACE_MAXLENGTH = 200;
 
 	
     protected static ModeloNoticia eInstancia = null;

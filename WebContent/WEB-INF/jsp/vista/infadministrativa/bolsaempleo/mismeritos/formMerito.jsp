@@ -6,10 +6,17 @@
 <%@ page import="es.ujaen.uvirtual.beans.uvirtual.bolsaempleo.ItemBaremacion" %>
 <%@ page import="es.ujaen.uvirtual.utilidades.EscapaHTML" %>
 <%@ page import="es.ujaen.uvirtual.utilidades.Formateador"%>
+<%@ page import="es.ujaen.uvirtual.utilidades.BolsaEmpleoUtils" %>
 
 <% 
 UVDatos uvdatos = (UVDatos) request.getAttribute(UVDatos.NOMBRE_ATRIBUTO);
 VistaMeritos bean = (VistaMeritos) uvdatos.getVistas().get(VistaMeritos.class.getName());
+
+ApartadoBaremacion apartado = bean.getApartado();
+String item = BolsaEmpleoUtils.getParamForm(request, ControladorMisMeritos.PARAM_ITEM, "");
+String valor = BolsaEmpleoUtils.getParamForm(request, ControladorMisMeritos.PARAM_VALOR, "");
+String descripcion = BolsaEmpleoUtils.getParamForm(request, ControladorMisMeritos.PARAM_DESCRIPCION, "");
+String observacion = BolsaEmpleoUtils.getParamForm(request, ControladorMisMeritos.PARAM_OBSERVACION, "");
 %>
 
 
@@ -19,10 +26,11 @@ VistaMeritos bean = (VistaMeritos) uvdatos.getVistas().get(VistaMeritos.class.ge
 		if(bean.getMensajesDeError().size()>0) {
 			out.print("<div class='error'>" + bean.formatearMensajesDeError() + "</div>");
 		}
-	
 	%>
 	
 	<h2>Nuevo mérito</h2>
+	
+	<p>Las etiquetas en <b>negrita</b> corresponden a campos de relleno obligatorio</p>
     
     <form id="agregar_merito" class="be-form" method="post" action="<%= request.getRequestURI() %>" enctype="multipart/form-data">
     	<input type="hidden" name="<%= ControladorMisMeritos.PARAM_ACCION %>" id="accion_formulario" value="" />
@@ -32,12 +40,12 @@ VistaMeritos bean = (VistaMeritos) uvdatos.getVistas().get(VistaMeritos.class.ge
 				<select class="form-input-custom" id="select_apartado" name="<%= ControladorMisMeritos.PARAM_APARTADO %>">
 					<option value="0">Elija el apartado</option>
 					<%
-					for(ApartadoBaremacion apartado: bean.getApartados()) {
+					for(ApartadoBaremacion apar: bean.getApartados()) {
 					%>	
-						<% if (bean.getApartado() != null && bean.getApartado().equals(apartado)) { %>
-		    				<option value="<%=apartado.getCodNum()%>" selected><%=apartado.getCodigo()%> - <%=apartado.getNombre()%></option>
+						<% if (apartado != null && apartado.equals(apar)) { %>
+		    				<option value="<%=apar.getCodNum()%>" selected><%=apar.getCodigo()%> - <%=apar.getNombre()%></option>
 		    			<% } else { %>
-		    				<option value="<%=apartado.getCodNum()%>"><%=apartado.getCodigo()%> - <%=apartado.getNombre()%></option>
+		    				<option value="<%=apar.getCodNum()%>"><%=apar.getCodigo()%> - <%=apar.getNombre()%></option>
 		    			<% } %>
 		    		<%
 		    		}
@@ -45,15 +53,19 @@ VistaMeritos bean = (VistaMeritos) uvdatos.getVistas().get(VistaMeritos.class.ge
 				</select>
 			</div>
 		
-		<% if (bean.getApartado() != null) { %>
+		<% if (apartado != null) { %>
 			<div class="form-group">
 				<label>Ítem:</label>
 				<select class="form-input-custom" id="select_item" name="<%= ControladorMisMeritos.PARAM_ITEM %>">
 					<option value="0">Elija el ítem</option>
 					<%
-					for(ItemBaremacion item: bean.getItems()) {
+					for(ItemBaremacion it: bean.getItems()) {
 					%>
-		    			<option value="<%=item.getCodNum()%>" data-unidades="<%= item.getUnidades() %>"><%=item.getCodigo()%> - <%=item.getNombre()%></option>
+						<% if (item != null && !item.isEmpty() && it.getCodNum() == Integer.parseInt(item)) { %>
+		    				<option value="<%=it.getCodNum()%>" data-unidades="<%= it.getUnidades() %>" selected><%=it.getCodigo()%> - <%=it.getNombre()%></option>
+		    			<% } else { %>
+		    				<option value="<%=it.getCodNum()%>" data-unidades="<%= it.getUnidades() %>"><%=it.getCodigo()%> - <%=it.getNombre()%></option>
+		    			<% } %>
 		    		<%
 		    		}
 		    		%>
@@ -67,11 +79,11 @@ VistaMeritos bean = (VistaMeritos) uvdatos.getVistas().get(VistaMeritos.class.ge
 		<div class="form-group-container col2">
 	    	<div class="form-group">
 	    		<label for="merito_valor" id="merito_valor_label">Valor:</label>
-	    		<input class="form-input-custom" id="merito_valor" type="text" name="<%= ControladorMisMeritos.PARAM_VALOR %>"/>
+	    		<input class="form-input-custom" id="merito_valor" type="text" name="<%= ControladorMisMeritos.PARAM_VALOR %>" value="<%= valor %>"/>
 	    	</div>
 	    	<div class="form-group">
 	    		<label for="merito_descripcion">Descripción:</label>
-	    		<input class="form-input-custom" id="merito_descripcion" type="text" name="<%= ControladorMisMeritos.PARAM_DESCRIPCION %>"></input>
+	    		<input class="form-input-custom" id="merito_descripcion" type="text" name="<%= ControladorMisMeritos.PARAM_DESCRIPCION %>" value="<%= descripcion %>"></input>
 	    	</div>
     	</div>
     	<div class="form-file">
@@ -81,7 +93,9 @@ VistaMeritos bean = (VistaMeritos) uvdatos.getVistas().get(VistaMeritos.class.ge
     	<div class="form-group-container col1">
 	    	<div class="form-group">
 	    		<label for="merito_observacion">Observación para la comisión:</label>
-	    		<textarea class="form-input-custom" id="merito_observacion" name="<%= ControladorMisMeritos.PARAM_OBSERVACION %>" rows="2" cols="50"></textarea>
+	    		<textarea class="form-input-custom" id="merito_observacion" name="<%= ControladorMisMeritos.PARAM_OBSERVACION %>" rows="2" cols="50">
+	    		<%= observacion %>
+	    		</textarea>
 	    	</div>
     	</div>
     	<div class="form-btn">
