@@ -86,9 +86,9 @@ String codigoCompleto = apartado.getCodigo() + "." + bloque.getCodigo() + "." + 
 				%>
 	    		<label for="item_afinida">Afinidad</label>
 	    		<select class="params" id="item_unidades" name="<%= ControladorItemsBaremacion.PARAM_ITEM_AFINIDAD %>" style="width:100%;">
-					<option value="<%= ModeloBaremacion.ITEM_AFINIDADES_SIN_MODULACION %>" <%= unidadesSelected.equals(ModeloBaremacion.ITEM_AFINIDADES_SIN_MODULACION) ? "selected=\"selected\"" : "" %>>N - Las contribuciones no se someten a modulación</option>
-					<option value="<%= ModeloBaremacion.ITEM_AFINIDADES_PROPIAS_AL_AREA %>" <%= unidadesSelected.equals(ModeloBaremacion.ITEM_AFINIDADES_PROPIAS_AL_AREA) ? "selected=\"selected\"" : "" %>>AA - Solo se valoran las contribuaciones propias del area, sometidas a modulación</option>
-					<option value="<%= ModeloBaremacion.ITEM_AFINIDADES_PROPIAS_AL_PERFIL_INVERSTIGADOR %>" <%= unidadesSelected.equals(ModeloBaremacion.ITEM_AFINIDADES_PROPIAS_AL_PERFIL_INVERSTIGADOR) ? "selected=\"selected\"" : "" %>>AI - Solo se valoran las contribuaciones asociadas al perfil investigador, sometidas a modulación</option>
+					<option value="<%= ModeloBaremacion.ITEM_AFINIDADES_SIN_MODULACION %>" <%= afinidadSelected.equals(ModeloBaremacion.ITEM_AFINIDADES_SIN_MODULACION) ? "selected=\"selected\"" : "" %>>N - Las contribuciones no se someten a modulación</option>
+					<option value="<%= ModeloBaremacion.ITEM_AFINIDADES_PROPIAS_AL_AREA %>" <%= afinidadSelected.equals(ModeloBaremacion.ITEM_AFINIDADES_PROPIAS_AL_AREA) ? "selected=\"selected\"" : "" %>>AA - Solo se valoran las contribuaciones propias del area, sometidas a modulación</option>
+					<option value="<%= ModeloBaremacion.ITEM_AFINIDADES_PROPIAS_AL_PERFIL_INVERSTIGADOR %>" <%= afinidadSelected.equals(ModeloBaremacion.ITEM_AFINIDADES_PROPIAS_AL_PERFIL_INVERSTIGADOR) ? "selected=\"selected\"" : "" %>>AI - Solo se valoran las contribuaciones asociadas al perfil investigador, sometidas a modulación</option>
 				</select>
 	    	</div>
 		</div>

@@ -31,6 +31,7 @@ import es.ujaen.uvirtual.modelo.bolsaempleo.ModeloBaremacion;
 import es.ujaen.uvirtual.modelo.bolsaempleo.ModeloMerito;
 import es.ujaen.uvirtual.modelo.bolsaempleo.ModeloUsuarioBolsaEmpleo;
 import es.ujaen.uvirtual.utilidades.BolsaEmpleoUtils;
+import es.ujaen.uvirtual.utilidades.BolsaEmpleoValidator;
 import es.ujaen.uvirtual.utilidades.BolsaEmpleoDataTable;
 import es.ujaen.uvirtual.utilidades.EscapaHTML;
 import es.ujaen.uvirtual.utilidades.Formateador;
@@ -75,7 +76,17 @@ public class ControladorMisMeritos extends HttpServlet {
 	
 	// mensajes
 	public static final String MENSAJE_ENVIADO = "mensaje";
+	
+	public static final String MENSAJE_ERROR_APARTADO_REQUERIDO = "Debe seleccionar un apartado";
+	public static final String MENSAJE_ERROR_DESCRIPCION_LARGO = "La descripción no puede contener mas de %d caracteres";
+	public static final String MENSAJE_ERROR_DESCRIPCION_VACIA = "La descripción no puede estar vacía";
+	public static final String MENSAJE_ERROR_ITEM_REQUERIDO = "Debe seleccionar un ítem";
+	public static final String MENSAJE_ERROR_OBSERVACION_LARGO = "La observación no puede contener mas de %d caracteres";
+	public static final String MENSAJE_ERROR_VALOR_VACIO = "El valor no puede estar vacio";
+	public static final String MENSAJE_ERROR_VALOR_MAXIMO_PERMITIDO = "El valor máximo permitido es %d";
+	public static final String MENSAJE_ERROR_VALOR_MINIMO_PERMITIDO = "El valor mínimo permitido es %d";
 	public static final String MENSAJE_ERROR_MERITOS_SELECCIONADOS_INCORRECTOS = "No hay méritos seleccionados válidos";
+	
 	public static final String MENSAJE_EXITO_AGREGAR = "Mérito agregado correctamente";
 	public static final String MENSAJE_EXITO_ELIMINAR = "Mérito eliminado correctamente";
 	
@@ -178,6 +189,11 @@ public class ControladorMisMeritos extends HttpServlet {
 		
 		if (request.getParameter(PARAM_APARTADO) != null) {
 			Integer apartadoId = Formateador.leeParametroInteger(request.getParameter(PARAM_APARTADO));
+			
+			if (apartadoId == 0) {
+				throw new UVException(MENSAJE_ERROR_APARTADO_REQUERIDO);				
+			}
+			
 			ApartadoBaremacion apartado = modelo.getApartadoBaremacionById(apartadoId); 
 			bean.setApartado(apartado);
 			bean.setItems(modelo.getItemsDeApartado(apartado));
@@ -196,23 +212,48 @@ public class ControladorMisMeritos extends HttpServlet {
 						    }
 						}
 						
-						InputStream input = uploadedFile.getInputStream();
-						Float valor = Formateador.leeParametroFloat(request.getParameter(PARAM_VALOR));
-						String descripcion = EscapaHTML.ajustaCodificacion(request.getParameter(PARAM_DESCRIPCION));
-						String observacion = EscapaHTML.ajustaCodificacion(request.getParameter(PARAM_OBSERVACION));
-						Integer itemId = Formateador.leeParametroInteger(request.getParameter(PARAM_ITEM));
-						Usuario usuArcos = datos.getUsuario();
-						ModeloUsuarioBolsaEmpleo modeloUsuarioBolsaEmpleo = ModeloUsuarioBolsaEmpleo.obtenerInstancia();
-						Integer idUsuario = modeloUsuarioBolsaEmpleo.listaUsuario(usuArcos.getUid()).getCodNum();
+						BolsaEmpleoValidator validator = this.getValidatorMisMeritos(request);
 						
-						ItemBaremacion itemBaremacion = ModeloBaremacion.obtenerInstancia().getItemBaremacionById(itemId);
-						Merito merito = new Merito(valor, descripcion, observacion, itemBaremacion, input);
-						ModeloMerito modeloMer = ModeloMerito.obtenerInstancia();
-						modeloMer.insertaMerito(merito, idUsuario);
-						
-						HttpSession session = request.getSession(false);
-						session.setAttribute(MENSAJE_ENVIADO, MENSAJE_EXITO_AGREGAR);
-						response.sendRedirect(request.getServletPath());
+						if (!validator.isValid()) {
+							for (String param : validator.getErrors().keySet()) {
+								for (String paramError : validator.getErrors().get(param)) {
+									bean.getMensajesDeError().add(paramError);
+								}
+							}
+						} else {
+							InputStream input = uploadedFile.getInputStream();
+							Float valor = validator.getValueFloat(PARAM_VALOR);
+							String descripcion = validator.getValueString(PARAM_DESCRIPCION);
+							String observacion = validator.getValueString(PARAM_OBSERVACION);
+							Integer itemId = validator.getValueInteger(PARAM_ITEM);
+							Usuario usuArcos = datos.getUsuario();
+							ModeloUsuarioBolsaEmpleo modeloUsuarioBolsaEmpleo = ModeloUsuarioBolsaEmpleo.obtenerInstancia();
+							Integer idUsuario = modeloUsuarioBolsaEmpleo.listaUsuario(usuArcos.getUid()).getCodNum();
+							
+							if (itemId == 0) {
+								throw new UVException(MENSAJE_ERROR_ITEM_REQUERIDO);				
+							}
+							
+							ItemBaremacion itemBaremacion = ModeloBaremacion.obtenerInstancia().getItemBaremacionById(itemId);
+							
+							
+							
+							if (valor < itemBaremacion.getValorMinimo()) {
+								throw new UVException(String.format(MENSAJE_ERROR_VALOR_MINIMO_PERMITIDO, itemBaremacion.getValorMinimo()));
+							}
+							
+							if (valor > itemBaremacion.getValorMaximo()) {
+								throw new UVException(String.format(MENSAJE_ERROR_VALOR_MAXIMO_PERMITIDO, itemBaremacion.getValorMaximo()));
+							}
+							
+							Merito merito = new Merito(valor, descripcion, observacion, itemBaremacion, input);
+							ModeloMerito modeloMer = ModeloMerito.obtenerInstancia();
+							modeloMer.insertaMerito(merito, idUsuario);
+							
+							HttpSession session = request.getSession(false);
+							session.setAttribute(MENSAJE_ENVIADO, MENSAJE_EXITO_AGREGAR);
+							response.sendRedirect(request.getServletPath());
+						}
 					} else {
 						throw new UVException("No se puede agregar un mérito sin archivo");
 					}
@@ -307,6 +348,36 @@ public class ControladorMisMeritos extends HttpServlet {
 				response.setStatus(RESPONSE_HTTP_CODE_ERROR);
 			}
 		}
+	}
+	
+	/** Valida el formulario de Mis Méritos.
+	 * @param request .
+	 * @return BolsaEmpleoValidator validator .
+	 * @throws UVException .
+	 * @throws SQLException .
+	 * @throws IOException .
+	 * @throws IOException .
+	 */
+	private BolsaEmpleoValidator getValidatorMisMeritos(HttpServletRequest request) throws UVException {
+		BolsaEmpleoValidator validator = new BolsaEmpleoValidator(request);
+		
+		validator.addParamInteger(PARAM_ITEM);
+		validator.addRule(PARAM_ITEM, "required", MENSAJE_ERROR_ITEM_REQUERIDO);
+		
+		validator.addParamFloat(PARAM_VALOR);
+		validator.addRule(PARAM_VALOR, "required", MENSAJE_ERROR_VALOR_VACIO);
+		
+		validator.addParamString(PARAM_DESCRIPCION);
+		validator.addRule(PARAM_DESCRIPCION, "required", MENSAJE_ERROR_DESCRIPCION_VACIA);
+		validator.addRule(PARAM_DESCRIPCION, "noBlank", MENSAJE_ERROR_DESCRIPCION_VACIA);
+		validator.addRule(PARAM_DESCRIPCION, "max:" + ModeloMerito.COLUMN_DESCRIPCION_MAXLENGTH, 
+				String.format(MENSAJE_ERROR_DESCRIPCION_LARGO, ModeloMerito.COLUMN_DESCRIPCION_MAXLENGTH));
+		
+		validator.addParamString(PARAM_OBSERVACION);
+		validator.addRule(PARAM_OBSERVACION, "max:" + ModeloMerito.COLUMN_OBSERVACION_MAXLENGTH, 
+				String.format(MENSAJE_ERROR_OBSERVACION_LARGO, ModeloMerito.COLUMN_OBSERVACION_MAXLENGTH));
+		
+		return validator;
 	}
 	
 }

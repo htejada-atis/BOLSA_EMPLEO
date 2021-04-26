@@ -65,6 +65,7 @@ public class ControladorGestionNoticias extends HttpServlet {
 	// Mensajes
 	public static final String MENSAJE_ENVIADO = "mensaje";
 	
+	public static final String MENSAJE_ERROR_FECHA_REQUERIDA = "La fecha es requerida";
 	public static final String MENSAJE_ERROR_TEXTO_VACIO = "El texto no puede estar vacio";
 	
 	public static final String MENSAJE_ERROR_TEXTO_LARGO = "El texto no puede contener mas de %d caracteres";
@@ -171,10 +172,10 @@ public class ControladorGestionNoticias extends HttpServlet {
 				}
 			} else {
 				ModeloNoticia modelo = ModeloNoticia.obtenerInstancia();
-				String enlace = EscapaHTML.ajustaCodificacion(request.getParameter(PARAM_ENLACE));
-				String texto = EscapaHTML.ajustaCodificacion(request.getParameter(PARAM_TEXTO));
+				String enlace = validator.getValueString(PARAM_ENLACE);
+				String texto = validator.getValueString(PARAM_TEXTO);
 				Boolean publica = request.getParameter(PARAM_PUBLICA) != null && EscapaHTML.ajustaCodificacion(request.getParameter(PARAM_PUBLICA)).equals("true");
-				Date fecha = Formateador.leeParametroFecha(request.getParameter(PARAM_FECHA), Formateador.FORMATO_FECHA_DDMMYYYY, "/");
+				Date fecha = validator.getValueDate(PARAM_FECHA);
 				Noticia noticia = new Noticia(enlace, texto, fecha, publica, true);
 				modelo.insertaNoticia(noticia);
 				bean.getMensajesDeExito().add(MENSAJE_EXITO_AGREGAR);
@@ -208,10 +209,10 @@ public class ControladorGestionNoticias extends HttpServlet {
 				}
 			} else {
 				Integer codNum = Formateador.leeParametroInteger(request.getParameter(PARAM_ID));
-				String enlace = EscapaHTML.ajustaCodificacion(request.getParameter(PARAM_ENLACE));
-				String texto = EscapaHTML.ajustaCodificacion(request.getParameter(PARAM_TEXTO));
+				String enlace = validator.getValueString(PARAM_ENLACE);
+				String texto = validator.getValueString(PARAM_TEXTO);
 				Boolean publica = request.getParameter(PARAM_PUBLICA) != null && EscapaHTML.ajustaCodificacion(request.getParameter(PARAM_PUBLICA)).equals("true");
-				Date fecha = Formateador.leeParametroFecha(request.getParameter(PARAM_FECHA), Formateador.FORMATO_FECHA_DDMMYYYY, "/");
+				Date fecha = validator.getValueDate(PARAM_FECHA);
 				Noticia noticia = new Noticia(codNum, enlace, texto, fecha, publica, true);
 				modelo.actualizaNoticia(noticia);
 				bean.getMensajesDeExito().add(MENSAJE_EXITO_EDITAR);
@@ -289,12 +290,15 @@ public class ControladorGestionNoticias extends HttpServlet {
 		validator.addParamString(PARAM_TEXTO);
 		validator.addRule(PARAM_TEXTO, "required", MENSAJE_ERROR_TEXTO_VACIO);
 		validator.addRule(PARAM_TEXTO, "noBlank", MENSAJE_ERROR_TEXTO_VACIO);
-		validator.addRule(PARAM_TEXTO, "max:" + ModeloUsuarioBolsaEmpleo.COLUMN_NOTICIA_TEXTO_MAXLENGTH, 
-				String.format(MENSAJE_ERROR_TEXTO_LARGO, ModeloUsuarioBolsaEmpleo.COLUMN_NOTICIA_TEXTO_MAXLENGTH));
+		validator.addRule(PARAM_TEXTO, "max:" + ModeloNoticia.COLUMN_TEXTO_MAXLENGTH, 
+				String.format(MENSAJE_ERROR_TEXTO_LARGO, ModeloNoticia.COLUMN_TEXTO_MAXLENGTH));
 		
 		validator.addParamString(PARAM_ENLACE);
-		validator.addRule(PARAM_ENLACE, "max:" + ModeloUsuarioBolsaEmpleo.COLUMN_NOTICIA_ENLACE_MAXLENGTH, 
-				String.format(MENSAJE_ERROR_ENLACE_LARGO, ModeloUsuarioBolsaEmpleo.COLUMN_NOTICIA_ENLACE_MAXLENGTH));
+		validator.addRule(PARAM_ENLACE, "max:" + ModeloNoticia.COLUMN_ENLACE_MAXLENGTH, 
+				String.format(MENSAJE_ERROR_ENLACE_LARGO, ModeloNoticia.COLUMN_ENLACE_MAXLENGTH));
+		
+		validator.addParamDate(PARAM_FECHA);
+		validator.addRule(PARAM_FECHA, "required", MENSAJE_ERROR_FECHA_REQUERIDA);
 		
 		return validator;
 	}

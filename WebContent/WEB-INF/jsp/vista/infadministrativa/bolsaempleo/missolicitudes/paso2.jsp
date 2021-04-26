@@ -78,9 +78,8 @@ VistaSolicitudes bean = (VistaSolicitudes) uvdatos.getVistas().get(VistaSolicitu
 		document.getElementById("paso2_volver").addEventListener("click", function(event) {
 			event.preventDefault();
 			var params = {
-					'a': '<%= ControladorMisSolicitudes.ACCION_SELECCIONAR_BOLSAS %>',
+					'a': '<%= ControladorMisSolicitudes.ACCION_CONSULTAR_SOLICITUD %>',
 					'<%= ControladorMisSolicitudes.PARAM_SOLICITUD_ID %>': '<%= bean.getSolicitud().getCodNum() %>',
-					'<%= ControladorMisSolicitudes.PARAM_BOLSAS %>': JSON.stringify(tableAreas.getCheckedItems())
 			};
 			Atis.sendForm("<%= request.getRequestURI() %>", params);
 		});

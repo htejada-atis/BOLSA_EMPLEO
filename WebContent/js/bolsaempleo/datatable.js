@@ -78,7 +78,7 @@ function DataTable(id, config) {
         $('tr', self.tbody).empty();
     	
     	if (response.data.length > 0) {
-	    	response.data.forEach(function(row, index) {    		
+	    	response.data.forEach(function(row, index) {
 	    		self.addRow(row, index);	    	    		    
 	    	});
     	} else {
@@ -102,15 +102,27 @@ function DataTable(id, config) {
     	var tr = $('<tr id="' + this.id + '_row_' + index + '"></tr>');
 
         if (self.config.clickable || self.config.selectable) {
-            $(tr).addClass("clickable");
+            $(tr).addClass('clickable');
         }
 
         if (self.config.clickable) {
-            $(tr).on("click", self.config.clickable.onClick.bind($(tr), row, self));
+            $(tr).on('click', self.config.clickable.onClick.bind($(tr), row, self));
         }
-        
-        if (self.config.selected && self.config.selected == row.codNum) {
-        	$(tr).addClass("selected");
+
+        var selected = self.config.selected;
+
+        if (Array.isArray(selected)) {
+            selected.forEach(function (element) {
+                if (element == row.codNum) {
+                    row['selected'] = true;
+                }
+            });
+        } else if (selected && selected == row.codNum) {
+            row['selected'] = true;
+        }
+
+        if (row.selected) {
+            $(tr).addClass('selected');
         }
     	
     	self.config.columns.forEach(function(columnDef) {
@@ -134,6 +146,17 @@ function DataTable(id, config) {
     	if (columnDef.hasOwnProperty('render')) {
     		return columnDef.render(row);
     	}
+
+        if (columnDef.hasOwnProperty('overflow')) {
+            var overflow;
+
+            if (columnDef.overflow == 'auto') {
+                overflow = $('<div></div>');
+                overflow.addClass('overflow-auto');
+            }
+
+            return overflow.append(typeof value !== 'undefined' ? '' + value : '');
+        }
     	
     	if (columnDef.hasOwnProperty('buttons')) {
     		var buttons = $('<span class="btns"></span>');
@@ -147,7 +170,7 @@ function DataTable(id, config) {
     				$(btn).addClass(buttonDef.class);
     			}
     			
-    			$(btn).on("click", buttonDef.onClick.bind($(btn), row, self));
+    			$(btn).on('click', buttonDef.onClick.bind($(btn), row, self));
     			$(buttons).append(btn);
     		});
 
@@ -156,6 +179,11 @@ function DataTable(id, config) {
     	
     	if (columnDef.hasOwnProperty('selectable') && columnDef.selectable) {
     		var check = $('<input type="checkbox"/>');
+
+            if (row.selected) {
+                self.checked[value] = true;
+                check.prop('checked', true);
+            }
     		
     		$(check).on('change', function() {
     			self.checked[value] = this.checked;
@@ -164,7 +192,7 @@ function DataTable(id, config) {
     		});
 
             if (columnDef.selectable.exclude && Atis.getProp(row, columnDef.selectable.exclude)) {
-                $(check).prop( "disabled", true);
+                $(check).prop( 'disabled', true);
             }
     		
     		return check;
@@ -217,6 +245,7 @@ function DataTable(id, config) {
 
         selectSize.on('change', function() {
             self.params.pageSize = this.value;
+            self.params.page = 0;
             self.refresh();
         });
 
@@ -286,6 +315,7 @@ function DataTable(id, config) {
                     $(columnDef.node).prepend('<img src="/img/iconos/' + (self.params.orderDirection === 'asc' ? 'down.png' : 'up.png') + '" class="order"/>');
                 }
 
+                $(columnDef.node).prop('title', 'Ordenar por ' + $(columnDef.node).text());
                 $(columnDef.node).css('cursor', 'pointer');
                 $(columnDef.node).on('click', function() { self.orderBy(columnDef, index); });
             }
@@ -442,6 +472,7 @@ function DataTable(id, config) {
 
     this.filterBy = function(indexColumnDef, value) {
         self.filterParams[indexColumnDef] = value;
+        self.params.page = 0;
         
         if (value == "" || value == 0) {
             delete self.filterParams[indexColumnDef];

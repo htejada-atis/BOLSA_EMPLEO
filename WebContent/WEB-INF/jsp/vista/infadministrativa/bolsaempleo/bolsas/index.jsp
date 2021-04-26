@@ -47,9 +47,7 @@ VistaEstadoBolsas bean = (VistaEstadoBolsas) uvdatos.getVistas().get(VistaEstado
     				</p>
     		</div>
 		</div>
-		<a class="link-btn" id="nuevo_evaluador" href="<%=request.getRequestURI()%>">
-	    	Importar bolsas U Virtual
-	    </a>
+		
 	</div>
 	
 	
@@ -88,7 +86,7 @@ $(document).ready(function() {
 	    "columns": [
 	    	{'data': 'codNum', 'selectable': true},
 	        {'data': 'codNum', 'filter': {'type': 'number'}},
-	        {'data': 'area.descripcion', 'filter': true, 'class': 'overflow-auto'},
+	        {'data': 'area.descripcion', 'filter': true},
 	        {'data': 'estado', 'filter': {'type': 'select', 'options': {'BLOQUEADA':'Bloqueada', 'REVISION':'Revisión', 'BAREMACION':'Baremación', 'ALEGACIONES':'Alegaciones', 'DESBLOQUEADA':'Desbloqueada'}} },
 	        {'data': 'fechaActualizacion', 'filter': {'type': 'date'}},
 	        {'data': 'fechaBloqueo', 'filter': {'type': 'date'}},

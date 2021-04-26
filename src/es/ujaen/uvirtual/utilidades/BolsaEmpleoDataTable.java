@@ -105,7 +105,7 @@ public class BolsaEmpleoDataTable<T> {
 
 		@Override
 		public boolean shouldSkipField(FieldAttributes arg0) {
-			List<String> list = Arrays.asList(new String[]{"consulta", "query", "queryCount", "orderDirection"});
+			List<String> list = Arrays.asList(new String[]{"consulta", "query", "queryCount", "orderDirection", "columns"});
 			
 			if (list.contains(arg0.getName())) {
 				return true;
@@ -324,7 +324,6 @@ public class BolsaEmpleoDataTable<T> {
 		String consultaResult = "";
 		for (Map.Entry<Integer, String> filter : filters.entrySet()) {
 	        Integer key = filter.getKey();
-	        System.out.println("key: " + key);
 			String column = this.columns.get(key).getName();
 			
 			if (column == null) {

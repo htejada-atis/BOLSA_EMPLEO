@@ -32,6 +32,9 @@ public class ModeloNoticia {
 	public static final int ORDER_COLUMN_INDEX_FLGPUBLICA = 3;
 	public static final int ORDER_COLUMN_INDEX_FLGACTIVA = 4;
 	public static final int ORDER_COLUMN_INDEX_ID = 5;
+	
+	public static final int COLUMN_TEXTO_MAXLENGTH = 300;
+	public static final int COLUMN_ENLACE_MAXLENGTH = 200;
 
 	
     protected static ModeloNoticia eInstancia = null;
@@ -235,22 +238,25 @@ public class ModeloNoticia {
 		if (noticia.getTexto() == null || noticia.getTexto().equals("")) {
 			throw new UVException("No se puede insertar una noticia sin texto");
 		}
-		if (noticia.getEnlace() == null) {
-			throw new UVException("enlace obligatorio");
-		}
-		if (noticia.getFecha() == null) {
-			throw new UVException("fecha obligatoria");
-		}
 		
 		String consulta = "INSERT INTO tbep_noticias " 
-						+ " (ENLACE,TEXTO,FECHA,FLGPUBLICA) "
-						+ "VALUES (?, ?, ?, ?)";
+				+ " (ENLACE,TEXTO,FECHA,FLGPUBLICA) ";
+		
+		if (noticia.getFecha() == null) {
+			consulta += "VALUES (?, ?, ?)";
+		} else {
+			consulta += "VALUES (?, ?, ?, ?)";
+		}
+		
+		
 		try (Connection conexion = ConexionUvirtual.obtenerInstancia();
 			 PreparedStatement stmt = conexion.prepareStatement(consulta);) {
 			int parameterIndex = 1;
 			stmt.setString(parameterIndex++, noticia.getEnlace());
 			stmt.setString(parameterIndex++, noticia.getTexto());
-			stmt.setDate(parameterIndex++, new java.sql.Date(noticia.getFecha().getTime()));
+			if (noticia.getFecha() != null) {
+				stmt.setDate(parameterIndex++, new Date(noticia.getFecha().getTime()));
+			}
 			stmt.setString(parameterIndex++, noticia.isPublica() ? "S" : "N");
 			stmt.executeUpdate();
 		}
@@ -309,9 +315,6 @@ public class ModeloNoticia {
 		}
 		if (noticia.getCodNum() == null) {
 			throw new UVException("id noticia no válido");
-		}
-		if (noticia.getEnlace() == null) {
-			throw new UVException("enlace obligatorio");
 		}
 		if (noticia.getTexto() == null) {
 			throw new UVException("texto obligatoria");

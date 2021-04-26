@@ -9,7 +9,7 @@ UVDatos uvdatos = (UVDatos) request.getAttribute(UVDatos.NOMBRE_ATRIBUTO);
 VistaAreasBaremar bean = (VistaAreasBaremar) uvdatos.getVistas().get(VistaAreasBaremar.class.getName());
 %>
 
-<div class='bolsas'>
+<div class='bolsa-empleo'>
 	<% if (bean.getMensajesDeExito().size() > 0) { %>
 		<div id="exito" class="success">
 			<%= bean.formatearMensajesDeExito() %>
@@ -20,13 +20,20 @@ VistaAreasBaremar bean = (VistaAreasBaremar) uvdatos.getVistas().get(VistaAreasB
 			<%= bean.formatearMensajesDeError() %>
 		</div>
 	<% } else { %>
-	<h2>Áreas baremables</h2>
+	
+	<div class="titulo-bolsa-empleo">
+		<h2>Bolsas baremables</h2>
+    
+	    <a class="link-btn" id="nueva_convocatoria" href="#">
+	    	Importar Areas UVirtual
+	    </a>
+	</div>
 	
 	<table class="bluetable bolsaempleo" id="table">
 		<tr>
 			<th scope="col" style="width:5%"></th>
 			<th scope="col" style="width:5%" title="Id de la area">Id</th>
-			<th scope="col" style="width:25%" title="Código de area">Código</th>
+			<th scope="col" style="width:25%" title="Cï¿½digo de area">Cï¿½digo</th>
 			<th scope="col" style="width:65%">Area</th>
 			<th scope="col" class="center" style="width:15%">Baremable</th>			
 		</tr>
@@ -70,7 +77,7 @@ $(document).ready(function() {
 	
 	function enviaAccion(accion, selected) {
 		if (selected.length == 0) {
-			Atis.alertDialog('Estado de las áreas', 'Seleccione al menos un área.');
+			Atis.alertDialog('Estado de las ï¿½reas', 'Seleccione al menos un ï¿½rea.');
 			return;
 		}
 		

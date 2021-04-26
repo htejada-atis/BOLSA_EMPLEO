@@ -54,7 +54,7 @@ VistaItemsBaremacion bean = (VistaItemsBaremacion) uvdatos.getVistas().get(Vista
 		</tbody>
 		<tfoot>
 			<tr>
-				<th colSpan="5" style="width:100%"></th>
+				<th colSpan="4" style="width:100%"></th>
 			</tr>
 		</tfoot>
 	</table>
@@ -250,7 +250,7 @@ VistaItemsBaremacion bean = (VistaItemsBaremacion) uvdatos.getVistas().get(Vista
 				    "ajax": { url: "<%= ControladorItemsBaremacion.URL_PATTERN_AJAX %>", async: false },
 				    "params": {"<%=ControladorItemsBaremacion.PARAM_BLOQUE%>": <%= bean.getBloqueBaremacion().getCodNum() %>},
 				    "pageSize": 10,
-				    "title": "ÍTEMS: <%= bean.getBloqueBaremacion().getNombre() %>",
+				    "title": "TIPOS DE MÉRITOS: <%= bean.getBloqueBaremacion().getNombre() %>",
 				    "filterable": true,
 				    "defaultOrderBy": 0,
 				    "defaultOrderDirection": "asc",
@@ -274,8 +274,8 @@ VistaItemsBaremacion bean = (VistaItemsBaremacion) uvdatos.getVistas().get(Vista
 				        {'data': 'afinidad', 'render': function(row) {
 				        	var titles = {
 				        		'N': 'N - Las contribuciones no se someten a modulación',
-				        		'AA': 'AA - Solo se valoran las contribuaciones propias del area, sometidas a modulación',
-				        		'AI': 'AI - Solo se valoran las contribuaciones asociadas al perfil investigador, sometidas a modulación'
+				        		'AA': 'AA - Solo se valoran las contribuciones propias del area, sometidas a modulación',
+				        		'AI': 'AI - Solo se valoran las contribuciones asociadas al perfil investigador, sometidas a modulación'
 				        	};
 				        	
 				        	return '<span title="' + Atis.getProp(titles, row.afinidad) +'">' + row.afinidad + '</span>';
