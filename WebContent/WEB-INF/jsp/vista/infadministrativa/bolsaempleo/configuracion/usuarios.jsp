@@ -33,14 +33,14 @@ VistaUsuarioBolsaEmpleo bean = (VistaUsuarioBolsaEmpleo) uvdatos.getVistas().get
 	  	<caption class="table-title">Usuarios</caption>  
 		<tr>
 			<th scope="col" style="width:5%"></th>
-			<th scope="col" style="width:6%" title="Tipo de documento">Tipo</th>
-			<th scope="col" style="width:13%" title="N Documento">Documento</th>
+			<th scope="col" style="width:7%" title="Tipo de documento">Tipo</th>
+			<th scope="col" style="width:15%" title="N Documento">Documento</th>
 			<th scope="col" style="width:14%" title="Nombre de usuario" class="user">Usuario</th>
 			<th scope="col" style="width:30%" title="Nombre y apellidos">Nombre y Apellidos</th>
 			<th scope="col" style="width:20%" title="Rol del usuario">Rol</th>
-			<th scope="col" style="width:10%" class="center" title="Lista del usuario">Lista</th>
-			<th scope="col" style="width:10%" class="center" title="Excluido">Excluido</th>
-			<th scope="col" style="width:10%" class="center" title="Eliminado">Eliminado</th>
+			<th scope="col" style="width:15%" class="center" title="Lista del usuario">Lista</th>
+			<th scope="col" style="width:15%" class="center" title="Excluido">Excluido</th>
+			<th scope="col" style="width:15%" class="center" title="Eliminado">Eliminado</th>
 			<th scope="col" style="width:15%"></th>
 		</tr>
 		<tbody>				
@@ -85,16 +85,20 @@ $(document).ready(function() {
         			return "<div title='Excluido de lista distribución' class='circle-false'></div>"; 
         		}
         	}},
-        	{'data': 'excluido', 'filter': {'type': 'selectBoolean', 'true': 'Excluido', 'false': 'Incluido'}, 'render': function(row) {
-	        	if(row.excluido==true){
-        			return "<div title='Excluido' class='circle-true'></div>"; 
+        	{'data': 'excluido', 'order': {'active': false}, 'filter': {'type': 'select', 'options':{'true': 'Excluido', 'false': 'Incluido'}, 'optionDefault': 'false'},
+	    		'render': function(row) {
+	        		if (row.excluido) {
+	        			return "<div title='Excluido' class='circle-true'></div>"; 
+	        		}
         		}
-        	}},
-        	{'data': 'borrado', 'filter': {'type': 'selectBoolean', 'true': 'Borrado', 'false': 'No Borrado'}, 'render': function(row) {
-	        	if(row.borrado==true){
-        			return "<div title='Eliminado' class='circle-true'></div>"; 
+	        },
+        	{'data': 'borrado', 'order': {'active': false}, 'filter': {'type': 'select', 'options':{'true': 'Borrado', 'false': 'No Borrado'}, 'optionDefault': 'false'},
+	    		'render': function(row) {
+	        		if (row.borrado) {
+	        			return "<div title='Eliminado' class='circle-true'></div>"; 
+	        		}
         		}
-        	}},
+	        },
         	{'data': 'codnum', 'buttons': [
         		{'label': 'Editar', 'onClick': function(row) {
         		var params = {'a': '<%= ControladorUsuarioBolsaEmpleo.ACCION_EDITAR_USUARIO %>', '<%= ControladorUsuarioBolsaEmpleo.PARAM_NOMBRE_USUARIO %>': row.codcuenta};
