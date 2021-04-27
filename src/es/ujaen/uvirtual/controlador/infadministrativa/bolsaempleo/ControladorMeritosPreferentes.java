@@ -93,7 +93,7 @@ public class ControladorMeritosPreferentes extends HttpServlet {
 		if (nombreAccion == null) {
 			nombreAccion = ACCION_INDEX;
 		}
-		
+				
 		try {
 			ModeloUsuarioBolsaEmpleo.obtenerInstancia().checkUser(datos);
 			switch (nombreAccion) {
@@ -244,7 +244,7 @@ public class ControladorMeritosPreferentes extends HttpServlet {
 		} else if (merito.getAplicable().equals(ModeloMeritosPreferentes.APLICABLE_ITEM)) {
 			merito.setAplicableItemBaremacion(ModeloBaremacion.obtenerInstancia().getItemBaremacionById(
 					Formateador.leeParametroInteger(request.getParameter(PARAM_MERITO_APLICABLE_ITEM))));
-		} else {
+		} else if (!merito.getAplicable().equals(ModeloMeritosPreferentes.APLICABLE_TOTAL)) {
 			throw new UVException("Introduce el campo aplicable");
 		}
 				
