@@ -16,7 +16,6 @@ import es.ujaen.uvirtual.utilidades.BolsaEmpleoDataTable;
 public class VistaValidar extends Vista implements Serializable {
 	private static final long serialVersionUID = 1L;
 	private String vista;
-	private List<Area> areas = new ArrayList<>();
 	private Convocatoria conv;
 	private BolsaEmpleoDataTable<Bolsa> datatable;
 	

@@ -65,7 +65,7 @@ $(document).ready(function() {
 	    	{'data': 'codNum', 'filter': {'type': 'number'}},
 	    	{'data': 'area.idAreaExterno', 'filter': {'type': 'number'}},
 	        {'data': 'area.descripcion', 'filter': true, 'class': 'overflow-auto'},
-	        {'data': 'codnum', 'buttons': [{'label': 'Filtrar bolsa', 'onClick': function(row) {}}]}        
+	        {'data': 'codnum', 'buttons': [{'label': 'Validar', 'onClick': function(row) {}}]}        
 	    ]	    
 	});		
 }); 
