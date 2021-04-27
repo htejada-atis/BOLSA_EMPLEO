@@ -93,8 +93,7 @@ public class ModeloBolsa {
 		try (Connection conexion = ConexionUvirtual.obtenerInstancia();
 				PreparedStatement stmtCount = conexion.prepareStatement(dataTable.getQueryCount());
 				PreparedStatement stmt = conexion.prepareStatement(dataTable.getQuery());
-		) {				
-			
+		) {			
 			int indexParam = 1;
 			dataTable.setFiltersParams(stmt, stmtCount, indexParam);
 			

@@ -43,24 +43,24 @@ VistaFiltrar bean = (VistaFiltrar)uvdatos.getVistas().get(VistaFiltrar.class.get
 </div>
 	
 <script>
-$(document).ready(function() {
-	var table = new Atis.DataTable('#table', {
-	    "ajax": { url: "/srv/es/ajax/informacionadministrativa/bolsaempleo/filtrar" },
-	    "pageSize": 10,
-	    "filterable": true,
-	    "action": "<%= ControladorFiltrar.ACCION_DATATABLE %>",
-	    "defaultOrderBy": 2,
-	    "defaultOrderDirection": 'desc',
-	    "columns": [
-	    	{'data': 'codNum', 'filter': {'type': 'number'}},
-	    	{'data': 'area.idAreaExterno', 'filter': {'type': 'number'}},
-	        {'data': 'area.descripcion', 'filter': true, 'class': 'overflow-auto'},
-	        {'data': 'codnum', 'buttons': [{'label': 'Filtrar bolsa', 'onClick': function(row) {}}]}        
-	    ],
-	    "actions": [
-	    	{'label': 'Filtrar bolsa', 'onClick': function(selected) {  } },	    	
-	    ]
-	});		
-}); 
+	$(document).ready(function() {
+		var table = new Atis.DataTable('#table', {
+		    "ajax": { url: "/srv/es/ajax/informacionadministrativa/bolsaempleo/filtrar" },
+		    "pageSize": 10,
+		    "filterable": true,
+		    "action": "<%= ControladorFiltrar.ACCION_DATATABLE %>",
+		    "defaultOrderBy": 2,
+		    "defaultOrderDirection": 'desc',
+		    "columns": [
+		    	{'data': 'codNum', 'filter': {'type': 'number'}},
+		    	{'data': 'area.idAreaExterno', 'filter': {'type': 'number'}},
+		        {'data': 'area.descripcion', 'filter': true, 'class': 'overflow-auto'},
+		        {'data': 'codnum', 'buttons': [{'label': 'Filtrar bolsa', 'onClick': function(row) {}}]}        
+		    ],
+		    "actions": [
+		    	{'label': 'Filtrar bolsa', 'onClick': function(selected) {  } },	    	
+		    ]
+		});		
+	}); 
 </script>
 	

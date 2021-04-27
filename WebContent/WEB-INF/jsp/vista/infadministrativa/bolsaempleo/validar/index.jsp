@@ -13,18 +13,19 @@ VistaValidar bean = (VistaValidar)uvdatos.getVistas().get(VistaValidar.class.get
 <div class='bolsa-empleo'>
 	<% 
 		String descripcion = "";
-		if(bean.getConvocatoria()!=null){
-			descripcion = "Última convocatoria abierta:" + bean.getConvocatoria().getDescripcion();
+		if(bean.getConvocatoria() != null) {
+			descripcion = "Última convocatoria: " + bean.getConvocatoria().getDescripcion();
 		} else {
-			descripcion = "No existen convocatorias abiertas en este momento";
+			descripcion = "No existen convocatorias en este momento";
 		}
+	%>
 	
-	if (bean.getMensajesDeExito().size() > 0) { %>
+	<% if (bean.getMensajesDeExito().size() > 0) { %>
 		<div id="exito" class="success">
 			<%= bean.formatearMensajesDeExito() %>
 		</div>
 	<% } %>
-	
+
 	<% if (bean.getMensajesDeError().size() > 0) { %>
 		<div id="error" class="error">
 			<%= bean.formatearMensajesDeError() %>
@@ -33,7 +34,7 @@ VistaValidar bean = (VistaValidar)uvdatos.getVistas().get(VistaValidar.class.get
 	
 	<h2>Validar meritos sujetos afinidad</h2>
 	<h3><%= descripcion %></h3>
-
+		
 	<table class="bluetable bolsaempleo" id="table">
 		<tr>
 			<th scope="col" style="width:5%">Id.</th>
@@ -65,10 +66,7 @@ $(document).ready(function() {
 	    	{'data': 'area.idAreaExterno', 'filter': {'type': 'number'}},
 	        {'data': 'area.descripcion', 'filter': true, 'class': 'overflow-auto'},
 	        {'data': 'codnum', 'buttons': [{'label': 'Filtrar bolsa', 'onClick': function(row) {}}]}        
-	    ],
-	    "actions": [
-	    	{'label': 'Filtrar bolsa', 'onClick': function(selected) {  } },	    	
-	    ]
+	    ]	    
 	});		
 }); 
 </script>
