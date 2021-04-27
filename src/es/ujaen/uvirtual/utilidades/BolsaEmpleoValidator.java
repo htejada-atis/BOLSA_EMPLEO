@@ -362,7 +362,7 @@ public class BolsaEmpleoValidator {
 	
 	private void checkRuleFloat(String param, String type, Object value, String mensajeError) throws UVException {
 		if (value != null) {
-			String regex = "[0-9]+(,[0-9])?";
+			String regex = "[0-9]+(,[0-9]+)?";
 	        Pattern p = Pattern.compile(regex);
 	        Matcher m = p.matcher((String) value);
 
