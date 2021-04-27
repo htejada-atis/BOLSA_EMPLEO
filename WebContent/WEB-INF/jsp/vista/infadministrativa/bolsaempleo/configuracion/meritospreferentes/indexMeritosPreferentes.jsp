@@ -70,13 +70,21 @@ VistaMeritosPreferentes bean = (VistaMeritosPreferentes) uvdatos.getVistas().get
 		        	return tiposLabel[row.tipo];
 		        }},
 		        {'data': 'aplicable', 'render': function(row) {
-		        	var aplicableTipos = {
-		        		'<%= ModeloMeritosPreferentes.APLICABLE_BLOQUE %>': 'Al apartado',
-		        		'<%= ModeloMeritosPreferentes.APLICABLE_APARTADO %>': 'Al bloque',
-		        		'<%= ModeloMeritosPreferentes.APLICABLE_ITEM %>': 'Al mérito',
-		        	};
+		        	var text;
 		        	
-		        	return aplicableTipos[row.aplicable];
+		        	switch(row.aplicable) {
+		        	case '<%= ModeloMeritosPreferentes.APLICABLE_BLOQUE %>':
+		        		text = 'Al apartado. '
+		        		break;
+		        	case '<%= ModeloMeritosPreferentes.APLICABLE_APARTADO %>':
+		        		text = 'Al bloque. ' + row.aplicableApartadoBaremacion.nombre;
+		        		break;
+		        	case '<%= ModeloMeritosPreferentes.APLICABLE_ITEM %>':
+		        		text = 'Al mérito. ';
+		        		break;
+		        	}
+		        	
+		        	return text;
 		        }},
 		        {'data': 'codNum', 'buttons': [
 		        	{'label': 'Editar', 'onClick': function(row) {
