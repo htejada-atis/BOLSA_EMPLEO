@@ -21,7 +21,7 @@ function DataTable(id, config) {
     this.pageSizeOptions = Atis.getProp(config, 'pageSizeOptions', [5,10,20,100]);
     this.filterParams = {}
     this.title = Atis.getProp(config, 'title', undefined);
-    this.lastResponse = null;
+    this.lastResponse = null;    
     this.checked = {};
 
     var self = this;
@@ -211,7 +211,7 @@ function DataTable(id, config) {
     	
         // texto total
         var selected = self.getCheckedItems();  
-        var labelTotal = 'Total ' + self.lastResponse.recordsTotal;
+        var labelTotal = self.lastResponse.recordsTotal ? 'Total ' + self.lastResponse.recordsTotal : '';
         var labelSelected = selected.length > 0 ? ' (Seleccionados ' + selected.length + ')' : ''
         var textoTotal = '<span class="total">' + labelTotal + labelSelected +'</span>';
         
@@ -236,7 +236,7 @@ function DataTable(id, config) {
         var pagination = $('<span class="pagination"></span>');
         $(pagination).append(btnFirst);
         $(pagination).append(btnBack);
-        $(pagination).append(' P&aacute;gina ' + (self.params.page + 1) + ' / ' + (self.lastResponse.pagesTotal + 1) + ' ');
+        $(pagination).append(' P&aacute;gina ' + (self.params.page + 1) + ' / ' + (self.lastResponse.pagesTotal ? self.lastResponse.pagesTotal + 1 : '1') + ' ');
         $(pagination).append(btnNext);
         $(pagination).append(btnLast);
 

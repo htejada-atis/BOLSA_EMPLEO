@@ -10,6 +10,7 @@ public class Afinidad {
 	private String codigo;
 	private String descripcion;
 	private Float modulacion;
+	private Boolean sujetoAfinidad;
 
 	
 	/** Constructor por defecto.
@@ -72,5 +73,13 @@ public class Afinidad {
 
 	public void setModulacion(Float pmodulacion) {
 		this.modulacion = pmodulacion;
+	}
+	
+	public Boolean getSujetoAfinidad() {
+		return sujetoAfinidad;
+	}
+
+	public void setSujetoAfinidad(Boolean sujetoAfinidad) {
+		this.sujetoAfinidad = sujetoAfinidad;
 	}
 }

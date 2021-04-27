@@ -34,10 +34,9 @@ VistaTitulaciones bean = (VistaTitulaciones) uvdatos.getVistas().get(VistaTitula
 	<table class="bluetable bolsaempleo" id="tableTitulacionesUsuario">
 		<tr>
 			<th scope="col" style="width:10%"></th>
-			<th scope="col" style="width:30%">Titulación</th>		
-			<th scope="col" style="width:30%">Descripción</th>		
-			<th scope="col" style="width:30%">Archivo</th>		
-			<th scope="col" style="width:10%"></th>	
+			<th scope="col" style="width:60%">Titulación</th>		
+			<th scope="col" style="width:40%">Descripción</th>		
+			<th scope="col" class="center" style="width:15%">Archivo</th>		
 		</tr>
 		<tbody>				
 		</tbody>
@@ -91,17 +90,9 @@ $(document).ready(function() {
 	        {'data': 'codnum', 'order': {'active': false}, 'class': 'overflow-ellipsis', 'render': function(row) {
 	        	var link = "<%= ControladorMisTitulaciones.URL_PATTERN_FILES_PRIVADA %>"
 	        	+ "?a=<%= ControladorMisTitulaciones.ACCION_DESCARGAR_FICHERO %>&<%= ControladorMisTitulaciones.PARAM_FICHERO %>=" + row.codNum;
-	        	return "<a class='consultar-fichero' title='Descargar fichero' href='" +link +"' target='_blank'>" +link +"</a>"; 
+	        	return "<a class='consultar-fichero' title='Descargar fichero' href='" +link +"' target='_blank'>Descargar</a>"; 
 	        	}
-	        },
-	        {'data': 'codnum', 'buttons': [{'label': '<label class="tooltiptext">Copiar enlace</label>Copiar', 'class': 'tooltip', 'onClick': function(row) {
-		        	$(this).parent().parent().parent().find(".tooltiptext").text("¡Enlace copiado!");
-		        	
-		        	var link = "<%= ControladorMisTitulaciones.URL_PATTERN_FILES_PRIVADA %>"
-			        	+ "?a=<%= ControladorMisTitulaciones.ACCION_DESCARGAR_FICHERO %>&<%= ControladorMisTitulaciones.PARAM_FICHERO %>=" + row.codNum;
-		        	navigator.clipboard.writeText(link);
-		        }
-		    }]}
+	        }
 	    ],
 	    "actions": [
 	    	{'label': 'Borrar', 'onClick': function(selected) { enviaAccion("<%=ControladorMisTitulaciones.ACCION_ELIMINAR_TITULACION_USUARIO%>", selected); } }   	

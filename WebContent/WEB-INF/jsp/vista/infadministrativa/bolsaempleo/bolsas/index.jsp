@@ -13,12 +13,13 @@ VistaEstadoBolsas bean = (VistaEstadoBolsas) uvdatos.getVistas().get(VistaEstado
 
 <div class='bolsa-empleo'>
 	<% 
-
 		Integer bloqueadas = null;
 		Integer revisadas = null;
+		Integer totales = null;
 
 		bloqueadas = bean.getTotalBolsasBloqueadas();
 		revisadas = bean.getTotalBolsasRevisadas();
+		totales = bean.getTotalBolsas();
 	%>
 
 
@@ -38,12 +39,12 @@ VistaEstadoBolsas bean = (VistaEstadoBolsas) uvdatos.getVistas().get(VistaEstado
 		<div class="form-group-container">
 	    	<div class="form-group">
     				<p>Total de bolsas bloqueadas:
-    					<%= bloqueadas %>
+    					<%= bloqueadas %> / <%= totales %>
     				</p>
     		</div>
     		<div class="form-group">
     				<p>Total de bolsas revisadas:
-    				   <%= revisadas %>
+    				   <%= revisadas %> / <%= totales %>
     				</p>
     		</div>
 		</div>
@@ -82,7 +83,7 @@ $(document).ready(function() {
 	    "filterable": true,
 	    "action": "<%= ControladorBolsas.ACCION_DATATABLE %>",
 	    "defaultOrderBy": 2,
-	    "defaultOrderDirection": 'desc',
+	    "defaultOrderDirection": 'asc',
 	    "columns": [
 	    	{'data': 'codNum', 'selectable': true},
 	        {'data': 'codNum', 'filter': {'type': 'number'}},

@@ -5,6 +5,7 @@
 <%@ page import="es.ujaen.uvirtual.beans.uvirtual.bolsaempleo.ApartadoBaremacion" %>
 <%@ page import="es.ujaen.uvirtual.beans.uvirtual.bolsaempleo.BloqueBaremacion" %>
 <%@ page import="es.ujaen.uvirtual.beans.uvirtual.bolsaempleo.ItemBaremacion" %>
+<%@ page import="es.ujaen.uvirtual.beans.uvirtual.bolsaempleo.Afinidad" %>
 <%@ page import="es.ujaen.uvirtual.utilidades.EscapaHTML" %>
 <%@ page import="es.ujaen.uvirtual.utilidades.BolsaEmpleoUtils" %>
 <%@ page import="es.ujaen.uvirtual.modelo.bolsaempleo.ModeloBaremacion" %>
@@ -81,14 +82,23 @@ String codigoCompleto = apartado.getCodigo() + "." + bloque.getCodigo() + "." + 
 	    			   value="<%= BolsaEmpleoUtils.getParamForm(request, ControladorItemsBaremacion.PARAM_ITEM_VALOR, item != null ? item.getValor().toString() : "") %>"/>
 	    	</div>
 	    	<div class="form-group">
-	    		<%
-					String afinidadSelected = BolsaEmpleoUtils.getParamForm(request, ControladorItemsBaremacion.PARAM_ITEM_AFINIDAD, item != null ? item.getAfinidad() : ModeloBaremacion.ITEM_AFINIDADES_SIN_MODULACION); 
-				%>
 	    		<label for="item_afinida">Afinidad</label>
 	    		<select class="params" id="item_unidades" name="<%= ControladorItemsBaremacion.PARAM_ITEM_AFINIDAD %>" style="width:100%;">
-					<option value="<%= ModeloBaremacion.ITEM_AFINIDADES_SIN_MODULACION %>" <%= afinidadSelected.equals(ModeloBaremacion.ITEM_AFINIDADES_SIN_MODULACION) ? "selected=\"selected\"" : "" %>>N - Las contribuciones no se someten a modulación</option>
-					<option value="<%= ModeloBaremacion.ITEM_AFINIDADES_PROPIAS_AL_AREA %>" <%= afinidadSelected.equals(ModeloBaremacion.ITEM_AFINIDADES_PROPIAS_AL_AREA) ? "selected=\"selected\"" : "" %>>AA - Solo se valoran las contribuaciones propias del area, sometidas a modulación</option>
-					<option value="<%= ModeloBaremacion.ITEM_AFINIDADES_PROPIAS_AL_PERFIL_INVERSTIGADOR %>" <%= afinidadSelected.equals(ModeloBaremacion.ITEM_AFINIDADES_PROPIAS_AL_PERFIL_INVERSTIGADOR) ? "selected=\"selected\"" : "" %>>AI - Solo se valoran las contribuaciones asociadas al perfil investigador, sometidas a modulación</option>
+					<option value="-1"> - </option>
+    				<%for(Afinidad afinidad: bean.getAfinidades()){
+    					if(item!=null){
+            				if(bean.getAfinidad().getCodNum().equals(afinidad.getCodNum())){%>
+        						<option value="<%=afinidad.getCodNum()%>" selected="selected"><%=afinidad.getCodigo()%> - <%=afinidad.getDescripcion()%></option>
+        					<%}
+    						else{%>
+								<option value="<%=afinidad.getCodNum()%>"><%=afinidad.getCodigo()%> - <%=afinidad.getDescripcion()%></option>
+							<%}
+    					}
+						else{%>
+							<option value="<%=afinidad.getCodNum()%>"><%=afinidad.getCodigo()%> - <%=afinidad.getDescripcion()%></option>
+						<%}
+							
+					}%>
 				</select>
 	    	</div>
 		</div>

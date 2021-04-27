@@ -19,9 +19,10 @@ import es.ujaen.uvirtual.beans.uvirtual.bolsaempleo.ApartadoBaremacion;
 import es.ujaen.uvirtual.beans.uvirtual.bolsaempleo.BloqueBaremacion;
 import es.ujaen.uvirtual.beans.uvirtual.bolsaempleo.ItemBaremacion;
 import es.ujaen.uvirtual.beans.vistas.uvirtual.bolsaempleo.VistaItemsBaremacion;
+import es.ujaen.uvirtual.modelo.bolsaempleo.ModeloAfinidad;
 import es.ujaen.uvirtual.modelo.bolsaempleo.ModeloBaremacion;
 import es.ujaen.uvirtual.utilidades.BolsaEmpleoDataTable;
-import es.ujaen.uvirtual.utilidades.BolsaEmpleoValidator;
+import es.ujaen.uvirtual.utilidades.BolsaEmpleoUtils;
 import es.ujaen.uvirtual.modelo.bolsaempleo.ModeloUsuarioBolsaEmpleo;
 import es.ujaen.uvirtual.utilidades.EscapaHTML;
 import es.ujaen.uvirtual.utilidades.Formateador;
@@ -97,8 +98,6 @@ public class ControladorItemsBaremacion extends HttpServlet {
 	public static final String PARAM_APARTADO_CODIGO = "codigoapartado";
 	public static final String PARAM_APARTADO_PUNTUACIONMAXIMA = "puntuaacionmaxima";
 	public static final String PARAM_APARTADO_PORCENTAJEMAXIMO = "porcentajemaximo";
-	public static final String PARAM_APARTADO_MERITOSPREFERENTES = "meritospreferentes";
-	public static final String PARAM_APARTADO_FACTORMERITOPREFERENTE = "factormeritopreferente";
 	public static final String PARAM_BLOQUE = "bloque";
 	public static final String PARAM_BLOQUE_NOMBRE = "nombrebloque";
 	public static final String PARAM_BLOQUE_CODIGO = "codigobloque";
@@ -285,26 +284,8 @@ public class ControladorItemsBaremacion extends HttpServlet {
 	private void agregarApartadoConfirm(VistaItemsBaremacion bean, HttpServletRequest request, HttpServletResponse response) throws SQLException, UVException, IOException {
 		bean.setVista(RUTA_BEP_CONF + "formApartadoBaremacion.jsp");
 		
-		BolsaEmpleoValidator validator = this.getValidatorApartado(request);		
-		if (!validator.isValid()) {
-			for (String param : validator.getErrors().keySet()) {
-				for (String paramError : validator.getErrors().get(param)) {
-					bean.getMensajesDeError().add(paramError);
-				}
-			}
-			return;
-		}
-		
-		// agregamos		
-		ApartadoBaremacion apartado = new ApartadoBaremacion();
-		apartado.setCodigo(validator.getValueString(PARAM_APARTADO_CODIGO));
-		apartado.setNombre(validator.getValueString(PARAM_APARTADO_NOMBRE));
+		ApartadoBaremacion apartado = this.validateApartadoBaremacion(new ApartadoBaremacion(), request);
 		apartado.setActivo(true);
-		apartado.setPuntuacionMaxima(validator.getValueFloat(PARAM_APARTADO_PUNTUACIONMAXIMA));
-		apartado.setPorcentajeMaximo(validator.getValueFloat(PARAM_APARTADO_PORCENTAJEMAXIMO));
-		apartado.setMeritosPreferentes(validator.getValueBoolean(PARAM_APARTADO_MERITOSPREFERENTES));
-		apartado.setFactorMeritoPreferente(validator.getValueFloat(PARAM_APARTADO_PUNTUACIONMAXIMA));
-		
 		ModeloBaremacion.obtenerInstancia().insertaApartado(apartado);
 		
 		bean.getMensajesDeExito().add(MENSAJE_EXITO_APARTADO_AGREGAR);
@@ -348,28 +329,10 @@ public class ControladorItemsBaremacion extends HttpServlet {
 	private void editarApartadoConfirm(VistaItemsBaremacion bean, HttpServletRequest request, HttpServletResponse response) throws SQLException, UVException, IOException {
 		ModeloBaremacion modelo = ModeloBaremacion.obtenerInstancia();
 		Integer codNum = Formateador.leeParametroInteger(request.getParameter(PARAM_APARTADO));
-		ApartadoBaremacion apartado = modelo.getApartadoBaremacionById(codNum);
-		
+		ApartadoBaremacion apartado = this.validateApartadoBaremacion(modelo.getApartadoBaremacionById(codNum), request); 
+				
 		bean.setVista(RUTA_BEP_CONF + "formApartadoBaremacion.jsp");
 		bean.setApartadoBaremacion(apartado);
-		
-		BolsaEmpleoValidator validator = this.getValidatorApartado(request);		
-		if (!validator.isValid()) {
-			for (String param : validator.getErrors().keySet()) {
-				for (String paramError : validator.getErrors().get(param)) {
-					bean.getMensajesDeError().add(paramError);
-				}
-			}
-			return;
-		}
-		
-		// agregamos
-		apartado.setCodigo(validator.getValueString(PARAM_APARTADO_CODIGO));
-		apartado.setNombre(validator.getValueString(PARAM_APARTADO_NOMBRE));
-		apartado.setPuntuacionMaxima(validator.getValueFloat(PARAM_APARTADO_PUNTUACIONMAXIMA));
-		apartado.setPorcentajeMaximo(validator.getValueFloat(PARAM_APARTADO_PORCENTAJEMAXIMO));
-		apartado.setMeritosPreferentes(validator.getValueBoolean(PARAM_APARTADO_MERITOSPREFERENTES));
-		apartado.setFactorMeritoPreferente(validator.getValueFloat(PARAM_APARTADO_FACTORMERITOPREFERENTE));
 		
 		modelo.actualizaApartado(apartado);
 		
@@ -387,29 +350,29 @@ public class ControladorItemsBaremacion extends HttpServlet {
 		bean.setVista(RUTA_BEP_CONF + "itemsbaremacion.jsp");
 	}
 	
-	private BolsaEmpleoValidator getValidatorApartado(HttpServletRequest request) throws UVException {
-		BolsaEmpleoValidator validator = new BolsaEmpleoValidator(request);
-		validator.addParamString(PARAM_APARTADO_CODIGO);
-		validator.addRule(PARAM_APARTADO_CODIGO, "required", MENSAJE_ERROR_CODIGO_VACIO);
-		validator.addRule(PARAM_APARTADO_CODIGO, "noBlank", MENSAJE_ERROR_CODIGO_VACIO);
-		validator.addRule(PARAM_APARTADO_CODIGO, "max:" + ModeloBaremacion.COLUMN_CODIGO_MAXLENGTH, 
-				String.format(MENSAJE_ERROR_CODIGO_MAXIMO, ModeloBaremacion.COLUMN_CODIGO_MAXLENGTH));
+	private ApartadoBaremacion validateApartadoBaremacion(ApartadoBaremacion apartado, HttpServletRequest request) throws UVException {
+		apartado.setCodigo(EscapaHTML.ajustaCodificacion(request.getParameter(PARAM_APARTADO_CODIGO)));
+		if (apartado.getCodigo().isBlank()) {
+			throw new UVException(MENSAJE_ERROR_CODIGO_VACIO);
+		}
+		if (apartado.getCodigo().length() > ModeloBaremacion.COLUMN_CODIGO_MAXLENGTH) {
+			throw new UVException(String.format(MENSAJE_ERROR_CODIGO_MAXIMO, ModeloBaremacion.COLUMN_CODIGO_MAXLENGTH));
+		}
 		
-		validator.addParamString(PARAM_APARTADO_NOMBRE);
-		validator.addRule(PARAM_APARTADO_NOMBRE, "required", MENSAJE_ERROR_NOMBRE_VACIO);
-		validator.addRule(PARAM_APARTADO_NOMBRE, "noBlank", MENSAJE_ERROR_NOMBRE_VACIO);
-		validator.addRule(PARAM_APARTADO_NOMBRE, "max:" + ModeloBaremacion.COLUMN_NOMBRE_MAXLENGTH, 
-				String.format(MENSAJE_ERROR_NOMBRE_MAXIMO, ModeloBaremacion.COLUMN_NOMBRE_MAXLENGTH));
+		apartado.setNombre(EscapaHTML.ajustaCodificacion(request.getParameter(PARAM_APARTADO_NOMBRE)));
+		if (apartado.getNombre().isBlank()) {
+			throw new UVException(MENSAJE_ERROR_NOMBRE_VACIO);
+		}
+		if (apartado.getNombre().length() > ModeloBaremacion.COLUMN_NOMBRE_MAXLENGTH) {
+			throw new UVException(String.format(MENSAJE_ERROR_NOMBRE_MAXIMO, ModeloBaremacion.COLUMN_NOMBRE_MAXLENGTH));
+		}
 		
-		validator.addParamFloat(PARAM_APARTADO_PUNTUACIONMAXIMA);
-		validator.addParamFloat(PARAM_APARTADO_PORCENTAJEMAXIMO);
-		validator.addParamFloat(PARAM_APARTADO_FACTORMERITOPREFERENTE);
+		apartado.setPuntuacionMaxima(Formateador.leeParametroFloat(request.getParameter(PARAM_APARTADO_PUNTUACIONMAXIMA)));
+		apartado.setPorcentajeMaximo(Formateador.leeParametroFloat(request.getParameter(PARAM_APARTADO_PORCENTAJEMAXIMO)));
 		
-		validator.addParamBoolean(PARAM_APARTADO_MERITOSPREFERENTES);
-				
-		return validator;
+		return apartado;
 	}
-	
+		
 	///////////////////////////////////////////////////////////////////////////////////////////////////////////
 	// BLOQUES
 	///////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -493,25 +456,12 @@ public class ControladorItemsBaremacion extends HttpServlet {
 		bean.setBloqueBaremacion(null);
 		bean.setUltimoCodigo(modelo.getUltimoCodigoBloque(apartado));
 		bean.setVista(RUTA_BEP_CONF + "formBloqueBaremacion.jsp");
-		
-		BolsaEmpleoValidator validator = this.getValidatorBloque(request);		
-		if (!validator.isValid()) {
-			for (String param : validator.getErrors().keySet()) {
-				for (String paramError : validator.getErrors().get(param)) {
-					bean.getMensajesDeError().add(paramError);
-				}
-			}
-			return;
-		}
-		
-		// agregamos
-		BloqueBaremacion bloque = new BloqueBaremacion();
-		bloque.setCodigo(validator.getValueString(PARAM_BLOQUE_CODIGO));
-		bloque.setNombre(validator.getValueString(PARAM_BLOQUE_NOMBRE));
-		bloque.setNumeroMaximoMeritos(validator.getValueInteger(PARAM_BLOQUE_NUMEROMAXIMOMERITOS));
+				
+		BloqueBaremacion bloque = this.validateBloqueBaremacion(new BloqueBaremacion(), request); 
 		bloque.setActivo(true);
 		bloque.setApartadoBaremacion(apartado);
 		
+		// agregamos
 		modelo.insertaBloque(bloque);
 		
 		bean.getMensajesDeExito().add(MENSAJE_EXITO_BLOQUE_AGREGAR);
@@ -556,31 +506,18 @@ public class ControladorItemsBaremacion extends HttpServlet {
 	
 	private void editarBloqueConfirm(VistaItemsBaremacion bean, HttpServletRequest request, HttpServletResponse response) throws SQLException, UVException, IOException {
 		ModeloBaremacion modelo = ModeloBaremacion.obtenerInstancia();
-		BloqueBaremacion bloque = modelo.getBloqueBaremacionById(Formateador.leeParametroInteger(request.getParameter(PARAM_BLOQUE)));
-		
+		Integer codBloque = Formateador.leeParametroInteger(request.getParameter(PARAM_BLOQUE));
+
 		bean.setVista(RUTA_BEP_CONF + "formBloqueBaremacion.jsp");
+		BloqueBaremacion bloque = modelo.getBloqueBaremacionById(codBloque);
 		bean.setApartadoBaremacion(bloque.getApartadoBaremacion());
 		bean.setBloqueBaremacion(bloque);
-		
-		BolsaEmpleoValidator validator = this.getValidatorBloque(request);		
-		if (!validator.isValid()) {
-			for (String param : validator.getErrors().keySet()) {
-				for (String paramError : validator.getErrors().get(param)) {
-					bean.getMensajesDeError().add(paramError);
-				}
-			}
-			return;
-		}
-		
-		// agregamos
-		bloque.setCodigo(validator.getValueString(PARAM_BLOQUE_CODIGO));
-		bloque.setNombre(validator.getValueString(PARAM_BLOQUE_NOMBRE));
-		bloque.setNumeroMaximoMeritos(validator.getValueInteger(PARAM_BLOQUE_NUMEROMAXIMOMERITOS));
-		
+
+		bloque = this.validateBloqueBaremacion(bloque, request);
 		modelo.actualizaBloque(bloque);
-		
+
 		bean.getMensajesDeExito().add(MENSAJE_EXITO_BLOQUE_EDITAR);
-		
+
 		bean.setVista(RUTA_BEP_CONF + "itemsbaremacion.jsp");
 	}
 	
@@ -593,26 +530,30 @@ public class ControladorItemsBaremacion extends HttpServlet {
 		bean.setVista(RUTA_BEP_CONF + "itemsbaremacion.jsp");
 	}
 	
-	private BolsaEmpleoValidator getValidatorBloque(HttpServletRequest request) throws UVException {
-		BolsaEmpleoValidator validator = new BolsaEmpleoValidator(request);
-		validator.addParamString(PARAM_BLOQUE_CODIGO);
-		validator.addRule(PARAM_BLOQUE_CODIGO, "required", MENSAJE_ERROR_CODIGO_VACIO);
-		validator.addRule(PARAM_BLOQUE_CODIGO, "noBlank", MENSAJE_ERROR_CODIGO_VACIO);
-		validator.addRule(PARAM_BLOQUE_CODIGO, "number", MENSAJE_ERROR_CODIGO_NUMERO);		
-		validator.addRule(PARAM_BLOQUE_CODIGO, "max:" + ModeloBaremacion.COLUMN_CODIGO_MAXLENGTH, 
-				String.format(MENSAJE_ERROR_CODIGO_MAXIMO, ModeloBaremacion.COLUMN_CODIGO_MAXLENGTH));
+	private BloqueBaremacion validateBloqueBaremacion(BloqueBaremacion bloque, HttpServletRequest request) throws UVException {
+		bloque.setCodigo(EscapaHTML.ajustaCodificacion(request.getParameter(PARAM_BLOQUE_CODIGO)));
+		if (bloque.getCodigo().isBlank()) {
+			throw new UVException(MENSAJE_ERROR_CODIGO_VACIO);
+		}
+		if (bloque.getCodigo().length() > ModeloBaremacion.COLUMN_CODIGO_MAXLENGTH) {
+			throw new UVException(String.format(MENSAJE_ERROR_CODIGO_MAXIMO, ModeloBaremacion.COLUMN_CODIGO_MAXLENGTH));
+		}
 		
-		validator.addParamString(PARAM_BLOQUE_NOMBRE);
-		validator.addRule(PARAM_BLOQUE_NOMBRE, "required", MENSAJE_ERROR_NOMBRE_VACIO);
-		validator.addRule(PARAM_BLOQUE_NOMBRE, "noBlank", MENSAJE_ERROR_NOMBRE_VACIO);
-		validator.addRule(PARAM_BLOQUE_NOMBRE, "max:" + ModeloBaremacion.COLUMN_NOMBRE_MAXLENGTH, 
-				String.format(MENSAJE_ERROR_NOMBRE_MAXIMO, ModeloBaremacion.COLUMN_NOMBRE_MAXLENGTH));
+		bloque.setNombre(EscapaHTML.ajustaCodificacion(request.getParameter(PARAM_BLOQUE_NOMBRE)));
+		if (bloque.getNombre().isBlank()) {
+			throw new UVException(MENSAJE_ERROR_NOMBRE_VACIO);
+		}
+		if (bloque.getNombre().length() > ModeloBaremacion.COLUMN_NOMBRE_MAXLENGTH) {
+			throw new UVException(String.format(MENSAJE_ERROR_NOMBRE_MAXIMO, ModeloBaremacion.COLUMN_NOMBRE_MAXLENGTH));
+		}
 		
-		validator.addParamInteger(PARAM_BLOQUE_NUMEROMAXIMOMERITOS);
-		validator.addRule(PARAM_BLOQUE_NUMEROMAXIMOMERITOS, "min:1", MENSAJE_ERROR_BLOQUE_NUMMAXMERITOS_MINIMO);
-					
-		return validator;
-	}
+		bloque.setNumeroMaximoMeritos(Formateador.leeParametroInteger(request.getParameter(PARAM_BLOQUE_NUMEROMAXIMOMERITOS)));
+		if (bloque.getNumeroMaximoMeritos() != null && bloque.getNumeroMaximoMeritos() < 1) {
+			throw new UVException(MENSAJE_ERROR_BLOQUE_NUMMAXMERITOS_MINIMO);
+		}
+		
+		return bloque;
+	}	
 	
 	///////////////////////////////////////////////////////////////////////////////////////////////////////////
 	// ITEM
@@ -684,6 +625,10 @@ public class ControladorItemsBaremacion extends HttpServlet {
 		bean.setApartadoBaremacion(bloque.getApartadoBaremacion());
 		bean.setBloqueBaremacion(bloque);
 		bean.setItemBaremacion(null);
+		
+		ModeloAfinidad modeloAfinidad = ModeloAfinidad.obtenerInstancia();
+		bean.setAfinidades(modeloAfinidad.listaAfinidades());
+		
 		bean.setVista(RUTA_BEP_CONF + "formItemBaremacion.jsp");		
 		bean.setUltimoCodigo(modelo.getUltimoCodigoItem(bloque));		
 	}
@@ -692,48 +637,35 @@ public class ControladorItemsBaremacion extends HttpServlet {
 		ModeloBaremacion modelo = ModeloBaremacion.obtenerInstancia();
 		Integer codNum = Formateador.leeParametroInteger(request.getParameter(PARAM_BLOQUE));
 		BloqueBaremacion bloque = modelo.getBloqueBaremacionById(codNum);
-		
+
 		bean.setApartadoBaremacion(bloque.getApartadoBaremacion());
 		bean.setBloqueBaremacion(bloque);
 		bean.setItemBaremacion(null);
 		bean.setUltimoCodigo(modelo.getUltimoCodigoItem(bloque));
 		bean.setVista(RUTA_BEP_CONF + "formItemBaremacion.jsp");
-		
-		BolsaEmpleoValidator validator = this.getValidatorItem(request);		
-		if (!validator.isValid()) {
-			for (String param : validator.getErrors().keySet()) {
-				for (String paramError : validator.getErrors().get(param)) {
-					bean.getMensajesDeError().add(paramError);
-				}
-			}
-			return;
-		}
-		
+
 		// agregamos
-		ItemBaremacion item = new ItemBaremacion();
+		ItemBaremacion item = this.validateItemBaremacion(new ItemBaremacion(), request);
 		item.setBloqueBaremacion(bloque);
 		item.setActivo(true);
-		item.setCodigo(validator.getValueString(PARAM_ITEM_CODIGO));
-		item.setNombre(validator.getValueString(PARAM_ITEM_NOMBRE));				
-		item.setUnidades(validator.getValueString(PARAM_ITEM_UNIDADES));
-		item.setAfinidad(validator.getValueString(PARAM_ITEM_AFINIDAD));
-		item.setValor(validator.getValueFloat(PARAM_ITEM_VALOR));
-		item.setValorMinimo(validator.getValueFloat(PARAM_ITEM_VALOR_MINIMO));
-		item.setValorMaximo(validator.getValueFloat(PARAM_ITEM_VALOR_MAXIMO));
-		
+
 		modelo.insertaItem(item);
-		
+
 		bean.getMensajesDeExito().add(MENSAJE_EXITO_ITEM_AGREGAR);
 		bean.setVista(RUTA_BEP_CONF + "itemsbaremacion.jsp");
 	}
 	
 	private void editarItem(VistaItemsBaremacion bean, HttpServletRequest request, HttpServletResponse response) throws SQLException, UVException, IOException {
 		ModeloBaremacion modelo = ModeloBaremacion.obtenerInstancia();
+		ModeloAfinidad modeloAfinidad = ModeloAfinidad.obtenerInstancia();
 		ItemBaremacion item = modelo.getItemBaremacionById(Formateador.leeParametroInteger(request.getParameter(PARAM_ITEM)));
 		
 		bean.setApartadoBaremacion(item.getBloqueBaremacion().getApartadoBaremacion());
 		bean.setBloqueBaremacion(item.getBloqueBaremacion());
 		bean.setItemBaremacion(item);
+		
+		bean.setAfinidad(modeloAfinidad.getAfinidadById(item.getAfinidad()));
+		bean.setAfinidades(modeloAfinidad.listaAfinidades());
 		
 		bean.setVista(RUTA_BEP_CONF + "formItemBaremacion.jsp");
 		bean.setUltimoCodigo(ModeloBaremacion.obtenerInstancia().getUltimoCodigoApartado());
@@ -742,35 +674,17 @@ public class ControladorItemsBaremacion extends HttpServlet {
 	private void editarItemConfirm(VistaItemsBaremacion bean, HttpServletRequest request, HttpServletResponse response) throws SQLException, UVException, IOException {
 		ModeloBaremacion modelo = ModeloBaremacion.obtenerInstancia();
 		ItemBaremacion item = modelo.getItemBaremacionById(Formateador.leeParametroInteger(request.getParameter(PARAM_ITEM)));
-		
+
 		bean.setVista(RUTA_BEP_CONF + "formItemBaremacion.jsp");
 		bean.setApartadoBaremacion(item.getBloqueBaremacion().getApartadoBaremacion());
 		bean.setBloqueBaremacion(item.getBloqueBaremacion());
 		bean.setItemBaremacion(item);
-		
-		BolsaEmpleoValidator validator = this.getValidatorItem(request);		
-		if (!validator.isValid()) {
-			for (String param : validator.getErrors().keySet()) {
-				for (String paramError : validator.getErrors().get(param)) {
-					bean.getMensajesDeError().add(paramError);
-				}
-			}
-			return;
-		}
-		
-		// agregamos
-		item.setCodigo(validator.getValueString(PARAM_ITEM_CODIGO));
-		item.setNombre(validator.getValueString(PARAM_ITEM_NOMBRE));				
-		item.setUnidades(validator.getValueString(PARAM_ITEM_UNIDADES));
-		item.setAfinidad(validator.getValueString(PARAM_ITEM_AFINIDAD));
-		item.setValor(validator.getValueFloat(PARAM_ITEM_VALOR));
-		item.setValorMinimo(validator.getValueFloat(PARAM_ITEM_VALOR_MINIMO));
-		item.setValorMaximo(validator.getValueFloat(PARAM_ITEM_VALOR_MAXIMO));
-		
+
+		item = this.validateItemBaremacion(item, request);
 		modelo.actualizaItem(item);
-		
+
 		bean.getMensajesDeExito().add(MENSAJE_EXITO_ITEM_EDITAR);
-		
+
 		bean.setVista(RUTA_BEP_CONF + "itemsbaremacion.jsp");
 	}
 	
@@ -809,34 +723,50 @@ public class ControladorItemsBaremacion extends HttpServlet {
 		bean.setItemBaremacion(item);
 		bean.setVista(RUTA_BEP_CONF + "itemsbaremacion.jsp");		
 	}
+		
+	private ItemBaremacion validateItemBaremacion(ItemBaremacion item, HttpServletRequest request) throws UVException {
+		item.setCodigo(EscapaHTML.ajustaCodificacion(request.getParameter(PARAM_ITEM_CODIGO)));
+		if (item.getCodigo().isBlank()) {
+			throw new UVException(MENSAJE_ERROR_CODIGO_VACIO);
+		}
+		if (item.getCodigo().length() > ModeloBaremacion.COLUMN_CODIGO_MAXLENGTH) {
+			throw new UVException(String.format(MENSAJE_ERROR_CODIGO_MAXIMO, ModeloBaremacion.COLUMN_CODIGO_MAXLENGTH));
+		}
+		if (!BolsaEmpleoUtils.isInteger(item.getCodigo())) {
+			throw new UVException(MENSAJE_ERROR_CODIGO_NUMERO);
+		}
+
+		item.setNombre(EscapaHTML.ajustaCodificacion(request.getParameter(PARAM_ITEM_NOMBRE)));
+		if (item.getNombre().isBlank()) {
+			throw new UVException(MENSAJE_ERROR_NOMBRE_VACIO);
+		}
+		if (item.getNombre().length() > ModeloBaremacion.COLUMN_NOMBRE_MAXLENGTH) {
+			throw new UVException(String.format(MENSAJE_ERROR_NOMBRE_MAXIMO, ModeloBaremacion.COLUMN_NOMBRE_MAXLENGTH));
+		}
+
+		item.setUnidades(EscapaHTML.ajustaCodificacion(request.getParameter(PARAM_ITEM_UNIDADES)));
+		item.setAfinidad(Formateador.leeParametroInteger(request.getParameter(PARAM_ITEM_AFINIDAD)));
+
+		item.setValor(Formateador.leeParametroFloat(request.getParameter(PARAM_ITEM_VALOR)));
+		if (item.getValor() == null) {
+			throw new UVException("El valor unitario no puede estar vacio");
+		}
+
+		item.setValorMinimo(Formateador.leeParametroFloat(request.getParameter(PARAM_ITEM_VALOR_MINIMO)));
+		if (item.getValorMinimo() == null) {
+			throw new UVException("El valor mínimo no puede estar vacio");
+		}
+
+		item.setValorMaximo(Formateador.leeParametroFloat(request.getParameter(PARAM_ITEM_VALOR_MAXIMO)));
+		if (item.getValorMaximo() == null) {
+			throw new UVException("El valor máximo no puede estar vacio");
+		}
+		
+		if (item.getValorMinimo() > item.getValorMaximo()) {
+			throw new UVException("El valor mínimo debe ser menor o igual que el valor máximo");
+		}
+
+		return item;
+	}	
 	
-	private BolsaEmpleoValidator getValidatorItem(HttpServletRequest request) throws UVException {
-		BolsaEmpleoValidator validator = new BolsaEmpleoValidator(request);
-		validator.addParamString(PARAM_ITEM_CODIGO);
-		validator.addRule(PARAM_ITEM_CODIGO, "required", MENSAJE_ERROR_CODIGO_VACIO);
-		validator.addRule(PARAM_ITEM_CODIGO, "noBlank", MENSAJE_ERROR_CODIGO_VACIO);
-		validator.addRule(PARAM_ITEM_CODIGO, "number", MENSAJE_ERROR_CODIGO_NUMERO);		
-		validator.addRule(PARAM_ITEM_CODIGO, "max:" + ModeloBaremacion.COLUMN_CODIGO_MAXLENGTH, 
-				String.format(MENSAJE_ERROR_CODIGO_MAXIMO, ModeloBaremacion.COLUMN_CODIGO_MAXLENGTH));
-		
-		validator.addParamString(PARAM_ITEM_NOMBRE);
-		validator.addRule(PARAM_ITEM_NOMBRE, "required", MENSAJE_ERROR_NOMBRE_VACIO);
-		validator.addRule(PARAM_ITEM_NOMBRE, "noBlank", MENSAJE_ERROR_NOMBRE_VACIO);
-		validator.addRule(PARAM_ITEM_NOMBRE, "max:" + ModeloBaremacion.COLUMN_NOMBRE_MAXLENGTH, 
-				String.format(MENSAJE_ERROR_NOMBRE_MAXIMO, ModeloBaremacion.COLUMN_NOMBRE_MAXLENGTH));
-		
-		validator.addParamString(PARAM_ITEM_UNIDADES);
-		validator.addParamString(PARAM_ITEM_AFINIDAD);		
-		
-		validator.addParamFloat(PARAM_ITEM_VALOR);		
-		validator.addRule(PARAM_ITEM_VALOR, "required", "El valor unitario no puede estar vacio");
-		
-		validator.addParamFloat(PARAM_ITEM_VALOR_MINIMO);
-		validator.addRule(PARAM_ITEM_VALOR_MINIMO, "required", "El valor mínimo no puede estar vacio");
-		
-		validator.addParamFloat(PARAM_ITEM_VALOR_MAXIMO);
-		validator.addRule(PARAM_ITEM_VALOR_MAXIMO, "required", "El valor máximo no puede estar vacio");
-		
-		return validator;
-	}
 }
