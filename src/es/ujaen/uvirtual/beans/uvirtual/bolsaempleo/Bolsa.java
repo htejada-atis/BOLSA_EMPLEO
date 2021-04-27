@@ -44,6 +44,14 @@ public class Bolsa implements Serializable {
 		this.fechaDesBloqueo = pfechaDesBloqueo;
 	}
 	
+	/** Constructor con parametros.
+	 * @param pidBolsaEmpleo .
+	 */
+	public Bolsa(Integer pidBolsaEmpleo) {
+		super();
+		this.codNum = pidBolsaEmpleo;
+	}
+	
 	/** Constructor copia.
 	 * @param copia Convocatoria a copiar
 	 */

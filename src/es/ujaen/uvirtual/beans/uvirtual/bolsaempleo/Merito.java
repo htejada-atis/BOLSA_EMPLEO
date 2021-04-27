@@ -44,6 +44,14 @@ public class Merito implements Serializable {
 	}
 	
 	/** Constructor con parametros.
+	 * @param pcodNum .
+	 */
+	public Merito(Integer pcodNum) {
+		super();
+		this.codNum = pcodNum;
+	}
+	
+	/** Constructor con parametros.
 	 * @param pvalor .
 	 * @param pdescripcion .
 	 * @param pobservacion .

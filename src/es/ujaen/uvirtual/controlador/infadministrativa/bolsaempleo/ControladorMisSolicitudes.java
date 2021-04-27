@@ -20,6 +20,7 @@ import es.ujaen.uvirtual.beans.UVDatos;
 import es.ujaen.uvirtual.beans.Usuario;
 import es.ujaen.uvirtual.beans.uvirtual.bolsaempleo.Bolsa;
 import es.ujaen.uvirtual.beans.uvirtual.bolsaempleo.BolsaCandidato;
+import es.ujaen.uvirtual.beans.uvirtual.bolsaempleo.BolsaSolicitud;
 import es.ujaen.uvirtual.beans.uvirtual.bolsaempleo.Convocatoria;
 import es.ujaen.uvirtual.beans.uvirtual.bolsaempleo.Merito;
 import es.ujaen.uvirtual.beans.uvirtual.bolsaempleo.MeritoSolicitud;
@@ -202,14 +203,30 @@ public class ControladorMisSolicitudes extends HttpServlet {
 		}
 	}
 	
+	/** 
+	 * Agrega la vista del paso 1 y le añade la lista de bolsas de la solicitud .
+	 * @param bean .
+	 * @param solicitud .
+	 * @throws UVException .
+	 * @throws SQLException .
+	 */
 	private void listaBolsasCandidato(VistaSolicitudes bean, Solicitud solicitud) throws UVException, SQLException {
+		ModeloSolicitud modelo = ModeloSolicitud.obtenerInstancia();
 		bean.setVista(RUTA_BEP_SOL + "paso1.jsp");
 		
-		ModeloSolicitud modelo = ModeloSolicitud.obtenerInstancia();
 		List<Bolsa> listaBolsas = modelo.getBolsasSolicitud(solicitud);
 		bean.setListaBolsas(listaBolsas);
 	}
 	
+	/** 
+	 * Crea la solicitud .
+	 * @param bean .
+	 * @param datos .
+	 * @param request .
+	 * @param response .
+	 * @throws UVException .
+	 * @throws SQLException .
+	 */
 	private void crearSolicitud(VistaSolicitudes bean, UVDatos datos, HttpServletRequest request, HttpServletResponse response) throws UVException, SQLException {
 		ModeloSolicitud modeloSolicitud = ModeloSolicitud.obtenerInstancia();
 		ModeloConvocatoria modeloConvocatoria = ModeloConvocatoria.obtenerInstancia();
@@ -223,6 +240,15 @@ public class ControladorMisSolicitudes extends HttpServlet {
 		listaBolsasCandidato(bean, solicitud);
 	}
 	
+	/** 
+	 * Consultar solicitud .
+	 * @param bean .
+	 * @param datos .
+	 * @param request .
+	 * @param response .
+	 * @throws UVException .
+	 * @throws SQLException .
+	 */
 	private void consultarSolicitud(VistaSolicitudes bean, UVDatos datos, HttpServletRequest request, HttpServletResponse response) throws UVException, SQLException {
 		ModeloSolicitud modeloSolicitud = new ModeloSolicitud();
 		
@@ -242,6 +268,15 @@ public class ControladorMisSolicitudes extends HttpServlet {
 		}
 	}
 	
+	/**
+	 * Seleccionar bolsas para la solicitud .
+	 * @param bean .
+	 * @param datos .
+	 * @param request .
+	 * @param response .
+	 * @throws UVException .
+	 * @throws SQLException .
+	 */
 	private void seleccionarBolsas(VistaSolicitudes bean, UVDatos datos, HttpServletRequest request, HttpServletResponse response) throws UVException, SQLException {
 		bean.setVista(RUTA_BEP_SOL + "paso1.jsp");
 		
@@ -252,6 +287,8 @@ public class ControladorMisSolicitudes extends HttpServlet {
 		
 		Solicitud solicitud = modeloSolicitud.getSolicitudById(Formateador.leeParametroInteger(request.getParameter(PARAM_SOLICITUD_ID)));
 		bean.setSolicitud(solicitud);
+		
+		listaBolsasCandidato(bean, solicitud);
 		
 		List<String> idBolsas = null;
 			
@@ -288,6 +325,15 @@ public class ControladorMisSolicitudes extends HttpServlet {
 		bean.setVista(RUTA_BEP_SOL + "paso2.jsp");
 	}
 	
+	/**
+	 * Selecciona una bolsa para mostrar los méritos .
+	 * @param bean .
+	 * @param datos .
+	 * @param request .
+	 * @param response .
+	 * @throws UVException .
+	 * @throws SQLException .
+	 */
 	private void seleccionarBolsa(VistaSolicitudes bean, UVDatos datos, HttpServletRequest request, HttpServletResponse response) throws UVException, SQLException {
 		bean.setVista(RUTA_BEP_SOL + "paso2.jsp");
 		
@@ -305,6 +351,16 @@ public class ControladorMisSolicitudes extends HttpServlet {
 		bean.setListaMeritos(listaMeritos);
 	}
 	
+	/** 
+	 * Selecciona un mérito para agregarlo a una bolsa .
+	 * @param bean .
+	 * @param datos .
+	 * @param request .
+	 * @param response .
+	 * @param seleccionado .
+	 * @throws IOException .
+	 * @throws SQLException .
+	 */
 	private void seleccionarMerito(VistaSolicitudes bean, UVDatos datos, HttpServletRequest request, HttpServletResponse response, Boolean seleccionado)
 			throws IOException, SQLException {
 		ModeloBolsa modeloBolsa = ModeloBolsa.obtenerInstancia();
@@ -377,8 +433,8 @@ public class ControladorMisSolicitudes extends HttpServlet {
 		
 		try (PrintWriter writer = response.getWriter()) {
 			try {
-				BolsaEmpleoDataTable<Bolsa> dataTable = modelo.listaBolsasSolicitudesDatatable(solicitud, request.getParameterMap());
-				bean.setDatatableAreas(dataTable);
+				BolsaEmpleoDataTable<BolsaSolicitud> dataTable = modelo.listaBolsasSolicitudesDatatable(solicitud, request.getParameterMap());
+				bean.setDatatableBolsasSolicitud(dataTable);
 				Gson gson = new GsonBuilder().setExclusionStrategies(BolsaEmpleoDataTable.GSONEXCLUSIONSTRATEGY).create();				
 				writer.write(gson.toJson(dataTable));
 			} catch (Exception ex) {
