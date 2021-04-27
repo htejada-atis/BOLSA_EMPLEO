@@ -21,6 +21,7 @@ import es.ujaen.uvirtual.beans.uvirtual.bolsaempleo.Bolsa;
 import es.ujaen.uvirtual.beans.uvirtual.bolsaempleo.Convocatoria;
 import es.ujaen.uvirtual.beans.vistas.uvirtual.bolsaempleo.VistaValidar;
 import es.ujaen.uvirtual.modelo.bolsaempleo.ModeloConvocatoria;
+import es.ujaen.uvirtual.modelo.bolsaempleo.ModeloUsuarioBolsaEmpleo;
 import es.ujaen.uvirtual.modelo.bolsaempleo.ModeloValidar;
 import es.ujaen.uvirtual.utilidades.BolsaEmpleoDataTable;
 import es.ujaen.uvirtual.utilidades.EscapaHTML;
@@ -49,12 +50,9 @@ public class ControladorValidar extends HttpServlet {
 	public static final String ACCION_INDEX = "listar";
 	public static final String ACCION_DATATABLE = "datatable";
 	
-	// mensajes
-	public static final String MENSAJE_ERROR_FOO = "Mensaje de error";
-	public static final String MENSAJE_EXITO_BAR = "Mensaje de exito"; 
-
+	// url y rutas
 	public static final String URL_PATTERN_AJAX = "/srv/es/ajax/informacionadministrativa/bolsaempleo/validar";
-	public static final String RUTA_BEP_CONF = "/WEB-INF/jsp/vista/infadministrativa/bolsaempleo/validar/";
+	public static final String RUTA_BEP_CONF = "/WEB-INF/jsp/vista/infadministrativa/bolsaempleo/validar/";	
 	
 	public static final int RESPONSE_HTTP_CODE_ERROR = 400;
 	
@@ -75,6 +73,7 @@ public class ControladorValidar extends HttpServlet {
 		}
 		
 		try {
+			ModeloUsuarioBolsaEmpleo.obtenerInstancia().checkUser(datos);
 			switch (nombreAccion) {
 				case ACCION_INDEX:
 					index(bean, datos, request, response);
@@ -140,6 +139,4 @@ public class ControladorValidar extends HttpServlet {
 			}
 		}
 	}
-	
-	
 }
