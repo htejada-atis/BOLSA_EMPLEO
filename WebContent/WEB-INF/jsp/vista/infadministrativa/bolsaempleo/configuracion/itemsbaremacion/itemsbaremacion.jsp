@@ -26,12 +26,10 @@ VistaItemsBaremacion bean = (VistaItemsBaremacion) uvdatos.getVistas().get(Vista
 	
 	<table class="bluetable bolsaempleo custom" id="tableApartadosGenerales">
 		<tr>
-			<th scope="col" style="width:10%" title="Código apartado">Código</th>
-			<th scope="col" style="width:40%" title="Nombre del bloque">Nombre del bloque</th>
+			<th scope="col" style="width:20%" title="Código apartado">Código</th>
+			<th scope="col" style="width:60%" title="Nombre del bloque">Nombre del bloque</th>
 			<th scope="col" style="width:10%" title="Puntuación máxima por bloque">Puntuación max.</th>
 			<th scope="col" style="width:10%" title="Porcentaje máximo por bloque">Porcentaje max.</th>
-			<th scope="col" style="width:10%" title="Méritos preferentes">M. Preferentes</th>
-			<th scope="col" style="width:10%" title="Factor mérito preferente">Factor M. Pref.</th>
 			<th scope="col" class="center" style="width:10%">Activo</th>
 		</tr>
 		<tbody>				
@@ -134,15 +132,6 @@ VistaItemsBaremacion bean = (VistaItemsBaremacion) uvdatos.getVistas().get(Vista
 		        {'data': 'nombre', 'filter': true},
 		        {'data': 'puntuacionMaxima'},
 		        {'data': 'porcentajeMaximo'},
-		        {'data': 'meritosPreferentes', 'filter': {'type': 'selectBoolean', 'true': 'Si', 'false': 'No'}, 'render': function(row) {
-	        		if(row.meritosPreferentes){
-	        			return "<div title='Ponderado por méritos preferentes' class='circle-true'></div>"; 
-	        		}
-	        		else{
-	        			return "<div title='Sin ponderación por méritos preferentes' class='circle-false'></div>"; 
-	        		}
-	        	}},
-	        	{'data': 'factorMeritoPrefente'},
 		        {'data': 'activo', 'filter': {'type': 'selectBoolean', 'true': 'Activo', 'false': 'Inactivo'}, 'render': function(row) {
 	        		if(row.activo){
 	        			return "<div title='Activo' class='circle-true'></div>"; 
@@ -271,15 +260,9 @@ VistaItemsBaremacion bean = (VistaItemsBaremacion) uvdatos.getVistas().get(Vista
 				        {'data': 'valor'},
 				        {'data': 'valorMinimo'},
 				        {'data': 'valorMaximo'},				        
-				        {'data': 'afinidad', 'render': function(row) {
-				        	var titles = {
-				        		'N': 'N - Las contribuciones no se someten a modulación',
-				        		'AA': 'AA - Solo se valoran las contribuciones propias del area, sometidas a modulación',
-				        		'AI': 'AI - Solo se valoran las contribuciones asociadas al perfil investigador, sometidas a modulación'
-				        	};
-				        	
-				        	return '<span title="' + Atis.getProp(titles, row.afinidad) +'">' + row.afinidad + '</span>';
-				        }},
+				        {'data': 'afinidadOBJ.codigo', 'render': function(row) {
+			        			return "<div title='"+row.afinidadOBJ.descripcion+"'>"+row.afinidadOBJ.codigo+"</div>"; 
+			        	}},
 				        {'data': 'activo', 'filter': {'type': 'selectBoolean', 'true': 'Activo', 'false': 'Inactivo'}, 'render': function(row) {
 			        		if(row.activo){
 			        			return "<div class='circle-true'></div>"; 

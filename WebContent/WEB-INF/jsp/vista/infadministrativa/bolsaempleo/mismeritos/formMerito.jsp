@@ -36,7 +36,7 @@ String observacion = BolsaEmpleoUtils.getParamForm(request, ControladorMisMerito
     	<input type="hidden" name="<%= ControladorMisMeritos.PARAM_ACCION %>" id="accion_formulario" value="" />
     	<div class="form-group-container col2">
 	    	<div class="form-group">
-				<label>Apartado:</label>
+				<label class="bold-label" for="select_apartado">Apartado:</label>
 				<select class="form-input-custom" id="select_apartado" name="<%= ControladorMisMeritos.PARAM_APARTADO %>">
 					<option value="0">Elija el apartado</option>
 					<%
@@ -55,7 +55,7 @@ String observacion = BolsaEmpleoUtils.getParamForm(request, ControladorMisMerito
 		
 		<% if (apartado != null) { %>
 			<div class="form-group">
-				<label>Ítem:</label>
+				<label class="bold-label" for="select_item">Ítem:</label>
 				<select class="form-input-custom" id="select_item" name="<%= ControladorMisMeritos.PARAM_ITEM %>">
 					<option value="0">Elija el ítem</option>
 					<%
@@ -78,24 +78,22 @@ String observacion = BolsaEmpleoUtils.getParamForm(request, ControladorMisMerito
 		
 		<div class="form-group-container col2">
 	    	<div class="form-group">
-	    		<label for="merito_valor" id="merito_valor_label">Valor:</label>
+	    		<label for="merito_valor" id="merito_valor_label" class="bold-label">Valor:</label>
 	    		<input class="form-input-custom" id="merito_valor" type="text" name="<%= ControladorMisMeritos.PARAM_VALOR %>" value="<%= valor %>"/>
 	    	</div>
 	    	<div class="form-group">
-	    		<label for="merito_descripcion">Descripción:</label>
+	    		<label for="merito_descripcion" class="bold-label">Descripción:</label>
 	    		<input class="form-input-custom" id="merito_descripcion" type="text" name="<%= ControladorMisMeritos.PARAM_DESCRIPCION %>" value="<%= descripcion %>"></input>
 	    	</div>
     	</div>
     	<div class="form-file">
-			<label for="merito_archivo">Fichero:</label>
+			<label for="merito_archivo" class="bold-label">Fichero:</label>
 			<input id="merito_archivo" type="file" name="<%= ControladorMisMeritos.PARAM_ARCHIVO %>"/>
 		</div>
     	<div class="form-group-container col1">
 	    	<div class="form-group">
 	    		<label for="merito_observacion">Observación para la comisión:</label>
-	    		<textarea class="form-input-custom" id="merito_observacion" name="<%= ControladorMisMeritos.PARAM_OBSERVACION %>" rows="2" cols="50">
-	    		<%= observacion %>
-	    		</textarea>
+	    		<textarea class="form-input-custom" id="merito_observacion" name="<%= ControladorMisMeritos.PARAM_OBSERVACION %>" rows="2" cols="50"><%=observacion%></textarea>
 	    	</div>
     	</div>
     	<div class="form-btn">

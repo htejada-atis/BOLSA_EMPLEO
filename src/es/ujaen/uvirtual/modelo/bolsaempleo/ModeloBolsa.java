@@ -154,6 +154,28 @@ public class ModeloBolsa {
 		return bolsas;
 	}
 
+	
+	/**
+	 * Devuelve el total de bolsas .
+	 * @return num bolsas
+	 * @throws SQLException en caso de error en la BD
+	 * @throws UVException si bolsa no es existe
+	 */
+	public Integer getTotalBolsas() throws SQLException, UVException {
+		String consulta = "SELECT COUNT(*) AS total "
+				+ "FROM TBEP_BOLSAS";
+			
+		try (Connection conexion = ConexionUvirtual.obtenerInstancia();
+				PreparedStatement stmt = conexion.prepareStatement(consulta);) {
+			try (ResultSet rs = stmt.executeQuery()) {
+				while (rs.next()) {
+					return rs.getInt("total");				
+				}	
+			}
+		}
+		return null;		
+	}
+	
 	/**
 	 * Devuelve el total de bolsas bloqueadas .
 	 * @return num bolsas

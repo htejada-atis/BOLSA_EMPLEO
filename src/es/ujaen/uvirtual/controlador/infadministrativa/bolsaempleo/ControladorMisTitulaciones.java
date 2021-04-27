@@ -1,5 +1,6 @@
 package es.ujaen.uvirtual.controlador.infadministrativa.bolsaempleo;
 
+import java.io.BufferedInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.PrintWriter;
@@ -9,6 +10,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import javax.servlet.ServletException;
+import javax.servlet.ServletOutputStream;
 import javax.servlet.annotation.MultipartConfig;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
@@ -24,9 +26,12 @@ import com.google.gson.reflect.TypeToken;
 import es.ujaen.uvirtual.beans.CodigoDescripcion;
 import es.ujaen.uvirtual.beans.UVDatos;
 import es.ujaen.uvirtual.beans.Usuario;
+import es.ujaen.uvirtual.beans.uvirtual.bolsaempleo.Fichero;
 import es.ujaen.uvirtual.beans.uvirtual.bolsaempleo.Titulacion;
 import es.ujaen.uvirtual.beans.uvirtual.bolsaempleo.UsuarioBolsaEmpleo;
+import es.ujaen.uvirtual.beans.vistas.uvirtual.bolsaempleo.VistaFicheros;
 import es.ujaen.uvirtual.beans.vistas.uvirtual.bolsaempleo.VistaTitulaciones;
+import es.ujaen.uvirtual.modelo.bolsaempleo.ModeloFichero;
 import es.ujaen.uvirtual.modelo.bolsaempleo.ModeloMisTitulaciones;
 import es.ujaen.uvirtual.modelo.bolsaempleo.ModeloUsuarioBolsaEmpleo;
 import es.ujaen.uvirtual.utilidades.BolsaEmpleoDataTable;
@@ -138,6 +143,9 @@ public class ControladorMisTitulaciones extends HttpServlet {
 				break;
 			case ACCION_ELIMINAR_TITULACION_USUARIO:
 				eliminarTitulacionUsuario(request, response, bean);
+				break;
+			case ACCION_DESCARGAR_FICHERO:
+				descargarFichero(bean, datos, request, response);
 				break;
 			}
 		} catch (SQLException e) {
@@ -337,6 +345,37 @@ public class ControladorMisTitulaciones extends HttpServlet {
 		bean.setVista("/WEB-INF/jsp/vista/infadministrativa/bolsaempleo/mistitulaciones/index.jsp");
 
 		bean.getMensajesDeExito().add(MENSAJE_EXITO_TITULACION_BORRADA);
+	}
+	
+	/** descarga un fichero .
+	 * @param bean .
+	 * @param datos .
+	 * @param request .
+	 * @param response .
+	 * @throws SQLException excepcion de bbdd.
+	 * @throws UVException en caso de error de parametros .
+	 * @throws IOException en caso de error de input u output .
+	 */
+	private void descargarFichero(VistaTitulaciones bean, UVDatos datos, HttpServletRequest request, HttpServletResponse response)
+			throws SQLException, UVException, IOException {
+		ModeloMisTitulaciones modelo = ModeloMisTitulaciones.obtenerInstancia();
+		if (EscapaHTML.ajustaCodificacion(request.getParameter(PARAM_FICHERO)) != null) {
+			Titulacion titulacion = modelo.listaTitulacionUsuario(Formateador.leeParametroInteger(request.getParameter(PARAM_FICHERO)));
+			bean.setTitulacion(titulacion);
+			
+	    	response.setContentType("application/pdf");
+	        datos.setRespuestaEnviada(true);
+	        
+	        try (ServletOutputStream stream = response.getOutputStream();
+	             BufferedInputStream buf = new BufferedInputStream(titulacion.getArchivo());) {
+	            int readBytes = 0;
+	            while ((readBytes = buf.read()) != -1) {
+	                stream.write(readBytes);
+	            }
+	            stream.flush();
+	        }
+			
+		}
 	}
 	
 }

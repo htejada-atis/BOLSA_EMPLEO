@@ -446,3 +446,17 @@ nav-bolsa-empleo a:active, nav-bolsa-empleo a:hover {
 }
 
 
+
+a.consultar-fichero {
+  background-color: #B9C9FE;
+  color: #003399;
+  padding: 2px 6px 2px 6px;
+  text-decoration: none;
+  margin: 0 auto;
+}
+
+a.consultar-fichero:hover {
+  background-color: #049FE1;
+  cursor: pointer;
+}
+
