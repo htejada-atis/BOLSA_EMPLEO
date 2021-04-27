@@ -30,6 +30,8 @@ public class ModeloMerito {
 	public static final int ORDER_COLUMN_INDEX_ITEM_SOLICITUD = 1;
 	public static final int ORDER_COLUMN_INDEX_NOMBRE_ITEM_SOLICITUD = 2;
 	public static final int ORDER_COLUMN_INDEX_VALOR_SOLICITUD = 3;
+	public static final int ORDER_COLUMN_INDEX_AFINIDAD_SOLICITUD = 4;
+	public static final int ORDER_COLUMN_INDEX_EXCLUIDO_SOLICITUD = 5;
 	
 	public static final int COLUMN_DESCRIPCION_MAXLENGTH = 200;
 	public static final int COLUMN_OBSERVACION_MAXLENGTH = 300;
@@ -256,20 +258,19 @@ public class ModeloMerito {
 		BolsaEmpleoDataTable<MeritoSolicitud> dataTable = new BolsaEmpleoDataTable<MeritoSolicitud>(params);
 		
 		String consulta = "SELECT bepmer.*, bepsbm.FLGAFINIDAD, bepsbm.FLGEXCLUIDO, bepblo.BEPAPA_CODNUM FROM TBEP_MERITOS bepmer"
-				+ " INNER JOIN TBEP_ITEMSBAREMACION bepite"
-				+ " ON bepite.CODNUM = bepmer.BEPITE_CODNUM"
-				+ " INNER JOIN TBEP_BLOQUESBAREMACION bepblo"
-				+ " ON bepblo.CODNUM = bepite.BEPBLO_CODNUM"
-				+ " LEFT JOIN TBEP_SOLICITUD_BOLSAS_MERITOS bepsbm"
-				+ " ON bepsbm.BEPMER_CODNUM = bepmer.CODNUM"
+				+ " INNER JOIN TBEP_ITEMSBAREMACION bepite ON bepite.CODNUM = bepmer.BEPITE_CODNUM"
+				+ " INNER JOIN TBEP_BLOQUESBAREMACION bepblo ON bepblo.CODNUM = bepite.BEPBLO_CODNUM"
+				+ " LEFT JOIN TBEP_SOLICITUD_BOLSAS_MERITOS bepsbm ON bepsbm.BEPMER_CODNUM = bepmer.CODNUM"
 				+ " WHERE bepmer.BEPUSU_CODNUM = ? ";
 		
 		dataTable.setColumn(ORDER_COLUMN_INDEX_ID_SOLICITUD, "bepmer.CODNUM");
 		dataTable.setColumn(ORDER_COLUMN_INDEX_ITEM_SOLICITUD, "bepmer.BEPITE_CODNUM");
 		dataTable.setColumn(ORDER_COLUMN_INDEX_NOMBRE_ITEM_SOLICITUD, "bepite.NOMBRE");
 		dataTable.setColumn(ORDER_COLUMN_INDEX_VALOR_SOLICITUD, "bepmer.VALOR");
+		dataTable.setColumn(ORDER_COLUMN_INDEX_AFINIDAD_SOLICITUD, "bepsbm.FLGAFINIDAD");
+		dataTable.setColumn(ORDER_COLUMN_INDEX_EXCLUIDO_SOLICITUD, "bepsbm.FLGEXCLUIDO");
 		dataTable.setQuery(consulta);
-				
+		
 		try (Connection conexion = ConexionUvirtual.obtenerInstancia();
 				PreparedStatement stmtCount = conexion.prepareStatement(dataTable.getQueryCount());
 				PreparedStatement stmt = conexion.prepareStatement(dataTable.getQuery());
@@ -287,11 +288,12 @@ public class ModeloMerito {
 					mer.setDescripcion(rs.getString("DESCRIPCION"));
 					mer.setObservacion(rs.getString("OBSERVACION"));
 					mer.setValor(rs.getFloat("VALOR"));
-					
-					MeritoSolicitud meritoSolicitud = new MeritoSolicitud(mer, false, false);
+					Boolean afinidad = rs.getString("FLGAFINIDAD") != null && rs.getString("FLGAFINIDAD").equals("S");
+					Boolean excluido = rs.getString("FLGEXCLUIDO") != null && rs.getString("FLGEXCLUIDO").equals("S");
+					MeritoSolicitud meritoSolicitud = new MeritoSolicitud(mer, afinidad, excluido);
 					meritos.add(meritoSolicitud);
-				}				
-			}	
+				}
+			}
 			
 			dataTable.setRecordsTotalFromQuery(stmtCount);
 			dataTable.setData(meritos);

@@ -192,7 +192,7 @@ function DataTable(id, config) {
     			self.renderFooter();
 
                 if (columnDef.selectable.hasOwnProperty('onChange')) {
-                    columnDef.selectable.onChange(row);
+                    columnDef.selectable.onChange(row, this);
                 }
     		});
 
@@ -203,7 +203,7 @@ function DataTable(id, config) {
     		return check;
     	}
 
-    	return typeof value !== 'undefined' ? '' + value : '';    	
+    	return typeof value !== 'undefined' ? '' + value : '';
     };
     
     this.renderFooter = function() {

@@ -15,7 +15,6 @@ import javax.servlet.http.HttpServletResponse;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.reflect.TypeToken;
-
 import es.ujaen.uvirtual.beans.CodigoDescripcion;
 import es.ujaen.uvirtual.beans.UVDatos;
 import es.ujaen.uvirtual.beans.Usuario;
@@ -26,7 +25,6 @@ import es.ujaen.uvirtual.beans.uvirtual.bolsaempleo.Merito;
 import es.ujaen.uvirtual.beans.uvirtual.bolsaempleo.MeritoSolicitud;
 import es.ujaen.uvirtual.beans.uvirtual.bolsaempleo.Solicitud;
 import es.ujaen.uvirtual.beans.uvirtual.bolsaempleo.UsuarioBolsaEmpleo;
-import es.ujaen.uvirtual.beans.vistas.uvirtual.bolsaempleo.VistaMeritos;
 import es.ujaen.uvirtual.beans.vistas.uvirtual.bolsaempleo.VistaSolicitudes;
 import es.ujaen.uvirtual.modelo.bolsaempleo.ModeloArea;
 import es.ujaen.uvirtual.modelo.bolsaempleo.ModeloBolsa;
@@ -60,6 +58,7 @@ public class ControladorMisSolicitudes extends HttpServlet {
 	public static final String PARAM_BOLSA = "bolsa";
 	public static final String PARAM_BOLSAS = "bolsas";
 	public static final String PARAM_CONVOCATORIA_ID = "idConvocatoria";
+	public static final String PARAM_MERITO = "merito";
 	public static final String PARAM_SOLICITUD_ID = "idSolicitud";
 	
 	// acciones
@@ -71,6 +70,8 @@ public class ControladorMisSolicitudes extends HttpServlet {
 	public static final String ACCION_DATATABLE_BOLSAS_SELECCIONADAS = "datatableBolsasSolicitud";
 	public static final String ACCION_DATATABLE_MERITOS_BOLSA = "datatablemeritosbolsa";
 	public static final String ACCION_LISTAR_SOLICITUDES = "listar";
+	public static final String ACCION_MERITO_DESELECCIONADO = "meritodeseleccionado";
+	public static final String ACCION_MERITO_SELECCIONADO = "meritoseleccionado";
 	public static final String ACCION_SELECCIONAR_BOLSAS = "seleccionarbolsas";
 	
 	// mensajes
@@ -131,6 +132,12 @@ public class ControladorMisSolicitudes extends HttpServlet {
 					break;
 				case ACCION_LISTAR_SOLICITUDES:
 					index(bean, datos, request, response);
+					break;
+				case ACCION_MERITO_DESELECCIONADO:
+					seleccionarMerito(bean, datos, request, response, false);
+					break;
+				case ACCION_MERITO_SELECCIONADO:
+					seleccionarMerito(bean, datos, request, response, true);
 					break;
 				case ACCION_SELECCIONAR_BOLSAS:
 					seleccionarBolsas(bean, datos, request, response);
@@ -292,6 +299,45 @@ public class ControladorMisSolicitudes extends HttpServlet {
 		
 		Solicitud solicitud = modeloSolicitud.getSolicitudById(Formateador.leeParametroInteger(request.getParameter(PARAM_SOLICITUD_ID)));
 		bean.setSolicitud(solicitud);
+		
+		ModeloSolicitud modelo = ModeloSolicitud.obtenerInstancia();
+		List<Merito> listaMeritos = modelo.getMeritosSolicitudBolsa(solicitud, area);
+		bean.setListaMeritos(listaMeritos);
+	}
+	
+	private void seleccionarMerito(VistaSolicitudes bean, UVDatos datos, HttpServletRequest request, HttpServletResponse response, Boolean seleccionado)
+			throws IOException, SQLException {
+		ModeloBolsa modeloBolsa = ModeloBolsa.obtenerInstancia();
+		ModeloMerito modeloMerito = ModeloMerito.obtenerInstancia();
+		ModeloSolicitud modeloSolicitud = ModeloSolicitud.obtenerInstancia();
+		datos.setContentType("application/json");
+		datos.setRespuestaEnviada(true);
+		response.setContentType("application/json");
+		response.setCharacterEncoding("UTF-8");
+		
+		try (PrintWriter writer = response.getWriter()) {
+			try {
+				Bolsa area = modeloBolsa.getBolsaById(Formateador.leeParametroInteger(request.getParameter(PARAM_BOLSA)));
+				bean.setArea(area);
+				Solicitud solicitud = modeloSolicitud.getSolicitudById(Formateador.leeParametroInteger(request.getParameter(PARAM_SOLICITUD_ID)));
+				bean.setSolicitud(solicitud);
+				Merito merito = modeloMerito.listaMerito(Formateador.leeParametroInteger(request.getParameter(PARAM_MERITO)));
+				
+				if (seleccionado) {
+					modeloSolicitud.asignarMeritosASolicitudBolsa(solicitud, area, merito);
+				} else {
+					modeloSolicitud.borrarMeritoDeSolicitudBolsa(solicitud, area, merito);
+				}
+				
+				CodigoDescripcion mensaje = new CodigoDescripcion("ok", seleccionado ? "mérito agregado a la bolsa" : "mérito quitado de la bolsa");
+				writer.write(new Gson().toJson(mensaje));
+			} catch (Exception ex) {
+				bean.getMensajesDeError().add(ex.getMessage());
+				CodigoDescripcion mensaje = new CodigoDescripcion("error", ex.getMessage());
+				writer.write(new Gson().toJson(mensaje));
+				response.setStatus(RESPONSE_HTTP_CODE_ERROR);
+			}
+		}
 	}
 	
 	private void listadoAreas(VistaSolicitudes bean, UVDatos datos, HttpServletRequest request, HttpServletResponse response) throws IOException, SQLException {
