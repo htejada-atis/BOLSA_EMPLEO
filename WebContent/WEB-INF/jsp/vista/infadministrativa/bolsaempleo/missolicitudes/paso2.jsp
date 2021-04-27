@@ -6,6 +6,7 @@
 <%@ page import="es.ujaen.uvirtual.beans.vistas.uvirtual.bolsaempleo.VistaSolicitudes" %>
 <%@ page import="es.ujaen.uvirtual.beans.uvirtual.bolsaempleo.Solicitud" %>
 <%@ page import="es.ujaen.uvirtual.utilidades.EscapaHTML" %>
+<%@	page import="es.ujaen.uvirtual.beans.uvirtual.bolsaempleo.Merito" %>
 
 <%
 UVDatos uvdatos = (UVDatos) request.getAttribute(UVDatos.NOMBRE_ATRIBUTO);
@@ -98,16 +99,41 @@ VistaSolicitudes bean = (VistaSolicitudes) uvdatos.getVistas().get(VistaSolicitu
 		
 		<% if (bean.getArea() != null) { %>
 		
+			var meritosBolsaSolicitud = [];
+		
+			<%  if (bean.getListaBolsas() != null) {
+					for (Merito merito: bean.getListaMeritos()) { %>
+						meritosBolsaSolicitud.push("<%=merito.getCodNum()%>");
+					<% }
+				} %>
+		
 			var tableMeritos = new Atis.DataTable('#tableMeritos', {
 				"ajax": { url: "<%= ControladorMisSolicitudes.URL_PATTERN_AJAX %>" },
 			    "pageSize": 10,
 			    "selectable": true,
 			    "filterable": true,
 			    "title": 'Mis méritos',
+			    "selected": meritosBolsaSolicitud,
 			    "action": "<%= ControladorMisSolicitudes.ACCION_DATATABLE_MERITOS_BOLSA %>",
 			    "params": {"<%= ControladorMisSolicitudes.PARAM_SOLICITUD_ID %>": <%= bean.getSolicitud().getCodNum() %>},
 			    "columns": [
-			    	{'data': 'codNum', 'selectable': true},
+			    	{'data': 'codNum', 'selectable': {'onChange': function(row, checkbox) {
+			    				var accion = checkbox.checked ? '<%= ControladorMisSolicitudes.ACCION_MERITO_SELECCIONADO %>'
+			    						: '<%= ControladorMisSolicitudes.ACCION_MERITO_DESELECCIONADO %>';
+				    			var params = {
+				    				'a': accion,
+				    				'<%= ControladorMisSolicitudes.PARAM_BOLSA %>': '<%=bean.getArea().getCodNum()%>',
+				    				'<%= ControladorMisSolicitudes.PARAM_SOLICITUD_ID %>': '<%= bean.getSolicitud().getCodNum() %>',
+				    				'<%= ControladorMisSolicitudes.PARAM_MERITO %>': row.codNum,
+				    			};
+				    			Atis.sendAjax("<%= request.getRequestURI() %>", params, function(data) {
+				    				console.log(data);
+				    			}, function(error) {
+				    				console.log(error);
+				    			});
+				    		}
+			    		}
+			    	},
 			    	{'data': 'item', 'filter': true, 'render': function(row) {
 			        	return row.item.bloque.apartado.codigo + "." + row.item.bloque.codigo + "." + row.item.codigo;
 		        	}},

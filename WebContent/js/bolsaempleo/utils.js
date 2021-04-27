@@ -66,6 +66,18 @@ function sendForm(url, params) {
 	form.submit();
 }
 
+function sendAjax(url, params, success, error) {
+	$.ajax({
+		type: 'GET',
+		url: url,
+		contentType: "application/json",
+		dataType: "json",
+		data: params,
+		success: success,
+		error: error
+	});
+}
+
 function alertDialog(title, message) {
 	$('<div class="atisDialog"></div>')
 		.appendTo('body')
@@ -123,5 +135,6 @@ window.Atis = $.extend(window.Atis ? window.Atis : {}, {
 	"formatearFecha": formatearFecha,
 	"sendForm": sendForm,
 	"object2Json": object2Json,
-	"json2Object": json2Object
+	"json2Object": json2Object,
+	"sendAjax": sendAjax
 });
