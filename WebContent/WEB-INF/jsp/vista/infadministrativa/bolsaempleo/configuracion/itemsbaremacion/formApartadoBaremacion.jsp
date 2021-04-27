@@ -62,27 +62,6 @@ ApartadoBaremacion apartado = bean.getApartadoBaremacion();
 					value="<%= BolsaEmpleoUtils.getParamForm(request, ControladorItemsBaremacion.PARAM_APARTADO_PORCENTAJEMAXIMO, apartado != null && apartado.getPorcentajeMaximo() != null ? apartado.getPorcentajeMaximo().toString() : "") %>"/>
 			</div>
 		</div>
-		<div class="form-group-container col2">
-			<div class="form-group">
-				<%
-					String meritosPreferentesSelected = BolsaEmpleoUtils.getParamForm(request, ControladorItemsBaremacion.PARAM_APARTADO_MERITOSPREFERENTES, 
-							apartado != null && apartado.getMeritosPreferentes() ? "1" :
-								apartado != null && !apartado.getMeritosPreferentes() ? "0" : "0"
-					); 
-				%>
-				<label for="apartado_meritospreferentes">Méritos preferentes</label> 
-				<select class="params" id="apartado_meritospreferentes" name="<%= ControladorItemsBaremacion.PARAM_APARTADO_MERITOSPREFERENTES %>" style="width:100%;">
-					<option value="1" <%= meritosPreferentesSelected.equals("1") ? "selected=\"selected\"" : "" %>>Si</option>
-					<option value="0" <%= meritosPreferentesSelected.equals("0") ? "selected=\"selected\"" : "" %>>No</option>
-				</select>				
-			</div>
-			<div class="form-group">
-				<label for="apartado_factor_merito">Factor mérito preferente</label> 
-				<input type="text" class="form-input-custom" name="<%= ControladorItemsBaremacion.PARAM_APARTADO_FACTORMERITOPREFERENTE %>" id="apartado_factor_merito"
-					value="<%= BolsaEmpleoUtils.getParamForm(request, ControladorItemsBaremacion.PARAM_APARTADO_FACTORMERITOPREFERENTE, apartado != null && apartado.getFactorMeritoPreferente() != null ? apartado.getFactorMeritoPreferente().toString() : "") %>"/>
-			</div>
-		</div>
-
 		<div class="form-btn">
 			<input id="apartado_enviar" type="submit" name="<%= ControladorItemsBaremacion.PARAM_ENVIAR %>"
 				value="<%= apartado != null ? "Guardar cambios" : "Insertar apartado" %>" />
@@ -91,26 +70,6 @@ ApartadoBaremacion apartado = bean.getApartadoBaremacion();
 </div>
 
 <script>
-	$(document).ready(function() {
-		
-		<%
-			if(meritosPreferentesSelected.equals("0")){%>
-				document.getElementById("apartado_factor_merito").value="";
-				document.getElementById("apartado_factor_merito").disabled=true;
-			<%}
-		%>
-		
-		
-		document.getElementById("apartado_meritospreferentes").addEventListener("change", function(event) {
-			if(event.target.value==0){
-				document.getElementById("apartado_factor_merito").value="";
-				document.getElementById("apartado_factor_merito").disabled=true;
-			}
-			else{
-				document.getElementById("apartado_factor_merito").value="";
-				document.getElementById("apartado_factor_merito").disabled=false;
-			}
-		});
-	});
+
 </script>
 

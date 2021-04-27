@@ -27,6 +27,7 @@ public class ModeloAfinidad {
 	public static final int ORDER_COLUMN_INDEX_CODIGO = 1;
 	public static final int ORDER_COLUMN_INDEX_DESCRIPCION = 2;
 	public static final int ORDER_COLUMN_INDEX_MODULACION = 3;
+	public static final int ORDER_COLUMN_INDEX_AFINIDAD = 4;
 	
 	public static final int COLUMN_DESCRIPCION_MAXLENGTH = 250;
 	public static final int COLUMN_CODIGO_MAXLENGTH = 4;
@@ -75,7 +76,8 @@ public class ModeloAfinidad {
 		dataTable.setColumn(ORDER_COLUMN_INDEX_ID, "bepafi.CODNUM");
 		dataTable.setColumn(ORDER_COLUMN_INDEX_CODIGO, "bepafi.CODIGO");
 		dataTable.setColumn(ORDER_COLUMN_INDEX_DESCRIPCION, "bepafi.DESCRIPCION");
-		dataTable.setColumn(ORDER_COLUMN_INDEX_MODULACION, "bepafi.MODULACION", DataTableColumn.COLUMN_TYPE_NUMBER);		
+		dataTable.setColumn(ORDER_COLUMN_INDEX_MODULACION, "bepafi.MODULACION", DataTableColumn.COLUMN_TYPE_NUMBER);	
+		dataTable.setColumn(ORDER_COLUMN_INDEX_AFINIDAD, "bepafi.FLGSUJETOAFINIDAD", DataTableColumn.COLUMN_TYPE_BOOLEAN);
 		dataTable.setQuery(consulta);
 				
 		try (Connection conexion = ConexionUvirtual.obtenerInstancia();
@@ -91,7 +93,8 @@ public class ModeloAfinidad {
 					afinidad.setCodNum(rs.getInt("CODNUM"));
 					afinidad.setCodigo(rs.getString("CODIGO"));
 					afinidad.setDescripcion(rs.getString("DESCRIPCION"));
-					afinidad.setModulacion(rs.getFloat("MODULACION"));					
+					afinidad.setModulacion(rs.getFloat("MODULACION"));	
+					afinidad.setSujetoAfinidad(rs.getString("FLGSUJETOAFINIDAD").equals("S"));
 					afinidades.add(afinidad);					
 				}				
 			}	
@@ -140,9 +143,11 @@ public class ModeloAfinidad {
 					while (rs.next()) {
 						try {
 							Afinidad afinidad = new Afinidad();
-							afinidad.setCodNum(rs.getInt("CODIGO"));
+							afinidad.setCodNum(rs.getInt("CODNUM"));
+							afinidad.setCodigo(rs.getString("CODIGO"));
 							afinidad.setDescripcion(rs.getString("DESCRIPCION"));
-							afinidad.setModulacion(rs.getFloat("MODULACION"));				
+							afinidad.setModulacion(rs.getFloat("MODULACION"));
+							afinidad.setSujetoAfinidad(rs.getString("FLGSUJETOAFINIDAD").equals("S"));	
 							afinidades.add(afinidad);	
 						} catch (Exception e) {
 							e.printStackTrace();
@@ -198,6 +203,7 @@ public class ModeloAfinidad {
 				afinidad.setCodigo(rs.getString("CODIGO"));
 				afinidad.setDescripcion(rs.getString("DESCRIPCION"));
 				afinidad.setModulacion(rs.getFloat("MODULACION"));
+				afinidad.setSujetoAfinidad(rs.getString("FLGSUJETOAFINIDAD").equals("S"));
 				
 				return afinidad;
 			}
