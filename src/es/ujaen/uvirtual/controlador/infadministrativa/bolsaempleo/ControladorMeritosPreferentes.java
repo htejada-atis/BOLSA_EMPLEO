@@ -189,7 +189,7 @@ public class ControladorMeritosPreferentes extends HttpServlet {
 		bean.setVista(RUTA_BEP_CONF + "formMeritosPreferentes.jsp");
 		
 		MeritoPreferente merito = new MeritoPreferente();
-		merito.setBorrado(false);
+		merito.setActivo(true);
 		
 		ModeloMeritosPreferentes.obtenerInstancia().crearMeritoPreferente(this.validate(merito, request));
 		bean.getMensajesDeExito().add("Mérito preferente añadido correctamente");
