@@ -11,7 +11,15 @@ VistaValidar bean = (VistaValidar)uvdatos.getVistas().get(VistaValidar.class.get
 %>
 
 <div class='bolsa-empleo'>
-	<% if (bean.getMensajesDeExito().size() > 0) { %>
+	<% 
+		String descripcion = "";
+		if(bean.getConvocatoria()!=null){
+			descripcion = "Última convocatoria abierta:" + bean.getConvocatoria().getDescripcion();
+		} else {
+			descripcion = "No existen convocatorias abiertas en este momento";
+		}
+	
+	if (bean.getMensajesDeExito().size() > 0) { %>
 		<div id="exito" class="success">
 			<%= bean.formatearMensajesDeExito() %>
 		</div>
@@ -21,9 +29,13 @@ VistaValidar bean = (VistaValidar)uvdatos.getVistas().get(VistaValidar.class.get
 			<%= bean.formatearMensajesDeError() %>
 		</div>
 	<% } else {%>
-	<h2>Validar meritos sujetos afinidad</h2>	
 	
 	<div class="titulo-bolsa-empleo">
+		<h2>Validar meritos sujetos afinidad</h2>
+		<h3><%= descripcion %></h3>
+	</div>
+	
+	<div class="form-group-container">
 		<div class="form-select">
 			<label>Área</label>
 			<select id="select_area" autocomplete="off">

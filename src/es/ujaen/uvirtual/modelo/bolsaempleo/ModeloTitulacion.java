@@ -30,8 +30,11 @@ public class ModeloTitulacion {
 	
 	public static final int COLUMN_NOMBRE_MAXLENGTH = 150;
 	
-    protected static ModeloTitulacion eInstancia = null;
+	public static final String ERROR_TITULACION_NOEXITE = "No existe la titulación";
+	public static final String ERROR_TITULACION_REQUERIDA = "La titulación es requerida";
 	
+    protected static ModeloTitulacion eInstancia = null;
+    	
 	/** Crea una instancia del objeto.
 	 *  de forma sincronizada para protegerse de posibles problemas multi-hilo
 	 */
@@ -66,14 +69,10 @@ public class ModeloTitulacion {
 			PreparedStatement stmt = conexion.prepareStatement(consulta);) {
 				try (ResultSet rs = stmt.executeQuery()) {
 					while (rs.next()) {
-						try {
-							Titulacion tit = new Titulacion();
-							tit.setCodNum(rs.getInt("CODNUM"));
-							tit.setNombre(rs.getString("NOMBRE"));
-							titulaciones.add(tit);
-						} catch (Exception e) {
-							e.printStackTrace();
-						}
+						Titulacion tit = new Titulacion();
+						tit.setCodNum(rs.getInt("CODNUM"));
+						tit.setNombre(rs.getString("NOMBRE"));
+						titulaciones.add(tit);
 						
 					}
 				}
@@ -406,5 +405,37 @@ public class ModeloTitulacion {
 		}
 		
 		return dataTable;
+	}
+	
+	/**
+	 * Devuelve una titulación por su código.
+	 * @param codNum .
+	 * @return .
+	 * @throws UVException .
+	 * @throws SQLException .
+	 */
+	public Titulacion getTitulacionById(Integer codNum) throws SQLException, UVException {
+		if (codNum == null) {
+			throw new UVException(ERROR_TITULACION_REQUERIDA);
+		} 
+		
+		String consulta = "SELECT beptit.* FROM TBEP_TITULACIONES beptit WHERE beptit.CODNUM = ?";
+		
+		try (Connection con = ConexionUvirtual.obtenerInstancia(); PreparedStatement stmt = con.prepareStatement(consulta);) {
+			int parameterIndex = 1;
+			stmt.setInt(parameterIndex++, codNum);
+			
+			try (ResultSet rs = stmt.executeQuery()) {
+				while (rs.next()) {
+					Titulacion t = new Titulacion();
+					t.setCodNum(rs.getInt("CODNUM"));
+					t.setNombre(rs.getString("NOMBRE"));
+					
+					return t;
+				}
+			}
+		}
+		
+		throw new UVException(ERROR_TITULACION_NOEXITE);	
 	}
 }

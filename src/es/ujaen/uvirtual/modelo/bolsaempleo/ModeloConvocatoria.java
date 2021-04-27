@@ -5,14 +5,11 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
-import es.ujaen.uvirtual.beans.uvirtual.bolsaempleo.Bolsa;
 import es.ujaen.uvirtual.beans.uvirtual.bolsaempleo.Convocatoria;
-import es.ujaen.uvirtual.beans.uvirtual.bolsaempleo.Noticia;
-import es.ujaen.uvirtual.beans.uvirtual.bolsaempleo.UsuarioBolsaEmpleo;
+import es.ujaen.uvirtual.beans.uvirtual.bolsaempleo.Titulacion;
 import es.ujaen.uvirtual.modelo.conexion.ConexionUvirtual;
 import es.ujaen.uvirtual.utilidades.BolsaEmpleoDataTable;
 import es.ujaen.uvirtual.utilidades.UVException;
@@ -128,6 +125,37 @@ public class ModeloConvocatoria {
 		}
 		
 		return false;
+	}
+	
+	/** Consulta titulaciones en BBDD y las devuelve.
+	 * @param clausula para filtrar las titulaciones de la bd
+	 * @return todas las titulaciones de la base de datos
+	 * @throws SQLException en caso de error de base de datos
+	 */
+	public List<Convocatoria> listaConvocatorias() throws SQLException {
+		List<Convocatoria> convocatorias = new ArrayList<>();
+		String consulta = "SELECT bepcon.* FROM TBEP_CONVOCATORIAS bepcon";
+		
+		try (Connection conexion = ConexionUvirtual.obtenerInstancia();
+			PreparedStatement stmt = conexion.prepareStatement(consulta);) {
+				try (ResultSet rs = stmt.executeQuery()) {
+					while (rs.next()) {
+						try {
+							Convocatoria convocatoria = new Convocatoria();
+							convocatoria.setCodNum(rs.getInt("CODNUM"));
+							convocatoria.setDescripcion(rs.getString("DESCRIPCION"));
+							convocatoria.setFechaCierre(rs.getDate("FECHACIERRE"));
+							convocatoria.setEstado(rs.getString("ESTADO"));					
+							convocatorias.add(convocatoria);	
+						} catch (Exception e) {
+							e.printStackTrace();
+						}
+						
+					}
+				}
+			}
+		
+		return convocatorias;
 	}
 	
 	/**

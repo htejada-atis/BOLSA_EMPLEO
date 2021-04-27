@@ -1,5 +1,6 @@
 package es.ujaen.uvirtual.beans.uvirtual.bolsaempleo;
 
+import java.io.InputStream;
 import java.io.Serializable;
 
 
@@ -13,6 +14,10 @@ public class Titulacion implements Serializable {
 	private Integer codNum;
 	private String nombre;
 	private Area area;
+	private String descripcion;
+	private InputStream archivo;
+	private Titulacion titulacion;
+	private UsuarioBolsaEmpleo usuario;
 
 	
 	/** Constructor por defecto.
@@ -91,9 +96,41 @@ public class Titulacion implements Serializable {
 	public void setArea(Area area) {
 		this.area = area;
 	}
+	
+	public String getDescripcion() {
+		return descripcion;
+	}
+
+	public void setDescripcion(String descripcion) {
+		this.descripcion = descripcion;
+	}
 
 	public static long getSerialversionuid() {
 		return serialVersionUID;
+	}
+	
+	public InputStream getArchivo() {
+		return archivo;
+	}
+	
+	public void setArchivo(InputStream archivo) {
+		this.archivo = archivo;
+	}
+	
+	public Titulacion getTitulacion() {
+		return titulacion;
+	}
+	
+	public void setTitulacion(Titulacion titulacion) {
+		this.titulacion = titulacion;
+	}
+	
+	public UsuarioBolsaEmpleo getUsuario() {
+		return usuario;
+	}
+	
+	public void setUsuario(UsuarioBolsaEmpleo usuario) {
+		this.usuario = usuario;
 	}
 	
 	@Override

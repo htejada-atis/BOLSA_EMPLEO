@@ -107,6 +107,10 @@ public class ModeloBaremacion {
 	 * @throws UVException si apartado no es existe
 	 */
 	public ApartadoBaremacion getApartadoBaremacionById(Integer codNum) throws SQLException, UVException {
+		if (codNum == null) {
+			throw new UVException("El bloque es requerido");	
+		}
+			
 		String sql = "SELECT bepapa.* FROM TBEP_APARTADOSBAREMACION bepapa WHERE bepapa.CODNUM = ?";
 		
 		try (Connection con = ConexionUvirtual.obtenerInstancia(); PreparedStatement stmt = con.prepareStatement(sql);) {
@@ -323,6 +327,31 @@ public class ModeloBaremacion {
 		return apartados;
 	}
 
+	/**
+	 * Devuelve los apartados de bareamación activos.
+	 * @return .
+	 * @throws UVException .
+	 * @throws SQLException .
+	 */
+	public List<ApartadoBaremacion> listaApartadoBaremacion() throws SQLException, UVException {
+		return listaApartadoBaremacion(" WHERE FLGACTIVO = 'S' ORDER BY nombre");
+	} 
+	
+	private List<ApartadoBaremacion> listaApartadoBaremacion(String clausula) throws SQLException, UVException {
+		List<ApartadoBaremacion> items = new ArrayList<>();
+		String consulta = "SELECT bepapa.* FROM TBEP_APARTADOSBAREMACION bepapa " + clausula;
+		
+		try (Connection conexion = ConexionUvirtual.obtenerInstancia();
+			PreparedStatement stmt = conexion.prepareStatement(consulta);) {
+				try (ResultSet rs = stmt.executeQuery()) {
+					while (rs.next()) {
+						items.add(this.createApartadoFromResultSet(rs));
+					}
+				}
+			}
+		return items;
+	}
+	
 	private ApartadoBaremacion createApartadoFromResultSet(ResultSet rs) throws SQLException {
 		ApartadoBaremacion apartado = new ApartadoBaremacion();
 		apartado.setCodNum(rs.getInt("CODNUM"));
@@ -462,6 +491,10 @@ public class ModeloBaremacion {
 	 * @throws UVException si bloque no es existe
 	 */
 	public BloqueBaremacion getBloqueBaremacionById(Integer codNum) throws SQLException, UVException {
+		if (codNum == null) {
+			throw new UVException("El bloque de baremación es requerido");
+		}
+		
 		String sql = "SELECT bepblo.* FROM TBEP_BLOQUESBAREMACION bepblo WHERE bepblo.CODNUM = ?";
 		
 		try (Connection con = ConexionUvirtual.obtenerInstancia(); PreparedStatement stmt = con.prepareStatement(sql);) {
@@ -625,6 +658,31 @@ public class ModeloBaremacion {
 				}
 			}
 		}
+	}
+	
+	/**
+	 * Devuelve los bloques de bareamación activos.
+	 * @return .
+	 * @throws UVException .
+	 * @throws SQLException .
+	 */
+	public List<BloqueBaremacion> listaBloqueBaremacion() throws SQLException, UVException {
+		return listaBloqueBaremacion(" WHERE FLGACTIVO = 'S' ORDER BY nombre");
+	} 
+	
+	private List<BloqueBaremacion> listaBloqueBaremacion(String clausula) throws SQLException, UVException {
+		List<BloqueBaremacion> items = new ArrayList<>();
+		String consulta = "SELECT bepblo.* FROM TBEP_BLOQUESBAREMACION bepblo " + clausula;
+		
+		try (Connection conexion = ConexionUvirtual.obtenerInstancia();
+			PreparedStatement stmt = conexion.prepareStatement(consulta);) {
+				try (ResultSet rs = stmt.executeQuery()) {
+					while (rs.next()) {
+						items.add(this.createBloqueFromResultSet(rs));
+					}
+				}
+			}
+		return items;
 	}
 	
 	private BloqueBaremacion createBloqueFromResultSet(ResultSet rs) throws SQLException, UVException {
@@ -900,6 +958,31 @@ public class ModeloBaremacion {
 		return items;
 	}
 
+	/**
+	 * Devuelve los items de bareamación activos.
+	 * @return .
+	 * @throws UVException .
+	 * @throws SQLException .
+	 */
+	public List<ItemBaremacion> listaItemBaremacion() throws SQLException, UVException {
+		return listaItemBaremacion(" WHERE FLGACTIVO = 'S' ORDER BY nombre");
+	} 
+	
+	private List<ItemBaremacion> listaItemBaremacion(String clausula) throws SQLException, UVException {
+		List<ItemBaremacion> items = new ArrayList<>();
+		String consulta = "SELECT bepite.* FROM TBEP_ITEMSBAREMACION bepite " + clausula;
+		
+		try (Connection conexion = ConexionUvirtual.obtenerInstancia();
+			PreparedStatement stmt = conexion.prepareStatement(consulta);) {
+				try (ResultSet rs = stmt.executeQuery()) {
+					while (rs.next()) {
+						items.add(this.createItemFromResultSet(rs));
+					}
+				}
+			}
+		return items;
+	}
+	
 	private ItemBaremacion createItemFromResultSet(ResultSet rs) throws SQLException, UVException {
 		ItemBaremacion item = new ItemBaremacion();
 		item.setCodNum(rs.getInt("CODNUM"));

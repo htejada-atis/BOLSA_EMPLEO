@@ -3,7 +3,6 @@ package es.ujaen.uvirtual.controlador.infadministrativa.bolsaempleo;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.sql.SQLException;
-import java.text.SimpleDateFormat;
 import java.util.logging.Logger;
 import java.util.Date;
 import java.util.logging.Level;
@@ -18,19 +17,13 @@ import javax.servlet.http.HttpSession;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 
-import es.ujaen.uvirtual.adm.CrearUsuario;
 import es.ujaen.uvirtual.beans.CodigoDescripcion;
-import es.ujaen.uvirtual.beans.Rol;
 import es.ujaen.uvirtual.beans.UVDatos;
 import es.ujaen.uvirtual.beans.Usuario;
 import es.ujaen.uvirtual.beans.uvirtual.bolsaempleo.Convocatoria;
-import es.ujaen.uvirtual.beans.uvirtual.bolsaempleo.Noticia;
-import es.ujaen.uvirtual.beans.uvirtual.bolsaempleo.UsuarioBolsaEmpleo;
 import es.ujaen.uvirtual.beans.vistas.uvirtual.bolsaempleo.VistaConvocatorias;
-import es.ujaen.uvirtual.beans.vistas.uvirtual.bolsaempleo.VistaNoticias;
+import es.ujaen.uvirtual.modelo.bolsaempleo.ModeloBolsa;
 import es.ujaen.uvirtual.modelo.bolsaempleo.ModeloConvocatoria;
-import es.ujaen.uvirtual.modelo.bolsaempleo.ModeloNoticia;
-import es.ujaen.uvirtual.modelo.bolsaempleo.ModeloRol;
 import es.ujaen.uvirtual.modelo.bolsaempleo.ModeloUsuarioBolsaEmpleo;
 import es.ujaen.uvirtual.utilidades.BolsaEmpleoValidator;
 import es.ujaen.uvirtual.utilidades.BolsaEmpleoDataTable;
@@ -89,6 +82,7 @@ public class ControladorConvocatorias extends HttpServlet {
 	public static final String MENSAJE_ERROR_NUMMERITOSBLOQUE_INCORRECTA = "El número de méritos por bloque debe ser un entero";
 	public static final String MENSAJE_ERROR_NUMMERITOSBLOQUE_MINIMO = "El número de méritos por bloque debe ser al menos uno";
 	public static final String MENSAJE_ERROR_CONVOCATORIAS_ABIERTAS = "Ya existen convocatorias abiertas.";
+	public static final String MENSAJE_ERROR_SIN_BOLSAS_BAREMABLES = "Antes de abrir una convocatoria debe de tener areas baremables";
 	public static final String MENSAJE_INFO_CONVOCATORIAS_INSERTADA_CORRECTAMENTE = "Convocatoria insertada correctamente.";
 	public static final String MENSAJE_INFO_CONVOCATORIA_ACTUALIZADA_CORRECTAMENTE = "Convocatoria actualizada correctamente.";
 
@@ -283,11 +277,14 @@ public class ControladorConvocatorias extends HttpServlet {
 				
 		BolsaEmpleoValidator validator = this.getValidatorConvocatoria(request); 							
 		ModeloConvocatoria modelo = ModeloConvocatoria.obtenerInstancia();
+		ModeloBolsa modeloBolsas = ModeloBolsa.obtenerInstancia();
 		
 		Convocatoria convocatoria = modelo.getConvocatoriaById(Formateador.leeParametroInteger(request.getParameter(PARAM_CONVOCATORIA_ID)));
 		bean.setConvocatoria(convocatoria);
 		
-		if (modelo.hayConvocatoriaAbierta()) {
+		if (!modeloBolsas.hayBolsasBaremables()) {
+			bean.getMensajesDeError().add(MENSAJE_ERROR_SIN_BOLSAS_BAREMABLES);
+		} else if (modelo.hayConvocatoriaAbierta()) {
 			bean.getMensajesDeError().add(MENSAJE_ERROR_CONVOCATORIAS_ABIERTAS);
 		} else {
 			Integer codNum = Formateador.leeParametroInteger(request.getParameter(PARAM_CONVOCATORIA_ID));

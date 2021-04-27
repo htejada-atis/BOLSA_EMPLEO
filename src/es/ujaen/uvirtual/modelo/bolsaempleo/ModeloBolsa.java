@@ -392,4 +392,32 @@ public class ModeloBolsa {
 			stmt.executeUpdate();
 		}
 	}
+	
+	/**
+	 * Comprueba si hay bolsas baremables.
+	 * @return .
+	 * @throws SQLException .
+	 */
+	public boolean hayBolsasBaremables() throws SQLException {
+		String consulta =
+				"SELECT COUNT(1) as numero_bolsas_abiertas "
+						+ "FROM TBEP_BOLSAS bepbol "
+						+ "INNER JOIN TBEP_AREAS bepare ON bepare.CODNUM = bepbol.BEPARE_CODNUM "
+						+ "WHERE bepbol.FLGBAREMABLE='S'";
+		
+		try (Connection conexion = ConexionUvirtual.obtenerInstancia(); 
+				PreparedStatement stmt = conexion.prepareStatement(consulta);) {
+    		try (ResultSet rs = stmt.executeQuery();) {
+	    		if (rs.next()) {
+    				Integer cont = rs.getInt("numero_bolsas_abiertas");
+	    			if (rs.getInt("numero_bolsas_abiertas") > 0) {
+
+	    				return true;
+	    			}
+	    		}
+    		}
+		}
+		
+		return false;
+	}
 }

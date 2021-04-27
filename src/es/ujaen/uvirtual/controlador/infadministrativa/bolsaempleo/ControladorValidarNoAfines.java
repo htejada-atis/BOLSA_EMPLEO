@@ -15,8 +15,10 @@ import javax.servlet.http.HttpServletResponse;
 import es.ujaen.uvirtual.beans.UVDatos;
 import es.ujaen.uvirtual.beans.Usuario;
 import es.ujaen.uvirtual.beans.uvirtual.bolsaempleo.Area;
+import es.ujaen.uvirtual.beans.uvirtual.bolsaempleo.Convocatoria;
 import es.ujaen.uvirtual.beans.vistas.uvirtual.bolsaempleo.VistaValidarNoAfines;
 import es.ujaen.uvirtual.modelo.bolsaempleo.ModeloArea;
+import es.ujaen.uvirtual.modelo.bolsaempleo.ModeloConvocatoria;
 import es.ujaen.uvirtual.modelo.bolsaempleo.ModeloUsuarioBolsaEmpleo;
 import es.ujaen.uvirtual.utilidades.EscapaHTML;
 import es.ujaen.uvirtual.utilidades.Formateador;
@@ -61,6 +63,7 @@ public class ControladorValidarNoAfines extends HttpServlet {
 		VistaValidarNoAfines bean = new VistaValidarNoAfines();		
 		Usuario usuario = datos.getUsuario();
 		ModeloUsuarioBolsaEmpleo modelo = ModeloUsuarioBolsaEmpleo.obtenerInstancia();
+		ModeloConvocatoria modeloConv = ModeloConvocatoria.obtenerInstancia();
 		LOGGER.log(Level.FINEST, "usuario que ha entrado en el servlet es {0}", usuario.getUid());
 		
 		String nombreAccion = EscapaHTML.ajustaCodificacion(request.getParameter(PARAM_ACCION));
@@ -72,6 +75,12 @@ public class ControladorValidarNoAfines extends HttpServlet {
 		
 		try {
 			anonimo = !modelo.checkUser(datos);
+			List<Convocatoria> convocatorias = modeloConv.listaConvocatorias();
+			for (Convocatoria convocatoria: convocatorias) {
+				if (convocatoria.getEstado().equals("ABIERTA")) {
+					bean.setConvocatoria(convocatoria);
+				} 
+			}
 			switch (nombreAccion) {
 				case ACCION_LISTAR:
 					listado(datos, request, response);

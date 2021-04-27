@@ -72,6 +72,7 @@ VistaNoticias bean = (VistaNoticias) uvdatos.getVistas().get(VistaNoticias.class
 		var table = new Atis.DataTable('#table_noticias_insertadas', {
 		    "ajax": { url: "<%= ControladorGestionNoticias.URL_PATTERN_AJAX %>" },
 		    "pageSize": 10,
+	    	"defaultOrderBy": 0,
 		    "filterable": true,
 		    "columns": [
 		    	{'data': 'fecha', 'filter': {'type': 'date'}},
