@@ -221,13 +221,13 @@ VistaUsuarioBolsaEmpleo bean = (VistaUsuarioBolsaEmpleo) uvdatos.getVistas().get
 
 	$(document).ready(function() {
 		
-		<%if(bean.getUsuario().getExcluido()){%>
-				document.getElementById("razon_exclusion").value=<%=bean.getUsuario().getRazonExcluido()%>;
-				document.getElementById("razon_exclusion").disabled=false;
-			<%} else {%>
-				document.getElementById("razon_exclusion").value="";
-				document.getElementById("razon_exclusion").disabled=true;
-			<%}%>
+		document.getElementById("usuario_enviar").addEventListener("click", function(event) {
+			console.log("asda");
+			enviarUsuario(event, this);
+		});
+		
+		
+
 		
 		document.getElementById("usuario_excluido").addEventListener("change", function(event) {
 			if(document.getElementById("usuario_excluido").checked){
@@ -240,9 +240,7 @@ VistaUsuarioBolsaEmpleo bean = (VistaUsuarioBolsaEmpleo) uvdatos.getVistas().get
 			}
 		});
 		
-		document.getElementById("usuario_enviar").addEventListener("click", function(event) {
-			enviarUsuario(event, this);
-		});
+
 		
 		<% if(bean.getBusqueda()) {%>
 		params = document.getElementsByClassName("params");

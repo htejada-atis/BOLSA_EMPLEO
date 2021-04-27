@@ -4,15 +4,18 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
 import es.ujaen.uvirtual.beans.uvirtual.bolsaempleo.Afinidad;
-import es.ujaen.uvirtual.beans.uvirtual.bolsaempleo.Convocatoria;
 import es.ujaen.uvirtual.modelo.conexion.ConexionUvirtual;
 import es.ujaen.uvirtual.utilidades.BolsaEmpleoDataTable;
+import es.ujaen.uvirtual.utilidades.BolsaEmpleoUtils;
 import es.ujaen.uvirtual.utilidades.UVException;
+import es.ujaen.uvirtual.utilidades.BolsaEmpleoDataTable.DataTableColumn;
 
 /**
  * Clase de modelo para la gestión de afinidades .
@@ -25,12 +28,10 @@ public class ModeloAfinidad {
 	public static final int ORDER_COLUMN_INDEX_DESCRIPCION = 2;
 	public static final int ORDER_COLUMN_INDEX_MODULACION = 3;
 	
-	public static final String CONVOCATORIA_ESTADO_ABIERTA = "ABIERTA";
-	public static final String CONVOCATORIA_ESTADO_CERRADA = "CERRADA";
+	public static final int COLUMN_DESCRIPCION_MAXLENGTH = 250;
+	public static final int COLUMN_CODIGO_MAXLENGTH = 4;
 	
-	public static final int COLUMN_DESCRIPCION_MAXLENGTH = 150;
-	
-	public static final String MENSAJE_ERROR_NO_EXISTE_CONVOCATORIA = "No existe la convocatoria";
+	public static final String MENSAJE_ERROR_NO_EXISTE_AFINIDAD = "No existe la afinidad";
 		
     protected static ModeloAfinidad eInstancia = null;
 	
@@ -74,13 +75,16 @@ public class ModeloAfinidad {
 		dataTable.setColumn(ORDER_COLUMN_INDEX_ID, "bepafi.CODNUM");
 		dataTable.setColumn(ORDER_COLUMN_INDEX_CODIGO, "bepafi.CODIGO");
 		dataTable.setColumn(ORDER_COLUMN_INDEX_DESCRIPCION, "bepafi.DESCRIPCION");
-		dataTable.setColumn(ORDER_COLUMN_INDEX_MODULACION, "bepafi.MODULACION");		
+		dataTable.setColumn(ORDER_COLUMN_INDEX_MODULACION, "bepafi.MODULACION", DataTableColumn.COLUMN_TYPE_NUMBER);		
 		dataTable.setQuery(consulta);
 				
 		try (Connection conexion = ConexionUvirtual.obtenerInstancia();
 				PreparedStatement stmtCount = conexion.prepareStatement(dataTable.getQueryCount());
 				PreparedStatement stmt = conexion.prepareStatement(dataTable.getQuery());
 		) {					
+			
+			dataTable.setFiltersParams(stmt, stmtCount, 1);
+			
 			try (ResultSet rs = stmt.executeQuery()) {
 				while (rs.next()) {
 					Afinidad afinidad = new Afinidad();
@@ -99,52 +103,47 @@ public class ModeloAfinidad {
 		return dataTable;
 	}	
 	
+	
 	/**
-	 * Comprueba si hay convocatorias abiertas.
-	 * @return .
+	 * Devuelve un listado de afinidades por su id.
+	 * @param ids codnum de afinidad
+	 * @return listado de afinidades
+	 * @throws UVException .
 	 * @throws SQLException .
 	 */
-	public boolean hayConvocatoriaAbierta() throws SQLException {
-		String consulta =
-				"SELECT COUNT(1) numero_convocatorias_abiertas "
-			  + "FROM TBEP_CONVOCATORIAS bepcon "		  
-			  + "WHERE bepcon.ESTADO = ?";
+	public List<Afinidad> getAfinidadesByIds(int[] ids) throws SQLException, UVException {
+		List<Afinidad> afinidades = new ArrayList<>();
 		
-		try (Connection conexion = ConexionUvirtual.obtenerInstancia(); 
-				PreparedStatement stmt = conexion.prepareStatement(consulta);) {
-			stmt.setString(1, CONVOCATORIA_ESTADO_ABIERTA);
-    		try (ResultSet rs = stmt.executeQuery();) {
-	    		if (rs.next()) {
-	    			if (rs.getInt("numero_convocatorias_abiertas") > 0) {
-	    				return true;
-	    			}
-	    		}
-    		}
-		}
+		for (int i = 0; i < ids.length; i++) {
+			afinidades.add(this.getAfinidadById(ids[i]));
+	    }
 		
-		return false;
+		return afinidades;
 	}
 	
-	/** Consulta titulaciones en BBDD y las devuelve.
-	 * @param clausula para filtrar las titulaciones de la bd
-	 * @return todas las titulaciones de la base de datos
+	
+	
+	
+	
+	
+	/** Consulta afinidades en BBDD y las devuelve.
+	 * @return todas las afinidades de la base de datos
 	 * @throws SQLException en caso de error de base de datos
 	 */
-	public List<Convocatoria> listaConvocatorias() throws SQLException {
-		List<Convocatoria> convocatorias = new ArrayList<>();
-		String consulta = "SELECT bepcon.* FROM TBEP_CONVOCATORIAS bepcon";
+	public List<Afinidad> listaAfinidades() throws SQLException {
+		List<Afinidad> afinidades = new ArrayList<>();
+		String consulta = "SELECT bepafi.* FROM TBEP_AFINIDADES bepafi";
 		
 		try (Connection conexion = ConexionUvirtual.obtenerInstancia();
 			PreparedStatement stmt = conexion.prepareStatement(consulta);) {
 				try (ResultSet rs = stmt.executeQuery()) {
 					while (rs.next()) {
 						try {
-							Convocatoria convocatoria = new Convocatoria();
-							convocatoria.setCodNum(rs.getInt("CODNUM"));
-							convocatoria.setDescripcion(rs.getString("DESCRIPCION"));
-							convocatoria.setFechaCierre(rs.getDate("FECHACIERRE"));
-							convocatoria.setEstado(rs.getString("ESTADO"));					
-							convocatorias.add(convocatoria);	
+							Afinidad afinidad = new Afinidad();
+							afinidad.setCodNum(rs.getInt("CODIGO"));
+							afinidad.setDescripcion(rs.getString("DESCRIPCION"));
+							afinidad.setModulacion(rs.getFloat("MODULACION"));				
+							afinidades.add(afinidad);	
 						} catch (Exception e) {
 							e.printStackTrace();
 						}
@@ -153,39 +152,37 @@ public class ModeloAfinidad {
 				}
 			}
 		
-		return convocatorias;
+		return afinidades;
 	}
 	
 	/**
-	 * Añade una convocatoria al sistema cerrada.
-	 * @param convocatoria .	 
+	 * Añade una afinidad al sistema cerrada.
+	 * @param afinidad .	 
 	 * @throws SQLException .
 	 */
-	public void nuevaConvocatoria(Convocatoria convocatoria) throws SQLException {
+	public void nuevaAfinidad(Afinidad afinidad) throws SQLException {
 		String consulta =
-			"INSERT INTO TBEP_CONVOCATORIAS (DESCRIPCION, FECHACIERRE, ESTADO, NUMBOLSASMAXIMO, NUMMERITOSPORBLOQUE) " 
-			+ "VALUES (?, ?, ?, ?, ?)";
+			"INSERT INTO TBEP_AFINIDADES (CODIGO, DESCRIPCION, MODULACION) " 
+			+ "VALUES (?, ?, ?)";
 		
 		try (Connection conexion = ConexionUvirtual.obtenerInstancia();
 				 PreparedStatement stmt = conexion.prepareStatement(consulta);) {
 			int parameterIndex = 1;
-			stmt.setString(parameterIndex++, convocatoria.getDescripcion());
-			stmt.setDate(parameterIndex++, new java.sql.Date(convocatoria.getFechaCierre().getTime()));
-			stmt.setString(parameterIndex++, convocatoria.getEstado());
-			stmt.setInt(parameterIndex++, convocatoria.getNumBolsasMaximo());
-			stmt.setInt(parameterIndex++, convocatoria.getNumMeritosPorBloque());			
+			stmt.setString(parameterIndex++, afinidad.getCodigo());
+			stmt.setString(parameterIndex++, afinidad.getDescripcion());
+			stmt.setFloat(parameterIndex++, afinidad.getModulacion());			
 			stmt.executeUpdate();
 		}		
 	}
 	
 	/**
-	 * Devuelve un convocatoria por su pk.
+	 * Devuelve una afinidad por su id.
 	 * @param codNum .
-	 * @return Convocatoria o null si no existe
+	 * @return Afinidad o null si no existe
 	 * @throws SQLException .
 	 */
-	public Convocatoria getConvocatoriaById(int codNum) throws SQLException, UVException {
-		String consulta = "SELECT bepcon.* FROM TBEP_CONVOCATORIAS bepcon WHERE bepcon.CODNUM = ?";
+	public Afinidad getAfinidadById(int codNum) throws SQLException, UVException {
+		String consulta = "SELECT bepafi.* FROM TBEP_AFINIDADES bepafi WHERE bepafi.CODNUM = ?";
 			
 		try (Connection conexion = ConexionUvirtual.obtenerInstancia();
 				PreparedStatement stmt = conexion.prepareStatement(consulta);) {
@@ -193,92 +190,67 @@ public class ModeloAfinidad {
 						
 			try (ResultSet rs = stmt.executeQuery()) {
 				if (!rs.next()) {
-					throw new UVException(MENSAJE_ERROR_NO_EXISTE_CONVOCATORIA);
+					throw new UVException(MENSAJE_ERROR_NO_EXISTE_AFINIDAD);
 				}
 				
-				Convocatoria convocatoria = new Convocatoria();
-				convocatoria.setCodNum(rs.getInt("CODNUM"));
-				convocatoria.setDescripcion(rs.getString("DESCRIPCION"));
-				convocatoria.setEstado(rs.getString("ESTADO"));
-				convocatoria.setFechaCierre(rs.getDate("FECHACIERRE"));
-				convocatoria.setNumBolsasMaximo(rs.getInt("NUMBOLSASMAXIMO"));
-				convocatoria.setNumMeritosPorBloque(rs.getInt("NUMMERITOSPORBLOQUE"));
+				Afinidad afinidad = new Afinidad();
+				afinidad.setCodNum(rs.getInt("CODNUM"));
+				afinidad.setCodigo(rs.getString("CODIGO"));
+				afinidad.setDescripcion(rs.getString("DESCRIPCION"));
+				afinidad.setModulacion(rs.getFloat("MODULACION"));
 				
-				return convocatoria;
+				return afinidad;
 			}
 		}
 	}
 	
-	/** Actualiza una convocatoria.
-	 * @param conv Convocatoria con los datos nuevos a actualizar
+	/** Actualiza una afinidad.
+	 * @param afi Afinidad con los datos nuevos a actualizar
 	 * @throws SQLException en caso de error en la BD
 	 * @throws UVException en caso de errores de validacion
 	 */
-	public void actualizaConvocatoria(Convocatoria conv) throws SQLException, UVException {
-		if (conv == null) {
-			throw new UVException("Convocatoria obligatorio");
+	public void actualizaAfinidad(Afinidad afi) throws SQLException, UVException {
+		if (afi == null) {
+			throw new UVException("Afinidad obligatorio");
 		}
-		if (conv.getCodNum() == null) {
-			throw new UVException("id convocatoria no válido");
+		if (afi.getCodNum() == null) {
+			throw new UVException("id afinidad no válido");
 		}
 		
-		String consulta = "UPDATE tbep_convocatorias "
-			+ " SET DESCRIPCION=?, FECHACIERRE=?, ESTADO=?, NUMBOLSASMAXIMO=?, NUMMERITOSPORBLOQUE=? "
+		String consulta = "UPDATE tbep_afinidades "
+			+ " SET CODIGO=?, DESCRIPCION=?, MODULACION=? "
 			+ " WHERE codnum=?";
 		try (Connection conexion = ConexionUvirtual.obtenerInstancia();
 		PreparedStatement stmt = conexion.prepareStatement(consulta);) {
 			int parameterIndex = 1;
-			stmt.setString(parameterIndex++, conv.getDescripcion());
-			stmt.setDate(parameterIndex++, new java.sql.Date(conv.getFechaCierre().getTime()));
-			stmt.setString(parameterIndex++, conv.getEstado());
-			stmt.setInt(parameterIndex++, conv.getNumBolsasMaximo());
-			stmt.setInt(parameterIndex++, conv.getNumMeritosPorBloque());
-			stmt.setInt(parameterIndex++, conv.getCodNum());
+			stmt.setString(parameterIndex++, afi.getCodigo());
+			stmt.setString(parameterIndex++, afi.getDescripcion());
+			stmt.setFloat(parameterIndex++, afi.getModulacion());
+			stmt.setInt(parameterIndex++, afi.getCodNum());
 			stmt.executeUpdate();
 		}
 	}
 	
-	/** Cambia el estado de una convocatoria.
-	 * @param conv Convocatoria con los datos a actualizar
+	/** Elimina afinidades.
+	 * @param afinidades Afinidades a borrar
 	 * @throws SQLException en caso de error en la BD
-	 * @throws UVException en caso de errores de validacion
+	 * @throws UVException si afinidad no es valida
 	 */
-	public void cambiaEstadoConvocatoria(Convocatoria conv) throws SQLException, UVException {
-		if (conv == null) {
-			throw new UVException("Convocatoria obligatorio");
-		}
-		if (conv.getCodNum() == null) {
-			throw new UVException("id convocatoria no válido");
-		}
-		
-		String consulta = "UPDATE tbep_convocatorias "
-			+ " SET ESTADO=? "
-			+ " WHERE codnum=?";
-		try (Connection conexion = ConexionUvirtual.obtenerInstancia();
-		PreparedStatement stmt = conexion.prepareStatement(consulta);) {
-			int parameterIndex = 1;
-			stmt.setString(parameterIndex++, conv.getEstado());
-			stmt.setInt(parameterIndex++, conv.getCodNum());
-			stmt.executeUpdate();
-		}
-	}
-	
-	/** Elimina una convocatoria.
-	 * @param conv convocatoria a borrar
-	 * @throws SQLException en caso de error en la BD
-	 * @throws UVException si convocatoria no es valida
-	 */
-	public void borraConvocatoria(Convocatoria conv) throws SQLException, UVException {
-		if (conv == null) {
-			throw new UVException("No se puede eliminar una convocatoria vacía");
-		}
-		if (conv.getCodNum() == null) {
-			throw new UVException("No se puede eliminar una convocatoria con id vacío");
-		}
-		String consulta = "DELETE FROM tbep_convocatorias WHERE codnum = ? ";
-		try (Connection conexion = ConexionUvirtual.obtenerInstancia(); PreparedStatement stmt = conexion.prepareStatement(consulta);) {
-			int parameterIndex = 1;
-			stmt.setInt(parameterIndex++, conv.getCodNum());
+	public void borraAfinidades(List<Afinidad> afinidades) throws SQLException, UVException {
+		String params = BolsaEmpleoUtils.consultaMultiplesParametros(afinidades.size());
+		String query = "UPDATE tbep_afinidades SET FLGBORRADO= ?, FECHA_BORRADO = ? WHERE CODNUM IN (" + params + ")";		
+		try (Connection conexion = ConexionUvirtual.obtenerInstancia(); PreparedStatement stmt = conexion.prepareStatement(query)) {
+			int indexParam = 1;
+			stmt.setString(indexParam++, "S");
+			
+			SimpleDateFormat formatter = new SimpleDateFormat("dd/MM/YYYY HH:mm:ss");
+			Date date = new Date(System.currentTimeMillis());
+			
+			stmt.setDate(indexParam++, new java.sql.Date(date.getTime()));
+			for (Afinidad afiniad : afinidades) {
+
+				stmt.setInt(indexParam++, afiniad.getCodNum()); 	
+			}
 			stmt.executeUpdate();
 		}
 	}
