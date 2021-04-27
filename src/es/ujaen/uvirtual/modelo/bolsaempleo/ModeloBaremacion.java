@@ -757,6 +757,10 @@ public class ModeloBaremacion {
 	 * @throws UVException si bloque no es existe
 	 */
 	public ItemBaremacion getItemBaremacionById(Integer codNum) throws SQLException, UVException {
+		if (codNum == null) {
+			throw new UVException("El mérito es requerido");
+		}
+		
 		String sql = "SELECT bepite.* FROM TBEP_ITEMSBAREMACION bepite WHERE bepite.CODNUM = ?";
 		
 		try (Connection con = ConexionUvirtual.obtenerInstancia(); PreparedStatement stmt = con.prepareStatement(sql);) {

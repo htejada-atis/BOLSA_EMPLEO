@@ -5,15 +5,13 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Types;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 import java.util.Map;
 import es.ujaen.uvirtual.beans.uvirtual.bolsaempleo.MeritoPreferente;
-import es.ujaen.uvirtual.beans.uvirtual.bolsaempleo.Titulacion;
 import es.ujaen.uvirtual.modelo.conexion.ConexionUvirtual;
 import es.ujaen.uvirtual.utilidades.BolsaEmpleoDataTable;
+import es.ujaen.uvirtual.utilidades.BolsaEmpleoDataTable.DataTableColumn;
 import es.ujaen.uvirtual.utilidades.UVException;
 
 /**
@@ -24,11 +22,11 @@ import es.ujaen.uvirtual.utilidades.UVException;
 public class ModeloMeritosPreferentes {
 	// ordenación 
 	public static final int ORDER_COLUMN_INDEX_CODIGO = 0;
-	public static final int ORDER_COLUMN_INDEX_APARTADOS_NOMBRE = 1;
-	public static final int ORDER_COLUMN_INDEX_APARTADOS_PUNTUACIONMAXIMA = 2;
-	public static final int ORDER_COLUMN_INDEX_APARTADOS_PORCENTAJEMAXIMO = 3;
-	public static final int ORDER_COLUMN_INDEX_APARTADOS_MERITOSPREFERENTES = 4;
-	public static final int ORDER_COLUMN_INDEX_APARTADOS_ACTIVO = 5;
+	public static final int ORDER_COLUMN_INDEX_DESCRIPCION = 1;
+	public static final int ORDER_COLUMN_INDEX_TIPO = 2;
+	public static final int ORDER_COLUMN_INDEX_APLICABLE = 3;
+	public static final int ORDER_COLUMN_INDEX_FACTOR = 4;
+	public static final int ORDER_COLUMN_INDEX_ACTIVO = 5;
 	
 	public static final int MAX_LENGTH_COLUMN_DESCRIPCION = 1000;
 	public static final int MAX_LENGTH_COLUMN_FACTOR = 20;
@@ -107,13 +105,13 @@ public class ModeloMeritosPreferentes {
 		  + "FROM TBEP_MERITOS_PREFERENTES bepmep "		  
 		  + "WHERE 1=1 ";
 		
-		dataTable.setColumn(ORDER_COLUMN_INDEX_CODIGO, "bepmep.CODIGO");
-//		dataTable.setColumn(ORDER_COLUMN_INDEX_APARTADOS_NOMBRE, "bepapa.NOMBRE");
-//		dataTable.setColumn(ORDER_COLUMN_INDEX_APARTADOS_PUNTUACIONMAXIMA, "bepapa.PUNTUACIONMAXIMA");
-//		dataTable.setColumn(ORDER_COLUMN_INDEX_APARTADOS_PORCENTAJEMAXIMO, "bepapa.PORCENTAJEMAXIMO");
-//		dataTable.setColumn(ORDER_COLUMN_INDEX_APARTADOS_MERITOSPREFERENTES, "bepapa.MERITOS_PREFERENTES", DataTableColumn.COLUMN_TYPE_BOOLEAN);
-//		dataTable.setColumn(ORDER_COLUMN_INDEX_APARTADOS_ACTIVO, "bepapa.FLGACTIVO", DataTableColumn.COLUMN_TYPE_BOOLEAN);
-		
+		dataTable.setColumn(ORDER_COLUMN_INDEX_CODIGO, "bepmep.CODNUM");
+		dataTable.setColumn(ORDER_COLUMN_INDEX_DESCRIPCION, "bepmep.DESCRIPCION");
+		dataTable.setColumn(ORDER_COLUMN_INDEX_TIPO, "bepmep.TIPO");
+		dataTable.setColumn(ORDER_COLUMN_INDEX_APLICABLE, "bepmep.APLICABLE");
+		dataTable.setColumn(ORDER_COLUMN_INDEX_FACTOR, "bepmep.FACTOR");
+		dataTable.setColumn(ORDER_COLUMN_INDEX_ACTIVO, "bepmep.FLGACTIVO", DataTableColumn.COLUMN_TYPE_BOOLEAN);
+				
 		dataTable.setQuery(consulta);
 				
 		try (Connection conexion = ConexionUvirtual.obtenerInstancia();
@@ -208,7 +206,7 @@ public class ModeloMeritosPreferentes {
 				+ "BEPBLO_APLICABLE_CODNUM = ?, "
 				+ "BEPAPA_APLICABLE_CODNUM = ?, "
 				+ "BEPITE_APLICABLE_CODNUM = ?, "
-				+ "FLGBORRADO = ? "
+				+ "FLGACTIVO = ? "
 				+ "WHERE CODNUM = ?";
 		
 		try (Connection conexion = ConexionUvirtual.obtenerInstancia(); PreparedStatement stmt = conexion.prepareStatement(query);) {
@@ -242,7 +240,7 @@ public class ModeloMeritosPreferentes {
 			} else {
 				stmt.setNull(parameterIndex++, Types.NULL);
 			}
-			stmt.setString(parameterIndex++, merito.getBorrado() ? "S" : "N");
+			stmt.setString(parameterIndex++, merito.getActivo() ? "S" : "N");
 			stmt.setInt(parameterIndex++, merito.getCodNum());
 			
 			stmt.executeUpdate();
@@ -300,7 +298,7 @@ public class ModeloMeritosPreferentes {
 			: ModeloBaremacion.obtenerInstancia().getBloqueBaremacionById(rs.getInt("BEPBLO_APLICABLE_CODNUM")));
 		obj.setAplicableItemBaremacion(rs.getInt("BEPITE_APLICABLE_CODNUM") == 0 ? null 
 			: ModeloBaremacion.obtenerInstancia().getItemBaremacionById(rs.getInt("BEPITE_APLICABLE_CODNUM")));
-		obj.setBorrado(rs.getString("FLGBORRADO").equals("S"));
+		obj.setActivo(rs.getString("FLGACTIVO").equals("S"));
 		return obj;
 	}
 
