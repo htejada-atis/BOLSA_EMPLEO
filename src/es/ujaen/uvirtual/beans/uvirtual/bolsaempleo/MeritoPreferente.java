@@ -19,7 +19,7 @@ public class MeritoPreferente implements Serializable {
 	private BloqueBaremacion aplicableBloqueBaremacion;
 	private ApartadoBaremacion aplicableApartadoBaremacion;
 	private ItemBaremacion aplicableItemBareamcion;
-	private Boolean borrado;
+	private Boolean activo;
 	
 	/** Constructor por defecto.
 	 */
@@ -38,11 +38,11 @@ public class MeritoPreferente implements Serializable {
 	 * @param paplicableBloqueBaremacion .
 	 * @param paplicableApartadoBaremacion .
 	 * @param paplicableItemBareamcion .
-	 * @param pborrado .
+	 * @param pactivo .
 	 */
 	public MeritoPreferente(Integer pcodNum, String pdescripcion, String ptipo, String paplicable, String pfactor, Float pvalorMaximo, 
 			ItemBaremacion ptipoItemBaremacion, BloqueBaremacion paplicableBloqueBaremacion, ApartadoBaremacion paplicableApartadoBaremacion, 
-			ItemBaremacion paplicableItemBareamcion, Boolean pborrado) {
+			ItemBaremacion paplicableItemBareamcion, Boolean pactivo) {
 		super();
 		this.codNum = pcodNum;
 		this.descripcion = pdescripcion;
@@ -54,7 +54,7 @@ public class MeritoPreferente implements Serializable {
 		this.aplicableBloqueBaremacion = paplicableBloqueBaremacion;
 		this.aplicableApartadoBaremacion = paplicableApartadoBaremacion;
 		this.aplicableItemBareamcion = paplicableItemBareamcion;
-		this.borrado = pborrado;
+		this.activo = pactivo;
 	}
 		
 	/** Constructor copia.
@@ -71,7 +71,7 @@ public class MeritoPreferente implements Serializable {
 		this.aplicableBloqueBaremacion = copia.aplicableBloqueBaremacion;
 		this.aplicableApartadoBaremacion = copia.aplicableApartadoBaremacion;
 		this.aplicableItemBareamcion = copia.aplicableItemBareamcion;
-		this.borrado = copia.borrado;
+		this.activo = copia.activo;
 	}
 	
 	public Integer getCodNum() {
@@ -154,12 +154,12 @@ public class MeritoPreferente implements Serializable {
 		this.aplicableItemBareamcion = aplicableItemBaremacion;
 	}
 	
-	public Boolean getBorrado() {
-		return this.borrado;
+	public Boolean getActivo() {
+		return this.activo;
 	}
 
-	public void setBorrado(Boolean borrado) {
-		this.borrado = borrado;
+	public void setActivo(Boolean activo) {
+		this.activo = activo;
 	}
 		
 	public static long getSerialversionuid() {
@@ -171,7 +171,7 @@ public class MeritoPreferente implements Serializable {
 		return "ApartadoBaremacion [codNum=" + codNum + ", descripcion=" + descripcion + ", tipo=" + tipo
 				+ ", aplicable=" + aplicable + ", factor=" + factor + ", valorMaximo=" + valorMaximo + ", tipoItemBaremacion=" + tipoItemBaremacion 
 				+ ", aplicableBloqueBaremacion" + aplicableBloqueBaremacion + ", aplicableApartadoBaremacion=" + aplicableApartadoBaremacion 
-				+ ", aplicableItemBareamcion=" + aplicableItemBareamcion + ", borrado=" + borrado + "]";
+				+ ", aplicableItemBareamcion=" + aplicableItemBareamcion + ", activo=" + activo + "]";
 	}
 	
 	@Override
@@ -188,7 +188,7 @@ public class MeritoPreferente implements Serializable {
 		result = prime * result + ((aplicableBloqueBaremacion == null) ? 0 : aplicableBloqueBaremacion.hashCode());
 		result = prime * result + ((aplicableApartadoBaremacion == null) ? 0 : aplicableApartadoBaremacion.hashCode());
 		result = prime * result + ((aplicableItemBareamcion == null) ? 0 : aplicableItemBareamcion.hashCode());
-		result = prime * result + ((borrado == null) ? 0 : borrado.hashCode());
+		result = prime * result + ((activo == null) ? 0 : activo.hashCode());
 		return result;
 	}
 	
@@ -275,11 +275,11 @@ public class MeritoPreferente implements Serializable {
 		} else if (!aplicableItemBareamcion.equals(other.aplicableItemBareamcion)) {
 			return false;
 		}
-		if (borrado == null) {
-			if (other.borrado != null) {
+		if (activo == null) {
+			if (other.activo != null) {
 				return false;
 			}
-		} else if (!borrado.equals(other.borrado)) {
+		} else if (!activo.equals(other.activo)) {
 			return false;
 		}
 		

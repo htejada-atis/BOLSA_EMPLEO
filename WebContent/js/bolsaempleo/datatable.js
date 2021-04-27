@@ -403,6 +403,18 @@ function DataTable(id, config) {
                 $(this).datepicker();
             });
         }
+
+        if (self.config.selected) {
+            if (!Array.isArray(self.config.selected)) {
+                self.config.selected = [self.config.selected];
+            }
+
+            self.config.selected.forEach(function (id) {
+                self.checked[id] = true;
+            });
+
+            console.log('checked', self.checked);
+        }
     };
     
     this.checkUncheckAll = function(check) {
