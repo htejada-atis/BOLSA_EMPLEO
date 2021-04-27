@@ -71,9 +71,9 @@ VistaMeritos bean = (VistaMeritos) uvdatos.getVistas().get(VistaMeritos.class.ge
 		        	return row.item.bloque.apartado.codigo + "." + row.item.bloque.codigo + "." + row.item.codigo;
 	        	}},
 		        {'data': 'item.nombre', 'filter': true},
-		        {'data': 'descripcion', 'filter': true, 'class': 'overflow-auto'},
-		        {'data': 'valor', 'filter': true, 'class': 'overflow-auto'},
-		        {'data': 'observacion', 'filter': true, 'class': 'overflow-auto'},
+		        {'data': 'descripcion', 'filter': true, 'overflow': 'auto'},
+		        {'data': 'valor', 'filter': true, 'overflow': 'auto'},
+		        {'data': 'observacion', 'filter': true, 'overflow': 'auto'},
 		        {'data': 'codnum', 'order': {'active': false}, 'class': 'overflow-ellipsis', 'render': function(row) {
 		        	var link = "<%= request.getRequestURI() %>?a=<%= ControladorMisMeritos.ACCION_DESCARGAR_FICHERO %>&<%= ControladorMisMeritos.PARAM_ID %>=" + row.codNum;
 		        	return "<a class='consultar-fichero' title='Descargar fichero' href='" +link +"' target='_blank'>" +link +"</a>"; 

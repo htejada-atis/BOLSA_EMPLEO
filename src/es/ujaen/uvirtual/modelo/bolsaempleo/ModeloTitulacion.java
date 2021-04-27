@@ -186,7 +186,7 @@ public class ModeloTitulacion {
 		}
 		
 		String params = BolsaEmpleoUtils.consultaMultiplesParametros(titulaciones.size());
-		String consulta = "INSERT INTO TBEP_TITULACIONESPREFERENTESAREA (BEPARE_CODNUM, BEPTIT_CODNUM)"
+		String consulta = "INSERT INTO TBEP_TITULACIONES_PREFERENTES_AREA (BEPARE_CODNUM, BEPTIT_CODNUM)"
 				+ " SELECT bepare.CODNUM AS BEPARE_CODNUM, beptit.CODNUM AS BEPTIT_CODNUM"
 				+ " FROM TBEP_TITULACIONES beptit, TBEP_AREAS bepare WHERE bepare.CODNUM = ? AND "
 				+ " beptit.CODNUM IN (" + params + ")";
@@ -207,7 +207,7 @@ public class ModeloTitulacion {
 	 */
 	public void eliminarTitulacionesPreferentesArea(List<String> titulaciones, Integer area) throws SQLException {
 		String params = BolsaEmpleoUtils.consultaMultiplesParametros(titulaciones.size());
-		String consulta = "DELETE FROM TBEP_TITULACIONESPREFERENTESAREA WHERE BEPARE_CODNUM = ? AND BEPTIT_CODNUM IN (" + params + ")";
+		String consulta = "DELETE FROM TBEP_TITULACIONES_PREFERENTES_AREA WHERE BEPARE_CODNUM = ? AND BEPTIT_CODNUM IN (" + params + ")";
 		try (Connection conexion = ConexionUvirtual.obtenerInstancia(); PreparedStatement stmt = conexion.prepareStatement(consulta)) {
 			int indexParam = 1;
 			stmt.setInt(indexParam++, area);
@@ -274,7 +274,7 @@ public class ModeloTitulacion {
 		BolsaEmpleoDataTable<Titulacion> dataTable = new BolsaEmpleoDataTable<Titulacion>(params);
 		
 		String consultaNotIn = "SELECT beptit.CODNUM FROM tbep_titulaciones beptit "
-				+ "INNER JOIN tbep_titulacionespreferentesarea beptpa ON beptit.codnum = beptpa.beptit_codnum "
+				+ "INNER JOIN tbep_titulaciones_preferentes_area beptpa ON beptit.codnum = beptpa.beptit_codnum "
 				+ "INNER JOIN TBEP_AREAS bepare ON bepare.codnum = beptpa.bepare_codnum "
 				+ "WHERE bepare.CODNUM = ? ";
 		String consulta = "SELECT beptit.* FROM tbep_titulaciones beptit WHERE beptit.CODNUM NOT IN (" + consultaNotIn + ")";
@@ -325,7 +325,7 @@ public class ModeloTitulacion {
 		BolsaEmpleoDataTable<Titulacion> dataTable = new BolsaEmpleoDataTable<Titulacion>(params);
 		
 		String consulta = "SELECT beptit.CODNUM, beptit.NOMBRE FROM tbep_titulaciones beptit "
-				+ "INNER JOIN tbep_titulacionespreferentesarea beptpa ON beptit.codnum = beptpa.beptit_codnum "
+				+ "INNER JOIN tbep_titulaciones_preferentes_area beptpa ON beptit.codnum = beptpa.beptit_codnum "
 				+ "INNER JOIN TBEP_AREAS bepare ON bepare.codnum = beptpa.bepare_codnum "
 				+ "WHERE bepare.CODNUM = ? ";
 		
@@ -376,7 +376,7 @@ public class ModeloTitulacion {
 		BolsaEmpleoDataTable<Titulacion> dataTable = new BolsaEmpleoDataTable<Titulacion>(params);
 		
 		String consulta = "SELECT beptit.CODNUM, beptit.NOMBRE FROM tbep_titulaciones beptit "
-				+ "INNER JOIN tbep_titulacionespreferentesarea beptpa ON beptit.codnum = beptpa.beptit_codnum "
+				+ "INNER JOIN tbep_titulaciones_preferentes_area beptpa ON beptit.codnum = beptpa.beptit_codnum "
 				+ "INNER JOIN TBEP_AREAS bepare ON bepare.codnum = beptpa.bepare_codnum "
 				+ "WHERE bepare.CODNUM = ? ";
 		

@@ -25,24 +25,39 @@ VistaSolicitudes bean = (VistaSolicitudes) uvdatos.getVistas().get(VistaSolicitu
 		</div>
 	<% } %>
 	
-	<div class="titulo-bolsa-empleo">
-		<h2>Paso 2: Asignación de méritos a bolsas</h2>
-		<h3><%= bean.getSolicitud().getConvocatoria().getDescripcion() %></h3>
-		
-		<p>Para cada bolsa de empleo selecciona hasta un máximo de [<%= bean.getSolicitud().getConvocatoria().getNumMeritosPorBloque() %>] méritos por bloque</p>
-	</div>
+	<h2>Paso 2: Asignación de méritos a bolsas</h2>
+	<h3><%= bean.getSolicitud().getConvocatoria().getDescripcion() %></h3>
+	
+	<p>Para cada bolsa de empleo selecciona hasta un máximo de [<%= bean.getSolicitud().getConvocatoria().getNumMeritosPorBloque() %>] méritos por bloque</p>
 	
 	<table class="bluetable bolsaempleo" id="tableAreas">
 		<tr>
-			<th scope="col" style="width:5%"></th>
 			<th scope="col"	style="width:15%">Código</th>
-			<th scope="col"	style="width:60%">Nombre</th>			
+			<th scope="col"	style="width:85%">Nombre</th>			
 		</tr>
 		<tbody>		
 		</tbody>
 		<tfoot>
 			<tr>
-				<th colspan="3" style="width:100%"></th>
+				<th colspan="2" style="width:100%"></th>
+			</tr>
+		</tfoot>
+	</table>
+	
+	<table class="bluetable bolsaempleo" id="tableMeritos" style="visibility: collapse">
+		<tr>
+			<th scope="col"	style="width:10%"></th>
+			<th scope="col"	style="width:15%">Código ítem</th>
+			<th scope="col"	style="width:45%">Nombre ítem</th>
+			<th scope="col"	style="width:10%">Valor</th>
+			<th scope="col" class="center" style="width:10%">Afinidad</th>
+			<th scope="col" class="center" style="width:10%">Excluido</th>
+		</tr>
+		<tbody>		
+		</tbody>
+		<tfoot>
+			<tr>
+				<th colspan="6" style="width:100%"></th>
 			</tr>
 		</tfoot>
 	</table>	
@@ -51,8 +66,8 @@ VistaSolicitudes bean = (VistaSolicitudes) uvdatos.getVistas().get(VistaSolicitu
 		<a class="link-btn" id="paso2_volver" href="<%= request.getRequestURI() %>">
 	    	 Volver
 	    </a>
-	    <a class="link-btn" id="paso3_siguiente" href="<%= request.getRequestURI() %>">
-	    	 Siguiente
+	    <a class="link-btn" id="paso2_siguiente" href="<%= request.getRequestURI() %>">
+	    	 Ir a 'Confirmar Solicitud'
 	    </a>
 	</div>
 </div>
@@ -63,17 +78,61 @@ VistaSolicitudes bean = (VistaSolicitudes) uvdatos.getVistas().get(VistaSolicitu
 		var tableAreas = new Atis.DataTable('#tableAreas', {
 			"ajax": { url: "<%= ControladorMisSolicitudes.URL_PATTERN_AJAX %>" },
 		    "pageSize": 10,
-		    "selectable": true,
+		    "clickable": {'onClick': function(row) {
+		    	var params = {
+	    				'a': '<%= ControladorMisSolicitudes.ACCION_BOLSA_SELECCIONADA %>',
+	    				'<%= ControladorMisSolicitudes.PARAM_BOLSA %>': row.codNum,
+	    				'<%= ControladorMisSolicitudes.PARAM_SOLICITUD_ID %>': <%= bean.getSolicitud().getCodNum() %>};
+        		Atis.sendForm("<%= request.getRequestURI() %>", params);
+		    }},
+		    <% if (bean.getArea() != null) { %> "selected": <%= bean.getArea().getCodNum() %> ,<% } %>
 		    "filterable": true,
 		    "title": 'Mis bolsas para esta convocatoria',
 		    "action": "<%= ControladorMisSolicitudes.ACCION_DATATABLE_BOLSAS_SELECCIONADAS %>",
 		    "params": {"<%= ControladorMisSolicitudes.PARAM_SOLICITUD_ID %>": <%= bean.getSolicitud().getCodNum() %>},
 		    "columns": [
-		    	{'data': 'codNum', 'selectable': {'exclude': 'excluido'}},
 		    	{'data': 'area.idAreaExterno', 'filter': true},
-		    	{'data': 'area.descripcion', 'filter': true},		        
+		    	{'data': 'area.descripcion', 'filter': true},	        
 	        ],
 		});
+		
+		<% if (bean.getArea() != null) { %>
+		
+			var tableMeritos = new Atis.DataTable('#tableMeritos', {
+				"ajax": { url: "<%= ControladorMisSolicitudes.URL_PATTERN_AJAX %>" },
+			    "pageSize": 10,
+			    "selectable": true,
+			    "filterable": true,
+			    "title": 'Mis méritos',
+			    "action": "<%= ControladorMisSolicitudes.ACCION_DATATABLE_MERITOS_BOLSA %>",
+			    "params": {"<%= ControladorMisSolicitudes.PARAM_SOLICITUD_ID %>": <%= bean.getSolicitud().getCodNum() %>},
+			    "columns": [
+			    	{'data': 'codNum', 'selectable': true},
+			    	{'data': 'item', 'filter': true, 'render': function(row) {
+			        	return row.item.bloque.apartado.codigo + "." + row.item.bloque.codigo + "." + row.item.codigo;
+		        	}},
+		        	{'data': 'item.nombre', 'filter': true, 'overflow': 'auto'},
+		        	{'data': 'valor', 'filter': true},
+		        	{'data': 'afinidad', 'order': {'active': false}, 'filter': {'type': 'selectBoolean', 'true': 'Afín', 'false': 'No afín'}, 'render': function(row) {
+		        		if(row.afinidad) {
+		        			return "<div title='Afín' class='circle-true'></div>";
+		        		} else {
+		        			return "<div title='No afín' class='circle-false'></div>"; 
+		        		}
+		        	}},
+		        	{'data': 'excluido', 'order': {'active': false}, 'filter': {'type': 'selectBoolean', 'true': 'Excluido', 'false': 'No excluido'}, 'render': function(row) {
+		        		if (row.excluido) {
+		        			return "<div title='Excluido' class='circle-true'></div>";
+		        		} else {
+		        			return "<div title='No excluido' class='circle-false'></div>";
+		        		}
+		        	}},
+		        ],
+			});
+			
+			document.getElementById("tableMeritos").style.visibility = "visible";
+		
+		<% } %>
 		
 		document.getElementById("paso2_volver").addEventListener("click", function(event) {
 			event.preventDefault();
@@ -84,7 +143,7 @@ VistaSolicitudes bean = (VistaSolicitudes) uvdatos.getVistas().get(VistaSolicitu
 			Atis.sendForm("<%= request.getRequestURI() %>", params);
 		});
 		
-		document.getElementById("paso3_siguiente").addEventListener("click", function(event) {
+		document.getElementById("paso2_siguiente").addEventListener("click", function(event) {
 			event.preventDefault();
 			
 		});

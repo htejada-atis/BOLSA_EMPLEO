@@ -30,12 +30,6 @@ VistaSolicitudes bean = (VistaSolicitudes) uvdatos.getVistas().get(VistaSolicitu
 	<h3><%= bean.getSolicitud().getConvocatoria().getDescripcion() %></h3>
 	<p>Seleccione las bolsas donde desee participar, hasta un máximo de [<%=bean.getSolicitud().getConvocatoria().getNumBolsasMaximo()%>].</p>
 	
-	<div class="btn-align-right">
-		<a class="link-btn" id="gestion_meritos" href="/srv/es/informacionadministrativa/bolsaempleo/mismeritos">
-	    	 Ir a la gestión de méritos
-	    </a>
-	</div>
-	
 	<table class="bluetable bolsaempleo" id="tableAreas">
 		<tr>
 			<th scope="col" style="width:5%"></th>
@@ -58,7 +52,7 @@ VistaSolicitudes bean = (VistaSolicitudes) uvdatos.getVistas().get(VistaSolicitu
 	    	 Volver
 	    </a>
 	    <a class="link-btn" id="paso1_siguiente" href="<%= request.getRequestURI() %>">
-	    	 Siguiente
+	    	 Ir a 'Méritos por Área'
 	    </a>
 	</div>
 	
@@ -76,10 +70,8 @@ VistaSolicitudes bean = (VistaSolicitudes) uvdatos.getVistas().get(VistaSolicitu
 				<% }
 			} %>
 		
-		console.log(bolsasSolicitud);
-		
 		var tableAreas = new Atis.DataTable('#tableAreas', {
-			"ajax": { url: "<%= ControladorMisSolicitudes.URL_PATTERN_AJAX %>" },
+			"ajax": { url: "<%=ControladorMisSolicitudes.URL_PATTERN_AJAX%>" },
 		    "pageSize": 10,
 		    "selectable": true,
 		    "filterable": true,
@@ -117,7 +109,7 @@ VistaSolicitudes bean = (VistaSolicitudes) uvdatos.getVistas().get(VistaSolicitu
 			event.preventDefault();
 			if (tableAreas.getCheckedItems().length < 1) {
 				Atis.alertDialog("Seleccionar bolsas", "Debes seleccionar al menos una bolsa para continuar");
-			} else if (tableAreas.getCheckedItems().length > <%= bean.getSolicitud().getConvocatoria().getNumBolsasMaximo() %>) {
+			} else if (tableAreas.getCheckedItems().length > <%=bean.getSolicitud().getConvocatoria().getNumBolsasMaximo()%>) {
 				Atis.alertDialog("Seleccionar bolsas", "No puedes superar el número máximo de bolsas permitido de la convocatoria");
 			} else {
 				var params = {
