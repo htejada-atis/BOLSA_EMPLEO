@@ -95,6 +95,7 @@ public class ControladorBolsas extends HttpServlet {
 		try {
 			bean.setTotalBolsasBloqueadas(modeloBolsa.getBolsasBloqueadas());
 			bean.setTotalBolsasRevisadas(modeloBolsa.getBolsasRevisadas());
+			bean.setTotalBolsas(modeloBolsa.getTotalBolsas());
 			anonimo = !modelo.checkUser(datos);
 			switch (nombreAccion) {
 				case ACCION_DATATABLE:

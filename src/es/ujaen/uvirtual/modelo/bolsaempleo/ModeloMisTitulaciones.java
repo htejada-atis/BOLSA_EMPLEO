@@ -99,6 +99,7 @@ public class ModeloMisTitulaciones {
 							Titulacion tit = new Titulacion();
 							tit.setCodNum(rs.getInt("CODNUM"));
 							tit.setDescripcion(rs.getString("DESCRIPCION"));
+							tit.setArchivo(rs.getBlob("ARCHIVO").getBinaryStream());
 							titulaciones.add(tit);
 						} catch (Exception e) {
 							e.printStackTrace();
@@ -157,6 +158,7 @@ public class ModeloMisTitulaciones {
 				+ "FROM tbep_titulaciones beptit "
 				+ "LEFT JOIN tbep_titulaciones_usuario beptitusu "
 				+ "ON beptit.CODNUM = beptitusu.BEPTIT_USU_TIT_CODNUM AND beptitusu.BEPTIT_USU_USU_CODNUM = ? "
+				+ "AND beptitusu.FLGBORRADO != 'S' "
 				+ "WHERE beptitusu.BEPTIT_USU_USU_CODNUM IS NULL";
 		
 		dataTable.setColumn(ORDER_COLUMN_INDEX_ID, "beptit.CODNUM", DataTableColumn.COLUMN_TYPE_NUMBER);

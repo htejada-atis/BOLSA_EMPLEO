@@ -52,11 +52,6 @@ public class ModeloBaremacion {
 	public static final String ITEM_UNIDADES_CREDITOS = "CREDITOS";
 	public static final String ITEM_UNIDADES_MESES = "MESES";
 	public static final String ITEM_UNIDADES_ANIOS = "ANIOS";
-	
-	// tipos de afinidades de los items
-	public static final String ITEM_AFINIDADES_SIN_MODULACION = "N";
-	public static final String ITEM_AFINIDADES_PROPIAS_AL_AREA = "AA";
-	public static final String ITEM_AFINIDADES_PROPIAS_AL_PERFIL_INVERSTIGADOR = "AI";
 		
 	// errores
 	public static final String ERROR_APARTADO_NOEXITE = "Apartado no encontrado";
@@ -203,7 +198,7 @@ public class ModeloBaremacion {
 	public void insertaApartado(ApartadoBaremacion apartado) throws SQLException, UVException {
 		this.chequearApartadoParaInsertarOActualizar(apartado);
 		
-		String consulta = "INSERT INTO TBEP_APARTADOSBAREMACION (CODIGO,NOMBRE,FLGACTIVO,PUNTUACIONMAXIMA,PORCENTAJEMAXIMO,MERITOS_PREFERENTES,FACTOR_MERITO_PREFERENTE) "
+		String consulta = "INSERT INTO TBEP_APARTADOSBAREMACION (CODIGO,NOMBRE,FLGACTIVO,PUNTUACIONMAXIMA,PORCENTAJEMAXIMO) "
 				+ " VALUES (?,?,?,?,?,?,?)";
 		
 		try (Connection conexion = ConexionUvirtual.obtenerInstancia(); PreparedStatement stmt = conexion.prepareStatement(consulta);) {
@@ -221,14 +216,6 @@ public class ModeloBaremacion {
 			} else {
 				stmt.setNull(parameterIndex++, Types.NULL);
 				stmt.setNull(parameterIndex++, Types.NULL);				
-			}
-			
-			stmt.setString(parameterIndex++, apartado.getMeritosPreferentes() ? "S" : "N");
-			
-			if (apartado.getFactorMeritoPreferente() != null) {
-				stmt.setFloat(parameterIndex++, apartado.getFactorMeritoPreferente());
-			} else {
-				stmt.setNull(parameterIndex++, Types.NULL);
 			}
 			
 			stmt.executeUpdate();
@@ -268,9 +255,7 @@ public class ModeloBaremacion {
 				+ "NOMBRE = ?, "
 				+ "FLGACTIVO = ?, "
 				+ "PUNTUACIONMAXIMA = ?, "
-				+ "PORCENTAJEMAXIMO = ?, "
-				+ "MERITOS_PREFERENTES = ?, "
-				+ "FACTOR_MERITO_PREFERENTE = ? "
+				+ "PORCENTAJEMAXIMO = ? "
 				+ "WHERE CODNUM = ?";
 		
 		try (Connection conexion = ConexionUvirtual.obtenerInstancia(); PreparedStatement stmt = conexion.prepareStatement(consulta);) {
@@ -288,13 +273,6 @@ public class ModeloBaremacion {
 			} else {
 				stmt.setNull(parameterIndex++, Types.NULL);
 				stmt.setNull(parameterIndex++, Types.NULL);				
-			}
-			stmt.setString(parameterIndex++, apartado.getMeritosPreferentes() ? "S" : "N");
-			
-			if (apartado.getFactorMeritoPreferente() != null) {
-				stmt.setFloat(parameterIndex++, apartado.getFactorMeritoPreferente());
-			} else {
-				stmt.setNull(parameterIndex++, Types.NULL);
 			}
 			
 			stmt.setInt(parameterIndex++, apartado.getCodNum());
@@ -360,8 +338,6 @@ public class ModeloBaremacion {
 		apartado.setPuntuacionMaxima(rs.getFloat("PUNTUACIONMAXIMA") == 0 ? null : rs.getFloat("PUNTUACIONMAXIMA"));
 		apartado.setPorcentajeMaximo(rs.getFloat("PORCENTAJEMAXIMO") == 0 ? null : rs.getFloat("PORCENTAJEMAXIMO"));
 		apartado.setActivo(rs.getString("FLGACTIVO").equals("S"));
-		apartado.setMeritosPreferentes(rs.getString("MERITOS_PREFERENTES").equals("S"));
-		apartado.setFactorMeritoPreferente(rs.getFloat("FACTOR_MERITO_PREFERENTE") == 0 ? null : rs.getFloat("FACTOR_MERITO_PREFERENTE"));
 		return apartado;
 	}
 	
@@ -430,12 +406,6 @@ public class ModeloBaremacion {
 		// si este apartado tiene porcentaje, el resto tb con porcentaje
 		if (apartado.getPorcentajeMaximo() != null && !this.todosLosApartadosConPorcentaje()) {
 			throw new UVException(ERROR_APARTADO_EXISTEN_APARTADOS_CON_PUNTUACION);
-		}
-		
-		if (apartado.getMeritosPreferentes()) {
-			if (apartado.getFactorMeritoPreferente() == null || apartado.getFactorMeritoPreferente() <= 0) {
-				throw new UVException("Introduce un factor por mérito preferente");
-			}			
 		}
 	}
 	
@@ -787,7 +757,8 @@ public class ModeloBaremacion {
 		
 		String consulta = "SELECT bepite.* "
 				+ "FROM TBEP_ITEMSBAREMACION bepite "
-				+ "WHERE bepite.BEPBLO_CODNUM = ? ";
+				+ "INNER JOIN TBEP_AFINIDADES bepafi ON bepafi.CODNUM = bepite.AFINIDAD "
+				+ "WHERE bepite.BEPBLO_CODNUM = ?";
 		
 		dataTable.setColumn(ORDER_COLUMN_INDEX_ITEMS_CODIGO, "bepite.CODIGO");
 		dataTable.setColumn(ORDER_COLUMN_INDEX_ITEMS_NOMBRE, "bepite.NOMBRE");
@@ -876,7 +847,7 @@ public class ModeloBaremacion {
 			stmt.setFloat(parameterIndex++, item.getValor());
 			stmt.setFloat(parameterIndex++, item.getValorMinimo());
 			stmt.setFloat(parameterIndex++, item.getValorMaximo());
-			stmt.setString(parameterIndex++, item.getAfinidad());			
+			stmt.setInt(parameterIndex++, item.getAfinidad());			
 			stmt.setInt(parameterIndex++, item.getCodNum());
 			stmt.executeUpdate();
 		}
@@ -923,7 +894,7 @@ public class ModeloBaremacion {
 			stmt.setFloat(parameterIndex++, item.getValor());
 			stmt.setFloat(parameterIndex++, item.getValorMinimo());
 			stmt.setFloat(parameterIndex++, item.getValorMaximo());
-			stmt.setString(parameterIndex++, item.getAfinidad());
+			stmt.setInt(parameterIndex++, item.getAfinidad());
 			stmt.executeUpdate();
 		}
 	}
@@ -984,6 +955,7 @@ public class ModeloBaremacion {
 	}
 	
 	private ItemBaremacion createItemFromResultSet(ResultSet rs) throws SQLException, UVException {
+		ModeloAfinidad modelo = ModeloAfinidad.obtenerInstancia();	
 		ItemBaremacion item = new ItemBaremacion();
 		item.setCodNum(rs.getInt("CODNUM"));
 		item.setCodigo(rs.getString("CODIGO"));
@@ -994,7 +966,8 @@ public class ModeloBaremacion {
 		item.setValor(rs.getFloat("VALOR"));
 		item.setValorMinimo(rs.getFloat("VALOR_MINIMO"));
 		item.setValorMaximo(rs.getFloat("VALOR_MAXIMO"));
-		item.setAfinidad(rs.getString("AFINIDAD"));
+		item.setAfinidad(rs.getInt("AFINIDAD"));
+		item.setAfinidadOBJ(modelo.getAfinidadById(rs.getInt("AFINIDAD")));
 		return item;
 	}
 	
@@ -1024,15 +997,6 @@ public class ModeloBaremacion {
 			
 		if (!unidades.contains(item.getUnidades())) {
 			throw new UVException("Tipo de unidad no válida");
-		}
-					
-		ArrayList<String> afinidades = new ArrayList<String>();
-		afinidades.add(ITEM_AFINIDADES_SIN_MODULACION);
-		afinidades.add(ITEM_AFINIDADES_PROPIAS_AL_AREA);
-		afinidades.add(ITEM_AFINIDADES_PROPIAS_AL_PERFIL_INVERSTIGADOR);
-			
-		if (!afinidades.contains(item.getAfinidad())) {
-			throw new UVException("Tipo de afinidad no válida");
 		}
 		
 		if (item.getValorMinimo() < MINIMO_VALOR_FLOAT) {

@@ -1,6 +1,10 @@
 package es.ujaen.uvirtual.beans.vistas.uvirtual.bolsaempleo;
 
 import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.List;
+
+import es.ujaen.uvirtual.beans.uvirtual.bolsaempleo.Afinidad;
 import es.ujaen.uvirtual.beans.uvirtual.bolsaempleo.ApartadoBaremacion;
 import es.ujaen.uvirtual.beans.uvirtual.bolsaempleo.BloqueBaremacion;
 import es.ujaen.uvirtual.beans.uvirtual.bolsaempleo.ItemBaremacion;
@@ -18,6 +22,8 @@ public class VistaItemsBaremacion extends Vista implements Serializable {
     private BloqueBaremacion bloque;
     private ItemBaremacion item;
     private String ultimoCodigo; 
+    private Afinidad afinidad;
+    private List<Afinidad> afinidades = new ArrayList<>();
         
     public String getVista() {
         return vista;
@@ -66,4 +72,20 @@ public class VistaItemsBaremacion extends Vista implements Serializable {
 	public void setUltimoCodigo(String codigo) {
 		this.ultimoCodigo = codigo;
 	}    
+	
+	public Afinidad getAfinidad() {
+		return this.afinidad;
+	}
+	
+	public void setAfinidad(Afinidad afinidad) {
+		this.afinidad = afinidad;
+	}   
+	
+	public List<Afinidad> getAfinidades() {
+		return afinidades;
+	}
+	
+	public void setAfinidades(List<Afinidad> pafinidades) {
+		this.afinidades = pafinidades;
+	}
 }

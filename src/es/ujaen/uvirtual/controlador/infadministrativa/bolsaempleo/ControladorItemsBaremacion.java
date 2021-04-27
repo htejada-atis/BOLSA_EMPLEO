@@ -19,6 +19,7 @@ import es.ujaen.uvirtual.beans.uvirtual.bolsaempleo.ApartadoBaremacion;
 import es.ujaen.uvirtual.beans.uvirtual.bolsaempleo.BloqueBaremacion;
 import es.ujaen.uvirtual.beans.uvirtual.bolsaempleo.ItemBaremacion;
 import es.ujaen.uvirtual.beans.vistas.uvirtual.bolsaempleo.VistaItemsBaremacion;
+import es.ujaen.uvirtual.modelo.bolsaempleo.ModeloAfinidad;
 import es.ujaen.uvirtual.modelo.bolsaempleo.ModeloBaremacion;
 import es.ujaen.uvirtual.utilidades.BolsaEmpleoDataTable;
 import es.ujaen.uvirtual.utilidades.BolsaEmpleoValidator;
@@ -302,8 +303,6 @@ public class ControladorItemsBaremacion extends HttpServlet {
 		apartado.setActivo(true);
 		apartado.setPuntuacionMaxima(validator.getValueFloat(PARAM_APARTADO_PUNTUACIONMAXIMA));
 		apartado.setPorcentajeMaximo(validator.getValueFloat(PARAM_APARTADO_PORCENTAJEMAXIMO));
-		apartado.setMeritosPreferentes(validator.getValueBoolean(PARAM_APARTADO_MERITOSPREFERENTES));
-		apartado.setFactorMeritoPreferente(validator.getValueFloat(PARAM_APARTADO_PUNTUACIONMAXIMA));
 		
 		ModeloBaremacion.obtenerInstancia().insertaApartado(apartado);
 		
@@ -368,8 +367,6 @@ public class ControladorItemsBaremacion extends HttpServlet {
 		apartado.setNombre(validator.getValueString(PARAM_APARTADO_NOMBRE));
 		apartado.setPuntuacionMaxima(validator.getValueFloat(PARAM_APARTADO_PUNTUACIONMAXIMA));
 		apartado.setPorcentajeMaximo(validator.getValueFloat(PARAM_APARTADO_PORCENTAJEMAXIMO));
-		apartado.setMeritosPreferentes(validator.getValueBoolean(PARAM_APARTADO_MERITOSPREFERENTES));
-		apartado.setFactorMeritoPreferente(validator.getValueFloat(PARAM_APARTADO_FACTORMERITOPREFERENTE));
 		
 		modelo.actualizaApartado(apartado);
 		
@@ -684,6 +681,10 @@ public class ControladorItemsBaremacion extends HttpServlet {
 		bean.setApartadoBaremacion(bloque.getApartadoBaremacion());
 		bean.setBloqueBaremacion(bloque);
 		bean.setItemBaremacion(null);
+		
+		ModeloAfinidad modeloAfinidad = ModeloAfinidad.obtenerInstancia();
+		bean.setAfinidades(modeloAfinidad.listaAfinidades());
+		
 		bean.setVista(RUTA_BEP_CONF + "formItemBaremacion.jsp");		
 		bean.setUltimoCodigo(modelo.getUltimoCodigoItem(bloque));		
 	}
@@ -716,7 +717,7 @@ public class ControladorItemsBaremacion extends HttpServlet {
 		item.setCodigo(validator.getValueString(PARAM_ITEM_CODIGO));
 		item.setNombre(validator.getValueString(PARAM_ITEM_NOMBRE));				
 		item.setUnidades(validator.getValueString(PARAM_ITEM_UNIDADES));
-		item.setAfinidad(validator.getValueString(PARAM_ITEM_AFINIDAD));
+		item.setAfinidad(validator.getValueInteger(PARAM_ITEM_AFINIDAD));
 		item.setValor(validator.getValueFloat(PARAM_ITEM_VALOR));
 		item.setValorMinimo(validator.getValueFloat(PARAM_ITEM_VALOR_MINIMO));
 		item.setValorMaximo(validator.getValueFloat(PARAM_ITEM_VALOR_MAXIMO));
@@ -729,11 +730,15 @@ public class ControladorItemsBaremacion extends HttpServlet {
 	
 	private void editarItem(VistaItemsBaremacion bean, HttpServletRequest request, HttpServletResponse response) throws SQLException, UVException, IOException {
 		ModeloBaremacion modelo = ModeloBaremacion.obtenerInstancia();
+		ModeloAfinidad modeloAfinidad = ModeloAfinidad.obtenerInstancia();
 		ItemBaremacion item = modelo.getItemBaremacionById(Formateador.leeParametroInteger(request.getParameter(PARAM_ITEM)));
 		
 		bean.setApartadoBaremacion(item.getBloqueBaremacion().getApartadoBaremacion());
 		bean.setBloqueBaremacion(item.getBloqueBaremacion());
 		bean.setItemBaremacion(item);
+		
+		bean.setAfinidad(modeloAfinidad.getAfinidadById(item.getAfinidad()));
+		bean.setAfinidades(modeloAfinidad.listaAfinidades());
 		
 		bean.setVista(RUTA_BEP_CONF + "formItemBaremacion.jsp");
 		bean.setUltimoCodigo(ModeloBaremacion.obtenerInstancia().getUltimoCodigoApartado());
@@ -762,7 +767,7 @@ public class ControladorItemsBaremacion extends HttpServlet {
 		item.setCodigo(validator.getValueString(PARAM_ITEM_CODIGO));
 		item.setNombre(validator.getValueString(PARAM_ITEM_NOMBRE));				
 		item.setUnidades(validator.getValueString(PARAM_ITEM_UNIDADES));
-		item.setAfinidad(validator.getValueString(PARAM_ITEM_AFINIDAD));
+		item.setAfinidad(validator.getValueInteger(PARAM_ITEM_AFINIDAD));
 		item.setValor(validator.getValueFloat(PARAM_ITEM_VALOR));
 		item.setValorMinimo(validator.getValueFloat(PARAM_ITEM_VALOR_MINIMO));
 		item.setValorMaximo(validator.getValueFloat(PARAM_ITEM_VALOR_MAXIMO));
@@ -826,7 +831,7 @@ public class ControladorItemsBaremacion extends HttpServlet {
 				String.format(MENSAJE_ERROR_NOMBRE_MAXIMO, ModeloBaremacion.COLUMN_NOMBRE_MAXLENGTH));
 		
 		validator.addParamString(PARAM_ITEM_UNIDADES);
-		validator.addParamString(PARAM_ITEM_AFINIDAD);		
+		validator.addParamInteger(PARAM_ITEM_AFINIDAD);		
 		
 		validator.addParamFloat(PARAM_ITEM_VALOR);		
 		validator.addRule(PARAM_ITEM_VALOR, "required", "El valor unitario no puede estar vacio");
