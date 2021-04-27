@@ -1,9 +1,8 @@
 package es.ujaen.uvirtual.beans.uvirtual.bolsaempleo;
 
 import java.io.Serializable;
-import java.util.Date;
 
-/** Clase bolsa empleo de bolsaempleo.
+/** Clase bolsa candidato de bolsaempleo.
  * @author atis
  */
 public class BolsaCandidato extends Bolsa implements Serializable {
