@@ -83,7 +83,7 @@ $(document).ready(function() {
 	    "filterable": true,
 	    "action": "<%= ControladorBolsas.ACCION_DATATABLE %>",
 	    "defaultOrderBy": 2,
-	    "defaultOrderDirection": 'desc',
+	    "defaultOrderDirection": 'asc',
 	    "columns": [
 	    	{'data': 'codNum', 'selectable': true},
 	        {'data': 'codNum', 'filter': {'type': 'number'}},
