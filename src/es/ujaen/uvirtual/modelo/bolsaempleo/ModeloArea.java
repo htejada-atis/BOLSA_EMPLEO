@@ -378,7 +378,7 @@ public class ModeloArea {
 //		}
 //		
 //		String params = BolsaEmpleoUtils.consultaMultiplesParametros(bolsas.size());
-//		String consulta = "INSERT INTO TBEP_SOLICITUDBOLSAS (BEPBOL_CODNUM, BEPSOL_CODNUM)"
+//		String consulta = "INSERT INTO TBEP_SOLICITUD_BOLSAS (BEPBOL_CODNUM, BEPSOL_CODNUM)"
 //				+ " SELECT bepbol.CODNUM AS BEPBOL_CODNUM, bepsol.CODNUM AS BEPSOL_CODNUM"
 //				+ " FROM TBEP_BOLSAS bepbol, TBEP_SOLICITUDES bepsol WHERE bepsol.CODNUM = ? AND "
 //				+ " bepbol.CODNUM IN (" + params + ")";

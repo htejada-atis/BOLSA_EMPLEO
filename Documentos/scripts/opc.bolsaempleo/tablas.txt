@@ -12,9 +12,9 @@ TBEP_ITEMSBAREMACION                ITE     bepite
 TBEP_MERITOS                        MER     bepmer
 TBEP_MERITOSPREFERENTES             MEP     bepmep
 TBEP_NOTICIAS                       NOT     bepnot
-TBEP_SOLICITUDBOLSAS                SBO     bepsbo
 TBEP_SOLICITUDES                    SOL     bepsol
+TBEP_SOLICITUD_BOLSAS				SBO		bepsbo
+TBEP_SOLICITUD_BOLSAS_MERITOS		SBM     bepsbm
 TBEP_TITULACIONES                   TIT     beptit
-TBEP_TITULACIONESPREFERENTESAREA    TPA     beptpa
-TBEP_USUARIOS                       USU     bepusu
+TBEP_TITULACIONES_PREFERENTES_AREA  TPA     beptpa
 TBEP_USUARIOS                       USU     bepusu

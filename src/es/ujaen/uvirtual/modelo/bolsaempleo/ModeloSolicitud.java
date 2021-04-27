@@ -236,7 +236,7 @@ public class ModeloSolicitud {
 		// leemos las bolsas que están asignadas y ya dejan de estarlo. para ver si tiene meritos asigando o no
 		// TODO: refactor la asignación de bolsas a la solicitud		
 //		String consulta = "SELECT bepsbo.* "
-//				+ "FROM TBEP_SOLICITUDBOLSAS "
+//				+ "FROM TBEP_SOLICITUD_BOLSAS "
 //				+ "WHERE 1=1 "
 //				+ "AND bepsbo.BEPSOL_CODNUM = ? "
 //				+ "AND bepsbo.BEPBOL_CODNUM NOT IN (" + params + ")";
@@ -262,7 +262,7 @@ public class ModeloSolicitud {
 			conexion.setAutoCommit(false);
 			
 			// eliminamos las bolsas anteriores
-			String sqlDelete = "DELETE FROM TBEP_SOLICITUDBOLSAS WHERE BEPSOL_CODNUM = ?";
+			String sqlDelete = "DELETE FROM TBEP_SOLICITUD_BOLSAS WHERE BEPSOL_CODNUM = ?";
 			
 			try (PreparedStatement stmt = conexion.prepareStatement(sqlDelete)) {
 				stmt.setInt(1, solicitud.getCodNum());
@@ -275,7 +275,7 @@ public class ModeloSolicitud {
 			}
 			
 			// insertamos la bolsas en la solicidad		
-			String consultaInsert = "INSERT INTO TBEP_SOLICITUDBOLSAS (BEPBOL_CODNUM, BEPSOL_CODNUM)"
+			String consultaInsert = "INSERT INTO TBEP_SOLICITUD_BOLSAS (BEPBOL_CODNUM, BEPSOL_CODNUM)"
 					+ " SELECT bepbol.CODNUM AS BEPBOL_CODNUM, bepsol.CODNUM AS BEPSOL_CODNUM"
 					+ " FROM TBEP_BOLSAS bepbol, TBEP_SOLICITUDES bepsol WHERE bepsol.CODNUM = ? AND "
 					+ " bepbol.CODNUM IN (" + params + ")";
@@ -309,7 +309,7 @@ public class ModeloSolicitud {
 		ModeloBolsa modeloBolsa = ModeloBolsa.obtenerInstancia();
 		ArrayList<Bolsa> bolsas = new ArrayList<Bolsa>();
 		
-		String consulta = "SELECT bepsbo.* FROM TBEP_SOLICITUDBOLSAS bepsbo WHERE bepsbo.BEPSOL_CODNUM = ?";
+		String consulta = "SELECT bepsbo.* FROM TBEP_SOLICITUD_BOLSAS bepsbo WHERE bepsbo.BEPSOL_CODNUM = ?";
 		
 		try (Connection conexion = ConexionUvirtual.obtenerInstancia(); PreparedStatement stmt = conexion.prepareStatement(consulta)) {
 			int indexParam = 1;
@@ -340,7 +340,7 @@ public class ModeloSolicitud {
 		
 		String consulta =
 			"SELECT bepsbo.* "
-		  + "FROM TBEP_SOLICITUDBOLSAS bepsbo "
+		  + "FROM TBEP_SOLICITUD_BOLSAS bepsbo "
 		  + "WHERE bepsbo.BEPSOL_CODNUM = ? ";
 		
 		dataTable.setQuery(consulta);

@@ -34,21 +34,22 @@ VistaMeritosPreferentes bean = (VistaMeritosPreferentes) uvdatos.getVistas().get
 	
 	<table class="bluetable bolsaempleo" id="table">
 		<tr>
-			<th scope="col" style="width:10%" title="Id del tipo de mérito preferente">Id</th>
-			<th scope="col"	style="width:40%" title="Descripción del mérito">Descripción</th>
+			<th scope="col" style="width:5%" title="Id del tipo de mérito preferente">Id</th>
+			<th scope="col"	style="width:20%" title="Descripción del mérito">Descripción</th>
 			<th scope="col"	style="width:20%">Tipo</th>
 			<th scope="col"	style="width:20%">Aplicable</th>			
+			<th scope="col"	style="width:10%">Factor</th>
+			<th scope="col"	style="width:10%">Activo</th>
 			<th scope="col"	style="width:10%"></th>
 		</tr>
 		<tbody>
 		</tbody>
 		<tfoot>
 			<tr>
-				<th colspan="5" style="width:100%"></th>
+				<th colspan="7" style="width:100%"></th>
 			</tr>
 		</tfoot>
-	</table>
-	
+	</table>	
 </div>
 
 <script>
@@ -58,26 +59,47 @@ VistaMeritosPreferentes bean = (VistaMeritosPreferentes) uvdatos.getVistas().get
 		    "ajax": { url: "<%=  ControladorMeritosPreferentes.URL_PATTERN_AJAX %>" },
 		    "pageSize": 10,
 		    "action": "<%= ControladorMeritosPreferentes.ACCION_DATATABLE %>",
+		    "filterable": true,
 		    "columns": [
 		    	{'data': 'codNum'},
-		        {'data': 'descripcion'},
+		        {'data': 'descripcion', 'filter': true},
 		        {'data': 'tipo', 'render': function(row) {
-		        	var tiposLabel = {
-		        		'<%= ModeloMeritosPreferentes.TIPO_TITULACION_PREFERENTE %>': 'Titulación preferente',
-		        		'<%= ModeloMeritosPreferentes.TIPO_MERITO %>': 'Mérito'
-		        	};
+		        	var text;
+		        	
+		        	switch(row.tipo) {
+		        	case '<%= ModeloMeritosPreferentes.TIPO_TITULACION_PREFERENTE %>':
+		        		text = 'Titulación preferente';
+		        		break;
+		        	case '<%= ModeloMeritosPreferentes.TIPO_MERITO %>':
+		        		text = 'Mérito: ' + row.tipoItemBaremacion.nombre;
+		        		break;		        	
+		        	}
 		        			        	
-		        	return tiposLabel[row.tipo];
+		        	return text;
 		        }},
 		        {'data': 'aplicable', 'render': function(row) {
-		        	var aplicableTipos = {
-		        		'<%= ModeloMeritosPreferentes.APLICABLE_BLOQUE %>': 'Al apartado',
-		        		'<%= ModeloMeritosPreferentes.APLICABLE_APARTADO %>': 'Al bloque',
-		        		'<%= ModeloMeritosPreferentes.APLICABLE_ITEM %>': 'Al mérito',
-		        	};
+		        	var text;
 		        	
-		        	return aplicableTipos[row.aplicable];
+		        	switch(row.aplicable) {
+		        	case '<%= ModeloMeritosPreferentes.APLICABLE_BLOQUE %>':
+		        		text = 'Al apartado. '
+		        		break;
+		        	case '<%= ModeloMeritosPreferentes.APLICABLE_APARTADO %>':
+		        		text = 'Al bloque. ' + row.aplicableApartadoBaremacion.nombre;
+		        		break;
+		        	case '<%= ModeloMeritosPreferentes.APLICABLE_ITEM %>':
+		        		text = 'Al mérito. ';
+		        		break;
+		        	}
+		        	
+		        	return text;
 		        }},
+		        {'data': 'factor'},
+		        {'data': 'activo', 
+		         'render': function(row) { return '<div title="' + (row.activo ? 'Activo' : 'Inactivo') +'" class="'+ (row.activo ? 'circle-true' : 'circle-false') +'"></div>'; }, 
+		         'filter': {'type': 'select', 'options': {'true': 'Activo', 'false': 'Inactivo'}, 'optionDefault': 'true'},		         
+		         'order': {'active': false}
+		        },
 		        {'data': 'codNum', 'buttons': [
 		        	{'label': 'Editar', 'onClick': function(row) {
 			    			var params = {
