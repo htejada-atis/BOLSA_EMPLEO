@@ -1,6 +1,5 @@
 package es.ujaen.uvirtual.beans.uvirtual.bolsaempleo;
 
-import java.io.InputStream;
 import java.io.Serializable;
 
 
@@ -8,16 +7,11 @@ import java.io.Serializable;
  * @author jlopez
  *
  */
-public class MeritoSolicitud implements Serializable {
+public class MeritoSolicitud extends Merito implements Serializable {
 
 	private static final long serialVersionUID = 1L;
-	private Integer codNum;
-	private Float valor;
-	private String descripcion;
-	private String observacion;
-	private ItemBaremacion item;
-	private UsuarioBolsaEmpleo user;
-	private InputStream archivo;
+	private Boolean afinidad;
+	private Boolean excluido;
 	
 	/** Constructor por defecto.
 	 */
@@ -26,105 +20,31 @@ public class MeritoSolicitud implements Serializable {
 	}
 	
 	/** Constructor con parametros.
-	 * @param pcodNum .
-	 * @param pvalor .
-	 * @param pdescripcion .
-	 * @param pobservacion .
-	 * @param pitem .
-	 * @param parchivo .
+	 * @param pmerito .
+	 * @param pexcluido .
+	 * @param pafinidad .
 	 */
-	public MeritoSolicitud(Integer pcodNum, Float pvalor, String pdescripcion, String pobservacion, ItemBaremacion pitem, InputStream parchivo) {
-		super();
-		this.codNum = pcodNum;
-		this.valor = pvalor;
-		this.descripcion = pdescripcion;
-		this.observacion = pobservacion;
-		this.item = pitem;
-		this.archivo = parchivo;
+	public MeritoSolicitud(Merito pmerito, Boolean pexcluido, Boolean pafinidad) {
+		super(pmerito);
+		this.excluido = pexcluido;
+		this.afinidad = pafinidad;
 	}
 	
-	/** Constructor con parametros.
-	 * @param pvalor .
-	 * @param pdescripcion .
-	 * @param pobservacion .
-	 * @param pitem .
-	 * @param parchivo .
-	 */
-	public MeritoSolicitud(Float pvalor, String pdescripcion, String pobservacion, ItemBaremacion pitem, InputStream parchivo) {
-		super();
-		this.valor = pvalor;
-		this.descripcion = pdescripcion;
-		this.observacion = pobservacion;
-		this.item = pitem;
-		this.archivo = parchivo;
-	}
 	
-	/** Constructor copia.
-	 * @param copia Noticia a copiar
-	 */
-	public MeritoSolicitud(MeritoSolicitud copia) {
-		this.codNum = copia.codNum;
-		this.valor = copia.valor;
-		this.descripcion = copia.descripcion;
-		this.observacion = copia.observacion;
-		this.item = copia.item;
-		this.archivo = copia.archivo;
-	}
-	
-	public Integer getCodNum() {
-		return codNum;
+	public Boolean isAfinidad() {
+		return afinidad;
 	}
 
-	public void setCodNum(Integer codNum) {
-		this.codNum = codNum;
+	public void setAfinidad(Boolean afinidad) {
+		this.afinidad = afinidad;
+	}
+	
+	public Boolean isExcluido() {
+		return excluido;
 	}
 
-	public Float getValor() {
-		return valor;
-	}
-	
-	public void setValor(Float valor) {
-		this.valor = valor;
-	}
-	
-	public String getDescripcion() {
-		return descripcion;
-	}
-	
-	public void setDescripcion(String descripcion) {
-		this.descripcion = descripcion;
-	}
-	
-	public String getObservacion() {
-		return observacion;
-	}
-	
-	public void setObservacion(String observacion) {
-		this.observacion = observacion;
-	}
-	
-	public ItemBaremacion getItemBaremacion() {
-		return item;
-	}
-	
-	public void setItemBaremacion(ItemBaremacion pitem) {
-		this.item = pitem;
-	}
-	
-	public InputStream getArchivo() {
-		return archivo;
-	}
-	
-	public void setArchivo(InputStream archivo) {
-		this.archivo = archivo;
-	}
-	
-	public UsuarioBolsaEmpleo getUsuario() {
-		return user;
-	}
-	
-	public void setUsuario(UsuarioBolsaEmpleo pusu) {
-		this.user = pusu;
+	public void setExcluido(Boolean excluido) {
+		this.excluido = excluido;
 	}
 
 	public static long getSerialversionuid() {
@@ -133,21 +53,15 @@ public class MeritoSolicitud implements Serializable {
 	
 	@Override
 	public String toString() {
-		return "Noticia [codNum=" + codNum + ", valor=" + valor
-				+ ", descripcion=" + descripcion + ", observacion=" + observacion 
-				+ ", item=" + item + "]";
+		return "MeritoSolicitud [afinidad=" + afinidad + ", excluido=" + excluido + "]";
 	}
 	
 	@Override
 	public int hashCode() {
 		final int prime = 31;
 		int result = 1;
-		result = prime * result + ((valor == null) ? 0 : valor.hashCode());
-		result = prime * result + ((descripcion == null) ? 0 : descripcion.hashCode());
-		result = prime * result + ((observacion == null) ? 0 : observacion.hashCode());
-		result = prime * result + ((item == null) ? 0 : item.hashCode());
-		result = prime * result + ((archivo == null) ? 0 : archivo.hashCode());
-		result = prime * result + ((codNum == null) ? 0 : codNum.hashCode());
+		result = prime * result + ((afinidad == null) ? 0 : afinidad.hashCode());
+		result = prime * result + ((excluido == null) ? 0 : excluido.hashCode());
 		return result;
 	}
 	
@@ -164,39 +78,18 @@ public class MeritoSolicitud implements Serializable {
 			return false;
 		}
 		MeritoSolicitud other = (MeritoSolicitud) obj;
-		if (valor == null) {
-			if (other.valor != null) {
+		if (afinidad == null) {
+			if (other.afinidad != null) {
 				return false;
 			}
-		} else if (!valor.equals(other.valor)) {
+		} else if (!afinidad.equals(other.afinidad)) {
 			return false;
 		}
-		if (descripcion == null) {
-			if (other.descripcion != null) {
+		if (excluido == null) {
+			if (other.excluido != null) {
 				return false;
 			}
-		} else if (!descripcion.equals(other.descripcion)) {
-			return false;
-		}
-		if (observacion == null) {
-			if (other.observacion != null) {
-				return false;
-			}
-		} else if (!observacion.equals(other.observacion)) {
-			return false;
-		}
-		if (item == null) {
-			if (other.item != null) {
-				return false;
-			}
-		} else if (!item.equals(other.item)) {
-			return false;
-		}
-		if (archivo == null) {
-			if (other.archivo != null) {
-				return false;
-			}
-		} else if (!archivo.equals(other.archivo)) {
+		} else if (!excluido.equals(other.excluido)) {
 			return false;
 		}
 		

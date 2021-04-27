@@ -8,6 +8,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import es.ujaen.uvirtual.beans.uvirtual.bolsaempleo.Merito;
+import es.ujaen.uvirtual.beans.uvirtual.bolsaempleo.MeritoSolicitud;
 import es.ujaen.uvirtual.modelo.conexion.ConexionUvirtual;
 import es.ujaen.uvirtual.utilidades.BolsaEmpleoUtils;
 import es.ujaen.uvirtual.utilidades.BolsaEmpleoDataTable;
@@ -24,6 +25,11 @@ public class ModeloMerito {
 	public static final int ORDER_COLUMN_INDEX_DESCRIPCION = 3;
 	public static final int ORDER_COLUMN_INDEX_VALOR = 4;
 	public static final int ORDER_COLUMN_INDEX_OBSERVACION = 5;
+	
+	public static final int ORDER_COLUMN_INDEX_ID_SOLICITUD = 0;
+	public static final int ORDER_COLUMN_INDEX_ITEM_SOLICITUD = 1;
+	public static final int ORDER_COLUMN_INDEX_NOMBRE_ITEM_SOLICITUD = 2;
+	public static final int ORDER_COLUMN_INDEX_VALOR_SOLICITUD = 3;
 	
 	public static final int COLUMN_DESCRIPCION_MAXLENGTH = 200;
 	public static final int COLUMN_OBSERVACION_MAXLENGTH = 300;
@@ -222,6 +228,68 @@ public class ModeloMerito {
 					mer.setObservacion(rs.getString("OBSERVACION"));
 					mer.setValor(rs.getFloat("VALOR"));
 					meritos.add(mer);
+				}				
+			}	
+			
+			dataTable.setRecordsTotalFromQuery(stmtCount);
+			dataTable.setData(meritos);
+		}
+		
+		return dataTable;
+	}
+	
+	/**
+	 * Listado de méritos de un usuario en la solicitud .
+	 * @param params para leer los parametros de paginación, ordenacion, etc .
+	 * @param usuario id del usuario .
+	 * @return listado de titulaciones .
+	 * @throws SQLException en caso de error de base de datos .
+	 * @throws UVException error si no existe titulación .
+	 */
+	public BolsaEmpleoDataTable<MeritoSolicitud> listaMeritosSolicitudDatatable(Map<String, String[]> params, Integer usuario) throws SQLException, UVException {
+		
+		if (usuario == null) {
+			throw new UVException("No se pueden listar méritos sin el id del usuario");
+		}
+		
+		List<MeritoSolicitud> meritos = new ArrayList<>();
+		BolsaEmpleoDataTable<MeritoSolicitud> dataTable = new BolsaEmpleoDataTable<MeritoSolicitud>(params);
+		
+		String consulta = "SELECT bepmer.*, bepsbm.FLGAFINIDAD, bepsbm.FLGEXCLUIDO, bepblo.BEPAPA_CODNUM FROM TBEP_MERITOS bepmer"
+				+ " INNER JOIN TBEP_ITEMSBAREMACION bepite"
+				+ " ON bepite.CODNUM = bepmer.BEPITE_CODNUM"
+				+ " INNER JOIN TBEP_BLOQUESBAREMACION bepblo"
+				+ " ON bepblo.CODNUM = bepite.BEPBLO_CODNUM"
+				+ " LEFT JOIN TBEP_SOLICITUD_BOLSAS_MERITOS bepsbm"
+				+ " ON bepsbm.BEPMER_CODNUM = bepmer.CODNUM"
+				+ " WHERE bepmer.BEPUSU_CODNUM = ? ";
+		
+		dataTable.setColumn(ORDER_COLUMN_INDEX_ID_SOLICITUD, "bepmer.CODNUM");
+		dataTable.setColumn(ORDER_COLUMN_INDEX_ITEM_SOLICITUD, "bepmer.BEPITE_CODNUM");
+		dataTable.setColumn(ORDER_COLUMN_INDEX_NOMBRE_ITEM_SOLICITUD, "bepite.NOMBRE");
+		dataTable.setColumn(ORDER_COLUMN_INDEX_VALOR_SOLICITUD, "bepmer.VALOR");
+		dataTable.setQuery(consulta);
+				
+		try (Connection conexion = ConexionUvirtual.obtenerInstancia();
+				PreparedStatement stmtCount = conexion.prepareStatement(dataTable.getQueryCount());
+				PreparedStatement stmt = conexion.prepareStatement(dataTable.getQuery());
+		) {
+			int indexParam = 1;
+			stmt.setInt(indexParam, usuario);
+			stmtCount.setInt(indexParam++, usuario);
+			dataTable.setFiltersParams(stmt, stmtCount, indexParam);
+			try (ResultSet rs = stmt.executeQuery()) {
+				while (rs.next()) {
+					Merito mer = new Merito();
+					mer.setCodNum(rs.getInt("CODNUM"));
+					ModeloBaremacion modeloBar = ModeloBaremacion.obtenerInstancia();
+					mer.setItemBaremacion(modeloBar.getItemBaremacionById(rs.getInt("BEPITE_CODNUM")));
+					mer.setDescripcion(rs.getString("DESCRIPCION"));
+					mer.setObservacion(rs.getString("OBSERVACION"));
+					mer.setValor(rs.getFloat("VALOR"));
+					
+					MeritoSolicitud meritoSolicitud = new MeritoSolicitud(mer, false, false);
+					meritos.add(meritoSolicitud);
 				}				
 			}	
 			

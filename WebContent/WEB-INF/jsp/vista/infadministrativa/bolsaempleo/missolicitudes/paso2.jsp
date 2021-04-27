@@ -107,7 +107,11 @@ VistaSolicitudes bean = (VistaSolicitudes) uvdatos.getVistas().get(VistaSolicitu
 			    "action": "<%= ControladorMisSolicitudes.ACCION_DATATABLE_MERITOS_BOLSA %>",
 			    "params": {"<%= ControladorMisSolicitudes.PARAM_SOLICITUD_ID %>": <%= bean.getSolicitud().getCodNum() %>},
 			    "columns": [
-			    	{'data': 'codNum', 'selectable': true},
+			    	{'data': 'codNum', 'selectable': {'onChange': function(row) {
+				    			console.log(row.codNum);
+				    		}
+			    		}
+			    	},
 			    	{'data': 'item', 'filter': true, 'render': function(row) {
 			        	return row.item.bloque.apartado.codigo + "." + row.item.bloque.codigo + "." + row.item.codigo;
 		        	}},

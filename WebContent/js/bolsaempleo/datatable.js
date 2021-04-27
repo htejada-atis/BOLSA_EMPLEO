@@ -183,12 +183,17 @@ function DataTable(id, config) {
             if (row.selected) {
                 self.checked[value] = true;
                 check.prop('checked', true);
+                self.renderFooter();
             }
     		
     		$(check).on('change', function() {
     			self.checked[value] = this.checked;
                 this.checked ? $(this).parent().parent().addClass("selected") : $(this).parent().parent().removeClass("selected");
     			self.renderFooter();
+
+                if (columnDef.selectable.hasOwnProperty('onChange')) {
+                    columnDef.selectable.onChange(row);
+                }
     		});
 
             if (columnDef.selectable.exclude && Atis.getProp(row, columnDef.selectable.exclude)) {
