@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.sql.SQLException;
 import java.util.Date;
+import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -16,17 +17,15 @@ import javax.servlet.http.HttpSession;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+import com.google.gson.reflect.TypeToken;
 
 import es.ujaen.uvirtual.beans.CodigoDescripcion;
 import es.ujaen.uvirtual.beans.UVDatos;
 import es.ujaen.uvirtual.beans.Usuario;
 import es.ujaen.uvirtual.beans.uvirtual.bolsaempleo.Afinidad;
-import es.ujaen.uvirtual.beans.uvirtual.bolsaempleo.Convocatoria;
 import es.ujaen.uvirtual.beans.vistas.uvirtual.bolsaempleo.VistaAfinidades;
-import es.ujaen.uvirtual.beans.vistas.uvirtual.bolsaempleo.VistaConvocatorias;
+import es.ujaen.uvirtual.beans.vistas.uvirtual.bolsaempleo.VistaUsuarioBolsaEmpleo;
 import es.ujaen.uvirtual.modelo.bolsaempleo.ModeloAfinidad;
-import es.ujaen.uvirtual.modelo.bolsaempleo.ModeloBolsa;
-import es.ujaen.uvirtual.modelo.bolsaempleo.ModeloConvocatoria;
 import es.ujaen.uvirtual.modelo.bolsaempleo.ModeloUsuarioBolsaEmpleo;
 import es.ujaen.uvirtual.utilidades.BolsaEmpleoDataTable;
 import es.ujaen.uvirtual.utilidades.BolsaEmpleoValidator;
@@ -39,7 +38,7 @@ import es.ujaen.uvirtual.utilidades.UVException;
  */
 @WebServlet(
 	name = "informacionadministrativa.bolsaempleo.configuracion.afinidades", 
-	description = "Gestión de convocatorias", 
+	description = "Gestión de afinidades", 
 	urlPatterns = { 
 			"/srv/es/informacionadministrativa/bolsaempleo/configuracion/afinidades", 
 			"/srv/en/informacionadministrativa/bolsaempleo/configuracion/afinidades",
@@ -48,46 +47,45 @@ import es.ujaen.uvirtual.utilidades.UVException;
 })
 public class ControladorAfinidades extends HttpServlet {
 	private static final long serialVersionUID = 1L;
-	private static final String NOMBREDEESTACLASE = ControladorConvocatorias.class.getName();
+	private static final String NOMBREDEESTACLASE = ControladorAfinidades.class.getName();
 	private static final Logger LOGGER = Logger.getLogger(NOMBREDEESTACLASE);
 	public static final String PARAM_ACCION = "a";
 	public static final String PARAM_ACCION_ENVIAR = "enviar"; 
-	public static final String PARAM_CONVOCATORIA_ID = "id";
-	public static final String PARAM_CONVOCATORIA_DESCRIPCION = "descripcion";
-	public static final String PARAM_CONVOCATORIA_FECHACIERRE = "fechaCierre";
-	public static final String PARAM_CONVOCATORIA_NUMEROBOLSASMAXIMO = "numBolsasMaximo";
-	public static final String PARAM_CONVOCATORIA_NUMEROMERITOSPORBLOQUE = "numMeritosPorBloque";
+	public static final String PARAM_ID = "id";
+	public static final String PARAM_CODIGO = "codigo";
+	public static final String PARAM_DESCRIPCION = "descripcion";
+	public static final String PARAM_MODULACION = "modulacion";
+	public static final String PARAM_AFINIDADES_SELECCIONADAS = "afinidadesseleccionadas";
+
 	
 	// acciones
 	public static final String ACCION_LISTAR_AFINIDADES = "listar";
 	public static final String ACCION_DATATABLE = "datatable";
-	public static final String ACCION_FORMULARIO_CONVOCATORIA = "formConvocatoria";
-	public static final String ACCION_AGREGAR_CONVOCATORIA = "addConvocatoria";
-	public static final String ACCION_FORMULARIO_EDITAR_CONVOCATORIA = "formEditarConvocatoria";
-	public static final String ACCION_MODIFICAR_CONVOCATORIA = "editConvocatoria";
-	public static final String ACCION_ABRIR_CONVOCATORIA = "abrirConvocatoria";
-	public static final String ACCION_CERRAR_CONVOCATORIA = "cerrarConvocatoria";
-	public static final String ACCION_BORRAR_CONVOCATORIA = "borrarConvocatoria";
+	public static final String ACCION_AGREGAR_AFINIDAD = "addAfinidad";
+	public static final String ACCION_FORMULARIO_AFINIDAD = "formularioafinidad";
+
+	public static final String ACCION_MODIFICAR_AFINIDAD = "editafinidad";
+	public static final String ACCION_BORRAR_AFINIDAD = "borrarafinidad";
 
 	
 	// mensajes
 	public static final String MENSAJE_ENVIADO = "mensaje";
-	public static final String MENSAJE_EXITO_ELIMINAR = "Convocatoria eliminada correctamente";
+	public static final String MENSAJE_EXITO_ELIMINAR = "Afinidad eliminada correctamente";
+	
 	public static final String MENSAJE_ERROR_DESCRIPCION_LARGA = "La descripción no puede ser superior a %d";
+	public static final String MENSAJE_ERROR_DESCRIPCION_REQUERIDA = "La descripción es requerida";
 	public static final String MENSAJE_ERROR_DESCRIPCION_VACIA = "La descripción no puede estar vacia";
-	public static final String MENSAJE_ERROR_FECHACIERRE_INCORRECTA = "La fecha de cierre no tiene el formato DD/MM/YYYY";
-	public static final String MENSAJE_ERROR_FECHACIERRE_REQUERIDA = "La fecha de cierre es requerida";
-	public static final String MENSAJE_ERROR_FECHACIERRE_MINIMA = "La fecha de cierre debe ser mayor que la fecha actual";
-	public static final String MENSAJE_ERROR_NUMBOLSASMAXIMAS_REQUERIDA = "El número de bolsas máximas es requerido";
-	public static final String MENSAJE_ERROR_NUMBOLSASMAXIMAS_INCORRECTA = "El número de bolsas máximas debe ser un entero";
-	public static final String MENSAJE_ERROR_NUMBOLSASMAXIMAS_MINIMO = "El número de bolsas máximas debe ser al menos una";
-	public static final String MENSAJE_ERROR_NUMMERITOSBLOQUE_REQUERIDA = "El número de méritos por bloque es requerido";
-	public static final String MENSAJE_ERROR_NUMMERITOSBLOQUE_INCORRECTA = "El número de méritos por bloque debe ser un entero";
-	public static final String MENSAJE_ERROR_NUMMERITOSBLOQUE_MINIMO = "El número de méritos por bloque debe ser al menos uno";
-	public static final String MENSAJE_ERROR_CONVOCATORIAS_ABIERTAS = "Ya existen convocatorias abiertas.";
-	public static final String MENSAJE_ERROR_SIN_BOLSAS_BAREMABLES = "Antes de abrir una convocatoria debe de tener areas baremables";
-	public static final String MENSAJE_INFO_CONVOCATORIAS_INSERTADA_CORRECTAMENTE = "Convocatoria insertada correctamente.";
-	public static final String MENSAJE_INFO_CONVOCATORIA_ACTUALIZADA_CORRECTAMENTE = "Convocatoria actualizada correctamente.";
+	
+	public static final String MENSAJE_ERROR_CODIGO_LARGA = "El código no puede ser superior a %d";
+	public static final String MENSAJE_ERROR_CODIGO_REQUERIDO = "El código es requerido";
+	public static final String MENSAJE_ERROR_CODIGO_VACIO = "El código no puede estar vacio";
+	
+	public static final String MENSAJE_ERROR_MODULACION_LARGA = "La modulación no puede ser superior a %d";
+	public static final String MENSAJE_ERROR_MODULACION_REQUERIDA = "La modulación es requerida";
+	public static final String MENSAJE_ERROR_MODULACION_VACIA = "La modulación no puede estar vacia";	
+	
+	public static final String MENSAJE_INFO_AFINIDAD_INSERTADA_CORRECTAMENTE = "Afinidad insertada correctamente.";
+	public static final String MENSAJE_INFO_AFINIDAD_ACTUALIZADA_CORRECTAMENTE = "Afinidad actualizada correctamente.";
 
 	public static final int RESPONSE_HTTP_CODE_ERROR = 400;
 	
@@ -128,6 +126,18 @@ public class ControladorAfinidades extends HttpServlet {
 				case ACCION_DATATABLE:
 					listado(bean, datos, request, response);
 					break;
+				case ACCION_FORMULARIO_AFINIDAD:
+					formularioAfinidad(request, response, bean);
+					break;
+				case ACCION_AGREGAR_AFINIDAD:
+					nuevaAfinidad(bean, datos, request, response);
+					break;
+				case ACCION_MODIFICAR_AFINIDAD:
+					modificarAfinidad(bean, datos, request, response);
+					break;
+				case ACCION_BORRAR_AFINIDAD:
+					borrarAfinidad(bean, request, response);
+					break;
 			}			
 		} catch (UVException e) {
 			LOGGER.log(Level.WARNING, e.toString());
@@ -161,6 +171,17 @@ public class ControladorAfinidades extends HttpServlet {
 	private void index(VistaAfinidades bean, UVDatos datos, HttpServletRequest request, HttpServletResponse response) {
 		bean.setVista(RUTA_BEP_CON + "index.jsp");
 	}
+	
+	/** dirige al formulario de busqueda de un usuario.
+	 * @param request .
+	 * @param response .
+	 * @param bean bean de la vista a la que poner los valores.
+	 * @throws SQLException excepcion de bbdd.
+	 * @throws UVException en caso de error en bd
+	 */
+	private void formularioAfinidad(HttpServletRequest request, HttpServletResponse response, VistaAfinidades bean) {
+		bean.setVista("/WEB-INF/jsp/vista/infadministrativa/bolsaempleo/configuracion/afinidades/formAfinidades.jsp");
+	}
 		
 	private void listado(VistaAfinidades bean, UVDatos datos, HttpServletRequest request, HttpServletResponse response) throws IOException, SQLException {
 		ModeloAfinidad modelo = ModeloAfinidad.obtenerInstancia(); 
@@ -187,15 +208,11 @@ public class ControladorAfinidades extends HttpServlet {
 		}
 	}
 	
-	private void formAfinidad(VistaConvocatorias bean, UVDatos datos, HttpServletRequest request, HttpServletResponse response) {
+	private void nuevaAfinidad(VistaAfinidades bean, UVDatos datos, HttpServletRequest request, HttpServletResponse response) throws UVException, SQLException {
 		bean.setVista(RUTA_BEP_CON + "formAfinidades.jsp");
-	}
-	
-	private void nuevaConvocatoria(VistaConvocatorias bean, UVDatos datos, HttpServletRequest request, HttpServletResponse response) throws UVException, SQLException {
-		bean.setVista(RUTA_BEP_CON + "formConvocatoria.jsp");
 		
-		BolsaEmpleoValidator validator = this.getValidatorConvocatoria(request); 							
-		ModeloConvocatoria modelo = ModeloConvocatoria.obtenerInstancia();
+		BolsaEmpleoValidator validator = this.getValidatorAfinidad(request); 							
+		ModeloAfinidad modelo = ModeloAfinidad.obtenerInstancia();
 		
 		if (!validator.isValid()) {
 			for (String param : validator.getErrors().keySet()) {
@@ -203,35 +220,30 @@ public class ControladorAfinidades extends HttpServlet {
 					bean.getMensajesDeError().add(paramError);
 				}
 			}
-		} else if (modelo.hayConvocatoriaAbierta()) {
-			bean.getMensajesDeError().add(MENSAJE_ERROR_CONVOCATORIAS_ABIERTAS);
 		} else {
-			// creamos convocatoria, por defecto cerrada
 			
-			Convocatoria convocatoria = new Convocatoria();
-			convocatoria.setDescripcion(validator.getValueString(PARAM_CONVOCATORIA_DESCRIPCION));
-			convocatoria.setEstado(ModeloConvocatoria.CONVOCATORIA_ESTADO_CERRADA);
-			convocatoria.setFechaCierre(validator.getValueDate(PARAM_CONVOCATORIA_FECHACIERRE));
-			convocatoria.setNumBolsasMaximo(validator.getValueInteger(PARAM_CONVOCATORIA_NUMEROBOLSASMAXIMO));
-			convocatoria.setNumMeritosPorBloque(validator.getValueInteger(PARAM_CONVOCATORIA_NUMEROMERITOSPORBLOQUE));		 
-			modelo.nuevaConvocatoria(convocatoria);	
+			Afinidad afinidad = new Afinidad();
+			afinidad.setCodigo(validator.getValueString(PARAM_CODIGO));
+			afinidad.setDescripcion(validator.getValueString(PARAM_DESCRIPCION));
+			afinidad.setModulacion(validator.getValueFloat(PARAM_MODULACION)); 
+			modelo.nuevaAfinidad(afinidad);	
 						
-			bean.getMensajesDeExito().add(MENSAJE_INFO_CONVOCATORIAS_INSERTADA_CORRECTAMENTE);			
+			bean.getMensajesDeExito().add(MENSAJE_INFO_AFINIDAD_INSERTADA_CORRECTAMENTE);			
 			
 			this.index(bean, datos, request, response);
 		}			
 	}
 		
-	private void editarConvocatoria(VistaConvocatorias bean, UVDatos datos, HttpServletRequest request, HttpServletResponse response) throws UVException, SQLException { 
-		bean.setVista(RUTA_BEP_CON + "formConvocatoria.jsp");
+	private void modificarAfinidad(VistaAfinidades bean, UVDatos datos, HttpServletRequest request, HttpServletResponse response) throws UVException, SQLException { 
+		bean.setVista(RUTA_BEP_CON + "formAfinidades.jsp");
 		
-		BolsaEmpleoValidator validator = this.getValidatorConvocatoria(request); 							
-		ModeloConvocatoria modelo = ModeloConvocatoria.obtenerInstancia();
+		BolsaEmpleoValidator validator = this.getValidatorAfinidad(request); 							
+		ModeloAfinidad modelo = ModeloAfinidad.obtenerInstancia();
 		
-		Convocatoria convocatoria = modelo.getConvocatoriaById(Formateador.leeParametroInteger(request.getParameter(PARAM_CONVOCATORIA_ID)));
-		bean.setConvocatoria(convocatoria);
+		Afinidad afinidad = modelo.getAfinidadById(Formateador.leeParametroInteger(request.getParameter(PARAM_ID)));
+		bean.setAfinidad(afinidad);
 		
-		if (EscapaHTML.ajustaCodificacion(request.getParameter(PARAM_CONVOCATORIA_DESCRIPCION)) != null) {
+		if (EscapaHTML.ajustaCodificacion(request.getParameter(PARAM_DESCRIPCION)) != null) {
 			if (!validator.isValid()) {
 				for (String param : validator.getErrors().keySet()) {
 					for (String paramError : validator.getErrors().get(param)) {
@@ -240,92 +252,22 @@ public class ControladorAfinidades extends HttpServlet {
 				}
 			} else {
 				
-				Integer codNum = Formateador.leeParametroInteger(request.getParameter(PARAM_CONVOCATORIA_ID));
-				String descripcion = EscapaHTML.ajustaCodificacion(request.getParameter(PARAM_CONVOCATORIA_DESCRIPCION));
-				Integer nbolsas = Formateador.leeParametroInteger(request.getParameter(PARAM_CONVOCATORIA_NUMEROBOLSASMAXIMO));
-				Integer nmeritos = Formateador.leeParametroInteger(request.getParameter(PARAM_CONVOCATORIA_NUMEROMERITOSPORBLOQUE));
-				Date fechacierre = Formateador.leeParametroFecha(request.getParameter(PARAM_CONVOCATORIA_FECHACIERRE), Formateador.FORMATO_FECHA_DDMMYYYY, "/");
+				Integer codNum = Formateador.leeParametroInteger(request.getParameter(PARAM_ID));
+				String descripcion = EscapaHTML.ajustaCodificacion(request.getParameter(PARAM_DESCRIPCION));
+				String codigo = EscapaHTML.ajustaCodificacion(request.getParameter(PARAM_CODIGO));
+				Float modulacion = Formateador.leeParametroFloat(request.getParameter(PARAM_MODULACION));
 				
-				Convocatoria conFinal = new Convocatoria(codNum, descripcion, fechacierre, ModeloConvocatoria.CONVOCATORIA_ESTADO_CERRADA, nbolsas, nmeritos); 
-				modelo.actualizaConvocatoria(conFinal);	
+				Afinidad afinidadEdit = new Afinidad(codNum, codigo, descripcion, modulacion); 
+				modelo.actualizaAfinidad(afinidadEdit);
 				
-				bean.getMensajesDeExito().add(MENSAJE_INFO_CONVOCATORIA_ACTUALIZADA_CORRECTAMENTE);
+				bean.getMensajesDeExito().add(MENSAJE_INFO_AFINIDAD_ACTUALIZADA_CORRECTAMENTE);
 				
 				this.index(bean, datos, request, response);
 			}	
 		}	
 	}	
 	
-	
-	private void abrirConvocatoria(VistaConvocatorias bean, UVDatos datos,
-			HttpServletRequest request, HttpServletResponse response) throws UVException, SQLException {
-				
-		BolsaEmpleoValidator validator = this.getValidatorConvocatoria(request); 							
-		ModeloConvocatoria modelo = ModeloConvocatoria.obtenerInstancia();
-		ModeloBolsa modeloBolsas = ModeloBolsa.obtenerInstancia();
-		
-		Convocatoria convocatoria = modelo.getConvocatoriaById(Formateador.leeParametroInteger(request.getParameter(PARAM_CONVOCATORIA_ID)));
-		bean.setConvocatoria(convocatoria);
-		
-		if (!modeloBolsas.hayBolsasBaremables()) {
-			bean.getMensajesDeError().add(MENSAJE_ERROR_SIN_BOLSAS_BAREMABLES);
-		} else if (modelo.hayConvocatoriaAbierta()) {
-			bean.getMensajesDeError().add(MENSAJE_ERROR_CONVOCATORIAS_ABIERTAS);
-		} else {
-			Integer codNum = Formateador.leeParametroInteger(request.getParameter(PARAM_CONVOCATORIA_ID));
-			Convocatoria conFinal = new Convocatoria(codNum, ModeloConvocatoria.CONVOCATORIA_ESTADO_ABIERTA); 
-			modelo.cambiaEstadoConvocatoria(conFinal);	
-
-			bean.getMensajesDeExito().add(MENSAJE_INFO_CONVOCATORIA_ACTUALIZADA_CORRECTAMENTE);
-		}	
-		
-		this.index(bean, datos, request, response);
-	}
-	
-	
-	private void cerrarConvocatoria(VistaConvocatorias bean, UVDatos datos,
-			HttpServletRequest request, HttpServletResponse response) throws UVException, SQLException {
-				
-		BolsaEmpleoValidator validator = this.getValidatorConvocatoria(request); 							
-		ModeloConvocatoria modelo = ModeloConvocatoria.obtenerInstancia();
-		
-		Convocatoria convocatoria = modelo.getConvocatoriaById(Formateador.leeParametroInteger(request.getParameter(PARAM_CONVOCATORIA_ID)));
-		bean.setConvocatoria(convocatoria);
-		
-		Integer codNum = Formateador.leeParametroInteger(request.getParameter(PARAM_CONVOCATORIA_ID));
-		Convocatoria conFinal = new Convocatoria(codNum, ModeloConvocatoria.CONVOCATORIA_ESTADO_CERRADA); 
-		modelo.cambiaEstadoConvocatoria(conFinal);	
-
-		bean.getMensajesDeExito().add(MENSAJE_INFO_CONVOCATORIA_ACTUALIZADA_CORRECTAMENTE);	
-		
-		this.index(bean, datos, request, response);
-	}
-	
-	private BolsaEmpleoValidator getValidatorConvocatoria(HttpServletRequest request) throws UVException {
-		BolsaEmpleoValidator validator = new BolsaEmpleoValidator(request);
-		validator.addParamString(PARAM_CONVOCATORIA_DESCRIPCION);
-		validator.addRule(PARAM_CONVOCATORIA_DESCRIPCION, "required", MENSAJE_ERROR_DESCRIPCION_VACIA);
-		validator.addRule(PARAM_CONVOCATORIA_DESCRIPCION, "noBlank", MENSAJE_ERROR_DESCRIPCION_VACIA);
-		validator.addRule(PARAM_CONVOCATORIA_DESCRIPCION, "max:" + ModeloConvocatoria.COLUMN_DESCRIPCION_MAXLENGTH, 
-				String.format(MENSAJE_ERROR_DESCRIPCION_LARGA, ModeloConvocatoria.COLUMN_DESCRIPCION_MAXLENGTH));
-		
-		validator.addParamDate(PARAM_CONVOCATORIA_FECHACIERRE);
-		validator.addRule(PARAM_CONVOCATORIA_FECHACIERRE, "required", MENSAJE_ERROR_FECHACIERRE_REQUERIDA);
-		validator.addRule(PARAM_CONVOCATORIA_FECHACIERRE, "min:" + Formateador.formatoFecha(new Date(), Formateador.FORMATO_FECHA_DDMMYYYY), 
-				MENSAJE_ERROR_FECHACIERRE_MINIMA);
-		
-		validator.addParamInteger(PARAM_CONVOCATORIA_NUMEROBOLSASMAXIMO);
-		validator.addRule(PARAM_CONVOCATORIA_NUMEROBOLSASMAXIMO, "required", MENSAJE_ERROR_NUMBOLSASMAXIMAS_REQUERIDA);
-		validator.addRule(PARAM_CONVOCATORIA_NUMEROBOLSASMAXIMO, "min:1", MENSAJE_ERROR_NUMBOLSASMAXIMAS_MINIMO);
-		
-		validator.addParamInteger(PARAM_CONVOCATORIA_NUMEROMERITOSPORBLOQUE);
-		validator.addRule(PARAM_CONVOCATORIA_NUMEROMERITOSPORBLOQUE, "required", MENSAJE_ERROR_NUMMERITOSBLOQUE_REQUERIDA);
-		validator.addRule(PARAM_CONVOCATORIA_NUMEROMERITOSPORBLOQUE, "min:1", MENSAJE_ERROR_NUMMERITOSBLOQUE_MINIMO);
-		
-		return validator;
-	}
-	
-	/** eliminar una convocatoria.
+	/** eliminar una afinidad.
 	 * @param bean .
 	 * @param request .
 	 * @param response .
@@ -333,16 +275,39 @@ public class ControladorAfinidades extends HttpServlet {
 	 * @throws UVException en caso de error de parametros .
 	 * @throws IOException en caso de error de input u output .
 	 */
-	private void borrarConvocatoria(VistaConvocatorias bean, HttpServletRequest request, HttpServletResponse response) throws SQLException, UVException, IOException {
-		ModeloConvocatoria modelo = ModeloConvocatoria.obtenerInstancia();
-		Integer codNum = Formateador.leeParametroInteger(request.getParameter(PARAM_CONVOCATORIA_ID));
-		Convocatoria convocatoria = new Convocatoria();
-		convocatoria.setCodNum(codNum);
-		modelo.borraConvocatoria(convocatoria);
+	private void borrarAfinidad(VistaAfinidades bean, HttpServletRequest request, HttpServletResponse response) throws SQLException, UVException, IOException {
+		String selectedJson = EscapaHTML.ajustaCodificacion(request.getParameter(PARAM_AFINIDADES_SELECCIONADAS));
+		ModeloAfinidad modelo = ModeloAfinidad.obtenerInstancia();
+		int[] selected = (new Gson()).fromJson(selectedJson, new TypeToken<int[]>() { }.getType());
+		
+		List<Afinidad> afinidades = modelo.getAfinidadesByIds(selected);
+		
+		modelo.borraAfinidades(afinidades);
 		bean.getMensajesDeExito().add(MENSAJE_EXITO_ELIMINAR);
 		HttpSession session = request.getSession(false);
 		session.setAttribute(MENSAJE_ENVIADO, MENSAJE_EXITO_ELIMINAR);
 		response.sendRedirect(request.getServletPath());
+	}
+	
+	private BolsaEmpleoValidator getValidatorAfinidad(HttpServletRequest request) throws UVException {
+		BolsaEmpleoValidator validator = new BolsaEmpleoValidator(request);
+		
+		validator.addParamString(PARAM_CODIGO);
+		validator.addRule(PARAM_CODIGO, "required", MENSAJE_ERROR_CODIGO_REQUERIDO);
+		validator.addRule(PARAM_CODIGO, "noBlank", MENSAJE_ERROR_CODIGO_VACIO);
+		validator.addRule(PARAM_CODIGO, "max:" + ModeloAfinidad.COLUMN_CODIGO_MAXLENGTH, 
+				String.format(MENSAJE_ERROR_CODIGO_LARGA, ModeloAfinidad.COLUMN_CODIGO_MAXLENGTH));
+		
+		validator.addParamString(PARAM_DESCRIPCION);
+		validator.addRule(PARAM_DESCRIPCION, "required", MENSAJE_ERROR_DESCRIPCION_REQUERIDA);
+		validator.addRule(PARAM_DESCRIPCION, "noBlank", MENSAJE_ERROR_DESCRIPCION_VACIA);
+		validator.addRule(PARAM_DESCRIPCION, "max:" + ModeloAfinidad.COLUMN_DESCRIPCION_MAXLENGTH, 
+				String.format(MENSAJE_ERROR_DESCRIPCION_LARGA, ModeloAfinidad.COLUMN_DESCRIPCION_MAXLENGTH));
+		
+		validator.addParamFloat(PARAM_MODULACION);
+		validator.addRule(PARAM_MODULACION, "required", MENSAJE_ERROR_MODULACION_VACIA);
+		
+		return validator;
 	}
 	
 }
