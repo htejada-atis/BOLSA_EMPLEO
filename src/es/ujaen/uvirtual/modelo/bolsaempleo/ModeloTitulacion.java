@@ -9,6 +9,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import es.ujaen.uvirtual.beans.uvirtual.bolsaempleo.Titulacion;
+import es.ujaen.uvirtual.beans.uvirtual.bolsaempleo.TitulacionArea;
 import es.ujaen.uvirtual.modelo.conexion.ConexionUvirtual;
 import es.ujaen.uvirtual.utilidades.BolsaEmpleoUtils;
 import es.ujaen.uvirtual.utilidades.BolsaEmpleoDataTable;
@@ -314,14 +315,14 @@ public class ModeloTitulacion {
 	 * @throws SQLException en caso de error de base de datos
 	 * @throws UVException error si no existe titulación
 	 */
-	public BolsaEmpleoDataTable<Titulacion> listaTitulacionesAreaDatatable(Map<String, String[]> params, Integer area) throws SQLException, UVException {
+	public BolsaEmpleoDataTable<TitulacionArea> listaTitulacionesAreaDatatable(Map<String, String[]> params, Integer area) throws SQLException, UVException {
 		
 		if (area == null) {
 			throw new UVException("No se pueden listar titulaciones sin el id del área");
 		}
 		
-		List<Titulacion> titulaciones = new ArrayList<>();
-		BolsaEmpleoDataTable<Titulacion> dataTable = new BolsaEmpleoDataTable<Titulacion>(params);
+		List<TitulacionArea> titulaciones = new ArrayList<>();
+		BolsaEmpleoDataTable<TitulacionArea> dataTable = new BolsaEmpleoDataTable<TitulacionArea>(params);
 		
 		String consulta = "SELECT beptit.CODNUM, beptit.NOMBRE FROM tbep_titulaciones beptit "
 				+ "INNER JOIN tbep_titulaciones_preferentes_area beptpa ON beptit.codnum = beptpa.beptit_codnum "
@@ -345,9 +346,8 @@ public class ModeloTitulacion {
 					Titulacion tit = new Titulacion();
 					tit.setCodNum(rs.getInt("CODNUM"));
 					tit.setNombre(rs.getString("NOMBRE"));
-					ModeloArea modeloArea = ModeloArea.obtenerInstancia();	
-					tit.setArea(modeloArea.getAreaById(area));
-					titulaciones.add(tit);
+					ModeloArea modeloArea = ModeloArea.obtenerInstancia();
+					titulaciones.add(new TitulacionArea(tit, modeloArea.getAreaById(area)));
 				}
 			}
 			dataTable.setRecordsTotalFromQuery(stmtCount);
@@ -365,14 +365,14 @@ public class ModeloTitulacion {
 	 * @throws SQLException en caso de error de base de datos
 	 * @throws UVException error si no existe titulación
 	 */
-	public BolsaEmpleoDataTable<Titulacion> listaTitulacionesAreaCandidatoDatatable(Map<String, String[]> params, Integer area) throws SQLException, UVException {
+	public BolsaEmpleoDataTable<TitulacionArea> listaTitulacionesAreaCandidatoDatatable(Map<String, String[]> params, Integer area) throws SQLException, UVException {
 		
 		if (area == null) {
 			throw new UVException("No se pueden listar titulaciones sin el id del área");
 		}
 		
-		List<Titulacion> titulaciones = new ArrayList<>();
-		BolsaEmpleoDataTable<Titulacion> dataTable = new BolsaEmpleoDataTable<Titulacion>(params);
+		List<TitulacionArea> titulaciones = new ArrayList<>();
+		BolsaEmpleoDataTable<TitulacionArea> dataTable = new BolsaEmpleoDataTable<TitulacionArea>(params);
 		
 		String consulta = "SELECT beptit.CODNUM, beptit.NOMBRE FROM tbep_titulaciones beptit "
 				+ "INNER JOIN tbep_titulaciones_preferentes_area beptpa ON beptit.codnum = beptpa.beptit_codnum "
@@ -395,9 +395,8 @@ public class ModeloTitulacion {
 					Titulacion tit = new Titulacion();
 					tit.setCodNum(rs.getInt("CODNUM"));
 					tit.setNombre(rs.getString("NOMBRE"));
-					ModeloArea modeloArea = ModeloArea.obtenerInstancia();	
-					tit.setArea(modeloArea.getAreaById(area));
-					titulaciones.add(tit);
+					ModeloArea modeloArea = ModeloArea.obtenerInstancia();
+					titulaciones.add(new TitulacionArea(tit, modeloArea.getAreaById(area)));
 				}
 			}
 			dataTable.setRecordsTotalFromQuery(stmtCount);
