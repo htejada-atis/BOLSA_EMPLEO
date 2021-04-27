@@ -56,7 +56,6 @@ public class ModeloConvocatoria {
         return eInstancia;
     }
 	
-	
 	/**
 	 * Listado de bolsas de convocatorias. 
 	 * @param params para leer los parametros de paginación, ordenacion, etc
@@ -283,6 +282,43 @@ public class ModeloConvocatoria {
 			stmt.setInt(parameterIndex++, conv.getCodNum());
 			stmt.executeUpdate();
 		}
+	}
+
+	/**
+	 * Devuelve la última convocatoria o null si no hay.
+	 * @return .
+	 * @throws UVException . 
+	 * @throws SQLException .
+	 */
+	public Convocatoria getUltimaConvocatoria() throws SQLException, UVException {
+		String consulta = "SELECT bepcon.* FROM TBEP_CONVOCATORIAS bepcon WHERE ROWNUM = 1 ORDER BY bepcon.CODNUM";
+
+		try (Connection conexion = ConexionUvirtual.obtenerInstancia();
+				PreparedStatement stmt = conexion.prepareStatement(consulta);) {
+			try (ResultSet rs = stmt.executeQuery()) {
+				while (rs.next()) {
+					return this.createFromResultSet(rs);
+				}
+			}
+		}
+
+		return null;
+	}
+
+	/**
+	 * Crea una convocatoria a partir de un resulset.
+	 * @param rs .
+	 * @return .
+	 * @throws SQLException .
+	 * @throws UVException .
+	 */
+	public Convocatoria createFromResultSet(ResultSet rs) throws SQLException, UVException {
+		Convocatoria convocatoria = new Convocatoria();
+		convocatoria.setCodNum(rs.getInt("CODNUM"));
+		convocatoria.setDescripcion(rs.getString("DESCRIPCION"));
+		convocatoria.setFechaCierre(rs.getDate("FECHACIERRE"));
+		convocatoria.setEstado(rs.getString("ESTADO"));
+		return convocatoria;
 	}
 	
 }
