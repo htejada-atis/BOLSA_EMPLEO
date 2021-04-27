@@ -1,4 +1,5 @@
 <%@ page trimDirectiveWhitespaces="true" %>
+<%@ page import="es.ujaen.uvirtual.modelo.bolsaempleo.ModeloMeritosPreferentes"%>
 <%@ page import="es.ujaen.uvirtual.beans.UVDatos" %>
 <%@	page import="es.ujaen.uvirtual.controlador.infadministrativa.bolsaempleo.ControladorMeritosPreferentes" %>
 <%@ page import="es.ujaen.uvirtual.beans.vistas.uvirtual.bolsaempleo.VistaMeritosPreferentes" %>
@@ -60,11 +61,29 @@ VistaMeritosPreferentes bean = (VistaMeritosPreferentes) uvdatos.getVistas().get
 		    "columns": [
 		    	{'data': 'codNum'},
 		        {'data': 'descripcion'},
-		        {'data': 'tipo'},
-		        {'data': 'aplicable'},
+		        {'data': 'tipo', 'render': function(row) {
+		        	var tiposLabel = {
+		        		'<%= ModeloMeritosPreferentes.TIPO_TITULACION_PREFERENTE %>': 'Titulación preferente',
+		        		'<%= ModeloMeritosPreferentes.TIPO_MERITO %>': 'Mérito'
+		        	};
+		        			        	
+		        	return tiposLabel[row.tipo];
+		        }},
+		        {'data': 'aplicable', 'render': function(row) {
+		        	var aplicableTipos = {
+		        		'<%= ModeloMeritosPreferentes.APLICABLE_BLOQUE %>': 'Al apartado',
+		        		'<%= ModeloMeritosPreferentes.APLICABLE_APARTADO %>': 'Al bloque',
+		        		'<%= ModeloMeritosPreferentes.APLICABLE_ITEM %>': 'Al mérito',
+		        	};
+		        	
+		        	return aplicableTipos[row.aplicable];
+		        }},
 		        {'data': 'codNum', 'buttons': [
 		        	{'label': 'Editar', 'onClick': function(row) {
-			    			var params = {'a': '<%= ControladorMeritosPreferentes.ACCION_DETALLE %>', '<%= ControladorMeritosPreferentes.PARAM_ID %>': row.codNum};
+			    			var params = {
+			    				'a': '<%=ControladorMeritosPreferentes.ACCION_MODIFICAR%>', 
+			    				'<%= ControladorMeritosPreferentes.PARAM_ID %>': row.codNum
+			    			};
 		        			Atis.sendForm("<%= request.getRequestURI() %>", params);
 			    		}
 		        	}

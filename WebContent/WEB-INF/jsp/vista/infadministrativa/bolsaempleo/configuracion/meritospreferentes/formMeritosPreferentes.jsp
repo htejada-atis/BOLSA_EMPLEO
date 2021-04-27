@@ -87,13 +87,14 @@ MeritoPreferente merito = bean.getMeritoPreferente();
     			<div class="form-group">
 	    			<%
 	    			String aplicableSelected = BolsaEmpleoUtils.getParamForm(request, ControladorMeritosPreferentes.PARAM_MERITO_APLICABLE, 
-	    				    					merito != null ? merito.getTipo() : ModeloMeritosPreferentes.APLICABLE_APARTADO);
+	    				    					merito != null ? merito.getAplicable() : ModeloMeritosPreferentes.APLICABLE_APARTADO);
 	    			%>
-		    		<label for="merito_aplicable">Aplicable: </label>
+		    		<label for="merito_aplicable">Aplicable:</label>
 		    		<select class="params" id="merito_aplicable" name="<%=ControladorMeritosPreferentes.PARAM_MERITO_APLICABLE%>" style="width:100%;">
 						<option value="<%=ModeloMeritosPreferentes.APLICABLE_APARTADO%>" <%=aplicableSelected.equals(ModeloMeritosPreferentes.APLICABLE_APARTADO) ? "selected=\"selected\"" : ""%>>Bloque</option>
 						<option value="<%=ModeloMeritosPreferentes.APLICABLE_BLOQUE%>" <%=aplicableSelected.equals(ModeloMeritosPreferentes.APLICABLE_BLOQUE) ? "selected=\"selected\"" : ""%>>Apartado</option>										
 						<option value="<%=ModeloMeritosPreferentes.APLICABLE_ITEM%>" <%=aplicableSelected.equals(ModeloMeritosPreferentes.APLICABLE_ITEM) ? "selected=\"selected\"" : ""%>>Mérito</option>
+						<option value="<%=ModeloMeritosPreferentes.APLICABLE_TOTAL%>" <%=aplicableSelected.equals(ModeloMeritosPreferentes.APLICABLE_TOTAL) ? "selected=\"selected\"" : ""%>>Total</option>						
 					</select>	
     			</div>
     		</div>
@@ -158,6 +159,10 @@ MeritoPreferente merito = bean.getMeritoPreferente();
     				   type="text"
     				   name="<%=ControladorMeritosPreferentes.PARAM_MERITO_FACTOR%>" 
     				   value="<%=BolsaEmpleoUtils.getParamForm(request, ControladorMeritosPreferentes.PARAM_MERITO_FACTOR, merito != null ? merito.getFactor() : "")%>"/>
+    			<div id="helpTextFactor">
+    				<p>Valor por el cual se multiplica el total del bloque, apartado o item, seleccionado en el campo Aplicable o al total de la puntuación.</p>
+    				<p>Puede contener una fórmula de cálculo utilizando la varible 'N' como valor objecto seleccionado en Aplicable.</p>
+    			</div>
     		</div>
     		<div class="form-group">
     			<label for="factor">Valor máximo: </label>
@@ -166,6 +171,9 @@ MeritoPreferente merito = bean.getMeritoPreferente();
     				   type="text"
     				   name="<%=ControladorMeritosPreferentes.PARAM_MERITO_VALORMAXIMO%>" 
     				   value="<%=BolsaEmpleoUtils.getParamForm(request, ControladorMeritosPreferentes.PARAM_MERITO_VALORMAXIMO, merito != null && merito.getValorMaximo() != null ? merito.getValorMaximo().toString() : "")%>"/>
+    			<div id="helpTextValorMaximo">
+    				<p>Valor máximo que puede alcanzar el factor de ponderación. Vacio si no hay máximo.</p>
+    			</div>
     		</div>
     	</div>
     	
@@ -206,6 +214,11 @@ MeritoPreferente merito = bean.getMeritoPreferente();
 				$('#bloque_aplicable_bloque').hide();
 				$('#bloque_aplicable_apartado').hide();
 				$('#bloque_aplicable_item').show();
+				break;
+			case '<%=ModeloMeritosPreferentes.APLICABLE_TOTAL%>':
+				$('#bloque_aplicable_bloque').hide();
+				$('#bloque_aplicable_apartado').hide();
+				$('#bloque_aplicable_item').hide();
 				break;
 			}			
 		});
