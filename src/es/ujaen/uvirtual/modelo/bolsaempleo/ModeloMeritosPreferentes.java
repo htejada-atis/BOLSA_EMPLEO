@@ -5,10 +5,13 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Types;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
 import es.ujaen.uvirtual.beans.uvirtual.bolsaempleo.MeritoPreferente;
+import es.ujaen.uvirtual.beans.uvirtual.bolsaempleo.Titulacion;
 import es.ujaen.uvirtual.modelo.conexion.ConexionUvirtual;
 import es.ujaen.uvirtual.utilidades.BolsaEmpleoDataTable;
 import es.ujaen.uvirtual.utilidades.UVException;
@@ -38,6 +41,7 @@ public class ModeloMeritosPreferentes {
 	public static final String APLICABLE_BLOQUE = "BLOQUE";
 	public static final String APLICABLE_APARTADO = "APARTADO";
 	public static final String APLICABLE_ITEM = "ITEM"; 
+	public static final String APLICABLE_TOTAL = "TOTAL";
 	
 	public static final String ERROR_MERITO_NOEXITE = "El mérito no existe";
 		
@@ -71,7 +75,7 @@ public class ModeloMeritosPreferentes {
 	 * @throws UVException .
 	 */
 	public MeritoPreferente getMeritoPreferenteById(Integer codNum) throws SQLException, UVException {
-		String sql = "SELECT bepmep.* FROM TBEP_MERITOSPREFERENTES bepmep WHERE bepmep.CODNUM = ?";
+		String sql = "SELECT bepmep.* FROM TBEP_MERITOS_PREFERENTES bepmep WHERE bepmep.CODNUM = ?";
 		
 		try (Connection con = ConexionUvirtual.obtenerInstancia(); PreparedStatement stmt = con.prepareStatement(sql);) {
 			int parameterIndex = 1;
@@ -100,7 +104,7 @@ public class ModeloMeritosPreferentes {
 		
 		String consulta =
 			"SELECT bepmep.* "
-		  + "FROM TBEP_MERITOSPREFERENTES bepmep "		  
+		  + "FROM TBEP_MERITOS_PREFERENTES bepmep "		  
 		  + "WHERE 1=1 ";
 		
 		dataTable.setColumn(ORDER_COLUMN_INDEX_CODIGO, "bepmep.CODIGO");
@@ -140,7 +144,7 @@ public class ModeloMeritosPreferentes {
 	public void crearMeritoPreferente(MeritoPreferente merito) throws UVException, SQLException {
 		this.validateMeritoPreferente(merito);
 						
-		String sql = "INSERT INTO TBEP_MERITOSPREFERENTES ("
+		String sql = "INSERT INTO TBEP_MERITOS_PREFERENTES ("
 				+ "DESCRIPCION,TIPO,APLICABLE,FACTOR,VALOR_MAXIMO,"
 				+ "BEPITE_TIPO_CODNUM,BEPBLO_APLICABLE_CODNUM,BEPAPA_APLICABLE_CODNUM,BEPITE_APLICABLE_CODNUM) "
 				+ "VALUES (?,?,?,?,?,?,?,?,?)";
@@ -184,21 +188,101 @@ public class ModeloMeritosPreferentes {
 		}
 	} 
 	
+	/**
+	 * Edita un mérito preferente .
+	 * @param merito .
+	 * @throws SQLException .
+	 * @throws UVException . 
+	 */
+	public void editarMeritoPreferente(MeritoPreferente merito) throws UVException, SQLException {
+		this.validateMeritoPreferente(merito);
+		
+		// TODO, condiciones para poder modificar un mérito preferente
+		String query = "UPDATE TBEP_MERITOS_PREFERENTES SET "
+				+ "DESCRIPCION = ?, "
+				+ "TIPO = ?, "
+				+ "APLICABLE = ?, "
+				+ "FACTOR = ?, "
+				+ "VALOR_MAXIMO = ?, "
+				+ "BEPITE_TIPO_CODNUM = ?, "
+				+ "BEPBLO_APLICABLE_CODNUM = ?, "
+				+ "BEPAPA_APLICABLE_CODNUM = ?, "
+				+ "BEPITE_APLICABLE_CODNUM = ?, "
+				+ "FLGBORRADO = ? "
+				+ "WHERE CODNUM = ?";
+		
+		try (Connection conexion = ConexionUvirtual.obtenerInstancia(); PreparedStatement stmt = conexion.prepareStatement(query);) {
+			int parameterIndex = 1;
+			stmt.setString(parameterIndex++, merito.getDescripcion());
+			stmt.setString(parameterIndex++, merito.getTipo());
+			stmt.setString(parameterIndex++, merito.getAplicable());
+			stmt.setString(parameterIndex++, merito.getFactor());
+			if (merito.getValorMaximo() != null) {
+				stmt.setFloat(parameterIndex++, merito.getValorMaximo());
+			} else {
+				stmt.setNull(parameterIndex++, Types.NULL);
+			}
+			if (merito.getTipoItemBaremacion() != null) {
+				stmt.setInt(parameterIndex++, merito.getTipoItemBaremacion().getCodNum());	
+			} else {
+				stmt.setNull(parameterIndex++, Types.NULL);
+			}
+			if (merito.getAplicableBloqueBaremacion() != null) {
+				stmt.setInt(parameterIndex++, merito.getAplicableBloqueBaremacion().getCodNum());
+			} else {
+				stmt.setNull(parameterIndex++, Types.NULL);
+			}
+			if (merito.getAplicableApartadoBaremacion() != null) {
+				stmt.setInt(parameterIndex++, merito.getAplicableApartadoBaremacion().getCodNum());
+			} else {
+				stmt.setNull(parameterIndex++, Types.NULL);
+			}
+			if (merito.getAplicableItemBaremacion() != null) {
+				stmt.setInt(parameterIndex++, merito.getAplicableItemBaremacion().getCodNum());
+			} else {
+				stmt.setNull(parameterIndex++, Types.NULL);
+			}
+			stmt.setString(parameterIndex++, merito.getBorrado() ? "S" : "N");
+			stmt.setInt(parameterIndex++, merito.getCodNum());
+			
+			stmt.executeUpdate();
+		}		
+	}	
+	
 	private void validateMeritoPreferente(MeritoPreferente merito) throws UVException {
 		if (merito.getDescripcion().isBlank()) {
 			throw new UVException("La descripción es requerida");
 		}
 		if (merito.getDescripcion().length() > MAX_LENGTH_COLUMN_DESCRIPCION) {
-			throw new UVException("La descripción debe ser como máximo " + MAX_LENGTH_COLUMN_DESCRIPCION);
+			throw new UVException("La descripción tiene demasiados caracteres. Máximo: " + MAX_LENGTH_COLUMN_DESCRIPCION);
 		}		
 		
 		if (merito.getFactor().isBlank()) {
 			throw new UVException("El factor es requerido");
 		} 
 		if (merito.getFactor().length() > MAX_LENGTH_COLUMN_FACTOR) { 
-			throw new UVException("El factor debe ser como máximo " + MAX_LENGTH_COLUMN_FACTOR);
+			throw new UVException("El factor tiene demasiados caracteres. Máximo: " + MAX_LENGTH_COLUMN_FACTOR);
 		}
+		
+		if (merito.getValorMaximo() != null && merito.getValorMaximo() <= 0) {
+			throw new UVException("El valor máximo debe ser mayor que cero");
+		}
+		
+		// comprobamos si el factor es una expresión válida
+		// TODO: librería para parsear una expresión
+//		try {
+//			ScriptEngineManager manager = new ScriptEngineManager(null);
+//			ScriptEngine engine = manager.getEngineByName("JavaScript");
+//			System.out.println("engine " + engine);
+//			
+//			Object result = engine.eval(merito.getFactor().replace("N", "0"));
+//			System.out.println(result);
+//		} catch (ScriptException ex) {
+//			throw new UVException("El factor contiene una expresión inválida");
+//		}
 	}
+	
+	
 	
 	private MeritoPreferente createApartadoFromResultSet(ResultSet rs) throws SQLException, UVException {
 		MeritoPreferente obj = new MeritoPreferente();
@@ -216,6 +300,9 @@ public class ModeloMeritosPreferentes {
 			: ModeloBaremacion.obtenerInstancia().getBloqueBaremacionById(rs.getInt("BEPBLO_APLICABLE_CODNUM")));
 		obj.setAplicableItemBaremacion(rs.getInt("BEPITE_APLICABLE_CODNUM") == 0 ? null 
 			: ModeloBaremacion.obtenerInstancia().getItemBaremacionById(rs.getInt("BEPITE_APLICABLE_CODNUM")));
+		obj.setBorrado(rs.getString("FLGBORRADO").equals("S"));
 		return obj;
-	}		
+	}
+
+			
 }
