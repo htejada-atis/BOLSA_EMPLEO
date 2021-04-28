@@ -1,5 +1,6 @@
 package es.ujaen.uvirtual.controlador.infadministrativa.bolsaempleo;
 
+import java.awt.Color;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.sql.SQLException;
@@ -40,6 +41,13 @@ import es.ujaen.uvirtual.utilidades.EscapaHTML;
 import es.ujaen.uvirtual.utilidades.Formateador;
 import es.ujaen.uvirtual.utilidades.UVException;
 
+import com.lowagie.text.Cell;
+import com.lowagie.text.Document;
+import com.lowagie.text.PageSize;
+import com.lowagie.text.Paragraph;
+import com.lowagie.text.pdf.PdfWriter;
+import com.lowagie.text.Table;
+
 /**
  * Listado de bolsas y su estado.
  */
@@ -79,6 +87,7 @@ public class ControladorMisSolicitudes extends HttpServlet {
 	public static final String ACCION_MERITO_SELECCIONADO = "meritoseleccionado";
 	public static final String ACCION_RESUMEN_SOLICITUD = "resumensolicitud";
 	public static final String ACCION_SELECCIONAR_BOLSAS = "seleccionarbolsas";
+	public static final String ACCION_DESCARGAR_PDF = "descargarpdf";
 	
 	// mensajes
 	public static final String MENSAJE_ERROR_BOLSAS_SELECCIONADAS_INCORRECTAS = "No hay bolsas seleccionadas válidas";
@@ -97,6 +106,13 @@ public class ControladorMisSolicitudes extends HttpServlet {
 	
 	// urls
 	public static final String URL_PATTERN_AJAX = "/srv/es/ajax/informacionadministrativa/bolsaempleo/missolicitudes";
+	
+	//pdf
+	public static final Integer PDF_ANCHO = 4;
+	public static final Integer PDF_ALTO = 4;
+	public static final Integer PDF_FORMATO = 4;
+	public static final Integer PDF_TABLE_COLUMNS = 4;
+
 	
 	private UsuarioBolsaEmpleo usuario = null;
 	
@@ -162,6 +178,9 @@ public class ControladorMisSolicitudes extends HttpServlet {
 				case ACCION_SELECCIONAR_BOLSAS:
 					seleccionarBolsas(bean, datos, request, response);
 					break;
+				case ACCION_DESCARGAR_PDF:
+					descargarPDF(bean, datos, request, response);
+					break;
 			}
 		} catch (SQLIntegrityConstraintViolationException e) {
 			LOGGER.log(Level.WARNING, e.toString());
@@ -185,7 +204,7 @@ public class ControladorMisSolicitudes extends HttpServlet {
 			datos.getFicherosCSS().add("/css/jqueryujaen/jquery-ui-1.8.16.custom.css");
 			datos.getFicherosCSS().add("/css/ujaen_bolsa_empleo.css");			
 		}
-	}	
+	}
 
 	/** redireccion de do post.
 	 * @see HttpServlet#doPost(HttpServletRequest request, HttpServletResponse response)
@@ -628,5 +647,104 @@ public class ControladorMisSolicitudes extends HttpServlet {
 			}
 		}
 	}
+	
+	
+	
+	
+	/** exportar .
+	 * @param response .
+	 * @param bean .
+	 * @param request .
+	 * @throws IOException .
+	 * @throws SQLException .
+	 * @throws UVException .
+	 */
+	  public void exportar(VistaSolicitudes bean, HttpServletRequest request, HttpServletResponse response) {
+		  try {
+			  
+				Integer codNum = Formateador.leeParametroInteger(request.getParameter(PARAM_SOLICITUD_ID));
+				ModeloSolicitud modelo = ModeloSolicitud.obtenerInstancia(); 
+				
+				Solicitud solicitud = modelo.getSolicitudById(codNum);
+			    Document document = new Document();
+
+			    //create a PDF writer instance and pass output stream
+			    PdfWriter writer = PdfWriter.getInstance(document, response.getOutputStream());
+
+			    document.open();
+			    document.addAuthor(this.usuario.getNombre() + this.usuario.getPrimerApellido() + this.usuario.getSegundoApellido());
+			    document.addTitle("Solicitud_" + solicitud.getConvocatoria().getDescripcion());
+			    document.addCreationDate();
+
+			    document.add(new Paragraph("Usuario : " + this.usuario.getNombre() + this.usuario.getPrimerApellido() + this.usuario.getSegundoApellido()));
+			    document.add(new Paragraph("Convocatoria : " + solicitud.getConvocatoria().getDescripcion()));
+			    document.add(new Paragraph("Fecha confirmación de solicitud : " + solicitud.getEstado()));
+			    
+			    
+			    bean.getListaBolsas().size();
+			    
+			    document.newPage();
+				
+				Table table2 = new Table(PDF_TABLE_COLUMNS, 4); // 4 columns, 2 rows
+				table2.setBorderWidth(1);
+				table2.setBorderColor(new Color(0, 0, 255));
+				table2.setPadding(5);
+				table2.setSpacing(5);
+				 Cell cell = new Cell("header");
+				 cell.setHeader(true);
+				 cell.setColspan(3);
+				 table2.addCell(cell);
+				 table2.endHeaders();
+				 cell = new Cell("example cell with colspan 1 and rowspan 2");
+				 cell.setRowspan(2);
+				 cell.setBorderColor(new Color(255, 0, 0));
+				 table2.addCell(cell);
+				 table2.addCell("1.1");
+				 table2.addCell("2.1");
+				 table2.addCell("1.2");
+				 table2.addCell("2.2");
+				 table2.addCell("cell test1");
+				 cell = new Cell("big cell");
+				 cell.setRowspan(2);
+				 cell.setColspan(2);
+				 table2.addCell(cell);
+				 table2.addCell("cell test2");
+				
+				
+					document.add(table2);
+					document.add(new Paragraph("converted to PdfPTable:"));
+					table2.setConvert2pdfptable(true);
+					document.add(table2);
+				
+				
+				
+				
+				
+				
+				
+				
+
+			    document.close();
+			    
+			 } catch (Exception exp) {
+			    System.out.println(exp.getMessage());
+			 }
+	  }
+	
+	
+	/** descarga de pdf .
+	 * @param response .
+	 * @param datos .
+	 * @param bean .
+	 * @param request .
+	 * @throws IOException .
+	 * @throws SQLException .
+	 * @throws UVException .
+	 */
+	  public void descargarPDF(VistaSolicitudes bean, UVDatos datos, HttpServletRequest request, HttpServletResponse response) {
+		  response.setContentType("application/pdf");
+	      datos.setRespuestaEnviada(true);
+	      exportar(bean, request, response);    
+	  }
 	
 }

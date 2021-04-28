@@ -54,6 +54,9 @@ VistaSolicitudes bean = (VistaSolicitudes) uvdatos.getVistas().get(VistaSolicitu
 	    <a class="link-btn" id="paso1_siguiente" href="<%= request.getRequestURI() %>">
 	    	 Ir a 'Méritos por Área'
 	    </a>
+	   	<a class="link-btn" id="descargar_pdf" href="<%= request.getRequestURI() %>">
+	    	 Descargar
+	    </a>
 	</div>
 	
 </div>
@@ -120,6 +123,12 @@ VistaSolicitudes bean = (VistaSolicitudes) uvdatos.getVistas().get(VistaSolicitu
 				};
 				Atis.sendForm("<%= request.getRequestURI() %>", params);
 			}
+		});
+		
+		document.getElementById("descargar_pdf").addEventListener("click", function(event) {
+			event.preventDefault();
+			window.open("<%= request.getRequestURI() %>"
+		        	+ "?a=<%= ControladorMisSolicitudes.ACCION_DESCARGAR_PDF %>&<%= ControladorMisSolicitudes.PARAM_SOLICITUD_ID %>=" + '<%= bean.getSolicitud().getCodNum() %>');			
 		});
 		
 	});
