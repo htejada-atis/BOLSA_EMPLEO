@@ -12,14 +12,14 @@ public class ItemBaremacion implements Serializable {
 	private Integer codNum;
 	private String codigo;
 	private String nombre;
+	private String descripcion;
 	private Boolean activo;
 	private BloqueBaremacion bloque;
 	private String unidades;
 	private Float valor;
 	private Float valorMinimo;
 	private Float valorMaximo;
-	private Integer afinidad;
-	private Afinidad afinidadOBJ;
+	private Afinidad afinidad;
 	
 	/** Constructor por defecto.
 	 */
@@ -40,7 +40,7 @@ public class ItemBaremacion implements Serializable {
 	 * @param pafinidad .
 	 */
 	public ItemBaremacion(Integer pcodNum, BloqueBaremacion pbloque, String pcodigo, String pnombre, Boolean pactivo, 
-			String punidades, Float pvalor, Float pvalorMinimo, Float pvalorMaximo, Integer pafinidad) {
+			String punidades, Float pvalor, Float pvalorMinimo, Float pvalorMaximo, Afinidad pafinidad) {
 		super();
 		this.bloque = pbloque;
 		this.codNum = pcodNum;
@@ -102,6 +102,14 @@ public class ItemBaremacion implements Serializable {
 		this.nombre = nombre;
 	}
 	
+	public String getDescripcion() {
+		return descripcion;
+	}
+
+	public void setDescripcion(String descripcion) {
+		this.descripcion = descripcion;
+	}
+	
 	public Boolean getActivo() {
 		return activo;
 	}
@@ -142,20 +150,12 @@ public class ItemBaremacion implements Serializable {
 		this.valorMaximo = valorMaximo;
 	}
 	
-	public Integer getAfinidad() {
+	public Afinidad getAfinidad() {
 		return this.afinidad;
 	}
 
-	public void setAfinidad(Integer afinidad) {
+	public void setAfinidad(Afinidad afinidad) {
 		this.afinidad = afinidad;
-	}
-	
-	public Afinidad getAfinidadOBJ() {
-		return this.afinidadOBJ;
-	}
-
-	public void setAfinidadOBJ(Afinidad afinidadOBJ) {
-		this.afinidadOBJ = afinidadOBJ;
 	}
 	
 	public static long getSerialversionuid() {

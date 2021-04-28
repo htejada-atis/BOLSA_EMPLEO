@@ -82,16 +82,7 @@ public class ModeloMerito {
 			try (ResultSet rs = stmt.executeQuery()) {
 				while (rs.next()) {
 					try {
-						Merito mer = new Merito();
-						mer.setCodNum(rs.getInt("CODNUM"));
-						ModeloUsuarioBolsaEmpleo modelo = ModeloUsuarioBolsaEmpleo.obtenerInstancia();
-						mer.setUsuario(modelo.getUsuarioById(rs.getInt("BEPUSU_CODNUM")));
-						ModeloBaremacion modeloBar = ModeloBaremacion.obtenerInstancia();
-						mer.setItemBaremacion(modeloBar.getItemBaremacionById(rs.getInt("BEPITE_CODNUM")));
-						mer.setDescripcion(rs.getString("DESCRIPCION"));
-						mer.setObservacion(rs.getString("OBSERVACION"));
-						mer.setValor(rs.getFloat("VALOR"));
-						mer.setArchivo(rs.getBlob("ARCHIVO").getBinaryStream());
+						Merito mer = this.createMeritoFromResultset(rs, true, true); 								
 						meritos.add(mer);
 					} catch (Exception e) {
 						e.printStackTrace();
@@ -287,14 +278,8 @@ public class ModeloMerito {
 			stmtCount.setInt(indexParam++, usuario);
 			dataTable.setFiltersParams(stmt, stmtCount, indexParam);
 			try (ResultSet rs = stmt.executeQuery()) {
-				while (rs.next()) {
-					Merito mer = new Merito();
-					mer.setCodNum(rs.getInt("CODNUM"));
-					ModeloBaremacion modeloBar = ModeloBaremacion.obtenerInstancia();
-					mer.setItemBaremacion(modeloBar.getItemBaremacionById(rs.getInt("BEPITE_CODNUM")));
-					mer.setDescripcion(rs.getString("DESCRIPCION"));
-					mer.setObservacion(rs.getString("OBSERVACION"));
-					mer.setValor(rs.getFloat("VALOR"));
+				while (rs.next()) {					
+					Merito mer = this.createMeritoFromResultset(rs, false, false); 
 					meritos.add(mer);
 				}				
 			}	
@@ -367,5 +352,57 @@ public class ModeloMerito {
 		
 		return dataTable;
 	}
+
+	/**
+	 * Devuelve el merito por su id o excepcion si no existe.
+	 * @param id .
+	 * @param withUsuario indica si cargar en memoria el usuario asociado al merito o no.
+	 * @param withFichero indica si cargar en memoria el fichero del mérito o no .
+	 * @return .
+	 * @throws SQLException .
+	 * @throws UVException .
+	 */
+	public Merito getMeritoById(Integer id, Boolean withUsuario, Boolean withFichero) throws UVException, SQLException {
+		if (id == null) {
+			throw new UVException("El mérito es requerido");
+		}
+		
+		String consulta = "SELECT bepmer.* "
+				+ "FROM TBEP_MERITOS bepmer "
+				+ "WHERE 1=1 "
+				+ "AND bepmer.CODNUM = ? ";
+			
+		try (Connection conexion = ConexionUvirtual.obtenerInstancia(); PreparedStatement stmt = conexion.prepareStatement(consulta);) {
+			stmt.setInt(1, id);
+						
+			try (ResultSet rs = stmt.executeQuery()) {
+				if (!rs.next()) {
+					throw new UVException("No existe el merito");
+				}
+				
+				return this.createMeritoFromResultset(rs, withUsuario, withFichero);						
+			}
+		}
+	}
 	
+	private Merito createMeritoFromResultset(ResultSet rs, Boolean withUsuario, Boolean withFile) throws SQLException, UVException {
+		ModeloBaremacion modeloBar = ModeloBaremacion.obtenerInstancia();
+		
+		Merito mer = new Merito();		
+		mer.setCodNum(rs.getInt("CODNUM"));
+		mer.setItemBaremacion(modeloBar.getItemBaremacionById(rs.getInt("BEPITE_CODNUM")));		
+		mer.setValor(rs.getFloat("VALOR"));
+		mer.setDescripcion(rs.getString("DESCRIPCION"));
+		mer.setObservacion(rs.getString("OBSERVACION"));
+		
+		if (withUsuario) {
+			mer.setUsuario(ModeloUsuarioBolsaEmpleo.obtenerInstancia().getUsuarioById(rs.getInt("BEPUSU_CODNUM")));
+		}
+		
+		if (withFile) {
+			mer.setArchivo(rs.getBlob("ARCHIVO").getBinaryStream());
+		}
+		
+		return mer;
+	}
 }

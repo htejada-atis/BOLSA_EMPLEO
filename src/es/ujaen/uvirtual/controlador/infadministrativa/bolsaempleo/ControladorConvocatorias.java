@@ -238,12 +238,18 @@ public class ControladorConvocatorias extends HttpServlet {
 	}
 		
 	private void editarConvocatoria(VistaConvocatorias bean, UVDatos datos, HttpServletRequest request, HttpServletResponse response) throws UVException, SQLException { 
+		ModeloConvocatoria modelo = ModeloConvocatoria.obtenerInstancia();
+		Convocatoria convocatoria = modelo.getConvocatoriaById(Formateador.leeParametroInteger(request.getParameter(PARAM_CONVOCATORIA_ID)));
+		Integer solicitudes = modelo.getNumSolicitudesByConvocatoriaId(convocatoria.getCodNum());
+		if (solicitudes > 0) {
+			bean.setVista(RUTA_BEP_CON + "indexConvocatorias.jsp");
+			throw new UVException("No puede editar la convocatoria, ya existen solicitudes abiertas para ella");
+		}
+		
 		bean.setVista(RUTA_BEP_CON + "formConvocatoria.jsp");
 		
 		BolsaEmpleoValidator validator = this.getValidatorConvocatoria(request); 							
-		ModeloConvocatoria modelo = ModeloConvocatoria.obtenerInstancia();
-		
-		Convocatoria convocatoria = modelo.getConvocatoriaById(Formateador.leeParametroInteger(request.getParameter(PARAM_CONVOCATORIA_ID)));
+	
 		bean.setConvocatoria(convocatoria);
 		
 		if (EscapaHTML.ajustaCodificacion(request.getParameter(PARAM_CONVOCATORIA_DESCRIPCION)) != null) {

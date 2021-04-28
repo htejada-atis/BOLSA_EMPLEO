@@ -9,6 +9,7 @@ import java.util.List;
 import java.util.Map;
 
 import es.ujaen.uvirtual.beans.uvirtual.bolsaempleo.Bolsa;
+import es.ujaen.uvirtual.beans.uvirtual.bolsaempleo.BolsaValidacion;
 import es.ujaen.uvirtual.beans.uvirtual.bolsaempleo.Convocatoria;
 import es.ujaen.uvirtual.beans.uvirtual.bolsaempleo.Solicitud;
 import es.ujaen.uvirtual.modelo.conexion.ConexionUvirtual;
@@ -59,7 +60,7 @@ public class ModeloValidar {
 	 * @throws SQLException .
 	 * @throws UVException  .
 	 */
-	public BolsaEmpleoDataTable<Bolsa> listadoAreasSujetasAfinidad(Convocatoria convocatoria, Map<String, String[]> params) throws SQLException, UVException {
+	public BolsaEmpleoDataTable<BolsaValidacion> listadoAreasSujetasAfinidad(Convocatoria convocatoria, Map<String, String[]> params) throws SQLException, UVException {
 		return this.listadoAreas(convocatoria, true, params);
 	}
 
@@ -72,14 +73,14 @@ public class ModeloValidar {
 	 * @throws SQLException .
 	 * @throws UVException  .
 	 */
-	public BolsaEmpleoDataTable<Bolsa> listadoAreasNoSujetasAfinidad(Convocatoria convocatoria, Map<String, String[]> params) throws SQLException, UVException {
+	public BolsaEmpleoDataTable<BolsaValidacion> listadoAreasNoSujetasAfinidad(Convocatoria convocatoria, Map<String, String[]> params) throws SQLException, UVException {
 		return this.listadoAreas(convocatoria, false, params);
 	}
 
-	private BolsaEmpleoDataTable<Bolsa> listadoAreas(Convocatoria convocatoria, Boolean sujetasAfinidad, Map<String, String[]> params) 
+	private BolsaEmpleoDataTable<BolsaValidacion> listadoAreas(Convocatoria convocatoria, Boolean sujetasAfinidad, Map<String, String[]> params) 
 			throws SQLException, UVException {
-		List<Bolsa> rows = new ArrayList<>();
-		BolsaEmpleoDataTable<Bolsa> dataTable = new BolsaEmpleoDataTable<Bolsa>(params);
+		List<BolsaValidacion> rows = new ArrayList<>();
+		BolsaEmpleoDataTable<BolsaValidacion> dataTable = new BolsaEmpleoDataTable<BolsaValidacion>(params);
 		ModeloBolsa modeloBolsa = ModeloBolsa.obtenerInstancia();
 
 		if (convocatoria == null) {
@@ -88,7 +89,8 @@ public class ModeloValidar {
 		}
 
 		// seleccionamos las bolsas, con meritos con afinidad, en la solicitud pasada
-		String consulta = "SELECT bepbol.* " + "FROM TBEP_BOLSAS bepbol "
+		String consulta = "SELECT bepbol.* " 
+				+ "FROM TBEP_BOLSAS bepbol "
 				+ "INNER JOIN TBEP_AREAS bepare ON bepare.CODNUM = bepbol.BEPARE_CODNUM "
 				+ "INNER JOIN TBEP_SOLICITUD_BOLSAS bepsbo ON bepsbo.BEPBOL_CODNUM = bepbol.CODNUM "
 				+ "INNER JOIN TBEP_SOLICITUDES bepsol ON bepsol.CODNUM = bepsbo.BEPSOL_CODNUM "				
@@ -116,7 +118,10 @@ public class ModeloValidar {
 
 			try (ResultSet rs = stmt.executeQuery()) {
 				while (rs.next()) {
-					rows.add(modeloBolsa.createFromResultSet(rs));
+					Bolsa bolsa = modeloBolsa.createFromResultSet(rs);
+					BolsaValidacion bolsaValidacion = new BolsaValidacion(bolsa);
+					
+					rows.add(bolsaValidacion);
 				}
 			}
 

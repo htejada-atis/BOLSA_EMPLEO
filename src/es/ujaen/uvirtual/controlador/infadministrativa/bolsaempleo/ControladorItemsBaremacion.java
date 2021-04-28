@@ -106,6 +106,7 @@ public class ControladorItemsBaremacion extends HttpServlet {
 	public static final String PARAM_ENVIAR = "enviar";
 	public static final String PARAM_ITEM = "item";
 	public static final String PARAM_ITEM_NOMBRE = "nombreitem";
+	public static final String PARAM_ITEM_DESCRIPCION = "descripcion";
 	public static final String PARAM_ITEM_CODIGO = "codigoitem";
 	public static final String PARAM_ITEM_UNIDADES = "unidades";
 	public static final String PARAM_ITEM_VALOR = "valor";
@@ -119,6 +120,7 @@ public class ControladorItemsBaremacion extends HttpServlet {
 	public static final String MENSAJE_ERROR_CODIGO_NUMERO = "El código debe ser un número";
 	public static final String MENSAJE_ERROR_NOMBRE_VACIO = "El nombre no puede estar vacio";
 	public static final String MENSAJE_ERROR_NOMBRE_MAXIMO = "El nombre no puede ser mayor que ";
+	public static final String MENSAJE_ERROR_DESCRIPCION_MAXIMO = "La descripción no puede ser mayor que ";
 	public static final String MENSAJE_ERROR_VALOR_NO_VALIDO = "Valor no válido";
 	public static final String MENSAJE_ERROR_AFINIDAD_VACIO = "La afinidad no puede estar vacia";
 	
@@ -659,11 +661,6 @@ public class ControladorItemsBaremacion extends HttpServlet {
 		ItemBaremacion item = this.validateItemBaremacion(new ItemBaremacion(), request);
 		item.setBloqueBaremacion(bloque);
 		item.setActivo(true);
-		
-//		if (validator.getValueInteger(PARAM_ITEM_AFINIDAD) == -1) {
-//			throw new UVException(MENSAJE_ERROR_AFINIDAD_VACIA);
-//		}
-		
 		modelo.insertaItem(item);
 
 		bean.getMensajesDeExito().add(MENSAJE_EXITO_ITEM_AGREGAR);
@@ -679,7 +676,7 @@ public class ControladorItemsBaremacion extends HttpServlet {
 		bean.setBloqueBaremacion(item.getBloqueBaremacion());
 		bean.setItemBaremacion(item);
 		
-		bean.setAfinidad(modeloAfinidad.getAfinidadById(item.getAfinidad()));
+		bean.setAfinidad(modeloAfinidad.getAfinidadById(item.getAfinidad().getCodNum()));
 		bean.setAfinidades(modeloAfinidad.listaAfinidades());
 		
 		bean.setVista(RUTA_BEP_CONF + "formItemBaremacion.jsp");
@@ -739,7 +736,7 @@ public class ControladorItemsBaremacion extends HttpServlet {
 		bean.setVista(RUTA_BEP_CONF + "itemsbaremacion.jsp");		
 	}
 		
-	private ItemBaremacion validateItemBaremacion(ItemBaremacion item, HttpServletRequest request) throws UVException {
+	private ItemBaremacion validateItemBaremacion(ItemBaremacion item, HttpServletRequest request) throws UVException, SQLException {
 		item.setCodigo(EscapaHTML.ajustaCodificacion(request.getParameter(PARAM_ITEM_CODIGO)));
 		if (item.getCodigo().isBlank()) {
 			throw new UVException(MENSAJE_ERROR_CODIGO_VACIO);
@@ -758,14 +755,24 @@ public class ControladorItemsBaremacion extends HttpServlet {
 		if (item.getNombre().length() > ModeloBaremacion.COLUMN_NOMBRE_MAXLENGTH) {
 			throw new UVException(String.format(MENSAJE_ERROR_NOMBRE_MAXIMO, ModeloBaremacion.COLUMN_NOMBRE_MAXLENGTH));
 		}
+		
+		item.setDescripcion(EscapaHTML.ajustaCodificacion(request.getParameter(PARAM_ITEM_DESCRIPCION)));
+		if (item.getDescripcion().length() > ModeloBaremacion.COLUMN_DESCRIPCION_MAXLENGTH) {
+			throw new UVException(String.format(MENSAJE_ERROR_DESCRIPCION_MAXIMO, ModeloBaremacion.COLUMN_DESCRIPCION_MAXLENGTH));
+		}
 
 		item.setUnidades(EscapaHTML.ajustaCodificacion(request.getParameter(PARAM_ITEM_UNIDADES)));
 		
-		item.setAfinidad(Formateador.leeParametroInteger(request.getParameter(PARAM_ITEM_AFINIDAD)));
+		
+		ModeloAfinidad modeloAfinidad = ModeloAfinidad.obtenerInstancia();
+		item.setAfinidad(modeloAfinidad.getAfinidadById(Formateador.leeParametroInteger(request.getParameter(PARAM_ITEM_AFINIDAD))));
 		if (item.getAfinidad() == null) {
 			throw new UVException(MENSAJE_ERROR_AFINIDAD_VACIA);
 		}
-
+		if (Formateador.leeParametroInteger(request.getParameter(PARAM_ITEM_AFINIDAD)) == -1) {
+			throw new UVException(MENSAJE_ERROR_AFINIDAD_VACIA);
+		}
+		
 		item.setValor(Formateador.leeParametroFloat(request.getParameter(PARAM_ITEM_VALOR)));
 		if (item.getValor() == null) {
 			throw new UVException("El valor unitario no puede estar vacio");

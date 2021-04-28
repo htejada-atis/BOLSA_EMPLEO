@@ -66,6 +66,7 @@ public class ModeloBaremacion {
 	
 	public static final Integer COLUMN_CODIGO_MAXLENGTH = 3; // logitud máxima de los códigos
 	public static final Integer COLUMN_NOMBRE_MAXLENGTH = 100; // logitud máxima de los nombres
+	public static final Integer COLUMN_DESCRIPCION_MAXLENGTH = 250; // logitud máxima de los nombres
 	
 	public static final Float MINIMO_VALOR_FLOAT = (float) 0.01;
 	
@@ -136,7 +137,7 @@ public class ModeloBaremacion {
 		try (Connection conexion = ConexionUvirtual.obtenerInstancia(); PreparedStatement stmt = conexion.prepareStatement(consulta);) {
 			try (ResultSet rs = stmt.executeQuery()) {
 				if (!rs.next()) {
-					ultimoCodigo = "1";		
+					ultimoCodigo = "0";		
 				} else {
 					ultimoCodigo = rs.getString("CODIGO");					
 				}
@@ -622,7 +623,7 @@ public class ModeloBaremacion {
 			stmt.setInt(parameterIndex++, apartado.getCodNum());
 			try (ResultSet rs = stmt.executeQuery()) {
 				if (!rs.next()) {
-					return "1";
+					return "0";
 				} else {
 					return rs.getString("CODIGO");
 				}
@@ -815,7 +816,7 @@ public class ModeloBaremacion {
 			stmt.setInt(parameterIndex++, bloque.getCodNum());
 			try (ResultSet rs = stmt.executeQuery()) {
 				if (!rs.next()) {
-					return "1";
+					return "0";
 				} else {
 					return rs.getString("CODIGO");
 				}
@@ -834,6 +835,7 @@ public class ModeloBaremacion {
 		String consulta = "UPDATE TBEP_ITEMSBAREMACION SET "
 				+ "CODIGO = ?, "
 				+ "NOMBRE = ?, "
+				+ "DESCRIPCION = ?, "
 				+ "FLGACTIVO = ?, "
 				+ "UNIDADES = ?, "
 				+ "VALOR = ?, "
@@ -846,12 +848,13 @@ public class ModeloBaremacion {
 			int parameterIndex = 1;
 			stmt.setString(parameterIndex++, item.getCodigo());
 			stmt.setString(parameterIndex++, item.getNombre());
+			stmt.setString(parameterIndex++, item.getDescripcion());
 			stmt.setString(parameterIndex++, item.getActivo() ? "S" : "N");
 			stmt.setString(parameterIndex++, item.getUnidades());
 			stmt.setFloat(parameterIndex++, item.getValor());
 			stmt.setFloat(parameterIndex++, item.getValorMinimo());
 			stmt.setFloat(parameterIndex++, item.getValorMaximo());
-			stmt.setInt(parameterIndex++, item.getAfinidad());			
+			stmt.setInt(parameterIndex++, item.getAfinidad().getCodNum());			
 			stmt.setInt(parameterIndex++, item.getCodNum());
 			stmt.executeUpdate();
 		}
@@ -886,19 +889,20 @@ public class ModeloBaremacion {
 		this.chequearItemParaInsertarOActualizar(item);
 		
 		String consulta = "INSERT INTO TBEP_ITEMSBAREMACION "
-				+ " (CODIGO,NOMBRE,BEPBLO_CODNUM,UNIDADES,VALOR,VALOR_MINIMO,VALOR_MAXIMO,AFINIDAD)"
+				+ " (CODIGO,NOMBRE,DESCRIPCION,BEPBLO_CODNUM,UNIDADES,VALOR,VALOR_MINIMO,VALOR_MAXIMO,AFINIDAD)"
 				+ " VALUES (?,?,?,?,?,?,?,?)";
 		
 		try (Connection conexion = ConexionUvirtual.obtenerInstancia(); PreparedStatement stmt = conexion.prepareStatement(consulta);) {
 			int parameterIndex = 1;
 			stmt.setString(parameterIndex++, item.getCodigo());
 			stmt.setString(parameterIndex++, item.getNombre());
+			stmt.setString(parameterIndex++, item.getDescripcion());
 			stmt.setInt(parameterIndex++, item.getBloqueBaremacion().getCodNum());
 			stmt.setString(parameterIndex++, item.getUnidades());
 			stmt.setFloat(parameterIndex++, item.getValor());
 			stmt.setFloat(parameterIndex++, item.getValorMinimo());
 			stmt.setFloat(parameterIndex++, item.getValorMaximo());
-			stmt.setInt(parameterIndex++, item.getAfinidad());
+			stmt.setInt(parameterIndex++, item.getAfinidad().getCodNum());
 			stmt.executeUpdate();
 		}
 	}
@@ -964,14 +968,14 @@ public class ModeloBaremacion {
 		item.setCodNum(rs.getInt("CODNUM"));
 		item.setCodigo(rs.getString("CODIGO"));
 		item.setNombre(rs.getString("NOMBRE"));
+		item.setDescripcion(rs.getString("DESCRIPCION"));
 		item.setActivo(rs.getString("FLGACTIVO").equals("S"));
 		item.setBloqueBaremacion(this.getBloqueBaremacionById(rs.getInt("BEPBLO_CODNUM")));
 		item.setUnidades(rs.getString("UNIDADES"));
 		item.setValor(rs.getFloat("VALOR"));
 		item.setValorMinimo(rs.getFloat("VALOR_MINIMO"));
 		item.setValorMaximo(rs.getFloat("VALOR_MAXIMO"));
-		item.setAfinidad(rs.getInt("AFINIDAD"));
-		item.setAfinidadOBJ(modelo.getAfinidadById(rs.getInt("AFINIDAD")));
+		item.setAfinidad(modelo.getAfinidadById(rs.getInt("AFINIDAD")));
 		return item;
 	}
 	

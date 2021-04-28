@@ -38,7 +38,7 @@ VistaMeritos bean = (VistaMeritos) uvdatos.getVistas().get(VistaMeritos.class.ge
 			<th scope="col"	style="width:20%">Descripción</th>
 			<th scope="col"	style="width:10%">Valor</th>
 			<th scope="col"	style="width:15%">Observación</th>
-			<th scope="col"	style="width:15%">Fichero</th>
+			<th scope="col"	style="width:15%"></th>
 		</tr>
 		<tbody>		
 		</tbody>
@@ -74,11 +74,12 @@ VistaMeritos bean = (VistaMeritos) uvdatos.getVistas().get(VistaMeritos.class.ge
 		        {'data': 'descripcion', 'filter': true, 'overflow': 'auto'},
 		        {'data': 'valor', 'filter': true, 'overflow': 'auto'},
 		        {'data': 'observacion', 'filter': true, 'overflow': 'auto'},
-		        {'data': 'codnum', 'order': {'active': false}, 'class': 'overflow-ellipsis', 'render': function(row) {
-		        	var link = "<%= request.getRequestURI() %>?a=<%= ControladorMisMeritos.ACCION_DESCARGAR_FICHERO %>&<%= ControladorMisMeritos.PARAM_ID %>=" + row.codNum;
-		        	return "<a class='consultar-fichero' title='Descargar fichero' href='" +link +"' target='_blank'>" +link +"</a>"; 
-		        	}
-		        },
+		        {'data': 'codnum', 'buttons': [
+	        		{'label': 'Descargar', 'onClick': function(row) {
+	        			window.open("<%= request.getRequestURI() %>"
+	        		        	+ "?a=<%= ControladorMisMeritos.ACCION_DESCARGAR_FICHERO %>&<%= ControladorMisMeritos.PARAM_ID %>=" + row.codNum);
+	        		}},
+	   			]}
 		    ],
 		    "actions": [
 		    	{'label': 'Eliminar', 'title': 'Eliminar méritos seleccionados', 'onClick': function(selected) {
