@@ -125,8 +125,18 @@ $(document).ready(function() {
     		          	});
     	    		}
     	    		else{
-    	    			var params = {'a': '<%= ControladorUsuarioBolsaEmpleo.ACCION_EXCLUIR_USUARIO %>', '<%= ControladorUsuarioBolsaEmpleo.PARAM_NOMBRE_USUARIO %>': row.codcuenta};
-    	        		Atis.sendForm("<%= request.getRequestURI() %>", params);
+    	    			Atis.confirmDialog("Excluir usuario", "¿Desea excluir a este usuario en la base de datos?", {
+    		            	Si: function() {
+    		            		var params = {'a': '<%= ControladorUsuarioBolsaEmpleo.ACCION_EXCLUIR_USUARIO %>',
+    		            				'<%= ControladorUsuarioBolsaEmpleo.PARAM_NOMBRE_USUARIO %>': row.codcuenta
+    		            		};
+    		        			Atis.sendForm("<%= request.getRequestURI() %>", params);
+    		              		$(this).dialog("close");
+    		            	},
+    		            	No: function() {
+    		              		$(this).dialog("close");
+    		            	}
+    		          	});
     	    		}
         		}
         		}

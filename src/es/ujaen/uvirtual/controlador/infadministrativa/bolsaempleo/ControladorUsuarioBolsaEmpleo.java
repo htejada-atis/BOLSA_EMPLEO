@@ -173,6 +173,9 @@ public class ControladorUsuarioBolsaEmpleo extends HttpServlet {
 			case ACCION_EDITAR_USUARIO:
 				editarUsuario(request, response, bean);
 				break;
+			case ACCION_INCLUIR_USUARIO:
+				incluirUsuario(request, response, bean);
+				break;
 			case ACCION_EXCLUIR_USUARIO:
 				excluirUsuario(request, response, bean);
 				break;
@@ -300,9 +303,6 @@ public class ControladorUsuarioBolsaEmpleo extends HttpServlet {
 			break;
 		case ACCION_RECUPERAR_USUARIO:
 			modelo.ponerUsuarioComoNoBorrado(usuarios);
-			break;
-		case ACCION_INCLUIR_USUARIO:
-			modelo.ponerUsuarioComoNoExcluido(usuarios);
 			break;
 		case ACCION_EXCLUIR_USUARIO_AREA:
 			UsuarioBolsaEmpleo usu = modelo.getUsuarioById(codNum);
@@ -484,6 +484,39 @@ public class ControladorUsuarioBolsaEmpleo extends HttpServlet {
 			}
 		}
 	}
+	
+	
+	/** incluir un usuario .
+	 * @param request .
+	 * @param response .
+	 * @param bean bean de la vista a la que poner los valores .
+	 * @throws SQLException excepcion de bbdd.
+	 * @throws UVException en caso de error en bd
+	 * @throws IOException en caso de error de IO.
+	 */
+	private void incluirUsuario(HttpServletRequest request, HttpServletResponse response, VistaUsuarioBolsaEmpleo bean) throws SQLException, UVException, IOException {
+		ModeloUsuarioBolsaEmpleo modelo = ModeloUsuarioBolsaEmpleo.obtenerInstancia();
+		
+		obtenerRoles(bean);
+		
+		UsuarioBolsaEmpleo usu = modelo.getUsuarioById(Formateador.leeParametroInteger(request.getParameter(PARAM_ID)));
+
+			Integer codNum = Formateador.leeParametroInteger(request.getParameter(PARAM_ID));
+			Boolean excluido = true;
+					
+			String razonexcluido = EscapaHTML.ajustaCodificacion(request.getParameter(PARAM_RAZON_EXCLUIDO));
+			
+			SimpleDateFormat formatter = new SimpleDateFormat("dd/MM/YYYY HH:mm:ss");
+			Date date = new Date(System.currentTimeMillis());
+			
+			UsuarioBolsaEmpleo usuario = new UsuarioBolsaEmpleo(codNum, excluido, razonexcluido, date);
+			
+			modelo.ponerUsuarioComoExcluido(usuario);
+			HttpSession session = request.getSession(false);
+			session.setAttribute(MENSAJE_ENVIADO, MENSAJE_EXITO_EDITAR);
+			response.sendRedirect(request.getServletPath());
+	}
+	
 	
 	/** excluir un usuario .
 	 * @param request .

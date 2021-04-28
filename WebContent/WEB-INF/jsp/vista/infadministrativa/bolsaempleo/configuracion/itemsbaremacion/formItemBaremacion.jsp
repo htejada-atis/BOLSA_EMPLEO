@@ -87,9 +87,14 @@ String codigoCompleto = apartado.getCodigo() + "." + bloque.getCodigo() + "." + 
 					<option value="-1"> - </option>
     				<%for(Afinidad afinidad: bean.getAfinidades()){
     					if(item!=null){
-            				if(bean.getAfinidad().getCodNum().equals(afinidad.getCodNum())){%>
-        						<option value="<%=afinidad.getCodNum()%>" selected="selected"><%=afinidad.getCodigo()%> - <%=afinidad.getDescripcion()%></option>
-        					<%}
+    						if(bean.getAfinidad()!=null){
+            					if(bean.getAfinidad().getCodNum().equals(afinidad.getCodNum())){%>
+        							<option value="<%=afinidad.getCodNum()%>" selected="selected"><%=afinidad.getCodigo()%> - <%=afinidad.getDescripcion()%></option>
+        						<%}	
+            					else {%>
+            						<option value="<%=afinidad.getCodNum()%>"><%=afinidad.getCodigo()%> - <%=afinidad.getDescripcion()%></option>
+            					<%}
+            				}
     						else{%>
 								<option value="<%=afinidad.getCodNum()%>"><%=afinidad.getCodigo()%> - <%=afinidad.getDescripcion()%></option>
 							<%}

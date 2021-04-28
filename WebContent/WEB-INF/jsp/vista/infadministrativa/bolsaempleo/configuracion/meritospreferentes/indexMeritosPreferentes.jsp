@@ -108,7 +108,44 @@ VistaMeritosPreferentes bean = (VistaMeritosPreferentes) uvdatos.getVistas().get
 			    			};
 		        			Atis.sendForm("<%= request.getRequestURI() %>", params);
 			    		}
-		        	}
+		        	},
+		        	{'label': function(row) { 
+    						if(row.activo) return "Desactivar"
+    						else return "Activar"; 
+    					}, 
+    					'onClick': function(row) {
+    						if(row.activo){
+    							Atis.confirmDialog("Desactivar merito", "¿Desea desactivar este mérito preferente en la base de datos?", {
+    	    		            	Si: function() {
+    	    		            		var params = {
+    	    				    				'a': '<%=ControladorMeritosPreferentes.ACCION_DESACTIVAR%>', 
+    	    				    				'<%= ControladorMeritosPreferentes.PARAM_ID %>': row.codNum
+    	    				    			};
+    	    		        			Atis.sendForm("<%= request.getRequestURI() %>", params);
+    	    		              		$(this).dialog("close");
+    	    		            	},
+    	    		            	No: function() {
+    	    		              		$(this).dialog("close");
+    	    		            	}
+    	    		          	});
+    						}
+    						else {
+    							Atis.confirmDialog("Activar merito", "¿Desea activar este mérito preferente en la base de datos?", {
+    	    		            	Si: function() {
+    	    		            		var params = {
+    	    				    				'a': '<%=ControladorMeritosPreferentes.ACCION_ACTIVAR%>', 
+    	    				    				'<%= ControladorMeritosPreferentes.PARAM_ID %>': row.codNum
+    	    				    			};
+    	    		        			Atis.sendForm("<%= request.getRequestURI() %>", params);
+    	    		              		$(this).dialog("close");
+    	    		            	},
+    	    		            	No: function() {
+    	    		              		$(this).dialog("close");
+    	    		            	}
+    	    		          	});	
+    						}
+		    			}
+	        		}
 				]}
 			]
 		});

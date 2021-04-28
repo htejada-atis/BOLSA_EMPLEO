@@ -58,6 +58,7 @@ public class ControladorItemsBaremacion extends HttpServlet {
 	public static final String MENSAJE_EXITO_APARTADO_EDITAR = "Bloque editado correctamente";
 	public static final String MENSAJE_EXITO_APARTADO_DESACTIVAR = "Bloque desactivado correctamente";
 	public static final String MENSAJE_EXITO_APARTADO_ACTIVAR = "Bloque activado correctamente";
+	public static final String MENSAJE_ERROR_AFINIDAD_VACIA = "Debe seleccionar un tipo de afinidad";
 	
 	// acciones bloques
 	public static final String ACCION_DATATABLE_BLOQUES = "datatable_bloques";
@@ -121,6 +122,7 @@ public class ControladorItemsBaremacion extends HttpServlet {
 	public static final String MENSAJE_ERROR_NOMBRE_VACIO = "El nombre no puede estar vacio";
 	public static final String MENSAJE_ERROR_NOMBRE_MAXIMO = "El nombre no puede ser mayor que ";
 	public static final String MENSAJE_ERROR_VALOR_NO_VALIDO = "Valor no válido";
+	public static final String MENSAJE_ERROR_AFINIDAD_VACIO = "La afinidad no puede estar vacia";
 	
 	// urls
 	public static final String URL_PATTERN_AJAX = "/srv/es/ajax/informacionadministrativa/bolsaempleo/configuracion/itemsbaremacion";
@@ -194,6 +196,13 @@ public class ControladorItemsBaremacion extends HttpServlet {
 		} catch (UVException e) {
 			LOGGER.log(Level.WARNING, e.toString());
 			bean.getMensajesDeError().add(e.getMessage());
+			
+			ModeloAfinidad modeloAfinidad = ModeloAfinidad.obtenerInstancia();
+			try {
+				bean.setAfinidades(modeloAfinidad.listaAfinidades());
+			} catch (SQLException ex) {
+				ex.printStackTrace();
+			}
 		} finally {
 			datos.getVistas().put(bean.getClass().getName(), bean);
 			datos.getFicherosJSP().add(bean.getVista());
@@ -280,7 +289,7 @@ public class ControladorItemsBaremacion extends HttpServlet {
 	private void agregarApartado(VistaItemsBaremacion bean, HttpServletRequest request, HttpServletResponse response) throws SQLException, UVException, IOException {
 		bean.setVista(RUTA_BEP_CONF + "formApartadoBaremacion.jsp");
 		bean.setApartadoBaremacion(null);
-		bean.setUltimoCodigo(ModeloBaremacion.obtenerInstancia().getUltimoCodigoApartado());
+		bean.setUltimoCodigo((Integer.parseInt(ModeloBaremacion.obtenerInstancia().getUltimoCodigoApartado()) + 1) + "");
 	}
 	
 	private void agregarApartadoConfirm(VistaItemsBaremacion bean, HttpServletRequest request, HttpServletResponse response) throws SQLException, UVException, IOException {
@@ -400,9 +409,6 @@ public class ControladorItemsBaremacion extends HttpServlet {
 		
 		validator.addParamFloat(PARAM_APARTADO_PUNTUACIONMAXIMA);
 		validator.addParamFloat(PARAM_APARTADO_PORCENTAJEMAXIMO);
-		validator.addParamFloat(PARAM_APARTADO_FACTORMERITOPREFERENTE);
-		
-		validator.addParamBoolean(PARAM_APARTADO_MERITOSPREFERENTES);
 				
 		return validator;
 	}
@@ -477,8 +483,9 @@ public class ControladorItemsBaremacion extends HttpServlet {
 		
 		bean.setApartadoBaremacion(apartado);
 		bean.setBloqueBaremacion(null);
-		bean.setVista(RUTA_BEP_CONF + "formBloqueBaremacion.jsp");		
-		bean.setUltimoCodigo(modelo.getUltimoCodigoBloque(apartado));
+		bean.setVista(RUTA_BEP_CONF + "formBloqueBaremacion.jsp");	
+		
+		bean.setUltimoCodigo((Integer.parseInt(modelo.getUltimoCodigoBloque(apartado)) + 1) + "");	
 	}
 	
 	private void agregarBloqueConfirm(VistaItemsBaremacion bean, HttpServletRequest request, HttpServletResponse response) throws SQLException, UVException, IOException {
@@ -685,8 +692,9 @@ public class ControladorItemsBaremacion extends HttpServlet {
 		ModeloAfinidad modeloAfinidad = ModeloAfinidad.obtenerInstancia();
 		bean.setAfinidades(modeloAfinidad.listaAfinidades());
 		
-		bean.setVista(RUTA_BEP_CONF + "formItemBaremacion.jsp");		
-		bean.setUltimoCodigo(modelo.getUltimoCodigoItem(bloque));		
+		bean.setVista(RUTA_BEP_CONF + "formItemBaremacion.jsp");	
+		
+		bean.setUltimoCodigo((Integer.parseInt(modelo.getUltimoCodigoItem(bloque)) + 1) + "");	
 	}
 	
 	private void agregarItemConfirm(VistaItemsBaremacion bean, HttpServletRequest request, HttpServletResponse response) throws SQLException, UVException, IOException {
@@ -717,6 +725,11 @@ public class ControladorItemsBaremacion extends HttpServlet {
 		item.setCodigo(validator.getValueString(PARAM_ITEM_CODIGO));
 		item.setNombre(validator.getValueString(PARAM_ITEM_NOMBRE));				
 		item.setUnidades(validator.getValueString(PARAM_ITEM_UNIDADES));
+		
+		if (validator.getValueInteger(PARAM_ITEM_AFINIDAD) == -1) {
+			throw new UVException(MENSAJE_ERROR_AFINIDAD_VACIA);
+		}
+		
 		item.setAfinidad(validator.getValueInteger(PARAM_ITEM_AFINIDAD));
 		item.setValor(validator.getValueFloat(PARAM_ITEM_VALOR));
 		item.setValorMinimo(validator.getValueFloat(PARAM_ITEM_VALOR_MINIMO));
@@ -767,6 +780,11 @@ public class ControladorItemsBaremacion extends HttpServlet {
 		item.setCodigo(validator.getValueString(PARAM_ITEM_CODIGO));
 		item.setNombre(validator.getValueString(PARAM_ITEM_NOMBRE));				
 		item.setUnidades(validator.getValueString(PARAM_ITEM_UNIDADES));
+		
+		if (validator.getValueInteger(PARAM_ITEM_AFINIDAD) == -1) {
+			throw new UVException(MENSAJE_ERROR_AFINIDAD_VACIA);
+		}
+		
 		item.setAfinidad(validator.getValueInteger(PARAM_ITEM_AFINIDAD));
 		item.setValor(validator.getValueFloat(PARAM_ITEM_VALOR));
 		item.setValorMinimo(validator.getValueFloat(PARAM_ITEM_VALOR_MINIMO));
@@ -831,7 +849,8 @@ public class ControladorItemsBaremacion extends HttpServlet {
 				String.format(MENSAJE_ERROR_NOMBRE_MAXIMO, ModeloBaremacion.COLUMN_NOMBRE_MAXLENGTH));
 		
 		validator.addParamString(PARAM_ITEM_UNIDADES);
-		validator.addParamInteger(PARAM_ITEM_AFINIDAD);		
+		validator.addParamInteger(PARAM_ITEM_AFINIDAD);	
+		validator.addRule(PARAM_ITEM_AFINIDAD, "required", MENSAJE_ERROR_AFINIDAD_VACIO);
 		
 		validator.addParamFloat(PARAM_ITEM_VALOR);		
 		validator.addRule(PARAM_ITEM_VALOR, "required", "El valor unitario no puede estar vacio");
