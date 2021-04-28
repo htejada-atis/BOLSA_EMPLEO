@@ -1,6 +1,7 @@
 package es.ujaen.uvirtual.modelo.bolsaempleo;
 
 import java.sql.Connection;
+import java.sql.Date;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -11,6 +12,7 @@ import es.ujaen.uvirtual.beans.uvirtual.bolsaempleo.Bolsa;
 import es.ujaen.uvirtual.beans.uvirtual.bolsaempleo.BolsaSolicitud;
 import es.ujaen.uvirtual.beans.uvirtual.bolsaempleo.Convocatoria;
 import es.ujaen.uvirtual.beans.uvirtual.bolsaempleo.Merito;
+import es.ujaen.uvirtual.beans.uvirtual.bolsaempleo.MeritoSolicitud;
 import es.ujaen.uvirtual.beans.uvirtual.bolsaempleo.Solicitud;
 import es.ujaen.uvirtual.beans.uvirtual.bolsaempleo.UsuarioBolsaEmpleo;
 import es.ujaen.uvirtual.modelo.conexion.ConexionUvirtual;
@@ -397,6 +399,36 @@ public class ModeloSolicitud {
 		
 		return bolsas;
 	}
+	
+	/**
+	 * Devuleve las bolsas de una solicitud .
+	 * @param solicitud .
+	 * @return .
+	 * @throws UVException .
+	 * @throws SQLException  .
+	 */
+	public List<BolsaSolicitud> getBolsasSolicitudMeritos(Solicitud solicitud) throws SQLException, UVException {
+		ModeloBolsa modeloBolsa = ModeloBolsa.obtenerInstancia();
+		ModeloMerito modeloMerito = ModeloMerito.obtenerInstancia();
+		ArrayList<BolsaSolicitud> bolsas = new ArrayList<BolsaSolicitud>();
+		
+		String consulta = "SELECT bepsbo.* FROM TBEP_SOLICITUD_BOLSAS bepsbo WHERE bepsbo.BEPSOL_CODNUM = ?";
+		
+		try (Connection conexion = ConexionUvirtual.obtenerInstancia(); PreparedStatement stmt = conexion.prepareStatement(consulta)) {
+			int indexParam = 1;
+			stmt.setInt(indexParam++, solicitud.getCodNum());
+			
+			try (ResultSet rs = stmt.executeQuery()) {
+				while (rs.next()) {
+					Bolsa bolsa = modeloBolsa.getBolsaById(rs.getInt("BEPBOL_CODNUM"));
+					List<Merito> meritos = modeloMerito.getMeritosSolicitudBolsa(solicitud, bolsa);
+					bolsas.add(new BolsaSolicitud(bolsa, meritos));
+				}				
+			}
+		}
+		
+		return bolsas;
+	}
 
 	/**
 	 * Devuelve las bolsas de una solicitud.
@@ -408,6 +440,7 @@ public class ModeloSolicitud {
 	 */
 	public BolsaEmpleoDataTable<BolsaSolicitud> listaBolsasSolicitudesDatatable(Solicitud solicitud, Map<String, String[]> params) throws SQLException, UVException {
 		ModeloBolsa modeloBolsa = ModeloBolsa.obtenerInstancia();
+		ModeloMerito modeloMerito = ModeloMerito.obtenerInstancia();
 		List<BolsaSolicitud> data = new ArrayList<>();
 		BolsaEmpleoDataTable<BolsaSolicitud> dataTable = new BolsaEmpleoDataTable<BolsaSolicitud>(params);
 		
@@ -428,7 +461,7 @@ public class ModeloSolicitud {
 			try (ResultSet rs = stmt.executeQuery()) {
 				while (rs.next()) {
 					Bolsa bolsa = modeloBolsa.getBolsaById(rs.getInt("BEPBOL_CODNUM"));
-					List<Merito> meritos = getMeritosSolicitudBolsa(solicitud, bolsa);
+					List<Merito> meritos = modeloMerito.getMeritosSolicitudBolsa(solicitud, bolsa);
 					data.add(new BolsaSolicitud(bolsa, meritos));
 				}
 			}
@@ -438,36 +471,6 @@ public class ModeloSolicitud {
 		}
 		
 		return dataTable;
-	}
-	
-	/** Devuelve los méritos de la bolsa en una solicitud .
-	 * @param solicitud .
-	 * @param bolsa .
-	 * @return meritos .
-	 * @throws SQLException .
-	 * @throws UVException .
-	 */
-	public ArrayList<Merito> getMeritosSolicitudBolsa(Solicitud solicitud, Bolsa bolsa) throws SQLException, UVException {
-		ModeloMerito modeloMerito = ModeloMerito.obtenerInstancia();
-		ArrayList<Merito> meritos = new ArrayList<Merito>();
-		
-		String consulta = "SELECT bepsbm.BEPMER_CODNUM FROM TBEP_SOLICITUD_BOLSAS_MERITOS bepsbm"
-				+ " INNER JOIN TBEP_SOLICITUD_BOLSAS bepsbo ON bepsbm.BEPSBO_CODNUM = bepsbo.CODNUM"
-				+ " WHERE bepsbo.BEPSOL_CODNUM = ? AND bepsbo.BEPBOL_CODNUM = ?";
-		
-		try (Connection conexion = ConexionUvirtual.obtenerInstancia(); PreparedStatement stmt = conexion.prepareStatement(consulta)) {
-			int indexParam = 1;
-			stmt.setInt(indexParam++, solicitud.getCodNum());
-			stmt.setInt(indexParam++, bolsa.getCodNum());
-			
-			try (ResultSet rs = stmt.executeQuery()) {
-				while (rs.next()) {
-					meritos.add(new Merito(rs.getInt("BEPMER_CODNUM")));
-				}				
-			}
-		}
-		
-		return meritos;
 	}
 	
 	/** El usuario selecciona un mérito para una bolsa en la solicitud .
@@ -535,6 +538,117 @@ public class ModeloSolicitud {
 			}
 			
 			conexion.commit();
+		}
+	}
+	
+	/**
+	 * Devuelve un merito solicitud, el de un merito en una solicitud.
+	 * @param idMerito .
+	 * @param idSolicitudBolsa .
+	 * @return .
+	 * @throws SQLException .
+	 * @throws UVException .
+	 */
+	public MeritoSolicitud getMeritoSolicitudById(Integer idMerito, Integer idSolicitudBolsa) throws SQLException, UVException {
+		String consulta = "SELECT bepsbm.* FROM TBEP_SOLICITUD_BOLSAS_MERITOS bepsbm "
+				+ "WHERE 1=1 "
+				+ "AND bepsbm.BEPSBO_CODNUM = ? "
+				+ "AND bepsbm.BEPMER_CODNUM = ? ";
+			
+		try (Connection conexion = ConexionUvirtual.obtenerInstancia();
+				PreparedStatement stmt = conexion.prepareStatement(consulta);) {
+			stmt.setInt(1, idSolicitudBolsa);
+			stmt.setInt(2, idMerito);
+						
+			try (ResultSet rs = stmt.executeQuery()) {
+				if (!rs.next()) {
+					throw new UVException("No existe el merito de la solicitud");
+				}
+				
+				Merito merito = ModeloMerito.obtenerInstancia().getMeritoById(rs.getInt("BEPMER_CODNUM"), false, false);
+				MeritoSolicitud meritoSolicitud = new MeritoSolicitud(merito);
+				meritoSolicitud.setAfinidad(rs.getString("FLGAFINIDAD").equals("S"));
+				meritoSolicitud.setExcluido(rs.getString("FLGEXCLUIDO").equals("S"));
+				
+				return meritoSolicitud;
+			}
+		}
+	}
+
+	/**
+	 * Obtiene el total de méritos por bloque que hay en la solicitud .
+	 * @param solicitud .
+	 * @param merito .
+	 * @return total .
+	 * @throws SQLException .
+	 */
+	public Integer obtenerTotalMeritosPorBloqueSolicitud(Solicitud solicitud, Merito merito) throws SQLException {
+		Integer total = 0;
+		String consulta = "SELECT COUNT(*) AS total FROM TBEP_SOLICITUD_BOLSAS_MERITOS bepsbm"
+				+ "	INNER JOIN TBEP_SOLICITUD_BOLSAS bepsbo ON bepsbm.BEPSBO_CODNUM = bepsbo.CODNUM"
+				+ "	INNER JOIN TBEP_MERITOS bepmer ON bepsbm.BEPMER_CODNUM = bepmer.CODNUM"
+				+ "	INNER JOIN TBEP_ITEMSBAREMACION bepite ON bepmer.BEPITE_CODNUM = bepite.CODNUM"
+				+ "	INNER JOIN TBEP_BLOQUESBAREMACION bepblo ON bepite.BEPBLO_CODNUM = bepblo.CODNUM"
+				+ "	INNER JOIN TBEP_APARTADOSBAREMACION bepapa ON bepblo.CODNUM = bepapa.CODNUM"
+				+ "	WHERE bepsbo.BEPSOL_CODNUM = ? AND bepapa.CODNUM = ?";
+		
+		try (Connection conexion = ConexionUvirtual.obtenerInstancia(); PreparedStatement stmt = conexion.prepareStatement(consulta);) {
+			int parameterIndex = 1;
+			stmt.setInt(parameterIndex++, solicitud.getCodNum());
+			stmt.setInt(parameterIndex++, merito.getItemBaremacion().getBloqueBaremacion().getApartadoBaremacion().getCodNum());
+			stmt.executeUpdate();
+			
+			try (ResultSet rs = stmt.executeQuery()) {
+				while (rs.next()) {
+					total = rs.getInt("total");
+				}
+			}
+		}
+		return total;
+	}
+	
+	/**
+	 * Obtiene el total de méritos que hay en la solicitud .
+	 * @param solicitud .
+	 * @param merito .
+	 * @return total .
+	 * @throws SQLException .
+	 */
+	public Integer obtenerTotalMeritosSolicitud(Solicitud solicitud) throws SQLException {
+		Integer total = 0;
+		String consulta = "SELECT COUNT(*) AS total FROM TBEP_SOLICITUD_BOLSAS_MERITOS bepsbm"
+				+ "	INNER JOIN TBEP_SOLICITUD_BOLSAS bepsbo ON bepsbm.BEPSBO_CODNUM = bepsbo.CODNUM"
+				+ "	WHERE bepsbo.BEPSOL_CODNUM = ? ";
+		
+		try (Connection conexion = ConexionUvirtual.obtenerInstancia(); PreparedStatement stmt = conexion.prepareStatement(consulta);) {
+			int parameterIndex = 1;
+			stmt.setInt(parameterIndex++, solicitud.getCodNum());
+			stmt.executeUpdate();
+			
+			try (ResultSet rs = stmt.executeQuery()) {
+				while (rs.next()) {
+					total = rs.getInt("total");
+				}
+			}
+		}
+		return total;
+	}
+	
+	/**
+	 * Actualiza el estado de la solicitud a cerrado .
+	 * @param solicitud .
+	 * @throws SQLException .
+	 */
+	public void confirmacionSolicitud(Solicitud solicitud) throws SQLException {
+		String consulta = "UPDATE TBEP_SOLICITUDES "
+				+ " SET ESTADO=?, FECHACONFIRMACION=?"
+				+ " WHERE CODNUM=?";
+		try (Connection conexion = ConexionUvirtual.obtenerInstancia(); PreparedStatement stmt = conexion.prepareStatement(consulta);) {
+			int parameterIndex = 1;
+			stmt.setString(parameterIndex++, solicitud.getEstado());
+			stmt.setDate(parameterIndex++, new Date(solicitud.getFechaConfirmacion().getTime()));
+			stmt.setInt(parameterIndex++, solicitud.getCodNum());
+			stmt.executeUpdate();
 		}
 	}
 	

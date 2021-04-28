@@ -23,6 +23,7 @@ public class VistaSolicitudes extends Vista implements Serializable {
 	private BolsaEmpleoDataTable<BolsaCandidato> dataTableBolsasCandidato;
 	private BolsaEmpleoDataTable<MeritoSolicitud> dataTableMeritos;
 	private List<Bolsa> listaBolsas;
+	private List<BolsaSolicitud> listaBolsasSolicitud;
 	private List<Merito> listaMeritos;
 	private Solicitud solicitud;
 	private Bolsa area;
@@ -81,6 +82,14 @@ public class VistaSolicitudes extends Vista implements Serializable {
 	
 	public void setListaBolsas(List<Bolsa> bolsas) {
 		this.listaBolsas = bolsas;
+	}
+	
+	public List<BolsaSolicitud> getListaBolsasSolicitud() {
+		return listaBolsasSolicitud;
+	}
+	
+	public void setListaBolsasSolicitud(List<BolsaSolicitud> bolsas) {
+		this.listaBolsasSolicitud = bolsas;
 	}
 	
 	public List<Merito> getListaMeritos() {

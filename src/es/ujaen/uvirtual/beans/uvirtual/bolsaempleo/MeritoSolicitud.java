@@ -21,6 +21,13 @@ public class MeritoSolicitud extends Merito implements Serializable {
 	
 	/** Constructor con parametros.
 	 * @param pmerito .
+	 */
+	public MeritoSolicitud(Merito pmerito) {
+		super(pmerito);
+	}
+	
+	/** Constructor con parametros.
+	 * @param pmerito .
 	 * @param pexcluido .
 	 * @param pafinidad .
 	 */
