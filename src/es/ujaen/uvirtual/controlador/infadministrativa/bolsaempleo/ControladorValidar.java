@@ -18,6 +18,7 @@ import com.google.gson.GsonBuilder;
 import es.ujaen.uvirtual.beans.CodigoDescripcion;
 import es.ujaen.uvirtual.beans.UVDatos;
 import es.ujaen.uvirtual.beans.uvirtual.bolsaempleo.Bolsa;
+import es.ujaen.uvirtual.beans.uvirtual.bolsaempleo.BolsaValidacion;
 import es.ujaen.uvirtual.beans.uvirtual.bolsaempleo.Convocatoria;
 import es.ujaen.uvirtual.beans.vistas.uvirtual.bolsaempleo.VistaValidar;
 import es.ujaen.uvirtual.modelo.bolsaempleo.ModeloConvocatoria;
@@ -126,7 +127,8 @@ public class ControladorValidar extends HttpServlet {
 		
 		try (PrintWriter writer = response.getWriter()) {
 			try {
-				BolsaEmpleoDataTable<Bolsa> dataTable = ModeloValidar.obtenerInstancia().listadoAreasSujetasAfinidad(convocatoria, request.getParameterMap());
+				BolsaEmpleoDataTable<BolsaValidacion> dataTable = ModeloValidar.obtenerInstancia().
+						listadoAreasSujetasAfinidad(convocatoria, request.getParameterMap());
 				Gson gson = new GsonBuilder().setExclusionStrategies(BolsaEmpleoDataTable.GSONEXCLUSIONSTRATEGY).create();
 				bean.setDatatable(dataTable);
 				writer.write(gson.toJson(dataTable));

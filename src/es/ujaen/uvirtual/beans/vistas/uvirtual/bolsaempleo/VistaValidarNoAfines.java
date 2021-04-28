@@ -1,11 +1,7 @@
 package es.ujaen.uvirtual.beans.vistas.uvirtual.bolsaempleo;
 
 import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.List;
-
-import es.ujaen.uvirtual.beans.uvirtual.bolsaempleo.Area;
-import es.ujaen.uvirtual.beans.uvirtual.bolsaempleo.Bolsa;
+import es.ujaen.uvirtual.beans.uvirtual.bolsaempleo.BolsaValidacion;
 import es.ujaen.uvirtual.beans.uvirtual.bolsaempleo.Convocatoria;
 import es.ujaen.uvirtual.beans.vistas.Vista;
 import es.ujaen.uvirtual.utilidades.BolsaEmpleoDataTable;
@@ -17,7 +13,7 @@ public class VistaValidarNoAfines extends Vista implements Serializable {
 	private static final long serialVersionUID = 1L;
 	private String vista;	
 	private Convocatoria conv;
-	private BolsaEmpleoDataTable<Bolsa> datatable;
+	private BolsaEmpleoDataTable<BolsaValidacion> datatable;
 	
 	public String getVista() {
 		return vista;
@@ -27,11 +23,11 @@ public class VistaValidarNoAfines extends Vista implements Serializable {
 		this.vista = vista;
 	}
 	
-	public void setDatatable(BolsaEmpleoDataTable<Bolsa> dt) {
+	public void setDatatable(BolsaEmpleoDataTable<BolsaValidacion> dt) {
 		this.datatable = dt;
 	}
 	
-	public BolsaEmpleoDataTable<Bolsa> getDatatable() {
+	public BolsaEmpleoDataTable<BolsaValidacion> getDatatable() {
 		return this.datatable;	
 	}
 	

@@ -21,6 +21,13 @@ public class BolsaValidacion extends Bolsa implements Serializable {
 	
 	/** Constructor con parametros.
 	 * @param pbolsa .
+	 */
+	public BolsaValidacion(Bolsa pbolsa) {
+		super(pbolsa);			
+	}
+	
+	/** Constructor con parametros.
+	 * @param pbolsa .
 	 * @param pmeritosNoValidados .
 	 * @param pmeritosValidados .
 	 * @param pmeritosExcluidos .
