@@ -326,15 +326,6 @@ public class ControladorMisSolicitudes extends HttpServlet {
 			throw new UVException(ModeloSolicitud.MENSAJE_ERROR_CONVOCATORIA_NO_ABIERTA);
 		}
 		
-<<<<<<< HEAD
-		bean.setVista(RUTA_BEP_SOL + "paso3.jsp");
-		
-//		if (solicitud.getEstado().equals(ModeloSolicitud.SOLICITUD_ESTADO_ABIERTA)) {
-//			listaBolsasCandidato(bean, solicitud);
-//		} else {
-//			bean.setVista(RUTA_BEP_SOL + "paso3.jsp");
-//		}
-=======
 		if (solicitud.getEstado().equals(ModeloSolicitud.SOLICITUD_ESTADO_ABIERTA)) {
 			listaBolsas(bean, solicitud);
 		} else {
@@ -342,7 +333,6 @@ public class ControladorMisSolicitudes extends HttpServlet {
 			bean.setListaBolsasSolicitud(listaBolsas);
 			bean.setVista(RUTA_BEP_SOL + "paso3.jsp");
 		}
->>>>>>> 5dae19d750921a2dbbbbae0021219cbcdeb8abe6
 	}
 	
 	/**
