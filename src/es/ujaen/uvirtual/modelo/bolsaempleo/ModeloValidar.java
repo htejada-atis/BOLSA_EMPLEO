@@ -5,6 +5,7 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -76,6 +77,40 @@ public class ModeloValidar {
 	public BolsaEmpleoDataTable<BolsaValidacion> listadoAreasNoSujetasAfinidad(Convocatoria convocatoria, Map<String, String[]> params) throws SQLException, UVException {
 		return this.listadoAreas(convocatoria, false, params);
 	}
+	
+	/**
+	 * Devuelve los totales de méritos de una bolsa. 
+	 * @param convocatoria .
+	 * @param bolsa .
+	 * @return .
+	 */
+//	public HashMap<String, Integer> getTotalesMeritosBolsa(Convocatoria convocatoria, Bolsa bolsa) {
+//		String sql = "SELECT COUNT(*) AS count "
+//				+ "FROM TBEP_SOLICITUD_BOLSAS_MERITOS bepsbm "
+//				+ "INNER JOIN TBEP_SOLICITUD_BOLSAS_MERITOS bepsbo ON bepsbo.CODNUM = bepsbm.BEPSBO_CODNUM "
+//				+ "INNER JOIN  "
+//				+ "WHERE 1=1 "
+//				+ "AND bepsbm.FLGEXCLUIDO = 'S' "
+//				+ "AND bepsbm.BEPSBO_CODNUM = '' "
+//				+ "AND bepsbo.BEPSOL_CODNUM = ? ";		
+//		
+//		try (Connection con = ConexionUvirtual.obtenerInstancia(); PreparedStatement stmt = con.prepareStatement(sql);) {
+//			int param = 1;
+//			stmt.setInt(param++, usuario.getCodNum());
+//			stmt.setInt(param++, area.getCodNum());
+//			
+//			try (ResultSet rs = stmt.executeQuery()) {
+//				rs.next();
+//				
+//				if (rs.getInt("count") > 0) {
+//					return true;
+//				}
+//			}
+//		}
+//		
+//		
+//		
+//	}
 
 	private BolsaEmpleoDataTable<BolsaValidacion> listadoAreas(Convocatoria convocatoria, Boolean sujetasAfinidad, Map<String, String[]> params) 
 			throws SQLException, UVException {
@@ -120,6 +155,7 @@ public class ModeloValidar {
 				while (rs.next()) {
 					Bolsa bolsa = modeloBolsa.createFromResultSet(rs);
 					BolsaValidacion bolsaValidacion = new BolsaValidacion(bolsa);
+//					bolsaValidacion.set
 					
 					rows.add(bolsaValidacion);
 				}
