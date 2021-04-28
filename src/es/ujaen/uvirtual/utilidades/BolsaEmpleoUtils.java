@@ -1,5 +1,8 @@
 package es.ujaen.uvirtual.utilidades;
 
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.Part;
 
@@ -45,7 +48,7 @@ public class BolsaEmpleoUtils {
 	} 
 	
 	/**
-	 * adfadf.
+	 * Devuelve el valor de un input del request o un valor por defecto si no existe.
 	 * @param request .
 	 * @param param .
 	 * @param defaultParam .
@@ -61,4 +64,37 @@ public class BolsaEmpleoUtils {
 		return defaultParam;
 	}
 
+	/**
+	 * Devuleve si la cadena contiene un valor entero o no.
+	 * @param value .
+	 * @return .
+	 */
+	public static Boolean isInteger(String value) {
+		if (value == null) {
+			return false;
+		}
+		
+		String regex = "[0-9]+";
+        Pattern p = Pattern.compile(regex);
+        Matcher m = p.matcher(value);
+
+        return m.matches();
+	}
+	
+	/**
+	 * Devuleve si la cadena contiene un valor float o no.
+	 * @param value .
+	 * @return .
+	 */
+	public static Boolean isFloat(String value) {
+		if (value == null) {
+			return false;
+		}
+		
+		String regex = "[0-9]+(,[0-9]+)?";
+        Pattern p = Pattern.compile(regex);
+        Matcher m = p.matcher(value);
+
+        return m.matches();
+	}
 }

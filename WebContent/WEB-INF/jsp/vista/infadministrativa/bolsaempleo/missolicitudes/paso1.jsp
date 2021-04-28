@@ -91,7 +91,7 @@ VistaSolicitudes bean = (VistaSolicitudes) uvdatos.getVistas().get(VistaSolicitu
 		        		}
 	        		}
 		        },
-		        {'data': 'baremable', 'order': {'active': false}, 'filter': {'type': 'selectBoolean', 'true': 'Baremable', 'false': 'No baremable'}, 'render': function(row) {
+		        {'data': 'baremable', 'order': {'active': false}, 'filter': {'type': 'select', 'options':{'true': 'Baremable', 'false': 'No baremable'}, 'optionDefault': 'true'}, 'render': function(row) {
 	        		if (row.baremable) {
 	        			return "<div title='Baremable' class='circle-true'></div>"; 
 	        		} else {

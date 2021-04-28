@@ -1,6 +1,7 @@
 package es.ujaen.uvirtual.controlador.infadministrativa.bolsaempleo;
 
 import java.io.IOException;
+import java.io.PrintWriter;
 import java.sql.SQLException;
 import java.util.logging.Logger;
 import java.util.List;
@@ -12,14 +13,22 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
+
+import es.ujaen.uvirtual.beans.CodigoDescripcion;
 import es.ujaen.uvirtual.beans.UVDatos;
 import es.ujaen.uvirtual.beans.Usuario;
 import es.ujaen.uvirtual.beans.uvirtual.bolsaempleo.Area;
+import es.ujaen.uvirtual.beans.uvirtual.bolsaempleo.Bolsa;
 import es.ujaen.uvirtual.beans.uvirtual.bolsaempleo.Convocatoria;
+import es.ujaen.uvirtual.beans.vistas.uvirtual.bolsaempleo.VistaValidar;
 import es.ujaen.uvirtual.beans.vistas.uvirtual.bolsaempleo.VistaValidarNoAfines;
 import es.ujaen.uvirtual.modelo.bolsaempleo.ModeloArea;
 import es.ujaen.uvirtual.modelo.bolsaempleo.ModeloConvocatoria;
 import es.ujaen.uvirtual.modelo.bolsaempleo.ModeloUsuarioBolsaEmpleo;
+import es.ujaen.uvirtual.modelo.bolsaempleo.ModeloValidar;
+import es.ujaen.uvirtual.utilidades.BolsaEmpleoDataTable;
 import es.ujaen.uvirtual.utilidades.EscapaHTML;
 import es.ujaen.uvirtual.utilidades.Formateador;
 import es.ujaen.uvirtual.utilidades.UVException;
@@ -32,7 +41,9 @@ import es.ujaen.uvirtual.utilidades.UVException;
 		description = "Validación de méritos sujetos a afinidad", 
 		urlPatterns = { 
 				"/srv/es/informacionadministrativa/bolsaempleo/validarnoafines", 
-				"/srv/en/informacionadministrativa/bolsaempleo/validarnoafines"
+				"/srv/en/informacionadministrativa/bolsaempleo/validarnoafines",
+				"/srv/es/ajax/informacionadministrativa/bolsaempleo/validarnoafines", 
+				"/srv/en/ajax/informacionadministrativa/bolsaempleo/validarnoafines"
 		})
 public class ControladorValidarNoAfines extends HttpServlet {
 	private static final long serialVersionUID = 1L;
@@ -41,15 +52,14 @@ public class ControladorValidarNoAfines extends HttpServlet {
 	public static final String PARAM_ACCION = "a";
 	
 	// acciones
-	public static final String ACCION_LISTAR = "listar";
-	public static final String ACCION_LISTAR_AREAS = "listarareas";
+	public static final String ACCION_INDEX = "listar";
+	public static final String ACCION_DATATABLE = "datatable";
 	
-	// mensajes
-	public static final String MENSAJE_ERROR_FOO = "Mensaje de error";
-	public static final String MENSAJE_EXITO_BAR = "Mensaje de exito"; 
+	// url y rutas
+	public static final String URL_PATTERN_AJAX = "/srv/es/ajax/informacionadministrativa/bolsaempleo/validarnoafines";
+	public static final String RUTA_BEP_CONF = "/WEB-INF/jsp/vista/infadministrativa/bolsaempleo/validarnoafines/";	
 	
-	// variables
-	public static boolean anonimo = true;
+	public static final int RESPONSE_HTTP_CODE_ERROR = 400;
 
 	/** Peticion GET.
 	 * @see HttpServlet#doGet(HttpServletRequest request, HttpServletResponse response)
@@ -60,33 +70,21 @@ public class ControladorValidarNoAfines extends HttpServlet {
 		datos.setDocType("<!DOCTYPE html>");
 		datos.setContentType("text/html");
 		
-		VistaValidarNoAfines bean = new VistaValidarNoAfines();		
-		Usuario usuario = datos.getUsuario();
-		ModeloUsuarioBolsaEmpleo modelo = ModeloUsuarioBolsaEmpleo.obtenerInstancia();
-		ModeloConvocatoria modeloConv = ModeloConvocatoria.obtenerInstancia();
-		LOGGER.log(Level.FINEST, "usuario que ha entrado en el servlet es {0}", usuario.getUid());
-		
+		VistaValidarNoAfines bean = new VistaValidarNoAfines();
+				
 		String nombreAccion = EscapaHTML.ajustaCodificacion(request.getParameter(PARAM_ACCION));
 		if (nombreAccion == null) {
-			nombreAccion = ACCION_LISTAR_AREAS;
+			nombreAccion = ACCION_INDEX;
 		}
 		
-		bean.setVista("/WEB-INF/jsp/vista/infadministrativa/bolsaempleo/validarnoafines/index.jsp");
-		
 		try {
-			anonimo = !modelo.checkUser(datos);
-			List<Convocatoria> convocatorias = modeloConv.listaConvocatorias();
-			for (Convocatoria convocatoria: convocatorias) {
-				if (convocatoria.getEstado().equals("ABIERTA")) {
-					bean.setConvocatoria(convocatoria);
-				} 
-			}
+			ModeloUsuarioBolsaEmpleo.obtenerInstancia().checkUser(datos);
 			switch (nombreAccion) {
-				case ACCION_LISTAR:
-					listado(datos, request, response);
-					break;
-				case ACCION_LISTAR_AREAS:
-					obtenerAreas(bean, request);
+				case ACCION_INDEX:
+					index(bean, datos, request, response);
+					break;	
+				case ACCION_DATATABLE:
+					listado(bean, datos, request, response);
 					break;
 			}
 		} catch (SQLException e) {
@@ -118,21 +116,32 @@ public class ControladorValidarNoAfines extends HttpServlet {
 		doGet(request, response);
 	}
 		
-	private void listado(UVDatos datos, HttpServletRequest request, HttpServletResponse response) throws IOException, SQLException {
-		
+	private void index(VistaValidarNoAfines bean, UVDatos datos, HttpServletRequest request, HttpServletResponse response) throws SQLException, UVException {
+		bean.setConvocatoria(ModeloConvocatoria.obtenerInstancia().getUltimaConvocatoria());
+		bean.setVista(RUTA_BEP_CONF + "index.jsp");
 	}
-	
-	/** muestra todas las areas en un select .
-	 * @param bean bean de la vista a la que poner los valores.
-	 * @param request .
-	 * @throws SQLException excepcion de bbdd .
-	 * @throws UVException .
-	 */
-	private void obtenerAreas(VistaValidarNoAfines bean, HttpServletRequest request) throws SQLException, UVException {
-		bean.setVista("/WEB-INF/jsp/vista/infadministrativa/bolsaempleo/validarnoafines/index.jsp");
 		
-		ModeloArea modelo = ModeloArea.obtenerInstancia();
-		List<Area> areas = modelo.listaAreas();
-		bean.setAreas(areas);
+	private void listado(VistaValidarNoAfines bean, UVDatos datos, HttpServletRequest request, HttpServletResponse response) throws IOException, SQLException, UVException {
+		datos.setContentType("application/json");
+		datos.setRespuestaEnviada(true);
+		response.setContentType("application/json");
+		response.setCharacterEncoding("UTF-8");
+		
+		Convocatoria convocatoria = ModeloConvocatoria.obtenerInstancia().getUltimaConvocatoria();
+		
+		try (PrintWriter writer = response.getWriter()) {
+			try {
+				BolsaEmpleoDataTable<Bolsa> dataTable = ModeloValidar.obtenerInstancia().listadoAreasNoSujetasAfinidad(convocatoria, request.getParameterMap());
+				Gson gson = new GsonBuilder().setExclusionStrategies(BolsaEmpleoDataTable.GSONEXCLUSIONSTRATEGY).create();
+				bean.setDatatable(dataTable);
+				writer.write(gson.toJson(dataTable));
+			} catch (Exception ex) {
+				bean.getMensajesDeError().add(ex.getMessage());
+				
+				CodigoDescripcion mensaje = new CodigoDescripcion("error", ex.getMessage());
+				writer.write(new Gson().toJson(mensaje));
+				response.setStatus(RESPONSE_HTTP_CODE_ERROR);
+			}
+		}
 	}
 }

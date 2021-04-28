@@ -34,13 +34,14 @@ VistaSolicitudes bean = (VistaSolicitudes) uvdatos.getVistas().get(VistaSolicitu
 	<table class="bluetable bolsaempleo" id="tableAreas">
 		<tr>
 			<th scope="col"	style="width:15%">Código</th>
-			<th scope="col"	style="width:85%">Nombre</th>			
+			<th scope="col"	style="width:65%">Nombre</th>
+			<th scope="col"	style="width:20%">Nº méritos en área</th>
 		</tr>
 		<tbody>		
 		</tbody>
 		<tfoot>
 			<tr>
-				<th colspan="2" style="width:100%"></th>
+				<th colspan="3" style="width:100%"></th>
 			</tr>
 		</tfoot>
 	</table>
@@ -93,7 +94,8 @@ VistaSolicitudes bean = (VistaSolicitudes) uvdatos.getVistas().get(VistaSolicitu
 		    "params": {"<%= ControladorMisSolicitudes.PARAM_SOLICITUD_ID %>": <%= bean.getSolicitud().getCodNum() %>},
 		    "columns": [
 		    	{'data': 'area.idAreaExterno', 'filter': true},
-		    	{'data': 'area.descripcion', 'filter': true},	        
+		    	{'data': 'area.descripcion', 'filter': true},
+		    	{'data': 'listaMeritos.length', 'order': {'active': false}},
 	        ],
 		});
 		
@@ -101,7 +103,7 @@ VistaSolicitudes bean = (VistaSolicitudes) uvdatos.getVistas().get(VistaSolicitu
 		
 			var meritosBolsaSolicitud = [];
 		
-			<%  if (bean.getListaBolsas() != null) {
+			<%  if (bean.getListaMeritos() != null) {
 					for (Merito merito: bean.getListaMeritos()) { %>
 						meritosBolsaSolicitud.push("<%=merito.getCodNum()%>");
 					<% }
@@ -127,7 +129,7 @@ VistaSolicitudes bean = (VistaSolicitudes) uvdatos.getVistas().get(VistaSolicitu
 				    				'<%= ControladorMisSolicitudes.PARAM_MERITO %>': row.codNum,
 				    			};
 				    			Atis.sendAjax("<%= request.getRequestURI() %>", params, function(data) {
-				    				console.log(data);
+				    				tableAreas.refresh();
 				    			}, function(error) {
 				    				console.log(error);
 				    			});

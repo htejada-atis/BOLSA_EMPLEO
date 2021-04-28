@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import java.util.List;
 import es.ujaen.uvirtual.beans.uvirtual.bolsaempleo.Area;
 import es.ujaen.uvirtual.beans.uvirtual.bolsaempleo.Titulacion;
+import es.ujaen.uvirtual.beans.uvirtual.bolsaempleo.TitulacionArea;
 import es.ujaen.uvirtual.beans.vistas.Vista;
 import es.ujaen.uvirtual.utilidades.BolsaEmpleoDataTable;
 
@@ -14,7 +15,8 @@ import es.ujaen.uvirtual.utilidades.BolsaEmpleoDataTable;
 public class VistaTitulacionesArea extends Vista implements Serializable {
 	private static final long serialVersionUID = 1L;
 	private List<Area> areas = new ArrayList<>();
-	private BolsaEmpleoDataTable<Titulacion> dataTable;
+	private BolsaEmpleoDataTable<Titulacion> dataTableTitulaciones;
+	private BolsaEmpleoDataTable<TitulacionArea> dataTableTitulacionesArea;
 	private Area area;
 	private String vista;
 	
@@ -27,11 +29,19 @@ public class VistaTitulacionesArea extends Vista implements Serializable {
 	}
 	
 	public BolsaEmpleoDataTable<Titulacion> getDatatableTitulaciones() {
-		return dataTable;
+		return dataTableTitulaciones;
 	}
 	
 	public void setDatatableTitulaciones(BolsaEmpleoDataTable<Titulacion> dt) {
-		this.dataTable = dt;
+		this.dataTableTitulaciones = dt;
+	}
+	
+	public BolsaEmpleoDataTable<TitulacionArea> getDatatableTitulacionesArea() {
+		return dataTableTitulacionesArea;
+	}
+	
+	public void setDatatableTitulacionesArea(BolsaEmpleoDataTable<TitulacionArea> dt) {
+		this.dataTableTitulacionesArea = dt;
 	}
 	
 	public Area getArea() {

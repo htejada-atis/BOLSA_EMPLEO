@@ -7,6 +7,7 @@ import es.ujaen.uvirtual.beans.uvirtual.bolsaempleo.Solicitud;
 import es.ujaen.uvirtual.beans.vistas.Vista;
 import es.ujaen.uvirtual.utilidades.BolsaEmpleoDataTable;
 import es.ujaen.uvirtual.beans.uvirtual.bolsaempleo.BolsaCandidato;
+import es.ujaen.uvirtual.beans.uvirtual.bolsaempleo.BolsaSolicitud;
 import es.ujaen.uvirtual.beans.uvirtual.bolsaempleo.Merito;
 import es.ujaen.uvirtual.beans.uvirtual.bolsaempleo.MeritoSolicitud;
 
@@ -18,6 +19,7 @@ public class VistaSolicitudes extends Vista implements Serializable {
 	private String vista;
 	private BolsaEmpleoDataTable<Solicitud> dataTable;
 	private BolsaEmpleoDataTable<Bolsa> dataTableAreas;
+	private BolsaEmpleoDataTable<BolsaSolicitud> dataTableBolsasSolicitud;
 	private BolsaEmpleoDataTable<BolsaCandidato> dataTableBolsasCandidato;
 	private BolsaEmpleoDataTable<MeritoSolicitud> dataTableMeritos;
 	private List<Bolsa> listaBolsas;
@@ -47,6 +49,14 @@ public class VistaSolicitudes extends Vista implements Serializable {
 	
 	public void setDatatableAreas(BolsaEmpleoDataTable<Bolsa> dt) {
 		this.dataTableAreas = dt;
+	}
+	
+	public BolsaEmpleoDataTable<BolsaSolicitud> getDatatableBolsasSolicitud() {
+		return dataTableBolsasSolicitud;
+	}
+	
+	public void setDatatableBolsasSolicitud(BolsaEmpleoDataTable<BolsaSolicitud> dt) {
+		this.dataTableBolsasSolicitud = dt;
 	}
 	
 	public BolsaEmpleoDataTable<BolsaCandidato> getDataTableBolsasCandidato() {

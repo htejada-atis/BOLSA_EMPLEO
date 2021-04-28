@@ -73,7 +73,6 @@ public class ModeloBolsa {
 	 */
 	public BolsaEmpleoDataTable<Bolsa> listaBolsaEmpleoDatatable(Map<String, String[]> params) throws SQLException, UVException {
 		List<Bolsa> bolsas = new ArrayList<>();
-		ModeloArea modeloArea = ModeloArea.obtenerInstancia();	
 		BolsaEmpleoDataTable<Bolsa> dataTable = new BolsaEmpleoDataTable<Bolsa>(params);
 		
 		String consulta =
@@ -94,23 +93,13 @@ public class ModeloBolsa {
 		try (Connection conexion = ConexionUvirtual.obtenerInstancia();
 				PreparedStatement stmtCount = conexion.prepareStatement(dataTable.getQueryCount());
 				PreparedStatement stmt = conexion.prepareStatement(dataTable.getQuery());
-		) {				
-			
+		) {			
 			int indexParam = 1;
 			dataTable.setFiltersParams(stmt, stmtCount, indexParam);
 			
 			try (ResultSet rs = stmt.executeQuery()) {
 				while (rs.next()) {
-					Bolsa bolsa = new Bolsa();
-					bolsa.setCodNum(rs.getInt("CODNUM"));
-					bolsa.setArea(modeloArea.getAreaById(rs.getInt("BEPARE_CODNUM")));
-					bolsa.setEstado(rs.getString("ESTADO"));
-					bolsa.setBaremable(rs.getString("FLGBAREMABLE").equals("S"));					
-					bolsa.setFechaActualizacion(rs.getTimestamp("FECHAACTUALIZACION"));
-					bolsa.setFechaBloqueo(rs.getTimestamp("FECHABLOQUEO"));
-					bolsa.setFechaDesBloqueo(rs.getTimestamp("FECHADEBLOQUEO"));
-					
-					bolsas.add(bolsa);					
+					bolsas.add(this.createFromResultSet(rs));					
 				}				
 			}	
 			
@@ -142,16 +131,7 @@ public class ModeloBolsa {
 					throw new UVException("No existe la bolsa con id " + codNum);
 				}
 				
-				Bolsa bolsa = new Bolsa();
-				bolsa.setCodNum(rs.getInt("CODNUM"));
-				bolsa.setArea(modeloArea.getAreaById(rs.getInt("BEPARE_CODNUM")));
-				bolsa.setEstado(rs.getString("ESTADO"));
-				bolsa.setBaremable(rs.getString("FLGBAREMABLE").equals("S"));					
-				bolsa.setFechaActualizacion(rs.getTimestamp("FECHAACTUALIZACION"));
-				bolsa.setFechaBloqueo(rs.getTimestamp("FECHABLOQUEO"));
-				bolsa.setFechaDesBloqueo(rs.getTimestamp("FECHADEBLOQUEO"));
-				
-				return bolsa;
+				return this.createFromResultSet(rs);
 			}
 		}
 	}
@@ -441,5 +421,25 @@ public class ModeloBolsa {
 		}
 		
 		return false;
+	}
+
+	/**
+	 * Crea una una bolsa a partir de un ResultSet.
+	 * @param rs .
+	 * @return .
+	 * @throws UVException .
+	 * @throws SQLException .
+	 */
+	public Bolsa createFromResultSet(ResultSet rs) throws SQLException, UVException {
+		Bolsa bolsa = new Bolsa();
+		bolsa.setCodNum(rs.getInt("CODNUM"));
+		bolsa.setArea(ModeloArea.obtenerInstancia().getAreaById(rs.getInt("BEPARE_CODNUM")));
+		bolsa.setEstado(rs.getString("ESTADO"));
+		bolsa.setBaremable(rs.getString("FLGBAREMABLE").equals("S"));					
+		bolsa.setFechaActualizacion(rs.getTimestamp("FECHAACTUALIZACION"));
+		bolsa.setFechaBloqueo(rs.getTimestamp("FECHABLOQUEO"));
+		bolsa.setFechaDesBloqueo(rs.getTimestamp("FECHADEBLOQUEO"));
+		
+		return bolsa;
 	}
 }

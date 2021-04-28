@@ -12,7 +12,6 @@ import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import javax.servlet.http.HttpSession;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.reflect.TypeToken;
@@ -20,6 +19,7 @@ import es.ujaen.uvirtual.beans.CodigoDescripcion;
 import es.ujaen.uvirtual.beans.UVDatos;
 import es.ujaen.uvirtual.beans.uvirtual.bolsaempleo.Area;
 import es.ujaen.uvirtual.beans.uvirtual.bolsaempleo.Titulacion;
+import es.ujaen.uvirtual.beans.uvirtual.bolsaempleo.TitulacionArea;
 import es.ujaen.uvirtual.beans.vistas.uvirtual.bolsaempleo.VistaTitulacionesArea;
 import es.ujaen.uvirtual.modelo.bolsaempleo.ModeloArea;
 import es.ujaen.uvirtual.modelo.bolsaempleo.ModeloTitulacion;
@@ -260,8 +260,8 @@ public class ControladorGestionTitulacionesPreferentesArea extends HttpServlet {
 		try (PrintWriter writer = response.getWriter()) {
 			try {
 				Integer area = Formateador.leeParametroInteger(request.getParameter(PARAM_AREA));
-				BolsaEmpleoDataTable<Titulacion> dataTable = modelo.listaTitulacionesAreaDatatable(request.getParameterMap(), area);
-				bean.setDatatableTitulaciones(dataTable);
+				BolsaEmpleoDataTable<TitulacionArea> dataTable = modelo.listaTitulacionesAreaDatatable(request.getParameterMap(), area);
+				bean.setDatatableTitulacionesArea(dataTable);
 				Gson gson = new GsonBuilder().setExclusionStrategies(BolsaEmpleoDataTable.GSONEXCLUSIONSTRATEGY).create();
 				writer.write(gson.toJson(dataTable));
 			} catch (UVException ex) {
