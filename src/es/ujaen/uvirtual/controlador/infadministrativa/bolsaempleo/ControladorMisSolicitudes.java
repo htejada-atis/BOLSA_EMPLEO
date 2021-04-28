@@ -179,7 +179,7 @@ public class ControladorMisSolicitudes extends HttpServlet {
 					seleccionarBolsas(bean, datos, request, response);
 					break;
 				case ACCION_DESCARGAR_PDF:
-					descargarPDF(bean, datos, response);
+					descargarPDF(bean, datos, request, response);
 					break;
 			}
 		} catch (SQLIntegrityConstraintViolationException e) {
@@ -204,7 +204,7 @@ public class ControladorMisSolicitudes extends HttpServlet {
 			datos.getFicherosCSS().add("/css/jqueryujaen/jquery-ui-1.8.16.custom.css");
 			datos.getFicherosCSS().add("/css/ujaen_bolsa_empleo.css");			
 		}
-	}	
+	}
 
 	/** redireccion de do post.
 	 * @see HttpServlet#doPost(HttpServletRequest request, HttpServletResponse response)
@@ -654,12 +654,18 @@ public class ControladorMisSolicitudes extends HttpServlet {
 	/** exportar .
 	 * @param response .
 	 * @param bean .
+	 * @param request .
 	 * @throws IOException .
 	 * @throws SQLException .
 	 * @throws UVException .
 	 */
-	  public void exportar(VistaSolicitudes bean, HttpServletResponse response) {
+	  public void exportar(VistaSolicitudes bean, HttpServletRequest request, HttpServletResponse response) {
 		  try {
+			  
+				Integer codNum = Formateador.leeParametroInteger(request.getParameter(PARAM_SOLICITUD_ID));
+				ModeloSolicitud modelo = ModeloSolicitud.obtenerInstancia(); 
+				
+				Solicitud solicitud = modelo.getSolicitudById(codNum);
 			    Document document = new Document();
 
 			    //create a PDF writer instance and pass output stream
@@ -667,34 +673,19 @@ public class ControladorMisSolicitudes extends HttpServlet {
 
 			    document.open();
 			    document.addAuthor(this.usuario.getNombre() + this.usuario.getPrimerApellido() + this.usuario.getSegundoApellido());
-			    document.addTitle("Solicitud_" + bean.getSolicitud().getConvocatoria().getDescripcion());
+			    document.addTitle("Solicitud_" + solicitud.getConvocatoria().getDescripcion());
 			    document.addCreationDate();
 
-
-//			    document.add(new Paragraph("Usuario : " + this.usuario.getNombre() + this.usuario.getPrimerApellido() + this.usuario.getSegundoApellido()));
-//			    document.add(new Paragraph("Convocatoria : " + bean.getSolicitud().getConvocatoria().getDescripcion()));
-//			    document.add(new Paragraph("Fecha cierre de solicitud : " + bean.getSolicitud()));
+			    document.add(new Paragraph("Usuario : " + this.usuario.getNombre() + this.usuario.getPrimerApellido() + this.usuario.getSegundoApellido()));
+			    document.add(new Paragraph("Convocatoria : " + solicitud.getConvocatoria().getDescripcion()));
+			    document.add(new Paragraph("Fecha confirmación de solicitud : " + solicitud.getEstado()));
 			    
-//			    bean.getListaBolsas().size()
-
+			    
+			    bean.getListaBolsas().size();
+			    
 			    document.newPage();
-			    
-				Table table = new Table(PDF_TABLE_COLUMNS, 2); // 4 columns, 2 rows
-				table.addCell("0.0");
-				table.addCell("0.1");
-				table.addCell("1.0");
-				table.addCell("1.1");
-				table.addCell("2.2");
-				table.addCell("2.2");
-				table.addCell("2.2");
-				table.addCell("2.2");
-				document.add(table);
-				document.add(new Paragraph("converted to PdfPTable:"));
-				table.setConvert2pdfptable(true);
-				document.add(table);
 				
-				
-				Table table2 = new Table(3);
+				Table table2 = new Table(PDF_TABLE_COLUMNS, 4); // 4 columns, 2 rows
 				table2.setBorderWidth(1);
 				table2.setBorderColor(new Color(0, 0, 255));
 				table2.setPadding(5);
@@ -745,14 +736,15 @@ public class ControladorMisSolicitudes extends HttpServlet {
 	 * @param response .
 	 * @param datos .
 	 * @param bean .
+	 * @param request .
 	 * @throws IOException .
 	 * @throws SQLException .
 	 * @throws UVException .
 	 */
-	  public void descargarPDF(VistaSolicitudes bean, UVDatos datos, HttpServletResponse response) {
+	  public void descargarPDF(VistaSolicitudes bean, UVDatos datos, HttpServletRequest request, HttpServletResponse response) {
 		  response.setContentType("application/pdf");
 	      datos.setRespuestaEnviada(true);
-	      exportar(bean, response);    
+	      exportar(bean, request, response);    
 	  }
 	
 }
