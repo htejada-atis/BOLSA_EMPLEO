@@ -9,6 +9,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import es.ujaen.uvirtual.beans.uvirtual.bolsaempleo.MeritoPreferente;
+import es.ujaen.uvirtual.beans.uvirtual.bolsaempleo.UsuarioBolsaEmpleo;
 import es.ujaen.uvirtual.modelo.conexion.ConexionUvirtual;
 import es.ujaen.uvirtual.utilidades.BolsaEmpleoDataTable;
 import es.ujaen.uvirtual.utilidades.BolsaEmpleoDataTable.DataTableColumn;
@@ -280,6 +281,24 @@ public class ModeloMeritosPreferentes {
 //		}
 	}
 	
+	
+	/**
+	 * Activa el merito. 
+	 * @param merito .
+	 * @param flgactivo .
+	 * @throws SQLException .
+	 */
+	public void cambiaFlagActivoMeritoPreferente(MeritoPreferente merito, String flgactivo) throws SQLException {
+		String query = "UPDATE TBEP_MERITOS_PREFERENTES SET FLGACTIVO = ? WHERE CODNUM IN ?";		
+		
+		try (Connection conexion = ConexionUvirtual.obtenerInstancia(); PreparedStatement stmt = conexion.prepareStatement(query)) {
+			int indexParam = 1;
+			stmt.setString(indexParam++, flgactivo);
+			stmt.setInt(indexParam++, merito.getCodNum());
+			stmt.executeUpdate();
+		}
+	}
+
 	
 	
 	private MeritoPreferente createApartadoFromResultSet(ResultSet rs) throws SQLException, UVException {

@@ -50,6 +50,8 @@ public class ControladorMeritosPreferentes extends HttpServlet {
 	public static final String ACCION_NUEVO_MERITO_CONFIRM = "nuevoMeritoConfirm";
 	public static final String ACCION_MODIFICAR_MERITO = "modificarMerito";
 	public static final String ACCION_MODIFICAR_MERITO_CONFIRM = "modificarMeritoConfirm";
+	public static final String ACCION_DESACTIVAR = "desactivarmerito";
+	public static final String ACCION_ACTIVAR = "activarmerito";
 			
 	// parámetros
 	public static final String PARAM_ACCION = "a";
@@ -114,6 +116,12 @@ public class ControladorMeritosPreferentes extends HttpServlet {
 					break;
 				case ACCION_MODIFICAR_MERITO_CONFIRM:
 					editarMeritoConfirm(bean, datos, request, response);
+					break;
+				case ACCION_ACTIVAR:
+					activarMerito(bean, datos, request, response);
+					break;
+				case ACCION_DESACTIVAR:
+					desactivarMerito(bean, datos, request, response);
 					break;
 			}
 		} catch (SQLException e) {
@@ -219,6 +227,26 @@ public class ControladorMeritosPreferentes extends HttpServlet {
 		bean.getMensajesDeExito().add("Mérito preferente editado correctamente");
 		bean.setVista(RUTA_BEP_CONF + "indexMeritosPreferentes.jsp");
 	}
+	
+	
+	private void activarMerito(VistaMeritosPreferentes bean, UVDatos datos, HttpServletRequest request, HttpServletResponse response) throws SQLException, UVException {
+		MeritoPreferente merito = ModeloMeritosPreferentes.obtenerInstancia().getMeritoPreferenteById(Formateador.leeParametroInteger(request.getParameter(PARAM_ID)));
+		
+		ModeloMeritosPreferentes.obtenerInstancia().cambiaFlagActivoMeritoPreferente(merito, "S");
+		bean.getMensajesDeExito().add("Mérito preferente activado correctamente");
+		bean.setVista(RUTA_BEP_CONF + "indexMeritosPreferentes.jsp");
+	}
+	
+	
+	private void desactivarMerito(VistaMeritosPreferentes bean, UVDatos datos, HttpServletRequest request, HttpServletResponse response) throws SQLException, UVException {
+		MeritoPreferente merito = ModeloMeritosPreferentes.obtenerInstancia().getMeritoPreferenteById(Formateador.leeParametroInteger(request.getParameter(PARAM_ID)));
+		
+		ModeloMeritosPreferentes.obtenerInstancia().cambiaFlagActivoMeritoPreferente(merito, "N");
+		bean.getMensajesDeExito().add("Mérito preferente desactivado correctamente");
+		bean.setVista(RUTA_BEP_CONF + "indexMeritosPreferentes.jsp");
+	}
+	
+	
 	
 	private MeritoPreferente validate(MeritoPreferente merito, HttpServletRequest request) throws UVException, SQLException {
 		merito.setDescripcion(EscapaHTML.ajustaCodificacion(request.getParameter(PARAM_MERITO_DESCRIPCION)));
