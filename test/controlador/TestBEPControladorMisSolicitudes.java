@@ -102,13 +102,34 @@ public class TestBEPControladorMisSolicitudes {
 		assertEquals(MENSAJE_SIN_ADVERTENCIAS, 0, bean.getMensajesDeAdvertencia().size());
 	}
 	
+	/** Obtener mis solicitudes, sin parametro definido .
+	 * @throws SQLException si fallo bd 
+	 * @throws IOException si error io
+	 * @throws ServletException  si error servlet
+	 */
+	@Test
+	public void testA02() throws SQLException, ServletException, IOException {
+		PeticionHttp peticion = UtilsTestBolsaEmpleo.peticionAutenticadaCandidato();
+		peticion.setParameter(ControladorMisSolicitudes.PARAM_ACCION, ControladorMisSolicitudes.ACCION_CONSULTAR_SOLICITUD);
+
+		RespuestaHttp respuesta = new RespuestaHttp();
+		ControladorMisSolicitudes controlador = new ControladorMisSolicitudes();
+		controlador.doGet(peticion, respuesta);
+		VistaSolicitudes bean = (VistaSolicitudes) peticion.getUVDatos().getVistas().get(VistaSolicitudes.class.getName());
+		
+		assertEquals(MENSAJE_SIN_ERROR, 0, bean.getMensajesDeError().size());
+		assertEquals(MENSAJE_SIN_ADVERTENCIAS, 0, bean.getMensajesDeAdvertencia().size());
+	}
+	
+	
+	
 	/** obtener datatable méritos de una bolsa .
 	 * @throws SQLException .
 	 * @throws ServletException .
 	 * @throws IOException .
 	 */
 	@Test
-	public void testA02ObtenerMeritos() throws SQLException, ServletException, IOException {
+	public void testA03ObtenerMeritos() throws SQLException, ServletException, IOException {
 		VistaSolicitudes bean = obtenerMeritosBolsa();
 		
 		assertNotEquals(MENSAJE_MERITOS_DEVUELTOS, 0, bean.getDataTableMeritos().getData().size());

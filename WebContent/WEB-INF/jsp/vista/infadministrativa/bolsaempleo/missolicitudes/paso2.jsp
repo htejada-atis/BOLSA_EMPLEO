@@ -128,10 +128,17 @@ VistaSolicitudes bean = (VistaSolicitudes) uvdatos.getVistas().get(VistaSolicitu
 				    				'<%= ControladorMisSolicitudes.PARAM_SOLICITUD_ID %>': '<%= bean.getSolicitud().getCodNum() %>',
 				    				'<%= ControladorMisSolicitudes.PARAM_MERITO %>': row.codNum,
 				    			};
+				    			
 				    			Atis.sendAjax("<%= request.getRequestURI() %>", params, function(data) {
 				    				tableAreas.refresh();
-				    			}, function(error) {
-				    				console.log(error);
+				    			}, function(data) {
+				    				var response = JSON.parse(data.responseText);
+				    				
+				    				// alert en caso de error
+				    				Atis.alertDialog("Error en la solicitud", response.descripcion);
+				    				
+				    				checkbox.checked = !checkbox.checked;
+				    				checkbox.checked ? $(checkbox).parent().parent().addClass("selected") : $(checkbox).parent().parent().removeClass("selected");
 				    			});
 				    		}
 			    		}
@@ -173,7 +180,11 @@ VistaSolicitudes bean = (VistaSolicitudes) uvdatos.getVistas().get(VistaSolicitu
 		
 		document.getElementById("paso2_siguiente").addEventListener("click", function(event) {
 			event.preventDefault();
-			
+			var params = {
+					'a': '<%= ControladorMisSolicitudes.ACCION_RESUMEN_SOLICITUD %>',
+					'<%= ControladorMisSolicitudes.PARAM_SOLICITUD_ID %>': '<%= bean.getSolicitud().getCodNum() %>'
+			};
+			Atis.sendForm("<%= request.getRequestURI() %>", params);
 		});
 		
 	});
