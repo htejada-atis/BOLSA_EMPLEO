@@ -1,20 +1,21 @@
 Listado de tablas con sus acrónimos y álias
 
-TBEP_APARTADOSBAREMACION            APA     bepapa
-TBEP_AREAS                          ARE     bepare
-TBEP_BLOQUESBAREMACION              BLO     bepblo
-TBEP_BOLSAS                         BOL     bepbol
-TBEP_CATEGORIABAREMACION            CAT     bepcat
-TBEP_CONVOCATORIAS                  CON     bepcon
-TBEP_DEPARTAMENTOS                  DEP     bepdep
-TBEP_FICHEROS                       FIC     bepfic
-TBEP_ITEMSBAREMACION                ITE     bepite
-TBEP_MERITOS                        MER     bepmer
-TBEP_MERITOSPREFERENTES             MEP     bepmep
-TBEP_NOTICIAS                       NOT     bepnot
-TBEP_SOLICITUDES                    SOL     bepsol
+TBEP_APARTADOSBAREMACION            APA     bepapa		ApartadoBaremacion
+TBEP_AREAS                          ARE     bepare		Area
+TBEP_BLOQUESBAREMACION              BLO     bepblo		BloqueBaremacion
+TBEP_BOLSAS                         BOL     bepbol		Bolsa, BolsaCandidato, BolsaSolicitud
+TBEP_CATEGORIABAREMACION            CAT     bepcat		
+TBEP_CONVOCATORIAS                  CON     bepcon		Convocatoria
+TBEP_DEPARTAMENTOS                  DEP     bepdep		Departamento
+TBEP_EVALUADORES					EVA		bepeva		Evaluador
+TBEP_FICHEROS                       FIC     bepfic		Fichero
+TBEP_ITEMSBAREMACION                ITE     bepite		ItemBaremacion
+TBEP_MERITOS                        MER     bepmer		Merito
+TBEP_MERITOSPREFERENTES             MEP     bepmep		
+TBEP_NOTICIAS                       NOT     bepnot		Noticia
+TBEP_SOLICITUDES                    SOL     bepsol		Solicitud
 TBEP_SOLICITUD_BOLSAS				SBO		bepsbo
-TBEP_SOLICITUD_BOLSAS_MERITOS		SBM     bepsbm
-TBEP_TITULACIONES                   TIT     beptit
-TBEP_TITULACIONES_PREFERENTES_AREA  TPA     beptpa
-TBEP_USUARIOS                       USU     bepusu
+TBEP_SOLICITUD_BOLSAS_MERITOS		SBM     bepsbm		MeritoSolicitud
+TBEP_TITULACIONES                   TIT     beptit		Titulacion
+TBEP_TITULACIONES_PREFERENTES_AREA  TPA		beptpa		TitulacionArea
+TBEP_USUARIOS                       USU     bepusu		UsuarioBolsaEmpleo
