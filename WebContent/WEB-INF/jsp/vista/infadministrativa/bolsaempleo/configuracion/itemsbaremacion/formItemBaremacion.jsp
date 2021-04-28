@@ -18,6 +18,10 @@ ApartadoBaremacion apartado = bean.getApartadoBaremacion();
 BloqueBaremacion bloque = bean.getBloqueBaremacion();
 ItemBaremacion item = bean.getItemBaremacion();
 String codigoCompleto = apartado.getCodigo() + "." + bloque.getCodigo() + "." + (item != null ? item.getCodigo() : bean.getUltimoCodigo());
+String descripcion = item.getDescripcion();
+if(descripcion==null){
+	descripcion = "";
+}
 %>
 
 
@@ -60,6 +64,15 @@ String codigoCompleto = apartado.getCodigo() + "." + bloque.getCodigo() + "." + 
 	    			   value="<%= BolsaEmpleoUtils.getParamForm(request, ControladorItemsBaremacion.PARAM_ITEM_NOMBRE, item != null ? item.getNombre() : "") %>"/>
 	    	</div>
 		</div>
+		
+		<div class="form-group-container col1">
+			<div class="form-group">
+    			<label for="descripcion">Descripción</label>
+    			<textarea class="params form-input-custom" id="descripcion" name="<%= ControladorItemsBaremacion.PARAM_ITEM_DESCRIPCION %>" rows="3" cols="60"><%= BolsaEmpleoUtils.getParamForm(request, ControladorItemsBaremacion.PARAM_ITEM_DESCRIPCION, item != null ? descripcion : "") %></textarea>
+   			</div>
+		</div>
+   		
+   		
 		<div class="form-group-container col2">
 			<div class="form-group">
 				<%

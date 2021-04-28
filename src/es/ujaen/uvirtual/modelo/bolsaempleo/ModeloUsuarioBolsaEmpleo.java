@@ -4,6 +4,7 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.Types;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
@@ -751,17 +752,14 @@ public class ModeloUsuarioBolsaEmpleo {
 	 * @throws SQLException .
 	 */
 	public void ponerUsuarioComoNoExcluido(UsuarioBolsaEmpleo usuario) throws SQLException {
-		String query = "UPDATE TBEP_USUARIOS SET FLGEXCLUIDO = ?, RAZON_EXCLUSION = ?, FECHA_EXCLUSION = ? WHERE CODNUM IN ?";			
-				
+		String query = "UPDATE TBEP_USUARIOS SET FLGEXCLUIDO = ?, RAZON_EXCLUSION = ?, FECHA_EXCLUSION = ? WHERE CODNUM IN ?";		
+		
 		try (Connection conexion = ConexionUvirtual.obtenerInstancia(); PreparedStatement stmt = conexion.prepareStatement(query)) {
 			int indexParam = 1;
 			stmt.setString(indexParam++, "N");
-			stmt.setString(indexParam++, "");
-			stmt.setString(indexParam++, null);
-			for (UsuarioBolsaEmpleo usuario : usuarios) {
-
-				stmt.setInt(indexParam++, usuario.getCodNum()); 	
-			}
+			stmt.setNull(indexParam++, Types.NULL);
+			stmt.setNull(indexParam++, Types.NULL);
+			stmt.setInt(indexParam++, usuario.getCodNum());
 			stmt.executeUpdate();
 		}
 	}

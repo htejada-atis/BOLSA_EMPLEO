@@ -110,11 +110,12 @@ $(document).ready(function() {
         				},
         		'onClick': function(row) {
     	    		if(row.excluido){
-    	    			Atis.confirmDialog("Incluir usuario", "¿Desea incluir a este usuario en la base de datos?", {
+    	    			Atis.confirmDialog("Incluir usuario", "&iquest;Desea incluir a este usuario en la base de datos?", {
     		            	Si: function() {
     		            		var params = {
     		            				'a': '<%=ControladorUsuarioBolsaEmpleo.ACCION_INCLUIR_USUARIO%>', 
-    		            				'<%=ControladorUsuarioBolsaEmpleo.PARAM_NOMBRE_USUARIO%>': row.codNum
+    		            				'<%= ControladorUsuarioBolsaEmpleo.PARAM_NOMBRE_USUARIO %>': row.codcuenta,
+    		            				'<%=ControladorUsuarioBolsaEmpleo.PARAM_ID%>': row.codNum
     		            			};
     		        			Atis.sendForm("<%= request.getRequestURI() %>", params);
     		              		$(this).dialog("close");
@@ -125,10 +126,11 @@ $(document).ready(function() {
     		          	});
     	    		}
     	    		else{
-    	    			Atis.confirmDialog("Excluir usuario", "¿Desea excluir a este usuario en la base de datos?", {
+    	    			Atis.confirmDialog("Excluir usuario", "&iquest;Desea excluir a este usuario en la base de datos?", {
     		            	Si: function() {
     		            		var params = {'a': '<%= ControladorUsuarioBolsaEmpleo.ACCION_EXCLUIR_USUARIO %>',
-    		            				'<%= ControladorUsuarioBolsaEmpleo.PARAM_NOMBRE_USUARIO %>': row.codcuenta
+    		            				'<%= ControladorUsuarioBolsaEmpleo.PARAM_NOMBRE_USUARIO %>': row.codcuenta,
+    		            				'<%= ControladorUsuarioBolsaEmpleo.PARAM_ID %>': row.codcuenta
     		            		};
     		        			Atis.sendForm("<%= request.getRequestURI() %>", params);
     		              		$(this).dialog("close");
@@ -156,17 +158,17 @@ $(document).ready(function() {
 		
 		switch(accion){
 			case('eliminarusuario'):
-        		var mensaje = "¿Desea borrar los usuarios seleccionados?";
+        		var mensaje = "&iquest;Desea borrar los usuarios seleccionados?";
     			var titulo = "Borrar Usuarios";
 			break;
 			case('excluirusuario'):
-        		var mensaje = "¿Desea excluir los usuarios seleccionados?";
+        		var mensaje = "&iquest;Desea excluir los usuarios seleccionados?";
     			var titulo = "Excluir Usuarios";
 			case('incluirusuario'):
-        		var mensaje = "¿Desea incluir los usuarios seleccionados?";
+        		var mensaje = "&iquest;Desea incluir los usuarios seleccionados?";
     			var titulo = "Incluir Usuarios";
 			case('recuperarusuario'):
-        		var mensaje = "¿Desea recuperar los usuarios seleccionados?";
+        		var mensaje = "&iquest;Desea recuperar los usuarios seleccionados?";
     			var titulo = "Recuperar Usuarios";
 			break;
 		}

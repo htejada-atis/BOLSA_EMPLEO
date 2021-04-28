@@ -61,6 +61,8 @@ VistaTitulaciones bean = (VistaTitulaciones) uvdatos.getVistas().get(VistaTitula
 function agregarTitulacion(event, submit_input) {
 	event.preventDefault();
 
+	document.getElementById("agregar_titulacion").disabled=true;
+	
 	input_accion = document.getElementById("accion_formulario");
 	input_accion.value = '<%= ControladorMisTitulaciones.ACCION_AGREGAR_TITULACION %>';
 	
