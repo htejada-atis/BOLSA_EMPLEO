@@ -108,7 +108,7 @@ VistaSolicitudes bean = (VistaSolicitudes) uvdatos.getVistas().get(VistaSolicitu
 						meritosBolsaSolicitud.push("<%=merito.getCodNum()%>");
 					<% }
 				} %>
-		
+				
 			var tableMeritos = new Atis.DataTable('#tableMeritos', {
 				"ajax": { url: "<%= ControladorMisSolicitudes.URL_PATTERN_AJAX %>" },
 			    "pageSize": 10,
