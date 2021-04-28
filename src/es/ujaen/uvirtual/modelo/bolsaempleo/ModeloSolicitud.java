@@ -11,6 +11,7 @@ import es.ujaen.uvirtual.beans.uvirtual.bolsaempleo.Bolsa;
 import es.ujaen.uvirtual.beans.uvirtual.bolsaempleo.BolsaSolicitud;
 import es.ujaen.uvirtual.beans.uvirtual.bolsaempleo.Convocatoria;
 import es.ujaen.uvirtual.beans.uvirtual.bolsaempleo.Merito;
+import es.ujaen.uvirtual.beans.uvirtual.bolsaempleo.MeritoSolicitud;
 import es.ujaen.uvirtual.beans.uvirtual.bolsaempleo.Solicitud;
 import es.ujaen.uvirtual.beans.uvirtual.bolsaempleo.UsuarioBolsaEmpleo;
 import es.ujaen.uvirtual.modelo.conexion.ConexionUvirtual;
@@ -538,4 +539,37 @@ public class ModeloSolicitud {
 		}
 	}
 	
+	/**
+	 * Devuelve un merito solicitud, el de un merito en una solicitud.
+	 * @param idMerito .
+	 * @param idSolicitudBolsa .
+	 * @return .
+	 * @throws SQLException .
+	 * @throws UVException .
+	 */
+	public MeritoSolicitud getMeritoSolicitudById(Integer idMerito, Integer idSolicitudBolsa) throws SQLException, UVException {
+		String consulta = "SELECT bepsbm.* FROM TBEP_SOLICITUD_BOLSAS_MERITOS bepsbm "
+				+ "WHERE 1=1 "
+				+ "AND bepsbm.BEPSBO_CODNUM = ? "
+				+ "AND bepsbm.BEPMER_CODNUM = ? ";
+			
+		try (Connection conexion = ConexionUvirtual.obtenerInstancia();
+				PreparedStatement stmt = conexion.prepareStatement(consulta);) {
+			stmt.setInt(1, idSolicitudBolsa);
+			stmt.setInt(2, idMerito);
+						
+			try (ResultSet rs = stmt.executeQuery()) {
+				if (!rs.next()) {
+					throw new UVException("No existe el merito de la solicitud");
+				}
+				
+				Merito merito = ModeloMerito.obtenerInstancia().getMeritoById(rs.getInt("BEPMER_CODNUM"), false, false);
+				MeritoSolicitud meritoSolicitud = new MeritoSolicitud(merito);
+				meritoSolicitud.setAfinidad(rs.getString("FLGAFINIDAD").equals("S"));
+				meritoSolicitud.setExcluido(rs.getString("FLGEXCLUIDO").equals("S"));
+				
+				return meritoSolicitud;
+			}
+		}
+	}
 }

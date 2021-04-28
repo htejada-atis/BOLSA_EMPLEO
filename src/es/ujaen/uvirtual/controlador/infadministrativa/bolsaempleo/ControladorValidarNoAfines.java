@@ -4,7 +4,6 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.sql.SQLException;
 import java.util.logging.Logger;
-import java.util.List;
 import java.util.logging.Level;
 
 import javax.servlet.ServletException;
@@ -18,13 +17,9 @@ import com.google.gson.GsonBuilder;
 
 import es.ujaen.uvirtual.beans.CodigoDescripcion;
 import es.ujaen.uvirtual.beans.UVDatos;
-import es.ujaen.uvirtual.beans.Usuario;
-import es.ujaen.uvirtual.beans.uvirtual.bolsaempleo.Area;
-import es.ujaen.uvirtual.beans.uvirtual.bolsaempleo.Bolsa;
+import es.ujaen.uvirtual.beans.uvirtual.bolsaempleo.BolsaValidacion;
 import es.ujaen.uvirtual.beans.uvirtual.bolsaempleo.Convocatoria;
-import es.ujaen.uvirtual.beans.vistas.uvirtual.bolsaempleo.VistaValidar;
 import es.ujaen.uvirtual.beans.vistas.uvirtual.bolsaempleo.VistaValidarNoAfines;
-import es.ujaen.uvirtual.modelo.bolsaempleo.ModeloArea;
 import es.ujaen.uvirtual.modelo.bolsaempleo.ModeloConvocatoria;
 import es.ujaen.uvirtual.modelo.bolsaempleo.ModeloUsuarioBolsaEmpleo;
 import es.ujaen.uvirtual.modelo.bolsaempleo.ModeloValidar;
@@ -34,11 +29,11 @@ import es.ujaen.uvirtual.utilidades.Formateador;
 import es.ujaen.uvirtual.utilidades.UVException;
 
 /**
- * Listado de bolsas y su estado.
+ * Validación meritos de bolsas no sujetos a afinidad.
  */
 @WebServlet(
 		name = "informacionadministrativa.bolsaempleo.validarnoafines", 
-		description = "Validación de méritos sujetos a afinidad", 
+		description = "Validación de méritos no sujetos a afinidad", 
 		urlPatterns = { 
 				"/srv/es/informacionadministrativa/bolsaempleo/validarnoafines", 
 				"/srv/en/informacionadministrativa/bolsaempleo/validarnoafines",
@@ -131,7 +126,8 @@ public class ControladorValidarNoAfines extends HttpServlet {
 		
 		try (PrintWriter writer = response.getWriter()) {
 			try {
-				BolsaEmpleoDataTable<Bolsa> dataTable = ModeloValidar.obtenerInstancia().listadoAreasNoSujetasAfinidad(convocatoria, request.getParameterMap());
+				BolsaEmpleoDataTable<BolsaValidacion> dataTable = ModeloValidar.obtenerInstancia().
+						listadoAreasNoSujetasAfinidad(convocatoria, request.getParameterMap());
 				Gson gson = new GsonBuilder().setExclusionStrategies(BolsaEmpleoDataTable.GSONEXCLUSIONSTRATEGY).create();
 				bean.setDatatable(dataTable);
 				writer.write(gson.toJson(dataTable));
