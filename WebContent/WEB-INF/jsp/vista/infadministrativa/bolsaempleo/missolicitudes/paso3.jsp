@@ -109,7 +109,8 @@ VistaSolicitudes bean = (VistaSolicitudes) uvdatos.getVistas().get(VistaSolicitu
 		<% } else { %>
 			$('#paso3_descargar').on('click', function(event) {
 				event.preventDefault();
-				console.log("genera pdf y descargar");
+				window.open("<%= request.getRequestURI() %>"
+			        	+ "?a=<%= ControladorMisSolicitudes.ACCION_DESCARGAR_PDF %>&<%= ControladorMisSolicitudes.PARAM_SOLICITUD_ID %>=" + '<%= bean.getSolicitud().getCodNum() %>');			
 			});
 		<% } %>
 	});
