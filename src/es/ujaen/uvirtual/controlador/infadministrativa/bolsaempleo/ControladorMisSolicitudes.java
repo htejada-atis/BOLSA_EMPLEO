@@ -42,7 +42,9 @@ import es.ujaen.uvirtual.utilidades.Formateador;
 import es.ujaen.uvirtual.utilidades.UVException;
 
 import com.lowagie.text.Cell;
+import com.lowagie.text.Chunk;
 import com.lowagie.text.Document;
+import com.lowagie.text.FontFactory;
 import com.lowagie.text.PageSize;
 import com.lowagie.text.Paragraph;
 import com.lowagie.text.pdf.PdfWriter;
@@ -354,9 +356,8 @@ public class ControladorMisSolicitudes extends HttpServlet {
 		ModeloArea modeloArea = ModeloArea.obtenerInstancia();
 		
 		Solicitud solicitud = modeloSolicitud.getSolicitudById(Formateador.leeParametroInteger(request.getParameter(PARAM_SOLICITUD_ID)));
-		bean.setSolicitud(solicitud);
-		
-		listaBolsas(bean, solicitud);
+		bean.setSolicitud(solicitud);		
+		listaBolsas(bean, solicitud);	
 		
 		List<String> idBolsas = null;
 			
@@ -387,13 +388,8 @@ public class ControladorMisSolicitudes extends HttpServlet {
 			throw new UVException("Número de bolsas seleccionada no valido");
 		}
 		
-		
-		try {
-			// añadimos las bolsas a la solicitud
-			modeloSolicitud.asignarBolsasASolicitud(solicitud, bolsas);
-		} catch (SQLIntegrityConstraintViolationException e) {
-			throw new SQLIntegrityConstraintViolationException(MENSAJE_ERROR_BORRAR_BOLSA);
-		}
+		// añadimos las bolsas a la solicitud
+		modeloSolicitud.asignarBolsasASolicitud(solicitud, bolsas);
 		
 		bean.setVista(RUTA_BEP_SOL + "paso2.jsp");
 	}
@@ -631,10 +627,7 @@ public class ControladorMisSolicitudes extends HttpServlet {
 		
 		try (PrintWriter writer = response.getWriter()) {
 			try {
-				Usuario usuArcos = datos.getUsuario();
-				ModeloUsuarioBolsaEmpleo modeloUsuarioBolsaEmpleo = ModeloUsuarioBolsaEmpleo.obtenerInstancia();
-				Integer idUsuario = modeloUsuarioBolsaEmpleo.listaUsuario(usuArcos.getUid()).getCodNum();
-				BolsaEmpleoDataTable<MeritoSolicitud> dataTable = modelo.listaMeritosSolicitudDatatable(request.getParameterMap(), idUsuario);
+				BolsaEmpleoDataTable<MeritoSolicitud> dataTable = modelo.listaMeritosSolicitudDatatable(request.getParameterMap(), this.usuario);
 				bean.setDataTableMeritos(dataTable);
 				Gson gson = new GsonBuilder().setExclusionStrategies(BolsaEmpleoDataTable.GSONEXCLUSIONSTRATEGY).create();
 				writer.write(gson.toJson(dataTable));
@@ -648,103 +641,143 @@ public class ControladorMisSolicitudes extends HttpServlet {
 		}
 	}
 	
-	
-	
+	/**
+	 * descarga de pdf .
+	 * 
+	 * @param response .
+	 * @param datos    .
+	 * @param bean     .
+	 * @param request  .
+	 * @throws UVException
+	 * @throws SQLException
+	 * @throws IOException  .
+	 * @throws SQLException .
+	 * @throws UVException  .
+	 */
+	public void descargarPDF(VistaSolicitudes bean, UVDatos datos, HttpServletRequest request,
+			HttpServletResponse response) throws SQLException, UVException {
+		
+		bean.setVista(RUTA_BEP_SOL + "resumenError.jsp");
+		ModeloSolicitud modeloSolicitud = ModeloSolicitud.obtenerInstancia();
+		
+		Solicitud solicitud = modeloSolicitud.getSolicitudById(Formateador.leeParametroInteger(request.getParameter(PARAM_SOLICITUD_ID)));
+		System.out.println(solicitud);
+		
+		if (this.usuario.getCodNum() != solicitud.getUsuario().getCodNum()) {
+			throw new UVException("No tienes permisos");
+		}
+		
+		List<BolsaSolicitud> listaBolsas = modeloSolicitud.getBolsasSolicitudMeritos(solicitud);
+		
+		exportar(response, solicitud, listaBolsas);
+		
+		response.setContentType("application/pdf");
+		datos.setRespuestaEnviada(true);
+	}
 	
 	/** exportar .
 	 * @param response .
-	 * @param bean .
-	 * @param request .
+	 * @param bolsasSolicitud .
+	 * @throws UVException . 
 	 * @throws IOException .
 	 * @throws SQLException .
 	 * @throws UVException .
 	 */
-	  public void exportar(VistaSolicitudes bean, HttpServletRequest request, HttpServletResponse response) {
-		  try {
-			  
-				Integer codNum = Formateador.leeParametroInteger(request.getParameter(PARAM_SOLICITUD_ID));
-				ModeloSolicitud modelo = ModeloSolicitud.obtenerInstancia(); 
-				
-				Solicitud solicitud = modelo.getSolicitudById(codNum);
-			    Document document = new Document();
+	public void exportar(HttpServletResponse response, Solicitud solicitud, List<BolsaSolicitud> bolsasSolicitud) throws UVException {
+		try {
+			Document document = new Document();
 
-			    //create a PDF writer instance and pass output stream
-			    PdfWriter writer = PdfWriter.getInstance(document, response.getOutputStream());
+			// create a PDF writer instance and pass output stream
+			PdfWriter writer = PdfWriter.getInstance(document, response.getOutputStream());
 
-			    document.open();
-			    document.addAuthor(this.usuario.getNombre() + this.usuario.getPrimerApellido() + this.usuario.getSegundoApellido());
-			    document.addTitle("Solicitud_" + solicitud.getConvocatoria().getDescripcion());
-			    document.addCreationDate();
+			document.open();
+			document.addAuthor(this.usuario.getNombre() + " " + this.usuario.getPrimerApellido() + " " + this.usuario.getSegundoApellido());
+			document.addTitle("Solicitud_" + solicitud.getConvocatoria().getDescripcion());
+			document.addCreationDate();
 
-			    document.add(new Paragraph("Usuario : " + this.usuario.getNombre() + this.usuario.getPrimerApellido() + this.usuario.getSegundoApellido()));
-			    document.add(new Paragraph("Convocatoria : " + solicitud.getConvocatoria().getDescripcion()));
-			    document.add(new Paragraph("Fecha confirmación de solicitud : " + solicitud.getEstado()));
-			    
-			    
-			    bean.getListaBolsas().size();
-			    
-			    document.newPage();
-				
-				Table table2 = new Table(PDF_TABLE_COLUMNS, 4); // 4 columns, 2 rows
-				table2.setBorderWidth(1);
-				table2.setBorderColor(new Color(0, 0, 255));
-				table2.setPadding(5);
-				table2.setSpacing(5);
-				 Cell cell = new Cell("header");
-				 cell.setHeader(true);
-				 cell.setColspan(3);
-				 table2.addCell(cell);
-				 table2.endHeaders();
-				 cell = new Cell("example cell with colspan 1 and rowspan 2");
-				 cell.setRowspan(2);
-				 cell.setBorderColor(new Color(255, 0, 0));
-				 table2.addCell(cell);
-				 table2.addCell("1.1");
-				 table2.addCell("2.1");
-				 table2.addCell("1.2");
-				 table2.addCell("2.2");
-				 table2.addCell("cell test1");
-				 cell = new Cell("big cell");
-				 cell.setRowspan(2);
-				 cell.setColspan(2);
-				 table2.addCell(cell);
-				 table2.addCell("cell test2");
-				
-				
-					document.add(table2);
-					document.add(new Paragraph("converted to PdfPTable:"));
-					table2.setConvert2pdfptable(true);
-					document.add(table2);
-				
-				
-				
-				
-				
-				
-				
-				
+			document.add(new Paragraph(new Chunk("SOLICITUD", FontFactory.getFont(FontFactory.HELVETICA, 40))));
+			document.add(new Paragraph("Usuario: " + this.usuario.getNombre() + " " + this.usuario.getPrimerApellido() + " " 
+					+ this.usuario.getSegundoApellido()));
+			document.add(new Paragraph("Convocatoria: " + solicitud.getConvocatoria().getDescripcion()));
+			document.add(new Paragraph("Fecha confirmación de solicitud: " 
+					+ Formateador.formatoFecha(solicitud.getFechaConfirmacion(), Formateador.FORMATO_FECHA_DDMMYYYY_HHMMSS)));
 
-			    document.close();
-			    
-			 } catch (Exception exp) {
-			    System.out.println(exp.getMessage());
-			 }
-	  }
-	
-	
-	/** descarga de pdf .
-	 * @param response .
-	 * @param datos .
-	 * @param bean .
-	 * @param request .
-	 * @throws IOException .
-	 * @throws SQLException .
-	 * @throws UVException .
-	 */
-	  public void descargarPDF(VistaSolicitudes bean, UVDatos datos, HttpServletRequest request, HttpServletResponse response) {
-		  response.setContentType("application/pdf");
-	      datos.setRespuestaEnviada(true);
-	      exportar(bean, request, response);    
-	  }
+			document.add(new Paragraph(" ")); // no se meter espacio
+			
+			// document.newPage();
+			
+			for (BolsaSolicitud bolsa: bolsasSolicitud) {
+				document.add(new Paragraph("Área - " + bolsa.getArea().getDescripcion()));
+				
+				Table table = new Table(PDF_TABLE_COLUMNS, 4);
+				table.setBorderWidth(1);
+				table.setBorderColor(new Color(0, 0, 0));
+				
+				Cell cell = new Cell("Cod. Mérito");
+				cell.setHeader(true);
+				table.addCell(cell);
+				cell = new Cell("Mérito");
+				cell.setHeader(true);
+				table.addCell(cell);
+				cell = new Cell("Valor");
+				cell.setHeader(true);
+				table.addCell(cell);
+				cell = new Cell("Descripción");
+				cell.setHeader(true);
+				table.addCell(cell);
+				table.endHeaders();
+				
+				if (bolsa.getListaMeritos() != null && bolsa.getListaMeritos().size() > 0) {
+					for (Merito merito: bolsa.getListaMeritos()) {
+						String codigoItem = merito.getItemBaremacion().getBloqueBaremacion().getApartadoBaremacion().getCodigo() + "." 
+								+ merito.getItemBaremacion().getBloqueBaremacion().getCodigo() + "." + merito.getItemBaremacion().getCodigo();
+						table.addCell(codigoItem);
+						table.addCell(merito.getItemBaremacion().getNombre());
+						table.addCell(merito.getValor().toString());
+						table.addCell(merito.getDescripcion().toString());
+					}
+				}
+				
+				document.add(table);
+				
+			}
+//
+//			Table table2 = new Table(PDF_TABLE_COLUMNS, 4); // 4 columns, 2 rows
+//			table2.setBorderWidth(1);
+//			table2.setBorderColor(new Color(0, 0, 255));
+//			table2.setPadding(5);
+//			table2.setSpacing(5);
+//			Cell cell = new Cell("header");
+//			cell.setHeader(true);
+//			cell.setColspan(3);
+//			table2.addCell(cell);
+//			table2.endHeaders();
+//			cell = new Cell("example cell with colspan 1 and rowspan 2");
+//			cell.setRowspan(2);
+//			cell.setBorderColor(new Color(255, 0, 0));
+//			table2.addCell(cell);
+//			table2.addCell("1.1");
+//			table2.addCell("2.1");
+//			table2.addCell("1.2");
+//			table2.addCell("2.2");
+//			table2.addCell("cell test1");
+//			cell = new Cell("big cell");
+//			cell.setRowspan(2);
+//			cell.setColspan(2);
+//			table2.addCell(cell);
+//			table2.addCell("cell test2");
+//
+//			document.add(table2);
+//			document.add(new Paragraph("converted to PdfPTable:"));
+//			table2.setConvert2pdfptable(true);
+//			document.add(table2);
+
+			document.close();
+
+		} catch (Exception exp) {
+			System.out.println(exp.getMessage());
+			throw new UVException("Error generando pdf, consulte con los administradores");
+		}
+	}
 	
 }
