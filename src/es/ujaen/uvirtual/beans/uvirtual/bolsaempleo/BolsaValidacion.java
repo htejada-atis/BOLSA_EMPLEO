@@ -9,10 +9,9 @@ import java.util.List;
 public class BolsaValidacion extends Bolsa implements Serializable {
 
 	private static final long serialVersionUID = 1L;
-	private Integer meritosNoValidados;
-	private Integer meritosValidados;
-	private Integer meritosExcluidos;
-	private Integer meritosTotal;
+	private Integer totalMeritosNoValidados;
+	private Integer totalMeritosValidados;
+	private Integer totalMeritosExcluidos;
 	
 	/** Constructor por defecto.
 	 */
@@ -25,14 +24,12 @@ public class BolsaValidacion extends Bolsa implements Serializable {
 	 * @param pmeritosNoValidados .
 	 * @param pmeritosValidados .
 	 * @param pmeritosExcluidos .
-	 * @param pmeritosTotal .
 	 */
-	public BolsaValidacion(Bolsa pbolsa, Integer pmeritosNoValidados, Integer pmeritosValidados, Integer pmeritosExcluidos, Integer pmeritosTotal) {
+	public BolsaValidacion(Bolsa pbolsa, Integer pmeritosNoValidados, Integer pmeritosValidados, Integer pmeritosExcluidos) {
 		super(pbolsa);
-		this.meritosNoValidados = pmeritosNoValidados;
-		this.meritosValidados = pmeritosValidados;
-		this.meritosExcluidos = pmeritosExcluidos;
-		this.meritosTotal = pmeritosTotal;
+		this.totalMeritosNoValidados = pmeritosNoValidados;
+		this.totalMeritosValidados = pmeritosValidados;
+		this.totalMeritosExcluidos = pmeritosExcluidos;		
 	}
 	
 	/** Constructor copia.
@@ -40,23 +37,30 @@ public class BolsaValidacion extends Bolsa implements Serializable {
 	 */
 	public BolsaValidacion(BolsaValidacion copia) {
 		super(copia);
-		this.meritosNoValidados = copia.meritosNoValidados;
-		this.meritosValidados = copia.meritosValidados;
-		this.meritosExcluidos = copia.meritosExcluidos;
-		this.meritosTotal = copia.meritosTotal;		
+		this.totalMeritosNoValidados = copia.totalMeritosNoValidados;
+		this.totalMeritosValidados = copia.totalMeritosValidados;
+		this.totalMeritosExcluidos = copia.totalMeritosExcluidos;
 	}
 	
 	public Integer getMeritosNoValidados() {
-		return this.meritosNoValidados;
+		return this.totalMeritosNoValidados;
 	}
 	
 	public void setMeritosNoValidados(Integer v) {
-		meritosNoValidados = v;
+		totalMeritosNoValidados = v;
+	}
+	
+	/**
+	 * Devuelve el total de meritos.
+	 * @return total.
+	 */
+	public Integer getTotalMeritos() {
+		return totalMeritosNoValidados + totalMeritosValidados + totalMeritosExcluidos;
 	}
 	
 	@Override
 	public String toString() {
-		return "BolsaSolicitud [meritosNoValidados=" + meritosNoValidados + "]";
+		return "BolsaSolicitud [bolsa=" + super.toString() + ", meritosNoValidados=" + totalMeritosNoValidados + "]";
 	}
 	
 	@Override
@@ -64,10 +68,9 @@ public class BolsaValidacion extends Bolsa implements Serializable {
 		final int prime = 31;
 		int result = 1;
 		result = prime * super.hashCode();
-		result = prime * result + ((meritosNoValidados == null) ? 0 : meritosNoValidados.hashCode());
-		result = prime * result + ((meritosValidados == null) ? 0 : meritosValidados.hashCode());
-		result = prime * result + ((meritosExcluidos == null) ? 0 : meritosExcluidos.hashCode());
-		result = prime * result + ((meritosTotal == null) ? 0 : meritosTotal.hashCode());
+		result = prime * result + ((totalMeritosNoValidados == null) ? 0 : totalMeritosNoValidados.hashCode());
+		result = prime * result + ((totalMeritosValidados == null) ? 0 : totalMeritosValidados.hashCode());
+		result = prime * result + ((totalMeritosExcluidos == null) ? 0 : totalMeritosExcluidos.hashCode());
 		return result;
 	}
 
@@ -89,32 +92,25 @@ public class BolsaValidacion extends Bolsa implements Serializable {
 			return false;
 		}
 
-		if (meritosNoValidados == null) {
-			if (other.meritosNoValidados != null) {
+		if (totalMeritosNoValidados == null) {
+			if (other.totalMeritosNoValidados != null) {
 				return false;
 			}
-		} else if (!meritosNoValidados.equals(other.meritosNoValidados)) {
+		} else if (!totalMeritosNoValidados.equals(other.totalMeritosNoValidados)) {
 			return false;
 		}
-		if (meritosValidados == null) {
-			if (other.meritosValidados != null) {
+		if (totalMeritosValidados == null) {
+			if (other.totalMeritosValidados != null) {
 				return false;
 			}
-		} else if (!meritosValidados.equals(other.meritosValidados)) {
+		} else if (!totalMeritosValidados.equals(other.totalMeritosValidados)) {
 			return false;
 		}
-		if (meritosExcluidos == null) {
-			if (other.meritosExcluidos != null) {
+		if (totalMeritosExcluidos == null) {
+			if (other.totalMeritosExcluidos != null) {
 				return false;
 			}
-		} else if (!meritosExcluidos.equals(other.meritosExcluidos)) {
-			return false;
-		}
-		if (meritosTotal == null) {
-			if (other.meritosTotal != null) {
-				return false;
-			}
-		} else if (!meritosTotal.equals(other.meritosTotal)) {
+		} else if (!totalMeritosExcluidos.equals(other.totalMeritosExcluidos)) {
 			return false;
 		}
 		
