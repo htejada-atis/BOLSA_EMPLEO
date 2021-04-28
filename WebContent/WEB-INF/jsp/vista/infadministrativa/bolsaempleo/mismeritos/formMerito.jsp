@@ -108,6 +108,7 @@ String observacion = BolsaEmpleoUtils.getParamForm(request, ControladorMisMerito
 	function agregarMerito(event, submit_input) {
 		event.preventDefault();
 		
+		document.getElementById("merito_enviar").disabled=true;
 		input_accion = document.getElementById("accion_formulario");
 		input_accion.value = '<%= ControladorMisMeritos.ACCION_AGREGAR_MERITO %>';
 		submit_input.form.submit();

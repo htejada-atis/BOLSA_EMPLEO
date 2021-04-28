@@ -36,7 +36,7 @@ VistaTitulaciones bean = (VistaTitulaciones) uvdatos.getVistas().get(VistaTitula
 			<th scope="col" style="width:10%"></th>
 			<th scope="col" style="width:60%">Titulación</th>		
 			<th scope="col" style="width:40%">Descripción</th>		
-			<th scope="col" class="center" style="width:15%">Archivo</th>		
+			<th scope="col" style="width:15%"></th>		
 		</tr>
 		<tbody>				
 		</tbody>
@@ -81,18 +81,17 @@ $(document).ready(function() {
 		"selectable": true,
 	    "filterable": true,
 	    "pageSize": 10,
-	    "title": 'Titulaciones',
 	    "action": "<%=ControladorMisTitulaciones.ACCION_DATATABLE_TITULACIONES_USUARIO%>",
 	    "columns": [
 	    	{'data': 'codNum', 'selectable': true},
 	        {'data': 'nombre', 'class': 'overflow-auto', 'filter': {'type': 'text'}},
 	    	{'data': 'descripcion'},
-	        {'data': 'codnum', 'order': {'active': false}, 'class': 'overflow-ellipsis', 'render': function(row) {
-	        	var link = "<%= ControladorMisTitulaciones.URL_PATTERN_FILES_PRIVADA %>"
-	        	+ "?a=<%= ControladorMisTitulaciones.ACCION_DESCARGAR_FICHERO %>&<%= ControladorMisTitulaciones.PARAM_FICHERO %>=" + row.codNum;
-	        	return "<a class='consultar-fichero' title='Descargar fichero' href='" +link +"' target='_blank'>Descargar</a>"; 
-	        	}
-	        }
+        	{'data': 'codnum', 'buttons': [
+        		{'label': 'Descargar', 'onClick': function(row) {
+        			window.open("<%= ControladorMisTitulaciones.URL_PATTERN_FILES_PRIVADA %>"
+        		        	+ "?a=<%= ControladorMisTitulaciones.ACCION_DESCARGAR_FICHERO %>&<%= ControladorMisTitulaciones.PARAM_FICHERO %>=" + row.codNum);
+        		}},
+   			]}	
 	    ],
 	    "actions": [
 	    	{'label': 'Borrar', 'onClick': function(selected) { enviaAccion("<%=ControladorMisTitulaciones.ACCION_ELIMINAR_TITULACION_USUARIO%>", selected); } }   	

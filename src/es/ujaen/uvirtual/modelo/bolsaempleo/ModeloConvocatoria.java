@@ -210,6 +210,30 @@ public class ModeloConvocatoria {
 		}
 	}
 	
+	/**
+	 * Devuelve numero de solicitudes asociadas a convocatoria .
+	 * @param codNum .
+	 * @return Convocatoria o null si no existe
+	 * @throws SQLException .
+	 */
+	public Integer getNumSolicitudesByConvocatoriaId(int codNum) throws SQLException, UVException {
+		String consulta = "SELECT COUNT(*) AS total "
+				+ "FROM TBEP_SOLICITUDES bepsol WHERE bepsol.BEPCON_CODNUM = ?";
+			
+		try (Connection conexion = ConexionUvirtual.obtenerInstancia();
+				PreparedStatement stmt = conexion.prepareStatement(consulta);) {
+			
+			stmt.setInt(1, codNum);
+			try (ResultSet rs = stmt.executeQuery()) {
+				while (rs.next()) {
+					return rs.getInt("total");				
+				}	
+			}
+		}
+		return null;
+	}
+	
+	
 	/** Actualiza una convocatoria.
 	 * @param conv Convocatoria con los datos nuevos a actualizar
 	 * @throws SQLException en caso de error en la BD

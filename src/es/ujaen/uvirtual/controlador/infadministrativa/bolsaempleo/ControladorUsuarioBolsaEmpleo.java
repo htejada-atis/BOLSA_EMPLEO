@@ -440,7 +440,7 @@ public class ControladorUsuarioBolsaEmpleo extends HttpServlet {
 		
 		obtenerRoles(bean);
 		
-		UsuarioBolsaEmpleo usu = modelo.listaUsuario(Formateador.leeParametroString(request.getParameter(PARAM_NOMBRE_USUARIO)));
+		UsuarioBolsaEmpleo usu = modelo.getUsuarioByCodCuenta(Formateador.leeParametroString(request.getParameter(PARAM_NOMBRE_USUARIO)));
 		Usuario usuArcos = CrearUsuario.usuario(request.getParameter(PARAM_NOMBRE_USUARIO));
 		
 		bean.setBusqueda(false);
@@ -500,21 +500,11 @@ public class ControladorUsuarioBolsaEmpleo extends HttpServlet {
 		obtenerRoles(bean);
 		
 		UsuarioBolsaEmpleo usu = modelo.getUsuarioById(Formateador.leeParametroInteger(request.getParameter(PARAM_ID)));
-
-			Integer codNum = Formateador.leeParametroInteger(request.getParameter(PARAM_ID));
-			Boolean excluido = true;
-					
-			String razonexcluido = EscapaHTML.ajustaCodificacion(request.getParameter(PARAM_RAZON_EXCLUIDO));
 			
-			SimpleDateFormat formatter = new SimpleDateFormat("dd/MM/YYYY HH:mm:ss");
-			Date date = new Date(System.currentTimeMillis());
-			
-			UsuarioBolsaEmpleo usuario = new UsuarioBolsaEmpleo(codNum, excluido, razonexcluido, date);
-			
-			modelo.ponerUsuarioComoExcluido(usuario);
-			HttpSession session = request.getSession(false);
-			session.setAttribute(MENSAJE_ENVIADO, MENSAJE_EXITO_EDITAR);
-			response.sendRedirect(request.getServletPath());
+		modelo.ponerUsuarioComoNoExcluido(usu);
+		HttpSession session = request.getSession(false);
+		session.setAttribute(MENSAJE_ENVIADO, MENSAJE_EXITO_EDITAR);
+		response.sendRedirect(request.getServletPath());
 	}
 	
 	

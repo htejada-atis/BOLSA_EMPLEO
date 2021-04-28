@@ -89,7 +89,7 @@ VistaNoticias bean = (VistaNoticias) uvdatos.getVistas().get(VistaNoticias.class
 	        			return "<div title='Privada' class='circle-false'></div>"; 
 	        		}
 	        	}},
-		        {'data': 'activa', 'order': {'active': false}, 'filter': {'type': 'selectBoolean', 'true': 'Activa', 'false': 'Inactiva'}, 'render': function(row) {
+		        {'data': 'activa', 'order': {'active': false}, 'filter': {'type': 'select', 'options':{'true': 'Activa', 'false': 'Inactiva'}, 'optionDefault': 'true'}, 'render': function(row) {
 	        		if(row.activa){
 	        			return "<div title='Activa' class='circle-true'></div>"; 
 	        		}
