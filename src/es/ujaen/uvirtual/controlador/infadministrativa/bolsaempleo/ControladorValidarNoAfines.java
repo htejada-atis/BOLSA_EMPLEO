@@ -34,11 +34,11 @@ import es.ujaen.uvirtual.utilidades.Formateador;
 import es.ujaen.uvirtual.utilidades.UVException;
 
 /**
- * Listado de bolsas y su estado.
+ * Validación meritos de bolsas no sujetos a afinidad.
  */
 @WebServlet(
 		name = "informacionadministrativa.bolsaempleo.validarnoafines", 
-		description = "Validación de méritos sujetos a afinidad", 
+		description = "Validación de méritos no sujetos a afinidad", 
 		urlPatterns = { 
 				"/srv/es/informacionadministrativa/bolsaempleo/validarnoafines", 
 				"/srv/en/informacionadministrativa/bolsaempleo/validarnoafines",

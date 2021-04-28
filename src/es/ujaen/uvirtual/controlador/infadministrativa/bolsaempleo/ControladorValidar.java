@@ -29,7 +29,7 @@ import es.ujaen.uvirtual.utilidades.Formateador;
 import es.ujaen.uvirtual.utilidades.UVException;
 
 /**
- * Listado de bolsas y su estado.
+ * Validación de meritos de bolsas sujetas a afinidad.
  */
 @WebServlet(
 		name = "informacionadministrativa.bolsaempleo.validar", 
