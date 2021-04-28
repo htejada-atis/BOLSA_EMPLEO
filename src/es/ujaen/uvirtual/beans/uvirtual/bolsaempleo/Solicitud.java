@@ -1,6 +1,7 @@
 package es.ujaen.uvirtual.beans.uvirtual.bolsaempleo;
 
 import java.io.Serializable;
+import java.util.Date;
 
 
 /** Clase solicitud de bolsa empleo.
@@ -12,6 +13,7 @@ public class Solicitud implements Serializable {
 	private UsuarioBolsaEmpleo usuario;
 	private Convocatoria convocatoria;
 	private String estado;
+	private Date fechaConfirmacion;
 	
 	/** Constructor por defecto.
 	 */
@@ -75,13 +77,22 @@ public class Solicitud implements Serializable {
 		this.estado = estado;
 	}
 	
+	public Date getFechaConfirmacion() {
+		return fechaConfirmacion;
+	}
+	
+	public void setFechaConfirmacion(Date fecha) {
+		this.fechaConfirmacion = fecha;
+	}
+	
 	public static long getSerialversionuid() {
 		return serialVersionUID;
 	}
 	
 	@Override
 	public String toString() {
-		return "Solicitud [codNum=" + codNum + ", usuario=" + usuario + ", convocatoria=" + convocatoria + ", estado=" + estado + "]";
+		return "Solicitud [codNum=" + codNum + ", usuario=" + usuario + ", convocatoria=" 
+					+ convocatoria + ", estado=" + estado + ", fechaConfirmacion=" + fechaConfirmacion + "]";
 	}
 	
 	@Override
@@ -91,7 +102,8 @@ public class Solicitud implements Serializable {
 		result = prime * result + ((codNum == null) ? 0 : codNum.hashCode());
 		result = prime * result + ((usuario == null) ? 0 : usuario.hashCode());
 		result = prime * result + ((convocatoria == null) ? 0 : convocatoria.hashCode());
-		result = prime * result + ((estado == null) ? 0 : estado.hashCode());		
+		result = prime * result + ((estado == null) ? 0 : estado.hashCode());
+		result = prime * result + ((fechaConfirmacion == null) ? 0 : fechaConfirmacion.hashCode());
 		return result;
 	}
 	
@@ -134,6 +146,13 @@ public class Solicitud implements Serializable {
 				return false;
 			}
 		} else if (!estado.equals(other.estado)) {
+			return false;
+		}
+		if (fechaConfirmacion == null) {
+			if (other.fechaConfirmacion != null) {
+				return false;
+			}
+		} else if (!fechaConfirmacion.equals(other.fechaConfirmacion)) {
 			return false;
 		}
 		
