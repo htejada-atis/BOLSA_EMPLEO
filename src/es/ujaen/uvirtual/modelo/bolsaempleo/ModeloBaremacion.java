@@ -199,7 +199,7 @@ public class ModeloBaremacion {
 		this.chequearApartadoParaInsertarOActualizar(apartado);
 		
 		String consulta = "INSERT INTO TBEP_APARTADOSBAREMACION (CODIGO,NOMBRE,FLGACTIVO,PUNTUACIONMAXIMA,PORCENTAJEMAXIMO) "
-				+ " VALUES (?,?,?,?,?,?,?)";
+				+ " VALUES (?,?,?,?,?)";
 		
 		try (Connection conexion = ConexionUvirtual.obtenerInstancia(); PreparedStatement stmt = conexion.prepareStatement(consulta);) {
 			int parameterIndex = 1;

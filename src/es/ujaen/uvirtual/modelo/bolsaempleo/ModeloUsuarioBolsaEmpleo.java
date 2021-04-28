@@ -747,12 +747,11 @@ public class ModeloUsuarioBolsaEmpleo {
 	
 	/**
 	 * Establece el usuario como NO excluido. 
-	 * @param usuarios .
+	 * @param usuario .
 	 * @throws SQLException .
 	 */
-	public void ponerUsuarioComoNoExcluido(List<UsuarioBolsaEmpleo> usuarios) throws SQLException {
-		String params = BolsaEmpleoUtils.consultaMultiplesParametros(usuarios.size());
-		String query = "UPDATE TBEP_USUARIOS SET FLGEXCLUIDO = ?, RAZON_EXCLUSION = ? , FECHA_EXCLUSION = ? WHERE CODNUM IN (" + params + ")";		
+	public void ponerUsuarioComoNoExcluido(UsuarioBolsaEmpleo usuario) throws SQLException {
+		String query = "UPDATE TBEP_USUARIOS SET FLGEXCLUIDO = ?, RAZON_EXCLUSION = ?, FECHA_EXCLUSION = ? WHERE CODNUM IN ?";			
 				
 		try (Connection conexion = ConexionUvirtual.obtenerInstancia(); PreparedStatement stmt = conexion.prepareStatement(query)) {
 			int indexParam = 1;
