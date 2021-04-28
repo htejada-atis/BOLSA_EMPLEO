@@ -18,6 +18,7 @@ public class UtilsTestBolsaEmpleo {
 	private static final String NOMBREDEESTACLASE = UtilsTestBolsaEmpleo.class.getName();
 	private static final Logger LOGGER = Logger.getLogger(NOMBREDEESTACLASE);
 	private static final String UID_PRUEBAS = "usig";
+	private static final String UID_CANDIDATO_PRUEBAS = "candidato1";
 	private static final int LONGITUD_NAME_SQL = 3;
 
 	private UtilsTestBolsaEmpleo() { }
@@ -62,6 +63,22 @@ public class UtilsTestBolsaEmpleo {
 		datos.setIdentificadorUsuario(UID_PRUEBAS);
 		
 		Usuario usuario = CrearUsuario.usuario(UID_PRUEBAS);
+		datos.setUsuario(usuario);
+		
+		PeticionHttp peticion = new PeticionHttp();
+		peticion.setUVDatos(datos);
+		
+		return peticion;
+    }
+    
+    /** obtiene una peticion autenticada con el usuario candidato1 de pruebas de BolsaEmpleo.
+     * @return peticion autenticada
+     */
+    public static PeticionHttp peticionAutenticadaCandidato() {
+		UVDatos datos = new UVDatos();
+		datos.setIdentificadorUsuario(UID_CANDIDATO_PRUEBAS);
+		
+		Usuario usuario = CrearUsuario.usuario(UID_CANDIDATO_PRUEBAS);
 		datos.setUsuario(usuario);
 		
 		PeticionHttp peticion = new PeticionHttp();
