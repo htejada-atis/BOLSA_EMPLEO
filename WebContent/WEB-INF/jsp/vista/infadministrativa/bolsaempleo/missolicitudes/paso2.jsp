@@ -78,7 +78,7 @@ VistaSolicitudes bean = (VistaSolicitudes) uvdatos.getVistas().get(VistaSolicitu
 
 	$(document).ready(function() {
 		var tableAreas = new Atis.DataTable('#tableAreas', {
-			"ajax": { url: "<%= ControladorMisSolicitudes.URL_PATTERN_AJAX %>" },
+			"ajax": { url: "<%= ControladorMisSolicitudes.URL_PATTERN_AJAX %>", async: false },
 		    "pageSize": 10,
 		    "clickable": {'onClick': function(row) {
 		    	var params = {
@@ -110,11 +110,11 @@ VistaSolicitudes bean = (VistaSolicitudes) uvdatos.getVistas().get(VistaSolicitu
 				} %>
 				
 			var tableMeritos = new Atis.DataTable('#tableMeritos', {
-				"ajax": { url: "<%= ControladorMisSolicitudes.URL_PATTERN_AJAX %>" },
+				"ajax": { url: "<%= ControladorMisSolicitudes.URL_PATTERN_AJAX %>", async: false },
 			    "pageSize": 10,
 			    "selectable": true,
 			    "filterable": true,
-			    "title": 'Mis méritos',
+			    "title": 'Mis méritos: <%=bean.getArea().getArea().getDescripcion()%>',
 			    "selected": meritosBolsaSolicitud,
 			    "action": "<%= ControladorMisSolicitudes.ACCION_DATATABLE_MERITOS_BOLSA %>",
 			    "params": {"<%= ControladorMisSolicitudes.PARAM_SOLICITUD_ID %>": <%= bean.getSolicitud().getCodNum() %>},
