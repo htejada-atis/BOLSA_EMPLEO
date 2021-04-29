@@ -88,15 +88,15 @@ VistaItemsBaremacion bean = (VistaItemsBaremacion) uvdatos.getVistas().get(Vista
 		
 		<%if (bean.getApartadoBaremacion() != null) {
     		if (bean.getApartadoBaremacion().getActivo()) {%>
-    			activatorApartado = false;
+    			activatorBloque = false;
     	<% } else { %>
-    			activatorApartado = true;
+    			activatorBloque = true;
     	<% }
     		if (bean.getBloqueBaremacion() != null) {
     			if (bean.getBloqueBaremacion().isActivo()) {%>
-        			activatorBloque = false;
+    				activatorApartado = false;
         	<% } else { %>
-        			activatorBloque = true;
+        			activatorApartado = true;
         	<% }
     			if (bean.getItemBaremacion() != null) {
     				if (bean.getItemBaremacion().getActivo()) {%>
@@ -150,7 +150,7 @@ VistaItemsBaremacion bean = (VistaItemsBaremacion) uvdatos.getVistas().get(Vista
 	        		Atis.confirmDialog(activatorBloqueName + " bloque", "¿Desea " + activatorBloqueName + " el bloque seleccionado?", {
 		        		Si: function() {
 		        			var params = {
-			    				'a': activatorBloqueName ? '<%=ControladorItemsBaremacion.ACCION_ACTIVAR_APARTADO%>' : '<%=ControladorItemsBaremacion.ACCION_DESACTIVAR_APARTADO%>' , 
+			    				'a': activatorApartado ? '<%=ControladorItemsBaremacion.ACCION_ACTIVAR_APARTADO%>' : '<%=ControladorItemsBaremacion.ACCION_DESACTIVAR_APARTADO%>' , 
 			    				'<%=ControladorItemsBaremacion.PARAM_APARTADO%>': selected
 			    			};
 			        		Atis.sendForm("<%=request.getRequestURI()%>", params);
@@ -169,7 +169,7 @@ VistaItemsBaremacion bean = (VistaItemsBaremacion) uvdatos.getVistas().get(Vista
 		    ]
 		});
 		
-		document.getElementById("tableBloques").style.visibility = "hidden";
+		document.getElementById("tableApartados").style.visibility = "hidden";
 		document.getElementById("tableItems").style.visibility = "hidden";
 		
 		<% if (bean.getApartadoBaremacion() != null) { %>
@@ -232,7 +232,7 @@ VistaItemsBaremacion bean = (VistaItemsBaremacion) uvdatos.getVistas().get(Vista
 			    	}}
 			    ]
 			});
-			document.getElementById("tableBloques").style.visibility = "visible";
+			document.getElementById("tableApartados").style.visibility = "visible";
 			
 			<% if (bean.getBloqueBaremacion() != null) { %>
 				var tableItems = new Atis.DataTable('#tableItems', {
