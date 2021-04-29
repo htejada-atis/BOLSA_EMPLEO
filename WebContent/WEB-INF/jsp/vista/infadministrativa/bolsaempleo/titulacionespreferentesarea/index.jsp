@@ -3,10 +3,12 @@
 <%@ page import="es.ujaen.uvirtual.beans.vistas.uvirtual.bolsaempleo.VistaCandidatoTitulacionesArea" %>
 <%@ page import="es.ujaen.uvirtual.beans.UVDatos"%>
 <%@ page import="es.ujaen.uvirtual.utilidades.Formateador"%>
+<%@ page import="es.ujaen.uvirtual.beans.uvirtual.bolsaempleo.Bolsa" %>
 
 <% 
 UVDatos uvdatos = (UVDatos)request.getAttribute(UVDatos.NOMBRE_ATRIBUTO);
 VistaCandidatoTitulacionesArea bean = (VistaCandidatoTitulacionesArea)uvdatos.getVistas().get(VistaCandidatoTitulacionesArea.class.getName());
+Bolsa bolsa = bean.getArea();
 %>
 
 <div class='bolsas'>
@@ -57,33 +59,34 @@ $(document).ready(function() {
 	    "ajax": { url: "<%= ControladorCandidatoTitulacionesPreferentesArea.URL_PATTERN_AJAX %>", async: false },
 	    "pageSize": 10,
 	    "filterable": true,
-	    "action": "<%= ControladorCandidatoTitulacionesPreferentesArea.ACCION_DATATABLE_AREAS %>",
+	    "action": "<%= ControladorCandidatoTitulacionesPreferentesArea.ACCION_DATATABLE_BOLSAS %>",
 	    "defaultOrderBy": 1,
 	    "title": 'Areas de conocimiento',
 	    "clickable": {'onClick': function(row) {
 	    	var params = {
-    				'a': '<%= ControladorCandidatoTitulacionesPreferentesArea.ACCION_AREA_SELECCIONADA %>',
-    				'<%= ControladorCandidatoTitulacionesPreferentesArea.PARAM_AREA %>': row.area.codNum};
+    				'a': '<%= ControladorCandidatoTitulacionesPreferentesArea.ACCION_BOLSA_SELECCIONADA %>',
+    				'<%= ControladorCandidatoTitulacionesPreferentesArea.PARAM_BOLSA %>': row.codNum};
     		Atis.sendForm("<%= request.getRequestURI() %>", params);
 	    }},
+	    <% if (bolsa != null) { %> "selected": <%= bolsa.getCodNum() %>,<% } %>
 	    "columns": [
 	    	{'data': 'area.idAreaExterno', 'filter': true},
-	        {'data': 'area.descripcion', 'filter': true, 'class': 'overflow-auto'},  
+	        {'data': 'area.descripcion', 'filter': true},  
 	    ],
 	});
 	
-	<% if (bean.getArea() != null) { %>
+	<% if (bolsa != null) { %>
 		
 		var table_titulaciones_area = new Atis.DataTable('#tableTitulaciones', {
 			"ajax": { url: "<%=ControladorCandidatoTitulacionesPreferentesArea.URL_PATTERN_AJAX%>", async: false },
-		    "params": {"<%=ControladorCandidatoTitulacionesPreferentesArea.PARAM_AREA%>": "<%= bean.getArea().getCodNum() %>"},
+		    "params": {"<%=ControladorCandidatoTitulacionesPreferentesArea.PARAM_AREA%>": "<%= bolsa.getArea().getCodNum() %>"},
 		    "filterable": true,
 		    "pageSize": 5,
 		    "defaultOrderBy": 0,
-		    "title": 'Titulaciones Preferentes',
+		    "title": 'Titulaciones Preferentes: <%=bolsa.getArea().getDescripcion()%>',
 		    "action": "<%=ControladorCandidatoTitulacionesPreferentesArea.ACCION_DATATABLE_TITULACIONES%>",
 		    "columns": [
-		        {'data': 'nombre', 'class': 'overflow-auto', 'filter': {'type': 'text'}},
+		        {'data': 'nombre', 'filter': {'type': 'text'}},
 		    ],
 		});
 	
