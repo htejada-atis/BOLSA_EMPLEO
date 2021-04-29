@@ -115,7 +115,7 @@ public class TestBEPControladorMisMeritos {
 		
 		PeticionHttp peticion = UtilsTestBolsaEmpleo.peticionAutenticadaCandidato();
 		peticion.setParameter(ControladorMisMeritos.PARAM_ACCION, ControladorMisMeritos.ACCION_ELIMINAR_MERITOS);
-		peticion.setParameter(ControladorMisMeritos.PARAM_MERITOS, "[" + bean.getDatatable().getData().get(0).getCodNum().toString() + "]");
+		peticion.setParameter(ControladorMisMeritos.PARAM_MERITOS, "[" + bean.getDatatable().getData().get(2).getCodNum().toString() + "]");
 		
 		RespuestaHttp respuesta = new RespuestaHttp();
 		ControladorMisMeritos controlador = new ControladorMisMeritos();
