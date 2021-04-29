@@ -66,7 +66,7 @@ VistaSolicitudes bean = (VistaSolicitudes) uvdatos.getVistas().get(VistaSolicitu
 		
 		<%  if (bean.getListaBolsas() != null) {
 				for (Bolsa bolsa: bean.getListaBolsas()) { %>
-					bolsasSolicitud.push("<%=bolsa.getCodNum()%>");
+					bolsasSolicitud.push(<%=bolsa.getCodNum()%>);
 				<% }
 			} %>
 		

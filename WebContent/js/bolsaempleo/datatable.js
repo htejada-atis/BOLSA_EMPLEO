@@ -187,8 +187,15 @@ function DataTable(id, config) {
             }
     		
     		$(check).on('change', function() {
-    			self.checked[value] = this.checked;
-                this.checked ? $(this).parent().parent().addClass("selected") : $(this).parent().parent().removeClass("selected");
+                var checked  = this.checked;
+                var selected = self.config.selected;
+
+                if (selected) {
+                    checked ? selected.push(value) : Atis.removeValueArray(selected, value);
+                }
+                
+    			self.checked[value] = checked;
+                checked ? $(this).parent().parent().addClass("selected") : $(this).parent().parent().removeClass("selected");
     			self.renderFooter();
 
                 if (columnDef.selectable.hasOwnProperty('onChange')) {

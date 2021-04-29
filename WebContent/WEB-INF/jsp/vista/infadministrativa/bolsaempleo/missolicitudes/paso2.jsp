@@ -105,7 +105,7 @@ VistaSolicitudes bean = (VistaSolicitudes) uvdatos.getVistas().get(VistaSolicitu
 		
 			<%  if (bean.getListaMeritos() != null) {
 					for (Merito merito: bean.getListaMeritos()) { %>
-						meritosBolsaSolicitud.push("<%=merito.getCodNum()%>");
+						meritosBolsaSolicitud.push(<%=merito.getCodNum()%>);
 					<% }
 				} %>
 				
