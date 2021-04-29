@@ -21,6 +21,12 @@ VistaMeritos bean = (VistaMeritos) uvdatos.getVistas().get(VistaMeritos.class.ge
 		} 
 	%>
 	
+	<% if (bean.getMensajesDeError().size() > 0) { %>
+		<div id="error" class="error">
+			<%= bean.formatearMensajesDeError()   %>
+		</div>
+	<% } %>
+	
 	<div class="titulo-bolsa-empleo">
 		<h2>Mis méritos</h2>
     
@@ -75,7 +81,7 @@ VistaMeritos bean = (VistaMeritos) uvdatos.getVistas().get(VistaMeritos.class.ge
 		        {'data': 'valor', 'filter': true, 'overflow': 'auto'},
 		        {'data': 'observacion', 'filter': true, 'overflow': 'auto'},
 		        {'data': 'codnum', 'buttons': [
-	        		{'label': 'Descargar', 'onClick': function(row) {
+	        		{'label': 'Descargar', 'title': 'Descargar fichero del mérito', 'onClick': function(row) {
 	        			window.open("<%= request.getRequestURI() %>"
 	        		        	+ "?a=<%= ControladorMisMeritos.ACCION_DESCARGAR_FICHERO %>&<%= ControladorMisMeritos.PARAM_ID %>=" + row.codNum);
 	        		}},

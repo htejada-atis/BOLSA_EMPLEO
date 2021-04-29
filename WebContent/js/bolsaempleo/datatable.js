@@ -21,7 +21,7 @@ function DataTable(id, config) {
     this.pageSizeOptions = Atis.getProp(config, 'pageSizeOptions', [5,10,20,100]);
     this.filterParams = {}
     this.title = Atis.getProp(config, 'title', undefined);
-    this.lastResponse = null;    
+    this.lastResponse = null;
     this.checked = {};
 
     var self = this;
@@ -247,6 +247,7 @@ function DataTable(id, config) {
 
         // page size select
         var selectSize = $('<select></select>');
+        selectSize.prop('title', 'Cambiar tama\u00f1o de p\u00e1gina');
 
         self.pageSizeOptions.forEach(function(option) {
             var option = $('<option ' + (self.params.pageSize == option ? 'selected' : '') + '>' + option + '</option>');
