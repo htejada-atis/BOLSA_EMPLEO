@@ -49,7 +49,7 @@ public class TestBEPControladorUsuariosBolsaEmpleo {
     
     // método para obtener la vista con una lista de apartados .
     private VistaUsuarioBolsaEmpleo obtenerUsuarios() throws ServletException, IOException {
-    	PeticionHttp peticion = UtilsTestBolsaEmpleo.peticionAutenticada();
+    	PeticionHttp peticion = UtilsTestBolsaEmpleo.peticionAutenticadaPersonal();
     	
     	peticion.setParameter(ControladorUsuarioBolsaEmpleo.PARAM_ACCION, ControladorUsuarioBolsaEmpleo.ACCION_DATATABLE_USUARIOS);
     	
@@ -61,7 +61,7 @@ public class TestBEPControladorUsuariosBolsaEmpleo {
     
     // método para obtener la vista con una lista de bloques .
     private VistaUsuarioBolsaEmpleo obtenerUsuariosBorrados() throws ServletException, IOException {
-    	PeticionHttp peticion = UtilsTestBolsaEmpleo.peticionAutenticada();
+    	PeticionHttp peticion = UtilsTestBolsaEmpleo.peticionAutenticadaPersonal();
 		peticion.setParameter(ControladorUsuarioBolsaEmpleo.PARAM_ACCION, ControladorUsuarioBolsaEmpleo.ACCION_DATATABLE_USUARIOS_BORRADOS);
 
 		RespuestaHttp respuesta = new RespuestaHttp();
@@ -72,7 +72,7 @@ public class TestBEPControladorUsuariosBolsaEmpleo {
     
  // método para obtener la vista con una lista de ítems .
     private VistaUsuarioBolsaEmpleo obtenerUsuariosExcluidos() throws ServletException, IOException {
-    	PeticionHttp peticion = UtilsTestBolsaEmpleo.peticionAutenticada();
+    	PeticionHttp peticion = UtilsTestBolsaEmpleo.peticionAutenticadaPersonal();
 		peticion.setParameter(ControladorUsuarioBolsaEmpleo.PARAM_ACCION, ControladorUsuarioBolsaEmpleo.ACCION_DATATABLE_USUARIOS_EXCLUIDOS);
 
 		RespuestaHttp respuesta = new RespuestaHttp();
@@ -88,7 +88,7 @@ public class TestBEPControladorUsuariosBolsaEmpleo {
 	 */
 	@Test
 	public void testA01() throws SQLException, ServletException, IOException {
-		PeticionHttp peticion = UtilsTestBolsaEmpleo.peticionAutenticada();
+		PeticionHttp peticion = UtilsTestBolsaEmpleo.peticionAutenticadaPersonal();
 		
 		RespuestaHttp respuesta = new RespuestaHttp();
 		ControladorUsuarioBolsaEmpleo controlador = new ControladorUsuarioBolsaEmpleo();
@@ -149,7 +149,7 @@ public class TestBEPControladorUsuariosBolsaEmpleo {
 	 */
 	@Test
 	public void testA05obtenerFormularioBusqueda() throws SQLException, ServletException, IOException {
-		PeticionHttp peticion = UtilsTestBolsaEmpleo.peticionAutenticada();
+		PeticionHttp peticion = UtilsTestBolsaEmpleo.peticionAutenticadaPersonal();
 		peticion.setParameter(ControladorUsuarioBolsaEmpleo.PARAM_ACCION, ControladorUsuarioBolsaEmpleo.ACCION_FORMULARIO_USUARIO);
 		RespuestaHttp respuesta = new RespuestaHttp();
 		ControladorUsuarioBolsaEmpleo controlador = new ControladorUsuarioBolsaEmpleo();
@@ -168,7 +168,7 @@ public class TestBEPControladorUsuariosBolsaEmpleo {
 	 */
 	@Test
 	public void testA06BuscarUsuario() throws SQLException, ServletException, IOException {
-		PeticionHttp peticion = UtilsTestBolsaEmpleo.peticionAutenticada();
+		PeticionHttp peticion = UtilsTestBolsaEmpleo.peticionAutenticadaPersonal();
 		peticion.setParameter(ControladorUsuarioBolsaEmpleo.PARAM_ACCION, ControladorUsuarioBolsaEmpleo.ACCION_BUSCAR_USUARIO);
 		peticion.setParameter(ControladorUsuarioBolsaEmpleo.PARAM_NOMBRE, CODCUENTA);
 		RespuestaHttp respuesta = new RespuestaHttp();
@@ -188,7 +188,7 @@ public class TestBEPControladorUsuariosBolsaEmpleo {
 	 */
 	@Test
 	public void testA07ListaRoles() throws SQLException, ServletException, IOException {
-		PeticionHttp peticion = UtilsTestBolsaEmpleo.peticionAutenticada();
+		PeticionHttp peticion = UtilsTestBolsaEmpleo.peticionAutenticadaPersonal();
 		peticion.setParameter(ControladorUsuarioBolsaEmpleo.PARAM_ACCION, ControladorUsuarioBolsaEmpleo.ACCION_LISTAR_ROLES);
 		RespuestaHttp respuesta = new RespuestaHttp();
 		ControladorUsuarioBolsaEmpleo controlador = new ControladorUsuarioBolsaEmpleo();
@@ -207,7 +207,7 @@ public class TestBEPControladorUsuariosBolsaEmpleo {
 	 */
 	@Test
 	public void testA08AgregarUsuario() throws SQLException, ServletException, IOException {
-		PeticionHttp peticion = UtilsTestBolsaEmpleo.peticionAutenticada();
+		PeticionHttp peticion = UtilsTestBolsaEmpleo.peticionAutenticadaPersonal();
 		peticion.setParameter(ControladorUsuarioBolsaEmpleo.PARAM_ACCION, ControladorUsuarioBolsaEmpleo.ACCION_AGREGAR_USUARIO);
 		peticion.setParameter(ControladorUsuarioBolsaEmpleo.PARAM_LISTA, LISTADIST);
 		peticion.setParameter(ControladorUsuarioBolsaEmpleo.PARAM_EXCLUIDO, "N");
@@ -233,7 +233,7 @@ public class TestBEPControladorUsuariosBolsaEmpleo {
 	 */
 	@Test
 	public void testA09EditarUsuario() throws SQLException, ServletException, IOException {
-		PeticionHttp peticion = UtilsTestBolsaEmpleo.peticionAutenticada();
+		PeticionHttp peticion = UtilsTestBolsaEmpleo.peticionAutenticadaPersonal();
 		peticion.setParameter(ControladorUsuarioBolsaEmpleo.PARAM_ACCION, ControladorUsuarioBolsaEmpleo.ACCION_EDITAR_USUARIO);
 		peticion.setParameter(ControladorUsuarioBolsaEmpleo.PARAM_LISTA, LISTADIST);
 		peticion.setParameter(ControladorUsuarioBolsaEmpleo.PARAM_EXCLUIDO, "N");
@@ -258,7 +258,7 @@ public class TestBEPControladorUsuariosBolsaEmpleo {
 	 */
 	@Test
 	public void testA10ExcluirUsuario() throws SQLException, ServletException, IOException {
-		PeticionHttp peticion = UtilsTestBolsaEmpleo.peticionAutenticada();
+		PeticionHttp peticion = UtilsTestBolsaEmpleo.peticionAutenticadaPersonal();
 		peticion.setParameter(ControladorUsuarioBolsaEmpleo.PARAM_ACCION, ControladorUsuarioBolsaEmpleo.ACCION_EXCLUIR_USUARIO);
 		peticion.setParameter(ControladorUsuarioBolsaEmpleo.PARAM_LISTA, LISTADIST);
 		peticion.setParameter(ControladorUsuarioBolsaEmpleo.PARAM_EXCLUIDO, "S");
@@ -288,7 +288,7 @@ public class TestBEPControladorUsuariosBolsaEmpleo {
 				+ bean.getDatatable().getData().get(0).getCodNum() + "," 
 				+ bean.getDatatable().getData().get(1).getCodNum() + "]";
 		
-		PeticionHttp peticion = UtilsTestBolsaEmpleo.peticionAutenticada();
+		PeticionHttp peticion = UtilsTestBolsaEmpleo.peticionAutenticadaPersonal();
 		peticion.setParameter(ControladorUsuarioBolsaEmpleo.PARAM_ACCION, ControladorUsuarioBolsaEmpleo.ACCION_USUARIO);
 		peticion.setParameter(ControladorUsuarioBolsaEmpleo.PARAM_ACCION_USUARIO, ControladorUsuarioBolsaEmpleo.ACCION_ELIMINAR_USUARIO);
     	peticion.setParameter(ControladorUsuarioBolsaEmpleo.PARAM_USUARIOS_SELECCIONADOS, selected); 
@@ -316,7 +316,7 @@ public class TestBEPControladorUsuariosBolsaEmpleo {
 				+ bean.getDatatable().getData().get(0).getCodNum() + "," 
 				+ bean.getDatatable().getData().get(1).getCodNum() + "]";
 		
-		PeticionHttp peticion = UtilsTestBolsaEmpleo.peticionAutenticada();
+		PeticionHttp peticion = UtilsTestBolsaEmpleo.peticionAutenticadaPersonal();
 		peticion.setParameter(ControladorUsuarioBolsaEmpleo.PARAM_ACCION, ControladorUsuarioBolsaEmpleo.ACCION_USUARIO);
 		peticion.setParameter(ControladorUsuarioBolsaEmpleo.PARAM_ACCION_USUARIO, ControladorUsuarioBolsaEmpleo.ACCION_RECUPERAR_USUARIO);
     	peticion.setParameter(ControladorUsuarioBolsaEmpleo.PARAM_USUARIOS_SELECCIONADOS, selected); 
@@ -344,7 +344,7 @@ public class TestBEPControladorUsuariosBolsaEmpleo {
 				+ bean.getDatatable().getData().get(0).getCodNum() + "," 
 				+ bean.getDatatable().getData().get(1).getCodNum() + "]";
 		
-		PeticionHttp peticion = UtilsTestBolsaEmpleo.peticionAutenticada();
+		PeticionHttp peticion = UtilsTestBolsaEmpleo.peticionAutenticadaPersonal();
 		peticion.setParameter(ControladorUsuarioBolsaEmpleo.PARAM_ACCION, ControladorUsuarioBolsaEmpleo.ACCION_USUARIO);
 		peticion.setParameter(ControladorUsuarioBolsaEmpleo.PARAM_ACCION_USUARIO, ControladorUsuarioBolsaEmpleo.ACCION_INCLUIR_USUARIO);
     	peticion.setParameter(ControladorUsuarioBolsaEmpleo.PARAM_USUARIOS_SELECCIONADOS, selected); 
@@ -367,7 +367,7 @@ public class TestBEPControladorUsuariosBolsaEmpleo {
 	 */
 	@Test
 	public void testA14VolverFormulario() throws SQLException, ServletException, IOException {
-		PeticionHttp peticion = UtilsTestBolsaEmpleo.peticionAutenticada();
+		PeticionHttp peticion = UtilsTestBolsaEmpleo.peticionAutenticadaPersonal();
 		peticion.setParameter(ControladorUsuarioBolsaEmpleo.PARAM_ACCION, ControladorUsuarioBolsaEmpleo.ACCION_VOLVER_USUARIO);
 		RespuestaHttp respuesta = new RespuestaHttp();
 		ControladorUsuarioBolsaEmpleo controlador = new ControladorUsuarioBolsaEmpleo();
@@ -387,7 +387,7 @@ public class TestBEPControladorUsuariosBolsaEmpleo {
 	 */
 	@Test
 	public void testE01BuscarUsuarioErroneo() throws SQLException, ServletException, IOException {
-    	PeticionHttp peticion = UtilsTestBolsaEmpleo.peticionAutenticada();
+    	PeticionHttp peticion = UtilsTestBolsaEmpleo.peticionAutenticadaPersonal();
 		peticion.setParameter(ControladorUsuarioBolsaEmpleo.PARAM_ACCION, ControladorUsuarioBolsaEmpleo.ACCION_BUSCAR_USUARIO);
 		peticion.setParameter(ControladorUsuarioBolsaEmpleo.PARAM_NOMBRE, "prueba");
     	

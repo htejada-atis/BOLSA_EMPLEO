@@ -39,7 +39,7 @@ public class TestBEPControladorGestionTitulacionesPreferentesArea {
     
     // método para obtener la vista con una lista de áreas .
     private VistaTitulacionesArea getVistaConAreas() throws ServletException, IOException {
-    	PeticionHttp peticion = UtilsTestBolsaEmpleo.peticionAutenticada();
+    	PeticionHttp peticion = UtilsTestBolsaEmpleo.peticionAutenticadaPersonal();
     	peticion.setParameter(ControladorGestionTitulacionesPreferentesArea.PARAM_ACCION, ControladorGestionTitulacionesPreferentesArea.ACCION_LISTAR_AREAS);	
 		
 		RespuestaHttp respuesta = new RespuestaHttp();
@@ -51,7 +51,7 @@ public class TestBEPControladorGestionTitulacionesPreferentesArea {
     
     // método para obtener la vista con una lista de las titulaciones .
     private VistaTitulacionesArea getVistaConTitulaciones(String accion, boolean area) throws ServletException, IOException {
-		PeticionHttp peticion = UtilsTestBolsaEmpleo.peticionAutenticada();
+		PeticionHttp peticion = UtilsTestBolsaEmpleo.peticionAutenticadaPersonal();
 		peticion.setParameter(ControladorGestionTitulacionesPreferentesArea.PARAM_ACCION, accion);
 		
 		if (area) {
@@ -68,7 +68,7 @@ public class TestBEPControladorGestionTitulacionesPreferentesArea {
     
     // método para obtener la vista con la respuesta de incluir o eliminar una titulación preferente
     private VistaTitulacionesArea getVistaCambiarTitulacionesPreferentes(String accion, boolean area, String listaTitulaciones) throws ServletException, IOException {
-		PeticionHttp peticion = UtilsTestBolsaEmpleo.peticionAutenticada();
+		PeticionHttp peticion = UtilsTestBolsaEmpleo.peticionAutenticadaPersonal();
 		peticion.setParameter(ControladorGestionTitulacionesPreferentesArea.PARAM_ACCION, accion);
 		peticion.setParameter(ControladorGestionTitulacionesPreferentesArea.PARAM_TITULACIONES, listaTitulaciones);
 		
@@ -91,7 +91,7 @@ public class TestBEPControladorGestionTitulacionesPreferentesArea {
 	 */
 	@Test
 	public void testA01Obtener() throws SQLException, ServletException, IOException {
-		PeticionHttp peticion = UtilsTestBolsaEmpleo.peticionAutenticada();
+		PeticionHttp peticion = UtilsTestBolsaEmpleo.peticionAutenticadaPersonal();
 		
 		RespuestaHttp respuesta = new RespuestaHttp();
 		ControladorGestionTitulacionesPreferentesArea controlador = new ControladorGestionTitulacionesPreferentesArea();

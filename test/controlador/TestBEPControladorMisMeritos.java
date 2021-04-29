@@ -46,7 +46,7 @@ public class TestBEPControladorMisMeritos {
     
     // método para obtener la vista con una lista de méritos .
     private VistaMeritos obtenerMeritos() throws ServletException, IOException {
-    	PeticionHttp peticion = UtilsTestBolsaEmpleo.peticionAutenticada();
+    	PeticionHttp peticion = UtilsTestBolsaEmpleo.peticionAutenticadaCandidato();
 		peticion.setParameter(ControladorMisMeritos.PARAM_ACCION, ControladorMisMeritos.ACCION_DATATABLE);
 
 		RespuestaHttp respuesta = new RespuestaHttp();
@@ -57,7 +57,7 @@ public class TestBEPControladorMisMeritos {
     
     // método para obtener la vista con el formulario de agregar .
     private VistaMeritos obtenerFormularioAgregar(Integer apartado) throws ServletException, IOException {
-    	PeticionHttp peticion = UtilsTestBolsaEmpleo.peticionAutenticada();
+    	PeticionHttp peticion = UtilsTestBolsaEmpleo.peticionAutenticadaCandidato();
 		peticion.setParameter(ControladorMisMeritos.PARAM_ACCION, ControladorMisMeritos.ACCION_AGREGAR_MERITO);
 		
 		if (apartado != null) {
@@ -78,7 +78,7 @@ public class TestBEPControladorMisMeritos {
 	 */
 	@Test
 	public void testA01() throws SQLException, ServletException, IOException {
-		PeticionHttp peticion = UtilsTestBolsaEmpleo.peticionAutenticada();
+		PeticionHttp peticion = UtilsTestBolsaEmpleo.peticionAutenticadaCandidato();
 		
 		RespuestaHttp respuesta = new RespuestaHttp();
 		ControladorMisMeritos controlador = new ControladorMisMeritos();
@@ -113,7 +113,7 @@ public class TestBEPControladorMisMeritos {
 	public void testA03BorrarMeritos() throws SQLException, ServletException, IOException {
 		VistaMeritos bean = obtenerMeritos();
 		
-		PeticionHttp peticion = UtilsTestBolsaEmpleo.peticionAutenticada();
+		PeticionHttp peticion = UtilsTestBolsaEmpleo.peticionAutenticadaCandidato();
 		peticion.setParameter(ControladorMisMeritos.PARAM_ACCION, ControladorMisMeritos.ACCION_ELIMINAR_MERITOS);
 		peticion.setParameter(ControladorMisMeritos.PARAM_MERITOS, "[" + bean.getDatatable().getData().get(0).getCodNum().toString() + "]");
 		
@@ -134,7 +134,7 @@ public class TestBEPControladorMisMeritos {
 	public void testA04Descargar() throws ServletException, IOException {
 		VistaMeritos bean = obtenerMeritos();
 		
-		PeticionHttp peticion = UtilsTestBolsaEmpleo.peticionAutenticada();
+		PeticionHttp peticion = UtilsTestBolsaEmpleo.peticionAutenticadaCandidato();
 		peticion.setParameter(ControladorMisMeritos.PARAM_ACCION, ControladorMisMeritos.ACCION_DESCARGAR_FICHERO);
 		peticion.setParameter(ControladorMisMeritos.PARAM_ID, bean.getDatatable().getData().get(0).getCodNum().toString());
 		
@@ -183,7 +183,7 @@ public class TestBEPControladorMisMeritos {
 	 */
 	@Test
 	public void testE01EliminarMeritosNoValidos() throws SQLException, ServletException, IOException {
-		PeticionHttp peticion = UtilsTestBolsaEmpleo.peticionAutenticada();
+		PeticionHttp peticion = UtilsTestBolsaEmpleo.peticionAutenticadaCandidato();
 		peticion.setParameter(ControladorMisMeritos.PARAM_ACCION, ControladorMisMeritos.ACCION_ELIMINAR_MERITOS);
 		peticion.setParameter(ControladorMisMeritos.PARAM_MERITOS, "");
 		

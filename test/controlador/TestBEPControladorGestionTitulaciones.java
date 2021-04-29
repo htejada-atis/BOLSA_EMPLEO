@@ -40,7 +40,7 @@ public class TestBEPControladorGestionTitulaciones {
     }
     
     private VistaTitulaciones getVistaTitulaciones(String action) throws ServletException, IOException {
-    	PeticionHttp peticion = UtilsTestBolsaEmpleo.peticionAutenticada();
+    	PeticionHttp peticion = UtilsTestBolsaEmpleo.peticionAutenticadaPersonal();
     	
     	if (action != null) {
     		peticion.setParameter(ControladorGestionTitulaciones.PARAM_ACCION, action);	
@@ -101,7 +101,7 @@ public class TestBEPControladorGestionTitulaciones {
 	 */
 	@Test
 	public void testA04Insertar() throws SQLException, UVException, ServletException, IOException {
-		PeticionHttp peticion = UtilsTestBolsaEmpleo.peticionAutenticada();
+		PeticionHttp peticion = UtilsTestBolsaEmpleo.peticionAutenticadaPersonal();
 		peticion.setParameter(ControladorGestionTitulaciones.PARAM_ACCION, ControladorGestionTitulaciones.ACCION_AGREGAR_TITULACION);
 		peticion.setParameter(ControladorGestionTitulaciones.PARAM_NOMBRE, NOMBRE_TITULACION);
 
@@ -122,7 +122,7 @@ public class TestBEPControladorGestionTitulaciones {
 	public void testA05Editar() throws ServletException, IOException {
 		VistaTitulaciones bean = getVistaTitulaciones(ControladorGestionTitulaciones.ACCION_DATATABLE_TITULACIONES);
 		
-		PeticionHttp peticion = UtilsTestBolsaEmpleo.peticionAutenticada();
+		PeticionHttp peticion = UtilsTestBolsaEmpleo.peticionAutenticadaPersonal();
 		peticion.setParameter(ControladorGestionTitulaciones.PARAM_ACCION, ControladorGestionTitulaciones.ACCION_EDITAR_TITULACION);
 		peticion.setParameter(ControladorGestionTitulaciones.PARAM_ID, bean.getDatatableTitulaciones().getData().get(0).getCodNum().toString());
 		peticion.setParameter(ControladorGestionTitulaciones.PARAM_NOMBRE, NOMBRE_TITULACION);
@@ -145,7 +145,7 @@ public class TestBEPControladorGestionTitulaciones {
 	public void testA06Eliminar() throws ServletException, IOException {
 		VistaTitulaciones bean = getVistaTitulaciones(ControladorGestionTitulaciones.ACCION_DATATABLE_TITULACIONES);
 		
-		PeticionHttp peticion = UtilsTestBolsaEmpleo.peticionAutenticada();
+		PeticionHttp peticion = UtilsTestBolsaEmpleo.peticionAutenticadaPersonal();
 		peticion.setParameter(ControladorGestionTitulaciones.PARAM_ACCION, ControladorGestionTitulaciones.ACCION_BORRAR_TITULACION);
 		peticion.setParameter(ControladorGestionTitulaciones.PARAM_ID, bean.getDatatableTitulaciones().getData().get(0).getCodNum().toString());
 		

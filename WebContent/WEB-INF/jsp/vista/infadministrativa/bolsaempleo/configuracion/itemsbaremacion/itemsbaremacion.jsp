@@ -24,7 +24,7 @@ VistaItemsBaremacion bean = (VistaItemsBaremacion) uvdatos.getVistas().get(Vista
 	
 	<h2>Items para las baremaciones</h2>
 	
-	<table class="bluetable bolsaempleo custom" id="tableApartadosGenerales">
+	<table class="bluetable bolsaempleo custom" id="tableBloques">
 		<tr>
 			<th scope="col" style="width:20%" title="Código apartado">Código</th>
 			<th scope="col" style="width:60%" title="Nombre del bloque">Nombre del bloque</th>
@@ -41,7 +41,7 @@ VistaItemsBaremacion bean = (VistaItemsBaremacion) uvdatos.getVistas().get(Vista
 		</tfoot>
 	</table>
 	
-	<table class="bluetable bolsaempleo custom" id="tableBloques">
+	<table class="bluetable bolsaempleo custom" id="tableApartados">
 		<tr>
 			<th scope="col" style="width:10%" title="Código bloque">Código</th>
 			<th scope="col" style="width:70%" title="Nombre de apartado">Nombre del apartado</th>
@@ -112,7 +112,7 @@ VistaItemsBaremacion bean = (VistaItemsBaremacion) uvdatos.getVistas().get(Vista
     	var activatorBloqueName = activatorBloque ? "Activar" : "Desactivar";
     	var activatorItemName = activatorItem ? "Activar" : "Desactivar";
 		
-		var tableApartados = new Atis.DataTable('#tableApartadosGenerales', {
+		var tableBloques = new Atis.DataTable('#tableBloques', {
 		    "ajax": { url: "<%= ControladorItemsBaremacion.URL_PATTERN_AJAX %>", async: false },
 		    "pageSize": 10,
 		    "action": "<%= ControladorItemsBaremacion.ACCION_DATATABLE_APARTADOS %>",
@@ -142,15 +142,15 @@ VistaItemsBaremacion bean = (VistaItemsBaremacion) uvdatos.getVistas().get(Vista
 	        	}},
 		    ],
 		    "actions": [		    	
-		    	{'label': 'Añadir', 'title': 'Añadir un nuevo apartado', 'onClick': function(selected) {
+		    	{'label': 'Añadir', 'title': 'Añadir un nuevo bloque', 'onClick': function(selected) {
 		    		var params = {'a': '<%=ControladorItemsBaremacion.ACCION_AGREGAR_APARTADO%>'};
 	        		Atis.sendForm("<%=request.getRequestURI()%>", params);
 		    	}},
-		    	{'label': activatorApartadoName, 'showWhenSelected': true, 'title': activatorApartadoName + ' apartado seleccionado', 'onClick': function(selected) {
-	        		Atis.confirmDialog(activatorApartadoName + " apartado", "¿Desea " + activatorApartadoName + " el apartado seleccionado?", {
+		    	{'label': activatorBloqueName, 'showWhenSelected': true, 'title': activatorBloqueName + ' bloque seleccionado', 'onClick': function(selected) {
+	        		Atis.confirmDialog(activatorBloqueName + " bloque", "¿Desea " + activatorBloqueName + " el bloque seleccionado?", {
 		        		Si: function() {
 		        			var params = {
-			    				'a': activatorApartado ? '<%=ControladorItemsBaremacion.ACCION_ACTIVAR_APARTADO%>' : '<%=ControladorItemsBaremacion.ACCION_DESACTIVAR_APARTADO%>' , 
+			    				'a': activatorBloqueName ? '<%=ControladorItemsBaremacion.ACCION_ACTIVAR_APARTADO%>' : '<%=ControladorItemsBaremacion.ACCION_DESACTIVAR_APARTADO%>' , 
 			    				'<%=ControladorItemsBaremacion.PARAM_APARTADO%>': selected
 			    			};
 			        		Atis.sendForm("<%=request.getRequestURI()%>", params);
@@ -161,7 +161,7 @@ VistaItemsBaremacion bean = (VistaItemsBaremacion) uvdatos.getVistas().get(Vista
 				    	}
 				    });
 		    	}},
-		    	{'label': 'Editar', 'showWhenSelected': true, 'title': 'Editar apartado seleccionado', 'onClick': function(selected) {
+		    	{'label': 'Editar', 'showWhenSelected': true, 'title': 'Editar bloque seleccionado', 'onClick': function(selected) {
 		    		var params = {'a': '<%=ControladorItemsBaremacion.ACCION_EDITAR_APARTADO%>', 
 		    				'<%=ControladorItemsBaremacion.PARAM_APARTADO%>': selected};
 	        		Atis.sendForm("<%=request.getRequestURI()%>", params);
@@ -173,7 +173,7 @@ VistaItemsBaremacion bean = (VistaItemsBaremacion) uvdatos.getVistas().get(Vista
 		document.getElementById("tableItems").style.visibility = "hidden";
 		
 		<% if (bean.getApartadoBaremacion() != null) { %>
-			var tableBloques = new Atis.DataTable('#tableBloques', {
+			var tableApartados = new Atis.DataTable('#tableApartados', {
 			    "ajax": { url: "<%= ControladorItemsBaremacion.URL_PATTERN_AJAX %>", async: false },
 			    "params": {"<%=ControladorItemsBaremacion.PARAM_APARTADO%>": <%= bean.getApartadoBaremacion().getCodNum() %>},
 			    "pageSize": 10,
@@ -205,13 +205,13 @@ VistaItemsBaremacion bean = (VistaItemsBaremacion) uvdatos.getVistas().get(Vista
 		        	}},
 			    ],
 			    "actions": [
-			    	{'label': 'Añadir', 'title': 'Añadir un nuevo bloque', 'onClick': function(selected) {
+			    	{'label': 'Añadir', 'title': 'Añadir un nuevo apartado', 'onClick': function(selected) {
 			    		var params = {'a': '<%=ControladorItemsBaremacion.ACCION_AGREGAR_BLOQUE%>', 
 			    				'<%=ControladorItemsBaremacion.PARAM_APARTADO%>': '<%=bean.getApartadoBaremacion().getCodNum()%>'};
 		        		Atis.sendForm("<%=request.getRequestURI()%>", params);
 			    	}},
-			    	{'label': activatorBloqueName, 'showWhenSelected': true, 'title': activatorBloqueName + ' bloque seleccionado', 'onClick': function(selected) {
-		        		Atis.confirmDialog(activatorBloqueName + " bloque", "¿Desea " + activatorBloqueName + " el bloque seleccionado?", {
+			    	{'label': activatorApartadoName, 'showWhenSelected': true, 'title': activatorApartadoName + ' apartado seleccionado', 'onClick': function(selected) {
+		        		Atis.confirmDialog(activatorApartadoName + " apartado", "¿Desea " + activatorApartadoName + " el apartado seleccionado?", {
 			        		Si: function() {
 			        			var params = {
 				    				'a': activatorBloque ? '<%=ControladorItemsBaremacion.ACCION_ACTIVAR_BLOQUE%>' : '<%=ControladorItemsBaremacion.ACCION_DESACTIVAR_BLOQUE%>' , 
@@ -225,7 +225,7 @@ VistaItemsBaremacion bean = (VistaItemsBaremacion) uvdatos.getVistas().get(Vista
 					    	}
 					    });
 			    	}},			    	
-			    	{'label': 'Editar', 'showWhenSelected': true, 'title': 'Editar bloque seleccionado', 'onClick': function(selected) {
+			    	{'label': 'Editar', 'showWhenSelected': true, 'title': 'Editar apartado seleccionado', 'onClick': function(selected) {
 			    		var params = {'a': '<%=ControladorItemsBaremacion.ACCION_EDITAR_BLOQUE%>', 
 			    				'<%=ControladorItemsBaremacion.PARAM_BLOQUE%>': selected};
 		        		Atis.sendForm("<%=request.getRequestURI()%>", params);
