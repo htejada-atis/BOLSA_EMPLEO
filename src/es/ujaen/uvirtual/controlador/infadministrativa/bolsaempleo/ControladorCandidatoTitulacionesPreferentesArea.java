@@ -14,7 +14,6 @@ import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import es.ujaen.uvirtual.beans.CodigoDescripcion;
 import es.ujaen.uvirtual.beans.UVDatos;
-import es.ujaen.uvirtual.beans.uvirtual.bolsaempleo.Area;
 import es.ujaen.uvirtual.beans.uvirtual.bolsaempleo.Bolsa;
 import es.ujaen.uvirtual.beans.uvirtual.bolsaempleo.TitulacionArea;
 import es.ujaen.uvirtual.beans.vistas.uvirtual.bolsaempleo.VistaCandidatoTitulacionesArea;
