@@ -37,7 +37,7 @@ public class TestBEPControladorInicio {
     }
     
     private VistaInicio obtenerInicio(String accion) throws ServletException, IOException {
-    	PeticionHttp peticion = UtilsTestBolsaEmpleo.peticionAutenticada();
+    	PeticionHttp peticion = UtilsTestBolsaEmpleo.peticionAutenticadaPersonal();
 		peticion.setParameter(ControladorInicio.PARAM_ACCION, accion);
 
 		RespuestaHttp respuesta = new RespuestaHttp();
@@ -90,7 +90,7 @@ public class TestBEPControladorInicio {
 	 */
 	@Test
 	public void testA03Post() throws ServletException, IOException {
-		PeticionHttp peticion = UtilsTestBolsaEmpleo.peticionAutenticada();
+		PeticionHttp peticion = UtilsTestBolsaEmpleo.peticionAutenticadaPersonal();
 		peticion.setParameter(ControladorInicio.PARAM_ACCION, ControladorInicio.ACCION_AYUDA);
 		
 		RespuestaHttp respuesta = new RespuestaHttp();
@@ -108,7 +108,7 @@ public class TestBEPControladorInicio {
 	 */
 	@Test
 	public void testA04Post() throws ServletException, IOException {
-		PeticionHttp peticion = UtilsTestBolsaEmpleo.peticionAutenticada();
+		PeticionHttp peticion = UtilsTestBolsaEmpleo.peticionAutenticadaPersonal();
 		peticion.setParameter(ControladorInicio.PARAM_ACCION, ControladorInicio.ACCION_FAQ);
 		
 		RespuestaHttp respuesta = new RespuestaHttp();
@@ -128,7 +128,7 @@ public class TestBEPControladorInicio {
 	public void testA05Obtener() throws ServletException, IOException {
 		VistaInicio bean = obtenerInicio(ControladorInicio.ACCION_LISTAR_NOTICIAS);
 		
-		PeticionHttp peticion = UtilsTestBolsaEmpleo.peticionAutenticada();
+		PeticionHttp peticion = UtilsTestBolsaEmpleo.peticionAutenticadaPersonal();
 		peticion.setParameter(ControladorInicio.PARAM_ACCION, ControladorInicio.ACCION_LISTAR_TODAS_NOTICIAS);
 		peticion.setParameter(ControladorInicio.PARAM_NOTICIAS, 
 				"[" + bean.getNoticias().get(0).getCodNum().toString() + "]");
@@ -150,7 +150,7 @@ public class TestBEPControladorInicio {
 	 */
 	@Test
 	public void testA06Post() throws ServletException, IOException {
-		PeticionHttp peticion = UtilsTestBolsaEmpleo.peticionAutenticada();
+		PeticionHttp peticion = UtilsTestBolsaEmpleo.peticionAutenticadaPersonal();
 		peticion.setParameter(ControladorInicio.PARAM_ACCION, ControladorInicio.ACCION_DOCUMENTOS);
 		
 		RespuestaHttp respuesta = new RespuestaHttp();
