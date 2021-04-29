@@ -19,6 +19,7 @@ import es.ujaen.uvirtual.beans.uvirtual.bolsaempleo.Bolsa;
 import es.ujaen.uvirtual.beans.uvirtual.bolsaempleo.TitulacionArea;
 import es.ujaen.uvirtual.beans.vistas.uvirtual.bolsaempleo.VistaCandidatoTitulacionesArea;
 import es.ujaen.uvirtual.modelo.bolsaempleo.ModeloArea;
+import es.ujaen.uvirtual.modelo.bolsaempleo.ModeloBolsa;
 import es.ujaen.uvirtual.modelo.bolsaempleo.ModeloTitulacion;
 import es.ujaen.uvirtual.modelo.bolsaempleo.ModeloUsuarioBolsaEmpleo;
 import es.ujaen.uvirtual.utilidades.BolsaEmpleoDataTable;
@@ -44,14 +45,15 @@ public class ControladorCandidatoTitulacionesPreferentesArea extends HttpServlet
 	private static final Logger LOGGER = Logger.getLogger(NOMBREDEESTACLASE);
 	
 	// Acciones
-	public static final String ACCION_AREA_SELECCIONADA = "seleccionararea";
-	public static final String ACCION_DATATABLE_AREAS = "datatableareas";
+	public static final String ACCION_BOLSA_SELECCIONADA = "seleccionarbolsa";
+	public static final String ACCION_DATATABLE_BOLSAS = "datatablebolsas";
 	public static final String ACCION_DATATABLE_TITULACIONES = "datatabletitulaciones";
-	public static final String ACCION_LISTAR_AREAS = "listarareas";
+	public static final String ACCION_LISTAR_BOLSAS = "listarbolsas";
 	
 	// Parámetros
 	public static final String PARAM_ACCION = "a";
 	public static final String PARAM_AREA = "area";
+	public static final String PARAM_BOLSA = "bolsa";
 	public static final String PARAM_ENVIAR = "enviar";
 	
 	// Mensajes
@@ -85,19 +87,19 @@ public class ControladorCandidatoTitulacionesPreferentesArea extends HttpServlet
 	
 		String nombreAccion = EscapaHTML.ajustaCodificacion(request.getParameter(PARAM_ACCION));
 		if (nombreAccion == null) {
-			nombreAccion = ACCION_LISTAR_AREAS;
+			nombreAccion = ACCION_LISTAR_BOLSAS;
 		}
 		
 		try {
 			anonimo = !modelo.checkUser(datos);
 			switch (nombreAccion) {
-				case ACCION_AREA_SELECCIONADA:
+				case ACCION_BOLSA_SELECCIONADA:
 					seleccionarArea(bean, request, response);
 					break;
-				case ACCION_DATATABLE_AREAS:
-					listadoAreas(bean, datos, request, response);
+				case ACCION_DATATABLE_BOLSAS:
+					listadoBolsas(bean, datos, request, response);
 					break;
-				case ACCION_LISTAR_AREAS:
+				case ACCION_LISTAR_BOLSAS:
 					bean.setVista(RUTA_BEP + "index.jsp");
 					break;
 				case ACCION_DATATABLE_TITULACIONES:
@@ -132,9 +134,9 @@ public class ControladorCandidatoTitulacionesPreferentesArea extends HttpServlet
 	}
 	
 	private void seleccionarArea(VistaCandidatoTitulacionesArea bean, HttpServletRequest request, HttpServletResponse response) throws SQLException, UVException {
-		ModeloArea modelo = ModeloArea.obtenerInstancia();
-		Integer codNum = Formateador.leeParametroInteger(request.getParameter(PARAM_AREA));
-		Area area = modelo.getAreaById(codNum);
+		ModeloBolsa modelo = ModeloBolsa.obtenerInstancia();
+		Integer codNum = Formateador.leeParametroInteger(request.getParameter(PARAM_BOLSA));
+		Bolsa area = modelo.getBolsaById(codNum);
 		
 		bean.setArea(area);
 		bean.setVista(RUTA_BEP + "index.jsp");
@@ -149,7 +151,7 @@ public class ControladorCandidatoTitulacionesPreferentesArea extends HttpServlet
 	 * @throws IOException .
 	 * @throws SQLException .
 	 */
-	private void listadoAreas(VistaCandidatoTitulacionesArea bean, UVDatos datos, HttpServletRequest request, HttpServletResponse response) throws IOException, SQLException {
+	private void listadoBolsas(VistaCandidatoTitulacionesArea bean, UVDatos datos, HttpServletRequest request, HttpServletResponse response) throws IOException, SQLException {
 		ModeloArea modelo = ModeloArea.obtenerInstancia();		
 		datos.setContentType("application/json");
 		datos.setRespuestaEnviada(true);

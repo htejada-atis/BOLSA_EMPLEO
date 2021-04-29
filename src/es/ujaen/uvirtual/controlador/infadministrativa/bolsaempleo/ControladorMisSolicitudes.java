@@ -641,14 +641,10 @@ public class ControladorMisSolicitudes extends HttpServlet {
 	
 	/**
 	 * descarga de pdf .
-	 * 
 	 * @param response .
 	 * @param datos    .
 	 * @param bean     .
 	 * @param request  .
-	 * @throws UVException
-	 * @throws SQLException
-	 * @throws IOException  .
 	 * @throws SQLException .
 	 * @throws UVException  .
 	 */
