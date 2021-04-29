@@ -5,6 +5,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.PrintWriter;
 import java.sql.SQLException;
+import java.sql.SQLIntegrityConstraintViolationException;
 import java.util.logging.Logger;
 import java.util.List;
 import java.util.logging.Level;
@@ -86,6 +87,7 @@ public class ControladorMisMeritos extends HttpServlet {
 	public static final String MENSAJE_ERROR_VALOR_MAXIMO_PERMITIDO = "El valor máximo permitido es %d";
 	public static final String MENSAJE_ERROR_VALOR_MINIMO_PERMITIDO = "El valor mínimo permitido es %d";
 	public static final String MENSAJE_ERROR_MERITOS_SELECCIONADOS_INCORRECTOS = "No hay méritos seleccionados válidos";
+	public static final String MENSAJE_ERROR_ELIMINAR_MERITO = "No se puede eliminar un mérito que ya está asociado a una solicitud";
 	
 	public static final String MENSAJE_EXITO_AGREGAR = "Mérito agregado correctamente";
 	public static final String MENSAJE_EXITO_ELIMINAR = "Mérito eliminado correctamente";
@@ -311,6 +313,8 @@ public class ControladorMisMeritos extends HttpServlet {
 			HttpSession session = request.getSession(false);
 			session.setAttribute(MENSAJE_ENVIADO, MENSAJE_EXITO_ELIMINAR);
 			response.sendRedirect(request.getServletPath());
+		} catch (SQLIntegrityConstraintViolationException e) {
+			throw new UVException(MENSAJE_ERROR_ELIMINAR_MERITO);
 		} catch (Exception ex) {
 			throw new UVException(MENSAJE_ERROR_MERITOS_SELECCIONADOS_INCORRECTOS);
 		}
