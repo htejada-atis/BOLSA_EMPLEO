@@ -1,6 +1,7 @@
 <%@ page trimDirectiveWhitespaces="true"%>
 <%@ page import="es.ujaen.uvirtual.beans.UVDatos"%>
 <%@	page import="es.ujaen.uvirtual.controlador.infadministrativa.bolsaempleo.ControladorUsuarioCandidato"%>
+<%@	page import="es.ujaen.uvirtual.controlador.infadministrativa.bolsaempleo.ControladorUsuarioBolsaEmpleo"%>
 <%@ page import="es.ujaen.uvirtual.beans.vistas.uvirtual.bolsaempleo.VistaUsuarioBolsaEmpleo"%>
 <%@ page import="es.ujaen.uvirtual.utilidades.EscapaHTML" %>
 
@@ -94,14 +95,51 @@ $(document).ready(function() {
         			return "<div title='En lista distribución' class='circle-true'></div>"; 
         		}
         	}},
-        	{'data': 'codnum', 'buttons': [{'label': 'Editar', 'onClick': function(row) {
-        		var params = {'a': '<%= ControladorUsuarioCandidato.ACCION_EDITAR_USUARIO %>', '<%= ControladorUsuarioCandidato.PARAM_NOMBRE_USUARIO %>': row.codcuenta};
-        		Atis.sendForm("<%= request.getRequestURI() %>", params);
-        	}},
-        	{'label': 'Excluir', 'onClick': function(row) {
-        		var params = {'a': '<%= ControladorUsuarioCandidato.ACCION_EXCLUIR_USUARIO %>', '<%= ControladorUsuarioCandidato.PARAM_NOMBRE_USUARIO %>': row.codcuenta};
-        		Atis.sendForm("<%= request.getRequestURI() %>", params);
-        	}}]}	
+        	{'data': 'codnum', 'buttons': [
+        		{'label': 'Editar', 'onClick': function(row) {
+        				var params = {'a': '<%= ControladorUsuarioCandidato.ACCION_EDITAR_USUARIO %>', '<%= ControladorUsuarioCandidato.PARAM_NOMBRE_USUARIO %>': row.codcuenta};
+        				Atis.sendForm("<%= request.getRequestURI() %>", params);
+        			}
+        		},
+        		{'label': function(row) { 
+					if(row.excluido) return "Incluir"
+					else return "Excluir"; 
+				},
+				'onClick': function(row) {
+    				if(row.excluido){
+    					Atis.confirmDialog("Incluir usuario", "&iquest;Desea incluir a este usuario en la base de datos?", {
+	            			Si: function() {
+	            				var params = {
+	            					'a': '<%=ControladorUsuarioBolsaEmpleo.ACCION_INCLUIR_USUARIO%>', 
+	            					'<%= ControladorUsuarioBolsaEmpleo.PARAM_NOMBRE_USUARIO %>': row.codcuenta,
+	            					'<%=ControladorUsuarioBolsaEmpleo.PARAM_ID%>': row.codNum
+	            				};
+	        					Atis.sendForm("<%= request.getRequestURI() %>", params);
+	              				$(this).dialog("close");
+	            				},
+	            			No: function() {
+	              				$(this).dialog("close");
+	            			}
+	          			});
+    				}
+    				else{
+    					Atis.confirmDialog("Excluir usuario", "&iquest;Desea excluir a este usuario en la base de datos?", {
+	            			Si: function() {
+	            				var params = {'a': '<%= ControladorUsuarioBolsaEmpleo.ACCION_EXCLUIR_USUARIO %>',
+	            					'<%= ControladorUsuarioBolsaEmpleo.PARAM_NOMBRE_USUARIO %>': row.codcuenta,
+	            					'<%= ControladorUsuarioBolsaEmpleo.PARAM_ID %>': row.codcuenta
+	            				};
+	        					Atis.sendForm("<%= request.getRequestURI() %>", params);
+	              				$(this).dialog("close");
+	            			},
+	            			No: function() {
+	              				$(this).dialog("close");
+	            			}
+	          			});
+    				}
+				}
+				}
+        	]}	
 	    ],
 	    "actions": [
 	    	{'label': 'Borrar', 'onClick': function(selected) { enviaAccion("<%=ControladorUsuarioCandidato.ACCION_ELIMINAR_USUARIO%>", selected); } }   	

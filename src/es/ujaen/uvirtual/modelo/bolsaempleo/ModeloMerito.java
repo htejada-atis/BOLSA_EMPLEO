@@ -12,6 +12,7 @@ import es.ujaen.uvirtual.beans.uvirtual.bolsaempleo.Bolsa;
 import es.ujaen.uvirtual.beans.uvirtual.bolsaempleo.Merito;
 import es.ujaen.uvirtual.beans.uvirtual.bolsaempleo.MeritoSolicitud;
 import es.ujaen.uvirtual.beans.uvirtual.bolsaempleo.Solicitud;
+import es.ujaen.uvirtual.beans.uvirtual.bolsaempleo.UsuarioBolsaEmpleo;
 import es.ujaen.uvirtual.modelo.conexion.ConexionUvirtual;
 import es.ujaen.uvirtual.utilidades.BolsaEmpleoUtils;
 import es.ujaen.uvirtual.utilidades.BolsaEmpleoDataTable;
@@ -292,23 +293,25 @@ public class ModeloMerito {
 	}
 	
 	/**
-	 * Listado de méritos de un usuario en la solicitud .
+	 * Listado de méritos de un usuario en la solicitud.
 	 * @param params para leer los parametros de paginación, ordenacion, etc .
 	 * @param usuario id del usuario .
 	 * @return listado de titulaciones .
 	 * @throws SQLException en caso de error de base de datos .
 	 * @throws UVException error si no existe titulación .
 	 */
-	public BolsaEmpleoDataTable<MeritoSolicitud> listaMeritosSolicitudDatatable(Map<String, String[]> params, Integer usuario) throws SQLException, UVException {
-		
+	public BolsaEmpleoDataTable<MeritoSolicitud> listaMeritosSolicitudDatatable(Map<String, String[]> params, UsuarioBolsaEmpleo usuario) throws SQLException, UVException {		
 		if (usuario == null) {
-			throw new UVException("No se pueden listar méritos sin el id del usuario");
+			throw new UVException("Introduce un usuario");
 		}
 		
 		List<MeritoSolicitud> meritos = new ArrayList<>();
 		BolsaEmpleoDataTable<MeritoSolicitud> dataTable = new BolsaEmpleoDataTable<MeritoSolicitud>(params);
 		
-		String consulta = "SELECT bepmer.*, bepsbm.FLGAFINIDAD, bepsbm.FLGEXCLUIDO, bepblo.BEPAPA_CODNUM FROM TBEP_MERITOS bepmer"
+		String consulta = ""
+				+ " SELECT DISTINCT (bepmer.CODNUM), bepmer.BEPITE_CODNUM, bepmer.BEPUSU_CODNUM, bepmer.VALOR, bepite.NOMBRE, "
+				+ "		bepmer.DESCRIPCION, bepmer.OBSERVACION, bepsbm.FLGAFINIDAD, bepsbm.FLGEXCLUIDO, bepblo.BEPAPA_CODNUM "
+				+ " FROM TBEP_MERITOS bepmer"
 				+ " INNER JOIN TBEP_ITEMSBAREMACION bepite ON bepite.CODNUM = bepmer.BEPITE_CODNUM"
 				+ " INNER JOIN TBEP_BLOQUESBAREMACION bepblo ON bepblo.CODNUM = bepite.BEPBLO_CODNUM"
 				+ " LEFT JOIN TBEP_SOLICITUD_BOLSAS_MERITOS bepsbm ON bepsbm.BEPMER_CODNUM = bepmer.CODNUM"
@@ -327,8 +330,8 @@ public class ModeloMerito {
 				PreparedStatement stmt = conexion.prepareStatement(dataTable.getQuery());
 		) {
 			int indexParam = 1;
-			stmt.setInt(indexParam, usuario);
-			stmtCount.setInt(indexParam++, usuario);
+			stmt.setInt(indexParam, usuario.getCodNum());
+			stmtCount.setInt(indexParam++, usuario.getCodNum());
 			dataTable.setFiltersParams(stmt, stmtCount, indexParam);
 			try (ResultSet rs = stmt.executeQuery()) {
 				while (rs.next()) {

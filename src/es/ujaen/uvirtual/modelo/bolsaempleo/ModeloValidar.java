@@ -5,6 +5,7 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -12,6 +13,7 @@ import es.ujaen.uvirtual.beans.uvirtual.bolsaempleo.Bolsa;
 import es.ujaen.uvirtual.beans.uvirtual.bolsaempleo.BolsaValidacion;
 import es.ujaen.uvirtual.beans.uvirtual.bolsaempleo.Convocatoria;
 import es.ujaen.uvirtual.beans.uvirtual.bolsaempleo.Solicitud;
+import es.ujaen.uvirtual.beans.uvirtual.bolsaempleo.UsuarioBolsaEmpleo;
 import es.ujaen.uvirtual.modelo.conexion.ConexionUvirtual;
 import es.ujaen.uvirtual.utilidades.BolsaEmpleoDataTable;
 import es.ujaen.uvirtual.utilidades.BolsaEmpleoDataTable.DataTableColumn;
@@ -26,6 +28,11 @@ public class ModeloValidar {
 	public static final int ORDER_COLUMN_INDEX_ID = 1;
 	public static final int ORDER_COLUMN_INDEX_CODIGO_AREA = 2;
 	public static final int ORDER_COLUMN_INDEX_AREA = 3;
+	
+	public static final String TOTAL_NO_VALIDADO = "TOTAL_NO_VALIDADO";
+	public static final String TOTAL_VALIDADO = "TOTAL_VALIDADO";
+	public static final String TOTAL_EXCLUIDO = "TOTAL_EXCLUIDO";
+	public static final String TOTAL_MERITOS = "TOTAL_MERITOS";
 
 	protected static ModeloValidar eInstancia = null;
 
@@ -76,7 +83,48 @@ public class ModeloValidar {
 	public BolsaEmpleoDataTable<BolsaValidacion> listadoAreasNoSujetasAfinidad(Convocatoria convocatoria, Map<String, String[]> params) throws SQLException, UVException {
 		return this.listadoAreas(convocatoria, false, params);
 	}
-
+	
+	/**
+	 * Devuelve los totales de méritos de los candidatos para un convocatoria.
+	 * @param convocatoria .
+	 * @param sujetosAfinidad los mérito contabilizados si son afines o no
+	 * @return un hashmap con los pares: "idbolsa" - "número de meritos"
+	 * @throws SQLException .
+	 */
+	public HashMap<Integer, Integer> getTotalesMeritosConvocatoria(Convocatoria convocatoria, Boolean sujetosAfinidad) throws SQLException {
+		HashMap<Integer, Integer> totales = new HashMap<Integer, Integer>();
+					
+		try (Connection con = ConexionUvirtual.obtenerInstancia();) {
+			String sql =
+					"SELECT bepbol.CODNUM, COUNT(*) AS COUNT "
+					+ "FROM TBEP_BOLSAS bepbol "
+					+ "INNER JOIN TBEP_AREAS bepare ON bepare.CODNUM = bepbol.BEPARE_CODNUM "
+					+ "INNER JOIN TBEP_SOLICITUD_BOLSAS bepsbo ON bepsbo.BEPBOL_CODNUM = bepbol.CODNUM "
+					+ "INNER JOIN TBEP_SOLICITUDES bepsol ON bepsol.CODNUM = bepsbo.BEPSOL_CODNUM "
+					+ "INNER JOIN TBEP_SOLICITUD_BOLSAS_MERITOS bepsbm ON bepsbm.BEPSBO_CODNUM = bepsbo.CODNUM "
+					+ "INNER JOIN TBEP_MERITOS bepmer ON bepmer.CODNUM = bepsbm.BEPMER_CODNUM "
+					+ "INNER JOIN TBEP_ITEMSBAREMACION bepite ON bepite.CODNUM = bepmer.BEPITE_CODNUM "
+					+ "INNER JOIN TBEP_AFINIDADES bepafi ON bepafi.CODNUM = bepite.AFINIDAD "
+					+ "WHERE 1=1 "
+					+ "AND bepsol.BEPCON_CODNUM = ? "
+					+ "AND bepafi.FLGSUJETOAFINIDAD = '" + (sujetosAfinidad ? "S" : "N") + "'"
+					+ "GROUP BY bepbol.CODNUM ";
+								
+			try (PreparedStatement stmt = con.prepareStatement(sql);) {
+				int param = 1;
+				stmt.setInt(param++, convocatoria.getCodNum());
+				
+				try (ResultSet rs = stmt.executeQuery()) {
+					while (rs.next()) {
+						totales.put(rs.getInt("CODNUM"), rs.getInt("COUNT"));
+					}
+				}
+			}			
+		}
+		
+		return totales;
+	}
+	
 	private BolsaEmpleoDataTable<BolsaValidacion> listadoAreas(Convocatoria convocatoria, Boolean sujetasAfinidad, Map<String, String[]> params) 
 			throws SQLException, UVException {
 		List<BolsaValidacion> rows = new ArrayList<>();
@@ -87,9 +135,13 @@ public class ModeloValidar {
 			dataTable.setData(rows);
 			return dataTable;
 		}
+		
+		// leemos el total de méritos por bolsa
+		HashMap<Integer, Integer> totalMeritosPorBolsa = this.getTotalesMeritosConvocatoria(convocatoria, sujetasAfinidad);
 
-		// seleccionamos las bolsas, con meritos con afinidad, en la solicitud pasada
-		String consulta = "SELECT bepbol.* " 
+		// seleccionamos las bolsas, con meritos, en la convocatoria pasada
+		String consulta = 
+				"SELECT DISTINCT bepbol.* " 
 				+ "FROM TBEP_BOLSAS bepbol "
 				+ "INNER JOIN TBEP_AREAS bepare ON bepare.CODNUM = bepbol.BEPARE_CODNUM "
 				+ "INNER JOIN TBEP_SOLICITUD_BOLSAS bepsbo ON bepsbo.BEPBOL_CODNUM = bepbol.CODNUM "
@@ -120,6 +172,7 @@ public class ModeloValidar {
 				while (rs.next()) {
 					Bolsa bolsa = modeloBolsa.createFromResultSet(rs);
 					BolsaValidacion bolsaValidacion = new BolsaValidacion(bolsa);
+					bolsaValidacion.setTotalMeritos(totalMeritosPorBolsa.get(bolsa.getCodNum()));
 					
 					rows.add(bolsaValidacion);
 				}

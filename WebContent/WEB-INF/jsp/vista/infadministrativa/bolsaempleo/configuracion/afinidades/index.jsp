@@ -66,13 +66,9 @@ $(document).ready(function() {
 	    "columns": [
 	    	{'data': 'codNum', 'selectable': true},
 	        {'data': 'codNum'},
-	        {'data': 'codigo', 'render': function(row) {
-        			return "<div style='text-align: center;'>"+row.codigo+"</div>"; 
-        	}},
+	        {'data': 'codigo', 'class': 'center'},
 	        {'data': 'descripcion'},
-	        {'data': 'modulacion', 'render': function(row) {
-        			return "<div style='text-align: center;'>"+row.modulacion+"</div>"; 
-        	}},
+	        {'data': 'modulacion', 'class': 'center'},
         	{'data': 'sujetoAfinidad', 'order': {'active': false},
 	    		'render': function(row) {
 	        		if (row.sujetoAfinidad) {

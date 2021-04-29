@@ -12,6 +12,7 @@ public class BolsaValidacion extends Bolsa implements Serializable {
 	private Integer totalMeritosNoValidados;
 	private Integer totalMeritosValidados;
 	private Integer totalMeritosExcluidos;
+	private Integer totalMeritos;
 	
 	/** Constructor por defecto.
 	 */
@@ -31,12 +32,14 @@ public class BolsaValidacion extends Bolsa implements Serializable {
 	 * @param pmeritosNoValidados .
 	 * @param pmeritosValidados .
 	 * @param pmeritosExcluidos .
+	 * @param ptotalMeritos .
 	 */
-	public BolsaValidacion(Bolsa pbolsa, Integer pmeritosNoValidados, Integer pmeritosValidados, Integer pmeritosExcluidos) {
+	public BolsaValidacion(Bolsa pbolsa, Integer pmeritosNoValidados, Integer pmeritosValidados, Integer pmeritosExcluidos, Integer ptotalMeritos) {
 		super(pbolsa);
 		this.totalMeritosNoValidados = pmeritosNoValidados;
 		this.totalMeritosValidados = pmeritosValidados;
 		this.totalMeritosExcluidos = pmeritosExcluidos;		
+		this.totalMeritos = ptotalMeritos;
 	}
 	
 	/** Constructor copia.
@@ -47,27 +50,46 @@ public class BolsaValidacion extends Bolsa implements Serializable {
 		this.totalMeritosNoValidados = copia.totalMeritosNoValidados;
 		this.totalMeritosValidados = copia.totalMeritosValidados;
 		this.totalMeritosExcluidos = copia.totalMeritosExcluidos;
+		this.totalMeritos = copia.totalMeritos;
 	}
 	
-	public Integer getMeritosNoValidados() {
+	public Integer getTotalMeritosNoValidados() {
 		return this.totalMeritosNoValidados;
 	}
 	
-	public void setMeritosNoValidados(Integer v) {
+	public void setTotalMeritosNoValidados(Integer v) {
 		totalMeritosNoValidados = v;
 	}
 	
-	/**
-	 * Devuelve el total de meritos.
-	 * @return total.
-	 */
-	public Integer getTotalMeritos() {
-		return totalMeritosNoValidados + totalMeritosValidados + totalMeritosExcluidos;
+	public Integer getTotalMeritosValidados() {
+		return this.totalMeritosValidados;
 	}
 	
+	public void setTotalMeritosValidados(Integer v) {
+		totalMeritosValidados = v;
+	}
+	
+	public Integer getTotalMeritosExcluidos() {
+		return this.totalMeritosExcluidos;
+	}
+	
+	public void setTotalMeritosExcluidos(Integer v) {
+		totalMeritosExcluidos = v;
+	}
+	
+	public Integer getTotalMeritos() {
+		return this.totalMeritos;
+	}
+	
+	public void setTotalMeritos(Integer v) {
+		totalMeritos = v;
+	}
+		
 	@Override
 	public String toString() {
-		return "BolsaSolicitud [bolsa=" + super.toString() + ", meritosNoValidados=" + totalMeritosNoValidados + "]";
+		return "BolsaSolicitud [bolsa=" + super.toString() + ", meritosNoValidados=" + totalMeritosNoValidados 
+				+ ", totalMeritosValidados=" + totalMeritosValidados + ", totalMeritosExcluidos=" + totalMeritosExcluidos 
+				+ ", totalMeritos=" + totalMeritos + "]";
 	}
 	
 	@Override
@@ -78,6 +100,7 @@ public class BolsaValidacion extends Bolsa implements Serializable {
 		result = prime * result + ((totalMeritosNoValidados == null) ? 0 : totalMeritosNoValidados.hashCode());
 		result = prime * result + ((totalMeritosValidados == null) ? 0 : totalMeritosValidados.hashCode());
 		result = prime * result + ((totalMeritosExcluidos == null) ? 0 : totalMeritosExcluidos.hashCode());
+		result = prime * result + ((totalMeritos == null) ? 0 : totalMeritos.hashCode());
 		return result;
 	}
 
@@ -118,6 +141,13 @@ public class BolsaValidacion extends Bolsa implements Serializable {
 				return false;
 			}
 		} else if (!totalMeritosExcluidos.equals(other.totalMeritosExcluidos)) {
+			return false;
+		}
+		if (totalMeritos == null) {
+			if (other.totalMeritos != null) {
+				return false;
+			}
+		} else if (!totalMeritos.equals(other.totalMeritos)) {
 			return false;
 		}
 		

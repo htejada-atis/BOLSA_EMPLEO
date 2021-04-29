@@ -109,16 +109,16 @@ function DataTable(id, config) {
             $(tr).on('click', self.config.clickable.onClick.bind($(tr), row, self));
         }
 
-        var selected = self.config.selected;
-
-        if (Array.isArray(selected)) {
-            selected.forEach(function (element) {
-                if (element == row.codNum) {
-                    row['selected'] = true;
+        row.selected = false;
+        
+        if (Array.isArray(self.config.selected)) {            
+            self.config.selected.forEach(function (element) {
+                if (element === row.codNum) {
+                    row.selected = true;
                 }
             });
-        } else if (selected && selected == row.codNum) {
-            row['selected'] = true;
+
+            // console.log('render row', row.codNum, row.selected, self.config.selected);
         }
 
         if (row.selected) {
@@ -142,7 +142,7 @@ function DataTable(id, config) {
     this.renderCol = function(row, columnDef) {
     	var data = columnDef.data;
     	var value = Atis.getProp(row, data);
-    	
+
     	if (columnDef.hasOwnProperty('render')) {
     		return columnDef.render(row);
     	}
@@ -180,6 +180,8 @@ function DataTable(id, config) {
     	if (columnDef.hasOwnProperty('selectable') && columnDef.selectable) {
     		var check = $('<input type="checkbox"/>');
 
+            // console.log('render col', check, row.selected);
+
             if (row.selected) {
                 self.checked[value] = true;
                 check.prop('checked', true);
@@ -204,7 +206,7 @@ function DataTable(id, config) {
     		});
 
             if (columnDef.selectable.exclude && Atis.getProp(row, columnDef.selectable.exclude)) {
-                $(check).prop( 'disabled', true);
+                $(check).prop('disabled', true);
             }
     		
     		return check;
