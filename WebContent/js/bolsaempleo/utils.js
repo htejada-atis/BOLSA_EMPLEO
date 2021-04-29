@@ -21,6 +21,17 @@ function setProp( object, keys, val ){
 	object[keys[0]] = val;
 }
 
+function removeValueArray(array, val) {
+	array = Array.isArray(array) ? array : [array];
+	console.log(array);
+	const index = array.indexOf(val);
+	if (index > -1) {
+		array.splice(index, 1);
+	}
+	
+	console.log(array);
+}
+
 function formatearFecha(fecha) {
 	var sin_hora = fecha.split(" ")[0];
 	var sin_guiones = sin_hora.split("-");
@@ -136,5 +147,6 @@ window.Atis = $.extend(window.Atis ? window.Atis : {}, {
 	"sendForm": sendForm,
 	"object2Json": object2Json,
 	"json2Object": json2Object,
-	"sendAjax": sendAjax
+	"sendAjax": sendAjax,
+	"removeValueArray": removeValueArray
 });

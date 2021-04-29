@@ -40,13 +40,11 @@ import es.ujaen.uvirtual.utilidades.BolsaEmpleoDataTable;
 import es.ujaen.uvirtual.utilidades.EscapaHTML;
 import es.ujaen.uvirtual.utilidades.Formateador;
 import es.ujaen.uvirtual.utilidades.UVException;
-
 import com.lowagie.text.Cell;
 import com.lowagie.text.Chunk;
 import com.lowagie.text.Document;
 import com.lowagie.text.Font;
 import com.lowagie.text.FontFactory;
-import com.lowagie.text.PageSize;
 import com.lowagie.text.Paragraph;
 import com.lowagie.text.Phrase;
 import com.lowagie.text.pdf.PdfWriter;
@@ -646,14 +644,10 @@ public class ControladorMisSolicitudes extends HttpServlet {
 	
 	/**
 	 * descarga de pdf .
-	 * 
 	 * @param response .
 	 * @param datos    .
 	 * @param bean     .
 	 * @param request  .
-	 * @throws UVException
-	 * @throws SQLException
-	 * @throws IOException  .
 	 * @throws SQLException .
 	 * @throws UVException  .
 	 */

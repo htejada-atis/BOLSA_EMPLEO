@@ -66,7 +66,7 @@ VistaSolicitudes bean = (VistaSolicitudes) uvdatos.getVistas().get(VistaSolicitu
 		
 		<%  if (bean.getListaBolsas() != null) {
 				for (Bolsa bolsa: bean.getListaBolsas()) { %>
-					bolsasSolicitud.push("<%=bolsa.getCodNum()%>");
+					bolsasSolicitud.push(<%=bolsa.getCodNum()%>);
 				<% }
 			} %>
 		
@@ -110,8 +110,10 @@ VistaSolicitudes bean = (VistaSolicitudes) uvdatos.getVistas().get(VistaSolicitu
 			if (tableAreas.getCheckedItems().length < 1) {
 				Atis.alertDialog("Seleccionar áreas", "Debes seleccionar al menos un área para continuar");
 			} else if (tableAreas.getCheckedItems().length > <%= bean.getSolicitud().getConvocatoria().getNumBolsasMaximo() %>) {
-				Atis.alertDialog("Seleccionar áreas", "No puedes superar el número máximo de áreas permitido de la convocatoria. <br/>" + 
-						"Máximo perimitido " + "<%= bean.getSolicitud().getConvocatoria().getNumBolsasMaximo() %>.");
+				var message = "No puedes superar el número máximo de áreas permitido de la convocatoria. <br/>"
+							+ "Máximo perimitido: <%= bean.getSolicitud().getConvocatoria().getNumBolsasMaximo() %>. <br/>"
+							+ "Áreas seleccionadas: " + tableAreas.getCheckedItems().length + ".";
+				Atis.alertDialog("Seleccionar áreas", message);
 			} else {
 				var params = {
 						'a': '<%= ControladorMisSolicitudes.ACCION_SELECCIONAR_BOLSAS %>',

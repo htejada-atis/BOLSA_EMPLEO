@@ -21,7 +21,7 @@ function DataTable(id, config) {
     this.pageSizeOptions = Atis.getProp(config, 'pageSizeOptions', [5,10,20,100]);
     this.filterParams = {}
     this.title = Atis.getProp(config, 'title', undefined);
-    this.lastResponse = null;    
+    this.lastResponse = null;
     this.checked = {};
 
     var self = this;
@@ -117,8 +117,6 @@ function DataTable(id, config) {
                     row.selected = true;
                 }
             });
-
-            // console.log('render row', row.codNum, row.selected, self.config.selected);
         }
 
         if (row.selected) {
@@ -180,8 +178,6 @@ function DataTable(id, config) {
     	if (columnDef.hasOwnProperty('selectable') && columnDef.selectable) {
     		var check = $('<input type="checkbox"/>');
 
-            // console.log('render col', check, row.selected);
-
             if (row.selected) {
                 self.checked[value] = true;
                 check.prop('checked', true);
@@ -189,8 +185,15 @@ function DataTable(id, config) {
             }
     		
     		$(check).on('change', function() {
-    			self.checked[value] = this.checked;
-                this.checked ? $(this).parent().parent().addClass("selected") : $(this).parent().parent().removeClass("selected");
+                var checked  = this.checked;
+                var selected = self.config.selected;
+
+                if (selected) {
+                    checked ? selected.push(value) : Atis.removeValueArray(selected, value);
+                }
+                
+    			self.checked[value] = checked;
+                checked ? $(this).parent().parent().addClass("selected") : $(this).parent().parent().removeClass("selected");
     			self.renderFooter();
 
                 if (columnDef.selectable.hasOwnProperty('onChange')) {
@@ -244,6 +247,7 @@ function DataTable(id, config) {
 
         // page size select
         var selectSize = $('<select></select>');
+        selectSize.prop('title', 'Cambiar tama\u00f1o de p\u00e1gina');
 
         self.pageSizeOptions.forEach(function(option) {
             var option = $('<option ' + (self.params.pageSize == option ? 'selected' : '') + '>' + option + '</option>');
@@ -414,8 +418,6 @@ function DataTable(id, config) {
             self.config.selected.forEach(function (id) {
                 self.checked[id] = true;
             });
-
-            console.log('checked', self.checked);
         }
     };
     

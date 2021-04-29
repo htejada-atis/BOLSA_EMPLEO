@@ -1,7 +1,6 @@
 package es.ujaen.uvirtual.beans.vistas.uvirtual.bolsaempleo;
 
 import java.io.Serializable;
-import es.ujaen.uvirtual.beans.uvirtual.bolsaempleo.Area;
 import es.ujaen.uvirtual.beans.uvirtual.bolsaempleo.Bolsa;
 import es.ujaen.uvirtual.beans.uvirtual.bolsaempleo.TitulacionArea;
 import es.ujaen.uvirtual.beans.vistas.Vista;
@@ -14,7 +13,7 @@ public class VistaCandidatoTitulacionesArea extends Vista implements Serializabl
 	private static final long serialVersionUID = 1L;
 	private BolsaEmpleoDataTable<Bolsa> dataTableAreas;
 	private BolsaEmpleoDataTable<TitulacionArea> dataTableTitulaciones;
-	private Area area;
+	private Bolsa area;
 	private String vista;
 	
 	
@@ -34,11 +33,11 @@ public class VistaCandidatoTitulacionesArea extends Vista implements Serializabl
 		this.dataTableTitulaciones = dt;
 	}
 	
-	public Area getArea() {
+	public Bolsa getArea() {
 		return area;
 	}
 	
-	public void setArea(Area area) {
+	public void setArea(Bolsa area) {
 		this.area = area;
 	}
 	

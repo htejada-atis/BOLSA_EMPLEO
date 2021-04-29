@@ -39,7 +39,7 @@ public class TestBEPControladorGestionEvaluadores {
     
     // método para obtener la vista con una lista de áreas .
     private VistaEvaluadores getVistaConAreas() throws ServletException, IOException {
-    	PeticionHttp peticion = UtilsTestBolsaEmpleo.peticionAutenticada();
+    	PeticionHttp peticion = UtilsTestBolsaEmpleo.peticionAutenticadaPersonal();
     	peticion.setParameter(ControladorGestionEvaluadores.PARAM_ACCION, ControladorGestionEvaluadores.ACCION_LISTAR_AREAS);	
 		
 		RespuestaHttp respuesta = new RespuestaHttp();
@@ -52,7 +52,7 @@ public class TestBEPControladorGestionEvaluadores {
     
     // método para obtener la vista con una lista de usuarios .
     private VistaEvaluadores getVistaConUsuarios(String accion) throws ServletException, IOException {
-		PeticionHttp peticion = UtilsTestBolsaEmpleo.peticionAutenticada();
+		PeticionHttp peticion = UtilsTestBolsaEmpleo.peticionAutenticadaPersonal();
 		peticion.setParameter(ControladorGestionEvaluadores.PARAM_ACCION, accion);
 		
 		VistaEvaluadores bean = getVistaConAreas();
@@ -73,7 +73,7 @@ public class TestBEPControladorGestionEvaluadores {
 	 */
 	@Test
 	public void testA01Obtener() throws SQLException, ServletException, IOException {
-		PeticionHttp peticion = UtilsTestBolsaEmpleo.peticionAutenticada();
+		PeticionHttp peticion = UtilsTestBolsaEmpleo.peticionAutenticadaPersonal();
 		
 		RespuestaHttp respuesta = new RespuestaHttp();
 		ControladorGestionEvaluadores controlador = new ControladorGestionEvaluadores();
@@ -137,7 +137,7 @@ public class TestBEPControladorGestionEvaluadores {
 	public void testA05AgregarEvaluadores() throws SQLException, ServletException, IOException {
 		VistaEvaluadores bean = getVistaConUsuarios(ControladorGestionEvaluadores.ACCION_DATATABLE_USUARIOS);
 		
-		PeticionHttp peticion = UtilsTestBolsaEmpleo.peticionAutenticada();
+		PeticionHttp peticion = UtilsTestBolsaEmpleo.peticionAutenticadaPersonal();
 		peticion.setParameter(ControladorGestionEvaluadores.PARAM_ACCION, ControladorGestionEvaluadores.ACCION_AGREGAR_EVALUADORES);
 		peticion.setParameter(ControladorGestionEvaluadores.PARAM_USUARIOS, 
 				"[" + bean.getDatatableUsuarios().getData().get(0).getCodNum().toString() + "]");

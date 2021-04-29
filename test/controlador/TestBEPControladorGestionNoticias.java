@@ -47,7 +47,7 @@ public class TestBEPControladorGestionNoticias {
     
     
     private VistaNoticias obtenerNoticias(String action) throws ServletException, IOException {
-    	PeticionHttp peticion = UtilsTestBolsaEmpleo.peticionAutenticada();
+    	PeticionHttp peticion = UtilsTestBolsaEmpleo.peticionAutenticadaPersonal();
 		peticion.setParameter(ControladorGestionNoticias.PARAM_ACCION, action);
 
 		RespuestaHttp respuesta = new RespuestaHttp();
@@ -104,7 +104,7 @@ public class TestBEPControladorGestionNoticias {
 	 */
 	@Test
 	public void testA04Insertar() throws SQLException, UVException, ServletException, IOException {
-		PeticionHttp peticion = UtilsTestBolsaEmpleo.peticionAutenticada();
+		PeticionHttp peticion = UtilsTestBolsaEmpleo.peticionAutenticadaPersonal();
 		peticion.setParameter(ControladorGestionNoticias.PARAM_ACCION, ControladorGestionNoticias.ACCION_AGREGAR_NOTICIA);
 		peticion.setParameter(ControladorGestionNoticias.PARAM_ENLACE, ENLACE_NOTICIA);
 		peticion.setParameter(ControladorGestionNoticias.PARAM_FECHA, FECHA_NOTICIA);
@@ -129,7 +129,7 @@ public class TestBEPControladorGestionNoticias {
 	public void testA05Editar() throws ServletException, IOException {
 		VistaNoticias bean = obtenerNoticias(ControladorGestionNoticias.ACCION_DATATABLE);
 		
-		PeticionHttp peticion = UtilsTestBolsaEmpleo.peticionAutenticada();
+		PeticionHttp peticion = UtilsTestBolsaEmpleo.peticionAutenticadaPersonal();
 		peticion.setParameter(ControladorGestionNoticias.PARAM_ACCION, ControladorGestionNoticias.ACCION_EDITAR_NOTICIA);
 		peticion.setParameter(ControladorGestionNoticias.PARAM_ID, bean.getDatatableNoticias().getData().get(0).getCodNum().toString());
 		peticion.setParameter(ControladorGestionNoticias.PARAM_ENLACE, ENLACE_NOTICIA);
@@ -156,7 +156,7 @@ public class TestBEPControladorGestionNoticias {
 	public void testA06Eliminar() throws ServletException, IOException {
 		VistaNoticias bean = obtenerNoticias(ControladorGestionNoticias.ACCION_DATATABLE);
 		
-		PeticionHttp peticion = UtilsTestBolsaEmpleo.peticionAutenticada();
+		PeticionHttp peticion = UtilsTestBolsaEmpleo.peticionAutenticadaPersonal();
 		peticion.setParameter(ControladorGestionNoticias.PARAM_ACCION, ControladorGestionNoticias.ACCION_ELIMINAR_NOTICIA);
 		peticion.setParameter(ControladorGestionNoticias.PARAM_ID, bean.getDatatableNoticias().getData().get(0).getCodNum().toString());
 		
@@ -176,7 +176,7 @@ public class TestBEPControladorGestionNoticias {
 	 */
 	@Test
 	public void testE01EditarVacio() throws ServletException, IOException {
-		PeticionHttp peticion = UtilsTestBolsaEmpleo.peticionAutenticada();
+		PeticionHttp peticion = UtilsTestBolsaEmpleo.peticionAutenticadaPersonal();
 		peticion.setParameter(ControladorGestionNoticias.PARAM_ACCION, ControladorGestionNoticias.ACCION_EDITAR_NOTICIA);
 
 		RespuestaHttp respuesta = new RespuestaHttp();

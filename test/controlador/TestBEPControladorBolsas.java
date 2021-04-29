@@ -2,16 +2,13 @@ package controlador;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotEquals;
-
 import java.io.IOException;
 import java.sql.SQLException;
 import javax.servlet.ServletException;
 import org.junit.BeforeClass;
 import org.junit.Test;
-
 import bbdd.BbddRunner;
 import bbdd.UtilsTestBolsaEmpleo;
-import bbdd.UtilsTestDocentia;
 import controlador.implementacion.PeticionHttp;
 import controlador.implementacion.RespuestaHttp;
 import es.ujaen.uvirtual.beans.vistas.uvirtual.bolsaempleo.VistaEstadoBolsas;
@@ -35,7 +32,7 @@ public class TestBEPControladorBolsas {
     }
     
     private VistaEstadoBolsas getVistaBolsasEmpleo(String action) throws ServletException, IOException {
-    	PeticionHttp peticion = UtilsTestBolsaEmpleo.peticionAutenticada();
+    	PeticionHttp peticion = UtilsTestBolsaEmpleo.peticionAutenticadaPersonal();
     	
     	if (action != null) {
     		peticion.setParameter(ControladorBolsas.PARAM_ACCION, action);
@@ -152,7 +149,7 @@ public class TestBEPControladorBolsas {
 				+ bean.getDatatableBolsas().getData().get(1).getCodNum() + "]";
 								
 		// petición para bloquear bolsas
-		PeticionHttp peticion = UtilsTestDocentia.peticionAutenticada();
+		PeticionHttp peticion = UtilsTestBolsaEmpleo.peticionAutenticadaPersonal();
 		peticion.setParameter(ControladorBolsas.PARAM_ACCION, ControladorBolsas.ACCION_BOLSA);		
 		peticion.setParameter(ControladorBolsas.PARAM_ACCION_BOLSA, ControladorBolsas.ACCION_BOLSAS_BAREMAR);
     	peticion.setParameter(ControladorBolsas.PARAM_BOLSAS_SELECCIONADAS, selected);    	
@@ -177,7 +174,7 @@ public class TestBEPControladorBolsas {
 	 */
 	@Test
 	public void testA10() throws SQLException, ServletException, IOException {
-		PeticionHttp peticion = UtilsTestDocentia.peticionAutenticada();
+		PeticionHttp peticion = UtilsTestBolsaEmpleo.peticionAutenticadaPersonal();
 		peticion.setParameter(ControladorBolsas.PARAM_ACCION, ControladorBolsas.ACCION_BOLSA);		
 		peticion.setParameter(ControladorBolsas.PARAM_ACCION_BOLSA, ControladorBolsas.ACCION_BOLSAS_BLOQUEAR);
 		peticion.setParameter(ControladorBolsas.PARAM_BOLSAS_SELECCIONADAS, "");
@@ -204,7 +201,7 @@ public class TestBEPControladorBolsas {
 				+ bean.getDatatableBolsas().getData().get(1).getCodNum() + "]";
 				
 		bean = getVistaBolsasEmpleo(ControladorBolsas.ACCION_DATATABLE);
-		PeticionHttp peticion = UtilsTestDocentia.peticionAutenticada();
+		PeticionHttp peticion = UtilsTestBolsaEmpleo.peticionAutenticadaPersonal();
 		peticion.setParameter(ControladorBolsas.PARAM_ACCION, ControladorBolsas.ACCION_BOLSA);		
 		peticion.setParameter(ControladorBolsas.PARAM_ACCION_BOLSA, "accionmal");
 		peticion.setParameter(ControladorBolsas.PARAM_BOLSAS_SELECCIONADAS, selected);
@@ -224,7 +221,7 @@ public class TestBEPControladorBolsas {
 	 */
 	@Test
 	public void testA12() throws SQLException, ServletException, IOException {
-		PeticionHttp peticion = UtilsTestDocentia.peticionAutenticada();
+		PeticionHttp peticion = UtilsTestBolsaEmpleo.peticionAutenticadaPersonal();
 		peticion.setParameter(ControladorBolsas.PARAM_ACCION, ControladorBolsas.ACCION_DATATABLE);
 		peticion.setParameter(BolsaEmpleoDataTable.PARAM_ORDER_BY, "ddd");
     	RespuestaHttp respuesta = new RespuestaHttp();
@@ -248,7 +245,7 @@ public class TestBEPControladorBolsas {
 		String selected = "[111111111111]";
 				
 		bean = getVistaBolsasEmpleo(ControladorBolsas.ACCION_DATATABLE);
-		PeticionHttp peticion = UtilsTestDocentia.peticionAutenticada();
+		PeticionHttp peticion = UtilsTestBolsaEmpleo.peticionAutenticadaPersonal();
 		peticion.setParameter(ControladorBolsas.PARAM_ACCION, ControladorBolsas.ACCION_BOLSA);		
 		peticion.setParameter(ControladorBolsas.PARAM_ACCION_BOLSA, "accionmal");
 		peticion.setParameter(ControladorBolsas.PARAM_BOLSAS_SELECCIONADAS, selected);
@@ -269,10 +266,10 @@ public class TestBEPControladorBolsas {
 				+ bean.getDatatableBolsas().getData().get(1).getCodNum() + "]";
 								
 		// petición para bloquear bolsas
-		PeticionHttp peticion = UtilsTestDocentia.peticionAutenticada();
-		peticion.setParameter(ControladorBolsas.PARAM_ACCION, ControladorBolsas.ACCION_BOLSA);		
+		PeticionHttp peticion = UtilsTestBolsaEmpleo.peticionAutenticadaPersonal();
+		peticion.setParameter(ControladorBolsas.PARAM_ACCION, ControladorBolsas.ACCION_BOLSA);
 		peticion.setParameter(ControladorBolsas.PARAM_ACCION_BOLSA, accionSobreBolsas);
-    	peticion.setParameter(ControladorBolsas.PARAM_BOLSAS_SELECCIONADAS, selected);    	
+    	peticion.setParameter(ControladorBolsas.PARAM_BOLSAS_SELECCIONADAS, selected);
     	RespuestaHttp respuesta = new RespuestaHttp();
     	ControladorBolsas controlador = new ControladorBolsas();
     	controlador.doPost(peticion, respuesta);
