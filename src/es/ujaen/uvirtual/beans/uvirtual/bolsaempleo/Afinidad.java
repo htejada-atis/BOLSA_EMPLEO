@@ -16,7 +16,11 @@ public class Afinidad {
 	/** Constructor por defecto.
 	 */
 	public Afinidad() {
-		
+		super();
+		this.codNum = null;
+		this.codigo = "";
+		this.descripcion = "";
+		this.modulacion = null;
 	}
 	
 	/** Constructor con parametros.
@@ -32,6 +36,23 @@ public class Afinidad {
 		this.descripcion = pdescripcion;
 		this.modulacion = pmodulacion;
 	}
+	
+	
+	/** Constructor con parametros.
+	 * @param pcodNum .
+	 * @param pcodigo .
+	 * @param pdescripcion .
+	 * @param pmodulacion .
+	 * @param psujetoAfinidad .
+	 */
+	public Afinidad(Integer pcodNum, String pcodigo, String pdescripcion, Float pmodulacion, Boolean psujetoAfinidad) {
+		super();
+		this.codNum = pcodNum;
+		this.codigo = pcodigo;
+		this.descripcion = pdescripcion;
+		this.modulacion = pmodulacion;
+		this.sujetoAfinidad = psujetoAfinidad;
+	}
 
 	/** Constructor copia.
 	 * @param copia Titulación a copiar
@@ -41,6 +62,7 @@ public class Afinidad {
 		this.codigo = copia.codigo;
 		this.descripcion = copia.descripcion;
 		this.modulacion = copia.modulacion;
+		this.sujetoAfinidad = copia.sujetoAfinidad;
 	}
 	
 	public Integer getCodNum() {

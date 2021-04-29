@@ -15,7 +15,7 @@ import es.ujaen.uvirtual.beans.uvirtual.docentia.Convocatoria;
 /** test convocatoria.
  *
  */
-public class TestBeanConvocatoria {
+public class TestBEPBeanConvocatoria {
 
 	private static final String CADENA = "cadena";
 	

@@ -163,21 +163,42 @@ public class ModeloAfinidad {
 	/**
 	 * Añade una afinidad al sistema cerrada.
 	 * @param afinidad .	 
+	 * @throws UVException .
 	 * @throws SQLException .
 	 */
-	public void nuevaAfinidad(Afinidad afinidad) throws SQLException {
-		String consulta =
-			"INSERT INTO TBEP_AFINIDADES (CODIGO, DESCRIPCION, MODULACION) " 
-			+ "VALUES (?, ?, ?)";
-		
-		try (Connection conexion = ConexionUvirtual.obtenerInstancia();
-				 PreparedStatement stmt = conexion.prepareStatement(consulta);) {
-			int parameterIndex = 1;
-			stmt.setString(parameterIndex++, afinidad.getCodigo());
-			stmt.setString(parameterIndex++, afinidad.getDescripcion());
-			stmt.setFloat(parameterIndex++, afinidad.getModulacion());			
-			stmt.executeUpdate();
-		}		
+	public void nuevaAfinidad(Afinidad afinidad) throws SQLException, UVException {
+		if (afinidad == null) {
+			throw new UVException("No se puede insertar una afinidad vacio");
+		}
+		if (afinidad.getCodNum() != null) {
+			String consulta =
+					"INSERT INTO TBEP_AFINIDADES (CODNUM, CODIGO, DESCRIPCION, MODULACION) " 
+					+ "VALUES (?, ?, ?, ?)";
+				
+				try (Connection conexion = ConexionUvirtual.obtenerInstancia();
+						 PreparedStatement stmt = conexion.prepareStatement(consulta);) {
+					int parameterIndex = 1;
+					stmt.setInt(parameterIndex++, afinidad.getCodNum());
+					stmt.setString(parameterIndex++, afinidad.getCodigo());
+					stmt.setString(parameterIndex++, afinidad.getDescripcion());
+					stmt.setFloat(parameterIndex++, afinidad.getModulacion());			
+					stmt.executeUpdate();
+				}		
+		} else {
+			String consulta =
+					"INSERT INTO TBEP_AFINIDADES (CODIGO, DESCRIPCION, MODULACION) " 
+					+ "VALUES (?, ?, ?)";
+				
+				try (Connection conexion = ConexionUvirtual.obtenerInstancia();
+						 PreparedStatement stmt = conexion.prepareStatement(consulta);) {
+					int parameterIndex = 1;
+					stmt.setString(parameterIndex++, afinidad.getCodigo());
+					stmt.setString(parameterIndex++, afinidad.getDescripcion());
+					stmt.setFloat(parameterIndex++, afinidad.getModulacion());			
+					stmt.executeUpdate();
+				}		
+		}
+
 	}
 	
 	/**
@@ -186,7 +207,10 @@ public class ModeloAfinidad {
 	 * @return Afinidad o null si no existe
 	 * @throws SQLException .
 	 */
-	public Afinidad getAfinidadById(int codNum) throws SQLException, UVException {
+	public Afinidad getAfinidadById(Integer codNum) throws SQLException, UVException {
+		if (codNum == null) {
+			throw new UVException("No existe la afinidad");
+		}
 		String consulta = "SELECT bepafi.* FROM TBEP_AFINIDADES bepafi WHERE bepafi.CODNUM = ?";
 			
 		try (Connection conexion = ConexionUvirtual.obtenerInstancia();
@@ -204,6 +228,10 @@ public class ModeloAfinidad {
 				afinidad.setDescripcion(rs.getString("DESCRIPCION"));
 				afinidad.setModulacion(rs.getFloat("MODULACION"));
 				afinidad.setSujetoAfinidad(rs.getString("FLGSUJETOAFINIDAD").equals("S"));
+				
+				if (rs.getString("FLGBORRADO").equals("S")) {
+					throw new UVException("La afinidad ha sido borrada");
+				}
 				
 				return afinidad;
 			}
@@ -259,5 +287,24 @@ public class ModeloAfinidad {
 			}
 			stmt.executeUpdate();
 		}
+	}
+	
+	/** Elimina una afinidad.
+	 * @param afinidad a borrar
+	 * @throws SQLException en caso de error en la BD
+	 * @throws UVException si noticia no es valida
+	 */
+	public void borraAfinidad(Afinidad afinidad) throws SQLException, UVException {
+		if (afinidad == null) {
+			throw new UVException("No se puede eliminar una afinidad vacía");
+		}
+		if (afinidad.getCodNum() == null) {
+			throw new UVException("No se puede eliminar una afinidad con id vacío");
+		}
+		
+		List<Afinidad> afinidades = new ArrayList<>();
+		afinidades.add(this.getAfinidadById(afinidad.getCodNum()));
+		
+		borraAfinidades(afinidades);
 	}
 }

@@ -43,8 +43,10 @@ import es.ujaen.uvirtual.utilidades.UVException;
 import com.lowagie.text.Cell;
 import com.lowagie.text.Chunk;
 import com.lowagie.text.Document;
+import com.lowagie.text.Font;
 import com.lowagie.text.FontFactory;
 import com.lowagie.text.Paragraph;
+import com.lowagie.text.Phrase;
 import com.lowagie.text.pdf.PdfWriter;
 import com.lowagie.text.Table;
 
@@ -112,6 +114,7 @@ public class ControladorMisSolicitudes extends HttpServlet {
 	public static final Integer PDF_ALTO = 4;
 	public static final Integer PDF_FORMATO = 4;
 	public static final Integer PDF_TABLE_COLUMNS = 4;
+	public static final Integer PDF_TABLE_PADDING = 5;
 
 	
 	private UsuarioBolsaEmpleo usuario = null;
@@ -689,35 +692,58 @@ public class ControladorMisSolicitudes extends HttpServlet {
 			document.addTitle("Solicitud_" + solicitud.getConvocatoria().getDescripcion());
 			document.addCreationDate();
 
-			document.add(new Paragraph(new Chunk("SOLICITUD", FontFactory.getFont(FontFactory.HELVETICA, 40))));
-			document.add(new Paragraph("Usuario: " + this.usuario.getNombre() + " " + this.usuario.getPrimerApellido() + " " 
-					+ this.usuario.getSegundoApellido()));
-			document.add(new Paragraph("Convocatoria: " + solicitud.getConvocatoria().getDescripcion()));
-			document.add(new Paragraph("Fecha confirmación de solicitud: " 
-					+ Formateador.formatoFecha(solicitud.getFechaConfirmacion(), Formateador.FORMATO_FECHA_DDMMYYYY_HHMMSS)));
-
-			document.add(new Paragraph(" ")); // no se meter espacio
+			document.add(new Paragraph(new Chunk("SOLICITUD", FontFactory.getFont(FontFactory.HELVETICA, 40, Font.BOLDITALIC))));
 			
-			// document.newPage();
+			document.add(new Paragraph("\n"));
+			
+			Font font2 = new Font(Font.BOLD);
+			font2.setStyle("bold");
+			
+			document.add(new Paragraph("Usuario: " + this.usuario.getNombre() + " " + this.usuario.getPrimerApellido() + " " 
+					+ this.usuario.getSegundoApellido(), font2));
+			document.add(new Paragraph("Convocatoria: " + solicitud.getConvocatoria().getDescripcion(), font2));
+			document.add(new Paragraph("Fecha confirmación de solicitud: " 
+					+ Formateador.formatoFecha(solicitud.getFechaConfirmacion(), Formateador.FORMATO_FECHA_DDMMYYYY_HHMMSS), font2));
+
+			document.add(new Paragraph("\n"));
+			
+	        com.lowagie.text.List lista = new com.lowagie.text.List();
+	        lista.setListSymbol("• ");
 			
 			for (BolsaSolicitud bolsa: bolsasSolicitud) {
-				document.add(new Paragraph("Área - " + bolsa.getArea().getDescripcion()));
+		        lista.add("Área - " + bolsa.getArea().getDescripcion());  
 				
-				Table table = new Table(PDF_TABLE_COLUMNS, 4);
+				Table table = new Table(PDF_TABLE_COLUMNS, bolsasSolicitud.size());
 				table.setBorderWidth(1);
 				table.setBorderColor(new Color(0, 0, 0));
+				table.setPadding(PDF_TABLE_PADDING);
+				table.setWidth(100);
 				
-				Cell cell = new Cell("Cod. Mérito");
+				Font font = new Font();
+				font.setColor(new Color(0, 51, 153));
+
+				Phrase phrase = new Phrase("Cod. Mérito", font);
+				Cell cell = new Cell(phrase);
 				cell.setHeader(true);
+				cell.setBackgroundColor(new Color(185, 201, 254));
 				table.addCell(cell);
-				cell = new Cell("Mérito");
+				
+				Phrase phrase2 = new Phrase("Mérito", font);
+				cell = new Cell(phrase);
 				cell.setHeader(true);
+				cell.setBackgroundColor(new Color(185, 201, 254));
 				table.addCell(cell);
-				cell = new Cell("Valor");
+				
+				Phrase phrase3 = new Phrase("Valor", font);
+				cell = new Cell(phrase3);
 				cell.setHeader(true);
+				cell.setBackgroundColor(new Color(185, 201, 254));
 				table.addCell(cell);
-				cell = new Cell("Descripción");
+				
+				Phrase phrase4 = new Phrase("Descripción", font);
+				cell = new Cell(phrase4);
 				cell.setHeader(true);
+				cell.setBackgroundColor(new Color(185, 201, 254));
 				table.addCell(cell);
 				table.endHeaders();
 				
@@ -725,47 +751,27 @@ public class ControladorMisSolicitudes extends HttpServlet {
 					for (Merito merito: bolsa.getListaMeritos()) {
 						String codigoItem = merito.getItemBaremacion().getBloqueBaremacion().getApartadoBaremacion().getCodigo() + "." 
 								+ merito.getItemBaremacion().getBloqueBaremacion().getCodigo() + "." + merito.getItemBaremacion().getCodigo();
-						table.addCell(codigoItem);
-						table.addCell(merito.getItemBaremacion().getNombre());
-						table.addCell(merito.getValor().toString());
-						table.addCell(merito.getDescripcion().toString());
+						
+						cell = new Cell(codigoItem);
+						cell.setBackgroundColor(new Color(241, 241, 241));
+						table.addCell(cell);
+						cell = new Cell(merito.getItemBaremacion().getNombre());
+						cell.setBackgroundColor(new Color(241, 241, 241));
+						table.addCell(cell);
+						cell = new Cell(merito.getValor().toString());
+						cell.setBackgroundColor(new Color(241, 241, 241));
+						table.addCell(cell);
+						cell = new Cell(merito.getDescripcion().toString());
+						cell.setBackgroundColor(new Color(241, 241, 241));
+						table.addCell(cell);
 					}
 				}
+								
+		        document.add(lista);
 				
 				document.add(table);
-				
-			}
-//
-//			Table table2 = new Table(PDF_TABLE_COLUMNS, 4); // 4 columns, 2 rows
-//			table2.setBorderWidth(1);
-//			table2.setBorderColor(new Color(0, 0, 255));
-//			table2.setPadding(5);
-//			table2.setSpacing(5);
-//			Cell cell = new Cell("header");
-//			cell.setHeader(true);
-//			cell.setColspan(3);
-//			table2.addCell(cell);
-//			table2.endHeaders();
-//			cell = new Cell("example cell with colspan 1 and rowspan 2");
-//			cell.setRowspan(2);
-//			cell.setBorderColor(new Color(255, 0, 0));
-//			table2.addCell(cell);
-//			table2.addCell("1.1");
-//			table2.addCell("2.1");
-//			table2.addCell("1.2");
-//			table2.addCell("2.2");
-//			table2.addCell("cell test1");
-//			cell = new Cell("big cell");
-//			cell.setRowspan(2);
-//			cell.setColspan(2);
-//			table2.addCell(cell);
-//			table2.addCell("cell test2");
-//
-//			document.add(table2);
-//			document.add(new Paragraph("converted to PdfPTable:"));
-//			table2.setConvert2pdfptable(true);
-//			document.add(table2);
 
+			}
 			document.close();
 
 		} catch (Exception exp) {
