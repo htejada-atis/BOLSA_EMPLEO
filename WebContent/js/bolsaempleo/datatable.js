@@ -117,8 +117,6 @@ function DataTable(id, config) {
                     row.selected = true;
                 }
             });
-
-            // console.log('render row', row.codNum, row.selected, self.config.selected);
         }
 
         if (row.selected) {
@@ -179,8 +177,6 @@ function DataTable(id, config) {
     	
     	if (columnDef.hasOwnProperty('selectable') && columnDef.selectable) {
     		var check = $('<input type="checkbox"/>');
-
-            // console.log('render col', check, row.selected);
 
             if (row.selected) {
                 self.checked[value] = true;
@@ -421,8 +417,6 @@ function DataTable(id, config) {
             self.config.selected.forEach(function (id) {
                 self.checked[id] = true;
             });
-
-            console.log('checked', self.checked);
         }
     };
     
