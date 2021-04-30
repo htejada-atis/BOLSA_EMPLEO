@@ -48,10 +48,8 @@ public class ModeloBaremacion {
 	
 	// tipos de unidades de los items
 	public static final String ITEM_UNIDADES_UNIDADES = "UNIDADES";
-	public static final String ITEM_UNIDADES_PUNTOS = "PUNTOS";
-	public static final String ITEM_UNIDADES_CREDITOS = "CREDITOS";
-	public static final String ITEM_UNIDADES_MESES = "MESES";
-	public static final String ITEM_UNIDADES_ANIOS = "ANIOS";
+	public static final String ITEM_UNIDADES_MEDICION_ENTERO = "ENTERO";
+	public static final String ITEM_UNIDADES_MEDICION_DECIMAL = "DECIMAL";
 		
 	// errores
 	public static final String ERROR_APARTADO_NOEXITE = "Apartado no encontrado";
@@ -762,7 +760,6 @@ public class ModeloBaremacion {
 		
 		String consulta = "SELECT bepite.* "
 				+ "FROM TBEP_ITEMSBAREMACION bepite "
-				+ "INNER JOIN TBEP_AFINIDADES bepafi ON bepafi.CODNUM = bepite.AFINIDAD "
 				+ "WHERE bepite.BEPBLO_CODNUM = ?";
 		
 		dataTable.setColumn(ORDER_COLUMN_INDEX_ITEMS_CODIGO, "bepite.CODIGO");
@@ -771,7 +768,7 @@ public class ModeloBaremacion {
 		dataTable.setColumn(ORDER_COLUMN_INDEX_ITEMS_VALOR, "bepite.VALOR");
 		dataTable.setColumn(ORDER_COLUMN_INDEX_ITEMS_VALOR_MINIMO, "bepite.VALOR_MINIMO");
 		dataTable.setColumn(ORDER_COLUMN_INDEX_ITEMS_VALOR_MAXIMO, "bepite.VALOR_MAXIMO");
-		dataTable.setColumn(ORDER_COLUMN_INDEX_ITEMS_AFINIDAD, "bepite.VALOR_AFINIDAD");		
+		dataTable.setColumn(ORDER_COLUMN_INDEX_ITEMS_AFINIDAD, "bepite.AFINIDAD");		
 		dataTable.setColumn(ORDER_COLUMN_INDEX_ITEMS_ACTIVO, "bepite.FLGACTIVO", DataTableColumn.COLUMN_TYPE_BOOLEAN);
 		dataTable.setQuery(consulta);
 				
@@ -854,7 +851,7 @@ public class ModeloBaremacion {
 			stmt.setFloat(parameterIndex++, item.getValor());
 			stmt.setFloat(parameterIndex++, item.getValorMinimo());
 			stmt.setFloat(parameterIndex++, item.getValorMaximo());
-			stmt.setInt(parameterIndex++, item.getAfinidad().getCodNum());			
+			stmt.setString(parameterIndex++, item.getAfinidad());			
 			stmt.setInt(parameterIndex++, item.getCodNum());
 			stmt.executeUpdate();
 		}
@@ -890,7 +887,7 @@ public class ModeloBaremacion {
 		
 		String consulta = "INSERT INTO TBEP_ITEMSBAREMACION "
 				+ " (CODIGO,NOMBRE,DESCRIPCION,BEPBLO_CODNUM,UNIDADES,VALOR,VALOR_MINIMO,VALOR_MAXIMO,AFINIDAD)"
-				+ " VALUES (?,?,?,?,?,?,?,?)";
+				+ " VALUES (?,?,?,?,?,?,?,?,?)";
 		
 		try (Connection conexion = ConexionUvirtual.obtenerInstancia(); PreparedStatement stmt = conexion.prepareStatement(consulta);) {
 			int parameterIndex = 1;
@@ -902,7 +899,7 @@ public class ModeloBaremacion {
 			stmt.setFloat(parameterIndex++, item.getValor());
 			stmt.setFloat(parameterIndex++, item.getValorMinimo());
 			stmt.setFloat(parameterIndex++, item.getValorMaximo());
-			stmt.setInt(parameterIndex++, item.getAfinidad().getCodNum());
+			stmt.setString(parameterIndex++, item.getAfinidad());
 			stmt.executeUpdate();
 		}
 	}
@@ -962,8 +959,7 @@ public class ModeloBaremacion {
 		return items;
 	}
 	
-	private ItemBaremacion createItemFromResultSet(ResultSet rs) throws SQLException, UVException {
-		ModeloAfinidad modelo = ModeloAfinidad.obtenerInstancia();	
+	private ItemBaremacion createItemFromResultSet(ResultSet rs) throws SQLException, UVException {	
 		ItemBaremacion item = new ItemBaremacion();
 		item.setCodNum(rs.getInt("CODNUM"));
 		item.setCodigo(rs.getString("CODIGO"));
@@ -975,7 +971,7 @@ public class ModeloBaremacion {
 		item.setValor(rs.getFloat("VALOR"));
 		item.setValorMinimo(rs.getFloat("VALOR_MINIMO"));
 		item.setValorMaximo(rs.getFloat("VALOR_MAXIMO"));
-		item.setAfinidad(modelo.getAfinidadById(rs.getInt("AFINIDAD")));
+		item.setAfinidad(rs.getString("AFINIDAD"));
 		return item;
 	}
 	
@@ -997,11 +993,8 @@ public class ModeloBaremacion {
 		}
 		
 		ArrayList<String> unidades = new ArrayList<String>();
-		unidades.add(ITEM_UNIDADES_UNIDADES);
-		unidades.add(ITEM_UNIDADES_PUNTOS);
-		unidades.add(ITEM_UNIDADES_CREDITOS);
-		unidades.add(ITEM_UNIDADES_MESES);
-		unidades.add(ITEM_UNIDADES_ANIOS);
+		unidades.add(ITEM_UNIDADES_MEDICION_ENTERO);
+		unidades.add(ITEM_UNIDADES_MEDICION_DECIMAL);
 			
 		if (!unidades.contains(item.getUnidades())) {
 			throw new UVException("Tipo de unidad no válida");

@@ -68,7 +68,7 @@ public class ModeloValidar {
 	 * @throws UVException  .
 	 */
 	public BolsaEmpleoDataTable<BolsaValidacion> listadoAreasSujetasAfinidad(Convocatoria convocatoria, Map<String, String[]> params) throws SQLException, UVException {
-		return this.listadoAreas(convocatoria, true, params);
+		return this.listadoAreas(convocatoria, params);
 	}
 
 	/**
@@ -81,17 +81,16 @@ public class ModeloValidar {
 	 * @throws UVException  .
 	 */
 	public BolsaEmpleoDataTable<BolsaValidacion> listadoAreasNoSujetasAfinidad(Convocatoria convocatoria, Map<String, String[]> params) throws SQLException, UVException {
-		return this.listadoAreas(convocatoria, false, params);
+		return this.listadoAreas(convocatoria, params);
 	}
 	
 	/**
 	 * Devuelve los totales de méritos de los candidatos para un convocatoria.
 	 * @param convocatoria .
-	 * @param sujetosAfinidad los mérito contabilizados si son afines o no
 	 * @return un hashmap con los pares: "idbolsa" - "número de meritos"
 	 * @throws SQLException .
 	 */
-	public HashMap<Integer, Integer> getTotalesMeritosConvocatoria(Convocatoria convocatoria, Boolean sujetosAfinidad) throws SQLException {
+	public HashMap<Integer, Integer> getTotalesMeritosConvocatoria(Convocatoria convocatoria) throws SQLException {
 		HashMap<Integer, Integer> totales = new HashMap<Integer, Integer>();
 					
 		try (Connection con = ConexionUvirtual.obtenerInstancia();) {
@@ -107,7 +106,6 @@ public class ModeloValidar {
 					+ "INNER JOIN TBEP_AFINIDADES bepafi ON bepafi.CODNUM = bepite.AFINIDAD "
 					+ "WHERE 1=1 "
 					+ "AND bepsol.BEPCON_CODNUM = ? "
-					+ "AND bepafi.FLGSUJETOAFINIDAD = '" + (sujetosAfinidad ? "S" : "N") + "'"
 					+ "GROUP BY bepbol.CODNUM ";
 								
 			try (PreparedStatement stmt = con.prepareStatement(sql);) {
@@ -125,7 +123,7 @@ public class ModeloValidar {
 		return totales;
 	}
 	
-	private BolsaEmpleoDataTable<BolsaValidacion> listadoAreas(Convocatoria convocatoria, Boolean sujetasAfinidad, Map<String, String[]> params) 
+	private BolsaEmpleoDataTable<BolsaValidacion> listadoAreas(Convocatoria convocatoria, Map<String, String[]> params) 
 			throws SQLException, UVException {
 		List<BolsaValidacion> rows = new ArrayList<>();
 		BolsaEmpleoDataTable<BolsaValidacion> dataTable = new BolsaEmpleoDataTable<BolsaValidacion>(params);
@@ -137,7 +135,7 @@ public class ModeloValidar {
 		}
 		
 		// leemos el total de méritos por bolsa
-		HashMap<Integer, Integer> totalMeritosPorBolsa = this.getTotalesMeritosConvocatoria(convocatoria, sujetasAfinidad);
+		HashMap<Integer, Integer> totalMeritosPorBolsa = this.getTotalesMeritosConvocatoria(convocatoria);
 
 		// seleccionamos las bolsas, con meritos, en la convocatoria pasada
 		String consulta = 
@@ -150,8 +148,7 @@ public class ModeloValidar {
 				+ "INNER JOIN TBEP_MERITOS bepmer ON bepmer.CODNUM = bepsbm.BEPMER_CODNUM "
 				+ "INNER JOIN TBEP_ITEMSBAREMACION bepite ON bepite.CODNUM = bepmer.BEPITE_CODNUM "
 				+ "INNER JOIN TBEP_AFINIDADES bepafi ON bepafi.CODNUM = bepite.AFINIDAD " + "WHERE 1=1 "
-				+ "AND bepsol.BEPCON_CODNUM = ? "
-				+ "AND bepafi.FLGSUJETOAFINIDAD = '" + (sujetasAfinidad ? "S" : "N") + "' ";
+				+ "AND bepsol.BEPCON_CODNUM = ? ";
 
 		dataTable.setColumn(ORDER_COLUMN_INDEX_ID, "bepbol.CODNUM", DataTableColumn.COLUMN_TYPE_NUMBER);
 		dataTable.setColumn(ORDER_COLUMN_INDEX_CODIGO_AREA, "bepare.ID_AREA_CONOCIMIENTO");

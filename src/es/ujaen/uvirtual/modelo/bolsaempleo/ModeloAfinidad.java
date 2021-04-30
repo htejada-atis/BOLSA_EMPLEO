@@ -27,7 +27,7 @@ public class ModeloAfinidad {
 	public static final int ORDER_COLUMN_INDEX_CODIGO = 1;
 	public static final int ORDER_COLUMN_INDEX_DESCRIPCION = 2;
 	public static final int ORDER_COLUMN_INDEX_MODULACION = 3;
-	public static final int ORDER_COLUMN_INDEX_AFINIDAD = 4;
+	public static final int ORDER_COLUMN_INDEX_BORRADO = 4;
 	
 	public static final int COLUMN_DESCRIPCION_MAXLENGTH = 250;
 	public static final int COLUMN_CODIGO_MAXLENGTH = 4;
@@ -70,14 +70,13 @@ public class ModeloAfinidad {
 		
 		String consulta =
 			"SELECT bepafi.* "
-		  + "FROM TBEP_AFINIDADES bepafi "		  
-		  + "WHERE FLGBORRADO!='S'";
+		  + "FROM TBEP_AFINIDADES bepafi"; 
 		
 		dataTable.setColumn(ORDER_COLUMN_INDEX_ID, "bepafi.CODNUM");
 		dataTable.setColumn(ORDER_COLUMN_INDEX_CODIGO, "bepafi.CODIGO");
 		dataTable.setColumn(ORDER_COLUMN_INDEX_DESCRIPCION, "bepafi.DESCRIPCION");
 		dataTable.setColumn(ORDER_COLUMN_INDEX_MODULACION, "bepafi.MODULACION", DataTableColumn.COLUMN_TYPE_NUMBER);	
-		dataTable.setColumn(ORDER_COLUMN_INDEX_AFINIDAD, "bepafi.FLGSUJETOAFINIDAD", DataTableColumn.COLUMN_TYPE_BOOLEAN);
+		dataTable.setColumn(ORDER_COLUMN_INDEX_BORRADO, "bepafi.FLGBORRADO", DataTableColumn.COLUMN_TYPE_BOOLEAN);	
 		dataTable.setQuery(consulta);
 				
 		try (Connection conexion = ConexionUvirtual.obtenerInstancia();
@@ -94,7 +93,6 @@ public class ModeloAfinidad {
 					afinidad.setCodigo(rs.getString("CODIGO"));
 					afinidad.setDescripcion(rs.getString("DESCRIPCION"));
 					afinidad.setModulacion(rs.getFloat("MODULACION"));	
-					afinidad.setSujetoAfinidad(rs.getString("FLGSUJETOAFINIDAD").equals("S"));
 					afinidades.add(afinidad);					
 				}				
 			}	
@@ -135,7 +133,8 @@ public class ModeloAfinidad {
 	 */
 	public List<Afinidad> listaAfinidades() throws SQLException {
 		List<Afinidad> afinidades = new ArrayList<>();
-		String consulta = "SELECT bepafi.* FROM TBEP_AFINIDADES bepafi";
+		String consulta = "SELECT bepafi.CODIGO, bepafi.DESCRIPCION FROM TBEP_AFINIDADES bepafi "
+				+ "WHERE bepafi.FLGBORRADO != 'S' GROUP BY CODIGO, DESCRIPCION";
 		
 		try (Connection conexion = ConexionUvirtual.obtenerInstancia();
 			PreparedStatement stmt = conexion.prepareStatement(consulta);) {
@@ -143,11 +142,8 @@ public class ModeloAfinidad {
 					while (rs.next()) {
 						try {
 							Afinidad afinidad = new Afinidad();
-							afinidad.setCodNum(rs.getInt("CODNUM"));
 							afinidad.setCodigo(rs.getString("CODIGO"));
 							afinidad.setDescripcion(rs.getString("DESCRIPCION"));
-							afinidad.setModulacion(rs.getFloat("MODULACION"));
-							afinidad.setSujetoAfinidad(rs.getString("FLGSUJETOAFINIDAD").equals("S"));	
 							afinidades.add(afinidad);	
 						} catch (Exception e) {
 							e.printStackTrace();
@@ -227,11 +223,41 @@ public class ModeloAfinidad {
 				afinidad.setCodigo(rs.getString("CODIGO"));
 				afinidad.setDescripcion(rs.getString("DESCRIPCION"));
 				afinidad.setModulacion(rs.getFloat("MODULACION"));
-				afinidad.setSujetoAfinidad(rs.getString("FLGSUJETOAFINIDAD").equals("S"));
 				
 				if (rs.getString("FLGBORRADO").equals("S")) {
 					throw new UVException("La afinidad ha sido borrada");
 				}
+				
+				return afinidad;
+			}
+		}
+	}
+	
+	
+	/**
+	 * Devuelve una afinidad por su codigo.
+	 * @param codigo .
+	 * @return Afinidad o null si no existe
+	 * @throws SQLException .
+	 */
+	public Afinidad getAfinidadByCodigo(String codigo) throws SQLException, UVException {
+		if (codigo == null) {
+			throw new UVException("No existe la afinidad");
+		}
+		String consulta = "SELECT bepafi.CODIGO, bepafi.DESCRIPCION FROM TBEP_AFINIDADES bepafi WHERE bepafi.CODIGO = ? GROUP BY CODIGO, DESCRIPCION";
+			
+		try (Connection conexion = ConexionUvirtual.obtenerInstancia();
+				PreparedStatement stmt = conexion.prepareStatement(consulta);) {
+			stmt.setString(1, codigo);
+						
+			try (ResultSet rs = stmt.executeQuery()) {
+				if (!rs.next()) {
+					throw new UVException(MENSAJE_ERROR_NO_EXISTE_AFINIDAD);
+				}
+				
+				Afinidad afinidad = new Afinidad();
+				afinidad.setCodigo(rs.getString("CODIGO"));
+				afinidad.setDescripcion(rs.getString("DESCRIPCION"));
 				
 				return afinidad;
 			}
