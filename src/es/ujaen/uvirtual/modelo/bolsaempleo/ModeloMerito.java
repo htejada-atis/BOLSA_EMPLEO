@@ -23,18 +23,18 @@ import es.ujaen.uvirtual.utilidades.UVException;
  * @author ATISoluciones
  */
 public class ModeloMerito {
-	public static final int ORDER_COLUMN_INDEX_ID = 0;
-	public static final int ORDER_COLUMN_INDEX_ITEM = 1;
-	public static final int ORDER_COLUMN_INDEX_NOMBRE_ITEM = 2;
-	public static final int ORDER_COLUMN_INDEX_DESCRIPCION = 3;
-	public static final int ORDER_COLUMN_INDEX_VALOR = 4;
-	public static final int ORDER_COLUMN_INDEX_OBSERVACION = 5;
+	public static final int ORDER_COLUMN_INDEX_ID = 1;
+	public static final int ORDER_COLUMN_INDEX_BLOQUE = 2;
+	public static final int ORDER_COLUMN_INDEX_ITEM = 3;
+	public static final int ORDER_COLUMN_INDEX_NOMBRE_ITEM = 4;
+	public static final int ORDER_COLUMN_INDEX_DESCRIPCION = 5;
+	public static final int ORDER_COLUMN_INDEX_VALOR = 6;
+	public static final int ORDER_COLUMN_INDEX_OBSERVACION = 7;
 	
-	public static final int ORDER_COLUMN_INDEX_ID_SOLICITUD = 0;
-	public static final int ORDER_COLUMN_INDEX_ITEM_SOLICITUD = 1;
-	public static final int ORDER_COLUMN_INDEX_NOMBRE_ITEM_SOLICITUD = 2;
-	public static final int ORDER_COLUMN_INDEX_VALOR_SOLICITUD = 3;
-	public static final int ORDER_COLUMN_INDEX_AFINIDAD_SOLICITUD = 4;
+	public static final int ORDER_COLUMN_INDEX_ID_SOLICITUD = 1;
+	public static final int ORDER_COLUMN_INDEX_ITEM_SOLICITUD = 2;
+	public static final int ORDER_COLUMN_INDEX_NOMBRE_ITEM_SOLICITUD = 3;
+	public static final int ORDER_COLUMN_INDEX_VALOR_SOLICITUD = 4;
 	public static final int ORDER_COLUMN_INDEX_EXCLUIDO_SOLICITUD = 5;
 	
 	public static final int COLUMN_DESCRIPCION_MAXLENGTH = 200;
@@ -263,6 +263,7 @@ public class ModeloMerito {
 				+ " WHERE bepmer.BEPUSU_CODNUM = ? ";
 		
 		dataTable.setColumn(ORDER_COLUMN_INDEX_ID, "bepmer.CODNUM");
+		dataTable.setColumn(ORDER_COLUMN_INDEX_BLOQUE, "bepblo.BEPAPA_CODNUM");
 		dataTable.setColumn(ORDER_COLUMN_INDEX_ITEM, "bepmer.BEPITE_CODNUM");
 		dataTable.setColumn(ORDER_COLUMN_INDEX_NOMBRE_ITEM, "bepite.NOMBRE");
 		dataTable.setColumn(ORDER_COLUMN_INDEX_DESCRIPCION, "bepmer.DESCRIPCION");
@@ -300,7 +301,8 @@ public class ModeloMerito {
 	 * @throws SQLException en caso de error de base de datos .
 	 * @throws UVException error si no existe titulación .
 	 */
-	public BolsaEmpleoDataTable<MeritoSolicitud> listaMeritosSolicitudDatatable(Map<String, String[]> params, UsuarioBolsaEmpleo usuario) throws SQLException, UVException {		
+	public BolsaEmpleoDataTable<MeritoSolicitud> listaMeritosSolicitudDatatable(Map<String, String[]> params, UsuarioBolsaEmpleo usuario)
+			throws SQLException, UVException {		
 		if (usuario == null) {
 			throw new UVException("Introduce un usuario");
 		}
@@ -310,7 +312,7 @@ public class ModeloMerito {
 		
 		String consulta = ""
 				+ " SELECT DISTINCT (bepmer.CODNUM), bepmer.BEPITE_CODNUM, bepmer.BEPUSU_CODNUM, bepmer.VALOR, bepite.NOMBRE, "
-				+ "		bepmer.DESCRIPCION, bepmer.OBSERVACION, bepsbm.FLGAFINIDAD, bepsbm.FLGEXCLUIDO, bepblo.BEPAPA_CODNUM "
+				+ "		bepmer.DESCRIPCION, bepmer.OBSERVACION, bepsbm.FLGEXCLUIDO, bepblo.BEPAPA_CODNUM "
 				+ " FROM TBEP_MERITOS bepmer"
 				+ " INNER JOIN TBEP_ITEMSBAREMACION bepite ON bepite.CODNUM = bepmer.BEPITE_CODNUM"
 				+ " INNER JOIN TBEP_BLOQUESBAREMACION bepblo ON bepblo.CODNUM = bepite.BEPBLO_CODNUM"
@@ -321,7 +323,6 @@ public class ModeloMerito {
 		dataTable.setColumn(ORDER_COLUMN_INDEX_ITEM_SOLICITUD, "bepmer.BEPITE_CODNUM");
 		dataTable.setColumn(ORDER_COLUMN_INDEX_NOMBRE_ITEM_SOLICITUD, "bepite.NOMBRE");
 		dataTable.setColumn(ORDER_COLUMN_INDEX_VALOR_SOLICITUD, "bepmer.VALOR");
-		dataTable.setColumn(ORDER_COLUMN_INDEX_AFINIDAD_SOLICITUD, "bepsbm.FLGAFINIDAD");
 		dataTable.setColumn(ORDER_COLUMN_INDEX_EXCLUIDO_SOLICITUD, "bepsbm.FLGEXCLUIDO");
 		dataTable.setQuery(consulta);
 		
@@ -342,9 +343,8 @@ public class ModeloMerito {
 					mer.setDescripcion(rs.getString("DESCRIPCION"));
 					mer.setObservacion(rs.getString("OBSERVACION"));
 					mer.setValor(rs.getFloat("VALOR"));
-					Boolean afinidad = rs.getString("FLGAFINIDAD") != null && rs.getString("FLGAFINIDAD").equals("S");
 					Boolean excluido = rs.getString("FLGEXCLUIDO") != null && rs.getString("FLGEXCLUIDO").equals("S");
-					MeritoSolicitud meritoSolicitud = new MeritoSolicitud(mer, afinidad, excluido);
+					MeritoSolicitud meritoSolicitud = new MeritoSolicitud(mer, excluido);
 					meritos.add(meritoSolicitud);
 				}
 			}

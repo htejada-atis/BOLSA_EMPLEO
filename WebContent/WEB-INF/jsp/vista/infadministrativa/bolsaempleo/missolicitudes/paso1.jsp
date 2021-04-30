@@ -36,13 +36,12 @@ VistaSolicitudes bean = (VistaSolicitudes) uvdatos.getVistas().get(VistaSolicitu
 			<th scope="col"	style="width:15%">Código</th>
 			<th scope="col"	style="width:60%">Nombre</th>
 			<th scope="col" class="center" style="width:10%">Excluido</th>
-			<th scope="col" class="center" style="width:10%">Baremable</th>
 		</tr>
 		<tbody>
 		</tbody>
 		<tfoot>
 			<tr>
-				<th colspan="5" style="width:100%"></th>
+				<th colspan="4" style="width:100%"></th>
 			</tr>
 		</tfoot>
 	</table>
@@ -91,13 +90,6 @@ VistaSolicitudes bean = (VistaSolicitudes) uvdatos.getVistas().get(VistaSolicitu
 		        		}
 	        		}
 		        },
-		        {'data': 'baremable', 'order': {'active': false}, 'filter': {'type': 'select', 'options':{'true': 'Baremable', 'false': 'No baremable'}, 'optionDefault': 'true'}, 'render': function(row) {
-	        		if (row.baremable) {
-	        			return "<div title='Baremable' class='circle-true'></div>"; 
-	        		} else {
-	        			return "<div title='No baremable' class='circle-false'></div>"; 
-	        		}
-	        	}},
 	        ],
 		});
 		

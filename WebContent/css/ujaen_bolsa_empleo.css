@@ -250,6 +250,11 @@ nav-bolsa-empleo a:active, nav-bolsa-empleo a:hover {
 	text-decoration: none;
 }
 
+.link-btn.disabled {
+	pointer-events: none;
+	opacity: .65;
+}
+
 .bolsa-empleo #nueva_noticia span {
 	display: inline-block;
 	padding: .6em;

@@ -181,7 +181,7 @@ public class ModeloSolicitud {
 
 				conexion.commit();
 				
-				return this.getSolicitudById(idSolucitud); 
+				return this.getSolicitudById(idSolucitud);
 			} catch (SQLException | UVException e) {
 				if (conexion != null) { 
 					conexion.rollback();
@@ -194,11 +194,12 @@ public class ModeloSolicitud {
 	/**
 	 * Devuelve una solicitud por su pk.
 	 * @param codNum .
+	 * @param archivo booleano que nos indica si incluir el archivo al obtener la solicitud o no .
 	 * @return Solicitud o null si no existe
 	 * @throws UVException  .
 	 * @throws SQLException .
 	 */
-	public Solicitud getSolicitudById(Integer codNum) throws SQLException, UVException {
+	private Solicitud getSolicitudById(Integer codNum, boolean archivo) throws SQLException, UVException {
 		if (codNum == null) {
 			throw new UVException("La solicitud es requerida");
 		}
@@ -222,9 +223,35 @@ public class ModeloSolicitud {
 				solicitud.setUsuario(ModeloUsuarioBolsaEmpleo.obtenerInstancia().getUsuarioById(rs.getInt("BEPUSU_CODNUM")));
 				solicitud.setFechaConfirmacion(rs.getDate("FECHACONFIRMACION"));
 				
+				if (archivo) {
+					solicitud.setArchivo(rs.getBlob("ARCHIVO").getBinaryStream());
+				}
+				
 				return solicitud;
 			}
 		}
+	}
+	
+	/**
+	 * Devuelve una solicitud por su id.
+	 * @param codNum .
+	 * @return Solicitud o null si no existe .
+	 * @throws UVException  .
+	 * @throws SQLException .
+	 */
+	public Solicitud getSolicitudById(Integer codNum) throws SQLException, UVException {
+		return getSolicitudById(codNum, false);
+	}
+	
+	/**
+	 * Devuelve una solicitud por su id.
+	 * @param codNum .
+	 * @return Solicitud o null si no existe .
+	 * @throws UVException  .
+	 * @throws SQLException .
+	 */
+	public Solicitud getSolicitudByIdArchivo(Integer codNum) throws SQLException, UVException {
+		return getSolicitudById(codNum, true);
 	}
 	
 	/**
@@ -474,7 +501,6 @@ public class ModeloSolicitud {
 				
 				Merito merito = ModeloMerito.obtenerInstancia().getMeritoById(rs.getInt("BEPMER_CODNUM"), false, false);
 				MeritoSolicitud meritoSolicitud = new MeritoSolicitud(merito);
-				meritoSolicitud.setAfinidad(rs.getString("FLGAFINIDAD").equals("S"));
 				meritoSolicitud.setExcluido(rs.getString("FLGEXCLUIDO").equals("S"));
 				
 				return meritoSolicitud;
@@ -517,7 +543,6 @@ public class ModeloSolicitud {
 	/**
 	 * Obtiene el total de méritos que hay en la solicitud .
 	 * @param solicitud .
-	 * @param merito .
 	 * @return total .
 	 * @throws SQLException .
 	 */
@@ -546,14 +571,35 @@ public class ModeloSolicitud {
 	 * @param solicitud .
 	 * @throws SQLException .
 	 */
-	public void confirmacionSolicitud(Solicitud solicitud) throws SQLException {
+	public void confirmacionSolicitud(Solicitud solicitud) throws SQLException, UVException {
+		if (solicitud == null) {
+			throw new UVException("No se puede confirmar una solicitud vacía");
+		}
+		
+		if (solicitud.getCodNum() == null) {
+			throw new UVException("No se puede confirmar una solicitud con id vacío");
+		}
+		
+		if (solicitud.getFechaConfirmacion() == null) {
+			throw new UVException("No se puede confirmar una solicitud sin fecha confirmacion");
+		}
+		
+		if (solicitud.getEstado() == null || !solicitud.getEstado().equals(SOLICITUD_ESTADO_CERRADA)) {
+			throw new UVException("No se puede confirmar una solicitud sin estado cerrado");
+		}
+		
+		if (solicitud.getArchivo() == null) {
+			throw new UVException("No se puede confirmar una solicitud sin archivo");
+		}
+		
 		String consulta = "UPDATE TBEP_SOLICITUDES "
-				+ " SET ESTADO=?, FECHACONFIRMACION=?"
+				+ " SET ESTADO=?, FECHACONFIRMACION=?, ARCHIVO=?"
 				+ " WHERE CODNUM=?";
 		try (Connection conexion = ConexionUvirtual.obtenerInstancia(); PreparedStatement stmt = conexion.prepareStatement(consulta);) {
 			int parameterIndex = 1;
 			stmt.setString(parameterIndex++, solicitud.getEstado());
 			stmt.setDate(parameterIndex++, new Date(solicitud.getFechaConfirmacion().getTime()));
+			stmt.setBinaryStream(parameterIndex++, solicitud.getArchivo());
 			stmt.setInt(parameterIndex++, solicitud.getCodNum());
 			stmt.executeUpdate();
 		}

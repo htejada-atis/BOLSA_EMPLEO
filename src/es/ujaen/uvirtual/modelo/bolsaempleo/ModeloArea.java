@@ -326,7 +326,7 @@ public class ModeloArea {
 		+ "INNER JOIN TBEP_AREAS bepare ON bepare.CODNUM = bepbol.BEPARE_CODNUM "
 		+ "LEFT JOIN UVIRTUAL.TBEP_USUARIOS_EXCLUIDOS_AREA bepusuexc "
 		+ "ON bepare.CODNUM = bepusuexc.AREA AND bepusuexc.USUARIO = ? "
-		+ "WHERE 1=1 ";
+		+ "WHERE bepbol.FLGBAREMABLE = 'S' ";
 		
 		dataTable.setColumn(ORDER_COLUMN_INDEX_CODIGO_SOLICITUDES, "bepare.ID_AREA_CONOCIMIENTO");
 		dataTable.setColumn(ORDER_COLUMN_INDEX_AREA_SOLICITUDES, "bepare.DES_AREA_CONOCIMIENTO");

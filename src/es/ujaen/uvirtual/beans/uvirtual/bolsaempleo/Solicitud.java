@@ -1,5 +1,6 @@
 package es.ujaen.uvirtual.beans.uvirtual.bolsaempleo;
 
+import java.io.InputStream;
 import java.io.Serializable;
 import java.util.Date;
 
@@ -14,6 +15,7 @@ public class Solicitud implements Serializable {
 	private Convocatoria convocatoria;
 	private String estado;
 	private Date fechaConfirmacion;
+	private InputStream archivo;
 	
 	/** Constructor por defecto.
 	 */
@@ -85,6 +87,14 @@ public class Solicitud implements Serializable {
 		this.fechaConfirmacion = fecha;
 	}
 	
+	public InputStream getArchivo() {
+		return archivo;
+	}
+	
+	public void setArchivo(InputStream archivo) {
+		this.archivo = archivo;
+	}
+	
 	public static long getSerialversionuid() {
 		return serialVersionUID;
 	}
@@ -104,6 +114,7 @@ public class Solicitud implements Serializable {
 		result = prime * result + ((convocatoria == null) ? 0 : convocatoria.hashCode());
 		result = prime * result + ((estado == null) ? 0 : estado.hashCode());
 		result = prime * result + ((fechaConfirmacion == null) ? 0 : fechaConfirmacion.hashCode());
+		result = prime * result + ((archivo == null) ? 0 : archivo.hashCode());
 		return result;
 	}
 	
@@ -153,6 +164,13 @@ public class Solicitud implements Serializable {
 				return false;
 			}
 		} else if (!fechaConfirmacion.equals(other.fechaConfirmacion)) {
+			return false;
+		}
+		if (archivo == null) {
+			if (other.archivo != null) {
+				return false;
+			}
+		} else if (!archivo.equals(other.archivo)) {
 			return false;
 		}
 		
