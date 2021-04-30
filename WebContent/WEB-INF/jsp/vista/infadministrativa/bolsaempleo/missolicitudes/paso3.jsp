@@ -92,7 +92,8 @@ VistaSolicitudes bean = (VistaSolicitudes) uvdatos.getVistas().get(VistaSolicitu
 				event.preventDefault();
 				Atis.confirmDialog(
 					"Confirmar solicitud", 
-					"¿Desea confirmar la solicitud?<br/><br/>ATENCIÓN: NO PODRA EDITAR LA SOLICITUD<br/>DESPUES DE CONFIRMAR SU SOLICITUD", {
+					"¿Desea confirmar la solicitud?<br/><br/>ATENCIÓN: NO PODRA EDITAR LA SOLICITUD<br/>DESPUES DE CONFIRMAR SU SOLICITUD.<br/>"
+					+ "Posteriormente podrá descargar una copia de su solicitud.", {
 	            	'Confirmar': function(row) {
 	            		var params = {
 	            				'a': '<%= ControladorMisSolicitudes.ACCION_CONFIRMAR_SOLICITUD %>',

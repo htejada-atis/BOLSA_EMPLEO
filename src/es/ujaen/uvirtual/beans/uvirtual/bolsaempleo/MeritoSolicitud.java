@@ -10,7 +10,6 @@ import java.io.Serializable;
 public class MeritoSolicitud extends Merito implements Serializable {
 
 	private static final long serialVersionUID = 1L;
-	private Boolean afinidad;
 	private Boolean excluido;
 	
 	/** Constructor por defecto.
@@ -29,21 +28,10 @@ public class MeritoSolicitud extends Merito implements Serializable {
 	/** Constructor con parametros.
 	 * @param pmerito .
 	 * @param pexcluido .
-	 * @param pafinidad .
 	 */
-	public MeritoSolicitud(Merito pmerito, Boolean pexcluido, Boolean pafinidad) {
+	public MeritoSolicitud(Merito pmerito, Boolean pexcluido) {
 		super(pmerito);
 		this.excluido = pexcluido;
-		this.afinidad = pafinidad;
-	}
-	
-	
-	public Boolean isAfinidad() {
-		return afinidad;
-	}
-
-	public void setAfinidad(Boolean afinidad) {
-		this.afinidad = afinidad;
 	}
 	
 	public Boolean isExcluido() {
@@ -60,14 +48,13 @@ public class MeritoSolicitud extends Merito implements Serializable {
 	
 	@Override
 	public String toString() {
-		return "MeritoSolicitud [afinidad=" + afinidad + ", excluido=" + excluido + "]";
+		return "MeritoSolicitud [excluido=" + excluido + "]";
 	}
 	
 	@Override
 	public int hashCode() {
 		final int prime = 31;
 		int result = 1;
-		result = prime * result + ((afinidad == null) ? 0 : afinidad.hashCode());
 		result = prime * result + ((excluido == null) ? 0 : excluido.hashCode());
 		return result;
 	}
@@ -85,13 +72,6 @@ public class MeritoSolicitud extends Merito implements Serializable {
 			return false;
 		}
 		MeritoSolicitud other = (MeritoSolicitud) obj;
-		if (afinidad == null) {
-			if (other.afinidad != null) {
-				return false;
-			}
-		} else if (!afinidad.equals(other.afinidad)) {
-			return false;
-		}
 		if (excluido == null) {
 			if (other.excluido != null) {
 				return false;

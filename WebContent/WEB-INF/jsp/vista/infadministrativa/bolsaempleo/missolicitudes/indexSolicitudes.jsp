@@ -118,7 +118,7 @@ VistaSolicitudes bean = (VistaSolicitudes) uvdatos.getVistas().get(VistaSolicitu
 		var table_titulaciones = new Atis.DataTable('#table', {
 		    "ajax": { url: "<%=  ControladorMisSolicitudes.URL_PATTERN_AJAX %>" },
 		    "pageSize": 10,
-		    "action": "<%= ControladorMisSolicitudes.ACCION_DATATABLE %>",
+		    "action": "<%=ControladorMisSolicitudes.ACCION_DATATABLE_SOLICITUDES%>",
 		    "beforeRender": beforeRender,
 		    "afterRender": afterRender,
 		    "columns": [

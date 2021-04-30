@@ -123,8 +123,6 @@ public class ControladorMisMeritos extends HttpServlet {
 			nombreAccion = ACCION_LISTAR;
 		}
 		
-		bean.setVista(RUTA_BEP_MERITOS + "index.jsp");
-		
 		try {
 			anonimo = !modelo.checkUser(datos);
 			switch (nombreAccion) {
@@ -139,6 +137,9 @@ public class ControladorMisMeritos extends HttpServlet {
 					break;
 				case ACCION_ELIMINAR_MERITOS:
 					eliminarMeritos(request, response);
+					break;
+				case ACCION_LISTAR:
+					listaMeritos(bean);
 					break;
 			}
 		} catch (SQLException e) {
@@ -172,12 +173,27 @@ public class ControladorMisMeritos extends HttpServlet {
 		doGet(request, response);
 	}
 	
+	/**
+	 * lista meritos .
+	 * @param bean .
+	 * @throws UVException .
+	 * @throws SQLException .
+	 * @throws ServletException .
+	 * @throws IOException .
+	 */
+	private void listaMeritos(VistaMeritos bean) throws SQLException, UVException {
+		bean.setVista(RUTA_BEP_MERITOS + "index.jsp");
+		
+		ModeloBaremacion modeloBaremacion = ModeloBaremacion.obtenerInstancia();
+		bean.setApartados(modeloBaremacion.getApartadosActivos());
+	}
+	
 	/** agrega un nuevo mérito.
 	 * @param bean .
 	 * @param datos .
 	 * @param request .
 	 * @param response .
-	 * @throws SQLException excepcion de bbdd.
+	 * @throws SQLException excepcion de bbdd .
 	 * @throws UVException en caso de error de parametros .
 	 * @throws IOException en caso de error de input u output .
 	 * @throws ServletException .

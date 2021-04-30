@@ -43,7 +43,7 @@ public class TestBEPControladorMisSolicitudes {
     // método para obtener la vista con una lista de solicitudes .
     private VistaSolicitudes obtenerSolicitudes() throws ServletException, IOException {
     	PeticionHttp peticion = UtilsTestBolsaEmpleo.peticionAutenticadaCandidato();
-		peticion.setParameter(ControladorMisSolicitudes.PARAM_ACCION, ControladorMisSolicitudes.ACCION_DATATABLE);
+		peticion.setParameter(ControladorMisSolicitudes.PARAM_ACCION, ControladorMisSolicitudes.ACCION_DATATABLE_SOLICITUDES);
 
 		RespuestaHttp respuesta = new RespuestaHttp();
 		ControladorMisSolicitudes controlador = new ControladorMisSolicitudes();

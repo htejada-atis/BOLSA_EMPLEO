@@ -48,11 +48,11 @@ VistaSolicitudes bean = (VistaSolicitudes) uvdatos.getVistas().get(VistaSolicitu
 	
 	<table class="bluetable bolsaempleo" id="tableMeritos" style="visibility: collapse">
 		<tr>
-			<th scope="col"	style="width:10%"></th>
+			<th scope="col"	style="width:5%"></th>
+			<th scope="col"	style="width:10%">Id</th>
 			<th scope="col"	style="width:15%">Código ítem</th>
 			<th scope="col"	style="width:45%">Nombre ítem</th>
 			<th scope="col"	style="width:10%">Valor</th>
-			<th scope="col" class="center" style="width:10%">Afinidad</th>
 			<th scope="col" class="center" style="width:10%">Excluido</th>
 		</tr>
 		<tbody>		
@@ -144,18 +144,12 @@ VistaSolicitudes bean = (VistaSolicitudes) uvdatos.getVistas().get(VistaSolicitu
 				    		}
 			    		}
 			    	},
+			    	{'data': 'codNum', 'filter': {'type': 'number'}},
 			    	{'data': 'item', 'filter': true, 'render': function(row) {
 			        	return row.item.bloque.apartado.codigo + "." + row.item.bloque.codigo + "." + row.item.codigo;
 		        	}},
 		        	{'data': 'item.nombre', 'filter': true, 'overflow': 'auto'},
 		        	{'data': 'valor', 'filter': true},
-		        	{'data': 'afinidad', 'order': {'active': false}, 'filter': {'type': 'selectBoolean', 'true': 'Afín', 'false': 'No afín'}, 'render': function(row) {
-		        		if(row.afinidad) {
-		        			return "<div title='Afín' class='circle-true'></div>";
-		        		} else {
-		        			return "<div title='No afín' class='circle-false'></div>"; 
-		        		}
-		        	}},
 		        	{'data': 'excluido', 'order': {'active': false}, 'filter': {'type': 'selectBoolean', 'true': 'Excluido', 'false': 'No excluido'}, 'render': function(row) {
 		        		if (row.excluido) {
 		        			return "<div title='Excluido' class='circle-true'></div>";
