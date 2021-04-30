@@ -7,6 +7,8 @@ import static org.junit.Assert.fail;
 import java.io.IOException;
 import java.sql.SQLException;
 import java.text.ParseException;
+import java.util.Calendar;
+import java.util.Date;
 import java.util.List;
 
 import javax.sql.DataSource;
@@ -16,20 +18,32 @@ import org.junit.Test;
 
 import bbdd.BbddRunner;
 import bbdd.UtilsTestBolsaEmpleo;
+import es.ujaen.uvirtual.beans.Rol;
 import es.ujaen.uvirtual.beans.uvirtual.bolsaempleo.Afinidad;
+import es.ujaen.uvirtual.beans.uvirtual.bolsaempleo.Evaluador;
 import es.ujaen.uvirtual.modelo.bolsaempleo.ModeloAfinidad;
+import es.ujaen.uvirtual.modelo.bolsaempleo.ModeloEvaluador;
+import es.ujaen.uvirtual.modelo.bolsaempleo.ModeloUsuarioBolsaEmpleo;
 import es.ujaen.uvirtual.modelo.conexion.Conexion;
 import es.ujaen.uvirtual.utilidades.UVException;
 
-/** test afinidades.
+
+/** test evaluadores.
 *
 */
-public class TestBEPModeloAfinidad {
-	private static final Integer ID_AFINIDAD = 4;
-	private static final String CODIGO = "AAA";
-	private static final String CODIGOEDITAR = "EEEE";
-	private static final String DESCRIPCION = "pruebas de afinidad";
-	private static final Float MODULACION = (float) 10000;
+public class TestBEPModeloEvaluador {
+	private static final Integer CODPERSONA = 1;
+	private static final String CODCUENTA = "test2";
+	private static final Rol ROL = new Rol(1050);
+	private static final String EMAIL = "test@test";
+	private static final String RAZONEXCLUIDO = "test";
+	private static final Boolean LISTADIST = true;
+	private static final Boolean EXCLUIDO = false;
+	private static final Boolean BORRADO = true;
+	private static final Date FECHAEXCLUSION = new java.sql.Date(Calendar.getInstance().getTime().getTime());
+	private static final Date FECHABORRADO = new java.sql.Date(Calendar.getInstance().getTime().getTime());
+	private static final Boolean ACTIVO = false;
+	private static final Integer AREA = 3;
     
 	/** prepara la bd con los datos iniciales.
      * @throws SQLException si error en bd
@@ -43,40 +57,29 @@ public class TestBEPModeloAfinidad {
     	UtilsTestBolsaEmpleo.inicializaBolsaEmpleo();
     }
     
-    /** test acierto insertar usuario.
+    /** test acierto insertar evaluador.
      * @throws SQLException si error en bd
-     * @throws UVException si error al validar usuario
+     * @throws UVException si error al validar evaluador
      * @throws ParseException si error al validar fecha
      */
     @Test
     public void testA01InsertaAfinidad() throws SQLException, ParseException, UVException {
-    	Afinidad afinidad = new Afinidad();
-    	afinidad.setCodNum(ID_AFINIDAD);
-    	afinidad.setCodigo(CODIGO);
-    	afinidad.setDescripcion(DESCRIPCION);
-    	afinidad.setModulacion(MODULACION);
+		ModeloEvaluador modelo = ModeloEvaluador.obtenerInstancia();
+		ModeloUsuarioBolsaEmpleo modeloUsuario = ModeloUsuarioBolsaEmpleo.obtenerInstancia();
     	
-    	Afinidad afinidad2 = new Afinidad();
-    	afinidad2.setCodigo(CODIGO);
-    	afinidad2.setDescripcion(DESCRIPCION);
-    	afinidad2.setModulacion(MODULACION);
-    	
-		ModeloAfinidad modelo = ModeloAfinidad.obtenerInstancia();
-    	modelo.nuevaAfinidad(afinidad);
-    	modelo.nuevaAfinidad(afinidad2);
-    	
-    	Afinidad afinidadCont = new Afinidad();
-    	afinidadCont = modelo.getAfinidadById(afinidad.getCodNum());
-    	List<Afinidad> afinidades = modelo.listaAfinidades();
-    	Boolean eje = false;
-    	
-        for (Afinidad afi : afinidades) {
-            if (afi.getCodNum() == afinidadCont.getCodNum()) {
-            	eje = true;
-            }
-        }
-    	
-    	assertTrue("afinidad insertada debe ser listada", eje);
+		Evaluador evaluador = new Evaluador();
+		evaluador.setCodPersona(CODPERSONA);
+		evaluador.setCodCuenta(CODCUENTA);
+		evaluador.setRol(ROL);
+		evaluador.setEmail(EMAIL);
+		evaluador.setListaDist(LISTADIST);
+		evaluador.setExcluido(EXCLUIDO);
+		evaluador.setRazonExcluido(RAZONEXCLUIDO);
+		evaluador.setFechaExclusion(FECHAEXCLUSION);
+		evaluador.setBorrado(BORRADO);
+		evaluador.setFechaBorrado(FECHABORRADO);
+		evaluador.setCodNumArea(AREA);    	
+
     }
 
     /** test acierto borrar afinidad.
@@ -108,7 +111,6 @@ public class TestBEPModeloAfinidad {
 		ModeloAfinidad modelo = ModeloAfinidad.obtenerInstancia();
     	List<Afinidad> afinidades = modelo.listaAfinidades();
     	Afinidad afinidad = afinidades.get(0);
-    	afinidad.setCodigo(CODIGOEDITAR);
     	modelo.actualizaAfinidad(afinidad);
     	Afinidad afinidadActualizada = modelo.getAfinidadById(afinidad.getCodNum());
     	

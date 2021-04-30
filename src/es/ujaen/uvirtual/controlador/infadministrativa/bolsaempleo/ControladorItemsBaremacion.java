@@ -193,6 +193,13 @@ public class ControladorItemsBaremacion extends HttpServlet {
 			LOGGER.log(Level.SEVERE, Formateador.getStackTrace(e));
 			LOGGER.log(Level.SEVERE, e.toString());
 			bean.getMensajesDeError().add(e.toString());
+			
+			ModeloAfinidad modeloAfinidad = ModeloAfinidad.obtenerInstancia();
+			try {
+				bean.setAfinidades(modeloAfinidad.listaAfinidades());
+			} catch (SQLException ex) {
+				ex.printStackTrace();
+			}
 		} catch (UVException e) {
 			LOGGER.log(Level.WARNING, e.toString());
 			bean.getMensajesDeError().add(e.getMessage());
@@ -676,7 +683,7 @@ public class ControladorItemsBaremacion extends HttpServlet {
 		bean.setBloqueBaremacion(item.getBloqueBaremacion());
 		bean.setItemBaremacion(item);
 		
-		bean.setAfinidad(modeloAfinidad.getAfinidadById(item.getAfinidad().getCodNum()));
+		bean.setAfinidad(modeloAfinidad.getAfinidadByCodigo(item.getAfinidad()));
 		bean.setAfinidades(modeloAfinidad.listaAfinidades());
 		
 		bean.setVista(RUTA_BEP_CONF + "formItemBaremacion.jsp");
@@ -763,13 +770,12 @@ public class ControladorItemsBaremacion extends HttpServlet {
 
 		item.setUnidades(EscapaHTML.ajustaCodificacion(request.getParameter(PARAM_ITEM_UNIDADES)));
 		
-		
-		ModeloAfinidad modeloAfinidad = ModeloAfinidad.obtenerInstancia();
-		item.setAfinidad(modeloAfinidad.getAfinidadById(Formateador.leeParametroInteger(request.getParameter(PARAM_ITEM_AFINIDAD))));
+
+		item.setAfinidad(EscapaHTML.ajustaCodificacion(request.getParameter(PARAM_ITEM_AFINIDAD)));
 		if (item.getAfinidad() == null) {
 			throw new UVException(MENSAJE_ERROR_AFINIDAD_VACIA);
 		}
-		if (Formateador.leeParametroInteger(request.getParameter(PARAM_ITEM_AFINIDAD)) == -1) {
+		if (EscapaHTML.ajustaCodificacion(request.getParameter(PARAM_ITEM_AFINIDAD)).equals("1")) {
 			throw new UVException(MENSAJE_ERROR_AFINIDAD_VACIA);
 		}
 		

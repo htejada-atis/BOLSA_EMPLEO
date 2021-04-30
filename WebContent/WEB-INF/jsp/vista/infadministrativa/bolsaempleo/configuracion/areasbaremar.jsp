@@ -22,7 +22,7 @@ VistaAreasBaremar bean = (VistaAreasBaremar) uvdatos.getVistas().get(VistaAreasB
 	<% } else { %>
 	
 	<div class="titulo-bolsa-empleo">
-		<h2>Bolsas baremables</h2>
+		<h2>Áreas baremables</h2>
     
 	    <a class="link-btn" id="nueva_convocatoria" href="#">
 	    	Importar Areas UVirtual

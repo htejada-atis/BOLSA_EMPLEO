@@ -36,7 +36,7 @@ VistaAfinidades bean = (VistaAfinidades) uvdatos.getVistas().get(VistaAfinidades
 			<th scope="col" class="center" style="width:10%" title="Código de afinidad">Código</th>
 			<th scope="col" style="width:55%">Descripcion</th>
 			<th scope="col" class="center" style="width:15%">Modulación</th>
-			<th scope="col" class="center" style="width:15%">Afinidad</th>
+			<th scope="col" class="center" style="width:15%">Borrado</th>
 			<th scope="col" style="width:15%"></th>			
 		</tr>
 		<tbody>				
