@@ -18,7 +18,6 @@ public class TestBEPBeanAfinidad {
 	private static final String CODIGO = "AAA";
 	private static final String DESCRIPCION = "pruebas de afinidad";
 	private static final Float MODULACION = (float) 10000;
-	private static final Boolean SUJETOAFINIDAD = true;
 	
 	/** test constructor.
 	 * 
@@ -31,13 +30,11 @@ public class TestBEPBeanAfinidad {
 		afinidad.setCodigo(CODIGO);
 		afinidad.setDescripcion(DESCRIPCION);
 		afinidad.setModulacion(MODULACION);
-		afinidad.setSujetoAfinidad(SUJETOAFINIDAD);
 				
 		assertEquals(ID_AFINIDAD, afinidad.getCodNum());
 		assertEquals(CODIGO, afinidad.getCodigo());
 		assertEquals(DESCRIPCION, afinidad.getDescripcion());
 		assertEquals(MODULACION, afinidad.getModulacion());
-		assertEquals(SUJETOAFINIDAD, afinidad.getSujetoAfinidad());
 		
 		assertNotNull(afinidad.toString());
 	}
@@ -46,7 +43,7 @@ public class TestBEPBeanAfinidad {
 	 */
 	@Test
 	public void testA02() {
-		Afinidad afinidad = new Afinidad(ID_AFINIDAD, CODIGO, DESCRIPCION, MODULACION, SUJETOAFINIDAD);
+		Afinidad afinidad = new Afinidad(ID_AFINIDAD, CODIGO, DESCRIPCION, MODULACION);
 		Afinidad afinidad2 = new Afinidad(afinidad);
 		
 		assertEquals(ID_AFINIDAD, afinidad.getCodNum());
@@ -57,8 +54,6 @@ public class TestBEPBeanAfinidad {
 		assertEquals(DESCRIPCION, afinidad2.getDescripcion());		
 		assertEquals(MODULACION, afinidad.getModulacion());
 		assertEquals(MODULACION, afinidad2.getModulacion());
-		assertEquals(SUJETOAFINIDAD, afinidad.getSujetoAfinidad());
-		assertEquals(SUJETOAFINIDAD, afinidad2.getSujetoAfinidad());
 		
 		assertNotNull(afinidad.toString());
 		assertNotNull(afinidad2.toString());

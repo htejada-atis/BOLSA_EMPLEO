@@ -19,7 +19,7 @@ public class ItemBaremacion implements Serializable {
 	private Float valor;
 	private Float valorMinimo;
 	private Float valorMaximo;
-	private Afinidad afinidad;
+	private String afinidad;
 	
 	/** Constructor por defecto.
 	 */
@@ -40,7 +40,7 @@ public class ItemBaremacion implements Serializable {
 	 * @param pafinidad .
 	 */
 	public ItemBaremacion(Integer pcodNum, BloqueBaremacion pbloque, String pcodigo, String pnombre, Boolean pactivo, 
-			String punidades, Float pvalor, Float pvalorMinimo, Float pvalorMaximo, Afinidad pafinidad) {
+			String punidades, Float pvalor, Float pvalorMinimo, Float pvalorMaximo, String pafinidad) {
 		super();
 		this.bloque = pbloque;
 		this.codNum = pcodNum;
@@ -150,11 +150,11 @@ public class ItemBaremacion implements Serializable {
 		this.valorMaximo = valorMaximo;
 	}
 	
-	public Afinidad getAfinidad() {
+	public String getAfinidad() {
 		return this.afinidad;
 	}
 
-	public void setAfinidad(Afinidad afinidad) {
+	public void setAfinidad(String afinidad) {
 		this.afinidad = afinidad;
 	}
 	

@@ -15,10 +15,12 @@ VistaEstadoBolsas bean = (VistaEstadoBolsas) uvdatos.getVistas().get(VistaEstado
 	<% 
 		Integer bloqueadas = null;
 		Integer revisadas = null;
+		Integer baremables = null;
 		Integer totales = null;
 
 		bloqueadas = bean.getTotalBolsasBloqueadas();
 		revisadas = bean.getTotalBolsasRevisadas();
+		baremables = bean.getTotalBolsasBaremables();
 		totales = bean.getTotalBolsas();
 	%>
 
@@ -36,7 +38,7 @@ VistaEstadoBolsas bean = (VistaEstadoBolsas) uvdatos.getVistas().get(VistaEstado
 	<h2>Estado de las bolsas</h2>
 	
 	<div class="titulo-bolsa-empleo">
-		<div class="form-group-container">
+		<div class="form-group-container col3">
 	    	<div class="form-group">
     				<p>Total de bolsas bloqueadas:
     					<%= bloqueadas %> / <%= totales %>
@@ -45,6 +47,11 @@ VistaEstadoBolsas bean = (VistaEstadoBolsas) uvdatos.getVistas().get(VistaEstado
     		<div class="form-group">
     				<p>Total de bolsas revisadas:
     				   <%= revisadas %> / <%= totales %>
+    				</p>
+    		</div>
+    		<div class="form-group">
+    				<p>Total de bolsas baremables:
+    				   <%= baremables %> / <%= totales %>
     				</p>
     		</div>
 		</div>
@@ -92,7 +99,7 @@ $(document).ready(function() {
 	        {'data': 'fechaActualizacion', 'filter': {'type': 'date'}},
 	        {'data': 'fechaBloqueo', 'filter': {'type': 'date'}},
 	        {'data': 'fechaDesBloqueo', 'filter': {'type': 'date'}},
-	        {'data': 'baremable', 'filter': {'type': 'selectBoolean', 'true': 'Baremable', 'false': 'No Baremable'} , 'render': function(row) {
+	        {'data': 'baremable', 'filter': {'type': 'select', 'options':{'true': 'Baremable', 'false': 'No Baremable'} , 'optionDefault': 'true'}, 'render': function(row) {
         		if(row.baremable){
         			return "<div title='Baremable' class='circle-true'></div>"; 
         		}

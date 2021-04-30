@@ -18,9 +18,12 @@ ApartadoBaremacion apartado = bean.getApartadoBaremacion();
 BloqueBaremacion bloque = bean.getBloqueBaremacion();
 ItemBaremacion item = bean.getItemBaremacion();
 String codigoCompleto = apartado.getCodigo() + "." + bloque.getCodigo() + "." + (item != null ? item.getCodigo() : bean.getUltimoCodigo());
-String descripcion = item.getDescripcion();
-if(descripcion==null){
-	descripcion = "";
+String descripcion = "";
+if(item!=null){
+	descripcion = item.getDescripcion();
+	if (descripcion==null) {
+		descripcion = "";
+	}
 }
 %>
 
@@ -76,15 +79,12 @@ if(descripcion==null){
 		<div class="form-group-container col2">
 			<div class="form-group">
 				<%
-					String unidadesSelected = BolsaEmpleoUtils.getParamForm(request, ControladorItemsBaremacion.PARAM_ITEM_UNIDADES, item != null ? item.getUnidades() : ModeloBaremacion.ITEM_UNIDADES_UNIDADES); 
+					String unidadesSelected = BolsaEmpleoUtils.getParamForm(request, ControladorItemsBaremacion.PARAM_ITEM_UNIDADES, item != null ? item.getUnidades() : ModeloBaremacion.ITEM_UNIDADES_UNIDADES);
 				%>
 	    		<label for="item_unidades">Unidades</label>
 	    		<select class="params" id="item_unidades" name="<%= ControladorItemsBaremacion.PARAM_ITEM_UNIDADES %>" style="width:100%;">
-					<option value="<%= ModeloBaremacion.ITEM_UNIDADES_UNIDADES %>" <%= unidadesSelected.equals(ModeloBaremacion.ITEM_UNIDADES_UNIDADES) ? "selected=\"selected\"" : "" %>>Unidades</option>
-					<option value="<%= ModeloBaremacion.ITEM_UNIDADES_PUNTOS %>" <%= unidadesSelected.equals(ModeloBaremacion.ITEM_UNIDADES_PUNTOS) ? "selected=\"selected\"" : "" %>>Puntos</option>
-					<option value="<%= ModeloBaremacion.ITEM_UNIDADES_CREDITOS %>" <%= unidadesSelected.equals(ModeloBaremacion.ITEM_UNIDADES_CREDITOS) ? "selected=\"selected\"" : "" %>>Créditos</option>
-					<option value="<%= ModeloBaremacion.ITEM_UNIDADES_MESES %>" <%= unidadesSelected.equals(ModeloBaremacion.ITEM_UNIDADES_MESES) ? "selected=\"selected\"" : "" %>>Meses</option>
-					<option value="<%= ModeloBaremacion.ITEM_UNIDADES_ANIOS %>" <%= unidadesSelected.equals(ModeloBaremacion.ITEM_UNIDADES_ANIOS) ? "selected=\"selected\"" : "" %>>Años</option>
+					<option value="<%= ModeloBaremacion.ITEM_UNIDADES_MEDICION_ENTERO %>" <%= unidadesSelected.equals(ModeloBaremacion.ITEM_UNIDADES_MEDICION_ENTERO) ? "selected=\"selected\"" : "" %>>Entero</option>
+					<option value="<%= ModeloBaremacion.ITEM_UNIDADES_MEDICION_DECIMAL %>" <%= unidadesSelected.equals(ModeloBaremacion.ITEM_UNIDADES_MEDICION_DECIMAL) ? "selected=\"selected\"" : "" %>>Decimal</option>
 				</select>				
 	    	</div>	    	
 		</div>
@@ -101,22 +101,17 @@ if(descripcion==null){
     				<%for(Afinidad afinidad: bean.getAfinidades()){
     					if(item!=null){
     						if(bean.getAfinidad()!=null){
-            					if(bean.getAfinidad().getCodNum().equals(afinidad.getCodNum())){%>
-        							<option value="<%=afinidad.getCodNum()%>" selected="selected"><%=afinidad.getCodigo()%> - <%=afinidad.getDescripcion()%></option>
-        						<%}	
-            					else {%>
-            						<option value="<%=afinidad.getCodNum()%>"><%=afinidad.getCodigo()%> - <%=afinidad.getDescripcion()%></option>
+            					if(bean.getAfinidad().getCodigo().equals(afinidad.getCodigo())){%>
+        							<option value="<%=afinidad.getCodigo()%>" selected="selected"><%=afinidad.getCodigo()%></option>
+        						<%}	else {%>
+            						<option value="<%=afinidad.getCodigo()%>"><%=afinidad.getCodigo()%></option>
             					<%}
-            				}
-    						else{%>
-								<option value="<%=afinidad.getCodNum()%>"><%=afinidad.getCodigo()%> - <%=afinidad.getDescripcion()%></option>
+            				} else{%>
+								<option value="<%=afinidad.getCodigo()%>"><%=afinidad.getCodigo()%></option>
 							<%}
-    					}
-						else{%>
-							<option value="<%=afinidad.getCodNum()%>"><%=afinidad.getCodigo()%> - <%=afinidad.getDescripcion()%></option>
-						<%}
-							
-					}%>
+    					} else{%>
+							<option value="<%=afinidad.getCodigo()%>"><%=afinidad.getCodigo()%></option>
+						<%}	}%>
 				</select>
 	    	</div>
 		</div>

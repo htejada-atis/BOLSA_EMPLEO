@@ -260,9 +260,7 @@ VistaItemsBaremacion bean = (VistaItemsBaremacion) uvdatos.getVistas().get(Vista
 				        {'data': 'valor'},
 				        {'data': 'valorMinimo'},
 				        {'data': 'valorMaximo'},				        
-				        {'data': 'afinidad.codigo', 'render': function(row) {
-			        			return "<div title='"+row.afinidad.descripcion+"'>"+row.afinidad.codigo+"</div>"; 
-			        	}},
+				        {'data': 'afinidad'},
 				        {'data': 'activo', 'filter': {'type': 'selectBoolean', 'true': 'Activo', 'false': 'Inactivo'}, 'render': function(row) {
 			        		if(row.activo){
 			        			return "<div class='circle-true'></div>"; 

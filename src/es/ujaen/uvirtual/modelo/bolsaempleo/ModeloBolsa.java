@@ -219,6 +219,31 @@ public class ModeloBolsa {
 		return null;		
 	}
 	
+	
+	/**
+	 * Devuelve el total de bolsas baremables .
+	 * @return num bolsas
+	 * @throws SQLException en caso de error en la BD
+	 * @throws UVException si bolsa no es existe
+	 */
+	public Integer getBolsasBaremables() throws SQLException, UVException {
+		String consulta = "SELECT COUNT(*) AS total "
+				+ "FROM TBEP_BOLSAS "
+				+ "WHERE FLGBAREMABLE='S'";
+			
+		try (Connection conexion = ConexionUvirtual.obtenerInstancia();
+				PreparedStatement stmt = conexion.prepareStatement(consulta);) {
+			try (ResultSet rs = stmt.executeQuery()) {
+				while (rs.next()) {
+					return rs.getInt("total");				
+				}	
+			}
+		}
+		return null;		
+	}
+	
+	
+	
 	/**
 	 * Bloquea bolsas.
 	 * @param bolsas .
