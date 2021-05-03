@@ -8,6 +8,7 @@
 <%@ page import="es.ujaen.uvirtual.utilidades.EscapaHTML" %>
 <%@	page import="es.ujaen.uvirtual.beans.uvirtual.bolsaempleo.BolsaSolicitud" %>
 <%@	page import="es.ujaen.uvirtual.beans.uvirtual.bolsaempleo.Merito" %>
+<%@	page import="es.ujaen.uvirtual.beans.uvirtual.bolsaempleo.Titulacion" %>
 
 <%
 UVDatos uvdatos = (UVDatos) request.getAttribute(UVDatos.NOMBRE_ATRIBUTO);
@@ -68,13 +69,8 @@ VistaSolicitudes bean = (VistaSolicitudes) uvdatos.getVistas().get(VistaSolicitu
 		    	 Confirmar Solicitud
 		    </a>
 		</div>				
-	<% } else { %>
-		<div class="btns-by-steps">
-			<a class="link-btn" id="paso3_descargar" href="<%= request.getRequestURI() %>">
-		    	 Descargar Solicitud
-		    </a>
-		</div>		
 	<% } %>
+	
 </div>
 
 <script>
@@ -90,9 +86,27 @@ VistaSolicitudes bean = (VistaSolicitudes) uvdatos.getVistas().get(VistaSolicitu
 			});
 			$('#paso3_confirmar').on('click', function(event) {
 				event.preventDefault();
+				
+				var message = "";
+				
+				<% if (bean.getListaTitulaciones() != null && bean.getListaTitulaciones().size() > 0) { %>
+					message = "¿Desea confirmar la solicitud?<br/><br/>";
+					message += "Mis titulaciones: <br/>";
+					
+					<% for (Titulacion titulacion: bean.getListaTitulaciones()) { %>
+						message += "<%= titulacion.getNombre() %><br/>";
+					<% } %>
+					
+					message += "<br/>ATENCIÓN: NO PODRA EDITAR LA SOLICITUD<br/>DESPUES DE CONFIRMAR SU SOLICITUD.<br/><br/>";
+					message += "Posteriormente podrá descargar una copia de su solicitud.<br/><br/>";
+					
+				<% } else { %>
+					message = "No tiene ninguna titulación agregada. <br/> Para confirmar la solicitud debe tener al menos una titulación <br/>" 
+							+ "agregada en el apartado 'Mis titulaciones'";
+				<% } %>
+				
 				Atis.confirmDialog(
-					"Confirmar solicitud", 
-					"¿Desea confirmar la solicitud?<br/><br/>ATENCIÓN: NO PODRA EDITAR LA SOLICITUD<br/>DESPUES DE CONFIRMAR SU SOLICITUD", {
+					"Confirmar solicitud", message, {
 	            	'Confirmar': function(row) {
 	            		var params = {
 	            				'a': '<%= ControladorMisSolicitudes.ACCION_CONFIRMAR_SOLICITUD %>',
@@ -106,12 +120,7 @@ VistaSolicitudes bean = (VistaSolicitudes) uvdatos.getVistas().get(VistaSolicitu
 	            	}
 	          	});
 			});
-		<% } else { %>
-			$('#paso3_descargar').on('click', function(event) {
-				event.preventDefault();
-				window.open("<%= request.getRequestURI() %>"
-			        	+ "?a=<%= ControladorMisSolicitudes.ACCION_DESCARGAR_PDF %>&<%= ControladorMisSolicitudes.PARAM_SOLICITUD_ID %>=" + '<%= bean.getSolicitud().getCodNum() %>');			
-			});
 		<% } %>
+		
 	});
 </script>

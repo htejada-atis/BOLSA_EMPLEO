@@ -12,7 +12,17 @@ UVDatos uvdatos = (UVDatos) request.getAttribute(UVDatos.NOMBRE_ATRIBUTO);
 VistaSolicitudes bean = (VistaSolicitudes) uvdatos.getVistas().get(VistaSolicitudes.class.getName());
 %>
 
-<div class="bolsa-empleo">	
+<div class="bolsa-empleo">
+
+	<% if (session.getAttribute(ControladorMisSolicitudes.MENSAJE_ENVIADO) != null) { %>
+		<div id="exito" class="success">
+			<%= session.getAttribute(ControladorMisSolicitudes.MENSAJE_ENVIADO) %>
+		</div>
+	<% 
+			session.removeAttribute(ControladorMisSolicitudes.MENSAJE_ENVIADO);
+		} 
+	%>
+
 	<% if (bean.getMensajesDeExito().size() > 0) { %>
 		<div id="exito" class="success">
 			<%= bean.formatearMensajesDeExito() %>
@@ -61,6 +71,8 @@ VistaSolicitudes bean = (VistaSolicitudes) uvdatos.getVistas().get(VistaSolicitu
 			var convocatoriaCerrada = row.convocatoria.estado == '<%= ModeloConvocatoria.CONVOCATORIA_ESTADO_CERRADA %>';
 			var btnCrear = '<button class="create-solicitud" data-rowid="' + row.convocatoria.codNum + '" title="Crear una nueva solicitud para: ' + row.convocatoria.descripcion + '">Abrir una solicitud</button>';
 			var btnConsultar = '<button class="consultar-solicitud" data-rowid="' + row.codNum + '" title="Consultar solicitud para: ' + row.convocatoria.descripcion + '">Consultar solicitud</button>';
+			var btnDescargarPDF = '<button class="descargar-pdf-solicitud" data-rowid="' + row.codNum + '" title="Descargar pdf solicitud para: ' + row.convocatoria.descripcion + '">Descargar PDF solicitud</button>';
+			
 			
 			if (convocatoriaAbierta && solicitudNoCreada) {
 				// convocatoria abierta, solicitud no creada
@@ -81,7 +93,7 @@ VistaSolicitudes bean = (VistaSolicitudes) uvdatos.getVistas().get(VistaSolicitu
 			} else if ((convocatoriaAbierta || convocatoriaCerrada) && solicitudCerrada) {
 				// convocatoria abierta o cerrada y solicitud cerrada
 				console.log("convocatoria abierta o cerrada y solicitud cerrada");
-				html = 'Solicitud cerrada. ' + btnConsultar;
+				html = 'Solicitud cerrada. ' + btnDescargarPDF;
 			} 
 			
 			return html
@@ -102,23 +114,31 @@ VistaSolicitudes bean = (VistaSolicitudes) uvdatos.getVistas().get(VistaSolicitu
 				'<%= ControladorMisSolicitudes.PARAM_ACCION %>': '<%= ControladorMisSolicitudes.ACCION_CONSULTAR_SOLICITUD %>', 
 				'<%= ControladorMisSolicitudes.PARAM_SOLICITUD_ID %>': id
 			};
-			Atis.sendForm('<%= request.getRequestURI() %>', params);	
-		}; 
+			Atis.sendForm('<%= request.getRequestURI() %>', params);
+		};
+		
+		var descargarPDFSolicitud = function() {
+			var id = $(this).data('rowid')
+			window.open("<%= request.getRequestURI() %>"
+			        	+ "?a=<%= ControladorMisSolicitudes.ACCION_DESCARGAR_PDF %>&<%= ControladorMisSolicitudes.PARAM_SOLICITUD_ID %>=" + id);
+		}
 					
 		var beforeRender = function(table) {
 			$('button.create-solicitud', table.node).off('click', createSolicitud);
 			$('button.consultar-solicitud', table.node).off('click', consultarSolicitud);
+			$('button.descargar-pdf-solicitud', table.node).off('click', descargarPDFSolicitud);
 		};
 		
 		var afterRender = function(table) {
 			$('button.create-solicitud', table.node).on('click', createSolicitud)
 			$('button.consultar-solicitud', table.node).on('click', consultarSolicitud);
+			$('button.descargar-pdf-solicitud', table.node).on('click', descargarPDFSolicitud);
 		};
 		
 		var table_titulaciones = new Atis.DataTable('#table', {
 		    "ajax": { url: "<%=  ControladorMisSolicitudes.URL_PATTERN_AJAX %>" },
 		    "pageSize": 10,
-		    "action": "<%= ControladorMisSolicitudes.ACCION_DATATABLE %>",
+		    "action": "<%=ControladorMisSolicitudes.ACCION_DATATABLE_SOLICITUDES%>",
 		    "beforeRender": beforeRender,
 		    "afterRender": afterRender,
 		    "columns": [

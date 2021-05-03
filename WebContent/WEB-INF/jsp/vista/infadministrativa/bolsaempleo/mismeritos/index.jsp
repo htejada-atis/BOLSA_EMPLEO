@@ -4,6 +4,7 @@
 <%@ page import="es.ujaen.uvirtual.beans.vistas.uvirtual.bolsaempleo.VistaMeritos"%>
 <%@ page import="es.ujaen.uvirtual.utilidades.EscapaHTML" %>
 <%@ page import="es.ujaen.uvirtual.utilidades.Formateador"%>
+<%@	page import="es.ujaen.uvirtual.beans.uvirtual.bolsaempleo.ApartadoBaremacion" %>
 
 <% 
 UVDatos uvdatos = (UVDatos) request.getAttribute(UVDatos.NOMBRE_ATRIBUTO);
@@ -39,18 +40,20 @@ VistaMeritos bean = (VistaMeritos) uvdatos.getVistas().get(VistaMeritos.class.ge
 		<!--<caption>MÉRITOS QUE LA COMISIÓN EVALUARÁ</caption>-->
 		<tr>
 			<th scope="col" style="width:5%"></th>
-			<th scope="col"	style="width:15%">Código ítem</th>
+			<th scope="col" style="width:10%">Id</th>
+			<th scope="col" style="width:10%">Bloque</th>
+			<th scope="col"	style="width:12%">Código ítem</th>
 			<th scope="col"	style="width:15%">Nombre ítem</th>
-			<th scope="col"	style="width:20%">Descripción</th>
-			<th scope="col"	style="width:10%">Valor</th>
+			<th scope="col"	style="width:15%">Descripción</th>
+			<th scope="col"	style="width:8%">Valor</th>
 			<th scope="col"	style="width:15%">Observación</th>
-			<th scope="col"	style="width:15%"></th>
+			<th scope="col"	style="width:12%"></th>
 		</tr>
 		<tbody>		
 		</tbody>
 		<tfoot>
 			<tr>
-				<th colspan="7" style="width:100%"></th>
+				<th colspan="9" style="width:100%"></th>
 			</tr>
 		</tfoot>
 	</table>
@@ -65,6 +68,14 @@ VistaMeritos bean = (VistaMeritos) uvdatos.getVistas().get(VistaMeritos.class.ge
 			Atis.sendForm("<%= request.getRequestURI() %>", {'a': '<%= ControladorMisMeritos.ACCION_AGREGAR_MERITO %>'});
 		});
 		
+		var optionsApartados = {};
+		
+		<% if (bean.getApartados() != null) { %>
+			<% for (ApartadoBaremacion apartado: bean.getApartados()) { %>
+				optionsApartados[<%=apartado.getCodNum()%>] = '<%=apartado.getNombre()%>';
+			<% } %>
+		<% } %>
+		
 		var table = new Atis.DataTable('#tableMeritos', {
 		    "ajax": { url: "<%= ControladorMisMeritos.URL_PATTERN_AJAX %>" },
 		    "pageSize": 10,
@@ -73,13 +84,15 @@ VistaMeritos bean = (VistaMeritos) uvdatos.getVistas().get(VistaMeritos.class.ge
 		    "filterable": true,
 		    "columns": [
 		    	{'data': 'codNum', 'selectable': true},
+		    	{'data': 'codNum', 'filter': {'type': 'number'}},
+		    	{'data': 'item.bloque.apartado.nombre', 'filter': {'type': 'select', 'options': optionsApartados}},
 		        {'data': 'item', 'filter': true, 'render': function(row) {
 		        	return row.item.bloque.apartado.codigo + "." + row.item.bloque.codigo + "." + row.item.codigo;
 	        	}},
 		        {'data': 'item.nombre', 'filter': true},
-		        {'data': 'descripcion', 'filter': true, 'overflow': 'auto'},
+		        {'data': 'descripcion', 'filter': true},
 		        {'data': 'valor', 'filter': true, 'overflow': 'auto'},
-		        {'data': 'observacion', 'filter': true, 'overflow': 'auto'},
+		        {'data': 'observacion', 'filter': true},
 		        {'data': 'codnum', 'buttons': [
 	        		{'label': 'Descargar', 'title': 'Descargar fichero del mérito', 'onClick': function(row) {
 	        			window.open("<%= request.getRequestURI() %>"

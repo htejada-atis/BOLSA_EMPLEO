@@ -1,7 +1,12 @@
 package es.ujaen.uvirtual.controlador.infadministrativa.bolsaempleo;
 
 import java.awt.Color;
+import java.io.BufferedInputStream;
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.PrintWriter;
 import java.sql.SQLException;
 import java.sql.SQLIntegrityConstraintViolationException;
@@ -11,10 +16,13 @@ import java.util.Date;
 import java.util.List;
 import java.util.logging.Level;
 import javax.servlet.ServletException;
+import javax.servlet.ServletOutputStream;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
+
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.reflect.TypeToken;
@@ -25,16 +33,21 @@ import es.ujaen.uvirtual.beans.uvirtual.bolsaempleo.Bolsa;
 import es.ujaen.uvirtual.beans.uvirtual.bolsaempleo.BolsaCandidato;
 import es.ujaen.uvirtual.beans.uvirtual.bolsaempleo.BolsaSolicitud;
 import es.ujaen.uvirtual.beans.uvirtual.bolsaempleo.Convocatoria;
+import es.ujaen.uvirtual.beans.uvirtual.bolsaempleo.Fichero;
 import es.ujaen.uvirtual.beans.uvirtual.bolsaempleo.Merito;
 import es.ujaen.uvirtual.beans.uvirtual.bolsaempleo.MeritoSolicitud;
 import es.ujaen.uvirtual.beans.uvirtual.bolsaempleo.Solicitud;
+import es.ujaen.uvirtual.beans.uvirtual.bolsaempleo.Titulacion;
 import es.ujaen.uvirtual.beans.uvirtual.bolsaempleo.UsuarioBolsaEmpleo;
+import es.ujaen.uvirtual.beans.vistas.uvirtual.bolsaempleo.VistaFicheros;
 import es.ujaen.uvirtual.beans.vistas.uvirtual.bolsaempleo.VistaSolicitudes;
 import es.ujaen.uvirtual.modelo.bolsaempleo.ModeloArea;
 import es.ujaen.uvirtual.modelo.bolsaempleo.ModeloBolsa;
 import es.ujaen.uvirtual.modelo.bolsaempleo.ModeloConvocatoria;
+import es.ujaen.uvirtual.modelo.bolsaempleo.ModeloFichero;
 import es.ujaen.uvirtual.modelo.bolsaempleo.ModeloMerito;
 import es.ujaen.uvirtual.modelo.bolsaempleo.ModeloSolicitud;
+import es.ujaen.uvirtual.modelo.bolsaempleo.ModeloTitulacion;
 import es.ujaen.uvirtual.modelo.bolsaempleo.ModeloUsuarioBolsaEmpleo;
 import es.ujaen.uvirtual.utilidades.BolsaEmpleoDataTable;
 import es.ujaen.uvirtual.utilidades.EscapaHTML;
@@ -74,24 +87,32 @@ public class ControladorMisSolicitudes extends HttpServlet {
 	public static final String PARAM_MERITO = "merito";
 	public static final String PARAM_SOLICITUD_ID = "idSolicitud";
 	
-	// acciones
-	public static final String ACCION_BOLSA_SELECCIONADA = "bolsaseleccionada";
-	public static final String ACCION_CONFIRMAR_SOLICITUD = "confirmarsolicitud";
+	// acciones solicitudes
 	public static final String ACCION_CONSULTAR_SOLICITUD = "consultarSolicitud";
 	public static final String ACCION_CREAR_SOLICITUD = "crearSolicitud";
-	public static final String ACCION_DATATABLE = "datatable";
+	public static final String ACCION_DATATABLE_SOLICITUDES = "datatablesolicitudes";
+	public static final String ACCION_LISTAR_SOLICITUDES = "listar";
+	
+	// acciones paso 1: Selección de áreas
 	public static final String ACCION_DATATABLE_AREAS = "datatableareas";
+	public static final String ACCION_SELECCIONAR_BOLSAS = "seleccionarbolsas";
+	
+	// acciones paso 2: Asignación de méritos a áreas
+	public static final String ACCION_BOLSA_SELECCIONADA = "bolsaseleccionada";
 	public static final String ACCION_DATATABLE_BOLSAS_SELECCIONADAS = "datatableBolsasSolicitud";
 	public static final String ACCION_DATATABLE_MERITOS_BOLSA = "datatablemeritosbolsa";
 	public static final String ACCION_LISTAR_BOLSAS_SOLICITUD = "listarbolsassolicitud";
-	public static final String ACCION_LISTAR_SOLICITUDES = "listar";
 	public static final String ACCION_MERITO_DESELECCIONADO = "meritodeseleccionado";
 	public static final String ACCION_MERITO_SELECCIONADO = "meritoseleccionado";
+	
+	// acciones paso 3: Confirmar Solicitud
+	
+	public static final String ACCION_CONFIRMAR_SOLICITUD = "confirmarsolicitud";
 	public static final String ACCION_RESUMEN_SOLICITUD = "resumensolicitud";
-	public static final String ACCION_SELECCIONAR_BOLSAS = "seleccionarbolsas";
 	public static final String ACCION_DESCARGAR_PDF = "descargarpdf";
 	
 	// mensajes
+	public static final String MENSAJE_ENVIADO = "enviadomissolicitudes";
 	public static final String MENSAJE_ERROR_BOLSAS_SELECCIONADAS_INCORRECTAS = "No hay bolsas seleccionadas válidas";
 	public static final String MENSAJE_ERROR_BORRAR_BOLSA = "No puede deseleccionar ésta bolsa, tiene méritos asociados";
 	public static final String MENSAJE_ERROR_CONVOCATORIA_ID_REQUERIDA = "El id de la convocatoria es requerído";
@@ -139,50 +160,28 @@ public class ControladorMisSolicitudes extends HttpServlet {
 			this.usuario = ModeloUsuarioBolsaEmpleo.obtenerInstancia().getUsuarioLogeado(datos);
 			
 			switch (nombreAccion) {
-				case ACCION_BOLSA_SELECCIONADA:
-					seleccionarBolsa(bean, datos, request, response);
-					break;
-				case ACCION_CONFIRMAR_SOLICITUD:
-					confirmarSolicitud(bean, request);
-					break;
 				case ACCION_CONSULTAR_SOLICITUD:
-					consultarSolicitud(bean, datos, request, response);
-					break;
 				case ACCION_CREAR_SOLICITUD:
-					crearSolicitud(bean, datos, request, response);
-					break;
-				case ACCION_DATATABLE:
-					listado(bean, datos, request, response);
+				case ACCION_DATATABLE_SOLICITUDES:
+				case ACCION_LISTAR_SOLICITUDES:
+					accionesSolicitudes(bean, datos, request, response, nombreAccion);
 					break;
 				case ACCION_DATATABLE_AREAS:
-					listadoAreas(bean, datos, request, response);
-					break;
-				case ACCION_DATATABLE_BOLSAS_SELECCIONADAS:
-					listadoBolsasSolicitud(bean, datos, request, response);
-					break;
-				case ACCION_DATATABLE_MERITOS_BOLSA:
-					listadoMeritosCandidato(bean, datos, request, response);
-					break;
-				case ACCION_LISTAR_BOLSAS_SOLICITUD:
-					listaBolsasSolicitud(bean, request);
-					break;
-				case ACCION_LISTAR_SOLICITUDES:
-					index(bean, datos, request, response);
-					break;
-				case ACCION_MERITO_DESELECCIONADO:
-					seleccionarMerito(bean, datos, request, response, false);
-					break;
-				case ACCION_MERITO_SELECCIONADO:
-					seleccionarMerito(bean, datos, request, response, true);
-					break;
-				case ACCION_RESUMEN_SOLICITUD:
-					resumenSolicitud(bean, datos, request, response);
-					break;
 				case ACCION_SELECCIONAR_BOLSAS:
-					seleccionarBolsas(bean, datos, request, response);
+					accionesPaso1(bean, datos, request, response, nombreAccion);
 					break;
+				case ACCION_BOLSA_SELECCIONADA:
+				case ACCION_DATATABLE_BOLSAS_SELECCIONADAS:
+				case ACCION_DATATABLE_MERITOS_BOLSA:
+				case ACCION_LISTAR_BOLSAS_SOLICITUD:
+				case ACCION_MERITO_DESELECCIONADO:
+				case ACCION_MERITO_SELECCIONADO:
+					accionesPaso2(bean, datos, request, response, nombreAccion);
+					break;
+				case ACCION_CONFIRMAR_SOLICITUD:
+				case ACCION_RESUMEN_SOLICITUD:
 				case ACCION_DESCARGAR_PDF:
-					descargarPDF(bean, datos, request, response);
+					accionesPaso3(bean, datos, request, response, nombreAccion);
 					break;
 			}
 		} catch (SQLIntegrityConstraintViolationException e) {
@@ -217,73 +216,26 @@ public class ControladorMisSolicitudes extends HttpServlet {
 		doGet(request, response);
 	}
 	
-	private void index(VistaSolicitudes bean, UVDatos datos, HttpServletRequest request, HttpServletResponse response) {
-		bean.setVista(RUTA_BEP_SOL + "indexSolicitudes.jsp");
-	}
+	///////////////////////////////////////////////////////////////////////////////////////////////////////////
+	// SOLICITUDES
+	///////////////////////////////////////////////////////////////////////////////////////////////////////////
 	
-	/**
-	 * Lista de solicitudes .
-	 * @param bean .
-	 * @param datos .
-	 * @param request .
-	 * @param response .
-	 * @throws IOException .
-	 * @throws SQLException .
-	 */
-	private void listado(VistaSolicitudes bean, UVDatos datos, HttpServletRequest request, HttpServletResponse response) throws IOException, SQLException {
-		ModeloSolicitud modelo = ModeloSolicitud.obtenerInstancia(); 
-		
-		datos.setContentType("application/json");
-		datos.setRespuestaEnviada(true);
-		response.setContentType("application/json");
-		response.setCharacterEncoding("UTF-8");
-		
-		try (PrintWriter writer = response.getWriter()) {
-			try {
-				BolsaEmpleoDataTable<Solicitud> dataTable = modelo.listaSolicitudesDatatable(usuario, request.getParameterMap());
-				bean.setDatatableSolicitudes(dataTable);
-				
-				Gson gson = new GsonBuilder().setDateFormat("dd/M/yyyy").
-						setExclusionStrategies(BolsaEmpleoDataTable.GSONEXCLUSIONSTRATEGY).create();				
-				writer.write(gson.toJson(dataTable));
-			} catch (Exception ex) {
-				bean.getMensajesDeError().add(ex.getMessage());
-				
-				CodigoDescripcion mensaje = new CodigoDescripcion("error", ex.getMessage());
-				writer.write(new Gson().toJson(mensaje));
-				response.setStatus(RESPONSE_HTTP_CODE_ERROR);
-			}
+	private void accionesSolicitudes(VistaSolicitudes bean, UVDatos datos, HttpServletRequest request, HttpServletResponse response, String nombreAccion)
+			throws IOException, SQLException, UVException {
+		switch (nombreAccion) {
+			case ACCION_CONSULTAR_SOLICITUD:
+				consultarSolicitud(bean, datos, request, response);
+				break;	
+			case ACCION_CREAR_SOLICITUD:
+				crearSolicitud(bean, datos, request, response);
+				break;
+			case ACCION_DATATABLE_SOLICITUDES:
+				listadoSolicitudes(bean, datos, request, response);
+				break;
+			case ACCION_LISTAR_SOLICITUDES:
+				bean.setVista(RUTA_BEP_SOL + "indexSolicitudes.jsp");
+				break;
 		}
-	}
-	
-	/** 
-	 * Agrega la vista del paso 1 y le añade la lista de bolsas de la solicitud .
-	 * @param bean .
-	 * @param solicitud .
-	 * @throws UVException .
-	 * @throws SQLException .
-	 */
-	private void listaBolsas(VistaSolicitudes bean, Solicitud solicitud) throws UVException, SQLException {
-		ModeloSolicitud modelo = ModeloSolicitud.obtenerInstancia();
-		bean.setVista(RUTA_BEP_SOL + "paso1.jsp");
-		
-		List<Bolsa> listaBolsas = modelo.getBolsasSolicitud(solicitud);
-		bean.setListaBolsas(listaBolsas);
-	}
-	
-	/** 
-	 * Agrega la vista del paso 2 y le añade la solicitud a la vista.
-	 * @param bean .
-	 * @param request .
-	 * @throws UVException .
-	 * @throws SQLException .
-	 */
-	private void listaBolsasSolicitud(VistaSolicitudes bean, HttpServletRequest request) throws UVException, SQLException {
-		ModeloSolicitud modeloSolicitud = ModeloSolicitud.obtenerInstancia();
-		Solicitud solicitud = modeloSolicitud.getSolicitudById(Formateador.leeParametroInteger(request.getParameter(PARAM_SOLICITUD_ID)));
-		
-		bean.setVista(RUTA_BEP_SOL + "paso2.jsp");
-		bean.setSolicitud(solicitud);
 	}
 	
 	/** 
@@ -335,6 +287,57 @@ public class ControladorMisSolicitudes extends HttpServlet {
 			List<BolsaSolicitud> listaBolsas = modeloSolicitud.getBolsasSolicitudMeritos(solicitud);
 			bean.setListaBolsasSolicitud(listaBolsas);
 			bean.setVista(RUTA_BEP_SOL + "paso3.jsp");
+		}
+	}
+	
+	/**
+	 * Lista de solicitudes .
+	 * @param bean .
+	 * @param datos .
+	 * @param request .
+	 * @param response .
+	 * @throws IOException .
+	 * @throws SQLException .
+	 */
+	private void listadoSolicitudes(VistaSolicitudes bean, UVDatos datos, HttpServletRequest request, HttpServletResponse response) throws IOException, SQLException {
+		ModeloSolicitud modelo = ModeloSolicitud.obtenerInstancia(); 
+		
+		datos.setContentType("application/json");
+		datos.setRespuestaEnviada(true);
+		response.setContentType("application/json");
+		response.setCharacterEncoding("UTF-8");
+		
+		try (PrintWriter writer = response.getWriter()) {
+			try {
+				BolsaEmpleoDataTable<Solicitud> dataTable = modelo.listaSolicitudesDatatable(usuario, request.getParameterMap());
+				bean.setDatatableSolicitudes(dataTable);
+				
+				Gson gson = new GsonBuilder().setDateFormat("dd/M/yyyy").
+						setExclusionStrategies(BolsaEmpleoDataTable.GSONEXCLUSIONSTRATEGY).create();				
+				writer.write(gson.toJson(dataTable));
+			} catch (Exception ex) {
+				bean.getMensajesDeError().add(ex.getMessage());
+				
+				CodigoDescripcion mensaje = new CodigoDescripcion("error", ex.getMessage());
+				writer.write(new Gson().toJson(mensaje));
+				response.setStatus(RESPONSE_HTTP_CODE_ERROR);
+			}
+		}
+	}
+	
+	///////////////////////////////////////////////////////////////////////////////////////////////////////////
+	// PASO 1: SELECCIÓN DE ÁREAS
+	///////////////////////////////////////////////////////////////////////////////////////////////////////////
+	
+	private void accionesPaso1(VistaSolicitudes bean, UVDatos datos, HttpServletRequest request, HttpServletResponse response, String nombreAccion)
+			throws IOException, SQLException, UVException {
+		switch (nombreAccion) {
+			case ACCION_DATATABLE_AREAS:
+				listadoAreas(bean, datos, request, response);
+				break;
+			case ACCION_SELECCIONAR_BOLSAS:
+				seleccionarBolsas(bean, datos, request, response);
+				break;
 		}
 	}
 	
@@ -393,6 +396,83 @@ public class ControladorMisSolicitudes extends HttpServlet {
 		modeloSolicitud.asignarBolsasASolicitud(solicitud, bolsas);
 		
 		bean.setVista(RUTA_BEP_SOL + "paso2.jsp");
+	}
+	
+	/** 
+	 * Agrega la vista del paso 1 y le añade la lista de bolsas de la solicitud .
+	 * @param bean .
+	 * @param solicitud .
+	 * @throws UVException .
+	 * @throws SQLException .
+	 */
+	private void listaBolsas(VistaSolicitudes bean, Solicitud solicitud) throws UVException, SQLException {
+		ModeloSolicitud modelo = ModeloSolicitud.obtenerInstancia();
+		bean.setVista(RUTA_BEP_SOL + "paso1.jsp");
+		
+		List<Bolsa> listaBolsas = modelo.getBolsasSolicitud(solicitud);
+		bean.setListaBolsas(listaBolsas);
+	}
+	
+	/**
+	 * Lista de áreas datatable .
+	 * @param bean .
+	 * @param datos .
+	 * @param request .
+	 * @param response .
+	 * @throws IOException .
+	 * @throws SQLException .
+	 */
+	private void listadoAreas(VistaSolicitudes bean, UVDatos datos, HttpServletRequest request, HttpServletResponse response) throws IOException, SQLException {
+		ModeloArea modelo = ModeloArea.obtenerInstancia();
+		datos.setContentType("application/json");
+		datos.setRespuestaEnviada(true);
+		response.setContentType("application/json");
+		response.setCharacterEncoding("UTF-8");
+		
+		try (PrintWriter writer = response.getWriter()) {
+			try {
+				Usuario usuArcos = datos.getUsuario();
+				ModeloUsuarioBolsaEmpleo modeloUsuarioBolsaEmpleo = ModeloUsuarioBolsaEmpleo.obtenerInstancia();
+				Integer idUsuario = modeloUsuarioBolsaEmpleo.listaUsuario(usuArcos.getUid()).getCodNum();
+				BolsaEmpleoDataTable<BolsaCandidato> dataTable = modelo.listaAreaSolicitudDatatable(request.getParameterMap(), idUsuario);
+				Gson gson = new GsonBuilder().setExclusionStrategies(BolsaEmpleoDataTable.GSONEXCLUSIONSTRATEGY).create();
+				bean.setDataTableBolsasCandidato(dataTable);
+				writer.write(gson.toJson(dataTable));
+			} catch (Exception ex) {
+				bean.getMensajesDeError().add(ex.getMessage());
+				CodigoDescripcion mensaje = new CodigoDescripcion("error", ex.getMessage());
+				writer.write(new Gson().toJson(mensaje));
+				response.setStatus(RESPONSE_HTTP_CODE_ERROR);
+			}
+		}
+	}
+	
+	///////////////////////////////////////////////////////////////////////////////////////////////////////////
+	// PASO 2: ASIGNACIÓN DE MÉRITOS A ÁREAS
+	///////////////////////////////////////////////////////////////////////////////////////////////////////////
+	
+	private void accionesPaso2(VistaSolicitudes bean, UVDatos datos, HttpServletRequest request, HttpServletResponse response, String nombreAccion)
+			throws IOException, SQLException, UVException {
+		switch (nombreAccion) {
+			case ACCION_BOLSA_SELECCIONADA:
+				seleccionarBolsa(bean, datos, request, response);
+				break;
+			case ACCION_DATATABLE_BOLSAS_SELECCIONADAS:
+				listadoBolsasSolicitud(bean, datos, request, response);
+				break;
+			case ACCION_DATATABLE_MERITOS_BOLSA:
+				listadoMeritosCandidato(bean, datos, request, response);
+				break;
+			case ACCION_LISTAR_BOLSAS_SOLICITUD:
+				listaBolsasSolicitud(bean, request);
+				break;
+			case ACCION_MERITO_DESELECCIONADO:
+				seleccionarMerito(bean, datos, request, response, false);
+				break;
+			case ACCION_MERITO_SELECCIONADO:
+				seleccionarMerito(bean, datos, request, response, true);
+				break;
+		}
 	}
 	
 	/**
@@ -481,96 +561,19 @@ public class ControladorMisSolicitudes extends HttpServlet {
 		}
 	}
 	
-	/** Resumen de la solicitud .
+	/** 
+	 * Agrega la vista del paso 2 y le añade la solicitud a la vista.
 	 * @param bean .
-	 * @param datos .
 	 * @param request .
-	 * @param response .
-	 * @throws IOException .
-	 * @throws SQLException .
 	 * @throws UVException .
+	 * @throws SQLException .
 	 */
-	private void resumenSolicitud(VistaSolicitudes bean, UVDatos datos, HttpServletRequest request, HttpServletResponse response)
-			throws IOException, SQLException, UVException {
+	private void listaBolsasSolicitud(VistaSolicitudes bean, HttpServletRequest request) throws UVException, SQLException {
+		ModeloSolicitud modeloSolicitud = ModeloSolicitud.obtenerInstancia();
+		Solicitud solicitud = modeloSolicitud.getSolicitudById(Formateador.leeParametroInteger(request.getParameter(PARAM_SOLICITUD_ID)));
+		
 		bean.setVista(RUTA_BEP_SOL + "paso2.jsp");
-		
-		ModeloSolicitud modeloSolicitud = ModeloSolicitud.obtenerInstancia();
-		
-		Solicitud solicitud = modeloSolicitud.getSolicitudById(Formateador.leeParametroInteger(request.getParameter(PARAM_SOLICITUD_ID)));
 		bean.setSolicitud(solicitud);
-		
-		// comprobamos que el total de méritos sea mayor que 0
-		Integer totalMeritos = modeloSolicitud.obtenerTotalMeritosSolicitud(solicitud);
-		
-		if (!(totalMeritos > 0)) {
-			throw new UVException(MENSAJE_ERROR_SIN_MERITOS);
-		}
-		
-		List<BolsaSolicitud> listaBolsas = modeloSolicitud.getBolsasSolicitudMeritos(solicitud);
-		bean.setListaBolsasSolicitud(listaBolsas);
-		
-		bean.setVista(RUTA_BEP_SOL + "paso3.jsp");
-	}
-	
-	/**
-	 * El usuario confirma la solicitud .
-	 * @param bean .
-	 * @param request .
-	 * @throws IOException .
-	 * @throws SQLException .
-	 * @throws UVException .
-	 */
-	private void confirmarSolicitud(VistaSolicitudes bean, HttpServletRequest request) throws SQLException, UVException {
-		bean.setVista(RUTA_BEP_SOL + "paso3.jsp");
-		
-		ModeloSolicitud modeloSolicitud = ModeloSolicitud.obtenerInstancia();
-		
-		Solicitud solicitud = modeloSolicitud.getSolicitudById(Formateador.leeParametroInteger(request.getParameter(PARAM_SOLICITUD_ID)));
-		bean.setSolicitud(solicitud);
-		
-		List<BolsaSolicitud> listaBolsas = modeloSolicitud.getBolsasSolicitudMeritos(solicitud);
-		bean.setListaBolsasSolicitud(listaBolsas);
-		
-		solicitud.setEstado(ModeloSolicitud.SOLICITUD_ESTADO_CERRADA);
-		solicitud.setFechaConfirmacion(new Date());
-		
-		modeloSolicitud.confirmacionSolicitud(solicitud);
-		
-		bean.getMensajesDeExito().add(MENSAJE_EXITO_SOLICITUD_CONFIRMADA);
-	}
-	
-	/**
-	 * Lista de áreas datatable .
-	 * @param bean .
-	 * @param datos .
-	 * @param request .
-	 * @param response .
-	 * @throws IOException .
-	 * @throws SQLException .
-	 */
-	private void listadoAreas(VistaSolicitudes bean, UVDatos datos, HttpServletRequest request, HttpServletResponse response) throws IOException, SQLException {
-		ModeloArea modelo = ModeloArea.obtenerInstancia();
-		datos.setContentType("application/json");
-		datos.setRespuestaEnviada(true);
-		response.setContentType("application/json");
-		response.setCharacterEncoding("UTF-8");
-		
-		try (PrintWriter writer = response.getWriter()) {
-			try {
-				Usuario usuArcos = datos.getUsuario();
-				ModeloUsuarioBolsaEmpleo modeloUsuarioBolsaEmpleo = ModeloUsuarioBolsaEmpleo.obtenerInstancia();
-				Integer idUsuario = modeloUsuarioBolsaEmpleo.listaUsuario(usuArcos.getUid()).getCodNum();
-				BolsaEmpleoDataTable<BolsaCandidato> dataTable = modelo.listaAreaSolicitudDatatable(request.getParameterMap(), idUsuario);
-				Gson gson = new GsonBuilder().setExclusionStrategies(BolsaEmpleoDataTable.GSONEXCLUSIONSTRATEGY).create();
-				bean.setDataTableBolsasCandidato(dataTable);
-				writer.write(gson.toJson(dataTable));
-			} catch (Exception ex) {
-				bean.getMensajesDeError().add(ex.getMessage());
-				CodigoDescripcion mensaje = new CodigoDescripcion("error", ex.getMessage());
-				writer.write(new Gson().toJson(mensaje));
-				response.setStatus(RESPONSE_HTTP_CODE_ERROR);
-			}
-		}
 	}
 	
 	/**
@@ -642,6 +645,94 @@ public class ControladorMisSolicitudes extends HttpServlet {
 		}
 	}
 	
+	///////////////////////////////////////////////////////////////////////////////////////////////////////////
+	// PASO 3: RESUMEN, CONFIRMAR SOLICITUD
+	///////////////////////////////////////////////////////////////////////////////////////////////////////////
+	
+	private void accionesPaso3(VistaSolicitudes bean, UVDatos datos, HttpServletRequest request, HttpServletResponse response, String nombreAccion)
+			throws IOException, SQLException, UVException {
+		switch (nombreAccion) {
+			case ACCION_CONFIRMAR_SOLICITUD:
+				confirmarSolicitud(bean, request, response);
+				break;
+			case ACCION_RESUMEN_SOLICITUD:
+				resumenSolicitud(bean, datos, request, response);
+				break;
+			case ACCION_DESCARGAR_PDF:
+				descargarPDF(bean, datos, request, response);
+				break;
+		}
+	}
+	
+	/** Resumen de la solicitud .
+	 * @param bean .
+	 * @param datos .
+	 * @param request .
+	 * @param response .
+	 * @throws IOException .
+	 * @throws SQLException .
+	 * @throws UVException .
+	 */
+	private void resumenSolicitud(VistaSolicitudes bean, UVDatos datos, HttpServletRequest request, HttpServletResponse response)
+			throws IOException, SQLException, UVException {
+		bean.setVista(RUTA_BEP_SOL + "paso2.jsp");
+		
+		ModeloSolicitud modeloSolicitud = ModeloSolicitud.obtenerInstancia();
+		ModeloTitulacion modeloTitulacion = ModeloTitulacion.obtenerInstancia();
+		
+		Solicitud solicitud = modeloSolicitud.getSolicitudById(Formateador.leeParametroInteger(request.getParameter(PARAM_SOLICITUD_ID)));
+		bean.setSolicitud(solicitud);
+		
+		
+		List<Titulacion> titulaciones = modeloTitulacion.listaTitulacionesCandidato(this.usuario.getCodNum());
+		bean.setListaTitulaciones(titulaciones);
+		
+		// comprobamos que el total de méritos sea mayor que 0
+		Integer totalMeritos = modeloSolicitud.obtenerTotalMeritosSolicitud(solicitud);
+		
+		if (!(totalMeritos > 0)) {
+			throw new UVException(MENSAJE_ERROR_SIN_MERITOS);
+		}
+		
+		List<BolsaSolicitud> listaBolsas = modeloSolicitud.getBolsasSolicitudMeritos(solicitud);
+		bean.setListaBolsasSolicitud(listaBolsas);
+		
+		bean.setVista(RUTA_BEP_SOL + "paso3.jsp");
+	}
+	
+	/**
+	 * El usuario confirma la solicitud .
+	 * @param bean .
+	 * @param request .
+	 * @param response .
+	 * @throws IOException .
+	 * @throws IOException .
+	 * @throws SQLException .
+	 * @throws UVException .
+	 */
+	private void confirmarSolicitud(VistaSolicitudes bean, HttpServletRequest request, HttpServletResponse response) throws SQLException, UVException, IOException {
+		bean.setVista(RUTA_BEP_SOL + "paso3.jsp");
+		
+		ModeloSolicitud modeloSolicitud = ModeloSolicitud.obtenerInstancia();
+		
+		Solicitud solicitud = modeloSolicitud.getSolicitudById(Formateador.leeParametroInteger(request.getParameter(PARAM_SOLICITUD_ID)));
+		bean.setSolicitud(solicitud);
+		
+		List<BolsaSolicitud> listaBolsas = modeloSolicitud.getBolsasSolicitudMeritos(solicitud);
+		bean.setListaBolsasSolicitud(listaBolsas);
+		
+		solicitud.setEstado(ModeloSolicitud.SOLICITUD_ESTADO_CERRADA);
+		solicitud.setFechaConfirmacion(new Date());
+		solicitud.setArchivo(generarPDF(solicitud, listaBolsas));
+		
+		modeloSolicitud.confirmacionSolicitud(solicitud);
+		
+		bean.getMensajesDeExito().add(MENSAJE_EXITO_SOLICITUD_CONFIRMADA);
+		HttpSession session = request.getSession(false);
+		session.setAttribute(MENSAJE_ENVIADO, MENSAJE_EXITO_SOLICITUD_CONFIRMADA);
+		response.sendRedirect(request.getServletPath());
+	}
+	
 	/**
 	 * descarga de pdf .
 	 * @param response .
@@ -651,41 +742,43 @@ public class ControladorMisSolicitudes extends HttpServlet {
 	 * @throws SQLException .
 	 * @throws UVException  .
 	 */
-	public void descargarPDF(VistaSolicitudes bean, UVDatos datos, HttpServletRequest request,
-			HttpServletResponse response) throws SQLException, UVException {
-		
-		bean.setVista(RUTA_BEP_SOL + "resumenError.jsp");
+	private void descargarPDF(VistaSolicitudes bean, UVDatos datos, HttpServletRequest request, HttpServletResponse response)
+			throws SQLException, UVException, IOException {
 		ModeloSolicitud modeloSolicitud = ModeloSolicitud.obtenerInstancia();
-		
-		Solicitud solicitud = modeloSolicitud.getSolicitudById(Formateador.leeParametroInteger(request.getParameter(PARAM_SOLICITUD_ID)));
-		System.out.println(solicitud);
+		Solicitud solicitud = modeloSolicitud.getSolicitudByIdArchivo(Formateador.leeParametroInteger(request.getParameter(PARAM_SOLICITUD_ID)));
+		bean.setSolicitud(solicitud);
 		
 		if (this.usuario.getCodNum() != solicitud.getUsuario().getCodNum()) {
 			throw new UVException("No tienes permisos");
 		}
-		
-		List<BolsaSolicitud> listaBolsas = modeloSolicitud.getBolsasSolicitudMeritos(solicitud);
-		
-		exportar(response, solicitud, listaBolsas);
-		
-		response.setContentType("application/pdf");
-		datos.setRespuestaEnviada(true);
+        
+        try (ServletOutputStream stream = response.getOutputStream();
+             BufferedInputStream buf = new BufferedInputStream(solicitud.getArchivo());) {
+            int readBytes = 0;
+            while ((readBytes = buf.read()) != -1) {
+                stream.write(readBytes);
+            }
+            stream.flush();
+        }
+        
+        response.setContentType("application/pdf");
+        datos.setRespuestaEnviada(true);
 	}
 	
-	/** exportar .
-	 * @param response .
+	/**
+	 * generar PDF de la solicitud .
+	 * @param solicitud .
 	 * @param bolsasSolicitud .
-	 * @throws UVException . 
-	 * @throws IOException .
-	 * @throws SQLException .
+	 * @return InputStream .
 	 * @throws UVException .
 	 */
-	public void exportar(HttpServletResponse response, Solicitud solicitud, List<BolsaSolicitud> bolsasSolicitud) throws UVException {
+	public InputStream generarPDF(Solicitud solicitud, List<BolsaSolicitud> bolsasSolicitud) throws UVException {
 		try {
 			Document document = new Document();
 
 			// create a PDF writer instance and pass output stream
-			PdfWriter writer = PdfWriter.getInstance(document, response.getOutputStream());
+			ByteArrayOutputStream out = new ByteArrayOutputStream();
+			PdfWriter.getInstance(document, out);
 
 			document.open();
 			document.addAuthor(this.usuario.getNombre() + " " + this.usuario.getPrimerApellido() + " " + this.usuario.getSegundoApellido());
@@ -773,7 +866,7 @@ public class ControladorMisSolicitudes extends HttpServlet {
 
 			}
 			document.close();
-
+			return new ByteArrayInputStream(out.toByteArray());
 		} catch (Exception exp) {
 			System.out.println(exp.getMessage());
 			throw new UVException("Error generando pdf, consulte con los administradores");
