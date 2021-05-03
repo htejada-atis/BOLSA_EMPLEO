@@ -19,20 +19,12 @@ import com.google.gson.GsonBuilder;
 import es.ujaen.uvirtual.beans.CodigoDescripcion;
 import es.ujaen.uvirtual.beans.UVDatos;
 import es.ujaen.uvirtual.beans.Usuario;
-import es.ujaen.uvirtual.beans.uvirtual.bolsaempleo.Bolsa;
 import es.ujaen.uvirtual.beans.uvirtual.bolsaempleo.Candidato;
-import es.ujaen.uvirtual.beans.uvirtual.bolsaempleo.Merito;
-import es.ujaen.uvirtual.beans.uvirtual.bolsaempleo.Solicitud;
 import es.ujaen.uvirtual.beans.uvirtual.bolsaempleo.Titulacion;
 import es.ujaen.uvirtual.beans.uvirtual.bolsaempleo.UsuarioBolsaEmpleo;
 import es.ujaen.uvirtual.beans.vistas.uvirtual.bolsaempleo.VistaFiltrar;
-import es.ujaen.uvirtual.beans.vistas.uvirtual.bolsaempleo.VistaSolicitudes;
-import es.ujaen.uvirtual.beans.vistas.uvirtual.bolsaempleo.VistaTitulaciones;
-import es.ujaen.uvirtual.modelo.bolsaempleo.ModeloBolsa;
 import es.ujaen.uvirtual.modelo.bolsaempleo.ModeloCandidato;
-import es.ujaen.uvirtual.modelo.bolsaempleo.ModeloMerito;
 import es.ujaen.uvirtual.modelo.bolsaempleo.ModeloMisTitulaciones;
-import es.ujaen.uvirtual.modelo.bolsaempleo.ModeloSolicitud;
 import es.ujaen.uvirtual.modelo.bolsaempleo.ModeloTitulacion;
 import es.ujaen.uvirtual.modelo.bolsaempleo.ModeloUsuarioBolsaEmpleo;
 import es.ujaen.uvirtual.utilidades.BolsaEmpleoDataTable;
@@ -114,7 +106,7 @@ public class ControladorFiltrar extends HttpServlet {
 					listadoCandidatos(bean, datos, request, response);
 					break;
 				case ACCION_DATATABLE_TITULACIONES_CANDIDATO:
-					listadoTitulacionesUsuario(bean, datos, request, response);
+					listadoTitulacionesCandidato(bean, datos, request, response);
 					break;
 				case ACCION_DESCARGAR_FICHERO:
 					descargarFichero(bean, datos, request, response);
@@ -271,7 +263,7 @@ public class ControladorFiltrar extends HttpServlet {
 	 * @throws IOException en caso de error de input u output .
 	 * @throws SQLException excepcion de bbdd.
 	 */
-	private void listadoTitulacionesUsuario(VistaFiltrar bean, UVDatos datos, HttpServletRequest request, HttpServletResponse response) throws IOException, SQLException {
+	private void listadoTitulacionesCandidato(VistaFiltrar bean, UVDatos datos, HttpServletRequest request, HttpServletResponse response) throws IOException, SQLException {
 		ModeloMisTitulaciones modelo = ModeloMisTitulaciones.obtenerInstancia();
 		datos.setContentType("application/json");
 		response.setContentType("application/json");
@@ -285,6 +277,7 @@ public class ControladorFiltrar extends HttpServlet {
 				Gson gson = new GsonBuilder().setExclusionStrategies(BolsaEmpleoDataTable.GSONEXCLUSIONSTRATEGY).create();
 				writer.write(gson.toJson(dataTable));
 			} catch (UVException ex) {
+				bean.getMensajesDeError().add(ex.getMessage());
 				CodigoDescripcion mensaje = new CodigoDescripcion("error", ex.getMessage());
 				writer.write(new Gson().toJson(mensaje));
 				response.setStatus(RESPONSE_HTTP_CODE_ERROR);

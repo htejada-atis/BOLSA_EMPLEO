@@ -200,6 +200,10 @@ public class ModeloMisTitulaciones {
 	 * @throws UVException error si no existe titulación
 	 */
 	public BolsaEmpleoDataTable<Titulacion> listaTitulacionesUsuarioDatatable(Map<String, String[]> params, Integer codNum) throws SQLException, UVException {
+		if (codNum == null) {
+			throw new UVException("No se pueden listar titulaciones sin usuario");
+		}
+		
 		List<Titulacion> titulaciones = new ArrayList<>();
 		BolsaEmpleoDataTable<Titulacion> dataTable = new BolsaEmpleoDataTable<Titulacion>(params);
 		
