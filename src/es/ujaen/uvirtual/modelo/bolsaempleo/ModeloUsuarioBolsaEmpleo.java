@@ -60,6 +60,7 @@ public class ModeloUsuarioBolsaEmpleo {
 	public static final int COLUMN_NACIONALIDAD_MAXLENGTH = 20;
 	public static final int COLUMN_EMAIL_MAXLENGTH = 50;
 	public static final int COLUMN_RAZON_EXCLUSION_MAXLENGTH = 200;
+	public static final int COLUMN_RAZON_BORRADO_MAXLENGTH = 500;
 	
 	
     protected static ModeloUsuarioBolsaEmpleo eInstancia = null;
@@ -108,7 +109,7 @@ public class ModeloUsuarioBolsaEmpleo {
 		return usuarios;
 	}
 	
-	/** lista todas las noticias.
+	/** lista todos los usuarios.
 	 * @return lista de todas las noticias
 	 * @throws SQLException si hay un error en la base de datos
 	 */
@@ -408,11 +409,11 @@ public class ModeloUsuarioBolsaEmpleo {
 		String consulta = "SELECT bepare.CODNUM as CODNUMAREA, bepbol.CODNUM AS CODNUMBOLSA, bepare.ID_AREA_CONOCIMIENTO, "
 		+ "bepare.DES_AREA_CONOCIMIENTO, bepbol.FLGBAREMABLE , bepbol.BEPARE_CODNUM, "
 		+ "bepbol.ESTADO, bepbol.FECHAACTUALIZACION , bepbol.FECHABLOQUEO ,bepbol.FECHADEBLOQUEO "
-		+ "FROM UVIRTUAL.TBEP_USUARIOS_EXCLUIDOS_AREA bepusuexc "
-		+ "INNER JOIN UVIRTUAL.TBEP_AREAS bepare ON bepusuexc.AREA=bepare.CODNUM "
+		+ "FROM UVIRTUAL.TBEP_USUARIOS_EXCLUIDOS_AREA bepuea "
+		+ "INNER JOIN UVIRTUAL.TBEP_AREAS bepare ON bepuea.AREA=bepare.CODNUM "
 		+ "INNER JOIN TBEP_BOLSAS bepbol ON bepare.CODNUM = bepbol.BEPARE_CODNUM "
-		+ "INNER JOIN uvirtual.TBEP_USUARIOS bepusu ON bepusuexc.USUARIO = bepusu.CODNUM "
-		+ "WHERE bepusuexc.USUARIO = ? ";
+		+ "INNER JOIN uvirtual.TBEP_USUARIOS bepusu ON bepuea.USUARIO = bepusu.CODNUM "
+		+ "WHERE bepuea.USUARIO = ? ";
 		
 		BolsaEmpleoDataTable<Bolsa> dataTable = new BolsaEmpleoDataTable<Bolsa>(params);
 		
@@ -924,6 +925,30 @@ public class ModeloUsuarioBolsaEmpleo {
 	    		}
 	    	}
 			return roles;
+	}
+	
+	
+	/** Cambia flag usuario a borrado con razon de borrado .
+	 * @param usuario .
+	 * @throws SQLException en caso de error en la BD
+	 * @throws UVException si noticia no es valida
+	 */
+	public void cambiarFlagBorradoUsuarioRazon(UsuarioBolsaEmpleo usuario) throws SQLException {
+		String query = "UPDATE TBEP_USUARIOS SET FLGBORRADO = ?, RAZON_BORRADO = ?, FECHA_BORRADO = ? WHERE CODNUM = ?";		
+				
+		try (Connection conexion = ConexionUvirtual.obtenerInstancia(); PreparedStatement stmt = conexion.prepareStatement(query)) {
+			int indexParam = 1;
+
+			stmt.setString(indexParam++, "S");
+			stmt.setString(indexParam++, usuario.getRazonBorrado());
+			
+			SimpleDateFormat formatter = new SimpleDateFormat("dd/MM/YYYY HH:mm:ss");
+			Date date = new Date(System.currentTimeMillis());
+			
+			stmt.setDate(indexParam++, new java.sql.Date(date.getTime()));
+			stmt.setInt(indexParam++, usuario.getCodNum()); 
+			stmt.executeUpdate();
+		}	
 	}
 	
 }

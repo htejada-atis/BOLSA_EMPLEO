@@ -27,9 +27,12 @@ import es.ujaen.uvirtual.beans.UVDatos;
 import es.ujaen.uvirtual.beans.Usuario;
 import es.ujaen.uvirtual.beans.uvirtual.bolsaempleo.Area;
 import es.ujaen.uvirtual.beans.uvirtual.bolsaempleo.Bolsa;
+import es.ujaen.uvirtual.beans.uvirtual.bolsaempleo.ItemBaremacion;
 import es.ujaen.uvirtual.beans.uvirtual.bolsaempleo.UsuarioBolsaEmpleo;
+import es.ujaen.uvirtual.beans.vistas.uvirtual.bolsaempleo.VistaItemsBaremacion;
 import es.ujaen.uvirtual.beans.vistas.uvirtual.bolsaempleo.VistaUsuarioBolsaEmpleo;
 import es.ujaen.uvirtual.modelo.bolsaempleo.ModeloArea;
+import es.ujaen.uvirtual.modelo.bolsaempleo.ModeloBaremacion;
 import es.ujaen.uvirtual.modelo.bolsaempleo.ModeloRol;
 import es.ujaen.uvirtual.modelo.bolsaempleo.ModeloUsuarioBolsaEmpleo;
 import es.ujaen.uvirtual.utilidades.BolsaEmpleoDataTable;
@@ -94,6 +97,12 @@ public class ControladorUsuarioCandidato extends HttpServlet {
 	
 	public static final String ACCION_EXCLUIR_USUARIO_AREA = "excluirusuarioarea";
 	public static final String ACCION_INCLUIR_USUARIO_AREA = "incluirusuarioarea";
+	
+	public static final String ACCION_SELECCION_APARTADO = "seleccionapartado";
+	public static final String ACCION_APARTADO_AREA = "apartadoarea";
+	public static final String ACCION_APARTADO_SOLICITUDES = "apartadosolicitudes";
+	public static final String ACCION_APARTADO_COMUNICACIONES = "apartadocomunicaciones";
+
 	
 	// mensajes
 	public static final String MENSAJE_ENVIADO = "mensaje";
@@ -175,6 +184,9 @@ public class ControladorUsuarioCandidato extends HttpServlet {
 				break;
 			case ACCION_VOLVER_USUARIO:
 				volverUsuario(request, response, bean);
+				break;
+			case ACCION_SELECCION_APARTADO:
+				seleccionarOpcion(bean, request, response);
 				break;
 			}
 		} catch (SQLException e) {
@@ -305,7 +317,7 @@ public class ControladorUsuarioCandidato extends HttpServlet {
 			bean.setBusqueda(false);
 			
 			bean.setUsuario(usu);
-			bean.setVista("/WEB-INF/jsp/vista/infadministrativa/bolsaempleo/configuracion/formUsuario.jsp");
+			bean.setVista("/WEB-INF/jsp/vista/infadministrativa/bolsaempleo/configuracion/formCandidatos.jsp");
 			break;
 		case ACCION_INCLUIR_USUARIO_AREA:
 			UsuarioBolsaEmpleo usuCont = modelo.getUsuarioById(codNum);
@@ -316,7 +328,7 @@ public class ControladorUsuarioCandidato extends HttpServlet {
 			bean.setBusqueda(false);
 			
 			bean.setUsuario(usuCont);
-			bean.setVista("/WEB-INF/jsp/vista/infadministrativa/bolsaempleo/configuracion/formUsuario.jsp");
+			bean.setVista("/WEB-INF/jsp/vista/infadministrativa/bolsaempleo/configuracion/formCandidatos.jsp");
 			break;
 		default:
 			bean.getMensajesDeError().add(MENSAJE_ERROR_ACCION_USUARIO_NO_VALIDA);
@@ -350,13 +362,13 @@ public class ControladorUsuarioCandidato extends HttpServlet {
 			bean.setUsuario(usu);
 			bean.setRol(usu.getRol());
 			
-			bean.setVista("/WEB-INF/jsp/vista/infadministrativa/bolsaempleo/configuracion/formUsuario.jsp");
+			bean.setVista("/WEB-INF/jsp/vista/infadministrativa/bolsaempleo/configuracion/formCandidatos.jsp");
 		} catch (UVException e) {
 			Usuario usuArcos = CrearUsuario.usuario(request.getParameter(PARAM_NOMBRE));
 			if (usuArcos != null) {
 				bean.setBusqueda(false);
 				bean.setUsuarioArcos(usuArcos);
-				bean.setVista("/WEB-INF/jsp/vista/infadministrativa/bolsaempleo/configuracion/formUsuario.jsp");
+				bean.setVista("/WEB-INF/jsp/vista/infadministrativa/bolsaempleo/configuracion/formCandidatos.jsp");
 			} else {
 				bean.setVista("/WEB-INF/jsp/vista/infadministrativa/bolsaempleo/configuracion/buscarUsuario.jsp");
 				throw new UVException("No existe el usuario");
@@ -425,7 +437,7 @@ public class ControladorUsuarioCandidato extends HttpServlet {
 	 * @throws IOException en caso de error de IO.
 	 */
 	private void editarUsuario(HttpServletRequest request, HttpServletResponse response, VistaUsuarioBolsaEmpleo bean) throws SQLException, UVException, IOException {
-		bean.setVista("/WEB-INF/jsp/vista/infadministrativa/bolsaempleo/configuracion/formUsuario.jsp");
+		bean.setVista("/WEB-INF/jsp/vista/infadministrativa/bolsaempleo/configuracion/formCandidatos.jsp");
 		
 		ModeloUsuarioBolsaEmpleo modelo = ModeloUsuarioBolsaEmpleo.obtenerInstancia();
 		
@@ -665,5 +677,33 @@ public class ControladorUsuarioCandidato extends HttpServlet {
 				response.setStatus(RESPONSE_HTTP_CODE_ERROR);
 			}
 		}
+	}
+	
+	
+	
+	private void seleccionarOpcion(VistaUsuarioBolsaEmpleo bean, HttpServletRequest request, HttpServletResponse response) throws SQLException, UVException {
+		ModeloUsuarioBolsaEmpleo modelo = ModeloUsuarioBolsaEmpleo.obtenerInstancia();
+		String nombreAccionUsuario = EscapaHTML.ajustaCodificacion(request.getParameter(PARAM_ACCION_USUARIO));
+		Integer codNum = Formateador.leeParametroInteger(request.getParameter(PARAM_ID));
+		
+		UsuarioBolsaEmpleo usu = modelo.getUsuarioById(codNum);
+		Usuario usuArcos = CrearUsuario.usuario(usu.getCodCuenta());
+		
+		bean.setUsuarioArcos(usuArcos);
+		
+		switch (nombreAccionUsuario) {
+		case ACCION_APARTADO_AREA:
+			bean.setApartadoAreasExcluidas(true);							
+			break;
+		case ACCION_APARTADO_SOLICITUDES:
+			bean.setApartadoSolicitudes(true);
+			break;
+		case ACCION_APARTADO_COMUNICACIONES:
+			bean.setApartadoComunicaciones(true);
+			break;
+		}
+		
+		bean.setUsuario(usu);
+		bean.setVista("/WEB-INF/jsp/vista/infadministrativa/bolsaempleo/configuracion/formCandidatos.jsp");
 	}
 }

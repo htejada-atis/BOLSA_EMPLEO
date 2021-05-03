@@ -20,8 +20,10 @@ import com.google.gson.GsonBuilder;
 import es.ujaen.uvirtual.beans.CodigoDescripcion;
 import es.ujaen.uvirtual.beans.UVDatos;
 import es.ujaen.uvirtual.beans.Usuario;
+import es.ujaen.uvirtual.beans.uvirtual.bolsaempleo.ApartadoBaremacion;
 import es.ujaen.uvirtual.beans.uvirtual.bolsaempleo.Convocatoria;
 import es.ujaen.uvirtual.beans.vistas.uvirtual.bolsaempleo.VistaConvocatorias;
+import es.ujaen.uvirtual.modelo.bolsaempleo.ModeloBaremacion;
 import es.ujaen.uvirtual.modelo.bolsaempleo.ModeloBolsa;
 import es.ujaen.uvirtual.modelo.bolsaempleo.ModeloConvocatoria;
 import es.ujaen.uvirtual.modelo.bolsaempleo.ModeloUsuarioBolsaEmpleo;
@@ -82,6 +84,8 @@ public class ControladorConvocatorias extends HttpServlet {
 	public static final String MENSAJE_ERROR_NUMMERITOSBLOQUE_INCORRECTA = "El número de méritos por bloque debe ser un entero";
 	public static final String MENSAJE_ERROR_NUMMERITOSBLOQUE_MINIMO = "El número de méritos por bloque debe ser al menos uno";
 	public static final String MENSAJE_ERROR_CONVOCATORIAS_ABIERTAS = "Ya existen convocatorias abiertas.";
+	public static final String MENSAJE_ERROR_APARTADOS_PORCENTAGES = 
+			"Los apartados de baremación no alcanzan el 100% de porcentaje, porfavor edite los apartados antes de abrir una convocatoria";
 	public static final String MENSAJE_ERROR_SIN_BOLSAS_BAREMABLES = "Antes de abrir una convocatoria debe de tener areas baremables";
 	public static final String MENSAJE_INFO_CONVOCATORIAS_INSERTADA_CORRECTAMENTE = "Convocatoria insertada correctamente.";
 	public static final String MENSAJE_INFO_CONVOCATORIA_ACTUALIZADA_CORRECTAMENTE = "Convocatoria actualizada correctamente.";
@@ -285,6 +289,9 @@ public class ControladorConvocatorias extends HttpServlet {
 		ModeloConvocatoria modelo = ModeloConvocatoria.obtenerInstancia();
 		ModeloBolsa modeloBolsas = ModeloBolsa.obtenerInstancia();
 		
+		ModeloBaremacion modeloBaremacion = ModeloBaremacion.obtenerInstancia();
+		ApartadoBaremacion apartado = new ApartadoBaremacion();
+		
 		Convocatoria convocatoria = modelo.getConvocatoriaById(Formateador.leeParametroInteger(request.getParameter(PARAM_CONVOCATORIA_ID)));
 		bean.setConvocatoria(convocatoria);
 		
@@ -292,6 +299,8 @@ public class ControladorConvocatorias extends HttpServlet {
 			bean.getMensajesDeError().add(MENSAJE_ERROR_SIN_BOLSAS_BAREMABLES);
 		} else if (modelo.hayConvocatoriaAbierta()) {
 			bean.getMensajesDeError().add(MENSAJE_ERROR_CONVOCATORIAS_ABIERTAS);
+		} else if (modeloBaremacion.checkSumaPorcentagesApartados(apartado, "Alcanzar")) {
+			bean.getMensajesDeError().add(MENSAJE_ERROR_APARTADOS_PORCENTAGES);
 		} else {
 			Integer codNum = Formateador.leeParametroInteger(request.getParameter(PARAM_CONVOCATORIA_ID));
 			Convocatoria conFinal = new Convocatoria(codNum, ModeloConvocatoria.CONVOCATORIA_ESTADO_ABIERTA); 

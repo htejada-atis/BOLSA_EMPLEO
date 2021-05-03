@@ -18,4 +18,6 @@ TBEP_SOLICITUD_BOLSAS				SBO		bepsbo
 TBEP_SOLICITUD_BOLSAS_MERITOS		SBM     bepsbm		MeritoSolicitud
 TBEP_TITULACIONES                   TIT     beptit		Titulacion
 TBEP_TITULACIONES_PREFERENTES_AREA  TPA		beptpa		TitulacionArea
+TBEP_TITULACIONES_USUARIO        	TUS     beptus		TitulacionesUsuario
 TBEP_USUARIOS                       USU     bepusu		UsuarioBolsaEmpleo
+TBEP_USUARIOS_EXCLUIDOS_AREA        UEA     bepuea		UsuarioExcluidoArea

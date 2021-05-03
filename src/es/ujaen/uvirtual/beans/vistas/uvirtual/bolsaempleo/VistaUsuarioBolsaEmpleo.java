@@ -25,6 +25,9 @@ public class VistaUsuarioBolsaEmpleo extends Vista implements Serializable {
 	 private Boolean busqueda;
 	 private BolsaEmpleoDataTable<UsuarioBolsaEmpleo> dataTable;
 	 private BolsaEmpleoDataTable<Bolsa> dataTableBolsa;
+	 private Boolean apartadoAreasExcluidas;
+	 private Boolean apartadoSolicitudes;
+	 private Boolean apartadoComunicaciones;
 
 	 public List<UsuarioBolsaEmpleo> getUsuarios() {
 		 return usuarios;
@@ -92,5 +95,29 @@ public class VistaUsuarioBolsaEmpleo extends Vista implements Serializable {
 	 
 	 public void setDatatableBolsa(BolsaEmpleoDataTable<Bolsa> dt) {
 		 this.dataTableBolsa = dt;
+	 }
+	 
+	 public void setApartadoAreasExcluidas(Boolean apartadoAreasExcluidas) {
+		this.apartadoAreasExcluidas = apartadoAreasExcluidas;
+	 }
+		
+	 public Boolean getApartadoAreasExcluidas() {
+		 return apartadoAreasExcluidas;
+	 }
+	 
+	 public void setApartadoSolicitudes(Boolean apartadoSolicitudes) {
+		this.apartadoSolicitudes = apartadoSolicitudes;
+	 }
+		
+	 public Boolean getApartadoSolicitudes() {
+		 return apartadoSolicitudes;
+	 }
+	 
+	 public void setApartadoComunicaciones(Boolean apartadoComunicaciones) {
+		this.apartadoComunicaciones = apartadoComunicaciones;
+	 }
+		
+	 public Boolean getApartadoComunicaciones() {
+		 return apartadoComunicaciones;
 	 }
 }
