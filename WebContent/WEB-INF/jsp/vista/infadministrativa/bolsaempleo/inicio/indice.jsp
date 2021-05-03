@@ -1,6 +1,7 @@
 <%@ page trimDirectiveWhitespaces="true"%>
 <%@	page import="es.ujaen.uvirtual.controlador.infadministrativa.bolsaempleo.ControladorInicio"%>
 <%@ page import="es.ujaen.uvirtual.beans.vistas.uvirtual.bolsaempleo.VistaInicio" %>
+<%@ page import="es.ujaen.uvirtual.beans.vistas.uvirtual.bolsaempleo.VistaUsuarioBolsaEmpleo"%>
 <%@ page import="es.ujaen.uvirtual.beans.uvirtual.bolsaempleo.Noticia" %>
 <%@ page import="es.ujaen.uvirtual.beans.UVDatos"%>
 <%@ page import="es.ujaen.uvirtual.utilidades.Formateador"%>
@@ -8,19 +9,32 @@
 <% 
 UVDatos uvdatos = (UVDatos)request.getAttribute(UVDatos.NOMBRE_ATRIBUTO);
 VistaInicio bean = (VistaInicio)uvdatos.getVistas().get(VistaInicio.class.getName());
+VistaUsuarioBolsaEmpleo beanUsuario = (VistaUsuarioBolsaEmpleo) uvdatos.getVistas().get(VistaUsuarioBolsaEmpleo.class.getName());
 %>
 
 <div class="bolsa-empleo">
+	<% if (bean != null) { %>
 	<% if (bean.getMensajesDeExito().size() > 0) { %>
-		<div id="exito" class="success">
-			<%= bean.formatearMensajesDeExito() %>
-		</div>
+	<div id="exito" class="success">
+		<%= bean.formatearMensajesDeExito() %>
+	</div>
 	<% } %>
 	<% if (bean.getMensajesDeError().size() > 0) { %>
 		<div id="error" class="error">
 			<%= bean.formatearMensajesDeError() %>
 		</div>
 	<% } else {%>
+
+		<% if (beanUsuario != null) { %>
+			<% if (beanUsuario.getMensajesDeExito().size() > 0) { %>
+				<div id="exito" class="success">
+				<%= beanUsuario.formatearMensajesDeExito() %>
+				</div>
+			<% } %>
+		<% } %>
+
+
+
 
     <h2>Bolsa de empleo para PDI de la Universidad de Jaén</h2>
     
@@ -55,6 +69,7 @@ VistaInicio bean = (VistaInicio)uvdatos.getVistas().get(VistaInicio.class.getNam
 		</ul>
 		<div class="row-ver-todas" id="view_all"> (<a href="#">Ver todas</a>) </div>
     </div>
+<% } %>
 <% } %>
 </div>
 

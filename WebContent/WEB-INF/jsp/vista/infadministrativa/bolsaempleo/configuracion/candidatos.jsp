@@ -1,7 +1,6 @@
 <%@ page trimDirectiveWhitespaces="true"%>
 <%@ page import="es.ujaen.uvirtual.beans.UVDatos"%>
 <%@	page import="es.ujaen.uvirtual.controlador.infadministrativa.bolsaempleo.ControladorUsuarioCandidato"%>
-<%@	page import="es.ujaen.uvirtual.controlador.infadministrativa.bolsaempleo.ControladorUsuarioBolsaEmpleo"%>
 <%@ page import="es.ujaen.uvirtual.beans.vistas.uvirtual.bolsaempleo.VistaUsuarioBolsaEmpleo"%>
 <%@ page import="es.ujaen.uvirtual.utilidades.EscapaHTML" %>
 
@@ -110,9 +109,9 @@ $(document).ready(function() {
     					Atis.confirmDialog("Incluir usuario", "&iquest;Desea incluir a este usuario en la base de datos?", {
 	            			Si: function() {
 	            				var params = {
-	            					'a': '<%=ControladorUsuarioBolsaEmpleo.ACCION_INCLUIR_USUARIO%>', 
-	            					'<%= ControladorUsuarioBolsaEmpleo.PARAM_NOMBRE_USUARIO %>': row.codcuenta,
-	            					'<%=ControladorUsuarioBolsaEmpleo.PARAM_ID%>': row.codNum
+	            					'a': '<%=ControladorUsuarioCandidato.ACCION_INCLUIR_USUARIO%>', 
+	            					'<%= ControladorUsuarioCandidato.PARAM_NOMBRE_USUARIO %>': row.codcuenta,
+	            					'<%=ControladorUsuarioCandidato.PARAM_ID%>': row.codNum
 	            				};
 	        					Atis.sendForm("<%= request.getRequestURI() %>", params);
 	              				$(this).dialog("close");
@@ -125,9 +124,9 @@ $(document).ready(function() {
     				else{
     					Atis.confirmDialog("Excluir usuario", "&iquest;Desea excluir a este usuario en la base de datos?", {
 	            			Si: function() {
-	            				var params = {'a': '<%= ControladorUsuarioBolsaEmpleo.ACCION_EXCLUIR_USUARIO %>',
-	            					'<%= ControladorUsuarioBolsaEmpleo.PARAM_NOMBRE_USUARIO %>': row.codcuenta,
-	            					'<%= ControladorUsuarioBolsaEmpleo.PARAM_ID %>': row.codcuenta
+	            				var params = {'a': '<%= ControladorUsuarioCandidato.ACCION_EXCLUIR_USUARIO %>',
+	            					'<%= ControladorUsuarioCandidato.PARAM_NOMBRE_USUARIO %>': row.codcuenta,
+	            					'<%= ControladorUsuarioCandidato.PARAM_ID %>': row.codcuenta
 	            				};
 	        					Atis.sendForm("<%= request.getRequestURI() %>", params);
 	              				$(this).dialog("close");

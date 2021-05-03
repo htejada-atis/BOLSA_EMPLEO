@@ -2,6 +2,10 @@ package es.ujaen.uvirtual.controlador.infadministrativa.bolsaempleo;
 
 import java.io.IOException;
 import java.sql.SQLException;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -10,12 +14,15 @@ import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
 
 import es.ujaen.uvirtual.adm.CrearUsuario;
+import es.ujaen.uvirtual.beans.Rol;
 import es.ujaen.uvirtual.beans.UVDatos;
 import es.ujaen.uvirtual.beans.Usuario;
 import es.ujaen.uvirtual.beans.uvirtual.bolsaempleo.UsuarioBolsaEmpleo;
 import es.ujaen.uvirtual.beans.vistas.uvirtual.bolsaempleo.VistaUsuarioBolsaEmpleo;
+import es.ujaen.uvirtual.modelo.bolsaempleo.ModeloRol;
 import es.ujaen.uvirtual.modelo.bolsaempleo.ModeloUsuarioBolsaEmpleo;
 import es.ujaen.uvirtual.utilidades.BolsaEmpleoValidator;
 import es.ujaen.uvirtual.utilidades.EscapaHTML;
@@ -58,17 +65,23 @@ public class ControladorMisDatos extends HttpServlet {
 	public static final String PARAM_TELEFONO = "telefono";
 	public static final String PARAM_NACIONALIDAD = "nacionalidad";
 	public static final String PARAM_SEXO = "sexo";
-
+	public static final String PARAM_DARSE_BAJA = "baja";
+	public static final String PARAM_RAZON_BORRADO = "razonborrado";
+	
 	// acciones
 	public static final String ACCION_ENVIAR_MISDATOS = "enviarmisdatos";
+	public static final String ACCION_BAJA_USUARIO = "bajausuario";
 	
 	// mensajes
 	public static final String MENSAJE_ENVIADO = "mensaje";
 	public static final String MENSAJE_EXITO_ENVIAR = "Datos personales actualizados correctamente";
+	public static final String MENSAJE_EXITO_DARSE_BAJA = "Usuario dado de baja correctamente";
 	
 	public static final String MENSAJE_ERROR_PRIMER_APELLIDO_VACIO = "El primer apellido no puede estar vacio";
 	public static final String MENSAJE_ERROR_NACIONALIDAD_VACIO = "La nacionalidad no puede estar vacia";
 	public static final String MENSAJE_ERROR_NOMBRE_VACIO = "El nombre no puede estar vacio";
+	
+	public static final String MENSAJE_ERROR_RAZON_BORRADO_VACIO = "La razón de borrado no puede estar vacía";
 	
 	public static final String MENSAJE_ERROR_TELEFONO_STRING = "El telefono debe ser un número";
 	public static final String MENSAJE_ERROR_MOVIL_STRING = "El móvil debe ser un número";
@@ -85,6 +98,9 @@ public class ControladorMisDatos extends HttpServlet {
 	public static final String MENSAJE_ERROR_TELEFONO_LARGO = "El telefono no puede contener mas de %d caracteres";
 	public static final String MENSAJE_ERROR_NACIONALIDAD_LARGO = "La nacionalidad no puede contener mas de %d caracteres";
 	public static final String MENSAJE_ERROR_EMAIL_LARGO = "El email no puede contener mas de %d caracteres";
+	
+	
+	
 
 	public static final int RESPONSE_HTTP_CODE_ERROR = 400;
 	
@@ -130,6 +146,9 @@ public class ControladorMisDatos extends HttpServlet {
 			switch (nombreAccion) {
 			case ACCION_ENVIAR_MISDATOS:
 				enviarMisDatos(request, response, bean, usuario);
+				break;
+			case ACCION_BAJA_USUARIO:
+				bajaUsuario(request, response, bean, usuario);
 				break;
 			}
 		} catch (SQLException e) {
@@ -219,8 +238,52 @@ public class ControladorMisDatos extends HttpServlet {
 		}
 	}
 	
+	
+	/** Da de baja al usuario .
+	 * @param bean .
+	 * @param request .
+	 * @param response .
+	 * @param usuario .
+	 * @throws UVException .
+	 * @throws SQLException .
+	 * @throws IOException .
+	 * @throws IOException .
+	 */
+	public void bajaUsuario(HttpServletRequest request, HttpServletResponse response, 
+			VistaUsuarioBolsaEmpleo bean, Usuario usuario) throws SQLException, UVException, IOException {
+		bean.setVista("/WEB-INF/jsp/vista/infadministrativa/bolsaempleo/misdatos/formBaja.jsp");
+		
+		if (EscapaHTML.ajustaCodificacion(request.getParameter(PARAM_RAZON_BORRADO)) != null) {
+			BolsaEmpleoValidator validator = this.getValidatorBajaUsuario(request); 							
+			
+			if (!validator.isValid()) {
+				for (String param : validator.getErrors().keySet()) {
+					for (String paramError : validator.getErrors().get(param)) {
+						bean.getMensajesDeError().add(paramError);
+					}
+				}
+			} else {
+				bean.setVista("/WEB-INF/jsp/vista/infadministrativa/bolsaempleo/inicio/indice.jsp");
+				ModeloUsuarioBolsaEmpleo modelo = ModeloUsuarioBolsaEmpleo.obtenerInstancia();
+				
+				Integer codNum = Formateador.leeParametroInteger(request.getParameter(PARAM_ID));
+				String razonborrado = EscapaHTML.ajustaCodificacion(request.getParameter(PARAM_RAZON_BORRADO));
+				UsuarioBolsaEmpleo usu = modelo.getUsuarioById(codNum);
+				
+				usu.setRazonBorrado(razonborrado);
+				
+				modelo.cambiarFlagBorradoUsuarioRazon(usu);
+
+				bean.getMensajesDeExito().add(MENSAJE_EXITO_DARSE_BAJA);
+			}
+		}
+	}
+	
+	
+	
 	/** Valida el formulario de Mis Datos.
 	 * @param request .
+	 * @return validator .
 	 * @throws UVException .
 	 * @throws SQLException .
 	 * @throws IOException .
@@ -280,6 +343,27 @@ public class ControladorMisDatos extends HttpServlet {
 		validator.addParamString(PARAM_EMAIL);
 		validator.addRule(PARAM_EMAIL, "max:" + ModeloUsuarioBolsaEmpleo.COLUMN_EMAIL_MAXLENGTH, 
 				String.format(MENSAJE_ERROR_EMAIL_LARGO, ModeloUsuarioBolsaEmpleo.COLUMN_EMAIL_MAXLENGTH));
+		
+		return validator;
+	}
+	
+	
+	
+	/** Valida el formulario de Baja de usuario.
+	 * @param request .
+	 * @return validator .
+	 * @throws UVException .
+	 * @throws SQLException .
+	 * @throws IOException .
+	 * @throws IOException .
+	 */
+	private BolsaEmpleoValidator getValidatorBajaUsuario(HttpServletRequest request) throws UVException {
+		BolsaEmpleoValidator validator = new BolsaEmpleoValidator(request);
+		validator.addParamString(PARAM_RAZON_BORRADO);
+		validator.addRule(PARAM_RAZON_BORRADO, "required", MENSAJE_ERROR_RAZON_BORRADO_VACIO);
+		validator.addRule(PARAM_RAZON_BORRADO, "noBlank", MENSAJE_ERROR_RAZON_BORRADO_VACIO);
+		validator.addRule(PARAM_RAZON_BORRADO, "max:" + ModeloUsuarioBolsaEmpleo.COLUMN_RAZON_BORRADO_MAXLENGTH, 
+				String.format(MENSAJE_ERROR_NOMBRE_LARGO, ModeloUsuarioBolsaEmpleo.COLUMN_RAZON_BORRADO_MAXLENGTH));
 		
 		return validator;
 	}

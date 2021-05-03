@@ -67,6 +67,7 @@ public class ModeloBaremacion {
 	public static final Integer COLUMN_DESCRIPCION_MAXLENGTH = 250; // logitud máxima de los nombres
 	
 	public static final Float MINIMO_VALOR_FLOAT = (float) 0.01;
+	public static final Float MAXIMO_VALOR_PORCENTAGE = (float) 100.0;
 	
     protected static ModeloBaremacion eInstancia = null;
 	
@@ -382,9 +383,54 @@ public class ModeloBaremacion {
 		return false;
 	} 
 	
+	public boolean checkSumaPorcentagesApartados(ApartadoBaremacion apartado, String sentido) throws SQLException {		
+		String sql = "SELECT SUM(bepapa.PORCENTAJEMAXIMO) AS SUMA "
+				+ "FROM TBEP_APARTADOSBAREMACION bepapa "
+				+ "WHERE bepapa.FLGACTIVO != 'N'";
+		
+		if (apartado.getCodNum() != null) {
+			sql += " AND bepapa.CODNUM != ?";
+		}
+		
+		try (Connection con = ConexionUvirtual.obtenerInstancia(); PreparedStatement stmt = con.prepareStatement(sql);) {
+			int parameterIndex = 1;
+			
+			if (apartado.getCodNum() != null) {
+				stmt.setInt(parameterIndex++, apartado.getCodNum());
+			}
+		
+			try (ResultSet rs = stmt.executeQuery()) {
+				while (rs.next()) {
+					Float acum = null;
+					if (apartado.getPorcentajeMaximo() != null) {
+						acum = rs.getFloat("SUMA") + apartado.getPorcentajeMaximo();
+					} else {
+						acum = rs.getFloat("SUMA");
+					}
+					
+					if ("Superar".equals(sentido)) {
+						if (acum > MAXIMO_VALOR_PORCENTAGE) {
+							return true;
+						}
+					} else {
+						if (acum < MAXIMO_VALOR_PORCENTAGE) {
+							return true;
+						}
+					}
+				}
+			}
+		}
+		
+		return false;
+	} 
+	
 	private void chequearApartadoParaInsertarOActualizar(ApartadoBaremacion apartado) throws SQLException, UVException {
 		if (this.existeOtroApartadoActivoPorCodigo(apartado)) {
 			throw new UVException("Ya existe un apartado con el código introducido");
+		}
+		
+		if (this.checkSumaPorcentagesApartados(apartado, "Superar")) {
+			throw new UVException("Los porcentages maximos de los bloques ya suman el 100%");
 		}
 		
 		// puntuación o porcentaje

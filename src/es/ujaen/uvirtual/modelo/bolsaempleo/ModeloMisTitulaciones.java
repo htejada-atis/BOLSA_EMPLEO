@@ -89,7 +89,7 @@ public class ModeloMisTitulaciones {
 	 */
 	private List<Titulacion> listaTitulacionesUsuarios(String clausula) throws SQLException {
 		List<Titulacion> titulaciones = new ArrayList<>();
-		String consulta = "SELECT beptitusu.* FROM tbep_titulaciones_usuario beptitusu " + clausula;
+		String consulta = "SELECT beptus.* FROM tbep_titulaciones_usuario beptus " + clausula;
 		
 		try (Connection conexion = ConexionUvirtual.obtenerInstancia();
 			PreparedStatement stmt = conexion.prepareStatement(consulta);) {
@@ -154,12 +154,12 @@ public class ModeloMisTitulaciones {
 		List<Titulacion> titulaciones = new ArrayList<>();
 		BolsaEmpleoDataTable<Titulacion> dataTable = new BolsaEmpleoDataTable<Titulacion>(params);
 		
-		String consulta = "SELECT beptit.*, beptitusu.*"
+		String consulta = "SELECT beptit.*, beptus.*"
 				+ "FROM tbep_titulaciones beptit "
-				+ "LEFT JOIN tbep_titulaciones_usuario beptitusu "
-				+ "ON beptit.CODNUM = beptitusu.BEPTIT_USU_TIT_CODNUM AND beptitusu.BEPTIT_USU_USU_CODNUM = ? "
-				+ "AND beptitusu.FLGBORRADO != 'S' "
-				+ "WHERE beptitusu.BEPTIT_USU_USU_CODNUM IS NULL";
+				+ "LEFT JOIN tbep_titulaciones_usuario beptus "
+				+ "ON beptit.CODNUM = beptus.BEPTUS_TIT_CODNUM AND beptus.BEPTUS_USU_CODNUM = ? "
+				+ "AND beptus.FLGBORRADO != 'S' "
+				+ "WHERE beptus.BEPTUS_USU_CODNUM IS NULL";
 		
 		dataTable.setColumn(ORDER_COLUMN_INDEX_ID, "beptit.CODNUM", DataTableColumn.COLUMN_TYPE_NUMBER);
 		dataTable.setColumn(ORDER_COLUMN_INDEX_NOMBRE, "beptit.NOMBRE");
@@ -203,12 +203,12 @@ public class ModeloMisTitulaciones {
 		List<Titulacion> titulaciones = new ArrayList<>();
 		BolsaEmpleoDataTable<Titulacion> dataTable = new BolsaEmpleoDataTable<Titulacion>(params);
 		
-		String consulta = "SELECT beptitusu.codnum as beptitusucod,BEPTITUSU.DESCRIPCION AS BEPTITUSUDESCRIPCION, beptit.* FROM tbep_titulaciones_usuario beptitusu "
-				+ "INNER JOIN tbep_titulaciones beptit ON beptit.codnum=beptitusu.beptit_usu_tit_codnum "
-				+ "WHERE beptitusu.BEPTIT_USU_USU_CODNUM = ? AND beptitusu.FLGBORRADO != 'S'";
+		String consulta = "SELECT beptus.codnum as beptus,BEPTUS.DESCRIPCION AS BEPTUSDESCRIPCION, beptit.* FROM tbep_titulaciones_usuario beptus "
+				+ "INNER JOIN tbep_titulaciones beptit ON beptit.codnum=beptus.beptus_tit_codnum "
+				+ "WHERE beptus.BEPTUS_USU_CODNUM = ? AND beptus.FLGBORRADO != 'S'";
 		
 		dataTable.setColumn(ORDER_COLUMN_INDEX_NOMBRE_USUARIO, "beptit.NOMBRE");
-		dataTable.setColumn(ORDER_COLUMN_INDEX_DESCRIPCION, "BEPTITUSUDESCRIPCION");
+		dataTable.setColumn(ORDER_COLUMN_INDEX_DESCRIPCION, "BEPTUSDESCRIPCION");
 		dataTable.setQuery(consulta);
 				
 		try (Connection conexion = ConexionUvirtual.obtenerInstancia();
@@ -224,9 +224,9 @@ public class ModeloMisTitulaciones {
 			try (ResultSet rs = stmt.executeQuery()) {
 				while (rs.next()) {
 					Titulacion tit = new Titulacion();
-					tit.setCodNum(rs.getInt("beptitusucod"));
+					tit.setCodNum(rs.getInt("beptuscod"));
 					tit.setNombre(rs.getString("NOMBRE"));
-					tit.setDescripcion(rs.getString("BEPTITUSUDESCRIPCION"));
+					tit.setDescripcion(rs.getString("BEPTUSDESCRIPCION"));
 					titulaciones.add(tit);
 				}
 			}
@@ -268,7 +268,7 @@ public class ModeloMisTitulaciones {
 		}
 		
 		String consulta = "INSERT INTO tbep_titulaciones_usuario " 
-						+ " (BEPTIT_USU_TIT_CODNUM,BEPTIT_USU_USU_CODNUM,DESCRIPCION,ARCHIVO) "
+						+ " (BEPTUS_TIT_CODNUM,BEPTUS_USU_CODNUM,DESCRIPCION,ARCHIVO) "
 						+ "VALUES (?,?,?,?)";
 		try (Connection conexion = ConexionUvirtual.obtenerInstancia();
 			 PreparedStatement stmt = conexion.prepareStatement(consulta);) {
