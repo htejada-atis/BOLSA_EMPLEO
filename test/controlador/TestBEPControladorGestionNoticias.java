@@ -17,7 +17,7 @@ import es.ujaen.uvirtual.controlador.infadministrativa.bolsaempleo.ControladorGe
 import es.ujaen.uvirtual.utilidades.UVException;
 
 /** test controlador noticias.
- * @author jmoral
+ * @author ATISoluciones
  *
  */
 public class TestBEPControladorGestionNoticias {

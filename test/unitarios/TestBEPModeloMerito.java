@@ -22,7 +22,7 @@ import es.ujaen.uvirtual.modelo.conexion.Conexion;
 import es.ujaen.uvirtual.utilidades.UVException;
 
 
-/** Clase para probar el modelo fichero. */
+/** Clase para probar el modelo merito. */
 public class TestBEPModeloMerito {
 	
     private static final String DESCRIPCION_MERITO = "descripcion merito";

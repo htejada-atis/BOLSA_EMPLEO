@@ -3,19 +3,15 @@ package unitarios;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
-
 import java.io.IOException;
 import java.sql.SQLException;
 import java.text.ParseException;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
-
 import javax.sql.DataSource;
-
 import org.junit.BeforeClass;
 import org.junit.Test;
-
 import bbdd.BbddRunner;
 import bbdd.UtilsTestBolsaEmpleo;
 import es.ujaen.uvirtual.beans.Rol;
@@ -28,9 +24,7 @@ import es.ujaen.uvirtual.modelo.conexion.Conexion;
 import es.ujaen.uvirtual.utilidades.UVException;
 
 
-/** test evaluadores.
-*
-*/
+/** Clase para probar el modelo evaluador. */
 public class TestBEPModeloEvaluador {
 	private static final Integer CODPERSONA = 1;
 	private static final String CODCUENTA = "test2";

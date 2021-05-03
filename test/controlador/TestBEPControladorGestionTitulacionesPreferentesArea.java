@@ -15,7 +15,7 @@ import es.ujaen.uvirtual.beans.vistas.uvirtual.bolsaempleo.VistaTitulacionesArea
 import es.ujaen.uvirtual.controlador.infadministrativa.bolsaempleo.ControladorGestionTitulacionesPreferentesArea;
 
 
-/** test controlador titulacion.
+/** test controlador titulaciones preferentes area.
  * @author ATISoluciones 
  */
 public class TestBEPControladorGestionTitulacionesPreferentesArea {

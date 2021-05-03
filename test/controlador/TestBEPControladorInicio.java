@@ -14,8 +14,8 @@ import controlador.implementacion.RespuestaHttp;
 import es.ujaen.uvirtual.beans.vistas.uvirtual.bolsaempleo.VistaInicio;
 import es.ujaen.uvirtual.controlador.infadministrativa.bolsaempleo.ControladorInicio;
 
-/** test controlador convocatoria crud.
- * @author jmoral
+/** test controlador inicio.
+ * @author jlopez
  *
  */
 public class TestBEPControladorInicio {
