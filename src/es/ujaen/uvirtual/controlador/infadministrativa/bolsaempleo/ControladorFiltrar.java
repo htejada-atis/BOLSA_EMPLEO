@@ -5,21 +5,18 @@ import java.io.PrintWriter;
 import java.sql.SQLException;
 import java.util.logging.Logger;
 import java.util.logging.Level;
-
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
-
 import es.ujaen.uvirtual.beans.CodigoDescripcion;
 import es.ujaen.uvirtual.beans.UVDatos;
 import es.ujaen.uvirtual.beans.Usuario;
 import es.ujaen.uvirtual.beans.uvirtual.bolsaempleo.Bolsa;
-import es.ujaen.uvirtual.beans.vistas.uvirtual.bolsaempleo.VistaEstadoBolsas;
+import es.ujaen.uvirtual.beans.uvirtual.bolsaempleo.UsuarioBolsaEmpleo;
 import es.ujaen.uvirtual.beans.vistas.uvirtual.bolsaempleo.VistaFiltrar;
 import es.ujaen.uvirtual.modelo.bolsaempleo.ModeloBolsa;
 import es.ujaen.uvirtual.modelo.bolsaempleo.ModeloUsuarioBolsaEmpleo;
@@ -48,7 +45,7 @@ public class ControladorFiltrar extends HttpServlet {
 	
 	// acciones
 	public static final String ACCION_LISTAR = "listar";
-	public static final String ACCION_DATATABLE = "datatable";
+	public static final String ACCION_DATATABLE_CANDIDATOS = "datatablecandidatos";
 	
 	// mensajes
 	public static final String MENSAJE_ERROR_FOO = "Mensaje de error";
@@ -80,8 +77,8 @@ public class ControladorFiltrar extends HttpServlet {
 		try {
 			modelo.checkUser(datos);
 			switch (nombreAccion) {
-				case ACCION_DATATABLE:
-					listado(bean, datos, request, response);
+				case ACCION_DATATABLE_CANDIDATOS:
+					listadoCandidatos(bean, datos, request, response);
 					break;
 			}			
 		} catch (SQLException e) {
@@ -112,9 +109,18 @@ public class ControladorFiltrar extends HttpServlet {
 	public void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 		doGet(request, response);
 	}
-		
-	private void listado(VistaFiltrar bean, UVDatos datos, HttpServletRequest request, HttpServletResponse response) throws IOException, SQLException {
-		ModeloBolsa modelo = ModeloBolsa.obtenerInstancia();
+	
+	/**
+	 * Lista de candidatos datatable .
+	 * @param bean .
+	 * @param datos .
+	 * @param request .
+	 * @param response .
+	 * @throws IOException .
+	 * @throws SQLException .
+	 */
+	private void listadoCandidatos(VistaFiltrar bean, UVDatos datos, HttpServletRequest request, HttpServletResponse response) throws IOException, SQLException {
+		ModeloUsuarioBolsaEmpleo modeloUsuario = ModeloUsuarioBolsaEmpleo.obtenerInstancia();
 		
 		datos.setContentType("application/json");
 		datos.setRespuestaEnviada(true);
@@ -123,10 +129,8 @@ public class ControladorFiltrar extends HttpServlet {
 		
 		try (PrintWriter writer = response.getWriter()) {
 			try {
-				BolsaEmpleoDataTable<Bolsa> dataTable = modelo.listaBolsaEmpleoDatatable(request.getParameterMap());
-				Integer bolsas = modelo.getBolsasBloqueadas();
-				
-				//bean.setDatatableBolsas(dataTable);
+				BolsaEmpleoDataTable<UsuarioBolsaEmpleo> dataTable = modeloUsuario.listaUsuarioCandidatosBolsaEmpleoDatatable(request.getParameterMap());
+				bean.setDatatableCandidato(dataTable);
 				
 				Gson gson = new GsonBuilder().setExclusionStrategies(BolsaEmpleoDataTable.GSONEXCLUSIONSTRATEGY).create();				
 				writer.write(gson.toJson(dataTable));

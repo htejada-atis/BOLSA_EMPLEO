@@ -1,8 +1,10 @@
 package es.ujaen.uvirtual.beans.vistas.uvirtual.bolsaempleo;
 
 import java.io.Serializable;
-
+import es.ujaen.uvirtual.beans.uvirtual.bolsaempleo.Candidato;
+import es.ujaen.uvirtual.beans.uvirtual.bolsaempleo.Titulacion;
 import es.ujaen.uvirtual.beans.vistas.Vista;
+import es.ujaen.uvirtual.utilidades.BolsaEmpleoDataTable;
 
 /** Bean para la vista.
  * @author fcampos
@@ -10,6 +12,25 @@ import es.ujaen.uvirtual.beans.vistas.Vista;
 public class VistaFiltrar extends Vista implements Serializable {
 	private static final long serialVersionUID = 1L;
 	private String vista;
+	private BolsaEmpleoDataTable<Candidato> dataTableCandidatos;
+	private BolsaEmpleoDataTable<Titulacion> dataTableTitulaciones;
+	
+	
+	public BolsaEmpleoDataTable<Candidato> getDatatableCandidatos() {
+		return dataTableCandidatos;
+	}
+	
+	public void setDatatableCandidatos(BolsaEmpleoDataTable<Candidato> dt) {
+		this.dataTableCandidatos = dt;
+	}
+	
+	public BolsaEmpleoDataTable<Titulacion> getDatatableTitulaciones() {
+		return dataTableTitulaciones;
+	}
+	
+	public void setDatatableTitulaciones(BolsaEmpleoDataTable<Titulacion> dt) {
+		this.dataTableTitulaciones = dt;
+	}
 	
 	public String getVista() {
 		return vista;

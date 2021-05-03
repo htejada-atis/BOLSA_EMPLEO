@@ -22,15 +22,15 @@ VistaFiltrar bean = (VistaFiltrar)uvdatos.getVistas().get(VistaFiltrar.class.get
 		</div>
 	<% } %>
 	
-	<h2>Filtrar</h2>
-	<p>Filtrado de candidatos por bolsa, para su posible exclusión</p>
+	<h2>Filtrado de candidatos por titulación</h2>
+	<p>Filtrado de candidatos por titulaciones, para su posible exclusión.</p>
 	
 	<table class="bluetable bolsaempleo" id="table">
 		<tr>
-			<th scope="col" style="width:5%">Id.</th>
-			<th scope="col" style="width:5%" title="Código área">Cod. Area.</th>
-			<th scope="col" style="width:25%" class="area">Area</th>			
-			<th scope="col" style="width:10%" class="center"></th>			
+			<th scope="col" style="width:40%">Candidato</th>
+			<th scope="col" style="width:25%" title="Código área">Nº Titulaciones</th>
+			<th scope="col" style="width:25%" class="area">Nº Tit. Validadas</th>			
+			<th scope="col" style="width:10%"></th>			
 		</tr>
 		<tbody>				
 		</tbody>
