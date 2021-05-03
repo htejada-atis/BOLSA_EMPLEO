@@ -21,6 +21,8 @@ import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
+
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.reflect.TypeToken;
@@ -35,6 +37,7 @@ import es.ujaen.uvirtual.beans.uvirtual.bolsaempleo.Fichero;
 import es.ujaen.uvirtual.beans.uvirtual.bolsaempleo.Merito;
 import es.ujaen.uvirtual.beans.uvirtual.bolsaempleo.MeritoSolicitud;
 import es.ujaen.uvirtual.beans.uvirtual.bolsaempleo.Solicitud;
+import es.ujaen.uvirtual.beans.uvirtual.bolsaempleo.Titulacion;
 import es.ujaen.uvirtual.beans.uvirtual.bolsaempleo.UsuarioBolsaEmpleo;
 import es.ujaen.uvirtual.beans.vistas.uvirtual.bolsaempleo.VistaFicheros;
 import es.ujaen.uvirtual.beans.vistas.uvirtual.bolsaempleo.VistaSolicitudes;
@@ -44,6 +47,7 @@ import es.ujaen.uvirtual.modelo.bolsaempleo.ModeloConvocatoria;
 import es.ujaen.uvirtual.modelo.bolsaempleo.ModeloFichero;
 import es.ujaen.uvirtual.modelo.bolsaempleo.ModeloMerito;
 import es.ujaen.uvirtual.modelo.bolsaempleo.ModeloSolicitud;
+import es.ujaen.uvirtual.modelo.bolsaempleo.ModeloTitulacion;
 import es.ujaen.uvirtual.modelo.bolsaempleo.ModeloUsuarioBolsaEmpleo;
 import es.ujaen.uvirtual.utilidades.BolsaEmpleoDataTable;
 import es.ujaen.uvirtual.utilidades.EscapaHTML;
@@ -108,6 +112,7 @@ public class ControladorMisSolicitudes extends HttpServlet {
 	public static final String ACCION_DESCARGAR_PDF = "descargarpdf";
 	
 	// mensajes
+	public static final String MENSAJE_ENVIADO = "enviadomissolicitudes";
 	public static final String MENSAJE_ERROR_BOLSAS_SELECCIONADAS_INCORRECTAS = "No hay bolsas seleccionadas válidas";
 	public static final String MENSAJE_ERROR_BORRAR_BOLSA = "No puede deseleccionar ésta bolsa, tiene méritos asociados";
 	public static final String MENSAJE_ERROR_CONVOCATORIA_ID_REQUERIDA = "El id de la convocatoria es requerído";
@@ -641,7 +646,7 @@ public class ControladorMisSolicitudes extends HttpServlet {
 	}
 	
 	///////////////////////////////////////////////////////////////////////////////////////////////////////////
-	// PASO 3: CONFIRMAR SOLICITUD
+	// PASO 3: RESUMEN, CONFIRMAR SOLICITUD
 	///////////////////////////////////////////////////////////////////////////////////////////////////////////
 	
 	private void accionesPaso3(VistaSolicitudes bean, UVDatos datos, HttpServletRequest request, HttpServletResponse response, String nombreAccion)
@@ -673,9 +678,14 @@ public class ControladorMisSolicitudes extends HttpServlet {
 		bean.setVista(RUTA_BEP_SOL + "paso2.jsp");
 		
 		ModeloSolicitud modeloSolicitud = ModeloSolicitud.obtenerInstancia();
+		ModeloTitulacion modeloTitulacion = ModeloTitulacion.obtenerInstancia();
 		
 		Solicitud solicitud = modeloSolicitud.getSolicitudById(Formateador.leeParametroInteger(request.getParameter(PARAM_SOLICITUD_ID)));
 		bean.setSolicitud(solicitud);
+		
+		
+		List<Titulacion> titulaciones = modeloTitulacion.listaTitulacionesCandidato(this.usuario.getCodNum());
+		bean.setListaTitulaciones(titulaciones);
 		
 		// comprobamos que el total de méritos sea mayor que 0
 		Integer totalMeritos = modeloSolicitud.obtenerTotalMeritosSolicitud(solicitud);
@@ -696,10 +706,11 @@ public class ControladorMisSolicitudes extends HttpServlet {
 	 * @param request .
 	 * @param response .
 	 * @throws IOException .
+	 * @throws IOException .
 	 * @throws SQLException .
 	 * @throws UVException .
 	 */
-	private void confirmarSolicitud(VistaSolicitudes bean, HttpServletRequest request, HttpServletResponse response) throws SQLException, UVException {
+	private void confirmarSolicitud(VistaSolicitudes bean, HttpServletRequest request, HttpServletResponse response) throws SQLException, UVException, IOException {
 		bean.setVista(RUTA_BEP_SOL + "paso3.jsp");
 		
 		ModeloSolicitud modeloSolicitud = ModeloSolicitud.obtenerInstancia();
@@ -717,6 +728,9 @@ public class ControladorMisSolicitudes extends HttpServlet {
 		modeloSolicitud.confirmacionSolicitud(solicitud);
 		
 		bean.getMensajesDeExito().add(MENSAJE_EXITO_SOLICITUD_CONFIRMADA);
+		HttpSession session = request.getSession(false);
+		session.setAttribute(MENSAJE_ENVIADO, MENSAJE_EXITO_SOLICITUD_CONFIRMADA);
+		response.sendRedirect(request.getServletPath());
 	}
 	
 	/**

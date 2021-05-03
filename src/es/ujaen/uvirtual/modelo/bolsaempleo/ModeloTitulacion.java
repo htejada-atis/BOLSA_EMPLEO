@@ -89,6 +89,33 @@ public class ModeloTitulacion {
 		return listaTitulaciones(" ORDER BY nombre");
 	}
 	
+	/** lista todas las titulaciones del candidato .
+	 * @param usuario .
+	 * @return lista de todas las titulaciones .
+	 * @throws SQLException si hay un error en la base de datos .
+	 */
+	public List<Titulacion> listaTitulacionesCandidato(Integer usuario) throws SQLException {
+		List<Titulacion> titulaciones = new ArrayList<>();
+		String consulta = "SELECT beptit.* FROM TBEP_TITULACIONES beptit"
+				+ " INNER JOIN TBEP_TITULACIONES_USUARIO beptus ON beptus.BEPTIT_USU_TIT_CODNUM = beptit.CODNUM"
+				+ " WHERE beptus.BEPTIT_USU_USU_CODNUM = ?";
+		
+		try (Connection conexion = ConexionUvirtual.obtenerInstancia(); PreparedStatement stmt = conexion.prepareStatement(consulta);) {
+			int parameterIndex = 1;
+			stmt.setInt(parameterIndex++, usuario);
+			try (ResultSet rs = stmt.executeQuery()) {
+				while (rs.next()) {
+					Titulacion tit = new Titulacion();
+					tit.setCodNum(rs.getInt("CODNUM"));
+					tit.setNombre(rs.getString("NOMBRE"));
+					titulaciones.add(tit);
+					
+				}
+			}
+		}
+		return titulaciones;
+	}
+	
 	/** obtiene una titulación a partir de su id.
 	 * @param id codigo de la titulación
 	 * @return titulación con el id especificado
