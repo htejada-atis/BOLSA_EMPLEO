@@ -16,8 +16,8 @@ import es.ujaen.uvirtual.beans.vistas.uvirtual.bolsaempleo.VistaMeritos;
 import es.ujaen.uvirtual.controlador.infadministrativa.bolsaempleo.ControladorMisMeritos;
 import es.ujaen.uvirtual.utilidades.UVException;
 
-/** test controlador items baremación.
- * @author jmoral
+/** test controlador mis méritos.
+ * @author jlopez
  *
  */
 public class TestBEPControladorMisMeritos {

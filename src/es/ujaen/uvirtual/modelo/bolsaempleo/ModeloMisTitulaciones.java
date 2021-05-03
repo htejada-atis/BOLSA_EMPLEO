@@ -203,7 +203,7 @@ public class ModeloMisTitulaciones {
 		List<Titulacion> titulaciones = new ArrayList<>();
 		BolsaEmpleoDataTable<Titulacion> dataTable = new BolsaEmpleoDataTable<Titulacion>(params);
 		
-		String consulta = "SELECT beptus.codnum as beptus,BEPTUS.DESCRIPCION AS BEPTUSDESCRIPCION, beptit.* FROM tbep_titulaciones_usuario beptus "
+		String consulta = "SELECT beptus.codnum as beptuscod,BEPTUS.DESCRIPCION AS BEPTUSDESCRIPCION, beptit.* FROM tbep_titulaciones_usuario beptus "
 				+ "INNER JOIN tbep_titulaciones beptit ON beptit.codnum=beptus.beptus_tit_codnum "
 				+ "WHERE beptus.BEPTUS_USU_CODNUM = ? AND beptus.FLGBORRADO != 'S'";
 		
