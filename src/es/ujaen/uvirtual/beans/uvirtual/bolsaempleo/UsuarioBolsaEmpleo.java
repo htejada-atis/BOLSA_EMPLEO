@@ -38,6 +38,7 @@ public class UsuarioBolsaEmpleo implements Serializable {
 	private String razonExclusion;
 	private Date fechaExclusion;
 	private Boolean borrado;
+	private String razonBorrado;
 	private Date fechaBorrado;
 
 	
@@ -373,6 +374,14 @@ public class UsuarioBolsaEmpleo implements Serializable {
 
 	public void setBorrado(Boolean borrado) {
 		this.borrado = borrado;
+	}
+	
+	public String getRazonBorrado() {
+		return razonBorrado;
+	}
+
+	public void setRazonBorrado(String prazonBorrado) {
+		this.razonBorrado = prazonBorrado;
 	}
 	
 	public Date getFechaBorrado() {

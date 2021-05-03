@@ -277,8 +277,8 @@ public class ModeloConvocatoria {
 		}
 		
 		String consulta = "UPDATE tbep_convocatorias "
-			+ " SET ESTADO=? "
-			+ " WHERE codnum=?";
+			+ "SET ESTADO=? "
+			+ "WHERE codnum=?";
 		try (Connection conexion = ConexionUvirtual.obtenerInstancia();
 		PreparedStatement stmt = conexion.prepareStatement(consulta);) {
 			int parameterIndex = 1;

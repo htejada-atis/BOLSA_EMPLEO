@@ -390,6 +390,12 @@ nav-bolsa-empleo a:active, nav-bolsa-empleo a:hover {
 	display: block;
 }
 
+.form-group-custom.w100{
+	display: inline-block;
+	width: 100% !important;
+	margin-bottom: 1rem;
+}
+
 .form-group-container {
     display: grid;
     grid-template-columns: 1fr 1fr;

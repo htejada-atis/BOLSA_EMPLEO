@@ -264,9 +264,9 @@ public class ModeloArea {
 		"SELECT bepbol.* "
 		+ "FROM TBEP_BOLSAS bepbol "
 		+ "INNER JOIN TBEP_AREAS bepare ON bepare.CODNUM = bepbol.BEPARE_CODNUM "
-		+ "LEFT JOIN UVIRTUAL.TBEP_USUARIOS_EXCLUIDOS_AREA bepusuexc "
-		+ "ON bepare.CODNUM = bepusuexc.AREA AND bepusuexc.USUARIO = ? "
-		+ "WHERE bepusuexc.USUARIO IS NULL";
+		+ "LEFT JOIN UVIRTUAL.TBEP_USUARIOS_EXCLUIDOS_AREA bepuea "
+		+ "ON bepare.CODNUM = bepuea.AREA AND bepuea.USUARIO = ? "
+		+ "WHERE bepuea.USUARIO IS NULL";
 		
 		dataTable.setColumn(ORDER_COLUMN_INDEX_ID, "bepare.CODNUM", DataTableColumn.COLUMN_TYPE_NUMBER);
 		dataTable.setColumn(ORDER_COLUMN_INDEX_CODIGO, "bepare.ID_AREA_CONOCIMIENTO");
@@ -321,16 +321,16 @@ public class ModeloArea {
 		BolsaEmpleoDataTable<BolsaCandidato> dataTable = new BolsaEmpleoDataTable<BolsaCandidato>(params);
 		
 		String consulta =
-		"SELECT bepbol.*, bepusuexc.USUARIO "
+		"SELECT bepbol.*, bepuea.USUARIO "
 		+ "FROM TBEP_BOLSAS bepbol "
 		+ "INNER JOIN TBEP_AREAS bepare ON bepare.CODNUM = bepbol.BEPARE_CODNUM "
-		+ "LEFT JOIN UVIRTUAL.TBEP_USUARIOS_EXCLUIDOS_AREA bepusuexc "
-		+ "ON bepare.CODNUM = bepusuexc.AREA AND bepusuexc.USUARIO = ? "
-		+ "WHERE bepbol.FLGBAREMABLE = 'S' ";
+		+ "LEFT JOIN UVIRTUAL.TBEP_USUARIOS_EXCLUIDOS_AREA bepuea "
+		+ "ON bepare.CODNUM = bepuea.AREA AND bepuea.USUARIO = ? "
+		+ "WHERE 1=1 ";
 		
 		dataTable.setColumn(ORDER_COLUMN_INDEX_CODIGO_SOLICITUDES, "bepare.ID_AREA_CONOCIMIENTO");
 		dataTable.setColumn(ORDER_COLUMN_INDEX_AREA_SOLICITUDES, "bepare.DES_AREA_CONOCIMIENTO");
-		dataTable.setColumn(ORDER_COLUMN_INDEX_EXCLUIDO_SOLICITUDES, "bepusuexc.USUARIO", DataTableColumn.COLUMN_TYPE_IS_NULL);
+		dataTable.setColumn(ORDER_COLUMN_INDEX_EXCLUIDO_SOLICITUDES, "bepuea.USUARIO", DataTableColumn.COLUMN_TYPE_IS_NULL);
 		dataTable.setColumn(ORDER_COLUMN_INDEX_BAREMABLE_SOLICITUDES, "bepbol.FLGBAREMABLE", DataTableColumn.COLUMN_TYPE_BOOLEAN);
 		dataTable.setQuery(consulta);
 				

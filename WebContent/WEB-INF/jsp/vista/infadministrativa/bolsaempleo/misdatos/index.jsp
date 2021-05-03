@@ -146,9 +146,16 @@ VistaUsuarioBolsaEmpleo bean = (VistaUsuarioBolsaEmpleo) uvdatos.getVistas().get
     		</div>
     	</div>
 
-    	<div class="form-group">
-    		<input id="usuario_enviar" type="submit" name="<%= ControladorMisDatos.PARAM_ENVIAR %> " 
-    		value="Enviar" style="float:right;"/>
+    	<div class="form-group-container">
+    		<div class="form-group-custom w100">
+
+    		</div>
+    		<div class="form-group-custom w100">
+    		    <input id="baja_usuario" type="submit" name="<%= ControladorMisDatos.PARAM_DARSE_BAJA %> " 
+    			value="Darse de baja de la bolsa" style="float:left;"/>
+    			<input id="usuario_enviar" type="submit" name="<%= ControladorMisDatos.PARAM_ENVIAR %> " 
+    			value="Enviar" style="float:right;"/>
+    		</div>
     	</div>
     </form>
 </div>
@@ -190,8 +197,23 @@ function enviarUsuario(event, submit_input) {
 	submit_input.form.submit();
 }
 
+function bajaUsuario(event, submit_input) {
+	event.preventDefault();
+
+	input_accion = document.getElementById("accion_formulario");
+	input_accion.value = '<%= ControladorMisDatos.ACCION_BAJA_USUARIO %>';
+	input_id = document.getElementById("usuario_id");
+	input_id.value = '<%= bean.getUsuario().getCodNum() %>';
+
+	submit_input.form.submit();
+}
+
 document.getElementById("usuario_enviar").addEventListener("click", function(event) {
 	enviarUsuario(event, this);
+});
+
+document.getElementById("baja_usuario").addEventListener("click", function(event) {
+	bajaUsuario(event, this);
 });
 
 
