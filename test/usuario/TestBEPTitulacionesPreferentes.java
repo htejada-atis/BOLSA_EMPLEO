@@ -16,28 +16,30 @@ import org.junit.Test;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.ui.ExpectedConditions;
+import org.openqa.selenium.support.ui.Select;
 import org.openqa.selenium.support.ui.WebDriverWait;
 
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 
 import es.ujaen.uvirtual.beans.uvirtual.bolsaempleo.Afinidad;
-import es.ujaen.uvirtual.controlador.infadministrativa.bolsaempleo.ControladorAfinidades;
+import es.ujaen.uvirtual.beans.uvirtual.bolsaempleo.TitulacionArea;
+import es.ujaen.uvirtual.controlador.infadministrativa.bolsaempleo.ControladorGestionTitulacionesPreferentesArea;
 import es.ujaen.uvirtual.utilidades.BolsaEmpleoDataTable;
 
-/** Clase para probar configuracion.afinidades BEP .
+/** Clase para probar titulaciones preferentes.
  * @author fcampos
  *
  */
-public class TestBEPAfinidad {
-	private static final String NOMBREDEESTACLASE = TestBEPUsuariosBolsaEmpleo.class.getName();
+public class TestBEPTitulacionesPreferentes {
+	private static final String NOMBREDEESTACLASE = TestBEPTitulacionesPreferentes.class.getName();
 
 	private static final Logger LOGGER = Logger.getLogger(NOMBREDEESTACLASE);
 	private static final Integer WAIT_ELEMENT = 5; // segundos
 	
-	private static final String DIV_MAIN_AFINIDADES = "afinidades";
-	private static final String DIV_MAIN_AFINIDAD_FORM = "afinidad-form";
-	private static final String ID_TABLE = "tableAfinidades";
+	private static final String DIV_MAIN_TITULACIONES = "titulacionespreferentes";
+	private static final String ID_TABLE = "table_titulaciones_preferentes_area";
+	private static final String ID_TABLE_DISPONIBLES = "table_titulaciones";
 	private static final String CLASS_PAGINATION = "pagination";
 	private static final String CLASS_PAGINATION_LAST = "last";
 	private static final String CLASS_PAGINATION_FIRST = "first";
@@ -46,7 +48,7 @@ public class TestBEPAfinidad {
 	private static final String CLASS_DIALOGO = "ui-dialog";
 	private static final String CLASS_DIALOGO_CONTENT = "ui-dialog-content";
 		
-	private static final String MENSAJE_DIALOGO_SELECCIONAR_FILAS = "Seleccione al menos una afinidad.";
+	private static final String MENSAJE_DIALOGO_SELECCIONAR_FILAS = "Seleccione al menos una titulacion.";
 		
 	/** Se ejecuta una vez al inicio de la clase.
 	 * @throws SQLException Si se produce error en bbdd
@@ -69,7 +71,7 @@ public class TestBEPAfinidad {
 		DriverUvBEP.getDriver().get("http://localhost:8080/srv/es/informacionadministrativa");
 		DriverUvBEP.getDriver().get("http://localhost:8080/srv/es/informacionadministrativa/bolsaempleo");		
 		DriverUvBEP.getDriver().get("http://localhost:8080/srv/es/informacionadministrativa/bolsaempleo/configuracion");
-		DriverUvBEP.getDriver().get("http://localhost:8080/srv/es/informacionadministrativa/bolsaempleo/configuracion/afinidades");
+		DriverUvBEP.getDriver().get("http://localhost:8080/srv/es/informacionadministrativa/bolsaempleo/configuracion/titulacionespreferentesarea");
 	}
 	
 	/** Listado de usuarios.
@@ -79,20 +81,26 @@ public class TestBEPAfinidad {
 		WebDriverWait wait = new WebDriverWait(DriverUvBEP.getDriver(), WAIT_ELEMENT);
 
 		// esperamos div principal
-		WebElement main = wait.until(ExpectedConditions.visibilityOfElementLocated(By.className(DIV_MAIN_AFINIDADES)));		
+		WebElement main = wait.until(ExpectedConditions.visibilityOfElementLocated(By.className(DIV_MAIN_TITULACIONES)));		
 		WebElement h2 = main.findElement(By.tagName("h2"));
-		assertTrue(h2.getText().equals("Afinidades"));
+		assertTrue(h2.getText().equals("Titulaciones preferentes por área"));
+		
+		//seleccionamos en select
+		Select area = new Select(DriverUvBEP.getDriver().findElement(By.id("select_area")));
+		area.selectByIndex(1);
 		
 		// esperamos a que se renderice la table
 		WebElement total = wait.until(ExpectedConditions.presenceOfNestedElementLocatedBy(getTables(main, ID_TABLE), By.className("total")));
-			
+		WebElement totalDisponibles = wait.until(ExpectedConditions.presenceOfNestedElementLocatedBy(getTables(main, ID_TABLE_DISPONIBLES), By.className("total")));	
+		
 		comprobarNumUsu(total);
+		comprobarNumUsu(totalDisponibles);
 		
 		comprobarOrdenacion(getTables(main, ID_TABLE));
+		comprobarOrdenacion(getTables(main, ID_TABLE_DISPONIBLES));
 
 		comprobarPaginacion(getTables(main, ID_TABLE));
-		
-		comprobarSeleccionTabla(getTables(main, ID_TABLE), main);
+		comprobarPaginacion(getTables(main, ID_TABLE_DISPONIBLES));
 	}
 	
 	/**
@@ -102,11 +110,12 @@ public class TestBEPAfinidad {
 	 */
 	@Test
 	public void testA2() throws MalformedURLException, IOException {
-		String u = "http://localhost:8080/srv/es/informacionadministrativa/bolsaempleo/configuracion/afinidades?a=" + ControladorAfinidades.ACCION_DATATABLE;
+		String u = "http://localhost:8080/srv/es/informacionadministrativa/bolsaempleo/configuracion/titulacionespreferentesarea?a="
+	+ ControladorGestionTitulacionesPreferentesArea.ACCION_DATATABLE_TITULACIONES + "&area=0";
 		String json = DriverUvBEP.getAjaxRequestJson(u);
 		
-		Type typeDt = new TypeToken<BolsaEmpleoDataTable<Afinidad>>() { }.getType();
-		BolsaEmpleoDataTable<Afinidad> dt = new Gson().fromJson(json, typeDt);
+		Type typeDt = new TypeToken<BolsaEmpleoDataTable<TitulacionArea>>() { }.getType();
+		BolsaEmpleoDataTable<TitulacionArea> dt = new Gson().fromJson(json, typeDt);
 		
 		assertTrue(dt.getData().size() > 0);
 	}
@@ -118,22 +127,27 @@ public class TestBEPAfinidad {
 	 */
 	@Test
 	public void testA3() throws MalformedURLException, IOException {
+		//seleccionamos en select
+		Select area = new Select(DriverUvBEP.getDriver().findElement(By.id("select_area")));
+		area.selectByIndex(1);
+		
 		WebDriverWait wait = new WebDriverWait(DriverUvBEP.getDriver(), WAIT_ELEMENT);
-		WebElement pmain = wait.until(ExpectedConditions.visibilityOfElementLocated(By.className(DIV_MAIN_AFINIDADES)));	
-		WebElement btnNuevo = pmain.findElement(By.id("nueva_afinidad"));
-		btnNuevo.click();
+		WebElement pmain = wait.until(ExpectedConditions.visibilityOfElementLocated(By.className(DIV_MAIN_TITULACIONES)));	
+		WebElement table = getTables(pmain, ID_TABLE);
+		WebElement th = table.findElement(By.cssSelector("input[type='checkbox']"));
+		th.click();
+		WebElement actions = table.findElement(By.className(CLASS_ACTIONS));
+		WebElement btnNoBaremable = actions.findElement(By.xpath("button[1]"));
+		btnNoBaremable.click();
 		
 		WebDriverWait wait2 = new WebDriverWait(DriverUvBEP.getDriver(), WAIT_ELEMENT);
-		WebElement pmain2 = wait2.until(ExpectedConditions.visibilityOfElementLocated(By.className(DIV_MAIN_AFINIDAD_FORM)));	
-
-		WebElement descripcion = pmain2.findElement(By.name("descripcion"));
-		descripcion.sendKeys("EJEMPLO");
-		WebElement codigo = pmain2.findElement(By.name("codigo"));
-		codigo.sendKeys("AI");
-		WebElement modulacion = pmain2.findElement(By.name("modulacion"));
-		modulacion.sendKeys("10");
-		WebElement btnAgregar = pmain2.findElement(By.id("convocatoria_enviar"));
-		btnAgregar.click();
+		WebElement pmain2 = wait2.until(ExpectedConditions.visibilityOfElementLocated(By.className(DIV_MAIN_TITULACIONES)));	
+		WebElement table2 = getTables(pmain2, ID_TABLE_DISPONIBLES);
+		WebElement th2 = table2.findElement(By.cssSelector("input[type='checkbox']"));
+		th2.click();
+		WebElement actions2 = table2.findElement(By.className(CLASS_ACTIONS));
+		WebElement btnNoBaremable2 = actions2.findElement(By.xpath("button[1]"));
+		btnNoBaremable2.click();
 	}
 	
 	private String getDialogText() {
@@ -175,7 +189,7 @@ public class TestBEPAfinidad {
 	 */
 	public void comprobarOrdenacion(WebElement tabla) {
 		System.out.print(tabla);
-		WebElement th = tabla.findElement(By.className("codigo"));
+		WebElement th = tabla.findElement(By.className("nombre"));
 		th.click();
 		WebElement img = th.findElement(By.className("order"));
 		assertTrue(img.getAttribute("src").indexOf("down.png") != -1);

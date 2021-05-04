@@ -10,7 +10,7 @@ UVDatos uvdatos = (UVDatos) request.getAttribute(UVDatos.NOMBRE_ATRIBUTO);
 VistaConvocatorias bean = (VistaConvocatorias) uvdatos.getVistas().get(VistaConvocatorias.class.getName());
 %>
 
-<div class="bolsa-empleo">	
+<div class="bolsa-empleo convocatorias">	
 	<% if (bean.getMensajesDeExito().size() > 0) { %>
 		<div id="exito" class="success">
 			<%= bean.formatearMensajesDeExito() %>
@@ -34,7 +34,7 @@ VistaConvocatorias bean = (VistaConvocatorias) uvdatos.getVistas().get(VistaConv
 	<table class="bluetable bolsaempleo" id="table_convocatorias">
 		<tr>
 			<th scope="col" style="width:10%" title="Id de la convocatoria">Id</th>
-			<th scope="col"	style="width:40%">Descripción</th>
+			<th scope="col"	class="descripcion" style="width:40%">Descripción</th>
 			<th scope="col"	style="width:20%">Fecha cierre</th>
 			<th scope="col"	style="width:20%">Estado</th>			
 			<th scope="col"	style="width:10%"></th>
@@ -56,6 +56,7 @@ VistaConvocatorias bean = (VistaConvocatorias) uvdatos.getVistas().get(VistaConv
 		var table_titulaciones = new Atis.DataTable('#table_convocatorias', {
 		    "ajax": { url: "<%=  ControladorConvocatorias.URL_PATTERN_AJAX %>" },
 		    "pageSize": 10,
+	    	"defaultOrderBy": 2,
 		    "action": "<%= ControladorConvocatorias.ACCION_DATATABLE %>",
 		    "columns": [
 		    	{'data': 'codNum'},

@@ -10,7 +10,7 @@ UVDatos uvdatos = (UVDatos) request.getAttribute(UVDatos.NOMBRE_ATRIBUTO);
 VistaTitulacionesArea bean = (VistaTitulacionesArea) uvdatos.getVistas().get(VistaTitulacionesArea.class.getName());
 %>
 
-<div class="bolsa-empleo">
+<div class="bolsa-empleo titulacionespreferentes">
 	
 	<% if (bean.getMensajesDeExito().size() > 0) { %>
 		<div id="exito" class="success">
@@ -45,7 +45,7 @@ VistaTitulacionesArea bean = (VistaTitulacionesArea) uvdatos.getVistas().get(Vis
 			<tr>
 				<th scope="col" style="width:5%"></th>
 				<th scope="col" style="width:10%" title="Id de la titulación">Id</th>
-				<th scope="col"	style="width:70%">Nombre</th>
+				<th scope="col"	class="nombre" style="width:70%">Nombre</th>
 			</tr>
 			<tbody>		
 			</tbody>
@@ -60,7 +60,7 @@ VistaTitulacionesArea bean = (VistaTitulacionesArea) uvdatos.getVistas().get(Vis
 			<tr>
 				<th scope="col" style="width:5%"></th>
 				<th scope="col" style="width:10%" title="Id de la titulación">Id</th>
-				<th scope="col"	style="width:85%">Nombre</th>
+				<th scope="col"	class="nombre" style="width:85%">Nombre</th>
 			</tr>
 			<tbody>
 			</tbody>

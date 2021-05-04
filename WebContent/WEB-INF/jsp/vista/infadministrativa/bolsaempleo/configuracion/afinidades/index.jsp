@@ -9,7 +9,7 @@ UVDatos uvdatos = (UVDatos) request.getAttribute(UVDatos.NOMBRE_ATRIBUTO);
 VistaAfinidades bean = (VistaAfinidades) uvdatos.getVistas().get(VistaAfinidades.class.getName());
 %>
 
-<div class='bolsa-empleo'>
+<div class='bolsa-empleo afinidades'>
 	<% if (bean.getMensajesDeExito().size() > 0) { %>
 		<div id="exito" class="success">
 			<%= bean.formatearMensajesDeExito() %>
@@ -33,7 +33,7 @@ VistaAfinidades bean = (VistaAfinidades) uvdatos.getVistas().get(VistaAfinidades
 		<tr>
 			<th scope="col" style="width:5%"></th>
 			<th scope="col" style="width:5%" title="Id de la afinidad">Id</th>
-			<th scope="col" class="center" style="width:10%" title="Código de afinidad">Código</th>
+			<th scope="col" class="center codigo" style="width:10%" title="Código de afinidad">Código</th>
 			<th scope="col" style="width:55%">Descripcion</th>
 			<th scope="col" class="center" style="width:15%">Modulación</th>
 			<th scope="col" class="center" style="width:15%">Borrado</th>
