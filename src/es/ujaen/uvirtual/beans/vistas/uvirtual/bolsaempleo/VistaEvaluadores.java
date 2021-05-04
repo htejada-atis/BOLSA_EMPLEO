@@ -16,6 +16,7 @@ public class VistaEvaluadores extends Vista implements Serializable {
 	private List<Area> areas = new ArrayList<>();
 	private BolsaEmpleoDataTable<Evaluador> dataTable;
 	private Area area;
+	private Evaluador evaluador;
 	private String vista;
 	
 	public List<Area> getAreas() {
@@ -40,6 +41,14 @@ public class VistaEvaluadores extends Vista implements Serializable {
 	
 	public void setArea(Area area) {
 		this.area = area;
+	}
+	
+	public Evaluador getEvaluador() {
+		return evaluador;
+	}
+	
+	public void setEvaluador(Evaluador evaluador) {
+		this.evaluador = evaluador;
 	}
 	
 	public String getVista() {
