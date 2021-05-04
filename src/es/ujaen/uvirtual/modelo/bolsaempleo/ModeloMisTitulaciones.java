@@ -4,7 +4,6 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -332,7 +331,6 @@ public class ModeloMisTitulaciones {
 
 			stmt.setString(parameterIndex++, "S");
 			
-			SimpleDateFormat formatter = new SimpleDateFormat("dd/MM/YYYY HH:mm:ss");
 			Date date = new Date(System.currentTimeMillis());
 			
 			stmt.setDate(parameterIndex++, new java.sql.Date(date.getTime()));

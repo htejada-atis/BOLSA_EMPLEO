@@ -345,11 +345,8 @@ public class ModeloConvocatoria {
 				+ "FROM TBEP_BOLSAS";
 		
 		try (Connection con = ConexionUvirtual.obtenerInstancia(); PreparedStatement stmt = con.prepareStatement(sql);) {
-			int parameterIndex = 1;
-		
 			try (ResultSet rs = stmt.executeQuery()) {
 				while (rs.next()) {
-					Float acum = null;
 					if (!rs.getString("ESTADO").equals("DESBLOQUEADA")) {
 						return true;
 					}

@@ -822,7 +822,7 @@ public class ControladorMisSolicitudes extends HttpServlet {
 				table.addCell(cell);
 				
 				Phrase phrase2 = new Phrase("Mérito", font);
-				cell = new Cell(phrase);
+				cell = new Cell(phrase2);
 				cell.setHeader(true);
 				cell.setBackgroundColor(new Color(COLOR_185, COLOR_201, COLOR_254));
 				table.addCell(cell);

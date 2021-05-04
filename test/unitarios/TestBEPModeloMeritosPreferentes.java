@@ -4,9 +4,7 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
-import java.io.ByteArrayInputStream;
 import java.io.IOException;
-import java.io.InputStream;
 import java.sql.SQLException;
 import java.text.ParseException;
 import java.util.List;
@@ -37,8 +35,6 @@ public class TestBEPModeloMeritosPreferentes {
 	private static final String FACTOR = "factor";
 	private static final Float VALORMAXIMO = (float) 100.0;
 	private static final Boolean ACTIVO = true;
-	private static final Float FLOAT = 1.1f;
-	private static final InputStream ARCHIVO = new ByteArrayInputStream("archivo de prueba".getBytes());
 	private static final String ITEM_UNIDADES = "ENTERO";
 	private static final Float ITEM_VALOR = (float) 10;
 	private static final Float ITEM_VALORMINIMO = (float) 1;

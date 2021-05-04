@@ -23,7 +23,6 @@ import es.ujaen.uvirtual.utilidades.UVException;
  */
 public class TestBEPControladorGestionTitulaciones {
 	
-	private static final String MENSAJE_TITULACIONES_DEVUELTAS = "Debe devolver titulaciones";
 	private static final String MENSAJE_TITULACION_DEVUELTA = "Debe devolver titulación";
 	private static final String MENSAJE_SIN_ADVERTENCIAS = "No debe mostrar advertencias";
 	private static final String MENSAJE_SIN_ERROR = "No debe devolver error";

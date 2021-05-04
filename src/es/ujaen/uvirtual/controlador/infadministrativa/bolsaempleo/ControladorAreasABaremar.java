@@ -179,7 +179,6 @@ public class ControladorAreasABaremar extends HttpServlet {
 	private void listadoAreasExcluidasUsuario(VistaAreasBaremar bean, UVDatos datos, 
 			HttpServletRequest request, HttpServletResponse response) throws IOException, SQLException {
 		ModeloArea modelo = ModeloArea.obtenerInstancia();	
-		ModeloUsuarioBolsaEmpleo modeloUsuario = ModeloUsuarioBolsaEmpleo.obtenerInstancia();
 		datos.setContentType("application/json");
 		datos.setRespuestaEnviada(true);
 		response.setContentType("application/json");

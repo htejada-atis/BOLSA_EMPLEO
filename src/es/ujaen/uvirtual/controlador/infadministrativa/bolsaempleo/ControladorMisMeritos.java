@@ -334,7 +334,6 @@ public class ControladorMisMeritos extends HttpServlet {
 	 */
 	private void eliminarMeritos(HttpServletRequest request, HttpServletResponse response) throws SQLException, UVException, IOException {
 		ModeloMerito modelo = ModeloMerito.obtenerInstancia();
-		Integer codNum = Formateador.leeParametroInteger(request.getParameter(PARAM_ID));
 		
 		Gson gson = new GsonBuilder().create();
 		

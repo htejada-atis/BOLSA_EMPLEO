@@ -25,7 +25,6 @@ public class TestBEPControladorMisSolicitudes {
 	private static final String MENSAJE_BOLSAS_DEVUELTAS = "Debe devolver bolsas";
 	private static final String MENSAJE_BOLSA_DEVUELTA = "Debe devolver bolsa";
 	private static final String MENSAJE_CON_ERROR = "Debe devolver error";
-	private static final String MENSAJE_CON_EXITO_ESPERADO = "El mensaje de exito debe coincidir";
 	private static final String MENSAJE_MERITOS_DEVUELTOS = "Debe devolver méritos";
 	private static final String MENSAJE_MERITO_DEVUELTO = "Debe devolver mérito";
 	private static final String MENSAJE_SIN_ADVERTENCIAS = "No debe mostrar advertencias";
@@ -58,8 +57,6 @@ public class TestBEPControladorMisSolicitudes {
     
     // método para obtener la vista con una lista de bolsas del usuario .
     private VistaSolicitudes obtenerAreas() throws ServletException, IOException {
-    	VistaSolicitudes bean = obtenerSolicitudes();
-    	
     	PeticionHttp peticion = UtilsTestBolsaEmpleo.peticionAutenticadaCandidato();
 		peticion.setParameter(ControladorMisSolicitudes.PARAM_ACCION, ControladorMisSolicitudes.ACCION_DATATABLE_AREAS);
 
@@ -293,8 +290,6 @@ public class TestBEPControladorMisSolicitudes {
 	 */
 	@Test
 	public void testE03ObtenerAreasParametroErroneo() throws SQLException, ServletException, IOException {
-		VistaSolicitudes bean = obtenerSolicitudes();
-    	
     	PeticionHttp peticion = UtilsTestBolsaEmpleo.peticionAutenticadaCandidato();
 		peticion.setParameter(ControladorMisSolicitudes.PARAM_ACCION, ControladorMisSolicitudes.ACCION_DATATABLE_AREAS);
 		peticion.setParameter(BolsaEmpleoDataTable.PARAM_ORDER_BY, "9");

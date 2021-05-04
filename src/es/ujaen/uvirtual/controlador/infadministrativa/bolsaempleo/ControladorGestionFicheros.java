@@ -227,7 +227,6 @@ public class ControladorGestionFicheros extends HttpServlet {
 	 */
 	private void cambiarFicherosPublico(HttpServletRequest request, HttpServletResponse response, Boolean publico) throws SQLException, UVException {
 		ModeloFichero modelo = ModeloFichero.obtenerInstancia();
-		Integer codNum = Formateador.leeParametroInteger(request.getParameter(PARAM_FICHERO));
 		
 		Gson gson = new GsonBuilder().create();
 		
@@ -293,7 +292,6 @@ public class ControladorGestionFicheros extends HttpServlet {
 	 */
 	private void eliminarFicheros(HttpServletRequest request, HttpServletResponse response) throws SQLException, UVException, IOException {
 		ModeloFichero modelo = ModeloFichero.obtenerInstancia();
-		Integer codNum = Formateador.leeParametroInteger(request.getParameter(PARAM_FICHERO));
 		
 		Gson gson = new GsonBuilder().create();
 		
