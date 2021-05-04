@@ -160,9 +160,11 @@ $(document).ready(function() {
 			case('excluirusuario'):
         		var mensaje = "¿Desea excluir los usuarios seleccionados?";
     			var titulo = "Excluir Usuarios";
+    		break;
 			case('incluirusuario'):
         		var mensaje = "¿Desea incluir los usuarios seleccionados?";
     			var titulo = "Incluir Usuarios";
+    		break;
 			case('recuperarusuario'):
         		var mensaje = "¿Desea recuperar los usuarios seleccionados?";
     			var titulo = "Recuperar Usuarios";

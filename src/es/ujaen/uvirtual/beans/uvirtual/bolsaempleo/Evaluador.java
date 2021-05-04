@@ -50,8 +50,10 @@ public class Evaluador extends UsuarioBolsaEmpleo implements Serializable {
 	
 	/** Constructor copia.
 	 * @param copia Evaluador a copiar
+	 * @param pusuario usuario a copiar
 	 */
-	public Evaluador(Evaluador copia) {
+	public Evaluador(Evaluador copia, UsuarioBolsaEmpleo pusuario) {
+		super(pusuario);
 		this.codNumArea = copia.codNumArea;
 		this.activo = copia.activo;
 	}

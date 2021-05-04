@@ -196,6 +196,10 @@ public class ModeloBaremacion {
 	 * @throws UVException .
 	 */
 	public void insertaApartado(ApartadoBaremacion apartado) throws SQLException, UVException {
+		if (apartado == null) {
+			throw new UVException("No se puede insertar un apartado vacio");
+		}
+		
 		this.chequearApartadoParaInsertarOActualizar(apartado);
 		
 		String consulta = "INSERT INTO TBEP_APARTADOSBAREMACION (CODIGO,NOMBRE,FLGACTIVO,PUNTUACIONMAXIMA,PORCENTAJEMAXIMO) "
@@ -631,6 +635,10 @@ public class ModeloBaremacion {
 	 * @throws UVException .
 	 */
 	public void insertaBloque(BloqueBaremacion bloque) throws SQLException, UVException {
+		if (bloque == null) {
+			throw new UVException("No se puede insertar un bloque vacio");
+		}
+		
 		this.chequearBloqueParaInsertarOActualizar(bloque);
 		
 		String consulta = "INSERT INTO TBEP_BLOQUESBAREMACION " 
@@ -929,6 +937,10 @@ public class ModeloBaremacion {
 	 * @throws UVException .
 	 */
 	public void insertaItem(ItemBaremacion item) throws SQLException, UVException {
+		if (item == null) {
+			throw new UVException("No se puede insertar un item vacio");
+		}
+		
 		this.chequearItemParaInsertarOActualizar(item);
 		
 		String consulta = "INSERT INTO TBEP_ITEMSBAREMACION "

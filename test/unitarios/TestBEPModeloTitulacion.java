@@ -5,12 +5,15 @@ import static org.junit.Assert.fail;
 import java.io.IOException;
 import java.sql.SQLException;
 import java.text.ParseException;
+import java.util.ArrayList;
 import java.util.List;
 import javax.sql.DataSource;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import bbdd.BbddRunner;
 import bbdd.UtilsTestBolsaEmpleo;
+import es.ujaen.uvirtual.beans.uvirtual.bolsaempleo.Area;
+import es.ujaen.uvirtual.beans.uvirtual.bolsaempleo.Bolsa;
 import es.ujaen.uvirtual.beans.uvirtual.bolsaempleo.Titulacion;
 import es.ujaen.uvirtual.modelo.bolsaempleo.ModeloTitulacion;
 import es.ujaen.uvirtual.modelo.conexion.Conexion;
@@ -20,6 +23,9 @@ import es.ujaen.uvirtual.utilidades.UVException;
 public class TestBEPModeloTitulacion {
 	
     private static final String NOMBRE_TITULACION = "nombre titulacion";
+    private static final Integer AREA = 19;
+
+    
     
 	/** prepara la bd con los datos iniciales.
      * @throws SQLException si error en bd
@@ -54,6 +60,14 @@ public class TestBEPModeloTitulacion {
     @Test
     public void testA02BorraTitulacion() throws SQLException, UVException {
     	ModeloTitulacion modelo = ModeloTitulacion.obtenerInstancia();
+		List<String> titulacionesPreferentes = new ArrayList<String>();
+		
+		for (Titulacion tit: modelo.listaTitulaciones()) {
+			titulacionesPreferentes.add(Integer.toString(tit.getCodNum()));
+		}
+
+    	modelo.eliminarTitulacionesPreferentesArea(titulacionesPreferentes, AREA);
+    	
     	List<Titulacion> titulaciones = modelo.listaTitulaciones();
     	Titulacion titulacion = titulaciones.get(0);
     	modelo.borraTitulacion(titulacion);

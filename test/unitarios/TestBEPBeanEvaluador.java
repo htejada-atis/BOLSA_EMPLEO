@@ -13,7 +13,6 @@ import org.junit.Test;
 
 import es.ujaen.uvirtual.beans.Rol;
 import es.ujaen.uvirtual.beans.uvirtual.bolsaempleo.Area;
-import es.ujaen.uvirtual.beans.uvirtual.bolsaempleo.Departamento;
 import es.ujaen.uvirtual.beans.uvirtual.bolsaempleo.Evaluador;
 import es.ujaen.uvirtual.beans.uvirtual.bolsaempleo.UsuarioBolsaEmpleo;
 
@@ -74,13 +73,10 @@ public class TestBEPBeanEvaluador {
 	 */
 	@Test
 	public void testA02() {
-		Integer id = 1;
 		UsuarioBolsaEmpleo usuario = new UsuarioBolsaEmpleo(CODPERSONA, CODCUENTA, ROL, LISTADIST, EXCLUIDO);
 		Evaluador evaluador = new Evaluador(usuario, AREA, ACTIVO);
-		Evaluador evaluador2 = new Evaluador(evaluador);
+		Evaluador evaluador2 = new Evaluador(evaluador, usuario);
 		
-		assertEquals(id, evaluador.getCodNum());
-		assertEquals(id, evaluador2.getCodNum());
 		assertEquals(CODPERSONA, evaluador.getCodPersona());
 		assertEquals(CODPERSONA, evaluador2.getCodPersona());
 		assertEquals(CODCUENTA, evaluador.getCodCuenta());
