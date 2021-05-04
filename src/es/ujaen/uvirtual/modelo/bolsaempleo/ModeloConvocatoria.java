@@ -8,6 +8,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
+import es.ujaen.uvirtual.beans.uvirtual.bolsaempleo.ApartadoBaremacion;
 import es.ujaen.uvirtual.beans.uvirtual.bolsaempleo.Convocatoria;
 import es.ujaen.uvirtual.beans.uvirtual.bolsaempleo.Titulacion;
 import es.ujaen.uvirtual.modelo.conexion.ConexionUvirtual;
@@ -127,8 +128,7 @@ public class ModeloConvocatoria {
 	}
 	
 	/** Consulta titulaciones en BBDD y las devuelve.
-	 * @param clausula para filtrar las titulaciones de la bd
-	 * @return todas las titulaciones de la base de datos
+	 * @return todas las titulaciones de la base de datos .
 	 * @throws SQLException en caso de error de base de datos
 	 */
 	public List<Convocatoria> listaConvocatorias() throws SQLException {
@@ -144,7 +144,9 @@ public class ModeloConvocatoria {
 							convocatoria.setCodNum(rs.getInt("CODNUM"));
 							convocatoria.setDescripcion(rs.getString("DESCRIPCION"));
 							convocatoria.setFechaCierre(rs.getDate("FECHACIERRE"));
-							convocatoria.setEstado(rs.getString("ESTADO"));					
+							convocatoria.setEstado(rs.getString("ESTADO"));		
+							convocatoria.setNumBolsasMaximo(rs.getInt("NUMBOLSASMAXIMO"));		
+							convocatoria.setNumMeritosPorBloque(rs.getInt("NUMMERITOSPORBLOQUE"));		
 							convocatorias.add(convocatoria);	
 						} catch (Exception e) {
 							e.printStackTrace();
@@ -160,9 +162,14 @@ public class ModeloConvocatoria {
 	/**
 	 * Añade una convocatoria al sistema cerrada.
 	 * @param convocatoria .	 
+	 * @throws UVException .
 	 * @throws SQLException .
 	 */
-	public void nuevaConvocatoria(Convocatoria convocatoria) throws SQLException {
+	public void nuevaConvocatoria(Convocatoria convocatoria) throws SQLException, UVException {
+		if (convocatoria == null) {
+			throw new UVException("No se puede insertar una convocatoria vacio");
+		}
+		
 		String consulta =
 			"INSERT INTO TBEP_CONVOCATORIAS (DESCRIPCION, FECHACIERRE, ESTADO, NUMBOLSASMAXIMO, NUMMERITOSPORBLOQUE) " 
 			+ "VALUES (?, ?, ?, ?, ?)";
@@ -328,6 +335,32 @@ public class ModeloConvocatoria {
 
 		return null;
 	}
+	
+	/**
+	 * Comprueba si las bolsas estan desbloqueadas.
+	 * @return bool .
+	 * @throws UVException . 
+	 * @throws SQLException .
+	 */
+	public boolean checkBolsasDesbloqueadas() throws SQLException {		
+		String sql = "SELECT ESTADO "
+				+ "FROM TBEP_BOLSAS";
+		
+		try (Connection con = ConexionUvirtual.obtenerInstancia(); PreparedStatement stmt = con.prepareStatement(sql);) {
+			int parameterIndex = 1;
+		
+			try (ResultSet rs = stmt.executeQuery()) {
+				while (rs.next()) {
+					Float acum = null;
+					if (!rs.getString("ESTADO").equals("DESBLOQUEADA")) {
+						return true;
+					}
+				}
+			}
+		}
+		
+		return false;
+	} 
 
 	/**
 	 * Crea una convocatoria a partir de un resulset.

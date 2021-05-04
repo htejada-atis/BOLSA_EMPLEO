@@ -13,7 +13,6 @@ import es.ujaen.uvirtual.beans.uvirtual.bolsaempleo.BolsaCandidato;
 import es.ujaen.uvirtual.beans.uvirtual.bolsaempleo.UsuarioBolsaEmpleo;
 import es.ujaen.uvirtual.modelo.conexion.ConexionUvirtual;
 import es.ujaen.uvirtual.utilidades.BolsaEmpleoDataTable;
-import es.ujaen.uvirtual.utilidades.BolsaEmpleoUtils;
 import es.ujaen.uvirtual.utilidades.UVException;
 import es.ujaen.uvirtual.utilidades.BolsaEmpleoDataTable.DataTableColumn;
 
@@ -263,7 +262,7 @@ public class ModeloArea {
 		String consulta =
 		"SELECT bepbol.* "
 		+ "FROM TBEP_BOLSAS bepbol "
-		+ "INNER JOIN TBEP_AREAS bepare ON bepare.CODNUM = bepbol.BEPARE_CODNUM "
+		+ "INNER JOIN TBEP_AREAS bepare ON bepare.CODNUM = bepbol.BEPARE_CODNUM AND bepbol.FLGBAREMABLE = 'S' "
 		+ "LEFT JOIN UVIRTUAL.TBEP_USUARIOS_EXCLUIDOS_AREA bepuea "
 		+ "ON bepare.CODNUM = bepuea.AREA AND bepuea.USUARIO = ? "
 		+ "WHERE bepuea.USUARIO IS NULL";

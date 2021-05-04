@@ -8,6 +8,8 @@ import java.sql.Types;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+
+import es.ujaen.uvirtual.beans.uvirtual.bolsaempleo.Convocatoria;
 import es.ujaen.uvirtual.beans.uvirtual.bolsaempleo.MeritoPreferente;
 import es.ujaen.uvirtual.beans.uvirtual.bolsaempleo.UsuarioBolsaEmpleo;
 import es.ujaen.uvirtual.modelo.conexion.ConexionUvirtual;
@@ -133,6 +135,34 @@ public class ModeloMeritosPreferentes {
 		
 		return dataTable;
 	}
+	
+	
+	/** Consulta meritos preferentes en BBDD y las devuelve.
+	 * @return todos los meritos de la base de datos
+	 * @throws SQLException en caso de error de base de datos
+	 */
+	public List<MeritoPreferente> listaMeritosPreferentes() throws SQLException {
+		List<MeritoPreferente> meritos = new ArrayList<>();
+		String consulta = "SELECT bepmep.* "
+				  + "FROM TBEP_MERITOS_PREFERENTES bepmep";
+		
+		try (Connection conexion = ConexionUvirtual.obtenerInstancia();
+			PreparedStatement stmt = conexion.prepareStatement(consulta);) {
+				try (ResultSet rs = stmt.executeQuery()) {
+					while (rs.next()) {
+						try {
+							MeritoPreferente row = this.createApartadoFromResultSet(rs);
+							meritos.add(row);		
+						} catch (Exception e) {
+							e.printStackTrace();
+						}
+						
+					}
+				}
+			}
+		
+		return meritos;
+	}
 
 	/**
 	 * Inserta un merito en la db.
@@ -141,6 +171,10 @@ public class ModeloMeritosPreferentes {
 	 * @throws UVException .
 	 */
 	public void crearMeritoPreferente(MeritoPreferente merito) throws UVException, SQLException {
+		if (merito == null) {
+			throw new UVException("No se puede insertar un merito preferente vacio");
+		}
+		
 		this.validateMeritoPreferente(merito);
 						
 		String sql = "INSERT INTO TBEP_MERITOS_PREFERENTES ("

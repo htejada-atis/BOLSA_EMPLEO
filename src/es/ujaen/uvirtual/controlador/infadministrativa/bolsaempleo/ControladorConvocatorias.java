@@ -89,6 +89,7 @@ public class ControladorConvocatorias extends HttpServlet {
 	public static final String MENSAJE_ERROR_SIN_BOLSAS_BAREMABLES = "Antes de abrir una convocatoria debe de tener areas baremables";
 	public static final String MENSAJE_INFO_CONVOCATORIAS_INSERTADA_CORRECTAMENTE = "Convocatoria insertada correctamente.";
 	public static final String MENSAJE_INFO_CONVOCATORIA_ACTUALIZADA_CORRECTAMENTE = "Convocatoria actualizada correctamente.";
+	public static final String MENSAJE_ERROR_BOLSAS_BLOQUEADAS = "Debe desbloquear primero el total de las bolsas para abrir la convocatoria";
 
 	public static final int RESPONSE_HTTP_CODE_ERROR = 400;
 	
@@ -297,6 +298,8 @@ public class ControladorConvocatorias extends HttpServlet {
 		
 		if (!modeloBolsas.hayBolsasBaremables()) {
 			bean.getMensajesDeError().add(MENSAJE_ERROR_SIN_BOLSAS_BAREMABLES);
+		} else if (modelo.checkBolsasDesbloqueadas()) {
+			bean.getMensajesDeError().add(MENSAJE_ERROR_BOLSAS_BLOQUEADAS);
 		} else if (modelo.hayConvocatoriaAbierta()) {
 			bean.getMensajesDeError().add(MENSAJE_ERROR_CONVOCATORIAS_ABIERTAS);
 		} else if (modeloBaremacion.checkSumaPorcentagesApartados(apartado, "Alcanzar")) {

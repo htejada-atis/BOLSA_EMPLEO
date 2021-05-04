@@ -9,6 +9,8 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
+
+import es.ujaen.uvirtual.beans.uvirtual.bolsaempleo.Convocatoria;
 import es.ujaen.uvirtual.beans.uvirtual.bolsaempleo.Titulacion;
 import es.ujaen.uvirtual.modelo.conexion.ConexionUvirtual;
 import es.ujaen.uvirtual.utilidades.BolsaEmpleoUtils;
@@ -79,6 +81,36 @@ public class ModeloMisTitulaciones {
 			throw new UVException("No existe titulación");
 		}
 		return titulaciones.get(0);
+	}
+	
+	/** Consulta titulaciones en BBDD y las devuelve.
+	 * @return todas las titulaciones de la base de datos .
+	 * @throws SQLException en caso de error de base de datos
+	 */
+	public List<Titulacion> listaTitulaciones() throws SQLException {
+		List<Titulacion> titulaciones = new ArrayList<>();
+		String consulta = "SELECT * FROM TBEP_TITULACIONES_USUARIO";
+		
+		try (Connection conexion = ConexionUvirtual.obtenerInstancia();
+			PreparedStatement stmt = conexion.prepareStatement(consulta);) {
+				try (ResultSet rs = stmt.executeQuery()) {
+					while (rs.next()) {
+						try {
+							Titulacion tit = new Titulacion();
+							tit.setCodNum(rs.getInt("CODNUM"));
+							tit.setDescripcion(rs.getString("DESCRIPCION"));
+							tit.setArchivo(rs.getBlob("ARCHIVO").getBinaryStream());
+							tit.setBorrado(rs.getString("FLGBORRADO").equals("S"));
+							titulaciones.add(tit);		
+						} catch (Exception e) {
+							e.printStackTrace();
+						}
+						
+					}
+				}
+			}
+		
+		return titulaciones;
 	}
 	
 	

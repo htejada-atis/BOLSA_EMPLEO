@@ -113,8 +113,10 @@ public class TestBEPModeloUsuarios {
             	meritosAcum.add(mer.getCodNum().toString());
             }
         }
-    	
-    	modeloMeritos.eliminarMeritos(meritosAcum);
+    	if (meritosAcum.size() > 0) {
+        	modeloMeritos.eliminarMeritos(meritosAcum);
+    	}
+
     	modelo.borraUsuario(usuario);
     	try {
     		modelo.listaUsuario(usuario.getCodCuenta());
