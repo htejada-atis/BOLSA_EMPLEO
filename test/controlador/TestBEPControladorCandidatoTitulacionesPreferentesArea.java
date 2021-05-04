@@ -24,9 +24,11 @@ public class TestBEPControladorCandidatoTitulacionesPreferentesArea {
 	
 	private static final String MENSAJE_AREA_DEVUELTA = "Debe devolver area";
 	private static final String MENSAJE_AREAS_DEVUELTAS = "Debe devolver areas";
+	private static final String MENSAJE_CON_ERROR = "Debe devolver error";
 	private static final String MENSAJE_TITULACIONES_DEVUELTAS = "Debe devolver titulaciones";
 	private static final String MENSAJE_SIN_ADVERTENCIAS = "No debe mostrar advertencias";
 	private static final String MENSAJE_SIN_ERROR = "No debe devolver error";
+	private static final String MENSAJE_SIN_EXITO = "No debe exito";
 	
     /** prepara la bd con los datos iniciales.
      * @throws SQLException si error en bd .
