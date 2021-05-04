@@ -11,6 +11,7 @@ import java.util.List;
 import java.util.Map;
 
 import es.ujaen.uvirtual.beans.uvirtual.bolsaempleo.Bolsa;
+import es.ujaen.uvirtual.beans.uvirtual.bolsaempleo.UsuarioBolsaEmpleo;
 import es.ujaen.uvirtual.modelo.conexion.ConexionUvirtual;
 import es.ujaen.uvirtual.utilidades.BolsaEmpleoUtils;
 import es.ujaen.uvirtual.utilidades.BolsaEmpleoDataTable;
@@ -109,6 +110,33 @@ public class ModeloBolsa {
 		
 		return dataTable;
 	}	
+	
+	/**
+	 * Devuelve todas las bolsas del sistema.
+	 * @return bolsas
+	 * @throws SQLException en caso de error en la BD
+	 * @throws UVException si bolsa no es existe
+	 */
+	public List<Bolsa> getBolsas() throws SQLException, UVException {
+		List<Bolsa> bolsas = new ArrayList<>();
+		String consulta = "SELECT bepbol.* "
+				  + "FROM TBEP_BOLSAS bepbol";
+		try (Connection conexion = ConexionUvirtual.obtenerInstancia();
+			PreparedStatement stmt = conexion.prepareStatement(consulta);) {
+				try (ResultSet rs = stmt.executeQuery()) {
+					while (rs.next()) {
+						try {
+							bolsas.add(this.createFromResultSet(rs));		
+						} catch (Exception e) {
+							e.printStackTrace();
+						}
+					}
+				}
+			}
+		return bolsas;
+	}
+	
+	
 	
 	/**
 	 * Devuelve una bolsa por su id.

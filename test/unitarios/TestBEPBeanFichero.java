@@ -52,6 +52,7 @@ public class TestBEPBeanFichero {
     	fichero.setNombre(CADENA);
     	fichero.setTitulo(CADENA);
     	fichero.setArchivo(ARCHIVO);
+    	fichero.setPublico(BOOLEANO);
 		assertEquals(id, fichero.getCodNum());
 		assertEquals(CADENA, fichero.getNombre());
 		assertEquals(CADENA, fichero.getTitulo());

@@ -14,6 +14,7 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 import bbdd.BbddRunner;
 import bbdd.UtilsTestBolsaEmpleo;
+import es.ujaen.uvirtual.beans.uvirtual.bolsaempleo.Convocatoria;
 import es.ujaen.uvirtual.beans.uvirtual.bolsaempleo.Fichero;
 import es.ujaen.uvirtual.modelo.bolsaempleo.ModeloFichero;
 import es.ujaen.uvirtual.modelo.conexion.Conexion;
@@ -23,6 +24,7 @@ import es.ujaen.uvirtual.utilidades.UVException;
 /** Clase para probar el modelo fichero. */
 public class TestBEPModeloFichero {
 	
+    private static final Integer CODNUM = 5;
     private static final String NOMBRE_FICHERO = "nombre fichero";
     private static final String TITULO_FICHERO = "titulo fichero";
     private static final Boolean PUBLICO_FICHERO = true;
@@ -47,6 +49,7 @@ public class TestBEPModeloFichero {
     @Test
     public void testA01InsertaFichero() throws SQLException, UVException {
     	Fichero fichero = new Fichero();
+    	fichero.setCodNum(CODNUM);
     	fichero.setNombre(NOMBRE_FICHERO);
     	fichero.setTitulo(TITULO_FICHERO);
     	fichero.setArchivo(ARCHIVO_FICHERO);
@@ -54,7 +57,16 @@ public class TestBEPModeloFichero {
     	ModeloFichero modelo = ModeloFichero.obtenerInstancia();
     	modelo.insertaFichero(fichero);
     	List<Fichero> ficheros = modelo.listaFicheros();
-    	assertTrue("fichero insertado debe ser listado", ficheros.contains(fichero));
+    	
+    	Boolean eje = false;
+    	
+        for (Fichero fich : ficheros) {
+            if (fich.getCodNum() == fichero.getCodNum()) {
+            	eje = true;
+            }
+        }
+    	
+    	assertTrue("fichero insertado debe ser listado", eje);
     }
     
     /** test acierto borrar fichero.

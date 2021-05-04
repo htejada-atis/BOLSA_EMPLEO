@@ -147,10 +147,7 @@ public class TestBEPModeloNoticia {
      */
     @Test(expected = UVException.class)
     public void testE04InsertaNoticiaSinFecha() throws SQLException, UVException {
-    	Noticia noticia = new Noticia();
-    	noticia.setEnlace(ENLACE_NOTICIA);
-    	noticia.setTexto(TEXTO_NOTICIA);
-    	noticia.setPublica(PUBLICA_NOTICIA);
+    	Noticia noticia = null;
     	ModeloNoticia modelo = ModeloNoticia.obtenerInstancia();
     	modelo.insertaNoticia(noticia);
     	fail();

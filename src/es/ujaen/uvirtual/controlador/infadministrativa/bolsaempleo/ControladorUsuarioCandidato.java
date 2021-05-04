@@ -27,13 +27,12 @@ import es.ujaen.uvirtual.beans.UVDatos;
 import es.ujaen.uvirtual.beans.Usuario;
 import es.ujaen.uvirtual.beans.uvirtual.bolsaempleo.Area;
 import es.ujaen.uvirtual.beans.uvirtual.bolsaempleo.Bolsa;
-import es.ujaen.uvirtual.beans.uvirtual.bolsaempleo.ItemBaremacion;
+import es.ujaen.uvirtual.beans.uvirtual.bolsaempleo.Solicitud;
 import es.ujaen.uvirtual.beans.uvirtual.bolsaempleo.UsuarioBolsaEmpleo;
-import es.ujaen.uvirtual.beans.vistas.uvirtual.bolsaempleo.VistaItemsBaremacion;
 import es.ujaen.uvirtual.beans.vistas.uvirtual.bolsaempleo.VistaUsuarioBolsaEmpleo;
 import es.ujaen.uvirtual.modelo.bolsaempleo.ModeloArea;
-import es.ujaen.uvirtual.modelo.bolsaempleo.ModeloBaremacion;
 import es.ujaen.uvirtual.modelo.bolsaempleo.ModeloRol;
+import es.ujaen.uvirtual.modelo.bolsaempleo.ModeloSolicitud;
 import es.ujaen.uvirtual.modelo.bolsaempleo.ModeloUsuarioBolsaEmpleo;
 import es.ujaen.uvirtual.utilidades.BolsaEmpleoDataTable;
 import es.ujaen.uvirtual.utilidades.BolsaEmpleoValidator;
@@ -102,7 +101,8 @@ public class ControladorUsuarioCandidato extends HttpServlet {
 	public static final String ACCION_APARTADO_AREA = "apartadoarea";
 	public static final String ACCION_APARTADO_SOLICITUDES = "apartadosolicitudes";
 	public static final String ACCION_APARTADO_COMUNICACIONES = "apartadocomunicaciones";
-
+	
+	public static final String ACCION_DATATABLE_SOLICITUDES = "datatablesolicitudes";
 	
 	// mensajes
 	public static final String MENSAJE_ENVIADO = "mensaje";
@@ -187,6 +187,9 @@ public class ControladorUsuarioCandidato extends HttpServlet {
 				break;
 			case ACCION_SELECCION_APARTADO:
 				seleccionarOpcion(bean, request, response);
+				break;
+			case ACCION_DATATABLE_SOLICITUDES:
+				listadoSolicitudes(bean, datos, request, response);
 				break;
 			}
 		} catch (SQLException e) {
@@ -690,6 +693,7 @@ public class ControladorUsuarioCandidato extends HttpServlet {
 		Usuario usuArcos = CrearUsuario.usuario(usu.getCodCuenta());
 		
 		bean.setUsuarioArcos(usuArcos);
+		bean.setBusqueda(false);
 		
 		switch (nombreAccionUsuario) {
 		case ACCION_APARTADO_AREA:
@@ -705,5 +709,45 @@ public class ControladorUsuarioCandidato extends HttpServlet {
 		
 		bean.setUsuario(usu);
 		bean.setVista("/WEB-INF/jsp/vista/infadministrativa/bolsaempleo/configuracion/formCandidatos.jsp");
+	}
+	
+	/**
+	 * Lista de solicitudes .
+	 * @param bean .
+	 * @param datos .
+	 * @param request .
+	 * @param response .
+	 * @throws UVException .
+	 * @throws IOException .
+	 * @throws SQLException .
+	 */
+	private void listadoSolicitudes(VistaUsuarioBolsaEmpleo bean, UVDatos datos,
+			HttpServletRequest request, HttpServletResponse response) throws IOException, SQLException, UVException {
+		ModeloSolicitud modelo = ModeloSolicitud.obtenerInstancia(); 
+		ModeloUsuarioBolsaEmpleo modeloUsuario = ModeloUsuarioBolsaEmpleo.obtenerInstancia();
+		Integer codNum = Formateador.leeParametroInteger(request.getParameter(PARAM_ID));
+		
+		UsuarioBolsaEmpleo usuario = modeloUsuario.getUsuarioById(codNum);
+		
+		datos.setContentType("application/json");
+		datos.setRespuestaEnviada(true);
+		response.setContentType("application/json");
+		response.setCharacterEncoding("UTF-8");
+		
+		try (PrintWriter writer = response.getWriter()) {
+			try {
+				BolsaEmpleoDataTable<Solicitud> dataTable = modelo.listaSolicitudesDatatable(usuario, request.getParameterMap());
+				
+				Gson gson = new GsonBuilder().setDateFormat("dd/M/yyyy").
+						setExclusionStrategies(BolsaEmpleoDataTable.GSONEXCLUSIONSTRATEGY).create();				
+				writer.write(gson.toJson(dataTable));
+			} catch (Exception ex) {
+				bean.getMensajesDeError().add(ex.getMessage());
+				
+				CodigoDescripcion mensaje = new CodigoDescripcion("error", ex.getMessage());
+				writer.write(new Gson().toJson(mensaje));
+				response.setStatus(RESPONSE_HTTP_CODE_ERROR);
+			}
+		}
 	}
 }

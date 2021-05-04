@@ -238,6 +238,9 @@ public class ModeloNoticia {
 		if (noticia.getTexto() == null || noticia.getTexto().equals("")) {
 			throw new UVException("No se puede insertar una noticia sin texto");
 		}
+		if (noticia.getEnlace() == null) {
+			throw new UVException("No se puede insertar una noticia sin enlace");
+		}
 		
 		String consulta = "INSERT INTO tbep_noticias " 
 				+ " (ENLACE,TEXTO,FECHA,FLGPUBLICA) ";

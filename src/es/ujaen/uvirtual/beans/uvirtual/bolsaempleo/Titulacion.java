@@ -17,6 +17,7 @@ public class Titulacion implements Serializable {
 	private InputStream archivo;
 	private Titulacion titulacion;
 	private UsuarioBolsaEmpleo usuario;
+	private Boolean borrado;
 
 	
 	/** Constructor por defecto.
@@ -109,6 +110,14 @@ public class Titulacion implements Serializable {
 	
 	public void setUsuario(UsuarioBolsaEmpleo usuario) {
 		this.usuario = usuario;
+	}
+	
+	public Boolean getBorrado() {
+		return borrado;
+	}
+	
+	public void setBorrado(Boolean borrado) {
+		this.borrado = borrado;
 	}
 	
 	@Override

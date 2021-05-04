@@ -123,7 +123,36 @@ public class ModeloAfinidad {
 	}
 	
 	
-	
+	/** Consulta afinidades en BBDD y las devuelve.
+	 * @return todas las afinidades de la base de datos
+	 * @throws SQLException en caso de error de base de datos
+	 */
+	public List<Afinidad> listaAfinidades() throws SQLException {
+		List<Afinidad> afinidades = new ArrayList<>();
+		String consulta = "SELECT * FROM TBEP_AFINIDADES bepafi "
+				+ "WHERE bepafi.FLGBORRADO != 'S'";
+		
+		try (Connection conexion = ConexionUvirtual.obtenerInstancia();
+			PreparedStatement stmt = conexion.prepareStatement(consulta);) {
+				try (ResultSet rs = stmt.executeQuery()) {
+					while (rs.next()) {
+						try {
+							Afinidad afinidad = new Afinidad();
+							afinidad.setCodNum(rs.getInt("CODNUM"));
+							afinidad.setCodigo(rs.getString("CODIGO"));
+							afinidad.setDescripcion(rs.getString("DESCRIPCION"));
+							afinidad.setModulacion(rs.getFloat("MODULACION"));
+							afinidades.add(afinidad);	
+						} catch (Exception e) {
+							e.printStackTrace();
+						}
+						
+					}
+				}
+			}
+		
+		return afinidades;
+	}
 	
 	
 	
@@ -131,7 +160,7 @@ public class ModeloAfinidad {
 	 * @return todas las afinidades de la base de datos
 	 * @throws SQLException en caso de error de base de datos
 	 */
-	public List<Afinidad> listaAfinidades() throws SQLException {
+	public List<Afinidad> listaAfinidadesSelect() throws SQLException {
 		List<Afinidad> afinidades = new ArrayList<>();
 		String consulta = "SELECT bepafi.CODIGO, bepafi.DESCRIPCION FROM TBEP_AFINIDADES bepafi "
 				+ "WHERE bepafi.FLGBORRADO != 'S' GROUP BY CODIGO, DESCRIPCION";

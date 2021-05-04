@@ -2,8 +2,11 @@
 <%@ page import="es.ujaen.uvirtual.beans.UVDatos"%>
 <%@ page import="es.ujaen.uvirtual.beans.Rol"%>
 <%@	page import="es.ujaen.uvirtual.controlador.infadministrativa.bolsaempleo.ControladorUsuarioBolsaEmpleo"%>
+<%@	page import="es.ujaen.uvirtual.controlador.infadministrativa.bolsaempleo.ControladorUsuarioCandidato"%>
 <%@	page import="es.ujaen.uvirtual.controlador.infadministrativa.bolsaempleo.ControladorAreasABaremar"%>
 <%@ page import="es.ujaen.uvirtual.beans.vistas.uvirtual.bolsaempleo.VistaUsuarioBolsaEmpleo"%>
+<%@ page import="es.ujaen.uvirtual.modelo.bolsaempleo.ModeloConvocatoria" %>
+<%@ page import="es.ujaen.uvirtual.modelo.bolsaempleo.ModeloSolicitud" %>
 <%@ page import="es.ujaen.uvirtual.utilidades.EscapaHTML" %>
 <%@ page import="es.ujaen.uvirtual.utilidades.Formateador"%>
 
@@ -128,13 +131,13 @@ VistaUsuarioBolsaEmpleo bean = (VistaUsuarioBolsaEmpleo) uvdatos.getVistas().get
 
 		<div class="form-group-container col3" style="margin-top:1rem;">
     	    <div class="form-group">
-    			<a class="link-btn" id="areas_excluidas" href="<%= request.getRequestURI() %>" style="margin-top:0">Áreas excluidas</a>
+    			<a class="link-btn" id="areas_excluidas" href="#" style="margin-top:0">Áreas excluidas</a>
     		</div>
     		<div class="form-group">
-				<a class="link-btn" id="solicitudes" href="<%= request.getRequestURI() %>" style="margin-top:0">Solicitudes</a>
+				<a class="link-btn" id="solicitudes" href="#" style="margin-top:0">Solicitudes</a>
     		</div>
     		<div class="form-group">
-				<a class="link-btn" id="comunicaciones" href="<%= request.getRequestURI() %>" style="margin-top:0">Comunicaciones</a>
+				<a class="link-btn" id="comunicaciones" href="#" style="margin-top:0">Comunicaciones</a>
     		</div>
     	</div>
     </form>
@@ -148,7 +151,6 @@ VistaUsuarioBolsaEmpleo bean = (VistaUsuarioBolsaEmpleo) uvdatos.getVistas().get
 				<th scope="col" style="width:20%" title="Id de la area">Id</th>
 				<th scope="col" style="width:25%" title="Código de area">Código</th>
 				<th scope="col" style="width:65%">Area</th>
-				<th scope="col" class="center" style="width:15%">Baremable</th>	
 			</tr>
 			<tbody>				
 			</tbody>
@@ -167,7 +169,6 @@ VistaUsuarioBolsaEmpleo bean = (VistaUsuarioBolsaEmpleo) uvdatos.getVistas().get
 				<th scope="col" style="width:20%" title="Id de la area">Id</th>
 				<th scope="col" style="width:25%" title="Código de area">Código</th>
 				<th scope="col" style="width:65%">Area</th>
-				<th scope="col" class="center" style="width:15%">Baremable</th>	
 			</tr>
 			<tbody>				
 			</tbody>
@@ -178,81 +179,79 @@ VistaUsuarioBolsaEmpleo bean = (VistaUsuarioBolsaEmpleo) uvdatos.getVistas().get
 			</tfoot>
 		</table>		
 	<%}%>   
+	
+	<% if(bean.getApartadoComunicaciones()!=null){ %>
+	
+		
+	<%}%>  
+	
+	
+	<% if(bean.getApartadoSolicitudes()!=null){ %>
+		<table class="bluetable bolsaempleo" id="table_solicitudes">
+			<tr>
+				<th scope="col"	style="width:50%">Descripción</th>
+				<th scope="col"	style="width:20%">Fecha cierre</th>
+				<th scope="col"	style="width:30%">Estado convocatoria</th>				
+			</tr>
+			<tbody>				
+			</tbody>
+			<tfoot>
+				<tr>
+					<th colSpan="10" style="width:100%"></th>
+				</tr>
+			</tfoot>
+		</table>	
+	<%}%>  
 
 </div>
 
 <script>
 
-
-function apartadoCandidato(event, submit_input, opcion) {
-	event.preventDefault();
-	
-	input_accion = document.getElementById("accion_formulario");
-	input_accion.value = '<%= ControladorUsuarioBolsaEmpleo.ACCION_EXCLUIR_USUARIO %>';
-	input_accion_usuario = document.getElementById("accion_formulario_usuario");
-	input_accion_usuario.value = opcion;
-	input_id = document.getElementById("usuario_id");
-	input_id.value = '<%= bean.getUsuario().getCodNum() %>';
-	input_nombre_usuario = document.getElementById("usuario_nombre");
-	input_nombre_usuario.value = '<%= bean.getUsuario().getCodCuenta()%>';
-
-	submit_input.form.submit();
-}
-	function enviarUsuario(event, submit_input) {
-		event.preventDefault();
-	
-		<% if(bean.getUsuario() != null) { 
-			
-			if(bean.getBusqueda()) {%>
-				input_accion = document.getElementById("accion_formulario");
-				input_accion.value = '<%= ControladorUsuarioBolsaEmpleo.ACCION_VOLVER_USUARIO %>';
-			<%}else{%>
-				input_accion = document.getElementById("accion_formulario");
-				input_accion.value = '<%= ControladorUsuarioBolsaEmpleo.ACCION_EDITAR_USUARIO %>';
-				input_id = document.getElementById("usuario_id");
-				input_id.value = '<%= bean.getUsuario().getCodNum() %>';
-				input_nombre_usuario = document.getElementById("usuario_nombre");
-				input_nombre_usuario.value = '<%= bean.getUsuario().getCodCuenta()%>';
-			<%}%>
-			
-		<% } else { %>
-			input_id = document.getElementById("usuario_id");
-			input_id.value = '<%= bean.getUsuarioArcos().getUid() %>';
-			input_accion = document.getElementById("accion_formulario");
-			input_accion.value = '<%= ControladorUsuarioBolsaEmpleo.ACCION_AGREGAR_USUARIO %>';
-		<% } %>
-	
-		input_lista_dist = document.getElementById("usuario_lista_dist");
-		input_lista_dist.value = input_lista_dist.checked;
-	
-		input_excluido = document.getElementById("usuario_excluido");
-		input_excluido.value = input_excluido.checked;
-	
-		submit_input.form.submit();
-	}
-
 	$(document).ready(function() {
 		
+		<% if(bean.getApartadoSolicitudes()!=null){ %>
+		var table = new Atis.DataTable('#table_solicitudes', {
+		    "ajax": { url: "/srv/es/ajax/informacionadministrativa/bolsaempleo/configuracion/candidatos" },
+		    "params": {"<%=ControladorUsuarioCandidato.PARAM_ID%>": <%= bean.getUsuario().getCodNum() %>},
+		    "pageSize": 10,
+		    "title": "Solicitudes",
+		    "filterable": true,
+		    "action": "<%= ControladorUsuarioCandidato.ACCION_DATATABLE_SOLICITUDES %>",
+		    "columns": [
+		    	{'data': 'convocatoria.descripcion', order: {'active': false}},
+		        {'data': 'convocatoria.fechaCierre', order: {'active': false}},
+		        {'data': 'convocatoria.estado', order: {'active': false}}
+		    ]
+		});	
+		<%}%> 
+
 		if(document.getElementById("areas_excluidas")!=undefined){
 			document.getElementById("areas_excluidas").addEventListener("click", function(event) {
-				event.preventDefault();
-				Atis.sendForm("<%= request.getRequestURI() %>", {'a': '<%= ControladorUsuarioBolsaEmpleo.ACCION_BUSCAR_USUARIO %>',
-					'nombre': document.getElementById("usuario_nombre").value});
-				
-				
-				apartadoCandidato(event, this, "apartadoarea");
+				Atis.sendForm("<%= request.getRequestURI() %>", {
+					'<%=ControladorUsuarioCandidato.PARAM_ACCION%>': '<%=ControladorUsuarioCandidato.ACCION_SELECCION_APARTADO%>', 
+					'<%=ControladorUsuarioCandidato.PARAM_ACCION_USUARIO%>': '<%=ControladorUsuarioCandidato.ACCION_APARTADO_AREA%>',
+					'<%=ControladorUsuarioCandidato.PARAM_ID%>': <%= bean.getUsuario().getCodNum() %>
+				});
 			});
 		}
 		
 		if(document.getElementById("solicitudes")!=undefined){
 			document.getElementById("solicitudes").addEventListener("click", function(event) {
-				apartadoCandidato(event, this, "apartadosolicitudes");
+				Atis.sendForm("<%= request.getRequestURI() %>", {
+					'<%=ControladorUsuarioCandidato.PARAM_ACCION%>': '<%=ControladorUsuarioCandidato.ACCION_SELECCION_APARTADO%>', 
+					'<%=ControladorUsuarioCandidato.PARAM_ACCION_USUARIO%>': '<%=ControladorUsuarioCandidato.ACCION_APARTADO_SOLICITUDES%>',
+					'<%=ControladorUsuarioCandidato.PARAM_ID%>': <%= bean.getUsuario().getCodNum() %>
+				});
 			});
 		}
 		
 		if(document.getElementById("comunicaciones")!=undefined){
 			document.getElementById("comunicaciones").addEventListener("click", function(event) {
-				apartadoCandidato(event, this, "apartadocomunicaciones");
+				Atis.sendForm("<%= request.getRequestURI() %>", {
+					'<%=ControladorUsuarioCandidato.PARAM_ACCION%>': '<%=ControladorUsuarioCandidato.ACCION_SELECCION_APARTADO%>', 
+					'<%=ControladorUsuarioCandidato.PARAM_ACCION_USUARIO%>': '<%=ControladorUsuarioCandidato.ACCION_APARTADO_COMUNICACIONES%>',
+					'<%=ControladorUsuarioCandidato.PARAM_ID%>': <%= bean.getUsuario().getCodNum() %>
+				});
 			});
 		}
 		
@@ -292,15 +291,7 @@ function apartadoCandidato(event, submit_input, opcion) {
 		    	{'data': 'area.codNum', 'selectable': true},
 		        {'data': 'area.codNum', 'filter': {'type': 'number'}},
 		        {'data': 'area.idAreaExterno' , 'filter': true, 'class': 'overflow-auto'},
-		        {'data': 'area.descripcion', 'filter': true, 'class': 'overflow-auto'},
-		        {'data': 'baremable', 'filter': {'type': 'selectBoolean', 'true': 'Baremable', 'false': 'No Baremable'} , 'order': {'active': false}, 'render': function(row) {
-	        		if(row.baremable){
-	        			return "<div title='Baremable' class='circle-true'></div>"; 
-	        		}
-	        		else{
-	        			return "<div title='No Baremable' class='circle-false'></div>"; 
-	        		}
-	        	}},
+		        {'data': 'area.descripcion', 'filter': true, 'class': 'overflow-auto'}
 		    ],
 		    "actions": [
 		    	{'label': 'Excluir Areas', 'onClick': function(selected) { enviaAccion("<%=ControladorUsuarioBolsaEmpleo.ACCION_EXCLUIR_USUARIO_AREA%>", selected); } }
@@ -318,15 +309,7 @@ function apartadoCandidato(event, submit_input, opcion) {
 		    	{'data': 'area.codNum', 'selectable': true},
 		        {'data': 'area.codNum', 'filter': {'type': 'number'}},
 		        {'data': 'area.idAreaExterno', 'filter': true, 'class': 'overflow-auto'},
-		        {'data': 'area.descripcion', 'filter': true, 'class': 'overflow-auto'},
-		        {'data': 'baremable', 'filter': {'type': 'selectBoolean', 'true': 'Baremable', 'false': 'No Baremable'} , 'order': {'active': false},'render': function(row) {
-	        		if(row.baremable){
-	        			return "<div title='Baremable' class='circle-true'></div>";
-	        		}
-	        		else{
-	        			return "<div title='No Baremable' class='circle-false'></div>";
-	        		}
-	        	}},
+		        {'data': 'area.descripcion', 'filter': true, 'class': 'overflow-auto'}
 		    ],
 		    "actions": [
 		    	{'label': 'Borrar Areas excluidas', 'onClick': function(selected) { enviaAccion("<%= ControladorUsuarioBolsaEmpleo.ACCION_INCLUIR_USUARIO_AREA %>", selected); } }
@@ -360,6 +343,40 @@ function apartadoCandidato(event, submit_input, opcion) {
 		}
 		
 		<%}%>
+		
+		function enviarUsuario(event, submit_input) {
+			event.preventDefault();
+		
+			<% if(bean.getUsuario() != null) { 
+				
+				if(bean.getBusqueda()) {%>
+					input_accion = document.getElementById("accion_formulario");
+					input_accion.value = '<%= ControladorUsuarioBolsaEmpleo.ACCION_VOLVER_USUARIO %>';
+				<%}else{%>
+					input_accion = document.getElementById("accion_formulario");
+					input_accion.value = '<%= ControladorUsuarioBolsaEmpleo.ACCION_EDITAR_USUARIO %>';
+					input_id = document.getElementById("usuario_id");
+					input_id.value = '<%= bean.getUsuario().getCodNum() %>';
+					input_nombre_usuario = document.getElementById("usuario_nombre");
+					input_nombre_usuario.value = '<%= bean.getUsuario().getCodCuenta()%>';
+				<%}%>
+				
+			<% } else { %>
+				input_id = document.getElementById("usuario_id");
+				input_id.value = '<%= bean.getUsuarioArcos().getUid() %>';
+				input_accion = document.getElementById("accion_formulario");
+				input_accion.value = '<%= ControladorUsuarioBolsaEmpleo.ACCION_AGREGAR_USUARIO %>';
+			<% } %>
+		
+			input_lista_dist = document.getElementById("usuario_lista_dist");
+			input_lista_dist.value = input_lista_dist.checked;
+		
+			input_excluido = document.getElementById("usuario_excluido");
+			input_excluido.value = input_excluido.checked;
+		
+			submit_input.form.submit();
+		}
+
 	});
 	
 	
