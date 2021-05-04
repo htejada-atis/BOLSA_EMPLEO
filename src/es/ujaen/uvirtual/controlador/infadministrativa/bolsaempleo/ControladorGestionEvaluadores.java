@@ -188,12 +188,14 @@ public class ControladorGestionEvaluadores extends HttpServlet {
 	 */
 	private void eliminarEvaluador(VistaEvaluadores bean, HttpServletRequest request, HttpServletResponse response) throws SQLException, UVException, IOException {
 		ModeloEvaluador modelo = ModeloEvaluador.obtenerInstancia();
-		Integer codNum = Formateador.leeParametroInteger(request.getParameter(PARAM_USUARIO));
+		Integer codNumUsuario = Formateador.leeParametroInteger(request.getParameter(PARAM_USUARIO));
 		Integer codNumArea = Formateador.leeParametroInteger(request.getParameter(PARAM_AREA));
 		Boolean activo = request.getParameter(PARAM_ACTIVO) != null && EscapaHTML.ajustaCodificacion(request.getParameter(PARAM_ACTIVO)).equals("true");
 		Evaluador evaluador = new Evaluador(codNumArea, activo);
-		evaluador.setCodNum(codNum);
+		evaluador.setCodNum(codNumUsuario);
+		bean.setEvaluador(evaluador);
 		modelo.borraRestauraEvaluador(evaluador);
+		bean.setVista(RUTA_BEP_CONF + "evaluadoresListar.jsp");
 		bean.getMensajesDeExito().add(activo ? MENSAJE_EXITO_RESTAURAR : MENSAJE_EXITO_BORRAR);
 		HttpSession session = request.getSession(false);
 		session.setAttribute(MENSAJE_ENVIADO, activo ? MENSAJE_EXITO_RESTAURAR : MENSAJE_EXITO_BORRAR);
@@ -240,21 +242,24 @@ public class ControladorGestionEvaluadores extends HttpServlet {
 	 */
 	private void listadoEvaluadores(VistaEvaluadores bean, UVDatos datos, HttpServletRequest request, HttpServletResponse response)
 			throws IOException, SQLException {
-		ModeloEvaluador modelo = ModeloEvaluador.obtenerInstancia();
+		ModeloEvaluador modeloEvaluador = ModeloEvaluador.obtenerInstancia();
+		ModeloArea modeloArea = ModeloArea.obtenerInstancia();
 		datos.setContentType("application/json");
 		response.setContentType("application/json");
 		response.setCharacterEncoding("UTF-8");
 		
 		try (PrintWriter writer = response.getWriter()) {
 			try {
-				Integer area = Formateador.leeParametroInteger(request.getParameter(PARAM_AREA));
-				BolsaEmpleoDataTable<Evaluador> dataTable = modelo.listaEvaluadoresDatatable(request.getParameterMap(), area);
+				Integer idArea = Formateador.leeParametroInteger(request.getParameter(PARAM_AREA));
+				Area area = modeloArea.getAreaById(idArea);
+				bean.setArea(area);
+				BolsaEmpleoDataTable<Evaluador> dataTable = modeloEvaluador.listaEvaluadoresDatatable(request.getParameterMap(), area.getCodNum());
 				bean.setDatatableUsuarios(dataTable);
 				Gson gson = new GsonBuilder().setExclusionStrategies(BolsaEmpleoDataTable.GSONEXCLUSIONSTRATEGY).create();
 				writer.write(gson.toJson(dataTable));
-			} catch (UVException ex) {
+			} catch (Exception ex) {
+				bean.getMensajesDeError().add(ex.getMessage());
 				CodigoDescripcion mensaje = new CodigoDescripcion("error", ex.getMessage());
-				bean.getMensajesDeError().add(mensaje.toString());
 				writer.write(new Gson().toJson(mensaje));
 				response.setStatus(RESPONSE_HTTP_CODE_ERROR);
 			}
@@ -274,20 +279,23 @@ public class ControladorGestionEvaluadores extends HttpServlet {
 	private void listadoUsuarios(VistaEvaluadores bean, UVDatos datos, HttpServletRequest request, HttpServletResponse response)
 			throws IOException, SQLException {
 		ModeloEvaluador modelo = ModeloEvaluador.obtenerInstancia();
+		ModeloArea modeloArea = ModeloArea.obtenerInstancia();
 		datos.setContentType("application/json");
 		response.setContentType("application/json");
 		response.setCharacterEncoding("UTF-8");
 		
 		try (PrintWriter writer = response.getWriter()) {
 			try {
-				Integer area = Formateador.leeParametroInteger(request.getParameter(PARAM_AREA));
-				BolsaEmpleoDataTable<Evaluador> dataTable = modelo.listaUsuariosRestantesDatatable(request.getParameterMap(), area);
+				Integer idArea = Formateador.leeParametroInteger(request.getParameter(PARAM_AREA));
+				Area area = modeloArea.getAreaById(idArea);
+				bean.setArea(area);
+				BolsaEmpleoDataTable<Evaluador> dataTable = modelo.listaUsuariosRestantesDatatable(request.getParameterMap(), area.getCodNum());
 				bean.setDatatableUsuarios(dataTable);
 				Gson gson = new GsonBuilder().setExclusionStrategies(BolsaEmpleoDataTable.GSONEXCLUSIONSTRATEGY).create();
 				writer.write(gson.toJson(dataTable));
-			} catch (UVException ex) {
+			} catch (Exception ex) {
+				bean.getMensajesDeError().add(ex.getMessage());
 				CodigoDescripcion mensaje = new CodigoDescripcion("error", ex.getMessage());
-				bean.getMensajesDeError().add(mensaje.toString());
 				writer.write(new Gson().toJson(mensaje));
 				response.setStatus(RESPONSE_HTTP_CODE_ERROR);
 			}

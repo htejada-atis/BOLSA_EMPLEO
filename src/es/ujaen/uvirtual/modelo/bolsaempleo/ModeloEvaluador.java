@@ -79,7 +79,7 @@ public class ModeloEvaluador {
 		dataTable.setColumn(ORDER_COLUMN_INDEX_ACTIVO_EVALUADORES, "bepeva.FLGACTIVO", DataTableColumn.COLUMN_TYPE_BOOLEAN);
 		
 		dataTable.setQuery(consulta);
-				
+		
 		try (Connection conexion = ConexionUvirtual.obtenerInstancia();
 				PreparedStatement stmtCount = conexion.prepareStatement(dataTable.getQueryCount());
 				PreparedStatement stmt = conexion.prepareStatement(dataTable.getQuery());
@@ -103,7 +103,7 @@ public class ModeloEvaluador {
 					Evaluador evaluador = new Evaluador(usuario, codNumArea, activo);
 					usuarios.add(evaluador);
 				}				
-			}	
+			}
 			
 			dataTable.setRecordsTotalFromQuery(stmtCount);
 			dataTable.setData(usuarios);
