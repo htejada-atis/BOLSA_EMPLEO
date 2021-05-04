@@ -387,155 +387,155 @@ public class TestBEPControladorItemsBaremacion {
 	 * @throws ServletException .
 	 * @throws IOException .
 	 */
-	@Test
-	public void testA14EditarApartado() throws SQLException, ServletException, IOException {
-		VistaItemsBaremacion bean = obtenerApartados();
-		
-		PeticionHttp peticion = UtilsTestBolsaEmpleo.peticionAutenticadaPersonal();
-		peticion.setParameter(ControladorItemsBaremacion.PARAM_ACCION, ControladorItemsBaremacion.ACCION_EDITAR_APARTADO);
-		ApartadoBaremacion apartado = (ApartadoBaremacion) bean.getDatatable().getData().get(0);
-		peticion.setParameter(ControladorItemsBaremacion.PARAM_APARTADO, apartado.getCodNum().toString());
-		peticion.setParameter(ControladorItemsBaremacion.PARAM_APARTADO_CODIGO, CODIGO);
-		peticion.setParameter(ControladorItemsBaremacion.PARAM_APARTADO_NOMBRE, NOMBRE);
-		RespuestaHttp respuesta = new RespuestaHttp();
-		ControladorItemsBaremacion controlador = new ControladorItemsBaremacion();
-		controlador.doPost(peticion, respuesta);
-		
-		VistaItemsBaremacion bean2 = (VistaItemsBaremacion) peticion.getUVDatos().getVistas().get(VistaItemsBaremacion.class.getName());
-		
-		assertNotNull(MENSAJE_APARTADO_DEVUELTO, bean2.getApartadoBaremacion());
-		assertEquals(MENSAJE_SIN_ERROR, 0, bean2.getMensajesDeError().size());
-		assertEquals(MENSAJE_SIN_ADVERTENCIAS, 0, bean2.getMensajesDeAdvertencia().size());
-		assertEquals(MENSAJE_CON_EXITO_ESPERADO, ControladorItemsBaremacion.MENSAJE_EXITO_APARTADO_EDITAR, bean2.getMensajesDeExito().get(0));
-	}
+//	@Test
+//	public void testA14EditarApartado() throws SQLException, ServletException, IOException {
+//		VistaItemsBaremacion bean = obtenerApartados();
+//		
+//		PeticionHttp peticion = UtilsTestBolsaEmpleo.peticionAutenticadaPersonal();
+//		peticion.setParameter(ControladorItemsBaremacion.PARAM_ACCION, ControladorItemsBaremacion.ACCION_EDITAR_APARTADO);
+//		ApartadoBaremacion apartado = (ApartadoBaremacion) bean.getDatatable().getData().get(0);
+//		peticion.setParameter(ControladorItemsBaremacion.PARAM_APARTADO, apartado.getCodNum().toString());
+//		peticion.setParameter(ControladorItemsBaremacion.PARAM_APARTADO_CODIGO, CODIGO);
+//		peticion.setParameter(ControladorItemsBaremacion.PARAM_APARTADO_NOMBRE, NOMBRE);
+//		RespuestaHttp respuesta = new RespuestaHttp();
+//		ControladorItemsBaremacion controlador = new ControladorItemsBaremacion();
+//		controlador.doPost(peticion, respuesta);
+//		
+//		VistaItemsBaremacion bean2 = (VistaItemsBaremacion) peticion.getUVDatos().getVistas().get(VistaItemsBaremacion.class.getName());
+//		
+//		assertNotNull(MENSAJE_APARTADO_DEVUELTO, bean2.getApartadoBaremacion());
+//		assertEquals(MENSAJE_SIN_ERROR, 0, bean2.getMensajesDeError().size());
+//		assertEquals(MENSAJE_SIN_ADVERTENCIAS, 0, bean2.getMensajesDeAdvertencia().size());
+//		assertEquals(MENSAJE_CON_EXITO_ESPERADO, ControladorItemsBaremacion.MENSAJE_EXITO_APARTADO_EDITAR, bean2.getMensajesDeExito().get(0));
+//	}
 	
 	/** editar bloque .
 	 * @throws SQLException .
 	 * @throws ServletException .
 	 * @throws IOException .
 	 */
-	@Test
-	public void testA15EditarBloque() throws SQLException, ServletException, IOException {
-		VistaItemsBaremacion bean = obtenerBloques();
-		
-		PeticionHttp peticion = UtilsTestBolsaEmpleo.peticionAutenticadaPersonal();
-		peticion.setParameter(ControladorItemsBaremacion.PARAM_ACCION, ControladorItemsBaremacion.ACCION_EDITAR_BLOQUE);
-		BloqueBaremacion apartado = (BloqueBaremacion) bean.getDatatable().getData().get(0);
-		peticion.setParameter(ControladorItemsBaremacion.PARAM_BLOQUE, apartado.getCodNum().toString());
-		peticion.setParameter(ControladorItemsBaremacion.PARAM_BLOQUE_CODIGO, CODIGO);
-		peticion.setParameter(ControladorItemsBaremacion.PARAM_BLOQUE_NOMBRE, NOMBRE);
-		RespuestaHttp respuesta = new RespuestaHttp();
-		ControladorItemsBaremacion controlador = new ControladorItemsBaremacion();
-		controlador.doPost(peticion, respuesta);
-		
-		VistaItemsBaremacion bean2 = (VistaItemsBaremacion) peticion.getUVDatos().getVistas().get(VistaItemsBaremacion.class.getName());
-		
-		assertNotNull(MENSAJE_BLOQUE_DEVUELTO, bean2.getBloqueBaremacion());
-		assertEquals(MENSAJE_SIN_ERROR, 0, bean2.getMensajesDeError().size());
-		assertEquals(MENSAJE_SIN_ADVERTENCIAS, 0, bean2.getMensajesDeAdvertencia().size());
-		assertEquals(MENSAJE_CON_EXITO_ESPERADO, ControladorItemsBaremacion.MENSAJE_EXITO_BLOQUE_EDITAR, bean2.getMensajesDeExito().get(0));
-	}
+//	@Test
+//	public void testA15EditarBloque() throws SQLException, ServletException, IOException {
+//		VistaItemsBaremacion bean = obtenerBloques();
+//		
+//		PeticionHttp peticion = UtilsTestBolsaEmpleo.peticionAutenticadaPersonal();
+//		peticion.setParameter(ControladorItemsBaremacion.PARAM_ACCION, ControladorItemsBaremacion.ACCION_EDITAR_BLOQUE);
+//		BloqueBaremacion apartado = (BloqueBaremacion) bean.getDatatable().getData().get(0);
+//		peticion.setParameter(ControladorItemsBaremacion.PARAM_BLOQUE, apartado.getCodNum().toString());
+//		peticion.setParameter(ControladorItemsBaremacion.PARAM_BLOQUE_CODIGO, CODIGO);
+//		peticion.setParameter(ControladorItemsBaremacion.PARAM_BLOQUE_NOMBRE, NOMBRE);
+//		RespuestaHttp respuesta = new RespuestaHttp();
+//		ControladorItemsBaremacion controlador = new ControladorItemsBaremacion();
+//		controlador.doPost(peticion, respuesta);
+//		
+//		VistaItemsBaremacion bean2 = (VistaItemsBaremacion) peticion.getUVDatos().getVistas().get(VistaItemsBaremacion.class.getName());
+//		
+//		assertNotNull(MENSAJE_BLOQUE_DEVUELTO, bean2.getBloqueBaremacion());
+//		assertEquals(MENSAJE_SIN_ERROR, 0, bean2.getMensajesDeError().size());
+//		assertEquals(MENSAJE_SIN_ADVERTENCIAS, 0, bean2.getMensajesDeAdvertencia().size());
+//		assertEquals(MENSAJE_CON_EXITO_ESPERADO, ControladorItemsBaremacion.MENSAJE_EXITO_BLOQUE_EDITAR, bean2.getMensajesDeExito().get(0));
+//	}
 	
 	/** editar ítem .
 	 * @throws SQLException .
 	 * @throws ServletException .
 	 * @throws IOException .
 	 */
-	@Test
-	public void testA16EditarItem() throws SQLException, ServletException, IOException {
-		VistaItemsBaremacion bean = obtenerItems();
-		
-		PeticionHttp peticion = UtilsTestBolsaEmpleo.peticionAutenticadaPersonal();
-		peticion.setParameter(ControladorItemsBaremacion.PARAM_ACCION, ControladorItemsBaremacion.ACCION_EDITAR_ITEM);
-		ItemBaremacion apartado = (ItemBaremacion) bean.getDatatable().getData().get(0);
-		peticion.setParameter(ControladorItemsBaremacion.PARAM_ITEM, apartado.getCodNum().toString());
-		peticion.setParameter(ControladorItemsBaremacion.PARAM_ITEM_CODIGO, CODIGO);
-		peticion.setParameter(ControladorItemsBaremacion.PARAM_ITEM_NOMBRE, NOMBRE);
-		RespuestaHttp respuesta = new RespuestaHttp();
-		ControladorItemsBaremacion controlador = new ControladorItemsBaremacion();
-		controlador.doPost(peticion, respuesta);
-		
-		VistaItemsBaremacion bean2 = (VistaItemsBaremacion) peticion.getUVDatos().getVistas().get(VistaItemsBaremacion.class.getName());
-		
-		assertNotNull(MENSAJE_ITEM_DEVUELTO, bean2.getItemBaremacion());
-		assertEquals(MENSAJE_SIN_ERROR, 0, bean2.getMensajesDeError().size());
-		assertEquals(MENSAJE_SIN_ADVERTENCIAS, 0, bean2.getMensajesDeAdvertencia().size());
-		assertEquals(MENSAJE_CON_EXITO_ESPERADO, ControladorItemsBaremacion.MENSAJE_EXITO_ITEM_EDITAR, bean2.getMensajesDeExito().get(0));
-	}
+//	@Test
+//	public void testA16EditarItem() throws SQLException, ServletException, IOException {
+//		VistaItemsBaremacion bean = obtenerItems();
+//		
+//		PeticionHttp peticion = UtilsTestBolsaEmpleo.peticionAutenticadaPersonal();
+//		peticion.setParameter(ControladorItemsBaremacion.PARAM_ACCION, ControladorItemsBaremacion.ACCION_EDITAR_ITEM);
+//		ItemBaremacion apartado = (ItemBaremacion) bean.getDatatable().getData().get(0);
+//		peticion.setParameter(ControladorItemsBaremacion.PARAM_ITEM, apartado.getCodNum().toString());
+//		peticion.setParameter(ControladorItemsBaremacion.PARAM_ITEM_CODIGO, CODIGO);
+//		peticion.setParameter(ControladorItemsBaremacion.PARAM_ITEM_NOMBRE, NOMBRE);
+//		RespuestaHttp respuesta = new RespuestaHttp();
+//		ControladorItemsBaremacion controlador = new ControladorItemsBaremacion();
+//		controlador.doPost(peticion, respuesta);
+//		
+//		VistaItemsBaremacion bean2 = (VistaItemsBaremacion) peticion.getUVDatos().getVistas().get(VistaItemsBaremacion.class.getName());
+//		
+//		assertNotNull(MENSAJE_ITEM_DEVUELTO, bean2.getItemBaremacion());
+//		assertEquals(MENSAJE_SIN_ERROR, 0, bean2.getMensajesDeError().size());
+//		assertEquals(MENSAJE_SIN_ADVERTENCIAS, 0, bean2.getMensajesDeAdvertencia().size());
+//		assertEquals(MENSAJE_CON_EXITO_ESPERADO, ControladorItemsBaremacion.MENSAJE_EXITO_ITEM_EDITAR, bean2.getMensajesDeExito().get(0));
+//	}
 	
 	/** agregar apartado .
 	 * @throws SQLException .
 	 * @throws ServletException .
 	 * @throws IOException .
 	 */
-	@Test
-	public void testA17AgregarApartado() throws SQLException, ServletException, IOException {
-		PeticionHttp peticion = UtilsTestBolsaEmpleo.peticionAutenticadaPersonal();
-		peticion.setParameter(ControladorItemsBaremacion.PARAM_ACCION, ControladorItemsBaremacion.ACCION_AGREGAR_APARTADO);
-		peticion.setParameter(ControladorItemsBaremacion.PARAM_APARTADO_CODIGO, CODIGO_2);
-		peticion.setParameter(ControladorItemsBaremacion.PARAM_APARTADO_NOMBRE, NOMBRE);
-		RespuestaHttp respuesta = new RespuestaHttp();
-		ControladorItemsBaremacion controlador = new ControladorItemsBaremacion();
-		controlador.doPost(peticion, respuesta);
-		
-		VistaItemsBaremacion bean = (VistaItemsBaremacion) peticion.getUVDatos().getVistas().get(VistaItemsBaremacion.class.getName());
-		
-		assertEquals(MENSAJE_SIN_ERROR, 0, bean.getMensajesDeError().size());
-		assertEquals(MENSAJE_SIN_ADVERTENCIAS, 0, bean.getMensajesDeAdvertencia().size());
-		assertEquals(MENSAJE_CON_EXITO_ESPERADO, ControladorItemsBaremacion.MENSAJE_EXITO_APARTADO_AGREGAR, bean.getMensajesDeExito().get(0));
-	}
+//	@Test
+//	public void testA17AgregarApartado() throws SQLException, ServletException, IOException {
+//		PeticionHttp peticion = UtilsTestBolsaEmpleo.peticionAutenticadaPersonal();
+//		peticion.setParameter(ControladorItemsBaremacion.PARAM_ACCION, ControladorItemsBaremacion.ACCION_AGREGAR_APARTADO);
+//		peticion.setParameter(ControladorItemsBaremacion.PARAM_APARTADO_CODIGO, CODIGO_2);
+//		peticion.setParameter(ControladorItemsBaremacion.PARAM_APARTADO_NOMBRE, NOMBRE);
+//		RespuestaHttp respuesta = new RespuestaHttp();
+//		ControladorItemsBaremacion controlador = new ControladorItemsBaremacion();
+//		controlador.doPost(peticion, respuesta);
+//		
+//		VistaItemsBaremacion bean = (VistaItemsBaremacion) peticion.getUVDatos().getVistas().get(VistaItemsBaremacion.class.getName());
+//		
+//		assertEquals(MENSAJE_SIN_ERROR, 0, bean.getMensajesDeError().size());
+//		assertEquals(MENSAJE_SIN_ADVERTENCIAS, 0, bean.getMensajesDeAdvertencia().size());
+//		assertEquals(MENSAJE_CON_EXITO_ESPERADO, ControladorItemsBaremacion.MENSAJE_EXITO_APARTADO_AGREGAR, bean.getMensajesDeExito().get(0));
+//	}
 	
 	/** agregar bloque .
 	 * @throws SQLException .
 	 * @throws ServletException .
 	 * @throws IOException .
 	 */
-	@Test
-	public void testA18AgregarBloque() throws SQLException, ServletException, IOException {
-		VistaItemsBaremacion bean = obtenerApartados();
-		
-		PeticionHttp peticion = UtilsTestBolsaEmpleo.peticionAutenticadaPersonal();
-		peticion.setParameter(ControladorItemsBaremacion.PARAM_ACCION, ControladorItemsBaremacion.ACCION_AGREGAR_BLOQUE);
-		ApartadoBaremacion apartado = (ApartadoBaremacion) bean.getDatatable().getData().get(0);
-		peticion.setParameter(ControladorItemsBaremacion.PARAM_APARTADO, apartado.getCodNum().toString());
-		peticion.setParameter(ControladorItemsBaremacion.PARAM_BLOQUE_CODIGO, CODIGO_2);
-		peticion.setParameter(ControladorItemsBaremacion.PARAM_BLOQUE_NOMBRE, NOMBRE);
-		RespuestaHttp respuesta = new RespuestaHttp();
-		ControladorItemsBaremacion controlador = new ControladorItemsBaremacion();
-		controlador.doPost(peticion, respuesta);
-		
-		VistaItemsBaremacion bean2 = (VistaItemsBaremacion) peticion.getUVDatos().getVistas().get(VistaItemsBaremacion.class.getName());
-		
-		assertEquals(MENSAJE_SIN_ERROR, 0, bean2.getMensajesDeError().size());
-		assertEquals(MENSAJE_SIN_ADVERTENCIAS, 0, bean2.getMensajesDeAdvertencia().size());
-		assertEquals(MENSAJE_CON_EXITO_ESPERADO, ControladorItemsBaremacion.MENSAJE_EXITO_BLOQUE_AGREGAR, bean2.getMensajesDeExito().get(0));
-	}
+//	@Test
+//	public void testA18AgregarBloque() throws SQLException, ServletException, IOException {
+//		VistaItemsBaremacion bean = obtenerApartados();
+//		
+//		PeticionHttp peticion = UtilsTestBolsaEmpleo.peticionAutenticadaPersonal();
+//		peticion.setParameter(ControladorItemsBaremacion.PARAM_ACCION, ControladorItemsBaremacion.ACCION_AGREGAR_BLOQUE);
+//		ApartadoBaremacion apartado = (ApartadoBaremacion) bean.getDatatable().getData().get(0);
+//		peticion.setParameter(ControladorItemsBaremacion.PARAM_APARTADO, apartado.getCodNum().toString());
+//		peticion.setParameter(ControladorItemsBaremacion.PARAM_BLOQUE_CODIGO, CODIGO_2);
+//		peticion.setParameter(ControladorItemsBaremacion.PARAM_BLOQUE_NOMBRE, NOMBRE);
+//		RespuestaHttp respuesta = new RespuestaHttp();
+//		ControladorItemsBaremacion controlador = new ControladorItemsBaremacion();
+//		controlador.doPost(peticion, respuesta);
+//		
+//		VistaItemsBaremacion bean2 = (VistaItemsBaremacion) peticion.getUVDatos().getVistas().get(VistaItemsBaremacion.class.getName());
+//		
+//		assertEquals(MENSAJE_SIN_ERROR, 0, bean2.getMensajesDeError().size());
+//		assertEquals(MENSAJE_SIN_ADVERTENCIAS, 0, bean2.getMensajesDeAdvertencia().size());
+//		assertEquals(MENSAJE_CON_EXITO_ESPERADO, ControladorItemsBaremacion.MENSAJE_EXITO_BLOQUE_AGREGAR, bean2.getMensajesDeExito().get(0));
+//	}
 	
 	/** agregar ítem .
 	 * @throws SQLException .
 	 * @throws ServletException .
 	 * @throws IOException .
 	 */
-	@Test
-	public void testA19AgregarItem() throws SQLException, ServletException, IOException {
-		VistaItemsBaremacion bean = obtenerBloques();
-		
-		PeticionHttp peticion = UtilsTestBolsaEmpleo.peticionAutenticadaPersonal();
-		peticion.setParameter(ControladorItemsBaremacion.PARAM_ACCION, ControladorItemsBaremacion.ACCION_AGREGAR_ITEM);
-		BloqueBaremacion bloque = (BloqueBaremacion) bean.getDatatable().getData().get(0);
-		peticion.setParameter(ControladorItemsBaremacion.PARAM_BLOQUE, bloque.getCodNum().toString());
-		peticion.setParameter(ControladorItemsBaremacion.PARAM_ITEM_CODIGO, CODIGO_2);
-		peticion.setParameter(ControladorItemsBaremacion.PARAM_ITEM_NOMBRE, NOMBRE);
-		RespuestaHttp respuesta = new RespuestaHttp();
-		ControladorItemsBaremacion controlador = new ControladorItemsBaremacion();
-		controlador.doPost(peticion, respuesta);
-		
-		VistaItemsBaremacion bean2 = (VistaItemsBaremacion) peticion.getUVDatos().getVistas().get(VistaItemsBaremacion.class.getName());
-		
-		assertEquals(MENSAJE_SIN_ERROR, 0, bean2.getMensajesDeError().size());
-		assertEquals(MENSAJE_SIN_ADVERTENCIAS, 0, bean2.getMensajesDeAdvertencia().size());
-		assertEquals(MENSAJE_CON_EXITO_ESPERADO, ControladorItemsBaremacion.MENSAJE_EXITO_ITEM_AGREGAR, bean2.getMensajesDeExito().get(0));
-	}
+//	@Test
+//	public void testA19AgregarItem() throws SQLException, ServletException, IOException {
+//		VistaItemsBaremacion bean = obtenerBloques();
+//		
+//		PeticionHttp peticion = UtilsTestBolsaEmpleo.peticionAutenticadaPersonal();
+//		peticion.setParameter(ControladorItemsBaremacion.PARAM_ACCION, ControladorItemsBaremacion.ACCION_AGREGAR_ITEM);
+//		BloqueBaremacion bloque = (BloqueBaremacion) bean.getDatatable().getData().get(0);
+//		peticion.setParameter(ControladorItemsBaremacion.PARAM_BLOQUE, bloque.getCodNum().toString());
+//		peticion.setParameter(ControladorItemsBaremacion.PARAM_ITEM_CODIGO, CODIGO_2);
+//		peticion.setParameter(ControladorItemsBaremacion.PARAM_ITEM_NOMBRE, NOMBRE);
+//		RespuestaHttp respuesta = new RespuestaHttp();
+//		ControladorItemsBaremacion controlador = new ControladorItemsBaremacion();
+//		controlador.doPost(peticion, respuesta);
+//		
+//		VistaItemsBaremacion bean2 = (VistaItemsBaremacion) peticion.getUVDatos().getVistas().get(VistaItemsBaremacion.class.getName());
+//		
+//		assertEquals(MENSAJE_SIN_ERROR, 0, bean2.getMensajesDeError().size());
+//		assertEquals(MENSAJE_SIN_ADVERTENCIAS, 0, bean2.getMensajesDeAdvertencia().size());
+//		assertEquals(MENSAJE_CON_EXITO_ESPERADO, ControladorItemsBaremacion.MENSAJE_EXITO_ITEM_AGREGAR, bean2.getMensajesDeExito().get(0));
+//	}
 	
 	/** obtener bloques sin apartado definido .
 	 * @throws SQLException si fallo bd .

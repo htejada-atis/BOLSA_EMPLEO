@@ -97,6 +97,10 @@ public class VistaUsuarioBolsaEmpleo extends Vista implements Serializable {
 		 this.dataTableBolsa = dt;
 	 }
 	 
+	 public BolsaEmpleoDataTable<Bolsa> getDatatableBolsa() {
+		 return dataTableBolsa;
+	 }
+	 
 	 public void setApartadoAreasExcluidas(Boolean apartadoAreasExcluidas) {
 		this.apartadoAreasExcluidas = apartadoAreasExcluidas;
 	 }

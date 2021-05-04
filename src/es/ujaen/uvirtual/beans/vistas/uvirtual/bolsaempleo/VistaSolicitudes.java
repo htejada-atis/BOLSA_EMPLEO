@@ -29,6 +29,7 @@ public class VistaSolicitudes extends Vista implements Serializable {
 	private List<Titulacion> listaTitulaciones;
 	private Solicitud solicitud;
 	private Bolsa area;
+	private Merito merito;
 			
 	public String getVista() {
 		return vista;
@@ -124,5 +125,13 @@ public class VistaSolicitudes extends Vista implements Serializable {
 	
 	public void setSolicitud(Solicitud psolicitud) {
 		this.solicitud = psolicitud;
+	}
+	
+	public Merito getMerito() {
+		return merito;
+	}
+	
+	public void setMerito(Merito merito) {
+		this.merito = merito;
 	}
 }

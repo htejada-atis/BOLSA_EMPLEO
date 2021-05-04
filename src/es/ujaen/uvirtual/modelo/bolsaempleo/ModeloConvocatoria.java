@@ -8,9 +8,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-import es.ujaen.uvirtual.beans.uvirtual.bolsaempleo.ApartadoBaremacion;
 import es.ujaen.uvirtual.beans.uvirtual.bolsaempleo.Convocatoria;
-import es.ujaen.uvirtual.beans.uvirtual.bolsaempleo.Titulacion;
 import es.ujaen.uvirtual.modelo.conexion.ConexionUvirtual;
 import es.ujaen.uvirtual.utilidades.BolsaEmpleoDataTable;
 import es.ujaen.uvirtual.utilidades.UVException;
@@ -347,11 +345,8 @@ public class ModeloConvocatoria {
 				+ "FROM TBEP_BOLSAS";
 		
 		try (Connection con = ConexionUvirtual.obtenerInstancia(); PreparedStatement stmt = con.prepareStatement(sql);) {
-			int parameterIndex = 1;
-		
 			try (ResultSet rs = stmt.executeQuery()) {
 				while (rs.next()) {
-					Float acum = null;
 					if (!rs.getString("ESTADO").equals("DESBLOQUEADA")) {
 						return true;
 					}

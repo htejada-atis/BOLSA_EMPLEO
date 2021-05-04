@@ -14,7 +14,7 @@ import controlador.implementacion.PeticionHttp;
 import controlador.implementacion.RespuestaHttp;
 import es.ujaen.uvirtual.beans.vistas.uvirtual.bolsaempleo.VistaMeritos;
 import es.ujaen.uvirtual.controlador.infadministrativa.bolsaempleo.ControladorMisMeritos;
-import es.ujaen.uvirtual.utilidades.UVException;
+import es.ujaen.uvirtual.utilidades.BolsaEmpleoDataTable;
 
 /** test controlador mis méritos.
  * @author jlopez
@@ -25,7 +25,6 @@ public class TestBEPControladorMisMeritos {
 	private static final String MENSAJE_APARTADO_DEVUELTO = "Debe devolver apartado";
 	private static final String MENSAJE_APARTADOS_DEVUELTOS = "Debe devolver apartados";
 	private static final String MENSAJE_CON_ERROR = "Debe devolver error";
-	private static final String MENSAJE_CON_EXITO_ESPERADO = "El mensaje de exito debe coincidir";
 	private static final String MENSAJE_ITEMS_DEVUELTOS = "Debe devolver items";
 	private static final String MENSAJE_MERITOS_DEVUELTOS = "Debe devolver méritos";
 	private static final String MENSAJE_MERITO_DEVUELTO = "Debe devolver mérito";
@@ -126,34 +125,12 @@ public class TestBEPControladorMisMeritos {
 		assertEquals(MENSAJE_SIN_ADVERTENCIAS, 0, bean2.getMensajesDeAdvertencia().size());
 	}
 	
-	/** descargar fichero mérito.
-	 * @throws ServletException si error de servlet
-	 * @throws IOException si error de io
-	 */
-	@Test
-	public void testA04Descargar() throws ServletException, IOException {
-		VistaMeritos bean = obtenerMeritos();
-		
-		PeticionHttp peticion = UtilsTestBolsaEmpleo.peticionAutenticadaCandidato();
-		peticion.setParameter(ControladorMisMeritos.PARAM_ACCION, ControladorMisMeritos.ACCION_DESCARGAR_FICHERO);
-		peticion.setParameter(ControladorMisMeritos.PARAM_ID, bean.getDatatable().getData().get(0).getCodNum().toString());
-		
-		RespuestaHttp respuesta = new RespuestaHttp();
-		ControladorMisMeritos controlador = new ControladorMisMeritos();
-		controlador.doGet(peticion, respuesta);
-		VistaMeritos bean2 = (VistaMeritos) peticion.getUVDatos().getVistas().get(VistaMeritos.class.getName());
-		
-		assertNotNull(MENSAJE_MERITO_DEVUELTO, bean2.getMerito());
-		assertEquals(MENSAJE_SIN_ERROR, 0, bean2.getMensajesDeError().size());
-		assertEquals(MENSAJE_SIN_ADVERTENCIAS, 0, bean2.getMensajesDeAdvertencia().size());
-	}
-	
 	/** carga formulario de agregar mérito.
 	 * @throws ServletException si error de servlet
 	 * @throws IOException si error de io
 	 */
 	@Test
-	public void testA05AgregarMerito() throws ServletException, IOException {
+	public void testA04AgregarMerito() throws ServletException, IOException {
 		VistaMeritos bean = obtenerFormularioAgregar(null);
 		
 		assertNotEquals(MENSAJE_APARTADOS_DEVUELTOS, 0, bean.getApartados().size());
@@ -204,6 +181,47 @@ public class TestBEPControladorMisMeritos {
 	@Test
 	public void testE02AgregarMeritoApartadoSeleccionadoNoValido() throws SQLException, ServletException, IOException {
 		VistaMeritos bean = obtenerFormularioAgregar(-1);
+		
+		assertEquals(MENSAJE_CON_ERROR, 1, bean.getMensajesDeError().size());
+		assertEquals(MENSAJE_SIN_EXITO, 0, bean.getMensajesDeExito().size());
+	}
+	
+	/** descargar fichero mérito error.
+	 * @throws ServletException si error de servlet
+	 * @throws IOException si error de io
+	 */
+	@Test
+	public void testE03DescargarError() throws ServletException, IOException {
+		VistaMeritos bean = obtenerMeritos();
+		
+		PeticionHttp peticion = UtilsTestBolsaEmpleo.peticionAutenticadaCandidato();
+		peticion.setParameter(ControladorMisMeritos.PARAM_ACCION, ControladorMisMeritos.ACCION_DESCARGAR_FICHERO);
+		peticion.setParameter(ControladorMisMeritos.PARAM_ID, bean.getDatatable().getData().get(0).getCodNum().toString());
+		
+		RespuestaHttp respuesta = new RespuestaHttp();
+		ControladorMisMeritos controlador = new ControladorMisMeritos();
+		controlador.doGet(peticion, respuesta);
+		VistaMeritos bean2 = (VistaMeritos) peticion.getUVDatos().getVistas().get(VistaMeritos.class.getName());
+		
+		assertEquals(MENSAJE_CON_ERROR, 1, bean2.getMensajesDeError().size());
+		assertEquals(MENSAJE_SIN_EXITO, 0, bean2.getMensajesDeExito().size());
+	}
+	
+	/** obtener datatable méritos con parámetro no válido .
+	 * @throws SQLException .
+	 * @throws ServletException .
+	 * @throws IOException .
+	 */
+	@Test
+	public void testE04ObtenerMeritos() throws SQLException, ServletException, IOException {
+		PeticionHttp peticion = UtilsTestBolsaEmpleo.peticionAutenticadaCandidato();
+		peticion.setParameter(ControladorMisMeritos.PARAM_ACCION, ControladorMisMeritos.ACCION_DATATABLE);
+		peticion.setParameter(BolsaEmpleoDataTable.PARAM_ORDER_BY, "9");
+
+		RespuestaHttp respuesta = new RespuestaHttp();
+		ControladorMisMeritos controlador = new ControladorMisMeritos();
+		controlador.doGet(peticion, respuesta);
+		VistaMeritos bean = (VistaMeritos) peticion.getUVDatos().getVistas().get(VistaMeritos.class.getName());
 		
 		assertEquals(MENSAJE_CON_ERROR, 1, bean.getMensajesDeError().size());
 		assertEquals(MENSAJE_SIN_EXITO, 0, bean.getMensajesDeExito().size());

@@ -77,4 +77,70 @@ public class Afinidad {
 	public void setModulacion(Float pmodulacion) {
 		this.modulacion = pmodulacion;
 	}
+	
+	public static long getSerialversionuid() {
+		return serialVersionUID;
+	}
+	
+	@Override
+	public String toString() {
+		return "Afinidad [codNum=" + codNum + ", codigo=" + codigo + ", descripcion=" + descripcion + ", modulacion="
+				+ modulacion + "]";
+	}
+	
+	@Override
+	public int hashCode() {
+		final int prime = 31;
+		int result = 1;
+		result = prime * result + ((codNum == null) ? 0 : codNum.hashCode());
+		result = prime * result + ((codigo == null) ? 0 : codigo.hashCode());
+		result = prime * result + ((descripcion == null) ? 0 : descripcion.hashCode());
+		result = prime * result + ((modulacion == null) ? 0 : modulacion.hashCode());
+		return result;
+	}
+
+	@Override
+	@SuppressWarnings({ "checkstyle:CyclomaticComplexity", "checkstyle:NPathComplexity" })
+	public boolean equals(Object obj) {
+		if (this == obj) {
+			return true;
+		}
+		if (obj == null) {
+			return false;
+		}
+		if (getClass() != obj.getClass()) {
+			return false;
+		}
+		Afinidad other = (Afinidad) obj;
+		if (codNum == null) {
+			if (other.codNum != null) {
+				return false;
+			}
+		} else if (!codNum.equals(other.codNum)) {
+			return false;
+		}
+		if (codigo == null) {
+			if (other.codigo != null) {
+				return false;
+			}
+		} else if (!codigo.equals(other.codigo)) {
+			return false;
+		}
+		if (descripcion == null) {
+			if (other.descripcion != null) {
+				return false;
+			}
+		} else if (!descripcion.equals(other.descripcion)) {
+			return false;
+		}
+		if (modulacion == null) {
+			if (other.modulacion != null) {
+				return false;
+			}
+		} else if (!modulacion.equals(other.modulacion)) {
+			return false;
+		}
+		
+		return true;
+	}
 }

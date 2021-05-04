@@ -47,7 +47,7 @@ public class ControladorCandidatoTitulacionesPreferentesArea extends HttpServlet
 	public static final String ACCION_BOLSA_SELECCIONADA = "seleccionarbolsa";
 	public static final String ACCION_DATATABLE_BOLSAS = "datatablebolsas";
 	public static final String ACCION_DATATABLE_TITULACIONES = "datatabletitulaciones";
-	public static final String ACCION_LISTAR_BOLSAS = "listarbolsas";
+	public static final String ACCION_LISTAR_AREAS = "listarareas";
 	
 	// Parámetros
 	public static final String PARAM_ACCION = "a";
@@ -86,7 +86,7 @@ public class ControladorCandidatoTitulacionesPreferentesArea extends HttpServlet
 	
 		String nombreAccion = EscapaHTML.ajustaCodificacion(request.getParameter(PARAM_ACCION));
 		if (nombreAccion == null) {
-			nombreAccion = ACCION_LISTAR_BOLSAS;
+			nombreAccion = ACCION_LISTAR_AREAS;
 		}
 		
 		try {
@@ -98,7 +98,7 @@ public class ControladorCandidatoTitulacionesPreferentesArea extends HttpServlet
 				case ACCION_DATATABLE_BOLSAS:
 					listadoBolsas(bean, datos, request, response);
 					break;
-				case ACCION_LISTAR_BOLSAS:
+				case ACCION_LISTAR_AREAS:
 					bean.setVista(RUTA_BEP + "index.jsp");
 					break;
 				case ACCION_DATATABLE_TITULACIONES:
@@ -160,8 +160,8 @@ public class ControladorCandidatoTitulacionesPreferentesArea extends HttpServlet
 		try (PrintWriter writer = response.getWriter()) {
 			try {
 				BolsaEmpleoDataTable<Bolsa> dataTable = modelo.listaAreaCandidatoDatatable(request.getParameterMap());
+				bean.setDatatableAreas(dataTable);
 				Gson gson = new GsonBuilder().setExclusionStrategies(BolsaEmpleoDataTable.GSONEXCLUSIONSTRATEGY).create();
-
 				writer.write(gson.toJson(dataTable));
 			} catch (Exception ex) {
 				bean.getMensajesDeError().add(ex.getMessage());

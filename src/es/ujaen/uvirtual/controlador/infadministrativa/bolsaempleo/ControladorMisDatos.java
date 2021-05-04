@@ -2,10 +2,6 @@ package es.ujaen.uvirtual.controlador.infadministrativa.bolsaempleo;
 
 import java.io.IOException;
 import java.sql.SQLException;
-import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -14,15 +10,12 @@ import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import javax.servlet.http.HttpSession;
 
 import es.ujaen.uvirtual.adm.CrearUsuario;
-import es.ujaen.uvirtual.beans.Rol;
 import es.ujaen.uvirtual.beans.UVDatos;
 import es.ujaen.uvirtual.beans.Usuario;
 import es.ujaen.uvirtual.beans.uvirtual.bolsaempleo.UsuarioBolsaEmpleo;
 import es.ujaen.uvirtual.beans.vistas.uvirtual.bolsaempleo.VistaUsuarioBolsaEmpleo;
-import es.ujaen.uvirtual.modelo.bolsaempleo.ModeloRol;
 import es.ujaen.uvirtual.modelo.bolsaempleo.ModeloUsuarioBolsaEmpleo;
 import es.ujaen.uvirtual.utilidades.BolsaEmpleoValidator;
 import es.ujaen.uvirtual.utilidades.EscapaHTML;
@@ -196,7 +189,6 @@ public class ControladorMisDatos extends HttpServlet {
 		
 		BolsaEmpleoValidator validator = this.getValidatorMisDatos(request); 							
 		ModeloUsuarioBolsaEmpleo modelo = ModeloUsuarioBolsaEmpleo.obtenerInstancia();
-		UsuarioBolsaEmpleo usu = modelo.listaUsuario(usuario.getUid());
 		
 		if (!validator.isValid()) {
 			for (String param : validator.getErrors().keySet()) {

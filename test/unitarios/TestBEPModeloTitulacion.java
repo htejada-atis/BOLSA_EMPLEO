@@ -12,8 +12,6 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 import bbdd.BbddRunner;
 import bbdd.UtilsTestBolsaEmpleo;
-import es.ujaen.uvirtual.beans.uvirtual.bolsaempleo.Area;
-import es.ujaen.uvirtual.beans.uvirtual.bolsaempleo.Bolsa;
 import es.ujaen.uvirtual.beans.uvirtual.bolsaempleo.Titulacion;
 import es.ujaen.uvirtual.modelo.bolsaempleo.ModeloTitulacion;
 import es.ujaen.uvirtual.modelo.conexion.Conexion;

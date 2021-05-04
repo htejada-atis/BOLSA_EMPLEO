@@ -8,7 +8,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.PrintWriter;
 import java.sql.SQLException;
-import java.sql.SQLIntegrityConstraintViolationException;
 import java.util.logging.Logger;
 import java.util.ArrayList;
 import java.util.Date;
@@ -59,7 +58,7 @@ import com.lowagie.text.pdf.PdfWriter;
 import com.lowagie.text.Table;
 
 /**
- * Listado de bolsas y su estado.
+ * Clase controlador para las solicitudes de un candidato de bolsa de empleo.
  */
 @WebServlet(
 	name = "informacionadministrativa.bolsaempleo.missolicitudes", 
@@ -125,12 +124,19 @@ public class ControladorMisSolicitudes extends HttpServlet {
 	public static final String URL_PATTERN_AJAX = "/srv/es/ajax/informacionadministrativa/bolsaempleo/missolicitudes";
 	
 	//pdf
-	public static final Integer PDF_ANCHO = 4;
-	public static final Integer PDF_ALTO = 4;
-	public static final Integer PDF_FORMATO = 4;
-	public static final Integer PDF_TABLE_COLUMNS = 4;
-	public static final Integer PDF_TABLE_PADDING = 5;
-
+	public static final int PDF_ANCHO = 4;
+	public static final int PDF_ALTO = 4;
+	public static final int PDF_FORMATO = 4;
+	public static final int PDF_TABLE_COLUMNS = 4;
+	public static final int PDF_TABLE_PADDING = 5;
+	public static final int SIZE_40 = 40;
+	public static final int SIZE_100 = 100;	
+	public static final int COLOR_51 = 51;
+	public static final int COLOR_153 = 153;
+	public static final int COLOR_185 = 185;
+	public static final int COLOR_201 = 201;
+	public static final int COLOR_241 = 241;
+	public static final int COLOR_254 = 254;
 	
 	private UsuarioBolsaEmpleo usuario = null;
 	
@@ -178,9 +184,6 @@ public class ControladorMisSolicitudes extends HttpServlet {
 					accionesPaso3(bean, datos, request, response, nombreAccion);
 					break;
 			}
-		} catch (SQLIntegrityConstraintViolationException e) {
-			LOGGER.log(Level.WARNING, e.toString());
-			bean.getMensajesDeError().add(e.getMessage());
 		} catch (UVException e) {
 			LOGGER.log(Level.WARNING, e.toString());
 			bean.getMensajesDeError().add(e.getMessage());
@@ -345,7 +348,7 @@ public class ControladorMisSolicitudes extends HttpServlet {
 	 * @throws SQLException .
 	 */
 	private void seleccionarBolsas(VistaSolicitudes bean, UVDatos datos, HttpServletRequest request, HttpServletResponse response)
-			throws UVException, SQLException, SQLIntegrityConstraintViolationException {
+			throws UVException, SQLException {
 		bean.setVista(RUTA_BEP_SOL + "paso1.jsp");
 		
 		Gson gson = new GsonBuilder().create();
@@ -522,6 +525,7 @@ public class ControladorMisSolicitudes extends HttpServlet {
 				Solicitud solicitud = modeloSolicitud.getSolicitudById(Formateador.leeParametroInteger(request.getParameter(PARAM_SOLICITUD_ID)));
 				bean.setSolicitud(solicitud);
 				Merito merito = modeloMerito.listaMerito(Formateador.leeParametroInteger(request.getParameter(PARAM_MERITO)));
+				bean.setMerito(merito);
 				
 				if (merito == null) {
 					throw new UVException("merito no puede ser nulo");
@@ -753,6 +757,8 @@ public class ControladorMisSolicitudes extends HttpServlet {
                 stream.write(readBytes);
             }
             stream.flush();
+        } catch (Exception ex) {
+        	throw new UVException(ex.toString());
         }
         
         response.setContentType("application/pdf");
@@ -779,7 +785,7 @@ public class ControladorMisSolicitudes extends HttpServlet {
 			document.addTitle("Solicitud_" + solicitud.getConvocatoria().getDescripcion());
 			document.addCreationDate();
 
-			document.add(new Paragraph(new Chunk("SOLICITUD", FontFactory.getFont(FontFactory.HELVETICA, 40, Font.BOLDITALIC))));
+			document.add(new Paragraph(new Chunk("SOLICITUD", FontFactory.getFont(FontFactory.HELVETICA, SIZE_40, Font.BOLDITALIC))));
 			
 			document.add(new Paragraph("\n"));
 			
@@ -804,33 +810,33 @@ public class ControladorMisSolicitudes extends HttpServlet {
 				table.setBorderWidth(1);
 				table.setBorderColor(new Color(0, 0, 0));
 				table.setPadding(PDF_TABLE_PADDING);
-				table.setWidth(100);
+				table.setWidth(SIZE_100);
 				
 				Font font = new Font();
-				font.setColor(new Color(0, 51, 153));
+				font.setColor(new Color(0, COLOR_51, COLOR_153));
 
 				Phrase phrase = new Phrase("Cod. Mérito", font);
 				Cell cell = new Cell(phrase);
 				cell.setHeader(true);
-				cell.setBackgroundColor(new Color(185, 201, 254));
+				cell.setBackgroundColor(new Color(COLOR_185, COLOR_201, COLOR_254));
 				table.addCell(cell);
 				
 				Phrase phrase2 = new Phrase("Mérito", font);
-				cell = new Cell(phrase);
+				cell = new Cell(phrase2);
 				cell.setHeader(true);
-				cell.setBackgroundColor(new Color(185, 201, 254));
+				cell.setBackgroundColor(new Color(COLOR_185, COLOR_201, COLOR_254));
 				table.addCell(cell);
 				
 				Phrase phrase3 = new Phrase("Valor", font);
 				cell = new Cell(phrase3);
 				cell.setHeader(true);
-				cell.setBackgroundColor(new Color(185, 201, 254));
+				cell.setBackgroundColor(new Color(COLOR_185, COLOR_201, COLOR_254));
 				table.addCell(cell);
 				
 				Phrase phrase4 = new Phrase("Descripción", font);
 				cell = new Cell(phrase4);
 				cell.setHeader(true);
-				cell.setBackgroundColor(new Color(185, 201, 254));
+				cell.setBackgroundColor(new Color(COLOR_185, COLOR_201, COLOR_254));
 				table.addCell(cell);
 				table.endHeaders();
 				
@@ -840,16 +846,16 @@ public class ControladorMisSolicitudes extends HttpServlet {
 								+ merito.getItemBaremacion().getBloqueBaremacion().getCodigo() + "." + merito.getItemBaremacion().getCodigo();
 						
 						cell = new Cell(codigoItem);
-						cell.setBackgroundColor(new Color(241, 241, 241));
+						cell.setBackgroundColor(new Color(COLOR_241, COLOR_241, COLOR_241));
 						table.addCell(cell);
 						cell = new Cell(merito.getItemBaremacion().getNombre());
-						cell.setBackgroundColor(new Color(241, 241, 241));
+						cell.setBackgroundColor(new Color(COLOR_241, COLOR_241, COLOR_241));
 						table.addCell(cell);
 						cell = new Cell(merito.getValor().toString());
-						cell.setBackgroundColor(new Color(241, 241, 241));
+						cell.setBackgroundColor(new Color(COLOR_241, COLOR_241, COLOR_241));
 						table.addCell(cell);
 						cell = new Cell(merito.getDescripcion().toString());
-						cell.setBackgroundColor(new Color(241, 241, 241));
+						cell.setBackgroundColor(new Color(COLOR_241, COLOR_241, COLOR_241));
 						table.addCell(cell);
 					}
 				}

@@ -63,6 +63,7 @@ public class Fichero implements Serializable {
 	
 	/** Constructor con parametros.
 	 * @param pcodNum .
+	 * @param ppublico .
 	 */
 	public Fichero(Integer pcodNum, Boolean ppublico) {
 		super();

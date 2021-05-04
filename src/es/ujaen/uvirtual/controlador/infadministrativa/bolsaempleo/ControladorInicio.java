@@ -75,8 +75,8 @@ public class ControladorInicio extends HttpServlet {
 	public static final Integer RESPONSE_HTTP_CODE_ERROR_400 = 400;
 	
 	// urls
-	public static String URL_PATTERN_AJAX_PUBLICA = "/pub/es/ajax/informacionadministrativa/bolsaempleo";
-	public static String URL_PATTERN_AJAX_PRIVADA = "/srv/es/ajax/informacionadministrativa/bolsaempleo";
+	public static final String URL_PATTERN_AJAX_PUBLICA = "/pub/es/ajax/informacionadministrativa/bolsaempleo";
+	public static final String URL_PATTERN_AJAX_PRIVADA = "/srv/es/ajax/informacionadministrativa/bolsaempleo";
 	public static final String URL_PATTERN_FILES_PUBLICA = "/pub/es/informacionadministrativa/bolsaempleo";
 	public static final String URL_PATTERN_FILES_PRIVADA = "/srv/es/informacionadministrativa/bolsaempleo";
 	
@@ -184,6 +184,8 @@ public class ControladorInicio extends HttpServlet {
 			    }
 			}
 			
+		} else {
+			bean.getMensajesDeAdvertencia().add("El fichero no puede ser nulo");
 		}
 	}
 	
@@ -214,7 +216,8 @@ public class ControladorInicio extends HttpServlet {
 				
 				JsonArray result = (JsonArray) gson.toJsonTree(listaNoticias, new TypeToken<List<Noticia>>() { }.getType());
 				writer.print(result);
-			} catch (UVException ex) {
+			} catch (Exception ex) {
+				bean.getMensajesDeError().add(ex.getMessage());
 				CodigoDescripcion mensaje = new CodigoDescripcion("error", ex.getMessage());
 				writer.write(new Gson().toJson(mensaje));
 				response.setStatus(RESPONSE_HTTP_CODE_ERROR_400);

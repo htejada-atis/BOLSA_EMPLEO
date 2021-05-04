@@ -4,14 +4,12 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
 import es.ujaen.uvirtual.beans.uvirtual.bolsaempleo.Bolsa;
-import es.ujaen.uvirtual.beans.uvirtual.bolsaempleo.UsuarioBolsaEmpleo;
 import es.ujaen.uvirtual.modelo.conexion.ConexionUvirtual;
 import es.ujaen.uvirtual.utilidades.BolsaEmpleoUtils;
 import es.ujaen.uvirtual.utilidades.BolsaEmpleoDataTable;
@@ -146,7 +144,6 @@ public class ModeloBolsa {
 	 * @throws UVException si bolsa no es existe
 	 */
 	public Bolsa getBolsaById(int codNum) throws SQLException, UVException {
-		ModeloArea modeloArea = ModeloArea.obtenerInstancia();	
 
 		String consulta = "SELECT bepbol.* FROM TBEP_BOLSAS bepbol WHERE bepbol.CODNUM = ?";
 			
@@ -385,7 +382,6 @@ public class ModeloBolsa {
 				int indexParam = 1;
 
 				stmt.setString(indexParam++, estado);
-				SimpleDateFormat formatter = new SimpleDateFormat("dd/MM/YYYY HH:mm:ss");
 				Date date = new Date(System.currentTimeMillis());
 				
 				stmt.setDate(indexParam++, new java.sql.Date(date.getTime()));
@@ -407,7 +403,6 @@ public class ModeloBolsa {
 					int indexParam = 1;
 
 					stmt.setString(indexParam++, estado);
-					SimpleDateFormat formatter = new SimpleDateFormat("dd/MM/YYYY HH:mm:ss");
 					Date date = new Date(System.currentTimeMillis());
 					
 					stmt.setDate(indexParam++, null);
@@ -464,7 +459,6 @@ public class ModeloBolsa {
 				PreparedStatement stmt = conexion.prepareStatement(consulta);) {
     		try (ResultSet rs = stmt.executeQuery();) {
 	    		if (rs.next()) {
-    				Integer cont = rs.getInt("numero_bolsas_abiertas");
 	    			if (rs.getInt("numero_bolsas_abiertas") > 0) {
 
 	    				return true;

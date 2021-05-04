@@ -127,16 +127,14 @@ public class TestBEPUsuariosBolsaEmpleo {
 		WebElement btnNuevo = pmain.findElement(By.id("nuevo_usuario"));
 		btnNuevo.click();
 		
-		WebDriverWait wait2 = new WebDriverWait(DriverUvBEP.getDriver(), WAIT_ELEMENT);
-		WebElement pmain2 = wait2.until(ExpectedConditions.visibilityOfElementLocated(By.className(DIV_MAIN_USUARIOS_BUSQUEDA)));	
+		WebElement pmain2 = wait.until(ExpectedConditions.visibilityOfElementLocated(By.className(DIV_MAIN_USUARIOS_BUSQUEDA)));	
 
 		WebElement username = pmain2.findElement(By.name("nombre"));
 		username.sendKeys("usig");
 		WebElement btnBuscar = pmain2.findElement(By.id("usuario_buscar"));
 		btnBuscar.click();
 		
-		WebDriverWait wait3 = new WebDriverWait(DriverUvBEP.getDriver(), WAIT_ELEMENT);
-		WebElement pmain3 = wait3.until(ExpectedConditions.visibilityOfElementLocated(By.className(DIV_MAIN_USUARIOS_FORM)));
+		WebElement pmain3 = wait.until(ExpectedConditions.visibilityOfElementLocated(By.className(DIV_MAIN_USUARIOS_FORM)));
 		WebElement btnVolver = pmain3.findElement(By.id("usuario_enviar"));
 		btnVolver.click();
 	}

@@ -286,7 +286,6 @@ public class ControladorConvocatorias extends HttpServlet {
 	private void abrirConvocatoria(VistaConvocatorias bean, UVDatos datos,
 			HttpServletRequest request, HttpServletResponse response) throws UVException, SQLException {
 				
-		BolsaEmpleoValidator validator = this.getValidatorConvocatoria(request); 							
 		ModeloConvocatoria modelo = ModeloConvocatoria.obtenerInstancia();
 		ModeloBolsa modeloBolsas = ModeloBolsa.obtenerInstancia();
 		
@@ -319,7 +318,6 @@ public class ControladorConvocatorias extends HttpServlet {
 	private void cerrarConvocatoria(VistaConvocatorias bean, UVDatos datos,
 			HttpServletRequest request, HttpServletResponse response) throws UVException, SQLException {
 				
-		BolsaEmpleoValidator validator = this.getValidatorConvocatoria(request); 							
 		ModeloConvocatoria modelo = ModeloConvocatoria.obtenerInstancia();
 		
 		Convocatoria convocatoria = modelo.getConvocatoriaById(Formateador.leeParametroInteger(request.getParameter(PARAM_CONVOCATORIA_ID)));
