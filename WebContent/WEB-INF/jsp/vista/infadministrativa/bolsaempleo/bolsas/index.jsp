@@ -86,7 +86,7 @@ $(document).ready(function() {
 	var table = new Atis.DataTable('#table', {
 	    "ajax": { url: "/srv/es/ajax/informacionadministrativa/bolsaempleo/bolsas" },
 	    "selectable": true,
-	    "pageSize": 10,
+	    "pageSize": 5,
 	    "filterable": true,
 	    "action": "<%= ControladorBolsas.ACCION_DATATABLE %>",
 	    "defaultOrderBy": 2,

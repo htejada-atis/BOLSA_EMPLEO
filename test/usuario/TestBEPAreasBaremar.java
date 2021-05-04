@@ -21,23 +21,23 @@ import org.openqa.selenium.support.ui.WebDriverWait;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 
-import es.ujaen.uvirtual.beans.uvirtual.bolsaempleo.Afinidad;
-import es.ujaen.uvirtual.controlador.infadministrativa.bolsaempleo.ControladorAfinidades;
+import es.ujaen.uvirtual.beans.uvirtual.bolsaempleo.Area;
+import es.ujaen.uvirtual.controlador.infadministrativa.bolsaempleo.ControladorAreasABaremar;
 import es.ujaen.uvirtual.utilidades.BolsaEmpleoDataTable;
 
-/** Clase para probar configuracion.afinidades BEP .
+
+/** Clase para probar configuracion.areasbaremar BEP .
  * @author fcampos
  *
  */
-public class TestBEPAfinidad {
-	private static final String NOMBREDEESTACLASE = TestBEPUsuariosBolsaEmpleo.class.getName();
+public class TestBEPAreasBaremar {
+	private static final String NOMBREDEESTACLASE = TestBEPAreasBaremar.class.getName();
 
 	private static final Logger LOGGER = Logger.getLogger(NOMBREDEESTACLASE);
 	private static final Integer WAIT_ELEMENT = 5; // segundos
 	
-	private static final String DIV_MAIN_AFINIDADES = "afinidades";
-	private static final String DIV_MAIN_AFINIDAD_FORM = "afinidad-form";
-	private static final String ID_TABLE = "tableAfinidades";
+	private static final String DIV_MAIN_AREAS = "areasbaremar";
+	private static final String ID_TABLE = "table";
 	private static final String CLASS_PAGINATION = "pagination";
 	private static final String CLASS_PAGINATION_LAST = "last";
 	private static final String CLASS_PAGINATION_FIRST = "first";
@@ -46,7 +46,7 @@ public class TestBEPAfinidad {
 	private static final String CLASS_DIALOGO = "ui-dialog";
 	private static final String CLASS_DIALOGO_CONTENT = "ui-dialog-content";
 		
-	private static final String MENSAJE_DIALOGO_SELECCIONAR_FILAS = "Seleccione al menos una afinidad.";
+	private static final String MENSAJE_DIALOGO_SELECCIONAR_FILAS = "Seleccione al menos un ï¿½rea.";
 		
 	/** Se ejecuta una vez al inicio de la clase.
 	 * @throws SQLException Si se produce error en bbdd
@@ -69,7 +69,7 @@ public class TestBEPAfinidad {
 		DriverUvBEP.getDriver().get("http://localhost:8080/srv/es/informacionadministrativa");
 		DriverUvBEP.getDriver().get("http://localhost:8080/srv/es/informacionadministrativa/bolsaempleo");		
 		DriverUvBEP.getDriver().get("http://localhost:8080/srv/es/informacionadministrativa/bolsaempleo/configuracion");
-		DriverUvBEP.getDriver().get("http://localhost:8080/srv/es/informacionadministrativa/bolsaempleo/configuracion/afinidades");
+		DriverUvBEP.getDriver().get("http://localhost:8080/srv/es/informacionadministrativa/bolsaempleo/configuracion/areasbaremar");
 	}
 	
 	/** Listado de usuarios.
@@ -79,9 +79,9 @@ public class TestBEPAfinidad {
 		WebDriverWait wait = new WebDriverWait(DriverUvBEP.getDriver(), WAIT_ELEMENT);
 
 		// esperamos div principal
-		WebElement main = wait.until(ExpectedConditions.visibilityOfElementLocated(By.className(DIV_MAIN_AFINIDADES)));		
+		WebElement main = wait.until(ExpectedConditions.visibilityOfElementLocated(By.className(DIV_MAIN_AREAS)));		
 		WebElement h2 = main.findElement(By.tagName("h2"));
-		assertTrue(h2.getText().equals("Afinidades"));
+		assertTrue(h2.getText().equals("Áreas baremables"));
 		
 		// esperamos a que se renderice la table
 		WebElement total = wait.until(ExpectedConditions.presenceOfNestedElementLocatedBy(getTables(main, ID_TABLE), By.className("total")));
@@ -102,11 +102,11 @@ public class TestBEPAfinidad {
 	 */
 	@Test
 	public void testA2() throws MalformedURLException, IOException {
-		String u = "http://localhost:8080/srv/es/informacionadministrativa/bolsaempleo/configuracion/afinidades?a=" + ControladorAfinidades.ACCION_DATATABLE;
+		String u = "http://localhost:8080/srv/es/informacionadministrativa/bolsaempleo/configuracion/areasbaremar?a=" + ControladorAreasABaremar.ACCION_DATATABLE;
 		String json = DriverUvBEP.getAjaxRequestJson(u);
 		
-		Type typeDt = new TypeToken<BolsaEmpleoDataTable<Afinidad>>() { }.getType();
-		BolsaEmpleoDataTable<Afinidad> dt = new Gson().fromJson(json, typeDt);
+		Type typeDt = new TypeToken<BolsaEmpleoDataTable<Area>>() { }.getType();
+		BolsaEmpleoDataTable<Area> dt = new Gson().fromJson(json, typeDt);
 		
 		assertTrue(dt.getData().size() > 0);
 	}
@@ -119,21 +119,13 @@ public class TestBEPAfinidad {
 	@Test
 	public void testA3() throws MalformedURLException, IOException {
 		WebDriverWait wait = new WebDriverWait(DriverUvBEP.getDriver(), WAIT_ELEMENT);
-		WebElement pmain = wait.until(ExpectedConditions.visibilityOfElementLocated(By.className(DIV_MAIN_AFINIDADES)));	
-		WebElement btnNuevo = pmain.findElement(By.id("nueva_afinidad"));
-		btnNuevo.click();
-		
-		WebDriverWait wait2 = new WebDriverWait(DriverUvBEP.getDriver(), WAIT_ELEMENT);
-		WebElement pmain2 = wait2.until(ExpectedConditions.visibilityOfElementLocated(By.className(DIV_MAIN_AFINIDAD_FORM)));	
-
-		WebElement descripcion = pmain2.findElement(By.name("descripcion"));
-		descripcion.sendKeys("EJEMPLO");
-		WebElement codigo = pmain2.findElement(By.name("codigo"));
-		codigo.sendKeys("AI");
-		WebElement modulacion = pmain2.findElement(By.name("modulacion"));
-		modulacion.sendKeys("10");
-		WebElement btnAgregar = pmain2.findElement(By.id("convocatoria_enviar"));
-		btnAgregar.click();
+		WebElement pmain = wait.until(ExpectedConditions.visibilityOfElementLocated(By.className(DIV_MAIN_AREAS)));	
+		WebElement table = getTables(pmain, ID_TABLE);
+		WebElement th = table.findElement(By.cssSelector("input[type='checkbox']"));
+		th.click();
+		WebElement actions = table.findElement(By.className(CLASS_ACTIONS));
+		WebElement btnNoBaremable = actions.findElement(By.xpath("button[2]"));
+		btnNoBaremable.click();
 	}
 	
 	private String getDialogText() {

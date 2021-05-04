@@ -10,7 +10,7 @@ UVDatos uvdatos = (UVDatos) request.getAttribute(UVDatos.NOMBRE_ATRIBUTO);
 VistaTitulaciones bean = (VistaTitulaciones) uvdatos.getVistas().get(VistaTitulaciones.class.getName());
 %>
 
-<div class="bolsa-empleo">
+<div class="bolsa-empleo titulacionespreferentes">
 
 	<%
 		if (session.getAttribute(ControladorGestionTitulaciones.MENSAJE_ENVIADO_CORRECTO) != null) {

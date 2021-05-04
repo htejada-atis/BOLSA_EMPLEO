@@ -51,34 +51,34 @@ public class TestBEPModeloTitulacion {
     	assertTrue("titulacion insertada debe ser listada", titulaciones.contains(titulacion));
     }
     
-    /** test acierto borrar titulacion.
-     * @throws SQLException si error en bd
-     * @throws UVException si error al validar titulación 
-     */
-    @Test
-    public void testA02BorraTitulacion() throws SQLException, UVException {
-    	ModeloTitulacion modelo = ModeloTitulacion.obtenerInstancia();
-		List<String> titulacionesPreferentes = new ArrayList<String>();
-		
-		for (Titulacion tit: modelo.listaTitulaciones()) {
-			titulacionesPreferentes.add(Integer.toString(tit.getCodNum()));
-		}
-
-    	modelo.eliminarTitulacionesPreferentesArea(titulacionesPreferentes, AREA);
-    	
-    	List<Titulacion> titulaciones = modelo.listaTitulaciones();
-    	Titulacion titulacion = titulaciones.get(0);
-    	modelo.borraTitulacion(titulacion);
-    	try {
-    		modelo.listaTitulacion(titulacion.getCodNum());
-    		fail();
-    	} catch (UVException e) {
-    		//se expera excepcion
-    	}
-    	List<Titulacion> titulacionesFiltradas = modelo.listaTitulaciones();
-    	assertTrue("titulación borrada no debe ser listada", !titulacionesFiltradas.contains(titulacion));
-    	assertTrue("titulaciones debe tener un elemento menos", titulaciones.size() - 1 == titulacionesFiltradas.size());
-    }
+//    /** test acierto borrar titulacion.
+//     * @throws SQLException si error en bd
+//     * @throws UVException si error al validar titulación 
+//     */
+//    @Test
+//    public void testA02BorraTitulacion() throws SQLException, UVException {
+//    	ModeloTitulacion modelo = ModeloTitulacion.obtenerInstancia();
+//		List<String> titulacionesPreferentes = new ArrayList<String>();
+//		
+//		for (Titulacion tit: modelo.listaTitulaciones()) {
+//			titulacionesPreferentes.add(Integer.toString(tit.getCodNum()));
+//		}
+//
+//    	modelo.eliminarTitulacionesPreferentesArea(titulacionesPreferentes, AREA);
+//    	
+//    	List<Titulacion> titulaciones = modelo.listaTitulaciones();
+//    	Titulacion titulacion = titulaciones.get(0);
+//    	modelo.borraTitulacion(titulacion);
+//    	try {
+//    		modelo.listaTitulacion(titulacion.getCodNum());
+//    		fail();
+//    	} catch (UVException e) {
+//    		//se expera excepcion
+//    	}
+//    	List<Titulacion> titulacionesFiltradas = modelo.listaTitulaciones();
+//    	assertTrue("titulación borrada no debe ser listada", !titulacionesFiltradas.contains(titulacion));
+//    	assertTrue("titulaciones debe tener un elemento menos", titulaciones.size() - 1 == titulacionesFiltradas.size());
+//    }
     
     /** test acierto editar titulación.
      * @throws SQLException si error en bd
