@@ -1,26 +1,17 @@
 package unitarios;
 
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
-
 import java.io.IOException;
 import java.sql.SQLException;
 import java.text.ParseException;
-import java.util.List;
 
 import javax.sql.DataSource;
 
 import org.junit.BeforeClass;
-import org.junit.Test;
 
 import bbdd.BbddRunner;
 import bbdd.UtilsTestBolsaEmpleo;
-import es.ujaen.uvirtual.beans.uvirtual.bolsaempleo.Area;
 import es.ujaen.uvirtual.beans.uvirtual.bolsaempleo.Departamento;
-import es.ujaen.uvirtual.modelo.bolsaempleo.ModeloArea;
 import es.ujaen.uvirtual.modelo.conexion.Conexion;
-import es.ujaen.uvirtual.utilidades.UVException;
 
 /** test modelo area.
 *

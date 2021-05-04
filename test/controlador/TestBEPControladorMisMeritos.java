@@ -14,7 +14,6 @@ import controlador.implementacion.PeticionHttp;
 import controlador.implementacion.RespuestaHttp;
 import es.ujaen.uvirtual.beans.vistas.uvirtual.bolsaempleo.VistaMeritos;
 import es.ujaen.uvirtual.controlador.infadministrativa.bolsaempleo.ControladorMisMeritos;
-import es.ujaen.uvirtual.utilidades.UVException;
 
 /** test controlador mis méritos.
  * @author jlopez

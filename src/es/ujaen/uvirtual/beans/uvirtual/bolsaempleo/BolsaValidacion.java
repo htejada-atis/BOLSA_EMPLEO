@@ -1,7 +1,6 @@
 package es.ujaen.uvirtual.beans.uvirtual.bolsaempleo;
 
 import java.io.Serializable;
-import java.util.List;
 
 /** Clase bolsa para los listados de validacion.
  * @author atis

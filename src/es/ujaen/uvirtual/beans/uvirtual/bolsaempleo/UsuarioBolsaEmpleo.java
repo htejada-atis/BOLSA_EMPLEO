@@ -119,6 +119,9 @@ public class UsuarioBolsaEmpleo implements Serializable {
 	
 	/** Constructor con parametros para envio de datos personales.
 	 * @param pcodNum .
+	 * @param pnombre .
+	 * @param primerapellido .
+	 * @param segundoapellido .
 	 * @param pemail .
 	 * @param pdireccion .
 	 * @param pcodigopostal .
@@ -130,13 +133,13 @@ public class UsuarioBolsaEmpleo implements Serializable {
 	 * @param psexo .
 	 * @param plistaDist .
 	 */
-	public UsuarioBolsaEmpleo(Integer pcodNum, String pnombre, String primer_apellido, String segundo_apellido, String pemail, String pdireccion, String pcodigopostal,
+	public UsuarioBolsaEmpleo(Integer pcodNum, String pnombre, String primerapellido, String segundoapellido, String pemail, String pdireccion, String pcodigopostal,
 			String plocalidad, String pprovincia, String pmovil, String ptelefono, String pnacionalidad, String psexo, Boolean plistaDist) {
 		super();
 		this.codNum = pcodNum;
 		this.nombre = pnombre;
-		this.apellido1 = primer_apellido;
-		this.apellido2 = segundo_apellido;
+		this.apellido1 = primerapellido;
+		this.apellido2 = segundoapellido;
 		this.email = pemail;
 		this.direccion = pdireccion;
 		this.codigopostal = pcodigopostal;

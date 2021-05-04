@@ -104,7 +104,6 @@ public class ModeloFichero {
 	}
 	
 	/** lista todos los ficheros .
-	 * @param anonimo .
 	 * @return lista de todos los ficheros .
 	 * @throws SQLException si hay un error en la base de datos .
 	 */
