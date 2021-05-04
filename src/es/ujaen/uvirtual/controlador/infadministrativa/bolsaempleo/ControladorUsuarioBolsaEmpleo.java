@@ -112,6 +112,9 @@ public class ControladorUsuarioBolsaEmpleo extends HttpServlet {
 	
 	public static final String URL_PATTERN_AJAX = "/srv/es/ajax/informacionadministrativa/bolsaempleo/configuracion/usuarios";
 	
+	// ruta vistas
+	public static final String RUTA_BEP_CONF = "/WEB-INF/jsp/vista/infadministrativa/bolsaempleo/configuracion/usuarios/";
+	
 	// variables
 	public static boolean anonimo = true;
 	
@@ -135,7 +138,7 @@ public class ControladorUsuarioBolsaEmpleo extends HttpServlet {
 			nombreAccion = ACCION_LISTAR;
 		}
 		
-		bean.setVista("/WEB-INF/jsp/vista/infadministrativa/bolsaempleo/configuracion/usuarios.jsp");
+		bean.setVista(RUTA_BEP_CONF + "usuarios.jsp");
 		
 		try {
 			anonimo = !modelo.checkUser(datos);
@@ -308,7 +311,7 @@ public class ControladorUsuarioBolsaEmpleo extends HttpServlet {
 			bean.setBusqueda(false);
 			
 			bean.setUsuario(usu);
-			bean.setVista("/WEB-INF/jsp/vista/infadministrativa/bolsaempleo/configuracion/formUsuario.jsp");
+			bean.setVista(RUTA_BEP_CONF + "formUsuario.jsp");
 			break;
 		case ACCION_INCLUIR_USUARIO_AREA:
 			UsuarioBolsaEmpleo usuCont = modelo.getUsuarioById(codNum);
@@ -319,7 +322,7 @@ public class ControladorUsuarioBolsaEmpleo extends HttpServlet {
 			bean.setBusqueda(false);
 			
 			bean.setUsuario(usuCont);
-			bean.setVista("/WEB-INF/jsp/vista/infadministrativa/bolsaempleo/configuracion/formUsuario.jsp");
+			bean.setVista(RUTA_BEP_CONF + "formUsuario.jsp");
 			break;
 		default:
 			bean.getMensajesDeError().add(MENSAJE_ERROR_ACCION_USUARIO_NO_VALIDA);
@@ -353,15 +356,15 @@ public class ControladorUsuarioBolsaEmpleo extends HttpServlet {
 			bean.setUsuario(usu);
 			bean.setRol(usu.getRol());
 			
-			bean.setVista("/WEB-INF/jsp/vista/infadministrativa/bolsaempleo/configuracion/formUsuario.jsp");
+			bean.setVista(RUTA_BEP_CONF + "formUsuario.jsp");
 		} catch (UVException e) {
 			Usuario usuArcos = CrearUsuario.usuario(request.getParameter(PARAM_NOMBRE));
 			if (usuArcos != null) {
 				bean.setBusqueda(false);
 				bean.setUsuarioArcos(usuArcos);
-				bean.setVista("/WEB-INF/jsp/vista/infadministrativa/bolsaempleo/configuracion/formUsuario.jsp");
+				bean.setVista(RUTA_BEP_CONF + "formUsuario.jsp");
 			} else {
-				bean.setVista("/WEB-INF/jsp/vista/infadministrativa/bolsaempleo/configuracion/buscarUsuario.jsp");
+				bean.setVista(RUTA_BEP_CONF + "buscarUsuario.jsp");
 				throw new UVException("No existe el usuario");
 			}
 		}
@@ -377,7 +380,7 @@ public class ControladorUsuarioBolsaEmpleo extends HttpServlet {
 	 * @throws UVException en caso de error en bd
 	 */
 	public void agregarUsuario(HttpServletRequest request, HttpServletResponse response, VistaUsuarioBolsaEmpleo bean) throws SQLException, UVException, IOException {
-		bean.setVista("/WEB-INF/jsp/vista/infadministrativa/bolsaempleo/configuracion/usuarios.jsp");
+		bean.setVista(RUTA_BEP_CONF + "usuarios.jsp");
 		
 		ModeloUsuarioBolsaEmpleo modelo = ModeloUsuarioBolsaEmpleo.obtenerInstancia();
 		
@@ -426,7 +429,7 @@ public class ControladorUsuarioBolsaEmpleo extends HttpServlet {
 	 * @throws IOException en caso de error de IO.
 	 */
 	private void editarUsuario(HttpServletRequest request, HttpServletResponse response, VistaUsuarioBolsaEmpleo bean) throws SQLException, UVException, IOException {
-		bean.setVista("/WEB-INF/jsp/vista/infadministrativa/bolsaempleo/configuracion/formUsuario.jsp");
+		bean.setVista(RUTA_BEP_CONF + "formUsuario.jsp");
 		
 		ModeloUsuarioBolsaEmpleo modelo = ModeloUsuarioBolsaEmpleo.obtenerInstancia();
 		
@@ -506,7 +509,7 @@ public class ControladorUsuarioBolsaEmpleo extends HttpServlet {
 	 * @throws IOException en caso de error de IO.
 	 */
 	private void excluirUsuario(HttpServletRequest request, HttpServletResponse response, VistaUsuarioBolsaEmpleo bean) throws SQLException, UVException, IOException {
-		bean.setVista("/WEB-INF/jsp/vista/infadministrativa/bolsaempleo/configuracion/buscarUsuario.jsp");
+		bean.setVista(RUTA_BEP_CONF + "buscarUsuario.jsp");
 		
 		ModeloUsuarioBolsaEmpleo modelo = ModeloUsuarioBolsaEmpleo.obtenerInstancia();
 		
@@ -546,7 +549,7 @@ public class ControladorUsuarioBolsaEmpleo extends HttpServlet {
 	 * @throws UVException en caso de error en bd
 	 */
 	private void formularioUsuario(HttpServletRequest request, HttpServletResponse response, VistaUsuarioBolsaEmpleo bean) {
-		bean.setVista("/WEB-INF/jsp/vista/infadministrativa/bolsaempleo/configuracion/buscarUsuario.jsp");
+		bean.setVista(RUTA_BEP_CONF + "buscarUsuario.jsp");
 		bean.setBusqueda(false);
 	}
 	
@@ -569,7 +572,7 @@ public class ControladorUsuarioBolsaEmpleo extends HttpServlet {
 	 * @throws UVException en caso de error en bd
 	 */
 	private void volverUsuario(HttpServletRequest request, HttpServletResponse response, VistaUsuarioBolsaEmpleo bean) throws SQLException, UVException, IOException {
-		bean.setVista("/WEB-INF/jsp/vista/infadministrativa/bolsaempleo/configuracion/usuarios.jsp");
+		bean.setVista(RUTA_BEP_CONF + "usuarios.jsp");
 	}
 	
 	

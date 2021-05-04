@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.sql.SQLException;
 import java.util.logging.Logger;
+import java.util.List;
 import java.util.logging.Level;
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
@@ -113,6 +114,7 @@ public class ControladorItemsBaremacion extends HttpServlet {
 	public static final String PARAM_ITEM_VALOR_MINIMO = "valorminimo";
 	public static final String PARAM_ITEM_VALOR_MAXIMO = "valormaximo";
 	public static final String PARAM_ITEM_AFINIDAD = "afinidad";
+	public static final String PARAM_ITEM_INDIVIDUALIZADO = "individualizado";
 	
 	// mensajes
 	public static final String MENSAJE_ERROR_CODIGO_VACIO = "El código no puede estar vacio";
@@ -192,24 +194,10 @@ public class ControladorItemsBaremacion extends HttpServlet {
 		} catch (SQLException e) {
 			LOGGER.log(Level.SEVERE, Formateador.getStackTrace(e));
 			LOGGER.log(Level.SEVERE, e.toString());
-			bean.getMensajesDeError().add(e.toString());
-			
-			ModeloAfinidad modeloAfinidad = ModeloAfinidad.obtenerInstancia();
-			try {
-				bean.setAfinidades(modeloAfinidad.listaAfinidades());
-			} catch (SQLException ex) {
-				ex.printStackTrace();
-			}
+			bean.getMensajesDeError().add(e.toString());			
 		} catch (UVException e) {
 			LOGGER.log(Level.WARNING, e.toString());
-			bean.getMensajesDeError().add(e.getMessage());
-			
-			ModeloAfinidad modeloAfinidad = ModeloAfinidad.obtenerInstancia();
-			try {
-				bean.setAfinidades(modeloAfinidad.listaAfinidades());
-			} catch (SQLException ex) {
-				ex.printStackTrace();
-			}
+			bean.getMensajesDeError().add(e.getMessage());			
 		} finally {
 			datos.getVistas().put(bean.getClass().getName(), bean);
 			datos.getFicherosJSP().add(bean.getVista());
@@ -646,7 +634,7 @@ public class ControladorItemsBaremacion extends HttpServlet {
 		bean.setItemBaremacion(null);
 		
 		ModeloAfinidad modeloAfinidad = ModeloAfinidad.obtenerInstancia();
-		bean.setAfinidades(modeloAfinidad.listaAfinidades());
+		bean.setAfinidades(modeloAfinidad.getTiposAfinidad());
 		
 		bean.setVista(RUTA_BEP_CONF + "formItemBaremacion.jsp");	
 		
@@ -683,8 +671,7 @@ public class ControladorItemsBaremacion extends HttpServlet {
 		bean.setBloqueBaremacion(item.getBloqueBaremacion());
 		bean.setItemBaremacion(item);
 		
-		bean.setAfinidad(modeloAfinidad.getAfinidadByCodigo(item.getAfinidad()));
-		bean.setAfinidades(modeloAfinidad.listaAfinidades());
+		bean.setAfinidades(modeloAfinidad.getTiposAfinidad());
 		
 		bean.setVista(RUTA_BEP_CONF + "formItemBaremacion.jsp");
 		bean.setUltimoCodigo(ModeloBaremacion.obtenerInstancia().getUltimoCodigoApartado());
@@ -769,14 +756,18 @@ public class ControladorItemsBaremacion extends HttpServlet {
 		}
 
 		item.setUnidades(EscapaHTML.ajustaCodificacion(request.getParameter(PARAM_ITEM_UNIDADES)));
-		
 
 		item.setAfinidad(EscapaHTML.ajustaCodificacion(request.getParameter(PARAM_ITEM_AFINIDAD)));
 		if (item.getAfinidad() == null) {
 			throw new UVException(MENSAJE_ERROR_AFINIDAD_VACIA);
-		}
-		if (EscapaHTML.ajustaCodificacion(request.getParameter(PARAM_ITEM_AFINIDAD)).equals("1")) {
-			throw new UVException(MENSAJE_ERROR_AFINIDAD_VACIA);
+		}		
+		if (item.getAfinidad().equals("N")) {
+			item.setAfinidad(null);
+		} else {
+			List<String> afinidadesValidas = ModeloAfinidad.obtenerInstancia().getTiposAfinidad();
+			if (!afinidadesValidas.contains(item.getAfinidad())) {
+				throw new UVException("Afinidad no válida");
+			}
 		}
 		
 		item.setValor(Formateador.leeParametroFloat(request.getParameter(PARAM_ITEM_VALOR)));
@@ -797,7 +788,10 @@ public class ControladorItemsBaremacion extends HttpServlet {
 		if (item.getValorMinimo() > item.getValorMaximo()) {
 			throw new UVException("El valor mínimo debe ser menor o igual que el valor máximo");
 		}
-		
+
+		String individualizado = EscapaHTML.ajustaCodificacion(request.getParameter(PARAM_ITEM_INDIVIDUALIZADO));
+		item.setIndividualizado("S".equals(individualizado));
+				
 		return item;
 	}	
 	

@@ -42,6 +42,7 @@ public class TestBEPBeanItemBaremacion {
 	private static final Float ITEM_VALORMINIMO = (float) 1;
 	private static final Float ITEM_VALORMAXIMO = (float) 100;
 	private static final String ITEM_AFINIDAD = "EEEE";
+	private static final Boolean ITEM_INDIVIDUALIZADO = true;
 	
 	/** test constructor.
 	 * 
@@ -80,7 +81,8 @@ public class TestBEPBeanItemBaremacion {
 	@Test
 	public void testA02() {
 		ItemBaremacion item = new ItemBaremacion(ITEM_CODNUM, ITEM_BLOQUE, 
-				ITEM_CODIGO, ITEM_NOMBRE, ITEM_ACTIVO, ITEM_UNIDADES, ITEM_VALOR, ITEM_VALORMINIMO, ITEM_VALORMAXIMO, ITEM_AFINIDAD);
+				ITEM_CODIGO, ITEM_NOMBRE, ITEM_ACTIVO, ITEM_UNIDADES, ITEM_VALOR, ITEM_VALORMINIMO, ITEM_VALORMAXIMO, ITEM_AFINIDAD,
+				ITEM_INDIVIDUALIZADO);
 		assertEquals(ITEM_CODNUM, item.getCodNum());
 		assertEquals(ITEM_CODIGO, item.getCodigo());
 		assertEquals(ITEM_NOMBRE, item.getNombre());
@@ -91,6 +93,7 @@ public class TestBEPBeanItemBaremacion {
 		assertEquals(ITEM_VALORMINIMO, item.getValorMinimo());
 		assertEquals(ITEM_VALORMAXIMO, item.getValorMaximo());
 		assertEquals(ITEM_AFINIDAD, item.getAfinidad());
+		assertEquals(ITEM_INDIVIDUALIZADO, item.getIndividualizado());
 		assertNotNull(item.toString());
 	}
 	
@@ -99,7 +102,7 @@ public class TestBEPBeanItemBaremacion {
 	@Test
 	public void testA03() {
 		ItemBaremacion item2 = new ItemBaremacion(ITEM_CODNUM, ITEM_BLOQUE, 
-				ITEM_CODIGO, ITEM_NOMBRE, ITEM_ACTIVO, ITEM_UNIDADES, ITEM_VALOR, ITEM_VALORMINIMO, ITEM_VALORMAXIMO, ITEM_AFINIDAD);
+				ITEM_CODIGO, ITEM_NOMBRE, ITEM_ACTIVO, ITEM_UNIDADES, ITEM_VALOR, ITEM_VALORMINIMO, ITEM_VALORMAXIMO, ITEM_AFINIDAD, ITEM_INDIVIDUALIZADO);
 		ItemBaremacion item = new ItemBaremacion(item2);
 
 		assertEquals(ITEM_CODNUM, item.getCodNum());
@@ -112,6 +115,7 @@ public class TestBEPBeanItemBaremacion {
 		assertEquals(ITEM_VALORMINIMO, item.getValorMinimo());
 		assertEquals(ITEM_VALORMAXIMO, item.getValorMaximo());
 		assertEquals(ITEM_AFINIDAD, item.getAfinidad());
+		assertEquals(ITEM_INDIVIDUALIZADO, item.getIndividualizado());		
 		assertNotNull(item.toString());
 		assertTrue(item.equals(item2));
 		assertTrue(item.hashCode() == item2.hashCode());
@@ -125,7 +129,7 @@ public class TestBEPBeanItemBaremacion {
 	public void testA04() {
 
 		ItemBaremacion item3 = new ItemBaremacion(ITEM_CODNUM, ITEM_BLOQUE, 
-				ITEM_CODIGO, ITEM_NOMBRE, ITEM_ACTIVO, ITEM_UNIDADES, ITEM_VALOR, ITEM_VALORMINIMO, ITEM_VALORMAXIMO, ITEM_AFINIDAD);
+				ITEM_CODIGO, ITEM_NOMBRE, ITEM_ACTIVO, ITEM_UNIDADES, ITEM_VALOR, ITEM_VALORMINIMO, ITEM_VALORMAXIMO, ITEM_AFINIDAD, ITEM_INDIVIDUALIZADO);
 		ItemBaremacion item2 = new ItemBaremacion();
 		ItemBaremacion item = new ItemBaremacion();
 		assertTrue(item.equals(item2));

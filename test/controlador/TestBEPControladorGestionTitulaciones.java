@@ -146,8 +146,6 @@ public class TestBEPControladorGestionTitulaciones {
 	 */
 	@Test
 	public void testA06EliminarTitulacion() throws ServletException, IOException {
-		VistaTitulaciones bean = getVistaTitulaciones(ControladorGestionTitulaciones.ACCION_DATATABLE_TITULACIONES);
-		
 		PeticionHttp peticion = UtilsTestBolsaEmpleo.peticionAutenticadaPersonal();
 		peticion.setParameter(ControladorGestionTitulaciones.PARAM_ACCION, ControladorGestionTitulaciones.ACCION_BORRAR_TITULACION);
 		peticion.setParameter(ControladorGestionTitulaciones.PARAM_ID, "8");

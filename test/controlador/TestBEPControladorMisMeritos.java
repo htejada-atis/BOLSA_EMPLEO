@@ -27,7 +27,6 @@ public class TestBEPControladorMisMeritos {
 	private static final String MENSAJE_CON_ERROR = "Debe devolver error";
 	private static final String MENSAJE_ITEMS_DEVUELTOS = "Debe devolver items";
 	private static final String MENSAJE_MERITOS_DEVUELTOS = "Debe devolver méritos";
-	private static final String MENSAJE_MERITO_DEVUELTO = "Debe devolver mérito";
 	private static final String MENSAJE_SIN_ADVERTENCIAS = "No debe mostrar advertencias";
 	private static final String MENSAJE_SIN_ERROR = "No debe devolver error";
 	private static final String MENSAJE_SIN_EXITO = "No debe exito";
