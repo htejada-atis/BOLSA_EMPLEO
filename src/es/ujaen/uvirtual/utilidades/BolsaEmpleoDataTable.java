@@ -305,9 +305,6 @@ public class BolsaEmpleoDataTable<T> {
 			consultaResult += orderByQuery();
 		}
 		
-		
-		System.out.println(pconsulta + consultaResult);
-		
 		return pconsulta + consultaResult;
 	}
 	

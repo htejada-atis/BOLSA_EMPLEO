@@ -59,7 +59,7 @@ import com.lowagie.text.pdf.PdfWriter;
 import com.lowagie.text.Table;
 
 /**
- * Listado de bolsas y su estado.
+ * Clase controlador para las solicitudes de un candidato de bolsa de empleo.
  */
 @WebServlet(
 	name = "informacionadministrativa.bolsaempleo.missolicitudes", 
@@ -178,9 +178,6 @@ public class ControladorMisSolicitudes extends HttpServlet {
 					accionesPaso3(bean, datos, request, response, nombreAccion);
 					break;
 			}
-		} catch (SQLIntegrityConstraintViolationException e) {
-			LOGGER.log(Level.WARNING, e.toString());
-			bean.getMensajesDeError().add(e.getMessage());
 		} catch (UVException e) {
 			LOGGER.log(Level.WARNING, e.toString());
 			bean.getMensajesDeError().add(e.getMessage());
@@ -345,7 +342,7 @@ public class ControladorMisSolicitudes extends HttpServlet {
 	 * @throws SQLException .
 	 */
 	private void seleccionarBolsas(VistaSolicitudes bean, UVDatos datos, HttpServletRequest request, HttpServletResponse response)
-			throws UVException, SQLException, SQLIntegrityConstraintViolationException {
+			throws UVException, SQLException {
 		bean.setVista(RUTA_BEP_SOL + "paso1.jsp");
 		
 		Gson gson = new GsonBuilder().create();
@@ -522,6 +519,7 @@ public class ControladorMisSolicitudes extends HttpServlet {
 				Solicitud solicitud = modeloSolicitud.getSolicitudById(Formateador.leeParametroInteger(request.getParameter(PARAM_SOLICITUD_ID)));
 				bean.setSolicitud(solicitud);
 				Merito merito = modeloMerito.listaMerito(Formateador.leeParametroInteger(request.getParameter(PARAM_MERITO)));
+				bean.setMerito(merito);
 				
 				if (merito == null) {
 					throw new UVException("merito no puede ser nulo");
@@ -753,6 +751,8 @@ public class ControladorMisSolicitudes extends HttpServlet {
                 stream.write(readBytes);
             }
             stream.flush();
+        } catch (Exception ex) {
+        	throw new UVException(ex.toString());
         }
         
         response.setContentType("application/pdf");
