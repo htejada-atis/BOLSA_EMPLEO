@@ -3,7 +3,7 @@ package es.ujaen.uvirtual.beans.uvirtual.bolsaempleo;
 import java.io.Serializable;
 
 
-/** Clase titulación de bolsa empleo.
+/** Clase candidato de bolsa empleo.
  * @author jlopez
  *
  */
