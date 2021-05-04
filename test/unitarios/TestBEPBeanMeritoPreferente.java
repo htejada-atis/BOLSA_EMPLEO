@@ -6,9 +6,6 @@ import static org.junit.Assert.assertNotEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
-import java.io.ByteArrayInputStream;
-import java.io.InputStream;
-
 import org.junit.Test;
 
 import es.ujaen.uvirtual.beans.uvirtual.bolsaempleo.ApartadoBaremacion;
@@ -73,7 +70,6 @@ public class TestBEPBeanMeritoPreferente {
 	@Test
 	public void testA02() {
 
-		ItemBaremacion item = new ItemBaremacion();
 		MeritoPreferente merito = new MeritoPreferente(CODNUM, DESCRIPCION, TIPO, APLICABLE, FACTOR, VALORMAXIMO, ITEM, BLOQUE, APARTADO, ITEM2, ACTIVO);
 		assertEquals(CODNUM, merito.getCodNum());
 		assertEquals(DESCRIPCION, merito.getDescripcion());
@@ -94,7 +90,6 @@ public class TestBEPBeanMeritoPreferente {
 	@Test
 	public void testA03() {
 
-		ItemBaremacion item = new ItemBaremacion();
 		MeritoPreferente merito2 = new MeritoPreferente(CODNUM, DESCRIPCION, TIPO, APLICABLE, FACTOR, VALORMAXIMO, ITEM, BLOQUE, APARTADO, ITEM2, ACTIVO);
 		MeritoPreferente merito = new MeritoPreferente(merito2);
 		merito.setCodNum(CODNUM);
@@ -132,8 +127,6 @@ public class TestBEPBeanMeritoPreferente {
 	@Test
 	@SuppressWarnings("java:S2159")
 	public void testA04() {
-		Integer id = 1;
-		ItemBaremacion item = new ItemBaremacion();
 		MeritoPreferente merito3 = new MeritoPreferente(CODNUM, DESCRIPCION, TIPO, APLICABLE, FACTOR, VALORMAXIMO, ITEM, BLOQUE, APARTADO, ITEM2, ACTIVO);
 		MeritoPreferente merito2 = new MeritoPreferente();
 		MeritoPreferente merito = new MeritoPreferente();

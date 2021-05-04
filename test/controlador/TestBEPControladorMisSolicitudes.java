@@ -57,8 +57,6 @@ public class TestBEPControladorMisSolicitudes {
     
     // método para obtener la vista con una lista de bolsas del usuario .
     private VistaSolicitudes obtenerAreas() throws ServletException, IOException {
-    	VistaSolicitudes bean = obtenerSolicitudes();
-    	
     	PeticionHttp peticion = UtilsTestBolsaEmpleo.peticionAutenticadaCandidato();
 		peticion.setParameter(ControladorMisSolicitudes.PARAM_ACCION, ControladorMisSolicitudes.ACCION_DATATABLE_AREAS);
 
@@ -292,8 +290,6 @@ public class TestBEPControladorMisSolicitudes {
 	 */
 	@Test
 	public void testE03ObtenerAreasParametroErroneo() throws SQLException, ServletException, IOException {
-		VistaSolicitudes bean = obtenerSolicitudes();
-    	
     	PeticionHttp peticion = UtilsTestBolsaEmpleo.peticionAutenticadaCandidato();
 		peticion.setParameter(ControladorMisSolicitudes.PARAM_ACCION, ControladorMisSolicitudes.ACCION_DATATABLE_AREAS);
 		peticion.setParameter(BolsaEmpleoDataTable.PARAM_ORDER_BY, "9");

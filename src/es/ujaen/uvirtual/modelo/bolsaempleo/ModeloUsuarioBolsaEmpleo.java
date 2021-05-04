@@ -5,7 +5,6 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Types;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -793,7 +792,6 @@ public class ModeloUsuarioBolsaEmpleo {
 			
 			stmt.setString(indexParam++, borrado);
 			
-			SimpleDateFormat formatter = new SimpleDateFormat("dd/MM/YYYY HH:mm:ss");
 			Date date = new Date(System.currentTimeMillis());
 			
 			stmt.setDate(indexParam++, new java.sql.Date(date.getTime()));
@@ -831,33 +829,29 @@ public class ModeloUsuarioBolsaEmpleo {
 			if (usuario.getBorrado()) {
 				throw new UVException("No puede acceder, su perfil ha sido borrado de la base de datos");
 			} else {
-				if (usuArcos != null) {
+				try {
+					listaUsuario(usuArcos.getUid());
+				} catch (UVException e) {
+					ModeloRol modeloRol = ModeloRol.obtenerInstancia();
+					Rol role;
+					
 					try {
-						UsuarioBolsaEmpleo usu = listaUsuario(usuArcos.getUid());
-					} catch (UVException e) {
-						ModeloRol modeloRol = ModeloRol.obtenerInstancia();
-						Rol role;
+						role = modeloRol.getRoleById(PARAM_ROL_CANDIDATO_ID);
 						
-						try {
-							role = modeloRol.getRoleById(PARAM_ROL_CANDIDATO_ID);
-							
-							UsuarioBolsaEmpleo usuarioFinal = 
-							new UsuarioBolsaEmpleo(usuArcos.getCodigoPersonaArcos(), usuArcos.getUid(), role, true, false);
-							
-							insertaUsuario(usuarioFinal);
+						UsuarioBolsaEmpleo usuarioFinal = 
+						new UsuarioBolsaEmpleo(usuArcos.getCodigoPersonaArcos(), usuArcos.getUid(), role, true, false);
 						
-							CrearUsuario.refrescarUsuario(usuarioFinal.getCodCuenta());
-							
-						} catch (SQLException | UVException ex) {
-							ex.printStackTrace();
-						}
-					} catch (SQLException e) {
-						e.printStackTrace();
-					}	
-					return true;
-				} else {
-					return false;
-				}
+						insertaUsuario(usuarioFinal);
+					
+						CrearUsuario.refrescarUsuario(usuarioFinal.getCodCuenta());
+						
+					} catch (SQLException | UVException ex) {
+						throw new UVException("Error creando usuario de bolsa de empleo");
+					}
+				} catch (SQLException e) {
+					throw new UVException("Error al buscar usuario de bolsa de empleo");
+				}	
+				return true;
 			}
 		}
 	}
@@ -942,7 +936,6 @@ public class ModeloUsuarioBolsaEmpleo {
 			stmt.setString(indexParam++, "S");
 			stmt.setString(indexParam++, usuario.getRazonBorrado());
 			
-			SimpleDateFormat formatter = new SimpleDateFormat("dd/MM/YYYY HH:mm:ss");
 			Date date = new Date(System.currentTimeMillis());
 			
 			stmt.setDate(indexParam++, new java.sql.Date(date.getTime()));

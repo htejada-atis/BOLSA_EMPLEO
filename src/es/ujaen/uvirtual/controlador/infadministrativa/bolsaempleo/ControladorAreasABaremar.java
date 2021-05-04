@@ -21,7 +21,6 @@ import es.ujaen.uvirtual.beans.CodigoDescripcion;
 import es.ujaen.uvirtual.beans.UVDatos;
 import es.ujaen.uvirtual.beans.Usuario;
 import es.ujaen.uvirtual.beans.uvirtual.bolsaempleo.Bolsa;
-import es.ujaen.uvirtual.beans.uvirtual.bolsaempleo.UsuarioBolsaEmpleo;
 import es.ujaen.uvirtual.beans.vistas.uvirtual.bolsaempleo.VistaAreasBaremar;
 import es.ujaen.uvirtual.modelo.bolsaempleo.ModeloBolsa;
 import es.ujaen.uvirtual.modelo.bolsaempleo.ModeloUsuarioBolsaEmpleo;
@@ -180,7 +179,6 @@ public class ControladorAreasABaremar extends HttpServlet {
 	private void listadoAreasExcluidasUsuario(VistaAreasBaremar bean, UVDatos datos, 
 			HttpServletRequest request, HttpServletResponse response) throws IOException, SQLException {
 		ModeloArea modelo = ModeloArea.obtenerInstancia();	
-		ModeloUsuarioBolsaEmpleo modeloUsuario = ModeloUsuarioBolsaEmpleo.obtenerInstancia();
 		datos.setContentType("application/json");
 		datos.setRespuestaEnviada(true);
 		response.setContentType("application/json");

@@ -30,7 +30,6 @@ import es.ujaen.uvirtual.modelo.bolsaempleo.ModeloMisTitulaciones;
 import es.ujaen.uvirtual.modelo.bolsaempleo.ModeloUsuarioBolsaEmpleo;
 import es.ujaen.uvirtual.utilidades.BolsaEmpleoDataTable;
 import es.ujaen.uvirtual.utilidades.BolsaEmpleoUtils;
-import es.ujaen.uvirtual.utilidades.BolsaEmpleoValidator;
 import es.ujaen.uvirtual.utilidades.EscapaHTML;
 import es.ujaen.uvirtual.utilidades.Formateador;
 import es.ujaen.uvirtual.utilidades.UVException;
@@ -232,28 +231,6 @@ public class ControladorMisTitulaciones extends HttpServlet {
 		}
 	}
 	
-	
-	/** Valida el formulario de Mis Datos.
-	 * @param request .
-	 * @return validator .
-	 * @throws UVException .
-	 * @throws SQLException .
-	 * @throws IOException .
-	 * @throws IOException .
-	 */
-	private BolsaEmpleoValidator getValidatorTitulaciones(HttpServletRequest request) throws UVException {
-		BolsaEmpleoValidator validator = new BolsaEmpleoValidator(request);
-		validator.addParamString(PARAM_DESCRIPCION);
-		validator.addRule(PARAM_DESCRIPCION, "max:" + ModeloMisTitulaciones.COLUMN_DESCRIPCION_MAXLENGTH, 
-				String.format(MENSAJE_ERROR_DESCRIPCION_LARGA, ModeloMisTitulaciones.COLUMN_DESCRIPCION_MAXLENGTH));
-		
-		validator.addParamString(PARAM_ARCHIVO);
-		validator.addRule(PARAM_ARCHIVO, "required", MENSAJE_ERROR_ARCHIVO_VACIO);
-		validator.addRule(PARAM_ARCHIVO, "noBlank", MENSAJE_ERROR_ARCHIVO_VACIO);
-		
-		return validator;
-	}
-	
 	/** dirige al formulario de creación de una nueva titulación para un usuario.
 	 * @param request .
 	 * @param response .
@@ -286,8 +263,6 @@ public class ControladorMisTitulaciones extends HttpServlet {
 	 */
 	public void agregarTitulacion(HttpServletRequest request, HttpServletResponse response, VistaTitulaciones bean, UsuarioBolsaEmpleo usu) 
 			throws SQLException, UVException, IOException, ServletException {
-		UVDatos datos = (UVDatos) request.getAttribute(UVDatos.NOMBRE_ATRIBUTO);
-		
 		ModeloMisTitulaciones modelo = ModeloMisTitulaciones.obtenerInstancia();		
 				
 			String descripcion = EscapaHTML.ajustaCodificacion(request.getParameter(PARAM_DESCRIPCION));
@@ -327,7 +302,6 @@ public class ControladorMisTitulaciones extends HttpServlet {
 	
 	private void eliminarTitulacionUsuario(HttpServletRequest request, HttpServletResponse response, VistaTitulaciones bean) throws SQLException, UVException, IOException {
 		String selectedJson = EscapaHTML.ajustaCodificacion(request.getParameter(PARAM_TITULACIONES_USUARIOS_SELECCIONADOS));
-		Integer codNum = Formateador.leeParametroInteger(request.getParameter(PARAM_ID));
 		int[] selected = (new Gson()).fromJson(selectedJson, new TypeToken<int[]>() { }.getType());
 		
 		ModeloMisTitulaciones modelo = ModeloMisTitulaciones.obtenerInstancia();

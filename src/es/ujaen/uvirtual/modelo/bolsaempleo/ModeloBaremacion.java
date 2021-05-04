@@ -387,6 +387,13 @@ public class ModeloBaremacion {
 		return false;
 	} 
 	
+	/**
+	 * Devuelve si la suma de porcenajes de items es correcta.
+	 * @param apartado .
+	 * @param sentido .
+	 * @return .
+	 * @throws SQLException .
+	 */
 	public boolean checkSumaPorcentagesApartados(ApartadoBaremacion apartado, String sentido) throws SQLException {		
 		String sql = "SELECT SUM(bepapa.PORCENTAJEMAXIMO) AS SUMA "
 				+ "FROM TBEP_APARTADOSBAREMACION bepapa "
@@ -395,6 +402,8 @@ public class ModeloBaremacion {
 		if (apartado.getCodNum() != null) {
 			sql += " AND bepapa.CODNUM != ?";
 		}
+		
+		boolean check = false; 
 		
 		try (Connection con = ConexionUvirtual.obtenerInstancia(); PreparedStatement stmt = con.prepareStatement(sql);) {
 			int parameterIndex = 1;
@@ -414,18 +423,20 @@ public class ModeloBaremacion {
 					
 					if ("Superar".equals(sentido)) {
 						if (acum > MAXIMO_VALOR_PORCENTAGE) {
-							return true;
+							check = true;
+							break;
 						}
 					} else {
 						if (acum < MAXIMO_VALOR_PORCENTAGE) {
-							return true;
+							check = true;
+							break;
 						}
 					}
 				}
 			}
 		}
 		
-		return false;
+		return check;
 	} 
 	
 	private void chequearApartadoParaInsertarOActualizar(ApartadoBaremacion apartado) throws SQLException, UVException {

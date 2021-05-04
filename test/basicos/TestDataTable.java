@@ -200,7 +200,7 @@ public class TestDataTable {
     	assertEquals(BolsaEmpleoDataTable.ERROR_MSG_PARAMETRO_TIPO_ORDENACION_NO_VALIDO, throwable.getMessage());
     }
    
-    /** Error al no poner la columna de ordenacion ordenación.
+    /** Error al no poner la columna de ordenación.
      * @throws UVException .
      */
     @Test

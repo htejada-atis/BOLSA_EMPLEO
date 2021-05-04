@@ -137,7 +137,6 @@ public class TestBEPAfinidad {
 		WebElement btnNuevo = pmain.findElement(By.id("nuevo_usuario"));
 		btnNuevo.click();
 		
-		WebDriverWait wait2 = new WebDriverWait(DriverUvBEP.getDriver(), WAIT_ELEMENT);
 		WebElement pmain2 = wait.until(ExpectedConditions.visibilityOfElementLocated(By.className(DIV_MAIN_USUARIOS_BUSQUEDA)));	
 
 		WebElement username = pmain2.findElement(By.name("nombre"));
@@ -145,7 +144,6 @@ public class TestBEPAfinidad {
 		WebElement btnBuscar = pmain2.findElement(By.id("usuario_buscar"));
 		btnBuscar.click();
 		
-		WebDriverWait wait3 = new WebDriverWait(DriverUvBEP.getDriver(), WAIT_ELEMENT);
 		WebElement pmain3 = wait.until(ExpectedConditions.visibilityOfElementLocated(By.className(DIV_MAIN_USUARIOS_FORM)));
 		WebElement btnVolver = pmain3.findElement(By.id("usuario_enviar"));
 		btnVolver.click();

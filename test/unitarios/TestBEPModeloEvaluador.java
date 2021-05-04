@@ -18,8 +18,6 @@ import es.ujaen.uvirtual.beans.Rol;
 import es.ujaen.uvirtual.beans.uvirtual.bolsaempleo.Afinidad;
 import es.ujaen.uvirtual.beans.uvirtual.bolsaempleo.Evaluador;
 import es.ujaen.uvirtual.modelo.bolsaempleo.ModeloAfinidad;
-import es.ujaen.uvirtual.modelo.bolsaempleo.ModeloEvaluador;
-import es.ujaen.uvirtual.modelo.bolsaempleo.ModeloUsuarioBolsaEmpleo;
 import es.ujaen.uvirtual.modelo.conexion.Conexion;
 import es.ujaen.uvirtual.utilidades.UVException;
 
@@ -36,7 +34,6 @@ public class TestBEPModeloEvaluador {
 	private static final Boolean BORRADO = true;
 	private static final Date FECHAEXCLUSION = new java.sql.Date(Calendar.getInstance().getTime().getTime());
 	private static final Date FECHABORRADO = new java.sql.Date(Calendar.getInstance().getTime().getTime());
-	private static final Boolean ACTIVO = false;
 	private static final Integer AREA = 3;
     
 	/** prepara la bd con los datos iniciales.
@@ -58,9 +55,6 @@ public class TestBEPModeloEvaluador {
      */
     @Test
     public void testA01InsertaAfinidad() throws SQLException, ParseException, UVException {
-		ModeloEvaluador modelo = ModeloEvaluador.obtenerInstancia();
-		ModeloUsuarioBolsaEmpleo modeloUsuario = ModeloUsuarioBolsaEmpleo.obtenerInstancia();
-    	
 		Evaluador evaluador = new Evaluador();
 		evaluador.setCodPersona(CODPERSONA);
 		evaluador.setCodCuenta(CODCUENTA);

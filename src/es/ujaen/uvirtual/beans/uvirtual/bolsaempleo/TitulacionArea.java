@@ -1,6 +1,5 @@
 package es.ujaen.uvirtual.beans.uvirtual.bolsaempleo;
 
-import java.io.InputStream;
 import java.io.Serializable;
 
 

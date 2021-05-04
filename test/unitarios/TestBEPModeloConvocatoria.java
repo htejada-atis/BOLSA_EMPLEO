@@ -32,8 +32,6 @@ public class TestBEPModeloConvocatoria {
 	private static final String CADENA = "cadena";
 	private static final String ESTADO = "CERRADA";
 	private static final Date FECHACOMISION = new java.sql.Date(Calendar.getInstance().getTime().getTime());
-	private static final Date FECHALIMITE = new java.sql.Date(Calendar.getInstance().getTime().getTime());
-
 
 	/** prepara la bd con los datos iniciales.
      * @throws SQLException si error en bd

@@ -7,7 +7,6 @@ import es.ujaen.uvirtual.beans.uvirtual.bolsaempleo.ApartadoBaremacion;
 import es.ujaen.uvirtual.beans.uvirtual.bolsaempleo.BloqueBaremacion;
 import es.ujaen.uvirtual.beans.uvirtual.bolsaempleo.ItemBaremacion;
 import es.ujaen.uvirtual.beans.uvirtual.bolsaempleo.MeritoPreferente;
-import es.ujaen.uvirtual.beans.uvirtual.bolsaempleo.Titulacion;
 import es.ujaen.uvirtual.beans.vistas.Vista;
 import es.ujaen.uvirtual.utilidades.BolsaEmpleoDataTable;
 

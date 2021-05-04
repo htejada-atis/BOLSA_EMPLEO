@@ -90,7 +90,7 @@ public class ModeloEvaluador {
 			dataTable.setFiltersParams(stmt, stmtCount, indexParam);
 			try (ResultSet rs = stmt.executeQuery()) {
 				while (rs.next()) {
-					UsuarioBolsaEmpleo usuario =  new UsuarioBolsaEmpleo();
+					UsuarioBolsaEmpleo usuario = new UsuarioBolsaEmpleo();
 					usuario.setCodNum(rs.getInt("CODNUM"));
 					usuario.setTipoDocumento(rs.getString("STRTIPODOCUMENTO"));
 					usuario.setNumDocumento(rs.getString("IDNIF") + rs.getString("LETRANIF"));

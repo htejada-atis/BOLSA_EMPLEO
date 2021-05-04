@@ -75,8 +75,8 @@ public class ControladorInicio extends HttpServlet {
 	public static final Integer RESPONSE_HTTP_CODE_ERROR_400 = 400;
 	
 	// urls
-	public static String URL_PATTERN_AJAX_PUBLICA = "/pub/es/ajax/informacionadministrativa/bolsaempleo";
-	public static String URL_PATTERN_AJAX_PRIVADA = "/srv/es/ajax/informacionadministrativa/bolsaempleo";
+	public static final String URL_PATTERN_AJAX_PUBLICA = "/pub/es/ajax/informacionadministrativa/bolsaempleo";
+	public static final String URL_PATTERN_AJAX_PRIVADA = "/srv/es/ajax/informacionadministrativa/bolsaempleo";
 	public static final String URL_PATTERN_FILES_PUBLICA = "/pub/es/informacionadministrativa/bolsaempleo";
 	public static final String URL_PATTERN_FILES_PRIVADA = "/srv/es/informacionadministrativa/bolsaempleo";
 	

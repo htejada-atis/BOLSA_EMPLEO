@@ -57,8 +57,6 @@ public class ModeloCandidato {
 	 * @throws UVException error si no existe la area .
 	 */
 	public BolsaEmpleoDataTable<Candidato> listaCandidatosDatatable(Map<String, String[]> params) throws SQLException, UVException {
-		ModeloTitulacion modeloTitulaciones = ModeloTitulacion.obtenerInstancia();
-		
 		List<Candidato> usuarios = new ArrayList<>();
 		BolsaEmpleoDataTable<Candidato> dataTable = new BolsaEmpleoDataTable<Candidato>(params);
 		

@@ -261,11 +261,13 @@ public class ControladorMisMeritos extends HttpServlet {
 							
 							if (itemBaremacion.getUnidades().equals("DECIMAL")) {
 								if (valor % 1 == 0) {
-									throw new UVException(String.format(MENSAJE_ERROR_VALOR_DECIMAL_NO_PERMITIDO, itemBaremacion.getValorMinimo()));
+									throw new UVException(String.format(MENSAJE_ERROR_VALOR_DECIMAL_NO_PERMITIDO, 
+											itemBaremacion.getValorMinimo()));
 								}
 							} else {
 								if (valor % 1 != 0) {
-									throw new UVException(String.format(MENSAJE_ERROR_VALOR_ENTERO_NO_PERMITIDO, itemBaremacion.getValorMinimo()));
+									throw new UVException(String.format(MENSAJE_ERROR_VALOR_ENTERO_NO_PERMITIDO, 
+											itemBaremacion.getValorMinimo()));
 								}
 							}
 							
@@ -332,7 +334,6 @@ public class ControladorMisMeritos extends HttpServlet {
 	 */
 	private void eliminarMeritos(HttpServletRequest request, HttpServletResponse response) throws SQLException, UVException, IOException {
 		ModeloMerito modelo = ModeloMerito.obtenerInstancia();
-		Integer codNum = Formateador.leeParametroInteger(request.getParameter(PARAM_ID));
 		
 		Gson gson = new GsonBuilder().create();
 		

@@ -14,7 +14,6 @@ import controlador.implementacion.PeticionHttp;
 import controlador.implementacion.RespuestaHttp;
 import es.ujaen.uvirtual.beans.vistas.uvirtual.bolsaempleo.VistaMeritos;
 import es.ujaen.uvirtual.controlador.infadministrativa.bolsaempleo.ControladorMisMeritos;
-import es.ujaen.uvirtual.utilidades.UVException;
 
 /** test controlador mis méritos.
  * @author jlopez
@@ -25,7 +24,6 @@ public class TestBEPControladorMisMeritos {
 	private static final String MENSAJE_APARTADO_DEVUELTO = "Debe devolver apartado";
 	private static final String MENSAJE_APARTADOS_DEVUELTOS = "Debe devolver apartados";
 	private static final String MENSAJE_CON_ERROR = "Debe devolver error";
-	private static final String MENSAJE_CON_EXITO_ESPERADO = "El mensaje de exito debe coincidir";
 	private static final String MENSAJE_ITEMS_DEVUELTOS = "Debe devolver items";
 	private static final String MENSAJE_MERITOS_DEVUELTOS = "Debe devolver méritos";
 	private static final String MENSAJE_MERITO_DEVUELTO = "Debe devolver mérito";

@@ -3,8 +3,6 @@ package es.ujaen.uvirtual.controlador.infadministrativa.bolsaempleo;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.sql.SQLException;
-import java.text.SimpleDateFormat;
-import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 import java.util.logging.Level;
@@ -28,13 +26,9 @@ import es.ujaen.uvirtual.beans.Usuario;
 import es.ujaen.uvirtual.adm.CrearUsuario;
 import es.ujaen.uvirtual.beans.uvirtual.bolsaempleo.Area;
 import es.ujaen.uvirtual.beans.uvirtual.bolsaempleo.Bolsa;
-import es.ujaen.uvirtual.beans.uvirtual.bolsaempleo.Noticia;
 import es.ujaen.uvirtual.beans.uvirtual.bolsaempleo.UsuarioBolsaEmpleo;
-import es.ujaen.uvirtual.beans.vistas.uvirtual.bolsaempleo.VistaNoticias;
 import es.ujaen.uvirtual.beans.vistas.uvirtual.bolsaempleo.VistaUsuarioBolsaEmpleo;
 import es.ujaen.uvirtual.modelo.bolsaempleo.ModeloArea;
-import es.ujaen.uvirtual.modelo.bolsaempleo.ModeloBolsa;
-import es.ujaen.uvirtual.modelo.bolsaempleo.ModeloNoticia;
 import es.ujaen.uvirtual.modelo.bolsaempleo.ModeloRol;
 import es.ujaen.uvirtual.modelo.bolsaempleo.ModeloUsuarioBolsaEmpleo;
 import es.ujaen.uvirtual.utilidades.BolsaEmpleoValidator;
@@ -383,7 +377,6 @@ public class ControladorUsuarioBolsaEmpleo extends HttpServlet {
 	 * @throws UVException en caso de error en bd
 	 */
 	public void agregarUsuario(HttpServletRequest request, HttpServletResponse response, VistaUsuarioBolsaEmpleo bean) throws SQLException, UVException, IOException {
-		UVDatos datos = (UVDatos) request.getAttribute(UVDatos.NOMBRE_ATRIBUTO);
 		bean.setVista("/WEB-INF/jsp/vista/infadministrativa/bolsaempleo/configuracion/usuarios.jsp");
 		
 		ModeloUsuarioBolsaEmpleo modelo = ModeloUsuarioBolsaEmpleo.obtenerInstancia();
@@ -407,7 +400,6 @@ public class ControladorUsuarioBolsaEmpleo extends HttpServlet {
 			ModeloRol modeloRol = ModeloRol.obtenerInstancia();
 			Rol role = modeloRol.getRoleById(Formateador.leeParametroInteger(request.getParameter(PARAM_ROLE)));
 				
-			SimpleDateFormat formatter = new SimpleDateFormat("dd/MM/YYYY HH:mm:ss");
 			Date date = new Date(System.currentTimeMillis());
 				
 			String usu = EscapaHTML.ajustaCodificacion(request.getParameter(PARAM_ID));
@@ -470,10 +462,7 @@ public class ControladorUsuarioBolsaEmpleo extends HttpServlet {
 				ModeloRol modeloRol = ModeloRol.obtenerInstancia();
 				Rol role = modeloRol.getRoleById(Formateador.leeParametroInteger(request.getParameter(PARAM_ROLE)));
 				
-				SimpleDateFormat formatter = new SimpleDateFormat("dd/MM/YYYY HH:mm:ss");
 				Date date = new Date(System.currentTimeMillis());
-				
-				String usua = EscapaHTML.ajustaCodificacion(request.getParameter(PARAM_NOMBRE_USUARIO));
 				
 				UsuarioBolsaEmpleo usuario = new UsuarioBolsaEmpleo(codNum, role, listadist, excluido, razonexcluido, date);
 				
@@ -538,7 +527,6 @@ public class ControladorUsuarioBolsaEmpleo extends HttpServlet {
 					
 			String razonexcluido = EscapaHTML.ajustaCodificacion(request.getParameter(PARAM_RAZON_EXCLUIDO));
 			
-			SimpleDateFormat formatter = new SimpleDateFormat("dd/MM/YYYY HH:mm:ss");
 			Date date = new Date(System.currentTimeMillis());
 			
 			UsuarioBolsaEmpleo usuario = new UsuarioBolsaEmpleo(codNum, excluido, razonexcluido, date);
