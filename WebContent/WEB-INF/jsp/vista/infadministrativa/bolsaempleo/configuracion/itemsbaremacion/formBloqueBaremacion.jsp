@@ -72,7 +72,7 @@ String codigoCompleto = apartado.getCodigo() + "." + (bloque != null ? bloque.ge
 <script>
 	$(document).ready(function() {
 		document.getElementById("bloque_codigo").addEventListener("input", function(event) {
-			document.getElementById("bloque_apartado_codigo").value = <%= apartado.getCodigo() %> + "." + this.value;
+			document.getElementById("bloque_apartado_codigo").value = '<%= apartado.getCodigo() %>.' + this.value;
 		});		
 	});
 </script>

@@ -40,6 +40,7 @@ public class TestBEPModeloMeritosPreferentes {
 	private static final Float ITEM_VALORMINIMO = (float) 1;
 	private static final Float ITEM_VALORMAXIMO = (float) 100;
 	private static final String ITEM_AFINIDAD = "EEEE";	
+	private static final Boolean ITEM_INDIVIDUALIZADO = true;
 	private static final Integer BLOQUE_NUM_MAXIMO_MERITOS = 1;
 	private static final Float APARTADO_PUNTUACIONMAXIMA = (float) 1;
 	private static final Float APARTADO_PORCENTAJEMAXIMO = (float) 1;
@@ -48,10 +49,12 @@ public class TestBEPModeloMeritosPreferentes {
 	private static final BloqueBaremacion BLOQUE = new BloqueBaremacion(CODNUM, APARTADO, DESCRIPCION, DESCRIPCION, ACTIVO, BLOQUE_NUM_MAXIMO_MERITOS);
 
 	private static final ItemBaremacion ITEM = 
-			new ItemBaremacion(CODNUM, BLOQUE, DESCRIPCION, DESCRIPCION, ACTIVO, ITEM_UNIDADES, ITEM_VALOR, ITEM_VALORMINIMO, ITEM_VALORMAXIMO, ITEM_AFINIDAD);
+			new ItemBaremacion(CODNUM, BLOQUE, DESCRIPCION, DESCRIPCION, ACTIVO, ITEM_UNIDADES, ITEM_VALOR, 
+					ITEM_VALORMINIMO, ITEM_VALORMAXIMO, ITEM_AFINIDAD, ITEM_INDIVIDUALIZADO);
+	
 	private static final ItemBaremacion ITEM2 = 
-			new ItemBaremacion(CODNUM, BLOQUE, DESCRIPCION, DESCRIPCION, ACTIVO, ITEM_UNIDADES, ITEM_VALOR, ITEM_VALORMINIMO, ITEM_VALORMAXIMO, ITEM_AFINIDAD);
-
+			new ItemBaremacion(CODNUM, BLOQUE, DESCRIPCION, DESCRIPCION, ACTIVO, ITEM_UNIDADES, ITEM_VALOR, 
+					ITEM_VALORMINIMO, ITEM_VALORMAXIMO, ITEM_AFINIDAD, ITEM_INDIVIDUALIZADO);
     
 	/** prepara la bd con los datos iniciales.
      * @throws SQLException si error en bd

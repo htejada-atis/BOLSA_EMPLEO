@@ -47,9 +47,9 @@ public class ModeloBaremacion {
 	public static final int ORDER_COLUMN_INDEX_ITEMS_ACTIVO = 7;
 	
 	// tipos de unidades de los items
-	public static final String ITEM_UNIDADES_UNIDADES = "UNIDADES";
 	public static final String ITEM_UNIDADES_MEDICION_ENTERO = "ENTERO";
 	public static final String ITEM_UNIDADES_MEDICION_DECIMAL = "DECIMAL";
+	public static final String ITEM_UNIDADES_MEDICION_SINO = "SI/NO";
 		
 	// errores
 	public static final String ERROR_APARTADO_NOEXITE = "Apartado no encontrado";
@@ -90,7 +90,6 @@ public class ModeloBaremacion {
         }
         return eInstancia;
     }
-	
 	
 	/********************************************** METODOS PÚBLICOS PARA CONSULTAS APARTADOBAREMACION  ********************************************/
 	
@@ -319,6 +318,58 @@ public class ModeloBaremacion {
 		return listaApartadoBaremacion(" WHERE FLGACTIVO = 'S' ORDER BY nombre");
 	} 
 	
+	/**
+	 * Devuelve si la suma de porcenajes de items es correcta.
+	 * @param apartado .
+	 * @param sentido .
+	 * @return .
+	 * @throws SQLException .
+	 */
+	public boolean checkSumaPorcentagesApartados(ApartadoBaremacion apartado, String sentido) throws SQLException {		
+		String sql = "SELECT SUM(bepapa.PORCENTAJEMAXIMO) AS SUMA "
+				+ "FROM TBEP_APARTADOSBAREMACION bepapa "
+				+ "WHERE bepapa.FLGACTIVO != 'N'";
+		
+		if (apartado.getCodNum() != null) {
+			sql += " AND bepapa.CODNUM != ?";
+		}
+		
+		boolean check = false; 
+		
+		try (Connection con = ConexionUvirtual.obtenerInstancia(); PreparedStatement stmt = con.prepareStatement(sql);) {
+			int parameterIndex = 1;
+			
+			if (apartado.getCodNum() != null) {
+				stmt.setInt(parameterIndex++, apartado.getCodNum());
+			}
+		
+			try (ResultSet rs = stmt.executeQuery()) {
+				while (rs.next()) {
+					Float acum = null;
+					if (apartado.getPorcentajeMaximo() != null) {
+						acum = rs.getFloat("SUMA") + apartado.getPorcentajeMaximo();
+					} else {
+						acum = rs.getFloat("SUMA");
+					}
+					
+					if ("Superar".equals(sentido)) {
+						if (acum > MAXIMO_VALOR_PORCENTAGE) {
+							check = true;
+							break;
+						}
+					} else {
+						if (acum < MAXIMO_VALOR_PORCENTAGE) {
+							check = true;
+							break;
+						}
+					}
+				}
+			}
+		}
+		
+		return check;
+	} 
+	
 	private List<ApartadoBaremacion> listaApartadoBaremacion(String clausula) throws SQLException, UVException {
 		List<ApartadoBaremacion> items = new ArrayList<>();
 		String consulta = "SELECT bepapa.* FROM TBEP_APARTADOSBAREMACION bepapa " + clausula;
@@ -386,59 +437,7 @@ public class ModeloBaremacion {
 		
 		return false;
 	} 
-	
-	/**
-	 * Devuelve si la suma de porcenajes de items es correcta.
-	 * @param apartado .
-	 * @param sentido .
-	 * @return .
-	 * @throws SQLException .
-	 */
-	public boolean checkSumaPorcentagesApartados(ApartadoBaremacion apartado, String sentido) throws SQLException {		
-		String sql = "SELECT SUM(bepapa.PORCENTAJEMAXIMO) AS SUMA "
-				+ "FROM TBEP_APARTADOSBAREMACION bepapa "
-				+ "WHERE bepapa.FLGACTIVO != 'N'";
-		
-		if (apartado.getCodNum() != null) {
-			sql += " AND bepapa.CODNUM != ?";
-		}
-		
-		boolean check = false; 
-		
-		try (Connection con = ConexionUvirtual.obtenerInstancia(); PreparedStatement stmt = con.prepareStatement(sql);) {
-			int parameterIndex = 1;
 			
-			if (apartado.getCodNum() != null) {
-				stmt.setInt(parameterIndex++, apartado.getCodNum());
-			}
-		
-			try (ResultSet rs = stmt.executeQuery()) {
-				while (rs.next()) {
-					Float acum = null;
-					if (apartado.getPorcentajeMaximo() != null) {
-						acum = rs.getFloat("SUMA") + apartado.getPorcentajeMaximo();
-					} else {
-						acum = rs.getFloat("SUMA");
-					}
-					
-					if ("Superar".equals(sentido)) {
-						if (acum > MAXIMO_VALOR_PORCENTAGE) {
-							check = true;
-							break;
-						}
-					} else {
-						if (acum < MAXIMO_VALOR_PORCENTAGE) {
-							check = true;
-							break;
-						}
-					}
-				}
-			}
-		}
-		
-		return check;
-	} 
-	
 	private void chequearApartadoParaInsertarOActualizar(ApartadoBaremacion apartado) throws SQLException, UVException {
 		if (this.existeOtroApartadoActivoPorCodigo(apartado)) {
 			throw new UVException("Ya existe un apartado con el código introducido");
@@ -781,7 +780,7 @@ public class ModeloBaremacion {
 		return false;
 	} 
 	
-	/********************************************** METODOS PÚBLICOS PARA CONSULTAS BLOQUEBAREMACION  ********************************************/	
+	/********************************************** METODOS PÚBLICOS PARA CONSULTAS ITEMS  ********************************************/	
 
 	/**
 	 * Devuelve un item de baremación por su id.
@@ -903,7 +902,8 @@ public class ModeloBaremacion {
 				+ "VALOR = ?, "
 				+ "VALOR_MINIMO = ?, "
 				+ "VALOR_MAXIMO = ?, "
-				+ "AFINIDAD = ? "
+				+ "AFINIDAD = ?, "
+				+ "INDIVIDUALIZADO = ? "
 				+ "WHERE CODNUM = ?";
 		
 		try (Connection conexion = ConexionUvirtual.obtenerInstancia(); PreparedStatement stmt = conexion.prepareStatement(consulta);) {
@@ -916,7 +916,16 @@ public class ModeloBaremacion {
 			stmt.setFloat(parameterIndex++, item.getValor());
 			stmt.setFloat(parameterIndex++, item.getValorMinimo());
 			stmt.setFloat(parameterIndex++, item.getValorMaximo());
-			stmt.setString(parameterIndex++, item.getAfinidad());			
+			if (item.getAfinidad() == null) {
+				stmt.setNull(parameterIndex++, Types.NULL);
+			} else {
+				stmt.setString(parameterIndex++, item.getAfinidad());	
+			}	
+			if (item.getAfinidad() == null) {
+				stmt.setString(parameterIndex++, "N");
+			} else {
+				stmt.setString(parameterIndex++, item.getIndividualizado() ? "S" : "N");
+			}			
 			stmt.setInt(parameterIndex++, item.getCodNum());
 			stmt.executeUpdate();
 		}
@@ -955,8 +964,8 @@ public class ModeloBaremacion {
 		this.chequearItemParaInsertarOActualizar(item);
 		
 		String consulta = "INSERT INTO TBEP_ITEMSBAREMACION "
-				+ " (CODIGO,NOMBRE,DESCRIPCION,BEPBLO_CODNUM,UNIDADES,VALOR,VALOR_MINIMO,VALOR_MAXIMO,AFINIDAD)"
-				+ " VALUES (?,?,?,?,?,?,?,?,?)";
+				+ " (CODIGO,NOMBRE,DESCRIPCION,BEPBLO_CODNUM,UNIDADES,VALOR,VALOR_MINIMO,VALOR_MAXIMO,AFINIDAD,INDIVIDUALIZADO)"
+				+ " VALUES (?,?,?,?,?,?,?,?,?,?)";
 		
 		try (Connection conexion = ConexionUvirtual.obtenerInstancia(); PreparedStatement stmt = conexion.prepareStatement(consulta);) {
 			int parameterIndex = 1;
@@ -969,6 +978,11 @@ public class ModeloBaremacion {
 			stmt.setFloat(parameterIndex++, item.getValorMinimo());
 			stmt.setFloat(parameterIndex++, item.getValorMaximo());
 			stmt.setString(parameterIndex++, item.getAfinidad());
+			if (item.getAfinidad() == null) {
+				stmt.setString(parameterIndex++, "N");
+			} else {
+				stmt.setString(parameterIndex++, item.getIndividualizado() ? "S" : "N");
+			}			
 			stmt.executeUpdate();
 		}
 	}
@@ -1031,16 +1045,17 @@ public class ModeloBaremacion {
 	private ItemBaremacion createItemFromResultSet(ResultSet rs) throws SQLException, UVException {	
 		ItemBaremacion item = new ItemBaremacion();
 		item.setCodNum(rs.getInt("CODNUM"));
+		item.setBloqueBaremacion(this.getBloqueBaremacionById(rs.getInt("BEPBLO_CODNUM")));
 		item.setCodigo(rs.getString("CODIGO"));
 		item.setNombre(rs.getString("NOMBRE"));
 		item.setDescripcion(rs.getString("DESCRIPCION"));
-		item.setActivo(rs.getString("FLGACTIVO").equals("S"));
-		item.setBloqueBaremacion(this.getBloqueBaremacionById(rs.getInt("BEPBLO_CODNUM")));
+		item.setActivo(rs.getString("FLGACTIVO").equals("S"));		
 		item.setUnidades(rs.getString("UNIDADES"));
 		item.setValor(rs.getFloat("VALOR"));
 		item.setValorMinimo(rs.getFloat("VALOR_MINIMO"));
 		item.setValorMaximo(rs.getFloat("VALOR_MAXIMO"));
 		item.setAfinidad(rs.getString("AFINIDAD"));
+		item.setIndividualizado(rs.getString("INDIVIDUALIZADO").equals("S"));
 		return item;
 	}
 	
@@ -1064,6 +1079,7 @@ public class ModeloBaremacion {
 		ArrayList<String> unidades = new ArrayList<String>();
 		unidades.add(ITEM_UNIDADES_MEDICION_ENTERO);
 		unidades.add(ITEM_UNIDADES_MEDICION_DECIMAL);
+		unidades.add(ITEM_UNIDADES_MEDICION_SINO);
 			
 		if (!unidades.contains(item.getUnidades())) {
 			throw new UVException("Tipo de unidad no válida");
@@ -1113,6 +1129,5 @@ public class ModeloBaremacion {
 		}
 		
 		return false;
-	} 
-		
+	} 		
 }

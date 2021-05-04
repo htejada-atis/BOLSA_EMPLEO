@@ -1,16 +1,16 @@
 package basicos;
 
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertThrows;
-import static org.mockito.Mockito.when;
+//import static org.junit.Assert.assertNotNull;
+//import static org.junit.Assert.assertThrows;
+//import static org.mockito.Mockito.when;
 
-import javax.servlet.http.Part;
+//import javax.servlet.http.Part;
 
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.junit.MockitoJUnitRunner;
-import org.mockito.Mock;
+//import org.mockito.Mock;
 
 import es.ujaen.uvirtual.utilidades.BolsaEmpleoUtils;
 

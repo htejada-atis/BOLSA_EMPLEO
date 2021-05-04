@@ -1,7 +1,7 @@
 -- creación registros de prueba apartados de baremación;
 INSERT INTO TBEP_APARTADOSBAREMACION (CODIGO,NOMBRE,PORCENTAJEMAXIMO)
-VALUES ('1','Formación académica',30);
+VALUES ('I','Formación académica',50);
 INSERT INTO TBEP_APARTADOSBAREMACION (CODIGO,NOMBRE,PORCENTAJEMAXIMO)
-VALUES ('2','Actividad docente',40);
+VALUES ('II','Actividad docente',20);
 INSERT INTO TBEP_APARTADOSBAREMACION (CODIGO,NOMBRE,PORCENTAJEMAXIMO)
-VALUES ('3','Actividad investigadora',20);
+VALUES ('III','Actividad investigadora',30);

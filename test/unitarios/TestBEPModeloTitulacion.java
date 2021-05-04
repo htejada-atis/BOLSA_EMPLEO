@@ -5,7 +5,6 @@ import static org.junit.Assert.fail;
 import java.io.IOException;
 import java.sql.SQLException;
 import java.text.ParseException;
-import java.util.ArrayList;
 import java.util.List;
 import javax.sql.DataSource;
 import org.junit.BeforeClass;
@@ -21,9 +20,6 @@ import es.ujaen.uvirtual.utilidades.UVException;
 public class TestBEPModeloTitulacion {
 	
     private static final String NOMBRE_TITULACION = "nombre titulacion";
-    private static final Integer AREA = 19;
-
-    
     
 	/** prepara la bd con los datos iniciales.
      * @throws SQLException si error en bd

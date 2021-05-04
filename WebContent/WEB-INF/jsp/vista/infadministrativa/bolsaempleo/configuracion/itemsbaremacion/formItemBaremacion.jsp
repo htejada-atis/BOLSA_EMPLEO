@@ -79,41 +79,20 @@ if(item!=null){
 		<div class="form-group-container col2">
 			<div class="form-group">
 				<%
-					String unidadesSelected = BolsaEmpleoUtils.getParamForm(request, ControladorItemsBaremacion.PARAM_ITEM_UNIDADES, item != null ? item.getUnidades() : ModeloBaremacion.ITEM_UNIDADES_UNIDADES);
+					String unidadesSelected = BolsaEmpleoUtils.getParamForm(request, ControladorItemsBaremacion.PARAM_ITEM_UNIDADES, item != null ? item.getUnidades() : ModeloBaremacion.ITEM_UNIDADES_MEDICION_ENTERO);
 				%>
 	    		<label for="item_unidades">Unidades</label>
 	    		<select class="params" id="item_unidades" name="<%= ControladorItemsBaremacion.PARAM_ITEM_UNIDADES %>" style="width:100%;">
 					<option value="<%= ModeloBaremacion.ITEM_UNIDADES_MEDICION_ENTERO %>" <%= unidadesSelected.equals(ModeloBaremacion.ITEM_UNIDADES_MEDICION_ENTERO) ? "selected=\"selected\"" : "" %>>Entero</option>
 					<option value="<%= ModeloBaremacion.ITEM_UNIDADES_MEDICION_DECIMAL %>" <%= unidadesSelected.equals(ModeloBaremacion.ITEM_UNIDADES_MEDICION_DECIMAL) ? "selected=\"selected\"" : "" %>>Decimal</option>
+					<option value="<%= ModeloBaremacion.ITEM_UNIDADES_MEDICION_SINO %>" <%= unidadesSelected.equals(ModeloBaremacion.ITEM_UNIDADES_MEDICION_SINO) ? "selected=\"selected\"" : "" %>>Si ó No</option>				
 				</select>				
-	    	</div>	    	
-		</div>
-		<div class="form-group-container col2">
-			<div class="form-group">
+	    	</div>
+	    	<div class="form-group">
 	    		<label for="item_valor">Valor unitario</label>
 	    		<input class="form-input-custom" type="text" name="<%= ControladorItemsBaremacion.PARAM_ITEM_VALOR %>" id="item_valor" 
 	    			   value="<%= BolsaEmpleoUtils.getParamForm(request, ControladorItemsBaremacion.PARAM_ITEM_VALOR, item != null ? item.getValor().toString() : "") %>"/>
-	    	</div>
-	    	<div class="form-group">
-	    		<label for="item_afinida">Afinidad</label>
-	    		<select class="params" id="item_unidades" name="<%= ControladorItemsBaremacion.PARAM_ITEM_AFINIDAD %>" style="width:100%;">
-					<option value="-1"> - </option>
-    				<%for(Afinidad afinidad: bean.getAfinidades()){
-    					if(item!=null){
-    						if(bean.getAfinidad()!=null){
-            					if(bean.getAfinidad().getCodigo().equals(afinidad.getCodigo())){%>
-        							<option value="<%=afinidad.getCodigo()%>" selected="selected"><%=afinidad.getCodigo()%></option>
-        						<%}	else {%>
-            						<option value="<%=afinidad.getCodigo()%>"><%=afinidad.getCodigo()%></option>
-            					<%}
-            				} else{%>
-								<option value="<%=afinidad.getCodigo()%>"><%=afinidad.getCodigo()%></option>
-							<%}
-    					} else{%>
-							<option value="<%=afinidad.getCodigo()%>"><%=afinidad.getCodigo()%></option>
-						<%}	}%>
-				</select>
-	    	</div>
+	    	</div>	  	    	
 		</div>
 		<div class="form-group-container col2">
 			<div class="form-group">
@@ -127,6 +106,28 @@ if(item!=null){
 	    			   value="<%= BolsaEmpleoUtils.getParamForm(request, ControladorItemsBaremacion.PARAM_ITEM_VALOR_MAXIMO, item != null ? item.getValorMaximo().toString() : "1000") %>"/>
 	    	</div>
 		</div>
+		<div class="form-group-container col2">
+			<div class="form-group">
+	    		<%
+					String afinidadSelected = BolsaEmpleoUtils.getParamForm(request, ControladorItemsBaremacion.PARAM_ITEM_AFINIDAD, item != null && item.getAfinidad() != null ? item.getAfinidad() : "N");
+				%>
+	    		<label for="item_afinida">Afinidad</label>	    		
+	    		<select class="params" id="item_afinida" name="<%= ControladorItemsBaremacion.PARAM_ITEM_AFINIDAD %>" style="width:100%;">
+					<option value="N" <%= afinidadSelected.equals("N") ? "selected=\"selected\"" : "" %>>N</option>
+					<% for (String afinidad: bean.getAfinidades()) { %>
+						<option value="<%=afinidad%>" <%= afinidadSelected.equals(afinidad) ? "selected=\"selected\"" : "" %>><%=afinidad%></option>					
+					<% } %>
+				</select>
+	    	</div>
+	    	<div class="form-check" id="individualizadoBloque" style="<%= afinidadSelected.equals("N") ? "display:none;" : "" %> ">
+	    		<%
+					String individualizado = BolsaEmpleoUtils.getParamForm(request, ControladorItemsBaremacion.PARAM_ITEM_INDIVIDUALIZADO, item != null ? item.getIndividualizado() ? "S" : "N" : "S");
+				%>
+    			<label for="individualizado">
+    			<input class="params" type="checkbox" id="individualizado" name="<%= ControladorItemsBaremacion.PARAM_ITEM_INDIVIDUALIZADO %>" 
+    				value="S" <%= individualizado.equals("S") ? "checked=''" : "" %>/>Individualizado</label>
+    		</div>
+		</div>
 		<div class="form-btn">
     		<input id="item_enviar" type="submit" name="<%= ControladorItemsBaremacion.PARAM_ENVIAR %>" 
     			   value="<%= item != null ? "Guardar cambios" : "Insertar item" %>"/>
@@ -137,7 +138,16 @@ if(item!=null){
 <script>
 	$(document).ready(function() {
 		document.getElementById("bloque_codigo").addEventListener("input", function(event) {
-			document.getElementById("item_bloque_codigo").value = <%= apartado.getCodigo() + "." + bloque.getCodigo() %>  + "." + this.value;
+			document.getElementById("item_bloque_codigo").value = '<%= apartado.getCodigo() %>.<%= bloque.getCodigo() %>.' + this.value;
+		});
+		$('#item_afinida').on('change', function() {
+			console.log("items", $(this).val());
+			
+			if ($(this).val() == 'N') {
+				$('#individualizadoBloque').hide();
+			} else {
+				$('#individualizadoBloque').show();
+			}
 		});
 	});
 </script>

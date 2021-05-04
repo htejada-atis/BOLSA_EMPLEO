@@ -36,10 +36,6 @@ public class TestBEPControladorItemsBaremacion {
 	private static final String MENSAJE_SIN_ERROR = "No debe devolver error";
 	private static final String MENSAJE_SIN_EXITO = "No debe exito";
 	
-	private static final String CODIGO = "0";
-	private static final String CODIGO_2 = "99";
-	private static final String NOMBRE = "nombre";
-	
 	
     /** prepara la bd con los datos iniciales.
      * @throws SQLException si error en bd

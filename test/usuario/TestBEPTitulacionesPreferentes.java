@@ -22,7 +22,6 @@ import org.openqa.selenium.support.ui.WebDriverWait;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 
-import es.ujaen.uvirtual.beans.uvirtual.bolsaempleo.Afinidad;
 import es.ujaen.uvirtual.beans.uvirtual.bolsaempleo.TitulacionArea;
 import es.ujaen.uvirtual.controlador.infadministrativa.bolsaempleo.ControladorGestionTitulacionesPreferentesArea;
 import es.ujaen.uvirtual.utilidades.BolsaEmpleoDataTable;

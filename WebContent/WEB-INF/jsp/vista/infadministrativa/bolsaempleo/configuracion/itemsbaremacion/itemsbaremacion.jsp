@@ -60,19 +60,20 @@ VistaItemsBaremacion bean = (VistaItemsBaremacion) uvdatos.getVistas().get(Vista
 	<table class="bluetable bolsaempleo custom" id="tableItems">
 		<tr>
 			<th scope="col" style="width:10%" title="Código ítem">Código</th>
-			<th scope="col" style="width:30%" title="Nombre del ítem">Nombre del ítem</th>
+			<th scope="col" style="width:20%" title="Nombre del ítem">Nombre del ítem</th>
 			<th scope="col" style="width:10%" title="Tipo de unidad para los valores del ítem">Unidades</th>
 			<th scope="col" style="width:10%" title="Valor del ítem">Valor</th>
 			<th scope="col" style="width:10%" title="Valor mínimo para los méritos">Valor Min.</th>
 			<th scope="col" style="width:10%" title="Valor máximo para los méritos">Valor Max.</th>
 			<th scope="col" style="width:10%" title="Afinidad con el área de conocimiento">Afinidad</th>
+			<th scope="col" style="width:10%" title="Individualizado">Indi.</th>
 			<th scope="col" style="width:10%">Activo</th>
 		</tr>
 		<tbody>				
 		</tbody>
 		<tfoot>
 			<tr>
-				<th colSpan="8" style="width:100%"></th>
+				<th colSpan="9" style="width:100%"></th>
 			</tr>
 		</tfoot>
 	</table>
@@ -260,7 +261,15 @@ VistaItemsBaremacion bean = (VistaItemsBaremacion) uvdatos.getVistas().get(Vista
 				        {'data': 'valor'},
 				        {'data': 'valorMinimo'},
 				        {'data': 'valorMaximo'},				        
-				        {'data': 'afinidad'},
+				        {'data': 'afinidad', 'render': function(row) { return row.afinidad ? row.afinidad : 'N'; }},
+				        {'data': 'individualizado', 'filter': {'type': 'selectBoolean', 'true': 'Si', 'false': 'No'}, 'render': function(row) {
+			        		if(row.individualizado){
+			        			return '<div class="circle-true" title="Individualizado"></div>'; 
+			        		}
+			        		else{
+			        			return '<div class="circle-false" title="No individualizado"></div>'; 
+			        		}
+			        	}},
 				        {'data': 'activo', 'filter': {'type': 'selectBoolean', 'true': 'Activo', 'false': 'Inactivo'}, 'render': function(row) {
 			        		if(row.activo){
 			        			return "<div class='circle-true'></div>"; 

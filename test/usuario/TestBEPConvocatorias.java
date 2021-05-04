@@ -3,7 +3,6 @@ package usuario;
 import static org.junit.Assert.assertTrue;
 
 import java.io.IOException;
-import java.lang.reflect.Type;
 import java.net.MalformedURLException;
 import java.sql.SQLException;
 import java.util.logging.Level;
@@ -16,17 +15,7 @@ import org.junit.Test;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.ui.ExpectedConditions;
-import org.openqa.selenium.support.ui.Select;
 import org.openqa.selenium.support.ui.WebDriverWait;
-
-import com.google.gson.Gson;
-import com.google.gson.reflect.TypeToken;
-
-import es.ujaen.uvirtual.beans.uvirtual.bolsaempleo.Convocatoria;
-import es.ujaen.uvirtual.beans.uvirtual.bolsaempleo.Evaluador;
-import es.ujaen.uvirtual.controlador.infadministrativa.bolsaempleo.ControladorConvocatorias;
-import es.ujaen.uvirtual.controlador.infadministrativa.bolsaempleo.ControladorGestionEvaluadores;
-import es.ujaen.uvirtual.utilidades.BolsaEmpleoDataTable;
 
 /** Clase para probar configuracion.convocatorias BEP .
  * @author fcampos
@@ -48,8 +37,6 @@ public class TestBEPConvocatorias {
 
 	private static final String CLASS_DIALOGO = "ui-dialog";
 	private static final String CLASS_DIALOGO_CONTENT = "ui-dialog-content";
-	private static final String CLASS_DIALOGO_BUTTON_PANEL = "ui-dialog-buttonpane";
-	private static final String CLASS_DIALOGO_BUTTON = "ui-button";
 		
 	private static final String MENSAJE_DIALOGO_SELECCIONAR_FILAS = "Seleccione al menos un ï¿½rea.";
 		
