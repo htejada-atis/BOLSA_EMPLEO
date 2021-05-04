@@ -311,6 +311,8 @@ public class ControladorFiltrar extends HttpServlet {
 	                stream.write(readBytes);
 	            }
 	            stream.flush();
+	        } catch (Exception ex) {
+	        	bean.getMensajesDeError().add(ex.getMessage());
 	        }
 			
 		}
