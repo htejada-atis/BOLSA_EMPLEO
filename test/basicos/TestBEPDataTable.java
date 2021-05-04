@@ -1,6 +1,7 @@
 package basicos;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertThrows;
 
@@ -9,22 +10,57 @@ import java.util.HashMap;
 
 import org.junit.Test;
 
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
+
 import es.ujaen.uvirtual.utilidades.BolsaEmpleoDataTable;
 import es.ujaen.uvirtual.utilidades.UVException;
 
 /** test datatable.
  * @author ATISoluciones
  */
-public class TestDataTable {
+public class TestBEPDataTable {
 	public static final Integer CURRENT_PAGE = 0;
 	public static final Integer PAGE_SIZE = 10;
 	public static final Integer ORDER_BY = 0;
 	public static final String ORDER_DIRECTION = BolsaEmpleoDataTable.PARAM_ORDER_DIRECTION_VALUE_ASC;
+	public static final int EDAD_1 = 10;
+	public static final int EDAD_2 = 21;
+	public static final int EDAD_3 = 34;
 	
 	/**
 	 * Class mock para testear datatable.
 	 */
-	class Mock { }
+	class Mock {
+		private String codNum;
+		private Integer edad;
+		
+		public Mock() {
+			this.codNum = "1";
+			this.edad = 1;
+		}
+		
+		public Mock(String pcodNum, Integer pedad) {
+			this.codNum = pcodNum;
+			this.edad = pedad;
+		}
+		
+		public String getCodNum() {
+			return codNum;
+		}
+		
+		public void setCodNum(String codNum) {
+			this.codNum = codNum;
+		}
+		
+		public Integer getEdad() {
+			return edad;
+		}
+		
+		public void setEdad(Integer edad) {
+			this.edad = edad;
+		}
+	}
 	
     /** Creación de dt correcta.
      * @throws UVException .
@@ -199,36 +235,12 @@ public class TestDataTable {
     	assertEquals(UVException.class, throwable.getClass());
     	assertEquals(BolsaEmpleoDataTable.ERROR_MSG_PARAMETRO_TIPO_ORDENACION_NO_VALIDO, throwable.getMessage());
     }
-   
-    /** Error al no poner la columna de ordenación.
-     * @throws UVException .
-     */
-    @Test
-    public void testA10() throws UVException {
-    	String sql = "SELECT 'c1' AS C1, 'c2' AS C2"
-    			+ "FROM DUAL"
-    			+ "connect by level <= 100";
-    	
-    	HashMap<String, String[]> params = new HashMap<String, String[]>();
-    	
-    	params.put(BolsaEmpleoDataTable.PARAM_CURRENT_PAGE, new String[] {CURRENT_PAGE.toString()});
-    	params.put(BolsaEmpleoDataTable.PARAM_PAGE_SIZE, new String[] {PAGE_SIZE.toString()});
-    	params.put(BolsaEmpleoDataTable.PARAM_ORDER_BY, new String[] {ORDER_BY.toString()});
-    	params.put(BolsaEmpleoDataTable.PARAM_ORDER_DIRECTION, new String[] {ORDER_DIRECTION});
-    	
-    	Throwable throwable = assertThrows(Throwable.class, () -> { 
-    		BolsaEmpleoDataTable<Mock> dt = new BolsaEmpleoDataTable<Mock>(params);
-    		dt.setQuery(sql);
-    	});
-    	assertEquals(UVException.class, throwable.getClass());
-    	assertEquals(BolsaEmpleoDataTable.ERROR_MSG_COLUMNA_ORDENACION_NO_VALIDA, throwable.getMessage());
-    }
     
     /** Asignación de query correcta.
      * @throws UVException .
      */
     @Test
-    public void testA11() throws UVException {
+    public void testA10() throws UVException {
     	final String sql = "SELECT 'c1' AS C1, 'c2' AS C2"
     			+ "FROM DUAL"
     			+ "connect by level <= 100";
@@ -262,7 +274,7 @@ public class TestDataTable {
      * @throws UVException .
      */
     @Test 
-    public void testA12() throws UVException {
+    public void testA11() throws UVException {
     	HashMap<String, String[]> params = new HashMap<String, String[]>();
     	
     	params.put(BolsaEmpleoDataTable.PARAM_CURRENT_PAGE, new String[] {CURRENT_PAGE.toString()});
@@ -282,7 +294,7 @@ public class TestDataTable {
      * @throws UVException .
      */
     @Test
-    public void testA13() throws UVException {
+    public void testA12() throws UVException {
     	final String sql = "SELECT 'c1' AS C1, 'c2' AS C2"
     			+ "FROM DUAL"
     			+ "connect by level <= 100";
@@ -306,32 +318,35 @@ public class TestDataTable {
     	assertEquals(lista.size(), dt.getData().size());
     }
     
-//    @Test
-//    public void testA14() throws UVException {
-//    	final String sql = "SELECT 'c1' AS C1, 'c2' AS C2"
-//    			+ "FROM DUAL"
-//    			+ "connect by level <= 100";
-//    	
-//    	HashMap<String, String[]> params = new HashMap<String, String[]>();    	
-//    	DataTable<Mock> dt = new DataTable<Mock>(params);
-//    	dt.setOrderColumn(ORDER_BY, "C1");
-//    	dt.setOrderColumn(ORDER_BY + 1, "C2");
-//    	dt.setQuery(sql);
-//    	
-//    	assertNotNull(dt.getQuery());
-//    	assertNotNull(dt.getQueryCount());
-//    	
-//    	MockPreparedStatement ps = new MockPreparedStatement();
-//    	dt.setRecordsTotalFromQuery(ps);
-//    	
-//    	ArrayList<Mock> lista = new ArrayList<Mock>();
-//    	lista.add(new Mock());
-//    	lista.add(new Mock());
-//    	lista.add(new Mock());
-//    	
-//    	dt.setData(lista);
-//    	
-//    	assertEquals(lista.size(), dt.getData().size());
-//    }
+    /** Generar json a partir de dt.
+     * @throws UVException .
+     */
+    @Test
+    public void testA13() throws UVException {
+    	final String sql = "SELECT 'c1' AS C1, 'c2' AS C2"
+    			+ "FROM DUAL"
+    			+ "connect by level <= 100";
+    	
+		HashMap<String, String[]> params = new HashMap<String, String[]>();
+		BolsaEmpleoDataTable<Mock> dt = new BolsaEmpleoDataTable<Mock>(params);
+		dt.setColumn(ORDER_BY, "C1");
+		dt.setColumn(ORDER_BY + 1, "C2");
+		dt.setQuery(sql);
+
+		ArrayList<Mock> lista = new ArrayList<Mock>();
+		lista.add(new Mock("1", EDAD_1));
+		lista.add(new Mock("2", EDAD_2));
+		lista.add(new Mock("3", EDAD_3));
+		dt.setData(lista);
+
+		Gson gson = new GsonBuilder().setExclusionStrategies(BolsaEmpleoDataTable.GSONEXCLUSIONSTRATEGY).create();
+		String json = gson.toJson(dt);
+		
+		assertNotEquals(-1, json.indexOf("{\"codNum\":\"1\",\"edad\":" + EDAD_1 + "}")); 
+		assertNotEquals(-1, json.indexOf("{\"codNum\":\"2\",\"edad\":" + EDAD_2 + "}"));
+		assertNotEquals(-1, json.indexOf("{\"codNum\":\"3\",\"edad\":" + EDAD_3 + "}"));
+				
+		// System.out.println(json);
+    }
     
 }

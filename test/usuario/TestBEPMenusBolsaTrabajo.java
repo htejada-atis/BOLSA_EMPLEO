@@ -92,13 +92,13 @@ public class TestBEPMenusBolsaTrabajo {
 		assertTrue(numElementos > 0);
 		
 		// click sobre ordenación y comprobamos que existe icono
-		WebElement th = table.findElement(By.xpath("//th[@class='area']"));
+		WebElement th = table.findElement(By.className("area"));
 		th.click();
 		WebElement img = th.findElement(By.className("order"));
-		assertTrue(img.getAttribute("src").indexOf("down.png") != -1);
+		assertTrue(img.getAttribute("src").indexOf("up.png") != -1);
 		th.click();
 		img = th.findElement(By.className("order"));
-		assertTrue(img.getAttribute("src").indexOf("up.png") != -1);
+		assertTrue(img.getAttribute("src").indexOf("down.png") != -1);
 		
 		// paginacion
 		WebElement pagination = table.findElement(By.className(CLASS_PAGINATION));

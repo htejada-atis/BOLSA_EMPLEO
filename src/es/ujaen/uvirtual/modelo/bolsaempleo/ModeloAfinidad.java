@@ -55,7 +55,6 @@ public class ModeloAfinidad {
         return eInstancia;
     }
 	
-	
 	/**
 	 * Listado de afinidades. 
 	 * @param params para leer los parametros de paginación, ordenacion, etc
@@ -103,7 +102,6 @@ public class ModeloAfinidad {
 		return dataTable;
 	}	
 	
-	
 	/**
 	 * Devuelve un listado de afinidades por su id.
 	 * @param ids codnum de afinidad
@@ -120,7 +118,6 @@ public class ModeloAfinidad {
 		
 		return afinidades;
 	}
-	
 	
 	/** Consulta afinidades en BBDD y las devuelve.
 	 * @return todas las afinidades de la base de datos
@@ -152,8 +149,6 @@ public class ModeloAfinidad {
 		
 		return afinidades;
 	}
-	
-	
 	
 	/** Consulta afinidades en BBDD y las devuelve.
 	 * @return todas las afinidades de la base de datos
@@ -233,7 +228,7 @@ public class ModeloAfinidad {
 	 */
 	public Afinidad getAfinidadById(Integer codNum) throws SQLException, UVException {
 		if (codNum == null) {
-			throw new UVException("No existe la afinidad");
+			throw new UVException(MENSAJE_ERROR_NO_EXISTE_AFINIDAD);
 		}
 		String consulta = "SELECT bepafi.* FROM TBEP_AFINIDADES bepafi WHERE bepafi.CODNUM = ?";
 			
@@ -261,7 +256,6 @@ public class ModeloAfinidad {
 		}
 	}
 	
-	
 	/**
 	 * Devuelve una afinidad por su codigo.
 	 * @param codigo .
@@ -270,7 +264,7 @@ public class ModeloAfinidad {
 	 */
 	public Afinidad getAfinidadByCodigo(String codigo) throws SQLException, UVException {
 		if (codigo == null) {
-			throw new UVException("No existe la afinidad");
+			throw new UVException(MENSAJE_ERROR_NO_EXISTE_AFINIDAD);
 		}
 		String consulta = "SELECT bepafi.CODIGO, bepafi.DESCRIPCION FROM TBEP_AFINIDADES bepafi WHERE bepafi.CODIGO = ? GROUP BY CODIGO, DESCRIPCION";
 			
@@ -359,5 +353,28 @@ public class ModeloAfinidad {
 		afinidades.add(this.getAfinidadById(afinidad.getCodNum()));
 		
 		borraAfinidades(afinidades);
+	}
+
+	/** Devuelve los tipos de afinidad disponibles.
+	 * 
+	 * @return lista de tipos de afinidad.
+	 * @throws SQLException .
+	 */
+	public List<String> getTiposAfinidad() throws SQLException {
+		List<String> afinidades = new ArrayList<>();
+		String consulta = 
+				"SELECT bepafi.CODIGO "
+				+ "FROM TBEP_AFINIDADES bepafi "
+				+ "WHERE bepafi.FLGBORRADO = 'N' GROUP BY bepafi.CODIGO";
+		
+		try (Connection conexion = ConexionUvirtual.obtenerInstancia(); PreparedStatement stmt = conexion.prepareStatement(consulta);) {
+				try (ResultSet rs = stmt.executeQuery()) {
+					while (rs.next()) {
+						afinidades.add(rs.getString("CODIGO"));							
+					}
+				}
+			}
+		
+		return afinidades;
 	}
 }

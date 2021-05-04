@@ -10,7 +10,7 @@ UVDatos uvdatos = (UVDatos) request.getAttribute(UVDatos.NOMBRE_ATRIBUTO);
 VistaEvaluadores bean = (VistaEvaluadores) uvdatos.getVistas().get(VistaEvaluadores.class.getName());
 %>
 
-<div class="bolsa-empleo">
+<div class="bolsa-empleo evaluadores-listar">
 
 	<%
 		if (session.getAttribute(ControladorGestionEvaluadores.MENSAJE_ENVIADO) != null) {
@@ -57,7 +57,7 @@ VistaEvaluadores bean = (VistaEvaluadores) uvdatos.getVistas().get(VistaEvaluado
 	</div>
 	<table class="bluetable bolsaempleo" id="table_evaluadores_area">
 		<tr>
-			<th scope="col" style="width:25%">D.N.I</th>
+			<th scope="col" class="dni" style="width:25%">D.N.I</th>
 			<th scope="col"	style="width:55%">Nombre</th>
 			<th scope="col" class="center" style="width:10%">Activo</th>
 			<th scope="col" style="width:11%"></th>
