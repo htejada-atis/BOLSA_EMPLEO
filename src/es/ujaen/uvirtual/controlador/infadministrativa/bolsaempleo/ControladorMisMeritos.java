@@ -321,6 +321,8 @@ public class ControladorMisMeritos extends HttpServlet {
 	                stream.write(readBytes);
 	            }
 	            stream.flush();
+	        } catch (Exception ex) {
+	        	bean.getMensajesDeError().add(ex.getMessage().toString());
 	        }
 		}
 	}
