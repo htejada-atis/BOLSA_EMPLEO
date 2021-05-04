@@ -141,7 +141,7 @@ public class TestBEPControladorGestionTitulacionesPreferentesArea {
 	public void testA04ObtenerTitulacionesPreferentesArea() throws SQLException, ServletException, IOException {
 		VistaTitulacionesArea bean = getVistaConTitulaciones(ControladorGestionTitulacionesPreferentesArea.ACCION_DATATABLE_TITULACIONES_PREFERENTES_AREA, true);
 		
-		assertNotEquals(MENSAJE_TITULACIONES_DEVUELTAS, 0, bean.getDatatableTitulaciones().getData().size());	
+		assertNotEquals(MENSAJE_TITULACIONES_DEVUELTAS, 0, bean.getDatatableTitulacionesArea().getData().size());	
 		assertEquals(MENSAJE_SIN_ERROR, 0, bean.getMensajesDeError().size());
 		assertEquals(MENSAJE_SIN_ADVERTENCIAS, 0, bean.getMensajesDeAdvertencia().size());
 	}

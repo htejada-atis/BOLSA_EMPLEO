@@ -19,12 +19,15 @@ import es.ujaen.uvirtual.controlador.infadministrativa.bolsaempleo.ControladorIn
  *
  */
 public class TestBEPControladorInicio {
+	
+	private static final String MENSAJE_CON_ERROR = "Debe devolver error";
 	private static final String MENSAJE_DOCUMENTOS_DEVUELTOS = "Debe devolver documentos";
 	private static final String MENSAJE_FICHERO_PUBLICO = "Fichero debe ser público";
 	private static final String MENSAJE_NOTICIAS_DEVUELTAS = "Debe devolver noticias";
 	private static final String MENSAJE_NOTICIA_PUBLICA = "Noticia debe ser pública";
 	private static final String MENSAJE_SIN_ERROR = "No debe devolver error";
 	private static final String MENSAJE_SIN_ADVERTENCIAS = "No debe mostrar advertencias";
+	private static final String MENSAJE_SIN_EXITO = "No debe exito";
 		
     /** Prepara la bd con los datos iniciales.
      * @throws SQLException si error en bd
@@ -217,6 +220,64 @@ public class TestBEPControladorInicio {
 		assertEquals(MENSAJE_SIN_ERROR, 0, bean.getMensajesDeError().size());
 		assertEquals(MENSAJE_SIN_ADVERTENCIAS, 0, bean.getMensajesDeAdvertencia().size());
 		assertEquals(MENSAJE_FICHERO_PUBLICO, true, bean.getFicheros().get(0).isPublico());
+	}
+	
+	/** obtener todas las noticias con parámetro 'noticias' no válido .
+	 * @throws ServletException .
+	 * @throws IOException .
+	 */
+	@Test
+	public void testE01ObtenerTodasNoticiasParametroNoValido() throws ServletException, IOException {
+		VistaInicio bean = obtenerInicio(ControladorInicio.ACCION_LISTAR_NOTICIAS);
+		
+		PeticionHttp peticion = UtilsTestBolsaEmpleo.peticionAutenticadaPersonal();
+		peticion.setParameter(ControladorInicio.PARAM_ACCION, ControladorInicio.ACCION_LISTAR_TODAS_NOTICIAS);
+		peticion.setParameter(ControladorInicio.PARAM_NOTICIAS, bean.getNoticias().get(0).getCodNum().toString());
+		
+		RespuestaHttp respuesta = new RespuestaHttp();
+		ControladorInicio controlador = new ControladorInicio();
+		controlador.doPost(peticion, respuesta);
+		VistaInicio bean2 = (VistaInicio) peticion.getUVDatos().getVistas().get(VistaInicio.class.getName());
+		
+		assertEquals(MENSAJE_CON_ERROR, 1, bean2.getMensajesDeError().size());
+		assertEquals(MENSAJE_SIN_EXITO, 0, bean2.getMensajesDeExito().size());
+	}
+	
+	/** Descargar fichero no válido .
+	 * @throws ServletException .
+	 * @throws IOException .
+	 */
+	@Test
+	public void testE02DescargarFicheroNoValido() throws ServletException, IOException {
+		PeticionHttp peticion = UtilsTestBolsaEmpleo.peticionAutenticadaPersonal();
+		peticion.setParameter(ControladorInicio.PARAM_ACCION, ControladorInicio.ACCION_DESCARGAR_FICHERO);
+		peticion.setParameter(ControladorInicio.PARAM_FICHERO, "-1");
+		
+		RespuestaHttp respuesta = new RespuestaHttp();
+		ControladorInicio controlador = new ControladorInicio();
+		controlador.doPost(peticion, respuesta);
+		VistaInicio bean = (VistaInicio) peticion.getUVDatos().getVistas().get(VistaInicio.class.getName());
+		
+		assertEquals(MENSAJE_CON_ERROR, 1, bean.getMensajesDeError().size());
+		assertEquals(MENSAJE_SIN_EXITO, 0, bean.getMensajesDeExito().size());
+	}
+	
+	/** Descargar fichero sin fichero .
+	 * @throws ServletException .
+	 * @throws IOException .
+	 */
+	@Test
+	public void testE03DescargarFicheroSinFichero() throws ServletException, IOException {
+		PeticionHttp peticion = UtilsTestBolsaEmpleo.peticionAutenticadaPersonal();
+		peticion.setParameter(ControladorInicio.PARAM_ACCION, ControladorInicio.ACCION_DESCARGAR_FICHERO);
+		
+		RespuestaHttp respuesta = new RespuestaHttp();
+		ControladorInicio controlador = new ControladorInicio();
+		controlador.doPost(peticion, respuesta);
+		VistaInicio bean = (VistaInicio) peticion.getUVDatos().getVistas().get(VistaInicio.class.getName());
+		
+		assertEquals(MENSAJE_CON_ERROR, 1, bean.getMensajesDeAdvertencia().size());
+		assertEquals(MENSAJE_SIN_EXITO, 0, bean.getMensajesDeExito().size());
 	}
 
 }

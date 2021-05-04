@@ -101,13 +101,13 @@ public class ControladorGestionTitulaciones extends HttpServlet {
 			anonimo = !modelo.checkUser(datos);
 			switch (nombreAccion) {
 			case ACCION_AGREGAR_TITULACION:
-				agregarTitulacion(request, response, bean);
+				agregarTitulacion(bean, request, response);
 				break;
 			case ACCION_EDITAR_TITULACION:
-				editarTitulacion(request, response, bean);
+				editarTitulacion(bean, request, response);
 				break;
 			case ACCION_BORRAR_TITULACION:
-				eliminarTitulacion(request, response);
+				eliminarTitulacion(bean, request, response);
 				break;
 			case ACCION_DATATABLE_TITULACIONES:
 				listadoTitulaciones(bean, datos, request, response);
@@ -151,7 +151,7 @@ public class ControladorGestionTitulaciones extends HttpServlet {
 	 * @throws UVException en caso de error de parametros .
 	 * @throws IOException en caso de error de input u output .
 	 */
-	private void editarTitulacion(HttpServletRequest request, HttpServletResponse response, VistaTitulaciones bean) throws SQLException, UVException, IOException {
+	private void editarTitulacion(VistaTitulaciones bean, HttpServletRequest request, HttpServletResponse response) throws SQLException, UVException, IOException {
 		bean.setVista(RUTA_BEP_CONF + "formTitulacion.jsp");
 		ModeloTitulacion modelo = ModeloTitulacion.obtenerInstancia();
 		bean.setTitulacion(modelo.listaTitulacion(Formateador.leeParametroInteger(request.getParameter(PARAM_ID))));
@@ -176,13 +176,14 @@ public class ControladorGestionTitulaciones extends HttpServlet {
 	}
 	
 	/** eliminar una titulación.
+	 * @param bean .
 	 * @param request .
 	 * @param response .
 	 * @throws SQLException excepcion de bbdd.
 	 * @throws UVException en caso de error de parametros .
 	 * @throws IOException en caso de error de input u output .
 	 */
-	private void eliminarTitulacion(HttpServletRequest request, HttpServletResponse response) throws SQLException, UVException, IOException {
+	private void eliminarTitulacion(VistaTitulaciones bean, HttpServletRequest request, HttpServletResponse response) throws SQLException, UVException, IOException {
 		Integer codNum = Formateador.leeParametroInteger(request.getParameter(PARAM_ID));
 		ModeloTitulacion modelo = ModeloTitulacion.obtenerInstancia();
 		try {
@@ -191,6 +192,7 @@ public class ControladorGestionTitulaciones extends HttpServlet {
 			session.setAttribute(MENSAJE_ENVIADO_CORRECTO, MENSAJE_EXITO_ELIMINAR);
 			response.sendRedirect(request.getServletPath());
 		} catch (SQLIntegrityConstraintViolationException e) {
+			bean.getMensajesDeError().add(e.getMessage());
 			HttpSession session = request.getSession(false);
 			session.setAttribute(MENSAJE_ENVIADO_ERROR, MENSAJE_ERROR_ELIMINAR_TITULACION);
 			response.sendRedirect(request.getServletPath());
@@ -205,7 +207,7 @@ public class ControladorGestionTitulaciones extends HttpServlet {
 	 * @throws UVException en caso de error de parametros .
 	 * @throws IOException en caso de error de input u output .
 	 */
-	private void agregarTitulacion(HttpServletRequest request, HttpServletResponse response, VistaTitulaciones bean) throws SQLException, UVException, IOException {
+	private void agregarTitulacion(VistaTitulaciones bean, HttpServletRequest request, HttpServletResponse response) throws SQLException, UVException, IOException {
 		bean.setVista(RUTA_BEP_CONF + "formTitulacion.jsp");
 		if (EscapaHTML.ajustaCodificacion(request.getParameter(PARAM_NOMBRE)) != null) {
 			BolsaEmpleoValidator validator = this.getValidatorTitulaciones(request); 							
@@ -247,7 +249,8 @@ public class ControladorGestionTitulaciones extends HttpServlet {
 				bean.setDatatableTitulaciones(dataTable);
 				Gson gson = new GsonBuilder().setExclusionStrategies(BolsaEmpleoDataTable.GSONEXCLUSIONSTRATEGY).create();
 				writer.write(gson.toJson(dataTable));
-			} catch (UVException ex) {
+			} catch (Exception ex) {
+				bean.getMensajesDeError().add(ex.getMessage());
 				CodigoDescripcion mensaje = new CodigoDescripcion("error", ex.getMessage());
 				writer.write(new Gson().toJson(mensaje));
 				response.setStatus(RESPONSE_HTTP_CODE_ERROR);
