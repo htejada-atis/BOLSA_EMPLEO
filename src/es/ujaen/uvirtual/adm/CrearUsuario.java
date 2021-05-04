@@ -48,27 +48,22 @@ public class CrearUsuario {
 			ModeloUsuarioBolsaEmpleo modeloBolsaEmpleo = ModeloUsuarioBolsaEmpleo.obtenerInstancia();
 			List<String> rolesAdministradosUV = modeloAdministracion.listaRolesUsuario(uid, true);
 			List<String> rolesDelUsuarioUV = modeloAdministracion.listaRolesUsuario(uid, false);
-			List<String> rolesDelUsuarioBolsaEmpleo = modeloBolsaEmpleo.listaRolesUsuario(uid);
-			
+						
 			for (String grp: rolesDelUsuarioUV) {
 				if (!rolesDelUsuario.contains(grp)) {
 					rolesDelUsuario.add(grp);
 				}
 			}
 			
-			
-			
-			//NO VA A PRODUCCION BORRAR ANTES DE SUBIR
+			//////////////////// CONSULTAR ANTES DE SUBIR A PRODUCCION
+			List<String> rolesDelUsuarioBolsaEmpleo = modeloBolsaEmpleo.listaRolesUsuario(uid);
 			for (String grp: rolesDelUsuarioBolsaEmpleo) {
 				if (!rolesDelUsuario.contains(grp)) {
 					rolesDelUsuario.add(grp);
 				}
 			}
-			//
-			
-			
-			
-			
+			///////////////////////////////////////////////////////////////////////////
+						
 			// Los roles administrados se añaden como administrador y como rol del usr. 
 			for (String grp: rolesAdministradosUV) {
 				if (!rolesAdministrados.contains(grp)) {
