@@ -465,7 +465,7 @@ public class ModeloSolicitud {
 				stmt.setInt(indexParam++, merito.getCodNum());
 				stmt.executeUpdate();
 			} catch (SQLException e) {
-				if (conexion != null) { 
+				if (conexion != null) {
 					conexion.rollback();
 				}
 				throw e;

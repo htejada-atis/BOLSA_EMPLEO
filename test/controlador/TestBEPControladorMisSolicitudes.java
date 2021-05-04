@@ -15,8 +15,8 @@ import controlador.implementacion.RespuestaHttp;
 import es.ujaen.uvirtual.beans.vistas.uvirtual.bolsaempleo.VistaSolicitudes;
 import es.ujaen.uvirtual.controlador.infadministrativa.bolsaempleo.ControladorMisSolicitudes;
 
-/** test controlador items baremación.
- * @author jmoral
+/** test controlador mis solicitudes.
+ * @author ATISoluciones
  *
  */
 public class TestBEPControladorMisSolicitudes {

@@ -19,7 +19,7 @@ import es.ujaen.uvirtual.beans.vistas.uvirtual.bolsaempleo.VistaItemsBaremacion;
 import es.ujaen.uvirtual.controlador.infadministrativa.bolsaempleo.ControladorItemsBaremacion;
 
 /** test controlador items baremación.
- * @author jmoral
+ * @author ATISoluciones
  *
  */
 public class TestBEPControladorItemsBaremacion {

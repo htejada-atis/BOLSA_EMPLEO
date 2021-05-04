@@ -99,7 +99,7 @@ public class ModeloNoticia {
 					
 				}
 			}
-			}
+		}
 		return noticias;
 	}
 	
