@@ -3,13 +3,13 @@ package es.ujaen.uvirtual.beans.uvirtual.bolsaempleo;
 import java.io.Serializable;
 import java.util.List;
 
-/** Clase bolsa solicitud de bolsaempleo.
- * @author atis
+/** Una bolsa seleccionada por el candidato en la solicitud. Contiene los meritos asigandos a la bolsa.
+ * @author ATISoluciones
  */
 public class BolsaSolicitud extends Bolsa implements Serializable {
 
 	private static final long serialVersionUID = 1L;
-	private List<Merito> listaMeritos;
+	private List<MeritoSolicitud> listaMeritos;
 	
 	/** Constructor por defecto.
 	 */
@@ -21,12 +21,12 @@ public class BolsaSolicitud extends Bolsa implements Serializable {
 	 * @param pbolsa .
 	 * @param plistaMeritos .
 	 */
-	public BolsaSolicitud(Bolsa pbolsa, List<Merito> plistaMeritos) {
+	public BolsaSolicitud(Bolsa pbolsa, List<MeritoSolicitud> plistaMeritos) {
 		super(pbolsa);
 		this.listaMeritos = plistaMeritos;
 	}
 	
-	public List<Merito> getListaMeritos() {
+	public List<MeritoSolicitud> getListaMeritos() {
 		return listaMeritos;
 	}
 	
@@ -34,7 +34,7 @@ public class BolsaSolicitud extends Bolsa implements Serializable {
 		return listaMeritos.size();
 	}
 	
-	public void setListaMeritos(List<Merito> meritos) {
+	public void setListaMeritos(List<MeritoSolicitud> meritos) {
 		this.listaMeritos = meritos;
 	}
 	
