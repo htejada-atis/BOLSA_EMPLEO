@@ -9,6 +9,7 @@
 <%@ page import="es.ujaen.uvirtual.modulo.bolsaempleo.modelo.ModeloSolicitud" %>
 <%@ page import="es.ujaen.uvirtual.utilidades.EscapaHTML" %>
 <%@ page import="es.ujaen.uvirtual.utilidades.Formateador"%>
+<%@ page import="java.util.Date"%>
 
 <% 
 UVDatos uvdatos = (UVDatos) request.getAttribute(UVDatos.NOMBRE_ATRIBUTO);
@@ -32,6 +33,8 @@ VistaUsuarioBolsaEmpleo bean = (VistaUsuarioBolsaEmpleo) uvdatos.getVistas().get
 		String usuario = "";
 		Boolean lista_dist = false;
 		Boolean excluido = false;
+		Date fecha_ini = null;
+		Date fecha_fin = null;
 		
 		if(bean.getUsuarioArcos() != null) {
 			usuario = bean.getUsuarioArcos().getUid();
@@ -44,6 +47,8 @@ VistaUsuarioBolsaEmpleo bean = (VistaUsuarioBolsaEmpleo) uvdatos.getVistas().get
 			if(bean.getUsuario() != null){
 				lista_dist = bean.getUsuario().getListaDist();
 				excluido = bean.getUsuario().getExcluido();
+				fecha_ini = bean.getUsuario().getFechaExclusionInicio();
+				fecha_fin = bean.getUsuario().getFechaExclusionFin();
 
 				if(bean.getUsuario().getRazonExcluido()!=null){
 					razon_excluido = bean.getUsuario().getRazonExcluido();
@@ -106,12 +111,33 @@ VistaUsuarioBolsaEmpleo bean = (VistaUsuarioBolsaEmpleo) uvdatos.getVistas().get
     		</div>
 		</div>
 		<div class="form-group-container">
-	    	<div class="form-check">
+	    	<div class="form-check-custom">
     			<label for="usuario_lista_dist"><input class="params" type="checkbox" id="usuario_lista_dist" name="<%= ControladorUsuarioBolsaEmpleo.PARAM_LISTA %>" value="<%= lista_dist %>" <%= (lista_dist ? "checked=''" : "") %>/>Lista Distribución</label>
     		</div>
     		<div class="form-check">
-    			<label for="usuario_excluido"><input class="params" type="checkbox" id="usuario_excluido" name="<%= ControladorUsuarioBolsaEmpleo.PARAM_EXCLUIDO %>" value="<%= excluido %>" <%= (excluido ? "checked=''" : "") %>/>Excluido</label>
+    			<div class="form-check-custom">
+    				<label for="usuario_excluido"><input class="params" type="checkbox" id="usuario_excluido" name="<%= ControladorUsuarioBolsaEmpleo.PARAM_EXCLUIDO %>" value="<%= excluido %>" <%= (excluido ? "checked=''" : "") %>/>Excluido</label>
+    			</div>    		
+    			<div class="form-check-custom" id="excluido_tipo" style="display:none;">
+					<label class="form-label-custom" for="indefinido" style="float: none; margin-right:0px; margin-bottom:5px;"><input class="form-input" type="radio" id="indefinido" name="<%= ControladorUsuarioBolsaEmpleo.PARAM_EXCLUIDO_TIPO %>" style="display: inline;">Indefinido</label>
+					<label class="form-label-custom" for="temporal" style="float: none; margin-right:0px;"><input class="form-input" type="radio" id="temporal" name="<%= ControladorUsuarioBolsaEmpleo.PARAM_EXCLUIDO_TIPO %>" style="display: inline;">Temporal</label>
+    			</div>
     		</div>
+		</div>
+		<div class="form-group-container col-2" id="fecha_excluido" style="display:none;">
+	    	<div class="form-check">
+    			
+    		</div>
+    		<div class="form-check">
+    			<div class="form-check-custom">
+	    			<label for="noticia_fecha"><b>Fecha Inicio</b>:</label>
+	    			<input class="form-input-custom" type="text" name="<%= ControladorUsuarioBolsaEmpleo.PARAM_FECHA_EXCLUIDO_INICIO %>" id="fecha_ini" autocomplete="off" value="<%= fecha_ini!=null ? fecha_ini : "" %>" style="width:80%"/>
+	    		</div>
+	    		<div class="form-check-custom">
+	    			<label for="noticia_fecha"><b>Fecha Fin</b>:</label>
+	    			<input class="form-input-custom" type="text" name="<%= ControladorUsuarioBolsaEmpleo.PARAM_FECHA_EXCLUIDO_FIN %>" id="fecha_fin" autocomplete="off" value="<%= fecha_fin!=null ? fecha_fin : "" %>" style="width:80%"/>
+	    		</div>
+	    	</div>
 		</div>
 	
 		<div class="form-group">
@@ -225,6 +251,28 @@ VistaUsuarioBolsaEmpleo bean = (VistaUsuarioBolsaEmpleo) uvdatos.getVistas().get
 		});	
 		<%}%> 
 
+		document.getElementById("usuario_excluido").addEventListener("change", function(event) {
+			if(document.getElementById("usuario_excluido").checked){
+				document.getElementById("razon_exclusion").value="";
+				document.getElementById("razon_exclusion").disabled=false;
+				
+				$("#excluido_tipo").show();
+			}
+			else{
+				document.getElementById("razon_exclusion").value="";
+				document.getElementById("razon_exclusion").disabled=true;
+				
+				$("#excluido_tipo").hide();
+			}
+		});
+		
+		document.getElementById("temporal").addEventListener("change", function(event) {
+			if(document.getElementById("temporal").checked) $("#fecha_excluido").show();
+		});
+		document.getElementById("indefinido").addEventListener("change", function(event) {
+			if(document.getElementById("indefinido").checked) $("#fecha_excluido").hide();
+		});
+		
 		if(document.getElementById("areas_excluidas")!=undefined){
 			document.getElementById("areas_excluidas").addEventListener("click", function(event) {
 				Atis.sendForm("<%= request.getRequestURI() %>", {
@@ -270,14 +318,16 @@ VistaUsuarioBolsaEmpleo bean = (VistaUsuarioBolsaEmpleo) uvdatos.getVistas().get
 			}
 		});
 		
-
-		
 		<% if(bean.getBusqueda()) {%>
 		params = document.getElementsByClassName("params");
 		for (var i = 0; i < params.length; i++) { 
 			params[i].disabled = true;
 		}
 		<%}%>
+		
+		<% if (fecha_ini == null) { %>
+			document.getElementById("fecha_ini").value = getTodayDate();
+		<% } %>
 		
 		<% if(bean.getUsuario()!=null) {%>
 		var table = new Atis.DataTable('#table_areas', {
@@ -375,6 +425,15 @@ VistaUsuarioBolsaEmpleo bean = (VistaUsuarioBolsaEmpleo) uvdatos.getVistas().get
 			input_excluido.value = input_excluido.checked;
 		
 			submit_input.form.submit();
+		}
+		
+		function getTodayDate() {
+			var now = new Date();
+
+			var day = ("0" + now.getDate()).slice(-2);
+			var month = ("0" + (now.getMonth() + 1)).slice(-2);
+
+			return day + "/" + month + "/" + now.getFullYear();
 		}
 
 	});

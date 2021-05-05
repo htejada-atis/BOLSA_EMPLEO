@@ -24,6 +24,8 @@ public class TestBEPBeanUsuarios {
 	private static final Boolean LISTADIST = true;
 	private static final Boolean EXCLUIDO = false;
 	private static final String EXCLUIDOTIPO = "EJEMPLO";
+	private static final Date FECHAEXCLUSIONINICIO = new java.sql.Date(Calendar.getInstance().getTime().getTime());
+	private static final Date FECHAEXCLUSIONFIN = new java.sql.Date(Calendar.getInstance().getTime().getTime());
 	private static final Boolean BORRADO = true;
 	private static final Date FECHAEXCLUSION = new java.sql.Date(Calendar.getInstance().getTime().getTime());
 	private static final Date FECHABORRADO = new java.sql.Date(Calendar.getInstance().getTime().getTime());
@@ -68,7 +70,7 @@ public class TestBEPBeanUsuarios {
 	 */
 	@Test
 	public void testA02() {
-		UsuarioBolsaEmpleo usuario = new UsuarioBolsaEmpleo(CODPERSONA, CODCUENTA, ROL, LISTADIST, EXCLUIDO, EXCLUIDOTIPO);
+		UsuarioBolsaEmpleo usuario = new UsuarioBolsaEmpleo(CODPERSONA, CODCUENTA, ROL, LISTADIST, EXCLUIDO, EXCLUIDOTIPO, FECHAEXCLUSIONINICIO, FECHAEXCLUSIONFIN);
 		usuario.setCodPersona(CODPERSONA);
 		usuario.setCodCuenta(CODCUENTA);
 		usuario.setRol(ROL);
@@ -90,7 +92,7 @@ public class TestBEPBeanUsuarios {
 	@Test
 	public void testA03() {
 		Integer id = 1;
-		UsuarioBolsaEmpleo usuario = new UsuarioBolsaEmpleo(id, EXCLUIDO, EXCLUIDOTIPO, RAZONEXCLUIDO, FECHAEXCLUSION);
+		UsuarioBolsaEmpleo usuario = new UsuarioBolsaEmpleo(id, EXCLUIDO, EXCLUIDOTIPO, RAZONEXCLUIDO, FECHAEXCLUSION, FECHAEXCLUSIONINICIO, FECHAEXCLUSIONFIN);
 		usuario.setCodNum(id);
 		usuario.setExcluido(EXCLUIDO);
 		usuario.setRazonExcluido(RAZONEXCLUIDO);
@@ -108,7 +110,8 @@ public class TestBEPBeanUsuarios {
 	public void testA04() {
 		Integer id = 1;
 		
-		UsuarioBolsaEmpleo usuario = new UsuarioBolsaEmpleo(id, ROL, LISTADIST, EXCLUIDO, EXCLUIDOTIPO, RAZONEXCLUIDO, FECHAEXCLUSION);
+		UsuarioBolsaEmpleo usuario = 
+				new UsuarioBolsaEmpleo(id, ROL, LISTADIST, EXCLUIDO, EXCLUIDOTIPO, RAZONEXCLUIDO, FECHAEXCLUSION, FECHAEXCLUSIONINICIO, FECHAEXCLUSIONFIN);
 		assertEquals(id, usuario.getCodNum());
 		assertEquals(ROL, usuario.getRol());
 		assertEquals(LISTADIST, usuario.getListaDist());
@@ -124,7 +127,8 @@ public class TestBEPBeanUsuarios {
 	 */
 	@Test
 	public void testA05() {		
-		UsuarioBolsaEmpleo usuario = new UsuarioBolsaEmpleo(CODPERSONA, CODCUENTA, ROL, LISTADIST, EXCLUIDO, EXCLUIDOTIPO, RAZONEXCLUIDO, FECHAEXCLUSION);
+		UsuarioBolsaEmpleo usuario = new UsuarioBolsaEmpleo(CODPERSONA, CODCUENTA, ROL, LISTADIST, 
+				EXCLUIDO, EXCLUIDOTIPO, RAZONEXCLUIDO, FECHAEXCLUSION, FECHAEXCLUSIONINICIO, FECHAEXCLUSIONFIN);
 		assertEquals(CODPERSONA, usuario.getCodPersona());
 		assertEquals(CODCUENTA, usuario.getCodCuenta());
 		assertEquals(ROL, usuario.getRol());

@@ -410,6 +410,13 @@ nav-bolsa-empleo a:active, nav-bolsa-empleo a:hover {
 	width: 49% !important;
 }
 
+.form-check-custom.w-35{
+	width: 35% !important;
+}
+.form-check-custom.w-64{
+	width: 64% !important;
+}
+
 .form-group-custom label, .form-check-custom label, .form-file label, .form-select label {
 	display: inline-block;
 	font-size: .9rem;
