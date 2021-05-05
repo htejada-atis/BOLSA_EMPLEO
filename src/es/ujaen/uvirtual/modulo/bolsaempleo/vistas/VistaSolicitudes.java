@@ -4,6 +4,7 @@ import java.io.Serializable;
 import java.util.List;
 
 import es.ujaen.uvirtual.beans.vistas.Vista;
+import es.ujaen.uvirtual.modulo.bolsaempleo.beans.Afinidad;
 import es.ujaen.uvirtual.modulo.bolsaempleo.beans.Bolsa;
 import es.ujaen.uvirtual.modulo.bolsaempleo.beans.BolsaCandidato;
 import es.ujaen.uvirtual.modulo.bolsaempleo.beans.BolsaSolicitud;
@@ -30,6 +31,8 @@ public class VistaSolicitudes extends Vista implements Serializable {
 	private List<BolsaSolicitud> listaBolsasSolicitud;
 	private List<MeritoSolicitud> listaMeritos;
 	private List<Titulacion> listaTitulaciones;
+	private List<Afinidad> listaAfinidades;
+	private List<String> listaTiposAfinidades;
 	private Solicitud solicitud;
 	private Bolsa area;
 	private Merito merito;
@@ -120,6 +123,22 @@ public class VistaSolicitudes extends Vista implements Serializable {
 	
 	public void setListaTitulaciones(List<Titulacion> titulaciones) {
 		this.listaTitulaciones = titulaciones;
+	}
+	
+	public List<Afinidad> getListaAfinidades() {
+		return listaAfinidades;
+	}
+	
+	public void setListaAfinidades(List<Afinidad> afinidades) {
+		this.listaAfinidades = afinidades;
+	}
+	
+	public List<String> getListaTipoAfinidades() {
+		return listaTiposAfinidades;
+	}
+	
+	public void setListaTipoAfinidades(List<String> afinidades) {
+		this.listaTiposAfinidades = afinidades;
 	}
 	
 	public Bolsa getArea() {

@@ -8,6 +8,10 @@
 	padding: 0px 8px;
 }
 
+.bolsa-empleo .pointer {	
+    cursor: pointer;
+}
+
 .bolsa-empleo select, .bolsa-empleo input[type=text], .bolsa-empleo input[type=number], .bolsa-empleo textarea {
 	border: 1px solid rgb(118, 118, 118);
 	border-radius: 3px;
