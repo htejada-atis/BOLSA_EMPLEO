@@ -6,7 +6,7 @@
 <%@ page import="es.ujaen.uvirtual.beans.vistas.uvirtual.bolsaempleo.VistaSolicitudes" %>
 <%@ page import="es.ujaen.uvirtual.beans.uvirtual.bolsaempleo.Solicitud" %>
 <%@ page import="es.ujaen.uvirtual.utilidades.EscapaHTML" %>
-<%@	page import="es.ujaen.uvirtual.beans.uvirtual.bolsaempleo.BolsaSolicitud" %>
+<%@	page import="es.ujaen.uvirtual.beans.uvirtual.bolsaempleo.TablaBolsaSolicitud" %>
 <%@	page import="es.ujaen.uvirtual.beans.uvirtual.bolsaempleo.Merito" %>
 
 <%

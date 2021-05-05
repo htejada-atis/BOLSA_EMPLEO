@@ -19,7 +19,7 @@ import es.ujaen.uvirtual.utilidades.BolsaEmpleoDataTable;
 import es.ujaen.uvirtual.utilidades.UVException;
 
 /**
- * Clase de modelo para la gestión de titulaciones. 
+ * Clase de modelo para la gestión de meritos. 
  * @author ATISoluciones
  */
 public class ModeloMerito {
@@ -149,35 +149,6 @@ public class ModeloMerito {
 				return mer;
 			}
 		}
-	}
-	
-	/** Devuelve los méritos de la bolsa en una solicitud .
-	 * @param solicitud .
-	 * @param bolsa .
-	 * @return meritos .
-	 * @throws SQLException .
-	 * @throws UVException .
-	 */
-	public ArrayList<Merito> getMeritosSolicitudBolsa(Solicitud solicitud, Bolsa bolsa) throws SQLException, UVException {
-		ArrayList<Merito> meritos = new ArrayList<Merito>();
-		
-		String consulta = "SELECT bepsbm.BEPMER_CODNUM FROM TBEP_SOLICITUD_BOLSAS_MERITOS bepsbm"
-				+ " INNER JOIN TBEP_SOLICITUD_BOLSAS bepsbo ON bepsbm.BEPSBO_CODNUM = bepsbo.CODNUM"
-				+ " WHERE bepsbo.BEPSOL_CODNUM = ? AND bepsbo.BEPBOL_CODNUM = ?";
-		
-		try (Connection conexion = ConexionUvirtual.obtenerInstancia(); PreparedStatement stmt = conexion.prepareStatement(consulta)) {
-			int indexParam = 1;
-			stmt.setInt(indexParam++, solicitud.getCodNum());
-			stmt.setInt(indexParam++, bolsa.getCodNum());
-			
-			try (ResultSet rs = stmt.executeQuery()) {
-				while (rs.next()) {
-					meritos.add(getMeritoById(rs.getInt("BEPMER_CODNUM")));
-				}				
-			}
-		}
-		
-		return meritos;
 	}
 	
 	/**	Función que elimina méritos .
@@ -311,8 +282,17 @@ public class ModeloMerito {
 		BolsaEmpleoDataTable<MeritoSolicitud> dataTable = new BolsaEmpleoDataTable<MeritoSolicitud>(params);
 		
 		String consulta = ""
-				+ " SELECT DISTINCT (bepmer.CODNUM), bepmer.BEPITE_CODNUM, bepmer.BEPUSU_CODNUM, bepmer.VALOR, bepite.NOMBRE, "
-				+ "		bepmer.DESCRIPCION, bepmer.OBSERVACION, bepsbm.FLGEXCLUIDO, bepblo.BEPAPA_CODNUM "
+				+ " SELECT DISTINCT "
+				+ "		(bepmer.CODNUM), "
+				+ "		bepmer.BEPITE_CODNUM, "
+				+ "		bepmer.BEPUSU_CODNUM, "
+				+ "		bepmer.VALOR, bepite.NOMBRE, "
+				+ "		bepmer.DESCRIPCION, "
+				+ "		bepmer.OBSERVACION, "
+				+ "		bepsbm.FLGEXCLUIDO, "
+				+ "		bepblo.BEPAPA_CODNUM, "
+				+ "		bepsbm.CODNUM as SBM_CODNUM, "
+				+ "		bepsbm.BEPSBO_CODNUM "
 				+ " FROM TBEP_MERITOS bepmer"
 				+ " INNER JOIN TBEP_ITEMSBAREMACION bepite ON bepite.CODNUM = bepmer.BEPITE_CODNUM"
 				+ " INNER JOIN TBEP_BLOQUESBAREMACION bepblo ON bepblo.CODNUM = bepite.BEPBLO_CODNUM"
@@ -336,15 +316,9 @@ public class ModeloMerito {
 			dataTable.setFiltersParams(stmt, stmtCount, indexParam);
 			try (ResultSet rs = stmt.executeQuery()) {
 				while (rs.next()) {
-					Merito mer = new Merito();
-					mer.setCodNum(rs.getInt("CODNUM"));
-					ModeloBaremacion modeloBar = ModeloBaremacion.obtenerInstancia();
-					mer.setItemBaremacion(modeloBar.getItemBaremacionById(rs.getInt("BEPITE_CODNUM")));
-					mer.setDescripcion(rs.getString("DESCRIPCION"));
-					mer.setObservacion(rs.getString("OBSERVACION"));
-					mer.setValor(rs.getFloat("VALOR"));
+					Merito merito = this.getMeritoById(rs.getInt("CODNUM"));					
 					Boolean excluido = rs.getString("FLGEXCLUIDO") != null && rs.getString("FLGEXCLUIDO").equals("S");
-					MeritoSolicitud meritoSolicitud = new MeritoSolicitud(mer, excluido);
+					MeritoSolicitud meritoSolicitud = new MeritoSolicitud(rs.getInt("SBM_CODNUM"), merito, rs.getInt("BEPSBO_CODNUM"), excluido);
 					meritos.add(meritoSolicitud);
 				}
 			}

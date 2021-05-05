@@ -29,6 +29,7 @@ import es.ujaen.uvirtual.beans.Usuario;
 import es.ujaen.uvirtual.beans.uvirtual.bolsaempleo.Bolsa;
 import es.ujaen.uvirtual.beans.uvirtual.bolsaempleo.BolsaCandidato;
 import es.ujaen.uvirtual.beans.uvirtual.bolsaempleo.BolsaSolicitud;
+import es.ujaen.uvirtual.beans.uvirtual.bolsaempleo.TablaBolsaSolicitud;
 import es.ujaen.uvirtual.beans.uvirtual.bolsaempleo.Convocatoria;
 import es.ujaen.uvirtual.beans.uvirtual.bolsaempleo.Merito;
 import es.ujaen.uvirtual.beans.uvirtual.bolsaempleo.MeritoSolicitud;
@@ -155,10 +156,10 @@ public class ControladorMisSolicitudes extends HttpServlet {
 		if (nombreAccion == null) {
 			nombreAccion = ACCION_LISTAR_SOLICITUDES;
 		}
-					
+
 		try {
 			this.usuario = ModeloUsuarioBolsaEmpleo.obtenerInstancia().getUsuarioLogeado(datos);
-			
+
 			switch (nombreAccion) {
 				case ACCION_CONSULTAR_SOLICITUD:
 				case ACCION_CREAR_SOLICITUD:
@@ -201,7 +202,7 @@ public class ControladorMisSolicitudes extends HttpServlet {
 			datos.getFicherosJS().add("/js/bolsaempleo/datatable.js");
 			datos.getFicherosCSS().add("/css/intranet.css");
 			datos.getFicherosCSS().add("/css/jqueryujaen/jquery-ui-1.8.16.custom.css");
-			datos.getFicherosCSS().add("/css/ujaen_bolsa_empleo.css");			
+			datos.getFicherosCSS().add("/css/ujaen_bolsa_empleo.css");
 		}
 	}
 
@@ -494,8 +495,8 @@ public class ControladorMisSolicitudes extends HttpServlet {
 		Solicitud solicitud = modeloSolicitud.getSolicitudById(Formateador.leeParametroInteger(request.getParameter(PARAM_SOLICITUD_ID)));
 		bean.setSolicitud(solicitud);
 		
-		List<Merito> listaMeritos = modeloMerito.getMeritosSolicitudBolsa(solicitud, area);
-		bean.setListaMeritos(listaMeritos);
+		List<MeritoSolicitud> listaMeritos = modeloSolicitud.getMeritosSolicitudBolsa(solicitud, area);
+		bean.setListaMeritosSolicitud(listaMeritos);
 	}
 	
 	/** 
@@ -596,7 +597,7 @@ public class ControladorMisSolicitudes extends HttpServlet {
 		
 		try (PrintWriter writer = response.getWriter()) {
 			try {
-				BolsaEmpleoDataTable<BolsaSolicitud> dataTable = modelo.listaBolsasSolicitudesDatatable(solicitud, request.getParameterMap());
+				BolsaEmpleoDataTable<TablaBolsaSolicitud> dataTable = modelo.listaBolsasSolicitudesDatatable(solicitud, request.getParameterMap());
 				bean.setDatatableBolsasSolicitud(dataTable);
 				Gson gson = new GsonBuilder().setExclusionStrategies(BolsaEmpleoDataTable.GSONEXCLUSIONSTRATEGY).create();				
 				writer.write(gson.toJson(dataTable));
@@ -804,66 +805,7 @@ public class ControladorMisSolicitudes extends HttpServlet {
 	        lista.setListSymbol("• ");
 			
 			for (BolsaSolicitud bolsa: bolsasSolicitud) {
-		        lista.add("Área - " + bolsa.getArea().getDescripcion());  
-				
-				Table table = new Table(PDF_TABLE_COLUMNS, bolsasSolicitud.size());
-				table.setBorderWidth(1);
-				table.setBorderColor(new Color(0, 0, 0));
-				table.setPadding(PDF_TABLE_PADDING);
-				table.setWidth(SIZE_100);
-				
-				Font font = new Font();
-				font.setColor(new Color(0, COLOR_51, COLOR_153));
-
-				Phrase phrase = new Phrase("Cod. Mérito", font);
-				Cell cell = new Cell(phrase);
-				cell.setHeader(true);
-				cell.setBackgroundColor(new Color(COLOR_185, COLOR_201, COLOR_254));
-				table.addCell(cell);
-				
-				Phrase phrase2 = new Phrase("Mérito", font);
-				cell = new Cell(phrase2);
-				cell.setHeader(true);
-				cell.setBackgroundColor(new Color(COLOR_185, COLOR_201, COLOR_254));
-				table.addCell(cell);
-				
-				Phrase phrase3 = new Phrase("Valor", font);
-				cell = new Cell(phrase3);
-				cell.setHeader(true);
-				cell.setBackgroundColor(new Color(COLOR_185, COLOR_201, COLOR_254));
-				table.addCell(cell);
-				
-				Phrase phrase4 = new Phrase("Descripción", font);
-				cell = new Cell(phrase4);
-				cell.setHeader(true);
-				cell.setBackgroundColor(new Color(COLOR_185, COLOR_201, COLOR_254));
-				table.addCell(cell);
-				table.endHeaders();
-				
-				if (bolsa.getListaMeritos() != null && bolsa.getListaMeritos().size() > 0) {
-					for (Merito merito: bolsa.getListaMeritos()) {
-						String codigoItem = merito.getItemBaremacion().getBloqueBaremacion().getApartadoBaremacion().getCodigo() + "." 
-								+ merito.getItemBaremacion().getBloqueBaremacion().getCodigo() + "." + merito.getItemBaremacion().getCodigo();
-						
-						cell = new Cell(codigoItem);
-						cell.setBackgroundColor(new Color(COLOR_241, COLOR_241, COLOR_241));
-						table.addCell(cell);
-						cell = new Cell(merito.getItemBaremacion().getNombre());
-						cell.setBackgroundColor(new Color(COLOR_241, COLOR_241, COLOR_241));
-						table.addCell(cell);
-						cell = new Cell(merito.getValor().toString());
-						cell.setBackgroundColor(new Color(COLOR_241, COLOR_241, COLOR_241));
-						table.addCell(cell);
-						cell = new Cell(merito.getDescripcion().toString());
-						cell.setBackgroundColor(new Color(COLOR_241, COLOR_241, COLOR_241));
-						table.addCell(cell);
-					}
-				}
-								
-		        document.add(lista);
-				
-				document.add(table);
-
+				this.generarPDFArea(lista, bolsa, bolsasSolicitud, document);
 			}
 			document.close();
 			return new ByteArrayInputStream(out.toByteArray());
@@ -873,4 +815,70 @@ public class ControladorMisSolicitudes extends HttpServlet {
 		}
 	}
 	
+	private void generarPDFArea(com.lowagie.text.List lista, BolsaSolicitud bolsa, List<BolsaSolicitud> bolsasSolicitud, Document document) {
+		Table table = new Table(PDF_TABLE_COLUMNS, bolsasSolicitud.size());
+		
+		this.generarPDFAreaHeader(table, lista, bolsa);
+		
+		if (bolsa.getNumeroMeritos() != null && bolsa.getNumeroMeritos() > 0) {
+			for (MeritoSolicitud merito: bolsa.getListaMeritos()) {
+				String codigoItem = merito.getMerito().getItemBaremacion().getBloqueBaremacion().getApartadoBaremacion().getCodigo() + "." 
+						+ merito.getMerito().getItemBaremacion().getBloqueBaremacion().getCodigo() + "." 
+						+ merito.getMerito().getItemBaremacion().getCodigo();
+				
+				Cell cell = new Cell(codigoItem);
+				cell.setBackgroundColor(new Color(COLOR_241, COLOR_241, COLOR_241));
+				table.addCell(cell);
+				cell = new Cell(merito.getMerito().getItemBaremacion().getNombre());
+				cell.setBackgroundColor(new Color(COLOR_241, COLOR_241, COLOR_241));
+				table.addCell(cell);
+				cell = new Cell(merito.getMerito().getValor().toString());
+				cell.setBackgroundColor(new Color(COLOR_241, COLOR_241, COLOR_241));
+				table.addCell(cell);
+				cell = new Cell(merito.getMerito().getDescripcion().toString());
+				cell.setBackgroundColor(new Color(COLOR_241, COLOR_241, COLOR_241));
+				table.addCell(cell);
+			}
+		}
+						
+        document.add(lista);
+		document.add(table);
+	}
+	
+	private void generarPDFAreaHeader(Table table, com.lowagie.text.List lista, BolsaSolicitud bolsa) {
+		lista.add("Área - " + bolsa.getArea().getDescripcion());  
+		
+		table.setBorderWidth(1);
+		table.setBorderColor(new Color(0, 0, 0));
+		table.setPadding(PDF_TABLE_PADDING);
+		table.setWidth(SIZE_100);
+		
+		Font font = new Font();
+		font.setColor(new Color(0, COLOR_51, COLOR_153));
+
+		Phrase phrase = new Phrase("Cod. Mérito", font);
+		Cell cell = new Cell(phrase);
+		cell.setHeader(true);
+		cell.setBackgroundColor(new Color(COLOR_185, COLOR_201, COLOR_254));
+		table.addCell(cell);
+		
+		Phrase phrase2 = new Phrase("Mérito", font);
+		cell = new Cell(phrase2);
+		cell.setHeader(true);
+		cell.setBackgroundColor(new Color(COLOR_185, COLOR_201, COLOR_254));
+		table.addCell(cell);
+		
+		Phrase phrase3 = new Phrase("Valor", font);
+		cell = new Cell(phrase3);
+		cell.setHeader(true);
+		cell.setBackgroundColor(new Color(COLOR_185, COLOR_201, COLOR_254));
+		table.addCell(cell);
+		
+		Phrase phrase4 = new Phrase("Descripción", font);
+		cell = new Cell(phrase4);
+		cell.setHeader(true);
+		cell.setBackgroundColor(new Color(COLOR_185, COLOR_201, COLOR_254));
+		table.addCell(cell);
+		table.endHeaders();		
+	}	
 }

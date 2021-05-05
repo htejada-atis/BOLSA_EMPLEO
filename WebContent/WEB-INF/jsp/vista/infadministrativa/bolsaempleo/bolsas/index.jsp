@@ -99,7 +99,7 @@ $(document).ready(function() {
 	        {'data': 'fechaActualizacion', 'filter': {'type': 'date'}},
 	        {'data': 'fechaBloqueo', 'filter': {'type': 'date'}},
 	        {'data': 'fechaDesBloqueo', 'filter': {'type': 'date'}},
-	        {'data': 'baremable', 'filter': {'type': 'select', 'options':{'true': 'Baremable', 'false': 'No Baremable'} , 'optionDefault': 'true'}, 'render': function(row) {
+	        {'data': 'baremable', 'filter': {'type': 'select', 'options': {'true': 'Baremable', 'false': 'No Baremable'} , 'optionDefault': 'true'}, 'render': function(row) {
         		if(row.baremable){
         			return "<div title='Baremable' class='circle-true'></div>"; 
         		}
