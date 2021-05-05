@@ -8,6 +8,8 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.sql.SQLException;
 import java.text.ParseException;
+import java.util.Calendar;
+import java.util.Date;
 import java.util.List;
 
 import javax.sql.DataSource;
@@ -34,11 +36,14 @@ public class TestBEPModeloMisTitulaciones {
 	private static final Boolean LISTADIST = true;
 	private static final Boolean EXCLUIDO = false;
 	private static final String EXCLUIDOTIPO = "EJEMPLO";
+	private static final Date FECHAEXCLUSIONINICIO = new java.sql.Date(Calendar.getInstance().getTime().getTime());
+	private static final Date FECHAEXCLUSIONFIN = new java.sql.Date(Calendar.getInstance().getTime().getTime());
 	
 	private static final Integer CODNUM = 10;
 	private static final Integer CODNUM_TITULACION = 1;
 	private static final String NOMBRE = "nombre";
-	private static final UsuarioBolsaEmpleo USUARIO = new UsuarioBolsaEmpleo(CODPERSONA, CODCUENTA, ROL, LISTADIST, EXCLUIDO, EXCLUIDOTIPO);
+	private static final UsuarioBolsaEmpleo USUARIO = 
+			new UsuarioBolsaEmpleo(CODPERSONA, CODCUENTA, ROL, LISTADIST, EXCLUIDO, EXCLUIDOTIPO, FECHAEXCLUSIONINICIO, FECHAEXCLUSIONFIN);
 	private static final Titulacion TITULACION = new Titulacion(CODPERSONA, NOMBRE);
 	private static final InputStream ARCHIVO = new ByteArrayInputStream("archivo de prueba".getBytes());
     

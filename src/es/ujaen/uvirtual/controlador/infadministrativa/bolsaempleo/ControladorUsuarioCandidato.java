@@ -66,6 +66,8 @@ public class ControladorUsuarioCandidato extends HttpServlet {
 	public static final String PARAM_LISTA = "listadist";
 	public static final String PARAM_EXCLUIDO = "excluido";
 	public static final String PARAM_EXCLUIDO_TIPO = "excluidotipo";
+	public static final String PARAM_FECHA_EXCLUIDO_INICIO = "fechaexcluidoinicio";
+	public static final String PARAM_FECHA_EXCLUIDO_FIN = "fechaexcluidofin";
 	public static final String PARAM_RAZON_EXCLUIDO = "razonexcluido";
 	public static final String PARAM_ROLE = "rol";
 	public static final String PARAM_ENVIAR = "enviar";
@@ -116,6 +118,11 @@ public class ControladorUsuarioCandidato extends HttpServlet {
 	public static final String MENSAJE_ERROR_RAZON_EXCLUSION_LARGO = "La razón de exclusión no puede contener mas de %d caracteres";
 	public static final String MENSAJE_ERROR_ROL_VACIO = "El rol no puede estar vacio";
 	public static final String MENSAJE_ERROR_ROL_NEGATIVO = "Debe seleccionar un role válido";
+	
+	public static final String MENSAJE_ERROR_EXCLUIDO_TIPO_VACIO = "El tipo de exclusión no puede estar vacio";
+	
+	public static final String MENSAJE_ERROR_FECHA_EXCLUIDO_INICIO_REQUERIDA = "La fecha de inicio es requerida";
+	public static final String MENSAJE_ERROR_FECHA_EXCLUIDO_FIN_REQUERIDA = "La fecha de fin es requerida";
 
 	public static final int RESPONSE_HTTP_CODE_ERROR = 400;
 	
@@ -417,6 +424,9 @@ public class ControladorUsuarioCandidato extends HttpServlet {
 			ModeloRol modeloRol = ModeloRol.obtenerInstancia();
 			Rol role = modeloRol.getRoleById(Formateador.leeParametroInteger(request.getParameter(PARAM_ROLE)));
 				
+			Date fechaini = validator.getValueDate(PARAM_FECHA_EXCLUIDO_INICIO);
+			Date fechafin = validator.getValueDate(PARAM_FECHA_EXCLUIDO_FIN);
+			
 			Date date = new Date(System.currentTimeMillis());
 				
 			String usu = EscapaHTML.ajustaCodificacion(request.getParameter(PARAM_ID));
@@ -424,7 +434,8 @@ public class ControladorUsuarioCandidato extends HttpServlet {
 			Usuario usuArcos = CrearUsuario.usuario(request.getParameter(PARAM_ID));
 				
 			UsuarioBolsaEmpleo usuarioFinal =
-					new UsuarioBolsaEmpleo(usuArcos.getCodigoPersonaArcos(), usu, role, listadist, excluido, excluidoTipo, razonexcluido, date);
+					new UsuarioBolsaEmpleo(usuArcos.getCodigoPersonaArcos(), usu, role, 
+							listadist, excluido, excluidoTipo, razonexcluido, date, fechaini, fechafin);
 				
 			modelo.insertaUsuario(usuarioFinal);
 			
@@ -459,7 +470,7 @@ public class ControladorUsuarioCandidato extends HttpServlet {
 		bean.setUsuario(usu);
 		bean.setRol(usu.getRol());
 		
-		if (EscapaHTML.ajustaCodificacion(request.getParameter(PARAM_ROLE)) != null) {
+		if (EscapaHTML.ajustaCodificacion(request.getParameter(PARAM_LISTA)) != null) {
 			BolsaEmpleoValidator validator = this.getValidatorUsuarios(request); 							
 			
 			if (!validator.isValid()) {
@@ -482,12 +493,14 @@ public class ControladorUsuarioCandidato extends HttpServlet {
 				
 				String razonexcluido = EscapaHTML.ajustaCodificacion(request.getParameter(PARAM_RAZON_EXCLUIDO));
 				
-				ModeloRol modeloRol = ModeloRol.obtenerInstancia();
-				Rol role = modeloRol.getRoleById(Formateador.leeParametroInteger(request.getParameter(PARAM_ROLE)));
+				Rol role = modelo.getUsuarioById(Formateador.leeParametroInteger(request.getParameter(PARAM_ID))).getRol();
+				
+				Date fechaini = validator.getValueDate(PARAM_FECHA_EXCLUIDO_INICIO);
+				Date fechafin = validator.getValueDate(PARAM_FECHA_EXCLUIDO_FIN);
 				
 				Date date = new Date(System.currentTimeMillis());
 				
-				UsuarioBolsaEmpleo usuario = new UsuarioBolsaEmpleo(codNum, role, listadist, excluido, excluidoTipo, razonexcluido, date);
+				UsuarioBolsaEmpleo usuario = new UsuarioBolsaEmpleo(codNum, role, listadist, excluido, excluidoTipo, razonexcluido, date, fechaini, fechafin);
 				
 				modelo.actualizaUsuario(usuario);
 				HttpSession session = request.getSession(false);
@@ -545,24 +558,37 @@ public class ControladorUsuarioCandidato extends HttpServlet {
 		bean.setRol(usu.getRol());
 		
 		if (EscapaHTML.ajustaCodificacion(request.getParameter(PARAM_RAZON_EXCLUIDO)) != null) {
-			Integer codNum = Formateador.leeParametroInteger(request.getParameter(PARAM_ID));
-			Boolean excluido = true;
-					
-			String excluidoTipo = null;		
-			if (request.getParameter(PARAM_EXCLUIDO) != null) {
-				excluidoTipo = EscapaHTML.ajustaCodificacion(request.getParameter(PARAM_EXCLUIDO_TIPO));
+			BolsaEmpleoValidator validator = this.getValidatorExclusion(request); 							
+			
+			if (!validator.isValid()) {
+				for (String param : validator.getErrors().keySet()) {
+					for (String paramError : validator.getErrors().get(param)) {
+						bean.getMensajesDeError().add(paramError);
+					}
+				}
+			} else {
+				Integer codNum = Formateador.leeParametroInteger(request.getParameter(PARAM_ID));
+				Boolean excluido = true;
+						
+				String excluidoTipo = null;		
+				if (request.getParameter(PARAM_RAZON_EXCLUIDO) != null) {
+					excluidoTipo = EscapaHTML.ajustaCodificacion(request.getParameter(PARAM_EXCLUIDO_TIPO));
+				}
+				
+				String razonexcluido = EscapaHTML.ajustaCodificacion(request.getParameter(PARAM_RAZON_EXCLUIDO));
+				
+				Date fechaini = validator.getValueDate(PARAM_FECHA_EXCLUIDO_INICIO);
+				Date fechafin = validator.getValueDate(PARAM_FECHA_EXCLUIDO_FIN);
+				
+				Date date = new Date(System.currentTimeMillis());
+				
+				UsuarioBolsaEmpleo usuario = new UsuarioBolsaEmpleo(codNum, excluido, excluidoTipo, razonexcluido, date, fechaini, fechafin);
+				
+				modelo.ponerUsuarioComoExcluido(usuario);
+				HttpSession session = request.getSession(false);
+				session.setAttribute(MENSAJE_ENVIADO, MENSAJE_EXITO_EDITAR);
+				response.sendRedirect(request.getServletPath());
 			}
-			
-			String razonexcluido = EscapaHTML.ajustaCodificacion(request.getParameter(PARAM_RAZON_EXCLUIDO));
-			
-			Date date = new Date(System.currentTimeMillis());
-			
-			UsuarioBolsaEmpleo usuario = new UsuarioBolsaEmpleo(codNum, excluido, excluidoTipo, razonexcluido, date);
-			
-			modelo.ponerUsuarioComoExcluido(usuario);
-			HttpSession session = request.getSession(false);
-			session.setAttribute(MENSAJE_ENVIADO, MENSAJE_EXITO_EDITAR);
-			response.sendRedirect(request.getServletPath());
 		}
 	}
 	
@@ -618,15 +644,57 @@ public class ControladorUsuarioCandidato extends HttpServlet {
 			validator.addRule(PARAM_RAZON_EXCLUIDO, "noBlank", MENSAJE_ERROR_RAZON_EXCLUSION_VACIO);
 			validator.addRule(PARAM_RAZON_EXCLUIDO, "max:" + ModeloUsuarioBolsaEmpleo.COLUMN_RAZON_EXCLUSION_MAXLENGTH, 
 					String.format(MENSAJE_ERROR_RAZON_EXCLUSION_LARGO, ModeloUsuarioBolsaEmpleo.COLUMN_RAZON_EXCLUSION_MAXLENGTH));
+			
+			validator.addParamString(PARAM_EXCLUIDO_TIPO);
+			validator.addRule(PARAM_EXCLUIDO_TIPO, "required", MENSAJE_ERROR_EXCLUIDO_TIPO_VACIO);
+			validator.addRule(PARAM_EXCLUIDO_TIPO, "noBlank", MENSAJE_ERROR_EXCLUIDO_TIPO_VACIO);
+			
+			if (request.getParameter(PARAM_EXCLUIDO_TIPO) != null && request.getParameter(PARAM_EXCLUIDO_TIPO).equals("T")) {
+				validator.addParamDate(PARAM_FECHA_EXCLUIDO_INICIO);
+				validator.addRule(PARAM_FECHA_EXCLUIDO_INICIO, "required", MENSAJE_ERROR_FECHA_EXCLUIDO_INICIO_REQUERIDA);
+				
+				validator.addParamDate(PARAM_FECHA_EXCLUIDO_FIN);
+				validator.addRule(PARAM_FECHA_EXCLUIDO_FIN, "required", MENSAJE_ERROR_FECHA_EXCLUIDO_FIN_REQUERIDA);
+			}
 		}
-		
-		validator.addParamString(PARAM_ROLE);
-		validator.addRule(PARAM_ROLE, "required", MENSAJE_ERROR_ROL_VACIO);
-		validator.addRule(PARAM_ROLE, "noBlank", MENSAJE_ERROR_ROL_VACIO);
-		validator.addRule(PARAM_ROLE, "select", MENSAJE_ERROR_ROL_NEGATIVO);
 		
 		return validator;
 	}
+	
+	/** Valida el formulario de Exclusion de Usuarios.
+	 * @param request .
+	 * @return validator
+	 * @throws UVException .
+	 * @throws SQLException .
+	 * @throws IOException .
+	 * @throws IOException .
+	 */
+	private BolsaEmpleoValidator getValidatorExclusion(HttpServletRequest request) throws UVException {
+		BolsaEmpleoValidator validator = new BolsaEmpleoValidator(request);
+		
+		if (request.getParameter(PARAM_RAZON_EXCLUIDO) != null) {
+			validator.addParamString(PARAM_RAZON_EXCLUIDO);
+			validator.addRule(PARAM_RAZON_EXCLUIDO, "required", MENSAJE_ERROR_RAZON_EXCLUSION_VACIO);
+			validator.addRule(PARAM_RAZON_EXCLUIDO, "noBlank", MENSAJE_ERROR_RAZON_EXCLUSION_VACIO);
+			validator.addRule(PARAM_RAZON_EXCLUIDO, "max:" + ModeloUsuarioBolsaEmpleo.COLUMN_RAZON_EXCLUSION_MAXLENGTH, 
+					String.format(MENSAJE_ERROR_RAZON_EXCLUSION_LARGO, ModeloUsuarioBolsaEmpleo.COLUMN_RAZON_EXCLUSION_MAXLENGTH));
+			
+			validator.addParamString(PARAM_EXCLUIDO_TIPO);
+			validator.addRule(PARAM_EXCLUIDO_TIPO, "required", MENSAJE_ERROR_EXCLUIDO_TIPO_VACIO);
+			validator.addRule(PARAM_EXCLUIDO_TIPO, "noBlank", MENSAJE_ERROR_EXCLUIDO_TIPO_VACIO);
+			
+			if (request.getParameter(PARAM_EXCLUIDO_TIPO).equals("T")) {
+				validator.addParamDate(PARAM_FECHA_EXCLUIDO_INICIO);
+				validator.addRule(PARAM_FECHA_EXCLUIDO_INICIO, "required", MENSAJE_ERROR_FECHA_EXCLUIDO_INICIO_REQUERIDA);
+				
+				validator.addParamDate(PARAM_FECHA_EXCLUIDO_FIN);
+				validator.addRule(PARAM_FECHA_EXCLUIDO_FIN, "required", MENSAJE_ERROR_FECHA_EXCLUIDO_FIN_REQUERIDA);
+			}
+		}
+		
+		return validator;
+	}
+	
 	
 	
 	/**

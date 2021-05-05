@@ -142,7 +142,8 @@ VistaUsuarioBolsaEmpleo bean = (VistaUsuarioBolsaEmpleo) uvdatos.getVistas().get
 				<label class="form-label-custom" for="female" style="float: none; margin-right:0px;">Femenino</label>
     		</div>
     		<div class="form-check">
-    			<label for="usuario_lista_dist"><input class="params" type="checkbox" id="usuario_lista_dist" name="<%= ControladorMisDatos.PARAM_LISTA %>" value="<%= lista_dist %>" <%= (lista_dist ? "checked=''" : "") %>/>Lista Distribucion</label>
+    			<label for="usuario_lista_dist">Lista Distribucion:</label>
+    			<input class="params" type="checkbox" id="usuario_lista_dist" name="<%= ControladorMisDatos.PARAM_LISTA %>" value="<%= lista_dist %>" <%= (lista_dist ? "checked=''" : "") %>/>
     		</div>
     	</div>
 

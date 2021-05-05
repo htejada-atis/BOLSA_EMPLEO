@@ -6,6 +6,7 @@
 <%@ page import="es.ujaen.uvirtual.beans.vistas.uvirtual.bolsaempleo.VistaUsuarioBolsaEmpleo"%>
 <%@ page import="es.ujaen.uvirtual.utilidades.EscapaHTML" %>
 <%@ page import="es.ujaen.uvirtual.utilidades.Formateador"%>
+<%@ page import="java.util.Date"%>
 
 <% 
 UVDatos uvdatos = (UVDatos) request.getAttribute(UVDatos.NOMBRE_ATRIBUTO);
@@ -29,6 +30,8 @@ VistaUsuarioBolsaEmpleo bean = (VistaUsuarioBolsaEmpleo) uvdatos.getVistas().get
 		String usuario = "";
 		Boolean lista_dist = false;
 		Boolean excluido = false;
+		Date fecha_ini = null;
+		Date fecha_fin = null;
 		
 		if(bean.getUsuarioArcos() != null) {
 			usuario = bean.getUsuarioArcos().getUid();
@@ -41,6 +44,8 @@ VistaUsuarioBolsaEmpleo bean = (VistaUsuarioBolsaEmpleo) uvdatos.getVistas().get
 			if(bean.getUsuario() != null){
 				lista_dist = bean.getUsuario().getListaDist();
 				excluido = bean.getUsuario().getExcluido();
+				fecha_ini = bean.getUsuario().getFechaExclusionInicio();
+				fecha_fin = bean.getUsuario().getFechaExclusionFin();
 
 				if(bean.getUsuario().getRazonExcluido()!=null){
 					razon_excluido = bean.getUsuario().getRazonExcluido();
@@ -101,7 +106,7 @@ VistaUsuarioBolsaEmpleo bean = (VistaUsuarioBolsaEmpleo) uvdatos.getVistas().get
     			<input class="form-input-custom" id="n_documento" type="text" name="<%= ControladorUsuarioBolsaEmpleo.PARAM_NOMBRE %>" value="<%= n_documento %>" disabled/>
     		</div>
 		</div>
-		<div class="form-group-container 3col">
+		<div class="form-group-container">
 	    	<div class="form-check-custom">
     			<label for="usuario_lista_dist"><input class="params" type="checkbox" id="usuario_lista_dist" name="<%= ControladorUsuarioBolsaEmpleo.PARAM_LISTA %>" value="<%= lista_dist %>" <%= (lista_dist ? "checked=''" : "") %>/>Lista Distribución</label>
     		</div>
@@ -110,10 +115,25 @@ VistaUsuarioBolsaEmpleo bean = (VistaUsuarioBolsaEmpleo) uvdatos.getVistas().get
     				<label for="usuario_excluido"><input class="params" type="checkbox" id="usuario_excluido" name="<%= ControladorUsuarioBolsaEmpleo.PARAM_EXCLUIDO %>" value="<%= excluido %>" <%= (excluido ? "checked=''" : "") %>/>Excluido</label>
     			</div>    		
     			<div class="form-check-custom" id="excluido_tipo" style="display:none;">
-					<label class="form-label-custom" for="indefinido" style="float: none; margin-right:0px"><input class="form-input" type="radio" id="indefinido" name="<%= ControladorUsuarioBolsaEmpleo.PARAM_EXCLUIDO_TIPO %>" style="display: inline;">Indefinido</label>
+					<label class="form-label-custom" for="indefinido" style="float: none; margin-right:0px; margin-bottom:5px;"><input class="form-input" type="radio" id="indefinido" name="<%= ControladorUsuarioBolsaEmpleo.PARAM_EXCLUIDO_TIPO %>" style="display: inline;">Indefinido</label>
 					<label class="form-label-custom" for="temporal" style="float: none; margin-right:0px;"><input class="form-input" type="radio" id="temporal" name="<%= ControladorUsuarioBolsaEmpleo.PARAM_EXCLUIDO_TIPO %>" style="display: inline;">Temporal</label>
     			</div>
     		</div>
+		</div>
+		<div class="form-group-container col-2" id="fecha_excluido" style="display:none;">
+	    	<div class="form-check">
+    			
+    		</div>
+    		<div class="form-check">
+    			<div class="form-check-custom">
+	    			<label for="noticia_fecha"><b>Fecha Inicio</b>:</label>
+	    			<input class="form-input-custom" type="text" name="<%= ControladorUsuarioBolsaEmpleo.PARAM_FECHA_EXCLUIDO_INICIO %>" id="fecha_ini" autocomplete="off" value="<%= fecha_ini!=null ? fecha_ini : "" %>" style="width:80%"/>
+	    		</div>
+	    		<div class="form-check-custom">
+	    			<label for="noticia_fecha"><b>Fecha Fin</b>:</label>
+	    			<input class="form-input-custom" type="text" name="<%= ControladorUsuarioBolsaEmpleo.PARAM_FECHA_EXCLUIDO_FIN %>" id="fecha_fin" autocomplete="off" value="<%= fecha_fin!=null ? fecha_fin : "" %>" style="width:80%"/>
+	    		</div>
+	    	</div>
 		</div>
 	
 		<div class="form-group">
@@ -146,47 +166,6 @@ VistaUsuarioBolsaEmpleo bean = (VistaUsuarioBolsaEmpleo) uvdatos.getVistas().get
     		<input id="usuario_enviar" type="submit" name="<%= ControladorUsuarioBolsaEmpleo.PARAM_ENVIAR %> " value="<%if(bean.getUsuario()!=null){%><%if(bean.getBusqueda()){%>Volver<%}else{%>Guardar usuario<%}%><%}else{%>Añadir usuario<%}%>"/>
     	</div>
     </form>
-    
-    
-	<% if(bean.getUsuario()!=null){
-		if(bean.getUsuario().getRol().getValor().equals("bolempcandidato")) { %>
-		<table class="bluetable bolsaempleo" id="table_areas_excluidas">
-  			<caption class="table-title">Áreas excluidas para el usuario</caption>  
-			<tr>
-				<th scope="col" style="width:5%"></th>
-				<th scope="col" style="width:20%" title="Id de la area">Id</th>
-				<th scope="col" style="width:25%" title="Código de area">Código</th>
-				<th scope="col" style="width:65%">Area</th>
-				<th scope="col" class="center" style="width:15%">Baremable</th>	
-			</tr>
-			<tbody>				
-			</tbody>
-			<tfoot>
-				<tr>
-					<th colSpan="10" style="width:100%"></th>
-				</tr>
-			</tfoot>
-		</table>
-		
-		
-		<table class="bluetable bolsaempleo" id="table_areas">
-  			<caption class="table-title">Listado de áreas</caption>  
-			<tr>
-				<th scope="col" style="width:5%"></th>
-				<th scope="col" style="width:20%" title="Id de la area">Id</th>
-				<th scope="col" style="width:25%" title="Código de area">Código</th>
-				<th scope="col" style="width:65%">Area</th>
-				<th scope="col" class="center" style="width:15%">Baremable</th>	
-			</tr>
-			<tbody>				
-			</tbody>
-			<tfoot>
-				<tr>
-					<th colSpan="10" style="width:100%"></th>
-				</tr>
-			</tfoot>
-		</table>		
-	<%}	}%>   
 
 </div>
 
@@ -246,8 +225,12 @@ VistaUsuarioBolsaEmpleo bean = (VistaUsuarioBolsaEmpleo) uvdatos.getVistas().get
 			enviarUsuario(event, this);
 		});
 		
+		$("#fecha_ini").datepicker();
+		$("#fecha_fin").datepicker();
 		
-
+		<% if (fecha_ini == null) { %>
+			document.getElementById("fecha_ini").value = getTodayDate();
+		<% } %>
 		
 		document.getElementById("usuario_excluido").addEventListener("change", function(event) {
 			if(document.getElementById("usuario_excluido").checked){
@@ -264,8 +247,13 @@ VistaUsuarioBolsaEmpleo bean = (VistaUsuarioBolsaEmpleo) uvdatos.getVistas().get
 			}
 		});
 		
-
-		
+		document.getElementById("temporal").addEventListener("change", function(event) {
+			if(document.getElementById("temporal").checked) $("#fecha_excluido").show();
+		});
+		document.getElementById("indefinido").addEventListener("change", function(event) {
+			if(document.getElementById("indefinido").checked) $("#fecha_excluido").hide();
+		});
+	
 		<% if(bean.getBusqueda()) {%>
 		params = document.getElementsByClassName("params");
 		for (var i = 0; i < params.length; i++) { 
@@ -273,86 +261,14 @@ VistaUsuarioBolsaEmpleo bean = (VistaUsuarioBolsaEmpleo) uvdatos.getVistas().get
 		}
 		<%}%>
 		
-		<% if(bean.getUsuario()!=null) {%>
-		var table = new Atis.DataTable('#table_areas', {
-		    "ajax": { url: "/srv/es/ajax/informacionadministrativa/bolsaempleo/configuracion/areasbaremar" },
-		    "params": {"<%=ControladorUsuarioBolsaEmpleo.PARAM_ID%>": <%= bean.getUsuario().getCodNum() %>},
-		    "selectable": true,
-		    "pageSize": 10,
-		    "filterable": true,
-		    "action": "<%= ControladorAreasABaremar.ACCION_DATATABLE_EXCLUIDOS %>",
-		    "columns": [
-		    	{'data': 'area.codNum', 'selectable': true},
-		        {'data': 'area.codNum', 'filter': {'type': 'number'}},
-		        {'data': 'area.idAreaExterno' , 'filter': true, 'class': 'overflow-auto'},
-		        {'data': 'area.descripcion', 'filter': true, 'class': 'overflow-auto'},
-		        {'data': 'baremable', 'filter': {'type': 'selectBoolean', 'true': 'Baremable', 'false': 'No Baremable'} , 'order': {'active': false}, 'render': function(row) {
-	        		if(row.baremable){
-	        			return "<div title='Baremable' class='circle-true'></div>"; 
-	        		}
-	        		else{
-	        			return "<div title='No Baremable' class='circle-false'></div>"; 
-	        		}
-	        	}},
-		    ],
-		    "actions": [
-		    	{'label': 'Excluir Areas', 'onClick': function(selected) { enviaAccion("<%=ControladorUsuarioBolsaEmpleo.ACCION_EXCLUIR_USUARIO_AREA%>", selected); } }
-		    ]
-		});	
-		
-		var table = new Atis.DataTable('#table_areas_excluidas', {
-		    "ajax": { url: "/srv/es/ajax/informacionadministrativa/bolsaempleo/configuracion/usuarios" },
-		    "params": {"<%=ControladorUsuarioBolsaEmpleo.PARAM_ID%>": <%= bean.getUsuario().getCodNum() %>},
-		    "selectable": true,
-		    "pageSize": 10,
-		    "filterable": true,
-		    "action": "<%= ControladorUsuarioBolsaEmpleo.ACCION_DATATABLE_USUARIOS_EXCLUIDOS_AREA %>",
-		    "columns": [
-		    	{'data': 'area.codNum', 'selectable': true},
-		        {'data': 'area.codNum', 'filter': {'type': 'number'}},
-		        {'data': 'area.idAreaExterno', 'filter': true, 'class': 'overflow-auto'},
-		        {'data': 'area.descripcion', 'filter': true, 'class': 'overflow-auto'},
-		        {'data': 'baremable', 'filter': {'type': 'selectBoolean', 'true': 'Baremable', 'false': 'No Baremable'} , 'order': {'active': false},'render': function(row) {
-	        		if(row.baremable){
-	        			return "<div title='Baremable' class='circle-true'></div>";
-	        		}
-	        		else{
-	        			return "<div title='No Baremable' class='circle-false'></div>";
-	        		}
-	        	}},
-		    ],
-		    "actions": [
-		    	{'label': 'Borrar Areas excluidas', 'onClick': function(selected) { enviaAccion("<%= ControladorUsuarioBolsaEmpleo.ACCION_INCLUIR_USUARIO_AREA %>", selected); } }
-		    ]
-		});	
-		
-		
-		function enviaAccion(accion, selected) {
-			if (selected.length == 0) {
-				Atis.alertDialog('Estado de los usuarios', 'Seleccione al menos un usuario.');
-				return;
-			}
-			console.log(accion,selected);
+		function getTodayDate() {
+			var now = new Date();
 
-			Atis.confirmDialog("Exclusión de areas", "¿ Desea excluir las areas seleccionadas del usuario ?", {
-	        	Si: function() {
-	        		var params = {
-	        				'a': '<%=ControladorUsuarioBolsaEmpleo.ACCION_USUARIO%>', 
-	        				'aa': '<%=ControladorUsuarioBolsaEmpleo.ACCION_EXCLUIR_USUARIO_AREA%>', 
-	        				'<%=ControladorUsuarioBolsaEmpleo.PARAM_ACCION_USUARIO%>': accion, 
-	        				'<%=ControladorUsuarioBolsaEmpleo.PARAM_ID%>': <%= bean.getUsuario().getCodNum() %>, 
-	        				'<%=ControladorUsuarioBolsaEmpleo.PARAM_USUARIOS_SELECCIONADOS%>': Atis.object2Json(selected)
-	        			};
-	    			Atis.sendForm("<%= request.getRequestURI() %>", params);
-	          		$(this).dialog("close");
-	        	},
-	        	No: function() {
-	          		$(this).dialog("close");
-	        	}
-	      	});
+			var day = ("0" + now.getDate()).slice(-2);
+			var month = ("0" + (now.getMonth() + 1)).slice(-2);
+
+			return day + "/" + month + "/" + now.getFullYear();
 		}
-		
-		<%}%>
 	});
 	
 	

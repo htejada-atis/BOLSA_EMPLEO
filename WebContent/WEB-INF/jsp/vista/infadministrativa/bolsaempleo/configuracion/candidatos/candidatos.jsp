@@ -84,12 +84,12 @@ $(document).ready(function() {
         			return "<div title='Excluido de lista distribución' class='circle-false'></div>"; 
         		}
         	}},
-        	{'data': 'excluido', 'filter': {'type': 'selectBoolean', 'true': 'Excluido', 'false': 'Incluido'}, 'render': function(row) {
+        	{'data': 'excluido', 'filter': {'type': 'select', 'options':{'true': 'Excluido', 'false': 'Incluido'}, 'optionDefault': 'false'}, 'render': function(row) {
 	        	if(row.excluido==true){
         			return "<div title='En lista distribución' class='circle-true'></div>"; 
         		}
         	}},
-        	{'data': 'borrado', 'filter': {'type': 'selectBoolean', 'true': 'Borrado', 'false': 'No Borrado'}, 'render': function(row) {
+        	{'data': 'borrado', 'filter': {'type': 'select', 'options':{'true': 'Borrado', 'false': 'No Borrado'}, 'optionDefault': 'false'}, 'render': function(row) {
 	        	if(row.borrado==true){
         			return "<div title='En lista distribución' class='circle-true'></div>"; 
         		}

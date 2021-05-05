@@ -24,6 +24,8 @@ public class TestBEPBeanEvaluador {
 	private static final Boolean LISTADIST = true;
 	private static final Boolean EXCLUIDO = false;
 	private static final String EXCLUIDOTIPO = "EJEMPLO";
+	private static final Date FECHAEXCLUSIONINICIO = new java.sql.Date(Calendar.getInstance().getTime().getTime());
+	private static final Date FECHAEXCLUSIONFIN = new java.sql.Date(Calendar.getInstance().getTime().getTime());
 	private static final Boolean BORRADO = true;
 	private static final Date FECHAEXCLUSION = new java.sql.Date(Calendar.getInstance().getTime().getTime());
 	private static final Date FECHABORRADO = new java.sql.Date(Calendar.getInstance().getTime().getTime());
@@ -69,7 +71,7 @@ public class TestBEPBeanEvaluador {
 	 */
 	@Test
 	public void testA02() {
-		UsuarioBolsaEmpleo usuario = new UsuarioBolsaEmpleo(CODPERSONA, CODCUENTA, ROL, LISTADIST, EXCLUIDO, EXCLUIDOTIPO);
+		UsuarioBolsaEmpleo usuario = new UsuarioBolsaEmpleo(CODPERSONA, CODCUENTA, ROL, LISTADIST, EXCLUIDO, EXCLUIDOTIPO, FECHAEXCLUSIONINICIO, FECHAEXCLUSIONFIN);
 		Evaluador evaluador = new Evaluador(usuario, AREA, ACTIVO);
 		Evaluador evaluador2 = new Evaluador(evaluador, usuario);
 		
@@ -94,7 +96,7 @@ public class TestBEPBeanEvaluador {
 	 */
 	@Test
 	public void testA03() {
-		UsuarioBolsaEmpleo usuario = new UsuarioBolsaEmpleo(CODPERSONA, CODCUENTA, ROL, LISTADIST, EXCLUIDO, EXCLUIDOTIPO);
+		UsuarioBolsaEmpleo usuario = new UsuarioBolsaEmpleo(CODPERSONA, CODCUENTA, ROL, LISTADIST, EXCLUIDO, EXCLUIDOTIPO, FECHAEXCLUSIONINICIO, FECHAEXCLUSIONFIN);
 		
 		Evaluador evaluador = new Evaluador();
 		Evaluador evaluador2 = new Evaluador();
