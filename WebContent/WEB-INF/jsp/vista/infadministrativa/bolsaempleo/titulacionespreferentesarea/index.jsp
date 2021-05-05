@@ -11,7 +11,7 @@ VistaCandidatoTitulacionesArea bean = (VistaCandidatoTitulacionesArea)uvdatos.ge
 Bolsa bolsa = bean.getArea();
 %>
 
-<div class='bolsas'>
+<div class='bolsa-empleo'>
 	<% if (bean.getMensajesDeExito().size() > 0) { %>
 		<div id="exito" class="success">
 			<%= bean.formatearMensajesDeExito() %>

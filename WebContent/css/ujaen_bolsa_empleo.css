@@ -8,11 +8,30 @@
 	padding: 0px 8px;
 }
 
+.bolsa-empleo select, .bolsa-empleo input[type=text], .bolsa-empleo input[type=number], .bolsa-empleo textarea {
+	border: 1px solid rgb(118, 118, 118);
+	border-radius: 3px;
+	box-sizing: border-box;
+}
+
+.bolsa-empleo select {
+	padding: 4px;
+	background-color: white;
+}
+
+.bolsa-empleo select:focus {
+	background-color: #FFFF99;
+}
+
+.bolsa-empleo input[type=text], .bolsa-empleo input[type=number], .bolsa-empleo textarea {
+	padding: 4px 6px;
+}
+
 /* datatable */
 table.bluetable.bolsaempleo {
-	width: 100%;	
+	width: 100%;
 	margin-left: 0;
-	margin-right: 0;	
+	margin-right: 0;
 }
 table.bluetable.bolsaempleo th {
 	padding-left: 5px;
@@ -61,16 +80,26 @@ table.bluetable.bolsaempleo caption {
 	padding:0.5rem;
 }
 table.bluetable.bolsaempleo .filterable input {
-	display: block;
 	width: 100%;
 	max-width: 150px;
+	font-size: 13px;
 }
 table.bluetable.bolsaempleo .filterable select {
 	width: 100%;
 	max-width: 150px;
+	font-size: 13px;
 }
-
-
+/* datatable inputs && selects */
+table.bluetable.bolsaempleo input[type=text], table.bluetable.bolsaempleo input[type=number], table.bluetable.bolsaempleo select {
+	display: inline-block;
+	border-radius: 0px;
+}
+table.bluetable.bolsaempleo input[type=text], table.bluetable.bolsaempleo input[type=number] {
+	padding: 1px 2px;
+}
+table.bluetable.bolsaempleo select {
+	padding: 0px;
+}
 /* datatable buttons */
 table.bluetable.bolsaempleo .btns .btn {
 	width: 100%;
@@ -79,7 +108,7 @@ table.bluetable.bolsaempleo .btns .btn {
 }
 table.bluetable.bolsaempleo span button {
 	margin-left: 1px;
-	border: 1px solid #767676;
+	border: 1px solid rgb(118, 118, 118);
 }
 table.bluetable.bolsaempleo button.btn, table.bluetable.bolsaempleo .page-size select {
 	font-size: 11px; /* Set a font size */
