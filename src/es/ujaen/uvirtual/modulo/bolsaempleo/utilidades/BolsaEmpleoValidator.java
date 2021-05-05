@@ -162,7 +162,7 @@ public class BolsaEmpleoValidator {
 			value = Formateador.leeParametroInteger(this.request.getParameter(param));
 			break;
 		case PARAM_FLOAT:
-			value = Formateador.leeParametroFloat(this.request.getParameter(param));
+			value = BolsaEmpleoUtils.leeParametroFloat(this.request.getParameter(param));
 			break;
 		case PARAM_BOOLEAN:
 			value = Formateador.leeParametroBoolean(this.request.getParameter(param), "1", "0");

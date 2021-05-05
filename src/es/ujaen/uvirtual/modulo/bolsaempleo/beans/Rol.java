@@ -1,4 +1,4 @@
-package es.ujaen.uvirtual.beans;
+package es.ujaen.uvirtual.modulo.bolsaempleo.beans;
 
 import java.io.Serializable;
 

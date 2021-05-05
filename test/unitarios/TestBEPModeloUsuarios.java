@@ -19,9 +19,9 @@ import org.junit.Test;
 
 import bbdd.BbddRunner;
 import bbdd.UtilsTestBolsaEmpleo;
-import es.ujaen.uvirtual.beans.Rol;
 import es.ujaen.uvirtual.modelo.conexion.Conexion;
 import es.ujaen.uvirtual.modulo.bolsaempleo.beans.Merito;
+import es.ujaen.uvirtual.modulo.bolsaempleo.beans.Rol;
 import es.ujaen.uvirtual.modulo.bolsaempleo.beans.UsuarioBolsaEmpleo;
 import es.ujaen.uvirtual.modulo.bolsaempleo.modelo.ModeloMerito;
 import es.ujaen.uvirtual.modulo.bolsaempleo.modelo.ModeloUsuarioBolsaEmpleo;

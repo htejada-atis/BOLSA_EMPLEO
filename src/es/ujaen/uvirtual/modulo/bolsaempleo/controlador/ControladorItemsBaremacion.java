@@ -373,8 +373,8 @@ public class ControladorItemsBaremacion extends HttpServlet {
 			throw new UVException(String.format(MENSAJE_ERROR_NOMBRE_MAXIMO, ModeloBaremacion.COLUMN_NOMBRE_MAXLENGTH));
 		}
 		
-		apartado.setPuntuacionMaxima(Formateador.leeParametroFloat(request.getParameter(PARAM_APARTADO_PUNTUACIONMAXIMA)));
-		apartado.setPorcentajeMaximo(Formateador.leeParametroFloat(request.getParameter(PARAM_APARTADO_PORCENTAJEMAXIMO)));
+		apartado.setPuntuacionMaxima(BolsaEmpleoUtils.leeParametroFloat(request.getParameter(PARAM_APARTADO_PUNTUACIONMAXIMA)));
+		apartado.setPorcentajeMaximo(BolsaEmpleoUtils.leeParametroFloat(request.getParameter(PARAM_APARTADO_PORCENTAJEMAXIMO)));
 		
 		return apartado;
 	}
@@ -770,17 +770,17 @@ public class ControladorItemsBaremacion extends HttpServlet {
 			}
 		}
 		
-		item.setValor(Formateador.leeParametroFloat(request.getParameter(PARAM_ITEM_VALOR)));
+		item.setValor(BolsaEmpleoUtils.leeParametroFloat(request.getParameter(PARAM_ITEM_VALOR)));
 		if (item.getValor() == null) {
 			throw new UVException("El valor unitario no puede estar vacio");
 		}
 
-		item.setValorMinimo(Formateador.leeParametroFloat(request.getParameter(PARAM_ITEM_VALOR_MINIMO)));
+		item.setValorMinimo(BolsaEmpleoUtils.leeParametroFloat(request.getParameter(PARAM_ITEM_VALOR_MINIMO)));
 		if (item.getValorMinimo() == null) {
 			throw new UVException("El valor mínimo no puede estar vacio");
 		}
 
-		item.setValorMaximo(Formateador.leeParametroFloat(request.getParameter(PARAM_ITEM_VALOR_MAXIMO)));
+		item.setValorMaximo(BolsaEmpleoUtils.leeParametroFloat(request.getParameter(PARAM_ITEM_VALOR_MAXIMO)));
 		if (item.getValorMaximo() == null) {
 			throw new UVException("El valor máximo no puede estar vacio");
 		}

@@ -20,6 +20,7 @@ import es.ujaen.uvirtual.modulo.bolsaempleo.modelo.ModeloBaremacion;
 import es.ujaen.uvirtual.modulo.bolsaempleo.modelo.ModeloMeritosPreferentes;
 import es.ujaen.uvirtual.modulo.bolsaempleo.modelo.ModeloUsuarioBolsaEmpleo;
 import es.ujaen.uvirtual.modulo.bolsaempleo.utilidades.BolsaEmpleoDataTable;
+import es.ujaen.uvirtual.modulo.bolsaempleo.utilidades.BolsaEmpleoUtils;
 import es.ujaen.uvirtual.modulo.bolsaempleo.vistas.VistaMeritosPreferentes;
 import es.ujaen.uvirtual.utilidades.EscapaHTML;
 import es.ujaen.uvirtual.utilidades.Formateador;
@@ -280,7 +281,7 @@ public class ControladorMeritosPreferentes extends HttpServlet {
 		if (merito.getFactor().isBlank()) {
 			throw new UVException("El factor es requerido");
 		}
-		merito.setValorMaximo(Formateador.leeParametroFloat(request.getParameter(PARAM_MERITO_VALORMAXIMO)));
+		merito.setValorMaximo(BolsaEmpleoUtils.leeParametroFloat(request.getParameter(PARAM_MERITO_VALORMAXIMO)));
 		
 		return merito;
 	}

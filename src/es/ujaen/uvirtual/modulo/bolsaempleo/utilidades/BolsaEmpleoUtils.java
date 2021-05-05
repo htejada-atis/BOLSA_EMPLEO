@@ -97,4 +97,17 @@ public class BolsaEmpleoUtils {
 
         return m.matches();
 	}
+	
+	/**
+	 * Trata de convertir a Float el valor recibido como parámetro. Si la conversión falla, devuelve null, de modo que nunca salte una excepción
+	 * @param valor valor
+	 * @return El valor convertido a float, o null si no es posible
+	 */
+	public static Float leeParametroFloat(String valor) {
+		try {
+			return Float.parseFloat(valor);
+		} catch (Exception e) {
+			return null;
+		}
+	}
 }

@@ -25,6 +25,7 @@ import es.ujaen.uvirtual.modulo.bolsaempleo.beans.Afinidad;
 import es.ujaen.uvirtual.modulo.bolsaempleo.modelo.ModeloAfinidad;
 import es.ujaen.uvirtual.modulo.bolsaempleo.modelo.ModeloUsuarioBolsaEmpleo;
 import es.ujaen.uvirtual.modulo.bolsaempleo.utilidades.BolsaEmpleoDataTable;
+import es.ujaen.uvirtual.modulo.bolsaempleo.utilidades.BolsaEmpleoUtils;
 import es.ujaen.uvirtual.modulo.bolsaempleo.utilidades.BolsaEmpleoValidator;
 import es.ujaen.uvirtual.modulo.bolsaempleo.vistas.VistaAfinidades;
 import es.ujaen.uvirtual.utilidades.EscapaHTML;
@@ -253,7 +254,7 @@ public class ControladorAfinidades extends HttpServlet {
 				Integer codNum = Formateador.leeParametroInteger(request.getParameter(PARAM_ID));
 				String descripcion = EscapaHTML.ajustaCodificacion(request.getParameter(PARAM_DESCRIPCION));
 				String codigo = EscapaHTML.ajustaCodificacion(request.getParameter(PARAM_CODIGO));
-				Float modulacion = Formateador.leeParametroFloat(request.getParameter(PARAM_MODULACION));
+				Float modulacion = BolsaEmpleoUtils.leeParametroFloat(request.getParameter(PARAM_MODULACION));
 				
 				Afinidad afinidadEdit = new Afinidad(codNum, codigo, descripcion, modulacion); 
 				modelo.actualizaAfinidad(afinidadEdit);

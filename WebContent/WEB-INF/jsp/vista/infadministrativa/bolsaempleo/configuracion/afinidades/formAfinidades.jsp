@@ -1,6 +1,6 @@
 <%@ page trimDirectiveWhitespaces="true" %>
 <%@ page import="es.ujaen.uvirtual.beans.UVDatos" %>
-<%@ page import="es.ujaen.uvirtual.beans.Rol" %>
+<%@ page import="es.ujaen.uvirtual.modulo.bolsaempleo.beans.Rol" %>
 <%@	page import="es.ujaen.uvirtual.modulo.bolsaempleo.controlador.ControladorAfinidades" %>
 <%@	page import="es.ujaen.uvirtual.modulo.bolsaempleo.beans.Afinidad" %>
 <%@ page import="es.ujaen.uvirtual.modulo.bolsaempleo.vistas.VistaAfinidades" %>

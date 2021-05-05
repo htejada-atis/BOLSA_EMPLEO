@@ -8,7 +8,7 @@ import java.util.Date;
 
 import org.junit.Test;
 
-import es.ujaen.uvirtual.beans.Rol;
+import es.ujaen.uvirtual.modulo.bolsaempleo.beans.Rol;
 import es.ujaen.uvirtual.modulo.bolsaempleo.beans.UsuarioBolsaEmpleo;
 
 /** test usuarios bolsa empleo.

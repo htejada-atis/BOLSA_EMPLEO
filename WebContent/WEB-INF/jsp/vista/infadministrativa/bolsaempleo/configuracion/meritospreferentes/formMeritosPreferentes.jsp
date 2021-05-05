@@ -8,7 +8,7 @@
 <%@ page import="es.ujaen.uvirtual.modulo.bolsaempleo.vistas.VistaMeritosPreferentes"%>
 <%@ page import="es.ujaen.uvirtual.modulo.bolsaempleo.beans.MeritoPreferente"%>
 <%@ page import="es.ujaen.uvirtual.beans.UVDatos" %>
-<%@ page import="es.ujaen.uvirtual.beans.Rol" %>
+<%@ page import="es.ujaen.uvirtual.modulo.bolsaempleo.beans.Rol" %>
 <%@ page import="es.ujaen.uvirtual.utilidades.EscapaHTML" %>
 <%@ page import="es.ujaen.uvirtual.utilidades.Formateador" %>
 <%@ page import="es.ujaen.uvirtual.modulo.bolsaempleo.utilidades.BolsaEmpleoUtils" %>
