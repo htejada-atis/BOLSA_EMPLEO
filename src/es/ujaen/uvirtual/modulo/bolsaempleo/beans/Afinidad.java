@@ -10,7 +10,6 @@ public class Afinidad {
 	private String codigo;
 	private String descripcion;
 	private Float modulacion;
-
 	
 	/** Constructor por defecto.
 	 */
@@ -76,6 +75,10 @@ public class Afinidad {
 
 	public void setModulacion(Float pmodulacion) {
 		this.modulacion = pmodulacion;
+	}
+	
+	public String getCodigoDescripcion() {
+		return this.getCodigo() + " - " + this.getDescripcion() + " (" + this.getModulacion() + " %)"; 
 	}
 	
 	public static long getSerialversionuid() {

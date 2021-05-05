@@ -23,13 +23,10 @@ function setProp( object, keys, val ){
 
 function removeValueArray(array, val) {
 	array = Array.isArray(array) ? array : [array];
-	console.log(array);
 	const index = array.indexOf(val);
 	if (index > -1) {
 		array.splice(index, 1);
-	}
-	
-	console.log(array);
+	}	
 }
 
 function formatearFecha(fecha) {
@@ -89,10 +86,10 @@ function sendAjax(url, params, success, error) {
 	});
 }
 
-function alertDialog(title, message) {
+function alertDialog(title, message, onOk) {
 	$('<div class="atisDialog"></div>')
 		.appendTo('body')
-		.html('<div><h6>' + message + '</h6></div>')
+		.html(message)
 		.dialog({
 			modal: true,
 			title: title,
@@ -102,6 +99,7 @@ function alertDialog(title, message) {
 			resizable: false,
 			buttons: {
 				Ok: function() {
+					onOk && onOk(this);
 					$(this).dialog("close");
 				}
 			},
@@ -113,7 +111,7 @@ function alertDialog(title, message) {
 
 function confirmDialog(title, message, buttons) {
 	$('<div></div>').appendTo('body')
-	    	.html('<div><h6>' + message + '</h6></div>')
+	    	.html(message)
 	    	.dialog({
 		      modal: true,
 		      title: title,
@@ -136,6 +134,10 @@ function json2Object(json) {
 	return JSON.parse(json);
 }
 
+function escapeHtml(str) {
+    return str.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;").replace(/'/g, "&#039;");
+}
+
 window.Atis = $.extend(window.Atis ? window.Atis : {}, {
 	"getProp": getProp,
 	"setProp": setProp,
@@ -148,5 +150,6 @@ window.Atis = $.extend(window.Atis ? window.Atis : {}, {
 	"object2Json": object2Json,
 	"json2Object": json2Object,
 	"sendAjax": sendAjax,
-	"removeValueArray": removeValueArray
+	"removeValueArray": removeValueArray,
+	"escapeHtml": escapeHtml
 });
