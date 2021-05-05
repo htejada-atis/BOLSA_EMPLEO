@@ -1,12 +1,12 @@
 <%@ page trimDirectiveWhitespaces="true" %>
 <%@ page import="es.ujaen.uvirtual.beans.UVDatos" %>
-<%@ page import="es.ujaen.uvirtual.beans.Rol" %>
-<%@	page import="es.ujaen.uvirtual.controlador.infadministrativa.bolsaempleo.ControladorAfinidades" %>
-<%@	page import="es.ujaen.uvirtual.beans.uvirtual.bolsaempleo.Afinidad" %>
-<%@ page import="es.ujaen.uvirtual.beans.vistas.uvirtual.bolsaempleo.VistaAfinidades" %>
+<%@ page import="es.ujaen.uvirtual.modulo.bolsaempleo.beans.Rol" %>
+<%@	page import="es.ujaen.uvirtual.modulo.bolsaempleo.controlador.ControladorAfinidades" %>
+<%@	page import="es.ujaen.uvirtual.modulo.bolsaempleo.beans.Afinidad" %>
+<%@ page import="es.ujaen.uvirtual.modulo.bolsaempleo.vistas.VistaAfinidades" %>
 <%@ page import="es.ujaen.uvirtual.utilidades.EscapaHTML" %>
 <%@ page import="es.ujaen.uvirtual.utilidades.Formateador" %>
-<%@ page import="es.ujaen.uvirtual.utilidades.BolsaEmpleoUtils" %>
+<%@ page import="es.ujaen.uvirtual.modulo.bolsaempleo.utilidades.BolsaEmpleoUtils" %>
 
 <% 
 UVDatos uvdatos = (UVDatos) request.getAttribute(UVDatos.NOMBRE_ATRIBUTO);

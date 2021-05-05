@@ -22,9 +22,9 @@ import org.openqa.selenium.support.ui.WebDriverWait;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 
-import es.ujaen.uvirtual.beans.uvirtual.bolsaempleo.TitulacionArea;
-import es.ujaen.uvirtual.controlador.infadministrativa.bolsaempleo.ControladorGestionTitulacionesPreferentesArea;
-import es.ujaen.uvirtual.utilidades.BolsaEmpleoDataTable;
+import es.ujaen.uvirtual.modulo.bolsaempleo.beans.TitulacionArea;
+import es.ujaen.uvirtual.modulo.bolsaempleo.controlador.ControladorGestionTitulacionesPreferentesArea;
+import es.ujaen.uvirtual.modulo.bolsaempleo.utilidades.BolsaEmpleoDataTable;
 
 /** Clase para probar titulaciones preferentes.
  * @author fcampos
@@ -110,7 +110,7 @@ public class TestBEPTitulacionesPreferentes {
 	@Test
 	public void testA2() throws MalformedURLException, IOException {
 		String u = "http://localhost:8080/srv/es/informacionadministrativa/bolsaempleo/configuracion/titulacionespreferentesarea?a="
-	+ ControladorGestionTitulacionesPreferentesArea.ACCION_DATATABLE_TITULACIONES + "&area=0";
+				+ ControladorGestionTitulacionesPreferentesArea.ACCION_DATATABLE_TITULACIONES + "&area=0";
 		String json = DriverUvBEP.getAjaxRequestJson(u);
 		
 		Type typeDt = new TypeToken<BolsaEmpleoDataTable<TitulacionArea>>() { }.getType();

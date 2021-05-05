@@ -65,7 +65,7 @@ public class TestBEPConvocatorias {
 	}
 	
 	/** Agregado de convocatoria.
-	 * @throws InterruptedException 
+	 * @throws InterruptedException .
 	 */
 	@Test
 	public void testA1() throws InterruptedException {
@@ -91,8 +91,8 @@ public class TestBEPConvocatorias {
 		nMerBloque.sendKeys("10");
 		nMerBloque.click();
 		
-		Thread.sleep(2000); 
-		
+		// esperamos a que se cierre el datapicker
+		wait.until(ExpectedConditions.invisibilityOfElementLocated(By.id("ui-datepicker-div")));
 		WebElement btnAgregar = pmain.findElement(By.id("convocatoria_enviar"));
 		btnAgregar.click();
 	}

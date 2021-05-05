@@ -7,7 +7,7 @@ import static org.junit.Assert.assertTrue;
 
 import org.junit.Test;
 
-import es.ujaen.uvirtual.beans.uvirtual.bolsaempleo.Afinidad;
+import es.ujaen.uvirtual.modulo.bolsaempleo.beans.Afinidad;
 
 /** test afinidad.
 *

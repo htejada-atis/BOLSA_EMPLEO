@@ -12,9 +12,9 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 import bbdd.BbddRunner;
 import bbdd.UtilsTestBolsaEmpleo;
-import es.ujaen.uvirtual.beans.uvirtual.bolsaempleo.Noticia;
-import es.ujaen.uvirtual.modelo.bolsaempleo.ModeloNoticia;
 import es.ujaen.uvirtual.modelo.conexion.Conexion;
+import es.ujaen.uvirtual.modulo.bolsaempleo.beans.Noticia;
+import es.ujaen.uvirtual.modulo.bolsaempleo.modelo.ModeloNoticia;
 import es.ujaen.uvirtual.utilidades.UVException;
 
 /** Clase para probar el modelo noticia. */

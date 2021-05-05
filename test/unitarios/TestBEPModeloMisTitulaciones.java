@@ -17,11 +17,11 @@ import org.junit.Test;
 
 import bbdd.BbddRunner;
 import bbdd.UtilsTestBolsaEmpleo;
-import es.ujaen.uvirtual.beans.Rol;
-import es.ujaen.uvirtual.beans.uvirtual.bolsaempleo.Titulacion;
-import es.ujaen.uvirtual.beans.uvirtual.bolsaempleo.UsuarioBolsaEmpleo;
-import es.ujaen.uvirtual.modelo.bolsaempleo.ModeloMisTitulaciones;
 import es.ujaen.uvirtual.modelo.conexion.Conexion;
+import es.ujaen.uvirtual.modulo.bolsaempleo.beans.Rol;
+import es.ujaen.uvirtual.modulo.bolsaempleo.beans.Titulacion;
+import es.ujaen.uvirtual.modulo.bolsaempleo.beans.UsuarioBolsaEmpleo;
+import es.ujaen.uvirtual.modulo.bolsaempleo.modelo.ModeloMisTitulaciones;
 import es.ujaen.uvirtual.utilidades.UVException;
 
 /** test modelo mis titulaciones.

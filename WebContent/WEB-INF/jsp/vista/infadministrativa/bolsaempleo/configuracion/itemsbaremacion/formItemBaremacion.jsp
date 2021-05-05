@@ -1,14 +1,14 @@
 <%@ page trimDirectiveWhitespaces="true"%>
 <%@ page import="es.ujaen.uvirtual.beans.UVDatos"%>
-<%@	page import="es.ujaen.uvirtual.controlador.infadministrativa.bolsaempleo.ControladorItemsBaremacion"%>
-<%@ page import="es.ujaen.uvirtual.beans.vistas.uvirtual.bolsaempleo.VistaItemsBaremacion"%>
-<%@ page import="es.ujaen.uvirtual.beans.uvirtual.bolsaempleo.ApartadoBaremacion" %>
-<%@ page import="es.ujaen.uvirtual.beans.uvirtual.bolsaempleo.BloqueBaremacion" %>
-<%@ page import="es.ujaen.uvirtual.beans.uvirtual.bolsaempleo.ItemBaremacion" %>
-<%@ page import="es.ujaen.uvirtual.beans.uvirtual.bolsaempleo.Afinidad" %>
+<%@	page import="es.ujaen.uvirtual.modulo.bolsaempleo.controlador.ControladorItemsBaremacion"%>
+<%@ page import="es.ujaen.uvirtual.modulo.bolsaempleo.vistas.VistaItemsBaremacion"%>
+<%@ page import="es.ujaen.uvirtual.modulo.bolsaempleo.beans.ApartadoBaremacion" %>
+<%@ page import="es.ujaen.uvirtual.modulo.bolsaempleo.beans.BloqueBaremacion" %>
+<%@ page import="es.ujaen.uvirtual.modulo.bolsaempleo.beans.ItemBaremacion" %>
+<%@ page import="es.ujaen.uvirtual.modulo.bolsaempleo.beans.Afinidad" %>
 <%@ page import="es.ujaen.uvirtual.utilidades.EscapaHTML" %>
-<%@ page import="es.ujaen.uvirtual.utilidades.BolsaEmpleoUtils" %>
-<%@ page import="es.ujaen.uvirtual.modelo.bolsaempleo.ModeloBaremacion" %>
+<%@ page import="es.ujaen.uvirtual.modulo.bolsaempleo.utilidades.BolsaEmpleoUtils" %>
+<%@ page import="es.ujaen.uvirtual.modulo.bolsaempleo.modelo.ModeloBaremacion" %>
 
 <% 
 UVDatos uvdatos = (UVDatos) request.getAttribute(UVDatos.NOMBRE_ATRIBUTO);

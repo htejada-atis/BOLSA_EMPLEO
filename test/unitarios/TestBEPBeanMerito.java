@@ -8,8 +8,9 @@ import static org.junit.Assert.assertTrue;
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
 import org.junit.Test;
-import es.ujaen.uvirtual.beans.uvirtual.bolsaempleo.ItemBaremacion;
-import es.ujaen.uvirtual.beans.uvirtual.bolsaempleo.Merito;
+
+import es.ujaen.uvirtual.modulo.bolsaempleo.beans.ItemBaremacion;
+import es.ujaen.uvirtual.modulo.bolsaempleo.beans.Merito;
 
 /** test merito.
  *
