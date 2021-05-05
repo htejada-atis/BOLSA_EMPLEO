@@ -4,11 +4,11 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
-import es.ujaen.uvirtual.beans.uvirtual.bolsaempleo.Afinidad;
-import es.ujaen.uvirtual.beans.uvirtual.bolsaempleo.ApartadoBaremacion;
-import es.ujaen.uvirtual.beans.uvirtual.bolsaempleo.BloqueBaremacion;
-import es.ujaen.uvirtual.beans.uvirtual.bolsaempleo.ItemBaremacion;
 import es.ujaen.uvirtual.beans.vistas.Vista;
+import es.ujaen.uvirtual.modulo.bolsaempleo.beans.Afinidad;
+import es.ujaen.uvirtual.modulo.bolsaempleo.beans.ApartadoBaremacion;
+import es.ujaen.uvirtual.modulo.bolsaempleo.beans.BloqueBaremacion;
+import es.ujaen.uvirtual.modulo.bolsaempleo.beans.ItemBaremacion;
 import es.ujaen.uvirtual.utilidades.BolsaEmpleoDataTable;
 
 /** Bean para la vista.

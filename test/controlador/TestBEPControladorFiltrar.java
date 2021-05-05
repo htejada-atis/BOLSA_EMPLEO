@@ -13,7 +13,7 @@ import bbdd.UtilsTestBolsaEmpleo;
 import controlador.implementacion.PeticionHttp;
 import controlador.implementacion.RespuestaHttp;
 import es.ujaen.uvirtual.beans.vistas.uvirtual.bolsaempleo.VistaFiltrar;
-import es.ujaen.uvirtual.controlador.infadministrativa.bolsaempleo.ControladorFiltrar;
+import es.ujaen.uvirtual.modulo.bolsaempleo.controlador.ControladorFiltrar;
 
 /** test controlador filtrar.
  * @author jlopez

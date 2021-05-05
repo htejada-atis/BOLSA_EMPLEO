@@ -10,7 +10,8 @@ import java.io.ByteArrayInputStream;
 import java.io.InputStream;
 
 import org.junit.Test;
-import es.ujaen.uvirtual.beans.uvirtual.bolsaempleo.Fichero;
+
+import es.ujaen.uvirtual.modulo.bolsaempleo.beans.Fichero;
 
 /** test fichero.
  *

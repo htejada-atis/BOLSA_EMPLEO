@@ -1,9 +1,9 @@
 <%@ page trimDirectiveWhitespaces="true"%>
-<%@	page import="es.ujaen.uvirtual.controlador.infadministrativa.bolsaempleo.ControladorCandidatoTitulacionesPreferentesArea"%>
+<%@	page import="es.ujaen.uvirtual.modulo.bolsaempleo.controlador.ControladorCandidatoTitulacionesPreferentesArea"%>
 <%@ page import="es.ujaen.uvirtual.beans.vistas.uvirtual.bolsaempleo.VistaCandidatoTitulacionesArea" %>
 <%@ page import="es.ujaen.uvirtual.beans.UVDatos"%>
 <%@ page import="es.ujaen.uvirtual.utilidades.Formateador"%>
-<%@ page import="es.ujaen.uvirtual.beans.uvirtual.bolsaempleo.Bolsa" %>
+<%@ page import="es.ujaen.uvirtual.modulo.bolsaempleo.beans.Bolsa" %>
 
 <% 
 UVDatos uvdatos = (UVDatos)request.getAttribute(UVDatos.NOMBRE_ATRIBUTO);

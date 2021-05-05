@@ -12,8 +12,8 @@ import bbdd.UtilsTestBolsaEmpleo;
 import controlador.implementacion.PeticionHttp;
 import controlador.implementacion.RespuestaHttp;
 import es.ujaen.uvirtual.beans.vistas.uvirtual.bolsaempleo.VistaEstadoBolsas;
-import es.ujaen.uvirtual.controlador.infadministrativa.bolsaempleo.ControladorBolsas;
-import es.ujaen.uvirtual.modelo.bolsaempleo.ModeloBolsa;
+import es.ujaen.uvirtual.modulo.bolsaempleo.controlador.ControladorBolsas;
+import es.ujaen.uvirtual.modulo.bolsaempleo.modelo.ModeloBolsa;
 import es.ujaen.uvirtual.utilidades.BolsaEmpleoDataTable;
 
 

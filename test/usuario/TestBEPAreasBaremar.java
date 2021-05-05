@@ -21,8 +21,8 @@ import org.openqa.selenium.support.ui.WebDriverWait;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 
-import es.ujaen.uvirtual.beans.uvirtual.bolsaempleo.Area;
-import es.ujaen.uvirtual.controlador.infadministrativa.bolsaempleo.ControladorAreasABaremar;
+import es.ujaen.uvirtual.modulo.bolsaempleo.beans.Area;
+import es.ujaen.uvirtual.modulo.bolsaempleo.controlador.ControladorAreasABaremar;
 import es.ujaen.uvirtual.utilidades.BolsaEmpleoDataTable;
 
 

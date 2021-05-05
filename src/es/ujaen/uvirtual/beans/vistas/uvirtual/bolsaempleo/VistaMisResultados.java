@@ -1,8 +1,9 @@
 package es.ujaen.uvirtual.beans.vistas.uvirtual.bolsaempleo;
 
 import java.io.Serializable;
-import es.ujaen.uvirtual.beans.uvirtual.bolsaempleo.Area;
+
 import es.ujaen.uvirtual.beans.vistas.Vista;
+import es.ujaen.uvirtual.modulo.bolsaempleo.beans.Area;
 import es.ujaen.uvirtual.utilidades.BolsaEmpleoDataTable;
 
 /** Bean para la vista.

@@ -6,8 +6,9 @@ import static org.junit.Assert.assertNotEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 import org.junit.Test;
-import es.ujaen.uvirtual.beans.uvirtual.bolsaempleo.ApartadoBaremacion;
-import es.ujaen.uvirtual.beans.uvirtual.bolsaempleo.BloqueBaremacion;
+
+import es.ujaen.uvirtual.modulo.bolsaempleo.beans.ApartadoBaremacion;
+import es.ujaen.uvirtual.modulo.bolsaempleo.beans.BloqueBaremacion;
 
 /** test bloque.
  *

@@ -13,7 +13,7 @@ import bbdd.UtilsTestBolsaEmpleo;
 import controlador.implementacion.PeticionHttp;
 import controlador.implementacion.RespuestaHttp;
 import es.ujaen.uvirtual.beans.vistas.uvirtual.bolsaempleo.VistaNoticias;
-import es.ujaen.uvirtual.controlador.infadministrativa.bolsaempleo.ControladorGestionNoticias;
+import es.ujaen.uvirtual.modulo.bolsaempleo.controlador.ControladorGestionNoticias;
 import es.ujaen.uvirtual.utilidades.UVException;
 
 /** test controlador noticias.

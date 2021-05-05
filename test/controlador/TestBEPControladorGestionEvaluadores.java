@@ -12,7 +12,7 @@ import bbdd.UtilsTestBolsaEmpleo;
 import controlador.implementacion.PeticionHttp;
 import controlador.implementacion.RespuestaHttp;
 import es.ujaen.uvirtual.beans.vistas.uvirtual.bolsaempleo.VistaEvaluadores;
-import es.ujaen.uvirtual.controlador.infadministrativa.bolsaempleo.ControladorGestionEvaluadores;
+import es.ujaen.uvirtual.modulo.bolsaempleo.controlador.ControladorGestionEvaluadores;
 
 
 /** test controlador titulacion.

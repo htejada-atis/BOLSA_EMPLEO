@@ -12,7 +12,7 @@ import bbdd.UtilsTestBolsaEmpleo;
 import controlador.implementacion.PeticionHttp;
 import controlador.implementacion.RespuestaHttp;
 import es.ujaen.uvirtual.beans.vistas.uvirtual.bolsaempleo.VistaTitulacionesArea;
-import es.ujaen.uvirtual.controlador.infadministrativa.bolsaempleo.ControladorGestionTitulacionesPreferentesArea;
+import es.ujaen.uvirtual.modulo.bolsaempleo.controlador.ControladorGestionTitulacionesPreferentesArea;
 
 
 /** test controlador titulaciones preferentes area.

@@ -16,7 +16,7 @@ import bbdd.UtilsTestBolsaEmpleo;
 import controlador.implementacion.PeticionHttp;
 import controlador.implementacion.RespuestaHttp;
 import es.ujaen.uvirtual.beans.vistas.uvirtual.bolsaempleo.VistaUsuarioBolsaEmpleo;
-import es.ujaen.uvirtual.controlador.infadministrativa.bolsaempleo.ControladorUsuarioBolsaEmpleo;
+import es.ujaen.uvirtual.modulo.bolsaempleo.controlador.ControladorUsuarioBolsaEmpleo;
 
 /** test controlador usuarios bolsa empleo.
  * @author fcampos

@@ -10,9 +10,9 @@ import java.util.Date;
 
 import org.junit.Test;
 
-import es.ujaen.uvirtual.beans.uvirtual.bolsaempleo.Area;
-import es.ujaen.uvirtual.beans.uvirtual.bolsaempleo.Bolsa;
-import es.ujaen.uvirtual.beans.uvirtual.bolsaempleo.Departamento;
+import es.ujaen.uvirtual.modulo.bolsaempleo.beans.Area;
+import es.ujaen.uvirtual.modulo.bolsaempleo.beans.Bolsa;
+import es.ujaen.uvirtual.modulo.bolsaempleo.beans.Departamento;
 
 /** test bolsas.
  *

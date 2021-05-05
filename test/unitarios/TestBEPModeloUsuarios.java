@@ -20,11 +20,11 @@ import org.junit.Test;
 import bbdd.BbddRunner;
 import bbdd.UtilsTestBolsaEmpleo;
 import es.ujaen.uvirtual.beans.Rol;
-import es.ujaen.uvirtual.beans.uvirtual.bolsaempleo.Merito;
-import es.ujaen.uvirtual.beans.uvirtual.bolsaempleo.UsuarioBolsaEmpleo;
-import es.ujaen.uvirtual.modelo.bolsaempleo.ModeloMerito;
-import es.ujaen.uvirtual.modelo.bolsaempleo.ModeloUsuarioBolsaEmpleo;
 import es.ujaen.uvirtual.modelo.conexion.Conexion;
+import es.ujaen.uvirtual.modulo.bolsaempleo.beans.Merito;
+import es.ujaen.uvirtual.modulo.bolsaempleo.beans.UsuarioBolsaEmpleo;
+import es.ujaen.uvirtual.modulo.bolsaempleo.modelo.ModeloMerito;
+import es.ujaen.uvirtual.modulo.bolsaempleo.modelo.ModeloUsuarioBolsaEmpleo;
 import es.ujaen.uvirtual.utilidades.UVException;
 
 

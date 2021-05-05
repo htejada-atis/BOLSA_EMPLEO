@@ -12,9 +12,9 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 import bbdd.BbddRunner;
 import bbdd.UtilsTestBolsaEmpleo;
-import es.ujaen.uvirtual.beans.uvirtual.bolsaempleo.Titulacion;
-import es.ujaen.uvirtual.modelo.bolsaempleo.ModeloTitulacion;
 import es.ujaen.uvirtual.modelo.conexion.Conexion;
+import es.ujaen.uvirtual.modulo.bolsaempleo.beans.Titulacion;
+import es.ujaen.uvirtual.modulo.bolsaempleo.modelo.ModeloTitulacion;
 import es.ujaen.uvirtual.utilidades.UVException;
 
 /** Clase para probar el modelo titulación. */

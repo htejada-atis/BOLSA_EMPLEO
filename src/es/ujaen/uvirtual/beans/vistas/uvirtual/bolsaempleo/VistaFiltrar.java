@@ -3,10 +3,10 @@ package es.ujaen.uvirtual.beans.vistas.uvirtual.bolsaempleo;
 import java.io.Serializable;
 import java.util.List;
 
-import es.ujaen.uvirtual.beans.uvirtual.bolsaempleo.Candidato;
-import es.ujaen.uvirtual.beans.uvirtual.bolsaempleo.Titulacion;
-import es.ujaen.uvirtual.beans.uvirtual.bolsaempleo.UsuarioBolsaEmpleo;
 import es.ujaen.uvirtual.beans.vistas.Vista;
+import es.ujaen.uvirtual.modulo.bolsaempleo.beans.Candidato;
+import es.ujaen.uvirtual.modulo.bolsaempleo.beans.Titulacion;
+import es.ujaen.uvirtual.modulo.bolsaempleo.beans.UsuarioBolsaEmpleo;
 import es.ujaen.uvirtual.utilidades.BolsaEmpleoDataTable;
 
 /** Bean para la vista.

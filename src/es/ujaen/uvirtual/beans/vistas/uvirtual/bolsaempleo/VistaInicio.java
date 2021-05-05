@@ -3,9 +3,10 @@ package es.ujaen.uvirtual.beans.vistas.uvirtual.bolsaempleo;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
-import es.ujaen.uvirtual.beans.uvirtual.bolsaempleo.Fichero;
-import es.ujaen.uvirtual.beans.uvirtual.bolsaempleo.Noticia;
+
 import es.ujaen.uvirtual.beans.vistas.Vista;
+import es.ujaen.uvirtual.modulo.bolsaempleo.beans.Fichero;
+import es.ujaen.uvirtual.modulo.bolsaempleo.beans.Noticia;
 
 /** Bean para la vista.
  * @author jlopez

@@ -6,9 +6,9 @@ import java.util.List;
 
 import es.ujaen.uvirtual.beans.Rol;
 import es.ujaen.uvirtual.beans.Usuario;
-import es.ujaen.uvirtual.beans.uvirtual.bolsaempleo.Bolsa;
-import es.ujaen.uvirtual.beans.uvirtual.bolsaempleo.UsuarioBolsaEmpleo;
 import es.ujaen.uvirtual.beans.vistas.Vista;
+import es.ujaen.uvirtual.modulo.bolsaempleo.beans.Bolsa;
+import es.ujaen.uvirtual.modulo.bolsaempleo.beans.UsuarioBolsaEmpleo;
 import es.ujaen.uvirtual.utilidades.BolsaEmpleoDataTable;
 
 /** Bean para la vista.

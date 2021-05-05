@@ -2,15 +2,16 @@ package es.ujaen.uvirtual.beans.vistas.uvirtual.bolsaempleo;
 
 import java.io.Serializable;
 import java.util.List;
-import es.ujaen.uvirtual.beans.uvirtual.bolsaempleo.Bolsa;
-import es.ujaen.uvirtual.beans.uvirtual.bolsaempleo.Solicitud;
-import es.ujaen.uvirtual.beans.uvirtual.bolsaempleo.Titulacion;
+
 import es.ujaen.uvirtual.beans.vistas.Vista;
+import es.ujaen.uvirtual.modulo.bolsaempleo.beans.Bolsa;
+import es.ujaen.uvirtual.modulo.bolsaempleo.beans.BolsaCandidato;
+import es.ujaen.uvirtual.modulo.bolsaempleo.beans.BolsaSolicitud;
+import es.ujaen.uvirtual.modulo.bolsaempleo.beans.Merito;
+import es.ujaen.uvirtual.modulo.bolsaempleo.beans.MeritoSolicitud;
+import es.ujaen.uvirtual.modulo.bolsaempleo.beans.Solicitud;
+import es.ujaen.uvirtual.modulo.bolsaempleo.beans.Titulacion;
 import es.ujaen.uvirtual.utilidades.BolsaEmpleoDataTable;
-import es.ujaen.uvirtual.beans.uvirtual.bolsaempleo.BolsaCandidato;
-import es.ujaen.uvirtual.beans.uvirtual.bolsaempleo.BolsaSolicitud;
-import es.ujaen.uvirtual.beans.uvirtual.bolsaempleo.Merito;
-import es.ujaen.uvirtual.beans.uvirtual.bolsaempleo.MeritoSolicitud;
 
 /** Bean para la vista.
  * @author ATISoluciones

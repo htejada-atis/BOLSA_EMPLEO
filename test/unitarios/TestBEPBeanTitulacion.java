@@ -6,7 +6,8 @@ import static org.junit.Assert.assertNotEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 import org.junit.Test;
-import es.ujaen.uvirtual.beans.uvirtual.bolsaempleo.Titulacion;
+
+import es.ujaen.uvirtual.modulo.bolsaempleo.beans.Titulacion;
 
 /** test titulación.
  *

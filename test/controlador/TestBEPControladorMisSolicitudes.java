@@ -13,7 +13,7 @@ import bbdd.UtilsTestBolsaEmpleo;
 import controlador.implementacion.PeticionHttp;
 import controlador.implementacion.RespuestaHttp;
 import es.ujaen.uvirtual.beans.vistas.uvirtual.bolsaempleo.VistaSolicitudes;
-import es.ujaen.uvirtual.controlador.infadministrativa.bolsaempleo.ControladorMisSolicitudes;
+import es.ujaen.uvirtual.modulo.bolsaempleo.controlador.ControladorMisSolicitudes;
 import es.ujaen.uvirtual.utilidades.BolsaEmpleoDataTable;
 
 /** test controlador mis solicitudes.

@@ -1,5 +1,5 @@
 <%@ page trimDirectiveWhitespaces="true"%>
-<%@	page import="es.ujaen.uvirtual.controlador.infadministrativa.bolsaempleo.ControladorMisResultados"%>
+<%@	page import="es.ujaen.uvirtual.modulo.bolsaempleo.controlador.ControladorMisResultados"%>
 <%@ page import="es.ujaen.uvirtual.beans.vistas.uvirtual.bolsaempleo.VistaMisResultados" %>
 <%@ page import="es.ujaen.uvirtual.beans.UVDatos"%>
 <%@ page import="es.ujaen.uvirtual.utilidades.Formateador"%>
