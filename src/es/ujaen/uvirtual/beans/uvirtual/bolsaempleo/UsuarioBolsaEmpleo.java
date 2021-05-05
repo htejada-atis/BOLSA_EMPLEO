@@ -35,6 +35,7 @@ public class UsuarioBolsaEmpleo implements Serializable {
 	private Rol rol;
 	private Boolean listaDist;
 	private Boolean excluido;
+	private String excluidoTipo;
 	private String razonExclusion;
 	private Date fechaExclusion;
 	private Boolean borrado;
@@ -53,27 +54,31 @@ public class UsuarioBolsaEmpleo implements Serializable {
 	 * @param prol .
 	 * @param plistaDist .
 	 * @param pexcluido .
+	 * @param pexcluidotipo .
 	 * @param pusu .
 	 */
-	public UsuarioBolsaEmpleo(Integer pcodpersona, String pusu, Rol prol, Boolean plistaDist, Boolean pexcluido) {
+	public UsuarioBolsaEmpleo(Integer pcodpersona, String pusu, Rol prol, Boolean plistaDist, Boolean pexcluido, String pexcluidotipo) {
 		super();
 		this.codpersona = pcodpersona;
 		this.codcuenta = pusu;
 		this.rol = prol;
 		this.listaDist = plistaDist;
 		this.excluido = pexcluido;
+		this.excluidoTipo = pexcluidotipo;
 	}
 	
 	/** Constructor con parametros para Bolsa Empleo excluir usuario.
 	 * @param pcodNum .
 	 * @param pexcluido .
+	 * @param pexcluidotipo .
 	 * @param prazonexcluido .
 	 * @param pfechaexclusion .
 	 */
-	public UsuarioBolsaEmpleo(Integer pcodNum, Boolean pexcluido, String prazonexcluido, Date pfechaexclusion) {
+	public UsuarioBolsaEmpleo(Integer pcodNum, Boolean pexcluido, String pexcluidotipo, String prazonexcluido, Date pfechaexclusion) {
 		super();
 		this.codNum = pcodNum;
 		this.excluido = pexcluido;
+		this.excluidoTipo = pexcluidotipo;
 		this.razonExclusion = prazonexcluido;
 		this.fechaExclusion = pfechaexclusion;
 	}
@@ -83,11 +88,12 @@ public class UsuarioBolsaEmpleo implements Serializable {
 	 * @param prol .
 	 * @param plistaDist .
 	 * @param pexcluido .
+	 * @param pexcluidotipo .
 	 * @param prazonexcluido .
 	 * @param pfechaexclusion .
 	 * @param pcodNum .
 	 */
-	public UsuarioBolsaEmpleo(Integer pcodNum, Rol prol, Boolean plistaDist, Boolean pexcluido, String prazonexcluido, Date pfechaexclusion) {
+	public UsuarioBolsaEmpleo(Integer pcodNum, Rol prol, Boolean plistaDist, Boolean pexcluido, String pexcluidotipo, String prazonexcluido, Date pfechaexclusion) {
 		super();
 		this.codNum = pcodNum;
 		this.rol = prol;
@@ -101,18 +107,21 @@ public class UsuarioBolsaEmpleo implements Serializable {
 	 * @param prol .
 	 * @param plistaDist .
 	 * @param pexcluido .
+	 * @param pexcluidotipo .
 	 * @param prazonexcluido .
 	 * @param pfechaexclusion .
 	 * @param pusu .
 	 * @param pcodpersona .
 	 */
-	public UsuarioBolsaEmpleo(Integer pcodpersona, String pusu, Rol prol, Boolean plistaDist, Boolean pexcluido, String prazonexcluido, Date pfechaexclusion) {
+	public UsuarioBolsaEmpleo(Integer pcodpersona, String pusu,
+			Rol prol, Boolean plistaDist, Boolean pexcluido, String pexcluidotipo, String prazonexcluido, Date pfechaexclusion) {
 		super();
 		this.codpersona = pcodpersona;
 		this.codcuenta = pusu;
 		this.rol = prol;
 		this.listaDist = plistaDist;
 		this.excluido = pexcluido;
+		this.excluidoTipo = pexcluidotipo;
 		this.razonExclusion = prazonexcluido;
 		this.fechaExclusion = pfechaexclusion;
 	}
@@ -172,6 +181,7 @@ public class UsuarioBolsaEmpleo implements Serializable {
 		this.rol = copia.rol;
 		this.listaDist = copia.listaDist;
 		this.excluido = copia.excluido;
+		this.excluidoTipo = copia.excluidoTipo;
 		this.razonExclusion = copia.razonExclusion;
 		this.fechaExclusion = copia.fechaExclusion;
 		this.borrado = copia.borrado;
@@ -344,6 +354,14 @@ public class UsuarioBolsaEmpleo implements Serializable {
 
 	public void setExcluido(Boolean excluido) {
 		this.excluido = excluido;
+	}
+	
+	public String getExcluidoTipo() {
+		return excluidoTipo;
+	}
+
+	public void setExcluidoTipo(String excluidoTipo) {
+		this.excluidoTipo = excluidoTipo;
 	}
 	
 	public String getRazonExcluido() {

@@ -23,6 +23,7 @@ public class TestBEPBeanUsuarios {
 	private static final String RAZONEXCLUIDO = "test";
 	private static final Boolean LISTADIST = true;
 	private static final Boolean EXCLUIDO = false;
+	private static final String EXCLUIDOTIPO = "EJEMPLO";
 	private static final Boolean BORRADO = true;
 	private static final Date FECHAEXCLUSION = new java.sql.Date(Calendar.getInstance().getTime().getTime());
 	private static final Date FECHABORRADO = new java.sql.Date(Calendar.getInstance().getTime().getTime());
@@ -41,6 +42,7 @@ public class TestBEPBeanUsuarios {
 		usuario.setEmail(EMAIL);
 		usuario.setListaDist(LISTADIST);
 		usuario.setExcluido(EXCLUIDO);
+		usuario.setExcluidoTipo(EXCLUIDOTIPO);
 		usuario.setRazonExcluido(RAZONEXCLUIDO);
 		usuario.setFechaExclusion(FECHAEXCLUSION);
 		usuario.setBorrado(BORRADO);
@@ -53,6 +55,7 @@ public class TestBEPBeanUsuarios {
 		assertEquals(EMAIL, usuario.getEmail());
 		assertEquals(LISTADIST, usuario.getListaDist());
 		assertEquals(EXCLUIDO, usuario.getExcluido());
+		assertEquals(EXCLUIDOTIPO, usuario.getExcluidoTipo());
 		assertEquals(RAZONEXCLUIDO, usuario.getRazonExcluido());
 		assertEquals(FECHAEXCLUSION, usuario.getFechaExclusion());
 		assertEquals(BORRADO, usuario.getBorrado());
@@ -65,18 +68,20 @@ public class TestBEPBeanUsuarios {
 	 */
 	@Test
 	public void testA02() {
-		UsuarioBolsaEmpleo usuario = new UsuarioBolsaEmpleo(CODPERSONA, CODCUENTA, ROL, LISTADIST, EXCLUIDO);
+		UsuarioBolsaEmpleo usuario = new UsuarioBolsaEmpleo(CODPERSONA, CODCUENTA, ROL, LISTADIST, EXCLUIDO, EXCLUIDOTIPO);
 		usuario.setCodPersona(CODPERSONA);
 		usuario.setCodCuenta(CODCUENTA);
 		usuario.setRol(ROL);
 		usuario.setListaDist(LISTADIST);
 		usuario.setExcluido(EXCLUIDO);
+		usuario.setExcluidoTipo(EXCLUIDOTIPO);
 		
 		assertEquals(CODPERSONA, usuario.getCodPersona());
 		assertEquals(CODCUENTA, usuario.getCodCuenta());
 		assertEquals(ROL, usuario.getRol());
 		assertEquals(LISTADIST, usuario.getListaDist());
 		assertEquals(EXCLUIDO, usuario.getExcluido());
+		assertEquals(EXCLUIDOTIPO, usuario.getExcluidoTipo());
 		assertNotNull(usuario.toString());
 	}
 	
@@ -85,13 +90,14 @@ public class TestBEPBeanUsuarios {
 	@Test
 	public void testA03() {
 		Integer id = 1;
-		UsuarioBolsaEmpleo usuario = new UsuarioBolsaEmpleo(id, EXCLUIDO, RAZONEXCLUIDO, FECHAEXCLUSION);
+		UsuarioBolsaEmpleo usuario = new UsuarioBolsaEmpleo(id, EXCLUIDO, EXCLUIDOTIPO, RAZONEXCLUIDO, FECHAEXCLUSION);
 		usuario.setCodNum(id);
 		usuario.setExcluido(EXCLUIDO);
 		usuario.setRazonExcluido(RAZONEXCLUIDO);
 		usuario.setFechaExclusion(FECHAEXCLUSION);
 		assertEquals(id, usuario.getCodNum());
 		assertEquals(EXCLUIDO, usuario.getExcluido());
+		assertEquals(EXCLUIDOTIPO, usuario.getExcluidoTipo());
 		assertEquals(RAZONEXCLUIDO, usuario.getRazonExcluido());
 		assertEquals(FECHAEXCLUSION, usuario.getFechaExclusion());
 	}
@@ -102,11 +108,12 @@ public class TestBEPBeanUsuarios {
 	public void testA04() {
 		Integer id = 1;
 		
-		UsuarioBolsaEmpleo usuario = new UsuarioBolsaEmpleo(id, ROL, LISTADIST, EXCLUIDO, RAZONEXCLUIDO, FECHAEXCLUSION);
+		UsuarioBolsaEmpleo usuario = new UsuarioBolsaEmpleo(id, ROL, LISTADIST, EXCLUIDO, EXCLUIDOTIPO, RAZONEXCLUIDO, FECHAEXCLUSION);
 		assertEquals(id, usuario.getCodNum());
 		assertEquals(ROL, usuario.getRol());
 		assertEquals(LISTADIST, usuario.getListaDist());
 		assertEquals(EXCLUIDO, usuario.getExcluido());
+		assertEquals(EXCLUIDOTIPO, usuario.getExcluidoTipo());
 		assertEquals(RAZONEXCLUIDO, usuario.getRazonExcluido());
 		assertEquals(FECHAEXCLUSION, usuario.getFechaExclusion());
 		
@@ -117,12 +124,13 @@ public class TestBEPBeanUsuarios {
 	 */
 	@Test
 	public void testA05() {		
-		UsuarioBolsaEmpleo usuario = new UsuarioBolsaEmpleo(CODPERSONA, CODCUENTA, ROL, LISTADIST, EXCLUIDO, RAZONEXCLUIDO, FECHAEXCLUSION);
+		UsuarioBolsaEmpleo usuario = new UsuarioBolsaEmpleo(CODPERSONA, CODCUENTA, ROL, LISTADIST, EXCLUIDO, EXCLUIDOTIPO, RAZONEXCLUIDO, FECHAEXCLUSION);
 		assertEquals(CODPERSONA, usuario.getCodPersona());
 		assertEquals(CODCUENTA, usuario.getCodCuenta());
 		assertEquals(ROL, usuario.getRol());
 		assertEquals(LISTADIST, usuario.getListaDist());
 		assertEquals(EXCLUIDO, usuario.getExcluido());
+		assertEquals(EXCLUIDOTIPO, usuario.getExcluidoTipo());
 		assertEquals(RAZONEXCLUIDO, usuario.getRazonExcluido());
 		assertEquals(FECHAEXCLUSION, usuario.getFechaExclusion());		
 	}

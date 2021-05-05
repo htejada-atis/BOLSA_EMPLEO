@@ -65,6 +65,7 @@ public class ControladorUsuarioCandidato extends HttpServlet {
 	public static final String PARAM_NOMBRE_USUARIO = "nombreusuario";
 	public static final String PARAM_LISTA = "listadist";
 	public static final String PARAM_EXCLUIDO = "excluido";
+	public static final String PARAM_EXCLUIDO_TIPO = "excluidotipo";
 	public static final String PARAM_RAZON_EXCLUIDO = "razonexcluido";
 	public static final String PARAM_ROLE = "rol";
 	public static final String PARAM_ENVIAR = "enviar";
@@ -406,6 +407,11 @@ public class ControladorUsuarioCandidato extends HttpServlet {
 			Boolean listadist = request.getParameter(PARAM_LISTA) != null && EscapaHTML.ajustaCodificacion(request.getParameter(PARAM_LISTA)).equals("true");
 			Boolean excluido = request.getParameter(PARAM_EXCLUIDO) != null && EscapaHTML.ajustaCodificacion(request.getParameter(PARAM_EXCLUIDO)).equals("true");
 						
+			String excluidoTipo = null;		
+			if (request.getParameter(PARAM_EXCLUIDO) != null) {
+				excluidoTipo = EscapaHTML.ajustaCodificacion(request.getParameter(PARAM_EXCLUIDO_TIPO));
+			}
+			
 			String razonexcluido = EscapaHTML.ajustaCodificacion(request.getParameter(PARAM_RAZON_EXCLUIDO));
 				
 			ModeloRol modeloRol = ModeloRol.obtenerInstancia();
@@ -417,7 +423,8 @@ public class ControladorUsuarioCandidato extends HttpServlet {
 				
 			Usuario usuArcos = CrearUsuario.usuario(request.getParameter(PARAM_ID));
 				
-			UsuarioBolsaEmpleo usuarioFinal = new UsuarioBolsaEmpleo(usuArcos.getCodigoPersonaArcos(), usu, role, listadist, excluido, razonexcluido, date);
+			UsuarioBolsaEmpleo usuarioFinal =
+					new UsuarioBolsaEmpleo(usuArcos.getCodigoPersonaArcos(), usu, role, listadist, excluido, excluidoTipo, razonexcluido, date);
 				
 			modelo.insertaUsuario(usuarioFinal);
 			
@@ -468,6 +475,11 @@ public class ControladorUsuarioCandidato extends HttpServlet {
 				Boolean excluido = 
 						request.getParameter(PARAM_EXCLUIDO) != null && EscapaHTML.ajustaCodificacion(request.getParameter(PARAM_EXCLUIDO)).equals("true");
 						
+				String excluidoTipo = null;		
+				if (request.getParameter(PARAM_EXCLUIDO) != null) {
+					excluidoTipo = EscapaHTML.ajustaCodificacion(request.getParameter(PARAM_EXCLUIDO_TIPO));
+				}
+				
 				String razonexcluido = EscapaHTML.ajustaCodificacion(request.getParameter(PARAM_RAZON_EXCLUIDO));
 				
 				ModeloRol modeloRol = ModeloRol.obtenerInstancia();
@@ -475,7 +487,7 @@ public class ControladorUsuarioCandidato extends HttpServlet {
 				
 				Date date = new Date(System.currentTimeMillis());
 				
-				UsuarioBolsaEmpleo usuario = new UsuarioBolsaEmpleo(codNum, role, listadist, excluido, razonexcluido, date);
+				UsuarioBolsaEmpleo usuario = new UsuarioBolsaEmpleo(codNum, role, listadist, excluido, excluidoTipo, razonexcluido, date);
 				
 				modelo.actualizaUsuario(usuario);
 				HttpSession session = request.getSession(false);
@@ -536,11 +548,16 @@ public class ControladorUsuarioCandidato extends HttpServlet {
 			Integer codNum = Formateador.leeParametroInteger(request.getParameter(PARAM_ID));
 			Boolean excluido = true;
 					
+			String excluidoTipo = null;		
+			if (request.getParameter(PARAM_EXCLUIDO) != null) {
+				excluidoTipo = EscapaHTML.ajustaCodificacion(request.getParameter(PARAM_EXCLUIDO_TIPO));
+			}
+			
 			String razonexcluido = EscapaHTML.ajustaCodificacion(request.getParameter(PARAM_RAZON_EXCLUIDO));
 			
 			Date date = new Date(System.currentTimeMillis());
 			
-			UsuarioBolsaEmpleo usuario = new UsuarioBolsaEmpleo(codNum, excluido, razonexcluido, date);
+			UsuarioBolsaEmpleo usuario = new UsuarioBolsaEmpleo(codNum, excluido, excluidoTipo, razonexcluido, date);
 			
 			modelo.ponerUsuarioComoExcluido(usuario);
 			HttpSession session = request.getSession(false);

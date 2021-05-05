@@ -370,10 +370,15 @@ nav-bolsa-empleo a:active, nav-bolsa-empleo a:hover {
 	font-weight: bold;
 }
 
-.form-group-custom, .form-check-custom, .form-btn, .form-file, .form-select {
+.form-group-custom, .form-btn, .form-file, .form-select {
 	display: inline-block;
 	width: 50% !important;
 	margin-bottom: 1rem;
+}
+
+.form-check-custom {
+	display: inline-block;
+	width: 49% !important;
 }
 
 .form-group-custom label, .form-check-custom label, .form-file label, .form-select label {
