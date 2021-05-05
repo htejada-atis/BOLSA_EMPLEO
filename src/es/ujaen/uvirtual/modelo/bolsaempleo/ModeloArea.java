@@ -13,6 +13,7 @@ import es.ujaen.uvirtual.beans.uvirtual.bolsaempleo.BolsaCandidato;
 import es.ujaen.uvirtual.beans.uvirtual.bolsaempleo.UsuarioBolsaEmpleo;
 import es.ujaen.uvirtual.modelo.conexion.ConexionUvirtual;
 import es.ujaen.uvirtual.utilidades.BolsaEmpleoDataTable;
+import es.ujaen.uvirtual.utilidades.BolsaEmpleoUtils;
 import es.ujaen.uvirtual.utilidades.UVException;
 import es.ujaen.uvirtual.utilidades.BolsaEmpleoDataTable.DataTableColumn;
 
@@ -417,4 +418,78 @@ public class ModeloArea {
 		
 		return false;
 	}
+	
+	public void actualizarListaAreas() throws SQLException {
+		
+		ArrayList<Area> areasNuevas = listaAreasNuevas();
+		ArrayList<Area> areasActualizadas = listaAreasModificadas();
+		
+	}
+	
+	/** Lista de áreas a agregar de UVirtual .
+	 * @return areas nuevas .
+	 * @throws SQLException .
+	 */
+	public ArrayList<Area> listaAreasNuevas() throws SQLException {
+		ArrayList<Area> areasNuevas = new ArrayList<>();
+		
+		// leemos las areas y le restamos el resultado de las que ya existen en la bolsa de empleo,
+		// diferencia la cual nos devuelve las areas que hay que agregar .
+		String consulta = 
+				"SELECT ID_AREA_CONOCIMIENTO FROM UXXIRRHH_VUJA_NET_BEP_RH_DEPTO_SECC_AREA "
+				+ " MINUS"
+				+ " SELECT bepare.ID_AREA_CONOCIMIENTO FROM TBEP_AREAS bepare";
+		
+		try (Connection conexion = ConexionUvirtual.obtenerInstancia(); PreparedStatement stmt = conexion.prepareStatement(consulta);) {
+			try (ResultSet rs = stmt.executeQuery()) {
+				while (rs.next()) {
+					try {
+						Area are = new Area();
+						are.setIdAreaExterno(rs.getString("ID_AREA_CONOCIMIENTO"));
+						areasNuevas.add(are);
+					} catch (Exception e) {
+						e.printStackTrace();
+					}
+				}
+			}
+		}
+		
+		return areasNuevas;
+	}
+	
+	public ArrayList<Area> listaAreasModificadas() throws SQLException {
+		ArrayList<Area> areasModificadas = new ArrayList<>();
+		
+		return areasModificadas;
+	}
+	
+	/** obtiene la lista de areas de uvirtual .
+	 * @return lista de areas.
+	 * @throws SQLException .
+	 */
+	public ArrayList<Area> obtenerAreasExternas() throws SQLException {
+		ModeloDepartamento modeloDepartamento = ModeloDepartamento.obtenerInstancia();
+		ArrayList<Area> areas = new ArrayList<>();
+		String consulta = "SELECT * FROM UXXIRRHH_VUJA_NET_BEP_RH_DEPTO_SECC_AREA ";
+		
+		try (Connection conexion = ConexionUvirtual.obtenerInstancia(); PreparedStatement stmt = conexion.prepareStatement(consulta);) {
+			try (ResultSet rs = stmt.executeQuery()) {
+				while (rs.next()) {
+					try {
+						Area are = new Area();
+						are.setDepartamento(modeloDepartamento.getDepartamentoById(rs.getInt("ID_DEPARTAMENTO")));
+						are.setIdAreaExterno(rs.getString("ID_AREA_CONOCIMIENTO"));
+						are.setIdSeccion(rs.getString("ID_SECCION"));
+						are.setDescripcion(rs.getString("DES_AREA_CONOCIMIENTO"));
+						areas.add(are);
+					} catch (Exception e) {
+						e.printStackTrace();
+					}
+				}
+			}
+		}
+		return areas;
+	}
+	
+	
 }

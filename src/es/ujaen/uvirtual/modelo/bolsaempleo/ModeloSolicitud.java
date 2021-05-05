@@ -647,7 +647,7 @@ public class ModeloSolicitud {
 	/** Lista de bolsas de la solicitud seleccionadas por el usuario que se agregan .
 	 * @param solicitud .
 	 * @param bolsas .
-	 * @return bolsas excluidas .
+	 * @return bolsas agregadas .
 	 * @throws SQLException .
 	 * @throws UVException .
 	 */

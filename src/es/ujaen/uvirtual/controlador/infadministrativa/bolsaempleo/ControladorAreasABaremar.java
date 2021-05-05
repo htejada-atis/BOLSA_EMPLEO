@@ -46,29 +46,33 @@ public class ControladorAreasABaremar extends HttpServlet {
 	private static final long serialVersionUID = 1L;
 	private static final String NOMBREDEESTACLASE = ControladorAreasABaremar.class.getName();
 	private static final Logger LOGGER = Logger.getLogger(NOMBREDEESTACLASE);
+	
+	// acciones
+	public static final String ACCION_AREA = "accionarea";
+	public static final String ACCION_AREA_PASAR_A_BAREMALE = "accionareabaremable";
+	public static final String ACCION_AREA_PASAR_A_NO_BAREMALE = "accionareanobaremable";
+	public static final String ACCION_DATATABLE = "datatable";
+	public static final String ACCION_DATATABLE_EXCLUIDOS = "datatableexcluidos";
+	public static final String ACCION_IMPORTAR_AREAS_UVIRTUAL = "importarareasuvirtual";
+	public static final String ACCION_LISTAR = "listar";
+	
+	// mensajes
+	public static final String MENSAJE_ERROR_ACCION_AREA_NO_VALIDA = "Acción no válida";
+	public static final String MENSAJE_EXITO_AREA_MODIFICADA_CORRECTAMENTE = "Area/s modificada/s correctamente"; 
+	
+	// parámetros
 	public static final String PARAM_ACCION = "a";
 	public static final String PARAM_ACCION_AREA = "aa";
 	public static final String PARAM_AREAS_SELECCIONADAS = "areasselected";
 	public static final String PARAM_ID = "id";
 	
-	// acciones
-	public static final String ACCION_LISTAR = "listar";
-	public static final String ACCION_DATATABLE = "datatable";
-	public static final String ACCION_DATATABLE_EXCLUIDOS = "datatableexcluidos";
-	public static final String ACCION_AREA = "accionarea";
-	public static final String ACCION_AREA_PASAR_A_BAREMALE = "accionareabaremable";
-	public static final String ACCION_AREA_PASAR_A_NO_BAREMALE = "accionareanobaremable";
-	
-	// mensajes
-	public static final String MENSAJE_ERROR_ACCION_AREA_NO_VALIDA = "Acción no válida";
-	public static final String MENSAJE_EXITO_AREA_MODIFICADA_CORRECTAMENTE = "Area/s modificada/s correctamente"; 
-
-	public static final int RESPONSE_HTTP_CODE_ERROR = 400;
 	
 	// ruta vistas
 	public static final String RUTA_BEP_CONF = "/WEB-INF/jsp/vista/infadministrativa/bolsaempleo/configuracion/";
 	// variables
 	public static boolean anonimo = true;
+	
+	public static final int RESPONSE_HTTP_CODE_ERROR = 400;
 	
 	/** Peticion GET.
 	 * @see HttpServlet#doGet(HttpServletRequest request, HttpServletResponse response)
@@ -95,14 +99,17 @@ public class ControladorAreasABaremar extends HttpServlet {
 		try {
 			anonimo = !modelo.checkUser(datos);
 			switch (nombreAccion) {
+				case ACCION_AREA:
+					accionSobreArea(bean, datos, request);
+					break;
 				case ACCION_DATATABLE:
 					listado(bean, datos, request, response);
 					break;
 				case ACCION_DATATABLE_EXCLUIDOS:
 					listadoAreasExcluidasUsuario(bean, datos, request, response);
 					break;
-				case ACCION_AREA:
-					accionSobreArea(bean, datos, request);
+				case ACCION_IMPORTAR_AREAS_UVIRTUAL:
+					importarAreasDeUvirtual(bean, datos, request, response);
 					break;
 			}
 		} catch (SQLException e) {
@@ -225,4 +232,18 @@ public class ControladorAreasABaremar extends HttpServlet {
 		
 		bean.getMensajesDeExito().add(MENSAJE_EXITO_AREA_MODIFICADA_CORRECTAMENTE);
 	}
+	
+	/**
+	 * método que consulta la tabla 'UXXIRRHH_VUJA_NET_BEP_RH_DEPTO_SECC_AREA' de la que obtiene todas las áreas y las actualiza .
+	 * @param bean .
+	 * @param datos .
+	 * @param request .
+	 * @param response .
+	 * @throws UVException .
+	 * @throws SQLException .
+	 */
+	private void importarAreasDeUvirtual(VistaAreasBaremar bean, UVDatos datos, HttpServletRequest request, HttpServletResponse response) throws UVException, SQLException {
+		
+	}
+	
 }
