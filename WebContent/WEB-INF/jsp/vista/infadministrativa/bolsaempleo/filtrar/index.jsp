@@ -12,7 +12,7 @@ VistaFiltrar bean = (VistaFiltrar)uvdatos.getVistas().get(VistaFiltrar.class.get
 UsuarioBolsaEmpleo candidato = bean.getCandidato();
 %>
 
-<div class='bolsas'>
+<div class='bolsa-empleo'>
 
 	<% if (bean.getMensajesDeExito().size() > 0) { %>
 		<div id="exito" class="success">
