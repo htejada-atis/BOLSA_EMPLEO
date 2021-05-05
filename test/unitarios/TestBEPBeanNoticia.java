@@ -7,7 +7,8 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 import java.util.Calendar;
 import org.junit.Test;
-import es.ujaen.uvirtual.beans.uvirtual.bolsaempleo.Noticia;
+
+import es.ujaen.uvirtual.modulo.bolsaempleo.beans.Noticia;
 
 /** test noticia.
  *

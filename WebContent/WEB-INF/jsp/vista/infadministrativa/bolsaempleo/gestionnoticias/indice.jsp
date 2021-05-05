@@ -1,7 +1,7 @@
 <%@ page trimDirectiveWhitespaces="true"%>
 <%@ page import="es.ujaen.uvirtual.beans.UVDatos"%>
-<%@	page import="es.ujaen.uvirtual.controlador.infadministrativa.bolsaempleo.ControladorGestionNoticias"%>
-<%@ page import="es.ujaen.uvirtual.beans.vistas.uvirtual.bolsaempleo.VistaNoticias"%>
+<%@	page import="es.ujaen.uvirtual.modulo.bolsaempleo.controlador.ControladorGestionNoticias"%>
+<%@ page import="es.ujaen.uvirtual.modulo.bolsaempleo.vistas.VistaNoticias"%>
 <%@ page import="es.ujaen.uvirtual.utilidades.EscapaHTML" %>
 
 <% 

@@ -1,17 +1,17 @@
-<%@page import="es.ujaen.uvirtual.beans.uvirtual.bolsaempleo.ApartadoBaremacion"%>
-<%@page import="es.ujaen.uvirtual.beans.uvirtual.bolsaempleo.BloqueBaremacion"%>
-<%@page import="es.ujaen.uvirtual.modelo.bolsaempleo.ModeloMeritosPreferentes"%>
-<%@page import="es.ujaen.uvirtual.beans.uvirtual.bolsaempleo.ItemBaremacion"%>
-<%@page import="es.ujaen.uvirtual.beans.uvirtual.bolsaempleo.Titulacion"%>
+<%@page import="es.ujaen.uvirtual.modulo.bolsaempleo.beans.ApartadoBaremacion"%>
+<%@page import="es.ujaen.uvirtual.modulo.bolsaempleo.beans.BloqueBaremacion"%>
+<%@page import="es.ujaen.uvirtual.modulo.bolsaempleo.modelo.ModeloMeritosPreferentes"%>
+<%@page import="es.ujaen.uvirtual.modulo.bolsaempleo.beans.ItemBaremacion"%>
+<%@page import="es.ujaen.uvirtual.modulo.bolsaempleo.beans.Titulacion"%>
 <%@ page trimDirectiveWhitespaces="true" %>
-<%@ page import="es.ujaen.uvirtual.controlador.infadministrativa.bolsaempleo.ControladorMeritosPreferentes"%>
-<%@ page import="es.ujaen.uvirtual.beans.vistas.uvirtual.bolsaempleo.VistaMeritosPreferentes"%>
-<%@ page import="es.ujaen.uvirtual.beans.uvirtual.bolsaempleo.MeritoPreferente"%>
+<%@ page import="es.ujaen.uvirtual.modulo.bolsaempleo.controlador.ControladorMeritosPreferentes"%>
+<%@ page import="es.ujaen.uvirtual.modulo.bolsaempleo.vistas.VistaMeritosPreferentes"%>
+<%@ page import="es.ujaen.uvirtual.modulo.bolsaempleo.beans.MeritoPreferente"%>
 <%@ page import="es.ujaen.uvirtual.beans.UVDatos" %>
 <%@ page import="es.ujaen.uvirtual.beans.Rol" %>
 <%@ page import="es.ujaen.uvirtual.utilidades.EscapaHTML" %>
 <%@ page import="es.ujaen.uvirtual.utilidades.Formateador" %>
-<%@ page import="es.ujaen.uvirtual.utilidades.BolsaEmpleoUtils" %>
+<%@ page import="es.ujaen.uvirtual.modulo.bolsaempleo.utilidades.BolsaEmpleoUtils" %>
 
 <% 
 UVDatos uvdatos = (UVDatos) request.getAttribute(UVDatos.NOMBRE_ATRIBUTO);

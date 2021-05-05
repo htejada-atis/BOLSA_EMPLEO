@@ -13,7 +13,7 @@ import es.ujaen.uvirtual.modelo.ModeloAdministracion;
 import es.ujaen.uvirtual.modelo.ModeloUsuarioArcos;
 import es.ujaen.uvirtual.modelo.ModeloUsuarioUXXIAC;
 import es.ujaen.uvirtual.modelo.ModeloUsuarioUXXIRRHH;
-import es.ujaen.uvirtual.modelo.bolsaempleo.ModeloUsuarioBolsaEmpleo;
+import es.ujaen.uvirtual.modulo.bolsaempleo.modelo.ModeloUsuarioBolsaEmpleo;
 import es.ujaen.uvirtual.utilidades.Formateador;
 import es.ujaen.uvirtual.utilidades.Memcache;
 

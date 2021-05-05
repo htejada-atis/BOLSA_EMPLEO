@@ -47,6 +47,9 @@
 		<fileset dir="Documentos/junit">
 			<include name="**/*.jar"/>
 		</fileset>		
+		<fileset dir="Documentos/mockito">
+			<include name="**/*.jar"/>
+		</fileset>		
 	</path>	
 	
 	<!-- Define the Jacoco project properties -->
