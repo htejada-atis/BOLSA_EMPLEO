@@ -101,18 +101,24 @@ VistaUsuarioBolsaEmpleo bean = (VistaUsuarioBolsaEmpleo) uvdatos.getVistas().get
     			<input class="form-input-custom" id="n_documento" type="text" name="<%= ControladorUsuarioBolsaEmpleo.PARAM_NOMBRE %>" value="<%= n_documento %>" disabled/>
     		</div>
 		</div>
-		<div class="form-group-container">
-	    	<div class="form-check">
+		<div class="form-group-container 3col">
+	    	<div class="form-check-custom">
     			<label for="usuario_lista_dist"><input class="params" type="checkbox" id="usuario_lista_dist" name="<%= ControladorUsuarioBolsaEmpleo.PARAM_LISTA %>" value="<%= lista_dist %>" <%= (lista_dist ? "checked=''" : "") %>/>Lista Distribución</label>
     		</div>
     		<div class="form-check">
-    			<label for="usuario_excluido"><input class="params" type="checkbox" id="usuario_excluido" name="<%= ControladorUsuarioBolsaEmpleo.PARAM_EXCLUIDO %>" value="<%= excluido %>" <%= (excluido ? "checked=''" : "") %>/>Excluido</label>
+    			<div class="form-check-custom">
+    				<label for="usuario_excluido"><input class="params" type="checkbox" id="usuario_excluido" name="<%= ControladorUsuarioBolsaEmpleo.PARAM_EXCLUIDO %>" value="<%= excluido %>" <%= (excluido ? "checked=''" : "") %>/>Excluido</label>
+    			</div>    		
+    			<div class="form-check-custom" id="excluido_tipo" style="display:none;">
+					<label class="form-label-custom" for="indefinido" style="float: none; margin-right:0px"><input class="form-input" type="radio" id="indefinido" name="<%= ControladorUsuarioBolsaEmpleo.PARAM_EXCLUIDO_TIPO %>" style="display: inline;">Indefinido</label>
+					<label class="form-label-custom" for="temporal" style="float: none; margin-right:0px;"><input class="form-input" type="radio" id="temporal" name="<%= ControladorUsuarioBolsaEmpleo.PARAM_EXCLUIDO_TIPO %>" style="display: inline;">Temporal</label>
+    			</div>
     		</div>
 		</div>
 	
 		<div class="form-group">
     		<label for="razon_exclusion">Razón exclusión</label>
-    		<textarea class="params form-input-custom" id="razon_exclusion" name="<%= ControladorUsuarioBolsaEmpleo.PARAM_RAZON_EXCLUIDO %>" rows="3" cols="60"><%= razon_excluido %></textarea>
+    		<textarea class="params form-input-custom" id="razon_exclusion" name="<%= ControladorUsuarioBolsaEmpleo.PARAM_RAZON_EXCLUIDO %>" rows="3" cols="60" <%= (excluido ? "" : "disabled") %>><%= razon_excluido %></textarea>
    		</div>
 		
 		<div class="form-group">
@@ -215,6 +221,20 @@ VistaUsuarioBolsaEmpleo bean = (VistaUsuarioBolsaEmpleo) uvdatos.getVistas().get
 	
 		input_excluido = document.getElementById("usuario_excluido");
 		input_excluido.value = input_excluido.checked;
+		
+		if(input_excluido.checked){
+			input_exc_indefinido = document.getElementById("indefinido");
+			input_exc_temporal = document.getElementById("temporal");
+			
+			if(input_exc_indefinido.checked){
+				input_exc_indefinido.value = "I";
+				input_exc_temporal.value = "I";
+			}
+			else{
+				input_exc_indefinido.value = "T";
+				input_exc_temporal.value = "T";
+			}
+		}
 	
 		submit_input.form.submit();
 	}
@@ -233,10 +253,14 @@ VistaUsuarioBolsaEmpleo bean = (VistaUsuarioBolsaEmpleo) uvdatos.getVistas().get
 			if(document.getElementById("usuario_excluido").checked){
 				document.getElementById("razon_exclusion").value="";
 				document.getElementById("razon_exclusion").disabled=false;
+				
+				$("#excluido_tipo").show();
 			}
 			else{
 				document.getElementById("razon_exclusion").value="";
 				document.getElementById("razon_exclusion").disabled=true;
+				
+				$("#excluido_tipo").hide();
 			}
 		});
 		

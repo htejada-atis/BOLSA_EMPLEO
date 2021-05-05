@@ -40,6 +40,7 @@ public class TestBEPModeloUsuarios {
 	private static final String RAZONEXCLUIDO = "test";
 	private static final Boolean LISTADIST = true;
 	private static final Boolean EXCLUIDO = false;
+	private static final String EXCLUIDOTIPO = "EJEMPLO";
 	private static final Boolean BORRADO = true;
 	private static final String SEXO = "M";
 	private static final Date FECHAEXCLUSION = new java.sql.Date(Calendar.getInstance().getTime().getTime());
@@ -71,6 +72,7 @@ public class TestBEPModeloUsuarios {
 		usuario.setEmail(EMAIL);
 		usuario.setListaDist(LISTADIST);
 		usuario.setExcluido(EXCLUIDO);
+		usuario.setExcluidoTipo(EXCLUIDOTIPO);
 		usuario.setRazonExcluido(RAZONEXCLUIDO);
 		usuario.setFechaExclusion(FECHAEXCLUSION);
 		usuario.setBorrado(BORRADO);

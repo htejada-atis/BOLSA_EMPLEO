@@ -19,9 +19,24 @@ VistaTitulaciones bean = (VistaTitulaciones) uvdatos.getVistas().get(VistaTitula
 		}
 	
 	%>
+	<div class="titulo-bolsa-empleo" style="float:right; margin-top:1.2rem">
+		<a class="link-btn" id="nueva_titulacion" href="<%= request.getRequestURI() %>" style="margin-top:0">Nueva titulación</a>
+	</div>
 	
-	<h2>Nueva titulación</h2>
-	<p>Seleccione la titulación y complete el formulario inferior:</p>
+	<div class="titulo-bolsa-empleo" style="margin-top:1rem;">
+		<h2>Nueva titulación</h2>
+	</div>
+
+	
+	
+	  <div class="form-group-container col2">
+    		<div class="form-group">
+    			<p>Seleccione la titulación y complete el formulario inferior:</p>
+    		</div>
+    		<div class="form-group">
+    			<p>Si no encuentra su titulación, pongase en contacto con nosotros</p>
+    		</div>
+    	</div>
     
 	<table class="bluetable bolsaempleo" id="tableTitulaciones">
 		<tr>

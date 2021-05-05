@@ -235,7 +235,16 @@ public class ControladorMisMeritos extends HttpServlet {
 						    }
 						}
 						
-						BolsaEmpleoValidator validator = this.getValidatorMisMeritos(request);
+						Integer itemId = Formateador.leeParametroInteger(request.getParameter(PARAM_ITEM));
+						ItemBaremacion itemBaremacion = ModeloBaremacion.obtenerInstancia().getItemBaremacionById(itemId);
+						
+						Boolean valorBool = false;
+						
+						if (itemBaremacion.getUnidades().equals("SI/NO")) {
+							valorBool = true;
+						}
+						
+						BolsaEmpleoValidator validator = this.getValidatorMisMeritos(request, valorBool);
 						
 						if (!validator.isValid()) {
 							for (String param : validator.getErrors().keySet()) {
@@ -248,7 +257,6 @@ public class ControladorMisMeritos extends HttpServlet {
 							Float valor = validator.getValueFloat(PARAM_VALOR);
 							String descripcion = validator.getValueString(PARAM_DESCRIPCION);
 							String observacion = validator.getValueString(PARAM_OBSERVACION);
-							Integer itemId = validator.getValueInteger(PARAM_ITEM);
 							Usuario usuArcos = datos.getUsuario();
 							ModeloUsuarioBolsaEmpleo modeloUsuarioBolsaEmpleo = ModeloUsuarioBolsaEmpleo.obtenerInstancia();
 							Integer idUsuario = modeloUsuarioBolsaEmpleo.listaUsuario(usuArcos.getUid()).getCodNum();
@@ -257,18 +265,22 @@ public class ControladorMisMeritos extends HttpServlet {
 								throw new UVException(MENSAJE_ERROR_ITEM_REQUERIDO);				
 							}
 							
-							ItemBaremacion itemBaremacion = ModeloBaremacion.obtenerInstancia().getItemBaremacionById(itemId);
+							if (valor != null) {
+								if (itemBaremacion.getUnidades().equals("DECIMAL")) {
+									if (valor % 1 == 0) {
+										throw new UVException(String.format(MENSAJE_ERROR_VALOR_DECIMAL_NO_PERMITIDO, 
+												itemBaremacion.getValorMinimo()));
+									}
+								} else {
+									if (valor % 1 != 0) {
+										throw new UVException(String.format(MENSAJE_ERROR_VALOR_ENTERO_NO_PERMITIDO, 
+												itemBaremacion.getValorMinimo()));
+									}
+								}
+							}
 							
-							if (itemBaremacion.getUnidades().equals("DECIMAL")) {
-								if (valor % 1 == 0) {
-									throw new UVException(String.format(MENSAJE_ERROR_VALOR_DECIMAL_NO_PERMITIDO, 
-											itemBaremacion.getValorMinimo()));
-								}
-							} else {
-								if (valor % 1 != 0) {
-									throw new UVException(String.format(MENSAJE_ERROR_VALOR_ENTERO_NO_PERMITIDO, 
-											itemBaremacion.getValorMinimo()));
-								}
+							if (itemBaremacion.getUnidades().equals("SI/NO")) {
+								valor = (float) 1;
 							}
 							
 							if (valor < itemBaremacion.getValorMinimo()) {
@@ -394,15 +406,19 @@ public class ControladorMisMeritos extends HttpServlet {
 	 * @throws IOException .
 	 * @throws IOException .
 	 */
-	private BolsaEmpleoValidator getValidatorMisMeritos(HttpServletRequest request) throws UVException {
+	private BolsaEmpleoValidator getValidatorMisMeritos(HttpServletRequest request, Boolean valorBool) throws UVException {
 		BolsaEmpleoValidator validator = new BolsaEmpleoValidator(request);
 		
 		validator.addParamInteger(PARAM_ITEM);
 		validator.addRule(PARAM_ITEM, "required", MENSAJE_ERROR_ITEM_REQUERIDO);
 		
-		validator.addParamFloat(PARAM_VALOR);
-		validator.addRule(PARAM_VALOR, "required", MENSAJE_ERROR_VALOR_VACIO);
-		
+		if (valorBool) {
+			validator.addParamFloat(PARAM_VALOR);
+		} else {
+			validator.addParamFloat(PARAM_VALOR);
+			validator.addRule(PARAM_VALOR, "required", MENSAJE_ERROR_VALOR_VACIO);
+		}
+
 		validator.addParamString(PARAM_DESCRIPCION);
 		validator.addRule(PARAM_DESCRIPCION, "required", MENSAJE_ERROR_DESCRIPCION_VACIA);
 		validator.addRule(PARAM_DESCRIPCION, "noBlank", MENSAJE_ERROR_DESCRIPCION_VACIA);

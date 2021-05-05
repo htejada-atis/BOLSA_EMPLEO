@@ -23,6 +23,7 @@ public class TestBEPBeanEvaluador {
 	private static final String RAZONEXCLUIDO = "test";
 	private static final Boolean LISTADIST = true;
 	private static final Boolean EXCLUIDO = false;
+	private static final String EXCLUIDOTIPO = "EJEMPLO";
 	private static final Boolean BORRADO = true;
 	private static final Date FECHAEXCLUSION = new java.sql.Date(Calendar.getInstance().getTime().getTime());
 	private static final Date FECHABORRADO = new java.sql.Date(Calendar.getInstance().getTime().getTime());
@@ -68,7 +69,7 @@ public class TestBEPBeanEvaluador {
 	 */
 	@Test
 	public void testA02() {
-		UsuarioBolsaEmpleo usuario = new UsuarioBolsaEmpleo(CODPERSONA, CODCUENTA, ROL, LISTADIST, EXCLUIDO);
+		UsuarioBolsaEmpleo usuario = new UsuarioBolsaEmpleo(CODPERSONA, CODCUENTA, ROL, LISTADIST, EXCLUIDO, EXCLUIDOTIPO);
 		Evaluador evaluador = new Evaluador(usuario, AREA, ACTIVO);
 		Evaluador evaluador2 = new Evaluador(evaluador, usuario);
 		
@@ -92,16 +93,15 @@ public class TestBEPBeanEvaluador {
 	 * se quita warning S2159 de equals null, es lo que se quiere probar
 	 */
 	@Test
-	@SuppressWarnings("java:S2159")
 	public void testA03() {
-		UsuarioBolsaEmpleo usuario = new UsuarioBolsaEmpleo(CODPERSONA, CODCUENTA, ROL, LISTADIST, EXCLUIDO);
+		UsuarioBolsaEmpleo usuario = new UsuarioBolsaEmpleo(CODPERSONA, CODCUENTA, ROL, LISTADIST, EXCLUIDO, EXCLUIDOTIPO);
 		
 		Evaluador evaluador = new Evaluador();
 		Evaluador evaluador2 = new Evaluador();
 		Evaluador evaluador3 = new Evaluador(usuario, AREA, ACTIVO);
 		    	
 		assertTrue(evaluador.equals(evaluador2));
-		assertTrue(evaluador2.equals(evaluador));		
+		assertTrue(evaluador2.equals(evaluador));
 		assertEquals(evaluador.hashCode(), evaluador2.hashCode());
 		assertFalse(evaluador.equals(null));
 		assertFalse(evaluador.equals(evaluador3));

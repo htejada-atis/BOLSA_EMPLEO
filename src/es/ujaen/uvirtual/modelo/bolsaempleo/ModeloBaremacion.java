@@ -27,8 +27,7 @@ public class ModeloBaremacion {
 	public static final int ORDER_COLUMN_INDEX_APARTADOS_NOMBRE = 1;
 	public static final int ORDER_COLUMN_INDEX_APARTADOS_PUNTUACIONMAXIMA = 2;
 	public static final int ORDER_COLUMN_INDEX_APARTADOS_PORCENTAJEMAXIMO = 3;
-	public static final int ORDER_COLUMN_INDEX_APARTADOS_MERITOSPREFERENTES = 4;
-	public static final int ORDER_COLUMN_INDEX_APARTADOS_ACTIVO = 5;
+	public static final int ORDER_COLUMN_INDEX_APARTADOS_ACTIVO = 4;
 	
 	// ordenación bloques de baremación
 	public static final int ORDER_COLUMN_INDEX_BLOQUES_CODIGO = 0;
@@ -165,7 +164,6 @@ public class ModeloBaremacion {
 		dataTable.setColumn(ORDER_COLUMN_INDEX_APARTADOS_NOMBRE, "bepapa.NOMBRE");
 		dataTable.setColumn(ORDER_COLUMN_INDEX_APARTADOS_PUNTUACIONMAXIMA, "bepapa.PUNTUACIONMAXIMA");
 		dataTable.setColumn(ORDER_COLUMN_INDEX_APARTADOS_PORCENTAJEMAXIMO, "bepapa.PORCENTAJEMAXIMO");
-		dataTable.setColumn(ORDER_COLUMN_INDEX_APARTADOS_MERITOSPREFERENTES, "bepapa.MERITOS_PREFERENTES", DataTableColumn.COLUMN_TYPE_BOOLEAN);
 		dataTable.setColumn(ORDER_COLUMN_INDEX_APARTADOS_ACTIVO, "bepapa.FLGACTIVO", DataTableColumn.COLUMN_TYPE_BOOLEAN);
 		
 		dataTable.setQuery(consulta);

@@ -33,11 +33,12 @@ public class TestBEPModeloMisTitulaciones {
 	private static final Rol ROL = new Rol(1050);
 	private static final Boolean LISTADIST = true;
 	private static final Boolean EXCLUIDO = false;
+	private static final String EXCLUIDOTIPO = "EJEMPLO";
 	
 	private static final Integer CODNUM = 10;
 	private static final Integer CODNUM_TITULACION = 1;
 	private static final String NOMBRE = "nombre";
-	private static final UsuarioBolsaEmpleo USUARIO = new UsuarioBolsaEmpleo(CODPERSONA, CODCUENTA, ROL, LISTADIST, EXCLUIDO);
+	private static final UsuarioBolsaEmpleo USUARIO = new UsuarioBolsaEmpleo(CODPERSONA, CODCUENTA, ROL, LISTADIST, EXCLUIDO, EXCLUIDOTIPO);
 	private static final Titulacion TITULACION = new Titulacion(CODPERSONA, NOMBRE);
 	private static final InputStream ARCHIVO = new ByteArrayInputStream("archivo de prueba".getBytes());
     
