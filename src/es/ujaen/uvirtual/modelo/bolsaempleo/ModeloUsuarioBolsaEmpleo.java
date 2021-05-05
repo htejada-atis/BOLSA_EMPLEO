@@ -485,6 +485,7 @@ public class ModeloUsuarioBolsaEmpleo {
 		usuario.setRol(modeloRol.getRoleById(rs.getInt("ROL")));
 		usuario.setListaDist(rs.getString("FLGLISTADISTRIBUCION").equals("S"));
 		usuario.setExcluido(rs.getString("FLGEXCLUIDO").equals("S"));
+		usuario.setExcluidoTipo(rs.getString("FLGEXCLUIDOTIPO"));
 		usuario.setRazonExcluido(rs.getString("RAZON_EXCLUSION"));
 		usuario.setFechaExclusion(rs.getTimestamp("FECHA_EXCLUSION"));
 		usuario.setBorrado(rs.getString("FLGBORRADO").equals("S"));
@@ -524,6 +525,7 @@ public class ModeloUsuarioBolsaEmpleo {
 		usuario.setRol(modeloRol.getRoleById(rs.getInt("ROL")));
 		usuario.setListaDist(rs.getString("FLGLISTADISTRIBUCION").equals("S"));
 		usuario.setExcluido(rs.getString("FLGEXCLUIDO").equals("S"));
+		usuario.setExcluidoTipo(rs.getString("FLGEXCLUIDOTIPO"));
 		usuario.setRazonExcluido(rs.getString("RAZON_EXCLUSION"));
 		usuario.setFechaExclusion(rs.getTimestamp("FECHA_EXCLUSION"));
 		usuario.setBorrado(rs.getString("FLGBORRADO").equals("S"));
@@ -584,7 +586,7 @@ public class ModeloUsuarioBolsaEmpleo {
 				}
 		} else {
 			String consulta = "INSERT INTO tbep_usuarios " 
-					+ " (CODPERSONA,CODCUENTA,ROL,EMAIL,FLGLISTADISTRIBUCION,FLGEXCLUIDO,RAZON_EXCLUSION,FECHA_EXCLUSION) "
+					+ " (CODPERSONA,CODCUENTA,ROL,EMAIL,FLGLISTADISTRIBUCION,FLGEXCLUIDO,FLGEXCLUIDOTIPO,RAZON_EXCLUSION,FECHA_EXCLUSION) "
 					+ "VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
 			
 			try (Connection conexion = ConexionUvirtual.obtenerInstancia();
@@ -596,6 +598,7 @@ public class ModeloUsuarioBolsaEmpleo {
 					stmt.setString(parameterIndex++, usuario.getEmail());
 					stmt.setString(parameterIndex++, usuario.getListaDist() ? "S" : "N");
 					stmt.setString(parameterIndex++, usuario.getExcluido() ? "S" : "N");
+					stmt.setString(parameterIndex++, usuario.getExcluidoTipo());
 					stmt.setString(parameterIndex++, usuario.getRazonExcluido());
 					stmt.setDate(parameterIndex++, new java.sql.Date(usuario.getFechaExclusion().getTime()));
 					stmt.executeUpdate();
@@ -617,7 +620,7 @@ public class ModeloUsuarioBolsaEmpleo {
 		}
 		
 		String consulta = "UPDATE tbep_usuarios "
-			+ " SET ROL=?, FLGLISTADISTRIBUCION=?, FLGEXCLUIDO=?, RAZON_EXCLUSION=?, FECHA_EXCLUSION=? "
+			+ " SET ROL=?, FLGLISTADISTRIBUCION=?, FLGEXCLUIDO=?, FLGEXCLUIDOTIPO=?, RAZON_EXCLUSION=?, FECHA_EXCLUSION=? "
 			+ " WHERE codnum=?";
 		try (Connection conexion = ConexionUvirtual.obtenerInstancia();
 		PreparedStatement stmt = conexion.prepareStatement(consulta);) {
@@ -625,6 +628,7 @@ public class ModeloUsuarioBolsaEmpleo {
 			stmt.setInt(parameterIndex++, usuario.getRol().getCodNum());
 			stmt.setString(parameterIndex++, usuario.getListaDist() ? "S" : "N");
 			stmt.setString(parameterIndex++, usuario.getExcluido() ? "S" : "N");
+			stmt.setString(parameterIndex++, usuario.getExcluidoTipo());
 			stmt.setString(parameterIndex++, usuario.getRazonExcluido());
 			stmt.setDate(parameterIndex++, new java.sql.Date(usuario.getFechaExclusion().getTime()));
 			stmt.setInt(parameterIndex++, usuario.getCodNum());
@@ -734,11 +738,12 @@ public class ModeloUsuarioBolsaEmpleo {
 	 * @throws SQLException .
 	 */
 	public void ponerUsuarioComoExcluido(UsuarioBolsaEmpleo usuario) throws SQLException {
-		String query = "UPDATE TBEP_USUARIOS SET FLGEXCLUIDO = ?, RAZON_EXCLUSION = ?, FECHA_EXCLUSION = ? WHERE CODNUM IN ?";		
+		String query = "UPDATE TBEP_USUARIOS SET FLGEXCLUIDO = ?, FLGEXCLUIDOTIPO = ?, RAZON_EXCLUSION = ?, FECHA_EXCLUSION = ? WHERE CODNUM IN ?";		
 		
 		try (Connection conexion = ConexionUvirtual.obtenerInstancia(); PreparedStatement stmt = conexion.prepareStatement(query)) {
 			int indexParam = 1;
 			stmt.setString(indexParam++, USUARIO_EXCLUIDO);
+			stmt.setString(indexParam++, usuario.getExcluidoTipo());
 			stmt.setString(indexParam++, usuario.getRazonExcluido());
 			stmt.setDate(indexParam++, new java.sql.Date(usuario.getFechaExclusion().getTime()));
 			stmt.setInt(indexParam++, usuario.getCodNum());
@@ -752,11 +757,12 @@ public class ModeloUsuarioBolsaEmpleo {
 	 * @throws SQLException .
 	 */
 	public void ponerUsuarioComoNoExcluido(UsuarioBolsaEmpleo usuario) throws SQLException {
-		String query = "UPDATE TBEP_USUARIOS SET FLGEXCLUIDO = ?, RAZON_EXCLUSION = ?, FECHA_EXCLUSION = ? WHERE CODNUM IN ?";		
+		String query = "UPDATE TBEP_USUARIOS SET FLGEXCLUIDO = ?, FLGEXCLUIDOTIPO = ?, RAZON_EXCLUSION = ?, FECHA_EXCLUSION = ? WHERE CODNUM IN ?";		
 		
 		try (Connection conexion = ConexionUvirtual.obtenerInstancia(); PreparedStatement stmt = conexion.prepareStatement(query)) {
 			int indexParam = 1;
 			stmt.setString(indexParam++, "N");
+			stmt.setNull(indexParam++, Types.NULL);
 			stmt.setNull(indexParam++, Types.NULL);
 			stmt.setNull(indexParam++, Types.NULL);
 			stmt.setInt(indexParam++, usuario.getCodNum());
@@ -839,7 +845,7 @@ public class ModeloUsuarioBolsaEmpleo {
 						role = modeloRol.getRoleById(PARAM_ROL_CANDIDATO_ID);
 						
 						UsuarioBolsaEmpleo usuarioFinal = 
-						new UsuarioBolsaEmpleo(usuArcos.getCodigoPersonaArcos(), usuArcos.getUid(), role, true, false);
+						new UsuarioBolsaEmpleo(usuArcos.getCodigoPersonaArcos(), usuArcos.getUid(), role, true, false, null);
 						
 						insertaUsuario(usuarioFinal);
 					

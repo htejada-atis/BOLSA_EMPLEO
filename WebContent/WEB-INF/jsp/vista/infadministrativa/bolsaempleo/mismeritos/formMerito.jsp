@@ -62,9 +62,9 @@ String observacion = BolsaEmpleoUtils.getParamForm(request, ControladorMisMerito
 					for(ItemBaremacion it: bean.getItems()) {
 					%>
 						<% if (item != null && !item.isEmpty() && it.getCodNum() == Integer.parseInt(item)) { %>
-		    				<option value="<%=it.getCodNum()%>" data-unidades="<%= it.getUnidades() %>" selected><%=it.getCodigo()%> - <%=it.getNombre()%> - <%=it.getDescripcion()%></option>
+		    				<option value="<%=it.getCodNum()%>" data-unidades="<%= it.getUnidades() %>" data-descripcion="<%= it.getDescripcion() %>" selected><%=it.getCodigo()%> - <%=it.getNombre()%></option>
 		    			<% } else { %>
-		    				<option value="<%=it.getCodNum()%>" data-unidades="<%= it.getUnidades() %>"><%=it.getCodigo()%> - <%=it.getNombre()%> - <%=it.getDescripcion()%></option>
+		    				<option value="<%=it.getCodNum()%>" data-unidades="<%= it.getUnidades() %>" data-descripcion="<%= it.getDescripcion() %>"><%=it.getCodigo()%> - <%=it.getNombre()%></option>
 		    			<% } %>
 		    		<%
 		    		}
@@ -76,16 +76,32 @@ String observacion = BolsaEmpleoUtils.getParamForm(request, ControladorMisMerito
 		
 		</div>
 		
-		<div class="form-group-container col2">
-	    	<div class="form-group">
-	    		<label for="merito_valor" id="merito_valor_label" class="bold-label">Valor:</label>
-	    		<input class="form-input-custom" id="merito_valor" type="text" name="<%= ControladorMisMeritos.PARAM_VALOR %>" value="<%= valor %>"/>
-	    	</div>
-	    	<div class="form-group">
-	    		<label for="merito_descripcion" class="bold-label">Descripción:</label>
-	    		<input class="form-input-custom" id="merito_descripcion" type="text" name="<%= ControladorMisMeritos.PARAM_DESCRIPCION %>" value="<%= descripcion %>"></input>
-	    	</div>
+		<div id="contDescripcionItem" style="display:none;">
+			<div class="form-group">
+	    		<div class="form-group">
+	    			<p id="descripcionItem">Descripción del Ítem: </p>
+	    		</div>
+    		</div>
+		</div>
+		
+		<div id="contValor" style="display:none;">
+			<div class="form-group">
+	    		<div class="form-group">
+	    			<label for="merito_valor" id="merito_valor_label" class="bold-label">Valor:</label>
+	    			<input class="form-input-custom" id="merito_valor" type="text" name="<%= ControladorMisMeritos.PARAM_VALOR %>" value="<%= valor %>"/>
+	    		</div>
+    		</div>
     	</div>
+		
+		<div id="contDescripcion">
+			<div class="form-group">
+	    		<div class="form-group">
+	    			<label for="merito_descripcion" class="bold-label">Descripción:</label>
+	    			<textarea class="form-input-custom" id="merito_descripcion" type="text" name="<%= ControladorMisMeritos.PARAM_DESCRIPCION %>" value="<%= descripcion %>"></textarea>
+	    		</div>
+    		</div>
+		</div>
+	
     	<div class="form-file">
 			<label for="merito_archivo" class="bold-label">Fichero:</label>
 			<input id="merito_archivo" type="file" name="<%= ControladorMisMeritos.PARAM_ARCHIVO %>"/>
@@ -104,6 +120,8 @@ String observacion = BolsaEmpleoUtils.getParamForm(request, ControladorMisMerito
 </div>
 
 <script>
+
+	$('#select_item').prop('selectedIndex',0);
 
 	function agregarMerito(event, submit_input) {
 		event.preventDefault();
@@ -128,13 +146,21 @@ String observacion = BolsaEmpleoUtils.getParamForm(request, ControladorMisMerito
 		
 		$('#select_item').on('change', function() {			
 			var unidades = $(this).children("option:selected").data('unidades');
+			var descripcion = $(this).children("option:selected").data('descripcion');
 			//var selected = $(this).children("option:selected").val();
 						
-			if (unidades) {
-				$('#merito_valor_label').text('Valor (' + unidades + ')');
+			if (descripcion) {
+				$('#descripcionItem').text('Descripción del Ítem: ' + descripcion);
+				$('#contDescripcionItem').show();
 			} else {
-				$('#merito_valor_label').text('Valor');
-			}			
+				$('#contDescripcionItem').hide();
+			}	
+			
+			if (unidades=="SI/NO") $('#contValor').hide();
+			else $('#contValor').show();
+			
+			if (unidades) $('#merito_valor_label').text('Valor (' + unidades + ')');
+			else $('#merito_valor_label').text('Valor');		
 		})
 		
 		
