@@ -1,8 +1,8 @@
 <%@ page trimDirectiveWhitespaces="true"%>
-<%@	page import="es.ujaen.uvirtual.controlador.infadministrativa.bolsaempleo.ControladorInicio"%>
-<%@ page import="es.ujaen.uvirtual.beans.vistas.uvirtual.bolsaempleo.VistaInicio" %>
-<%@ page import="es.ujaen.uvirtual.beans.vistas.uvirtual.bolsaempleo.VistaUsuarioBolsaEmpleo"%>
-<%@ page import="es.ujaen.uvirtual.beans.uvirtual.bolsaempleo.Noticia" %>
+<%@	page import="es.ujaen.uvirtual.modulo.bolsaempleo.controlador.ControladorInicio"%>
+<%@ page import="es.ujaen.uvirtual.modulo.bolsaempleo.vistas.VistaInicio" %>
+<%@ page import="es.ujaen.uvirtual.modulo.bolsaempleo.vistas.VistaUsuarioBolsaEmpleo"%>
+<%@ page import="es.ujaen.uvirtual.modulo.bolsaempleo.beans.Noticia" %>
 <%@ page import="es.ujaen.uvirtual.beans.UVDatos"%>
 <%@ page import="es.ujaen.uvirtual.utilidades.Formateador"%>
 

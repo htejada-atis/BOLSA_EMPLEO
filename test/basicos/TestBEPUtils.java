@@ -12,7 +12,7 @@ import org.junit.runner.RunWith;
 import org.mockito.junit.MockitoJUnitRunner;
 //import org.mockito.Mock;
 
-import es.ujaen.uvirtual.utilidades.BolsaEmpleoUtils;
+import es.ujaen.uvirtual.modulo.bolsaempleo.utilidades.BolsaEmpleoUtils;
 
 /**
  * test utilidades bolsa empleo.

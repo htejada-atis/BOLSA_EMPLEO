@@ -14,14 +14,14 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 import bbdd.BbddRunner;
 import bbdd.UtilsTestBolsaEmpleo;
-import es.ujaen.uvirtual.beans.uvirtual.bolsaempleo.Bolsa;
-import es.ujaen.uvirtual.beans.uvirtual.bolsaempleo.ItemBaremacion;
-import es.ujaen.uvirtual.beans.uvirtual.bolsaempleo.Merito;
-import es.ujaen.uvirtual.beans.uvirtual.bolsaempleo.Solicitud;
-import es.ujaen.uvirtual.modelo.bolsaempleo.ModeloBaremacion;
-import es.ujaen.uvirtual.modelo.bolsaempleo.ModeloMerito;
-import es.ujaen.uvirtual.modelo.bolsaempleo.ModeloSolicitud;
 import es.ujaen.uvirtual.modelo.conexion.Conexion;
+import es.ujaen.uvirtual.modulo.bolsaempleo.beans.Bolsa;
+import es.ujaen.uvirtual.modulo.bolsaempleo.beans.ItemBaremacion;
+import es.ujaen.uvirtual.modulo.bolsaempleo.beans.Merito;
+import es.ujaen.uvirtual.modulo.bolsaempleo.beans.Solicitud;
+import es.ujaen.uvirtual.modulo.bolsaempleo.modelo.ModeloBaremacion;
+import es.ujaen.uvirtual.modulo.bolsaempleo.modelo.ModeloMerito;
+import es.ujaen.uvirtual.modulo.bolsaempleo.modelo.ModeloSolicitud;
 import es.ujaen.uvirtual.utilidades.UVException;
 
 

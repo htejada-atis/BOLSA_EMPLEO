@@ -1,12 +1,12 @@
 <%@ page trimDirectiveWhitespaces="true" %>
 <%@ page import="es.ujaen.uvirtual.beans.UVDatos" %>
-<%@ page import="es.ujaen.uvirtual.modelo.bolsaempleo.ModeloConvocatoria" %>
-<%@ page import="es.ujaen.uvirtual.modelo.bolsaempleo.ModeloSolicitud" %>
-<%@	page import="es.ujaen.uvirtual.controlador.infadministrativa.bolsaempleo.ControladorMisSolicitudes" %>
-<%@ page import="es.ujaen.uvirtual.beans.vistas.uvirtual.bolsaempleo.VistaSolicitudes" %>
-<%@ page import="es.ujaen.uvirtual.beans.uvirtual.bolsaempleo.Solicitud" %>
+<%@ page import="es.ujaen.uvirtual.modulo.bolsaempleo.modelo.ModeloConvocatoria" %>
+<%@ page import="es.ujaen.uvirtual.modulo.bolsaempleo.modelo.ModeloSolicitud" %>
+<%@	page import="es.ujaen.uvirtual.modulo.bolsaempleo.controlador.ControladorMisSolicitudes" %>
+<%@ page import="es.ujaen.uvirtual.modulo.bolsaempleo.vistas.VistaSolicitudes" %>
+<%@ page import="es.ujaen.uvirtual.modulo.bolsaempleo.beans.Solicitud" %>
+<%@ page import="es.ujaen.uvirtual.modulo.bolsaempleo.beans.MeritoSolicitud" %>
 <%@ page import="es.ujaen.uvirtual.utilidades.EscapaHTML" %>
-<%@	page import="es.ujaen.uvirtual.beans.uvirtual.bolsaempleo.Merito" %>
 
 <%
 UVDatos uvdatos = (UVDatos) request.getAttribute(UVDatos.NOMBRE_ATRIBUTO);
@@ -49,7 +49,7 @@ VistaSolicitudes bean = (VistaSolicitudes) uvdatos.getVistas().get(VistaSolicitu
 	<table class="bluetable bolsaempleo" id="tableMeritos" style="visibility: collapse">
 		<tr>
 			<th scope="col"	style="width:5%"></th>
-			<th scope="col"	style="width:10%">Id</th>
+			<th scope="col"	style="width:10%">Cod.</th>
 			<th scope="col"	style="width:15%">Código ítem</th>
 			<th scope="col"	style="width:45%">Nombre ítem</th>
 			<th scope="col"	style="width:10%">Valor</th>
@@ -95,7 +95,7 @@ VistaSolicitudes bean = (VistaSolicitudes) uvdatos.getVistas().get(VistaSolicitu
 		    "columns": [
 		    	{'data': 'area.idAreaExterno', 'filter': true},
 		    	{'data': 'area.descripcion', 'filter': true},
-		    	{'data': 'listaMeritos.length', 'order': {'active': false}},
+		    	{'data': 'numeroMeritos', 'order': {'active': false}},
 	        ],
 		});
 		
@@ -103,8 +103,8 @@ VistaSolicitudes bean = (VistaSolicitudes) uvdatos.getVistas().get(VistaSolicitu
 		
 			var meritosBolsaSolicitud = [];
 		
-			<%  if (bean.getListaMeritos() != null) {
-					for (Merito merito: bean.getListaMeritos()) { %>
+			<%if (bean.getListaMeritosSolicitud() != null) {
+					for (MeritoSolicitud merito: bean.getListaMeritosSolicitud()) {%>
 						meritosBolsaSolicitud.push(<%=merito.getCodNum()%>);
 					<% }
 				} %>
@@ -120,14 +120,14 @@ VistaSolicitudes bean = (VistaSolicitudes) uvdatos.getVistas().get(VistaSolicitu
 			    "action": "<%= ControladorMisSolicitudes.ACCION_DATATABLE_MERITOS_BOLSA %>",
 			    "params": {"<%= ControladorMisSolicitudes.PARAM_SOLICITUD_ID %>": <%= bean.getSolicitud().getCodNum() %>},
 			    "columns": [
-			    	{'data': 'codNum', 'selectable': {'onChange': function(row, checkbox) {
+			    	{'data': 'merito.codNum', 'selectable': {'onChange': function(row, checkbox) {
 			    				var accion = checkbox.checked ? '<%= ControladorMisSolicitudes.ACCION_MERITO_SELECCIONADO %>'
 			    						: '<%= ControladorMisSolicitudes.ACCION_MERITO_DESELECCIONADO %>';
 				    			var params = {
 				    				'a': accion,
 				    				'<%= ControladorMisSolicitudes.PARAM_BOLSA %>': '<%=bean.getArea().getCodNum()%>',
 				    				'<%= ControladorMisSolicitudes.PARAM_SOLICITUD_ID %>': '<%= bean.getSolicitud().getCodNum() %>',
-				    				'<%= ControladorMisSolicitudes.PARAM_MERITO %>': row.codNum,
+				    				'<%= ControladorMisSolicitudes.PARAM_MERITO %>': row.merito.codNum,
 				    			};
 				    			
 				    			Atis.sendAjax("<%= request.getRequestURI() %>", params, function(data) {
@@ -144,17 +144,17 @@ VistaSolicitudes bean = (VistaSolicitudes) uvdatos.getVistas().get(VistaSolicitu
 				    		}
 			    		}
 			    	},
-			    	{'data': 'codNum', 'filter': {'type': 'number'}},
-			    	{'data': 'item', 'filter': true, 'render': function(row) {
-			        	return row.item.bloque.apartado.codigo + "." + row.item.bloque.codigo + "." + row.item.codigo;
+			    	{'data': 'merito.codNum', 'filter': {'type': 'number'}},
+			    	{'data': 'merito.item', 'filter': true, 'render': function(row) {
+			        	return row.merito.item.bloque.apartado.codigo + "." + row.merito.item.bloque.codigo + "." + row.merito.item.codigo;
 		        	}},
-		        	{'data': 'item.nombre', 'filter': true, 'overflow': 'auto'},
-		        	{'data': 'valor', 'filter': true},
-		        	{'data': 'excluido', 'order': {'active': false}, 'filter': {'type': 'selectBoolean', 'true': 'Excluido', 'false': 'No excluido'}, 'render': function(row) {
+		        	{'data': 'merito.item.nombre', 'filter': true},
+		        	{'data': 'merito.valor', 'filter': true},
+		        	{'data': 'excluido', 'order': {'active': false}, 'filter': {'type': 'selectBoolean', 'true': 'Excluido', 'false': 'No excluido', 'optionDefault': 'false'}, 'render': function(row) {
 		        		if (row.excluido) {
-		        			return "<div title='Excluido' class='circle-true'></div>";
+		        			return "<div title='Mérito excluido' class='circle-false'></div>";
 		        		} else {
-		        			return "<div title='No excluido' class='circle-false'></div>";
+		        			return "<div title='Mérito no excluido' class='circle-true'></div>";
 		        		}
 		        	}},
 		        ],

@@ -1,7 +1,7 @@
 <%@ page trimDirectiveWhitespaces="true"%>
 <%@ page import="es.ujaen.uvirtual.beans.UVDatos"%>
-<%@	page import="es.ujaen.uvirtual.controlador.infadministrativa.bolsaempleo.ControladorUsuarioCandidato"%>
-<%@ page import="es.ujaen.uvirtual.beans.vistas.uvirtual.bolsaempleo.VistaUsuarioBolsaEmpleo"%>
+<%@	page import="es.ujaen.uvirtual.modulo.bolsaempleo.controlador.ControladorUsuarioCandidato"%>
+<%@ page import="es.ujaen.uvirtual.modulo.bolsaempleo.vistas.VistaUsuarioBolsaEmpleo"%>
 <%@ page import="es.ujaen.uvirtual.utilidades.EscapaHTML" %>
 
 <% 
@@ -73,7 +73,7 @@ $(document).ready(function() {
 	        {'data': 'numdocumento', 'filter': true, 'class': 'overflow-auto'},
 	        {'data': 'codcuenta', 'filter': true, 'class': 'overflow-auto'},
 	        {'data': 'apellido1', 'filter': true, 'class': 'overflow-auto', 'render': function(row) {
-        		return row.nombre + "\n" + row.apellido1 + "\n" + row.apellido2; 
+        		return "<div class='overflow-auto'>" + row.nombre + "\n" + row.apellido1 + "\n" + row.apellido2 + "</div>"; 
         	}},
 	        {'data': 'rol.descripcion', 'order': {'active': false}},
 	        {'data': 'listaDist', 'filter': {'type': 'selectBoolean', 'true': 'En Lista', 'false': 'Sin Lista'}, 'render': function(row) {

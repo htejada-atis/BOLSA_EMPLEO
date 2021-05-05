@@ -145,19 +145,6 @@ public class Formateador {
 	}
 	
 	/**
-	 * Trata de convertir a Float el valor recibido como parámetro. Si la conversión falla, devuelve null, de modo que nunca salte una excepción
-	 * @param valor valor
-	 * @return El valor convertido a float, o null si no es posible
-	 */
-	public static Float leeParametroFloat(String valor) {
-		try {
-			return Float.parseFloat(valor);
-		} catch (Exception e) {
-			return null;
-		}
-	}
-	
-	/**
 	 * Recibe un array de parámetros (o sea, el valor de varios campos de un mismo formulario que tienen el mismo nombre) y devuelve el mismo array, 
 	 * pero con todos los valores recortados los espacios iniciales y finales, y reemplazando los null por cadenas vacías.
 	 * Si el array es null o está vacío, devuelve un String[0]
@@ -180,9 +167,6 @@ public class Formateador {
 		}
 		return parametrosSinNulos;
 	}
-	
-	
-	
 	
 	/**
 	 * Trata de convertir a Integer el valor recibido como parámetro. 

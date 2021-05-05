@@ -13,8 +13,8 @@ import bbdd.BbddRunner;
 import bbdd.UtilsTestBolsaEmpleo;
 import controlador.implementacion.PeticionHttp;
 import controlador.implementacion.RespuestaHttp;
-import es.ujaen.uvirtual.beans.vistas.uvirtual.bolsaempleo.VistaFicheros;
-import es.ujaen.uvirtual.controlador.infadministrativa.bolsaempleo.ControladorGestionFicheros;
+import es.ujaen.uvirtual.modulo.bolsaempleo.controlador.ControladorGestionFicheros;
+import es.ujaen.uvirtual.modulo.bolsaempleo.vistas.VistaFicheros;
 
 /** test controlador ficheros.
  * @author ATISoluciones

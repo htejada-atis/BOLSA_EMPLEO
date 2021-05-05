@@ -12,11 +12,11 @@ import bbdd.BbddRunner;
 import bbdd.UtilsTestBolsaEmpleo;
 import controlador.implementacion.PeticionHttp;
 import controlador.implementacion.RespuestaHttp;
-import es.ujaen.uvirtual.beans.uvirtual.bolsaempleo.ApartadoBaremacion;
-import es.ujaen.uvirtual.beans.uvirtual.bolsaempleo.BloqueBaremacion;
-import es.ujaen.uvirtual.beans.uvirtual.bolsaempleo.ItemBaremacion;
-import es.ujaen.uvirtual.beans.vistas.uvirtual.bolsaempleo.VistaItemsBaremacion;
-import es.ujaen.uvirtual.controlador.infadministrativa.bolsaempleo.ControladorItemsBaremacion;
+import es.ujaen.uvirtual.modulo.bolsaempleo.beans.ApartadoBaremacion;
+import es.ujaen.uvirtual.modulo.bolsaempleo.beans.BloqueBaremacion;
+import es.ujaen.uvirtual.modulo.bolsaempleo.beans.ItemBaremacion;
+import es.ujaen.uvirtual.modulo.bolsaempleo.controlador.ControladorItemsBaremacion;
+import es.ujaen.uvirtual.modulo.bolsaempleo.vistas.VistaItemsBaremacion;
 
 /** test controlador items baremación.
  * @author ATISoluciones

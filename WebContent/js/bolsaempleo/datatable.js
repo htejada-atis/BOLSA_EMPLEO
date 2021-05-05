@@ -347,15 +347,15 @@ function DataTable(id, config) {
                         case 'selectBoolean':
                             filterElement = $('<select ' + name + '></select>');
                             filterElement.append($('<option value="0">-----</option>'));
-
+                                                        
                             if (columnDef.filter.true) {
-                                filterElement.append($('<option value="true">' + columnDef.filter.true + '</option>'));
+                                filterElement.append($('<option value="true" title="' + columnDef.filter.true + '" ' + (columnDef.filter.optionDefault == "true" ? ' selected' : '') + '>' + columnDef.filter.true + '</option>'));
                             } else {
                                 filterElement.append($('<option>' + true + '</option>'));
                             }
 
                             if (columnDef.filter.false) {
-                                filterElement.append($('<option value="false">' + columnDef.filter.false + '</option>'));
+                                filterElement.append($('<option value="false" title="' + columnDef.filter.true + '"' + (columnDef.filter.optionDefault == "false" ? ' selected' : '') + '>' + columnDef.filter.false + '</option>'));
                             } else {
                                 filterElement.append($('<option>' + false + '</option>'));
                             }

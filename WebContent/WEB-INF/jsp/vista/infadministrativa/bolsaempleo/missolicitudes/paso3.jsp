@@ -1,14 +1,16 @@
 <%@ page trimDirectiveWhitespaces="true" %>
 <%@ page import="es.ujaen.uvirtual.beans.UVDatos" %>
-<%@ page import="es.ujaen.uvirtual.modelo.bolsaempleo.ModeloConvocatoria" %>
-<%@ page import="es.ujaen.uvirtual.modelo.bolsaempleo.ModeloSolicitud" %>
-<%@	page import="es.ujaen.uvirtual.controlador.infadministrativa.bolsaempleo.ControladorMisSolicitudes" %>
-<%@ page import="es.ujaen.uvirtual.beans.vistas.uvirtual.bolsaempleo.VistaSolicitudes" %>
-<%@ page import="es.ujaen.uvirtual.beans.uvirtual.bolsaempleo.Solicitud" %>
+<%@ page import="es.ujaen.uvirtual.modulo.bolsaempleo.modelo.ModeloConvocatoria" %>
+<%@ page import="es.ujaen.uvirtual.modulo.bolsaempleo.modelo.ModeloSolicitud" %>
+<%@	page import="es.ujaen.uvirtual.modulo.bolsaempleo.controlador.ControladorMisSolicitudes" %>
+<%@ page import="es.ujaen.uvirtual.modulo.bolsaempleo.vistas.VistaSolicitudes" %>
+<%@ page import="es.ujaen.uvirtual.modulo.bolsaempleo.beans.Solicitud" %>
 <%@ page import="es.ujaen.uvirtual.utilidades.EscapaHTML" %>
-<%@	page import="es.ujaen.uvirtual.beans.uvirtual.bolsaempleo.BolsaSolicitud" %>
-<%@	page import="es.ujaen.uvirtual.beans.uvirtual.bolsaempleo.Merito" %>
-<%@	page import="es.ujaen.uvirtual.beans.uvirtual.bolsaempleo.Titulacion" %>
+<%@	page import="es.ujaen.uvirtual.modulo.bolsaempleo.beans.TablaBolsaSolicitud" %>
+<%@	page import="es.ujaen.uvirtual.modulo.bolsaempleo.beans.BolsaSolicitud" %>
+<%@	page import="es.ujaen.uvirtual.modulo.bolsaempleo.beans.Merito" %>
+<%@	page import="es.ujaen.uvirtual.modulo.bolsaempleo.beans.MeritoSolicitud" %>
+<%@	page import="es.ujaen.uvirtual.modulo.bolsaempleo.beans.Titulacion" %>
 
 <%
 UVDatos uvdatos = (UVDatos) request.getAttribute(UVDatos.NOMBRE_ATRIBUTO);
@@ -16,24 +18,34 @@ VistaSolicitudes bean = (VistaSolicitudes) uvdatos.getVistas().get(VistaSolicitu
 %>
 
 <div class="bolsa-empleo">	
-	<% if (bean.getMensajesDeExito().size() > 0) { %>
+	<%
+		if (bean.getMensajesDeExito().size() > 0) {
+		%>
 		<div id="exito" class="success">
-			<%= bean.formatearMensajesDeExito() %>
+			<%=bean.formatearMensajesDeExito()%>
 		</div>
-	<% } %>
+	<%
+	}
+	%>
 	
-	<% if (bean.getMensajesDeError().size() > 0) { %>
+	<%
+		if (bean.getMensajesDeError().size() > 0) {
+		%>
 		<div id="error" class="error">
-			<%= bean.formatearMensajesDeError()   %>
+			<%=bean.formatearMensajesDeError()%>
 		</div>
-	<% } %>
+	<%
+	}
+	%>
 	
 	<h2>Paso 3: Resumen de solicitud y confirmación</h2>
-	<h3><%= bean.getSolicitud().getConvocatoria().getDescripcion() %></h3>
+	<h3><%=bean.getSolicitud().getConvocatoria().getDescripcion()%></h3>
 	
-	<p>Revise su solicitud para la convocatoria <%= bean.getSolicitud().getConvocatoria().getDescripcion() %>. Una vez confirmada no podrá ser editada</p>
+	<p>Revise su solicitud para la convocatoria <%=bean.getSolicitud().getConvocatoria().getDescripcion()%>. Una vez confirmada no podrá ser editada</p>
 	
-	<% for (BolsaSolicitud bolsa: bean.getListaBolsasSolicitud()) { %>
+	<%
+		for (BolsaSolicitud bolsa: bean.getListaBolsasSolicitud()) {
+		%>
 		
 		<h4>Área - <%= bolsa.getArea().getDescripcion() %></h4>
 		<table class="bluetable bolsaempleo">
@@ -45,14 +57,14 @@ VistaSolicitudes bean = (VistaSolicitudes) uvdatos.getVistas().get(VistaSolicitu
 			</tr>
 			<tbody>
 				<% if (bolsa.getListaMeritos() != null && bolsa.getListaMeritos().size() > 0) { %>
-					<% for (Merito merito: bolsa.getListaMeritos()) { 
-							String codigoItem = merito.getItemBaremacion().getBloqueBaremacion().getApartadoBaremacion().getCodigo() + "." + merito.getItemBaremacion().getBloqueBaremacion().getCodigo() + "." + merito.getItemBaremacion().getCodigo();
+					<% for (MeritoSolicitud merito: bolsa.getListaMeritos()) { 
+							String codigoItem = merito.getMerito().getItemBaremacion().getBloqueBaremacion().getApartadoBaremacion().getCodigo() + "." + merito.getMerito().getItemBaremacion().getBloqueBaremacion().getCodigo() + "." + merito.getMerito().getItemBaremacion().getCodigo();
 					%>
 						<tr>
 							<td><%= codigoItem %></td>
-							<td><%= merito.getItemBaremacion().getNombre() %></td>
-							<td><%= merito.getValor() %></td>
-							<td><%= merito.getDescripcion() %></td>
+							<td><%= merito.getMerito().getItemBaremacion().getNombre() %></td>
+							<td><%= merito.getMerito().getValor() %></td>
+							<td><%= merito.getMerito().getDescripcion() %></td>
 						</tr>
 					<% } %>
 				<% } %>

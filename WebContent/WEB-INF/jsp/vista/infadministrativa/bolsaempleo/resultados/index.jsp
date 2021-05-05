@@ -1,6 +1,6 @@
 <%@ page trimDirectiveWhitespaces="true"%>
-<%@	page import="es.ujaen.uvirtual.controlador.infadministrativa.bolsaempleo.ControladorResultados"%>
-<%@ page import="es.ujaen.uvirtual.beans.vistas.uvirtual.bolsaempleo.VistaResultados" %>
+<%@	page import="es.ujaen.uvirtual.modulo.bolsaempleo.controlador.ControladorResultados"%>
+<%@ page import="es.ujaen.uvirtual.modulo.bolsaempleo.vistas.VistaResultados" %>
 <%@ page import="es.ujaen.uvirtual.beans.UVDatos"%>
 <%@ page import="es.ujaen.uvirtual.utilidades.Formateador"%>
 
@@ -9,7 +9,7 @@ UVDatos uvdatos = (UVDatos)request.getAttribute(UVDatos.NOMBRE_ATRIBUTO);
 VistaResultados bean = (VistaResultados)uvdatos.getVistas().get(VistaResultados.class.getName());
 %>
 
-<div class='bolsas'>
+<div class='bolsa-empleo'>
 	<% if (bean.getMensajesDeExito().size() > 0) { %>
 		<div id="exito" class="success">
 			<%= bean.formatearMensajesDeExito() %>

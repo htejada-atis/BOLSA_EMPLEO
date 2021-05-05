@@ -11,8 +11,8 @@ import bbdd.BbddRunner;
 import bbdd.UtilsTestBolsaEmpleo;
 import controlador.implementacion.PeticionHttp;
 import controlador.implementacion.RespuestaHttp;
-import es.ujaen.uvirtual.beans.vistas.uvirtual.bolsaempleo.VistaInicio;
-import es.ujaen.uvirtual.controlador.infadministrativa.bolsaempleo.ControladorInicio;
+import es.ujaen.uvirtual.modulo.bolsaempleo.controlador.ControladorInicio;
+import es.ujaen.uvirtual.modulo.bolsaempleo.vistas.VistaInicio;
 
 /** test controlador inicio.
  * @author jlopez
