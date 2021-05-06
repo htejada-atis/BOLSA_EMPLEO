@@ -184,7 +184,8 @@ VistaSolicitudes bean = (VistaSolicitudes) uvdatos.getVistas().get(VistaSolicitu
 			        	return row.merito.item.bloque.apartado.codigo + "." + row.merito.item.bloque.codigo + "." + row.merito.item.codigo;
 		        	}},
 		        	{'data': 'merito.item.nombre', 'filter': true, 'render': function(row) {
-			        	return merito;
+		        		console.log(row);
+			        	return row.merito.item.nombre + "<br/> Descripción del usuario: " + row.merito.descripcion;
 		        	}},
 		        	{'data': 'merito.valor', 'filter': true},
 		        	{'data': 'codNum', 'filter': false, 'render': function(row) {

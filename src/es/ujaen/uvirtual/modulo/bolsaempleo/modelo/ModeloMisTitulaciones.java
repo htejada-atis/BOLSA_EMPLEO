@@ -1,5 +1,6 @@
 package es.ujaen.uvirtual.modulo.bolsaempleo.modelo;
 
+import java.io.IOException;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -30,6 +31,7 @@ public class ModeloMisTitulaciones {
 	
 	public static final int COLUMN_DESCRIPCION_MAXLENGTH = 250;
 	
+	public static final int MAX_FILE_SIZE = 5000000;
 	
     protected static ModeloMisTitulaciones eInstancia = null;
 	
@@ -277,18 +279,24 @@ public class ModeloMisTitulaciones {
 	/**	Función que inserta una titulacion de usuario en la BD.
 	 * @param titulacion a insertar en la BD
 	 * @throws SQLException en caso de error en la BD
+	 * @throws IOException .
 	 */
-	public void insertaTitulacionUsuario(Titulacion titulacion) throws SQLException, UVException {
+	public void insertaTitulacionUsuario(Titulacion titulacion) throws SQLException, UVException, IOException {
 		if (titulacion == null) {
 			throw new UVException("No se puede insertar una titulación vacia");
 		}
 		if (titulacion.getArchivo() == null) {
 			throw new UVException("No se puede insertar una titulación sin archivo");
 		}
+		Integer espacio = titulacion.getArchivo().available();
+		if (titulacion.getArchivo().available() > MAX_FILE_SIZE) {
+			throw new UVException("No se puede insertar un archivo tan grande");
+		}
 		
 		String consulta = "INSERT INTO tbep_titulaciones_usuario " 
 						+ " (BEPTUS_TIT_CODNUM,BEPTUS_USU_CODNUM,DESCRIPCION,ARCHIVO) "
 						+ "VALUES (?,?,?,?)";
+		
 		try (Connection conexion = ConexionUvirtual.obtenerInstancia();
 			 PreparedStatement stmt = conexion.prepareStatement(consulta);) {
 			int parameterIndex = 1;

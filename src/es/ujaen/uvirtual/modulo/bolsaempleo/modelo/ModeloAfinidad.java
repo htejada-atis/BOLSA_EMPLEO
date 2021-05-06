@@ -22,11 +22,10 @@ import es.ujaen.uvirtual.utilidades.UVException;
  * @author fcampos
  */
 public class ModeloAfinidad {
-	public static final int ORDER_COLUMN_INDEX_ID = 0;
-	public static final int ORDER_COLUMN_INDEX_CODIGO = 1;
-	public static final int ORDER_COLUMN_INDEX_DESCRIPCION = 2;
-	public static final int ORDER_COLUMN_INDEX_MODULACION = 3;
-	public static final int ORDER_COLUMN_INDEX_BORRADO = 4;
+	public static final int ORDER_COLUMN_INDEX_ID = 1;
+	public static final int ORDER_COLUMN_INDEX_CODIGO = 2;
+	public static final int ORDER_COLUMN_INDEX_DESCRIPCION = 3;
+	public static final int ORDER_COLUMN_INDEX_MODULACION = 4;
 	
 	public static final int COLUMN_DESCRIPCION_MAXLENGTH = 250;
 	public static final int COLUMN_CODIGO_MAXLENGTH = 4;
@@ -68,13 +67,13 @@ public class ModeloAfinidad {
 		
 		String consulta =
 			"SELECT bepafi.* "
-		  + "FROM TBEP_AFINIDADES bepafi"; 
+		  + "FROM TBEP_AFINIDADES bepafi "
+		  + "WHERE FLGBORRADO!='S'"; 
 		
-		dataTable.setColumn(ORDER_COLUMN_INDEX_ID, "bepafi.CODNUM");
+		dataTable.setColumn(ORDER_COLUMN_INDEX_ID, "bepafi.CODNUM", DataTableColumn.COLUMN_TYPE_NUMBER);
 		dataTable.setColumn(ORDER_COLUMN_INDEX_CODIGO, "bepafi.CODIGO");
 		dataTable.setColumn(ORDER_COLUMN_INDEX_DESCRIPCION, "bepafi.DESCRIPCION");
 		dataTable.setColumn(ORDER_COLUMN_INDEX_MODULACION, "bepafi.MODULACION", DataTableColumn.COLUMN_TYPE_NUMBER);	
-		dataTable.setColumn(ORDER_COLUMN_INDEX_BORRADO, "bepafi.FLGBORRADO", DataTableColumn.COLUMN_TYPE_BOOLEAN);	
 		dataTable.setQuery(consulta);
 				
 		try (Connection conexion = ConexionUvirtual.obtenerInstancia();
