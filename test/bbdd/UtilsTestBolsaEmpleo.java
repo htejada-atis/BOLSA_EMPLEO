@@ -22,6 +22,8 @@ public class UtilsTestBolsaEmpleo {
 	private static final String UID_CANDIDATO2_PRUEBAS = "candidato2";
 	private static final String UID_PERSONAL_PRUEBAS = "personal5";
 	private static final int LONGITUD_NAME_SQL = 3;
+	
+	public static final boolean VERBOSE = false;
 
 	private UtilsTestBolsaEmpleo() { }
 	
@@ -142,7 +144,10 @@ public class UtilsTestBolsaEmpleo {
     		return;
     	}
     	    	
-    	LOGGER.log(Level.INFO, "Ejecutando sql: " + file.getAbsolutePath());
+    	if (VERBOSE) {
+    		LOGGER.log(Level.INFO, "Ejecutando sql: " + file.getAbsolutePath());	
+    	}
+    	
     	    	
     	String methodKey = nameSplit[1];		
 		switch (methodKey) {

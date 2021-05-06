@@ -119,13 +119,14 @@ public class ModeloAfinidad {
 	}
 	
 	/** Consulta afinidades en BBDD y las devuelve.
-	 * @return todas las afinidades de la base de datos
+	 * @return todas las afinidades de la base de datos ordenadas por modulacion de mayor a menor
 	 * @throws SQLException en caso de error de base de datos
 	 */
 	public List<Afinidad> listaAfinidades() throws SQLException {
 		List<Afinidad> afinidades = new ArrayList<>();
 		String consulta = "SELECT * FROM TBEP_AFINIDADES bepafi "
-				+ "WHERE bepafi.FLGBORRADO != 'S'";
+				+ "WHERE bepafi.FLGBORRADO != 'S' "
+				+ "ORDER BY bepafi.MODULACION DESC";
 		
 		try (Connection conexion = ConexionUvirtual.obtenerInstancia();
 			PreparedStatement stmt = conexion.prepareStatement(consulta);) {

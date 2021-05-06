@@ -25,17 +25,17 @@ import com.google.gson.GsonBuilder;
 import com.google.gson.reflect.TypeToken;
 import es.ujaen.uvirtual.beans.CodigoDescripcion;
 import es.ujaen.uvirtual.beans.UVDatos;
-import es.ujaen.uvirtual.beans.Usuario;
+import es.ujaen.uvirtual.modulo.bolsaempleo.beans.Afinidad;
 import es.ujaen.uvirtual.modulo.bolsaempleo.beans.Bolsa;
 import es.ujaen.uvirtual.modulo.bolsaempleo.beans.BolsaCandidato;
 import es.ujaen.uvirtual.modulo.bolsaempleo.beans.BolsaSolicitud;
-import es.ujaen.uvirtual.modulo.bolsaempleo.beans.TablaBolsaSolicitud;
+import es.ujaen.uvirtual.modulo.bolsaempleo.beans.BolsaSolicitudTable;
 import es.ujaen.uvirtual.modulo.bolsaempleo.beans.Convocatoria;
 import es.ujaen.uvirtual.modulo.bolsaempleo.beans.Merito;
 import es.ujaen.uvirtual.modulo.bolsaempleo.beans.MeritoSolicitud;
+import es.ujaen.uvirtual.modulo.bolsaempleo.beans.MeritoSolicitudTable;
 import es.ujaen.uvirtual.modulo.bolsaempleo.beans.Solicitud;
 import es.ujaen.uvirtual.modulo.bolsaempleo.beans.Titulacion;
-import es.ujaen.uvirtual.modulo.bolsaempleo.beans.UsuarioBolsaEmpleo;
 import es.ujaen.uvirtual.modulo.bolsaempleo.modelo.ModeloAfinidad;
 import es.ujaen.uvirtual.modulo.bolsaempleo.modelo.ModeloArea;
 import es.ujaen.uvirtual.modulo.bolsaempleo.modelo.ModeloBolsa;
@@ -80,8 +80,10 @@ public class ControladorMisSolicitudes extends HttpServlet {
 	public static final String PARAM_BOLSA = "bolsa";
 	public static final String PARAM_BOLSAS = "bolsas";
 	public static final String PARAM_CONVOCATORIA_ID = "idConvocatoria";
-	public static final String PARAM_MERITO = "merito";
+	public static final String PARAM_MERITO_ID = "merito";
 	public static final String PARAM_SOLICITUD_ID = "idSolicitud";
+	public static final String PARAM_AFINIDAD_ID = "idAfinidad";
+	public static final String PARAM_MERITO_SOLICITUD_ID = "idMeritoSolicitud";
 	
 	// acciones solicitudes
 	public static final String ACCION_CONSULTAR_SOLICITUD = "consultarSolicitud";
@@ -100,6 +102,7 @@ public class ControladorMisSolicitudes extends HttpServlet {
 	public static final String ACCION_LISTAR_BOLSAS_SOLICITUD = "listarbolsassolicitud";
 	public static final String ACCION_MERITO_DESELECCIONADO = "meritodeseleccionado";
 	public static final String ACCION_MERITO_SELECCIONADO = "meritoseleccionado";
+	public static final String ACCION_MERITO_AFINIDAD = "afinidadseleccionada";
 	
 	// acciones paso 3: Confirmar Solicitud
 	public static final String ACCION_CONFIRMAR_SOLICITUD = "confirmarsolicitud";
@@ -142,8 +145,6 @@ public class ControladorMisSolicitudes extends HttpServlet {
 	public static final int COLOR_254 = 254;
 	public static final int COLSPAN_4 = 4;
 	
-	private UsuarioBolsaEmpleo usuario = null;
-	
 	/** Peticion GET.
 	 * @see HttpServlet#doGet(HttpServletRequest request, HttpServletResponse response)
 	 */
@@ -161,8 +162,8 @@ public class ControladorMisSolicitudes extends HttpServlet {
 		}
 
 		try {
-			this.usuario = ModeloUsuarioBolsaEmpleo.obtenerInstancia().getUsuarioLogeado(datos);
-
+			bean.setCandidato(ModeloUsuarioBolsaEmpleo.obtenerInstancia().getUsuarioCandidato(datos));
+			
 			switch (nombreAccion) {
 				case ACCION_CONSULTAR_SOLICITUD:
 				case ACCION_CREAR_SOLICITUD:
@@ -180,6 +181,7 @@ public class ControladorMisSolicitudes extends HttpServlet {
 				case ACCION_LISTAR_BOLSAS_SOLICITUD:
 				case ACCION_MERITO_DESELECCIONADO:
 				case ACCION_MERITO_SELECCIONADO:
+				case ACCION_MERITO_AFINIDAD:
 					accionesPaso2(bean, datos, request, response, nombreAccion);
 					break;
 				case ACCION_CONFIRMAR_SOLICITUD:
@@ -254,8 +256,9 @@ public class ControladorMisSolicitudes extends HttpServlet {
 		
 		bean.setVista(RUTA_BEP_SOL + "indexSolicitudes.jsp");
 		
-		Convocatoria convocatoria = modeloConvocatoria.getConvocatoriaById(Formateador.leeParametroInteger(request.getParameter(PARAM_CONVOCATORIA_ID)));		
-		Solicitud solicitud = modeloSolicitud.nuevaSolicitud(usuario, convocatoria);
+		Convocatoria convocatoria = modeloConvocatoria.getConvocatoriaById(Formateador.leeParametroInteger(request.getParameter(PARAM_CONVOCATORIA_ID)));
+				
+		Solicitud solicitud = modeloSolicitud.nuevaSolicitud(bean.getCandidato(), convocatoria);
 				
 		bean.setSolicitud(solicitud);
 		listaBolsas(bean, solicitud);
@@ -310,7 +313,7 @@ public class ControladorMisSolicitudes extends HttpServlet {
 		
 		try (PrintWriter writer = response.getWriter()) {
 			try {
-				BolsaEmpleoDataTable<Solicitud> dataTable = modelo.listaSolicitudesDatatable(usuario, request.getParameterMap());
+				BolsaEmpleoDataTable<Solicitud> dataTable = modelo.listaSolicitudesDatatable(bean.getCandidato(), request.getParameterMap());
 				bean.setDatatableSolicitudes(dataTable);
 				
 				Gson gson = new GsonBuilder().setDateFormat("dd/M/yyyy").
@@ -362,7 +365,7 @@ public class ControladorMisSolicitudes extends HttpServlet {
 		
 		Solicitud solicitud = modeloSolicitud.getSolicitudById(Formateador.leeParametroInteger(request.getParameter(PARAM_SOLICITUD_ID)));
 		bean.setSolicitud(solicitud);		
-		listaBolsas(bean, solicitud);	
+		listaBolsas(bean, solicitud);
 		
 		List<String> idBolsas = null;
 			
@@ -382,7 +385,7 @@ public class ControladorMisSolicitudes extends HttpServlet {
 				throw new UVException("Ha selecciona una bolsa no baremable");
 			}
 			
-			if (modeloArea.isUsuarioExcluidoBolsa(usuario, bolsa.getArea())) {
+			if (modeloArea.isUsuarioExcluidoBolsa(bean.getCandidato(), bolsa.getArea())) {
 				throw new UVException("Usuario excluido de la bolsa");
 			}
 							
@@ -434,10 +437,7 @@ public class ControladorMisSolicitudes extends HttpServlet {
 		
 		try (PrintWriter writer = response.getWriter()) {
 			try {
-				Usuario usuArcos = datos.getUsuario();
-				ModeloUsuarioBolsaEmpleo modeloUsuarioBolsaEmpleo = ModeloUsuarioBolsaEmpleo.obtenerInstancia();
-				Integer idUsuario = modeloUsuarioBolsaEmpleo.listaUsuario(usuArcos.getUid()).getCodNum();
-				BolsaEmpleoDataTable<BolsaCandidato> dataTable = modelo.listaAreaSolicitudDatatable(request.getParameterMap(), idUsuario);
+				BolsaEmpleoDataTable<BolsaCandidato> dataTable = modelo.listaAreaSolicitudDatatable(request.getParameterMap(), bean.getCandidato().getCodNum());
 				Gson gson = new GsonBuilder().setExclusionStrategies(BolsaEmpleoDataTable.GSONEXCLUSIONSTRATEGY).create();
 				bean.setDataTableBolsasCandidato(dataTable);
 				writer.write(gson.toJson(dataTable));
@@ -475,6 +475,9 @@ public class ControladorMisSolicitudes extends HttpServlet {
 			case ACCION_MERITO_SELECCIONADO:
 				seleccionarMerito(bean, datos, request, response, true);
 				break;
+			case ACCION_MERITO_AFINIDAD:
+				seleccionarAfinidad(bean, datos, request, response);
+				break;
 		}
 	}
 	
@@ -506,7 +509,7 @@ public class ControladorMisSolicitudes extends HttpServlet {
 	}
 	
 	/** 
-	 * Selecciona un mérito para agregarlo a una bolsa .
+	 * Selecciona un mérito para agregarlo o quitarlo de una bolsa .
 	 * @param bean .
 	 * @param datos .
 	 * @param request .
@@ -516,42 +519,77 @@ public class ControladorMisSolicitudes extends HttpServlet {
 	 * @throws SQLException .
 	 */
 	private void seleccionarMerito(VistaSolicitudes bean, UVDatos datos, HttpServletRequest request, HttpServletResponse response, Boolean seleccionado)
-			throws IOException, UVException, SQLException {
+			throws UVException, SQLException {
 		ModeloBolsa modeloBolsa = ModeloBolsa.obtenerInstancia();
 		ModeloMerito modeloMerito = ModeloMerito.obtenerInstancia();
 		ModeloSolicitud modeloSolicitud = ModeloSolicitud.obtenerInstancia();
 		
 		Bolsa area = modeloBolsa.getBolsaById(Formateador.leeParametroInteger(request.getParameter(PARAM_BOLSA)));
 		bean.setArea(area);
-		
+
 		Solicitud solicitud = modeloSolicitud.getSolicitudById(Formateador.leeParametroInteger(request.getParameter(PARAM_SOLICITUD_ID)));
 		bean.setSolicitud(solicitud);
-		
-		Merito merito = modeloMerito.listaMerito(Formateador.leeParametroInteger(request.getParameter(PARAM_MERITO)));
+
+		Merito merito = modeloMerito.listaMerito(Formateador.leeParametroInteger(request.getParameter(PARAM_MERITO_ID)));
 		bean.setMerito(merito);
-		
+
 		if (merito == null) {
 			throw new UVException("merito no puede ser nulo");
 		}
-		
+
 		if (solicitud == null) {
 			throw new UVException("solicitud no puede ser nula");
 		}
-		
-		if (seleccionado) {
-			// comprobamos que el total de méritos por bloque de la solicitud sea menor que el permitido por la convocatoria
+
+		if (Boolean.TRUE.equals(seleccionado)) {
+			// comprobamos que el total de méritos por bloque de la solicitud sea menor que
+			// el permitido por la convocatoria
 			Integer totalMeritos = modeloSolicitud.obtenerTotalMeritosPorBloqueSolicitud(solicitud, merito);
-			
+
 			if (totalMeritos >= solicitud.getConvocatoria().getNumMeritosPorBloque()) {
 				throw new UVException(MENSAJE_ERROR_NUMERO_MAXIMO_MERITOS_BLOQUE);
 			}
-			
+
 			modeloSolicitud.asignarMeritosASolicitudBolsa(solicitud, area, merito);
 		} else {
 			modeloSolicitud.borrarMeritoDeSolicitudBolsa(solicitud, area, merito);
 		}
+
+		this.seleccionarBolsa(bean, datos, request, response);
+	}
+	
+	/**
+	 * Establece la afinidad del merito dentro del area que ha seleccionado el candidato.
+	 * @param bean .
+	 * @param datos .
+	 * @param request .
+	 * @param response .
+	 * @throws UVException .
+	 * @throws SQLException .
+	 */
+	private void seleccionarAfinidad(VistaSolicitudes bean, UVDatos datos, HttpServletRequest request, HttpServletResponse response) throws SQLException, UVException {
+		Bolsa area = ModeloBolsa.obtenerInstancia().getBolsaById(Formateador.leeParametroInteger(request.getParameter(PARAM_BOLSA)));
+		bean.setArea(area);
+
+		Solicitud solicitud = ModeloSolicitud.obtenerInstancia().getSolicitudById(Formateador.leeParametroInteger(request.getParameter(PARAM_SOLICITUD_ID)));
+		bean.setSolicitud(solicitud);
+
+		Merito merito = ModeloMerito.obtenerInstancia().listaMerito(Formateador.leeParametroInteger(request.getParameter(PARAM_MERITO_ID)));
+		bean.setMerito(merito);
 		
-		this.seleccionarBolsa(bean, datos, request, response);		
+		Afinidad afinidad = ModeloAfinidad.obtenerInstancia().getAfinidadById(Formateador.leeParametroInteger(request.getParameter(PARAM_AFINIDAD_ID))); 
+
+		if (merito == null) {
+			throw new UVException("merito no puede ser nulo");
+		}
+
+		if (solicitud == null) {
+			throw new UVException("solicitud no puede ser nula");
+		}
+		
+		ModeloSolicitud.obtenerInstancia().asignarAfinidadMeritoIndividualizado(solicitud, area, merito, afinidad);
+
+		this.seleccionarBolsa(bean, datos, request, response);
 	}
 	
 	/** 
@@ -593,7 +631,7 @@ public class ControladorMisSolicitudes extends HttpServlet {
 		
 		try (PrintWriter writer = response.getWriter()) {
 			try {
-				BolsaEmpleoDataTable<TablaBolsaSolicitud> dataTable = modelo.listaBolsasSolicitudesDatatable(solicitud, request.getParameterMap());
+				BolsaEmpleoDataTable<BolsaSolicitudTable> dataTable = modelo.listaBolsasSolicitudesDatatable(solicitud, request.getParameterMap());
 				bean.setDatatableBolsasSolicitud(dataTable);
 				Gson gson = new GsonBuilder().setExclusionStrategies(BolsaEmpleoDataTable.GSONEXCLUSIONSTRATEGY).create();				
 				writer.write(gson.toJson(dataTable));
@@ -617,7 +655,6 @@ public class ControladorMisSolicitudes extends HttpServlet {
 	 */
 	private void listadoMeritosCandidato(VistaSolicitudes bean, UVDatos datos, HttpServletRequest request, HttpServletResponse response)
 			throws IOException, SQLException, UVException {
-		ModeloMerito modelo = ModeloMerito.obtenerInstancia();
 		
 		datos.setContentType("application/json");
 		datos.setRespuestaEnviada(true);
@@ -626,7 +663,10 @@ public class ControladorMisSolicitudes extends HttpServlet {
 		
 		try (PrintWriter writer = response.getWriter()) {
 			try {
-				BolsaEmpleoDataTable<MeritoSolicitud> dataTable = modelo.listaMeritosSolicitudDatatable(request.getParameterMap(), this.usuario);
+				Bolsa bolsa = ModeloBolsa.obtenerInstancia().getBolsaById(Formateador.leeParametroInteger(request.getParameter(PARAM_BOLSA)));
+				
+				BolsaEmpleoDataTable<MeritoSolicitudTable> dataTable = ModeloSolicitud.obtenerInstancia().
+						listaMeritosSolicitudDatatable(request.getParameterMap(), bean.getCandidato(), bolsa);
 				bean.setDataTableMeritos(dataTable);
 				Gson gson = new GsonBuilder().setExclusionStrategies(BolsaEmpleoDataTable.GSONEXCLUSIONSTRATEGY).create();
 				writer.write(gson.toJson(dataTable));
@@ -669,7 +709,7 @@ public class ControladorMisSolicitudes extends HttpServlet {
 	 * @throws UVException .
 	 */
 	private void resumenSolicitud(VistaSolicitudes bean, UVDatos datos, HttpServletRequest request, HttpServletResponse response)
-			throws IOException, SQLException, UVException {
+			throws SQLException, UVException {
 		bean.setVista(RUTA_BEP_SOL + "paso2.jsp");
 		bean.setListaAfinidades(ModeloAfinidad.obtenerInstancia().listaAfinidades());
 		bean.setListaTipoAfinidades(ModeloAfinidad.obtenerInstancia().getTiposAfinidad());
@@ -681,13 +721,13 @@ public class ControladorMisSolicitudes extends HttpServlet {
 		bean.setSolicitud(solicitud);
 		
 		
-		List<Titulacion> titulaciones = modeloTitulacion.listaTitulacionesCandidato(this.usuario.getCodNum());
+		List<Titulacion> titulaciones = modeloTitulacion.listaTitulacionesCandidato(bean.getCandidato().getCodNum());
 		bean.setListaTitulaciones(titulaciones);
 		
 		// comprobamos que el total de méritos sea mayor que 0
 		Integer totalMeritos = modeloSolicitud.obtenerTotalMeritosSolicitud(solicitud);
 		
-		if (!(totalMeritos > 0)) {
+		if (totalMeritos <= 0) {
 			throw new UVException(MENSAJE_ERROR_SIN_MERITOS);
 		}
 		
@@ -720,7 +760,7 @@ public class ControladorMisSolicitudes extends HttpServlet {
 		
 		solicitud.setEstado(ModeloSolicitud.SOLICITUD_ESTADO_CERRADA);
 		solicitud.setFechaConfirmacion(new Date());
-		solicitud.setArchivo(generarPDF(solicitud, listaBolsas));
+		solicitud.setArchivo(generarPDF(bean, solicitud, listaBolsas));
 		
 		modeloSolicitud.confirmacionSolicitud(solicitud);
 		
@@ -745,7 +785,7 @@ public class ControladorMisSolicitudes extends HttpServlet {
 		Solicitud solicitud = modeloSolicitud.getSolicitudByIdArchivo(Formateador.leeParametroInteger(request.getParameter(PARAM_SOLICITUD_ID)));
 		bean.setSolicitud(solicitud);
 		
-		if (this.usuario.getCodNum() != solicitud.getUsuario().getCodNum()) {
+		if (bean.getCandidato().getCodNum().equals(solicitud.getUsuario().getCodNum())) {
 			throw new UVException("No tienes permisos");
 		}
         
@@ -766,21 +806,20 @@ public class ControladorMisSolicitudes extends HttpServlet {
 	
 	/**
 	 * generar PDF de la solicitud .
+	 * @param bean .
 	 * @param solicitud .
 	 * @param bolsasSolicitud .
 	 * @return InputStream .
 	 * @throws UVException .
 	 */
-	public InputStream generarPDF(Solicitud solicitud, List<BolsaSolicitud> bolsasSolicitud) throws UVException {
-		try {
-			Document document = new Document();
-
+	public InputStream generarPDF(VistaSolicitudes bean, Solicitud solicitud, List<BolsaSolicitud> bolsasSolicitud) throws UVException {
+		try (Document document = new Document()) {
 			// create a PDF writer instance and pass output stream
 			ByteArrayOutputStream out = new ByteArrayOutputStream();
 			PdfWriter.getInstance(document, out);
 
 			document.open();
-			document.addAuthor(this.usuario.getNombre() + " " + this.usuario.getPrimerApellido() + " " + this.usuario.getSegundoApellido());
+			document.addAuthor(bean.getCandidato().getNombre() + " " + bean.getCandidato().getPrimerApellido() + " " + bean.getCandidato().getSegundoApellido());
 			document.addTitle("Solicitud_" + solicitud.getConvocatoria().getDescripcion());
 			document.addCreationDate();
 
@@ -791,8 +830,8 @@ public class ControladorMisSolicitudes extends HttpServlet {
 			Font font2 = new Font(Font.BOLD);
 			font2.setStyle("bold");
 			
-			document.add(new Paragraph("Usuario: " + this.usuario.getNombre() + " " + this.usuario.getPrimerApellido() + " " 
-					+ this.usuario.getSegundoApellido(), font2));
+			document.add(new Paragraph("Usuario: " + bean.getCandidato().getNombre() + " " + bean.getCandidato().getPrimerApellido() + " " 
+					+ bean.getCandidato().getSegundoApellido(), font2));
 			document.add(new Paragraph("Convocatoria: " + solicitud.getConvocatoria().getDescripcion(), font2));
 			document.add(new Paragraph("Fecha confirmación de solicitud: " 
 					+ Formateador.formatoFecha(solicitud.getFechaConfirmacion(), Formateador.FORMATO_FECHA_DDMMYYYY_HHMMSS), font2));
@@ -802,19 +841,18 @@ public class ControladorMisSolicitudes extends HttpServlet {
 			for (BolsaSolicitud bolsa: bolsasSolicitud) {
 				this.generarPDFArea(bolsa, bolsasSolicitud, document);
 			}
-			document.close();
+			
 			return new ByteArrayInputStream(out.toByteArray());
 		} catch (Exception exp) {
-			System.out.println(exp.getMessage());
 			throw new UVException("Error generando pdf, consulte con los administradores");
 		}
 	}
 	
 	private void generarPDFArea(BolsaSolicitud bolsa, List<BolsaSolicitud> bolsasSolicitud, Document document) {
 		Table table = new Table(PDF_TABLE_COLUMNS, bolsasSolicitud.size());
-		
-		this.generarPDFAreaHeader(table, bolsa);
-		
+
+		this.generarPDFAreaHeader(table);
+
 		if (bolsa.getNumeroMeritos() != null && bolsa.getNumeroMeritos() > 0) {
 			for (MeritoSolicitud merito: bolsa.getListaMeritos()) {
 				String codigoItem = merito.getMerito().getItemBaremacion().getBloqueBaremacion().getApartadoBaremacion().getCodigo() + "." 
@@ -830,7 +868,7 @@ public class ControladorMisSolicitudes extends HttpServlet {
 				cell = new Cell(merito.getMerito().getValor().toString());
 				cell.setBackgroundColor(new Color(COLOR_241, COLOR_241, COLOR_241));
 				table.addCell(cell);
-				cell = new Cell(merito.getMerito().getDescripcion().toString());
+				cell = new Cell(merito.getMerito().getDescripcion());
 				cell.setBackgroundColor(new Color(COLOR_241, COLOR_241, COLOR_241));
 				table.addCell(cell);
 			}
@@ -838,23 +876,23 @@ public class ControladorMisSolicitudes extends HttpServlet {
 			Cell cell = new Cell(MENSAJE_AREA_SIN_MERITOS);
 			cell.setColspan(COLSPAN_4);
 			cell.setBackgroundColor(new Color(COLOR_241, COLOR_241, COLOR_241));
-	        table.addCell(cell);
+			table.addCell(cell);
 		}
-		
+
 		com.lowagie.text.List lista = new com.lowagie.text.List();
 		lista.setListSymbol("• ");
 		lista.add("Área - " + bolsa.getArea().getDescripcion());
-		
-        document.add(lista);
-		document.add(table);		
+
+		document.add(lista);
+		document.add(table);	
 	}
 	
-	private void generarPDFAreaHeader(Table table, BolsaSolicitud bolsa) {				
+	private void generarPDFAreaHeader(Table table) {
 		table.setBorderWidth(1);
 		table.setBorderColor(new Color(0, 0, 0));
 		table.setPadding(PDF_TABLE_PADDING);
 		table.setWidth(SIZE_100);
-		
+
 		Font font = new Font();
 		font.setColor(new Color(0, COLOR_51, COLOR_153));
 
@@ -863,24 +901,24 @@ public class ControladorMisSolicitudes extends HttpServlet {
 		cell.setHeader(true);
 		cell.setBackgroundColor(new Color(COLOR_185, COLOR_201, COLOR_254));
 		table.addCell(cell);
-		
+
 		Phrase phrase2 = new Phrase("Mérito", font);
 		cell = new Cell(phrase2);
 		cell.setHeader(true);
 		cell.setBackgroundColor(new Color(COLOR_185, COLOR_201, COLOR_254));
 		table.addCell(cell);
-		
+
 		Phrase phrase3 = new Phrase("Valor", font);
 		cell = new Cell(phrase3);
 		cell.setHeader(true);
 		cell.setBackgroundColor(new Color(COLOR_185, COLOR_201, COLOR_254));
 		table.addCell(cell);
-		
+
 		Phrase phrase4 = new Phrase("Descripción", font);
 		cell = new Cell(phrase4);
 		cell.setHeader(true);
 		cell.setBackgroundColor(new Color(COLOR_185, COLOR_201, COLOR_254));
 		table.addCell(cell);
-		table.endHeaders();		
-	}	
+		table.endHeaders();
+	}
 }
