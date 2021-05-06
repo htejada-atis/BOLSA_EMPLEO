@@ -138,8 +138,9 @@ public class ModeloMeritosPreferentes {
 	/** Consulta meritos preferentes en BBDD y las devuelve.
 	 * @return todos los meritos de la base de datos
 	 * @throws SQLException en caso de error de base de datos
+	 * @throws UVException 
 	 */
-	public List<MeritoPreferente> listaMeritosPreferentes() throws SQLException {
+	public List<MeritoPreferente> listaMeritosPreferentes() throws SQLException, UVException {
 		List<MeritoPreferente> meritos = new ArrayList<>();
 		String consulta = "SELECT bepmep.* "
 				  + "FROM TBEP_MERITOS_PREFERENTES bepmep";
@@ -148,13 +149,8 @@ public class ModeloMeritosPreferentes {
 			PreparedStatement stmt = conexion.prepareStatement(consulta);) {
 				try (ResultSet rs = stmt.executeQuery()) {
 					while (rs.next()) {
-						try {
-							MeritoPreferente row = this.createApartadoFromResultSet(rs);
-							meritos.add(row);		
-						} catch (Exception e) {
-							e.printStackTrace();
-						}
-						
+						MeritoPreferente row = this.createApartadoFromResultSet(rs);
+						meritos.add(row);		
 					}
 				}
 			}

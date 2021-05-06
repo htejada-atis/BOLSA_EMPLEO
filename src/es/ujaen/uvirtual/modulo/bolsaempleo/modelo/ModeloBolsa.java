@@ -123,11 +123,7 @@ public class ModeloBolsa {
 			PreparedStatement stmt = conexion.prepareStatement(consulta);) {
 				try (ResultSet rs = stmt.executeQuery()) {
 					while (rs.next()) {
-						try {
-							bolsas.add(this.createFromResultSet(rs));		
-						} catch (Exception e) {
-							e.printStackTrace();
-						}
+						bolsas.add(this.createFromResultSet(rs));		
 					}
 				}
 			}

@@ -85,19 +85,14 @@ public class ModeloNoticia {
 			}
 			try (ResultSet rs = stmt.executeQuery()) {
 				while (rs.next()) {
-					try {
-						Noticia not = new Noticia();
-						not.setCodNum(rs.getInt("CODNUM"));
-						not.setEnlace(rs.getString("ENLACE"));
-						not.setTexto(rs.getString("TEXTO"));
-						not.setFecha(rs.getTimestamp("FECHA"));
-						not.setPublica(rs.getString("FLGPUBLICA").equals("S"));
-						not.setActiva(rs.getString("FLGACTIVA").equals("S"));
-						noticias.add(not);
-					} catch (Exception e) {
-						e.printStackTrace();
-					}
-					
+					Noticia not = new Noticia();
+					not.setCodNum(rs.getInt("CODNUM"));
+					not.setEnlace(rs.getString("ENLACE"));
+					not.setTexto(rs.getString("TEXTO"));
+					not.setFecha(rs.getTimestamp("FECHA"));
+					not.setPublica(rs.getString("FLGPUBLICA").equals("S"));
+					not.setActiva(rs.getString("FLGACTIVA").equals("S"));
+					noticias.add(not);
 				}
 			}
 		}
@@ -209,18 +204,14 @@ public class ModeloNoticia {
 			
 			try (ResultSet rs = stmt.executeQuery()) {
 				while (rs.next()) {
-					try {
-						Noticia not = new Noticia();
-						not.setCodNum(rs.getInt("CODNUM"));
-						not.setEnlace(rs.getString("ENLACE"));
-						not.setTexto(rs.getString("TEXTO"));
-						not.setFecha(rs.getTimestamp("FECHA"));
-						not.setPublica(rs.getString("FLGPUBLICA").equals("S"));
-						not.setActiva(rs.getString("FLGACTIVA").equals("S"));
-						noticias.add(not);
-					} catch (Exception e) {
-						e.printStackTrace();
-					}
+					Noticia not = new Noticia();
+					not.setCodNum(rs.getInt("CODNUM"));
+					not.setEnlace(rs.getString("ENLACE"));
+					not.setTexto(rs.getString("TEXTO"));
+					not.setFecha(rs.getTimestamp("FECHA"));
+					not.setPublica(rs.getString("FLGPUBLICA").equals("S"));
+					not.setActiva(rs.getString("FLGACTIVA").equals("S"));
+					noticias.add(not);
 				}
 			}
 		}

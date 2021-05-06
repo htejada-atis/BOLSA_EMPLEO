@@ -62,8 +62,9 @@ public class ModeloArea {
 	 * @param clausula para filtrar las areas de la bd
 	 * @return areas de la base de datos
 	 * @throws SQLException en caso de error de base de datos
+	 * @throws UVException .
 	 */
-	private List<Area> listaAreas(String clausula) throws SQLException {
+	private List<Area> listaAreas(String clausula) throws SQLException, UVException {
 		ModeloDepartamento modeloDepartamento = ModeloDepartamento.obtenerInstancia();
 		List<Area> areas = new ArrayList<>();
 		String consulta = "SELECT bepare.* FROM TBEP_AREAS bepare " + clausula;
@@ -72,18 +73,13 @@ public class ModeloArea {
 			PreparedStatement stmt = conexion.prepareStatement(consulta);) {
 				try (ResultSet rs = stmt.executeQuery()) {
 					while (rs.next()) {
-						try {
 							Area are = new Area();
 							are.setCodNum(rs.getInt("CODNUM"));
 							are.setDepartamento(modeloDepartamento.getDepartamentoByCodNum(rs.getInt("BEPDEP_CODNUM")));
 							are.setIdAreaExterno(rs.getString("ID_AREA_CONOCIMIENTO"));
 							are.setIdSeccion(rs.getString("ID_SECCION"));
 							are.setDescripcion(rs.getString("DES_AREA_CONOCIMIENTO"));
-							areas.add(are);
-						} catch (Exception e) {
-							e.printStackTrace();
-						}
-						
+							areas.add(are);	
 					}
 				}
 			}
@@ -93,8 +89,9 @@ public class ModeloArea {
 	/** lista todas las areas.
 	 * @return lista de todas las areas
 	 * @throws SQLException si hay un error en la base de datos
+	 * @throws UVException .
 	 */
-	public List<Area> listaAreas() throws SQLException {
+	public List<Area> listaAreas() throws SQLException, UVException {
 		return listaAreas(" ORDER BY DES_AREA_CONOCIMIENTO");
 	}
 		

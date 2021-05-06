@@ -132,17 +132,12 @@ public class ModeloAfinidad {
 			PreparedStatement stmt = conexion.prepareStatement(consulta);) {
 				try (ResultSet rs = stmt.executeQuery()) {
 					while (rs.next()) {
-						try {
-							Afinidad afinidad = new Afinidad();
-							afinidad.setCodNum(rs.getInt("CODNUM"));
-							afinidad.setCodigo(rs.getString("CODIGO"));
-							afinidad.setDescripcion(rs.getString("DESCRIPCION"));
-							afinidad.setModulacion(rs.getFloat("MODULACION"));
-							afinidades.add(afinidad);	
-						} catch (Exception e) {
-							e.printStackTrace();
-						}
-						
+						Afinidad afinidad = new Afinidad();
+						afinidad.setCodNum(rs.getInt("CODNUM"));
+						afinidad.setCodigo(rs.getString("CODIGO"));
+						afinidad.setDescripcion(rs.getString("DESCRIPCION"));
+						afinidad.setModulacion(rs.getFloat("MODULACION"));
+						afinidades.add(afinidad);	
 					}
 				}
 			}
@@ -163,15 +158,10 @@ public class ModeloAfinidad {
 			PreparedStatement stmt = conexion.prepareStatement(consulta);) {
 				try (ResultSet rs = stmt.executeQuery()) {
 					while (rs.next()) {
-						try {
-							Afinidad afinidad = new Afinidad();
-							afinidad.setCodigo(rs.getString("CODIGO"));
-							afinidad.setDescripcion(rs.getString("DESCRIPCION"));
-							afinidades.add(afinidad);	
-						} catch (Exception e) {
-							e.printStackTrace();
-						}
-						
+						Afinidad afinidad = new Afinidad();
+						afinidad.setCodigo(rs.getString("CODIGO"));
+						afinidad.setDescripcion(rs.getString("DESCRIPCION"));
+						afinidades.add(afinidad);	
 					}
 				}
 			}
