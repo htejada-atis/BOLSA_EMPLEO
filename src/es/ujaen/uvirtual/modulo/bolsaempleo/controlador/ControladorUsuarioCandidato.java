@@ -75,6 +75,8 @@ public class ControladorUsuarioCandidato extends HttpServlet {
 	public static final String PARAM_BORRADO = "borrar";
 	public static final String PARAM_EMAIL = "email";
 	
+	public static final Integer PARAM_ROLE_CANDIDATO = 1052;
+	
 	// acciones
 	public static final String ACCION_LISTAR = "listar";
 	public static final String ACCION_DATATABLE = "datatable";
@@ -422,7 +424,7 @@ public class ControladorUsuarioCandidato extends HttpServlet {
 			String razonexcluido = EscapaHTML.ajustaCodificacion(request.getParameter(PARAM_RAZON_EXCLUIDO));
 				
 			ModeloRol modeloRol = ModeloRol.obtenerInstancia();
-			Rol role = modeloRol.getRoleById(Formateador.leeParametroInteger(request.getParameter(PARAM_ROLE)));
+			Rol role = modeloRol.getRoleById(PARAM_ROLE_CANDIDATO);
 				
 			Date fechaini = validator.getValueDate(PARAM_FECHA_EXCLUIDO_INICIO);
 			Date fechafin = validator.getValueDate(PARAM_FECHA_EXCLUIDO_FIN);

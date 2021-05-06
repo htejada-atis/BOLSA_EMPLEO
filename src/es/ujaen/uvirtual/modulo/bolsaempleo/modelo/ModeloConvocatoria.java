@@ -137,19 +137,14 @@ public class ModeloConvocatoria {
 			PreparedStatement stmt = conexion.prepareStatement(consulta);) {
 				try (ResultSet rs = stmt.executeQuery()) {
 					while (rs.next()) {
-						try {
-							Convocatoria convocatoria = new Convocatoria();
-							convocatoria.setCodNum(rs.getInt("CODNUM"));
-							convocatoria.setDescripcion(rs.getString("DESCRIPCION"));
-							convocatoria.setFechaCierre(rs.getDate("FECHACIERRE"));
-							convocatoria.setEstado(rs.getString("ESTADO"));		
-							convocatoria.setNumBolsasMaximo(rs.getInt("NUMBOLSASMAXIMO"));		
-							convocatoria.setNumMeritosPorBloque(rs.getInt("NUMMERITOSPORBLOQUE"));		
-							convocatorias.add(convocatoria);	
-						} catch (Exception e) {
-							e.printStackTrace();
-						}
-						
+						Convocatoria convocatoria = new Convocatoria();
+						convocatoria.setCodNum(rs.getInt("CODNUM"));
+						convocatoria.setDescripcion(rs.getString("DESCRIPCION"));
+						convocatoria.setFechaCierre(rs.getDate("FECHACIERRE"));
+						convocatoria.setEstado(rs.getString("ESTADO"));		
+						convocatoria.setNumBolsasMaximo(rs.getInt("NUMBOLSASMAXIMO"));		
+						convocatoria.setNumMeritosPorBloque(rs.getInt("NUMMERITOSPORBLOQUE"));		
+						convocatorias.add(convocatoria);
 					}
 				}
 			}

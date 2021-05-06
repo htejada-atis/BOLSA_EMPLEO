@@ -62,6 +62,8 @@ $(document).ready(function() {
 	    "ajax": { url: "/srv/es/ajax/informacionadministrativa/bolsaempleo/configuracion/afinidades" },
 	    "selectable": true,
 	    "pageSize": 10,
+    	"defaultOrderBy": 2,
+    	"defaultOrderDirection": 'desc',
 	    "action": "<%= ControladorAfinidades.ACCION_DATATABLE %>",
 	    "columns": [
 	    	{'data': 'codNum', 'selectable': true},

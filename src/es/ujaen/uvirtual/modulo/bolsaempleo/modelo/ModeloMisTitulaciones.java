@@ -93,17 +93,12 @@ public class ModeloMisTitulaciones {
 			PreparedStatement stmt = conexion.prepareStatement(consulta);) {
 				try (ResultSet rs = stmt.executeQuery()) {
 					while (rs.next()) {
-						try {
-							Titulacion tit = new Titulacion();
-							tit.setCodNum(rs.getInt("CODNUM"));
-							tit.setDescripcion(rs.getString("DESCRIPCION"));
-							tit.setArchivo(rs.getBlob("ARCHIVO").getBinaryStream());
-							tit.setBorrado(rs.getString("FLGBORRADO").equals("S"));
-							titulaciones.add(tit);		
-						} catch (Exception e) {
-							e.printStackTrace();
-						}
-						
+						Titulacion tit = new Titulacion();
+						tit.setCodNum(rs.getInt("CODNUM"));
+						tit.setDescripcion(rs.getString("DESCRIPCION"));
+						tit.setArchivo(rs.getBlob("ARCHIVO").getBinaryStream());
+						tit.setBorrado(rs.getString("FLGBORRADO").equals("S"));
+						titulaciones.add(tit);	
 					}
 				}
 			}
@@ -125,16 +120,11 @@ public class ModeloMisTitulaciones {
 			PreparedStatement stmt = conexion.prepareStatement(consulta);) {
 				try (ResultSet rs = stmt.executeQuery()) {
 					while (rs.next()) {
-						try {
-							Titulacion tit = new Titulacion();
-							tit.setCodNum(rs.getInt("CODNUM"));
-							tit.setDescripcion(rs.getString("DESCRIPCION"));
-							tit.setArchivo(rs.getBlob("ARCHIVO").getBinaryStream());
-							titulaciones.add(tit);
-						} catch (Exception e) {
-							e.printStackTrace();
-						}
-						
+						Titulacion tit = new Titulacion();
+						tit.setCodNum(rs.getInt("CODNUM"));
+						tit.setDescripcion(rs.getString("DESCRIPCION"));
+						tit.setArchivo(rs.getBlob("ARCHIVO").getBinaryStream());
+						titulaciones.add(tit);
 					}
 				}
 			}
@@ -156,15 +146,10 @@ public class ModeloMisTitulaciones {
 			PreparedStatement stmt = conexion.prepareStatement(consulta);) {
 				try (ResultSet rs = stmt.executeQuery()) {
 					while (rs.next()) {
-						try {
-							Titulacion tit = new Titulacion();
-							tit.setCodNum(rs.getInt("CODNUM"));
-							tit.setDescripcion(rs.getString("NOMBRE"));
-							titulaciones.add(tit);
-						} catch (Exception e) {
-							e.printStackTrace();
-						}
-						
+						Titulacion tit = new Titulacion();
+						tit.setCodNum(rs.getInt("CODNUM"));
+						tit.setDescripcion(rs.getString("NOMBRE"));
+						titulaciones.add(tit);
 					}
 				}
 			}

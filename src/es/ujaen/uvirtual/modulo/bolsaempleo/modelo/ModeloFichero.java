@@ -78,17 +78,13 @@ public class ModeloFichero {
 			}
 			try (ResultSet rs = stmt.executeQuery()) {
 				while (rs.next()) {
-					try {
-						Fichero fich = new Fichero();
-						fich.setCodNum(rs.getInt("CODNUM"));
-						fich.setNombre(rs.getString("NOMBRE"));
-						fich.setTitulo(rs.getString("TITULO"));
-						fich.setArchivo(rs.getBlob("ARCHIVO").getBinaryStream());
-						fich.setPublico(rs.getString("FLGPUBLICO").equals("S"));
-						ficheros.add(fich);
-					} catch (Exception e) {
-						e.printStackTrace();
-					}
+					Fichero fich = new Fichero();
+					fich.setCodNum(rs.getInt("CODNUM"));
+					fich.setNombre(rs.getString("NOMBRE"));
+					fich.setTitulo(rs.getString("TITULO"));
+					fich.setArchivo(rs.getBlob("ARCHIVO").getBinaryStream());
+					fich.setPublico(rs.getString("FLGPUBLICO").equals("S"));
+					ficheros.add(fich);
 				}
 			}
 		}

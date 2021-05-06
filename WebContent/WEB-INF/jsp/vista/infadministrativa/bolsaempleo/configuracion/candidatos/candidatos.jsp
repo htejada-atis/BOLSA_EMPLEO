@@ -22,7 +22,7 @@ VistaUsuarioBolsaEmpleo bean = (VistaUsuarioBolsaEmpleo) uvdatos.getVistas().get
 	<% } else { %>
 	
 	<div class="titulo-bolsa-empleo" style="float:right; margin-top:1.2rem">
-		<a class="link-btn" id="nuevo_usuario" href="<%= request.getRequestURI() %>" style="margin-top:0">Nuevo usuario</a>
+		<a class="link-btn" id="nuevo_usuario" href="<%= request.getRequestURI() %>" style="margin-top:0">Nuevo candidato</a>
 	</div>
 	
 	<div class="titulo-bolsa-empleo" style="margin-top:1rem;">
