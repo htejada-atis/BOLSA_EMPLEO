@@ -17,7 +17,7 @@ public class Merito implements Serializable {
 	private String observacion;
 	private ItemBaremacion item;
 	private UsuarioBolsaEmpleo user;
-	private InputStream archivo;
+	private transient InputStream archivo;
 	
 	/** Constructor por defecto.
 	 */

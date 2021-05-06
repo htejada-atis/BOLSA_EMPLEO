@@ -71,7 +71,7 @@ public class TestBEPModeloAfinidad {
     	Boolean eje = false;
     	
         for (Afinidad afi : afinidades) {
-            if (afi.getCodNum() == afinidadCont.getCodNum()) {
+            if (afi.getCodNum().equals(afinidadCont.getCodNum())) {
             	eje = true;
             }
         }

@@ -36,7 +36,7 @@ VistaInicio bean = (VistaInicio)uvdatos.getVistas().get(VistaInicio.class.getNam
     				<li><a href="<%= link %>" target="_blank"><%= titulo %></a></li>
     			<% }
     			} else { %>
-    				<p>No hay documentos disponibles.</p>
+    				<li><p>No hay documentos disponibles.</p></li>
     		 <% }
     		%>
     			

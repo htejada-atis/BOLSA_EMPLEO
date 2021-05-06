@@ -14,7 +14,7 @@ public class Fichero implements Serializable {
 	private String nombre;
 	private String titulo;
 	private Boolean publico;
-	private InputStream archivo;
+	private transient InputStream archivo;
 	
 	
 	/** Constructor por defecto.

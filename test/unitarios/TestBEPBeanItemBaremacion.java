@@ -80,9 +80,12 @@ public class TestBEPBeanItemBaremacion {
 	 */
 	@Test
 	public void testA02() {
-		ItemBaremacion item = new ItemBaremacion(ITEM_CODNUM, ITEM_BLOQUE, 
-				ITEM_CODIGO, ITEM_NOMBRE, ITEM_ACTIVO, ITEM_UNIDADES, ITEM_VALOR, ITEM_VALORMINIMO, ITEM_VALORMAXIMO, ITEM_AFINIDAD,
-				ITEM_INDIVIDUALIZADO);
+		ItemBaremacion item = new ItemBaremacion(ITEM_CODNUM, ITEM_BLOQUE, ITEM_CODIGO, ITEM_NOMBRE, ITEM_ACTIVO, ITEM_UNIDADES, ITEM_VALOR);
+		item.setValorMinimo(ITEM_VALORMINIMO);
+		item.setValorMaximo(ITEM_VALORMAXIMO);
+		item.setAfinidad(ITEM_AFINIDAD);
+		item.setIndividualizado(ITEM_INDIVIDUALIZADO);
+		
 		assertEquals(ITEM_CODNUM, item.getCodNum());
 		assertEquals(ITEM_CODIGO, item.getCodigo());
 		assertEquals(ITEM_NOMBRE, item.getNombre());
@@ -101,8 +104,12 @@ public class TestBEPBeanItemBaremacion {
 	 */
 	@Test
 	public void testA03() {
-		ItemBaremacion item2 = new ItemBaremacion(ITEM_CODNUM, ITEM_BLOQUE, 
-				ITEM_CODIGO, ITEM_NOMBRE, ITEM_ACTIVO, ITEM_UNIDADES, ITEM_VALOR, ITEM_VALORMINIMO, ITEM_VALORMAXIMO, ITEM_AFINIDAD, ITEM_INDIVIDUALIZADO);
+		ItemBaremacion item2 = new ItemBaremacion(ITEM_CODNUM, ITEM_BLOQUE, ITEM_CODIGO, ITEM_NOMBRE, ITEM_ACTIVO, ITEM_UNIDADES, ITEM_VALOR);
+		item2.setValorMinimo(ITEM_VALORMINIMO);
+		item2.setValorMaximo(ITEM_VALORMAXIMO);
+		item2.setAfinidad(ITEM_AFINIDAD);
+		item2.setIndividualizado(ITEM_INDIVIDUALIZADO);
+		
 		ItemBaremacion item = new ItemBaremacion(item2);
 
 		assertEquals(ITEM_CODNUM, item.getCodNum());
@@ -128,8 +135,12 @@ public class TestBEPBeanItemBaremacion {
 	@SuppressWarnings("java:S2159")
 	public void testA04() {
 
-		ItemBaremacion item3 = new ItemBaremacion(ITEM_CODNUM, ITEM_BLOQUE, 
-				ITEM_CODIGO, ITEM_NOMBRE, ITEM_ACTIVO, ITEM_UNIDADES, ITEM_VALOR, ITEM_VALORMINIMO, ITEM_VALORMAXIMO, ITEM_AFINIDAD, ITEM_INDIVIDUALIZADO);
+		ItemBaremacion item3 = new ItemBaremacion(ITEM_CODNUM, ITEM_BLOQUE, ITEM_CODIGO, ITEM_NOMBRE, ITEM_ACTIVO, ITEM_UNIDADES, ITEM_VALOR);
+		item3.setValorMinimo(ITEM_VALORMINIMO);
+		item3.setValorMaximo(ITEM_VALORMAXIMO);
+		item3.setAfinidad(ITEM_AFINIDAD);
+		item3.setIndividualizado(ITEM_INDIVIDUALIZADO);
+		
 		ItemBaremacion item2 = new ItemBaremacion();
 		ItemBaremacion item = new ItemBaremacion();
 		assertTrue(item.equals(item2));

@@ -81,7 +81,7 @@ public class TestBEPModeloMisTitulaciones {
     	Boolean eje = false;
     	
         for (Titulacion tit : titulaciones) {
-            if (tit.getCodNum() == titulacionCont.getCodNum()) {
+            if (tit.getCodNum().equals(titulacionCont.getCodNum())) {
             	eje = true;
             }
         }
@@ -107,7 +107,7 @@ public class TestBEPModeloMisTitulaciones {
     	
     	Boolean eje = false;
     	
-        if (titulacion.getBorrado() != titulacion2.getBorrado()) {
+        if (!titulacion.getBorrado().equals(titulacion2.getBorrado())) {
         	eje = true;
         }
     	

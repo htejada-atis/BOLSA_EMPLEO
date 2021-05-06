@@ -18,7 +18,7 @@ import es.ujaen.uvirtual.utilidades.UVException;
 
 /**
  * Clase de modelo para la gestión de meritos. 
- * @author ATISoluciones
+ * @author ATISoluciones 2021
  */
 public class ModeloMerito {
 	public static final int ORDER_COLUMN_INDEX_ID = 1;

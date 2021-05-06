@@ -5,7 +5,7 @@ import java.io.Serializable;
 /**
  * Clase mérito solicitud de bolsa empleo.
  * 
- * @author Atisoluciones
+ * @author ATISoluciones 2021
  */
 public class MeritoSolicitud implements Serializable {
 
