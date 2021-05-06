@@ -56,16 +56,11 @@ public class ModeloRol {
 			PreparedStatement stmt = conexion.prepareStatement(consulta);) {
 				try (ResultSet rs = stmt.executeQuery()) {
 					while (rs.next()) {
-						try {
-							Rol role = new Rol();
-							role.setCodNum(rs.getInt("ROL_CODNUM"));
-							role.setDescripcion(rs.getString("DESCRIPCION"));
-							role.setValor(rs.getString("VALOR"));
-							roles.add(role);
-						} catch (Exception e) {
-							e.printStackTrace();
-						}
-						
+						Rol role = new Rol();
+						role.setCodNum(rs.getInt("ROL_CODNUM"));
+						role.setDescripcion(rs.getString("DESCRIPCION"));
+						role.setValor(rs.getString("VALOR"));
+						roles.add(role);	
 					}
 				}
 			}
@@ -94,7 +89,7 @@ public class ModeloRol {
 				
 				Area area = new Area();
 				area.setCodNum(rs.getInt("CODNUM"));
-				area.setDepartamento(modeloDepartamento.getDepartamentoById(rs.getInt("BEPDEP_CODNUM")));
+				area.setDepartamento(modeloDepartamento.getDepartamentoByCodNum(rs.getInt("BEPDEP_CODNUM")));
 				area.setIdAreaExterno(rs.getString("ID_AREA_CONOCIMIENTO"));
 				area.setIdSeccion(rs.getString("ID_SECCION"));
 				area.setDescripcion(rs.getString("DES_AREA_CONOCIMIENTO"));

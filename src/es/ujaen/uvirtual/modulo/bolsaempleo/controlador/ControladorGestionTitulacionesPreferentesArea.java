@@ -202,8 +202,9 @@ public class ControladorGestionTitulacionesPreferentesArea extends HttpServlet {
 	/** muestra todas las areas en un select .
 	 * @param bean bean de la vista a la que poner los valores.
 	 * @throws SQLException excepcion de bbdd.
+	 * @throws UVException .
 	 */
-	private void obtenerAreas(VistaTitulacionesArea bean) throws SQLException {
+	private void obtenerAreas(VistaTitulacionesArea bean) throws SQLException, UVException {
 		ModeloArea modelo = ModeloArea.obtenerInstancia();	
 		List<Area> areas = modelo.listaAreas();
 		bean.setAreas(areas);

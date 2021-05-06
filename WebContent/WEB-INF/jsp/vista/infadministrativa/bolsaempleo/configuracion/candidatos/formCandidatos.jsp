@@ -24,6 +24,7 @@ VistaUsuarioBolsaEmpleo bean = (VistaUsuarioBolsaEmpleo) uvdatos.getVistas().get
 			out.print("<div class='error'>" + bean.formatearMensajesDeError() + "</div>");
 		}
 	
+		Integer codnum = null;
 		String nombre = "";
 		String apellidos = "";
 		String email = "";
@@ -45,6 +46,7 @@ VistaUsuarioBolsaEmpleo bean = (VistaUsuarioBolsaEmpleo) uvdatos.getVistas().get
 			n_documento = bean.getUsuarioArcos().getDocumentoNumero();
 			
 			if(bean.getUsuario() != null){
+				codnum = bean.getUsuario().getCodNum();
 				lista_dist = bean.getUsuario().getListaDist();
 				excluido = bean.getUsuario().getExcluido();
 				fecha_ini = bean.getUsuario().getFechaExclusionInicio();
@@ -58,18 +60,18 @@ VistaUsuarioBolsaEmpleo bean = (VistaUsuarioBolsaEmpleo) uvdatos.getVistas().get
 				}
 				
 				if(bean.getBusqueda()){
-			    	out.print("<h2>El usuario ya existe</h2>");
+			    	out.print("<h2>El candidato ya existe</h2>");
 				}
 				else{
-			    	out.print("<h2>Editar Usuario</h2>");
+			    	out.print("<h2>Editar Candidato</h2>");
 				}
 			}
 			else{
-			    out.print("<h2>Nuevo Usuario</h2>");
+			    out.print("<h2>Nuevo Candidato</h2>");
 			}
 
 		} else {
-		    out.print("<h2>Nuevo Usuario</h2>");
+		    out.print("<h2>Nuevo Candidato</h2>");
 		}
 	%>
 	
@@ -150,7 +152,7 @@ VistaUsuarioBolsaEmpleo bean = (VistaUsuarioBolsaEmpleo) uvdatos.getVistas().get
     					
     		</div>
     		<div class="form-group-custom w100" style="float:right;">
-    			<input id="usuario_enviar" type="submit" name="<%= ControladorUsuarioBolsaEmpleo.PARAM_ENVIAR %> " value="<%if(bean.getUsuario()!=null){%><%if(bean.getBusqueda()){%>Volver<%}else{%>Guardar usuario<%}%><%}else{%>Añadir usuario<%}%>" style="float:right;"/>
+    			<input id="usuario_enviar" type="submit" name="<%= ControladorUsuarioBolsaEmpleo.PARAM_ENVIAR %> " value="<%if(bean.getUsuario()!=null){%><%if(bean.getBusqueda()){%>Volver<%}else{%>Guardar candidato<%}%><%}else{%>Añadir candidato<%}%>" style="float:right;"/>
     		</div>
     	</div>
     	
@@ -278,7 +280,7 @@ VistaUsuarioBolsaEmpleo bean = (VistaUsuarioBolsaEmpleo) uvdatos.getVistas().get
 				Atis.sendForm("<%= request.getRequestURI() %>", {
 					'<%=ControladorUsuarioCandidato.PARAM_ACCION%>': '<%=ControladorUsuarioCandidato.ACCION_SELECCION_APARTADO%>', 
 					'<%=ControladorUsuarioCandidato.PARAM_ACCION_USUARIO%>': '<%=ControladorUsuarioCandidato.ACCION_APARTADO_AREA%>',
-					'<%=ControladorUsuarioCandidato.PARAM_ID%>': <%= bean.getUsuario().getCodNum() %>
+					'<%=ControladorUsuarioCandidato.PARAM_ID%>': <%= codnum %>
 				});
 			});
 		}
@@ -288,7 +290,7 @@ VistaUsuarioBolsaEmpleo bean = (VistaUsuarioBolsaEmpleo) uvdatos.getVistas().get
 				Atis.sendForm("<%= request.getRequestURI() %>", {
 					'<%=ControladorUsuarioCandidato.PARAM_ACCION%>': '<%=ControladorUsuarioCandidato.ACCION_SELECCION_APARTADO%>', 
 					'<%=ControladorUsuarioCandidato.PARAM_ACCION_USUARIO%>': '<%=ControladorUsuarioCandidato.ACCION_APARTADO_SOLICITUDES%>',
-					'<%=ControladorUsuarioCandidato.PARAM_ID%>': <%= bean.getUsuario().getCodNum() %>
+					'<%=ControladorUsuarioCandidato.PARAM_ID%>': <%= codnum %>
 				});
 			});
 		}
@@ -298,7 +300,7 @@ VistaUsuarioBolsaEmpleo bean = (VistaUsuarioBolsaEmpleo) uvdatos.getVistas().get
 				Atis.sendForm("<%= request.getRequestURI() %>", {
 					'<%=ControladorUsuarioCandidato.PARAM_ACCION%>': '<%=ControladorUsuarioCandidato.ACCION_SELECCION_APARTADO%>', 
 					'<%=ControladorUsuarioCandidato.PARAM_ACCION_USUARIO%>': '<%=ControladorUsuarioCandidato.ACCION_APARTADO_COMUNICACIONES%>',
-					'<%=ControladorUsuarioCandidato.PARAM_ID%>': <%= bean.getUsuario().getCodNum() %>
+					'<%=ControladorUsuarioCandidato.PARAM_ID%>': <%= codnum %>
 				});
 			});
 		}
@@ -324,6 +326,9 @@ VistaUsuarioBolsaEmpleo bean = (VistaUsuarioBolsaEmpleo) uvdatos.getVistas().get
 			params[i].disabled = true;
 		}
 		<%}%>
+		
+		$("#fecha_ini").datepicker();
+		$("#fecha_fin").datepicker();
 		
 		<% if (fecha_ini == null) { %>
 			document.getElementById("fecha_ini").value = getTodayDate();
@@ -423,6 +428,23 @@ VistaUsuarioBolsaEmpleo bean = (VistaUsuarioBolsaEmpleo) uvdatos.getVistas().get
 		
 			input_excluido = document.getElementById("usuario_excluido");
 			input_excluido.value = input_excluido.checked;
+			
+			input_excluido = document.getElementById("usuario_excluido");
+			input_excluido.value = input_excluido.checked;
+			
+			if(input_excluido.checked){
+				input_exc_indefinido = document.getElementById("indefinido");
+				input_exc_temporal = document.getElementById("temporal");
+				
+				if(input_exc_indefinido.checked){
+					input_exc_indefinido.value = "I";
+					input_exc_temporal.value = "I";
+				}
+				else{
+					input_exc_indefinido.value = "T";
+					input_exc_temporal.value = "T";
+				}
+			}
 		
 			submit_input.form.submit();
 		}

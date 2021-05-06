@@ -8,7 +8,6 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-
 import es.ujaen.uvirtual.modelo.conexion.ConexionUvirtual;
 import es.ujaen.uvirtual.modulo.bolsaempleo.beans.Bolsa;
 import es.ujaen.uvirtual.modulo.bolsaempleo.beans.BolsaSolicitud;
@@ -684,7 +683,7 @@ public class ModeloSolicitud {
 	/** Lista de bolsas de la solicitud seleccionadas por el usuario que se agregan .
 	 * @param solicitud .
 	 * @param bolsas .
-	 * @return bolsas excluidas .
+	 * @return bolsas agregadas .
 	 * @throws SQLException .
 	 * @throws UVException .
 	 */
@@ -752,7 +751,7 @@ public class ModeloSolicitud {
 			int indexParam = 1;
 			stmt.setInt(indexParam++, solicitud.getCodNum());
 			for (Bolsa bolsaExcluida: bolsasExcluidas) {
-				stmt.setInt(indexParam++, bolsaExcluida.getCodNum());		
+				stmt.setInt(indexParam++, bolsaExcluida.getCodNum());
 			}
 			stmt.executeUpdate();
 		}

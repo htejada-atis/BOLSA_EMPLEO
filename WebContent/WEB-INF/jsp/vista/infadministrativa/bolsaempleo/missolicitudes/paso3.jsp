@@ -52,8 +52,8 @@ VistaSolicitudes bean = (VistaSolicitudes) uvdatos.getVistas().get(VistaSolicitu
 			<tr>
 				<th scope="col"	style="width:15%">Cod. mérito</th>
 				<th scope="col"	style="width:40%">Mérito</th>
-				<th scope="col"	style="width:10%">Valor</th>			
-				<th scope="col"	style="width:35%">Descripción</th>			
+				<th scope="col"	style="width:10%">Valor</th>	
+				<th scope="col"	style="width:35%">Descripción</th>
 			</tr>
 			<tbody>
 				<% if (bolsa.getListaMeritos() != null && bolsa.getListaMeritos().size() > 0) { %>
@@ -67,8 +67,10 @@ VistaSolicitudes bean = (VistaSolicitudes) uvdatos.getVistas().get(VistaSolicitu
 							<td><%= merito.getMerito().getDescripcion() %></td>
 						</tr>
 					<% } %>
+				<% } else { %>
+					<tr><td colspan="4"><%= ControladorMisSolicitudes.MENSAJE_AREA_SIN_MERITOS %></td><tr>
 				<% } %>
-			</tbody>		
+			</tbody>
 		</table>
 	<% } %>
 	
@@ -80,7 +82,7 @@ VistaSolicitudes bean = (VistaSolicitudes) uvdatos.getVistas().get(VistaSolicitu
 		    <a class="link-btn" id="paso3_confirmar" href="<%= request.getRequestURI() %>">
 		    	 Confirmar Solicitud
 		    </a>
-		</div>				
+		</div>
 	<% } %>
 	
 </div>
@@ -125,6 +127,10 @@ VistaSolicitudes bean = (VistaSolicitudes) uvdatos.getVistas().get(VistaSolicitu
 	            				'<%= ControladorMisSolicitudes.PARAM_SOLICITUD_ID %>': '<%= bean.getSolicitud().getCodNum() %>'
 	            				};
 	        			Atis.sendForm("<%= request.getRequestURI() %>", params);
+	        			
+	        			$("a").attr("disabled", "disabled");
+	        			document.getElementById("paso3_confirmar").innerHTML = "Generando solicitud...";
+	        			
 	              		$(this).dialog("close");
 	            	},
 	            	'No': function() {

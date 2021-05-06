@@ -64,8 +64,9 @@ public class ModeloMerito {
 	 * @param id para devolver un mérito .
 	 * @return lista de los méritos de la base de datos .
 	 * @throws SQLException en caso de error de base de datos .
+	 * @throws UVException .
 	 */
-	private List<Merito> listaMeritos(Integer id) throws SQLException {
+	private List<Merito> listaMeritos(Integer id) throws SQLException, UVException {
 		List<Merito> meritos = new ArrayList<>();
 		String consulta = "SELECT bepmer.* FROM tbep_meritos bepmer ";
 		
@@ -80,13 +81,8 @@ public class ModeloMerito {
 			}
 			try (ResultSet rs = stmt.executeQuery()) {
 				while (rs.next()) {
-					try {
-						Merito mer = this.createMeritoFromResultset(rs, true, true); 								
-						meritos.add(mer);
-					} catch (Exception e) {
-						e.printStackTrace();
-					}
-					
+					Merito mer = this.createMeritoFromResultset(rs, true, true); 								
+					meritos.add(mer);
 				}
 			}
 			}
@@ -95,9 +91,10 @@ public class ModeloMerito {
 	
 	/** lista todos los méritos de la BBDD .
 	 * @return .
+	 * @throws UVException .
 	 * @throws SQLException .
 	 */
-	public List<Merito> listaMeritos() throws SQLException {
+	public List<Merito> listaMeritos() throws SQLException, UVException {
 		return listaMeritos(null);
 	}
 	

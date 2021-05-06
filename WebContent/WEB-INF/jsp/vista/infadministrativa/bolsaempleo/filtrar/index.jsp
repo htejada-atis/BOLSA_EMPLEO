@@ -14,6 +14,13 @@ UsuarioBolsaEmpleo candidato = bean.getCandidato();
 
 <div class='bolsa-empleo'>
 
+	<%
+	
+	String nombreApellidos = candidato.getNombre() + candidato.getPrimerApellido() + candidato.getSegundoApellido();
+	
+	%>
+
+
 	<% if (bean.getMensajesDeExito().size() > 0) { %>
 		<div id="exito" class="success">
 			<%= bean.formatearMensajesDeExito() %>
@@ -103,7 +110,7 @@ UsuarioBolsaEmpleo candidato = bean.getCandidato();
 				"ajax": { url: "<%=ControladorFiltrar.URL_PATTERN_AJAX%>", async: false },
 				"selectable": true,
 			    "filterable": true,
-			    "title": 'Titulaciones: <%= candidato.getNombre() %>',
+			    "title": 'Titulaciones: <%=nombreApellidos%>',
 			    "pageSize": 10,
 			    "action": "<%=ControladorFiltrar.ACCION_DATATABLE_TITULACIONES_CANDIDATO%>",
 			    "params": {"<%= ControladorFiltrar.PARAM_CANDIDATO %>": <%= candidato.getCodNum() %>},

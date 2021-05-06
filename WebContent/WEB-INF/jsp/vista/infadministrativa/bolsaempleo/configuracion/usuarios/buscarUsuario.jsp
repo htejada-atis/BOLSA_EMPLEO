@@ -75,7 +75,8 @@ VistaUsuarioBolsaEmpleo bean = (VistaUsuarioBolsaEmpleo) uvdatos.getVistas().get
 
 	$(document).ready(function() {
 	
-		<% if(bean.getBusqueda()) {%>
+		
+		<% if(bean.getUsuario()!=null && bean.getBusqueda()){%>
 		$("#fecha_ini").datepicker();
 		$("#fecha_fin").datepicker();
 		
