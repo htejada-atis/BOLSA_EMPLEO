@@ -69,10 +69,9 @@ VistaSolicitudes bean = (VistaSolicitudes) uvdatos.getVistas().get(VistaSolicitu
 			var solicitudCerrada = row.estado == '<%= ModeloSolicitud.SOLICITUD_ESTADO_CERRADA %>';
 			var convocatoriaAbierta = row.convocatoria.estado == '<%= ModeloConvocatoria.CONVOCATORIA_ESTADO_ABIERTA %>';
 			var convocatoriaCerrada = row.convocatoria.estado == '<%= ModeloConvocatoria.CONVOCATORIA_ESTADO_CERRADA %>';
-			var btnCrear = '<button class="create-solicitud" data-rowid="' + row.convocatoria.codNum + '" title="Crear una nueva solicitud para: ' + row.convocatoria.descripcion + '">Abrir una solicitud</button>';
-			var btnConsultar = '<button class="consultar-solicitud" data-rowid="' + row.codNum + '" title="Consultar solicitud para: ' + row.convocatoria.descripcion + '">Consultar solicitud</button>';
-			var btnDescargarPDF = '<button class="descargar-pdf-solicitud" data-rowid="' + row.codNum + '" title="Descargar pdf solicitud para: ' + row.convocatoria.descripcion + '">Descargar PDF solicitud</button>';
-			
+			var btnCrear = '<button class="create-solicitud pointer" data-rowid="' + row.convocatoria.codNum + '" title="Crear una nueva solicitud para: ' + row.convocatoria.descripcion + '">Abrir una solicitud</button>';
+			var btnConsultar = '<button class="consultar-solicitud pointer" data-rowid="' + row.codNum + '" title="Consultar solicitud para: ' + row.convocatoria.descripcion + '">Consultar solicitud</button>';
+			var btnDescargarPDF = '<button class="descargar-pdf-solicitud pointer" data-rowid="' + row.codNum + '" title="Descargar pdf solicitud para: ' + row.convocatoria.descripcion + '">Descargar PDF solicitud</button>';
 			
 			if (convocatoriaAbierta && solicitudNoCreada) {
 				// convocatoria abierta, solicitud no creada

@@ -89,7 +89,7 @@ public class ModeloRol {
 				
 				Area area = new Area();
 				area.setCodNum(rs.getInt("CODNUM"));
-				area.setDepartamento(modeloDepartamento.getDepartamentoById(rs.getInt("BEPDEP_CODNUM")));
+				area.setDepartamento(modeloDepartamento.getDepartamentoByCodNum(rs.getInt("BEPDEP_CODNUM")));
 				area.setIdAreaExterno(rs.getString("ID_AREA_CONOCIMIENTO"));
 				area.setIdSeccion(rs.getString("ID_SECCION"));
 				area.setDescripcion(rs.getString("DES_AREA_CONOCIMIENTO"));

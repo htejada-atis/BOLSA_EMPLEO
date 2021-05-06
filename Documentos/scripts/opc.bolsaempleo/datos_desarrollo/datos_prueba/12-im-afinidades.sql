@@ -1,12 +1,10 @@
 INSERT INTO TBEP_AFINIDADES (CODNUM,CODIGO,DESCRIPCION,MODULACION)
-VALUES (1,'AA','Solo se valoran las contribuciones propias del area, sometidas a modulacion',100);
+VALUES (1,'AA','Propia al área',100);
 INSERT INTO TBEP_AFINIDADES (CODNUM,CODIGO,DESCRIPCION,MODULACION)
-VALUES (2,'AA','Solo se valoran las contribuciones propias del area, sometidas a modulacion',75);
+VALUES (2,'AA','Afína al área',75);
 INSERT INTO TBEP_AFINIDADES (CODNUM,CODIGO,DESCRIPCION,MODULACION)
-VALUES (3,'AA','Solo se valoran las contribuciones propias del area, sometidas a modulacion',30);
+VALUES (3,'AI','Contribución asociada al perfil investigador de la plaza',100);
 INSERT INTO TBEP_AFINIDADES (CODNUM,CODIGO,DESCRIPCION,MODULACION)
-VALUES (4,'AI','Solo se valoran las contribuciones asociadas al perfil investigador, sometidas a modulacion',100);
+VALUES (4,'AI','Contribución asociada a otras líneas de investigación de la plaza',50);
 INSERT INTO TBEP_AFINIDADES (CODNUM,CODIGO,DESCRIPCION,MODULACION)
-VALUES (5,'AI','Solo se valoran las contribuciones asociadas al perfil investigador, sometidas a modulacion',50);
-INSERT INTO TBEP_AFINIDADES (CODNUM,CODIGO,DESCRIPCION,MODULACION)
-VALUES (6,'AI','Solo se valoran las contribuciones asociadas al perfil investigador, sometidas a modulacion',0);
+VALUES (5,'AI','Contribución asociada a áreas afines',30);
