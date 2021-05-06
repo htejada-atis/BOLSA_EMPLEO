@@ -107,6 +107,7 @@ public class ControladorMisSolicitudes extends HttpServlet {
 	public static final String ACCION_DESCARGAR_PDF = "descargarpdf";
 	
 	// mensajes
+	public static final String MENSAJE_AREA_SIN_MERITOS = "No hay méritos asignados a éste área.";
 	public static final String MENSAJE_ENVIADO = "enviadomissolicitudes";
 	public static final String MENSAJE_ERROR_BOLSAS_SELECCIONADAS_INCORRECTAS = "No hay bolsas seleccionadas válidas";
 	public static final String MENSAJE_ERROR_BORRAR_BOLSA = "No puede deseleccionar ésta bolsa, tiene méritos asociados";
@@ -139,6 +140,7 @@ public class ControladorMisSolicitudes extends HttpServlet {
 	public static final int COLOR_201 = 201;
 	public static final int COLOR_241 = 241;
 	public static final int COLOR_254 = 254;
+	public static final int COLSPAN_4 = 4;
 	
 	private UsuarioBolsaEmpleo usuario = null;
 	
@@ -832,6 +834,11 @@ public class ControladorMisSolicitudes extends HttpServlet {
 				cell.setBackgroundColor(new Color(COLOR_241, COLOR_241, COLOR_241));
 				table.addCell(cell);
 			}
+		} else {
+			Cell cell = new Cell(MENSAJE_AREA_SIN_MERITOS);
+			cell.setColspan(COLSPAN_4);
+			cell.setBackgroundColor(new Color(COLOR_241, COLOR_241, COLOR_241));
+	        table.addCell(cell);
 		}
 		
 		com.lowagie.text.List lista = new com.lowagie.text.List();
