@@ -301,7 +301,7 @@ public class ControladorItemsBaremacion extends HttpServlet {
 	private void agregarApartado(VistaItemsBaremacion bean) throws SQLException, UVException {
 		bean.setVista(JSP_FORM_APARTADO_BAREMACION);
 		bean.setApartadoBaremacion(null);
-		bean.setUltimoCodigo((Integer.parseInt(ModeloBaremacion.obtenerInstancia().getUltimoCodigoApartado()) + 1) + "");
+		bean.setUltimoCodigo(ModeloBaremacion.obtenerInstancia().getUltimoCodigoApartado());
 	}
 	
 	private void agregarApartadoConfirm(VistaItemsBaremacion bean, HttpServletRequest request) throws SQLException, UVException {

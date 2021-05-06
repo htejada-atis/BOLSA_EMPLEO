@@ -36,7 +36,6 @@ VistaAfinidades bean = (VistaAfinidades) uvdatos.getVistas().get(VistaAfinidades
 			<th scope="col" class="center codigo" style="width:10%" title="Código de afinidad">Código</th>
 			<th scope="col" style="width:55%">Descripcion</th>
 			<th scope="col" class="center" style="width:15%">Modulación</th>
-			<th scope="col" class="center" style="width:15%">Borrado</th>
 			<th scope="col" style="width:15%"></th>			
 		</tr>
 		<tbody>				
@@ -71,13 +70,6 @@ $(document).ready(function() {
 	        {'data': 'codigo', 'class': 'center'},
 	        {'data': 'descripcion'},
 	        {'data': 'modulacion', 'class': 'center'},
-        	{'data': 'sujetoAfinidad', 'order': {'active': false},
-	    		'render': function(row) {
-	        		if (row.sujetoAfinidad) {
-	        			return "<div title='Afinidad' class='circle-true'></div>"; 
-	        		}
-        		}
-	        },
         	{'data': 'codnum', 'buttons': [
         		{'label': 'Editar', 'onClick': function(row) {
         			var params = {'a': '<%= ControladorAfinidades.ACCION_MODIFICAR_AFINIDAD %>', '<%= ControladorAfinidades.PARAM_ID %>': row.codNum};

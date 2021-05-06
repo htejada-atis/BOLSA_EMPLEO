@@ -24,3 +24,4 @@ DELETE FROM ADM_USUARIO_ROL WHERE USERUID = 'candidato10';
 DELETE FROM ADM_USUARIO_ROL WHERE USERUID = 'pruebas1';
 DELETE FROM ADM_ROL WHERE rol_codnum IN (1050, 1051, 1052, 1053);
 DELETE FROM adm_parametros WHERE config_codalf = 'default' AND param_codalf = 'bolsaempleo.urlAyuda';
+DELETE FROM adm_parametros WHERE config_codalf = 'default' AND param_codalf = 'bolsaempleo.maxEspacioArchivo';

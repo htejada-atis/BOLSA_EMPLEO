@@ -1,25 +1,25 @@
 Listado de tablas con sus acrónimos y álias
 
 TBEP_AFINIDADES                             AFI     bepafi      Afinidad
-TBEP_APARTADOSBAREMACION                    APA     bepapa		ApartadoBaremacion
-TBEP_AREAS                                  ARE     bepare		Area
-TBEP_BLOQUESBAREMACION                      BLO     bepblo		BloqueBaremacion
-TBEP_BOLSAS                                 BOL     bepbol		Bolsa, BolsaCandidato, BolsaSolicitud
-TBEP_CATEGORIABAREMACION                    CAT     bepcat		
-TBEP_CONVOCATORIAS                          CON     bepcon		Convocatoria
-TBEP_DEPARTAMENTOS                          DEP     bepdep		Departamento
-TBEP_EVALUADORES					        EVA		bepeva		Evaluador
-TBEP_FICHEROS                               FIC     bepfic		Fichero
-TBEP_ITEMSBAREMACION                        ITE     bepite		ItemBaremacion
-TBEP_MERITOS                                MER     bepmer		Merito
-TBEP_MERITOSPREFERENTES                     MEP     bepmep		
-TBEP_NOTICIAS                               NOT     bepnot		Noticia
-TBEP_SOLICITUDES                            SOL     bepsol		Solicitud
-TBEP_SOLICITUD_BOLSAS				        SBO		bepsbo
-TBEP_SOLICITUD_BOLSAS_MERITOS		        SBM     bepsbm		MeritoSolicitud
-TBEP_SOLICITUD_BOLSAS_MERITOS_VALORACION    SBV     bepsbv      MeritoSolicitudValoracion
-TBEP_TITULACIONES                           TIT     beptit		Titulacion
-TBEP_TITULACIONES_PREFERENTES_AREA          TPA		beptpa		TitulacionArea
-TBEP_TITULACIONES_USUARIO        	        TUS     beptus		TitulacionesUsuario
-TBEP_USUARIOS                               USU     bepusu		UsuarioBolsaEmpleo
-TBEP_USUARIOS_EXCLUIDOS_AREA                UEA     bepuea		UsuarioExcluidoArea
+TBEP_APARTADOSBAREMACION            APA     bepapa		ApartadoBaremacion
+TBEP_AREAS                          ARE     bepare		Area
+TBEP_BLOQUESBAREMACION              BLO     bepblo		BloqueBaremacion
+TBEP_BOLSAS                         BOL     bepbol		Bolsa, BolsaCandidato, BolsaSolicitud
+TBEP_CATEGORIABAREMACION            CAT     bepcat		
+TBEP_CONVOCATORIAS                  CON     bepcon		Convocatoria
+TBEP_DEPARTAMENTOS                  DEP     bepdep		Departamento
+TBEP_EVALUADORES					EVA		bepeva		Evaluador
+TBEP_FICHEROS                       FIC     bepfic		Fichero
+TBEP_ITEMSBAREMACION                ITE     bepite		ItemBaremacion
+TBEP_MERITOS                        MER     bepmer		Merito
+TBEP_MERITOSPREFERENTES             MEP     bepmep		
+TBEP_NOTICIAS                       NOT     bepnot		Noticia
+TBEP_SOLICITUDES                    SOL     bepsol		Solicitud
+TBEP_SOLICITUD_BOLSAS				SBO		bepsbo
+TBEP_SOLICITUD_BOLSAS_MERITOS		SBM     bepsbm		MeritoSolicitud
+TBEP_TITULACIONES                   TIT     beptit		Titulacion
+TBEP_TITULACIONES_PREFERENTES_AREA  TPA		beptpa		TitulacionArea
+TBEP_TITULACIONES_USUARIO        	TUS     beptus		TitulacionesUsuario
+TBEP_USUARIOS                       USU     bepusu		UsuarioBolsaEmpleo
+TBEP_USUARIOS_EXCLUIDOS_AREA        UEA     bepuea		UsuarioExcluidoArea
+TBEP_PARAMETROS_CONFIGURACION       PAC     beppac		ParametrosConfiguracion

@@ -63,9 +63,10 @@ public class TestBEPModeloMisTitulaciones {
      * @throws SQLException si error en bd
      * @throws UVException si error al validar usuario
      * @throws ParseException si error al validar fecha
+     * @throws IOException .
      */
     @Test
-    public void testA01InsertaUsuario() throws SQLException, ParseException, UVException {
+    public void testA01InsertaUsuario() throws SQLException, ParseException, UVException, IOException {
     	Titulacion titulacion = new Titulacion();
     	titulacion.setCodNum(CODNUM_TITULACION);
     	titulacion.setTitulacion(TITULACION);
@@ -117,9 +118,10 @@ public class TestBEPModeloMisTitulaciones {
     /** test error inserta titulacion null.
      * @throws SQLException si error bd
      * @throws UVException error experado
+     * @throws IOException .
      */
     @Test(expected = UVException.class)
-    public void testE01InsertaTitulacionNull() throws SQLException, UVException {
+    public void testE01InsertaTitulacionNull() throws SQLException, UVException, IOException {
     	Titulacion titulacion = null;
     	ModeloMisTitulaciones modelo = ModeloMisTitulaciones.obtenerInstancia();
     	modelo.insertaTitulacionUsuario(titulacion);
