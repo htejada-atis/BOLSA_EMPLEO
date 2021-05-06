@@ -56,16 +56,11 @@ public class ModeloRol {
 			PreparedStatement stmt = conexion.prepareStatement(consulta);) {
 				try (ResultSet rs = stmt.executeQuery()) {
 					while (rs.next()) {
-						try {
-							Rol role = new Rol();
-							role.setCodNum(rs.getInt("ROL_CODNUM"));
-							role.setDescripcion(rs.getString("DESCRIPCION"));
-							role.setValor(rs.getString("VALOR"));
-							roles.add(role);
-						} catch (Exception e) {
-							e.printStackTrace();
-						}
-						
+						Rol role = new Rol();
+						role.setCodNum(rs.getInt("ROL_CODNUM"));
+						role.setDescripcion(rs.getString("DESCRIPCION"));
+						role.setValor(rs.getString("VALOR"));
+						roles.add(role);	
 					}
 				}
 			}

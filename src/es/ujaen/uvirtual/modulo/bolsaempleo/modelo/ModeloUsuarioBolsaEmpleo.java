@@ -88,20 +88,17 @@ public class ModeloUsuarioBolsaEmpleo {
 	 * @param clausula para filtrar los usuarios de la bd
 	 * @return todos los usuarios de la base de datos
 	 * @throws SQLException en caso de error de base de datos
+	 * @throws UVException .
 	 */
-	public List<UsuarioBolsaEmpleo> listaUsuarios(String clausula) throws SQLException {
+	public List<UsuarioBolsaEmpleo> listaUsuarios(String clausula) throws SQLException, UVException {
 		List<UsuarioBolsaEmpleo> usuarios = new ArrayList<>();
 		String consulta = "SELECT * FROM tbep_usuarios bepusu INNER JOIN VUJA_NET_BEP_AR_PERSONA uvpersona ON uvpersona.CODINT=bepusu.CODPERSONA " + clausula;
 		try (Connection conexion = ConexionUvirtual.obtenerInstancia();
 			PreparedStatement stmt = conexion.prepareStatement(consulta);) {
 				try (ResultSet rs = stmt.executeQuery()) {
 					while (rs.next()) {
-						try {
-							UsuarioBolsaEmpleo usuario = setUsuario(rs);
-							usuarios.add(usuario);		
-						} catch (Exception e) {
-							e.printStackTrace();
-						}
+						UsuarioBolsaEmpleo usuario = setUsuario(rs);
+						usuarios.add(usuario);
 					}
 				}
 			}
@@ -111,8 +108,9 @@ public class ModeloUsuarioBolsaEmpleo {
 	/** lista todos los usuarios.
 	 * @return lista de todas las noticias
 	 * @throws SQLException si hay un error en la base de datos
+	 * @throws UVException .
 	 */
-	public List<UsuarioBolsaEmpleo> listaUsuarios() throws SQLException {
+	public List<UsuarioBolsaEmpleo> listaUsuarios() throws SQLException, UVException {
 		return listaUsuarios(" ORDER BY bepusu.CODCUENTA");
 	}
 	
