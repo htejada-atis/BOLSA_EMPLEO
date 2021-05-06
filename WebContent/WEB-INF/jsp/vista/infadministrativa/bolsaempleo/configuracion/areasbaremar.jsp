@@ -24,7 +24,7 @@ VistaAreasBaremar bean = (VistaAreasBaremar) uvdatos.getVistas().get(VistaAreasB
 	<div class="titulo-bolsa-empleo">
 		<h2>Áreas baremables</h2>
     
-	    <a class="link-btn" id="nueva_convocatoria" href="#">
+	    <a class="link-btn" id="importar_areas_uvirtual" href="#">
 	    	Importar Areas UVirtual
 	    </a>
 	</div>
@@ -89,5 +89,10 @@ $(document).ready(function() {
 		
    		Atis.sendForm("<%= request.getRequestURI() %>", params);
 	}
+	
+	document.getElementById("importar_areas_uvirtual").addEventListener("click", function() {
+		Atis.sendForm("<%= request.getRequestURI() %>", {'a': '<%=ControladorAreasABaremar.ACCION_IMPORTAR_AREAS_UVIRTUAL%>'});
+	});
+	
 }); 
 </script>
