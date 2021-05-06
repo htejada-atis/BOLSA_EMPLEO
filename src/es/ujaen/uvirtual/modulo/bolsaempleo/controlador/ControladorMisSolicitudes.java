@@ -36,6 +36,7 @@ import es.ujaen.uvirtual.modulo.bolsaempleo.beans.MeritoSolicitud;
 import es.ujaen.uvirtual.modulo.bolsaempleo.beans.Solicitud;
 import es.ujaen.uvirtual.modulo.bolsaempleo.beans.Titulacion;
 import es.ujaen.uvirtual.modulo.bolsaempleo.beans.UsuarioBolsaEmpleo;
+import es.ujaen.uvirtual.modulo.bolsaempleo.modelo.ModeloAfinidad;
 import es.ujaen.uvirtual.modulo.bolsaempleo.modelo.ModeloArea;
 import es.ujaen.uvirtual.modulo.bolsaempleo.modelo.ModeloBolsa;
 import es.ujaen.uvirtual.modulo.bolsaempleo.modelo.ModeloConvocatoria;
@@ -392,8 +393,10 @@ public class ControladorMisSolicitudes extends HttpServlet {
 		
 		// añadimos las bolsas a la solicitud
 		modeloSolicitud.asignarBolsasASolicitud(solicitud, bolsas);
-		
+				
 		bean.setVista(RUTA_BEP_SOL + "paso2.jsp");
+		bean.setListaAfinidades(ModeloAfinidad.obtenerInstancia().listaAfinidades());
+		bean.setListaTipoAfinidades(ModeloAfinidad.obtenerInstancia().getTiposAfinidad());
 	}
 	
 	/** 
@@ -484,6 +487,8 @@ public class ControladorMisSolicitudes extends HttpServlet {
 	 */
 	private void seleccionarBolsa(VistaSolicitudes bean, UVDatos datos, HttpServletRequest request, HttpServletResponse response) throws UVException, SQLException {
 		bean.setVista(RUTA_BEP_SOL + "paso2.jsp");
+		bean.setListaAfinidades(ModeloAfinidad.obtenerInstancia().listaAfinidades());
+		bean.setListaTipoAfinidades(ModeloAfinidad.obtenerInstancia().getTiposAfinidad());
 		
 		ModeloBolsa modeloBolsa = ModeloBolsa.obtenerInstancia();
 		ModeloSolicitud modeloSolicitud = ModeloSolicitud.obtenerInstancia();
@@ -513,50 +518,38 @@ public class ControladorMisSolicitudes extends HttpServlet {
 		ModeloBolsa modeloBolsa = ModeloBolsa.obtenerInstancia();
 		ModeloMerito modeloMerito = ModeloMerito.obtenerInstancia();
 		ModeloSolicitud modeloSolicitud = ModeloSolicitud.obtenerInstancia();
-		datos.setContentType("application/json");
-		datos.setRespuestaEnviada(true);
-		response.setContentType("application/json");
-		response.setCharacterEncoding("UTF-8");
 		
-		try (PrintWriter writer = response.getWriter()) {
-			try {
-				Bolsa area = modeloBolsa.getBolsaById(Formateador.leeParametroInteger(request.getParameter(PARAM_BOLSA)));
-				bean.setArea(area);
-				Solicitud solicitud = modeloSolicitud.getSolicitudById(Formateador.leeParametroInteger(request.getParameter(PARAM_SOLICITUD_ID)));
-				bean.setSolicitud(solicitud);
-				Merito merito = modeloMerito.listaMerito(Formateador.leeParametroInteger(request.getParameter(PARAM_MERITO)));
-				bean.setMerito(merito);
-				
-				if (merito == null) {
-					throw new UVException("merito no puede ser nulo");
-				}
-				
-				if (solicitud == null) {
-					throw new UVException("solicitud no puede ser nula");
-				}
-				
-				if (seleccionado) {
-					// comprobamos que el total de méritos por bloque de la solicitud sea menor que el permitido por la convocatoria
-					Integer totalMeritos = modeloSolicitud.obtenerTotalMeritosPorBloqueSolicitud(solicitud, merito);
-					
-					if (totalMeritos >= solicitud.getConvocatoria().getNumMeritosPorBloque()) {
-						throw new Exception(MENSAJE_ERROR_NUMERO_MAXIMO_MERITOS_BLOQUE);
-					}
-					
-					modeloSolicitud.asignarMeritosASolicitudBolsa(solicitud, area, merito);
-				} else {
-					modeloSolicitud.borrarMeritoDeSolicitudBolsa(solicitud, area, merito);
-				}
-				
-				CodigoDescripcion mensaje = new CodigoDescripcion("ok", seleccionado ? "mérito agregado a la bolsa" : "mérito quitado de la bolsa");
-				writer.write(new Gson().toJson(mensaje));
-			} catch (Exception ex) {
-				bean.getMensajesDeError().add(ex.getMessage());
-				CodigoDescripcion mensaje = new CodigoDescripcion("error", ex.getMessage());
-				writer.write(new Gson().toJson(mensaje));
-				response.setStatus(RESPONSE_HTTP_CODE_ERROR);
-			}
+		Bolsa area = modeloBolsa.getBolsaById(Formateador.leeParametroInteger(request.getParameter(PARAM_BOLSA)));
+		bean.setArea(area);
+		
+		Solicitud solicitud = modeloSolicitud.getSolicitudById(Formateador.leeParametroInteger(request.getParameter(PARAM_SOLICITUD_ID)));
+		bean.setSolicitud(solicitud);
+		
+		Merito merito = modeloMerito.listaMerito(Formateador.leeParametroInteger(request.getParameter(PARAM_MERITO)));
+		bean.setMerito(merito);
+		
+		if (merito == null) {
+			throw new UVException("merito no puede ser nulo");
 		}
+		
+		if (solicitud == null) {
+			throw new UVException("solicitud no puede ser nula");
+		}
+		
+		if (seleccionado) {
+			// comprobamos que el total de méritos por bloque de la solicitud sea menor que el permitido por la convocatoria
+			Integer totalMeritos = modeloSolicitud.obtenerTotalMeritosPorBloqueSolicitud(solicitud, merito);
+			
+			if (totalMeritos >= solicitud.getConvocatoria().getNumMeritosPorBloque()) {
+				throw new UVException(MENSAJE_ERROR_NUMERO_MAXIMO_MERITOS_BLOQUE);
+			}
+			
+			modeloSolicitud.asignarMeritosASolicitudBolsa(solicitud, area, merito);
+		} else {
+			modeloSolicitud.borrarMeritoDeSolicitudBolsa(solicitud, area, merito);
+		}
+		
+		this.seleccionarBolsa(bean, datos, request, response);		
 	}
 	
 	/** 
@@ -571,6 +564,8 @@ public class ControladorMisSolicitudes extends HttpServlet {
 		Solicitud solicitud = modeloSolicitud.getSolicitudById(Formateador.leeParametroInteger(request.getParameter(PARAM_SOLICITUD_ID)));
 		
 		bean.setVista(RUTA_BEP_SOL + "paso2.jsp");
+		bean.setListaAfinidades(ModeloAfinidad.obtenerInstancia().listaAfinidades());
+		bean.setListaTipoAfinidades(ModeloAfinidad.obtenerInstancia().getTiposAfinidad());
 		bean.setSolicitud(solicitud);
 	}
 	
@@ -674,6 +669,8 @@ public class ControladorMisSolicitudes extends HttpServlet {
 	private void resumenSolicitud(VistaSolicitudes bean, UVDatos datos, HttpServletRequest request, HttpServletResponse response)
 			throws IOException, SQLException, UVException {
 		bean.setVista(RUTA_BEP_SOL + "paso2.jsp");
+		bean.setListaAfinidades(ModeloAfinidad.obtenerInstancia().listaAfinidades());
+		bean.setListaTipoAfinidades(ModeloAfinidad.obtenerInstancia().getTiposAfinidad());
 		
 		ModeloSolicitud modeloSolicitud = ModeloSolicitud.obtenerInstancia();
 		ModeloTitulacion modeloTitulacion = ModeloTitulacion.obtenerInstancia();

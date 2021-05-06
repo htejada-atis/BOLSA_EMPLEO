@@ -8,6 +8,10 @@
 	padding: 0px 8px;
 }
 
+.bolsa-empleo .pointer {	
+    cursor: pointer;
+}
+
 .bolsa-empleo select, .bolsa-empleo input[type=text], .bolsa-empleo input[type=number], .bolsa-empleo textarea {
 	border: 1px solid rgb(118, 118, 118);
 	border-radius: 3px;
@@ -408,6 +412,13 @@ nav-bolsa-empleo a:active, nav-bolsa-empleo a:hover {
 .form-check-custom {
 	display: inline-block;
 	width: 49% !important;
+}
+
+.form-check-custom.w-35{
+	width: 35% !important;
+}
+.form-check-custom.w-64{
+	width: 64% !important;
 }
 
 .form-group-custom label, .form-check-custom label, .form-file label, .form-select label {

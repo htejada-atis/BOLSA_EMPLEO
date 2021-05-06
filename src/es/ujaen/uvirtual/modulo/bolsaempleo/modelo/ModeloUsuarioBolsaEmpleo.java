@@ -486,6 +486,8 @@ public class ModeloUsuarioBolsaEmpleo {
 		usuario.setListaDist(rs.getString("FLGLISTADISTRIBUCION").equals("S"));
 		usuario.setExcluido(rs.getString("FLGEXCLUIDO").equals("S"));
 		usuario.setExcluidoTipo(rs.getString("FLGEXCLUIDOTIPO"));
+		usuario.setFechaExclusionInicio(rs.getTimestamp("FECHA_EXCLUSION_INICIO"));
+		usuario.setFechaExclusionFin(rs.getTimestamp("FECHA_EXCLUSION_FIN"));
 		usuario.setRazonExcluido(rs.getString("RAZON_EXCLUSION"));
 		usuario.setFechaExclusion(rs.getTimestamp("FECHA_EXCLUSION"));
 		usuario.setBorrado(rs.getString("FLGBORRADO").equals("S"));
@@ -526,6 +528,8 @@ public class ModeloUsuarioBolsaEmpleo {
 		usuario.setListaDist(rs.getString("FLGLISTADISTRIBUCION").equals("S"));
 		usuario.setExcluido(rs.getString("FLGEXCLUIDO").equals("S"));
 		usuario.setExcluidoTipo(rs.getString("FLGEXCLUIDOTIPO"));
+		usuario.setFechaExclusionInicio(rs.getTimestamp("FECHA_EXCLUSION_INICIO"));
+		usuario.setFechaExclusionFin(rs.getTimestamp("FECHA_EXCLUSION_FIN"));
 		usuario.setRazonExcluido(rs.getString("RAZON_EXCLUSION"));
 		usuario.setFechaExclusion(rs.getTimestamp("FECHA_EXCLUSION"));
 		usuario.setBorrado(rs.getString("FLGBORRADO").equals("S"));
@@ -586,8 +590,14 @@ public class ModeloUsuarioBolsaEmpleo {
 				}
 		} else {
 			String consulta = "INSERT INTO tbep_usuarios " 
-					+ " (CODPERSONA,CODCUENTA,ROL,EMAIL,FLGLISTADISTRIBUCION,FLGEXCLUIDO,FLGEXCLUIDOTIPO,RAZON_EXCLUSION,FECHA_EXCLUSION) "
-					+ "VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
+					+ " (CODPERSONA,CODCUENTA,ROL,EMAIL,FLGLISTADISTRIBUCION,"
+					+ "FLGEXCLUIDO,FLGEXCLUIDOTIPO,RAZON_EXCLUSION,FECHA_EXCLUSION";
+					
+					if (usuario.getExcluidoTipo() != null && usuario.getExcluidoTipo().equals("T")) {
+						consulta += ",FECHA_EXCLUSION_INICIO,FECHA_EXCLUSION_FIN) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?) "; 
+					} else {
+						consulta += ") VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?) ";
+					}
 			
 			try (Connection conexion = ConexionUvirtual.obtenerInstancia();
 					PreparedStatement stmt = conexion.prepareStatement(consulta);) {
@@ -601,6 +611,12 @@ public class ModeloUsuarioBolsaEmpleo {
 					stmt.setString(parameterIndex++, usuario.getExcluidoTipo());
 					stmt.setString(parameterIndex++, usuario.getRazonExcluido());
 					stmt.setDate(parameterIndex++, new java.sql.Date(usuario.getFechaExclusion().getTime()));
+					
+					if (usuario.getExcluidoTipo() != null && usuario.getExcluidoTipo().equals("T")) {
+						stmt.setDate(parameterIndex++, new java.sql.Date(usuario.getFechaExclusionInicio().getTime()));
+						stmt.setDate(parameterIndex++, new java.sql.Date(usuario.getFechaExclusionFin().getTime()));
+					}
+					
 					stmt.executeUpdate();
 				}
 		}
@@ -620,8 +636,16 @@ public class ModeloUsuarioBolsaEmpleo {
 		}
 		
 		String consulta = "UPDATE tbep_usuarios "
-			+ " SET ROL=?, FLGLISTADISTRIBUCION=?, FLGEXCLUIDO=?, FLGEXCLUIDOTIPO=?, RAZON_EXCLUSION=?, FECHA_EXCLUSION=? "
-			+ " WHERE codnum=?";
+			+ " SET ROL=?, FLGLISTADISTRIBUCION=?, FLGEXCLUIDO=?, FLGEXCLUIDOTIPO=?,"
+			+ " RAZON_EXCLUSION=?, FECHA_EXCLUSION=?";
+		
+		if (usuario.getExcluidoTipo() != null && usuario.getExcluidoTipo().equals("T")) {
+			consulta += ", FECHA_EXCLUSION_INICIO = ?, FECHA_EXCLUSION_FIN = ?";
+		}
+		
+		consulta += " WHERE CODNUM IN ?";	
+		
+		
 		try (Connection conexion = ConexionUvirtual.obtenerInstancia();
 		PreparedStatement stmt = conexion.prepareStatement(consulta);) {
 			int parameterIndex = 1;
@@ -631,6 +655,12 @@ public class ModeloUsuarioBolsaEmpleo {
 			stmt.setString(parameterIndex++, usuario.getExcluidoTipo());
 			stmt.setString(parameterIndex++, usuario.getRazonExcluido());
 			stmt.setDate(parameterIndex++, new java.sql.Date(usuario.getFechaExclusion().getTime()));
+			
+			if (usuario.getExcluidoTipo() != null && usuario.getExcluidoTipo().equals("T")) {
+				stmt.setDate(parameterIndex++, new java.sql.Date(usuario.getFechaExclusionInicio().getTime()));
+				stmt.setDate(parameterIndex++, new java.sql.Date(usuario.getFechaExclusionFin().getTime()));
+			}
+			
 			stmt.setInt(parameterIndex++, usuario.getCodNum());
 			stmt.executeUpdate();
 		}
@@ -738,7 +768,15 @@ public class ModeloUsuarioBolsaEmpleo {
 	 * @throws SQLException .
 	 */
 	public void ponerUsuarioComoExcluido(UsuarioBolsaEmpleo usuario) throws SQLException {
-		String query = "UPDATE TBEP_USUARIOS SET FLGEXCLUIDO = ?, FLGEXCLUIDOTIPO = ?, RAZON_EXCLUSION = ?, FECHA_EXCLUSION = ? WHERE CODNUM IN ?";		
+		
+		String query = "UPDATE TBEP_USUARIOS SET FLGEXCLUIDO = ?, FLGEXCLUIDOTIPO = ?, "
+				+ "RAZON_EXCLUSION = ?, FECHA_EXCLUSION = ?";
+		
+		if (usuario.getExcluidoTipo().equals("T")) {
+			query += ", FECHA_EXCLUSION_INICIO = ?, FECHA_EXCLUSION_FIN = ?";
+		}
+		
+		query += " WHERE CODNUM IN ?";	
 		
 		try (Connection conexion = ConexionUvirtual.obtenerInstancia(); PreparedStatement stmt = conexion.prepareStatement(query)) {
 			int indexParam = 1;
@@ -746,6 +784,12 @@ public class ModeloUsuarioBolsaEmpleo {
 			stmt.setString(indexParam++, usuario.getExcluidoTipo());
 			stmt.setString(indexParam++, usuario.getRazonExcluido());
 			stmt.setDate(indexParam++, new java.sql.Date(usuario.getFechaExclusion().getTime()));
+			
+			if (usuario.getExcluidoTipo().equals("T")) {
+				stmt.setDate(indexParam++, new java.sql.Date(usuario.getFechaExclusionInicio().getTime()));
+				stmt.setDate(indexParam++, new java.sql.Date(usuario.getFechaExclusionFin().getTime()));
+			}
+			
 			stmt.setInt(indexParam++, usuario.getCodNum());
 			stmt.executeUpdate();
 		}
@@ -757,11 +801,14 @@ public class ModeloUsuarioBolsaEmpleo {
 	 * @throws SQLException .
 	 */
 	public void ponerUsuarioComoNoExcluido(UsuarioBolsaEmpleo usuario) throws SQLException {
-		String query = "UPDATE TBEP_USUARIOS SET FLGEXCLUIDO = ?, FLGEXCLUIDOTIPO = ?, RAZON_EXCLUSION = ?, FECHA_EXCLUSION = ? WHERE CODNUM IN ?";		
+		String query = "UPDATE TBEP_USUARIOS SET FLGEXCLUIDO = ?, FLGEXCLUIDOTIPO = ?, "
+				+ "FECHA_EXCLUSION_INICIO=?, FECHA_EXCLUSION_FIN=?, RAZON_EXCLUSION = ?, FECHA_EXCLUSION = ? WHERE CODNUM IN ?";		
 		
 		try (Connection conexion = ConexionUvirtual.obtenerInstancia(); PreparedStatement stmt = conexion.prepareStatement(query)) {
 			int indexParam = 1;
 			stmt.setString(indexParam++, "N");
+			stmt.setNull(indexParam++, Types.NULL);
+			stmt.setNull(indexParam++, Types.NULL);
 			stmt.setNull(indexParam++, Types.NULL);
 			stmt.setNull(indexParam++, Types.NULL);
 			stmt.setNull(indexParam++, Types.NULL);
@@ -845,7 +892,7 @@ public class ModeloUsuarioBolsaEmpleo {
 						role = modeloRol.getRoleById(PARAM_ROL_CANDIDATO_ID);
 						
 						UsuarioBolsaEmpleo usuarioFinal = 
-						new UsuarioBolsaEmpleo(usuArcos.getCodigoPersonaArcos(), usuArcos.getUid(), role, true, false, null);
+						new UsuarioBolsaEmpleo(usuArcos.getCodigoPersonaArcos(), usuArcos.getUid(), role, true, false, null, null, null);
 						
 						insertaUsuario(usuarioFinal);
 					
