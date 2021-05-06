@@ -126,13 +126,19 @@ public class ControladorItemsBaremacion extends HttpServlet {
 	public static final String MENSAJE_ERROR_VALOR_NO_VALIDO = "Valor no válido";
 	public static final String MENSAJE_ERROR_AFINIDAD_VACIO = "La afinidad no puede estar vacia";
 	
-	// urls
-	public static final String URL_PATTERN_AJAX = "/srv/es/ajax/informacionadministrativa/bolsaempleo/configuracion/itemsbaremacion";
-	
-	// ruta vistas
+	// vistas	
 	public static final String RUTA_BEP_CONF = "/WEB-INF/jsp/vista/infadministrativa/bolsaempleo/configuracion/itemsbaremacion/";
-	
+	public static final String JSP_FORM_APARTADO_BAREMACION = RUTA_BEP_CONF + "formApartadoBaremacion.jsp";
+	public static final String JSP_FORM_BLOQUE_BAREMACION = RUTA_BEP_CONF + "formBloqueBaremacion.jsp";
+	public static final String JSP_FORM_ITEM_BAREMACION = RUTA_BEP_CONF + "formItemBaremacion.jsp";
+	public static final String JSP_ITEM_BAREMACION = RUTA_BEP_CONF + "itemsbaremacion.jsp";
+
+	// ajax
 	public static final int RESPONSE_HTTP_CODE_ERROR = 400;
+	public static final String URL_PATTERN_AJAX = "/srv/es/ajax/informacionadministrativa/bolsaempleo/configuracion/itemsbaremacion";	
+	public static final String RESPONSE_AJAX_CONTENTTYPE = "application/json";
+	public static final String RESPONSE_AJAX_ENCODING = "UTF-8";
+	public static final String RESPONSE_AJAX_ERROR = "error"; 	
 	
 	/** Peticion GET.
 	 * @see HttpServlet#doGet(HttpServletRequest request, HttpServletResponse response)
@@ -156,7 +162,7 @@ public class ControladorItemsBaremacion extends HttpServlet {
 			ModeloUsuarioBolsaEmpleo.obtenerInstancia().checkUser(datos);
 			switch (nombreAccion) {
 				case ACCION_INDEX:
-					indice(bean, request, response);
+					indice(bean);
 					break;
 				case ACCION_DATATABLE_APARTADOS:
 				case ACCION_AGREGAR_APARTADO:
@@ -190,6 +196,9 @@ public class ControladorItemsBaremacion extends HttpServlet {
 				case ACCION_ITEM_SELECCIONADO:
 					accionesItems(bean, datos, request, response, nombreAccion);					
 					break;
+				
+				default:
+					accionNodefinida(bean);
 			}
 		} catch (SQLException e) {
 			LOGGER.log(Level.SEVERE, Formateador.getStackTrace(e));
@@ -213,6 +222,7 @@ public class ControladorItemsBaremacion extends HttpServlet {
 	}
 	
 	/** Redireccion de do post.
+	 * @throws IOException .
 	 * @see HttpServlet#doPost(HttpServletRequest request, HttpServletResponse response)
 	 */
 	@Override
@@ -220,8 +230,13 @@ public class ControladorItemsBaremacion extends HttpServlet {
 		doGet(request, response);
 	}
 	
-	private void indice(VistaItemsBaremacion bean, HttpServletRequest request, HttpServletResponse response) {
-		bean.setVista(RUTA_BEP_CONF + "itemsbaremacion.jsp");
+	private void indice(VistaItemsBaremacion bean) {
+		bean.setVista(JSP_ITEM_BAREMACION);
+	}
+	
+	private void accionNodefinida(VistaItemsBaremacion bean) {
+		bean.getMensajesDeError().add("Acción no definida");
+		this.indice(bean);
 	}
 	
 	///////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -235,34 +250,36 @@ public class ControladorItemsBaremacion extends HttpServlet {
 				listadoApartados(bean, datos, request, response);
 				break;	
 			case ACCION_AGREGAR_APARTADO:
-				agregarApartado(bean, request, response);
+				agregarApartado(bean);
 				break;
 			case ACCION_AGREGAR_APARTADO_CONFIRM:
-				agregarApartadoConfirm(bean, request, response);
+				agregarApartadoConfirm(bean, request);
 				break;
 			case ACCION_EDITAR_APARTADO:
-				editarApartado(bean, request, response);
+				editarApartado(bean, request);
 				break;
 			case ACCION_EDITAR_APARTADO_CONFIRM:
-				editarApartadoConfirm(bean, request, response);
+				editarApartadoConfirm(bean, request);
 				break;
 			case ACCION_DESACTIVAR_APARTADO:
-				desactivarApartado(bean, request, response);
+				desactivarApartado(bean, request);
 				break;
 			case ACCION_ACTIVAR_APARTADO:
-				activarApartado(bean, request, response);
+				activarApartado(bean, request);
 				break;
 			case ACCION_APARTADO_SELECCIONADO:
-				seleccionarApartado(bean, request, response);
-				break;				
+				seleccionarApartado(bean, request);
+				break;	
+			default:
+				this.accionNodefinida(bean);
 		}
 	}
 	
 	private void listadoApartados(VistaItemsBaremacion bean, UVDatos datos, HttpServletRequest request, HttpServletResponse response) throws IOException, SQLException {
-		datos.setContentType("application/json");
+		datos.setContentType(RESPONSE_AJAX_CONTENTTYPE);
 		datos.setRespuestaEnviada(true);
-		response.setContentType("application/json");
-		response.setCharacterEncoding("UTF-8");
+		response.setContentType(RESPONSE_AJAX_CONTENTTYPE);
+		response.setCharacterEncoding(RESPONSE_AJAX_ENCODING);
 		
 		try (PrintWriter writer = response.getWriter()) {
 			try {
@@ -274,32 +291,32 @@ public class ControladorItemsBaremacion extends HttpServlet {
 			} catch (Exception ex) {
 				bean.getMensajesDeError().add(ex.getMessage());
 				
-				CodigoDescripcion mensaje = new CodigoDescripcion("error", ex.getMessage());
+				CodigoDescripcion mensaje = new CodigoDescripcion(RESPONSE_AJAX_ERROR, ex.getMessage());
 				writer.write(new Gson().toJson(mensaje));
 				response.setStatus(RESPONSE_HTTP_CODE_ERROR);
 			}
 		}
 	}
 	
-	private void agregarApartado(VistaItemsBaremacion bean, HttpServletRequest request, HttpServletResponse response) throws SQLException, UVException, IOException {
-		bean.setVista(RUTA_BEP_CONF + "formApartadoBaremacion.jsp");
+	private void agregarApartado(VistaItemsBaremacion bean) throws SQLException, UVException {
+		bean.setVista(JSP_FORM_APARTADO_BAREMACION);
 		bean.setApartadoBaremacion(null);
 		bean.setUltimoCodigo((Integer.parseInt(ModeloBaremacion.obtenerInstancia().getUltimoCodigoApartado()) + 1) + "");
 	}
 	
-	private void agregarApartadoConfirm(VistaItemsBaremacion bean, HttpServletRequest request, HttpServletResponse response) throws SQLException, UVException, IOException {
-		bean.setVista(RUTA_BEP_CONF + "formApartadoBaremacion.jsp");
+	private void agregarApartadoConfirm(VistaItemsBaremacion bean, HttpServletRequest request) throws SQLException, UVException {
+		bean.setVista(JSP_FORM_APARTADO_BAREMACION);
 		
 		ApartadoBaremacion apartado = this.validateApartadoBaremacion(new ApartadoBaremacion(), request);
 		apartado.setActivo(true);
 		ModeloBaremacion.obtenerInstancia().insertaApartado(apartado);
 		
 		bean.getMensajesDeExito().add(MENSAJE_EXITO_APARTADO_AGREGAR);
-		bean.setVista(RUTA_BEP_CONF + "itemsbaremacion.jsp");				
+		bean.setVista(JSP_ITEM_BAREMACION);				
 	}
 	
-	private void desactivarApartado(VistaItemsBaremacion bean, HttpServletRequest request, HttpServletResponse response) throws SQLException, UVException, IOException {
-		bean.setVista(RUTA_BEP_CONF + "itemsbaremacion.jsp");
+	private void desactivarApartado(VistaItemsBaremacion bean, HttpServletRequest request) throws SQLException, UVException {
+		bean.setVista(JSP_ITEM_BAREMACION);
 		
 		ModeloBaremacion modelo = ModeloBaremacion.obtenerInstancia();
 		Integer codNum = Formateador.leeParametroInteger(request.getParameter(PARAM_APARTADO));
@@ -310,9 +327,8 @@ public class ControladorItemsBaremacion extends HttpServlet {
 		bean.getMensajesDeExito().add(MENSAJE_EXITO_APARTADO_DESACTIVAR);
 	}
 	
-	private void activarApartado(VistaItemsBaremacion bean, HttpServletRequest request, HttpServletResponse response)
-			throws SQLException, UVException, IOException {
-		bean.setVista(RUTA_BEP_CONF + "itemsbaremacion.jsp");
+	private void activarApartado(VistaItemsBaremacion bean, HttpServletRequest request) throws SQLException, UVException {
+		bean.setVista(JSP_ITEM_BAREMACION);
 		
 		ModeloBaremacion modelo = ModeloBaremacion.obtenerInstancia();
 		Integer codNum = Formateador.leeParametroInteger(request.getParameter(PARAM_APARTADO));
@@ -323,37 +339,37 @@ public class ControladorItemsBaremacion extends HttpServlet {
 		bean.getMensajesDeExito().add(MENSAJE_EXITO_APARTADO_ACTIVAR);	
 	}
 	
-	private void editarApartado(VistaItemsBaremacion bean, HttpServletRequest request, HttpServletResponse response) throws SQLException, UVException, IOException {
+	private void editarApartado(VistaItemsBaremacion bean, HttpServletRequest request) throws SQLException, UVException {
 		ModeloBaremacion modelo = ModeloBaremacion.obtenerInstancia();
 		Integer codNum = Formateador.leeParametroInteger(request.getParameter(PARAM_APARTADO));
 		bean.setApartadoBaremacion(modelo.getApartadoBaremacionById(codNum));
 		
-		bean.setVista(RUTA_BEP_CONF + "formApartadoBaremacion.jsp");
+		bean.setVista(JSP_FORM_APARTADO_BAREMACION);
 		bean.setUltimoCodigo(ModeloBaremacion.obtenerInstancia().getUltimoCodigoApartado());			
 	}
 	
-	private void editarApartadoConfirm(VistaItemsBaremacion bean, HttpServletRequest request, HttpServletResponse response) throws SQLException, UVException, IOException {
+	private void editarApartadoConfirm(VistaItemsBaremacion bean, HttpServletRequest request) throws SQLException, UVException {
 		ModeloBaremacion modelo = ModeloBaremacion.obtenerInstancia();
 		Integer codNum = Formateador.leeParametroInteger(request.getParameter(PARAM_APARTADO));
 		ApartadoBaremacion apartado = this.validateApartadoBaremacion(modelo.getApartadoBaremacionById(codNum), request); 
 				
-		bean.setVista(RUTA_BEP_CONF + "formApartadoBaremacion.jsp");
+		bean.setVista(JSP_FORM_APARTADO_BAREMACION);
 		bean.setApartadoBaremacion(apartado);
 		
 		modelo.actualizaApartado(apartado);
 		
 		bean.getMensajesDeExito().add(MENSAJE_EXITO_APARTADO_EDITAR);
 		
-		bean.setVista(RUTA_BEP_CONF + "itemsbaremacion.jsp");
+		bean.setVista(JSP_ITEM_BAREMACION);
 	}
 	
-	private void seleccionarApartado(VistaItemsBaremacion bean, HttpServletRequest request, HttpServletResponse response) throws SQLException, UVException {
+	private void seleccionarApartado(VistaItemsBaremacion bean, HttpServletRequest request) throws SQLException, UVException {
 		ModeloBaremacion modelo = ModeloBaremacion.obtenerInstancia();
 		Integer codNum = Formateador.leeParametroInteger(request.getParameter(PARAM_APARTADO));
 		ApartadoBaremacion apartado = modelo.getApartadoBaremacionById(codNum);
 				
 		bean.setApartadoBaremacion(apartado);
-		bean.setVista(RUTA_BEP_CONF + "itemsbaremacion.jsp");
+		bean.setVista(JSP_ITEM_BAREMACION);
 	}
 	
 	private ApartadoBaremacion validateApartadoBaremacion(ApartadoBaremacion apartado, HttpServletRequest request) throws UVException {
@@ -390,16 +406,16 @@ public class ControladorItemsBaremacion extends HttpServlet {
 				listadoBloques(bean, datos, request, response);
 				break;	
 			case ACCION_AGREGAR_BLOQUE:
-				agregarBloque(bean, request, response);
+				agregarBloque(bean, request);
 				break;
 			case ACCION_AGREGAR_BLOQUE_CONFIRM:
-				agregarBloqueConfirm(bean, request, response);
+				agregarBloqueConfirm(bean, request);
 				break;
 			case ACCION_EDITAR_BLOQUE:
-				editarBloque(bean, request, response);
+				editarBloque(bean, request);
 				break;
 			case ACCION_EDITAR_BLOQUE_CONFIRM:
-				editarBloqueConfirm(bean, request, response);
+				editarBloqueConfirm(bean, request);
 				break;
 			case ACCION_DESACTIVAR_BLOQUE:
 				desactivarBloque(bean, request, response);
@@ -408,22 +424,24 @@ public class ControladorItemsBaremacion extends HttpServlet {
 				activarBloque(bean, request, response);
 				break;
 			case ACCION_BLOQUE_SELECCIONADO:
-				seleccionarBloque(bean, request, response);
-				break;				
+				seleccionarBloque(bean, request);
+				break;	
+			default:
+				this.accionNodefinida(bean);
 		}
 	}
 	
 	private void listadoBloques(VistaItemsBaremacion bean, UVDatos datos, HttpServletRequest request, HttpServletResponse response) 
-			throws IOException, SQLException, UVException {
+			throws SQLException, UVException, IOException {
 		
 		ModeloBaremacion modelo = ModeloBaremacion.obtenerInstancia();
 		Integer codNum = Formateador.leeParametroInteger(request.getParameter(PARAM_APARTADO));
 		ApartadoBaremacion apartado = modelo.getApartadoBaremacionById(codNum);
 		
-		datos.setContentType("application/json");
+		datos.setContentType(RESPONSE_AJAX_CONTENTTYPE);
 		datos.setRespuestaEnviada(true);
-		response.setContentType("application/json");
-		response.setCharacterEncoding("UTF-8");
+		response.setContentType(RESPONSE_AJAX_CONTENTTYPE);
+		response.setCharacterEncoding(RESPONSE_AJAX_ENCODING);
 		
 		try (PrintWriter writer = response.getWriter()) {
 			try {
@@ -435,26 +453,26 @@ public class ControladorItemsBaremacion extends HttpServlet {
 			} catch (Exception ex) {
 				bean.getMensajesDeError().add(ex.getMessage());
 				
-				CodigoDescripcion mensaje = new CodigoDescripcion("error", ex.getMessage());
+				CodigoDescripcion mensaje = new CodigoDescripcion(RESPONSE_AJAX_ERROR, ex.getMessage());
 				writer.write(new Gson().toJson(mensaje));
 				response.setStatus(RESPONSE_HTTP_CODE_ERROR);
 			}
 		}
 	}
 	
-	private void agregarBloque(VistaItemsBaremacion bean, HttpServletRequest request, HttpServletResponse response) throws SQLException, UVException, IOException {
+	private void agregarBloque(VistaItemsBaremacion bean, HttpServletRequest request) throws SQLException, UVException {
 		ModeloBaremacion modelo = ModeloBaremacion.obtenerInstancia();
 		Integer codNum = Formateador.leeParametroInteger(request.getParameter(PARAM_APARTADO));
 		ApartadoBaremacion apartado = modelo.getApartadoBaremacionById(codNum);
 		
 		bean.setApartadoBaremacion(apartado);
 		bean.setBloqueBaremacion(null);
-		bean.setVista(RUTA_BEP_CONF + "formBloqueBaremacion.jsp");	
+		bean.setVista(JSP_FORM_BLOQUE_BAREMACION);	
 		
 		bean.setUltimoCodigo((Integer.parseInt(modelo.getUltimoCodigoBloque(apartado)) + 1) + "");	
 	}
 	
-	private void agregarBloqueConfirm(VistaItemsBaremacion bean, HttpServletRequest request, HttpServletResponse response) throws SQLException, UVException, IOException {
+	private void agregarBloqueConfirm(VistaItemsBaremacion bean, HttpServletRequest request) throws SQLException, UVException {
 		ModeloBaremacion modelo = ModeloBaremacion.obtenerInstancia();
 		Integer codNum = Formateador.leeParametroInteger(request.getParameter(PARAM_APARTADO));
 		ApartadoBaremacion apartado = modelo.getApartadoBaremacionById(codNum);
@@ -462,7 +480,7 @@ public class ControladorItemsBaremacion extends HttpServlet {
 		bean.setApartadoBaremacion(apartado);
 		bean.setBloqueBaremacion(null);
 		bean.setUltimoCodigo(modelo.getUltimoCodigoBloque(apartado));
-		bean.setVista(RUTA_BEP_CONF + "formBloqueBaremacion.jsp");
+		bean.setVista(JSP_FORM_BLOQUE_BAREMACION);
 				
 		BloqueBaremacion bloque = this.validateBloqueBaremacion(new BloqueBaremacion(), request); 
 		bloque.setActivo(true);
@@ -472,11 +490,11 @@ public class ControladorItemsBaremacion extends HttpServlet {
 		modelo.insertaBloque(bloque);
 		
 		bean.getMensajesDeExito().add(MENSAJE_EXITO_BLOQUE_AGREGAR);
-		bean.setVista(RUTA_BEP_CONF + "itemsbaremacion.jsp");	
+		bean.setVista(JSP_ITEM_BAREMACION);	
 	}
 	
-	private void desactivarBloque(VistaItemsBaremacion bean, HttpServletRequest request, HttpServletResponse response) throws SQLException, UVException, IOException {
-		bean.setVista(RUTA_BEP_CONF + "itemsbaremacion.jsp");
+	private void desactivarBloque(VistaItemsBaremacion bean, HttpServletRequest request, HttpServletResponse response) throws SQLException, UVException {
+		bean.setVista(JSP_ITEM_BAREMACION);
 		
 		ModeloBaremacion modelo = ModeloBaremacion.obtenerInstancia();
 		BloqueBaremacion bloque = modelo.getBloqueBaremacionById(Formateador.leeParametroInteger(request.getParameter(PARAM_BLOQUE)));
@@ -484,12 +502,11 @@ public class ControladorItemsBaremacion extends HttpServlet {
 		modelo.desactivarBloque(bloque);		
 		
 		bean.getMensajesDeExito().add(MENSAJE_EXITO_BLOQUE_DESACTIVAR);
-		this.seleccionarBloque(bean, request, response);
+		this.seleccionarBloque(bean, request);
 	}
 	
-	private void activarBloque(VistaItemsBaremacion bean, HttpServletRequest request, HttpServletResponse response)
-			throws SQLException, UVException, IOException {
-		bean.setVista(RUTA_BEP_CONF + "itemsbaremacion.jsp");
+	private void activarBloque(VistaItemsBaremacion bean, HttpServletRequest request, HttpServletResponse response) throws SQLException, UVException {
+		bean.setVista(JSP_ITEM_BAREMACION);
 		
 		ModeloBaremacion modelo = ModeloBaremacion.obtenerInstancia();
 		BloqueBaremacion bloque = modelo.getBloqueBaremacionById(Formateador.leeParametroInteger(request.getParameter(PARAM_BLOQUE)));
@@ -497,44 +514,43 @@ public class ControladorItemsBaremacion extends HttpServlet {
 		modelo.activarBloque(bloque);
 		
 		bean.getMensajesDeExito().add(MENSAJE_EXITO_BLOQUE_ACTIVAR);
-		this.seleccionarBloque(bean, request, response);			
+		this.seleccionarBloque(bean, request);			
 	}
 	
-	private void editarBloque(VistaItemsBaremacion bean, HttpServletRequest request, HttpServletResponse response) throws SQLException, UVException, IOException {
+	private void editarBloque(VistaItemsBaremacion bean, HttpServletRequest request) throws SQLException, UVException {
 		ModeloBaremacion modelo = ModeloBaremacion.obtenerInstancia();
 		BloqueBaremacion bloque = modelo.getBloqueBaremacionById(Formateador.leeParametroInteger(request.getParameter(PARAM_BLOQUE)));
 		
 		bean.setApartadoBaremacion(bloque.getApartadoBaremacion());
 		bean.setBloqueBaremacion(bloque);
 		
-		bean.setVista(RUTA_BEP_CONF + "formBloqueBaremacion.jsp");
+		bean.setVista(JSP_FORM_BLOQUE_BAREMACION);
 		bean.setUltimoCodigo(ModeloBaremacion.obtenerInstancia().getUltimoCodigoApartado());			
 	}
 	
-	private void editarBloqueConfirm(VistaItemsBaremacion bean, HttpServletRequest request, HttpServletResponse response) throws SQLException, UVException, IOException {
+	private void editarBloqueConfirm(VistaItemsBaremacion bean, HttpServletRequest request) throws SQLException, UVException {
 		ModeloBaremacion modelo = ModeloBaremacion.obtenerInstancia();
 		Integer codBloque = Formateador.leeParametroInteger(request.getParameter(PARAM_BLOQUE));
 
-		bean.setVista(RUTA_BEP_CONF + "formBloqueBaremacion.jsp");
+		bean.setVista(JSP_FORM_BLOQUE_BAREMACION);
 		BloqueBaremacion bloque = modelo.getBloqueBaremacionById(codBloque);
 		bean.setApartadoBaremacion(bloque.getApartadoBaremacion());
 		bean.setBloqueBaremacion(bloque);
 
-		bloque = this.validateBloqueBaremacion(bloque, request);
-		modelo.actualizaBloque(bloque);
+		modelo.actualizaBloque(this.validateBloqueBaremacion(bloque, request));
 
 		bean.getMensajesDeExito().add(MENSAJE_EXITO_BLOQUE_EDITAR);
 
-		bean.setVista(RUTA_BEP_CONF + "itemsbaremacion.jsp");
+		bean.setVista(JSP_ITEM_BAREMACION);
 	}
 	
-	private void seleccionarBloque(VistaItemsBaremacion bean, HttpServletRequest request, HttpServletResponse response) throws SQLException, UVException {
+	private void seleccionarBloque(VistaItemsBaremacion bean, HttpServletRequest request) throws SQLException, UVException {
 		ModeloBaremacion modelo = ModeloBaremacion.obtenerInstancia();
 		BloqueBaremacion bloque = modelo.getBloqueBaremacionById(Formateador.leeParametroInteger(request.getParameter(PARAM_BLOQUE)));
 				
 		bean.setApartadoBaremacion(bloque.getApartadoBaremacion());
 		bean.setBloqueBaremacion(bloque);		
-		bean.setVista(RUTA_BEP_CONF + "itemsbaremacion.jsp");
+		bean.setVista(JSP_ITEM_BAREMACION);
 	}
 	
 	private BloqueBaremacion validateBloqueBaremacion(BloqueBaremacion bloque, HttpServletRequest request) throws UVException {
@@ -573,16 +589,16 @@ public class ControladorItemsBaremacion extends HttpServlet {
 				listadoItems(bean, datos, request, response);
 				break;	
 			case ACCION_AGREGAR_ITEM:
-				agregarItem(bean, request, response);
+				agregarItem(bean, request);
 				break;
 			case ACCION_AGREGAR_ITEM_CONFIRM:
-				agregarItemConfirm(bean, request, response);
+				agregarItemConfirm(bean, request);
 				break;
 			case ACCION_EDITAR_ITEM:
-				editarItem(bean, request, response);
+				editarItem(bean, request);
 				break;
 			case ACCION_EDITAR_ITEM_CONFIRM:
-				editarItemConfirm(bean, request, response);
+				editarItemConfirm(bean, request);
 				break;
 			case ACCION_DESACTIVAR_ITEM:
 				desactivarItem(bean, request, response);
@@ -591,8 +607,10 @@ public class ControladorItemsBaremacion extends HttpServlet {
 				activarItem(bean, request, response);
 				break;
 			case ACCION_ITEM_SELECCIONADO:
-				seleccionarItem(bean, request, response);
+				seleccionarItem(bean, request);
 				break;
+			default:
+				this.accionNodefinida(bean);
 		}
 	}
 	
@@ -603,10 +621,10 @@ public class ControladorItemsBaremacion extends HttpServlet {
 		Integer codNum = Formateador.leeParametroInteger(request.getParameter(PARAM_BLOQUE));
 		BloqueBaremacion bloque = modelo.getBloqueBaremacionById(codNum);
 		
-		datos.setContentType("application/json");
+		datos.setContentType(RESPONSE_AJAX_CONTENTTYPE);
 		datos.setRespuestaEnviada(true);
-		response.setContentType("application/json");
-		response.setCharacterEncoding("UTF-8");
+		response.setContentType(RESPONSE_AJAX_CONTENTTYPE);
+		response.setCharacterEncoding(RESPONSE_AJAX_ENCODING);
 		
 		try (PrintWriter writer = response.getWriter()) {
 			try {
@@ -617,14 +635,14 @@ public class ControladorItemsBaremacion extends HttpServlet {
 			} catch (Exception ex) {
 				bean.getMensajesDeError().add(ex.getMessage());
 				
-				CodigoDescripcion mensaje = new CodigoDescripcion("error", ex.getMessage());
+				CodigoDescripcion mensaje = new CodigoDescripcion(RESPONSE_AJAX_ERROR, ex.getMessage());
 				writer.write(new Gson().toJson(mensaje));
 				response.setStatus(RESPONSE_HTTP_CODE_ERROR);
 			}
 		}
 	}
 	
-	private void agregarItem(VistaItemsBaremacion bean, HttpServletRequest request, HttpServletResponse response) throws SQLException, UVException, IOException {
+	private void agregarItem(VistaItemsBaremacion bean, HttpServletRequest request) throws SQLException, UVException {
 		ModeloBaremacion modelo = ModeloBaremacion.obtenerInstancia();
 		Integer codNum = Formateador.leeParametroInteger(request.getParameter(PARAM_BLOQUE));
 		BloqueBaremacion bloque = modelo.getBloqueBaremacionById(codNum);
@@ -636,12 +654,12 @@ public class ControladorItemsBaremacion extends HttpServlet {
 		ModeloAfinidad modeloAfinidad = ModeloAfinidad.obtenerInstancia();
 		bean.setAfinidades(modeloAfinidad.getTiposAfinidad());
 		
-		bean.setVista(RUTA_BEP_CONF + "formItemBaremacion.jsp");	
+		bean.setVista(JSP_FORM_ITEM_BAREMACION);	
 		
 		bean.setUltimoCodigo((Integer.parseInt(modelo.getUltimoCodigoItem(bloque)) + 1) + "");	
 	}
 	
-	private void agregarItemConfirm(VistaItemsBaremacion bean, HttpServletRequest request, HttpServletResponse response) throws SQLException, UVException, IOException {
+	private void agregarItemConfirm(VistaItemsBaremacion bean, HttpServletRequest request) throws SQLException, UVException {
 		ModeloBaremacion modelo = ModeloBaremacion.obtenerInstancia();
 		Integer codNum = Formateador.leeParametroInteger(request.getParameter(PARAM_BLOQUE));
 		BloqueBaremacion bloque = modelo.getBloqueBaremacionById(codNum);
@@ -650,7 +668,7 @@ public class ControladorItemsBaremacion extends HttpServlet {
 		bean.setBloqueBaremacion(bloque);
 		bean.setItemBaremacion(null);
 		bean.setUltimoCodigo(modelo.getUltimoCodigoItem(bloque));
-		bean.setVista(RUTA_BEP_CONF + "formItemBaremacion.jsp");
+		bean.setVista(JSP_FORM_ITEM_BAREMACION);
 
 		// agregamos
 		ItemBaremacion item = this.validateItemBaremacion(new ItemBaremacion(), request);
@@ -659,10 +677,10 @@ public class ControladorItemsBaremacion extends HttpServlet {
 		modelo.insertaItem(item);
 
 		bean.getMensajesDeExito().add(MENSAJE_EXITO_ITEM_AGREGAR);
-		bean.setVista(RUTA_BEP_CONF + "itemsbaremacion.jsp");
+		bean.setVista(JSP_ITEM_BAREMACION);
 	}
 	
-	private void editarItem(VistaItemsBaremacion bean, HttpServletRequest request, HttpServletResponse response) throws SQLException, UVException, IOException {
+	private void editarItem(VistaItemsBaremacion bean, HttpServletRequest request) throws SQLException, UVException {
 		ModeloBaremacion modelo = ModeloBaremacion.obtenerInstancia();
 		ModeloAfinidad modeloAfinidad = ModeloAfinidad.obtenerInstancia();
 		ItemBaremacion item = modelo.getItemBaremacionById(Formateador.leeParametroInteger(request.getParameter(PARAM_ITEM)));
@@ -673,29 +691,28 @@ public class ControladorItemsBaremacion extends HttpServlet {
 		
 		bean.setAfinidades(modeloAfinidad.getTiposAfinidad());
 		
-		bean.setVista(RUTA_BEP_CONF + "formItemBaremacion.jsp");
+		bean.setVista(JSP_FORM_ITEM_BAREMACION);
 		bean.setUltimoCodigo(ModeloBaremacion.obtenerInstancia().getUltimoCodigoApartado());
 	}
 	
-	private void editarItemConfirm(VistaItemsBaremacion bean, HttpServletRequest request, HttpServletResponse response) throws SQLException, UVException, IOException {
+	private void editarItemConfirm(VistaItemsBaremacion bean, HttpServletRequest request) throws SQLException, UVException {
 		ModeloBaremacion modelo = ModeloBaremacion.obtenerInstancia();
 		ItemBaremacion item = modelo.getItemBaremacionById(Formateador.leeParametroInteger(request.getParameter(PARAM_ITEM)));
 
-		bean.setVista(RUTA_BEP_CONF + "formItemBaremacion.jsp");
+		bean.setVista(JSP_FORM_ITEM_BAREMACION);
 		bean.setApartadoBaremacion(item.getBloqueBaremacion().getApartadoBaremacion());
 		bean.setBloqueBaremacion(item.getBloqueBaremacion());
 		bean.setItemBaremacion(item);
 
-		item = this.validateItemBaremacion(item, request);
-		modelo.actualizaItem(item);
+		modelo.actualizaItem(this.validateItemBaremacion(item, request));
 
 		bean.getMensajesDeExito().add(MENSAJE_EXITO_ITEM_EDITAR);
 
-		bean.setVista(RUTA_BEP_CONF + "itemsbaremacion.jsp");
+		bean.setVista(JSP_ITEM_BAREMACION);
 	}
 	
-	private void desactivarItem(VistaItemsBaremacion bean, HttpServletRequest request, HttpServletResponse response) throws SQLException, UVException, IOException {
-		bean.setVista(RUTA_BEP_CONF + "itemsbaremacion.jsp");
+	private void desactivarItem(VistaItemsBaremacion bean, HttpServletRequest request, HttpServletResponse response) throws SQLException, UVException {
+		bean.setVista(JSP_ITEM_BAREMACION);
 		
 		ModeloBaremacion modelo = ModeloBaremacion.obtenerInstancia();
 		ItemBaremacion item = modelo.getItemBaremacionById(Formateador.leeParametroInteger(request.getParameter(PARAM_ITEM)));
@@ -703,12 +720,11 @@ public class ControladorItemsBaremacion extends HttpServlet {
 		modelo.desactivarItem(item);		
 		
 		bean.getMensajesDeExito().add(MENSAJE_EXITO_ITEM_DESACTIVAR);
-		this.seleccionarItem(bean, request, response);
+		this.seleccionarItem(bean, request);
 	}
 	
-	private void activarItem(VistaItemsBaremacion bean, HttpServletRequest request, HttpServletResponse response)
-			throws SQLException, UVException, IOException {
-		bean.setVista(RUTA_BEP_CONF + "itemsbaremacion.jsp");
+	private void activarItem(VistaItemsBaremacion bean, HttpServletRequest request, HttpServletResponse response) throws SQLException, UVException {
+		bean.setVista(JSP_ITEM_BAREMACION);
 		
 		ModeloBaremacion modelo = ModeloBaremacion.obtenerInstancia();
 		ItemBaremacion item = modelo.getItemBaremacionById(Formateador.leeParametroInteger(request.getParameter(PARAM_ITEM)));
@@ -716,10 +732,10 @@ public class ControladorItemsBaremacion extends HttpServlet {
 		modelo.activarItem(item);
 		
 		bean.getMensajesDeExito().add(MENSAJE_EXITO_ITEM_ACTIVAR);
-		this.seleccionarItem(bean, request, response);			
+		this.seleccionarItem(bean, request);			
 	}
 	
-	private void seleccionarItem(VistaItemsBaremacion bean, HttpServletRequest request, HttpServletResponse response) throws SQLException, UVException {
+	private void seleccionarItem(VistaItemsBaremacion bean, HttpServletRequest request) throws SQLException, UVException {
 		ModeloBaremacion modelo = ModeloBaremacion.obtenerInstancia();
 		Integer codNum = Formateador.leeParametroInteger(request.getParameter(PARAM_ITEM));
 		ItemBaremacion item = modelo.getItemBaremacionById(codNum);

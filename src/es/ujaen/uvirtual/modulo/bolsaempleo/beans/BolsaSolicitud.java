@@ -4,7 +4,7 @@ import java.io.Serializable;
 import java.util.List;
 
 /** Una bolsa seleccionada por el candidato en la solicitud. Contiene los meritos asigandos a la bolsa.
- * @author ATISoluciones
+ * @author ATISoluciones 2021
  */
 public class BolsaSolicitud extends Bolsa implements Serializable {
 

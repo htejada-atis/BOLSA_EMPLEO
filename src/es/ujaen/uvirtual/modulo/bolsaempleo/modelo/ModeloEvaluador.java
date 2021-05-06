@@ -20,7 +20,7 @@ import es.ujaen.uvirtual.utilidades.UVException;
  * Clase para obtener la información de usuarios de UVIRTUAL.
  * Modelo - Operaciones con nombres: lista,    actualiza,  borra,    inserta
  * Controlador - Opers. con nombres: obtener,  cambiar,    eliminar, agregar
- * @author ATISoluciones
+ * @author ATISoluciones 2021
  */
 public class ModeloEvaluador {
 	

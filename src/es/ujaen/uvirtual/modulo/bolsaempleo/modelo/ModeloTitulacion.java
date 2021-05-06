@@ -21,7 +21,7 @@ import es.ujaen.uvirtual.utilidades.UVException;
 
 /**
  * Clase de modelo para la gestión de titulaciones. 
- * @author ATISoluciones
+ * @author ATISoluciones 2021
  */
 public class ModeloTitulacion {
 	public static final int ORDER_COLUMN_INDEX_ID = 0;

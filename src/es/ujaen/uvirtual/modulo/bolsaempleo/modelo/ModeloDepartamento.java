@@ -11,7 +11,7 @@ import es.ujaen.uvirtual.utilidades.UVException;
 
 /**
  * Clase de modelo para la gestión de departamentos. 
- * @author ATISoluciones
+ * @author ATISoluciones 2021
  */
 public class ModeloDepartamento {	
 	

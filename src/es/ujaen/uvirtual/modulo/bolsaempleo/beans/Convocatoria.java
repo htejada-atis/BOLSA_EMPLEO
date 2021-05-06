@@ -5,7 +5,7 @@ import java.util.Date;
 
 
 /** Clase convocatario de bolsa empleo.
- * @author ATISoluciones 
+ * @author ATISoluciones 2021
  */
 public class Convocatoria implements Serializable {
 	private static final long serialVersionUID = 1L;

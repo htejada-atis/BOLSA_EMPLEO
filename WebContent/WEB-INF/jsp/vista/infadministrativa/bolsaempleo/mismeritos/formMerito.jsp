@@ -97,7 +97,7 @@ String observacion = BolsaEmpleoUtils.getParamForm(request, ControladorMisMerito
 			<div class="form-group">
 	    		<div class="form-group">
 	    			<label for="merito_descripcion" class="bold-label">Descripción:</label>
-	    			<textarea class="form-input-custom" id="merito_descripcion" type="text" name="<%= ControladorMisMeritos.PARAM_DESCRIPCION %>" value="<%= descripcion %>"></textarea>
+	    			<textarea class="form-input-custom" id="merito_descripcion" name="<%= ControladorMisMeritos.PARAM_DESCRIPCION %>"><%= descripcion %></textarea>
 	    		</div>
     		</div>
 		</div>

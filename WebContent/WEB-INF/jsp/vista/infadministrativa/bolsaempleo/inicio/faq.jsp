@@ -79,8 +79,7 @@ UVDatos uvdatos = (UVDatos)request.getAttribute(UVDatos.NOMBRE_ATRIBUTO);
 		<ul>
 			<li>Entra en Rueda dentada &gt; Opciones &gt; Evitar correo no deseado &gt; Remitentes seguros y bloqueados</li>
 			<li>Agregar a la lista @ujaen.es</li>
-			<li>Agregar a la lista @red.ujaen.es</li>
-			<br/><br/>
+			<li>Agregar a la lista @red.ujaen.es</li>			
 		</ul>
     </div>
 	
