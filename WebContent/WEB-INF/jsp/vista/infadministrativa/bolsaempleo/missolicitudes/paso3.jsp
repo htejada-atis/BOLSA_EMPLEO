@@ -125,6 +125,10 @@ VistaSolicitudes bean = (VistaSolicitudes) uvdatos.getVistas().get(VistaSolicitu
 	            				'<%= ControladorMisSolicitudes.PARAM_SOLICITUD_ID %>': '<%= bean.getSolicitud().getCodNum() %>'
 	            				};
 	        			Atis.sendForm("<%= request.getRequestURI() %>", params);
+	        			
+	        			$("a").attr("disabled", "disabled");
+	        			document.getElementById("paso3_confirmar").innerHTML = "Generando solicitud...";
+	        			
 	              		$(this).dialog("close");
 	            	},
 	            	'No': function() {
