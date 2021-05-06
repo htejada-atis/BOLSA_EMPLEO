@@ -288,7 +288,6 @@ public class ModeloMisTitulaciones {
 		if (titulacion.getArchivo() == null) {
 			throw new UVException("No se puede insertar una titulación sin archivo");
 		}
-		Integer espacio = titulacion.getArchivo().available();
 		if (titulacion.getArchivo().available() > MAX_FILE_SIZE) {
 			throw new UVException("No se puede insertar un archivo tan grande");
 		}

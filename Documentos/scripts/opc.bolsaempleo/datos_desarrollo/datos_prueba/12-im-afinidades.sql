@@ -3,8 +3,12 @@ VALUES (1,'AA','Propia al área',100);
 INSERT INTO TBEP_AFINIDADES (CODNUM,CODIGO,DESCRIPCION,MODULACION)
 VALUES (2,'AA','Afín al área',75);
 INSERT INTO TBEP_AFINIDADES (CODNUM,CODIGO,DESCRIPCION,MODULACION)
-VALUES (3,'AI','Contribución asociada al perfil investigador de la plaza',100);
+VALUES (3,'AA','Sin afinidad',0);
 INSERT INTO TBEP_AFINIDADES (CODNUM,CODIGO,DESCRIPCION,MODULACION)
-VALUES (4,'AI','Contribución asociada a otras líneas de investigación de la plaza',50);
+VALUES (4,'AI','Contribución asociada al perfil investigador de la plaza',100);
 INSERT INTO TBEP_AFINIDADES (CODNUM,CODIGO,DESCRIPCION,MODULACION)
-VALUES (5,'AI','Contribución asociada a áreas afines',30);
+VALUES (5,'AI','Contribución asociada a otras líneas de investigación de la plaza',50);
+INSERT INTO TBEP_AFINIDADES (CODNUM,CODIGO,DESCRIPCION,MODULACION)
+VALUES (6,'AI','Contribución asociada a áreas afines',30);
+INSERT INTO TBEP_AFINIDADES (CODNUM,CODIGO,DESCRIPCION,MODULACION)
+VALUES (7,'AI','Sin afinidad',0);

@@ -399,7 +399,7 @@ public class TestBEPControladorMisSolicitudes {
 		peticion.setParameter(ControladorMisSolicitudes.PARAM_ACCION, ControladorMisSolicitudes.ACCION_MERITO_DESELECCIONADO);
 		peticion.setParameter(ControladorMisSolicitudes.PARAM_SOLICITUD_ID, bean.getDatatableSolicitudes().getData().get(0).getCodNum().toString());
 		peticion.setParameter(ControladorMisSolicitudes.PARAM_BOLSA, bean2.getDatatableBolsasSolicitud().getData().get(0).getCodNum().toString());
-		peticion.setParameter(ControladorMisSolicitudes.PARAM_MERITO, bean3.getDataTableMeritos().getData().get(0).getCodNum().toString());
+		peticion.setParameter(ControladorMisSolicitudes.PARAM_MERITO_ID, bean3.getDataTableMeritos().getData().get(0).getCodNum().toString());
 		
 		RespuestaHttp respuesta = new RespuestaHttp();
 		ControladorMisSolicitudes controlador = new ControladorMisSolicitudes();
@@ -427,7 +427,7 @@ public class TestBEPControladorMisSolicitudes {
 		peticion.setParameter(ControladorMisSolicitudes.PARAM_ACCION, ControladorMisSolicitudes.ACCION_MERITO_SELECCIONADO);
 		peticion.setParameter(ControladorMisSolicitudes.PARAM_SOLICITUD_ID, bean.getDatatableSolicitudes().getData().get(0).getCodNum().toString());
 		peticion.setParameter(ControladorMisSolicitudes.PARAM_BOLSA, bean2.getDatatableBolsasSolicitud().getData().get(0).getCodNum().toString());
-		peticion.setParameter(ControladorMisSolicitudes.PARAM_MERITO, bean3.getDataTableMeritos().getData().get(0).getCodNum().toString());
+		peticion.setParameter(ControladorMisSolicitudes.PARAM_MERITO_ID, bean3.getDataTableMeritos().getData().get(0).getCodNum().toString());
 		
 		RespuestaHttp respuesta = new RespuestaHttp();
 		ControladorMisSolicitudes controlador = new ControladorMisSolicitudes();

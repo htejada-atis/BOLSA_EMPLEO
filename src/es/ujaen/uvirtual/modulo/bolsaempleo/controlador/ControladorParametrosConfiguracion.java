@@ -2,7 +2,6 @@ package es.ujaen.uvirtual.modulo.bolsaempleo.controlador;
 
 import java.io.IOException;
 import java.sql.SQLException;
-import java.util.Date;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -13,20 +12,13 @@ import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import javax.servlet.http.HttpSession;
 
-import es.ujaen.uvirtual.adm.CrearUsuario;
 import es.ujaen.uvirtual.beans.UVDatos;
 import es.ujaen.uvirtual.beans.Usuario;
 import es.ujaen.uvirtual.modulo.bolsaempleo.beans.ParametrosConfiguracion;
-import es.ujaen.uvirtual.modulo.bolsaempleo.beans.Rol;
-import es.ujaen.uvirtual.modulo.bolsaempleo.beans.UsuarioBolsaEmpleo;
 import es.ujaen.uvirtual.modulo.bolsaempleo.modelo.ModeloParametrosConfiguracion;
-import es.ujaen.uvirtual.modulo.bolsaempleo.modelo.ModeloRol;
 import es.ujaen.uvirtual.modulo.bolsaempleo.modelo.ModeloUsuarioBolsaEmpleo;
-import es.ujaen.uvirtual.modulo.bolsaempleo.utilidades.BolsaEmpleoValidator;
 import es.ujaen.uvirtual.modulo.bolsaempleo.vistas.VistaParametrosConfiguracion;
-import es.ujaen.uvirtual.modulo.bolsaempleo.vistas.VistaUsuarioBolsaEmpleo;
 import es.ujaen.uvirtual.utilidades.EscapaHTML;
 import es.ujaen.uvirtual.utilidades.Formateador;
 import es.ujaen.uvirtual.utilidades.UVException;
@@ -172,10 +164,10 @@ public class ControladorParametrosConfiguracion extends HttpServlet {
 	 * @throws SQLException excepcion de bbdd.
 	 */
 	private void editarParametros(HttpServletRequest request, HttpServletResponse response, VistaParametrosConfiguracion bean) throws SQLException {
-		ModeloParametrosConfiguracion modelo = ModeloParametrosConfiguracion.obtenerInstancia();
-		List<ParametrosConfiguracion> parametros = modelo.listaParametros();
+		// ModeloParametrosConfiguracion modelo = ModeloParametrosConfiguracion.obtenerInstancia();
+		// List<ParametrosConfiguracion> parametros = modelo.listaParametros();
 		
-		request.getParameter(PARAM_RAZON_EXCLUIDO)
+		//request.getParameter(PARAM_RAZON_EXCLUIDO)
 		
 	}
 
