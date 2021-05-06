@@ -400,6 +400,7 @@ public class ControladorMisMeritos extends HttpServlet {
 	
 	/** Valida el formulario de Mis Méritos.
 	 * @param request .
+	 * @param valorBool .
 	 * @return BolsaEmpleoValidator validator .
 	 * @throws UVException .
 	 * @throws SQLException .

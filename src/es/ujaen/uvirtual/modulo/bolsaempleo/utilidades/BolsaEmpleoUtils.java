@@ -69,7 +69,7 @@ public class BolsaEmpleoUtils {
 	 * @param value .
 	 * @return .
 	 */
-	public static Boolean isInteger(String value) {
+	public static boolean isInteger(String value) {
 		if (value == null) {
 			return false;
 		}

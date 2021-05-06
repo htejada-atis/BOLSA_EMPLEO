@@ -39,7 +39,7 @@ VistaEvaluadores bean = (VistaEvaluadores) uvdatos.getVistas().get(VistaEvaluado
 	<div class="titulo-bolsa-empleo">
 		<div class="form-select">
 			<label>Área</label>
-			<select id="select_area" autocomplete="off">
+			<select id="select_area">
 				<option value="0">Elija el área</option>
 				<%
 				for(Area area: bean.getAreas()) {

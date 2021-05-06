@@ -920,7 +920,7 @@ public class ModeloBaremacion {
 			} else {
 				stmt.setString(parameterIndex++, item.getAfinidad());	
 			}	
-			if (item.getAfinidad() == null) {
+			if (item.getIndividualizado() == null) {
 				stmt.setString(parameterIndex++, "N");
 			} else {
 				stmt.setString(parameterIndex++, item.getIndividualizado() ? "S" : "N");
@@ -977,7 +977,7 @@ public class ModeloBaremacion {
 			stmt.setFloat(parameterIndex++, item.getValorMinimo());
 			stmt.setFloat(parameterIndex++, item.getValorMaximo());
 			stmt.setString(parameterIndex++, item.getAfinidad());
-			if (item.getAfinidad() == null) {
+			if (item.getIndividualizado() == null) {
 				stmt.setString(parameterIndex++, "N");
 			} else {
 				stmt.setString(parameterIndex++, item.getIndividualizado() ? "S" : "N");

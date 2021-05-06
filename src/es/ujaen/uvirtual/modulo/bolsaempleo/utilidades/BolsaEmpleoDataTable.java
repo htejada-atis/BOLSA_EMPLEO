@@ -21,7 +21,7 @@ import es.ujaen.uvirtual.utilidades.UVException;
 
 /**
  * Utilidad para la gestión de los parámetros del datatable.
- * @author ATISoluciones
+ * @author ATISoluciones 2021
  * @param <T> Modelo que gestiona el datatable.
  */
 public class BolsaEmpleoDataTable<T> {

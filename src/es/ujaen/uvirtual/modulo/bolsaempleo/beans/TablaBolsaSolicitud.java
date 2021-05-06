@@ -3,7 +3,7 @@ package es.ujaen.uvirtual.modulo.bolsaempleo.beans;
 import java.io.Serializable;
 
 /** Clase para gestionar la tabla del bolsas en una solicitud.
- * @author Atisoluciones
+ * @author ATISoluciones
  */
 public class TablaBolsaSolicitud extends Bolsa implements Serializable {
 

@@ -99,8 +99,13 @@ function alertDialog(title, message, onOk) {
 			resizable: false,
 			buttons: {
 				Ok: function() {
-					onOk && onOk(this);
-					$(this).dialog("close");
+					if (onOk) {
+						if (onOk(this)) {
+							$(this).dialog("close");
+						}
+					} else {
+						$(this).dialog("close");
+					}
 				}
 			},
 			close: function(event, ui) {
@@ -135,7 +140,16 @@ function json2Object(json) {
 }
 
 function escapeHtml(str) {
-    return str.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;").replace(/'/g, "&#039;");
+    //return str.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;").replace(/'/g, "&#039;");
+    return str.replace(/</g, "&lt;").replace(/>/g, "&gt;");
+}
+
+function strToFloat(str) {
+	if (str.replace) {
+		return parseFloat(str.replace('.', '').replace(',', '.'));
+	} else {
+		return 0;
+	}
 }
 
 window.Atis = $.extend(window.Atis ? window.Atis : {}, {
@@ -151,5 +165,6 @@ window.Atis = $.extend(window.Atis ? window.Atis : {}, {
 	"json2Object": json2Object,
 	"sendAjax": sendAjax,
 	"removeValueArray": removeValueArray,
-	"escapeHtml": escapeHtml
+	"escapeHtml": escapeHtml,
+	"strToFloat": strToFloat
 });
