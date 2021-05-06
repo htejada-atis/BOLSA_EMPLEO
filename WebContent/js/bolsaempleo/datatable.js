@@ -101,7 +101,7 @@ function DataTable(id, config) {
     this.addRow = function(row, index) {
     	var tr = $('<tr id="' + this.id + '_row_' + index + '"></tr>');
 
-        if (self.config.clickable || self.config.selectable) {
+        if (self.config.clickable) {
             $(tr).addClass('clickable');
         }
 

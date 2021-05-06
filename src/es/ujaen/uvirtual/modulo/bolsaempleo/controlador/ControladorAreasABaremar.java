@@ -250,9 +250,6 @@ public class ControladorAreasABaremar extends HttpServlet {
 		Integer nuevas = modeloArea.insertarAreasNuevasExternas();
 		Integer actualizadas = modeloArea.actualizaAreasDeExternas();
 		
-		System.out.println("nuevas: " + nuevas);
-		System.out.println("actualizadas: " + actualizadas);
-		
 		if (nuevas > 0 || actualizadas > 0) {
 			if (nuevas > 0) {
 				bean.getMensajesDeExito().add(nuevas > 1 ? String.format(MENSAJE_EXITO_AREA_AGREGADA, nuevas) : MENSAJE_EXITO_AREA_AGREGADA);
