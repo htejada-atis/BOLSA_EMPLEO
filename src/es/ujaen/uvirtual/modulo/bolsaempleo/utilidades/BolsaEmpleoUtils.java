@@ -1,5 +1,6 @@
 package es.ujaen.uvirtual.modulo.bolsaempleo.utilidades;
 
+import java.text.DecimalFormat;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -12,6 +13,7 @@ import javax.servlet.http.Part;
  *
  */
 public class BolsaEmpleoUtils {
+	private final static double ROUNDER = 100.0;
 	
 	private BolsaEmpleoUtils() { }
 	
@@ -109,5 +111,14 @@ public class BolsaEmpleoUtils {
 		} catch (Exception e) {
 			return null;
 		}
+	}
+	
+	/**
+	 * Redondeo a dos decimales.
+	 * @param v .
+	 * @return .
+	 */
+	public static double redondeo(double v) {
+		return Math.round(v * ROUNDER) / ROUNDER;
 	}
 }
