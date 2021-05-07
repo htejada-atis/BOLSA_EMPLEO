@@ -306,7 +306,7 @@ public class BbddRunner {
 	 * @throws SQLException si error en bd
 	 */
 	public static void ejecutarRh(String rutaFichero) throws IOException, SQLException {
-		try (Connection con = obtenerConexionArcos()) {
+		try (Connection con = obtenerConexionRh()) {
 			try (Scanner s = new Scanner(new BufferedReader(new FileReader(rutaFichero)))) {
 				procesarLineaEjecutar(s, con);
 			}
