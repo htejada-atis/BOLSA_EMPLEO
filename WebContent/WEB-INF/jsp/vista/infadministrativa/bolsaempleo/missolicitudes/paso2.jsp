@@ -94,6 +94,8 @@ VistaSolicitudes bean = (VistaSolicitudes) uvdatos.getVistas().get(VistaSolicitu
 		
 		if (valoracion) {
 			texto += '<b title="' + valoracion.afinidad.descripcion + '">' + valoracion.afinidad.codigo + " " + valoracion.afinidad.modulacion + " %</b><br/>"; 
+		} else {
+			texto += 'Selecciona afinidad<br/>';
 		}
 		
 		texto += '<button class="pointer" title="Seleccionar afinidad">Afinidad</button></span>';
@@ -121,13 +123,14 @@ VistaSolicitudes bean = (VistaSolicitudes) uvdatos.getVistas().get(VistaSolicitu
 				'<p><select>' + options + '</select></p>'
 			;
 			
+			// enviamos afinidad
 			Atis.alertDialog("Seleccionar afinidad mérito individualizado", $(message), function(dialog) {
 				var option = $('select option:selected', dialog);
 				
 				var params = {
-    				'a': '<%= ControladorMisSolicitudes.ACCION_MERITO_AFINIDAD %>',
-    				'<%= ControladorMisSolicitudes.PARAM_BOLSA %>': '<%= bean.getArea() != null ? bean.getArea().getCodNum() : "" %>',
-    				'<%= ControladorMisSolicitudes.PARAM_SOLICITUD_ID %>': '<%= bean.getSolicitud().getCodNum() %>',
+    				'a': '<%=ControladorMisSolicitudes.ACCION_MERITO_AFINIDAD_INDIVIDUALIZADO%>',
+    				'<%=ControladorMisSolicitudes.PARAM_BOLSA%>': '<%=bean.getArea() != null ? bean.getArea().getCodNum() : ""%>',
+    				'<%=ControladorMisSolicitudes.PARAM_SOLICITUD_ID%>': '<%=bean.getSolicitud().getCodNum()%>',
     				'<%=ControladorMisSolicitudes.PARAM_MERITO_ID%>': row.merito.codNum,
     				'<%=ControladorMisSolicitudes.PARAM_AFINIDAD_ID%>': $(option).val(), 
     			};
@@ -140,9 +143,23 @@ VistaSolicitudes bean = (VistaSolicitudes) uvdatos.getVistas().get(VistaSolicitu
 	}
 	
 	function renderNoIndividualizado(row) {
-		var texto = $('<span>Selecciona afinidad <button class="pointer" title="Seleccionar afinidad">Afinidad</button></span>');
+		var texto = "<div>";
 		
-		$('button', texto).on('click', function() {
+		if (row.valoraciones) {
+			for(var i=0; i<row.valoraciones.length; i++) {
+				var valoracion = row.valoraciones[i];
+				texto += '<b title="' + valoracion.afinidad.descripcion + '">' + valoracion.valor + ' - ' + valoracion.afinidad.codigo + " " + valoracion.afinidad.modulacion + ' %</b><br/>';
+			}
+		} else {
+			texto += 'Selecciona afinidad<br/>';
+		}
+		
+		texto += '<button class="pointer" title="Seleccionar afinidad">Afinidad</button></span>';
+		texto += '</div>';
+		
+		var nodo = $(texto);
+		
+		$('button', nodo).on('click', function() {
 			var message = 
 				'<h3>Selecciona la afinidad para el mérito</h3><br/>' +
 				'<p>Mérito: ' + Atis.escapeHtml(row.merito.item.nombre) + '</p>' +
@@ -154,35 +171,46 @@ VistaSolicitudes bean = (VistaSolicitudes) uvdatos.getVistas().get(VistaSolicitu
 				'<p>Introduce el valor para cada grado de afinidad con el área (la suma de todas debe ' + row.merito.valor + ')</p>'
 			;
 			
-			message += '<table style="margin-top: 10px;">';			
+			message += '<table style="margin-top: 10px;">';
 			
 			for(var i=0; i<afinidades[row.merito.item.afinidad].length; i++) {
 				var a = afinidades[row.merito.item.afinidad][i];
-				message += '<tr><td style="padding-right: 10px;"><p>' + a.name + '</p></td><td><input data-afinidad="' + a.id + '" class="afinidad" type="number" value="0"/></td></tr>';
+				message += '<tr><td style="padding-right: 10px;"><p>' + a.name + '</p></td><td><input data-afinidad="' + a.id + '" class="afinidad" type="number" min="0" value="0" step="0.01" lang="es-ES"/></td></tr>';
 			}
 			
-			message += '<tr><td style="padding-top: 10px; padding-right: 10px;"><p>TOTAL</p></td><td><input name="total" readonly value="0" class="total"/></td></tr>';
+			message += '<tr><td style="padding-top: 10px; padding-right: 10px;"><p>TOTAL</p></td><td><input name="total" readonly value="0" class="total" type="number" lang="es-ES"/></td></tr>';
 			message += '</table>'
 			message += '<br/><p class="mensaje" style="display:none; color:red"></p>';
 			
 			var node = $(message);
 			
-			var sumaTotal = function() {
-				var total = 0.0;				
+			var getValoresAfinidades = function() {
+				var afinidades = {};
 				$('input.afinidad', node).each(function(index, input) {
 					var afinidad = $(input).data('afinidad');
-					var value = Atis.strToFloat($(input).val());
-					total += value && value > 0 ? value : 0;
+					var value = parseFloat($(input).val());
+					afinidades[afinidad] = value;					
 				});
+				return afinidades;
+			};
+			
+			var sumaTotal = function() {
+				var total = 0.0;
+				var afinidades = getValoresAfinidades();				
+				Object.keys(afinidades).forEach(function(key) {
+					total += afinidades[key];
+				});				
 				return total;
 			};
 			
 			var actualizaTotal = function() {
-				var total = sumaTotal();				
+				var total = Atis.redondearFloat(sumaTotal());
+				var merito = Atis.redondearFloat(row.merito.valor);
+				
 				$('input.total').val(total);
 				
-				if (total > row.merito.valor) {
-					$('p.mensaje').text('El total es superior al valor del mérito. Máximo ' + row.merito.valor);
+				if (total > merito) {
+					$('p.mensaje').text('El total es superior al valor del mérito. Actual ' + total + ' Máximo ' + row.merito.valor);
 					$('p.mensaje').show();
 				} else {
 					$('p.mensaje').hide();
@@ -191,7 +219,7 @@ VistaSolicitudes bean = (VistaSolicitudes) uvdatos.getVistas().get(VistaSolicitu
 			};
 						
 			$('input.afinidad', node).on('change', function() {
-				var value = Atis.strToFloat($(this).val());
+				var value = parseFloat($(this).val());
 				if (value < 0) {
 					$(this).val('0');
 				}
@@ -201,21 +229,31 @@ VistaSolicitudes bean = (VistaSolicitudes) uvdatos.getVistas().get(VistaSolicitu
 			Atis.alertDialog("Seleccionar afinidad mérito no individualizado", node, function(dialog) {
 				var option = $('select option:selected', dialog);
 				var total = actualizaTotal();
-								
-				console.log("ok", total, row.merito.valor);
-				
-				if (total != row.merito.valor) {
-					$('p.mensaje').text('El total debe ser igual al valor del mérito. Valor de mérito ' + row.merito.valor);
+				var merito = Atis.redondearFloat(row.merito.valor);
+												
+				if (total != merito) {
+					$('p.mensaje').text('El total debe ser igual al valor del mérito. Actual ' + total + ' Valor de mérito ' + merito);
 					$('p.mensaje').show();
 					return false;
 				}
 				
 				$('p.mensaje').hide();
+				
+				// enviamos afinidad
+				var params = {
+    				'a': '<%=ControladorMisSolicitudes.ACCION_MERITO_AFINIDAD_NOINDIVIDUALIZADO%>',
+    				'<%=ControladorMisSolicitudes.PARAM_BOLSA %>': '<%= bean.getArea() != null ? bean.getArea().getCodNum() : "" %>',
+    				'<%=ControladorMisSolicitudes.PARAM_SOLICITUD_ID %>': '<%= bean.getSolicitud().getCodNum() %>',
+    				'<%=ControladorMisSolicitudes.PARAM_MERITO_ID%>': row.merito.codNum,
+    				'<%=ControladorMisSolicitudes.PARAM_AFINIDADES%>': Atis.object2Json(getValoresAfinidades()), 
+    			};    			
+    			Atis.sendForm("<%=request.getRequestURI()%>", params);				
+			
 				return true;
 			});
 		});
 		
-		return texto;
+		return nodo;
 	}
 
 	$(document).ready(function() {

@@ -144,12 +144,11 @@ function escapeHtml(str) {
     return str.replace(/</g, "&lt;").replace(/>/g, "&gt;");
 }
 
-function strToFloat(str) {
-	if (str.replace) {
-		return parseFloat(str.replace('.', '').replace(',', '.'));
-	} else {
-		return 0;
-	}
+function redondearFloat(number, decimalPlaces) {
+	// https://medium.com/swlh/how-to-round-to-a-certain-number-of-decimal-places-in-javascript-ed74c471c1b8
+
+	decimalPlaces = decimalPlaces || 2;
+	return Number(Math.round(number + "e" + decimalPlaces) + "e-" + decimalPlaces);
 }
 
 window.Atis = $.extend(window.Atis ? window.Atis : {}, {
@@ -159,12 +158,12 @@ window.Atis = $.extend(window.Atis ? window.Atis : {}, {
 	"confirmDialog": confirmDialog,
 	"getErrorResponse": getErrorResponse,
 	"isFunction": isFunction,
-	"formatearFecha": formatearFecha,
+	"formatearFecha": formatearFecha,	
 	"sendForm": sendForm,
 	"object2Json": object2Json,
 	"json2Object": json2Object,
 	"sendAjax": sendAjax,
 	"removeValueArray": removeValueArray,
 	"escapeHtml": escapeHtml,
-	"strToFloat": strToFloat
+	"redondearFloat": redondearFloat
 });

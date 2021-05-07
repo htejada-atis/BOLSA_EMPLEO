@@ -6,6 +6,7 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import es.ujaen.uvirtual.modelo.conexion.ConexionUvirtual;
@@ -438,14 +439,6 @@ public class ModeloSolicitud {
 		List<MeritoSolicitudTable> meritos = new ArrayList<>();
 		BolsaEmpleoDataTable<MeritoSolicitudTable> dataTable = new BolsaEmpleoDataTable<MeritoSolicitudTable>(params);
 		
-//		String consulta = ""
-//				+ " SELECT bepmer.CODNUM, bepmer.VALOR, bepite.CODIGO, bepite.NOMBRE, bepsbm.CODNUM SBM_CODNUM, bepsbm.FLGEXCLUIDO "
-//				+ " FROM TBEP_MERITOS bepmer "
-//				+ " INNER JOIN TBEP_ITEMSBAREMACION bepite ON bepite.CODNUM = bepmer.BEPITE_CODNUM "
-//				+ " LEFT JOIN TBEP_SOLICITUD_BOLSAS_MERITOS bepsbm ON bepsbm.BEPMER_CODNUM = bepmer.CODNUM "
-//				+ " LEFT JOIN TBEP_SOLICITUD_BOLSAS bepsbo ON bepsbo.CODNUM = bepsbm.BEPSBO_CODNUM "				
-//				+ " WHERE bepmer.BEPUSU_CODNUM = ? ";
-		
 		String consulta = ""
 				+ " SELECT bepmer.CODNUM, bepmer.VALOR, bepite.CODIGO, bepite.NOMBRE, MERITOS_BOLSAS.CODNUM SBM_CODNUM, MERITOS_BOLSAS.FLGEXCLUIDO "
 				+ " FROM TBEP_MERITOS bepmer "
@@ -605,11 +598,11 @@ public class ModeloSolicitud {
 			MeritoSolicitud meritoSolicitud = this.getMeritoSolicitud(solicitud.getCodNum(), bolsa.getCodNum(), merito.getCodNum());
 						
 			// eliminamos la afinidad previamente seleccionada
-			String sqlDelete = "DELETE FROM TBEP_SOLICITUD_BOLSAS_MERITOS_VALORACION bepsbv WHERE bepsbv.BEPSBM_CODNUM = ?";
-			try (PreparedStatement stmt = conexion.prepareStatement(sqlDelete)) {
-				int indexParam = 1;
-				stmt.setInt(indexParam++, meritoSolicitud.getCodNum());				
-				stmt.executeUpdate();
+			try {
+				this.eliminarValoracionesDelMeritoSolicitud(conexion, meritoSolicitud);
+			} catch (SQLException e) {
+				conexion.rollback();
+				throw e;
 			}
 						
 			// insertamos la afinidad del mérito
@@ -623,6 +616,48 @@ public class ModeloSolicitud {
 				conexion.rollback();
 				throw e;
 			}			
+			
+			conexion.commit();
+		}
+	}
+	
+	/** El usuario ha seleccionado la afinidad del mérito no individualizado. 
+	 * @param solicitud .
+	 * @param bolsa .
+	 * @param merito -
+	 * @param afinidades .
+	 * @throws UVException .
+	 * @throws SQLException .
+	 */
+	public void asignarAfinidadMeritoNoIndividualizado(Solicitud solicitud, Bolsa bolsa, Merito merito, HashMap<Afinidad, Float> afinidades) throws SQLException, UVException {
+		try (Connection conexion = ConexionUvirtual.obtenerInstancia();) {
+			conexion.setAutoCommit(false);
+			
+			MeritoSolicitud meritoSolicitud = this.getMeritoSolicitud(solicitud.getCodNum(), bolsa.getCodNum(), merito.getCodNum());
+						
+			// eliminamos las afinidades previamente seleccionadas
+			try {
+				this.eliminarValoracionesDelMeritoSolicitud(conexion, meritoSolicitud);
+			} catch (SQLException e) {
+				conexion.rollback();
+				throw e;
+			}	
+									
+			// insertamos las afinidades del mérito
+			for (Map.Entry<Afinidad, Float> entry : afinidades.entrySet()) {
+				String sqlInsert = "INSERT INTO TBEP_SOLICITUD_BOLSAS_MERITOS_VALORACION (BEPSBM_CODNUM, BEPAFI_CODNUM, VALOR) VALUES (?,?,?)";
+				
+				try (PreparedStatement stmt = conexion.prepareStatement(sqlInsert)) {
+					int indexParam = 1;
+					stmt.setInt(indexParam++, meritoSolicitud.getCodNum());
+					stmt.setInt(indexParam++, entry.getKey().getCodNum());
+					stmt.setFloat(indexParam++, entry.getValue());
+					stmt.executeUpdate();
+				} catch (SQLException e) {
+					conexion.rollback();
+					throw e;
+				}				
+			}
 			
 			conexion.commit();
 		}
@@ -734,7 +769,6 @@ public class ModeloSolicitud {
 		return valoraciones;
 	}
 	
-
 	/**
 	 * Obtiene el total de méritos por bloque que hay en la solicitud .
 	 * @param solicitud .
@@ -767,7 +801,6 @@ public class ModeloSolicitud {
 		return total;
 	}
 	
-	
 	/**
 	 * Obtiene el total de méritos que hay en la solicitud .
 	 * @param solicitud .
@@ -793,7 +826,6 @@ public class ModeloSolicitud {
 		}
 		return total;
 	}
-	
 	
 	/**
 	 * Actualiza el estado de la solicitud a cerrado .
@@ -834,7 +866,6 @@ public class ModeloSolicitud {
 		}
 	}
 	
-	
 	/** Devuelve los méritos de la bolsa en una solicitud .
 	 * @param solicitud .
 	 * @param bolsa .
@@ -868,7 +899,6 @@ public class ModeloSolicitud {
 		
 		return meritos;
 	}
-	
 	
 	/** Lista de bolsas de la solicitud deseleccionadas por el usuario .
 	 * @param solicitud .
@@ -908,7 +938,6 @@ public class ModeloSolicitud {
 		
 		return bolsasExcluidas;
 	}
-	
 	
 	/** Lista de bolsas de la solicitud seleccionadas por el usuario que se agregan .
 	 * @param solicitud .
@@ -958,7 +987,6 @@ public class ModeloSolicitud {
 		return bolsasAgregadas;
 	}
 	
-	
 	/**
 	 * Elimina las bolsas asociadas a las solicitud y los meritos a cada bolsa si lo tienen.
 	 * @param conexion . 
@@ -998,6 +1026,21 @@ public class ModeloSolicitud {
 			for (Bolsa bolsaExcluida: bolsasExcluidas) {
 				stmt.setInt(indexParam++, bolsaExcluida.getCodNum());		
 			}
+			stmt.executeUpdate();
+		}
+	}
+	
+	/**
+	 * Elimina las valoraciones (asociadas a la afinidad de una solicitudMerito).
+	 * @param conexion .
+	 * @param meritoSolicitud .
+	 * @throws SQLException .
+	 */
+	private void eliminarValoracionesDelMeritoSolicitud(Connection conexion, MeritoSolicitud meritoSolicitud) throws SQLException {
+		String sqlDelete = "DELETE FROM TBEP_SOLICITUD_BOLSAS_MERITOS_VALORACION bepsbv WHERE bepsbv.BEPSBM_CODNUM = ?";
+		try (PreparedStatement stmt = conexion.prepareStatement(sqlDelete)) {
+			int indexParam = 1;
+			stmt.setInt(indexParam++, meritoSolicitud.getCodNum());
 			stmt.executeUpdate();
 		}
 	}
