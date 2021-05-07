@@ -36,7 +36,7 @@ String requestURI = (String) request.getAttribute("javax.servlet.error.request_u
 			<h2 class="skip">Menú principal</h2>
 			<ul class="mainNav">
 
-				<li><a href="/srv/es/index"><span id="pageHome">&nbsp;</span></a></li>
+				<li><a href="/srv/es/index"><span id="pageHome"> </span></a></li>
 			</ul>
 			<h2 class="skip">Información de usuario y servicios</h2>
 			<ul class="secondaryNav">

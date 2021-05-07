@@ -29,7 +29,7 @@ import es.ujaen.uvirtual.utilidades.AyudaURL;
 public class GeneradorPDF implements Filter {
 	private HttpServletRequest req;
 	private HttpServletResponse resp;
-	protected static FilterConfig filterConfig = null;
+	protected FilterConfig filterConfig = null;
 	public static final String ELEMENTO_URL = "generadorPdf:url:";
 	public static final String ELEMENTO_URI = "generadorPdf:uri:";
 	public static final String ELEMENTO_QUERY = "generadorPdf:query:";

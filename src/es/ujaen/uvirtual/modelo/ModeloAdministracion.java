@@ -445,18 +445,6 @@ public class ModeloAdministracion {
 	}
 	
 	/**
-	 * Obtiene el estado de los sistemas con la información almacenada en memcached.
-	 * @return estado sistemas
-	 */
-	public static List<Sistema> listaEstadoSistemas() {
-		Memcache mc = Memcache.getInstance();
-		
-		@SuppressWarnings("unchecked")
-		ArrayList<Sistema> sistemas = (ArrayList<Sistema>) mc.get(ConfiguracionGlobal.getAtributoSistemas());
-		return sistemas;
-	}
-
-	/**
 	 * Lista los avisos o notificaciones del sistema.
 	 * @param usuario usuario
 	 * @return avisos del sistema
