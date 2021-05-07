@@ -3,7 +3,9 @@ package es.ujaen.uvirtual.modulo.bolsaempleo.vistas;
 import java.io.Serializable;
 
 import es.ujaen.uvirtual.beans.vistas.Vista;
+import es.ujaen.uvirtual.modulo.bolsaempleo.beans.Bolsa;
 import es.ujaen.uvirtual.modulo.bolsaempleo.beans.BolsaValidacion;
+import es.ujaen.uvirtual.modulo.bolsaempleo.beans.CandidatoValidacion;
 import es.ujaen.uvirtual.modulo.bolsaempleo.beans.Convocatoria;
 import es.ujaen.uvirtual.modulo.bolsaempleo.utilidades.BolsaEmpleoDataTable;
 
@@ -13,8 +15,10 @@ import es.ujaen.uvirtual.modulo.bolsaempleo.utilidades.BolsaEmpleoDataTable;
 public class VistaValidarNoAfines extends Vista implements Serializable {
 	private static final long serialVersionUID = 1L;
 	private String vista;	
+	private Bolsa bolsa;
 	private Convocatoria conv;
-	private BolsaEmpleoDataTable<BolsaValidacion> datatable;
+	private BolsaEmpleoDataTable<BolsaValidacion> datatableBolsas;
+	private BolsaEmpleoDataTable<CandidatoValidacion> datatableCandidatos;
 	
 	public String getVista() {
 		return vista;
@@ -24,12 +28,28 @@ public class VistaValidarNoAfines extends Vista implements Serializable {
 		this.vista = vista;
 	}
 	
-	public void setDatatable(BolsaEmpleoDataTable<BolsaValidacion> dt) {
-		this.datatable = dt;
+	public void setDatatableBolsas(BolsaEmpleoDataTable<BolsaValidacion> dt) {
+		this.datatableBolsas = dt;
 	}
 	
-	public BolsaEmpleoDataTable<BolsaValidacion> getDatatable() {
-		return this.datatable;	
+	public BolsaEmpleoDataTable<BolsaValidacion> getDatatableBolsas() {
+		return this.datatableBolsas;	
+	}
+	
+	public void setDatatableCandidatos(BolsaEmpleoDataTable<CandidatoValidacion> dt) {
+		this.datatableCandidatos = dt;
+	}
+	
+	public BolsaEmpleoDataTable<CandidatoValidacion> getDatatableCandidatos() {
+		return this.datatableCandidatos;	
+	}
+	
+	public Bolsa getBolsa() {
+		return bolsa;
+	}
+	
+	public void setBolsa(Bolsa bolsa) {
+		this.bolsa = bolsa;
 	}
 	
 	public Convocatoria getConvocatoria() {

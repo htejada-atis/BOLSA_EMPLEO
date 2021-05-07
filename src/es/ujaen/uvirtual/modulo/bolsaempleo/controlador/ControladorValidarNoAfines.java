@@ -16,6 +16,7 @@ import es.ujaen.uvirtual.beans.CodigoDescripcion;
 import es.ujaen.uvirtual.beans.UVDatos;
 import es.ujaen.uvirtual.modulo.bolsaempleo.beans.BolsaValidacion;
 import es.ujaen.uvirtual.modulo.bolsaempleo.beans.Convocatoria;
+import es.ujaen.uvirtual.modulo.bolsaempleo.modelo.ModeloBolsa;
 import es.ujaen.uvirtual.modulo.bolsaempleo.modelo.ModeloConvocatoria;
 import es.ujaen.uvirtual.modulo.bolsaempleo.modelo.ModeloUsuarioBolsaEmpleo;
 import es.ujaen.uvirtual.modulo.bolsaempleo.modelo.ModeloValidar;
@@ -45,7 +46,11 @@ public class ControladorValidarNoAfines extends HttpServlet {
 	
 	// acciones
 	public static final String ACCION_INDEX = "listar";
-	public static final String ACCION_DATATABLE = "datatable";
+	public static final String ACCION_DATATABLE_BOLSAS = "datatablebolsas";
+	public static final String ACCION_BOLSA_SELECCIONADA = "bolsaseleccionada";
+	
+	// parámetros
+	public static final String PARAM_BOLSA = "bolsa";
 	
 	// url y rutas
 	public static final String URL_PATTERN_AJAX = "/srv/es/ajax/informacionadministrativa/bolsaempleo/validarnoafines";
@@ -71,12 +76,17 @@ public class ControladorValidarNoAfines extends HttpServlet {
 		
 		try {
 			ModeloUsuarioBolsaEmpleo.obtenerInstancia().checkUser(datos);
+			bean.setConvocatoria(ModeloConvocatoria.obtenerInstancia().getUltimaConvocatoria());
+			
 			switch (nombreAccion) {
+				case ACCION_BOLSA_SELECCIONADA:
+					
+					break;
+				case ACCION_DATATABLE_BOLSAS:
+					listadoBolsas(bean, datos, request, response);
+					break;
 				case ACCION_INDEX:
-					index(bean, datos, request, response);
-					break;	
-				case ACCION_DATATABLE:
-					listado(bean, datos, request, response);
+					bean.setVista(RUTA_BEP_CONF + "index.jsp");
 					break;
 			}
 		} catch (SQLException e) {
@@ -108,25 +118,34 @@ public class ControladorValidarNoAfines extends HttpServlet {
 		doGet(request, response);
 	}
 		
-	private void index(VistaValidarNoAfines bean, UVDatos datos, HttpServletRequest request, HttpServletResponse response) throws SQLException, UVException {
-		bean.setConvocatoria(ModeloConvocatoria.obtenerInstancia().getUltimaConvocatoria());
-		bean.setVista(RUTA_BEP_CONF + "index.jsp");
+	private void seleccionarBolsa(VistaValidarNoAfines bean, UVDatos datos, HttpServletRequest request, HttpServletResponse response) {
+		ModeloBolsa modeloBolsa = ModeloBolsa.obtenerInstancia();
+		bean.setConvocatoria(null);
 	}
-		
-	private void listado(VistaValidarNoAfines bean, UVDatos datos, HttpServletRequest request, HttpServletResponse response) throws IOException, SQLException, UVException {
+	
+	/**
+	 * Listado de bolsas de validación datatable .
+	 * @param bean .
+	 * @param datos .
+	 * @param request .
+	 * @param response .
+	 * @throws IOException .
+	 * @throws SQLException .
+	 * @throws UVException .
+	 */
+	private void listadoBolsas(VistaValidarNoAfines bean, UVDatos datos, HttpServletRequest request, HttpServletResponse response)
+			throws IOException, SQLException, UVException {
 		datos.setContentType("application/json");
 		datos.setRespuestaEnviada(true);
 		response.setContentType("application/json");
 		response.setCharacterEncoding("UTF-8");
 		
-		Convocatoria convocatoria = ModeloConvocatoria.obtenerInstancia().getUltimaConvocatoria();
-		
 		try (PrintWriter writer = response.getWriter()) {
 			try {
 				BolsaEmpleoDataTable<BolsaValidacion> dataTable = ModeloValidar.obtenerInstancia().
-						listadoAreasNoSujetasAfinidad(convocatoria, request.getParameterMap());
+						listadoAreasNoSujetasAfinidad(bean.getConvocatoria(), request.getParameterMap());
 				Gson gson = new GsonBuilder().setExclusionStrategies(BolsaEmpleoDataTable.GSONEXCLUSIONSTRATEGY).create();
-				bean.setDatatable(dataTable);
+				bean.setDatatableBolsas(dataTable);
 				writer.write(gson.toJson(dataTable));
 			} catch (Exception ex) {
 				bean.getMensajesDeError().add(ex.getMessage());
