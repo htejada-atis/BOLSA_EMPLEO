@@ -64,7 +64,12 @@ pipeline {
 		               sh "ant sonar -Dsonar.projectKey=${SONAR_PROYECTKEY} -DdbUrl=127.0.0.1 -DmemcacheUrl=127.0.0.1"
 		            }
 		        }
-	        }        
+	        }   
+	        post {
+	        	always {
+	        		junit 'builds/build/rama/site/jacoco/*.xml'
+	        	}
+	        }     
 	    }
 	    stage('push docker') {
 	    	steps {
