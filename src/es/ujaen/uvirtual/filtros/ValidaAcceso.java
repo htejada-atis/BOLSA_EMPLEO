@@ -27,6 +27,7 @@ import es.ujaen.uvirtual.beans.UVDatos;
 import es.ujaen.uvirtual.beans.Usuario;
 import es.ujaen.uvirtual.modelo.ModeloAdministracion;
 import es.ujaen.uvirtual.utilidades.AyudaURL;
+import es.ujaen.uvirtual.utilidades.UVException;
 
 
 /**
@@ -38,7 +39,7 @@ import es.ujaen.uvirtual.utilidades.AyudaURL;
 	},
 	filterName = "ValidaAcceso")
 public class ValidaAcceso implements Filter {
-	protected static FilterConfig filterConfig = null;
+	protected FilterConfig filterConfig = null;
 	protected static Logger logger = Logger.getLogger(ValidaAcceso.class.getName());
 	protected static String nombreDeEstaClase = ValidaAcceso.class.getName();
 	
@@ -52,9 +53,9 @@ public class ValidaAcceso implements Filter {
 	/** destroy.
 	 * @see Filter#destroy()
 	 */
+	@Override
 	public void destroy() {
-		logger = null;
-		nombreDeEstaClase = null;
+		//
 	}
 
 	/**
@@ -72,6 +73,8 @@ public class ValidaAcceso implements Filter {
 		HttpServletRequest req = (HttpServletRequest) request;
 		HttpServletResponse resp = (HttpServletResponse) response;
 		String atributroError = ConfiguracionGlobal.getParametroCadenaNE("administracion.atributoerror");
+		String rutaSistemaNoDisponible = ConfiguracionGlobal.getParametroCadenaNE("administracion.sistemanodisponible");
+		String nombreMetodo = "doFilter";
 
 		String controlador = AyudaURL.obtenerControlador(req.getRequestURI());
 		UVDatos datos = (UVDatos) req.getAttribute(UVDatos.NOMBRE_ATRIBUTO);
@@ -88,8 +91,8 @@ public class ValidaAcceso implements Filter {
 			menu = modeloAdministracion.listaMenuDeControlador(controlador);
 			if (menu == null) {
 				error = ErroresPersonalizados.ERROR_CONTROLADOR_NO_EXISTE;
-				logger.logp(Level.SEVERE, nombreDeEstaClase, "doFilter", "No se han encontrado datos del controlador: " + controlador);
-				throw new Exception("No se han encontrado datos del controlador");
+				logger.logp(Level.SEVERE, nombreDeEstaClase, nombreMetodo, "No se han encontrado datos del controlador: " + controlador);
+				throw new UVException("No se han encontrado datos del controlador");
 			}
 			
 			// Obtenemos la información del usuario
@@ -97,8 +100,8 @@ public class ValidaAcceso implements Filter {
 				usuario = CrearUsuario.usuario(uid);
 				if (usuario == null) { 
 					error = ErroresPersonalizados.ERROR_USUARIO_NO_EXISTE;
-					logger.logp(Level.SEVERE, nombreDeEstaClase, "doFilter", "No se han encontrado datos del usuario: " + uid);
-					throw new Exception("No se han encontrado datos de usuario");
+					logger.logp(Level.SEVERE, nombreDeEstaClase, nombreMetodo, "No se han encontrado datos del usuario: " + uid);
+					throw new UVException("No se han encontrado datos de usuario");
 				}
 			}
 		
@@ -109,7 +112,7 @@ public class ValidaAcceso implements Filter {
 		} catch (Exception e) {
 			if (error == null) {
 				error = ErroresPersonalizados.ERROR_EN_BASEDEDATOS;
-				logger.logp(Level.SEVERE, nombreDeEstaClase, "doFilter", "Error de acceso a la base de datos: " + e.toString());
+				logger.logp(Level.SEVERE, nombreDeEstaClase, nombreMetodo, "Error de acceso a la base de datos: " + e.toString());
 			}
 			req.getSession().setAttribute(atributroError, error);
 			resp.sendRedirect(ConfiguracionGlobal.getParametroCadenaNE("administracion.urlerror"));
@@ -131,33 +134,28 @@ public class ValidaAcceso implements Filter {
 		
 		// Comprobamos si el sistema está disponible
 		if (menu.getSistemas() != null) {
-			List<Sistema> sistemas = ModeloAdministracion.listaEstadoSistemas();
-			if (sistemas == null) {
-				try {
-					sistemas = modeloAdministracion.listaSistemas();
-				} catch (Exception e) {
-					// No tenemos acceso a la lista de sistemas ... uv está caído
-					req.getSession().setAttribute(atributroError, ErroresPersonalizados.ERROR_UV_NO_DISPONIBLE);
-					resp.sendRedirect(ConfiguracionGlobal.getParametroCadenaNE("administracion.sistemanodisponible"));
-					return;
-				}
+			List<Sistema> sistemas = null;
+			try {
+				sistemas = modeloAdministracion.listaSistemas();
+			} catch (Exception e) {
+				// No tenemos acceso a la lista de sistemas ... uv está caído
+				req.getSession().setAttribute(atributroError, ErroresPersonalizados.ERROR_UV_NO_DISPONIBLE);
+				resp.sendRedirect(rutaSistemaNoDisponible);
+				return;
 			}
 			for (Sistema sistema : sistemas) {
 				if (menu.getSistemas().contains(sistema.getCodigo())) {
 					String servNoDospinible = ErroresPersonalizados.ERROR_SERV_NO_DISPONIBLE + ":";
-					if (sistema.isEnMantenimiento() && (sistema.getFechaEntradaEnMantenimiento() == null)) {
+					if (sistema.isEnMantenimiento() 
+						&& ((sistema.getFechaEntradaEnMantenimiento() == null) 
+							|| sistema.getFechaEntradaEnMantenimiento().before(new Date()))) {
 						// Sistema en mantenimiento
 						req.getSession().setAttribute(atributroError, servNoDospinible + sistema.getMotivoDelMantenimiento());
-						resp.sendRedirect(ConfiguracionGlobal.getParametroCadenaNE("administracion.sistemanodisponible"));
-						return;
-					} else if (sistema.isEnMantenimiento() && (sistema.getFechaEntradaEnMantenimiento().before(new Date()))) {
-						// Sistema entra en mantenimiento y ya ha llegado la fecha
-						req.getSession().setAttribute(atributroError, servNoDospinible + sistema.getMotivoDelMantenimiento());
-						resp.sendRedirect(ConfiguracionGlobal.getParametroCadenaNE("administracion.sistemanodisponible"));
+						resp.sendRedirect(rutaSistemaNoDisponible);
 						return;
 					} else if (sistema.isSinConexion()) {
 						req.getSession().setAttribute(atributroError, servNoDospinible + "Actualmente no existe conexión con el sistema de información");
-						resp.sendRedirect(ConfiguracionGlobal.getParametroCadenaNE("administracion.sistemanodisponible"));
+						resp.sendRedirect(rutaSistemaNoDisponible);
 						return;
 					}
 				}
@@ -175,6 +173,7 @@ public class ValidaAcceso implements Filter {
 	 * @param fConfig configuracion
 	 * @see Filter#init(FilterConfig)
 	 */
+	@Override
 	public void init(FilterConfig fConfig) throws ServletException {
 		filterConfig = fConfig;
 	}

@@ -73,8 +73,8 @@ Cada módulo tiene que tener los siguientes componentes:
 
 Todos los recursos generados seguiran la [guia de estilo](STYLE.md).
 
-### Código fuente en directorio src
-Como mínimo, se debe generar modelo, vista y controlador
+### Código fuente en directorio src/modulo/[nombre]
+Como mínimo, se debe generar modelo, beans, controlador
 
 ### pruebas en directorio test
 Como mínimo, se debe generar test unitarios, test de controlador y test de usuario.
