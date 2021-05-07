@@ -1,6 +1,7 @@
 package bbdd;
 
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.sql.SQLException;
 import java.util.Arrays;
@@ -23,7 +24,7 @@ public class UtilsTestBolsaEmpleo {
 	private static final String UID_PERSONAL_PRUEBAS = "personal5";
 	private static final int LONGITUD_NAME_SQL = 3;
 	
-	public static final boolean VERBOSE = false;
+	public static final boolean VERBOSE = true;
 
 	private UtilsTestBolsaEmpleo() { }
 	
@@ -32,31 +33,53 @@ public class UtilsTestBolsaEmpleo {
 	 */
 	public static void inicializaBolsaEmpleo() throws SQLException, IOException {
 		File directoryPath;
-		File filesList[];				
+		File filesList[];
+		
+		// mocks esquema arcos
+		directoryPath = new File("Documentos/scripts/opc.bolsaempleo/mock_arcos");
+		filesList = directoryPath.listFiles();
+		Arrays.sort(filesList);
+		for (int i = 0; i< filesList.length; i++) {
+			if (VERBOSE) {
+	    		LOGGER.log(Level.INFO, String.format("%n%nSQL [%d/%d]: %s%n", i + 1, filesList.length, filesList[i].getAbsolutePath()));	
+	    	}
+			UtilsTestBolsaEmpleo.ejecutarFile(filesList[i], "arcos");
+			if (VERBOSE) {
+	    		LOGGER.log(Level.INFO, "\n\nFIN\n");	
+	    	}
+		}
+				
+		// mocks esquema rrhh
+//		directoryPath = new File("Documentos/scripts/opc.bolsaempleo/mock_rrhh");
+//		filesList = directoryPath.listFiles();
+//		Arrays.sort(filesList);
+//		for (File file : filesList) {
+//			UtilsTestBolsaEmpleo.ejecutarFile(file, "rrhh");
+//		}
 		
 		// limpieza
-		directoryPath = new File("Documentos/scripts/opc.bolsaempleo/datos_desarrollo/clean");
-		filesList = directoryPath.listFiles();
-		Arrays.sort(filesList);
-		for (int i = filesList.length - 1; i >= 0; i--) {
-			UtilsTestBolsaEmpleo.ejecutarFile(filesList[i]);					
-	    }
-		
-		// creación
-		directoryPath = new File("Documentos/scripts/opc.bolsaempleo");
-		filesList = directoryPath.listFiles();
-		Arrays.sort(filesList);
-		for (File file : filesList) {
-			UtilsTestBolsaEmpleo.ejecutarFile(file);
-		}
-		
-		// datos de prueba
-		directoryPath = new File("Documentos/scripts/opc.bolsaempleo/datos_desarrollo/datos_prueba");
-		filesList = directoryPath.listFiles();
-		Arrays.sort(filesList);
-		for (File file : filesList) {
-			UtilsTestBolsaEmpleo.ejecutarFile(file);
-		}
+//		directoryPath = new File("Documentos/scripts/opc.bolsaempleo/datos_desarrollo/clean");
+//		filesList = directoryPath.listFiles();
+//		Arrays.sort(filesList);
+//		for (int i = filesList.length - 1; i >= 0; i--) {
+//			UtilsTestBolsaEmpleo.ejecutarFile(filesList[i]);
+//		}
+//
+//		// creación
+//		directoryPath = new File("Documentos/scripts/opc.bolsaempleo");
+//		filesList = directoryPath.listFiles();
+//		Arrays.sort(filesList);
+//		for (File file : filesList) {
+//			UtilsTestBolsaEmpleo.ejecutarFile(file);
+//		}
+//
+//		// datos de prueba
+//		directoryPath = new File("Documentos/scripts/opc.bolsaempleo/datos_desarrollo/datos_prueba");
+//		filesList = directoryPath.listFiles();
+//		Arrays.sort(filesList);
+//		for (File file : filesList) {
+//			UtilsTestBolsaEmpleo.ejecutarFile(file);
+//		}
 	}
 	
     /** obtiene una peticion autenticada con el usuario de pruebas de BolsaEmpleo.
@@ -135,7 +158,7 @@ public class UtilsTestBolsaEmpleo {
 		return peticion;
     }
     
-    private static void ejecutarFile(File file) throws SQLException, IOException {
+    private static void ejecutarFile(File file, String esquema) throws SQLException, IOException {
     	String name = file.getName();
     	String[] nameSplit = name.split("-");
     	
@@ -144,28 +167,56 @@ public class UtilsTestBolsaEmpleo {
     		return;
     	}
     	    	
-    	if (VERBOSE) {
-    		LOGGER.log(Level.INFO, "Ejecutando sql: " + file.getAbsolutePath());	
-    	}
     	
-    	    	
+    	    	    	
     	String methodKey = nameSplit[1];		
 		switch (methodKey) {
-		case "arcosim":
-			BbddRunner.insertMasivoArcos(file.getAbsolutePath());
-			break;
-		case "arcoseje":
-			BbddRunner.ejecutarArcos(file.getAbsolutePath());
-			break;
 		case "im":
-			BbddRunner.insertMasivo(file.getAbsolutePath());
+			UtilsTestBolsaEmpleo.ejectuarInsertMasivoFileEsquema(file, esquema);			
 			break;
 		case "eje":
+			UtilsTestBolsaEmpleo.ejectuarFileEsquema(file, esquema);
 			BbddRunner.ejecutar(file.getAbsolutePath());
 			break;
 		default:
-			LOGGER.log(Level.WARNING, "Error ejecutando fichero. No entiendo el tipo: " + name);						
+			LOGGER.log(Level.WARNING, "Error ejecutando fichero. No entiendo el tipo: {0}", name);						
 		}
+		
+		if (VERBOSE) {
+    		LOGGER.log(Level.INFO, "\n\nFIN FILE\n");	
+    	}
+    }
+    
+    private static void ejectuarInsertMasivoFileEsquema(File file, String esquema) throws FileNotFoundException, SQLException {
+    	switch (esquema) {
+    	case "arcos":
+    		BbddRunner.insertMasivoArcos(file.getAbsolutePath());
+    		break;
+    	case "rrhh":
+    		BbddRunner.insertMasivoRh(file.getAbsolutePath());
+    		break;
+    	case "uvirtual":
+    		BbddRunner.insertMasivo(file.getAbsolutePath());
+    		break;
+    	default:
+    		LOGGER.log(Level.WARNING, "Error ejecutando fichero. No entiendo el esquema: {0}", esquema);
+    	}
+    }
+    
+    private static void ejectuarFileEsquema(File file, String esquema) throws SQLException, IOException {
+    	switch (esquema) {
+    	case "arcos":
+    		BbddRunner.ejecutarArcos(file.getAbsolutePath());
+    		break;
+    	case "rrhh":
+    		BbddRunner.ejecutarRh(file.getAbsolutePath());
+    		break;
+    	case "uvirtual":
+    		BbddRunner.ejecutar(file.getAbsolutePath());
+    		break;
+    	default:
+    		LOGGER.log(Level.WARNING, "Error ejecutando fichero. No entiendo el esquema: {0}", esquema);
+    	}
     }
 	
 }

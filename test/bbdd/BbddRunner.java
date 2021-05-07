@@ -35,7 +35,7 @@ public class BbddRunner {
     
     private static String servidorMemcacheDefecto = "jenkins.ujaen.es";
 
-    public static final boolean VERBOSE = false;
+    public static final boolean VERBOSE = true;
 	
     private BbddRunner() { }
 	
@@ -104,6 +104,10 @@ public class BbddRunner {
 		return odsArcos.getConnection();
 	}
 	
+	private static Connection obtenerConexionRh() throws SQLException {
+		return odsRh.getConnection();
+	}
+	
 	/** conectar a todas las db.
 	 */
 	public static void conectarBd() {
@@ -147,6 +151,22 @@ public class BbddRunner {
 	 */
 	public static void insertMasivoArcos(String rutaFichero) throws SQLException, FileNotFoundException {
 		try (Connection con = obtenerConexionArcos();
+			 Statement statement = con.createStatement()) {
+			try (Scanner s = new Scanner(new BufferedReader(new FileReader(rutaFichero)))) {
+				procesarLineaInsertMasivo(s, statement);
+			}
+		}
+	}
+	
+	/** ejecuta instrucciones SQL del fichero separadas por ; en bbdd Rh.
+	 * 
+	 * <p>los comentarios deben empezar por -- y terminar en la misma linea en ;.</p>
+	 * @param rutaFichero ruta del fichero a cargar
+	 * @throws SQLException si error en bd
+	 * @throws FileNotFoundException si no existe fichero
+	 */
+	public static void insertMasivoRh(String rutaFichero) throws SQLException, FileNotFoundException {
+		try (Connection con = obtenerConexionRh();
 			 Statement statement = con.createStatement()) {
 			try (Scanner s = new Scanner(new BufferedReader(new FileReader(rutaFichero)))) {
 				procesarLineaInsertMasivo(s, statement);
@@ -241,6 +261,20 @@ public class BbddRunner {
 	 */
 	public static void ejecutarArcos(String rutaFichero) throws IOException, SQLException {
 		try (Connection con = obtenerConexionArcos();
+			 Statement statement = con.createStatement()) {
+			try (Scanner s = new Scanner(new BufferedReader(new FileReader(rutaFichero)))) {
+				procesarLineaEjecutar(s, statement);
+			}
+		}
+	}
+	
+	/** ejecutar fichero con instrucciones SQL separada por el delimitadoren bd Rh.
+	 * @param rutaFichero ruta del fichero a cargar en la bd
+	 * @throws IOException si error lectura fichero
+	 * @throws SQLException si error en bd
+	 */
+	public static void ejecutarRh(String rutaFichero) throws IOException, SQLException {
+		try (Connection con = obtenerConexionRh();
 			 Statement statement = con.createStatement()) {
 			try (Scanner s = new Scanner(new BufferedReader(new FileReader(rutaFichero)))) {
 				procesarLineaEjecutar(s, statement);
