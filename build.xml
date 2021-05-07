@@ -185,6 +185,7 @@
 					<path location="Documentos/junit"/>
 				</classpath>
 	            <formatter type="brief"/>
+	        	<formatter type="xml"/>
 	            <batchtest fork="yes" todir="${result.report.dir}">
 	            	<fileset dir="${test}">
 	            		<include name="basicos/Test*.java"/>
