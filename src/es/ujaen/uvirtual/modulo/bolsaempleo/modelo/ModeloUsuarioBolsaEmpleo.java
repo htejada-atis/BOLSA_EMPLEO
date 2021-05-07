@@ -27,7 +27,7 @@ import es.ujaen.uvirtual.utilidades.UVException;
  * Clase para obtener la información de usuarios de UVIRTUAL.
  * Modelo - Operaciones con nombres: lista,    actualiza,  borra,    inserta
  * Controlador - Opers. con nombres: obtener,  cambiar,    eliminar, agregar
- * @author ATISoluciones
+ * @author ATISoluciones 2021
  */
 public class ModeloUsuarioBolsaEmpleo {
 	
@@ -61,6 +61,10 @@ public class ModeloUsuarioBolsaEmpleo {
 	public static final int COLUMN_RAZON_EXCLUSION_MAXLENGTH = 200;
 	public static final int COLUMN_RAZON_BORRADO_MAXLENGTH = 500;
 	
+	public static final String ROL_SERVICIO_PERSONAL = "bolemppersonal";
+	public static final String ROL_DIRECTOR_DEPARTAMENTO = "bolempdirdepartamento";
+	public static final String ROL_MIEMBRO_COMISION = "bolempcomision";
+	public static final String ROL_CANDIDATO = "bolempcandidato";
 	
     protected static ModeloUsuarioBolsaEmpleo eInstancia = null;
 	
@@ -184,6 +188,27 @@ public class ModeloUsuarioBolsaEmpleo {
 		}
 		
 		return usuarioBolsa;
+	}
+	
+	/**
+	 * Devuelve el usuario candidato o excepción si no está logeado o no es de tipo candidato.
+	 * @param datos .
+	 * @return candidato .
+	 * @throws SQLException .
+	 * @throws UVException .
+	 */
+	public UsuarioBolsaEmpleo getUsuarioCandidato(UVDatos datos) throws UVException, SQLException {
+		UsuarioBolsaEmpleo usuario = this.getUsuarioLogeado(datos);
+		
+		if (usuario == null) {
+			throw new UVException("No hay usuario logeado");
+		}
+		
+		if (!usuario.getRol().getValor().equals(ROL_CANDIDATO)) {
+			throw new UVException("El usuario no es un candidato");
+		} 
+		
+		return usuario;
 	}
 	
 	/**

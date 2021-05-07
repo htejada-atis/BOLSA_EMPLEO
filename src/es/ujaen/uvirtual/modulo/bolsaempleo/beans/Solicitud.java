@@ -6,7 +6,7 @@ import java.util.Date;
 
 
 /** Clase solicitud de bolsa empleo.
- * @author ATISoluciones 
+ * @author ATISoluciones 2021
  */
 public class Solicitud implements Serializable {
 	private static final long serialVersionUID = 1L;

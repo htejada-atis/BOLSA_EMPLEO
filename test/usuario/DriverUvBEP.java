@@ -70,8 +70,6 @@ public class DriverUvBEP {
 	        c.setRequestProperty("Cookie", cookie.getName() + "=" + cookie.getValue());
 	        c.setUseCaches(false);
 	        c.setAllowUserInteraction(false);
-//	        c.setConnectTimeout(timeout);
-//	        c.setReadTimeout(timeout);
 	        c.connect();
 	        
 	        int status = c.getResponseCode();

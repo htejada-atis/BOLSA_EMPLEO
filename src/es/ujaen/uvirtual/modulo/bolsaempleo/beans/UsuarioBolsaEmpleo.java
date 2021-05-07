@@ -7,8 +7,7 @@ import es.ujaen.uvirtual.beans.Usuario;
 import es.ujaen.uvirtual.utilidades.Formateador;
 
 /** Clase usuario de UVIRTUAL.
- * @author ATISoluciones
- *
+ * @author ATISoluciones 2021 
  */
 public class UsuarioBolsaEmpleo implements Serializable {
 	private static final long serialVersionUID = 1L;

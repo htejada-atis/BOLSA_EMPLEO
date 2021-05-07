@@ -5,14 +5,13 @@ import java.io.Serializable;
 /**
  * Clase mérito solicitud de bolsa empleo.
  * 
- * @author Atisoluciones
+ * @author ATISoluciones 2021
  */
 public class MeritoSolicitud implements Serializable {
 
 	private static final long serialVersionUID = 1L;
 	private Integer codNum;
 	private Merito merito;
-	private Integer codNumSolicitudBolsa;
 	private Boolean excluido;
 
 	/**
@@ -27,13 +26,11 @@ public class MeritoSolicitud implements Serializable {
 	 *
 	 * @param pcodNum .
 	 * @param pmerito   .
-	 * @param pcodNumSolicitudBolsa   .
 	 * @param pexcluido .
 	 */
-	public MeritoSolicitud(Integer pcodNum, Merito pmerito, Integer pcodNumSolicitudBolsa, Boolean pexcluido) {
+	public MeritoSolicitud(Integer pcodNum, Merito pmerito, Boolean pexcluido) {
 		this.codNum = pcodNum;
-		this.merito = pmerito;
-		this.codNumSolicitudBolsa = pcodNumSolicitudBolsa;
+		this.merito = pmerito;		
 		this.excluido = pexcluido;		
 	}
 
@@ -45,14 +42,6 @@ public class MeritoSolicitud implements Serializable {
 		this.codNum = codNum;
 	}
 
-	public Integer getCodNumSolicitudBolsa() {
-		return this.codNumSolicitudBolsa;
-	}
-
-	public void setCodNumSolicitudBolsa(Integer codNumSolicitudBolsa) {
-		this.codNumSolicitudBolsa = codNumSolicitudBolsa;
-	}
-	
 	public Merito getMerito() {
 		return this.merito;
 	}
@@ -75,7 +64,7 @@ public class MeritoSolicitud implements Serializable {
 
 	@Override
 	public String toString() {
-		return "MeritoSolicitud [codNum=" + codNum + ", merito=" + merito + ", codNumSolicitudBolsa=" + codNumSolicitudBolsa + ", excluido=" + excluido + "]";
+		return "MeritoSolicitud [codNum=" + codNum + ", merito=" + merito + ", excluido=" + excluido + "]";
 	}
 
 	@Override
@@ -84,7 +73,6 @@ public class MeritoSolicitud implements Serializable {
 		int result = 1;
 		result = prime * result + ((codNum == null) ? 0 : codNum.hashCode());
 		result = prime * result + ((merito == null) ? 0 : merito.hashCode());
-		result = prime * result + ((codNumSolicitudBolsa == null) ? 0 : codNumSolicitudBolsa.hashCode());	
 		result = prime * result + ((excluido == null) ? 0 : excluido.hashCode());		
 		return result;
 	}
@@ -114,13 +102,6 @@ public class MeritoSolicitud implements Serializable {
 				return false;
 			}
 		} else if (!merito.equals(other.merito)) {
-			return false;
-		}
-		if (codNumSolicitudBolsa == null) {
-			if (other.codNumSolicitudBolsa != null) {
-				return false;
-			}
-		} else if (!codNumSolicitudBolsa.equals(other.codNumSolicitudBolsa)) {
 			return false;
 		}
 		if (excluido == null) {

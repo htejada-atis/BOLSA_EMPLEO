@@ -7,7 +7,7 @@ import es.ujaen.uvirtual.modulo.bolsaempleo.beans.Convocatoria;
 import es.ujaen.uvirtual.modulo.bolsaempleo.utilidades.BolsaEmpleoDataTable;
 
 /** Bean para la vista.
- * @author ATISoluciones
+ * @author ATISoluciones 2021
  */
 public class VistaConvocatorias extends Vista implements Serializable {
 	private static final long serialVersionUID = 1L;

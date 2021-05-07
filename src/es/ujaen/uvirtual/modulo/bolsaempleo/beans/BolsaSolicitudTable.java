@@ -3,16 +3,16 @@ package es.ujaen.uvirtual.modulo.bolsaempleo.beans;
 import java.io.Serializable;
 
 /** Clase para gestionar la tabla del bolsas en una solicitud.
- * @author Atisoluciones
+ * @author ATISoluciones
  */
-public class TablaBolsaSolicitud extends Bolsa implements Serializable {
+public class BolsaSolicitudTable extends Bolsa implements Serializable {
 
 	private static final long serialVersionUID = 1L;
 	private Integer numeroMeritos;
 	
 	/** Constructor por defecto.
 	 */
-	public TablaBolsaSolicitud() {
+	public BolsaSolicitudTable() {
 		//este contructor esta vacio intencionadamente
 	}
 	
@@ -20,7 +20,7 @@ public class TablaBolsaSolicitud extends Bolsa implements Serializable {
 	 * @param pbolsa .
 	 * @param pnumeroMeritos .
 	 */
-	public TablaBolsaSolicitud(Bolsa pbolsa, Integer pnumeroMeritos) {
+	public BolsaSolicitudTable(Bolsa pbolsa, Integer pnumeroMeritos) {
 		super(pbolsa);
 		this.numeroMeritos = pnumeroMeritos;
 	}
@@ -60,7 +60,7 @@ public class TablaBolsaSolicitud extends Bolsa implements Serializable {
 			return false;
 		}
 		
-		TablaBolsaSolicitud other = (TablaBolsaSolicitud) obj;
+		BolsaSolicitudTable other = (BolsaSolicitudTable) obj;
 		if (!super.equals(other)) {
 			return false;
 		}

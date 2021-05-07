@@ -10,24 +10,26 @@ import es.ujaen.uvirtual.modulo.bolsaempleo.beans.BolsaCandidato;
 import es.ujaen.uvirtual.modulo.bolsaempleo.beans.BolsaSolicitud;
 import es.ujaen.uvirtual.modulo.bolsaempleo.beans.Merito;
 import es.ujaen.uvirtual.modulo.bolsaempleo.beans.MeritoSolicitud;
+import es.ujaen.uvirtual.modulo.bolsaempleo.beans.MeritoSolicitudTable;
 import es.ujaen.uvirtual.modulo.bolsaempleo.beans.Solicitud;
 import es.ujaen.uvirtual.modulo.bolsaempleo.beans.Titulacion;
+import es.ujaen.uvirtual.modulo.bolsaempleo.beans.UsuarioBolsaEmpleo;
 import es.ujaen.uvirtual.modulo.bolsaempleo.utilidades.BolsaEmpleoDataTable;
-import es.ujaen.uvirtual.modulo.bolsaempleo.beans.TablaBolsaSolicitud;
+import es.ujaen.uvirtual.modulo.bolsaempleo.beans.BolsaSolicitudTable;
 
 /** Bean para la vista.
- * @author ATISoluciones
+ * @author ATISoluciones 2021
  */
 public class VistaSolicitudes extends Vista implements Serializable {
 	private static final long serialVersionUID = 1L;
 	private String vista;
 	private BolsaEmpleoDataTable<Solicitud> dataTable;
 	private BolsaEmpleoDataTable<Bolsa> dataTableAreas;
-	private BolsaEmpleoDataTable<TablaBolsaSolicitud> dataTableBolsasSolicitud;
+	private BolsaEmpleoDataTable<BolsaSolicitudTable> dataTableBolsasSolicitud;
 	private BolsaEmpleoDataTable<BolsaCandidato> dataTableBolsasCandidato;
-	private BolsaEmpleoDataTable<MeritoSolicitud> dataTableMeritos;
+	private BolsaEmpleoDataTable<MeritoSolicitudTable> dataTableMeritos;
 	private List<Bolsa> listaBolsas;
-	private List<TablaBolsaSolicitud> listaTablaBolsasSolicitud;
+	private List<BolsaSolicitudTable> listaTablaBolsasSolicitud;
 	private List<BolsaSolicitud> listaBolsasSolicitud;
 	private List<MeritoSolicitud> listaMeritos;
 	private List<Titulacion> listaTitulaciones;
@@ -36,6 +38,7 @@ public class VistaSolicitudes extends Vista implements Serializable {
 	private Solicitud solicitud;
 	private Bolsa area;
 	private Merito merito;
+	private UsuarioBolsaEmpleo candidato;
 			
 	public String getVista() {
 		return vista;
@@ -61,11 +64,11 @@ public class VistaSolicitudes extends Vista implements Serializable {
 		this.dataTableAreas = dt;
 	}
 	
-	public BolsaEmpleoDataTable<TablaBolsaSolicitud> getDatatableBolsasSolicitud() {
+	public BolsaEmpleoDataTable<BolsaSolicitudTable> getDatatableBolsasSolicitud() {
 		return dataTableBolsasSolicitud;
 	}
 	
-	public void setDatatableBolsasSolicitud(BolsaEmpleoDataTable<TablaBolsaSolicitud> dt) {
+	public void setDatatableBolsasSolicitud(BolsaEmpleoDataTable<BolsaSolicitudTable> dt) {
 		this.dataTableBolsasSolicitud = dt;
 	}
 	
@@ -77,12 +80,12 @@ public class VistaSolicitudes extends Vista implements Serializable {
 		this.dataTableBolsasCandidato = dt;
 	}
 	
-	public BolsaEmpleoDataTable<MeritoSolicitud> getDataTableMeritos() {
+	public BolsaEmpleoDataTable<MeritoSolicitudTable> getDataTableMeritos() {
 		return dataTableMeritos;
 	}
 	
-	public void setDataTableMeritos(BolsaEmpleoDataTable<MeritoSolicitud> dt) {
-		this.dataTableMeritos = dt;
+	public void setDataTableMeritos(BolsaEmpleoDataTable<MeritoSolicitudTable> dataTable2) {
+		this.dataTableMeritos = dataTable2;
 	}
 	
 	public List<Bolsa> getListaBolsas() {
@@ -93,11 +96,11 @@ public class VistaSolicitudes extends Vista implements Serializable {
 		this.listaBolsas = bolsas;
 	}
 	
-	public List<TablaBolsaSolicitud> getListaTablaBolsasSolicitud() {
+	public List<BolsaSolicitudTable> getListaTablaBolsasSolicitud() {
 		return listaTablaBolsasSolicitud;
 	}
 	
-	public void setListaTablaBolsasSolicitud(List<TablaBolsaSolicitud> bolsas) {
+	public void setListaTablaBolsasSolicitud(List<BolsaSolicitudTable> bolsas) {
 		this.listaTablaBolsasSolicitud = bolsas;
 	}
 	
@@ -163,5 +166,13 @@ public class VistaSolicitudes extends Vista implements Serializable {
 	
 	public void setMerito(Merito merito) {
 		this.merito = merito;
+	}
+
+	public void setCandidato(UsuarioBolsaEmpleo usuarioCandidato) {
+		this.candidato = usuarioCandidato;		
+	}
+	
+	public UsuarioBolsaEmpleo getCandidato() {
+		return this.candidato;		
 	}
 }

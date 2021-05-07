@@ -10,15 +10,13 @@ import java.util.Map;
 
 import es.ujaen.uvirtual.modelo.conexion.ConexionUvirtual;
 import es.ujaen.uvirtual.modulo.bolsaempleo.beans.Merito;
-import es.ujaen.uvirtual.modulo.bolsaempleo.beans.MeritoSolicitud;
-import es.ujaen.uvirtual.modulo.bolsaempleo.beans.UsuarioBolsaEmpleo;
 import es.ujaen.uvirtual.modulo.bolsaempleo.utilidades.BolsaEmpleoDataTable;
 import es.ujaen.uvirtual.modulo.bolsaempleo.utilidades.BolsaEmpleoUtils;
 import es.ujaen.uvirtual.utilidades.UVException;
 
 /**
  * Clase de modelo para la gestión de meritos. 
- * @author ATISoluciones
+ * @author ATISoluciones 2021
  */
 public class ModeloMerito {
 	public static final int ORDER_COLUMN_INDEX_ID = 1;
@@ -28,12 +26,6 @@ public class ModeloMerito {
 	public static final int ORDER_COLUMN_INDEX_DESCRIPCION = 5;
 	public static final int ORDER_COLUMN_INDEX_VALOR = 6;
 	public static final int ORDER_COLUMN_INDEX_OBSERVACION = 7;
-	
-	public static final int ORDER_COLUMN_INDEX_ID_SOLICITUD = 1;
-	public static final int ORDER_COLUMN_INDEX_ITEM_SOLICITUD = 2;
-	public static final int ORDER_COLUMN_INDEX_NOMBRE_ITEM_SOLICITUD = 3;
-	public static final int ORDER_COLUMN_INDEX_VALOR_SOLICITUD = 4;
-	public static final int ORDER_COLUMN_INDEX_EXCLUIDO_SOLICITUD = 5;
 	
 	public static final int COLUMN_DESCRIPCION_MAXLENGTH = 200;
 	public static final int COLUMN_OBSERVACION_MAXLENGTH = 300;
@@ -259,72 +251,6 @@ public class ModeloMerito {
 		return dataTable;
 	}
 	
-	/**
-	 * Listado de méritos de un usuario en la solicitud.
-	 * @param params para leer los parametros de paginación, ordenacion, etc .
-	 * @param usuario id del usuario .
-	 * @return listado de titulaciones .
-	 * @throws SQLException en caso de error de base de datos .
-	 * @throws UVException error si no existe titulación .
-	 */
-	public BolsaEmpleoDataTable<MeritoSolicitud> listaMeritosSolicitudDatatable(Map<String, String[]> params, UsuarioBolsaEmpleo usuario)
-			throws SQLException, UVException {		
-		if (usuario == null) {
-			throw new UVException("Introduce un usuario");
-		}
-		
-		List<MeritoSolicitud> meritos = new ArrayList<>();
-		BolsaEmpleoDataTable<MeritoSolicitud> dataTable = new BolsaEmpleoDataTable<MeritoSolicitud>(params);
-		
-		String consulta = ""
-				+ " SELECT DISTINCT "
-				+ "		(bepmer.CODNUM), "
-				+ "		bepmer.BEPITE_CODNUM, "
-				+ "		bepmer.BEPUSU_CODNUM, "
-				+ "		bepmer.VALOR, bepite.NOMBRE, "
-				+ "		bepmer.DESCRIPCION, "
-				+ "		bepmer.OBSERVACION, "
-				+ "		bepsbm.FLGEXCLUIDO, "
-				+ "		bepblo.BEPAPA_CODNUM, "
-				+ "		bepsbm.CODNUM as SBM_CODNUM, "
-				+ "		bepsbm.BEPSBO_CODNUM "
-				+ " FROM TBEP_MERITOS bepmer"
-				+ " INNER JOIN TBEP_ITEMSBAREMACION bepite ON bepite.CODNUM = bepmer.BEPITE_CODNUM"
-				+ " INNER JOIN TBEP_BLOQUESBAREMACION bepblo ON bepblo.CODNUM = bepite.BEPBLO_CODNUM"
-				+ " LEFT JOIN TBEP_SOLICITUD_BOLSAS_MERITOS bepsbm ON bepsbm.BEPMER_CODNUM = bepmer.CODNUM"
-				+ " WHERE bepmer.BEPUSU_CODNUM = ? ";
-		
-		dataTable.setColumn(ORDER_COLUMN_INDEX_ID_SOLICITUD, "bepmer.CODNUM");
-		dataTable.setColumn(ORDER_COLUMN_INDEX_ITEM_SOLICITUD, "bepmer.BEPITE_CODNUM");
-		dataTable.setColumn(ORDER_COLUMN_INDEX_NOMBRE_ITEM_SOLICITUD, "bepite.NOMBRE");
-		dataTable.setColumn(ORDER_COLUMN_INDEX_VALOR_SOLICITUD, "bepmer.VALOR");
-		dataTable.setColumn(ORDER_COLUMN_INDEX_EXCLUIDO_SOLICITUD, "bepsbm.FLGEXCLUIDO");
-		dataTable.setQuery(consulta);
-		
-		try (Connection conexion = ConexionUvirtual.obtenerInstancia();
-				PreparedStatement stmtCount = conexion.prepareStatement(dataTable.getQueryCount());
-				PreparedStatement stmt = conexion.prepareStatement(dataTable.getQuery());
-		) {
-			int indexParam = 1;
-			stmt.setInt(indexParam, usuario.getCodNum());
-			stmtCount.setInt(indexParam++, usuario.getCodNum());
-			dataTable.setFiltersParams(stmt, stmtCount, indexParam);
-			try (ResultSet rs = stmt.executeQuery()) {
-				while (rs.next()) {
-					Merito merito = this.getMeritoById(rs.getInt("CODNUM"));					
-					Boolean excluido = rs.getString("FLGEXCLUIDO") != null && rs.getString("FLGEXCLUIDO").equals("S");
-					MeritoSolicitud meritoSolicitud = new MeritoSolicitud(rs.getInt("SBM_CODNUM"), merito, rs.getInt("BEPSBO_CODNUM"), excluido);
-					meritos.add(meritoSolicitud);
-				}
-			}
-			
-			dataTable.setRecordsTotalFromQuery(stmtCount);
-			dataTable.setData(meritos);
-		}
-		
-		return dataTable;
-	}
-
 	/**
 	 * Devuelve el merito por su id o excepcion si no existe.
 	 * @param id .

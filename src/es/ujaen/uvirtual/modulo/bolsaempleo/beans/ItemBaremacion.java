@@ -36,13 +36,9 @@ public class ItemBaremacion implements Serializable {
 	 * @param pactivo .
 	 * @param punidades .
 	 * @param pvalor .
-	 * @param pvalorMinimo .
-	 * @param pvalorMaximo .
-	 * @param pafinidad .
-	 * @param pindividualizado .
 	 */
 	public ItemBaremacion(Integer pcodNum, BloqueBaremacion pbloque, String pcodigo, String pnombre, Boolean pactivo, 
-			String punidades, Float pvalor, Float pvalorMinimo, Float pvalorMaximo, String pafinidad, Boolean pindividualizado) {
+			String punidades, Float pvalor) {
 		super();
 		this.bloque = pbloque;
 		this.codNum = pcodNum;
@@ -50,11 +46,7 @@ public class ItemBaremacion implements Serializable {
 		this.nombre = pnombre;
 		this.activo = pactivo;
 		this.unidades = punidades;
-		this.valor = pvalor;
-		this.valorMinimo = pvalorMinimo;
-		this.valorMaximo = pvalorMaximo;
-		this.afinidad = pafinidad;
-		this.individualizado = pindividualizado;
+		this.valor = pvalor;		
 	}
 		
 	/** Constructor copia.

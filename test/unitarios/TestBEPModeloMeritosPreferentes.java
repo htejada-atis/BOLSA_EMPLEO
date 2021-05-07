@@ -48,24 +48,29 @@ public class TestBEPModeloMeritosPreferentes {
 	private static final ApartadoBaremacion APARTADO = new ApartadoBaremacion(CODNUM, DESCRIPCION, DESCRIPCION, ACTIVO, APARTADO_PUNTUACIONMAXIMA, APARTADO_PORCENTAJEMAXIMO);
 	private static final BloqueBaremacion BLOQUE = new BloqueBaremacion(CODNUM, APARTADO, DESCRIPCION, DESCRIPCION, ACTIVO, BLOQUE_NUM_MAXIMO_MERITOS);
 
-	private static final ItemBaremacion ITEM = 
-			new ItemBaremacion(CODNUM, BLOQUE, DESCRIPCION, DESCRIPCION, ACTIVO, ITEM_UNIDADES, ITEM_VALOR, 
-					ITEM_VALORMINIMO, ITEM_VALORMAXIMO, ITEM_AFINIDAD, ITEM_INDIVIDUALIZADO);
+	private static final ItemBaremacion ITEM = new ItemBaremacion(CODNUM, BLOQUE, DESCRIPCION, DESCRIPCION, ACTIVO, ITEM_UNIDADES, ITEM_VALOR);
 	
-	private static final ItemBaremacion ITEM2 = 
-			new ItemBaremacion(CODNUM, BLOQUE, DESCRIPCION, DESCRIPCION, ACTIVO, ITEM_UNIDADES, ITEM_VALOR, 
-					ITEM_VALORMINIMO, ITEM_VALORMAXIMO, ITEM_AFINIDAD, ITEM_INDIVIDUALIZADO);
+	private static final ItemBaremacion ITEM2 = new ItemBaremacion(CODNUM, BLOQUE, DESCRIPCION, DESCRIPCION, ACTIVO, ITEM_UNIDADES, ITEM_VALOR);
     
 	/** prepara la bd con los datos iniciales.
      * @throws SQLException si error en bd
      * @throws IOException si error en ficheros
-	 * @throws ParseException si error fecha
      */
     @BeforeClass
-    public static void preparaBd() throws SQLException, IOException, ParseException {
+    public static void preparaBd() throws SQLException, IOException {
     	DataSource ds = BbddRunner.obtenerDataSourceUv();
     	Conexion.setConexionUvirtual(ds);
     	UtilsTestBolsaEmpleo.inicializaBolsaEmpleo();
+    	
+    	ITEM.setValorMinimo(ITEM_VALORMINIMO);
+    	ITEM.setValorMaximo(ITEM_VALORMAXIMO);
+    	ITEM.setAfinidad(ITEM_AFINIDAD);
+    	ITEM.setIndividualizado(ITEM_INDIVIDUALIZADO);
+    	
+    	ITEM2.setValorMinimo(ITEM_VALORMINIMO);
+    	ITEM2.setValorMaximo(ITEM_VALORMAXIMO);
+    	ITEM2.setAfinidad(ITEM_AFINIDAD);
+    	ITEM2.setIndividualizado(ITEM_INDIVIDUALIZADO);    	
     }
     
     /** test acierto insertar usuario.
@@ -95,7 +100,7 @@ public class TestBEPModeloMeritosPreferentes {
     	Boolean eje = false;
     	
         for (MeritoPreferente mer : meritosPreferentes) {
-            if (mer.getCodNum() == meritoCont.getCodNum()) {
+            if (mer.getCodNum().equals(meritoCont.getCodNum())) {
             	eje = true;
             }
         }

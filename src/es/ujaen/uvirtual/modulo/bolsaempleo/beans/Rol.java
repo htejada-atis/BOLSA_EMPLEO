@@ -3,7 +3,7 @@ package es.ujaen.uvirtual.modulo.bolsaempleo.beans;
 import java.io.Serializable;
 
 /** Clase rol de UVIRTUAL.
- * @author ATISoluciones
+ * @author ATISoluciones 2021
  *
  */
 public class Rol implements Serializable {

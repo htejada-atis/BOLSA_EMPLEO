@@ -9,13 +9,16 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import es.ujaen.uvirtual.modelo.conexion.ConexionUvirtual;
+import es.ujaen.uvirtual.modulo.bolsaempleo.beans.Afinidad;
 import es.ujaen.uvirtual.modulo.bolsaempleo.beans.Bolsa;
 import es.ujaen.uvirtual.modulo.bolsaempleo.beans.BolsaSolicitud;
 import es.ujaen.uvirtual.modulo.bolsaempleo.beans.Convocatoria;
 import es.ujaen.uvirtual.modulo.bolsaempleo.beans.Merito;
 import es.ujaen.uvirtual.modulo.bolsaempleo.beans.MeritoSolicitud;
+import es.ujaen.uvirtual.modulo.bolsaempleo.beans.MeritoSolicitudTable;
+import es.ujaen.uvirtual.modulo.bolsaempleo.beans.MeritoSolicitudValoracion;
 import es.ujaen.uvirtual.modulo.bolsaempleo.beans.Solicitud;
-import es.ujaen.uvirtual.modulo.bolsaempleo.beans.TablaBolsaSolicitud;
+import es.ujaen.uvirtual.modulo.bolsaempleo.beans.BolsaSolicitudTable;
 import es.ujaen.uvirtual.modulo.bolsaempleo.beans.UsuarioBolsaEmpleo;
 import es.ujaen.uvirtual.modulo.bolsaempleo.utilidades.BolsaEmpleoDataTable;
 import es.ujaen.uvirtual.modulo.bolsaempleo.utilidades.BolsaEmpleoUtils;
@@ -35,6 +38,13 @@ public class ModeloSolicitud {
 	public static final String MENSAJE_ERROR_CONVOCATORIA_NO_ABIERTA = "La convocatoria no está abierta";
 	public static final String MENSAJE_ERROR_SOLICITUDES_ABIERTAS = "Ya existen solicitides abiertas";
 	public static final String MENSAJE_ERROR_SOLICITUDE_NO_EXISTE = "No existe la solicitud";
+
+	public static final int ORDER_COLUMN_INDEX_MERITOS_ID_MERITO = 1;
+	public static final int ORDER_COLUMN_INDEX_MERITOS_ITEM_CODIGO = 2;
+	public static final int ORDER_COLUMN_INDEX_MERITOS_ITEM_NOMBRE = 3;
+	public static final int ORDER_COLUMN_INDEX_MERITOS_VALOR = 4;
+	public static final int ORDER_COLUMN_INDEX_MERITOS_AFINIDAD = 5;
+	public static final int ORDER_COLUMN_INDEX_MERITOS_EXCLUIDO = 6;
 			
     protected static ModeloSolicitud eInstancia = null;
 	
@@ -372,10 +382,10 @@ public class ModeloSolicitud {
 	 * @throws UVException .
 	 * @throws SQLException .
 	 */
-	public BolsaEmpleoDataTable<TablaBolsaSolicitud> listaBolsasSolicitudesDatatable(Solicitud solicitud, Map<String, String[]> params) throws SQLException, UVException {
+	public BolsaEmpleoDataTable<BolsaSolicitudTable> listaBolsasSolicitudesDatatable(Solicitud solicitud, Map<String, String[]> params) throws SQLException, UVException {
 		ModeloBolsa modeloBolsa = ModeloBolsa.obtenerInstancia();
-		List<TablaBolsaSolicitud> data = new ArrayList<>();
-		BolsaEmpleoDataTable<TablaBolsaSolicitud> dataTable = new BolsaEmpleoDataTable<TablaBolsaSolicitud>(params);
+		List<BolsaSolicitudTable> data = new ArrayList<>();
+		BolsaEmpleoDataTable<BolsaSolicitudTable> dataTable = new BolsaEmpleoDataTable<BolsaSolicitudTable>(params);
 		
 		String consulta = ""
 				+ "SELECT "
@@ -396,12 +406,93 @@ public class ModeloSolicitud {
 			try (ResultSet rs = stmt.executeQuery()) {
 				while (rs.next()) {
 					Bolsa bolsa = modeloBolsa.getBolsaById(rs.getInt("BEPBOL_CODNUM"));
-					data.add(new TablaBolsaSolicitud(bolsa, rs.getInt("COUNT_MERITOS")));
+					data.add(new BolsaSolicitudTable(bolsa, rs.getInt("COUNT_MERITOS")));
 				}
 			}
 			
 			dataTable.setRecordsTotalFromQuery(stmtCount);
 			dataTable.setData(data);
+		}
+		
+		return dataTable;
+	}
+	
+	/**
+	 * Listado de méritos de un usuario en la solicitud y una bolsa.
+	 * @param params para leer los parametros de paginación, ordenacion, etc .
+	 * @param usuario id del usuario .
+	 * @param bolsa id de la bolsa.
+	 * @return listado de titulaciones .
+	 * @throws SQLException en caso de error de base de datos .
+	 * @throws UVException error si no existe titulación .
+	 */
+	public BolsaEmpleoDataTable<MeritoSolicitudTable> listaMeritosSolicitudDatatable(Map<String, String[]> params, UsuarioBolsaEmpleo usuario, Bolsa bolsa)
+			throws SQLException, UVException {		
+		if (usuario == null) {
+			throw new UVException("Introduce un usuario");
+		}
+		if (bolsa == null) {
+			throw new UVException("Introduce una bolsa");
+		}
+		
+		List<MeritoSolicitudTable> meritos = new ArrayList<>();
+		BolsaEmpleoDataTable<MeritoSolicitudTable> dataTable = new BolsaEmpleoDataTable<MeritoSolicitudTable>(params);
+		
+//		String consulta = ""
+//				+ " SELECT bepmer.CODNUM, bepmer.VALOR, bepite.CODIGO, bepite.NOMBRE, bepsbm.CODNUM SBM_CODNUM, bepsbm.FLGEXCLUIDO "
+//				+ " FROM TBEP_MERITOS bepmer "
+//				+ " INNER JOIN TBEP_ITEMSBAREMACION bepite ON bepite.CODNUM = bepmer.BEPITE_CODNUM "
+//				+ " LEFT JOIN TBEP_SOLICITUD_BOLSAS_MERITOS bepsbm ON bepsbm.BEPMER_CODNUM = bepmer.CODNUM "
+//				+ " LEFT JOIN TBEP_SOLICITUD_BOLSAS bepsbo ON bepsbo.CODNUM = bepsbm.BEPSBO_CODNUM "				
+//				+ " WHERE bepmer.BEPUSU_CODNUM = ? ";
+		
+		String consulta = ""
+				+ " SELECT bepmer.CODNUM, bepmer.VALOR, bepite.CODIGO, bepite.NOMBRE, MERITOS_BOLSAS.CODNUM SBM_CODNUM, MERITOS_BOLSAS.FLGEXCLUIDO "
+				+ " FROM TBEP_MERITOS bepmer "
+				+ " INNER JOIN TBEP_ITEMSBAREMACION bepite ON bepite.CODNUM = bepmer.BEPITE_CODNUM "
+				+ " LEFT JOIN ( "
+				+ " 	SELECT bepsbm.* "
+				+ " 	FROM TBEP_SOLICITUD_BOLSAS_MERITOS bepsbm "
+				+ "		INNER JOIN TBEP_SOLICITUD_BOLSAS bepsbo ON bepsbo.CODNUM = bepsbm.BEPSBO_CODNUM"
+				+ "		WHERE bepsbo.BEPBOL_CODNUM = ? "				
+				+ " ) MERITOS_BOLSAS ON MERITOS_BOLSAS.BEPMER_CODNUM = bepmer.CODNUM "							
+				+ " WHERE bepmer.BEPUSU_CODNUM = ? ";
+
+		
+		dataTable.setColumn(ORDER_COLUMN_INDEX_MERITOS_ID_MERITO, "bepmer.CODNUM");
+		dataTable.setColumn(ORDER_COLUMN_INDEX_MERITOS_ITEM_CODIGO, "bepite.CODIGO");
+		dataTable.setColumn(ORDER_COLUMN_INDEX_MERITOS_ITEM_NOMBRE, "bepite.NOMBRE");
+		dataTable.setColumn(ORDER_COLUMN_INDEX_MERITOS_VALOR, "bepmer.VALOR");
+		dataTable.setColumn(ORDER_COLUMN_INDEX_MERITOS_AFINIDAD, "bepmer.CODNUM");
+		dataTable.setColumn(ORDER_COLUMN_INDEX_MERITOS_EXCLUIDO, "bepsbm.FLGEXCLUIDO");
+		dataTable.setQuery(consulta);
+		
+		try (Connection conexion = ConexionUvirtual.obtenerInstancia();
+				PreparedStatement stmtCount = conexion.prepareStatement(dataTable.getQueryCount());
+				PreparedStatement stmt = conexion.prepareStatement(dataTable.getQuery());
+		) {
+			int indexParam = 1;
+			stmt.setInt(indexParam, bolsa.getCodNum());
+			stmtCount.setInt(indexParam++, bolsa.getCodNum());
+			stmt.setInt(indexParam, usuario.getCodNum());
+			stmtCount.setInt(indexParam++, usuario.getCodNum());			
+			
+			dataTable.setFiltersParams(stmt, stmtCount, indexParam);
+			try (ResultSet rs = stmt.executeQuery()) {
+				while (rs.next()) {
+					Merito merito = ModeloMerito.obtenerInstancia().getMeritoById(rs.getInt("CODNUM"), false, false);
+					Integer idMeritoSolicitud = rs.getInt("SBM_CODNUM"); 									
+					MeritoSolicitud ms = idMeritoSolicitud != 0 ? this.getMeritoSolicitudById(idMeritoSolicitud) : null;
+					List<MeritoSolicitudValoracion> valoraciones = idMeritoSolicitud != null 
+							? this.getValoracionesMeritoSolicitud(idMeritoSolicitud, false) : new ArrayList<>();
+					
+					MeritoSolicitudTable row = new MeritoSolicitudTable(merito, ms, valoraciones);
+					meritos.add(row);
+				}
+			}
+			
+			dataTable.setRecordsTotalFromQuery(stmtCount);
+			dataTable.setData(meritos);
 		}
 		
 		return dataTable;
@@ -451,63 +542,198 @@ public class ModeloSolicitud {
 	public void borrarMeritoDeSolicitudBolsa(Solicitud solicitud, Bolsa bolsa, Merito merito) throws SQLException, UVException {
 		try (Connection conexion = ConexionUvirtual.obtenerInstancia();) {
 			conexion.setAutoCommit(false);
-			// eliminamos el mérito de la bolsa en la solicitud
-			String consulta = "DELETE FROM TBEP_SOLICITUD_BOLSAS_MERITOS bepsbm "
-					+ "	WHERE bepsbm.BEPSBO_CODNUM IN ("
-					+ "		SELECT bepsbo.CODNUM FROM TBEP_SOLICITUD_BOLSAS bepsbo"
-					+ "		WHERE bepsbo.BEPSOL_CODNUM = ? AND bepsbo.BEPBOL_CODNUM = ?)"
-					+ "	AND bepsbm.BEPMER_CODNUM = ?";
+						
+			// eliminamos valoraciones
+			String sqlValoraciones = ""
+					+ "DELETE FROM TBEP_SOLICITUD_BOLSAS_MERITOS_VALORACION bepsbv WHERE bepsbv.BEPSBM_CODNUM IN ( "
+					+ "		SELECT bepsbm.CODNUM "
+					+ "		FROM TBEP_SOLICITUD_BOLSAS_MERITOS bepsbm "
+					+ "		WHERE bepsbm.BEPMER_CODNUM = ? AND bepsbm.BEPSBO_CODNUM IN ( "
+					+ "			SELECT bepsbo.CODNUM "
+					+ "			FROM TBEP_SOLICITUD_BOLSAS bepsbo "
+					+ "			WHERE bepsbo.BEPSOL_CODNUM = ? AND bepsbo.BEPBOL_CODNUM = ? "						
+					+ "		)"
+					+ ")";
 			
-			try (PreparedStatement stmt = conexion.prepareStatement(consulta)) {
+			try (PreparedStatement stmt = conexion.prepareStatement(sqlValoraciones)) {
+				int indexParam = 1;
+				stmt.setInt(indexParam++, merito.getCodNum());
+				stmt.setInt(indexParam++, solicitud.getCodNum());
+				stmt.setInt(indexParam++, bolsa.getCodNum());				
+				stmt.executeUpdate();
+			} catch (SQLException e) {
+				conexion.rollback();
+				throw e;
+			}
+			
+			// eliminamos merito en la solicitud
+			String sqlMeritos = ""
+					+ "DELETE FROM TBEP_SOLICITUD_BOLSAS_MERITOS bepsbm "
+					+ "WHERE bepsbm.BEPSBO_CODNUM IN ( "
+					+ "		SELECT bepsbo.CODNUM "
+					+ "		FROM TBEP_SOLICITUD_BOLSAS bepsbo "
+					+ "		WHERE bepsbo.BEPSOL_CODNUM = ? AND bepsbo.BEPBOL_CODNUM = ? "
+					+ ") AND bepsbm.BEPMER_CODNUM = ?";
+			
+			try (PreparedStatement stmt = conexion.prepareStatement(sqlMeritos)) {
 				int indexParam = 1;
 				stmt.setInt(indexParam++, solicitud.getCodNum());
 				stmt.setInt(indexParam++, bolsa.getCodNum());
 				stmt.setInt(indexParam++, merito.getCodNum());
 				stmt.executeUpdate();
 			} catch (SQLException e) {
-				if (conexion != null) {
-					conexion.rollback();
-				}
+				conexion.rollback();
 				throw e;
 			}
 			
 			conexion.commit();
 		}
 	}
+	 
+	/** El usuario ha seleccionado la afinidad del mérito individualizado. 
+	 * @param solicitud .
+	 * @param bolsa .
+	 * @param merito -
+	 * @param afinidad .
+	 * @throws UVException .
+	 * @throws SQLException .
+	 */
+	public void asignarAfinidadMeritoIndividualizado(Solicitud solicitud, Bolsa bolsa, Merito merito, Afinidad afinidad) throws SQLException, UVException {
+		try (Connection conexion = ConexionUvirtual.obtenerInstancia();) {
+			conexion.setAutoCommit(false);
+			
+			MeritoSolicitud meritoSolicitud = this.getMeritoSolicitud(solicitud.getCodNum(), bolsa.getCodNum(), merito.getCodNum());
+						
+			// eliminamos la afinidad previamente seleccionada
+			String sqlDelete = "DELETE FROM TBEP_SOLICITUD_BOLSAS_MERITOS_VALORACION bepsbv WHERE bepsbv.BEPSBM_CODNUM = ?";
+			try (PreparedStatement stmt = conexion.prepareStatement(sqlDelete)) {
+				int indexParam = 1;
+				stmt.setInt(indexParam++, meritoSolicitud.getCodNum());				
+				stmt.executeUpdate();
+			}
+						
+			// insertamos la afinidad del mérito
+			String sqlInsert = "INSERT INTO TBEP_SOLICITUD_BOLSAS_MERITOS_VALORACION (BEPSBM_CODNUM, BEPAFI_CODNUM, VALOR) VALUES (?,?,NULL)";			
+			try (PreparedStatement stmt = conexion.prepareStatement(sqlInsert)) {
+				int indexParam = 1;
+				stmt.setInt(indexParam++, meritoSolicitud.getCodNum());
+				stmt.setInt(indexParam++, afinidad.getCodNum());				
+				stmt.executeUpdate();
+			} catch (SQLException e) {
+				conexion.rollback();
+				throw e;
+			}			
+			
+			conexion.commit();
+		}
+	}
 	
 	/**
-	 * Devuelve un merito solicitud, el de un merito en una solicitud.
+	 * Devuelve un merito solicitud asociando a una solicitud y una bolsa.
+	 * @param idSolicitud .
+	 * @param idBolsa .
 	 * @param idMerito .
-	 * @param idSolicitudBolsa .
 	 * @return .
 	 * @throws SQLException .
 	 * @throws UVException .
 	 */
-	public MeritoSolicitud getMeritoSolicitudById(Integer idMerito, Integer idSolicitudBolsa) throws SQLException, UVException {
+	public MeritoSolicitud getMeritoSolicitud(Integer idSolicitud, Integer idBolsa, Integer idMerito) throws SQLException, UVException {
 		String consulta = "SELECT bepsbm.* "
 				+ "FROM TBEP_SOLICITUD_BOLSAS_MERITOS bepsbm "
+				+ "INNER JOIN TBEP_SOLICITUD_BOLSAS bepsbo ON bepsbo.CODNUM = bepsbm.BEPSBO_CODNUM "
 				+ "WHERE 1=1 "
-				+ "AND bepsbm.BEPSBO_CODNUM = ? "
-				+ "AND bepsbm.BEPMER_CODNUM = ? ";
+				+ "AND bepsbm.BEPMER_CODNUM = ? "
+				+ "AND bepsbo.BEPSOL_CODNUM = ? "
+				+ "AND bepsbo.BEPBOL_CODNUM = ? ";
 			
 		try (Connection conexion = ConexionUvirtual.obtenerInstancia();
 				PreparedStatement stmt = conexion.prepareStatement(consulta);) {
-			stmt.setInt(1, idSolicitudBolsa);
-			stmt.setInt(2, idMerito);
-						
+			
+			int params = 1;
+			stmt.setInt(params++, idMerito);
+			stmt.setInt(params++, idSolicitud);
+			stmt.setInt(params++, idBolsa);
+									
 			try (ResultSet rs = stmt.executeQuery()) {
 				if (!rs.next()) {
 					throw new UVException("No existe el merito de la solicitud");
 				}
 				
 				Merito merito = ModeloMerito.obtenerInstancia().getMeritoById(rs.getInt("BEPMER_CODNUM"), false, false);
-				MeritoSolicitud meritoSolicitud = new MeritoSolicitud(rs.getInt("CODNUM"), merito, rs.getInt("BEPSBO_CODNUM"), 
-						rs.getString("FLGEXCLUIDO").equals("S"));
-								
-				return meritoSolicitud;
+				
+				return new MeritoSolicitud(rs.getInt("CODNUM"), merito, rs.getString("FLGEXCLUIDO").equals("S"));
 			}
 		}
 	}
+	
+	/**
+	 * Devuelve un merito solicitud por su id.
+	 * @param idMeritoSolicitud .
+	 * @return .
+	 * @throws SQLException .
+	 * @throws UVException .
+	 */
+	public MeritoSolicitud getMeritoSolicitudById(Integer idMeritoSolicitud) throws SQLException, UVException {
+		if (idMeritoSolicitud == null) {
+			throw new UVException("No existe el merito de la solicitud");
+		}
+		
+		String consulta = "SELECT bepsbm.* FROM TBEP_SOLICITUD_BOLSAS_MERITOS bepsbm WHERE bepsbm.CODNUM = ?";
+			
+		try (Connection conexion = ConexionUvirtual.obtenerInstancia();
+				PreparedStatement stmt = conexion.prepareStatement(consulta);) {
+			
+			int params = 1;
+			stmt.setInt(params++, idMeritoSolicitud);
+									
+			try (ResultSet rs = stmt.executeQuery()) {
+				if (!rs.next()) {
+					throw new UVException("No existe el merito de la solicitud");
+				}
+				
+				Merito merito = ModeloMerito.obtenerInstancia().getMeritoById(rs.getInt("BEPMER_CODNUM"), false, false);
+				
+				return new MeritoSolicitud(rs.getInt("CODNUM"), merito, rs.getString("FLGEXCLUIDO").equals("S"));
+			}
+		}
+	}
+	
+	/**
+	 * Devuleve el listado de valoraciones de un meritoSolicitud.
+	 * @param idMeritoSolicitud .
+	 * @param loadMeritoSolicitud indica si cargar en memoria el MeritoSolicitud asociado
+	 * @return .
+	 * @throws SQLException .
+	 * @throws UVException .
+	 * @throws SQLException .
+	 * @throws UVException .
+	 */
+	public List<MeritoSolicitudValoracion> getValoracionesMeritoSolicitud(int idMeritoSolicitud, boolean loadMeritoSolicitud) throws SQLException, UVException {
+		List<MeritoSolicitudValoracion> valoraciones = new ArrayList<>();
+		
+		String consulta = "SELECT * FROM TBEP_SOLICITUD_BOLSAS_MERITOS_VALORACION bepsbv WHERE bepsbv.BEPSBM_CODNUM = ?";
+		
+		try (Connection conexion = ConexionUvirtual.obtenerInstancia(); PreparedStatement stmt = conexion.prepareStatement(consulta);
+		) {
+			int indexParam = 1;
+			stmt.setInt(indexParam, idMeritoSolicitud);
+			
+			try (ResultSet rs = stmt.executeQuery()) {
+				while (rs.next()) {
+					MeritoSolicitudValoracion msv = new MeritoSolicitudValoracion(
+							rs.getInt("CODNUM"),
+							loadMeritoSolicitud ? this.getMeritoSolicitudById(rs.getInt("BEPSBM_CODNUM")) : null,
+							ModeloAfinidad.obtenerInstancia().getAfinidadById(rs.getInt("BEPAFI_CODNUM")),
+							rs.getFloat("VALOR")
+					);
+					valoraciones.add(msv);					
+				}
+			}
+		}
+		
+		return valoraciones;
+	}
+	
 
 	/**
 	 * Obtiene el total de méritos por bloque que hay en la solicitud .
@@ -541,6 +767,7 @@ public class ModeloSolicitud {
 		return total;
 	}
 	
+	
 	/**
 	 * Obtiene el total de méritos que hay en la solicitud .
 	 * @param solicitud .
@@ -566,6 +793,7 @@ public class ModeloSolicitud {
 		}
 		return total;
 	}
+	
 	
 	/**
 	 * Actualiza el estado de la solicitud a cerrado .
@@ -606,6 +834,7 @@ public class ModeloSolicitud {
 		}
 	}
 	
+	
 	/** Devuelve los méritos de la bolsa en una solicitud .
 	 * @param solicitud .
 	 * @param bolsa .
@@ -613,8 +842,8 @@ public class ModeloSolicitud {
 	 * @throws SQLException .
 	 * @throws UVException .
 	 */
-	public ArrayList<MeritoSolicitud> getMeritosSolicitudBolsa(Solicitud solicitud, Bolsa bolsa) throws SQLException, UVException {
-		ArrayList<MeritoSolicitud> meritos = new ArrayList<MeritoSolicitud>();
+	public List<MeritoSolicitud> getMeritosSolicitudBolsa(Solicitud solicitud, Bolsa bolsa) throws SQLException, UVException {
+		ArrayList<MeritoSolicitud> meritos = new ArrayList<>();
 		
 		String consulta = "SELECT bepsbm.* "
 				+ " FROM TBEP_SOLICITUD_BOLSAS_MERITOS bepsbm "
@@ -630,7 +859,6 @@ public class ModeloSolicitud {
 				while (rs.next()) {
 					MeritoSolicitud ms = new MeritoSolicitud(rs.getInt("CODNUM"),
 							ModeloMerito.obtenerInstancia().getMeritoById(rs.getInt("BEPMER_CODNUM")), 
-							rs.getInt("BEPSBO_CODNUM"),
 							rs.getString("FLGEXCLUIDO").equals("S")
 					);
 					meritos.add(ms);
@@ -640,6 +868,7 @@ public class ModeloSolicitud {
 		
 		return meritos;
 	}
+	
 	
 	/** Lista de bolsas de la solicitud deseleccionadas por el usuario .
 	 * @param solicitud .
@@ -679,6 +908,7 @@ public class ModeloSolicitud {
 		
 		return bolsasExcluidas;
 	}
+	
 	
 	/** Lista de bolsas de la solicitud seleccionadas por el usuario que se agregan .
 	 * @param solicitud .
@@ -727,6 +957,7 @@ public class ModeloSolicitud {
 		
 		return bolsasAgregadas;
 	}
+	
 	
 	/**
 	 * Elimina las bolsas asociadas a las solicitud y los meritos a cada bolsa si lo tienen.

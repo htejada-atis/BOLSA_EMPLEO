@@ -27,7 +27,7 @@ VistaMiembrosComision bean = (VistaMiembrosComision) uvdatos.getVistas().get(Vis
 	<div class="titulo-bolsa-empleo">
 		<div class="form-select">
 			<label>Bolsas</label>
-			<select id="select_area" autocomplete="off">
+			<select id="select_area">
 				<option value="0">Elija la bolsa</option>
 				<%
 				for(Area area: bean.getAreas()) {

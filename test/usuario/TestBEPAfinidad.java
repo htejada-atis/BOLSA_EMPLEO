@@ -184,8 +184,6 @@ public class TestBEPAfinidad {
 		assertTrue(img.getAttribute("src").indexOf("up.png") != -1);
 	}
 	
-	
-	
 	/** comprobacion de la paginación.
 	 * @param tabla .
 	 */

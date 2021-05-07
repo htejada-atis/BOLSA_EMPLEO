@@ -1,5 +1,6 @@
 Listado de tablas con sus acrónimos y álias
 
+TBEP_AFINIDADES                             AFI     bepafi      Afinidad
 TBEP_APARTADOSBAREMACION            APA     bepapa		ApartadoBaremacion
 TBEP_AREAS                          ARE     bepare		Area
 TBEP_BLOQUESBAREMACION              BLO     bepblo		BloqueBaremacion
@@ -21,3 +22,4 @@ TBEP_TITULACIONES_PREFERENTES_AREA  TPA		beptpa		TitulacionArea
 TBEP_TITULACIONES_USUARIO        	TUS     beptus		TitulacionesUsuario
 TBEP_USUARIOS                       USU     bepusu		UsuarioBolsaEmpleo
 TBEP_USUARIOS_EXCLUIDOS_AREA        UEA     bepuea		UsuarioExcluidoArea
+TBEP_PARAMETROS_CONFIGURACION       PAC     beppac		ParametrosConfiguracion

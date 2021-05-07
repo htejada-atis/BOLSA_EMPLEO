@@ -1,0 +1,102 @@
+package es.ujaen.uvirtual.modulo.bolsaempleo.modelo;
+
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.List;
+
+import es.ujaen.uvirtual.modelo.conexion.ConexionUvirtual;
+import es.ujaen.uvirtual.modulo.bolsaempleo.beans.ParametrosConfiguracion;
+import es.ujaen.uvirtual.utilidades.UVException;
+
+
+/**
+ * Clase de modelo para la gestión de parametros de configuracion de la bolsa de empleo . 
+ * @author fcampos
+ */
+public class ModeloParametrosConfiguracion {
+	
+	public static final int COLUMN_DESCRIPCION_MAXLENGTH = 250;
+	
+	public static final int MAX_FILE_SIZE = 5000000;
+	
+    protected static ModeloParametrosConfiguracion eInstancia = null;
+	
+	/** Crea una instancia del objeto.
+	 *  de forma sincronizada para protegerse de posibles problemas multi-hilo
+	 */
+	private static synchronized void crearInstancia() {
+		if (eInstancia == null) {
+			eInstancia = new ModeloParametrosConfiguracion();
+		}
+	}
+
+    /**
+     * Obtiene una instancia de la conexión.
+     * @return instancia
+     */
+    public static ModeloParametrosConfiguracion obtenerInstancia() {
+        if (eInstancia == null) {
+        	crearInstancia();
+        }
+        return eInstancia;
+    }
+	
+	/** Consulta los parametros en BBDD y los devuelve.
+	 * @return todas las titulaciones de la base de datos .
+	 * @throws SQLException en caso de error de base de datos
+	 */
+	public List<ParametrosConfiguracion> listaParametros() throws SQLException {
+		List<ParametrosConfiguracion> parametros = new ArrayList<>();
+		String consulta = "SELECT * FROM ADM_PARAMETROS "
+				+ "WHERE PARAM_CODALF LIKE '%bolsaempleo%'";
+		
+		try (Connection conexion = ConexionUvirtual.obtenerInstancia();
+			PreparedStatement stmt = conexion.prepareStatement(consulta);) {
+				try (ResultSet rs = stmt.executeQuery()) {
+					while (rs.next()) {
+						ParametrosConfiguracion param = new ParametrosConfiguracion();
+						param.setCodNum(rs.getString("CONFIG_CODALF"));
+						param.setNombre(rs.getString("PARAM_CODALF"));
+						param.setValor(rs.getString("VALOR"));
+						param.setDescripcion(rs.getString("DESID"));
+						parametros.add(param);	
+					}
+				}
+			}
+		
+		return parametros;
+	}
+	
+	
+	/** Actualiza un parametro de configuración.
+	 * @param param ParametrosConfiguracion con los datos nuevos a actualizar
+	 * @throws SQLException en caso de error en la BD
+	 * @throws UVException en caso de errores de validacion
+	 */
+	public void actualizaParametro(ParametrosConfiguracion param) throws SQLException, UVException {
+		if (param == null) {
+			throw new UVException("parametro obligatorio");
+		}
+		if (param.getCodNum() == null) {
+			throw new UVException("id parametro no válido");
+		}
+		
+		String consulta = "UPDATE ADM_PARAMETROS "
+			+ " SET DESID=?, VALOR=? "
+			+ " WHERE CONFIG_CODALF=? AND PARAM_CODALF=?";
+		
+		try (Connection conexion = ConexionUvirtual.obtenerInstancia();
+		PreparedStatement stmt = conexion.prepareStatement(consulta);) {
+			int parameterIndex = 1;
+			stmt.setString(parameterIndex++, param.getDescripcion());
+			stmt.setString(parameterIndex++, param.getValor());
+			stmt.setString(parameterIndex++, param.getCodNum());
+			stmt.setString(parameterIndex++, param.getNombre());
+			stmt.executeUpdate();
+		}
+	}
+	
+}
