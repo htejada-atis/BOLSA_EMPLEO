@@ -141,11 +141,11 @@ public class TestFormateador {
 		String textoFormato = Formateador.formatoCalificacion(calificacion, 0);
 		assertEquals("2", textoFormato);
 		String textoFormato2 = Formateador.formatoCalificacion(calificacion, 1);
-		assertEquals("2.5", textoFormato2);
+		assertEquals("2,5", textoFormato2);
 		String textoFormato3 = Formateador.formatoCalificacion(calificacion, 2);
-		assertEquals("2.50", textoFormato3);
+		assertEquals("2,50", textoFormato3);
 		String textoFormato4 = Formateador.formatoCalificacion(calificacion, numeroMaximoDecimales);
-		assertEquals("2.500", textoFormato4);
+		assertEquals("2,500", textoFormato4);
 	}
 	
 	/** limita.
