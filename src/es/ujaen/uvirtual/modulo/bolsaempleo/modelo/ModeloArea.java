@@ -400,35 +400,18 @@ public class ModeloArea {
 				+ " SELECT bepare.ID_AREA_CONOCIMIENTO FROM TBEP_AREAS bepare";
 		
 		try (Connection conexion = ConexionUvirtual.obtenerInstancia();) {
-			conexion.setAutoCommit(false);
-			
-			try {
-		
-				try (PreparedStatement stmt = conexion.prepareStatement(consulta);) {
-					try (ResultSet rs = stmt.executeQuery()) {
-						while (rs.next()) {
-							try {
-								Area area = this.getAreaExternaById(rs.getString("ID_AREA_CONOCIMIENTO"));
-								areasNuevas.add(area);
-							} catch (Exception e) {
-								throw new SQLException(e.getMessage());
-							}
-						}
+			try (PreparedStatement stmt = conexion.prepareStatement(consulta);) {
+				try (ResultSet rs = stmt.executeQuery()) {
+					while (rs.next()) {
+						Area area = this.getAreaExternaById(rs.getString("ID_AREA_CONOCIMIENTO"));
+						areasNuevas.add(area);
 					}
 				}
-				
-				for (Area area: areasNuevas) {
-					this.insertaArea(area);
-				}
-			
-			} catch (SQLException e) {
-				if (conexion != null) {
-					conexion.rollback();
-				}
-				throw e;
 			}
 			
-			conexion.commit();
+			for (Area area: areasNuevas) {
+				this.insertaArea(area);
+			}
 		}
 		
 		return areasNuevas.size();
@@ -446,36 +429,17 @@ public class ModeloArea {
 				+ "	INNER JOIN TBEP_AREAS bepare ON bepare.ID_AREA_CONOCIMIENTO = bepuar.ID_AREA_CONOCIMIENTO"
 				+ "	WHERE bepare.DES_AREA_CONOCIMIENTO != bepuar.DES_AREA_CONOCIMIENTO ";
 		
-		try (Connection conexion = ConexionUvirtual.obtenerInstancia();) {
-			conexion.setAutoCommit(false);
-			
-			try {
-		
-				try (PreparedStatement stmt = conexion.prepareStatement(consulta);) {
-					try (ResultSet rs = stmt.executeQuery()) {
-						while (rs.next()) {
-							try {
-								Area area = new Area();
-								area.setCodNum(rs.getInt("CODNUM"));
-								area.setIdAreaExterno(rs.getString("ID_AREA_CONOCIMIENTO"));
-								area.setDescripcion(rs.getString("DES_AREA_CONOCIMIENTO"));
-								this.actualizaArea(area);
-								total++;
-							} catch (Exception e) {
-								throw new SQLException(e.getMessage());
-							}
-						}
-					}
+		try (Connection conexion = ConexionUvirtual.obtenerInstancia(); PreparedStatement stmt = conexion.prepareStatement(consulta);) {
+			try (ResultSet rs = stmt.executeQuery()) {
+				while (rs.next()) {
+					Area area = new Area();
+					area.setCodNum(rs.getInt("CODNUM"));
+					area.setIdAreaExterno(rs.getString("ID_AREA_CONOCIMIENTO"));
+					area.setDescripcion(rs.getString("DES_AREA_CONOCIMIENTO"));
+					this.actualizaArea(area);
+					total++;
 				}
-			
-			} catch (SQLException e) {
-				if (conexion != null) { 
-					conexion.rollback();
-				}
-				throw e;
 			}
-			
-			conexion.commit();
 		}
 		
 		return total;
