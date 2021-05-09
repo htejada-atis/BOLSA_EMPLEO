@@ -225,7 +225,7 @@
 			<xml destfile="${result.report.dir}/report.xml"/>
 		</jacoco:report>
 	</target>
-	<target name="checstyle">
+	<target name="checkstyle">
 		<cs:checkstyle config="checkstyle.xml">
 			<formatter type="xml" tofile="${result.report.dir}/checkstyle_report.xml"/>
 			<fileset dir="${src}" includes="**/*.java"/>
