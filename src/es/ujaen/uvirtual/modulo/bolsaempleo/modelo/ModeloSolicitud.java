@@ -177,29 +177,20 @@ public class ModeloSolicitud {
 			"INSERT INTO TBEP_SOLICITUDES (BEPUSU_CODNUM, BEPCON_CODNUM, ESTADO) " 
 			+ "VALUES (?, ?, ?)";
 		
-		try (Connection conexion = ConexionUvirtual.obtenerInstancia()) {
-			conexion.setAutoCommit(false);
+		try (Connection conexion = ConexionUvirtual.obtenerInstancia();
+				PreparedStatement stmt = conexion.prepareStatement(consulta, new String[]{"CODNUM"})) {
 		
-			try (PreparedStatement stmt = conexion.prepareStatement(consulta, new String[]{"CODNUM"})) {
-				int parameterIndex = 1;
-				stmt.setInt(parameterIndex++, usuario.getCodNum());
-				stmt.setInt(parameterIndex++, convocatoria.getCodNum());
-				stmt.setString(parameterIndex++, ModeloSolicitud.SOLICITUD_ESTADO_ABIERTA);
-				stmt.executeUpdate();
-				
-				ResultSet rs = stmt.getGeneratedKeys();
-				rs.next();
-				Integer idSolucitud = rs.getInt(1);
+			int parameterIndex = 1;
+			stmt.setInt(parameterIndex++, usuario.getCodNum());
+			stmt.setInt(parameterIndex++, convocatoria.getCodNum());
+			stmt.setString(parameterIndex++, ModeloSolicitud.SOLICITUD_ESTADO_ABIERTA);
+			stmt.executeUpdate();
+			
+			ResultSet rs = stmt.getGeneratedKeys();
+			rs.next();
+			Integer idSolucitud = rs.getInt(1);
 
-				conexion.commit();
-				
-				return this.getSolicitudById(idSolucitud);
-			} catch (SQLException | UVException e) {
-				if (conexion != null) { 
-					conexion.rollback();
-				}
-				throw e;
-			}
+			return this.getSolicitudById(idSolucitud);
 		}
 	}
 	
@@ -286,14 +277,14 @@ public class ModeloSolicitud {
 			
 			try {				
 				// eliminamos las bolsas excluidas de la solicitud
-				if (bolsasExcluidas.size() > 0) {
+				if (bolsasExcluidas.isEmpty()) {
 					this.eliminarBolsasExcluidasDeLaSolicitud(conexion, solicitud, bolsasExcluidas);
 				}
 				
 				// insertamos la bolsas agregadas a la solicitud
-				if (bolsasAgregadas.size() > 0) {
+				if (bolsasAgregadas.isEmpty()) {
 					String paramsAgregadas = BolsaEmpleoUtils.consultaMultiplesParametros(bolsasAgregadas.size());
-										
+
 					String consultaInsert = "INSERT INTO TBEP_SOLICITUD_BOLSAS (BEPBOL_CODNUM, BEPSOL_CODNUM)"
 							+ " SELECT bepbol.CODNUM AS BEPBOL_CODNUM, bepsol.CODNUM AS BEPSOL_CODNUM"
 							+ " FROM TBEP_BOLSAS bepbol, TBEP_SOLICITUDES bepsol WHERE bepsol.CODNUM = ? AND "
@@ -308,15 +299,15 @@ public class ModeloSolicitud {
 						stmt.executeUpdate();
 					}					
 				}
+				
+				conexion.commit();
+				conexion.setAutoCommit(true);
 			} catch (SQLException e) {
-				if (conexion != null) { 
-					conexion.rollback();
-				}
+				conexion.rollback();
+				conexion.setAutoCommit(true);
 				throw e;
 			}
-			
-			conexion.commit();
-		}		
+		} 	
 	}
 
 	/**
@@ -499,29 +490,18 @@ public class ModeloSolicitud {
 	 * @throws UVException .
 	 */
 	public void asignarMeritosASolicitudBolsa(Solicitud solicitud, Bolsa bolsa, Merito merito) throws SQLException, UVException {
-		try (Connection conexion = ConexionUvirtual.obtenerInstancia();) {
-			conexion.setAutoCommit(false);
-			
-			// insertamos el mérito en la solicitud bolsa
-			String consulta = "INSERT INTO TBEP_SOLICITUD_BOLSAS_MERITOS (BEPSBO_CODNUM, BEPMER_CODNUM)"
-					+ " SELECT bepsbo.CODNUM AS BEPSBO_CODNUM, bepmer.CODNUM AS BEPMER_CODNUM"
-					+ " FROM TBEP_SOLICITUD_BOLSAS bepsbo, TBEP_MERITOS bepmer"
-					+ " WHERE bepsbo.BEPSOL_CODNUM = ? AND bepsbo.BEPBOL_CODNUM = ? AND bepmer.CODNUM = ? ";
-			
-			try (PreparedStatement stmt = conexion.prepareStatement(consulta)) {
-				int indexParam = 1;
-				stmt.setInt(indexParam++, solicitud.getCodNum());
-				stmt.setInt(indexParam++, bolsa.getCodNum());
-				stmt.setInt(indexParam++, merito.getCodNum());
-				stmt.executeUpdate();
-			} catch (SQLException e) {
-				if (conexion != null) { 
-					conexion.rollback();
-				}
-				throw e;
-			}
-			
-			conexion.commit();
+		// insertamos el mérito en la solicitud bolsa
+		String consulta = "INSERT INTO TBEP_SOLICITUD_BOLSAS_MERITOS (BEPSBO_CODNUM, BEPMER_CODNUM)"
+				+ " SELECT bepsbo.CODNUM AS BEPSBO_CODNUM, bepmer.CODNUM AS BEPMER_CODNUM"
+				+ " FROM TBEP_SOLICITUD_BOLSAS bepsbo, TBEP_MERITOS bepmer"
+				+ " WHERE bepsbo.BEPSOL_CODNUM = ? AND bepsbo.BEPBOL_CODNUM = ? AND bepmer.CODNUM = ? ";
+					
+		try (Connection conexion = ConexionUvirtual.obtenerInstancia(); PreparedStatement stmt = conexion.prepareStatement(consulta);) {
+			int indexParam = 1;
+			stmt.setInt(indexParam++, solicitud.getCodNum());
+			stmt.setInt(indexParam++, bolsa.getCodNum());
+			stmt.setInt(indexParam++, merito.getCodNum());
+			stmt.executeUpdate();
 		}
 	}
 	
@@ -556,6 +536,7 @@ public class ModeloSolicitud {
 				stmt.executeUpdate();
 			} catch (SQLException e) {
 				conexion.rollback();
+				conexion.setAutoCommit(true);
 				throw e;
 			}
 			
@@ -576,10 +557,12 @@ public class ModeloSolicitud {
 				stmt.executeUpdate();
 			} catch (SQLException e) {
 				conexion.rollback();
+				conexion.setAutoCommit(true);
 				throw e;
 			}
 			
 			conexion.commit();
+			conexion.setAutoCommit(true);
 		}
 	}
 	 
@@ -600,8 +583,9 @@ public class ModeloSolicitud {
 			// eliminamos la afinidad previamente seleccionada
 			try {
 				this.eliminarValoracionesDelMeritoSolicitud(conexion, meritoSolicitud);
-			} catch (SQLException e) {
+			} catch (SQLException e) {				
 				conexion.rollback();
+				conexion.setAutoCommit(true);
 				throw e;
 			}
 						
@@ -614,10 +598,12 @@ public class ModeloSolicitud {
 				stmt.executeUpdate();
 			} catch (SQLException e) {
 				conexion.rollback();
+				conexion.setAutoCommit(true);
 				throw e;
 			}			
 			
 			conexion.commit();
+			conexion.setAutoCommit(true);
 		}
 	}
 	
@@ -640,6 +626,7 @@ public class ModeloSolicitud {
 				this.eliminarValoracionesDelMeritoSolicitud(conexion, meritoSolicitud);
 			} catch (SQLException e) {
 				conexion.rollback();
+				conexion.setAutoCommit(true);
 				throw e;
 			}	
 									
@@ -655,11 +642,13 @@ public class ModeloSolicitud {
 					stmt.executeUpdate();
 				} catch (SQLException e) {
 					conexion.rollback();
+					conexion.setAutoCommit(true);
 					throw e;
 				}				
 			}
 			
 			conexion.commit();
+			conexion.setAutoCommit(true);
 		}
 	}
 	
