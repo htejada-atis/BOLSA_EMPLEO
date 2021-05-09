@@ -56,7 +56,7 @@ pipeline {
 	        	}
 	        }
 	    }
-	    stage('sonar') {
+	    stage('analisis') {
 	    	steps {
 		        echo 'Inicio sonar'
 		        withSonarQubeEnv('sonar docker') { 
@@ -64,10 +64,14 @@ pipeline {
 		               sh "ant sonar -Dsonar.projectKey=${SONAR_PROYECTKEY} -DdbUrl=127.0.0.1 -DmemcacheUrl=127.0.0.1"
 		            }
 		        }
+	            withAnt(installation: 'LocalAnt') {
+	               sh "ant checkstyle"
+	            }
 	        }   
 	        post {
 	        	always {
 	        		junit 'builds/build/rama/site/jacoco/*.xml'
+	        		recordIssues enabledForFailure: true, tool: checkStyle(pattern: 'builds/build/rama/site/jacoco/checkstyle-report.xml')
 	        	}
 	        }     
 	    }
