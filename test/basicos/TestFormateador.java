@@ -67,7 +67,7 @@ public class TestFormateador {
 		final Double ceroCreditos = 0.0;
 		final Double creditosNegativos = -10.0;
 		String creditos = Formateador.formatoCreditos(creditosEntrada, 1);
-		assertEquals("2.5", creditos);
+		assertEquals("2,5", creditos);
 		String creditos1 = Formateador.formatoCreditos(creditosEntrada, -1, false);
 		assertEquals("#¡ERROR DE PRECISIÓN!#", creditos1);
 		String creditos2 = Formateador.formatoCreditos(creditosEntrada, tres, false);
@@ -79,11 +79,11 @@ public class TestFormateador {
 		String creditos5 = Formateador.formatoCreditos(creditosNegativos, 1, false);
 		assertEquals("#¡NÚMERO DE CRÉDITOS NO VÁLIDO!#", creditos5);
 		String creditos6 = Formateador.formatoCreditos(creditosEntrada, 1, true);
-		assertEquals("2.5", creditos6);
+		assertEquals("2,5", creditos6);
 		String creditos7 = Formateador.formatoCreditos(creditosEntrada, 0, true);
 		assertEquals("2", creditos7);
 		String creditos8 = Formateador.formatoCreditos(creditosEntrada, 2, true);
-		assertEquals("2.5", creditos8);
+		assertEquals("2,5", creditos8);
 	}
 	
 	/** formato fecha.

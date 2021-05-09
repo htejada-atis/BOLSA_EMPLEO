@@ -71,7 +71,7 @@ pipeline {
 	        post {
 	        	always {
 	        		junit 'builds/build/rama/site/jacoco/*.xml'
-	        		recordIssues enabledForFailure: true, tool: checkStyle(pattern: 'builds/build/rama/site/jacoco/checkstyle-report.xml')
+	        		recordIssues enabledForFailure: true, tool: checkStyle(pattern: 'builds/build/rama/site/jacoco/checkstyle_report.xml')
 	        	}
 	        }     
 	    }
