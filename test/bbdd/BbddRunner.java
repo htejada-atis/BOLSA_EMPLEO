@@ -97,11 +97,19 @@ public class BbddRunner {
 		return odsAc;
 	}
 
-	private static Connection obtenerConexionUvirtual() throws SQLException {
+	/** obtiene la conexión con uvirtual.
+	 * @return .
+	 * @throws SQLException .
+	 */
+	public static Connection obtenerConexionUvirtual() throws SQLException {
 		return odsUv.getConnection();
 	}
 
-	private static Connection obtenerConexionArcos() throws SQLException {
+	/** obtiene la conexión con arcos.
+	 * @return .
+	 * @throws SQLException .
+	 */
+	public static Connection obtenerConexionArcos() throws SQLException {
 		return odsArcos.getConnection();
 	}
 	
@@ -109,7 +117,12 @@ public class BbddRunner {
 		return odsAc.getConnection();
 	}	
 	
-	private static Connection obtenerConexionRh() throws SQLException {
+	/** obtiene la conexión con rrhh.
+	 *
+	 * @return .
+	 * @throws SQLException .
+	 */
+	public static Connection obtenerConexionRh() throws SQLException {
 		return odsRh.getConnection();
 	}	
 	

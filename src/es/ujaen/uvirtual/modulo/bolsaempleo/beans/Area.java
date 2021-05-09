@@ -9,9 +9,7 @@ public class Area implements Serializable {
 
 	private static final long serialVersionUID = 1L;
 	private Integer codNum;	// CODNUM
-	private Departamento departamento; // BEPDEP_CODNUM
-	private String idAreaExterno; // ID_AREA_CONOCIMIENTO id externo del area de conocimento
-	private String idSeccion; // ID_SECCION
+	private String idAreaExterno; // ID_AREA_CONOCIMIENTO id externo del area de conocimento	
 	private String descripcion; // DES_AREA_CONOCIMIENTO
 			
 	/** Constructor por defecto.
@@ -22,17 +20,13 @@ public class Area implements Serializable {
 	
 	/** Constructor con parametros.
 	 * @param pCodNum .
-	 * @param pdepartamento .
 	 * @param pidAreaExterno .
-	 * @param pidSeccion .
 	 * @param pdescripcion .
 	 */
-	public Area(Integer pCodNum, Departamento pdepartamento, String pidAreaExterno, String pidSeccion, String pdescripcion) {
+	public Area(Integer pCodNum, String pidAreaExterno, String pdescripcion) {
 		super();
 		this.codNum = pCodNum;
-		this.departamento = pdepartamento;
 		this.idAreaExterno = pidAreaExterno;		
-		this.idSeccion = pidSeccion;
 		this.descripcion = pdescripcion;
 	}
 	
@@ -49,9 +43,7 @@ public class Area implements Serializable {
 	 */
 	public Area(Area copia) {
 		this.codNum = copia.codNum;
-		this.departamento = copia.departamento;
 		this.idAreaExterno = copia.idAreaExterno;		
-		this.idSeccion = copia.idSeccion;
 		this.descripcion = copia.descripcion;		
 	}
 	
@@ -63,28 +55,12 @@ public class Area implements Serializable {
 		this.codNum = codNum;
 	}
 	
-	public Departamento getDepartamento() {
-		return departamento;
-	}
-	
-	public void setDepartamento(Departamento departamento) {
-		this.departamento = departamento;
-	}
-	
 	public String getIdAreaExterno() {
 		return idAreaExterno;
 	}
 	
 	public void setIdAreaExterno(String idAreaExterno) {
 		this.idAreaExterno = idAreaExterno;
-	}
-	
-	public String getIdSeccion() {
-		return idSeccion;
-	}
-	
-	public void setIdSeccion(String idSeccion) {
-		this.idSeccion = idSeccion;
 	}
 	
 	public String getDescripcion() {
@@ -97,18 +73,15 @@ public class Area implements Serializable {
 	
 	@Override
 	public String toString() {
-		return "Area Conocimiento [idArea=" + codNum + ", departamento=" + departamento
-				+ ", idAreaExterno=" + idAreaExterno + ", idSeccion=" + idSeccion  
-				+ ", descripcion=" + descripcion + "]";
+		return "Area Conocimiento [idArea=" + codNum + ", idAreaExterno=" + idAreaExterno + ", descripcion=" + descripcion + "]";
 	}
 	
 	@Override
 	public int hashCode() {
 		final int prime = 31;
 		int result = 1;
-		result = prime * result + ((departamento == null) ? 0 : departamento.hashCode());		
+		result = prime * result + ((codNum == null) ? 0 : codNum.hashCode());
 		result = prime * result + ((idAreaExterno == null) ? 0 : idAreaExterno.hashCode());
-		result = prime * result + ((idSeccion == null) ? 0 : idSeccion.hashCode());
 		result = prime * result + ((descripcion == null) ? 0 : descripcion.hashCode());
 		return result;
 	}
@@ -126,11 +99,11 @@ public class Area implements Serializable {
 			return false;
 		}
 		Area other = (Area) obj;
-		if (departamento == null) {
-			if (other.departamento != null) {
+		if (codNum == null) {
+			if (other.codNum != null) {
 				return false;
 			}
-		} else if (!departamento.equals(other.departamento)) {
+		} else if (!codNum.equals(other.codNum)) {
 			return false;
 		}
 		if (idAreaExterno == null) {
@@ -138,13 +111,6 @@ public class Area implements Serializable {
 				return false;
 			}
 		} else if (!idAreaExterno.equals(other.idAreaExterno)) {
-			return false;
-		}
-		if (idSeccion == null) {
-			if (other.idSeccion != null) {
-				return false;
-			}
-		} else if (!idSeccion.equals(other.idSeccion)) {
 			return false;
 		}
 		if (descripcion == null) {

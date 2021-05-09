@@ -65,7 +65,6 @@ public class ModeloArea {
 	 * @throws UVException .
 	 */
 	private List<Area> listaAreas(String clausula) throws SQLException, UVException {
-		ModeloDepartamento modeloDepartamento = ModeloDepartamento.obtenerInstancia();
 		List<Area> areas = new ArrayList<>();
 		String consulta = "SELECT bepare.* FROM TBEP_AREAS bepare " + clausula;
 		
@@ -75,9 +74,7 @@ public class ModeloArea {
 					while (rs.next()) {
 							Area are = new Area();
 							are.setCodNum(rs.getInt("CODNUM"));
-							are.setDepartamento(modeloDepartamento.getDepartamentoByCodNum(rs.getInt("BEPDEP_CODNUM")));
 							are.setIdAreaExterno(rs.getString("ID_AREA_CONOCIMIENTO"));
-							are.setIdSeccion(rs.getString("ID_SECCION"));
 							are.setDescripcion(rs.getString("DES_AREA_CONOCIMIENTO"));
 							areas.add(are);	
 					}
@@ -103,7 +100,6 @@ public class ModeloArea {
 	 * @throws UVException si area no es existe
 	 */
 	public Area getAreaById(int codNum) throws SQLException, UVException {
-		ModeloDepartamento modeloDepartamento = ModeloDepartamento.obtenerInstancia();
 		String consulta = "SELECT bepare.* FROM TBEP_AREAS bepare WHERE bepare.CODNUM = ?";				
 			
 		try (Connection conexion = ConexionUvirtual.obtenerInstancia();
@@ -117,9 +113,7 @@ public class ModeloArea {
 				
 				Area area = new Area();
 				area.setCodNum(rs.getInt("CODNUM"));
-				area.setDepartamento(modeloDepartamento.getDepartamentoByCodNum(rs.getInt("BEPDEP_CODNUM")));
 				area.setIdAreaExterno(rs.getString("ID_AREA_CONOCIMIENTO"));
-				area.setIdSeccion(rs.getString("ID_SECCION"));
 				area.setDescripcion(rs.getString("DES_AREA_CONOCIMIENTO"));
 				
 				return area;
@@ -447,7 +441,6 @@ public class ModeloArea {
 	 */
 	public Integer actualizaAreasDeExternas() throws SQLException, UVException {
 		Integer total = 0;
-		ModeloDepartamento modeloDepartamento = ModeloDepartamento.obtenerInstancia();
 		
 		String consulta = "SELECT * FROM UXXIRRHH_VUJA_NET_BEP_RH_DEPTO_SECC_AREA bepuar"
 				+ "	INNER JOIN TBEP_AREAS bepare ON bepare.ID_AREA_CONOCIMIENTO = bepuar.ID_AREA_CONOCIMIENTO"
@@ -464,9 +457,7 @@ public class ModeloArea {
 							try {
 								Area area = new Area();
 								area.setCodNum(rs.getInt("CODNUM"));
-								area.setDepartamento(modeloDepartamento.getDepartamentoByIdExterno(rs.getString("ID_DEPARTAMENTO")));
 								area.setIdAreaExterno(rs.getString("ID_AREA_CONOCIMIENTO"));
-								area.setIdSeccion(rs.getString("ID_SECCION"));
 								area.setDescripcion(rs.getString("DES_AREA_CONOCIMIENTO"));
 								this.actualizaArea(area);
 								total++;
@@ -512,9 +503,7 @@ public class ModeloArea {
 				}
 				
 				Area area = new Area();
-				area.setDepartamento(departamento);
 				area.setIdAreaExterno(rs.getString("ID_AREA_CONOCIMIENTO"));
-				area.setIdSeccion(rs.getString("ID_SECCION"));
 				area.setDescripcion(rs.getString("DES_AREA_CONOCIMIENTO"));
 				return area;
 			}
@@ -541,8 +530,6 @@ public class ModeloArea {
 		try (Connection conexion = ConexionUvirtual.obtenerInstancia();
 			 PreparedStatement stmt = conexion.prepareStatement(consulta);) {
 			int parameterIndex = 1;
-			stmt.setInt(parameterIndex++, area.getDepartamento().getCodNum());
-			stmt.setString(parameterIndex++, area.getIdSeccion());
 			stmt.setString(parameterIndex++, area.getIdAreaExterno());
 			stmt.setString(parameterIndex++, area.getDescripcion());
 			stmt.executeUpdate();

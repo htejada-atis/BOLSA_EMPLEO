@@ -1,4 +1,3 @@
--- creación registros de prueba titulaciones;
 INSERT INTO TBEP_TITULACIONES (NOMBRE)
 VALUES ('Arquitectura');
 INSERT INTO TBEP_TITULACIONES (NOMBRE)

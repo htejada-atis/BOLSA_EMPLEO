@@ -1,4 +1,3 @@
--- creación registros de prueba ficheros;
 INSERT INTO TBEP_FICHEROS (NOMBRE,TITULO,ARCHIVO,FLGPUBLICO)
 VALUES ('archivo1.test', 'titulo1', hextoraw('453d7a34'), 'S');
 INSERT INTO TBEP_FICHEROS (NOMBRE,TITULO,ARCHIVO)

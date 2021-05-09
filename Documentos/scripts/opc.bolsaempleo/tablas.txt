@@ -1,8 +1,9 @@
 Listado de tablas con sus acrónimos y álias
 
-TBEP_AFINIDADES                             AFI     bepafi      Afinidad
+TBEP_AFINIDADES                     AFI     bepafi      Afinidad
 TBEP_APARTADOSBAREMACION            APA     bepapa		ApartadoBaremacion
 TBEP_AREAS                          ARE     bepare		Area
+TBEP_AREAS_DEPARTAMENTOS            ADE     bepade      
 TBEP_BLOQUESBAREMACION              BLO     bepblo		BloqueBaremacion
 TBEP_BOLSAS                         BOL     bepbol		Bolsa, BolsaCandidato, BolsaSolicitud
 TBEP_CATEGORIABAREMACION            CAT     bepcat		
