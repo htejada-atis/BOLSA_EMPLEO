@@ -1,12 +1,12 @@
 package es.ujaen.uvirtual.filtros;
 
 import java.io.IOException;
+import java.sql.SQLException;
 import java.util.Date;
 import java.util.List;
 
 import javax.servlet.Filter;
 import javax.servlet.FilterChain;
-import javax.servlet.FilterConfig;
 import javax.servlet.RequestDispatcher;
 import javax.servlet.ServletException;
 import javax.servlet.ServletRequest;
@@ -38,14 +38,6 @@ public class ValidaEstadoSistema implements Filter {
     	//vacio
     }
 
-	/** destroy.
-	 * @see Filter#destroy()
-	 */
-    @Override
-	public void destroy() {
-		//
-	}
-
 	/** filtro.
 	 * @param request peticion
 	 * @param response respuesta
@@ -65,15 +57,22 @@ public class ValidaEstadoSistema implements Filter {
 			despachador.include(request, response);
 			return;
 		}
-		
-		List<Sistema> sistemas = ModeloAdministracion.listaEstadoSistemas();
+		ModeloAdministracion modeloAdministracion = ModeloAdministracion.obtenerInstancia();
+		List<Sistema> sistemas = null;
+		try {
+			sistemas = modeloAdministracion.listaSistemas();
+		} catch (SQLException e) {
+			RequestDispatcher despachador = request.getRequestDispatcher("WEB-INF/jsp/vista/nodisponible.jsp");
+			despachador.include(request, response);
+			return;
+		}
 		if (sistemas != null) {
 			for (Sistema sistema: sistemas) {
 				String servNoDisponible = ErroresPersonalizados.ERROR_SERV_NO_DISPONIBLE + ":";
 				// Buscamos "uv"
 				if (sistema.getCodigo().equals("uvirtual")) {
 					if (sistema.isEnMantenimiento() 
-							&& (sistema.getFechaEntradaEnMantenimiento() == null) || (sistema.getFechaEntradaEnMantenimiento().before(new Date()))) {
+							&& ((sistema.getFechaEntradaEnMantenimiento() == null) || (sistema.getFechaEntradaEnMantenimiento().before(new Date())))) {
 						// Sistema en mantenimiento
 						req.getSession().setAttribute(atributoError, servNoDisponible + sistema.getMotivoDelMantenimiento());
 						resp.sendRedirect(ConfiguracionGlobal.getUrlSistemaNoDisponible());
@@ -90,14 +89,4 @@ public class ValidaEstadoSistema implements Filter {
 		
 		chain.doFilter(request, response);
 	}
-
-	/** init.
-	 * @param fConfig configuracion
-	 * @see Filter#init(FilterConfig)
-	 */
-	@Override
-	public void init(FilterConfig fConfig) throws ServletException {
-		//
-	}
-
 }

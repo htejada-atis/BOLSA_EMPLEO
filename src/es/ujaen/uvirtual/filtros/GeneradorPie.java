@@ -32,8 +32,8 @@ import es.ujaen.uvirtual.beans.Menu;
 public class GeneradorPie implements Filter {
 	protected static Logger logger = Logger.getLogger(GeneradorPie.class.getPackage().getName());
 	protected static String nombreDeEstaClase = GeneradorPie.class.getName();
-	protected static FilterConfig filterConfig = null;
-	protected static String urlPie = null;
+	protected FilterConfig filterConfig = null;
+	protected String urlPie = null;
 
 	/**
 	 * Default constructor. 
@@ -45,6 +45,7 @@ public class GeneradorPie implements Filter {
 	/** destroy.
 	 * @see Filter#destroy()
 	 */
+	@Override
 	public void destroy() {
 		filterConfig = null;
 		urlPie = null;
@@ -73,6 +74,7 @@ public class GeneradorPie implements Filter {
 	 * @param fConfig configuracion
 	 * @see Filter#init(FilterConfig)
 	 */
+	@Override
 	public void init(FilterConfig fConfig) throws ServletException {
 		filterConfig = fConfig;
 		urlPie = fConfig.getInitParameter("URLVista");

@@ -50,7 +50,7 @@ public class DriverUvBEP {
 	public static void login() {
 		driver.get("http://localhost:8080/srv/es/index");
 		WebElement username = driver.findElement(By.name("usuario"));
-		username.sendKeys("personal4");
+		username.sendKeys("personal1");
 		username.submit();
 	}
 	
@@ -101,7 +101,6 @@ public class DriverUvBEP {
 	}
 	
 	/** inicializa la bd para realizar las pruebas.
-	 * @throws IOException si error en fichero
 	 * @throws SQLException si error en bd
 	 */
 	public static void inicializaBd() throws IOException, SQLException {

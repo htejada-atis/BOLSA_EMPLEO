@@ -41,8 +41,8 @@ import es.ujaen.uvirtual.modelo.ModeloAdministracion;
 public class GeneradorCuerpoPreServlet implements Filter {
 	protected static Logger logger = Logger.getLogger(GeneradorCuerpoPreServlet.class.getPackage().getName());
 	protected static String nombreDeEstaClase = GeneradorCuerpoPreServlet.class.getName();
-	protected static FilterConfig filterConfig = null;
-	protected static String urlPreServlet = null;
+	protected FilterConfig filterConfig = null;
+	protected String urlPreServlet = null;
 
 	/**
 	 * Default constructor. 
