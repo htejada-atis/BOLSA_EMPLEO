@@ -8,6 +8,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import es.ujaen.uvirtual.modelo.conexion.ConexionUvirtual;
+import es.ujaen.uvirtual.modulo.bolsaempleo.beans.Area;
 import es.ujaen.uvirtual.modulo.bolsaempleo.beans.ParametrosConfiguracion;
 import es.ujaen.uvirtual.utilidades.UVException;
 
@@ -97,6 +98,42 @@ public class ModeloParametrosConfiguracion {
 			stmt.setString(parameterIndex++, param.getNombre());
 			stmt.executeUpdate();
 		}
+	}
+	
+	
+	/** Devuelve un parametro de configuración.
+	 * @param nombre del parametro a buscar .
+	 * @return param .
+	 * @throws SQLException en caso de error en la BD
+	 * @throws UVException en caso de errores de validacion
+	 */
+	public ParametrosConfiguracion getParametroByNombre(String nombre) throws SQLException, UVException {
+		if (nombre == null) {
+			throw new UVException("El nombre no puede estar vacío");
+		}
+		
+		String consulta = "SELECT * FROM ADM_PARAMETROS "
+			+ " WHERE PARAM_CODALF=?";
+		
+		try (Connection conexion = ConexionUvirtual.obtenerInstancia();
+				PreparedStatement stmt = conexion.prepareStatement(consulta);) {
+			stmt.setString(1, nombre);
+						
+			try (ResultSet rs = stmt.executeQuery()) {
+				if (!rs.next()) {
+					throw new UVException("No existe el parametro con nombre" + nombre);
+				}
+				
+				ParametrosConfiguracion param = new ParametrosConfiguracion();
+				param.setCodNum(rs.getString("CONFIG_CODALF"));
+				param.setNombre(rs.getString("PARAM_CODALF"));
+				param.setDescripcion(rs.getString("DESID"));
+				param.setValor(rs.getString("VALOR"));
+				
+				return param;
+			}
+		}
+		
 	}
 	
 }

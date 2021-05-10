@@ -7,6 +7,7 @@ import java.util.List;
 import es.ujaen.uvirtual.modulo.bolsaempleo.beans.ApartadoBaremacion;
 import es.ujaen.uvirtual.modulo.bolsaempleo.beans.BloqueBaremacion;
 import es.ujaen.uvirtual.modulo.bolsaempleo.beans.ItemBaremacion;
+import es.ujaen.uvirtual.modulo.bolsaempleo.beans.MeritoSolicitud;
 import es.ujaen.uvirtual.modulo.bolsaempleo.utilidades.BolsaEmpleoDataTable;
 import es.ujaen.uvirtual.beans.vistas.Vista;
 
@@ -22,6 +23,7 @@ public class VistaItemsBaremacion extends Vista implements Serializable {
     private ItemBaremacion item;
     private String ultimoCodigo; 
     private List<String> afinidades = new ArrayList<>();
+	private List<ItemBaremacion> listaItemsExcluyentes;
         
     public String getVista() {
         return vista;
@@ -77,5 +79,13 @@ public class VistaItemsBaremacion extends Vista implements Serializable {
 	
 	public void setAfinidades(List<String> pafinidades) {
 		this.afinidades = pafinidades;
+	}
+	
+	public List<ItemBaremacion> getListaItemsExcluyentes() {
+		return listaItemsExcluyentes;
+	}
+	
+	public void setListaItemsExcluyentes(List<ItemBaremacion> listaItemsExcluyentes) {
+		this.listaItemsExcluyentes = listaItemsExcluyentes;
 	}
 }

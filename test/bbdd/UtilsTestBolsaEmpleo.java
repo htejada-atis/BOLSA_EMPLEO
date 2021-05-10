@@ -23,7 +23,7 @@ public class UtilsTestBolsaEmpleo {
 	private static final String UID_PERSONAL_PRUEBAS = "personal5";
 	private static final int LONGITUD_NAME_SQL = 3;
 	
-	public static final boolean VERBOSE = false;
+	public static final boolean VERBOSE = true;
 
 	private UtilsTestBolsaEmpleo() { }
 	

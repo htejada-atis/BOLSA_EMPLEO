@@ -31,8 +31,6 @@ public class ModeloMisTitulaciones {
 	
 	public static final int COLUMN_DESCRIPCION_MAXLENGTH = 250;
 	
-	public static final int MAX_FILE_SIZE = 5000000;
-	
     protected static ModeloMisTitulaciones eInstancia = null;
 	
 	/** Crea una instancia del objeto.
@@ -287,9 +285,6 @@ public class ModeloMisTitulaciones {
 		}
 		if (titulacion.getArchivo() == null) {
 			throw new UVException("No se puede insertar una titulación sin archivo");
-		}
-		if (titulacion.getArchivo().available() > MAX_FILE_SIZE) {
-			throw new UVException("No se puede insertar un archivo tan grande");
 		}
 		
 		String consulta = "INSERT INTO tbep_titulaciones_usuario " 

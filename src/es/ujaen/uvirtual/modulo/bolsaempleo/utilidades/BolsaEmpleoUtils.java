@@ -1,10 +1,16 @@
 package es.ujaen.uvirtual.modulo.bolsaempleo.utilidades;
 
+import java.io.IOException;
+import java.io.InputStream;
+import java.sql.SQLException;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.Part;
+
+import es.ujaen.uvirtual.modulo.bolsaempleo.modelo.ModeloParametrosConfiguracion;
+import es.ujaen.uvirtual.utilidades.UVException;
 
 /**
  * Métodos para la bolsa de empleo.
@@ -110,4 +116,39 @@ public class BolsaEmpleoUtils {
 			return null;
 		}
 	}
+	
+	/**
+	 * Devuelve el valor del parametro solicitado .
+	 * @param nombre .
+	 * @return El valor .
+	 * @throws UVException .
+	 * @throws SQLException .
+	 */
+	public static String getParametroConfiguracion(String nombre) throws SQLException, UVException {
+		ModeloParametrosConfiguracion modeloParam = ModeloParametrosConfiguracion.obtenerInstancia();
+		return modeloParam.getParametroByNombre(nombre).getValor();
+	}
+	
+	
+	/**
+	 * Checkea si un archivo es mas grande que una variable o no .
+	 * @param archivo .
+	 * @throws IOException .
+	 * @throws NumberFormatException .
+	 * @throws UVException .
+	 * @throws SQLException .
+	 */
+	public static void checkFileSize(InputStream archivo) throws SQLException, UVException, NumberFormatException, IOException {
+	
+		if (archivo.available() <= 0) {
+			throw new UVException("No se puede insertar sin archivo o archivo vacio");
+		}
+		
+		ModeloParametrosConfiguracion modeloParam = ModeloParametrosConfiguracion.obtenerInstancia();
+		if (archivo.available() > Integer.parseInt(getParametroConfiguracion("bolsaempleo.maxEspacioArchivo"))) {
+			throw new UVException("No se puede insertar un archivo tan grande");
+		}	
+		
+	}
+	
 }

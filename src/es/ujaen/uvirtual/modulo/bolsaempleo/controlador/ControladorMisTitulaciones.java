@@ -25,10 +25,13 @@ import es.ujaen.uvirtual.beans.UVDatos;
 import es.ujaen.uvirtual.beans.Usuario;
 import es.ujaen.uvirtual.modulo.bolsaempleo.beans.Titulacion;
 import es.ujaen.uvirtual.modulo.bolsaempleo.beans.UsuarioBolsaEmpleo;
+import es.ujaen.uvirtual.modulo.bolsaempleo.modelo.ModeloAfinidad;
 import es.ujaen.uvirtual.modulo.bolsaempleo.modelo.ModeloMisTitulaciones;
+import es.ujaen.uvirtual.modulo.bolsaempleo.modelo.ModeloParametrosConfiguracion;
 import es.ujaen.uvirtual.modulo.bolsaempleo.modelo.ModeloUsuarioBolsaEmpleo;
 import es.ujaen.uvirtual.modulo.bolsaempleo.utilidades.BolsaEmpleoDataTable;
 import es.ujaen.uvirtual.modulo.bolsaempleo.utilidades.BolsaEmpleoUtils;
+import es.ujaen.uvirtual.modulo.bolsaempleo.utilidades.BolsaEmpleoValidator;
 import es.ujaen.uvirtual.modulo.bolsaempleo.vistas.VistaTitulaciones;
 import es.ujaen.uvirtual.utilidades.EscapaHTML;
 import es.ujaen.uvirtual.utilidades.Formateador;
@@ -84,6 +87,8 @@ public class ControladorMisTitulaciones extends HttpServlet {
 	public static final String MENSAJE_ERROR_MOVIL_STRING = "El móvil debe ser un número";
 	public static final String MENSAJE_ERROR_CODIGO_POSTAL_STRING = "El código postal debe ser un número";
 	
+	public static final String MENSAJE_ERROR_DESCRIPCION_VACIO = "El campo descripción no puede estar vacio";
+	public static final String MENSAJE_ERROR_DESCRIPCION_REQUERIDO = "El campo descripción es obligatorio";
 	public static final String MENSAJE_ERROR_DESCRIPCION_LARGA = "La descripción no puede contener mas de %d caracteres";
 
 	public static final int RESPONSE_HTTP_CODE_ERROR = 400;
@@ -265,6 +270,8 @@ public class ControladorMisTitulaciones extends HttpServlet {
 			throws SQLException, UVException, IOException, ServletException {
 		ModeloMisTitulaciones modelo = ModeloMisTitulaciones.obtenerInstancia();		
 				
+		bean.setVista(RUTA_BEP_CONF + "formMisTitulaciones.jsp");
+		
 			String descripcion = EscapaHTML.ajustaCodificacion(request.getParameter(PARAM_DESCRIPCION));
 			Integer codNum = Formateador.leeParametroInteger(request.getParameter(PARAM_ID));
 			
@@ -272,32 +279,44 @@ public class ControladorMisTitulaciones extends HttpServlet {
 			
 			Part uploadedFile = request.getPart(PARAM_ARCHIVO);
 			
-			String nombre = BolsaEmpleoUtils.obtenerNombreFichero(uploadedFile);
-			
-			int i = nombre.lastIndexOf('.');
-			if (i > 0) {
-			    String extension = nombre.substring(i + 1);
-			    if (!extension.toLowerCase().equals("pdf")) {
-			    	throw new UVException("No se puede subir un fichero que sea distinto de pdf");
-			    }
-			}
-			
-			InputStream input = uploadedFile.getInputStream();
-			Titulacion titulacionUsuario = new Titulacion();
-			
-			titulacionUsuario.setDescripcion(descripcion);
-			titulacionUsuario.setArchivo(input);
-			titulacionUsuario.setTitulacion(titulacion);
-			titulacionUsuario.setUsuario(usu);
+			if (uploadedFile != null) {
+					
+					BolsaEmpleoValidator validator = this.getValidatorTitulacion(request);
+					
+					if (!validator.isValid()) {
+						for (String param : validator.getErrors().keySet()) {
+							for (String paramError : validator.getErrors().get(param)) {
+								bean.getMensajesDeError().add(paramError);
+							}
+						}
+					} else {
+						
+						String nombre = BolsaEmpleoUtils.obtenerNombreFichero(uploadedFile);
+						
+						int i = nombre.lastIndexOf('.');
+						if (i > 0) {
+						    String extension = nombre.substring(i + 1);
+						    if (!extension.toLowerCase().equals("pdf")) {
+						    	throw new UVException("No se puede subir un fichero que sea distinto de pdf");
+						    }
+						}
+						
+						InputStream input = uploadedFile.getInputStream();
+						Titulacion titulacionUsuario = new Titulacion();
+						
+						titulacionUsuario.setDescripcion(descripcion);
+						titulacionUsuario.setArchivo(input);
+						titulacionUsuario.setTitulacion(titulacion);
+						titulacionUsuario.setUsuario(usu);
 
-			modelo.insertaTitulacionUsuario(titulacionUsuario);
-			
-			bean.getMensajesDeExito().add(MENSAJE_EXITO_AGREGAR);
-			HttpSession session = request.getSession(false);
-			session.setAttribute(MENSAJE_ENVIADO, MENSAJE_EXITO_AGREGAR);
-			response.sendRedirect(request.getServletPath());
-		
-		bean.setVista("/WEB-INF/jsp/vista/infadministrativa/bolsaempleo/mistitulaciones/index.jsp");
+						BolsaEmpleoUtils.checkFileSize(titulacionUsuario.getArchivo());
+						
+						modelo.insertaTitulacionUsuario(titulacionUsuario);
+						
+						bean.getMensajesDeExito().add(MENSAJE_EXITO_AGREGAR);
+						response.sendRedirect(request.getServletPath());	
+					}
+			}
 	}
 	
 	private void eliminarTitulacionUsuario(HttpServletRequest request, HttpServletResponse response, VistaTitulaciones bean) throws SQLException, UVException, IOException {
@@ -344,6 +363,18 @@ public class ControladorMisTitulaciones extends HttpServlet {
 	        }
 			
 		}
+	}
+	
+	private BolsaEmpleoValidator getValidatorTitulacion(HttpServletRequest request) throws UVException {
+		BolsaEmpleoValidator validator = new BolsaEmpleoValidator(request);
+		
+		validator.addParamString(PARAM_DESCRIPCION);
+		validator.addRule(PARAM_DESCRIPCION, "required", MENSAJE_ERROR_DESCRIPCION_REQUERIDO);
+		validator.addRule(PARAM_DESCRIPCION, "noBlank", MENSAJE_ERROR_DESCRIPCION_VACIO);
+		validator.addRule(PARAM_DESCRIPCION, "max:" + ModeloMisTitulaciones.COLUMN_DESCRIPCION_MAXLENGTH, 
+				String.format(MENSAJE_ERROR_DESCRIPCION_LARGA, ModeloMisTitulaciones.COLUMN_DESCRIPCION_MAXLENGTH));
+		
+		return validator;
 	}
 	
 }

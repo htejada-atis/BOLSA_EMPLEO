@@ -592,7 +592,7 @@ public class ModeloUsuarioBolsaEmpleo {
 		if (usuario == null) {
 			throw new UVException("No se puede insertar un usuario vacio");
 		}
-		if (usuario.getRol() == null || usuario.getRol().equals("")) {
+		if (usuario.getRol() == null) {
 			throw new UVException("No se puede insertar un usuario sin role");
 		}
 		
@@ -889,7 +889,7 @@ public class ModeloUsuarioBolsaEmpleo {
 	 * @throws UVException si noticia no es valida.
 	 */
 	public Boolean checkUser(UVDatos datos) throws SQLException, UVException {
-		Usuario usuArcos = datos.getUsuario();		
+		Usuario usuArcos = datos.getUsuario();
 		
 		// no hay usuario logeado, salimos
 		if (usuArcos == null) {

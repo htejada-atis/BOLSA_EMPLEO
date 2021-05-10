@@ -29,6 +29,7 @@ import es.ujaen.uvirtual.modulo.bolsaempleo.beans.ItemBaremacion;
 import es.ujaen.uvirtual.modulo.bolsaempleo.beans.Merito;
 import es.ujaen.uvirtual.modulo.bolsaempleo.modelo.ModeloBaremacion;
 import es.ujaen.uvirtual.modulo.bolsaempleo.modelo.ModeloMerito;
+import es.ujaen.uvirtual.modulo.bolsaempleo.modelo.ModeloParametrosConfiguracion;
 import es.ujaen.uvirtual.modulo.bolsaempleo.modelo.ModeloUsuarioBolsaEmpleo;
 import es.ujaen.uvirtual.modulo.bolsaempleo.utilidades.BolsaEmpleoDataTable;
 import es.ujaen.uvirtual.modulo.bolsaempleo.utilidades.BolsaEmpleoUtils;
@@ -293,6 +294,9 @@ public class ControladorMisMeritos extends HttpServlet {
 							
 							Merito merito = new Merito(valor, descripcion, observacion, itemBaremacion, input);
 							ModeloMerito modeloMer = ModeloMerito.obtenerInstancia();
+							
+							BolsaEmpleoUtils.checkFileSize(merito.getArchivo());
+							
 							modeloMer.insertaMerito(merito, idUsuario);
 							
 							HttpSession session = request.getSession(false);
