@@ -87,7 +87,7 @@ public class CompruebaAcceso {
 			while (!tieneAcceso && i < rolesDelUsuario.size()) {
 				for (MenuRol menuRol : rolesDelMenu) {
 					// si coincide y no está desactivado el rol o bien es administrador
-					if ((menuRol.getValorRol().equals(rolesDelUsuario.get(i))) && (!menuRol.isDesactivado() || menuRol.isAdministrador())) {
+					if (menuRol.getValorRol().equals(rolesDelUsuario.get(i)) && (!menuRol.isDesactivado() || menuRol.isAdministrador())) {
 						tieneAcceso = true;
 					}
 				}
