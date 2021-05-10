@@ -121,6 +121,8 @@ public class ControladorInicio extends HttpServlet {
 				case ACCION_LISTAR_TODAS_NOTICIAS:
 					obtenerTodasNoticias(bean, request, response, datos);
 					break;
+				default:
+					errorFatal(bean, "Acción no contemplada");
 			}
 		} catch (SQLException e) {
 			bean.getMensajesDeError().add("Error al acceder a la base de datos");
@@ -148,6 +150,11 @@ public class ControladorInicio extends HttpServlet {
 		doGet(request, response);
 	}
 	
+	private void errorFatal(VistaInicio bean, String mensaje) {
+		bean.setVista("/WEB-INF/jsp/vista/infadministrativa/bolsaempleo/error.jsp");
+		bean.getMensajesDeError().add(mensaje);
+	}
+	
 	/** descarga un fichero .
 	 * @param bean .
 	 * @param datos .
@@ -167,7 +174,7 @@ public class ControladorInicio extends HttpServlet {
 			int i = fichero.getNombre().lastIndexOf('.');
 			if (i > 0) {
 			    String extension = fichero.getNombre().substring(i + 1);
-			    if (extension.toLowerCase().equals("pdf")) {
+			    if ("pdf".equalsIgnoreCase(extension)) {
 			    	response.setContentType("application/pdf");
 			        datos.setRespuestaEnviada(true);
 			        

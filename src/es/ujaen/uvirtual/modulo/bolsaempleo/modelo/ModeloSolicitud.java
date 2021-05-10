@@ -145,10 +145,8 @@ public class ModeloSolicitud {
 			stmt.setInt(paramIndex++, usuario.getCodNum());
 			
     		try (ResultSet rs = stmt.executeQuery();) {
-	    		if (rs.next()) {
-	    			if (rs.getInt("numero_solicitudes_abiertas") > 0) {
-	    				return true;
-	    			}
+	    		if (rs.next() && rs.getInt("numero_solicitudes_abiertas") > 0) {
+	    			return true;	    			
 	    		}
     		}
 		}

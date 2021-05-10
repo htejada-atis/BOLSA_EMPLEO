@@ -58,13 +58,15 @@ public class DriverUvBEP {
 	 * @param url . 
 	 * @return deuelve un string con json leido
 	 */
+	@java.lang.SuppressWarnings("java:S2093") 
 	public static String getAjaxRequestJson(String url) throws IOException {
-	    HttpURLConnection c = null;
 	    Cookie cookie = driver.manage().getCookieNamed("JSESSIONID");
+	    URL u = new URL(url);
+	    HttpURLConnection c = null;
 	    
 	    try {
-	        URL u = new URL(url);
-	        c = (HttpURLConnection) u.openConnection();
+	    	c = (HttpURLConnection) u.openConnection();
+	    			
 	        c.setRequestMethod("GET");
 	        c.setRequestProperty("Content-length", "0");
 	        c.setRequestProperty("Cookie", cookie.getName() + "=" + cookie.getValue());
@@ -73,24 +75,21 @@ public class DriverUvBEP {
 	        c.connect();
 	        
 	        int status = c.getResponseCode();
-
-	        switch (status) {
-	            case RESPONSE_CODE_200:
-	            case RESPONSE_CODE_201:
-	                BufferedReader br = new BufferedReader(new InputStreamReader(c.getInputStream()));
-	                StringBuilder sb = new StringBuilder();
-	                String line;
-	                while ((line = br.readLine()) != null) {
-	                    sb.append(line + "\n");
-	                }
-	                br.close();
-	                return sb.toString();
+	        
+	        if (status == RESPONSE_CODE_200 || status == RESPONSE_CODE_201) {
+	        	BufferedReader br = new BufferedReader(new InputStreamReader(c.getInputStream()));
+                StringBuilder sb = new StringBuilder();
+                String line;
+                while ((line = br.readLine()) != null) {
+                    sb.append(line + "\n");
+                }
+                br.close();
+                return sb.toString();
 	        }
-
 	    } finally {
-	       if (c != null) {
-	    	   c.disconnect();
-	       }
+	    	if (c != null) {
+	    		c.disconnect();
+	    	}	    	
 	    }
 	    
 	    return null;
