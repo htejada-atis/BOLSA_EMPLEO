@@ -55,17 +55,14 @@ public class ControladorAfinidades extends HttpServlet {
 	public static final String PARAM_DESCRIPCION = "descripcion";
 	public static final String PARAM_MODULACION = "modulacion";
 	public static final String PARAM_AFINIDADES_SELECCIONADAS = "afinidadesseleccionadas";
-
 	
 	// acciones
 	public static final String ACCION_LISTAR_AFINIDADES = "listar";
 	public static final String ACCION_DATATABLE = "datatable";
 	public static final String ACCION_AGREGAR_AFINIDAD = "addAfinidad";
 	public static final String ACCION_FORMULARIO_AFINIDAD = "formularioafinidad";
-
 	public static final String ACCION_MODIFICAR_AFINIDAD = "editafinidad";
 	public static final String ACCION_BORRAR_AFINIDAD = "borrarafinidad";
-
 	
 	// mensajes
 	public static final String MENSAJE_ENVIADO = "mensaje";
@@ -86,17 +83,16 @@ public class ControladorAfinidades extends HttpServlet {
 	public static final String MENSAJE_INFO_AFINIDAD_INSERTADA_CORRECTAMENTE = "Afinidad insertada correctamente.";
 	public static final String MENSAJE_INFO_AFINIDAD_ACTUALIZADA_CORRECTAMENTE = "Afinidad actualizada correctamente.";
 
-	public static final int RESPONSE_HTTP_CODE_ERROR = 400;
-	
 	// ruta vistas
 	public static final String RUTA_BEP_CON = "/WEB-INF/jsp/vista/infadministrativa/bolsaempleo/configuracion/afinidades/";
 	
-	// urls
+	// ajax	
 	public static final String URL_PATTERN_AJAX = "/srv/es/ajax/informacionadministrativa/bolsaempleo/configuracion/afinidades";
-	
-	// variables
-	public static boolean anonimo = true;
-	
+	public static final String RESPONSE_AJAX_CONTENTTYPE = "application/json";
+	public static final String RESPONSE_AJAX_ENCODING = "UTF-8";
+	public static final String RESPONSE_AJAX_ERROR = "error";
+	public static final int RESPONSE_AJAX_HTTP_CODE_ERROR = 400;
+		
 	/** Peticion GET.
 	 * @see HttpServlet#doGet(HttpServletRequest request, HttpServletResponse response)
 	 */
@@ -117,26 +113,28 @@ public class ControladorAfinidades extends HttpServlet {
 		}
 					
 		try {
-			anonimo = !modelo.checkUser(datos);
+			modelo.checkUser(datos);
 			switch (nombreAccion) {
 				case ACCION_LISTAR_AFINIDADES:
-					index(bean, datos, request, response);
+					index(bean);
 					break;				
 				case ACCION_DATATABLE:
 					listado(bean, datos, request, response);
 					break;
 				case ACCION_FORMULARIO_AFINIDAD:
-					formularioAfinidad(request, response, bean);
+					formularioAfinidad(bean);
 					break;
 				case ACCION_AGREGAR_AFINIDAD:
-					nuevaAfinidad(bean, datos, request, response);
+					nuevaAfinidad(bean, request);
 					break;
 				case ACCION_MODIFICAR_AFINIDAD:
-					modificarAfinidad(bean, datos, request, response);
+					modificarAfinidad(bean, request);
 					break;
 				case ACCION_BORRAR_AFINIDAD:
 					borrarAfinidad(bean, request, response);
 					break;
+				default:
+					errorFatal(bean, "Acción no contemplada");
 			}			
 		} catch (UVException e) {
 			LOGGER.log(Level.WARNING, e.toString());
@@ -158,6 +156,11 @@ public class ControladorAfinidades extends HttpServlet {
 			datos.getFicherosCSS().add("/css/ujaen_bolsa_empleo.css");			
 		}
 	}	
+	
+	private void errorFatal(VistaAfinidades bean, String mensaje) {
+		bean.setVista("/WEB-INF/jsp/vista/infadministrativa/bolsaempleo/error.jsp");
+		bean.getMensajesDeError().add(mensaje);
+	}
 
 	/** redireccion de do post.
 	 * @see HttpServlet#doPost(HttpServletRequest request, HttpServletResponse response)
@@ -167,28 +170,26 @@ public class ControladorAfinidades extends HttpServlet {
 		doGet(request, response);
 	}
 	
-	private void index(VistaAfinidades bean, UVDatos datos, HttpServletRequest request, HttpServletResponse response) {
+	private void index(VistaAfinidades bean) {
 		bean.setVista(RUTA_BEP_CON + "index.jsp");
 	}
 	
 	/** dirige al formulario de busqueda de un usuario.
-	 * @param request .
-	 * @param response .
 	 * @param bean bean de la vista a la que poner los valores.
 	 * @throws SQLException excepcion de bbdd.
 	 * @throws UVException en caso de error en bd
 	 */
-	private void formularioAfinidad(HttpServletRequest request, HttpServletResponse response, VistaAfinidades bean) {
+	private void formularioAfinidad(VistaAfinidades bean) {
 		bean.setVista("/WEB-INF/jsp/vista/infadministrativa/bolsaempleo/configuracion/afinidades/formAfinidades.jsp");
 	}
 		
 	private void listado(VistaAfinidades bean, UVDatos datos, HttpServletRequest request, HttpServletResponse response) throws IOException, SQLException {
 		ModeloAfinidad modelo = ModeloAfinidad.obtenerInstancia(); 
 		
-		datos.setContentType("application/json");
+		datos.setContentType(RESPONSE_AJAX_CONTENTTYPE);
 		datos.setRespuestaEnviada(true);
-		response.setContentType("application/json");
-		response.setCharacterEncoding("UTF-8");
+		response.setContentType(RESPONSE_AJAX_CONTENTTYPE);
+		response.setCharacterEncoding(RESPONSE_AJAX_ENCODING);
 		
 		try (PrintWriter writer = response.getWriter()) {
 			try {
@@ -200,14 +201,14 @@ public class ControladorAfinidades extends HttpServlet {
 			} catch (Exception ex) {
 				bean.getMensajesDeError().add(ex.getMessage());
 				
-				CodigoDescripcion mensaje = new CodigoDescripcion("error", ex.getMessage());
+				CodigoDescripcion mensaje = new CodigoDescripcion(RESPONSE_AJAX_ERROR, ex.getMessage());
 				writer.write(new Gson().toJson(mensaje));
-				response.setStatus(RESPONSE_HTTP_CODE_ERROR);
+				response.setStatus(RESPONSE_AJAX_HTTP_CODE_ERROR);
 			}
 		}
 	}
 	
-	private void nuevaAfinidad(VistaAfinidades bean, UVDatos datos, HttpServletRequest request, HttpServletResponse response) throws UVException, SQLException {
+	private void nuevaAfinidad(VistaAfinidades bean, HttpServletRequest request) throws UVException, SQLException {
 		bean.setVista(RUTA_BEP_CON + "formAfinidades.jsp");
 		
 		BolsaEmpleoValidator validator = this.getValidatorAfinidad(request); 							
@@ -229,11 +230,11 @@ public class ControladorAfinidades extends HttpServlet {
 						
 			bean.getMensajesDeExito().add(MENSAJE_INFO_AFINIDAD_INSERTADA_CORRECTAMENTE);			
 			
-			this.index(bean, datos, request, response);
+			this.index(bean);
 		}			
 	}
 		
-	private void modificarAfinidad(VistaAfinidades bean, UVDatos datos, HttpServletRequest request, HttpServletResponse response) throws UVException, SQLException { 
+	private void modificarAfinidad(VistaAfinidades bean, HttpServletRequest request) throws UVException, SQLException { 
 		bean.setVista(RUTA_BEP_CON + "formAfinidades.jsp");
 		
 		BolsaEmpleoValidator validator = this.getValidatorAfinidad(request); 							
@@ -261,10 +262,10 @@ public class ControladorAfinidades extends HttpServlet {
 				
 				bean.getMensajesDeExito().add(MENSAJE_INFO_AFINIDAD_ACTUALIZADA_CORRECTAMENTE);
 				
-				this.index(bean, datos, request, response);
-			}	
-		}	
-	}	
+				this.index(bean);
+			}
+		}
+	}
 	
 	/** eliminar una afinidad.
 	 * @param bean .
@@ -308,5 +309,4 @@ public class ControladorAfinidades extends HttpServlet {
 		
 		return validator;
 	}
-	
 }

@@ -36,24 +36,31 @@ VistaEvaluadores bean = (VistaEvaluadores) uvdatos.getVistas().get(VistaEvaluado
 	
 	<h2>Evaluadores de un área</h2>
 	
-	<div class="titulo-bolsa-empleo">
-		<div class="form-select">
-			<label>Área</label>
-			<select id="select_area">
-				<option value="0">Elija el área</option>
-				<%
-				for(Area area: bean.getAreas()) {
-				%>
-	    			<option value="<%=area.getCodNum()%>"><%=area.getDescripcion()%></option>
-	    		<%
-	    		}
-	    		%>
-			</select>
+	<div class="">
+	    <div class="form-group-container col2">
+	    	<div class="form-group">   
+	    		<div class="form-check-custom w-64">
+					<label>Área</label>
+					<select id="select_area">
+						<option value="0">Elija el área</option>
+						<% for(Area area: bean.getAreas()) { %>
+	    					<option value="<%=area.getCodNum()%>"><%=area.getDescripcion()%></option>
+	    				<% } %>
+					</select>
+				</div>
+			</div>
+			<div class="form-group-container-offset col2"  id="nuevo_evaluador_cont">   
+	    		<div class="form-group" style="width:80%">
+					<label for="bloque_nombre">Nombre Evaluador</label>
+	    			<input class="form-input-custom" type="text" name="<%= ControladorGestionEvaluadores.PARAM_NOMBRE_EVALUADOR %>" id="nombre_evaluador" value=""/>
+	    		</div>
+	    		<div class="form-group" style="width:20%">
+					<a class="link-btn" id="nuevo_evaluador" href="<%=request.getRequestURI()%>" style="display:inline-block !important; padding: 0; margin-top: 1.4rem" title="Buscar evaluador">
+						<img id="iconoMenu" src="/img/md/search_white.svg" width="25"/>
+	   	 			</a>
+	   			</div>
+			</div>
 		</div>
-    
-	    <a class="link-btn" id="nuevo_evaluador" href="<%=request.getRequestURI()%>">
-	    	 Añadir evaluador
-	    </a>
 	</div>
 	<table class="bluetable bolsaempleo" id="table_evaluadores_area">
 		<tr>
@@ -86,7 +93,7 @@ VistaEvaluadores bean = (VistaEvaluadores) uvdatos.getVistas().get(VistaEvaluado
 		function toggleVisibility() {
 			var visibility = checkVisibility() ? "visible" : "hidden";
 			document.getElementById("table_evaluadores_area").style.visibility = visibility;
-			document.getElementById("nuevo_evaluador").style.visibility = visibility;
+			document.getElementById("nuevo_evaluador_cont").style.visibility = visibility;
 		}
 		
 		function inicializarTablas(id, title) {
@@ -166,6 +173,7 @@ VistaEvaluadores bean = (VistaEvaluadores) uvdatos.getVistas().get(VistaEvaluado
 			event.preventDefault();
 			var params = {
 					'a': '<%=ControladorGestionEvaluadores.ACCION_AGREGAR_EVALUADORES%>',
+					'<%=ControladorGestionEvaluadores.PARAM_NOMBRE_EVALUADOR%>': document.getElementById("nombre_evaluador").value,
 					'<%=ControladorGestionEvaluadores.PARAM_AREA%>': document.getElementById("select_area").value
 			}
 			Atis.sendForm("<%= request.getRequestURI() %>", params);

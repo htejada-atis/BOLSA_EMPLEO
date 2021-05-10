@@ -13,6 +13,7 @@ import java.util.Map;
 import es.ujaen.uvirtual.adm.CrearUsuario;
 import es.ujaen.uvirtual.beans.UVDatos;
 import es.ujaen.uvirtual.beans.Usuario;
+import es.ujaen.uvirtual.modelo.conexion.ConexionArcos;
 import es.ujaen.uvirtual.modelo.conexion.ConexionUvirtual;
 import es.ujaen.uvirtual.modulo.bolsaempleo.beans.Area;
 import es.ujaen.uvirtual.modulo.bolsaempleo.beans.Bolsa;
@@ -45,7 +46,7 @@ public class ModeloUsuarioBolsaEmpleo {
 	public static final String USUARIO_EXCLUIDO = "S";
 	public static final String USUARIO_NO_EXCLUIDO = "N";
 	
-	public static final Integer PARAM_ROL_CANDIDATO_ID = 1051;
+	public static final Integer PARAM_ROL_CANDIDATO_ID = 1052;
 	
 	public static final int COLUMN_NOMBRE_MAXLENGTH = 20;
 	public static final int COLUMN_PRIMER_APELLIDO_MAXLENGTH = 40;
@@ -101,7 +102,7 @@ public class ModeloUsuarioBolsaEmpleo {
 			PreparedStatement stmt = conexion.prepareStatement(consulta);) {
 				try (ResultSet rs = stmt.executeQuery()) {
 					while (rs.next()) {
-						UsuarioBolsaEmpleo usuario = setUsuario(rs);
+						UsuarioBolsaEmpleo usuario = setUsuario(rs, rs);
 						usuarios.add(usuario);
 					}
 				}
@@ -142,7 +143,6 @@ public class ModeloUsuarioBolsaEmpleo {
 	public UsuarioBolsaEmpleo getUsuarioById(int codNum) throws SQLException, UVException {
 		String consulta = "SELECT * "
 				+ "FROM TBEP_USUARIOS bepusu "
-				+ "INNER JOIN VUJA_NET_BEP_AR_PERSONA uvpersona ON uvpersona.CODINT=bepusu.CODPERSONA "
 				+ "WHERE bepusu.CODNUM = ?";
 			
 		try (Connection conexion = ConexionUvirtual.obtenerInstancia();
@@ -154,7 +154,7 @@ public class ModeloUsuarioBolsaEmpleo {
 					throw new UVException("No existe el usuario con id " + codNum);
 				}
 	
-				UsuarioBolsaEmpleo usuario = setUsuario(rs);
+				UsuarioBolsaEmpleo usuario = setUsuario(rs, rs);
 				
 				return usuario;
 			}
@@ -249,7 +249,7 @@ public class ModeloUsuarioBolsaEmpleo {
 					throw new UVException("No existe el usuario con codcuenta = " + codcuenta);
 				}
 	
-				return setUsuario(rs);
+				return setUsuario(rs, rs);
 			}
 		}
 	}
@@ -264,32 +264,38 @@ public class ModeloUsuarioBolsaEmpleo {
 	public BolsaEmpleoDataTable<UsuarioBolsaEmpleo> listaUsuarioBolsaEmpleoDatatable(Map<String, String[]> params) throws SQLException, UVException {
 		List<UsuarioBolsaEmpleo> usuarios = new ArrayList<>();
 		
-		String consulta =
-		"SELECT * "
-		+ "FROM TBEP_USUARIOS bepusu "
-		+ "INNER JOIN VUJA_NET_BEP_AR_PERSONA uvpersona ON uvpersona.CODINT=bepusu.CODPERSONA "
-		+ "WHERE bepusu.rol != 1052";
+		String consultaArcos = "SELECT * FROM VUJA_NET_BEP_AR_PERSONA";
 		
+		String consulta = "SELECT * FROM TBEP_USUARIOS";
+
 		BolsaEmpleoDataTable<UsuarioBolsaEmpleo> dataTable = setDatatable(params, consulta);
-				
-		try (Connection conexion = ConexionUvirtual.obtenerInstancia();
-				PreparedStatement stmtCount = conexion.prepareStatement(dataTable.getQueryCount());
-				PreparedStatement stmt = conexion.prepareStatement(dataTable.getQuery());
+		
+		try (Connection conexionArcos = ConexionArcos.obtenerInstancia();
+				PreparedStatement stmtArcos = conexionArcos.prepareStatement(consultaArcos);
 		) {		
+			
+			Connection conexion = ConexionUvirtual.obtenerInstancia();
+			PreparedStatement stmtCount = conexion.prepareStatement(dataTable.getQueryCount());
+			PreparedStatement stmt = conexion.prepareStatement(dataTable.getQuery());
 			
 			dataTable.setFiltersParams(stmt, stmtCount, 1);
 			
-			try (ResultSet rs = stmt.executeQuery()) {
-				while (rs.next()) {
-					UsuarioBolsaEmpleo usuario = setUsuario(rs);
-					usuarios.add(usuario);					
+			try (ResultSet rsArcos = stmtArcos.executeQuery();
+					ResultSet rs = stmt.executeQuery()) {
+				while (rsArcos.next()) {
+					while (rs.next()) {
+						if (rsArcos.getString("IDNIF").equals(rs.getString("NIF"))) {
+							if (rsArcos.getString("LETRANIF").equals(rs.getString("LETRANIF"))) {
+								UsuarioBolsaEmpleo usuario = setUsuario(rsArcos, rs);
+								usuarios.add(usuario);	
+							}
+						}
+						dataTable.setRecordsTotalFromQuery(stmtCount);
+						dataTable.setData(usuarios);
+					}				
 				}				
 			}	
-			
-			dataTable.setRecordsTotalFromQuery(stmtCount);
-			dataTable.setData(usuarios);
 		}
-		
 		return dataTable;
 	}
 	
@@ -320,7 +326,7 @@ public class ModeloUsuarioBolsaEmpleo {
 			
 			try (ResultSet rs = stmt.executeQuery()) {
 				while (rs.next()) {
-					UsuarioBolsaEmpleo usuario = setUsuario(rs);
+					UsuarioBolsaEmpleo usuario = setUsuario(rs, rs);
 					usuarios.add(usuario);					
 				}				
 			}	
@@ -359,7 +365,7 @@ public class ModeloUsuarioBolsaEmpleo {
 			
 			try (ResultSet rs = stmt.executeQuery()) {
 				while (rs.next()) {
-					UsuarioBolsaEmpleo usuario = setUsuario(rs);
+					UsuarioBolsaEmpleo usuario = setUsuario(rs, rs);
 					usuarios.add(usuario);						
 				}				
 			}	
@@ -399,7 +405,7 @@ public class ModeloUsuarioBolsaEmpleo {
 			
 			try (ResultSet rs = stmt.executeQuery()) {
 				while (rs.next()) {			
-					UsuarioBolsaEmpleo usuario = setUsuario(rs);
+					UsuarioBolsaEmpleo usuario = setUsuario(rs, rs);
 					usuarios.add(usuario);					
 				}				
 			}
@@ -476,17 +482,17 @@ public class ModeloUsuarioBolsaEmpleo {
 	
 	/**
 	 * Set usuario. 
-	 * @param rs resultado de la consulta
+	 * @param rsArcos resultado de la consulta de ARCOS
+	 * @param rs resultado de la consulta de UVIRTUAL
 	 * @return usuario
 	 * @throws SQLException en caso de error de base de datos
 	 * @throws UVException en caso de no poder crear el usuario
 	 */	
-	public UsuarioBolsaEmpleo setUsuario(ResultSet rs) throws SQLException, UVException {
+	public UsuarioBolsaEmpleo setUsuario(ResultSet rsArcos, ResultSet rs) throws SQLException, UVException {
 		ModeloRol modeloRol = ModeloRol.obtenerInstancia();
 		
 		UsuarioBolsaEmpleo usuario = new UsuarioBolsaEmpleo();
 		usuario.setCodNum(rs.getInt("CODNUM"));
-		usuario.setCodPersona(rs.getInt("CODPERSONA"));
 		usuario.setCodCuenta(rs.getString("CODCUENTA"));
 		//usuario.setTipoDocumento(rs.getString("STRTIPODOCUMENTO"));
 		//usuario.setNumDocumento(rs.getString("IDNIF") + rs.getString("LETRANIF"));

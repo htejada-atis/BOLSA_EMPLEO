@@ -80,10 +80,6 @@ public class ControladorInicio extends HttpServlet {
 	public static final String URL_PATTERN_FILES_PUBLICA = "/pub/es/informacionadministrativa/bolsaempleo";
 	public static final String URL_PATTERN_FILES_PRIVADA = "/srv/es/informacionadministrativa/bolsaempleo";
 	
-	// variables
-	public static boolean anonimo = true;
-	
-
 	/** Peticion GET.
 	 * @see HttpServlet#doGet(HttpServletRequest request, HttpServletResponse response)
 	 */
@@ -101,7 +97,8 @@ public class ControladorInicio extends HttpServlet {
 			nombreAccion = ACCION_LISTAR_NOTICIAS;
 		}
 		try {
-			anonimo = !modelo.checkUser(datos);
+			bean.setAnonimo(!modelo.checkUser(datos));
+			
 			switch (nombreAccion) {
 				case ACCION_AYUDA:
 					bean.setVista(RUTA_BEP_INICIO + "ayuda.jsp");
@@ -142,6 +139,11 @@ public class ControladorInicio extends HttpServlet {
 		}
 	}
 	
+	private void errorFatal(VistaInicio bean, String mensaje) {
+		bean.setVista("/WEB-INF/jsp/vista/infadministrativa/bolsaempleo/error.jsp");
+		bean.getMensajesDeError().add(mensaje);
+	}
+	
 	/** redireccion de do post.
 	 * @see HttpServlet#doPost(HttpServletRequest request, HttpServletResponse response)
 	 */
@@ -149,12 +151,7 @@ public class ControladorInicio extends HttpServlet {
 	public void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 		doGet(request, response);
 	}
-	
-	private void errorFatal(VistaInicio bean, String mensaje) {
-		bean.setVista("/WEB-INF/jsp/vista/infadministrativa/bolsaempleo/error.jsp");
-		bean.getMensajesDeError().add(mensaje);
-	}
-	
+		
 	/** descarga un fichero .
 	 * @param bean .
 	 * @param datos .
@@ -164,31 +161,36 @@ public class ControladorInicio extends HttpServlet {
 	 * @throws UVException en caso de error de parametros .
 	 * @throws IOException en caso de error de input u output .
 	 */
-	private void descargarFichero(VistaInicio bean, UVDatos datos, HttpServletRequest request, HttpServletResponse response) throws SQLException, UVException, IOException {
+	private void descargarFichero(VistaInicio bean, UVDatos datos, HttpServletRequest request, HttpServletResponse response) throws SQLException, UVException {
 		bean.setVista(RUTA_BEP_INICIO + "documentos.jsp");
 		ModeloFichero modelo = ModeloFichero.obtenerInstancia();
+		
 		if (EscapaHTML.ajustaCodificacion(request.getParameter(PARAM_FICHERO)) != null) {
 			Fichero fichero = modelo.listaFichero(Formateador.leeParametroInteger(request.getParameter(PARAM_FICHERO)));
 			bean.setFichero(fichero);
 			
 			int i = fichero.getNombre().lastIndexOf('.');
 			if (i > 0) {
-			    String extension = fichero.getNombre().substring(i + 1);
-			    if ("pdf".equalsIgnoreCase(extension)) {
-			    	response.setContentType("application/pdf");
-			        datos.setRespuestaEnviada(true);
-			        
-			        try (ServletOutputStream stream = response.getOutputStream();
-			             BufferedInputStream buf = new BufferedInputStream(fichero.getArchivo());) {
-			            int readBytes = 0;
-			            while ((readBytes = buf.read()) != -1) {
-			                stream.write(readBytes);
-			            }
-			            stream.flush();
-			        }
-			    } else {
-			    	response.sendRedirect(request.getServletPath());
-			    }
+				try {
+					String extension = fichero.getNombre().substring(i + 1);
+					if ("pdf".equalsIgnoreCase(extension)) {
+						response.setContentType("application/pdf");
+						datos.setRespuestaEnviada(true);
+						
+						try (ServletOutputStream stream = response.getOutputStream(); 
+								BufferedInputStream buf = new BufferedInputStream(fichero.getArchivo())) {
+							int readBytes = 0;
+							while ((readBytes = buf.read()) != -1) {
+								stream.write(readBytes);
+						    }
+							stream.flush();
+						} 
+					} else {
+						response.sendRedirect(request.getServletPath());
+				    }
+				} catch (IOException ex) {
+					throw new UVException("Erro descargando fichero");
+				}
 			}
 			
 		} else {
@@ -206,7 +208,7 @@ public class ControladorInicio extends HttpServlet {
 	 * @throws SQLException excepcion de bbdd.
 	 */
 	private void obtenerTodasNoticias(VistaInicio bean, HttpServletRequest request, HttpServletResponse response, UVDatos datos) 
-			throws ServletException, IOException, SQLException {
+			throws IOException, SQLException {
 		ModeloNoticia modelo = ModeloNoticia.obtenerInstancia();
 		
 		bean.setVista(RUTA_BEP_INICIO + "indice.jsp");
@@ -218,12 +220,12 @@ public class ControladorInicio extends HttpServlet {
 			try {
 				Gson gson = new GsonBuilder().setDateFormat("dd/M/yyyy").create();
 				List<String> idsNoticias = gson.fromJson(request.getParameter(PARAM_NOTICIAS), new TypeToken<List<String>>() { }.getType());
-				List<Noticia> listaNoticias = modelo.listaNoticiasInicioRestantes(idsNoticias, anonimo);
+				List<Noticia> listaNoticias = modelo.listaNoticiasInicioRestantes(idsNoticias, bean.getAnonimo());
 				bean.setNoticias(listaNoticias);
 				
 				JsonArray result = (JsonArray) gson.toJsonTree(listaNoticias, new TypeToken<List<Noticia>>() { }.getType());
 				writer.print(result);
-			} catch (Exception ex) {
+			} catch (UVException ex) {
 				bean.getMensajesDeError().add(ex.getMessage());
 				CodigoDescripcion mensaje = new CodigoDescripcion("error", ex.getMessage());
 				writer.write(new Gson().toJson(mensaje));
@@ -239,14 +241,14 @@ public class ControladorInicio extends HttpServlet {
 	private void obtenerNoticias(VistaInicio bean) throws SQLException {
 		bean.setVista(RUTA_BEP_INICIO + "indice.jsp");
 		ModeloNoticia modelo = ModeloNoticia.obtenerInstancia();
-		List<Noticia> noticias = modelo.listaNoticiasInicio(anonimo);
+		List<Noticia> noticias = modelo.listaNoticiasInicio(bean.getAnonimo());
 		bean.setNoticias(noticias);
 	}
 	
 	private void obtenerFicheros(VistaInicio bean) throws SQLException {
 		bean.setVista(RUTA_BEP_INICIO + "documentos.jsp");
 		ModeloFichero modelo = ModeloFichero.obtenerInstancia();
-		List<Fichero> ficheros = modelo.listaFicherosInicio(anonimo);
+		List<Fichero> ficheros = modelo.listaFicherosInicio(bean.getAnonimo());
 		bean.setFicheros(ficheros);
 	}
 }

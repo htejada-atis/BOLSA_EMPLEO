@@ -203,6 +203,31 @@ public class ModeloEvaluador {
 		}
 	}
 	
+	/**	Función que agrega un evaluador a un área .
+	 * @param usuario .
+	 * @param area id del area por el que se va a filtrar .
+	 * @throws SQLException en caso de error en la BD .
+	 * @throws UVException en caso de error de parámetros .
+	 */
+	public void insertaEvaluador(UsuarioBolsaEmpleo usuario, Integer area) throws SQLException, UVException {
+		
+		if (area == null) {
+			throw new UVException("No se puede agregar un evaluador sin el id del área");
+		}
+
+		String consulta = "INSERT INTO TBEP_EVALUADORES (BEPARE_CODNUM, BEPUSU_CODNUM)"
+				+ " SELECT bepare.CODNUM AS BEPARE_CODNUM, bepusu.CODNUM AS BEPUSU_CODNUM"
+				+ " FROM TBEP_USUARIOS bepusu, TBEP_AREAS bepare WHERE bepare.CODNUM = ? AND "
+				+ " bepusu.CODNUM = ?";
+		
+		try (Connection conexion = ConexionUvirtual.obtenerInstancia(); PreparedStatement stmt = conexion.prepareStatement(consulta)) {
+			int indexParam = 1;
+			stmt.setInt(indexParam++, area);
+			stmt.setInt(indexParam++, usuario.getCodNum());
+			stmt.executeUpdate();
+		}
+	}
+	
 	/** Borra o restaura un evaluador .
 	 * @param evaluador a borrar .
 	 * @throws SQLException en caso de error en la BD .

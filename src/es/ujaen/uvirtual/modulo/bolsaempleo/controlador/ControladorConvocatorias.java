@@ -91,16 +91,16 @@ public class ControladorConvocatorias extends HttpServlet {
 	public static final String MENSAJE_INFO_CONVOCATORIA_ACTUALIZADA_CORRECTAMENTE = "Convocatoria actualizada correctamente.";
 	public static final String MENSAJE_ERROR_BOLSAS_BLOQUEADAS = "Debe desbloquear primero el total de las bolsas para abrir la convocatoria";
 
-	public static final int RESPONSE_HTTP_CODE_ERROR = 400;
-	
 	// ruta vistas
 	public static final String RUTA_BEP_CON = "/WEB-INF/jsp/vista/infadministrativa/bolsaempleo/configuracion/convocatorias/";
+	public static final String JPS_FORM_CONVOCATORIA = RUTA_BEP_CON + "formConvocatoria.jsp";
 	
-	// urls
+	// ajax
 	public static final String URL_PATTERN_AJAX = "/srv/es/ajax/informacionadministrativa/bolsaempleo/configuracion/convocatorias";
-	
-	// variables
-	public static boolean anonimo = true;
+	public static final String RESPONSE_AJAX_CONTENTTYPE = "application/json";
+	public static final String RESPONSE_AJAX_ENCODING = "UTF-8";
+	public static final String RESPONSE_AJAX_ERROR = "error";
+	public static final int RESPONSE_AJAX_HTTP_CODE_ERROR = 400;
 	
 	/** Peticion GET.
 	 * @see HttpServlet#doGet(HttpServletRequest request, HttpServletResponse response)
@@ -122,32 +122,34 @@ public class ControladorConvocatorias extends HttpServlet {
 		}
 					
 		try {
-			anonimo = !modelo.checkUser(datos);
+			modelo.checkUser(datos);
 			switch (nombreAccion) {
 				case ACCION_LISTAR_CONVOCATORIAS:
-					index(bean, datos, request, response);
-					break;				
+					index(bean);
+					break;
 				case ACCION_DATATABLE:
 					listado(bean, datos, request, response);
 					break;	
 				case ACCION_FORMULARIO_CONVOCATORIA:
-					formConvocatoria(bean, datos, request, response);
+					formConvocatoria(bean);
 					break;
 				case ACCION_AGREGAR_CONVOCATORIA:
-					nuevaConvocatoria(bean, datos, request, response);
+					nuevaConvocatoria(bean, request);
 					break;
 				case ACCION_MODIFICAR_CONVOCATORIA:
-					editarConvocatoria(bean, datos, request, response);
+					editarConvocatoria(bean, request);
 					break;
 				case ACCION_ABRIR_CONVOCATORIA:
-					abrirConvocatoria(bean, datos, request, response);
+					abrirConvocatoria(bean, request);
 					break;	
 				case ACCION_CERRAR_CONVOCATORIA:
-					cerrarConvocatoria(bean, datos, request, response);
+					cerrarConvocatoria(bean, request);
 					break;	
 				case ACCION_BORRAR_CONVOCATORIA:
 					borrarConvocatoria(bean, request, response);
 					break;	
+				default:
+					errorFatal(bean, "Acción no contemplada");
 			}			
 		} catch (UVException e) {
 			LOGGER.log(Level.WARNING, e.toString());
@@ -169,6 +171,11 @@ public class ControladorConvocatorias extends HttpServlet {
 			datos.getFicherosCSS().add("/css/ujaen_bolsa_empleo.css");			
 		}
 	}	
+	
+	private void errorFatal(VistaConvocatorias bean, String mensaje) {
+		bean.setVista("/WEB-INF/jsp/vista/infadministrativa/bolsaempleo/error.jsp");
+		bean.getMensajesDeError().add(mensaje);
+	}
 
 	/** redireccion de do post.
 	 * @see HttpServlet#doPost(HttpServletRequest request, HttpServletResponse response)
@@ -178,17 +185,17 @@ public class ControladorConvocatorias extends HttpServlet {
 		doGet(request, response);
 	}
 	
-	private void index(VistaConvocatorias bean, UVDatos datos, HttpServletRequest request, HttpServletResponse response) {
+	private void index(VistaConvocatorias bean) {
 		bean.setVista(RUTA_BEP_CON + "indexConvocatorias.jsp");
 	}
 		
 	private void listado(VistaConvocatorias bean, UVDatos datos, HttpServletRequest request, HttpServletResponse response) throws IOException, SQLException {
 		ModeloConvocatoria modelo = ModeloConvocatoria.obtenerInstancia(); 
 		
-		datos.setContentType("application/json");
+		datos.setContentType(RESPONSE_AJAX_CONTENTTYPE);
 		datos.setRespuestaEnviada(true);
-		response.setContentType("application/json");
-		response.setCharacterEncoding("UTF-8");
+		response.setContentType(RESPONSE_AJAX_CONTENTTYPE);
+		response.setCharacterEncoding(RESPONSE_AJAX_ENCODING);
 		
 		try (PrintWriter writer = response.getWriter()) {
 			try {
@@ -200,19 +207,19 @@ public class ControladorConvocatorias extends HttpServlet {
 			} catch (Exception ex) {
 				bean.getMensajesDeError().add(ex.getMessage());
 				
-				CodigoDescripcion mensaje = new CodigoDescripcion("error", ex.getMessage());
+				CodigoDescripcion mensaje = new CodigoDescripcion(RESPONSE_AJAX_ERROR, ex.getMessage());
 				writer.write(new Gson().toJson(mensaje));
-				response.setStatus(RESPONSE_HTTP_CODE_ERROR);
+				response.setStatus(RESPONSE_AJAX_HTTP_CODE_ERROR);
 			}
 		}
 	}
 	
-	private void formConvocatoria(VistaConvocatorias bean, UVDatos datos, HttpServletRequest request, HttpServletResponse response) {
-		bean.setVista(RUTA_BEP_CON + "formConvocatoria.jsp");
+	private void formConvocatoria(VistaConvocatorias bean) {
+		bean.setVista(JPS_FORM_CONVOCATORIA);
 	}
 	
-	private void nuevaConvocatoria(VistaConvocatorias bean, UVDatos datos, HttpServletRequest request, HttpServletResponse response) throws UVException, SQLException {
-		bean.setVista(RUTA_BEP_CON + "formConvocatoria.jsp");
+	private void nuevaConvocatoria(VistaConvocatorias bean, HttpServletRequest request) throws UVException, SQLException {
+		bean.setVista(JPS_FORM_CONVOCATORIA);
 		
 		BolsaEmpleoValidator validator = this.getValidatorConvocatoria(request); 							
 		ModeloConvocatoria modelo = ModeloConvocatoria.obtenerInstancia();
@@ -238,11 +245,11 @@ public class ControladorConvocatorias extends HttpServlet {
 						
 			bean.getMensajesDeExito().add(MENSAJE_INFO_CONVOCATORIAS_INSERTADA_CORRECTAMENTE);			
 			
-			this.index(bean, datos, request, response);
+			this.index(bean);
 		}			
 	}
 		
-	private void editarConvocatoria(VistaConvocatorias bean, UVDatos datos, HttpServletRequest request, HttpServletResponse response) throws UVException, SQLException { 
+	private void editarConvocatoria(VistaConvocatorias bean, HttpServletRequest request) throws UVException, SQLException { 
 		ModeloConvocatoria modelo = ModeloConvocatoria.obtenerInstancia();
 		Convocatoria convocatoria = modelo.getConvocatoriaById(Formateador.leeParametroInteger(request.getParameter(PARAM_CONVOCATORIA_ID)));
 		Integer solicitudes = modelo.getNumSolicitudesByConvocatoriaId(convocatoria.getCodNum());
@@ -251,7 +258,7 @@ public class ControladorConvocatorias extends HttpServlet {
 			throw new UVException("No puede editar la convocatoria, ya existen solicitudes abiertas para ella");
 		}
 		
-		bean.setVista(RUTA_BEP_CON + "formConvocatoria.jsp");
+		bean.setVista(JPS_FORM_CONVOCATORIA);
 		
 		BolsaEmpleoValidator validator = this.getValidatorConvocatoria(request); 							
 	
@@ -277,15 +284,13 @@ public class ControladorConvocatorias extends HttpServlet {
 				
 				bean.getMensajesDeExito().add(MENSAJE_INFO_CONVOCATORIA_ACTUALIZADA_CORRECTAMENTE);
 				
-				this.index(bean, datos, request, response);
+				this.index(bean);
 			}	
 		}	
 	}	
 	
 	
-	private void abrirConvocatoria(VistaConvocatorias bean, UVDatos datos,
-			HttpServletRequest request, HttpServletResponse response) throws UVException, SQLException {
-				
+	private void abrirConvocatoria(VistaConvocatorias bean, HttpServletRequest request) throws UVException, SQLException {
 		ModeloConvocatoria modelo = ModeloConvocatoria.obtenerInstancia();
 		ModeloBolsa modeloBolsas = ModeloBolsa.obtenerInstancia();
 		
@@ -311,13 +316,11 @@ public class ControladorConvocatorias extends HttpServlet {
 			bean.getMensajesDeExito().add(MENSAJE_INFO_CONVOCATORIA_ACTUALIZADA_CORRECTAMENTE);
 		}	
 		
-		this.index(bean, datos, request, response);
+		this.index(bean);
 	}
 	
 	
-	private void cerrarConvocatoria(VistaConvocatorias bean, UVDatos datos,
-			HttpServletRequest request, HttpServletResponse response) throws UVException, SQLException {
-				
+	private void cerrarConvocatoria(VistaConvocatorias bean, HttpServletRequest request) throws UVException, SQLException {
 		ModeloConvocatoria modelo = ModeloConvocatoria.obtenerInstancia();
 		
 		Convocatoria convocatoria = modelo.getConvocatoriaById(Formateador.leeParametroInteger(request.getParameter(PARAM_CONVOCATORIA_ID)));
@@ -329,7 +332,7 @@ public class ControladorConvocatorias extends HttpServlet {
 
 		bean.getMensajesDeExito().add(MENSAJE_INFO_CONVOCATORIA_ACTUALIZADA_CORRECTAMENTE);	
 		
-		this.index(bean, datos, request, response);
+		this.index(bean);
 	}
 	
 	private BolsaEmpleoValidator getValidatorConvocatoria(HttpServletRequest request) throws UVException {
@@ -375,5 +378,4 @@ public class ControladorConvocatorias extends HttpServlet {
 		session.setAttribute(MENSAJE_ENVIADO, MENSAJE_EXITO_ELIMINAR);
 		response.sendRedirect(request.getServletPath());
 	}
-	
 }

@@ -66,18 +66,16 @@ public class ControladorGestionTitulacionesPreferentesArea extends HttpServlet {
 	public static final String MENSAJE_ERROR_TITULACIONES_SELECCIONADAS_INCORRECTAS = "No hay titulaciones seleccionadas válidas";
 	public static final String MENSAJE_ERROR_TITULACIONES_PREFERENTES_YA_SELECCIONADAS_PREVIAMENTE = "Las titulaciones ya han sido incluidas para éste área";
 	
-	// Respuesta error
-	public static final int RESPONSE_HTTP_CODE_ERROR = 400;
-	
 	// ruta vistas
 	public static final String RUTA_BEP_CONF = "/WEB-INF/jsp/vista/infadministrativa/bolsaempleo/configuracion/";
 	
-	// urls
+	// ajax	
 	public static final String URL_PATTERN_AJAX = "/srv/es/ajax/informacionadministrativa/bolsaempleo/configuracion/titulacionespreferentesarea";
+	public static final String RESPONSE_AJAX_CONTENTTYPE = "application/json";
+	public static final String RESPONSE_AJAX_ENCODING = "UTF-8";
+	public static final String RESPONSE_AJAX_ERROR = "error";
+	public static final int RESPONSE_AJAX_HTTP_CODE_ERROR = 400;
 
-	// variables
-	public static boolean anonimo = true;
-	
 	/** Peticion GET.
 	 * @see HttpServlet#doGet(HttpServletRequest request, HttpServletResponse response)
 	 */
@@ -98,13 +96,13 @@ public class ControladorGestionTitulacionesPreferentesArea extends HttpServlet {
 		}
 		
 		try {
-			anonimo = !modelo.checkUser(datos);
+			modelo.checkUser(datos);
 			switch (nombreAccion) {
 				case ACCION_ELIMINAR_TITULACION_AREA:
-					eliminarTitulacionesArea(request, response, bean);
+					eliminarTitulacionesArea(request, bean);
 					break;
 				case ACCION_INCLUIR_TITULACION_AREA:
-					incluirTitulacionesPreferentesArea(request, response, bean);
+					incluirTitulacionesPreferentesArea(request, bean);
 					break;
 				case ACCION_LISTAR_AREAS:
 					obtenerAreas(bean);
@@ -115,6 +113,8 @@ public class ControladorGestionTitulacionesPreferentesArea extends HttpServlet {
 				case ACCION_DATATABLE_TITULACIONES_PREFERENTES_AREA:
 					listadoTitulacionesPreferentesArea(bean, datos, request, response);
 					break;
+				default:
+					errorFatal(bean, "Acción no contemplada");
 			}
 			
 		} catch (SQLException e) {
@@ -136,6 +136,11 @@ public class ControladorGestionTitulacionesPreferentesArea extends HttpServlet {
 		}
 	}
 	
+	private void errorFatal(VistaTitulacionesArea bean, String mensaje) {
+		bean.setVista("/WEB-INF/jsp/vista/infadministrativa/bolsaempleo/error.jsp");
+		bean.getMensajesDeError().add(mensaje);
+	}
+	
 	/** redireccion de do post.
 	 * @see HttpServlet#doPost(HttpServletRequest request, HttpServletResponse response)
 	 */
@@ -143,14 +148,13 @@ public class ControladorGestionTitulacionesPreferentesArea extends HttpServlet {
 	public void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 		doGet(request, response);
 	}
-	
+		
 	/** elimina una lista de titulaciones afines a un área .
 	 * @param request .
-	 * @param response .
 	 * @param bean .
 	 * @throws IOException en caso de error de IO .
 	 */
-	private void eliminarTitulacionesArea(HttpServletRequest request, HttpServletResponse response, VistaTitulacionesArea bean) throws SQLException, IOException, UVException {
+	private void eliminarTitulacionesArea(HttpServletRequest request, VistaTitulacionesArea bean) throws SQLException, UVException {
 		Integer area = Formateador.leeParametroInteger(request.getParameter(PARAM_AREA));
 		
 		ModeloArea modelo = ModeloArea.obtenerInstancia();
@@ -170,15 +174,14 @@ public class ControladorGestionTitulacionesPreferentesArea extends HttpServlet {
 	
 	/** incluye una lista de titulaciones en las afines a un área .
 	 * @param request .
-	 * @param response .
 	 * @param bean .
 	 * @throws SQLException excepcion de bbdd .
 	 * @throws IOException en caso de error de IO .
 	 * @throws UVException en caso de error de parametros .
 	 * @throws SQLIntegrityConstraintViolationException error de repetición de id ya existente .
 	 */
-	private void incluirTitulacionesPreferentesArea(HttpServletRequest request, HttpServletResponse response, VistaTitulacionesArea bean)
-			throws SQLException, IOException, UVException {
+	private void incluirTitulacionesPreferentesArea(HttpServletRequest request, VistaTitulacionesArea bean)
+			throws SQLException, UVException {
 		Integer area = Formateador.leeParametroInteger(request.getParameter(PARAM_AREA));
 		
 		ModeloArea modelo = ModeloArea.obtenerInstancia();	
@@ -221,9 +224,9 @@ public class ControladorGestionTitulacionesPreferentesArea extends HttpServlet {
 	private void listadoTitulaciones(VistaTitulacionesArea bean, UVDatos datos, HttpServletRequest request, HttpServletResponse response)
 			throws IOException, SQLException {
 		ModeloTitulacion modelo = ModeloTitulacion.obtenerInstancia();
-		datos.setContentType("application/json");
-		response.setContentType("application/json");
-		response.setCharacterEncoding("UTF-8");
+		datos.setContentType(RESPONSE_AJAX_CONTENTTYPE);
+		response.setContentType(RESPONSE_AJAX_CONTENTTYPE);
+		response.setCharacterEncoding(RESPONSE_AJAX_ENCODING);
 		
 		try (PrintWriter writer = response.getWriter()) {
 			try {
@@ -233,10 +236,10 @@ public class ControladorGestionTitulacionesPreferentesArea extends HttpServlet {
 				Gson gson = new GsonBuilder().setExclusionStrategies(BolsaEmpleoDataTable.GSONEXCLUSIONSTRATEGY).create();
 				writer.write(gson.toJson(dataTable));
 			} catch (UVException ex) {
-				CodigoDescripcion mensaje = new CodigoDescripcion("error", ex.getMessage());
+				CodigoDescripcion mensaje = new CodigoDescripcion(RESPONSE_AJAX_ERROR, ex.getMessage());
 				bean.getMensajesDeError().add(mensaje.toString());
 				writer.write(new Gson().toJson(mensaje));
-				response.setStatus(RESPONSE_HTTP_CODE_ERROR);
+				response.setStatus(RESPONSE_AJAX_HTTP_CODE_ERROR);
 			}
 		}
 		
@@ -254,9 +257,9 @@ public class ControladorGestionTitulacionesPreferentesArea extends HttpServlet {
 	private void listadoTitulacionesPreferentesArea(VistaTitulacionesArea bean, UVDatos datos, HttpServletRequest request, HttpServletResponse response)
 			throws IOException, SQLException {
 		ModeloTitulacion modelo = ModeloTitulacion.obtenerInstancia();
-		datos.setContentType("application/json");
-		response.setContentType("application/json");
-		response.setCharacterEncoding("UTF-8");
+		datos.setContentType(RESPONSE_AJAX_CONTENTTYPE);
+		response.setContentType(RESPONSE_AJAX_CONTENTTYPE);
+		response.setCharacterEncoding(RESPONSE_AJAX_ENCODING);
 		
 		try (PrintWriter writer = response.getWriter()) {
 			try {
@@ -266,10 +269,10 @@ public class ControladorGestionTitulacionesPreferentesArea extends HttpServlet {
 				Gson gson = new GsonBuilder().setExclusionStrategies(BolsaEmpleoDataTable.GSONEXCLUSIONSTRATEGY).create();
 				writer.write(gson.toJson(dataTable));
 			} catch (UVException ex) {
-				CodigoDescripcion mensaje = new CodigoDescripcion("error", ex.getMessage());
+				CodigoDescripcion mensaje = new CodigoDescripcion(RESPONSE_AJAX_ERROR, ex.getMessage());
 				bean.getMensajesDeError().add(mensaje.toString());
 				writer.write(new Gson().toJson(mensaje));
-				response.setStatus(RESPONSE_HTTP_CODE_ERROR);
+				response.setStatus(RESPONSE_AJAX_HTTP_CODE_ERROR);
 			}
 		}
 		

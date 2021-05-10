@@ -15,12 +15,18 @@ import javax.servlet.http.HttpSession;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.reflect.TypeToken;
+
+import es.ujaen.uvirtual.adm.CrearUsuario;
 import es.ujaen.uvirtual.beans.CodigoDescripcion;
 import es.ujaen.uvirtual.beans.UVDatos;
+import es.ujaen.uvirtual.beans.Usuario;
 import es.ujaen.uvirtual.modulo.bolsaempleo.beans.Area;
 import es.ujaen.uvirtual.modulo.bolsaempleo.beans.Evaluador;
+import es.ujaen.uvirtual.modulo.bolsaempleo.beans.Rol;
+import es.ujaen.uvirtual.modulo.bolsaempleo.beans.UsuarioBolsaEmpleo;
 import es.ujaen.uvirtual.modulo.bolsaempleo.modelo.ModeloArea;
 import es.ujaen.uvirtual.modulo.bolsaempleo.modelo.ModeloEvaluador;
+import es.ujaen.uvirtual.modulo.bolsaempleo.modelo.ModeloRol;
 import es.ujaen.uvirtual.modulo.bolsaempleo.modelo.ModeloUsuarioBolsaEmpleo;
 import es.ujaen.uvirtual.modulo.bolsaempleo.utilidades.BolsaEmpleoDataTable;
 import es.ujaen.uvirtual.modulo.bolsaempleo.vistas.VistaEvaluadores;
@@ -60,7 +66,9 @@ public class ControladorGestionEvaluadores extends HttpServlet {
 	public static final String PARAM_ENVIAR = "enviar";
 	public static final String PARAM_USUARIO = "usuario";
 	public static final String PARAM_USUARIOS = "usuarios";
-	
+	public static final String PARAM_NOMBRE_EVALUADOR = "nombreevaluador";
+	public static final Integer PARAM_ROL_COMISION_ID = 1051;
+
 	// Mensajes
 	public static final String MENSAJE_ENVIADO = "mensaje";
 	public static final String MENSAJE_ERROR_USUARIOS_SELECCIONADOS_INCORRECTOS = "Usuarios seleccionados incorrectos";
@@ -74,11 +82,12 @@ public class ControladorGestionEvaluadores extends HttpServlet {
 	// ruta vistas
 	public static final String RUTA_BEP_CONF = "/WEB-INF/jsp/vista/infadministrativa/bolsaempleo/configuracion/evaluadores/";
 	
-	// urls
-	public static final String URL_PATTERN_AJAX = "/srv/es/ajax/informacionadministrativa/bolsaempleo/configuracion/evaluadores";
-	
-	// variables
-	public static boolean anonimo = true;
+	// ajax	
+	public static final String RESPONSE_AJAX_URL = "/srv/es/ajax/informacionadministrativa/bolsaempleo/configuracion/evaluadores";
+	public static final String RESPONSE_AJAX_CONTENTTYPE = "application/json";
+	public static final String RESPONSE_AJAX_ENCODING = "UTF-8";
+	public static final String RESPONSE_AJAX_ERROR = "error";
+	public static final int RESPONSE_AJAX_HTTP_CODE_ERROR = 400;
 
 	/** Peticion GET.
 	 * @see HttpServlet#doGet(HttpServletRequest request, HttpServletResponse response)
@@ -99,7 +108,7 @@ public class ControladorGestionEvaluadores extends HttpServlet {
 		}
 		
 		try {
-			anonimo = !modelo.checkUser(datos);
+			modelo.checkUser(datos);
 			switch (nombreAccion) {
 				case ACCION_AGREGAR_EVALUADORES:
 					agregarEvaluadores(bean, request, response);
@@ -116,6 +125,8 @@ public class ControladorGestionEvaluadores extends HttpServlet {
 				case ACCION_LISTAR_AREAS:
 					obtenerAreas(bean, request);
 					break;
+				default:
+					errorFatal(bean, "Acción no contemplada");
 			}
 		} catch (SQLException e) {
 			LOGGER.log(Level.WARNING, e.toString());
@@ -136,6 +147,11 @@ public class ControladorGestionEvaluadores extends HttpServlet {
 		}
 	}
 	
+	private void errorFatal(VistaEvaluadores bean, String mensaje) {
+		bean.setVista("/WEB-INF/jsp/vista/infadministrativa/bolsaempleo/error.jsp");
+		bean.getMensajesDeError().add(mensaje);
+	}
+	
 	/** redireccion de do post.
 	 * @see HttpServlet#doPost(HttpServletRequest request, HttpServletResponse response)
 	 */
@@ -153,28 +169,60 @@ public class ControladorGestionEvaluadores extends HttpServlet {
 	 * @throws SQLException .
 	 */
 	private void agregarEvaluadores(VistaEvaluadores bean, HttpServletRequest request, HttpServletResponse response) throws SQLException, UVException, IOException {
-		bean.setVista(RUTA_BEP_CONF + "evaluadoresAgregar.jsp");
+//		bean.setVista(RUTA_BEP_CONF + "evaluadoresAgregar.jsp");
+//		
+//		ModeloArea modelo = ModeloArea.obtenerInstancia();	
+//		Integer idArea = Formateador.leeParametroInteger(request.getParameter(PARAM_AREA));
+//		Area area = modelo.getAreaById(idArea);
+//		bean.setArea(area);
+//		
+//		if (EscapaHTML.ajustaCodificacion(request.getParameter(PARAM_USUARIOS)) != null) {
+//			Gson gson = new GsonBuilder().create();
+//			
+//			try {
+//				List<String> usuarios = gson.fromJson(request.getParameter(PARAM_USUARIOS), new TypeToken<List<String>>() { }.getType());
+//				ModeloEvaluador modeloEvaluador = ModeloEvaluador.obtenerInstancia();
+//				modeloEvaluador.insertaEvaluadores(usuarios, idArea);
+//				bean.getMensajesDeExito().add(MENSAJE_EXITO_AGREGAR_EVALUADORES);
+//				HttpSession session = request.getSession(false);
+//				session.setAttribute(MENSAJE_ENVIADO, MENSAJE_EXITO_AGREGAR_EVALUADORES);
+//				session.setAttribute(PARAM_AREA, idArea);
+//				response.sendRedirect(request.getServletPath());
+//			} catch (Exception ex) {
+//				throw new UVException(MENSAJE_ERROR_USUARIOS_SELECCIONADOS_INCORRECTOS);
+//			}
+//		}
 		
-		ModeloArea modelo = ModeloArea.obtenerInstancia();	
-		Integer idArea = Formateador.leeParametroInteger(request.getParameter(PARAM_AREA));
-		Area area = modelo.getAreaById(idArea);
-		bean.setArea(area);
+		ModeloUsuarioBolsaEmpleo modelo = ModeloUsuarioBolsaEmpleo.obtenerInstancia();
+		ModeloEvaluador modeloEvaluador = ModeloEvaluador.obtenerInstancia();
 		
-		if (EscapaHTML.ajustaCodificacion(request.getParameter(PARAM_USUARIOS)) != null) {
-			Gson gson = new GsonBuilder().create();
+		try {
+			UsuarioBolsaEmpleo usu = modelo.listaUsuario(Formateador.leeParametroString(request.getParameter(PARAM_NOMBRE_EVALUADOR)));
+			Integer idArea = Formateador.leeParametroInteger(request.getParameter(PARAM_AREA));
+			
+			modeloEvaluador.insertaEvaluador(usu, idArea);
+		} catch (UVException e) {
 			
 			try {
-				List<String> usuarios = gson.fromJson(request.getParameter(PARAM_USUARIOS), new TypeToken<List<String>>() { }.getType());
-				ModeloEvaluador modeloEvaluador = ModeloEvaluador.obtenerInstancia();
-				modeloEvaluador.insertaEvaluadores(usuarios, idArea);
-				bean.getMensajesDeExito().add(MENSAJE_EXITO_AGREGAR_EVALUADORES);
-				HttpSession session = request.getSession(false);
-				session.setAttribute(MENSAJE_ENVIADO, MENSAJE_EXITO_AGREGAR_EVALUADORES);
-				session.setAttribute(PARAM_AREA, idArea);
-				response.sendRedirect(request.getServletPath());
-			} catch (Exception ex) {
-				throw new UVException(MENSAJE_ERROR_USUARIOS_SELECCIONADOS_INCORRECTOS);
+				Usuario usuArcos = CrearUsuario.usuario(request.getParameter(PARAM_NOMBRE_EVALUADOR));
+				
+				Rol role = ModeloRol.obtenerInstancia().getRoleById(PARAM_ROL_COMISION_ID);
+				UsuarioBolsaEmpleo usuarioFinal = 
+						new UsuarioBolsaEmpleo(usuArcos.getCodigoPersonaArcos(), usuArcos.getUid(), role, true, false, null, null, null);
+						
+				modelo.insertaUsuario(usuarioFinal);
+					
+				CrearUsuario.refrescarUsuario(usuarioFinal.getCodCuenta());
+				
+				UsuarioBolsaEmpleo usu = modelo.listaUsuario(Formateador.leeParametroString(usuarioFinal.getCodCuenta()));
+				Integer idArea = Formateador.leeParametroInteger(request.getParameter(PARAM_AREA));
+				
+				modeloEvaluador.insertaEvaluador(usu, idArea);
+			} catch (UVException ex) {
+				throw new UVException("No existe el evaluador en el sistema, primero debe crearlo");
 			}
+			
+			bean.setVista(RUTA_BEP_CONF + "evaluadoresListar.jsp");
 		}
 	}
 	
@@ -190,7 +238,7 @@ public class ControladorGestionEvaluadores extends HttpServlet {
 		ModeloEvaluador modelo = ModeloEvaluador.obtenerInstancia();
 		Integer codNumUsuario = Formateador.leeParametroInteger(request.getParameter(PARAM_USUARIO));
 		Integer codNumArea = Formateador.leeParametroInteger(request.getParameter(PARAM_AREA));
-		Boolean activo = request.getParameter(PARAM_ACTIVO) != null && EscapaHTML.ajustaCodificacion(request.getParameter(PARAM_ACTIVO)).equals("true");
+		boolean activo = "true".equals(EscapaHTML.ajustaCodificacion(request.getParameter(PARAM_ACTIVO)));
 		Evaluador evaluador = new Evaluador(codNumArea, activo);
 		evaluador.setCodNum(codNumUsuario);
 		bean.setEvaluador(evaluador);
@@ -244,9 +292,9 @@ public class ControladorGestionEvaluadores extends HttpServlet {
 			throws IOException, SQLException {
 		ModeloEvaluador modeloEvaluador = ModeloEvaluador.obtenerInstancia();
 		ModeloArea modeloArea = ModeloArea.obtenerInstancia();
-		datos.setContentType("application/json");
-		response.setContentType("application/json");
-		response.setCharacterEncoding("UTF-8");
+		datos.setContentType(RESPONSE_AJAX_CONTENTTYPE);
+		response.setContentType(RESPONSE_AJAX_CONTENTTYPE);
+		response.setCharacterEncoding(RESPONSE_AJAX_ENCODING);
 		
 		try (PrintWriter writer = response.getWriter()) {
 			try {
@@ -259,7 +307,7 @@ public class ControladorGestionEvaluadores extends HttpServlet {
 				writer.write(gson.toJson(dataTable));
 			} catch (Exception ex) {
 				bean.getMensajesDeError().add(ex.getMessage());
-				CodigoDescripcion mensaje = new CodigoDescripcion("error", ex.getMessage());
+				CodigoDescripcion mensaje = new CodigoDescripcion(RESPONSE_AJAX_ERROR, ex.getMessage());
 				writer.write(new Gson().toJson(mensaje));
 				response.setStatus(RESPONSE_HTTP_CODE_ERROR);
 			}
@@ -280,9 +328,9 @@ public class ControladorGestionEvaluadores extends HttpServlet {
 			throws IOException, SQLException {
 		ModeloEvaluador modelo = ModeloEvaluador.obtenerInstancia();
 		ModeloArea modeloArea = ModeloArea.obtenerInstancia();
-		datos.setContentType("application/json");
-		response.setContentType("application/json");
-		response.setCharacterEncoding("UTF-8");
+		datos.setContentType(RESPONSE_AJAX_CONTENTTYPE);
+		response.setContentType(RESPONSE_AJAX_CONTENTTYPE);
+		response.setCharacterEncoding(RESPONSE_AJAX_ENCODING);
 		
 		try (PrintWriter writer = response.getWriter()) {
 			try {
@@ -295,7 +343,7 @@ public class ControladorGestionEvaluadores extends HttpServlet {
 				writer.write(gson.toJson(dataTable));
 			} catch (Exception ex) {
 				bean.getMensajesDeError().add(ex.getMessage());
-				CodigoDescripcion mensaje = new CodigoDescripcion("error", ex.getMessage());
+				CodigoDescripcion mensaje = new CodigoDescripcion(RESPONSE_AJAX_ERROR, ex.getMessage());
 				writer.write(new Gson().toJson(mensaje));
 				response.setStatus(RESPONSE_HTTP_CODE_ERROR);
 			}

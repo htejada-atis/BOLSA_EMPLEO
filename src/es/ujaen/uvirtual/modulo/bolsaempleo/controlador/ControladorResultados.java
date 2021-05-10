@@ -51,11 +51,9 @@ public class ControladorResultados extends HttpServlet {
 	
 	// mensajes
 	public static final String MENSAJE_ERROR_FOO = "Mensaje de error";
+	public static final String MENSAJE_ERROR_ACCION_NO_CONTEMPLADA = "Acción no contemplada";
 	public static final String MENSAJE_EXITO_BAR = "Mensaje de exito"; 
 
-	// variables
-	public static boolean anonimo = true;
-	
 	public static final int RESPONSE_HTTP_CODE_ERROR = 400;
 	
 	/** Peticion GET.
@@ -73,12 +71,6 @@ public class ControladorResultados extends HttpServlet {
 		
 		LOGGER.log(Level.FINEST, "usuario que ha entrado en el servlet es {0}", usuario.getUid());
 
-		try {
-			anonimo = !modelo.checkUser(datos);
-		} catch (SQLException | UVException e) {
-			bean.getMensajesDeError().add(e.getMessage());
-		}
-		
 		String nombreAccion = EscapaHTML.ajustaCodificacion(request.getParameter(PARAM_ACCION));
 		if (nombreAccion == null) {
 			nombreAccion = ACCION_LISTAR;
@@ -87,15 +79,21 @@ public class ControladorResultados extends HttpServlet {
 		bean.setVista("/WEB-INF/jsp/vista/infadministrativa/bolsaempleo/resultados/index.jsp");
 		
 		try {
+			modelo.checkUser(datos);
 			switch (nombreAccion) {
 				case ACCION_DATATABLE:
 					listado(bean, datos, request, response);
 					break;
+				default:
+					errorFatal(bean, MENSAJE_ERROR_ACCION_NO_CONTEMPLADA);
 			}
 		} catch (SQLException e) {
 			LOGGER.log(Level.SEVERE, Formateador.getStackTrace(e));
 			LOGGER.log(Level.SEVERE, e.toString());
 			bean.getMensajesDeError().add("Error al acceder a la base de datos");
+		} catch (UVException e) {
+			LOGGER.log(Level.WARNING, e.toString());
+			bean.getMensajesDeError().add(e.getMessage());
 		} finally {
 			datos.getVistas().put(bean.getClass().getName(), bean);
 			datos.getFicherosJSP().add(bean.getVista());
@@ -108,6 +106,11 @@ public class ControladorResultados extends HttpServlet {
 			datos.getFicherosCSS().add("/css/ujaen_bolsa_empleo.css");
 			datos.getFicherosCSS().add("/css/jqueryujaen/jquery-ui-1.8.16.custom.css");
 		}
+	}
+	
+	private void errorFatal(VistaResultados bean, String mensaje) {
+		bean.setVista("/WEB-INF/jsp/vista/infadministrativa/bolsaempleo/error.jsp");
+		bean.getMensajesDeError().add(mensaje);
 	}
 	
 	/** redireccion de do post.
@@ -129,8 +132,6 @@ public class ControladorResultados extends HttpServlet {
 		try (PrintWriter writer = response.getWriter()) {
 			try {
 				BolsaEmpleoDataTable<Bolsa> dataTable = modelo.listaBolsaEmpleoDatatable(request.getParameterMap());
-				
-				//bean.setDatatableBolsas(dataTable);
 				
 				Gson gson = new GsonBuilder().setExclusionStrategies(BolsaEmpleoDataTable.GSONEXCLUSIONSTRATEGY).create();				
 				writer.write(gson.toJson(dataTable));

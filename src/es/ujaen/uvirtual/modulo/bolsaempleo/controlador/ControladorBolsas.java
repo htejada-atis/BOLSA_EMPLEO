@@ -63,13 +63,14 @@ public class ControladorBolsas extends HttpServlet {
 	// mensajes
 	public static final String MENSAJE_ERROR_ACCION_BOLSA_NO_VALIDA = "Acción no válida";
 	public static final String MENSAJE_ERROR_BOLSAS_SELECCIONADAS_INCORRECTAS = "No hay bolsas seleccionadas válidas";
-	public static final String MENSAJE_EXITO_BOLSA_MODIFICADA_CORRECTAMENTE = "Bolsa/s modificada/s correctamente"; 
+	public static final String MENSAJE_EXITO_BOLSA_MODIFICADA_CORRECTAMENTE = "Bolsa/s modificada/s correctamente";
+	
+	// ajax
+	public static final String RESPONSE_AJAX_CONTENTTYPE = "application/json";
+	public static final String RESPONSE_AJAX_ENCODING = "UTF-8";
+	public static final String RESPONSE_AJAX_ERROR = "error";
+	public static final int RESPONSE_AJAX_HTTP_CODE_ERROR = 400;
 
-	public static final int RESPONSE_HTTP_CODE_ERROR = 400;
-	
-	// variables
-	public static boolean anonimo = true;
-	
 	/** Peticion GET.
 	 * @see HttpServlet#doGet(HttpServletRequest request, HttpServletResponse response)
 	 */
@@ -97,14 +98,16 @@ public class ControladorBolsas extends HttpServlet {
 			bean.setTotalBolsasRevisadas(modeloBolsa.getBolsasRevisadas());
 			bean.setTotalBolsasBaremables(modeloBolsa.getBolsasBaremables());
 			bean.setTotalBolsas(modeloBolsa.getTotalBolsas());
-			anonimo = !modelo.checkUser(datos);
+			modelo.checkUser(datos);
 			switch (nombreAccion) {
 				case ACCION_DATATABLE:
 					listado(bean, datos, request, response);
 					break;
 				case ACCION_BOLSA:
-					accionSobreBolsas(bean, datos, request);					
+					accionSobreBolsas(bean, request);					
 					break;
+				default:
+					errorFatal(bean, "Acción no contemplada");
 			}			
 		} catch (UVException e) {
 			LOGGER.log(Level.WARNING, e.toString());
@@ -127,6 +130,11 @@ public class ControladorBolsas extends HttpServlet {
 		}
 	}
 	
+	private void errorFatal(VistaEstadoBolsas bean, String mensaje) {
+		bean.setVista("/WEB-INF/jsp/vista/infadministrativa/bolsaempleo/error.jsp");
+		bean.getMensajesDeError().add(mensaje);
+	}
+	
 	/** redireccion de do post.
 	 * @see HttpServlet#doPost(HttpServletRequest request, HttpServletResponse response)
 	 */
@@ -138,10 +146,10 @@ public class ControladorBolsas extends HttpServlet {
 	private void listado(VistaEstadoBolsas bean, UVDatos datos, HttpServletRequest request, HttpServletResponse response) throws IOException, SQLException {
 		ModeloBolsa modelo = ModeloBolsa.obtenerInstancia();
 		
-		datos.setContentType("application/json");
+		datos.setContentType(RESPONSE_AJAX_CONTENTTYPE);
 		datos.setRespuestaEnviada(true);
-		response.setContentType("application/json");
-		response.setCharacterEncoding("UTF-8");
+		response.setContentType(RESPONSE_AJAX_CONTENTTYPE);
+		response.setCharacterEncoding(RESPONSE_AJAX_ENCODING);
 		
 		try (PrintWriter writer = response.getWriter()) {
 			try {
@@ -154,17 +162,15 @@ public class ControladorBolsas extends HttpServlet {
 			} catch (Exception ex) {
 				bean.getMensajesDeError().add(ex.getMessage());
 				
-				CodigoDescripcion mensaje = new CodigoDescripcion("error", ex.getMessage());
+				CodigoDescripcion mensaje = new CodigoDescripcion(RESPONSE_AJAX_ERROR, ex.getMessage());
 				writer.write(new Gson().toJson(mensaje));
-				response.setStatus(RESPONSE_HTTP_CODE_ERROR);
+				response.setStatus(RESPONSE_AJAX_HTTP_CODE_ERROR);
 			}
 		}
 	}
 	
-	private void accionSobreBolsas(VistaEstadoBolsas bean, UVDatos datos, HttpServletRequest request) throws UVException, SQLException {
-		ModeloBolsa modelo = ModeloBolsa.obtenerInstancia();
-		
-		String nombreAccionBolsa = EscapaHTML.ajustaCodificacion(request.getParameter(PARAM_ACCION_BOLSA));
+	private void accionSobreBolsas(VistaEstadoBolsas bean, HttpServletRequest request) throws UVException, SQLException {
+		ModeloBolsa modelo = ModeloBolsa.obtenerInstancia();		
 		String selectedJson = EscapaHTML.ajustaCodificacion(request.getParameter(PARAM_BOLSAS_SELECCIONADAS));
 		int[] selected;
 		List<Bolsa> bolsas;
@@ -175,29 +181,30 @@ public class ControladorBolsas extends HttpServlet {
 		} catch (Exception ex) {
 			throw new UVException(MENSAJE_ERROR_BOLSAS_SELECCIONADAS_INCORRECTAS);
 		}
-				
+		
+		String nombreAccionBolsa = EscapaHTML.ajustaCodificacion(request.getParameter(PARAM_ACCION_BOLSA));
 		switch (nombreAccionBolsa) {
-		case ACCION_BOLSAS_BLOQUEAR:
-			modelo.bloquearBolsas(bolsas);
-			break;
-		case ACCION_BOLSAS_REVISION:
-			modelo.ponerBolsasEnRevision(bolsas);
-			break;
-		case ACCION_BOLSAS_BAREMACION:
-			modelo.ponerBolsasEnBaremacion(bolsas);
-			break;
-		case ACCION_BOLSAS_ALEGACION:
-			modelo.ponerBolsasEnAlegaciones(bolsas);
-			break;
-		case ACCION_BOLSAS_DESBLOQUEAR:
-			modelo.desbloquearBolsas(bolsas);
-			break;
-		case ACCION_BOLSAS_BAREMAR:
-			modelo.baremarBolsas(bolsas);
-			break;
-		default:
-			bean.getMensajesDeError().add(MENSAJE_ERROR_ACCION_BOLSA_NO_VALIDA);
-			return;
+			case ACCION_BOLSAS_BLOQUEAR:
+				modelo.bloquearBolsas(bolsas);
+				break;
+			case ACCION_BOLSAS_REVISION:
+				modelo.ponerBolsasEnRevision(bolsas);
+				break;
+			case ACCION_BOLSAS_BAREMACION:
+				modelo.ponerBolsasEnBaremacion(bolsas);
+				break;
+			case ACCION_BOLSAS_ALEGACION:
+				modelo.ponerBolsasEnAlegaciones(bolsas);
+				break;
+			case ACCION_BOLSAS_DESBLOQUEAR:
+				modelo.desbloquearBolsas(bolsas);
+				break;
+			case ACCION_BOLSAS_BAREMAR:
+				modelo.baremarBolsas(bolsas);
+				break;
+			default:
+				bean.getMensajesDeError().add(MENSAJE_ERROR_ACCION_BOLSA_NO_VALIDA);
+				return;
 		}
 		
 		bean.getMensajesDeExito().add(MENSAJE_EXITO_BOLSA_MODIFICADA_CORRECTAMENTE);

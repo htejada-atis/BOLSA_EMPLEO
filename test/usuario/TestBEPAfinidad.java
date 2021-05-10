@@ -43,9 +43,6 @@ public class TestBEPAfinidad {
 	private static final String CLASS_PAGINATION_FIRST = "first";
 	private static final String CLASS_ACTIONS = "actions";
 	
-	private static final String CLASS_DIALOGO = "ui-dialog";
-	private static final String CLASS_DIALOGO_CONTENT = "ui-dialog-content";
-		
 	private static final String MENSAJE_DIALOGO_SELECCIONAR_FILAS = "Seleccione al menos una afinidad.";
 		
 	/** Se ejecuta una vez al inicio de la clase.
@@ -138,10 +135,10 @@ public class TestBEPAfinidad {
 	}
 	
 	private String getDialogText() {
-		WebElement dialogo = DriverUvBEP.getDriver().findElement(By.className(CLASS_DIALOGO));
-		WebElement content = dialogo.findElement(By.className(CLASS_DIALOGO_CONTENT));
+		WebDriverWait wait = new WebDriverWait(DriverUvBEP.getDriver(), WAIT_ELEMENT);
+		WebElement content = wait.until(ExpectedConditions.visibilityOfElementLocated(By.className("atisDialog")));		
 		
-		return content.findElement(By.tagName("h6")).getText();
+		return content.getText();
 	}
 
 	/** Cierre de este unittest.

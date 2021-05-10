@@ -15,7 +15,6 @@ import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import javax.servlet.http.HttpSession;
 import javax.servlet.http.Part;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
@@ -25,9 +24,7 @@ import es.ujaen.uvirtual.beans.UVDatos;
 import es.ujaen.uvirtual.beans.Usuario;
 import es.ujaen.uvirtual.modulo.bolsaempleo.beans.Titulacion;
 import es.ujaen.uvirtual.modulo.bolsaempleo.beans.UsuarioBolsaEmpleo;
-import es.ujaen.uvirtual.modulo.bolsaempleo.modelo.ModeloAfinidad;
 import es.ujaen.uvirtual.modulo.bolsaempleo.modelo.ModeloMisTitulaciones;
-import es.ujaen.uvirtual.modulo.bolsaempleo.modelo.ModeloParametrosConfiguracion;
 import es.ujaen.uvirtual.modulo.bolsaempleo.modelo.ModeloUsuarioBolsaEmpleo;
 import es.ujaen.uvirtual.modulo.bolsaempleo.utilidades.BolsaEmpleoDataTable;
 import es.ujaen.uvirtual.modulo.bolsaempleo.utilidades.BolsaEmpleoUtils;
@@ -91,15 +88,18 @@ public class ControladorMisTitulaciones extends HttpServlet {
 	public static final String MENSAJE_ERROR_DESCRIPCION_REQUERIDO = "El campo descripción es obligatorio";
 	public static final String MENSAJE_ERROR_DESCRIPCION_LARGA = "La descripción no puede contener mas de %d caracteres";
 
-	public static final int RESPONSE_HTTP_CODE_ERROR = 400;
-	
 	public static final String URL_PATTERN_FILES_PRIVADA = "/srv/es/informacionadministrativa/bolsaempleo/mistitulaciones";
+	
+	// ajax
 	public static final String URL_PATTERN_AJAX = "/srv/es/ajax/informacionadministrativa/bolsaempleo/mistitulaciones";
+	public static final String RESPONSE_AJAX_CONTENTTYPE = "application/json";
+	public static final String RESPONSE_AJAX_ENCODING = "UTF-8";
+	public static final String RESPONSE_AJAX_ERROR = "error";
+	public static final int RESPONSE_AJAX_HTTP_CODE_ERROR = 400;
+	
 	// ruta vistas
 	public static final String RUTA_BEP_CONF = "/WEB-INF/jsp/vista/infadministrativa/bolsaempleo/mistitulaciones/";
-	
-	public static boolean anonimo = true;
-	
+		
 	/** Peticion GET.
 	 * @see HttpServlet#doGet(HttpServletRequest request, HttpServletResponse response)
 	 */
@@ -122,29 +122,31 @@ public class ControladorMisTitulaciones extends HttpServlet {
 		bean.setVista("/WEB-INF/jsp/vista/infadministrativa/bolsaempleo/mistitulaciones/index.jsp");
 		
 		try {
-			anonimo = !modeloUsuario.checkUser(datos);
+			modeloUsuario.checkUser(datos);
 			switch (nombreAccion) {
-			case ACCION_DATATABLE_TITULACIONES_USUARIO:
-				listadoTitulacionesUsuario(bean, datos, request, response, modeloUsuario.getUsuarioByCodCuenta(usuario.getUid()).getCodNum());
-				break;
-			case ACCION_DATATABLE_TITULACIONES:
-				listadoTitulaciones(bean, datos, request, response, modeloUsuario.getUsuarioByCodCuenta(usuario.getUid()).getCodNum());
-				break;
-			case ACCION_FORMULARIO_TITULACIONES_USUARIO:
-				formularioTitulacionesUsuario(request, response, bean);
-				break;
-			case ACCION_TITULACION_SELECCIONADA:
-				seleccionarTitulacion(bean, request, response);
-				break;
-			case ACCION_AGREGAR_TITULACION:
-				agregarTitulacion(request, response, bean, modeloUsuario.getUsuarioByCodCuenta(usuario.getUid()));
-				break;
-			case ACCION_ELIMINAR_TITULACION_USUARIO:
-				eliminarTitulacionUsuario(request, response, bean);
-				break;
-			case ACCION_DESCARGAR_FICHERO:
-				descargarFichero(bean, datos, request, response);
-				break;
+				case ACCION_DATATABLE_TITULACIONES_USUARIO:
+					listadoTitulacionesUsuario(bean, datos, request, response, modeloUsuario.getUsuarioByCodCuenta(usuario.getUid()).getCodNum());
+					break;
+				case ACCION_DATATABLE_TITULACIONES:
+					listadoTitulaciones(bean, datos, request, response, modeloUsuario.getUsuarioByCodCuenta(usuario.getUid()).getCodNum());
+					break;
+				case ACCION_FORMULARIO_TITULACIONES_USUARIO:
+					formularioTitulacionesUsuario(bean);
+					break;
+				case ACCION_TITULACION_SELECCIONADA:
+					seleccionarTitulacion(bean, request);
+					break;
+				case ACCION_AGREGAR_TITULACION:
+					agregarTitulacion(request, response, bean, modeloUsuario.getUsuarioByCodCuenta(usuario.getUid()));
+					break;
+				case ACCION_ELIMINAR_TITULACION_USUARIO:
+					eliminarTitulacionUsuario(request, bean);
+					break;
+				case ACCION_DESCARGAR_FICHERO:
+					descargarFichero(bean, datos, request, response);
+					break;
+				default:
+					errorFatal(bean, "Acción no contemplada");
 			}
 		} catch (SQLException e) {
 			LOGGER.log(Level.SEVERE, Formateador.getStackTrace(e));
@@ -167,6 +169,11 @@ public class ControladorMisTitulaciones extends HttpServlet {
 		}
 	}
 	
+	private void errorFatal(VistaTitulaciones bean, String mensaje) {
+		bean.setVista("/WEB-INF/jsp/vista/infadministrativa/bolsaempleo/error.jsp");
+		bean.getMensajesDeError().add(mensaje);
+	}
+	
 	/** Redireccion de do post.
 	 * @see HttpServlet#doPost(HttpServletRequest request, HttpServletResponse response)
 	 */
@@ -187,9 +194,9 @@ public class ControladorMisTitulaciones extends HttpServlet {
 	private void listadoTitulaciones(VistaTitulaciones bean, UVDatos datos, HttpServletRequest request, HttpServletResponse response, Integer codnum) 
 			throws IOException, SQLException {
 		ModeloMisTitulaciones modelo = ModeloMisTitulaciones.obtenerInstancia();
-		datos.setContentType("application/json");
-		response.setContentType("application/json");
-		response.setCharacterEncoding("UTF-8");
+		datos.setContentType(RESPONSE_AJAX_CONTENTTYPE);
+		response.setContentType(RESPONSE_AJAX_CONTENTTYPE);
+		response.setCharacterEncoding(RESPONSE_AJAX_ENCODING);
 		
 		try (PrintWriter writer = response.getWriter()) {
 			try {
@@ -198,9 +205,9 @@ public class ControladorMisTitulaciones extends HttpServlet {
 				Gson gson = new GsonBuilder().setExclusionStrategies(BolsaEmpleoDataTable.GSONEXCLUSIONSTRATEGY).create();
 				writer.write(gson.toJson(dataTable));
 			} catch (UVException ex) {
-				CodigoDescripcion mensaje = new CodigoDescripcion("error", ex.getMessage());
+				CodigoDescripcion mensaje = new CodigoDescripcion(RESPONSE_AJAX_ERROR, ex.getMessage());
 				writer.write(new Gson().toJson(mensaje));
-				response.setStatus(RESPONSE_HTTP_CODE_ERROR);
+				response.setStatus(RESPONSE_AJAX_HTTP_CODE_ERROR);
 			}
 		}
 	}
@@ -218,9 +225,9 @@ public class ControladorMisTitulaciones extends HttpServlet {
 	private void listadoTitulacionesUsuario(VistaTitulaciones bean, UVDatos datos,
 			HttpServletRequest request, HttpServletResponse response, Integer codnum) throws IOException, SQLException {
 		ModeloMisTitulaciones modelo = ModeloMisTitulaciones.obtenerInstancia();
-		datos.setContentType("application/json");
-		response.setContentType("application/json");
-		response.setCharacterEncoding("UTF-8");
+		datos.setContentType(RESPONSE_AJAX_CONTENTTYPE);
+		response.setContentType(RESPONSE_AJAX_CONTENTTYPE);
+		response.setCharacterEncoding(RESPONSE_AJAX_ENCODING);
 		
 		try (PrintWriter writer = response.getWriter()) {
 			try {
@@ -229,25 +236,23 @@ public class ControladorMisTitulaciones extends HttpServlet {
 				Gson gson = new GsonBuilder().setExclusionStrategies(BolsaEmpleoDataTable.GSONEXCLUSIONSTRATEGY).create();
 				writer.write(gson.toJson(dataTable));
 			} catch (UVException ex) {
-				CodigoDescripcion mensaje = new CodigoDescripcion("error", ex.getMessage());
+				CodigoDescripcion mensaje = new CodigoDescripcion(RESPONSE_AJAX_ERROR, ex.getMessage());
 				writer.write(new Gson().toJson(mensaje));
-				response.setStatus(RESPONSE_HTTP_CODE_ERROR);
+				response.setStatus(RESPONSE_AJAX_HTTP_CODE_ERROR);
 			}
 		}
 	}
 	
 	/** dirige al formulario de creación de una nueva titulación para un usuario.
-	 * @param request .
-	 * @param response .
 	 * @param bean bean de la vista a la que poner los valores.
 	 * @throws SQLException excepcion de bbdd.
 	 * @throws UVException en caso de error en bd
 	 */
-	private void formularioTitulacionesUsuario(HttpServletRequest request, HttpServletResponse response, VistaTitulaciones bean) {
+	private void formularioTitulacionesUsuario(VistaTitulaciones bean) {
 		bean.setVista("/WEB-INF/jsp/vista/infadministrativa/bolsaempleo/mistitulaciones/formMisTitulaciones.jsp");
 	}
 	
-	private void seleccionarTitulacion(VistaTitulaciones bean, HttpServletRequest request, HttpServletResponse response) throws SQLException, UVException {
+	private void seleccionarTitulacion(VistaTitulaciones bean, HttpServletRequest request) throws SQLException, UVException {
 		ModeloMisTitulaciones modelo = ModeloMisTitulaciones.obtenerInstancia();
 		Integer codNum = Formateador.leeParametroInteger(request.getParameter(PARAM_TITULACION));
 		Titulacion titulacion = modelo.listaTitulacion(codNum);
@@ -272,54 +277,52 @@ public class ControladorMisTitulaciones extends HttpServlet {
 				
 		bean.setVista(RUTA_BEP_CONF + "formMisTitulaciones.jsp");
 		
-			String descripcion = EscapaHTML.ajustaCodificacion(request.getParameter(PARAM_DESCRIPCION));
-			Integer codNum = Formateador.leeParametroInteger(request.getParameter(PARAM_ID));
+		String descripcion = EscapaHTML.ajustaCodificacion(request.getParameter(PARAM_DESCRIPCION));
+		Integer codNum = Formateador.leeParametroInteger(request.getParameter(PARAM_ID));
+		
+		Titulacion titulacion = modelo.listaTitulacion(codNum);
+		
+		Part uploadedFile = request.getPart(PARAM_ARCHIVO);
+		
+		if (uploadedFile != null) {
+			BolsaEmpleoValidator validator = this.getValidatorTitulacion(request);
 			
-			Titulacion titulacion = modelo.listaTitulacion(codNum);
-			
-			Part uploadedFile = request.getPart(PARAM_ARCHIVO);
-			
-			if (uploadedFile != null) {
-					
-					BolsaEmpleoValidator validator = this.getValidatorTitulacion(request);
-					
-					if (!validator.isValid()) {
-						for (String param : validator.getErrors().keySet()) {
-							for (String paramError : validator.getErrors().get(param)) {
-								bean.getMensajesDeError().add(paramError);
-							}
-						}
-					} else {
-						
-						String nombre = BolsaEmpleoUtils.obtenerNombreFichero(uploadedFile);
-						
-						int i = nombre.lastIndexOf('.');
-						if (i > 0) {
-						    String extension = nombre.substring(i + 1);
-						    if (!extension.toLowerCase().equals("pdf")) {
-						    	throw new UVException("No se puede subir un fichero que sea distinto de pdf");
-						    }
-						}
-						
-						InputStream input = uploadedFile.getInputStream();
-						Titulacion titulacionUsuario = new Titulacion();
-						
-						titulacionUsuario.setDescripcion(descripcion);
-						titulacionUsuario.setArchivo(input);
-						titulacionUsuario.setTitulacion(titulacion);
-						titulacionUsuario.setUsuario(usu);
-
-						BolsaEmpleoUtils.checkFileSize(titulacionUsuario.getArchivo());
-						
-						modelo.insertaTitulacionUsuario(titulacionUsuario);
-						
-						bean.getMensajesDeExito().add(MENSAJE_EXITO_AGREGAR);
-						response.sendRedirect(request.getServletPath());	
+			if (!validator.isValid()) {
+				for (String param : validator.getErrors().keySet()) {
+					for (String paramError : validator.getErrors().get(param)) {
+						bean.getMensajesDeError().add(paramError);
 					}
+				}
+			} else {
+				String nombre = BolsaEmpleoUtils.obtenerNombreFichero(uploadedFile);				
+				int i = nombre.lastIndexOf('.');
+				
+				if (i > 0) {
+					String extension = nombre.substring(i + 1);
+					if (!"pdf".equalsIgnoreCase(extension)) {
+						throw new UVException("No se puede subir un fichero que sea distinto de pdf");
+				    }
+				}
+				
+				InputStream input = uploadedFile.getInputStream();
+				Titulacion titulacionUsuario = new Titulacion();
+				
+				titulacionUsuario.setDescripcion(descripcion);
+				titulacionUsuario.setArchivo(input);
+				titulacionUsuario.setTitulacion(titulacion);
+				titulacionUsuario.setUsuario(usu);
+
+				BolsaEmpleoUtils.checkFileSize(titulacionUsuario.getArchivo());
+				
+				modelo.insertaTitulacionUsuario(titulacionUsuario);
+				
+				bean.getMensajesDeExito().add(MENSAJE_EXITO_AGREGAR);
+				response.sendRedirect(request.getServletPath());	
 			}
+		}
 	}
 	
-	private void eliminarTitulacionUsuario(HttpServletRequest request, HttpServletResponse response, VistaTitulaciones bean) throws SQLException, UVException, IOException {
+	private void eliminarTitulacionUsuario(HttpServletRequest request, VistaTitulaciones bean) throws SQLException, UVException {
 		String selectedJson = EscapaHTML.ajustaCodificacion(request.getParameter(PARAM_TITULACIONES_USUARIOS_SELECCIONADOS));
 		int[] selected = (new Gson()).fromJson(selectedJson, new TypeToken<int[]>() { }.getType());
 		
@@ -350,18 +353,16 @@ public class ControladorMisTitulaciones extends HttpServlet {
 			Titulacion titulacion = modelo.listaTitulacionUsuario(Formateador.leeParametroInteger(request.getParameter(PARAM_FICHERO)));
 			bean.setTitulacion(titulacion);
 			
-	    	response.setContentType("application/pdf");
-	        datos.setRespuestaEnviada(true);
-	        
-	        try (ServletOutputStream stream = response.getOutputStream();
-	             BufferedInputStream buf = new BufferedInputStream(titulacion.getArchivo());) {
-	            int readBytes = 0;
-	            while ((readBytes = buf.read()) != -1) {
-	                stream.write(readBytes);
-	            }
-	            stream.flush();
+			response.setContentType("application/pdf");
+			datos.setRespuestaEnviada(true);
+
+			try (ServletOutputStream stream = response.getOutputStream(); BufferedInputStream buf = new BufferedInputStream(titulacion.getArchivo())) {
+				int readBytes = 0;
+				while ((readBytes = buf.read()) != -1) {
+					stream.write(readBytes);
+				}
+				stream.flush();
 	        }
-			
 		}
 	}
 	

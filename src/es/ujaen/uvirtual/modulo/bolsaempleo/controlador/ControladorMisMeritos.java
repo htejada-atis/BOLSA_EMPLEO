@@ -29,7 +29,6 @@ import es.ujaen.uvirtual.modulo.bolsaempleo.beans.ItemBaremacion;
 import es.ujaen.uvirtual.modulo.bolsaempleo.beans.Merito;
 import es.ujaen.uvirtual.modulo.bolsaempleo.modelo.ModeloBaremacion;
 import es.ujaen.uvirtual.modulo.bolsaempleo.modelo.ModeloMerito;
-import es.ujaen.uvirtual.modulo.bolsaempleo.modelo.ModeloParametrosConfiguracion;
 import es.ujaen.uvirtual.modulo.bolsaempleo.modelo.ModeloUsuarioBolsaEmpleo;
 import es.ujaen.uvirtual.modulo.bolsaempleo.utilidades.BolsaEmpleoDataTable;
 import es.ujaen.uvirtual.modulo.bolsaempleo.utilidades.BolsaEmpleoUtils;
@@ -105,9 +104,6 @@ public class ControladorMisMeritos extends HttpServlet {
 	public static final String URL_PATTERN_AJAX = "/srv/es/ajax/informacionadministrativa/bolsaempleo/mismeritos";
 	
 	public static final int RESPONSE_HTTP_CODE_ERROR = 400;
-
-	// variables
-	public static boolean anonimo = true;
 	
 	/** Peticion GET.
 	 * @see HttpServlet#doGet(HttpServletRequest request, HttpServletResponse response)
@@ -130,7 +126,7 @@ public class ControladorMisMeritos extends HttpServlet {
 		}
 		
 		try {
-			anonimo = !modelo.checkUser(datos);
+			modelo.checkUser(datos);
 			switch (nombreAccion) {
 				case ACCION_AGREGAR_MERITO:
 					agregarMerito(bean, datos, request, response);
@@ -147,6 +143,8 @@ public class ControladorMisMeritos extends HttpServlet {
 				case ACCION_LISTAR:
 					listaMeritos(bean);
 					break;
+				default:
+					errorFatal(bean, "Acción no contemplada");
 			}
 		} catch (SQLException e) {
 			LOGGER.log(Level.SEVERE, Formateador.getStackTrace(e));
@@ -169,6 +167,11 @@ public class ControladorMisMeritos extends HttpServlet {
 			datos.getFicherosCSS().add("/css/ujaen_bolsa_empleo.css");
 			datos.getFicherosCSS().add("/css/jqueryujaen/jquery-ui-1.8.16.custom.css");
 		}
+	}
+	
+	private void errorFatal(VistaMeritos bean, String mensaje) {
+		bean.setVista("/WEB-INF/jsp/vista/infadministrativa/bolsaempleo/error.jsp");
+		bean.getMensajesDeError().add(mensaje);
 	}
 	
 	/** Redireccion de do post.
@@ -230,10 +233,10 @@ public class ControladorMisMeritos extends HttpServlet {
 						
 						int i = nombre.lastIndexOf('.');
 						if (i > 0) {
-						    String extension = nombre.substring(i + 1);
-						    if (!extension.toLowerCase().equals("pdf")) {
-						    	throw new UVException("No se puede subir un fichero que sea distinto de pdf");
-						    }
+							String extension = nombre.substring(i + 1);
+							if (!"pdf".equalsIgnoreCase(extension)) {
+								throw new UVException("No se puede subir un fichero que sea distinto de pdf");
+							}
 						}
 						
 						Integer itemId = Formateador.leeParametroInteger(request.getParameter(PARAM_ITEM));
@@ -241,7 +244,7 @@ public class ControladorMisMeritos extends HttpServlet {
 						
 						Boolean valorBool = false;
 						
-						if (itemBaremacion.getUnidades().equals("SI/NO")) {
+						if ("SI/NO".equals(itemBaremacion.getUnidades())) {
 							valorBool = true;
 						}
 						
@@ -254,20 +257,13 @@ public class ControladorMisMeritos extends HttpServlet {
 								}
 							}
 						} else {
-							InputStream input = uploadedFile.getInputStream();
-							Float valor = validator.getValueFloat(PARAM_VALOR);
-							String descripcion = validator.getValueString(PARAM_DESCRIPCION);
-							String observacion = validator.getValueString(PARAM_OBSERVACION);
-							Usuario usuArcos = datos.getUsuario();
-							ModeloUsuarioBolsaEmpleo modeloUsuarioBolsaEmpleo = ModeloUsuarioBolsaEmpleo.obtenerInstancia();
-							Integer idUsuario = modeloUsuarioBolsaEmpleo.listaUsuario(usuArcos.getUid()).getCodNum();
-							
 							if (itemId == 0) {
 								throw new UVException(MENSAJE_ERROR_ITEM_REQUERIDO);				
 							}
 							
+							Float valor = validator.getValueFloat(PARAM_VALOR);
 							if (valor != null) {
-								if (itemBaremacion.getUnidades().equals("DECIMAL")) {
+								if ("DECIMAL".equals(itemBaremacion.getUnidades())) {
 									if (valor % 1 == 0) {
 										throw new UVException(String.format(MENSAJE_ERROR_VALOR_DECIMAL_NO_PERMITIDO, 
 												itemBaremacion.getValorMinimo()));
@@ -280,7 +276,7 @@ public class ControladorMisMeritos extends HttpServlet {
 								}
 							}
 							
-							if (itemBaremacion.getUnidades().equals("SI/NO")) {
+							if ("SI/NO".equals(itemBaremacion.getUnidades())) {
 								valor = (float) 1;
 							}
 							
@@ -292,11 +288,17 @@ public class ControladorMisMeritos extends HttpServlet {
 								throw new UVException(String.format(MENSAJE_ERROR_VALOR_MAXIMO_PERMITIDO, itemBaremacion.getValorMaximo()));
 							}
 							
+							InputStream input = uploadedFile.getInputStream();
+							String descripcion = validator.getValueString(PARAM_DESCRIPCION);
+							String observacion = validator.getValueString(PARAM_OBSERVACION);							
 							Merito merito = new Merito(valor, descripcion, observacion, itemBaremacion, input);
 							ModeloMerito modeloMer = ModeloMerito.obtenerInstancia();
 							
 							BolsaEmpleoUtils.checkFileSize(merito.getArchivo());
 							
+							Usuario usuArcos = datos.getUsuario();
+							ModeloUsuarioBolsaEmpleo modeloUsuarioBolsaEmpleo = ModeloUsuarioBolsaEmpleo.obtenerInstancia();
+							Integer idUsuario = modeloUsuarioBolsaEmpleo.listaUsuario(usuArcos.getUid()).getCodNum();
 							modeloMer.insertaMerito(merito, idUsuario);
 							
 							HttpSession session = request.getSession(false);
@@ -328,17 +330,16 @@ public class ControladorMisMeritos extends HttpServlet {
 			bean.setMerito(merito);
 			
 			response.setContentType("application/pdf");
-	        datos.setRespuestaEnviada(true);
+			datos.setRespuestaEnviada(true);
 	        
-	        try (ServletOutputStream stream = response.getOutputStream();
-	             BufferedInputStream buf = new BufferedInputStream(merito.getArchivo());) {
-	            int readBytes = 0;
-	            while ((readBytes = buf.read()) != -1) {
-	                stream.write(readBytes);
+			try (ServletOutputStream stream = response.getOutputStream(); BufferedInputStream buf = new BufferedInputStream(merito.getArchivo())) {
+				int readBytes = 0;
+				while ((readBytes = buf.read()) != -1) {
+					stream.write(readBytes);
 	            }
-	            stream.flush();
-	        } catch (Exception ex) {
-	        	bean.getMensajesDeError().add(ex.getMessage().toString());
+				stream.flush();
+			} catch (Exception ex) {
+				bean.getMensajesDeError().add(ex.getMessage());
 	        }
 		}
 	}
@@ -411,7 +412,7 @@ public class ControladorMisMeritos extends HttpServlet {
 	 * @throws IOException .
 	 * @throws IOException .
 	 */
-	private BolsaEmpleoValidator getValidatorMisMeritos(HttpServletRequest request, Boolean valorBool) throws UVException {
+	private BolsaEmpleoValidator getValidatorMisMeritos(HttpServletRequest request, boolean valorBool) throws UVException {
 		BolsaEmpleoValidator validator = new BolsaEmpleoValidator(request);
 		
 		validator.addParamInteger(PARAM_ITEM);

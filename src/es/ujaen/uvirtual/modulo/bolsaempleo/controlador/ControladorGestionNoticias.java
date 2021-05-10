@@ -84,9 +84,6 @@ public class ControladorGestionNoticias extends HttpServlet {
 	// urls
 	public static final String URL_PATTERN_AJAX = "/srv/es/ajax/informacionadministrativa/bolsaempleo/noticias";
 
-	// variables
-	public static boolean anonimo = true;
-	
 	/** Peticion GET.
 	 * @see HttpServlet#doGet(HttpServletRequest request, HttpServletResponse response)
 	 */
@@ -104,7 +101,7 @@ public class ControladorGestionNoticias extends HttpServlet {
 			nombreAccion = ACCION_LISTAR_NOTICIAS;
 		}
 		try {
-			anonimo = !modelo.checkUser(datos);
+			modelo.checkUser(datos);
 			switch (nombreAccion) {
 				case ACCION_AGREGAR_NOTICIA:
 					agregarNoticia(bean, request, response);
@@ -121,6 +118,8 @@ public class ControladorGestionNoticias extends HttpServlet {
 				case ACCION_LISTAR_NOTICIAS:
 					bean.setVista(RUTA_BEP_NOTICIAS + "indice.jsp");
 					break;
+				default:
+					errorFatal(bean, "Acción no contemplada");
 			}
 		} catch (UVException e) {
 			LOGGER.log(Level.WARNING, e.toString());
@@ -139,6 +138,11 @@ public class ControladorGestionNoticias extends HttpServlet {
 			datos.getFicherosCSS().add("/css/jqueryujaen/jquery-ui-1.8.16.custom.css");
 			datos.getFicherosCSS().add("/css/ujaen_bolsa_empleo.css");
 		}
+	}
+	
+	private void errorFatal(VistaNoticias bean, String mensaje) {
+		bean.setVista("/WEB-INF/jsp/vista/infadministrativa/bolsaempleo/error.jsp");
+		bean.getMensajesDeError().add(mensaje);
 	}
 	
 	/** redireccion de do post.
@@ -174,7 +178,7 @@ public class ControladorGestionNoticias extends HttpServlet {
 				ModeloNoticia modelo = ModeloNoticia.obtenerInstancia();
 				String enlace = validator.getValueString(PARAM_ENLACE);
 				String texto = validator.getValueString(PARAM_TEXTO);
-				Boolean publica = request.getParameter(PARAM_PUBLICA) != null && EscapaHTML.ajustaCodificacion(request.getParameter(PARAM_PUBLICA)).equals("true");
+				Boolean publica = "true".equals(EscapaHTML.ajustaCodificacion(request.getParameter(PARAM_PUBLICA)));
 				Date fecha = validator.getValueDate(PARAM_FECHA);
 				Noticia noticia = new Noticia(enlace, texto, fecha, publica, true);
 				modelo.insertaNoticia(noticia);
@@ -211,7 +215,7 @@ public class ControladorGestionNoticias extends HttpServlet {
 				Integer codNum = Formateador.leeParametroInteger(request.getParameter(PARAM_ID));
 				String enlace = validator.getValueString(PARAM_ENLACE);
 				String texto = validator.getValueString(PARAM_TEXTO);
-				Boolean publica = request.getParameter(PARAM_PUBLICA) != null && EscapaHTML.ajustaCodificacion(request.getParameter(PARAM_PUBLICA)).equals("true");
+				Boolean publica = "true".equals(EscapaHTML.ajustaCodificacion(request.getParameter(PARAM_PUBLICA)));
 				Date fecha = validator.getValueDate(PARAM_FECHA);
 				Noticia noticia = new Noticia(codNum, enlace, texto, fecha, publica, true);
 				modelo.actualizaNoticia(noticia);
@@ -236,7 +240,7 @@ public class ControladorGestionNoticias extends HttpServlet {
 		Integer codNum = Formateador.leeParametroInteger(request.getParameter(PARAM_ID));
 		Noticia noticia = new Noticia();
 		noticia.setCodNum(codNum);
-		Boolean activa = request.getParameter(PARAM_ACTIVA) != null && EscapaHTML.ajustaCodificacion(request.getParameter(PARAM_ACTIVA)).equals("true");
+		boolean activa = "true".equals(EscapaHTML.ajustaCodificacion(request.getParameter(PARAM_ACTIVA))); 
 		noticia.setActiva(activa);
 		modelo.borraRestauraNoticia(noticia);
 		bean.getMensajesDeExito().add(MENSAJE_EXITO_ELIMINAR);

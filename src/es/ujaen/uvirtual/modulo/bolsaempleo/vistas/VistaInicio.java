@@ -17,6 +17,7 @@ public class VistaInicio extends Vista implements Serializable {
 	private List<Fichero> ficheros = new ArrayList<>();
 	private Fichero fichero;
 	private String vista;
+	private boolean anonimo;
 	
 	public List<Noticia> getNoticias() {
 		return noticias;
@@ -50,4 +51,11 @@ public class VistaInicio extends Vista implements Serializable {
 		this.vista = vista;
 	}
 	
+	public boolean getAnonimo() {
+		return anonimo;
+	}
+	
+	public void setAnonimo(boolean anonimo) {
+		this.anonimo = anonimo;
+	}
 }

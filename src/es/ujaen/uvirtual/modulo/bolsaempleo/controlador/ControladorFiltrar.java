@@ -71,12 +71,16 @@ public class ControladorFiltrar extends HttpServlet {
 	// ruta vistas
 	public static final String RUTA_BEP_FILTRAR = "/WEB-INF/jsp/vista/infadministrativa/bolsaempleo/filtrar/";
 	
-	// urls
-	public static final String URL_PATTERN_AJAX = "/srv/es/ajax/informacionadministrativa/bolsaempleo/filtrar";
+	// urls	
 	public static final String URL_PATTERN_FILES_PRIVADA = "/srv/es/informacionadministrativa/bolsaempleo/filtrar";
 	
-	public static final int RESPONSE_HTTP_CODE_ERROR = 400;
-	
+	// ajax
+	public static final String URL_PATTERN_AJAX = "/srv/es/ajax/informacionadministrativa/bolsaempleo/filtrar";
+	public static final String RESPONSE_AJAX_CONTENTTYPE = "application/json";
+	public static final String RESPONSE_AJAX_ENCODING = "UTF-8";
+	public static final String RESPONSE_AJAX_ERROR = "error";
+	public static final int RESPONSE_AJAX_HTTP_CODE_ERROR = 400;
+
 	/** Peticion GET.
 	 * @see HttpServlet#doGet(HttpServletRequest request, HttpServletResponse response)
 	 */
@@ -120,6 +124,8 @@ public class ControladorFiltrar extends HttpServlet {
 				case ACCION_TITULACION_SELECCIONADA:
 					seleccionarTitulacion(bean, datos, request, response, true);
 					break;
+				default:
+					errorFatal(bean, "Acción no contemplada");
 			}
 		} catch (SQLException e) {
 			LOGGER.log(Level.SEVERE, Formateador.getStackTrace(e));
@@ -140,6 +146,11 @@ public class ControladorFiltrar extends HttpServlet {
 			datos.getFicherosCSS().add("/css/ujaen_bolsa_empleo.css");
 			datos.getFicherosCSS().add("/css/jqueryujaen/jquery-ui-1.8.16.custom.css");
 		}
+	}
+	
+	private void errorFatal(VistaFiltrar bean, String mensaje) {
+		bean.setVista("/WEB-INF/jsp/vista/infadministrativa/bolsaempleo/error.jsp");
+		bean.getMensajesDeError().add(mensaje);
 	}
 	
 	/** redireccion de do post.
@@ -180,14 +191,14 @@ public class ControladorFiltrar extends HttpServlet {
 	 * @throws IOException .
 	 * @throws SQLException .
 	 */
-	private void seleccionarTitulacion(VistaFiltrar bean, UVDatos datos, HttpServletRequest request, HttpServletResponse response, Boolean seleccionado)
+	private void seleccionarTitulacion(VistaFiltrar bean, UVDatos datos, HttpServletRequest request, HttpServletResponse response, boolean seleccionado)
 			throws IOException, UVException, SQLException {
 		ModeloTitulacion modeloTitulacion = ModeloTitulacion.obtenerInstancia();
 		ModeloUsuarioBolsaEmpleo modeloUsuario = ModeloUsuarioBolsaEmpleo.obtenerInstancia();
-		datos.setContentType("application/json");
+		datos.setContentType(RESPONSE_AJAX_CONTENTTYPE);
 		datos.setRespuestaEnviada(true);
-		response.setContentType("application/json");
-		response.setCharacterEncoding("UTF-8");
+		response.setContentType(RESPONSE_AJAX_CONTENTTYPE);
+		response.setCharacterEncoding(RESPONSE_AJAX_ENCODING);
 		
 		try (PrintWriter writer = response.getWriter()) {
 			try {
@@ -204,7 +215,7 @@ public class ControladorFiltrar extends HttpServlet {
 					throw new UVException("candidato no puede ser nulo");
 				}
 				
-				if (seleccionado) {	
+				if (seleccionado) {
 					modeloTitulacion.validaTitulacion(titulacion, candidato, new Date());
 				} else {
 					modeloTitulacion.desvalidaTitulacion(titulacion, candidato);
@@ -214,9 +225,9 @@ public class ControladorFiltrar extends HttpServlet {
 				writer.write(new Gson().toJson(mensaje));
 			} catch (Exception ex) {
 				bean.getMensajesDeError().add(ex.getMessage());
-				CodigoDescripcion mensaje = new CodigoDescripcion("error", ex.getMessage());
+				CodigoDescripcion mensaje = new CodigoDescripcion(RESPONSE_AJAX_ERROR, ex.getMessage());
 				writer.write(new Gson().toJson(mensaje));
-				response.setStatus(RESPONSE_HTTP_CODE_ERROR);
+				response.setStatus(RESPONSE_AJAX_HTTP_CODE_ERROR);
 			}
 		}
 	}
@@ -233,10 +244,10 @@ public class ControladorFiltrar extends HttpServlet {
 	private void listadoCandidatos(VistaFiltrar bean, UVDatos datos, HttpServletRequest request, HttpServletResponse response) throws IOException, SQLException {
 		ModeloCandidato modeloCandidato = ModeloCandidato.obtenerInstancia();
 		
-		datos.setContentType("application/json");
+		datos.setContentType(RESPONSE_AJAX_CONTENTTYPE);
 		datos.setRespuestaEnviada(true);
-		response.setContentType("application/json");
-		response.setCharacterEncoding("UTF-8");
+		response.setContentType(RESPONSE_AJAX_CONTENTTYPE);
+		response.setCharacterEncoding(RESPONSE_AJAX_ENCODING);
 		
 		try (PrintWriter writer = response.getWriter()) {
 			try {
@@ -248,9 +259,9 @@ public class ControladorFiltrar extends HttpServlet {
 			} catch (Exception ex) {
 				bean.getMensajesDeError().add(ex.getMessage());
 				
-				CodigoDescripcion mensaje = new CodigoDescripcion("error", ex.getMessage());
+				CodigoDescripcion mensaje = new CodigoDescripcion(RESPONSE_AJAX_ERROR, ex.getMessage());
 				writer.write(new Gson().toJson(mensaje));
-				response.setStatus(RESPONSE_HTTP_CODE_ERROR);
+				response.setStatus(RESPONSE_AJAX_HTTP_CODE_ERROR);
 			}
 		}
 	}	
@@ -265,9 +276,9 @@ public class ControladorFiltrar extends HttpServlet {
 	 */
 	private void listadoTitulacionesCandidato(VistaFiltrar bean, UVDatos datos, HttpServletRequest request, HttpServletResponse response) throws IOException, SQLException {
 		ModeloMisTitulaciones modelo = ModeloMisTitulaciones.obtenerInstancia();
-		datos.setContentType("application/json");
-		response.setContentType("application/json");
-		response.setCharacterEncoding("UTF-8");
+		datos.setContentType(RESPONSE_AJAX_CONTENTTYPE);
+		response.setContentType(RESPONSE_AJAX_CONTENTTYPE);
+		response.setCharacterEncoding(RESPONSE_AJAX_ENCODING);
 		
 		try (PrintWriter writer = response.getWriter()) {
 			try {
@@ -278,9 +289,9 @@ public class ControladorFiltrar extends HttpServlet {
 				writer.write(gson.toJson(dataTable));
 			} catch (UVException ex) {
 				bean.getMensajesDeError().add(ex.getMessage());
-				CodigoDescripcion mensaje = new CodigoDescripcion("error", ex.getMessage());
+				CodigoDescripcion mensaje = new CodigoDescripcion(RESPONSE_AJAX_ERROR, ex.getMessage());
 				writer.write(new Gson().toJson(mensaje));
-				response.setStatus(RESPONSE_HTTP_CODE_ERROR);
+				response.setStatus(RESPONSE_AJAX_HTTP_CODE_ERROR);
 			}
 		}
 	}
@@ -301,20 +312,18 @@ public class ControladorFiltrar extends HttpServlet {
 			Titulacion titulacion = modelo.listaTitulacionUsuario(Formateador.leeParametroInteger(request.getParameter(PARAM_FICHERO)));
 			bean.setTitulacion(titulacion);
 			
-	    	response.setContentType("application/pdf");
-	        datos.setRespuestaEnviada(true);
+			response.setContentType("application/pdf");
+			datos.setRespuestaEnviada(true);
 	        
-	        try (ServletOutputStream stream = response.getOutputStream();
-	             BufferedInputStream buf = new BufferedInputStream(titulacion.getArchivo());) {
-	            int readBytes = 0;
-	            while ((readBytes = buf.read()) != -1) {
-	                stream.write(readBytes);
-	            }
-	            stream.flush();
-	        } catch (Exception ex) {
-	        	bean.getMensajesDeError().add(ex.getMessage());
-	        }
-			
+			try (ServletOutputStream stream = response.getOutputStream(); BufferedInputStream buf = new BufferedInputStream(titulacion.getArchivo())) {
+				int readBytes = 0;
+				while ((readBytes = buf.read()) != -1) {
+					stream.write(readBytes);
+				}
+				stream.flush();
+			} catch (Exception ex) {
+				bean.getMensajesDeError().add(ex.getMessage());
+	        }			
 		}
 	}
 }
