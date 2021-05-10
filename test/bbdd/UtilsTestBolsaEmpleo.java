@@ -27,7 +27,7 @@ public class UtilsTestBolsaEmpleo {
 	private static final String UID_PRUEBAS = "usig";
 	private static final String UID_CANDIDATO_PRUEBAS = "candidato1";
 	private static final String UID_CANDIDATO2_PRUEBAS = "candidato2";
-	private static final String UID_PERSONAL_PRUEBAS = "personal5";
+	private static final String UID_PERSONAL_PRUEBAS = "personal1";
 	private static final String ESQUEMA_ARCOS = "arcos";
 	private static final String ESQUEMA_RRHH = "rrhh";
 	private static final String ESQUEMA_UVIRTUAL = "uvirtual";
