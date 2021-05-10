@@ -59,8 +59,6 @@ public class ControladorParametrosConfiguracion extends HttpServlet {
 
 	public static final int RESPONSE_HTTP_CODE_ERROR = 400;
 	
-	public static final String URL_PATTERN_AJAX = "/srv/es/ajax/informacionadministrativa/bolsaempleo/configuracion/candidatos";
-	
 	// ruta vistas
 	public static final String RUTA_BEP_CONF = "/WEB-INF/jsp/vista/infadministrativa/bolsaempleo/configuracion/parametros/";
 		

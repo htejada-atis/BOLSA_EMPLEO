@@ -73,7 +73,8 @@ public class ControladorUsuarioBolsaEmpleo extends HttpServlet {
 	public static final String PARAM_BORRADO = "borrar";
 	public static final String PARAM_EMAIL = "email";
 	
-	// acciones
+	// acciones	
+	public static final String ACCION_INDEX = "index";
 	public static final String ACCION_LISTAR = "listar";
 	public static final String ACCION_DATATABLE = "datatable";
 	public static final String ACCION_USUARIO = "accionusuario";
@@ -147,14 +148,15 @@ public class ControladorUsuarioBolsaEmpleo extends HttpServlet {
 		
 		String nombreAccion = EscapaHTML.ajustaCodificacion(request.getParameter(PARAM_ACCION));
 		if (nombreAccion == null) {
-			nombreAccion = PARAM_ACCION;
+			nombreAccion = ACCION_INDEX;
 		}
-		
-		bean.setVista(JSP_USUARIOS);
-		
+					
 		try {
 			modelo.checkUser(datos);
 			switch (nombreAccion) {
+				case ACCION_INDEX:
+					bean.setVista(JSP_USUARIOS);
+					break;
 				case ACCION_FORMULARIO_USUARIO:
 					formularioUsuario(bean);
 					break;

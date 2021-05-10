@@ -102,9 +102,7 @@ public class ControladorGestionFicheros extends HttpServlet {
 		datos.setDocType("<!DOCTYPE html>");
 		datos.setContentType("text/html");
 		
-		VistaFicheros bean = new VistaFicheros();
-		bean.setVista(RUTA_BEP_CONF + "ficheros.jsp");
-		
+		VistaFicheros bean = new VistaFicheros();		
 		ModeloUsuarioBolsaEmpleo modelo = ModeloUsuarioBolsaEmpleo.obtenerInstancia();
 		
 		String nombreAccion = EscapaHTML.ajustaCodificacion(request.getParameter(PARAM_ACCION));
@@ -115,6 +113,9 @@ public class ControladorGestionFicheros extends HttpServlet {
 		try {
 			modelo.checkUser(datos);
 			switch (nombreAccion) {
+				case ACCION_LISTAR_FICHEROS:
+					bean.setVista(RUTA_BEP_CONF + "ficheros.jsp");
+					break;
 				case ACCION_BORRAR_FICHEROS:
 					eliminarFicheros(request, response);
 					break;
@@ -188,37 +189,15 @@ public class ControladorGestionFicheros extends HttpServlet {
 			if (uploadedFile != null) {
 				if (uploadedFile.getSize() > 0) {
 					
-					BolsaEmpleoValidator validator = this.getValidatorGestionFicheros(request);
+					Fichero fichero = this.validatorFichero(request, uploadedFile);										
+					fichero.setArchivo(uploadedFile.getInputStream());
 					
-					if (!validator.isValid()) {
-						for (String param : validator.getErrors().keySet()) {
-							for (String paramError : validator.getErrors().get(param)) {
-								bean.getMensajesDeError().add(paramError);
-							}
-						}
-					} else {
-						String nombre = BolsaEmpleoUtils.obtenerNombreFichero(uploadedFile);
-						
-						int i = nombre.lastIndexOf('.');
-						if (i > 0) {
-							String extension = nombre.substring(i + 1);
-							if (!"pdf".equalsIgnoreCase(extension)) {
-								throw new UVException("No se puede subir un fichero que sea distinto de pdf");
-						    }
-						}
-						
-						InputStream input = uploadedFile.getInputStream();
-						String titulo = EscapaHTML.ajustaCodificacion(request.getParameter(PARAM_TITULO));
-						Boolean publico = "on".equals(EscapaHTML.ajustaCodificacion(request.getParameter(PARAM_PUBLICO)));
-						Fichero fichero = new Fichero(nombre, titulo, input, publico);
-						
-						BolsaEmpleoUtils.checkFileSize(fichero.getArchivo());
-						
-						modelo.insertaFichero(fichero);
-						HttpSession session = request.getSession(false);
-						session.setAttribute(MENSAJE_ENVIADO, MENSAJE_EXITO_AGREGAR);
-						response.sendRedirect(request.getServletPath());
-					}
+					BolsaEmpleoUtils.checkFileSize(fichero.getArchivo());
+					
+					modelo.insertaFichero(fichero);
+					HttpSession session = request.getSession(false);
+					session.setAttribute(MENSAJE_ENVIADO, MENSAJE_EXITO_AGREGAR);
+					response.sendRedirect(request.getServletPath());
 				} else {
 					throw new UVException("No se puede subir un fichero sin archivo");
 				}
@@ -352,19 +331,39 @@ public class ControladorGestionFicheros extends HttpServlet {
 	
 	/** Valida el formulario de Gestión Ficheros.
 	 * @param request .
+	 * @param uploadedFile .
 	 * @return BolsaEmpleoValidator validator .
 	 * @throws UVException .
 	 * @throws SQLException .
 	 * @throws IOException .
 	 * @throws IOException .
 	 */
-	private BolsaEmpleoValidator getValidatorGestionFicheros(HttpServletRequest request) throws UVException {
-		BolsaEmpleoValidator validator = new BolsaEmpleoValidator(request);
+	private Fichero validatorFichero(HttpServletRequest request, Part uploadedFile) throws UVException {			
+		// nombre fichero
+		String nombre = BolsaEmpleoUtils.obtenerNombreFichero(uploadedFile);
+		int i = nombre.lastIndexOf('.');
+		if (i > 0) {
+			String extension = nombre.substring(i + 1);
+			if (!"pdf".equalsIgnoreCase(extension)) {
+				throw new UVException("No se puede subir un fichero que sea distinto de pdf");
+		    }
+		}
+		Fichero f = new Fichero();
+		f.setNombre(nombre);
 		
-		validator.addParamString(PARAM_TITULO);
-		validator.addRule(PARAM_TITULO, "max:" + ModeloFichero.COLUMN_TITULO_MAXLENGTH, 
-				String.format(MENSAJE_ERROR_TITULO_LARGO, ModeloFichero.COLUMN_TITULO_MAXLENGTH));
+		// titulo
+		f.setTitulo(EscapaHTML.ajustaCodificacion(request.getParameter(PARAM_TITULO)));
+		if (f.getTitulo() == null || f.getTitulo().isBlank()) {
+			throw new UVException("El título no puede estar vacio");
+		}
+		if (f.getTitulo().length() > ModeloFichero.COLUMN_TITULO_MAXLENGTH) {
+			throw new UVException(String.format(MENSAJE_ERROR_TITULO_LARGO, ModeloFichero.COLUMN_TITULO_MAXLENGTH));
+		}
 		
-		return validator;
+		// publico
+		boolean publico = "on".equals(EscapaHTML.ajustaCodificacion(request.getParameter(PARAM_PUBLICO)));
+		f.setPublico(publico);
+		
+		return f;
 	}
 }

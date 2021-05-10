@@ -83,7 +83,7 @@ public class ControladorGestionEvaluadores extends HttpServlet {
 	public static final String RUTA_BEP_CONF = "/WEB-INF/jsp/vista/infadministrativa/bolsaempleo/configuracion/evaluadores/";
 	
 	// ajax	
-	public static final String RESPONSE_AJAX_URL = "/srv/es/ajax/informacionadministrativa/bolsaempleo/configuracion/evaluadores";
+	public static final String URL_PATTERN_AJAX = "/srv/es/ajax/informacionadministrativa/bolsaempleo/configuracion/evaluadores";
 	public static final String RESPONSE_AJAX_CONTENTTYPE = "application/json";
 	public static final String RESPONSE_AJAX_ENCODING = "UTF-8";
 	public static final String RESPONSE_AJAX_ERROR = "error";

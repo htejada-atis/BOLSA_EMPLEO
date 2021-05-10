@@ -75,12 +75,13 @@ public class ControladorResultados extends HttpServlet {
 		if (nombreAccion == null) {
 			nombreAccion = ACCION_LISTAR;
 		}
-		
-		bean.setVista("/WEB-INF/jsp/vista/infadministrativa/bolsaempleo/resultados/index.jsp");
-		
+					
 		try {
 			modelo.checkUser(datos);
 			switch (nombreAccion) {
+				case ACCION_LISTAR:
+					bean.setVista("/WEB-INF/jsp/vista/infadministrativa/bolsaempleo/resultados/index.jsp");
+					break;
 				case ACCION_DATATABLE:
 					listado(bean, datos, request, response);
 					break;

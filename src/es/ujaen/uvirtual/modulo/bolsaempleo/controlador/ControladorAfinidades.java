@@ -211,59 +211,31 @@ public class ControladorAfinidades extends HttpServlet {
 	private void nuevaAfinidad(VistaAfinidades bean, HttpServletRequest request) throws UVException, SQLException {
 		bean.setVista(RUTA_BEP_CON + "formAfinidades.jsp");
 		
-		BolsaEmpleoValidator validator = this.getValidatorAfinidad(request); 							
-		ModeloAfinidad modelo = ModeloAfinidad.obtenerInstancia();
+		Afinidad afinidad = this.validarAfinidad(request);
 		
-		if (!validator.isValid()) {
-			for (String param : validator.getErrors().keySet()) {
-				for (String paramError : validator.getErrors().get(param)) {
-					bean.getMensajesDeError().add(paramError);
-				}
-			}
-		} else {
-			
-			Afinidad afinidad = new Afinidad();
-			afinidad.setCodigo(validator.getValueString(PARAM_CODIGO));
-			afinidad.setDescripcion(validator.getValueString(PARAM_DESCRIPCION));
-			afinidad.setModulacion(validator.getValueFloat(PARAM_MODULACION)); 
-			modelo.nuevaAfinidad(afinidad);	
-						
-			bean.getMensajesDeExito().add(MENSAJE_INFO_AFINIDAD_INSERTADA_CORRECTAMENTE);			
-			
-			this.index(bean);
-		}			
+		ModeloAfinidad.obtenerInstancia().nuevaAfinidad(afinidad);	
+					
+		bean.getMensajesDeExito().add(MENSAJE_INFO_AFINIDAD_INSERTADA_CORRECTAMENTE);			
+		
+		this.index(bean);
 	}
 		
 	private void modificarAfinidad(VistaAfinidades bean, HttpServletRequest request) throws UVException, SQLException { 
 		bean.setVista(RUTA_BEP_CON + "formAfinidades.jsp");
 		
-		BolsaEmpleoValidator validator = this.getValidatorAfinidad(request); 							
+		Afinidad afinidadForm = this.validarAfinidad(request); 							
 		ModeloAfinidad modelo = ModeloAfinidad.obtenerInstancia();
 		
 		Afinidad afinidad = modelo.getAfinidadById(Formateador.leeParametroInteger(request.getParameter(PARAM_ID)));
 		bean.setAfinidad(afinidad);
 		
 		if (EscapaHTML.ajustaCodificacion(request.getParameter(PARAM_DESCRIPCION)) != null) {
-			if (!validator.isValid()) {
-				for (String param : validator.getErrors().keySet()) {
-					for (String paramError : validator.getErrors().get(param)) {
-						bean.getMensajesDeError().add(paramError);
-					}
-				}
-			} else {
-				
-				Integer codNum = Formateador.leeParametroInteger(request.getParameter(PARAM_ID));
-				String descripcion = EscapaHTML.ajustaCodificacion(request.getParameter(PARAM_DESCRIPCION));
-				String codigo = EscapaHTML.ajustaCodificacion(request.getParameter(PARAM_CODIGO));
-				Float modulacion = BolsaEmpleoUtils.leeParametroFloat(request.getParameter(PARAM_MODULACION));
-				
-				Afinidad afinidadEdit = new Afinidad(codNum, codigo, descripcion, modulacion); 
-				modelo.actualizaAfinidad(afinidadEdit);
-				
-				bean.getMensajesDeExito().add(MENSAJE_INFO_AFINIDAD_ACTUALIZADA_CORRECTAMENTE);
-				
-				this.index(bean);
-			}
+			Afinidad afinidadEdit = new Afinidad(afinidad.getCodNum(), afinidadForm.getCodigo(), afinidadForm.getDescripcion(), afinidadForm.getModulacion()); 
+			modelo.actualizaAfinidad(afinidadEdit);
+			
+			bean.getMensajesDeExito().add(MENSAJE_INFO_AFINIDAD_ACTUALIZADA_CORRECTAMENTE);
+			
+			this.index(bean);			
 		}
 	}
 	
@@ -289,24 +261,30 @@ public class ControladorAfinidades extends HttpServlet {
 		response.sendRedirect(request.getServletPath());
 	}
 	
-	private BolsaEmpleoValidator getValidatorAfinidad(HttpServletRequest request) throws UVException {
-		BolsaEmpleoValidator validator = new BolsaEmpleoValidator(request);
+	private Afinidad validarAfinidad(HttpServletRequest request) throws UVException {
+		Afinidad afinidad = new Afinidad();
 		
-		validator.addParamString(PARAM_CODIGO);
-		validator.addRule(PARAM_CODIGO, "required", MENSAJE_ERROR_CODIGO_REQUERIDO);
-		validator.addRule(PARAM_CODIGO, "noBlank", MENSAJE_ERROR_CODIGO_VACIO);
-		validator.addRule(PARAM_CODIGO, "max:" + ModeloAfinidad.COLUMN_CODIGO_MAXLENGTH, 
-				String.format(MENSAJE_ERROR_CODIGO_LARGA, ModeloAfinidad.COLUMN_CODIGO_MAXLENGTH));
+		afinidad.setCodigo(EscapaHTML.ajustaCodificacion(request.getParameter(PARAM_CODIGO)));
+		if (afinidad.getCodigo() == null || afinidad.getCodigo().isBlank()) {
+			throw new UVException(MENSAJE_ERROR_CODIGO_REQUERIDO);
+		}
+		if (afinidad.getCodigo().length() > ModeloAfinidad.COLUMN_CODIGO_MAXLENGTH) {
+			throw new UVException(String.format(MENSAJE_ERROR_CODIGO_LARGA, ModeloAfinidad.COLUMN_CODIGO_MAXLENGTH));
+		}
 		
-		validator.addParamString(PARAM_DESCRIPCION);
-		validator.addRule(PARAM_DESCRIPCION, "required", MENSAJE_ERROR_DESCRIPCION_REQUERIDA);
-		validator.addRule(PARAM_DESCRIPCION, "noBlank", MENSAJE_ERROR_DESCRIPCION_VACIA);
-		validator.addRule(PARAM_DESCRIPCION, "max:" + ModeloAfinidad.COLUMN_DESCRIPCION_MAXLENGTH, 
-				String.format(MENSAJE_ERROR_DESCRIPCION_LARGA, ModeloAfinidad.COLUMN_DESCRIPCION_MAXLENGTH));
+		afinidad.setDescripcion(EscapaHTML.ajustaCodificacion(request.getParameter(PARAM_DESCRIPCION)));
+		if (afinidad.getDescripcion() == null || afinidad.getDescripcion().isBlank()) {
+			throw new UVException(MENSAJE_ERROR_DESCRIPCION_REQUERIDA);
+		}
+		if (afinidad.getDescripcion().length() > ModeloAfinidad.COLUMN_DESCRIPCION_MAXLENGTH) {
+			throw new UVException(String.format(MENSAJE_ERROR_DESCRIPCION_LARGA, ModeloAfinidad.COLUMN_DESCRIPCION_MAXLENGTH));
+		}
 		
-		validator.addParamFloat(PARAM_MODULACION);
-		validator.addRule(PARAM_MODULACION, "required", MENSAJE_ERROR_MODULACION_VACIA);
+		afinidad.setModulacion(Formateador.leeParametroDouble(PARAM_MODULACION));
+		if (afinidad.getModulacion() == null) {
+			throw new UVException(MENSAJE_ERROR_MODULACION_VACIA);
+		}
 		
-		return validator;
+		return afinidad;
 	}
 }
