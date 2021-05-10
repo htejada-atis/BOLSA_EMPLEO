@@ -61,8 +61,6 @@ pipeline {
 		        echo 'Inicio sonar'
 		        withSonarQubeEnv('sonar docker') { 
 		            withAnt(installation: 'LocalAnt') {
-		               sh "export DISPLAY=:0"
-		               sh "echo $DISPLAY"
 		               sh "ant sonar -Dsonar.projectKey=${SONAR_PROYECTKEY} -DdbUrl=127.0.0.1 -DmemcacheUrl=127.0.0.1"
 		            }
 		        }

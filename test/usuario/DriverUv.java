@@ -8,6 +8,7 @@ import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.firefox.FirefoxDriver;
+import org.openqa.selenium.firefox.FirefoxOptions;
 
 import bbdd.UtilsTestDocentia;
 
@@ -21,7 +22,9 @@ public class DriverUv {
 	/** inicializa el driver. */
 	public static void inicializaDriver() {
 		System.setProperty("webdriver.gecko.driver", "Documentos/selenium/drivers/geckodriver");
-		driver = new FirefoxDriver();
+		FirefoxOptions firefoxOptions = new FirefoxOptions();
+		firefoxOptions.addArguments("--display=0");
+		driver = new FirefoxDriver(firefoxOptions);
 		driver.manage().timeouts().pageLoadTimeout(TIEMPO_MAXIMO_ESPERA, TimeUnit.SECONDS);
 	}
 	
