@@ -77,17 +77,17 @@ public class CompruebaAcceso {
 				rolesDelUsuario = usuario.getRoles();
 			}
 			
-			if ((rolesDelUsuario == null) || (rolesDelMenu == null)) {
+			if (rolesDelUsuario == null || rolesDelMenu == null) {
 				if (registraErrores) {
 					logger.logp(Level.SEVERE, nombreDeEstaClase, nombreEsteMetodo, mensajeNoAutorizado(usuario) + menu.getControlador() + "' (sin roles) ");
 				}
 				return ErroresPersonalizados.ERROR_PRIVILEGIOS;
 			}
 	
-			while ((!tieneAcceso) && (i < rolesDelUsuario.size())) {
+			while (!tieneAcceso && i < rolesDelUsuario.size()) {
 				for (MenuRol menuRol : rolesDelMenu) {
 					// si coincide y no está desactivado el rol o bien es administrador
-					if ((menuRol.getValorRol().equals(rolesDelUsuario.get(i))) && ((!menuRol.isDesactivado()) || (menuRol.isAdministrador()))) {
+					if ((menuRol.getValorRol().equals(rolesDelUsuario.get(i))) && (!menuRol.isDesactivado() || menuRol.isAdministrador())) {
 						tieneAcceso = true;
 					}
 				}

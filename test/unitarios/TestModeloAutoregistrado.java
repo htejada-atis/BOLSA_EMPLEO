@@ -18,6 +18,7 @@ import es.ujaen.uvirtual.utilidades.UVException;
  */
 public class TestModeloAutoregistrado {
 
+	static final String TEXTO = "prueba"; 
 	/** prepara la bbdd para los tests.
      */
     @BeforeClass
@@ -35,6 +36,11 @@ public class TestModeloAutoregistrado {
     public void testA01() throws SQLException, UVException {
     	ModeloUsuarioAutoregistrado modelo = new ModeloUsuarioAutoregistrado();
     	Usuario usuario = new Usuario();
+    	usuario.setNombre(TEXTO);
+    	usuario.setApellido1(TEXTO);
+    	usuario.setDocumentoNumero(TEXTO);
+    	usuario.setDominio("ujaen.es");
+    	usuario.setUid(TEXTO);
     	modelo.insertaUsuarioAutoregistrado(usuario);
     }
 
