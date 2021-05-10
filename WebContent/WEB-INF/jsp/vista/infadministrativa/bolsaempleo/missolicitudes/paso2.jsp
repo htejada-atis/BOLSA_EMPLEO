@@ -145,7 +145,7 @@ VistaSolicitudes bean = (VistaSolicitudes) uvdatos.getVistas().get(VistaSolicitu
 	function renderNoIndividualizado(row) {
 		var texto = "<div>";
 		
-		if (row.valoraciones) {
+		if (row.valoraciones && row.valoraciones.length > 0) {
 			for(var i=0; i<row.valoraciones.length; i++) {
 				var valoracion = row.valoraciones[i];
 				texto += '<b title="' + valoracion.afinidad.descripcion + '">' + valoracion.valor + ' - ' + valoracion.afinidad.codigo + " " + valoracion.afinidad.modulacion + ' %</b><br/>';

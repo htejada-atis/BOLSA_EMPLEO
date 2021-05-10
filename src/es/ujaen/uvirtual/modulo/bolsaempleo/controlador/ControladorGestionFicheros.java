@@ -24,7 +24,6 @@ import es.ujaen.uvirtual.beans.CodigoDescripcion;
 import es.ujaen.uvirtual.beans.UVDatos;
 import es.ujaen.uvirtual.modulo.bolsaempleo.beans.Fichero;
 import es.ujaen.uvirtual.modulo.bolsaempleo.modelo.ModeloFichero;
-import es.ujaen.uvirtual.modulo.bolsaempleo.modelo.ModeloParametrosConfiguracion;
 import es.ujaen.uvirtual.modulo.bolsaempleo.modelo.ModeloUsuarioBolsaEmpleo;
 import es.ujaen.uvirtual.modulo.bolsaempleo.utilidades.BolsaEmpleoDataTable;
 import es.ujaen.uvirtual.modulo.bolsaempleo.utilidades.BolsaEmpleoUtils;
@@ -89,12 +88,11 @@ public class ControladorGestionFicheros extends HttpServlet {
 	// urls
 	public static final String URL_PATTERN_FILES_PRIVADA = "/srv/es/informacionadministrativa/bolsaempleo/configuracion/ficheros";
 	public static final String URL_PATTERN_AJAX = "/srv/es/ajax/informacionadministrativa/bolsaempleo/configuracion/ficheros";
-
-	public static final int RESPONSE_HTTP_CODE_ERROR = 400;
-	
-	// variables
-	public static boolean anonimo = true;
-	
+	public static final String RESPONSE_AJAX_CONTENTTYPE = "application/json";
+	public static final String RESPONSE_AJAX_ENCODING = "UTF-8";
+	public static final String RESPONSE_AJAX_ERROR = "error";
+	public static final int RESPONSE_AJAX_HTTP_CODE_ERROR = 400;
+		
 	/** Peticion GET.
 	 * @see HttpServlet#doGet(HttpServletRequest request, HttpServletResponse response)
 	 */
@@ -115,7 +113,7 @@ public class ControladorGestionFicheros extends HttpServlet {
 		}
 		
 		try {
-			anonimo = !modelo.checkUser(datos);
+			modelo.checkUser(datos);
 			switch (nombreAccion) {
 				case ACCION_BORRAR_FICHEROS:
 					eliminarFicheros(request, response);
@@ -135,6 +133,8 @@ public class ControladorGestionFicheros extends HttpServlet {
 				case ACCION_SUBIR_FICHERO:
 					agregarFichero(request, response, bean);
 					break;
+				default:
+					errorFatal(bean, "Acción no contemplada");
 			}
 		} catch (SQLException e) {
 			bean.getMensajesDeError().add("Error al acceder a la base de datos");
@@ -155,6 +155,11 @@ public class ControladorGestionFicheros extends HttpServlet {
 			datos.getFicherosCSS().add("/css/jqueryujaen/jquery-ui-1.8.16.custom.css");
 			datos.getFicherosCSS().add("/css/ujaen_bolsa_empleo.css");
 		}
+	}
+	
+	private void errorFatal(VistaFicheros bean, String mensaje) {
+		bean.setVista("/WEB-INF/jsp/vista/infadministrativa/bolsaempleo/error.jsp");
+		bean.getMensajesDeError().add(mensaje);
 	}
 	
 	/** redireccion de do post.
@@ -196,16 +201,15 @@ public class ControladorGestionFicheros extends HttpServlet {
 						
 						int i = nombre.lastIndexOf('.');
 						if (i > 0) {
-						    String extension = nombre.substring(i + 1);
-						    if (!extension.toLowerCase().equals("pdf")) {
-						    	throw new UVException("No se puede subir un fichero que sea distinto de pdf");
+							String extension = nombre.substring(i + 1);
+							if (!"pdf".equalsIgnoreCase(extension)) {
+								throw new UVException("No se puede subir un fichero que sea distinto de pdf");
 						    }
 						}
 						
 						InputStream input = uploadedFile.getInputStream();
 						String titulo = EscapaHTML.ajustaCodificacion(request.getParameter(PARAM_TITULO));
-						Boolean publico = request.getParameter(PARAM_PUBLICO) != null 
-								&& EscapaHTML.ajustaCodificacion(request.getParameter(PARAM_PUBLICO)).equals("on");
+						Boolean publico = "on".equals(EscapaHTML.ajustaCodificacion(request.getParameter(PARAM_PUBLICO)));
 						Fichero fichero = new Fichero(nombre, titulo, input, publico);
 						
 						BolsaEmpleoUtils.checkFileSize(fichero.getArchivo());
@@ -266,24 +270,23 @@ public class ControladorGestionFicheros extends HttpServlet {
 			
 			int i = fichero.getNombre().lastIndexOf('.');
 			if (i > 0) {
-			    String extension = fichero.getNombre().substring(i + 1);
-			    if (extension.toLowerCase().equals("pdf")) {
-			    	response.setContentType("application/pdf");
-			        datos.setRespuestaEnviada(true);
+				String extension = fichero.getNombre().substring(i + 1);
+				if ("pdf".equalsIgnoreCase(extension)) {
+					response.setContentType("application/pdf");
+					datos.setRespuestaEnviada(true);
 			        
-			        try (ServletOutputStream stream = response.getOutputStream();
-			             BufferedInputStream buf = new BufferedInputStream(fichero.getArchivo());) {
-			            int readBytes = 0;
-			            while ((readBytes = buf.read()) != -1) {
-			                stream.write(readBytes);
-			            }
-			            stream.flush();
+					try (ServletOutputStream stream = response.getOutputStream();
+			             BufferedInputStream buf = new BufferedInputStream(fichero.getArchivo())) {
+						int readBytes = 0;
+						while ((readBytes = buf.read()) != -1) {
+							stream.write(readBytes);
+						}
+						stream.flush();
 			        }
-			    } else {
-			    	response.sendRedirect(request.getServletPath());
+				} else {
+					response.sendRedirect(request.getServletPath());
 			    }
-			}
-			
+			}			
 		}
 	}
 	
@@ -326,10 +329,10 @@ public class ControladorGestionFicheros extends HttpServlet {
 	private void listadoFicheros(VistaFicheros bean, UVDatos datos, HttpServletRequest request, HttpServletResponse response) throws IOException, SQLException {
 		ModeloFichero modelo = ModeloFichero.obtenerInstancia();
 		
-		datos.setContentType("application/json");
+		datos.setContentType(RESPONSE_AJAX_CONTENTTYPE);
 		datos.setRespuestaEnviada(true);
-		response.setContentType("application/json");
-		response.setCharacterEncoding("UTF-8");
+		response.setContentType(RESPONSE_AJAX_CONTENTTYPE);
+		response.setCharacterEncoding(RESPONSE_AJAX_ENCODING);
 		
 		try (PrintWriter writer = response.getWriter()) {
 			try {
@@ -340,9 +343,9 @@ public class ControladorGestionFicheros extends HttpServlet {
 			} catch (Exception ex) {
 				bean.getMensajesDeError().add(ex.getMessage());
 				
-				CodigoDescripcion mensaje = new CodigoDescripcion("error", ex.getMessage());
+				CodigoDescripcion mensaje = new CodigoDescripcion(RESPONSE_AJAX_ERROR, ex.getMessage());
 				writer.write(new Gson().toJson(mensaje));
-				response.setStatus(RESPONSE_HTTP_CODE_ERROR);
+				response.setStatus(RESPONSE_AJAX_HTTP_CODE_ERROR);
 			}
 		}
 	}

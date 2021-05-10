@@ -15,8 +15,6 @@ import com.google.gson.GsonBuilder;
 import es.ujaen.uvirtual.beans.CodigoDescripcion;
 import es.ujaen.uvirtual.beans.UVDatos;
 import es.ujaen.uvirtual.modulo.bolsaempleo.beans.BolsaValidacion;
-import es.ujaen.uvirtual.modulo.bolsaempleo.beans.Convocatoria;
-import es.ujaen.uvirtual.modulo.bolsaempleo.modelo.ModeloBolsa;
 import es.ujaen.uvirtual.modulo.bolsaempleo.modelo.ModeloConvocatoria;
 import es.ujaen.uvirtual.modulo.bolsaempleo.modelo.ModeloUsuarioBolsaEmpleo;
 import es.ujaen.uvirtual.modulo.bolsaempleo.modelo.ModeloValidar;
@@ -95,6 +93,8 @@ public class ControladorValidarNoAfines extends HttpServlet {
 				case ACCION_INDEX:
 					bean.setVista(RUTA_BEP_CONF + "index.jsp");
 					break;
+				default:
+					errorFatal(bean, "Acción no contemplada");
 			}
 		} catch (SQLException e) {
 			LOGGER.log(Level.SEVERE, Formateador.getStackTrace(e));
@@ -117,6 +117,11 @@ public class ControladorValidarNoAfines extends HttpServlet {
 		}
 	}
 	
+	private void errorFatal(VistaValidarNoAfines bean, String mensaje) {
+		bean.setVista("/WEB-INF/jsp/vista/infadministrativa/bolsaempleo/error.jsp");
+		bean.getMensajesDeError().add(mensaje);
+	}
+	
 	/** redireccion de do post.
 	 * @see HttpServlet#doPost(HttpServletRequest request, HttpServletResponse response)
 	 */
@@ -125,11 +130,6 @@ public class ControladorValidarNoAfines extends HttpServlet {
 		doGet(request, response);
 	}
 		
-	private void seleccionarBolsa(VistaValidarNoAfines bean, UVDatos datos, HttpServletRequest request, HttpServletResponse response) {
-		ModeloBolsa modeloBolsa = ModeloBolsa.obtenerInstancia();
-		bean.setConvocatoria(null);
-	}
-	
 	/**
 	 * Listado de bolsas de validación datatable .
 	 * @param bean .

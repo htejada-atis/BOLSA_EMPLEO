@@ -66,7 +66,7 @@ public class ControladorMeritosPreferentes extends HttpServlet {
 	public static final String PARAM_MERITO_APLICABLE_APARTADO = "aplicableApartado";
 	public static final String PARAM_MERITO_APLICABLE_ITEM = "aplicableItem";
 	public static final String PARAM_MERITO_FACTOR = "factor";
-	public static final String PARAM_MERITO_VALORMAXIMO = "valorMaximo";
+	public static final String PARAM_MERITO_VALORMAXIMO = "valorMaximo";	
 	
 	// mensajes
 	public static final String MENSAJE_ERROR_CODIGO_VACIO = "El código no puede estar vacio";
@@ -76,6 +76,8 @@ public class ControladorMeritosPreferentes extends HttpServlet {
 	
 	// ruta vistas
 	public static final String RUTA_BEP_CONF = "/WEB-INF/jsp/vista/infadministrativa/bolsaempleo/configuracion/meritospreferentes/";
+	public static final String JSP_INDEX = RUTA_BEP_CONF + "indexMeritosPreferentes.jsp";
+	public static final String JSP_FORM = RUTA_BEP_CONF + "formMeritosPreferentes.jsp";
 	
 	public static final int RESPONSE_HTTP_CODE_ERROR = 400;
 	
@@ -101,29 +103,31 @@ public class ControladorMeritosPreferentes extends HttpServlet {
 			ModeloUsuarioBolsaEmpleo.obtenerInstancia().checkUser(datos);
 			switch (nombreAccion) {
 				case ACCION_INDEX:
-					indice(bean, request, response);
+					indice(bean);
 					break;
 				case ACCION_DATATABLE:
 					datatable(bean, datos, request, response);					
 					break;	
 				case ACCION_NUEVO_MERITO:
-					nuevoMerito(bean, datos, request, response);
+					nuevoMerito(bean);
 					break;
 				case ACCION_NUEVO_MERITO_CONFIRM:
-					nuevoMeritoConfirm(bean, datos, request, response);
+					nuevoMeritoConfirm(bean, request);
 					break;
 				case ACCION_MODIFICAR:
-					editarMerito(bean, datos, request, response);
+					editarMerito(bean, request);
 					break;
 				case ACCION_MODIFICAR_MERITO_CONFIRM:
-					editarMeritoConfirm(bean, datos, request, response);
+					editarMeritoConfirm(bean, request);
 					break;
 				case ACCION_ACTIVAR:
-					activarMerito(bean, datos, request, response);
+					activarMerito(bean, request);
 					break;
 				case ACCION_DESACTIVAR:
-					desactivarMerito(bean, datos, request, response);
+					desactivarMerito(bean, request);
 					break;
+				default:
+					errorFatal(bean, "Acción no contemplada");
 			}
 		} catch (SQLException e) {
 			LOGGER.log(Level.SEVERE, Formateador.getStackTrace(e));
@@ -146,6 +150,11 @@ public class ControladorMeritosPreferentes extends HttpServlet {
 		}
 	}
 	
+	private void errorFatal(VistaMeritosPreferentes bean, String mensaje) {
+		bean.setVista("/WEB-INF/jsp/vista/infadministrativa/bolsaempleo/error.jsp");
+		bean.getMensajesDeError().add(mensaje);
+	}
+	
 	/** Redireccion de do post.
 	 * @see HttpServlet#doPost(HttpServletRequest request, HttpServletResponse response)
 	 */
@@ -154,8 +163,8 @@ public class ControladorMeritosPreferentes extends HttpServlet {
 		doGet(request, response);
 	}
 	
-	private void indice(VistaMeritosPreferentes bean, HttpServletRequest request, HttpServletResponse response) {
-		bean.setVista(RUTA_BEP_CONF + "indexMeritosPreferentes.jsp");
+	private void indice(VistaMeritosPreferentes bean) {
+		bean.setVista(JSP_INDEX);
 	}
 	
 	private void datatable(VistaMeritosPreferentes bean, UVDatos datos, HttpServletRequest request, HttpServletResponse response) 
@@ -182,72 +191,70 @@ public class ControladorMeritosPreferentes extends HttpServlet {
 		}
 	}
 	
-	private void nuevoMerito(VistaMeritosPreferentes bean, UVDatos datos, HttpServletRequest request, HttpServletResponse response) throws SQLException, UVException {
+	private void nuevoMerito(VistaMeritosPreferentes bean) throws SQLException, UVException {
 		bean.setMeritoPreferente(null);
 		bean.setItemsBaremacion(ModeloBaremacion.obtenerInstancia().listaItemBaremacion());
 		bean.setBloqueBaremacion(ModeloBaremacion.obtenerInstancia().listaBloqueBaremacion());
 		bean.setApartadoBaremacion(ModeloBaremacion.obtenerInstancia().listaApartadoBaremacion());
-		bean.setVista(RUTA_BEP_CONF + "formMeritosPreferentes.jsp");		
+		bean.setVista(JSP_FORM);		
 	}
 	
-	private void nuevoMeritoConfirm(VistaMeritosPreferentes bean, UVDatos datos, HttpServletRequest request, HttpServletResponse response) throws SQLException, UVException {
+	private void nuevoMeritoConfirm(VistaMeritosPreferentes bean, HttpServletRequest request) throws SQLException, UVException {
 		bean.setMeritoPreferente(null);
 		bean.setItemsBaremacion(ModeloBaremacion.obtenerInstancia().listaItemBaremacion());
 		bean.setBloqueBaremacion(ModeloBaremacion.obtenerInstancia().listaBloqueBaremacion());
 		bean.setApartadoBaremacion(ModeloBaremacion.obtenerInstancia().listaApartadoBaremacion());
-		bean.setVista(RUTA_BEP_CONF + "formMeritosPreferentes.jsp");
+		bean.setVista(JSP_FORM);
 		
 		MeritoPreferente merito = new MeritoPreferente();
 		merito.setActivo(true);
 		
 		ModeloMeritosPreferentes.obtenerInstancia().crearMeritoPreferente(this.validate(merito, request));
 		bean.getMensajesDeExito().add("Mérito preferente añadido correctamente");
-		bean.setVista(RUTA_BEP_CONF + "indexMeritosPreferentes.jsp");
+		bean.setVista(JSP_INDEX);
 	}
 	
-	private void editarMerito(VistaMeritosPreferentes bean, UVDatos datos, HttpServletRequest request, HttpServletResponse response) throws SQLException, UVException {
+	private void editarMerito(VistaMeritosPreferentes bean, HttpServletRequest request) throws SQLException, UVException {
 		MeritoPreferente merito = ModeloMeritosPreferentes.obtenerInstancia().getMeritoPreferenteById(Formateador.leeParametroInteger(request.getParameter(PARAM_ID)));
 		
 		bean.setMeritoPreferente(merito);
 		bean.setItemsBaremacion(ModeloBaremacion.obtenerInstancia().listaItemBaremacion());
 		bean.setBloqueBaremacion(ModeloBaremacion.obtenerInstancia().listaBloqueBaremacion());
 		bean.setApartadoBaremacion(ModeloBaremacion.obtenerInstancia().listaApartadoBaremacion());
-		bean.setVista(RUTA_BEP_CONF + "formMeritosPreferentes.jsp");
+		bean.setVista(JSP_FORM);
 	}
 	
-	private void editarMeritoConfirm(VistaMeritosPreferentes bean, UVDatos datos, HttpServletRequest request, HttpServletResponse response) throws SQLException, UVException {
+	private void editarMeritoConfirm(VistaMeritosPreferentes bean, HttpServletRequest request) throws SQLException, UVException {
 		MeritoPreferente merito = ModeloMeritosPreferentes.obtenerInstancia().getMeritoPreferenteById(Formateador.leeParametroInteger(request.getParameter(PARAM_ID)));
 				
 		bean.setMeritoPreferente(merito);
 		bean.setItemsBaremacion(ModeloBaremacion.obtenerInstancia().listaItemBaremacion());
 		bean.setBloqueBaremacion(ModeloBaremacion.obtenerInstancia().listaBloqueBaremacion());
 		bean.setApartadoBaremacion(ModeloBaremacion.obtenerInstancia().listaApartadoBaremacion());
-		bean.setVista(RUTA_BEP_CONF + "formMeritosPreferentes.jsp");
+		bean.setVista(JSP_FORM);
 		
 		ModeloMeritosPreferentes.obtenerInstancia().editarMeritoPreferente(this.validate(merito, request));
 		bean.getMensajesDeExito().add("Mérito preferente editado correctamente");
-		bean.setVista(RUTA_BEP_CONF + "indexMeritosPreferentes.jsp");
+		bean.setVista(JSP_INDEX);
 	}
 	
 	
-	private void activarMerito(VistaMeritosPreferentes bean, UVDatos datos, HttpServletRequest request, HttpServletResponse response) throws SQLException, UVException {
+	private void activarMerito(VistaMeritosPreferentes bean, HttpServletRequest request) throws SQLException, UVException {
 		MeritoPreferente merito = ModeloMeritosPreferentes.obtenerInstancia().getMeritoPreferenteById(Formateador.leeParametroInteger(request.getParameter(PARAM_ID)));
 		
 		ModeloMeritosPreferentes.obtenerInstancia().cambiaFlagActivoMeritoPreferente(merito, "S");
 		bean.getMensajesDeExito().add("Mérito preferente activado correctamente");
-		bean.setVista(RUTA_BEP_CONF + "indexMeritosPreferentes.jsp");
+		bean.setVista(JSP_INDEX);
 	}
 	
 	
-	private void desactivarMerito(VistaMeritosPreferentes bean, UVDatos datos, HttpServletRequest request, HttpServletResponse response) throws SQLException, UVException {
+	private void desactivarMerito(VistaMeritosPreferentes bean, HttpServletRequest request) throws SQLException, UVException {
 		MeritoPreferente merito = ModeloMeritosPreferentes.obtenerInstancia().getMeritoPreferenteById(Formateador.leeParametroInteger(request.getParameter(PARAM_ID)));
 		
 		ModeloMeritosPreferentes.obtenerInstancia().cambiaFlagActivoMeritoPreferente(merito, "N");
 		bean.getMensajesDeExito().add("Mérito preferente desactivado correctamente");
-		bean.setVista(RUTA_BEP_CONF + "indexMeritosPreferentes.jsp");
+		bean.setVista(JSP_INDEX);
 	}
-	
-	
 	
 	private MeritoPreferente validate(MeritoPreferente merito, HttpServletRequest request) throws UVException, SQLException {
 		merito.setDescripcion(EscapaHTML.ajustaCodificacion(request.getParameter(PARAM_MERITO_DESCRIPCION)));

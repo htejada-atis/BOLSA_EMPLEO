@@ -8,7 +8,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import es.ujaen.uvirtual.modelo.conexion.ConexionUvirtual;
-import es.ujaen.uvirtual.modulo.bolsaempleo.beans.Area;
 import es.ujaen.uvirtual.modulo.bolsaempleo.beans.ParametrosConfiguracion;
 import es.ujaen.uvirtual.utilidades.UVException;
 
@@ -21,9 +20,9 @@ public class ModeloParametrosConfiguracion {
 	
 	public static final int COLUMN_DESCRIPCION_MAXLENGTH = 250;
 	
-	public static final int MAX_FILE_SIZE = 5000000;
+	public static final int MAX_FILE_SIZE = 5_000_000;
 	
-    protected static ModeloParametrosConfiguracion eInstancia = null;
+	protected static ModeloParametrosConfiguracion eInstancia = null;
 	
 	/** Crea una instancia del objeto.
 	 *  de forma sincronizada para protegerse de posibles problemas multi-hilo
@@ -38,11 +37,11 @@ public class ModeloParametrosConfiguracion {
      * Obtiene una instancia de la conexión.
      * @return instancia
      */
-    public static ModeloParametrosConfiguracion obtenerInstancia() {
-        if (eInstancia == null) {
-        	crearInstancia();
+	public static ModeloParametrosConfiguracion obtenerInstancia() {
+		if (eInstancia == null) {
+			crearInstancia();
         }
-        return eInstancia;
+		return eInstancia;
     }
 	
 	/** Consulta los parametros en BBDD y los devuelve.
@@ -54,19 +53,18 @@ public class ModeloParametrosConfiguracion {
 		String consulta = "SELECT * FROM ADM_PARAMETROS "
 				+ "WHERE PARAM_CODALF LIKE '%bolsaempleo%'";
 		
-		try (Connection conexion = ConexionUvirtual.obtenerInstancia();
-			PreparedStatement stmt = conexion.prepareStatement(consulta);) {
-				try (ResultSet rs = stmt.executeQuery()) {
-					while (rs.next()) {
-						ParametrosConfiguracion param = new ParametrosConfiguracion();
-						param.setCodNum(rs.getString("CONFIG_CODALF"));
-						param.setNombre(rs.getString("PARAM_CODALF"));
-						param.setValor(rs.getString("VALOR"));
-						param.setDescripcion(rs.getString("DESID"));
-						parametros.add(param);	
-					}
+		try (Connection conexion = ConexionUvirtual.obtenerInstancia(); PreparedStatement stmt = conexion.prepareStatement(consulta)) {
+			try (ResultSet rs = stmt.executeQuery()) {
+				while (rs.next()) {
+					ParametrosConfiguracion param = new ParametrosConfiguracion();
+					param.setCodNum(rs.getString("CONFIG_CODALF"));
+					param.setNombre(rs.getString("PARAM_CODALF"));
+					param.setValor(rs.getString("VALOR"));
+					param.setDescripcion(rs.getString("DESID"));
+					parametros.add(param);	
 				}
 			}
+		}
 		
 		return parametros;
 	}
@@ -116,7 +114,7 @@ public class ModeloParametrosConfiguracion {
 			+ " WHERE PARAM_CODALF=?";
 		
 		try (Connection conexion = ConexionUvirtual.obtenerInstancia();
-				PreparedStatement stmt = conexion.prepareStatement(consulta);) {
+				PreparedStatement stmt = conexion.prepareStatement(consulta)) {
 			stmt.setString(1, nombre);
 						
 			try (ResultSet rs = stmt.executeQuery()) {

@@ -117,17 +117,19 @@ public class ControladorUsuarioBolsaEmpleo extends HttpServlet {
 	public static final String MENSAJE_ERROR_FECHA_EXCLUIDO_INICIO_REQUERIDA = "La fecha de inicio es requerida";
 	public static final String MENSAJE_ERROR_FECHA_EXCLUIDO_FIN_REQUERIDA = "La fecha de fin es requerida";
 	
-
-	public static final int RESPONSE_HTTP_CODE_ERROR = 400;
-	
+	// ajax	
 	public static final String URL_PATTERN_AJAX = "/srv/es/ajax/informacionadministrativa/bolsaempleo/configuracion/usuarios";
-	
+	public static final String RESPONSE_AJAX_CONTENTTYPE = "application/json";
+	public static final String RESPONSE_AJAX_ENCODING = "UTF-8";
+	public static final String RESPONSE_AJAX_ERROR = "error";
+	public static final int RESPONSE_AJAX_HTTP_CODE_ERROR = 400;
+
 	// ruta vistas
 	public static final String RUTA_BEP_CONF = "/WEB-INF/jsp/vista/infadministrativa/bolsaempleo/configuracion/usuarios/";
-	
-	// variables
-	public static boolean anonimo = true;
-	
+	public static final String JSP_USUARIOS = RUTA_BEP_CONF + "usuarios.jsp";
+	public static final String JSP_BUSCAR_USUARIO = RUTA_BEP_CONF + "buscarUsuario.jsp";
+	public static final String JSP_FORM_USUARIO = RUTA_BEP_CONF + "formUsuario.jsp";
+		
 	/** Peticion GET.
 	 * @see HttpServlet#doGet(HttpServletRequest request, HttpServletResponse response)
 	 */
@@ -148,51 +150,52 @@ public class ControladorUsuarioBolsaEmpleo extends HttpServlet {
 			nombreAccion = PARAM_ACCION;
 		}
 		
-		bean.setVista(RUTA_BEP_CONF + "usuarios.jsp");
+		bean.setVista(JSP_USUARIOS);
 		
 		try {
-			anonimo = !modelo.checkUser(datos);
+			modelo.checkUser(datos);
 			switch (nombreAccion) {
-			case ACCION_FORMULARIO_USUARIO:
-				formularioUsuario(request, response, bean);
-				break;
-			case ACCION_BUSCAR_USUARIO:
-				buscarUsuario(request, response, bean);
-				break;
-			case ACCION_DATATABLE_USUARIOS:
-				listado(bean, datos, request, response);
-				break;
-			case ACCION_DATATABLE_USUARIOS_BORRADOS:
-				listadoBorrados(bean, datos, request, response);
-				break;
-			case ACCION_DATATABLE_USUARIOS_EXCLUIDOS:
-				listadoExcluidos(bean, datos, request, response);
-				break;
-			case ACCION_DATATABLE_USUARIOS_EXCLUIDOS_AREA:
-				listadoExcluidosArea(bean, datos, request, response);
-				break;
-			case ACCION_LISTAR_ROLES:
-				obtenerRoles(bean);
-				break;
-			case ACCION_AGREGAR_USUARIO:
-				agregarUsuario(request, response, bean);
-				break;
-			case ACCION_EDITAR_USUARIO:
-				editarUsuario(request, response, bean);
-				break;
-			case ACCION_INCLUIR_USUARIO:
-				incluirUsuario(request, response, bean);
-				break;
-			case ACCION_EXCLUIR_USUARIO:
-				excluirUsuario(request, response, bean);
-				break;
-			case ACCION_USUARIO:
-				accionSobreUsuario(request, response, bean);						
-				break;
-			case ACCION_VOLVER_USUARIO:
-				volverUsuario(request, response, bean);
-				break;
-				
+				case ACCION_FORMULARIO_USUARIO:
+					formularioUsuario(bean);
+					break;
+				case ACCION_BUSCAR_USUARIO:
+					buscarUsuario(request, bean);
+					break;
+				case ACCION_DATATABLE_USUARIOS:
+					listado(bean, datos, request, response);
+					break;
+				case ACCION_DATATABLE_USUARIOS_BORRADOS:
+					listadoBorrados(bean, datos, request, response);
+					break;
+				case ACCION_DATATABLE_USUARIOS_EXCLUIDOS:
+					listadoExcluidos(bean, datos, request, response);
+					break;
+				case ACCION_DATATABLE_USUARIOS_EXCLUIDOS_AREA:
+					listadoExcluidosArea(bean, datos, request, response);
+					break;
+				case ACCION_LISTAR_ROLES:
+					obtenerRoles(bean);
+					break;
+				case ACCION_AGREGAR_USUARIO:
+					agregarUsuario(request, response, bean);
+					break;
+				case ACCION_EDITAR_USUARIO:
+					editarUsuario(request, response, bean);
+					break;
+				case ACCION_INCLUIR_USUARIO:
+					incluirUsuario(request, response, bean);
+					break;
+				case ACCION_EXCLUIR_USUARIO:
+					excluirUsuario(request, response, bean);
+					break;
+				case ACCION_USUARIO:
+					accionSobreUsuario(request, bean);						
+					break;
+				case ACCION_VOLVER_USUARIO:
+					volverUsuario(bean);
+					break;
+				default:
+					errorFatal(bean, "Acción no contemplada");
 			}
 		} catch (SQLException e) {
 			LOGGER.log(Level.SEVERE, Formateador.getStackTrace(e));
@@ -222,6 +225,11 @@ public class ControladorUsuarioBolsaEmpleo extends HttpServlet {
 	public void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 		doGet(request, response);
 	}
+	
+	private void errorFatal(VistaUsuarioBolsaEmpleo bean, String mensaje) {
+		bean.setVista("/WEB-INF/jsp/vista/infadministrativa/bolsaempleo/error.jsp");
+		bean.getMensajesDeError().add(mensaje);
+	}
 		
 	/**
 	 * AJAX para devolver listado de usuarios.
@@ -234,10 +242,10 @@ public class ControladorUsuarioBolsaEmpleo extends HttpServlet {
 	 */
 	private void listado(VistaUsuarioBolsaEmpleo bean, UVDatos datos, HttpServletRequest request, HttpServletResponse response) throws IOException {
 		ModeloUsuarioBolsaEmpleo modelo = ModeloUsuarioBolsaEmpleo.obtenerInstancia();	
-		datos.setContentType("application/json");
+		datos.setContentType(RESPONSE_AJAX_CONTENTTYPE);
 		datos.setRespuestaEnviada(true);
-		response.setContentType("application/json");
-		response.setCharacterEncoding("UTF-8");
+		response.setContentType(RESPONSE_AJAX_CONTENTTYPE);
+		response.setCharacterEncoding(RESPONSE_AJAX_ENCODING);
 		
 		try (PrintWriter writer = response.getWriter()) {
 			try {
@@ -248,30 +256,20 @@ public class ControladorUsuarioBolsaEmpleo extends HttpServlet {
 			} catch (Exception ex) {
 				bean.getMensajesDeError().add(ex.getMessage());
 				
-				CodigoDescripcion mensaje = new CodigoDescripcion("error", ex.getMessage());
+				CodigoDescripcion mensaje = new CodigoDescripcion(RESPONSE_AJAX_ERROR, ex.getMessage());
 				writer.write(new Gson().toJson(mensaje));
-				response.setStatus(RESPONSE_HTTP_CODE_ERROR);
+				response.setStatus(RESPONSE_AJAX_HTTP_CODE_ERROR);
 			}
 		}
 	}
 	
-	/**
-	 * AJAX para devolver listado de areas excluidas de un usuario.
-	 * @param bean .
-	 * @param datos .
-	 * @param request .
-	 * @param response .
-	 * @throws UVException .
-	 * @throws SQLException .
-	 * @throws IOException .
-	 */
-	public void listadoExcluidosArea(VistaUsuarioBolsaEmpleo bean, 
-			UVDatos datos, HttpServletRequest request, HttpServletResponse response) throws IOException, SQLException, UVException {
+	private void listadoExcluidosArea(VistaUsuarioBolsaEmpleo bean, UVDatos datos, HttpServletRequest request, HttpServletResponse response) 
+			throws IOException, SQLException, UVException {
 		ModeloUsuarioBolsaEmpleo modelo = ModeloUsuarioBolsaEmpleo.obtenerInstancia();
-		datos.setContentType("application/json");
+		datos.setContentType(RESPONSE_AJAX_CONTENTTYPE);
 		datos.setRespuestaEnviada(true);
-		response.setContentType("application/json");
-		response.setCharacterEncoding("UTF-8");
+		response.setContentType(RESPONSE_AJAX_CONTENTTYPE);
+		response.setCharacterEncoding(RESPONSE_AJAX_ENCODING);
 		Integer codNum = Formateador.leeParametroInteger(request.getParameter(PARAM_ID));
 		
 		try (PrintWriter writer = response.getWriter()) {
@@ -283,16 +281,14 @@ public class ControladorUsuarioBolsaEmpleo extends HttpServlet {
 			} catch (Exception ex) {
 				bean.getMensajesDeError().add(ex.getMessage());
 				
-				CodigoDescripcion mensaje = new CodigoDescripcion("error", ex.getMessage());
+				CodigoDescripcion mensaje = new CodigoDescripcion(RESPONSE_AJAX_ERROR, ex.getMessage());
 				writer.write(new Gson().toJson(mensaje));
-				response.setStatus(RESPONSE_HTTP_CODE_ERROR);
+				response.setStatus(RESPONSE_AJAX_HTTP_CODE_ERROR);
 			}
 		}
 	}
 	
-	
-	
-	private void accionSobreUsuario(HttpServletRequest request, HttpServletResponse response, VistaUsuarioBolsaEmpleo bean) throws SQLException, UVException, IOException {
+	private void accionSobreUsuario(HttpServletRequest request, VistaUsuarioBolsaEmpleo bean) throws SQLException, UVException {
 		String selectedJson = EscapaHTML.ajustaCodificacion(request.getParameter(PARAM_USUARIOS_SELECCIONADOS));
 		String nombreAccionUsuario = EscapaHTML.ajustaCodificacion(request.getParameter(PARAM_ACCION_USUARIO));
 		Integer codNum = Formateador.leeParametroInteger(request.getParameter(PARAM_ID));
@@ -305,38 +301,38 @@ public class ControladorUsuarioBolsaEmpleo extends HttpServlet {
 		List<Area> areas = modeloArea.getAreasByIds(selected);
 
 		switch (nombreAccionUsuario) {
-		case ACCION_ELIMINAR_USUARIO:
-			modelo.ponerUsuarioComoBorrado(usuarios);							
-			break;
-		case ACCION_RECUPERAR_USUARIO:
-			modelo.ponerUsuarioComoNoBorrado(usuarios);
-			break;
-		case ACCION_EXCLUIR_USUARIO_AREA:
-			UsuarioBolsaEmpleo usu = modelo.getUsuarioById(codNum);
-			Usuario usuArcos = CrearUsuario.usuario(usu.getCodCuenta());
-			modelo.excluirUsuarioArea(usu, areas);
-			
-			bean.setUsuarioArcos(usuArcos);
-			
-			bean.setBusqueda(false);
-			
-			bean.setUsuario(usu);
-			bean.setVista(RUTA_BEP_CONF + "formUsuario.jsp");
-			break;
-		case ACCION_INCLUIR_USUARIO_AREA:
-			UsuarioBolsaEmpleo usuCont = modelo.getUsuarioById(codNum);
-			Usuario usuArcosCont = CrearUsuario.usuario(usuCont.getCodCuenta());
-			modelo.incluirUsuarioArea(usuCont, areas);
-
-			bean.setUsuarioArcos(usuArcosCont);
-			bean.setBusqueda(false);
-			
-			bean.setUsuario(usuCont);
-			bean.setVista(RUTA_BEP_CONF + "formUsuario.jsp");
-			break;
-		default:
-			bean.getMensajesDeError().add(MENSAJE_ERROR_ACCION_USUARIO_NO_VALIDA);
-			return;
+			case ACCION_ELIMINAR_USUARIO:
+				modelo.ponerUsuarioComoBorrado(usuarios);
+				break;
+			case ACCION_RECUPERAR_USUARIO:
+				modelo.ponerUsuarioComoNoBorrado(usuarios);
+				break;
+			case ACCION_EXCLUIR_USUARIO_AREA:
+				UsuarioBolsaEmpleo usu = modelo.getUsuarioById(codNum);
+				Usuario usuArcos = CrearUsuario.usuario(usu.getCodCuenta());
+				modelo.excluirUsuarioArea(usu, areas);
+				
+				bean.setUsuarioArcos(usuArcos);
+				
+				bean.setBusqueda(false);
+				
+				bean.setUsuario(usu);
+				bean.setVista(JSP_FORM_USUARIO);
+				break;
+			case ACCION_INCLUIR_USUARIO_AREA:
+				UsuarioBolsaEmpleo usuCont = modelo.getUsuarioById(codNum);
+				Usuario usuArcosCont = CrearUsuario.usuario(usuCont.getCodCuenta());
+				modelo.incluirUsuarioArea(usuCont, areas);
+	
+				bean.setUsuarioArcos(usuArcosCont);
+				bean.setBusqueda(false);
+				
+				bean.setUsuario(usuCont);
+				bean.setVista(JSP_FORM_USUARIO);
+				break;
+			default:
+				bean.getMensajesDeError().add(MENSAJE_ERROR_ACCION_USUARIO_NO_VALIDA);
+				return;
 		}
 
 		bean.getMensajesDeExito().add(MENSAJE_EXITO_USUARIO_MODIFICADO_CORRECTAMENTE);
@@ -347,12 +343,11 @@ public class ControladorUsuarioBolsaEmpleo extends HttpServlet {
 	
 	/** Busca un usuario.
 	 * @param request .
-	 * @param response .
 	 * @param bean bean de la vista a la que poner los valores.
 	 * @throws SQLException excepcion de bbdd.
 	 * @throws UVException en caso de error en bd
 	 */
-	private void buscarUsuario(HttpServletRequest request, HttpServletResponse response, VistaUsuarioBolsaEmpleo bean) throws SQLException, UVException {
+	private void buscarUsuario(HttpServletRequest request, VistaUsuarioBolsaEmpleo bean) throws SQLException, UVException {
 		ModeloUsuarioBolsaEmpleo modelo = ModeloUsuarioBolsaEmpleo.obtenerInstancia();
 		
 		obtenerRoles(bean);
@@ -366,15 +361,15 @@ public class ControladorUsuarioBolsaEmpleo extends HttpServlet {
 			bean.setUsuario(usu);
 			bean.setRol(usu.getRol());
 			
-			bean.setVista(RUTA_BEP_CONF + "formUsuario.jsp");
+			bean.setVista(JSP_FORM_USUARIO);
 		} catch (UVException e) {
 			Usuario usuArcos = CrearUsuario.usuario(request.getParameter(PARAM_NOMBRE));
 			if (usuArcos != null) {
 				bean.setBusqueda(false);
 				bean.setUsuarioArcos(usuArcos);
-				bean.setVista(RUTA_BEP_CONF + "formUsuario.jsp");
+				bean.setVista(JSP_FORM_USUARIO);
 			} else {
-				bean.setVista(RUTA_BEP_CONF + "buscarUsuario.jsp");
+				bean.setVista(JSP_BUSCAR_USUARIO);
 				throw new UVException("No existe el usuario");
 			}
 		}
@@ -390,7 +385,7 @@ public class ControladorUsuarioBolsaEmpleo extends HttpServlet {
 	 * @throws UVException en caso de error en bd
 	 */
 	public void agregarUsuario(HttpServletRequest request, HttpServletResponse response, VistaUsuarioBolsaEmpleo bean) throws SQLException, UVException, IOException {
-		bean.setVista(RUTA_BEP_CONF + "usuarios.jsp");
+		bean.setVista(JSP_USUARIOS);
 		
 		ModeloUsuarioBolsaEmpleo modelo = ModeloUsuarioBolsaEmpleo.obtenerInstancia();
 		
@@ -404,8 +399,8 @@ public class ControladorUsuarioBolsaEmpleo extends HttpServlet {
 				}
 			}
 		} else {
-			Boolean listadist = request.getParameter(PARAM_LISTA) != null && EscapaHTML.ajustaCodificacion(request.getParameter(PARAM_LISTA)).equals("true");
-			Boolean excluido = request.getParameter(PARAM_EXCLUIDO) != null && EscapaHTML.ajustaCodificacion(request.getParameter(PARAM_EXCLUIDO)).equals("true");
+			boolean listadist = "true".equals(EscapaHTML.ajustaCodificacion(request.getParameter(PARAM_LISTA))); 					
+			boolean excluido = "true".equals(EscapaHTML.ajustaCodificacion(request.getParameter(PARAM_EXCLUIDO)));
 			
 			String excluidoTipo = null;		
 			if (request.getParameter(PARAM_EXCLUIDO) != null) {
@@ -447,8 +442,9 @@ public class ControladorUsuarioBolsaEmpleo extends HttpServlet {
 	 * @throws UVException en caso de error en bd
 	 * @throws IOException en caso de error de IO.
 	 */
-	private void editarUsuario(HttpServletRequest request, HttpServletResponse response, VistaUsuarioBolsaEmpleo bean) throws SQLException, UVException, IOException {
-		bean.setVista(RUTA_BEP_CONF + "formUsuario.jsp");
+	private void editarUsuario(HttpServletRequest request, HttpServletResponse response, VistaUsuarioBolsaEmpleo bean) 
+			throws SQLException, UVException, IOException {
+		bean.setVista(JSP_FORM_USUARIO);
 		
 		ModeloUsuarioBolsaEmpleo modelo = ModeloUsuarioBolsaEmpleo.obtenerInstancia();
 		
@@ -474,10 +470,8 @@ public class ControladorUsuarioBolsaEmpleo extends HttpServlet {
 				}
 			} else {
 				Integer codNum = Formateador.leeParametroInteger(request.getParameter(PARAM_ID));
-				Boolean listadist = request.getParameter(PARAM_LISTA) != null && EscapaHTML.ajustaCodificacion(request.getParameter(PARAM_LISTA)).equals("true");
-				
-				Boolean excluido = 
-						request.getParameter(PARAM_EXCLUIDO) != null && EscapaHTML.ajustaCodificacion(request.getParameter(PARAM_EXCLUIDO)).equals("true");
+				boolean listadist = "true".equals(EscapaHTML.ajustaCodificacion(request.getParameter(PARAM_LISTA)));				
+				boolean excluido = "true".equals(EscapaHTML.ajustaCodificacion(request.getParameter(PARAM_EXCLUIDO)));
 						
 				String excluidoTipo = null;		
 				if (request.getParameter(PARAM_EXCLUIDO) != null) {
@@ -536,7 +530,7 @@ public class ControladorUsuarioBolsaEmpleo extends HttpServlet {
 	 * @throws IOException en caso de error de IO.
 	 */
 	private void excluirUsuario(HttpServletRequest request, HttpServletResponse response, VistaUsuarioBolsaEmpleo bean) throws SQLException, UVException, IOException {
-		bean.setVista(RUTA_BEP_CONF + "buscarUsuario.jsp");
+		bean.setVista(JSP_BUSCAR_USUARIO);
 		
 		ModeloUsuarioBolsaEmpleo modelo = ModeloUsuarioBolsaEmpleo.obtenerInstancia();
 		
@@ -587,14 +581,12 @@ public class ControladorUsuarioBolsaEmpleo extends HttpServlet {
 	}
 	
 	/** dirige al formulario de busqueda de un usuario.
-	 * @param request .
-	 * @param response .
 	 * @param bean bean de la vista a la que poner los valores.
 	 * @throws SQLException excepcion de bbdd.
 	 * @throws UVException en caso de error en bd
 	 */
-	private void formularioUsuario(HttpServletRequest request, HttpServletResponse response, VistaUsuarioBolsaEmpleo bean) {
-		bean.setVista(RUTA_BEP_CONF + "buscarUsuario.jsp");
+	private void formularioUsuario(VistaUsuarioBolsaEmpleo bean) {
+		bean.setVista(JSP_BUSCAR_USUARIO);
 		bean.setBusqueda(false);
 	}
 	
@@ -610,14 +602,10 @@ public class ControladorUsuarioBolsaEmpleo extends HttpServlet {
 	}
 	
 	/** dirige a la vista de usuarios .
-	 * @param request .
-	 * @param response .
 	 * @param bean bean de la vista a la que poner los valores.
-	 * @throws SQLException excepcion de bbdd.
-	 * @throws UVException en caso de error en bd
 	 */
-	private void volverUsuario(HttpServletRequest request, HttpServletResponse response, VistaUsuarioBolsaEmpleo bean) throws SQLException, UVException, IOException {
-		bean.setVista(RUTA_BEP_CONF + "usuarios.jsp");
+	private void volverUsuario(VistaUsuarioBolsaEmpleo bean) {
+		bean.setVista(JSP_USUARIOS);
 	}
 	
 	
@@ -643,7 +631,7 @@ public class ControladorUsuarioBolsaEmpleo extends HttpServlet {
 			validator.addRule(PARAM_EXCLUIDO_TIPO, "required", MENSAJE_ERROR_EXCLUIDO_TIPO_VACIO);
 			validator.addRule(PARAM_EXCLUIDO_TIPO, "noBlank", MENSAJE_ERROR_EXCLUIDO_TIPO_VACIO);
 			
-			if (request.getParameter(PARAM_EXCLUIDO_TIPO).equals("T")) {
+			if ("T".equals(request.getParameter(PARAM_EXCLUIDO_TIPO))) {
 				validator.addParamDate(PARAM_FECHA_EXCLUIDO_INICIO);
 				validator.addRule(PARAM_FECHA_EXCLUIDO_INICIO, "required", MENSAJE_ERROR_FECHA_EXCLUIDO_INICIO_REQUERIDA);
 				
@@ -682,7 +670,7 @@ public class ControladorUsuarioBolsaEmpleo extends HttpServlet {
 			validator.addRule(PARAM_EXCLUIDO_TIPO, "required", MENSAJE_ERROR_EXCLUIDO_TIPO_VACIO);
 			validator.addRule(PARAM_EXCLUIDO_TIPO, "noBlank", MENSAJE_ERROR_EXCLUIDO_TIPO_VACIO);
 			
-			if (request.getParameter(PARAM_EXCLUIDO_TIPO).equals("T")) {
+			if ("T".equals(request.getParameter(PARAM_EXCLUIDO_TIPO))) {
 				validator.addParamDate(PARAM_FECHA_EXCLUIDO_INICIO);
 				validator.addRule(PARAM_FECHA_EXCLUIDO_INICIO, "required", MENSAJE_ERROR_FECHA_EXCLUIDO_INICIO_REQUERIDA);
 				
@@ -702,12 +690,12 @@ public class ControladorUsuarioBolsaEmpleo extends HttpServlet {
 	 * @param response .
 	 * @throws IOException .
 	 */
-	public void listadoBorrados(VistaUsuarioBolsaEmpleo bean, UVDatos datos, HttpServletRequest request, HttpServletResponse response) throws IOException {
+	private void listadoBorrados(VistaUsuarioBolsaEmpleo bean, UVDatos datos, HttpServletRequest request, HttpServletResponse response) throws IOException {
 		ModeloUsuarioBolsaEmpleo modelo = ModeloUsuarioBolsaEmpleo.obtenerInstancia();	
-		datos.setContentType("application/json");
+		datos.setContentType(RESPONSE_AJAX_CONTENTTYPE);
 		datos.setRespuestaEnviada(true);
-		response.setContentType("application/json");
-		response.setCharacterEncoding("UTF-8");
+		response.setContentType(RESPONSE_AJAX_CONTENTTYPE);
+		response.setCharacterEncoding(RESPONSE_AJAX_ENCODING);
 		
 		try (PrintWriter writer = response.getWriter()) {
 			try {
@@ -718,9 +706,9 @@ public class ControladorUsuarioBolsaEmpleo extends HttpServlet {
 			} catch (Exception ex) {
 				bean.getMensajesDeError().add(ex.getMessage());
 				
-				CodigoDescripcion mensaje = new CodigoDescripcion("error", ex.getMessage());
+				CodigoDescripcion mensaje = new CodigoDescripcion(RESPONSE_AJAX_ERROR, ex.getMessage());
 				writer.write(new Gson().toJson(mensaje));
-				response.setStatus(RESPONSE_HTTP_CODE_ERROR);
+				response.setStatus(RESPONSE_AJAX_HTTP_CODE_ERROR);
 			}
 		}
 	}
@@ -732,14 +720,13 @@ public class ControladorUsuarioBolsaEmpleo extends HttpServlet {
 	 * @param request .
 	 * @param response .
 	 * @throws IOException .
-
 	 */
-	public void listadoExcluidos(VistaUsuarioBolsaEmpleo bean, UVDatos datos, HttpServletRequest request, HttpServletResponse response) throws IOException {
+	private void listadoExcluidos(VistaUsuarioBolsaEmpleo bean, UVDatos datos, HttpServletRequest request, HttpServletResponse response) throws IOException {
 		ModeloUsuarioBolsaEmpleo modelo = ModeloUsuarioBolsaEmpleo.obtenerInstancia();
-		datos.setContentType("application/json");
+		datos.setContentType(RESPONSE_AJAX_CONTENTTYPE);
 		datos.setRespuestaEnviada(true);
-		response.setContentType("application/json");
-		response.setCharacterEncoding("UTF-8");
+		response.setContentType(RESPONSE_AJAX_CONTENTTYPE);
+		response.setCharacterEncoding(RESPONSE_AJAX_ENCODING);
 		
 		try (PrintWriter writer = response.getWriter()) {
 			try {
@@ -750,9 +737,9 @@ public class ControladorUsuarioBolsaEmpleo extends HttpServlet {
 			} catch (Exception ex) {
 				bean.getMensajesDeError().add(ex.getMessage());
 				
-				CodigoDescripcion mensaje = new CodigoDescripcion("error", ex.getMessage());
+				CodigoDescripcion mensaje = new CodigoDescripcion(RESPONSE_AJAX_ERROR, ex.getMessage());
 				writer.write(new Gson().toJson(mensaje));
-				response.setStatus(RESPONSE_HTTP_CODE_ERROR);
+				response.setStatus(RESPONSE_AJAX_HTTP_CODE_ERROR);
 			}
 		}
 	}

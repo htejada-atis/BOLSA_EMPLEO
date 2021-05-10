@@ -139,6 +139,11 @@ public class ControladorInicio extends HttpServlet {
 		}
 	}
 	
+	private void errorFatal(VistaInicio bean, String mensaje) {
+		bean.setVista("/WEB-INF/jsp/vista/infadministrativa/bolsaempleo/error.jsp");
+		bean.getMensajesDeError().add(mensaje);
+	}
+	
 	/** redireccion de do post.
 	 * @see HttpServlet#doPost(HttpServletRequest request, HttpServletResponse response)
 	 */
@@ -146,12 +151,7 @@ public class ControladorInicio extends HttpServlet {
 	public void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 		doGet(request, response);
 	}
-	
-	private void errorFatal(VistaInicio bean, String mensaje) {
-		bean.setVista("/WEB-INF/jsp/vista/infadministrativa/bolsaempleo/error.jsp");
-		bean.getMensajesDeError().add(mensaje);
-	}
-	
+		
 	/** descarga un fichero .
 	 * @param bean .
 	 * @param datos .
@@ -161,31 +161,36 @@ public class ControladorInicio extends HttpServlet {
 	 * @throws UVException en caso de error de parametros .
 	 * @throws IOException en caso de error de input u output .
 	 */
-	private void descargarFichero(VistaInicio bean, UVDatos datos, HttpServletRequest request, HttpServletResponse response) throws SQLException, UVException, IOException {
+	private void descargarFichero(VistaInicio bean, UVDatos datos, HttpServletRequest request, HttpServletResponse response) throws SQLException, UVException {
 		bean.setVista(RUTA_BEP_INICIO + "documentos.jsp");
 		ModeloFichero modelo = ModeloFichero.obtenerInstancia();
+		
 		if (EscapaHTML.ajustaCodificacion(request.getParameter(PARAM_FICHERO)) != null) {
 			Fichero fichero = modelo.listaFichero(Formateador.leeParametroInteger(request.getParameter(PARAM_FICHERO)));
 			bean.setFichero(fichero);
 			
 			int i = fichero.getNombre().lastIndexOf('.');
 			if (i > 0) {
-			    String extension = fichero.getNombre().substring(i + 1);
-			    if ("pdf".equalsIgnoreCase(extension)) {
-			    	response.setContentType("application/pdf");
-			        datos.setRespuestaEnviada(true);
-			        
-			        try (ServletOutputStream stream = response.getOutputStream();
-			             BufferedInputStream buf = new BufferedInputStream(fichero.getArchivo());) {
-			            int readBytes = 0;
-			            while ((readBytes = buf.read()) != -1) {
-			                stream.write(readBytes);
-			            }
-			            stream.flush();
-			        }
-			    } else {
-			    	response.sendRedirect(request.getServletPath());
-			    }
+				try {
+					String extension = fichero.getNombre().substring(i + 1);
+					if ("pdf".equalsIgnoreCase(extension)) {
+						response.setContentType("application/pdf");
+						datos.setRespuestaEnviada(true);
+						
+						try (ServletOutputStream stream = response.getOutputStream(); 
+								BufferedInputStream buf = new BufferedInputStream(fichero.getArchivo())) {
+							int readBytes = 0;
+							while ((readBytes = buf.read()) != -1) {
+								stream.write(readBytes);
+						    }
+							stream.flush();
+						} 
+					} else {
+						response.sendRedirect(request.getServletPath());
+				    }
+				} catch (IOException ex) {
+					throw new UVException("Erro descargando fichero");
+				}
 			}
 			
 		} else {
@@ -220,7 +225,7 @@ public class ControladorInicio extends HttpServlet {
 				
 				JsonArray result = (JsonArray) gson.toJsonTree(listaNoticias, new TypeToken<List<Noticia>>() { }.getType());
 				writer.print(result);
-			} catch (Exception ex) {
+			} catch (UVException ex) {
 				bean.getMensajesDeError().add(ex.getMessage());
 				CodigoDescripcion mensaje = new CodigoDescripcion("error", ex.getMessage());
 				writer.write(new Gson().toJson(mensaje));
