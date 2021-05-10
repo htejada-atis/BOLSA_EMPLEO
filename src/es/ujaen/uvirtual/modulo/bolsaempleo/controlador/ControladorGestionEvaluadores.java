@@ -15,12 +15,18 @@ import javax.servlet.http.HttpSession;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.reflect.TypeToken;
+
+import es.ujaen.uvirtual.adm.CrearUsuario;
 import es.ujaen.uvirtual.beans.CodigoDescripcion;
 import es.ujaen.uvirtual.beans.UVDatos;
+import es.ujaen.uvirtual.beans.Usuario;
 import es.ujaen.uvirtual.modulo.bolsaempleo.beans.Area;
 import es.ujaen.uvirtual.modulo.bolsaempleo.beans.Evaluador;
+import es.ujaen.uvirtual.modulo.bolsaempleo.beans.Rol;
+import es.ujaen.uvirtual.modulo.bolsaempleo.beans.UsuarioBolsaEmpleo;
 import es.ujaen.uvirtual.modulo.bolsaempleo.modelo.ModeloArea;
 import es.ujaen.uvirtual.modulo.bolsaempleo.modelo.ModeloEvaluador;
+import es.ujaen.uvirtual.modulo.bolsaempleo.modelo.ModeloRol;
 import es.ujaen.uvirtual.modulo.bolsaempleo.modelo.ModeloUsuarioBolsaEmpleo;
 import es.ujaen.uvirtual.modulo.bolsaempleo.utilidades.BolsaEmpleoDataTable;
 import es.ujaen.uvirtual.modulo.bolsaempleo.vistas.VistaEvaluadores;
@@ -60,7 +66,9 @@ public class ControladorGestionEvaluadores extends HttpServlet {
 	public static final String PARAM_ENVIAR = "enviar";
 	public static final String PARAM_USUARIO = "usuario";
 	public static final String PARAM_USUARIOS = "usuarios";
-	
+	public static final String PARAM_NOMBRE_EVALUADOR = "nombreevaluador";
+	public static final Integer PARAM_ROL_COMISION_ID = 1051;
+
 	// Mensajes
 	public static final String MENSAJE_ENVIADO = "mensaje";
 	public static final String MENSAJE_ERROR_USUARIOS_SELECCIONADOS_INCORRECTOS = "Usuarios seleccionados incorrectos";
@@ -153,28 +161,60 @@ public class ControladorGestionEvaluadores extends HttpServlet {
 	 * @throws SQLException .
 	 */
 	private void agregarEvaluadores(VistaEvaluadores bean, HttpServletRequest request, HttpServletResponse response) throws SQLException, UVException, IOException {
-		bean.setVista(RUTA_BEP_CONF + "evaluadoresAgregar.jsp");
+//		bean.setVista(RUTA_BEP_CONF + "evaluadoresAgregar.jsp");
+//		
+//		ModeloArea modelo = ModeloArea.obtenerInstancia();	
+//		Integer idArea = Formateador.leeParametroInteger(request.getParameter(PARAM_AREA));
+//		Area area = modelo.getAreaById(idArea);
+//		bean.setArea(area);
+//		
+//		if (EscapaHTML.ajustaCodificacion(request.getParameter(PARAM_USUARIOS)) != null) {
+//			Gson gson = new GsonBuilder().create();
+//			
+//			try {
+//				List<String> usuarios = gson.fromJson(request.getParameter(PARAM_USUARIOS), new TypeToken<List<String>>() { }.getType());
+//				ModeloEvaluador modeloEvaluador = ModeloEvaluador.obtenerInstancia();
+//				modeloEvaluador.insertaEvaluadores(usuarios, idArea);
+//				bean.getMensajesDeExito().add(MENSAJE_EXITO_AGREGAR_EVALUADORES);
+//				HttpSession session = request.getSession(false);
+//				session.setAttribute(MENSAJE_ENVIADO, MENSAJE_EXITO_AGREGAR_EVALUADORES);
+//				session.setAttribute(PARAM_AREA, idArea);
+//				response.sendRedirect(request.getServletPath());
+//			} catch (Exception ex) {
+//				throw new UVException(MENSAJE_ERROR_USUARIOS_SELECCIONADOS_INCORRECTOS);
+//			}
+//		}
 		
-		ModeloArea modelo = ModeloArea.obtenerInstancia();	
-		Integer idArea = Formateador.leeParametroInteger(request.getParameter(PARAM_AREA));
-		Area area = modelo.getAreaById(idArea);
-		bean.setArea(area);
+		ModeloUsuarioBolsaEmpleo modelo = ModeloUsuarioBolsaEmpleo.obtenerInstancia();
+		ModeloEvaluador modeloEvaluador = ModeloEvaluador.obtenerInstancia();
 		
-		if (EscapaHTML.ajustaCodificacion(request.getParameter(PARAM_USUARIOS)) != null) {
-			Gson gson = new GsonBuilder().create();
+		try {
+			UsuarioBolsaEmpleo usu = modelo.listaUsuario(Formateador.leeParametroString(request.getParameter(PARAM_NOMBRE_EVALUADOR)));
+			Integer idArea = Formateador.leeParametroInteger(request.getParameter(PARAM_AREA));
+			
+			modeloEvaluador.insertaEvaluador(usu, idArea);
+		} catch (UVException e) {
 			
 			try {
-				List<String> usuarios = gson.fromJson(request.getParameter(PARAM_USUARIOS), new TypeToken<List<String>>() { }.getType());
-				ModeloEvaluador modeloEvaluador = ModeloEvaluador.obtenerInstancia();
-				modeloEvaluador.insertaEvaluadores(usuarios, idArea);
-				bean.getMensajesDeExito().add(MENSAJE_EXITO_AGREGAR_EVALUADORES);
-				HttpSession session = request.getSession(false);
-				session.setAttribute(MENSAJE_ENVIADO, MENSAJE_EXITO_AGREGAR_EVALUADORES);
-				session.setAttribute(PARAM_AREA, idArea);
-				response.sendRedirect(request.getServletPath());
-			} catch (Exception ex) {
-				throw new UVException(MENSAJE_ERROR_USUARIOS_SELECCIONADOS_INCORRECTOS);
+				Usuario usuArcos = CrearUsuario.usuario(request.getParameter(PARAM_NOMBRE_EVALUADOR));
+				
+				Rol role = ModeloRol.obtenerInstancia().getRoleById(PARAM_ROL_COMISION_ID);
+				UsuarioBolsaEmpleo usuarioFinal = 
+						new UsuarioBolsaEmpleo(usuArcos.getCodigoPersonaArcos(), usuArcos.getUid(), role, true, false, null, null, null);
+						
+				modelo.insertaUsuario(usuarioFinal);
+					
+				CrearUsuario.refrescarUsuario(usuarioFinal.getCodCuenta());
+				
+				UsuarioBolsaEmpleo usu = modelo.listaUsuario(Formateador.leeParametroString(usuarioFinal.getCodCuenta()));
+				Integer idArea = Formateador.leeParametroInteger(request.getParameter(PARAM_AREA));
+				
+				modeloEvaluador.insertaEvaluador(usu, idArea);
+			} catch (UVException ex) {
+				throw new UVException("No existe el evaluador en el sistema, primero debe crearlo");
 			}
+			
+			bean.setVista(RUTA_BEP_CONF + "evaluadoresListar.jsp");
 		}
 	}
 	

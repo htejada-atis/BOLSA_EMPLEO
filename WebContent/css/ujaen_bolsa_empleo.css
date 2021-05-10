@@ -524,6 +524,12 @@ nav-bolsa-empleo a:active, nav-bolsa-empleo a:hover {
     grid-gap: 20px;
 }
 
+.form-group-container-offset {
+    display: grid;
+    grid-template-columns: 4fr 1fr;
+    grid-gap: 20px;
+}
+
 .form-group-container.col1 {
 	grid-template-columns: 1fr;
 }
