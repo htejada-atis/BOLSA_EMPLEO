@@ -71,7 +71,7 @@ pipeline {
 	        post {
 	        	always {
 		        	jacoco(
-					    execPattern: '**/builds/build/rama/site/jacoco.exec',
+					    execPattern: '**/builds/build/rama/jacoco.exec',
     					classPattern: '**/builds/build/rama/**',
     					sourcePattern: '**/src/**',
     					inclusionPattern: '**/*.class'
