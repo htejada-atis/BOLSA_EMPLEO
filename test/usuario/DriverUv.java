@@ -23,7 +23,7 @@ public class DriverUv {
 	public static void inicializaDriver() {
 		System.setProperty("webdriver.gecko.driver", "Documentos/selenium/drivers/geckodriver");
 		FirefoxOptions firefoxOptions = new FirefoxOptions();
-		firefoxOptions.addArguments("--display=0");
+		firefoxOptions.addArguments("--display=99");
 		driver = new FirefoxDriver(firefoxOptions);
 		driver.manage().timeouts().pageLoadTimeout(TIEMPO_MAXIMO_ESPERA, TimeUnit.SECONDS);
 	}
