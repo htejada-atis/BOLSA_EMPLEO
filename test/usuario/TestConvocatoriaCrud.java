@@ -52,10 +52,10 @@ public class TestConvocatoriaCrud {
 	 */
 	@Before
 	public void navegaOpcion() {
-		DriverUv.getDriver().get("http://localhost:8080/srv/es/index");
-		DriverUv.getDriver().get("http://localhost:8080/srv/es/informacionadministrativa");
-		DriverUv.getDriver().get("http://localhost:8080/srv/es/informacionadministrativa/docentia");
-		DriverUv.getDriver().get("http://localhost:8080/srv/es/informacionadministrativa/docentia/convocatoriacrud");
+		DriverUv.getDriver().get(DriverUv.RUTA + "/srv/es/index");
+		DriverUv.getDriver().get(DriverUv.RUTA + "/srv/es/informacionadministrativa");
+		DriverUv.getDriver().get(DriverUv.RUTA + "/srv/es/informacionadministrativa/docentia");
+		DriverUv.getDriver().get(DriverUv.RUTA + "/srv/es/informacionadministrativa/docentia/convocatoriacrud");
 	}
 	
 	/** Inserta una convocatoria.

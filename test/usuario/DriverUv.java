@@ -23,7 +23,10 @@ public class DriverUv {
 	private static final int TIEMPO_MAXIMO_ESPERA = 10;
 	private static int contador = 1;
 	
+	public static final String RUTA = "http://localhost:8888";
+	
 	private DriverUv() { }
+	
 	
 	/** inicializa el driver. */
 	public static void inicializaDriver() {
@@ -36,7 +39,7 @@ public class DriverUv {
 	
 	/** realiza el login del usuario. */
 	public static void login() {
-		driver.get("http://localhost:8888/srv/es/index");
+		driver.get(RUTA + "/srv/es/index");
 		capturaPantalla("index");
 		WebElement username = driver.findElement(By.name("usuario"));
 		username.sendKeys("usig");
