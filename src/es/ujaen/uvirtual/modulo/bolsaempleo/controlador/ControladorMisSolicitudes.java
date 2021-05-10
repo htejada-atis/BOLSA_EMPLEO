@@ -11,7 +11,9 @@ import java.sql.SQLException;
 import java.util.logging.Logger;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.logging.Level;
 import javax.servlet.ServletException;
 import javax.servlet.ServletOutputStream;
@@ -45,6 +47,7 @@ import es.ujaen.uvirtual.modulo.bolsaempleo.modelo.ModeloSolicitud;
 import es.ujaen.uvirtual.modulo.bolsaempleo.modelo.ModeloTitulacion;
 import es.ujaen.uvirtual.modulo.bolsaempleo.modelo.ModeloUsuarioBolsaEmpleo;
 import es.ujaen.uvirtual.modulo.bolsaempleo.utilidades.BolsaEmpleoDataTable;
+import es.ujaen.uvirtual.modulo.bolsaempleo.utilidades.BolsaEmpleoUtils;
 import es.ujaen.uvirtual.modulo.bolsaempleo.vistas.VistaSolicitudes;
 import es.ujaen.uvirtual.utilidades.EscapaHTML;
 import es.ujaen.uvirtual.utilidades.Formateador;
@@ -84,6 +87,7 @@ public class ControladorMisSolicitudes extends HttpServlet {
 	public static final String PARAM_SOLICITUD_ID = "idSolicitud";
 	public static final String PARAM_AFINIDAD_ID = "idAfinidad";
 	public static final String PARAM_MERITO_SOLICITUD_ID = "idMeritoSolicitud";
+	public static final String PARAM_AFINIDADES = "afinidades";
 	
 	// acciones solicitudes
 	public static final String ACCION_CONSULTAR_SOLICITUD = "consultarSolicitud";
@@ -102,7 +106,8 @@ public class ControladorMisSolicitudes extends HttpServlet {
 	public static final String ACCION_LISTAR_BOLSAS_SOLICITUD = "listarbolsassolicitud";
 	public static final String ACCION_MERITO_DESELECCIONADO = "meritodeseleccionado";
 	public static final String ACCION_MERITO_SELECCIONADO = "meritoseleccionado";
-	public static final String ACCION_MERITO_AFINIDAD = "afinidadseleccionada";
+	public static final String ACCION_MERITO_AFINIDAD_INDIVIDUALIZADO = "afinidadseleccionadaindividualizado";
+	public static final String ACCION_MERITO_AFINIDAD_NOINDIVIDUALIZADO = "afinidadseleccionadanoindividualizado";
 	
 	// acciones paso 3: Confirmar Solicitud
 	public static final String ACCION_CONFIRMAR_SOLICITUD = "confirmarsolicitud";
@@ -181,7 +186,8 @@ public class ControladorMisSolicitudes extends HttpServlet {
 				case ACCION_LISTAR_BOLSAS_SOLICITUD:
 				case ACCION_MERITO_DESELECCIONADO:
 				case ACCION_MERITO_SELECCIONADO:
-				case ACCION_MERITO_AFINIDAD:
+				case ACCION_MERITO_AFINIDAD_INDIVIDUALIZADO:
+				case ACCION_MERITO_AFINIDAD_NOINDIVIDUALIZADO:
 					accionesPaso2(bean, datos, request, response, nombreAccion);
 					break;
 				case ACCION_CONFIRMAR_SOLICITUD:
@@ -475,8 +481,11 @@ public class ControladorMisSolicitudes extends HttpServlet {
 			case ACCION_MERITO_SELECCIONADO:
 				seleccionarMerito(bean, datos, request, response, true);
 				break;
-			case ACCION_MERITO_AFINIDAD:
-				seleccionarAfinidad(bean, datos, request, response);
+			case ACCION_MERITO_AFINIDAD_INDIVIDUALIZADO:
+				seleccionarAfinidadIndividualizado(bean, datos, request, response);
+				break;
+			case ACCION_MERITO_AFINIDAD_NOINDIVIDUALIZADO:
+				seleccionarAfinidadNoIndividualizado(bean, datos, request, response);
 				break;
 		}
 	}
@@ -524,11 +533,10 @@ public class ControladorMisSolicitudes extends HttpServlet {
 		ModeloMerito modeloMerito = ModeloMerito.obtenerInstancia();
 		ModeloSolicitud modeloSolicitud = ModeloSolicitud.obtenerInstancia();
 		
+		Solicitud solicitud = this.listaBolsasSolicitud(bean, request);
+		
 		Bolsa area = modeloBolsa.getBolsaById(Formateador.leeParametroInteger(request.getParameter(PARAM_BOLSA)));
 		bean.setArea(area);
-
-		Solicitud solicitud = modeloSolicitud.getSolicitudById(Formateador.leeParametroInteger(request.getParameter(PARAM_SOLICITUD_ID)));
-		bean.setSolicitud(solicitud);
 
 		Merito merito = modeloMerito.listaMerito(Formateador.leeParametroInteger(request.getParameter(PARAM_MERITO_ID)));
 		bean.setMerito(merito);
@@ -559,7 +567,7 @@ public class ControladorMisSolicitudes extends HttpServlet {
 	}
 	
 	/**
-	 * Establece la afinidad del merito dentro del area que ha seleccionado el candidato.
+	 * Establece la afinidad del merito dentro del area que ha seleccionado el candidato, del tipo individualizado.
 	 * @param bean .
 	 * @param datos .
 	 * @param request .
@@ -567,12 +575,12 @@ public class ControladorMisSolicitudes extends HttpServlet {
 	 * @throws UVException .
 	 * @throws SQLException .
 	 */
-	private void seleccionarAfinidad(VistaSolicitudes bean, UVDatos datos, HttpServletRequest request, HttpServletResponse response) throws SQLException, UVException {
+	private void seleccionarAfinidadIndividualizado(VistaSolicitudes bean, UVDatos datos, HttpServletRequest request, HttpServletResponse response) 
+			throws SQLException, UVException {
+		Solicitud solicitud = this.listaBolsasSolicitud(bean, request);
+		
 		Bolsa area = ModeloBolsa.obtenerInstancia().getBolsaById(Formateador.leeParametroInteger(request.getParameter(PARAM_BOLSA)));
 		bean.setArea(area);
-
-		Solicitud solicitud = ModeloSolicitud.obtenerInstancia().getSolicitudById(Formateador.leeParametroInteger(request.getParameter(PARAM_SOLICITUD_ID)));
-		bean.setSolicitud(solicitud);
 
 		Merito merito = ModeloMerito.obtenerInstancia().listaMerito(Formateador.leeParametroInteger(request.getParameter(PARAM_MERITO_ID)));
 		bean.setMerito(merito);
@@ -592,14 +600,73 @@ public class ControladorMisSolicitudes extends HttpServlet {
 		this.seleccionarBolsa(bean, datos, request, response);
 	}
 	
+	/**
+	 * Establece la afinidad del merito dentro del area que ha seleccionado el candidato, del tipo no individualizado.
+	 * @param bean .
+	 * @param datos .
+	 * @param request .
+	 * @param response .
+	 * @throws UVException .
+	 * @throws SQLException .
+	 */
+	private void seleccionarAfinidadNoIndividualizado(VistaSolicitudes bean, UVDatos datos, HttpServletRequest request, HttpServletResponse response) 
+			throws SQLException, UVException {
+		Solicitud solicitud = this.listaBolsasSolicitud(bean, request);
+		
+		Bolsa area = ModeloBolsa.obtenerInstancia().getBolsaById(Formateador.leeParametroInteger(request.getParameter(PARAM_BOLSA)));
+		bean.setArea(area);
+
+		Merito merito = ModeloMerito.obtenerInstancia().listaMerito(Formateador.leeParametroInteger(request.getParameter(PARAM_MERITO_ID)));
+		bean.setMerito(merito);
+		
+		if (merito == null) {
+			throw new UVException("merito no puede ser nulo");
+		}
+
+		if (solicitud == null) {
+			throw new UVException("solicitud no puede ser nula");
+		}
+		
+		// parseamos json bolsas
+		Gson gson = new GsonBuilder().create();
+		HashMap<String, Float> afinidadesRaw;
+		try {			
+			afinidadesRaw = gson.fromJson(request.getParameter(PARAM_AFINIDADES), 
+					new TypeToken<HashMap<String, Float>>() { }.getType());					
+		} catch (Exception e) {
+			throw new UVException("Afinidades incorrectas");
+		}
+		
+		// comprobamos validez de las afinidades
+		HashMap<Afinidad, Float> afinidades = new HashMap<Afinidad, Float>();
+		ModeloAfinidad modeloAfinidad = ModeloAfinidad.obtenerInstancia();
+		Float total = (float) 0.0;				
+		for (Map.Entry<String, Float> entry : afinidadesRaw.entrySet()) {
+			Afinidad a = modeloAfinidad.getAfinidadById(Formateador.leeParametroInteger(entry.getKey()));
+			afinidades.put(a, entry.getValue());
+			total += entry.getValue(); 
+		}
+		
+		Float totalRounder = (float) BolsaEmpleoUtils.redondeo(total);		
+		if (!totalRounder.equals(merito.getValor())) {
+			throw new UVException("El total de afinidades tiene que ser igual al valor del mérito");
+		}
+		
+		// asignamos afinidades al merito de la bolsa
+		ModeloSolicitud.obtenerInstancia().asignarAfinidadMeritoNoIndividualizado(solicitud, area, merito, afinidades);
+
+		this.seleccionarBolsa(bean, datos, request, response);
+	}
+	
 	/** 
 	 * Agrega la vista del paso 2 y le añade la solicitud a la vista.
 	 * @param bean .
 	 * @param request .
+	 * @return solicitud .
 	 * @throws UVException .
 	 * @throws SQLException .
 	 */
-	private void listaBolsasSolicitud(VistaSolicitudes bean, HttpServletRequest request) throws UVException, SQLException {
+	private Solicitud listaBolsasSolicitud(VistaSolicitudes bean, HttpServletRequest request) throws UVException, SQLException {
 		ModeloSolicitud modeloSolicitud = ModeloSolicitud.obtenerInstancia();
 		Solicitud solicitud = modeloSolicitud.getSolicitudById(Formateador.leeParametroInteger(request.getParameter(PARAM_SOLICITUD_ID)));
 		
@@ -607,6 +674,8 @@ public class ControladorMisSolicitudes extends HttpServlet {
 		bean.setListaAfinidades(ModeloAfinidad.obtenerInstancia().listaAfinidades());
 		bean.setListaTipoAfinidades(ModeloAfinidad.obtenerInstancia().getTiposAfinidad());
 		bean.setSolicitud(solicitud);
+		
+		return solicitud;
 	}
 	
 	/**

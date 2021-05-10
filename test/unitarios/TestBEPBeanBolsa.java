@@ -12,7 +12,6 @@ import org.junit.Test;
 
 import es.ujaen.uvirtual.modulo.bolsaempleo.beans.Area;
 import es.ujaen.uvirtual.modulo.bolsaempleo.beans.Bolsa;
-import es.ujaen.uvirtual.modulo.bolsaempleo.beans.Departamento;
 
 /** test bolsas.
  *
@@ -30,8 +29,7 @@ public class TestBEPBeanBolsa {
 	@Test
 	public void testA01() {
 		Integer id = 1;		
-		Departamento dep = new Departamento(1, "DEP1", "Fisica");
-		Area area = new Area(1, dep, "idexte", "idsec", "descripcion");
+		Area area = new Area(1, "idexte", "descripcion");
 		Bolsa bolsa = new Bolsa();
 				
 		bolsa.setCodNum(id);
@@ -58,8 +56,7 @@ public class TestBEPBeanBolsa {
 	@Test
 	public void testA02() {
 		Integer id = 1;
-		Departamento dep = new Departamento(1, "DEP1", "Fisica");
-		Area area = new Area(1, dep, "idexte", "idsec", "descripcion");
+		Area area = new Area(1, "idexte", "descripcion");
 		
 		Bolsa bolsa = new Bolsa(id, area, ESTADO, BAREAMABLE, FECHAATUALIZACION, FECHABLOQUEO, FECHADESBLOQUEO);
 		Bolsa bolsa2 = new Bolsa(bolsa);
@@ -92,8 +89,7 @@ public class TestBEPBeanBolsa {
 	@SuppressWarnings("java:S2159")
 	public void testA03() {
 		Integer id = 1;
-		Departamento dep = new Departamento(1, "DEP1", "Fisica");
-		Area area = new Area(1, dep, "idexte", "idsec", "descripcion");
+		Area area = new Area(1, "idexte", "descripcion");
 		
 		Bolsa bolsa = new Bolsa();
 		Bolsa bolsa2 = new Bolsa();

@@ -36,6 +36,7 @@ pipeline {
                             chmod a+x ${WORKSPACE}/Documentos/docker/wait-for-it.sh
                             export ORACLE_SCRIPTS_STARTUP=${WORKSPACE}/Documentos/docker/init-oracle
                             export ORACLE_DATA=/home/jenkins-nodo/oracledata
+                            export ORACLE_IMAGE=usig-registrydocker.ujaen.es:5044/uvirtual/oracle/database:18.4.0-xe
                             docker-compose build
                             docker-compose up -d
                            '''

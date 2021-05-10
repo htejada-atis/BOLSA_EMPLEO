@@ -51,6 +51,7 @@ public class TestBEPAfinidad {
 	/** Se ejecuta una vez al inicio de la clase.
 	 * @throws SQLException Si se produce error en bbdd
 	 * @throws IOException Si no se puede cargar los ficheros
+	 * @throws UVException .
 	 */
 	@BeforeClass
 	public static void setUp() throws IOException, SQLException {

@@ -96,7 +96,7 @@ public class ModeloUsuarioBolsaEmpleo {
 	 */
 	public List<UsuarioBolsaEmpleo> listaUsuarios(String clausula) throws SQLException, UVException {
 		List<UsuarioBolsaEmpleo> usuarios = new ArrayList<>();
-		String consulta = "SELECT * FROM tbep_usuarios bepusu INNER JOIN VUJA_NET_BEP_AR_PERSONA uvpersona ON uvpersona.CODINT=bepusu.CODPERSONA " + clausula;
+		String consulta = "SELECT * FROM tbep_usuarios bepusu " + clausula;
 		try (Connection conexion = ConexionUvirtual.obtenerInstancia();
 			PreparedStatement stmt = conexion.prepareStatement(consulta);) {
 				try (ResultSet rs = stmt.executeQuery()) {
@@ -238,7 +238,6 @@ public class ModeloUsuarioBolsaEmpleo {
 	public UsuarioBolsaEmpleo getUsuarioByCodCuenta(String codcuenta) throws SQLException, UVException {
 		String consulta = "SELECT * "
 				+ "FROM TBEP_USUARIOS bepusu "
-				+ "INNER JOIN VUJA_NET_BEP_AR_PERSONA uvpersona ON uvpersona.CODINT=bepusu.CODPERSONA "
 				+ "WHERE bepusu.CODCUENTA = ?";
 			
 		try (Connection conexion = ConexionUvirtual.obtenerInstancia();
@@ -250,9 +249,7 @@ public class ModeloUsuarioBolsaEmpleo {
 					throw new UVException("No existe el usuario con codcuenta = " + codcuenta);
 				}
 	
-				UsuarioBolsaEmpleo usuario = setUsuario(rs);
-				
-				return usuario;
+				return setUsuario(rs);
 			}
 		}
 	}
@@ -491,11 +488,11 @@ public class ModeloUsuarioBolsaEmpleo {
 		usuario.setCodNum(rs.getInt("CODNUM"));
 		usuario.setCodPersona(rs.getInt("CODPERSONA"));
 		usuario.setCodCuenta(rs.getString("CODCUENTA"));
-		usuario.setTipoDocumento(rs.getString("STRTIPODOCUMENTO"));
-		usuario.setNumDocumento(rs.getString("IDNIF") + rs.getString("LETRANIF"));
-		usuario.setNombre(rs.getString("STRNOMBRE"));
-		usuario.setPrimerApellido(rs.getString("STRAPELLIDO1"));
-		usuario.setSegundoApellido(rs.getString("STRAPELLIDO2"));
+		//usuario.setTipoDocumento(rs.getString("STRTIPODOCUMENTO"));
+		//usuario.setNumDocumento(rs.getString("IDNIF") + rs.getString("LETRANIF"));
+		//usuario.setNombre(rs.getString("STRNOMBRE"));
+		//usuario.setPrimerApellido(rs.getString("STRAPELLIDO1"));
+		//usuario.setSegundoApellido(rs.getString("STRAPELLIDO2"));
 		usuario.setEmail(rs.getString("EMAIL"));
 		usuario.setDireccion(rs.getString("DIRECCION"));
 		usuario.setCodigoPostal(rs.getString("CODIGOPOSTAL"));
@@ -899,37 +896,35 @@ public class ModeloUsuarioBolsaEmpleo {
 		// comprobamos si el usuario existe en uvirtual (excepción si no existe)
 		UsuarioBolsaEmpleo usuario = getUsuarioByCodCuenta(usuArcos.getUid());
 	
-		if (usuario.getExcluido()) {
+		if (Boolean.TRUE.equals(usuario.getExcluido())) {
 			throw new UVException("No puede acceder, su perfil ha sido excluido por los siguientes motivos: " + usuario.getRazonExcluido());
+		} else if (Boolean.TRUE.equals(usuario.getBorrado())) {
+			throw new UVException("No puede acceder, su perfil ha sido borrado de la base de datos");
 		} else {
-			if (usuario.getBorrado()) {
-				throw new UVException("No puede acceder, su perfil ha sido borrado de la base de datos");
-			} else {
+			try {
+				listaUsuario(usuArcos.getUid());
+			} catch (UVException e) {
+				ModeloRol modeloRol = ModeloRol.obtenerInstancia();
+				Rol role;
+				
 				try {
-					listaUsuario(usuArcos.getUid());
-				} catch (UVException e) {
-					ModeloRol modeloRol = ModeloRol.obtenerInstancia();
-					Rol role;
+					role = modeloRol.getRoleById(PARAM_ROL_CANDIDATO_ID);
 					
-					try {
-						role = modeloRol.getRoleById(PARAM_ROL_CANDIDATO_ID);
-						
-						UsuarioBolsaEmpleo usuarioFinal = 
-						new UsuarioBolsaEmpleo(usuArcos.getCodigoPersonaArcos(), usuArcos.getUid(), role, true, false, null, null, null);
-						
-						insertaUsuario(usuarioFinal);
+					UsuarioBolsaEmpleo usuarioFinal = 
+					new UsuarioBolsaEmpleo(usuArcos.getCodigoPersonaArcos(), usuArcos.getUid(), role, true, false, null, null, null);
 					
-						CrearUsuario.refrescarUsuario(usuarioFinal.getCodCuenta());
-						
-					} catch (SQLException | UVException ex) {
-						throw new UVException("Error creando usuario de bolsa de empleo");
-					}
-				} catch (SQLException e) {
-					throw new UVException("Error al buscar usuario de bolsa de empleo");
-				}	
-				return true;
-			}
-		}
+					insertaUsuario(usuarioFinal);
+				
+					CrearUsuario.refrescarUsuario(usuarioFinal.getCodCuenta());
+					
+				} catch (SQLException | UVException ex) {
+					throw new UVException("Error creando usuario de bolsa de empleo");
+				}
+			} catch (SQLException e) {
+				throw new UVException("Error al buscar usuario de bolsa de empleo");
+			}	
+			return true;
+		}		
 	}
 	
 	/** Elimina un usuario.

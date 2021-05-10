@@ -1,9 +1,8 @@
-<%@ page contentType="text/html; charset=UTF-8" %>
-<%@ page language="java" contentType="text/html; charset=UTF-8"  pageEncoding="UTF-8"%>
+<%@ page contentType="text/html; charset=utf-8" %>
+<%@ page language="java" contentType="text/html;charset=utf-8" pageEncoding="utf-8"%>
 <%@ page import="es.ujaen.uvirtual.utilidades.EscapaHTML" %>
 <%@ page import="es.ujaen.uvirtual.beans.ConfiguracionGlobal" %>
 <%@ page import="es.ujaen.uvirtual.beans.ErroresPersonalizados" %>
-
 <%
 
 String titulo = "Opción temporalmente fuera de servicio";
@@ -33,7 +32,7 @@ if (atributoError != null) {
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <html lang="es" xml:lang="es">
 <head>
-	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+	<meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
 	<meta http-equiv="pragma" content="no-cache" />
 	<meta http-equiv="cache-control" content="no-cache" />
 	<meta http-equiv="expires" content="-1" />
@@ -62,7 +61,7 @@ if (atributoError != null) {
 
 			<h2 class="skip">Menú principal</h2>
 			<ul class="mainNav">
-				<li><a href="/srv/es/index"><span id="pageHome">&nbsp;</span></a></li>
+				<li><a href="/srv/es/index"><span id="pageHome"> </span></a></li>
 				<li><a href="/srv/es/informaciongeneral" accesskey="1"> Información general</a></li> 
 					</ul>
 			<h2 class="skip">Información de usuario y servicios</h2>
