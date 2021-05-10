@@ -291,7 +291,7 @@ public class EnviaCorreo {
 			
 			// Crear el archivo
 			MimeBodyPart fileBodyPart = new MimeBodyPart();
-			if ((nombreArchivo != null) && (!"".equals(nombreArchivo))) {
+			if (nombreArchivo != null && !"".equals(nombreArchivo)) {
 				fileBodyPart.setDataHandler(new DataHandler(dataSource));
 				fileBodyPart.setFileName(nombreArchivo);
 			}
@@ -300,7 +300,7 @@ public class EnviaCorreo {
 			MimeMultipart mimeMultipart = new MimeMultipart();
 			mimeMultipart.addBodyPart(textBodyPart);
 			
-			if ((nombreArchivo != null) && (!"".equals(nombreArchivo))) {
+			if (nombreArchivo != null && !"".equals(nombreArchivo)) {
 				mimeMultipart.addBodyPart(fileBodyPart);
 			}				
 			
