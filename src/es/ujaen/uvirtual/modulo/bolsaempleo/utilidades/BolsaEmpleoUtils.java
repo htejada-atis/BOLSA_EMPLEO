@@ -12,6 +12,7 @@ import javax.servlet.http.Part;
  *
  */
 public class BolsaEmpleoUtils {
+	private static final double ROUNDER = 100.0;
 	
 	private BolsaEmpleoUtils() { }
 	
@@ -109,5 +110,14 @@ public class BolsaEmpleoUtils {
 		} catch (Exception e) {
 			return null;
 		}
+	}
+	
+	/**
+	 * Redondeo a dos decimales.
+	 * @param v .
+	 * @return .
+	 */
+	public static double redondeo(double v) {
+		return Math.round(v * ROUNDER) / ROUNDER;
 	}
 }

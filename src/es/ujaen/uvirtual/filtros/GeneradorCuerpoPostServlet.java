@@ -33,8 +33,8 @@ import es.ujaen.uvirtual.beans.Menu;
 public class GeneradorCuerpoPostServlet implements Filter {
 	protected static Logger logger = Logger.getLogger(GeneradorCuerpoPostServlet.class.getPackage().getName());
 	protected static String nombreDeEstaClase = GeneradorCuerpoPostServlet.class.getName();
-	protected static FilterConfig filterConfig = null;
-	protected static String urlPostServlet = null;
+	protected FilterConfig filterConfig = null;
+	protected String urlPostServlet = null;
 
 	/**
 	 * Default constructor. 
@@ -46,6 +46,7 @@ public class GeneradorCuerpoPostServlet implements Filter {
 	/** destroy.
 	 * @see Filter#destroy()
 	 */
+	@Override
 	public void destroy() {
 		filterConfig = null;
 		urlPostServlet = null;
@@ -77,6 +78,7 @@ public class GeneradorCuerpoPostServlet implements Filter {
 	 * @param fConfig configuracion
 	 * @see Filter#init(FilterConfig)
 	 */
+	@Override
 	public void init(FilterConfig fConfig) throws ServletException {
 		filterConfig = fConfig;
 		urlPostServlet = fConfig.getInitParameter("URLVista");

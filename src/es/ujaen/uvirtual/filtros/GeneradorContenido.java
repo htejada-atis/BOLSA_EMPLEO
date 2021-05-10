@@ -28,7 +28,7 @@ import es.ujaen.uvirtual.utilidades.AyudaURL;
 		urlPatterns = { "/srv/*", "/pub/*", "/error/*" },
 		filterName = "GeneradorContenido")
 public class GeneradorContenido implements Filter {
-	protected static FilterConfig filterConfig = null;
+	protected FilterConfig filterConfig = null;
 	private static String nombreDeEstaClase = GeneradorContenido.class.getName();
     private static final Logger ELOGGER = Logger.getLogger(GeneradorContenido.class.getPackage().getName());
 	
