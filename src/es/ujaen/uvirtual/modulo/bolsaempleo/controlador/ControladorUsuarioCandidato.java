@@ -77,7 +77,8 @@ public class ControladorUsuarioCandidato extends HttpServlet {
 	
 	public static final Integer PARAM_ROLE_CANDIDATO = 1052;
 	
-	// acciones
+	// acciones	
+	public static final String ACCION_INDEX = "index";
 	public static final String ACCION_LISTAR = "listar";
 	public static final String ACCION_DATATABLE = "datatable";
 	public static final String ACCION_USUARIO = "accionusuario";
@@ -155,14 +156,15 @@ public class ControladorUsuarioCandidato extends HttpServlet {
 		
 		String nombreAccion = EscapaHTML.ajustaCodificacion(request.getParameter(PARAM_ACCION));
 		if (nombreAccion == null) {
-			nombreAccion = PARAM_ACCION;
+			nombreAccion = ACCION_INDEX;
 		}
-		
-		bean.setVista(RUTA_BEP_CONF + "candidatos.jsp");
 		
 		try {
 			modeloUsuario.checkUser(datos);
 			switch (nombreAccion) {
+				case ACCION_INDEX:
+					bean.setVista(RUTA_BEP_CONF + "candidatos.jsp");
+					break;
 				case ACCION_DATATABLE_USUARIOS_CANDIDATOS:
 					listadoCandidatos(bean, datos, request, response);
 					break;

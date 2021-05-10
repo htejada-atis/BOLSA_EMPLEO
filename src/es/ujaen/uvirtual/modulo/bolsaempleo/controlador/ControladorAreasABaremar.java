@@ -96,13 +96,14 @@ public class ControladorAreasABaremar extends HttpServlet {
 		String nombreAccion = EscapaHTML.ajustaCodificacion(request.getParameter(PARAM_ACCION));
 		if (nombreAccion == null) {
 			nombreAccion = ACCION_LISTAR;
-		}
-		
-		bean.setVista(RUTA_BEP_CONF + "areasbaremar.jsp");
+		}		
 		
 		try {
 			modelo.checkUser(datos);
 			switch (nombreAccion) {
+				case ACCION_LISTAR:
+					bean.setVista(RUTA_BEP_CONF + "areasbaremar.jsp");
+					break;
 				case ACCION_AREA:
 					accionSobreArea(bean, request);
 					break;
