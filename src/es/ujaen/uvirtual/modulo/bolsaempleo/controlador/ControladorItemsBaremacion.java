@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.sql.SQLException;
 import java.util.logging.Logger;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Level;
 import javax.servlet.ServletException;
@@ -13,18 +14,29 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+import com.google.gson.reflect.TypeToken;
+
 import es.ujaen.uvirtual.beans.CodigoDescripcion;
 import es.ujaen.uvirtual.beans.UVDatos;
 import es.ujaen.uvirtual.beans.Usuario;
 import es.ujaen.uvirtual.modulo.bolsaempleo.beans.ApartadoBaremacion;
 import es.ujaen.uvirtual.modulo.bolsaempleo.beans.BloqueBaremacion;
+import es.ujaen.uvirtual.modulo.bolsaempleo.beans.Bolsa;
 import es.ujaen.uvirtual.modulo.bolsaempleo.beans.ItemBaremacion;
+import es.ujaen.uvirtual.modulo.bolsaempleo.beans.Merito;
+import es.ujaen.uvirtual.modulo.bolsaempleo.beans.MeritoPreferente;
+import es.ujaen.uvirtual.modulo.bolsaempleo.beans.MeritoSolicitud;
+import es.ujaen.uvirtual.modulo.bolsaempleo.beans.Solicitud;
 import es.ujaen.uvirtual.modulo.bolsaempleo.modelo.ModeloAfinidad;
 import es.ujaen.uvirtual.modulo.bolsaempleo.modelo.ModeloBaremacion;
+import es.ujaen.uvirtual.modulo.bolsaempleo.modelo.ModeloBolsa;
+import es.ujaen.uvirtual.modulo.bolsaempleo.modelo.ModeloMerito;
+import es.ujaen.uvirtual.modulo.bolsaempleo.modelo.ModeloSolicitud;
 import es.ujaen.uvirtual.modulo.bolsaempleo.modelo.ModeloUsuarioBolsaEmpleo;
 import es.ujaen.uvirtual.modulo.bolsaempleo.utilidades.BolsaEmpleoDataTable;
 import es.ujaen.uvirtual.modulo.bolsaempleo.utilidades.BolsaEmpleoUtils;
 import es.ujaen.uvirtual.modulo.bolsaempleo.vistas.VistaItemsBaremacion;
+import es.ujaen.uvirtual.modulo.bolsaempleo.vistas.VistaSolicitudes;
 import es.ujaen.uvirtual.utilidades.EscapaHTML;
 import es.ujaen.uvirtual.utilidades.Formateador;
 import es.ujaen.uvirtual.utilidades.UVException;
@@ -79,6 +91,7 @@ public class ControladorItemsBaremacion extends HttpServlet {
 	
 	// acciones items
 	public static final String ACCION_DATATABLE_ITEMS = "datatable_items";
+	public static final String ACCION_DATATABLE_ITEMS_EXCLUYENTES = "datatable_items_excluyentes";
 	public static final String ACCION_AGREGAR_ITEM = "agregaritem";
 	public static final String ACCION_AGREGAR_ITEM_CONFIRM = "agregaritemconfirm";
 	public static final String ACCION_EDITAR_ITEM = "editaritem";
@@ -86,6 +99,8 @@ public class ControladorItemsBaremacion extends HttpServlet {
 	public static final String ACCION_DESACTIVAR_ITEM = "desactivaraitem";
 	public static final String ACCION_ACTIVAR_ITEM = "activaraitem";	
 	public static final String ACCION_ITEM_SELECCIONADO = "itemseleccionado";
+	public static final String ACCION_ITEM_EXCLUYENTE_SELECCIONADO = "itemexcluyenteseleccionado";
+	public static final String ACCION_ITEM_EXCLUYENTE_DESELECCIONADO = "itemexcluyentedeseleccionado";
 	public static final String MENSAJE_EXITO_ITEM_AGREGAR = "Item agregado correctamente";
 	public static final String MENSAJE_EXITO_ITEM_EDITAR = "Item editado correctamente";
 	public static final String MENSAJE_EXITO_ITEM_DESACTIVAR = "Item desactivado correctamente";
@@ -106,6 +121,7 @@ public class ControladorItemsBaremacion extends HttpServlet {
 	public static final String PARAM_BLOQUE_NUMEROMAXIMOMERITOS = "numeromaximomeritos";
 	public static final String PARAM_ENVIAR = "enviar";
 	public static final String PARAM_ITEM = "item";
+	public static final String PARAM_ITEM_EXCLUYENTE = "itemexcluyente";
 	public static final String PARAM_ITEM_NOMBRE = "nombreitem";
 	public static final String PARAM_ITEM_DESCRIPCION = "descripcion";
 	public static final String PARAM_ITEM_CODIGO = "codigoitem";
@@ -115,6 +131,7 @@ public class ControladorItemsBaremacion extends HttpServlet {
 	public static final String PARAM_ITEM_VALOR_MAXIMO = "valormaximo";
 	public static final String PARAM_ITEM_AFINIDAD = "afinidad";
 	public static final String PARAM_ITEM_INDIVIDUALIZADO = "individualizado";
+	public static final String PARAM_ITEMS_SELECCIONADOS = "itemsseleccionados";
 	
 	// mensajes
 	public static final String MENSAJE_ERROR_CODIGO_VACIO = "El código no puede estar vacio";
@@ -194,6 +211,9 @@ public class ControladorItemsBaremacion extends HttpServlet {
 				case ACCION_DESACTIVAR_ITEM:
 				case ACCION_ACTIVAR_ITEM:				
 				case ACCION_ITEM_SELECCIONADO:
+				case ACCION_DATATABLE_ITEMS_EXCLUYENTES:
+				case ACCION_ITEM_EXCLUYENTE_SELECCIONADO:
+				case ACCION_ITEM_EXCLUYENTE_DESELECCIONADO:
 					accionesItems(bean, datos, request, response, nombreAccion);					
 					break;
 				
@@ -301,7 +321,7 @@ public class ControladorItemsBaremacion extends HttpServlet {
 	private void agregarApartado(VistaItemsBaremacion bean) throws SQLException, UVException {
 		bean.setVista(JSP_FORM_APARTADO_BAREMACION);
 		bean.setApartadoBaremacion(null);
-		bean.setUltimoCodigo(ModeloBaremacion.obtenerInstancia().getUltimoCodigoApartado());
+		bean.setUltimoCodigo("");
 	}
 	
 	private void agregarApartadoConfirm(VistaItemsBaremacion bean, HttpServletRequest request) throws SQLException, UVException {
@@ -588,6 +608,9 @@ public class ControladorItemsBaremacion extends HttpServlet {
 			case ACCION_DATATABLE_ITEMS:
 				listadoItems(bean, datos, request, response);
 				break;	
+			case ACCION_DATATABLE_ITEMS_EXCLUYENTES:
+				listadoItemsExcluyentes(bean, datos, request, response);
+				break;	
 			case ACCION_AGREGAR_ITEM:
 				agregarItem(bean, request);
 				break;
@@ -608,6 +631,12 @@ public class ControladorItemsBaremacion extends HttpServlet {
 				break;
 			case ACCION_ITEM_SELECCIONADO:
 				seleccionarItem(bean, request);
+				break;
+			case ACCION_ITEM_EXCLUYENTE_SELECCIONADO:
+				seleccionarItemExcluyente(bean, datos, request, response, true);
+				break;
+			case ACCION_ITEM_EXCLUYENTE_DESELECCIONADO:
+				seleccionarItemExcluyente(bean, datos, request, response, false);
 				break;
 			default:
 				this.accionNodefinida(bean);
@@ -631,6 +660,36 @@ public class ControladorItemsBaremacion extends HttpServlet {
 				BolsaEmpleoDataTable<ItemBaremacion> dataTable = modelo.listadoItemsBaremacionDatatable(request.getParameterMap(), bloque);
 				Gson gson = new GsonBuilder().setExclusionStrategies(BolsaEmpleoDataTable.GSONEXCLUSIONSTRATEGY).create();
 				bean.setDatatable(dataTable);
+				writer.write(gson.toJson(dataTable));
+			} catch (Exception ex) {
+				bean.getMensajesDeError().add(ex.getMessage());
+				
+				CodigoDescripcion mensaje = new CodigoDescripcion(RESPONSE_AJAX_ERROR, ex.getMessage());
+				writer.write(new Gson().toJson(mensaje));
+				response.setStatus(RESPONSE_HTTP_CODE_ERROR);
+			}
+		}
+	}
+	
+	
+	private void listadoItemsExcluyentes(VistaItemsBaremacion bean, UVDatos datos, HttpServletRequest request, HttpServletResponse response) 
+			throws IOException, SQLException, UVException {
+		
+		ModeloBaremacion modelo = ModeloBaremacion.obtenerInstancia();
+		Integer codNum = Formateador.leeParametroInteger(request.getParameter(PARAM_ITEM));
+		ItemBaremacion item = modelo.getItemBaremacionById(codNum);
+		
+		datos.setContentType(RESPONSE_AJAX_CONTENTTYPE);
+		datos.setRespuestaEnviada(true);
+		response.setContentType(RESPONSE_AJAX_CONTENTTYPE);
+		response.setCharacterEncoding(RESPONSE_AJAX_ENCODING);
+		
+		try (PrintWriter writer = response.getWriter()) {
+			try {
+				BolsaEmpleoDataTable<ItemBaremacion> dataTable = modelo.listadoItemsBaremacionExcluyentesDatatable(request.getParameterMap(), item);
+				Gson gson = new GsonBuilder().setExclusionStrategies(BolsaEmpleoDataTable.GSONEXCLUSIONSTRATEGY).create();
+				bean.setDatatable(dataTable);
+				
 				writer.write(gson.toJson(dataTable));
 			} catch (Exception ex) {
 				bean.getMensajesDeError().add(ex.getMessage());
@@ -693,6 +752,9 @@ public class ControladorItemsBaremacion extends HttpServlet {
 		
 		bean.setVista(JSP_FORM_ITEM_BAREMACION);
 		bean.setUltimoCodigo(ModeloBaremacion.obtenerInstancia().getUltimoCodigoApartado());
+		
+		List<ItemBaremacion> listaItemsExcluyentes = modelo.getItemsExcluyentes(item);
+		bean.setListaItemsExcluyentes(listaItemsExcluyentes);
 	}
 	
 	private void editarItemConfirm(VistaItemsBaremacion bean, HttpServletRequest request) throws SQLException, UVException {
@@ -744,6 +806,37 @@ public class ControladorItemsBaremacion extends HttpServlet {
 		bean.setBloqueBaremacion(item.getBloqueBaremacion());
 		bean.setItemBaremacion(item);
 		bean.setVista(RUTA_BEP_CONF + "itemsbaremacion.jsp");		
+	}
+	
+	/** 
+	 * Selecciona un item para excluirlo o añadirlo de otro item .
+	 * @param bean .
+	 * @param datos .
+	 * @param request .
+	 * @param response .
+	 * @param seleccionado .
+	 * @throws IOException .
+	 * @throws SQLException .
+	 */
+	private void seleccionarItemExcluyente(VistaItemsBaremacion bean, UVDatos datos, HttpServletRequest request, HttpServletResponse response, Boolean seleccionado)
+			throws UVException, SQLException {
+		ModeloBaremacion modelo = ModeloBaremacion.obtenerInstancia();
+		
+		ItemBaremacion itemPadre = modelo.getItemBaremacionById(Formateador.leeParametroInteger(request.getParameter(PARAM_ITEM)));
+		ItemBaremacion itemHijo = modelo.getItemBaremacionById(Formateador.leeParametroInteger(request.getParameter(PARAM_ITEM_EXCLUYENTE)));
+
+		if (Boolean.TRUE.equals(seleccionado)) {
+			modelo.asignarItemsExcluyentesAItem(itemPadre, itemHijo);
+		} else {
+			modelo.borrarItemsExcluyentesAItem(itemPadre, itemHijo);
+		}
+
+		List<ItemBaremacion> listaItemsExcluyentes = modelo.getItemsExcluyentes(itemPadre);
+		bean.setListaItemsExcluyentes(listaItemsExcluyentes);
+		bean.setItemBaremacion(itemPadre);
+		bean.setApartadoBaremacion(itemPadre.getBloqueBaremacion().getApartadoBaremacion());
+		bean.setBloqueBaremacion(itemPadre.getBloqueBaremacion());
+		bean.setVista(RUTA_BEP_CONF + "formItemBaremacion.jsp");
 	}
 		
 	private ItemBaremacion validateItemBaremacion(ItemBaremacion item, HttpServletRequest request) throws UVException, SQLException {

@@ -133,13 +133,33 @@ if(item!=null){
     			   value="<%= item != null ? "Guardar cambios" : "Insertar item" %>"/>
     	</div>    	
     </form>
+    
+	<table class="bluetable bolsaempleo custom" id="tableMeritosExcluyentes">
+		<tr>
+			<th scope="col" style="width:10%" title="Id"></th>
+			<th scope="col" style="width:20%" title="ID ítem">Id</th>
+			<th scope="col" style="width:20%" title="Código ítem">Código</th>
+			<th scope="col" style="width:60%" title="Nombre del ítem">Nombre del ítem</th>
+			<th scope="col" style="width:15%">Activo</th>
+		</tr>
+		<tbody>				
+		</tbody>
+		<tfoot>
+			<tr>
+				<th colSpan="15" style="width:100%"></th>
+			</tr>
+		</tfoot>
+	</table>
+    
 </div>
 
 <script>
 	$(document).ready(function() {
+		
 		document.getElementById("bloque_codigo").addEventListener("input", function(event) {
 			document.getElementById("item_bloque_codigo").value = '<%= apartado.getCodigo() %>.<%= bloque.getCodigo() %>.' + this.value;
 		});
+		
 		$('#item_afinida').on('change', function() {
 			console.log("items", $(this).val());
 			
@@ -149,5 +169,62 @@ if(item!=null){
 				$('#individualizadoBloque').show();
 			}
 		});
+		
+		var itemsExcluyentes = [];
+		
+		<%if (bean.getListaItemsExcluyentes() != null) {
+			for (ItemBaremacion it: bean.getListaItemsExcluyentes()) {%>
+				itemsExcluyentes.push(<%=it.getCodNum()%>);
+			<%}
+		}%>
+		
+		var tableItems = new Atis.DataTable('#tableMeritosExcluyentes', {
+		    "ajax": { url: "<%= ControladorItemsBaremacion.URL_PATTERN_AJAX %>", async: false },
+		    "params": {"<%=ControladorItemsBaremacion.PARAM_ITEM%>": <%= item.getCodNum() %>},
+		    "pageSize": 10,
+		    "title": "Items excluyentes:",
+		    "filterable": true,
+		    "selectable": true,
+	    	"defaultOrderBy": 1,
+	    	"defaultOrderDirection": 'asc',
+		    "selected": itemsExcluyentes,
+		    "action": "<%=ControladorItemsBaremacion.ACCION_DATATABLE_ITEMS_EXCLUYENTES%>",
+		    "columns": [
+		    	{'data': 'codNum', 'selectable': {'onChange': function(row, checkbox) {
+    					var accion = checkbox.checked ? '<%=ControladorItemsBaremacion.ACCION_ITEM_EXCLUYENTE_SELECCIONADO%>'
+    						: '<%=ControladorItemsBaremacion.ACCION_ITEM_EXCLUYENTE_DESELECCIONADO%>';
+	    				var params = {
+	    					'a': accion,
+	    					'<%=ControladorItemsBaremacion.PARAM_ITEM%>': '<%=item.getCodNum()%>',
+	    					'<%=ControladorItemsBaremacion.PARAM_ITEM_EXCLUYENTE%>': row.codNum,
+	    				};
+	    				
+	    				Atis.sendForm("<%= request.getRequestURI() %>", params);
+	    				}
+    				}
+    			},
+		    	{'data': 'codNum'},
+		    	{'data': 'codigo', 'filter': true, 'render': function(row) {
+		    		return row.bloque.apartado.codigo + "." + row.bloque.codigo + "." + row.codigo;
+		    	}},
+		        {'data': 'nombre', 'filter': true},
+		        {'data': 'activo', 'filter': {'type': 'selectBoolean', 'true': 'Activo', 'false': 'Inactivo'}, 'render': function(row) {
+	        		if(row.activo){
+	        			return "<div class='circle-true'></div>"; 
+	        		}
+	        		else{
+	        			return "<div class='circle-false'></div>"; 
+	        		}
+	        	}},
+		    ],
+		    "actions": [
+		    	{'label': 'Añadir', 'title': 'Añadir un nuevo ítem', 'onClick': function(selected) {
+		    		var params = {'a': '<%=ControladorItemsBaremacion.ACCION_AGREGAR_ITEM%>', 
+		    				'<%=ControladorItemsBaremacion.PARAM_BLOQUE%>': '<%=bean.getBloqueBaremacion().getCodNum()%>'};
+	        		Atis.sendForm("<%=request.getRequestURI()%>", params);
+		    	}}
+		    ]
+		});
+		
 	});
 </script>
