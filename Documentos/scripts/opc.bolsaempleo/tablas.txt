@@ -14,6 +14,7 @@ TBEP_FICHEROS                       FIC     bepfic		Fichero
 TBEP_ITEMSBAREMACION                ITE     bepite		ItemBaremacion
 TBEP_MERITOS                        MER     bepmer		Merito
 TBEP_MERITOSPREFERENTES             MEP     bepmep		
+TBEP_MERITOS_EXCLUYENTES       		MEX     bepmex		MeritosExcluyentes
 TBEP_NOTICIAS                       NOT     bepnot		Noticia
 TBEP_SOLICITUDES                    SOL     bepsol		Solicitud
 TBEP_SOLICITUD_BOLSAS				SBO		bepsbo

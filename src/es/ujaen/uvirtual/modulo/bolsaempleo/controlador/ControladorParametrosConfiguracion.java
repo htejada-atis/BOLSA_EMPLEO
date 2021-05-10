@@ -12,6 +12,7 @@ import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
 
 import es.ujaen.uvirtual.beans.UVDatos;
 import es.ujaen.uvirtual.beans.Usuario;
@@ -55,22 +56,7 @@ public class ControladorParametrosConfiguracion extends HttpServlet {
 	public static final String ACCION_EDITAR_PARAMETROS = "editarparametros";
 	
 	// mensajes
-	public static final String MENSAJE_ENVIADO = "mensaje";
-	public static final String MENSAJE_EXITO_AGREGAR = "usuario creado correctamente";
-	public static final String MENSAJE_EXITO_EDITAR = "usuario editadi correctamente";
-	public static final String MENSAJE_EXITO_ELIMINAR = "usuario eliminado correctamente";
-	public static final String MENSAJE_ERROR_ACCION_USUARIO_NO_VALIDA = "Acción no válida";
-	public static final String MENSAJE_EXITO_USUARIO_MODIFICADO_CORRECTAMENTE = "Usuario/s modificado/s correctamente"; 
-	
-	public static final String MENSAJE_ERROR_RAZON_EXCLUSION_VACIO = "Si excluye al usuario, debe especificar una razón";
-	public static final String MENSAJE_ERROR_RAZON_EXCLUSION_LARGO = "La razón de exclusión no puede contener mas de %d caracteres";
-	public static final String MENSAJE_ERROR_ROL_VACIO = "El rol no puede estar vacio";
-	public static final String MENSAJE_ERROR_ROL_NEGATIVO = "Debe seleccionar un role válido";
-	
-	public static final String MENSAJE_ERROR_EXCLUIDO_TIPO_VACIO = "El tipo de exclusión no puede estar vacio";
-	
-	public static final String MENSAJE_ERROR_FECHA_EXCLUIDO_INICIO_REQUERIDA = "La fecha de inicio es requerida";
-	public static final String MENSAJE_ERROR_FECHA_EXCLUIDO_FIN_REQUERIDA = "La fecha de fin es requerida";
+	public static final String MENSAJE_EXITO_EDITAR = "Parámetros editados correctamente";
 
 	public static final int RESPONSE_HTTP_CODE_ERROR = 400;
 	
@@ -101,7 +87,7 @@ public class ControladorParametrosConfiguracion extends HttpServlet {
 			nombreAccion = ACCION_LISTA_PARAMETROS;
 		}
 		
-		bean.setVista(RUTA_BEP_CONF + "parametros.jsp");
+		bean.setVista(RUTA_BEP_CONF + "index.jsp");
 		
 		try {
 			anonimo = !modeloUsuario.checkUser(datos);
@@ -162,13 +148,24 @@ public class ControladorParametrosConfiguracion extends HttpServlet {
 	 * @param response .
 	 * @param bean bean de la vista a la que poner los valores .
 	 * @throws SQLException excepcion de bbdd.
+	 * @throws IOException .
+	 * @throws UVException .
 	 */
-	private void editarParametros(HttpServletRequest request, HttpServletResponse response, VistaParametrosConfiguracion bean) throws SQLException {
-		// ModeloParametrosConfiguracion modelo = ModeloParametrosConfiguracion.obtenerInstancia();
-		// List<ParametrosConfiguracion> parametros = modelo.listaParametros();
+	private void editarParametros(HttpServletRequest request, HttpServletResponse response, VistaParametrosConfiguracion bean) throws SQLException, UVException, IOException {
+		ModeloParametrosConfiguracion modelo = ModeloParametrosConfiguracion.obtenerInstancia();
+		List<ParametrosConfiguracion> parametros = modelo.listaParametros();
 		
-		//request.getParameter(PARAM_RAZON_EXCLUIDO)
+		for (ParametrosConfiguracion param : parametros) {
+			param.setValor(EscapaHTML.ajustaCodificacion(request.getParameter(param.getNombre() + PARAM_VALOR)));
+			param.setDescripcion(EscapaHTML.ajustaCodificacion(request.getParameter(param.getNombre() + PARAM_DESCRIPCION)));
+			modelo.actualizaParametro(param);
+		}	
 		
+		
+		List<ParametrosConfiguracion> parametrosCont = modelo.listaParametros();
+		bean.setParametros(parametrosCont);
+		bean.getMensajesDeExito().add(MENSAJE_EXITO_EDITAR);
+
 	}
 
 }

@@ -13,18 +13,20 @@ VistaTitulaciones bean = (VistaTitulaciones) uvdatos.getVistas().get(VistaTitula
 
 <div class="bolsa-empleo">
 
-	<% 
-		if(bean.getMensajesDeError().size()>0) {
-			out.print("<div class='error'>" + bean.formatearMensajesDeError() + "</div>");
-		}
-	
-	%>
+	<% if (bean.getMensajesDeExito().size() > 0) { %>
+		<div id="exito" class="success">
+			<%= bean.formatearMensajesDeExito() %>
+		</div>
+	<% } %>
+	<% if (bean.getMensajesDeError().size() > 0) { %>
+		<div id="error" class="error">
+			<%= bean.formatearMensajesDeError() %>
+		</div>
+	<% } %>
 	
 	<div class="titulo-bolsa-empleo" style="margin-top:1rem;">
 		<h2>Nueva titulación</h2>
 	</div>
-
-	
 	
 	  <div class="form-group-container col2">
     		<div class="form-group">

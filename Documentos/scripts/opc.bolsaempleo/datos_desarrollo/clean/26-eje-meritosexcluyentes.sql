@@ -1,0 +1,7 @@
+DROP TABLE TBEP_HTO_MERITOS_EXCLUYENTES;
+--/////////////////////
+DROP TABLE TBEP_MERITOS_EXCLUYENTES;
+--/////////////////////
+DROP SEQUENCE QBEP_MEX;
+--/////////////////////
+DROP SEQUENCE QBEP_HTO_MEX;

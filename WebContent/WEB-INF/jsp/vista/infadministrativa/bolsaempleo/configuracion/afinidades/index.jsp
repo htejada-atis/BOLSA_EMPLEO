@@ -32,7 +32,6 @@ VistaAfinidades bean = (VistaAfinidades) uvdatos.getVistas().get(VistaAfinidades
 	<table class="bluetable bolsaempleo" id="tableAfinidades">
 		<tr>
 			<th scope="col" style="width:5%"></th>
-			<th scope="col" style="width:5%" title="Id de la afinidad">Id</th>
 			<th scope="col" class="center codigo" style="width:10%" title="Código de afinidad">Código</th>
 			<th scope="col" style="width:55%">Descripcion</th>
 			<th scope="col" class="center" style="width:15%">Modulación</th>
@@ -61,12 +60,11 @@ $(document).ready(function() {
 	    "ajax": { url: "/srv/es/ajax/informacionadministrativa/bolsaempleo/configuracion/afinidades" },
 	    "selectable": true,
 	    "pageSize": 10,
-    	"defaultOrderBy": 2,
+    	"defaultOrderBy": 1,
     	"defaultOrderDirection": 'desc',
 	    "action": "<%= ControladorAfinidades.ACCION_DATATABLE %>",
 	    "columns": [
 	    	{'data': 'codNum', 'selectable': true},
-	        {'data': 'codNum'},
 	        {'data': 'codigo', 'class': 'center'},
 	        {'data': 'descripcion'},
 	        {'data': 'modulacion', 'class': 'center'},

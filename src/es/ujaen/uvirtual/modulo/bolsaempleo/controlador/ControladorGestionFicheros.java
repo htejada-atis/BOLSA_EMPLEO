@@ -24,6 +24,7 @@ import es.ujaen.uvirtual.beans.CodigoDescripcion;
 import es.ujaen.uvirtual.beans.UVDatos;
 import es.ujaen.uvirtual.modulo.bolsaempleo.beans.Fichero;
 import es.ujaen.uvirtual.modulo.bolsaempleo.modelo.ModeloFichero;
+import es.ujaen.uvirtual.modulo.bolsaempleo.modelo.ModeloParametrosConfiguracion;
 import es.ujaen.uvirtual.modulo.bolsaempleo.modelo.ModeloUsuarioBolsaEmpleo;
 import es.ujaen.uvirtual.modulo.bolsaempleo.utilidades.BolsaEmpleoDataTable;
 import es.ujaen.uvirtual.modulo.bolsaempleo.utilidades.BolsaEmpleoUtils;
@@ -206,6 +207,9 @@ public class ControladorGestionFicheros extends HttpServlet {
 						Boolean publico = request.getParameter(PARAM_PUBLICO) != null 
 								&& EscapaHTML.ajustaCodificacion(request.getParameter(PARAM_PUBLICO)).equals("on");
 						Fichero fichero = new Fichero(nombre, titulo, input, publico);
+						
+						BolsaEmpleoUtils.checkFileSize(fichero.getArchivo());
+						
 						modelo.insertaFichero(fichero);
 						HttpSession session = request.getSession(false);
 						session.setAttribute(MENSAJE_ENVIADO, MENSAJE_EXITO_AGREGAR);

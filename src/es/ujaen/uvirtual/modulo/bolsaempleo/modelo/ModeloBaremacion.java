@@ -12,8 +12,13 @@ import java.util.Map;
 import es.ujaen.uvirtual.modelo.conexion.ConexionUvirtual;
 import es.ujaen.uvirtual.modulo.bolsaempleo.beans.ApartadoBaremacion;
 import es.ujaen.uvirtual.modulo.bolsaempleo.beans.BloqueBaremacion;
+import es.ujaen.uvirtual.modulo.bolsaempleo.beans.Bolsa;
 import es.ujaen.uvirtual.modulo.bolsaempleo.beans.ItemBaremacion;
+import es.ujaen.uvirtual.modulo.bolsaempleo.beans.Merito;
+import es.ujaen.uvirtual.modulo.bolsaempleo.beans.MeritoSolicitud;
+import es.ujaen.uvirtual.modulo.bolsaempleo.beans.Solicitud;
 import es.ujaen.uvirtual.modulo.bolsaempleo.utilidades.BolsaEmpleoDataTable;
+import es.ujaen.uvirtual.modulo.bolsaempleo.utilidades.BolsaEmpleoUtils;
 import es.ujaen.uvirtual.modulo.bolsaempleo.utilidades.BolsaEmpleoDataTable.DataTableColumn;
 import es.ujaen.uvirtual.utilidades.UVException;
 
@@ -45,6 +50,13 @@ public class ModeloBaremacion {
 	public static final int ORDER_COLUMN_INDEX_ITEMS_VALOR_MAXIMO = 5;
 	public static final int ORDER_COLUMN_INDEX_ITEMS_AFINIDAD = 6;
 	public static final int ORDER_COLUMN_INDEX_ITEMS_ACTIVO = 7;
+	
+	// ordenación ítems de baremación
+	
+	public static final int ORDER_COLUMN_INDEX_ITEMS_EXCLUYENTES_ID = 1;
+	public static final int ORDER_COLUMN_INDEX_ITEMS_EXCLUYENTES_CODIGO = 2;
+	public static final int ORDER_COLUMN_INDEX_ITEMS_EXCLUYENTES_NOMBRE = 3;
+	public static final int ORDER_COLUMN_INDEX_ITEMS_EXCLUYENTES_ACTIVO = 4;
 	
 	// tipos de unidades de los items
 	public static final String ITEM_UNIDADES_MEDICION_ENTERO = "ENTERO";
@@ -858,6 +870,102 @@ public class ModeloBaremacion {
 		return dataTable;
 	}
 	
+	/**
+	 * Listado de ítems de baremación excluyentes entre si. 
+	 * @param params para leer los parametros de paginación, ordenacion, etc
+	 * @param item id del item .
+	 * @return listado .
+	 * @throws SQLException en caso de error de base de datos .
+	 * @throws UVException error si no existe la area .
+	 */
+	public BolsaEmpleoDataTable<ItemBaremacion> listadoItemsBaremacionExcluyentesDatatable(Map<String, String[]> params, 
+			ItemBaremacion item) throws SQLException, UVException {
+		List<ItemBaremacion> items = new ArrayList<>();
+		BolsaEmpleoDataTable<ItemBaremacion> dataTable = new BolsaEmpleoDataTable<ItemBaremacion>(params);
+		
+//		String consulta = "SELECT bepite.* "
+//				+ "FROM TBEP_ITEMSBAREMACION bepite "
+//				+ "LEFT JOIN TBEP_MERITOS_EXCLUYENTES bepmex ON bepite.CODNUM = bepmex.BEPITE_CODNUM_HIJO AND bepmex.BEPITE_CODNUM_PADRE = ? "
+//				+ "WHERE bepite.CODNUM != ? AND bepmex.BEPITE_CODNUM_HIJO IS NULL";
+		
+//		String consulta = "SELECT bepite.* "
+//		+ "FROM TBEP_ITEMSBAREMACION bepite "
+//		+ "WHERE bepite.CODNUM != ?";
+		
+		String consulta = "SELECT bepite.*, SEL.HIJO "
+				+ "FROM TBEP_ITEMSBAREMACION bepite "
+				+ "LEFT JOIN "
+				+ "( SELECT bepite.*, bepmex.BEPITE_CODNUM_HIJO HIJO "
+				+ "FROM TBEP_ITEMSBAREMACION bepite "
+				+ "LEFT JOIN TBEP_MERITOS_EXCLUYENTES bepmex "
+				+ "ON bepite.CODNUM = bepmex.BEPITE_CODNUM_HIJO "
+				+ "AND bepmex.BEPITE_CODNUM_PADRE = ? ) "
+				+ "SEL ON SEL.HIJO = bepite.CODNUM "
+				+ "WHERE bepite.CODNUM != ? ";
+		
+		dataTable.setColumn(ORDER_COLUMN_INDEX_ITEMS_EXCLUYENTES_ID, "SEL.HIJO", DataTableColumn.COLUMN_TYPE_NUMBER);
+		dataTable.setColumn(ORDER_COLUMN_INDEX_ITEMS_EXCLUYENTES_CODIGO, "bepite.CODIGO");
+		dataTable.setColumn(ORDER_COLUMN_INDEX_ITEMS_EXCLUYENTES_NOMBRE, "bepite.NOMBRE");	
+		dataTable.setColumn(ORDER_COLUMN_INDEX_ITEMS_EXCLUYENTES_ACTIVO, "bepite.FLGACTIVO", DataTableColumn.COLUMN_TYPE_BOOLEAN);
+		dataTable.setQuery(consulta);
+				
+		try (Connection conexion = ConexionUvirtual.obtenerInstancia();
+				PreparedStatement stmtCount = conexion.prepareStatement(dataTable.getQueryCount());
+				PreparedStatement stmt = conexion.prepareStatement(dataTable.getQuery());
+		) {
+			int indexParam = 1;
+			stmt.setInt(indexParam, item.getCodNum());
+			stmtCount.setInt(indexParam++, item.getCodNum());
+			
+			stmt.setInt(indexParam, item.getCodNum());
+			stmtCount.setInt(indexParam++, item.getCodNum());
+			
+			dataTable.setFiltersParams(stmt, stmtCount, indexParam);
+			
+			try (ResultSet rs = stmt.executeQuery()) {
+				while (rs.next()) {					
+					items.add(this.createItemFromResultSet(rs));
+				}
+			}
+
+			dataTable.setRecordsTotalFromQuery(stmtCount);
+			dataTable.setData(items);
+		}
+		
+		return dataTable;
+	}
+	
+	
+	
+	/** Devuelve los items excluyentes de otro.
+	 * @param item .
+	 * @return meritos .
+	 * @throws UVException .
+	 * @throws SQLException .
+	 */
+	public List<ItemBaremacion> getItemsExcluyentes(ItemBaremacion item) throws SQLException, UVException {
+		ArrayList<ItemBaremacion> items = new ArrayList<>();
+		
+		String consulta = "SELECT bepite.* FROM TBEP_ITEMSBAREMACION bepite "
+				+ "RIGHT JOIN TBEP_MERITOS_EXCLUYENTES bepmex "
+				+ "ON bepite.CODNUM = bepmex.BEPITE_CODNUM_HIJO "
+				+ "AND bepmex.BEPITE_CODNUM_PADRE = ?";
+		
+		try (Connection conexion = ConexionUvirtual.obtenerInstancia(); PreparedStatement stmt = conexion.prepareStatement(consulta)) {
+			int indexParam = 1;
+			stmt.setInt(indexParam++, item.getCodNum());
+			
+			try (ResultSet rs = stmt.executeQuery()) {
+				while (rs.next()) {
+					if (rs.getString("CODIGO") != null) {
+						items.add(this.createItemFromResultSet(rs));
+					}
+				}
+			}
+		}
+		return items;
+	}
+	
 	/** Consulta para obtener el último código de los items de un bloque .
 	 * @param bloque .
 	 * @return .
@@ -1129,4 +1237,62 @@ public class ModeloBaremacion {
 		
 		return false;
 	} 		
+	
+	/** El usuario selecciona un item para excluirlo de otro item .
+	 * @param itemPadre .
+	 * @param itemHijo .
+	 * @throws SQLException .
+	 * @throws UVException .
+	 */
+	public void asignarItemsExcluyentesAItem(ItemBaremacion itemPadre, ItemBaremacion itemHijo) throws SQLException, UVException {
+		try (Connection conexion = ConexionUvirtual.obtenerInstancia();) {
+			conexion.setAutoCommit(false);
+			
+			String consulta = "INSERT INTO TBEP_MERITOS_EXCLUYENTES (BEPITE_CODNUM_PADRE, BEPITE_CODNUM_HIJO) "
+					+ " VALUES (?,?)";
+			
+			try (PreparedStatement stmt = conexion.prepareStatement(consulta)) {
+				int indexParam = 1;
+				stmt.setInt(indexParam++, itemPadre.getCodNum());
+				stmt.setInt(indexParam++, itemHijo.getCodNum());
+				stmt.executeUpdate();
+			} catch (SQLException e) {
+				if (conexion != null) { 
+					conexion.rollback();
+				}
+				throw e;
+			}
+			conexion.commit();
+		}
+	}
+	
+	
+	/** El usuario deselecciona un item para borrarlo de su lista de excluyentes de otro .
+	 * @param itemPadre .
+	 * @param itemHijo .
+	 * @throws SQLException .
+	 * @throws UVException .
+	 */
+	public void borrarItemsExcluyentesAItem(ItemBaremacion itemPadre, ItemBaremacion itemHijo) throws SQLException, UVException {
+		try (Connection conexion = ConexionUvirtual.obtenerInstancia();) {
+			conexion.setAutoCommit(false);
+		
+			String consulta = "DELETE FROM TBEP_MERITOS_EXCLUYENTES bepmex "
+				+ " WHERE BEPITE_CODNUM_PADRE = ? AND "
+				+ " BEPITE_CODNUM_HIJO = ?";
+		
+			try (PreparedStatement stmt = conexion.prepareStatement(consulta)) {
+				int indexParam = 1;
+				stmt.setInt(indexParam++, itemPadre.getCodNum());
+				stmt.setInt(indexParam++, itemHijo.getCodNum());
+				stmt.executeUpdate();
+			} catch (SQLException e) {
+				if (conexion != null) { 
+					conexion.rollback();
+				}
+				throw e;
+			}
+			conexion.commit();
+		}
+	}
 }

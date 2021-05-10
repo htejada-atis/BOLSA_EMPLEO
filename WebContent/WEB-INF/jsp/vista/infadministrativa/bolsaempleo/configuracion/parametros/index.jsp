@@ -13,11 +13,16 @@ VistaParametrosConfiguracion bean = (VistaParametrosConfiguracion) uvdatos.getVi
 
 <div class="bolsa-empleo parametros-form">
 
-	<% 
-		if(bean.getMensajesDeError().size()>0) {
-			out.print("<div class='error'>" + bean.formatearMensajesDeError() + "</div>");
-		}
-	%>
+	<% if (bean.getMensajesDeExito().size() > 0) { %>
+		<div id="exito" class="success">
+			<%= bean.formatearMensajesDeExito() %>
+		</div>
+	<% } %>
+	<% if (bean.getMensajesDeError().size() > 0) { %>
+		<div id="error" class="error">
+			<%= bean.formatearMensajesDeError() %>
+		</div>
+	<% } %>
 	
 	<div class="titulo-bolsa-empleo" style="margin-top:1rem;">
 		<h2>Parámetros de configuración</h2>
@@ -36,17 +41,17 @@ VistaParametrosConfiguracion bean = (VistaParametrosConfiguracion) uvdatos.getVi
 					<div class="form-group">
 	   					<div class="form-group">
     						<label for="nombre">Nombre: </label>
-    						<input class="form-input-custom" id="nombre" type="text" name="<%= param.getNombre() %>" value="<%= param.getNombre() %>" disabled/>
+    						<input class="form-input-custom" id="nombre" type="text" name="<%= param.getNombre() + ControladorParametrosConfiguracion.PARAM_NOMBRE %>" value="<%= param.getNombre() %>" disabled/>
     					</div>
 	   					<div class="form-group">
     						<label for="nombre">Valor: </label>
-    						<input class="form-input-custom" id="valor" type="text" name="<%= param.getNombre() %>" value="<%= param.getValor() %>"/>
+    						<input class="form-input-custom" id="valor" type="text" name="<%= param.getNombre() + ControladorParametrosConfiguracion.PARAM_VALOR%>" value="<%= param.getValor() %>"/>
     					</div>
     				</div>
 		
 					<div class="form-group">
     					<label for="razon_exclusion">Descripción: </label>
-    					<textarea class="params form-input-custom" id="descripcion" name="<%= param.getNombre() %>" rows="6" cols="60"><%= param.getDescripcion() %></textarea>
+    					<textarea class="params form-input-custom" id="descripcion" name="<%= param.getNombre() + ControladorParametrosConfiguracion.PARAM_DESCRIPCION %>" rows="6" cols="60"><%= param.getDescripcion() %></textarea>
    					</div>
    				</div>
 			<% } %>
