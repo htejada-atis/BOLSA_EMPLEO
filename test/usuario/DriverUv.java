@@ -21,6 +21,7 @@ import bbdd.UtilsTestDocentia;
 public class DriverUv {
 	private static WebDriver driver;
 	private static final int TIEMPO_MAXIMO_ESPERA = 10;
+	private static int contador = 1;
 	
 	private DriverUv() { }
 	
@@ -49,13 +50,18 @@ public class DriverUv {
 		File scrFile = ((TakesScreenshot) driver).getScreenshotAs(OutputType.FILE);
 	    String directorio = "/tmp/";
 	    try {
-			Files.copy(scrFile.toPath(), (new File(directorio + nombre + ".png")).toPath(), StandardCopyOption.REPLACE_EXISTING);
+	    	String nombreFichero = directorio + contador++ + "-" + nombre + ".png";
+			Files.copy(scrFile.toPath(), (new File(nombreFichero)).toPath(), StandardCopyOption.REPLACE_EXISTING);
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
 	}
 	
+	/** obtiene el driver.
+	 * @return driver
+	 */
 	public static WebDriver getDriver() {
+		capturaPantalla("");
 		return driver;
 	}
 	

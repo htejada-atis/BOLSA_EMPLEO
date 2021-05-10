@@ -123,15 +123,15 @@ public class ModeloClaveArcos {
 		for (int i = 0; i < clave.length(); i++) {
 			boolean contado = false;
 			pcount++;
-			if ((clave.charAt(i) >= '0') && (clave.charAt(i) <= '9')) {
+			if (clave.charAt(i) >= '0' && clave.charAt(i) <= '9') {
 				num++;
 				contado = true;
 			}
-			if ((clave.charAt(i) >= 'a') && (clave.charAt(i) <= 'z')) {
+			if (clave.charAt(i) >= 'a' && clave.charAt(i) <= 'z') {
 				alfa++;
 				contado = true;
 			}
-			if ((clave.charAt(i) >= 'A') && (clave.charAt(i) <= 'Z')) {
+			if (clave.charAt(i) >= 'A' && clave.charAt(i) <= 'Z') {
 				alfaMay++;
 				contado = true;
 			}
@@ -139,7 +139,7 @@ public class ModeloClaveArcos {
 				especial++;
 			}
 		}
-		if ((pcount < minimoTamClave) || (num < 1) || (alfa < 1) || (alfaMay < 1) || (especial < 1)) {
+		if (pcount < minimoTamClave || num < 1 || alfa < 1 || alfaMay < 1 || especial < 1) {
 			salida = false;
 		}
 		return salida;
