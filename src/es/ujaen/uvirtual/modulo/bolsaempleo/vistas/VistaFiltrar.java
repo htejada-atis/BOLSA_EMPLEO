@@ -15,8 +15,8 @@ import es.ujaen.uvirtual.modulo.bolsaempleo.utilidades.BolsaEmpleoDataTable;
 public class VistaFiltrar extends Vista implements Serializable {
 	private static final long serialVersionUID = 1L;
 	private String vista;
-	private BolsaEmpleoDataTable<Candidato> dataTableCandidatos;
-	private BolsaEmpleoDataTable<Titulacion> dataTableTitulaciones;
+	private transient BolsaEmpleoDataTable<Candidato> dataTableCandidatos;
+	private transient BolsaEmpleoDataTable<Titulacion> dataTableTitulaciones;
 	private UsuarioBolsaEmpleo candidato;
 	private Titulacion titulacion;
 	private List<Titulacion> listaValidadas;

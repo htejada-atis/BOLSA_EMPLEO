@@ -90,7 +90,7 @@ VistaUsuarioBolsaEmpleo beanUsuario = (VistaUsuarioBolsaEmpleo) uvdatos.getVista
 			
 			$.ajax({
 		        type: "GET",
-		        url: "<%= ControladorInicio.anonimo ? ControladorInicio.URL_PATTERN_AJAX_PUBLICA : ControladorInicio.URL_PATTERN_AJAX_PRIVADA %>",
+		        url: "<%= bean.getAnonimo() ? ControladorInicio.URL_PATTERN_AJAX_PUBLICA : ControladorInicio.URL_PATTERN_AJAX_PRIVADA %>",
 		        contentType: "application/json",
 		        dataType: "json",
 		        data: params,

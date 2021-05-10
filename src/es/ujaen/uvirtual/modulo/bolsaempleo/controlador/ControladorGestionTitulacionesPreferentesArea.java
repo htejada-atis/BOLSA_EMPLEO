@@ -24,6 +24,7 @@ import es.ujaen.uvirtual.modulo.bolsaempleo.modelo.ModeloArea;
 import es.ujaen.uvirtual.modulo.bolsaempleo.modelo.ModeloTitulacion;
 import es.ujaen.uvirtual.modulo.bolsaempleo.modelo.ModeloUsuarioBolsaEmpleo;
 import es.ujaen.uvirtual.modulo.bolsaempleo.utilidades.BolsaEmpleoDataTable;
+import es.ujaen.uvirtual.modulo.bolsaempleo.vistas.VistaInicio;
 import es.ujaen.uvirtual.modulo.bolsaempleo.vistas.VistaTitulacionesArea;
 import es.ujaen.uvirtual.utilidades.EscapaHTML;
 import es.ujaen.uvirtual.utilidades.Formateador;
@@ -75,9 +76,6 @@ public class ControladorGestionTitulacionesPreferentesArea extends HttpServlet {
 	// urls
 	public static final String URL_PATTERN_AJAX = "/srv/es/ajax/informacionadministrativa/bolsaempleo/configuracion/titulacionespreferentesarea";
 
-	// variables
-	public static boolean anonimo = true;
-	
 	/** Peticion GET.
 	 * @see HttpServlet#doGet(HttpServletRequest request, HttpServletResponse response)
 	 */
@@ -98,7 +96,7 @@ public class ControladorGestionTitulacionesPreferentesArea extends HttpServlet {
 		}
 		
 		try {
-			anonimo = !modelo.checkUser(datos);
+			modelo.checkUser(datos);
 			switch (nombreAccion) {
 				case ACCION_ELIMINAR_TITULACION_AREA:
 					eliminarTitulacionesArea(request, response, bean);
@@ -115,6 +113,8 @@ public class ControladorGestionTitulacionesPreferentesArea extends HttpServlet {
 				case ACCION_DATATABLE_TITULACIONES_PREFERENTES_AREA:
 					listadoTitulacionesPreferentesArea(bean, datos, request, response);
 					break;
+				default:
+					errorFatal(bean, "Acción no contemplada"); 
 			}
 			
 		} catch (SQLException e) {
@@ -142,6 +142,11 @@ public class ControladorGestionTitulacionesPreferentesArea extends HttpServlet {
 	@Override
 	public void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 		doGet(request, response);
+	}
+	
+	private void errorFatal(VistaTitulacionesArea bean, String mensaje) {
+		bean.setVista("/WEB-INF/jsp/vista/infadministrativa/bolsaempleo/error.jsp");
+		bean.getMensajesDeError().add(mensaje);
 	}
 	
 	/** elimina una lista de titulaciones afines a un área .
