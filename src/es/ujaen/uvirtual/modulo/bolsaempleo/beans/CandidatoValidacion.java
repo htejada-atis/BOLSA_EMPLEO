@@ -23,6 +23,13 @@ public class CandidatoValidacion extends UsuarioBolsaEmpleo implements Serializa
 	
 	/** Constructor con parametros.
 	 * @param pusuario .
+	 */
+	public CandidatoValidacion(UsuarioBolsaEmpleo pusuario) {
+		super(pusuario);
+	}
+	
+	/** Constructor con parametros.
+	 * @param pusuario .
 	 * @param pmeritosNoValidados .
 	 * @param pmeritosValidados .
 	 * @param pmeritosExcluidos .
@@ -40,6 +47,7 @@ public class CandidatoValidacion extends UsuarioBolsaEmpleo implements Serializa
 	 * @param copia CandidatoValidacion a copiar
 	 */
 	public CandidatoValidacion(CandidatoValidacion copia) {
+		super(copia);
 		this.totalMeritosNoValidados = copia.totalMeritosNoValidados;
 		this.totalMeritosValidados = copia.totalMeritosValidados;
 		this.totalMeritosExcluidos = copia.totalMeritosExcluidos;
@@ -114,6 +122,10 @@ public class CandidatoValidacion extends UsuarioBolsaEmpleo implements Serializa
 			return false;
 		}
 		CandidatoValidacion other = (CandidatoValidacion) obj;
+		if (!super.equals(other)) {
+			return false;
+		}
+		
 		if (totalMeritosNoValidados == null) {
 			if (other.totalMeritosNoValidados != null) {
 				return false;

@@ -5,21 +5,22 @@ import java.io.PrintWriter;
 import java.sql.SQLException;
 import java.util.logging.Logger;
 import java.util.logging.Level;
-
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
-
 import es.ujaen.uvirtual.beans.CodigoDescripcion;
 import es.ujaen.uvirtual.beans.UVDatos;
+import es.ujaen.uvirtual.modulo.bolsaempleo.beans.Bolsa;
 import es.ujaen.uvirtual.modulo.bolsaempleo.beans.BolsaValidacion;
-import es.ujaen.uvirtual.modulo.bolsaempleo.beans.Convocatoria;
+import es.ujaen.uvirtual.modulo.bolsaempleo.beans.CandidatoValidacion;
+import es.ujaen.uvirtual.modulo.bolsaempleo.beans.Merito;
+import es.ujaen.uvirtual.modulo.bolsaempleo.modelo.ModeloBolsa;
 import es.ujaen.uvirtual.modulo.bolsaempleo.modelo.ModeloConvocatoria;
+import es.ujaen.uvirtual.modulo.bolsaempleo.modelo.ModeloMerito;
 import es.ujaen.uvirtual.modulo.bolsaempleo.modelo.ModeloUsuarioBolsaEmpleo;
 import es.ujaen.uvirtual.modulo.bolsaempleo.modelo.ModeloValidar;
 import es.ujaen.uvirtual.modulo.bolsaempleo.utilidades.BolsaEmpleoDataTable;
@@ -44,15 +45,32 @@ public class ControladorValidar extends HttpServlet {
 	private static final long serialVersionUID = 1L;
 	private static final String NOMBREDEESTACLASE = ControladorValidar.class.getName();
 	private static final Logger LOGGER = Logger.getLogger(NOMBREDEESTACLASE);
-	public static final String PARAM_ACCION = "a";
 	
 	// acciones
+	public static final String ACCION_DATATABLE_BOLSAS = "datatablebolsas";
+	public static final String ACCION_DATATABLE_BOLSAS_CANDIDATO = "datatablebolsascandidato";
+	public static final String ACCION_DATATABLE_CANDIDATOS = "datatablecandidatos";
+	public static final String ACCION_DATATABLE_MERITOS = "datatablemeritos";
+	public static final String ACCION_DATATABLE_VALORES_MERITO_BOLSA = "datatablevaloresmeritobolsa";
+	public static final String ACCION_DESCARGAR_FICHERO = "descargarfichero";
+	public static final String ACCION_BOLSA_SELECCIONADA = "bolsaseleccionada";
+	public static final String ACCION_CANDIDATO_SELECCIONADO = "candidatoseleccionado";
 	public static final String ACCION_INDEX = "listar";
-	public static final String ACCION_DATATABLE = "datatable";
+	public static final String ACCION_MERITO_SELECCIONADO = "meritoseleccionado";
 	
-	// url y rutas
+	// parámetros
+	public static final String PARAM_ACCION = "a";
+	public static final String PARAM_BOLSA = "bolsa";
+	public static final String PARAM_CANDIDATO = "candidato";
+	public static final String PARAM_MERITO = "merito";
+	
+	// urls
 	public static final String URL_PATTERN_AJAX = "/srv/es/ajax/informacionadministrativa/bolsaempleo/validar";
-	public static final String RUTA_BEP_CONF = "/WEB-INF/jsp/vista/infadministrativa/bolsaempleo/validar/";	
+	
+	// vistas
+	public static final String RUTA_BEP_VALIDAR = "/WEB-INF/jsp/vista/infadministrativa/bolsaempleo/validar/";
+	public static final String JSQP_INDEX = RUTA_BEP_VALIDAR + "index.jsp";
+	public static final String JSP_MERITOS_CANDIDATOS = RUTA_BEP_VALIDAR + "meritoscandidatos.jsp";
 	
 	public static final int RESPONSE_HTTP_CODE_ERROR = 400;
 	
@@ -74,13 +92,26 @@ public class ControladorValidar extends HttpServlet {
 		
 		try {
 			ModeloUsuarioBolsaEmpleo.obtenerInstancia().checkUser(datos);
+			bean.setConvocatoria(ModeloConvocatoria.obtenerInstancia().getUltimaConvocatoria());
+			
 			switch (nombreAccion) {
+				case ACCION_BOLSA_SELECCIONADA:
+				case ACCION_CANDIDATO_SELECCIONADO:
+				case ACCION_DATATABLE_BOLSAS_CANDIDATO:
+				case ACCION_DATATABLE_CANDIDATOS:
+				case ACCION_DATATABLE_VALORES_MERITO_BOLSA:
+				case ACCION_DATATABLE_MERITOS:
+				case ACCION_MERITO_SELECCIONADO:
+					bolsaSeleccionada(bean, datos, request, response, nombreAccion);
+					break;
+				case ACCION_DATATABLE_BOLSAS:
+					listadoBolsas(bean, datos, request, response);
+					break;
 				case ACCION_INDEX:
-					index(bean, datos, request, response);
-					break;	
-				case ACCION_DATATABLE:
-					listado(bean, datos, request, response);
-					break;			
+					indice(bean);
+					break;
+				default:
+					this.accionNodefinida(bean);
 			}
 		} catch (SQLException e) {
 			LOGGER.log(Level.SEVERE, Formateador.getStackTrace(e));
@@ -111,25 +142,152 @@ public class ControladorValidar extends HttpServlet {
 		doGet(request, response);
 	}
 	
-	private void index(VistaValidar bean, UVDatos datos, HttpServletRequest request, HttpServletResponse response) throws SQLException, UVException {
-		bean.setConvocatoria(ModeloConvocatoria.obtenerInstancia().getUltimaConvocatoria());
-		bean.setVista(RUTA_BEP_CONF + "index.jsp");
+	private void indice(VistaValidar bean) {
+		bean.setVista(JSQP_INDEX);
 	}
+	
+	private void accionNodefinida(VistaValidar bean) {
+		bean.getMensajesDeError().add("Acción no definida");
+		this.indice(bean);
+	}
+	
+	private void bolsaSeleccionada(VistaValidar bean, UVDatos datos, HttpServletRequest request, HttpServletResponse response, String nombreAccion) 
+			throws SQLException, UVException, IOException {
+		ModeloBolsa modeloBolsa = ModeloBolsa.obtenerInstancia();
+		bean.setBolsa(modeloBolsa.getBolsaById(Formateador.leeParametroInteger(request.getParameter(PARAM_BOLSA))));
+		bean.setVista(RUTA_BEP_VALIDAR + "meritoscandidatos.jsp");
 		
-	private void listado(VistaValidar bean, UVDatos datos, HttpServletRequest request, HttpServletResponse response) throws IOException, SQLException, UVException {
+		switch (nombreAccion) {
+			case ACCION_DATATABLE_BOLSAS_CANDIDATO:
+			case ACCION_CANDIDATO_SELECCIONADO:
+			case ACCION_DATATABLE_MERITOS:
+			case ACCION_DATATABLE_VALORES_MERITO_BOLSA:
+			case ACCION_MERITO_SELECCIONADO:
+				candidatoSeleccionado(bean, datos, request, response, nombreAccion);
+				break;
+			case ACCION_DATATABLE_CANDIDATOS:
+				listadoCandidatos(bean, datos, request, response);
+				break;
+		}
+	}
+	
+	private void candidatoSeleccionado(VistaValidar bean, UVDatos datos, HttpServletRequest request, HttpServletResponse response, String nombreAccion) 
+			throws SQLException, UVException, IOException {
+		
+		ModeloUsuarioBolsaEmpleo modeloUsuario = ModeloUsuarioBolsaEmpleo.obtenerInstancia();
+		bean.setCandidato(modeloUsuario.getUsuarioById(Formateador.leeParametroInteger(request.getParameter(PARAM_CANDIDATO))));
+		
+		switch (nombreAccion) {
+			case ACCION_DATATABLE_MERITOS:
+				listadoMeritos(bean, datos, request, response);
+				break;
+			case ACCION_DATATABLE_BOLSAS_CANDIDATO:
+			case ACCION_DATATABLE_VALORES_MERITO_BOLSA:
+			case ACCION_MERITO_SELECCIONADO:
+				meritoSeleccionado(bean, datos, request, response, nombreAccion);
+				break;
+		}
+		
+	}
+	
+	private void meritoSeleccionado(VistaValidar bean, UVDatos datos, HttpServletRequest request, HttpServletResponse response, String nombreAccion) 
+			throws SQLException, UVException, IOException {
+		
+		ModeloMerito modeloMerito = ModeloMerito.obtenerInstancia();
+		bean.setMerito(modeloMerito.getMeritoById(Formateador.leeParametroInteger(request.getParameter(PARAM_MERITO))));
+		
+		switch (nombreAccion) {
+			case ACCION_DATATABLE_BOLSAS_CANDIDATO:
+				listadoBolsasCandidato(bean, datos, request, response);
+				break;
+			case ACCION_DATATABLE_VALORES_MERITO_BOLSA:
+				break;
+		}
+		
+	}
+	
+	private void listadoBolsas(VistaValidar bean, UVDatos datos, HttpServletRequest request, HttpServletResponse response) throws IOException, SQLException, UVException {
 		datos.setContentType("application/json");
 		datos.setRespuestaEnviada(true);
 		response.setContentType("application/json");
 		response.setCharacterEncoding("UTF-8");
 		
-		Convocatoria convocatoria = ModeloConvocatoria.obtenerInstancia().getUltimaConvocatoria();
-		
 		try (PrintWriter writer = response.getWriter()) {
 			try {
 				BolsaEmpleoDataTable<BolsaValidacion> dataTable = ModeloValidar.obtenerInstancia().
-						listadoAreasSujetasAfinidad(convocatoria, request.getParameterMap());
+						listadoAreasSujetasAfinidad(bean.getConvocatoria(), request.getParameterMap());
 				Gson gson = new GsonBuilder().setExclusionStrategies(BolsaEmpleoDataTable.GSONEXCLUSIONSTRATEGY).create();
-				bean.setDatatable(dataTable);
+				bean.setDatatableBolsas(dataTable);
+				writer.write(gson.toJson(dataTable));
+			} catch (Exception ex) {
+				bean.getMensajesDeError().add(ex.getMessage());
+				
+				CodigoDescripcion mensaje = new CodigoDescripcion("error", ex.getMessage());
+				writer.write(new Gson().toJson(mensaje));
+				response.setStatus(RESPONSE_HTTP_CODE_ERROR);
+			}
+		}
+	}
+	
+	private void listadoBolsasCandidato(VistaValidar bean, UVDatos datos, HttpServletRequest request, HttpServletResponse response)
+			throws IOException, SQLException, UVException {
+		datos.setContentType("application/json");
+		datos.setRespuestaEnviada(true);
+		response.setContentType("application/json");
+		response.setCharacterEncoding("UTF-8");
+		
+		try (PrintWriter writer = response.getWriter()) {
+			try {
+				BolsaEmpleoDataTable<Bolsa> dataTable = ModeloValidar.obtenerInstancia().
+						listadoAreasCandidatoSujetasAfinidad(bean.getConvocatoria(), bean.getCandidato(), request.getParameterMap());
+				Gson gson = new GsonBuilder().setExclusionStrategies(BolsaEmpleoDataTable.GSONEXCLUSIONSTRATEGY).create();
+				bean.setDatatableBolsasCandidato(dataTable);
+				writer.write(gson.toJson(dataTable));
+			} catch (Exception ex) {
+				bean.getMensajesDeError().add(ex.getMessage());
+				
+				CodigoDescripcion mensaje = new CodigoDescripcion("error", ex.getMessage());
+				writer.write(new Gson().toJson(mensaje));
+				response.setStatus(RESPONSE_HTTP_CODE_ERROR);
+			}
+		}
+	}
+	
+	private void listadoCandidatos(VistaValidar bean, UVDatos datos, HttpServletRequest request, HttpServletResponse response) throws IOException, SQLException, UVException {
+		datos.setContentType("application/json");
+		datos.setRespuestaEnviada(true);
+		response.setContentType("application/json");
+		response.setCharacterEncoding("UTF-8");
+		
+		try (PrintWriter writer = response.getWriter()) {
+			try {
+				BolsaEmpleoDataTable<CandidatoValidacion> dataTable = ModeloValidar.obtenerInstancia().
+						listadoCandidatosSujetosAfinidad(bean.getConvocatoria(), bean.getBolsa(), request.getParameterMap());
+				Gson gson = new GsonBuilder().setExclusionStrategies(BolsaEmpleoDataTable.GSONEXCLUSIONSTRATEGY).create();
+				bean.setDatatableCandidatos(dataTable);
+				writer.write(gson.toJson(dataTable));
+			} catch (Exception ex) {
+				bean.getMensajesDeError().add(ex.getMessage());
+				
+				CodigoDescripcion mensaje = new CodigoDescripcion("error", ex.getMessage());
+				writer.write(new Gson().toJson(mensaje));
+				response.setStatus(RESPONSE_HTTP_CODE_ERROR);
+			}
+		}
+	}
+	
+	private void listadoMeritos(VistaValidar bean, UVDatos datos, HttpServletRequest request, HttpServletResponse response) throws IOException, SQLException, UVException {
+		datos.setContentType("application/json");
+		datos.setRespuestaEnviada(true);
+		response.setContentType("application/json");
+		response.setCharacterEncoding("UTF-8");
+		
+		try (PrintWriter writer = response.getWriter()) {
+			try {
+				BolsaEmpleoDataTable<Merito> dataTable = ModeloValidar.obtenerInstancia().
+						listadoMeritosSujetosAfinidad(bean.getConvocatoria(), bean.getBolsa(), bean.getCandidato(), request.getParameterMap());
+				Gson gson = new GsonBuilder().setExclusionStrategies(BolsaEmpleoDataTable.GSONEXCLUSIONSTRATEGY).create();
+				bean.setDatatableMeritos(dataTable);
 				writer.write(gson.toJson(dataTable));
 			} catch (Exception ex) {
 				bean.getMensajesDeError().add(ex.getMessage());

@@ -74,7 +74,7 @@ public class TestBEPBeanEvaluador {
 	public void testA02() {
 		UsuarioBolsaEmpleo usuario = new UsuarioBolsaEmpleo(CODPERSONA, CODCUENTA, ROL, LISTADIST, EXCLUIDO, EXCLUIDOTIPO, FECHAEXCLUSIONINICIO, FECHAEXCLUSIONFIN);
 		Evaluador evaluador = new Evaluador(usuario, AREA, ACTIVO);
-		Evaluador evaluador2 = new Evaluador(evaluador, usuario);
+		Evaluador evaluador2 = new Evaluador(evaluador);
 		
 		assertEquals(CODPERSONA, evaluador.getCodPersona());
 		assertEquals(CODPERSONA, evaluador2.getCodPersona());

@@ -37,12 +37,12 @@ public class BolsaValidacion extends Bolsa implements Serializable {
 		super(pbolsa);
 		this.totalMeritosNoValidados = pmeritosNoValidados;
 		this.totalMeritosValidados = pmeritosValidados;
-		this.totalMeritosExcluidos = pmeritosExcluidos;		
+		this.totalMeritosExcluidos = pmeritosExcluidos;
 		this.totalMeritos = ptotalMeritos;
 	}
 	
 	/** Constructor copia.
-	 * @param copia Convocatoria a copiar
+	 * @param copia BolsaValidacion a copiar
 	 */
 	public BolsaValidacion(BolsaValidacion copia) {
 		super(copia);

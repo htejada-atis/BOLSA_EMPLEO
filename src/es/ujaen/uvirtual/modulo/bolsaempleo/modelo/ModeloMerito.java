@@ -283,7 +283,7 @@ public class ModeloMerito {
 		}
 	}
 	
-	private Merito createMeritoFromResultset(ResultSet rs, Boolean withUsuario, Boolean withFile) throws SQLException, UVException {
+	public Merito createMeritoFromResultset(ResultSet rs, Boolean withUsuario, Boolean withFile) throws SQLException, UVException {
 		ModeloBaremacion modeloBar = ModeloBaremacion.obtenerInstancia();
 		
 		Merito mer = new Merito();		

@@ -3,7 +3,7 @@ package es.ujaen.uvirtual.modulo.bolsaempleo.beans;
 import java.io.Serializable;
 
 
-/** Clase titulación de bolsa empleo.
+/** Clase evaluador de bolsa empleo.
  * @author jlopez
  *
  */
@@ -50,10 +50,9 @@ public class Evaluador extends UsuarioBolsaEmpleo implements Serializable {
 	
 	/** Constructor copia.
 	 * @param copia Evaluador a copiar
-	 * @param pusuario usuario a copiar
 	 */
-	public Evaluador(Evaluador copia, UsuarioBolsaEmpleo pusuario) {
-		super(pusuario);
+	public Evaluador(Evaluador copia) {
+		super(copia);
 		this.codNumArea = copia.codNumArea;
 		this.activo = copia.activo;
 	}
@@ -80,13 +79,14 @@ public class Evaluador extends UsuarioBolsaEmpleo implements Serializable {
 	
 	@Override
 	public String toString() {
-		return "Evaluador [codNumArea=" + codNumArea + ", activo=" + activo + "]";
+		return "Evaluador [usuario= " + super.toString() + ", codNumArea=" + codNumArea + ", activo=" + activo + "]";
 	}
 	
 	@Override
 	public int hashCode() {
 		final int prime = 31;
 		int result = 1;
+		result = prime * super.hashCode();
 		result = prime * result + ((codNumArea == null) ? 0 : codNumArea.hashCode());
 		result = prime * result + ((activo == null) ? 0 : activo.hashCode());
 		return result;
@@ -105,6 +105,10 @@ public class Evaluador extends UsuarioBolsaEmpleo implements Serializable {
 			return false;
 		}
 		Evaluador other = (Evaluador) obj;
+		if (!super.equals(other)) {
+			return false;
+		}
+		
 		if (activo == null) {
 			if (other.activo != null) {
 				return false;

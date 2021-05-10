@@ -42,15 +42,22 @@ public class ControladorValidarNoAfines extends HttpServlet {
 	private static final long serialVersionUID = 1L;
 	private static final String NOMBREDEESTACLASE = ControladorValidarNoAfines.class.getName();
 	private static final Logger LOGGER = Logger.getLogger(NOMBREDEESTACLASE);
-	public static final String PARAM_ACCION = "a";
 	
 	// acciones
-	public static final String ACCION_INDEX = "listar";
 	public static final String ACCION_DATATABLE_BOLSAS = "datatablebolsas";
+	public static final String ACCION_DATATABLE_CANDIDATOS = "datatablecandidatos";
+	public static final String ACCION_DATATABLE_MERITOS = "datatablemeritos";
+	public static final String ACCION_DESCARGAR_FICHERO = "descargarfichero";
 	public static final String ACCION_BOLSA_SELECCIONADA = "bolsaseleccionada";
+	public static final String ACCION_CANDIDATO_SELECCIONADO = "candidatoseleccionado";
+	public static final String ACCION_INDEX = "listar";
+	public static final String ACCION_MERITO_SELECCIONADO = "meritoseleccionado";
 	
 	// parámetros
+	public static final String PARAM_ACCION = "a";
 	public static final String PARAM_BOLSA = "bolsa";
+	public static final String PARAM_CANDIDATO = "candidato";
+	public static final String PARAM_MERITO = "merito";
 	
 	// url y rutas
 	public static final String URL_PATTERN_AJAX = "/srv/es/ajax/informacionadministrativa/bolsaempleo/validarnoafines";

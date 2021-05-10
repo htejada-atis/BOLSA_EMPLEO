@@ -60,8 +60,14 @@ $(document).ready(function() {
 	    "ajax": { url: "<%= ControladorValidar.URL_PATTERN_AJAX %>" },
 	    "pageSize": 10,
 	    "filterable": true,
-	    "action": "<%= ControladorValidar.ACCION_DATATABLE %>",
+	    "action": "<%= ControladorValidar.ACCION_DATATABLE_BOLSAS %>",
 	    "defaultOrderBy": 1,
+	    "clickable": {'onClick': function(row) {
+	    	var params = {
+    				'a': '<%= ControladorValidar.ACCION_BOLSA_SELECCIONADA %>', 
+    				'<%= ControladorValidar.PARAM_BOLSA %>': row.codNum};
+    		Atis.sendForm("<%= request.getRequestURI() %>", params);
+	    }},
 	    "columns": [
 	    	{'data': 'area.idAreaExterno', 'filter': {'type': 'number'}},
 	        {'data': 'area.descripcion', 'filter': true},
