@@ -36,7 +36,7 @@ public class UtilsTestBolsaEmpleo {
 	private static final int ROL_CANDIDATO = 1052;
 	private static final int ROL_DIRECTOR_DEPARTAMENTO = 1053;
 	private static final int NUM_AREAS_INSERTAR = 35;
-	private static final Pattern RE_FILE_MIGRATION = Pattern.compile("\\d+-(im|eje)-[a-zA-z]+\\.sql", Pattern.DOTALL);
+	private static final Pattern RE_FILE_MIGRATION = Pattern.compile("\\d+-(im|eje)-[a-zA-Z]+\\.sql", Pattern.DOTALL);
 			
 	public static final boolean VERBOSE = false;
 
