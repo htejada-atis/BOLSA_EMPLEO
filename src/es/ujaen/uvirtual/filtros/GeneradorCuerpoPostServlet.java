@@ -67,7 +67,7 @@ public class GeneradorCuerpoPostServlet implements Filter {
 		UVDatos datos = (UVDatos) req.getAttribute(UVDatos.NOMBRE_ATRIBUTO);
 		
 		Menu menu = datos.getMenu();
-		if ((menu != null) && (menu.isCrearMenu()) && (ConfiguracionGlobal.getParametroCadenaNE("ayudaurl.formatohtml").equals(datos.getFormatoSalida()))) {
+		if (menu != null && menu.isCrearMenu() && ConfiguracionGlobal.getParametroCadenaNE("ayudaurl.formatohtml").equals(datos.getFormatoSalida())) {
 			datos.getFicherosJSP().add(urlPostServlet);
 		}
 

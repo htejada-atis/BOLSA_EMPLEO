@@ -147,7 +147,7 @@ public class ValidaAcceso implements Filter {
 				if (menu.getSistemas().contains(sistema.getCodigo())) {
 					String servNoDospinible = ErroresPersonalizados.ERROR_SERV_NO_DISPONIBLE + ":";
 					if (sistema.isEnMantenimiento() 
-						&& ((sistema.getFechaEntradaEnMantenimiento() == null) 
+						&& (sistema.getFechaEntradaEnMantenimiento() == null 
 							|| sistema.getFechaEntradaEnMantenimiento().before(new Date()))) {
 						// Sistema en mantenimiento
 						req.getSession().setAttribute(atributroError, servNoDospinible + sistema.getMotivoDelMantenimiento());

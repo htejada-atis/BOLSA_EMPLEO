@@ -76,7 +76,7 @@ public class GeneradorCuerpoPreServlet implements Filter {
 
 		Menu menu = vista.getMenu();
 
-		if ((menu != null) && (menu.isCrearMenu()) && (ConfiguracionGlobal.getParametroCadenaNE("ayudaurl.formatohtml").equals(datos.getFormatoSalida()))) {
+		if (menu != null && menu.isCrearMenu() && ConfiguracionGlobal.getParametroCadenaNE("ayudaurl.formatohtml").equals(datos.getFormatoSalida())) {
 			Map<Integer, Menu> menus = null;
 			List<Menu> todosLosHijos = null;
 			List<Menu> todosMismoNivel = null;
@@ -158,7 +158,7 @@ public class GeneradorCuerpoPreServlet implements Filter {
 	 */
 	private ArrayList<Menu> obtenerMigaDePan(Menu menu, Map<Integer, Menu> menus) {
 		// caso base: es el elemento raíz o no existe elemento padre
-		if ((menu.getCodigo() == ConfiguracionGlobal.getParametroEnteroNE("administracion.codigomenuraiz")) || (!menus.containsKey(menu.getCodigoPadre()))) {
+		if (menu.getCodigo() == ConfiguracionGlobal.getParametroEnteroNE("administracion.codigomenuraiz") || !menus.containsKey(menu.getCodigoPadre())) {
 			ArrayList<Menu> resultado = new ArrayList<>();
 			resultado.add(menu);
 			return resultado;
