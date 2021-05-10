@@ -76,9 +76,6 @@ public class ControladorGestionTitulaciones extends HttpServlet {
 	// urls
 	public static final String URL_PATTERN_AJAX = "/srv/es/ajax/informacionadministrativa/bolsaempleo/configuracion/titulaciones";
 
-	// variables
-	public static boolean anonimo = true;
-	
 	/** Peticion GET.
 	 * @see HttpServlet#doGet(HttpServletRequest request, HttpServletResponse response)
 	 */
@@ -98,26 +95,28 @@ public class ControladorGestionTitulaciones extends HttpServlet {
 		}
 		
 		try {
-			anonimo = !modelo.checkUser(datos);
+			modelo.checkUser(datos);
 			switch (nombreAccion) {
-			case ACCION_AGREGAR_TITULACION:
-				agregarTitulacion(bean, request, response);
-				break;
-			case ACCION_EDITAR_TITULACION:
-				editarTitulacion(bean, request, response);
-				break;
-			case ACCION_BORRAR_TITULACION:
-				eliminarTitulacion(bean, request, response);
-				break;
-			case ACCION_DATATABLE_TITULACIONES:
-				listadoTitulaciones(bean, datos, request, response);
-				break;
-			case ACCION_LISTAR_TITULACIONES:
-				bean.setVista(RUTA_BEP_CONF + "titulaciones.jsp");
-				break;
+				case ACCION_AGREGAR_TITULACION:
+					agregarTitulacion(bean, request, response);
+					break;
+				case ACCION_EDITAR_TITULACION:
+					editarTitulacion(bean, request, response);
+					break;
+				case ACCION_BORRAR_TITULACION:
+					eliminarTitulacion(bean, request, response);
+					break;
+				case ACCION_DATATABLE_TITULACIONES:
+					listadoTitulaciones(bean, datos, request, response);
+					break;
+				case ACCION_LISTAR_TITULACIONES:
+					bean.setVista(RUTA_BEP_CONF + "titulaciones.jsp");
+					break;
+				default:
+					errorFatal(bean, "Acción no contemplada");
 			}
 		} catch (SQLException e) {
-			System.out.println("error: " + e);
+			LOGGER.log(Level.WARNING, e.toString());
 			bean.getMensajesDeError().add("Error al acceder a la base de datos");
 		} catch (UVException e) {
 			LOGGER.log(Level.WARNING, e.toString());
@@ -133,6 +132,11 @@ public class ControladorGestionTitulaciones extends HttpServlet {
 			datos.getFicherosCSS().add("/css/jqueryujaen/jquery-ui-1.8.16.custom.css");
 			datos.getFicherosCSS().add("/css/ujaen_bolsa_empleo.css");
 		}
+	}
+	
+	private void errorFatal(VistaTitulaciones bean, String mensaje) {
+		bean.setVista("/WEB-INF/jsp/vista/infadministrativa/bolsaempleo/error.jsp");
+		bean.getMensajesDeError().add(mensaje);
 	}
 	
 	/** redireccion de do post.

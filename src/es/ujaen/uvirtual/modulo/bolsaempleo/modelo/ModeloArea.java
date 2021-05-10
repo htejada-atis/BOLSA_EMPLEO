@@ -36,7 +36,7 @@ public class ModeloArea {
 	public static final int ORDER_COLUMN_INDEX_CODIGO_CANDIDATO = 0;
 	public static final int ORDER_COLUMN_INDEX_AREA_CANDIDATO = 1;
 	
-    protected static ModeloArea eInstancia = null;
+	protected static ModeloArea eInstancia = null;
 	
 	/** Crea una instancia del objeto.
 	 *  de forma sincronizada para protegerse de posibles problemas multi-hilo
@@ -51,11 +51,11 @@ public class ModeloArea {
      * Obtiene una instancia de la conexión.
      * @return instancia
      */
-    public static ModeloArea obtenerInstancia() {
-        if (eInstancia == null) {
-        	crearInstancia();
-        }
-        return eInstancia;
+	public static ModeloArea obtenerInstancia() {
+		if (eInstancia == null) {
+			crearInstancia();
+		}
+		return eInstancia;
     }
 	
 	/** Consulta areas en BBDD y las devuelve.
@@ -364,7 +364,7 @@ public class ModeloArea {
 	 * @return true o false si está excluido o no
 	 * @throws SQLException .
 	 */
-	public Boolean isUsuarioExcluidoBolsa(UsuarioBolsaEmpleo usuario, Area area) throws SQLException {
+	public boolean isUsuarioExcluidoBolsa(UsuarioBolsaEmpleo usuario, Area area) throws SQLException {
 		String query = "SELECT COUNT(*) as count FROM TBEP_USUARIOS_EXCLUIDOS_AREA WHERE USUARIO = ? AND AREA = ?";		
 		
 		try (Connection con = ConexionUvirtual.obtenerInstancia(); PreparedStatement stmt = con.prepareStatement(query);) {

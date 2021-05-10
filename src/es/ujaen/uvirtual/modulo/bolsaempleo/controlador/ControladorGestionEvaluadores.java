@@ -82,11 +82,12 @@ public class ControladorGestionEvaluadores extends HttpServlet {
 	// ruta vistas
 	public static final String RUTA_BEP_CONF = "/WEB-INF/jsp/vista/infadministrativa/bolsaempleo/configuracion/evaluadores/";
 	
-	// urls
-	public static final String URL_PATTERN_AJAX = "/srv/es/ajax/informacionadministrativa/bolsaempleo/configuracion/evaluadores";
-	
-	// variables
-	public static boolean anonimo = true;
+	// ajax	
+	public static final String RESPONSE_AJAX_URL = "/srv/es/ajax/informacionadministrativa/bolsaempleo/configuracion/evaluadores";
+	public static final String RESPONSE_AJAX_CONTENTTYPE = "application/json";
+	public static final String RESPONSE_AJAX_ENCODING = "UTF-8";
+	public static final String RESPONSE_AJAX_ERROR = "error";
+	public static final int RESPONSE_AJAX_HTTP_CODE_ERROR = 400;
 
 	/** Peticion GET.
 	 * @see HttpServlet#doGet(HttpServletRequest request, HttpServletResponse response)
@@ -107,7 +108,7 @@ public class ControladorGestionEvaluadores extends HttpServlet {
 		}
 		
 		try {
-			anonimo = !modelo.checkUser(datos);
+			modelo.checkUser(datos);
 			switch (nombreAccion) {
 				case ACCION_AGREGAR_EVALUADORES:
 					agregarEvaluadores(bean, request, response);
@@ -124,6 +125,8 @@ public class ControladorGestionEvaluadores extends HttpServlet {
 				case ACCION_LISTAR_AREAS:
 					obtenerAreas(bean, request);
 					break;
+				default:
+					errorFatal(bean, "Acción no contemplada");
 			}
 		} catch (SQLException e) {
 			LOGGER.log(Level.WARNING, e.toString());
@@ -142,6 +145,11 @@ public class ControladorGestionEvaluadores extends HttpServlet {
 			datos.getFicherosCSS().add("/css/jqueryujaen/jquery-ui-1.8.16.custom.css");
 			datos.getFicherosCSS().add("/css/ujaen_bolsa_empleo.css");
 		}
+	}
+	
+	private void errorFatal(VistaEvaluadores bean, String mensaje) {
+		bean.setVista("/WEB-INF/jsp/vista/infadministrativa/bolsaempleo/error.jsp");
+		bean.getMensajesDeError().add(mensaje);
 	}
 	
 	/** redireccion de do post.
@@ -230,7 +238,7 @@ public class ControladorGestionEvaluadores extends HttpServlet {
 		ModeloEvaluador modelo = ModeloEvaluador.obtenerInstancia();
 		Integer codNumUsuario = Formateador.leeParametroInteger(request.getParameter(PARAM_USUARIO));
 		Integer codNumArea = Formateador.leeParametroInteger(request.getParameter(PARAM_AREA));
-		Boolean activo = request.getParameter(PARAM_ACTIVO) != null && EscapaHTML.ajustaCodificacion(request.getParameter(PARAM_ACTIVO)).equals("true");
+		boolean activo = "true".equals(EscapaHTML.ajustaCodificacion(request.getParameter(PARAM_ACTIVO)));
 		Evaluador evaluador = new Evaluador(codNumArea, activo);
 		evaluador.setCodNum(codNumUsuario);
 		bean.setEvaluador(evaluador);
@@ -284,9 +292,9 @@ public class ControladorGestionEvaluadores extends HttpServlet {
 			throws IOException, SQLException {
 		ModeloEvaluador modeloEvaluador = ModeloEvaluador.obtenerInstancia();
 		ModeloArea modeloArea = ModeloArea.obtenerInstancia();
-		datos.setContentType("application/json");
-		response.setContentType("application/json");
-		response.setCharacterEncoding("UTF-8");
+		datos.setContentType(RESPONSE_AJAX_CONTENTTYPE);
+		response.setContentType(RESPONSE_AJAX_CONTENTTYPE);
+		response.setCharacterEncoding(RESPONSE_AJAX_ENCODING);
 		
 		try (PrintWriter writer = response.getWriter()) {
 			try {
@@ -299,7 +307,7 @@ public class ControladorGestionEvaluadores extends HttpServlet {
 				writer.write(gson.toJson(dataTable));
 			} catch (Exception ex) {
 				bean.getMensajesDeError().add(ex.getMessage());
-				CodigoDescripcion mensaje = new CodigoDescripcion("error", ex.getMessage());
+				CodigoDescripcion mensaje = new CodigoDescripcion(RESPONSE_AJAX_ERROR, ex.getMessage());
 				writer.write(new Gson().toJson(mensaje));
 				response.setStatus(RESPONSE_HTTP_CODE_ERROR);
 			}
@@ -320,9 +328,9 @@ public class ControladorGestionEvaluadores extends HttpServlet {
 			throws IOException, SQLException {
 		ModeloEvaluador modelo = ModeloEvaluador.obtenerInstancia();
 		ModeloArea modeloArea = ModeloArea.obtenerInstancia();
-		datos.setContentType("application/json");
-		response.setContentType("application/json");
-		response.setCharacterEncoding("UTF-8");
+		datos.setContentType(RESPONSE_AJAX_CONTENTTYPE);
+		response.setContentType(RESPONSE_AJAX_CONTENTTYPE);
+		response.setCharacterEncoding(RESPONSE_AJAX_ENCODING);
 		
 		try (PrintWriter writer = response.getWriter()) {
 			try {
@@ -335,7 +343,7 @@ public class ControladorGestionEvaluadores extends HttpServlet {
 				writer.write(gson.toJson(dataTable));
 			} catch (Exception ex) {
 				bean.getMensajesDeError().add(ex.getMessage());
-				CodigoDescripcion mensaje = new CodigoDescripcion("error", ex.getMessage());
+				CodigoDescripcion mensaje = new CodigoDescripcion(RESPONSE_AJAX_ERROR, ex.getMessage());
 				writer.write(new Gson().toJson(mensaje));
 				response.setStatus(RESPONSE_HTTP_CODE_ERROR);
 			}

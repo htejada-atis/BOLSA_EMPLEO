@@ -56,8 +56,11 @@ public class UsuarioBolsaEmpleo implements Serializable {
 	 * @param pexcluido .
 	 * @param pexcluidotipo .
 	 * @param pusu .
+	 * @param pfechaexclusionini .
+	 * @param pfechaexclusionfin .
 	 */
-	public UsuarioBolsaEmpleo(Integer pcodpersona, String pusu, Rol prol, Boolean plistaDist, Boolean pexcluido, String pexcluidotipo, Date pfechaexclusionini, Date pfechaexclusionfin) {
+	public UsuarioBolsaEmpleo(Integer pcodpersona, String pusu, Rol prol, Boolean plistaDist, Boolean pexcluido, 
+			String pexcluidotipo, Date pfechaexclusionini, Date pfechaexclusionfin) {
 		super();
 		this.codpersona = pcodpersona;
 		this.codcuenta = pusu;
@@ -75,8 +78,11 @@ public class UsuarioBolsaEmpleo implements Serializable {
 	 * @param pexcluidotipo .
 	 * @param prazonexcluido .
 	 * @param pfechaexclusion .
+	 * @param pfechaexclusionini .
+	 * @param pfechaexclusionfin .
 	 */
-	public UsuarioBolsaEmpleo(Integer pcodNum, Boolean pexcluido, String pexcluidotipo, String prazonexcluido, Date pfechaexclusion, Date pfechaexclusionini, Date pfechaexclusionfin) {
+	public UsuarioBolsaEmpleo(Integer pcodNum, Boolean pexcluido, String pexcluidotipo, String prazonexcluido, 
+			Date pfechaexclusion, Date pfechaexclusionini, Date pfechaexclusionfin) {
 		super();
 		this.codNum = pcodNum;
 		this.excluido = pexcluido;

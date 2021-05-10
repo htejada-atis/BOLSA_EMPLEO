@@ -46,9 +46,6 @@ public class ControladorMiembrosComision extends HttpServlet {
 	public static final String MENSAJE_ERROR_FOO = "Mensaje de error";
 	public static final String MENSAJE_EXITO_BAR = "Mensaje de exito"; 
 
-	// variables
-	public static boolean anonimo = true;
-	
 	/** Peticion GET.
 	 * @see HttpServlet#doGet(HttpServletRequest request, HttpServletResponse response)
 	 */
@@ -71,14 +68,16 @@ public class ControladorMiembrosComision extends HttpServlet {
 		bean.setVista("/WEB-INF/jsp/vista/infadministrativa/bolsaempleo/miembroscomision/index.jsp");
 		
 		try {
-			anonimo = !modelo.checkUser(datos);
+			modelo.checkUser(datos);
 			switch (nombreAccion) {
 				case ACCION_LISTAR:
 					listado(datos, request, response);
 					break;
 				case ACCION_LISTAR_AREAS:
-					obtenerAreas(bean, request);
+					obtenerAreas(bean);
 					break;
+				default:
+					errorFatal(bean, "Acción no contemplada");
 			}
 		} catch (SQLException e) {
 			LOGGER.log(Level.SEVERE, Formateador.getStackTrace(e));
@@ -101,6 +100,11 @@ public class ControladorMiembrosComision extends HttpServlet {
 		}
 	}
 	
+	private void errorFatal(VistaMiembrosComision bean, String mensaje) {
+		bean.setVista("/WEB-INF/jsp/vista/infadministrativa/bolsaempleo/error.jsp");
+		bean.getMensajesDeError().add(mensaje);
+	}
+	
 	/** redireccion de do post.
 	 * @see HttpServlet#doPost(HttpServletRequest request, HttpServletResponse response)
 	 */
@@ -109,17 +113,16 @@ public class ControladorMiembrosComision extends HttpServlet {
 		doGet(request, response);
 	}
 		
-	private void listado(UVDatos datos, HttpServletRequest request, HttpServletResponse response) throws IOException, SQLException {
+	private void listado(UVDatos datos, HttpServletRequest request, HttpServletResponse response) {
 		
 	}
 	
 	/** muestra todas las areas en un select .
 	 * @param bean bean de la vista a la que poner los valores.
-	 * @param request .
 	 * @throws SQLException excepcion de bbdd.
 	 * @throws UVException .
 	 */
-	private void obtenerAreas(VistaMiembrosComision bean, HttpServletRequest request) throws SQLException, UVException {
+	private void obtenerAreas(VistaMiembrosComision bean) throws SQLException, UVException {
 		bean.setVista("/WEB-INF/jsp/vista/infadministrativa/bolsaempleo/miembroscomision/index.jsp");
 		
 		ModeloArea modelo = ModeloArea.obtenerInstancia();

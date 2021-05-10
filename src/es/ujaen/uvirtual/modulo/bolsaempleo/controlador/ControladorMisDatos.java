@@ -73,13 +73,10 @@ public class ControladorMisDatos extends HttpServlet {
 	public static final String MENSAJE_ERROR_PRIMER_APELLIDO_VACIO = "El primer apellido no puede estar vacio";
 	public static final String MENSAJE_ERROR_NACIONALIDAD_VACIO = "La nacionalidad no puede estar vacia";
 	public static final String MENSAJE_ERROR_NOMBRE_VACIO = "El nombre no puede estar vacio";
-	
 	public static final String MENSAJE_ERROR_RAZON_BORRADO_VACIO = "La razón de borrado no puede estar vacía";
-	
 	public static final String MENSAJE_ERROR_TELEFONO_STRING = "El telefono debe ser un número";
 	public static final String MENSAJE_ERROR_MOVIL_STRING = "El móvil debe ser un número";
 	public static final String MENSAJE_ERROR_CODIGO_POSTAL_STRING = "El código postal debe ser un número";
-	
 	public static final String MENSAJE_ERROR_NOMBRE_LARGO = "El nombre no puede contener mas de %d caracteres";
 	public static final String MENSAJE_ERROR_PRIMER_APELLIDO_LARGO = "El primer apellido no puede contener mas de %d caracteres";
 	public static final String MENSAJE_ERROR_SEGUNDO_APELLIDO_LARGO = "El segundo apellido no puede contener mas de %d caracteres";
@@ -92,15 +89,10 @@ public class ControladorMisDatos extends HttpServlet {
 	public static final String MENSAJE_ERROR_NACIONALIDAD_LARGO = "La nacionalidad no puede contener mas de %d caracteres";
 	public static final String MENSAJE_ERROR_EMAIL_LARGO = "El email no puede contener mas de %d caracteres";
 	
-	
-	
-
 	public static final int RESPONSE_HTTP_CODE_ERROR = 400;
 	
 	public static final String URL_PATTERN_AJAX = "/srv/es/ajax/informacionadministrativa/bolsaempleo/misdatos";
-	
-	public static boolean anonimo = true;
-	
+
 	/** Peticion GET.
 	 * @see HttpServlet#doGet(HttpServletRequest request, HttpServletResponse response)
 	 */
@@ -123,26 +115,20 @@ public class ControladorMisDatos extends HttpServlet {
 		bean.setVista("/WEB-INF/jsp/vista/infadministrativa/bolsaempleo/misdatos/index.jsp");
 		
 		Usuario usuArcos = CrearUsuario.usuario(usuario.getUid());
-		
 		bean.setUsuarioArcos(usuArcos);
 	
-		UsuarioBolsaEmpleo usu;
 		try {
-			usu = modelo.listaUsuario(usuario.getUid());
-			bean.setUsuario(usu);
-		} catch (SQLException | UVException exy) {
-			exy.printStackTrace();
-		}	
-		
-		try {
-			anonimo = !modelo.checkUser(datos);
+			modelo.checkUser(datos);
+			bean.setUsuario(ModeloUsuarioBolsaEmpleo.obtenerInstancia().listaUsuario(usuario.getUid()));			
 			switch (nombreAccion) {
-			case ACCION_ENVIAR_MISDATOS:
-				enviarMisDatos(request, response, bean, usuario);
-				break;
-			case ACCION_BAJA_USUARIO:
-				bajaUsuario(request, response, bean, usuario);
-				break;
+				case ACCION_ENVIAR_MISDATOS:
+					enviarMisDatos(request, bean);
+					break;
+				case ACCION_BAJA_USUARIO:
+					bajaUsuario(request, bean);
+					break;
+				default:
+					errorFatal(bean, "Acción no contemplada");
 			}
 		} catch (SQLException e) {
 			LOGGER.log(Level.SEVERE, Formateador.getStackTrace(e));
@@ -165,6 +151,11 @@ public class ControladorMisDatos extends HttpServlet {
 		}
 	}
 	
+	private void errorFatal(VistaUsuarioBolsaEmpleo bean, String mensaje) {
+		bean.setVista("/WEB-INF/jsp/vista/infadministrativa/bolsaempleo/error.jsp");
+		bean.getMensajesDeError().add(mensaje);
+	}
+	
 	/** Redireccion de do post.
 	 * @see HttpServlet#doPost(HttpServletRequest request, HttpServletResponse response)
 	 */
@@ -176,15 +167,10 @@ public class ControladorMisDatos extends HttpServlet {
 	/** Envia el formulario con los datos del usuario logueado.
 	 * @param bean .
 	 * @param request .
-	 * @param response .
-	 * @param usuario .
 	 * @throws UVException .
 	 * @throws SQLException .
-	 * @throws IOException .
-	 * @throws IOException .
 	 */
-	public void enviarMisDatos(HttpServletRequest request, HttpServletResponse response, 
-			VistaUsuarioBolsaEmpleo bean, Usuario usuario) throws SQLException, UVException, IOException {
+	public void enviarMisDatos(HttpServletRequest request, VistaUsuarioBolsaEmpleo bean) throws SQLException, UVException {
 		bean.setVista("/WEB-INF/jsp/vista/infadministrativa/bolsaempleo/misdatos/index.jsp");
 		
 		BolsaEmpleoValidator validator = this.getValidatorMisDatos(request); 							
@@ -197,7 +183,6 @@ public class ControladorMisDatos extends HttpServlet {
 				}
 			}
 		} else {
-		
 			String nombre = EscapaHTML.ajustaCodificacion(request.getParameter(PARAM_NOMBRE));
 			String primerapellido = EscapaHTML.ajustaCodificacion(request.getParameter(PARAM_PRIMER_APELLIDO));
 			String segundoapellido = EscapaHTML.ajustaCodificacion(request.getParameter(PARAM_SEGUNDO_APELLIDO));
@@ -211,8 +196,8 @@ public class ControladorMisDatos extends HttpServlet {
 			String telefono = EscapaHTML.ajustaCodificacion(request.getParameter(PARAM_TELEFONO));
 			String nacionalidad = EscapaHTML.ajustaCodificacion(request.getParameter(PARAM_NACIONALIDAD));
 			String sexo = EscapaHTML.ajustaCodificacion(request.getParameter(PARAM_SEXO));
-			Boolean listadist = request.getParameter(PARAM_LISTA) != null && EscapaHTML.ajustaCodificacion(request.getParameter(PARAM_LISTA)).equals("true");
-			
+			Boolean listadist = "true".equals(EscapaHTML.ajustaCodificacion(request.getParameter(PARAM_LISTA))); 
+					
 			UsuarioBolsaEmpleo usuarioFinal = new UsuarioBolsaEmpleo(codNum, nombre, primerapellido, 
 					segundoapellido, email, direccion, codigopostal, localidad, provincia, movil, telefono, nacionalidad, sexo, listadist);
 			
@@ -234,15 +219,10 @@ public class ControladorMisDatos extends HttpServlet {
 	/** Da de baja al usuario .
 	 * @param bean .
 	 * @param request .
-	 * @param response .
-	 * @param usuario .
 	 * @throws UVException .
 	 * @throws SQLException .
-	 * @throws IOException .
-	 * @throws IOException .
 	 */
-	public void bajaUsuario(HttpServletRequest request, HttpServletResponse response, 
-			VistaUsuarioBolsaEmpleo bean, Usuario usuario) throws SQLException, UVException, IOException {
+	public void bajaUsuario(HttpServletRequest request, VistaUsuarioBolsaEmpleo bean) throws SQLException, UVException {
 		bean.setVista("/WEB-INF/jsp/vista/infadministrativa/bolsaempleo/misdatos/formBaja.jsp");
 		
 		if (EscapaHTML.ajustaCodificacion(request.getParameter(PARAM_RAZON_BORRADO)) != null) {
@@ -338,8 +318,6 @@ public class ControladorMisDatos extends HttpServlet {
 		
 		return validator;
 	}
-	
-	
 	
 	/** Valida el formulario de Baja de usuario.
 	 * @param request .

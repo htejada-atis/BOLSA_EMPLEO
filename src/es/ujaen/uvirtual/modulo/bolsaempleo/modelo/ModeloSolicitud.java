@@ -46,8 +46,8 @@ public class ModeloSolicitud {
 	public static final int ORDER_COLUMN_INDEX_MERITOS_VALOR = 4;
 	public static final int ORDER_COLUMN_INDEX_MERITOS_AFINIDAD = 5;
 	public static final int ORDER_COLUMN_INDEX_MERITOS_EXCLUIDO = 6;
-			
-    protected static ModeloSolicitud eInstancia = null;
+
+	protected static ModeloSolicitud eInstancia = null;
 	
 	/** Crea una instancia del objeto.
 	 *  de forma sincronizada para protegerse de posibles problemas multi-hilo
@@ -62,11 +62,11 @@ public class ModeloSolicitud {
      * Obtiene una instancia de la conexión.
      * @return instancia
      */
-    public static ModeloSolicitud obtenerInstancia() {
-        if (eInstancia == null) {
-        	crearInstancia();
+	public static ModeloSolicitud obtenerInstancia() {
+		if (eInstancia == null) {
+			crearInstancia();
         }
-        return eInstancia;
+		return eInstancia;
     }
 	
 	/**
@@ -143,10 +143,10 @@ public class ModeloSolicitud {
 			stmt.setString(paramIndex++, SOLICITUD_ESTADO_ABIERTA);
 			stmt.setInt(paramIndex++, convocatoria.getCodNum());			
 			stmt.setInt(paramIndex++, usuario.getCodNum());
-			
-    		try (ResultSet rs = stmt.executeQuery();) {
-	    		if (rs.next() && rs.getInt("numero_solicitudes_abiertas") > 0) {
-	    			return true;	    			
+
+			try (ResultSet rs = stmt.executeQuery();) {
+				if (rs.next() && rs.getInt("numero_solicitudes_abiertas") > 0) {
+					return true;	    			
 	    		}
     		}
 		}
@@ -275,12 +275,12 @@ public class ModeloSolicitud {
 			
 			try {				
 				// eliminamos las bolsas excluidas de la solicitud
-				if (bolsasExcluidas.isEmpty()) {
+				if (!bolsasExcluidas.isEmpty()) {
 					this.eliminarBolsasExcluidasDeLaSolicitud(conexion, solicitud, bolsasExcluidas);
 				}
 				
 				// insertamos la bolsas agregadas a la solicitud
-				if (bolsasAgregadas.isEmpty()) {
+				if (!bolsasAgregadas.isEmpty()) {
 					String paramsAgregadas = BolsaEmpleoUtils.consultaMultiplesParametros(bolsasAgregadas.size());
 
 					String consultaInsert = "INSERT INTO TBEP_SOLICITUD_BOLSAS (BEPBOL_CODNUM, BEPSOL_CODNUM)"

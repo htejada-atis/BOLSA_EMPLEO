@@ -64,12 +64,13 @@ public class ControladorCandidatoTitulacionesPreferentesArea extends HttpServlet
 	// ruta vistas
 	public static final String RUTA_BEP = "/WEB-INF/jsp/vista/infadministrativa/bolsaempleo/titulacionespreferentesarea/";
 	
-	// urls
+	// ajax	
 	public static final String URL_PATTERN_AJAX = "/srv/es/ajax/informacionadministrativa/bolsaempleo/titulacionespreferentesarea";
+	public static final String RESPONSE_AJAX_CONTENTTYPE = "application/json";
+	public static final String RESPONSE_AJAX_ENCODING = "UTF-8";
+	public static final String RESPONSE_AJAX_ERROR = "error";
+	public static final int RESPONSE_AJAX_HTTP_CODE_ERROR = 400;
 
-	// variables
-	public static boolean anonimo = true;
-	
 	/** Peticion GET.
 	 * @see HttpServlet#doGet(HttpServletRequest request, HttpServletResponse response)
 	 */
@@ -81,7 +82,6 @@ public class ControladorCandidatoTitulacionesPreferentesArea extends HttpServlet
 		
 		VistaCandidatoTitulacionesArea bean = new VistaCandidatoTitulacionesArea();
 		
-		
 		ModeloUsuarioBolsaEmpleo modelo = ModeloUsuarioBolsaEmpleo.obtenerInstancia();
 	
 		String nombreAccion = EscapaHTML.ajustaCodificacion(request.getParameter(PARAM_ACCION));
@@ -90,10 +90,10 @@ public class ControladorCandidatoTitulacionesPreferentesArea extends HttpServlet
 		}
 		
 		try {
-			anonimo = !modelo.checkUser(datos);
+			modelo.checkUser(datos);
 			switch (nombreAccion) {
 				case ACCION_BOLSA_SELECCIONADA:
-					seleccionarArea(bean, request, response);
+					seleccionarArea(bean, request);
 					break;
 				case ACCION_DATATABLE_BOLSAS:
 					listadoBolsas(bean, datos, request, response);
@@ -104,6 +104,8 @@ public class ControladorCandidatoTitulacionesPreferentesArea extends HttpServlet
 				case ACCION_DATATABLE_TITULACIONES:
 					listadoTitulacionesPreferentesArea(bean, datos, request, response);
 					break;
+				default:
+					errorFatal(bean, "Acción no contemplada");
 			}
 		} catch (SQLException e) {
 			LOGGER.log(Level.WARNING, e.toString());
@@ -124,6 +126,11 @@ public class ControladorCandidatoTitulacionesPreferentesArea extends HttpServlet
 		}
 	}
 	
+	private void errorFatal(VistaCandidatoTitulacionesArea bean, String mensaje) {
+		bean.setVista("/WEB-INF/jsp/vista/infadministrativa/bolsaempleo/error.jsp");
+		bean.getMensajesDeError().add(mensaje);
+	}
+	
 	/** redireccion de do post.
 	 * @see HttpServlet#doPost(HttpServletRequest request, HttpServletResponse response)
 	 */
@@ -132,7 +139,7 @@ public class ControladorCandidatoTitulacionesPreferentesArea extends HttpServlet
 		doGet(request, response);
 	}
 	
-	private void seleccionarArea(VistaCandidatoTitulacionesArea bean, HttpServletRequest request, HttpServletResponse response) throws SQLException, UVException {
+	private void seleccionarArea(VistaCandidatoTitulacionesArea bean, HttpServletRequest request) throws SQLException, UVException {
 		ModeloBolsa modelo = ModeloBolsa.obtenerInstancia();
 		Integer codNum = Formateador.leeParametroInteger(request.getParameter(PARAM_BOLSA));
 		Bolsa area = modelo.getBolsaById(codNum);
@@ -152,10 +159,10 @@ public class ControladorCandidatoTitulacionesPreferentesArea extends HttpServlet
 	 */
 	private void listadoBolsas(VistaCandidatoTitulacionesArea bean, UVDatos datos, HttpServletRequest request, HttpServletResponse response) throws IOException, SQLException {
 		ModeloArea modelo = ModeloArea.obtenerInstancia();		
-		datos.setContentType("application/json");
+		datos.setContentType(RESPONSE_AJAX_CONTENTTYPE);
 		datos.setRespuestaEnviada(true);
-		response.setContentType("application/json");
-		response.setCharacterEncoding("UTF-8");
+		response.setContentType(RESPONSE_AJAX_CONTENTTYPE);
+		response.setCharacterEncoding(RESPONSE_AJAX_ENCODING);
 		
 		try (PrintWriter writer = response.getWriter()) {
 			try {
@@ -166,7 +173,7 @@ public class ControladorCandidatoTitulacionesPreferentesArea extends HttpServlet
 			} catch (Exception ex) {
 				bean.getMensajesDeError().add(ex.getMessage());
 				
-				CodigoDescripcion mensaje = new CodigoDescripcion("error", ex.getMessage());
+				CodigoDescripcion mensaje = new CodigoDescripcion(RESPONSE_AJAX_ERROR, ex.getMessage());
 				writer.write(new Gson().toJson(mensaje));
 				response.setStatus(RESPONSE_HTTP_CODE_ERROR);
 			}
@@ -184,9 +191,9 @@ public class ControladorCandidatoTitulacionesPreferentesArea extends HttpServlet
 	private void listadoTitulacionesPreferentesArea(VistaCandidatoTitulacionesArea bean, UVDatos datos, HttpServletRequest request, HttpServletResponse response)
 			throws IOException, SQLException {
 		ModeloTitulacion modelo = ModeloTitulacion.obtenerInstancia();
-		datos.setContentType("application/json");
-		response.setContentType("application/json");
-		response.setCharacterEncoding("UTF-8");
+		datos.setContentType(RESPONSE_AJAX_CONTENTTYPE);
+		response.setContentType(RESPONSE_AJAX_CONTENTTYPE);
+		response.setCharacterEncoding(RESPONSE_AJAX_ENCODING);
 		
 		try (PrintWriter writer = response.getWriter()) {
 			try {
@@ -196,7 +203,7 @@ public class ControladorCandidatoTitulacionesPreferentesArea extends HttpServlet
 				Gson gson = new GsonBuilder().setExclusionStrategies(BolsaEmpleoDataTable.GSONEXCLUSIONSTRATEGY).create();
 				writer.write(gson.toJson(dataTable));
 			} catch (UVException ex) {
-				CodigoDescripcion mensaje = new CodigoDescripcion("error", ex.getMessage());
+				CodigoDescripcion mensaje = new CodigoDescripcion(RESPONSE_AJAX_ERROR, ex.getMessage());
 				bean.getMensajesDeError().add(mensaje.toString());
 				writer.write(new Gson().toJson(mensaje));
 				response.setStatus(RESPONSE_HTTP_CODE_ERROR);
@@ -204,6 +211,5 @@ public class ControladorCandidatoTitulacionesPreferentesArea extends HttpServlet
 		}
 		
 		datos.setRespuestaEnviada(true);
-	}
-	
+	}	
 }
