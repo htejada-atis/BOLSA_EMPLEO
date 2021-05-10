@@ -124,7 +124,7 @@ public class CompruebaAcceso {
 		// Comprobación de la red
 		tieneAcceso = false;
 		i = 0;
-		while ((!tieneAcceso) && (i < subredesConAcceso.size())) {
+		while (!tieneAcceso && i < subredesConAcceso.size()) {
 			try {
 				if (!subredesConAcceso.get(i).isDesactivado()) {
 					tieneAcceso = compruebaIPEnSubred(subredesConAcceso.get(i).getRed(), direccionIPUsuario);

@@ -49,7 +49,7 @@ public class DriverUv {
 		File scrFile = ((TakesScreenshot) driver).getScreenshotAs(OutputType.FILE);
 	    String directorio = "/tmp/";
 	    try {
-			Files.copy(scrFile.toPath(), (new File(directorio + nombre + ".jpg")).toPath(), StandardCopyOption.REPLACE_EXISTING);
+			Files.copy(scrFile.toPath(), (new File(directorio + nombre + ".png")).toPath(), StandardCopyOption.REPLACE_EXISTING);
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
