@@ -69,7 +69,7 @@ UsuarioBolsaEmpleo candidato = bean.getCandidato();
 						<th scope="col" style="width:30px">Id</th>
 						<th scope="col" style="width:30px">Estado</th>
 						<th scope="col" style="width:30px">Código</th>
-						<th scope="col" style="width:40px">Valor</th>
+						<th scope="col" style="width:100%">Valor</th>
 						<th scope="col" style="width:30px">Fichero</th>
 					</tr>
 					<tbody>
@@ -86,9 +86,9 @@ UsuarioBolsaEmpleo candidato = bean.getCandidato();
 					<table class="bluetable bolsaempleo" id="tableBolsasCandidato">
 						<tr>
 							<th scope="col" style="width:30px">Bolsa</th>
-							<th scope="col" style="width:80px">Nombre</th>
+							<th scope="col" style="width:100%">Nombre</th>
 							<th scope="col" style="width:30px">Estado</th>
-							<th scope="col" style="width:20px">Propagar</th>
+							<th scope="col" style="width:35px">Propagar</th>
 						</tr>
 						<tbody>
 						</tbody>
@@ -159,7 +159,7 @@ UsuarioBolsaEmpleo candidato = bean.getCandidato();
 <script>
 $(document).ready(function() {
 	var tableCandidatos = new Atis.DataTable('#tableCandidatos', {
-	    "ajax": { url: "<%= ControladorValidar.URL_PATTERN_AJAX %>" },
+	    "ajax": { url: "<%= ControladorValidar.URL_PATTERN_AJAX %>", async: false },
 	    "pageSize": 10,
 	    "filterable": true,
 	    "action": "<%= ControladorValidar.ACCION_DATATABLE_CANDIDATOS %>",
@@ -190,7 +190,7 @@ $(document).ready(function() {
 	<% if (candidato != null) { %>
 	
 		var tableMeritos = new Atis.DataTable('#tableMeritos', {
-		    "ajax": { url: "<%= ControladorValidar.URL_PATTERN_AJAX %>" },
+		    "ajax": { url: "<%= ControladorValidar.URL_PATTERN_AJAX %>", async: false },
 		    "pageSize": 10,
 		    "filterable": true,
 		    "action": "<%= ControladorValidar.ACCION_DATATABLE_MERITOS %>",
@@ -230,7 +230,7 @@ $(document).ready(function() {
 		<% if (merito != null) { %>
 			
 			var tableBolsasCandidato = new Atis.DataTable('#tableBolsasCandidato', {
-			    "ajax": { url: "<%= ControladorValidar.URL_PATTERN_AJAX %>" },
+			    "ajax": { url: "<%= ControladorValidar.URL_PATTERN_AJAX %>", async: false },
 			    "pageSize": 10,
 			    "selectable": true,
 			    "action": "<%= ControladorValidar.ACCION_DATATABLE_BOLSAS_CANDIDATO %>",
