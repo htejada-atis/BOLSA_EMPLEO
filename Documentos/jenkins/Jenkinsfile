@@ -67,6 +67,7 @@ pipeline {
 		        }
 	            withAnt(installation: 'LocalAnt') {
 	               sh "ant checkstyle"
+	               sh "ant pmd"
 	            }
 	        }   
 	        post {
