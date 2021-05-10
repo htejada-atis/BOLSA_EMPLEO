@@ -162,11 +162,21 @@ function DataTable(id, config) {
     		columnDef.buttons.forEach(function(buttonDef) {
                 var label = isFunction(buttonDef.label) ? buttonDef.label(row) : buttonDef.label;
                 var title = isFunction(buttonDef.title) ? buttonDef.title(row) : buttonDef.title;
-    			var btn = $('<button class="btn"' + (title ? 'title="' + title + '"' : '') + ' type="button">'+label+'</button>');
+    			var btn = $('<button class="btn"' + (title ? 'title="' + title + '"' : '') + ' type="button">'+ (label ? label : '')+'</button>');
     			
     			if (buttonDef.hasOwnProperty('class')) {
     				$(btn).addClass(buttonDef.class);
     			}
+
+                if (buttonDef.hasOwnProperty('icon')) {
+                    var position = buttonDef.icon.position ? buttonDef.icon.position : 'left';
+                    var icon = $('<i class="' + buttonDef.icon.class + '"></i>');
+                    if (position == 'left') {
+                        btn.prepend(icon);
+                    } else {
+                        btn.append(icon);
+                    }
+                }
     			
     			$(btn).on('click', buttonDef.onClick.bind($(btn), row, self));
     			$(buttons).append(btn);
@@ -274,6 +284,20 @@ function DataTable(id, config) {
 	            	if (self.config.selected) {
 	            		selected = self.config.selected;
 	            	}
+
+                    if (action.hasOwnProperty('class')) {
+                        $(btn).addClass(action.class);
+                    }
+
+                    if (action.hasOwnProperty('icon')) {
+                        var position = action.icon.position ? action.icon.position : 'left';
+                        var icon = $('<i class="' + action.icon.class + '"></i>');
+                        if (position == 'left') {
+                            btn.prepend(icon);
+                        } else {
+                            btn.append(icon);
+                        }
+                    }
 	            	
 	            	$(btn).on("click", action.onClick.bind(self, selected));
 	            	$(actions).append(btn);
@@ -291,6 +315,20 @@ function DataTable(id, config) {
     this.renderHeader = function(row) {
         if (self.title) {
             var header = $('<caption>' + self.title + '</caption>');
+
+            if (self.config.dropdown) {
+                var dropdown = $('<div class="dropdown"></div>');
+                var arrow = $('<img class="show" src="/img/iconos/down.png" />');
+
+                dropdown.on('click', function() {
+                    $(self.node).children('tbody').toggle('fast');
+                    $(this).find('img').toggleClass('show');
+                });
+
+                dropdown.append(arrow);
+                header.append(dropdown);
+            }
+            
             $(self.node).find('caption').remove();
             $(self.node).prepend(header);
         }

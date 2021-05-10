@@ -22,6 +22,10 @@
 	box-sizing: border-box;
 }
 
+.bolsa-empleo input[type=text]:disabled, .bolsa-empleo input[type=number]:disabled, .bolsa-empleo textarea:disabled {
+	border: 1px solid rgba(118, 118, 118, 0.3);
+}
+
 .bolsa-empleo select {
 	padding: 4px;
 	background-color: white;
@@ -35,6 +39,48 @@
 	padding: 4px 6px;
 }
 
+/* icons */
+.bolsa-empleo .icon, .bolsa-empleo .only-icon {
+	white-space: nowrap;
+	overflow: hidden;
+	text-overflow: ellipsis;
+}
+
+.bolsa-empleo .only-icon {
+	padding: 0px;
+}
+
+
+
+.bolsa-empleo .icon:before, .bolsa-empleo .only-icon:before {
+    content: "";
+	display: inline-block;
+	width: 20px;
+    height: 20px;
+    background-size: 20px 20px;
+  	background-repeat: no-repeat;
+  	vertical-align: -50%;
+}
+
+.bolsa-empleo .icon-download:before {
+	background-image: url(../img/md/file_download.svg);
+}
+
+/* grid system */
+.bolsa-empleo .row {
+	display: flex;
+	flex-wrap: wrap;
+	gap: 16px;
+}
+.bolsa-empleo .row > .col {
+	flex: 1 0 0%;
+}
+@media (min-width: 768px) {
+	.bolsa-empleo .row > .col-md-7 {
+		flex: 0 0 auto;
+	    width: 58.3333333333%;
+	}
+}
 
 /* datatable */
 table.bluetable.bolsaempleo {
@@ -81,6 +127,9 @@ table.bluetable.bolsaempleo .page-size select {
 	margin-right: 5px;
 	border-radius: unset;
 }
+.bolsa-empleo .table-responsive{
+	overflow-x: auto;
+}
 /* datatable header */
 table.bluetable.bolsaempleo caption {
 	background-color:#B9C9FE;
@@ -88,6 +137,26 @@ table.bluetable.bolsaempleo caption {
 	color:#003399;
 	padding:0.5rem;
 }
+table.bluetable.bolsaempleo caption .dropdown {
+	display: block;
+	width: 15px;
+    height: 15px;
+    float: right;
+    border-radius: 50%;
+    background-repeat: no-repeat;
+    background-color: #F0F0F0;
+    cursor: pointer;
+}
+/* invert(10%) sepia(62%) saturate(6451%) hue-rotate(216deg) brightness(97%) contrast(103%) */
+table.bluetable.bolsaempleo caption .dropdown img {
+	width: 15px;
+    height: 15px;
+	filter: invert(89%) sepia(5%) saturate(6124%) hue-rotate(184deg) brightness(95%) contrast(112%);
+}
+table.bluetable.bolsaempleo caption .dropdown .show {
+	transform: scaleY(-1);
+}
+/* datatable filters */
 table.bluetable.bolsaempleo .filterable input {
 	width: 100%;
 	max-width: 150px;
@@ -118,6 +187,9 @@ table.bluetable.bolsaempleo .btns .btn {
 table.bluetable.bolsaempleo span button {
 	margin-left: 1px;
 	border: 1px solid rgb(118, 118, 118);
+}
+table.bluetable.bolsaempleo span button:disabled {
+	border: 1px solid rgba(118, 118, 118, 0.3);
 }
 table.bluetable.bolsaempleo button.btn, table.bluetable.bolsaempleo .page-size select {
 	font-size: 11px; /* Set a font size */

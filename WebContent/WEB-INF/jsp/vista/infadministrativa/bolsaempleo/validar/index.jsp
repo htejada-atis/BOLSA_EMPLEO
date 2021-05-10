@@ -37,17 +37,18 @@ VistaValidar bean = (VistaValidar)uvdatos.getVistas().get(VistaValidar.class.get
 		
 	<table class="bluetable bolsaempleo" id="table">
 		<tr>
-			<th scope="col" style="width:5%" title="Código área">Cod. Area.</th>
-			<th scope="col" style="width:25%" class="area">Area</th>	
-			<th scope="col" style="width:5%" class="center">No validos</th>			
-			<th scope="col" style="width:5%" class="center">Total</th>		
-			<th scope="col" style="width:10%" class="center"></th>			
+			<th scope="col" style="width:10%" title="Código área">Cod. Area.</th>
+			<th scope="col" style="width:50%" class="area">Area</th>
+			<th scope="col" style="width:10%" class="center">No validados</th>	
+			<th scope="col" style="width:10%" class="center">Validados</th>
+			<th scope="col" style="width:10%" class="center">Excluidos</th>	
+			<th scope="col" style="width:10%" class="center">Total</th>	
 		</tr>
 		<tbody>				
 		</tbody>
 		<tfoot>
 			<tr>
-				<th colSpan="5" style="width:100%"></th>
+				<th colSpan="6" style="width:100%"></th>
 			</tr>
 		</tfoot>
 	</table>	
@@ -59,15 +60,21 @@ $(document).ready(function() {
 	    "ajax": { url: "<%= ControladorValidar.URL_PATTERN_AJAX %>" },
 	    "pageSize": 10,
 	    "filterable": true,
-	    "action": "<%= ControladorValidar.ACCION_DATATABLE %>",
-	    "defaultOrderBy": 2,
-	    "defaultOrderDirection": 'desc',
+	    "action": "<%= ControladorValidar.ACCION_DATATABLE_BOLSAS %>",
+	    "defaultOrderBy": 1,
+	    "clickable": {'onClick': function(row) {
+	    	var params = {
+    				'a': '<%= ControladorValidar.ACCION_BOLSA_SELECCIONADA %>', 
+    				'<%= ControladorValidar.PARAM_BOLSA %>': row.codNum};
+    		Atis.sendForm("<%= request.getRequestURI() %>", params);
+	    }},
 	    "columns": [
 	    	{'data': 'area.idAreaExterno', 'filter': {'type': 'number'}},
 	        {'data': 'area.descripcion', 'filter': true},
 	        {'data': 'totalMeritosNoValidados', 'order': false, 'class': 'center', 'render': function(row) { return isNaN(row.totalMeritosNoValidados) ? 0 : row.totalMeritosNoValidados; } },
-	        {'data': 'totalMeritos', 'order': false, 'class': 'center'},
-	        {'data': 'codnum', 'buttons': [{'label': 'Validar', 'onClick': function(row) {}}]}        
+	        {'data': 'totalMeritosValidados', 'order': false, 'class': 'center', 'render': function(row) { return isNaN(row.totalMeritosValidados) ? 0 : row.totalMeritosValidados; } },
+	        {'data': 'totalMeritosExcluidos', 'order': false, 'class': 'center', 'render': function(row) { return isNaN(row.totalMeritosExcluidos) ? 0 : row.totalMeritosExcluidos; } },
+	        {'data': 'totalMeritos', 'order': false, 'class': 'center'} 
 	    ]	    
 	});		
 }); 

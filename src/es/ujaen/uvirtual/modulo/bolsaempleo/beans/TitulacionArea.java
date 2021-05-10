@@ -38,13 +38,14 @@ public class TitulacionArea extends Titulacion implements Serializable {
 	
 	@Override
 	public String toString() {
-		return "TitulaciónArea [area=" + area + "]";
+		return "TitulaciónArea [titulación= " + super.toString() + ", area=" + area + "]";
 	}
 	
 	@Override
 	public int hashCode() {
 		final int prime = 31;
 		int result = 1;
+		result = prime * super.hashCode();
 		result = prime * result + ((area == null) ? 0 : area.hashCode());
 		return result;
 	}
@@ -62,6 +63,10 @@ public class TitulacionArea extends Titulacion implements Serializable {
 			return false;
 		}
 		TitulacionArea other = (TitulacionArea) obj;
+		if (!super.equals(other)) {
+			return false;
+		}
+		
 		if (area == null) {
 			if (other.area != null) {
 				return false;

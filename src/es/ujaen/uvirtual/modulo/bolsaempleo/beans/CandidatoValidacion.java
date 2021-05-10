@@ -2,10 +2,12 @@ package es.ujaen.uvirtual.modulo.bolsaempleo.beans;
 
 import java.io.Serializable;
 
-/** Clase bolsa para los listados de validacion.
- * @author atis
+
+/** Clase candidato para los listados de validacion.
+ * @author jlopez
+ *
  */
-public class BolsaValidacion extends Bolsa implements Serializable {
+public class CandidatoValidacion extends UsuarioBolsaEmpleo implements Serializable {
 
 	private static final long serialVersionUID = 1L;
 	private Integer totalMeritosNoValidados;
@@ -15,26 +17,26 @@ public class BolsaValidacion extends Bolsa implements Serializable {
 	
 	/** Constructor por defecto.
 	 */
-	public BolsaValidacion() {
-		//este contructor esta vacio intencionadamente
+	public CandidatoValidacion() {
+		super();
 	}
 	
 	/** Constructor con parametros.
-	 * @param pbolsa .
+	 * @param pusuario .
 	 */
-	public BolsaValidacion(Bolsa pbolsa) {
-		super(pbolsa);			
+	public CandidatoValidacion(UsuarioBolsaEmpleo pusuario) {
+		super(pusuario);
 	}
 	
 	/** Constructor con parametros.
-	 * @param pbolsa .
+	 * @param pusuario .
 	 * @param pmeritosNoValidados .
 	 * @param pmeritosValidados .
 	 * @param pmeritosExcluidos .
 	 * @param ptotalMeritos .
 	 */
-	public BolsaValidacion(Bolsa pbolsa, Integer pmeritosNoValidados, Integer pmeritosValidados, Integer pmeritosExcluidos, Integer ptotalMeritos) {
-		super(pbolsa);
+	public CandidatoValidacion(UsuarioBolsaEmpleo pusuario, Integer pmeritosNoValidados, Integer pmeritosValidados, Integer pmeritosExcluidos, Integer ptotalMeritos) {
+		super(pusuario);
 		this.totalMeritosNoValidados = pmeritosNoValidados;
 		this.totalMeritosValidados = pmeritosValidados;
 		this.totalMeritosExcluidos = pmeritosExcluidos;
@@ -42,9 +44,9 @@ public class BolsaValidacion extends Bolsa implements Serializable {
 	}
 	
 	/** Constructor copia.
-	 * @param copia BolsaValidacion a copiar
+	 * @param copia CandidatoValidacion a copiar
 	 */
-	public BolsaValidacion(BolsaValidacion copia) {
+	public CandidatoValidacion(CandidatoValidacion copia) {
 		super(copia);
 		this.totalMeritosNoValidados = copia.totalMeritosNoValidados;
 		this.totalMeritosValidados = copia.totalMeritosValidados;
@@ -83,10 +85,14 @@ public class BolsaValidacion extends Bolsa implements Serializable {
 	public void setTotalMeritos(Integer v) {
 		totalMeritos = v;
 	}
-		
+
+	public static long getSerialversionuid() {
+		return serialVersionUID;
+	}
+	
 	@Override
 	public String toString() {
-		return "BolsaSolicitud [bolsa=" + super.toString() + ", meritosNoValidados=" + totalMeritosNoValidados 
+		return "CandidatoValidacin [candidato=" + super.toString() + ", meritosNoValidados=" + totalMeritosNoValidados 
 				+ ", totalMeritosValidados=" + totalMeritosValidados + ", totalMeritosExcluidos=" + totalMeritosExcluidos 
 				+ ", totalMeritos=" + totalMeritos + "]";
 	}
@@ -102,7 +108,7 @@ public class BolsaValidacion extends Bolsa implements Serializable {
 		result = prime * result + ((totalMeritos == null) ? 0 : totalMeritos.hashCode());
 		return result;
 	}
-
+	
 	@Override
 	@SuppressWarnings({"checkstyle:CyclomaticComplexity", "checkstyle:NPathComplexity"})
 	public boolean equals(Object obj) {
@@ -115,12 +121,11 @@ public class BolsaValidacion extends Bolsa implements Serializable {
 		if (getClass() != obj.getClass()) {
 			return false;
 		}
-		
-		BolsaValidacion other = (BolsaValidacion) obj;
+		CandidatoValidacion other = (CandidatoValidacion) obj;
 		if (!super.equals(other)) {
 			return false;
 		}
-
+		
 		if (totalMeritosNoValidados == null) {
 			if (other.totalMeritosNoValidados != null) {
 				return false;
@@ -152,5 +157,5 @@ public class BolsaValidacion extends Bolsa implements Serializable {
 		
 		return true;
 	}
+	
 }
-
