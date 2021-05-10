@@ -5,6 +5,13 @@
 	xmlns:jacoco="antlib:org.jacoco.ant"
 	xmlns:cs="antlib:com.puppycrawl.tools.checkstyle.ant">
 
+	<taskdef name="pmd" classname="net.sourceforge.pmd.ant.PMDTask">
+	    <classpath>
+	        <fileset dir="Documentos/pmd/lib">
+	            <include name="*.jar"/>
+	        </fileset>
+	    </classpath>
+	</taskdef>
 	<taskdef uri="antlib:com.puppycrawl.tools.checkstyle.ant" resource="com/puppycrawl/tools/checkstyle/ant/checkstyle-ant-task.properties">
 		<classpath path="Documentos/checkstyle/checkstyle-8.42-all.jar"/>
 	</taskdef>
@@ -231,4 +238,13 @@
 			<fileset dir="${src}" includes="**/*.java"/>
 		</cs:checkstyle>
 	</target>
+	<target name="pmd">
+	    <pmd shortFilenames="true">
+	        <ruleset>rulesets/java/quickstart.xml</ruleset>
+	    	<formatter type="xml" toFile="${result.report.dir}/pmd_report.xml"/>
+	        <fileset dir="${src}">
+	            <include name="**/*.java"/>
+	        </fileset>
+	    </pmd>
+	</target>	
 </project>
