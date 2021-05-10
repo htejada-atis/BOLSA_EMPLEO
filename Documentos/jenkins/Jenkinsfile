@@ -70,6 +70,12 @@ pipeline {
 	        }   
 	        post {
 	        	always {
+		        	jacoco(
+					    execPattern: '**/builds/build/rama/site/jacoco.exec',
+    					classPattern: '**/builds/build/rama/**',
+    					sourcePattern: '**/src/**',
+    					inclusionPattern: '**/*.class'
+					)	
 	        		junit 'builds/build/rama/site/jacoco/*.xml'
 	        		recordIssues enabledForFailure: true, tool: checkStyle(pattern: 'builds/build/rama/site/jacoco/checkstyle_report.xml')
 	        	}
