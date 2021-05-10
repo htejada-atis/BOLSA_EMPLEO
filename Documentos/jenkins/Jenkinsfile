@@ -41,7 +41,7 @@ pipeline {
                             docker-compose build
                             docker-compose up -d
                            '''
-                        sleep(time:2,unit:"SECONDS")
+                        sleep(time:20,unit:"SECONDS")
                     }
 	        	}
 	        }
