@@ -329,10 +329,7 @@ public class ControladorMisMeritos extends HttpServlet {
 	
 	private Merito validarMerito(HttpServletRequest request, Part uploadedFile) throws UVException, SQLException, IOException {		
 		Merito merito = new Merito();
-		
-		merito.setArchivo(this.validateFicheroMerito(uploadedFile));
-		BolsaEmpleoUtils.checkFileSize(merito.getArchivo());
-		
+				
 		// item de baremación
 		ItemBaremacion item = ModeloBaremacion.obtenerInstancia().getItemBaremacionById(Formateador.leeParametroInteger(request.getParameter(PARAM_ITEM)));
 		merito.setItemBaremacion(item);
@@ -355,6 +352,9 @@ public class ControladorMisMeritos extends HttpServlet {
 			throw new UVException(String.format(MENSAJE_ERROR_OBSERVACION_LARGO, ModeloMerito.COLUMN_OBSERVACION_MAXLENGTH));
 		}
 		
+		merito.setArchivo(this.validateFicheroMerito(uploadedFile));
+		BolsaEmpleoUtils.checkFileSize(merito.getArchivo());
+				
 		return merito;
 	}
 	
