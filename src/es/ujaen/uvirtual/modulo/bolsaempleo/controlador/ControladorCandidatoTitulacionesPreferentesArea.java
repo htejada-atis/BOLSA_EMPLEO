@@ -22,6 +22,7 @@ import es.ujaen.uvirtual.modulo.bolsaempleo.modelo.ModeloTitulacion;
 import es.ujaen.uvirtual.modulo.bolsaempleo.modelo.ModeloUsuarioBolsaEmpleo;
 import es.ujaen.uvirtual.modulo.bolsaempleo.utilidades.BolsaEmpleoDataTable;
 import es.ujaen.uvirtual.modulo.bolsaempleo.vistas.VistaCandidatoTitulacionesArea;
+import es.ujaen.uvirtual.modulo.bolsaempleo.vistas.VistaEstadoBolsas;
 import es.ujaen.uvirtual.utilidades.EscapaHTML;
 import es.ujaen.uvirtual.utilidades.Formateador;
 import es.ujaen.uvirtual.utilidades.UVException;
@@ -63,6 +64,7 @@ public class ControladorCandidatoTitulacionesPreferentesArea extends HttpServlet
 	
 	// ruta vistas
 	public static final String RUTA_BEP = "/WEB-INF/jsp/vista/infadministrativa/bolsaempleo/titulacionespreferentesarea/";
+	public static final String JSP_INDEX = RUTA_BEP + "index.jsp";
 	
 	// ajax	
 	public static final String URL_PATTERN_AJAX = "/srv/es/ajax/informacionadministrativa/bolsaempleo/titulacionespreferentesarea";
@@ -82,25 +84,23 @@ public class ControladorCandidatoTitulacionesPreferentesArea extends HttpServlet
 		
 		VistaCandidatoTitulacionesArea bean = new VistaCandidatoTitulacionesArea();
 		
-		ModeloUsuarioBolsaEmpleo modelo = ModeloUsuarioBolsaEmpleo.obtenerInstancia();
-	
 		String nombreAccion = EscapaHTML.ajustaCodificacion(request.getParameter(PARAM_ACCION));
 		if (nombreAccion == null) {
 			nombreAccion = ACCION_LISTAR_AREAS;
 		}
 		
 		try {
-			modelo.checkUser(datos);
+			checkUser(bean, datos);
 			switch (nombreAccion) {
+				case ACCION_LISTAR_AREAS:
+					bean.setVista(JSP_INDEX);
+					break;
 				case ACCION_BOLSA_SELECCIONADA:
 					seleccionarArea(bean, request);
 					break;
 				case ACCION_DATATABLE_BOLSAS:
 					listadoBolsas(bean, datos, request, response);
-					break;
-				case ACCION_LISTAR_AREAS:
-					bean.setVista(RUTA_BEP + "index.jsp");
-					break;
+					break;				
 				case ACCION_DATATABLE_TITULACIONES:
 					listadoTitulacionesPreferentesArea(bean, datos, request, response);
 					break;
@@ -126,6 +126,11 @@ public class ControladorCandidatoTitulacionesPreferentesArea extends HttpServlet
 		}
 	}
 	
+	private void checkUser(VistaCandidatoTitulacionesArea bean, UVDatos datos) throws SQLException, UVException {
+		bean.setVista(JSP_INDEX);
+		ModeloUsuarioBolsaEmpleo.obtenerInstancia().checkUser(datos);
+	}
+	
 	private void errorFatal(VistaCandidatoTitulacionesArea bean, String mensaje) {
 		bean.setVista("/WEB-INF/jsp/vista/infadministrativa/bolsaempleo/error.jsp");
 		bean.getMensajesDeError().add(mensaje);
@@ -145,7 +150,7 @@ public class ControladorCandidatoTitulacionesPreferentesArea extends HttpServlet
 		Bolsa area = modelo.getBolsaById(codNum);
 		
 		bean.setArea(area);
-		bean.setVista(RUTA_BEP + "index.jsp");
+		bean.setVista(JSP_INDEX);
 	}
 	
 	/**

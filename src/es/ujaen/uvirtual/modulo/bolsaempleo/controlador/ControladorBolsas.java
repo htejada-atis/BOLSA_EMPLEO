@@ -24,6 +24,7 @@ import es.ujaen.uvirtual.modulo.bolsaempleo.beans.Bolsa;
 import es.ujaen.uvirtual.modulo.bolsaempleo.modelo.ModeloBolsa;
 import es.ujaen.uvirtual.modulo.bolsaempleo.modelo.ModeloUsuarioBolsaEmpleo;
 import es.ujaen.uvirtual.modulo.bolsaempleo.utilidades.BolsaEmpleoDataTable;
+import es.ujaen.uvirtual.modulo.bolsaempleo.vistas.VistaAreasBaremar;
 import es.ujaen.uvirtual.modulo.bolsaempleo.vistas.VistaEstadoBolsas;
 import es.ujaen.uvirtual.utilidades.EscapaHTML;
 import es.ujaen.uvirtual.utilidades.Formateador;
@@ -82,7 +83,6 @@ public class ControladorBolsas extends HttpServlet {
 		
 		VistaEstadoBolsas bean = new VistaEstadoBolsas();		
 		Usuario usuario = datos.getUsuario();
-		ModeloUsuarioBolsaEmpleo modelo = ModeloUsuarioBolsaEmpleo.obtenerInstancia();	
 		ModeloBolsa modeloBolsa = ModeloBolsa.obtenerInstancia();
 		LOGGER.log(Level.FINEST, "usuario que ha entrado en el servlet es {0}", usuario.getUid());
 		
@@ -96,7 +96,7 @@ public class ControladorBolsas extends HttpServlet {
 			bean.setTotalBolsasRevisadas(modeloBolsa.getBolsasRevisadas());
 			bean.setTotalBolsasBaremables(modeloBolsa.getBolsasBaremables());
 			bean.setTotalBolsas(modeloBolsa.getTotalBolsas());
-			modelo.checkUser(datos);
+			checkUser(bean, datos);
 			switch (nombreAccion) {
 				case ACCION_LISTAR_BOLSAS:
 					bean.setVista("/WEB-INF/jsp/vista/infadministrativa/bolsaempleo/bolsas/index.jsp");
@@ -129,6 +129,11 @@ public class ControladorBolsas extends HttpServlet {
 			datos.getFicherosCSS().add("/css/ujaen_bolsa_empleo.css");
 			datos.getFicherosCSS().add("/css/jqueryujaen/jquery-ui-1.8.16.custom.css");
 		}
+	}
+	
+	private void checkUser(VistaEstadoBolsas bean, UVDatos datos) throws SQLException, UVException {
+		bean.setVista("/WEB-INF/jsp/vista/infadministrativa/bolsaempleo/bolsas/index.jsp");
+		ModeloUsuarioBolsaEmpleo.obtenerInstancia().checkUser(datos);
 	}
 	
 	private void errorFatal(VistaEstadoBolsas bean, String mensaje) {

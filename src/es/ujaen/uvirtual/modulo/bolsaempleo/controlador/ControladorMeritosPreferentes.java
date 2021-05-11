@@ -21,6 +21,7 @@ import es.ujaen.uvirtual.modulo.bolsaempleo.modelo.ModeloMeritosPreferentes;
 import es.ujaen.uvirtual.modulo.bolsaempleo.modelo.ModeloUsuarioBolsaEmpleo;
 import es.ujaen.uvirtual.modulo.bolsaempleo.utilidades.BolsaEmpleoDataTable;
 import es.ujaen.uvirtual.modulo.bolsaempleo.utilidades.BolsaEmpleoUtils;
+import es.ujaen.uvirtual.modulo.bolsaempleo.vistas.VistaEstadoBolsas;
 import es.ujaen.uvirtual.modulo.bolsaempleo.vistas.VistaMeritosPreferentes;
 import es.ujaen.uvirtual.utilidades.EscapaHTML;
 import es.ujaen.uvirtual.utilidades.Formateador;
@@ -100,7 +101,7 @@ public class ControladorMeritosPreferentes extends HttpServlet {
 		}
 				
 		try {
-			ModeloUsuarioBolsaEmpleo.obtenerInstancia().checkUser(datos);
+			checkUser(bean, datos);
 			switch (nombreAccion) {
 				case ACCION_INDEX:
 					indice(bean);
@@ -148,6 +149,11 @@ public class ControladorMeritosPreferentes extends HttpServlet {
 			datos.getFicherosCSS().add("/css/ujaen_bolsa_empleo.css");
 			datos.getFicherosCSS().add("/css/jqueryujaen/jquery-ui-1.8.16.custom.css");
 		}
+	}
+	
+	private void checkUser(VistaMeritosPreferentes bean, UVDatos datos) throws SQLException, UVException {
+		this.indice(bean);
+		ModeloUsuarioBolsaEmpleo.obtenerInstancia().checkUser(datos);
 	}
 	
 	private void errorFatal(VistaMeritosPreferentes bean, String mensaje) {

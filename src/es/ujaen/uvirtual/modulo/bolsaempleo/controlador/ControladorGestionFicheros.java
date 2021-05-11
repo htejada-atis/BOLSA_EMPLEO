@@ -28,6 +28,7 @@ import es.ujaen.uvirtual.modulo.bolsaempleo.modelo.ModeloUsuarioBolsaEmpleo;
 import es.ujaen.uvirtual.modulo.bolsaempleo.utilidades.BolsaEmpleoDataTable;
 import es.ujaen.uvirtual.modulo.bolsaempleo.utilidades.BolsaEmpleoUtils;
 import es.ujaen.uvirtual.modulo.bolsaempleo.utilidades.BolsaEmpleoValidator;
+import es.ujaen.uvirtual.modulo.bolsaempleo.vistas.VistaEstadoBolsas;
 import es.ujaen.uvirtual.modulo.bolsaempleo.vistas.VistaFicheros;
 import es.ujaen.uvirtual.utilidades.EscapaHTML;
 import es.ujaen.uvirtual.utilidades.Formateador;
@@ -103,7 +104,6 @@ public class ControladorGestionFicheros extends HttpServlet {
 		datos.setContentType("text/html");
 		
 		VistaFicheros bean = new VistaFicheros();		
-		ModeloUsuarioBolsaEmpleo modelo = ModeloUsuarioBolsaEmpleo.obtenerInstancia();
 		
 		String nombreAccion = EscapaHTML.ajustaCodificacion(request.getParameter(PARAM_ACCION));
 		if (nombreAccion == null) {
@@ -111,7 +111,7 @@ public class ControladorGestionFicheros extends HttpServlet {
 		}
 		
 		try {
-			modelo.checkUser(datos);
+			checkUser(bean, datos);
 			switch (nombreAccion) {
 				case ACCION_LISTAR_FICHEROS:
 					bean.setVista(RUTA_BEP_CONF + "ficheros.jsp");
@@ -156,6 +156,11 @@ public class ControladorGestionFicheros extends HttpServlet {
 			datos.getFicherosCSS().add("/css/jqueryujaen/jquery-ui-1.8.16.custom.css");
 			datos.getFicherosCSS().add("/css/ujaen_bolsa_empleo.css");
 		}
+	}
+	
+	private void checkUser(VistaFicheros bean, UVDatos datos) throws SQLException, UVException {
+		bean.setVista(RUTA_BEP_CONF + "ficheros.jsp");
+		ModeloUsuarioBolsaEmpleo.obtenerInstancia().checkUser(datos);
 	}
 	
 	private void errorFatal(VistaFicheros bean, String mensaje) {

@@ -22,6 +22,7 @@ import es.ujaen.uvirtual.modulo.bolsaempleo.modelo.ModeloArea;
 import es.ujaen.uvirtual.modulo.bolsaempleo.modelo.ModeloBolsa;
 import es.ujaen.uvirtual.modulo.bolsaempleo.modelo.ModeloUsuarioBolsaEmpleo;
 import es.ujaen.uvirtual.modulo.bolsaempleo.utilidades.BolsaEmpleoDataTable;
+import es.ujaen.uvirtual.modulo.bolsaempleo.vistas.VistaAfinidades;
 import es.ujaen.uvirtual.modulo.bolsaempleo.vistas.VistaAreasBaremar;
 import es.ujaen.uvirtual.utilidades.EscapaHTML;
 import es.ujaen.uvirtual.utilidades.Formateador;
@@ -91,18 +92,15 @@ public class ControladorAreasABaremar extends HttpServlet {
 		Usuario usuario = datos.getUsuario();
 		LOGGER.log(Level.FINEST, "usuario que ha entrado en el servlet es {0}", usuario.getUid());
 				
-		ModeloUsuarioBolsaEmpleo modelo = ModeloUsuarioBolsaEmpleo.obtenerInstancia();		
-		
 		String nombreAccion = EscapaHTML.ajustaCodificacion(request.getParameter(PARAM_ACCION));
 		if (nombreAccion == null) {
 			nombreAccion = ACCION_LISTAR;
 		}		
-		
+					
 		try {
-			modelo.checkUser(datos);
+			checkUser(bean, datos);
 			switch (nombreAccion) {
 				case ACCION_LISTAR:
-					bean.setVista(RUTA_BEP_CONF + "areasbaremar.jsp");
 					break;
 				case ACCION_AREA:
 					accionSobreArea(bean, request);
@@ -138,6 +136,11 @@ public class ControladorAreasABaremar extends HttpServlet {
 			datos.getFicherosCSS().add("/css/ujaen_bolsa_empleo.css");
 			datos.getFicherosCSS().add("/css/jqueryujaen/jquery-ui-1.8.16.custom.css");
 		}
+	}
+	
+	private void checkUser(VistaAreasBaremar bean, UVDatos datos) throws SQLException, UVException {
+		bean.setVista(RUTA_BEP_CONF + "areasbaremar.jsp");
+		ModeloUsuarioBolsaEmpleo.obtenerInstancia().checkUser(datos);
 	}
 	
 	private void errorFatal(VistaAreasBaremar bean, String mensaje) {

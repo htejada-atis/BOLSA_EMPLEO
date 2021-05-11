@@ -27,6 +27,7 @@ import es.ujaen.uvirtual.modulo.bolsaempleo.modelo.ModeloMisTitulaciones;
 import es.ujaen.uvirtual.modulo.bolsaempleo.modelo.ModeloTitulacion;
 import es.ujaen.uvirtual.modulo.bolsaempleo.modelo.ModeloUsuarioBolsaEmpleo;
 import es.ujaen.uvirtual.modulo.bolsaempleo.utilidades.BolsaEmpleoDataTable;
+import es.ujaen.uvirtual.modulo.bolsaempleo.vistas.VistaEstadoBolsas;
 import es.ujaen.uvirtual.modulo.bolsaempleo.vistas.VistaFiltrar;
 import es.ujaen.uvirtual.utilidades.EscapaHTML;
 import es.ujaen.uvirtual.utilidades.Formateador;
@@ -92,7 +93,6 @@ public class ControladorFiltrar extends HttpServlet {
 		
 		VistaFiltrar bean = new VistaFiltrar();		
 		Usuario usuario = datos.getUsuario();
-		ModeloUsuarioBolsaEmpleo modelo = ModeloUsuarioBolsaEmpleo.obtenerInstancia();	
 		LOGGER.log(Level.FINEST, "usuario que ha entrado en el servlet es {0}", usuario.getUid());
 		
 		String nombreAccion = EscapaHTML.ajustaCodificacion(request.getParameter(PARAM_ACCION));
@@ -101,8 +101,11 @@ public class ControladorFiltrar extends HttpServlet {
 		}
 		
 		try {
-			modelo.checkUser(datos);
+			checkUser(bean, datos);
 			switch (nombreAccion) {
+				case ACCION_LISTAR:
+					bean.setVista(RUTA_BEP_FILTRAR + "index.jsp");
+					break;
 				case ACCION_CANDIDATO_SELECCIONADO:
 					seleccionarCandidato(bean, request);
 					break;
@@ -114,10 +117,7 @@ public class ControladorFiltrar extends HttpServlet {
 					break;
 				case ACCION_DESCARGAR_FICHERO:
 					descargarFichero(bean, datos, request, response);
-					break;
-				case ACCION_LISTAR:
-					bean.setVista(RUTA_BEP_FILTRAR + "index.jsp");
-					break;
+					break;				
 				case ACCION_TITULACION_DESELECCIONADA:
 					seleccionarTitulacion(bean, datos, request, response, false);
 					break;
@@ -146,6 +146,11 @@ public class ControladorFiltrar extends HttpServlet {
 			datos.getFicherosCSS().add("/css/ujaen_bolsa_empleo.css");
 			datos.getFicherosCSS().add("/css/jqueryujaen/jquery-ui-1.8.16.custom.css");
 		}
+	}
+	
+	private void checkUser(VistaFiltrar bean, UVDatos datos) throws SQLException, UVException {
+		bean.setVista(RUTA_BEP_FILTRAR + "index.jsp");
+		ModeloUsuarioBolsaEmpleo.obtenerInstancia().checkUser(datos);
 	}
 	
 	private void errorFatal(VistaFiltrar bean, String mensaje) {

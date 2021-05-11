@@ -28,6 +28,7 @@ import es.ujaen.uvirtual.modulo.bolsaempleo.modelo.ModeloEvaluador;
 import es.ujaen.uvirtual.modulo.bolsaempleo.modelo.ModeloRol;
 import es.ujaen.uvirtual.modulo.bolsaempleo.modelo.ModeloUsuarioBolsaEmpleo;
 import es.ujaen.uvirtual.modulo.bolsaempleo.utilidades.BolsaEmpleoDataTable;
+import es.ujaen.uvirtual.modulo.bolsaempleo.vistas.VistaEstadoBolsas;
 import es.ujaen.uvirtual.modulo.bolsaempleo.vistas.VistaEvaluadores;
 import es.ujaen.uvirtual.utilidades.EscapaHTML;
 import es.ujaen.uvirtual.utilidades.Formateador;
@@ -99,16 +100,17 @@ public class ControladorGestionEvaluadores extends HttpServlet {
 		
 		VistaEvaluadores bean = new VistaEvaluadores();
 		
-		ModeloUsuarioBolsaEmpleo modelo = ModeloUsuarioBolsaEmpleo.obtenerInstancia();	
-		
 		String nombreAccion = EscapaHTML.ajustaCodificacion(request.getParameter(PARAM_ACCION));
 		if (nombreAccion == null) {
 			nombreAccion = ACCION_LISTAR_AREAS;
 		}
 		
 		try {
-			modelo.checkUser(datos);
+			checkUser(bean, datos);
 			switch (nombreAccion) {
+				case ACCION_LISTAR_AREAS:
+					obtenerAreas(bean, request);
+					break;
 				case ACCION_AGREGAR_EVALUADORES:
 					agregarEvaluadores(bean, request, response);
 					break;
@@ -120,10 +122,7 @@ public class ControladorGestionEvaluadores extends HttpServlet {
 					break;
 				case ACCION_ELIMINAR_EVALUADOR:
 					eliminarEvaluador(bean, request, response);
-					break;
-				case ACCION_LISTAR_AREAS:
-					obtenerAreas(bean, request);
-					break;
+					break;				
 				default:
 					errorFatal(bean, "Acción no contemplada");
 			}
@@ -144,6 +143,11 @@ public class ControladorGestionEvaluadores extends HttpServlet {
 			datos.getFicherosCSS().add("/css/jqueryujaen/jquery-ui-1.8.16.custom.css");
 			datos.getFicherosCSS().add("/css/ujaen_bolsa_empleo.css");
 		}
+	}
+	
+	private void checkUser(VistaEvaluadores bean, UVDatos datos) throws SQLException, UVException {
+		bean.setVista(RUTA_BEP_CONF + "evaluadoresListar.jsp");
+		ModeloUsuarioBolsaEmpleo.obtenerInstancia().checkUser(datos);
 	}
 	
 	private void errorFatal(VistaEvaluadores bean, String mensaje) {

@@ -25,6 +25,7 @@ import es.ujaen.uvirtual.modulo.bolsaempleo.modelo.ModeloBaremacion;
 import es.ujaen.uvirtual.modulo.bolsaempleo.modelo.ModeloUsuarioBolsaEmpleo;
 import es.ujaen.uvirtual.modulo.bolsaempleo.utilidades.BolsaEmpleoDataTable;
 import es.ujaen.uvirtual.modulo.bolsaempleo.utilidades.BolsaEmpleoUtils;
+import es.ujaen.uvirtual.modulo.bolsaempleo.vistas.VistaEstadoBolsas;
 import es.ujaen.uvirtual.modulo.bolsaempleo.vistas.VistaItemsBaremacion;
 import es.ujaen.uvirtual.utilidades.EscapaHTML;
 import es.ujaen.uvirtual.utilidades.Formateador;
@@ -165,7 +166,7 @@ public class ControladorItemsBaremacion extends HttpServlet {
 		}
 		
 		try {
-			ModeloUsuarioBolsaEmpleo.obtenerInstancia().checkUser(datos);
+			checkUser(bean, datos);
 			switch (nombreAccion) {
 				case ACCION_INDEX:
 					indice(bean);
@@ -241,6 +242,11 @@ public class ControladorItemsBaremacion extends HttpServlet {
 	
 	private void indice(VistaItemsBaremacion bean) {
 		bean.setVista(JSP_ITEM_BAREMACION);
+	}
+	
+	private void checkUser(VistaItemsBaremacion bean, UVDatos datos) throws SQLException, UVException {
+		bean.setVista(JSP_ITEM_BAREMACION);
+		ModeloUsuarioBolsaEmpleo.obtenerInstancia().checkUser(datos);
 	}
 	
 	private void accionNodefinida(VistaItemsBaremacion bean) {

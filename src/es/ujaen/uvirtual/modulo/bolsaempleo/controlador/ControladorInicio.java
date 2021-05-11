@@ -26,6 +26,7 @@ import es.ujaen.uvirtual.modulo.bolsaempleo.beans.Noticia;
 import es.ujaen.uvirtual.modulo.bolsaempleo.modelo.ModeloFichero;
 import es.ujaen.uvirtual.modulo.bolsaempleo.modelo.ModeloNoticia;
 import es.ujaen.uvirtual.modulo.bolsaempleo.modelo.ModeloUsuarioBolsaEmpleo;
+import es.ujaen.uvirtual.modulo.bolsaempleo.vistas.VistaEstadoBolsas;
 import es.ujaen.uvirtual.modulo.bolsaempleo.vistas.VistaInicio;
 import es.ujaen.uvirtual.utilidades.EscapaHTML;
 import es.ujaen.uvirtual.utilidades.Formateador;
@@ -70,6 +71,7 @@ public class ControladorInicio extends HttpServlet {
 	
 	// ruta vistas
 	public static final String RUTA_BEP_INICIO = "/WEB-INF/jsp/vista/infadministrativa/bolsaempleo/inicio/";
+	public static final String JSP_INICIO = RUTA_BEP_INICIO + "indice.jsp";
 	
 	// errors
 	public static final Integer RESPONSE_HTTP_CODE_ERROR_400 = 400;
@@ -90,16 +92,18 @@ public class ControladorInicio extends HttpServlet {
 		datos.setContentType("text/html");
 		
 		VistaInicio bean = new VistaInicio();
-		ModeloUsuarioBolsaEmpleo modelo = ModeloUsuarioBolsaEmpleo.obtenerInstancia();
 		
 		String nombreAccion = EscapaHTML.ajustaCodificacion(request.getParameter(PARAM_ACCION));
 		if (nombreAccion == null || nombreAccion.isEmpty()) {
 			nombreAccion = ACCION_LISTAR_NOTICIAS;
 		}
 		try {
-			bean.setAnonimo(!modelo.checkUser(datos));
+			checkUser(bean, datos);
 			
 			switch (nombreAccion) {
+				case ACCION_LISTAR_NOTICIAS:
+					obtenerNoticias(bean);
+					break;
 				case ACCION_AYUDA:
 					bean.setVista(RUTA_BEP_INICIO + "ayuda.jsp");
 					break;
@@ -111,9 +115,6 @@ public class ControladorInicio extends HttpServlet {
 					break;
 				case ACCION_FAQ:
 					bean.setVista(RUTA_BEP_INICIO + "faq.jsp");
-					break;
-				case ACCION_LISTAR_NOTICIAS:
-					obtenerNoticias(bean);
 					break;
 				case ACCION_LISTAR_TODAS_NOTICIAS:
 					obtenerTodasNoticias(bean, request, response, datos);
@@ -137,6 +138,12 @@ public class ControladorInicio extends HttpServlet {
 			datos.getFicherosCSS().add("/css/jqueryujaen/jquery-ui-1.8.16.custom.css");
 			datos.getFicherosCSS().add("/css/ujaen_bolsa_empleo.css");
 		}
+	}
+	
+	private void checkUser(VistaInicio bean, UVDatos datos) throws SQLException, UVException {
+		bean.setVista(JSP_INICIO);
+		boolean existe = ModeloUsuarioBolsaEmpleo.obtenerInstancia().checkUser(datos);
+		bean.setAnonimo(!existe);
 	}
 	
 	private void errorFatal(VistaInicio bean, String mensaje) {
@@ -211,7 +218,7 @@ public class ControladorInicio extends HttpServlet {
 			throws IOException, SQLException {
 		ModeloNoticia modelo = ModeloNoticia.obtenerInstancia();
 		
-		bean.setVista(RUTA_BEP_INICIO + "indice.jsp");
+		bean.setVista(JSP_INICIO);
 		response.setContentType("application/json");
 		response.setCharacterEncoding("UTF-8");
 		datos.setRespuestaEnviada(true);
@@ -239,7 +246,7 @@ public class ControladorInicio extends HttpServlet {
 	 * @throws SQLException excepcion de bbdd.
 	 */
 	private void obtenerNoticias(VistaInicio bean) throws SQLException {
-		bean.setVista(RUTA_BEP_INICIO + "indice.jsp");
+		bean.setVista(JSP_INICIO);
 		ModeloNoticia modelo = ModeloNoticia.obtenerInstancia();
 		List<Noticia> noticias = modelo.listaNoticiasInicio(bean.getAnonimo());
 		bean.setNoticias(noticias);
