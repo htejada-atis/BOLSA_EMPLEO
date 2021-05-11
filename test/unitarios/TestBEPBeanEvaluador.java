@@ -17,10 +17,9 @@ import es.ujaen.uvirtual.modulo.bolsaempleo.beans.UsuarioBolsaEmpleo;
 *
 */
 public class TestBEPBeanEvaluador {
-	private static final Integer CODPERSONA = 1;
 	private static final String CODCUENTA = "test2";
 	private static final Rol ROL = new Rol(1050);
-	private static final String EMAIL = "test@test";
+	private static final String DOCUMENTO = "123456789A";
 	private static final String RAZONEXCLUIDO = "test";
 	private static final Boolean LISTADIST = true;
 	private static final Boolean EXCLUIDO = false;
@@ -42,10 +41,8 @@ public class TestBEPBeanEvaluador {
 		Evaluador evaluador = new Evaluador();
 		
 		evaluador.setCodNum(id);
-		evaluador.setCodPersona(CODPERSONA);
 		evaluador.setCodCuenta(CODCUENTA);
 		evaluador.setRol(ROL);
-		evaluador.setEmail(EMAIL);
 		evaluador.setListaDist(LISTADIST);
 		evaluador.setExcluido(EXCLUIDO);
 		evaluador.setRazonExcluido(RAZONEXCLUIDO);
@@ -55,10 +52,8 @@ public class TestBEPBeanEvaluador {
 		evaluador.setCodNumArea(AREA);
 		
 		assertEquals(id, evaluador.getCodNum());
-		assertEquals(CODPERSONA, evaluador.getCodPersona());
 		assertEquals(CODCUENTA, evaluador.getCodCuenta());
 		assertEquals(ROL, evaluador.getRol());
-		assertEquals(EMAIL, evaluador.getEmail());
 		assertEquals(LISTADIST, evaluador.getListaDist());
 		assertEquals(EXCLUIDO, evaluador.getExcluido());
 		assertEquals(RAZONEXCLUIDO, evaluador.getRazonExcluido());
@@ -72,12 +67,10 @@ public class TestBEPBeanEvaluador {
 	 */
 	@Test
 	public void testA02() {
-		UsuarioBolsaEmpleo usuario = new UsuarioBolsaEmpleo(CODPERSONA, CODCUENTA, ROL, LISTADIST, EXCLUIDO, EXCLUIDOTIPO, FECHAEXCLUSIONINICIO, FECHAEXCLUSIONFIN);
+		UsuarioBolsaEmpleo usuario = new UsuarioBolsaEmpleo(DOCUMENTO, CODCUENTA, ROL, LISTADIST, EXCLUIDO, EXCLUIDOTIPO, FECHAEXCLUSIONINICIO, FECHAEXCLUSIONFIN);
 		Evaluador evaluador = new Evaluador(usuario, AREA, ACTIVO);
 		Evaluador evaluador2 = new Evaluador(evaluador);
 		
-		assertEquals(CODPERSONA, evaluador.getCodPersona());
-		assertEquals(CODPERSONA, evaluador2.getCodPersona());
 		assertEquals(CODCUENTA, evaluador.getCodCuenta());
 		assertEquals(CODCUENTA, evaluador2.getCodCuenta());		
 		assertEquals(ROL, evaluador.getRol());
@@ -97,7 +90,7 @@ public class TestBEPBeanEvaluador {
 	 */
 	@Test
 	public void testA03() {
-		UsuarioBolsaEmpleo usuario = new UsuarioBolsaEmpleo(CODPERSONA, CODCUENTA, ROL, LISTADIST, EXCLUIDO, EXCLUIDOTIPO, FECHAEXCLUSIONINICIO, FECHAEXCLUSIONFIN);
+		UsuarioBolsaEmpleo usuario = new UsuarioBolsaEmpleo(DOCUMENTO, CODCUENTA, ROL, LISTADIST, EXCLUIDO, EXCLUIDOTIPO, FECHAEXCLUSIONINICIO, FECHAEXCLUSIONFIN);
 		
 		Evaluador evaluador = new Evaluador();
 		Evaluador evaluador2 = new Evaluador();

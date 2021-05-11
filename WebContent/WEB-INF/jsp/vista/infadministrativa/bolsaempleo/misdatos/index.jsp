@@ -36,7 +36,6 @@ VistaUsuarioBolsaEmpleo bean = (VistaUsuarioBolsaEmpleo) uvdatos.getVistas().get
 	String codigo_postal = "";
 	String localidad = "";
 	String provincia = "";
-	String movil = "";
 	String telefono = "";
 	String nacionalidad = "";
 	String sexo = "";
@@ -53,7 +52,6 @@ VistaUsuarioBolsaEmpleo bean = (VistaUsuarioBolsaEmpleo) uvdatos.getVistas().get
 	if(bean.getUsuario().getCodigoPostal()!=null) codigo_postal = bean.getUsuario().getCodigoPostal();
 	if(bean.getUsuario().getLocalidad()!=null) localidad = bean.getUsuario().getLocalidad();
 	if(bean.getUsuario().getProvincia()!=null) provincia = bean.getUsuario().getProvincia();
-	if(bean.getUsuario().getMovil()!=null) movil = bean.getUsuario().getMovil();
 	if(bean.getUsuario().getTelefono()!=null) telefono = bean.getUsuario().getTelefono();
 	if(bean.getUsuario().getNacionalidad()!=null) nacionalidad = bean.getUsuario().getNacionalidad();
 	if(bean.getUsuario().getSexo()!=null) sexo = bean.getUsuario().getSexo();
@@ -110,26 +108,21 @@ VistaUsuarioBolsaEmpleo bean = (VistaUsuarioBolsaEmpleo) uvdatos.getVistas().get
     	</div>
     	
     	<div class="form-group-container">
-    	    <div class="form-group">
-    			<label for="movil">M&oacute;vil: </label>
-    			<input class="form-input-custom" id="movil" type="text" name="<%= ControladorMisDatos.PARAM_MOVIL %>" value="<%= movil %>"/>
-    		</div>
     		<div class="form-group">
     			<label for="telefono">Tel&eacute;fono: </label>
     			<input class="form-input-custom" id="telefono" type="text" name="<%= ControladorMisDatos.PARAM_TELEFONO %>" value="<%= telefono %>"/>
     		</div>
-    	</div>
-    	
-    	<div class="form-group-container">
-    	    <div class="form-group">
+    		    	    <div class="form-group">
     			<label for="nacionalidad">Nacionalidad: </label>
     			<input class="form-input-custom" id="nacionalidad" type="text" name="<%= ControladorMisDatos.PARAM_NACIONALIDAD %>" value="<%= nacionalidad %>"/>
     		</div>
-    	    <div class="form-group">
+    	</div>
+    	
+    	    	    <div class="form-group">
     			<label for="apellidos">Email: </label>
     			<input class="form-input-custom" id="apellidos" type="text" name="<%= ControladorMisDatos.PARAM_EMAIL %>" value="<%= email %>"/>
     		</div>
-    	</div>
+    	
     	
     	<div class="form-group-container">
     		<div class="form-group-custom">
@@ -165,14 +158,14 @@ VistaUsuarioBolsaEmpleo bean = (VistaUsuarioBolsaEmpleo) uvdatos.getVistas().get
 $(document).ready(function() {	
 	
 	<% String acum = bean.getUsuario().getSexo();
-	
+	if(bean.getUsuario().getSexo()!=null){
 	if(bean.getUsuario().getSexo().equals("M")) { %>
 	document.getElementById("masculino").checked = true;
 	<%} else { 
 		if(bean.getUsuario().getSexo().equals("F")) { %>
 			document.getElementById("femenino").checked = true;
 		<%}%>
-	<%}%>
+	<%}}%>
 	
 });
 

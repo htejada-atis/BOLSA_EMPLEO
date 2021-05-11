@@ -116,6 +116,14 @@ public class ControladorMisDatos extends HttpServlet {
 		Usuario usuArcos = CrearUsuario.usuario(usuario.getUid());
 		bean.setUsuarioArcos(usuArcos);
 	
+		UsuarioBolsaEmpleo usu;
+		try {
+			usu = modelo.listaUsuario(usuario.getDocumentoNumero());
+			bean.setUsuario(usu);
+		} catch (SQLException | UVException exy) {
+			exy.printStackTrace();
+		}	
+		
 		try {
 			modelo.checkUser(datos);
 			bean.setUsuario(ModeloUsuarioBolsaEmpleo.obtenerInstancia().listaUsuario(usuario.getUid()));			
@@ -181,7 +189,32 @@ public class ControladorMisDatos extends HttpServlet {
 		UsuarioBolsaEmpleo usua = modelo.getUsuarioById(codNum);
 		usuario.setCodPersona(usua.getCodPersona());
 		
-		modelo.actualizaUsuarioMisDatos(usuario);
+		if (!validator.isValid()) {
+			for (String param : validator.getErrors().keySet()) {
+				for (String paramError : validator.getErrors().get(param)) {
+					bean.getMensajesDeError().add(paramError);
+				}
+			}
+		} else {
+		
+			String nombre = EscapaHTML.ajustaCodificacion(request.getParameter(PARAM_NOMBRE));
+			String primerapellido = EscapaHTML.ajustaCodificacion(request.getParameter(PARAM_PRIMER_APELLIDO));
+			String segundoapellido = EscapaHTML.ajustaCodificacion(request.getParameter(PARAM_SEGUNDO_APELLIDO));
+			Integer codNum = Formateador.leeParametroInteger(request.getParameter(PARAM_ID));
+			String email = EscapaHTML.ajustaCodificacion(request.getParameter(PARAM_EMAIL));
+			String direccion = EscapaHTML.ajustaCodificacion(request.getParameter(PARAM_DIRECCION));
+			String codigopostal = EscapaHTML.ajustaCodificacion(request.getParameter(PARAM_CODIGO_POSTAL));
+			String localidad = EscapaHTML.ajustaCodificacion(request.getParameter(PARAM_LOCALIDAD));
+			String provincia = EscapaHTML.ajustaCodificacion(request.getParameter(PARAM_PROVINCIA));
+			String telefono = EscapaHTML.ajustaCodificacion(request.getParameter(PARAM_TELEFONO));
+			String nacionalidad = EscapaHTML.ajustaCodificacion(request.getParameter(PARAM_NACIONALIDAD));
+			String sexo = EscapaHTML.ajustaCodificacion(request.getParameter(PARAM_SEXO));
+			Boolean listadist = request.getParameter(PARAM_LISTA) != null && EscapaHTML.ajustaCodificacion(request.getParameter(PARAM_LISTA)).equals("true");
+			
+			UsuarioBolsaEmpleo usuarioFinal = new UsuarioBolsaEmpleo(codNum, nombre, primerapellido, 
+					segundoapellido, email, direccion, codigopostal, localidad, provincia, telefono, nacionalidad, sexo, listadist);
+			
+			modelo.actualizaUsuarioMisDatos(usuarioFinal);
 
 		UsuarioBolsaEmpleo usuaCont = modelo.getUsuarioById(codNum);
 		Usuario usuArcos = CrearUsuario.usuario(usuaCont.getCodCuenta());
