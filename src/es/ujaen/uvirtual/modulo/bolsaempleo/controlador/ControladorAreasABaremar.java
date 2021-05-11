@@ -22,7 +22,6 @@ import es.ujaen.uvirtual.modulo.bolsaempleo.modelo.ModeloArea;
 import es.ujaen.uvirtual.modulo.bolsaempleo.modelo.ModeloBolsa;
 import es.ujaen.uvirtual.modulo.bolsaempleo.modelo.ModeloUsuarioBolsaEmpleo;
 import es.ujaen.uvirtual.modulo.bolsaempleo.utilidades.BolsaEmpleoDataTable;
-import es.ujaen.uvirtual.modulo.bolsaempleo.vistas.VistaAfinidades;
 import es.ujaen.uvirtual.modulo.bolsaempleo.vistas.VistaAreasBaremar;
 import es.ujaen.uvirtual.utilidades.EscapaHTML;
 import es.ujaen.uvirtual.utilidades.Formateador;
@@ -98,7 +97,7 @@ public class ControladorAreasABaremar extends HttpServlet {
 		}		
 					
 		try {
-			checkUser(bean, datos);
+			init(bean, datos);
 			switch (nombreAccion) {
 				case ACCION_LISTAR:
 					break;
@@ -138,7 +137,7 @@ public class ControladorAreasABaremar extends HttpServlet {
 		}
 	}
 	
-	private void checkUser(VistaAreasBaremar bean, UVDatos datos) throws SQLException, UVException {
+	private void init(VistaAreasBaremar bean, UVDatos datos) throws SQLException, UVException {
 		bean.setVista(RUTA_BEP_CONF + "areasbaremar.jsp");
 		ModeloUsuarioBolsaEmpleo.obtenerInstancia().checkUser(datos);
 	}

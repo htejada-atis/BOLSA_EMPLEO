@@ -73,7 +73,6 @@ public class ControladorParametrosConfiguracion extends HttpServlet {
 		
 		VistaParametrosConfiguracion bean = new VistaParametrosConfiguracion();		
 		Usuario usuario = datos.getUsuario();
-		ModeloUsuarioBolsaEmpleo modeloUsuario = ModeloUsuarioBolsaEmpleo.obtenerInstancia();
 		LOGGER.log(Level.FINEST, "usuario que ha entrado en el servlet es {0}", usuario.getUid());
 		
 		String nombreAccion = EscapaHTML.ajustaCodificacion(request.getParameter(PARAM_ACCION));
@@ -81,10 +80,8 @@ public class ControladorParametrosConfiguracion extends HttpServlet {
 			nombreAccion = ACCION_LISTA_PARAMETROS;
 		}
 		
-		bean.setVista(RUTA_BEP_CONF + "index.jsp");
-		
 		try {
-			modeloUsuario.checkUser(datos);
+			init(bean, datos);
 			switch (nombreAccion) {
 				case ACCION_LISTA_PARAMETROS:
 					listaParametros(bean);
@@ -114,6 +111,11 @@ public class ControladorParametrosConfiguracion extends HttpServlet {
 			datos.getFicherosCSS().add("/css/ujaen_bolsa_empleo.css");
 			datos.getFicherosCSS().add("/css/jqueryujaen/jquery-ui-1.8.16.custom.css");
 		}
+	}
+	
+	private void init(VistaParametrosConfiguracion bean, UVDatos datos) throws SQLException, UVException {
+		bean.setVista(RUTA_BEP_CONF + "index.jsp");
+		ModeloUsuarioBolsaEmpleo.obtenerInstancia().checkUser(datos);
 	}
 	
 	private void errorFatal(VistaParametrosConfiguracion bean, String mensaje) {

@@ -111,7 +111,7 @@ public class ControladorAfinidades extends HttpServlet {
 		}
 					
 		try {
-			checkUser(bean, datos);
+			init(bean, datos);
 			switch (nombreAccion) {
 				case ACCION_LISTAR_AFINIDADES:
 					index(bean);
@@ -155,7 +155,7 @@ public class ControladorAfinidades extends HttpServlet {
 		}
 	}
 	
-	private void checkUser(VistaAfinidades bean, UVDatos datos) throws SQLException, UVException {
+	private void init(VistaAfinidades bean, UVDatos datos) throws SQLException, UVException {
 		bean.setVista(RUTA_BEP_CON + "index.jsp");
 		ModeloUsuarioBolsaEmpleo.obtenerInstancia().checkUser(datos);
 	}

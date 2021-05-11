@@ -151,7 +151,6 @@ public class ControladorUsuarioCandidato extends HttpServlet {
 		
 		VistaUsuarioBolsaEmpleo bean = new VistaUsuarioBolsaEmpleo();		
 		Usuario usuario = datos.getUsuario();
-		ModeloUsuarioBolsaEmpleo modeloUsuario = ModeloUsuarioBolsaEmpleo.obtenerInstancia();
 		LOGGER.log(Level.FINEST, "usuario que ha entrado en el servlet es {0}", usuario.getUid());
 		
 		String nombreAccion = EscapaHTML.ajustaCodificacion(request.getParameter(PARAM_ACCION));
@@ -160,7 +159,7 @@ public class ControladorUsuarioCandidato extends HttpServlet {
 		}
 		
 		try {
-			modeloUsuario.checkUser(datos);
+			init(bean, datos);
 			switch (nombreAccion) {
 				case ACCION_INDEX:
 					bean.setVista(RUTA_BEP_CONF + "candidatos.jsp");
@@ -234,7 +233,12 @@ public class ControladorUsuarioCandidato extends HttpServlet {
 	@Override
 	public void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 		doGet(request, response);
-	}	
+	}
+	
+	private void init(VistaUsuarioBolsaEmpleo bean, UVDatos datos) throws SQLException, UVException {
+		bean.setVista(RUTA_BEP_CONF + "candidatos.jsp");
+		ModeloUsuarioBolsaEmpleo.obtenerInstancia().checkUser(datos);
+	}
 	
 	private void errorFatal(VistaUsuarioBolsaEmpleo bean, String mensaje) {
 		bean.setVista("/WEB-INF/jsp/vista/infadministrativa/bolsaempleo/error.jsp");
@@ -369,8 +373,7 @@ public class ControladorUsuarioCandidato extends HttpServlet {
 	 * @throws SQLException excepcion de bbdd.
 	 * @throws UVException en caso de error en bd
 	 */
-	private void buscarUsuario(HttpServletRequest request, VistaUsuarioBolsaEmpleo bean) throws SQLException, UVException {
-		ModeloUsuarioBolsaEmpleo modelo = ModeloUsuarioBolsaEmpleo.obtenerInstancia();
+	private void buscarUsuario(HttpServletRequest request, VistaUsuarioBolsaEmpleo bean) throws SQLException, UVException {		
 		
 		obtenerRoles(bean);
 		Usuario usuArcos = CrearUsuario.usuario(request.getParameter(PARAM_NOMBRE));
@@ -378,6 +381,8 @@ public class ControladorUsuarioCandidato extends HttpServlet {
 			bean.setVista(RUTA_BEP_CONF_USU + "buscarUsuario.jsp");
 			throw new UVException("No existe el usuario");
 		}
+		
+		ModeloUsuarioBolsaEmpleo modelo = ModeloUsuarioBolsaEmpleo.obtenerInstancia();
 		
 		try {
 			UsuarioBolsaEmpleo usu = modelo.listaUsuario(usuArcos.getDocumentoNumero());

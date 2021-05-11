@@ -22,13 +22,11 @@ import es.ujaen.uvirtual.beans.UVDatos;
 import es.ujaen.uvirtual.beans.Usuario;
 import es.ujaen.uvirtual.modulo.bolsaempleo.beans.ApartadoBaremacion;
 import es.ujaen.uvirtual.modulo.bolsaempleo.beans.Convocatoria;
-import es.ujaen.uvirtual.modulo.bolsaempleo.modelo.ModeloAfinidad;
 import es.ujaen.uvirtual.modulo.bolsaempleo.modelo.ModeloBaremacion;
 import es.ujaen.uvirtual.modulo.bolsaempleo.modelo.ModeloBolsa;
 import es.ujaen.uvirtual.modulo.bolsaempleo.modelo.ModeloConvocatoria;
 import es.ujaen.uvirtual.modulo.bolsaempleo.modelo.ModeloUsuarioBolsaEmpleo;
 import es.ujaen.uvirtual.modulo.bolsaempleo.utilidades.BolsaEmpleoDataTable;
-import es.ujaen.uvirtual.modulo.bolsaempleo.utilidades.BolsaEmpleoValidator;
 import es.ujaen.uvirtual.modulo.bolsaempleo.vistas.VistaConvocatorias;
 import es.ujaen.uvirtual.utilidades.EscapaHTML;
 import es.ujaen.uvirtual.utilidades.Formateador;
@@ -94,7 +92,8 @@ public class ControladorConvocatorias extends HttpServlet {
 
 	// ruta vistas
 	public static final String RUTA_BEP_CON = "/WEB-INF/jsp/vista/infadministrativa/bolsaempleo/configuracion/convocatorias/";
-	public static final String JPS_FORM_CONVOCATORIA = RUTA_BEP_CON + "formConvocatoria.jsp";
+	public static final String JSP_INDEX = RUTA_BEP_CON + "indexConvocatorias.jsp";
+	public static final String JSP_FORM_CONVOCATORIA = RUTA_BEP_CON + "formConvocatoria.jsp";
 	
 	// ajax
 	public static final String URL_PATTERN_AJAX = "/srv/es/ajax/informacionadministrativa/bolsaempleo/configuracion/convocatorias";
@@ -122,7 +121,7 @@ public class ControladorConvocatorias extends HttpServlet {
 		}
 		
 		try {
-			checkUser(bean, datos);
+			init(bean, datos);
 			switch (nombreAccion) {
 				case ACCION_LISTAR_CONVOCATORIAS:
 					index(bean);
@@ -172,8 +171,8 @@ public class ControladorConvocatorias extends HttpServlet {
 		}
 	}	
 	
-	private void checkUser(VistaConvocatorias bean, UVDatos datos) throws SQLException, UVException {
-		bean.setVista(RUTA_BEP_CON + "indexConvocatorias.jsp");
+	private void init(VistaConvocatorias bean, UVDatos datos) throws SQLException, UVException {
+		bean.setVista(JSP_INDEX);
 		ModeloUsuarioBolsaEmpleo.obtenerInstancia().checkUser(datos);
 	}
 	
@@ -191,7 +190,7 @@ public class ControladorConvocatorias extends HttpServlet {
 	}
 	
 	private void index(VistaConvocatorias bean) {
-		bean.setVista(RUTA_BEP_CON + "indexConvocatorias.jsp");
+		bean.setVista(JSP_INDEX);
 	}
 		
 	private void listado(VistaConvocatorias bean, UVDatos datos, HttpServletRequest request, HttpServletResponse response) throws IOException, SQLException {
@@ -220,11 +219,11 @@ public class ControladorConvocatorias extends HttpServlet {
 	}
 	
 	private void formConvocatoria(VistaConvocatorias bean) {
-		bean.setVista(JPS_FORM_CONVOCATORIA);
+		bean.setVista(JSP_FORM_CONVOCATORIA);
 	}
 	
 	private void nuevaConvocatoria(VistaConvocatorias bean, HttpServletRequest request) throws UVException, SQLException {
-		bean.setVista(JPS_FORM_CONVOCATORIA);
+		bean.setVista(JSP_FORM_CONVOCATORIA);
 		
 		Convocatoria convocatoria = this.validateConvocatoria(request);
 		ModeloConvocatoria modelo = ModeloConvocatoria.obtenerInstancia();
@@ -248,11 +247,11 @@ public class ControladorConvocatorias extends HttpServlet {
 		Convocatoria convocatoria = modelo.getConvocatoriaById(Formateador.leeParametroInteger(request.getParameter(PARAM_CONVOCATORIA_ID)));
 		Integer solicitudes = modelo.getNumSolicitudesByConvocatoriaId(convocatoria.getCodNum());
 		if (solicitudes > 0) {
-			bean.setVista(RUTA_BEP_CON + "indexConvocatorias.jsp");
+			bean.setVista(JSP_INDEX);
 			throw new UVException("No puede editar la convocatoria, ya existen solicitudes abiertas para ella");
 		}
 		
-		bean.setVista(JPS_FORM_CONVOCATORIA);
+		bean.setVista(JSP_FORM_CONVOCATORIA);
 		bean.setConvocatoria(convocatoria);
 		
 		Convocatoria convocatoriaForm = this.validateConvocatoria(request); 							

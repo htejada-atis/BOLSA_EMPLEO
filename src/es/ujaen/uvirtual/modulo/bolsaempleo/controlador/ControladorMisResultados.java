@@ -65,15 +65,13 @@ public class ControladorMisResultados extends HttpServlet {
 		
 		VistaMisResultados bean = new VistaMisResultados();
 		
-		ModeloUsuarioBolsaEmpleo modelo = ModeloUsuarioBolsaEmpleo.obtenerInstancia();
-	
 		String nombreAccion = EscapaHTML.ajustaCodificacion(request.getParameter(PARAM_ACCION));
 		if (nombreAccion == null) {
 			nombreAccion = ACCION_LISTAR_AREAS;
 		}
 		
 		try {
-			modelo.checkUser(datos);
+			init(bean, datos);
 			switch (nombreAccion) {
 				case ACCION_LISTAR_AREAS:
 					bean.setVista(RUTA_BEP + "index.jsp");
@@ -104,6 +102,11 @@ public class ControladorMisResultados extends HttpServlet {
 			datos.getFicherosCSS().add("/css/jqueryujaen/jquery-ui-1.8.16.custom.css");
 			datos.getFicherosCSS().add("/css/ujaen_bolsa_empleo.css");
 		}
+	}
+	
+	private void init(VistaMisResultados bean, UVDatos datos) throws SQLException, UVException {
+		bean.setVista(RUTA_BEP + "index.jsp");
+		ModeloUsuarioBolsaEmpleo.obtenerInstancia().checkUser(datos);
 	}
 	
 	private void errorFatal(VistaMisResultados bean, String mensaje) {

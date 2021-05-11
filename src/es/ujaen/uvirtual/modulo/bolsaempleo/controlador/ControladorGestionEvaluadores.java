@@ -28,7 +28,6 @@ import es.ujaen.uvirtual.modulo.bolsaempleo.modelo.ModeloEvaluador;
 import es.ujaen.uvirtual.modulo.bolsaempleo.modelo.ModeloRol;
 import es.ujaen.uvirtual.modulo.bolsaempleo.modelo.ModeloUsuarioBolsaEmpleo;
 import es.ujaen.uvirtual.modulo.bolsaempleo.utilidades.BolsaEmpleoDataTable;
-import es.ujaen.uvirtual.modulo.bolsaempleo.vistas.VistaEstadoBolsas;
 import es.ujaen.uvirtual.modulo.bolsaempleo.vistas.VistaEvaluadores;
 import es.ujaen.uvirtual.utilidades.EscapaHTML;
 import es.ujaen.uvirtual.utilidades.Formateador;
@@ -81,6 +80,7 @@ public class ControladorGestionEvaluadores extends HttpServlet {
 	
 	// ruta vistas
 	public static final String RUTA_BEP_CONF = "/WEB-INF/jsp/vista/infadministrativa/bolsaempleo/configuracion/evaluadores/";
+	public static final String JSP_INDEX = RUTA_BEP_CONF + "evaluadoresListar.jsp";
 	
 	// ajax	
 	public static final String URL_PATTERN_AJAX = "/srv/es/ajax/informacionadministrativa/bolsaempleo/configuracion/evaluadores";
@@ -106,7 +106,7 @@ public class ControladorGestionEvaluadores extends HttpServlet {
 		}
 		
 		try {
-			checkUser(bean, datos);
+			init(bean, datos);
 			switch (nombreAccion) {
 				case ACCION_LISTAR_AREAS:
 					obtenerAreas(bean, request);
@@ -145,8 +145,8 @@ public class ControladorGestionEvaluadores extends HttpServlet {
 		}
 	}
 	
-	private void checkUser(VistaEvaluadores bean, UVDatos datos) throws SQLException, UVException {
-		bean.setVista(RUTA_BEP_CONF + "evaluadoresListar.jsp");
+	private void init(VistaEvaluadores bean, UVDatos datos) throws SQLException, UVException {
+		bean.setVista(JSP_INDEX);
 		ModeloUsuarioBolsaEmpleo.obtenerInstancia().checkUser(datos);
 	}
 	
@@ -195,19 +195,20 @@ public class ControladorGestionEvaluadores extends HttpServlet {
 //				throw new UVException(MENSAJE_ERROR_USUARIOS_SELECCIONADOS_INCORRECTOS);
 //			}
 //		}
-		
-		ModeloUsuarioBolsaEmpleo modelo = ModeloUsuarioBolsaEmpleo.obtenerInstancia();
-		ModeloEvaluador modeloEvaluador = ModeloEvaluador.obtenerInstancia();
+				
 		Usuario usuArcos = CrearUsuario.usuario(request.getParameter(PARAM_NOMBRE_EVALUADOR));
 		
 		if (usuArcos == null) {
-			bean.setVista(RUTA_BEP_CONF + "evaluadoresListar.jsp");
+			bean.setVista(JSP_INDEX);
 			List<Area> areas = ModeloArea.obtenerInstancia().listaAreas();
 			bean.setAreas(areas);
 			throw new UVException("No existe el evaluador en el sistema, primero debe crearlo");
 		}
 		
-		try {
+		ModeloUsuarioBolsaEmpleo modelo = ModeloUsuarioBolsaEmpleo.obtenerInstancia();
+		ModeloEvaluador modeloEvaluador = ModeloEvaluador.obtenerInstancia();
+		
+		try {			
 			UsuarioBolsaEmpleo usu = modelo.listaUsuario(usuArcos.getDocumentoNumero());
 			Integer idArea = Formateador.leeParametroInteger(request.getParameter(PARAM_AREA));
 			
@@ -215,7 +216,7 @@ public class ControladorGestionEvaluadores extends HttpServlet {
 			List<Area> areas = ModeloArea.obtenerInstancia().listaAreas();
 			bean.setAreas(areas);
 			bean.getMensajesDeExito().add(MENSAJE_EXITO_AGREGAR_EVALUADORES);
-			bean.setVista(RUTA_BEP_CONF + "evaluadoresListar.jsp");
+			bean.setVista(JSP_INDEX);
 
 		} catch (UVException e) {
 			
@@ -241,7 +242,7 @@ public class ControladorGestionEvaluadores extends HttpServlet {
 				throw new UVException("No existe el evaluador en el sistema, primero debe crearlo");
 			}
 			
-			bean.setVista(RUTA_BEP_CONF + "evaluadoresListar.jsp");
+			bean.setVista(JSP_INDEX);
 		}
 	}
 	
@@ -262,7 +263,7 @@ public class ControladorGestionEvaluadores extends HttpServlet {
 		evaluador.setCodNum(codNumUsuario);
 		bean.setEvaluador(evaluador);
 		modelo.borraRestauraEvaluador(evaluador);
-		bean.setVista(RUTA_BEP_CONF + "evaluadoresListar.jsp");
+		bean.setVista(JSP_INDEX);
 		bean.getMensajesDeExito().add(activo ? MENSAJE_EXITO_RESTAURAR : MENSAJE_EXITO_BORRAR);
 		HttpSession session = request.getSession(false);
 		session.setAttribute(MENSAJE_ENVIADO, activo ? MENSAJE_EXITO_RESTAURAR : MENSAJE_EXITO_BORRAR);
@@ -277,7 +278,7 @@ public class ControladorGestionEvaluadores extends HttpServlet {
 	 * @throws UVException .
 	 */
 	private void obtenerAreas(VistaEvaluadores bean, HttpServletRequest request) throws SQLException, UVException {
-		bean.setVista(RUTA_BEP_CONF + "evaluadoresListar.jsp");
+		bean.setVista(JSP_INDEX);
 		
 		ModeloArea modelo = ModeloArea.obtenerInstancia();
 		List<Area> areas = modelo.listaAreas();

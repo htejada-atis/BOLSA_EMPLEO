@@ -17,7 +17,6 @@ import es.ujaen.uvirtual.beans.Usuario;
 import es.ujaen.uvirtual.modulo.bolsaempleo.beans.Area;
 import es.ujaen.uvirtual.modulo.bolsaempleo.modelo.ModeloArea;
 import es.ujaen.uvirtual.modulo.bolsaempleo.modelo.ModeloUsuarioBolsaEmpleo;
-import es.ujaen.uvirtual.modulo.bolsaempleo.vistas.VistaEstadoBolsas;
 import es.ujaen.uvirtual.modulo.bolsaempleo.vistas.VistaMiembrosComision;
 import es.ujaen.uvirtual.utilidades.EscapaHTML;
 import es.ujaen.uvirtual.utilidades.Formateador;
@@ -66,7 +65,7 @@ public class ControladorMiembrosComision extends HttpServlet {
 		}
 		
 		try {
-			checkUser(bean, datos);
+			init(bean, datos);
 			switch (nombreAccion) {
 				case ACCION_LISTAR_AREAS:
 					obtenerAreas(bean);
@@ -98,7 +97,7 @@ public class ControladorMiembrosComision extends HttpServlet {
 		}
 	}
 	
-	private void checkUser(VistaMiembrosComision bean, UVDatos datos) throws SQLException, UVException {
+	private void init(VistaMiembrosComision bean, UVDatos datos) throws SQLException, UVException {
 		bean.setVista("/WEB-INF/jsp/vista/infadministrativa/bolsaempleo/miembroscomision/index.jsp");
 		ModeloUsuarioBolsaEmpleo.obtenerInstancia().checkUser(datos);
 	}

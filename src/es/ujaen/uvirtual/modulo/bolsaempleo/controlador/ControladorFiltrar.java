@@ -27,7 +27,6 @@ import es.ujaen.uvirtual.modulo.bolsaempleo.modelo.ModeloMisTitulaciones;
 import es.ujaen.uvirtual.modulo.bolsaempleo.modelo.ModeloTitulacion;
 import es.ujaen.uvirtual.modulo.bolsaempleo.modelo.ModeloUsuarioBolsaEmpleo;
 import es.ujaen.uvirtual.modulo.bolsaempleo.utilidades.BolsaEmpleoDataTable;
-import es.ujaen.uvirtual.modulo.bolsaempleo.vistas.VistaEstadoBolsas;
 import es.ujaen.uvirtual.modulo.bolsaempleo.vistas.VistaFiltrar;
 import es.ujaen.uvirtual.utilidades.EscapaHTML;
 import es.ujaen.uvirtual.utilidades.Formateador;
@@ -71,6 +70,7 @@ public class ControladorFiltrar extends HttpServlet {
 	
 	// ruta vistas
 	public static final String RUTA_BEP_FILTRAR = "/WEB-INF/jsp/vista/infadministrativa/bolsaempleo/filtrar/";
+	public static final String JSP_INDEX = RUTA_BEP_FILTRAR + "index.jsp";
 	
 	// urls	
 	public static final String URL_PATTERN_FILES_PRIVADA = "/srv/es/informacionadministrativa/bolsaempleo/filtrar";
@@ -101,10 +101,10 @@ public class ControladorFiltrar extends HttpServlet {
 		}
 		
 		try {
-			checkUser(bean, datos);
+			init(bean, datos);
 			switch (nombreAccion) {
 				case ACCION_LISTAR:
-					bean.setVista(RUTA_BEP_FILTRAR + "index.jsp");
+					bean.setVista(JSP_INDEX);
 					break;
 				case ACCION_CANDIDATO_SELECCIONADO:
 					seleccionarCandidato(bean, request);
@@ -148,8 +148,8 @@ public class ControladorFiltrar extends HttpServlet {
 		}
 	}
 	
-	private void checkUser(VistaFiltrar bean, UVDatos datos) throws SQLException, UVException {
-		bean.setVista(RUTA_BEP_FILTRAR + "index.jsp");
+	private void init(VistaFiltrar bean, UVDatos datos) throws SQLException, UVException {
+		bean.setVista(JSP_INDEX);
 		ModeloUsuarioBolsaEmpleo.obtenerInstancia().checkUser(datos);
 	}
 	
@@ -174,7 +174,7 @@ public class ControladorFiltrar extends HttpServlet {
 	 * @throws SQLException .
 	 */
 	private void seleccionarCandidato(VistaFiltrar bean, HttpServletRequest request) throws UVException, SQLException {
-		bean.setVista(RUTA_BEP_FILTRAR + "index.jsp");
+		bean.setVista(JSP_INDEX);
 		
 		ModeloTitulacion modeloTitulacion = ModeloTitulacion.obtenerInstancia();
 		ModeloUsuarioBolsaEmpleo modeloUsuario = ModeloUsuarioBolsaEmpleo.obtenerInstancia();

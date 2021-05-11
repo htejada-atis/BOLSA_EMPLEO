@@ -20,7 +20,6 @@ import es.ujaen.uvirtual.modulo.bolsaempleo.beans.Titulacion;
 import es.ujaen.uvirtual.modulo.bolsaempleo.modelo.ModeloTitulacion;
 import es.ujaen.uvirtual.modulo.bolsaempleo.modelo.ModeloUsuarioBolsaEmpleo;
 import es.ujaen.uvirtual.modulo.bolsaempleo.utilidades.BolsaEmpleoDataTable;
-import es.ujaen.uvirtual.modulo.bolsaempleo.vistas.VistaEstadoBolsas;
 import es.ujaen.uvirtual.modulo.bolsaempleo.vistas.VistaTitulaciones;
 import es.ujaen.uvirtual.utilidades.EscapaHTML;
 import es.ujaen.uvirtual.utilidades.Formateador;
@@ -93,7 +92,7 @@ public class ControladorGestionTitulaciones extends HttpServlet {
 		}
 		
 		try {
-			checkUser(bean, datos);
+			init(bean, datos);
 			switch (nombreAccion) {
 				case ACCION_LISTAR_TITULACIONES:
 					bean.setVista(RUTA_BEP_CONF + "titulaciones.jsp");
@@ -132,7 +131,7 @@ public class ControladorGestionTitulaciones extends HttpServlet {
 		}
 	}
 	
-	private void checkUser(VistaTitulaciones bean, UVDatos datos) throws SQLException, UVException {
+	private void init(VistaTitulaciones bean, UVDatos datos) throws SQLException, UVException {
 		bean.setVista(RUTA_BEP_CONF + "titulaciones.jsp");
 		ModeloUsuarioBolsaEmpleo.obtenerInstancia().checkUser(datos);
 	}

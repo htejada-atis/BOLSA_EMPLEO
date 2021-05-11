@@ -2,7 +2,6 @@ package es.ujaen.uvirtual.modulo.bolsaempleo.controlador;
 
 import java.io.BufferedInputStream;
 import java.io.IOException;
-import java.io.InputStream;
 import java.io.PrintWriter;
 import java.sql.SQLException;
 import java.util.List;
@@ -28,7 +27,6 @@ import es.ujaen.uvirtual.modulo.bolsaempleo.modelo.ModeloMisTitulaciones;
 import es.ujaen.uvirtual.modulo.bolsaempleo.modelo.ModeloUsuarioBolsaEmpleo;
 import es.ujaen.uvirtual.modulo.bolsaempleo.utilidades.BolsaEmpleoDataTable;
 import es.ujaen.uvirtual.modulo.bolsaempleo.utilidades.BolsaEmpleoUtils;
-import es.ujaen.uvirtual.modulo.bolsaempleo.utilidades.BolsaEmpleoValidator;
 import es.ujaen.uvirtual.modulo.bolsaempleo.vistas.VistaTitulaciones;
 import es.ujaen.uvirtual.utilidades.EscapaHTML;
 import es.ujaen.uvirtual.utilidades.Formateador;
@@ -100,6 +98,7 @@ public class ControladorMisTitulaciones extends HttpServlet {
 	
 	// ruta vistas
 	public static final String RUTA_BEP_CONF = "/WEB-INF/jsp/vista/infadministrativa/bolsaempleo/mistitulaciones/";
+	public static final String JSP_INDEX = "/WEB-INF/jsp/vista/infadministrativa/bolsaempleo/mistitulaciones/index.jsp";
 		
 	/** Peticion GET.
 	 * @see HttpServlet#doGet(HttpServletRequest request, HttpServletResponse response)
@@ -121,10 +120,10 @@ public class ControladorMisTitulaciones extends HttpServlet {
 		}
 		
 		try {
-			modeloUsuario.checkUser(datos);
+			init(bean, datos);
 			switch (nombreAccion) {
 				case ACCION_INDEX:
-					bean.setVista("/WEB-INF/jsp/vista/infadministrativa/bolsaempleo/mistitulaciones/index.jsp");
+					bean.setVista(JSP_INDEX);
 					break;					
 				case ACCION_DATATABLE_TITULACIONES_USUARIO:
 					listadoTitulacionesUsuario(bean, datos, request, response, modeloUsuario.getUsuarioByCodCuenta(usuario.getUid()).getCodNum());
@@ -169,6 +168,11 @@ public class ControladorMisTitulaciones extends HttpServlet {
 			datos.getFicherosCSS().add("/css/ujaen_bolsa_empleo.css");
 			datos.getFicherosCSS().add("/css/jqueryujaen/jquery-ui-1.8.16.custom.css");
 		}
+	}
+	
+	private void init(VistaTitulaciones bean, UVDatos datos) throws SQLException, UVException {
+		bean.setVista(JSP_INDEX);
+		ModeloUsuarioBolsaEmpleo.obtenerInstancia().checkUser(datos);
 	}
 	
 	private void errorFatal(VistaTitulaciones bean, String mensaje) {
@@ -279,9 +283,6 @@ public class ControladorMisTitulaciones extends HttpServlet {
 				
 		bean.setVista(RUTA_BEP_CONF + "formMisTitulaciones.jsp");
 		
-		//Integer codNum = Formateador.leeParametroInteger(request.getParameter(PARAM_ID));		
-		// Titulacion titulacion = modelo.listaTitulacion(codNum);
-		
 		Part uploadedFile = request.getPart(PARAM_ARCHIVO);
 		
 		if (uploadedFile != null) {
@@ -306,7 +307,7 @@ public class ControladorMisTitulaciones extends HttpServlet {
 
 		modelo.borraTitulacionUsuario(titulaciones);
 		
-		bean.setVista("/WEB-INF/jsp/vista/infadministrativa/bolsaempleo/mistitulaciones/index.jsp");
+		bean.setVista(JSP_INDEX);
 
 		bean.getMensajesDeExito().add(MENSAJE_EXITO_TITULACION_BORRADA);
 	}

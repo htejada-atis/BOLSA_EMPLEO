@@ -3,7 +3,6 @@ package es.ujaen.uvirtual.modulo.bolsaempleo.controlador;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.sql.SQLException;
-import java.util.Date;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.servlet.ServletException;
@@ -20,8 +19,6 @@ import es.ujaen.uvirtual.modulo.bolsaempleo.beans.Noticia;
 import es.ujaen.uvirtual.modulo.bolsaempleo.modelo.ModeloNoticia;
 import es.ujaen.uvirtual.modulo.bolsaempleo.modelo.ModeloUsuarioBolsaEmpleo;
 import es.ujaen.uvirtual.modulo.bolsaempleo.utilidades.BolsaEmpleoDataTable;
-import es.ujaen.uvirtual.modulo.bolsaempleo.utilidades.BolsaEmpleoValidator;
-import es.ujaen.uvirtual.modulo.bolsaempleo.vistas.VistaEstadoBolsas;
 import es.ujaen.uvirtual.modulo.bolsaempleo.vistas.VistaNoticias;
 import es.ujaen.uvirtual.utilidades.EscapaHTML;
 import es.ujaen.uvirtual.utilidades.Formateador;
@@ -101,7 +98,7 @@ public class ControladorGestionNoticias extends HttpServlet {
 			nombreAccion = ACCION_LISTAR_NOTICIAS;
 		}
 		try {
-			checkUser(bean, datos);
+			init(bean, datos);
 			switch (nombreAccion) {
 				case ACCION_LISTAR_NOTICIAS:
 					bean.setVista(RUTA_BEP_NOTICIAS + "indice.jsp");
@@ -140,7 +137,7 @@ public class ControladorGestionNoticias extends HttpServlet {
 		}
 	}
 	
-	private void checkUser(VistaNoticias bean, UVDatos datos) throws SQLException, UVException {
+	private void init(VistaNoticias bean, UVDatos datos) throws SQLException, UVException {
 		bean.setVista(RUTA_BEP_NOTICIAS + "indice.jsp");
 		ModeloUsuarioBolsaEmpleo.obtenerInstancia().checkUser(datos);
 	}

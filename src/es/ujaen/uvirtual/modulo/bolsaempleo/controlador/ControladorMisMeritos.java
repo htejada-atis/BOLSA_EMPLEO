@@ -117,16 +117,17 @@ public class ControladorMisMeritos extends HttpServlet {
 		Usuario usuario = datos.getUsuario();
 		LOGGER.log(Level.FINEST, "usuario que ha entrado en el servlet es {0}", usuario.getUid());
 				
-		ModeloUsuarioBolsaEmpleo modelo = ModeloUsuarioBolsaEmpleo.obtenerInstancia();
-		
 		String nombreAccion = EscapaHTML.ajustaCodificacion(request.getParameter(PARAM_ACCION));
 		if (nombreAccion == null) {
 			nombreAccion = ACCION_LISTAR;
 		}
 		
 		try {
-			modelo.checkUser(datos);
+			init(bean, datos);
 			switch (nombreAccion) {
+				case ACCION_LISTAR:
+					listaMeritos(bean);
+					break;
 				case ACCION_AGREGAR_MERITO:
 					agregarMerito(bean, datos, request, response);
 					break;
@@ -138,10 +139,7 @@ public class ControladorMisMeritos extends HttpServlet {
 					break;
 				case ACCION_ELIMINAR_MERITOS:
 					eliminarMeritos(request, response);
-					break;
-				case ACCION_LISTAR:
-					listaMeritos(bean);
-					break;
+					break;				
 				default:
 					errorFatal(bean, "Acción no contemplada");
 			}
@@ -166,6 +164,11 @@ public class ControladorMisMeritos extends HttpServlet {
 			datos.getFicherosCSS().add("/css/ujaen_bolsa_empleo.css");
 			datos.getFicherosCSS().add("/css/jqueryujaen/jquery-ui-1.8.16.custom.css");
 		}
+	}
+	
+	private void init(VistaMeritos bean, UVDatos datos) throws SQLException, UVException {
+		bean.setVista(RUTA_BEP_MERITOS + "index.jsp");
+		ModeloUsuarioBolsaEmpleo.obtenerInstancia().checkUser(datos);
 	}
 	
 	private void errorFatal(VistaMeritos bean, String mensaje) {

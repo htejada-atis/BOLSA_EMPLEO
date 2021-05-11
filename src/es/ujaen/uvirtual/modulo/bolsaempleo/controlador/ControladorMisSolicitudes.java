@@ -178,8 +178,7 @@ public class ControladorMisSolicitudes extends HttpServlet {
 		}
 
 		try {
-			bean.setCandidato(ModeloUsuarioBolsaEmpleo.obtenerInstancia().getUsuarioCandidato(datos));
-			
+			init(bean, datos);
 			switch (nombreAccion) {
 				case ACCION_CONSULTAR_SOLICITUD:
 				case ACCION_CREAR_SOLICITUD:
@@ -228,6 +227,12 @@ public class ControladorMisSolicitudes extends HttpServlet {
 			datos.getFicherosCSS().add("/css/jqueryujaen/jquery-ui-1.8.16.custom.css");
 			datos.getFicherosCSS().add("/css/ujaen_bolsa_empleo.css");
 		}
+	}
+	
+	private void init(VistaSolicitudes bean, UVDatos datos) throws SQLException, UVException {
+		bean.setVista(JSP_INDEX);
+		ModeloUsuarioBolsaEmpleo.obtenerInstancia().checkUser(datos);
+		bean.setCandidato(ModeloUsuarioBolsaEmpleo.obtenerInstancia().getUsuarioCandidato(datos));
 	}
 	
 	private void errorFatal(VistaSolicitudes bean, String mensaje) {

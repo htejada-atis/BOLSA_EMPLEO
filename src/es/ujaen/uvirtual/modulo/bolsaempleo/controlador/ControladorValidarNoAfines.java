@@ -80,18 +80,16 @@ public class ControladorValidarNoAfines extends HttpServlet {
 		}
 		
 		try {
-			ModeloUsuarioBolsaEmpleo.obtenerInstancia().checkUser(datos);
-			bean.setConvocatoria(ModeloConvocatoria.obtenerInstancia().getUltimaConvocatoria());
-			
+			init(bean, datos);
+						
 			switch (nombreAccion) {
+				case ACCION_INDEX:
+					bean.setVista(RUTA_BEP_CONF + "index.jsp");
+					break;	
 				case ACCION_BOLSA_SELECCIONADA:
-					
 					break;
 				case ACCION_DATATABLE_BOLSAS:
 					listadoBolsas(bean, datos, request, response);
-					break;
-				case ACCION_INDEX:
-					bean.setVista(RUTA_BEP_CONF + "index.jsp");
 					break;
 				default:
 					errorFatal(bean, "Acción no contemplada");
@@ -115,6 +113,12 @@ public class ControladorValidarNoAfines extends HttpServlet {
 			datos.getFicherosCSS().add("/css/ujaen_bolsa_empleo.css");
 			datos.getFicherosCSS().add("/css/jqueryujaen/jquery-ui-1.8.16.custom.css");
 		}
+	}
+	
+	private void init(VistaValidarNoAfines bean, UVDatos datos) throws SQLException, UVException {
+		bean.setVista(RUTA_BEP_CONF + "index.jsp");
+		bean.setConvocatoria(ModeloConvocatoria.obtenerInstancia().getUltimaConvocatoria());
+		ModeloUsuarioBolsaEmpleo.obtenerInstancia().checkUser(datos);
 	}
 	
 	private void errorFatal(VistaValidarNoAfines bean, String mensaje) {

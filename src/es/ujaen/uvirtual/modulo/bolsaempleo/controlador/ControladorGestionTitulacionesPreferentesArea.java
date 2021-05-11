@@ -24,7 +24,6 @@ import es.ujaen.uvirtual.modulo.bolsaempleo.modelo.ModeloArea;
 import es.ujaen.uvirtual.modulo.bolsaempleo.modelo.ModeloTitulacion;
 import es.ujaen.uvirtual.modulo.bolsaempleo.modelo.ModeloUsuarioBolsaEmpleo;
 import es.ujaen.uvirtual.modulo.bolsaempleo.utilidades.BolsaEmpleoDataTable;
-import es.ujaen.uvirtual.modulo.bolsaempleo.vistas.VistaEstadoBolsas;
 import es.ujaen.uvirtual.modulo.bolsaempleo.vistas.VistaTitulacionesArea;
 import es.ujaen.uvirtual.utilidades.EscapaHTML;
 import es.ujaen.uvirtual.utilidades.Formateador;
@@ -94,7 +93,7 @@ public class ControladorGestionTitulacionesPreferentesArea extends HttpServlet {
 		}
 		
 		try {
-			checkUser(bean, datos);
+			init(bean, datos);
 			switch (nombreAccion) {
 				case ACCION_LISTAR_AREAS:
 					obtenerAreas(bean);
@@ -134,7 +133,7 @@ public class ControladorGestionTitulacionesPreferentesArea extends HttpServlet {
 		}
 	}
 	
-	private void checkUser(VistaTitulacionesArea bean, UVDatos datos) throws SQLException, UVException {
+	private void init(VistaTitulacionesArea bean, UVDatos datos) throws SQLException, UVException {
 		bean.setVista(RUTA_BEP_CONF + "titulacionespreferentesarea.jsp");
 		ModeloUsuarioBolsaEmpleo.obtenerInstancia().checkUser(datos);
 	}
