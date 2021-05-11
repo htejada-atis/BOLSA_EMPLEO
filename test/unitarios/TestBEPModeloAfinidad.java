@@ -29,18 +29,17 @@ public class TestBEPModeloAfinidad {
 	private static final String CODIGO = "AAA";
 	private static final String CODIGOEDITAR = "EEEE";
 	private static final String DESCRIPCION = "pruebas de afinidad";
-	private static final Float MODULACION = (float) 10000;
+	private static final Double MODULACION = (double) 10000;
     
 	/** prepara la bd con los datos iniciales.
      * @throws SQLException si error en bd
      * @throws IOException si error en ficheros
-	 * @throws ParseException si error fecha
      */
-    @BeforeClass
-    public static void preparaBd() throws SQLException, IOException, ParseException {
-    	DataSource ds = BbddRunner.obtenerDataSourceUv();
-    	Conexion.setConexionUvirtual(ds);
-    	UtilsTestBolsaEmpleo.inicializaBolsaEmpleo();
+	@BeforeClass
+    public static void preparaBd() throws SQLException, IOException {
+		DataSource ds = BbddRunner.obtenerDataSourceUv();
+		Conexion.setConexionUvirtual(ds);
+		UtilsTestBolsaEmpleo.inicializaBolsaEmpleo();
     }
     
     /** test acierto insertar usuario.
@@ -48,83 +47,82 @@ public class TestBEPModeloAfinidad {
      * @throws UVException si error al validar usuario
      * @throws ParseException si error al validar fecha
      */
-    @Test
+	@Test
     public void testA01InsertaAfinidad() throws SQLException, ParseException, UVException {
-    	Afinidad afinidad = new Afinidad();
-    	afinidad.setCodNum(ID_AFINIDAD);
-    	afinidad.setCodigo(CODIGO);
-    	afinidad.setDescripcion(DESCRIPCION);
-    	afinidad.setModulacion(MODULACION);
+		Afinidad afinidad = new Afinidad();
+		afinidad.setCodNum(ID_AFINIDAD);
+		afinidad.setCodigo(CODIGO);
+		afinidad.setDescripcion(DESCRIPCION);
+		afinidad.setModulacion(MODULACION);
     	
-    	Afinidad afinidad2 = new Afinidad();
-    	afinidad2.setCodigo(CODIGO);
-    	afinidad2.setDescripcion(DESCRIPCION);
-    	afinidad2.setModulacion(MODULACION);
+		Afinidad afinidad2 = new Afinidad();
+		afinidad2.setCodigo(CODIGO);
+		afinidad2.setDescripcion(DESCRIPCION);
+		afinidad2.setModulacion(MODULACION);
     	
 		ModeloAfinidad modelo = ModeloAfinidad.obtenerInstancia();
-    	modelo.nuevaAfinidad(afinidad);
-    	modelo.nuevaAfinidad(afinidad2);
+		modelo.nuevaAfinidad(afinidad);
+		modelo.nuevaAfinidad(afinidad2);
     	
-    	Afinidad afinidadCont = new Afinidad();
-    	afinidadCont = modelo.getAfinidadById(afinidad.getCodNum());
-    	List<Afinidad> afinidades = modelo.listaAfinidades();
-    	Boolean eje = false;
+		Afinidad afinidadCont = modelo.getAfinidadById(afinidad.getCodNum());
+		List<Afinidad> afinidades = modelo.listaAfinidades();
+		Boolean eje = false;
     	
-        for (Afinidad afi : afinidades) {
-            if (afi.getCodNum().equals(afinidadCont.getCodNum())) {
-            	eje = true;
-            }
-        }
+		for (Afinidad afi : afinidades) {
+			if (afi.getCodNum().equals(afinidadCont.getCodNum())) {
+				eje = true;
+			}
+		}
     	
-    	assertTrue("afinidad insertada debe ser listada", eje);
+		assertTrue("afinidad insertada debe ser listada", eje);
     }
 
     /** test acierto borrar afinidad.
      * @throws SQLException si error en bd
      * @throws UVException si error al validar afinidad 
      */
-    @Test
-    public void testA02BorraAfinidad() throws SQLException, UVException {
+	@Test
+	public void testA02BorraAfinidad() throws SQLException, UVException {
 		ModeloAfinidad modelo = ModeloAfinidad.obtenerInstancia();
-    	List<Afinidad> afinidades = modelo.listaAfinidades();
-    	Afinidad afinidad = afinidades.get(0);
-    	modelo.borraAfinidad(afinidad);
-    	try {
-    		modelo.getAfinidadById(afinidad.getCodNum());
-    		fail();
-    	} catch (UVException e) {
-    		//se expera excepcion
-    	}
-    	List<Afinidad> afinidadesFiltradas = modelo.listaAfinidades();
-    	assertTrue("fichero borrado no debe ser listado", !afinidadesFiltradas.contains(afinidad));
-    }
+		List<Afinidad> afinidades = modelo.listaAfinidades();
+		Afinidad afinidad = afinidades.get(0);
+		modelo.borraAfinidad(afinidad);
+		try {
+			modelo.getAfinidadById(afinidad.getCodNum());
+			fail();
+		} catch (UVException e) {
+			//se expera excepcion
+		}
+		List<Afinidad> afinidadesFiltradas = modelo.listaAfinidades();
+		assertTrue("fichero borrado no debe ser listado", !afinidadesFiltradas.contains(afinidad));
+	}
     
     /** test acierto editar afinidad.
      * @throws SQLException si error en bd
      * @throws UVException si error el validar afinidad
      */
-    @Test
-    public void testA03EditarAfinidad() throws SQLException, UVException {
+	@Test
+	public void testA03EditarAfinidad() throws SQLException, UVException {
 		ModeloAfinidad modelo = ModeloAfinidad.obtenerInstancia();
-    	List<Afinidad> afinidades = modelo.listaAfinidades();
-    	Afinidad afinidad = afinidades.get(0);
-    	afinidad.setCodigo(CODIGOEDITAR);
-    	modelo.actualizaAfinidad(afinidad);
-    	Afinidad afinidadActualizada = modelo.getAfinidadById(afinidad.getCodNum());
-    	
-    	assertFalse("afinidad debe ser actualizada", afinidad.equals(afinidadActualizada));
-    }
+		List<Afinidad> afinidades = modelo.listaAfinidades();
+		Afinidad afinidad = afinidades.get(0);
+		afinidad.setCodigo(CODIGOEDITAR);
+		modelo.actualizaAfinidad(afinidad);
+		Afinidad afinidadActualizada = modelo.getAfinidadById(afinidad.getCodNum());
+		
+		assertFalse("afinidad debe ser actualizada", afinidad.equals(afinidadActualizada));
+	}
     
     
     /** test error inserta usuario null.
      * @throws SQLException si error bd
      * @throws UVException error experado
      */
-    @Test(expected = UVException.class)
-    public void testE01InsertaAfinidadNull() throws SQLException, UVException {
-    	Afinidad afinidad = null;
+	@Test(expected = UVException.class)
+	public void testE01InsertaAfinidadNull() throws SQLException, UVException {
+		Afinidad afinidad = null;
 		ModeloAfinidad modelo = ModeloAfinidad.obtenerInstancia();
-    	modelo.nuevaAfinidad(afinidad);
-    	fail();
-    }
+		modelo.nuevaAfinidad(afinidad);
+		fail();
+	}
 }

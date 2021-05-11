@@ -29,11 +29,9 @@ import es.ujaen.uvirtual.modulo.bolsaempleo.beans.ItemBaremacion;
 import es.ujaen.uvirtual.modulo.bolsaempleo.beans.Merito;
 import es.ujaen.uvirtual.modulo.bolsaempleo.modelo.ModeloBaremacion;
 import es.ujaen.uvirtual.modulo.bolsaempleo.modelo.ModeloMerito;
-import es.ujaen.uvirtual.modulo.bolsaempleo.modelo.ModeloParametrosConfiguracion;
 import es.ujaen.uvirtual.modulo.bolsaempleo.modelo.ModeloUsuarioBolsaEmpleo;
 import es.ujaen.uvirtual.modulo.bolsaempleo.utilidades.BolsaEmpleoDataTable;
 import es.ujaen.uvirtual.modulo.bolsaempleo.utilidades.BolsaEmpleoUtils;
-import es.ujaen.uvirtual.modulo.bolsaempleo.utilidades.BolsaEmpleoValidator;
 import es.ujaen.uvirtual.modulo.bolsaempleo.vistas.VistaMeritos;
 import es.ujaen.uvirtual.utilidades.EscapaHTML;
 import es.ujaen.uvirtual.utilidades.Formateador;
@@ -105,9 +103,6 @@ public class ControladorMisMeritos extends HttpServlet {
 	public static final String URL_PATTERN_AJAX = "/srv/es/ajax/informacionadministrativa/bolsaempleo/mismeritos";
 	
 	public static final int RESPONSE_HTTP_CODE_ERROR = 400;
-
-	// variables
-	public static boolean anonimo = true;
 	
 	/** Peticion GET.
 	 * @see HttpServlet#doGet(HttpServletRequest request, HttpServletResponse response)
@@ -130,7 +125,7 @@ public class ControladorMisMeritos extends HttpServlet {
 		}
 		
 		try {
-			anonimo = !modelo.checkUser(datos);
+			modelo.checkUser(datos);
 			switch (nombreAccion) {
 				case ACCION_AGREGAR_MERITO:
 					agregarMerito(bean, datos, request, response);
@@ -147,6 +142,8 @@ public class ControladorMisMeritos extends HttpServlet {
 				case ACCION_LISTAR:
 					listaMeritos(bean);
 					break;
+				default:
+					errorFatal(bean, "Acción no contemplada");
 			}
 		} catch (SQLException e) {
 			LOGGER.log(Level.SEVERE, Formateador.getStackTrace(e));
@@ -169,6 +166,11 @@ public class ControladorMisMeritos extends HttpServlet {
 			datos.getFicherosCSS().add("/css/ujaen_bolsa_empleo.css");
 			datos.getFicherosCSS().add("/css/jqueryujaen/jquery-ui-1.8.16.custom.css");
 		}
+	}
+	
+	private void errorFatal(VistaMeritos bean, String mensaje) {
+		bean.setVista("/WEB-INF/jsp/vista/infadministrativa/bolsaempleo/error.jsp");
+		bean.getMensajesDeError().add(mensaje);
 	}
 	
 	/** Redireccion de do post.
@@ -212,101 +214,22 @@ public class ControladorMisMeritos extends HttpServlet {
 		bean.setApartados(modelo.getApartadosActivos());
 		
 		if (request.getParameter(PARAM_APARTADO) != null) {
-			Integer apartadoId = Formateador.leeParametroInteger(request.getParameter(PARAM_APARTADO));
-			
-			if (apartadoId == 0) {
-				throw new UVException(MENSAJE_ERROR_APARTADO_REQUERIDO);				
-			}
-			
-			ApartadoBaremacion apartado = modelo.getApartadoBaremacionById(apartadoId); 
+			ApartadoBaremacion apartado = modelo.getApartadoBaremacionById(Formateador.leeParametroInteger(request.getParameter(PARAM_APARTADO))); 
 			bean.setApartado(apartado);
 			bean.setItems(modelo.getItemsDeApartado(apartado));
 			
 			if (request.getParameter(PARAM_ITEM) != null) {
 				Part uploadedFile = request.getPart(PARAM_ARCHIVO);
-				if (uploadedFile != null) {
-					if (uploadedFile.getSize() > 0) {
-						String nombre = BolsaEmpleoUtils.obtenerNombreFichero(uploadedFile);
-						
-						int i = nombre.lastIndexOf('.');
-						if (i > 0) {
-						    String extension = nombre.substring(i + 1);
-						    if (!extension.toLowerCase().equals("pdf")) {
-						    	throw new UVException("No se puede subir un fichero que sea distinto de pdf");
-						    }
-						}
-						
-						Integer itemId = Formateador.leeParametroInteger(request.getParameter(PARAM_ITEM));
-						ItemBaremacion itemBaremacion = ModeloBaremacion.obtenerInstancia().getItemBaremacionById(itemId);
-						
-						Boolean valorBool = false;
-						
-						if (itemBaremacion.getUnidades().equals("SI/NO")) {
-							valorBool = true;
-						}
-						
-						BolsaEmpleoValidator validator = this.getValidatorMisMeritos(request, valorBool);
-						
-						if (!validator.isValid()) {
-							for (String param : validator.getErrors().keySet()) {
-								for (String paramError : validator.getErrors().get(param)) {
-									bean.getMensajesDeError().add(paramError);
-								}
-							}
-						} else {
-							InputStream input = uploadedFile.getInputStream();
-							Float valor = validator.getValueFloat(PARAM_VALOR);
-							String descripcion = validator.getValueString(PARAM_DESCRIPCION);
-							String observacion = validator.getValueString(PARAM_OBSERVACION);
-							Usuario usuArcos = datos.getUsuario();
-							ModeloUsuarioBolsaEmpleo modeloUsuarioBolsaEmpleo = ModeloUsuarioBolsaEmpleo.obtenerInstancia();
-							Integer idUsuario = modeloUsuarioBolsaEmpleo.listaUsuario(usuArcos.getUid()).getCodNum();
+				Merito merito = this.validarMerito(request, uploadedFile);
+				
+				// TODO: un metodo en ModeloUsuarioBolsaEmpleo para obtener un usuario adecuadamente
+				Usuario usuArcos = datos.getUsuario();
+				Integer idUsuario = ModeloUsuarioBolsaEmpleo.obtenerInstancia().listaUsuario(usuArcos.getUid()).getCodNum();
+				ModeloMerito.obtenerInstancia().insertaMerito(merito, idUsuario);
 							
-							if (itemId == 0) {
-								throw new UVException(MENSAJE_ERROR_ITEM_REQUERIDO);				
-							}
-							
-							if (valor != null) {
-								if (itemBaremacion.getUnidades().equals("DECIMAL")) {
-									if (valor % 1 == 0) {
-										throw new UVException(String.format(MENSAJE_ERROR_VALOR_DECIMAL_NO_PERMITIDO, 
-												itemBaremacion.getValorMinimo()));
-									}
-								} else {
-									if (valor % 1 != 0) {
-										throw new UVException(String.format(MENSAJE_ERROR_VALOR_ENTERO_NO_PERMITIDO, 
-												itemBaremacion.getValorMinimo()));
-									}
-								}
-							}
-							
-							if (itemBaremacion.getUnidades().equals("SI/NO")) {
-								valor = (float) 1;
-							}
-							
-							if (valor < itemBaremacion.getValorMinimo()) {
-								throw new UVException(String.format(MENSAJE_ERROR_VALOR_MINIMO_PERMITIDO, itemBaremacion.getValorMinimo()));
-							}
-							
-							if (valor > itemBaremacion.getValorMaximo()) {
-								throw new UVException(String.format(MENSAJE_ERROR_VALOR_MAXIMO_PERMITIDO, itemBaremacion.getValorMaximo()));
-							}
-							
-							Merito merito = new Merito(valor, descripcion, observacion, itemBaremacion, input);
-							ModeloMerito modeloMer = ModeloMerito.obtenerInstancia();
-							
-							BolsaEmpleoUtils.checkFileSize(merito.getArchivo());
-							
-							modeloMer.insertaMerito(merito, idUsuario);
-							
-							HttpSession session = request.getSession(false);
-							session.setAttribute(MENSAJE_ENVIADO, MENSAJE_EXITO_AGREGAR);
-							response.sendRedirect(request.getServletPath());
-						}
-					} else {
-						throw new UVException("No se puede agregar un mérito sin archivo");
-					}
-				}
+				HttpSession session = request.getSession(false);
+				session.setAttribute(MENSAJE_ENVIADO, MENSAJE_EXITO_AGREGAR);
+				response.sendRedirect(request.getServletPath());
 			}
 		}
 		
@@ -328,17 +251,16 @@ public class ControladorMisMeritos extends HttpServlet {
 			bean.setMerito(merito);
 			
 			response.setContentType("application/pdf");
-	        datos.setRespuestaEnviada(true);
+			datos.setRespuestaEnviada(true);
 	        
-	        try (ServletOutputStream stream = response.getOutputStream();
-	             BufferedInputStream buf = new BufferedInputStream(merito.getArchivo());) {
-	            int readBytes = 0;
-	            while ((readBytes = buf.read()) != -1) {
-	                stream.write(readBytes);
+			try (ServletOutputStream stream = response.getOutputStream(); BufferedInputStream buf = new BufferedInputStream(merito.getArchivo())) {
+				int readBytes = 0;
+				while ((readBytes = buf.read()) != -1) {
+					stream.write(readBytes);
 	            }
-	            stream.flush();
-	        } catch (Exception ex) {
-	        	bean.getMensajesDeError().add(ex.getMessage().toString());
+				stream.flush();
+			} catch (Exception ex) {
+				bean.getMensajesDeError().add(ex.getMessage());
 	        }
 		}
 	}
@@ -402,39 +324,100 @@ public class ControladorMisMeritos extends HttpServlet {
 		}
 	}
 	
-	/** Valida el formulario de Mis Méritos.
-	 * @param request .
-	 * @param valorBool .
-	 * @return BolsaEmpleoValidator validator .
-	 * @throws UVException .
-	 * @throws SQLException .
-	 * @throws IOException .
-	 * @throws IOException .
-	 */
-	private BolsaEmpleoValidator getValidatorMisMeritos(HttpServletRequest request, Boolean valorBool) throws UVException {
-		BolsaEmpleoValidator validator = new BolsaEmpleoValidator(request);
+	private Merito validarMerito(HttpServletRequest request, Part uploadedFile) throws UVException, SQLException, IOException {		
+		Merito merito = new Merito();
 		
-		validator.addParamInteger(PARAM_ITEM);
-		validator.addRule(PARAM_ITEM, "required", MENSAJE_ERROR_ITEM_REQUERIDO);
+		merito.setArchivo(this.validateFicheroMerito(uploadedFile));
+		BolsaEmpleoUtils.checkFileSize(merito.getArchivo());
 		
-		if (valorBool) {
-			validator.addParamFloat(PARAM_VALOR);
-		} else {
-			validator.addParamFloat(PARAM_VALOR);
-			validator.addRule(PARAM_VALOR, "required", MENSAJE_ERROR_VALOR_VACIO);
+		// valor
+		merito = this.validateValorDelMerito(request, new Merito());
+				
+		// descripcion
+		merito.setDescripcion(EscapaHTML.ajustaCodificacion(request.getParameter(PARAM_DESCRIPCION)));
+		if (merito.getDescripcion() == null || merito.getDescripcion().isBlank()) {
+			throw new UVException(MENSAJE_ERROR_DESCRIPCION_VACIA);
 		}
-
-		validator.addParamString(PARAM_DESCRIPCION);
-		validator.addRule(PARAM_DESCRIPCION, "required", MENSAJE_ERROR_DESCRIPCION_VACIA);
-		validator.addRule(PARAM_DESCRIPCION, "noBlank", MENSAJE_ERROR_DESCRIPCION_VACIA);
-		validator.addRule(PARAM_DESCRIPCION, "max:" + ModeloMerito.COLUMN_DESCRIPCION_MAXLENGTH, 
-				String.format(MENSAJE_ERROR_DESCRIPCION_LARGO, ModeloMerito.COLUMN_DESCRIPCION_MAXLENGTH));
+		if (merito.getDescripcion().length() > ModeloMerito.COLUMN_DESCRIPCION_MAXLENGTH) {
+			throw new UVException(String.format(MENSAJE_ERROR_DESCRIPCION_LARGO, ModeloMerito.COLUMN_DESCRIPCION_MAXLENGTH));
+		}
 		
-		validator.addParamString(PARAM_OBSERVACION);
-		validator.addRule(PARAM_OBSERVACION, "max:" + ModeloMerito.COLUMN_OBSERVACION_MAXLENGTH, 
-				String.format(MENSAJE_ERROR_OBSERVACION_LARGO, ModeloMerito.COLUMN_OBSERVACION_MAXLENGTH));
+		// observaciones
+		merito.setObservacion(EscapaHTML.ajustaCodificacion(request.getParameter(PARAM_OBSERVACION)));
+		if (merito.getObservacion() != null && merito.getObservacion().length() > ModeloMerito.COLUMN_OBSERVACION_MAXLENGTH) {
+			throw new UVException(String.format(MENSAJE_ERROR_OBSERVACION_LARGO, ModeloMerito.COLUMN_OBSERVACION_MAXLENGTH));
+		}
 		
-		return validator;
+		return merito;
 	}
 	
+	private InputStream validateFicheroMerito(Part uploadedFile) throws UVException {
+		// TODO: mover estos chequeos a BolsaEmpleoUtils
+		
+		// comprobamos si hay fichero
+		if (uploadedFile == null) {
+			throw new UVException("El fichero es requerido");
+		}
+		if (uploadedFile.getSize() == 0) {
+			throw new UVException("El fichero es requerido");
+		}
+		
+		// comprobamos si es pdf
+		String nombre = BolsaEmpleoUtils.obtenerNombreFichero(uploadedFile);
+		int i = nombre.lastIndexOf('.');
+		if (i > 0) {
+			String extension = nombre.substring(i + 1);
+			if (!"pdf".equalsIgnoreCase(extension)) {
+				throw new UVException("No se puede subir un fichero que sea distinto de pdf");
+			}
+		}
+		
+		try {
+			return uploadedFile.getInputStream();
+		} catch (IOException ex) {
+			LOGGER.log(Level.WARNING, ex.toString());
+			throw new UVException("Error guardando fichero");
+		}		
+	}
+	
+	private Merito validateValorDelMerito(HttpServletRequest request, Merito merito) throws UVException, SQLException {
+		// item de baremación
+		ItemBaremacion item = ModeloBaremacion.obtenerInstancia().getItemBaremacionById(Formateador.leeParametroInteger(PARAM_ITEM));
+		merito.setItemBaremacion(item);
+		
+		// chequeo tipo de valor
+		String valorStr = request.getParameter(PARAM_VALOR);
+		switch (item.getUnidades()) {
+			case ModeloBaremacion.ITEM_UNIDADES_MEDICION_SINO:
+				merito.setValor((float) 1);
+				break;
+			case ModeloBaremacion.ITEM_UNIDADES_MEDICION_ENTERO:
+				if (!BolsaEmpleoUtils.isInteger(valorStr)) {
+					throw new UVException(MENSAJE_ERROR_VALOR_ENTERO_NO_PERMITIDO);
+				}
+				break;
+			case ModeloBaremacion.ITEM_UNIDADES_MEDICION_DECIMAL:
+				if (!BolsaEmpleoUtils.isFloat(valorStr)) {
+					throw new UVException(MENSAJE_ERROR_VALOR_DECIMAL_NO_PERMITIDO);
+				}
+				break;
+			default:
+				throw new UVException("Tipo de unidad no válido");
+		}
+		
+		// chequeo máximo y mínimo
+		Float valor = BolsaEmpleoUtils.leeParametroFloat(valorStr);
+		if (valor == null) {
+			throw new UVException("El valor no es válido");
+		}
+		if (valor < item.getValorMinimo()) {
+			throw new UVException(String.format(MENSAJE_ERROR_VALOR_MINIMO_PERMITIDO, item.getValorMinimo()));
+		}
+		if (valor > item.getValorMaximo()) {
+			throw new UVException(String.format(MENSAJE_ERROR_VALOR_MAXIMO_PERMITIDO, item.getValorMaximo()));
+		}
+		merito.setValor(valor);
+		
+		return merito;
+	}
 }

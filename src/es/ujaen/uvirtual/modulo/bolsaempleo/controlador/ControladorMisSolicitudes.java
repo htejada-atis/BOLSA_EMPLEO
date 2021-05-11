@@ -123,16 +123,27 @@ public class ControladorMisSolicitudes extends HttpServlet {
 	public static final String MENSAJE_ERROR_NUMERO_MAXIMO_MERITOS_BLOQUE = "Se ha alcanzado el número máximo de méritos por bloque";
 	public static final String MENSAJE_ERROR_SIN_MERITOS = "Dene incluir al menos un mérito en una bolsa para continuar";
 	public static final String MENSAJE_ERROR_SOLICITUD_ID_REQUERIDO = "El id de la solicitud es requerído";
-	
+	public static final String MENSAJE_ERROR_ACCION_NO_CONTEMPLADA = "Acción no contemplada";
+	public static final String MENSAJE_ERROR_MERITO_NO_NULO = "Merito no puede ser nulo";
+	public static final String MENSAJE_ERROR_SOLICITUD_NO_NULO = "Solicitud no puede ser nula";
+		
 	public static final String MENSAJE_EXITO_SOLICITUD_CONFIRMADA = "La solicitud ha sido confirmada correctamente";
+	
 		
 	public static final int RESPONSE_HTTP_CODE_ERROR = 400;
 	
 	// ruta vistas
 	public static final String RUTA_BEP_SOL = "/WEB-INF/jsp/vista/infadministrativa/bolsaempleo/missolicitudes/";
-	
-	// urls
+	public static final String JSP_INDEX = RUTA_BEP_SOL + "indexSolicitudes.jsp";
+	public static final String JSP_PASO2 = RUTA_BEP_SOL + "paso2.jsp";
+	public static final String JSP_PASO3 = RUTA_BEP_SOL + "paso3.jsp";
+		
+	// ajax
 	public static final String URL_PATTERN_AJAX = "/srv/es/ajax/informacionadministrativa/bolsaempleo/missolicitudes";
+	public static final String RESPONSE_AJAX_CONTENTTYPE = "application/json";
+	public static final String RESPONSE_AJAX_ENCODING = "UTF-8";
+	public static final String RESPONSE_AJAX_ERROR = "error";
+	public static final int RESPONSE_AJAX_HTTP_CODE_ERROR = 400;
 	
 	//pdf
 	public static final int PDF_ANCHO = 4;
@@ -195,6 +206,8 @@ public class ControladorMisSolicitudes extends HttpServlet {
 				case ACCION_DESCARGAR_PDF:
 					accionesPaso3(bean, datos, request, response, nombreAccion);
 					break;
+				default:
+					errorFatal(bean, MENSAJE_ERROR_ACCION_NO_CONTEMPLADA);
 			}
 		} catch (UVException e) {
 			LOGGER.log(Level.WARNING, e.toString());
@@ -216,6 +229,11 @@ public class ControladorMisSolicitudes extends HttpServlet {
 			datos.getFicherosCSS().add("/css/ujaen_bolsa_empleo.css");
 		}
 	}
+	
+	private void errorFatal(VistaSolicitudes bean, String mensaje) {
+		bean.setVista("/WEB-INF/jsp/vista/infadministrativa/bolsaempleo/error.jsp");
+		bean.getMensajesDeError().add(mensaje);
+	}
 
 	/** redireccion de do post.
 	 * @see HttpServlet#doPost(HttpServletRequest request, HttpServletResponse response)
@@ -233,34 +251,34 @@ public class ControladorMisSolicitudes extends HttpServlet {
 			throws IOException, SQLException, UVException {
 		switch (nombreAccion) {
 			case ACCION_CONSULTAR_SOLICITUD:
-				consultarSolicitud(bean, datos, request, response);
+				consultarSolicitud(bean, request);
 				break;	
 			case ACCION_CREAR_SOLICITUD:
-				crearSolicitud(bean, datos, request, response);
+				crearSolicitud(bean, request);
 				break;
 			case ACCION_DATATABLE_SOLICITUDES:
 				listadoSolicitudes(bean, datos, request, response);
 				break;
 			case ACCION_LISTAR_SOLICITUDES:
-				bean.setVista(RUTA_BEP_SOL + "indexSolicitudes.jsp");
+				bean.setVista(JSP_INDEX);
 				break;
+			default:
+				errorFatal(bean, MENSAJE_ERROR_ACCION_NO_CONTEMPLADA);
 		}
 	}
 	
 	/** 
 	 * Crea la solicitud .
 	 * @param bean .
-	 * @param datos .
 	 * @param request .
-	 * @param response .
 	 * @throws UVException .
 	 * @throws SQLException .
 	 */
-	private void crearSolicitud(VistaSolicitudes bean, UVDatos datos, HttpServletRequest request, HttpServletResponse response) throws UVException, SQLException {
+	private void crearSolicitud(VistaSolicitudes bean, HttpServletRequest request) throws UVException, SQLException {
 		ModeloSolicitud modeloSolicitud = ModeloSolicitud.obtenerInstancia();
 		ModeloConvocatoria modeloConvocatoria = ModeloConvocatoria.obtenerInstancia();
 		
-		bean.setVista(RUTA_BEP_SOL + "indexSolicitudes.jsp");
+		bean.setVista(JSP_INDEX);
 		
 		Convocatoria convocatoria = modeloConvocatoria.getConvocatoriaById(Formateador.leeParametroInteger(request.getParameter(PARAM_CONVOCATORIA_ID)));
 				
@@ -273,16 +291,14 @@ public class ControladorMisSolicitudes extends HttpServlet {
 	/** 
 	 * Consultar solicitud .
 	 * @param bean .
-	 * @param datos .
 	 * @param request .
-	 * @param response .
 	 * @throws UVException .
 	 * @throws SQLException .
 	 */
-	private void consultarSolicitud(VistaSolicitudes bean, UVDatos datos, HttpServletRequest request, HttpServletResponse response) throws UVException, SQLException {
+	private void consultarSolicitud(VistaSolicitudes bean, HttpServletRequest request) throws UVException, SQLException {
 		ModeloSolicitud modeloSolicitud = new ModeloSolicitud();
 		
-		bean.setVista(RUTA_BEP_SOL + "indexSolicitudes.jsp");
+		bean.setVista(JSP_INDEX);
 		
 		Solicitud solicitud = modeloSolicitud.getSolicitudById(Formateador.leeParametroInteger(request.getParameter(PARAM_SOLICITUD_ID)));
 		bean.setSolicitud(solicitud);
@@ -296,7 +312,7 @@ public class ControladorMisSolicitudes extends HttpServlet {
 		} else {
 			List<BolsaSolicitud> listaBolsas = modeloSolicitud.getBolsasSolicitudMeritos(solicitud);
 			bean.setListaBolsasSolicitud(listaBolsas);
-			bean.setVista(RUTA_BEP_SOL + "paso3.jsp");
+			bean.setVista(JSP_PASO3);
 		}
 	}
 	
@@ -312,10 +328,10 @@ public class ControladorMisSolicitudes extends HttpServlet {
 	private void listadoSolicitudes(VistaSolicitudes bean, UVDatos datos, HttpServletRequest request, HttpServletResponse response) throws IOException, SQLException {
 		ModeloSolicitud modelo = ModeloSolicitud.obtenerInstancia(); 
 		
-		datos.setContentType("application/json");
+		datos.setContentType(RESPONSE_AJAX_CONTENTTYPE);
 		datos.setRespuestaEnviada(true);
-		response.setContentType("application/json");
-		response.setCharacterEncoding("UTF-8");
+		response.setContentType(RESPONSE_AJAX_CONTENTTYPE);
+		response.setCharacterEncoding(RESPONSE_AJAX_ENCODING);
 		
 		try (PrintWriter writer = response.getWriter()) {
 			try {
@@ -328,7 +344,7 @@ public class ControladorMisSolicitudes extends HttpServlet {
 			} catch (Exception ex) {
 				bean.getMensajesDeError().add(ex.getMessage());
 				
-				CodigoDescripcion mensaje = new CodigoDescripcion("error", ex.getMessage());
+				CodigoDescripcion mensaje = new CodigoDescripcion(RESPONSE_AJAX_ERROR, ex.getMessage());
 				writer.write(new Gson().toJson(mensaje));
 				response.setStatus(RESPONSE_HTTP_CODE_ERROR);
 			}
@@ -346,28 +362,26 @@ public class ControladorMisSolicitudes extends HttpServlet {
 				listadoAreas(bean, datos, request, response);
 				break;
 			case ACCION_SELECCIONAR_BOLSAS:
-				seleccionarBolsas(bean, datos, request, response);
+				seleccionarBolsas(bean, request);
 				break;
+			default:
+				errorFatal(bean, MENSAJE_ERROR_ACCION_NO_CONTEMPLADA);
 		}
 	}
 	
 	/**
 	 * Seleccionar bolsas para la solicitud .
 	 * @param bean .
-	 * @param datos .
 	 * @param request .
-	 * @param response .
 	 * @throws UVException .
 	 * @throws SQLException .
 	 */
-	private void seleccionarBolsas(VistaSolicitudes bean, UVDatos datos, HttpServletRequest request, HttpServletResponse response)
+	private void seleccionarBolsas(VistaSolicitudes bean, HttpServletRequest request)
 			throws UVException, SQLException {
 		bean.setVista(RUTA_BEP_SOL + "paso1.jsp");
 		
 		Gson gson = new GsonBuilder().create();
 		ModeloSolicitud modeloSolicitud = ModeloSolicitud.obtenerInstancia();
-		ModeloBolsa modeloBolsa = ModeloBolsa.obtenerInstancia();
-		ModeloArea modeloArea = ModeloArea.obtenerInstancia();
 		
 		Solicitud solicitud = modeloSolicitud.getSolicitudById(Formateador.leeParametroInteger(request.getParameter(PARAM_SOLICITUD_ID)));
 		bean.setSolicitud(solicitud);		
@@ -383,15 +397,15 @@ public class ControladorMisSolicitudes extends HttpServlet {
 		}
 		
 		// comprobamos si son bolsas válidas
-		List<Bolsa> bolsas = new ArrayList<Bolsa>();
+		List<Bolsa> bolsas = new ArrayList<>();
 		for (String idBolsa : idBolsas) {
-			Bolsa bolsa = modeloBolsa.getBolsaById(Integer.parseInt(idBolsa));
+			Bolsa bolsa = ModeloBolsa.obtenerInstancia().getBolsaById(Integer.parseInt(idBolsa));
 			
-			if (!bolsa.getBaremable()) {
+			if (Boolean.FALSE.equals(bolsa.getBaremable())) {
 				throw new UVException("Ha selecciona una bolsa no baremable");
 			}
 			
-			if (modeloArea.isUsuarioExcluidoBolsa(bean.getCandidato(), bolsa.getArea())) {
+			if (ModeloArea.obtenerInstancia().isUsuarioExcluidoBolsa(bean.getCandidato(), bolsa.getArea())) {
 				throw new UVException("Usuario excluido de la bolsa");
 			}
 							
@@ -405,7 +419,7 @@ public class ControladorMisSolicitudes extends HttpServlet {
 		// añadimos las bolsas a la solicitud
 		modeloSolicitud.asignarBolsasASolicitud(solicitud, bolsas);
 				
-		bean.setVista(RUTA_BEP_SOL + "paso2.jsp");
+		bean.setVista(JSP_PASO2);
 		bean.setListaAfinidades(ModeloAfinidad.obtenerInstancia().listaAfinidades());
 		bean.setListaTipoAfinidades(ModeloAfinidad.obtenerInstancia().getTiposAfinidad());
 	}
@@ -436,10 +450,10 @@ public class ControladorMisSolicitudes extends HttpServlet {
 	 */
 	private void listadoAreas(VistaSolicitudes bean, UVDatos datos, HttpServletRequest request, HttpServletResponse response) throws IOException, SQLException {
 		ModeloArea modelo = ModeloArea.obtenerInstancia();
-		datos.setContentType("application/json");
+		datos.setContentType(RESPONSE_AJAX_CONTENTTYPE);
 		datos.setRespuestaEnviada(true);
-		response.setContentType("application/json");
-		response.setCharacterEncoding("UTF-8");
+		response.setContentType(RESPONSE_AJAX_CONTENTTYPE);
+		response.setCharacterEncoding(RESPONSE_AJAX_ENCODING);
 		
 		try (PrintWriter writer = response.getWriter()) {
 			try {
@@ -449,7 +463,7 @@ public class ControladorMisSolicitudes extends HttpServlet {
 				writer.write(gson.toJson(dataTable));
 			} catch (Exception ex) {
 				bean.getMensajesDeError().add(ex.getMessage());
-				CodigoDescripcion mensaje = new CodigoDescripcion("error", ex.getMessage());
+				CodigoDescripcion mensaje = new CodigoDescripcion(RESPONSE_AJAX_ERROR, ex.getMessage());
 				writer.write(new Gson().toJson(mensaje));
 				response.setStatus(RESPONSE_HTTP_CODE_ERROR);
 			}
@@ -464,7 +478,7 @@ public class ControladorMisSolicitudes extends HttpServlet {
 			throws IOException, SQLException, UVException {
 		switch (nombreAccion) {
 			case ACCION_BOLSA_SELECCIONADA:
-				seleccionarBolsa(bean, datos, request, response);
+				seleccionarBolsa(bean, request);
 				break;
 			case ACCION_DATATABLE_BOLSAS_SELECCIONADAS:
 				listadoBolsasSolicitud(bean, datos, request, response);
@@ -476,31 +490,31 @@ public class ControladorMisSolicitudes extends HttpServlet {
 				listaBolsasSolicitud(bean, request);
 				break;
 			case ACCION_MERITO_DESELECCIONADO:
-				seleccionarMerito(bean, datos, request, response, false);
+				seleccionarMerito(bean, request, false);
 				break;
 			case ACCION_MERITO_SELECCIONADO:
-				seleccionarMerito(bean, datos, request, response, true);
+				seleccionarMerito(bean, request, true);
 				break;
 			case ACCION_MERITO_AFINIDAD_INDIVIDUALIZADO:
-				seleccionarAfinidadIndividualizado(bean, datos, request, response);
+				seleccionarAfinidadIndividualizado(bean, request);
 				break;
 			case ACCION_MERITO_AFINIDAD_NOINDIVIDUALIZADO:
-				seleccionarAfinidadNoIndividualizado(bean, datos, request, response);
+				seleccionarAfinidadNoIndividualizado(bean, request);
 				break;
+			default:
+				errorFatal(bean, MENSAJE_ERROR_ACCION_NO_CONTEMPLADA);
 		}
 	}
 	
 	/**
 	 * Selecciona una bolsa para mostrar los méritos .
 	 * @param bean .
-	 * @param datos .
 	 * @param request .
-	 * @param response .
 	 * @throws UVException .
 	 * @throws SQLException .
 	 */
-	private void seleccionarBolsa(VistaSolicitudes bean, UVDatos datos, HttpServletRequest request, HttpServletResponse response) throws UVException, SQLException {
-		bean.setVista(RUTA_BEP_SOL + "paso2.jsp");
+	private void seleccionarBolsa(VistaSolicitudes bean, HttpServletRequest request) throws UVException, SQLException {
+		bean.setVista(JSP_PASO2);
 		bean.setListaAfinidades(ModeloAfinidad.obtenerInstancia().listaAfinidades());
 		bean.setListaTipoAfinidades(ModeloAfinidad.obtenerInstancia().getTiposAfinidad());
 		
@@ -520,21 +534,16 @@ public class ControladorMisSolicitudes extends HttpServlet {
 	/** 
 	 * Selecciona un mérito para agregarlo o quitarlo de una bolsa .
 	 * @param bean .
-	 * @param datos .
 	 * @param request .
-	 * @param response .
 	 * @param seleccionado .
 	 * @throws IOException .
 	 * @throws SQLException .
 	 */
-	private void seleccionarMerito(VistaSolicitudes bean, UVDatos datos, HttpServletRequest request, HttpServletResponse response, Boolean seleccionado)
+	private void seleccionarMerito(VistaSolicitudes bean, HttpServletRequest request, Boolean seleccionado)
 			throws UVException, SQLException {
 		ModeloBolsa modeloBolsa = ModeloBolsa.obtenerInstancia();
 		ModeloMerito modeloMerito = ModeloMerito.obtenerInstancia();
-		ModeloSolicitud modeloSolicitud = ModeloSolicitud.obtenerInstancia();
-		
-		Solicitud solicitud = this.listaBolsasSolicitud(bean, request);
-		
+					
 		Bolsa area = modeloBolsa.getBolsaById(Formateador.leeParametroInteger(request.getParameter(PARAM_BOLSA)));
 		bean.setArea(area);
 
@@ -542,13 +551,17 @@ public class ControladorMisSolicitudes extends HttpServlet {
 		bean.setMerito(merito);
 
 		if (merito == null) {
-			throw new UVException("merito no puede ser nulo");
+			throw new UVException(MENSAJE_ERROR_MERITO_NO_NULO);
 		}
 
+		Solicitud solicitud = this.listaBolsasSolicitud(bean, request);
+		
 		if (solicitud == null) {
-			throw new UVException("solicitud no puede ser nula");
+			throw new UVException(MENSAJE_ERROR_SOLICITUD_NO_NULO);
 		}
 
+		ModeloSolicitud modeloSolicitud = ModeloSolicitud.obtenerInstancia();
+		
 		if (Boolean.TRUE.equals(seleccionado)) {
 			// comprobamos que el total de méritos por bloque de la solicitud sea menor que
 			// el permitido por la convocatoria
@@ -563,56 +576,49 @@ public class ControladorMisSolicitudes extends HttpServlet {
 			modeloSolicitud.borrarMeritoDeSolicitudBolsa(solicitud, area, merito);
 		}
 
-		this.seleccionarBolsa(bean, datos, request, response);
+		this.seleccionarBolsa(bean, request);
 	}
 	
 	/**
 	 * Establece la afinidad del merito dentro del area que ha seleccionado el candidato, del tipo individualizado.
 	 * @param bean .
-	 * @param datos .
 	 * @param request .
-	 * @param response .
 	 * @throws UVException .
 	 * @throws SQLException .
 	 */
-	private void seleccionarAfinidadIndividualizado(VistaSolicitudes bean, UVDatos datos, HttpServletRequest request, HttpServletResponse response) 
-			throws SQLException, UVException {
-		Solicitud solicitud = this.listaBolsasSolicitud(bean, request);
-		
+	private void seleccionarAfinidadIndividualizado(VistaSolicitudes bean, HttpServletRequest request) 
+			throws SQLException, UVException {			
 		Bolsa area = ModeloBolsa.obtenerInstancia().getBolsaById(Formateador.leeParametroInteger(request.getParameter(PARAM_BOLSA)));
 		bean.setArea(area);
 
 		Merito merito = ModeloMerito.obtenerInstancia().listaMerito(Formateador.leeParametroInteger(request.getParameter(PARAM_MERITO_ID)));
 		bean.setMerito(merito);
-		
-		Afinidad afinidad = ModeloAfinidad.obtenerInstancia().getAfinidadById(Formateador.leeParametroInteger(request.getParameter(PARAM_AFINIDAD_ID))); 
-
+				
 		if (merito == null) {
-			throw new UVException("merito no puede ser nulo");
+			throw new UVException(MENSAJE_ERROR_MERITO_NO_NULO);
 		}
 
+		Solicitud solicitud = this.listaBolsasSolicitud(bean, request);
+		
 		if (solicitud == null) {
-			throw new UVException("solicitud no puede ser nula");
+			throw new UVException(MENSAJE_ERROR_SOLICITUD_NO_NULO);
 		}
 		
+		Afinidad afinidad = ModeloAfinidad.obtenerInstancia().getAfinidadById(Formateador.leeParametroInteger(request.getParameter(PARAM_AFINIDAD_ID)));
 		ModeloSolicitud.obtenerInstancia().asignarAfinidadMeritoIndividualizado(solicitud, area, merito, afinidad);
 
-		this.seleccionarBolsa(bean, datos, request, response);
+		this.seleccionarBolsa(bean, request);
 	}
 	
 	/**
 	 * Establece la afinidad del merito dentro del area que ha seleccionado el candidato, del tipo no individualizado.
 	 * @param bean .
-	 * @param datos .
 	 * @param request .
-	 * @param response .
 	 * @throws UVException .
 	 * @throws SQLException .
 	 */
-	private void seleccionarAfinidadNoIndividualizado(VistaSolicitudes bean, UVDatos datos, HttpServletRequest request, HttpServletResponse response) 
+	private void seleccionarAfinidadNoIndividualizado(VistaSolicitudes bean, HttpServletRequest request) 
 			throws SQLException, UVException {
-		Solicitud solicitud = this.listaBolsasSolicitud(bean, request);
-		
 		Bolsa area = ModeloBolsa.obtenerInstancia().getBolsaById(Formateador.leeParametroInteger(request.getParameter(PARAM_BOLSA)));
 		bean.setArea(area);
 
@@ -620,11 +626,13 @@ public class ControladorMisSolicitudes extends HttpServlet {
 		bean.setMerito(merito);
 		
 		if (merito == null) {
-			throw new UVException("merito no puede ser nulo");
+			throw new UVException(MENSAJE_ERROR_MERITO_NO_NULO);
 		}
 
+		Solicitud solicitud = this.listaBolsasSolicitud(bean, request);
+		
 		if (solicitud == null) {
-			throw new UVException("solicitud no puede ser nula");
+			throw new UVException(MENSAJE_ERROR_SOLICITUD_NO_NULO);
 		}
 		
 		// parseamos json bolsas
@@ -638,7 +646,7 @@ public class ControladorMisSolicitudes extends HttpServlet {
 		}
 		
 		// comprobamos validez de las afinidades
-		HashMap<Afinidad, Float> afinidades = new HashMap<Afinidad, Float>();
+		HashMap<Afinidad, Float> afinidades = new HashMap<>();
 		ModeloAfinidad modeloAfinidad = ModeloAfinidad.obtenerInstancia();
 		Float total = (float) 0.0;				
 		for (Map.Entry<String, Float> entry : afinidadesRaw.entrySet()) {
@@ -655,7 +663,7 @@ public class ControladorMisSolicitudes extends HttpServlet {
 		// asignamos afinidades al merito de la bolsa
 		ModeloSolicitud.obtenerInstancia().asignarAfinidadMeritoNoIndividualizado(solicitud, area, merito, afinidades);
 
-		this.seleccionarBolsa(bean, datos, request, response);
+		this.seleccionarBolsa(bean, request);
 	}
 	
 	/** 
@@ -670,7 +678,7 @@ public class ControladorMisSolicitudes extends HttpServlet {
 		ModeloSolicitud modeloSolicitud = ModeloSolicitud.obtenerInstancia();
 		Solicitud solicitud = modeloSolicitud.getSolicitudById(Formateador.leeParametroInteger(request.getParameter(PARAM_SOLICITUD_ID)));
 		
-		bean.setVista(RUTA_BEP_SOL + "paso2.jsp");
+		bean.setVista(JSP_PASO2);
 		bean.setListaAfinidades(ModeloAfinidad.obtenerInstancia().listaAfinidades());
 		bean.setListaTipoAfinidades(ModeloAfinidad.obtenerInstancia().getTiposAfinidad());
 		bean.setSolicitud(solicitud);
@@ -691,10 +699,10 @@ public class ControladorMisSolicitudes extends HttpServlet {
 	private void listadoBolsasSolicitud(VistaSolicitudes bean, UVDatos datos, HttpServletRequest request, HttpServletResponse response) 
 			throws SQLException, UVException, IOException {
 		ModeloSolicitud modelo = ModeloSolicitud.obtenerInstancia();
-		datos.setContentType("application/json");
+		datos.setContentType(RESPONSE_AJAX_CONTENTTYPE);
 		datos.setRespuestaEnviada(true);
-		response.setContentType("application/json");
-		response.setCharacterEncoding("UTF-8");
+		response.setContentType(RESPONSE_AJAX_CONTENTTYPE);
+		response.setCharacterEncoding(RESPONSE_AJAX_ENCODING);
 		
 		Solicitud solicitud = modelo.getSolicitudById(Formateador.leeParametroInteger(request.getParameter(PARAM_SOLICITUD_ID)));
 		
@@ -706,7 +714,7 @@ public class ControladorMisSolicitudes extends HttpServlet {
 				writer.write(gson.toJson(dataTable));
 			} catch (Exception ex) {
 				bean.getMensajesDeError().add(ex.getMessage());
-				CodigoDescripcion mensaje = new CodigoDescripcion("error", ex.getMessage());
+				CodigoDescripcion mensaje = new CodigoDescripcion(RESPONSE_AJAX_ERROR, ex.getMessage());
 				writer.write(new Gson().toJson(mensaje));
 				response.setStatus(RESPONSE_HTTP_CODE_ERROR);
 			}
@@ -725,10 +733,10 @@ public class ControladorMisSolicitudes extends HttpServlet {
 	private void listadoMeritosCandidato(VistaSolicitudes bean, UVDatos datos, HttpServletRequest request, HttpServletResponse response)
 			throws IOException, SQLException, UVException {
 		
-		datos.setContentType("application/json");
+		datos.setContentType(RESPONSE_AJAX_CONTENTTYPE);
 		datos.setRespuestaEnviada(true);
-		response.setContentType("application/json");
-		response.setCharacterEncoding("UTF-8");
+		response.setContentType(RESPONSE_AJAX_CONTENTTYPE);
+		response.setCharacterEncoding(RESPONSE_AJAX_ENCODING);
 		
 		try (PrintWriter writer = response.getWriter()) {
 			try {
@@ -742,7 +750,7 @@ public class ControladorMisSolicitudes extends HttpServlet {
 			} catch (Exception ex) {
 				bean.getMensajesDeError().add(ex.getMessage());
 				
-				CodigoDescripcion mensaje = new CodigoDescripcion("error", ex.getMessage());
+				CodigoDescripcion mensaje = new CodigoDescripcion(RESPONSE_AJAX_ERROR, ex.getMessage());
 				writer.write(new Gson().toJson(mensaje));
 				response.setStatus(RESPONSE_HTTP_CODE_ERROR);
 			}
@@ -760,26 +768,25 @@ public class ControladorMisSolicitudes extends HttpServlet {
 				confirmarSolicitud(bean, request, response);
 				break;
 			case ACCION_RESUMEN_SOLICITUD:
-				resumenSolicitud(bean, datos, request, response);
+				resumenSolicitud(bean, request);
 				break;
 			case ACCION_DESCARGAR_PDF:
 				descargarPDF(bean, datos, request, response);
 				break;
+			default:
+				errorFatal(bean, MENSAJE_ERROR_ACCION_NO_CONTEMPLADA);
 		}
 	}
 	
 	/** Resumen de la solicitud .
 	 * @param bean .
-	 * @param datos .
 	 * @param request .
-	 * @param response .
 	 * @throws IOException .
 	 * @throws SQLException .
 	 * @throws UVException .
 	 */
-	private void resumenSolicitud(VistaSolicitudes bean, UVDatos datos, HttpServletRequest request, HttpServletResponse response)
-			throws SQLException, UVException {
-		bean.setVista(RUTA_BEP_SOL + "paso2.jsp");
+	private void resumenSolicitud(VistaSolicitudes bean, HttpServletRequest request) throws SQLException, UVException {
+		bean.setVista(JSP_PASO2);
 		bean.setListaAfinidades(ModeloAfinidad.obtenerInstancia().listaAfinidades());
 		bean.setListaTipoAfinidades(ModeloAfinidad.obtenerInstancia().getTiposAfinidad());
 		
@@ -803,7 +810,7 @@ public class ControladorMisSolicitudes extends HttpServlet {
 		List<BolsaSolicitud> listaBolsas = modeloSolicitud.getBolsasSolicitudMeritos(solicitud);
 		bean.setListaBolsasSolicitud(listaBolsas);
 		
-		bean.setVista(RUTA_BEP_SOL + "paso3.jsp");
+		bean.setVista(JSP_PASO3);
 	}
 	
 	/**
@@ -817,7 +824,7 @@ public class ControladorMisSolicitudes extends HttpServlet {
 	 * @throws UVException .
 	 */
 	private void confirmarSolicitud(VistaSolicitudes bean, HttpServletRequest request, HttpServletResponse response) throws SQLException, UVException, IOException {
-		bean.setVista(RUTA_BEP_SOL + "paso3.jsp");
+		bean.setVista(JSP_PASO3);
 		
 		ModeloSolicitud modeloSolicitud = ModeloSolicitud.obtenerInstancia();
 		
@@ -858,19 +865,18 @@ public class ControladorMisSolicitudes extends HttpServlet {
 			throw new UVException("No tienes permisos");
 		}
         
-        try (ServletOutputStream stream = response.getOutputStream();
-             BufferedInputStream buf = new BufferedInputStream(solicitud.getArchivo());) {
-            int readBytes = 0;
-            while ((readBytes = buf.read()) != -1) {
-                stream.write(readBytes);
-            }
-            stream.flush();
-        } catch (Exception ex) {
-        	throw new UVException(ex.toString());
-        }
+		try (ServletOutputStream stream = response.getOutputStream(); BufferedInputStream buf = new BufferedInputStream(solicitud.getArchivo())) {
+			int readBytes = 0;
+			while ((readBytes = buf.read()) != -1) {
+				stream.write(readBytes);
+			}
+			stream.flush();
+		} catch (Exception ex) {
+			throw new UVException(ex.toString());
+		}
         
-        response.setContentType("application/pdf");
-        datos.setRespuestaEnviada(true);
+		response.setContentType("application/pdf");
+		datos.setRespuestaEnviada(true);
 	}
 	
 	/**

@@ -4,7 +4,6 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.sql.SQLException;
 import java.util.logging.Logger;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Level;
 import javax.servlet.ServletException;
@@ -14,29 +13,19 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
-import com.google.gson.reflect.TypeToken;
 
 import es.ujaen.uvirtual.beans.CodigoDescripcion;
 import es.ujaen.uvirtual.beans.UVDatos;
 import es.ujaen.uvirtual.beans.Usuario;
 import es.ujaen.uvirtual.modulo.bolsaempleo.beans.ApartadoBaremacion;
 import es.ujaen.uvirtual.modulo.bolsaempleo.beans.BloqueBaremacion;
-import es.ujaen.uvirtual.modulo.bolsaempleo.beans.Bolsa;
 import es.ujaen.uvirtual.modulo.bolsaempleo.beans.ItemBaremacion;
-import es.ujaen.uvirtual.modulo.bolsaempleo.beans.Merito;
-import es.ujaen.uvirtual.modulo.bolsaempleo.beans.MeritoPreferente;
-import es.ujaen.uvirtual.modulo.bolsaempleo.beans.MeritoSolicitud;
-import es.ujaen.uvirtual.modulo.bolsaempleo.beans.Solicitud;
 import es.ujaen.uvirtual.modulo.bolsaempleo.modelo.ModeloAfinidad;
 import es.ujaen.uvirtual.modulo.bolsaempleo.modelo.ModeloBaremacion;
-import es.ujaen.uvirtual.modulo.bolsaempleo.modelo.ModeloBolsa;
-import es.ujaen.uvirtual.modulo.bolsaempleo.modelo.ModeloMerito;
-import es.ujaen.uvirtual.modulo.bolsaempleo.modelo.ModeloSolicitud;
 import es.ujaen.uvirtual.modulo.bolsaempleo.modelo.ModeloUsuarioBolsaEmpleo;
 import es.ujaen.uvirtual.modulo.bolsaempleo.utilidades.BolsaEmpleoDataTable;
 import es.ujaen.uvirtual.modulo.bolsaempleo.utilidades.BolsaEmpleoUtils;
 import es.ujaen.uvirtual.modulo.bolsaempleo.vistas.VistaItemsBaremacion;
-import es.ujaen.uvirtual.modulo.bolsaempleo.vistas.VistaSolicitudes;
 import es.ujaen.uvirtual.utilidades.EscapaHTML;
 import es.ujaen.uvirtual.utilidades.Formateador;
 import es.ujaen.uvirtual.utilidades.UVException;
@@ -151,11 +140,11 @@ public class ControladorItemsBaremacion extends HttpServlet {
 	public static final String JSP_ITEM_BAREMACION = RUTA_BEP_CONF + "itemsbaremacion.jsp";
 
 	// ajax
-	public static final int RESPONSE_HTTP_CODE_ERROR = 400;
-	public static final String URL_PATTERN_AJAX = "/srv/es/ajax/informacionadministrativa/bolsaempleo/configuracion/itemsbaremacion";	
+	public static final String URL_PATTERN_AJAX = "/srv/es/ajax/informacionadministrativa/bolsaempleo/configuracion/itemsbaremacion";
 	public static final String RESPONSE_AJAX_CONTENTTYPE = "application/json";
 	public static final String RESPONSE_AJAX_ENCODING = "UTF-8";
-	public static final String RESPONSE_AJAX_ERROR = "error"; 	
+	public static final String RESPONSE_AJAX_ERROR = "error";
+	public static final int RESPONSE_AJAX_HTTP_CODE_ERROR = 400;
 	
 	/** Peticion GET.
 	 * @see HttpServlet#doGet(HttpServletRequest request, HttpServletResponse response)
@@ -313,12 +302,12 @@ public class ControladorItemsBaremacion extends HttpServlet {
 				
 				CodigoDescripcion mensaje = new CodigoDescripcion(RESPONSE_AJAX_ERROR, ex.getMessage());
 				writer.write(new Gson().toJson(mensaje));
-				response.setStatus(RESPONSE_HTTP_CODE_ERROR);
+				response.setStatus(RESPONSE_AJAX_HTTP_CODE_ERROR);
 			}
 		}
 	}
 	
-	private void agregarApartado(VistaItemsBaremacion bean) throws SQLException, UVException {
+	private void agregarApartado(VistaItemsBaremacion bean) {
 		bean.setVista(JSP_FORM_APARTADO_BAREMACION);
 		bean.setApartadoBaremacion(null);
 		bean.setUltimoCodigo("");
@@ -438,10 +427,10 @@ public class ControladorItemsBaremacion extends HttpServlet {
 				editarBloqueConfirm(bean, request);
 				break;
 			case ACCION_DESACTIVAR_BLOQUE:
-				desactivarBloque(bean, request, response);
+				desactivarBloque(bean, request);
 				break;
 			case ACCION_ACTIVAR_BLOQUE:
-				activarBloque(bean, request, response);
+				activarBloque(bean, request);
 				break;
 			case ACCION_BLOQUE_SELECCIONADO:
 				seleccionarBloque(bean, request);
@@ -475,7 +464,7 @@ public class ControladorItemsBaremacion extends HttpServlet {
 				
 				CodigoDescripcion mensaje = new CodigoDescripcion(RESPONSE_AJAX_ERROR, ex.getMessage());
 				writer.write(new Gson().toJson(mensaje));
-				response.setStatus(RESPONSE_HTTP_CODE_ERROR);
+				response.setStatus(RESPONSE_AJAX_HTTP_CODE_ERROR);
 			}
 		}
 	}
@@ -513,7 +502,7 @@ public class ControladorItemsBaremacion extends HttpServlet {
 		bean.setVista(JSP_ITEM_BAREMACION);	
 	}
 	
-	private void desactivarBloque(VistaItemsBaremacion bean, HttpServletRequest request, HttpServletResponse response) throws SQLException, UVException {
+	private void desactivarBloque(VistaItemsBaremacion bean, HttpServletRequest request) throws SQLException, UVException {
 		bean.setVista(JSP_ITEM_BAREMACION);
 		
 		ModeloBaremacion modelo = ModeloBaremacion.obtenerInstancia();
@@ -525,7 +514,7 @@ public class ControladorItemsBaremacion extends HttpServlet {
 		this.seleccionarBloque(bean, request);
 	}
 	
-	private void activarBloque(VistaItemsBaremacion bean, HttpServletRequest request, HttpServletResponse response) throws SQLException, UVException {
+	private void activarBloque(VistaItemsBaremacion bean, HttpServletRequest request) throws SQLException, UVException {
 		bean.setVista(JSP_ITEM_BAREMACION);
 		
 		ModeloBaremacion modelo = ModeloBaremacion.obtenerInstancia();
@@ -624,19 +613,19 @@ public class ControladorItemsBaremacion extends HttpServlet {
 				editarItemConfirm(bean, request);
 				break;
 			case ACCION_DESACTIVAR_ITEM:
-				desactivarItem(bean, request, response);
+				desactivarItem(bean, request);
 				break;
 			case ACCION_ACTIVAR_ITEM:
-				activarItem(bean, request, response);
+				activarItem(bean, request);
 				break;
 			case ACCION_ITEM_SELECCIONADO:
 				seleccionarItem(bean, request);
 				break;
 			case ACCION_ITEM_EXCLUYENTE_SELECCIONADO:
-				seleccionarItemExcluyente(bean, datos, request, response, true);
+				seleccionarItemExcluyente(bean, request, true);
 				break;
 			case ACCION_ITEM_EXCLUYENTE_DESELECCIONADO:
-				seleccionarItemExcluyente(bean, datos, request, response, false);
+				seleccionarItemExcluyente(bean, request, false);
 				break;
 			default:
 				this.accionNodefinida(bean);
@@ -666,7 +655,7 @@ public class ControladorItemsBaremacion extends HttpServlet {
 				
 				CodigoDescripcion mensaje = new CodigoDescripcion(RESPONSE_AJAX_ERROR, ex.getMessage());
 				writer.write(new Gson().toJson(mensaje));
-				response.setStatus(RESPONSE_HTTP_CODE_ERROR);
+				response.setStatus(RESPONSE_AJAX_HTTP_CODE_ERROR);
 			}
 		}
 	}
@@ -696,7 +685,7 @@ public class ControladorItemsBaremacion extends HttpServlet {
 				
 				CodigoDescripcion mensaje = new CodigoDescripcion(RESPONSE_AJAX_ERROR, ex.getMessage());
 				writer.write(new Gson().toJson(mensaje));
-				response.setStatus(RESPONSE_HTTP_CODE_ERROR);
+				response.setStatus(RESPONSE_AJAX_HTTP_CODE_ERROR);
 			}
 		}
 	}
@@ -773,7 +762,7 @@ public class ControladorItemsBaremacion extends HttpServlet {
 		bean.setVista(JSP_ITEM_BAREMACION);
 	}
 	
-	private void desactivarItem(VistaItemsBaremacion bean, HttpServletRequest request, HttpServletResponse response) throws SQLException, UVException {
+	private void desactivarItem(VistaItemsBaremacion bean, HttpServletRequest request) throws SQLException, UVException {
 		bean.setVista(JSP_ITEM_BAREMACION);
 		
 		ModeloBaremacion modelo = ModeloBaremacion.obtenerInstancia();
@@ -785,7 +774,7 @@ public class ControladorItemsBaremacion extends HttpServlet {
 		this.seleccionarItem(bean, request);
 	}
 	
-	private void activarItem(VistaItemsBaremacion bean, HttpServletRequest request, HttpServletResponse response) throws SQLException, UVException {
+	private void activarItem(VistaItemsBaremacion bean, HttpServletRequest request) throws SQLException, UVException {
 		bean.setVista(JSP_ITEM_BAREMACION);
 		
 		ModeloBaremacion modelo = ModeloBaremacion.obtenerInstancia();
@@ -811,14 +800,12 @@ public class ControladorItemsBaremacion extends HttpServlet {
 	/** 
 	 * Selecciona un item para excluirlo o añadirlo de otro item .
 	 * @param bean .
-	 * @param datos .
 	 * @param request .
-	 * @param response .
 	 * @param seleccionado .
 	 * @throws IOException .
 	 * @throws SQLException .
 	 */
-	private void seleccionarItemExcluyente(VistaItemsBaremacion bean, UVDatos datos, HttpServletRequest request, HttpServletResponse response, Boolean seleccionado)
+	private void seleccionarItemExcluyente(VistaItemsBaremacion bean, HttpServletRequest request, Boolean seleccionado)
 			throws UVException, SQLException {
 		ModeloBaremacion modelo = ModeloBaremacion.obtenerInstancia();
 		
@@ -870,7 +857,7 @@ public class ControladorItemsBaremacion extends HttpServlet {
 		if (item.getAfinidad() == null) {
 			throw new UVException(MENSAJE_ERROR_AFINIDAD_VACIA);
 		}		
-		if (item.getAfinidad().equals("N")) {
+		if ("N".equals(item.getAfinidad())) {
 			item.setAfinidad(null);
 		} else {
 			List<String> afinidadesValidas = ModeloAfinidad.obtenerInstancia().getTiposAfinidad();

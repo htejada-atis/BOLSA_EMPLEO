@@ -16,7 +16,7 @@ import es.ujaen.uvirtual.beans.UVDatos;
 import es.ujaen.uvirtual.beans.Usuario;
 import es.ujaen.uvirtual.modulo.bolsaempleo.beans.UsuarioBolsaEmpleo;
 import es.ujaen.uvirtual.modulo.bolsaempleo.modelo.ModeloUsuarioBolsaEmpleo;
-import es.ujaen.uvirtual.modulo.bolsaempleo.utilidades.BolsaEmpleoValidator;
+import es.ujaen.uvirtual.modulo.bolsaempleo.utilidades.BolsaEmpleoUtils;
 import es.ujaen.uvirtual.modulo.bolsaempleo.vistas.VistaUsuarioBolsaEmpleo;
 import es.ujaen.uvirtual.utilidades.EscapaHTML;
 import es.ujaen.uvirtual.utilidades.Formateador;
@@ -62,6 +62,7 @@ public class ControladorMisDatos extends HttpServlet {
 	public static final String PARAM_RAZON_BORRADO = "razonborrado";
 	
 	// acciones
+	public static final String ACCION_INDEX = "index";
 	public static final String ACCION_ENVIAR_MISDATOS = "enviarmisdatos";
 	public static final String ACCION_BAJA_USUARIO = "bajausuario";
 	
@@ -73,13 +74,10 @@ public class ControladorMisDatos extends HttpServlet {
 	public static final String MENSAJE_ERROR_PRIMER_APELLIDO_VACIO = "El primer apellido no puede estar vacio";
 	public static final String MENSAJE_ERROR_NACIONALIDAD_VACIO = "La nacionalidad no puede estar vacia";
 	public static final String MENSAJE_ERROR_NOMBRE_VACIO = "El nombre no puede estar vacio";
-	
 	public static final String MENSAJE_ERROR_RAZON_BORRADO_VACIO = "La razón de borrado no puede estar vacía";
-	
 	public static final String MENSAJE_ERROR_TELEFONO_STRING = "El telefono debe ser un número";
 	public static final String MENSAJE_ERROR_MOVIL_STRING = "El móvil debe ser un número";
 	public static final String MENSAJE_ERROR_CODIGO_POSTAL_STRING = "El código postal debe ser un número";
-	
 	public static final String MENSAJE_ERROR_NOMBRE_LARGO = "El nombre no puede contener mas de %d caracteres";
 	public static final String MENSAJE_ERROR_PRIMER_APELLIDO_LARGO = "El primer apellido no puede contener mas de %d caracteres";
 	public static final String MENSAJE_ERROR_SEGUNDO_APELLIDO_LARGO = "El segundo apellido no puede contener mas de %d caracteres";
@@ -92,15 +90,10 @@ public class ControladorMisDatos extends HttpServlet {
 	public static final String MENSAJE_ERROR_NACIONALIDAD_LARGO = "La nacionalidad no puede contener mas de %d caracteres";
 	public static final String MENSAJE_ERROR_EMAIL_LARGO = "El email no puede contener mas de %d caracteres";
 	
-	
-	
-
 	public static final int RESPONSE_HTTP_CODE_ERROR = 400;
 	
 	public static final String URL_PATTERN_AJAX = "/srv/es/ajax/informacionadministrativa/bolsaempleo/misdatos";
-	
-	public static boolean anonimo = true;
-	
+
 	/** Peticion GET.
 	 * @see HttpServlet#doGet(HttpServletRequest request, HttpServletResponse response)
 	 */
@@ -117,13 +110,10 @@ public class ControladorMisDatos extends HttpServlet {
 		
 		String nombreAccion = EscapaHTML.ajustaCodificacion(request.getParameter(PARAM_ACCION));
 		if (nombreAccion == null) {
-			nombreAccion = PARAM_ACCION;
+			nombreAccion = ACCION_INDEX;
 		}
 		
-		bean.setVista("/WEB-INF/jsp/vista/infadministrativa/bolsaempleo/misdatos/index.jsp");
-		
 		Usuario usuArcos = CrearUsuario.usuario(usuario.getUid());
-		
 		bean.setUsuarioArcos(usuArcos);
 	
 		UsuarioBolsaEmpleo usu;
@@ -135,14 +125,20 @@ public class ControladorMisDatos extends HttpServlet {
 		}	
 		
 		try {
-			anonimo = !modelo.checkUser(datos);
+			modelo.checkUser(datos);
+			bean.setUsuario(ModeloUsuarioBolsaEmpleo.obtenerInstancia().listaUsuario(usuario.getUid()));			
 			switch (nombreAccion) {
-			case ACCION_ENVIAR_MISDATOS:
-				enviarMisDatos(request, response, bean, usuario);
-				break;
-			case ACCION_BAJA_USUARIO:
-				bajaUsuario(request, response, bean, usuario);
-				break;
+				case ACCION_INDEX:
+					bean.setVista("/WEB-INF/jsp/vista/infadministrativa/bolsaempleo/misdatos/index.jsp");
+					break;
+				case ACCION_ENVIAR_MISDATOS:
+					enviarMisDatos(request, bean);
+					break;
+				case ACCION_BAJA_USUARIO:
+					bajaUsuario(request, bean);
+					break;
+				default:
+					errorFatal(bean, "Acción no contemplada");
 			}
 		} catch (SQLException e) {
 			LOGGER.log(Level.SEVERE, Formateador.getStackTrace(e));
@@ -165,6 +161,11 @@ public class ControladorMisDatos extends HttpServlet {
 		}
 	}
 	
+	private void errorFatal(VistaUsuarioBolsaEmpleo bean, String mensaje) {
+		bean.setVista("/WEB-INF/jsp/vista/infadministrativa/bolsaempleo/error.jsp");
+		bean.getMensajesDeError().add(mensaje);
+	}
+	
 	/** Redireccion de do post.
 	 * @see HttpServlet#doPost(HttpServletRequest request, HttpServletResponse response)
 	 */
@@ -176,19 +177,17 @@ public class ControladorMisDatos extends HttpServlet {
 	/** Envia el formulario con los datos del usuario logueado.
 	 * @param bean .
 	 * @param request .
-	 * @param response .
-	 * @param usuario .
 	 * @throws UVException .
 	 * @throws SQLException .
-	 * @throws IOException .
-	 * @throws IOException .
 	 */
-	public void enviarMisDatos(HttpServletRequest request, HttpServletResponse response, 
-			VistaUsuarioBolsaEmpleo bean, Usuario usuario) throws SQLException, UVException, IOException {
+	public void enviarMisDatos(HttpServletRequest request, VistaUsuarioBolsaEmpleo bean) throws SQLException, UVException {
 		bean.setVista("/WEB-INF/jsp/vista/infadministrativa/bolsaempleo/misdatos/index.jsp");
 		
-		BolsaEmpleoValidator validator = this.getValidatorMisDatos(request); 							
+		UsuarioBolsaEmpleo usuario = this.validarDatosUsuario(request); 							
 		ModeloUsuarioBolsaEmpleo modelo = ModeloUsuarioBolsaEmpleo.obtenerInstancia();
+		Integer codNum = Formateador.leeParametroInteger(request.getParameter(PARAM_ID));
+		UsuarioBolsaEmpleo usua = modelo.getUsuarioById(codNum);
+		usuario.setCodPersona(usua.getCodPersona());
 		
 		if (!validator.isValid()) {
 			for (String param : validator.getErrors().keySet()) {
@@ -217,53 +216,43 @@ public class ControladorMisDatos extends HttpServlet {
 			
 			modelo.actualizaUsuarioMisDatos(usuarioFinal);
 
-			UsuarioBolsaEmpleo usuaCont = modelo.getUsuarioById(usuarioFinal.getCodNum());
-			Usuario usuArcos = CrearUsuario.usuario(usuaCont.getCodCuenta());
-			bean.setUsuarioArcos(usuArcos);
-			bean.setUsuario(usuaCont);
-			
-			bean.getMensajesDeExito().add(MENSAJE_EXITO_ENVIAR);
-		}
+		UsuarioBolsaEmpleo usuaCont = modelo.getUsuarioById(codNum);
+		Usuario usuArcos = CrearUsuario.usuario(usuaCont.getCodCuenta());
+		bean.setUsuarioArcos(usuArcos);
+		bean.setUsuario(usuaCont);
+		
+		bean.getMensajesDeExito().add(MENSAJE_EXITO_ENVIAR);
 	}
 	
 	
 	/** Da de baja al usuario .
 	 * @param bean .
 	 * @param request .
-	 * @param response .
-	 * @param usuario .
 	 * @throws UVException .
 	 * @throws SQLException .
-	 * @throws IOException .
-	 * @throws IOException .
 	 */
-	public void bajaUsuario(HttpServletRequest request, HttpServletResponse response, 
-			VistaUsuarioBolsaEmpleo bean, Usuario usuario) throws SQLException, UVException, IOException {
+	public void bajaUsuario(HttpServletRequest request, VistaUsuarioBolsaEmpleo bean) throws SQLException, UVException {
 		bean.setVista("/WEB-INF/jsp/vista/infadministrativa/bolsaempleo/misdatos/formBaja.jsp");
 		
 		if (EscapaHTML.ajustaCodificacion(request.getParameter(PARAM_RAZON_BORRADO)) != null) {
-			BolsaEmpleoValidator validator = this.getValidatorBajaUsuario(request); 							
-			
-			if (!validator.isValid()) {
-				for (String param : validator.getErrors().keySet()) {
-					for (String paramError : validator.getErrors().get(param)) {
-						bean.getMensajesDeError().add(paramError);
-					}
-				}
-			} else {
-				bean.setVista("/WEB-INF/jsp/vista/infadministrativa/bolsaempleo/inicio/indice.jsp");
-				ModeloUsuarioBolsaEmpleo modelo = ModeloUsuarioBolsaEmpleo.obtenerInstancia();
-				
-				Integer codNum = Formateador.leeParametroInteger(request.getParameter(PARAM_ID));
-				String razonborrado = EscapaHTML.ajustaCodificacion(request.getParameter(PARAM_RAZON_BORRADO));
-				UsuarioBolsaEmpleo usu = modelo.getUsuarioById(codNum);
-				
-				usu.setRazonBorrado(razonborrado);
-				
-				modelo.cambiarFlagBorradoUsuarioRazon(usu);
-
-				bean.getMensajesDeExito().add(MENSAJE_EXITO_DARSE_BAJA);
+			String razonBorrado = EscapaHTML.ajustaCodificacion(request.getParameter(PARAM_RAZON_BORRADO));
+			if (razonBorrado == null || razonBorrado.isBlank()) {
+				throw new UVException(MENSAJE_ERROR_RAZON_BORRADO_VACIO);
 			}
+			if (razonBorrado.length() > ModeloUsuarioBolsaEmpleo.COLUMN_RAZON_BORRADO_MAXLENGTH) {
+				throw new UVException(String.format(MENSAJE_ERROR_NOMBRE_LARGO, ModeloUsuarioBolsaEmpleo.COLUMN_RAZON_BORRADO_MAXLENGTH));
+			}
+			bean.setVista("/WEB-INF/jsp/vista/infadministrativa/bolsaempleo/inicio/indice.jsp");
+			ModeloUsuarioBolsaEmpleo modelo = ModeloUsuarioBolsaEmpleo.obtenerInstancia();
+			
+			Integer codNum = Formateador.leeParametroInteger(request.getParameter(PARAM_ID));
+			UsuarioBolsaEmpleo usu = modelo.getUsuarioById(codNum);
+			
+			usu.setRazonBorrado(razonBorrado);
+			
+			modelo.cambiarFlagBorradoUsuarioRazon(usu);
+
+			bean.getMensajesDeExito().add(MENSAJE_EXITO_DARSE_BAJA);
 		}
 	}
 	
@@ -277,83 +266,90 @@ public class ControladorMisDatos extends HttpServlet {
 	 * @throws IOException .
 	 * @throws IOException .
 	 */
-	private BolsaEmpleoValidator getValidatorMisDatos(HttpServletRequest request) throws UVException {
-		BolsaEmpleoValidator validator = new BolsaEmpleoValidator(request);
-		validator.addParamString(PARAM_NOMBRE);
-		validator.addRule(PARAM_NOMBRE, "required", MENSAJE_ERROR_NOMBRE_VACIO);
-		validator.addRule(PARAM_NOMBRE, "noBlank", MENSAJE_ERROR_NOMBRE_VACIO);
-		validator.addRule(PARAM_NOMBRE, "max:" + ModeloUsuarioBolsaEmpleo.COLUMN_NOMBRE_MAXLENGTH, 
-				String.format(MENSAJE_ERROR_NOMBRE_LARGO, ModeloUsuarioBolsaEmpleo.COLUMN_NOMBRE_MAXLENGTH));
+	private UsuarioBolsaEmpleo validarDatosUsuario(HttpServletRequest request) throws UVException {
+		UsuarioBolsaEmpleo u = new UsuarioBolsaEmpleo();
 		
-		validator.addParamString(PARAM_PRIMER_APELLIDO);
-		validator.addRule(PARAM_PRIMER_APELLIDO, "required", MENSAJE_ERROR_PRIMER_APELLIDO_VACIO);
-		validator.addRule(PARAM_PRIMER_APELLIDO, "noBlank", MENSAJE_ERROR_PRIMER_APELLIDO_VACIO);
-		validator.addRule(PARAM_PRIMER_APELLIDO, "max:" + ModeloUsuarioBolsaEmpleo.COLUMN_NOMBRE_MAXLENGTH, 
-				String.format(MENSAJE_ERROR_PRIMER_APELLIDO_LARGO, ModeloUsuarioBolsaEmpleo.COLUMN_NOMBRE_MAXLENGTH));
+		u.setNombre(EscapaHTML.ajustaCodificacion(request.getParameter(PARAM_NOMBRE)));
+		if (u.getNombre() == null || u.getNombre().isBlank()) {
+			throw new UVException(MENSAJE_ERROR_NOMBRE_VACIO);
+		}
+		if (u.getNombre().length() > ModeloUsuarioBolsaEmpleo.COLUMN_NOMBRE_MAXLENGTH) {
+			throw new UVException(String.format(MENSAJE_ERROR_NOMBRE_LARGO, ModeloUsuarioBolsaEmpleo.COLUMN_NOMBRE_MAXLENGTH));
+		}
 		
-		validator.addParamString(PARAM_SEGUNDO_APELLIDO);
-		validator.addRule(PARAM_SEGUNDO_APELLIDO, "max:" + ModeloUsuarioBolsaEmpleo.COLUMN_SEGUNDO_APELLIDO_MAXLENGTH, 
-				String.format(MENSAJE_ERROR_SEGUNDO_APELLIDO_LARGO, ModeloUsuarioBolsaEmpleo.COLUMN_SEGUNDO_APELLIDO_MAXLENGTH));
+		u.setPrimerApellido(EscapaHTML.ajustaCodificacion(request.getParameter(PARAM_PRIMER_APELLIDO)));
+		if (u.getPrimerApellido() == null || u.getPrimerApellido().isBlank()) {
+			throw new UVException(MENSAJE_ERROR_PRIMER_APELLIDO_VACIO);
+		}
+		if (u.getPrimerApellido().length() > ModeloUsuarioBolsaEmpleo.COLUMN_NOMBRE_MAXLENGTH) {
+			throw new UVException(String.format(MENSAJE_ERROR_NOMBRE_LARGO, ModeloUsuarioBolsaEmpleo.COLUMN_NOMBRE_MAXLENGTH));
+		}
+		
+		u.setSegundoApellido(EscapaHTML.ajustaCodificacion(request.getParameter(PARAM_SEGUNDO_APELLIDO)));
+		if (u.getSegundoApellido() != null && u.getSegundoApellido().length() > ModeloUsuarioBolsaEmpleo.COLUMN_SEGUNDO_APELLIDO_MAXLENGTH) {
+			throw new UVException(String.format(MENSAJE_ERROR_SEGUNDO_APELLIDO_LARGO, ModeloUsuarioBolsaEmpleo.COLUMN_SEGUNDO_APELLIDO_MAXLENGTH));
+		}
+		
+		u.setDireccion(EscapaHTML.ajustaCodificacion(request.getParameter(PARAM_DIRECCION)));
+		if (u.getDireccion() != null && u.getDireccion().length() > ModeloUsuarioBolsaEmpleo.COLUMN_DIRECCION_MAXLENGTH) {
+			throw new UVException(String.format(MENSAJE_ERROR_DIRECCION_LARGO, ModeloUsuarioBolsaEmpleo.COLUMN_DIRECCION_MAXLENGTH));
+		}
+		
+		u.setCodigoPostal(EscapaHTML.ajustaCodificacion(request.getParameter(PARAM_CODIGO_POSTAL)));
+		if (u.getDireccion() != null) {
+			if (!BolsaEmpleoUtils.isInteger(u.getDireccion())) {
+				throw new UVException(MENSAJE_ERROR_CODIGO_POSTAL_STRING);	
+			}
+			if (u.getDireccion().length() > ModeloUsuarioBolsaEmpleo.COLUMN_CODIGO_POSTAL_MAXLENGTH) {
+				throw new UVException(String.format(MENSAJE_ERROR_CODIGO_POSTAL_LARGO, ModeloUsuarioBolsaEmpleo.COLUMN_CODIGO_POSTAL_MAXLENGTH));
+			}
+		}
+		
+		u.setLocalidad(EscapaHTML.ajustaCodificacion(request.getParameter(PARAM_LOCALIDAD)));
+		if (u.getLocalidad() != null && u.getLocalidad().length() > ModeloUsuarioBolsaEmpleo.COLUMN_LOCALIDAD_MAXLENGTH) {
+			throw new UVException(String.format(MENSAJE_ERROR_LOCALIDAD_LARGO, ModeloUsuarioBolsaEmpleo.COLUMN_LOCALIDAD_MAXLENGTH));
+		}
+		
+		u.setProvincia(EscapaHTML.ajustaCodificacion(request.getParameter(PARAM_PROVINCIA)));
+		if (u.getProvincia() != null && u.getProvincia().length() > ModeloUsuarioBolsaEmpleo.COLUMN_PROVINCIA_MAXLENGTH) {
+			throw new UVException(String.format(MENSAJE_ERROR_PROVINCIA_LARGO, ModeloUsuarioBolsaEmpleo.COLUMN_PROVINCIA_MAXLENGTH));
+		}
+		
+		u.setMovil(EscapaHTML.ajustaCodificacion(request.getParameter(PARAM_MOVIL)));
+		if (u.getMovil() != null) {
+			if (!BolsaEmpleoUtils.isInteger(u.getMovil())) {
+				throw new UVException(MENSAJE_ERROR_MOVIL_STRING);	
+			}
+			if (u.getMovil().length() > ModeloUsuarioBolsaEmpleo.COLUMN_MOVIL_MAXLENGTH) {
+				throw new UVException(String.format(MENSAJE_ERROR_MOVIL_LARGO, ModeloUsuarioBolsaEmpleo.COLUMN_MOVIL_MAXLENGTH));
+			}
+		}
+		
+		u.setTelefono(EscapaHTML.ajustaCodificacion(request.getParameter(PARAM_TELEFONO)));
+		if (u.getTelefono() != null) {
+			if (!BolsaEmpleoUtils.isInteger(u.getTelefono())) {
+				throw new UVException(MENSAJE_ERROR_TELEFONO_STRING);	
+			}
+			if (u.getTelefono().length() > ModeloUsuarioBolsaEmpleo.COLUMN_TELEFONO_MAXLENGTH) {
+				throw new UVException(String.format(MENSAJE_ERROR_TELEFONO_LARGO, ModeloUsuarioBolsaEmpleo.COLUMN_TELEFONO_MAXLENGTH));
+			}
+		}
+		
+		u.setNacionalidad(EscapaHTML.ajustaCodificacion(request.getParameter(PARAM_NACIONALIDAD)));
+		if (u.getNacionalidad() == null || u.getNacionalidad().isBlank()) {
+			throw new UVException(MENSAJE_ERROR_NACIONALIDAD_VACIO);
+		}
+		if (u.getNacionalidad().length() > ModeloUsuarioBolsaEmpleo.COLUMN_NACIONALIDAD_MAXLENGTH) {
+			throw new UVException(String.format(MENSAJE_ERROR_NACIONALIDAD_LARGO, ModeloUsuarioBolsaEmpleo.COLUMN_NACIONALIDAD_MAXLENGTH));
+		}
+		
+		u.setEmail(EscapaHTML.ajustaCodificacion(request.getParameter(PARAM_EMAIL)));
+		if (u.getEmail() != null && u.getEmail().length() > ModeloUsuarioBolsaEmpleo.COLUMN_EMAIL_MAXLENGTH) {
+			throw new UVException(String.format(MENSAJE_ERROR_EMAIL_LARGO, ModeloUsuarioBolsaEmpleo.COLUMN_EMAIL_MAXLENGTH));
+		}
+		
+		u.setListaDist("true".equals(EscapaHTML.ajustaCodificacion(request.getParameter(PARAM_LISTA))));
 
-		validator.addParamString(PARAM_DIRECCION);
-		validator.addRule(PARAM_DIRECCION, "max:" + ModeloUsuarioBolsaEmpleo.COLUMN_DIRECCION_MAXLENGTH, 
-				String.format(MENSAJE_ERROR_DIRECCION_LARGO, ModeloUsuarioBolsaEmpleo.COLUMN_DIRECCION_MAXLENGTH));
-		
-		validator.addParamString(PARAM_CODIGO_POSTAL);
-		validator.addRule(PARAM_CODIGO_POSTAL, "number:", MENSAJE_ERROR_CODIGO_POSTAL_STRING);
-		validator.addRule(PARAM_CODIGO_POSTAL, "max:" + ModeloUsuarioBolsaEmpleo.COLUMN_CODIGO_POSTAL_MAXLENGTH, 
-				String.format(MENSAJE_ERROR_CODIGO_POSTAL_LARGO, ModeloUsuarioBolsaEmpleo.COLUMN_CODIGO_POSTAL_MAXLENGTH));
-		
-		validator.addParamString(PARAM_LOCALIDAD);
-		validator.addRule(PARAM_LOCALIDAD, "max:" + ModeloUsuarioBolsaEmpleo.COLUMN_LOCALIDAD_MAXLENGTH, 
-				String.format(MENSAJE_ERROR_LOCALIDAD_LARGO, ModeloUsuarioBolsaEmpleo.COLUMN_LOCALIDAD_MAXLENGTH));
-		
-		validator.addParamString(PARAM_PROVINCIA);
-		validator.addRule(PARAM_PROVINCIA, "max:" + ModeloUsuarioBolsaEmpleo.COLUMN_PROVINCIA_MAXLENGTH, 
-				String.format(MENSAJE_ERROR_PROVINCIA_LARGO, ModeloUsuarioBolsaEmpleo.COLUMN_PROVINCIA_MAXLENGTH));
-		
-		validator.addParamString(PARAM_MOVIL);
-		validator.addRule(PARAM_MOVIL, "number:", MENSAJE_ERROR_MOVIL_STRING);
-		validator.addRule(PARAM_MOVIL, "max:" + ModeloUsuarioBolsaEmpleo.COLUMN_MOVIL_MAXLENGTH, 
-				String.format(MENSAJE_ERROR_MOVIL_LARGO, ModeloUsuarioBolsaEmpleo.COLUMN_MOVIL_MAXLENGTH));
-		
-		validator.addParamString(PARAM_TELEFONO);
-		validator.addRule(PARAM_TELEFONO, "number:", MENSAJE_ERROR_TELEFONO_STRING);
-		validator.addRule(PARAM_TELEFONO, "max:" + ModeloUsuarioBolsaEmpleo.COLUMN_TELEFONO_MAXLENGTH, 
-				String.format(MENSAJE_ERROR_TELEFONO_LARGO, ModeloUsuarioBolsaEmpleo.COLUMN_TELEFONO_MAXLENGTH));
-		
-		validator.addParamString(PARAM_NACIONALIDAD);
-		validator.addRule(PARAM_NACIONALIDAD, "required", MENSAJE_ERROR_NACIONALIDAD_VACIO);
-		validator.addRule(PARAM_NACIONALIDAD, "noBlank", MENSAJE_ERROR_NACIONALIDAD_VACIO);
-		validator.addRule(PARAM_NACIONALIDAD, "max:" + ModeloUsuarioBolsaEmpleo.COLUMN_NACIONALIDAD_MAXLENGTH, 
-				String.format(MENSAJE_ERROR_NACIONALIDAD_LARGO, ModeloUsuarioBolsaEmpleo.COLUMN_NACIONALIDAD_MAXLENGTH));
-		
-		validator.addParamString(PARAM_EMAIL);
-		validator.addRule(PARAM_EMAIL, "max:" + ModeloUsuarioBolsaEmpleo.COLUMN_EMAIL_MAXLENGTH, 
-				String.format(MENSAJE_ERROR_EMAIL_LARGO, ModeloUsuarioBolsaEmpleo.COLUMN_EMAIL_MAXLENGTH));
-		
-		return validator;
+		return u;
 	}
-	
-	
-	
-	/** Valida el formulario de Baja de usuario.
-	 * @param request .
-	 * @return validator .
-	 * @throws UVException .
-	 * @throws SQLException .
-	 * @throws IOException .
-	 * @throws IOException .
-	 */
-	private BolsaEmpleoValidator getValidatorBajaUsuario(HttpServletRequest request) throws UVException {
-		BolsaEmpleoValidator validator = new BolsaEmpleoValidator(request);
-		validator.addParamString(PARAM_RAZON_BORRADO);
-		validator.addRule(PARAM_RAZON_BORRADO, "required", MENSAJE_ERROR_RAZON_BORRADO_VACIO);
-		validator.addRule(PARAM_RAZON_BORRADO, "noBlank", MENSAJE_ERROR_RAZON_BORRADO_VACIO);
-		validator.addRule(PARAM_RAZON_BORRADO, "max:" + ModeloUsuarioBolsaEmpleo.COLUMN_RAZON_BORRADO_MAXLENGTH, 
-				String.format(MENSAJE_ERROR_NOMBRE_LARGO, ModeloUsuarioBolsaEmpleo.COLUMN_RAZON_BORRADO_MAXLENGTH));
-		
-		return validator;
-	}
-	
 }

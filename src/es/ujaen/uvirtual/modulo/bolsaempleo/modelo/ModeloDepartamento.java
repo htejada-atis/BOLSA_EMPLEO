@@ -4,7 +4,11 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.List;
+
 import es.ujaen.uvirtual.modelo.conexion.ConexionUvirtual;
+import es.ujaen.uvirtual.modulo.bolsaempleo.beans.Area;
 import es.ujaen.uvirtual.modulo.bolsaempleo.beans.Departamento;
 import es.ujaen.uvirtual.utilidades.UVException;
 
@@ -39,6 +43,31 @@ public class ModeloDepartamento {
         return eInstancia;
     }
 	
+    
+    /** Consulta departamentos en BBDD y los devuelve.
+	 * @param clausula para filtrar los departamentos de la bd .
+	 * @return departamentos de la base de datos .
+	 * @throws SQLException en caso de error de base de datos .
+	 * @throws UVException .
+	 */
+	public List<Departamento> listaDepartamentos() throws SQLException, UVException {
+		List<Departamento> departamentos = new ArrayList<>();
+		String consulta = "SELECT bepdep.* FROM TBEP_DEPARTAMENTOS bepdep ";
+		
+		try (Connection conexion = ConexionUvirtual.obtenerInstancia();
+			PreparedStatement stmt = conexion.prepareStatement(consulta);) {
+				try (ResultSet rs = stmt.executeQuery()) {
+					while (rs.next()) {
+							Departamento dep = new Departamento();
+							dep.setCodNum(rs.getInt("CODNUM"));
+							dep.setIdDepartamentoExterno(rs.getString("ID_DEPARTAMENTO"));
+							dep.setDescripcion(rs.getString("DES_DEPARTAMENTO"));
+							departamentos.add(dep);	
+					}
+				}
+			}
+		return departamentos;
+	}
 	
 	/**
 	 * Devuelve un departamento por su id.
@@ -99,11 +128,12 @@ public class ModeloDepartamento {
 	}
 	
 	/**	Función que inserta un departamento en la BD.
+	 * @param conexion .
 	 * @param departamento a insertar en la BD .
 	 * @throws SQLException en caso de error en la BD .
 	 * @throws UVException en caso de error de parametros .
 	 */
-	public void insertaDepartamento(Departamento departamento) throws SQLException, UVException {
+	public void insertaDepartamento(Connection conexion, Departamento departamento) throws SQLException, UVException {
 		if (departamento == null) {
 			throw new UVException("No se puede insertar un departamento vacio");
 		}
@@ -115,8 +145,7 @@ public class ModeloDepartamento {
 				+ " (ID_DEPARTAMENTO,DES_DEPARTAMENTO)"
 				+ " VALUES (?, ?)";
 		
-		try (Connection conexion = ConexionUvirtual.obtenerInstancia();
-			 PreparedStatement stmt = conexion.prepareStatement(consulta);) {
+		try (PreparedStatement stmt = conexion.prepareStatement(consulta);) {
 			int parameterIndex = 1;
 			stmt.setString(parameterIndex++, departamento.getIdDepartamentoExterno());
 			stmt.setString(parameterIndex++, departamento.getDescripcion());

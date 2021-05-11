@@ -10,6 +10,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.Part;
 
 import es.ujaen.uvirtual.modulo.bolsaempleo.modelo.ModeloParametrosConfiguracion;
+import es.ujaen.uvirtual.utilidades.Formateador;
 import es.ujaen.uvirtual.utilidades.UVException;
 
 /**
@@ -19,6 +20,7 @@ import es.ujaen.uvirtual.utilidades.UVException;
  */
 public class BolsaEmpleoUtils {
 	private static final double ROUNDER = 100.0;
+	private static final int NUMBER_2 = 2;
 	
 	private BolsaEmpleoUtils() { }
 	
@@ -27,14 +29,14 @@ public class BolsaEmpleoUtils {
 	 * @return cadena con el nombre del fichero .
      */
 	public static String obtenerNombreFichero(Part part) {
-        String contentDisp = part.getHeader("content-disposition");
-        String[] tokens = contentDisp.split(";");
-        for (String token : tokens) {
-            if (token.trim().startsWith("filename")) {
-                return token.substring(token.indexOf("=") + 2, token.length() - 1);
+		String contentDisp = part.getHeader("content-disposition");
+		String[] tokens = contentDisp.split(";");
+		for (String token : tokens) {
+			if (token.trim().startsWith("filename")) {
+				return token.substring(token.indexOf("=") + NUMBER_2, token.length() - 1);
             }
         }
-        return "";
+		return "";
     }
 	
 	/**
@@ -48,11 +50,11 @@ public class BolsaEmpleoUtils {
 		StringBuilder builder = new StringBuilder();
 
 		for (int i = 0; i < numParams; i++) {
-		    builder.append("?,");
+			builder.append("?,");
 		}
 		
 		return builder.deleteCharAt(builder.length() - 1).toString();
-	} 
+	}
 	
 	/**
 	 * Devuelve el valor de un input del request o un valor por defecto si no existe.
@@ -82,10 +84,10 @@ public class BolsaEmpleoUtils {
 		}
 		
 		String regex = "[0-9]+";
-        Pattern p = Pattern.compile(regex);
-        Matcher m = p.matcher(value);
+		Pattern p = Pattern.compile(regex);
+		Matcher m = p.matcher(value);
 
-        return m.matches();
+		return m.matches();
 	}
 	
 	/**
@@ -93,16 +95,16 @@ public class BolsaEmpleoUtils {
 	 * @param value .
 	 * @return .
 	 */
-	public static Boolean isFloat(String value) {
+	public static boolean isFloat(String value) {
 		if (value == null) {
 			return false;
 		}
 		
 		String regex = "[0-9]+(,[0-9]+)?";
-        Pattern p = Pattern.compile(regex);
-        Matcher m = p.matcher(value);
+		Pattern p = Pattern.compile(regex);
+		Matcher m = p.matcher(value);
 
-        return m.matches();
+		return m.matches();
 	}
 	
 	/**
@@ -134,25 +136,26 @@ public class BolsaEmpleoUtils {
 	/**
 	 * Checkea si un archivo es mas grande que una variable o no .
 	 * @param archivo .
-	 * @throws IOException .
-	 * @throws NumberFormatException .
-	 * @throws UVException .
 	 * @throws SQLException .
+	 * @throws IOException .
+	 * @throws UVException .
 	 */
-	public static void checkFileSize(InputStream archivo) throws SQLException, UVException, NumberFormatException, IOException {
-	
+	public static void checkFileSize(InputStream archivo) throws UVException, SQLException, IOException {
 		if (archivo.available() <= 0) {
 			throw new UVException("No se puede insertar sin archivo o archivo vacio");
 		}
 		
-		ModeloParametrosConfiguracion modeloParam = ModeloParametrosConfiguracion.obtenerInstancia();
-		if (archivo.available() > Integer.parseInt(getParametroConfiguracion("bolsaempleo.maxEspacioArchivo"))) {
+		Integer maxSize = Formateador.leeParametroInteger(getParametroConfiguracion("bolsaempleo.maxEspacioArchivo"));
+		if (maxSize == null) {
+			throw new UVException("No se puede leer el tamañao máximo de archivo");
+		}
+		
+		if (archivo.available() > maxSize) {
 			throw new UVException("No se puede insertar un archivo tan grande");
 		}	
-		
 	}
 	
-	 /* Redondeo a dos decimales .
+	/** Redondeo a dos decimales.
 	 * @param v .
 	 * @return .
 	 */

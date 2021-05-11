@@ -84,9 +84,6 @@ public class ControladorGestionNoticias extends HttpServlet {
 	// urls
 	public static final String URL_PATTERN_AJAX = "/srv/es/ajax/informacionadministrativa/bolsaempleo/noticias";
 
-	// variables
-	public static boolean anonimo = true;
-	
 	/** Peticion GET.
 	 * @see HttpServlet#doGet(HttpServletRequest request, HttpServletResponse response)
 	 */
@@ -104,7 +101,7 @@ public class ControladorGestionNoticias extends HttpServlet {
 			nombreAccion = ACCION_LISTAR_NOTICIAS;
 		}
 		try {
-			anonimo = !modelo.checkUser(datos);
+			modelo.checkUser(datos);
 			switch (nombreAccion) {
 				case ACCION_AGREGAR_NOTICIA:
 					agregarNoticia(bean, request, response);
@@ -121,6 +118,8 @@ public class ControladorGestionNoticias extends HttpServlet {
 				case ACCION_LISTAR_NOTICIAS:
 					bean.setVista(RUTA_BEP_NOTICIAS + "indice.jsp");
 					break;
+				default:
+					errorFatal(bean, "Acción no contemplada");
 			}
 		} catch (UVException e) {
 			LOGGER.log(Level.WARNING, e.toString());
@@ -139,6 +138,11 @@ public class ControladorGestionNoticias extends HttpServlet {
 			datos.getFicherosCSS().add("/css/jqueryujaen/jquery-ui-1.8.16.custom.css");
 			datos.getFicherosCSS().add("/css/ujaen_bolsa_empleo.css");
 		}
+	}
+	
+	private void errorFatal(VistaNoticias bean, String mensaje) {
+		bean.setVista("/WEB-INF/jsp/vista/infadministrativa/bolsaempleo/error.jsp");
+		bean.getMensajesDeError().add(mensaje);
 	}
 	
 	/** redireccion de do post.
@@ -162,27 +166,14 @@ public class ControladorGestionNoticias extends HttpServlet {
 		
 		if (EscapaHTML.ajustaCodificacion(request.getParameter(PARAM_TEXTO)) != null) {
 			
-			BolsaEmpleoValidator validator = this.getValidatorGestionNoticias(request);
+			Noticia noticia = this.validarNoticia(request);
+			noticia.setActiva(true);
 			
-			if (!validator.isValid()) {
-				for (String param : validator.getErrors().keySet()) {
-					for (String paramError : validator.getErrors().get(param)) {
-						bean.getMensajesDeError().add(paramError);
-					}
-				}
-			} else {
-				ModeloNoticia modelo = ModeloNoticia.obtenerInstancia();
-				String enlace = validator.getValueString(PARAM_ENLACE);
-				String texto = validator.getValueString(PARAM_TEXTO);
-				Boolean publica = request.getParameter(PARAM_PUBLICA) != null && EscapaHTML.ajustaCodificacion(request.getParameter(PARAM_PUBLICA)).equals("true");
-				Date fecha = validator.getValueDate(PARAM_FECHA);
-				Noticia noticia = new Noticia(enlace, texto, fecha, publica, true);
-				modelo.insertaNoticia(noticia);
-				bean.getMensajesDeExito().add(MENSAJE_EXITO_AGREGAR);
-				HttpSession session = request.getSession(false);
-				session.setAttribute(MENSAJE_ENVIADO, MENSAJE_EXITO_AGREGAR);
-				response.sendRedirect(request.getServletPath());
-			}
+			ModeloNoticia.obtenerInstancia().insertaNoticia(noticia);
+			bean.getMensajesDeExito().add(MENSAJE_EXITO_AGREGAR);
+			HttpSession session = request.getSession(false);
+			session.setAttribute(MENSAJE_ENVIADO, MENSAJE_EXITO_AGREGAR);
+			response.sendRedirect(request.getServletPath());			
 		}
 	}
 	
@@ -197,29 +188,17 @@ public class ControladorGestionNoticias extends HttpServlet {
 	private void editarNoticia(VistaNoticias bean, HttpServletRequest request, HttpServletResponse response) throws SQLException, UVException, IOException {
 		bean.setVista(RUTA_BEP_NOTICIAS + "formNoticia.jsp");
 		ModeloNoticia modelo = ModeloNoticia.obtenerInstancia();
-		bean.setNoticia(modelo.listaNoticia(Formateador.leeParametroInteger(request.getParameter(PARAM_ID))));
+		Noticia noticia = modelo.listaNoticia(Formateador.leeParametroInteger(request.getParameter(PARAM_ID)));
+		bean.setNoticia(noticia);
+		
 		if (EscapaHTML.ajustaCodificacion(request.getParameter(PARAM_TEXTO)) != null) {
-			BolsaEmpleoValidator validator = this.getValidatorGestionNoticias(request);
-			
-			if (!validator.isValid()) {
-				for (String param : validator.getErrors().keySet()) {
-					for (String paramError : validator.getErrors().get(param)) {
-						bean.getMensajesDeError().add(paramError);
-					}
-				}
-			} else {
-				Integer codNum = Formateador.leeParametroInteger(request.getParameter(PARAM_ID));
-				String enlace = validator.getValueString(PARAM_ENLACE);
-				String texto = validator.getValueString(PARAM_TEXTO);
-				Boolean publica = request.getParameter(PARAM_PUBLICA) != null && EscapaHTML.ajustaCodificacion(request.getParameter(PARAM_PUBLICA)).equals("true");
-				Date fecha = validator.getValueDate(PARAM_FECHA);
-				Noticia noticia = new Noticia(codNum, enlace, texto, fecha, publica, true);
-				modelo.actualizaNoticia(noticia);
-				bean.getMensajesDeExito().add(MENSAJE_EXITO_EDITAR);
-				HttpSession session = request.getSession(false);
-				session.setAttribute(MENSAJE_ENVIADO, MENSAJE_EXITO_EDITAR);
-				response.sendRedirect(request.getServletPath());
-			}
+			Noticia noticiaForm = this.validarNoticia(request);
+			noticiaForm.setCodNum(noticia.getCodNum());
+			modelo.actualizaNoticia(noticiaForm);
+			bean.getMensajesDeExito().add(MENSAJE_EXITO_EDITAR);
+			HttpSession session = request.getSession(false);
+			session.setAttribute(MENSAJE_ENVIADO, MENSAJE_EXITO_EDITAR);
+			response.sendRedirect(request.getServletPath());
 		}
 	}
 	
@@ -236,7 +215,7 @@ public class ControladorGestionNoticias extends HttpServlet {
 		Integer codNum = Formateador.leeParametroInteger(request.getParameter(PARAM_ID));
 		Noticia noticia = new Noticia();
 		noticia.setCodNum(codNum);
-		Boolean activa = request.getParameter(PARAM_ACTIVA) != null && EscapaHTML.ajustaCodificacion(request.getParameter(PARAM_ACTIVA)).equals("true");
+		boolean activa = "true".equals(EscapaHTML.ajustaCodificacion(request.getParameter(PARAM_ACTIVA))); 
 		noticia.setActiva(activa);
 		modelo.borraRestauraNoticia(noticia);
 		bean.getMensajesDeExito().add(MENSAJE_EXITO_ELIMINAR);
@@ -284,23 +263,26 @@ public class ControladorGestionNoticias extends HttpServlet {
 	 * @throws IOException .
 	 * @throws IOException .
 	 */
-	private BolsaEmpleoValidator getValidatorGestionNoticias(HttpServletRequest request) throws UVException {
-		BolsaEmpleoValidator validator = new BolsaEmpleoValidator(request);
+	private Noticia validarNoticia(HttpServletRequest request) throws UVException {
+		Noticia n = new Noticia();
 		
-		validator.addParamString(PARAM_TEXTO);
-		validator.addRule(PARAM_TEXTO, "required", MENSAJE_ERROR_TEXTO_VACIO);
-		validator.addRule(PARAM_TEXTO, "noBlank", MENSAJE_ERROR_TEXTO_VACIO);
-		validator.addRule(PARAM_TEXTO, "max:" + ModeloNoticia.COLUMN_TEXTO_MAXLENGTH, 
-				String.format(MENSAJE_ERROR_TEXTO_LARGO, ModeloNoticia.COLUMN_TEXTO_MAXLENGTH));
+		n.setTexto(EscapaHTML.ajustaCodificacion(request.getParameter(PARAM_TEXTO)));
+		if (n.getTexto() == null || n.getTexto().isBlank()) {
+			throw new UVException(MENSAJE_ERROR_TEXTO_VACIO);
+		}
+		if (n.getTexto().length() > ModeloNoticia.COLUMN_TEXTO_MAXLENGTH) {
+			throw new UVException(String.format(MENSAJE_ERROR_TEXTO_LARGO, ModeloNoticia.COLUMN_TEXTO_MAXLENGTH));
+		}
+				
+		n.setEnlace(EscapaHTML.ajustaCodificacion(request.getParameter(PARAM_ENLACE)));
+		if (n.getEnlace() != null && n.getEnlace().length() > ModeloNoticia.COLUMN_ENLACE_MAXLENGTH) {
+			throw new UVException(String.format(MENSAJE_ERROR_ENLACE_LARGO, ModeloNoticia.COLUMN_ENLACE_MAXLENGTH));
+		}
 		
-		validator.addParamString(PARAM_ENLACE);
-		validator.addRule(PARAM_ENLACE, "max:" + ModeloNoticia.COLUMN_ENLACE_MAXLENGTH, 
-				String.format(MENSAJE_ERROR_ENLACE_LARGO, ModeloNoticia.COLUMN_ENLACE_MAXLENGTH));
-		
-		validator.addParamDate(PARAM_FECHA);
-		validator.addRule(PARAM_FECHA, "required", MENSAJE_ERROR_FECHA_REQUERIDA);
-		
-		return validator;
+		n.setFecha(Formateador.leeParametroFecha(request.getParameter(PARAM_FECHA), Formateador.FORMATO_FECHA_DDMMYYYY, "/"));
+		n.setPublica("true".equals(EscapaHTML.ajustaCodificacion(request.getParameter(PARAM_PUBLICA))));
+				
+		return n;
 	}
 	
 }

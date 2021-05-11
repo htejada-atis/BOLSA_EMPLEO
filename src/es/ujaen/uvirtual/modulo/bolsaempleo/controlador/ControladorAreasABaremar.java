@@ -62,20 +62,21 @@ public class ControladorAreasABaremar extends HttpServlet {
 	public static final String MENSAJE_EXITO_AREA_ACTUALIZADA = "Se ha actualizado un área del sistema";
 	public static final String MENSAJE_EXITO_SISTEMA_ACTUALIZADO = "No hay cambios necesarios, el sistema está actualizado";
 	
-	
 	// parámetros
 	public static final String PARAM_ACCION = "a";
 	public static final String PARAM_ACCION_AREA = "aa";
 	public static final String PARAM_AREAS_SELECCIONADAS = "areasselected";
 	public static final String PARAM_ID = "id";
 	
-	
 	// ruta vistas
 	public static final String RUTA_BEP_CONF = "/WEB-INF/jsp/vista/infadministrativa/bolsaempleo/configuracion/";
-	// variables
-	public static boolean anonimo = true;
-	
-	public static final int RESPONSE_HTTP_CODE_ERROR = 400;
+		
+	// ajax
+	public static final String URL_PATTERN_AJAX = "/srv/es/ajax/informacionadministrativa/bolsaempleo/configuracion/titulacionespreferentesarea";
+	public static final String RESPONSE_AJAX_CONTENTTYPE = "application/json";
+	public static final String RESPONSE_AJAX_ENCODING = "UTF-8";
+	public static final String RESPONSE_AJAX_ERROR = "error";
+	public static final int RESPONSE_AJAX_HTTP_CODE_ERROR = 400;
 	
 	/** Peticion GET.
 	 * @see HttpServlet#doGet(HttpServletRequest request, HttpServletResponse response)
@@ -95,15 +96,16 @@ public class ControladorAreasABaremar extends HttpServlet {
 		String nombreAccion = EscapaHTML.ajustaCodificacion(request.getParameter(PARAM_ACCION));
 		if (nombreAccion == null) {
 			nombreAccion = ACCION_LISTAR;
-		}
-		
-		bean.setVista(RUTA_BEP_CONF + "areasbaremar.jsp");
+		}		
 		
 		try {
-			anonimo = !modelo.checkUser(datos);
+			modelo.checkUser(datos);
 			switch (nombreAccion) {
+				case ACCION_LISTAR:
+					bean.setVista(RUTA_BEP_CONF + "areasbaremar.jsp");
+					break;
 				case ACCION_AREA:
-					accionSobreArea(bean, datos, request);
+					accionSobreArea(bean, request);
 					break;
 				case ACCION_DATATABLE:
 					listado(bean, datos, request, response);
@@ -112,8 +114,10 @@ public class ControladorAreasABaremar extends HttpServlet {
 					listadoAreasExcluidasUsuario(bean, datos, request, response);
 					break;
 				case ACCION_IMPORTAR_AREAS_UVIRTUAL:
-					importarAreasDeUvirtual(bean, datos, request, response);
+					importarAreasDeUvirtual(bean);
 					break;
+				default:
+					errorFatal(bean, "Acción no contemplada");
 			}
 		} catch (SQLException e) {
 			LOGGER.log(Level.SEVERE, Formateador.getStackTrace(e));
@@ -136,6 +140,11 @@ public class ControladorAreasABaremar extends HttpServlet {
 		}
 	}
 	
+	private void errorFatal(VistaAreasBaremar bean, String mensaje) {
+		bean.setVista("/WEB-INF/jsp/vista/infadministrativa/bolsaempleo/error.jsp");
+		bean.getMensajesDeError().add(mensaje);
+	}
+	
 	/** Redireccion de do post.
 	 * @see HttpServlet#doPost(HttpServletRequest request, HttpServletResponse response)
 	 */
@@ -155,10 +164,10 @@ public class ControladorAreasABaremar extends HttpServlet {
 	 */
 	private void listado(VistaAreasBaremar bean, UVDatos datos, HttpServletRequest request, HttpServletResponse response) throws IOException, SQLException {
 		ModeloArea modelo = ModeloArea.obtenerInstancia();		
-		datos.setContentType("application/json");
+		datos.setContentType(RESPONSE_AJAX_CONTENTTYPE);
 		datos.setRespuestaEnviada(true);
-		response.setContentType("application/json");
-		response.setCharacterEncoding("UTF-8");
+		response.setContentType(RESPONSE_AJAX_CONTENTTYPE);
+		response.setCharacterEncoding(RESPONSE_AJAX_ENCODING);
 		
 		try (PrintWriter writer = response.getWriter()) {
 			try {
@@ -169,9 +178,9 @@ public class ControladorAreasABaremar extends HttpServlet {
 			} catch (Exception ex) {
 				bean.getMensajesDeError().add(ex.getMessage());
 				
-				CodigoDescripcion mensaje = new CodigoDescripcion("error", ex.getMessage());
+				CodigoDescripcion mensaje = new CodigoDescripcion(RESPONSE_AJAX_ERROR, ex.getMessage());
 				writer.write(new Gson().toJson(mensaje));
-				response.setStatus(RESPONSE_HTTP_CODE_ERROR);
+				response.setStatus(RESPONSE_AJAX_HTTP_CODE_ERROR);
 			}
 		}
 	}
@@ -189,10 +198,10 @@ public class ControladorAreasABaremar extends HttpServlet {
 	private void listadoAreasExcluidasUsuario(VistaAreasBaremar bean, UVDatos datos, 
 			HttpServletRequest request, HttpServletResponse response) throws IOException, SQLException {
 		ModeloArea modelo = ModeloArea.obtenerInstancia();	
-		datos.setContentType("application/json");
+		datos.setContentType(RESPONSE_AJAX_CONTENTTYPE);
 		datos.setRespuestaEnviada(true);
-		response.setContentType("application/json");
-		response.setCharacterEncoding("UTF-8");
+		response.setContentType(RESPONSE_AJAX_CONTENTTYPE);
+		response.setCharacterEncoding(RESPONSE_AJAX_ENCODING);
 		
 		Integer codNum = Formateador.leeParametroInteger(request.getParameter(PARAM_ID));
 		
@@ -205,14 +214,14 @@ public class ControladorAreasABaremar extends HttpServlet {
 			} catch (Exception ex) {
 				bean.getMensajesDeError().add(ex.getMessage());
 				
-				CodigoDescripcion mensaje = new CodigoDescripcion("error", ex.getMessage());
+				CodigoDescripcion mensaje = new CodigoDescripcion(RESPONSE_AJAX_ERROR, ex.getMessage());
 				writer.write(new Gson().toJson(mensaje));
-				response.setStatus(RESPONSE_HTTP_CODE_ERROR);
+				response.setStatus(RESPONSE_AJAX_HTTP_CODE_ERROR);
 			}
 		}
 	}
 	
-	private void accionSobreArea(VistaAreasBaremar bean, UVDatos datos, HttpServletRequest request) throws UVException, SQLException {
+	private void accionSobreArea(VistaAreasBaremar bean, HttpServletRequest request) throws UVException, SQLException {
 		ModeloBolsa modelo = ModeloBolsa.obtenerInstancia();
 		
 		String nombreAccionBolsa = EscapaHTML.ajustaCodificacion(request.getParameter(PARAM_ACCION_AREA));
@@ -222,15 +231,15 @@ public class ControladorAreasABaremar extends HttpServlet {
 		List<Bolsa> bolsas = modelo.getBolsasByIds(selected);
 
 		switch (nombreAccionBolsa) {
-		case ACCION_AREA_PASAR_A_BAREMALE:
-			modelo.ponerAreaComoBaremable(bolsas);							
-			break;
-		case ACCION_AREA_PASAR_A_NO_BAREMALE:
-			modelo.ponerAreaComoNoBaremable(bolsas);
-			break;
-		default:
-			bean.getMensajesDeError().add(MENSAJE_ERROR_ACCION_AREA_NO_VALIDA);
-			return;
+			case ACCION_AREA_PASAR_A_BAREMALE:
+				modelo.ponerAreaComoBaremable(bolsas);
+				break;
+			case ACCION_AREA_PASAR_A_NO_BAREMALE:
+				modelo.ponerAreaComoNoBaremable(bolsas);
+				break;
+			default:
+				bean.getMensajesDeError().add(MENSAJE_ERROR_ACCION_AREA_NO_VALIDA);
+				return;
 		}
 		
 		bean.getMensajesDeExito().add(MENSAJE_EXITO_AREA_MODIFICADA_CORRECTAMENTE);
@@ -239,13 +248,10 @@ public class ControladorAreasABaremar extends HttpServlet {
 	/**
 	 * método que consulta la tabla 'UXXIRRHH_VUJA_NET_BEP_RH_DEPTO_SECC_AREA' de la que obtiene todas las áreas y las actualiza .
 	 * @param bean .
-	 * @param datos .
-	 * @param request .
-	 * @param response .
 	 * @throws UVException .
 	 * @throws SQLException .
 	 */
-	private void importarAreasDeUvirtual(VistaAreasBaremar bean, UVDatos datos, HttpServletRequest request, HttpServletResponse response) throws UVException, SQLException {
+	private void importarAreasDeUvirtual(VistaAreasBaremar bean) throws UVException, SQLException {
 		ModeloArea modeloArea = ModeloArea.obtenerInstancia();
 		Integer nuevas = modeloArea.insertarAreasNuevasExternas();
 		Integer actualizadas = modeloArea.actualizaAreasDeExternas();
@@ -261,6 +267,5 @@ public class ControladorAreasABaremar extends HttpServlet {
 		} else {
 			bean.getMensajesDeExito().add(MENSAJE_EXITO_SISTEMA_ACTUALIZADO);
 		}
-	}
-	
+	}	
 }

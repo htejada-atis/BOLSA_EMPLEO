@@ -12,7 +12,6 @@ import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import javax.servlet.http.HttpSession;
 
 import es.ujaen.uvirtual.beans.UVDatos;
 import es.ujaen.uvirtual.beans.Usuario;
@@ -60,14 +59,9 @@ public class ControladorParametrosConfiguracion extends HttpServlet {
 
 	public static final int RESPONSE_HTTP_CODE_ERROR = 400;
 	
-	public static final String URL_PATTERN_AJAX = "/srv/es/ajax/informacionadministrativa/bolsaempleo/configuracion/candidatos";
-	
 	// ruta vistas
 	public static final String RUTA_BEP_CONF = "/WEB-INF/jsp/vista/infadministrativa/bolsaempleo/configuracion/parametros/";
-	
-	// variables
-	public static boolean anonimo = true;
-	
+		
 	/** Peticion GET.
 	 * @see HttpServlet#doGet(HttpServletRequest request, HttpServletResponse response)
 	 */
@@ -90,14 +84,16 @@ public class ControladorParametrosConfiguracion extends HttpServlet {
 		bean.setVista(RUTA_BEP_CONF + "index.jsp");
 		
 		try {
-			anonimo = !modeloUsuario.checkUser(datos);
+			modeloUsuario.checkUser(datos);
 			switch (nombreAccion) {
-			case ACCION_LISTA_PARAMETROS:
-				listaParametros(bean);
-				break;
-			case ACCION_EDITAR_PARAMETROS:
-				editarParametros(request, response, bean);
-				break;
+				case ACCION_LISTA_PARAMETROS:
+					listaParametros(bean);
+					break;
+				case ACCION_EDITAR_PARAMETROS:
+					editarParametros(request, bean);
+					break;
+				default:
+					errorFatal(bean, "Acción no contemplada");
 			}
 		} catch (SQLException e) {
 			LOGGER.log(Level.SEVERE, Formateador.getStackTrace(e));
@@ -118,6 +114,11 @@ public class ControladorParametrosConfiguracion extends HttpServlet {
 			datos.getFicherosCSS().add("/css/ujaen_bolsa_empleo.css");
 			datos.getFicherosCSS().add("/css/jqueryujaen/jquery-ui-1.8.16.custom.css");
 		}
+	}
+	
+	private void errorFatal(VistaParametrosConfiguracion bean, String mensaje) {
+		bean.setVista("/WEB-INF/jsp/vista/infadministrativa/bolsaempleo/error.jsp");
+		bean.getMensajesDeError().add(mensaje);
 	}
 	
 	/** Redireccion de do post.
@@ -145,13 +146,12 @@ public class ControladorParametrosConfiguracion extends HttpServlet {
 	
 	/** edita los parametros de configuracion .
 	 * @param request .
-	 * @param response .
 	 * @param bean bean de la vista a la que poner los valores .
 	 * @throws SQLException excepcion de bbdd.
 	 * @throws IOException .
 	 * @throws UVException .
 	 */
-	private void editarParametros(HttpServletRequest request, HttpServletResponse response, VistaParametrosConfiguracion bean) throws SQLException, UVException, IOException {
+	private void editarParametros(HttpServletRequest request, VistaParametrosConfiguracion bean) throws SQLException, UVException {
 		ModeloParametrosConfiguracion modelo = ModeloParametrosConfiguracion.obtenerInstancia();
 		List<ParametrosConfiguracion> parametros = modelo.listaParametros();
 		

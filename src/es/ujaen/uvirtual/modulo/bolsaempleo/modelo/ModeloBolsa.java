@@ -72,7 +72,7 @@ public class ModeloBolsa {
 	 */
 	public BolsaEmpleoDataTable<Bolsa> listaBolsaEmpleoDatatable(Map<String, String[]> params) throws SQLException, UVException {
 		List<Bolsa> bolsas = new ArrayList<>();
-		BolsaEmpleoDataTable<Bolsa> dataTable = new BolsaEmpleoDataTable<Bolsa>(params);
+		BolsaEmpleoDataTable<Bolsa> dataTable = new BolsaEmpleoDataTable<>(params);
 		
 		String consulta =
 			"SELECT bepbol.* "

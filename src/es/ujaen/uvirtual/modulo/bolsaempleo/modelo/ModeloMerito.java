@@ -283,6 +283,15 @@ public class ModeloMerito {
 		}
 	}
 	
+	/**
+	 * Crea un mérito a partir de un resultset.
+	 * @param rs .
+	 * @param withUsuario .
+	 * @param withFile .
+	 * @return .
+	 * @throws SQLException .
+	 * @throws UVException .
+	 */
 	public Merito createMeritoFromResultset(ResultSet rs, Boolean withUsuario, Boolean withFile) throws SQLException, UVException {
 		ModeloBaremacion modeloBar = ModeloBaremacion.obtenerInstancia();
 		

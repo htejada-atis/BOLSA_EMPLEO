@@ -87,8 +87,8 @@ public class ModeloAfinidad {
 					afinidad.setCodNum(rs.getInt("CODNUM"));
 					afinidad.setCodigo(rs.getString("CODIGO"));
 					afinidad.setDescripcion(rs.getString("DESCRIPCION"));
-					afinidad.setModulacion(rs.getFloat("MODULACION"));	
-					afinidades.add(afinidad);					
+					afinidad.setModulacion(rs.getDouble("MODULACION"));	
+					afinidades.add(afinidad);
 				}				
 			}	
 			
@@ -134,7 +134,7 @@ public class ModeloAfinidad {
 						afinidad.setCodNum(rs.getInt("CODNUM"));
 						afinidad.setCodigo(rs.getString("CODIGO"));
 						afinidad.setDescripcion(rs.getString("DESCRIPCION"));
-						afinidad.setModulacion(rs.getFloat("MODULACION"));
+						afinidad.setModulacion(rs.getDouble("MODULACION"));
 						afinidades.add(afinidad);	
 					}
 				}
@@ -188,7 +188,7 @@ public class ModeloAfinidad {
 					stmt.setInt(parameterIndex++, afinidad.getCodNum());
 					stmt.setString(parameterIndex++, afinidad.getCodigo());
 					stmt.setString(parameterIndex++, afinidad.getDescripcion());
-					stmt.setFloat(parameterIndex++, afinidad.getModulacion());			
+					stmt.setDouble(parameterIndex++, afinidad.getModulacion());			
 					stmt.executeUpdate();
 				}		
 		} else {
@@ -201,7 +201,7 @@ public class ModeloAfinidad {
 					int parameterIndex = 1;
 					stmt.setString(parameterIndex++, afinidad.getCodigo());
 					stmt.setString(parameterIndex++, afinidad.getDescripcion());
-					stmt.setFloat(parameterIndex++, afinidad.getModulacion());			
+					stmt.setDouble(parameterIndex++, afinidad.getModulacion());			
 					stmt.executeUpdate();
 				}		
 		}
@@ -233,7 +233,7 @@ public class ModeloAfinidad {
 				afinidad.setCodNum(rs.getInt("CODNUM"));
 				afinidad.setCodigo(rs.getString("CODIGO"));
 				afinidad.setDescripcion(rs.getString("DESCRIPCION"));
-				afinidad.setModulacion(rs.getFloat("MODULACION"));
+				afinidad.setModulacion(rs.getDouble("MODULACION"));
 				
 				if (rs.getString("FLGBORRADO").equals("S")) {
 					throw new UVException("La afinidad ha sido borrada");
@@ -295,7 +295,7 @@ public class ModeloAfinidad {
 			int parameterIndex = 1;
 			stmt.setString(parameterIndex++, afi.getCodigo());
 			stmt.setString(parameterIndex++, afi.getDescripcion());
-			stmt.setFloat(parameterIndex++, afi.getModulacion());
+			stmt.setDouble(parameterIndex++, afi.getModulacion());
 			stmt.setInt(parameterIndex++, afi.getCodNum());
 			stmt.executeUpdate();
 		}
