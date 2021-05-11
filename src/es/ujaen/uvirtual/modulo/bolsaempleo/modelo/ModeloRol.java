@@ -73,7 +73,11 @@ public class ModeloRol {
 	 * @throws SQLException en caso de error en la BD
 	 * @throws UVException si area no es existe
 	 */
-	public Rol getRoleById(int codNum) throws SQLException, UVException {
+	public Rol getRoleById(Integer codNum) throws SQLException, UVException {
+		if (codNum == null) {
+			throw new UVException("El rol es requerido");
+		}
+			
 		String consulta = "SELECT admrol.* FROM ADM_ROL admrol WHERE admrol.ROL_CODNUM = ?";				
 			
 		try (Connection conexion = ConexionUvirtual.obtenerInstancia();
