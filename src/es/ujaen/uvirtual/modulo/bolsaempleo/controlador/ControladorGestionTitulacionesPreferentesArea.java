@@ -86,26 +86,23 @@ public class ControladorGestionTitulacionesPreferentesArea extends HttpServlet {
 		datos.setContentType("text/html");
 		
 		VistaTitulacionesArea bean = new VistaTitulacionesArea();
-		bean.setVista(RUTA_BEP_CONF + "titulacionespreferentesarea.jsp");
-		
-		ModeloUsuarioBolsaEmpleo modelo = ModeloUsuarioBolsaEmpleo.obtenerInstancia();
-	
+				
 		String nombreAccion = EscapaHTML.ajustaCodificacion(request.getParameter(PARAM_ACCION));
 		if (nombreAccion == null) {
 			nombreAccion = ACCION_LISTAR_AREAS;
 		}
 		
 		try {
-			modelo.checkUser(datos);
+			init(bean, datos);
 			switch (nombreAccion) {
+				case ACCION_LISTAR_AREAS:
+					obtenerAreas(bean);
+					break;	
 				case ACCION_ELIMINAR_TITULACION_AREA:
 					eliminarTitulacionesArea(request, bean);
 					break;
 				case ACCION_INCLUIR_TITULACION_AREA:
 					incluirTitulacionesPreferentesArea(request, bean);
-					break;
-				case ACCION_LISTAR_AREAS:
-					obtenerAreas(bean);
 					break;
 				case ACCION_DATATABLE_TITULACIONES:
 					listadoTitulaciones(bean, datos, request, response);
@@ -134,6 +131,11 @@ public class ControladorGestionTitulacionesPreferentesArea extends HttpServlet {
 			datos.getFicherosCSS().add("/css/jqueryujaen/jquery-ui-1.8.16.custom.css");
 			datos.getFicherosCSS().add("/css/ujaen_bolsa_empleo.css");
 		}
+	}
+	
+	private void init(VistaTitulacionesArea bean, UVDatos datos) throws SQLException, UVException {
+		bean.setVista(RUTA_BEP_CONF + "titulacionespreferentesarea.jsp");
+		ModeloUsuarioBolsaEmpleo.obtenerInstancia().checkUser(datos);
 	}
 	
 	private void errorFatal(VistaTitulacionesArea bean, String mensaje) {
@@ -210,6 +212,7 @@ public class ControladorGestionTitulacionesPreferentesArea extends HttpServlet {
 	private void obtenerAreas(VistaTitulacionesArea bean) throws SQLException, UVException {
 		ModeloArea modelo = ModeloArea.obtenerInstancia();	
 		List<Area> areas = modelo.listaAreas();
+		bean.setVista(RUTA_BEP_CONF + "titulacionespreferentesarea.jsp");
 		bean.setAreas(areas);
 	}
 	

@@ -15,7 +15,6 @@ public class VistaAfinidades extends Vista implements Serializable {
 	private Afinidad afinidad;
 	private String vista;
 	
-	
 	public BolsaEmpleoDataTable<Afinidad> getDatatableAfinidades() {
 		return dataTable;
 	}

@@ -3,7 +3,6 @@ package es.ujaen.uvirtual.modulo.bolsaempleo.controlador;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.sql.SQLException;
-import java.util.Date;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.servlet.ServletException;
@@ -20,7 +19,6 @@ import es.ujaen.uvirtual.modulo.bolsaempleo.beans.Noticia;
 import es.ujaen.uvirtual.modulo.bolsaempleo.modelo.ModeloNoticia;
 import es.ujaen.uvirtual.modulo.bolsaempleo.modelo.ModeloUsuarioBolsaEmpleo;
 import es.ujaen.uvirtual.modulo.bolsaempleo.utilidades.BolsaEmpleoDataTable;
-import es.ujaen.uvirtual.modulo.bolsaempleo.utilidades.BolsaEmpleoValidator;
 import es.ujaen.uvirtual.modulo.bolsaempleo.vistas.VistaNoticias;
 import es.ujaen.uvirtual.utilidades.EscapaHTML;
 import es.ujaen.uvirtual.utilidades.Formateador;
@@ -94,15 +92,17 @@ public class ControladorGestionNoticias extends HttpServlet {
 		datos.setContentType("text/html");
 		
 		VistaNoticias bean = new VistaNoticias();
-		ModeloUsuarioBolsaEmpleo modelo = ModeloUsuarioBolsaEmpleo.obtenerInstancia();
 
 		String nombreAccion = EscapaHTML.ajustaCodificacion(request.getParameter(PARAM_ACCION));
 		if (nombreAccion == null) {
 			nombreAccion = ACCION_LISTAR_NOTICIAS;
 		}
 		try {
-			modelo.checkUser(datos);
+			init(bean, datos);
 			switch (nombreAccion) {
+				case ACCION_LISTAR_NOTICIAS:
+					bean.setVista(RUTA_BEP_NOTICIAS + "indice.jsp");
+					break;
 				case ACCION_AGREGAR_NOTICIA:
 					agregarNoticia(bean, request, response);
 					break;
@@ -114,9 +114,6 @@ public class ControladorGestionNoticias extends HttpServlet {
 					break;
 				case ACCION_ELIMINAR_NOTICIA:
 					eliminarNoticia(bean, request, response);
-					break;
-				case ACCION_LISTAR_NOTICIAS:
-					bean.setVista(RUTA_BEP_NOTICIAS + "indice.jsp");
 					break;
 				default:
 					errorFatal(bean, "Acción no contemplada");
@@ -138,6 +135,11 @@ public class ControladorGestionNoticias extends HttpServlet {
 			datos.getFicherosCSS().add("/css/jqueryujaen/jquery-ui-1.8.16.custom.css");
 			datos.getFicherosCSS().add("/css/ujaen_bolsa_empleo.css");
 		}
+	}
+	
+	private void init(VistaNoticias bean, UVDatos datos) throws SQLException, UVException {
+		bean.setVista(RUTA_BEP_NOTICIAS + "indice.jsp");
+		ModeloUsuarioBolsaEmpleo.obtenerInstancia().checkUser(datos);
 	}
 	
 	private void errorFatal(VistaNoticias bean, String mensaje) {

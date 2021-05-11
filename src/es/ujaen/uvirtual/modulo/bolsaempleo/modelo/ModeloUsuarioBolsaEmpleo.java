@@ -813,7 +813,11 @@ public class ModeloUsuarioBolsaEmpleo {
 			stmt.setString(parameterIndex++, usuario.getExcluido() ? "S" : "N");
 			stmt.setString(parameterIndex++, usuario.getExcluidoTipo());
 			stmt.setString(parameterIndex++, usuario.getRazonExcluido());
-			stmt.setDate(parameterIndex++, new java.sql.Date(usuario.getFechaExclusion().getTime()));
+			if (usuario.getFechaExclusion() != null) {
+				stmt.setDate(parameterIndex++, new java.sql.Date(usuario.getFechaExclusion().getTime()));	
+			} else {
+				stmt.setNull(parameterIndex++, Types.NULL);
+			}
 			
 			if (usuario.getExcluidoTipo() != null && usuario.getExcluidoTipo().equals("T")) {
 				stmt.setDate(parameterIndex++, new java.sql.Date(usuario.getFechaExclusionInicio().getTime()));
@@ -1014,16 +1018,11 @@ public class ModeloUsuarioBolsaEmpleo {
 			return false;
 		} 
 		
+		UsuarioBolsaEmpleo usuario = null;
+		
 		try {
 			// comprobamos si el usuario existe en uvirtual (excepción si no existe)
-			UsuarioBolsaEmpleo usuario = getUsuarioByDocumentoLetra(usuArcos.getDocumentoNumero());
-			if (Boolean.TRUE.equals(usuario.getExcluido())) {
-				throw new UVException("No puede acceder, su perfil ha sido excluido por los siguientes motivos: " + usuario.getRazonExcluido());
-			} else if (Boolean.TRUE.equals(usuario.getBorrado())) {
-				throw new UVException("No puede acceder, su perfil ha sido borrado de la base de datos");
-			} else {
-				return true;
-			}
+			usuario = getUsuarioByDocumentoLetra(usuArcos.getDocumentoNumero());			
 		} catch (UVException e) {
 			ModeloRol modeloRol = ModeloRol.obtenerInstancia();
 			Rol role;
@@ -1038,11 +1037,19 @@ public class ModeloUsuarioBolsaEmpleo {
 			
 				CrearUsuario.refrescarUsuario(usuarioFinal.getCodCuenta());
 				
-				return true;
-				
+				return true;				
 			} catch (SQLException | UVException ex) {
 				throw new UVException("Error creando usuario de bolsa de empleo");
 			}
+		}
+		
+		// comprobamos si está borrado o excluido
+		if (Boolean.TRUE.equals(usuario.getExcluido())) {
+			throw new UVException("No puede acceder, su perfil ha sido excluido por los siguientes motivos: " + usuario.getRazonExcluido());
+		} else if (Boolean.TRUE.equals(usuario.getBorrado())) {
+			throw new UVException("No puede acceder, su perfil ha sido borrado de la base de datos");
+		} else {
+			return true;
 		}
 	}
 	

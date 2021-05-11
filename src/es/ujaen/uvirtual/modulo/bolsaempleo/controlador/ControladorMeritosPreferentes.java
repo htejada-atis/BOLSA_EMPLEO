@@ -100,7 +100,7 @@ public class ControladorMeritosPreferentes extends HttpServlet {
 		}
 				
 		try {
-			ModeloUsuarioBolsaEmpleo.obtenerInstancia().checkUser(datos);
+			init(bean, datos);
 			switch (nombreAccion) {
 				case ACCION_INDEX:
 					indice(bean);
@@ -148,6 +148,11 @@ public class ControladorMeritosPreferentes extends HttpServlet {
 			datos.getFicherosCSS().add("/css/ujaen_bolsa_empleo.css");
 			datos.getFicherosCSS().add("/css/jqueryujaen/jquery-ui-1.8.16.custom.css");
 		}
+	}
+	
+	private void init(VistaMeritosPreferentes bean, UVDatos datos) throws SQLException, UVException {
+		this.indice(bean);
+		ModeloUsuarioBolsaEmpleo.obtenerInstancia().checkUser(datos);
 	}
 	
 	private void errorFatal(VistaMeritosPreferentes bean, String mensaje) {

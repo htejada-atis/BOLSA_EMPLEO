@@ -93,10 +93,11 @@ public class ControladorValidar extends HttpServlet {
 		}
 		
 		try {
-			ModeloUsuarioBolsaEmpleo.obtenerInstancia().checkUser(datos);
-			bean.setConvocatoria(ModeloConvocatoria.obtenerInstancia().getUltimaConvocatoria());
-			
+			init(bean, datos);
 			switch (nombreAccion) {
+				case ACCION_INDEX:
+					indice(bean);
+					break;
 				case ACCION_BOLSA_SELECCIONADA:
 				case ACCION_CANDIDATO_SELECCIONADO:
 				case ACCION_DATATABLE_BOLSAS_CANDIDATO:
@@ -108,9 +109,6 @@ public class ControladorValidar extends HttpServlet {
 					break;
 				case ACCION_DATATABLE_BOLSAS:
 					listadoBolsas(bean, datos, request, response);
-					break;
-				case ACCION_INDEX:
-					indice(bean);
 					break;
 				default:
 					this.accionNodefinida(bean);
@@ -146,6 +144,12 @@ public class ControladorValidar extends HttpServlet {
 	
 	private void indice(VistaValidar bean) {
 		bean.setVista(JSQP_INDEX);
+	}
+	
+	private void init(VistaValidar bean, UVDatos datos) throws SQLException, UVException {
+		bean.setVista(JSQP_INDEX);
+		bean.setConvocatoria(ModeloConvocatoria.obtenerInstancia().getUltimaConvocatoria());
+		ModeloUsuarioBolsaEmpleo.obtenerInstancia().checkUser(datos);
 	}
 	
 	private void accionNodefinida(VistaValidar bean) {
