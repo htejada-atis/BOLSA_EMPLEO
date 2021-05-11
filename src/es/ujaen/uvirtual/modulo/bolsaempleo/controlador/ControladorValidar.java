@@ -34,7 +34,7 @@ import es.ujaen.uvirtual.utilidades.UVException;
  */
 @WebServlet(
 		name = "informacionadministrativa.bolsaempleo.validar", 
-		description = "Validación de méritos no sujetos a afinidad", 
+		description = "Validación de méritos sujetos a afinidad", 
 		urlPatterns = { 
 				"/srv/es/informacionadministrativa/bolsaempleo/validar", 
 				"/srv/en/informacionadministrativa/bolsaempleo/validar",
@@ -182,6 +182,8 @@ public class ControladorValidar extends HttpServlet {
 		bean.setCandidato(modeloUsuario.getUsuarioById(Formateador.leeParametroInteger(request.getParameter(PARAM_CANDIDATO))));
 		
 		switch (nombreAccion) {
+			case ACCION_CANDIDATO_SELECCIONADO:
+				break;
 			case ACCION_DATATABLE_MERITOS:
 				listadoMeritos(bean, datos, request, response);
 				break;
@@ -207,6 +209,8 @@ public class ControladorValidar extends HttpServlet {
 				listadoBolsasCandidato(bean, datos, request, response);
 				break;
 			case ACCION_DATATABLE_VALORES_MERITO_BOLSA:
+				break;
+			case ACCION_MERITO_SELECCIONADO:
 				break;
 			default:
 				accionNodefinida(bean);
