@@ -36,12 +36,13 @@ Afinidad afinidad = bean.getAfinidad();
 		<input type="hidden" name="<%= ControladorAfinidades.PARAM_ID %>" id="afinidad_id" value="<%= afinidad != null ? afinidad.getCodNum() : "" %>" />		
 		<div class="form-group-container col1">
     		<div class="form-group">
-    			<label for="descripcion">Descripción: </label>
+    			<label for="descripcion" class="bold-label">Descripción: </label>
     			<input id="descripcion"
     				   class="form-input-custom"
     				   type="text"
     				   name="<%= ControladorAfinidades.PARAM_DESCRIPCION %>" 
-    				   value="<%= BolsaEmpleoUtils.getParamForm(request, ControladorAfinidades.PARAM_DESCRIPCION, afinidad != null ? afinidad.getDescripcion() : "") %>"/>
+    				   value="<%= BolsaEmpleoUtils.getParamForm(request, ControladorAfinidades.PARAM_DESCRIPCION, afinidad != null ? afinidad.getDescripcion() : "") %>"
+    				   required/>
     		</div>
     	</div>
 
