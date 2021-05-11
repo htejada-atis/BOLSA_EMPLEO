@@ -62,9 +62,9 @@ String observacion = BolsaEmpleoUtils.getParamForm(request, ControladorMisMerito
 					for(ItemBaremacion it: bean.getItems()) {
 					%>
 						<% if (item != null && !item.isEmpty() && it.getCodNum() == Integer.parseInt(item)) { %>
-		    				<option value="<%=it.getCodNum()%>" data-unidades="<%= it.getUnidades() %>" data-descripcion="<%= it.getDescripcion() %>" selected><%=it.getCodigo()%> - <%=it.getNombre()%></option>
+		    				<option value="<%=it.getCodNum()%>" data-unidades="<%= it.getUnidades() %>" data-descripcion="<%= it.getDescripcion() %>" selected><%=apartado.getCodigo()%>.<%=it.getBloqueBaremacion().getCodigo()%>.<%=it.getCodigo()%> - <%=it.getNombre()%></option>
 		    			<% } else { %>
-		    				<option value="<%=it.getCodNum()%>" data-unidades="<%= it.getUnidades() %>" data-descripcion="<%= it.getDescripcion() %>"><%=it.getCodigo()%> - <%=it.getNombre()%></option>
+		    				<option value="<%=it.getCodNum()%>" data-unidades="<%= it.getUnidades() %>" data-descripcion="<%= it.getDescripcion() %>"><%=apartado.getCodigo()%>.<%=it.getBloqueBaremacion().getCodigo()%>.<%=it.getCodigo()%> - <%=it.getNombre()%></option>
 		    			<% } %>
 		    		<%
 		    		}
@@ -121,8 +121,26 @@ String observacion = BolsaEmpleoUtils.getParamForm(request, ControladorMisMerito
 
 <script>
 
-	$('#select_item').prop('selectedIndex',0);
-
+	<% if (item.isEmpty()) { %>
+		$('#select_item').prop('selectedIndex',0);
+	<%} else {%>
+	var unidades = $(this).children("option:selected").data('unidades');
+	var descripcion = $(this).children("option:selected").data('descripcion');
+	//var selected = $(this).children("option:selected").val();
+				
+	if (descripcion) {
+		$('#descripcionItem').text('Descripción del Ítem: ' + descripcion);
+		$('#contDescripcionItem').show();
+	} else {
+		$('#contDescripcionItem').hide();
+	}	
+	
+	if (unidades=="SI/NO") $('#contValor').hide();
+	else $('#contValor').show();
+	
+	if (unidades) $('#merito_valor_label').text('Valor (' + unidades + ')');
+	else $('#merito_valor_label').text('Valor');
+	<%}%>
 	function agregarMerito(event, submit_input) {
 		event.preventDefault();
 		
