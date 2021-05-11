@@ -353,9 +353,13 @@ public class ControladorUsuarioBolsaEmpleo extends HttpServlet {
 		ModeloUsuarioBolsaEmpleo modelo = ModeloUsuarioBolsaEmpleo.obtenerInstancia();
 		
 		obtenerRoles(bean);
+		Usuario usuArcos = CrearUsuario.usuario(request.getParameter(PARAM_NOMBRE));
+		if (usuArcos == null) {
+			throw new UVException("No existe el usuario");
+		}
+		
 		try {
-			UsuarioBolsaEmpleo usu = modelo.listaUsuario(Formateador.leeParametroString(request.getParameter(PARAM_NOMBRE)));
-			Usuario usuArcos = CrearUsuario.usuario(request.getParameter(PARAM_NOMBRE));
+			UsuarioBolsaEmpleo usu = modelo.listaUsuario(Formateador.leeParametroString(usuArcos.getDocumentoNumero()));
 			
 			bean.setBusqueda(true);
 			
@@ -365,7 +369,7 @@ public class ControladorUsuarioBolsaEmpleo extends HttpServlet {
 			
 			bean.setVista(JSP_FORM_USUARIO);
 		} catch (UVException e) {
-			Usuario usuArcos = CrearUsuario.usuario(request.getParameter(PARAM_NOMBRE));
+			usuArcos = CrearUsuario.usuario(request.getParameter(PARAM_NOMBRE));
 			if (usuArcos != null) {
 				bean.setBusqueda(false);
 				bean.setUsuarioArcos(usuArcos);
