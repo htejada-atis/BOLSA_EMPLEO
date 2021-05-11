@@ -337,13 +337,13 @@ public class ModeloMeritosPreferentes {
 		obj.setFactor(rs.getString("FACTOR"));
 		obj.setValorMaximo(rs.getFloat("VALOR_MAXIMO") == 0 ? null : rs.getFloat("VALOR_MAXIMO"));
 		obj.setTipoItemBaremacion(rs.getInt("BEPITE_TIPO_CODNUM") == 0 ? null 
-			: ModeloBaremacion.obtenerInstancia().getItemBaremacionById(rs.getInt("BEPITE_TIPO_CODNUM")));
+			: ModeloBaremacionItems.obtenerInstancia().getItemBaremacionById(rs.getInt("BEPITE_TIPO_CODNUM")));
 		obj.setAplicableApartadoBaremacion(rs.getInt("BEPAPA_APLICABLE_CODNUM") == 0 ? null 
-			: ModeloBaremacion.obtenerInstancia().getApartadoBaremacionById(rs.getInt("BEPAPA_APLICABLE_CODNUM")));
+			: ModeloBaremacionApartados.obtenerInstancia().getApartadoBaremacionById(rs.getInt("BEPAPA_APLICABLE_CODNUM")));
 		obj.setAplicableBloqueBaremacion(rs.getInt("BEPBLO_APLICABLE_CODNUM") == 0 ? null 
-			: ModeloBaremacion.obtenerInstancia().getBloqueBaremacionById(rs.getInt("BEPBLO_APLICABLE_CODNUM")));
+			: ModeloBaremacionBloques.obtenerInstancia().getBloqueBaremacionById(rs.getInt("BEPBLO_APLICABLE_CODNUM")));
 		obj.setAplicableItemBaremacion(rs.getInt("BEPITE_APLICABLE_CODNUM") == 0 ? null 
-			: ModeloBaremacion.obtenerInstancia().getItemBaremacionById(rs.getInt("BEPITE_APLICABLE_CODNUM")));
+			: ModeloBaremacionItems.obtenerInstancia().getItemBaremacionById(rs.getInt("BEPITE_APLICABLE_CODNUM")));
 		obj.setActivo(rs.getString("FLGACTIVO").equals("S"));
 		return obj;
 	}

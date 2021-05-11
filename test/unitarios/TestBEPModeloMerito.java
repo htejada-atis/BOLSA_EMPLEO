@@ -22,7 +22,7 @@ import es.ujaen.uvirtual.modulo.bolsaempleo.beans.Bolsa;
 import es.ujaen.uvirtual.modulo.bolsaempleo.beans.ItemBaremacion;
 import es.ujaen.uvirtual.modulo.bolsaempleo.beans.Merito;
 import es.ujaen.uvirtual.modulo.bolsaempleo.beans.Solicitud;
-import es.ujaen.uvirtual.modulo.bolsaempleo.modelo.ModeloBaremacion;
+import es.ujaen.uvirtual.modulo.bolsaempleo.modelo.ModeloBaremacionItems;
 import es.ujaen.uvirtual.modulo.bolsaempleo.modelo.ModeloMerito;
 import es.ujaen.uvirtual.modulo.bolsaempleo.modelo.ModeloSolicitud;
 import es.ujaen.uvirtual.utilidades.UVException;
@@ -56,7 +56,7 @@ public class TestBEPModeloMerito {
      */
     @Test
     public void testA01InsertaMerito() throws SQLException, UVException {
-		ModeloBaremacion modeloBar = ModeloBaremacion.obtenerInstancia();
+		ModeloBaremacionItems modeloBar = ModeloBaremacionItems.obtenerInstancia();
     	ItemBaremacion item = modeloBar.getItemBaremacionById(1);
     	Merito merito = new Merito();
     	merito.setCodNum(CODNUM);

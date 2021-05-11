@@ -8,9 +8,9 @@
 <%@ page import="es.ujaen.uvirtual.modulo.bolsaempleo.beans.Afinidad" %>
 <%@ page import="es.ujaen.uvirtual.utilidades.EscapaHTML" %>
 <%@ page import="es.ujaen.uvirtual.modulo.bolsaempleo.utilidades.BolsaEmpleoUtils" %>
-<%@ page import="es.ujaen.uvirtual.modulo.bolsaempleo.modelo.ModeloBaremacion" %>
+<%@ page import="es.ujaen.uvirtual.modulo.bolsaempleo.modelo.ModeloBaremacionItems" %>
 
-<% 
+<%
 UVDatos uvdatos = (UVDatos) request.getAttribute(UVDatos.NOMBRE_ATRIBUTO);
 VistaItemsBaremacion bean = (VistaItemsBaremacion) uvdatos.getVistas().get(VistaItemsBaremacion.class.getName());
 
@@ -29,49 +29,57 @@ if(item!=null){
 
 
 <div class="bolsa-empleo">
-	<% if (bean.getMensajesDeExito().size() > 0) { %>
+	<%
+	if (bean.getMensajesDeExito().size() > 0) {
+	%>
 		<div id="exito" class="success">
-			<%= bean.formatearMensajesDeExito() %>
+			<%=bean.formatearMensajesDeExito()%>
 		</div>
-	<% } %>
-	<% if (bean.getMensajesDeError().size() > 0) { %>
+	<%
+	}
+	%>
+	<%
+	if (bean.getMensajesDeError().size() > 0) {
+	%>
 		<div id="error" class="error">
-			<%= bean.formatearMensajesDeError() %>
+			<%=bean.formatearMensajesDeError()%>
 		</div>
-	<% } %>
+	<%
+	}
+	%>
 	
-	<h2><%= item != null ? "Editar item" : "Nuevo item" %></h2>
+	<h2><%=item != null ? "Editar item" : "Nuevo item"%></h2>
 	
-    <form id="actualizar_item" class="be-form" method="post" action="<%= request.getRequestURI() %>">
-    	<input type="hidden" name="<%= ControladorItemsBaremacion.PARAM_ACCION %>" id="accion_formulario"
-    		   value="<%= item != null ? ControladorItemsBaremacion.ACCION_EDITAR_ITEM_CONFIRM : ControladorItemsBaremacion.ACCION_AGREGAR_ITEM_CONFIRM %>" /> 
-		<input type="hidden" name="<%= ControladorItemsBaremacion.PARAM_APARTADO %>" id="apartado_id" value="<%= apartado.getCodNum() %>" />			  
-		<input type="hidden" name="<%= ControladorItemsBaremacion.PARAM_BLOQUE %>" id="bloque_id" value="<%= bloque.getCodNum() %>" />
-		<input type="hidden" name="<%= ControladorItemsBaremacion.PARAM_ITEM %>" id="item_id" value="<%= item != null ? item.getCodNum() : "" %>" />
+    <form id="actualizar_item" class="be-form" method="post" action="<%=request.getRequestURI()%>">
+    	<input type="hidden" name="<%=ControladorItemsBaremacion.PARAM_ACCION%>" id="accion_formulario"
+    		   value="<%=item != null ? ControladorItemsBaremacion.ACCION_EDITAR_ITEM_CONFIRM : ControladorItemsBaremacion.ACCION_AGREGAR_ITEM_CONFIRM%>" /> 
+		<input type="hidden" name="<%=ControladorItemsBaremacion.PARAM_APARTADO%>" id="apartado_id" value="<%=apartado.getCodNum()%>" />			  
+		<input type="hidden" name="<%=ControladorItemsBaremacion.PARAM_BLOQUE%>" id="bloque_id" value="<%=bloque.getCodNum()%>" />
+		<input type="hidden" name="<%=ControladorItemsBaremacion.PARAM_ITEM%>" id="item_id" value="<%=item != null ? item.getCodNum() : ""%>" />
 		
 		<div class="form-group-container col1">
 			<div class="form-group">
 	    		<label for="bloque_apartado_codigo">Código completo</label>
-	    		<input class="form-input-custom" type="text" name="<%= ControladorItemsBaremacion.PARAM_BLOQUE_CODIGO %>" id="item_bloque_codigo" value="<%= codigoCompleto %>" disabled/>
+	    		<input class="form-input-custom" type="text" name="<%=ControladorItemsBaremacion.PARAM_BLOQUE_CODIGO%>" id="item_bloque_codigo" value="<%=codigoCompleto%>" disabled/>
 	    	</div>
 		</div>
 		<div class="form-group-container col2">
 			<div class="form-group">
 	    		<label for="bloque_codigo">Código</label>
-	    		<input class="form-input-custom" type="text" name="<%= ControladorItemsBaremacion.PARAM_ITEM_CODIGO %>" id="bloque_codigo" 
-	    			   value="<%= BolsaEmpleoUtils.getParamForm(request, ControladorItemsBaremacion.PARAM_ITEM_CODIGO, item != null ? item.getCodigo() : bean.getUltimoCodigo()) %>"/>
+	    		<input class="form-input-custom" type="text" name="<%=ControladorItemsBaremacion.PARAM_ITEM_CODIGO%>" id="bloque_codigo" 
+	    			   value="<%=BolsaEmpleoUtils.getParamForm(request, ControladorItemsBaremacion.PARAM_ITEM_CODIGO, item != null ? item.getCodigo() : bean.getUltimoCodigo())%>"/>
 	    	</div>
 	    	<div class="form-group">
 	    		<label for="bloque_nombre">Nombre</label>
-	    		<input class="form-input-custom" type="text" name="<%= ControladorItemsBaremacion.PARAM_ITEM_NOMBRE %>" id="bloque_nombre" 
-	    			   value="<%= BolsaEmpleoUtils.getParamForm(request, ControladorItemsBaremacion.PARAM_ITEM_NOMBRE, item != null ? item.getNombre() : "") %>"/>
+	    		<input class="form-input-custom" type="text" name="<%=ControladorItemsBaremacion.PARAM_ITEM_NOMBRE%>" id="bloque_nombre" 
+	    			   value="<%=BolsaEmpleoUtils.getParamForm(request, ControladorItemsBaremacion.PARAM_ITEM_NOMBRE, item != null ? item.getNombre() : "")%>"/>
 	    	</div>
 		</div>
 		
 		<div class="form-group-container col1">
 			<div class="form-group">
     			<label for="descripcion">Descripción</label>
-    			<textarea class="params form-input-custom" id="descripcion" name="<%= ControladorItemsBaremacion.PARAM_ITEM_DESCRIPCION %>" rows="3" cols="60"><%= BolsaEmpleoUtils.getParamForm(request, ControladorItemsBaremacion.PARAM_ITEM_DESCRIPCION, item != null ? descripcion : "") %></textarea>
+    			<textarea class="params form-input-custom" id="descripcion" name="<%=ControladorItemsBaremacion.PARAM_ITEM_DESCRIPCION%>" rows="3" cols="60"><%=BolsaEmpleoUtils.getParamForm(request, ControladorItemsBaremacion.PARAM_ITEM_DESCRIPCION, item != null ? descripcion : "")%></textarea>
    			</div>
 		</div>
    		
@@ -79,13 +87,13 @@ if(item!=null){
 		<div class="form-group-container col2">
 			<div class="form-group">
 				<%
-					String unidadesSelected = BolsaEmpleoUtils.getParamForm(request, ControladorItemsBaremacion.PARAM_ITEM_UNIDADES, item != null ? item.getUnidades() : ModeloBaremacion.ITEM_UNIDADES_MEDICION_ENTERO);
+				String unidadesSelected = BolsaEmpleoUtils.getParamForm(request, ControladorItemsBaremacion.PARAM_ITEM_UNIDADES, item != null ? item.getUnidades() : ModeloBaremacionItems.ITEM_UNIDADES_MEDICION_ENTERO);
 				%>
 	    		<label for="item_unidades">Unidades</label>
-	    		<select class="params" id="item_unidades" name="<%= ControladorItemsBaremacion.PARAM_ITEM_UNIDADES %>" style="width:100%;">
-					<option value="<%= ModeloBaremacion.ITEM_UNIDADES_MEDICION_ENTERO %>" <%= unidadesSelected.equals(ModeloBaremacion.ITEM_UNIDADES_MEDICION_ENTERO) ? "selected=\"selected\"" : "" %>>Entero</option>
-					<option value="<%= ModeloBaremacion.ITEM_UNIDADES_MEDICION_DECIMAL %>" <%= unidadesSelected.equals(ModeloBaremacion.ITEM_UNIDADES_MEDICION_DECIMAL) ? "selected=\"selected\"" : "" %>>Decimal</option>
-					<option value="<%= ModeloBaremacion.ITEM_UNIDADES_MEDICION_SINO %>" <%= unidadesSelected.equals(ModeloBaremacion.ITEM_UNIDADES_MEDICION_SINO) ? "selected=\"selected\"" : "" %>>Si ó No</option>				
+	    		<select class="params" id="item_unidades" name="<%=ControladorItemsBaremacion.PARAM_ITEM_UNIDADES%>" style="width:100%;">
+					<option value="<%=ModeloBaremacionItems.ITEM_UNIDADES_MEDICION_ENTERO%>" <%=unidadesSelected.equals(ModeloBaremacionItems.ITEM_UNIDADES_MEDICION_ENTERO) ? "selected=\"selected\"" : ""%>>Entero</option>
+					<option value="<%=ModeloBaremacionItems.ITEM_UNIDADES_MEDICION_DECIMAL%>" <%=unidadesSelected.equals(ModeloBaremacionItems.ITEM_UNIDADES_MEDICION_DECIMAL) ? "selected=\"selected\"" : ""%>>Decimal</option>
+					<option value="<%=ModeloBaremacionItems.ITEM_UNIDADES_MEDICION_SINO%>" <%=unidadesSelected.equals(ModeloBaremacionItems.ITEM_UNIDADES_MEDICION_SINO) ? "selected=\"selected\"" : ""%>>Si ó No</option>				
 				</select>				
 	    	</div>
 	    	<div class="form-group">

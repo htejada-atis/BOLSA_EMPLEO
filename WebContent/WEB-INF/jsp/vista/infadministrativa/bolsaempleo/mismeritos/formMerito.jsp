@@ -63,7 +63,7 @@ String observacion = BolsaEmpleoUtils.getParamForm(request, ControladorMisMerito
 					for(ItemBaremacion it: bean.getItems()) {
 					%>
 						<% if (item != null && !item.isEmpty() && it.getCodNum() == Integer.parseInt(item)) { %>
-		    				<option value="<%=it.getCodNum()%>" data-unidades="<%= it.getUnidades() %>" data-descripcion="<%= it.getDescripcion() %>" selected><%=apartado.getCodigo()%>.<%=it.getBloqueBaremacion().getCodigo()%>.<%=it.getCodigo()%> - <%=it.getNombre()%></option>
+		    				<option value="<%=it.getCodNum()%>" data-unidades="<%= it.getUnidades() %>" data-descripcion="<%= it.getDescripcion() %>" selected><%=it.getBloqueBaremacion().getApartadoBaremacion().getCodigo()%>.<%=it.getBloqueBaremacion().getCodigo()%>.<%=it.getCodigo()%> - <%=it.getNombre()%></option>
 		    			<% } else { %>
 		    				<option value="<%=it.getCodNum()%>" data-unidades="<%= it.getUnidades() %>" data-descripcion="<%= it.getDescripcion() %>"><%=apartado.getCodigo()%>.<%=it.getBloqueBaremacion().getCodigo()%>.<%=it.getCodigo()%> - <%=it.getNombre()%></option>
 		    			<% } %>

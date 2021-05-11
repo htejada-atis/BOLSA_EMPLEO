@@ -33,7 +33,6 @@ import es.ujaen.uvirtual.modulo.bolsaempleo.beans.BolsaCandidato;
 import es.ujaen.uvirtual.modulo.bolsaempleo.beans.BolsaSolicitud;
 import es.ujaen.uvirtual.modulo.bolsaempleo.beans.BolsaSolicitudTable;
 import es.ujaen.uvirtual.modulo.bolsaempleo.beans.Convocatoria;
-import es.ujaen.uvirtual.modulo.bolsaempleo.beans.ItemBaremacion;
 import es.ujaen.uvirtual.modulo.bolsaempleo.beans.Merito;
 import es.ujaen.uvirtual.modulo.bolsaempleo.beans.MeritoSolicitud;
 import es.ujaen.uvirtual.modulo.bolsaempleo.beans.MeritoSolicitudTable;
@@ -41,7 +40,6 @@ import es.ujaen.uvirtual.modulo.bolsaempleo.beans.Solicitud;
 import es.ujaen.uvirtual.modulo.bolsaempleo.beans.Titulacion;
 import es.ujaen.uvirtual.modulo.bolsaempleo.modelo.ModeloAfinidad;
 import es.ujaen.uvirtual.modulo.bolsaempleo.modelo.ModeloArea;
-import es.ujaen.uvirtual.modulo.bolsaempleo.modelo.ModeloBaremacion;
 import es.ujaen.uvirtual.modulo.bolsaempleo.modelo.ModeloBolsa;
 import es.ujaen.uvirtual.modulo.bolsaempleo.modelo.ModeloConvocatoria;
 import es.ujaen.uvirtual.modulo.bolsaempleo.modelo.ModeloMerito;
@@ -578,8 +576,6 @@ public class ControladorMisSolicitudes extends HttpServlet {
 				throw new UVException(MENSAJE_ERROR_NUMERO_MAXIMO_MERITOS_BLOQUE);
 			}
 			
-			List<ItemBaremacion> listaItemsExcluyentes = ModeloBaremacion.obtenerInstancia().getItemsExcluyentes(merito.getItemBaremacion());
-
 			modeloSolicitud.asignarMeritosASolicitudBolsa(solicitud, area, merito);
 		} else {
 			modeloSolicitud.borrarMeritoDeSolicitudBolsa(solicitud, area, merito);
