@@ -128,7 +128,7 @@ public class ControladorMisDatos extends HttpServlet {
 	
 		UsuarioBolsaEmpleo usu;
 		try {
-			usu = modelo.listaUsuario(usuario.getUid());
+			usu = modelo.listaUsuario(usuario.getDocumentoNumero());
 			bean.setUsuario(usu);
 		} catch (SQLException | UVException exy) {
 			exy.printStackTrace();
@@ -207,17 +207,13 @@ public class ControladorMisDatos extends HttpServlet {
 			String codigopostal = EscapaHTML.ajustaCodificacion(request.getParameter(PARAM_CODIGO_POSTAL));
 			String localidad = EscapaHTML.ajustaCodificacion(request.getParameter(PARAM_LOCALIDAD));
 			String provincia = EscapaHTML.ajustaCodificacion(request.getParameter(PARAM_PROVINCIA));
-			String movil = EscapaHTML.ajustaCodificacion(request.getParameter(PARAM_MOVIL));
 			String telefono = EscapaHTML.ajustaCodificacion(request.getParameter(PARAM_TELEFONO));
 			String nacionalidad = EscapaHTML.ajustaCodificacion(request.getParameter(PARAM_NACIONALIDAD));
 			String sexo = EscapaHTML.ajustaCodificacion(request.getParameter(PARAM_SEXO));
 			Boolean listadist = request.getParameter(PARAM_LISTA) != null && EscapaHTML.ajustaCodificacion(request.getParameter(PARAM_LISTA)).equals("true");
 			
 			UsuarioBolsaEmpleo usuarioFinal = new UsuarioBolsaEmpleo(codNum, nombre, primerapellido, 
-					segundoapellido, email, direccion, codigopostal, localidad, provincia, movil, telefono, nacionalidad, sexo, listadist);
-			
-			UsuarioBolsaEmpleo usua = modelo.getUsuarioById(codNum);
-			usuarioFinal.setCodPersona(usua.getCodPersona());
+					segundoapellido, email, direccion, codigopostal, localidad, provincia, telefono, nacionalidad, sexo, listadist);
 			
 			modelo.actualizaUsuarioMisDatos(usuarioFinal);
 

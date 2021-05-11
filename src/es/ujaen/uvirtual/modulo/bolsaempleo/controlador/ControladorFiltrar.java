@@ -248,6 +248,7 @@ public class ControladorFiltrar extends HttpServlet {
 			} catch (Exception ex) {
 				bean.getMensajesDeError().add(ex.getMessage());
 				
+				LOGGER.log(Level.WARNING, ex.toString());
 				CodigoDescripcion mensaje = new CodigoDescripcion("error", ex.getMessage());
 				writer.write(new Gson().toJson(mensaje));
 				response.setStatus(RESPONSE_HTTP_CODE_ERROR);

@@ -16,9 +16,9 @@ import es.ujaen.uvirtual.modulo.bolsaempleo.beans.UsuarioBolsaEmpleo;
 */
 public class TestBEPBeanUsuarios {
 
-	private static final Integer CODPERSONA = 1;
 	private static final String CODCUENTA = "test2";
 	private static final Rol ROL = new Rol(1050);
+	private static final String DOCUMENTO = "123456789A";
 	private static final String EMAIL = "test@test";
 	private static final String RAZONEXCLUIDO = "test";
 	private static final Boolean LISTADIST = true;
@@ -38,10 +38,8 @@ public class TestBEPBeanUsuarios {
 		Integer id = 1;
 		UsuarioBolsaEmpleo usuario = new UsuarioBolsaEmpleo();
 		usuario.setCodNum(id);
-		usuario.setCodPersona(CODPERSONA);
 		usuario.setCodCuenta(CODCUENTA);
 		usuario.setRol(ROL);
-		usuario.setEmail(EMAIL);
 		usuario.setListaDist(LISTADIST);
 		usuario.setExcluido(EXCLUIDO);
 		usuario.setExcluidoTipo(EXCLUIDOTIPO);
@@ -51,7 +49,6 @@ public class TestBEPBeanUsuarios {
 		usuario.setFechaBorrado(FECHABORRADO);
 		
 		assertEquals(id, usuario.getCodNum());
-		assertEquals(CODPERSONA, usuario.getCodPersona());
 		assertEquals(CODCUENTA, usuario.getCodCuenta());
 		assertEquals(ROL, usuario.getRol());
 		assertEquals(EMAIL, usuario.getEmail());
@@ -70,15 +67,13 @@ public class TestBEPBeanUsuarios {
 	 */
 	@Test
 	public void testA02() {
-		UsuarioBolsaEmpleo usuario = new UsuarioBolsaEmpleo(CODPERSONA, CODCUENTA, ROL, LISTADIST, EXCLUIDO, EXCLUIDOTIPO, FECHAEXCLUSIONINICIO, FECHAEXCLUSIONFIN);
-		usuario.setCodPersona(CODPERSONA);
+		UsuarioBolsaEmpleo usuario = new UsuarioBolsaEmpleo(DOCUMENTO, CODCUENTA, ROL, LISTADIST, EXCLUIDO, EXCLUIDOTIPO, FECHAEXCLUSIONINICIO, FECHAEXCLUSIONFIN);
 		usuario.setCodCuenta(CODCUENTA);
 		usuario.setRol(ROL);
 		usuario.setListaDist(LISTADIST);
 		usuario.setExcluido(EXCLUIDO);
 		usuario.setExcluidoTipo(EXCLUIDOTIPO);
 		
-		assertEquals(CODPERSONA, usuario.getCodPersona());
 		assertEquals(CODCUENTA, usuario.getCodCuenta());
 		assertEquals(ROL, usuario.getRol());
 		assertEquals(LISTADIST, usuario.getListaDist());
@@ -127,9 +122,8 @@ public class TestBEPBeanUsuarios {
 	 */
 	@Test
 	public void testA05() {		
-		UsuarioBolsaEmpleo usuario = new UsuarioBolsaEmpleo(CODPERSONA, CODCUENTA, ROL, LISTADIST, 
+		UsuarioBolsaEmpleo usuario = new UsuarioBolsaEmpleo(CODCUENTA, DOCUMENTO, ROL, LISTADIST, 
 				EXCLUIDO, EXCLUIDOTIPO, RAZONEXCLUIDO, FECHAEXCLUSION, FECHAEXCLUSIONINICIO, FECHAEXCLUSIONFIN);
-		assertEquals(CODPERSONA, usuario.getCodPersona());
 		assertEquals(CODCUENTA, usuario.getCodCuenta());
 		assertEquals(ROL, usuario.getRol());
 		assertEquals(LISTADIST, usuario.getListaDist());

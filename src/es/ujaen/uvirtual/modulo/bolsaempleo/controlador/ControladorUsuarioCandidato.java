@@ -364,9 +364,14 @@ public class ControladorUsuarioCandidato extends HttpServlet {
 		ModeloUsuarioBolsaEmpleo modelo = ModeloUsuarioBolsaEmpleo.obtenerInstancia();
 		
 		obtenerRoles(bean);
+		Usuario usuArcos = CrearUsuario.usuario(request.getParameter(PARAM_NOMBRE));
+		if (usuArcos == null) {
+			bean.setVista(RUTA_BEP_CONF_USU + "buscarUsuario.jsp");
+			throw new UVException("No existe el usuario");
+		}
+		
 		try {
-			UsuarioBolsaEmpleo usu = modelo.listaUsuario(Formateador.leeParametroString(request.getParameter(PARAM_NOMBRE)));
-			Usuario usuArcos = CrearUsuario.usuario(request.getParameter(PARAM_NOMBRE));
+			UsuarioBolsaEmpleo usu = modelo.listaUsuario(usuArcos.getDocumentoNumero());
 			
 			bean.setBusqueda(true);
 			
@@ -376,15 +381,12 @@ public class ControladorUsuarioCandidato extends HttpServlet {
 			
 			bean.setVista(RUTA_BEP_CONF + "formCandidatos.jsp");
 		} catch (UVException e) {
-			Usuario usuArcos = CrearUsuario.usuario(request.getParameter(PARAM_NOMBRE));
-			if (usuArcos != null) {
+			Usuario usuArcosCont = CrearUsuario.usuario(request.getParameter(PARAM_NOMBRE));
+			if (usuArcosCont != null) {
 				bean.setBusqueda(false);
-				bean.setUsuarioArcos(usuArcos);
+				bean.setUsuarioArcos(usuArcosCont);
 				bean.setVista(RUTA_BEP_CONF + "formCandidatos.jsp");
-			} else {
-				bean.setVista(RUTA_BEP_CONF_USU + "buscarUsuario.jsp");
-				throw new UVException("No existe el usuario");
-			}
+			} 
 		}
 	}
 	
@@ -435,8 +437,8 @@ public class ControladorUsuarioCandidato extends HttpServlet {
 				
 			Usuario usuArcos = CrearUsuario.usuario(request.getParameter(PARAM_ID));
 				
-			UsuarioBolsaEmpleo usuarioFinal =
-					new UsuarioBolsaEmpleo(usuArcos.getCodigoPersonaArcos(), usu, role, 
+			UsuarioBolsaEmpleo usuarioFinal = 
+					new UsuarioBolsaEmpleo(usu, usuArcos.getDocumentoNumero(), role, 
 							listadist, excluido, excluidoTipo, razonexcluido, date, fechaini, fechafin);
 				
 			modelo.insertaUsuario(usuarioFinal);

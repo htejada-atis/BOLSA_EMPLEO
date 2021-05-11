@@ -30,9 +30,9 @@ import es.ujaen.uvirtual.utilidades.UVException;
 *
 */
 public class TestBEPModeloMisTitulaciones {
-	private static final Integer CODPERSONA = 1;
 	private static final String CODCUENTA = "test2";
 	private static final Rol ROL = new Rol(1050);
+	private static final String DOCUMENTO = "123456789A";
 	private static final Boolean LISTADIST = true;
 	private static final Boolean EXCLUIDO = false;
 	private static final String EXCLUIDOTIPO = "EJEMPLO";
@@ -43,8 +43,8 @@ public class TestBEPModeloMisTitulaciones {
 	private static final Integer CODNUM_TITULACION = 1;
 	private static final String NOMBRE = "nombre";
 	private static final UsuarioBolsaEmpleo USUARIO = 
-			new UsuarioBolsaEmpleo(CODPERSONA, CODCUENTA, ROL, LISTADIST, EXCLUIDO, EXCLUIDOTIPO, FECHAEXCLUSIONINICIO, FECHAEXCLUSIONFIN);
-	private static final Titulacion TITULACION = new Titulacion(CODPERSONA, NOMBRE);
+			new UsuarioBolsaEmpleo(DOCUMENTO, CODCUENTA, ROL, LISTADIST, EXCLUIDO, EXCLUIDOTIPO, FECHAEXCLUSIONINICIO, FECHAEXCLUSIONFIN);
+	private static final Titulacion TITULACION = new Titulacion(CODNUM, NOMBRE);
 	private static final InputStream ARCHIVO = new ByteArrayInputStream("archivo de prueba".getBytes());
     
 	/** prepara la bd con los datos iniciales.

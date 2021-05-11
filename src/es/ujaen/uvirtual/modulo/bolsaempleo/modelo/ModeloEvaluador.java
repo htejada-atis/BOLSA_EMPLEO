@@ -8,6 +8,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
+import es.ujaen.uvirtual.modelo.conexion.ConexionArcos;
 import es.ujaen.uvirtual.modelo.conexion.ConexionUvirtual;
 import es.ujaen.uvirtual.modulo.bolsaempleo.beans.Evaluador;
 import es.ujaen.uvirtual.modulo.bolsaempleo.beans.UsuarioBolsaEmpleo;
@@ -70,13 +71,12 @@ public class ModeloEvaluador {
 		BolsaEmpleoDataTable<Evaluador> dataTable = new BolsaEmpleoDataTable<Evaluador>(params);
 		
 		String consulta = "SELECT * FROM TBEP_USUARIOS bepusu "
-				+ "INNER JOIN VUJA_NET_BEP_AR_PERSONA uvpersona ON uvpersona.CODINT=bepusu.CODPERSONA "
 				+ "INNER JOIN TBEP_EVALUADORES bepeva ON bepusu.CODNUM = bepeva.BEPUSU_CODNUM "
 				+ "WHERE FLGBORRADO!='S' AND FLGEXCLUIDO!='S' AND bepeva.BEPARE_CODNUM = ? "
 				+ "AND bepusu.ROL = " + PARAM_ROL_ID;
 		
-		dataTable.setColumn(ORDER_COLUMN_INDEX_NUMDOCUMENTO_EVALUADORES, "uvpersona.IDNIF");
-		dataTable.setColumn(ORDER_COLUMN_INDEX_NOMBRE_Y_APELLIDOS_EVALUADORES, "uvpersona.STRAPELLIDO1");
+		dataTable.setColumn(ORDER_COLUMN_INDEX_NUMDOCUMENTO_EVALUADORES, "bepusu.PRSNIF");
+		dataTable.setColumn(ORDER_COLUMN_INDEX_NOMBRE_Y_APELLIDOS_EVALUADORES, "bepusu.CODCUENTA");
 		dataTable.setColumn(ORDER_COLUMN_INDEX_ACTIVO_EVALUADORES, "bepeva.FLGACTIVO", DataTableColumn.COLUMN_TYPE_BOOLEAN);
 		
 		dataTable.setQuery(consulta);
@@ -91,18 +91,28 @@ public class ModeloEvaluador {
 			dataTable.setFiltersParams(stmt, stmtCount, indexParam);
 			try (ResultSet rs = stmt.executeQuery()) {
 				while (rs.next()) {
-					UsuarioBolsaEmpleo usuario = new UsuarioBolsaEmpleo();
-					usuario.setCodNum(rs.getInt("CODNUM"));
-					usuario.setTipoDocumento(rs.getString("STRTIPODOCUMENTO"));
-					usuario.setNumDocumento(rs.getString("IDNIF") + rs.getString("LETRANIF"));
-					usuario.setNombre(rs.getString("STRNOMBRE"));
-					usuario.setPrimerApellido(rs.getString("STRAPELLIDO1"));
-					usuario.setSegundoApellido(rs.getString("STRAPELLIDO2"));
+					String consultaArcos = "SELECT * FROM VUJA_NET_BEP_AR_PERSONA WHERE PRSNIF = ?";
 					
-					Integer codNumArea = rs.getInt("BEPARE_CODNUM");
-					Boolean activo = rs.getString("FLGACTIVO").equals("S");
-					Evaluador evaluador = new Evaluador(usuario, codNumArea, activo);
-					usuarios.add(evaluador);
+				    try (Connection conexionArcos = ConexionArcos.obtenerInstancia();
+				    	PreparedStatement stmtArcos = conexionArcos.prepareStatement(consultaArcos);) {
+				    	stmtArcos.setString(1, rs.getString("PRSNIF"));
+				    	try (ResultSet rsArcos = stmtArcos.executeQuery();) {
+					    	while (rsArcos.next()) {
+								UsuarioBolsaEmpleo usuario = new UsuarioBolsaEmpleo();
+								usuario.setCodNum(rs.getInt("CODNUM"));
+								usuario.setTipoDocumento(rsArcos.getString("STRTIPODOCUMENTO"));
+								usuario.setNumDocumento(rsArcos.getString("PRSNIF"));
+								usuario.setNombre(rsArcos.getString("STRNOMBRE"));
+								usuario.setPrimerApellido(rsArcos.getString("STRAPELLIDO1"));
+								usuario.setSegundoApellido(rsArcos.getString("STRAPELLIDO2"));
+								
+								Integer codNumArea = rs.getInt("BEPARE_CODNUM");
+								Boolean activo = rs.getString("FLGACTIVO").equals("S");
+								Evaluador evaluador = new Evaluador(usuario, codNumArea, activo);
+								usuarios.add(evaluador);
+					    	}
+				    	}
+				    }
 				}				
 			}
 			
@@ -217,7 +227,7 @@ public class ModeloEvaluador {
 
 		String consulta = "INSERT INTO TBEP_EVALUADORES (BEPARE_CODNUM, BEPUSU_CODNUM)"
 				+ " SELECT bepare.CODNUM AS BEPARE_CODNUM, bepusu.CODNUM AS BEPUSU_CODNUM"
-				+ " FROM TBEP_USUARIOS bepusu, TBEP_AREAS bepare WHERE bepare.CODNUM = ? AND "
+				+ " FROM TBEP_USUARIOS bepusu, TBEP_AREAS bepare WHERE bepare.CODNUM = ? AND"
 				+ " bepusu.CODNUM = ?";
 		
 		try (Connection conexion = ConexionUvirtual.obtenerInstancia(); PreparedStatement stmt = conexion.prepareStatement(consulta)) {

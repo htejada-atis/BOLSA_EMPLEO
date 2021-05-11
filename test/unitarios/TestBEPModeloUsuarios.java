@@ -33,7 +33,6 @@ import es.ujaen.uvirtual.utilidades.UVException;
 */
 public class TestBEPModeloUsuarios {
 
-	private static final Integer CODPERSONA = 100;
 	private static final String CODCUENTA = "test2";
 	private static final Rol ROL = new Rol(1050);
 	private static final String EMAIL = "test@test";
@@ -66,7 +65,6 @@ public class TestBEPModeloUsuarios {
     @Test
     public void testA01InsertaUsuario() throws SQLException, ParseException, UVException {
     	UsuarioBolsaEmpleo usuario = new UsuarioBolsaEmpleo();
-		usuario.setCodPersona(CODPERSONA);
 		usuario.setCodCuenta(CODCUENTA);
 		usuario.setRol(ROL);
 		usuario.setEmail(EMAIL);

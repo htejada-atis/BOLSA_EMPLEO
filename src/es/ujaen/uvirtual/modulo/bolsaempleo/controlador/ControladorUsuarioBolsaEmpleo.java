@@ -248,6 +248,7 @@ public class ControladorUsuarioBolsaEmpleo extends HttpServlet {
 			} catch (Exception ex) {
 				bean.getMensajesDeError().add(ex.getMessage());
 				
+				LOGGER.log(Level.FINEST, "usuario que ha entrado en el servlet es {0}", ex.getMessage());
 				CodigoDescripcion mensaje = new CodigoDescripcion("error", ex.getMessage());
 				writer.write(new Gson().toJson(mensaje));
 				response.setStatus(RESPONSE_HTTP_CODE_ERROR);
@@ -427,7 +428,7 @@ public class ControladorUsuarioBolsaEmpleo extends HttpServlet {
 			Usuario usuArcos = CrearUsuario.usuario(request.getParameter(PARAM_ID));
 				
 			UsuarioBolsaEmpleo usuarioFinal = 
-					new UsuarioBolsaEmpleo(usuArcos.getCodigoPersonaArcos(), usu, role, 
+					new UsuarioBolsaEmpleo(usu, usuArcos.getDocumentoNumero(), role, 
 							listadist, excluido, excluidoTipo, razonexcluido, date, fechaini, fechafin);
 				
 			modelo.insertaUsuario(usuarioFinal);
@@ -497,9 +498,8 @@ public class ControladorUsuarioBolsaEmpleo extends HttpServlet {
 				UsuarioBolsaEmpleo usuario = new UsuarioBolsaEmpleo(codNum, role, listadist, excluido, excluidoTipo, razonexcluido, date, fechaini, fechafin);
 				
 				modelo.actualizaUsuario(usuario);
-				HttpSession session = request.getSession(false);
-				session.setAttribute(MENSAJE_ENVIADO, MENSAJE_EXITO_EDITAR);
 				response.sendRedirect(request.getServletPath());	
+				bean.getMensajesDeExito().add(MENSAJE_EXITO_EDITAR);
 			}
 		}
 	}
