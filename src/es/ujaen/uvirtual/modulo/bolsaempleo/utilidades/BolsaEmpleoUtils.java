@@ -3,10 +3,12 @@ package es.ujaen.uvirtual.modulo.bolsaempleo.utilidades;
 import java.io.IOException;
 import java.io.InputStream;
 import java.sql.SQLException;
+import java.time.LocalDate;
+import java.util.Date;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import javax.servlet.http.HttpServletRequest;
+import javax.servlet.ServletRequest;
 import javax.servlet.http.Part;
 
 import es.ujaen.uvirtual.modulo.bolsaempleo.modelo.ModeloParametrosConfiguracion;
@@ -18,7 +20,7 @@ import es.ujaen.uvirtual.utilidades.UVException;
  * @author jlopez
  *
  */
-public class BolsaEmpleoUtils {
+public final class BolsaEmpleoUtils {
 	private static final double ROUNDER = 100.0;
 	private static final int NUMBER_2 = 2;
 	
@@ -33,7 +35,7 @@ public class BolsaEmpleoUtils {
 		String[] tokens = contentDisp.split(";");
 		for (String token : tokens) {
 			if (token.trim().startsWith("filename")) {
-				return token.substring(token.indexOf("=") + NUMBER_2, token.length() - 1);
+				return token.substring(token.indexOf('=') + NUMBER_2, token.length() - 1);
             }
         }
 		return "";
@@ -63,7 +65,7 @@ public class BolsaEmpleoUtils {
 	 * @param defaultParam .
 	 * @return .
 	 */
-	public static String getParamForm(HttpServletRequest request, String param, String defaultParam) {
+	public static String getParamForm(ServletRequest request, String param, String defaultParam) {
 		String value = request.getParameter(param);
 		
 		if (value != null) {
@@ -161,5 +163,16 @@ public class BolsaEmpleoUtils {
 	 */
 	public static double redondeo(double v) {
 		return Math.round(v * ROUNDER) / ROUNDER;
+	}
+	
+	/**
+	 * Devuelve la fecha actual del sistema.
+	 * Según "java.time" classes should be used for dates and times (java:S2143)
+	 * https://www.baeldung.com/java-date-to-localdate-and-localdatetime
+	 * @return .
+	 */
+	public static Date getCurrentDate() {
+		LocalDate ld = LocalDate.now();
+		return java.sql.Date.valueOf(ld);
 	}
 }

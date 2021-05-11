@@ -31,7 +31,7 @@ public class ModeloAfinidad {
 	
 	public static final String MENSAJE_ERROR_NO_EXISTE_AFINIDAD = "No existe la afinidad";
 		
-    protected static ModeloAfinidad eInstancia = null;
+    protected static ModeloAfinidad eInstancia;
 	
 	/** Crea una instancia del objeto.
 	 *  de forma sincronizada para protegerse de posibles problemas multi-hilo
