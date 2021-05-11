@@ -22,7 +22,7 @@ import es.ujaen.uvirtual.beans.UVDatos;
 import es.ujaen.uvirtual.beans.Usuario;
 import es.ujaen.uvirtual.modulo.bolsaempleo.beans.ApartadoBaremacion;
 import es.ujaen.uvirtual.modulo.bolsaempleo.beans.Convocatoria;
-import es.ujaen.uvirtual.modulo.bolsaempleo.modelo.ModeloBaremacion;
+import es.ujaen.uvirtual.modulo.bolsaempleo.modelo.ModeloBaremacionApartados;
 import es.ujaen.uvirtual.modulo.bolsaempleo.modelo.ModeloBolsa;
 import es.ujaen.uvirtual.modulo.bolsaempleo.modelo.ModeloConvocatoria;
 import es.ujaen.uvirtual.modulo.bolsaempleo.modelo.ModeloUsuarioBolsaEmpleo;
@@ -278,7 +278,6 @@ public class ControladorConvocatorias extends HttpServlet {
 		ModeloConvocatoria modelo = ModeloConvocatoria.obtenerInstancia();
 		ModeloBolsa modeloBolsas = ModeloBolsa.obtenerInstancia();
 		
-		ModeloBaremacion modeloBaremacion = ModeloBaremacion.obtenerInstancia();
 		ApartadoBaremacion apartado = new ApartadoBaremacion();
 		
 		Convocatoria convocatoria = modelo.getConvocatoriaById(Formateador.leeParametroInteger(request.getParameter(PARAM_CONVOCATORIA_ID)));
@@ -290,7 +289,7 @@ public class ControladorConvocatorias extends HttpServlet {
 			bean.getMensajesDeError().add(MENSAJE_ERROR_BOLSAS_BLOQUEADAS);
 		} else if (modelo.hayConvocatoriaAbierta()) {
 			bean.getMensajesDeError().add(MENSAJE_ERROR_CONVOCATORIAS_ABIERTAS);
-		} else if (modeloBaremacion.checkSumaPorcentagesApartados(apartado, "Alcanzar")) {
+		} else if (ModeloBaremacionApartados.obtenerInstancia().checkSumaPorcentagesApartados(apartado, "Alcanzar")) {
 			bean.getMensajesDeError().add(MENSAJE_ERROR_APARTADOS_PORCENTAGES);
 		} else {
 			Integer codNum = Formateador.leeParametroInteger(request.getParameter(PARAM_CONVOCATORIA_ID));

@@ -13,7 +13,7 @@
 <%@ page import="es.ujaen.uvirtual.utilidades.Formateador" %>
 <%@ page import="es.ujaen.uvirtual.modulo.bolsaempleo.utilidades.BolsaEmpleoUtils" %>
 
-<% 
+<%
 UVDatos uvdatos = (UVDatos) request.getAttribute(UVDatos.NOMBRE_ATRIBUTO);
 VistaMeritosPreferentes bean = (VistaMeritosPreferentes) uvdatos.getVistas().get(VistaMeritosPreferentes.class.getName());
 MeritoPreferente merito = bean.getMeritoPreferente();
@@ -109,7 +109,7 @@ MeritoPreferente merito = bean.getMeritoPreferente();
 					<%
 					for(BloqueBaremacion item : bean.getBloqueBaremacion()) {
 					%>
-	    					<option value="<%=item.getCodNum()%>" <%=aplicableBloqueSelected.equals(item.getCodNum().toString()) ? "selected=\"selected\"" : ""%>><%=item.getNombre()%></option>
+	    					<option value="<%=item.getCodNum()%>" <%=aplicableBloqueSelected.equals(item.getCodNum().toString()) ? "selected=\"selected\"" : ""%>><%= item.getApartadoBaremacion().getCodigo() + "." + item.getCodigo() + " - " + item.getNombre() %></option>
 	    					<%
 	    					}
 	    					%>						
@@ -126,7 +126,7 @@ MeritoPreferente merito = bean.getMeritoPreferente();
 					<%
 					for(ApartadoBaremacion item : bean.getApartadoBaremacion()) {
 					%>
-	    					<option value="<%=item.getCodNum()%>" <%=aplicableApartadoSelected.equals(item.getCodNum().toString()) ? "selected=\"selected\"" : ""%>><%=item.getNombre()%></option>
+	    					<option value="<%=item.getCodNum()%>" <%=aplicableApartadoSelected.equals(item.getCodNum().toString()) ? "selected=\"selected\"" : ""%>><%= item.getCodigo() + " - " + item.getNombre()%></option>
 	    					<%
 	    					}
 	    					%>						
@@ -143,7 +143,7 @@ MeritoPreferente merito = bean.getMeritoPreferente();
 					<%
 					for(ItemBaremacion item : bean.getItemsBaremacion()) {
 					%>
-	    					<option value="<%=item.getCodNum()%>" <%=aplicableItemSelected.equals(item.getCodNum().toString()) ? "selected=\"selected\"" : ""%>><%=item.getNombre()%></option>
+	    					<option value="<%=item.getCodNum()%>" <%=aplicableItemSelected.equals(item.getCodNum().toString()) ? "selected=\"selected\"" : ""%>><%= item.getBloqueBaremacion().getApartadoBaremacion().getCodigo() + "." + item.getBloqueBaremacion().getCodigo() + "." + item.getCodigo() + " - " + item.getNombre()%></option>
 	    					<%
 	    					}
 	    					%>						

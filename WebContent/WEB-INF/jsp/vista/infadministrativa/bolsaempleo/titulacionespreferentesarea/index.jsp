@@ -22,7 +22,9 @@ Bolsa bolsa = bean.getArea();
 			<%= bean.formatearMensajesDeError() %>
 		</div>
 	<% } %>
-	<h2>Titulaciones por Área</h2>	
+	<h2>Titulaciones por área</h2>	
+
+	<p>Página de consulta sobre que titulaciones son preferentes por área</p>
 	
 	<table class="bluetable bolsaempleo" id="tableAreas">
 		<tr>
