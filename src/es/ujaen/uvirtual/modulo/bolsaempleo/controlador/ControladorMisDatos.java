@@ -215,6 +215,7 @@ public class ControladorMisDatos extends HttpServlet {
 					segundoapellido, email, direccion, codigopostal, localidad, provincia, telefono, nacionalidad, sexo, listadist);
 			
 			modelo.actualizaUsuarioMisDatos(usuarioFinal);
+		}
 
 		UsuarioBolsaEmpleo usuaCont = modelo.getUsuarioById(codNum);
 		Usuario usuArcos = CrearUsuario.usuario(usuaCont.getCodCuenta());
