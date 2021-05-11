@@ -11,7 +11,10 @@ import java.util.ArrayList;
 import java.util.List;
 import javax.sql.DataSource;
 import org.junit.BeforeClass;
+import org.junit.FixMethodOrder;
 import org.junit.Test;
+import org.junit.runners.MethodSorters;
+
 import bbdd.BbddRunner;
 import bbdd.UtilsTestBolsaEmpleo;
 import es.ujaen.uvirtual.modelo.conexion.Conexion;
@@ -26,6 +29,7 @@ import es.ujaen.uvirtual.utilidades.UVException;
 
 
 /** Clase para probar el modelo merito. */
+@FixMethodOrder(MethodSorters.NAME_ASCENDING)
 public class TestBEPModeloMerito {
 	
     private static final Integer CODNUM = 4;

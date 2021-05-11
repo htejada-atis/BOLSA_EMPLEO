@@ -8,7 +8,10 @@ import java.text.ParseException;
 import java.util.List;
 import javax.sql.DataSource;
 import org.junit.BeforeClass;
+import org.junit.FixMethodOrder;
 import org.junit.Test;
+import org.junit.runners.MethodSorters;
+
 import bbdd.BbddRunner;
 import bbdd.UtilsTestBolsaEmpleo;
 import es.ujaen.uvirtual.modelo.conexion.Conexion;
@@ -17,6 +20,7 @@ import es.ujaen.uvirtual.modulo.bolsaempleo.modelo.ModeloTitulacion;
 import es.ujaen.uvirtual.utilidades.UVException;
 
 /** Clase para probar el modelo titulación. */
+@FixMethodOrder(MethodSorters.NAME_ASCENDING)
 public class TestBEPModeloTitulacion {
 	
     private static final String NOMBRE_TITULACION = "nombre titulacion";

@@ -10,7 +10,9 @@ import java.util.List;
 import javax.sql.DataSource;
 
 import org.junit.BeforeClass;
+import org.junit.FixMethodOrder;
 import org.junit.Test;
+import org.junit.runners.MethodSorters;
 
 import bbdd.BbddRunner;
 import bbdd.UtilsTestBolsaEmpleo;
@@ -22,6 +24,7 @@ import es.ujaen.uvirtual.utilidades.UVException;
 /** test modelo bolsa.
 *
 */
+@FixMethodOrder(MethodSorters.NAME_ASCENDING)
 public class TestBEPModeloBolsa {
 	
 	/** prepara la bd con los datos iniciales.

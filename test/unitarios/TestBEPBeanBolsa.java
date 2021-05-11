@@ -8,7 +8,9 @@ import static org.junit.Assert.assertTrue;
 import java.util.Calendar;
 import java.util.Date;
 
+import org.junit.FixMethodOrder;
 import org.junit.Test;
+import org.junit.runners.MethodSorters;
 
 import es.ujaen.uvirtual.modulo.bolsaempleo.beans.Area;
 import es.ujaen.uvirtual.modulo.bolsaempleo.beans.Bolsa;
@@ -16,6 +18,7 @@ import es.ujaen.uvirtual.modulo.bolsaempleo.beans.Bolsa;
 /** test bolsas.
  *
  */
+@FixMethodOrder(MethodSorters.NAME_ASCENDING)
 public class TestBEPBeanBolsa {	
 	private static final String ESTADO = "BLOQUEADA";
 	private static final Boolean BAREAMABLE = true;

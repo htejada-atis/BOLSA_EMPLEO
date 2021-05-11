@@ -8,7 +8,10 @@ import java.io.IOException;
 import java.sql.SQLException;
 import javax.servlet.ServletException;
 import org.junit.BeforeClass;
+import org.junit.FixMethodOrder;
 import org.junit.Test;
+import org.junit.runners.MethodSorters;
+
 import bbdd.BbddRunner;
 import bbdd.UtilsTestBolsaEmpleo;
 import controlador.implementacion.PeticionHttp;
@@ -20,6 +23,7 @@ import es.ujaen.uvirtual.modulo.bolsaempleo.vistas.VistaFicheros;
  * @author ATISoluciones
  *
  */
+@FixMethodOrder(MethodSorters.NAME_ASCENDING)
 public class TestBEPControladorGestionFicheros {
 	
 	private static final String MENSAJE_FICHERO_DEVUELTO = "Debe devolver fichero";

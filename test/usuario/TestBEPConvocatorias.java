@@ -11,7 +11,9 @@ import java.util.logging.Logger;
 import org.junit.AfterClass;
 import org.junit.Before;
 import org.junit.BeforeClass;
+import org.junit.FixMethodOrder;
 import org.junit.Test;
+import org.junit.runners.MethodSorters;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.ui.ExpectedConditions;
@@ -21,6 +23,7 @@ import org.openqa.selenium.support.ui.WebDriverWait;
  * @author fcampos
  *
  */
+@FixMethodOrder(MethodSorters.NAME_ASCENDING)
 public class TestBEPConvocatorias {
 	private static final String NOMBREDEESTACLASE = TestBEPConvocatorias.class.getName();
 

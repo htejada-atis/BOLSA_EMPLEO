@@ -11,7 +11,9 @@ import java.io.InputStream;
 import java.util.Calendar;
 import java.util.Date;
 
+import org.junit.FixMethodOrder;
 import org.junit.Test;
+import org.junit.runners.MethodSorters;
 
 import es.ujaen.uvirtual.modulo.bolsaempleo.beans.Convocatoria;
 import es.ujaen.uvirtual.modulo.bolsaempleo.beans.Solicitud;
@@ -20,6 +22,7 @@ import es.ujaen.uvirtual.modulo.bolsaempleo.beans.UsuarioBolsaEmpleo;
 /** test solicitud.
 *
 */
+@FixMethodOrder(MethodSorters.NAME_ASCENDING)
 public class TestBEPBeanSolicitud {
 	private static final Integer CODNUM = 100;
 	private static final UsuarioBolsaEmpleo USUARIO = new UsuarioBolsaEmpleo();

@@ -5,13 +5,17 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
+
+import org.junit.FixMethodOrder;
 import org.junit.Test;
+import org.junit.runners.MethodSorters;
 
 import es.ujaen.uvirtual.modulo.bolsaempleo.beans.Area;
 
 /** test areas.
  *
  */
+@FixMethodOrder(MethodSorters.NAME_ASCENDING)
 public class TestBEPBeanArea {
 	
 	private static final String ID_AREA_EXTERNO = "area externo";

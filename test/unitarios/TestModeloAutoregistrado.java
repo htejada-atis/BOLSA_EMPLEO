@@ -5,7 +5,9 @@ import java.sql.SQLException;
 import javax.sql.DataSource;
 
 import org.junit.BeforeClass;
+import org.junit.FixMethodOrder;
 import org.junit.Test;
+import org.junit.runners.MethodSorters;
 
 import bbdd.BbddRunner;
 import es.ujaen.uvirtual.beans.Usuario;
@@ -16,6 +18,7 @@ import es.ujaen.uvirtual.utilidades.UVException;
 /** test para el modelo de autoaprovisionado.
  *
  */
+@FixMethodOrder(MethodSorters.NAME_ASCENDING)
 public class TestModeloAutoregistrado {
 
 	/** prepara la bbdd para los tests.

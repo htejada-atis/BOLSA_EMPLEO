@@ -6,7 +6,9 @@ import static org.junit.Assert.assertNotNull;
 import java.util.Calendar;
 import java.util.Date;
 
+import org.junit.FixMethodOrder;
 import org.junit.Test;
+import org.junit.runners.MethodSorters;
 
 import es.ujaen.uvirtual.modulo.bolsaempleo.beans.Rol;
 import es.ujaen.uvirtual.modulo.bolsaempleo.beans.UsuarioBolsaEmpleo;
@@ -14,6 +16,7 @@ import es.ujaen.uvirtual.modulo.bolsaempleo.beans.UsuarioBolsaEmpleo;
 /** test usuarios bolsa empleo.
 *
 */
+@FixMethodOrder(MethodSorters.NAME_ASCENDING)
 public class TestBEPBeanUsuarios {
 
 	private static final String CODCUENTA = "test2";

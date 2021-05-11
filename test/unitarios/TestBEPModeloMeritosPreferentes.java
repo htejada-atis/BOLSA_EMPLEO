@@ -12,7 +12,9 @@ import java.util.List;
 import javax.sql.DataSource;
 
 import org.junit.BeforeClass;
+import org.junit.FixMethodOrder;
 import org.junit.Test;
+import org.junit.runners.MethodSorters;
 
 import bbdd.BbddRunner;
 import bbdd.UtilsTestBolsaEmpleo;
@@ -27,6 +29,7 @@ import es.ujaen.uvirtual.utilidades.UVException;
 /** test modelo meritos preferentes.
 *
 */
+@FixMethodOrder(MethodSorters.NAME_ASCENDING)
 public class TestBEPModeloMeritosPreferentes {
 	private static final Integer CODNUM = 1;
 	private static final String DESCRIPCION = "descripcion";

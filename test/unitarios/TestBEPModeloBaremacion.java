@@ -12,7 +12,9 @@ import java.util.List;
 import javax.sql.DataSource;
 
 import org.junit.BeforeClass;
+import org.junit.FixMethodOrder;
 import org.junit.Test;
+import org.junit.runners.MethodSorters;
 
 import bbdd.BbddRunner;
 import bbdd.UtilsTestBolsaEmpleo;
@@ -26,6 +28,7 @@ import es.ujaen.uvirtual.utilidades.UVException;
 /** test modelo baremacion.
 *
 */
+@FixMethodOrder(MethodSorters.NAME_ASCENDING)
 public class TestBEPModeloBaremacion {
 	private static final Integer APARTADO_CODNUM = 4;
 	private static final String APARTADO_CODIGO = "AAA";

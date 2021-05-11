@@ -6,7 +6,10 @@ import java.io.IOException;
 import java.sql.SQLException;
 import javax.servlet.ServletException;
 import org.junit.BeforeClass;
+import org.junit.FixMethodOrder;
 import org.junit.Test;
+import org.junit.runners.MethodSorters;
+
 import bbdd.BbddRunner;
 import bbdd.UtilsTestBolsaEmpleo;
 import controlador.implementacion.PeticionHttp;
@@ -18,6 +21,7 @@ import es.ujaen.uvirtual.modulo.bolsaempleo.vistas.VistaTitulacionesArea;
 /** test controlador titulaciones preferentes area.
  * @author ATISoluciones 
  */
+@FixMethodOrder(MethodSorters.NAME_ASCENDING)
 public class TestBEPControladorGestionTitulacionesPreferentesArea {
 	
 	private static final String MENSAJE_AREAS_DEVUELTAS = "Debe devolver areas";
