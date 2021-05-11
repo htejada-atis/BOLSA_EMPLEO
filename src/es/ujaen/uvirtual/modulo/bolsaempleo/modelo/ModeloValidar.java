@@ -7,6 +7,8 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+
+import es.ujaen.uvirtual.modelo.conexion.ConexionArcos;
 import es.ujaen.uvirtual.modelo.conexion.ConexionUvirtual;
 import es.ujaen.uvirtual.modulo.bolsaempleo.beans.Bolsa;
 import es.ujaen.uvirtual.modulo.bolsaempleo.beans.BolsaValidacion;
@@ -341,14 +343,12 @@ public class ModeloValidar {
 		
 		// seleccionamos los candidatos, con meritos, en la convocatoria pasada
 		String consulta = 
-				"SELECT bepusu.CODNUM, uvpersona.STRNOMBRE, uvpersona.STRAPELLIDO1, uvpersona.STRAPELLIDO2,"
-				+ " uvpersona.IDNIF, uvpersona.LETRANIF, uvpersona.STRTIPODOCUMENTO,"
+				"SELECT bepusu.CODNUM, bepusu.PRSNIF,"
 				+ "	(" + consultaCount + " AND bepsbm.FLGVALIDADO = 'N' AND bepsbm.FLGEXCLUIDO = 'N') COUNT_NO_VALIDADOS,"
 				+ "	(" + consultaCount + " AND bepsbm.FLGVALIDADO = 'S' AND bepsbm.FLGEXCLUIDO = 'N') COUNT_VALIDADOS,"
 				+ "	(" + consultaCount + " AND bepsbm.FLGEXCLUIDO = 'S') COUNT_EXCLUIDOS,"
 				+ "	(" + consultaCount + ") COUNT_TOTAL"
 				+ "	FROM UVIRTUAL.TBEP_USUARIOS bepusu"
-				+ "	INNER JOIN UVIRTUAL.VUJA_NET_BEP_AR_PERSONA uvpersona ON uvpersona.CODINT=bepusu.CODPERSONA"
 				+ "	INNER JOIN UVIRTUAL.TBEP_MERITOS bepmer ON bepusu.CODNUM = bepmer.BEPUSU_CODNUM"
 				+ "	INNER JOIN UVIRTUAL.TBEP_ITEMSBAREMACION bepite ON bepite.CODNUM = bepmer.BEPITE_CODNUM"
 				+ "	INNER JOIN UVIRTUAL.TBEP_SOLICITUD_BOLSAS_MERITOS bepsbm ON bepmer.CODNUM = bepsbm.BEPMER_CODNUM"
@@ -358,11 +358,9 @@ public class ModeloValidar {
 		// agrega el filtro de afinidad
 		consulta += afinidad ? " AND bepite.AFINIDAD IS NOT NULL" : " AND bepite.AFINIDAD IS NULL";
 		
-		consulta += " GROUP BY bepusu.CODNUM, uvpersona.STRNOMBRE, uvpersona.STRAPELLIDO1, uvpersona.STRAPELLIDO2,"
-				+ " uvpersona.IDNIF, uvpersona.LETRANIF, uvpersona.STRTIPODOCUMENTO";
+		consulta += " GROUP BY bepusu.CODNUM, bepusu.PRSNIF";
 
-		dataTable.setColumn(ORDER_COLUMN_INDEX_NUMDOCUMENTO_CANDIDATO, "uvpersona.IDNIF");
-		dataTable.setColumn(ORDER_COLUMN_INDEX_NOMBRE_Y_APELLIDOS_CANDIDATO, "uvpersona.STRAPELLIDO1");
+		dataTable.setColumn(ORDER_COLUMN_INDEX_NUMDOCUMENTO_CANDIDATO, "bepusu.PRSNIF");
 
 		dataTable.setQuery(consulta);
 		
@@ -386,21 +384,20 @@ public class ModeloValidar {
 
 			try (ResultSet rs = stmt.executeQuery()) {
 				while (rs.next()) {
-					UsuarioBolsaEmpleo usuario = new UsuarioBolsaEmpleo();
-					usuario.setCodNum(rs.getInt("CODNUM"));
-					usuario.setTipoDocumento(rs.getString("STRTIPODOCUMENTO"));
-					usuario.setNumDocumento(rs.getString("IDNIF") + rs.getString("LETRANIF"));
-					usuario.setNombre(rs.getString("STRNOMBRE"));
-					usuario.setPrimerApellido(rs.getString("STRAPELLIDO1"));
-					usuario.setSegundoApellido(rs.getString("STRAPELLIDO2"));
+					String consultaArcos = "SELECT * FROM VUJA_NET_BEP_AR_PERSONA WHERE PRSNIF = ?";
 					
-					CandidatoValidacion candidato = new CandidatoValidacion(usuario);
-					candidato.setTotalMeritosNoValidados(rs.getInt("COUNT_TOTAL"));
-					candidato.setTotalMeritosValidados(rs.getInt("COUNT_VALIDADOS"));
-					candidato.setTotalMeritosExcluidos(rs.getInt("COUNT_EXCLUIDOS"));
-					candidato.setTotalMeritos(rs.getInt("COUNT_TOTAL"));
+					 try (Connection conexionArcos = ConexionArcos.obtenerInstancia();
+				    	PreparedStatement stmtArcos = conexionArcos.prepareStatement(consultaArcos);) {
+				    	stmtArcos.setString(1, rs.getString("PRSNIF"));
+				    	try (ResultSet rsArcos = stmtArcos.executeQuery();) {
+					    	while (rsArcos.next()) {
+								CandidatoValidacion candidato = createCandidatoFromResultSet(rs, rsArcos);
+								rows.add(candidato);
+					    	}
+				    	}
+				    }
 					
-					rows.add(candidato);
+					;
 				}
 			}
 
@@ -478,4 +475,31 @@ public class ModeloValidar {
 
 		return dataTable;
 	}
+	
+	/**
+	 * Crea un candidato validación a partir de un ResultSet.
+	 * @param rs .
+	 * @param rsArcos .
+	 * @return .
+	 * @throws UVException .
+	 * @throws SQLException .
+	 */
+	public CandidatoValidacion createCandidatoFromResultSet(ResultSet rs, ResultSet rsArcos) throws SQLException, UVException {
+		UsuarioBolsaEmpleo usuario = new UsuarioBolsaEmpleo();
+		usuario.setTipoDocumento(rsArcos.getString("STRTIPODOCUMENTO"));
+		usuario.setNumDocumento(rsArcos.getString("PRSNIF"));
+		usuario.setNombre(rsArcos.getString("STRNOMBRE"));
+		usuario.setPrimerApellido(rsArcos.getString("STRAPELLIDO1"));
+		usuario.setSegundoApellido(rsArcos.getString("STRAPELLIDO2"));
+		usuario.setCodNum(rs.getInt("CODNUM"));
+		
+		CandidatoValidacion candidato = new CandidatoValidacion(usuario);
+		candidato.setTotalMeritosNoValidados(rs.getInt("COUNT_TOTAL"));
+		candidato.setTotalMeritosValidados(rs.getInt("COUNT_VALIDADOS"));
+		candidato.setTotalMeritosExcluidos(rs.getInt("COUNT_EXCLUIDOS"));
+		candidato.setTotalMeritos(rs.getInt("COUNT_TOTAL"));
+		
+		return candidato;
+	}
+	
 }
