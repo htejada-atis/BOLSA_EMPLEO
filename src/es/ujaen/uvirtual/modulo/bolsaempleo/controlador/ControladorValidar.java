@@ -160,6 +160,8 @@ public class ControladorValidar extends HttpServlet {
 		bean.setVista(RUTA_BEP_VALIDAR + "meritoscandidatos.jsp");
 		
 		switch (nombreAccion) {
+			case ACCION_BOLSA_SELECCIONADA:
+				break;
 			case ACCION_DATATABLE_BOLSAS_CANDIDATO:
 			case ACCION_CANDIDATO_SELECCIONADO:
 			case ACCION_DATATABLE_MERITOS:
