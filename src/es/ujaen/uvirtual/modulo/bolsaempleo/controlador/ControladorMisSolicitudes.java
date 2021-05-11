@@ -864,6 +864,10 @@ public class ControladorMisSolicitudes extends HttpServlet {
 		if (bean.getCandidato().getCodNum().equals(solicitud.getUsuario().getCodNum())) {
 			throw new UVException("No tienes permisos");
 		}
+		
+		if (solicitud.getArchivo() == null) {
+			throw new UVException("El archivo no existe");
+		}
         
 		try (ServletOutputStream stream = response.getOutputStream(); BufferedInputStream buf = new BufferedInputStream(solicitud.getArchivo())) {
 			int readBytes = 0;
@@ -917,7 +921,10 @@ public class ControladorMisSolicitudes extends HttpServlet {
 				this.generarPDFArea(bolsa, bolsasSolicitud, document);
 			}
 			
-			return new ByteArrayInputStream(out.toByteArray());
+			ByteArrayInputStream pdf = new ByteArrayInputStream(out.toByteArray());
+			pdf.close();
+			
+			return pdf;
 		} catch (Exception exp) {
 			throw new UVException("Error generando pdf, consulte con los administradores");
 		}
@@ -959,7 +966,7 @@ public class ControladorMisSolicitudes extends HttpServlet {
 		lista.add("Área - " + bolsa.getArea().getDescripcion());
 
 		document.add(lista);
-		document.add(table);	
+		document.add(table);
 	}
 	
 	private void generarPDFAreaHeader(Table table) {
