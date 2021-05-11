@@ -203,7 +203,7 @@ public class ModeloBaremacionApartados {
 	 * @throws SQLException .
 	 * @throws UVException .
 	 */
-	public void desactivarApartado(ApartadoBaremacion apartado) throws SQLException, UVException {
+	public void desactivarApartado(ApartadoBaremacion apartado) throws SQLException {
 		this.activaDesactivaApartado(apartado, false);
 	}
 	
@@ -213,7 +213,7 @@ public class ModeloBaremacionApartados {
 	 * @throws SQLException .
 	 * @throws UVException .
 	 */
-	public void activarApartado(ApartadoBaremacion apartado) throws SQLException, UVException {
+	public void activarApartado(ApartadoBaremacion apartado) throws SQLException {
 		this.activaDesactivaApartado(apartado, true);
 	}
 	
@@ -279,7 +279,7 @@ public class ModeloBaremacionApartados {
 	 * @throws UVException .
 	 * @throws SQLException .
 	 */
-	public List<ApartadoBaremacion> listaApartadoBaremacion() throws SQLException, UVException {
+	public List<ApartadoBaremacion> listaApartadoBaremacion() throws SQLException {
 		return listaApartadoBaremacion(" WHERE FLGACTIVO = 'S' ORDER BY nombre");
 	} 
 	
@@ -333,12 +333,12 @@ public class ModeloBaremacionApartados {
 		return check;
 	} 
 	
-	private List<ApartadoBaremacion> listaApartadoBaremacion(String clausula) throws SQLException, UVException {
+	private List<ApartadoBaremacion> listaApartadoBaremacion(String clausula) throws SQLException {
 		List<ApartadoBaremacion> items = new ArrayList<>();
 		String consulta = "SELECT bepapa.* FROM TBEP_APARTADOSBAREMACION bepapa " + clausula;
 		
 		try (Connection conexion = ConexionUvirtual.obtenerInstancia();
-				PreparedStatement stmt = conexion.prepareStatement(consulta);) {
+				PreparedStatement stmt = conexion.prepareStatement(consulta)) {
 			try (ResultSet rs = stmt.executeQuery()) {
 				while (rs.next()) {
 					items.add(this.createApartadoFromResultSet(rs));
@@ -355,27 +355,24 @@ public class ModeloBaremacionApartados {
 		apartado.setNombre(rs.getString("NOMBRE"));
 		apartado.setPuntuacionMaxima(rs.getFloat("PUNTUACIONMAXIMA") == 0 ? null : rs.getFloat("PUNTUACIONMAXIMA"));
 		apartado.setPorcentajeMaximo(rs.getFloat("PORCENTAJEMAXIMO") == 0 ? null : rs.getFloat("PORCENTAJEMAXIMO"));
-		apartado.setActivo(rs.getString("FLGACTIVO").equals("S"));
+		apartado.setActivo("S".equals(rs.getString("FLGACTIVO")));
 		return apartado;
 	}
 	
-	private void activaDesactivaApartado(ApartadoBaremacion apartado, Boolean activo) throws SQLException, UVException {
+	private void activaDesactivaApartado(ApartadoBaremacion apartado, Boolean activo) throws SQLException {
 		String consulta = "UPDATE TBEP_APARTADOSBAREMACION SET FLGACTIVO = ? WHERE CODNUM = ?";
 		
-		try (Connection conexion = ConexionUvirtual.obtenerInstancia(); PreparedStatement stmt = conexion.prepareStatement(consulta);) {
+		try (Connection conexion = ConexionUvirtual.obtenerInstancia(); PreparedStatement stmt = conexion.prepareStatement(consulta)) {
 			int parameterIndex = 1;
 			
-			stmt.setString(parameterIndex++, activo ? "S" : "N");
+			stmt.setString(parameterIndex++, Boolean.TRUE.equals(activo) ? "S" : "N");
 			stmt.setInt(parameterIndex++, apartado.getCodNum());
 			stmt.executeUpdate();
 		}	
 	}
 	
 	private boolean existeOtroApartadoActivoPorCodigo(ApartadoBaremacion apartado) throws SQLException {		
-		String sql = "SELECT bepapa.* "
-				+ "FROM TBEP_APARTADOSBAREMACION bepapa "
-				+ "WHERE bepapa.CODIGO = ? "
-				+ "AND bepapa.FLGACTIVO = 'S' ";
+		String sql = "SELECT bepapa.* FROM TBEP_APARTADOSBAREMACION bepapa WHERE bepapa.CODIGO = ? AND bepapa.FLGACTIVO = 'S' ";
 		
 		if (apartado.getCodNum() != null) {
 			sql += " AND bepapa.CODNUM <> ? ";
@@ -383,7 +380,7 @@ public class ModeloBaremacionApartados {
 		
 		sql += " FETCH FIRST 1 ROW ONLY";
 		
-		try (Connection con = ConexionUvirtual.obtenerInstancia(); PreparedStatement stmt = con.prepareStatement(sql);) {
+		try (Connection con = ConexionUvirtual.obtenerInstancia(); PreparedStatement stmt = con.prepareStatement(sql)) {
 			int parameterIndex = 1;
 			stmt.setString(parameterIndex++, apartado.getCodigo());
 			
@@ -437,7 +434,7 @@ public class ModeloBaremacionApartados {
 				+ "WHERE bepapa.FLGACTIVO = 'S' "
 				+ "AND bepapa.PORCENTAJEMAXIMO IS NOT NULL";
 		
-		try (Connection con = ConexionUvirtual.obtenerInstancia(); PreparedStatement stmt = con.prepareStatement(sql);) {
+		try (Connection con = ConexionUvirtual.obtenerInstancia(); PreparedStatement stmt = con.prepareStatement(sql)) {
 			try (ResultSet rs = stmt.executeQuery()) {
 				if (!rs.next()) {
 					throw new UVException(ERROR_APARTADO_OBTENIENDO_TOTAL);
@@ -458,7 +455,7 @@ public class ModeloBaremacionApartados {
 				+ "WHERE bepapa.FLGACTIVO = 'S' "
 				+ "AND bepapa.PUNTUACIONMAXIMA IS NOT NULL";
 		
-		try (Connection con = ConexionUvirtual.obtenerInstancia(); PreparedStatement stmt = con.prepareStatement(sql);) {
+		try (Connection con = ConexionUvirtual.obtenerInstancia(); PreparedStatement stmt = con.prepareStatement(sql)) {
 			try (ResultSet rs = stmt.executeQuery()) {
 				if (!rs.next()) {
 					throw new UVException(ERROR_APARTADO_OBTENIENDO_TOTAL);

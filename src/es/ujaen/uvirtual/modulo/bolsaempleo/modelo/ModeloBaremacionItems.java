@@ -96,7 +96,7 @@ public class ModeloBaremacionItems {
 		
 		String sql = "SELECT bepite.* FROM TBEP_ITEMSBAREMACION bepite WHERE bepite.CODNUM = ?";
 		
-		try (Connection con = ConexionUvirtual.obtenerInstancia(); PreparedStatement stmt = con.prepareStatement(sql);) {
+		try (Connection con = ConexionUvirtual.obtenerInstancia(); PreparedStatement stmt = con.prepareStatement(sql)) {
 			int parameterIndex = 1;
 			stmt.setInt(parameterIndex++, codNum);
 			
@@ -120,11 +120,9 @@ public class ModeloBaremacionItems {
 	 */
 	public BolsaEmpleoDataTable<ItemBaremacion> listadoItemsBaremacionDatatable(Map<String, String[]> params, BloqueBaremacion bloque) throws SQLException, UVException {
 		List<ItemBaremacion> items = new ArrayList<>();
-		BolsaEmpleoDataTable<ItemBaremacion> dataTable = new BolsaEmpleoDataTable<ItemBaremacion>(params);
+		BolsaEmpleoDataTable<ItemBaremacion> dataTable = new BolsaEmpleoDataTable<>(params);
 		
-		String consulta = "SELECT bepite.* "
-				+ "FROM TBEP_ITEMSBAREMACION bepite "
-				+ "WHERE bepite.BEPBLO_CODNUM = ?";
+		String consulta = "SELECT bepite.* FROM TBEP_ITEMSBAREMACION bepite WHERE bepite.BEPBLO_CODNUM = ?";
 		
 		dataTable.setColumn(ORDER_COLUMN_INDEX_ITEMS_CODIGO, "bepite.CODIGO");
 		dataTable.setColumn(ORDER_COLUMN_INDEX_ITEMS_NOMBRE, "bepite.NOMBRE");
@@ -138,7 +136,7 @@ public class ModeloBaremacionItems {
 				
 		try (Connection conexion = ConexionUvirtual.obtenerInstancia();
 				PreparedStatement stmtCount = conexion.prepareStatement(dataTable.getQueryCount());
-				PreparedStatement stmt = conexion.prepareStatement(dataTable.getQuery());
+				PreparedStatement stmt = conexion.prepareStatement(dataTable.getQuery())
 		) {
 			int indexParam = 1;
 			stmt.setInt(indexParam, bloque.getCodNum());
@@ -170,7 +168,7 @@ public class ModeloBaremacionItems {
 	public BolsaEmpleoDataTable<ItemBaremacion> listadoItemsBaremacionExcluyentesDatatable(Map<String, String[]> params, 
 			ItemBaremacion item) throws SQLException, UVException {
 		List<ItemBaremacion> items = new ArrayList<>();
-		BolsaEmpleoDataTable<ItemBaremacion> dataTable = new BolsaEmpleoDataTable<ItemBaremacion>(params);
+		BolsaEmpleoDataTable<ItemBaremacion> dataTable = new BolsaEmpleoDataTable<>(params);
 		
 		String consulta = "SELECT bepite.*, SEL.HIJO "
 				+ "FROM TBEP_ITEMSBAREMACION bepite "
@@ -191,7 +189,7 @@ public class ModeloBaremacionItems {
 				
 		try (Connection conexion = ConexionUvirtual.obtenerInstancia();
 				PreparedStatement stmtCount = conexion.prepareStatement(dataTable.getQueryCount());
-				PreparedStatement stmt = conexion.prepareStatement(dataTable.getQuery());
+				PreparedStatement stmt = conexion.prepareStatement(dataTable.getQuery())
 		) {
 			int indexParam = 1;
 			stmt.setInt(indexParam, item.getCodNum());
@@ -252,14 +250,14 @@ public class ModeloBaremacionItems {
 	 * @throws SQLException .
 	 * @throws UVException .
 	 */
-	public String getUltimoCodigoItem(BloqueBaremacion bloque) throws SQLException, UVException {		
+	public String getUltimoCodigoItem(BloqueBaremacion bloque) throws SQLException {		
 		String consulta = "SELECT bepite.CODIGO, bepite.BEPBLO_CODNUM "
 				+ "FROM TBEP_ITEMSBAREMACION bepite "
 				+ "WHERE bepite.BEPBLO_CODNUM = ? "
 				+ "ORDER BY bepite.CODIGO DESC "
 				+ "FETCH FIRST 1 ROW ONLY";
 		
-		try (Connection conexion = ConexionUvirtual.obtenerInstancia(); PreparedStatement stmt = conexion.prepareStatement(consulta);) {
+		try (Connection conexion = ConexionUvirtual.obtenerInstancia(); PreparedStatement stmt = conexion.prepareStatement(consulta)) {
 			int parameterIndex = 1;
 			stmt.setInt(parameterIndex++, bloque.getCodNum());
 			try (ResultSet rs = stmt.executeQuery()) {
@@ -293,7 +291,7 @@ public class ModeloBaremacionItems {
 				+ "INDIVIDUALIZADO = ? "
 				+ "WHERE CODNUM = ?";
 		
-		try (Connection conexion = ConexionUvirtual.obtenerInstancia(); PreparedStatement stmt = conexion.prepareStatement(consulta);) {
+		try (Connection conexion = ConexionUvirtual.obtenerInstancia(); PreparedStatement stmt = conexion.prepareStatement(consulta)) {
 			int parameterIndex = 1;
 			stmt.setString(parameterIndex++, item.getCodigo());
 			stmt.setString(parameterIndex++, item.getNombre());
@@ -324,7 +322,7 @@ public class ModeloBaremacionItems {
 	 * @throws SQLException .
 	 * @throws UVException .
 	 */
-	public void desactivarItem(ItemBaremacion item) throws SQLException, UVException {
+	public void desactivarItem(ItemBaremacion item) throws SQLException {
 		this.activaDesactivaItem(item, false);
 	}
 	
@@ -334,7 +332,7 @@ public class ModeloBaremacionItems {
 	 * @throws SQLException .
 	 * @throws UVException .
 	 */
-	public void activarItem(ItemBaremacion item) throws SQLException, UVException {
+	public void activarItem(ItemBaremacion item) throws SQLException {
 		this.activaDesactivaItem(item, true);
 	}
 
@@ -354,7 +352,7 @@ public class ModeloBaremacionItems {
 				+ " (CODIGO,NOMBRE,DESCRIPCION,BEPBLO_CODNUM,UNIDADES,VALOR,VALOR_MINIMO,VALOR_MAXIMO,AFINIDAD,INDIVIDUALIZADO)"
 				+ " VALUES (?,?,?,?,?,?,?,?,?,?)";
 		
-		try (Connection conexion = ConexionUvirtual.obtenerInstancia(); PreparedStatement stmt = conexion.prepareStatement(consulta);) {
+		try (Connection conexion = ConexionUvirtual.obtenerInstancia(); PreparedStatement stmt = conexion.prepareStatement(consulta)) {
 			int parameterIndex = 1;
 			stmt.setString(parameterIndex++, item.getCodigo());
 			stmt.setString(parameterIndex++, item.getNombre());
@@ -388,7 +386,7 @@ public class ModeloBaremacionItems {
 				+ "INNER JOIN TBEP_BLOQUESBAREMACION bepblo ON bepblo.CODNUM = bepite.BEPBLO_CODNUM "
 				+ "WHERE bepblo.BEPAPA_CODNUM = ? ";
 		
-		try (Connection conexion = ConexionUvirtual.obtenerInstancia(); PreparedStatement stmt = conexion.prepareStatement(consulta);
+		try (Connection conexion = ConexionUvirtual.obtenerInstancia(); PreparedStatement stmt = conexion.prepareStatement(consulta)
 		) {
 			int indexParam = 1;
 			stmt.setInt(indexParam, apartado.getCodNum());
@@ -417,15 +415,15 @@ public class ModeloBaremacionItems {
 	private List<ItemBaremacion> listaItemBaremacion(String clausula) throws SQLException, UVException {
 		List<ItemBaremacion> items = new ArrayList<>();
 		String consulta = "SELECT bepite.* FROM TBEP_ITEMSBAREMACION bepite " + clausula;
-		
+
 		try (Connection conexion = ConexionUvirtual.obtenerInstancia();
-			PreparedStatement stmt = conexion.prepareStatement(consulta);) {
-				try (ResultSet rs = stmt.executeQuery()) {
-					while (rs.next()) {
-						items.add(this.createItemFromResultSet(rs));
-					}
+				PreparedStatement stmt = conexion.prepareStatement(consulta)) {
+			try (ResultSet rs = stmt.executeQuery()) {
+				while (rs.next()) {
+					items.add(this.createItemFromResultSet(rs));
 				}
 			}
+		}
 		return items;
 	}
 	
@@ -436,20 +434,20 @@ public class ModeloBaremacionItems {
 		item.setCodigo(rs.getString(CODIGO));
 		item.setNombre(rs.getString("NOMBRE"));
 		item.setDescripcion(rs.getString("DESCRIPCION"));
-		item.setActivo(rs.getString("FLGACTIVO").equals("S"));		
+		item.setActivo("S".equals(rs.getString("FLGACTIVO")));		
 		item.setUnidades(rs.getString("UNIDADES"));
 		item.setValor(rs.getFloat("VALOR"));
 		item.setValorMinimo(rs.getFloat("VALOR_MINIMO"));
 		item.setValorMaximo(rs.getFloat("VALOR_MAXIMO"));
 		item.setAfinidad(rs.getString("AFINIDAD"));
-		item.setIndividualizado(rs.getString("INDIVIDUALIZADO").equals("S"));
+		item.setIndividualizado("S".equals(rs.getString("INDIVIDUALIZADO")));
 		return item;
 	}
 	
-	private void activaDesactivaItem(ItemBaremacion item, Boolean activo) throws SQLException, UVException {
+	private void activaDesactivaItem(ItemBaremacion item, Boolean activo) throws SQLException {
 		String consulta = "UPDATE TBEP_ITEMSBAREMACION SET FLGACTIVO = ? WHERE CODNUM = ?";
 		
-		try (Connection conexion = ConexionUvirtual.obtenerInstancia(); PreparedStatement stmt = conexion.prepareStatement(consulta);) {
+		try (Connection conexion = ConexionUvirtual.obtenerInstancia(); PreparedStatement stmt = conexion.prepareStatement(consulta)) {
 			int parameterIndex = 1;
 			
 			stmt.setString(parameterIndex++, activo ? "S" : "N");
@@ -463,7 +461,7 @@ public class ModeloBaremacionItems {
 			throw new UVException("Ya existe un item con el código introducido");
 		}
 		
-		ArrayList<String> unidades = new ArrayList<String>();
+		ArrayList<String> unidades = new ArrayList<>();
 		unidades.add(ITEM_UNIDADES_MEDICION_ENTERO);
 		unidades.add(ITEM_UNIDADES_MEDICION_DECIMAL);
 		unidades.add(ITEM_UNIDADES_MEDICION_SINO);
@@ -499,7 +497,7 @@ public class ModeloBaremacionItems {
 		
 		sql += " FETCH FIRST 1 ROW ONLY";
 		
-		try (Connection con = ConexionUvirtual.obtenerInstancia(); PreparedStatement stmt = con.prepareStatement(sql);) {
+		try (Connection con = ConexionUvirtual.obtenerInstancia(); PreparedStatement stmt = con.prepareStatement(sql)) {
 			int parameterIndex = 1;
 			stmt.setInt(parameterIndex++, item.getBloqueBaremacion().getCodNum());
 			stmt.setString(parameterIndex++, item.getCodigo());
@@ -524,25 +522,16 @@ public class ModeloBaremacionItems {
 	 * @throws SQLException .
 	 * @throws UVException .
 	 */
-	public void asignarItemsExcluyentesAItem(ItemBaremacion itemPadre, ItemBaremacion itemHijo) throws SQLException, UVException {
-		try (Connection conexion = ConexionUvirtual.obtenerInstancia();) {
-			conexion.setAutoCommit(false);
-			
-			String consulta = "INSERT INTO TBEP_MERITOS_EXCLUYENTES (BEPITE_CODNUM_PADRE, BEPITE_CODNUM_HIJO) "
-					+ " VALUES (?,?)";
+	public void asignarItemsExcluyentesAItem(ItemBaremacion itemPadre, ItemBaremacion itemHijo) throws SQLException {
+		try (Connection conexion = ConexionUvirtual.obtenerInstancia()) {			
+			String consulta = "INSERT INTO TBEP_MERITOS_EXCLUYENTES (BEPITE_CODNUM_PADRE, BEPITE_CODNUM_HIJO) VALUES (?,?)";
 			
 			try (PreparedStatement stmt = conexion.prepareStatement(consulta)) {
 				int indexParam = 1;
 				stmt.setInt(indexParam++, itemPadre.getCodNum());
 				stmt.setInt(indexParam++, itemHijo.getCodNum());
 				stmt.executeUpdate();
-			} catch (SQLException e) {
-				if (conexion != null) { 
-					conexion.rollback();
-				}
-				throw e;
 			}
-			conexion.commit();
 		}
 	}
 	
@@ -553,10 +542,8 @@ public class ModeloBaremacionItems {
 	 * @throws SQLException .
 	 * @throws UVException .
 	 */
-	public void borrarItemsExcluyentesAItem(ItemBaremacion itemPadre, ItemBaremacion itemHijo) throws SQLException, UVException {
-		try (Connection conexion = ConexionUvirtual.obtenerInstancia();) {
-			conexion.setAutoCommit(false);
-		
+	public void borrarItemsExcluyentesAItem(ItemBaremacion itemPadre, ItemBaremacion itemHijo) throws SQLException {
+		try (Connection conexion = ConexionUvirtual.obtenerInstancia()) {			
 			String consulta = "DELETE FROM TBEP_MERITOS_EXCLUYENTES bepmex "
 				+ " WHERE BEPITE_CODNUM_PADRE = ? AND "
 				+ " BEPITE_CODNUM_HIJO = ?";
@@ -566,13 +553,7 @@ public class ModeloBaremacionItems {
 				stmt.setInt(indexParam++, itemPadre.getCodNum());
 				stmt.setInt(indexParam++, itemHijo.getCodNum());
 				stmt.executeUpdate();
-			} catch (SQLException e) {
-				if (conexion != null) { 
-					conexion.rollback();
-				}
-				throw e;
 			}
-			conexion.commit();
 		}
 	}
 }

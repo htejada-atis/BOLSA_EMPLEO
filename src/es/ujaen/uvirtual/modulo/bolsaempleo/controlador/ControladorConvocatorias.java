@@ -4,7 +4,6 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.sql.SQLException;
 import java.util.logging.Logger;
-import java.util.Date;
 import java.util.logging.Level;
 
 import javax.servlet.ServletException;
@@ -27,6 +26,7 @@ import es.ujaen.uvirtual.modulo.bolsaempleo.modelo.ModeloBolsa;
 import es.ujaen.uvirtual.modulo.bolsaempleo.modelo.ModeloConvocatoria;
 import es.ujaen.uvirtual.modulo.bolsaempleo.modelo.ModeloUsuarioBolsaEmpleo;
 import es.ujaen.uvirtual.modulo.bolsaempleo.utilidades.BolsaEmpleoDataTable;
+import es.ujaen.uvirtual.modulo.bolsaempleo.utilidades.BolsaEmpleoUtils;
 import es.ujaen.uvirtual.modulo.bolsaempleo.vistas.VistaConvocatorias;
 import es.ujaen.uvirtual.utilidades.EscapaHTML;
 import es.ujaen.uvirtual.utilidades.Formateador;
@@ -330,7 +330,7 @@ public class ControladorConvocatorias extends HttpServlet {
 		}
 		
 		c.setFechaCierre(Formateador.leeParametroFecha(request.getParameter(PARAM_CONVOCATORIA_FECHACIERRE), Formateador.FORMATO_FECHA_DDMMYYYY, "/"));
-		if (c.getFechaCierre().before(new Date())) {
+		if (c.getFechaCierre().before(BolsaEmpleoUtils.getCurrentDate())) {
 			throw new UVException(MENSAJE_ERROR_FECHACIERRE_MINIMA);
 		}
 		

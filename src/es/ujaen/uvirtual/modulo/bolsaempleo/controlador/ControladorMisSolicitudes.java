@@ -10,7 +10,6 @@ import java.io.PrintWriter;
 import java.sql.SQLException;
 import java.util.logging.Logger;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -840,7 +839,7 @@ public class ControladorMisSolicitudes extends HttpServlet {
 		bean.setListaBolsasSolicitud(listaBolsas);
 		
 		solicitud.setEstado(ModeloSolicitud.SOLICITUD_ESTADO_CERRADA);
-		solicitud.setFechaConfirmacion(new Date());
+		solicitud.setFechaConfirmacion(BolsaEmpleoUtils.getCurrentDate());
 		solicitud.setArchivo(generarPDF(bean, solicitud, listaBolsas));
 		
 		modeloSolicitud.confirmacionSolicitud(solicitud);

@@ -193,7 +193,7 @@ public class ControladorMisMeritos extends HttpServlet {
 	 * @throws ServletException .
 	 * @throws IOException .
 	 */
-	private void listaMeritos(VistaMeritos bean) throws SQLException, UVException {
+	private void listaMeritos(VistaMeritos bean) throws SQLException {
 		bean.setVista(RUTA_BEP_MERITOS + "index.jsp");
 		
 		ModeloBaremacionApartados modeloBaremacion = ModeloBaremacionApartados.obtenerInstancia();
@@ -389,7 +389,7 @@ public class ControladorMisMeritos extends HttpServlet {
 		}		
 	}
 	
-	private Float validateValorDelMerito(HttpServletRequest request, Merito merito) throws UVException, SQLException {
+	private Float validateValorDelMerito(HttpServletRequest request, Merito merito) throws UVException {
 		// chequeo tipo de valor
 		String valorStr = request.getParameter(PARAM_VALOR);
 		switch (merito.getItemBaremacion().getUnidades()) {
