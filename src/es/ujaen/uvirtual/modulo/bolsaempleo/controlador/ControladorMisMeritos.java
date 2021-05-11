@@ -227,7 +227,7 @@ public class ControladorMisMeritos extends HttpServlet {
 				
 				// TODO: un metodo en ModeloUsuarioBolsaEmpleo para obtener un usuario adecuadamente
 				Usuario usuArcos = datos.getUsuario();
-				Integer idUsuario = ModeloUsuarioBolsaEmpleo.obtenerInstancia().listaUsuario(usuArcos.getUid()).getCodNum();
+				Integer idUsuario = ModeloUsuarioBolsaEmpleo.obtenerInstancia().listaUsuario(usuArcos.getDocumentoNumero()).getCodNum();
 				ModeloMerito.obtenerInstancia().insertaMerito(merito, idUsuario);
 							
 				HttpSession session = request.getSession(false);
@@ -312,7 +312,7 @@ public class ControladorMisMeritos extends HttpServlet {
 			try {
 				Usuario usuArcos = datos.getUsuario();
 				ModeloUsuarioBolsaEmpleo modeloUsuarioBolsaEmpleo = ModeloUsuarioBolsaEmpleo.obtenerInstancia();
-				Integer idUsuario = modeloUsuarioBolsaEmpleo.listaUsuario(usuArcos.getUid()).getCodNum();
+				Integer idUsuario = modeloUsuarioBolsaEmpleo.listaUsuario(usuArcos.getDocumentoNumero()).getCodNum();
 				BolsaEmpleoDataTable<Merito> dataTable = modelo.listaMeritosDatatable(request.getParameterMap(), idUsuario);
 				bean.setDatatable(dataTable);
 				Gson gson = new GsonBuilder().setExclusionStrategies(BolsaEmpleoDataTable.GSONEXCLUSIONSTRATEGY).create();
@@ -333,8 +333,12 @@ public class ControladorMisMeritos extends HttpServlet {
 		merito.setArchivo(this.validateFicheroMerito(uploadedFile));
 		BolsaEmpleoUtils.checkFileSize(merito.getArchivo());
 		
+		// item de baremación
+		ItemBaremacion item = ModeloBaremacion.obtenerInstancia().getItemBaremacionById(Formateador.leeParametroInteger(request.getParameter(PARAM_ITEM)));
+		merito.setItemBaremacion(item);
+		
 		// valor
-		merito = this.validateValorDelMerito(request, new Merito());
+		merito.setValor(this.validateValorDelMerito(request, merito));
 				
 		// descripcion
 		merito.setDescripcion(EscapaHTML.ajustaCodificacion(request.getParameter(PARAM_DESCRIPCION)));
@@ -353,6 +357,7 @@ public class ControladorMisMeritos extends HttpServlet {
 		
 		return merito;
 	}
+	
 	
 	private InputStream validateFicheroMerito(Part uploadedFile) throws UVException {
 		// TODO: mover estos chequeos a BolsaEmpleoUtils
@@ -383,14 +388,10 @@ public class ControladorMisMeritos extends HttpServlet {
 		}		
 	}
 	
-	private Merito validateValorDelMerito(HttpServletRequest request, Merito merito) throws UVException, SQLException {
-		// item de baremación
-		ItemBaremacion item = ModeloBaremacion.obtenerInstancia().getItemBaremacionById(Formateador.leeParametroInteger(PARAM_ITEM));
-		merito.setItemBaremacion(item);
-		
+	private Float validateValorDelMerito(HttpServletRequest request, Merito merito) throws UVException, SQLException {
 		// chequeo tipo de valor
 		String valorStr = request.getParameter(PARAM_VALOR);
-		switch (item.getUnidades()) {
+		switch (merito.getItemBaremacion().getUnidades()) {
 			case ModeloBaremacion.ITEM_UNIDADES_MEDICION_SINO:
 				merito.setValor((float) 1);
 				break;
@@ -413,14 +414,14 @@ public class ControladorMisMeritos extends HttpServlet {
 		if (valor == null) {
 			throw new UVException("El valor no es válido");
 		}
-		if (valor < item.getValorMinimo()) {
-			throw new UVException(String.format(MENSAJE_ERROR_VALOR_MINIMO_PERMITIDO, item.getValorMinimo()));
+		if (valor < merito.getItemBaremacion().getValorMinimo()) {
+			throw new UVException(String.format(MENSAJE_ERROR_VALOR_MINIMO_PERMITIDO, merito.getItemBaremacion().getValorMinimo()));
 		}
-		if (valor > item.getValorMaximo()) {
-			throw new UVException(String.format(MENSAJE_ERROR_VALOR_MAXIMO_PERMITIDO, item.getValorMaximo()));
+		if (valor > merito.getItemBaremacion().getValorMaximo()) {
+			throw new UVException(String.format(MENSAJE_ERROR_VALOR_MAXIMO_PERMITIDO, merito.getItemBaremacion().getValorMaximo()));
 		}
 		merito.setValor(valor);
 		
-		return merito;
+		return merito.getValor();
 	}
 }

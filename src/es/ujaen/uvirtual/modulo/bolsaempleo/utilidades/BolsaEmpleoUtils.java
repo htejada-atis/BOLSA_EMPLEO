@@ -100,7 +100,7 @@ public class BolsaEmpleoUtils {
 			return false;
 		}
 		
-		String regex = "[0-9]+(,[0-9]+)?";
+		String regex = "[-+]?[0-9]*\\.?[0-9]+";
 		Pattern p = Pattern.compile(regex);
 		Matcher m = p.matcher(value);
 

@@ -283,11 +283,14 @@ public class ControladorMisTitulaciones extends HttpServlet {
 				
 		bean.setVista(RUTA_BEP_CONF + "formMisTitulaciones.jsp");
 		
+		Integer codNum = Formateador.leeParametroInteger(request.getParameter(PARAM_ID));		
+		Titulacion titulacionCont = modelo.listaTitulacion(codNum);
+		
 		Part uploadedFile = request.getPart(PARAM_ARCHIVO);
 		
 		if (uploadedFile != null) {
 			Titulacion titulacion = this.validarTitulacion(request, uploadedFile);
-			titulacion.setTitulacion(titulacion);
+			titulacion.setTitulacion(titulacionCont);
 			titulacion.setUsuario(usu);
 				
 			modelo.insertaTitulacionUsuario(titulacion);
