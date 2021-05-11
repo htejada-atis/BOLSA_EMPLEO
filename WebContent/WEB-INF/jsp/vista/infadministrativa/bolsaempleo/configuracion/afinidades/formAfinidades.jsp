@@ -28,6 +28,8 @@ Afinidad afinidad = bean.getAfinidad();
 	<% } %>
 	
 	<h2><%= afinidad != null ? "Editar afinidad" : "Nueva afinidad" %></h2>
+	
+	<p>Las etiquetas en <b>negrita</b> corresponden a campos de relleno obligatorio</p>
 		
 	<form id="afinidad_form" class="be-form" method="post" action="<%= request.getRequestURI() %>">
     	<input type="hidden" name="<%= ControladorAfinidades.PARAM_ACCION %>" id="accion_formulario" value="<%= afinidad != null ? ControladorAfinidades.ACCION_MODIFICAR_AFINIDAD : ControladorAfinidades.ACCION_AGREGAR_AFINIDAD %>" />
@@ -45,20 +47,22 @@ Afinidad afinidad = bean.getAfinidad();
 
     	<div class="form-group-container col2">
 	   		<div class="form-group">
-    			<label for="codigo">Código: </label>
+    			<label for="codigo" class="bold-label">Código: </label>
     			<input id="codigo" 
     				   class="form-input-custom" 
     				   type="text"    				   
     				   name="<%= ControladorAfinidades.PARAM_CODIGO %>" 
-    				   value="<%= BolsaEmpleoUtils.getParamForm(request, ControladorAfinidades.PARAM_CODIGO, afinidad != null ? afinidad.getCodigo() : "") %>"/>
+    				   value="<%= BolsaEmpleoUtils.getParamForm(request, ControladorAfinidades.PARAM_CODIGO, afinidad != null ? afinidad.getCodigo() : "") %>"
+    				   required/>
     		</div>
     		<div class="form-group">
-    			<label for="modulacion">Modulación </label>
+    			<label for="modulacion" class="bold-label">Modulación: </label>
     			<input id="modulacion" 
     				   class="form-input-custom" 
     				   type="text"    				   
     				   name="<%= ControladorAfinidades.PARAM_MODULACION %>" 
-    				   value="<%= afinidad != null ? afinidad.getModulacion() : "" %>"/>
+    				   value="<%= afinidad != null ? afinidad.getModulacion() : "" %>"
+    				   required>
     		</div>
     	</div>
     	
@@ -70,27 +74,3 @@ Afinidad afinidad = bean.getAfinidad();
     	</div>
     </form>
 </div>
-
-<script>
-
-	$(document).ready(function() {				
-		document.getElementById("convocatoria_enviar").addEventListener("click", function(event) {
-			enviarConvocatoria(event, this);
-		});
-	})
-	
-	function enviarConvocatoria(event, submit_input) {
-		event.preventDefault();
-	
-		<% if(bean.getAfinidad() != null) { %>
-				input_accion = document.getElementById("accion_formulario");
-				input_accion.value = '<%= ControladorAfinidades.ACCION_MODIFICAR_AFINIDAD %>';
-				input_id = document.getElementById("afinidad_id");
-				input_id.value = '<%= bean.getAfinidad().getCodNum() %>';
-		<%}%>
-	
-		submit_input.form.submit();
-	}
-
-
-</script>

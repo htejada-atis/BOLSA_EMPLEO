@@ -870,8 +870,12 @@ public class ControladorMisSolicitudes extends HttpServlet {
 		Solicitud solicitud = modeloSolicitud.getSolicitudByIdArchivo(Formateador.leeParametroInteger(request.getParameter(PARAM_SOLICITUD_ID)));
 		bean.setSolicitud(solicitud);
 		
-		if (bean.getCandidato().getCodNum().equals(solicitud.getUsuario().getCodNum())) {
+		if (!bean.getCandidato().getCodNum().equals(solicitud.getUsuario().getCodNum())) {
 			throw new UVException("No tienes permisos");
+		}
+		
+		if (solicitud.getArchivo() == null) {
+			throw new UVException("El archivo no existe");
 		}
         
 		try (ServletOutputStream stream = response.getOutputStream(); BufferedInputStream buf = new BufferedInputStream(solicitud.getArchivo())) {
@@ -897,9 +901,10 @@ public class ControladorMisSolicitudes extends HttpServlet {
 	 * @throws UVException .
 	 */
 	public InputStream generarPDF(VistaSolicitudes bean, Solicitud solicitud, List<BolsaSolicitud> bolsasSolicitud) throws UVException {
+		ByteArrayOutputStream out = new ByteArrayOutputStream();
+		
 		try (Document document = new Document()) {
 			// create a PDF writer instance and pass output stream
-			ByteArrayOutputStream out = new ByteArrayOutputStream();
 			PdfWriter.getInstance(document, out);
 
 			document.open();
@@ -925,11 +930,11 @@ public class ControladorMisSolicitudes extends HttpServlet {
 			for (BolsaSolicitud bolsa: bolsasSolicitud) {
 				this.generarPDFArea(bolsa, bolsasSolicitud, document);
 			}
-			
-			return new ByteArrayInputStream(out.toByteArray());
 		} catch (Exception exp) {
 			throw new UVException("Error generando pdf, consulte con los administradores");
 		}
+		
+		return new ByteArrayInputStream(out.toByteArray());
 	}
 	
 	private void generarPDFArea(BolsaSolicitud bolsa, List<BolsaSolicitud> bolsasSolicitud, Document document) {
@@ -968,7 +973,7 @@ public class ControladorMisSolicitudes extends HttpServlet {
 		lista.add("Área - " + bolsa.getArea().getDescripcion());
 
 		document.add(lista);
-		document.add(table);	
+		document.add(table);
 	}
 	
 	private void generarPDFAreaHeader(Table table) {

@@ -30,12 +30,14 @@ VistaTitulaciones bean = (VistaTitulaciones) uvdatos.getVistas().get(VistaTitula
 	%>
 	
     <form id="agregar_titulacion" class="be-form" method="post" action="<%=request.getRequestURI()%>">
-    	<input type="hidden" name="<%= ControladorGestionTitulaciones.PARAM_ACCION %>" id="accion_formulario" value="" />
-    	<input type="hidden" name="<%= ControladorGestionTitulaciones.PARAM_ID%>" id="titulacion_id" value="" />
+    	<input type="hidden" name="<%= ControladorGestionTitulaciones.PARAM_ACCION %>" id="accion_formulario" 
+    			value="<%= bean.getTitulacion() != null ? ControladorGestionTitulaciones.ACCION_EDITAR_TITULACION : ControladorGestionTitulaciones.ACCION_AGREGAR_TITULACION %>" />
+    	<input type="hidden" name="<%= ControladorGestionTitulaciones.PARAM_ID%>" id="titulacion_id" 
+    			value="<%= bean.getTitulacion() != null ? bean.getTitulacion().getCodNum() : "" %>" />
     	<div class="form-group-container col1">
 	    	<div class="form-group">
 	    		<label for="titulacion_nombre">Nombre</label>
-	    		<input class="form-input-custom" id="titulacion_nombre" name="<%=ControladorGestionTitulaciones.PARAM_NOMBRE%>" value="<%= nombre %>"/>
+	    		<input class="form-input-custom" id="titulacion_nombre" name="<%=ControladorGestionTitulaciones.PARAM_NOMBRE%>" value="<%= nombre %>" required/>
 	    	</div>
     	</div>
     	<div class="form-btn">
@@ -45,31 +47,3 @@ VistaTitulaciones bean = (VistaTitulaciones) uvdatos.getVistas().get(VistaTitula
     </form>
     
 </div>
-
-<script>
-
-	function enviarTitulacion(event, submit_input) {
-		event.preventDefault();
-		
-		<% if(bean.getTitulacion() != null) { %>
-			input_accion = document.getElementById("accion_formulario");
-			input_accion.value = '<%= ControladorGestionTitulaciones.ACCION_EDITAR_TITULACION %>';
-			input_id = document.getElementById("titulacion_id");
-			input_id.value = '<%= bean.getTitulacion().getCodNum() %>';
-		<% } else { %>
-			input_accion = document.getElementById("accion_formulario");
-			input_accion.value = '<%= ControladorGestionTitulaciones.ACCION_AGREGAR_TITULACION %>';
-		<% } %>
-		
-		submit_input.form.submit();
-	}
-
-	$(document).ready(function() {
-		
-		document.getElementById("titulacion_enviar").addEventListener("click", function(event) {
-			enviarTitulacion(event, this);
-		});
-		
-	});
-
-</script>

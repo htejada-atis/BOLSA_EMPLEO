@@ -52,8 +52,10 @@ VistaTitulaciones bean = (VistaTitulaciones) uvdatos.getVistas().get(VistaTitula
 	</table>
 	
 	<form id="agregar_titulacion_usuario" class="be-form" method="post" action="<%= request.getRequestURI() %>" enctype="multipart/form-data">
-    	<input type="hidden" name="<%= ControladorMisTitulaciones.PARAM_ACCION %>" id="accion_formulario" value="" />
-		<input type="hidden" name="<%= ControladorMisTitulaciones.PARAM_ID%>" id="titulacion_id" value="" />
+    	<input type="hidden" name="<%= ControladorMisTitulaciones.PARAM_ACCION %>" id="accion_formulario" 
+    			value="<%= ControladorMisTitulaciones.ACCION_AGREGAR_TITULACION %>" />
+		<input type="hidden" name="<%= ControladorMisTitulaciones.PARAM_ID%>" id="titulacion_id" 
+				value="<%= bean.getTitulacion() != null ? bean.getTitulacion().getCodNum() : "" %>" />
 		<div class="form-group">
     		<label for="razon_exclusion">Descripción</label>
     		<textarea class="params form-input-custom" id="descripcion" name="<%= ControladorMisTitulaciones.PARAM_DESCRIPCION %>" rows="3" cols="60"></textarea>
@@ -61,38 +63,18 @@ VistaTitulaciones bean = (VistaTitulaciones) uvdatos.getVistas().get(VistaTitula
    		
 	    	<div class="form-file">
 				<label for="fichero_archivo" class="bold-label">Fichero:</label>
-				<input id="fichero_archivo" type="file" name="<%= ControladorMisTitulaciones.PARAM_ARCHIVO %>"/>
+				<input id="fichero_archivo" type="file" name="<%= ControladorMisTitulaciones.PARAM_ARCHIVO %>" required/>
 			</div>
 		
     	<div class="form-btn">
-    		<input id="agregar_titulacion" type="submit" name="<%= ControladorMisTitulaciones.ACCION_AGREGAR_TITULACION %>"/>
+    		<input id="agregar_titulacion" type="submit" name="<%= ControladorMisTitulaciones.ACCION_AGREGAR_TITULACION %>" value="Enviar titulación"/>
     	</div>
     </form>
 </div>
 
 <script>
 
-function agregarTitulacion(event, submit_input) {
-	event.preventDefault();
-
-	document.getElementById("agregar_titulacion").disabled=true;
-	
-	input_accion = document.getElementById("accion_formulario");
-	input_accion.value = '<%= ControladorMisTitulaciones.ACCION_AGREGAR_TITULACION %>';
-	
-	<%if(bean.getTitulacion()!=null){%>
-		input_id = document.getElementById("titulacion_id");
-		input_id.value = '<%= bean.getTitulacion().getCodNum() %>';
-	<%}%>
-
-	submit_input.form.submit();
-}
-
 $(document).ready(function() {
-
-	document.getElementById("agregar_titulacion").addEventListener("click", function(event) {
-		agregarTitulacion(event, this);
-	});
 
 	var table_titulaciones = new Atis.DataTable('#tableTitulaciones', {
 		"ajax": { url: "<%=ControladorMisTitulaciones.URL_PATTERN_AJAX%>", async: false },

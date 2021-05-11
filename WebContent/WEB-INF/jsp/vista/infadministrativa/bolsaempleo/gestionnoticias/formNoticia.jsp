@@ -41,8 +41,10 @@ Boolean publica = noticia != null ? noticia.isPublica() : false;
     <p>Las etiquetas en <b>negrita</b> corresponden a campos de relleno obligatorio</p>
     
     <form id="actualizar_noticia" class="be-form" method="post" action="<%= request.getRequestURI() %>">
-    	<input type="hidden" name="<%= ControladorGestionNoticias.PARAM_ACCION %>" id="accion_formulario" value="" />
-		<input type="hidden" name="<%= ControladorGestionNoticias.PARAM_ID%>" id="noticia_id" value="" />
+    	<input type="hidden" name="<%= ControladorGestionNoticias.PARAM_ACCION %>" id="accion_formulario" 
+    			value="<%= noticia != null ? ControladorGestionNoticias.ACCION_EDITAR_NOTICIA : ControladorGestionNoticias.ACCION_AGREGAR_NOTICIA %>" />
+		<input type="hidden" name="<%= ControladorGestionNoticias.PARAM_ID%>" id="noticia_id" 
+				value="<%= noticia != null ? noticia.getCodNum() : "" %>" />
 		<div class="form-group-container col1">
 			<div class="form-group">
 	    		<label for="noticia_texto" class="bold-label">Texto:</label>
@@ -56,11 +58,13 @@ Boolean publica = noticia != null ? noticia.isPublica() : false;
 	    	</div>
 	    	<div class="form-group">
 	    		<label for="noticia_fecha"><b>Fecha</b>:</label>
-	    		<input class="form-input-custom" type="text" name="<%= ControladorGestionNoticias.PARAM_FECHA %>" id="noticia_fecha" autocomplete="off" value="<%= fecha %>"/>
+	    		<input class="form-input-custom" type="text" name="<%= ControladorGestionNoticias.PARAM_FECHA %>" id="noticia_fecha" autocomplete="off" 
+	    		value="<%= fecha %>" required/>
 	    	</div>
     	</div>
     	<div class="form-check">
-    		<label for="noticia_publica" class="bold-label"><input type="checkbox" id="noticia_publica" name="<%= ControladorGestionNoticias.PARAM_PUBLICA %>" value="<%= publica %>" <%= (publica ? "checked=''" : "") %>/>Pública</label>
+    		<label for="noticia_publica" class="bold-label"><input type="checkbox" id="noticia_publica" name="<%= ControladorGestionNoticias.PARAM_PUBLICA %>" 
+    		value="<%= publica %>" <%= (publica ? "checked=''" : "") %> />Pï¿½blica</label>
     	</div>
     	<div class="form-btn">
     		<input id="noticia_enviar" type="submit" name="<%= ControladorGestionNoticias.PARAM_ENVIAR %>" value="<%= noticia != null ? "Guardar cambios" : "Insertar noticia" %>"/>
@@ -117,10 +121,6 @@ Boolean publica = noticia != null ? noticia.isPublica() : false;
 
 	$(document).ready(function() {
 		$("#noticia_fecha").datepicker();
-		
-		document.getElementById("noticia_enviar").addEventListener("click", function(event) {
-			enviarNoticia(event, this);
-		});
 		
 		<% if (noticia == null) { %>
 			document.getElementById("noticia_fecha").value = getTodayDate();

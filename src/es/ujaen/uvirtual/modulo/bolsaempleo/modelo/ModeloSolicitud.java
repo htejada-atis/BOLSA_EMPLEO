@@ -6,7 +6,6 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import es.ujaen.uvirtual.modelo.conexion.ConexionUvirtual;
@@ -39,6 +38,7 @@ public class ModeloSolicitud {
 	public static final String MENSAJE_ERROR_CONVOCATORIA_NO_ABIERTA = "La convocatoria no está abierta";
 	public static final String MENSAJE_ERROR_SOLICITUDES_ABIERTAS = "Ya existen solicitides abiertas";
 	public static final String MENSAJE_ERROR_SOLICITUDE_NO_EXISTE = "No existe la solicitud";
+	public static final String MENSAJE_ERROR_NO_EXISTE_MERITO_SOLICITUD = "No existe el merito de la solicitud";
 
 	public static final int ORDER_COLUMN_INDEX_MERITOS_ID_MERITO = 1;
 	public static final int ORDER_COLUMN_INDEX_MERITOS_ITEM_CODIGO = 2;
@@ -46,8 +46,14 @@ public class ModeloSolicitud {
 	public static final int ORDER_COLUMN_INDEX_MERITOS_VALOR = 4;
 	public static final int ORDER_COLUMN_INDEX_MERITOS_AFINIDAD = 5;
 	public static final int ORDER_COLUMN_INDEX_MERITOS_EXCLUIDO = 6;
-
-	protected static ModeloSolicitud eInstancia = null;
+	
+	public static final String CODNUM = "CODNUM";
+	public static final String BEPBOL_CODNUM = "BEPBOL_CODNUM";
+	public static final String BEPMER_CODNUM = "BEPMER_CODNUM";
+	public static final String FLGEXCLUIDO = "FLGEXCLUIDO";
+	public static final String S = "S";
+		
+	protected static ModeloSolicitud eInstancia;
 	
 	/** Crea una instancia del objeto.
 	 *  de forma sincronizada para protegerse de posibles problemas multi-hilo
@@ -80,7 +86,7 @@ public class ModeloSolicitud {
 	public BolsaEmpleoDataTable<Solicitud> listaSolicitudesDatatable(UsuarioBolsaEmpleo usuario, Map<String, String[]> params) throws SQLException, UVException {
 		ModeloConvocatoria modeloConvocatoria = ModeloConvocatoria.obtenerInstancia(); 
 		List<Solicitud> data = new ArrayList<>();
-		BolsaEmpleoDataTable<Solicitud> dataTable = new BolsaEmpleoDataTable<Solicitud>(params);
+		BolsaEmpleoDataTable<Solicitud> dataTable = new BolsaEmpleoDataTable<>(params);
 		
 		String consulta =
 			"SELECT bepcon.CODNUM, bepcon.DESCRIPCION, bepcon.FECHACIERRE, bepcon.ESTADO ESTADO_CONVOCATORIA, "
@@ -94,16 +100,16 @@ public class ModeloSolicitud {
 				
 		try (Connection conexion = ConexionUvirtual.obtenerInstancia();
 				PreparedStatement stmtCount = conexion.prepareStatement(dataTable.getQueryCount());
-				PreparedStatement stmt = conexion.prepareStatement(dataTable.getQuery());
+				PreparedStatement stmt = conexion.prepareStatement(dataTable.getQuery())
 		) {				
 			stmt.setInt(1, usuario.getCodNum());
 			stmtCount.setInt(1, usuario.getCodNum());
 			
 			try (ResultSet rs = stmt.executeQuery()) {
 				while (rs.next()) {
-					Convocatoria convocatoria = modeloConvocatoria.getConvocatoriaById(rs.getInt("CODNUM"));
+					Convocatoria convocatoria = modeloConvocatoria.getConvocatoriaById(rs.getInt(CODNUM));
 					if (convocatoria == null) {
-						throw new UVException("No existe la convocatoria con id " + rs.getInt("CODNUM"));
+						throw new UVException("No existe la convocatoria con id " + rs.getInt(CODNUM));
 					}
 					
 					Solicitud solicitud = new Solicitud();
@@ -137,14 +143,14 @@ public class ModeloSolicitud {
 			  + "AND bepsol.BEPUSU_CODNUM = ? ";
 		
 		try (Connection conexion = ConexionUvirtual.obtenerInstancia(); 
-				PreparedStatement stmt = conexion.prepareStatement(consulta);) {
+				PreparedStatement stmt = conexion.prepareStatement(consulta)) {
 			
 			int paramIndex = 1;
 			stmt.setString(paramIndex++, SOLICITUD_ESTADO_ABIERTA);
 			stmt.setInt(paramIndex++, convocatoria.getCodNum());			
 			stmt.setInt(paramIndex++, usuario.getCodNum());
 
-			try (ResultSet rs = stmt.executeQuery();) {
+			try (ResultSet rs = stmt.executeQuery()) {
 				if (rs.next() && rs.getInt("numero_solicitudes_abiertas") > 0) {
 					return true;	    			
 	    		}
@@ -176,7 +182,7 @@ public class ModeloSolicitud {
 			+ "VALUES (?, ?, ?)";
 		
 		try (Connection conexion = ConexionUvirtual.obtenerInstancia();
-				PreparedStatement stmt = conexion.prepareStatement(consulta, new String[]{"CODNUM"})) {
+				PreparedStatement stmt = conexion.prepareStatement(consulta, new String[]{CODNUM})) {
 		
 			int parameterIndex = 1;
 			stmt.setInt(parameterIndex++, usuario.getCodNum());
@@ -209,16 +215,16 @@ public class ModeloSolicitud {
 		String consulta = "SELECT bepsol.* FROM TBEP_SOLICITUDES bepsol WHERE bepsol.CODNUM = ?";
 			
 		try (Connection conexion = ConexionUvirtual.obtenerInstancia();
-				PreparedStatement stmt = conexion.prepareStatement(consulta);) {
+				PreparedStatement stmt = conexion.prepareStatement(consulta)) {
 			stmt.setInt(1, codNum);
 						
 			try (ResultSet rs = stmt.executeQuery()) {
 				if (!rs.next()) {
-					throw new UVException("No existe la solicitud");
+					throw new UVException(MENSAJE_ERROR_SOLICITUDE_NO_EXISTE);
 				}
 				
 				Solicitud solicitud = new Solicitud();
-				solicitud.setCodNum(rs.getInt("CODNUM"));
+				solicitud.setCodNum(rs.getInt(CODNUM));
 				solicitud.setConvocatoria(modeloConvocatoria.getConvocatoriaById(rs.getInt("BEPCON_CODNUM")));
 				solicitud.setEstado(rs.getString("ESTADO"));
 				solicitud.setUsuario(ModeloUsuarioBolsaEmpleo.obtenerInstancia().getUsuarioById(rs.getInt("BEPUSU_CODNUM")));
@@ -270,7 +276,7 @@ public class ModeloSolicitud {
 		ArrayList<Bolsa> bolsasExcluidas = listaBolsasSolicitudExcluidas(solicitud, bolsas);
 		ArrayList<Bolsa> bolsasAgregadas = listaBolsasSolicitudAgregadas(solicitud, bolsas);
 		
-		try (Connection conexion = ConexionUvirtual.obtenerInstancia();) {
+		try (Connection conexion = ConexionUvirtual.obtenerInstancia()) {
 			conexion.setAutoCommit(false);
 			
 			try {				
@@ -317,7 +323,7 @@ public class ModeloSolicitud {
 	 */
 	public List<Bolsa> getBolsasSolicitud(Solicitud solicitud) throws SQLException, UVException {
 		ModeloBolsa modeloBolsa = ModeloBolsa.obtenerInstancia();
-		ArrayList<Bolsa> bolsas = new ArrayList<Bolsa>();
+		ArrayList<Bolsa> bolsas = new ArrayList<>();
 		
 		String consulta = "SELECT bepsbo.* FROM TBEP_SOLICITUD_BOLSAS bepsbo WHERE bepsbo.BEPSOL_CODNUM = ?";
 		
@@ -327,7 +333,7 @@ public class ModeloSolicitud {
 			
 			try (ResultSet rs = stmt.executeQuery()) {
 				while (rs.next()) {
-					bolsas.add(modeloBolsa.getBolsaById(rs.getInt("BEPBOL_CODNUM")));
+					bolsas.add(modeloBolsa.getBolsaById(rs.getInt(BEPBOL_CODNUM)));
 				}				
 			}
 		}
@@ -344,7 +350,7 @@ public class ModeloSolicitud {
 	 */
 	public List<BolsaSolicitud> getBolsasSolicitudMeritos(Solicitud solicitud) throws SQLException, UVException {
 		ModeloBolsa modeloBolsa = ModeloBolsa.obtenerInstancia();
-		ArrayList<BolsaSolicitud> bolsas = new ArrayList<BolsaSolicitud>();
+		ArrayList<BolsaSolicitud> bolsas = new ArrayList<>();
 		
 		String consulta = "SELECT bepsbo.* FROM TBEP_SOLICITUD_BOLSAS bepsbo WHERE bepsbo.BEPSOL_CODNUM = ?";
 		
@@ -354,7 +360,7 @@ public class ModeloSolicitud {
 			
 			try (ResultSet rs = stmt.executeQuery()) {
 				while (rs.next()) {
-					Bolsa bolsa = modeloBolsa.getBolsaById(rs.getInt("BEPBOL_CODNUM"));
+					Bolsa bolsa = modeloBolsa.getBolsaById(rs.getInt(BEPBOL_CODNUM));
 					List<MeritoSolicitud> meritos = this.getMeritosSolicitudBolsa(solicitud, bolsa);
 					bolsas.add(new BolsaSolicitud(bolsa, meritos));
 				}				
@@ -375,7 +381,7 @@ public class ModeloSolicitud {
 	public BolsaEmpleoDataTable<BolsaSolicitudTable> listaBolsasSolicitudesDatatable(Solicitud solicitud, Map<String, String[]> params) throws SQLException, UVException {
 		ModeloBolsa modeloBolsa = ModeloBolsa.obtenerInstancia();
 		List<BolsaSolicitudTable> data = new ArrayList<>();
-		BolsaEmpleoDataTable<BolsaSolicitudTable> dataTable = new BolsaEmpleoDataTable<BolsaSolicitudTable>(params);
+		BolsaEmpleoDataTable<BolsaSolicitudTable> dataTable = new BolsaEmpleoDataTable<>(params);
 		
 		String consulta = ""
 				+ "SELECT "
@@ -388,14 +394,14 @@ public class ModeloSolicitud {
 				
 		try (Connection conexion = ConexionUvirtual.obtenerInstancia();
 				PreparedStatement stmtCount = conexion.prepareStatement(dataTable.getQueryCount());
-				PreparedStatement stmt = conexion.prepareStatement(dataTable.getQuery());
+				PreparedStatement stmt = conexion.prepareStatement(dataTable.getQuery())
 		) {				
 			stmt.setInt(1, solicitud.getCodNum());
 			stmtCount.setInt(1, solicitud.getCodNum());
 			
 			try (ResultSet rs = stmt.executeQuery()) {
 				while (rs.next()) {
-					Bolsa bolsa = modeloBolsa.getBolsaById(rs.getInt("BEPBOL_CODNUM"));
+					Bolsa bolsa = modeloBolsa.getBolsaById(rs.getInt(BEPBOL_CODNUM));
 					data.add(new BolsaSolicitudTable(bolsa, rs.getInt("COUNT_MERITOS")));
 				}
 			}
@@ -426,7 +432,7 @@ public class ModeloSolicitud {
 		}
 		
 		List<MeritoSolicitudTable> meritos = new ArrayList<>();
-		BolsaEmpleoDataTable<MeritoSolicitudTable> dataTable = new BolsaEmpleoDataTable<MeritoSolicitudTable>(params);
+		BolsaEmpleoDataTable<MeritoSolicitudTable> dataTable = new BolsaEmpleoDataTable<>(params);
 		
 		String consulta = ""
 				+ " SELECT bepmer.CODNUM, bepmer.VALOR, bepite.CODIGO, bepite.NOMBRE, MERITOS_BOLSAS.CODNUM SBM_CODNUM, MERITOS_BOLSAS.FLGEXCLUIDO "
@@ -451,7 +457,7 @@ public class ModeloSolicitud {
 		
 		try (Connection conexion = ConexionUvirtual.obtenerInstancia();
 				PreparedStatement stmtCount = conexion.prepareStatement(dataTable.getQueryCount());
-				PreparedStatement stmt = conexion.prepareStatement(dataTable.getQuery());
+				PreparedStatement stmt = conexion.prepareStatement(dataTable.getQuery())
 		) {
 			int indexParam = 1;
 			stmt.setInt(indexParam, bolsa.getCodNum());
@@ -462,7 +468,7 @@ public class ModeloSolicitud {
 			dataTable.setFiltersParams(stmt, stmtCount, indexParam);
 			try (ResultSet rs = stmt.executeQuery()) {
 				while (rs.next()) {
-					Merito merito = ModeloMerito.obtenerInstancia().getMeritoById(rs.getInt("CODNUM"), false, false);
+					Merito merito = ModeloMerito.obtenerInstancia().getMeritoById(rs.getInt(CODNUM), false, false);
 					Integer idMeritoSolicitud = rs.getInt("SBM_CODNUM"); 									
 					MeritoSolicitud ms = idMeritoSolicitud != 0 ? this.getMeritoSolicitudById(idMeritoSolicitud) : null;
 					List<MeritoSolicitudValoracion> valoraciones = idMeritoSolicitud != null 
@@ -485,16 +491,15 @@ public class ModeloSolicitud {
 	 * @param bolsa .
 	 * @param merito .
 	 * @throws SQLException .
-	 * @throws UVException .
 	 */
-	public void asignarMeritosASolicitudBolsa(Solicitud solicitud, Bolsa bolsa, Merito merito) throws SQLException, UVException {
+	public void asignarMeritosASolicitudBolsa(Solicitud solicitud, Bolsa bolsa, Merito merito) throws SQLException {
 		// insertamos el mérito en la solicitud bolsa
 		String consulta = "INSERT INTO TBEP_SOLICITUD_BOLSAS_MERITOS (BEPSBO_CODNUM, BEPMER_CODNUM)"
 				+ " SELECT bepsbo.CODNUM AS BEPSBO_CODNUM, bepmer.CODNUM AS BEPMER_CODNUM"
 				+ " FROM TBEP_SOLICITUD_BOLSAS bepsbo, TBEP_MERITOS bepmer"
 				+ " WHERE bepsbo.BEPSOL_CODNUM = ? AND bepsbo.BEPBOL_CODNUM = ? AND bepmer.CODNUM = ? ";
 					
-		try (Connection conexion = ConexionUvirtual.obtenerInstancia(); PreparedStatement stmt = conexion.prepareStatement(consulta);) {
+		try (Connection conexion = ConexionUvirtual.obtenerInstancia(); PreparedStatement stmt = conexion.prepareStatement(consulta)) {
 			int indexParam = 1;
 			stmt.setInt(indexParam++, solicitud.getCodNum());
 			stmt.setInt(indexParam++, bolsa.getCodNum());
@@ -508,10 +513,9 @@ public class ModeloSolicitud {
 	 * @param bolsa .
 	 * @param merito .
 	 * @throws SQLException .
-	 * @throws UVException .
 	 */
-	public void borrarMeritoDeSolicitudBolsa(Solicitud solicitud, Bolsa bolsa, Merito merito) throws SQLException, UVException {
-		try (Connection conexion = ConexionUvirtual.obtenerInstancia();) {
+	public void borrarMeritoDeSolicitudBolsa(Solicitud solicitud, Bolsa bolsa, Merito merito) throws SQLException {
+		try (Connection conexion = ConexionUvirtual.obtenerInstancia()) {
 			conexion.setAutoCommit(false);
 						
 			// eliminamos valoraciones
@@ -573,7 +577,7 @@ public class ModeloSolicitud {
 	 * @throws SQLException .
 	 */
 	public void asignarAfinidadMeritoIndividualizado(Solicitud solicitud, Bolsa bolsa, Merito merito, Afinidad afinidad) throws SQLException, UVException {
-		try (Connection conexion = ConexionUvirtual.obtenerInstancia();) {
+		try (Connection conexion = ConexionUvirtual.obtenerInstancia()) {
 			conexion.setAutoCommit(false);
 			
 			MeritoSolicitud meritoSolicitud = this.getMeritoSolicitud(solicitud.getCodNum(), bolsa.getCodNum(), merito.getCodNum());
@@ -613,8 +617,8 @@ public class ModeloSolicitud {
 	 * @throws UVException .
 	 * @throws SQLException .
 	 */
-	public void asignarAfinidadMeritoNoIndividualizado(Solicitud solicitud, Bolsa bolsa, Merito merito, HashMap<Afinidad, Float> afinidades) throws SQLException, UVException {
-		try (Connection conexion = ConexionUvirtual.obtenerInstancia();) {
+	public void asignarAfinidadMeritoNoIndividualizado(Solicitud solicitud, Bolsa bolsa, Merito merito, Map<Afinidad, Float> afinidades) throws SQLException, UVException {
+		try (Connection conexion = ConexionUvirtual.obtenerInstancia()) {
 			conexion.setAutoCommit(false);
 			
 			MeritoSolicitud meritoSolicitud = this.getMeritoSolicitud(solicitud.getCodNum(), bolsa.getCodNum(), merito.getCodNum());
@@ -669,7 +673,7 @@ public class ModeloSolicitud {
 				+ "AND bepsbo.BEPBOL_CODNUM = ? ";
 			
 		try (Connection conexion = ConexionUvirtual.obtenerInstancia();
-				PreparedStatement stmt = conexion.prepareStatement(consulta);) {
+				PreparedStatement stmt = conexion.prepareStatement(consulta)) {
 			
 			int params = 1;
 			stmt.setInt(params++, idMerito);
@@ -678,12 +682,12 @@ public class ModeloSolicitud {
 									
 			try (ResultSet rs = stmt.executeQuery()) {
 				if (!rs.next()) {
-					throw new UVException("No existe el merito de la solicitud");
+					throw new UVException(MENSAJE_ERROR_NO_EXISTE_MERITO_SOLICITUD);
 				}
 				
-				Merito merito = ModeloMerito.obtenerInstancia().getMeritoById(rs.getInt("BEPMER_CODNUM"), false, false);
+				Merito merito = ModeloMerito.obtenerInstancia().getMeritoById(rs.getInt(BEPMER_CODNUM), false, false);
 				
-				return new MeritoSolicitud(rs.getInt("CODNUM"), merito, rs.getString("FLGEXCLUIDO").equals("S"));
+				return new MeritoSolicitud(rs.getInt(CODNUM), merito, rs.getString(FLGEXCLUIDO).equals(S));
 			}
 		}
 	}
@@ -697,25 +701,25 @@ public class ModeloSolicitud {
 	 */
 	public MeritoSolicitud getMeritoSolicitudById(Integer idMeritoSolicitud) throws SQLException, UVException {
 		if (idMeritoSolicitud == null) {
-			throw new UVException("No existe el merito de la solicitud");
+			throw new UVException(MENSAJE_ERROR_NO_EXISTE_MERITO_SOLICITUD);
 		}
 		
 		String consulta = "SELECT bepsbm.* FROM TBEP_SOLICITUD_BOLSAS_MERITOS bepsbm WHERE bepsbm.CODNUM = ?";
 			
 		try (Connection conexion = ConexionUvirtual.obtenerInstancia();
-				PreparedStatement stmt = conexion.prepareStatement(consulta);) {
+				PreparedStatement stmt = conexion.prepareStatement(consulta)) {
 			
 			int params = 1;
 			stmt.setInt(params++, idMeritoSolicitud);
 									
 			try (ResultSet rs = stmt.executeQuery()) {
 				if (!rs.next()) {
-					throw new UVException("No existe el merito de la solicitud");
+					throw new UVException(MENSAJE_ERROR_NO_EXISTE_MERITO_SOLICITUD);
 				}
 				
-				Merito merito = ModeloMerito.obtenerInstancia().getMeritoById(rs.getInt("BEPMER_CODNUM"), false, false);
+				Merito merito = ModeloMerito.obtenerInstancia().getMeritoById(rs.getInt(BEPMER_CODNUM), false, false);
 				
-				return new MeritoSolicitud(rs.getInt("CODNUM"), merito, rs.getString("FLGEXCLUIDO").equals("S"));
+				return new MeritoSolicitud(rs.getInt(CODNUM), merito, rs.getString(FLGEXCLUIDO).equals(S));
 			}
 		}
 	}
@@ -735,15 +739,14 @@ public class ModeloSolicitud {
 		
 		String consulta = "SELECT * FROM TBEP_SOLICITUD_BOLSAS_MERITOS_VALORACION bepsbv WHERE bepsbv.BEPSBM_CODNUM = ?";
 		
-		try (Connection conexion = ConexionUvirtual.obtenerInstancia(); PreparedStatement stmt = conexion.prepareStatement(consulta);
-		) {
+		try (Connection conexion = ConexionUvirtual.obtenerInstancia(); PreparedStatement stmt = conexion.prepareStatement(consulta)) {
 			int indexParam = 1;
 			stmt.setInt(indexParam, idMeritoSolicitud);
 			
 			try (ResultSet rs = stmt.executeQuery()) {
 				while (rs.next()) {
 					MeritoSolicitudValoracion msv = new MeritoSolicitudValoracion(
-							rs.getInt("CODNUM"),
+							rs.getInt(CODNUM),
 							loadMeritoSolicitud ? this.getMeritoSolicitudById(rs.getInt("BEPSBM_CODNUM")) : null,
 							ModeloAfinidad.obtenerInstancia().getAfinidadById(rs.getInt("BEPAFI_CODNUM")),
 							rs.getFloat("VALOR")
@@ -773,7 +776,7 @@ public class ModeloSolicitud {
 				+ "	INNER JOIN TBEP_APARTADOSBAREMACION bepapa ON bepblo.CODNUM = bepapa.CODNUM"
 				+ "	WHERE bepsbo.BEPSOL_CODNUM = ? AND bepapa.CODNUM = ?";
 		
-		try (Connection conexion = ConexionUvirtual.obtenerInstancia(); PreparedStatement stmt = conexion.prepareStatement(consulta);) {
+		try (Connection conexion = ConexionUvirtual.obtenerInstancia(); PreparedStatement stmt = conexion.prepareStatement(consulta)) {
 			int parameterIndex = 1;
 			stmt.setInt(parameterIndex++, solicitud.getCodNum());
 			stmt.setInt(parameterIndex++, merito.getItemBaremacion().getBloqueBaremacion().getApartadoBaremacion().getCodNum());
@@ -800,7 +803,7 @@ public class ModeloSolicitud {
 				+ "	INNER JOIN TBEP_SOLICITUD_BOLSAS bepsbo ON bepsbm.BEPSBO_CODNUM = bepsbo.CODNUM"
 				+ "	WHERE bepsbo.BEPSOL_CODNUM = ? ";
 		
-		try (Connection conexion = ConexionUvirtual.obtenerInstancia(); PreparedStatement stmt = conexion.prepareStatement(consulta);) {
+		try (Connection conexion = ConexionUvirtual.obtenerInstancia(); PreparedStatement stmt = conexion.prepareStatement(consulta)) {
 			int parameterIndex = 1;
 			stmt.setInt(parameterIndex++, solicitud.getCodNum());
 			stmt.executeUpdate();
@@ -818,6 +821,7 @@ public class ModeloSolicitud {
 	 * Actualiza el estado de la solicitud a cerrado .
 	 * @param solicitud .
 	 * @throws SQLException .
+	 * @throws UVException .
 	 */
 	public void confirmacionSolicitud(Solicitud solicitud) throws SQLException, UVException {
 		if (solicitud == null) {
@@ -843,7 +847,7 @@ public class ModeloSolicitud {
 		String consulta = "UPDATE TBEP_SOLICITUDES "
 				+ " SET ESTADO=?, FECHACONFIRMACION=?, ARCHIVO=?"
 				+ " WHERE CODNUM=?";
-		try (Connection conexion = ConexionUvirtual.obtenerInstancia(); PreparedStatement stmt = conexion.prepareStatement(consulta);) {
+		try (Connection conexion = ConexionUvirtual.obtenerInstancia(); PreparedStatement stmt = conexion.prepareStatement(consulta)) {
 			int parameterIndex = 1;
 			stmt.setString(parameterIndex++, solicitud.getEstado());
 			stmt.setDate(parameterIndex++, new Date(solicitud.getFechaConfirmacion().getTime()));
@@ -875,9 +879,9 @@ public class ModeloSolicitud {
 			
 			try (ResultSet rs = stmt.executeQuery()) {
 				while (rs.next()) {
-					MeritoSolicitud ms = new MeritoSolicitud(rs.getInt("CODNUM"),
-							ModeloMerito.obtenerInstancia().getMeritoById(rs.getInt("BEPMER_CODNUM")), 
-							rs.getString("FLGEXCLUIDO").equals("S")
+					MeritoSolicitud ms = new MeritoSolicitud(rs.getInt(CODNUM),
+							ModeloMerito.obtenerInstancia().getMeritoById(rs.getInt(BEPMER_CODNUM)), 
+							rs.getString(FLGEXCLUIDO).equals(S)
 					);
 					meritos.add(ms);
 				}
@@ -896,7 +900,7 @@ public class ModeloSolicitud {
 	 */
 	private ArrayList<Bolsa> listaBolsasSolicitudExcluidas(Solicitud solicitud, List<Bolsa> bolsas) throws SQLException, UVException {
 		ModeloBolsa modeloBolsa = ModeloBolsa.obtenerInstancia();
-		ArrayList<Bolsa> bolsasExcluidas = new ArrayList<Bolsa>();
+		ArrayList<Bolsa> bolsasExcluidas = new ArrayList<>();
 		
 		String params = BolsaEmpleoUtils.consultaMultiplesParametros(bolsas.size());
 		
@@ -915,7 +919,7 @@ public class ModeloSolicitud {
 			
 			try (ResultSet rs = stmt.executeQuery()) {
 				while (rs.next()) {
-					Bolsa bolsa = modeloBolsa.getBolsaById(rs.getInt("BEPBOL_CODNUM"));
+					Bolsa bolsa = modeloBolsa.getBolsaById(rs.getInt(BEPBOL_CODNUM));
 					bolsasExcluidas.add(bolsa);
 				}
 			}
@@ -933,9 +937,10 @@ public class ModeloSolicitud {
 	 * @throws SQLException .
 	 * @throws UVException .
 	 */
+	@SuppressWarnings("java:S3047")
 	private ArrayList<Bolsa> listaBolsasSolicitudAgregadas(Solicitud solicitud, List<Bolsa> bolsas) throws SQLException, UVException {
 		ModeloBolsa modeloBolsa = ModeloBolsa.obtenerInstancia();
-		ArrayList<Bolsa> bolsasAgregadas = new ArrayList<Bolsa>();
+		ArrayList<Bolsa> bolsasAgregadas = new ArrayList<>();
 		
 		String params = BolsaEmpleoUtils.consultaMultiplesParametros(bolsas.size());
 		
@@ -963,7 +968,7 @@ public class ModeloSolicitud {
 			
 			try (ResultSet rs = stmt.executeQuery()) {
 				while (rs.next()) {
-					Bolsa bolsa = modeloBolsa.getBolsaById(rs.getInt("CODNUM"));
+					Bolsa bolsa = modeloBolsa.getBolsaById(rs.getInt(CODNUM));
 					bolsasAgregadas.add(bolsa);
 				}
 			}
@@ -1032,3 +1037,4 @@ public class ModeloSolicitud {
 		}
 	}
 }
+

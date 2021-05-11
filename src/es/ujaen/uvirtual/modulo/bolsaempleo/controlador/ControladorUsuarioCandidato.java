@@ -3,7 +3,6 @@ package es.ujaen.uvirtual.modulo.bolsaempleo.controlador;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.sql.SQLException;
-import java.util.Date;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -33,7 +32,7 @@ import es.ujaen.uvirtual.modulo.bolsaempleo.modelo.ModeloRol;
 import es.ujaen.uvirtual.modulo.bolsaempleo.modelo.ModeloSolicitud;
 import es.ujaen.uvirtual.modulo.bolsaempleo.modelo.ModeloUsuarioBolsaEmpleo;
 import es.ujaen.uvirtual.modulo.bolsaempleo.utilidades.BolsaEmpleoDataTable;
-import es.ujaen.uvirtual.modulo.bolsaempleo.utilidades.BolsaEmpleoValidator;
+import es.ujaen.uvirtual.modulo.bolsaempleo.utilidades.BolsaEmpleoUtils;
 import es.ujaen.uvirtual.modulo.bolsaempleo.vistas.VistaUsuarioBolsaEmpleo;
 import es.ujaen.uvirtual.utilidades.EscapaHTML;
 import es.ujaen.uvirtual.utilidades.Formateador;
@@ -137,6 +136,7 @@ public class ControladorUsuarioCandidato extends HttpServlet {
 	// ruta vistas
 	public static final String RUTA_BEP_CONF = "/WEB-INF/jsp/vista/infadministrativa/bolsaempleo/configuracion/candidatos/";
 	public static final String RUTA_BEP_CONF_USU = "/WEB-INF/jsp/vista/infadministrativa/bolsaempleo/configuracion/usuarios/";
+	public static final String JSP_INDEX = RUTA_BEP_CONF + "candidatos.jsp";	
 	public static final String JSP_FORM_CANDIDATO = RUTA_BEP_CONF + "formCandidatos.jsp";
 	public static final String JSP_BUSCAR_USUARIO = RUTA_BEP_CONF_USU + "buscarUsuario.jsp";
 
@@ -162,7 +162,7 @@ public class ControladorUsuarioCandidato extends HttpServlet {
 			init(bean, datos);
 			switch (nombreAccion) {
 				case ACCION_INDEX:
-					bean.setVista(RUTA_BEP_CONF + "candidatos.jsp");
+					bean.setVista(JSP_INDEX);
 					break;
 				case ACCION_DATATABLE_USUARIOS_CANDIDATOS:
 					listadoCandidatos(bean, datos, request, response);
@@ -236,7 +236,7 @@ public class ControladorUsuarioCandidato extends HttpServlet {
 	}
 	
 	private void init(VistaUsuarioBolsaEmpleo bean, UVDatos datos) throws SQLException, UVException {
-		bean.setVista(RUTA_BEP_CONF + "candidatos.jsp");
+		bean.setVista(JSP_INDEX);
 		ModeloUsuarioBolsaEmpleo.obtenerInstancia().checkUser(datos);
 	}
 	
@@ -334,27 +334,10 @@ public class ControladorUsuarioCandidato extends HttpServlet {
 				modelo.ponerUsuarioComoNoBorrado(usuarios);
 				break;
 			case ACCION_EXCLUIR_USUARIO_AREA:
-				UsuarioBolsaEmpleo usu = modelo.getUsuarioById(codNum);
-				Usuario usuArcos = CrearUsuario.usuario(usu.getCodCuenta());
-				modelo.excluirUsuarioArea(usu, areas);
-				
-				bean.setUsuarioArcos(usuArcos);
-				
-				bean.setBusqueda(false);
-				
-				bean.setUsuario(usu);
-				bean.setVista(JSP_FORM_CANDIDATO);
+				excluirUsuarioArea(bean, codNum, modelo, areas);
 				break;
 			case ACCION_INCLUIR_USUARIO_AREA:
-				UsuarioBolsaEmpleo usuCont = modelo.getUsuarioById(codNum);
-				Usuario usuArcosCont = CrearUsuario.usuario(usuCont.getCodCuenta());
-				modelo.incluirUsuarioArea(usuCont, areas);
-	
-				bean.setUsuarioArcos(usuArcosCont);
-				bean.setBusqueda(false);
-				
-				bean.setUsuario(usuCont);
-				bean.setVista(JSP_FORM_CANDIDATO);
+				incluirUsuarioArea(bean, codNum, modelo, areas);
 				break;
 			default:
 				bean.getMensajesDeError().add(MENSAJE_ERROR_ACCION_USUARIO_NO_VALIDA);
@@ -363,9 +346,28 @@ public class ControladorUsuarioCandidato extends HttpServlet {
 
 		bean.getMensajesDeExito().add(MENSAJE_EXITO_USUARIO_MODIFICADO_CORRECTAMENTE);
 	}
-	
-	
-	
+
+	private void incluirUsuarioArea(VistaUsuarioBolsaEmpleo bean, Integer codNum, ModeloUsuarioBolsaEmpleo modelo, List<Area> areas) throws SQLException, UVException {
+		UsuarioBolsaEmpleo usuCont = modelo.getUsuarioById(codNum);
+		Usuario usuArcosCont = CrearUsuario.usuario(usuCont.getCodCuenta());
+		modelo.incluirUsuarioArea(usuCont, areas);
+
+		bean.setUsuarioArcos(usuArcosCont);
+		bean.setBusqueda(false);
+		bean.setUsuario(usuCont);
+		bean.setVista(JSP_FORM_CANDIDATO);
+	}
+
+	private void excluirUsuarioArea(VistaUsuarioBolsaEmpleo bean, Integer codNum, ModeloUsuarioBolsaEmpleo modelo, List<Area> areas) throws SQLException, UVException {
+		UsuarioBolsaEmpleo usu = modelo.getUsuarioById(codNum);
+		Usuario usuArcos = CrearUsuario.usuario(usu.getCodCuenta());
+		modelo.excluirUsuarioArea(usu, areas);
+		
+		bean.setUsuarioArcos(usuArcos);
+		bean.setBusqueda(false);
+		bean.setUsuario(usu);
+		bean.setVista(JSP_FORM_CANDIDATO);
+	}
 	
 	/** Busca un usuario.
 	 * @param request .
@@ -419,52 +421,18 @@ public class ControladorUsuarioCandidato extends HttpServlet {
 	public void agregarUsuario(HttpServletRequest request, HttpServletResponse response, VistaUsuarioBolsaEmpleo bean) throws SQLException, UVException, IOException {
 		bean.setVista(RUTA_BEP_CONF_USU + "usuarios.jsp");
 		
-		ModeloUsuarioBolsaEmpleo modelo = ModeloUsuarioBolsaEmpleo.obtenerInstancia();
-		
-							
-		BolsaEmpleoValidator validator = this.getValidatorUsuarios(request); 	
-		
-		if (!validator.isValid()) {
-			
-			for (String param : validator.getErrors().keySet()) {
-				for (String paramError : validator.getErrors().get(param)) {
-					bean.getMensajesDeError().add(paramError);
-				}
-			}
-		} else {
-			boolean listadist = "true".equals(EscapaHTML.ajustaCodificacion(request.getParameter(PARAM_LISTA))); 
-			boolean excluido = "true".equals(EscapaHTML.ajustaCodificacion(request.getParameter(PARAM_EXCLUIDO)));
+		Usuario usuArcos = CrearUsuario.usuario(request.getParameter(PARAM_ID));
+		ModeloUsuarioBolsaEmpleo modelo = ModeloUsuarioBolsaEmpleo.obtenerInstancia();		
+		UsuarioBolsaEmpleo usuarioForm = this.getValidatorUsuarios(request);
+		usuarioForm.setCodCuenta(EscapaHTML.ajustaCodificacion(request.getParameter(PARAM_ID)));		
+		usuarioForm.setNumDocumento(usuArcos.getDocumentoNumero());
 						
-			String excluidoTipo = null;		
-			if (request.getParameter(PARAM_EXCLUIDO) != null) {
-				excluidoTipo = EscapaHTML.ajustaCodificacion(request.getParameter(PARAM_EXCLUIDO_TIPO));
-			}
+		modelo.insertaUsuario(usuarioForm);
 			
-			String razonexcluido = EscapaHTML.ajustaCodificacion(request.getParameter(PARAM_RAZON_EXCLUIDO));
-				
-			ModeloRol modeloRol = ModeloRol.obtenerInstancia();
-			Rol role = modeloRol.getRoleById(PARAM_ROLE_CANDIDATO);
-				
-			Date fechaini = validator.getValueDate(PARAM_FECHA_EXCLUIDO_INICIO);
-			Date fechafin = validator.getValueDate(PARAM_FECHA_EXCLUIDO_FIN);
-			
-			Date date = new Date(System.currentTimeMillis());
-				
-			String usu = EscapaHTML.ajustaCodificacion(request.getParameter(PARAM_ID));
-				
-			Usuario usuArcos = CrearUsuario.usuario(request.getParameter(PARAM_ID));
-				
-			UsuarioBolsaEmpleo usuarioFinal = 
-					new UsuarioBolsaEmpleo(usu, usuArcos.getDocumentoNumero(), role, 
-							listadist, excluido, excluidoTipo, razonexcluido, date, fechaini, fechafin);
-				
-			modelo.insertaUsuario(usuarioFinal);
-			
-			bean.getMensajesDeExito().add(MENSAJE_EXITO_AGREGAR);
-			HttpSession session = request.getSession(false);
-			session.setAttribute(MENSAJE_ENVIADO, MENSAJE_EXITO_AGREGAR);
-			response.sendRedirect(request.getServletPath());
-		}
+		bean.getMensajesDeExito().add(MENSAJE_EXITO_AGREGAR);
+		HttpSession session = request.getSession(false);
+		session.setAttribute(MENSAJE_ENVIADO, MENSAJE_EXITO_AGREGAR);
+		response.sendRedirect(request.getServletPath());
 	}
 	
 	/** edita un usuario .
@@ -475,7 +443,8 @@ public class ControladorUsuarioCandidato extends HttpServlet {
 	 * @throws UVException en caso de error en bd
 	 * @throws IOException en caso de error de IO.
 	 */
-	private void editarUsuario(HttpServletRequest request, HttpServletResponse response, VistaUsuarioBolsaEmpleo bean) throws SQLException, UVException, IOException {
+	private void editarUsuario(HttpServletRequest request, HttpServletResponse response, VistaUsuarioBolsaEmpleo bean) 
+			throws SQLException, UVException, IOException {
 		bean.setVista(JSP_FORM_CANDIDATO);
 		
 		ModeloUsuarioBolsaEmpleo modelo = ModeloUsuarioBolsaEmpleo.obtenerInstancia();
@@ -486,46 +455,17 @@ public class ControladorUsuarioCandidato extends HttpServlet {
 		Usuario usuArcos = CrearUsuario.usuario(request.getParameter(PARAM_NOMBRE_USUARIO));
 		
 		bean.setBusqueda(false);
-		
 		bean.setUsuarioArcos(usuArcos);
 		bean.setUsuario(usu);
 		bean.setRol(usu.getRol());
 		
-		if (EscapaHTML.ajustaCodificacion(request.getParameter(PARAM_LISTA)) != null) {
-			BolsaEmpleoValidator validator = this.getValidatorUsuarios(request); 							
+		if (EscapaHTML.ajustaCodificacion(request.getParameter(PARAM_ROLE)) != null) {
+			UsuarioBolsaEmpleo usuarioForm = this.getValidatorUsuarios(request);
+			usuarioForm.setCodNum(Formateador.leeParametroInteger(request.getParameter(PARAM_ID)));
 			
-			if (!validator.isValid()) {
-				for (String param : validator.getErrors().keySet()) {
-					for (String paramError : validator.getErrors().get(param)) {
-						bean.getMensajesDeError().add(paramError);
-					}
-				}
-			} else {
-				Integer codNum = Formateador.leeParametroInteger(request.getParameter(PARAM_ID));
-				boolean listadist = "true".equals(EscapaHTML.ajustaCodificacion(request.getParameter(PARAM_LISTA)));				
-				boolean excluido = "true".equals(EscapaHTML.ajustaCodificacion(request.getParameter(PARAM_EXCLUIDO))); 
-						
-				String excluidoTipo = null;		
-				if (request.getParameter(PARAM_EXCLUIDO) != null) {
-					excluidoTipo = EscapaHTML.ajustaCodificacion(request.getParameter(PARAM_EXCLUIDO_TIPO));
-				}
-				
-				String razonexcluido = EscapaHTML.ajustaCodificacion(request.getParameter(PARAM_RAZON_EXCLUIDO));
-				
-				Rol role = modelo.getUsuarioById(Formateador.leeParametroInteger(request.getParameter(PARAM_ID))).getRol();
-				
-				Date fechaini = validator.getValueDate(PARAM_FECHA_EXCLUIDO_INICIO);
-				Date fechafin = validator.getValueDate(PARAM_FECHA_EXCLUIDO_FIN);
-				
-				Date date = new Date(System.currentTimeMillis());
-				
-				UsuarioBolsaEmpleo usuario = new UsuarioBolsaEmpleo(codNum, role, listadist, excluido, excluidoTipo, razonexcluido, date, fechaini, fechafin);
-				
-				modelo.actualizaUsuario(usuario);
-				HttpSession session = request.getSession(false);
-				session.setAttribute(MENSAJE_ENVIADO, MENSAJE_EXITO_EDITAR);
-				response.sendRedirect(request.getServletPath());	
-			}
+			modelo.actualizaUsuario(usuarioForm);
+			response.sendRedirect(request.getServletPath());	
+			bean.getMensajesDeExito().add(MENSAJE_EXITO_EDITAR);			
 		}
 	}
 	
@@ -566,14 +506,9 @@ public class ControladorUsuarioCandidato extends HttpServlet {
 		ModeloUsuarioBolsaEmpleo modelo = ModeloUsuarioBolsaEmpleo.obtenerInstancia();
 		
 		obtenerRoles(bean);
-	
-		Usuario usuArcos = CrearUsuario.usuario(request.getParameter(PARAM_NOMBRE_USUARIO));
-		if (usuArcos == null) {
-			bean.setVista(RUTA_BEP_CONF + "candidatos.jsp");
-			throw new UVException("No existe el usuario");
-		}
 		
-		UsuarioBolsaEmpleo usu = modelo.listaUsuario(Formateador.leeParametroString(usuArcos.getDocumentoNumero()));
+		UsuarioBolsaEmpleo usu = modelo.listaUsuario(Formateador.leeParametroString(request.getParameter(PARAM_NOMBRE_USUARIO)));
+		Usuario usuArcos = CrearUsuario.usuario(request.getParameter(PARAM_NOMBRE_USUARIO));
 		
 		bean.setBusqueda(true);
 		
@@ -582,37 +517,14 @@ public class ControladorUsuarioCandidato extends HttpServlet {
 		bean.setRol(usu.getRol());
 		
 		if (EscapaHTML.ajustaCodificacion(request.getParameter(PARAM_RAZON_EXCLUIDO)) != null) {
-			BolsaEmpleoValidator validator = this.getValidatorExclusion(request); 							
-			
-			if (!validator.isValid()) {
-				for (String param : validator.getErrors().keySet()) {
-					for (String paramError : validator.getErrors().get(param)) {
-						bean.getMensajesDeError().add(paramError);
-					}
-				}
-			} else {
-				Integer codNum = Formateador.leeParametroInteger(request.getParameter(PARAM_ID));
-				Boolean excluido = true;
-						
-				String excluidoTipo = null;		
-				if (request.getParameter(PARAM_RAZON_EXCLUIDO) != null) {
-					excluidoTipo = EscapaHTML.ajustaCodificacion(request.getParameter(PARAM_EXCLUIDO_TIPO));
-				}
-				
-				String razonexcluido = EscapaHTML.ajustaCodificacion(request.getParameter(PARAM_RAZON_EXCLUIDO));
-				
-				Date fechaini = validator.getValueDate(PARAM_FECHA_EXCLUIDO_INICIO);
-				Date fechafin = validator.getValueDate(PARAM_FECHA_EXCLUIDO_FIN);
-				
-				Date date = new Date(System.currentTimeMillis());
-				
-				UsuarioBolsaEmpleo usuario = new UsuarioBolsaEmpleo(codNum, excluido, excluidoTipo, razonexcluido, date, fechaini, fechafin);
-				
-				modelo.ponerUsuarioComoExcluido(usuario);
-				HttpSession session = request.getSession(false);
-				session.setAttribute(MENSAJE_ENVIADO, MENSAJE_EXITO_EDITAR);
-				response.sendRedirect(request.getServletPath());
-			}
+			UsuarioBolsaEmpleo usuarioForm = this.validateExclusion(request);			
+			usuarioForm.setCodNum(Formateador.leeParametroInteger(request.getParameter(PARAM_ID)));
+			usuarioForm.setExcluido(true);
+
+			modelo.ponerUsuarioComoExcluido(usuarioForm);
+			HttpSession session = request.getSession(false);
+			session.setAttribute(MENSAJE_ENVIADO, MENSAJE_EXITO_EDITAR);
+			response.sendRedirect(request.getServletPath());
 		}
 	}
 	
@@ -643,75 +555,63 @@ public class ControladorUsuarioCandidato extends HttpServlet {
 	 * @throws UVException en caso de error en bd
 	 */
 	private void volverUsuario(VistaUsuarioBolsaEmpleo bean) {
-		bean.setVista(RUTA_BEP_CONF + "candidatos.jsp");
+		bean.setVista(JSP_INDEX);
 	}
 	
-	/** Valida el formulario de Usuarios.
-	 * @param request .
-	 * @return validator
-	 * @throws UVException .
-	 * @throws SQLException .
-	 * @throws IOException .
-	 * @throws IOException .
-	 */
-	private BolsaEmpleoValidator getValidatorUsuarios(HttpServletRequest request) throws UVException {
-		BolsaEmpleoValidator validator = new BolsaEmpleoValidator(request);
+	private UsuarioBolsaEmpleo getValidatorUsuarios(HttpServletRequest request) throws UVException, SQLException {
+		UsuarioBolsaEmpleo u = new UsuarioBolsaEmpleo();
 		
-		if (request.getParameter(PARAM_EXCLUIDO) != null) {
-			validator.addParamString(PARAM_RAZON_EXCLUIDO);
-			validator.addRule(PARAM_RAZON_EXCLUIDO, "required", MENSAJE_ERROR_RAZON_EXCLUSION_VACIO);
-			validator.addRule(PARAM_RAZON_EXCLUIDO, "noBlank", MENSAJE_ERROR_RAZON_EXCLUSION_VACIO);
-			validator.addRule(PARAM_RAZON_EXCLUIDO, "max:" + ModeloUsuarioBolsaEmpleo.COLUMN_RAZON_EXCLUSION_MAXLENGTH, 
-					String.format(MENSAJE_ERROR_RAZON_EXCLUSION_LARGO, ModeloUsuarioBolsaEmpleo.COLUMN_RAZON_EXCLUSION_MAXLENGTH));
-			
-			validator.addParamString(PARAM_EXCLUIDO_TIPO);
-			validator.addRule(PARAM_EXCLUIDO_TIPO, "required", MENSAJE_ERROR_EXCLUIDO_TIPO_VACIO);
-			validator.addRule(PARAM_EXCLUIDO_TIPO, "noBlank", MENSAJE_ERROR_EXCLUIDO_TIPO_VACIO);
-			
-			if ("T".equals(request.getParameter(PARAM_EXCLUIDO_TIPO))) {
-				validator.addParamDate(PARAM_FECHA_EXCLUIDO_INICIO);
-				validator.addRule(PARAM_FECHA_EXCLUIDO_INICIO, "required", MENSAJE_ERROR_FECHA_EXCLUIDO_INICIO_REQUERIDA);
-				
-				validator.addParamDate(PARAM_FECHA_EXCLUIDO_FIN);
-				validator.addRule(PARAM_FECHA_EXCLUIDO_FIN, "required", MENSAJE_ERROR_FECHA_EXCLUIDO_FIN_REQUERIDA);
+		String excluido = request.getParameter(PARAM_EXCLUIDO);
+		if (excluido != null) {
+			u.setRazonExcluido(EscapaHTML.ajustaCodificacion(request.getParameter(PARAM_RAZON_EXCLUIDO)));
+			if (u.getRazonExcluido() == null || u.getRazonExcluido().isBlank()) {
+				throw new UVException(MENSAJE_ERROR_RAZON_EXCLUSION_VACIO);
 			}
+			if (u.getRazonExcluido().length() > ModeloUsuarioBolsaEmpleo.COLUMN_RAZON_EXCLUSION_MAXLENGTH) {
+				throw new UVException(String.format(MENSAJE_ERROR_RAZON_EXCLUSION_LARGO, ModeloUsuarioBolsaEmpleo.COLUMN_RAZON_EXCLUSION_MAXLENGTH));
+			}
+			
+			u.setExcluidoTipo(EscapaHTML.ajustaCodificacion(request.getParameter(PARAM_EXCLUIDO_TIPO)));
+			if ("T".equals(u.getExcluidoTipo())) {
+				u.setFechaExclusionInicio(Formateador.leeParametroFecha(request.getParameter(PARAM_FECHA_EXCLUIDO_INICIO), 
+						Formateador.FORMATO_FECHA_DDMMYYYY, "/"));
+				u.setFechaExclusionFin(Formateador.leeParametroFecha(request.getParameter(PARAM_FECHA_EXCLUIDO_FIN), 
+						Formateador.FORMATO_FECHA_DDMMYYYY, "/"));
+			}
+			u.setFechaExclusion(BolsaEmpleoUtils.getCurrentDate());
 		}
 		
-		return validator;
+		Rol rol = ModeloRol.obtenerInstancia().getRoleById(PARAM_ROLE_CANDIDATO);
+		u.setRol(rol);
+		
+		u.setListaDist("true".equals(EscapaHTML.ajustaCodificacion(request.getParameter(PARAM_LISTA))));
+		u.setExcluido("true".equals(EscapaHTML.ajustaCodificacion(request.getParameter(PARAM_EXCLUIDO))));
+		
+		return u;
 	}
 	
-	/** Valida el formulario de Exclusion de Usuarios.
-	 * @param request .
-	 * @return validator
-	 * @throws UVException .
-	 * @throws SQLException .
-	 * @throws IOException .
-	 * @throws IOException .
-	 */
-	private BolsaEmpleoValidator getValidatorExclusion(HttpServletRequest request) throws UVException {
-		BolsaEmpleoValidator validator = new BolsaEmpleoValidator(request);
-		
+	private UsuarioBolsaEmpleo validateExclusion(HttpServletRequest request) throws UVException {
+		UsuarioBolsaEmpleo u = new UsuarioBolsaEmpleo();
+				
 		if (request.getParameter(PARAM_RAZON_EXCLUIDO) != null) {
-			validator.addParamString(PARAM_RAZON_EXCLUIDO);
-			validator.addRule(PARAM_RAZON_EXCLUIDO, "required", MENSAJE_ERROR_RAZON_EXCLUSION_VACIO);
-			validator.addRule(PARAM_RAZON_EXCLUIDO, "noBlank", MENSAJE_ERROR_RAZON_EXCLUSION_VACIO);
-			validator.addRule(PARAM_RAZON_EXCLUIDO, "max:" + ModeloUsuarioBolsaEmpleo.COLUMN_RAZON_EXCLUSION_MAXLENGTH, 
-					String.format(MENSAJE_ERROR_RAZON_EXCLUSION_LARGO, ModeloUsuarioBolsaEmpleo.COLUMN_RAZON_EXCLUSION_MAXLENGTH));
+			u.setRazonExcluido(EscapaHTML.ajustaCodificacion(request.getParameter(PARAM_RAZON_EXCLUIDO)));
+			if (u.getRazonExcluido() == null || u.getRazonExcluido().isBlank()) {
+				throw new UVException(MENSAJE_ERROR_RAZON_EXCLUSION_VACIO);
+			}
+			if (u.getRazonExcluido().length() > ModeloUsuarioBolsaEmpleo.COLUMN_RAZON_EXCLUSION_MAXLENGTH) {
+				throw new UVException(String.format(MENSAJE_ERROR_RAZON_EXCLUSION_LARGO, ModeloUsuarioBolsaEmpleo.COLUMN_RAZON_EXCLUSION_MAXLENGTH));
+			}
 			
-			validator.addParamString(PARAM_EXCLUIDO_TIPO);
-			validator.addRule(PARAM_EXCLUIDO_TIPO, "required", MENSAJE_ERROR_EXCLUIDO_TIPO_VACIO);
-			validator.addRule(PARAM_EXCLUIDO_TIPO, "noBlank", MENSAJE_ERROR_EXCLUIDO_TIPO_VACIO);
-			
-			if ("T".equals(request.getParameter(PARAM_EXCLUIDO_TIPO))) {
-				validator.addParamDate(PARAM_FECHA_EXCLUIDO_INICIO);
-				validator.addRule(PARAM_FECHA_EXCLUIDO_INICIO, "required", MENSAJE_ERROR_FECHA_EXCLUIDO_INICIO_REQUERIDA);
-				
-				validator.addParamDate(PARAM_FECHA_EXCLUIDO_FIN);
-				validator.addRule(PARAM_FECHA_EXCLUIDO_FIN, "required", MENSAJE_ERROR_FECHA_EXCLUIDO_FIN_REQUERIDA);
+			u.setExcluidoTipo(EscapaHTML.ajustaCodificacion(request.getParameter(PARAM_EXCLUIDO_TIPO)));
+			if ("T".equals(u.getExcluidoTipo())) {
+				u.setFechaExclusionInicio(Formateador.leeParametroFecha(request.getParameter(PARAM_FECHA_EXCLUIDO_INICIO), 
+						Formateador.FORMATO_FECHA_DDMMYYYY, "/"));
+				u.setFechaExclusionFin(Formateador.leeParametroFecha(request.getParameter(PARAM_FECHA_EXCLUIDO_FIN), 
+						Formateador.FORMATO_FECHA_DDMMYYYY, "/"));
 			}
 		}
 		
-		return validator;
+		return u;
 	}
 	
 	private void seleccionarOpcion(VistaUsuarioBolsaEmpleo bean, HttpServletRequest request) throws SQLException, UVException {

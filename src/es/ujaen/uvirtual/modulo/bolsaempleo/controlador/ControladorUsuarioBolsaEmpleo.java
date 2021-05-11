@@ -3,7 +3,6 @@ package es.ujaen.uvirtual.modulo.bolsaempleo.controlador;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.sql.SQLException;
-import java.util.Date;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -31,6 +30,7 @@ import es.ujaen.uvirtual.modulo.bolsaempleo.modelo.ModeloArea;
 import es.ujaen.uvirtual.modulo.bolsaempleo.modelo.ModeloRol;
 import es.ujaen.uvirtual.modulo.bolsaempleo.modelo.ModeloUsuarioBolsaEmpleo;
 import es.ujaen.uvirtual.modulo.bolsaempleo.utilidades.BolsaEmpleoDataTable;
+import es.ujaen.uvirtual.modulo.bolsaempleo.utilidades.BolsaEmpleoUtils;
 import es.ujaen.uvirtual.modulo.bolsaempleo.vistas.VistaUsuarioBolsaEmpleo;
 import es.ujaen.uvirtual.utilidades.EscapaHTML;
 import es.ujaen.uvirtual.utilidades.Formateador;
@@ -313,27 +313,10 @@ public class ControladorUsuarioBolsaEmpleo extends HttpServlet {
 				modelo.ponerUsuarioComoNoBorrado(usuarios);
 				break;
 			case ACCION_EXCLUIR_USUARIO_AREA:
-				UsuarioBolsaEmpleo usu = modelo.getUsuarioById(codNum);
-				Usuario usuArcos = CrearUsuario.usuario(usu.getCodCuenta());
-				modelo.excluirUsuarioArea(usu, areas);
-				
-				bean.setUsuarioArcos(usuArcos);
-				
-				bean.setBusqueda(false);
-				
-				bean.setUsuario(usu);
-				bean.setVista(JSP_FORM_USUARIO);
+				excluirUsuarioArea(bean, codNum, modelo, areas);
 				break;
 			case ACCION_INCLUIR_USUARIO_AREA:
-				UsuarioBolsaEmpleo usuCont = modelo.getUsuarioById(codNum);
-				Usuario usuArcosCont = CrearUsuario.usuario(usuCont.getCodCuenta());
-				modelo.incluirUsuarioArea(usuCont, areas);
-	
-				bean.setUsuarioArcos(usuArcosCont);
-				bean.setBusqueda(false);
-				
-				bean.setUsuario(usuCont);
-				bean.setVista(JSP_FORM_USUARIO);
+				incluirUsuarioArea(bean, codNum, modelo, areas);
 				break;
 			default:
 				bean.getMensajesDeError().add(MENSAJE_ERROR_ACCION_USUARIO_NO_VALIDA);
@@ -342,9 +325,30 @@ public class ControladorUsuarioBolsaEmpleo extends HttpServlet {
 
 		bean.getMensajesDeExito().add(MENSAJE_EXITO_USUARIO_MODIFICADO_CORRECTAMENTE);
 	}
-	
-	
-	
+
+	private void incluirUsuarioArea(VistaUsuarioBolsaEmpleo bean, Integer codNum, ModeloUsuarioBolsaEmpleo modelo,
+			List<Area> areas) throws SQLException, UVException {
+		UsuarioBolsaEmpleo usuCont = modelo.getUsuarioById(codNum);
+		Usuario usuArcosCont = CrearUsuario.usuario(usuCont.getCodCuenta());
+		modelo.incluirUsuarioArea(usuCont, areas);
+
+		bean.setUsuarioArcos(usuArcosCont);
+		bean.setBusqueda(false);
+		
+		bean.setUsuario(usuCont);
+		bean.setVista(JSP_FORM_USUARIO);
+	}
+
+	private void excluirUsuarioArea(VistaUsuarioBolsaEmpleo bean, Integer codNum, ModeloUsuarioBolsaEmpleo modelo, List<Area> areas) throws SQLException, UVException {
+		UsuarioBolsaEmpleo usu = modelo.getUsuarioById(codNum);
+		Usuario usuArcos = CrearUsuario.usuario(usu.getCodCuenta());
+		modelo.excluirUsuarioArea(usu, areas);
+		
+		bean.setUsuarioArcos(usuArcos);
+		bean.setBusqueda(false);
+		bean.setUsuario(usu);
+		bean.setVista(JSP_FORM_USUARIO);
+	}
 	
 	/** Busca un usuario.
 	 * @param request .
@@ -352,14 +356,14 @@ public class ControladorUsuarioBolsaEmpleo extends HttpServlet {
 	 * @throws SQLException excepcion de bbdd.
 	 * @throws UVException en caso de error en bd
 	 */
-	private void buscarUsuario(HttpServletRequest request, VistaUsuarioBolsaEmpleo bean) throws SQLException, UVException {
-		ModeloUsuarioBolsaEmpleo modelo = ModeloUsuarioBolsaEmpleo.obtenerInstancia();
-		
+	private void buscarUsuario(HttpServletRequest request, VistaUsuarioBolsaEmpleo bean) throws SQLException, UVException {			
 		obtenerRoles(bean);
 		Usuario usuArcos = CrearUsuario.usuario(request.getParameter(PARAM_NOMBRE));
 		if (usuArcos == null) {
 			throw new UVException("No existe el usuario");
 		}
+		
+		ModeloUsuarioBolsaEmpleo modelo = ModeloUsuarioBolsaEmpleo.obtenerInstancia();
 		
 		try {
 			UsuarioBolsaEmpleo usu = modelo.listaUsuario(Formateador.leeParametroString(usuArcos.getDocumentoNumero()));
@@ -554,7 +558,7 @@ public class ControladorUsuarioBolsaEmpleo extends HttpServlet {
 				u.setFechaExclusionFin(Formateador.leeParametroFecha(request.getParameter(PARAM_FECHA_EXCLUIDO_FIN), 
 						Formateador.FORMATO_FECHA_DDMMYYYY, "/"));
 			}
-			u.setFechaExclusion(new Date());
+			u.setFechaExclusion(BolsaEmpleoUtils.getCurrentDate());
 		}
 		
 		Rol rol = ModeloRol.obtenerInstancia().getRoleById(Formateador.leeParametroInteger(request.getParameter(PARAM_ROLE)));
