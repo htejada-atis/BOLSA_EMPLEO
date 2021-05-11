@@ -27,10 +27,17 @@ public class DriverUv {
 	
 	private DriverUv() { }
 	
-	
+	private static String getTipoSistema() {
+		return System.getProperty("os.name").toLowerCase();
+	}
+
 	/** inicializa el driver. */
 	public static void inicializaDriver() {
-		System.setProperty("webdriver.gecko.driver", "Documentos/selenium/drivers/geckodriver");
+		if (getTipoSistema().contains("win")) {
+			System.setProperty("webdriver.gecko.driver", "Documentos/selenium/drivers/geckodriver.exe");
+		} else {
+			System.setProperty("webdriver.gecko.driver", "Documentos/selenium/drivers/geckodriver");
+		}
 		FirefoxOptions firefoxOptions = new FirefoxOptions();
 		firefoxOptions.setHeadless(true);
 		driver = new FirefoxDriver(firefoxOptions);
@@ -52,6 +59,9 @@ public class DriverUv {
 	public static void capturaPantalla(String nombre) {
 		File scrFile = ((TakesScreenshot) driver).getScreenshotAs(OutputType.FILE);
 	    String directorio = "/tmp/";
+		if (getTipoSistema().contains("win")) {
+			directorio = System.getProperty("java.io.tmpdir");
+		}
 	    try {
 	    	String nombreFichero = directorio + contador++ + "-" + nombre + ".png";
 			Files.copy(scrFile.toPath(), (new File(nombreFichero)).toPath(), StandardCopyOption.REPLACE_EXISTING);

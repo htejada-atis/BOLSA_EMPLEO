@@ -11,20 +11,25 @@ import es.ujaen.uvirtual.beans.Usuario;
 /** utilidades para los test docentia.
  *
  */
-public class UtilsTestautoAprovisionado {
+public class UtilsTestAutoregistrado {
 	
 	private static final String UID_PRUEBAS = "usig";
 
-	private UtilsTestautoAprovisionado() { }
+	private UtilsTestAutoregistrado() { }
+	
+	private static boolean cargado = false;
 	
 	/** Inicializa la bd autoaprovisionado.
 	 * @throws SQLException si error sql
 	 * @throws IOException si error io
 	 */
 	public static void inicializaDb() throws SQLException, IOException {
-		BbddRunner.ejecutarArcos("Documentos/scripts/opc.autoaprovisionado/Desarrollo/dropTables.sql");
-		BbddRunner.ejecutarArcos("Documentos/scripts/opc.autoaprovisionado/01-createTable.sql");
-		BbddRunner.ejecutar("Documentos/scripts/opc.autoaprovisionado/uv.sql");
+		if (!cargado) {
+			BbddRunner.ejecutarArcos("Documentos/scripts/opc.autoaprovisionado/Desarrollo/dropTables.sql");
+			BbddRunner.ejecutarArcos("Documentos/scripts/opc.autoaprovisionado/01-createTable.sql");
+			BbddRunner.insertMasivo("Documentos/scripts/opc.autoaprovisionado/uv.sql");
+			cargado = true;
+		}
 	}
 	
     /** obtiene una peticion autenticada con el usuario de pruebas de docentia.

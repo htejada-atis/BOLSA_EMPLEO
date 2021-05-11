@@ -1,4 +1,4 @@
-package es.ujaen.uvirtual.modelo;
+package es.ujaen.uvirtual.modulo.autoregistrado.modelo;
 
 import java.io.IOException;
 import java.math.BigInteger;
@@ -15,6 +15,7 @@ import javax.mail.internet.InternetAddress;
 
 import es.ujaen.uvirtual.beans.ConfiguracionGlobal;
 import es.ujaen.uvirtual.beans.Usuario;
+import es.ujaen.uvirtual.modelo.ModeloClaveArcos;
 import es.ujaen.uvirtual.modelo.conexion.ConexionArcos;
 import es.ujaen.uvirtual.utilidades.EnviaCorreo;
 import es.ujaen.uvirtual.utilidades.UVException;
@@ -22,7 +23,7 @@ import es.ujaen.uvirtual.utilidades.UVException;
 /** Modelo para usuario autoregistrado.
  */
 public class ModeloUsuarioAutoregistrado {
-
+	
 	private void insertaCuentaAutoregistradoBd(Connection conexion, Usuario usuario) throws SQLException, UVException {
 		String consulta = " INSERT INTO arcos.ARG_CUENTA " 
 				+ " (usuario, correo, clave, fecha_creacion) "
@@ -246,20 +247,20 @@ public class ModeloUsuarioAutoregistrado {
 	}
 	
 	/** obtiene el hash de la clave del usuario externo.
-	 * @param uid identificador del usuario externo
+	 * @param correo correo del usuario externo
 	 * @return hash de la clave del usuario externo
 	 * @throws SQLException si error en bd
 	 */
-	private String listaClaveUsuarioExterno(String uid) throws SQLException {
+	private String listaClaveUsuarioExterno(String correo) throws SQLException {
 		String salida = null;
-		String consulta = " select strclave from arcos.arg_cuenta c where c.ididentificador = ? ";
+		String consulta = " select clave from arcos.arg_cuenta c where c.correo = ? ";
 		try (Connection conexion = ConexionArcos.obtenerInstancia();
 			 PreparedStatement stmt = conexion.prepareStatement(consulta);) {
 			int parameterIndex = 1;
-			stmt.setString(parameterIndex++, uid);
+			stmt.setString(parameterIndex++, correo);
 			try (ResultSet rs = stmt.executeQuery();) {
 				if (rs.next()) {
-					salida = rs.getString("strclave");
+					salida = rs.getString("clave");
 				}
 			}
 		} 
@@ -268,14 +269,14 @@ public class ModeloUsuarioAutoregistrado {
 	
 	/**
 	 * Valida si la clave de un usuario externo es valida.
-	 * @param usuario identificador del usuario externo
+	 * @param correo correo del usuario externo
 	 * @param clave clave del usuairo
 	 * @return true en caso de ser valida, false en caso contrario
 	 * @throws SQLException en caso de error en la base de datos
 	 */
-	public boolean validaClaveUsuario(String usuario, String clave) throws SQLException {
+	public boolean validaClaveUsuario(String correo, String clave) throws SQLException {
 		boolean salida = false;
-		String ultimoHash = listaClaveUsuarioExterno(usuario);
+		String ultimoHash = listaClaveUsuarioExterno(correo);
 		ModeloClaveArcos modeloClaveArcos = new ModeloClaveArcos();
 		if (modeloClaveArcos.isClaveIgualHash(clave, ultimoHash)) {
 			salida = true;
@@ -332,15 +333,14 @@ public class ModeloUsuarioAutoregistrado {
 	 * @throws SQLException si error bd
 	 * @throws UVException si error validacion
 	 */
-	public static String mandarClaveTemporal(String correo, String ip) throws SQLException, UVException {
+	public String mandarClaveTemporal(String correo, String ip) throws SQLException, UVException {
 		ArrayList<String> destinatariosCorreo = new ArrayList<>();
 		ModeloClaveArcos modeloClaveArcos = new ModeloClaveArcos();
-		ModeloUsuarioAutoregistrado modelo = new ModeloUsuarioAutoregistrado();
 		final int numeroBitsId = 512;
 		final int moduloConversionACaracter = 32;
 		String codigoPin = modeloClaveArcos.pinAleatorioTemporal();
 		String idsolicitud = new BigInteger(numeroBitsId, new SecureRandom()).toString(moduloConversionACaracter);
-		modelo.insertaPeticionCambio(correo, idsolicitud, codigoPin, ip);
+		insertaPeticionCambio(correo, idsolicitud, codigoPin, ip);
 		destinatariosCorreo.add(correo);
 		String asunto = ConfiguracionGlobal.getParametroCadena("autoaprovisionado.mail.asunto");
 		String cuerpo = ConfiguracionGlobal.getParametroCadena("autoaprovisionado.mail.cuerpo");
@@ -360,11 +360,10 @@ public class ModeloUsuarioAutoregistrado {
 	 * @param idSolicitud idSolicitud para aplicar a la plantilla
 	 * @return texto de la plantilla con los valores cambiados
 	 */
-	protected static String aplicaPlantilla(String plantilla, String codigoPin, String idSolicitud) {
+	private String aplicaPlantilla(String plantilla, String codigoPin, String idSolicitud) {
 		String salida = plantilla;
 		salida = salida.replace("%%CODIGO%%", codigoPin);
 		salida = salida.replace("%%IDSOLICITUD%%", idSolicitud);
 		return salida;
 	}
-	
 }
