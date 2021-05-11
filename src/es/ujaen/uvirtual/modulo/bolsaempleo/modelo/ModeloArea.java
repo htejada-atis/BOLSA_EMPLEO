@@ -314,11 +314,11 @@ public class ModeloArea {
 		
 		String consulta =
 		"SELECT bepbol.*, bepuea.USUARIO "
-		+ "FROM TBEP_BOLSAS bepbol "
-		+ "INNER JOIN TBEP_AREAS bepare ON bepare.CODNUM = bepbol.BEPARE_CODNUM "
-		+ "LEFT JOIN UVIRTUAL.TBEP_USUARIOS_EXCLUIDOS_AREA bepuea "
-		+ "ON bepare.CODNUM = bepuea.AREA AND bepuea.USUARIO = ? "
-		+ "WHERE 1=1 ";
+		+ " FROM TBEP_BOLSAS bepbol"
+		+ " INNER JOIN TBEP_AREAS bepare ON bepare.CODNUM = bepbol.BEPARE_CODNUM"
+		+ " LEFT JOIN UVIRTUAL.TBEP_USUARIOS_EXCLUIDOS_AREA bepuea "
+		+ " ON bepare.CODNUM = bepuea.AREA AND bepuea.USUARIO = ?"
+		+ " WHERE bepbol.FLGBAREMABLE = 'S' ";
 		
 		dataTable.setColumn(ORDER_COLUMN_INDEX_CODIGO_SOLICITUDES, "bepare.ID_AREA_CONOCIMIENTO");
 		dataTable.setColumn(ORDER_COLUMN_INDEX_AREA_SOLICITUDES, "bepare.DES_AREA_CONOCIMIENTO");

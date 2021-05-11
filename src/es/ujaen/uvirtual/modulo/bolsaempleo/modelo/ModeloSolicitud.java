@@ -1,5 +1,6 @@
 package es.ujaen.uvirtual.modulo.bolsaempleo.modelo;
 
+import java.io.IOException;
 import java.sql.Connection;
 import java.sql.Date;
 import java.sql.PreparedStatement;
@@ -818,6 +819,7 @@ public class ModeloSolicitud {
 	 * Actualiza el estado de la solicitud a cerrado .
 	 * @param solicitud .
 	 * @throws SQLException .
+	 * @throws UVException .
 	 */
 	public void confirmacionSolicitud(Solicitud solicitud) throws SQLException, UVException {
 		if (solicitud == null) {
