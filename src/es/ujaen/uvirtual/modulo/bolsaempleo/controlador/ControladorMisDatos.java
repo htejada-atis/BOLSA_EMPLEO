@@ -126,7 +126,7 @@ public class ControladorMisDatos extends HttpServlet {
 		
 		try {
 			modelo.checkUser(datos);
-			bean.setUsuario(ModeloUsuarioBolsaEmpleo.obtenerInstancia().listaUsuario(usuario.getUid()));			
+			bean.setUsuario(ModeloUsuarioBolsaEmpleo.obtenerInstancia().listaUsuario(usuario.getDocumentoNumero()));
 			switch (nombreAccion) {
 				case ACCION_INDEX:
 					bean.setVista("/WEB-INF/jsp/vista/infadministrativa/bolsaempleo/misdatos/index.jsp");
@@ -187,7 +187,6 @@ public class ControladorMisDatos extends HttpServlet {
 		ModeloUsuarioBolsaEmpleo modelo = ModeloUsuarioBolsaEmpleo.obtenerInstancia();
 		Integer codNum = Formateador.leeParametroInteger(request.getParameter(PARAM_ID));
 		UsuarioBolsaEmpleo usua = modelo.getUsuarioById(codNum);
-		usuario.setCodPersona(usua.getCodPersona());
 		
 		if (!validator.isValid()) {
 			for (String param : validator.getErrors().keySet()) {
