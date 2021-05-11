@@ -14,7 +14,9 @@ import java.util.List;
 import javax.sql.DataSource;
 
 import org.junit.BeforeClass;
+import org.junit.FixMethodOrder;
 import org.junit.Test;
+import org.junit.runners.MethodSorters;
 
 import bbdd.BbddRunner;
 import bbdd.UtilsTestBolsaEmpleo;
@@ -26,6 +28,7 @@ import es.ujaen.uvirtual.utilidades.UVException;
 /** test modelo convocatorias.
 *
 */
+@FixMethodOrder(MethodSorters.NAME_ASCENDING)
 public class TestBEPModeloConvocatoria {
 	private static final Integer CODNUM = 2;
 	private static final Integer NUM = 10;

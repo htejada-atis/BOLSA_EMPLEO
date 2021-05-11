@@ -7,6 +7,8 @@ import java.text.ParseException;
 import javax.sql.DataSource;
 
 import org.junit.BeforeClass;
+import org.junit.FixMethodOrder;
+import org.junit.runners.MethodSorters;
 
 import bbdd.BbddRunner;
 import bbdd.UtilsTestBolsaEmpleo;
@@ -15,6 +17,7 @@ import es.ujaen.uvirtual.modelo.conexion.Conexion;
 /** test modelo area.
 *
 */
+@FixMethodOrder(MethodSorters.NAME_ASCENDING)
 public class TestBEPModeloArea {
 	
 	/** prepara la bd con los datos iniciales.

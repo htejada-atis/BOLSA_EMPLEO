@@ -4,6 +4,8 @@ import java.io.IOException;
 import java.sql.SQLException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
@@ -260,11 +262,15 @@ public class ControladorMisDatos extends HttpServlet {
 		}
 
 		u.setCodigoPostal(EscapaHTML.ajustaCodificacion(request.getParameter(PARAM_CODIGO_POSTAL)));
-		if (u.getDireccion() != null) {
-			if (!BolsaEmpleoUtils.isInteger(u.getDireccion())) {
-				throw new UVException(MENSAJE_ERROR_CODIGO_POSTAL_STRING);  
-			}
-			if (u.getDireccion().length() > ModeloUsuarioBolsaEmpleo.COLUMN_CODIGO_POSTAL_MAXLENGTH) {
+		if (u.getCodigoPostal() != null) {
+			String regex = "[0-9]+";
+	        Pattern p = Pattern.compile(regex);
+	        Matcher m = p.matcher((String) u.getCodigoPostal());
+
+	        if (!m.matches()) {
+	        	throw new UVException(MENSAJE_ERROR_CODIGO_POSTAL_STRING);
+	        }
+			if (u.getCodigoPostal().length() > ModeloUsuarioBolsaEmpleo.COLUMN_CODIGO_POSTAL_MAXLENGTH) {
 				throw new UVException(String.format(MENSAJE_ERROR_CODIGO_POSTAL_LARGO, ModeloUsuarioBolsaEmpleo.COLUMN_CODIGO_POSTAL_MAXLENGTH));
 		    }
 		}

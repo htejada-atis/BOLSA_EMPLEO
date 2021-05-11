@@ -8,7 +8,10 @@ import java.io.IOException;
 import java.sql.SQLException;
 import javax.servlet.ServletException;
 import org.junit.BeforeClass;
+import org.junit.FixMethodOrder;
 import org.junit.Test;
+import org.junit.runners.MethodSorters;
+
 import bbdd.BbddRunner;
 import bbdd.UtilsTestBolsaEmpleo;
 import controlador.implementacion.PeticionHttp;
@@ -21,6 +24,7 @@ import es.ujaen.uvirtual.modulo.bolsaempleo.vistas.VistaEvaluadores;
 /** test controlador titulacion.
  * @author ATISoluciones 
  */
+@FixMethodOrder(MethodSorters.NAME_ASCENDING)
 public class TestBEPControladorGestionEvaluadores {
 	
 	private static final String MENSAJE_AREAS_DEVUELTAS = "Debe devolver areas";
@@ -108,7 +112,7 @@ public class TestBEPControladorGestionEvaluadores {
 	/** Obtener datatable evaluadores .
 	 * @throws SQLException si fallo bd .
 	 * @throws IOException si error io .
-	 * @throws ServletException  si error servlet .
+	 * @throws ServletException si error servlet .
 	 */
 	@Test
 	public void testA03ObtenerEvaluadores() throws SQLException, ServletException, IOException {

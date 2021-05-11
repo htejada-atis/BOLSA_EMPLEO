@@ -70,6 +70,14 @@ VistaUsuarioBolsaEmpleo bean = (VistaUsuarioBolsaEmpleo) uvdatos.getVistas().get
 		}
 	%>
 	
+	<div id="erroresForm" class="error" style="display:none;">
+		<p>Porfavor primero debe rellenar todos los campos requeridos del formulario:</p>
+		<ul id="erroresFormList">
+		</ul>
+	</div>
+	
+	<p>Las etiquetas en <b>negrita</b> corresponden a campos de relleno obligatorio</p>
+	
 	<form id="actualizar_usuario" class="be-form" method="post" action="<%= request.getRequestURI() %>">
     	<input type="hidden" name="<%= ControladorUsuarioBolsaEmpleo.PARAM_ACCION %>" id="accion_formulario" value="" />
 		<input type="hidden" name="<%= ControladorUsuarioBolsaEmpleo.PARAM_ID%>" id="usuario_id" value="" />
@@ -142,8 +150,8 @@ VistaUsuarioBolsaEmpleo bean = (VistaUsuarioBolsaEmpleo) uvdatos.getVistas().get
    		</div>
 		
 		<div class="form-group">
-			<label for="select_role">Elija el rol para asociar</label>
-			<select class="params" id="select_role" name="<%= ControladorUsuarioBolsaEmpleo.PARAM_ROLE %>" style="width:100%;">
+			<label for="select_role"><b>Elija el rol para asociar</b></label>
+			<select class="params" id="select_role" name="<%= ControladorUsuarioBolsaEmpleo.PARAM_ROLE %>" style="width:100%;" required>
 				<option value="-1"> - </option>
     				<%for(Rol role: bean.getRoles()){
     					if(bean.getUsuario()!=null){
@@ -170,6 +178,17 @@ VistaUsuarioBolsaEmpleo bean = (VistaUsuarioBolsaEmpleo) uvdatos.getVistas().get
 </div>
 
 <script>
+
+	function checkRequiredInputs(){
+		if($('#select_role').val()==-1){
+			$('#erroresFormList').html("");
+			$('#erroresFormList').append( "<li>Rol</li>" );
+			$('#erroresForm').show();
+			return false;
+		}
+		return true;
+	}
+
 
 	function enviarUsuario(event, submit_input) {
 		event.preventDefault();
@@ -214,8 +233,8 @@ VistaUsuarioBolsaEmpleo bean = (VistaUsuarioBolsaEmpleo) uvdatos.getVistas().get
 				input_exc_temporal.value = "T";
 			}
 		}
-	
-		submit_input.form.submit();
+		
+		if(checkRequiredInputs()) submit_input.form.submit();
 	}
 
 	$(document).ready(function() {

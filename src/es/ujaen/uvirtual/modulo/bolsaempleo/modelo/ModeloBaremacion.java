@@ -878,15 +878,6 @@ public class ModeloBaremacion {
 		List<ItemBaremacion> items = new ArrayList<>();
 		BolsaEmpleoDataTable<ItemBaremacion> dataTable = new BolsaEmpleoDataTable<ItemBaremacion>(params);
 		
-//		String consulta = "SELECT bepite.* "
-//				+ "FROM TBEP_ITEMSBAREMACION bepite "
-//				+ "LEFT JOIN TBEP_MERITOS_EXCLUYENTES bepmex ON bepite.CODNUM = bepmex.BEPITE_CODNUM_HIJO AND bepmex.BEPITE_CODNUM_PADRE = ? "
-//				+ "WHERE bepite.CODNUM != ? AND bepmex.BEPITE_CODNUM_HIJO IS NULL";
-		
-//		String consulta = "SELECT bepite.* "
-//		+ "FROM TBEP_ITEMSBAREMACION bepite "
-//		+ "WHERE bepite.CODNUM != ?";
-		
 		String consulta = "SELECT bepite.*, SEL.HIJO "
 				+ "FROM TBEP_ITEMSBAREMACION bepite "
 				+ "LEFT JOIN "
@@ -941,13 +932,15 @@ public class ModeloBaremacion {
 	public List<ItemBaremacion> getItemsExcluyentes(ItemBaremacion item) throws SQLException, UVException {
 		ArrayList<ItemBaremacion> items = new ArrayList<>();
 		
-		String consulta = "SELECT bepite.* FROM TBEP_ITEMSBAREMACION bepite "
-				+ "RIGHT JOIN TBEP_MERITOS_EXCLUYENTES bepmex "
+		String consulta = "SELECT bepite.*,bepmex.BEPITE_CODNUM_HIJO FROM uvirtual.TBEP_ITEMSBAREMACION bepite "
+				+ "LEFT JOIN uvirtual.TBEP_MERITOS_EXCLUYENTES bepmex "
 				+ "ON bepite.CODNUM = bepmex.BEPITE_CODNUM_HIJO "
-				+ "AND bepmex.BEPITE_CODNUM_PADRE = ?";
+				+ "AND bepmex.BEPITE_CODNUM_PADRE = ? "
+				+ "WHERE bepmex.BEPITE_CODNUM_PADRE = ?";
 		
 		try (Connection conexion = ConexionUvirtual.obtenerInstancia(); PreparedStatement stmt = conexion.prepareStatement(consulta)) {
 			int indexParam = 1;
+			stmt.setInt(indexParam++, item.getCodNum());
 			stmt.setInt(indexParam++, item.getCodNum());
 			
 			try (ResultSet rs = stmt.executeQuery()) {

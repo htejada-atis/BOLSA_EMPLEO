@@ -15,7 +15,9 @@ import java.util.List;
 import javax.sql.DataSource;
 
 import org.junit.BeforeClass;
+import org.junit.FixMethodOrder;
 import org.junit.Test;
+import org.junit.runners.MethodSorters;
 
 import bbdd.BbddRunner;
 import bbdd.UtilsTestBolsaEmpleo;
@@ -29,6 +31,7 @@ import es.ujaen.uvirtual.utilidades.UVException;
 /** test modelo mis titulaciones.
 *
 */
+@FixMethodOrder(MethodSorters.NAME_ASCENDING)
 public class TestBEPModeloMisTitulaciones {
 	private static final String CODCUENTA = "test2";
 	private static final Rol ROL = new Rol(1050);
