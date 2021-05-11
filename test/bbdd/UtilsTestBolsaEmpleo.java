@@ -7,7 +7,6 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.sql.Types;
 import java.util.Arrays;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -31,10 +30,6 @@ public class UtilsTestBolsaEmpleo {
 	private static final String ESQUEMA_ARCOS = "arcos";
 	private static final String ESQUEMA_RRHH = "rrhh";
 	private static final String ESQUEMA_UVIRTUAL = "uvirtual";
-	private static final int ROL_PERSONAL = 1050;
-	private static final int ROL_COMISION = 1051;
-	private static final int ROL_CANDIDATO = 1052;
-	private static final int ROL_DIRECTOR_DEPARTAMENTO = 1053;
 	private static final int NUM_AREAS_INSERTAR = 35;
 	private static final Pattern RE_FILE_MIGRATION = Pattern.compile("\\d+-(im|eje)-[a-zA-Z]+\\.sql", Pattern.DOTALL);
 			

@@ -91,18 +91,15 @@ public class ControladorAreasABaremar extends HttpServlet {
 		Usuario usuario = datos.getUsuario();
 		LOGGER.log(Level.FINEST, "usuario que ha entrado en el servlet es {0}", usuario.getUid());
 				
-		ModeloUsuarioBolsaEmpleo modelo = ModeloUsuarioBolsaEmpleo.obtenerInstancia();		
-		
 		String nombreAccion = EscapaHTML.ajustaCodificacion(request.getParameter(PARAM_ACCION));
 		if (nombreAccion == null) {
 			nombreAccion = ACCION_LISTAR;
 		}		
-		
+					
 		try {
-			modelo.checkUser(datos);
+			init(bean, datos);
 			switch (nombreAccion) {
 				case ACCION_LISTAR:
-					bean.setVista(RUTA_BEP_CONF + "areasbaremar.jsp");
 					break;
 				case ACCION_AREA:
 					accionSobreArea(bean, request);
@@ -138,6 +135,11 @@ public class ControladorAreasABaremar extends HttpServlet {
 			datos.getFicherosCSS().add("/css/ujaen_bolsa_empleo.css");
 			datos.getFicherosCSS().add("/css/jqueryujaen/jquery-ui-1.8.16.custom.css");
 		}
+	}
+	
+	private void init(VistaAreasBaremar bean, UVDatos datos) throws SQLException, UVException {
+		bean.setVista(RUTA_BEP_CONF + "areasbaremar.jsp");
+		ModeloUsuarioBolsaEmpleo.obtenerInstancia().checkUser(datos);
 	}
 	
 	private void errorFatal(VistaAreasBaremar bean, String mensaje) {

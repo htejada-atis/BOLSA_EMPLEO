@@ -25,8 +25,6 @@ import es.ujaen.uvirtual.modulo.bolsaempleo.beans.Afinidad;
 import es.ujaen.uvirtual.modulo.bolsaempleo.modelo.ModeloAfinidad;
 import es.ujaen.uvirtual.modulo.bolsaempleo.modelo.ModeloUsuarioBolsaEmpleo;
 import es.ujaen.uvirtual.modulo.bolsaempleo.utilidades.BolsaEmpleoDataTable;
-import es.ujaen.uvirtual.modulo.bolsaempleo.utilidades.BolsaEmpleoUtils;
-import es.ujaen.uvirtual.modulo.bolsaempleo.utilidades.BolsaEmpleoValidator;
 import es.ujaen.uvirtual.modulo.bolsaempleo.vistas.VistaAfinidades;
 import es.ujaen.uvirtual.utilidades.EscapaHTML;
 import es.ujaen.uvirtual.utilidades.Formateador;
@@ -44,6 +42,7 @@ import es.ujaen.uvirtual.utilidades.UVException;
 			"/srv/es/ajax/informacionadministrativa/bolsaempleo/configuracion/afinidades",
 			"/srv/en/ajax/informacionadministrativa/bolsaempleo/configuracion/afinidades"
 })
+
 public class ControladorAfinidades extends HttpServlet {
 	private static final long serialVersionUID = 1L;
 	private static final String NOMBREDEESTACLASE = ControladorAfinidades.class.getName();
@@ -104,7 +103,6 @@ public class ControladorAfinidades extends HttpServlet {
 		
 		VistaAfinidades bean = new VistaAfinidades();		
 		Usuario usuario = datos.getUsuario();
-		ModeloUsuarioBolsaEmpleo modelo = ModeloUsuarioBolsaEmpleo.obtenerInstancia();	
 		LOGGER.log(Level.FINEST, "usuario que ha entrado en el servlet es {0}", usuario.getUid());
 				
 		String nombreAccion = EscapaHTML.ajustaCodificacion(request.getParameter(PARAM_ACCION));		
@@ -113,7 +111,7 @@ public class ControladorAfinidades extends HttpServlet {
 		}
 					
 		try {
-			modelo.checkUser(datos);
+			init(bean, datos);
 			switch (nombreAccion) {
 				case ACCION_LISTAR_AFINIDADES:
 					index(bean);
@@ -155,7 +153,12 @@ public class ControladorAfinidades extends HttpServlet {
 			datos.getFicherosCSS().add("/css/jqueryujaen/jquery-ui-1.8.16.custom.css");
 			datos.getFicherosCSS().add("/css/ujaen_bolsa_empleo.css");			
 		}
-	}	
+	}
+	
+	private void init(VistaAfinidades bean, UVDatos datos) throws SQLException, UVException {
+		bean.setVista(RUTA_BEP_CON + "index.jsp");
+		ModeloUsuarioBolsaEmpleo.obtenerInstancia().checkUser(datos);
+	}
 	
 	private void errorFatal(VistaAfinidades bean, String mensaje) {
 		bean.setVista("/WEB-INF/jsp/vista/infadministrativa/bolsaempleo/error.jsp");

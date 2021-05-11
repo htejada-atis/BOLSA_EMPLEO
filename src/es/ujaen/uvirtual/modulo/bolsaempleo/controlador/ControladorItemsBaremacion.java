@@ -165,7 +165,7 @@ public class ControladorItemsBaremacion extends HttpServlet {
 		}
 		
 		try {
-			ModeloUsuarioBolsaEmpleo.obtenerInstancia().checkUser(datos);
+			init(bean, datos);
 			switch (nombreAccion) {
 				case ACCION_INDEX:
 					indice(bean);
@@ -241,6 +241,11 @@ public class ControladorItemsBaremacion extends HttpServlet {
 	
 	private void indice(VistaItemsBaremacion bean) {
 		bean.setVista(JSP_ITEM_BAREMACION);
+	}
+	
+	private void init(VistaItemsBaremacion bean, UVDatos datos) throws SQLException, UVException {
+		bean.setVista(JSP_ITEM_BAREMACION);
+		ModeloUsuarioBolsaEmpleo.obtenerInstancia().checkUser(datos);
 	}
 	
 	private void accionNodefinida(VistaItemsBaremacion bean) {

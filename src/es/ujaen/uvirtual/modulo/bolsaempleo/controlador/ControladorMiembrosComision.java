@@ -57,7 +57,6 @@ public class ControladorMiembrosComision extends HttpServlet {
 		
 		VistaMiembrosComision bean = new VistaMiembrosComision();		
 		Usuario usuario = datos.getUsuario();
-		ModeloUsuarioBolsaEmpleo modelo = ModeloUsuarioBolsaEmpleo.obtenerInstancia();
 		LOGGER.log(Level.FINEST, "usuario que ha entrado en el servlet es {0}", usuario.getUid());
 		
 		String nombreAccion = EscapaHTML.ajustaCodificacion(request.getParameter(PARAM_ACCION));
@@ -65,16 +64,14 @@ public class ControladorMiembrosComision extends HttpServlet {
 			nombreAccion = ACCION_LISTAR_AREAS;
 		}
 		
-		bean.setVista("/WEB-INF/jsp/vista/infadministrativa/bolsaempleo/miembroscomision/index.jsp");
-		
 		try {
-			modelo.checkUser(datos);
+			init(bean, datos);
 			switch (nombreAccion) {
-				case ACCION_LISTAR:
-					listado(datos, request, response);
-					break;
 				case ACCION_LISTAR_AREAS:
 					obtenerAreas(bean);
+					break;	
+				case ACCION_LISTAR:
+					listado(datos, request, response);
 					break;
 				default:
 					errorFatal(bean, "Acción no contemplada");
@@ -98,6 +95,11 @@ public class ControladorMiembrosComision extends HttpServlet {
 			datos.getFicherosCSS().add("/css/ujaen_bolsa_empleo.css");
 			datos.getFicherosCSS().add("/css/jqueryujaen/jquery-ui-1.8.16.custom.css");
 		}
+	}
+	
+	private void init(VistaMiembrosComision bean, UVDatos datos) throws SQLException, UVException {
+		bean.setVista("/WEB-INF/jsp/vista/infadministrativa/bolsaempleo/miembroscomision/index.jsp");
+		ModeloUsuarioBolsaEmpleo.obtenerInstancia().checkUser(datos);
 	}
 	
 	private void errorFatal(VistaMiembrosComision bean, String mensaje) {

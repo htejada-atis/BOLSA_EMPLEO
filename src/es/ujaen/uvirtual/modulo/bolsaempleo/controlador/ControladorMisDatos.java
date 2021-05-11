@@ -106,7 +106,6 @@ public class ControladorMisDatos extends HttpServlet {
 		
 		VistaUsuarioBolsaEmpleo bean = new VistaUsuarioBolsaEmpleo();       
 		Usuario usuario = datos.getUsuario();
-		ModeloUsuarioBolsaEmpleo modelo = ModeloUsuarioBolsaEmpleo.obtenerInstancia();
 		LOGGER.log(Level.FINEST, "usuario que ha entrado en el servlet es {0}", usuario.getUid());
 		
 		String nombreAccion = EscapaHTML.ajustaCodificacion(request.getParameter(PARAM_ACCION));
@@ -114,15 +113,12 @@ public class ControladorMisDatos extends HttpServlet {
 			nombreAccion = ACCION_INDEX;
 		}
 		
-		Usuario usuArcos = CrearUsuario.usuario(usuario.getUid());
-		bean.setUsuarioArcos(usuArcos);
-		bean.setVista(JSP_INDEX);
-		
 		try {
-			modelo.checkUser(datos);
-			bean.setUsuario(ModeloUsuarioBolsaEmpleo.obtenerInstancia().listaUsuario(usuario.getDocumentoNumero()));            
+			init(bean, datos);
+
 			switch (nombreAccion) {
 				case ACCION_INDEX:
+					index(bean, datos);
 					break;
 				case ACCION_ENVIAR_MISDATOS:
 					enviarMisDatos(request, bean);
@@ -153,6 +149,11 @@ public class ControladorMisDatos extends HttpServlet {
 			datos.getFicherosCSS().add("/css/jqueryujaen/jquery-ui-1.8.16.custom.css");
 		}
     }
+	
+	private void init(VistaUsuarioBolsaEmpleo bean, UVDatos datos) throws SQLException, UVException {
+		this.index(bean, datos);
+		ModeloUsuarioBolsaEmpleo.obtenerInstancia().checkUser(datos);
+	}
     
 	private void errorFatal(VistaUsuarioBolsaEmpleo bean, String mensaje) {
 		bean.setVista("/WEB-INF/jsp/vista/infadministrativa/bolsaempleo/error.jsp");
@@ -166,6 +167,14 @@ public class ControladorMisDatos extends HttpServlet {
     public void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 		doGet(request, response);
 	}   
+	
+	private void index(VistaUsuarioBolsaEmpleo bean, UVDatos datos) throws SQLException, UVException {
+		Usuario usuario = datos.getUsuario();
+		Usuario usuArcos = CrearUsuario.usuario(usuario.getUid());
+		bean.setUsuario(ModeloUsuarioBolsaEmpleo.obtenerInstancia().listaUsuario(usuario.getDocumentoNumero()));
+		bean.setUsuarioArcos(usuArcos);
+		bean.setVista(JSP_INDEX);
+	}
     
     /** Envia el formulario con los datos del usuario logueado.
      * @param bean .

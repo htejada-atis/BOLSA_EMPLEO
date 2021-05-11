@@ -81,9 +81,7 @@ public class ControladorBolsas extends HttpServlet {
 		datos.setContentType("text/html");
 		
 		VistaEstadoBolsas bean = new VistaEstadoBolsas();		
-		Usuario usuario = datos.getUsuario();
-		ModeloUsuarioBolsaEmpleo modelo = ModeloUsuarioBolsaEmpleo.obtenerInstancia();	
-		ModeloBolsa modeloBolsa = ModeloBolsa.obtenerInstancia();
+		Usuario usuario = datos.getUsuario();		
 		LOGGER.log(Level.FINEST, "usuario que ha entrado en el servlet es {0}", usuario.getUid());
 		
 		String nombreAccion = EscapaHTML.ajustaCodificacion(request.getParameter(PARAM_ACCION));		
@@ -91,12 +89,8 @@ public class ControladorBolsas extends HttpServlet {
 			nombreAccion = ACCION_LISTAR_BOLSAS;
 		}
 		
-		try {
-			bean.setTotalBolsasBloqueadas(modeloBolsa.getBolsasBloqueadas());
-			bean.setTotalBolsasRevisadas(modeloBolsa.getBolsasRevisadas());
-			bean.setTotalBolsasBaremables(modeloBolsa.getBolsasBaremables());
-			bean.setTotalBolsas(modeloBolsa.getTotalBolsas());
-			modelo.checkUser(datos);
+		try {			
+			init(bean, datos);
 			switch (nombreAccion) {
 				case ACCION_LISTAR_BOLSAS:
 					bean.setVista("/WEB-INF/jsp/vista/infadministrativa/bolsaempleo/bolsas/index.jsp");
@@ -129,6 +123,18 @@ public class ControladorBolsas extends HttpServlet {
 			datos.getFicherosCSS().add("/css/ujaen_bolsa_empleo.css");
 			datos.getFicherosCSS().add("/css/jqueryujaen/jquery-ui-1.8.16.custom.css");
 		}
+	}
+	
+	private void init(VistaEstadoBolsas bean, UVDatos datos) throws SQLException, UVException {
+		ModeloBolsa modeloBolsa = ModeloBolsa.obtenerInstancia();
+		
+		bean.setVista("/WEB-INF/jsp/vista/infadministrativa/bolsaempleo/bolsas/index.jsp");
+		bean.setTotalBolsasBloqueadas(modeloBolsa.getBolsasBloqueadas());
+		bean.setTotalBolsasRevisadas(modeloBolsa.getBolsasRevisadas());
+		bean.setTotalBolsasBaremables(modeloBolsa.getBolsasBaremables());
+		bean.setTotalBolsas(modeloBolsa.getTotalBolsas());
+		
+		ModeloUsuarioBolsaEmpleo.obtenerInstancia().checkUser(datos);
 	}
 	
 	private void errorFatal(VistaEstadoBolsas bean, String mensaje) {

@@ -56,8 +56,6 @@ public class UsuarioBolsaEmpleo implements Serializable {
 	 * @param pfechaexclusionini .
 	 * @param pfechaexclusionfin .
 	 * @param pusu .
-	 * @param pfechaexclusionini .
-	 * @param pfechaexclusionfin .
 	 */
 	public UsuarioBolsaEmpleo(String pdocumento, String pusu, Rol prol, Boolean plistaDist,
 			Boolean pexcluido, String pexcluidotipo, Date pfechaexclusionini, Date pfechaexclusionfin) {
@@ -129,6 +127,7 @@ public class UsuarioBolsaEmpleo implements Serializable {
 	 * @param prazonexcluido .
 	 * @param pfechaexclusion .
 	 * @param pusu .
+	 * @param pdocumento .
 	 */
 	public UsuarioBolsaEmpleo(String pusu, String pdocumento, Rol prol, Boolean plistaDist, Boolean pexcluido, String pexcluidotipo, String prazonexcluido, 
 			Date pfechaexclusion, Date pfechaexclusionini, Date pfechaexclusionfin) {

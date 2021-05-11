@@ -70,6 +70,7 @@ public class ControladorFiltrar extends HttpServlet {
 	
 	// ruta vistas
 	public static final String RUTA_BEP_FILTRAR = "/WEB-INF/jsp/vista/infadministrativa/bolsaempleo/filtrar/";
+	public static final String JSP_INDEX = RUTA_BEP_FILTRAR + "index.jsp";
 	
 	// urls	
 	public static final String URL_PATTERN_FILES_PRIVADA = "/srv/es/informacionadministrativa/bolsaempleo/filtrar";
@@ -92,7 +93,6 @@ public class ControladorFiltrar extends HttpServlet {
 		
 		VistaFiltrar bean = new VistaFiltrar();		
 		Usuario usuario = datos.getUsuario();
-		ModeloUsuarioBolsaEmpleo modelo = ModeloUsuarioBolsaEmpleo.obtenerInstancia();	
 		LOGGER.log(Level.FINEST, "usuario que ha entrado en el servlet es {0}", usuario.getUid());
 		
 		String nombreAccion = EscapaHTML.ajustaCodificacion(request.getParameter(PARAM_ACCION));
@@ -101,8 +101,11 @@ public class ControladorFiltrar extends HttpServlet {
 		}
 		
 		try {
-			modelo.checkUser(datos);
+			init(bean, datos);
 			switch (nombreAccion) {
+				case ACCION_LISTAR:
+					bean.setVista(JSP_INDEX);
+					break;
 				case ACCION_CANDIDATO_SELECCIONADO:
 					seleccionarCandidato(bean, request);
 					break;
@@ -114,10 +117,7 @@ public class ControladorFiltrar extends HttpServlet {
 					break;
 				case ACCION_DESCARGAR_FICHERO:
 					descargarFichero(bean, datos, request, response);
-					break;
-				case ACCION_LISTAR:
-					bean.setVista(RUTA_BEP_FILTRAR + "index.jsp");
-					break;
+					break;				
 				case ACCION_TITULACION_DESELECCIONADA:
 					seleccionarTitulacion(bean, datos, request, response, false);
 					break;
@@ -148,6 +148,11 @@ public class ControladorFiltrar extends HttpServlet {
 		}
 	}
 	
+	private void init(VistaFiltrar bean, UVDatos datos) throws SQLException, UVException {
+		bean.setVista(JSP_INDEX);
+		ModeloUsuarioBolsaEmpleo.obtenerInstancia().checkUser(datos);
+	}
+	
 	private void errorFatal(VistaFiltrar bean, String mensaje) {
 		bean.setVista("/WEB-INF/jsp/vista/infadministrativa/bolsaempleo/error.jsp");
 		bean.getMensajesDeError().add(mensaje);
@@ -169,7 +174,7 @@ public class ControladorFiltrar extends HttpServlet {
 	 * @throws SQLException .
 	 */
 	private void seleccionarCandidato(VistaFiltrar bean, HttpServletRequest request) throws UVException, SQLException {
-		bean.setVista(RUTA_BEP_FILTRAR + "index.jsp");
+		bean.setVista(JSP_INDEX);
 		
 		ModeloTitulacion modeloTitulacion = ModeloTitulacion.obtenerInstancia();
 		ModeloUsuarioBolsaEmpleo modeloUsuario = ModeloUsuarioBolsaEmpleo.obtenerInstancia();

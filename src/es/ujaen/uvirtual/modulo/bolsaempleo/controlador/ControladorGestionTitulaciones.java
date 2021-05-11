@@ -86,16 +86,17 @@ public class ControladorGestionTitulaciones extends HttpServlet {
 		
 		VistaTitulaciones bean = new VistaTitulaciones();
 		
-		ModeloUsuarioBolsaEmpleo modelo = ModeloUsuarioBolsaEmpleo.obtenerInstancia();
-		
 		String nombreAccion = EscapaHTML.ajustaCodificacion(request.getParameter(PARAM_ACCION));
 		if (nombreAccion == null) {
 			nombreAccion = ACCION_LISTAR_TITULACIONES;
 		}
 		
 		try {
-			modelo.checkUser(datos);
+			init(bean, datos);
 			switch (nombreAccion) {
+				case ACCION_LISTAR_TITULACIONES:
+					bean.setVista(RUTA_BEP_CONF + "titulaciones.jsp");
+					break;
 				case ACCION_AGREGAR_TITULACION:
 					agregarTitulacion(bean, request, response);
 					break;
@@ -107,10 +108,7 @@ public class ControladorGestionTitulaciones extends HttpServlet {
 					break;
 				case ACCION_DATATABLE_TITULACIONES:
 					listadoTitulaciones(bean, datos, request, response);
-					break;
-				case ACCION_LISTAR_TITULACIONES:
-					bean.setVista(RUTA_BEP_CONF + "titulaciones.jsp");
-					break;
+					break;				
 				default:
 					errorFatal(bean, "Acción no contemplada");
 			}
@@ -131,6 +129,11 @@ public class ControladorGestionTitulaciones extends HttpServlet {
 			datos.getFicherosCSS().add("/css/jqueryujaen/jquery-ui-1.8.16.custom.css");
 			datos.getFicherosCSS().add("/css/ujaen_bolsa_empleo.css");
 		}
+	}
+	
+	private void init(VistaTitulaciones bean, UVDatos datos) throws SQLException, UVException {
+		bean.setVista(RUTA_BEP_CONF + "titulaciones.jsp");
+		ModeloUsuarioBolsaEmpleo.obtenerInstancia().checkUser(datos);
 	}
 	
 	private void errorFatal(VistaTitulaciones bean, String mensaje) {
