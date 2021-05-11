@@ -27,7 +27,7 @@ public class UtilsTestBolsaEmpleo {
 	private static final String UID_PRUEBAS = "usig";
 	private static final String UID_CANDIDATO_PRUEBAS = "candidato1";
 	private static final String UID_CANDIDATO2_PRUEBAS = "candidato2";
-	private static final String UID_PERSONAL_PRUEBAS = "personal5";
+	private static final String UID_PERSONAL_PRUEBAS = "personal1";
 	private static final String ESQUEMA_ARCOS = "arcos";
 	private static final String ESQUEMA_RRHH = "rrhh";
 	private static final String ESQUEMA_UVIRTUAL = "uvirtual";
@@ -72,19 +72,6 @@ public class UtilsTestBolsaEmpleo {
 			logFile("Insertando areas => OK");
 		} catch (SQLException ex) {
 			logFile("Error insertando areas y departamentos: " + ex, false);
-			throw ex;
-		}
-		
-		// datos de preubas => usuarios
-		try {
-			logFile("Insertando usuarios de pruebas...");
-			UtilsTestBolsaEmpleo.insertarUsuarios("personal1", ROL_PERSONAL);
-			UtilsTestBolsaEmpleo.insertarUsuarios("comision1", ROL_COMISION);
-			UtilsTestBolsaEmpleo.insertarUsuarios("candidato1", ROL_CANDIDATO);
-			UtilsTestBolsaEmpleo.insertarUsuarios("director1", ROL_DIRECTOR_DEPARTAMENTO);
-			logFile("Insertando usuarios de pruebas => OK");
-		} catch (SQLException ex) {
-			logFile("Error insertando usuarios: " + ex, false);
 			throw ex;
 		}
 		
@@ -368,69 +355,7 @@ public class UtilsTestBolsaEmpleo {
     		stmt.executeUpdate();    				
     	}
     }
-    
-    private static void insertarUsuarios(String idDentificador, Integer rol) throws SQLException {
-    	int parameterIndex = 1;
-    	String sql = "INSERT INTO TBEP_USUARIOS ("
-    			+ "CODPERSONA,"
-    			+ "CODCUENTA,"
-    			+ "ROL,"
-    			+ "EMAIL,"
-    			+ "DIRECCION,"
-    			+ "CODIGOPOSTAL,"
-    			+ "LOCALIDAD,"
-    			+ "PROVINCIA,"
-    			+ "MOVIL,"
-    			+ "TELEFONO,"
-    			+ "NACIONALIDAD,"
-    			+ "SEXO,"
-    			+ "FLGLISTADISTRIBUCION,"
-    			+ "FLGEXCLUIDO,"
-    			+ "FLGEXCLUIDOTIPO,"
-    			+ "RAZON_EXCLUSION,"
-    			+ "FECHA_EXCLUSION,"
-    			+ "FLGBORRADO,"
-    			+ "FECHA_BORRADO) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)";
-    	
-    	try (Connection con = BbddRunner.obtenerConexionUvirtual(); PreparedStatement stmt = con.prepareStatement(sql);) {
-    		parameterIndex = 1;
-    		stmt.setInt(parameterIndex++, UtilsTestBolsaEmpleo.getIdCuentaArcos(idDentificador));
-    		stmt.setString(parameterIndex++, idDentificador);
-    		stmt.setInt(parameterIndex++, rol);
-    		stmt.setString(parameterIndex++, idDentificador + "@bep.com");
-    		stmt.setString(parameterIndex++, "c/ calle " + idDentificador);
-    		stmt.setString(parameterIndex++, "11111");
-    		stmt.setString(parameterIndex++, "Granada");
-    		stmt.setString(parameterIndex++, "Granada");
-    		stmt.setString(parameterIndex++, "666111111");
-    		stmt.setString(parameterIndex++, "677111111");
-    		stmt.setString(parameterIndex++, "Española");
-    		stmt.setString(parameterIndex++, "M");
-    		stmt.setString(parameterIndex++, "S");
-    		stmt.setString(parameterIndex++, "N");
-    		stmt.setNull(parameterIndex++, Types.NULL);
-    		stmt.setNull(parameterIndex++, Types.NULL);
-    		stmt.setNull(parameterIndex++, Types.NULL);
-    		stmt.setString(parameterIndex++, "N");
-    		stmt.setNull(parameterIndex++, Types.NULL);
-    		stmt.executeUpdate();
-    	}
-    }
-    
-    private static Integer getIdCuentaArcos(String identificador) throws SQLException {
-    	String sql = "SELECT IDCUENTA FROM V_CUENTAS_INTRANET WHERE IDIDENTIFICADOR = ? FETCH FIRST 1 ROW ONLY";
-    	try (Connection con = BbddRunner.obtenerConexionArcos(); PreparedStatement stmt = con.prepareStatement(sql);) {
-    		stmt.setString(1, identificador);
-    		try (ResultSet rs = stmt.executeQuery()) {
-    			if (rs.next()) {
-    				return rs.getInt("IDCUENTA");
-    			}
-    		}
-    	}
-    	
-    	return null;
-    }
-    
+
     private static void logFile(String name, boolean ok) {
     	logFile(String.format("%s%s", name, ok ? " => OK" : ""));    	
     }

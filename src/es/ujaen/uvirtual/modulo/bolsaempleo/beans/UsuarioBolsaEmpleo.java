@@ -12,7 +12,6 @@ import es.ujaen.uvirtual.utilidades.Formateador;
 public class UsuarioBolsaEmpleo implements Serializable {
 	private static final long serialVersionUID = 1L;
 	private Integer codNum;
-	private Integer codpersona;
 	private String codcuenta;
 	private String tipodocumento;
 	private String numdocumento;
@@ -24,7 +23,6 @@ public class UsuarioBolsaEmpleo implements Serializable {
 	private String codigopostal;
 	private String localidad;
 	private String provincia;
-	private String movil;
 	private String telefono;
 	private String nacionalidad;
 	private String sexo;
@@ -50,19 +48,21 @@ public class UsuarioBolsaEmpleo implements Serializable {
 	}
 	
 	/** Constructor con parametros para Bolsa Empleo.
-	 * @param pcodpersona .
+	 * @param pdocumento .
 	 * @param prol .
 	 * @param plistaDist .
 	 * @param pexcluido .
 	 * @param pexcluidotipo .
+	 * @param pfechaexclusionini .
+	 * @param pfechaexclusionfin .
 	 * @param pusu .
 	 * @param pfechaexclusionini .
 	 * @param pfechaexclusionfin .
 	 */
-	public UsuarioBolsaEmpleo(Integer pcodpersona, String pusu, Rol prol, Boolean plistaDist, Boolean pexcluido, 
-			String pexcluidotipo, Date pfechaexclusionini, Date pfechaexclusionfin) {
+	public UsuarioBolsaEmpleo(String pdocumento, String pusu, Rol prol, Boolean plistaDist,
+			Boolean pexcluido, String pexcluidotipo, Date pfechaexclusionini, Date pfechaexclusionfin) {
 		super();
-		this.codpersona = pcodpersona;
+		this.numdocumento = pdocumento;
 		this.codcuenta = pusu;
 		this.rol = prol;
 		this.listaDist = plistaDist;
@@ -129,14 +129,12 @@ public class UsuarioBolsaEmpleo implements Serializable {
 	 * @param prazonexcluido .
 	 * @param pfechaexclusion .
 	 * @param pusu .
-	 * @param pcodpersona .
 	 */
-	public UsuarioBolsaEmpleo(Integer pcodpersona, String pusu,
-			Rol prol, Boolean plistaDist, Boolean pexcluido, String pexcluidotipo, String prazonexcluido, 
+	public UsuarioBolsaEmpleo(String pusu, String pdocumento, Rol prol, Boolean plistaDist, Boolean pexcluido, String pexcluidotipo, String prazonexcluido, 
 			Date pfechaexclusion, Date pfechaexclusionini, Date pfechaexclusionfin) {
 		super();
-		this.codpersona = pcodpersona;
 		this.codcuenta = pusu;
+		this.numdocumento = pdocumento;
 		this.rol = prol;
 		this.listaDist = plistaDist;
 		this.excluido = pexcluido;
@@ -157,14 +155,13 @@ public class UsuarioBolsaEmpleo implements Serializable {
 	 * @param pcodigopostal .
 	 * @param plocalidad .
 	 * @param pprovincia .
-	 * @param pmovil .
 	 * @param ptelefono .
 	 * @param pnacionalidad .
 	 * @param psexo .
 	 * @param plistaDist .
 	 */
 	public UsuarioBolsaEmpleo(Integer pcodNum, String pnombre, String primerapellido, String segundoapellido, String pemail, String pdireccion, String pcodigopostal,
-			String plocalidad, String pprovincia, String pmovil, String ptelefono, String pnacionalidad, String psexo, Boolean plistaDist) {
+			String plocalidad, String pprovincia, String ptelefono, String pnacionalidad, String psexo, Boolean plistaDist) {
 		super();
 		this.codNum = pcodNum;
 		this.nombre = pnombre;
@@ -175,7 +172,6 @@ public class UsuarioBolsaEmpleo implements Serializable {
 		this.codigopostal = pcodigopostal;
 		this.localidad = plocalidad;
 		this.provincia = pprovincia;
-		this.movil = pmovil;
 		this.telefono = ptelefono;
 		this.nacionalidad = pnacionalidad;
 		this.sexo = psexo;
@@ -189,7 +185,6 @@ public class UsuarioBolsaEmpleo implements Serializable {
 	 */
 	public UsuarioBolsaEmpleo(UsuarioBolsaEmpleo copia) {
 		this.codNum = copia.codNum;
-		this.codpersona = copia.codpersona;
 		this.codcuenta = copia.codcuenta;
 		this.tipodocumento = copia.tipodocumento;
 		this.numdocumento = copia.numdocumento;
@@ -217,14 +212,6 @@ public class UsuarioBolsaEmpleo implements Serializable {
 
 	public void setCodNum(Integer codNum) {
 		this.codNum = codNum;
-	}
-	
-	public Integer getCodPersona() {
-		return codpersona;
-	}
-
-	public void setCodPersona(Integer pcodpersona) {
-		this.codpersona = pcodpersona;
 	}
 	
 	public String getCodCuenta() {
@@ -321,14 +308,6 @@ public class UsuarioBolsaEmpleo implements Serializable {
 
 	public void setProvincia(String pprovincia) {
 		this.provincia = pprovincia;
-	}
-	
-	public String getMovil() {
-		return movil;
-	}
-
-	public void setMovil(String pmovil) {
-		this.movil = pmovil;
 	}
 	
 	public String getTelefono() {

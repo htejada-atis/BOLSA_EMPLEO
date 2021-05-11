@@ -54,7 +54,7 @@ public class BolsaEmpleoUtils {
 		}
 		
 		return builder.deleteCharAt(builder.length() - 1).toString();
-	} 
+	}
 	
 	/**
 	 * Devuelve el valor de un input del request o un valor por defecto si no existe.
