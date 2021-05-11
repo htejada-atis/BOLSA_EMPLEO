@@ -33,12 +33,13 @@ String observacion = BolsaEmpleoUtils.getParamForm(request, ControladorMisMerito
 	<p>Las etiquetas en <b>negrita</b> corresponden a campos de relleno obligatorio</p>
     
     <form id="agregar_merito" class="be-form" method="post" action="<%= request.getRequestURI() %>" enctype="multipart/form-data">
-    	<input type="hidden" name="<%= ControladorMisMeritos.PARAM_ACCION %>" id="accion_formulario" value="" />
+    	<input type="hidden" name="<%= ControladorMisMeritos.PARAM_ACCION %>" id="accion_formulario" 
+    		value="<%= ControladorMisMeritos.ACCION_AGREGAR_MERITO %>" />
     	<div class="form-group-container col2">
 	    	<div class="form-group">
 				<label class="bold-label" for="select_apartado">Apartado:</label>
-				<select class="form-input-custom" id="select_apartado" name="<%= ControladorMisMeritos.PARAM_APARTADO %>">
-					<option value="0">Elija el apartado</option>
+				<select class="form-input-custom" id="select_apartado" name="<%= ControladorMisMeritos.PARAM_APARTADO %>" required>
+					<option value="">Elija el apartado</option>
 					<%
 					for(ApartadoBaremacion apar: bean.getApartados()) {
 					%>	
@@ -56,8 +57,8 @@ String observacion = BolsaEmpleoUtils.getParamForm(request, ControladorMisMerito
 		<% if (apartado != null) { %>
 			<div class="form-group">
 				<label class="bold-label" for="select_item">Ítem:</label>
-				<select class="form-input-custom" id="select_item" name="<%= ControladorMisMeritos.PARAM_ITEM %>">
-					<option value="0">Elija el ítem</option>
+				<select class="form-input-custom" id="select_item" name="<%= ControladorMisMeritos.PARAM_ITEM %>" required>
+					<option value="">Elija el ítem</option>
 					<%
 					for(ItemBaremacion it: bean.getItems()) {
 					%>
@@ -88,7 +89,7 @@ String observacion = BolsaEmpleoUtils.getParamForm(request, ControladorMisMerito
 			<div class="form-group">
 	    		<div class="form-group">
 	    			<label for="merito_valor" id="merito_valor_label" class="bold-label">Valor:</label>
-	    			<input class="form-input-custom" id="merito_valor" type="text" name="<%= ControladorMisMeritos.PARAM_VALOR %>" value="<%= valor %>"/>
+	    			<input class="form-input-custom" id="merito_valor" type="text" name="<%= ControladorMisMeritos.PARAM_VALOR %>" value="<%= valor %>" required/>
 	    		</div>
     		</div>
     	</div>
@@ -97,14 +98,14 @@ String observacion = BolsaEmpleoUtils.getParamForm(request, ControladorMisMerito
 			<div class="form-group">
 	    		<div class="form-group">
 	    			<label for="merito_descripcion" class="bold-label">Descripción:</label>
-	    			<textarea class="form-input-custom" id="merito_descripcion" name="<%= ControladorMisMeritos.PARAM_DESCRIPCION %>"><%= descripcion %></textarea>
+	    			<textarea class="form-input-custom" id="merito_descripcion" name="<%= ControladorMisMeritos.PARAM_DESCRIPCION %>" required><%= descripcion %></textarea>
 	    		</div>
     		</div>
 		</div>
 	
     	<div class="form-file">
 			<label for="merito_archivo" class="bold-label">Fichero:</label>
-			<input id="merito_archivo" type="file" name="<%= ControladorMisMeritos.PARAM_ARCHIVO %>"/>
+			<input id="merito_archivo" type="file" name="<%= ControladorMisMeritos.PARAM_ARCHIVO %>" required/>
 		</div>
     	<div class="form-group-container col1">
 	    	<div class="form-group">
@@ -141,20 +142,8 @@ String observacion = BolsaEmpleoUtils.getParamForm(request, ControladorMisMerito
 	if (unidades) $('#merito_valor_label').text('Valor (' + unidades + ')');
 	else $('#merito_valor_label').text('Valor');
 	<%}%>
-	function agregarMerito(event, submit_input) {
-		event.preventDefault();
-		
-		document.getElementById("merito_enviar").disabled=true;
-		input_accion = document.getElementById("accion_formulario");
-		input_accion.value = '<%= ControladorMisMeritos.ACCION_AGREGAR_MERITO %>';
-		submit_input.form.submit();
-	}
 
 	$(document).ready(function() {
-		
-		document.getElementById("merito_enviar").addEventListener("click", function(event) {
-			agregarMerito(event, this);
-		});
 		
 		document.getElementById("select_apartado").onchange = function () {
 			var params = {'a': '<%= ControladorMisMeritos.ACCION_AGREGAR_MERITO %>',

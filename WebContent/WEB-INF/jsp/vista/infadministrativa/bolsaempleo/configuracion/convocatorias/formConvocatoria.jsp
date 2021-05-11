@@ -41,7 +41,8 @@ Convocatoria convocatoria = bean.getConvocatoria();
     				   class="form-input-custom"
     				   type="text"
     				   name="<%= ControladorConvocatorias.PARAM_CONVOCATORIA_DESCRIPCION %>" 
-    				   value="<%= BolsaEmpleoUtils.getParamForm(request, ControladorConvocatorias.PARAM_CONVOCATORIA_DESCRIPCION, convocatoria != null ? convocatoria.getDescripcion() : "") %>"/>
+    				   value="<%= BolsaEmpleoUtils.getParamForm(request, ControladorConvocatorias.PARAM_CONVOCATORIA_DESCRIPCION, convocatoria != null ? convocatoria.getDescripcion() : "") %>"
+    				   required/>
     		</div>
     	</div>
     	<div class="form-group-container col2">
@@ -52,7 +53,8 @@ Convocatoria convocatoria = bean.getConvocatoria();
     				   type="text"
     				   autocomplete="off" 
     				   name="<%= ControladorConvocatorias.PARAM_CONVOCATORIA_FECHACIERRE %>" 
-    				   value="<%= BolsaEmpleoUtils.getParamForm(request, ControladorConvocatorias.PARAM_CONVOCATORIA_FECHACIERRE, convocatoria != null ? Formateador.formatoFecha(convocatoria.getFechaCierre(), Formateador.FORMATO_FECHA_DDMMYYYY) : "") %>"/>
+    				   value="<%= BolsaEmpleoUtils.getParamForm(request, ControladorConvocatorias.PARAM_CONVOCATORIA_FECHACIERRE, convocatoria != null ? Formateador.formatoFecha(convocatoria.getFechaCierre(), Formateador.FORMATO_FECHA_DDMMYYYY) : "") %>"
+    				   required/>
     		</div>
     	</div>
     	
@@ -63,7 +65,8 @@ Convocatoria convocatoria = bean.getConvocatoria();
     				   class="form-input-custom" 
     				   type="text"    				   
     				   name="<%= ControladorConvocatorias.PARAM_CONVOCATORIA_NUMEROBOLSASMAXIMO %>" 
-    				   value="<%= BolsaEmpleoUtils.getParamForm(request, ControladorConvocatorias.PARAM_CONVOCATORIA_NUMEROBOLSASMAXIMO, convocatoria != null ? convocatoria.getNumBolsasMaximo().toString() : "5") %>"/>
+    				   value="<%= BolsaEmpleoUtils.getParamForm(request, ControladorConvocatorias.PARAM_CONVOCATORIA_NUMEROBOLSASMAXIMO, convocatoria != null ? convocatoria.getNumBolsasMaximo().toString() : "5") %>"
+    				   required/>
     		</div>
     		<div class="form-group">
     			<label for="numMeritosPorBloque">Nº méritos por bloque: </label>
@@ -71,7 +74,8 @@ Convocatoria convocatoria = bean.getConvocatoria();
     				   class="form-input-custom" 
     				   type="text"    				   
     				   name="<%= ControladorConvocatorias.PARAM_CONVOCATORIA_NUMEROMERITOSPORBLOQUE %>" 
-    				   value="<%= convocatoria != null ? convocatoria.getNumMeritosPorBloque() : "10" %>"/>
+    				   value="<%= convocatoria != null ? convocatoria.getNumMeritosPorBloque() : "10" %>"
+    				   required/>
     		</div>
     	</div>
     	
@@ -79,7 +83,7 @@ Convocatoria convocatoria = bean.getConvocatoria();
     		<input id="convocatoria_enviar" 
     			   type="submit" 
     			   name="<%= ControladorConvocatorias.PARAM_ACCION_ENVIAR %>" 
-    			   value="<%= convocatoria != null ? "Guardar" : "Nueva convocatoria" %>" />
+    			   value="<%= convocatoria != null ? "Guardar" : "Nueva convocatoria" %>"/>
     	</div>
     </form>
 </div>
@@ -88,24 +92,7 @@ Convocatoria convocatoria = bean.getConvocatoria();
 
 	$(document).ready(function() {		
 		$("#fechaCierre").datepicker();		
-		
-		document.getElementById("convocatoria_enviar").addEventListener("click", function(event) {
-			enviarConvocatoria(event, this);
-		});
-	})
-	
-	function enviarConvocatoria(event, submit_input) {
-		event.preventDefault();
-	
-		<% if(bean.getConvocatoria() != null) { %>
-				input_accion = document.getElementById("accion_formulario");
-				input_accion.value = '<%= ControladorConvocatorias.ACCION_MODIFICAR_CONVOCATORIA %>';
-				input_id = document.getElementById("convocatoria_id");
-				input_id.value = '<%= bean.getConvocatoria().getCodNum() %>';
-		<%}%>
-	
-		submit_input.form.submit();
-	}
+	});
 
 
 </script>

@@ -27,17 +27,18 @@ String tituloValue = BolsaEmpleoUtils.getParamForm(request, ControladorGestionFi
 	<p>Las etiquetas en <b>negrita</b> corresponden a campos de relleno obligatorio</p>
     
     <form id="subir_fichero" class="be-form" method="post" action="<%= request.getRequestURI() %>" enctype="multipart/form-data">
-    	<input type="hidden" name="<%= ControladorGestionFicheros.PARAM_ACCION %>" id="accion_formulario" value="" />
+    	<input type="hidden" name="<%= ControladorGestionFicheros.PARAM_ACCION %>" id="accion_formulario" 
+    		value="<%= ControladorGestionFicheros.ACCION_SUBIR_FICHERO %>" />
     	<div class="form-group-container col1">
 	    	<div class="form-group">
 	    		<label for="fichero_titulo">Título:</label>
-	    		<input class="form-input-custom" id="fichero_titulo" name="<%= ControladorGestionFicheros.PARAM_TITULO %>" value="<%= tituloValue %>"/>
+	    		<input class="form-input-custom" id="fichero_titulo" name="<%= ControladorGestionFicheros.PARAM_TITULO %>" value="<%= tituloValue %>" required/>
 	    	</div>
     	</div>
     	<div class="form-group-container col1">
 	    	<div class="form-file">
 				<label for="fichero_archivo" class="bold-label">Fichero:</label>
-				<input id="fichero_archivo" type="file" name="<%= ControladorGestionFicheros.PARAM_ARCHIVO %>"/>
+				<input id="fichero_archivo" type="file" name="<%= ControladorGestionFicheros.PARAM_ARCHIVO %>" required/>
 			</div>
 		</div>
 		<div class="form-group-container col1">
@@ -51,21 +52,3 @@ String tituloValue = BolsaEmpleoUtils.getParamForm(request, ControladorGestionFi
     </form>
     
 </div>
-
-<script>
-
-	function subirFichero(event, submit_input) {
-		event.preventDefault();
-		
-		input_accion = document.getElementById("accion_formulario");
-		input_accion.value = '<%= ControladorGestionFicheros.ACCION_SUBIR_FICHERO %>';
-		submit_input.form.submit();
-	}
-
-	$(document).ready(function() {		
-		document.getElementById("fichero_enviar").addEventListener("click", function(event) {
-			subirFichero(event, this);
-		});		
-	});
-
-</script>
