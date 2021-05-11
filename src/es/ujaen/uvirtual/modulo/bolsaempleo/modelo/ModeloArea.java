@@ -36,8 +36,12 @@ public class ModeloArea {
 	
 	public static final int ORDER_COLUMN_INDEX_CODIGO_CANDIDATO = 0;
 	public static final int ORDER_COLUMN_INDEX_AREA_CANDIDATO = 1;
+		
+	public static final String CODNUM = "CODNUM";
+	public static final String BEPARE_CODNUM = "BEPARE_CODNUM";
+	public static final String ESTADO = "ESTADO";
 	
-	protected static ModeloArea eInstancia = null;
+	protected static ModeloArea eInstancia;
 	
 	/** Crea una instancia del objeto.
 	 *  de forma sincronizada para protegerse de posibles problemas multi-hilo
@@ -65,22 +69,22 @@ public class ModeloArea {
 	 * @throws SQLException en caso de error de base de datos
 	 * @throws UVException .
 	 */
-	private List<Area> listaAreas(String clausula) throws SQLException, UVException {
+	private List<Area> listaAreas(String clausula) throws SQLException {
 		List<Area> areas = new ArrayList<>();
 		String consulta = "SELECT bepare.* FROM TBEP_AREAS bepare " + clausula;
 		
 		try (Connection conexion = ConexionUvirtual.obtenerInstancia();
-			PreparedStatement stmt = conexion.prepareStatement(consulta);) {
-				try (ResultSet rs = stmt.executeQuery()) {
-					while (rs.next()) {
-							Area are = new Area();
-							are.setCodNum(rs.getInt("CODNUM"));
-							are.setIdAreaExterno(rs.getString("ID_AREA_CONOCIMIENTO"));
-							are.setDescripcion(rs.getString("DES_AREA_CONOCIMIENTO"));
-							areas.add(are);	
-					}
+				PreparedStatement stmt = conexion.prepareStatement(consulta)) {
+			try (ResultSet rs = stmt.executeQuery()) {
+				while (rs.next()) {
+					Area are = new Area();
+					are.setCodNum(rs.getInt(CODNUM));
+					are.setIdAreaExterno(rs.getString("ID_AREA_CONOCIMIENTO"));
+					are.setDescripcion(rs.getString("DES_AREA_CONOCIMIENTO"));
+					areas.add(are);
 				}
 			}
+		}
 		return areas;
 	}
 	
@@ -89,7 +93,7 @@ public class ModeloArea {
 	 * @throws SQLException si hay un error en la base de datos
 	 * @throws UVException .
 	 */
-	public List<Area> listaAreas() throws SQLException, UVException {
+	public List<Area> listaAreas() throws SQLException {
 		return listaAreas(" ORDER BY DES_AREA_CONOCIMIENTO");
 	}
 		
@@ -104,7 +108,7 @@ public class ModeloArea {
 		String consulta = "SELECT bepare.* FROM TBEP_AREAS bepare WHERE bepare.CODNUM = ?";				
 			
 		try (Connection conexion = ConexionUvirtual.obtenerInstancia();
-				PreparedStatement stmt = conexion.prepareStatement(consulta);) {
+				PreparedStatement stmt = conexion.prepareStatement(consulta)) {
 			stmt.setInt(1, codNum);
 						
 			try (ResultSet rs = stmt.executeQuery()) {
@@ -113,7 +117,7 @@ public class ModeloArea {
 				}
 				
 				Area area = new Area();
-				area.setCodNum(rs.getInt("CODNUM"));
+				area.setCodNum(rs.getInt(CODNUM));
 				area.setIdAreaExterno(rs.getString("ID_AREA_CONOCIMIENTO"));
 				area.setDescripcion(rs.getString("DES_AREA_CONOCIMIENTO"));
 				
@@ -149,11 +153,9 @@ public class ModeloArea {
 	public BolsaEmpleoDataTable<Bolsa> listaAreaDatatable(Map<String, String[]> params) throws SQLException, UVException {
 		List<Bolsa> bolsas = new ArrayList<>();
 		ModeloArea modeloArea = ModeloArea.obtenerInstancia();	
-		BolsaEmpleoDataTable<Bolsa> dataTable = new BolsaEmpleoDataTable<Bolsa>(params);
+		BolsaEmpleoDataTable<Bolsa> dataTable = new BolsaEmpleoDataTable<>(params);
 		
-		String consulta =
-		"SELECT bepbol.* "
-		+ "FROM TBEP_BOLSAS bepbol "
+		String consulta = "SELECT bepbol.* FROM TBEP_BOLSAS bepbol "
 		+ "INNER JOIN TBEP_AREAS bepare ON bepare.CODNUM = bepbol.BEPARE_CODNUM "
 		+ "WHERE 1=1 ";
 		
@@ -165,16 +167,16 @@ public class ModeloArea {
 				
 		try (Connection conexion = ConexionUvirtual.obtenerInstancia();
 				PreparedStatement stmtCount = conexion.prepareStatement(dataTable.getQueryCount());
-				PreparedStatement stmt = conexion.prepareStatement(dataTable.getQuery());
+				PreparedStatement stmt = conexion.prepareStatement(dataTable.getQuery())
 		) {
 			dataTable.setFiltersParams(stmt, stmtCount, 1);
 			try (ResultSet rs = stmt.executeQuery()) {
 				while (rs.next()) {
 					Bolsa bolsa = new Bolsa();
-					bolsa.setCodNum(rs.getInt("CODNUM"));
-					bolsa.setArea(modeloArea.getAreaById(rs.getInt("BEPARE_CODNUM")));
-					bolsa.setEstado(rs.getString("ESTADO"));
-					bolsa.setBaremable(rs.getString("FLGBAREMABLE").equals("S"));					
+					bolsa.setCodNum(rs.getInt(CODNUM));
+					bolsa.setArea(modeloArea.getAreaById(rs.getInt(BEPARE_CODNUM)));
+					bolsa.setEstado(rs.getString(ESTADO));
+					bolsa.setBaremable("S".equals(rs.getString("FLGBAREMABLE")));					
 					bolsa.setFechaActualizacion(rs.getTimestamp("FECHAACTUALIZACION"));
 					bolsa.setFechaBloqueo(rs.getTimestamp("FECHABLOQUEO"));
 					bolsa.setFechaDesBloqueo(rs.getTimestamp("FECHADEBLOQUEO"));
@@ -200,7 +202,7 @@ public class ModeloArea {
 	public BolsaEmpleoDataTable<Bolsa> listaAreaCandidatoDatatable(Map<String, String[]> params) throws SQLException, UVException {
 		List<Bolsa> bolsas = new ArrayList<>();
 		ModeloArea modeloArea = ModeloArea.obtenerInstancia();	
-		BolsaEmpleoDataTable<Bolsa> dataTable = new BolsaEmpleoDataTable<Bolsa>(params);
+		BolsaEmpleoDataTable<Bolsa> dataTable = new BolsaEmpleoDataTable<>(params);
 		
 		String consulta =
 		"SELECT bepbol.* "
@@ -214,16 +216,16 @@ public class ModeloArea {
 				
 		try (Connection conexion = ConexionUvirtual.obtenerInstancia();
 				PreparedStatement stmtCount = conexion.prepareStatement(dataTable.getQueryCount());
-				PreparedStatement stmt = conexion.prepareStatement(dataTable.getQuery());
+				PreparedStatement stmt = conexion.prepareStatement(dataTable.getQuery())
 		) {
 			dataTable.setFiltersParams(stmt, stmtCount, 1);
 			try (ResultSet rs = stmt.executeQuery()) {
 				while (rs.next()) {
 					Bolsa bolsa = new Bolsa();
-					bolsa.setCodNum(rs.getInt("CODNUM"));
-					bolsa.setArea(modeloArea.getAreaById(rs.getInt("BEPARE_CODNUM")));
-					bolsa.setEstado(rs.getString("ESTADO"));
-					bolsa.setBaremable(rs.getString("FLGBAREMABLE").equals("S"));					
+					bolsa.setCodNum(rs.getInt(CODNUM));
+					bolsa.setArea(modeloArea.getAreaById(rs.getInt(BEPARE_CODNUM)));
+					bolsa.setEstado(rs.getString(ESTADO));
+					bolsa.setBaremable("S".equals(rs.getString("FLGBAREMABLE")));					
 					bolsa.setFechaActualizacion(rs.getTimestamp("FECHAACTUALIZACION"));
 					bolsa.setFechaBloqueo(rs.getTimestamp("FECHABLOQUEO"));
 					bolsa.setFechaDesBloqueo(rs.getTimestamp("FECHADEBLOQUEO"));
@@ -250,7 +252,7 @@ public class ModeloArea {
 	public BolsaEmpleoDataTable<Bolsa> listaAreaExcluidasUsuarioDatatable(Map<String, String[]> params, Integer codnum) throws SQLException, UVException {
 		List<Bolsa> bolsas = new ArrayList<>();
 		ModeloArea modeloArea = ModeloArea.obtenerInstancia();	
-		BolsaEmpleoDataTable<Bolsa> dataTable = new BolsaEmpleoDataTable<Bolsa>(params);
+		BolsaEmpleoDataTable<Bolsa> dataTable = new BolsaEmpleoDataTable<>(params);
 		
 		String consulta =
 		"SELECT bepbol.* "
@@ -268,7 +270,7 @@ public class ModeloArea {
 				
 		try (Connection conexion = ConexionUvirtual.obtenerInstancia();
 				PreparedStatement stmtCount = conexion.prepareStatement(dataTable.getQueryCount());
-				PreparedStatement stmt = conexion.prepareStatement(dataTable.getQuery());
+				PreparedStatement stmt = conexion.prepareStatement(dataTable.getQuery())
 		) {					
 		
 			int indexParam = 1;
@@ -280,10 +282,10 @@ public class ModeloArea {
 			try (ResultSet rs = stmt.executeQuery()) {
 				while (rs.next()) {
 					Bolsa bolsa = new Bolsa();
-					bolsa.setCodNum(rs.getInt("CODNUM"));
-					bolsa.setArea(modeloArea.getAreaById(rs.getInt("BEPARE_CODNUM")));
-					bolsa.setEstado(rs.getString("ESTADO"));
-					bolsa.setBaremable(rs.getString("FLGBAREMABLE").equals("S"));					
+					bolsa.setCodNum(rs.getInt(CODNUM));
+					bolsa.setArea(modeloArea.getAreaById(rs.getInt(BEPARE_CODNUM)));
+					bolsa.setEstado(rs.getString(ESTADO));
+					bolsa.setBaremable("S".equals(rs.getString("FLGBAREMABLE")));					
 					bolsa.setFechaActualizacion(rs.getTimestamp("FECHAACTUALIZACION"));
 					bolsa.setFechaBloqueo(rs.getTimestamp("FECHABLOQUEO"));
 					bolsa.setFechaDesBloqueo(rs.getTimestamp("FECHADEBLOQUEO"));
@@ -310,7 +312,7 @@ public class ModeloArea {
 	public BolsaEmpleoDataTable<BolsaCandidato> listaAreaSolicitudDatatable(Map<String, String[]> params, Integer codnum) throws SQLException, UVException {
 		List<BolsaCandidato> bolsas = new ArrayList<>();
 		ModeloArea modeloArea = ModeloArea.obtenerInstancia();	
-		BolsaEmpleoDataTable<BolsaCandidato> dataTable = new BolsaEmpleoDataTable<BolsaCandidato>(params);
+		BolsaEmpleoDataTable<BolsaCandidato> dataTable = new BolsaEmpleoDataTable<>(params);
 		
 		String consulta =
 		"SELECT bepbol.*, bepuea.USUARIO "
@@ -328,7 +330,7 @@ public class ModeloArea {
 				
 		try (Connection conexion = ConexionUvirtual.obtenerInstancia();
 				PreparedStatement stmtCount = conexion.prepareStatement(dataTable.getQueryCount());
-				PreparedStatement stmt = conexion.prepareStatement(dataTable.getQuery());
+				PreparedStatement stmt = conexion.prepareStatement(dataTable.getQuery())
 		) {
 			int indexParam = 1;
 			stmt.setInt(indexParam, codnum);
@@ -338,10 +340,10 @@ public class ModeloArea {
 			try (ResultSet rs = stmt.executeQuery()) {
 				while (rs.next()) {
 					Bolsa bolsa = new Bolsa();
-					bolsa.setCodNum(rs.getInt("CODNUM"));
-					bolsa.setArea(modeloArea.getAreaById(rs.getInt("BEPARE_CODNUM")));
-					bolsa.setEstado(rs.getString("ESTADO"));
-					bolsa.setBaremable(rs.getString("FLGBAREMABLE").equals("S"));
+					bolsa.setCodNum(rs.getInt(CODNUM));
+					bolsa.setArea(modeloArea.getAreaById(rs.getInt(BEPARE_CODNUM)));
+					bolsa.setEstado(rs.getString(ESTADO));
+					bolsa.setBaremable("S".equals(rs.getString("FLGBAREMABLE")));
 					bolsa.setFechaActualizacion(rs.getTimestamp("FECHAACTUALIZACION"));
 					bolsa.setFechaBloqueo(rs.getTimestamp("FECHABLOQUEO"));
 					bolsa.setFechaDesBloqueo(rs.getTimestamp("FECHADEBLOQUEO"));
@@ -368,7 +370,7 @@ public class ModeloArea {
 	public boolean isUsuarioExcluidoBolsa(UsuarioBolsaEmpleo usuario, Area area) throws SQLException {
 		String query = "SELECT COUNT(*) as count FROM TBEP_USUARIOS_EXCLUIDOS_AREA WHERE USUARIO = ? AND AREA = ?";		
 		
-		try (Connection con = ConexionUvirtual.obtenerInstancia(); PreparedStatement stmt = con.prepareStatement(query);) {
+		try (Connection con = ConexionUvirtual.obtenerInstancia(); PreparedStatement stmt = con.prepareStatement(query)) {
 			int param = 1;
 			stmt.setInt(param++, usuario.getCodNum());
 			stmt.setInt(param++, area.getCodNum());
@@ -394,7 +396,7 @@ public class ModeloArea {
 	private String obtenerStringIdsAreas(List<Area> areas) {
 		StringBuilder builder = new StringBuilder();
 		for (int i = 0; i < areas.size(); i++) {
-		    builder.append("'" + areas.get(i).getIdAreaExterno() + "',");
+			builder.append("'" + areas.get(i).getIdAreaExterno() + "',");
 		}
 		return builder.deleteCharAt(builder.length() - 1).toString();
 	}
@@ -403,7 +405,7 @@ public class ModeloArea {
 	private String obtenerStringDescsAreas(List<Area> areas) {
 		StringBuilder builder = new StringBuilder();
 		for (int i = 0; i < areas.size(); i++) {
-		    builder.append("'" + areas.get(i).getIdAreaExterno() + "',");
+			builder.append("'" + areas.get(i).getIdAreaExterno() + "',");
 		}
 		return builder.deleteCharAt(builder.length() - 1).toString();
 	}
@@ -412,7 +414,7 @@ public class ModeloArea {
 	private String obtenerStringIdsDepartamentos(List<Departamento> departamentos) {
 		StringBuilder builder = new StringBuilder();
 		for (int i = 0; i < departamentos.size(); i++) {
-		    builder.append("'" + departamentos.get(i).getIdDepartamentoExterno() + "',");
+			builder.append("'" + departamentos.get(i).getIdDepartamentoExterno() + "',");
 		}
 		return builder.deleteCharAt(builder.length() - 1).toString();
 	}
@@ -430,7 +432,7 @@ public class ModeloArea {
 				+ " WHERE uvnbrdsa.ID_AREA_CONOCIMIENTO NOT IN ("
 				+ obtenerStringIdsAreas(this.listaAreas("")) + ")";
 		
-		try (Connection conexionUxxiRrhh = ConexionUxxiRrhh.obtenerInstancia(); PreparedStatement stmt = conexionUxxiRrhh.prepareStatement(consulta);) {
+		try (Connection conexionUxxiRrhh = ConexionUxxiRrhh.obtenerInstancia(); PreparedStatement stmt = conexionUxxiRrhh.prepareStatement(consulta)) {
 			try (ResultSet rs = stmt.executeQuery()) {
 				while (rs.next()) {
 					String idArea = rs.getString("ID_AREA_CONOCIMIENTO");
@@ -446,14 +448,15 @@ public class ModeloArea {
 						try {
 							// insertamos el área
 							Area area = insertarAreaSiNoExiste(conexionUvirtual, idArea, descArea);
-							
-							// insertamos el departamento si no existe en la base de datos interna
-							Departamento departamento = insertarDepartamentoSiNoExiste(conexionUvirtual, idDepartamento, descDepartamento);
-							
-							// insertamos la relación de área y departamento
-							insertaAreaDepartamento(conexionUvirtual, area, departamento, idSeccion, descSeccion);
-							
-							totalInsertadas++;
+							if (area != null) {
+								// insertamos el departamento si no existe en la base de datos interna
+								Departamento departamento = insertarDepartamentoSiNoExiste(conexionUvirtual, idDepartamento, descDepartamento);
+								
+								// insertamos la relación de área y departamento
+								insertaAreaDepartamento(conexionUvirtual, area, departamento, idSeccion, descSeccion);
+								
+								totalInsertadas++;
+							}
 							
 							conexionUvirtual.commit();
 							conexionUvirtual.setAutoCommit(true);
@@ -478,7 +481,7 @@ public class ModeloArea {
 	public Integer actualizaAreasDeExternas() throws SQLException, UVException {
 		Integer total = 0;
 		
-		try (Connection conexionUxxiRrhh = ConexionUxxiRrhh.obtenerInstancia();) {
+		try (Connection conexionUxxiRrhh = ConexionUxxiRrhh.obtenerInstancia()) {
 			conexionUxxiRrhh.setAutoCommit(false);
 			
 			List<Area> areasInternas = this.listaAreas("");
@@ -506,13 +509,13 @@ public class ModeloArea {
 	 * @throws SQLException .
 	 * @throws UVException .
 	 */
-	private void actualizaArea(Area area) throws SQLException, UVException {
+	private void actualizaArea(Area area) throws SQLException {
 		String consulta = "UPDATE TBEP_AREAS "
 				+ "   SET ID_AREA_CONOCIMIENTO=?, DES_AREA_CONOCIMIENTO=? "
 				+ " WHERE ID_AREA_CONOCIMIENTO = ? ";
 		
 		try (Connection conexion = ConexionUvirtual.obtenerInstancia();
-			 PreparedStatement stmt = conexion.prepareStatement(consulta);) {
+			 PreparedStatement stmt = conexion.prepareStatement(consulta)) {
 			int parameterIndex = 1;
 			stmt.setString(parameterIndex++, area.getIdAreaExterno());
 			stmt.setString(parameterIndex++, area.getDescripcion());
@@ -536,7 +539,7 @@ public class ModeloArea {
 				+ "	AND uvnbrdsa.DES_AREA_CONOCIMIENTO NOT IN ("
 				+ obtenerStringDescsAreas(areasInternas) + ")";
 		
-		try (PreparedStatement stmt = conexion.prepareStatement(consulta);) {
+		try (PreparedStatement stmt = conexion.prepareStatement(consulta)) {
 			try (ResultSet rs = stmt.executeQuery()) {
 				while (rs.next()) {
 					Area area = new Area();
@@ -568,7 +571,7 @@ public class ModeloArea {
 				+ "	AND uvnbrdsa.ID_DEPARTAMENTO NOT IN ("
 				+ obtenerStringIdsDepartamentos(departamentosInternos) + ")";
 		
-		try (PreparedStatement stmt = conexion.prepareStatement(consulta);) {
+		try (PreparedStatement stmt = conexion.prepareStatement(consulta)) {
 			try (ResultSet rs = stmt.executeQuery()) {
 				while (rs.next()) {
 					String idArea = rs.getString("ID_AREA_CONOCIMIENTO");
@@ -584,13 +587,14 @@ public class ModeloArea {
 						try {
 							// insertamos el área
 							Area area = insertarAreaSiNoExiste(conexionUvirtual, idArea, descArea);
-							
-							// insertamos el departamento si no existe en la base de datos interna
-							Departamento departamento = insertarDepartamentoSiNoExiste(conexionUvirtual, idDepartamento, descDepartamento);
-							
-							// insertamos la relación de área y departamento
-							insertaAreaDepartamento(conexionUvirtual, area, departamento, idSeccion, descSeccion);
-							total++;
+							if (area != null) {
+								// insertamos el departamento si no existe en la base de datos interna
+								Departamento departamento = insertarDepartamentoSiNoExiste(conexionUvirtual, idDepartamento, descDepartamento);
+								
+								// insertamos la relación de área y departamento
+								insertaAreaDepartamento(conexionUvirtual, area, departamento, idSeccion, descSeccion);
+								total++;
+							}
 							
 							conexionUvirtual.commit();
 							conexionUvirtual.setAutoCommit(true);
@@ -616,12 +620,12 @@ public class ModeloArea {
 	 * @throws SQLException en caso de error en la BD .
 	 * @throws UVException en caso de error de parametros .
 	 */
-	private void insertaAreaDepartamento(Connection conexion, Area area, Departamento departamento, String idSeccion, String desSeccion) throws SQLException, UVException {
+	private void insertaAreaDepartamento(Connection conexion, Area area, Departamento departamento, String idSeccion, String desSeccion) throws SQLException {
 		String consulta = "INSERT INTO TBEP_AREAS_DEPARTAMENTOS " 
 				+ " (BEPARE_CODNUM,BEPDEP_CODNUM,ID_SECCION,DES_SECCION)"
 				+ " VALUES (?, ?, ?, ?)";
 		
-		try (PreparedStatement stmt = conexion.prepareStatement(consulta);) {
+		try (PreparedStatement stmt = conexion.prepareStatement(consulta)) {
 			int parameterIndex = 1;
 			stmt.setInt(parameterIndex++, area.getCodNum());
 			stmt.setInt(parameterIndex++, departamento.getCodNum());
@@ -641,7 +645,7 @@ public class ModeloArea {
 		if (area == null) {
 			throw new UVException("No se puede insertar un área vacio");
 		}
-		if (area.getIdAreaExterno() == null || area.getIdAreaExterno().equals("")) {
+		if (area.getIdAreaExterno() == null || "".equals(area.getIdAreaExterno())) {
 			throw new UVException("No se puede insertar un área sin id externo");
 		}
 		
@@ -649,7 +653,7 @@ public class ModeloArea {
 				+ " (ID_AREA_CONOCIMIENTO,DES_AREA_CONOCIMIENTO)"
 				+ " VALUES (?, ?)";
 		
-		try (PreparedStatement stmt = conexion.prepareStatement(consulta);) {
+		try (PreparedStatement stmt = conexion.prepareStatement(consulta)) {
 			int parameterIndex = 1;
 			stmt.setString(parameterIndex++, area.getIdAreaExterno());
 			stmt.setString(parameterIndex++, area.getDescripcion());
@@ -711,10 +715,10 @@ public class ModeloArea {
 	 * @throws SQLException en caso de error en la BD .
 	 * @throws UVException si area no es existe .
 	 */
-	private Area getAreaByIdExterno(Connection conexion, String idExterno) throws SQLException, UVException {
+	private Area getAreaByIdExterno(Connection conexion, String idExterno) throws SQLException {
 		String consulta = "SELECT bepare.* FROM TBEP_AREAS bepare WHERE bepare.ID_AREA_CONOCIMIENTO = ?";				
 			
-		try (PreparedStatement stmt = conexion.prepareStatement(consulta);) {
+		try (PreparedStatement stmt = conexion.prepareStatement(consulta)) {
 			stmt.setString(1, idExterno);
 						
 			try (ResultSet rs = stmt.executeQuery()) {
@@ -723,7 +727,7 @@ public class ModeloArea {
 				}
 				
 				Area area = new Area();
-				area.setCodNum(rs.getInt("CODNUM"));
+				area.setCodNum(rs.getInt(CODNUM));
 				area.setIdAreaExterno(rs.getString("ID_AREA_CONOCIMIENTO"));
 				area.setDescripcion(rs.getString("DES_AREA_CONOCIMIENTO"));
 				

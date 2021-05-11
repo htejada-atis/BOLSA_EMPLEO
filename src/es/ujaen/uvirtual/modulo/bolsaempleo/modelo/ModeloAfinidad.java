@@ -5,7 +5,7 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
-import java.util.Date;
+import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 
@@ -30,9 +30,14 @@ public class ModeloAfinidad {
 	public static final int COLUMN_CODIGO_MAXLENGTH = 4;
 	
 	public static final String MENSAJE_ERROR_NO_EXISTE_AFINIDAD = "No existe la afinidad";
-		
-    protected static ModeloAfinidad eInstancia;
 	
+	public static final String CODNUM = "CODNUM";
+	public static final String CODIGO = "CODIGO";
+	public static final String DESCRIPCION = "DESCRIPCION";
+	public static final String MODULACION = "MODULACION";
+	
+	protected static ModeloAfinidad eInstancia;
+
 	/** Crea una instancia del objeto.
 	 *  de forma sincronizada para protegerse de posibles problemas multi-hilo
 	 */
@@ -46,12 +51,12 @@ public class ModeloAfinidad {
      * Obtiene una instancia de la conexión.
      * @return instancia
      */
-    public static ModeloAfinidad obtenerInstancia() {
-        if (eInstancia == null) {
-        	crearInstancia();
-        }
-        return eInstancia;
-    }
+	public static ModeloAfinidad obtenerInstancia() {
+		if (eInstancia == null) {
+			crearInstancia();
+		}
+		return eInstancia;
+	}
 	
 	/**
 	 * Listado de afinidades. 
@@ -62,7 +67,7 @@ public class ModeloAfinidad {
 	 */
 	public BolsaEmpleoDataTable<Afinidad> listaAfinidadesDatatable(Map<String, String[]> params) throws SQLException, UVException {
 		List<Afinidad> afinidades = new ArrayList<>();
-		BolsaEmpleoDataTable<Afinidad> dataTable = new BolsaEmpleoDataTable<Afinidad>(params);
+		BolsaEmpleoDataTable<Afinidad> dataTable = new BolsaEmpleoDataTable<>(params);
 		
 		String consulta =
 			"SELECT bepafi.* "
@@ -76,7 +81,7 @@ public class ModeloAfinidad {
 				
 		try (Connection conexion = ConexionUvirtual.obtenerInstancia();
 				PreparedStatement stmtCount = conexion.prepareStatement(dataTable.getQueryCount());
-				PreparedStatement stmt = conexion.prepareStatement(dataTable.getQuery());
+				PreparedStatement stmt = conexion.prepareStatement(dataTable.getQuery())
 		) {					
 			
 			dataTable.setFiltersParams(stmt, stmtCount, 1);
@@ -84,10 +89,10 @@ public class ModeloAfinidad {
 			try (ResultSet rs = stmt.executeQuery()) {
 				while (rs.next()) {
 					Afinidad afinidad = new Afinidad();
-					afinidad.setCodNum(rs.getInt("CODNUM"));
-					afinidad.setCodigo(rs.getString("CODIGO"));
-					afinidad.setDescripcion(rs.getString("DESCRIPCION"));
-					afinidad.setModulacion(rs.getDouble("MODULACION"));	
+					afinidad.setCodNum(rs.getInt(CODNUM));
+					afinidad.setCodigo(rs.getString(CODIGO));
+					afinidad.setDescripcion(rs.getString(DESCRIPCION));
+					afinidad.setModulacion(rs.getDouble(MODULACION));	
 					afinidades.add(afinidad);
 				}				
 			}	
@@ -127,19 +132,19 @@ public class ModeloAfinidad {
 				+ "ORDER BY bepafi.MODULACION DESC";
 		
 		try (Connection conexion = ConexionUvirtual.obtenerInstancia();
-			PreparedStatement stmt = conexion.prepareStatement(consulta);) {
-				try (ResultSet rs = stmt.executeQuery()) {
-					while (rs.next()) {
-						Afinidad afinidad = new Afinidad();
-						afinidad.setCodNum(rs.getInt("CODNUM"));
-						afinidad.setCodigo(rs.getString("CODIGO"));
-						afinidad.setDescripcion(rs.getString("DESCRIPCION"));
-						afinidad.setModulacion(rs.getDouble("MODULACION"));
-						afinidades.add(afinidad);	
-					}
+				PreparedStatement stmt = conexion.prepareStatement(consulta)) {
+			try (ResultSet rs = stmt.executeQuery()) {
+				while (rs.next()) {
+					Afinidad afinidad = new Afinidad();
+					afinidad.setCodNum(rs.getInt(CODNUM));
+					afinidad.setCodigo(rs.getString(CODIGO));
+					afinidad.setDescripcion(rs.getString(DESCRIPCION));
+					afinidad.setModulacion(rs.getDouble(MODULACION));
+					afinidades.add(afinidad);
 				}
 			}
-		
+		}
+
 		return afinidades;
 	}
 	
@@ -153,17 +158,17 @@ public class ModeloAfinidad {
 				+ "WHERE bepafi.FLGBORRADO != 'S' GROUP BY CODIGO, DESCRIPCION";
 		
 		try (Connection conexion = ConexionUvirtual.obtenerInstancia();
-			PreparedStatement stmt = conexion.prepareStatement(consulta);) {
-				try (ResultSet rs = stmt.executeQuery()) {
-					while (rs.next()) {
-						Afinidad afinidad = new Afinidad();
-						afinidad.setCodigo(rs.getString("CODIGO"));
-						afinidad.setDescripcion(rs.getString("DESCRIPCION"));
-						afinidades.add(afinidad);	
-					}
+				PreparedStatement stmt = conexion.prepareStatement(consulta)) {
+			try (ResultSet rs = stmt.executeQuery()) {
+				while (rs.next()) {
+					Afinidad afinidad = new Afinidad();
+					afinidad.setCodigo(rs.getString(CODIGO));
+					afinidad.setDescripcion(rs.getString(DESCRIPCION));
+					afinidades.add(afinidad);
 				}
 			}
-		
+		}
+
 		return afinidades;
 	}
 	
@@ -182,28 +187,28 @@ public class ModeloAfinidad {
 					"INSERT INTO TBEP_AFINIDADES (CODNUM, CODIGO, DESCRIPCION, MODULACION) " 
 					+ "VALUES (?, ?, ?, ?)";
 				
-				try (Connection conexion = ConexionUvirtual.obtenerInstancia();
-						 PreparedStatement stmt = conexion.prepareStatement(consulta);) {
-					int parameterIndex = 1;
-					stmt.setInt(parameterIndex++, afinidad.getCodNum());
-					stmt.setString(parameterIndex++, afinidad.getCodigo());
-					stmt.setString(parameterIndex++, afinidad.getDescripcion());
-					stmt.setDouble(parameterIndex++, afinidad.getModulacion());			
-					stmt.executeUpdate();
-				}		
+			try (Connection conexion = ConexionUvirtual.obtenerInstancia();
+					PreparedStatement stmt = conexion.prepareStatement(consulta)) {
+				int parameterIndex = 1;
+				stmt.setInt(parameterIndex++, afinidad.getCodNum());
+				stmt.setString(parameterIndex++, afinidad.getCodigo());
+				stmt.setString(parameterIndex++, afinidad.getDescripcion());
+				stmt.setDouble(parameterIndex++, afinidad.getModulacion());
+				stmt.executeUpdate();
+			}
 		} else {
 			String consulta =
 					"INSERT INTO TBEP_AFINIDADES (CODIGO, DESCRIPCION, MODULACION) " 
 					+ "VALUES (?, ?, ?)";
 				
-				try (Connection conexion = ConexionUvirtual.obtenerInstancia();
-						 PreparedStatement stmt = conexion.prepareStatement(consulta);) {
-					int parameterIndex = 1;
-					stmt.setString(parameterIndex++, afinidad.getCodigo());
-					stmt.setString(parameterIndex++, afinidad.getDescripcion());
-					stmt.setDouble(parameterIndex++, afinidad.getModulacion());			
-					stmt.executeUpdate();
-				}		
+			try (Connection conexion = ConexionUvirtual.obtenerInstancia();
+					PreparedStatement stmt = conexion.prepareStatement(consulta)) {
+				int parameterIndex = 1;
+				stmt.setString(parameterIndex++, afinidad.getCodigo());
+				stmt.setString(parameterIndex++, afinidad.getDescripcion());
+				stmt.setDouble(parameterIndex++, afinidad.getModulacion());
+				stmt.executeUpdate();
+			}	
 		}
 
 	}
@@ -221,7 +226,7 @@ public class ModeloAfinidad {
 		String consulta = "SELECT bepafi.* FROM TBEP_AFINIDADES bepafi WHERE bepafi.CODNUM = ?";
 			
 		try (Connection conexion = ConexionUvirtual.obtenerInstancia();
-				PreparedStatement stmt = conexion.prepareStatement(consulta);) {
+				PreparedStatement stmt = conexion.prepareStatement(consulta)) {
 			stmt.setInt(1, codNum);
 						
 			try (ResultSet rs = stmt.executeQuery()) {
@@ -230,12 +235,12 @@ public class ModeloAfinidad {
 				}
 				
 				Afinidad afinidad = new Afinidad();
-				afinidad.setCodNum(rs.getInt("CODNUM"));
-				afinidad.setCodigo(rs.getString("CODIGO"));
-				afinidad.setDescripcion(rs.getString("DESCRIPCION"));
-				afinidad.setModulacion(rs.getDouble("MODULACION"));
+				afinidad.setCodNum(rs.getInt(CODNUM));
+				afinidad.setCodigo(rs.getString(CODIGO));
+				afinidad.setDescripcion(rs.getString(DESCRIPCION));
+				afinidad.setModulacion(rs.getDouble(MODULACION));
 				
-				if (rs.getString("FLGBORRADO").equals("S")) {
+				if ("S".equals(rs.getString("FLGBORRADO"))) {
 					throw new UVException("La afinidad ha sido borrada");
 				}
 				
@@ -257,7 +262,7 @@ public class ModeloAfinidad {
 		String consulta = "SELECT bepafi.CODIGO, bepafi.DESCRIPCION FROM TBEP_AFINIDADES bepafi WHERE bepafi.CODIGO = ? GROUP BY CODIGO, DESCRIPCION";
 			
 		try (Connection conexion = ConexionUvirtual.obtenerInstancia();
-				PreparedStatement stmt = conexion.prepareStatement(consulta);) {
+				PreparedStatement stmt = conexion.prepareStatement(consulta)) {
 			stmt.setString(1, codigo);
 						
 			try (ResultSet rs = stmt.executeQuery()) {
@@ -266,8 +271,8 @@ public class ModeloAfinidad {
 				}
 				
 				Afinidad afinidad = new Afinidad();
-				afinidad.setCodigo(rs.getString("CODIGO"));
-				afinidad.setDescripcion(rs.getString("DESCRIPCION"));
+				afinidad.setCodigo(rs.getString(CODIGO));
+				afinidad.setDescripcion(rs.getString(DESCRIPCION));
 				
 				return afinidad;
 			}
@@ -291,7 +296,7 @@ public class ModeloAfinidad {
 			+ " SET CODIGO=?, DESCRIPCION=?, MODULACION=? "
 			+ " WHERE codnum=?";
 		try (Connection conexion = ConexionUvirtual.obtenerInstancia();
-		PreparedStatement stmt = conexion.prepareStatement(consulta);) {
+		PreparedStatement stmt = conexion.prepareStatement(consulta)) {
 			int parameterIndex = 1;
 			stmt.setString(parameterIndex++, afi.getCodigo());
 			stmt.setString(parameterIndex++, afi.getDescripcion());
@@ -306,18 +311,15 @@ public class ModeloAfinidad {
 	 * @throws SQLException en caso de error en la BD
 	 * @throws UVException si afinidad no es valida
 	 */
-	public void borraAfinidades(List<Afinidad> afinidades) throws SQLException, UVException {
+	public void borraAfinidades(Collection<Afinidad> afinidades) throws SQLException, UVException {
 		String params = BolsaEmpleoUtils.consultaMultiplesParametros(afinidades.size());
 		String query = "UPDATE tbep_afinidades SET FLGBORRADO= ?, FECHA_BORRADO = ? WHERE CODNUM IN (" + params + ")";		
 		try (Connection conexion = ConexionUvirtual.obtenerInstancia(); PreparedStatement stmt = conexion.prepareStatement(query)) {
 			int indexParam = 1;
 			stmt.setString(indexParam++, "S");
 			
-			Date date = new Date(System.currentTimeMillis());
-			
-			stmt.setDate(indexParam++, new java.sql.Date(date.getTime()));
+			stmt.setDate(indexParam++, (java.sql.Date) BolsaEmpleoUtils.getCurrentDate());
 			for (Afinidad afiniad : afinidades) {
-
 				stmt.setInt(indexParam++, afiniad.getCodNum()); 	
 			}
 			stmt.executeUpdate();
@@ -354,15 +356,16 @@ public class ModeloAfinidad {
 				"SELECT bepafi.CODIGO "
 				+ "FROM TBEP_AFINIDADES bepafi "
 				+ "WHERE bepafi.FLGBORRADO = 'N' GROUP BY bepafi.CODIGO";
-		
-		try (Connection conexion = ConexionUvirtual.obtenerInstancia(); PreparedStatement stmt = conexion.prepareStatement(consulta);) {
-				try (ResultSet rs = stmt.executeQuery()) {
-					while (rs.next()) {
-						afinidades.add(rs.getString("CODIGO"));							
-					}
+
+		try (Connection conexion = ConexionUvirtual.obtenerInstancia();
+				PreparedStatement stmt = conexion.prepareStatement(consulta)) {
+			try (ResultSet rs = stmt.executeQuery()) {
+				while (rs.next()) {
+					afinidades.add(rs.getString(CODIGO));
 				}
 			}
-		
+		}
+
 		return afinidades;
 	}
 }

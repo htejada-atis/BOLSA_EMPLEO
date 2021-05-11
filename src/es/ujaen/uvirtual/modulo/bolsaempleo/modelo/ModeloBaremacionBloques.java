@@ -76,7 +76,7 @@ public class ModeloBaremacionBloques {
 		
 		String sql = "SELECT bepblo.* FROM TBEP_BLOQUESBAREMACION bepblo WHERE bepblo.CODNUM = ?";
 		
-		try (Connection con = ConexionUvirtual.obtenerInstancia(); PreparedStatement stmt = con.prepareStatement(sql);) {
+		try (Connection con = ConexionUvirtual.obtenerInstancia(); PreparedStatement stmt = con.prepareStatement(sql)) {
 			int parameterIndex = 1;
 			stmt.setInt(parameterIndex++, codNum);
 			
@@ -102,7 +102,7 @@ public class ModeloBaremacionBloques {
 			throws SQLException, UVException {
 		
 		List<BloqueBaremacion> bloques = new ArrayList<>();
-		BolsaEmpleoDataTable<BloqueBaremacion> dataTable = new BolsaEmpleoDataTable<BloqueBaremacion>(params);
+		BolsaEmpleoDataTable<BloqueBaremacion> dataTable = new BolsaEmpleoDataTable<>(params);
 		
 		String consulta = "SELECT bepblo.* "
 				+ "FROM TBEP_BLOQUESBAREMACION bepblo "
@@ -116,7 +116,7 @@ public class ModeloBaremacionBloques {
 				
 		try (Connection conexion = ConexionUvirtual.obtenerInstancia();
 				PreparedStatement stmtCount = conexion.prepareStatement(dataTable.getQueryCount());
-				PreparedStatement stmt = conexion.prepareStatement(dataTable.getQuery());
+				PreparedStatement stmt = conexion.prepareStatement(dataTable.getQuery())
 		) {
 			int indexParam = 1;
 			stmt.setInt(indexParam, apartado.getCodNum());
@@ -143,7 +143,7 @@ public class ModeloBaremacionBloques {
 	 * @throws SQLException .
 	 * @throws UVException .
 	 */
-	public void desactivarBloque(BloqueBaremacion bloque) throws SQLException, UVException {
+	public void desactivarBloque(BloqueBaremacion bloque) throws SQLException {
 		this.activaDesactivaBloque(bloque, false);
 	}
 	
@@ -153,7 +153,7 @@ public class ModeloBaremacionBloques {
 	 * @throws SQLException .
 	 * @throws UVException .
 	 */
-	public void activarBloque(BloqueBaremacion bloque) throws SQLException, UVException {
+	public void activarBloque(BloqueBaremacion bloque) throws SQLException {
 		this.activaDesactivaBloque(bloque, true);
 	}
 	
@@ -172,11 +172,11 @@ public class ModeloBaremacionBloques {
 				+ "NUMERO_MAXIMO_MERITOS = ? "
 				+ "WHERE CODNUM = ?";
 		
-		try (Connection conexion = ConexionUvirtual.obtenerInstancia(); PreparedStatement stmt = conexion.prepareStatement(consulta);) {
+		try (Connection conexion = ConexionUvirtual.obtenerInstancia(); PreparedStatement stmt = conexion.prepareStatement(consulta)) {
 			int parameterIndex = 1;
 			stmt.setString(parameterIndex++, bloque.getCodigo());
 			stmt.setString(parameterIndex++, bloque.getNombre());
-			stmt.setString(parameterIndex++, bloque.isActivo() ? "S" : "N");
+			stmt.setString(parameterIndex++, Boolean.TRUE.equals(bloque.isActivo()) ? "S" : "N");
 			
 			if (bloque.getNumeroMaximoMeritos() != null) {
 				stmt.setInt(parameterIndex++, bloque.getNumeroMaximoMeritos());
@@ -205,7 +205,7 @@ public class ModeloBaremacionBloques {
 				+ " (CODIGO,NOMBRE,BEPAPA_CODNUM,NUMERO_MAXIMO_MERITOS)"
 				+ " VALUES (?,?,?,?)";
 		
-		try (Connection conexion = ConexionUvirtual.obtenerInstancia(); PreparedStatement stmt = conexion.prepareStatement(consulta);) {
+		try (Connection conexion = ConexionUvirtual.obtenerInstancia(); PreparedStatement stmt = conexion.prepareStatement(consulta)) {
 			int parameterIndex = 1;
 			stmt.setString(parameterIndex++, bloque.getCodigo());
 			stmt.setString(parameterIndex++, bloque.getNombre());
@@ -225,12 +225,12 @@ public class ModeloBaremacionBloques {
 	 * @throws SQLException .
 	 * @throws UVException .
 	 */
-	public String getUltimoCodigoBloque(ApartadoBaremacion apartado) throws SQLException, UVException {
+	public String getUltimoCodigoBloque(ApartadoBaremacion apartado) throws SQLException {
 		String consulta = "SELECT bepblo.CODIGO, bepblo.BEPAPA_CODNUM FROM TBEP_BLOQUESBAREMACION bepblo "
 				+ " WHERE bepblo.BEPAPA_CODNUM = ? ORDER BY bepblo.CODIGO DESC"
 				+ " FETCH FIRST 1 ROW ONLY";
 		
-		try (Connection conexion = ConexionUvirtual.obtenerInstancia(); PreparedStatement stmt = conexion.prepareStatement(consulta);) {
+		try (Connection conexion = ConexionUvirtual.obtenerInstancia(); PreparedStatement stmt = conexion.prepareStatement(consulta)) {
 			int parameterIndex = 1;
 			stmt.setInt(parameterIndex++, apartado.getCodNum());
 			try (ResultSet rs = stmt.executeQuery()) {
@@ -272,7 +272,7 @@ public class ModeloBaremacionBloques {
 		obj.setCodNum(rs.getInt(CODNUM));
 		obj.setCodigo(rs.getString(CODIGO));
 		obj.setNombre(rs.getString("NOMBRE"));
-		obj.setActivo(rs.getString("FLGACTIVO").equals("S"));
+		obj.setActivo("S".equals(rs.getString("FLGACTIVO")));
 		obj.setNumeroMaximoMeritos(rs.getInt("NUMERO_MAXIMO_MERITOS") == 0 ? null : rs.getInt("NUMERO_MAXIMO_MERITOS"));
 		obj.setApartadoBaremacion(ModeloBaremacionApartados.obtenerInstancia().getApartadoBaremacionById(rs.getInt("BEPAPA_CODNUM")));
 		return obj;
@@ -284,13 +284,13 @@ public class ModeloBaremacionBloques {
 		}		
 	}
 
-	private void activaDesactivaBloque(BloqueBaremacion bloque, Boolean activo) throws SQLException, UVException {
+	private void activaDesactivaBloque(BloqueBaremacion bloque, Boolean activo) throws SQLException {
 		String consulta = "UPDATE TBEP_BLOQUESBAREMACION SET FLGACTIVO = ? WHERE CODNUM = ?";
 		
-		try (Connection conexion = ConexionUvirtual.obtenerInstancia(); PreparedStatement stmt = conexion.prepareStatement(consulta);) {
+		try (Connection conexion = ConexionUvirtual.obtenerInstancia(); PreparedStatement stmt = conexion.prepareStatement(consulta)) {
 			int parameterIndex = 1;
 			
-			stmt.setString(parameterIndex++, activo ? "S" : "N");
+			stmt.setString(parameterIndex++, Boolean.TRUE.equals(activo) ? "S" : "N");
 			stmt.setInt(parameterIndex++, bloque.getCodNum());
 			stmt.executeUpdate();
 		}	
@@ -310,7 +310,7 @@ public class ModeloBaremacionBloques {
 		
 		sql += " FETCH FIRST 1 ROW ONLY";
 		
-		try (Connection con = ConexionUvirtual.obtenerInstancia(); PreparedStatement stmt = con.prepareStatement(sql);) {
+		try (Connection con = ConexionUvirtual.obtenerInstancia(); PreparedStatement stmt = con.prepareStatement(sql)) {
 			int parameterIndex = 1;
 			stmt.setInt(parameterIndex++, bloque.getApartadoBaremacion().getCodNum());
 			stmt.setString(parameterIndex++, bloque.getCodigo());
