@@ -138,7 +138,7 @@ public class ControladorUsuarioCandidato extends HttpServlet {
 	public static final String RUTA_BEP_CONF = "/WEB-INF/jsp/vista/infadministrativa/bolsaempleo/configuracion/candidatos/";
 	public static final String RUTA_BEP_CONF_USU = "/WEB-INF/jsp/vista/infadministrativa/bolsaempleo/configuracion/usuarios/";
 	public static final String JSP_FORM_CANDIDATO = RUTA_BEP_CONF + "formCandidatos.jsp";
-	public static final String JSP_BUSCAR_USUARIO = RUTA_BEP_CONF + "buscarUsuario.jsp";
+	public static final String JSP_BUSCAR_USUARIO = RUTA_BEP_CONF_USU + "buscarUsuario.jsp";
 
 	/** Peticion GET.
 	 * @see HttpServlet#doGet(HttpServletRequest request, HttpServletResponse response)
@@ -561,9 +561,14 @@ public class ControladorUsuarioCandidato extends HttpServlet {
 		ModeloUsuarioBolsaEmpleo modelo = ModeloUsuarioBolsaEmpleo.obtenerInstancia();
 		
 		obtenerRoles(bean);
-		
-		UsuarioBolsaEmpleo usu = modelo.listaUsuario(Formateador.leeParametroString(request.getParameter(PARAM_NOMBRE_USUARIO)));
+	
 		Usuario usuArcos = CrearUsuario.usuario(request.getParameter(PARAM_NOMBRE_USUARIO));
+		if (usuArcos == null) {
+			bean.setVista(RUTA_BEP_CONF + "candidatos.jsp");
+			throw new UVException("No existe el usuario");
+		}
+		
+		UsuarioBolsaEmpleo usu = modelo.listaUsuario(Formateador.leeParametroString(usuArcos.getDocumentoNumero()));
 		
 		bean.setBusqueda(true);
 		
@@ -633,7 +638,7 @@ public class ControladorUsuarioCandidato extends HttpServlet {
 	 * @throws UVException en caso de error en bd
 	 */
 	private void volverUsuario(VistaUsuarioBolsaEmpleo bean) {
-		bean.setVista(RUTA_BEP_CONF_USU + "usuarios.jsp");
+		bean.setVista(RUTA_BEP_CONF + "candidatos.jsp");
 	}
 	
 	/** Valida el formulario de Usuarios.
