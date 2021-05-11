@@ -7,7 +7,10 @@ import java.io.IOException;
 import java.sql.SQLException;
 import javax.servlet.ServletException;
 import org.junit.BeforeClass;
+import org.junit.FixMethodOrder;
 import org.junit.Test;
+import org.junit.runners.MethodSorters;
+
 import bbdd.BbddRunner;
 import bbdd.UtilsTestBolsaEmpleo;
 import controlador.implementacion.PeticionHttp;
@@ -20,6 +23,7 @@ import es.ujaen.uvirtual.modulo.bolsaempleo.vistas.VistaMeritos;
  * @author jlopez
  *
  */
+@FixMethodOrder(MethodSorters.NAME_ASCENDING)
 public class TestBEPControladorMisMeritos {
 	
 	private static final String MENSAJE_APARTADO_DEVUELTO = "Debe devolver apartado";

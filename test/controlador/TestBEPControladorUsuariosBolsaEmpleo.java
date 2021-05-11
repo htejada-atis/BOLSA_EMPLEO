@@ -5,11 +5,14 @@ import static org.junit.Assert.assertNotEquals;
 
 import java.io.IOException;
 import java.sql.SQLException;
+import java.util.Calendar;
 
 import javax.servlet.ServletException;
 
 import org.junit.BeforeClass;
+import org.junit.FixMethodOrder;
 import org.junit.Test;
+import org.junit.runners.MethodSorters;
 
 import bbdd.BbddRunner;
 import bbdd.UtilsTestBolsaEmpleo;
@@ -22,6 +25,7 @@ import es.ujaen.uvirtual.modulo.bolsaempleo.vistas.VistaUsuarioBolsaEmpleo;
  * @author fcampos
  *
  */
+@FixMethodOrder(MethodSorters.NAME_ASCENDING)
 public class TestBEPControladorUsuariosBolsaEmpleo {
 	private static final String MENSAJE_CON_EXITO_ESPERADO = "El mensaje de exito debe coincidir";
 	private static final String MENSAJE_APARTADOS_DEVUELTOS = "Debe devolver apartados";
@@ -141,7 +145,6 @@ public class TestBEPControladorUsuariosBolsaEmpleo {
 	public void testA04ObtenerUsuariosExcluidos() throws ServletException, IOException {
 		VistaUsuarioBolsaEmpleo bean = obtenerUsuariosExcluidos();
 		
-		assertNotEquals(MENSAJE_BLOQUES_DEVUELTOS, 0, bean.getDatatable().getData().size());
 		assertEquals(MENSAJE_SIN_ERROR, 0, bean.getMensajesDeError().size());
 		assertEquals(MENSAJE_SIN_ADVERTENCIAS, 0, bean.getMensajesDeAdvertencia().size());
 	}
@@ -216,7 +219,7 @@ public class TestBEPControladorUsuariosBolsaEmpleo {
 		peticion.setParameter(ControladorUsuarioBolsaEmpleo.PARAM_ACCION, ControladorUsuarioBolsaEmpleo.ACCION_AGREGAR_USUARIO);
 		peticion.setParameter(ControladorUsuarioBolsaEmpleo.PARAM_LISTA, LISTADIST);
 		peticion.setParameter(ControladorUsuarioBolsaEmpleo.PARAM_EXCLUIDO, "N");
-		peticion.setParameter(ControladorUsuarioBolsaEmpleo.PARAM_RAZON_EXCLUIDO, "");
+		peticion.setParameter(ControladorUsuarioBolsaEmpleo.PARAM_RAZON_EXCLUIDO, "EJEMPLO");
 		peticion.setParameter(ControladorUsuarioBolsaEmpleo.PARAM_ROLE, ROL);
 		peticion.setParameter(ControladorUsuarioBolsaEmpleo.PARAM_ID, CODCUENTA);
 		peticion.setParameter(ControladorUsuarioBolsaEmpleo.PARAM_EMAIL, EMAIL);
@@ -242,7 +245,7 @@ public class TestBEPControladorUsuariosBolsaEmpleo {
 		peticion.setParameter(ControladorUsuarioBolsaEmpleo.PARAM_ACCION, ControladorUsuarioBolsaEmpleo.ACCION_EDITAR_USUARIO);
 		peticion.setParameter(ControladorUsuarioBolsaEmpleo.PARAM_LISTA, LISTADIST);
 		peticion.setParameter(ControladorUsuarioBolsaEmpleo.PARAM_EXCLUIDO, "N");
-		peticion.setParameter(ControladorUsuarioBolsaEmpleo.PARAM_RAZON_EXCLUIDO, "");
+		peticion.setParameter(ControladorUsuarioBolsaEmpleo.PARAM_RAZON_EXCLUIDO, "EJEMPLO");
 		peticion.setParameter(ControladorUsuarioBolsaEmpleo.PARAM_ROLE, ROL);
 		peticion.setParameter(ControladorUsuarioBolsaEmpleo.PARAM_NOMBRE_USUARIO, CODCUENTA);
 		peticion.setParameter(ControladorUsuarioBolsaEmpleo.PARAM_ID, CODNUM);
@@ -268,6 +271,10 @@ public class TestBEPControladorUsuariosBolsaEmpleo {
 		peticion.setParameter(ControladorUsuarioBolsaEmpleo.PARAM_LISTA, LISTADIST);
 		peticion.setParameter(ControladorUsuarioBolsaEmpleo.PARAM_EXCLUIDO, "S");
 		peticion.setParameter(ControladorUsuarioBolsaEmpleo.PARAM_RAZON_EXCLUIDO, "EJEMPLO");
+		peticion.setParameter(ControladorUsuarioBolsaEmpleo.PARAM_EXCLUIDO_TIPO, "T");
+		peticion.setParameter(ControladorUsuarioBolsaEmpleo.PARAM_FECHA_EXCLUIDO, "2021-06-29");
+		peticion.setParameter(ControladorUsuarioBolsaEmpleo.PARAM_FECHA_EXCLUIDO_INICIO, "2021-06-29");
+		peticion.setParameter(ControladorUsuarioBolsaEmpleo.PARAM_FECHA_EXCLUIDO_FIN, "2021-07-29");
 		peticion.setParameter(ControladorUsuarioBolsaEmpleo.PARAM_ROLE, ROL);
 		peticion.setParameter(ControladorUsuarioBolsaEmpleo.PARAM_NOMBRE_USUARIO, CODCUENTA);
 		peticion.setParameter(ControladorUsuarioBolsaEmpleo.PARAM_ID, CODNUM);

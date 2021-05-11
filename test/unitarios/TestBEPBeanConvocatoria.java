@@ -8,13 +8,16 @@ import static org.junit.Assert.assertTrue;
 
 import java.util.Calendar;
 
+import org.junit.FixMethodOrder;
 import org.junit.Test;
+import org.junit.runners.MethodSorters;
 
 import es.ujaen.uvirtual.beans.uvirtual.docentia.Convocatoria;
 
 /** test convocatoria.
  *
  */
+@FixMethodOrder(MethodSorters.NAME_ASCENDING)
 public class TestBEPBeanConvocatoria {
 
 	private static final String CADENA = "cadena";

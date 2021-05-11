@@ -62,6 +62,7 @@ public class ControladorUsuarioBolsaEmpleo extends HttpServlet {
 	public static final String PARAM_LISTA = "listadist";
 	public static final String PARAM_EXCLUIDO = "excluido";
 	public static final String PARAM_EXCLUIDO_TIPO = "excluidotipo";
+	public static final String PARAM_FECHA_EXCLUIDO = "fechaexcluido";
 	public static final String PARAM_FECHA_EXCLUIDO_INICIO = "fechaexcluidoinicio";
 	public static final String PARAM_FECHA_EXCLUIDO_FIN = "fechaexcluidofin";
 	
@@ -484,10 +485,13 @@ public class ControladorUsuarioBolsaEmpleo extends HttpServlet {
 		ModeloUsuarioBolsaEmpleo modelo = ModeloUsuarioBolsaEmpleo.obtenerInstancia();
 		
 		obtenerRoles(bean);
-		
-		UsuarioBolsaEmpleo usu = modelo.listaUsuario(Formateador.leeParametroString(request.getParameter(PARAM_NOMBRE_USUARIO)));
 		Usuario usuArcos = CrearUsuario.usuario(request.getParameter(PARAM_NOMBRE_USUARIO));
+		if (usuArcos == null) {
+			throw new UVException("No existe el usuario");
+		}
 		
+		UsuarioBolsaEmpleo usu = modelo.listaUsuario(usuArcos.getDocumentoNumero());
+
 		bean.setBusqueda(true);
 		
 		bean.setUsuarioArcos(usuArcos);

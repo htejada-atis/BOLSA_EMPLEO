@@ -12,7 +12,9 @@ import java.util.List;
 import javax.sql.DataSource;
 
 import org.junit.BeforeClass;
+import org.junit.FixMethodOrder;
 import org.junit.Test;
+import org.junit.runners.MethodSorters;
 
 import bbdd.BbddRunner;
 import bbdd.UtilsTestBolsaEmpleo;
@@ -24,6 +26,7 @@ import es.ujaen.uvirtual.utilidades.UVException;
 /** test afinidades.
 *
 */
+@FixMethodOrder(MethodSorters.NAME_ASCENDING)
 public class TestBEPModeloAfinidad {
 	private static final Integer ID_AFINIDAD = 4;
 	private static final String CODIGO = "AAA";

@@ -6,7 +6,9 @@ import static org.junit.Assert.assertNotEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
+import org.junit.FixMethodOrder;
 import org.junit.Test;
+import org.junit.runners.MethodSorters;
 
 import es.ujaen.uvirtual.modulo.bolsaempleo.beans.ApartadoBaremacion;
 import es.ujaen.uvirtual.modulo.bolsaempleo.beans.BloqueBaremacion;
@@ -17,6 +19,7 @@ import es.ujaen.uvirtual.modulo.bolsaempleo.beans.MeritoPreferente;
 /** test merito preferente.
  *
  */
+@FixMethodOrder(MethodSorters.NAME_ASCENDING)
 public class TestBEPBeanMeritoPreferente {
 	private static final Integer CODNUM = 100;
 	private static final String DESCRIPCION = "descripcion";

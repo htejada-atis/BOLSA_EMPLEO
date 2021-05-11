@@ -33,6 +33,11 @@ Boolean publica = noticia != null ? noticia.isPublica() : false;
 		    <h2>Nueva noticia</h2>
 	<%	} %>
     
+    <div id="erroresForm" class="error" style="display:none;">
+		<p>Porfavor primero debe rellenar todos los campos requeridos del formulario:</p>
+		<ul id="erroresFormList"></ul>
+	</div>
+    
     <p>Las etiquetas en <b>negrita</b> corresponden a campos de relleno obligatorio</p>
     
     <form id="actualizar_noticia" class="be-form" method="post" action="<%= request.getRequestURI() %>">
@@ -59,7 +64,7 @@ Boolean publica = noticia != null ? noticia.isPublica() : false;
     	</div>
     	<div class="form-check">
     		<label for="noticia_publica" class="bold-label"><input type="checkbox" id="noticia_publica" name="<%= ControladorGestionNoticias.PARAM_PUBLICA %>" 
-    		value="<%= publica %>" <%= (publica ? "checked=''" : "") %> />Pública</label>
+    		value="<%= publica %>" <%= (publica ? "checked=''" : "") %> />Pï¿½blica</label>
     	</div>
     	<div class="form-btn">
     		<input id="noticia_enviar" type="submit" name="<%= ControladorGestionNoticias.PARAM_ENVIAR %>" value="<%= noticia != null ? "Guardar cambios" : "Insertar noticia" %>"/>
@@ -70,6 +75,41 @@ Boolean publica = noticia != null ? noticia.isPublica() : false;
 
 <script>
 
+	function checkRequiredInputs(){
+		var cont = true;
+		$('#erroresFormList').html("");
+		if($('#noticia_texto').val()==""){
+			$('#erroresFormList').append( "<li>Texto</li>" );
+			$('#erroresForm').show();
+			cont = false;
+		}
+		if($('#noticia_fecha').val()==""){
+			$('#erroresFormList').append( "<li>Fecha</li>" );
+			$('#erroresForm').show();
+			cont = false;
+		}
+		
+		return cont;
+	}
+
+	function enviarNoticia(event, submit_input) {
+		
+		<% if(noticia != null) { %>
+			input_accion = document.getElementById("accion_formulario");
+			input_accion.value = '<%= ControladorGestionNoticias.ACCION_EDITAR_NOTICIA %>';
+			input_id = document.getElementById("noticia_id");
+			input_id.value = '<%= bean.getNoticia().getCodNum() %>';
+		<% } else { %>
+			input_accion = document.getElementById("accion_formulario");
+			input_accion.value = '<%= ControladorGestionNoticias.ACCION_AGREGAR_NOTICIA %>';
+		<% } %>
+		
+		input_publica = document.getElementById("noticia_publica");
+		input_publica.value = input_publica.checked;
+		
+
+	}
+	
 	function getTodayDate() {
 		var now = new Date();
 

@@ -11,7 +11,9 @@ import java.util.logging.Logger;
 import org.junit.AfterClass;
 import org.junit.Before;
 import org.junit.BeforeClass;
+import org.junit.FixMethodOrder;
 import org.junit.Test;
+import org.junit.runners.MethodSorters;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebElement;
 
@@ -19,6 +21,7 @@ import org.openqa.selenium.WebElement;
  * @author usig
  *
  */
+@FixMethodOrder(MethodSorters.NAME_ASCENDING)
 public class TestConvocatoriaCrud {
 	private static final String NOMBREDEESTACLASE = TestConvocatoriaCrud.class.getName();
 
