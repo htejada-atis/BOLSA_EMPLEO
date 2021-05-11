@@ -221,7 +221,6 @@ VistaUsuarioBolsaEmpleo bean = (VistaUsuarioBolsaEmpleo) uvdatos.getVistas().get
 	$(document).ready(function() {
 		
 		document.getElementById("usuario_enviar").addEventListener("click", function(event) {
-			console.log("asda");
 			enviarUsuario(event, this);
 		});
 		

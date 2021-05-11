@@ -8,6 +8,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
+import es.ujaen.uvirtual.modelo.conexion.ConexionArcos;
 import es.ujaen.uvirtual.modelo.conexion.ConexionUvirtual;
 import es.ujaen.uvirtual.modulo.bolsaempleo.beans.Candidato;
 import es.ujaen.uvirtual.modulo.bolsaempleo.beans.UsuarioBolsaEmpleo;
@@ -61,7 +62,7 @@ public class ModeloCandidato {
 		List<Candidato> usuarios = new ArrayList<>();
 		BolsaEmpleoDataTable<Candidato> dataTable = new BolsaEmpleoDataTable<Candidato>(params);
 		
-		String consulta = "SELECT bepusu.CODNUM, uvpersona.STRNOMBRE, uvpersona.STRAPELLIDO1, uvpersona.STRAPELLIDO2,"
+		String consulta = "SELECT bepusu.CODNUM, bepusu.PRSNIF, "
 				+ "	(SELECT COUNT(*) FROM UVIRTUAL.TBEP_TITULACIONES_USUARIO beptus"
 				+ "		WHERE beptus.BEPTUS_USU_CODNUM = bepusu.CODNUM"
 				+ "	) AS COUNT_TITULACIONES,"
@@ -69,10 +70,9 @@ public class ModeloCandidato {
 				+ "		WHERE beptus.BEPTUS_USU_CODNUM = bepusu.CODNUM AND beptus.FLGVALIDADA = 'S'"
 				+ "	) AS COUNT_VALIDADAS"
 				+ "	FROM UVIRTUAL.TBEP_USUARIOS bepusu"
-				+ "	INNER JOIN UVIRTUAL.VUJA_NET_BEP_AR_PERSONA uvpersona ON uvpersona.CODINT=bepusu.CODPERSONA"
 				+ "	WHERE bepusu.rol = " + PARAM_ROL_CANDIDATO_ID + " ";
 		
-		dataTable.setColumn(ORDER_COLUMN_INDEX_NOMBRE_CANDIDATO, "uvpersona.STRNOMBRE");
+		dataTable.setColumn(ORDER_COLUMN_INDEX_NOMBRE_CANDIDATO, "bepusu.CODCUENTA");
 		
 		dataTable.setQuery(consulta);
 		
@@ -84,16 +84,26 @@ public class ModeloCandidato {
 			
 			try (ResultSet rs = stmt.executeQuery()) {
 				while (rs.next()) {
-					UsuarioBolsaEmpleo usuario = new UsuarioBolsaEmpleo();
-					usuario.setCodNum(rs.getInt("CODNUM"));
-					usuario.setNombre(rs.getString("STRNOMBRE"));
-					usuario.setPrimerApellido(rs.getString("STRAPELLIDO1"));
-					usuario.setSegundoApellido(rs.getString("STRAPELLIDO2"));
+					String consultaArcos = "SELECT * FROM VUJA_NET_BEP_AR_PERSONA WHERE PRSNIF = ?";
 					
-					Integer titulaciones = rs.getInt("COUNT_TITULACIONES");
-					Integer validadas = rs.getInt("COUNT_VALIDADAS");
-					
-					usuarios.add(new Candidato(usuario, titulaciones, validadas));
+				    try (Connection conexionArcos = ConexionArcos.obtenerInstancia();
+				    	PreparedStatement stmtArcos = conexionArcos.prepareStatement(consultaArcos);) {
+				    	stmtArcos.setString(1, rs.getString("PRSNIF"));
+				    	try (ResultSet rsArcos = stmtArcos.executeQuery();) {
+					    	while (rsArcos.next()) {
+					    		UsuarioBolsaEmpleo usuario = new UsuarioBolsaEmpleo();
+								usuario.setCodNum(rs.getInt("CODNUM"));
+								usuario.setNombre(rsArcos.getString("STRNOMBRE"));
+								usuario.setPrimerApellido(rsArcos.getString("STRAPELLIDO1"));
+								usuario.setSegundoApellido(rsArcos.getString("STRAPELLIDO2"));
+								
+								Integer titulaciones = rs.getInt("COUNT_TITULACIONES");
+								Integer validadas = rs.getInt("COUNT_VALIDADAS");
+								
+								usuarios.add(new Candidato(usuario, titulaciones, validadas));
+					    	}
+				    	}
+				    }
 				}				
 			}	
 			

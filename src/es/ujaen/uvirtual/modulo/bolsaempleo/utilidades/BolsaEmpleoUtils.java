@@ -10,6 +10,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.Part;
 
 import es.ujaen.uvirtual.modulo.bolsaempleo.modelo.ModeloParametrosConfiguracion;
+import es.ujaen.uvirtual.utilidades.Formateador;
 import es.ujaen.uvirtual.utilidades.UVException;
 
 /**
@@ -94,7 +95,7 @@ public class BolsaEmpleoUtils {
 	 * @param value .
 	 * @return .
 	 */
-	public static Boolean isFloat(String value) {
+	public static boolean isFloat(String value) {
 		if (value == null) {
 			return false;
 		}
@@ -135,18 +136,21 @@ public class BolsaEmpleoUtils {
 	/**
 	 * Checkea si un archivo es mas grande que una variable o no .
 	 * @param archivo .
-	 * @throws IOException .
-	 * @throws NumberFormatException .
-	 * @throws UVException .
 	 * @throws SQLException .
+	 * @throws IOException .
+	 * @throws UVException .
 	 */
-	public static void checkFileSize(InputStream archivo) throws SQLException, UVException, NumberFormatException, IOException {
-	
+	public static void checkFileSize(InputStream archivo) throws UVException, SQLException, IOException {
 		if (archivo.available() <= 0) {
 			throw new UVException("No se puede insertar sin archivo o archivo vacio");
 		}
 		
-		if (archivo.available() > Integer.parseInt(getParametroConfiguracion("bolsaempleo.maxEspacioArchivo"))) {
+		Integer maxSize = Formateador.leeParametroInteger(getParametroConfiguracion("bolsaempleo.maxEspacioArchivo"));
+		if (maxSize == null) {
+			throw new UVException("No se puede leer el tamañao máximo de archivo");
+		}
+		
+		if (archivo.available() > maxSize) {
 			throw new UVException("No se puede insertar un archivo tan grande");
 		}	
 	}

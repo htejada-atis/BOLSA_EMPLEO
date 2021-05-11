@@ -56,6 +56,7 @@ public class ControladorMisTitulaciones extends HttpServlet {
 	// parámetros
 	public static final String PARAM_ACCION = "a";
 	public static final String PARAM_ID = "id";
+	public static final String ACCION_INDEX = "index";
 	public static final String PARAM_TITULACION = "titulacion";
 	public static final String PARAM_ARCHIVO = "archivo";
 	public static final String PARAM_DESCRIPCION = "descripcion";
@@ -116,14 +117,15 @@ public class ControladorMisTitulaciones extends HttpServlet {
 		
 		String nombreAccion = EscapaHTML.ajustaCodificacion(request.getParameter(PARAM_ACCION));
 		if (nombreAccion == null) {
-			nombreAccion = PARAM_ACCION;
+			nombreAccion = ACCION_INDEX;
 		}
-		
-		bean.setVista("/WEB-INF/jsp/vista/infadministrativa/bolsaempleo/mistitulaciones/index.jsp");
 		
 		try {
 			modeloUsuario.checkUser(datos);
 			switch (nombreAccion) {
+				case ACCION_INDEX:
+					bean.setVista("/WEB-INF/jsp/vista/infadministrativa/bolsaempleo/mistitulaciones/index.jsp");
+					break;					
 				case ACCION_DATATABLE_TITULACIONES_USUARIO:
 					listadoTitulacionesUsuario(bean, datos, request, response, modeloUsuario.getUsuarioByCodCuenta(usuario.getUid()).getCodNum());
 					break;
@@ -277,48 +279,20 @@ public class ControladorMisTitulaciones extends HttpServlet {
 				
 		bean.setVista(RUTA_BEP_CONF + "formMisTitulaciones.jsp");
 		
-		String descripcion = EscapaHTML.ajustaCodificacion(request.getParameter(PARAM_DESCRIPCION));
-		Integer codNum = Formateador.leeParametroInteger(request.getParameter(PARAM_ID));
-		
-		Titulacion titulacion = modelo.listaTitulacion(codNum);
+		//Integer codNum = Formateador.leeParametroInteger(request.getParameter(PARAM_ID));		
+		// Titulacion titulacion = modelo.listaTitulacion(codNum);
 		
 		Part uploadedFile = request.getPart(PARAM_ARCHIVO);
 		
 		if (uploadedFile != null) {
-			BolsaEmpleoValidator validator = this.getValidatorTitulacion(request);
-			
-			if (!validator.isValid()) {
-				for (String param : validator.getErrors().keySet()) {
-					for (String paramError : validator.getErrors().get(param)) {
-						bean.getMensajesDeError().add(paramError);
-					}
-				}
-			} else {
-				String nombre = BolsaEmpleoUtils.obtenerNombreFichero(uploadedFile);				
-				int i = nombre.lastIndexOf('.');
+			Titulacion titulacion = this.validarTitulacion(request, uploadedFile);
+			titulacion.setTitulacion(titulacion);
+			titulacion.setUsuario(usu);
 				
-				if (i > 0) {
-					String extension = nombre.substring(i + 1);
-					if (!"pdf".equalsIgnoreCase(extension)) {
-						throw new UVException("No se puede subir un fichero que sea distinto de pdf");
-				    }
-				}
+			modelo.insertaTitulacionUsuario(titulacion);
 				
-				InputStream input = uploadedFile.getInputStream();
-				Titulacion titulacionUsuario = new Titulacion();
-				
-				titulacionUsuario.setDescripcion(descripcion);
-				titulacionUsuario.setArchivo(input);
-				titulacionUsuario.setTitulacion(titulacion);
-				titulacionUsuario.setUsuario(usu);
-
-				BolsaEmpleoUtils.checkFileSize(titulacionUsuario.getArchivo());
-				
-				modelo.insertaTitulacionUsuario(titulacionUsuario);
-				
-				bean.getMensajesDeExito().add(MENSAJE_EXITO_AGREGAR);
-				response.sendRedirect(request.getServletPath());	
-			}
+			bean.getMensajesDeExito().add(MENSAJE_EXITO_AGREGAR);
+			response.sendRedirect(request.getServletPath());	
 		}
 	}
 	
@@ -366,16 +340,30 @@ public class ControladorMisTitulaciones extends HttpServlet {
 		}
 	}
 	
-	private BolsaEmpleoValidator getValidatorTitulacion(HttpServletRequest request) throws UVException {
-		BolsaEmpleoValidator validator = new BolsaEmpleoValidator(request);
+	private Titulacion validarTitulacion(HttpServletRequest request, Part uploadedFile) throws UVException, IOException, SQLException {
+		Titulacion t = new Titulacion();
 		
-		validator.addParamString(PARAM_DESCRIPCION);
-		validator.addRule(PARAM_DESCRIPCION, "required", MENSAJE_ERROR_DESCRIPCION_REQUERIDO);
-		validator.addRule(PARAM_DESCRIPCION, "noBlank", MENSAJE_ERROR_DESCRIPCION_VACIO);
-		validator.addRule(PARAM_DESCRIPCION, "max:" + ModeloMisTitulaciones.COLUMN_DESCRIPCION_MAXLENGTH, 
-				String.format(MENSAJE_ERROR_DESCRIPCION_LARGA, ModeloMisTitulaciones.COLUMN_DESCRIPCION_MAXLENGTH));
+		t.setDescripcion(EscapaHTML.ajustaCodificacion(request.getParameter(PARAM_DESCRIPCION)));
+		if (t.getDescripcion() == null || t.getDescripcion().isBlank()) {
+			throw new UVException(MENSAJE_ERROR_DESCRIPCION_REQUERIDO);
+		}
+		if (t.getDescripcion().length() > ModeloMisTitulaciones.COLUMN_DESCRIPCION_MAXLENGTH) {
+			throw new UVException(String.format(MENSAJE_ERROR_DESCRIPCION_LARGA, ModeloMisTitulaciones.COLUMN_DESCRIPCION_MAXLENGTH));
+		}
+				
+		String nombre = BolsaEmpleoUtils.obtenerNombreFichero(uploadedFile);				
+		int i = nombre.lastIndexOf('.');
 		
-		return validator;
+		if (i > 0) {
+			String extension = nombre.substring(i + 1);
+			if (!"pdf".equalsIgnoreCase(extension)) {
+				throw new UVException("No se puede subir un fichero que sea distinto de pdf");
+		    }
+		}
+		
+		t.setArchivo(uploadedFile.getInputStream());
+		BolsaEmpleoUtils.checkFileSize(t.getArchivo());
+		
+		return t;
 	}
-	
 }

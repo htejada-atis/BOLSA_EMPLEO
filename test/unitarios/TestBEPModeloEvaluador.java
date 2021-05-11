@@ -24,7 +24,6 @@ import es.ujaen.uvirtual.utilidades.UVException;
 
 /** Clase para probar el modelo evaluador. */
 public class TestBEPModeloEvaluador {
-	private static final Integer CODPERSONA = 1;
 	private static final String CODCUENTA = "test2";
 	private static final Rol ROL = new Rol(1050);
 	private static final String EMAIL = "test@test";
@@ -56,7 +55,6 @@ public class TestBEPModeloEvaluador {
     @Test
     public void testA01InsertaAfinidad() throws SQLException, ParseException, UVException {
 		Evaluador evaluador = new Evaluador();
-		evaluador.setCodPersona(CODPERSONA);
 		evaluador.setCodCuenta(CODCUENTA);
 		evaluador.setRol(ROL);
 		evaluador.setEmail(EMAIL);

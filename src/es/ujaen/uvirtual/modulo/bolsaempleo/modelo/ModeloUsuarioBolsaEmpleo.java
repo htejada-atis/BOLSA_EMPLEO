@@ -88,6 +88,29 @@ public class ModeloUsuarioBolsaEmpleo {
         }
         return eInstancia;
     }
+    
+    
+	/** Consulta usuarios en BBDD Arcos y las devuelve.
+	 * @return todos los usuarios de la base de datos
+	 * @throws SQLException en caso de error de base de datos
+	 * @throws UVException .
+	 */
+	public List<UsuarioBolsaEmpleo> listaUsuariosArcos() throws SQLException, UVException {
+		List<UsuarioBolsaEmpleo> usuariosArcos = new ArrayList<>();
+		String consultaArcos = "SELECT * FROM VUJA_NET_BEP_AR_PERSONA";
+		
+	    try (Connection conexion = ConexionArcos.obtenerInstancia();
+	    	PreparedStatement stmt = conexion.prepareStatement(consultaArcos);) {
+	    	try (ResultSet rs = stmt.executeQuery();) {
+		    	while (rs.next()) {
+					UsuarioBolsaEmpleo usuario = setUsuarioArcos(rs);
+		    		usuariosArcos.add(usuario);
+		    	}
+	    	}
+	    }
+	    return usuariosArcos;
+	}
+    
 	
 	/** Consulta usuarios en BBDD y las devuelve.
 	 * @param clausula para filtrar los usuarios de la bd
@@ -102,8 +125,18 @@ public class ModeloUsuarioBolsaEmpleo {
 			PreparedStatement stmt = conexion.prepareStatement(consulta);) {
 				try (ResultSet rs = stmt.executeQuery()) {
 					while (rs.next()) {
-						UsuarioBolsaEmpleo usuario = setUsuario(rs, rs);
-						usuarios.add(usuario);
+						String consultaArcos = "SELECT * FROM VUJA_NET_BEP_AR_PERSONA WHERE PRSNIF = ?";
+						
+					    try (Connection conexionArcos = ConexionArcos.obtenerInstancia();
+					    	PreparedStatement stmtArcos = conexionArcos.prepareStatement(consultaArcos);) {
+					    	stmtArcos.setString(1, rs.getString("PRSNIF"));
+					    	try (ResultSet rsArcos = stmtArcos.executeQuery();) {
+						    	while (rsArcos.next()) {
+						    		UsuarioBolsaEmpleo usuario = setUsuario(rs, rsArcos);
+									usuarios.add(usuario);
+						    	}
+					    	}
+					    }
 					}
 				}
 			}
@@ -120,12 +153,12 @@ public class ModeloUsuarioBolsaEmpleo {
 	}
 	
 	/** obtiene un usuario a partir de su nombre.
-	 * @param nombre del usuario
+	 * @param documento del usuario
 	 * @return usuario con el nombre especificado
 	 * @throws SQLException en caso de error en la BD
 	 */
-	public UsuarioBolsaEmpleo listaUsuario(String nombre) throws SQLException, UVException {
-		String clausulaWhere = "WHERE bepusu.codcuenta = '" + nombre + "'";
+	public UsuarioBolsaEmpleo listaUsuario(String documento) throws SQLException, UVException {
+		String clausulaWhere = "WHERE bepusu.prsnif = '" + documento + "'";
 		List<UsuarioBolsaEmpleo> usuarios = listaUsuarios(clausulaWhere);
 		if (usuarios.isEmpty()) {
 			throw new UVException("No existe el usuario");
@@ -141,6 +174,7 @@ public class ModeloUsuarioBolsaEmpleo {
 	 * @throws UVException si bolsa no es existe
 	 */
 	public UsuarioBolsaEmpleo getUsuarioById(int codNum) throws SQLException, UVException {
+		UsuarioBolsaEmpleo usuario = null;
 		String consulta = "SELECT * "
 				+ "FROM TBEP_USUARIOS bepusu "
 				+ "WHERE bepusu.CODNUM = ?";
@@ -153,12 +187,60 @@ public class ModeloUsuarioBolsaEmpleo {
 				if (!rs.next()) {
 					throw new UVException("No existe el usuario con id " + codNum);
 				}
-	
-				UsuarioBolsaEmpleo usuario = setUsuario(rs, rs);
+				String consultaArcos = "SELECT * FROM VUJA_NET_BEP_AR_PERSONA WHERE PRSNIF = ?";
 				
-				return usuario;
+			    try (Connection conexionArcos = ConexionArcos.obtenerInstancia();
+			    	PreparedStatement stmtArcos = conexionArcos.prepareStatement(consultaArcos);) {
+			    	stmtArcos.setString(1, rs.getString("PRSNIF"));
+			    	try (ResultSet rsArcos = stmtArcos.executeQuery();) {
+				    	while (rsArcos.next()) {
+				    		usuario = setUsuario(rs, rsArcos);
+							return usuario;
+				    	}
+			    	}
+			    }
 			}
 		}
+		return usuario;
+	}
+	
+	/**
+	 * Devuelve un usuario por su documento.
+	 * @param documento de usuario
+	 * @return usuarioBolsaEmpleo
+	 * @throws SQLException en caso de error en la BD
+	 * @throws UVException si bolsa no es existe
+	 */
+	public UsuarioBolsaEmpleo getUsuarioByDocumentoLetra(String documento) throws SQLException, UVException {
+		UsuarioBolsaEmpleo usuario = null;
+		
+		String consulta = "SELECT * "
+				+ "FROM TBEP_USUARIOS bepusu "
+				+ "WHERE bepusu.PRSNIF = ?";
+			
+		try (Connection conexion = ConexionUvirtual.obtenerInstancia();
+				PreparedStatement stmt = conexion.prepareStatement(consulta);) {
+				stmt.setString(1, documento);
+						
+			try (ResultSet rs = stmt.executeQuery()) {
+				if (!rs.next()) {
+					throw new UVException("No existe el usuario con el documento " + documento);
+				}
+				String consultaArcos = "SELECT * FROM VUJA_NET_BEP_AR_PERSONA WHERE PRSNIF = ?";
+				
+			    try (Connection conexionArcos = ConexionArcos.obtenerInstancia();
+			    	PreparedStatement stmtArcos = conexionArcos.prepareStatement(consultaArcos);) {
+			    	stmtArcos.setString(1, rs.getString("PRSNIF"));
+			    	try (ResultSet rsArcos = stmtArcos.executeQuery();) {
+				    	while (rsArcos.next()) {
+				    		usuario = setUsuario(rs, rsArcos);
+							return usuario;
+				    	}
+			    	}
+			    }
+			}
+		}
+		return usuario;
 	}
 	
 	/**
@@ -236,6 +318,8 @@ public class ModeloUsuarioBolsaEmpleo {
 	 * @throws UVException .
 	 */
 	public UsuarioBolsaEmpleo getUsuarioByCodCuenta(String codcuenta) throws SQLException, UVException {
+		UsuarioBolsaEmpleo usuario = null;
+		
 		String consulta = "SELECT * "
 				+ "FROM TBEP_USUARIOS bepusu "
 				+ "WHERE bepusu.CODCUENTA = ?";
@@ -248,10 +332,21 @@ public class ModeloUsuarioBolsaEmpleo {
 				if (!rs.next()) {
 					throw new UVException("No existe el usuario con codcuenta = " + codcuenta);
 				}
-	
-				return setUsuario(rs, rs);
+				String consultaArcos = "SELECT * FROM VUJA_NET_BEP_AR_PERSONA WHERE PRSNIF = ?";
+				
+			    try (Connection conexionArcos = ConexionArcos.obtenerInstancia();
+			    	PreparedStatement stmtArcos = conexionArcos.prepareStatement(consultaArcos);) {
+			    	stmtArcos.setString(1, rs.getString("PRSNIF"));
+			    	try (ResultSet rsArcos = stmtArcos.executeQuery();) {
+				    	while (rsArcos.next()) {
+				    		usuario = setUsuario(rs, rsArcos);
+							return usuario;
+				    	}
+			    	}
+			    }
 			}
 		}
+		return usuario;
 	}
 	
 	/**
@@ -264,38 +359,35 @@ public class ModeloUsuarioBolsaEmpleo {
 	public BolsaEmpleoDataTable<UsuarioBolsaEmpleo> listaUsuarioBolsaEmpleoDatatable(Map<String, String[]> params) throws SQLException, UVException {
 		List<UsuarioBolsaEmpleo> usuarios = new ArrayList<>();
 		
-		String consultaArcos = "SELECT * FROM VUJA_NET_BEP_AR_PERSONA";
-		
-		String consulta = "SELECT * FROM TBEP_USUARIOS";
-
+		String consulta = "SELECT * FROM TBEP_USUARIOS bepusu WHERE 1=1";
 		BolsaEmpleoDataTable<UsuarioBolsaEmpleo> dataTable = setDatatable(params, consulta);
-		
-		try (Connection conexionArcos = ConexionArcos.obtenerInstancia();
-				PreparedStatement stmtArcos = conexionArcos.prepareStatement(consultaArcos);
-		) {		
-			
-			Connection conexion = ConexionUvirtual.obtenerInstancia();
-			PreparedStatement stmtCount = conexion.prepareStatement(dataTable.getQueryCount());
-			PreparedStatement stmt = conexion.prepareStatement(dataTable.getQuery());
-			
+				
+		try (Connection conexion = ConexionUvirtual.obtenerInstancia();
+				PreparedStatement stmtCount = conexion.prepareStatement(dataTable.getQueryCount());
+				PreparedStatement stmt = conexion.prepareStatement(dataTable.getQuery());
+		) {
 			dataTable.setFiltersParams(stmt, stmtCount, 1);
+			try (ResultSet rs = stmt.executeQuery()) {
+				while (rs.next()) {
+					String consultaArcos = "SELECT * FROM VUJA_NET_BEP_AR_PERSONA WHERE PRSNIF = ?";
+					
+				    try (Connection conexionArcos = ConexionArcos.obtenerInstancia();
+				    	PreparedStatement stmtArcos = conexionArcos.prepareStatement(consultaArcos);) {
+				    	stmtArcos.setString(1, rs.getString("PRSNIF"));
+				    	try (ResultSet rsArcos = stmtArcos.executeQuery();) {
+					    	while (rsArcos.next()) {
+					    		UsuarioBolsaEmpleo usuario = setUsuario(rs, rsArcos);
+								usuarios.add(usuario);
+					    	}
+				    	}
+				    }
+				}
+			}
 			
-			try (ResultSet rsArcos = stmtArcos.executeQuery();
-					ResultSet rs = stmt.executeQuery()) {
-				while (rsArcos.next()) {
-					while (rs.next()) {
-						if (rsArcos.getString("IDNIF").equals(rs.getString("NIF"))) {
-							if (rsArcos.getString("LETRANIF").equals(rs.getString("LETRANIF"))) {
-								UsuarioBolsaEmpleo usuario = setUsuario(rsArcos, rs);
-								usuarios.add(usuario);	
-							}
-						}
-						dataTable.setRecordsTotalFromQuery(stmtCount);
-						dataTable.setData(usuarios);
-					}				
-				}				
-			}	
+			dataTable.setRecordsTotalFromQuery(stmtCount);
+			dataTable.setData(usuarios);
 		}
+		
 		return dataTable;
 	}
 	
@@ -309,11 +401,7 @@ public class ModeloUsuarioBolsaEmpleo {
 	public BolsaEmpleoDataTable<UsuarioBolsaEmpleo> listaUsuarioCandidatosBolsaEmpleoDatatable(Map<String, String[]> params) throws SQLException, UVException {
 		List<UsuarioBolsaEmpleo> usuarios = new ArrayList<>();
 		
-		String consulta =
-		"SELECT * "
-		+ "FROM TBEP_USUARIOS bepusu "
-		+ "INNER JOIN VUJA_NET_BEP_AR_PERSONA uvpersona ON uvpersona.CODINT=bepusu.CODPERSONA "
-		+ "WHERE bepusu.rol = 1052";
+		String consulta = "SELECT * FROM TBEP_USUARIOS bepusu WHERE bepusu.rol = 1052";
 		
 		BolsaEmpleoDataTable<UsuarioBolsaEmpleo> dataTable = setDatatable(params, consulta);
 				
@@ -326,9 +414,19 @@ public class ModeloUsuarioBolsaEmpleo {
 			
 			try (ResultSet rs = stmt.executeQuery()) {
 				while (rs.next()) {
-					UsuarioBolsaEmpleo usuario = setUsuario(rs, rs);
-					usuarios.add(usuario);					
-				}				
+					String consultaArcos = "SELECT * FROM VUJA_NET_BEP_AR_PERSONA WHERE PRSNIF = ?";
+					
+				    try (Connection conexionArcos = ConexionArcos.obtenerInstancia();
+				    	PreparedStatement stmtArcos = conexionArcos.prepareStatement(consultaArcos);) {
+				    	stmtArcos.setString(1, rs.getString("PRSNIF"));
+				    	try (ResultSet rsArcos = stmtArcos.executeQuery();) {
+					    	while (rsArcos.next()) {
+					    		UsuarioBolsaEmpleo usuario = setUsuario(rs, rsArcos);
+								usuarios.add(usuario);
+					    	}
+				    	}
+				    }
+				}					
 			}	
 			
 			dataTable.setRecordsTotalFromQuery(stmtCount);
@@ -351,7 +449,6 @@ public class ModeloUsuarioBolsaEmpleo {
 		String consulta =
 		"SELECT * "
 		+ "FROM TBEP_USUARIOS bepusu "
-		+ "INNER JOIN VUJA_NET_BEP_AR_PERSONA uvpersona ON uvpersona.CODINT=bepusu.CODPERSONA "
 		+ "WHERE bepusu.FLGBORRADO='S'";
 		
 		BolsaEmpleoDataTable<UsuarioBolsaEmpleo> dataTable = setDatatable(params, consulta);
@@ -365,8 +462,18 @@ public class ModeloUsuarioBolsaEmpleo {
 			
 			try (ResultSet rs = stmt.executeQuery()) {
 				while (rs.next()) {
-					UsuarioBolsaEmpleo usuario = setUsuario(rs, rs);
-					usuarios.add(usuario);						
+					String consultaArcos = "SELECT * FROM VUJA_NET_BEP_AR_PERSONA WHERE PRSNIF = ?";
+					
+				    try (Connection conexionArcos = ConexionArcos.obtenerInstancia();
+				    	PreparedStatement stmtArcos = conexionArcos.prepareStatement(consultaArcos);) {
+				    	stmtArcos.setString(1, rs.getString("PRSNIF"));
+				    	try (ResultSet rsArcos = stmtArcos.executeQuery();) {
+					    	while (rsArcos.next()) {
+					    		UsuarioBolsaEmpleo usuario = setUsuario(rs, rsArcos);
+								usuarios.add(usuario);
+					    	}
+				    	}
+				    }						
 				}				
 			}	
 			
@@ -390,7 +497,6 @@ public class ModeloUsuarioBolsaEmpleo {
 		String consulta =
 		"SELECT * "
 		+ "FROM TBEP_USUARIOS bepusu "
-		+ "INNER JOIN VUJA_NET_BEP_AR_PERSONA uvpersona ON uvpersona.CODINT=bepusu.CODPERSONA "
 		+ "WHERE FLGEXCLUIDO='S' "
 		+ "AND FLGBORRADO!='S'";
 		
@@ -404,9 +510,19 @@ public class ModeloUsuarioBolsaEmpleo {
 			dataTable.setFiltersParams(stmt, stmtCount, 1);
 			
 			try (ResultSet rs = stmt.executeQuery()) {
-				while (rs.next()) {			
-					UsuarioBolsaEmpleo usuario = setUsuario(rs, rs);
-					usuarios.add(usuario);					
+				while (rs.next()) {	
+					String consultaArcos = "SELECT * FROM VUJA_NET_BEP_AR_PERSONA WHERE PRSNIF = ?";
+					
+				    try (Connection conexionArcos = ConexionArcos.obtenerInstancia();
+				    	PreparedStatement stmtArcos = conexionArcos.prepareStatement(consultaArcos);) {
+				    	stmtArcos.setString(1, rs.getString("PRSNIF"));
+				    	try (ResultSet rsArcos = stmtArcos.executeQuery();) {
+					    	while (rsArcos.next()) {
+					    		UsuarioBolsaEmpleo usuario = setUsuario(rs, rsArcos);
+								usuarios.add(usuario);
+					    	}
+				    	}
+				    }					
 				}				
 			}
 			
@@ -482,32 +598,32 @@ public class ModeloUsuarioBolsaEmpleo {
 	
 	/**
 	 * Set usuario. 
-	 * @param rsArcos resultado de la consulta de ARCOS
 	 * @param rs resultado de la consulta de UVIRTUAL
+	 * @param rsArcos .
 	 * @return usuario
 	 * @throws SQLException en caso de error de base de datos
 	 * @throws UVException en caso de no poder crear el usuario
 	 */	
-	public UsuarioBolsaEmpleo setUsuario(ResultSet rsArcos, ResultSet rs) throws SQLException, UVException {
+	public UsuarioBolsaEmpleo setUsuario(ResultSet rs, ResultSet rsArcos) throws SQLException, UVException {
 		ModeloRol modeloRol = ModeloRol.obtenerInstancia();
-		
 		UsuarioBolsaEmpleo usuario = new UsuarioBolsaEmpleo();
+		
+		usuario.setNumDocumento(rsArcos.getString("PRSNIF"));
+		usuario.setTipoDocumento(rsArcos.getString("STRTIPODOCUMENTO"));
+		usuario.setEmail(rsArcos.getString("EMAIL_ALTA"));
+		usuario.setNombre(rsArcos.getString("STRNOMBRE"));
+		usuario.setPrimerApellido(rsArcos.getString("STRAPELLIDO1"));
+		usuario.setSegundoApellido(rsArcos.getString("STRAPELLIDO2"));
+		//usuario.setTelefono(rsArcos.getString("TELEFONO"));
+		//usuario.setSexo(rsArcos.getString("SEXO"));
+		
 		usuario.setCodNum(rs.getInt("CODNUM"));
 		usuario.setCodCuenta(rs.getString("CODCUENTA"));
-		//usuario.setTipoDocumento(rs.getString("STRTIPODOCUMENTO"));
-		//usuario.setNumDocumento(rs.getString("IDNIF") + rs.getString("LETRANIF"));
-		//usuario.setNombre(rs.getString("STRNOMBRE"));
-		//usuario.setPrimerApellido(rs.getString("STRAPELLIDO1"));
-		//usuario.setSegundoApellido(rs.getString("STRAPELLIDO2"));
-		usuario.setEmail(rs.getString("EMAIL"));
 		usuario.setDireccion(rs.getString("DIRECCION"));
 		usuario.setCodigoPostal(rs.getString("CODIGOPOSTAL"));
 		usuario.setLocalidad(rs.getString("LOCALIDAD"));
 		usuario.setProvincia(rs.getString("PROVINCIA"));
-		usuario.setMovil(rs.getString("MOVIL"));
-		usuario.setTelefono(rs.getString("TELEFONO"));
 		usuario.setNacionalidad(rs.getString("NACIONALIDAD"));
-		usuario.setSexo(rs.getString("SEXO"));
 		usuario.setRol(modeloRol.getRoleById(rs.getInt("ROL")));
 		usuario.setListaDist(rs.getString("FLGLISTADISTRIBUCION").equals("S"));
 		usuario.setExcluido(rs.getString("FLGEXCLUIDO").equals("S"));
@@ -523,6 +639,27 @@ public class ModeloUsuarioBolsaEmpleo {
 	}
 	
 	/**
+	 * Set usuario Arcos. 
+	 * @param rsArcos resultado de la consulta de ARCOS
+	 * @return usuario
+	 * @throws SQLException en caso de error de base de datos
+	 * @throws UVException en caso de no poder crear el usuario
+	 */	
+	public UsuarioBolsaEmpleo setUsuarioArcos(ResultSet rsArcos) throws SQLException, UVException {
+		UsuarioBolsaEmpleo usuario = new UsuarioBolsaEmpleo();
+		usuario.setNumDocumento(rsArcos.getString("PRSNIF"));
+		usuario.setTipoDocumento(rsArcos.getString("STRTIPODOCUMENTO"));
+		usuario.setEmail(rsArcos.getString("EMAIL_ALTA"));
+		usuario.setNombre(rsArcos.getString("STRNOMBRE"));
+		usuario.setPrimerApellido(rsArcos.getString("STRAPELLIDO1"));
+		usuario.setSegundoApellido(rsArcos.getString("STRAPELLIDO2"));
+		//usuario.setTelefono(rsArcos.getString("TELEFONO"));
+		//usuario.setSexo(rsArcos.getString("SEXO"));
+		return usuario;
+	}
+	
+	
+	/**
 	 * Set usuario excluido de area. 
 	 * @param rs resultado de la consulta
 	 * @return usuario
@@ -534,7 +671,6 @@ public class ModeloUsuarioBolsaEmpleo {
 		
 		UsuarioBolsaEmpleo usuario = new UsuarioBolsaEmpleo();
 		usuario.setCodNum(rs.getInt("CODNUM"));
-		usuario.setCodPersona(rs.getInt("CODPERSONA"));
 		usuario.setCodCuenta(rs.getString("CODCUENTA"));
 		usuario.setTipoDocumento(rs.getString("STRTIPODOCUMENTO"));
 		usuario.setNumDocumento(rs.getString("IDNIF") + rs.getString("LETRANIF"));
@@ -546,7 +682,6 @@ public class ModeloUsuarioBolsaEmpleo {
 		usuario.setCodigoPostal(rs.getString("CODIGOPOSTAL"));
 		usuario.setLocalidad(rs.getString("LOCALIDAD"));
 		usuario.setProvincia(rs.getString("PROVINCIA"));
-		usuario.setMovil(rs.getString("MOVIL"));
 		usuario.setTelefono(rs.getString("TELEFONO"));
 		usuario.setNacionalidad(rs.getString("NACIONALIDAD"));
 		usuario.setSexo(rs.getString("SEXO"));
@@ -574,14 +709,14 @@ public class ModeloUsuarioBolsaEmpleo {
 	public BolsaEmpleoDataTable<UsuarioBolsaEmpleo> setDatatable(Map<String, String[]> params, String consulta) throws UVException {
 		BolsaEmpleoDataTable<UsuarioBolsaEmpleo> dataTable = new BolsaEmpleoDataTable<UsuarioBolsaEmpleo>(params);
 		
-		dataTable.setColumn(ORDER_COLUMN_INDEX_TIPO_DOCUMENTO, "uvpersona.STRTIPODOCUMENTO");
-		dataTable.setColumn(ORDER_COLUMN_INDEX_NUMDOCUMENTO, "uvpersona.IDNIF");
-		dataTable.setColumn(ORDER_COLUMN_INDEX_COD_CUENTA, "bepusu.CODCUENTA");
-		dataTable.setColumn(ORDER_COLUMN_INDEX_NOMBRE_Y_APELLIDOS, "uvpersona.STRAPELLIDO1");
-		dataTable.setColumn(ORDER_COLUMN_INDEX_ROL, "bepusu.ROL", DataTableColumn.COLUMN_TYPE_NUMBER);
-		dataTable.setColumn(ORDER_COLUMN_INDEX_LISTA_DIST, "bepusu.FLGLISTADISTRIBUCION", DataTableColumn.COLUMN_TYPE_BOOLEAN);
-		dataTable.setColumn(ORDER_COLUMN_INDEX_EXCLUIDO, "bepusu.FLGEXCLUIDO", DataTableColumn.COLUMN_TYPE_BOOLEAN);
-		dataTable.setColumn(ORDER_COLUMN_INDEX_BORRADO, "bepusu.FLGBORRADO", DataTableColumn.COLUMN_TYPE_BOOLEAN);
+		dataTable.setColumn(ORDER_COLUMN_INDEX_TIPO_DOCUMENTO, "PRSNIF");
+		dataTable.setColumn(ORDER_COLUMN_INDEX_NUMDOCUMENTO, "PRSNIF");
+		dataTable.setColumn(ORDER_COLUMN_INDEX_COD_CUENTA, "CODCUENTA");
+		dataTable.setColumn(ORDER_COLUMN_INDEX_NOMBRE_Y_APELLIDOS, "PRSNIF");
+		dataTable.setColumn(ORDER_COLUMN_INDEX_ROL, "ROL", DataTableColumn.COLUMN_TYPE_NUMBER);
+		dataTable.setColumn(ORDER_COLUMN_INDEX_LISTA_DIST, "FLGLISTADISTRIBUCION", DataTableColumn.COLUMN_TYPE_BOOLEAN);
+		dataTable.setColumn(ORDER_COLUMN_INDEX_EXCLUIDO, "FLGEXCLUIDO", DataTableColumn.COLUMN_TYPE_BOOLEAN);
+		dataTable.setColumn(ORDER_COLUMN_INDEX_BORRADO, "FLGBORRADO", DataTableColumn.COLUMN_TYPE_BOOLEAN);
 		dataTable.setQuery(consulta);
 		
 		return dataTable;
@@ -601,37 +736,35 @@ public class ModeloUsuarioBolsaEmpleo {
 		
 		if (!usuario.getExcluido()) {
 			String consulta = "INSERT INTO tbep_usuarios " 
-					+ " (CODPERSONA,CODCUENTA,ROL,EMAIL,FLGLISTADISTRIBUCION) "
-					+ "VALUES (?, ?, ?, ?, ?)";
+					+ " (CODCUENTA,PRSNIF,ROL,FLGLISTADISTRIBUCION) "
+					+ "VALUES (?, ?, ?, ?)";
 			
 			try (Connection conexion = ConexionUvirtual.obtenerInstancia();
 					PreparedStatement stmt = conexion.prepareStatement(consulta);) {
 					int parameterIndex = 1;
-					stmt.setInt(parameterIndex++, usuario.getCodPersona());
 					stmt.setString(parameterIndex++, usuario.getCodCuenta());
+					stmt.setString(parameterIndex++, usuario.getNumDocumento());
 					stmt.setInt(parameterIndex++, usuario.getRol().getCodNum());
-					stmt.setString(parameterIndex++, usuario.getEmail());
 					stmt.setString(parameterIndex++, usuario.getListaDist() ? "S" : "N");
 					stmt.executeUpdate();
 				}
 		} else {
 			String consulta = "INSERT INTO tbep_usuarios " 
-					+ " (CODPERSONA,CODCUENTA,ROL,EMAIL,FLGLISTADISTRIBUCION,"
+					+ " (CODCUENTA,PRSNIF,ROL,FLGLISTADISTRIBUCION,"
 					+ "FLGEXCLUIDO,FLGEXCLUIDOTIPO,RAZON_EXCLUSION,FECHA_EXCLUSION";
 					
 					if (usuario.getExcluidoTipo() != null && usuario.getExcluidoTipo().equals("T")) {
-						consulta += ",FECHA_EXCLUSION_INICIO,FECHA_EXCLUSION_FIN) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?) "; 
+						consulta += ",FECHA_EXCLUSION_INICIO,FECHA_EXCLUSION_FIN) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?) "; 
 					} else {
-						consulta += ") VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?) ";
+						consulta += ") VALUES (?, ?, ?, ?, ?, ?, ?, ?) ";
 					}
 			
 			try (Connection conexion = ConexionUvirtual.obtenerInstancia();
 					PreparedStatement stmt = conexion.prepareStatement(consulta);) {
 					int parameterIndex = 1;
-					stmt.setInt(parameterIndex++, usuario.getCodPersona());
 					stmt.setString(parameterIndex++, usuario.getCodCuenta());
+					stmt.setString(parameterIndex++, usuario.getNumDocumento());
 					stmt.setInt(parameterIndex++, usuario.getRol().getCodNum());
-					stmt.setString(parameterIndex++, usuario.getEmail());
 					stmt.setString(parameterIndex++, usuario.getListaDist() ? "S" : "N");
 					stmt.setString(parameterIndex++, usuario.getExcluido() ? "S" : "N");
 					stmt.setString(parameterIndex++, usuario.getExcluidoTipo());
@@ -708,37 +841,19 @@ public class ModeloUsuarioBolsaEmpleo {
 		}
 		
 		String consulta = "UPDATE tbep_usuarios "
-			+ " SET EMAIL=?, DIRECCION=?, CODIGOPOSTAL=?, LOCALIDAD=?, PROVINCIA=?, MOVIL=?, TELEFONO=?, NACIONALIDAD=?, SEXO=?, FLGLISTADISTRIBUCION=?"
+			+ " SET DIRECCION=?, CODIGOPOSTAL=?, LOCALIDAD=?, PROVINCIA=?, NACIONALIDAD=?, FLGLISTADISTRIBUCION=?"
 			+ " WHERE codnum=?";
 		try (Connection conexion = ConexionUvirtual.obtenerInstancia();
 			PreparedStatement stmt = conexion.prepareStatement(consulta);) {
 			int parameterIndex = 1;
-			stmt.setString(parameterIndex++, usuario.getEmail());
 			stmt.setString(parameterIndex++, usuario.getDireccion());
 			stmt.setString(parameterIndex++, usuario.getCodigoPostal());
 			stmt.setString(parameterIndex++, usuario.getLocalidad());
 			stmt.setString(parameterIndex++, usuario.getProvincia());
-			stmt.setString(parameterIndex++, usuario.getMovil());
-			stmt.setString(parameterIndex++, usuario.getTelefono());
 			stmt.setString(parameterIndex++, usuario.getNacionalidad());
-			stmt.setString(parameterIndex++, usuario.getSexo());
 			stmt.setString(parameterIndex++, usuario.getListaDist() ? "S" : "N");
 			stmt.setInt(parameterIndex++, usuario.getCodNum());
 			stmt.executeUpdate();
-		}
-		
-		String consulta2 = "UPDATE VUJA_NET_BEP_AR_PERSONA "
-				+ " SET STRNOMBRE=?, STRAPELLIDO1=?, STRAPELLIDO2=?, EMAIL_ALTA=?"
-				+ " WHERE codint=?";
-			try (Connection conexion = ConexionUvirtual.obtenerInstancia();
-				PreparedStatement stmt = conexion.prepareStatement(consulta2);) {
-				int parameterIndex = 1;
-				stmt.setString(parameterIndex++, usuario.getNombre());
-				stmt.setString(parameterIndex++, usuario.getPrimerApellido());
-				stmt.setString(parameterIndex++, usuario.getSegundoApellido());
-				stmt.setString(parameterIndex++, usuario.getEmail());
-				stmt.setInt(parameterIndex++, usuario.getCodPersona());
-				stmt.executeUpdate();
 		}
 	}
 	
@@ -899,38 +1014,36 @@ public class ModeloUsuarioBolsaEmpleo {
 			return false;
 		} 
 		
-		// comprobamos si el usuario existe en uvirtual (excepción si no existe)
-		UsuarioBolsaEmpleo usuario = getUsuarioByCodCuenta(usuArcos.getUid());
-	
-		if (Boolean.TRUE.equals(usuario.getExcluido())) {
-			throw new UVException("No puede acceder, su perfil ha sido excluido por los siguientes motivos: " + usuario.getRazonExcluido());
-		} else if (Boolean.TRUE.equals(usuario.getBorrado())) {
-			throw new UVException("No puede acceder, su perfil ha sido borrado de la base de datos");
-		} else {
+		try {
+			// comprobamos si el usuario existe en uvirtual (excepción si no existe)
+			UsuarioBolsaEmpleo usuario = getUsuarioByDocumentoLetra(usuArcos.getDocumentoNumero());
+			if (Boolean.TRUE.equals(usuario.getExcluido())) {
+				throw new UVException("No puede acceder, su perfil ha sido excluido por los siguientes motivos: " + usuario.getRazonExcluido());
+			} else if (Boolean.TRUE.equals(usuario.getBorrado())) {
+				throw new UVException("No puede acceder, su perfil ha sido borrado de la base de datos");
+			} else {
+				return true;
+			}
+		} catch (UVException e) {
+			ModeloRol modeloRol = ModeloRol.obtenerInstancia();
+			Rol role;
+			
 			try {
-				listaUsuario(usuArcos.getUid());
-			} catch (UVException e) {
-				ModeloRol modeloRol = ModeloRol.obtenerInstancia();
-				Rol role;
+				role = modeloRol.getRoleById(PARAM_ROL_CANDIDATO_ID);
 				
-				try {
-					role = modeloRol.getRoleById(PARAM_ROL_CANDIDATO_ID);
-					
-					UsuarioBolsaEmpleo usuarioFinal = 
-					new UsuarioBolsaEmpleo(usuArcos.getCodigoPersonaArcos(), usuArcos.getUid(), role, true, false, null, null, null);
-					
-					insertaUsuario(usuarioFinal);
+				UsuarioBolsaEmpleo usuarioFinal = 
+				new UsuarioBolsaEmpleo(usuArcos.getDocumentoNumero(), usuArcos.getUid(), role, true, false, null, null, null);
 				
-					CrearUsuario.refrescarUsuario(usuarioFinal.getCodCuenta());
-					
-				} catch (SQLException | UVException ex) {
-					throw new UVException("Error creando usuario de bolsa de empleo");
-				}
-			} catch (SQLException e) {
-				throw new UVException("Error al buscar usuario de bolsa de empleo");
-			}	
-			return true;
-		}		
+				insertaUsuario(usuarioFinal);
+			
+				CrearUsuario.refrescarUsuario(usuarioFinal.getCodCuenta());
+				
+				return true;
+				
+			} catch (SQLException | UVException ex) {
+				throw new UVException("Error creando usuario de bolsa de empleo");
+			}
+		}
 	}
 	
 	/** Elimina un usuario.

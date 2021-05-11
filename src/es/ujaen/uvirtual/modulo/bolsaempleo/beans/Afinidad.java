@@ -9,7 +9,7 @@ public class Afinidad {
 	private Integer codNum;
 	private String codigo;
 	private String descripcion;
-	private Float modulacion;
+	private Double modulacion;
 	
 	/** Constructor por defecto.
 	 */
@@ -27,7 +27,7 @@ public class Afinidad {
 	 * @param pdescripcion .
 	 * @param pmodulacion .
 	 */
-	public Afinidad(Integer pcodNum, String pcodigo, String pdescripcion, Float pmodulacion) {
+	public Afinidad(Integer pcodNum, String pcodigo, String pdescripcion, Double pmodulacion) {
 		super();
 		this.codNum = pcodNum;
 		this.codigo = pcodigo;
@@ -69,11 +69,11 @@ public class Afinidad {
 		this.descripcion = descripcion;
 	}
 	
-	public Float getModulacion() {
+	public Double getModulacion() {
 		return modulacion;
 	}
 
-	public void setModulacion(Float pmodulacion) {
+	public void setModulacion(Double pmodulacion) {
 		this.modulacion = pmodulacion;
 	}
 	

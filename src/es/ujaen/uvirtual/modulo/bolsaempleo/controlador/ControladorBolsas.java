@@ -91,8 +91,6 @@ public class ControladorBolsas extends HttpServlet {
 			nombreAccion = ACCION_LISTAR_BOLSAS;
 		}
 		
-		bean.setVista("/WEB-INF/jsp/vista/infadministrativa/bolsaempleo/bolsas/index.jsp");
-		
 		try {
 			bean.setTotalBolsasBloqueadas(modeloBolsa.getBolsasBloqueadas());
 			bean.setTotalBolsasRevisadas(modeloBolsa.getBolsasRevisadas());
@@ -100,6 +98,9 @@ public class ControladorBolsas extends HttpServlet {
 			bean.setTotalBolsas(modeloBolsa.getTotalBolsas());
 			modelo.checkUser(datos);
 			switch (nombreAccion) {
+				case ACCION_LISTAR_BOLSAS:
+					bean.setVista("/WEB-INF/jsp/vista/infadministrativa/bolsaempleo/bolsas/index.jsp");
+					break;
 				case ACCION_DATATABLE:
 					listado(bean, datos, request, response);
 					break;

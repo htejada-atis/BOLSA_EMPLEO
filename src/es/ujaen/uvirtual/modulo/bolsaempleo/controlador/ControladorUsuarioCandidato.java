@@ -77,7 +77,8 @@ public class ControladorUsuarioCandidato extends HttpServlet {
 	
 	public static final Integer PARAM_ROLE_CANDIDATO = 1052;
 	
-	// acciones
+	// acciones	
+	public static final String ACCION_INDEX = "index";
 	public static final String ACCION_LISTAR = "listar";
 	public static final String ACCION_DATATABLE = "datatable";
 	public static final String ACCION_USUARIO = "accionusuario";
@@ -155,14 +156,15 @@ public class ControladorUsuarioCandidato extends HttpServlet {
 		
 		String nombreAccion = EscapaHTML.ajustaCodificacion(request.getParameter(PARAM_ACCION));
 		if (nombreAccion == null) {
-			nombreAccion = PARAM_ACCION;
+			nombreAccion = ACCION_INDEX;
 		}
-		
-		bean.setVista(RUTA_BEP_CONF + "candidatos.jsp");
 		
 		try {
 			modeloUsuario.checkUser(datos);
 			switch (nombreAccion) {
+				case ACCION_INDEX:
+					bean.setVista(RUTA_BEP_CONF + "candidatos.jsp");
+					break;
 				case ACCION_DATATABLE_USUARIOS_CANDIDATOS:
 					listadoCandidatos(bean, datos, request, response);
 					break;
@@ -371,9 +373,14 @@ public class ControladorUsuarioCandidato extends HttpServlet {
 		ModeloUsuarioBolsaEmpleo modelo = ModeloUsuarioBolsaEmpleo.obtenerInstancia();
 		
 		obtenerRoles(bean);
+		Usuario usuArcos = CrearUsuario.usuario(request.getParameter(PARAM_NOMBRE));
+		if (usuArcos == null) {
+			bean.setVista(RUTA_BEP_CONF_USU + "buscarUsuario.jsp");
+			throw new UVException("No existe el usuario");
+		}
+		
 		try {
-			UsuarioBolsaEmpleo usu = modelo.listaUsuario(Formateador.leeParametroString(request.getParameter(PARAM_NOMBRE)));
-			Usuario usuArcos = CrearUsuario.usuario(request.getParameter(PARAM_NOMBRE));
+			UsuarioBolsaEmpleo usu = modelo.listaUsuario(usuArcos.getDocumentoNumero());
 			
 			bean.setBusqueda(true);
 			
@@ -383,8 +390,8 @@ public class ControladorUsuarioCandidato extends HttpServlet {
 			
 			bean.setVista(JSP_FORM_CANDIDATO);
 		} catch (UVException e) {
-			Usuario usuArcos = CrearUsuario.usuario(request.getParameter(PARAM_NOMBRE));
-			if (usuArcos != null) {
+			Usuario usuArcosCont = CrearUsuario.usuario(request.getParameter(PARAM_NOMBRE));
+			if (usuArcosCont != null) {
 				bean.setBusqueda(false);
 				bean.setUsuarioArcos(usuArcos);
 				bean.setVista(JSP_FORM_CANDIDATO);
@@ -442,8 +449,8 @@ public class ControladorUsuarioCandidato extends HttpServlet {
 				
 			Usuario usuArcos = CrearUsuario.usuario(request.getParameter(PARAM_ID));
 				
-			UsuarioBolsaEmpleo usuarioFinal =
-					new UsuarioBolsaEmpleo(usuArcos.getCodigoPersonaArcos(), usu, role, 
+			UsuarioBolsaEmpleo usuarioFinal = 
+					new UsuarioBolsaEmpleo(usu, usuArcos.getDocumentoNumero(), role, 
 							listadist, excluido, excluidoTipo, razonexcluido, date, fechaini, fechafin);
 				
 			modelo.insertaUsuario(usuarioFinal);

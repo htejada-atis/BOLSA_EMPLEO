@@ -32,7 +32,7 @@ VistaEvaluadores bean = (VistaEvaluadores) uvdatos.getVistas().get(VistaEvaluado
 		<div id="error" class="error">
 			<%= bean.formatearMensajesDeError() %>
 		</div>
-	<% } else {%>
+	<% } %>
 	
 	<h2>Evaluadores de un área</h2>
 	
@@ -77,7 +77,6 @@ VistaEvaluadores bean = (VistaEvaluadores) uvdatos.getVistas().get(VistaEvaluado
 			</tr>
 		</tfoot>
 	</table>
-	<% } %>
 </div>
 
 <script>

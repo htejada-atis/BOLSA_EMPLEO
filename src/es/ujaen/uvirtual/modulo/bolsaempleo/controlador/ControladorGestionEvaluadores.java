@@ -14,7 +14,6 @@ import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
-import com.google.gson.reflect.TypeToken;
 
 import es.ujaen.uvirtual.adm.CrearUsuario;
 import es.ujaen.uvirtual.beans.CodigoDescripcion;
@@ -83,7 +82,7 @@ public class ControladorGestionEvaluadores extends HttpServlet {
 	public static final String RUTA_BEP_CONF = "/WEB-INF/jsp/vista/infadministrativa/bolsaempleo/configuracion/evaluadores/";
 	
 	// ajax	
-	public static final String RESPONSE_AJAX_URL = "/srv/es/ajax/informacionadministrativa/bolsaempleo/configuracion/evaluadores";
+	public static final String URL_PATTERN_AJAX = "/srv/es/ajax/informacionadministrativa/bolsaempleo/configuracion/evaluadores";
 	public static final String RESPONSE_AJAX_CONTENTTYPE = "application/json";
 	public static final String RESPONSE_AJAX_ENCODING = "UTF-8";
 	public static final String RESPONSE_AJAX_ERROR = "error";
@@ -195,29 +194,45 @@ public class ControladorGestionEvaluadores extends HttpServlet {
 		
 		ModeloUsuarioBolsaEmpleo modelo = ModeloUsuarioBolsaEmpleo.obtenerInstancia();
 		ModeloEvaluador modeloEvaluador = ModeloEvaluador.obtenerInstancia();
+		Usuario usuArcos = CrearUsuario.usuario(request.getParameter(PARAM_NOMBRE_EVALUADOR));
+		
+		if (usuArcos == null) {
+			bean.setVista(RUTA_BEP_CONF + "evaluadoresListar.jsp");
+			List<Area> areas = ModeloArea.obtenerInstancia().listaAreas();
+			bean.setAreas(areas);
+			throw new UVException("No existe el evaluador en el sistema, primero debe crearlo");
+		}
 		
 		try {
-			UsuarioBolsaEmpleo usu = modelo.listaUsuario(Formateador.leeParametroString(request.getParameter(PARAM_NOMBRE_EVALUADOR)));
+			UsuarioBolsaEmpleo usu = modelo.listaUsuario(usuArcos.getDocumentoNumero());
 			Integer idArea = Formateador.leeParametroInteger(request.getParameter(PARAM_AREA));
 			
 			modeloEvaluador.insertaEvaluador(usu, idArea);
+			List<Area> areas = ModeloArea.obtenerInstancia().listaAreas();
+			bean.setAreas(areas);
+			bean.getMensajesDeExito().add(MENSAJE_EXITO_AGREGAR_EVALUADORES);
+			bean.setVista(RUTA_BEP_CONF + "evaluadoresListar.jsp");
+
 		} catch (UVException e) {
 			
 			try {
-				Usuario usuArcos = CrearUsuario.usuario(request.getParameter(PARAM_NOMBRE_EVALUADOR));
 				
 				Rol role = ModeloRol.obtenerInstancia().getRoleById(PARAM_ROL_COMISION_ID);
 				UsuarioBolsaEmpleo usuarioFinal = 
-						new UsuarioBolsaEmpleo(usuArcos.getCodigoPersonaArcos(), usuArcos.getUid(), role, true, false, null, null, null);
+						new UsuarioBolsaEmpleo(usuArcos.getDocumentoNumero(), usuArcos.getUid(), role, true, false, null, null, null);
 						
 				modelo.insertaUsuario(usuarioFinal);
 					
 				CrearUsuario.refrescarUsuario(usuarioFinal.getCodCuenta());
 				
-				UsuarioBolsaEmpleo usu = modelo.listaUsuario(Formateador.leeParametroString(usuarioFinal.getCodCuenta()));
+				UsuarioBolsaEmpleo usu = modelo.listaUsuario(usuarioFinal.getNumDocumento());
 				Integer idArea = Formateador.leeParametroInteger(request.getParameter(PARAM_AREA));
 				
 				modeloEvaluador.insertaEvaluador(usu, idArea);
+				
+				List<Area> areas = ModeloArea.obtenerInstancia().listaAreas();
+				bean.setAreas(areas);
+				bean.getMensajesDeExito().add(MENSAJE_EXITO_AGREGAR_EVALUADORES);
 			} catch (UVException ex) {
 				throw new UVException("No existe el evaluador en el sistema, primero debe crearlo");
 			}
