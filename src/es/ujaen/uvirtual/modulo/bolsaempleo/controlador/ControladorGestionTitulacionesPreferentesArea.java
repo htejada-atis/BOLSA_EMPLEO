@@ -236,8 +236,7 @@ public class ControladorGestionTitulacionesPreferentesArea extends HttpServlet {
 				Integer area = Formateador.leeParametroInteger(request.getParameter(PARAM_AREA));
 				BolsaEmpleoDataTable<Titulacion> dataTable = modelo.listaTitulacionesDatatable(request.getParameterMap(), area);
 				bean.setDatatableTitulaciones(dataTable);
-				Gson gson = new GsonBuilder().setExclusionStrategies(BolsaEmpleoDataTable.GSONEXCLUSIONSTRATEGY).create();
-				writer.write(gson.toJson(dataTable));
+				writer.write(dataTable.toJson());
 			} catch (UVException ex) {
 				CodigoDescripcion mensaje = new CodigoDescripcion(RESPONSE_AJAX_ERROR, ex.getMessage());
 				bean.getMensajesDeError().add(mensaje.toString());
@@ -269,8 +268,7 @@ public class ControladorGestionTitulacionesPreferentesArea extends HttpServlet {
 				Integer area = Formateador.leeParametroInteger(request.getParameter(PARAM_AREA));
 				BolsaEmpleoDataTable<TitulacionArea> dataTable = modelo.listaTitulacionesAreaDatatable(request.getParameterMap(), area);
 				bean.setDatatableTitulacionesArea(dataTable);
-				Gson gson = new GsonBuilder().setExclusionStrategies(BolsaEmpleoDataTable.GSONEXCLUSIONSTRATEGY).create();
-				writer.write(gson.toJson(dataTable));
+				writer.write(dataTable.toJson());
 			} catch (UVException ex) {
 				CodigoDescripcion mensaje = new CodigoDescripcion(RESPONSE_AJAX_ERROR, ex.getMessage());
 				bean.getMensajesDeError().add(mensaje.toString());

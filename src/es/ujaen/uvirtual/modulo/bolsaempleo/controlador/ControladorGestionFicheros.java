@@ -319,8 +319,7 @@ public class ControladorGestionFicheros extends HttpServlet {
 			try {
 				BolsaEmpleoDataTable<Fichero> dataTable = modelo.listaFicherosDatatable(request.getParameterMap());
 				bean.setDatatableFicheros(dataTable);
-				Gson gson = new GsonBuilder().setExclusionStrategies(BolsaEmpleoDataTable.GSONEXCLUSIONSTRATEGY).create();
-				writer.write(gson.toJson(dataTable));
+				writer.write(dataTable.toJson());
 			} catch (Exception ex) {
 				bean.getMensajesDeError().add(ex.getMessage());
 				

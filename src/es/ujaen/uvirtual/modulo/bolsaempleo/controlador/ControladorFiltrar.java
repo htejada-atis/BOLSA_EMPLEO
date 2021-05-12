@@ -5,7 +5,6 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.sql.SQLException;
 import java.util.logging.Logger;
-import java.util.Date;
 import java.util.List;
 import java.util.logging.Level;
 import javax.servlet.ServletException;
@@ -15,19 +14,17 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
 import es.ujaen.uvirtual.beans.CodigoDescripcion;
 import es.ujaen.uvirtual.beans.UVDatos;
 import es.ujaen.uvirtual.beans.Usuario;
 import es.ujaen.uvirtual.modulo.bolsaempleo.beans.Candidato;
-import es.ujaen.uvirtual.modulo.bolsaempleo.beans.Titulacion;
 import es.ujaen.uvirtual.modulo.bolsaempleo.beans.TitulacionUsuario;
 import es.ujaen.uvirtual.modulo.bolsaempleo.beans.UsuarioBolsaEmpleo;
 import es.ujaen.uvirtual.modulo.bolsaempleo.modelo.ModeloCandidato;
 import es.ujaen.uvirtual.modulo.bolsaempleo.modelo.ModeloMisTitulaciones;
-import es.ujaen.uvirtual.modulo.bolsaempleo.modelo.ModeloTitulacion;
 import es.ujaen.uvirtual.modulo.bolsaempleo.modelo.ModeloUsuarioBolsaEmpleo;
 import es.ujaen.uvirtual.modulo.bolsaempleo.utilidades.BolsaEmpleoDataTable;
+import es.ujaen.uvirtual.modulo.bolsaempleo.utilidades.BolsaEmpleoUtils;
 import es.ujaen.uvirtual.modulo.bolsaempleo.vistas.VistaFiltrar;
 import es.ujaen.uvirtual.utilidades.EscapaHTML;
 import es.ujaen.uvirtual.utilidades.Formateador;
@@ -222,7 +219,7 @@ public class ControladorFiltrar extends HttpServlet {
 				}
 				
 				if (seleccionado) {
-					modeloTitulacion.validaTitulacion(titulacion, candidato, new Date());
+					modeloTitulacion.validaTitulacion(titulacion, candidato, BolsaEmpleoUtils.getCurrentDate());
 				} else {
 					modeloTitulacion.desvalidaTitulacion(titulacion, candidato);
 				}
@@ -259,9 +256,7 @@ public class ControladorFiltrar extends HttpServlet {
 			try {
 				BolsaEmpleoDataTable<Candidato> dataTable = modeloCandidato.listaCandidatosDatatable(request.getParameterMap());
 				bean.setDatatableCandidatos(dataTable);
-				
-				Gson gson = new GsonBuilder().setExclusionStrategies(BolsaEmpleoDataTable.GSONEXCLUSIONSTRATEGY).create();				
-				writer.write(gson.toJson(dataTable));
+				writer.write(dataTable.toJson());
 			} catch (Exception ex) {
 				bean.getMensajesDeError().add(ex.getMessage());
 				
@@ -291,8 +286,7 @@ public class ControladorFiltrar extends HttpServlet {
 				Integer candidato = Formateador.leeParametroInteger(request.getParameter(PARAM_CANDIDATO));
 				BolsaEmpleoDataTable<TitulacionUsuario> dataTable = modelo.listaTitulacionesUsuarioDatatable(request.getParameterMap(), candidato);
 				bean.setDatatableTitulaciones(dataTable);
-				Gson gson = new GsonBuilder().setExclusionStrategies(BolsaEmpleoDataTable.GSONEXCLUSIONSTRATEGY).create();
-				writer.write(gson.toJson(dataTable));
+				writer.write(dataTable.toJson());
 			} catch (UVException ex) {
 				bean.getMensajesDeError().add(ex.getMessage());
 				CodigoDescripcion mensaje = new CodigoDescripcion(RESPONSE_AJAX_ERROR, ex.getMessage());

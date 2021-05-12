@@ -170,14 +170,10 @@ public class ModeloBaremacionItems {
 		List<ItemBaremacion> items = new ArrayList<>();
 		BolsaEmpleoDataTable<ItemBaremacion> dataTable = new BolsaEmpleoDataTable<>(params);
 		
-		String consulta = "SELECT bepite.*, SEL.HIJO "
-				+ "FROM TBEP_ITEMSBAREMACION bepite "
+		String consulta = "SELECT bepite.*, SEL.HIJO FROM TBEP_ITEMSBAREMACION bepite "
 				+ "LEFT JOIN "
-				+ "( SELECT bepite.*, bepmex.BEPITE_CODNUM_HIJO HIJO "
-				+ "FROM TBEP_ITEMSBAREMACION bepite "
-				+ "LEFT JOIN TBEP_MERITOS_EXCLUYENTES bepmex "
-				+ "ON bepite.CODNUM = bepmex.BEPITE_CODNUM_HIJO "
-				+ "AND bepmex.BEPITE_CODNUM_PADRE = ? ) "
+				+ "(SELECT bepite.*, bepmex.BEPITE_CODNUM_HIJO HIJO FROM TBEP_ITEMSBAREMACION bepite " 
+				+ "LEFT JOIN TBEP_MERITOS_EXCLUYENTES bepmex ON bepite.CODNUM = bepmex.BEPITE_CODNUM_HIJO AND bepmex.BEPITE_CODNUM_PADRE = ?) "
 				+ "SEL ON SEL.HIJO = bepite.CODNUM "
 				+ "WHERE bepite.CODNUM != ? ";
 		
@@ -296,7 +292,7 @@ public class ModeloBaremacionItems {
 			stmt.setString(parameterIndex++, item.getCodigo());
 			stmt.setString(parameterIndex++, item.getNombre());
 			stmt.setString(parameterIndex++, item.getDescripcion());
-			stmt.setString(parameterIndex++, item.getActivo() ? "S" : "N");
+			stmt.setString(parameterIndex++, Boolean.TRUE.equals(item.getActivo()) ? "S" : "N");
 			stmt.setString(parameterIndex++, item.getUnidades());
 			stmt.setFloat(parameterIndex++, item.getValor());
 			stmt.setFloat(parameterIndex++, item.getValorMinimo());
@@ -309,7 +305,7 @@ public class ModeloBaremacionItems {
 			if (item.getIndividualizado() == null) {
 				stmt.setString(parameterIndex++, "N");
 			} else {
-				stmt.setString(parameterIndex++, item.getIndividualizado() ? "S" : "N");
+				stmt.setString(parameterIndex++, Boolean.TRUE.equals(item.getIndividualizado()) ? "S" : "N");
 			}			
 			stmt.setInt(parameterIndex++, item.getCodNum());
 			stmt.executeUpdate();

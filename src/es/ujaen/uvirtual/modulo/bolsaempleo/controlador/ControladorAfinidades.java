@@ -14,7 +14,6 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
 import com.google.gson.reflect.TypeToken;
 
 import es.ujaen.uvirtual.beans.CodigoDescripcion;
@@ -199,9 +198,7 @@ public class ControladorAfinidades extends HttpServlet {
 			try {
 				BolsaEmpleoDataTable<Afinidad> dataTable = modelo.listaAfinidadesDatatable(request.getParameterMap());
 				bean.setDatatableAfinidades(dataTable);
-				
-				Gson gson = new GsonBuilder().setExclusionStrategies(BolsaEmpleoDataTable.GSONEXCLUSIONSTRATEGY).create();				
-				writer.write(gson.toJson(dataTable));
+				writer.write(dataTable.toJson());				
 			} catch (Exception ex) {
 				bean.getMensajesDeError().add(ex.getMessage());
 				

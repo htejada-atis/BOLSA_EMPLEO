@@ -316,8 +316,7 @@ public class ControladorMisMeritos extends HttpServlet {
 				Integer idUsuario = modeloUsuarioBolsaEmpleo.listaUsuario(usuArcos.getDocumentoNumero()).getCodNum();
 				BolsaEmpleoDataTable<Merito> dataTable = modelo.listaMeritosDatatable(request.getParameterMap(), idUsuario);
 				bean.setDatatable(dataTable);
-				Gson gson = new GsonBuilder().setExclusionStrategies(BolsaEmpleoDataTable.GSONEXCLUSIONSTRATEGY).create();
-				writer.write(gson.toJson(dataTable));
+				writer.write(dataTable.toJson());
 			} catch (Exception ex) {
 				bean.getMensajesDeError().add(ex.getMessage());
 				
