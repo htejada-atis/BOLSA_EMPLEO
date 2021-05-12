@@ -108,12 +108,10 @@ public class BolsaEmpleoDataTable<T> {
 	};
 	
 
-	private String consulta;
 	private String query;
 	private String queryCount;
 	private Integer pageSize;
 	private Integer currentPage;
-	private Integer recordsTotal;
 	private Integer pagesTotal;
 	private Integer orderBy;
 	private String orderDirection;
@@ -170,9 +168,10 @@ public class BolsaEmpleoDataTable<T> {
 	 */
 	public void setQuery(String pconsulta) throws UVException {
 		// https://www.oracletutorial.com/oracle-basics/oracle-fetch/
-		this.consulta = this.prepareQuery(pconsulta);
-		this.queryCount = "SELECT COUNT(*) AS count FROM (" + this.consulta + ")";
-		this.query = this.consulta + " OFFSET " + (this.pageSize * this.currentPage) + " ROWS FETCH NEXT "
+		String consulta = this.prepareQuery(pconsulta);
+		
+		this.queryCount = "SELECT COUNT(*) AS count FROM (" + consulta + ")";
+		this.query = consulta + " OFFSET " + (this.pageSize * this.currentPage) + " ROWS FETCH NEXT "
 				+ this.pageSize + " ROWS ONLY";
 
 		if (VERBOSE) {
@@ -261,9 +260,9 @@ public class BolsaEmpleoDataTable<T> {
 			if (!rs.next()) {
 				throw new UVException("Error obteniendo número total de filas");
 			}
-			this.recordsTotal = rs.getInt("count");
-			this.pagesTotal = this.recordsTotal / this.pageSize;
-			if (this.recordsTotal % this.pageSize == 0) {
+			Integer recordsTotal = rs.getInt("count");
+			this.pagesTotal = recordsTotal / this.pageSize;
+			if (recordsTotal % this.pageSize == 0) {
 				this.pagesTotal -= 1;
 			}
 		}

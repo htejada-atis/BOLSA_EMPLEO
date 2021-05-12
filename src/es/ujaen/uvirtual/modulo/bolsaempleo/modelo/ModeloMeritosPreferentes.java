@@ -31,6 +31,7 @@ public class ModeloMeritosPreferentes {
 	
 	public static final int MAX_LENGTH_COLUMN_DESCRIPCION = 1000;
 	public static final int MAX_LENGTH_COLUMN_FACTOR = 20;
+	public static final int MAX_LENGTH_COLUMN_CODIGO = 10;
 	
 	// tipo de meritos preferentes
 	public static final String TIPO_TITULACION_PREFERENTE = "TITULACION_PREFERENTE";
