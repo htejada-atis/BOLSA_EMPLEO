@@ -123,33 +123,18 @@ public class TestBEPControladorGestionEvaluadores {
 		assertEquals(MENSAJE_SIN_ADVERTENCIAS, 0, bean.getMensajesDeAdvertencia().size());
 	}
 	
-	/** Obtener datatable usuarios .
-	 * @throws SQLException si fallo bd .
-	 * @throws IOException si error io .
-	 * @throws ServletException  si error servlet .
-	 */
-	@Test
-	public void testA04ObtenerUsuarios() throws SQLException, ServletException, IOException {
-		VistaEvaluadores bean = getVistaConUsuarios(ControladorGestionEvaluadores.ACCION_DATATABLE_USUARIOS);
-		
-		assertNotEquals(MENSAJE_USUARIOS_DEVUELTOS, 0, bean.getDatatableUsuarios().getData().size());
-		assertEquals(MENSAJE_SIN_ERROR, 0, bean.getMensajesDeError().size());
-		assertEquals(MENSAJE_SIN_ADVERTENCIAS, 0, bean.getMensajesDeAdvertencia().size());
-	}
-	
 	/** agregar evaluadores dentro de un área .
 	 * @throws SQLException si fallo bd .
 	 * @throws IOException si error io .
 	 * @throws ServletException  si error servlet .
 	 */
 	@Test
-	public void testA05AgregarEvaluadores() throws SQLException, ServletException, IOException {
+	public void testA04AgregarEvaluadores() throws SQLException, ServletException, IOException {
 		VistaEvaluadores bean = getVistaConUsuarios(ControladorGestionEvaluadores.ACCION_DATATABLE_USUARIOS);
 		
 		PeticionHttp peticion = UtilsTestBolsaEmpleo.peticionAutenticadaPersonal();
 		peticion.setParameter(ControladorGestionEvaluadores.PARAM_ACCION, ControladorGestionEvaluadores.ACCION_AGREGAR_EVALUADORES);
-		peticion.setParameter(ControladorGestionEvaluadores.PARAM_USUARIOS, 
-				"[" + bean.getDatatableUsuarios().getData().get(0).getCodNum().toString() + "]");
+		peticion.setParameter(ControladorGestionEvaluadores.PARAM_NOMBRE_EVALUADOR, "comision1");
 		
 		VistaEvaluadores bean2 = getVistaConAreas();
 		peticion.setParameter(ControladorGestionEvaluadores.PARAM_AREA, bean2.getAreas().get(0).getCodNum().toString());
@@ -169,7 +154,7 @@ public class TestBEPControladorGestionEvaluadores {
 	 * @throws ServletException  si error servlet .
 	 */
 	@Test
-	public void testA06EliminarEvaluador() throws SQLException, ServletException, IOException {
+	public void testA05EliminarEvaluador() throws SQLException, ServletException, IOException {
 		VistaEvaluadores bean = getVistaConUsuarios(ControladorGestionEvaluadores.ACCION_DATATABLE_EVALUADORES);
 		
 		PeticionHttp peticion = UtilsTestBolsaEmpleo.peticionAutenticadaPersonal();
@@ -195,7 +180,7 @@ public class TestBEPControladorGestionEvaluadores {
 	 * @throws ServletException  si error servlet .
 	 */
 	@Test
-	public void testA07RestauraEvaluador() throws SQLException, ServletException, IOException {
+	public void testA06RestauraEvaluador() throws SQLException, ServletException, IOException {
 		VistaEvaluadores bean = getVistaConUsuarios(ControladorGestionEvaluadores.ACCION_DATATABLE_EVALUADORES);
 		
 		PeticionHttp peticion = UtilsTestBolsaEmpleo.peticionAutenticadaPersonal();

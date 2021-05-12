@@ -22,6 +22,7 @@ import es.ujaen.uvirtual.beans.CodigoDescripcion;
 import es.ujaen.uvirtual.beans.UVDatos;
 import es.ujaen.uvirtual.beans.Usuario;
 import es.ujaen.uvirtual.modulo.bolsaempleo.beans.Titulacion;
+import es.ujaen.uvirtual.modulo.bolsaempleo.beans.TitulacionUsuario;
 import es.ujaen.uvirtual.modulo.bolsaempleo.beans.UsuarioBolsaEmpleo;
 import es.ujaen.uvirtual.modulo.bolsaempleo.modelo.ModeloMisTitulaciones;
 import es.ujaen.uvirtual.modulo.bolsaempleo.modelo.ModeloUsuarioBolsaEmpleo;
@@ -237,8 +238,8 @@ public class ControladorMisTitulaciones extends HttpServlet {
 		
 		try (PrintWriter writer = response.getWriter()) {
 			try {
-				BolsaEmpleoDataTable<Titulacion> dataTable = modelo.listaTitulacionesUsuarioDatatable(request.getParameterMap(), codnum);
-				bean.setDatatableTitulaciones(dataTable);
+				BolsaEmpleoDataTable<TitulacionUsuario> dataTable = modelo.listaTitulacionesUsuarioDatatable(request.getParameterMap(), codnum);
+				bean.setDatatableTitulacionesUsuario(dataTable);
 				Gson gson = new GsonBuilder().setExclusionStrategies(BolsaEmpleoDataTable.GSONEXCLUSIONSTRATEGY).create();
 				writer.write(gson.toJson(dataTable));
 			} catch (UVException ex) {
@@ -289,7 +290,7 @@ public class ControladorMisTitulaciones extends HttpServlet {
 		Part uploadedFile = request.getPart(PARAM_ARCHIVO);
 		
 		if (uploadedFile != null) {
-			Titulacion titulacion = this.validarTitulacion(request, uploadedFile);
+			TitulacionUsuario titulacion = this.validarTitulacion(request, uploadedFile);
 			titulacion.setTitulacion(titulacionCont);
 			titulacion.setUsuario(usu);
 				
@@ -306,7 +307,7 @@ public class ControladorMisTitulaciones extends HttpServlet {
 		
 		ModeloMisTitulaciones modelo = ModeloMisTitulaciones.obtenerInstancia();
 		
-		List<Titulacion> titulaciones = modelo.getTitulacionesUsuarios(selected);
+		List<TitulacionUsuario> titulaciones = modelo.getTitulacionesUsuarios(selected);
 
 		modelo.borraTitulacionUsuario(titulaciones);
 		
@@ -328,8 +329,8 @@ public class ControladorMisTitulaciones extends HttpServlet {
 			throws SQLException, UVException, IOException {
 		ModeloMisTitulaciones modelo = ModeloMisTitulaciones.obtenerInstancia();
 		if (EscapaHTML.ajustaCodificacion(request.getParameter(PARAM_FICHERO)) != null) {
-			Titulacion titulacion = modelo.listaTitulacionUsuario(Formateador.leeParametroInteger(request.getParameter(PARAM_FICHERO)));
-			bean.setTitulacion(titulacion);
+			TitulacionUsuario titulacion = modelo.listaTitulacionUsuario(Formateador.leeParametroInteger(request.getParameter(PARAM_FICHERO)));
+			bean.setTitulacionUsuario(titulacion);
 			
 			response.setContentType("application/pdf");
 			datos.setRespuestaEnviada(true);
@@ -344,8 +345,8 @@ public class ControladorMisTitulaciones extends HttpServlet {
 		}
 	}
 	
-	private Titulacion validarTitulacion(HttpServletRequest request, Part uploadedFile) throws UVException, IOException, SQLException {
-		Titulacion t = new Titulacion();
+	private TitulacionUsuario validarTitulacion(HttpServletRequest request, Part uploadedFile) throws UVException, IOException, SQLException {
+		TitulacionUsuario t = new TitulacionUsuario();
 		
 		t.setDescripcion(EscapaHTML.ajustaCodificacion(request.getParameter(PARAM_DESCRIPCION)));
 		if (t.getDescripcion() == null || t.getDescripcion().isBlank()) {
