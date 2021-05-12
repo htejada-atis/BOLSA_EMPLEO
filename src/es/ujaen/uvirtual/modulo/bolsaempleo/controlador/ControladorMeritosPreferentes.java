@@ -325,7 +325,7 @@ public class ControladorMeritosPreferentes extends HttpServlet {
 		return merito;
 	}
 	
-	private MeritoPreferente validateTipoCalculo(MeritoPreferente merito, HttpServletRequest request) throws UVException, SQLException {
+	private MeritoPreferente validateTipoCalculo(MeritoPreferente merito, HttpServletRequest request) throws UVException {
 		merito.setTipoCalculo(EscapaHTML.ajustaCodificacion(request.getParameter(PARAM_MERITO_TIPO_CALCULO)));
 		if (merito.getTipoCalculo().equals(ModeloMeritosPreferentes.TIPO_CALCULO_FACTOR)) {
 			merito.setFactor(Formateador.leeParametroDouble(request.getParameter(PARAM_MERITO_FACTOR)));
