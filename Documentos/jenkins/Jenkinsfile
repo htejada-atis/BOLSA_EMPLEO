@@ -37,7 +37,6 @@ pipeline {
                             export ORACLE_SCRIPTS_STARTUP=${WORKSPACE}/Documentos/docker/init-oracle
                             export ORACLE_DATA=/home/jenkins-nodo/oracledata
                             export ORACLE_IMAGE=usig-registrydocker.ujaen.es:5044/uvirtual/oracle/database:18.4.0-xe
-							docker-compose down || true
                             docker-compose build
                             docker-compose up -d
                            '''
@@ -107,7 +106,7 @@ pipeline {
 				attachLog: true, attachmentsPattern: 'builds/build/rama/site/jacoco/unittest.zip',
 				body: '${FILE,path="builds/build/rama/site/jacoco/index.html"}', 
 				subject: "Completado jenkins pipeline ${JOB_NAME} (${BUILD_NUMBER}) "
-    		//sh "docker-compose down || true"
+    		sh "docker-compose down || true"
             echo "-=- fin -=-"
         }
     }

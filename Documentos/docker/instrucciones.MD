@@ -11,3 +11,8 @@ sh "docker run --name oracle -p 1521:1521 -p 5000:5500 -e ORACLE_PWD=pwd123 -e O
 npm install --save-dev jest
 npm install jest-html-reporter --save-dev
 
+#integracion
+git remote add externo-base https://gitujap.ujaen.es/uvdesarrollo/uv-externo.git
+git config remote.externo-base.pushurl "no hacer commit desde aqui"
+git pull externo-base master
+
