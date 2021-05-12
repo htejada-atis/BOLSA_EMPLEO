@@ -127,7 +127,7 @@ UsuarioBolsaEmpleo usuarioBolsa = bean.getUsuario();
     				 <%= usuarioArcos != null && usuarioBolsa != null ? "" : "disabled" %>/>Excluido</label>
     			</div>    		
     			<div class="form-check-custom" id="excluido_tipo" style="display:none;">
-					<label class="form-label-custom" for="indefinido" style="float: none; margin-right:0px; margin-bottom:5px;"><input class="form-input" type="radio" id="indefinido" name="<%= ControladorUsuarioBolsaEmpleo.PARAM_EXCLUIDO_TIPO %>" style="display: inline;">Indefinido</label>
+					<label class="form-label-custom" for="indefinido" style="float: none; margin-right:0px; margin-bottom:5px;"><input class="form-input" type="radio" id="indefinido" name="<%= ControladorUsuarioBolsaEmpleo.PARAM_EXCLUIDO_TIPO %>" style="display: inline;" required>Indefinido</label>
 					<label class="form-label-custom" for="temporal" style="float: none; margin-right:0px;"><input class="form-input" type="radio" id="temporal" name="<%= ControladorUsuarioBolsaEmpleo.PARAM_EXCLUIDO_TIPO %>" style="display: inline;">Temporal</label>
     			</div>
     		</div>
@@ -266,12 +266,14 @@ UsuarioBolsaEmpleo usuarioBolsa = bean.getUsuario();
 				
 				$("#excluido_tipo").show();
 				$("#razon_excluido").show();
+				$("#razon_excluido").children("textarea").attr("required", true);
 			} else {
 				document.getElementById("razon_exclusion").value="";
 				document.getElementById("razon_exclusion").disabled=true;
 				
 				$("#excluido_tipo").hide();
 				$("#razon_excluido").hide();
+				$("#razon_excluido").children().attr("required", false);
 			}
 		});
 		

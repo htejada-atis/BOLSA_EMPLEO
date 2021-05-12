@@ -24,4 +24,7 @@ public class TestBEPControladorAreasABaremar {
     	BbddRunner.conectarBd();
     	UtilsTestBolsaEmpleo.inicializaBolsaEmpleo();
     }
+    
+    
+    
 }
