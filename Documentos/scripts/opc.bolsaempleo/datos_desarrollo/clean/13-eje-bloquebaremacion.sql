@@ -1,7 +1,7 @@
 --/////////////////////
 DROP TABLE TBEP_HTO_CATEGORIABAREMACION;
 --/////////////////////
-DROP TABLE TBEP_CATEGOBAREMACION;
+DROP TABLE TBEP_CATEGORIABAREMACION;
 --/////////////////////
 DROP TABLE TBEP_HTO_BLOQUESBAREMACION;
 --/////////////////////
