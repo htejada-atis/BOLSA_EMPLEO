@@ -263,11 +263,11 @@ public class TestFormateador {
 	public void testA14() {
 		final Integer cero = 0;
 		final Integer uno = 1;
-		//final Integer cuatro = 4;
+		final Integer cuatro = 4;
 		final Double tresPuntoCinco = 3.5;
-		//final Float tresPuntoCuarenta = 3.4005F;
-		//Integer integer1 = Formateador.getNumeroDecimales(tresPuntoCuarenta);
-		//assertEquals(cuatro, integer1);
+		final Float tresPuntoCuarenta = 3.4005F;
+		Integer integer1 = Formateador.getNumeroDecimales(tresPuntoCuarenta);
+		assertEquals(cuatro, integer1);
 		Integer integer2 = Formateador.getNumeroDecimales(tresPuntoCinco);
 		assertEquals(uno, integer2);
 		Integer integer3 = Formateador.getNumeroDecimales(null);

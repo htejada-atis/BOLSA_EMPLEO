@@ -20,7 +20,7 @@ import es.ujaen.uvirtual.utilidades.AdaptadorDocumentoIdentidad;
 public class TestAdaptadorDocumentoIdentidad {
 	private static Usuario usuario;
 	private static final String SIN_LETRA = "12345678";
-	private static final String CON_LETRA = "12345678A";
+	private static final String CON_LETRA = "12345678Z";
     /** prepara la bd con los datos iniciales.
      * @throws SQLException si error en bd
      * @throws IOException si error en ficheros
@@ -98,9 +98,9 @@ public class TestAdaptadorDocumentoIdentidad {
     public void testA08() {
     	usuario.setDocumentoTipo("OTR");
     	String letraNif = AdaptadorDocumentoIdentidad.letraNIF("NIF", CON_LETRA);
-    	assertEquals("A", letraNif);
+    	assertEquals("Z", letraNif);
     	String letraNie = AdaptadorDocumentoIdentidad.letraNIF("NIE", CON_LETRA);
-    	assertEquals("A", letraNie);
+    	assertEquals("Z", letraNie);
     	String letraNull = AdaptadorDocumentoIdentidad.letraNIF("NIE", null);
     	assertNull(letraNull);
     	String letraOtr = AdaptadorDocumentoIdentidad.letraNIF("OTR", null);
