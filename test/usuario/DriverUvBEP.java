@@ -64,33 +64,33 @@ public class DriverUvBEP {
 	    URL u = new URL(url);
 	    HttpURLConnection c = null;
 	    
-	    try {
-	    	c = (HttpURLConnection) u.openConnection();
-	    			
-	        c.setRequestMethod("GET");
-	        c.setRequestProperty("Content-length", "0");
-	        c.setRequestProperty("Cookie", cookie.getName() + "=" + cookie.getValue());
-	        c.setUseCaches(false);
-	        c.setAllowUserInteraction(false);
-	        c.connect();
-	        
-	        int status = c.getResponseCode();
-	        
-	        if (status == RESPONSE_CODE_200 || status == RESPONSE_CODE_201) {
-	        	BufferedReader br = new BufferedReader(new InputStreamReader(c.getInputStream()));
-                StringBuilder sb = new StringBuilder();
-                String line;
-                while ((line = br.readLine()) != null) {
-                    sb.append(line + "\n");
-                }
-                br.close();
-                return sb.toString();
-	        }
-	    } finally {
-	    	if (c != null) {
-	    		c.disconnect();
-	    	}	    	
-	    }
+		try {
+			c = (HttpURLConnection) u.openConnection();
+
+			c.setRequestMethod("GET");
+			c.setRequestProperty("Content-length", "0");
+			c.setRequestProperty("Cookie", cookie.getName() + "=" + cookie.getValue());
+			c.setUseCaches(false);
+			c.setAllowUserInteraction(false);
+			c.connect();
+
+			int status = c.getResponseCode();
+
+			if (status == RESPONSE_CODE_200 || status == RESPONSE_CODE_201) {
+				BufferedReader br = new BufferedReader(new InputStreamReader(c.getInputStream()));
+				StringBuilder sb = new StringBuilder();
+				String line;
+				while ((line = br.readLine()) != null) {
+					sb.append(line + "\n");
+				}
+				br.close();
+				return sb.toString();
+			}
+		} finally {
+			if (c != null) {
+				c.disconnect();
+			}
+		}
 	    
 	    return null;
 	}

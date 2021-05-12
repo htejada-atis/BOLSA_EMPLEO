@@ -4,7 +4,6 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.sql.SQLException;
 import java.util.logging.Logger;
-import java.util.Date;
 import java.util.logging.Level;
 
 import javax.servlet.ServletException;
@@ -22,11 +21,12 @@ import es.ujaen.uvirtual.beans.UVDatos;
 import es.ujaen.uvirtual.beans.Usuario;
 import es.ujaen.uvirtual.modulo.bolsaempleo.beans.ApartadoBaremacion;
 import es.ujaen.uvirtual.modulo.bolsaempleo.beans.Convocatoria;
-import es.ujaen.uvirtual.modulo.bolsaempleo.modelo.ModeloBaremacion;
+import es.ujaen.uvirtual.modulo.bolsaempleo.modelo.ModeloBaremacionApartados;
 import es.ujaen.uvirtual.modulo.bolsaempleo.modelo.ModeloBolsa;
 import es.ujaen.uvirtual.modulo.bolsaempleo.modelo.ModeloConvocatoria;
 import es.ujaen.uvirtual.modulo.bolsaempleo.modelo.ModeloUsuarioBolsaEmpleo;
 import es.ujaen.uvirtual.modulo.bolsaempleo.utilidades.BolsaEmpleoDataTable;
+import es.ujaen.uvirtual.modulo.bolsaempleo.utilidades.BolsaEmpleoUtils;
 import es.ujaen.uvirtual.modulo.bolsaempleo.vistas.VistaConvocatorias;
 import es.ujaen.uvirtual.utilidades.EscapaHTML;
 import es.ujaen.uvirtual.utilidades.Formateador;
@@ -278,7 +278,6 @@ public class ControladorConvocatorias extends HttpServlet {
 		ModeloConvocatoria modelo = ModeloConvocatoria.obtenerInstancia();
 		ModeloBolsa modeloBolsas = ModeloBolsa.obtenerInstancia();
 		
-		ModeloBaremacion modeloBaremacion = ModeloBaremacion.obtenerInstancia();
 		ApartadoBaremacion apartado = new ApartadoBaremacion();
 		
 		Convocatoria convocatoria = modelo.getConvocatoriaById(Formateador.leeParametroInteger(request.getParameter(PARAM_CONVOCATORIA_ID)));
@@ -290,7 +289,7 @@ public class ControladorConvocatorias extends HttpServlet {
 			bean.getMensajesDeError().add(MENSAJE_ERROR_BOLSAS_BLOQUEADAS);
 		} else if (modelo.hayConvocatoriaAbierta()) {
 			bean.getMensajesDeError().add(MENSAJE_ERROR_CONVOCATORIAS_ABIERTAS);
-		} else if (modeloBaremacion.checkSumaPorcentagesApartados(apartado, "Alcanzar")) {
+		} else if (ModeloBaremacionApartados.obtenerInstancia().checkSumaPorcentagesApartados(apartado, "Alcanzar")) {
 			bean.getMensajesDeError().add(MENSAJE_ERROR_APARTADOS_PORCENTAGES);
 		} else {
 			Integer codNum = Formateador.leeParametroInteger(request.getParameter(PARAM_CONVOCATORIA_ID));
@@ -331,7 +330,7 @@ public class ControladorConvocatorias extends HttpServlet {
 		}
 		
 		c.setFechaCierre(Formateador.leeParametroFecha(request.getParameter(PARAM_CONVOCATORIA_FECHACIERRE), Formateador.FORMATO_FECHA_DDMMYYYY, "/"));
-		if (c.getFechaCierre().before(new Date())) {
+		if (c.getFechaCierre().before(BolsaEmpleoUtils.getCurrentDate())) {
 			throw new UVException(MENSAJE_ERROR_FECHACIERRE_MINIMA);
 		}
 		

@@ -16,7 +16,9 @@ import es.ujaen.uvirtual.beans.CodigoDescripcion;
 import es.ujaen.uvirtual.beans.UVDatos;
 import es.ujaen.uvirtual.beans.Usuario;
 import es.ujaen.uvirtual.modulo.bolsaempleo.beans.MeritoPreferente;
-import es.ujaen.uvirtual.modulo.bolsaempleo.modelo.ModeloBaremacion;
+import es.ujaen.uvirtual.modulo.bolsaempleo.modelo.ModeloBaremacionItems;
+import es.ujaen.uvirtual.modulo.bolsaempleo.modelo.ModeloBaremacionApartados;
+import es.ujaen.uvirtual.modulo.bolsaempleo.modelo.ModeloBaremacionBloques;
 import es.ujaen.uvirtual.modulo.bolsaempleo.modelo.ModeloMeritosPreferentes;
 import es.ujaen.uvirtual.modulo.bolsaempleo.modelo.ModeloUsuarioBolsaEmpleo;
 import es.ujaen.uvirtual.modulo.bolsaempleo.utilidades.BolsaEmpleoDataTable;
@@ -198,17 +200,17 @@ public class ControladorMeritosPreferentes extends HttpServlet {
 	
 	private void nuevoMerito(VistaMeritosPreferentes bean) throws SQLException, UVException {
 		bean.setMeritoPreferente(null);
-		bean.setItemsBaremacion(ModeloBaremacion.obtenerInstancia().listaItemBaremacion());
-		bean.setBloqueBaremacion(ModeloBaremacion.obtenerInstancia().listaBloqueBaremacion());
-		bean.setApartadoBaremacion(ModeloBaremacion.obtenerInstancia().listaApartadoBaremacion());
+		bean.setItemsBaremacion(ModeloBaremacionItems.obtenerInstancia().listaItemBaremacion());
+		bean.setBloqueBaremacion(ModeloBaremacionBloques.obtenerInstancia().listaBloqueBaremacion());
+		bean.setApartadoBaremacion(ModeloBaremacionApartados.obtenerInstancia().listaApartadoBaremacion());
 		bean.setVista(JSP_FORM);		
 	}
 	
 	private void nuevoMeritoConfirm(VistaMeritosPreferentes bean, HttpServletRequest request) throws SQLException, UVException {
 		bean.setMeritoPreferente(null);
-		bean.setItemsBaremacion(ModeloBaremacion.obtenerInstancia().listaItemBaremacion());
-		bean.setBloqueBaremacion(ModeloBaremacion.obtenerInstancia().listaBloqueBaremacion());
-		bean.setApartadoBaremacion(ModeloBaremacion.obtenerInstancia().listaApartadoBaremacion());
+		bean.setItemsBaremacion(ModeloBaremacionItems.obtenerInstancia().listaItemBaremacion());
+		bean.setBloqueBaremacion(ModeloBaremacionBloques.obtenerInstancia().listaBloqueBaremacion());
+		bean.setApartadoBaremacion(ModeloBaremacionApartados.obtenerInstancia().listaApartadoBaremacion());
 		bean.setVista(JSP_FORM);
 		
 		MeritoPreferente merito = new MeritoPreferente();
@@ -223,9 +225,9 @@ public class ControladorMeritosPreferentes extends HttpServlet {
 		MeritoPreferente merito = ModeloMeritosPreferentes.obtenerInstancia().getMeritoPreferenteById(Formateador.leeParametroInteger(request.getParameter(PARAM_ID)));
 		
 		bean.setMeritoPreferente(merito);
-		bean.setItemsBaremacion(ModeloBaremacion.obtenerInstancia().listaItemBaremacion());
-		bean.setBloqueBaremacion(ModeloBaremacion.obtenerInstancia().listaBloqueBaremacion());
-		bean.setApartadoBaremacion(ModeloBaremacion.obtenerInstancia().listaApartadoBaremacion());
+		bean.setItemsBaremacion(ModeloBaremacionItems.obtenerInstancia().listaItemBaremacion());
+		bean.setBloqueBaremacion(ModeloBaremacionBloques.obtenerInstancia().listaBloqueBaremacion());
+		bean.setApartadoBaremacion(ModeloBaremacionApartados.obtenerInstancia().listaApartadoBaremacion());
 		bean.setVista(JSP_FORM);
 	}
 	
@@ -233,9 +235,9 @@ public class ControladorMeritosPreferentes extends HttpServlet {
 		MeritoPreferente merito = ModeloMeritosPreferentes.obtenerInstancia().getMeritoPreferenteById(Formateador.leeParametroInteger(request.getParameter(PARAM_ID)));
 				
 		bean.setMeritoPreferente(merito);
-		bean.setItemsBaremacion(ModeloBaremacion.obtenerInstancia().listaItemBaremacion());
-		bean.setBloqueBaremacion(ModeloBaremacion.obtenerInstancia().listaBloqueBaremacion());
-		bean.setApartadoBaremacion(ModeloBaremacion.obtenerInstancia().listaApartadoBaremacion());
+		bean.setItemsBaremacion(ModeloBaremacionItems.obtenerInstancia().listaItemBaremacion());
+		bean.setBloqueBaremacion(ModeloBaremacionBloques.obtenerInstancia().listaBloqueBaremacion());
+		bean.setApartadoBaremacion(ModeloBaremacionApartados.obtenerInstancia().listaApartadoBaremacion());
 		bean.setVista(JSP_FORM);
 		
 		ModeloMeritosPreferentes.obtenerInstancia().editarMeritoPreferente(this.validate(merito, request));
@@ -269,7 +271,7 @@ public class ControladorMeritosPreferentes extends HttpServlet {
 		
 		merito.setTipo(EscapaHTML.ajustaCodificacion(request.getParameter(PARAM_MERITO_TIPO)));		
 		if (merito.getTipo().equals(ModeloMeritosPreferentes.TIPO_MERITO)) {
-			merito.setTipoItemBaremacion(ModeloBaremacion.obtenerInstancia().getItemBaremacionById(
+			merito.setTipoItemBaremacion(ModeloBaremacionItems.obtenerInstancia().getItemBaremacionById(
 					Formateador.leeParametroInteger(request.getParameter(PARAM_MERITO_TIPO_ITEMBAREMACION))));
 		} else if (!merito.getTipo().equals(ModeloMeritosPreferentes.TIPO_TITULACION_PREFERENTE)) {
 			throw new UVException("Introduce un tipo de mérito");
@@ -277,13 +279,13 @@ public class ControladorMeritosPreferentes extends HttpServlet {
 		
 		merito.setAplicable(EscapaHTML.ajustaCodificacion(request.getParameter(PARAM_MERITO_APLICABLE)));
 		if (merito.getAplicable().equals(ModeloMeritosPreferentes.APLICABLE_BLOQUE)) {
-			merito.setAplicableBloqueBaremacion(ModeloBaremacion.obtenerInstancia().getBloqueBaremacionById(
+			merito.setAplicableBloqueBaremacion(ModeloBaremacionBloques.obtenerInstancia().getBloqueBaremacionById(
 					Formateador.leeParametroInteger(request.getParameter(PARAM_MERITO_APLICABLE_BLOQUE))));	
 		} else if (merito.getAplicable().equals(ModeloMeritosPreferentes.APLICABLE_APARTADO)) {
-			merito.setAplicableApartadoBaremacion(ModeloBaremacion.obtenerInstancia().getApartadoBaremacionById(
+			merito.setAplicableApartadoBaremacion(ModeloBaremacionApartados.obtenerInstancia().getApartadoBaremacionById(
 					Formateador.leeParametroInteger(request.getParameter(PARAM_MERITO_APLICABLE_APARTADO))));
 		} else if (merito.getAplicable().equals(ModeloMeritosPreferentes.APLICABLE_ITEM)) {
-			merito.setAplicableItemBaremacion(ModeloBaremacion.obtenerInstancia().getItemBaremacionById(
+			merito.setAplicableItemBaremacion(ModeloBaremacionItems.obtenerInstancia().getItemBaremacionById(
 					Formateador.leeParametroInteger(request.getParameter(PARAM_MERITO_APLICABLE_ITEM))));
 		} else if (!merito.getAplicable().equals(ModeloMeritosPreferentes.APLICABLE_TOTAL)) {
 			throw new UVException("Introduce el campo aplicable");

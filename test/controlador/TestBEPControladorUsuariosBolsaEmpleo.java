@@ -5,7 +5,6 @@ import static org.junit.Assert.assertNotEquals;
 
 import java.io.IOException;
 import java.sql.SQLException;
-import java.util.Calendar;
 
 import javax.servlet.ServletException;
 
@@ -29,7 +28,6 @@ import es.ujaen.uvirtual.modulo.bolsaempleo.vistas.VistaUsuarioBolsaEmpleo;
 public class TestBEPControladorUsuariosBolsaEmpleo {
 	private static final String MENSAJE_CON_EXITO_ESPERADO = "El mensaje de exito debe coincidir";
 	private static final String MENSAJE_APARTADOS_DEVUELTOS = "Debe devolver apartados";
-	private static final String MENSAJE_BLOQUES_DEVUELTOS = "Debe devolver bloques";
 	private static final String MENSAJE_SIN_ADVERTENCIAS = "No debe mostrar advertencias";
 	private static final String MENSAJE_SIN_ERROR = "No debe devolver error";
 	private static final String MENSAJE_CON_ERROR = "Debe devolver error";
