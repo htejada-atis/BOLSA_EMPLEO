@@ -21,6 +21,7 @@ import es.ujaen.uvirtual.modulo.bolsaempleo.modelo.ModeloBolsa;
 import es.ujaen.uvirtual.modulo.bolsaempleo.modelo.ModeloTitulacion;
 import es.ujaen.uvirtual.modulo.bolsaempleo.modelo.ModeloUsuarioBolsaEmpleo;
 import es.ujaen.uvirtual.modulo.bolsaempleo.utilidades.BolsaEmpleoDataTable;
+import es.ujaen.uvirtual.modulo.bolsaempleo.utilidades.BolsaEmpleoUtils;
 import es.ujaen.uvirtual.modulo.bolsaempleo.vistas.VistaCandidatoTitulacionesArea;
 import es.ujaen.uvirtual.utilidades.EscapaHTML;
 import es.ujaen.uvirtual.utilidades.Formateador;
@@ -89,7 +90,7 @@ public class ControladorCandidatoTitulacionesPreferentesArea extends HttpServlet
 		}
 		
 		try {
-			init(bean, datos);
+			init(bean, datos, request);
 			switch (nombreAccion) {
 				case ACCION_INDEX:
 					bean.setVista(JSP_INDEX);
@@ -125,8 +126,8 @@ public class ControladorCandidatoTitulacionesPreferentesArea extends HttpServlet
 		}
 	}
 	
-	private void init(VistaCandidatoTitulacionesArea bean, UVDatos datos) throws SQLException, UVException {
-		bean.setVista(JSP_INDEX);
+	private void init(VistaCandidatoTitulacionesArea bean, UVDatos datos, HttpServletRequest request) throws SQLException, UVException {
+		BolsaEmpleoUtils.readMensajeSession(bean, request);
 		ModeloUsuarioBolsaEmpleo.obtenerInstancia().checkUser(datos);
 	}
 	
@@ -196,6 +197,7 @@ public class ControladorCandidatoTitulacionesPreferentesArea extends HttpServlet
 			throws IOException, SQLException {
 		ModeloTitulacion modelo = ModeloTitulacion.obtenerInstancia();
 		datos.setContentType(RESPONSE_AJAX_CONTENTTYPE);
+		datos.setRespuestaEnviada(true);
 		response.setContentType(RESPONSE_AJAX_CONTENTTYPE);
 		response.setCharacterEncoding(RESPONSE_AJAX_ENCODING);
 		
@@ -213,7 +215,5 @@ public class ControladorCandidatoTitulacionesPreferentesArea extends HttpServlet
 				response.setStatus(RESPONSE_HTTP_CODE_ERROR);
 			}
 		}
-		
-		datos.setRespuestaEnviada(true);
 	}	
 }
