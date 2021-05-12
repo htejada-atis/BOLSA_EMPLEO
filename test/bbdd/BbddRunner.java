@@ -366,6 +366,10 @@ public class BbddRunner {
 				   + "END;";
 		try (Statement stmt = conexion.createStatement()) {
 			stmt.execute(sql);
+		} catch (SQLException e) {
+			String mensaje = "error al ejecutar drop de " + tipo + " " + nombre;
+			LOGGER.log(Level.SEVERE, mensaje);
+			throw e;
 		}
 	}
 	
