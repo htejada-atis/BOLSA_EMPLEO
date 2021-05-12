@@ -110,6 +110,11 @@ public final class BolsaEmpleoUtils {
 			return false;
 		}
 		
+		String valueSplitted[] = value.split(",");
+		if (valueSplitted.length > 1) {
+			value = value.replace(',', '.');
+		}
+		
 		String regex = "[-+]?[0-9]*\\.?[0-9]+";
 		Pattern p = Pattern.compile(regex);
 		Matcher m = p.matcher(value);
@@ -124,6 +129,10 @@ public final class BolsaEmpleoUtils {
 	 */
 	public static Float leeParametroFloat(String valor) {
 		try {
+			String valueSplitted[] = valor.split(",");
+			if (valueSplitted.length > 1) {
+				valor = valor.replace(',', '.');
+			}
 			return Float.parseFloat(valor);
 		} catch (Exception e) {
 			return null;

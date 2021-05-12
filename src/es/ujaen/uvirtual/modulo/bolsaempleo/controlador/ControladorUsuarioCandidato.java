@@ -86,6 +86,7 @@ public class ControladorUsuarioCandidato extends HttpServlet {
 	public static final String ACCION_FORMULARIO_USUARIO = "formulariousuario";
 	public static final String ACCION_BUSCAR_USUARIO = "buscarusuario";
 	public static final String ACCION_AGREGAR_USUARIO = "agregarusuario";
+	public static final String ACCION_EDITAR_USUARIO_FORM = "editarusuarioform";
 	public static final String ACCION_EDITAR_USUARIO = "editarusuario";
 	public static final String ACCION_ELIMINAR_USUARIO = "eliminarusuario";
 	public static final String ACCION_LISTAR_USUARIOS = "listar_usuarios";
@@ -181,6 +182,9 @@ public class ControladorUsuarioCandidato extends HttpServlet {
 					break;
 				case ACCION_AGREGAR_USUARIO:
 					agregarUsuario(request, response, bean);
+					break;
+				case ACCION_EDITAR_USUARIO_FORM:
+					editarUsuarioForm(request, response, bean);
 					break;
 				case ACCION_EDITAR_USUARIO:
 					editarUsuario(request, response, bean);
@@ -443,7 +447,7 @@ public class ControladorUsuarioCandidato extends HttpServlet {
 	 * @throws UVException en caso de error en bd
 	 * @throws IOException en caso de error de IO.
 	 */
-	private void editarUsuario(HttpServletRequest request, HttpServletResponse response, VistaUsuarioBolsaEmpleo bean) 
+	private void editarUsuarioForm(HttpServletRequest request, HttpServletResponse response, VistaUsuarioBolsaEmpleo bean) 
 			throws SQLException, UVException, IOException {
 		bean.setVista(JSP_FORM_CANDIDATO);
 		
@@ -451,22 +455,37 @@ public class ControladorUsuarioCandidato extends HttpServlet {
 		
 		obtenerRoles(bean);
 		
-		UsuarioBolsaEmpleo usu = modelo.getUsuarioByCodCuenta(Formateador.leeParametroString(request.getParameter(PARAM_NOMBRE_USUARIO)));
 		Usuario usuArcos = CrearUsuario.usuario(request.getParameter(PARAM_NOMBRE_USUARIO));
+		if (usuArcos == null) {
+			throw new UVException("No existe el usuario");
+		}
+		
+		UsuarioBolsaEmpleo usu = modelo.listaUsuario(usuArcos.getDocumentoNumero());
 		
 		bean.setBusqueda(false);
 		bean.setUsuarioArcos(usuArcos);
 		bean.setUsuario(usu);
 		bean.setRol(usu.getRol());
+	}
+	
+	
+	/** edita un usuario .
+	 * @param request .
+	 * @param response .
+	 * @param bean bean de la vista a la que poner los valores .
+	 * @throws SQLException excepcion de bbdd.
+	 * @throws UVException en caso de error en bd
+	 * @throws IOException en caso de error de IO.
+	 */
+	private void editarUsuario(HttpServletRequest request, HttpServletResponse response, VistaUsuarioBolsaEmpleo bean) 
+			throws SQLException, UVException, IOException {
+		ModeloUsuarioBolsaEmpleo modelo = ModeloUsuarioBolsaEmpleo.obtenerInstancia();
+		UsuarioBolsaEmpleo usuarioForm = this.getValidatorUsuarios(request);
+		usuarioForm.setCodNum(Formateador.leeParametroInteger(request.getParameter(PARAM_ID)));
 		
-		if (EscapaHTML.ajustaCodificacion(request.getParameter(PARAM_ROLE)) != null) {
-			UsuarioBolsaEmpleo usuarioForm = this.getValidatorUsuarios(request);
-			usuarioForm.setCodNum(Formateador.leeParametroInteger(request.getParameter(PARAM_ID)));
-			
-			modelo.actualizaUsuario(usuarioForm);
-			response.sendRedirect(request.getServletPath());	
-			bean.getMensajesDeExito().add(MENSAJE_EXITO_EDITAR);			
-		}
+		modelo.actualizaUsuario(usuarioForm);
+		response.sendRedirect(request.getServletPath());	
+		bean.getMensajesDeExito().add(MENSAJE_EXITO_EDITAR);
 	}
 	
 	

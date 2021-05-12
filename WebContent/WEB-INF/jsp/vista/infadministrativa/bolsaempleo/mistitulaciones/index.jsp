@@ -35,7 +35,8 @@ VistaTitulaciones bean = (VistaTitulaciones) uvdatos.getVistas().get(VistaTitula
 		<tr>
 			<th scope="col" style="width:10%"></th>
 			<th scope="col" style="width:60%">Titulación</th>		
-			<th scope="col" style="width:40%">Descripción</th>		
+			<th scope="col" style="width:40%">Descripción</th>	
+			<th scope="col" style="width:10%">Validada</th>		
 			<th scope="col" style="width:15%"></th>		
 		</tr>
 		<tbody>				
@@ -84,8 +85,15 @@ $(document).ready(function() {
 	    "action": "<%=ControladorMisTitulaciones.ACCION_DATATABLE_TITULACIONES_USUARIO%>",
 	    "columns": [
 	    	{'data': 'codNum', 'selectable': true},
-	        {'data': 'nombre', 'class': 'overflow-auto', 'filter': {'type': 'text'}},
+	        {'data': 'titulacion.nombre', 'class': 'overflow-auto', 'filter': {'type': 'text'}},
 	    	{'data': 'descripcion'},
+        	{'data': 'validada', 'order': {'active': false}, 'filter': {'type': 'select', 'options':{'true': 'Validado', 'false': 'Pendiente'}, 'optionDefault': 'true'},
+	    		'render': function(row) {
+	        		if (row.validada) {
+	        			return "<div title='Validado' class='circle-true'></div>"; 
+	        		}
+        		}
+	        },
         	{'data': 'codnum', 'buttons': [
         		{'label': 'Descargar', 'onClick': function(row) {
         			window.open("<%= ControladorMisTitulaciones.URL_PATTERN_FILES_PRIVADA %>"

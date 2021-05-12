@@ -6,6 +6,7 @@ import java.util.List;
 import es.ujaen.uvirtual.beans.vistas.Vista;
 import es.ujaen.uvirtual.modulo.bolsaempleo.beans.Candidato;
 import es.ujaen.uvirtual.modulo.bolsaempleo.beans.Titulacion;
+import es.ujaen.uvirtual.modulo.bolsaempleo.beans.TitulacionUsuario;
 import es.ujaen.uvirtual.modulo.bolsaempleo.beans.UsuarioBolsaEmpleo;
 import es.ujaen.uvirtual.modulo.bolsaempleo.utilidades.BolsaEmpleoDataTable;
 
@@ -16,10 +17,10 @@ public class VistaFiltrar extends Vista implements Serializable {
 	private static final long serialVersionUID = 1L;
 	private String vista;
 	private transient BolsaEmpleoDataTable<Candidato> dataTableCandidatos;
-	private transient BolsaEmpleoDataTable<Titulacion> dataTableTitulaciones;
+	private transient BolsaEmpleoDataTable<TitulacionUsuario> dataTableTitulaciones;
 	private UsuarioBolsaEmpleo candidato;
-	private Titulacion titulacion;
-	private List<Titulacion> listaValidadas;
+	private TitulacionUsuario titulacion;
+	private List<TitulacionUsuario> listaValidadas;
 	
 	
 	public BolsaEmpleoDataTable<Candidato> getDatatableCandidatos() {
@@ -30,11 +31,11 @@ public class VistaFiltrar extends Vista implements Serializable {
 		this.dataTableCandidatos = dt;
 	}
 	
-	public BolsaEmpleoDataTable<Titulacion> getDatatableTitulaciones() {
+	public BolsaEmpleoDataTable<TitulacionUsuario> getDatatableTitulaciones() {
 		return dataTableTitulaciones;
 	}
 	
-	public void setDatatableTitulaciones(BolsaEmpleoDataTable<Titulacion> dt) {
+	public void setDatatableTitulaciones(BolsaEmpleoDataTable<TitulacionUsuario> dt) {
 		this.dataTableTitulaciones = dt;
 	}
 	
@@ -46,19 +47,19 @@ public class VistaFiltrar extends Vista implements Serializable {
 		this.candidato = usuario;
 	}
 	
-	public Titulacion getTitulacion() {
+	public TitulacionUsuario getTitulacion() {
 		return titulacion;
 	}
 	
-	public void setTitulacion(Titulacion titulacion) {
+	public void setTitulacion(TitulacionUsuario titulacion) {
 		this.titulacion = titulacion;
 	}
 	
-	public List<Titulacion> getValidadas() {
+	public List<TitulacionUsuario> getValidadas() {
 		return listaValidadas;
 	}
 	
-	public void setValidadas(List<Titulacion> validadas) {
+	public void setValidadas(List<TitulacionUsuario> validadas) {
 		this.listaValidadas = validadas;
 	}
 	
