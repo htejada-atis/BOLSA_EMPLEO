@@ -172,9 +172,8 @@ public class ControladorMisDatos extends HttpServlet {
 	
 	private void index(VistaUsuarioBolsaEmpleo bean, UVDatos datos) throws SQLException, UVException {
 		Usuario usuario = datos.getUsuario();
-		Usuario usuArcos = CrearUsuario.usuario(usuario.getUid());
 		bean.setUsuario(ModeloUsuarioBolsaEmpleo.obtenerInstancia().listaUsuario(usuario.getDocumentoNumero()));
-		bean.setUsuarioArcos(usuArcos);
+		bean.setUsuarioArcos(usuario);
 		bean.setVista(JSP_INDEX);
 	}
     
@@ -242,6 +241,11 @@ public class ControladorMisDatos extends HttpServlet {
 	private UsuarioBolsaEmpleo validarDatosUsuario(HttpServletRequest request) throws UVException {
 		UsuarioBolsaEmpleo u = this.validarDatosUsuarioDireccion(request, new UsuarioBolsaEmpleo());
 		        
+		u.setTelefono(EscapaHTML.ajustaCodificacion(request.getParameter(PARAM_TELEFONO)));
+		if (u.getNacionalidad().length() > ModeloUsuarioBolsaEmpleo.COLUMN_TELEFONO_MAXLENGTH) {
+			throw new UVException(String.format(MENSAJE_ERROR_TELEFONO_LARGO, ModeloUsuarioBolsaEmpleo.COLUMN_TELEFONO_MAXLENGTH));
+		}
+		
 		u.setNacionalidad(EscapaHTML.ajustaCodificacion(request.getParameter(PARAM_NACIONALIDAD)));
 		if (u.getNacionalidad() == null || u.getNacionalidad().isBlank()) {
 			throw new UVException(MENSAJE_ERROR_NACIONALIDAD_VACIO);

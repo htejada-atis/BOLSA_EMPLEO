@@ -5,6 +5,7 @@
 <%@ page import="es.ujaen.uvirtual.utilidades.Formateador"%>
 <%@	page import="es.ujaen.uvirtual.modulo.bolsaempleo.beans.UsuarioBolsaEmpleo" %>
 <%@	page import="es.ujaen.uvirtual.modulo.bolsaempleo.beans.Titulacion" %>
+<%@	page import="es.ujaen.uvirtual.modulo.bolsaempleo.beans.TitulacionUsuario" %>
 
 <% 
 UVDatos uvdatos = (UVDatos)request.getAttribute(UVDatos.NOMBRE_ATRIBUTO);
@@ -94,7 +95,7 @@ UsuarioBolsaEmpleo candidato = bean.getCandidato();
 			var titulacionesValidadas = [];
 			
 			<%  if (bean.getValidadas() != null) {
-				for (Titulacion titulacion: bean.getValidadas()) { %>
+				for (TitulacionUsuario titulacion: bean.getValidadas()) { %>
 					titulacionesValidadas.push(<%=titulacion.getCodNum()%>);
 				<% }
 			} %>

@@ -6,6 +6,7 @@ import static org.junit.Assert.assertNotEquals;
 import java.io.IOException;
 import java.sql.SQLException;
 import java.util.Calendar;
+import java.util.Date;
 
 import javax.servlet.ServletException;
 
@@ -272,9 +273,9 @@ public class TestBEPControladorUsuariosBolsaEmpleo {
 		peticion.setParameter(ControladorUsuarioBolsaEmpleo.PARAM_EXCLUIDO, "S");
 		peticion.setParameter(ControladorUsuarioBolsaEmpleo.PARAM_RAZON_EXCLUIDO, "EJEMPLO");
 		peticion.setParameter(ControladorUsuarioBolsaEmpleo.PARAM_EXCLUIDO_TIPO, "T");
-		peticion.setParameter(ControladorUsuarioBolsaEmpleo.PARAM_FECHA_EXCLUIDO, "2021-06-29");
-		peticion.setParameter(ControladorUsuarioBolsaEmpleo.PARAM_FECHA_EXCLUIDO_INICIO, "2021-06-29");
-		peticion.setParameter(ControladorUsuarioBolsaEmpleo.PARAM_FECHA_EXCLUIDO_FIN, "2021-07-29");
+		peticion.setParameter(ControladorUsuarioBolsaEmpleo.PARAM_FECHA_EXCLUIDO, "12/05/2021");
+		peticion.setParameter(ControladorUsuarioBolsaEmpleo.PARAM_FECHA_EXCLUIDO_INICIO, "12/05/2021");
+		peticion.setParameter(ControladorUsuarioBolsaEmpleo.PARAM_FECHA_EXCLUIDO_FIN, "12/05/2021");
 		peticion.setParameter(ControladorUsuarioBolsaEmpleo.PARAM_ROLE, ROL);
 		peticion.setParameter(ControladorUsuarioBolsaEmpleo.PARAM_NOMBRE_USUARIO, CODCUENTA);
 		peticion.setParameter(ControladorUsuarioBolsaEmpleo.PARAM_ID, CODNUM);
@@ -296,8 +297,8 @@ public class TestBEPControladorUsuariosBolsaEmpleo {
 	@Test
 	public void testA11EliminarUsuario() throws ServletException, IOException {
 		VistaUsuarioBolsaEmpleo bean = obtenerUsuarios();
-		String selected = "[" + bean.getDatatable().getData().get(0).getCodNum() + ","
-				+ bean.getDatatable().getData().get(1).getCodNum() + "]";
+		String selected = "[" + bean.getDatatable().getData().get(2).getCodNum() + ","
+				+ bean.getDatatable().getData().get(3).getCodNum() + "]";
 
 		PeticionHttp peticion = UtilsTestBolsaEmpleo.peticionAutenticadaPersonal();
 		peticion.setParameter(ControladorUsuarioBolsaEmpleo.PARAM_ACCION, ControladorUsuarioBolsaEmpleo.ACCION_USUARIO);
@@ -355,27 +356,17 @@ public class TestBEPControladorUsuariosBolsaEmpleo {
 	 */
 	@Test
 	public void testA13IncluirUsuario() throws ServletException, IOException {
-		VistaUsuarioBolsaEmpleo bean = obtenerUsuariosExcluidos();
-		String selected = "[" + bean.getDatatable().getData().get(0).getCodNum() + ","
-				+ bean.getDatatable().getData().get(1).getCodNum() + "]";
-
 		PeticionHttp peticion = UtilsTestBolsaEmpleo.peticionAutenticadaPersonal();
-		peticion.setParameter(ControladorUsuarioBolsaEmpleo.PARAM_ACCION, ControladorUsuarioBolsaEmpleo.ACCION_USUARIO);
-		peticion.setParameter(ControladorUsuarioBolsaEmpleo.PARAM_ACCION_USUARIO,
-				ControladorUsuarioBolsaEmpleo.ACCION_INCLUIR_USUARIO);
-		peticion.setParameter(ControladorUsuarioBolsaEmpleo.PARAM_USUARIOS_SELECCIONADOS, selected);
-
+		peticion.setParameter(ControladorUsuarioBolsaEmpleo.PARAM_ACCION, ControladorUsuarioBolsaEmpleo.ACCION_INCLUIR_USUARIO);
+		peticion.setParameter(ControladorUsuarioBolsaEmpleo.PARAM_ID, CODNUM);
 		RespuestaHttp respuesta = new RespuestaHttp();
 		ControladorUsuarioBolsaEmpleo controlador = new ControladorUsuarioBolsaEmpleo();
 		controlador.doPost(peticion, respuesta);
-
+		
 		VistaUsuarioBolsaEmpleo bean2 = (VistaUsuarioBolsaEmpleo) peticion.getUVDatos().getVistas().get(VistaUsuarioBolsaEmpleo.class.getName());
-
+		
 		assertEquals(MENSAJE_SIN_ERROR, 0, bean2.getMensajesDeError().size());
 		assertEquals(MENSAJE_SIN_ADVERTENCIAS, 0, bean2.getMensajesDeAdvertencia().size());
-		assertEquals(MENSAJE_CON_EXITO_ESPERADO,
-				ControladorUsuarioBolsaEmpleo.MENSAJE_EXITO_USUARIO_MODIFICADO_CORRECTAMENTE,
-				bean2.getMensajesDeExito().get(0));
 	}
 	
 	/** editar bloque .
