@@ -40,7 +40,7 @@ public class ControladorMiembrosComision extends HttpServlet {
 	
 	// acciones
 	public static final String ACCION_LISTAR = "listar";
-	public static final String ACCION_LISTAR_AREAS = "listarareas";
+	public static final String ACCION_INDEX = "listarareas";
 	
 	// mensajes
 	public static final String MENSAJE_ERROR_FOO = "Mensaje de error";
@@ -61,13 +61,13 @@ public class ControladorMiembrosComision extends HttpServlet {
 		
 		String nombreAccion = EscapaHTML.ajustaCodificacion(request.getParameter(PARAM_ACCION));
 		if (nombreAccion == null) {
-			nombreAccion = ACCION_LISTAR_AREAS;
+			nombreAccion = ACCION_INDEX;
 		}
 		
 		try {
 			init(bean, datos);
 			switch (nombreAccion) {
-				case ACCION_LISTAR_AREAS:
+				case ACCION_INDEX:
 					obtenerAreas(bean);
 					break;	
 				case ACCION_LISTAR:

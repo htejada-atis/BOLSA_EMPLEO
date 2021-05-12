@@ -69,7 +69,7 @@ public class TestBEPControladorBolsas {
 	 */
 	@Test
 	public void testA02() throws SQLException, ServletException, IOException {
-		VistaEstadoBolsas bean = getVistaBolsasEmpleo(ControladorBolsas.ACCION_LISTAR_BOLSAS);
+		VistaEstadoBolsas bean = getVistaBolsasEmpleo(ControladorBolsas.ACCION_INDEX);
 		
 		assertEquals(0, bean.getMensajesDeError().size());
 		assertEquals(0, bean.getMensajesDeAdvertencia().size());

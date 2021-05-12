@@ -92,7 +92,7 @@ public class ControladorMisSolicitudes extends HttpServlet {
 	public static final String ACCION_CONSULTAR_SOLICITUD = "consultarSolicitud";
 	public static final String ACCION_CREAR_SOLICITUD = "crearSolicitud";
 	public static final String ACCION_DATATABLE_SOLICITUDES = "datatablesolicitudes";
-	public static final String ACCION_LISTAR_SOLICITUDES = "listar";
+	public static final String ACCION_INDEX = "listar";
 	
 	// acciones paso 1: Selección de áreas
 	public static final String ACCION_DATATABLE_AREAS = "datatableareas";
@@ -173,7 +173,7 @@ public class ControladorMisSolicitudes extends HttpServlet {
 		
 		String nombreAccion = EscapaHTML.ajustaCodificacion(request.getParameter(PARAM_ACCION));
 		if (nombreAccion == null) {
-			nombreAccion = ACCION_LISTAR_SOLICITUDES;
+			nombreAccion = ACCION_INDEX;
 		}
 
 		try {
@@ -182,7 +182,7 @@ public class ControladorMisSolicitudes extends HttpServlet {
 				case ACCION_CONSULTAR_SOLICITUD:
 				case ACCION_CREAR_SOLICITUD:
 				case ACCION_DATATABLE_SOLICITUDES:
-				case ACCION_LISTAR_SOLICITUDES:
+				case ACCION_INDEX:
 					accionesSolicitudes(bean, datos, request, response, nombreAccion);
 					break;
 				case ACCION_DATATABLE_AREAS:
@@ -263,7 +263,7 @@ public class ControladorMisSolicitudes extends HttpServlet {
 			case ACCION_DATATABLE_SOLICITUDES:
 				listadoSolicitudes(bean, datos, request, response);
 				break;
-			case ACCION_LISTAR_SOLICITUDES:
+			case ACCION_INDEX:
 				bean.setVista(JSP_INDEX);
 				break;
 			default:

@@ -99,7 +99,7 @@ public class TestBEPControladorCandidatoTitulacionesPreferentesArea {
 	@Test
 	public void testA02ObtenerAreas() throws SQLException, ServletException, IOException {
 		PeticionHttp peticion = UtilsTestBolsaEmpleo.peticionAutenticadaCandidato();
-		peticion.setParameter(ControladorCandidatoTitulacionesPreferentesArea.PARAM_ACCION, ControladorCandidatoTitulacionesPreferentesArea.ACCION_LISTAR_AREAS);
+		peticion.setParameter(ControladorCandidatoTitulacionesPreferentesArea.PARAM_ACCION, ControladorCandidatoTitulacionesPreferentesArea.ACCION_INDEX);
 		
 		RespuestaHttp respuesta = new RespuestaHttp();
 		ControladorCandidatoTitulacionesPreferentesArea controlador = new ControladorCandidatoTitulacionesPreferentesArea();

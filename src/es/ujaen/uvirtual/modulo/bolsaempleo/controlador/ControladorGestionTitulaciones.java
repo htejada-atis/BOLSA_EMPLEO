@@ -48,7 +48,7 @@ public class ControladorGestionTitulaciones extends HttpServlet {
 	public static final String ACCION_BORRAR_TITULACION = "borrartitulacion";
 	public static final String ACCION_DATATABLE_TITULACIONES = "datatabletitulaciones";
 	public static final String ACCION_EDITAR_TITULACION = "editartitulacion";
-	public static final String ACCION_LISTAR_TITULACIONES = "listartitulaciones";
+	public static final String ACCION_INDEX = "listartitulaciones";
 	
 	// Parámetros
 	public static final String PARAM_ACCION = "a";
@@ -88,13 +88,13 @@ public class ControladorGestionTitulaciones extends HttpServlet {
 		
 		String nombreAccion = EscapaHTML.ajustaCodificacion(request.getParameter(PARAM_ACCION));
 		if (nombreAccion == null) {
-			nombreAccion = ACCION_LISTAR_TITULACIONES;
+			nombreAccion = ACCION_INDEX;
 		}
 		
 		try {
 			init(bean, datos);
 			switch (nombreAccion) {
-				case ACCION_LISTAR_TITULACIONES:
+				case ACCION_INDEX:
 					bean.setVista(RUTA_BEP_CONF + "titulaciones.jsp");
 					break;
 				case ACCION_AGREGAR_TITULACION:

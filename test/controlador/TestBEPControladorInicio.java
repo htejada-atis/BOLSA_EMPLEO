@@ -83,7 +83,7 @@ public class TestBEPControladorInicio {
 	 */
 	@Test
 	public void testA02ObtenerNoticias() throws SQLException, ServletException, IOException {
-		VistaInicio bean = obtenerInicio(ControladorInicio.ACCION_LISTAR_NOTICIAS);
+		VistaInicio bean = obtenerInicio(ControladorInicio.ACCION_INDEX);
 
 		assertNotEquals(MENSAJE_NOTICIAS_DEVUELTAS, 0, bean.getNoticias().size());
 		assertEquals(MENSAJE_SIN_ERROR, 0, bean.getMensajesDeError().size());
@@ -133,7 +133,7 @@ public class TestBEPControladorInicio {
 	 */
 	@Test
 	public void testA05Obtener() throws ServletException, IOException {
-		VistaInicio bean = obtenerInicio(ControladorInicio.ACCION_LISTAR_NOTICIAS);
+		VistaInicio bean = obtenerInicio(ControladorInicio.ACCION_INDEX);
 		
 		PeticionHttp peticion = UtilsTestBolsaEmpleo.peticionAutenticadaPersonal();
 		peticion.setParameter(ControladorInicio.PARAM_ACCION, ControladorInicio.ACCION_LISTAR_TODAS_NOTICIAS);
@@ -204,7 +204,7 @@ public class TestBEPControladorInicio {
 	 */
 	@Test
 	public void testA09ObtenerNoticiaPublica() throws SQLException, ServletException, IOException {
-		VistaInicio bean = obtenerInicioPublico(ControladorInicio.ACCION_LISTAR_NOTICIAS);
+		VistaInicio bean = obtenerInicioPublico(ControladorInicio.ACCION_INDEX);
 
 		assertNotEquals(MENSAJE_NOTICIAS_DEVUELTAS, 0, bean.getNoticias().size());
 		assertEquals(MENSAJE_SIN_ERROR, 0, bean.getMensajesDeError().size());
@@ -232,7 +232,7 @@ public class TestBEPControladorInicio {
 	 */
 	@Test
 	public void testE01ObtenerTodasNoticiasParametroNoValido() throws ServletException, IOException {
-		VistaInicio bean = obtenerInicio(ControladorInicio.ACCION_LISTAR_NOTICIAS);
+		VistaInicio bean = obtenerInicio(ControladorInicio.ACCION_INDEX);
 		
 		PeticionHttp peticion = UtilsTestBolsaEmpleo.peticionAutenticadaPersonal();
 		peticion.setParameter(ControladorInicio.PARAM_ACCION, ControladorInicio.ACCION_LISTAR_TODAS_NOTICIAS);

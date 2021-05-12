@@ -35,7 +35,7 @@ public class ControladorMisResultados extends HttpServlet {
 	// Acciones
 	public static final String ACCION_DATATABLE_AREAS = "datatableareas";
 	public static final String ACCION_DATATABLE_RESULTADOS = "datatableresultados";
-	public static final String ACCION_LISTAR_AREAS = "listarareas";
+	public static final String ACCION_INDEX = "listarareas";
 	
 	// Parámetros
 	public static final String PARAM_ACCION = "a";
@@ -67,13 +67,13 @@ public class ControladorMisResultados extends HttpServlet {
 		
 		String nombreAccion = EscapaHTML.ajustaCodificacion(request.getParameter(PARAM_ACCION));
 		if (nombreAccion == null) {
-			nombreAccion = ACCION_LISTAR_AREAS;
+			nombreAccion = ACCION_INDEX;
 		}
 		
 		try {
 			init(bean, datos);
 			switch (nombreAccion) {
-				case ACCION_LISTAR_AREAS:
+				case ACCION_INDEX:
 					bean.setVista(RUTA_BEP + "index.jsp");
 					break;
 				default:

@@ -48,7 +48,7 @@ public class ControladorGestionNoticias extends HttpServlet {
 	public static final String ACCION_DATATABLE = "datatable";
 	public static final String ACCION_EDITAR_NOTICIA = "editarnoticia";
 	public static final String ACCION_ELIMINAR_NOTICIA = "eliminarnoticia";
-	public static final String ACCION_LISTAR_NOTICIAS = "listar_noticias";
+	public static final String ACCION_INDEX = "listar_noticias";
 	
 	// Parámetros
 	public static final String PARAM_ACCION = "a";
@@ -95,12 +95,12 @@ public class ControladorGestionNoticias extends HttpServlet {
 
 		String nombreAccion = EscapaHTML.ajustaCodificacion(request.getParameter(PARAM_ACCION));
 		if (nombreAccion == null) {
-			nombreAccion = ACCION_LISTAR_NOTICIAS;
+			nombreAccion = ACCION_INDEX;
 		}
 		try {
 			init(bean, datos);
 			switch (nombreAccion) {
-				case ACCION_LISTAR_NOTICIAS:
+				case ACCION_INDEX:
 					bean.setVista(RUTA_BEP_NOTICIAS + "indice.jsp");
 					break;
 				case ACCION_AGREGAR_NOTICIA:
