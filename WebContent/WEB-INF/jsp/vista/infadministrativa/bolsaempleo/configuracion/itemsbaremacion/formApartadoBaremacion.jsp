@@ -27,6 +27,8 @@ ApartadoBaremacion apartado = bean.getApartadoBaremacion();
 	
 	<h2><%= apartado != null ? "Editar bloque" : "Nuevo bloque" %></h2>
 	
+	<p>Las etiquetas en <b>negrita</b> corresponden a campos de relleno obligatorio</p>
+	
 	<form id="actualizar_apartado" class="be-form" method="post" action="<%= request.getRequestURI() %>">
 		<input type="hidden" 
 			   name="<%= ControladorItemsBaremacion.PARAM_ACCION %>" 
@@ -40,14 +42,16 @@ ApartadoBaremacion apartado = bean.getApartadoBaremacion();
 			
 		<div class="form-group-container col2">
 			<div class="form-group">
-				<label for="apartado_codigo">Código</label> 
+				<label for="apartado_codigo" class="bold-label">Código</label> 
 				<input type="text" class="form-input-custom" name="<%= ControladorItemsBaremacion.PARAM_APARTADO_CODIGO %>" id="apartado_codigo" 
-					value="<%= BolsaEmpleoUtils.getParamForm(request, ControladorItemsBaremacion.PARAM_APARTADO_CODIGO, apartado != null ? apartado.getCodigo() : bean.getUltimoCodigo()) %>" />
+					value="<%= BolsaEmpleoUtils.getParamForm(request, ControladorItemsBaremacion.PARAM_APARTADO_CODIGO, apartado != null ? apartado.getCodigo() : bean.getUltimoCodigo()) %>"
+					required />
 			</div>
 			<div class="form-group">
-				<label for="apartado_nombre">Nombre</label>
+				<label for="apartado_nombre" class="bold-label">Nombre</label>
 				<input type="text" class="form-input-custom" name="<%= ControladorItemsBaremacion.PARAM_APARTADO_NOMBRE %>" id="apartado_nombre" 
-					value="<%= BolsaEmpleoUtils.getParamForm(request, ControladorItemsBaremacion.PARAM_APARTADO_NOMBRE, apartado != null ? apartado.getNombre() : "") %>" />
+					value="<%= BolsaEmpleoUtils.getParamForm(request, ControladorItemsBaremacion.PARAM_APARTADO_NOMBRE, apartado != null ? apartado.getNombre() : "") %>"
+					required />
 			</div>
 		</div>
 		<div class="form-group-container col2">
