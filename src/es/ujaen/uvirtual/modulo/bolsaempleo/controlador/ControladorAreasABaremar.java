@@ -176,6 +176,7 @@ public class ControladorAreasABaremar extends HttpServlet {
 		try (PrintWriter writer = response.getWriter()) {
 			try {
 				BolsaEmpleoDataTable<Bolsa> dataTable = modelo.listaAreaDatatable(request.getParameterMap());
+				bean.setDatatableAreas(dataTable);
 				Gson gson = new GsonBuilder().setExclusionStrategies(BolsaEmpleoDataTable.GSONEXCLUSIONSTRATEGY).create();
 
 				writer.write(gson.toJson(dataTable));
@@ -211,6 +212,7 @@ public class ControladorAreasABaremar extends HttpServlet {
 		try (PrintWriter writer = response.getWriter()) {
 			try {
 				BolsaEmpleoDataTable<Bolsa> dataTable = modelo.listaAreaExcluidasUsuarioDatatable(request.getParameterMap(), codNum);
+				bean.setDatatableAreas(dataTable);
 				Gson gson = new GsonBuilder().setExclusionStrategies(BolsaEmpleoDataTable.GSONEXCLUSIONSTRATEGY).create();
 
 				writer.write(gson.toJson(dataTable));
@@ -232,6 +234,7 @@ public class ControladorAreasABaremar extends HttpServlet {
 		int[] selected = (new Gson()).fromJson(selectedJson, new TypeToken<int[]>() { }.getType());
 		
 		List<Bolsa> bolsas = modelo.getBolsasByIds(selected);
+		bean.setListaBolsas(bolsas);
 
 		switch (nombreAccionBolsa) {
 			case ACCION_AREA_PASAR_A_BAREMALE:
@@ -249,6 +252,15 @@ public class ControladorAreasABaremar extends HttpServlet {
 		response.sendRedirect(request.getServletPath());
 	}
 	
+	/**
+	 * método para actualizar las áreas del sistema con las áreas de uvirtual .
+	 * @param bean .
+	 * @param request .
+	 * @param response .
+	 * @throws UVException .
+	 * @throws IOException .
+	 * @throws SQLException .
+	 */
 	private void importarAreasDeUvirtual(VistaAreasBaremar bean, HttpServletRequest request, HttpServletResponse response) throws UVException, SQLException, IOException {
 		ModeloArea modeloArea = ModeloArea.obtenerInstancia();
 		Integer nuevas = modeloArea.insertarAreasNuevasExternas();
