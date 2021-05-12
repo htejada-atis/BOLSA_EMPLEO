@@ -4,7 +4,6 @@ import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.StandardCopyOption;
-import java.sql.SQLException;
 import java.util.concurrent.TimeUnit;
 
 import org.openqa.selenium.By;
@@ -14,8 +13,6 @@ import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.firefox.FirefoxDriver;
 import org.openqa.selenium.firefox.FirefoxOptions;
-
-import bbdd.UtilsTestDocentia;
 
 /** Clase para obtener el driver de firefox. */
 public class DriverUv {
@@ -31,26 +28,45 @@ public class DriverUv {
 		return System.getProperty("os.name").toLowerCase();
 	}
 
-	/** inicializa el driver. */
+	/** inicializa el driver sin opciones.
+	 */
 	public static void inicializaDriver() {
+		inicializaDriver(null);
+	}
+	
+	/** inicializa el driver. 
+	 * @param options opciones del navegador
+	 * */
+	public static void inicializaDriver(FirefoxOptions options) {
+		FirefoxOptions firefoxOptions = new FirefoxOptions();
+		if (options != null) {
+			firefoxOptions = options;
+		}
 		if (getTipoSistema().contains("win")) {
 			System.setProperty("webdriver.gecko.driver", "Documentos/selenium/drivers/geckodriver.exe");
 		} else {
 			System.setProperty("webdriver.gecko.driver", "Documentos/selenium/drivers/geckodriver");
+			firefoxOptions.setHeadless(true);
 		}
-		FirefoxOptions firefoxOptions = new FirefoxOptions();
-		firefoxOptions.setHeadless(true);
 		driver = new FirefoxDriver(firefoxOptions);
 		driver.manage().timeouts().pageLoadTimeout(TIEMPO_MAXIMO_ESPERA, TimeUnit.SECONDS);
 	}
 	
-	/** realiza el login del usuario. */
-	public static void login() {
+	/** realiza el login del usuario. 
+	 * @param userLogin usuario para logarse
+	 */
+	public static void login(String userLogin) {
 		driver.get(RUTA + "/srv/es/index");
 		capturaPantalla("index");
 		WebElement username = driver.findElement(By.name("usuario"));
-		username.sendKeys("usig");
+		username.sendKeys(userLogin);
 		username.submit();
+	}
+	
+	/** hace loguot del usuario.
+	 */
+	public static void logoutUser() {
+		driver.get(RUTA + "/salir");
 	}
 	
 	/** realiza una captura de pantalla.
@@ -76,13 +92,5 @@ public class DriverUv {
 	public static WebDriver getDriver() {
 		capturaPantalla("");
 		return driver;
-	}
-	
-	/** inicializa la bd para realizar las pruebas.
-	 * @throws IOException si error en fichero
-	 * @throws SQLException si error en bd
-	 */
-	public static void inicializaBd() throws IOException, SQLException {
-		UtilsTestDocentia.inicializaDocentia();	
 	}
 }

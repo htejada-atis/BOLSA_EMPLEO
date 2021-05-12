@@ -15,6 +15,8 @@ import org.junit.Test;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebElement;
 
+import bbdd.UtilsTestDocentia;
+
 /** Clase para probar solicitudCrud.
  * @author usig
  *
@@ -42,9 +44,9 @@ public class TestConvocatoriaCrud {
 	@BeforeClass
 	public static void setUp() throws IOException, SQLException {
 		LOGGER.log(Level.INFO, "inicio");
-		DriverUv.inicializaBd();
+		UtilsTestDocentia.inicializaDocentia();	
 		DriverUv.inicializaDriver();
-		DriverUv.login();
+		DriverUv.login("usig");
 	}
 
 	/** Se ejecuta antes de cada test.
