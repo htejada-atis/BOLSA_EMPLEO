@@ -214,10 +214,8 @@ public class ModeloMerito {
 		BolsaEmpleoDataTable<Merito> dataTable = new BolsaEmpleoDataTable<Merito>(params);
 		
 		String consulta = "SELECT bepmer.*, bepblo.BEPAPA_CODNUM FROM tbep_meritos bepmer"
-				+ " INNER JOIN tbep_itemsbaremacion bepite"
-				+ " ON bepite.CODNUM = bepmer.BEPITE_CODNUM"
-				+ " INNER JOIN tbep_bloquesbaremacion bepblo"
-				+ " ON bepblo.CODNUM = bepite.BEPBLO_CODNUM"
+				+ " INNER JOIN tbep_itemsbaremacion bepite ON bepite.CODNUM = bepmer.BEPITE_CODNUM"
+				+ " INNER JOIN tbep_bloquesbaremacion bepblo ON bepblo.CODNUM = bepite.BEPBLO_CODNUM"
 				+ " WHERE bepmer.BEPUSU_CODNUM = ? ";
 		
 		dataTable.setColumn(ORDER_COLUMN_INDEX_ID, "bepmer.CODNUM");

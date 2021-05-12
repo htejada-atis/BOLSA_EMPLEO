@@ -341,16 +341,12 @@ public class ControladorGestionFicheros extends HttpServlet {
 	 */
 	private Fichero validatorFichero(HttpServletRequest request, Part uploadedFile) throws UVException {			
 		// nombre fichero
-		String nombre = BolsaEmpleoUtils.obtenerNombreFichero(uploadedFile);
-		int i = nombre.lastIndexOf('.');
-		if (i > 0) {
-			String extension = nombre.substring(i + 1);
-			if (!"pdf".equalsIgnoreCase(extension)) {
-				throw new UVException("No se puede subir un fichero que sea distinto de pdf");
-		    }
+		if (!BolsaEmpleoUtils.checkFileIsPDF(uploadedFile)) {
+			throw new UVException("El fichero debe ser un pdf válido");
 		}
+		
 		Fichero f = new Fichero();
-		f.setNombre(nombre);
+		f.setNombre(BolsaEmpleoUtils.obtenerNombreFichero(uploadedFile));
 		
 		// titulo
 		f.setTitulo(EscapaHTML.ajustaCodificacion(request.getParameter(PARAM_TITULO)));

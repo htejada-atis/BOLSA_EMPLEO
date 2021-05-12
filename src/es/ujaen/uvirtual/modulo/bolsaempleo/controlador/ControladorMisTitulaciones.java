@@ -352,15 +352,9 @@ public class ControladorMisTitulaciones extends HttpServlet {
 		if (t.getDescripcion().length() > ModeloMisTitulaciones.COLUMN_DESCRIPCION_MAXLENGTH) {
 			throw new UVException(String.format(MENSAJE_ERROR_DESCRIPCION_LARGA, ModeloMisTitulaciones.COLUMN_DESCRIPCION_MAXLENGTH));
 		}
-				
-		String nombre = BolsaEmpleoUtils.obtenerNombreFichero(uploadedFile);				
-		int i = nombre.lastIndexOf('.');
 		
-		if (i > 0) {
-			String extension = nombre.substring(i + 1);
-			if (!"pdf".equalsIgnoreCase(extension)) {
-				throw new UVException("No se puede subir un fichero que sea distinto de pdf");
-		    }
+		if (!BolsaEmpleoUtils.checkFileIsPDF(uploadedFile)) {
+			throw new UVException("El fichero debe ser un pdf válido");
 		}
 		
 		t.setArchivo(uploadedFile.getInputStream());
