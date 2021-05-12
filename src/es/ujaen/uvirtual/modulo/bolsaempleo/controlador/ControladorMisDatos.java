@@ -18,7 +18,6 @@ import es.ujaen.uvirtual.beans.UVDatos;
 import es.ujaen.uvirtual.beans.Usuario;
 import es.ujaen.uvirtual.modulo.bolsaempleo.beans.UsuarioBolsaEmpleo;
 import es.ujaen.uvirtual.modulo.bolsaempleo.modelo.ModeloUsuarioBolsaEmpleo;
-import es.ujaen.uvirtual.modulo.bolsaempleo.utilidades.BolsaEmpleoUtils;
 import es.ujaen.uvirtual.modulo.bolsaempleo.vistas.VistaUsuarioBolsaEmpleo;
 import es.ujaen.uvirtual.utilidades.EscapaHTML;
 import es.ujaen.uvirtual.utilidades.Formateador;
@@ -259,36 +258,44 @@ public class ControladorMisDatos extends HttpServlet {
 		return u;
 	}
     
-	private UsuarioBolsaEmpleo validarDatosUsuarioDireccion(HttpServletRequest request, UsuarioBolsaEmpleo u) throws UVException {
+	private UsuarioBolsaEmpleo validarDatosUsuarioDireccion(HttpServletRequest request, UsuarioBolsaEmpleo u)
+			throws UVException {
 		u.setDireccion(EscapaHTML.ajustaCodificacion(request.getParameter(PARAM_DIRECCION)));
-		if (u.getDireccion() != null && u.getDireccion().length() > ModeloUsuarioBolsaEmpleo.COLUMN_DIRECCION_MAXLENGTH) {
-			throw new UVException(String.format(MENSAJE_ERROR_DIRECCION_LARGO, ModeloUsuarioBolsaEmpleo.COLUMN_DIRECCION_MAXLENGTH));
+		if (u.getDireccion() != null
+				&& u.getDireccion().length() > ModeloUsuarioBolsaEmpleo.COLUMN_DIRECCION_MAXLENGTH) {
+			throw new UVException(
+					String.format(MENSAJE_ERROR_DIRECCION_LARGO, ModeloUsuarioBolsaEmpleo.COLUMN_DIRECCION_MAXLENGTH));
 		}
 
 		u.setCodigoPostal(EscapaHTML.ajustaCodificacion(request.getParameter(PARAM_CODIGO_POSTAL)));
 		if (u.getCodigoPostal() != null) {
 			String regex = "[0-9]+";
-	        Pattern p = Pattern.compile(regex);
-	        Matcher m = p.matcher((String) u.getCodigoPostal());
+			Pattern p = Pattern.compile(regex);
+			Matcher m = p.matcher(u.getCodigoPostal());
 
-	        if (!m.matches()) {
-	        	throw new UVException(MENSAJE_ERROR_CODIGO_POSTAL_STRING);
-	        }
+			if (!m.matches()) {
+				throw new UVException(MENSAJE_ERROR_CODIGO_POSTAL_STRING);
+			}
 			if (u.getCodigoPostal().length() > ModeloUsuarioBolsaEmpleo.COLUMN_CODIGO_POSTAL_MAXLENGTH) {
-				throw new UVException(String.format(MENSAJE_ERROR_CODIGO_POSTAL_LARGO, ModeloUsuarioBolsaEmpleo.COLUMN_CODIGO_POSTAL_MAXLENGTH));
-		    }
+				throw new UVException(String.format(MENSAJE_ERROR_CODIGO_POSTAL_LARGO,
+						ModeloUsuarioBolsaEmpleo.COLUMN_CODIGO_POSTAL_MAXLENGTH));
+			}
 		}
-		
+
 		u.setLocalidad(EscapaHTML.ajustaCodificacion(request.getParameter(PARAM_LOCALIDAD)));
-		if (u.getLocalidad() != null && u.getLocalidad().length() > ModeloUsuarioBolsaEmpleo.COLUMN_LOCALIDAD_MAXLENGTH) {
-			throw new UVException(String.format(MENSAJE_ERROR_LOCALIDAD_LARGO, ModeloUsuarioBolsaEmpleo.COLUMN_LOCALIDAD_MAXLENGTH));
+		if (u.getLocalidad() != null
+				&& u.getLocalidad().length() > ModeloUsuarioBolsaEmpleo.COLUMN_LOCALIDAD_MAXLENGTH) {
+			throw new UVException(
+					String.format(MENSAJE_ERROR_LOCALIDAD_LARGO, ModeloUsuarioBolsaEmpleo.COLUMN_LOCALIDAD_MAXLENGTH));
 		}
-		
+
 		u.setProvincia(EscapaHTML.ajustaCodificacion(request.getParameter(PARAM_PROVINCIA)));
-		if (u.getProvincia() != null && u.getProvincia().length() > ModeloUsuarioBolsaEmpleo.COLUMN_PROVINCIA_MAXLENGTH) {
-			throw new UVException(String.format(MENSAJE_ERROR_PROVINCIA_LARGO, ModeloUsuarioBolsaEmpleo.COLUMN_PROVINCIA_MAXLENGTH));
+		if (u.getProvincia() != null
+				&& u.getProvincia().length() > ModeloUsuarioBolsaEmpleo.COLUMN_PROVINCIA_MAXLENGTH) {
+			throw new UVException(
+					String.format(MENSAJE_ERROR_PROVINCIA_LARGO, ModeloUsuarioBolsaEmpleo.COLUMN_PROVINCIA_MAXLENGTH));
 		}
-	    
+
 		return u;
 	}
 }

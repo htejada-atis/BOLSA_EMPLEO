@@ -55,7 +55,7 @@ public class ControladorFiltrar extends HttpServlet {
 	public static final String ACCION_DATATABLE_CANDIDATOS = "datatablecandidatos";
 	public static final String ACCION_DATATABLE_TITULACIONES_CANDIDATO = "datatabletitulacionescandidato";
 	public static final String ACCION_DESCARGAR_FICHERO = "descargarfichero";
-	public static final String ACCION_LISTAR = "listar";
+	public static final String ACCION_INDEX = "listar";
 	public static final String ACCION_TITULACION_DESELECCIONADA = "titulaciondeseleccionada";
 	public static final String ACCION_TITULACION_SELECCIONADA = "titulacionseleccionada";
 	
@@ -98,13 +98,13 @@ public class ControladorFiltrar extends HttpServlet {
 		
 		String nombreAccion = EscapaHTML.ajustaCodificacion(request.getParameter(PARAM_ACCION));
 		if (nombreAccion == null) {
-			nombreAccion = ACCION_LISTAR;
+			nombreAccion = ACCION_INDEX;
 		}
 		
 		try {
 			init(bean, datos);
 			switch (nombreAccion) {
-				case ACCION_LISTAR:
+				case ACCION_INDEX:
 					bean.setVista(JSP_INDEX);
 					break;
 				case ACCION_CANDIDATO_SELECCIONADO:

@@ -80,7 +80,7 @@ public class TestBEPControladorGestionNoticias {
 	 */
 	@Test
 	public void testA02Obtener() throws SQLException, ServletException, IOException {
-		VistaNoticias bean = obtenerNoticias(ControladorGestionNoticias.ACCION_LISTAR_NOTICIAS);
+		VistaNoticias bean = obtenerNoticias(ControladorGestionNoticias.ACCION_INDEX);
 
 		assertEquals(MENSAJE_SIN_ERROR, 0, bean.getMensajesDeError().size());
 		assertEquals(MENSAJE_SIN_ADVERTENCIAS, 0, bean.getMensajesDeAdvertencia().size());

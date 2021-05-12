@@ -9,8 +9,12 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import javax.servlet.ServletRequest;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
 import javax.servlet.http.Part;
 
+import es.ujaen.uvirtual.beans.vistas.Vista;
 import es.ujaen.uvirtual.modulo.bolsaempleo.modelo.ModeloParametrosConfiguracion;
 import es.ujaen.uvirtual.utilidades.Formateador;
 import es.ujaen.uvirtual.utilidades.UVException;
@@ -21,6 +25,10 @@ import es.ujaen.uvirtual.utilidades.UVException;
  *
  */
 public final class BolsaEmpleoUtils {
+	private static final String MENSAJE_REDIRECT_SESSION_EXITO = "BEP_MENSAJE_REDIRECT_SESSION_EXITO";	
+	private static final String MENSAJE_REDIRECT_SESSION_ERROR = "BEP_MENSAJE_REDIRECT_SESSION_ERROR";
+	private static final int TIPO_MENSAJE_ERROR = 0;
+	private static final int TIPO_MENSAJE_EXITO = 1;	
 	private static final double ROUNDER = 100.0;
 	private static final int NUMBER_2 = 2;
 	
@@ -183,5 +191,65 @@ public final class BolsaEmpleoUtils {
 	public static Date getCurrentDate() {
 		LocalDate ld = LocalDate.now();
 		return java.sql.Date.valueOf(ld);
+	}
+	
+	/**
+	 * Añade un mensaje de exito al bean y en la sessión, para luego su lectura.
+	 * @param mensaje .
+	 * @param bean .
+	 * @param request .
+	 * @throws UVException .
+	 */
+	public static void addMensajeDeExito(String mensaje, Vista bean, HttpServletRequest request) throws UVException {
+		BolsaEmpleoUtils.addMensajeSession(mensaje, bean, request, TIPO_MENSAJE_EXITO);		
+	}
+	
+	/**
+	 * Añade un mensaje de exito al bean y en la sessión, para luego su lectura.
+	 * @param mensaje .
+	 * @param bean .
+	 * @param request .
+	 * @throws UVException .
+	 */
+	public static void addMensajeDeError(String mensaje, Vista bean, HttpServletRequest request) throws UVException {
+		BolsaEmpleoUtils.addMensajeSession(mensaje, bean, request, TIPO_MENSAJE_ERROR);		
+	}
+	
+	/**
+	 * Comprueba si hay mensajes en la sessión y los mete en el bean.
+	 * @param bean .
+	 * @param request .
+	 */
+	public static void readMensajeSession(Vista bean, HttpServletRequest request) {
+		HttpSession session = request.getSession(false);
+		
+		String mensajeExito = (String) session.getAttribute(MENSAJE_REDIRECT_SESSION_EXITO);		
+		if (mensajeExito != null) {
+			bean.getMensajesDeExito().add(mensajeExito);
+			session.removeAttribute(MENSAJE_REDIRECT_SESSION_EXITO);
+		}
+		
+		String mensajeError = (String) session.getAttribute(MENSAJE_REDIRECT_SESSION_ERROR);		
+		if (mensajeError != null) {
+			bean.getMensajesDeError().add(mensajeError);
+			session.removeAttribute(MENSAJE_REDIRECT_SESSION_ERROR);
+		}
+	}
+	
+	private static void addMensajeSession(String mensaje, Vista bean, HttpServletRequest request, int tipo) throws UVException {		
+		HttpSession session = request.getSession(false);
+		
+		switch (tipo) {
+			case TIPO_MENSAJE_EXITO:
+				session.setAttribute(MENSAJE_REDIRECT_SESSION_EXITO, mensaje);
+				bean.getMensajesDeExito().add(mensaje);
+				break;
+			case TIPO_MENSAJE_ERROR:
+				session.setAttribute(MENSAJE_REDIRECT_SESSION_ERROR, mensaje);
+				bean.getMensajesDeError().add(mensaje);
+				break;
+			default:
+				throw new UVException("Tipo de mensaje no válido");
+		}
 	}
 }

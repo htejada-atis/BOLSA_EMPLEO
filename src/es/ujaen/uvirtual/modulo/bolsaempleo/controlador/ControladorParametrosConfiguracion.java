@@ -51,7 +51,7 @@ public class ControladorParametrosConfiguracion extends HttpServlet {
 	
 	
 	// acciones
-	public static final String ACCION_LISTA_PARAMETROS = "listaparametros";
+	public static final String ACCION_INDEX = "listaparametros";
 	public static final String ACCION_EDITAR_PARAMETROS = "editarparametros";
 	
 	// mensajes
@@ -77,13 +77,13 @@ public class ControladorParametrosConfiguracion extends HttpServlet {
 		
 		String nombreAccion = EscapaHTML.ajustaCodificacion(request.getParameter(PARAM_ACCION));
 		if (nombreAccion == null) {
-			nombreAccion = ACCION_LISTA_PARAMETROS;
+			nombreAccion = ACCION_INDEX;
 		}
 		
 		try {
 			init(bean, datos);
 			switch (nombreAccion) {
-				case ACCION_LISTA_PARAMETROS:
+				case ACCION_INDEX:
 					listaParametros(bean);
 					break;
 				case ACCION_EDITAR_PARAMETROS:

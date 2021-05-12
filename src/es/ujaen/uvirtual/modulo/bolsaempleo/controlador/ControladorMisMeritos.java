@@ -27,7 +27,8 @@ import es.ujaen.uvirtual.beans.Usuario;
 import es.ujaen.uvirtual.modulo.bolsaempleo.beans.ApartadoBaremacion;
 import es.ujaen.uvirtual.modulo.bolsaempleo.beans.ItemBaremacion;
 import es.ujaen.uvirtual.modulo.bolsaempleo.beans.Merito;
-import es.ujaen.uvirtual.modulo.bolsaempleo.modelo.ModeloBaremacion;
+import es.ujaen.uvirtual.modulo.bolsaempleo.modelo.ModeloBaremacionItems;
+import es.ujaen.uvirtual.modulo.bolsaempleo.modelo.ModeloBaremacionApartados;
 import es.ujaen.uvirtual.modulo.bolsaempleo.modelo.ModeloMerito;
 import es.ujaen.uvirtual.modulo.bolsaempleo.modelo.ModeloUsuarioBolsaEmpleo;
 import es.ujaen.uvirtual.modulo.bolsaempleo.utilidades.BolsaEmpleoDataTable;
@@ -60,7 +61,7 @@ public class ControladorMisMeritos extends HttpServlet {
 	public static final String ACCION_DATATABLE = "datatable";
 	public static final String ACCION_DESCARGAR_FICHERO = "descargarfichero";
 	public static final String ACCION_ELIMINAR_MERITOS = "eliminarmeritos";
-	public static final String ACCION_LISTAR = "listar";
+	public static final String ACCION_INDEX = "listar";
 	
 	// parámetros
 	public static final String PARAM_ACCION = "a";
@@ -119,13 +120,13 @@ public class ControladorMisMeritos extends HttpServlet {
 				
 		String nombreAccion = EscapaHTML.ajustaCodificacion(request.getParameter(PARAM_ACCION));
 		if (nombreAccion == null) {
-			nombreAccion = ACCION_LISTAR;
+			nombreAccion = ACCION_INDEX;
 		}
 		
 		try {
 			init(bean, datos);
 			switch (nombreAccion) {
-				case ACCION_LISTAR:
+				case ACCION_INDEX:
 					listaMeritos(bean);
 					break;
 				case ACCION_AGREGAR_MERITO:
@@ -192,10 +193,10 @@ public class ControladorMisMeritos extends HttpServlet {
 	 * @throws ServletException .
 	 * @throws IOException .
 	 */
-	private void listaMeritos(VistaMeritos bean) throws SQLException, UVException {
+	private void listaMeritos(VistaMeritos bean) throws SQLException {
 		bean.setVista(RUTA_BEP_MERITOS + "index.jsp");
 		
-		ModeloBaremacion modeloBaremacion = ModeloBaremacion.obtenerInstancia();
+		ModeloBaremacionApartados modeloBaremacion = ModeloBaremacionApartados.obtenerInstancia();
 		bean.setApartados(modeloBaremacion.getApartadosActivos());
 	}
 	
@@ -213,13 +214,13 @@ public class ControladorMisMeritos extends HttpServlet {
 			throws SQLException, UVException, IOException, ServletException {
 		bean.setVista(RUTA_BEP_MERITOS + "formMerito.jsp");
 		
-		ModeloBaremacion modelo = ModeloBaremacion.obtenerInstancia();
+		ModeloBaremacionApartados modelo = ModeloBaremacionApartados.obtenerInstancia();
 		bean.setApartados(modelo.getApartadosActivos());
 		
 		if (request.getParameter(PARAM_APARTADO) != null) {
 			ApartadoBaremacion apartado = modelo.getApartadoBaremacionById(Formateador.leeParametroInteger(request.getParameter(PARAM_APARTADO))); 
 			bean.setApartado(apartado);
-			bean.setItems(modelo.getItemsDeApartado(apartado));
+			bean.setItems(ModeloBaremacionItems.obtenerInstancia().getItemsDeApartado(apartado));
 			
 			if (request.getParameter(PARAM_ITEM) != null) {
 				Part uploadedFile = request.getPart(PARAM_ARCHIVO);
@@ -331,7 +332,7 @@ public class ControladorMisMeritos extends HttpServlet {
 		Merito merito = new Merito();
 				
 		// item de baremación
-		ItemBaremacion item = ModeloBaremacion.obtenerInstancia().getItemBaremacionById(Formateador.leeParametroInteger(request.getParameter(PARAM_ITEM)));
+		ItemBaremacion item = ModeloBaremacionItems.obtenerInstancia().getItemBaremacionById(Formateador.leeParametroInteger(request.getParameter(PARAM_ITEM)));
 		merito.setItemBaremacion(item);
 		
 		// valor
@@ -388,19 +389,19 @@ public class ControladorMisMeritos extends HttpServlet {
 		}		
 	}
 	
-	private Float validateValorDelMerito(HttpServletRequest request, Merito merito) throws UVException, SQLException {
+	private Float validateValorDelMerito(HttpServletRequest request, Merito merito) throws UVException {
 		// chequeo tipo de valor
 		String valorStr = request.getParameter(PARAM_VALOR);
 		switch (merito.getItemBaremacion().getUnidades()) {
-			case ModeloBaremacion.ITEM_UNIDADES_MEDICION_SINO:
+			case ModeloBaremacionItems.ITEM_UNIDADES_MEDICION_SINO:
 				merito.setValor((float) 1);
 				break;
-			case ModeloBaremacion.ITEM_UNIDADES_MEDICION_ENTERO:
+			case ModeloBaremacionItems.ITEM_UNIDADES_MEDICION_ENTERO:
 				if (!BolsaEmpleoUtils.isInteger(valorStr)) {
 					throw new UVException(MENSAJE_ERROR_VALOR_ENTERO_NO_PERMITIDO);
 				}
 				break;
-			case ModeloBaremacion.ITEM_UNIDADES_MEDICION_DECIMAL:
+			case ModeloBaremacionItems.ITEM_UNIDADES_MEDICION_DECIMAL:
 				if (!BolsaEmpleoUtils.isFloat(valorStr)) {
 					throw new UVException(MENSAJE_ERROR_VALOR_DECIMAL_NO_PERMITIDO);
 				}

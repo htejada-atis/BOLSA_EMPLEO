@@ -88,17 +88,47 @@ VistaSolicitudes bean = (VistaSolicitudes) uvdatos.getVistas().get(VistaSolicitu
 </div>
 
 <script>
+
 	$(document).ready(function() {
 		<% if (bean.getSolicitud().getEstado().equals(ModeloSolicitud.SOLICITUD_ESTADO_ABIERTA)) { %>
-			$('#paso3_volver').on('click', function(event) {
+		
+			var backBtn = document.getElementById("paso3_volver");
+			var confirmBtn = document.getElementById("paso3_confirmar");
+		
+			function confirmRequest(message) {
+				Atis.confirmDialog(
+					"Confirmar solicitud", message, {
+	            	'Confirmar': function(row) {
+	            		backBtn.style.pointerEvents = "none";
+	            		confirmBtn.style.pointerEvents = "none";
+	            		backBtn.removeEventListener("click", handleBackEvent);
+	            		confirmBtn.removeEventListener("click", handleConfirmEvent);
+	            		confirmBtn.innerHTML = "Generando solicitud...";
+	        			
+	            		var params = {
+	            				'a': '<%= ControladorMisSolicitudes.ACCION_CONFIRMAR_SOLICITUD %>',
+	            				'<%= ControladorMisSolicitudes.PARAM_SOLICITUD_ID %>': '<%= bean.getSolicitud().getCodNum() %>'
+	            				};
+	        			Atis.sendForm("<%= request.getRequestURI() %>", params);
+	        			
+	              		$(this).dialog("close");
+	            	},
+	            	'No': function() {
+	              		$(this).dialog("close");
+	            	}
+	          	});
+			}
+		
+			var handleBackEvent = function(event) {
 				event.preventDefault();
 				var params = {
 						'a': '<%= ControladorMisSolicitudes.ACCION_LISTAR_BOLSAS_SOLICITUD %>',
 						'<%= ControladorMisSolicitudes.PARAM_SOLICITUD_ID %>': '<%= bean.getSolicitud().getCodNum() %>'
 				};
 				Atis.sendForm("<%= request.getRequestURI() %>", params);
-			});
-			$('#paso3_confirmar').on('click', function(event) {
+			};
+			
+			var handleConfirmEvent = function(event) {
 				event.preventDefault();
 				
 				var message = "";
@@ -119,25 +149,12 @@ VistaSolicitudes bean = (VistaSolicitudes) uvdatos.getVistas().get(VistaSolicitu
 							+ "agregada en el apartado 'Mis titulaciones'";
 				<% } %>
 				
-				Atis.confirmDialog(
-					"Confirmar solicitud", message, {
-	            	'Confirmar': function(row) {
-	            		var params = {
-	            				'a': '<%= ControladorMisSolicitudes.ACCION_CONFIRMAR_SOLICITUD %>',
-	            				'<%= ControladorMisSolicitudes.PARAM_SOLICITUD_ID %>': '<%= bean.getSolicitud().getCodNum() %>'
-	            				};
-	        			Atis.sendForm("<%= request.getRequestURI() %>", params);
-	        			
-	        			$("a").attr("disabled", "disabled");
-	        			document.getElementById("paso3_confirmar").innerHTML = "Generando solicitud...";
-	        			
-	              		$(this).dialog("close");
-	            	},
-	            	'No': function() {
-	              		$(this).dialog("close");
-	            	}
-	          	});
-			});
+				confirmRequest(message);
+			};
+			
+			backBtn.addEventListener("click", handleBackEvent);
+			confirmBtn.addEventListener("click", handleConfirmEvent);
+			
 		<% } %>
 		
 	});

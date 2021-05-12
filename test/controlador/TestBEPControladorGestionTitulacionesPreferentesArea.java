@@ -44,7 +44,7 @@ public class TestBEPControladorGestionTitulacionesPreferentesArea {
     // método para obtener la vista con una lista de áreas .
     private VistaTitulacionesArea getVistaConAreas() throws ServletException, IOException {
     	PeticionHttp peticion = UtilsTestBolsaEmpleo.peticionAutenticadaPersonal();
-    	peticion.setParameter(ControladorGestionTitulacionesPreferentesArea.PARAM_ACCION, ControladorGestionTitulacionesPreferentesArea.ACCION_LISTAR_AREAS);	
+    	peticion.setParameter(ControladorGestionTitulacionesPreferentesArea.PARAM_ACCION, ControladorGestionTitulacionesPreferentesArea.ACCION_INDEX);	
 		
 		RespuestaHttp respuesta = new RespuestaHttp();
 		ControladorGestionTitulacionesPreferentesArea controlador = new ControladorGestionTitulacionesPreferentesArea();

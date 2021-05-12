@@ -47,7 +47,7 @@ public class ControladorCandidatoTitulacionesPreferentesArea extends HttpServlet
 	public static final String ACCION_BOLSA_SELECCIONADA = "seleccionarbolsa";
 	public static final String ACCION_DATATABLE_BOLSAS = "datatablebolsas";
 	public static final String ACCION_DATATABLE_TITULACIONES = "datatabletitulaciones";
-	public static final String ACCION_LISTAR_AREAS = "listarareas";
+	public static final String ACCION_INDEX = "listarareas";
 	
 	// Parámetros
 	public static final String PARAM_ACCION = "a";
@@ -85,13 +85,13 @@ public class ControladorCandidatoTitulacionesPreferentesArea extends HttpServlet
 		
 		String nombreAccion = EscapaHTML.ajustaCodificacion(request.getParameter(PARAM_ACCION));
 		if (nombreAccion == null) {
-			nombreAccion = ACCION_LISTAR_AREAS;
+			nombreAccion = ACCION_INDEX;
 		}
 		
 		try {
 			init(bean, datos);
 			switch (nombreAccion) {
-				case ACCION_LISTAR_AREAS:
+				case ACCION_INDEX:
 					bean.setVista(JSP_INDEX);
 					break;
 				case ACCION_BOLSA_SELECCIONADA:

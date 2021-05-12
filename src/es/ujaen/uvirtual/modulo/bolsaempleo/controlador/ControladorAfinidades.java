@@ -12,7 +12,6 @@ import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import javax.servlet.http.HttpSession;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
@@ -25,6 +24,7 @@ import es.ujaen.uvirtual.modulo.bolsaempleo.beans.Afinidad;
 import es.ujaen.uvirtual.modulo.bolsaempleo.modelo.ModeloAfinidad;
 import es.ujaen.uvirtual.modulo.bolsaempleo.modelo.ModeloUsuarioBolsaEmpleo;
 import es.ujaen.uvirtual.modulo.bolsaempleo.utilidades.BolsaEmpleoDataTable;
+import es.ujaen.uvirtual.modulo.bolsaempleo.utilidades.BolsaEmpleoUtils;
 import es.ujaen.uvirtual.modulo.bolsaempleo.vistas.VistaAfinidades;
 import es.ujaen.uvirtual.utilidades.EscapaHTML;
 import es.ujaen.uvirtual.utilidades.Formateador;
@@ -56,7 +56,7 @@ public class ControladorAfinidades extends HttpServlet {
 	public static final String PARAM_AFINIDADES_SELECCIONADAS = "afinidadesseleccionadas";
 	
 	// acciones
-	public static final String ACCION_LISTAR_AFINIDADES = "listar";
+	public static final String ACCION_INDEX = "listar";
 	public static final String ACCION_DATATABLE = "datatable";
 	public static final String ACCION_AGREGAR_AFINIDAD = "addAfinidad";
 	public static final String ACCION_FORMULARIO_AFINIDAD = "formularioafinidad";
@@ -107,15 +107,15 @@ public class ControladorAfinidades extends HttpServlet {
 				
 		String nombreAccion = EscapaHTML.ajustaCodificacion(request.getParameter(PARAM_ACCION));		
 		if (nombreAccion == null) {
-			nombreAccion = ACCION_LISTAR_AFINIDADES;
+			nombreAccion = ACCION_INDEX;
 		}
 					
 		try {
-			init(bean, datos);
+			init(bean, datos, request);
 			switch (nombreAccion) {
-				case ACCION_LISTAR_AFINIDADES:
+				case ACCION_INDEX:
 					index(bean);
-					break;				
+					break;
 				case ACCION_DATATABLE:
 					listado(bean, datos, request, response);
 					break;
@@ -123,10 +123,10 @@ public class ControladorAfinidades extends HttpServlet {
 					formularioAfinidad(bean);
 					break;
 				case ACCION_AGREGAR_AFINIDAD:
-					nuevaAfinidad(bean, request);
+					nuevaAfinidad(bean, request, response);
 					break;
 				case ACCION_MODIFICAR_AFINIDAD:
-					modificarAfinidad(bean, request);
+					modificarAfinidad(bean, request, response);
 					break;
 				case ACCION_BORRAR_AFINIDAD:
 					borrarAfinidad(bean, request, response);
@@ -155,8 +155,9 @@ public class ControladorAfinidades extends HttpServlet {
 		}
 	}
 	
-	private void init(VistaAfinidades bean, UVDatos datos) throws SQLException, UVException {
+	private void init(VistaAfinidades bean, UVDatos datos, HttpServletRequest request) throws SQLException, UVException {
 		bean.setVista(RUTA_BEP_CON + "index.jsp");
+		BolsaEmpleoUtils.readMensajeSession(bean, request);
 		ModeloUsuarioBolsaEmpleo.obtenerInstancia().checkUser(datos);
 	}
 	
@@ -211,19 +212,19 @@ public class ControladorAfinidades extends HttpServlet {
 		}
 	}
 	
-	private void nuevaAfinidad(VistaAfinidades bean, HttpServletRequest request) throws UVException, SQLException {
+	private void nuevaAfinidad(VistaAfinidades bean, HttpServletRequest request, HttpServletResponse response) throws UVException, SQLException, IOException {
 		bean.setVista(RUTA_BEP_CON + "formAfinidades.jsp");
 		
-		Afinidad afinidad = this.validarAfinidad(request);
-		
+		Afinidad afinidad = this.validarAfinidad(request);		
 		ModeloAfinidad.obtenerInstancia().nuevaAfinidad(afinidad);	
-					
-		bean.getMensajesDeExito().add(MENSAJE_INFO_AFINIDAD_INSERTADA_CORRECTAMENTE);			
-		
+
 		this.index(bean);
+
+		BolsaEmpleoUtils.addMensajeDeExito(MENSAJE_INFO_AFINIDAD_INSERTADA_CORRECTAMENTE, bean, request);
+		response.sendRedirect(request.getServletPath());
 	}
 		
-	private void modificarAfinidad(VistaAfinidades bean, HttpServletRequest request) throws UVException, SQLException { 
+	private void modificarAfinidad(VistaAfinidades bean, HttpServletRequest request, HttpServletResponse response) throws UVException, SQLException, IOException { 
 		bean.setVista(RUTA_BEP_CON + "formAfinidades.jsp");
 		
 		Afinidad afinidadForm = this.validarAfinidad(request); 							
@@ -236,9 +237,10 @@ public class ControladorAfinidades extends HttpServlet {
 			Afinidad afinidadEdit = new Afinidad(afinidad.getCodNum(), afinidadForm.getCodigo(), afinidadForm.getDescripcion(), afinidadForm.getModulacion()); 
 			modelo.actualizaAfinidad(afinidadEdit);
 			
-			bean.getMensajesDeExito().add(MENSAJE_INFO_AFINIDAD_ACTUALIZADA_CORRECTAMENTE);
+			this.index(bean);
 			
-			this.index(bean);			
+			BolsaEmpleoUtils.addMensajeDeExito(MENSAJE_INFO_AFINIDAD_ACTUALIZADA_CORRECTAMENTE, bean, request);
+			response.sendRedirect(request.getServletPath());
 		}
 	}
 	
@@ -258,9 +260,8 @@ public class ControladorAfinidades extends HttpServlet {
 		List<Afinidad> afinidades = modelo.getAfinidadesByIds(selected);
 		
 		modelo.borraAfinidades(afinidades);
-		bean.getMensajesDeExito().add(MENSAJE_EXITO_ELIMINAR);
-		HttpSession session = request.getSession(false);
-		session.setAttribute(MENSAJE_ENVIADO, MENSAJE_EXITO_ELIMINAR);
+		
+		BolsaEmpleoUtils.addMensajeDeExito(MENSAJE_EXITO_ELIMINAR, bean, request);
 		response.sendRedirect(request.getServletPath());
 	}
 	
@@ -283,7 +284,7 @@ public class ControladorAfinidades extends HttpServlet {
 			throw new UVException(String.format(MENSAJE_ERROR_DESCRIPCION_LARGA, ModeloAfinidad.COLUMN_DESCRIPCION_MAXLENGTH));
 		}
 		
-		afinidad.setModulacion(Formateador.leeParametroDouble(PARAM_MODULACION));
+		afinidad.setModulacion(Formateador.leeParametroDouble(request.getParameter(PARAM_MODULACION)));
 		if (afinidad.getModulacion() == null) {
 			throw new UVException(MENSAJE_ERROR_MODULACION_VACIA);
 		}

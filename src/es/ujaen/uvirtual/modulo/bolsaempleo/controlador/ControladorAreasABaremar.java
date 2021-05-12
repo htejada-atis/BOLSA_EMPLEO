@@ -22,6 +22,7 @@ import es.ujaen.uvirtual.modulo.bolsaempleo.modelo.ModeloArea;
 import es.ujaen.uvirtual.modulo.bolsaempleo.modelo.ModeloBolsa;
 import es.ujaen.uvirtual.modulo.bolsaempleo.modelo.ModeloUsuarioBolsaEmpleo;
 import es.ujaen.uvirtual.modulo.bolsaempleo.utilidades.BolsaEmpleoDataTable;
+import es.ujaen.uvirtual.modulo.bolsaempleo.utilidades.BolsaEmpleoUtils;
 import es.ujaen.uvirtual.modulo.bolsaempleo.vistas.VistaAreasBaremar;
 import es.ujaen.uvirtual.utilidades.EscapaHTML;
 import es.ujaen.uvirtual.utilidades.Formateador;
@@ -51,7 +52,7 @@ public class ControladorAreasABaremar extends HttpServlet {
 	public static final String ACCION_DATATABLE = "datatable";
 	public static final String ACCION_DATATABLE_EXCLUIDOS = "datatableexcluidos";
 	public static final String ACCION_IMPORTAR_AREAS_UVIRTUAL = "importarareasuvirtual";
-	public static final String ACCION_LISTAR = "listar";
+	public static final String ACCION_INDEX = "listar";
 	
 	// mensajes
 	public static final String MENSAJE_ERROR_ACCION_AREA_NO_VALIDA = "Acción no válida";
@@ -93,16 +94,16 @@ public class ControladorAreasABaremar extends HttpServlet {
 				
 		String nombreAccion = EscapaHTML.ajustaCodificacion(request.getParameter(PARAM_ACCION));
 		if (nombreAccion == null) {
-			nombreAccion = ACCION_LISTAR;
+			nombreAccion = ACCION_INDEX;
 		}		
 					
 		try {
-			init(bean, datos);
+			init(bean, datos, request);
 			switch (nombreAccion) {
-				case ACCION_LISTAR:
+				case ACCION_INDEX:
 					break;
 				case ACCION_AREA:
-					accionSobreArea(bean, request);
+					accionSobreArea(bean, request, response);
 					break;
 				case ACCION_DATATABLE:
 					listado(bean, datos, request, response);
@@ -111,7 +112,7 @@ public class ControladorAreasABaremar extends HttpServlet {
 					listadoAreasExcluidasUsuario(bean, datos, request, response);
 					break;
 				case ACCION_IMPORTAR_AREAS_UVIRTUAL:
-					importarAreasDeUvirtual(bean);
+					importarAreasDeUvirtual(bean, request, response);
 					break;
 				default:
 					errorFatal(bean, "Acción no contemplada");
@@ -137,8 +138,9 @@ public class ControladorAreasABaremar extends HttpServlet {
 		}
 	}
 	
-	private void init(VistaAreasBaremar bean, UVDatos datos) throws SQLException, UVException {
+	private void init(VistaAreasBaremar bean, UVDatos datos, HttpServletRequest request) throws SQLException, UVException {
 		bean.setVista(RUTA_BEP_CONF + "areasbaremar.jsp");
+		BolsaEmpleoUtils.readMensajeSession(bean, request);
 		ModeloUsuarioBolsaEmpleo.obtenerInstancia().checkUser(datos);
 	}
 	
@@ -174,6 +176,7 @@ public class ControladorAreasABaremar extends HttpServlet {
 		try (PrintWriter writer = response.getWriter()) {
 			try {
 				BolsaEmpleoDataTable<Bolsa> dataTable = modelo.listaAreaDatatable(request.getParameterMap());
+				bean.setDatatableAreas(dataTable);
 				Gson gson = new GsonBuilder().setExclusionStrategies(BolsaEmpleoDataTable.GSONEXCLUSIONSTRATEGY).create();
 
 				writer.write(gson.toJson(dataTable));
@@ -186,7 +189,6 @@ public class ControladorAreasABaremar extends HttpServlet {
 			}
 		}
 	}
-	
 	
 	/**
 	 * AJAX para devolver listado de areas excluidas de un usuario(bolsas).
@@ -210,6 +212,7 @@ public class ControladorAreasABaremar extends HttpServlet {
 		try (PrintWriter writer = response.getWriter()) {
 			try {
 				BolsaEmpleoDataTable<Bolsa> dataTable = modelo.listaAreaExcluidasUsuarioDatatable(request.getParameterMap(), codNum);
+				bean.setDatatableAreas(dataTable);
 				Gson gson = new GsonBuilder().setExclusionStrategies(BolsaEmpleoDataTable.GSONEXCLUSIONSTRATEGY).create();
 
 				writer.write(gson.toJson(dataTable));
@@ -223,7 +226,7 @@ public class ControladorAreasABaremar extends HttpServlet {
 		}
 	}
 	
-	private void accionSobreArea(VistaAreasBaremar bean, HttpServletRequest request) throws UVException, SQLException {
+	private void accionSobreArea(VistaAreasBaremar bean, HttpServletRequest request, HttpServletResponse response) throws UVException, SQLException, IOException {
 		ModeloBolsa modelo = ModeloBolsa.obtenerInstancia();
 		
 		String nombreAccionBolsa = EscapaHTML.ajustaCodificacion(request.getParameter(PARAM_ACCION_AREA));
@@ -231,6 +234,7 @@ public class ControladorAreasABaremar extends HttpServlet {
 		int[] selected = (new Gson()).fromJson(selectedJson, new TypeToken<int[]>() { }.getType());
 		
 		List<Bolsa> bolsas = modelo.getBolsasByIds(selected);
+		bean.setListaBolsas(bolsas);
 
 		switch (nombreAccionBolsa) {
 			case ACCION_AREA_PASAR_A_BAREMALE:
@@ -240,34 +244,45 @@ public class ControladorAreasABaremar extends HttpServlet {
 				modelo.ponerAreaComoNoBaremable(bolsas);
 				break;
 			default:
-				bean.getMensajesDeError().add(MENSAJE_ERROR_ACCION_AREA_NO_VALIDA);
+				BolsaEmpleoUtils.addMensajeDeError(MENSAJE_ERROR_ACCION_AREA_NO_VALIDA, bean, request);
 				return;
 		}
 		
-		bean.getMensajesDeExito().add(MENSAJE_EXITO_AREA_MODIFICADA_CORRECTAMENTE);
+		BolsaEmpleoUtils.addMensajeDeExito(MENSAJE_EXITO_AREA_MODIFICADA_CORRECTAMENTE, bean, request);
+		response.sendRedirect(request.getServletPath());
 	}
 	
 	/**
-	 * método que consulta la tabla 'UXXIRRHH_VUJA_NET_BEP_RH_DEPTO_SECC_AREA' de la que obtiene todas las áreas y las actualiza .
+	 * método para actualizar las áreas del sistema con las áreas de uvirtual .
 	 * @param bean .
+	 * @param request .
+	 * @param response .
 	 * @throws UVException .
+	 * @throws IOException .
 	 * @throws SQLException .
 	 */
-	private void importarAreasDeUvirtual(VistaAreasBaremar bean) throws UVException, SQLException {
+	private void importarAreasDeUvirtual(VistaAreasBaremar bean, HttpServletRequest request, HttpServletResponse response) throws UVException, SQLException, IOException {
 		ModeloArea modeloArea = ModeloArea.obtenerInstancia();
 		Integer nuevas = modeloArea.insertarAreasNuevasExternas();
 		Integer actualizadas = modeloArea.actualizaAreasDeExternas();
+		String mensajes = "";
 		
 		if (nuevas > 0 || actualizadas > 0) {
 			if (nuevas > 0) {
-				bean.getMensajesDeExito().add(nuevas > 1 ? String.format(MENSAJE_EXITO_AREA_AGREGADA, nuevas) : MENSAJE_EXITO_AREA_AGREGADA);
+				mensajes += nuevas > 1 ? String.format(MENSAJE_EXITO_AREA_AGREGADA, nuevas) : MENSAJE_EXITO_AREA_AGREGADA;
+				mensajes += ". ";
 			}
 			
 			if (actualizadas > 0) {
-				bean.getMensajesDeExito().add(actualizadas > 1 ? String.format(MENSAJE_EXITO_AREA_ACTUALIZADA, actualizadas) : MENSAJE_EXITO_AREA_ACTUALIZADA);
+				mensajes += actualizadas > 1 ? String.format(MENSAJE_EXITO_AREA_ACTUALIZADA, actualizadas) : MENSAJE_EXITO_AREA_ACTUALIZADA;
 			}
 		} else {
-			bean.getMensajesDeExito().add(MENSAJE_EXITO_SISTEMA_ACTUALIZADO);
+			mensajes = MENSAJE_EXITO_SISTEMA_ACTUALIZADO;
+		}
+		
+		if (mensajes.length() > 0) {
+			BolsaEmpleoUtils.addMensajeDeExito(mensajes, bean, request);
+			response.sendRedirect(request.getServletPath());
 		}
 	}	
 }

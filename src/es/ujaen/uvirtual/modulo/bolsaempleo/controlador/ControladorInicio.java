@@ -58,7 +58,7 @@ public class ControladorInicio extends HttpServlet {
 	public static final String ACCION_DESCARGAR_FICHERO = "descargarfichero";
 	public static final String ACCION_DOCUMENTOS = "documentos";
 	public static final String ACCION_FAQ = "faq";
-	public static final String ACCION_LISTAR_NOTICIAS = "listar_noticias";
+	public static final String ACCION_INDEX = "listar_noticias";
 	public static final String ACCION_LISTAR_TODAS_NOTICIAS = "listar_todas_noticias";
 	
 	// Parámetros
@@ -94,14 +94,14 @@ public class ControladorInicio extends HttpServlet {
 		
 		String nombreAccion = EscapaHTML.ajustaCodificacion(request.getParameter(PARAM_ACCION));
 		if (nombreAccion == null || nombreAccion.isEmpty()) {
-			nombreAccion = ACCION_LISTAR_NOTICIAS;
+			nombreAccion = ACCION_INDEX;
 		}
 		try {
 			init(bean, datos);
 			
 			switch (nombreAccion) {
-				case ACCION_LISTAR_NOTICIAS:
-					obtenerNoticias(bean);
+				case ACCION_INDEX:
+					index(bean);
 					break;
 				case ACCION_AYUDA:
 					bean.setVista(RUTA_BEP_INICIO + "ayuda.jsp");
@@ -231,7 +231,7 @@ public class ControladorInicio extends HttpServlet {
 				
 				JsonArray result = (JsonArray) gson.toJsonTree(listaNoticias, new TypeToken<List<Noticia>>() { }.getType());
 				writer.print(result);
-			} catch (UVException ex) {
+			} catch (Exception ex) {
 				bean.getMensajesDeError().add(ex.getMessage());
 				CodigoDescripcion mensaje = new CodigoDescripcion("error", ex.getMessage());
 				writer.write(new Gson().toJson(mensaje));
@@ -244,7 +244,7 @@ public class ControladorInicio extends HttpServlet {
 	 * @param bean bean de la vista a la que poner los valores.
 	 * @throws SQLException excepcion de bbdd.
 	 */
-	private void obtenerNoticias(VistaInicio bean) throws SQLException {
+	private void index(VistaInicio bean) throws SQLException {
 		bean.setVista(JSP_INICIO);
 		ModeloNoticia modelo = ModeloNoticia.obtenerInstancia();
 		List<Noticia> noticias = modelo.listaNoticiasInicio(bean.getAnonimo());

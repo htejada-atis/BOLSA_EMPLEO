@@ -127,7 +127,7 @@ public class ModeloMerito {
 				mer.setCodNum(rs.getInt("CODNUM"));
 				ModeloUsuarioBolsaEmpleo modelo = ModeloUsuarioBolsaEmpleo.obtenerInstancia();
 				mer.setUsuario(modelo.getUsuarioById(rs.getInt("BEPUSU_CODNUM")));
-				ModeloBaremacion modeloBar = ModeloBaremacion.obtenerInstancia();
+				ModeloBaremacionItems modeloBar = ModeloBaremacionItems.obtenerInstancia();
 				mer.setItemBaremacion(modeloBar.getItemBaremacionById(rs.getInt("BEPITE_CODNUM")));
 				mer.setDescripcion(rs.getString("DESCRIPCION"));
 				mer.setObservacion(rs.getString("OBSERVACION"));
@@ -293,7 +293,7 @@ public class ModeloMerito {
 	 * @throws UVException .
 	 */
 	public Merito createMeritoFromResultset(ResultSet rs, Boolean withUsuario, Boolean withFile) throws SQLException, UVException {
-		ModeloBaremacion modeloBar = ModeloBaremacion.obtenerInstancia();
+		ModeloBaremacionItems modeloBar = ModeloBaremacionItems.obtenerInstancia();
 		
 		Merito mer = new Merito();		
 		mer.setCodNum(rs.getInt("CODNUM"));

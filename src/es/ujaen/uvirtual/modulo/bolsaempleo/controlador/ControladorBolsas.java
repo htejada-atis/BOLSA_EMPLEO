@@ -50,7 +50,7 @@ public class ControladorBolsas extends HttpServlet {
 	public static final String PARAM_BOLSAS_SELECCIONADAS = "bolsasselected";
 	
 	// acciones
-	public static final String ACCION_LISTAR_BOLSAS = "listar";
+	public static final String ACCION_INDEX = "listar";
 	public static final String ACCION_DATATABLE = "datatable";
 	public static final String ACCION_BOLSA = "accionbolsa";
 	public static final String ACCION_BOLSAS_BLOQUEAR = "bloquear";
@@ -86,13 +86,13 @@ public class ControladorBolsas extends HttpServlet {
 		
 		String nombreAccion = EscapaHTML.ajustaCodificacion(request.getParameter(PARAM_ACCION));		
 		if (nombreAccion == null) {
-			nombreAccion = ACCION_LISTAR_BOLSAS;
+			nombreAccion = ACCION_INDEX;
 		}
 		
 		try {			
 			init(bean, datos);
 			switch (nombreAccion) {
-				case ACCION_LISTAR_BOLSAS:
+				case ACCION_INDEX:
 					bean.setVista("/WEB-INF/jsp/vista/infadministrativa/bolsaempleo/bolsas/index.jsp");
 					break;
 				case ACCION_DATATABLE:

@@ -56,7 +56,7 @@ public class ControladorGestionEvaluadores extends HttpServlet {
 	public static final String ACCION_DATATABLE_EVALUADORES = "datatableevaluadores";
 	public static final String ACCION_DATATABLE_USUARIOS = "datatableusuarios";
 	public static final String ACCION_ELIMINAR_EVALUADOR = "eliminarevaluador";
-	public static final String ACCION_LISTAR_AREAS = "listarareas";
+	public static final String ACCION_INDEX = "listarareas";
 	
 	// Parámetros
 	public static final String PARAM_ACCION = "a";
@@ -102,14 +102,14 @@ public class ControladorGestionEvaluadores extends HttpServlet {
 		
 		String nombreAccion = EscapaHTML.ajustaCodificacion(request.getParameter(PARAM_ACCION));
 		if (nombreAccion == null) {
-			nombreAccion = ACCION_LISTAR_AREAS;
+			nombreAccion = ACCION_INDEX;
 		}
 		
 		try {
 			init(bean, datos);
 			switch (nombreAccion) {
-				case ACCION_LISTAR_AREAS:
-					obtenerAreas(bean, request);
+				case ACCION_INDEX:
+					index(bean, request);
 					break;
 				case ACCION_AGREGAR_EVALUADORES:
 					agregarEvaluadores(bean, request, response);
@@ -282,7 +282,7 @@ public class ControladorGestionEvaluadores extends HttpServlet {
 	 * @throws SQLException excepcion de bbdd.
 	 * @throws UVException .
 	 */
-	private void obtenerAreas(VistaEvaluadores bean, HttpServletRequest request) throws SQLException, UVException {
+	private void index(VistaEvaluadores bean, HttpServletRequest request) throws SQLException, UVException {
 		bean.setVista(JSP_INDEX);
 		
 		ModeloArea modelo = ModeloArea.obtenerInstancia();

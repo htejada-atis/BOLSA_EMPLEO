@@ -7,6 +7,8 @@
 <%@ page import="es.ujaen.uvirtual.modulo.bolsaempleo.vistas.VistaUsuarioBolsaEmpleo"%>
 <%@ page import="es.ujaen.uvirtual.modulo.bolsaempleo.modelo.ModeloConvocatoria" %>
 <%@ page import="es.ujaen.uvirtual.modulo.bolsaempleo.modelo.ModeloSolicitud" %>
+<%@	page import="es.ujaen.uvirtual.modulo.bolsaempleo.beans.UsuarioBolsaEmpleo" %>
+<%@	page import="es.ujaen.uvirtual.beans.Usuario" %>
 <%@ page import="es.ujaen.uvirtual.utilidades.EscapaHTML" %>
 <%@ page import="es.ujaen.uvirtual.utilidades.Formateador"%>
 <%@ page import="java.util.Date"%>
@@ -14,6 +16,8 @@
 <% 
 UVDatos uvdatos = (UVDatos) request.getAttribute(UVDatos.NOMBRE_ATRIBUTO);
 VistaUsuarioBolsaEmpleo bean = (VistaUsuarioBolsaEmpleo) uvdatos.getVistas().get(VistaUsuarioBolsaEmpleo.class.getName());
+Usuario usuarioArcos = bean.getUsuarioArcos();
+UsuarioBolsaEmpleo usuarioBolsa = bean.getUsuario();
 %>
 
 
@@ -37,23 +41,23 @@ VistaUsuarioBolsaEmpleo bean = (VistaUsuarioBolsaEmpleo) uvdatos.getVistas().get
 		Date fecha_ini = null;
 		Date fecha_fin = null;
 		
-		if(bean.getUsuarioArcos() != null) {
-			usuario = bean.getUsuarioArcos().getUid();
-			nombre = bean.getUsuarioArcos().getNombre();
-			apellidos = bean.getUsuarioArcos().getApellido1() + " " + bean.getUsuarioArcos().getApellido2();
-			email = bean.getUsuarioArcos().getEmailCalculado();
-			tipo_documento = bean.getUsuarioArcos().getDocumentoTipo();
-			n_documento = bean.getUsuarioArcos().getDocumentoNumero();
+		if(usuarioArcos != null) {
+			usuario = usuarioArcos.getUid();
+			nombre = usuarioArcos.getNombre();
+			apellidos = usuarioArcos.getApellido1() + " " + usuarioArcos.getApellido2();
+			email = usuarioArcos.getEmailCalculado();
+			tipo_documento = usuarioArcos.getDocumentoTipo();
+			n_documento = usuarioArcos.getDocumentoNumero();
 			
-			if(bean.getUsuario() != null){
-				codnum = bean.getUsuario().getCodNum();
-				lista_dist = bean.getUsuario().getListaDist();
-				excluido = bean.getUsuario().getExcluido();
-				fecha_ini = bean.getUsuario().getFechaExclusionInicio();
-				fecha_fin = bean.getUsuario().getFechaExclusionFin();
+			if(usuarioBolsa != null){
+				codnum = usuarioBolsa.getCodNum();
+				lista_dist = usuarioBolsa.getListaDist();
+				excluido = usuarioBolsa.getExcluido();
+				fecha_ini = usuarioBolsa.getFechaExclusionInicio();
+				fecha_fin = usuarioBolsa.getFechaExclusionFin();
 
-				if(bean.getUsuario().getRazonExcluido()!=null){
-					razon_excluido = bean.getUsuario().getRazonExcluido();
+				if(usuarioBolsa.getRazonExcluido()!=null){
+					razon_excluido = usuarioBolsa.getRazonExcluido();
 				}
 				else{
 					razon_excluido ="";
@@ -117,11 +121,13 @@ VistaUsuarioBolsaEmpleo bean = (VistaUsuarioBolsaEmpleo) uvdatos.getVistas().get
     			<label for="usuario_lista_dist"><input class="params" type="checkbox" id="usuario_lista_dist" name="<%= ControladorUsuarioBolsaEmpleo.PARAM_LISTA %>" value="<%= lista_dist %>" <%= (lista_dist ? "checked=''" : "") %>/>Lista Distribución</label>
     		</div>
     		<div class="form-check">
-    			<div class="form-check-custom">
-    				<label for="usuario_excluido"><input class="params" type="checkbox" id="usuario_excluido" name="<%= ControladorUsuarioBolsaEmpleo.PARAM_EXCLUIDO %>" value="<%= excluido %>" <%= (excluido ? "checked=''" : "") %>/>Excluido</label>
+    			<div class="form-check-custom" style="float: left;">
+    				<label for="usuario_excluido"><input class="params" type="checkbox" id="usuario_excluido" name="<%= ControladorUsuarioBolsaEmpleo.PARAM_EXCLUIDO %>"
+    				 value="<%= excluido %>" <%= (excluido ? "checked=''" : "") %>
+    				 <%= usuarioArcos != null && usuarioBolsa != null ? "" : "disabled" %>/>Excluido</label>
     			</div>    		
     			<div class="form-check-custom" id="excluido_tipo" style="display:none;">
-					<label class="form-label-custom" for="indefinido" style="float: none; margin-right:0px; margin-bottom:5px;"><input class="form-input" type="radio" id="indefinido" name="<%= ControladorUsuarioBolsaEmpleo.PARAM_EXCLUIDO_TIPO %>" style="display: inline;">Indefinido</label>
+					<label class="form-label-custom" for="indefinido" style="float: none; margin-right:0px; margin-bottom:5px;"><input class="form-input" type="radio" id="indefinido" name="<%= ControladorUsuarioBolsaEmpleo.PARAM_EXCLUIDO_TIPO %>" style="display: inline;" required>Indefinido</label>
 					<label class="form-label-custom" for="temporal" style="float: none; margin-right:0px;"><input class="form-input" type="radio" id="temporal" name="<%= ControladorUsuarioBolsaEmpleo.PARAM_EXCLUIDO_TIPO %>" style="display: inline;">Temporal</label>
     			</div>
     		</div>
@@ -142,7 +148,7 @@ VistaUsuarioBolsaEmpleo bean = (VistaUsuarioBolsaEmpleo) uvdatos.getVistas().get
 	    	</div>
 		</div>
 	
-		<div class="form-group">
+		<div class="form-group" id="razon_excluido" style="display:none;">
     		<label for="razon_exclusion">Razón exclusión</label>
     		<textarea class="params form-input-custom" id="razon_exclusion" name="<%= ControladorUsuarioBolsaEmpleo.PARAM_RAZON_EXCLUIDO %>" rows="3" cols="60" <%= (excluido ? "" : "disabled") %>><%= razon_excluido %></textarea>
    		</div>
@@ -152,20 +158,20 @@ VistaUsuarioBolsaEmpleo bean = (VistaUsuarioBolsaEmpleo) uvdatos.getVistas().get
     					
     		</div>
     		<div class="form-group-custom w100" style="float:right;">
-    			<input id="usuario_enviar" type="submit" name="<%= ControladorUsuarioBolsaEmpleo.PARAM_ENVIAR %> " value="<%if(bean.getUsuario()!=null){%><%if(bean.getBusqueda()){%>Volver<%}else{%>Guardar candidato<%}%><%}else{%>Añadir candidato<%}%>" style="float:right;"/>
+    			<input id="usuario_enviar" type="submit" name="<%= ControladorUsuarioBolsaEmpleo.PARAM_ENVIAR %> " value="<%if(usuarioBolsa!=null){%><%if(bean.getBusqueda()){%>Volver<%}else{%>Guardar candidato<%}%><%}else{%>Añadir candidato<%}%>" style="float:right;"/>
     		</div>
     	</div>
     	
 
 		<div class="form-group-container col3" style="margin-top:1rem;">
     	    <div class="form-group">
-    			<a class="link-btn" id="areas_excluidas" href="#" style="margin-top:0">Áreas excluidas</a>
+    			<a class="link-btn" id="areas_excluidas" href="#" style="margin-top:0; visibility: hidden;">Áreas excluidas</a>
     		</div>
     		<div class="form-group">
-				<a class="link-btn" id="solicitudes" href="#" style="margin-top:0">Solicitudes</a>
+				<a class="link-btn" id="solicitudes" href="#" style="margin-top:0; visibility: hidden;">Solicitudes</a>
     		</div>
     		<div class="form-group">
-				<a class="link-btn" id="comunicaciones" href="#" style="margin-top:0">Comunicaciones</a>
+				<a class="link-btn" id="comunicaciones" href="#" style="margin-top:0; visibility: hidden;">Comunicaciones</a>
     		</div>
     	</div>
     </form>
@@ -240,7 +246,7 @@ VistaUsuarioBolsaEmpleo bean = (VistaUsuarioBolsaEmpleo) uvdatos.getVistas().get
 		<% if(bean.getApartadoSolicitudes()!=null){ %>
 		var table = new Atis.DataTable('#table_solicitudes', {
 		    "ajax": { url: "/srv/es/ajax/informacionadministrativa/bolsaempleo/configuracion/candidatos" },
-		    "params": {"<%=ControladorUsuarioCandidato.PARAM_ID%>": <%= bean.getUsuario().getCodNum() %>},
+		    "params": {"<%=ControladorUsuarioCandidato.PARAM_ID%>": <%= usuarioBolsa.getCodNum() %>},
 		    "pageSize": 10,
 		    "title": "Solicitudes",
 		    "filterable": true,
@@ -254,17 +260,20 @@ VistaUsuarioBolsaEmpleo bean = (VistaUsuarioBolsaEmpleo) uvdatos.getVistas().get
 		<%}%> 
 
 		document.getElementById("usuario_excluido").addEventListener("change", function(event) {
-			if(document.getElementById("usuario_excluido").checked){
+			if (document.getElementById("usuario_excluido").checked) {
 				document.getElementById("razon_exclusion").value="";
 				document.getElementById("razon_exclusion").disabled=false;
 				
 				$("#excluido_tipo").show();
-			}
-			else{
+				$("#razon_excluido").show();
+				$("#razon_excluido").children("textarea").attr("required", true);
+			} else {
 				document.getElementById("razon_exclusion").value="";
 				document.getElementById("razon_exclusion").disabled=true;
 				
 				$("#excluido_tipo").hide();
+				$("#razon_excluido").hide();
+				$("#razon_excluido").children().attr("required", false);
 			}
 		});
 		
@@ -309,17 +318,6 @@ VistaUsuarioBolsaEmpleo bean = (VistaUsuarioBolsaEmpleo) uvdatos.getVistas().get
 			enviarUsuario(event, this);
 		});
 		
-		document.getElementById("usuario_excluido").addEventListener("change", function(event) {
-			if(document.getElementById("usuario_excluido").checked){
-				document.getElementById("razon_exclusion").value="";
-				document.getElementById("razon_exclusion").disabled=false;
-			}
-			else{
-				document.getElementById("razon_exclusion").value="";
-				document.getElementById("razon_exclusion").disabled=true;
-			}
-		});
-		
 		<% if(bean.getBusqueda()) {%>
 		params = document.getElementsByClassName("params");
 		for (var i = 0; i < params.length; i++) { 
@@ -334,10 +332,10 @@ VistaUsuarioBolsaEmpleo bean = (VistaUsuarioBolsaEmpleo) uvdatos.getVistas().get
 			document.getElementById("fecha_ini").value = getTodayDate();
 		<% } %>
 		
-		<% if(bean.getUsuario()!=null) {%>
+		<% if(usuarioBolsa!=null) {%>
 		var table = new Atis.DataTable('#table_areas', {
 		    "ajax": { url: "/srv/es/ajax/informacionadministrativa/bolsaempleo/configuracion/areasbaremar" },
-		    "params": {"<%=ControladorUsuarioBolsaEmpleo.PARAM_ID%>": <%= bean.getUsuario().getCodNum() %>},
+		    "params": {"<%=ControladorUsuarioBolsaEmpleo.PARAM_ID%>": <%= usuarioBolsa.getCodNum() %>},
 		    "selectable": true,
 		    "pageSize": 10,
 		    "filterable": true,
@@ -355,7 +353,7 @@ VistaUsuarioBolsaEmpleo bean = (VistaUsuarioBolsaEmpleo) uvdatos.getVistas().get
 		
 		var table = new Atis.DataTable('#table_areas_excluidas', {
 		    "ajax": { url: "/srv/es/ajax/informacionadministrativa/bolsaempleo/configuracion/usuarios" },
-		    "params": {"<%=ControladorUsuarioBolsaEmpleo.PARAM_ID%>": <%= bean.getUsuario().getCodNum() %>},
+		    "params": {"<%=ControladorUsuarioBolsaEmpleo.PARAM_ID%>": <%= usuarioBolsa.getCodNum() %>},
 		    "selectable": true,
 		    "pageSize": 10,
 		    "filterable": true,
@@ -385,7 +383,7 @@ VistaUsuarioBolsaEmpleo bean = (VistaUsuarioBolsaEmpleo) uvdatos.getVistas().get
 	        				'a': '<%=ControladorUsuarioBolsaEmpleo.ACCION_USUARIO%>', 
 	        				'aa': '<%=ControladorUsuarioBolsaEmpleo.ACCION_EXCLUIR_USUARIO_AREA%>', 
 	        				'<%=ControladorUsuarioBolsaEmpleo.PARAM_ACCION_USUARIO%>': accion, 
-	        				'<%=ControladorUsuarioBolsaEmpleo.PARAM_ID%>': <%= bean.getUsuario().getCodNum() %>, 
+	        				'<%=ControladorUsuarioBolsaEmpleo.PARAM_ID%>': <%= usuarioBolsa.getCodNum() %>, 
 	        				'<%=ControladorUsuarioBolsaEmpleo.PARAM_USUARIOS_SELECCIONADOS%>': Atis.object2Json(selected)
 	        			};
 	    			Atis.sendForm("<%= request.getRequestURI() %>", params);
@@ -402,7 +400,7 @@ VistaUsuarioBolsaEmpleo bean = (VistaUsuarioBolsaEmpleo) uvdatos.getVistas().get
 		function enviarUsuario(event, submit_input) {
 			event.preventDefault();
 		
-			<% if(bean.getUsuario() != null) { 
+			<% if(usuarioBolsa != null) { 
 				
 				if(bean.getBusqueda()) {%>
 					input_accion = document.getElementById("accion_formulario");
@@ -411,14 +409,14 @@ VistaUsuarioBolsaEmpleo bean = (VistaUsuarioBolsaEmpleo) uvdatos.getVistas().get
 					input_accion = document.getElementById("accion_formulario");
 					input_accion.value = '<%= ControladorUsuarioBolsaEmpleo.ACCION_EDITAR_USUARIO %>';
 					input_id = document.getElementById("usuario_id");
-					input_id.value = '<%= bean.getUsuario().getCodNum() %>';
+					input_id.value = '<%= usuarioBolsa.getCodNum() %>';
 					input_nombre_usuario = document.getElementById("usuario_nombre");
-					input_nombre_usuario.value = '<%= bean.getUsuario().getCodCuenta()%>';
+					input_nombre_usuario.value = '<%= usuarioBolsa.getCodCuenta()%>';
 				<%}%>
 				
 			<% } else { %>
 				input_id = document.getElementById("usuario_id");
-				input_id.value = '<%= bean.getUsuarioArcos().getUid() %>';
+				input_id.value = '<%= usuarioArcos.getUid() %>';
 				input_accion = document.getElementById("accion_formulario");
 				input_accion.value = '<%= ControladorUsuarioBolsaEmpleo.ACCION_AGREGAR_USUARIO %>';
 			<% } %>

@@ -43,9 +43,9 @@ public class ModeloMeritosPreferentes {
 	public static final String APLICABLE_TOTAL = "TOTAL";
 	
 	public static final String ERROR_MERITO_NOEXITE = "El mérito no existe";
-		
-    protected static ModeloMeritosPreferentes eInstancia = null;
-	
+
+	protected static ModeloMeritosPreferentes eInstancia;
+
 	/** Crea una instancia del objeto.
 	 *  de forma sincronizada para protegerse de posibles problemas multi-hilo
 	 */
@@ -55,16 +55,17 @@ public class ModeloMeritosPreferentes {
 		}
 	}
 
-    /**
-     * Obtiene una instancia de la conexión.
-     * @return instancia
-     */
-    public static ModeloMeritosPreferentes obtenerInstancia() {
-        if (eInstancia == null) {
-        	crearInstancia();
-        }
-        return eInstancia;
-    }
+	/**
+	 * Obtiene una instancia de la conexión.
+	 * 
+	 * @return instancia
+	 */
+	public static ModeloMeritosPreferentes obtenerInstancia() {
+		if (eInstancia == null) {
+			crearInstancia();
+		}
+		return eInstancia;
+	}
 		
     /**
 	 * Devuelve un mérito preferente por su id.
@@ -76,7 +77,7 @@ public class ModeloMeritosPreferentes {
 	public MeritoPreferente getMeritoPreferenteById(Integer codNum) throws SQLException, UVException {
 		String sql = "SELECT bepmep.* FROM TBEP_MERITOS_PREFERENTES bepmep WHERE bepmep.CODNUM = ?";
 		
-		try (Connection con = ConexionUvirtual.obtenerInstancia(); PreparedStatement stmt = con.prepareStatement(sql);) {
+		try (Connection con = ConexionUvirtual.obtenerInstancia(); PreparedStatement stmt = con.prepareStatement(sql)) {
 			int parameterIndex = 1;
 			stmt.setInt(parameterIndex++, codNum);
 			
@@ -99,7 +100,7 @@ public class ModeloMeritosPreferentes {
 	 */
 	public BolsaEmpleoDataTable<MeritoPreferente> listadoMeritosPreferentes(Map<String, String[]> params) throws SQLException, UVException {
 		List<MeritoPreferente> apartados = new ArrayList<>();
-		BolsaEmpleoDataTable<MeritoPreferente> dataTable = new BolsaEmpleoDataTable<MeritoPreferente>(params);
+		BolsaEmpleoDataTable<MeritoPreferente> dataTable = new BolsaEmpleoDataTable<>(params);
 		
 		String consulta =
 			"SELECT bepmep.* "
@@ -117,7 +118,7 @@ public class ModeloMeritosPreferentes {
 				
 		try (Connection conexion = ConexionUvirtual.obtenerInstancia();
 				PreparedStatement stmtCount = conexion.prepareStatement(dataTable.getQueryCount());
-				PreparedStatement stmt = conexion.prepareStatement(dataTable.getQuery());
+				PreparedStatement stmt = conexion.prepareStatement(dataTable.getQuery())
 		) {
 			dataTable.setFiltersParams(stmt, stmtCount, 1);
 			try (ResultSet rs = stmt.executeQuery()) {
@@ -175,7 +176,7 @@ public class ModeloMeritosPreferentes {
 				+ "BEPITE_TIPO_CODNUM,BEPBLO_APLICABLE_CODNUM,BEPAPA_APLICABLE_CODNUM,BEPITE_APLICABLE_CODNUM) "
 				+ "VALUES (?,?,?,?,?,?,?,?,?)";
 		
-		try (Connection conexion = ConexionUvirtual.obtenerInstancia(); PreparedStatement stmt = conexion.prepareStatement(sql);) {
+		try (Connection conexion = ConexionUvirtual.obtenerInstancia(); PreparedStatement stmt = conexion.prepareStatement(sql)) {
 			int parameterIndex = 1;
 			stmt.setString(parameterIndex++, merito.getDescripcion());
 			stmt.setString(parameterIndex++, merito.getTipo());
@@ -237,7 +238,7 @@ public class ModeloMeritosPreferentes {
 				+ "FLGACTIVO = ? "
 				+ "WHERE CODNUM = ?";
 		
-		try (Connection conexion = ConexionUvirtual.obtenerInstancia(); PreparedStatement stmt = conexion.prepareStatement(query);) {
+		try (Connection conexion = ConexionUvirtual.obtenerInstancia(); PreparedStatement stmt = conexion.prepareStatement(query)) {
 			int parameterIndex = 1;
 			stmt.setString(parameterIndex++, merito.getDescripcion());
 			stmt.setString(parameterIndex++, merito.getTipo());
@@ -268,7 +269,7 @@ public class ModeloMeritosPreferentes {
 			} else {
 				stmt.setNull(parameterIndex++, Types.NULL);
 			}
-			stmt.setString(parameterIndex++, merito.getActivo() ? "S" : "N");
+			stmt.setString(parameterIndex++, Boolean.TRUE.equals(merito.getActivo()) ? "S" : "N");
 			stmt.setInt(parameterIndex++, merito.getCodNum());
 			
 			stmt.executeUpdate();
@@ -293,19 +294,6 @@ public class ModeloMeritosPreferentes {
 		if (merito.getValorMaximo() != null && merito.getValorMaximo() <= 0) {
 			throw new UVException("El valor máximo debe ser mayor que cero");
 		}
-		
-		// comprobamos si el factor es una expresión válida
-		// TODO: librería para parsear una expresión
-//		try {
-//			ScriptEngineManager manager = new ScriptEngineManager(null);
-//			ScriptEngine engine = manager.getEngineByName("JavaScript");
-//			System.out.println("engine " + engine);
-//			
-//			Object result = engine.eval(merito.getFactor().replace("N", "0"));
-//			System.out.println(result);
-//		} catch (ScriptException ex) {
-//			throw new UVException("El factor contiene una expresión inválida");
-//		}
 	}
 	
 	
@@ -337,14 +325,14 @@ public class ModeloMeritosPreferentes {
 		obj.setFactor(rs.getString("FACTOR"));
 		obj.setValorMaximo(rs.getFloat("VALOR_MAXIMO") == 0 ? null : rs.getFloat("VALOR_MAXIMO"));
 		obj.setTipoItemBaremacion(rs.getInt("BEPITE_TIPO_CODNUM") == 0 ? null 
-			: ModeloBaremacion.obtenerInstancia().getItemBaremacionById(rs.getInt("BEPITE_TIPO_CODNUM")));
+			: ModeloBaremacionItems.obtenerInstancia().getItemBaremacionById(rs.getInt("BEPITE_TIPO_CODNUM")));
 		obj.setAplicableApartadoBaremacion(rs.getInt("BEPAPA_APLICABLE_CODNUM") == 0 ? null 
-			: ModeloBaremacion.obtenerInstancia().getApartadoBaremacionById(rs.getInt("BEPAPA_APLICABLE_CODNUM")));
+			: ModeloBaremacionApartados.obtenerInstancia().getApartadoBaremacionById(rs.getInt("BEPAPA_APLICABLE_CODNUM")));
 		obj.setAplicableBloqueBaremacion(rs.getInt("BEPBLO_APLICABLE_CODNUM") == 0 ? null 
-			: ModeloBaremacion.obtenerInstancia().getBloqueBaremacionById(rs.getInt("BEPBLO_APLICABLE_CODNUM")));
+			: ModeloBaremacionBloques.obtenerInstancia().getBloqueBaremacionById(rs.getInt("BEPBLO_APLICABLE_CODNUM")));
 		obj.setAplicableItemBaremacion(rs.getInt("BEPITE_APLICABLE_CODNUM") == 0 ? null 
-			: ModeloBaremacion.obtenerInstancia().getItemBaremacionById(rs.getInt("BEPITE_APLICABLE_CODNUM")));
-		obj.setActivo(rs.getString("FLGACTIVO").equals("S"));
+			: ModeloBaremacionItems.obtenerInstancia().getItemBaremacionById(rs.getInt("BEPITE_APLICABLE_CODNUM")));
+		obj.setActivo("S".equals(rs.getString("FLGACTIVO")));
 		return obj;
 	}
 
