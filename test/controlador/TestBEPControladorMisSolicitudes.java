@@ -131,7 +131,7 @@ public class TestBEPControladorMisSolicitudes {
 	@Test
 	public void testA02() throws SQLException, ServletException, IOException {
 		PeticionHttp peticion = UtilsTestBolsaEmpleo.peticionAutenticadaCandidato();
-		peticion.setParameter(ControladorMisSolicitudes.PARAM_ACCION, ControladorMisSolicitudes.ACCION_LISTAR_SOLICITUDES);
+		peticion.setParameter(ControladorMisSolicitudes.PARAM_ACCION, ControladorMisSolicitudes.ACCION_INDEX);
 		
 		RespuestaHttp respuesta = new RespuestaHttp();
 		ControladorMisSolicitudes controlador = new ControladorMisSolicitudes();

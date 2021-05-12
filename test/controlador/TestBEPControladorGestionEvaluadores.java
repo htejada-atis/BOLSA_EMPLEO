@@ -49,7 +49,7 @@ public class TestBEPControladorGestionEvaluadores {
     // método para obtener la vista con una lista de áreas .
     private VistaEvaluadores getVistaConAreas() throws ServletException, IOException {
     	PeticionHttp peticion = UtilsTestBolsaEmpleo.peticionAutenticadaPersonal();
-    	peticion.setParameter(ControladorGestionEvaluadores.PARAM_ACCION, ControladorGestionEvaluadores.ACCION_LISTAR_AREAS);	
+    	peticion.setParameter(ControladorGestionEvaluadores.PARAM_ACCION, ControladorGestionEvaluadores.ACCION_INDEX);	
 		
 		RespuestaHttp respuesta = new RespuestaHttp();
 		ControladorGestionEvaluadores controlador = new ControladorGestionEvaluadores();

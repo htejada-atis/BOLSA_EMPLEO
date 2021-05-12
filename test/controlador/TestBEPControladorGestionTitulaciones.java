@@ -80,7 +80,7 @@ public class TestBEPControladorGestionTitulaciones {
 	 */
 	@Test
 	public void testA02ObtenerTitulaciones() throws SQLException, ServletException, IOException {
-		VistaTitulaciones bean = getVistaTitulaciones(ControladorGestionTitulaciones.ACCION_LISTAR_TITULACIONES);
+		VistaTitulaciones bean = getVistaTitulaciones(ControladorGestionTitulaciones.ACCION_INDEX);
 		
 		assertEquals(0, bean.getMensajesDeError().size());
 		assertEquals(0, bean.getMensajesDeAdvertencia().size());

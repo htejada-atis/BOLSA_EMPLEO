@@ -52,7 +52,7 @@ public class ControladorGestionTitulacionesPreferentesArea extends HttpServlet {
 	public static final String ACCION_DATATABLE_TITULACIONES_PREFERENTES_AREA = "datatabletitulacionespreferentesarea";
 	public static final String ACCION_ELIMINAR_TITULACION_AREA = "eliminartitulacionarea";
 	public static final String ACCION_INCLUIR_TITULACION_AREA = "incluirtitulacionarea";
-	public static final String ACCION_LISTAR_AREAS = "listarareas";
+	public static final String ACCION_INDEX = "listarareas";
 	
 	// Parámetros
 	public static final String PARAM_ACCION = "a";
@@ -89,14 +89,14 @@ public class ControladorGestionTitulacionesPreferentesArea extends HttpServlet {
 				
 		String nombreAccion = EscapaHTML.ajustaCodificacion(request.getParameter(PARAM_ACCION));
 		if (nombreAccion == null) {
-			nombreAccion = ACCION_LISTAR_AREAS;
+			nombreAccion = ACCION_INDEX;
 		}
 		
 		try {
 			init(bean, datos);
 			switch (nombreAccion) {
-				case ACCION_LISTAR_AREAS:
-					obtenerAreas(bean);
+				case ACCION_INDEX:
+					index(bean);
 					break;	
 				case ACCION_ELIMINAR_TITULACION_AREA:
 					eliminarTitulacionesArea(request, bean);
@@ -209,7 +209,7 @@ public class ControladorGestionTitulacionesPreferentesArea extends HttpServlet {
 	 * @throws SQLException excepcion de bbdd.
 	 * @throws UVException .
 	 */
-	private void obtenerAreas(VistaTitulacionesArea bean) throws SQLException, UVException {
+	private void index(VistaTitulacionesArea bean) throws SQLException, UVException {
 		ModeloArea modelo = ModeloArea.obtenerInstancia();	
 		List<Area> areas = modelo.listaAreas();
 		bean.setVista(RUTA_BEP_CONF + "titulacionespreferentesarea.jsp");

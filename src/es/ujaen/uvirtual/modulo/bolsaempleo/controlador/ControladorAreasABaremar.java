@@ -51,7 +51,7 @@ public class ControladorAreasABaremar extends HttpServlet {
 	public static final String ACCION_DATATABLE = "datatable";
 	public static final String ACCION_DATATABLE_EXCLUIDOS = "datatableexcluidos";
 	public static final String ACCION_IMPORTAR_AREAS_UVIRTUAL = "importarareasuvirtual";
-	public static final String ACCION_LISTAR = "listar";
+	public static final String ACCION_INDEX = "listar";
 	
 	// mensajes
 	public static final String MENSAJE_ERROR_ACCION_AREA_NO_VALIDA = "Acción no válida";
@@ -93,13 +93,13 @@ public class ControladorAreasABaremar extends HttpServlet {
 				
 		String nombreAccion = EscapaHTML.ajustaCodificacion(request.getParameter(PARAM_ACCION));
 		if (nombreAccion == null) {
-			nombreAccion = ACCION_LISTAR;
+			nombreAccion = ACCION_INDEX;
 		}		
 					
 		try {
 			init(bean, datos);
 			switch (nombreAccion) {
-				case ACCION_LISTAR:
+				case ACCION_INDEX:
 					break;
 				case ACCION_AREA:
 					accionSobreArea(bean, request);
