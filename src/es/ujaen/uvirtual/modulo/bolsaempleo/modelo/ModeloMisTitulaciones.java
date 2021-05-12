@@ -12,6 +12,8 @@ import java.util.Map;
 
 import es.ujaen.uvirtual.modelo.conexion.ConexionUvirtual;
 import es.ujaen.uvirtual.modulo.bolsaempleo.beans.Titulacion;
+import es.ujaen.uvirtual.modulo.bolsaempleo.beans.TitulacionUsuario;
+import es.ujaen.uvirtual.modulo.bolsaempleo.beans.UsuarioBolsaEmpleo;
 import es.ujaen.uvirtual.modulo.bolsaempleo.utilidades.BolsaEmpleoDataTable;
 import es.ujaen.uvirtual.modulo.bolsaempleo.utilidades.BolsaEmpleoUtils;
 import es.ujaen.uvirtual.modulo.bolsaempleo.utilidades.BolsaEmpleoDataTable.DataTableColumn;
@@ -28,6 +30,8 @@ public class ModeloMisTitulaciones {
 	
 	public static final int ORDER_COLUMN_INDEX_NOMBRE_USUARIO = 1;
 	public static final int ORDER_COLUMN_INDEX_DESCRIPCION = 2;
+	public static final int ORDER_COLUMN_INDEX_VALIDADA = 3;
+	public static final int ORDER_COLUMN_INDEX_ARCHIVO = 4;
 	
 	public static final int COLUMN_DESCRIPCION_MAXLENGTH = 250;
 	
@@ -58,9 +62,9 @@ public class ModeloMisTitulaciones {
 	 * @return titulación con el id especificado
 	 * @throws SQLException en caso de error en la BD
 	 */
-	public Titulacion listaTitulacionUsuario(int id) throws SQLException, UVException {
+	public Titulacion listaTitulacion(int id) throws SQLException, UVException {
 		String clausulaWhere = "WHERE codnum = " + id;
-		List<Titulacion> titulaciones = listaTitulacionesUsuarios(clausulaWhere);
+		List<Titulacion> titulaciones = listaTitulaciones(clausulaWhere);
 		if (titulaciones.isEmpty()) {
 			throw new UVException("No existe titulación");
 		}
@@ -72,9 +76,9 @@ public class ModeloMisTitulaciones {
 	 * @return titulación con el id especificado
 	 * @throws SQLException en caso de error en la BD
 	 */
-	public Titulacion listaTitulacion(int id) throws SQLException, UVException {
+	public TitulacionUsuario listaTitulacionUsuario(int id) throws SQLException, UVException {
 		String clausulaWhere = "WHERE codnum = " + id;
-		List<Titulacion> titulaciones = listaTitulaciones(clausulaWhere);
+		List<TitulacionUsuario> titulaciones = listaTitulacionesUsuarios(clausulaWhere);
 		if (titulaciones.isEmpty()) {
 			throw new UVException("No existe titulación");
 		}
@@ -82,48 +86,20 @@ public class ModeloMisTitulaciones {
 	}
 	
 	/** Consulta titulaciones en BBDD y las devuelve.
-	 * @return todas las titulaciones de la base de datos .
-	 * @throws SQLException en caso de error de base de datos
-	 */
-	public List<Titulacion> listaTitulaciones() throws SQLException {
-		List<Titulacion> titulaciones = new ArrayList<>();
-		String consulta = "SELECT * FROM TBEP_TITULACIONES_USUARIO";
-		
-		try (Connection conexion = ConexionUvirtual.obtenerInstancia();
-			PreparedStatement stmt = conexion.prepareStatement(consulta);) {
-				try (ResultSet rs = stmt.executeQuery()) {
-					while (rs.next()) {
-						Titulacion tit = new Titulacion();
-						tit.setCodNum(rs.getInt("CODNUM"));
-						tit.setDescripcion(rs.getString("DESCRIPCION"));
-						tit.setArchivo(rs.getBlob("ARCHIVO").getBinaryStream());
-						tit.setBorrado(rs.getString("FLGBORRADO").equals("S"));
-						titulaciones.add(tit);	
-					}
-				}
-			}
-		
-		return titulaciones;
-	}
-	
-	
-	/** Consulta titulaciones en BBDD y las devuelve.
 	 * @param clausula para filtrar las titulaciones de la bd
 	 * @return todas las titulaciones de la base de datos
 	 * @throws SQLException en caso de error de base de datos
+	 * @throws UVException .
 	 */
-	private List<Titulacion> listaTitulacionesUsuarios(String clausula) throws SQLException {
-		List<Titulacion> titulaciones = new ArrayList<>();
+	public List<TitulacionUsuario> listaTitulacionesUsuarios(String clausula) throws SQLException, UVException {
+		List<TitulacionUsuario> titulaciones = new ArrayList<>();
 		String consulta = "SELECT beptus.* FROM tbep_titulaciones_usuario beptus " + clausula;
 		
 		try (Connection conexion = ConexionUvirtual.obtenerInstancia();
 			PreparedStatement stmt = conexion.prepareStatement(consulta);) {
 				try (ResultSet rs = stmt.executeQuery()) {
 					while (rs.next()) {
-						Titulacion tit = new Titulacion();
-						tit.setCodNum(rs.getInt("CODNUM"));
-						tit.setDescripcion(rs.getString("DESCRIPCION"));
-						tit.setArchivo(rs.getBlob("ARCHIVO").getBinaryStream());
+						TitulacionUsuario tit = setTitulacionUsuario(rs, true);
 						titulaciones.add(tit);
 					}
 				}
@@ -148,7 +124,7 @@ public class ModeloMisTitulaciones {
 					while (rs.next()) {
 						Titulacion tit = new Titulacion();
 						tit.setCodNum(rs.getInt("CODNUM"));
-						tit.setDescripcion(rs.getString("NOMBRE"));
+						tit.setNombre(rs.getString("NOMBRE"));
 						titulaciones.add(tit);
 					}
 				}
@@ -214,20 +190,24 @@ public class ModeloMisTitulaciones {
 	 * @throws SQLException en caso de error de base de datos
 	 * @throws UVException error si no existe titulación
 	 */
-	public BolsaEmpleoDataTable<Titulacion> listaTitulacionesUsuarioDatatable(Map<String, String[]> params, Integer codNum) throws SQLException, UVException {
+	public BolsaEmpleoDataTable<TitulacionUsuario> listaTitulacionesUsuarioDatatable(Map<String, String[]> params, Integer codNum) throws SQLException, UVException {
 		if (codNum == null) {
 			throw new UVException("No se pueden listar titulaciones sin usuario");
 		}
 		
-		List<Titulacion> titulaciones = new ArrayList<>();
-		BolsaEmpleoDataTable<Titulacion> dataTable = new BolsaEmpleoDataTable<Titulacion>(params);
+		List<TitulacionUsuario> titulaciones = new ArrayList<>();
+		BolsaEmpleoDataTable<TitulacionUsuario> dataTable = new BolsaEmpleoDataTable<TitulacionUsuario>(params);
 		
-		String consulta = "SELECT beptus.codnum as beptuscod,BEPTUS.DESCRIPCION AS BEPTUSDESCRIPCION, beptit.* FROM tbep_titulaciones_usuario beptus "
+		String consulta = "SELECT beptit.CODNUM as beptitcod, beptit.NOMBRE AS beptitnombre, beptus.CODNUM, beptus.BEPTUS_USU_CODNUM, beptus.BEPTUS_TIT_CODNUM, "
+				+ "beptus.DESCRIPCION, beptus.FLGBORRADO, beptus.FLGVALIDADA, beptus.FECHA_BORRADO, beptus.FECHA_VALIDADA "
+				+ "FROM tbep_titulaciones_usuario beptus "
 				+ "INNER JOIN tbep_titulaciones beptit ON beptit.codnum=beptus.beptus_tit_codnum "
 				+ "WHERE beptus.BEPTUS_USU_CODNUM = ? AND beptus.FLGBORRADO != 'S'";
 		
-		dataTable.setColumn(ORDER_COLUMN_INDEX_NOMBRE_USUARIO, "beptit.NOMBRE");
-		dataTable.setColumn(ORDER_COLUMN_INDEX_DESCRIPCION, "BEPTUSDESCRIPCION");
+		dataTable.setColumn(ORDER_COLUMN_INDEX_NOMBRE_USUARIO, "beptitnombre");
+		dataTable.setColumn(ORDER_COLUMN_INDEX_DESCRIPCION, "DESCRIPCION");
+		dataTable.setColumn(ORDER_COLUMN_INDEX_VALIDADA, "FLGVALIDADA", DataTableColumn.COLUMN_TYPE_BOOLEAN);
+		dataTable.setColumn(ORDER_COLUMN_INDEX_ARCHIVO, "beptus.CODNUM", DataTableColumn.COLUMN_TYPE_NUMBER);
 		dataTable.setQuery(consulta);
 				
 		try (Connection conexion = ConexionUvirtual.obtenerInstancia();
@@ -242,10 +222,7 @@ public class ModeloMisTitulaciones {
 			dataTable.setFiltersParams(stmt, stmtCount, indexParam);
 			try (ResultSet rs = stmt.executeQuery()) {
 				while (rs.next()) {
-					Titulacion tit = new Titulacion();
-					tit.setCodNum(rs.getInt("beptuscod"));
-					tit.setNombre(rs.getString("NOMBRE"));
-					tit.setDescripcion(rs.getString("BEPTUSDESCRIPCION"));
+					TitulacionUsuario tit = setTitulacionUsuario(rs, false);
 					titulaciones.add(tit);
 				}
 			}
@@ -264,8 +241,8 @@ public class ModeloMisTitulaciones {
 	 * @throws UVException .
 	 * @throws SQLException .
 	 */
-	public List<Titulacion> getTitulacionesUsuarios(int[] ids) throws SQLException, UVException {
-		List<Titulacion> titulaciones = new ArrayList<>();
+	public List<TitulacionUsuario> getTitulacionesUsuarios(int[] ids) throws SQLException, UVException {
+		List<TitulacionUsuario> titulaciones = new ArrayList<>();
 		
 		for (int i = 0; i < ids.length; i++) {
 			titulaciones.add(this.listaTitulacionUsuario(ids[i]));
@@ -279,7 +256,7 @@ public class ModeloMisTitulaciones {
 	 * @throws SQLException en caso de error en la BD
 	 * @throws IOException .
 	 */
-	public void insertaTitulacionUsuario(Titulacion titulacion) throws SQLException, UVException, IOException {
+	public void insertaTitulacionUsuario(TitulacionUsuario titulacion) throws SQLException, UVException, IOException {
 		if (titulacion == null) {
 			throw new UVException("No se puede insertar una titulación vacia");
 		}
@@ -309,7 +286,7 @@ public class ModeloMisTitulaciones {
 	 * @throws SQLException en caso de error en la BD
 	 * @throws UVException si titulación no es valida
 	 */
-	public void borraTitulacionUsuario(List<Titulacion> titulaciones) throws SQLException, UVException {
+	public void borraTitulacionUsuario(List<TitulacionUsuario> titulaciones) throws SQLException, UVException {
 		String params = BolsaEmpleoUtils.consultaMultiplesParametros(titulaciones.size());
 		String query = "UPDATE TBEP_TITULACIONES_USUARIO SET FLGBORRADO = ?, FECHA_BORRADO = ? WHERE CODNUM IN  (" + params + ")";		
 				
@@ -321,9 +298,130 @@ public class ModeloMisTitulaciones {
 			Date date = new Date(System.currentTimeMillis());
 			
 			stmt.setDate(parameterIndex++, new java.sql.Date(date.getTime()));
-			for (Titulacion titulacion : titulaciones) {
+			for (TitulacionUsuario titulacion : titulaciones) {
 				stmt.setInt(parameterIndex++, titulacion.getCodNum()); 
 			}
+			stmt.executeUpdate();
+		}
+	}
+	
+	/** Setea los valores de la titulacion del usuario .
+	 * @param rs .
+	 * @param archivo .
+	 * @return titulacion .
+	 * @throws UVException .
+	 * @throws SQLException .
+	 */
+	public TitulacionUsuario setTitulacionUsuario(ResultSet rs, Boolean archivo) throws SQLException, UVException {
+		TitulacionUsuario tit = new TitulacionUsuario();
+		tit.setCodNum(rs.getInt("CODNUM"));
+		tit.setDescripcion(rs.getString("DESCRIPCION"));
+		
+		UsuarioBolsaEmpleo usu = ModeloUsuarioBolsaEmpleo.obtenerInstancia().getUsuarioById(rs.getInt("BEPTUS_USU_CODNUM"));
+		tit.setUsuario(usu);
+		
+		Titulacion titu = listaTitulacion(rs.getInt("BEPTUS_TIT_CODNUM"));
+		tit.setTitulacion(titu);
+		
+		if (archivo) {
+			tit.setArchivo(rs.getBlob("ARCHIVO").getBinaryStream());
+		}
+
+		tit.setBorrado(rs.getString("FLGBORRADO").equals("S"));
+		tit.setValidada(rs.getString("FLGVALIDADA").equals("S"));
+		
+		return tit;
+	}
+	
+	
+	/** lista todas las titulaciones validadas del candidato .
+	 * @param usuario .
+	 * @return lista de todas las titulaciones .
+	 * @throws SQLException si hay un error en la base de datos .
+	 * @throws UVException .
+	 */
+	public List<TitulacionUsuario> listaTitulacionesValidadasCandidato(Integer usuario) throws SQLException, UVException {
+		List<TitulacionUsuario> titulaciones = new ArrayList<>();
+		String consulta = "SELECT beptit.CODNUM as beptitcod, beptit.NOMBRE AS beptitnombre, beptus.*"
+				+ " FROM TBEP_TITULACIONES beptit"
+				+ " INNER JOIN TBEP_TITULACIONES_USUARIO beptus ON beptus.BEPTUS_TIT_CODNUM = beptit.CODNUM"
+				+ " WHERE beptus.BEPTUS_USU_CODNUM = ? AND beptus.FLGVALIDADA = 'S'";
+		
+		try (Connection conexion = ConexionUvirtual.obtenerInstancia(); PreparedStatement stmt = conexion.prepareStatement(consulta);) {
+			int parameterIndex = 1;
+			stmt.setInt(parameterIndex++, usuario);
+			try (ResultSet rs = stmt.executeQuery()) {
+				while (rs.next()) {
+					TitulacionUsuario tit = setTitulacionUsuario(rs, true);
+					titulaciones.add(tit);
+				}
+			}
+		}
+		return titulaciones;
+	}
+	
+	/**
+	 * Valida una titulación .
+	 * @param titulacion .
+	 * @param candidato .
+	 * @param date .
+	 * @throws SQLException .
+	 * @throws UVException .
+	 */
+	public void validaTitulacion(TitulacionUsuario titulacion, UsuarioBolsaEmpleo candidato, java.util.Date date) throws SQLException, UVException {
+		if (titulacion == null) {
+			throw new UVException("titulación obligatoria");
+		}
+		if (titulacion.getCodNum() == null) {
+			throw new UVException("id titulación no válido");
+		}
+		if (candidato == null) {
+			throw new UVException("candidato obligatorio");
+		}
+		if (candidato.getCodNum() == null) {
+			throw new UVException("id usuario no válido");
+		}
+		
+		String consulta = "UPDATE TBEP_TITULACIONES_USUARIO "
+				+ "	SET FLGVALIDADA = 'S', FECHA_VALIDADA = ?"
+				+ " WHERE BEPTUS_TIT_CODNUM = ? AND BEPTUS_USU_CODNUM = ?";
+		try (Connection conexion = ConexionUvirtual.obtenerInstancia(); PreparedStatement stmt = conexion.prepareStatement(consulta);) {
+			int parameterIndex = 1;
+			stmt.setDate(parameterIndex++, new java.sql.Date(date.getTime()));
+			stmt.setInt(parameterIndex++, titulacion.getTitulacion().getCodNum());
+			stmt.setInt(parameterIndex++, candidato.getCodNum());
+			stmt.executeUpdate();
+		}
+	}
+	
+	/**
+	 * Valida una titulación a false .
+	 * @param titulacion .
+	 * @param candidato .
+	 * @throws SQLException .
+	 * @throws UVException .
+	 */
+	public void desvalidaTitulacion(TitulacionUsuario titulacion, UsuarioBolsaEmpleo candidato) throws SQLException, UVException {
+		if (titulacion == null) {
+			throw new UVException("titulación obligatoria");
+		}
+		if (titulacion.getCodNum() == null) {
+			throw new UVException("id titulación no válido");
+		}
+		if (candidato == null) {
+			throw new UVException("candidato obligatorio");
+		}
+		if (candidato.getCodNum() == null) {
+			throw new UVException("id usuario no válido");
+		}
+		
+		String consulta = "UPDATE TBEP_TITULACIONES_USUARIO "
+				+ " SET FLGVALIDADA='N', FECHA_VALIDADA=null"
+				+ " WHERE BEPTUS_TIT_CODNUM = ? AND BEPTUS_USU_CODNUM = ?";
+		try (Connection conexion = ConexionUvirtual.obtenerInstancia(); PreparedStatement stmt = conexion.prepareStatement(consulta);) {
+			int parameterIndex = 1;
+			stmt.setInt(parameterIndex++, titulacion.getTitulacion().getCodNum());
+			stmt.setInt(parameterIndex++, candidato.getCodNum());
 			stmt.executeUpdate();
 		}
 	}

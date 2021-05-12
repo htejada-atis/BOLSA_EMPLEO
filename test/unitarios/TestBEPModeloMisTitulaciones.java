@@ -24,6 +24,7 @@ import bbdd.UtilsTestBolsaEmpleo;
 import es.ujaen.uvirtual.modelo.conexion.Conexion;
 import es.ujaen.uvirtual.modulo.bolsaempleo.beans.Rol;
 import es.ujaen.uvirtual.modulo.bolsaempleo.beans.Titulacion;
+import es.ujaen.uvirtual.modulo.bolsaempleo.beans.TitulacionUsuario;
 import es.ujaen.uvirtual.modulo.bolsaempleo.beans.UsuarioBolsaEmpleo;
 import es.ujaen.uvirtual.modulo.bolsaempleo.modelo.ModeloMisTitulaciones;
 import es.ujaen.uvirtual.utilidades.UVException;
@@ -70,7 +71,7 @@ public class TestBEPModeloMisTitulaciones {
      */
     @Test
     public void testA01InsertaUsuario() throws SQLException, ParseException, UVException, IOException {
-    	Titulacion titulacion = new Titulacion();
+    	TitulacionUsuario titulacion = new TitulacionUsuario();
     	titulacion.setCodNum(CODNUM_TITULACION);
     	titulacion.setTitulacion(TITULACION);
     	USUARIO.setCodNum(CODNUM);
@@ -80,17 +81,17 @@ public class TestBEPModeloMisTitulaciones {
 		ModeloMisTitulaciones modelo = ModeloMisTitulaciones.obtenerInstancia();
     	modelo.insertaTitulacionUsuario(titulacion);
     	
-    	Titulacion titulacionCont = modelo.listaTitulacion(titulacion.getCodNum());
-    	List<Titulacion> titulaciones = modelo.listaTitulaciones();
+    	TitulacionUsuario titulacionCont = modelo.listaTitulacionUsuario(titulacion.getCodNum());
+    	List<TitulacionUsuario> titulaciones = modelo.listaTitulacionesUsuarios("");
     	Boolean eje = false;
     	
-        for (Titulacion tit : titulaciones) {
+        for (TitulacionUsuario tit : titulaciones) {
             if (tit.getCodNum().equals(titulacionCont.getCodNum())) {
             	eje = true;
             }
         }
     	
-    	assertTrue("titulacion insertada debe ser listado", eje);
+    	assertTrue("titulacion de usuario insertada debe ser listado", eje);
     }
 
     /** test acierto borrar titulacion usuario.
@@ -101,13 +102,13 @@ public class TestBEPModeloMisTitulaciones {
     public void testA02BorraTitulacion() throws SQLException, UVException {
     	ModeloMisTitulaciones modelo = ModeloMisTitulaciones.obtenerInstancia();
     	
-    	List<Titulacion> titulaciones = modelo.listaTitulaciones();
-    	Titulacion titulacion = titulaciones.get(0);
+    	List<TitulacionUsuario> titulaciones = modelo.listaTitulacionesUsuarios("");
+    	TitulacionUsuario titulacion = titulaciones.get(0);
     	
     	modelo.borraTitulacionUsuario(titulaciones);
     	
-    	List<Titulacion> titulacionesFiltrados = modelo.listaTitulaciones();
-    	Titulacion titulacion2 = titulacionesFiltrados.get(0);
+    	List<TitulacionUsuario> titulacionesFiltrados = modelo.listaTitulacionesUsuarios("");
+    	TitulacionUsuario titulacion2 = titulacionesFiltrados.get(0);
     	
     	Boolean eje = false;
     	
@@ -125,7 +126,7 @@ public class TestBEPModeloMisTitulaciones {
      */
     @Test(expected = UVException.class)
     public void testE01InsertaTitulacionNull() throws SQLException, UVException, IOException {
-    	Titulacion titulacion = null;
+    	TitulacionUsuario titulacion = null;
     	ModeloMisTitulaciones modelo = ModeloMisTitulaciones.obtenerInstancia();
     	modelo.insertaTitulacionUsuario(titulacion);
     	fail();

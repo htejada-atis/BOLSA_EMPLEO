@@ -215,6 +215,10 @@ public class ControladorGestionEvaluadores extends HttpServlet {
 			modeloEvaluador.insertaEvaluador(usu, idArea);
 			List<Area> areas = ModeloArea.obtenerInstancia().listaAreas();
 			bean.setAreas(areas);
+			
+			Area area = ModeloArea.obtenerInstancia().getAreaById(idArea);
+			bean.setArea(area);
+			
 			bean.getMensajesDeExito().add(MENSAJE_EXITO_AGREGAR_EVALUADORES);
 			bean.setVista(JSP_INDEX);
 
@@ -237,6 +241,7 @@ public class ControladorGestionEvaluadores extends HttpServlet {
 				
 				List<Area> areas = ModeloArea.obtenerInstancia().listaAreas();
 				bean.setAreas(areas);
+
 				bean.getMensajesDeExito().add(MENSAJE_EXITO_AGREGAR_EVALUADORES);
 			} catch (UVException ex) {
 				throw new UVException("No existe el evaluador en el sistema, primero debe crearlo");

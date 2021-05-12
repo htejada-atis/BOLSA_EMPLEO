@@ -265,7 +265,7 @@ public class ModeloUsuarioBolsaEmpleo {
 			throw new UVException("El usuario está borrado de la bolsa de empleo");
 		}
 		
-		if (Boolean.TRUE.equals( usuarioBolsa.getExcluido())) {
+		if (Boolean.TRUE.equals(usuarioBolsa.getExcluido())) {
 			throw new UVException("El usuario está excluido de la bolsa de empleo");			
 		}
 		
@@ -609,7 +609,6 @@ public class ModeloUsuarioBolsaEmpleo {
 		usuario.setNombre(rsArcos.getString("STRNOMBRE"));
 		usuario.setPrimerApellido(rsArcos.getString("STRAPELLIDO1"));
 		usuario.setSegundoApellido(rsArcos.getString("STRAPELLIDO2"));
-		//usuario.setTelefono(rsArcos.getString("TELEFONO"));
 		//usuario.setSexo(rsArcos.getString("SEXO"));
 		
 		usuario.setCodNum(rs.getInt("CODNUM"));
@@ -619,6 +618,7 @@ public class ModeloUsuarioBolsaEmpleo {
 		usuario.setLocalidad(rs.getString("LOCALIDAD"));
 		usuario.setProvincia(rs.getString("PROVINCIA"));
 		usuario.setNacionalidad(rs.getString("NACIONALIDAD"));
+		usuario.setTelefono(rs.getString("TELEFONO"));
 		usuario.setRol(modeloRol.getRoleById(rs.getInt("ROL")));
 		usuario.setListaDist(rs.getString("FLGLISTADISTRIBUCION").equals("S"));
 		usuario.setExcluido(rs.getString("FLGEXCLUIDO").equals("S"));
@@ -839,7 +839,7 @@ public class ModeloUsuarioBolsaEmpleo {
 		}
 		
 		String consulta = "UPDATE tbep_usuarios "
-			+ " SET DIRECCION=?, CODIGOPOSTAL=?, LOCALIDAD=?, PROVINCIA=?, NACIONALIDAD=?, FLGLISTADISTRIBUCION=?"
+			+ " SET DIRECCION=?, CODIGOPOSTAL=?, LOCALIDAD=?, PROVINCIA=?, NACIONALIDAD=?, TELEFONO=?, FLGLISTADISTRIBUCION=?"
 			+ " WHERE codnum=?";
 		try (Connection conexion = ConexionUvirtual.obtenerInstancia();
 			PreparedStatement stmt = conexion.prepareStatement(consulta);) {
@@ -849,6 +849,7 @@ public class ModeloUsuarioBolsaEmpleo {
 			stmt.setString(parameterIndex++, usuario.getLocalidad());
 			stmt.setString(parameterIndex++, usuario.getProvincia());
 			stmt.setString(parameterIndex++, usuario.getNacionalidad());
+			stmt.setString(parameterIndex++, usuario.getTelefono());
 			stmt.setString(parameterIndex++, usuario.getListaDist() ? "S" : "N");
 			stmt.setInt(parameterIndex++, usuario.getCodNum());
 			stmt.executeUpdate();

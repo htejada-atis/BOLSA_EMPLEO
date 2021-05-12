@@ -19,7 +19,7 @@ VistaUsuarioBolsaEmpleo bean = (VistaUsuarioBolsaEmpleo) uvdatos.getVistas().get
 		<div id="error" class="error">
 			<%= bean.formatearMensajesDeError() %>
 		</div>
-	<% } else { %>
+	<% } %>
 	
 	<div class="titulo-bolsa-empleo" style="float:right; margin-top:1.2rem">
 		<a class="link-btn" id="nuevo_usuario" href="<%= request.getRequestURI() %>" style="margin-top:0">Nuevo candidato</a>
@@ -50,7 +50,6 @@ VistaUsuarioBolsaEmpleo bean = (VistaUsuarioBolsaEmpleo) uvdatos.getVistas().get
 			</tr>
 		</tfoot>
 	</table>
-	<% } %>
 </div>
 	
 <script>
@@ -96,7 +95,7 @@ $(document).ready(function() {
         	}},
         	{'data': 'codnum', 'buttons': [
         		{'label': 'Editar', 'onClick': function(row) {
-        				var params = {'a': '<%= ControladorUsuarioCandidato.ACCION_EDITAR_USUARIO %>', '<%= ControladorUsuarioCandidato.PARAM_NOMBRE_USUARIO %>': row.codcuenta};
+        				var params = {'a': '<%= ControladorUsuarioCandidato.ACCION_EDITAR_USUARIO_FORM %>', '<%= ControladorUsuarioCandidato.PARAM_NOMBRE_USUARIO %>': row.codcuenta};
         				Atis.sendForm("<%= request.getRequestURI() %>", params);
         			}
         		},

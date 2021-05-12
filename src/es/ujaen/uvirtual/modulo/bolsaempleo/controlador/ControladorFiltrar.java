@@ -21,6 +21,7 @@ import es.ujaen.uvirtual.beans.UVDatos;
 import es.ujaen.uvirtual.beans.Usuario;
 import es.ujaen.uvirtual.modulo.bolsaempleo.beans.Candidato;
 import es.ujaen.uvirtual.modulo.bolsaempleo.beans.Titulacion;
+import es.ujaen.uvirtual.modulo.bolsaempleo.beans.TitulacionUsuario;
 import es.ujaen.uvirtual.modulo.bolsaempleo.beans.UsuarioBolsaEmpleo;
 import es.ujaen.uvirtual.modulo.bolsaempleo.modelo.ModeloCandidato;
 import es.ujaen.uvirtual.modulo.bolsaempleo.modelo.ModeloMisTitulaciones;
@@ -176,13 +177,13 @@ public class ControladorFiltrar extends HttpServlet {
 	private void seleccionarCandidato(VistaFiltrar bean, HttpServletRequest request) throws UVException, SQLException {
 		bean.setVista(JSP_INDEX);
 		
-		ModeloTitulacion modeloTitulacion = ModeloTitulacion.obtenerInstancia();
+		ModeloMisTitulaciones modeloTitulacion = ModeloMisTitulaciones.obtenerInstancia();
 		ModeloUsuarioBolsaEmpleo modeloUsuario = ModeloUsuarioBolsaEmpleo.obtenerInstancia();
 		
 		UsuarioBolsaEmpleo candidato = modeloUsuario.getUsuarioById(Formateador.leeParametroInteger(request.getParameter(PARAM_CANDIDATO)));
 		bean.setCandidato(candidato);
 		
-		List<Titulacion> listaValidadas = modeloTitulacion.listaTitulacionesValidadasCandidato(candidato.getCodNum());
+		List<TitulacionUsuario> listaValidadas = modeloTitulacion.listaTitulacionesValidadasCandidato(candidato.getCodNum());
 		bean.setValidadas(listaValidadas);
 	}
 	
@@ -198,7 +199,7 @@ public class ControladorFiltrar extends HttpServlet {
 	 */
 	private void seleccionarTitulacion(VistaFiltrar bean, UVDatos datos, HttpServletRequest request, HttpServletResponse response, boolean seleccionado)
 			throws IOException, UVException, SQLException {
-		ModeloTitulacion modeloTitulacion = ModeloTitulacion.obtenerInstancia();
+		ModeloMisTitulaciones modeloTitulacion = ModeloMisTitulaciones.obtenerInstancia();
 		ModeloUsuarioBolsaEmpleo modeloUsuario = ModeloUsuarioBolsaEmpleo.obtenerInstancia();
 		datos.setContentType(RESPONSE_AJAX_CONTENTTYPE);
 		datos.setRespuestaEnviada(true);
@@ -207,7 +208,7 @@ public class ControladorFiltrar extends HttpServlet {
 		
 		try (PrintWriter writer = response.getWriter()) {
 			try {
-				Titulacion titulacion = modeloTitulacion.getTitulacionById(Formateador.leeParametroInteger(request.getParameter(PARAM_TITULACION)));
+				TitulacionUsuario titulacion = modeloTitulacion.listaTitulacionUsuario(Formateador.leeParametroInteger(request.getParameter(PARAM_TITULACION)));
 				bean.setTitulacion(titulacion);
 				UsuarioBolsaEmpleo candidato = modeloUsuario.getUsuarioById(Formateador.leeParametroInteger(request.getParameter(PARAM_CANDIDATO)));
 				bean.setCandidato(candidato);
@@ -288,7 +289,7 @@ public class ControladorFiltrar extends HttpServlet {
 		try (PrintWriter writer = response.getWriter()) {
 			try {
 				Integer candidato = Formateador.leeParametroInteger(request.getParameter(PARAM_CANDIDATO));
-				BolsaEmpleoDataTable<Titulacion> dataTable = modelo.listaTitulacionesUsuarioDatatable(request.getParameterMap(), candidato);
+				BolsaEmpleoDataTable<TitulacionUsuario> dataTable = modelo.listaTitulacionesUsuarioDatatable(request.getParameterMap(), candidato);
 				bean.setDatatableTitulaciones(dataTable);
 				Gson gson = new GsonBuilder().setExclusionStrategies(BolsaEmpleoDataTable.GSONEXCLUSIONSTRATEGY).create();
 				writer.write(gson.toJson(dataTable));
@@ -314,7 +315,7 @@ public class ControladorFiltrar extends HttpServlet {
 			throws SQLException, UVException, IOException {
 		ModeloMisTitulaciones modelo = ModeloMisTitulaciones.obtenerInstancia();
 		if (EscapaHTML.ajustaCodificacion(request.getParameter(PARAM_FICHERO)) != null) {
-			Titulacion titulacion = modelo.listaTitulacionUsuario(Formateador.leeParametroInteger(request.getParameter(PARAM_FICHERO)));
+			TitulacionUsuario titulacion = modelo.listaTitulacionUsuario(Formateador.leeParametroInteger(request.getParameter(PARAM_FICHERO)));
 			bean.setTitulacion(titulacion);
 			
 			response.setContentType("application/pdf");

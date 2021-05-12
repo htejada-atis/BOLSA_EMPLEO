@@ -118,32 +118,6 @@ public class ModeloTitulacion {
 		return titulaciones;
 	}
 	
-	/** lista todas las titulaciones validadas del candidato .
-	 * @param usuario .
-	 * @return lista de todas las titulaciones .
-	 * @throws SQLException si hay un error en la base de datos .
-	 */
-	public List<Titulacion> listaTitulacionesValidadasCandidato(Integer usuario) throws SQLException {
-		List<Titulacion> titulaciones = new ArrayList<>();
-		String consulta = "SELECT beptit.* FROM TBEP_TITULACIONES beptit"
-				+ " INNER JOIN TBEP_TITULACIONES_USUARIO beptus ON beptus.BEPTUS_TIT_CODNUM = beptit.CODNUM"
-				+ " WHERE beptus.BEPTUS_USU_CODNUM = ? AND beptus.FLGVALIDADA = 'S'";
-		
-		try (Connection conexion = ConexionUvirtual.obtenerInstancia(); PreparedStatement stmt = conexion.prepareStatement(consulta);) {
-			int parameterIndex = 1;
-			stmt.setInt(parameterIndex++, usuario);
-			try (ResultSet rs = stmt.executeQuery()) {
-				while (rs.next()) {
-					Titulacion tit = new Titulacion();
-					tit.setCodNum(rs.getInt("CODNUM"));
-					tit.setNombre(rs.getString("NOMBRE"));
-					titulaciones.add(tit);
-				}
-			}
-		}
-		return titulaciones;
-	}
-	
 	/** obtiene una titulación a partir de su id.
 	 * @param id codigo de la titulación
 	 * @return titulación con el id especificado
@@ -181,72 +155,6 @@ public class ModeloTitulacion {
 			int parameterIndex = 1;
 			stmt.setString(parameterIndex++, titulacion.getNombre());
 			stmt.setInt(parameterIndex++, titulacion.getCodNum());
-			stmt.executeUpdate();
-		}
-	}
-	
-	/**
-	 * Valida una titulación .
-	 * @param titulacion .
-	 * @param candidato .
-	 * @param date .
-	 * @throws SQLException .
-	 * @throws UVException .
-	 */
-	public void validaTitulacion(Titulacion titulacion, UsuarioBolsaEmpleo candidato, java.util.Date date) throws SQLException, UVException {
-		if (titulacion == null) {
-			throw new UVException("titulación obligatoria");
-		}
-		if (titulacion.getCodNum() == null) {
-			throw new UVException("id titulación no válido");
-		}
-		if (candidato == null) {
-			throw new UVException("candidato obligatorio");
-		}
-		if (candidato.getCodNum() == null) {
-			throw new UVException("id usuario no válido");
-		}
-		
-		String consulta = "UPDATE TBEP_TITULACIONES_USUARIO "
-				+ "	SET FLGVALIDADA = 'S', FECHA_VALIDADA = ?"
-				+ " WHERE BEPTUS_TIT_CODNUM = ? AND BEPTUS_USU_CODNUM = ?";
-		try (Connection conexion = ConexionUvirtual.obtenerInstancia(); PreparedStatement stmt = conexion.prepareStatement(consulta);) {
-			int parameterIndex = 1;
-			stmt.setDate(parameterIndex++, new Date(date.getTime()));
-			stmt.setInt(parameterIndex++, titulacion.getCodNum());
-			stmt.setInt(parameterIndex++, candidato.getCodNum());
-			stmt.executeUpdate();
-		}
-	}
-	
-	/**
-	 * Valida una titulación a false .
-	 * @param titulacion .
-	 * @param candidato .
-	 * @throws SQLException .
-	 * @throws UVException .
-	 */
-	public void desvalidaTitulacion(Titulacion titulacion, UsuarioBolsaEmpleo candidato) throws SQLException, UVException {
-		if (titulacion == null) {
-			throw new UVException("titulación obligatoria");
-		}
-		if (titulacion.getCodNum() == null) {
-			throw new UVException("id titulación no válido");
-		}
-		if (candidato == null) {
-			throw new UVException("candidato obligatorio");
-		}
-		if (candidato.getCodNum() == null) {
-			throw new UVException("id usuario no válido");
-		}
-		
-		String consulta = "UPDATE TBEP_TITULACIONES_USUARIO "
-				+ " SET FLGVALIDADA='N', FECHA_VALIDADA=null"
-				+ " WHERE BEPTUS_TIT_CODNUM = ? AND BEPTUS_USU_CODNUM = ?";
-		try (Connection conexion = ConexionUvirtual.obtenerInstancia(); PreparedStatement stmt = conexion.prepareStatement(consulta);) {
-			int parameterIndex = 1;
-			stmt.setInt(parameterIndex++, titulacion.getCodNum());
-			stmt.setInt(parameterIndex++, candidato.getCodNum());
 			stmt.executeUpdate();
 		}
 	}
@@ -535,6 +443,39 @@ public class ModeloTitulacion {
 	 * @throws SQLException .
 	 */
 	public Titulacion getTitulacionById(Integer codNum) throws SQLException, UVException {
+		if (codNum == null) {
+			throw new UVException(ERROR_TITULACION_REQUERIDA);
+		} 
+		
+		String consulta = "SELECT beptit.* FROM TBEP_TITULACIONES beptit WHERE beptit.CODNUM = ?";
+		
+		try (Connection con = ConexionUvirtual.obtenerInstancia(); PreparedStatement stmt = con.prepareStatement(consulta);) {
+			int parameterIndex = 1;
+			stmt.setInt(parameterIndex++, codNum);
+			
+			try (ResultSet rs = stmt.executeQuery()) {
+				while (rs.next()) {
+					Titulacion t = new Titulacion();
+					t.setCodNum(rs.getInt("CODNUM"));
+					t.setNombre(rs.getString("NOMBRE"));
+					
+					return t;
+				}
+			}
+		}
+		
+		throw new UVException(ERROR_TITULACION_NOEXITE);	
+	}
+	
+	
+	/**
+	 * Devuelve una titulación de usuario por su código.
+	 * @param codNum .
+	 * @return .
+	 * @throws UVException .
+	 * @throws SQLException .
+	 */
+	public Titulacion getTitulacionUsuarioById(Integer codNum) throws SQLException, UVException {
 		if (codNum == null) {
 			throw new UVException(ERROR_TITULACION_REQUERIDA);
 		} 

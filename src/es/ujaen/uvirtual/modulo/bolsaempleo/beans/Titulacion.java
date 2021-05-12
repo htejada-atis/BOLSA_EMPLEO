@@ -1,6 +1,5 @@
 package es.ujaen.uvirtual.modulo.bolsaempleo.beans;
 
-import java.io.InputStream;
 import java.io.Serializable;
 
 
@@ -13,11 +12,6 @@ public class Titulacion implements Serializable {
 	private static final long serialVersionUID = 1L;
 	private Integer codNum;
 	private String nombre;
-	private String descripcion;
-	private InputStream archivo;
-	private Titulacion titulacion;
-	private UsuarioBolsaEmpleo usuario;
-	private Boolean borrado;
 
 	
 	/** Constructor por defecto.
@@ -74,50 +68,6 @@ public class Titulacion implements Serializable {
 
 	public void setNombre(String nombre) {
 		this.nombre = nombre;
-	}
-	
-	public String getDescripcion() {
-		return descripcion;
-	}
-
-	public void setDescripcion(String descripcion) {
-		this.descripcion = descripcion;
-	}
-
-	public static long getSerialversionuid() {
-		return serialVersionUID;
-	}
-	
-	public InputStream getArchivo() {
-		return archivo;
-	}
-	
-	public void setArchivo(InputStream archivo) {
-		this.archivo = archivo;
-	}
-	
-	public Titulacion getTitulacion() {
-		return titulacion;
-	}
-	
-	public void setTitulacion(Titulacion titulacion) {
-		this.titulacion = titulacion;
-	}
-	
-	public UsuarioBolsaEmpleo getUsuario() {
-		return usuario;
-	}
-	
-	public void setUsuario(UsuarioBolsaEmpleo usuario) {
-		this.usuario = usuario;
-	}
-	
-	public Boolean getBorrado() {
-		return borrado;
-	}
-	
-	public void setBorrado(Boolean borrado) {
-		this.borrado = borrado;
 	}
 	
 	@Override

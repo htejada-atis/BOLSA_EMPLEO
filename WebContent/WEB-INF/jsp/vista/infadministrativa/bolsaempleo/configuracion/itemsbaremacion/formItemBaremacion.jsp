@@ -50,6 +50,8 @@ if(item!=null){
 	
 	<h2><%=item != null ? "Editar item" : "Nuevo item"%></h2>
 	
+	<p>Las etiquetas en <b>negrita</b> corresponden a campos de relleno obligatorio</p>
+	
     <form id="actualizar_item" class="be-form" method="post" action="<%=request.getRequestURI()%>">
     	<input type="hidden" name="<%=ControladorItemsBaremacion.PARAM_ACCION%>" id="accion_formulario"
     		   value="<%=item != null ? ControladorItemsBaremacion.ACCION_EDITAR_ITEM_CONFIRM : ControladorItemsBaremacion.ACCION_AGREGAR_ITEM_CONFIRM%>" /> 
@@ -65,14 +67,16 @@ if(item!=null){
 		</div>
 		<div class="form-group-container col2">
 			<div class="form-group">
-	    		<label for="bloque_codigo">Código</label>
+	    		<label for="bloque_codigo" class="bold-label">Código</label>
 	    		<input class="form-input-custom" type="text" name="<%=ControladorItemsBaremacion.PARAM_ITEM_CODIGO%>" id="bloque_codigo" 
-	    			   value="<%=BolsaEmpleoUtils.getParamForm(request, ControladorItemsBaremacion.PARAM_ITEM_CODIGO, item != null ? item.getCodigo() : bean.getUltimoCodigo())%>"/>
+	    			   value="<%=BolsaEmpleoUtils.getParamForm(request, ControladorItemsBaremacion.PARAM_ITEM_CODIGO, item != null ? item.getCodigo() : bean.getUltimoCodigo())%>"
+	    			   required/>
 	    	</div>
 	    	<div class="form-group">
-	    		<label for="bloque_nombre">Nombre</label>
+	    		<label for="bloque_nombre" class="bold-label">Nombre</label>
 	    		<input class="form-input-custom" type="text" name="<%=ControladorItemsBaremacion.PARAM_ITEM_NOMBRE%>" id="bloque_nombre" 
-	    			   value="<%=BolsaEmpleoUtils.getParamForm(request, ControladorItemsBaremacion.PARAM_ITEM_NOMBRE, item != null ? item.getNombre() : "")%>"/>
+	    			   value="<%=BolsaEmpleoUtils.getParamForm(request, ControladorItemsBaremacion.PARAM_ITEM_NOMBRE, item != null ? item.getNombre() : "")%>"
+	    			   required/>
 	    	</div>
 		</div>
 		
@@ -89,29 +93,32 @@ if(item!=null){
 				<%
 				String unidadesSelected = BolsaEmpleoUtils.getParamForm(request, ControladorItemsBaremacion.PARAM_ITEM_UNIDADES, item != null ? item.getUnidades() : ModeloBaremacionItems.ITEM_UNIDADES_MEDICION_ENTERO);
 				%>
-	    		<label for="item_unidades">Unidades</label>
-	    		<select class="params" id="item_unidades" name="<%=ControladorItemsBaremacion.PARAM_ITEM_UNIDADES%>" style="width:100%;">
+	    		<label for="item_unidades" class="bold-label">Unidades</label>
+	    		<select class="params" id="item_unidades" name="<%=ControladorItemsBaremacion.PARAM_ITEM_UNIDADES%>" style="width:100%;"required>
 					<option value="<%=ModeloBaremacionItems.ITEM_UNIDADES_MEDICION_ENTERO%>" <%=unidadesSelected.equals(ModeloBaremacionItems.ITEM_UNIDADES_MEDICION_ENTERO) ? "selected=\"selected\"" : ""%>>Entero</option>
 					<option value="<%=ModeloBaremacionItems.ITEM_UNIDADES_MEDICION_DECIMAL%>" <%=unidadesSelected.equals(ModeloBaremacionItems.ITEM_UNIDADES_MEDICION_DECIMAL) ? "selected=\"selected\"" : ""%>>Decimal</option>
 					<option value="<%=ModeloBaremacionItems.ITEM_UNIDADES_MEDICION_SINO%>" <%=unidadesSelected.equals(ModeloBaremacionItems.ITEM_UNIDADES_MEDICION_SINO) ? "selected=\"selected\"" : ""%>>Si ó No</option>				
 				</select>				
 	    	</div>
 	    	<div class="form-group">
-	    		<label for="item_valor">Valor unitario</label>
+	    		<label for="item_valor" class="bold-label">Valor unitario</label>
 	    		<input class="form-input-custom" type="text" name="<%= ControladorItemsBaremacion.PARAM_ITEM_VALOR %>" id="item_valor" 
-	    			   value="<%= BolsaEmpleoUtils.getParamForm(request, ControladorItemsBaremacion.PARAM_ITEM_VALOR, item != null ? item.getValor().toString() : "") %>"/>
+	    			   value="<%= BolsaEmpleoUtils.getParamForm(request, ControladorItemsBaremacion.PARAM_ITEM_VALOR, item != null ? item.getValor().toString() : "") %>"
+	    			   required/>
 	    	</div>	  	    	
 		</div>
 		<div class="form-group-container col2">
 			<div class="form-group">
-	    		<label for="bloque_valor_minimo">Valor mínimo</label>
+	    		<label for="bloque_valor_minimo" class="bold-label">Valor mínimo</label>
 	    		<input class="form-input-custom" type="text" name="<%= ControladorItemsBaremacion.PARAM_ITEM_VALOR_MINIMO %>" id="bloque_valor_minimo" 
-	    			   value="<%= BolsaEmpleoUtils.getParamForm(request, ControladorItemsBaremacion.PARAM_ITEM_VALOR_MINIMO, item != null ? item.getValorMinimo().toString() : "0.1") %>"/>
+	    			   value="<%= BolsaEmpleoUtils.getParamForm(request, ControladorItemsBaremacion.PARAM_ITEM_VALOR_MINIMO, item != null ? item.getValorMinimo().toString() : "0.1") %>"
+	    			   required/>
 	    	</div>
 	    	<div class="form-group">
-	    		<label for="bloque_valor_maximo">Valor máximo</label>
+	    		<label for="bloque_valor_maximo" class="bold-label">Valor máximo</label>
 	    		<input class="form-input-custom" type="text" name="<%= ControladorItemsBaremacion.PARAM_ITEM_VALOR_MAXIMO %>" id="bloque_valor_maximo" 
-	    			   value="<%= BolsaEmpleoUtils.getParamForm(request, ControladorItemsBaremacion.PARAM_ITEM_VALOR_MAXIMO, item != null ? item.getValorMaximo().toString() : "1000") %>"/>
+	    			   value="<%= BolsaEmpleoUtils.getParamForm(request, ControladorItemsBaremacion.PARAM_ITEM_VALOR_MAXIMO, item != null ? item.getValorMaximo().toString() : "1000") %>"
+	    			   required/>
 	    	</div>
 		</div>
 		<div class="form-group-container col2">
@@ -119,8 +126,8 @@ if(item!=null){
 	    		<%
 					String afinidadSelected = BolsaEmpleoUtils.getParamForm(request, ControladorItemsBaremacion.PARAM_ITEM_AFINIDAD, item != null && item.getAfinidad() != null ? item.getAfinidad() : "N");
 				%>
-	    		<label for="item_afinida">Afinidad</label>	    		
-	    		<select class="params" id="item_afinida" name="<%= ControladorItemsBaremacion.PARAM_ITEM_AFINIDAD %>" style="width:100%;">
+	    		<label for="item_afinida" class="bold-label">Afinidad</label>	    		
+	    		<select class="params" id="item_afinida" name="<%= ControladorItemsBaremacion.PARAM_ITEM_AFINIDAD %>" style="width:100%;" required>
 					<option value="N" <%= afinidadSelected.equals("N") ? "selected=\"selected\"" : "" %>>N</option>
 					<% for (String afinidad: bean.getAfinidades()) { %>
 						<option value="<%=afinidad%>" <%= afinidadSelected.equals(afinidad) ? "selected=\"selected\"" : "" %>><%=afinidad%></option>					
@@ -216,7 +223,7 @@ if(item!=null){
 		    		return row.bloque.apartado.codigo + "." + row.bloque.codigo + "." + row.codigo;
 		    	}},
 		        {'data': 'nombre', 'filter': true},
-		        {'data': 'activo', 'filter': {'type': 'selectBoolean', 'true': 'Activo', 'false': 'Inactivo'}, 'render': function(row) {
+		        {'data': 'activo', 'filter': {'type': 'select', 'options':{'true': 'Activo', 'false': 'Inactivo'}, 'optionDefault': 'true'}, 'render': function(row) {
 	        		if(row.activo){
 	        			return "<div class='circle-true'></div>"; 
 	        		}

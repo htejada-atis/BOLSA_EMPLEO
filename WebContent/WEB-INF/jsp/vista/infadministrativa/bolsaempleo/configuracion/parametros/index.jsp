@@ -28,6 +28,8 @@ VistaParametrosConfiguracion bean = (VistaParametrosConfiguracion) uvdatos.getVi
 		<h2>Parámetros de configuración</h2>
 	</div>
 	
+	 <p>Las etiquetas en <b>negrita</b> corresponden a campos de relleno obligatorio</p>
+	
 	<form id="actualizar_usuario" class="be-form" method="post" action="<%= request.getRequestURI() %>">
     	<input type="hidden" name="<%= ControladorParametrosConfiguracion.PARAM_ACCION %>" id="accion_formulario" value="<%= ControladorParametrosConfiguracion.ACCION_EDITAR_PARAMETROS %>" />
 		
@@ -40,18 +42,23 @@ VistaParametrosConfiguracion bean = (VistaParametrosConfiguracion) uvdatos.getVi
 				<div class="form-group-container col2">
 					<div class="form-group">
 	   					<div class="form-group">
-    						<label for="nombre">Nombre: </label>
-    						<input class="form-input-custom" id="nombre" type="text" name="<%= param.getNombre() + ControladorParametrosConfiguracion.PARAM_NOMBRE %>" value="<%= param.getNombre() %>" disabled/>
+    						<label for="nombre" class="bold-label">Nombre: </label>
+    						<input class="form-input-custom" id="nombre" type="text" name="<%= param.getNombre() + ControladorParametrosConfiguracion.PARAM_NOMBRE %>" 
+    								value="<%= param.getNombre() %>"
+    								disabled
+    								required/>
     					</div>
 	   					<div class="form-group">
-    						<label for="nombre">Valor: </label>
-    						<input class="form-input-custom" id="valor" type="text" name="<%= param.getNombre() + ControladorParametrosConfiguracion.PARAM_VALOR%>" value="<%= param.getValor() %>"/>
+    						<label for="nombre" class="bold-label">Valor: </label>
+    						<input class="form-input-custom" id="valor" type="text" name="<%= param.getNombre() + ControladorParametrosConfiguracion.PARAM_VALOR%>" 
+    								value="<%= param.getValor() %>"
+    								required/>
     					</div>
     				</div>
 		
 					<div class="form-group">
     					<label for="razon_exclusion">Descripción: </label>
-    					<textarea class="params form-input-custom" id="descripcion" name="<%= param.getNombre() + ControladorParametrosConfiguracion.PARAM_DESCRIPCION %>" rows="6" cols="60"><%= param.getDescripcion() %></textarea>
+    					<textarea class="params form-input-custom" id="descripcion" name="<%= param.getNombre() + ControladorParametrosConfiguracion.PARAM_DESCRIPCION %>" rows="6" cols="60"><%=param.getDescripcion() != null ? param.getDescripcion() : ""%></textarea>
    					</div>
    				</div>
 			<% } %>
@@ -64,15 +71,3 @@ VistaParametrosConfiguracion bean = (VistaParametrosConfiguracion) uvdatos.getVi
     </form>
 
 </div>
-
-<script>
-
-	$(document).ready(function() {				
-		document.getElementById("parametro_enviar").addEventListener("click", function(event) {
-			event.preventDefault();
-
-			this.form.submit();
-		});
-	})
-
-</script>

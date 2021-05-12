@@ -43,9 +43,19 @@ VistaEvaluadores bean = (VistaEvaluadores) uvdatos.getVistas().get(VistaEvaluado
 					<label>Área</label>
 					<select id="select_area">
 						<option value="0">Elija el área</option>
-						<% for(Area area: bean.getAreas()) { %>
-	    					<option value="<%=area.getCodNum()%>"><%=area.getDescripcion()%></option>
-	    				<% } %>
+	    				<%for(Area area: bean.getAreas()){
+	    					if(bean.getArea()!=null){
+	            				if(bean.getArea().getCodNum().equals(area.getCodNum())){%>
+	        						<option value="<%=area.getCodNum()%>" selected="selected"><%=area.getDescripcion()%></option>
+	        					<%}
+	    						else{%>
+									<option value="<%=area.getCodNum()%>"><%=area.getDescripcion()%></option>
+								<%}
+	    					}
+							else{%>
+								<option value="<%=area.getCodNum()%>"><%=area.getDescripcion()%></option>
+							<%}
+						}%>
 					</select>
 				</div>
 			</div>
