@@ -57,7 +57,7 @@ public class ControladorConvocatorias extends HttpServlet {
 	public static final String PARAM_CONVOCATORIA_NUMEROMERITOSPORBLOQUE = "numMeritosPorBloque";
 	
 	// acciones
-	public static final String ACCION_LISTAR_CONVOCATORIAS = "listar";
+	public static final String ACCION_INDEX = "listar";
 	public static final String ACCION_DATATABLE = "datatable";
 	public static final String ACCION_FORMULARIO_CONVOCATORIA = "formConvocatoria";
 	public static final String ACCION_AGREGAR_CONVOCATORIA = "addConvocatoria";
@@ -117,13 +117,13 @@ public class ControladorConvocatorias extends HttpServlet {
 				
 		String nombreAccion = EscapaHTML.ajustaCodificacion(request.getParameter(PARAM_ACCION));		
 		if (nombreAccion == null) {
-			nombreAccion = ACCION_LISTAR_CONVOCATORIAS;
+			nombreAccion = ACCION_INDEX;
 		}
 		
 		try {
 			init(bean, datos);
 			switch (nombreAccion) {
-				case ACCION_LISTAR_CONVOCATORIAS:
+				case ACCION_INDEX:
 					index(bean);
 					break;
 				case ACCION_DATATABLE:

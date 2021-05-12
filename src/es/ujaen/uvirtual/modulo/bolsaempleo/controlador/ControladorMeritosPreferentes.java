@@ -73,15 +73,17 @@ public class ControladorMeritosPreferentes extends HttpServlet {
 	// mensajes
 	public static final String MENSAJE_ERROR_CODIGO_VACIO = "El código no puede estar vacio";
 	
-	// urls
-	public static final String URL_PATTERN_AJAX = "/srv/es/ajax/informacionadministrativa/bolsaempleo/configuracion/meritospreferentes";
-	
 	// ruta vistas
 	public static final String RUTA_BEP_CONF = "/WEB-INF/jsp/vista/infadministrativa/bolsaempleo/configuracion/meritospreferentes/";
 	public static final String JSP_INDEX = RUTA_BEP_CONF + "indexMeritosPreferentes.jsp";
 	public static final String JSP_FORM = RUTA_BEP_CONF + "formMeritosPreferentes.jsp";
 	
-	public static final int RESPONSE_HTTP_CODE_ERROR = 400;
+	// ajax
+	public static final String URL_PATTERN_AJAX = "/srv/es/ajax/informacionadministrativa/bolsaempleo/configuracion/meritospreferentes";
+	public static final String RESPONSE_AJAX_CONTENTTYPE = "application/json";
+	public static final String RESPONSE_AJAX_ENCODING = "UTF-8";
+	public static final String RESPONSE_AJAX_ERROR = "error";
+	public static final int RESPONSE_AJAX_HTTP_CODE_ERROR = 400;
 	
 	/** Peticion GET.
 	 * @see HttpServlet#doGet(HttpServletRequest request, HttpServletResponse response)
@@ -102,7 +104,7 @@ public class ControladorMeritosPreferentes extends HttpServlet {
 		}
 				
 		try {
-			init(bean, datos);
+			init(bean, datos, request);
 			switch (nombreAccion) {
 				case ACCION_INDEX:
 					indice(bean);
@@ -114,19 +116,19 @@ public class ControladorMeritosPreferentes extends HttpServlet {
 					nuevoMerito(bean);
 					break;
 				case ACCION_NUEVO_MERITO_CONFIRM:
-					nuevoMeritoConfirm(bean, request);
+					nuevoMeritoConfirm(bean, request, response);
 					break;
 				case ACCION_MODIFICAR:
 					editarMerito(bean, request);
 					break;
 				case ACCION_MODIFICAR_MERITO_CONFIRM:
-					editarMeritoConfirm(bean, request);
+					editarMeritoConfirm(bean, request, response);
 					break;
 				case ACCION_ACTIVAR:
-					activarMerito(bean, request);
+					activarMerito(bean, request, response);
 					break;
 				case ACCION_DESACTIVAR:
-					desactivarMerito(bean, request);
+					desactivarMerito(bean, request, response);
 					break;
 				default:
 					errorFatal(bean, "Acción no contemplada");
@@ -152,9 +154,10 @@ public class ControladorMeritosPreferentes extends HttpServlet {
 		}
 	}
 	
-	private void init(VistaMeritosPreferentes bean, UVDatos datos) throws SQLException, UVException {
+	private void init(VistaMeritosPreferentes bean, UVDatos datos, HttpServletRequest request) throws SQLException, UVException {
 		this.indice(bean);
-		ModeloUsuarioBolsaEmpleo.obtenerInstancia().checkUser(datos);
+		BolsaEmpleoUtils.readMensajeSession(bean, request);
+		ModeloUsuarioBolsaEmpleo.obtenerInstancia().checkUser(datos);		
 	}
 	
 	private void errorFatal(VistaMeritosPreferentes bean, String mensaje) {
@@ -176,10 +179,10 @@ public class ControladorMeritosPreferentes extends HttpServlet {
 	
 	private void datatable(VistaMeritosPreferentes bean, UVDatos datos, HttpServletRequest request, HttpServletResponse response) 
 			throws SQLException, UVException, IOException {
-		datos.setContentType("application/json");
+		datos.setContentType(RESPONSE_AJAX_CONTENTTYPE);
 		datos.setRespuestaEnviada(true);
-		response.setContentType("application/json");
-		response.setCharacterEncoding("UTF-8");
+		response.setContentType(RESPONSE_AJAX_CONTENTTYPE);
+		response.setCharacterEncoding(RESPONSE_AJAX_ENCODING);
 		
 		try (PrintWriter writer = response.getWriter()) {
 			try {
@@ -191,9 +194,9 @@ public class ControladorMeritosPreferentes extends HttpServlet {
 			} catch (Exception ex) {
 				bean.getMensajesDeError().add(ex.getMessage());
 				
-				CodigoDescripcion mensaje = new CodigoDescripcion("error", ex.getMessage());
+				CodigoDescripcion mensaje = new CodigoDescripcion(RESPONSE_AJAX_ERROR, ex.getMessage());
 				writer.write(new Gson().toJson(mensaje));
-				response.setStatus(RESPONSE_HTTP_CODE_ERROR);
+				response.setStatus(RESPONSE_AJAX_HTTP_CODE_ERROR);
 			}
 		}
 	}
@@ -206,7 +209,7 @@ public class ControladorMeritosPreferentes extends HttpServlet {
 		bean.setVista(JSP_FORM);		
 	}
 	
-	private void nuevoMeritoConfirm(VistaMeritosPreferentes bean, HttpServletRequest request) throws SQLException, UVException {
+	private void nuevoMeritoConfirm(VistaMeritosPreferentes bean, HttpServletRequest request, HttpServletResponse response) throws SQLException, UVException, IOException {
 		bean.setMeritoPreferente(null);
 		bean.setItemsBaremacion(ModeloBaremacionItems.obtenerInstancia().listaItemBaremacion());
 		bean.setBloqueBaremacion(ModeloBaremacionBloques.obtenerInstancia().listaBloqueBaremacion());
@@ -217,8 +220,9 @@ public class ControladorMeritosPreferentes extends HttpServlet {
 		merito.setActivo(true);
 		
 		ModeloMeritosPreferentes.obtenerInstancia().crearMeritoPreferente(this.validate(merito, request));
-		bean.getMensajesDeExito().add("Mérito preferente añadido correctamente");
-		bean.setVista(JSP_INDEX);
+					
+		BolsaEmpleoUtils.addMensajeDeExito("Mérito preferente añadido correctamente", bean, request);
+		response.sendRedirect(request.getServletPath());
 	}
 	
 	private void editarMerito(VistaMeritosPreferentes bean, HttpServletRequest request) throws SQLException, UVException {
@@ -231,7 +235,7 @@ public class ControladorMeritosPreferentes extends HttpServlet {
 		bean.setVista(JSP_FORM);
 	}
 	
-	private void editarMeritoConfirm(VistaMeritosPreferentes bean, HttpServletRequest request) throws SQLException, UVException {
+	private void editarMeritoConfirm(VistaMeritosPreferentes bean, HttpServletRequest request, HttpServletResponse response) throws SQLException, UVException, IOException {
 		MeritoPreferente merito = ModeloMeritosPreferentes.obtenerInstancia().getMeritoPreferenteById(Formateador.leeParametroInteger(request.getParameter(PARAM_ID)));
 				
 		bean.setMeritoPreferente(merito);
@@ -241,26 +245,30 @@ public class ControladorMeritosPreferentes extends HttpServlet {
 		bean.setVista(JSP_FORM);
 		
 		ModeloMeritosPreferentes.obtenerInstancia().editarMeritoPreferente(this.validate(merito, request));
-		bean.getMensajesDeExito().add("Mérito preferente editado correctamente");
-		bean.setVista(JSP_INDEX);
+		
+		BolsaEmpleoUtils.addMensajeDeExito("Mérito preferente editado correctamente", bean, request);
+		response.sendRedirect(request.getServletPath());
 	}
 	
 	
-	private void activarMerito(VistaMeritosPreferentes bean, HttpServletRequest request) throws SQLException, UVException {
+	private void activarMerito(VistaMeritosPreferentes bean, HttpServletRequest request, HttpServletResponse response) throws SQLException, UVException, IOException {
 		MeritoPreferente merito = ModeloMeritosPreferentes.obtenerInstancia().getMeritoPreferenteById(Formateador.leeParametroInteger(request.getParameter(PARAM_ID)));
 		
 		ModeloMeritosPreferentes.obtenerInstancia().cambiaFlagActivoMeritoPreferente(merito, "S");
-		bean.getMensajesDeExito().add("Mérito preferente activado correctamente");
 		bean.setVista(JSP_INDEX);
+		
+		BolsaEmpleoUtils.addMensajeDeExito("Mérito preferente activado correctamente", bean, request);
+		response.sendRedirect(request.getServletPath());
 	}
 	
-	
-	private void desactivarMerito(VistaMeritosPreferentes bean, HttpServletRequest request) throws SQLException, UVException {
+	private void desactivarMerito(VistaMeritosPreferentes bean, HttpServletRequest request, HttpServletResponse response) throws SQLException, UVException, IOException {
 		MeritoPreferente merito = ModeloMeritosPreferentes.obtenerInstancia().getMeritoPreferenteById(Formateador.leeParametroInteger(request.getParameter(PARAM_ID)));
 		
 		ModeloMeritosPreferentes.obtenerInstancia().cambiaFlagActivoMeritoPreferente(merito, "N");
-		bean.getMensajesDeExito().add("Mérito preferente desactivado correctamente");
 		bean.setVista(JSP_INDEX);
+		
+		BolsaEmpleoUtils.addMensajeDeExito("Mérito preferente activado correctamente", bean, request);
+		response.sendRedirect(request.getServletPath());
 	}
 	
 	private MeritoPreferente validate(MeritoPreferente merito, HttpServletRequest request) throws UVException, SQLException {

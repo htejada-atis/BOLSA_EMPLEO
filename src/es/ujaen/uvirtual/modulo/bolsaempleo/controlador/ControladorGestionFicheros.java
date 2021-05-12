@@ -57,7 +57,7 @@ public class ControladorGestionFicheros extends HttpServlet {
 	public static final String ACCION_DESCARGAR_FICHERO = "descargarfichero";
 	public static final String ACCION_HACER_FICHEROS_PUBLICOS = "ficherospublicos";
 	public static final String ACCION_HACER_FICHEROS_PRIVADOS = "ficherosprivados";
-	public static final String ACCION_LISTAR_FICHEROS = "listarficheros";
+	public static final String ACCION_INDEX = "listarficheros";
 	public static final String ACCION_SUBIR_FICHERO = "subirfichero";
 	
 	// Parámetros
@@ -104,13 +104,13 @@ public class ControladorGestionFicheros extends HttpServlet {
 		
 		String nombreAccion = EscapaHTML.ajustaCodificacion(request.getParameter(PARAM_ACCION));
 		if (nombreAccion == null) {
-			nombreAccion = ACCION_LISTAR_FICHEROS;
+			nombreAccion = ACCION_INDEX;
 		}
 		
 		try {
 			init(bean, datos);
 			switch (nombreAccion) {
-				case ACCION_LISTAR_FICHEROS:
+				case ACCION_INDEX:
 					bean.setVista(RUTA_BEP_CONF + "ficheros.jsp");
 					break;
 				case ACCION_BORRAR_FICHEROS:

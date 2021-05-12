@@ -74,7 +74,7 @@ public class TestBEPControladorGestionFicheros {
 	 */
 	@Test
 	public void testA02() throws SQLException, ServletException, IOException {
-		VistaFicheros bean = obtenerFicheros(ControladorGestionFicheros.ACCION_LISTAR_FICHEROS);
+		VistaFicheros bean = obtenerFicheros(ControladorGestionFicheros.ACCION_INDEX);
 
 		assertEquals(MENSAJE_SIN_ERROR, 0, bean.getMensajesDeError().size());
 		assertEquals(MENSAJE_SIN_ADVERTENCIAS, 0, bean.getMensajesDeAdvertencia().size());

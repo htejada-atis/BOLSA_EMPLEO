@@ -46,7 +46,7 @@ public class ControladorResultados extends HttpServlet {
 	public static final String PARAM_ACCION = "a";
 	
 	// acciones
-	public static final String ACCION_LISTAR = "listar";
+	public static final String ACCION_INDEX = "listar";
 	public static final String ACCION_DATATABLE = "datatable";
 	
 	// mensajes
@@ -72,13 +72,13 @@ public class ControladorResultados extends HttpServlet {
 
 		String nombreAccion = EscapaHTML.ajustaCodificacion(request.getParameter(PARAM_ACCION));
 		if (nombreAccion == null) {
-			nombreAccion = ACCION_LISTAR;
+			nombreAccion = ACCION_INDEX;
 		}
 					
 		try {
 			init(bean, datos);
 			switch (nombreAccion) {
-				case ACCION_LISTAR:
+				case ACCION_INDEX:
 					bean.setVista("/WEB-INF/jsp/vista/infadministrativa/bolsaempleo/resultados/index.jsp");
 					break;
 				case ACCION_DATATABLE:
