@@ -35,6 +35,11 @@ public class ModeloMeritosPreferentes {
 	// tipo de meritos preferentes
 	public static final String TIPO_TITULACION_PREFERENTE = "TITULACION_PREFERENTE";
 	public static final String TIPO_MERITO = "MERITO";
+	public static final String TIPO_POSESION = "POSESION";
+		
+	// tipo de cálculo
+	public static final String TIPO_CALCULO_FACTOR = "FACTOR";
+	public static final String TIPO_CALCULO_VALOR_MERITO_FACTOR = "VALOR_MERITO_FACTOR";
 	
 	// tipos de aplicable
 	public static final String APLICABLE_BLOQUE = "BLOQUE";
@@ -169,22 +174,21 @@ public class ModeloMeritosPreferentes {
 			throw new UVException("No se puede insertar un merito preferente vacio");
 		}
 		
-		this.validateMeritoPreferente(merito);
-						
 		String sql = "INSERT INTO TBEP_MERITOS_PREFERENTES ("
-				+ "DESCRIPCION,TIPO,APLICABLE,FACTOR,VALOR_MAXIMO,"
+				+ "CODIGO,DESCRIPCION,TIPO,APLICABLE,FACTOR,VALOR_MAXIMO,"
 				+ "BEPITE_TIPO_CODNUM,BEPBLO_APLICABLE_CODNUM,BEPAPA_APLICABLE_CODNUM,BEPITE_APLICABLE_CODNUM) "
-				+ "VALUES (?,?,?,?,?,?,?,?,?)";
+				+ "VALUES (?,?,?,?,?,?,?,?,?,?)";
 		
 		try (Connection conexion = ConexionUvirtual.obtenerInstancia(); PreparedStatement stmt = conexion.prepareStatement(sql)) {
 			int parameterIndex = 1;
+			stmt.setString(parameterIndex++, merito.getCodigo());
 			stmt.setString(parameterIndex++, merito.getDescripcion());
 			stmt.setString(parameterIndex++, merito.getTipo());
 			stmt.setString(parameterIndex++, merito.getAplicable());
-			stmt.setString(parameterIndex++, merito.getFactor());
+			stmt.setDouble(parameterIndex++, merito.getFactor());
 						
 			if (merito.getValorMaximo() != null) {
-				stmt.setFloat(parameterIndex++, merito.getValorMaximo());
+				stmt.setDouble(parameterIndex++, merito.getValorMaximo());
 			} else {
 				stmt.setNull(parameterIndex++, Types.NULL);
 			}
@@ -222,13 +226,12 @@ public class ModeloMeritosPreferentes {
 	 * @throws UVException . 
 	 */
 	public void editarMeritoPreferente(MeritoPreferente merito) throws UVException, SQLException {
-		this.validateMeritoPreferente(merito);
-		
-		// TODO, condiciones para poder modificar un mérito preferente
 		String query = "UPDATE TBEP_MERITOS_PREFERENTES SET "
+				+ "CODIGO = ?, "
 				+ "DESCRIPCION = ?, "
 				+ "TIPO = ?, "
 				+ "APLICABLE = ?, "
+				+ "BASE = ?, "
 				+ "FACTOR = ?, "
 				+ "VALOR_MAXIMO = ?, "
 				+ "BEPITE_TIPO_CODNUM = ?, "
@@ -240,12 +243,18 @@ public class ModeloMeritosPreferentes {
 		
 		try (Connection conexion = ConexionUvirtual.obtenerInstancia(); PreparedStatement stmt = conexion.prepareStatement(query)) {
 			int parameterIndex = 1;
+			stmt.setString(parameterIndex++, merito.getCodigo());
 			stmt.setString(parameterIndex++, merito.getDescripcion());
 			stmt.setString(parameterIndex++, merito.getTipo());
 			stmt.setString(parameterIndex++, merito.getAplicable());
-			stmt.setString(parameterIndex++, merito.getFactor());
+			if (merito.getBase() != null) {
+				stmt.setDouble(parameterIndex++, merito.getBase());
+			} else {
+				stmt.setNull(parameterIndex++, Types.NULL);
+			}
+			stmt.setDouble(parameterIndex++, merito.getFactor());
 			if (merito.getValorMaximo() != null) {
-				stmt.setFloat(parameterIndex++, merito.getValorMaximo());
+				stmt.setDouble(parameterIndex++, merito.getValorMaximo());
 			} else {
 				stmt.setNull(parameterIndex++, Types.NULL);
 			}
@@ -276,27 +285,6 @@ public class ModeloMeritosPreferentes {
 		}		
 	}	
 	
-	private void validateMeritoPreferente(MeritoPreferente merito) throws UVException {
-		if (merito.getDescripcion().isBlank()) {
-			throw new UVException("La descripción es requerida");
-		}
-		if (merito.getDescripcion().length() > MAX_LENGTH_COLUMN_DESCRIPCION) {
-			throw new UVException("La descripción tiene demasiados caracteres. Máximo: " + MAX_LENGTH_COLUMN_DESCRIPCION);
-		}		
-		
-		if (merito.getFactor().isBlank()) {
-			throw new UVException("El factor es requerido");
-		} 
-		if (merito.getFactor().length() > MAX_LENGTH_COLUMN_FACTOR) { 
-			throw new UVException("El factor tiene demasiados caracteres. Máximo: " + MAX_LENGTH_COLUMN_FACTOR);
-		}
-		
-		if (merito.getValorMaximo() != null && merito.getValorMaximo() <= 0) {
-			throw new UVException("El valor máximo debe ser mayor que cero");
-		}
-	}
-	
-	
 	/**
 	 * Activa el merito. 
 	 * @param merito .
@@ -313,8 +301,31 @@ public class ModeloMeritosPreferentes {
 			stmt.executeUpdate();
 		}
 	}
-
 	
+	/**
+	 * Chequea si hay un mérito activo con el codigo pasado.
+	 * @param codigo .
+	 * @return .
+	 * @throws SQLException .
+	 */
+	public boolean isMeritoActivoConCodigo(String codigo) throws SQLException {
+		String query = "SELECT COUNT(*) as count FROM TBEP_MERITOS_PREFERENTES WHERE FLGACTIVO = 'S' AND CODIGO = ?";		
+		
+		try (Connection con = ConexionUvirtual.obtenerInstancia(); PreparedStatement stmt = con.prepareStatement(query)) {
+			int param = 1;
+			stmt.setString(param++, codigo);
+			
+			try (ResultSet rs = stmt.executeQuery()) {
+				rs.next();
+				
+				if (rs.getInt("count") > 0) {
+					return true;
+				}
+			}
+		}
+		
+		return false;
+	}
 	
 	private MeritoPreferente createApartadoFromResultSet(ResultSet rs) throws SQLException, UVException {
 		MeritoPreferente obj = new MeritoPreferente();
@@ -322,8 +333,9 @@ public class ModeloMeritosPreferentes {
 		obj.setDescripcion(rs.getString("DESCRIPCION"));
 		obj.setTipo(rs.getString("TIPO"));		
 		obj.setAplicable(rs.getString("APLICABLE"));
-		obj.setFactor(rs.getString("FACTOR"));
-		obj.setValorMaximo(rs.getFloat("VALOR_MAXIMO") == 0 ? null : rs.getFloat("VALOR_MAXIMO"));
+		obj.setBase(rs.getDouble("BASE") == 0 ? null : rs.getDouble("BASE"));
+		obj.setFactor(rs.getDouble("FACTOR"));
+		obj.setValorMaximo(rs.getDouble("VALOR_MAXIMO") == 0 ? null : rs.getDouble("VALOR_MAXIMO"));
 		obj.setTipoItemBaremacion(rs.getInt("BEPITE_TIPO_CODNUM") == 0 ? null 
 			: ModeloBaremacionItems.obtenerInstancia().getItemBaremacionById(rs.getInt("BEPITE_TIPO_CODNUM")));
 		obj.setAplicableApartadoBaremacion(rs.getInt("BEPAPA_APLICABLE_CODNUM") == 0 ? null 
@@ -335,6 +347,8 @@ public class ModeloMeritosPreferentes {
 		obj.setActivo("S".equals(rs.getString("FLGACTIVO")));
 		return obj;
 	}
+
+	
 
 			
 }

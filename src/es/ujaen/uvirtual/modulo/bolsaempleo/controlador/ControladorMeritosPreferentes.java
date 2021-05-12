@@ -47,7 +47,7 @@ public class ControladorMeritosPreferentes extends HttpServlet {
 	
 	// acciones 
 	public static final String ACCION_INDEX = "indice";
-	public static final String ACCION_DATATABLE = "datatable";	
+	public static final String ACCION_DATATABLE = "datatable";
 	public static final String ACCION_MODIFICAR = "detalle";
 	public static final String ACCION_NUEVO_MERITO = "nuevoMerito";
 	public static final String ACCION_NUEVO_MERITO_CONFIRM = "nuevoMeritoConfirm";
@@ -59,6 +59,7 @@ public class ControladorMeritosPreferentes extends HttpServlet {
 	// parámetros
 	public static final String PARAM_ACCION = "a";
 	public static final String PARAM_ID = "id";
+	public static final String PARAM_MERITO_CODIGO = "codigo";
 	public static final String PARAM_MERITO_DESCRIPCION = "descripcion";
 	public static final String PARAM_MERITO_TIPO = "tipo";
 	public static final String PARAM_MERITO_TIPO_TITULACION = "tipoTitulacion";
@@ -68,7 +69,9 @@ public class ControladorMeritosPreferentes extends HttpServlet {
 	public static final String PARAM_MERITO_APLICABLE_APARTADO = "aplicableApartado";
 	public static final String PARAM_MERITO_APLICABLE_ITEM = "aplicableItem";
 	public static final String PARAM_MERITO_FACTOR = "factor";
-	public static final String PARAM_MERITO_VALORMAXIMO = "valorMaximo";	
+	public static final String PARAM_MERITO_BASE = "base";	
+	public static final String PARAM_MERITO_VALORMAXIMO = "valorMaximo";
+	public static final String PARAM_MERITO_TIPO_CALCULO = "tipocalculo";
 	
 	// mensajes
 	public static final String MENSAJE_ERROR_CODIGO_VACIO = "El código no puede estar vacio";
@@ -272,16 +275,27 @@ public class ControladorMeritosPreferentes extends HttpServlet {
 	}
 	
 	private MeritoPreferente validate(MeritoPreferente merito, HttpServletRequest request) throws UVException, SQLException {
+		merito.setCodigo(EscapaHTML.ajustaCodificacion(request.getParameter(PARAM_MERITO_CODIGO)));
+		if (merito.getCodigo().isBlank()) {
+			throw new UVException("El código del mérito es requerido");
+		}	
+		if (ModeloMeritosPreferentes.obtenerInstancia().isMeritoActivoConCodigo(merito.getCodigo())) {
+			throw new UVException("Ya existe un mérito preferente activo con el código introducido");
+		}
+		
 		merito.setDescripcion(EscapaHTML.ajustaCodificacion(request.getParameter(PARAM_MERITO_DESCRIPCION)));
 		if (merito.getDescripcion().isBlank()) {
 			throw new UVException("La descripción del mérito es requerida");
 		}
+		if (merito.getDescripcion().length() > ModeloMeritosPreferentes.MAX_LENGTH_COLUMN_DESCRIPCION) {
+			throw new UVException("La descripción tiene demasiados caracteres. Máximo: " + ModeloMeritosPreferentes.MAX_LENGTH_COLUMN_DESCRIPCION);
+		}	
 		
 		merito.setTipo(EscapaHTML.ajustaCodificacion(request.getParameter(PARAM_MERITO_TIPO)));		
 		if (merito.getTipo().equals(ModeloMeritosPreferentes.TIPO_MERITO)) {
 			merito.setTipoItemBaremacion(ModeloBaremacionItems.obtenerInstancia().getItemBaremacionById(
 					Formateador.leeParametroInteger(request.getParameter(PARAM_MERITO_TIPO_ITEMBAREMACION))));
-		} else if (!merito.getTipo().equals(ModeloMeritosPreferentes.TIPO_TITULACION_PREFERENTE)) {
+		} else if (!merito.getTipo().equals(ModeloMeritosPreferentes.TIPO_TITULACION_PREFERENTE) && !merito.getTipo().equals(ModeloMeritosPreferentes.TIPO_POSESION)) {
 			throw new UVException("Introduce un tipo de mérito");
 		}
 		
@@ -299,12 +313,14 @@ public class ControladorMeritosPreferentes extends HttpServlet {
 			throw new UVException("Introduce el campo aplicable");
 		}
 				
-		merito.setFactor(EscapaHTML.ajustaCodificacion(request.getParameter(PARAM_MERITO_FACTOR)));
-		if (merito.getFactor().isBlank()) {
-			throw new UVException("El factor es requerido");
+		merito.setFactor(Formateador.leeParametroDouble(request.getParameter(PARAM_MERITO_BASE)));
+		merito.setFactor(Formateador.leeParametroDouble(request.getParameter(PARAM_MERITO_FACTOR)));
+		
+		merito.setValorMaximo(Formateador.leeParametroDouble(request.getParameter(PARAM_MERITO_VALORMAXIMO)));
+		if (merito.getValorMaximo() != null && merito.getValorMaximo() <= 0) {
+			throw new UVException("El valor máximo debe ser mayor que cero");
 		}
-		merito.setValorMaximo(BolsaEmpleoUtils.leeParametroFloat(request.getParameter(PARAM_MERITO_VALORMAXIMO)));
 		
 		return merito;
-	}
+	}	
 }
