@@ -30,6 +30,8 @@ String codigoCompleto = apartado.getCodigo() + "." + (bloque != null ? bloque.ge
     
     <h2><%= bloque != null ? "Editar apartado" : "Nuevo apartado" %></h2>
     
+    <p>Las etiquetas en <b>negrita</b> corresponden a campos de relleno obligatorio</p>
+    
     <form id="actualizar_bloque" class="be-form" method="post" action="<%= request.getRequestURI() %>">
     	<input type="hidden" name="<%= ControladorItemsBaremacion.PARAM_ACCION %>" id="accion_formulario"
     		   value="<%= bloque != null ? ControladorItemsBaremacion.ACCION_EDITAR_BLOQUE_CONFIRM : ControladorItemsBaremacion.ACCION_AGREGAR_BLOQUE_CONFIRM %>" /> 
@@ -44,14 +46,16 @@ String codigoCompleto = apartado.getCodigo() + "." + (bloque != null ? bloque.ge
 		</div>
 		<div class="form-group-container col2">
 			<div class="form-group">
-	    		<label for="bloque_codigo">Código</label>
+	    		<label for="bloque_codigo" class="bold-label">Código</label>
 	    		<input class="form-input-custom" type="text" name="<%= ControladorItemsBaremacion.PARAM_BLOQUE_CODIGO %>" id="bloque_codigo" 
-	    			   value="<%= BolsaEmpleoUtils.getParamForm(request, ControladorItemsBaremacion.PARAM_BLOQUE_CODIGO, bloque != null ? bloque.getCodigo() : bean.getUltimoCodigo()) %>"/>
+	    			   value="<%= BolsaEmpleoUtils.getParamForm(request, ControladorItemsBaremacion.PARAM_BLOQUE_CODIGO, bloque != null ? bloque.getCodigo() : bean.getUltimoCodigo()) %>"
+	    			   required/>
 	    	</div>
 	    	<div class="form-group">
-	    		<label for="bloque_nombre">Nombre</label>
+	    		<label for="bloque_nombre" class="bold-label">Nombre</label>
 	    		<input class="form-input-custom" type="text" name="<%= ControladorItemsBaremacion.PARAM_BLOQUE_NOMBRE %>" id="bloque_nombre" 
-	    			   value="<%= BolsaEmpleoUtils.getParamForm(request, ControladorItemsBaremacion.PARAM_BLOQUE_NOMBRE, bloque != null ? bloque.getNombre() : "") %>"/>
+	    			   value="<%= BolsaEmpleoUtils.getParamForm(request, ControladorItemsBaremacion.PARAM_BLOQUE_NOMBRE, bloque != null ? bloque.getNombre() : "") %>"
+	    			   required/>
 	    	</div>
 		</div>
 		<div class="form-group-container col2">

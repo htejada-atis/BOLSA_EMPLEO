@@ -105,7 +105,7 @@ UsuarioBolsaEmpleo candidato = bean.getCandidato();
 					    	<div class="form-group">
 								<label class="bold-label" for="select_apartado">Categoría:</label>
 								<select class="form-input-custom" id="select_apartado" name="">
-									<option value="0">---------------</option>
+									<option value="">---------------</option>
 								</select>
 							</div>
 						</div>
