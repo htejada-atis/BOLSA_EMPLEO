@@ -226,7 +226,6 @@ public class ControladorMisMeritos extends HttpServlet {
 				Part uploadedFile = request.getPart(PARAM_ARCHIVO);
 				Merito merito = this.validarMerito(request, uploadedFile);
 				
-				// TODO: un metodo en ModeloUsuarioBolsaEmpleo para obtener un usuario adecuadamente
 				Usuario usuArcos = datos.getUsuario();
 				Integer idUsuario = ModeloUsuarioBolsaEmpleo.obtenerInstancia().listaUsuario(usuArcos.getDocumentoNumero()).getCodNum();
 				ModeloMerito.obtenerInstancia().insertaMerito(merito, idUsuario);
