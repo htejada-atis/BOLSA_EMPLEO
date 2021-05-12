@@ -1,4 +1,4 @@
-package es.ujaen.uvirtual.controlador.operaciones.autoregistrado;
+package es.ujaen.uvirtual.modulo.autoregistrado.controlador;
 
 import java.io.IOException;
 import java.sql.SQLException;
@@ -13,8 +13,8 @@ import javax.servlet.http.HttpServletResponse;
 
 import es.ujaen.uvirtual.beans.UVDatos;
 import es.ujaen.uvirtual.beans.Usuario;
-import es.ujaen.uvirtual.beans.vistas.intranet.VistaUsuarioAutoregistrado;
-import es.ujaen.uvirtual.modelo.ModeloUsuarioAutoregistrado;
+import es.ujaen.uvirtual.modulo.autoregistrado.beans.vista.VistaUsuarioAutoregistrado;
+import es.ujaen.uvirtual.modulo.autoregistrado.modelo.ModeloUsuarioAutoregistrado;
 import es.ujaen.uvirtual.utilidades.EscapaHTML;
 import es.ujaen.uvirtual.utilidades.Formateador;
 import es.ujaen.uvirtual.utilidades.UVException;
@@ -162,7 +162,8 @@ public class ControladorUsuarioAutoregistrado extends HttpServlet {
 		bean.setVista("/WEB-INF/jsp/vista/operaciones/autoaprovisionado/validaCodigoTemporal.jsp");
 		String correo = Formateador.leeParametroString(request.getParameter(PARAM_CORREO));
 		String ip = request.getRemoteAddr();
-		String idSolicitud = ModeloUsuarioAutoregistrado.mandarClaveTemporal(correo, ip);
+		ModeloUsuarioAutoregistrado modelo = new ModeloUsuarioAutoregistrado();
+		String idSolicitud = modelo.mandarClaveTemporal(correo, ip);
 		bean.setIdSolicitud(idSolicitud);
 		bean.setCorreo(correo);
 	}
@@ -172,8 +173,8 @@ public class ControladorUsuarioAutoregistrado extends HttpServlet {
 		String correo = Formateador.leeParametroString(request.getParameter(PARAM_CORREO));
 		String temporal = Formateador.leeParametroString(request.getParameter(PARAM_CODIGO_TEMPORAL));
 		String idSolicitud = Formateador.leeParametroString(request.getParameter(PARAM_ID_CAMBIO));
-		ModeloUsuarioAutoregistrado modelo = new ModeloUsuarioAutoregistrado();
 		String ip = request.getRemoteAddr();
+		ModeloUsuarioAutoregistrado modelo = new ModeloUsuarioAutoregistrado();
 		String clave = modelo.verificaPeticionCambio(correo, idSolicitud, temporal, ip);
 		bean.setClave(clave);
 		bean.setCorreo(correo);

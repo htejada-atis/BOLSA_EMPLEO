@@ -1,4 +1,4 @@
-package es.ujaen.uvirtual.beans.vistas.intranet;
+package es.ujaen.uvirtual.modulo.autoregistrado.beans.vista;
 
 import java.io.Serializable;
 

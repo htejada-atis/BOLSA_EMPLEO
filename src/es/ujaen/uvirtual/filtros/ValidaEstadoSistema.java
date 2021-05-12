@@ -72,7 +72,7 @@ public class ValidaEstadoSistema implements Filter {
 				// Buscamos "uv"
 				if (sistema.getCodigo().equals("uvirtual")) {
 					if (sistema.isEnMantenimiento() 
-							&& ((sistema.getFechaEntradaEnMantenimiento() == null) || (sistema.getFechaEntradaEnMantenimiento().before(new Date())))) {
+							&& (sistema.getFechaEntradaEnMantenimiento() == null || sistema.getFechaEntradaEnMantenimiento().before(new Date()))) {
 						// Sistema en mantenimiento
 						req.getSession().setAttribute(atributoError, servNoDisponible + sistema.getMotivoDelMantenimiento());
 						resp.sendRedirect(ConfiguracionGlobal.getUrlSistemaNoDisponible());
