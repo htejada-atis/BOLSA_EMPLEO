@@ -22,6 +22,7 @@ import es.ujaen.uvirtual.modulo.bolsaempleo.beans.MeritoPreferente;
 @FixMethodOrder(MethodSorters.NAME_ASCENDING)
 public class TestBEPBeanMeritoPreferente {
 	private static final Integer CODNUM = 100;
+	private static final String CODIGO = "codigo";
 	private static final String DESCRIPCION = "descripcion";	
 	private static final String TIPO_CALCULO = "tipoCACULO";
 	private static final String TIPO = "tipo";
@@ -75,9 +76,10 @@ public class TestBEPBeanMeritoPreferente {
 	 */
 	@Test
 	public void testA02() {
-		MeritoPreferente merito = new MeritoPreferente(CODNUM, DESCRIPCION, TIPO, TIPO_CALCULO, APLICABLE, BASE, FACTOR,
+		MeritoPreferente merito = new MeritoPreferente(CODNUM, CODIGO, DESCRIPCION, TIPO, TIPO_CALCULO, APLICABLE, BASE, FACTOR,
 				VALORMAXIMO, ITEM, BLOQUE, APARTADO, ITEM2, ACTIVO);
 		assertEquals(CODNUM, merito.getCodNum());
+		assertEquals(CODIGO, merito.getCodigo());
 		assertEquals(DESCRIPCION, merito.getDescripcion());
 		assertEquals(TIPO, merito.getTipo());
 		assertEquals(APLICABLE, merito.getAplicable());
@@ -97,10 +99,11 @@ public class TestBEPBeanMeritoPreferente {
 	@Test
 	public void testA03() {
 
-		MeritoPreferente merito2 = new MeritoPreferente(CODNUM, DESCRIPCION, TIPO, TIPO_CALCULO, APLICABLE, BASE, FACTOR,
+		MeritoPreferente merito2 = new MeritoPreferente(CODNUM, CODIGO, DESCRIPCION, TIPO, TIPO_CALCULO, APLICABLE, BASE, FACTOR,
 				VALORMAXIMO, ITEM, BLOQUE, APARTADO, ITEM2, ACTIVO);
 		MeritoPreferente merito = new MeritoPreferente(merito2);
 		merito.setCodNum(CODNUM);
+		merito.setCodigo(CODIGO);
 		merito.setDescripcion(DESCRIPCION);
 		merito.setTipo(TIPO);
 		merito.setAplicable(APLICABLE);
@@ -137,7 +140,7 @@ public class TestBEPBeanMeritoPreferente {
 	@Test
 	@SuppressWarnings("java:S2159")
 	public void testA04() {
-		MeritoPreferente merito3 = new MeritoPreferente(CODNUM, DESCRIPCION, TIPO, TIPO_CALCULO, APLICABLE, BASE, FACTOR,
+		MeritoPreferente merito3 = new MeritoPreferente(CODNUM, CODIGO, DESCRIPCION, TIPO, TIPO_CALCULO, APLICABLE, BASE, FACTOR,
 				VALORMAXIMO, ITEM, BLOQUE, APARTADO, ITEM2, ACTIVO);
 		MeritoPreferente merito2 = new MeritoPreferente();
 		MeritoPreferente merito = new MeritoPreferente();

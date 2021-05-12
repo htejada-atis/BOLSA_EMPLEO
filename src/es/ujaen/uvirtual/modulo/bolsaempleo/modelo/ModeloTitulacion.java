@@ -1,19 +1,17 @@
 package es.ujaen.uvirtual.modulo.bolsaempleo.modelo;
 
 import java.sql.Connection;
-import java.sql.Date;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.sql.SQLIntegrityConstraintViolationException;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 
 import es.ujaen.uvirtual.modelo.conexion.ConexionUvirtual;
 import es.ujaen.uvirtual.modulo.bolsaempleo.beans.Titulacion;
 import es.ujaen.uvirtual.modulo.bolsaempleo.beans.TitulacionArea;
-import es.ujaen.uvirtual.modulo.bolsaempleo.beans.UsuarioBolsaEmpleo;
 import es.ujaen.uvirtual.modulo.bolsaempleo.utilidades.BolsaEmpleoDataTable;
 import es.ujaen.uvirtual.modulo.bolsaempleo.utilidades.BolsaEmpleoUtils;
 import es.ujaen.uvirtual.modulo.bolsaempleo.utilidades.BolsaEmpleoDataTable.DataTableColumn;
@@ -37,8 +35,11 @@ public class ModeloTitulacion {
 	public static final String ERROR_TITULACION_NOEXITE = "No existe la titulación";
 	public static final String ERROR_TITULACION_REQUERIDA = "La titulación es requerida";
 	
-    protected static ModeloTitulacion eInstancia = null;
-    	
+	public static final String CODNUM = "CODNUM";
+	public static final String NOMBRE = "NOMBRE";
+		
+	protected static ModeloTitulacion eInstancia;
+
 	/** Crea una instancia del objeto.
 	 *  de forma sincronizada para protegerse de posibles problemas multi-hilo
 	 */
@@ -48,16 +49,17 @@ public class ModeloTitulacion {
 		}
 	}
 
-    /**
-     * Obtiene una instancia de la conexión.
-     * @return instancia
-     */
-    public static ModeloTitulacion obtenerInstancia() {
-        if (eInstancia == null) {
-        	crearInstancia();
-        }
-        return eInstancia;
-    }
+	/**
+	 * Obtiene una instancia de la conexión.
+	 * 
+	 * @return instancia
+	 */
+	public static ModeloTitulacion obtenerInstancia() {
+		if (eInstancia == null) {
+			crearInstancia();
+		}
+		return eInstancia;
+	}
 	
 	
 	/** Consulta titulaciones en BBDD y las devuelve.
@@ -68,19 +70,19 @@ public class ModeloTitulacion {
 	private List<Titulacion> listaTitulaciones(String clausula) throws SQLException {
 		List<Titulacion> titulaciones = new ArrayList<>();
 		String consulta = "SELECT beptit.* FROM tbep_titulaciones beptit " + clausula;
-		
+
 		try (Connection conexion = ConexionUvirtual.obtenerInstancia();
-			PreparedStatement stmt = conexion.prepareStatement(consulta);) {
-				try (ResultSet rs = stmt.executeQuery()) {
-					while (rs.next()) {
-						Titulacion tit = new Titulacion();
-						tit.setCodNum(rs.getInt("CODNUM"));
-						tit.setNombre(rs.getString("NOMBRE"));
-						titulaciones.add(tit);
-						
-					}
+				PreparedStatement stmt = conexion.prepareStatement(consulta)) {
+			try (ResultSet rs = stmt.executeQuery()) {
+				while (rs.next()) {
+					Titulacion tit = new Titulacion();
+					tit.setCodNum(rs.getInt(CODNUM));
+					tit.setNombre(rs.getString(NOMBRE));
+					titulaciones.add(tit);
+
 				}
 			}
+		}
 		return titulaciones;
 	}
 	
@@ -103,14 +105,14 @@ public class ModeloTitulacion {
 				+ " INNER JOIN TBEP_TITULACIONES_USUARIO beptus ON beptus.BEPTUS_TIT_CODNUM = beptit.CODNUM"
 				+ " WHERE beptus.BEPTUS_USU_CODNUM = ?";
 		
-		try (Connection conexion = ConexionUvirtual.obtenerInstancia(); PreparedStatement stmt = conexion.prepareStatement(consulta);) {
+		try (Connection conexion = ConexionUvirtual.obtenerInstancia(); PreparedStatement stmt = conexion.prepareStatement(consulta)) {
 			int parameterIndex = 1;
 			stmt.setInt(parameterIndex++, usuario);
 			try (ResultSet rs = stmt.executeQuery()) {
 				while (rs.next()) {
 					Titulacion tit = new Titulacion();
-					tit.setCodNum(rs.getInt("CODNUM"));
-					tit.setNombre(rs.getString("NOMBRE"));
+					tit.setCodNum(rs.getInt(CODNUM));
+					tit.setNombre(rs.getString(NOMBRE));
 					titulaciones.add(tit);
 				}
 			}
@@ -151,7 +153,7 @@ public class ModeloTitulacion {
 		String consulta = "UPDATE tbep_titulaciones "
 						+ "   SET nombre=?"
 						+ " WHERE codnum=?";
-		try (Connection conexion = ConexionUvirtual.obtenerInstancia(); PreparedStatement stmt = conexion.prepareStatement(consulta);) {
+		try (Connection conexion = ConexionUvirtual.obtenerInstancia(); PreparedStatement stmt = conexion.prepareStatement(consulta)) {
 			int parameterIndex = 1;
 			stmt.setString(parameterIndex++, titulacion.getNombre());
 			stmt.setInt(parameterIndex++, titulacion.getCodNum());
@@ -172,7 +174,7 @@ public class ModeloTitulacion {
 			throw new UVException("No se puede eliminar una titulación con id vacío");
 		}
 		String consulta = "DELETE FROM tbep_titulaciones WHERE codnum = ? ";
-		try (Connection conexion = ConexionUvirtual.obtenerInstancia(); PreparedStatement stmt = conexion.prepareStatement(consulta);) {
+		try (Connection conexion = ConexionUvirtual.obtenerInstancia(); PreparedStatement stmt = conexion.prepareStatement(consulta)) {
 			int parameterIndex = 1;
 			stmt.setInt(parameterIndex++, titulacion.getCodNum());
 			stmt.executeUpdate();
@@ -187,7 +189,7 @@ public class ModeloTitulacion {
 		if (titulacion == null) {
 			throw new UVException("No se puede insertar una titulación vacia");
 		}
-		if (titulacion.getNombre() == null || titulacion.getNombre().equals("")) {
+		if (titulacion.getNombre() == null || "".equals(titulacion.getNombre())) {
 			throw new UVException("No se puede insertar una titulación sin nombre");
 		}
 		
@@ -195,7 +197,7 @@ public class ModeloTitulacion {
 						+ " (NOMBRE) "
 						+ "VALUES (?)";
 		try (Connection conexion = ConexionUvirtual.obtenerInstancia();
-			 PreparedStatement stmt = conexion.prepareStatement(consulta);) {
+			 PreparedStatement stmt = conexion.prepareStatement(consulta)) {
 			int parameterIndex = 1;
 			stmt.setString(parameterIndex++, titulacion.getNombre());
 			stmt.executeUpdate();
@@ -208,7 +210,7 @@ public class ModeloTitulacion {
 	 * @throws SQLException en caso de error en la BD .
 	 * @throws UVException en caso de error de parámetros .
 	 */
-	public void incluirTitulacionesPreferentesArea(List<String> titulaciones, Integer area) throws SQLException, SQLIntegrityConstraintViolationException, UVException {
+	public void incluirTitulacionesPreferentesArea(Collection<String> titulaciones, Integer area) throws SQLException, UVException {
 		
 		if (area == null) {
 			throw new UVException("No se puede incluir titulación sin el id del área");
@@ -234,7 +236,7 @@ public class ModeloTitulacion {
 	 * @param area id del area por el que se va a filtrar .
 	 * @throws SQLException en caso de error en la BD .
 	 */
-	public void eliminarTitulacionesPreferentesArea(List<String> titulaciones, Integer area) throws SQLException {
+	public void eliminarTitulacionesPreferentesArea(Collection<String> titulaciones, Integer area) throws SQLException {
 		String params = BolsaEmpleoUtils.consultaMultiplesParametros(titulaciones.size());
 		String consulta = "DELETE FROM TBEP_TITULACIONES_PREFERENTES_AREA WHERE BEPARE_CODNUM = ? AND BEPTIT_CODNUM IN (" + params + ")";
 		try (Connection conexion = ConexionUvirtual.obtenerInstancia(); PreparedStatement stmt = conexion.prepareStatement(consulta)) {
@@ -256,7 +258,7 @@ public class ModeloTitulacion {
 	 */
 	public BolsaEmpleoDataTable<Titulacion> listaTitulacionesDatatable(Map<String, String[]> params) throws SQLException, UVException {
 		List<Titulacion> titulaciones = new ArrayList<>();
-		BolsaEmpleoDataTable<Titulacion> dataTable = new BolsaEmpleoDataTable<Titulacion>(params);
+		BolsaEmpleoDataTable<Titulacion> dataTable = new BolsaEmpleoDataTable<>(params);
 		
 		String consulta = "SELECT beptit.* FROM tbep_titulaciones beptit WHERE 1=1 ";
 		
@@ -266,14 +268,14 @@ public class ModeloTitulacion {
 				
 		try (Connection conexion = ConexionUvirtual.obtenerInstancia();
 				PreparedStatement stmtCount = conexion.prepareStatement(dataTable.getQueryCount());
-				PreparedStatement stmt = conexion.prepareStatement(dataTable.getQuery());
+				PreparedStatement stmt = conexion.prepareStatement(dataTable.getQuery())
 		) {
 			dataTable.setFiltersParams(stmt, stmtCount, 1);
 			try (ResultSet rs = stmt.executeQuery()) {
 				while (rs.next()) {
 					Titulacion tit = new Titulacion();
-					tit.setCodNum(rs.getInt("CODNUM"));
-					tit.setNombre(rs.getString("NOMBRE"));
+					tit.setCodNum(rs.getInt(CODNUM));
+					tit.setNombre(rs.getString(NOMBRE));
 					titulaciones.add(tit);
 				}
 			}
@@ -300,7 +302,7 @@ public class ModeloTitulacion {
 		}
 		
 		List<Titulacion> titulaciones = new ArrayList<>();
-		BolsaEmpleoDataTable<Titulacion> dataTable = new BolsaEmpleoDataTable<Titulacion>(params);
+		BolsaEmpleoDataTable<Titulacion> dataTable = new BolsaEmpleoDataTable<>(params);
 		
 		String consultaNotIn = "SELECT beptit.CODNUM FROM tbep_titulaciones beptit "
 				+ "INNER JOIN tbep_titulaciones_preferentes_area beptpa ON beptit.codnum = beptpa.beptit_codnum "
@@ -314,7 +316,7 @@ public class ModeloTitulacion {
 				
 		try (Connection conexion = ConexionUvirtual.obtenerInstancia();
 				PreparedStatement stmtCount = conexion.prepareStatement(dataTable.getQueryCount());
-				PreparedStatement stmt = conexion.prepareStatement(dataTable.getQuery());
+				PreparedStatement stmt = conexion.prepareStatement(dataTable.getQuery())
 		) {
 			int indexParam = 1;
 			stmt.setInt(indexParam, area);
@@ -323,8 +325,8 @@ public class ModeloTitulacion {
 			try (ResultSet rs = stmt.executeQuery()) {
 				while (rs.next()) {
 					Titulacion tit = new Titulacion();
-					tit.setCodNum(rs.getInt("CODNUM"));
-					tit.setNombre(rs.getString("NOMBRE"));
+					tit.setCodNum(rs.getInt(CODNUM));
+					tit.setNombre(rs.getString(NOMBRE));
 					titulaciones.add(tit);
 				}				
 			}	
@@ -351,7 +353,7 @@ public class ModeloTitulacion {
 		}
 		
 		List<TitulacionArea> titulaciones = new ArrayList<>();
-		BolsaEmpleoDataTable<TitulacionArea> dataTable = new BolsaEmpleoDataTable<TitulacionArea>(params);
+		BolsaEmpleoDataTable<TitulacionArea> dataTable = new BolsaEmpleoDataTable<>(params);
 		
 		String consulta = "SELECT beptit.CODNUM, beptit.NOMBRE FROM tbep_titulaciones beptit "
 				+ "INNER JOIN tbep_titulaciones_preferentes_area beptpa ON beptit.codnum = beptpa.beptit_codnum "
@@ -364,7 +366,7 @@ public class ModeloTitulacion {
 				
 		try (Connection conexion = ConexionUvirtual.obtenerInstancia();
 				PreparedStatement stmtCount = conexion.prepareStatement(dataTable.getQueryCount());
-				PreparedStatement stmt = conexion.prepareStatement(dataTable.getQuery());
+				PreparedStatement stmt = conexion.prepareStatement(dataTable.getQuery())
 		) {
 			int indexParam = 1;
 			stmt.setInt(indexParam, area);
@@ -373,8 +375,8 @@ public class ModeloTitulacion {
 			try (ResultSet rs = stmt.executeQuery()) {
 				while (rs.next()) {
 					Titulacion tit = new Titulacion();
-					tit.setCodNum(rs.getInt("CODNUM"));
-					tit.setNombre(rs.getString("NOMBRE"));
+					tit.setCodNum(rs.getInt(CODNUM));
+					tit.setNombre(rs.getString(NOMBRE));
 					ModeloArea modeloArea = ModeloArea.obtenerInstancia();
 					titulaciones.add(new TitulacionArea(tit, modeloArea.getAreaById(area)));
 				}
@@ -401,7 +403,7 @@ public class ModeloTitulacion {
 		}
 		
 		List<TitulacionArea> titulaciones = new ArrayList<>();
-		BolsaEmpleoDataTable<TitulacionArea> dataTable = new BolsaEmpleoDataTable<TitulacionArea>(params);
+		BolsaEmpleoDataTable<TitulacionArea> dataTable = new BolsaEmpleoDataTable<>(params);
 		
 		String consulta = "SELECT beptit.CODNUM, beptit.NOMBRE FROM tbep_titulaciones beptit "
 				+ "INNER JOIN tbep_titulaciones_preferentes_area beptpa ON beptit.codnum = beptpa.beptit_codnum "
@@ -413,7 +415,7 @@ public class ModeloTitulacion {
 				
 		try (Connection conexion = ConexionUvirtual.obtenerInstancia();
 				PreparedStatement stmtCount = conexion.prepareStatement(dataTable.getQueryCount());
-				PreparedStatement stmt = conexion.prepareStatement(dataTable.getQuery());
+				PreparedStatement stmt = conexion.prepareStatement(dataTable.getQuery())
 		) {
 			int indexParam = 1;
 			stmt.setInt(indexParam, area);
@@ -422,8 +424,8 @@ public class ModeloTitulacion {
 			try (ResultSet rs = stmt.executeQuery()) {
 				while (rs.next()) {
 					Titulacion tit = new Titulacion();
-					tit.setCodNum(rs.getInt("CODNUM"));
-					tit.setNombre(rs.getString("NOMBRE"));
+					tit.setCodNum(rs.getInt(CODNUM));
+					tit.setNombre(rs.getString(NOMBRE));
 					ModeloArea modeloArea = ModeloArea.obtenerInstancia();
 					titulaciones.add(new TitulacionArea(tit, modeloArea.getAreaById(area)));
 				}
@@ -449,48 +451,15 @@ public class ModeloTitulacion {
 		
 		String consulta = "SELECT beptit.* FROM TBEP_TITULACIONES beptit WHERE beptit.CODNUM = ?";
 		
-		try (Connection con = ConexionUvirtual.obtenerInstancia(); PreparedStatement stmt = con.prepareStatement(consulta);) {
+		try (Connection con = ConexionUvirtual.obtenerInstancia(); PreparedStatement stmt = con.prepareStatement(consulta)) {
 			int parameterIndex = 1;
 			stmt.setInt(parameterIndex++, codNum);
 			
 			try (ResultSet rs = stmt.executeQuery()) {
 				while (rs.next()) {
 					Titulacion t = new Titulacion();
-					t.setCodNum(rs.getInt("CODNUM"));
-					t.setNombre(rs.getString("NOMBRE"));
-					
-					return t;
-				}
-			}
-		}
-		
-		throw new UVException(ERROR_TITULACION_NOEXITE);	
-	}
-	
-	
-	/**
-	 * Devuelve una titulación de usuario por su código.
-	 * @param codNum .
-	 * @return .
-	 * @throws UVException .
-	 * @throws SQLException .
-	 */
-	public Titulacion getTitulacionUsuarioById(Integer codNum) throws SQLException, UVException {
-		if (codNum == null) {
-			throw new UVException(ERROR_TITULACION_REQUERIDA);
-		} 
-		
-		String consulta = "SELECT beptit.* FROM TBEP_TITULACIONES beptit WHERE beptit.CODNUM = ?";
-		
-		try (Connection con = ConexionUvirtual.obtenerInstancia(); PreparedStatement stmt = con.prepareStatement(consulta);) {
-			int parameterIndex = 1;
-			stmt.setInt(parameterIndex++, codNum);
-			
-			try (ResultSet rs = stmt.executeQuery()) {
-				while (rs.next()) {
-					Titulacion t = new Titulacion();
-					t.setCodNum(rs.getInt("CODNUM"));
-					t.setNombre(rs.getString("NOMBRE"));
+					t.setCodNum(rs.getInt(CODNUM));
+					t.setNombre(rs.getString(NOMBRE));
 					
 					return t;
 				}

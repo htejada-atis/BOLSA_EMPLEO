@@ -11,7 +11,6 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
 import es.ujaen.uvirtual.beans.CodigoDescripcion;
 import es.ujaen.uvirtual.beans.UVDatos;
 import es.ujaen.uvirtual.modulo.bolsaempleo.beans.Bolsa;
@@ -234,9 +233,8 @@ public class ControladorValidar extends HttpServlet {
 			try {
 				BolsaEmpleoDataTable<BolsaValidacion> dataTable = ModeloValidar.obtenerInstancia().
 						listadoAreasSujetasAfinidad(bean.getConvocatoria(), request.getParameterMap());
-				Gson gson = new GsonBuilder().setExclusionStrategies(BolsaEmpleoDataTable.GSONEXCLUSIONSTRATEGY).create();
 				bean.setDatatableBolsas(dataTable);
-				writer.write(gson.toJson(dataTable));
+				writer.write(dataTable.toJson());
 			} catch (Exception ex) {
 				bean.getMensajesDeError().add(ex.getMessage());
 				
@@ -258,9 +256,8 @@ public class ControladorValidar extends HttpServlet {
 			try {
 				BolsaEmpleoDataTable<Bolsa> dataTable = ModeloValidar.obtenerInstancia().
 						listadoAreasCandidatoSujetasAfinidad(bean.getConvocatoria(), bean.getCandidato(), request.getParameterMap());
-				Gson gson = new GsonBuilder().setExclusionStrategies(BolsaEmpleoDataTable.GSONEXCLUSIONSTRATEGY).create();
 				bean.setDatatableBolsasCandidato(dataTable);
-				writer.write(gson.toJson(dataTable));
+				writer.write(dataTable.toJson());
 			} catch (Exception ex) {
 				bean.getMensajesDeError().add(ex.getMessage());
 				
@@ -281,9 +278,8 @@ public class ControladorValidar extends HttpServlet {
 			try {
 				BolsaEmpleoDataTable<CandidatoValidacion> dataTable = ModeloValidar.obtenerInstancia().
 						listadoCandidatosSujetosAfinidad(bean.getConvocatoria(), bean.getBolsa(), request.getParameterMap());
-				Gson gson = new GsonBuilder().setExclusionStrategies(BolsaEmpleoDataTable.GSONEXCLUSIONSTRATEGY).create();
 				bean.setDatatableCandidatos(dataTable);
-				writer.write(gson.toJson(dataTable));
+				writer.write(dataTable.toJson());
 			} catch (Exception ex) {
 				bean.getMensajesDeError().add(ex.getMessage());
 				
@@ -304,9 +300,8 @@ public class ControladorValidar extends HttpServlet {
 			try {
 				BolsaEmpleoDataTable<Merito> dataTable = ModeloValidar.obtenerInstancia().
 						listadoMeritosSujetosAfinidad(bean.getConvocatoria(), bean.getBolsa(), bean.getCandidato(), request.getParameterMap());
-				Gson gson = new GsonBuilder().setExclusionStrategies(BolsaEmpleoDataTable.GSONEXCLUSIONSTRATEGY).create();
 				bean.setDatatableMeritos(dataTable);
-				writer.write(gson.toJson(dataTable));
+				writer.write(dataTable.toJson());
 			} catch (Exception ex) {
 				bean.getMensajesDeError().add(ex.getMessage());
 				

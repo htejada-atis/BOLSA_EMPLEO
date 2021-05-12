@@ -15,7 +15,6 @@ import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
 import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
 import com.google.gson.reflect.TypeToken;
 
 import es.ujaen.uvirtual.beans.CodigoDescripcion;
@@ -255,9 +254,8 @@ public class ControladorUsuarioBolsaEmpleo extends HttpServlet {
 		try (PrintWriter writer = response.getWriter()) {
 			try {
 				BolsaEmpleoDataTable<UsuarioBolsaEmpleo> dataTable = modelo.listaUsuarioBolsaEmpleoDatatable(request.getParameterMap());
-				Gson gson = new GsonBuilder().setExclusionStrategies(BolsaEmpleoDataTable.GSONEXCLUSIONSTRATEGY).create();
 				bean.setDatatable(dataTable);
-				writer.write(gson.toJson(dataTable));
+				writer.write(dataTable.toJson());
 			} catch (Exception ex) {
 				bean.getMensajesDeError().add(ex.getMessage());
 				
@@ -280,12 +278,10 @@ public class ControladorUsuarioBolsaEmpleo extends HttpServlet {
 		try (PrintWriter writer = response.getWriter()) {
 			try {
 				BolsaEmpleoDataTable<Bolsa> dataTable = modelo.listaAreasExcluidasPorUsuarioDatatable(request.getParameterMap(), codNum);
-				Gson gson = new GsonBuilder().setExclusionStrategies(BolsaEmpleoDataTable.GSONEXCLUSIONSTRATEGY).create();
 				bean.setDatatableBolsa(dataTable);
-				writer.write(gson.toJson(dataTable));
+				writer.write(dataTable.toJson());
 			} catch (Exception ex) {
 				bean.getMensajesDeError().add(ex.getMessage());
-				
 				CodigoDescripcion mensaje = new CodigoDescripcion(RESPONSE_AJAX_ERROR, ex.getMessage());
 				writer.write(new Gson().toJson(mensaje));
 				response.setStatus(RESPONSE_AJAX_HTTP_CODE_ERROR);
@@ -614,9 +610,8 @@ public class ControladorUsuarioBolsaEmpleo extends HttpServlet {
 		try (PrintWriter writer = response.getWriter()) {
 			try {
 				BolsaEmpleoDataTable<UsuarioBolsaEmpleo> dataTable = modelo.listaUsuarioBorradoBolsaEmpleoDatatable(request.getParameterMap());
-				Gson gson = new GsonBuilder().setExclusionStrategies(BolsaEmpleoDataTable.GSONEXCLUSIONSTRATEGY).create();
 				bean.setDatatable(dataTable);
-				writer.write(gson.toJson(dataTable));
+				writer.write(dataTable.toJson());
 			} catch (Exception ex) {
 				bean.getMensajesDeError().add(ex.getMessage());
 				
@@ -645,9 +640,8 @@ public class ControladorUsuarioBolsaEmpleo extends HttpServlet {
 		try (PrintWriter writer = response.getWriter()) {
 			try {
 				BolsaEmpleoDataTable<UsuarioBolsaEmpleo> dataTable = modelo.listaUsuarioExcluidoBolsaEmpleoDatatable(request.getParameterMap());
-				Gson gson = new GsonBuilder().setExclusionStrategies(BolsaEmpleoDataTable.GSONEXCLUSIONSTRATEGY).create();
 				bean.setDatatable(dataTable);
-				writer.write(gson.toJson(dataTable));
+				writer.write(dataTable.toJson());
 			} catch (Exception ex) {
 				bean.getMensajesDeError().add(ex.getMessage());
 				

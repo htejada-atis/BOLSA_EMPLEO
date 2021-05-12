@@ -46,7 +46,7 @@ public class ModeloMeritosPreferentes {
 	public static final String APLICABLE_APARTADO = "APARTADO";
 	public static final String APLICABLE_ITEM = "ITEM"; 
 	public static final String APLICABLE_TOTAL = "TOTAL";
-	
+		
 	public static final String ERROR_MERITO_NOEXITE = "El mérito no existe";
 
 	protected static ModeloMeritosPreferentes eInstancia;
@@ -107,12 +107,9 @@ public class ModeloMeritosPreferentes {
 		List<MeritoPreferente> apartados = new ArrayList<>();
 		BolsaEmpleoDataTable<MeritoPreferente> dataTable = new BolsaEmpleoDataTable<>(params);
 		
-		String consulta =
-			"SELECT bepmep.* "
-		  + "FROM TBEP_MERITOS_PREFERENTES bepmep "		  
-		  + "WHERE 1=1 ";
+		String consulta = "SELECT bepmep.* FROM TBEP_MERITOS_PREFERENTES bepmep WHERE 1=1 ";
 		
-		dataTable.setColumn(ORDER_COLUMN_INDEX_CODIGO, "bepmep.CODNUM");
+		dataTable.setColumn(ORDER_COLUMN_INDEX_CODIGO, "bepmep.CODIGO");
 		dataTable.setColumn(ORDER_COLUMN_INDEX_DESCRIPCION, "bepmep.DESCRIPCION");
 		dataTable.setColumn(ORDER_COLUMN_INDEX_TIPO, "bepmep.TIPO");
 		dataTable.setColumn(ORDER_COLUMN_INDEX_APLICABLE, "bepmep.APLICABLE");
@@ -225,7 +222,7 @@ public class ModeloMeritosPreferentes {
 	 * @throws SQLException .
 	 * @throws UVException . 
 	 */
-	public void editarMeritoPreferente(MeritoPreferente merito) throws UVException, SQLException {
+	public void editarMeritoPreferente(MeritoPreferente merito) throws SQLException {
 		String query = "UPDATE TBEP_MERITOS_PREFERENTES SET "
 				+ "CODIGO = ?, "
 				+ "DESCRIPCION = ?, "
@@ -330,6 +327,7 @@ public class ModeloMeritosPreferentes {
 	private MeritoPreferente createApartadoFromResultSet(ResultSet rs) throws SQLException, UVException {
 		MeritoPreferente obj = new MeritoPreferente();
 		obj.setCodNum(rs.getInt("CODNUM"));
+		obj.setCodigo(rs.getString("CODIGO"));
 		obj.setDescripcion(rs.getString("DESCRIPCION"));
 		obj.setTipo(rs.getString("TIPO"));		
 		obj.setAplicable(rs.getString("APLICABLE"));

@@ -11,7 +11,6 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
 import es.ujaen.uvirtual.beans.CodigoDescripcion;
 import es.ujaen.uvirtual.beans.UVDatos;
 import es.ujaen.uvirtual.beans.Usuario;
@@ -182,8 +181,8 @@ public class ControladorMeritosPreferentes extends HttpServlet {
 	
 	private void datatable(VistaMeritosPreferentes bean, UVDatos datos, HttpServletRequest request, HttpServletResponse response) 
 			throws SQLException, UVException, IOException {
-		datos.setContentType(RESPONSE_AJAX_CONTENTTYPE);
 		datos.setRespuestaEnviada(true);
+		datos.setContentType(RESPONSE_AJAX_CONTENTTYPE);		
 		response.setContentType(RESPONSE_AJAX_CONTENTTYPE);
 		response.setCharacterEncoding(RESPONSE_AJAX_ENCODING);
 		
@@ -191,9 +190,8 @@ public class ControladorMeritosPreferentes extends HttpServlet {
 			try {
 				BolsaEmpleoDataTable<MeritoPreferente> dataTable = ModeloMeritosPreferentes.obtenerInstancia().
 						listadoMeritosPreferentes(request.getParameterMap());
-				Gson gson = new GsonBuilder().setExclusionStrategies(BolsaEmpleoDataTable.GSONEXCLUSIONSTRATEGY).create();
 				bean.setDatatable(dataTable);
-				writer.write(gson.toJson(dataTable));
+				writer.write(dataTable.toJson());
 			} catch (Exception ex) {
 				bean.getMensajesDeError().add(ex.getMessage());
 				

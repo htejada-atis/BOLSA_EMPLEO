@@ -34,13 +34,13 @@ VistaMeritosPreferentes bean = (VistaMeritosPreferentes) uvdatos.getVistas().get
 	
 	<table class="bluetable bolsaempleo" id="table">
 		<tr>
-			<th scope="col" style="width:5%" title="Id del tipo de mérito preferente">Id</th>
-			<th scope="col"	style="width:20%" title="Descripción del mérito">Descripción</th>
+			<th scope="col" style="width:10%" title="Código del mérito">Código</th>
+			<th scope="col"	style="width:24%" title="Descripción del mérito">Descripción</th>
 			<th scope="col"	style="width:20%">Tipo</th>
-			<th scope="col"	style="width:20%">Aplicable</th>			
+			<th scope="col"	style="width:15%">Aplicable</th>			
 			<th scope="col"	style="width:10%">Factor</th>
 			<th scope="col"	style="width:10%">Activo</th>
-			<th scope="col"	style="width:10%"></th>
+			<th scope="col"	style="width:11%"></th>
 		</tr>
 		<tbody>
 		</tbody>
@@ -60,8 +60,10 @@ VistaMeritosPreferentes bean = (VistaMeritosPreferentes) uvdatos.getVistas().get
 		    "pageSize": 10,
 		    "action": "<%= ControladorMeritosPreferentes.ACCION_DATATABLE %>",
 		    "filterable": true,
+		    "defaultOrderBy": 0,
+		    "defaultOrderDirection": 'asc',
 		    "columns": [
-		    	{'data': 'codNum'},
+		    	{'data': 'codigo'},
 		        {'data': 'descripcion', 'filter': true},
 		        {'data': 'tipo', 'render': function(row) {
 		        	var text;
@@ -72,7 +74,10 @@ VistaMeritosPreferentes bean = (VistaMeritosPreferentes) uvdatos.getVistas().get
 		        		break;
 		        	case '<%= ModeloMeritosPreferentes.TIPO_MERITO %>':
 		        		text = 'Mérito: ' + row.tipoItemBaremacion.nombre;
-		        		break;		        	
+		        		break;	
+		        	case '<%= ModeloMeritosPreferentes.TIPO_POSESION %>':
+		        		text = 'Por posesión';
+		        		break;
 		        	}
 		        			        	
 		        	return text;
@@ -89,6 +94,9 @@ VistaMeritosPreferentes bean = (VistaMeritosPreferentes) uvdatos.getVistas().get
 		        		break;
 		        	case '<%= ModeloMeritosPreferentes.APLICABLE_ITEM %>':
 		        		text = 'Al mérito. ';
+		        		break;
+		        	case '<%= ModeloMeritosPreferentes.APLICABLE_TOTAL %>':
+		        		text = 'Al total';
 		        		break;
 		        	}
 		        	

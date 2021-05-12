@@ -10,9 +10,6 @@ import java.util.HashMap;
 
 import org.junit.Test;
 
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
-
 import es.ujaen.uvirtual.modulo.bolsaempleo.utilidades.BolsaEmpleoDataTable;
 import es.ujaen.uvirtual.utilidades.UVException;
 
@@ -323,12 +320,10 @@ public class TestBEPDataTable {
      */
     @Test
     public void testA13() throws UVException {
-    	final String sql = "SELECT 'c1' AS C1, 'c2' AS C2"
-    			+ "FROM DUAL"
-    			+ "connect by level <= 100";
+    	final String sql = "SELECT 'c1' AS C1, 'c2' AS C2 FROM DUAL connect by level <= 100";
     	
-		HashMap<String, String[]> params = new HashMap<String, String[]>();
-		BolsaEmpleoDataTable<Mock> dt = new BolsaEmpleoDataTable<Mock>(params);
+		HashMap<String, String[]> params = new HashMap<>();
+		BolsaEmpleoDataTable<Mock> dt = new BolsaEmpleoDataTable<>(params);
 		dt.setColumn(ORDER_BY, "C1");
 		dt.setColumn(ORDER_BY + 1, "C2");
 		dt.setQuery(sql);
@@ -339,8 +334,7 @@ public class TestBEPDataTable {
 		lista.add(new Mock("3", EDAD_3));
 		dt.setData(lista);
 
-		Gson gson = new GsonBuilder().setExclusionStrategies(BolsaEmpleoDataTable.GSONEXCLUSIONSTRATEGY).create();
-		String json = gson.toJson(dt);
+		String json = dt.toJson(); 
 		
 		assertNotEquals(-1, json.indexOf("{\"codNum\":\"1\",\"edad\":" + EDAD_1 + "}")); 
 		assertNotEquals(-1, json.indexOf("{\"codNum\":\"2\",\"edad\":" + EDAD_2 + "}"));

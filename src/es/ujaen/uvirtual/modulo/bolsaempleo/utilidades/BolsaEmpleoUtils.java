@@ -109,7 +109,7 @@ public final class BolsaEmpleoUtils {
 			return false;
 		}
 		
-		String valueSplitted[] = value.split(",");
+		String[] valueSplitted = value.split(",");
 		if (valueSplitted.length > 1) {
 			value = value.replace(',', '.');
 		}
@@ -128,7 +128,7 @@ public final class BolsaEmpleoUtils {
 	 */
 	public static Float leeParametroFloat(String valor) {
 		try {
-			String valueSplitted[] = valor.split(",");
+			String[] valueSplitted = valor.split(",");
 			if (valueSplitted.length > 1) {
 				valor = valor.replace(',', '.');
 			}

@@ -12,7 +12,6 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
 import es.ujaen.uvirtual.beans.CodigoDescripcion;
 import es.ujaen.uvirtual.beans.UVDatos;
 import es.ujaen.uvirtual.modulo.bolsaempleo.beans.Noticia;
@@ -245,8 +244,7 @@ public class ControladorGestionNoticias extends HttpServlet {
 			try {
 				BolsaEmpleoDataTable<Noticia> dataTable = modelo.listaNoticiasDatatable(request.getParameterMap());
 				bean.setDatatableNoticias(dataTable);
-				Gson gson = new GsonBuilder().setDateFormat("dd/M/yyyy").setExclusionStrategies(BolsaEmpleoDataTable.GSONEXCLUSIONSTRATEGY).create();
-				writer.write(gson.toJson(dataTable));
+				writer.write(dataTable.toJson());
 			} catch (UVException ex) {
 				CodigoDescripcion mensaje = new CodigoDescripcion("error", ex.getMessage());
 				writer.write(new Gson().toJson(mensaje));
