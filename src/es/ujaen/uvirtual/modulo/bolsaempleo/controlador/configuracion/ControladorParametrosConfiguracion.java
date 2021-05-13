@@ -163,7 +163,6 @@ public class ControladorParametrosConfiguracion extends HttpServlet {
 			modelo.actualizaParametro(param);
 		}	
 		
-		
 		List<ParametrosConfiguracion> parametrosCont = modelo.listaParametros();
 		bean.setParametros(parametrosCont);
 		bean.getMensajesDeExito().add(MENSAJE_EXITO_EDITAR);

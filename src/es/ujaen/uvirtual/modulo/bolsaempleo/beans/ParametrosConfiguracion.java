@@ -12,6 +12,7 @@ public class ParametrosConfiguracion implements Serializable {
 	private String nombre;
 	private String valor;
 	private String descripcion;
+	private Boolean adm;
 	
 	/** Constructor por defecto.
 	 */
@@ -73,6 +74,14 @@ public class ParametrosConfiguracion implements Serializable {
 
 	public void setDescripcion(String descripcion) {
 		this.descripcion = descripcion;
+	}
+	
+	public Boolean getAdm() {
+		return adm;
+	}
+
+	public void setAdm(Boolean adm) {
+		this.adm = adm;
 	}
 
 	public static long getSerialversionuid() {

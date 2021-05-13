@@ -547,9 +547,7 @@ public class ControladorMisSolicitudes extends HttpServlet {
 		ModeloBolsa modeloBolsa = ModeloBolsa.obtenerInstancia();
 		ModeloMerito modeloMerito = ModeloMerito.obtenerInstancia();
 		ModeloBaremacionItems modeloItems = ModeloBaremacionItems.obtenerInstancia();
-		ModeloParametrosConfiguracion modeloParam = ModeloParametrosConfiguracion.obtenerInstancia();			
-		
-		ParametrosConfiguracion param = modeloParam.getParametroByNombreBEP("codMeritoPreferente");
+
 		Bolsa area = modeloBolsa.getBolsaById(Formateador.leeParametroInteger(request.getParameter(PARAM_BOLSA)));
 		bean.setArea(area);
 
@@ -574,13 +572,18 @@ public class ControladorMisSolicitudes extends HttpServlet {
 			Integer totalMeritos = modeloSolicitud.obtenerTotalMeritosPorBloqueSolicitud(solicitud, merito);
 
 			if (totalMeritos >= solicitud.getConvocatoria().getNumMeritosPorBloque()) {
+				this.seleccionarBolsa(bean, request);
 				throw new UVException(MENSAJE_ERROR_NUMERO_MAXIMO_MERITOS_BLOQUE);
 			}
 			
 			List<MeritoSolicitud> listaMeritos = modeloSolicitud.getMeritosSolicitudBolsa(solicitud, area);
 			for (MeritoSolicitud mer : listaMeritos) {
 				if (modeloItems.checkItemsExcluyentes(mer.getMerito().getItemBaremacion(), merito.getItemBaremacion())) {
-					throw new UVException(MENSAJE_ERROR_ITEM_EXCLUYENTE + merito.getItemBaremacion().getDescripcion());
+					this.seleccionarBolsa(bean, request);
+					throw new UVException(MENSAJE_ERROR_ITEM_EXCLUYENTE 
+							+ mer.getMerito().getItemBaremacion().getBloqueBaremacion().getApartadoBaremacion().getCodigo()
+							+ "." + mer.getMerito().getItemBaremacion().getBloqueBaremacion().getCodigo() 
+							+ "." + mer.getMerito().getItemBaremacion().getCodigo());
 				}
 			}
 			

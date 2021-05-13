@@ -34,11 +34,16 @@ VistaParametrosConfiguracion bean = (VistaParametrosConfiguracion) uvdatos.getVi
     	<input type="hidden" name="<%= ControladorParametrosConfiguracion.PARAM_ACCION %>" id="accion_formulario" value="<%= ControladorParametrosConfiguracion.ACCION_EDITAR_PARAMETROS %>" />
 		
 		<div class="form-group">
-			<% for(ParametrosConfiguracion param : bean.getParametros()){%>
-				<div class="titulo-bolsa-empleo" style="margin-top:1rem;">
-					<h3><%=param.getNombre().split("[.]")[1] %></h3>
-				</div>
-			
+			<% for(ParametrosConfiguracion param : bean.getParametros()){
+				if(param.getAdm()){%>
+					<div class="titulo-bolsa-empleo" style="margin-top:1rem;">
+						<h3><%= param.getNombre().split("[.]")[1] %></h3>
+					</div>
+				<% } else { %>
+					<div class="titulo-bolsa-empleo" style="margin-top:1rem;">
+						<h3><%= param.getNombre() %></h3>
+					</div>
+				<% } %>
 				<div class="form-group-container col2">
 					<div class="form-group">
 	   					<div class="form-group">
