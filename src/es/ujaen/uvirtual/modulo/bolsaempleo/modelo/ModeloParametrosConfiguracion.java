@@ -61,22 +61,23 @@ public class ModeloParametrosConfiguracion {
 					param.setNombre(rs.getString("PARAM_CODALF"));
 					param.setValor(rs.getString("VALOR"));
 					param.setDescripcion(rs.getString("DESID"));
+					param.setAdm(true);
 					parametros.add(param);	
 				}
 			}
 		}
 		
-		String consultaBep = "SELECT * FROM ADM_PARAMETROS "
-				+ "WHERE PARAM_CODALF LIKE '%bolsaempleo%'";
+		String consultaBep = "SELECT * FROM TBEP_PARAMETROS_CONFIGURACION";
 		
 		try (Connection conexion = ConexionUvirtual.obtenerInstancia(); PreparedStatement stmt = conexion.prepareStatement(consultaBep)) {
 			try (ResultSet rs = stmt.executeQuery()) {
 				while (rs.next()) {
 					ParametrosConfiguracion param = new ParametrosConfiguracion();
-					param.setCodNum(rs.getString("CONFIG_CODALF"));
-					param.setNombre(rs.getString("PARAM_CODALF"));
+					param.setCodNum(rs.getString("CODNUM"));
+					param.setNombre(rs.getString("NOMBRE"));
+					param.setDescripcion(rs.getString("DESCRIPCION"));
 					param.setValor(rs.getString("VALOR"));
-					param.setDescripcion(rs.getString("DESID"));
+					param.setAdm(false);
 					parametros.add(param);	
 				}
 			}
@@ -98,19 +99,32 @@ public class ModeloParametrosConfiguracion {
 		if (param.getCodNum() == null) {
 			throw new UVException("id parametro no válido");
 		}
-		
-		String consulta = "UPDATE ADM_PARAMETROS "
-			+ " SET DESID=?, VALOR=? "
-			+ " WHERE CONFIG_CODALF=? AND PARAM_CODALF=?";
-		
-		try (Connection conexion = ConexionUvirtual.obtenerInstancia();
-		PreparedStatement stmt = conexion.prepareStatement(consulta);) {
-			int parameterIndex = 1;
-			stmt.setString(parameterIndex++, param.getDescripcion());
-			stmt.setString(parameterIndex++, param.getValor());
-			stmt.setString(parameterIndex++, param.getCodNum());
-			stmt.setString(parameterIndex++, param.getNombre());
-			stmt.executeUpdate();
+		if (param.getAdm()) {
+			String consulta = "UPDATE ADM_PARAMETROS "
+					+ " SET DESID=?, VALOR=? "
+					+ " WHERE CONFIG_CODALF=? AND PARAM_CODALF=?";
+			try (Connection conexion = ConexionUvirtual.obtenerInstancia();
+					PreparedStatement stmt = conexion.prepareStatement(consulta);) {
+				int parameterIndex = 1;
+				stmt.setString(parameterIndex++, param.getDescripcion());
+				stmt.setString(parameterIndex++, param.getValor());
+				stmt.setString(parameterIndex++, param.getCodNum());
+				stmt.setString(parameterIndex++, param.getNombre());
+				stmt.executeUpdate();
+			}
+		} else {
+			String consulta = "UPDATE TBEP_PARAMETROS_CONFIGURACION "
+					+ " SET DESCRIPCION=?, VALOR=? "
+					+ " WHERE CODNUM=? AND NOMBRE=?";
+			try (Connection conexion = ConexionUvirtual.obtenerInstancia();
+					PreparedStatement stmt = conexion.prepareStatement(consulta);) {
+				int parameterIndex = 1;
+				stmt.setString(parameterIndex++, param.getDescripcion());
+				stmt.setString(parameterIndex++, param.getValor());
+				stmt.setString(parameterIndex++, param.getCodNum());
+				stmt.setString(parameterIndex++, param.getNombre());
+				stmt.executeUpdate();
+			}
 		}
 	}
 	

@@ -294,7 +294,7 @@ public class ControladorMisTitulaciones extends HttpServlet {
 			modelo.insertaTitulacionUsuario(titulacion);
 				
 			bean.getMensajesDeExito().add(MENSAJE_EXITO_AGREGAR);
-			response.sendRedirect(request.getServletPath());	
+			bean.setVista(RUTA_BEP_CONF + "index.jsp");
 		}
 	}
 	

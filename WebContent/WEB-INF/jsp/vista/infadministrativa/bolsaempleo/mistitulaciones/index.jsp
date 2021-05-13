@@ -13,13 +13,6 @@ VistaTitulaciones bean = (VistaTitulaciones) uvdatos.getVistas().get(VistaTitula
 
 
 <div class="bolsa-empleo misdatos-form">
-	<div class="titulo-bolsa-empleo" style="float:right; margin-top:1.2rem">
-		<a class="link-btn" id="nueva_titulacion" href="<%= request.getRequestURI() %>" style="margin-top:0">Nueva titulación</a>
-	</div>
-	
-	<div class="titulo-bolsa-empleo" style="margin-top:1rem;">
-		<h2>Mis Titulaciones</h2>
-	</div>
 	<% if (bean.getMensajesDeExito().size() > 0) { %>
 		<div id="exito" class="success">
 			<%= bean.formatearMensajesDeExito() %>
@@ -30,6 +23,14 @@ VistaTitulaciones bean = (VistaTitulaciones) uvdatos.getVistas().get(VistaTitula
 			<%= bean.formatearMensajesDeError() %>
 		</div>
 	<% } %>
+	
+	<div class="titulo-bolsa-empleo" style="float:right; margin-top:1.2rem">
+		<a class="link-btn" id="nueva_titulacion" href="<%= request.getRequestURI() %>" style="margin-top:0">Nueva titulación</a>
+	</div>
+	
+	<div class="titulo-bolsa-empleo" style="margin-top:1rem;">
+		<h2>Mis Titulaciones</h2>
+	</div>
 	
 	<table class="bluetable bolsaempleo" id="tableTitulacionesUsuario">
 		<tr>
@@ -87,7 +88,7 @@ $(document).ready(function() {
 	    	{'data': 'codNum', 'selectable': true},
 	        {'data': 'titulacion.nombre', 'class': 'overflow-auto', 'filter': {'type': 'text'}},
 	    	{'data': 'descripcion'},
-        	{'data': 'validada', 'order': {'active': false}, 'filter': {'type': 'select', 'options':{'true': 'Validado', 'false': 'Pendiente'}, 'optionDefault': 'true'},
+        	{'data': 'validada', 'order': {'active': false}, 'filter': {'type': 'select', 'options':{'true': 'Validado', 'false': 'Pendiente'}},
 	    		'render': function(row) {
 	        		if (row.validada) {
 	        			return "<div title='Validado' class='circle-true'></div>"; 
