@@ -15,12 +15,12 @@ Afinidad afinidad = bean.getAfinidad();
 %>
 
 <div class="bolsa-empleo afinidad-form">
+	
 	<% if (bean.getMensajesDeExito().size() > 0) { %>
 		<div id="exito" class="success">
 			<%= bean.formatearMensajesDeExito() %>
 		</div>
 	<% } %>
-	
 	<% if (bean.getMensajesDeError().size() > 0) { %>
 		<div id="error" class="error">
 			<%= bean.formatearMensajesDeError() %>

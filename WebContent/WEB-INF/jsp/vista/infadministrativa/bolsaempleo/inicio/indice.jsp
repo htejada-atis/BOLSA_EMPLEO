@@ -13,17 +13,18 @@ VistaUsuarioBolsaEmpleo beanUsuario = (VistaUsuarioBolsaEmpleo) uvdatos.getVista
 %>
 
 <div class="bolsa-empleo">
+
 	<% if (bean != null) { %>
-	<% if (bean.getMensajesDeExito().size() > 0) { %>
-	<div id="exito" class="success">
-		<%= bean.formatearMensajesDeExito() %>
-	</div>
-	<% } %>
-	<% if (bean.getMensajesDeError().size() > 0) { %>
-		<div id="error" class="error">
-			<%= bean.formatearMensajesDeError() %>
+		<% if (bean.getMensajesDeExito().size() > 0) { %>
+		<div id="exito" class="success">
+			<%= bean.formatearMensajesDeExito() %>
 		</div>
-	<% } else {%>
+		<% } %>
+		<% if (bean.getMensajesDeError().size() > 0) { %>
+			<div id="error" class="error">
+				<%= bean.formatearMensajesDeError() %>
+			</div>
+		<% } %>
 
 		<% if (beanUsuario != null) { %>
 			<% if (beanUsuario.getMensajesDeExito().size() > 0) { %>
@@ -32,9 +33,7 @@ VistaUsuarioBolsaEmpleo beanUsuario = (VistaUsuarioBolsaEmpleo) uvdatos.getVista
 				</div>
 			<% } %>
 		<% } %>
-
-
-
+	<% } %>
 
     <h2>Bolsa de empleo para PDI de la Universidad de Jaén</h2>
     
@@ -69,8 +68,7 @@ VistaUsuarioBolsaEmpleo beanUsuario = (VistaUsuarioBolsaEmpleo) uvdatos.getVista
 		</ul>
 		<div class="row-ver-todas" id="view_all"> (<a href="#">Ver todas</a>) </div>
     </div>
-<% } %>
-<% } %>
+
 </div>
 
 <script type="text/javascript">

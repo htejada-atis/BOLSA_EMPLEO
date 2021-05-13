@@ -13,18 +13,14 @@ VistaMeritos bean = (VistaMeritos) uvdatos.getVistas().get(VistaMeritos.class.ge
 
 <div class="bolsa-empleo">
 
-	<% if (session.getAttribute(ControladorMisMeritos.MENSAJE_ENVIADO) != null) { %>
+	<% if (bean.getMensajesDeExito().size() > 0) { %>
 		<div id="exito" class="success">
-			<%= session.getAttribute(ControladorMisMeritos.MENSAJE_ENVIADO) %>
+			<%= bean.formatearMensajesDeExito() %>
 		</div>
-	<% 
-			session.removeAttribute(ControladorMisMeritos.MENSAJE_ENVIADO);
-		} 
-	%>
-	
+	<% } %>
 	<% if (bean.getMensajesDeError().size() > 0) { %>
 		<div id="error" class="error">
-			<%= bean.formatearMensajesDeError()   %>
+			<%= bean.formatearMensajesDeError() %>
 		</div>
 	<% } %>
 	

@@ -22,16 +22,22 @@ Boolean publica = noticia != null ? noticia.isPublica() : false;
 
 <div class="bolsa-empleo">
 
-	<% 
-		if (bean.getMensajesDeError().size()>0) {
-			out.print("<div class='error'>" + bean.formatearMensajesDeError() + "</div>");
-		}
-	
-		if (noticia != null) { %>
-	    	<h2>Editar noticia</h2>
-	<%	} else { %>
-		    <h2>Nueva noticia</h2>
-	<%	} %>
+	<% if (bean.getMensajesDeExito().size() > 0) { %>
+		<div id="exito" class="success">
+			<%= bean.formatearMensajesDeExito() %>
+		</div>
+	<% } %>
+	<% if (bean.getMensajesDeError().size() > 0) { %>
+		<div id="error" class="error">
+			<%= bean.formatearMensajesDeError() %>
+		</div>
+	<% } %>
+
+	<% if (noticia != null) { %>
+	    <h2>Editar noticia</h2>
+	<% } else { %>
+		<h2>Nueva noticia</h2>
+	<% } %>
     
     <div id="erroresForm" class="error" style="display:none;">
 		<p>Porfavor primero debe rellenar todos los campos requeridos del formulario:</p>
