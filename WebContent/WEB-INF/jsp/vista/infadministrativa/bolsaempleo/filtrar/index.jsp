@@ -133,7 +133,7 @@ UsuarioBolsaEmpleo candidato = bean.getCandidato();
 				    		}
 			    		}
 			    	},
-			        {'data': 'nombre', 'class': 'overflow-auto', 'filter': {'type': 'text'}},
+			        {'data': 'titulacion.nombre', 'class': 'overflow-auto', 'filter': {'type': 'text'}},
 			    	{'data': 'descripcion'},
 		        	{'data': 'codnum', 'buttons': [
 		        		{'label': 'Descargar', 'onClick': function(row) {

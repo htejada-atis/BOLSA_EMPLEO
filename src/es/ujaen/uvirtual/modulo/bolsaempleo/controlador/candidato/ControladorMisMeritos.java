@@ -84,8 +84,8 @@ public class ControladorMisMeritos extends HttpServlet {
 	public static final String MENSAJE_ERROR_ITEM_REQUERIDO = "Debe seleccionar un ítem";
 	public static final String MENSAJE_ERROR_OBSERVACION_LARGO = "La observación no puede contener mas de %d caracteres";
 	public static final String MENSAJE_ERROR_VALOR_VACIO = "El valor no puede estar vacio";
-	public static final String MENSAJE_ERROR_VALOR_MAXIMO_PERMITIDO = "El valor máximo permitido es";
-	public static final String MENSAJE_ERROR_VALOR_MINIMO_PERMITIDO = "El valor mínimo permitido es";
+	public static final String MENSAJE_ERROR_VALOR_MAXIMO_PERMITIDO = "El valor máximo permitido es %s";
+	public static final String MENSAJE_ERROR_VALOR_MINIMO_PERMITIDO = "El valor mínimo permitido es %s";
 	public static final String MENSAJE_ERROR_MERITOS_SELECCIONADOS_INCORRECTOS = "No hay méritos seleccionados válidos";
 	public static final String MENSAJE_ERROR_ELIMINAR_MERITO = "No se puede eliminar un mérito que ya está asociado a una solicitud";
 	
@@ -396,10 +396,10 @@ public class ControladorMisMeritos extends HttpServlet {
 			throw new UVException("El valor no es válido");
 		}
 		if (valor < merito.getItemBaremacion().getValorMinimo()) {
-			throw new UVException(String.format(MENSAJE_ERROR_VALOR_MINIMO_PERMITIDO, merito.getItemBaremacion().getValorMinimo()));
+			throw new UVException(String.format(MENSAJE_ERROR_VALOR_MINIMO_PERMITIDO, merito.getItemBaremacion().getValorMinimo().toString()));
 		}
 		if (valor > merito.getItemBaremacion().getValorMaximo()) {
-			throw new UVException(String.format(MENSAJE_ERROR_VALOR_MAXIMO_PERMITIDO, merito.getItemBaremacion().getValorMaximo()));
+			throw new UVException(String.format(MENSAJE_ERROR_VALOR_MAXIMO_PERMITIDO, merito.getItemBaremacion().getValorMaximo().toString()));
 		}
 		merito.setValor(valor);
 		
