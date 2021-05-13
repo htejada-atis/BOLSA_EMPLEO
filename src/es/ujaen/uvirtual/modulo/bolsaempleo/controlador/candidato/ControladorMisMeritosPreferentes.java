@@ -1,44 +1,26 @@
 package es.ujaen.uvirtual.modulo.bolsaempleo.controlador.candidato;
 
-import java.io.BufferedInputStream;
 import java.io.IOException;
-import java.io.InputStream;
 import java.io.PrintWriter;
 import java.sql.SQLException;
-import java.sql.SQLIntegrityConstraintViolationException;
 import java.util.logging.Logger;
-import java.util.List;
 import java.util.logging.Level;
 import javax.servlet.ServletException;
-import javax.servlet.ServletOutputStream;
 import javax.servlet.annotation.MultipartConfig;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import javax.servlet.http.HttpSession;
-import javax.servlet.http.Part;
 import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
-import com.google.gson.reflect.TypeToken;
 import es.ujaen.uvirtual.beans.CodigoDescripcion;
 import es.ujaen.uvirtual.beans.UVDatos;
 import es.ujaen.uvirtual.beans.Usuario;
-import es.ujaen.uvirtual.modulo.bolsaempleo.beans.ApartadoBaremacion;
-import es.ujaen.uvirtual.modulo.bolsaempleo.beans.ItemBaremacion;
-import es.ujaen.uvirtual.modulo.bolsaempleo.beans.Merito;
-import es.ujaen.uvirtual.modulo.bolsaempleo.beans.MeritoPreferente;
 import es.ujaen.uvirtual.modulo.bolsaempleo.beans.MeritoPreferenteUsuario;
 import es.ujaen.uvirtual.modulo.bolsaempleo.beans.UsuarioBolsaEmpleo;
-import es.ujaen.uvirtual.modulo.bolsaempleo.modelo.ModeloBaremacionItems;
-import es.ujaen.uvirtual.modulo.bolsaempleo.modelo.ModeloBaremacionApartados;
-import es.ujaen.uvirtual.modulo.bolsaempleo.modelo.ModeloMerito;
-import es.ujaen.uvirtual.modulo.bolsaempleo.modelo.ModeloMeritosPreferentes;
 import es.ujaen.uvirtual.modulo.bolsaempleo.modelo.ModeloMeritosPreferentesCandidato;
 import es.ujaen.uvirtual.modulo.bolsaempleo.modelo.ModeloUsuarioBolsaEmpleo;
 import es.ujaen.uvirtual.modulo.bolsaempleo.utilidades.BolsaEmpleoDataTable;
 import es.ujaen.uvirtual.modulo.bolsaempleo.utilidades.BolsaEmpleoUtils;
-import es.ujaen.uvirtual.modulo.bolsaempleo.vistas.VistaMeritos;
 import es.ujaen.uvirtual.modulo.bolsaempleo.vistas.VistaMeritosPreferentesCandidato;
 import es.ujaen.uvirtual.utilidades.EscapaHTML;
 import es.ujaen.uvirtual.utilidades.Formateador;
@@ -128,7 +110,7 @@ public class ControladorMisMeritosPreferentes extends HttpServlet {
 		}
 		
 		try {
-			init(bean, datos);
+			init(bean, datos, request);
 			switch (nombreAccion) {
 				case ACCION_INDEX:
 					listaMeritos(bean);
@@ -159,8 +141,9 @@ public class ControladorMisMeritosPreferentes extends HttpServlet {
 		}
 	}
 	
-	private void init(VistaMeritosPreferentesCandidato bean, UVDatos datos) throws SQLException, UVException {
+	private void init(VistaMeritosPreferentesCandidato bean, UVDatos datos, HttpServletRequest request) throws SQLException, UVException {
 		bean.setVista(RUTA_BEP_MERITOS + "index.jsp");
+		BolsaEmpleoUtils.readMensajeSession(bean, request);
 		ModeloUsuarioBolsaEmpleo.obtenerInstancia().checkUser(datos);
 	}
 	

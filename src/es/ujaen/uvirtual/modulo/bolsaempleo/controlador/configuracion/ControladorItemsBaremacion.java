@@ -12,7 +12,6 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import com.google.gson.Gson;
-
 import es.ujaen.uvirtual.beans.CodigoDescripcion;
 import es.ujaen.uvirtual.beans.UVDatos;
 import es.ujaen.uvirtual.beans.Usuario;
@@ -166,7 +165,7 @@ public class ControladorItemsBaremacion extends HttpServlet {
 		}
 		
 		try {
-			init(bean, datos);
+			init(bean, datos, request);
 			switch (nombreAccion) {
 				case ACCION_INDEX:
 					indice(bean);
@@ -244,8 +243,9 @@ public class ControladorItemsBaremacion extends HttpServlet {
 		bean.setVista(JSP_ITEM_BAREMACION);
 	}
 	
-	private void init(VistaItemsBaremacion bean, UVDatos datos) throws SQLException, UVException {
+	private void init(VistaItemsBaremacion bean, UVDatos datos, HttpServletRequest request) throws SQLException, UVException {
 		bean.setVista(JSP_ITEM_BAREMACION);
+		BolsaEmpleoUtils.readMensajeSession(bean, request);
 		ModeloUsuarioBolsaEmpleo.obtenerInstancia().checkUser(datos);
 	}
 	
@@ -277,10 +277,10 @@ public class ControladorItemsBaremacion extends HttpServlet {
 				editarApartadoConfirm(bean, request);
 				break;
 			case ACCION_DESACTIVAR_APARTADO:
-				desactivarApartado(bean, request);
+				desactivarApartado(bean, request, response);
 				break;
 			case ACCION_ACTIVAR_APARTADO:
-				activarApartado(bean, request);
+				activarApartado(bean, request, response);
 				break;
 			case ACCION_APARTADO_SELECCIONADO:
 				seleccionarApartado(bean, request);
@@ -325,11 +325,11 @@ public class ControladorItemsBaremacion extends HttpServlet {
 		apartado.setActivo(true);
 		ModeloBaremacionApartados.obtenerInstancia().insertaApartado(apartado);
 		
-		bean.getMensajesDeExito().add(MENSAJE_EXITO_APARTADO_AGREGAR);
+		BolsaEmpleoUtils.addMensajeDeExito(MENSAJE_EXITO_APARTADO_AGREGAR, bean, request);
 		bean.setVista(JSP_ITEM_BAREMACION);				
 	}
 	
-	private void desactivarApartado(VistaItemsBaremacion bean, HttpServletRequest request) throws SQLException, UVException {
+	private void desactivarApartado(VistaItemsBaremacion bean, HttpServletRequest request, HttpServletResponse response) throws SQLException, UVException, IOException {
 		bean.setVista(JSP_ITEM_BAREMACION);
 		
 		ModeloBaremacionApartados modelo = ModeloBaremacionApartados.obtenerInstancia();
@@ -338,10 +338,11 @@ public class ControladorItemsBaremacion extends HttpServlet {
 		
 		modelo.desactivarApartado(apartado);
 		
-		bean.getMensajesDeExito().add(MENSAJE_EXITO_APARTADO_DESACTIVAR);
+		BolsaEmpleoUtils.addMensajeDeExito(MENSAJE_EXITO_APARTADO_DESACTIVAR, bean, request);
+		response.sendRedirect(request.getServletPath());
 	}
 	
-	private void activarApartado(VistaItemsBaremacion bean, HttpServletRequest request) throws SQLException, UVException {
+	private void activarApartado(VistaItemsBaremacion bean, HttpServletRequest request, HttpServletResponse response) throws SQLException, UVException, IOException {
 		bean.setVista(JSP_ITEM_BAREMACION);
 		
 		ModeloBaremacionApartados modelo = ModeloBaremacionApartados.obtenerInstancia();
@@ -350,7 +351,8 @@ public class ControladorItemsBaremacion extends HttpServlet {
 		
 		modelo.activarApartado(apartado);
 		
-		bean.getMensajesDeExito().add(MENSAJE_EXITO_APARTADO_ACTIVAR);	
+		BolsaEmpleoUtils.addMensajeDeExito(MENSAJE_EXITO_APARTADO_ACTIVAR, bean, request);
+		response.sendRedirect(request.getServletPath());
 	}
 	
 	private void editarApartado(VistaItemsBaremacion bean, HttpServletRequest request) throws SQLException, UVException {
@@ -359,7 +361,7 @@ public class ControladorItemsBaremacion extends HttpServlet {
 		bean.setApartadoBaremacion(modelo.getApartadoBaremacionById(codNum));
 		
 		bean.setVista(JSP_FORM_APARTADO_BAREMACION);
-		bean.setUltimoCodigo(modelo.getUltimoCodigoApartado());			
+		bean.setUltimoCodigo(modelo.getUltimoCodigoApartado());	
 	}
 	
 	private void editarApartadoConfirm(VistaItemsBaremacion bean, HttpServletRequest request) throws SQLException, UVException {

@@ -13,6 +13,7 @@ import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 import es.ujaen.uvirtual.beans.UVDatos;
 import es.ujaen.uvirtual.modulo.bolsaempleo.modelo.ModeloUsuarioBolsaEmpleo;
+import es.ujaen.uvirtual.modulo.bolsaempleo.utilidades.BolsaEmpleoUtils;
 import es.ujaen.uvirtual.modulo.bolsaempleo.vistas.VistaMisResultados;
 import es.ujaen.uvirtual.utilidades.EscapaHTML;
 import es.ujaen.uvirtual.utilidades.UVException;
@@ -71,7 +72,7 @@ public class ControladorMisResultados extends HttpServlet {
 		}
 		
 		try {
-			init(bean, datos);
+			init(bean, datos, request);
 			switch (nombreAccion) {
 				case ACCION_INDEX:
 					bean.setVista(RUTA_BEP + "index.jsp");
@@ -104,8 +105,9 @@ public class ControladorMisResultados extends HttpServlet {
 		}
 	}
 	
-	private void init(VistaMisResultados bean, UVDatos datos) throws SQLException, UVException {
+	private void init(VistaMisResultados bean, UVDatos datos, HttpServletRequest request) throws SQLException, UVException {
 		bean.setVista(RUTA_BEP + "index.jsp");
+		BolsaEmpleoUtils.readMensajeSession(bean, request);
 		ModeloUsuarioBolsaEmpleo.obtenerInstancia().checkUser(datos);
 	}
 	

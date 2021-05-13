@@ -70,7 +70,7 @@ Boolean publica = noticia != null ? noticia.isPublica() : false;
     	</div>
     	<div class="form-check">
     		<label for="noticia_publica" class="bold-label"><input type="checkbox" id="noticia_publica" name="<%= ControladorGestionNoticias.PARAM_PUBLICA %>" 
-    		value="<%= publica %>" <%= (publica ? "checked=''" : "") %> />Pï¿½blica</label>
+    		value="<%= publica %>" <%= (publica ? "checked=''" : "") %> />Pública</label>
     	</div>
     	<div class="form-btn">
     		<input id="noticia_enviar" type="submit" name="<%= ControladorGestionNoticias.PARAM_ENVIAR %>" value="<%= noticia != null ? "Guardar cambios" : "Insertar noticia" %>"/>

@@ -23,6 +23,7 @@ import es.ujaen.uvirtual.modulo.bolsaempleo.beans.Bolsa;
 import es.ujaen.uvirtual.modulo.bolsaempleo.modelo.ModeloBolsa;
 import es.ujaen.uvirtual.modulo.bolsaempleo.modelo.ModeloUsuarioBolsaEmpleo;
 import es.ujaen.uvirtual.modulo.bolsaempleo.utilidades.BolsaEmpleoDataTable;
+import es.ujaen.uvirtual.modulo.bolsaempleo.utilidades.BolsaEmpleoUtils;
 import es.ujaen.uvirtual.modulo.bolsaempleo.vistas.VistaEstadoBolsas;
 import es.ujaen.uvirtual.utilidades.EscapaHTML;
 import es.ujaen.uvirtual.utilidades.Formateador;
@@ -89,7 +90,7 @@ public class ControladorBolsas extends HttpServlet {
 		}
 		
 		try {			
-			init(bean, datos);
+			init(bean, datos, request);
 			switch (nombreAccion) {
 				case ACCION_INDEX:
 					bean.setVista("/WEB-INF/jsp/vista/infadministrativa/bolsaempleo/bolsas/index.jsp");
@@ -98,7 +99,7 @@ public class ControladorBolsas extends HttpServlet {
 					listado(bean, datos, request, response);
 					break;
 				case ACCION_BOLSA:
-					accionSobreBolsas(bean, request);					
+					accionSobreBolsas(bean, request, response);					
 					break;
 				default:
 					errorFatal(bean, "Acción no contemplada");
@@ -124,7 +125,7 @@ public class ControladorBolsas extends HttpServlet {
 		}
 	}
 	
-	private void init(VistaEstadoBolsas bean, UVDatos datos) throws SQLException, UVException {
+	private void init(VistaEstadoBolsas bean, UVDatos datos, HttpServletRequest request) throws SQLException, UVException {
 		ModeloBolsa modeloBolsa = ModeloBolsa.obtenerInstancia();
 		
 		bean.setVista("/WEB-INF/jsp/vista/infadministrativa/bolsaempleo/bolsas/index.jsp");
@@ -133,6 +134,7 @@ public class ControladorBolsas extends HttpServlet {
 		bean.setTotalBolsasBaremables(modeloBolsa.getBolsasBaremables());
 		bean.setTotalBolsas(modeloBolsa.getTotalBolsas());
 		
+		BolsaEmpleoUtils.readMensajeSession(bean, request);
 		ModeloUsuarioBolsaEmpleo.obtenerInstancia().checkUser(datos);
 	}
 	
@@ -172,7 +174,7 @@ public class ControladorBolsas extends HttpServlet {
 		}
 	}
 	
-	private void accionSobreBolsas(VistaEstadoBolsas bean, HttpServletRequest request) throws UVException, SQLException {
+	private void accionSobreBolsas(VistaEstadoBolsas bean, HttpServletRequest request, HttpServletResponse response) throws UVException, SQLException, IOException {
 		ModeloBolsa modelo = ModeloBolsa.obtenerInstancia();		
 		String selectedJson = EscapaHTML.ajustaCodificacion(request.getParameter(PARAM_BOLSAS_SELECCIONADAS));
 		int[] selected;
@@ -206,10 +208,12 @@ public class ControladorBolsas extends HttpServlet {
 				modelo.baremarBolsas(bolsas);
 				break;
 			default:
-				bean.getMensajesDeError().add(MENSAJE_ERROR_ACCION_BOLSA_NO_VALIDA);
+				BolsaEmpleoUtils.addMensajeDeError(MENSAJE_ERROR_ACCION_BOLSA_NO_VALIDA, bean, request);
+				response.sendRedirect(request.getServletPath());
 				return;
 		}
 		
-		bean.getMensajesDeExito().add(MENSAJE_EXITO_BOLSA_MODIFICADA_CORRECTAMENTE);
+		BolsaEmpleoUtils.addMensajeDeExito(MENSAJE_EXITO_BOLSA_MODIFICADA_CORRECTAMENTE, bean, request);
+		response.sendRedirect(request.getServletPath());
 	}
 }
