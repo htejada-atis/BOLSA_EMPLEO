@@ -116,6 +116,8 @@ public class ControladorUsuarioBolsaEmpleo extends HttpServlet {
 	
 	public static final String MENSAJE_ERROR_FECHA_EXCLUIDO_INICIO_REQUERIDA = "La fecha de inicio es requerida";
 	public static final String MENSAJE_ERROR_FECHA_EXCLUIDO_FIN_REQUERIDA = "La fecha de fin es requerida";
+	public static final String MENSAJE_ERROR_EXCLUSION_USUARIO_LOGUEADO =
+			"No puede auto excluirse, si desea que su perfil se excluya del sistema contacte con un administrador";
 	
 	// ajax	
 	public static final String URL_PATTERN_AJAX = "/srv/es/ajax/informacionadministrativa/bolsaempleo/configuracion/usuarios";
@@ -176,16 +178,16 @@ public class ControladorUsuarioBolsaEmpleo extends HttpServlet {
 					obtenerRoles(bean);
 					break;
 				case ACCION_AGREGAR_USUARIO:
-					agregarUsuario(request, response, bean);
+					agregarUsuario(request, response, bean, usuario);
 					break;
 				case ACCION_EDITAR_USUARIO:
-					editarUsuario(request, response, bean);
+					editarUsuario(request, response, bean, usuario);
 					break;
 				case ACCION_INCLUIR_USUARIO:
 					incluirUsuario(request, response, bean);
 					break;
 				case ACCION_EXCLUIR_USUARIO:
-					excluirUsuario(request, response, bean);
+					excluirUsuario(request, response, bean, usuario);
 					break;
 				case ACCION_USUARIO:
 					accionSobreUsuario(request, bean);						
@@ -390,15 +392,17 @@ public class ControladorUsuarioBolsaEmpleo extends HttpServlet {
 	 * @param request .
 	 * @param response .
 	 * @param bean bean de la vista a la que poner los valores.
+	 * @param usu .
 	 * @throws SQLException excepcion de bbdd.
 	 * @throws UVException en caso de error en bd
 	 */
-	public void agregarUsuario(HttpServletRequest request, HttpServletResponse response, VistaUsuarioBolsaEmpleo bean) throws SQLException, UVException, IOException {
+	public void agregarUsuario(HttpServletRequest request, HttpServletResponse response,
+			VistaUsuarioBolsaEmpleo bean, Usuario usu) throws SQLException, UVException, IOException {
 		bean.setVista(JSP_USUARIOS);
 		
 		Usuario usuArcos = CrearUsuario.usuario(request.getParameter(PARAM_ID));
 		ModeloUsuarioBolsaEmpleo modelo = ModeloUsuarioBolsaEmpleo.obtenerInstancia();		
-		UsuarioBolsaEmpleo usuarioForm = this.getValidatorUsuarios(request);
+		UsuarioBolsaEmpleo usuarioForm = this.getValidatorUsuarios(request, usu);
 		usuarioForm.setCodCuenta(EscapaHTML.ajustaCodificacion(request.getParameter(PARAM_ID)));		
 		usuarioForm.setNumDocumento(usuArcos.getDocumentoNumero());
 						
@@ -414,11 +418,12 @@ public class ControladorUsuarioBolsaEmpleo extends HttpServlet {
 	 * @param request .
 	 * @param response .
 	 * @param bean bean de la vista a la que poner los valores .
+	 * @param usuar .
 	 * @throws SQLException excepcion de bbdd.
 	 * @throws UVException en caso de error en bd
 	 * @throws IOException en caso de error de IO.
 	 */
-	private void editarUsuario(HttpServletRequest request, HttpServletResponse response, VistaUsuarioBolsaEmpleo bean) 
+	private void editarUsuario(HttpServletRequest request, HttpServletResponse response, VistaUsuarioBolsaEmpleo bean, Usuario usuar) 
 			throws SQLException, UVException, IOException {
 		bean.setVista(JSP_FORM_USUARIO);
 		
@@ -435,7 +440,7 @@ public class ControladorUsuarioBolsaEmpleo extends HttpServlet {
 		bean.setRol(usu.getRol());
 		
 		if (EscapaHTML.ajustaCodificacion(request.getParameter(PARAM_ROLE)) != null) {
-			UsuarioBolsaEmpleo usuarioForm = this.getValidatorUsuarios(request);
+			UsuarioBolsaEmpleo usuarioForm = this.getValidatorUsuarios(request, usuar);
 			usuarioForm.setCodNum(Formateador.leeParametroInteger(request.getParameter(PARAM_ID)));
 			
 			modelo.actualizaUsuario(usuarioForm);
@@ -471,12 +476,13 @@ public class ControladorUsuarioBolsaEmpleo extends HttpServlet {
 	 * @param request .
 	 * @param response .
 	 * @param bean bean de la vista a la que poner los valores .
+	 * @param usua .
 	 * @throws SQLException excepcion de bbdd.
 	 * @throws UVException en caso de error en bd
 	 * @throws IOException en caso de error de IO.
 	 */
-	private void excluirUsuario(HttpServletRequest request, HttpServletResponse response, VistaUsuarioBolsaEmpleo bean) throws SQLException, UVException, IOException {
-		bean.setVista(JSP_BUSCAR_USUARIO);
+	private void excluirUsuario(HttpServletRequest request, HttpServletResponse response, VistaUsuarioBolsaEmpleo bean, Usuario usua)
+			throws SQLException, UVException, IOException {
 		
 		ModeloUsuarioBolsaEmpleo modelo = ModeloUsuarioBolsaEmpleo.obtenerInstancia();
 		
@@ -484,6 +490,10 @@ public class ControladorUsuarioBolsaEmpleo extends HttpServlet {
 		Usuario usuArcos = CrearUsuario.usuario(request.getParameter(PARAM_NOMBRE_USUARIO));
 		if (usuArcos == null) {
 			throw new UVException("No existe el usuario");
+		}
+		if (usuArcos.getDocumentoNumero().equals(usua.getDocumentoNumero())) {
+			bean.setVista(JSP_USUARIOS);
+			throw new UVException(MENSAJE_ERROR_EXCLUSION_USUARIO_LOGUEADO);
 		}
 		
 		UsuarioBolsaEmpleo usu = modelo.listaUsuario(usuArcos.getDocumentoNumero());
@@ -504,6 +514,7 @@ public class ControladorUsuarioBolsaEmpleo extends HttpServlet {
 			session.setAttribute(MENSAJE_ENVIADO, MENSAJE_EXITO_EDITAR);
 			response.sendRedirect(request.getServletPath());
 		}
+		bean.setVista(JSP_BUSCAR_USUARIO);
 	}
 	
 	/** dirige al formulario de busqueda de un usuario.
@@ -534,11 +545,16 @@ public class ControladorUsuarioBolsaEmpleo extends HttpServlet {
 		bean.setVista(JSP_USUARIOS);
 	}
 	
-	private UsuarioBolsaEmpleo getValidatorUsuarios(HttpServletRequest request) throws UVException, SQLException {
+	private UsuarioBolsaEmpleo getValidatorUsuarios(HttpServletRequest request, Usuario usu) throws UVException, SQLException {
 		UsuarioBolsaEmpleo u = new UsuarioBolsaEmpleo();
 	
 		String excluido = request.getParameter(PARAM_EXCLUIDO);
 		if (excluido != null) {
+			Usuario usuArcos = CrearUsuario.usuario(request.getParameter(PARAM_NOMBRE_USUARIO));
+			if (usuArcos.getDocumentoNumero().equals(usu.getDocumentoNumero())) {
+				throw new UVException(MENSAJE_ERROR_EXCLUSION_USUARIO_LOGUEADO);
+			}
+			
 			u.setRazonExcluido(EscapaHTML.ajustaCodificacion(request.getParameter(PARAM_RAZON_EXCLUIDO)));
 			if (u.getRazonExcluido() == null || u.getRazonExcluido().isBlank()) {
 				throw new UVException(MENSAJE_ERROR_RAZON_EXCLUSION_VACIO);

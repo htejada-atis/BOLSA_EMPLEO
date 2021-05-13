@@ -70,25 +70,25 @@ VistaUsuarioBolsaEmpleo bean = (VistaUsuarioBolsaEmpleo) uvdatos.getVistas().get
     		</div>
     		<div class="form-group">
     			<label for="nombre">Nombre: </label>
-    			<input class="form-input-custom" id="nombre" type="text" name="<%= ControladorMisDatos.PARAM_NOMBRE %>" value="<%= nombre %>"/>
+    			<input class="form-input-custom" id="nombre" type="text" name="<%= ControladorMisDatos.PARAM_NOMBRE %>" value="<%= nombre %>" disabled/>
     		</div>
 		</div>
     	
     	<div class="form-group-container">
     	    <div class="form-group">
     			<label for="primer_apellido">Primer apellido: </label>
-    			<input class="form-input-custom" id="primer_apellido" type="text" name="<%= ControladorMisDatos.PARAM_PRIMER_APELLIDO %>" value="<%= primer_apellido %>"/>
+    			<input class="form-input-custom" id="primer_apellido" type="text" name="<%= ControladorMisDatos.PARAM_PRIMER_APELLIDO %>" value="<%= primer_apellido %>" disabled/>
     		</div>
     		<div class="form-group">
     			<label for="segundo_apellido">Segundo apellido: </label>
-    			<input class="form-input-custom" id="segundo_apellido" type="text" name="<%= ControladorMisDatos.PARAM_SEGUNDO_APELLIDO %>" value="<%= segundo_apellido %>"/>
+    			<input class="form-input-custom" id="segundo_apellido" type="text" name="<%= ControladorMisDatos.PARAM_SEGUNDO_APELLIDO %>" value="<%= segundo_apellido %>" disabled/>
     		</div>
     	</div>
     	
     	<div class="form-group-container">
     	    <div class="form-group">
     			<label for="direccion">Direcci&oacute;n: </label>
-    			<input class="form-input-custom" id="direccion" type="text" name="<%= ControladorMisDatos.PARAM_DIRECCION %>" value="<%= direccion %>"/>
+    			<input class="form-input-custom" id="direccion" type="text" name="<%= ControladorMisDatos.PARAM_DIRECCION %>" value="<%= direccion %>" />
     		</div>
     		<div class="form-group">
     			<label for="codigo_postal">Codigo Postal: </label>
@@ -120,7 +120,7 @@ VistaUsuarioBolsaEmpleo bean = (VistaUsuarioBolsaEmpleo) uvdatos.getVistas().get
     	
     	    	    <div class="form-group">
     			<label for="apellidos">Email: </label>
-    			<input class="form-input-custom" id="apellidos" type="text" name="<%= ControladorMisDatos.PARAM_EMAIL %>" value="<%= email %>"/>
+    			<input class="form-input-custom" id="apellidos" type="text" name="<%= ControladorMisDatos.PARAM_EMAIL %>" value="<%= email %>" disabled/>
     		</div>
     	
     	
@@ -128,10 +128,10 @@ VistaUsuarioBolsaEmpleo bean = (VistaUsuarioBolsaEmpleo) uvdatos.getVistas().get
     		<div class="form-group-custom">
     			<label>Sexo: </label>
     			<br><br>
-				<input class="form-input" type="radio" id="masculino" name="<%= ControladorMisDatos.PARAM_SEXO %>" style="display: inline;">
+				<input class="form-input" type="radio" id="masculino" name="<%= ControladorMisDatos.PARAM_SEXO %>" style="display: inline;" disabled>
 				<label class="form-label-custom" for="male" style="float: none; margin-right:0px">Masculino</label>
 				<br>
-    			<input class="form-input" type="radio" id="femenino" name="<%= ControladorMisDatos.PARAM_SEXO %>" style="display: inline;">
+    			<input class="form-input" type="radio" id="femenino" name="<%= ControladorMisDatos.PARAM_SEXO %>" style="display: inline;" disabled>
 				<label class="form-label-custom" for="female" style="float: none; margin-right:0px;">Femenino</label>
     		</div>
     		<div class="form-check">
@@ -159,10 +159,10 @@ $(document).ready(function() {
 	
 	<% String acum = bean.getUsuario().getSexo();
 	if(bean.getUsuario().getSexo()!=null){
-	if(bean.getUsuario().getSexo().equals("M")) { %>
+	if(bean.getUsuario().getSexo().equals("V")) { %>
 	document.getElementById("masculino").checked = true;
 	<%} else { 
-		if(bean.getUsuario().getSexo().equals("F")) { %>
+		if(bean.getUsuario().getSexo().equals("M")) { %>
 			document.getElementById("femenino").checked = true;
 		<%}%>
 	<%}}%>

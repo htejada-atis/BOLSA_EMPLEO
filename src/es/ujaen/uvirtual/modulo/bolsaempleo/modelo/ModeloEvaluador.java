@@ -10,6 +10,7 @@ import java.util.Map;
 
 import es.ujaen.uvirtual.modelo.conexion.ConexionArcos;
 import es.ujaen.uvirtual.modelo.conexion.ConexionUvirtual;
+import es.ujaen.uvirtual.modulo.bolsaempleo.beans.Area;
 import es.ujaen.uvirtual.modulo.bolsaempleo.beans.Evaluador;
 import es.ujaen.uvirtual.modulo.bolsaempleo.beans.UsuarioBolsaEmpleo;
 import es.ujaen.uvirtual.modulo.bolsaempleo.utilidades.BolsaEmpleoDataTable;
@@ -183,6 +184,33 @@ public class ModeloEvaluador {
 		}
 		
 		return dataTable;
+	}
+	
+	/** Consulta titulaciones en BBDD y las devuelve.
+	 * @param area .
+	 * @param usu .
+	 * @return boolean si el evaluador ya se encuentra asignado a ese area
+	 * @throws SQLException en caso de error de base de datos
+	 * @throws UVException .
+	 */
+	public Boolean checkEvaluadorArea(Area area, UsuarioBolsaEmpleo usu) throws SQLException, UVException {
+		String consulta = "SELECT * FROM TBEP_USUARIOS bepusu "
+				+ "INNER JOIN TBEP_EVALUADORES bepeva ON bepusu.CODNUM = bepeva.BEPUSU_CODNUM "
+				+ "WHERE FLGBORRADO!='S' AND FLGEXCLUIDO!='S' AND bepeva.BEPARE_CODNUM = ? "
+				+ "AND bepusu.ROL = " + PARAM_ROL_ID
+				+ " AND BEPUSU_CODNUM = ?";
+		try (Connection conexion = ConexionUvirtual.obtenerInstancia();
+				PreparedStatement stmt = conexion.prepareStatement(consulta)) {
+			int indexParam = 1;
+			stmt.setInt(indexParam++, area.getCodNum());
+			stmt.setInt(indexParam, usu.getCodNum());
+			try (ResultSet rs = stmt.executeQuery()) {
+				while (rs.next()) {
+					return true;
+				}
+			}
+		}
+		return false;
 	}
 	
 	/**	Función que agrega evaluadores a un área .
