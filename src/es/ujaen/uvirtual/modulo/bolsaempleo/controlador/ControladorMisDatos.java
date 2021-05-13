@@ -19,6 +19,7 @@ import es.ujaen.uvirtual.beans.Usuario;
 import es.ujaen.uvirtual.modulo.bolsaempleo.beans.UsuarioBolsaEmpleo;
 import es.ujaen.uvirtual.modulo.bolsaempleo.controlador.configuracion.ControladorUsuarioBolsaEmpleo;
 import es.ujaen.uvirtual.modulo.bolsaempleo.modelo.ModeloUsuarioBolsaEmpleo;
+import es.ujaen.uvirtual.modulo.bolsaempleo.utilidades.BolsaEmpleoUtils;
 import es.ujaen.uvirtual.modulo.bolsaempleo.vistas.VistaUsuarioBolsaEmpleo;
 import es.ujaen.uvirtual.utilidades.EscapaHTML;
 import es.ujaen.uvirtual.utilidades.Formateador;
@@ -242,8 +243,13 @@ public class ControladorMisDatos extends HttpServlet {
 		UsuarioBolsaEmpleo u = this.validarDatosUsuarioDireccion(request, new UsuarioBolsaEmpleo());
 		        
 		u.setTelefono(EscapaHTML.ajustaCodificacion(request.getParameter(PARAM_TELEFONO)));
-		if (u.getNacionalidad().length() > ModeloUsuarioBolsaEmpleo.COLUMN_TELEFONO_MAXLENGTH) {
-			throw new UVException(String.format(MENSAJE_ERROR_TELEFONO_LARGO, ModeloUsuarioBolsaEmpleo.COLUMN_TELEFONO_MAXLENGTH));
+		if (u.getTelefono() != null) {
+			if (!BolsaEmpleoUtils.isInteger(u.getTelefono())) {
+				throw new UVException(MENSAJE_ERROR_TELEFONO_STRING);
+			}
+			if (u.getTelefono().length() > ModeloUsuarioBolsaEmpleo.COLUMN_TELEFONO_MAXLENGTH) {
+				throw new UVException(String.format(MENSAJE_ERROR_TELEFONO_LARGO, ModeloUsuarioBolsaEmpleo.COLUMN_TELEFONO_MAXLENGTH));
+			}
 		}
 		
 		u.setNacionalidad(EscapaHTML.ajustaCodificacion(request.getParameter(PARAM_NACIONALIDAD)));
@@ -270,11 +276,7 @@ public class ControladorMisDatos extends HttpServlet {
 
 		u.setCodigoPostal(EscapaHTML.ajustaCodificacion(request.getParameter(PARAM_CODIGO_POSTAL)));
 		if (u.getCodigoPostal() != null) {
-			String regex = "[0-9]+";
-			Pattern p = Pattern.compile(regex);
-			Matcher m = p.matcher(u.getCodigoPostal());
-
-			if (!m.matches()) {
+			if (!BolsaEmpleoUtils.isInteger(u.getCodigoPostal())) {
 				throw new UVException(MENSAJE_ERROR_CODIGO_POSTAL_STRING);
 			}
 			if (u.getCodigoPostal().length() > ModeloUsuarioBolsaEmpleo.COLUMN_CODIGO_POSTAL_MAXLENGTH) {
