@@ -606,11 +606,11 @@ public class ModeloUsuarioBolsaEmpleo {
 		usuario.setNumDocumento(rsArcos.getString("PRSNIF"));
 		usuario.setTipoDocumento(rsArcos.getString("STRTIPODOCUMENTO"));
 		usuario.setEmail(rsArcos.getString("EMAIL_ALTA"));
+		usuario.setSexo(rsArcos.getString("SEXO"));
 		usuario.setNombre(rsArcos.getString("STRNOMBRE"));
 		usuario.setPrimerApellido(rsArcos.getString("STRAPELLIDO1"));
 		usuario.setSegundoApellido(rsArcos.getString("STRAPELLIDO2"));
-		//usuario.setSexo(rsArcos.getString("SEXO"));
-		
+
 		usuario.setCodNum(rs.getInt("CODNUM"));
 		usuario.setCodCuenta(rs.getString("CODCUENTA"));
 		usuario.setDireccion(rs.getString("DIRECCION"));

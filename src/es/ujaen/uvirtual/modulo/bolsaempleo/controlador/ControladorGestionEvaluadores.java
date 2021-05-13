@@ -207,20 +207,10 @@ public class ControladorGestionEvaluadores extends HttpServlet {
 		
 		ModeloUsuarioBolsaEmpleo modelo = ModeloUsuarioBolsaEmpleo.obtenerInstancia();
 		ModeloEvaluador modeloEvaluador = ModeloEvaluador.obtenerInstancia();
+		UsuarioBolsaEmpleo usu = null;
 		
 		try {			
-			UsuarioBolsaEmpleo usu = modelo.listaUsuario(usuArcos.getDocumentoNumero());
-			Integer idArea = Formateador.leeParametroInteger(request.getParameter(PARAM_AREA));
-			
-			modeloEvaluador.insertaEvaluador(usu, idArea);
-			List<Area> areas = ModeloArea.obtenerInstancia().listaAreas();
-			bean.setAreas(areas);
-			
-			Area area = ModeloArea.obtenerInstancia().getAreaById(idArea);
-			bean.setArea(area);
-			
-			bean.getMensajesDeExito().add(MENSAJE_EXITO_AGREGAR_EVALUADORES);
-			bean.setVista(JSP_INDEX);
+			usu = modelo.listaUsuario(usuArcos.getDocumentoNumero());
 
 		} catch (UVException e) {
 			
@@ -234,21 +224,28 @@ public class ControladorGestionEvaluadores extends HttpServlet {
 					
 				CrearUsuario.refrescarUsuario(usuarioFinal.getCodCuenta());
 				
-				UsuarioBolsaEmpleo usu = modelo.listaUsuario(usuarioFinal.getNumDocumento());
-				Integer idArea = Formateador.leeParametroInteger(request.getParameter(PARAM_AREA));
-				
-				modeloEvaluador.insertaEvaluador(usu, idArea);
-				
-				List<Area> areas = ModeloArea.obtenerInstancia().listaAreas();
-				bean.setAreas(areas);
-
-				bean.getMensajesDeExito().add(MENSAJE_EXITO_AGREGAR_EVALUADORES);
+				usu = modelo.listaUsuario(usuarioFinal.getNumDocumento());
 			} catch (UVException ex) {
 				throw new UVException("No existe el evaluador en el sistema, primero debe crearlo");
 			}
 			
 			bean.setVista(JSP_INDEX);
 		}
+		
+		Integer idArea = Formateador.leeParametroInteger(request.getParameter(PARAM_AREA));
+		Area area = ModeloArea.obtenerInstancia().getAreaById(idArea);
+		bean.setArea(area);
+		List<Area> areas = ModeloArea.obtenerInstancia().listaAreas();
+		bean.setAreas(areas);
+		
+		if (modeloEvaluador.checkEvaluadorArea(area, usu)) {
+			throw new UVException("El evaluador ya forma parte de este área");
+		}
+		
+		modeloEvaluador.insertaEvaluador(usu, idArea);
+
+		bean.getMensajesDeExito().add(MENSAJE_EXITO_AGREGAR_EVALUADORES);
+		bean.setVista(JSP_INDEX);
 	}
 	
 	/** eliminar un evaluador.
