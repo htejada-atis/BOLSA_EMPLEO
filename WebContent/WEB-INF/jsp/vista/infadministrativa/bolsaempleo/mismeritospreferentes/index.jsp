@@ -68,7 +68,9 @@ VistaMeritosPreferentesCandidato bean = (VistaMeritosPreferentesCandidato) uvdat
 		    "columns": [
 		    	{'data': 'codNum', 'selectable': true},
 		    	{'data': 'codNum', 'filter': {'type': 'number'}},
-		    	{'data': 'codigo', 'filter': true},
+		    	{'data': 'codigo', 'filter': true, 'render': function(row) {
+		    		return '<%= bean.getCodigoPadreMeritoPreferente() %>.' + row.meritoPreferente.codigo;
+		    	}},
 		    	{'data': 'meritoPreferente.descripcion', 'filter': true},		    	
 		    	{'data': 'descripcion', 'filter': true},
 		        {'data': 'codnum', 'buttons': [

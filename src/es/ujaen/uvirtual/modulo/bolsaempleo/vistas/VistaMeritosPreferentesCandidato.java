@@ -22,6 +22,7 @@ public class VistaMeritosPreferentesCandidato extends Vista implements Serializa
 	private String vista;
 	private BolsaEmpleoDataTable<MeritoPreferenteUsuario> dataTable;
 	private List<MeritoPreferente> meritosPreferentes;
+	private String codigoPadreMeritoPreferente;
 
 	public String getVista() {
 		return vista;
@@ -45,5 +46,13 @@ public class VistaMeritosPreferentesCandidato extends Vista implements Serializa
 	
 	public List<MeritoPreferente> getMeritosPreferente() {
 		return this.meritosPreferentes;
+	}
+
+	public void setCodigoPadreMeritoPreferente(String codigo) {
+		this.codigoPadreMeritoPreferente = codigo;		
+	}
+	
+	public String getCodigoPadreMeritoPreferente() {
+		return this.codigoPadreMeritoPreferente;
 	}
 }

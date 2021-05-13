@@ -1,11 +1,13 @@
 package es.ujaen.uvirtual.modulo.bolsaempleo.controlador.candidato;
 
+import java.io.BufferedInputStream;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.sql.SQLException;
 import java.util.logging.Logger;
 import java.util.logging.Level;
 import javax.servlet.ServletException;
+import javax.servlet.ServletOutputStream;
 import javax.servlet.annotation.MultipartConfig;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
@@ -19,7 +21,6 @@ import es.ujaen.uvirtual.beans.UVDatos;
 import es.ujaen.uvirtual.beans.Usuario;
 import es.ujaen.uvirtual.modulo.bolsaempleo.beans.MeritoPreferenteUsuario;
 import es.ujaen.uvirtual.modulo.bolsaempleo.beans.UsuarioBolsaEmpleo;
-import es.ujaen.uvirtual.modulo.bolsaempleo.modelo.ModeloMerito;
 import es.ujaen.uvirtual.modulo.bolsaempleo.modelo.ModeloMeritosPreferentes;
 import es.ujaen.uvirtual.modulo.bolsaempleo.modelo.ModeloMeritosPreferentesCandidato;
 import es.ujaen.uvirtual.modulo.bolsaempleo.modelo.ModeloUsuarioBolsaEmpleo;
@@ -64,12 +65,6 @@ public class ControladorMisMeritosPreferentes extends HttpServlet {
 	public static final String PARAM_OBSERVACION = "observacion";
 	public static final String PARAM_ENVIAR = "enviar";
 	public static final String PARAM_MERITOS = "meritos";
-	
-	//	public static final String PARAM_APARTADO = "apartado";	
-//	public static final String PARAM_DESCRIPCION = "descripcion";
-//	public static final String PARAM_ITEM = "item";
-//		
-//	public static final String PARAM_VALOR = "valor";
 	
 	// mensajes
 	public static final String MENSAJE_ENVIADO = "mensaje";
@@ -123,15 +118,19 @@ public class ControladorMisMeritosPreferentes extends HttpServlet {
 			init(bean, datos, request);
 			switch (nombreAccion) {
 				case ACCION_INDEX:
+					index(bean);
 					break;
 				case ACCION_DATATABLE:
 					listadoMeritos(bean, datos, request, response);
 					break;
 				case ACCION_AGREGAR_MERITO:
-					formularioAgregarMerito(bean, request, response);
+					formularioAgregarMerito(bean);
 					break;
 				case ACCION_AGREGAR_MERITO_CONFIRM:
 					agregarMerito(bean, datos, request, response);
+					break;
+				case ACCION_DESCARGAR_FICHERO:
+					descargarPdf(bean, datos, request, response);
 					break;
 				default:
 					errorFatal(bean, "Acción no contemplada");
@@ -157,7 +156,7 @@ public class ControladorMisMeritosPreferentes extends HttpServlet {
 	}
 	
 	private void init(VistaMeritosPreferentesCandidato bean, UVDatos datos, HttpServletRequest request) throws SQLException, UVException {
-		bean.setVista(JSP_INDEX);
+		this.index(bean);
 		BolsaEmpleoUtils.readMensajeSession(bean, request);
 		ModeloUsuarioBolsaEmpleo.obtenerInstancia().checkUser(datos);
 	}
@@ -175,10 +174,15 @@ public class ControladorMisMeritosPreferentes extends HttpServlet {
 		doGet(request, response);
 	}
 	
+	private void index(VistaMeritosPreferentesCandidato bean) {
+		bean.setVista(JSP_INDEX);
+		bean.setCodigoPadreMeritoPreferente("IV");
+	}
+	
 	private void listadoMeritos(VistaMeritosPreferentesCandidato bean, UVDatos datos, HttpServletRequest request, HttpServletResponse response) 
 			throws IOException, SQLException, UVException {
 		datos.setRespuestaEnviada(true);
-		datos.setContentType(RESPONSE_AJAX_CONTENTTYPE);		
+		datos.setContentType(RESPONSE_AJAX_CONTENTTYPE);
 		response.setContentType(RESPONSE_AJAX_CONTENTTYPE);
 		response.setCharacterEncoding(RESPONSE_AJAX_ENCODING);
 		
@@ -200,21 +204,43 @@ public class ControladorMisMeritosPreferentes extends HttpServlet {
 		}
 	}
 	
-	private void formularioAgregarMerito(VistaMeritosPreferentesCandidato bean, HttpServletRequest request, HttpServletResponse response) 
+	private void formularioAgregarMerito(VistaMeritosPreferentesCandidato bean) 
 			throws SQLException, UVException {
 		bean.setVista(JSP_FORMULARIO);
 		bean.setMeritosPreferente(ModeloMeritosPreferentes.obtenerInstancia().getMeritosPreferentesPorPosesion());
+		// bean.setCodigoPadreMeritoPreferente(ModeloParametrosConfiguracion.obtenerInstancia().getParametroByNombre("codmeritopreferente"));
+		bean.setCodigoPadreMeritoPreferente("IV");
 	}
 	
 	private void agregarMerito(VistaMeritosPreferentesCandidato bean, UVDatos datos, HttpServletRequest request, HttpServletResponse response) 
 			throws SQLException, UVException, IOException {
-		formularioAgregarMerito(bean, request, response);
+		formularioAgregarMerito(bean);
 				
 		MeritoPreferenteUsuario mp = validateMeritoPreferenteUsuario(request, datos);		
 		ModeloMeritosPreferentesCandidato.obtenerInstancia().insertaMeritoUsuario(mp);
 		
 		BolsaEmpleoUtils.addMensajeDeExito("Mérito preferente añadido correctamente", bean, request);
 		response.sendRedirect(request.getServletPath());
+	}
+	
+	private void descargarPdf(VistaMeritosPreferentesCandidato bean, UVDatos datos, HttpServletRequest request, HttpServletResponse response) throws SQLException, UVException {
+		this.index(bean);
+		
+		MeritoPreferenteUsuario mpu = ModeloMeritosPreferentesCandidato.obtenerInstancia().getMeritoPreferenteUsuarioById(
+				Formateador.leeParametroInteger(request.getParameter(PARAM_ID)), ModeloUsuarioBolsaEmpleo.obtenerInstancia().getUsuarioCandidato(datos));
+		
+		response.setContentType("application/pdf");
+		datos.setRespuestaEnviada(true);
+        
+		try (ServletOutputStream stream = response.getOutputStream(); BufferedInputStream buf = new BufferedInputStream(mpu.getArchivo())) {
+			int readBytes = 0;
+			while ((readBytes = buf.read()) != -1) {
+				stream.write(readBytes);
+            }
+			stream.flush();
+		} catch (Exception ex) {
+			bean.getMensajesDeError().add(ex.getMessage());
+        }		
 	}
 	
 	private MeritoPreferenteUsuario validateMeritoPreferenteUsuario(HttpServletRequest request, UVDatos datos) throws SQLException, UVException {

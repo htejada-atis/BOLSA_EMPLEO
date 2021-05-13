@@ -4,17 +4,14 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.sql.Types;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
 import es.ujaen.uvirtual.modelo.conexion.ConexionUvirtual;
-import es.ujaen.uvirtual.modulo.bolsaempleo.beans.MeritoPreferente;
 import es.ujaen.uvirtual.modulo.bolsaempleo.beans.MeritoPreferenteUsuario;
 import es.ujaen.uvirtual.modulo.bolsaempleo.beans.UsuarioBolsaEmpleo;
 import es.ujaen.uvirtual.modulo.bolsaempleo.utilidades.BolsaEmpleoDataTable;
-import es.ujaen.uvirtual.modulo.bolsaempleo.utilidades.BolsaEmpleoDataTable.DataTableColumn;
 import es.ujaen.uvirtual.utilidades.UVException;
 
 /**
@@ -79,10 +76,9 @@ public class ModeloMeritosPreferentesCandidato {
 				+ "WHERE bepmep.TIPO = ? AND bepmpu.BEPUSU_CODNUM = ? ";
 		
 		dataTable.setColumn(ORDER_COLUMN_INDEX_ID, "bepmpu.CODNUM");
-		dataTable.setColumn(ORDER_COLUMN_INDEX_CODIGO, "bepmpu.CODIGO");
+		dataTable.setColumn(ORDER_COLUMN_INDEX_CODIGO, "bepmep.CODIGO");
 		dataTable.setColumn(ORDER_COLUMN_INDEX_NOMBRE, "bepmep.DESCRIPCION");
 		dataTable.setColumn(ORDER_COLUMN_INDEX_DESCRIPCION, "bepmpu.DESCRIPCION");
-				
 		dataTable.setQuery(consulta);
 
 		try (Connection conexion = ConexionUvirtual.obtenerInstancia();
@@ -93,9 +89,8 @@ public class ModeloMeritosPreferentesCandidato {
 			stmt.setString(paramIndex, ModeloMeritosPreferentes.TIPO_POSESION);
 			stmtCount.setString(paramIndex++, ModeloMeritosPreferentes.TIPO_POSESION);
 			stmt.setInt(paramIndex, usuario.getCodNum());
-			stmtCount.setInt(paramIndex++, usuario.getCodNum());
-			
-			dataTable.setFiltersParams(stmt, stmtCount, 1);
+			stmtCount.setInt(paramIndex++, usuario.getCodNum());			
+			dataTable.setFiltersParams(stmt, stmtCount, paramIndex);
 			
 			try (ResultSet rs = stmt.executeQuery()) {
 				while (rs.next()) {
@@ -126,6 +121,39 @@ public class ModeloMeritosPreferentesCandidato {
 			stmt.setString(parameterIndex++, mp.getDescripcion());
 			stmt.setBinaryStream(parameterIndex++, mp.getArchivo());
 			stmt.executeUpdate();
+		}
+	}
+	
+	/**
+	 * Devuelve el merito preferente de un usuario.
+	 * @param codNum .
+	 * @param usuario .
+	 * @return .
+	 * @throws UVException .
+	 * @throws SQLException .
+	 */
+	public MeritoPreferenteUsuario getMeritoPreferenteUsuarioById(Integer codNum, UsuarioBolsaEmpleo usuario) throws SQLException, UVException {
+		if (codNum == null) {
+			throw new UVException("El mérito preferente del canditato es requerido");
+		}
+		if (usuario == null) {
+			throw new UVException("El usuario es requerido");
+		}
+		
+		String consulta = "SELECT * FROM TBEP_MERITOS_PREFERENTES_USUARIO WHERE CODNUM = ? AND BEPUSU_CODNUM = ?";
+		
+		try (Connection conexion = ConexionUvirtual.obtenerInstancia(); PreparedStatement stmt = conexion.prepareStatement(consulta)) {
+			int parameterIndex = 1;
+			stmt.setInt(parameterIndex++, codNum);
+			stmt.setInt(parameterIndex++, usuario.getCodNum());
+			
+			try (ResultSet rs = stmt.executeQuery()) {
+				if (!rs.next()) {
+					throw new UVException("Merito preferente no encontrado");
+				}
+				
+				return this.createMeritoUsuarioFromResultSet(rs);
+			}	
 		}
 	}
 	

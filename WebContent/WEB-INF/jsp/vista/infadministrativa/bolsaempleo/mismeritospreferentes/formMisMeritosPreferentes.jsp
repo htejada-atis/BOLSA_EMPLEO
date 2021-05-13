@@ -44,7 +44,7 @@ VistaMeritosPreferentesCandidato bean = (VistaMeritosPreferentesCandidato) uvdat
 				<select class="form-input-custom" id="select_apartado" name="<%= ControladorMisMeritosPreferentes.PARAM_MERITO_PREFERENTE %>" required>
 					<option value="">Elija el tipo de mérito preferente</option>
 					<% for (MeritoPreferente m: bean.getMeritosPreferente()) { %>
-							<option value="<%= m.getCodNum() %>" <%= meritoSelected.equals(m.getCodNum()) ? "selected=\"selected\"" : "" %>><%= m.getDescripcion() %></option>					
+							<option value="<%= m.getCodNum() %>" <%= meritoSelected.equals(m.getCodNum().toString()) ? "selected=\"selected\"" : "" %>><%= bean.getCodigoPadreMeritoPreferente() + "." + m.getCodigo() + " - " + m.getDescripcion() %></option>					
 					<% } %>
 				</select>
 			</div>		
@@ -70,6 +70,11 @@ VistaMeritosPreferentesCandidato bean = (VistaMeritosPreferentesCandidato) uvdat
 </div>
 
 <script>
-
-
+	$(document).ready(function() {
+		$('#agregar_merito').submit(function(event) { 
+			$('#merito_enviar').prop('disabled', true);
+			$('#merito_enviar').attr('value', 'Guardando mérito...');			
+			return true;
+		});
+	});
 </script>
