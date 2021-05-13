@@ -12,6 +12,7 @@ VistaMiembrosComision bean = (VistaMiembrosComision) uvdatos.getVistas().get(Vis
 
 
 <div class='bolsa-empleo'>
+	
 	<% if (bean.getMensajesDeExito().size() > 0) { %>
 		<div id="exito" class="success">
 			<%= bean.formatearMensajesDeExito() %>
@@ -21,7 +22,8 @@ VistaMiembrosComision bean = (VistaMiembrosComision) uvdatos.getVistas().get(Vis
 		<div id="error" class="error">
 			<%= bean.formatearMensajesDeError() %>
 		</div>
-	<% } else {%>
+	<% } %>
+
 	<h2>Miembros de la comisión</h2>	
 	
 	<div class="titulo-bolsa-empleo">
@@ -39,6 +41,5 @@ VistaMiembrosComision bean = (VistaMiembrosComision) uvdatos.getVistas().get(Vis
 			</select>
 		</div>
 	</div>
-	<% } %>
 </div>
 	

@@ -13,7 +13,7 @@ VistaUsuarioBolsaEmpleo bean = (VistaUsuarioBolsaEmpleo) uvdatos.getVistas().get
 
 
 <div class="bolsa-empleo misdatos-form">
-	<h2>Datos Personales</h2>
+
 	<% if (bean.getMensajesDeExito().size() > 0) { %>
 		<div id="exito" class="success">
 			<%= bean.formatearMensajesDeExito() %>
@@ -23,8 +23,12 @@ VistaUsuarioBolsaEmpleo bean = (VistaUsuarioBolsaEmpleo) uvdatos.getVistas().get
 		<div id="error" class="error">
 			<%= bean.formatearMensajesDeError() %>
 		</div>
-	<% } 
+	<% } %>
 
+	<h2>Datos Personales</h2>
+
+	<% 
+	
 	String nombre = "";
 	String primer_apellido = "";
 	String segundo_apellido = "";

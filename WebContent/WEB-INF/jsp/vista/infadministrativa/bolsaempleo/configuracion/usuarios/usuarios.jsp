@@ -10,6 +10,7 @@ VistaUsuarioBolsaEmpleo bean = (VistaUsuarioBolsaEmpleo) uvdatos.getVistas().get
 %>
 
 <div class='bolsa-empleo usuarios'>
+
 	<% if (bean.getMensajesDeExito().size() > 0) { %>
 		<div id="exito" class="success">
 			<%= bean.formatearMensajesDeExito() %>
@@ -19,7 +20,7 @@ VistaUsuarioBolsaEmpleo bean = (VistaUsuarioBolsaEmpleo) uvdatos.getVistas().get
 		<div id="error" class="error">
 			<%= bean.formatearMensajesDeError() %>
 		</div>
-	<% } else { %>
+	<% } %>
 	
 	<div class="titulo-bolsa-empleo" style="float:right; margin-top:1.2rem">
 		<a class="link-btn" id="nuevo_usuario" href="<%= request.getRequestURI() %>" style="margin-top:0">Nuevo usuario</a>
@@ -51,7 +52,7 @@ VistaUsuarioBolsaEmpleo bean = (VistaUsuarioBolsaEmpleo) uvdatos.getVistas().get
 			</tr>
 		</tfoot>
 	</table>
-	<% } %>
+	
 </div>
 	
 <script>

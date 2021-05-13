@@ -10,6 +10,7 @@ VistaResultados bean = (VistaResultados)uvdatos.getVistas().get(VistaResultados.
 %>
 
 <div class='bolsa-empleo'>
+
 	<% if (bean.getMensajesDeExito().size() > 0) { %>
 		<div id="exito" class="success">
 			<%= bean.formatearMensajesDeExito() %>
@@ -20,6 +21,7 @@ VistaResultados bean = (VistaResultados)uvdatos.getVistas().get(VistaResultados.
 			<%= bean.formatearMensajesDeError() %>
 		</div>
 	<% } %>
+	
 	<h2>Resultados</h2>	
 	<p>Resultados de la última evaluación. Al pulsar sobre un area, listado de candidatos con su puntuanción y el detalle del cálculo.</p>
 	

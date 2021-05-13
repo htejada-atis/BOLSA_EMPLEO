@@ -22,11 +22,16 @@ String observacion = BolsaEmpleoUtils.getParamForm(request, ControladorMisMerito
 
 <div class="bolsa-empleo">
 
-	<% 
-		if(bean.getMensajesDeError().size()>0) {
-			out.print("<div class='error'>" + bean.formatearMensajesDeError() + "</div>");
-		}
-	%>
+	<% if (bean.getMensajesDeExito().size() > 0) { %>
+		<div id="exito" class="success">
+			<%= bean.formatearMensajesDeExito() %>
+		</div>
+	<% } %>
+	<% if (bean.getMensajesDeError().size() > 0) { %>
+		<div id="error" class="error">
+			<%= bean.formatearMensajesDeError() %>
+		</div>
+	<% } %>
 	
 	<h2>Nuevo mérito</h2>
 	

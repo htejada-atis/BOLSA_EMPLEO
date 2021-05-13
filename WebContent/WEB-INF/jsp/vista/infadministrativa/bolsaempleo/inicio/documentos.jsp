@@ -11,6 +11,18 @@ VistaInicio bean = (VistaInicio)uvdatos.getVistas().get(VistaInicio.class.getNam
 %>
 
 <div class="bolsa-empleo">
+
+	<% if (bean.getMensajesDeExito().size() > 0) { %>
+		<div id="exito" class="success">
+			<%= bean.formatearMensajesDeExito() %>
+		</div>
+	<% } %>
+	<% if (bean.getMensajesDeError().size() > 0) { %>
+		<div id="error" class="error">
+			<%= bean.formatearMensajesDeError() %>
+		</div>
+	<% } %>
+
 	<h2>Documentos de interés</h2>
 	
 	<div class="nav-bolsa-empleo">

@@ -13,13 +13,7 @@ VistaTitulaciones bean = (VistaTitulaciones) uvdatos.getVistas().get(VistaTitula
 
 
 <div class="bolsa-empleo misdatos-form">
-	<div class="titulo-bolsa-empleo" style="float:right; margin-top:1.2rem">
-		<a class="link-btn" id="nueva_titulacion" href="<%= request.getRequestURI() %>" style="margin-top:0">Nueva titulación</a>
-	</div>
-	
-	<div class="titulo-bolsa-empleo" style="margin-top:1rem;">
-		<h2>Mis Titulaciones</h2>
-	</div>
+
 	<% if (bean.getMensajesDeExito().size() > 0) { %>
 		<div id="exito" class="success">
 			<%= bean.formatearMensajesDeExito() %>
@@ -30,6 +24,14 @@ VistaTitulaciones bean = (VistaTitulaciones) uvdatos.getVistas().get(VistaTitula
 			<%= bean.formatearMensajesDeError() %>
 		</div>
 	<% } %>
+
+	<div class="titulo-bolsa-empleo" style="float:right; margin-top:1.2rem">
+		<a class="link-btn" id="nueva_titulacion" href="<%= request.getRequestURI() %>" style="margin-top:0">Nueva titulación</a>
+	</div>
+	
+	<div class="titulo-bolsa-empleo" style="margin-top:1rem;">
+		<h2>Mis Titulaciones</h2>
+	</div>
 	
 	<table class="bluetable bolsaempleo" id="tableTitulacionesUsuario">
 		<tr>

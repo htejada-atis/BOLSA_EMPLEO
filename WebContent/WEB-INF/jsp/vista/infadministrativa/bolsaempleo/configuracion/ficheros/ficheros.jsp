@@ -19,7 +19,7 @@ VistaFicheros bean = (VistaFicheros) uvdatos.getVistas().get(VistaFicheros.class
 		<div id="error" class="error">
 			<%= bean.formatearMensajesDeError() %>
 		</div>
-	<% } else {%>
+	<% } %>
 	
 	<div class="titulo-bolsa-empleo">
 		<h2>Documentos del sistema</h2>
@@ -46,7 +46,7 @@ VistaFicheros bean = (VistaFicheros) uvdatos.getVistas().get(VistaFicheros.class
 			</tr>
 		</tfoot>
 	</table>
-	<% } %>
+	
 </div>
 
 <script>

@@ -20,6 +20,7 @@ MeritoPreferente merito = bean.getMeritoPreferente();
 %>
 
 <div class="bolsa-empleo meritos-preferentes-form">
+
 	<% if (bean.getMensajesDeExito().size() > 0) { %>
 		<div id="exito" class="success">
 			<%= bean.formatearMensajesDeExito() %>

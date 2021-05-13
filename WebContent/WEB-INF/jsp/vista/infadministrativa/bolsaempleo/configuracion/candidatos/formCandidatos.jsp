@@ -23,10 +23,18 @@ UsuarioBolsaEmpleo usuarioBolsa = bean.getUsuario();
 
 <div class="bolsa-empleo usuarios-form">
 
+	<% if (bean.getMensajesDeExito().size() > 0) { %>
+		<div id="exito" class="success">
+			<%= bean.formatearMensajesDeExito() %>
+		</div>
+	<% } %>
+	<% if (bean.getMensajesDeError().size() > 0) { %>
+		<div id="error" class="error">
+			<%= bean.formatearMensajesDeError() %>
+		</div>
+	<% } %>
+
 	<% 
-		if(bean.getMensajesDeError().size()>0) {
-			out.print("<div class='error'>" + bean.formatearMensajesDeError() + "</div>");
-		}
 	
 		Integer codnum = null;
 		String nombre = "";

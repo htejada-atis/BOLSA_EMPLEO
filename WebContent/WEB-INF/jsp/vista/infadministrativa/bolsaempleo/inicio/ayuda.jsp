@@ -1,12 +1,26 @@
 <%@ page trimDirectiveWhitespaces="true"%>
 <%@	page import="es.ujaen.uvirtual.modulo.bolsaempleo.controlador.ControladorInicio"%>
+<%@ page import="es.ujaen.uvirtual.modulo.bolsaempleo.vistas.VistaInicio" %>
 <%@ page import="es.ujaen.uvirtual.beans.UVDatos"%>
 
 <% 
 UVDatos uvdatos = (UVDatos)request.getAttribute(UVDatos.NOMBRE_ATRIBUTO);
+VistaInicio bean = (VistaInicio)uvdatos.getVistas().get(VistaInicio.class.getName());
 %>
 
 <div class="bolsa-empleo">
+
+	<% if (bean.getMensajesDeExito().size() > 0) { %>
+		<div id="exito" class="success">
+			<%= bean.formatearMensajesDeExito() %>
+		</div>
+	<% } %>
+	<% if (bean.getMensajesDeError().size() > 0) { %>
+		<div id="error" class="error">
+			<%= bean.formatearMensajesDeError() %>
+		</div>
+	<% } %>
+
 	<h2>Ayuda</h2>
 	
 	<div class="nav-bolsa-empleo">

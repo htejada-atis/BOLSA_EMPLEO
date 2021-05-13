@@ -11,28 +11,6 @@ VistaTitulaciones bean = (VistaTitulaciones) uvdatos.getVistas().get(VistaTitula
 %>
 
 <div class="bolsa-empleo titulacionespreferentes">
-
-	<%
-		if (session.getAttribute(ControladorGestionTitulaciones.MENSAJE_ENVIADO_CORRECTO) != null) {
-		%>
-		<div id="exito" class="success">
-			<%=session.getAttribute(ControladorGestionTitulaciones.MENSAJE_ENVIADO_CORRECTO)%>
-		</div>
-	<%
-			session.removeAttribute(ControladorGestionTitulaciones.MENSAJE_ENVIADO_CORRECTO);
-		}
-	%>
-	
-	<%
-		if (session.getAttribute(ControladorGestionTitulaciones.MENSAJE_ENVIADO_ERROR) != null) {
-		%>
-		<div id="error" class="error">
-			<%=session.getAttribute(ControladorGestionTitulaciones.MENSAJE_ENVIADO_ERROR)%>
-		</div>
-	<%
-			session.removeAttribute(ControladorGestionTitulaciones.MENSAJE_ENVIADO_ERROR);
-		}
-	%>
 	
 	<% if (bean.getMensajesDeExito().size() > 0) { %>
 		<div id="exito" class="success">
@@ -43,7 +21,7 @@ VistaTitulaciones bean = (VistaTitulaciones) uvdatos.getVistas().get(VistaTitula
 		<div id="error" class="error">
 			<%= bean.formatearMensajesDeError() %>
 		</div>
-	<% } else {%>
+	<% } %>
 	
 	<div class="titulo-bolsa-empleo">
 		<h2>Titulaciones</h2>
@@ -67,7 +45,7 @@ VistaTitulaciones bean = (VistaTitulaciones) uvdatos.getVistas().get(VistaTitula
 			</tr>
 		</tfoot>
 	</table>
-	<% } %>
+	
 </div>
 
 <script>
