@@ -81,6 +81,10 @@ public class ModeloMeritosPreferentes {
 	 * @throws UVException .
 	 */
 	public MeritoPreferente getMeritoPreferenteById(Integer codNum) throws SQLException, UVException {
+		if (codNum == null) {
+			throw new UVException("El merito preferente es requerido");
+		}
+		
 		String sql = "SELECT bepmep.* FROM TBEP_MERITOS_PREFERENTES bepmep WHERE bepmep.CODNUM = ?";
 		
 		try (Connection con = ConexionUvirtual.obtenerInstancia(); PreparedStatement stmt = con.prepareStatement(sql)) {
@@ -160,6 +164,29 @@ public class ModeloMeritosPreferentes {
 		return meritos;
 	}
 
+	/**
+	 * Devuelve los meritos preferentes por posesión.
+	 * @return .
+	 * @throws SQLException .
+	 * @throws UVException .
+	 */
+	public List<MeritoPreferente> getMeritosPreferentesPorPosesion() throws SQLException, UVException {
+		String consulta = "SELECT bepmep.* FROM TBEP_MERITOS_PREFERENTES bepmep WHERE bepmep.FLGACTIVO = 'S' AND bepmep.TIPO = ?";
+		ArrayList<MeritoPreferente> meritosPreferentesPosesion = new ArrayList<>();
+		
+		try (Connection conexion = ConexionUvirtual.obtenerInstancia(); PreparedStatement stmt = conexion.prepareStatement(consulta)) {
+			stmt.setString(1, ModeloMeritosPreferentes.TIPO_POSESION);
+						
+			try (ResultSet rs = stmt.executeQuery()) {
+				while (rs.next()) {
+					meritosPreferentesPosesion.add(this.createApartadoFromResultSet(rs));
+				}
+			}
+		}
+		
+		return meritosPreferentesPosesion;
+	}
+	
 	/**
 	 * Inserta un merito en la db.
 	 * @param merito .

@@ -4,6 +4,7 @@ import java.io.Serializable;
 import java.util.Date;
 
 import es.ujaen.uvirtual.beans.Usuario;
+import es.ujaen.uvirtual.modulo.bolsaempleo.modelo.ModeloUsuarioBolsaEmpleo;
 import es.ujaen.uvirtual.utilidades.Formateador;
 
 /** Clase usuario de UVIRTUAL.
@@ -421,7 +422,6 @@ public class UsuarioBolsaEmpleo implements Serializable {
 		return Formateador.formatoFecha(fechaExclusionFin, Formateador.FORMATO_FECHA_DDMMYYYY_HHMMSS);
 	}
 	
-	
 	public Boolean getBorrado() {
 		return borrado;
 	}
@@ -444,6 +444,22 @@ public class UsuarioBolsaEmpleo implements Serializable {
 
 	public void setFechaBorrado(Date fechaBorrado) {
 		this.fechaBorrado = fechaBorrado;
+	}
+	
+	public boolean isCandidato() {
+		return this.getRol() != null && this.getRol().getValor().equals(ModeloUsuarioBolsaEmpleo.ROL_CANDIDATO);
+	}
+	
+	public boolean isServicioPersonal() {
+		return this.getRol() != null && this.getRol().getValor().equals(ModeloUsuarioBolsaEmpleo.ROL_SERVICIO_PERSONAL);
+	}
+	
+	public boolean isMiembroComision() {
+		return this.getRol() != null && this.getRol().getValor().equals(ModeloUsuarioBolsaEmpleo.ROL_MIEMBRO_COMISION);
+	}
+	
+	public boolean isDirectorDepartamento() {
+		return this.getRol() != null && this.getRol().getValor().equals(ModeloUsuarioBolsaEmpleo.ROL_DIRECTOR_DEPARTAMENTO);
 	}
 	
 	public static long getSerialversionuid() {

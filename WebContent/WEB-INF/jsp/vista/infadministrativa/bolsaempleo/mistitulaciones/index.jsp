@@ -13,7 +13,6 @@ VistaTitulaciones bean = (VistaTitulaciones) uvdatos.getVistas().get(VistaTitula
 
 
 <div class="bolsa-empleo misdatos-form">
-
 	<% if (bean.getMensajesDeExito().size() > 0) { %>
 		<div id="exito" class="success">
 			<%= bean.formatearMensajesDeExito() %>
@@ -26,7 +25,15 @@ VistaTitulaciones bean = (VistaTitulaciones) uvdatos.getVistas().get(VistaTitula
 	<% } %>
 
 	<div class="titulo-bolsa-empleo" style="float:right; margin-top:1.2rem">
-		<a class="link-btn" id="nueva_titulacion" href="<%= request.getRequestURI() %>" style="margin-top:0">Nueva titulación</a>
+		<a class="link-btn" id="nueva_titulacion" href="<%= request.getRequestURI() %>" style="margin-top:0">Nueva titulaciï¿½n</a>
+	</div>
+	
+	<div class="titulo-bolsa-empleo" style="margin-top:1rem;">
+		<h2>Mis Titulaciones</h2>
+	</div>
+	
+	<div class="titulo-bolsa-empleo" style="float:right; margin-top:1.2rem">
+		<a class="link-btn" id="nueva_titulacion" href="<%= request.getRequestURI() %>" style="margin-top:0">Nueva titulaciï¿½n</a>
 	</div>
 	
 	<div class="titulo-bolsa-empleo" style="margin-top:1rem;">
@@ -36,8 +43,8 @@ VistaTitulaciones bean = (VistaTitulaciones) uvdatos.getVistas().get(VistaTitula
 	<table class="bluetable bolsaempleo" id="tableTitulacionesUsuario">
 		<tr>
 			<th scope="col" style="width:10%"></th>
-			<th scope="col" style="width:60%">Titulación</th>		
-			<th scope="col" style="width:40%">Descripción</th>	
+			<th scope="col" style="width:60%">Titulaciï¿½n</th>		
+			<th scope="col" style="width:40%">Descripciï¿½n</th>	
 			<th scope="col" style="width:10%">Validada</th>		
 			<th scope="col" style="width:15%"></th>		
 		</tr>
@@ -61,10 +68,10 @@ $(document).ready(function() {
 	
 	function enviaAccion(accion, selected) {
 		if (selected.length == 0) {
-			Atis.alertDialog('Estado de las titulaciones', 'Seleccione al menos una titulación.');
+			Atis.alertDialog('Estado de las titulaciones', 'Seleccione al menos una titulaciï¿½n.');
 			return;
 		}
-		Atis.confirmDialog("Borrar titulación", "¿Desea eliminar las titulaciónes seleccionadas, relacionadas con su usuario?", {
+		Atis.confirmDialog("Borrar titulaciï¿½n", "ï¿½Desea eliminar las titulaciï¿½nes seleccionadas, relacionadas con su usuario?", {
         	Si: function() {
         		var params = {
         				'a': accion, 
@@ -89,7 +96,7 @@ $(document).ready(function() {
 	    	{'data': 'codNum', 'selectable': true},
 	        {'data': 'titulacion.nombre', 'class': 'overflow-auto', 'filter': {'type': 'text'}},
 	    	{'data': 'descripcion'},
-        	{'data': 'validada', 'order': {'active': false}, 'filter': {'type': 'select', 'options':{'true': 'Validado', 'false': 'Pendiente'}, 'optionDefault': 'true'},
+        	{'data': 'validada', 'order': {'active': false}, 'filter': {'type': 'select', 'options':{'true': 'Validado', 'false': 'Pendiente'}},
 	    		'render': function(row) {
 	        		if (row.validada) {
 	        			return "<div title='Validado' class='circle-true'></div>"; 
