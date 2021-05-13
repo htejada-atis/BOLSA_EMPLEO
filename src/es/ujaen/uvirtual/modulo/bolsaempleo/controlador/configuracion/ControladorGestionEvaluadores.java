@@ -13,7 +13,6 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 import com.google.gson.Gson;
-
 import es.ujaen.uvirtual.adm.CrearUsuario;
 import es.ujaen.uvirtual.beans.CodigoDescripcion;
 import es.ujaen.uvirtual.beans.UVDatos;
@@ -27,6 +26,7 @@ import es.ujaen.uvirtual.modulo.bolsaempleo.modelo.ModeloEvaluador;
 import es.ujaen.uvirtual.modulo.bolsaempleo.modelo.ModeloRol;
 import es.ujaen.uvirtual.modulo.bolsaempleo.modelo.ModeloUsuarioBolsaEmpleo;
 import es.ujaen.uvirtual.modulo.bolsaempleo.utilidades.BolsaEmpleoDataTable;
+import es.ujaen.uvirtual.modulo.bolsaempleo.utilidades.BolsaEmpleoUtils;
 import es.ujaen.uvirtual.modulo.bolsaempleo.vistas.VistaEvaluadores;
 import es.ujaen.uvirtual.utilidades.EscapaHTML;
 import es.ujaen.uvirtual.utilidades.Formateador;
@@ -105,7 +105,7 @@ public class ControladorGestionEvaluadores extends HttpServlet {
 		}
 		
 		try {
-			init(bean, datos);
+			init(bean, datos, request);
 			switch (nombreAccion) {
 				case ACCION_INDEX:
 					index(bean, request);
@@ -144,8 +144,9 @@ public class ControladorGestionEvaluadores extends HttpServlet {
 		}
 	}
 	
-	private void init(VistaEvaluadores bean, UVDatos datos) throws SQLException, UVException {
+	private void init(VistaEvaluadores bean, UVDatos datos, HttpServletRequest request) throws SQLException, UVException {
 		bean.setVista(JSP_INDEX);
+		BolsaEmpleoUtils.readMensajeSession(bean, request);
 		ModeloUsuarioBolsaEmpleo.obtenerInstancia().checkUser(datos);
 	}
 	
@@ -264,11 +265,9 @@ public class ControladorGestionEvaluadores extends HttpServlet {
 		evaluador.setCodNum(codNumUsuario);
 		bean.setEvaluador(evaluador);
 		modelo.borraRestauraEvaluador(evaluador);
-		bean.setVista(JSP_INDEX);
-		bean.getMensajesDeExito().add(activo ? MENSAJE_EXITO_RESTAURAR : MENSAJE_EXITO_BORRAR);
 		HttpSession session = request.getSession(false);
-		session.setAttribute(MENSAJE_ENVIADO, activo ? MENSAJE_EXITO_RESTAURAR : MENSAJE_EXITO_BORRAR);
 		session.setAttribute(PARAM_AREA, codNumArea);
+		BolsaEmpleoUtils.addMensajeDeExito(activo ? MENSAJE_EXITO_RESTAURAR : MENSAJE_EXITO_BORRAR, bean, request);
 		response.sendRedirect(request.getServletPath());
 	}
 	
@@ -286,19 +285,12 @@ public class ControladorGestionEvaluadores extends HttpServlet {
 		bean.setAreas(areas);
 		
 		HttpSession session = request.getSession(false);
-		String mensaje = (String) session.getAttribute(MENSAJE_ENVIADO);
-
-		if (mensaje != null) {
-			switch (mensaje) {
-				case MENSAJE_EXITO_AGREGAR_EVALUADORES:
-				case MENSAJE_EXITO_BORRAR:
-				case MENSAJE_EXITO_RESTAURAR:
-					Area area = modelo.getAreaById((Integer) session.getAttribute(PARAM_AREA));
-					bean.setArea(area);
-					session.removeAttribute(PARAM_AREA);
-					break;
-			}
+		if (session.getAttribute(PARAM_AREA) != null) {
+			Area area = modelo.getAreaById((Integer) session.getAttribute(PARAM_AREA));
+			bean.setArea(area);
+			session.removeAttribute(PARAM_AREA);
 		}
+		
 	}
 	
 	/** carga los evaluadores en una tabla .

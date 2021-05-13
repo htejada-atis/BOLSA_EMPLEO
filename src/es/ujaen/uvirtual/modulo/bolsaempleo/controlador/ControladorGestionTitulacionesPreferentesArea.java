@@ -12,6 +12,7 @@ import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.reflect.TypeToken;
@@ -24,6 +25,7 @@ import es.ujaen.uvirtual.modulo.bolsaempleo.modelo.ModeloArea;
 import es.ujaen.uvirtual.modulo.bolsaempleo.modelo.ModeloTitulacion;
 import es.ujaen.uvirtual.modulo.bolsaempleo.modelo.ModeloUsuarioBolsaEmpleo;
 import es.ujaen.uvirtual.modulo.bolsaempleo.utilidades.BolsaEmpleoDataTable;
+import es.ujaen.uvirtual.modulo.bolsaempleo.utilidades.BolsaEmpleoUtils;
 import es.ujaen.uvirtual.modulo.bolsaempleo.vistas.VistaTitulacionesArea;
 import es.ujaen.uvirtual.utilidades.EscapaHTML;
 import es.ujaen.uvirtual.utilidades.Formateador;
@@ -65,6 +67,8 @@ public class ControladorGestionTitulacionesPreferentesArea extends HttpServlet {
 	// Mensajes
 	public static final String MENSAJE_ERROR_TITULACIONES_SELECCIONADAS_INCORRECTAS = "No hay titulaciones seleccionadas válidas";
 	public static final String MENSAJE_ERROR_TITULACIONES_PREFERENTES_YA_SELECCIONADAS_PREVIAMENTE = "Las titulaciones ya han sido incluidas para éste área";
+	public static final String MENSAJE_EXITO_TITULACIONES_ELIMINADAS_CORRECTAMENTE = "Titulacion/es eliminada/s correctamente";
+	public static final String MENSAJE_EXITO_TITULACIONES_INCLUIDAS_CORRECTAMENTE = "Titulacion/es incluida/s correctamente";
 	
 	// ruta vistas
 	public static final String RUTA_BEP_CONF = "/WEB-INF/jsp/vista/infadministrativa/bolsaempleo/configuracion/";
@@ -93,16 +97,16 @@ public class ControladorGestionTitulacionesPreferentesArea extends HttpServlet {
 		}
 		
 		try {
-			init(bean, datos);
+			init(bean, datos, request);
 			switch (nombreAccion) {
 				case ACCION_INDEX:
-					index(bean);
+					index(bean, request);
 					break;	
 				case ACCION_ELIMINAR_TITULACION_AREA:
-					eliminarTitulacionesArea(request, bean);
+					eliminarTitulacionesArea(bean, request, response);
 					break;
 				case ACCION_INCLUIR_TITULACION_AREA:
-					incluirTitulacionesPreferentesArea(request, bean);
+					incluirTitulacionesPreferentesArea(bean, request, response);
 					break;
 				case ACCION_DATATABLE_TITULACIONES:
 					listadoTitulaciones(bean, datos, request, response);
@@ -133,8 +137,9 @@ public class ControladorGestionTitulacionesPreferentesArea extends HttpServlet {
 		}
 	}
 	
-	private void init(VistaTitulacionesArea bean, UVDatos datos) throws SQLException, UVException {
+	private void init(VistaTitulacionesArea bean, UVDatos datos, HttpServletRequest request) throws SQLException, UVException {
 		bean.setVista(RUTA_BEP_CONF + "titulacionespreferentesarea.jsp");
+		BolsaEmpleoUtils.readMensajeSession(bean, request);
 		ModeloUsuarioBolsaEmpleo.obtenerInstancia().checkUser(datos);
 	}
 	
@@ -152,11 +157,14 @@ public class ControladorGestionTitulacionesPreferentesArea extends HttpServlet {
 	}
 		
 	/** elimina una lista de titulaciones afines a un área .
-	 * @param request .
 	 * @param bean .
+	 * @param request .
+	 * @param response .
+	 * @throws SQLException excepcion de bbdd .
 	 * @throws IOException en caso de error de IO .
+	 * @throws UVException en caso de error de parametros .
 	 */
-	private void eliminarTitulacionesArea(HttpServletRequest request, VistaTitulacionesArea bean) throws SQLException, UVException {
+	private void eliminarTitulacionesArea(VistaTitulacionesArea bean, HttpServletRequest request, HttpServletResponse response) throws SQLException, UVException, IOException {
 		Integer area = Formateador.leeParametroInteger(request.getParameter(PARAM_AREA));
 		
 		ModeloArea modelo = ModeloArea.obtenerInstancia();
@@ -166,24 +174,31 @@ public class ControladorGestionTitulacionesPreferentesArea extends HttpServlet {
 		Gson gson = new GsonBuilder().create();
 		ModeloTitulacion modeloTit = ModeloTitulacion.obtenerInstancia();
 		
+		HttpSession session = request.getSession(false);
+		session.setAttribute(PARAM_AREA, area);
+		
 		try {
 			List<String> titulaciones = gson.fromJson(request.getParameter(PARAM_TITULACIONES), new TypeToken<List<String>>() { }.getType());
 			modeloTit.eliminarTitulacionesPreferentesArea(titulaciones, area);
+			BolsaEmpleoUtils.addMensajeDeExito(MENSAJE_EXITO_TITULACIONES_ELIMINADAS_CORRECTAMENTE, bean, request);
 		} catch (Exception ex) {
-			throw new UVException(MENSAJE_ERROR_TITULACIONES_SELECCIONADAS_INCORRECTAS);
+			BolsaEmpleoUtils.addMensajeDeError(MENSAJE_ERROR_TITULACIONES_SELECCIONADAS_INCORRECTAS, bean, request);
 		}
+		
+		response.sendRedirect(request.getServletPath());
 	}
 	
 	/** incluye una lista de titulaciones en las afines a un área .
-	 * @param request .
 	 * @param bean .
+	 * @param request .
+	 * @param response .
 	 * @throws SQLException excepcion de bbdd .
 	 * @throws IOException en caso de error de IO .
 	 * @throws UVException en caso de error de parametros .
 	 * @throws SQLIntegrityConstraintViolationException error de repetición de id ya existente .
 	 */
-	private void incluirTitulacionesPreferentesArea(HttpServletRequest request, VistaTitulacionesArea bean)
-			throws SQLException, UVException {
+	private void incluirTitulacionesPreferentesArea(VistaTitulacionesArea bean, HttpServletRequest request, HttpServletResponse response)
+			throws SQLException, UVException, IOException {
 		Integer area = Formateador.leeParametroInteger(request.getParameter(PARAM_AREA));
 		
 		ModeloArea modelo = ModeloArea.obtenerInstancia();	
@@ -193,27 +208,41 @@ public class ControladorGestionTitulacionesPreferentesArea extends HttpServlet {
 		Gson gson = new GsonBuilder().create();
 		ModeloTitulacion modeloTit = ModeloTitulacion.obtenerInstancia();
 		
+		HttpSession session = request.getSession(false);
+		session.setAttribute(PARAM_AREA, area);
+		
 		try {
 			List<String> titulaciones = gson.fromJson(request.getParameter(PARAM_TITULACIONES), new TypeToken<List<String>>() { }.getType());
 			modeloTit.incluirTitulacionesPreferentesArea(titulaciones, area);
+			BolsaEmpleoUtils.addMensajeDeExito(MENSAJE_EXITO_TITULACIONES_INCLUIDAS_CORRECTAMENTE, bean, request);
 		} catch (SQLIntegrityConstraintViolationException e) {
-			LOGGER.log(Level.WARNING, e.toString());
-			bean.getMensajesDeError().add(e.toString());
+			BolsaEmpleoUtils.addMensajeDeError(MENSAJE_ERROR_TITULACIONES_PREFERENTES_YA_SELECCIONADAS_PREVIAMENTE, bean, request);
 		} catch (Exception ex) {
-			throw new UVException(MENSAJE_ERROR_TITULACIONES_SELECCIONADAS_INCORRECTAS);
+			BolsaEmpleoUtils.addMensajeDeError(MENSAJE_ERROR_TITULACIONES_SELECCIONADAS_INCORRECTAS, bean, request);
 		}
+		
+		response.sendRedirect(request.getServletPath());
 	}
 	
 	/** muestra todas las areas en un select .
-	 * @param bean bean de la vista a la que poner los valores.
-	 * @throws SQLException excepcion de bbdd.
+	 * @param bean bean de la vista a la que poner los valores .
+	 * @param request .
+	 * @throws SQLException excepcion de bbdd .
 	 * @throws UVException .
 	 */
-	private void index(VistaTitulacionesArea bean) throws SQLException, UVException {
+	private void index(VistaTitulacionesArea bean, HttpServletRequest request) throws SQLException, UVException {
 		ModeloArea modelo = ModeloArea.obtenerInstancia();	
 		List<Area> areas = modelo.listaAreas();
 		bean.setVista(RUTA_BEP_CONF + "titulacionespreferentesarea.jsp");
 		bean.setAreas(areas);
+		
+		HttpSession session = request.getSession(false);
+		if (session.getAttribute(PARAM_AREA) != null) {
+			Area area = modelo.getAreaById((Integer) session.getAttribute(PARAM_AREA));
+			bean.setArea(area);
+			session.removeAttribute(PARAM_AREA);
+		}
+		
 	}
 	
 	/** carga las titulaciones en una tabla .
@@ -238,6 +267,7 @@ public class ControladorGestionTitulacionesPreferentesArea extends HttpServlet {
 				bean.setDatatableTitulaciones(dataTable);
 				writer.write(dataTable.toJson());
 			} catch (UVException ex) {
+				System.out.println("error: " + ex.getMessage());
 				CodigoDescripcion mensaje = new CodigoDescripcion(RESPONSE_AJAX_ERROR, ex.getMessage());
 				bean.getMensajesDeError().add(mensaje.toString());
 				writer.write(new Gson().toJson(mensaje));
