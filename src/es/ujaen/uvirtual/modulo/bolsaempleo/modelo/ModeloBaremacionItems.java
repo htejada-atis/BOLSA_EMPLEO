@@ -552,4 +552,36 @@ public class ModeloBaremacionItems {
 			}
 		}
 	}
+	
+	
+	/** Comprueba que el item que se ha seleccionado no es excluyente con uno ya existente en la solicitud .
+	 * @param itemPadre .
+	 * @param itemHijo .
+	 * @return bool .
+	 * @throws SQLException .
+	 * @throws UVException .
+	 */
+	public Boolean checkItemsExcluyentes(ItemBaremacion itemPadre, ItemBaremacion itemHijo) throws SQLException {
+		String consulta = "SELECT bepite.*,bepmex.BEPITE_CODNUM_HIJO FROM uvirtual.TBEP_ITEMSBAREMACION bepite "
+				+ "LEFT JOIN uvirtual.TBEP_MERITOS_EXCLUYENTES bepmex "
+				+ "ON bepite.CODNUM = bepmex.BEPITE_CODNUM_HIJO "
+				+ "AND bepmex.BEPITE_CODNUM_PADRE = ? "
+				+ "WHERE bepmex.BEPITE_CODNUM_PADRE = ?"
+				+ "AND bepmex.BEPITE_CODNUM_HIJO = ?";
+		
+		try (Connection conexion = ConexionUvirtual.obtenerInstancia(); PreparedStatement stmt = conexion.prepareStatement(consulta)) {
+			int parameterIndex = 1;
+			stmt.setInt(parameterIndex++, itemPadre.getCodNum());
+			stmt.setInt(parameterIndex++, itemPadre.getCodNum());
+			stmt.setInt(parameterIndex++, itemHijo.getCodNum());
+			stmt.executeUpdate();
+			
+			try (ResultSet rs = stmt.executeQuery()) {
+				while (rs.next()) {
+					return true;
+				}
+			}
+		}
+		return false;
+	}
 }

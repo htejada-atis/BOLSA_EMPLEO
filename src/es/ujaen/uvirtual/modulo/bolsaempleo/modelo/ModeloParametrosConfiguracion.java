@@ -66,6 +66,22 @@ public class ModeloParametrosConfiguracion {
 			}
 		}
 		
+		String consultaBep = "SELECT * FROM ADM_PARAMETROS "
+				+ "WHERE PARAM_CODALF LIKE '%bolsaempleo%'";
+		
+		try (Connection conexion = ConexionUvirtual.obtenerInstancia(); PreparedStatement stmt = conexion.prepareStatement(consultaBep)) {
+			try (ResultSet rs = stmt.executeQuery()) {
+				while (rs.next()) {
+					ParametrosConfiguracion param = new ParametrosConfiguracion();
+					param.setCodNum(rs.getString("CONFIG_CODALF"));
+					param.setNombre(rs.getString("PARAM_CODALF"));
+					param.setValor(rs.getString("VALOR"));
+					param.setDescripcion(rs.getString("DESID"));
+					parametros.add(param);	
+				}
+			}
+		}
+		
 		return parametros;
 	}
 	
@@ -132,6 +148,41 @@ public class ModeloParametrosConfiguracion {
 			}
 		}
 		
+	}
+	
+	
+	/** Devuelve un parametro de configuración.
+	 * @param nombre del parametro a buscar .
+	 * @return param .
+	 * @throws SQLException en caso de error en la BD
+	 * @throws UVException en caso de errores de validacion
+	 */
+	public ParametrosConfiguracion getParametroByNombreBEP(String nombre) throws SQLException, UVException {
+		if (nombre == null) {
+			throw new UVException("El nombre no puede estar vacío");
+		}
+		
+		String consulta = "SELECT * FROM TBEP_PARAMETROS_CONFIGURACION "
+			+ " WHERE NOMBRE = ?";
+		
+		try (Connection conexion = ConexionUvirtual.obtenerInstancia();
+				PreparedStatement stmt = conexion.prepareStatement(consulta)) {
+			stmt.setString(1, nombre);
+						
+			try (ResultSet rs = stmt.executeQuery()) {
+				if (!rs.next()) {
+					throw new UVException("No existe el parametro con nombre" + nombre);
+				}
+				
+				ParametrosConfiguracion param = new ParametrosConfiguracion();
+				param.setCodNum(rs.getString("CODNUM"));
+				param.setNombre(rs.getString("NOMBRE"));
+				param.setDescripcion(rs.getString("DESCRIPCION"));
+				param.setValor(rs.getString("VALOR"));
+				
+				return param;
+			}
+		}
 	}
 	
 }
