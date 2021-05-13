@@ -405,7 +405,7 @@ public class ModeloArea {
 	private String obtenerStringDescsAreas(List<Area> areas) {
 		StringBuilder builder = new StringBuilder();
 		for (int i = 0; i < areas.size(); i++) {
-			builder.append("'" + areas.get(i).getIdAreaExterno() + "',");
+			builder.append("'" + areas.get(i).getDescripcion() + "',");
 		}
 		return builder.deleteCharAt(builder.length() - 1).toString();
 	}
