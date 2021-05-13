@@ -24,7 +24,6 @@ VistaEstadoBolsas bean = (VistaEstadoBolsas) uvdatos.getVistas().get(VistaEstado
 		totales = bean.getTotalBolsas();
 	%>
 
-
 	<% if (bean.getMensajesDeExito().size() > 0) { %>
 		<div id="exito" class="success">
 			<%= bean.formatearMensajesDeExito() %>
@@ -34,7 +33,8 @@ VistaEstadoBolsas bean = (VistaEstadoBolsas) uvdatos.getVistas().get(VistaEstado
 		<div id="error" class="error">
 			<%= bean.formatearMensajesDeError() %>
 		</div>
-	<% } else { %>
+	<% } %>
+	
 	<h2>Estado de las bolsas</h2>
 	
 	<div class="titulo-bolsa-empleo">
@@ -78,7 +78,7 @@ VistaEstadoBolsas bean = (VistaEstadoBolsas) uvdatos.getVistas().get(VistaEstado
 			</tr>
 		</tfoot>
 	</table>
-	<% } %>
+	
 </div>
 	
 <script>

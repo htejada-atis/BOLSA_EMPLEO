@@ -10,6 +10,7 @@ VistaAreasBaremar bean = (VistaAreasBaremar) uvdatos.getVistas().get(VistaAreasB
 %>
 
 <div class='bolsa-empleo areasbaremar'>
+
 	<% if (bean.getMensajesDeExito().size() > 0) { %>
 		<div id="exito" class="success">
 			<%= bean.formatearMensajesDeExito() %>

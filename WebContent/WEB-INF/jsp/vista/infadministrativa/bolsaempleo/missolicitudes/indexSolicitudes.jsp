@@ -14,15 +14,6 @@ VistaSolicitudes bean = (VistaSolicitudes) uvdatos.getVistas().get(VistaSolicitu
 
 <div class="bolsa-empleo">
 
-	<% if (session.getAttribute(ControladorMisSolicitudes.MENSAJE_ENVIADO) != null) { %>
-		<div id="exito" class="success">
-			<%= session.getAttribute(ControladorMisSolicitudes.MENSAJE_ENVIADO) %>
-		</div>
-	<% 
-			session.removeAttribute(ControladorMisSolicitudes.MENSAJE_ENVIADO);
-		} 
-	%>
-
 	<% if (bean.getMensajesDeExito().size() > 0) { %>
 		<div id="exito" class="success">
 			<%= bean.formatearMensajesDeExito() %>

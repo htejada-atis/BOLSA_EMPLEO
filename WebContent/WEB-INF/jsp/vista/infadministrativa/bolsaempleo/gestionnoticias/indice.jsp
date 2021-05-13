@@ -12,15 +12,6 @@ VistaNoticias bean = (VistaNoticias) uvdatos.getVistas().get(VistaNoticias.class
 
 <div class="bolsa-empleo">
 
-	<% if (session.getAttribute(ControladorGestionNoticias.MENSAJE_ENVIADO) != null) { %>
-		<div id="exito" class="success">
-			<%= session.getAttribute(ControladorGestionNoticias.MENSAJE_ENVIADO) %>
-		</div>
-	<% 
-			session.removeAttribute(ControladorGestionNoticias.MENSAJE_ENVIADO);
-		} 
-	%>
-
 	<% if (bean.getMensajesDeExito().size() > 0) { %>
 		<div id="exito" class="success">
 			<%= bean.formatearMensajesDeExito() %>
@@ -30,7 +21,7 @@ VistaNoticias bean = (VistaNoticias) uvdatos.getVistas().get(VistaNoticias.class
 		<div id="error" class="error">
 			<%= bean.formatearMensajesDeError() %>
 		</div>
-	<% } else {%>
+	<% } %>
 
 	<div class="titulo-bolsa-empleo">
 		<h2>Noticias</h2>
@@ -58,7 +49,6 @@ VistaNoticias bean = (VistaNoticias) uvdatos.getVistas().get(VistaNoticias.class
 		</tfoot>
 	</table>
 	
-	<% } %>
 </div>
 
 <script>

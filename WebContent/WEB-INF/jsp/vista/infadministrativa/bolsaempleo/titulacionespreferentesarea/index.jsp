@@ -12,6 +12,7 @@ Bolsa bolsa = bean.getArea();
 %>
 
 <div class='bolsa-empleo'>
+
 	<% if (bean.getMensajesDeExito().size() > 0) { %>
 		<div id="exito" class="success">
 			<%= bean.formatearMensajesDeExito() %>
@@ -22,6 +23,7 @@ Bolsa bolsa = bean.getArea();
 			<%= bean.formatearMensajesDeError() %>
 		</div>
 	<% } %>
+	
 	<h2>Titulaciones por área</h2>	
 
 	<p>Página de consulta sobre que titulaciones son preferentes por área</p>

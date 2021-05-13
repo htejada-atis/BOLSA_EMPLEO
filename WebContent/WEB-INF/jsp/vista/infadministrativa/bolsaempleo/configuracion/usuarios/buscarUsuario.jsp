@@ -13,11 +13,16 @@ VistaUsuarioBolsaEmpleo bean = (VistaUsuarioBolsaEmpleo) uvdatos.getVistas().get
 
 <div class="bolsa-empleo usuarios-buscar">
 
-	<% 
-		if(bean.getMensajesDeError().size()>0) {
-			out.print("<div class='error'>" + bean.formatearMensajesDeError() + "</div>");
-		}
-	%>
+	<% if (bean.getMensajesDeExito().size() > 0) { %>
+		<div id="exito" class="success">
+			<%= bean.formatearMensajesDeExito() %>
+		</div>
+	<% } %>
+	<% if (bean.getMensajesDeError().size() > 0) { %>
+		<div id="error" class="error">
+			<%= bean.formatearMensajesDeError() %>
+		</div>
+	<% } %>
 	
 	<% if(bean.getUsuario()!=null) {%>
 		<% if(bean.getBusqueda()) {%>

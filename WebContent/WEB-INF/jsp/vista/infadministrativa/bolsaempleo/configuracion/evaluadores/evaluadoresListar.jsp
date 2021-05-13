@@ -12,17 +12,6 @@ VistaEvaluadores bean = (VistaEvaluadores) uvdatos.getVistas().get(VistaEvaluado
 
 <div class="bolsa-empleo evaluadores-listar">
 
-	<%
-		if (session.getAttribute(ControladorGestionEvaluadores.MENSAJE_ENVIADO) != null) {
-	%>
-			<div id="exito" class="success">
-				<%=session.getAttribute(ControladorGestionEvaluadores.MENSAJE_ENVIADO)%>
-			</div>
-	<%
-			session.removeAttribute(ControladorGestionEvaluadores.MENSAJE_ENVIADO);
-		}
-	%>
-	
 	<% if (bean.getMensajesDeExito().size() > 0) { %>
 		<div id="exito" class="success">
 			<%= bean.formatearMensajesDeExito() %>
