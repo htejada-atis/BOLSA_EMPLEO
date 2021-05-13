@@ -98,7 +98,7 @@ public class GeneradorCabecera implements Filter {
 			return;
 		}
 
-		if ((menu != null) && (menu.isCrearMenu())) {
+		if (menu != null && menu.isCrearMenu()) {
 			Usuario usuario = null;
 			if (uid != null) {
 				usuario = CrearUsuario.usuario(uid);

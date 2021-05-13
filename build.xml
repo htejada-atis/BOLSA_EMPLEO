@@ -1,7 +1,21 @@
 <!-- build.xml -->
 <!DOCTYPE project>
-<project name="uv-desarrollo" default="war" basedir="." xmlns:sonar="antlib:org.sonar.ant" xmlns:jacoco="antlib:org.jacoco.ant">
+<project name="uv-desarrollo" default="war" basedir="." 
+	xmlns:sonar="antlib:org.sonar.ant" 
+	xmlns:jacoco="antlib:org.jacoco.ant"
+	xmlns:cs="antlib:com.puppycrawl.tools.checkstyle.ant">
 
+	<taskdef name="pmd" classname="net.sourceforge.pmd.ant.PMDTask">
+	    <classpath>
+	        <fileset dir="Documentos/pmd/lib">
+	            <include name="*.jar"/>
+	        </fileset>
+	    </classpath>
+	</taskdef>
+	<taskdef uri="antlib:com.puppycrawl.tools.checkstyle.ant" resource="com/puppycrawl/tools/checkstyle/ant/checkstyle-ant-task.properties">
+		<classpath path="Documentos/checkstyle/checkstyle-8.42-all.jar"/>
+	</taskdef>
+	
 	<taskdef resource="net/sf/antcontrib/antlib.xml"/>
 	
 	<taskdef uri="antlib:org.jacoco.ant" resource="org/jacoco/ant/antlib.xml">
@@ -188,6 +202,7 @@
 					<path location="Documentos/junit"/>
 				</classpath>
 	            <formatter type="brief"/>
+	        	<formatter type="xml"/>
 	            <batchtest fork="yes" todir="${result.report.dir}">
 	            	<fileset dir="${test}">
 	            		<include name="basicos/Test*.java"/>
@@ -219,5 +234,20 @@
 			<csv destfile="${result.report.dir}/report.csv"/>
 			<xml destfile="${result.report.dir}/report.xml"/>
 		</jacoco:report>
+	</target>
+	<target name="checkstyle">
+		<cs:checkstyle config="checkstyle.xml">
+			<formatter type="xml" tofile="${result.report.dir}/checkstyle_report.xml"/>
+			<fileset dir="${src}" includes="**/*.java"/>
+		</cs:checkstyle>
+	</target>
+	<target name="pmd">
+	    <pmd shortFilenames="true">
+	        <ruleset>rulesets/java/quickstart.xml</ruleset>
+	    	<formatter type="xml" toFile="${result.report.dir}/pmd_report.xml"/>
+	        <fileset dir="${src}">
+	            <include name="**/*.java"/>
+	        </fileset>
+	    </pmd>
 	</target>	
 </project>

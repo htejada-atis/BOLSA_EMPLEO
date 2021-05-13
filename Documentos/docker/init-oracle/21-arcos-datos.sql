@@ -3,7 +3,7 @@ Insert into ARCOS.V_PERSONA_INTRANET
     STRAPELLIDO1, STRAPELLIDO2, SEXO, COD_PERSONA_AC, COD_PERSONA_RH, 
     BLNMANUAL)
  Values
-   (1, '12345678', '12345678A', 'NIF', 'USIG', 
+   (1, '12345678', '12345678Z', 'NIF', 'USIG', 
     'Usuario de', 'pruebas', 'V', 1, 1, 
     'S');
 

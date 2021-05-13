@@ -48,7 +48,7 @@ public class ConfiguracionGlobal implements Serializable {
 	 */
 	public static boolean getParametroLogico(String parametro) throws UVException {
 		init();
-		if ((datos != null) && (datos.get(parametro) != null)) { 
+		if (datos != null && datos.get(parametro) != null) { 
 			return "S".equals(datos.get(parametro));
 		} 
 		lanzaExcepcionParametroNoExiste("getParametroLogico", parametro);
@@ -63,7 +63,7 @@ public class ConfiguracionGlobal implements Serializable {
 	 */
 	public static int getParametroEntero(String parametro) throws UVException {
 		init();
-		if ((datos != null) && (datos.get(parametro) != null)) {
+		if (datos != null && datos.get(parametro) != null) {
 			return Integer.parseInt(datos.get(parametro));
 		}
 		lanzaExcepcionParametroNoExiste("getParametroEntero", parametro);
@@ -78,7 +78,7 @@ public class ConfiguracionGlobal implements Serializable {
 	 */
 	public static Integer getParametroEnteroNE(String parametro) {
 		init();
-		if ((datos != null) && (datos.get(parametro) != null)) {
+		if (datos != null && datos.get(parametro) != null) {
 			return Integer.parseInt(datos.get(parametro));
 		}
 		return null;
@@ -92,7 +92,7 @@ public class ConfiguracionGlobal implements Serializable {
 	 */
 	public static long getParametroEnteroLargo(String parametro) throws UVException {
 		init();
-		if ((datos != null) && (datos.get(parametro) != null)) {
+		if (datos != null && datos.get(parametro) != null) {
 			return Long.parseLong(datos.get(parametro));
 		}
 		lanzaExcepcionParametroNoExiste("getParametroEnteroLargo", parametro);
@@ -107,7 +107,7 @@ public class ConfiguracionGlobal implements Serializable {
 	 */
 	public static Long getParametroEnteroLargoNE(String parametro) {
 		init();
-		if ((datos != null) && (datos.get(parametro) != null)) {
+		if (datos != null && datos.get(parametro) != null) {
 			return Long.parseLong(datos.get(parametro));
 		}
 		return null;
@@ -121,7 +121,7 @@ public class ConfiguracionGlobal implements Serializable {
 	 */
 	public static float getParametroNumeroDecimal(String parametro) throws UVException {
 		init();
-		if ((datos != null) && (datos.get(parametro) != null)) {
+		if (datos != null && datos.get(parametro) != null) {
 			return Float.parseFloat(datos.get(parametro));
 		}
 		lanzaExcepcionParametroNoExiste("getParametroNumeroDecimal", parametro);
@@ -136,7 +136,7 @@ public class ConfiguracionGlobal implements Serializable {
 	 */
 	public static String getParametroCadena(String parametro) throws UVException {
 		init(); 
-		if ((datos != null) && (datos.get(parametro) != null)) { 
+		if (datos != null && datos.get(parametro) != null) { 
 			return datos.get(parametro);
 		}
 		lanzaExcepcionParametroNoExiste("getParametroCadena", parametro);
@@ -150,7 +150,7 @@ public class ConfiguracionGlobal implements Serializable {
 	 */
 	public static String getParametroCadenaNE(String parametro) {
 		init();
-		if ((datos != null) && (datos.get(parametro) != null)) {
+		if (datos != null && datos.get(parametro) != null) {
 			return datos.get(parametro);
 		}
 		return null;
@@ -209,7 +209,7 @@ public class ConfiguracionGlobal implements Serializable {
 				// Para evitar poner dobles barras
 				String nombreParametroUrlBase = "administracion.urlbase"; 
 				String urlBase = datos.get(nombreParametroUrlBase);
-				if ((urlBase != null) && (urlBase.endsWith("/"))) {
+				if (urlBase != null && urlBase.endsWith("/")) {
 					datos.put(nombreParametroUrlBase, urlBase.substring(0, urlBase.length() - 1));
 				}
 				ultimaLectura = (new java.util.Date()).getTime();

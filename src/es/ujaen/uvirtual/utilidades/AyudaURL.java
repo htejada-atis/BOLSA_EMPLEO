@@ -119,7 +119,7 @@ public class AyudaURL {
 		if (posicionInicial + incremento < fields.length) { 
 			int i = posicionInicial + incremento + 1;
 			String servlet = fields[posicionInicial + incremento];
-			while ((i < fields.length) && (!separadorDeParametros.equals(fields[i]))) {
+			while (i < fields.length && !separadorDeParametros.equals(fields[i])) {
 				servlet += "." + fields[i]; 
 				i++;
 			}
@@ -139,7 +139,7 @@ public class AyudaURL {
 		String[] fields = splitter(url);
 		if (posicionInicial + 2 <= fields.length) { 
 			int i = posicionInicial + 2;
-			while ((i < fields.length) && (!separadorDeParametros.equals(fields[i]))) {
+			while (i < fields.length && !separadorDeParametros.equals(fields[i])) {
 				i++;
 			}
 			i++; // saltar el separador de parámetros
@@ -226,7 +226,7 @@ public class AyudaURL {
 			}
 			String newUrl = fields[0];
 			for (int i = 1; i < fields.length; i++) {
-				if ((i == posicionInicial + 2) && agregarParametro) {
+				if (i == posicionInicial + 2 && agregarParametro) {
 					newUrl += "/" + formato;
 				}
 				newUrl += "/" + fields[i];
@@ -313,7 +313,7 @@ public class AyudaURL {
 		String[] fields = splitter(url);
 		String urlSinParametros = fields[0];
 		int i = 1;
-		while ((i < fields.length) && (!separadorDeParametros.equals(fields[i]))) {
+		while (i < fields.length && !separadorDeParametros.equals(fields[i])) {
 			urlSinParametros += divisor + fields[i]; 
 			i++;
 		}

@@ -27,6 +27,8 @@
 		removeAbandoned="true"
 		removeAbandonedTimeout="600"
 		logAbandoned="true"
+		connectionTimeout="30000"
+		testOnBorrow="true"
 		maxWait="-1"/> 
 
 	<Resource name="jdbc/arcos" auth="Container"
@@ -38,6 +40,8 @@
 		removeAbandoned="true"
 		removeAbandonedTimeout="600"
 		logAbandoned="true"
+		connectionTimeout="30000"
+		testOnBorrow="true"
 		maxWait="-1"/> 
 
 	<Resource name="jdbc/uxxiac" auth="Container"
@@ -51,6 +55,8 @@
 		logAbandoned="true"
 		connectionProperties="SetBigStringTryClob=true"
 		alternateUsernameAllowed="true"
+		connectionTimeout="30000"
+		testOnBorrow="true"
 		maxWait="-1"/> 
 
 
@@ -64,6 +70,8 @@
 		removeAbandonedTimeout="600"
 		logAbandoned="true"
 		connectionProperties="SetBigStringTryClob=true"
+		connectionTimeout="30000"
+		testOnBorrow="true"
 		maxWait="-1"/> 
 
 	<Resource name="jdbc/tramuja" auth="Container"
@@ -76,6 +84,8 @@
 		removeAbandonedTimeout="600"
 		logAbandoned="true"
 		connectionProperties="SetBigStringTryClob=true"
+		connectionTimeout="30000"
+		testOnBorrow="true"
 		maxWait="-1"/> 
 	
 </Context>

@@ -40,7 +40,7 @@ pipeline {
                             docker-compose build
                             docker-compose up -d
                            '''
-                        sleep(time:2,unit:"MINUTES")
+                        sleep(time:20,unit:"SECONDS")
                     }
 	        	}
 	        }
@@ -56,7 +56,7 @@ pipeline {
 	        	}
 	        }
 	    }
-	    stage('sonar') {
+	    stage('analisis') {
 	    	steps {
 		        echo 'Inicio sonar'
 		        withSonarQubeEnv('sonar docker') { 
@@ -64,7 +64,24 @@ pipeline {
 		               sh "ant sonar -Dsonar.projectKey=${SONAR_PROYECTKEY} -DdbUrl=127.0.0.1 -DmemcacheUrl=127.0.0.1"
 		            }
 		        }
-	        }        
+	            withAnt(installation: 'LocalAnt') {
+	               sh "ant checkstyle"
+	               sh "ant pmd"
+	            }
+	        }   
+	        post {
+	        	always {
+		        	jacoco(
+					    execPattern: '**/builds/build/rama/jacoco.exec',
+    					classPattern: '**/builds/build/rama/**',
+    					sourcePattern: '**/src/**',
+    					inclusionPattern: '**/*.class'
+					)	
+	        		junit 'builds/build/rama/site/jacoco/*.xml'
+	        		recordIssues enabledForFailure: true, tool: checkStyle(pattern: 'builds/build/rama/site/jacoco/checkstyle_report.xml')
+	        		recordIssues enabledForFailure: true, tool: pmdParser(pattern: 'builds/build/rama/site/jacoco/pmd_report.xml')
+	        	}
+	        }     
 	    }
 	    stage('push docker') {
 	    	steps {
