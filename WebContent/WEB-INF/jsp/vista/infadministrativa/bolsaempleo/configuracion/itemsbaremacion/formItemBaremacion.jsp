@@ -27,7 +27,6 @@ if(item!=null){
 }
 %>
 
-
 <div class="bolsa-empleo">
 
 	<% if (bean.getMensajesDeExito().size() > 0) { %>

@@ -640,8 +640,8 @@ public class ControladorItemsBaremacion extends HttpServlet {
 		Integer codNum = Formateador.leeParametroInteger(request.getParameter(PARAM_BLOQUE));
 		BloqueBaremacion bloque = modelo.getBloqueBaremacionById(codNum);
 		
-		datos.setContentType(RESPONSE_AJAX_CONTENTTYPE);
 		datos.setRespuestaEnviada(true);
+		datos.setContentType(RESPONSE_AJAX_CONTENTTYPE);		
 		response.setContentType(RESPONSE_AJAX_CONTENTTYPE);
 		response.setCharacterEncoding(RESPONSE_AJAX_ENCODING);
 		
@@ -653,14 +653,12 @@ public class ControladorItemsBaremacion extends HttpServlet {
 				writer.write(dataTable.toJson());
 			} catch (Exception ex) {
 				bean.getMensajesDeError().add(ex.getMessage());
-				
 				CodigoDescripcion mensaje = new CodigoDescripcion(RESPONSE_AJAX_ERROR, ex.getMessage());
 				writer.write(new Gson().toJson(mensaje));
 				response.setStatus(RESPONSE_AJAX_HTTP_CODE_ERROR);
 			}
 		}
 	}
-	
 	
 	private void listadoItemsExcluyentes(VistaItemsBaremacion bean, UVDatos datos, HttpServletRequest request, HttpServletResponse response) 
 			throws IOException, SQLException, UVException {
@@ -669,8 +667,8 @@ public class ControladorItemsBaremacion extends HttpServlet {
 		Integer codNum = Formateador.leeParametroInteger(request.getParameter(PARAM_ITEM));
 		ItemBaremacion item = modelo.getItemBaremacionById(codNum);
 		
-		datos.setContentType(RESPONSE_AJAX_CONTENTTYPE);
 		datos.setRespuestaEnviada(true);
+		datos.setContentType(RESPONSE_AJAX_CONTENTTYPE);		
 		response.setContentType(RESPONSE_AJAX_CONTENTTYPE);
 		response.setCharacterEncoding(RESPONSE_AJAX_ENCODING);
 		

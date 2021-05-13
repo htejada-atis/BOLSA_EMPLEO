@@ -188,56 +188,83 @@ MeritoPreferente merito = bean.getMeritoPreferente();
     			%>
 	    		<label for="merito_tipo_calculo">Tipo de cálculo: </label>
 	    		<select class="params" id="merito_tipo_calculo" name="<%=ControladorMeritosPreferentes.PARAM_MERITO_TIPO_CALCULO%>" style="width:100%;">
-					<option value="<%=ModeloMeritosPreferentes.TIPO_CALCULO_FACTOR%>" <%=tipoSelected.equals(ModeloMeritosPreferentes.TIPO_CALCULO_FACTOR) ? "selected=\"selected\"" : ""%>>Factor</option>
-					<option value="<%=ModeloMeritosPreferentes.TIPO_CALCULO_VALOR_MERITO_FACTOR%>" <%=tipoSelected.equals(ModeloMeritosPreferentes.TIPO_CALCULO_VALOR_MERITO_FACTOR) ? "selected=\"selected\"" : ""%>>Por valor del mérito</option>					
-				</select>	
+					<option value="<%=ModeloMeritosPreferentes.TIPO_CALCULO_FACTOR%>" <%=tipoCalculoSelected.equals(ModeloMeritosPreferentes.TIPO_CALCULO_FACTOR) ? "selected=\"selected\"" : ""%>>Factor</option>
+					<option value="<%=ModeloMeritosPreferentes.TIPO_CALCULO_VALOR_MERITO_FACTOR%>" <%=tipoCalculoSelected.equals(ModeloMeritosPreferentes.TIPO_CALCULO_VALOR_MERITO_FACTOR) ? "selected=\"selected\"" : ""%>>Por valor del mérito</option>					
+					<option value="<%=ModeloMeritosPreferentes.TIPO_CALCULO_VALOR_MERITO_MAYOR_QUE%>" <%=tipoCalculoSelected.equals(ModeloMeritosPreferentes.TIPO_CALCULO_VALOR_MERITO_MAYOR_QUE) ? "selected=\"selected\"" : ""%>>Por valor del mérito mayor que</option>
+				</select>
     		</div>
     	</div>
     	<div class="form-group-container col1">
     		<div class="form-group">
     			<p>Indica como calcular el valor multiplicador que se aplicará donde se indique en el campo "Aplicable".</p>
     			<ul>
-    				<li>Factor: es valor multiplicador es un valor decimal.</li>
-    				<li>Por valor del mérito: el valor multiplicador se cálcula con la formula, BASE + FACTOR * VALOR_MERITO</li>    				
+    				<li id="tipo_calculo_helper_factor" class="<%= tipoCalculoSelected.equals(ModeloMeritosPreferentes.TIPO_CALCULO_FACTOR) ? "selected" : "" %>">Factor: es valor multiplicador es un valor decimal.</li>
+    				<li id="tipo_calculo_helper_valor_merito" class="<%= tipoCalculoSelected.equals(ModeloMeritosPreferentes.TIPO_CALCULO_VALOR_MERITO_FACTOR) ? "selected" : "" %>">Por valor del mérito: el valor multiplicador se cálcula con la formula, BASE + FACTOR * VALOR_MERITO</li>
+    				<li id="tipo_calculo_helper_valor_merito_mayor_que" class="<%= tipoCalculoSelected.equals(ModeloMeritosPreferentes.TIPO_CALCULO_VALOR_MERITO_MAYOR_QUE) ? "selected" : "" %>">Por valor del mérito mayor que: el valor de mérito debe ser mayor o igual al valor indicado en el campo "Valor mínimo del mérito" para aplicar el factor</li>    				
     			</ul>
     		</div>
     	</div>
     	
+    	<!-- TIPO DE CALCULO FACTOR -->
+    	
     	<div class="form-group-container col2" id="bloque_calculo_factor" style="<%=tipoCalculoSelected.equals(ModeloMeritosPreferentes.TIPO_CALCULO_FACTOR) ? "" : "display:none"%>">
     		<div class="form-group">
-    			<label for="factor">Factor: </label>
-    			<input id="factor"
+    			<label for="bloque_calculo_factor_factor">Factor: </label>
+    			<input id="bloque_calculo_factor_factor"
     				   class="form-input-custom"
     				   type="text"
-    				   name="<%=ControladorMeritosPreferentes.PARAM_MERITO_FACTOR%>" 
-    				   value="<%=BolsaEmpleoUtils.getParamForm(request, ControladorMeritosPreferentes.PARAM_MERITO_FACTOR, merito != null && merito.getFactor() != null ? merito.getFactor().toString() : "")%>"/>    			
+    				   name="<%=ControladorMeritosPreferentes.PARAM_MERITO_FACTOR_FACTOR%>" 
+    				   value="<%=BolsaEmpleoUtils.getParamForm(request, ControladorMeritosPreferentes.PARAM_MERITO_FACTOR_FACTOR, merito != null && merito.getFactor() != null ? merito.getFactor().toString() : "")%>"/>    			
     		</div>
     	</div>
     	
+    	<!--  TIPO DE CALCULO VALOR DEL MERITO -->
+    	
     	<div class="form-group-container col3" id="bloque_calculo_valor_merito" style="<%=tipoCalculoSelected.equals(ModeloMeritosPreferentes.TIPO_CALCULO_VALOR_MERITO_FACTOR) ? "" : "display:none"%>">
     		<div class="form-group">
-    			<label for="factor">Base: </label>
-    			<input id="factor"
+    			<label for="bloque_calculo_valor_merito_base">Base: </label>
+    			<input id="bloque_calculo_valor_merito_base"
     				   class="form-input-custom"
     				   type="text"
-    				   name="<%=ControladorMeritosPreferentes.PARAM_MERITO_BASE%>" 
-    				   value="<%=BolsaEmpleoUtils.getParamForm(request, ControladorMeritosPreferentes.PARAM_MERITO_BASE, merito != null && merito.getBase() != null ? merito.getBase().toString() : "")%>"/>
+    				   name="<%=ControladorMeritosPreferentes.PARAM_MERITO_BASE_POR_VALOR_MERITO%>" 
+    				   value="<%=BolsaEmpleoUtils.getParamForm(request, ControladorMeritosPreferentes.PARAM_MERITO_BASE_POR_VALOR_MERITO, merito != null && merito.getBase() != null ? merito.getBase().toString() : "")%>"/>
     		</div>
     		<div class="form-group">
-    			<label for="factor">Factor: </label>
-    			<input id="factor"
+    			<label for="bloque_calculo_valor_merito_factor">Factor: </label>
+    			<input id="bloque_calculo_valor_merito_factor"
     				   class="form-input-custom"
     				   type="text"
-    				   name="<%=ControladorMeritosPreferentes.PARAM_MERITO_FACTOR%>" 
-    				   value="<%=BolsaEmpleoUtils.getParamForm(request, ControladorMeritosPreferentes.PARAM_MERITO_FACTOR, merito != null && merito.getFactor() != null ? merito.getFactor().toString() : "")%>"/>
+    				   name="<%=ControladorMeritosPreferentes.PARAM_MERITO_FACTOR_POR_VALOR_MERITO%>" 
+    				   value="<%=BolsaEmpleoUtils.getParamForm(request, ControladorMeritosPreferentes.PARAM_MERITO_FACTOR_POR_VALOR_MERITO, merito != null && merito.getFactor() != null ? merito.getFactor().toString() : "")%>"/>
     		</div>
     		<div class="form-group">
-    			<label for="factor">Valor máximo: </label>
-    			<input id="factor"
+    			<label for="bloque_calculo_valor_merito_valor_maximo">Valor máximo: </label>
+    			<input id="bloque_calculo_valor_merito_valor_maximo"
     				   class="form-input-custom"
     				   type="text"
     				   name="<%=ControladorMeritosPreferentes.PARAM_MERITO_VALORMAXIMO%>" 
     				   value="<%=BolsaEmpleoUtils.getParamForm(request, ControladorMeritosPreferentes.PARAM_MERITO_VALORMAXIMO, merito != null && merito.getValorMaximo() != null ? merito.getValorMaximo().toString() : "")%>"/>
+    		</div>
+    	</div>
+    	
+    	<!--  TIPO DE CALCULO VALOR DEL MERITO MAYOR QUE -->
+    	
+    	<div class="form-group-container col3" id="bloque_calculo_valor_merito_mayor_que" style="<%=tipoCalculoSelected.equals(ModeloMeritosPreferentes.TIPO_CALCULO_VALOR_MERITO_MAYOR_QUE) ? "" : "display:none"%>">
+    		<div class="form-group">
+    			<label for="bloque_calculo_valor_merito_mayor_que_base">Valor mínimo mérito: </label>
+    			<input id="bloque_calculo_valor_merito_mayor_que_base"
+    				   class="form-input-custom"
+    				   type="text"
+    				   name="<%=ControladorMeritosPreferentes.PARAM_MERITO_BASE_POR_VALOR_MERITO_MAYOR_QUE%>" 
+    				   value="<%=BolsaEmpleoUtils.getParamForm(request, ControladorMeritosPreferentes.PARAM_MERITO_BASE_POR_VALOR_MERITO_MAYOR_QUE, merito != null && merito.getBase() != null ? merito.getBase().toString() : "")%>"/>
+    		</div>
+    		<div class="form-group">
+    			<label for="bloque_calculo_valor_merito_mayor_que_factor">Factor: </label>
+    			<input id="bloque_calculo_valor_merito_mayor_que_factor"
+    				   class="form-input-custom"
+    				   type="text"
+    				   name="<%=ControladorMeritosPreferentes.PARAM_MERITO_FACTOR_POR_VALOR_MERITO_MAYOR_QUE%>" 
+    				   value="<%=BolsaEmpleoUtils.getParamForm(request, ControladorMeritosPreferentes.PARAM_MERITO_FACTOR_POR_VALOR_MERITO_MAYOR_QUE, merito != null && merito.getFactor() != null ? merito.getFactor().toString() : "")%>"/>
     		</div>
     	</div>
     	
@@ -270,18 +297,34 @@ MeritoPreferente merito = bean.getMeritoPreferente();
 			
 			switch(value) {
 			case '<%=ModeloMeritosPreferentes.TIPO_CALCULO_FACTOR%>':
-				$('#bloque_calculo_factor').show();
-				$('#bloque_calculo_factor_helper').show();
-							
+				$('#bloque_calculo_factor').show();							
 				$('#bloque_calculo_valor_merito').hide();
-				$('#bloque_calculo_valor_merito_helper').hide();
+				$('#bloque_calculo_valor_merito_mayor_que').hide();	
+				
+				$('#tipo_calculo_helper_factor').addClass('selected');
+				$('#tipo_calculo_helper_valor_merito').removeClass('selected');
+				$('#tipo_calculo_helper_valor_merito_mayor_que').removeClass('selected');
 				break;
 			case '<%= ModeloMeritosPreferentes.TIPO_CALCULO_VALOR_MERITO_FACTOR %>':				
 				$('#bloque_calculo_factor').hide();
-				$('#bloque_calculo_factor_helper').hide();
-							
 				$('#bloque_calculo_valor_merito').show();
-				$('#bloque_calculo_valor_merito_helper').show();
+				$('#bloque_calculo_valor_merito_mayor_que').hide();
+				
+				$('#tipo_calculo_helper_factor').removeClass('selected');
+				$('#tipo_calculo_helper_valor_merito').addClass('selected');
+				$('#tipo_calculo_helper_valor_merito_mayor_que').removeClass('selected');
+				
+				$('#merito_tipo').val('<%= ModeloMeritosPreferentes.TIPO_MERITO %>');
+				onChangeTipoMerito('<%= ModeloMeritosPreferentes.TIPO_MERITO %>');
+				break;
+			case '<%=ModeloMeritosPreferentes.TIPO_CALCULO_VALOR_MERITO_MAYOR_QUE%>':
+				$('#bloque_calculo_factor').hide();
+				$('#bloque_calculo_valor_merito').hide();
+				$('#bloque_calculo_valor_merito_mayor_que').show();
+				
+				$('#tipo_calculo_helper_factor').removeClass('selected');
+				$('#tipo_calculo_helper_valor_merito').removeClass('selected');
+				$('#tipo_calculo_helper_valor_merito_mayor_que').addClass('selected');
 				
 				$('#merito_tipo').val('<%= ModeloMeritosPreferentes.TIPO_MERITO %>');
 				onChangeTipoMerito('<%= ModeloMeritosPreferentes.TIPO_MERITO %>');
