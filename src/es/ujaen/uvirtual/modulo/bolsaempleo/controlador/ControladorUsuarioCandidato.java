@@ -15,7 +15,6 @@ import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
 import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
 import com.google.gson.reflect.TypeToken;
 
 import es.ujaen.uvirtual.adm.CrearUsuario;
@@ -184,7 +183,7 @@ public class ControladorUsuarioCandidato extends HttpServlet {
 					agregarUsuario(request, response, bean);
 					break;
 				case ACCION_EDITAR_USUARIO_FORM:
-					editarUsuarioForm(request, response, bean);
+					editarUsuarioForm(request, bean);
 					break;
 				case ACCION_EDITAR_USUARIO:
 					editarUsuario(request, response, bean);
@@ -268,9 +267,8 @@ public class ControladorUsuarioCandidato extends HttpServlet {
 		try (PrintWriter writer = response.getWriter()) {
 			try {
 				BolsaEmpleoDataTable<UsuarioBolsaEmpleo> dataTable = modelo.listaUsuarioCandidatosBolsaEmpleoDatatable(request.getParameterMap());
-				Gson gson = new GsonBuilder().setExclusionStrategies(BolsaEmpleoDataTable.GSONEXCLUSIONSTRATEGY).create();
 				bean.setDatatable(dataTable);
-				writer.write(gson.toJson(dataTable));
+				writer.write(dataTable.toJson());
 			} catch (Exception ex) {
 				bean.getMensajesDeError().add(ex.getMessage());
 				
@@ -303,9 +301,8 @@ public class ControladorUsuarioCandidato extends HttpServlet {
 		try (PrintWriter writer = response.getWriter()) {
 			try {
 				BolsaEmpleoDataTable<Bolsa> dataTable = modelo.listaAreasExcluidasPorUsuarioDatatable(request.getParameterMap(), codNum);
-				Gson gson = new GsonBuilder().setExclusionStrategies(BolsaEmpleoDataTable.GSONEXCLUSIONSTRATEGY).create();
 				bean.setDatatableBolsa(dataTable);
-				writer.write(gson.toJson(dataTable));
+				writer.write(dataTable.toJson());
 			} catch (Exception ex) {
 				bean.getMensajesDeError().add(ex.getMessage());
 				
@@ -441,17 +438,13 @@ public class ControladorUsuarioCandidato extends HttpServlet {
 	
 	/** edita un usuario .
 	 * @param request .
-	 * @param response .
 	 * @param bean bean de la vista a la que poner los valores .
 	 * @throws SQLException excepcion de bbdd.
 	 * @throws UVException en caso de error en bd
 	 * @throws IOException en caso de error de IO.
 	 */
-	private void editarUsuarioForm(HttpServletRequest request, HttpServletResponse response, VistaUsuarioBolsaEmpleo bean) 
-			throws SQLException, UVException, IOException {
+	private void editarUsuarioForm(HttpServletRequest request, VistaUsuarioBolsaEmpleo bean) throws SQLException, UVException {
 		bean.setVista(JSP_FORM_CANDIDATO);
-		
-		ModeloUsuarioBolsaEmpleo modelo = ModeloUsuarioBolsaEmpleo.obtenerInstancia();
 		
 		obtenerRoles(bean);
 		
@@ -460,6 +453,7 @@ public class ControladorUsuarioCandidato extends HttpServlet {
 			throw new UVException("No existe el usuario");
 		}
 		
+		ModeloUsuarioBolsaEmpleo modelo = ModeloUsuarioBolsaEmpleo.obtenerInstancia();
 		UsuarioBolsaEmpleo usu = modelo.listaUsuario(usuArcos.getDocumentoNumero());
 		
 		bean.setBusqueda(false);
@@ -688,10 +682,7 @@ public class ControladorUsuarioCandidato extends HttpServlet {
 		try (PrintWriter writer = response.getWriter()) {
 			try {
 				BolsaEmpleoDataTable<Solicitud> dataTable = modelo.listaSolicitudesDatatable(usuario, request.getParameterMap());
-				
-				Gson gson = new GsonBuilder().setDateFormat("dd/M/yyyy").
-						setExclusionStrategies(BolsaEmpleoDataTable.GSONEXCLUSIONSTRATEGY).create();				
-				writer.write(gson.toJson(dataTable));
+				writer.write(dataTable.toJson());
 			} catch (Exception ex) {
 				bean.getMensajesDeError().add(ex.getMessage());
 				

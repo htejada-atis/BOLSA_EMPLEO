@@ -870,7 +870,7 @@ public class ModeloUsuarioBolsaEmpleo {
 		String query = "INSERT INTO TBEP_USUARIOS_EXCLUIDOS_AREA (USUARIO,AREA) VALUES (?,?)";		
 		
 		try (Connection conexion = ConexionUvirtual.obtenerInstancia(); PreparedStatement stmt = conexion.prepareStatement(query)) {
-
+			
 			for (Area area : areas) {
 				stmt.setInt(1, usu.getCodNum());
 				stmt.setInt(2, area.getCodNum());	

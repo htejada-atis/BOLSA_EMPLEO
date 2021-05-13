@@ -27,6 +27,7 @@ import es.ujaen.uvirtual.beans.Usuario;
 import es.ujaen.uvirtual.modulo.bolsaempleo.beans.ApartadoBaremacion;
 import es.ujaen.uvirtual.modulo.bolsaempleo.beans.ItemBaremacion;
 import es.ujaen.uvirtual.modulo.bolsaempleo.beans.Merito;
+import es.ujaen.uvirtual.modulo.bolsaempleo.beans.MeritoPreferente;
 import es.ujaen.uvirtual.modulo.bolsaempleo.modelo.ModeloBaremacionItems;
 import es.ujaen.uvirtual.modulo.bolsaempleo.modelo.ModeloBaremacionApartados;
 import es.ujaen.uvirtual.modulo.bolsaempleo.modelo.ModeloMerito;
@@ -34,26 +35,27 @@ import es.ujaen.uvirtual.modulo.bolsaempleo.modelo.ModeloUsuarioBolsaEmpleo;
 import es.ujaen.uvirtual.modulo.bolsaempleo.utilidades.BolsaEmpleoDataTable;
 import es.ujaen.uvirtual.modulo.bolsaempleo.utilidades.BolsaEmpleoUtils;
 import es.ujaen.uvirtual.modulo.bolsaempleo.vistas.VistaMeritos;
+import es.ujaen.uvirtual.modulo.bolsaempleo.vistas.VistaMeritosPreferentesCandidato;
 import es.ujaen.uvirtual.utilidades.EscapaHTML;
 import es.ujaen.uvirtual.utilidades.Formateador;
 import es.ujaen.uvirtual.utilidades.UVException;
 
 /**
- * Apartado de mis méritos de bolsa empleo.
+ * Apartado de mis méritos preferentes de bolsa empleo.
  */
 @WebServlet(
-		name = "informacionadministrativa.bolsaempleo.mismeritos", 
-		description = "Méritos del candidato", 
+		name = "informacionadministrativa.bolsaempleo.mismeritospreferentes", 
+		description = "Méritos preferentes del candidato", 
 		urlPatterns = { 
-				"/srv/es/informacionadministrativa/bolsaempleo/mismeritos", 
-				"/srv/en/informacionadministrativa/bolsaempleo/mismeritos",
-				"/srv/es/ajax/informacionadministrativa/bolsaempleo/mismeritos", 
-				"/srv/en/ajax/informacionadministrativa/bolsaempleo/mismeritos"
+				"/srv/es/informacionadministrativa/bolsaempleo/mismeritospreferentes", 
+				"/srv/en/informacionadministrativa/bolsaempleo/mismeritospreferentes",
+				"/srv/es/ajax/informacionadministrativa/bolsaempleo/mismeritospreferentes", 
+				"/srv/en/ajax/informacionadministrativa/bolsaempleo/mismeritospreferentes"
 		})
 @MultipartConfig
-public class ControladorMisMeritos extends HttpServlet {
+public class ControladorMisMeritosPreferentes extends HttpServlet {
 	private static final long serialVersionUID = 1L;
-	private static final String NOMBREDEESTACLASE = ControladorMisMeritos.class.getName();
+	private static final String NOMBREDEESTACLASE = ControladorMisMeritosPreferentes.class.getName();
 	private static final Logger LOGGER = Logger.getLogger(NOMBREDEESTACLASE);
 	
 	// acciones
@@ -98,10 +100,10 @@ public class ControladorMisMeritos extends HttpServlet {
 	public static final String MENSAJE_EXITO_ELIMINAR = "Mérito eliminado correctamente";
 	
 	// ruta vistas
-	public static final String RUTA_BEP_MERITOS = "/WEB-INF/jsp/vista/infadministrativa/bolsaempleo/mismeritos/";
+	public static final String RUTA_BEP_MERITOS = "/WEB-INF/jsp/vista/infadministrativa/bolsaempleo/mismeritospreferentes/";
 	
 	// urls
-	public static final String URL_PATTERN_AJAX = "/srv/es/ajax/informacionadministrativa/bolsaempleo/mismeritos";
+	public static final String URL_PATTERN_AJAX = "/srv/es/ajax/informacionadministrativa/bolsaempleo/mismeritospreferentes";
 	
 	public static final int RESPONSE_HTTP_CODE_ERROR = 400;
 	
@@ -114,9 +116,7 @@ public class ControladorMisMeritos extends HttpServlet {
 		datos.setDocType("<!DOCTYPE html>");
 		datos.setContentType("text/html");
 		
-		VistaMeritos bean = new VistaMeritos();		
-		Usuario usuario = datos.getUsuario();
-		LOGGER.log(Level.FINEST, "usuario que ha entrado en el servlet es {0}", usuario.getUid());
+		VistaMeritosPreferentesCandidato bean = new VistaMeritosPreferentesCandidato();
 				
 		String nombreAccion = EscapaHTML.ajustaCodificacion(request.getParameter(PARAM_ACCION));
 		if (nombreAccion == null) {
@@ -132,15 +132,6 @@ public class ControladorMisMeritos extends HttpServlet {
 				case ACCION_DATATABLE:
 					listadoMeritos(bean, datos, request, response);
 					break;
-				case ACCION_AGREGAR_MERITO:
-					agregarMerito(bean, datos, request, response);
-					break;
-				case ACCION_DESCARGAR_FICHERO:
-					descargarFichero(bean, datos, request, response);
-					break;
-				case ACCION_ELIMINAR_MERITOS:
-					eliminarMeritos(request, response);
-					break;				
 				default:
 					errorFatal(bean, "Acción no contemplada");
 			}
@@ -164,12 +155,12 @@ public class ControladorMisMeritos extends HttpServlet {
 		}
 	}
 	
-	private void init(VistaMeritos bean, UVDatos datos) throws SQLException, UVException {
+	private void init(VistaMeritosPreferentesCandidato bean, UVDatos datos) throws SQLException, UVException {
 		bean.setVista(RUTA_BEP_MERITOS + "index.jsp");
 		ModeloUsuarioBolsaEmpleo.obtenerInstancia().checkUser(datos);
 	}
 	
-	private void errorFatal(VistaMeritos bean, String mensaje) {
+	private void errorFatal(VistaMeritosPreferentesCandidato bean, String mensaje) {
 		bean.setVista("/WEB-INF/jsp/vista/infadministrativa/bolsaempleo/error.jsp");
 		bean.getMensajesDeError().add(mensaje);
 	}
@@ -190,104 +181,8 @@ public class ControladorMisMeritos extends HttpServlet {
 	 * @throws ServletException .
 	 * @throws IOException .
 	 */
-	private void listaMeritos(VistaMeritos bean) throws SQLException {
+	private void listaMeritos(VistaMeritosPreferentesCandidato bean) throws SQLException {
 		bean.setVista(RUTA_BEP_MERITOS + "index.jsp");
-		
-		ModeloBaremacionApartados modeloBaremacion = ModeloBaremacionApartados.obtenerInstancia();
-		bean.setApartados(modeloBaremacion.getApartadosActivos());
-	}
-	
-	/** agrega un nuevo mérito.
-	 * @param bean .
-	 * @param datos .
-	 * @param request .
-	 * @param response .
-	 * @throws SQLException excepcion de bbdd .
-	 * @throws UVException en caso de error de parametros .
-	 * @throws IOException en caso de error de input u output .
-	 * @throws ServletException .
-	 */
-	private void agregarMerito(VistaMeritos bean, UVDatos datos, HttpServletRequest request, HttpServletResponse response)
-			throws SQLException, UVException, IOException, ServletException {
-		bean.setVista(RUTA_BEP_MERITOS + "formMerito.jsp");
-		
-		ModeloBaremacionApartados modelo = ModeloBaremacionApartados.obtenerInstancia();
-		bean.setApartados(modelo.getApartadosActivos());
-		
-		if (request.getParameter(PARAM_APARTADO) != null) {
-			ApartadoBaremacion apartado = modelo.getApartadoBaremacionById(Formateador.leeParametroInteger(request.getParameter(PARAM_APARTADO))); 
-			bean.setApartado(apartado);
-			bean.setItems(ModeloBaremacionItems.obtenerInstancia().getItemsDeApartado(apartado));
-			
-			if (request.getParameter(PARAM_ITEM) != null) {
-				Part uploadedFile = request.getPart(PARAM_ARCHIVO);
-				Merito merito = this.validarMerito(request, uploadedFile);
-				
-				Usuario usuArcos = datos.getUsuario();
-				Integer idUsuario = ModeloUsuarioBolsaEmpleo.obtenerInstancia().listaUsuario(usuArcos.getDocumentoNumero()).getCodNum();
-				ModeloMerito.obtenerInstancia().insertaMerito(merito, idUsuario);
-							
-				HttpSession session = request.getSession(false);
-				session.setAttribute(MENSAJE_ENVIADO, MENSAJE_EXITO_AGREGAR);
-				response.sendRedirect(request.getServletPath());
-			}
-		}
-		
-	}
-	
-	/** descarga un fichero .
-	 * @param bean .
-	 * @param datos .
-	 * @param request .
-	 * @param response .
-	 * @throws SQLException excepcion de bbdd.
-	 * @throws UVException en caso de error de parametros .
-	 * @throws IOException en caso de error de input u output .
-	 */
-	private void descargarFichero(VistaMeritos bean, UVDatos datos, HttpServletRequest request, HttpServletResponse response) throws SQLException, UVException, IOException {
-		ModeloMerito modelo = ModeloMerito.obtenerInstancia();
-		if (EscapaHTML.ajustaCodificacion(request.getParameter(PARAM_ID)) != null) {
-			Merito merito = modelo.listaMerito(Formateador.leeParametroInteger(request.getParameter(PARAM_ID)));
-			bean.setMerito(merito);
-			
-			response.setContentType("application/pdf");
-			datos.setRespuestaEnviada(true);
-	        
-			try (ServletOutputStream stream = response.getOutputStream(); BufferedInputStream buf = new BufferedInputStream(merito.getArchivo())) {
-				int readBytes = 0;
-				while ((readBytes = buf.read()) != -1) {
-					stream.write(readBytes);
-	            }
-				stream.flush();
-			} catch (Exception ex) {
-				bean.getMensajesDeError().add(ex.getMessage());
-	        }
-		}
-	}
-	
-	/** elimina una lista de méritos seleccionados .
-	 * @param request .
-	 * @param response .
-	 * @throws SQLException .
-	 * @throws UVException .
-	 * @throws IOException .
-	 */
-	private void eliminarMeritos(HttpServletRequest request, HttpServletResponse response) throws SQLException, UVException, IOException {
-		ModeloMerito modelo = ModeloMerito.obtenerInstancia();
-		
-		Gson gson = new GsonBuilder().create();
-		
-		try {
-			List<String> meritos = gson.fromJson(request.getParameter(PARAM_MERITOS), new TypeToken<List<String>>() { }.getType());
-			modelo.eliminarMeritos(meritos);
-			HttpSession session = request.getSession(false);
-			session.setAttribute(MENSAJE_ENVIADO, MENSAJE_EXITO_ELIMINAR);
-			response.sendRedirect(request.getServletPath());
-		} catch (SQLIntegrityConstraintViolationException e) {
-			throw new UVException(MENSAJE_ERROR_ELIMINAR_MERITO);
-		} catch (Exception ex) {
-			throw new UVException(MENSAJE_ERROR_MERITOS_SELECCIONADOS_INCORRECTOS);
-		}
 	}
 	
 	/** Listado de méritos .
@@ -297,7 +192,8 @@ public class ControladorMisMeritos extends HttpServlet {
 	 * @param response .
 	 * @throws IOException .
 	 */
-	private void listadoMeritos(VistaMeritos bean, UVDatos datos, HttpServletRequest request, HttpServletResponse response) throws IOException, SQLException, UVException {
+	private void listadoMeritos(VistaMeritosPreferentesCandidato bean, UVDatos datos, HttpServletRequest request, HttpServletResponse response) 
+			throws IOException, SQLException, UVException {
 		ModeloMerito modelo = ModeloMerito.obtenerInstancia();
 		
 		datos.setContentType("application/json");
@@ -310,7 +206,7 @@ public class ControladorMisMeritos extends HttpServlet {
 				Usuario usuArcos = datos.getUsuario();
 				ModeloUsuarioBolsaEmpleo modeloUsuarioBolsaEmpleo = ModeloUsuarioBolsaEmpleo.obtenerInstancia();
 				Integer idUsuario = modeloUsuarioBolsaEmpleo.listaUsuario(usuArcos.getDocumentoNumero()).getCodNum();
-				BolsaEmpleoDataTable<Merito> dataTable = modelo.listaMeritosDatatable(request.getParameterMap(), idUsuario);
+				BolsaEmpleoDataTable<MeritoPreferente> dataTable = modelo.listaMeritosDatatable(request.getParameterMap(), idUsuario);
 				bean.setDatatable(dataTable);
 				writer.write(dataTable.toJson());
 			} catch (Exception ex) {

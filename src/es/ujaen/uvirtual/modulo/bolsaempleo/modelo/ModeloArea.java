@@ -531,7 +531,7 @@ public class ModeloArea {
 	 * @throws SQLException .
 	 * @throws UVException .
 	 */
-	private Integer actualizaAreasPorDescripcion(Connection conexion, List<Area> areasInternas) throws SQLException, UVException {
+	private Integer actualizaAreasPorDescripcion(Connection conexion, List<Area> areasInternas) throws SQLException {
 		Integer total = 0;
 		String consulta = "SELECT * FROM UXXIRRHH.VUJA_NET_BEP_RH_DEPTO_SECC_AREA uvnbrdsa"
 				+ "	WHERE uvnbrdsa.ID_AREA_CONOCIMIENTO IN ("

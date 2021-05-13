@@ -11,7 +11,6 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
 import es.ujaen.uvirtual.beans.CodigoDescripcion;
 import es.ujaen.uvirtual.beans.UVDatos;
 import es.ujaen.uvirtual.beans.Usuario;
@@ -47,7 +46,7 @@ public class ControladorMeritosPreferentes extends HttpServlet {
 	
 	// acciones 
 	public static final String ACCION_INDEX = "indice";
-	public static final String ACCION_DATATABLE = "datatable";	
+	public static final String ACCION_DATATABLE = "datatable";
 	public static final String ACCION_MODIFICAR = "detalle";
 	public static final String ACCION_NUEVO_MERITO = "nuevoMerito";
 	public static final String ACCION_NUEVO_MERITO_CONFIRM = "nuevoMeritoConfirm";
@@ -59,6 +58,7 @@ public class ControladorMeritosPreferentes extends HttpServlet {
 	// parámetros
 	public static final String PARAM_ACCION = "a";
 	public static final String PARAM_ID = "id";
+	public static final String PARAM_MERITO_CODIGO = "codigo";
 	public static final String PARAM_MERITO_DESCRIPCION = "descripcion";
 	public static final String PARAM_MERITO_TIPO = "tipo";
 	public static final String PARAM_MERITO_TIPO_TITULACION = "tipoTitulacion";
@@ -68,7 +68,9 @@ public class ControladorMeritosPreferentes extends HttpServlet {
 	public static final String PARAM_MERITO_APLICABLE_APARTADO = "aplicableApartado";
 	public static final String PARAM_MERITO_APLICABLE_ITEM = "aplicableItem";
 	public static final String PARAM_MERITO_FACTOR = "factor";
-	public static final String PARAM_MERITO_VALORMAXIMO = "valorMaximo";	
+	public static final String PARAM_MERITO_BASE = "base";	
+	public static final String PARAM_MERITO_VALORMAXIMO = "valorMaximo";
+	public static final String PARAM_MERITO_TIPO_CALCULO = "tipocalculo";
 	
 	// mensajes
 	public static final String MENSAJE_ERROR_CODIGO_VACIO = "El código no puede estar vacio";
@@ -179,8 +181,8 @@ public class ControladorMeritosPreferentes extends HttpServlet {
 	
 	private void datatable(VistaMeritosPreferentes bean, UVDatos datos, HttpServletRequest request, HttpServletResponse response) 
 			throws SQLException, UVException, IOException {
-		datos.setContentType(RESPONSE_AJAX_CONTENTTYPE);
 		datos.setRespuestaEnviada(true);
+		datos.setContentType(RESPONSE_AJAX_CONTENTTYPE);		
 		response.setContentType(RESPONSE_AJAX_CONTENTTYPE);
 		response.setCharacterEncoding(RESPONSE_AJAX_ENCODING);
 		
@@ -188,9 +190,8 @@ public class ControladorMeritosPreferentes extends HttpServlet {
 			try {
 				BolsaEmpleoDataTable<MeritoPreferente> dataTable = ModeloMeritosPreferentes.obtenerInstancia().
 						listadoMeritosPreferentes(request.getParameterMap());
-				Gson gson = new GsonBuilder().setExclusionStrategies(BolsaEmpleoDataTable.GSONEXCLUSIONSTRATEGY).create();
 				bean.setDatatable(dataTable);
-				writer.write(gson.toJson(dataTable));
+				writer.write(dataTable.toJson());
 			} catch (Exception ex) {
 				bean.getMensajesDeError().add(ex.getMessage());
 				
@@ -272,19 +273,41 @@ public class ControladorMeritosPreferentes extends HttpServlet {
 	}
 	
 	private MeritoPreferente validate(MeritoPreferente merito, HttpServletRequest request) throws UVException, SQLException {
+		merito.setCodigo(EscapaHTML.ajustaCodificacion(request.getParameter(PARAM_MERITO_CODIGO)));
+		if (merito.getCodigo().isBlank()) {
+			throw new UVException("El código del mérito es requerido");
+		}
+		if (merito.getCodigo().length() > ModeloMeritosPreferentes.MAX_LENGTH_COLUMN_CODIGO) {
+			throw new UVException("El código del mérito tiene demasiados caracteres. Máximo" + ModeloMeritosPreferentes.MAX_LENGTH_COLUMN_CODIGO);
+		}
+		if (ModeloMeritosPreferentes.obtenerInstancia().isMeritoActivoConCodigo(merito.getCodigo())) {
+			throw new UVException("Ya existe un mérito preferente activo con el código introducido");
+		}
+		
 		merito.setDescripcion(EscapaHTML.ajustaCodificacion(request.getParameter(PARAM_MERITO_DESCRIPCION)));
 		if (merito.getDescripcion().isBlank()) {
 			throw new UVException("La descripción del mérito es requerida");
 		}
+		if (merito.getDescripcion().length() > ModeloMeritosPreferentes.MAX_LENGTH_COLUMN_DESCRIPCION) {
+			throw new UVException("La descripción tiene demasiados caracteres. Máximo: " + ModeloMeritosPreferentes.MAX_LENGTH_COLUMN_DESCRIPCION);
+		}
+
+		this.validateAplicable(merito, request);
 		
 		merito.setTipo(EscapaHTML.ajustaCodificacion(request.getParameter(PARAM_MERITO_TIPO)));		
 		if (merito.getTipo().equals(ModeloMeritosPreferentes.TIPO_MERITO)) {
 			merito.setTipoItemBaremacion(ModeloBaremacionItems.obtenerInstancia().getItemBaremacionById(
 					Formateador.leeParametroInteger(request.getParameter(PARAM_MERITO_TIPO_ITEMBAREMACION))));
-		} else if (!merito.getTipo().equals(ModeloMeritosPreferentes.TIPO_TITULACION_PREFERENTE)) {
+		} else if (!merito.getTipo().equals(ModeloMeritosPreferentes.TIPO_TITULACION_PREFERENTE) && !merito.getTipo().equals(ModeloMeritosPreferentes.TIPO_POSESION)) {
 			throw new UVException("Introduce un tipo de mérito");
 		}
 		
+		this.validateTipoCalculo(merito, request);
+		
+		return merito;
+	}
+	
+	private MeritoPreferente validateAplicable(MeritoPreferente merito, HttpServletRequest request) throws UVException, SQLException {
 		merito.setAplicable(EscapaHTML.ajustaCodificacion(request.getParameter(PARAM_MERITO_APLICABLE)));
 		if (merito.getAplicable().equals(ModeloMeritosPreferentes.APLICABLE_BLOQUE)) {
 			merito.setAplicableBloqueBaremacion(ModeloBaremacionBloques.obtenerInstancia().getBloqueBaremacionById(
@@ -298,12 +321,35 @@ public class ControladorMeritosPreferentes extends HttpServlet {
 		} else if (!merito.getAplicable().equals(ModeloMeritosPreferentes.APLICABLE_TOTAL)) {
 			throw new UVException("Introduce el campo aplicable");
 		}
-				
-		merito.setFactor(EscapaHTML.ajustaCodificacion(request.getParameter(PARAM_MERITO_FACTOR)));
-		if (merito.getFactor().isBlank()) {
-			throw new UVException("El factor es requerido");
+		
+		return merito;
+	}
+	
+	private MeritoPreferente validateTipoCalculo(MeritoPreferente merito, HttpServletRequest request) throws UVException {
+		merito.setTipoCalculo(EscapaHTML.ajustaCodificacion(request.getParameter(PARAM_MERITO_TIPO_CALCULO)));
+		if (merito.getTipoCalculo().equals(ModeloMeritosPreferentes.TIPO_CALCULO_FACTOR)) {
+			merito.setFactor(Formateador.leeParametroDouble(request.getParameter(PARAM_MERITO_FACTOR)));
+			if (merito.getFactor() == null) {
+				throw new UVException("Introduce un valor válido para factor");
+			}
+		} else if (merito.getTipoCalculo().equals(ModeloMeritosPreferentes.TIPO_CALCULO_VALOR_MERITO_FACTOR)) {
+			merito.setBase(Formateador.leeParametroDouble(request.getParameter(PARAM_MERITO_BASE)));
+			if (merito.getBase() == null) {
+				throw new UVException("Introduce un valor válido para base");
+			}
+			
+			merito.setFactor(Formateador.leeParametroDouble(request.getParameter(PARAM_MERITO_FACTOR)));
+			if (merito.getFactor() == null) {
+				throw new UVException("Introduce un valor válido para factor");
+			}
+			
+			merito.setValorMaximo(Formateador.leeParametroDouble(request.getParameter(PARAM_MERITO_VALORMAXIMO)));
+			if (merito.getValorMaximo() != null && merito.getValorMaximo() <= 0) {
+				throw new UVException("El valor máximo debe ser mayor que cero");
+			}
+		} else {
+			throw new UVException("Tipo de cálculo no válido");
 		}
-		merito.setValorMaximo(BolsaEmpleoUtils.leeParametroFloat(request.getParameter(PARAM_MERITO_VALORMAXIMO)));
 		
 		return merito;
 	}

@@ -10,7 +10,6 @@ import java.util.regex.Pattern;
 
 import javax.servlet.ServletRequest;
 import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 import javax.servlet.http.Part;
 
@@ -110,7 +109,7 @@ public final class BolsaEmpleoUtils {
 			return false;
 		}
 		
-		String valueSplitted[] = value.split(",");
+		String[] valueSplitted = value.split(",");
 		if (valueSplitted.length > 1) {
 			value = value.replace(',', '.');
 		}
@@ -129,7 +128,7 @@ public final class BolsaEmpleoUtils {
 	 */
 	public static Float leeParametroFloat(String valor) {
 		try {
-			String valueSplitted[] = valor.split(",");
+			String[] valueSplitted = valor.split(",");
 			if (valueSplitted.length > 1) {
 				valor = valor.replace(',', '.');
 			}
@@ -151,7 +150,6 @@ public final class BolsaEmpleoUtils {
 		return modeloParam.getParametroByNombre(nombre).getValor();
 	}
 	
-	
 	/**
 	 * Checkea si un archivo es mas grande que una variable o no .
 	 * @param archivo .
@@ -172,6 +170,25 @@ public final class BolsaEmpleoUtils {
 		if (archivo.available() > maxSize) {
 			throw new UVException("No se puede insertar un archivo tan grande");
 		}	
+	}
+	
+	/**
+	 * Comprueba si es un fichero pdf válido.
+	 * @param uploadedFile . 
+	 * @return .
+	 */
+	public static boolean checkFileIsPDF(Part uploadedFile) { 
+		if (uploadedFile != null && uploadedFile.getSize() >= 0) {
+			String nombre = BolsaEmpleoUtils.obtenerNombreFichero(uploadedFile);
+			int i = nombre.lastIndexOf('.');
+			if (i > 0) {
+				String extension = nombre.substring(i + 1);
+				if ("pdf".equalsIgnoreCase(extension)) {
+					return true;
+				}
+			}
+		}
+		return false;
 	}
 	
 	/** Redondeo a dos decimales.

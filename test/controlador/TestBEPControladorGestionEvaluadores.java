@@ -130,8 +130,6 @@ public class TestBEPControladorGestionEvaluadores {
 	 */
 	@Test
 	public void testA04AgregarEvaluadores() throws SQLException, ServletException, IOException {
-		VistaEvaluadores bean = getVistaConUsuarios(ControladorGestionEvaluadores.ACCION_DATATABLE_USUARIOS);
-		
 		PeticionHttp peticion = UtilsTestBolsaEmpleo.peticionAutenticadaPersonal();
 		peticion.setParameter(ControladorGestionEvaluadores.PARAM_ACCION, ControladorGestionEvaluadores.ACCION_AGREGAR_EVALUADORES);
 		peticion.setParameter(ControladorGestionEvaluadores.PARAM_NOMBRE_EVALUADOR, "comision1");

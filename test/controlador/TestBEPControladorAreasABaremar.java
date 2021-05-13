@@ -28,7 +28,6 @@ import es.ujaen.uvirtual.modulo.bolsaempleo.vistas.VistaAreasBaremar;
 public class TestBEPControladorAreasABaremar {
 	
 	private static final String MENSAJE_AREAS_DEVUELTAS = "Debe devolver areas";
-	private static final String MENSAJE_AREA_DEVUELTA = "Debe devolver area";
 	private static final String MENSAJE_CON_ERROR = "Debe devolver error";
 	private static final String MENSAJE_CON_EXITO = "Debe devolver exito";
 	private static final String MENSAJE_SIN_ADVERTENCIAS = "No debe mostrar advertencias";

@@ -50,8 +50,6 @@
 	padding: 0px;
 }
 
-
-
 .bolsa-empleo .icon:before, .bolsa-empleo .only-icon:before {
     content: "";
 	display: inline-block;
@@ -64,6 +62,10 @@
 
 .bolsa-empleo .icon-download:before {
 	background-image: url(../img/md/file_download.svg);
+}
+
+#merito_preferente_form > p.helper {
+	margin-top: 0;
 }
 
 /* grid system */
@@ -522,6 +524,10 @@ nav-bolsa-empleo a:active, nav-bolsa-empleo a:hover {
     display: grid;
     grid-template-columns: 1fr 1fr;
     grid-gap: 20px;
+}
+
+.form-group-container.helper > .form-group {
+	margin-bottom: 0;
 }
 
 .form-group-container-offset {

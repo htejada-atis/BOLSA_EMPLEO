@@ -35,8 +35,8 @@ public class TestBEPModeloMeritosPreferentes {
 	private static final String DESCRIPCION = "descripcion";
 	private static final String TIPO = "MERITO";
 	private static final String APLICABLE = "BLOQUE";
-	private static final String FACTOR = "factor";
-	private static final Float VALORMAXIMO = (float) 100.0;
+	private static final Double FACTOR = 1.3;
+	private static final Double VALORMAXIMO = 100.0;
 	private static final Boolean ACTIVO = true;
 	private static final String ITEM_UNIDADES = "ENTERO";
 	private static final Float ITEM_VALOR = (float) 10;
@@ -55,35 +55,39 @@ public class TestBEPModeloMeritosPreferentes {
 	
 	private static final ItemBaremacion ITEM2 = new ItemBaremacion(CODNUM, BLOQUE, DESCRIPCION, DESCRIPCION, ACTIVO, ITEM_UNIDADES, ITEM_VALOR);
     
-	/** prepara la bd con los datos iniciales.
-     * @throws SQLException si error en bd
-     * @throws IOException si error en ficheros
-     */
-    @BeforeClass
-    public static void preparaBd() throws SQLException, IOException {
-    	DataSource ds = BbddRunner.obtenerDataSourceUv();
-    	Conexion.setConexionUvirtual(ds);
-    	UtilsTestBolsaEmpleo.inicializaBolsaEmpleo();
-    	
-    	ITEM.setValorMinimo(ITEM_VALORMINIMO);
-    	ITEM.setValorMaximo(ITEM_VALORMAXIMO);
-    	ITEM.setAfinidad(ITEM_AFINIDAD);
-    	ITEM.setIndividualizado(ITEM_INDIVIDUALIZADO);
-    	
-    	ITEM2.setValorMinimo(ITEM_VALORMINIMO);
-    	ITEM2.setValorMaximo(ITEM_VALORMAXIMO);
-    	ITEM2.setAfinidad(ITEM_AFINIDAD);
-    	ITEM2.setIndividualizado(ITEM_INDIVIDUALIZADO);    	
-    }
+	/**
+	 * prepara la bd con los datos iniciales.
+	 * 
+	 * @throws SQLException si error en bd
+	 * @throws IOException  si error en ficheros
+	 */
+	@BeforeClass
+	public static void preparaBd() throws SQLException, IOException {
+		DataSource ds = BbddRunner.obtenerDataSourceUv();
+		Conexion.setConexionUvirtual(ds);
+		UtilsTestBolsaEmpleo.inicializaBolsaEmpleo();
+
+		ITEM.setValorMinimo(ITEM_VALORMINIMO);
+		ITEM.setValorMaximo(ITEM_VALORMAXIMO);
+		ITEM.setAfinidad(ITEM_AFINIDAD);
+		ITEM.setIndividualizado(ITEM_INDIVIDUALIZADO);
+
+		ITEM2.setValorMinimo(ITEM_VALORMINIMO);
+		ITEM2.setValorMaximo(ITEM_VALORMAXIMO);
+		ITEM2.setAfinidad(ITEM_AFINIDAD);
+		ITEM2.setIndividualizado(ITEM_INDIVIDUALIZADO);
+	}
     
-    /** test acierto insertar usuario.
-     * @throws SQLException si error en bd
-     * @throws UVException si error al validar usuario
-     * @throws ParseException si error al validar fecha
-     */
-    @Test
-    public void testA01InsertaMeritoPreferente() throws SQLException, ParseException, UVException {
-    	MeritoPreferente merito = new MeritoPreferente();
+	/**
+	 * test acierto insertar usuario.
+	 * 
+	 * @throws SQLException   si error en bd
+	 * @throws UVException    si error al validar usuario
+	 * @throws ParseException si error al validar fecha
+	 */
+	@Test
+	public void testA01InsertaMeritoPreferente() throws SQLException, ParseException, UVException {
+		MeritoPreferente merito = new MeritoPreferente();
 		merito.setCodNum(CODNUM);
 		merito.setDescripcion(DESCRIPCION);
 		merito.setTipo(TIPO);
@@ -96,65 +100,71 @@ public class TestBEPModeloMeritosPreferentes {
 		merito.setAplicableItemBaremacion(ITEM2);
 		merito.setActivo(ACTIVO);
 		ModeloMeritosPreferentes modelo = ModeloMeritosPreferentes.obtenerInstancia();
-    	modelo.crearMeritoPreferente(merito);
-    	
-    	MeritoPreferente meritoCont = modelo.getMeritoPreferenteById(merito.getCodNum());
-    	List<MeritoPreferente> meritosPreferentes = modelo.listaMeritosPreferentes();
-    	Boolean eje = false;
-    	
-        for (MeritoPreferente mer : meritosPreferentes) {
-            if (mer.getCodNum().equals(meritoCont.getCodNum())) {
-            	eje = true;
-            }
-        }
-    	
-    	assertTrue("merito insertado debe ser listado", eje);
-    }
+		modelo.crearMeritoPreferente(merito);
 
-    /** test acierto borrar usuario.
-     * @throws SQLException si error en bd
-     * @throws UVException si error al validar usuario 
-     */
-    @Test
-    public void testA02DesactivarMeritoPreferente() throws SQLException, UVException {
-    	ModeloMeritosPreferentes modelo = ModeloMeritosPreferentes.obtenerInstancia();
-    	
-    	List<MeritoPreferente> meritos = modelo.listaMeritosPreferentes();
-    	MeritoPreferente merito = meritos.get(0);
+		MeritoPreferente meritoCont = modelo.getMeritoPreferenteById(merito.getCodNum());
+		List<MeritoPreferente> meritosPreferentes = modelo.listaMeritosPreferentes();
+		Boolean eje = false;
 
-    	modelo.cambiaFlagActivoMeritoPreferente(merito, "N");
-    	
-    	MeritoPreferente meritoCont = modelo.getMeritoPreferenteById(merito.getCodNum());
+		for (MeritoPreferente mer : meritosPreferentes) {
+			if (mer.getCodNum().equals(meritoCont.getCodNum())) {
+				eje = true;
+			}
+		}
 
-    	assertFalse("merito debe ser actualizado", merito.getActivo().equals(meritoCont.getActivo()));
-    }
+		assertTrue("merito insertado debe ser listado", eje);
+	}
+
+	/**
+	 * test acierto borrar usuario.
+	 * 
+	 * @throws SQLException si error en bd
+	 * @throws UVException  si error al validar usuario
+	 */
+	@Test
+	public void testA02DesactivarMeritoPreferente() throws SQLException, UVException {
+		ModeloMeritosPreferentes modelo = ModeloMeritosPreferentes.obtenerInstancia();
+
+		List<MeritoPreferente> meritos = modelo.listaMeritosPreferentes();
+		MeritoPreferente merito = meritos.get(0);
+
+		modelo.cambiaFlagActivoMeritoPreferente(merito, "N");
+
+		MeritoPreferente meritoCont = modelo.getMeritoPreferenteById(merito.getCodNum());
+
+		assertFalse("merito debe ser actualizado", merito.getActivo().equals(meritoCont.getActivo()));
+	}
     
-    /** test acierto editar merito preferente.
-     * @throws SQLException si error en bd
-     * @throws UVException si error el merito preferente.
-     */
-    @Test
-    public void testA03EditarMerito() throws SQLException, UVException {
-    	ModeloMeritosPreferentes modelo = ModeloMeritosPreferentes.obtenerInstancia();
-    	
-    	List<MeritoPreferente> meritos = modelo.listaMeritosPreferentes();
-    	MeritoPreferente merito = meritos.get(0);
-    	MeritoPreferente meritoCont = modelo.getMeritoPreferenteById(merito.getCodNum());
-    	merito.setDescripcion("EJEMPLO");
-    	modelo.editarMeritoPreferente(merito);
-    	
-    	assertFalse("usuario debe ser actualizado", merito.equals(meritoCont));
-    }    
+	/**
+	 * test acierto editar merito preferente.
+	 * 
+	 * @throws SQLException si error en bd
+	 * @throws UVException  si error el merito preferente.
+	 */
+	@Test
+	public void testA03EditarMerito() throws SQLException, UVException {
+		ModeloMeritosPreferentes modelo = ModeloMeritosPreferentes.obtenerInstancia();
+
+		List<MeritoPreferente> meritos = modelo.listaMeritosPreferentes();
+		MeritoPreferente merito = meritos.get(0);
+		MeritoPreferente meritoCont = modelo.getMeritoPreferenteById(merito.getCodNum());
+		merito.setDescripcion("EJEMPLO");
+		modelo.editarMeritoPreferente(merito);
+
+		assertFalse("usuario debe ser actualizado", merito.equals(meritoCont));
+	} 
     
-    /** test error inserta merito preferente null.
-     * @throws SQLException si error bd
-     * @throws UVException error experado
-     */
-    @Test(expected = UVException.class)
-    public void testE01InsertaMeritoPreferenteNull() throws SQLException, UVException {
-    	MeritoPreferente merito = null;
-    	ModeloMeritosPreferentes modelo = ModeloMeritosPreferentes.obtenerInstancia();
-    	modelo.crearMeritoPreferente(merito);
-    	fail();
-    }
+	/**
+	 * test error inserta merito preferente null.
+	 * 
+	 * @throws SQLException si error bd
+	 * @throws UVException  error experado
+	 */
+	@Test(expected = UVException.class)
+	public void testE01InsertaMeritoPreferenteNull() throws SQLException, UVException {
+		MeritoPreferente merito = null;
+		ModeloMeritosPreferentes modelo = ModeloMeritosPreferentes.obtenerInstancia();
+		modelo.crearMeritoPreferente(merito);
+		fail();
+	}
 }
