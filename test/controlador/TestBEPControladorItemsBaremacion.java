@@ -18,7 +18,7 @@ import controlador.implementacion.RespuestaHttp;
 import es.ujaen.uvirtual.modulo.bolsaempleo.beans.ApartadoBaremacion;
 import es.ujaen.uvirtual.modulo.bolsaempleo.beans.BloqueBaremacion;
 import es.ujaen.uvirtual.modulo.bolsaempleo.beans.ItemBaremacion;
-import es.ujaen.uvirtual.modulo.bolsaempleo.controlador.ControladorItemsBaremacion;
+import es.ujaen.uvirtual.modulo.bolsaempleo.controlador.configuracion.ControladorItemsBaremacion;
 import es.ujaen.uvirtual.modulo.bolsaempleo.vistas.VistaItemsBaremacion;
 
 /** test controlador items baremación.

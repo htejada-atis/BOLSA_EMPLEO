@@ -34,7 +34,9 @@ public final class UtilsTestBolsaEmpleo {
 	private static final int NUM_AREAS_INSERTAR = 35;
 	private static final Pattern RE_FILE_MIGRATION = Pattern.compile("\\d+-(im|eje)-[a-zA-Z]+\\.sql", Pattern.DOTALL);
 
-	public static final boolean VERBOSE = false;
+	public static final boolean VERBOSE = true;
+	
+	private static boolean cargado = false;
 
 	private UtilsTestBolsaEmpleo() {
 	}
@@ -47,35 +49,38 @@ public final class UtilsTestBolsaEmpleo {
 	 * @throws IOException  .
 	 */
 	public static void inicializaBolsaEmpleo() throws SQLException, IOException {
-		// mocks esquema arcos
-		UtilsTestBolsaEmpleo.ejecutarMultiplesScripts("MOCKS ARCOS", "Documentos/scripts/opc.bolsaempleo/mock_arcos",
-				ESQUEMA_ARCOS, false);
-
-		// mocks esquema rrhh
-		UtilsTestBolsaEmpleo.ejecutarMultiplesScripts("MOCKS RRHH", "Documentos/scripts/opc.bolsaempleo/mock_rrhh",
-				ESQUEMA_RRHH, false);
-
-		// limpieza uvirtual
-		UtilsTestBolsaEmpleo.ejecutarMultiplesScripts("UVIRTUAL CLEAN",
-				"Documentos/scripts/opc.bolsaempleo/datos_desarrollo/clean", ESQUEMA_UVIRTUAL, true);
-
-		// creación tablas uvirtual
-		UtilsTestBolsaEmpleo.ejecutarMultiplesScripts("UVIRTUAL TABLAS", "Documentos/scripts/opc.bolsaempleo",
-				ESQUEMA_UVIRTUAL, false);
-
-		// datos de pruebas => areas
-		try {
-			logFile("Insertando " + NUM_AREAS_INSERTAR + " primeras areas ...");
-			UtilsTestBolsaEmpleo.insertarDepartamentosAreas();
-			logFile("Insertando areas => OK");
-		} catch (SQLException ex) {
-			logFile("Error insertando areas y departamentos: " + ex, false);
-			throw ex;
+		if (!cargado) {
+			// mocks esquema arcos
+			UtilsTestBolsaEmpleo.ejecutarMultiplesScripts("MOCKS ARCOS", "Documentos/scripts/opc.bolsaempleo/mock_arcos",
+					ESQUEMA_ARCOS, false);
+	
+			// mocks esquema rrhh
+			UtilsTestBolsaEmpleo.ejecutarMultiplesScripts("MOCKS RRHH", "Documentos/scripts/opc.bolsaempleo/mock_rrhh",
+					ESQUEMA_RRHH, false);
+	
+			// limpieza uvirtual
+			UtilsTestBolsaEmpleo.ejecutarMultiplesScripts("UVIRTUAL CLEAN",
+					"Documentos/scripts/opc.bolsaempleo/datos_desarrollo/clean", ESQUEMA_UVIRTUAL, true);
+	
+			// creación tablas uvirtual
+			UtilsTestBolsaEmpleo.ejecutarMultiplesScripts("UVIRTUAL TABLAS", "Documentos/scripts/opc.bolsaempleo",
+					ESQUEMA_UVIRTUAL, false);
+	
+			// datos de pruebas => areas
+			try {
+				logFile("Insertando " + NUM_AREAS_INSERTAR + " primeras areas ...");
+				UtilsTestBolsaEmpleo.insertarDepartamentosAreas();
+				logFile("Insertando areas => OK");
+			} catch (SQLException ex) {
+				logFile("Error insertando areas y departamentos: " + ex, false);
+				throw ex;
+			}
+	
+			// datos para pruebas
+			UtilsTestBolsaEmpleo.ejecutarMultiplesScripts("UVIRTUAL DATOS PRUEBA",
+					"Documentos/scripts/opc.bolsaempleo/datos_desarrollo/datos_prueba", ESQUEMA_UVIRTUAL, false);
+			cargado = true;
 		}
-
-		// datos para pruebas
-		UtilsTestBolsaEmpleo.ejecutarMultiplesScripts("UVIRTUAL DATOS PRUEBA",
-				"Documentos/scripts/opc.bolsaempleo/datos_desarrollo/datos_prueba", ESQUEMA_UVIRTUAL, false);
 	}
 
 	/**

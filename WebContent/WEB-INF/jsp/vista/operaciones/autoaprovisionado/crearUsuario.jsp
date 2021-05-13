@@ -1,6 +1,6 @@
 <%@ page trimDirectiveWhitespaces="true"%>
-<%@	page import="es.ujaen.uvirtual.controlador.operaciones.autoregistrado.ControladorUsuarioAutoregistrado"%>
-<%@ page import="es.ujaen.uvirtual.beans.vistas.intranet.VistaUsuarioAutoregistrado" %>
+<%@	page import="es.ujaen.uvirtual.modulo.autoregistrado.controlador.ControladorUsuarioAutoregistrado"%>
+<%@ page import="es.ujaen.uvirtual.modulo.autoregistrado.beans.vista.VistaUsuarioAutoregistrado" %>
 <%@ page import="es.ujaen.uvirtual.beans.UVDatos"%>
 
 <%

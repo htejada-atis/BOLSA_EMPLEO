@@ -7,6 +7,7 @@ import java.io.IOException;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
+import java.sql.SQLIntegrityConstraintViolationException;
 import java.sql.Statement;
 import java.util.Scanner;
 import java.util.logging.Level;
@@ -15,6 +16,7 @@ import java.util.logging.Logger;
 import javax.sql.DataSource;
 
 import es.ujaen.uvirtual.modelo.conexion.Conexion;
+import es.ujaen.uvirtual.utilidades.Formateador;
 import es.ujaen.uvirtual.utilidades.Memcache;
 import oracle.jdbc.pool.OracleDataSource;
 
@@ -36,7 +38,7 @@ public class BbddRunner {
     
     private static String servidorMemcacheDefecto = "jenkins.ujaen.es";
 
-    public static final boolean VERBOSE = false;
+    public static final boolean VERBOSE = true;
 	
     private BbddRunner() { }
 	
@@ -140,8 +142,16 @@ public class BbddRunner {
     	System.setProperty("memcacheUrl", BbddRunner.getServidorMemcache());
     	System.setProperty("net.spy.log.LoggerImpl", "net.spy.memcached.compat.log.SunLogger");
     	Logger.getLogger("net.spy.memcached").setLevel(Level.WARNING);
-    	Memcache.getInstance();
+    	Memcache memcache = Memcache.getInstance();
+    	memcache.invalidateAllKeys();
     	Memcache.disable();
+	}
+	
+	private static void insertMasivo(Connection conexion, String rutaFichero) throws SQLException, FileNotFoundException {
+		LOGGER.log(Level.INFO, "InsertMasivo {0}", rutaFichero);
+		try (Scanner s = new Scanner(new BufferedReader(new FileReader(rutaFichero)))) {
+			procesarLineaInsertMasivo(s, conexion);
+		}
 	}
 	
 	/** ejecuta instrucciones SQL del fichero separadas por ; en bbdd uvirtual.
@@ -153,9 +163,7 @@ public class BbddRunner {
 	 */
 	public static void insertMasivo(String rutaFichero) throws SQLException, FileNotFoundException {
 		try (Connection con = obtenerConexionUvirtual()) {
-			try (Scanner s = new Scanner(new BufferedReader(new FileReader(rutaFichero)))) {
-				procesarLineaInsertMasivo(s, con);
-			}
+			insertMasivo(con, rutaFichero);
 		}
 	}
 	
@@ -168,9 +176,7 @@ public class BbddRunner {
 	 */
 	public static void insertMasivoArcos(String rutaFichero) throws SQLException, FileNotFoundException {
 		try (Connection con = obtenerConexionArcos()) {
-			try (Scanner s = new Scanner(new BufferedReader(new FileReader(rutaFichero)))) {
-				procesarLineaInsertMasivo(s, con);
-			}
+			insertMasivo(con, rutaFichero);
 		}
 	}
 
@@ -183,9 +189,7 @@ public class BbddRunner {
 	 */
 	public static void insertMasivoAc(String rutaFichero) throws SQLException, FileNotFoundException {
 		try (Connection con = obtenerConexionAc()) {
-			try (Scanner s = new Scanner(new BufferedReader(new FileReader(rutaFichero)))) {
-				procesarLineaInsertMasivo(s, con);
-			}
+			insertMasivo(con, rutaFichero);
 		}
 	}
 	
@@ -198,9 +202,7 @@ public class BbddRunner {
 	 */
 	public static void insertMasivoRh(String rutaFichero) throws SQLException, FileNotFoundException {
 		try (Connection con = obtenerConexionRh()) {
-			try (Scanner s = new Scanner(new BufferedReader(new FileReader(rutaFichero)))) {
-				procesarLineaInsertMasivo(s, con);
-			}
+			insertMasivo(con, rutaFichero);
 		}
 	}
 
@@ -215,10 +217,34 @@ public class BbddRunner {
 			if (instruccion.startsWith("--")) {
 				LOGGER.log(Level.INFO, instruccion);
 			} else {
-				try (Statement statement = conexion.createStatement()) {
-					statement.execute(instruccion);
-				}
+				ejecutarInstruccion(conexion, instruccion, true);
 			}
+		}
+	}
+	
+	private static void ejecutarInstruccion(Connection conexion, String instruccion) throws SQLException {
+		ejecutarInstruccion(conexion, instruccion, false);
+	}
+	
+	private static void ejecutarInstruccion(Connection conexion, String instruccion, boolean ignoreConstraint) throws SQLException {
+		final int longitudMinimaInstruccion = 4;
+		if (instruccion.length() < longitudMinimaInstruccion) {
+			return;
+		}
+		try (Statement statement = conexion.createStatement()) {
+			statement.execute(instruccion);
+		} catch (SQLIntegrityConstraintViolationException e) {
+			if (ignoreConstraint) {
+				LOGGER.log(Level.FINE, "Instruccion viola constraint {0}", instruccion);
+			} else {
+				String logSql = "Error ejecutando instruccion " + instruccion + System.lineSeparator() + Formateador.getStackTrace(e);
+				LOGGER.log(Level.SEVERE, logSql);
+				throw e;
+			}
+		} catch (SQLException e) {
+			String logSql = "Error ejecutando instruccion " + instruccion + System.lineSeparator() + Formateador.getStackTrace(e);
+			LOGGER.log(Level.SEVERE, logSql);
+			throw e;
 		}
 	}
 	
@@ -252,9 +278,7 @@ public class BbddRunner {
 				ejecutado = true;
 			}
 			if (!ejecutado && instruccion.length() > longitudMinimaIntruccion) {
-				try (Statement statement = conexion.createStatement()) {
-					statement.execute(instruccion);
-				}
+				ejecutarInstruccion(conexion, instruccion);
 			}
 		}
 	}
@@ -273,6 +297,13 @@ public class BbddRunner {
 		}
 		return salida.toString();
 	}
+	
+	private static void ejecutar(Connection conexion, String rutaFichero) throws IOException, SQLException {
+		LOGGER.log(Level.INFO, "ejecutar {0}", rutaFichero);
+		try (Scanner s = new Scanner(new BufferedReader(new FileReader(rutaFichero)))) {
+			procesarLineaEjecutar(s, conexion);
+		}
+	}
 
 	/** ejecutar fichero con instrucciones SQL separada por el delimitadoren bd uvirtual.
 	 * @param rutaFichero ruta del fichero a cargar en la bd
@@ -281,9 +312,7 @@ public class BbddRunner {
 	 */
 	public static void ejecutar(String rutaFichero) throws IOException, SQLException {
 		try (Connection con = obtenerConexionUvirtual()) {
-			try (Scanner s = new Scanner(new BufferedReader(new FileReader(rutaFichero)))) {
-				procesarLineaEjecutar(s, con);
-			}
+			ejecutar(con, rutaFichero);
 		}
 	}
 	
@@ -294,9 +323,7 @@ public class BbddRunner {
 	 */
 	public static void ejecutarArcos(String rutaFichero) throws IOException, SQLException {
 		try (Connection con = obtenerConexionArcos()) {
-			try (Scanner s = new Scanner(new BufferedReader(new FileReader(rutaFichero)))) {
-				procesarLineaEjecutar(s, con);
-			}
+			ejecutar(con, rutaFichero);
 		}
 	}
 	
@@ -307,9 +334,7 @@ public class BbddRunner {
 	 */
 	public static void ejecutarAc(String rutaFichero) throws IOException, SQLException {
 		try (Connection con = obtenerConexionAc()) {
-			try (Scanner s = new Scanner(new BufferedReader(new FileReader(rutaFichero)))) {
-				procesarLineaEjecutar(s, con);
-			}
+			ejecutar(con, rutaFichero);
 		}
 	}
 
@@ -320,9 +345,7 @@ public class BbddRunner {
 	 */
 	public static void ejecutarRh(String rutaFichero) throws IOException, SQLException {
 		try (Connection con = obtenerConexionRh()) {
-			try (Scanner s = new Scanner(new BufferedReader(new FileReader(rutaFichero)))) {
-				procesarLineaEjecutar(s, con);
-			}
+			ejecutar(con, rutaFichero);
 		}
 	}
 
@@ -343,6 +366,10 @@ public class BbddRunner {
 				   + "END;";
 		try (Statement stmt = conexion.createStatement()) {
 			stmt.execute(sql);
+		} catch (SQLException e) {
+			String mensaje = "error al ejecutar drop de " + tipo + " " + nombre;
+			LOGGER.log(Level.SEVERE, mensaje);
+			throw e;
 		}
 	}
 	
@@ -371,11 +398,24 @@ public class BbddRunner {
 	 * @param consulta SQL
 	 */
 	public static void insertDelete(String consulta) {
+		LOGGER.log(Level.INFO, "insertDelete {0}", consulta);
 		try (Connection conexion = obtenerConexionUvirtual();
 			 PreparedStatement stmt = conexion.prepareStatement(consulta);) {
 			stmt.executeUpdate();
 		} catch (SQLException e) {
 			LOGGER.logp(Level.SEVERE, NOMBREDEESTACLASE, "Exception SQL ", e.getMessage());
 		} 
-	} 	
+	}
+	
+	/** inicializa los datos de la bd.
+	 * @throws IOException si error io
+	 * @throws SQLException si error db
+	 */
+	public static void inicializaBd() throws IOException, SQLException {
+		BbddRunner.conectarBd();
+		BbddRunner.insertMasivoArcos("Documentos/docker/init-oracle/21-arcos-datos.sql");
+		BbddRunner.insertMasivo("Documentos/docker/init-oracle/22-uvirtual-datos.sql");
+		BbddRunner.insertMasivoRh("Documentos/docker/init-oracle/23-uxxirrhh-datos.sql");
+		BbddRunner.insertMasivoAc("Documentos/docker/init-oracle/24-uxxiac-datos.sql");
+	}
 }

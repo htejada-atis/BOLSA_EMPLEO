@@ -1,6 +1,6 @@
 <%@ page trimDirectiveWhitespaces="true"%>
 <%@	page import="es.ujaen.uvirtual.modulo.bolsaempleo.controlador.ControladorInicio"%>
-<%@	page import="es.ujaen.uvirtual.modulo.bolsaempleo.controlador.ControladorGestionFicheros"%>
+<%@	page import="es.ujaen.uvirtual.modulo.bolsaempleo.controlador.configuracion.ControladorGestionFicheros"%>
 <%@ page import="es.ujaen.uvirtual.modulo.bolsaempleo.vistas.VistaInicio" %>
 <%@ page import="es.ujaen.uvirtual.modulo.bolsaempleo.beans.Fichero" %>
 <%@ page import="es.ujaen.uvirtual.beans.UVDatos"%>

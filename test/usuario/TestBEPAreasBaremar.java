@@ -24,7 +24,7 @@ import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 
 import es.ujaen.uvirtual.modulo.bolsaempleo.beans.Area;
-import es.ujaen.uvirtual.modulo.bolsaempleo.controlador.ControladorAreasABaremar;
+import es.ujaen.uvirtual.modulo.bolsaempleo.controlador.configuracion.ControladorAreasABaremar;
 import es.ujaen.uvirtual.modulo.bolsaempleo.utilidades.BolsaEmpleoDataTable;
 
 

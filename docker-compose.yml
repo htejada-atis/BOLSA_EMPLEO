@@ -18,20 +18,20 @@ services:
       - '${ORACLE_DATA}:/opt/oracle/oradata'
       - '${ORACLE_SCRIPTS_STARTUP}:/opt/oracle/scripts/startup'
 
-  # uvirtual:
-  #   build: .
-  #   depends_on:
-  #     - memcached
-  #     - oracledb
-  #   environment:
-  #     - TZ='CST'
-  #     - SHOW="a"
-  #     - dbUrl=oracledb
-  #     - memcacheUrl=memcached
-  #     - CATALINA_OPTS=-DdbUrl=oracledb -DmemcacheUrl=memcached
-  #   ports:
-  #     - 8888:8080
-  #   entrypoint: ["/wait-for-it.sh","oracledb:1521","--timeout=0","--strict", "--", "catalina.sh", "run" ]
-  #   links:
-  #     - memcached
-  #     - oracledb
+#  uvirtual:
+#    build: .
+#    depends_on:
+#      - memcached
+#      - oracledb
+#    environment:
+#      - TZ='CST'
+#      - SHOW="a"
+#      - dbUrl=oracledb
+#      - memcacheUrl=memcached
+#      - CATALINA_OPTS=-DdbUrl=oracledb -DmemcacheUrl=memcached
+#    ports:
+#      - 8888:8080
+#    entrypoint: ["/wait-for-it.sh","oracledb:1580","--timeout=0","--strict", "--", "catalina.sh", "run" ]
+#    links:
+#      - memcached
+#      - oracledb

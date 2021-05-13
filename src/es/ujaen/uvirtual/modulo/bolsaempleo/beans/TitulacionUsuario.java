@@ -11,7 +11,7 @@ public class TitulacionUsuario implements Serializable {
 	private static final long serialVersionUID = 1L;
 	private Integer codNum;
 	private String descripcion;
-	private InputStream archivo;
+	private transient InputStream archivo;
 	private Titulacion titulacion;
 	private UsuarioBolsaEmpleo usuario;
 	private Boolean borrado;

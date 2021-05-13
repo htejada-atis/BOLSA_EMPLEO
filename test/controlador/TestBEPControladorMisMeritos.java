@@ -15,7 +15,7 @@ import bbdd.BbddRunner;
 import bbdd.UtilsTestBolsaEmpleo;
 import controlador.implementacion.PeticionHttp;
 import controlador.implementacion.RespuestaHttp;
-import es.ujaen.uvirtual.modulo.bolsaempleo.controlador.ControladorMisMeritos;
+import es.ujaen.uvirtual.modulo.bolsaempleo.controlador.candidato.ControladorMisMeritos;
 import es.ujaen.uvirtual.modulo.bolsaempleo.utilidades.BolsaEmpleoDataTable;
 import es.ujaen.uvirtual.modulo.bolsaempleo.vistas.VistaMeritos;
 

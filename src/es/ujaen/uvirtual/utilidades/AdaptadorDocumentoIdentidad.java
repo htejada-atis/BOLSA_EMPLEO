@@ -25,7 +25,7 @@ public class AdaptadorDocumentoIdentidad {
 	 */
 	public static String numeroDocumento(String sistemaDestino, String tipoDocumento, String numDocumento) {
 		String resultado = null;
-		if ((numDocumento != null) && (tipoDocumento != null)) {
+		if (numDocumento != null && tipoDocumento != null) {
 			if (sistemaDestino.equals(UXXIRRHH)) {
 				resultado = numDocumento;
 			} else if (sistemaDestino.equals(UXXIAC)) {

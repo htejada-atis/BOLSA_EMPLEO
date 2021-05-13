@@ -13,7 +13,8 @@ TBEP_EVALUADORES					EVA		bepeva		Evaluador
 TBEP_FICHEROS                       FIC     bepfic		Fichero
 TBEP_ITEMSBAREMACION                ITE     bepite		ItemBaremacion
 TBEP_MERITOS                        MER     bepmer		Merito
-TBEP_MERITOSPREFERENTES             MEP     bepmep		
+TBEP_MERITOS_PREFERENTES            MEP     bepmep		MeritoPreferente
+TBEP_MERITOS_PREFERENTES_USUARIO    MPU     bepmpu      MeritoPreferenteUsuario
 TBEP_MERITOS_EXCLUYENTES       		MEX     bepmex		MeritosExcluyentes
 TBEP_NOTICIAS                       NOT     bepnot		Noticia
 TBEP_SOLICITUDES                    SOL     bepsol		Solicitud

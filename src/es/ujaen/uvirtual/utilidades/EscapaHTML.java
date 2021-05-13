@@ -46,7 +46,7 @@ public class EscapaHTML {
 		int code;
 		for (int i = 0; i < origen.length(); i++) {
 			code = origen.codePointAt(i);
-			if ((code >= 0x20) && (code <= 0x7F) && (code != 0x26)) {
+			if (code >= 0x20 && code <= 0x7F && code != 0x26) {
 				buff.append((char) code);
 			} else {
 				buff.append(String.format("&#%d;", code));
@@ -99,7 +99,7 @@ public class EscapaHTML {
 	 * @return cadena ajustada
 	 */
 	public static String ajustaCodificacionCadenaVaciaComoNulo(String latin1) {
-		if ((latin1 == null) || ("".equals(latin1))) {
+		if (latin1 == null || "".equals(latin1)) {
 			return null;
 		} else {
 			return ajustaCodificacion(latin1);
