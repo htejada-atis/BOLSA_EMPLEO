@@ -57,9 +57,9 @@ public class ControladorAreasABaremar extends HttpServlet {
 	// mensajes
 	public static final String MENSAJE_ERROR_ACCION_AREA_NO_VALIDA = "Acción no válida";
 	public static final String MENSAJE_EXITO_AREA_MODIFICADA_CORRECTAMENTE = "Area/s modificada/s correctamente"; 
-	public static final String MENSAJE_EXITO_AREAS_AGREGADAS = "Se han agregado % áreas nuevas al sistema";
+	public static final String MENSAJE_EXITO_AREAS_AGREGADAS = "Se han agregado %d áreas nuevas al sistema";
 	public static final String MENSAJE_EXITO_AREA_AGREGADA = "Se ha agregado un área nueva al sistema";
-	public static final String MENSAJE_EXITO_AREAS_ACTUALIZADAS = "Se han actualizado % áreas del sistema";
+	public static final String MENSAJE_EXITO_AREAS_ACTUALIZADAS = "Se han actualizado %d áreas del sistema";
 	public static final String MENSAJE_EXITO_AREA_ACTUALIZADA = "Se ha actualizado un área del sistema";
 	public static final String MENSAJE_EXITO_SISTEMA_ACTUALIZADO = "No hay cambios necesarios, el sistema está actualizado";
 	
@@ -95,8 +95,8 @@ public class ControladorAreasABaremar extends HttpServlet {
 		String nombreAccion = EscapaHTML.ajustaCodificacion(request.getParameter(PARAM_ACCION));
 		if (nombreAccion == null) {
 			nombreAccion = ACCION_INDEX;
-		}		
-					
+		}
+		
 		try {
 			init(bean, datos, request);
 			switch (nombreAccion) {
@@ -269,12 +269,12 @@ public class ControladorAreasABaremar extends HttpServlet {
 		
 		if (nuevas > 0 || actualizadas > 0) {
 			if (nuevas > 0) {
-				mensajes += nuevas > 1 ? String.format(MENSAJE_EXITO_AREA_AGREGADA, nuevas) : MENSAJE_EXITO_AREA_AGREGADA;
+				mensajes += nuevas > 1 ? String.format(MENSAJE_EXITO_AREAS_AGREGADAS, nuevas) : MENSAJE_EXITO_AREA_AGREGADA;
 				mensajes += ". ";
 			}
 			
 			if (actualizadas > 0) {
-				mensajes += actualizadas > 1 ? String.format(MENSAJE_EXITO_AREA_ACTUALIZADA, actualizadas) : MENSAJE_EXITO_AREA_ACTUALIZADA;
+				mensajes += actualizadas > 1 ? String.format(MENSAJE_EXITO_AREAS_ACTUALIZADAS, actualizadas) : MENSAJE_EXITO_AREA_ACTUALIZADA;
 			}
 		} else {
 			mensajes = MENSAJE_EXITO_SISTEMA_ACTUALIZADO;
