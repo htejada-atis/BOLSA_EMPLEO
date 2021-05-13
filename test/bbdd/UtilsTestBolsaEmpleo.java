@@ -34,7 +34,7 @@ public final class UtilsTestBolsaEmpleo {
 	private static final int NUM_AREAS_INSERTAR = 35;
 	private static final Pattern RE_FILE_MIGRATION = Pattern.compile("\\d+-(im|eje)-[a-zA-Z]+\\.sql", Pattern.DOTALL);
 
-	public static final boolean VERBOSE = false;
+	public static final boolean VERBOSE = true;
 	
 	private static boolean cargado = false;
 

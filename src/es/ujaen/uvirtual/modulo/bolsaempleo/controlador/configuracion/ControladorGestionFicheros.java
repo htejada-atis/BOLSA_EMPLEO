@@ -1,4 +1,4 @@
-package es.ujaen.uvirtual.modulo.bolsaempleo.controlador;
+package es.ujaen.uvirtual.modulo.bolsaempleo.controlador.configuracion;
 
 import java.io.BufferedInputStream;
 import java.io.IOException;

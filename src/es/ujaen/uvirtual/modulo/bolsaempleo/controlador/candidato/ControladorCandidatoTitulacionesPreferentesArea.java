@@ -1,4 +1,4 @@
-package es.ujaen.uvirtual.modulo.bolsaempleo.controlador;
+package es.ujaen.uvirtual.modulo.bolsaempleo.controlador.candidato;
 
 import java.io.IOException;
 import java.io.PrintWriter;
@@ -27,7 +27,7 @@ import es.ujaen.uvirtual.utilidades.Formateador;
 import es.ujaen.uvirtual.utilidades.UVException;
 
 /**
- * Servlet implementation class ControladorIndice.
+ * Controlador de titulaciones preferentes.
  */
 @WebServlet(
 		name = "informacionadministrativa.bolsaempleo.titulacionespreferentesarea", 

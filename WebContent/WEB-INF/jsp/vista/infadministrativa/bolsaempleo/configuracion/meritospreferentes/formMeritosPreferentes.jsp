@@ -4,7 +4,7 @@
 <%@page import="es.ujaen.uvirtual.modulo.bolsaempleo.beans.ItemBaremacion"%>
 <%@page import="es.ujaen.uvirtual.modulo.bolsaempleo.beans.Titulacion"%>
 <%@ page trimDirectiveWhitespaces="true" %>
-<%@ page import="es.ujaen.uvirtual.modulo.bolsaempleo.controlador.ControladorMeritosPreferentes"%>
+<%@ page import="es.ujaen.uvirtual.modulo.bolsaempleo.controlador.configuracion.ControladorMeritosPreferentes"%>
 <%@ page import="es.ujaen.uvirtual.modulo.bolsaempleo.vistas.VistaMeritosPreferentes"%>
 <%@ page import="es.ujaen.uvirtual.modulo.bolsaempleo.beans.MeritoPreferente"%>
 <%@ page import="es.ujaen.uvirtual.beans.UVDatos" %>

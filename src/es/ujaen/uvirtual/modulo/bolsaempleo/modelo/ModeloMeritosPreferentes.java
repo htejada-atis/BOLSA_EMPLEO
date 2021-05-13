@@ -137,8 +137,7 @@ public class ModeloMeritosPreferentes {
 		
 		return dataTable;
 	}
-	
-	
+		
 	/** Consulta meritos preferentes en BBDD y las devuelve.
 	 * @return todos los meritos de la base de datos
 	 * @throws SQLException en caso de error de base de datos
@@ -346,8 +345,4 @@ public class ModeloMeritosPreferentes {
 		obj.setActivo("S".equals(rs.getString("FLGACTIVO")));
 		return obj;
 	}
-
-	
-
-			
 }

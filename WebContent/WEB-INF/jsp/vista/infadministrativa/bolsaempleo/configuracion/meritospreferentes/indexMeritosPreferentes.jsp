@@ -1,7 +1,7 @@
 <%@ page trimDirectiveWhitespaces="true" %>
 <%@ page import="es.ujaen.uvirtual.modulo.bolsaempleo.modelo.ModeloMeritosPreferentes"%>
 <%@ page import="es.ujaen.uvirtual.beans.UVDatos" %>
-<%@	page import="es.ujaen.uvirtual.modulo.bolsaempleo.controlador.ControladorMeritosPreferentes" %>
+<%@	page import="es.ujaen.uvirtual.modulo.bolsaempleo.controlador.configuracion.ControladorMeritosPreferentes" %>
 <%@ page import="es.ujaen.uvirtual.modulo.bolsaempleo.vistas.VistaMeritosPreferentes" %>
 <%@ page import="es.ujaen.uvirtual.modulo.bolsaempleo.beans.Convocatoria" %>
 <%@ page import="es.ujaen.uvirtual.utilidades.EscapaHTML" %>
