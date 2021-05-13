@@ -1,4 +1,4 @@
-package es.ujaen.uvirtual.modulo.bolsaempleo.controlador;
+package es.ujaen.uvirtual.modulo.bolsaempleo.controlador.candidato;
 
 import java.io.IOException;
 import java.sql.SQLException;

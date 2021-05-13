@@ -1,4 +1,4 @@
-package es.ujaen.uvirtual.modulo.bolsaempleo.controlador;
+package es.ujaen.uvirtual.modulo.bolsaempleo.controlador.candidato;
 
 import java.io.BufferedInputStream;
 import java.io.IOException;
@@ -28,9 +28,13 @@ import es.ujaen.uvirtual.modulo.bolsaempleo.beans.ApartadoBaremacion;
 import es.ujaen.uvirtual.modulo.bolsaempleo.beans.ItemBaremacion;
 import es.ujaen.uvirtual.modulo.bolsaempleo.beans.Merito;
 import es.ujaen.uvirtual.modulo.bolsaempleo.beans.MeritoPreferente;
+import es.ujaen.uvirtual.modulo.bolsaempleo.beans.MeritoPreferenteUsuario;
+import es.ujaen.uvirtual.modulo.bolsaempleo.beans.UsuarioBolsaEmpleo;
 import es.ujaen.uvirtual.modulo.bolsaempleo.modelo.ModeloBaremacionItems;
 import es.ujaen.uvirtual.modulo.bolsaempleo.modelo.ModeloBaremacionApartados;
 import es.ujaen.uvirtual.modulo.bolsaempleo.modelo.ModeloMerito;
+import es.ujaen.uvirtual.modulo.bolsaempleo.modelo.ModeloMeritosPreferentes;
+import es.ujaen.uvirtual.modulo.bolsaempleo.modelo.ModeloMeritosPreferentesCandidato;
 import es.ujaen.uvirtual.modulo.bolsaempleo.modelo.ModeloUsuarioBolsaEmpleo;
 import es.ujaen.uvirtual.modulo.bolsaempleo.utilidades.BolsaEmpleoDataTable;
 import es.ujaen.uvirtual.modulo.bolsaempleo.utilidades.BolsaEmpleoUtils;
@@ -181,7 +185,7 @@ public class ControladorMisMeritosPreferentes extends HttpServlet {
 	 * @throws ServletException .
 	 * @throws IOException .
 	 */
-	private void listaMeritos(VistaMeritosPreferentesCandidato bean) throws SQLException {
+	private void listaMeritos(VistaMeritosPreferentesCandidato bean) {
 		bean.setVista(RUTA_BEP_MERITOS + "index.jsp");
 	}
 	
@@ -194,8 +198,6 @@ public class ControladorMisMeritosPreferentes extends HttpServlet {
 	 */
 	private void listadoMeritos(VistaMeritosPreferentesCandidato bean, UVDatos datos, HttpServletRequest request, HttpServletResponse response) 
 			throws IOException, SQLException, UVException {
-		ModeloMerito modelo = ModeloMerito.obtenerInstancia();
-		
 		datos.setContentType("application/json");
 		datos.setRespuestaEnviada(true);
 		response.setContentType("application/json");
@@ -205,8 +207,9 @@ public class ControladorMisMeritosPreferentes extends HttpServlet {
 			try {
 				Usuario usuArcos = datos.getUsuario();
 				ModeloUsuarioBolsaEmpleo modeloUsuarioBolsaEmpleo = ModeloUsuarioBolsaEmpleo.obtenerInstancia();
-				Integer idUsuario = modeloUsuarioBolsaEmpleo.listaUsuario(usuArcos.getDocumentoNumero()).getCodNum();
-				BolsaEmpleoDataTable<MeritoPreferente> dataTable = modelo.listaMeritosDatatable(request.getParameterMap(), idUsuario);
+				UsuarioBolsaEmpleo usuario = modeloUsuarioBolsaEmpleo.listaUsuario(usuArcos.getDocumentoNumero());
+				BolsaEmpleoDataTable<MeritoPreferenteUsuario> dataTable = ModeloMeritosPreferentesCandidato.obtenerInstancia().
+						listaMeritosCandidatoDatatable(request.getParameterMap(), usuario);
 				bean.setDatatable(dataTable);
 				writer.write(dataTable.toJson());
 			} catch (Exception ex) {
@@ -217,87 +220,5 @@ public class ControladorMisMeritosPreferentes extends HttpServlet {
 				response.setStatus(RESPONSE_HTTP_CODE_ERROR);
 			}
 		}
-	}
-	
-	private Merito validarMerito(HttpServletRequest request, Part uploadedFile) throws UVException, SQLException, IOException {		
-		Merito merito = new Merito();
-				
-		// item de baremación
-		ItemBaremacion item = ModeloBaremacionItems.obtenerInstancia().getItemBaremacionById(Formateador.leeParametroInteger(request.getParameter(PARAM_ITEM)));
-		merito.setItemBaremacion(item);
-		
-		// valor
-		merito.setValor(this.validateValorDelMerito(request, merito));
-				
-		// descripcion
-		merito.setDescripcion(EscapaHTML.ajustaCodificacion(request.getParameter(PARAM_DESCRIPCION)));
-		if (merito.getDescripcion() == null || merito.getDescripcion().isBlank()) {
-			throw new UVException(MENSAJE_ERROR_DESCRIPCION_VACIA);
-		}
-		if (merito.getDescripcion().length() > ModeloMerito.COLUMN_DESCRIPCION_MAXLENGTH) {
-			throw new UVException(String.format(MENSAJE_ERROR_DESCRIPCION_LARGO, ModeloMerito.COLUMN_DESCRIPCION_MAXLENGTH));
-		}
-		
-		// observaciones
-		merito.setObservacion(EscapaHTML.ajustaCodificacion(request.getParameter(PARAM_OBSERVACION)));
-		if (merito.getObservacion() != null && merito.getObservacion().length() > ModeloMerito.COLUMN_OBSERVACION_MAXLENGTH) {
-			throw new UVException(String.format(MENSAJE_ERROR_OBSERVACION_LARGO, ModeloMerito.COLUMN_OBSERVACION_MAXLENGTH));
-		}
-		
-		merito.setArchivo(this.validateFicheroMerito(uploadedFile));
-		BolsaEmpleoUtils.checkFileSize(merito.getArchivo());
-				
-		return merito;
-	}
-	
-	
-	private InputStream validateFicheroMerito(Part uploadedFile) throws UVException {
-		if (!BolsaEmpleoUtils.checkFileIsPDF(uploadedFile)) {
-			throw new UVException("El fichero debe ser un pdf válido");
-		}
-		
-		try {
-			return uploadedFile.getInputStream();
-		} catch (IOException ex) {
-			LOGGER.log(Level.WARNING, ex.toString());
-			throw new UVException("Error guardando fichero");
-		}		
-	}
-	
-	private Float validateValorDelMerito(HttpServletRequest request, Merito merito) throws UVException {
-		// chequeo tipo de valor
-		String valorStr = request.getParameter(PARAM_VALOR);
-		switch (merito.getItemBaremacion().getUnidades()) {
-			case ModeloBaremacionItems.ITEM_UNIDADES_MEDICION_SINO:
-				merito.setValor((float) 1);
-				break;
-			case ModeloBaremacionItems.ITEM_UNIDADES_MEDICION_ENTERO:
-				if (!BolsaEmpleoUtils.isInteger(valorStr)) {
-					throw new UVException(MENSAJE_ERROR_VALOR_ENTERO_NO_PERMITIDO);
-				}
-				break;
-			case ModeloBaremacionItems.ITEM_UNIDADES_MEDICION_DECIMAL:
-				if (!BolsaEmpleoUtils.isFloat(valorStr)) {
-					throw new UVException(MENSAJE_ERROR_VALOR_DECIMAL_NO_PERMITIDO);
-				}
-				break;
-			default:
-				throw new UVException("Tipo de unidad no válido");
-		}
-		
-		// chequeo máximo y mínimo
-		Float valor = BolsaEmpleoUtils.leeParametroFloat(valorStr);
-		if (valor == null) {
-			throw new UVException("El valor no es válido");
-		}
-		if (valor < merito.getItemBaremacion().getValorMinimo()) {
-			throw new UVException(String.format(MENSAJE_ERROR_VALOR_MINIMO_PERMITIDO, merito.getItemBaremacion().getValorMinimo()));
-		}
-		if (valor > merito.getItemBaremacion().getValorMaximo()) {
-			throw new UVException(String.format(MENSAJE_ERROR_VALOR_MAXIMO_PERMITIDO, merito.getItemBaremacion().getValorMaximo()));
-		}
-		merito.setValor(valor);
-		
-		return merito.getValor();
 	}
 }

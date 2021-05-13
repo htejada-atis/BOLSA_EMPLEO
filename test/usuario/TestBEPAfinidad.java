@@ -24,7 +24,7 @@ import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 
 import es.ujaen.uvirtual.modulo.bolsaempleo.beans.Afinidad;
-import es.ujaen.uvirtual.modulo.bolsaempleo.controlador.ControladorAfinidades;
+import es.ujaen.uvirtual.modulo.bolsaempleo.controlador.configuracion.ControladorAfinidades;
 import es.ujaen.uvirtual.modulo.bolsaempleo.utilidades.BolsaEmpleoDataTable;
 
 /** Clase para probar configuracion.afinidades BEP .

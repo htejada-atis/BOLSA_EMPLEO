@@ -1,6 +1,6 @@
 <%@ page trimDirectiveWhitespaces="true"%>
 <%@ page import="es.ujaen.uvirtual.beans.UVDatos"%>
-<%@	page import="es.ujaen.uvirtual.modulo.bolsaempleo.controlador.ControladorAreasABaremar"%>
+<%@	page import="es.ujaen.uvirtual.modulo.bolsaempleo.controlador.configuracion.ControladorAreasABaremar"%>
 <%@ page import="es.ujaen.uvirtual.modulo.bolsaempleo.vistas.VistaAreasBaremar"%>
 <%@ page import="es.ujaen.uvirtual.utilidades.EscapaHTML" %>
 

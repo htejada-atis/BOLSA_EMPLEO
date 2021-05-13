@@ -1,5 +1,5 @@
 <%@ page trimDirectiveWhitespaces="true"%>
-<%@	page import="es.ujaen.uvirtual.modulo.bolsaempleo.controlador.ControladorCandidatoTitulacionesPreferentesArea"%>
+<%@	page import="es.ujaen.uvirtual.modulo.bolsaempleo.controlador.candidato.ControladorCandidatoTitulacionesPreferentesArea"%>
 <%@ page import="es.ujaen.uvirtual.modulo.bolsaempleo.vistas.VistaCandidatoTitulacionesArea" %>
 <%@ page import="es.ujaen.uvirtual.beans.UVDatos"%>
 <%@ page import="es.ujaen.uvirtual.utilidades.Formateador"%>
