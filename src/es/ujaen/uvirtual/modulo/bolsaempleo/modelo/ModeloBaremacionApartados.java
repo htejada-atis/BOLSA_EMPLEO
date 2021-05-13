@@ -280,7 +280,7 @@ public class ModeloBaremacionApartados {
 	 * @throws SQLException .
 	 */
 	public List<ApartadoBaremacion> listaApartadoBaremacion() throws SQLException {
-		return listaApartadoBaremacion(" WHERE FLGACTIVO = 'S' ORDER BY nombre");
+		return listaApartadoBaremacion(" WHERE FLGACTIVO = 'S' ORDER BY CODIGO");
 	} 
 	
 	/**
