@@ -19,7 +19,7 @@ VistaAreasBaremar bean = (VistaAreasBaremar) uvdatos.getVistas().get(VistaAreasB
 		<div id="error" class="error">
 			<%= bean.formatearMensajesDeError() %>
 		</div>
-	<% } else { %>
+	<% } %>
 	
 	<div class="titulo-bolsa-empleo">
 		<h2>Áreas baremables</h2>
@@ -45,7 +45,7 @@ VistaAreasBaremar bean = (VistaAreasBaremar) uvdatos.getVistas().get(VistaAreasB
 			</tr>
 		</tfoot>
 	</table>
-	<% } %>
+	
 </div>
 	
 <script>
@@ -55,12 +55,13 @@ $(document).ready(function() {
 	    "selectable": true,
 	    "pageSize": 10,
 	    "action": "<%= ControladorAreasABaremar.ACCION_DATATABLE %>",
+	    "filterable": true,
 	    "columns": [
 	    	{'data': 'codNum', 'selectable': true},
-	        {'data': 'codNum'},
-	        {'data': 'area.idAreaExterno'},
-	        {'data': 'area.descripcion'},
-	        {'data': 'baremable', 'render': function(row) {
+	        {'data': 'codNum', 'filter': {'type': 'number'}},
+	        {'data': 'area.idAreaExterno', 'filter': true},
+	        {'data': 'area.descripcion', 'filter': true},
+	        {'data': 'baremable', 'filter': {'type': 'select', 'options': {'true': 'baremable', 'false': 'no baremable'}}, 'render': function(row) {
         		if(row.baremable){
         			return "<div title='Baremable' class='circle-true'></div>"; 
         		}
@@ -77,7 +78,7 @@ $(document).ready(function() {
 	
 	function enviaAccion(accion, selected) {
 		if (selected.length == 0) {
-			Atis.alertDialog('Estado de las ï¿½reas', 'Seleccione al menos un ï¿½rea.');
+			Atis.alertDialog('Estado de las áreas', 'Seleccione al menos un área.');
 			return;
 		}
 		
@@ -90,7 +91,8 @@ $(document).ready(function() {
    		Atis.sendForm("<%= request.getRequestURI() %>", params);
 	}
 	
-	document.getElementById("importar_areas_uvirtual").addEventListener("click", function() {
+	document.getElementById("importar_areas_uvirtual").addEventListener("click", function(event) {
+		event.preventDefault();
 		Atis.sendForm("<%= request.getRequestURI() %>", {'a': '<%=ControladorAreasABaremar.ACCION_IMPORTAR_AREAS_UVIRTUAL%>'});
 	});
 	
