@@ -111,7 +111,7 @@ public class MeritoPreferenteUsuario implements Serializable {
 		this.archivo = archivo;
 	}
 	
-	public boolean getBorrado() {
+	public boolean isBorrado() {
 		return borrado;
 	}
 
@@ -127,7 +127,7 @@ public class MeritoPreferenteUsuario implements Serializable {
 		this.fechaBorrado = fechaBorrado;
 	}
 	
-	public boolean getValidado() {
+	public boolean isValidado() {
 		return validado;
 	}
 

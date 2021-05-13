@@ -98,9 +98,9 @@ VistaSolicitudes bean = (VistaSolicitudes) uvdatos.getVistas().get(VistaSolicitu
 	            		confirmBtn.innerHTML = "Generando solicitud...";
 	        			
 	            		var params = {
-	            				'a': '<%= ControladorMisSolicitudes.ACCION_CONFIRMAR_SOLICITUD %>',
-	            				'<%= ControladorMisSolicitudes.PARAM_SOLICITUD_ID %>': '<%= bean.getSolicitud().getCodNum() %>'
-	            				};
+            				'a': '<%= ControladorMisSolicitudes.ACCION_CONFIRMAR_SOLICITUD %>',
+            				'<%= ControladorMisSolicitudes.PARAM_SOLICITUD_ID %>': '<%= bean.getSolicitud().getCodNum() %>'
+           				};
 	        			Atis.sendForm("<%= request.getRequestURI() %>", params);
 	        			
 	              		$(this).dialog("close");
