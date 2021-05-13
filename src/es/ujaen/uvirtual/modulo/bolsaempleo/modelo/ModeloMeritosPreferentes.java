@@ -41,6 +41,7 @@ public class ModeloMeritosPreferentes {
 	// tipo de cálculo
 	public static final String TIPO_CALCULO_FACTOR = "FACTOR";
 	public static final String TIPO_CALCULO_VALOR_MERITO_FACTOR = "VALOR_MERITO_FACTOR";
+	public static final String TIPO_CALCULO_VALOR_MERITO_MAYOR_QUE = "VALOR_MERITO_MAYOR_QUE";
 	
 	// tipos de aplicable
 	public static final String APLICABLE_BLOQUE = "BLOQUE";
@@ -81,6 +82,10 @@ public class ModeloMeritosPreferentes {
 	 * @throws UVException .
 	 */
 	public MeritoPreferente getMeritoPreferenteById(Integer codNum) throws SQLException, UVException {
+		if (codNum == null) {
+			throw new UVException("El merito preferente es requerido");
+		}
+		
 		String sql = "SELECT bepmep.* FROM TBEP_MERITOS_PREFERENTES bepmep WHERE bepmep.CODNUM = ?";
 		
 		try (Connection con = ConexionUvirtual.obtenerInstancia(); PreparedStatement stmt = con.prepareStatement(sql)) {
@@ -161,6 +166,29 @@ public class ModeloMeritosPreferentes {
 	}
 
 	/**
+	 * Devuelve los meritos preferentes por posesión.
+	 * @return .
+	 * @throws SQLException .
+	 * @throws UVException .
+	 */
+	public List<MeritoPreferente> getMeritosPreferentesPorPosesion() throws SQLException, UVException {
+		String consulta = "SELECT bepmep.* FROM TBEP_MERITOS_PREFERENTES bepmep WHERE bepmep.FLGACTIVO = 'S' AND bepmep.TIPO = ?";
+		ArrayList<MeritoPreferente> meritosPreferentesPosesion = new ArrayList<>();
+		
+		try (Connection conexion = ConexionUvirtual.obtenerInstancia(); PreparedStatement stmt = conexion.prepareStatement(consulta)) {
+			stmt.setString(1, ModeloMeritosPreferentes.TIPO_POSESION);
+						
+			try (ResultSet rs = stmt.executeQuery()) {
+				while (rs.next()) {
+					meritosPreferentesPosesion.add(this.createApartadoFromResultSet(rs));
+				}
+			}
+		}
+		
+		return meritosPreferentesPosesion;
+	}
+	
+	/**
 	 * Inserta un merito en la db.
 	 * @param merito .
 	 * @throws SQLException .
@@ -227,6 +255,7 @@ public class ModeloMeritosPreferentes {
 				+ "CODIGO = ?, "
 				+ "DESCRIPCION = ?, "
 				+ "TIPO = ?, "
+				+ "TIPO_CALCULO = ?, "
 				+ "APLICABLE = ?, "
 				+ "BASE = ?, "
 				+ "FACTOR = ?, "
@@ -243,6 +272,7 @@ public class ModeloMeritosPreferentes {
 			stmt.setString(parameterIndex++, merito.getCodigo());
 			stmt.setString(parameterIndex++, merito.getDescripcion());
 			stmt.setString(parameterIndex++, merito.getTipo());
+			stmt.setString(parameterIndex++, merito.getTipoCalculo());
 			stmt.setString(parameterIndex++, merito.getAplicable());
 			if (merito.getBase() != null) {
 				stmt.setDouble(parameterIndex++, merito.getBase());
@@ -301,16 +331,23 @@ public class ModeloMeritosPreferentes {
 	
 	/**
 	 * Chequea si hay un mérito activo con el codigo pasado.
-	 * @param codigo .
+	 * @param merito .
 	 * @return .
 	 * @throws SQLException .
 	 */
-	public boolean isMeritoActivoConCodigo(String codigo) throws SQLException {
-		String query = "SELECT COUNT(*) as count FROM TBEP_MERITOS_PREFERENTES WHERE FLGACTIVO = 'S' AND CODIGO = ?";		
+	public boolean isMeritoActivoConCodigo(MeritoPreferente merito) throws SQLException {		
+		String query = "SELECT COUNT(*) as count FROM TBEP_MERITOS_PREFERENTES WHERE FLGACTIVO = 'S' AND CODIGO = ?";
+		
+		if (merito.getCodNum() != null) {
+			query += " AND CODNUM <> ? ";
+		}
 		
 		try (Connection con = ConexionUvirtual.obtenerInstancia(); PreparedStatement stmt = con.prepareStatement(query)) {
 			int param = 1;
-			stmt.setString(param++, codigo);
+			stmt.setString(param++, merito.getCodigo());			
+			if (merito.getCodNum() != null) {
+				stmt.setInt(param++, merito.getCodNum());
+			}
 			
 			try (ResultSet rs = stmt.executeQuery()) {
 				rs.next();
@@ -329,7 +366,8 @@ public class ModeloMeritosPreferentes {
 		obj.setCodNum(rs.getInt("CODNUM"));
 		obj.setCodigo(rs.getString("CODIGO"));
 		obj.setDescripcion(rs.getString("DESCRIPCION"));
-		obj.setTipo(rs.getString("TIPO"));		
+		obj.setTipo(rs.getString("TIPO"));
+		obj.setTipoCalculo(rs.getString("TIPO_CALCULO"));
 		obj.setAplicable(rs.getString("APLICABLE"));
 		obj.setBase(rs.getDouble("BASE") == 0 ? null : rs.getDouble("BASE"));
 		obj.setFactor(rs.getDouble("FACTOR"));

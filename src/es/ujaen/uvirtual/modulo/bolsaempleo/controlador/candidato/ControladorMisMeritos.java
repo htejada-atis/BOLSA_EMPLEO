@@ -124,7 +124,7 @@ public class ControladorMisMeritos extends HttpServlet {
 		}
 		
 		try {
-			init(bean, datos);
+			init(bean, datos, request);
 			switch (nombreAccion) {
 				case ACCION_INDEX:
 					listaMeritos(bean);
@@ -139,7 +139,7 @@ public class ControladorMisMeritos extends HttpServlet {
 					descargarFichero(bean, datos, request, response);
 					break;
 				case ACCION_ELIMINAR_MERITOS:
-					eliminarMeritos(request, response);
+					eliminarMeritos(bean, request, response);
 					break;				
 				default:
 					errorFatal(bean, "Acción no contemplada");
@@ -164,8 +164,9 @@ public class ControladorMisMeritos extends HttpServlet {
 		}
 	}
 	
-	private void init(VistaMeritos bean, UVDatos datos) throws SQLException, UVException {
+	private void init(VistaMeritos bean, UVDatos datos, HttpServletRequest request) throws SQLException, UVException {
 		bean.setVista(RUTA_BEP_MERITOS + "index.jsp");
+		BolsaEmpleoUtils.readMensajeSession(bean, request);
 		ModeloUsuarioBolsaEmpleo.obtenerInstancia().checkUser(datos);
 	}
 	
@@ -227,8 +228,7 @@ public class ControladorMisMeritos extends HttpServlet {
 				Integer idUsuario = ModeloUsuarioBolsaEmpleo.obtenerInstancia().listaUsuario(usuArcos.getDocumentoNumero()).getCodNum();
 				ModeloMerito.obtenerInstancia().insertaMerito(merito, idUsuario);
 							
-				HttpSession session = request.getSession(false);
-				session.setAttribute(MENSAJE_ENVIADO, MENSAJE_EXITO_AGREGAR);
+				BolsaEmpleoUtils.addMensajeDeExito(MENSAJE_EXITO_AGREGAR, bean, request);
 				response.sendRedirect(request.getServletPath());
 			}
 		}
@@ -266,13 +266,14 @@ public class ControladorMisMeritos extends HttpServlet {
 	}
 	
 	/** elimina una lista de méritos seleccionados .
+	 * @param bean .
 	 * @param request .
 	 * @param response .
 	 * @throws SQLException .
 	 * @throws UVException .
 	 * @throws IOException .
 	 */
-	private void eliminarMeritos(HttpServletRequest request, HttpServletResponse response) throws SQLException, UVException, IOException {
+	private void eliminarMeritos(VistaMeritos bean, HttpServletRequest request, HttpServletResponse response) throws SQLException, UVException, IOException {
 		ModeloMerito modelo = ModeloMerito.obtenerInstancia();
 		
 		Gson gson = new GsonBuilder().create();
@@ -280,14 +281,14 @@ public class ControladorMisMeritos extends HttpServlet {
 		try {
 			List<String> meritos = gson.fromJson(request.getParameter(PARAM_MERITOS), new TypeToken<List<String>>() { }.getType());
 			modelo.eliminarMeritos(meritos);
-			HttpSession session = request.getSession(false);
-			session.setAttribute(MENSAJE_ENVIADO, MENSAJE_EXITO_ELIMINAR);
-			response.sendRedirect(request.getServletPath());
+			BolsaEmpleoUtils.addMensajeDeExito(MENSAJE_EXITO_ELIMINAR, bean, request);
 		} catch (SQLIntegrityConstraintViolationException e) {
-			throw new UVException(MENSAJE_ERROR_ELIMINAR_MERITO);
+			BolsaEmpleoUtils.addMensajeDeError(MENSAJE_ERROR_ELIMINAR_MERITO, bean, request);
 		} catch (Exception ex) {
-			throw new UVException(MENSAJE_ERROR_MERITOS_SELECCIONADOS_INCORRECTOS);
+			BolsaEmpleoUtils.addMensajeDeError(MENSAJE_ERROR_MERITOS_SELECCIONADOS_INCORRECTOS, bean, request);
 		}
+		
+		response.sendRedirect(request.getServletPath());
 	}
 	
 	/** Listado de méritos .

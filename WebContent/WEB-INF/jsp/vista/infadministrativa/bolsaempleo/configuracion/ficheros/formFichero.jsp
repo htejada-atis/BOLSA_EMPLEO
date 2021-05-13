@@ -37,7 +37,7 @@ String tituloValue = BolsaEmpleoUtils.getParamForm(request, ControladorGestionFi
     	<div class="form-group-container col1">
 	    	<div class="form-group">
 	    		<label for="fichero_titulo">Título:</label>
-	    		<input class="form-input-custom" id="fichero_titulo" name="<%= ControladorGestionFicheros.PARAM_TITULO %>" value="<%= tituloValue %>" required/>
+	    		<input class="form-input-custom" id="fichero_titulo" name="<%= ControladorGestionFicheros.PARAM_TITULO %>" value="<%= tituloValue %>"/>
 	    	</div>
     	</div>
     	<div class="form-group-container col1">

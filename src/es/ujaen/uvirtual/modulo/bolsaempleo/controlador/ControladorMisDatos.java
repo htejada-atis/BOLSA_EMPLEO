@@ -117,7 +117,7 @@ public class ControladorMisDatos extends HttpServlet {
 		}
 		
 		try {
-			init(bean, datos);
+			init(bean, datos, request);
 
 			switch (nombreAccion) {
 				case ACCION_INDEX:
@@ -153,8 +153,9 @@ public class ControladorMisDatos extends HttpServlet {
 		}
     }
 	
-	private void init(VistaUsuarioBolsaEmpleo bean, UVDatos datos) throws SQLException, UVException {
+	private void init(VistaUsuarioBolsaEmpleo bean, UVDatos datos, HttpServletRequest request) throws SQLException, UVException {
 		this.index(bean, datos);
+		BolsaEmpleoUtils.readMensajeSession(bean, request);
 		ModeloUsuarioBolsaEmpleo.obtenerInstancia().checkUser(datos);
 	}
     

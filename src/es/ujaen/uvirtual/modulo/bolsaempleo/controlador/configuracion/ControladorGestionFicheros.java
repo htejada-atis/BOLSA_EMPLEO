@@ -14,7 +14,6 @@ import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import javax.servlet.http.HttpSession;
 import javax.servlet.http.Part;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
@@ -72,6 +71,7 @@ public class ControladorGestionFicheros extends HttpServlet {
 	// Mensajes
 	public static final String MENSAJE_ENVIADO = "mensaje";
 	
+	public static final String MENSAJE_ERROR_EXTENSION_FICHERO = "Solo se admiten ficheros de tipo pdf";
 	public static final String MENSAJE_ERROR_FICHEROS_SELECCIONADOS_INCORRECTOS = "Ficheros seleccionados no válidos";
 	public static final String MENSAJE_ERROR_TITULO_LARGO = "El enlace no puede contener mas de %d caracteres";
 	
@@ -108,13 +108,13 @@ public class ControladorGestionFicheros extends HttpServlet {
 		}
 		
 		try {
-			init(bean, datos);
+			init(bean, datos, request);
 			switch (nombreAccion) {
 				case ACCION_INDEX:
 					bean.setVista(RUTA_BEP_CONF + "ficheros.jsp");
 					break;
 				case ACCION_BORRAR_FICHEROS:
-					eliminarFicheros(request, response);
+					eliminarFicheros(bean, request, response);
 					break;
 				case ACCION_DATATABLE:
 					listadoFicheros(bean, datos, request, response);
@@ -123,13 +123,13 @@ public class ControladorGestionFicheros extends HttpServlet {
 					descargarFichero(bean, datos, request, response);
 					break;
 				case ACCION_HACER_FICHEROS_PUBLICOS:
-					cambiarFicherosPublico(request, response, true);
+					cambiarFicherosPublico(bean, request, response, true);
 					break;
 				case ACCION_HACER_FICHEROS_PRIVADOS:
-					cambiarFicherosPublico(request, response, false);
+					cambiarFicherosPublico(bean, request, response, false);
 					break;
 				case ACCION_SUBIR_FICHERO:
-					agregarFichero(request, response, bean);
+					agregarFichero(bean, request, response);
 					break;
 				default:
 					errorFatal(bean, "Acción no contemplada");
@@ -155,8 +155,9 @@ public class ControladorGestionFicheros extends HttpServlet {
 		}
 	}
 	
-	private void init(VistaFicheros bean, UVDatos datos) throws SQLException, UVException {
+	private void init(VistaFicheros bean, UVDatos datos, HttpServletRequest request) throws SQLException, UVException {
 		bean.setVista(RUTA_BEP_CONF + "ficheros.jsp");
+		BolsaEmpleoUtils.readMensajeSession(bean, request);
 		ModeloUsuarioBolsaEmpleo.obtenerInstancia().checkUser(datos);
 	}
 	
@@ -174,15 +175,15 @@ public class ControladorGestionFicheros extends HttpServlet {
 	}
 	
 	/** agrega un nuevo fichero .
+	 * @param bean bean de la vista a la que poner los valores .
 	 * @param request .
 	 * @param response .
-	 * @param bean bean de la vista a la que poner los valores.
-	 * @throws SQLException excepcion de bbdd.
+	 * @throws SQLException excepcion de bbdd .
 	 * @throws ServltetException .
 	 * @throws IOException en caso de error de input u output .
 	 * @throws UVException en caso de error de parametros .
 	 */
-	private void agregarFichero(HttpServletRequest request, HttpServletResponse response, VistaFicheros bean) throws SQLException, ServletException, IOException, UVException {
+	private void agregarFichero(VistaFicheros bean, HttpServletRequest request, HttpServletResponse response) throws SQLException, ServletException, IOException, UVException {
 		bean.setVista(RUTA_BEP_CONF + "formFichero.jsp");
 		
 		if (request.getParameter(PARAM_TITULO) != null) {
@@ -197,8 +198,7 @@ public class ControladorGestionFicheros extends HttpServlet {
 					BolsaEmpleoUtils.checkFileSize(fichero.getArchivo());
 					
 					modelo.insertaFichero(fichero);
-					HttpSession session = request.getSession(false);
-					session.setAttribute(MENSAJE_ENVIADO, MENSAJE_EXITO_AGREGAR);
+					BolsaEmpleoUtils.addMensajeDeExito(MENSAJE_EXITO_AGREGAR, bean, request);
 					response.sendRedirect(request.getServletPath());
 				} else {
 					throw new UVException("No se puede subir un fichero sin archivo");
@@ -208,13 +208,16 @@ public class ControladorGestionFicheros extends HttpServlet {
 	}
 	
 	/** cambia ficheros a publicos .
+	 * @param bean .
 	 * @param request .
 	 * @param response .
 	 * @param publico .
+	 * @throws IOException .
 	 * @throws SQLException .
 	 * @throws UVException .
 	 */
-	private void cambiarFicherosPublico(HttpServletRequest request, HttpServletResponse response, Boolean publico) throws SQLException, UVException {
+	private void cambiarFicherosPublico(VistaFicheros bean, HttpServletRequest request, HttpServletResponse response, Boolean publico)
+			throws SQLException, UVException, IOException {
 		ModeloFichero modelo = ModeloFichero.obtenerInstancia();
 		
 		Gson gson = new GsonBuilder().create();
@@ -226,12 +229,12 @@ public class ControladorGestionFicheros extends HttpServlet {
 				modelo.modificarPublicoFichero(new Fichero(fichero, publico));
 			}
 			
-			HttpSession session = request.getSession(false);
-			session.setAttribute(MENSAJE_ENVIADO, MENSAJE_EXITO_CAMBIAR_PUBLICO);
-			response.sendRedirect(request.getServletPath());
+			BolsaEmpleoUtils.addMensajeDeExito(MENSAJE_EXITO_CAMBIAR_PUBLICO, bean, request);
 		} catch (Exception ex) {
-			throw new UVException(MENSAJE_ERROR_FICHEROS_SELECCIONADOS_INCORRECTOS);
+			BolsaEmpleoUtils.addMensajeDeError(MENSAJE_ERROR_FICHEROS_SELECCIONADOS_INCORRECTOS, bean, request);
 		}
+		
+		response.sendRedirect(request.getServletPath());
 	}
 	
 	/** descarga un fichero .
@@ -265,6 +268,7 @@ public class ControladorGestionFicheros extends HttpServlet {
 						stream.flush();
 			        }
 				} else {
+					BolsaEmpleoUtils.addMensajeDeError(MENSAJE_ERROR_EXTENSION_FICHERO, bean, request);
 					response.sendRedirect(request.getServletPath());
 			    }
 			}			
@@ -272,13 +276,14 @@ public class ControladorGestionFicheros extends HttpServlet {
 	}
 	
 	/** eliminar ficheros .
+	 * @param bean .
 	 * @param request .
 	 * @param response .
 	 * @throws SQLException excepcion de bbdd .
 	 * @throws UVException en caso de error de parametros .
 	 * @throws IOException en caso de error de IO .
 	 */
-	private void eliminarFicheros(HttpServletRequest request, HttpServletResponse response) throws SQLException, UVException, IOException {
+	private void eliminarFicheros(VistaFicheros bean, HttpServletRequest request, HttpServletResponse response) throws SQLException, UVException, IOException {
 		ModeloFichero modelo = ModeloFichero.obtenerInstancia();
 		
 		Gson gson = new GsonBuilder().create();
@@ -290,12 +295,12 @@ public class ControladorGestionFicheros extends HttpServlet {
 				modelo.borraFichero(new Fichero(fichero));
 			}
 			
-			HttpSession session = request.getSession(false);
-			session.setAttribute(MENSAJE_ENVIADO, ficheros.size() > 1 ? MENSAJE_EXITO_ELIMINAR_FICHEROS : MENSAJE_EXITO_ELIMINAR_FICHERO);
-			response.sendRedirect(request.getServletPath());
+			BolsaEmpleoUtils.addMensajeDeExito(ficheros.size() > 1 ? MENSAJE_EXITO_ELIMINAR_FICHEROS : MENSAJE_EXITO_ELIMINAR_FICHERO, bean, request);
 		} catch (Exception ex) {
-			throw new UVException(MENSAJE_ERROR_FICHEROS_SELECCIONADOS_INCORRECTOS);
+			BolsaEmpleoUtils.addMensajeDeError(MENSAJE_ERROR_FICHEROS_SELECCIONADOS_INCORRECTOS, bean, request);
 		}
+		
+		response.sendRedirect(request.getServletPath());
 	}
 	
 	/**
@@ -350,9 +355,6 @@ public class ControladorGestionFicheros extends HttpServlet {
 		
 		// titulo
 		f.setTitulo(EscapaHTML.ajustaCodificacion(request.getParameter(PARAM_TITULO)));
-		if (f.getTitulo() == null || f.getTitulo().isBlank()) {
-			throw new UVException("El título no puede estar vacio");
-		}
 		if (f.getTitulo().length() > ModeloFichero.COLUMN_TITULO_MAXLENGTH) {
 			throw new UVException(String.format(MENSAJE_ERROR_TITULO_LARGO, ModeloFichero.COLUMN_TITULO_MAXLENGTH));
 		}

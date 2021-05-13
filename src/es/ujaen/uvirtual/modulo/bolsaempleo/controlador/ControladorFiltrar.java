@@ -99,7 +99,7 @@ public class ControladorFiltrar extends HttpServlet {
 		}
 		
 		try {
-			init(bean, datos);
+			init(bean, datos, request);
 			switch (nombreAccion) {
 				case ACCION_INDEX:
 					bean.setVista(JSP_INDEX);
@@ -146,8 +146,9 @@ public class ControladorFiltrar extends HttpServlet {
 		}
 	}
 	
-	private void init(VistaFiltrar bean, UVDatos datos) throws SQLException, UVException {
+	private void init(VistaFiltrar bean, UVDatos datos, HttpServletRequest request) throws SQLException, UVException {
 		bean.setVista(JSP_INDEX);
+		BolsaEmpleoUtils.readMensajeSession(bean, request);
 		ModeloUsuarioBolsaEmpleo.obtenerInstancia().checkUser(datos);
 	}
 	
