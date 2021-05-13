@@ -3,7 +3,7 @@ SELECT
     bepblo.CODNUM AS BEPBLO_CODNUM,
     '1' AS CODIGO,
     'Nota media de las asignaturas cursadas en la titulación exigida para la plaza' AS NOMBRE,
-    '(A:1, N:2, SB:3 y MH:4)' AS DESCRIPCION,
+    'A:1, N:2, SB:3 y MH:4' AS DESCRIPCION,
     'DECIMAL' AS UNIDADES,
     1 AS VALOR,
     1 AS VALOR_MINIMO,

@@ -405,7 +405,7 @@ public class ModeloBaremacionItems {
 	 * @throws SQLException .
 	 */
 	public List<ItemBaremacion> listaItemBaremacion() throws SQLException, UVException {
-		return listaItemBaremacion(" WHERE FLGACTIVO = 'S' ORDER BY nombre");
+		return listaItemBaremacion(" WHERE FLGACTIVO = 'S' ORDER BY codigo");
 	} 
 	
 	private List<ItemBaremacion> listaItemBaremacion(String clausula) throws SQLException, UVException {

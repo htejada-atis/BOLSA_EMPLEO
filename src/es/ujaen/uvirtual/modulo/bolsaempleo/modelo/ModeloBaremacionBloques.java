@@ -250,7 +250,7 @@ public class ModeloBaremacionBloques {
 	 * @throws SQLException .
 	 */
 	public List<BloqueBaremacion> listaBloqueBaremacion() throws SQLException, UVException {
-		return listaBloqueBaremacion(" WHERE FLGACTIVO = 'S' ORDER BY CODIGO, NOMBRE ");
+		return listaBloqueBaremacion(" WHERE FLGACTIVO = 'S' ORDER BY CODIGO ");
 	} 
 	
 	private List<BloqueBaremacion> listaBloqueBaremacion(String clausula) throws SQLException, UVException {
