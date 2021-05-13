@@ -24,34 +24,14 @@ import es.ujaen.uvirtual.utilidades.UVException;
  */
 public class ModeloMeritosPreferentesCandidato {
 	// ordenación 
-	public static final int ORDER_COLUMN_INDEX_CODIGO = 0;
-	public static final int ORDER_COLUMN_INDEX_DESCRIPCION = 1;
-	public static final int ORDER_COLUMN_INDEX_TIPO = 2;
-	public static final int ORDER_COLUMN_INDEX_APLICABLE = 3;
-	public static final int ORDER_COLUMN_INDEX_FACTOR = 4;
-	public static final int ORDER_COLUMN_INDEX_ACTIVO = 5;
+	public static final int ORDER_COLUMN_INDEX_ID = 1;
+	public static final int ORDER_COLUMN_INDEX_CODIGO = 2;
+	public static final int ORDER_COLUMN_INDEX_NOMBRE = 3;
+	public static final int ORDER_COLUMN_INDEX_DESCRIPCION = 4;
 	
-	public static final int MAX_LENGTH_COLUMN_DESCRIPCION = 1000;
+	public static final int MAX_LENGTH_COLUMN_DESCRIPCION = 250;
 	public static final int MAX_LENGTH_COLUMN_FACTOR = 20;
-	public static final int MAX_LENGTH_COLUMN_CODIGO = 10;
-	
-	// tipo de meritos preferentes
-	public static final String TIPO_TITULACION_PREFERENTE = "TITULACION_PREFERENTE";
-	public static final String TIPO_MERITO = "MERITO";
-	public static final String TIPO_POSESION = "POSESION";
-		
-	// tipo de cálculo
-	public static final String TIPO_CALCULO_FACTOR = "FACTOR";
-	public static final String TIPO_CALCULO_VALOR_MERITO_FACTOR = "VALOR_MERITO_FACTOR";
-	
-	// tipos de aplicable
-	public static final String APLICABLE_BLOQUE = "BLOQUE";
-	public static final String APLICABLE_APARTADO = "APARTADO";
-	public static final String APLICABLE_ITEM = "ITEM"; 
-	public static final String APLICABLE_TOTAL = "TOTAL";
-		
-	public static final String ERROR_MERITO_NOEXITE = "El mérito no existe";
-
+						
 	protected static ModeloMeritosPreferentesCandidato eInstancia;
 
 	/** Crea una instancia del objeto.
@@ -92,29 +72,34 @@ public class ModeloMeritosPreferentesCandidato {
 		List<MeritoPreferenteUsuario> meritos = new ArrayList<>();
 		BolsaEmpleoDataTable<MeritoPreferenteUsuario> dataTable = new BolsaEmpleoDataTable<>(params);
 		
-		String consulta = "SELECT bepmpu.* FROM TBEP_MERITOS_PREFERENTES_USUARIO bepmpu WHERE bepmpu.BEPUSU_CODNUM = ? ";
+		String consulta = 
+				"SELECT bepmpu.* "
+				+ "FROM TBEP_MERITOS_PREFERENTES_USUARIO bepmpu "
+				+ "INNER JOIN TBEP_MERITOS_PREFERENTES bepmep ON bepmep.CODNUM = bepmpu.BEPMEP_CODNUM "
+				+ "WHERE bepmep.TIPO = ? AND bepmpu.BEPUSU_CODNUM = ? ";
 		
-//		dataTable.setColumn(ORDER_COLUMN_INDEX_CODIGO, "bepmep.CODIGO");
-//		dataTable.setColumn(ORDER_COLUMN_INDEX_DESCRIPCION, "bepmep.DESCRIPCION");
-//		dataTable.setColumn(ORDER_COLUMN_INDEX_TIPO, "bepmep.TIPO");
-//		dataTable.setColumn(ORDER_COLUMN_INDEX_APLICABLE, "bepmep.APLICABLE");
-//		dataTable.setColumn(ORDER_COLUMN_INDEX_FACTOR, "bepmep.FACTOR");
-//		dataTable.setColumn(ORDER_COLUMN_INDEX_ACTIVO, "bepmep.FLGACTIVO", DataTableColumn.COLUMN_TYPE_BOOLEAN);
+		dataTable.setColumn(ORDER_COLUMN_INDEX_ID, "bepmpu.CODNUM");
+		dataTable.setColumn(ORDER_COLUMN_INDEX_CODIGO, "bepmpu.CODIGO");
+		dataTable.setColumn(ORDER_COLUMN_INDEX_NOMBRE, "bepmep.DESCRIPCION");
+		dataTable.setColumn(ORDER_COLUMN_INDEX_DESCRIPCION, "bepmpu.DESCRIPCION");
 				
 		dataTable.setQuery(consulta);
-				
+
 		try (Connection conexion = ConexionUvirtual.obtenerInstancia();
 				PreparedStatement stmtCount = conexion.prepareStatement(dataTable.getQueryCount());
 				PreparedStatement stmt = conexion.prepareStatement(dataTable.getQuery())
 		) {
-			stmt.setInt(1, usuario.getCodNum());
-			stmtCount.setInt(1, usuario.getCodNum());
+			int paramIndex = 1;
+			stmt.setString(paramIndex, ModeloMeritosPreferentes.TIPO_POSESION);
+			stmtCount.setString(paramIndex++, ModeloMeritosPreferentes.TIPO_POSESION);
+			stmt.setInt(paramIndex, usuario.getCodNum());
+			stmtCount.setInt(paramIndex++, usuario.getCodNum());
 			
 			dataTable.setFiltersParams(stmt, stmtCount, 1);
 			
 			try (ResultSet rs = stmt.executeQuery()) {
 				while (rs.next()) {
-					MeritoPreferenteUsuario row = this.createMeritoFromResultSet(rs);
+					MeritoPreferenteUsuario row = this.createMeritoUsuarioFromResultSet(rs);
 					meritos.add(row);					
 				}				
 			}	
@@ -125,8 +110,26 @@ public class ModeloMeritosPreferentesCandidato {
 		
 		return dataTable;
 	}
+	
+	/**
+	 * Inserta un merito preferente del candidato.
+	 * @param mp .
+	 * @throws SQLException .
+	 */
+	public void insertaMeritoUsuario(MeritoPreferenteUsuario mp) throws SQLException {
+		String consulta = "INSERT INTO TBEP_MERITOS_PREFERENTES_USUARIO (BEPMEP_CODNUM,BEPUSU_CODNUM,DESCRIPCION,ARCHIVO) VALUES (?,?,?,?)";
 		
-	private MeritoPreferenteUsuario createMeritoFromResultSet(ResultSet rs) throws SQLException, UVException {
+		try (Connection conexion = ConexionUvirtual.obtenerInstancia(); PreparedStatement stmt = conexion.prepareStatement(consulta)) {
+			int parameterIndex = 1;
+			stmt.setInt(parameterIndex++, mp.getMeritoPreferente().getCodNum());
+			stmt.setInt(parameterIndex++, mp.getUsuario().getCodNum());
+			stmt.setString(parameterIndex++, mp.getDescripcion());
+			stmt.setBinaryStream(parameterIndex++, mp.getArchivo());
+			stmt.executeUpdate();
+		}
+	}
+	
+	private MeritoPreferenteUsuario createMeritoUsuarioFromResultSet(ResultSet rs) throws SQLException, UVException {
 		MeritoPreferenteUsuario obj = new MeritoPreferenteUsuario();
 		obj.setCodNum(rs.getInt("CODNUM"));
 		obj.setMeritoPreferente(ModeloMeritosPreferentes.obtenerInstancia().getMeritoPreferenteById(rs.getInt("BEPMEP_CODNUM")));
@@ -139,4 +142,8 @@ public class ModeloMeritosPreferentesCandidato {
 		obj.setFechaValidado(rs.getDate("FECHA_VALIDADO"));
 		return obj;
 	}
+
+	
+
+	
 }
