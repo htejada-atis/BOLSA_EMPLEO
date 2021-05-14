@@ -69,11 +69,11 @@ public class TestBEPTitulacionesPreferentes {
 	 */
 	@Before
 	public void navegaOpcion() {
-		DriverUvBEP.getDriver().get("http://localhost:8080/srv/es/index");
-		DriverUvBEP.getDriver().get("http://localhost:8080/srv/es/informacionadministrativa");
-		DriverUvBEP.getDriver().get("http://localhost:8080/srv/es/informacionadministrativa/bolsaempleo");		
-		DriverUvBEP.getDriver().get("http://localhost:8080/srv/es/informacionadministrativa/bolsaempleo/configuracion");
-		DriverUvBEP.getDriver().get("http://localhost:8080/srv/es/informacionadministrativa/bolsaempleo/configuracion/titulacionespreferentesarea");
+		DriverUvBEP.getDriver().get(DriverUv.RUTA + "/srv/es/index");
+		DriverUvBEP.getDriver().get(DriverUv.RUTA + "/srv/es/informacionadministrativa");
+		DriverUvBEP.getDriver().get(DriverUv.RUTA + "/srv/es/informacionadministrativa/bolsaempleo");		
+		DriverUvBEP.getDriver().get(DriverUv.RUTA + "/srv/es/informacionadministrativa/bolsaempleo/configuracion");
+		DriverUvBEP.getDriver().get(DriverUv.RUTA + "/srv/es/informacionadministrativa/bolsaempleo/configuracion/titulacionespreferentesarea");
 	}
 	
 	/** Listado de usuarios.
@@ -112,7 +112,7 @@ public class TestBEPTitulacionesPreferentes {
 	 */
 	@Test
 	public void testA2() throws MalformedURLException, IOException {
-		String u = "http://localhost:8080/srv/es/informacionadministrativa/bolsaempleo/configuracion/titulacionespreferentesarea?a="
+		String u = DriverUv.RUTA + "/srv/es/informacionadministrativa/bolsaempleo/configuracion/titulacionespreferentesarea?a="
 				+ ControladorGestionTitulacionesPreferentesArea.ACCION_DATATABLE_TITULACIONES + "&area=0";
 		String json = DriverUvBEP.getAjaxRequestJson(u);
 		

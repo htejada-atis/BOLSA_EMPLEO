@@ -48,7 +48,7 @@ public class DriverUvBEP {
 	
 	/** realiza el login del usuario. */
 	public static void login() {
-		driver.get("http://localhost:8080/srv/es/index");
+		driver.get(DriverUv.RUTA + "/srv/es/index");
 		WebElement username = driver.findElement(By.name("usuario"));
 		username.sendKeys("personal1");
 		username.submit();
