@@ -196,9 +196,7 @@ public class ModeloEvaluador {
 	public Boolean checkEvaluadorArea(Area area, UsuarioBolsaEmpleo usu) throws SQLException, UVException {
 		String consulta = "SELECT * FROM TBEP_USUARIOS bepusu "
 				+ "INNER JOIN TBEP_EVALUADORES bepeva ON bepusu.CODNUM = bepeva.BEPUSU_CODNUM "
-				+ "WHERE FLGBORRADO!='S' AND FLGEXCLUIDO!='S' AND bepeva.BEPARE_CODNUM = ? "
-				+ "AND bepusu.ROL = " + PARAM_ROL_ID
-				+ " AND BEPUSU_CODNUM = ?";
+				+ "WHERE bepeva.BEPARE_CODNUM = ? AND BEPUSU_CODNUM = ?";
 		try (Connection conexion = ConexionUvirtual.obtenerInstancia();
 				PreparedStatement stmt = conexion.prepareStatement(consulta)) {
 			int indexParam = 1;
