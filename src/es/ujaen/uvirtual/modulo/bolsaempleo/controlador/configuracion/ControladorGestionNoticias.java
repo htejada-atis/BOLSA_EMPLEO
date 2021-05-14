@@ -98,7 +98,7 @@ public class ControladorGestionNoticias extends HttpServlet {
 			nombreAccion = ACCION_INDEX;
 		}
 		try {
-			init(bean, datos, request);
+			init(bean, datos, request, response);
 			switch (nombreAccion) {
 				case ACCION_INDEX:
 					bean.setVista(RUTA_BEP_NOTICIAS + "indice.jsp");
@@ -137,10 +137,15 @@ public class ControladorGestionNoticias extends HttpServlet {
 		}
 	}
 	
-	private void init(VistaNoticias bean, UVDatos datos, HttpServletRequest request) throws SQLException, UVException {
+	private void init(VistaNoticias bean, UVDatos datos, HttpServletRequest request, HttpServletResponse response) throws SQLException, UVException, IOException {
 		bean.setVista(RUTA_BEP_NOTICIAS + "indice.jsp");
 		BolsaEmpleoUtils.readMensajeSession(bean, request);
-		ModeloUsuarioBolsaEmpleo.obtenerInstancia().checkUser(datos);
+		try {
+			ModeloUsuarioBolsaEmpleo.obtenerInstancia().checkUser(datos);
+		} catch (UVException e) {
+			BolsaEmpleoUtils.addMensajeDeError(e.getMessage(), bean, request);
+			response.sendRedirect("/srv/es/informacionadministrativa/bolsaempleo/error");
+		}
 	}
 	
 	private void errorFatal(VistaNoticias bean, String mensaje) {

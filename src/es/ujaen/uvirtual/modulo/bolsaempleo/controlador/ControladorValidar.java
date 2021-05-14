@@ -93,7 +93,7 @@ public class ControladorValidar extends HttpServlet {
 		}
 		
 		try {
-			init(bean, datos, request);
+			init(bean, datos, request, response);
 			switch (nombreAccion) {
 				case ACCION_INDEX:
 					indice(bean);
@@ -146,11 +146,16 @@ public class ControladorValidar extends HttpServlet {
 		bean.setVista(JSQP_INDEX);
 	}
 	
-	private void init(VistaValidar bean, UVDatos datos, HttpServletRequest request) throws SQLException, UVException {
+	private void init(VistaValidar bean, UVDatos datos, HttpServletRequest request, HttpServletResponse response) throws SQLException, UVException, IOException {
 		bean.setVista(JSQP_INDEX);
 		bean.setConvocatoria(ModeloConvocatoria.obtenerInstancia().getUltimaConvocatoria());
 		BolsaEmpleoUtils.readMensajeSession(bean, request);
-		ModeloUsuarioBolsaEmpleo.obtenerInstancia().checkUser(datos);
+		try {
+			ModeloUsuarioBolsaEmpleo.obtenerInstancia().checkUser(datos);
+		} catch (UVException e) {
+			BolsaEmpleoUtils.addMensajeDeError(e.getMessage(), bean, request);
+			response.sendRedirect("/srv/es/informacionadministrativa/bolsaempleo/error");
+		}
 	}
 	
 	private void accionNodefinida(VistaValidar bean) {

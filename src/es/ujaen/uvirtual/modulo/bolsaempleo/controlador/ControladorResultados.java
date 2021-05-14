@@ -73,7 +73,7 @@ public class ControladorResultados extends HttpServlet {
 		}
 					
 		try {
-			init(bean, datos, request);
+			init(bean, datos, request, response);
 			switch (nombreAccion) {
 				case ACCION_INDEX:
 					bean.setVista("/WEB-INF/jsp/vista/infadministrativa/bolsaempleo/resultados/index.jsp");
@@ -105,10 +105,15 @@ public class ControladorResultados extends HttpServlet {
 		}
 	}
 	
-	private void init(VistaResultados bean, UVDatos datos, HttpServletRequest request) throws SQLException, UVException {
+	private void init(VistaResultados bean, UVDatos datos, HttpServletRequest request, HttpServletResponse response) throws SQLException, UVException, IOException {
 		bean.setVista("/WEB-INF/jsp/vista/infadministrativa/bolsaempleo/resultados/index.jsp");
 		BolsaEmpleoUtils.readMensajeSession(bean, request);
-		ModeloUsuarioBolsaEmpleo.obtenerInstancia().checkUser(datos);
+		try {
+			ModeloUsuarioBolsaEmpleo.obtenerInstancia().checkUser(datos);
+		} catch (UVException e) {
+			BolsaEmpleoUtils.addMensajeDeError(e.getMessage(), bean, request);
+			response.sendRedirect("/srv/es/informacionadministrativa/bolsaempleo/error");
+		}
 	}
 	
 	private void errorFatal(VistaResultados bean, String mensaje) {

@@ -15,17 +15,8 @@ Convocatoria convocatoria = bean.getConvocatoria();
 %>
 
 <div class="bolsa-empleo convocatoria-form">
-	<% if (bean.getMensajesDeExito().size() > 0) { %>
-		<div id="exito" class="success">
-			<%= bean.formatearMensajesDeExito() %>
-		</div>
-	<% } %>
-	
-	<% if (bean.getMensajesDeError().size() > 0) { %>
-		<div id="error" class="error">
-			<%= bean.formatearMensajesDeError() %>
-		</div>
-	<% } %>
+
+	<jsp:include page="/WEB-INF/jsp/vista/infadministrativa/bolsaempleo/mensajes.jsp" />
 	
 	<h2><%= convocatoria != null ? "Editar convocatoria" : "Nueva convocatoria" %></h2>
 	

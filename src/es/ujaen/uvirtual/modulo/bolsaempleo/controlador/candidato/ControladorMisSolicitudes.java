@@ -180,7 +180,7 @@ public class ControladorMisSolicitudes extends HttpServlet {
 		}
 
 		try {
-			init(bean, datos, request);
+			init(bean, datos, request, response);
 			switch (nombreAccion) {
 				case ACCION_CONSULTAR_SOLICITUD:
 				case ACCION_CREAR_SOLICITUD:
@@ -231,10 +231,15 @@ public class ControladorMisSolicitudes extends HttpServlet {
 		}
 	}
 	
-	private void init(VistaSolicitudes bean, UVDatos datos, HttpServletRequest request) throws SQLException, UVException {
+	private void init(VistaSolicitudes bean, UVDatos datos, HttpServletRequest request, HttpServletResponse response) throws SQLException, UVException, IOException {
 		bean.setVista(JSP_INDEX);
 		BolsaEmpleoUtils.readMensajeSession(bean, request);
-		ModeloUsuarioBolsaEmpleo.obtenerInstancia().checkUser(datos);
+		try {
+			ModeloUsuarioBolsaEmpleo.obtenerInstancia().checkUser(datos);
+		} catch (UVException e) {
+			BolsaEmpleoUtils.addMensajeDeError(e.getMessage(), bean, request);
+			response.sendRedirect("/srv/es/informacionadministrativa/bolsaempleo/error");
+		}
 		bean.setCandidato(ModeloUsuarioBolsaEmpleo.obtenerInstancia().getUsuarioCandidato(datos));
 	}
 	

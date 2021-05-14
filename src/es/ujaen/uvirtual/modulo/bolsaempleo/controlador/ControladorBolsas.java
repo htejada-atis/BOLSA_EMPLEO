@@ -90,7 +90,7 @@ public class ControladorBolsas extends HttpServlet {
 		}
 		
 		try {			
-			init(bean, datos, request);
+			init(bean, datos, request, response);
 			switch (nombreAccion) {
 				case ACCION_INDEX:
 					bean.setVista("/WEB-INF/jsp/vista/infadministrativa/bolsaempleo/bolsas/index.jsp");
@@ -125,7 +125,7 @@ public class ControladorBolsas extends HttpServlet {
 		}
 	}
 	
-	private void init(VistaEstadoBolsas bean, UVDatos datos, HttpServletRequest request) throws SQLException, UVException {
+	private void init(VistaEstadoBolsas bean, UVDatos datos, HttpServletRequest request, HttpServletResponse response) throws SQLException, UVException, IOException {
 		ModeloBolsa modeloBolsa = ModeloBolsa.obtenerInstancia();
 		
 		bean.setVista("/WEB-INF/jsp/vista/infadministrativa/bolsaempleo/bolsas/index.jsp");
@@ -135,7 +135,12 @@ public class ControladorBolsas extends HttpServlet {
 		bean.setTotalBolsas(modeloBolsa.getTotalBolsas());
 		
 		BolsaEmpleoUtils.readMensajeSession(bean, request);
-		ModeloUsuarioBolsaEmpleo.obtenerInstancia().checkUser(datos);
+		try {
+			ModeloUsuarioBolsaEmpleo.obtenerInstancia().checkUser(datos);
+		} catch (UVException e) {
+			BolsaEmpleoUtils.addMensajeDeError(e.getMessage(), bean, request);
+			response.sendRedirect("/srv/es/informacionadministrativa/bolsaempleo/error");
+		}
 	}
 	
 	private void errorFatal(VistaEstadoBolsas bean, String mensaje) {

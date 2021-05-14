@@ -16,16 +16,7 @@ Afinidad afinidad = bean.getAfinidad();
 
 <div class="bolsa-empleo afinidad-form">
 	
-	<% if (bean.getMensajesDeExito().size() > 0) { %>
-		<div id="exito" class="success">
-			<%= bean.formatearMensajesDeExito() %>
-		</div>
-	<% } %>
-	<% if (bean.getMensajesDeError().size() > 0) { %>
-		<div id="error" class="error">
-			<%= bean.formatearMensajesDeError() %>
-		</div>
-	<% } %>
+	<jsp:include page="/WEB-INF/jsp/vista/infadministrativa/bolsaempleo/mensajes.jsp" />
 	
 	<h2><%= afinidad != null ? "Editar afinidad" : "Nueva afinidad" %></h2>
 	

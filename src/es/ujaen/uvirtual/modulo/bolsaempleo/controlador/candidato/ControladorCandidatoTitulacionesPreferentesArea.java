@@ -89,7 +89,7 @@ public class ControladorCandidatoTitulacionesPreferentesArea extends HttpServlet
 		}
 		
 		try {
-			init(bean, datos, request);
+			init(bean, datos, request, response);
 			switch (nombreAccion) {
 				case ACCION_INDEX:
 					bean.setVista(JSP_INDEX);
@@ -125,9 +125,14 @@ public class ControladorCandidatoTitulacionesPreferentesArea extends HttpServlet
 		}
 	}
 	
-	private void init(VistaCandidatoTitulacionesArea bean, UVDatos datos, HttpServletRequest request) throws SQLException, UVException {
+	private void init(VistaCandidatoTitulacionesArea bean, UVDatos datos, HttpServletRequest request, HttpServletResponse response) throws SQLException, UVException, IOException {
 		BolsaEmpleoUtils.readMensajeSession(bean, request);
-		ModeloUsuarioBolsaEmpleo.obtenerInstancia().checkUser(datos);
+		try {
+			ModeloUsuarioBolsaEmpleo.obtenerInstancia().checkUser(datos);
+		} catch (UVException e) {
+			BolsaEmpleoUtils.addMensajeDeError(e.getMessage(), bean, request);
+			response.sendRedirect("/srv/es/informacionadministrativa/bolsaempleo/error");
+		}
 	}
 	
 	private void errorFatal(VistaCandidatoTitulacionesArea bean, String mensaje) {
