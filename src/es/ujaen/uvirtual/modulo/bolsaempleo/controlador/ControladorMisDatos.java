@@ -117,7 +117,7 @@ public class ControladorMisDatos extends HttpServlet {
 		}
 		
 		try {
-			init(bean, datos, request);
+			init(bean, datos, request, response);
 
 			switch (nombreAccion) {
 				case ACCION_INDEX:
@@ -153,10 +153,15 @@ public class ControladorMisDatos extends HttpServlet {
 		}
     }
 	
-	private void init(VistaUsuarioBolsaEmpleo bean, UVDatos datos, HttpServletRequest request) throws SQLException, UVException {
+	private void init(VistaUsuarioBolsaEmpleo bean, UVDatos datos, HttpServletRequest request, HttpServletResponse response) throws SQLException, UVException, IOException {
 		this.index(bean, datos);
 		BolsaEmpleoUtils.readMensajeSession(bean, request);
-		ModeloUsuarioBolsaEmpleo.obtenerInstancia().checkUser(datos);
+		try {
+			ModeloUsuarioBolsaEmpleo.obtenerInstancia().checkUser(datos);
+		} catch (UVException e) {
+			BolsaEmpleoUtils.addMensajeDeError(e.getMessage(), bean, request);
+			response.sendRedirect("/srv/es/informacionadministrativa/bolsaempleo/error");
+		}
 	}
     
 	private void errorFatal(VistaUsuarioBolsaEmpleo bean, String mensaje) {

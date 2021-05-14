@@ -8,15 +8,5 @@ VistaSolicitudes bean = (VistaSolicitudes) uvdatos.getVistas().get(VistaSolicitu
 %>
 
 <div class="bolsa-empleo">	
-	<% if (bean.getMensajesDeExito().size() > 0) { %>
-		<div id="exito" class="success">
-			<%= bean.formatearMensajesDeExito() %>
-		</div>
-	<% } %>
-	
-	<% if (bean.getMensajesDeError().size() > 0) { %>
-		<div id="error" class="error">
-			<%= bean.formatearMensajesDeError()   %>
-		</div>
-	<% } %>
+	<jsp:include page="/WEB-INF/jsp/vista/infadministrativa/bolsaempleo/mensajes.jsp" />
 </div>

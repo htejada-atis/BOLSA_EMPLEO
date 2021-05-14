@@ -151,6 +151,7 @@ public class ControladorInicio extends HttpServlet {
 			BolsaEmpleoUtils.addMensajeDeError(e.getMessage(), bean, request);
 			response.sendRedirect("/srv/es/informacionadministrativa/bolsaempleo/error");
 		}
+		
 	}
 	
 	private void errorFatal(VistaInicio bean, String mensaje) {

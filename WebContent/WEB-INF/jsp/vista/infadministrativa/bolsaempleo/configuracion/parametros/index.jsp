@@ -13,16 +13,7 @@ VistaParametrosConfiguracion bean = (VistaParametrosConfiguracion) uvdatos.getVi
 
 <div class="bolsa-empleo parametros-form">
 
-	<% if (bean.getMensajesDeExito().size() > 0) { %>
-		<div id="exito" class="success">
-			<%= bean.formatearMensajesDeExito() %>
-		</div>
-	<% } %>
-	<% if (bean.getMensajesDeError().size() > 0) { %>
-		<div id="error" class="error">
-			<%= bean.formatearMensajesDeError() %>
-		</div>
-	<% } %>
+	<jsp:include page="/WEB-INF/jsp/vista/infadministrativa/bolsaempleo/mensajes.jsp" />
 	
 	<div class="titulo-bolsa-empleo" style="margin-top:1rem;">
 		<h2>Parámetros de configuración</h2>

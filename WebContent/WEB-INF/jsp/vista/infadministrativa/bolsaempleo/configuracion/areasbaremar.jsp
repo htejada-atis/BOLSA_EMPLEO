@@ -11,16 +11,7 @@ VistaAreasBaremar bean = (VistaAreasBaremar) uvdatos.getVistas().get(VistaAreasB
 
 <div class='bolsa-empleo areasbaremar'>
 
-	<% if (bean.getMensajesDeExito().size() > 0) { %>
-		<div id="exito" class="success">
-			<%= bean.formatearMensajesDeExito() %>
-		</div>
-	<% } %>
-	<% if (bean.getMensajesDeError().size() > 0) { %>
-		<div id="error" class="error">
-			<%= bean.formatearMensajesDeError() %>
-		</div>
-	<% } %>
+	<jsp:include page="/WEB-INF/jsp/vista/infadministrativa/bolsaempleo/mensajes.jsp" />
 	
 	<div class="titulo-bolsa-empleo">
 		<h2>Áreas baremables</h2>
