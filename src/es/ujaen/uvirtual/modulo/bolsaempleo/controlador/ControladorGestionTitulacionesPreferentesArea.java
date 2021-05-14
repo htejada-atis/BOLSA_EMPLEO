@@ -267,7 +267,6 @@ public class ControladorGestionTitulacionesPreferentesArea extends HttpServlet {
 				bean.setDatatableTitulaciones(dataTable);
 				writer.write(dataTable.toJson());
 			} catch (UVException ex) {
-				System.out.println("error: " + ex.getMessage());
 				CodigoDescripcion mensaje = new CodigoDescripcion(RESPONSE_AJAX_ERROR, ex.getMessage());
 				bean.getMensajesDeError().add(mensaje.toString());
 				writer.write(new Gson().toJson(mensaje));

@@ -23,7 +23,14 @@ VistaItemsBaremacion bean = (VistaItemsBaremacion) uvdatos.getVistas().get(Vista
 		</div>
 	<% } %>
 	
+	<div class="titulo-bolsa-empleo">
 	<h2>Items para las baremaciones</h2>
+    
+	    <a class="link-btn" id="descargar_items" href="<%= request.getRequestURI() %>">
+	    	 Descargar Items
+	    </a>
+	</div>
+
 	
 	<table class="bluetable bolsaempleo custom" id="tableBloques">
 		<tr>
@@ -314,6 +321,12 @@ VistaItemsBaremacion bean = (VistaItemsBaremacion) uvdatos.getVistas().get(Vista
 			<% } %>
 			
 		<% } %>
+		
+		document.getElementById("descargar_items").addEventListener("click", function(event) {
+			event.preventDefault();
+			window.open("<%= ControladorItemsBaremacion.URL_PATTERN_FILES_PRIVADA %>"
+		        	+ "?a=<%= ControladorItemsBaremacion.ACCION_DESCARGAR_FICHERO %>");
+		});
 		
 	});
 

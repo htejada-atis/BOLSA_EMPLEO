@@ -109,5 +109,13 @@ $(document).ready(function() {
 		document.getElementById("descripcion").value = "";
 		document.getElementById("fichero_archivo").value = null;
 	<%}%>
+	
+	$('#agregar_titulacion_usuario').submit(function(event) { 
+		$('#agregar_titulacion').prop('disabled', true);
+		$('#agregar_titulacion').attr('value', 'Guardando titulación...');			
+		return true;
+	});
+	
+	
 });
 </script>

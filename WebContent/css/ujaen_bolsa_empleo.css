@@ -64,8 +64,12 @@
 	background-image: url(../img/md/file_download.svg);
 }
 
-#merito_preferente_form > p.helper {
+#merito_preferente_form p.helper {
 	margin-top: 0;
+}
+
+#merito_preferente_form li.selected {
+	font-weight: bold;
 }
 
 /* grid system */
