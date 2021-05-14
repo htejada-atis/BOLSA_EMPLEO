@@ -98,7 +98,7 @@ public class ControladorInicio extends HttpServlet {
 			nombreAccion = ACCION_INDEX;
 		}
 		try {
-			init(bean, datos, request);
+			init(bean, datos, request, response);
 			
 			switch (nombreAccion) {
 				case ACCION_INDEX:
@@ -140,11 +140,17 @@ public class ControladorInicio extends HttpServlet {
 		}
 	}
 	
-	private void init(VistaInicio bean, UVDatos datos, HttpServletRequest request) throws SQLException, UVException {
+	private void init(VistaInicio bean, UVDatos datos, HttpServletRequest request, HttpServletResponse response) throws SQLException, UVException, IOException {
 		bean.setVista(JSP_INICIO);
 		BolsaEmpleoUtils.readMensajeSession(bean, request);
-		boolean existe = ModeloUsuarioBolsaEmpleo.obtenerInstancia().checkUser(datos);
-		bean.setAnonimo(!existe);
+		
+		try {
+			boolean existe = ModeloUsuarioBolsaEmpleo.obtenerInstancia().checkUser(datos);
+			bean.setAnonimo(!existe);
+		} catch (UVException e) {
+			BolsaEmpleoUtils.addMensajeDeError(e.getMessage(), bean, request);
+			response.sendRedirect("/srv/es/informacionadministrativa/bolsaempleo/error");
+		}
 	}
 	
 	private void errorFatal(VistaInicio bean, String mensaje) {
