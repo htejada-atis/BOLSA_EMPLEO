@@ -1,0 +1,7 @@
+DROP TABLE TBEP_HTO_SOLICITUD_BOLSAS;
+--/////////////////////
+DROP TABLE TBEP_SOLICITUD_BOLSAS;
+--/////////////////////
+DROP SEQUENCE QBEP_SBO;
+--/////////////////////
+DROP SEQUENCE QBEP_HTO_SBO;

@@ -5,36 +5,53 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
+
+import org.junit.FixMethodOrder;
 import org.junit.Test;
-import es.ujaen.uvirtual.beans.uvirtual.bolsaempleo.ApartadoBaremacion;
-import es.ujaen.uvirtual.beans.uvirtual.bolsaempleo.BloqueBaremacion;
+import org.junit.runners.MethodSorters;
+
+import es.ujaen.uvirtual.modulo.bolsaempleo.beans.ApartadoBaremacion;
+import es.ujaen.uvirtual.modulo.bolsaempleo.beans.BloqueBaremacion;
 
 /** test bloque.
  *
  */
+@FixMethodOrder(MethodSorters.NAME_ASCENDING)
 public class TestBEPBeanBloqueBaremacion {
-
-	private static final String CADENA = "cadena";
-	private static final Boolean BOOLEANO = true;
+	
+	private static final Integer APARTADO_CODNUM = 4;
+	private static final String APARTADO_CODIGO = "AAA";
+	private static final String APARTADO_NOMBRE = "EEEE";
+	private static final Boolean APARTADO_ACTIVO = true;
+	private static final Float APARTADO_PUNTUACIONMAXIMA = (float) 1;
+	private static final Float APARTADO_PORCENTAJEMAXIMO = (float) 1;
+	
+	private static final Integer BLOQUE_CODNUM = 7;
+	private static final String BLOQUE_CODIGO = "A";
+	private static final String BLOQUE_NOMBRE = "EE";
+	private static final Boolean BLOQUE_ACTIVO = true;
+	private static final ApartadoBaremacion BLOQUE_APARTADO =
+			new ApartadoBaremacion(APARTADO_CODNUM, APARTADO_CODIGO, APARTADO_NOMBRE, APARTADO_ACTIVO, APARTADO_PUNTUACIONMAXIMA, APARTADO_PORCENTAJEMAXIMO);
+	private static final Integer BLOQUE_NUM_MAXIMO_MERITOS = 1;
 	
 	/** test constructor.
 	 * 
 	 */
 	@Test
 	public void testA01() {
-		Integer id = 1;
-		ApartadoBaremacion apartado = new ApartadoBaremacion();
+
 		BloqueBaremacion bloque = new BloqueBaremacion();
-		bloque.setCodNum(id);
-		bloque.setCodigo(CADENA);
-		bloque.setNombre(CADENA);
-		bloque.setActivo(BOOLEANO);
-		bloque.setApartadoBaremacion(apartado);
-		assertEquals(id, bloque.getCodNum());
-		assertEquals(CADENA, bloque.getCodigo());
-		assertEquals(CADENA, bloque.getNombre());
-		assertEquals(BOOLEANO, bloque.isActivo());
-		assertEquals(apartado, bloque.getApartadoBaremacion());
+    	bloque.setCodNum(BLOQUE_CODNUM);
+    	bloque.setCodigo(BLOQUE_CODIGO);
+    	bloque.setNombre(BLOQUE_NOMBRE);
+    	bloque.setActivo(BLOQUE_ACTIVO);
+    	bloque.setApartadoBaremacion(BLOQUE_APARTADO);
+    	bloque.setNumeroMaximoMeritos(BLOQUE_NUM_MAXIMO_MERITOS);
+		assertEquals(BLOQUE_CODNUM, bloque.getCodNum());
+		assertEquals(BLOQUE_CODIGO, bloque.getCodigo());
+		assertEquals(BLOQUE_NOMBRE, bloque.getNombre());
+		assertEquals(BLOQUE_ACTIVO, bloque.isActivo());
+		assertEquals(BLOQUE_APARTADO, bloque.getApartadoBaremacion());
 		assertNotNull(bloque.toString());
 	}
 	
@@ -43,14 +60,13 @@ public class TestBEPBeanBloqueBaremacion {
 	 */
 	@Test
 	public void testA02() {
-		Integer id = 1;
-		ApartadoBaremacion apartado = new ApartadoBaremacion();
-		BloqueBaremacion bloque = new BloqueBaremacion(id, apartado, CADENA, CADENA, BOOLEANO);
-		assertEquals(id, bloque.getCodNum());
-		assertEquals(CADENA, bloque.getCodigo());
-		assertEquals(CADENA, bloque.getNombre());
-		assertEquals(BOOLEANO, bloque.isActivo());
-		assertEquals(apartado, bloque.getApartadoBaremacion());
+
+		BloqueBaremacion bloque = new BloqueBaremacion(BLOQUE_CODNUM, BLOQUE_APARTADO, BLOQUE_CODIGO, BLOQUE_NOMBRE, BLOQUE_ACTIVO, BLOQUE_NUM_MAXIMO_MERITOS);
+		assertEquals(BLOQUE_CODNUM, bloque.getCodNum());
+		assertEquals(BLOQUE_CODIGO, bloque.getCodigo());
+		assertEquals(BLOQUE_NOMBRE, bloque.getNombre());
+		assertEquals(BLOQUE_ACTIVO, bloque.isActivo());
+		assertEquals(BLOQUE_APARTADO, bloque.getApartadoBaremacion());
 		assertNotNull(bloque.toString());
 	}
 	
@@ -58,18 +74,17 @@ public class TestBEPBeanBloqueBaremacion {
 	 */
 	@Test
 	public void testA03() {
-		Integer id = 1;
-		ApartadoBaremacion apartado = new ApartadoBaremacion();
-		BloqueBaremacion bloque2 = new BloqueBaremacion(id, apartado, CADENA, CADENA, BOOLEANO);
+
+		BloqueBaremacion bloque2 = new BloqueBaremacion(BLOQUE_CODNUM, BLOQUE_APARTADO, BLOQUE_CODIGO, BLOQUE_NOMBRE, BLOQUE_ACTIVO, BLOQUE_NUM_MAXIMO_MERITOS);
 		BloqueBaremacion bloque = new BloqueBaremacion(bloque2);
-		bloque.setCodNum(id);
-		bloque.setCodigo(CADENA);
-		bloque.setNombre(CADENA);
-		bloque.setActivo(BOOLEANO);
-		assertEquals(id, bloque.getCodNum());
-		assertEquals(CADENA, bloque.getCodigo());
-		assertEquals(CADENA, bloque.getNombre());
-		assertEquals(BOOLEANO, bloque.isActivo());
+		bloque.setCodNum(BLOQUE_CODNUM);
+		bloque.setCodigo(BLOQUE_CODIGO);
+		bloque.setNombre(BLOQUE_NOMBRE);
+		bloque.setActivo(BLOQUE_ACTIVO);
+		assertEquals(BLOQUE_CODNUM, bloque.getCodNum());
+		assertEquals(BLOQUE_CODIGO, bloque.getCodigo());
+		assertEquals(BLOQUE_NOMBRE, bloque.getNombre());
+		assertEquals(BLOQUE_ACTIVO, bloque.isActivo());
 		assertNotNull(bloque.toString());
 		assertTrue(bloque.equals(bloque2));
 		assertTrue(bloque.hashCode() == bloque2.hashCode());
@@ -81,9 +96,8 @@ public class TestBEPBeanBloqueBaremacion {
 	@Test
 	@SuppressWarnings("java:S2159")
 	public void testA04() {
-		Integer id = 1;
-		ApartadoBaremacion apartado = new ApartadoBaremacion();
-		BloqueBaremacion bloque3 = new BloqueBaremacion(id, apartado, CADENA, CADENA, BOOLEANO);
+
+		BloqueBaremacion bloque3 = new BloqueBaremacion(BLOQUE_CODNUM, BLOQUE_APARTADO, BLOQUE_CODIGO, BLOQUE_NOMBRE, BLOQUE_ACTIVO, BLOQUE_NUM_MAXIMO_MERITOS);
 		BloqueBaremacion bloque2 = new BloqueBaremacion();
 		BloqueBaremacion bloque = new BloqueBaremacion();
 		assertTrue(bloque.equals(bloque2));

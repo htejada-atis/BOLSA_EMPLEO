@@ -12,7 +12,9 @@ import java.util.List;
 import javax.sql.DataSource;
 
 import org.junit.BeforeClass;
+import org.junit.FixMethodOrder;
 import org.junit.Test;
+import org.junit.runners.MethodSorters;
 
 import bbdd.BbddRunner;
 import bbdd.UtilsTestDocentia;
@@ -22,6 +24,7 @@ import es.ujaen.uvirtual.modelo.conexion.Conexion;
 import es.ujaen.uvirtual.utilidades.UVException;
 
 /** Clase para probar el modelo convocatoria. */
+@FixMethodOrder(MethodSorters.NAME_ASCENDING)
 public class TestModeloConvocatoria {
 	
     private static final String FORMATO_FECHA = "dd/MM/yyyy";

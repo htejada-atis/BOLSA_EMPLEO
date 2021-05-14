@@ -1,8 +1,8 @@
 <%@ page trimDirectiveWhitespaces="true"%>
-<%@	page import="es.ujaen.uvirtual.controlador.infadministrativa.bolsaempleo.ControladorInicio"%>
-<%@	page import="es.ujaen.uvirtual.controlador.infadministrativa.bolsaempleo.ControladorGestionFicheros"%>
-<%@ page import="es.ujaen.uvirtual.beans.vistas.uvirtual.bolsaempleo.VistaInicio" %>
-<%@ page import="es.ujaen.uvirtual.beans.uvirtual.bolsaempleo.Fichero" %>
+<%@	page import="es.ujaen.uvirtual.modulo.bolsaempleo.controlador.ControladorInicio"%>
+<%@	page import="es.ujaen.uvirtual.modulo.bolsaempleo.controlador.configuracion.ControladorGestionFicheros"%>
+<%@ page import="es.ujaen.uvirtual.modulo.bolsaempleo.vistas.VistaInicio" %>
+<%@ page import="es.ujaen.uvirtual.modulo.bolsaempleo.beans.Fichero" %>
 <%@ page import="es.ujaen.uvirtual.beans.UVDatos"%>
 
 <% 
@@ -11,6 +11,18 @@ VistaInicio bean = (VistaInicio)uvdatos.getVistas().get(VistaInicio.class.getNam
 %>
 
 <div class="bolsa-empleo">
+
+	<% if (bean.getMensajesDeExito().size() > 0) { %>
+		<div id="exito" class="success">
+			<%= bean.formatearMensajesDeExito() %>
+		</div>
+	<% } %>
+	<% if (bean.getMensajesDeError().size() > 0) { %>
+		<div id="error" class="error">
+			<%= bean.formatearMensajesDeError() %>
+		</div>
+	<% } %>
+
 	<h2>Documentos de interés</h2>
 	
 	<div class="nav-bolsa-empleo">
@@ -36,7 +48,7 @@ VistaInicio bean = (VistaInicio)uvdatos.getVistas().get(VistaInicio.class.getNam
     				<li><a href="<%= link %>" target="_blank"><%= titulo %></a></li>
     			<% }
     			} else { %>
-    				<p>No hay documentos disponibles.</p>
+    				<li><p>No hay documentos disponibles.</p></li>
     		 <% }
     		%>
     			

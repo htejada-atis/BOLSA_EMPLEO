@@ -1,8 +1,8 @@
 <%@ page trimDirectiveWhitespaces="true"%>
 <%@ page import="es.ujaen.uvirtual.beans.UVDatos"%>
-<%@	page import="es.ujaen.uvirtual.controlador.infadministrativa.bolsaempleo.ControladorBolsas"%>
-<%@ page import="es.ujaen.uvirtual.beans.vistas.uvirtual.bolsaempleo.VistaEstadoBolsas"%>
-<%@ page import="es.ujaen.uvirtual.beans.uvirtual.bolsaempleo.Bolsa"%>
+<%@	page import="es.ujaen.uvirtual.modulo.bolsaempleo.controlador.ControladorBolsas"%>
+<%@ page import="es.ujaen.uvirtual.modulo.bolsaempleo.vistas.VistaEstadoBolsas"%>
+<%@ page import="es.ujaen.uvirtual.modulo.bolsaempleo.beans.Bolsa"%>
 <%@ page import="es.ujaen.uvirtual.utilidades.EscapaHTML" %>
 <%@ page import="es.ujaen.uvirtual.utilidades.Formateador"%>
 
@@ -11,7 +11,19 @@ UVDatos uvdatos = (UVDatos) request.getAttribute(UVDatos.NOMBRE_ATRIBUTO);
 VistaEstadoBolsas bean = (VistaEstadoBolsas) uvdatos.getVistas().get(VistaEstadoBolsas.class.getName());
 %>
 
-<div class='bolsas'>
+<div class='bolsa-empleo'>
+	<% 
+		Integer bloqueadas = null;
+		Integer revisadas = null;
+		Integer baremables = null;
+		Integer totales = null;
+
+		bloqueadas = bean.getTotalBolsasBloqueadas();
+		revisadas = bean.getTotalBolsasRevisadas();
+		baremables = bean.getTotalBolsasBaremables();
+		totales = bean.getTotalBolsas();
+	%>
+
 	<% if (bean.getMensajesDeExito().size() > 0) { %>
 		<div id="exito" class="success">
 			<%= bean.formatearMensajesDeExito() %>
@@ -21,8 +33,31 @@ VistaEstadoBolsas bean = (VistaEstadoBolsas) uvdatos.getVistas().get(VistaEstado
 		<div id="error" class="error">
 			<%= bean.formatearMensajesDeError() %>
 		</div>
-	<% } else { %>
+	<% } %>
+	
 	<h2>Estado de las bolsas</h2>
+	
+	<div class="titulo-bolsa-empleo">
+		<div class="form-group-container col3">
+	    	<div class="form-group">
+    				<p>Total de bolsas bloqueadas:
+    					<%= bloqueadas %> / <%= totales %>
+    				</p>
+    		</div>
+    		<div class="form-group">
+    				<p>Total de bolsas revisadas:
+    				   <%= revisadas %> / <%= totales %>
+    				</p>
+    		</div>
+    		<div class="form-group">
+    				<p>Total de bolsas baremables:
+    				   <%= baremables %> / <%= totales %>
+    				</p>
+    		</div>
+		</div>
+		
+	</div>
+	
 	
 	<table class="bluetable bolsaempleo" id="table">
 		<tr>
@@ -43,7 +78,7 @@ VistaEstadoBolsas bean = (VistaEstadoBolsas) uvdatos.getVistas().get(VistaEstado
 			</tr>
 		</tfoot>
 	</table>
-	<% } %>
+	
 </div>
 	
 <script>
@@ -51,19 +86,20 @@ $(document).ready(function() {
 	var table = new Atis.DataTable('#table', {
 	    "ajax": { url: "/srv/es/ajax/informacionadministrativa/bolsaempleo/bolsas" },
 	    "selectable": true,
-	    "pageSize": 10,
+	    "pageSize": 5,
+	    "filterable": true,
 	    "action": "<%= ControladorBolsas.ACCION_DATATABLE %>",
 	    "defaultOrderBy": 2,
-	    "defaultOrderDirection": 'desc'.
+	    "defaultOrderDirection": 'asc',
 	    "columns": [
 	    	{'data': 'codNum', 'selectable': true},
-	        {'data': 'codNum'},
-	        {'data': 'area.descripcion'},
-	        {'data': 'estado'},
-	        {'data': 'fechaActualizacion'},
-	        {'data': 'fechaBloqueo'},
-	        {'data': 'fechaDesBloqueo'},
-	        {'data': 'baremable', 'render': function(row) {
+	        {'data': 'codNum', 'filter': {'type': 'number'}},
+	        {'data': 'area.descripcion', 'filter': true},
+	        {'data': 'estado', 'filter': {'type': 'select', 'options': {'BLOQUEADA':'Bloqueada', 'REVISION':'Revisión', 'BAREMACION':'Baremación', 'ALEGACIONES':'Alegaciones', 'DESBLOQUEADA':'Desbloqueada'}} },
+	        {'data': 'fechaActualizacion', 'filter': {'type': 'date'}},
+	        {'data': 'fechaBloqueo', 'filter': {'type': 'date'}},
+	        {'data': 'fechaDesBloqueo', 'filter': {'type': 'date'}},
+	        {'data': 'baremable', 'filter': {'type': 'select', 'options': {'true': 'Baremable', 'false': 'No Baremable'} , 'optionDefault': 'true'}, 'render': function(row) {
         		if(row.baremable){
         			return "<div title='Baremable' class='circle-true'></div>"; 
         		}

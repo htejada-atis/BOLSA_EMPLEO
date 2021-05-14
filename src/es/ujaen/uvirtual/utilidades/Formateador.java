@@ -145,19 +145,6 @@ public class Formateador {
 	}
 	
 	/**
-	 * Trata de convertir a Float el valor recibido como parámetro. Si la conversión falla, devuelve null, de modo que nunca salte una excepción
-	 * @param valor valor
-	 * @return El valor convertido a float, o null si no es posible
-	 */
-	public static Float leeParametroFloat(String valor) {
-		try {
-			return Float.parseFloat(valor);
-		} catch (Exception e) {
-			return null;
-		}
-	}
-	
-	/**
 	 * Recibe un array de parámetros (o sea, el valor de varios campos de un mismo formulario que tienen el mismo nombre) y devuelve el mismo array, 
 	 * pero con todos los valores recortados los espacios iniciales y finales, y reemplazando los null por cadenas vacías.
 	 * Si el array es null o está vacío, devuelve un String[0]
@@ -181,9 +168,6 @@ public class Formateador {
 		return parametrosSinNulos;
 	}
 	
-	
-	
-	
 	/**
 	 * Trata de convertir a Integer el valor recibido como parámetro. 
 	 * Si la conversión falla, devuelve el valor valorPorDefecto que pasemos como parámetro (convertido de int a Integer).
@@ -200,6 +184,39 @@ public class Formateador {
 		}
 	}
 	
+	/** obtiene la fecha en formato yyyyMMdd.
+	 * @param valor cadena a analizar para obtener la fecha
+	 * @param separador separador de ano mes día
+	 * @return cadena en formato yyyyMMdd
+	 */
+	@SuppressWarnings({"checkstyle:magicnumber"})
+	private static String obtenerFechaAnoMesDia(String valor, String separador) {
+		String strDia = null;
+		String strMes = null;
+		String strAnio = null;
+		if (valor == null || "".equals(valor)) {
+			return null;
+		} else {
+			if ("".equals(separador)) {
+				if (valor.length() != 8) {
+					return null;
+				}
+				strDia = valor.substring(0, 2);
+				strMes = valor.substring(2, 4);
+				strAnio = valor.substring(4, 8);
+			} else {
+				String[] campos = valor.split(separador);
+				if (campos.length != 3) {
+					return null;
+				}
+				strDia = campos[0].length() == 1 ? "0" + campos[0] : campos[0];
+				strMes = campos[1].length() == 1 ? "0" + campos[1] : campos[1];
+				strAnio = campos[2];
+			}
+		}
+		
+		return strAnio + strMes + strDia;
+	}
 	
 	/**
 	 * Trata de convertir a Date el valor recibido como parámetro. Si la conversión falla, devuelve null, de modo que nunca salte una excepción
@@ -210,7 +227,6 @@ public class Formateador {
 	 * @return fecha en formato date
 	 * @throws UVException si error de formato
 	 */
-	@SuppressWarnings({"checkstyle:magicnumber", "checkstyle:CyclomaticComplexity", "checkstyle:NPathComplexity"})
 	public static Date leeParametroFecha(String valor, String formato, String separador) throws UVException {
 		String eNombreDeEsteMetodo = "leeParametroFecha";
 		Date dateFecha = null;
@@ -228,36 +244,14 @@ public class Formateador {
 					+ "También está permitido no usar ningún separador.", MENSAJE_ERROR_APLICACION, true);
 		}
 		
-		String strDia = null;
-		String strMes = null;
-		String strAnio = null;
-		if (valor == null || "".equals(valor)) {
-			return null;
-		} else {
-			if ("".equals(separador2)) {
-				if (valor.length() != 8) {
-					return null;
-				}
-				strDia = valor.substring(0, 2);
-				strMes = valor.substring(2, 4);
-				strAnio = valor.substring(4, 8);
-			} else {
-				String[] campos = valor.split(separador2);
-				if (campos.length != 3) {
-					return null;
-				}
-				strDia = campos[0].length() == 1 ? "0" + campos[0] : campos[0];
-				strMes = campos[1].length() == 1 ? "0" + campos[1] : campos[1];
-				strAnio = campos[2];
-			}
-		}
-		
-		String strFecha = strAnio + strMes + strDia;
 		SimpleDateFormat formatoFecha = new SimpleDateFormat("yyyyMMdd");
 		formatoFecha.setLenient(false);
 		// Comprobamos que la fecha tiene un valor correcto
 		try {
-			dateFecha = formatoFecha.parse(strFecha);
+			String strFecha = obtenerFechaAnoMesDia(valor, separador2);
+			if (strFecha != null) {
+				dateFecha = formatoFecha.parse(strFecha);
+			}
 		} catch (ParseException e) {
 			return null;
 		}

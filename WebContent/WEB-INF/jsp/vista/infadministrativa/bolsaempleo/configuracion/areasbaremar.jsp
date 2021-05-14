@@ -1,7 +1,7 @@
 <%@ page trimDirectiveWhitespaces="true"%>
 <%@ page import="es.ujaen.uvirtual.beans.UVDatos"%>
-<%@	page import="es.ujaen.uvirtual.controlador.infadministrativa.bolsaempleo.ControladorAreasABaremar"%>
-<%@ page import="es.ujaen.uvirtual.beans.vistas.uvirtual.bolsaempleo.VistaAreasBaremar"%>
+<%@	page import="es.ujaen.uvirtual.modulo.bolsaempleo.controlador.configuracion.ControladorAreasABaremar"%>
+<%@ page import="es.ujaen.uvirtual.modulo.bolsaempleo.vistas.VistaAreasBaremar"%>
 <%@ page import="es.ujaen.uvirtual.utilidades.EscapaHTML" %>
 
 <% 
@@ -9,7 +9,8 @@ UVDatos uvdatos = (UVDatos) request.getAttribute(UVDatos.NOMBRE_ATRIBUTO);
 VistaAreasBaremar bean = (VistaAreasBaremar) uvdatos.getVistas().get(VistaAreasBaremar.class.getName());
 %>
 
-<div class='bolsas'>
+<div class='bolsa-empleo areasbaremar'>
+
 	<% if (bean.getMensajesDeExito().size() > 0) { %>
 		<div id="exito" class="success">
 			<%= bean.formatearMensajesDeExito() %>
@@ -19,14 +20,21 @@ VistaAreasBaremar bean = (VistaAreasBaremar) uvdatos.getVistas().get(VistaAreasB
 		<div id="error" class="error">
 			<%= bean.formatearMensajesDeError() %>
 		</div>
-	<% } else { %>
-	<h2>Bolsas baremables</h2>
+	<% } %>
+	
+	<div class="titulo-bolsa-empleo">
+		<h2>Áreas baremables</h2>
+    
+	    <a class="link-btn" id="importar_areas_uvirtual" href="<%= request.getRequestURI() %>">
+	    	Importar Areas UVirtual
+	    </a>
+	</div>
 	
 	<table class="bluetable bolsaempleo" id="table">
 		<tr>
 			<th scope="col" style="width:5%"></th>
 			<th scope="col" style="width:5%" title="Id de la area">Id</th>
-			<th scope="col" style="width:25%" title="Código de area">Código</th>
+			<th scope="col" style="width:25%" class="codigo" title="Código de area">Código</th>
 			<th scope="col" style="width:65%">Area</th>
 			<th scope="col" class="center" style="width:15%">Baremable</th>			
 		</tr>
@@ -38,7 +46,7 @@ VistaAreasBaremar bean = (VistaAreasBaremar) uvdatos.getVistas().get(VistaAreasB
 			</tr>
 		</tfoot>
 	</table>
-	<% } %>
+	
 </div>
 	
 <script>
@@ -48,12 +56,13 @@ $(document).ready(function() {
 	    "selectable": true,
 	    "pageSize": 10,
 	    "action": "<%= ControladorAreasABaremar.ACCION_DATATABLE %>",
+	    "filterable": true,
 	    "columns": [
 	    	{'data': 'codNum', 'selectable': true},
-	        {'data': 'codNum'},
-	        {'data': 'area.idAreaExterno'},
-	        {'data': 'area.descripcion'},
-	        {'data': 'baremable', 'render': function(row) {
+	        {'data': 'codNum', 'filter': {'type': 'number'}},
+	        {'data': 'area.idAreaExterno', 'filter': true},
+	        {'data': 'area.descripcion', 'filter': true},
+	        {'data': 'baremable', 'filter': {'type': 'select', 'options': {'true': 'baremable', 'false': 'no baremable'}}, 'render': function(row) {
         		if(row.baremable){
         			return "<div title='Baremable' class='circle-true'></div>"; 
         		}
@@ -82,5 +91,11 @@ $(document).ready(function() {
 		
    		Atis.sendForm("<%= request.getRequestURI() %>", params);
 	}
+	
+	document.getElementById("importar_areas_uvirtual").addEventListener("click", function(event) {
+		event.preventDefault();
+		Atis.sendForm("<%= request.getRequestURI() %>", {'a': '<%=ControladorAreasABaremar.ACCION_IMPORTAR_AREAS_UVIRTUAL%>'});
+	});
+	
 }); 
 </script>

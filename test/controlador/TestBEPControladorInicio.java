@@ -6,25 +6,32 @@ import java.io.IOException;
 import java.sql.SQLException;
 import javax.servlet.ServletException;
 import org.junit.BeforeClass;
+import org.junit.FixMethodOrder;
 import org.junit.Test;
+import org.junit.runners.MethodSorters;
+
 import bbdd.BbddRunner;
 import bbdd.UtilsTestBolsaEmpleo;
 import controlador.implementacion.PeticionHttp;
 import controlador.implementacion.RespuestaHttp;
-import es.ujaen.uvirtual.beans.vistas.uvirtual.bolsaempleo.VistaInicio;
-import es.ujaen.uvirtual.controlador.infadministrativa.bolsaempleo.ControladorInicio;
+import es.ujaen.uvirtual.modulo.bolsaempleo.controlador.ControladorInicio;
+import es.ujaen.uvirtual.modulo.bolsaempleo.vistas.VistaInicio;
 
-/** test controlador convocatoria crud.
- * @author jmoral
+/** test controlador inicio.
+ * @author jlopez
  *
  */
+@FixMethodOrder(MethodSorters.NAME_ASCENDING)
 public class TestBEPControladorInicio {
+	
+	private static final String MENSAJE_CON_ERROR = "Debe devolver error";
 	private static final String MENSAJE_DOCUMENTOS_DEVUELTOS = "Debe devolver documentos";
 	private static final String MENSAJE_FICHERO_PUBLICO = "Fichero debe ser público";
 	private static final String MENSAJE_NOTICIAS_DEVUELTAS = "Debe devolver noticias";
 	private static final String MENSAJE_NOTICIA_PUBLICA = "Noticia debe ser pública";
 	private static final String MENSAJE_SIN_ERROR = "No debe devolver error";
 	private static final String MENSAJE_SIN_ADVERTENCIAS = "No debe mostrar advertencias";
+	private static final String MENSAJE_SIN_EXITO = "No debe exito";
 		
     /** Prepara la bd con los datos iniciales.
      * @throws SQLException si error en bd
@@ -37,7 +44,7 @@ public class TestBEPControladorInicio {
     }
     
     private VistaInicio obtenerInicio(String accion) throws ServletException, IOException {
-    	PeticionHttp peticion = UtilsTestBolsaEmpleo.peticionAutenticada();
+    	PeticionHttp peticion = UtilsTestBolsaEmpleo.peticionAutenticadaPersonal();
 		peticion.setParameter(ControladorInicio.PARAM_ACCION, accion);
 
 		RespuestaHttp respuesta = new RespuestaHttp();
@@ -76,7 +83,7 @@ public class TestBEPControladorInicio {
 	 */
 	@Test
 	public void testA02ObtenerNoticias() throws SQLException, ServletException, IOException {
-		VistaInicio bean = obtenerInicio(ControladorInicio.ACCION_LISTAR_NOTICIAS);
+		VistaInicio bean = obtenerInicio(ControladorInicio.ACCION_INDEX);
 
 		assertNotEquals(MENSAJE_NOTICIAS_DEVUELTAS, 0, bean.getNoticias().size());
 		assertEquals(MENSAJE_SIN_ERROR, 0, bean.getMensajesDeError().size());
@@ -90,7 +97,7 @@ public class TestBEPControladorInicio {
 	 */
 	@Test
 	public void testA03Post() throws ServletException, IOException {
-		PeticionHttp peticion = UtilsTestBolsaEmpleo.peticionAutenticada();
+		PeticionHttp peticion = UtilsTestBolsaEmpleo.peticionAutenticadaPersonal();
 		peticion.setParameter(ControladorInicio.PARAM_ACCION, ControladorInicio.ACCION_AYUDA);
 		
 		RespuestaHttp respuesta = new RespuestaHttp();
@@ -108,7 +115,7 @@ public class TestBEPControladorInicio {
 	 */
 	@Test
 	public void testA04Post() throws ServletException, IOException {
-		PeticionHttp peticion = UtilsTestBolsaEmpleo.peticionAutenticada();
+		PeticionHttp peticion = UtilsTestBolsaEmpleo.peticionAutenticadaPersonal();
 		peticion.setParameter(ControladorInicio.PARAM_ACCION, ControladorInicio.ACCION_FAQ);
 		
 		RespuestaHttp respuesta = new RespuestaHttp();
@@ -126,9 +133,9 @@ public class TestBEPControladorInicio {
 	 */
 	@Test
 	public void testA05Obtener() throws ServletException, IOException {
-		VistaInicio bean = obtenerInicio(ControladorInicio.ACCION_LISTAR_NOTICIAS);
+		VistaInicio bean = obtenerInicio(ControladorInicio.ACCION_INDEX);
 		
-		PeticionHttp peticion = UtilsTestBolsaEmpleo.peticionAutenticada();
+		PeticionHttp peticion = UtilsTestBolsaEmpleo.peticionAutenticadaPersonal();
 		peticion.setParameter(ControladorInicio.PARAM_ACCION, ControladorInicio.ACCION_LISTAR_TODAS_NOTICIAS);
 		peticion.setParameter(ControladorInicio.PARAM_NOTICIAS, 
 				"[" + bean.getNoticias().get(0).getCodNum().toString() + "]");
@@ -150,7 +157,7 @@ public class TestBEPControladorInicio {
 	 */
 	@Test
 	public void testA06Post() throws ServletException, IOException {
-		PeticionHttp peticion = UtilsTestBolsaEmpleo.peticionAutenticada();
+		PeticionHttp peticion = UtilsTestBolsaEmpleo.peticionAutenticadaPersonal();
 		peticion.setParameter(ControladorInicio.PARAM_ACCION, ControladorInicio.ACCION_DOCUMENTOS);
 		
 		RespuestaHttp respuesta = new RespuestaHttp();
@@ -197,7 +204,7 @@ public class TestBEPControladorInicio {
 	 */
 	@Test
 	public void testA09ObtenerNoticiaPublica() throws SQLException, ServletException, IOException {
-		VistaInicio bean = obtenerInicioPublico(ControladorInicio.ACCION_LISTAR_NOTICIAS);
+		VistaInicio bean = obtenerInicioPublico(ControladorInicio.ACCION_INDEX);
 
 		assertNotEquals(MENSAJE_NOTICIAS_DEVUELTAS, 0, bean.getNoticias().size());
 		assertEquals(MENSAJE_SIN_ERROR, 0, bean.getMensajesDeError().size());
@@ -217,6 +224,64 @@ public class TestBEPControladorInicio {
 		assertEquals(MENSAJE_SIN_ERROR, 0, bean.getMensajesDeError().size());
 		assertEquals(MENSAJE_SIN_ADVERTENCIAS, 0, bean.getMensajesDeAdvertencia().size());
 		assertEquals(MENSAJE_FICHERO_PUBLICO, true, bean.getFicheros().get(0).isPublico());
+	}
+	
+	/** obtener todas las noticias con parámetro 'noticias' no válido .
+	 * @throws ServletException .
+	 * @throws IOException .
+	 */
+	@Test
+	public void testE01ObtenerTodasNoticiasParametroNoValido() throws ServletException, IOException {
+		VistaInicio bean = obtenerInicio(ControladorInicio.ACCION_INDEX);
+		
+		PeticionHttp peticion = UtilsTestBolsaEmpleo.peticionAutenticadaPersonal();
+		peticion.setParameter(ControladorInicio.PARAM_ACCION, ControladorInicio.ACCION_LISTAR_TODAS_NOTICIAS);
+		peticion.setParameter(ControladorInicio.PARAM_NOTICIAS, bean.getNoticias().get(0).getCodNum().toString());
+		
+		RespuestaHttp respuesta = new RespuestaHttp();
+		ControladorInicio controlador = new ControladorInicio();
+		controlador.doPost(peticion, respuesta);
+		VistaInicio bean2 = (VistaInicio) peticion.getUVDatos().getVistas().get(VistaInicio.class.getName());
+		
+		assertEquals(MENSAJE_CON_ERROR, 1, bean2.getMensajesDeError().size());
+		assertEquals(MENSAJE_SIN_EXITO, 0, bean2.getMensajesDeExito().size());
+	}
+	
+	/** Descargar fichero no válido .
+	 * @throws ServletException .
+	 * @throws IOException .
+	 */
+	@Test
+	public void testE02DescargarFicheroNoValido() throws ServletException, IOException {
+		PeticionHttp peticion = UtilsTestBolsaEmpleo.peticionAutenticadaPersonal();
+		peticion.setParameter(ControladorInicio.PARAM_ACCION, ControladorInicio.ACCION_DESCARGAR_FICHERO);
+		peticion.setParameter(ControladorInicio.PARAM_FICHERO, "-1");
+		
+		RespuestaHttp respuesta = new RespuestaHttp();
+		ControladorInicio controlador = new ControladorInicio();
+		controlador.doPost(peticion, respuesta);
+		VistaInicio bean = (VistaInicio) peticion.getUVDatos().getVistas().get(VistaInicio.class.getName());
+		
+		assertEquals(MENSAJE_CON_ERROR, 1, bean.getMensajesDeError().size());
+		assertEquals(MENSAJE_SIN_EXITO, 0, bean.getMensajesDeExito().size());
+	}
+	
+	/** Descargar fichero sin fichero .
+	 * @throws ServletException .
+	 * @throws IOException .
+	 */
+	@Test
+	public void testE03DescargarFicheroSinFichero() throws ServletException, IOException {
+		PeticionHttp peticion = UtilsTestBolsaEmpleo.peticionAutenticadaPersonal();
+		peticion.setParameter(ControladorInicio.PARAM_ACCION, ControladorInicio.ACCION_DESCARGAR_FICHERO);
+		
+		RespuestaHttp respuesta = new RespuestaHttp();
+		ControladorInicio controlador = new ControladorInicio();
+		controlador.doPost(peticion, respuesta);
+		VistaInicio bean = (VistaInicio) peticion.getUVDatos().getVistas().get(VistaInicio.class.getName());
+		
+		assertEquals(MENSAJE_CON_ERROR, 1, bean.getMensajesDeAdvertencia().size());
+		assertEquals(MENSAJE_SIN_EXITO, 0, bean.getMensajesDeExito().size());
 	}
 
 }

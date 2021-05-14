@@ -12,7 +12,9 @@ import java.util.logging.Logger;
 import org.junit.AfterClass;
 import org.junit.Before;
 import org.junit.BeforeClass;
+import org.junit.FixMethodOrder;
 import org.junit.Test;
+import org.junit.runners.MethodSorters;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.ui.ExpectedConditions;
@@ -21,14 +23,15 @@ import org.openqa.selenium.support.ui.WebDriverWait;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 
-import es.ujaen.uvirtual.beans.uvirtual.bolsaempleo.UsuarioBolsaEmpleo;
-import es.ujaen.uvirtual.controlador.infadministrativa.bolsaempleo.ControladorUsuarioBolsaEmpleo;
-import es.ujaen.uvirtual.utilidades.BolsaEmpleoDataTable;
+import es.ujaen.uvirtual.modulo.bolsaempleo.beans.UsuarioBolsaEmpleo;
+import es.ujaen.uvirtual.modulo.bolsaempleo.controlador.configuracion.ControladorUsuarioBolsaEmpleo;
+import es.ujaen.uvirtual.modulo.bolsaempleo.utilidades.BolsaEmpleoDataTable;
 
 /** Clase para probar configuracion.usuarios BEP .
  * @author fcampos
  *
  */
+@FixMethodOrder(MethodSorters.NAME_ASCENDING)
 public class TestBEPUsuariosBolsaEmpleo {
 	private static final String NOMBREDEESTACLASE = TestBEPUsuariosBolsaEmpleo.class.getName();
 
@@ -39,8 +42,6 @@ public class TestBEPUsuariosBolsaEmpleo {
 	private static final String DIV_MAIN_USUARIOS_BUSQUEDA = "usuarios-buscar";
 	private static final String DIV_MAIN_USUARIOS_FORM = "usuarios-form";
 	private static final String ID_TABLE = "table_usuarios";
-	private static final String ID_TABLE_BORRADOS = "table_usuarios_borrados";
-	private static final String ID_TABLE_EXCLUIDOS = "table_usuarios_excluidos";
 	private static final String CLASS_PAGINATION = "pagination";
 	private static final String CLASS_PAGINATION_LAST = "last";
 	private static final String CLASS_PAGINATION_FIRST = "first";
@@ -88,20 +89,12 @@ public class TestBEPUsuariosBolsaEmpleo {
 		
 		// esperamos a que se renderice la table
 		WebElement total = wait.until(ExpectedConditions.presenceOfNestedElementLocatedBy(getTables(main, ID_TABLE), By.className("total")));
-		WebElement totalBorrados = wait.until(ExpectedConditions.presenceOfNestedElementLocatedBy(getTables(main, ID_TABLE_BORRADOS), By.className("total")));
-		WebElement totalExcluidos = wait.until(ExpectedConditions.presenceOfNestedElementLocatedBy(getTables(main, ID_TABLE_EXCLUIDOS), By.className("total")));
 		
 		comprobarNumUsu(total);
-		comprobarNumUsu(totalBorrados);
-		comprobarNumUsu(totalExcluidos);
 		
 		comprobarOrdenacion(getTables(main, ID_TABLE));
-		comprobarOrdenacion(getTables(main, ID_TABLE_BORRADOS));
-		comprobarOrdenacion(getTables(main, ID_TABLE_EXCLUIDOS));
 
 		comprobarPaginacion(getTables(main, ID_TABLE));
-		comprobarPaginacion(getTables(main, ID_TABLE_BORRADOS));
-		comprobarPaginacion(getTables(main, ID_TABLE_EXCLUIDOS));
 		
 		comprobarSeleccionTabla(getTables(main, ID_TABLE), main);
 	}
@@ -137,7 +130,6 @@ public class TestBEPUsuariosBolsaEmpleo {
 		WebElement btnNuevo = pmain.findElement(By.id("nuevo_usuario"));
 		btnNuevo.click();
 		
-		WebDriverWait wait2 = new WebDriverWait(DriverUvBEP.getDriver(), WAIT_ELEMENT);
 		WebElement pmain2 = wait.until(ExpectedConditions.visibilityOfElementLocated(By.className(DIV_MAIN_USUARIOS_BUSQUEDA)));	
 
 		WebElement username = pmain2.findElement(By.name("nombre"));
@@ -145,7 +137,6 @@ public class TestBEPUsuariosBolsaEmpleo {
 		WebElement btnBuscar = pmain2.findElement(By.id("usuario_buscar"));
 		btnBuscar.click();
 		
-		WebDriverWait wait3 = new WebDriverWait(DriverUvBEP.getDriver(), WAIT_ELEMENT);
 		WebElement pmain3 = wait.until(ExpectedConditions.visibilityOfElementLocated(By.className(DIV_MAIN_USUARIOS_FORM)));
 		WebElement btnVolver = pmain3.findElement(By.id("usuario_enviar"));
 		btnVolver.click();
@@ -190,7 +181,7 @@ public class TestBEPUsuariosBolsaEmpleo {
 	 */
 	public void comprobarOrdenacion(WebElement tabla) {
 		System.out.print(tabla);
-		WebElement th = tabla.findElement(By.className("rol"));
+		WebElement th = tabla.findElement(By.className("user"));
 		th.click();
 		WebElement img = th.findElement(By.className("order"));
 		assertTrue(img.getAttribute("src").indexOf("down.png") != -1);

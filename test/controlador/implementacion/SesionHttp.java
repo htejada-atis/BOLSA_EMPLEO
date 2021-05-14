@@ -61,6 +61,7 @@ public class SesionHttp implements HttpSession {
 	 */
 	@Override
 	@SuppressWarnings("java:S1133")
+	@Deprecated(since = "8.1")
 	public javax.servlet.http.HttpSessionContext getSessionContext() {
 		return null;
 	}

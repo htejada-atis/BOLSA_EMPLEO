@@ -1,8 +1,8 @@
 <%@ page trimDirectiveWhitespaces="true"%>
 <%@ page import="es.ujaen.uvirtual.beans.UVDatos"%>
-<%@	page import="es.ujaen.uvirtual.controlador.infadministrativa.bolsaempleo.ControladorGestionTitulacionesPreferentesArea"%>
-<%@ page import="es.ujaen.uvirtual.beans.vistas.uvirtual.bolsaempleo.VistaTitulacionesArea"%>
-<%@ page import="es.ujaen.uvirtual.beans.uvirtual.bolsaempleo.Area" %>
+<%@	page import="es.ujaen.uvirtual.modulo.bolsaempleo.controlador.ControladorGestionTitulacionesPreferentesArea"%>
+<%@ page import="es.ujaen.uvirtual.modulo.bolsaempleo.vistas.VistaTitulacionesArea"%>
+<%@ page import="es.ujaen.uvirtual.modulo.bolsaempleo.beans.Area" %>
 <%@ page import="es.ujaen.uvirtual.utilidades.EscapaHTML" %>
 
 <%
@@ -10,7 +10,7 @@ UVDatos uvdatos = (UVDatos) request.getAttribute(UVDatos.NOMBRE_ATRIBUTO);
 VistaTitulacionesArea bean = (VistaTitulacionesArea) uvdatos.getVistas().get(VistaTitulacionesArea.class.getName());
 %>
 
-<div class="bolsa-empleo">
+<div class="bolsa-empleo titulacionespreferentes">
 	
 	<% if (bean.getMensajesDeExito().size() > 0) { %>
 		<div id="exito" class="success">
@@ -21,7 +21,7 @@ VistaTitulacionesArea bean = (VistaTitulacionesArea) uvdatos.getVistas().get(Vis
 		<div id="error" class="error">
 			<%= bean.formatearMensajesDeError() %>
 		</div>
-	<% } else {%>
+	<% } %>
 	
 	<h2>Titulaciones preferentes por área</h2>
 	
@@ -45,7 +45,7 @@ VistaTitulacionesArea bean = (VistaTitulacionesArea) uvdatos.getVistas().get(Vis
 			<tr>
 				<th scope="col" style="width:5%"></th>
 				<th scope="col" style="width:10%" title="Id de la titulación">Id</th>
-				<th scope="col"	style="width:70%">Nombre</th>
+				<th scope="col"	class="nombre" style="width:70%">Nombre</th>
 			</tr>
 			<tbody>		
 			</tbody>
@@ -60,7 +60,7 @@ VistaTitulacionesArea bean = (VistaTitulacionesArea) uvdatos.getVistas().get(Vis
 			<tr>
 				<th scope="col" style="width:5%"></th>
 				<th scope="col" style="width:10%" title="Id de la titulación">Id</th>
-				<th scope="col"	style="width:85%">Nombre</th>
+				<th scope="col"	class="nombre" style="width:85%">Nombre</th>
 			</tr>
 			<tbody>
 			</tbody>
@@ -71,7 +71,6 @@ VistaTitulacionesArea bean = (VistaTitulacionesArea) uvdatos.getVistas().get(Vis
 			</tfoot>
 		</table>
 	</div>
-	<% } %>
 </div>
 
 <script>
@@ -91,18 +90,21 @@ VistaTitulacionesArea bean = (VistaTitulacionesArea) uvdatos.getVistas().get(Vis
 			    "title": title,
 			    "action": "<%=ControladorGestionTitulacionesPreferentesArea.ACCION_DATATABLE_TITULACIONES_PREFERENTES_AREA%>",
 			    "columns": [
-			    	{'data': 'codNum', 'selectable': true, 'filterable': true},
+			    	{'data': 'codNum', 'selectable': true},
 			    	{'data': 'codNum', 'filter': {'type': 'number'}},
 			        {'data': 'nombre', 'class': 'overflow-auto', 'filter': {'type': 'text'}},
 			    ],
 			    "actions": [
 			    	{'label': 'Eliminar', 'title': 'Eliminar titulación del área', 'onClick': function(selected) {
-			    		var params = {
-			    				'a': '<%=ControladorGestionTitulacionesPreferentesArea.ACCION_ELIMINAR_TITULACION_AREA%>',
-			    				'<%=ControladorGestionTitulacionesPreferentesArea.PARAM_TITULACIONES%>': JSON.stringify(selected),
-			    				'<%=ControladorGestionTitulacionesPreferentesArea.PARAM_AREA%>': id
-			    				};
-		        		Atis.sendForm("<%=request.getRequestURI()%>", params);
+			    		if(selected.length) {
+				    		var idArea = this.getParam("<%=ControladorGestionTitulacionesPreferentesArea.PARAM_AREA%>");
+				    		var params = {
+				    				'a': '<%=ControladorGestionTitulacionesPreferentesArea.ACCION_ELIMINAR_TITULACION_AREA%>',
+				    				'<%=ControladorGestionTitulacionesPreferentesArea.PARAM_TITULACIONES%>': JSON.stringify(selected),
+				    				'<%=ControladorGestionTitulacionesPreferentesArea.PARAM_AREA%>': idArea
+				    				};
+			        		Atis.sendForm("<%=request.getRequestURI()%>", params);
+			    		}
 			    	} },
 			    ]
 			});
@@ -123,10 +125,11 @@ VistaTitulacionesArea bean = (VistaTitulacionesArea) uvdatos.getVistas().get(Vis
 			    "actions": [
 			    	{'label': 'Incluir', 'title': 'Incluir titulación en el área', 'onClick': function(selected) {
 			    		if(selected.length) {
+			    			var idArea = this.getParam("<%=ControladorGestionTitulacionesPreferentesArea.PARAM_AREA%>");
 			    			var params = {
 				    				'a': '<%=ControladorGestionTitulacionesPreferentesArea.ACCION_INCLUIR_TITULACION_AREA%>',
 				    				'<%=ControladorGestionTitulacionesPreferentesArea.PARAM_TITULACIONES%>': JSON.stringify(selected),
-				    				'<%=ControladorGestionTitulacionesPreferentesArea.PARAM_AREA%>': id
+				    				'<%=ControladorGestionTitulacionesPreferentesArea.PARAM_AREA%>': idArea
 				    				};
 			        		Atis.sendForm("<%=request.getRequestURI()%>", params);
 			    		}

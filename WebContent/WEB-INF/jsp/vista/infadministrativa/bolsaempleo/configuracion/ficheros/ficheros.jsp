@@ -1,7 +1,7 @@
 <%@ page trimDirectiveWhitespaces="true"%>
 <%@ page import="es.ujaen.uvirtual.beans.UVDatos"%>
-<%@	page import="es.ujaen.uvirtual.controlador.infadministrativa.bolsaempleo.ControladorGestionFicheros"%>
-<%@ page import="es.ujaen.uvirtual.beans.vistas.uvirtual.bolsaempleo.VistaFicheros"%>
+<%@	page import="es.ujaen.uvirtual.modulo.bolsaempleo.controlador.configuracion.ControladorGestionFicheros"%>
+<%@ page import="es.ujaen.uvirtual.modulo.bolsaempleo.vistas.VistaFicheros"%>
 <%@ page import="es.ujaen.uvirtual.utilidades.EscapaHTML" %>
 
 <% 
@@ -19,7 +19,7 @@ VistaFicheros bean = (VistaFicheros) uvdatos.getVistas().get(VistaFicheros.class
 		<div id="error" class="error">
 			<%= bean.formatearMensajesDeError() %>
 		</div>
-	<% } else {%>
+	<% } %>
 	
 	<div class="titulo-bolsa-empleo">
 		<h2>Documentos del sistema</h2>
@@ -46,7 +46,7 @@ VistaFicheros bean = (VistaFicheros) uvdatos.getVistas().get(VistaFicheros.class
 			</tr>
 		</tfoot>
 	</table>
-	<% } %>
+	
 </div>
 
 <script>
@@ -60,19 +60,15 @@ VistaFicheros bean = (VistaFicheros) uvdatos.getVistas().get(VistaFicheros.class
 		    "filterable": true,
 		    "columns": [
 		    	{'data': 'codNum', 'selectable': true},
-		        {'data': 'nombre', 'filter': true, 'render': function(row) {
-		    		return "<div class='overflow-auto'>" +row.nombre +"</div>";
-		    	}},
-		        {'data': 'titulo', 'filter': true, 'render': function(row) {
-		    		return "<div class='overflow-auto'>" +row.titulo +"</div>";
-		    	}},
+		        {'data': 'nombre', 'filter': true, 'overflow': 'auto'},
+		        {'data': 'titulo', 'filter': true, 'overflow': 'auto'},
 		        {'data': 'codnum', 'order': {'active': false}, 'class': 'overflow-ellipsis', 'render': function(row) {
 		        	var link = "<%= ControladorGestionFicheros.URL_PATTERN_FILES_PRIVADA %>"
 		        	+ "?a=<%= ControladorGestionFicheros.ACCION_DESCARGAR_FICHERO %>&<%= ControladorGestionFicheros.PARAM_FICHERO %>=" + row.codNum;
 		        	return "<a class='consultar-fichero' title='Descargar fichero' href='" +link +"' target='_blank'>" +link +"</a>"; 
 		        	}
 		        },
-		        {'data': 'publico', 'filter': {'type': 'selectBoolean'}, 'order': {'active': false}, 'render': function(row) {
+		        {'data': 'publico', 'filter': {'type': 'select', 'options': {'true': 'Públicos', 'false': 'Privados'}}, 'order': {'active': false}, 'render': function(row) {
 	        		if(row.publico){
 	        			return "<div title='Público' class='circle-true'></div>"; 
 	        		}

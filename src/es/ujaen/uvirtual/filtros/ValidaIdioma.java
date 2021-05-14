@@ -27,9 +27,9 @@ import java.util.logging.Level;
 	urlPatterns = {"/srv/*", "/pub/*" },
 	filterName = "ValidaIdioma")
 public class ValidaIdioma implements Filter {
-	protected static FilterConfig filterConfig = null;
-	protected static String codigoErrorBaseDatos = null;
-	protected static String codigoErrorIdioma = null;
+	protected FilterConfig filterConfig = null;
+	protected String codigoErrorBaseDatos = null;
+	protected String codigoErrorIdioma = null;
 	
     /**
      * Default constructor. 
@@ -41,6 +41,7 @@ public class ValidaIdioma implements Filter {
 	/** destroy.
 	 * @see Filter#destroy()
 	 */
+    @Override
 	public void destroy() {
 		filterConfig = null;
 		codigoErrorIdioma = null;

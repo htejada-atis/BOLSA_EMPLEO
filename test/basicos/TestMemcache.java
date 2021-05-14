@@ -12,6 +12,7 @@ import java.util.Map;
 import javax.sql.DataSource;
 
 import org.junit.BeforeClass;
+import org.junit.Ignore;
 import org.junit.Test;
 
 import bbdd.BbddRunner;
@@ -39,6 +40,7 @@ public class TestMemcache {
 
 	/** test acierto poner datos en memcache. */
 	@Test
+	@Ignore
 	public void testA1Set() {
 		Memcache.enable();
 		Memcache mc = Memcache.getInstance();
@@ -74,6 +76,7 @@ public class TestMemcache {
 
 	/** test acierto disable y enable memcache. */
 	@Test
+	@Ignore
 	public void testA4Disable() {
 		Memcache.enable();
 		Memcache mc = Memcache.getInstance();

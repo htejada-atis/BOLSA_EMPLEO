@@ -6,18 +6,22 @@ import java.io.IOException;
 import java.sql.SQLException;
 import javax.servlet.ServletException;
 import org.junit.BeforeClass;
+import org.junit.FixMethodOrder;
 import org.junit.Test;
+import org.junit.runners.MethodSorters;
+
 import bbdd.BbddRunner;
 import bbdd.UtilsTestBolsaEmpleo;
 import controlador.implementacion.PeticionHttp;
 import controlador.implementacion.RespuestaHttp;
-import es.ujaen.uvirtual.beans.vistas.uvirtual.bolsaempleo.VistaTitulacionesArea;
-import es.ujaen.uvirtual.controlador.infadministrativa.bolsaempleo.ControladorGestionTitulacionesPreferentesArea;
+import es.ujaen.uvirtual.modulo.bolsaempleo.controlador.ControladorGestionTitulacionesPreferentesArea;
+import es.ujaen.uvirtual.modulo.bolsaempleo.vistas.VistaTitulacionesArea;
 
 
-/** test controlador titulacion.
+/** test controlador titulaciones preferentes area.
  * @author ATISoluciones 
  */
+@FixMethodOrder(MethodSorters.NAME_ASCENDING)
 public class TestBEPControladorGestionTitulacionesPreferentesArea {
 	
 	private static final String MENSAJE_AREAS_DEVUELTAS = "Debe devolver areas";
@@ -39,8 +43,8 @@ public class TestBEPControladorGestionTitulacionesPreferentesArea {
     
     // método para obtener la vista con una lista de áreas .
     private VistaTitulacionesArea getVistaConAreas() throws ServletException, IOException {
-    	PeticionHttp peticion = UtilsTestBolsaEmpleo.peticionAutenticada();
-    	peticion.setParameter(ControladorGestionTitulacionesPreferentesArea.PARAM_ACCION, ControladorGestionTitulacionesPreferentesArea.ACCION_LISTAR_AREAS);	
+    	PeticionHttp peticion = UtilsTestBolsaEmpleo.peticionAutenticadaPersonal();
+    	peticion.setParameter(ControladorGestionTitulacionesPreferentesArea.PARAM_ACCION, ControladorGestionTitulacionesPreferentesArea.ACCION_INDEX);	
 		
 		RespuestaHttp respuesta = new RespuestaHttp();
 		ControladorGestionTitulacionesPreferentesArea controlador = new ControladorGestionTitulacionesPreferentesArea();
@@ -51,7 +55,7 @@ public class TestBEPControladorGestionTitulacionesPreferentesArea {
     
     // método para obtener la vista con una lista de las titulaciones .
     private VistaTitulacionesArea getVistaConTitulaciones(String accion, boolean area) throws ServletException, IOException {
-		PeticionHttp peticion = UtilsTestBolsaEmpleo.peticionAutenticada();
+		PeticionHttp peticion = UtilsTestBolsaEmpleo.peticionAutenticadaPersonal();
 		peticion.setParameter(ControladorGestionTitulacionesPreferentesArea.PARAM_ACCION, accion);
 		
 		if (area) {
@@ -68,7 +72,7 @@ public class TestBEPControladorGestionTitulacionesPreferentesArea {
     
     // método para obtener la vista con la respuesta de incluir o eliminar una titulación preferente
     private VistaTitulacionesArea getVistaCambiarTitulacionesPreferentes(String accion, boolean area, String listaTitulaciones) throws ServletException, IOException {
-		PeticionHttp peticion = UtilsTestBolsaEmpleo.peticionAutenticada();
+		PeticionHttp peticion = UtilsTestBolsaEmpleo.peticionAutenticadaPersonal();
 		peticion.setParameter(ControladorGestionTitulacionesPreferentesArea.PARAM_ACCION, accion);
 		peticion.setParameter(ControladorGestionTitulacionesPreferentesArea.PARAM_TITULACIONES, listaTitulaciones);
 		
@@ -91,7 +95,7 @@ public class TestBEPControladorGestionTitulacionesPreferentesArea {
 	 */
 	@Test
 	public void testA01Obtener() throws SQLException, ServletException, IOException {
-		PeticionHttp peticion = UtilsTestBolsaEmpleo.peticionAutenticada();
+		PeticionHttp peticion = UtilsTestBolsaEmpleo.peticionAutenticadaPersonal();
 		
 		RespuestaHttp respuesta = new RespuestaHttp();
 		ControladorGestionTitulacionesPreferentesArea controlador = new ControladorGestionTitulacionesPreferentesArea();
@@ -141,7 +145,7 @@ public class TestBEPControladorGestionTitulacionesPreferentesArea {
 	public void testA04ObtenerTitulacionesPreferentesArea() throws SQLException, ServletException, IOException {
 		VistaTitulacionesArea bean = getVistaConTitulaciones(ControladorGestionTitulacionesPreferentesArea.ACCION_DATATABLE_TITULACIONES_PREFERENTES_AREA, true);
 		
-		assertNotEquals(MENSAJE_TITULACIONES_DEVUELTAS, 0, bean.getDatatableTitulaciones().getData().size());	
+		assertNotEquals(MENSAJE_TITULACIONES_DEVUELTAS, 0, bean.getDatatableTitulacionesArea().getData().size());	
 		assertEquals(MENSAJE_SIN_ERROR, 0, bean.getMensajesDeError().size());
 		assertEquals(MENSAJE_SIN_ADVERTENCIAS, 0, bean.getMensajesDeAdvertencia().size());
 	}

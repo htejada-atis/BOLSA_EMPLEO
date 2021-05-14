@@ -1,7 +1,7 @@
 <%@ page trimDirectiveWhitespaces="true"%>
 <%@ page import="es.ujaen.uvirtual.beans.UVDatos"%>
-<%@	page import="es.ujaen.uvirtual.controlador.infadministrativa.bolsaempleo.ControladorGestionNoticias"%>
-<%@ page import="es.ujaen.uvirtual.beans.vistas.uvirtual.bolsaempleo.VistaNoticias"%>
+<%@	page import="es.ujaen.uvirtual.modulo.bolsaempleo.controlador.configuracion.ControladorGestionNoticias"%>
+<%@ page import="es.ujaen.uvirtual.modulo.bolsaempleo.vistas.VistaNoticias"%>
 <%@ page import="es.ujaen.uvirtual.utilidades.EscapaHTML" %>
 
 <% 
@@ -12,15 +12,6 @@ VistaNoticias bean = (VistaNoticias) uvdatos.getVistas().get(VistaNoticias.class
 
 <div class="bolsa-empleo">
 
-	<% if (session.getAttribute(ControladorGestionNoticias.MENSAJE_ENVIADO) != null) { %>
-		<div id="exito" class="success">
-			<%= session.getAttribute(ControladorGestionNoticias.MENSAJE_ENVIADO) %>
-		</div>
-	<% 
-			session.removeAttribute(ControladorGestionNoticias.MENSAJE_ENVIADO);
-		} 
-	%>
-
 	<% if (bean.getMensajesDeExito().size() > 0) { %>
 		<div id="exito" class="success">
 			<%= bean.formatearMensajesDeExito() %>
@@ -30,7 +21,7 @@ VistaNoticias bean = (VistaNoticias) uvdatos.getVistas().get(VistaNoticias.class
 		<div id="error" class="error">
 			<%= bean.formatearMensajesDeError() %>
 		</div>
-	<% } else {%>
+	<% } %>
 
 	<div class="titulo-bolsa-empleo">
 		<h2>Noticias</h2>
@@ -58,7 +49,6 @@ VistaNoticias bean = (VistaNoticias) uvdatos.getVistas().get(VistaNoticias.class
 		</tfoot>
 	</table>
 	
-	<% } %>
 </div>
 
 <script>
@@ -72,22 +62,24 @@ VistaNoticias bean = (VistaNoticias) uvdatos.getVistas().get(VistaNoticias.class
 		var table = new Atis.DataTable('#table_noticias_insertadas', {
 		    "ajax": { url: "<%= ControladorGestionNoticias.URL_PATTERN_AJAX %>" },
 		    "pageSize": 10,
+	    	"defaultOrderBy": 0,
 		    "filterable": true,
 		    "columns": [
 		    	{'data': 'fecha', 'filter': {'type': 'date'}},
-		    	{'data': 'texto', 'filter': true, 'render': function(row) {
-		    		return "<div class='overflow-auto'>" +row.texto +"</div>";
-		    	}},
-		        {'data': 'enlace', 'order': {'active': false}, 'class': 'overflow-ellipsis', 'render': function(row) { return "<a href='" +row.enlace +"' target='_blank'>" +row.enlace +"</a>"; }},
-		        {'data': 'publica', 'order': {'active': false}, 'filter': {'type': 'selectBoolean'}, 'render': function(row) {
+		    	{'data': 'texto', 'filter': true, 'overflow': 'auto'},
+		        {'data': 'enlace', 'order': {'active': false}, 'class': 'overflow-ellipsis', 'render': function(row) {
+		        		return row.enlace ? "<a href='" +row.enlace +"' target='_blank'>" +row.enlace +"</a>" : "";
+		        	}
+		        },
+		        {'data': 'publica', 'order': {'active': false}, 'filter': {'type': 'selectBoolean', 'true': 'Pública', 'false': 'Privada'}, 'render': function(row) {
 	        		if(row.publica){
-	        			return "<div title='Pública' class='circle-true'></div>"; 
+	        			return "<div title='Pública' class='circle-true'></div>";
 	        		}
 	        		else{
 	        			return "<div title='Privada' class='circle-false'></div>"; 
 	        		}
 	        	}},
-		        {'data': 'activa', 'order': {'active': false}, 'filter': {'type': 'selectBoolean'}, 'render': function(row) {
+		        {'data': 'activa', 'order': {'active': false}, 'filter': {'type': 'select', 'options':{'true': 'Activa', 'false': 'Inactiva'}, 'optionDefault': 'true'}, 'render': function(row) {
 	        		if(row.activa){
 	        			return "<div title='Activa' class='circle-true'></div>"; 
 	        		}

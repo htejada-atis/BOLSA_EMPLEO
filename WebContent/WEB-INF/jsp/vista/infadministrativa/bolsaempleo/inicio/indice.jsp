@@ -1,26 +1,39 @@
 <%@ page trimDirectiveWhitespaces="true"%>
-<%@	page import="es.ujaen.uvirtual.controlador.infadministrativa.bolsaempleo.ControladorInicio"%>
-<%@ page import="es.ujaen.uvirtual.beans.vistas.uvirtual.bolsaempleo.VistaInicio" %>
-<%@ page import="es.ujaen.uvirtual.beans.uvirtual.bolsaempleo.Noticia" %>
+<%@	page import="es.ujaen.uvirtual.modulo.bolsaempleo.controlador.ControladorInicio"%>
+<%@ page import="es.ujaen.uvirtual.modulo.bolsaempleo.vistas.VistaInicio" %>
+<%@ page import="es.ujaen.uvirtual.modulo.bolsaempleo.vistas.VistaUsuarioBolsaEmpleo"%>
+<%@ page import="es.ujaen.uvirtual.modulo.bolsaempleo.beans.Noticia" %>
 <%@ page import="es.ujaen.uvirtual.beans.UVDatos"%>
 <%@ page import="es.ujaen.uvirtual.utilidades.Formateador"%>
 
 <% 
 UVDatos uvdatos = (UVDatos)request.getAttribute(UVDatos.NOMBRE_ATRIBUTO);
 VistaInicio bean = (VistaInicio)uvdatos.getVistas().get(VistaInicio.class.getName());
+VistaUsuarioBolsaEmpleo beanUsuario = (VistaUsuarioBolsaEmpleo) uvdatos.getVistas().get(VistaUsuarioBolsaEmpleo.class.getName());
 %>
 
 <div class="bolsa-empleo">
-	<% if (bean.getMensajesDeExito().size() > 0) { %>
+
+	<% if (bean != null) { %>
+		<% if (bean.getMensajesDeExito().size() > 0) { %>
 		<div id="exito" class="success">
 			<%= bean.formatearMensajesDeExito() %>
 		</div>
+		<% } %>
+		<% if (bean.getMensajesDeError().size() > 0) { %>
+			<div id="error" class="error">
+				<%= bean.formatearMensajesDeError() %>
+			</div>
+		<% } %>
+
+		<% if (beanUsuario != null) { %>
+			<% if (beanUsuario.getMensajesDeExito().size() > 0) { %>
+				<div id="exito" class="success">
+				<%= beanUsuario.formatearMensajesDeExito() %>
+				</div>
+			<% } %>
+		<% } %>
 	<% } %>
-	<% if (bean.getMensajesDeError().size() > 0) { %>
-		<div id="error" class="error">
-			<%= bean.formatearMensajesDeError() %>
-		</div>
-	<% } else {%>
 
     <h2>Bolsa de empleo para PDI de la Universidad de Jaén</h2>
     
@@ -55,7 +68,7 @@ VistaInicio bean = (VistaInicio)uvdatos.getVistas().get(VistaInicio.class.getNam
 		</ul>
 		<div class="row-ver-todas" id="view_all"> (<a href="#">Ver todas</a>) </div>
     </div>
-<% } %>
+
 </div>
 
 <script type="text/javascript">
@@ -75,7 +88,7 @@ VistaInicio bean = (VistaInicio)uvdatos.getVistas().get(VistaInicio.class.getNam
 			
 			$.ajax({
 		        type: "GET",
-		        url: "<%= ControladorInicio.anonimo ? ControladorInicio.URL_PATTERN_AJAX_PUBLICA : ControladorInicio.URL_PATTERN_AJAX_PRIVADA %>",
+		        url: "<%= bean.getAnonimo() ? ControladorInicio.URL_PATTERN_AJAX_PUBLICA : ControladorInicio.URL_PATTERN_AJAX_PRIVADA %>",
 		        contentType: "application/json",
 		        dataType: "json",
 		        data: params,

@@ -43,8 +43,8 @@ import es.ujaen.uvirtual.utilidades.AyudaURL;
 public class GeneradorCabecera implements Filter {
 	protected static Logger logger = Logger.getLogger(GeneradorCabecera.class.getPackage().getName());
 	protected static String nombreDeEstaClase = GeneradorCabecera.class.getName();
-	protected static FilterConfig filterConfig = null;
-	protected static String urlCabecera = null;
+	protected FilterConfig filterConfig = null;
+	protected String urlCabecera = null;
 
     /**
      * Default constructor. 
@@ -56,6 +56,7 @@ public class GeneradorCabecera implements Filter {
 	/** destroy.
 	 * @see Filter#destroy()
 	 */
+    @Override
 	public void destroy() {
 		filterConfig = null;
 		urlCabecera = null;
@@ -97,7 +98,7 @@ public class GeneradorCabecera implements Filter {
 			return;
 		}
 
-		if ((menu != null) && (menu.isCrearMenu())) {
+		if (menu != null && menu.isCrearMenu()) {
 			Usuario usuario = null;
 			if (uid != null) {
 				usuario = CrearUsuario.usuario(uid);
@@ -136,6 +137,7 @@ public class GeneradorCabecera implements Filter {
 	 * @param fConfig configuracion
 	 * @see Filter#init(FilterConfig)
 	 */
+	@Override
 	public void init(FilterConfig fConfig) throws ServletException {
 		filterConfig = fConfig;
 		urlCabecera = fConfig.getInitParameter("URLVista");

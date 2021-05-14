@@ -5,12 +5,17 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
+
+import org.junit.FixMethodOrder;
 import org.junit.Test;
-import es.ujaen.uvirtual.beans.uvirtual.bolsaempleo.Titulacion;
+import org.junit.runners.MethodSorters;
+
+import es.ujaen.uvirtual.modulo.bolsaempleo.beans.Titulacion;
 
 /** test titulación.
  *
  */
+@FixMethodOrder(MethodSorters.NAME_ASCENDING)
 public class TestBEPBeanTitulacion {
 	
 	private static final String NOMBRE = "nombre";

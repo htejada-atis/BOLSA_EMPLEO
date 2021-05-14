@@ -1,8 +1,8 @@
 <%@ page trimDirectiveWhitespaces="true"%>
 <%@ page import="es.ujaen.uvirtual.beans.UVDatos"%>
-<%@ page import="es.ujaen.uvirtual.beans.Rol"%>
-<%@	page import="es.ujaen.uvirtual.controlador.infadministrativa.bolsaempleo.ControladorMisDatos"%>
-<%@ page import="es.ujaen.uvirtual.beans.vistas.uvirtual.bolsaempleo.VistaUsuarioBolsaEmpleo"%>
+<%@ page import="es.ujaen.uvirtual.modulo.bolsaempleo.beans.Rol"%>
+<%@	page import="es.ujaen.uvirtual.modulo.bolsaempleo.controlador.ControladorMisDatos"%>
+<%@ page import="es.ujaen.uvirtual.modulo.bolsaempleo.vistas.VistaUsuarioBolsaEmpleo"%>
 <%@ page import="es.ujaen.uvirtual.utilidades.EscapaHTML" %>
 <%@ page import="es.ujaen.uvirtual.utilidades.Formateador"%>
 
@@ -13,7 +13,7 @@ VistaUsuarioBolsaEmpleo bean = (VistaUsuarioBolsaEmpleo) uvdatos.getVistas().get
 
 
 <div class="bolsa-empleo misdatos-form">
-	<h2>Datos Personales</h2>
+
 	<% if (bean.getMensajesDeExito().size() > 0) { %>
 		<div id="exito" class="success">
 			<%= bean.formatearMensajesDeExito() %>
@@ -23,8 +23,12 @@ VistaUsuarioBolsaEmpleo bean = (VistaUsuarioBolsaEmpleo) uvdatos.getVistas().get
 		<div id="error" class="error">
 			<%= bean.formatearMensajesDeError() %>
 		</div>
-	<% } 
+	<% } %>
 
+	<h2>Datos Personales</h2>
+
+	<% 
+	
 	String nombre = "";
 	String primer_apellido = "";
 	String segundo_apellido = "";
@@ -36,13 +40,14 @@ VistaUsuarioBolsaEmpleo bean = (VistaUsuarioBolsaEmpleo) uvdatos.getVistas().get
 	String codigo_postal = "";
 	String localidad = "";
 	String provincia = "";
-	String movil = "";
 	String telefono = "";
 	String nacionalidad = "";
 	String sexo = "";
+	Boolean lista_dist = false;
 	
 	if(bean.getUsuario().getNombre()!=null) nombre = bean.getUsuario().getNombre();
 	if(bean.getUsuario().getPrimerApellido()!=null) primer_apellido = bean.getUsuario().getPrimerApellido();
+	if(bean.getUsuario().getSegundoApellido()!=null) segundo_apellido = bean.getUsuario().getSegundoApellido();
 	if(bean.getUsuario().getSegundoApellido()!=null) segundo_apellido = bean.getUsuario().getSegundoApellido();
 	if(bean.getUsuario().getEmail()!=null) email = bean.getUsuario().getEmail();
 	if(bean.getUsuarioArcos().getDocumentoTipo()!=null) tipo_documento = bean.getUsuarioArcos().getDocumentoTipo();
@@ -51,10 +56,10 @@ VistaUsuarioBolsaEmpleo bean = (VistaUsuarioBolsaEmpleo) uvdatos.getVistas().get
 	if(bean.getUsuario().getCodigoPostal()!=null) codigo_postal = bean.getUsuario().getCodigoPostal();
 	if(bean.getUsuario().getLocalidad()!=null) localidad = bean.getUsuario().getLocalidad();
 	if(bean.getUsuario().getProvincia()!=null) provincia = bean.getUsuario().getProvincia();
-	if(bean.getUsuario().getMovil()!=null) movil = bean.getUsuario().getMovil();
 	if(bean.getUsuario().getTelefono()!=null) telefono = bean.getUsuario().getTelefono();
 	if(bean.getUsuario().getNacionalidad()!=null) nacionalidad = bean.getUsuario().getNacionalidad();
 	if(bean.getUsuario().getSexo()!=null) sexo = bean.getUsuario().getSexo();
+	if(bean.getUsuario()!=null) lista_dist = bean.getUsuario().getListaDist();
 	
 	%>
 	
@@ -69,25 +74,25 @@ VistaUsuarioBolsaEmpleo bean = (VistaUsuarioBolsaEmpleo) uvdatos.getVistas().get
     		</div>
     		<div class="form-group">
     			<label for="nombre">Nombre: </label>
-    			<input class="form-input-custom" id="nombre" type="text" name="<%= ControladorMisDatos.PARAM_NOMBRE %>" value="<%= nombre %>"/>
+    			<input class="form-input-custom" id="nombre" type="text" name="<%= ControladorMisDatos.PARAM_NOMBRE %>" value="<%= nombre %>" disabled/>
     		</div>
 		</div>
     	
     	<div class="form-group-container">
     	    <div class="form-group">
     			<label for="primer_apellido">Primer apellido: </label>
-    			<input class="form-input-custom" id="primer_apellido" type="text" name="<%= ControladorMisDatos.PARAM_PRIMER_APELLIDO %>" value="<%= primer_apellido %>"/>
+    			<input class="form-input-custom" id="primer_apellido" type="text" name="<%= ControladorMisDatos.PARAM_PRIMER_APELLIDO %>" value="<%= primer_apellido %>" disabled/>
     		</div>
     		<div class="form-group">
     			<label for="segundo_apellido">Segundo apellido: </label>
-    			<input class="form-input-custom" id="segundo_apellido" type="text" name="<%= ControladorMisDatos.PARAM_SEGUNDO_APELLIDO %>" value="<%= segundo_apellido %>"/>
+    			<input class="form-input-custom" id="segundo_apellido" type="text" name="<%= ControladorMisDatos.PARAM_SEGUNDO_APELLIDO %>" value="<%= segundo_apellido %>" disabled/>
     		</div>
     	</div>
     	
     	<div class="form-group-container">
     	    <div class="form-group">
     			<label for="direccion">Direcci&oacute;n: </label>
-    			<input class="form-input-custom" id="direccion" type="text" name="<%= ControladorMisDatos.PARAM_DIRECCION %>" value="<%= direccion %>"/>
+    			<input class="form-input-custom" id="direccion" type="text" name="<%= ControladorMisDatos.PARAM_DIRECCION %>" value="<%= direccion %>" />
     		</div>
     		<div class="form-group">
     			<label for="codigo_postal">Codigo Postal: </label>
@@ -107,42 +112,48 @@ VistaUsuarioBolsaEmpleo bean = (VistaUsuarioBolsaEmpleo) uvdatos.getVistas().get
     	</div>
     	
     	<div class="form-group-container">
-    	    <div class="form-group">
-    			<label for="movil">M&oacute;vil: </label>
-    			<input class="form-input-custom" id="movil" type="text" name="<%= ControladorMisDatos.PARAM_MOVIL %>" value="<%= movil %>"/>
-    		</div>
     		<div class="form-group">
     			<label for="telefono">Tel&eacute;fono: </label>
     			<input class="form-input-custom" id="telefono" type="text" name="<%= ControladorMisDatos.PARAM_TELEFONO %>" value="<%= telefono %>"/>
     		</div>
-    	</div>
-    	
-    	<div class="form-group-container">
-    	    <div class="form-group">
+    		    	    <div class="form-group">
     			<label for="nacionalidad">Nacionalidad: </label>
     			<input class="form-input-custom" id="nacionalidad" type="text" name="<%= ControladorMisDatos.PARAM_NACIONALIDAD %>" value="<%= nacionalidad %>"/>
     		</div>
-    	    <div class="form-group">
-    			<label for="apellidos">Email: </label>
-    			<input class="form-input-custom" id="apellidos" type="text" name="<%= ControladorMisDatos.PARAM_EMAIL %>" value="<%= email %>"/>
-    		</div>
     	</div>
+    	
+    	    	    <div class="form-group">
+    			<label for="apellidos">Email: </label>
+    			<input class="form-input-custom" id="apellidos" type="text" name="<%= ControladorMisDatos.PARAM_EMAIL %>" value="<%= email %>" disabled/>
+    		</div>
+    	
     	
     	<div class="form-group-container">
     		<div class="form-group-custom">
     			<label>Sexo: </label>
     			<br><br>
-				<input class="form-input" type="radio" id="masculino" name="<%= ControladorMisDatos.PARAM_SEXO %>" style="display: inline;">
+				<input class="form-input" type="radio" id="masculino" name="<%= ControladorMisDatos.PARAM_SEXO %>" style="display: inline;" disabled>
 				<label class="form-label-custom" for="male" style="float: none; margin-right:0px">Masculino</label>
 				<br>
-    			<input class="form-input" type="radio" id="femenino" name="<%= ControladorMisDatos.PARAM_SEXO %>" style="display: inline;">
+    			<input class="form-input" type="radio" id="femenino" name="<%= ControladorMisDatos.PARAM_SEXO %>" style="display: inline;" disabled>
 				<label class="form-label-custom" for="female" style="float: none; margin-right:0px;">Femenino</label>
     		</div>
+    		<div class="form-check">
+    			<label for="usuario_lista_dist">Lista Distribucion:</label>
+    			<input class="params" type="checkbox" id="usuario_lista_dist" name="<%= ControladorMisDatos.PARAM_LISTA %>" value="<%= lista_dist %>" <%= (lista_dist ? "checked=''" : "") %>/>
+    		</div>
     	</div>
-		
-    	<div class="form-group">
-    		<input id="usuario_enviar" type="submit" name="<%= ControladorMisDatos.PARAM_ENVIAR %> " 
-    		value="Enviar" style="float:right;"/>
+
+    	<div class="form-group-container">
+    		<div class="form-group-custom w100">
+
+    		</div>
+    		<div class="form-group-custom w100">
+    		    <input id="baja_usuario" type="submit" name="<%= ControladorMisDatos.PARAM_DARSE_BAJA %> " 
+    			value="Darse de baja de la bolsa" style="float:left;"/>
+    			<input id="usuario_enviar" type="submit" name="<%= ControladorMisDatos.PARAM_ENVIAR %> " 
+    			value="Enviar" style="float:right;"/>
+    		</div>
     	</div>
     </form>
 </div>
@@ -151,14 +162,14 @@ VistaUsuarioBolsaEmpleo bean = (VistaUsuarioBolsaEmpleo) uvdatos.getVistas().get
 $(document).ready(function() {	
 	
 	<% String acum = bean.getUsuario().getSexo();
-	
-	if(bean.getUsuario().getSexo().equals("M")) { %>
+	if(bean.getUsuario().getSexo()!=null){
+	if(bean.getUsuario().getSexo().equals("V")) { %>
 	document.getElementById("masculino").checked = true;
 	<%} else { 
-		if(bean.getUsuario().getSexo().equals("F")) { %>
+		if(bean.getUsuario().getSexo().equals("M")) { %>
 			document.getElementById("femenino").checked = true;
 		<%}%>
-	<%}%>
+	<%}}%>
 	
 });
 
@@ -184,8 +195,23 @@ function enviarUsuario(event, submit_input) {
 	submit_input.form.submit();
 }
 
+function bajaUsuario(event, submit_input) {
+	event.preventDefault();
+
+	input_accion = document.getElementById("accion_formulario");
+	input_accion.value = '<%= ControladorMisDatos.ACCION_BAJA_USUARIO %>';
+	input_id = document.getElementById("usuario_id");
+	input_id.value = '<%= bean.getUsuario().getCodNum() %>';
+
+	submit_input.form.submit();
+}
+
 document.getElementById("usuario_enviar").addEventListener("click", function(event) {
 	enviarUsuario(event, this);
+});
+
+document.getElementById("baja_usuario").addEventListener("click", function(event) {
+	bajaUsuario(event, this);
 });
 
 

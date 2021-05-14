@@ -1,7 +1,7 @@
 <%@ page trimDirectiveWhitespaces="true"%>
 <%@ page import="es.ujaen.uvirtual.beans.UVDatos"%>
-<%@	page import="es.ujaen.uvirtual.controlador.infadministrativa.bolsaempleo.ControladorGestionTitulaciones"%>
-<%@ page import="es.ujaen.uvirtual.beans.vistas.uvirtual.bolsaempleo.VistaTitulaciones"%>
+<%@	page import="es.ujaen.uvirtual.modulo.bolsaempleo.controlador.configuracion.ControladorGestionTitulaciones"%>
+<%@ page import="es.ujaen.uvirtual.modulo.bolsaempleo.vistas.VistaTitulaciones"%>
 <%@ page import="es.ujaen.uvirtual.utilidades.EscapaHTML" %>
 <%@ page import="es.ujaen.uvirtual.utilidades.Formateador"%>
 
@@ -13,10 +13,18 @@ VistaTitulaciones bean = (VistaTitulaciones) uvdatos.getVistas().get(VistaTitula
 
 <div class="bolsa-empleo">
 
+	<% if (bean.getMensajesDeExito().size() > 0) { %>
+		<div id="exito" class="success">
+			<%= bean.formatearMensajesDeExito() %>
+		</div>
+	<% } %>
+	<% if (bean.getMensajesDeError().size() > 0) { %>
+		<div id="error" class="error">
+			<%= bean.formatearMensajesDeError() %>
+		</div>
+	<% } %>
+
 	<%
-		if(bean.getMensajesDeError().size() > 0) {
-			out.print("<div class='error'>" + bean.formatearMensajesDeError() + "</div>");
-		}
 		
 		String nombre = "";
 		
@@ -29,12 +37,18 @@ VistaTitulaciones bean = (VistaTitulaciones) uvdatos.getVistas().get(VistaTitula
 		
 	%>
 	
+	<p>Las etiquetas en <b>negrita</b> corresponden a campos de relleno obligatorio</p>
+	
     <form id="agregar_titulacion" class="be-form" method="post" action="<%=request.getRequestURI()%>">
-    	<input type="hidden" name="<%= ControladorGestionTitulaciones.PARAM_ACCION %>" id="accion_formulario" value="" />
-    	<input type="hidden" name="<%= ControladorGestionTitulaciones.PARAM_ID%>" id="titulacion_id" value="" />
-    	<div class="form-group">
-    		<label for="titulacion_nombre">Nombre</label>
-    		<textarea id="titulacion_nombre" name="<%=ControladorGestionTitulaciones.PARAM_NOMBRE%>" rows="1" cols="60"><%= nombre %></textarea>
+    	<input type="hidden" name="<%= ControladorGestionTitulaciones.PARAM_ACCION %>" id="accion_formulario" 
+    			value="<%= bean.getTitulacion() != null ? ControladorGestionTitulaciones.ACCION_EDITAR_TITULACION : ControladorGestionTitulaciones.ACCION_AGREGAR_TITULACION %>" />
+    	<input type="hidden" name="<%= ControladorGestionTitulaciones.PARAM_ID%>" id="titulacion_id" 
+    			value="<%= bean.getTitulacion() != null ? bean.getTitulacion().getCodNum() : "" %>" />
+    	<div class="form-group-container col1">
+	    	<div class="form-group">
+	    		<label for="titulacion_nombre" class="bold-label">Nombre</label>
+	    		<input class="form-input-custom" id="titulacion_nombre" name="<%=ControladorGestionTitulaciones.PARAM_NOMBRE%>" value="<%= nombre %>" required/>
+	    	</div>
     	</div>
     	<div class="form-btn">
     		<input id="titulacion_enviar" type="submit" name="<%=ControladorGestionTitulaciones.PARAM_ENVIAR%>"
@@ -43,31 +57,3 @@ VistaTitulaciones bean = (VistaTitulaciones) uvdatos.getVistas().get(VistaTitula
     </form>
     
 </div>
-
-<script>
-
-	function enviarTitulacion(event, submit_input) {
-		event.preventDefault();
-		
-		<% if(bean.getTitulacion() != null) { %>
-			input_accion = document.getElementById("accion_formulario");
-			input_accion.value = '<%= ControladorGestionTitulaciones.ACCION_EDITAR_TITULACION %>';
-			input_id = document.getElementById("titulacion_id");
-			input_id.value = '<%= bean.getTitulacion().getCodNum() %>';
-		<% } else { %>
-			input_accion = document.getElementById("accion_formulario");
-			input_accion.value = '<%= ControladorGestionTitulaciones.ACCION_AGREGAR_TITULACION %>';
-		<% } %>
-		
-		submit_input.form.submit();
-	}
-
-	$(document).ready(function() {
-		
-		document.getElementById("titulacion_enviar").addEventListener("click", function(event) {
-			enviarTitulacion(event, this);
-		});
-		
-	});
-
-</script>

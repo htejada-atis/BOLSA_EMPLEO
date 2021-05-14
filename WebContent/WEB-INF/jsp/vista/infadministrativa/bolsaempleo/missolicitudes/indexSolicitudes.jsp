@@ -1,10 +1,10 @@
 <%@ page trimDirectiveWhitespaces="true" %>
 <%@ page import="es.ujaen.uvirtual.beans.UVDatos" %>
-<%@ page import="es.ujaen.uvirtual.modelo.bolsaempleo.ModeloConvocatoria" %>
-<%@ page import="es.ujaen.uvirtual.modelo.bolsaempleo.ModeloSolicitud" %>
-<%@	page import="es.ujaen.uvirtual.controlador.infadministrativa.bolsaempleo.ControladorMisSolicitudes" %>
-<%@ page import="es.ujaen.uvirtual.beans.vistas.uvirtual.bolsaempleo.VistaSolicitudes" %>
-<%@ page import="es.ujaen.uvirtual.beans.uvirtual.bolsaempleo.Solicitud" %>
+<%@ page import="es.ujaen.uvirtual.modulo.bolsaempleo.modelo.ModeloConvocatoria" %>
+<%@ page import="es.ujaen.uvirtual.modulo.bolsaempleo.modelo.ModeloSolicitud" %>
+<%@	page import="es.ujaen.uvirtual.modulo.bolsaempleo.controlador.candidato.ControladorMisSolicitudes" %>
+<%@ page import="es.ujaen.uvirtual.modulo.bolsaempleo.vistas.VistaSolicitudes" %>
+<%@ page import="es.ujaen.uvirtual.modulo.bolsaempleo.beans.Solicitud" %>
 <%@ page import="es.ujaen.uvirtual.utilidades.EscapaHTML" %>
 
 <%
@@ -12,7 +12,8 @@ UVDatos uvdatos = (UVDatos) request.getAttribute(UVDatos.NOMBRE_ATRIBUTO);
 VistaSolicitudes bean = (VistaSolicitudes) uvdatos.getVistas().get(VistaSolicitudes.class.getName());
 %>
 
-<div class="bolsa-empleo">	
+<div class="bolsa-empleo">
+
 	<% if (bean.getMensajesDeExito().size() > 0) { %>
 		<div id="exito" class="success">
 			<%= bean.formatearMensajesDeExito() %>
@@ -28,7 +29,7 @@ VistaSolicitudes bean = (VistaSolicitudes) uvdatos.getVistas().get(VistaSolicitu
 	<div class="titulo-bolsa-empleo">
 		<h2>Solicitudes</h2>
     
-	    <p>A continuación se muestran las convocatorias disponibles para poder introducir méritos y poder seleccionar las bolsas en las que desee participar.</p>
+	    <p>A continuación se muestran las convocatorias disponibles para poder introducir méritos y poder seleccionar las áreas en las que desee participar.</p>
 	</div>
 	
 	<table class="bluetable bolsaempleo" id="table">
@@ -59,8 +60,9 @@ VistaSolicitudes bean = (VistaSolicitudes) uvdatos.getVistas().get(VistaSolicitu
 			var solicitudCerrada = row.estado == '<%= ModeloSolicitud.SOLICITUD_ESTADO_CERRADA %>';
 			var convocatoriaAbierta = row.convocatoria.estado == '<%= ModeloConvocatoria.CONVOCATORIA_ESTADO_ABIERTA %>';
 			var convocatoriaCerrada = row.convocatoria.estado == '<%= ModeloConvocatoria.CONVOCATORIA_ESTADO_CERRADA %>';
-			var btnCrear = '<button class="create-solicitud" data-rowid="' + row.convocatoria.codNum + '" title="Crear una nueva solicitud para: ' + row.convocatoria.descripcion + '">Abrir una solicitud</button>';
-			var btnConsultar = '<button class="consultar-solicitud" data-rowid="' + row.codNum + '" title="Consultar solicitud para: ' + row.convocatoria.descripcion + '">Consultar solicitud</button>';
+			var btnCrear = '<button class="create-solicitud pointer" data-rowid="' + row.convocatoria.codNum + '" title="Crear una nueva solicitud para: ' + row.convocatoria.descripcion + '">Abrir una solicitud</button>';
+			var btnConsultar = '<button class="consultar-solicitud pointer" data-rowid="' + row.codNum + '" title="Consultar solicitud para: ' + row.convocatoria.descripcion + '">Consultar solicitud</button>';
+			var btnDescargarPDF = '<button class="descargar-pdf-solicitud pointer" data-rowid="' + row.codNum + '" title="Descargar pdf solicitud para: ' + row.convocatoria.descripcion + '">Descargar PDF solicitud</button>';
 			
 			if (convocatoriaAbierta && solicitudNoCreada) {
 				// convocatoria abierta, solicitud no creada
@@ -81,7 +83,7 @@ VistaSolicitudes bean = (VistaSolicitudes) uvdatos.getVistas().get(VistaSolicitu
 			} else if ((convocatoriaAbierta || convocatoriaCerrada) && solicitudCerrada) {
 				// convocatoria abierta o cerrada y solicitud cerrada
 				console.log("convocatoria abierta o cerrada y solicitud cerrada");
-				html = 'Solicitud cerrada. ' + btnConsultar;
+				html = 'Solicitud cerrada. ' + btnDescargarPDF;
 			} 
 			
 			return html
@@ -102,23 +104,31 @@ VistaSolicitudes bean = (VistaSolicitudes) uvdatos.getVistas().get(VistaSolicitu
 				'<%= ControladorMisSolicitudes.PARAM_ACCION %>': '<%= ControladorMisSolicitudes.ACCION_CONSULTAR_SOLICITUD %>', 
 				'<%= ControladorMisSolicitudes.PARAM_SOLICITUD_ID %>': id
 			};
-			Atis.sendForm('<%= request.getRequestURI() %>', params);	
-		}; 
+			Atis.sendForm('<%= request.getRequestURI() %>', params);
+		};
+		
+		var descargarPDFSolicitud = function() {
+			var id = $(this).data('rowid')
+			window.open("<%= request.getRequestURI() %>"
+			        	+ "?a=<%= ControladorMisSolicitudes.ACCION_DESCARGAR_PDF %>&<%= ControladorMisSolicitudes.PARAM_SOLICITUD_ID %>=" + id);
+		}
 					
 		var beforeRender = function(table) {
 			$('button.create-solicitud', table.node).off('click', createSolicitud);
 			$('button.consultar-solicitud', table.node).off('click', consultarSolicitud);
+			$('button.descargar-pdf-solicitud', table.node).off('click', descargarPDFSolicitud);
 		};
 		
 		var afterRender = function(table) {
 			$('button.create-solicitud', table.node).on('click', createSolicitud)
 			$('button.consultar-solicitud', table.node).on('click', consultarSolicitud);
+			$('button.descargar-pdf-solicitud', table.node).on('click', descargarPDFSolicitud);
 		};
 		
 		var table_titulaciones = new Atis.DataTable('#table', {
 		    "ajax": { url: "<%=  ControladorMisSolicitudes.URL_PATTERN_AJAX %>" },
 		    "pageSize": 10,
-		    "action": "<%= ControladorMisSolicitudes.ACCION_DATATABLE %>",
+		    "action": "<%=ControladorMisSolicitudes.ACCION_DATATABLE_SOLICITUDES%>",
 		    "beforeRender": beforeRender,
 		    "afterRender": afterRender,
 		    "columns": [

@@ -13,7 +13,7 @@ import es.ujaen.uvirtual.modelo.ModeloAdministracion;
 import es.ujaen.uvirtual.modelo.ModeloUsuarioArcos;
 import es.ujaen.uvirtual.modelo.ModeloUsuarioUXXIAC;
 import es.ujaen.uvirtual.modelo.ModeloUsuarioUXXIRRHH;
-import es.ujaen.uvirtual.modelo.bolsaempleo.ModeloUsuarioBolsaEmpleo;
+import es.ujaen.uvirtual.modulo.bolsaempleo.modelo.ModeloUsuarioBolsaEmpleo;
 import es.ujaen.uvirtual.utilidades.Formateador;
 import es.ujaen.uvirtual.utilidades.Memcache;
 
@@ -48,27 +48,22 @@ public class CrearUsuario {
 			ModeloUsuarioBolsaEmpleo modeloBolsaEmpleo = ModeloUsuarioBolsaEmpleo.obtenerInstancia();
 			List<String> rolesAdministradosUV = modeloAdministracion.listaRolesUsuario(uid, true);
 			List<String> rolesDelUsuarioUV = modeloAdministracion.listaRolesUsuario(uid, false);
-			List<String> rolesDelUsuarioBolsaEmpleo = modeloBolsaEmpleo.listaRolesUsuario(uid);
-			
+						
 			for (String grp: rolesDelUsuarioUV) {
 				if (!rolesDelUsuario.contains(grp)) {
 					rolesDelUsuario.add(grp);
 				}
 			}
 			
-			
-			
-			//NO VA A PRODUCCION BORRAR ANTES DE SUBIR
+			//////////////////// CONSULTAR ANTES DE SUBIR A PRODUCCION
+			List<String> rolesDelUsuarioBolsaEmpleo = modeloBolsaEmpleo.listaRolesUsuario(uid);
 			for (String grp: rolesDelUsuarioBolsaEmpleo) {
 				if (!rolesDelUsuario.contains(grp)) {
 					rolesDelUsuario.add(grp);
 				}
 			}
-			//
-			
-			
-			
-			
+			///////////////////////////////////////////////////////////////////////////
+						
 			// Los roles administrados se añaden como administrador y como rol del usr. 
 			for (String grp: rolesAdministradosUV) {
 				if (!rolesAdministrados.contains(grp)) {
@@ -233,7 +228,6 @@ public class CrearUsuario {
 				usuario.setRoles(rolesPorDominio.get(usuario.getDominio()));
 				usuario.setRolesAdministrados(rolesAdministrados);
 				
-				System.out.print(usuario);
 			}
 			
 			if (erroresArcos || erroresUvirtual || erroresRrhh || erroresAc || erroresDominio || usuario == null) {

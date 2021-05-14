@@ -9,12 +9,16 @@ import static org.junit.Assert.assertTrue;
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
 
+import org.junit.FixMethodOrder;
 import org.junit.Test;
-import es.ujaen.uvirtual.beans.uvirtual.bolsaempleo.Fichero;
+import org.junit.runners.MethodSorters;
+
+import es.ujaen.uvirtual.modulo.bolsaempleo.beans.Fichero;
 
 /** test fichero.
  *
  */
+@FixMethodOrder(MethodSorters.NAME_ASCENDING)
 public class TestBEPBeanFichero {
 
 	private static final String CADENA = "cadena";
@@ -52,6 +56,7 @@ public class TestBEPBeanFichero {
     	fichero.setNombre(CADENA);
     	fichero.setTitulo(CADENA);
     	fichero.setArchivo(ARCHIVO);
+    	fichero.setPublico(BOOLEANO);
 		assertEquals(id, fichero.getCodNum());
 		assertEquals(CADENA, fichero.getNombre());
 		assertEquals(CADENA, fichero.getTitulo());

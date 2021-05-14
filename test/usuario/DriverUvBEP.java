@@ -50,7 +50,7 @@ public class DriverUvBEP {
 	public static void login() {
 		driver.get("http://localhost:8080/srv/es/index");
 		WebElement username = driver.findElement(By.name("usuario"));
-		username.sendKeys("usig");
+		username.sendKeys("personal1");
 		username.submit();
 	}
 	
@@ -58,42 +58,39 @@ public class DriverUvBEP {
 	 * @param url . 
 	 * @return deuelve un string con json leido
 	 */
+	@java.lang.SuppressWarnings("java:S2093") 
 	public static String getAjaxRequestJson(String url) throws IOException {
-	    HttpURLConnection c = null;
 	    Cookie cookie = driver.manage().getCookieNamed("JSESSIONID");
+	    URL u = new URL(url);
+	    HttpURLConnection c = null;
 	    
-	    try {
-	        URL u = new URL(url);
-	        c = (HttpURLConnection) u.openConnection();
-	        c.setRequestMethod("GET");
-	        c.setRequestProperty("Content-length", "0");
-	        c.setRequestProperty("Cookie", cookie.getName() + "=" + cookie.getValue());
-	        c.setUseCaches(false);
-	        c.setAllowUserInteraction(false);
-//	        c.setConnectTimeout(timeout);
-//	        c.setReadTimeout(timeout);
-	        c.connect();
-	        
-	        int status = c.getResponseCode();
+		try {
+			c = (HttpURLConnection) u.openConnection();
 
-	        switch (status) {
-	            case RESPONSE_CODE_200:
-	            case RESPONSE_CODE_201:
-	                BufferedReader br = new BufferedReader(new InputStreamReader(c.getInputStream()));
-	                StringBuilder sb = new StringBuilder();
-	                String line;
-	                while ((line = br.readLine()) != null) {
-	                    sb.append(line + "\n");
-	                }
-	                br.close();
-	                return sb.toString();
-	        }
+			c.setRequestMethod("GET");
+			c.setRequestProperty("Content-length", "0");
+			c.setRequestProperty("Cookie", cookie.getName() + "=" + cookie.getValue());
+			c.setUseCaches(false);
+			c.setAllowUserInteraction(false);
+			c.connect();
 
-	    } finally {
-	       if (c != null) {
-	    	   c.disconnect();
-	       }
-	    }
+			int status = c.getResponseCode();
+
+			if (status == RESPONSE_CODE_200 || status == RESPONSE_CODE_201) {
+				BufferedReader br = new BufferedReader(new InputStreamReader(c.getInputStream()));
+				StringBuilder sb = new StringBuilder();
+				String line;
+				while ((line = br.readLine()) != null) {
+					sb.append(line + "\n");
+				}
+				br.close();
+				return sb.toString();
+			}
+		} finally {
+			if (c != null) {
+				c.disconnect();
+			}
+		}
 	    
 	    return null;
 	}
@@ -103,7 +100,6 @@ public class DriverUvBEP {
 	}
 	
 	/** inicializa la bd para realizar las pruebas.
-	 * @throws IOException si error en fichero
 	 * @throws SQLException si error en bd
 	 */
 	public static void inicializaBd() throws IOException, SQLException {

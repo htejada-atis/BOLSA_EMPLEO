@@ -67,7 +67,7 @@ public class TestFormateador {
 		final Double ceroCreditos = 0.0;
 		final Double creditosNegativos = -10.0;
 		String creditos = Formateador.formatoCreditos(creditosEntrada, 1);
-		assertEquals("2.5", creditos);
+		assertEquals("2,5", creditos);
 		String creditos1 = Formateador.formatoCreditos(creditosEntrada, -1, false);
 		assertEquals("#¡ERROR DE PRECISIÓN!#", creditos1);
 		String creditos2 = Formateador.formatoCreditos(creditosEntrada, tres, false);
@@ -79,11 +79,11 @@ public class TestFormateador {
 		String creditos5 = Formateador.formatoCreditos(creditosNegativos, 1, false);
 		assertEquals("#¡NÚMERO DE CRÉDITOS NO VÁLIDO!#", creditos5);
 		String creditos6 = Formateador.formatoCreditos(creditosEntrada, 1, true);
-		assertEquals("2.5", creditos6);
+		assertEquals("2,5", creditos6);
 		String creditos7 = Formateador.formatoCreditos(creditosEntrada, 0, true);
 		assertEquals("2", creditos7);
 		String creditos8 = Formateador.formatoCreditos(creditosEntrada, 2, true);
-		assertEquals("2.5", creditos8);
+		assertEquals("2,5", creditos8);
 	}
 	
 	/** formato fecha.
@@ -141,11 +141,11 @@ public class TestFormateador {
 		String textoFormato = Formateador.formatoCalificacion(calificacion, 0);
 		assertEquals("2", textoFormato);
 		String textoFormato2 = Formateador.formatoCalificacion(calificacion, 1);
-		assertEquals("2.5", textoFormato2);
+		assertEquals("2,5", textoFormato2);
 		String textoFormato3 = Formateador.formatoCalificacion(calificacion, 2);
-		assertEquals("2.50", textoFormato3);
+		assertEquals("2,50", textoFormato3);
 		String textoFormato4 = Formateador.formatoCalificacion(calificacion, numeroMaximoDecimales);
-		assertEquals("2.500", textoFormato4);
+		assertEquals("2,500", textoFormato4);
 	}
 	
 	/** limita.
@@ -263,11 +263,11 @@ public class TestFormateador {
 	public void testA14() {
 		final Integer cero = 0;
 		final Integer uno = 1;
-		//final Integer cuatro = 4;
+		final Integer cuatro = 4;
 		final Double tresPuntoCinco = 3.5;
-		//final Float tresPuntoCuarenta = 3.4005F;
-		//Integer integer1 = Formateador.getNumeroDecimales(tresPuntoCuarenta);
-		//assertEquals(cuatro, integer1);
+		final Float tresPuntoCuarenta = 3.4005F;
+		Integer integer1 = Formateador.getNumeroDecimales(tresPuntoCuarenta);
+		assertEquals(cuatro, integer1);
 		Integer integer2 = Formateador.getNumeroDecimales(tresPuntoCinco);
 		assertEquals(uno, integer2);
 		Integer integer3 = Formateador.getNumeroDecimales(null);

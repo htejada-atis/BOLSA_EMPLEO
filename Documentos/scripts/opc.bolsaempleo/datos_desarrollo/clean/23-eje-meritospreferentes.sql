@@ -1,0 +1,7 @@
+DROP TABLE TBEP_HTO_MERITOS_PREFERENTES;
+--/////////////////////
+DROP TABLE TBEP_MERITOS_PREFERENTES;
+--/////////////////////
+DROP SEQUENCE QBEP_MEP;
+--/////////////////////
+DROP SEQUENCE QBEP_HTO_MEP;

@@ -5,13 +5,17 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
-import org.junit.Test;
 
-import es.ujaen.uvirtual.beans.uvirtual.bolsaempleo.Departamento;
+import org.junit.FixMethodOrder;
+import org.junit.Test;
+import org.junit.runners.MethodSorters;
+
+import es.ujaen.uvirtual.modulo.bolsaempleo.beans.Departamento;
 
 /** test departamentos.
  *
  */
+@FixMethodOrder(MethodSorters.NAME_ASCENDING)
 public class TestBEPBeanDepartamento {
 
 	private static final String COD_DEPARTAMENTO = "dep01";

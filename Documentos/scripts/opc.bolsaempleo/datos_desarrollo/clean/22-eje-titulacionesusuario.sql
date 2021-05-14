@@ -1,0 +1,7 @@
+DROP TABLE TBEP_HTO_TITULACIONES_USUARIO;
+--/////////////////////
+DROP TABLE TBEP_TITULACIONES_USUARIO;
+--/////////////////////
+DROP SEQUENCE QBEP_TUS;
+--/////////////////////
+DROP SEQUENCE QBEP_HTO_TUS;

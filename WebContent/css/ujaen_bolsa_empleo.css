@@ -8,16 +8,97 @@
 	padding: 0px 8px;
 }
 
+.bolsa-empleo .pointer {	
+    cursor: pointer;
+}
+
+.bolsa-empleo a.disabled {
+    pointer-events: none;
+}
+
+.bolsa-empleo select, .bolsa-empleo input[type=text], .bolsa-empleo input[type=number], .bolsa-empleo textarea {
+	border: 1px solid rgb(118, 118, 118);
+	border-radius: 3px;
+	box-sizing: border-box;
+}
+
+.bolsa-empleo input[type=text]:disabled, .bolsa-empleo input[type=number]:disabled, .bolsa-empleo textarea:disabled {
+	border: 1px solid rgba(118, 118, 118, 0.3);
+}
+
+.bolsa-empleo select {
+	padding: 4px;
+	background-color: white;
+}
+
+.bolsa-empleo select:focus {
+	background-color: #FFFF99;
+}
+
+.bolsa-empleo input[type=text], .bolsa-empleo input[type=number], .bolsa-empleo textarea {
+	padding: 4px 6px;
+}
+
+/* icons */
+.bolsa-empleo .icon, .bolsa-empleo .only-icon {
+	white-space: nowrap;
+	overflow: hidden;
+	text-overflow: ellipsis;
+}
+
+.bolsa-empleo .only-icon {
+	padding: 0px;
+}
+
+.bolsa-empleo .icon:before, .bolsa-empleo .only-icon:before {
+    content: "";
+	display: inline-block;
+	width: 20px;
+    height: 20px;
+    background-size: 20px 20px;
+  	background-repeat: no-repeat;
+  	vertical-align: -50%;
+}
+
+.bolsa-empleo .icon-download:before {
+	background-image: url(../img/md/file_download.svg);
+}
+
+#merito_preferente_form p.helper {
+	margin-top: 0;
+}
+
+#merito_preferente_form li.selected {
+	font-weight: bold;
+}
+
+/* grid system */
+.bolsa-empleo .row {
+	display: flex;
+	flex-wrap: wrap;
+	gap: 16px;
+}
+.bolsa-empleo .row > .col {
+	flex: 1 0 0%;
+}
+@media (min-width: 768px) {
+	.bolsa-empleo .row > .col-md-7 {
+		flex: 0 0 auto;
+	    width: 58.3333333333%;
+	}
+}
+
 /* datatable */
 table.bluetable.bolsaempleo {
-	width: 100%;	
+	width: 100%;
 	margin-left: 0;
-	margin-right: 0;	
+	margin-right: 0;
 }
 table.bluetable.bolsaempleo th {
 	padding-left: 5px;
 }
-table.bluetable.bolsaempleo th.center {
+table.bluetable.bolsaempleo th.center,
+table.bluetable.bolsaempleo td.center {
 	text-align: center;
 }
 /* datatable ordenacion */
@@ -31,7 +112,7 @@ table.bluetable.bolsaempleo tfoot span.total {
 table.bluetable.bolsaempleo tfoot button.btn.last {
 	margin-right: 5px;
 }
-table.bluetable.bolsaempleo button.btn:hover {
+table.bluetable.bolsaempleo button.btn:hover:enabled {
 	background-color: #83a8ff;
 	border: 1px solid #83a8ff;
 }
@@ -48,6 +129,13 @@ table.bluetable.bolsaempleo .selected {
 table.bluetable.bolsaempleo .clickable:hover {
 	cursor: pointer;
 }
+table.bluetable.bolsaempleo .page-size select {
+	margin-right: 5px;
+	border-radius: unset;
+}
+.bolsa-empleo .table-responsive{
+	overflow-x: auto;
+}
 /* datatable header */
 table.bluetable.bolsaempleo caption {
 	background-color:#B9C9FE;
@@ -55,16 +143,47 @@ table.bluetable.bolsaempleo caption {
 	color:#003399;
 	padding:0.5rem;
 }
-table.bluetable.bolsaempleo .filterable input {
+table.bluetable.bolsaempleo caption .dropdown {
 	display: block;
+	width: 15px;
+    height: 15px;
+    float: right;
+    border-radius: 50%;
+    background-repeat: no-repeat;
+    background-color: #F0F0F0;
+    cursor: pointer;
+}
+/* invert(10%) sepia(62%) saturate(6451%) hue-rotate(216deg) brightness(97%) contrast(103%) */
+table.bluetable.bolsaempleo caption .dropdown img {
+	width: 15px;
+    height: 15px;
+	filter: invert(89%) sepia(5%) saturate(6124%) hue-rotate(184deg) brightness(95%) contrast(112%);
+}
+table.bluetable.bolsaempleo caption .dropdown .show {
+	transform: scaleY(-1);
+}
+/* datatable filters */
+table.bluetable.bolsaempleo .filterable input {
 	width: 100%;
 	max-width: 150px;
+	font-size: 13px;
 }
-table.bluetable.bolsaempleo .page-size select {
-	margin-right: 5px;
-	border-radius: unset;
+table.bluetable.bolsaempleo .filterable select {
+	width: 100%;
+	max-width: 150px;
+	font-size: 13px;
 }
-
+/* datatable inputs && selects */
+table.bluetable.bolsaempleo input[type=text], table.bluetable.bolsaempleo input[type=number], table.bluetable.bolsaempleo select {
+	display: inline-block;
+	border-radius: 0px;
+}
+table.bluetable.bolsaempleo input[type=text], table.bluetable.bolsaempleo input[type=number] {
+	padding: 1px 2px;
+}
+table.bluetable.bolsaempleo select {
+	padding: 0px;
+}
 /* datatable buttons */
 table.bluetable.bolsaempleo .btns .btn {
 	width: 100%;
@@ -73,7 +192,10 @@ table.bluetable.bolsaempleo .btns .btn {
 }
 table.bluetable.bolsaempleo span button {
 	margin-left: 1px;
-	border: 1px solid #767676;
+	border: 1px solid rgb(118, 118, 118);
+}
+table.bluetable.bolsaempleo span button:disabled {
+	border: 1px solid rgba(118, 118, 118, 0.3);
 }
 table.bluetable.bolsaempleo button.btn, table.bluetable.bolsaempleo .page-size select {
 	font-size: 11px; /* Set a font size */
@@ -244,6 +366,11 @@ nav-bolsa-empleo a:active, nav-bolsa-empleo a:hover {
 	text-decoration: none;
 }
 
+.link-btn.disabled {
+	pointer-events: none;
+	opacity: .65;
+}
+
 .bolsa-empleo #nueva_noticia span {
 	display: inline-block;
 	padding: .6em;
@@ -354,14 +481,27 @@ nav-bolsa-empleo a:active, nav-bolsa-empleo a:hover {
   opacity: 1;
 }
 
+/* Formularios */
+.bold-label {
+	font-weight: bold;
+}
 
-
-
-
-.form-group-custom, .form-check-custom, .form-btn, .form-file, .form-select {
+.form-group-custom, .form-btn, .form-file, .form-select {
 	display: inline-block;
 	width: 50% !important;
 	margin-bottom: 1rem;
+}
+
+.form-check-custom {
+	display: inline-block;
+	width: 49% !important;
+}
+
+.form-check-custom.w-35{
+	width: 35% !important;
+}
+.form-check-custom.w-64{
+	width: 64% !important;
 }
 
 .form-group-custom label, .form-check-custom label, .form-file label, .form-select label {
@@ -378,9 +518,25 @@ nav-bolsa-empleo a:active, nav-bolsa-empleo a:hover {
 	display: block;
 }
 
+.form-group-custom.w100{
+	display: inline-block;
+	width: 100% !important;
+	margin-bottom: 1rem;
+}
+
 .form-group-container {
     display: grid;
     grid-template-columns: 1fr 1fr;
+    grid-gap: 20px;
+}
+
+.form-group-container.helper > .form-group {
+	margin-bottom: 0;
+}
+
+.form-group-container-offset {
+    display: grid;
+    grid-template-columns: 4fr 1fr;
     grid-gap: 20px;
 }
 
@@ -390,6 +546,9 @@ nav-bolsa-empleo a:active, nav-bolsa-empleo a:hover {
 
 .form-group-container.col2 {
 	grid-template-columns: 1fr 1fr;
+}
+.form-group-container.col3 {
+	grid-template-columns: 1fr 1fr 1fr;
 }
 
 .form-input-custom{
@@ -426,3 +585,31 @@ nav-bolsa-empleo a:active, nav-bolsa-empleo a:hover {
 	color:#003399;
 	padding:0.5rem;
 }
+
+/* Botones */
+.btn-align-right {
+	display: flex;
+	flex-direction: row-reverse;
+}
+
+.btns-by-steps {
+	display: flex;
+	justify-content: space-between;
+	margin: 10px 0px;
+}
+
+
+
+a.consultar-fichero {
+  background-color: #B9C9FE;
+  color: #003399;
+  padding: 2px 6px 2px 6px;
+  text-decoration: none;
+  margin: 0 auto;
+}
+
+a.consultar-fichero:hover {
+  background-color: #049FE1;
+  cursor: pointer;
+}
+

@@ -1,0 +1,12 @@
+INSERT INTO TBEP_AFINIDADES (CODNUM,CODIGO,DESCRIPCION,MODULACION)
+VALUES (1,'AA','Contribuciones propias del área de la plaza.',100);
+INSERT INTO TBEP_AFINIDADES (CODNUM,CODIGO,DESCRIPCION,MODULACION)
+VALUES (2,'AA','Contribuciones afines a la área de la plaza.',50);
+INSERT INTO TBEP_AFINIDADES (CODNUM,CODIGO,DESCRIPCION,MODULACION)
+VALUES (3,'AA','Sin afinidad a la área de la plaza.',0);
+INSERT INTO TBEP_AFINIDADES (CODNUM,CODIGO,DESCRIPCION,MODULACION)
+VALUES (4,'AI','Contribuciones de investigación propias del área de la plaza.',100);
+INSERT INTO TBEP_AFINIDADES (CODNUM,CODIGO,DESCRIPCION,MODULACION)
+VALUES (5,'AI','Contribuciones de investigación afines del área de la plaza.',50);
+INSERT INTO TBEP_AFINIDADES (CODNUM,CODIGO,DESCRIPCION,MODULACION)
+VALUES (6,'AI','Sin afinidad a la área de la plaza.',0);

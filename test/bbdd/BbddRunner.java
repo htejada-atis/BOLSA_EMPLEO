@@ -5,7 +5,9 @@ import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
 import java.sql.Connection;
+import java.sql.PreparedStatement;
 import java.sql.SQLException;
+import java.sql.SQLIntegrityConstraintViolationException;
 import java.sql.Statement;
 import java.util.Scanner;
 import java.util.logging.Level;
@@ -14,6 +16,7 @@ import java.util.logging.Logger;
 import javax.sql.DataSource;
 
 import es.ujaen.uvirtual.modelo.conexion.Conexion;
+import es.ujaen.uvirtual.utilidades.Formateador;
 import es.ujaen.uvirtual.utilidades.Memcache;
 import oracle.jdbc.pool.OracleDataSource;
 
@@ -42,7 +45,7 @@ public class BbddRunner {
     static {
     	LOGGER.log(Level.INFO, "inicializacion de oracle");
 		try {
-			LOGGER.log(Level.INFO, "Conexión BBDD: " + getCadenaConexionBd());
+			LOGGER.log(Level.INFO, "Conexión BBDD: {0}", getCadenaConexionBd());
 			odsUv = new OracleDataSource();
 			odsUv.setURL(getCadenaConexionBd());
 			odsUv.setUser(usuarioBdUv);
@@ -96,13 +99,34 @@ public class BbddRunner {
 		return odsAc;
 	}
 
-	private static Connection obtenerConexionUvirtual() throws SQLException {
+	/** obtiene la conexión con uvirtual.
+	 * @return .
+	 * @throws SQLException .
+	 */
+	public static Connection obtenerConexionUvirtual() throws SQLException {
 		return odsUv.getConnection();
 	}
 
-	private static Connection obtenerConexionArcos() throws SQLException {
+	/** obtiene la conexión con arcos.
+	 * @return .
+	 * @throws SQLException .
+	 */
+	public static Connection obtenerConexionArcos() throws SQLException {
 		return odsArcos.getConnection();
 	}
+	
+	private static Connection obtenerConexionAc() throws SQLException {
+		return odsAc.getConnection();
+	}	
+	
+	/** obtiene la conexión con rrhh.
+	 *
+	 * @return .
+	 * @throws SQLException .
+	 */
+	public static Connection obtenerConexionRh() throws SQLException {
+		return odsRh.getConnection();
+	}	
 	
 	/** conectar a todas las db.
 	 */
@@ -118,8 +142,16 @@ public class BbddRunner {
     	System.setProperty("memcacheUrl", BbddRunner.getServidorMemcache());
     	System.setProperty("net.spy.log.LoggerImpl", "net.spy.memcached.compat.log.SunLogger");
     	Logger.getLogger("net.spy.memcached").setLevel(Level.WARNING);
-    	Memcache.getInstance();
+    	Memcache memcache = Memcache.getInstance();
+    	memcache.invalidateAllKeys();
     	Memcache.disable();
+	}
+	
+	private static void insertMasivo(Connection conexion, String rutaFichero) throws SQLException, FileNotFoundException {
+		LOGGER.log(Level.INFO, "InsertMasivo {0}", rutaFichero);
+		try (Scanner s = new Scanner(new BufferedReader(new FileReader(rutaFichero)))) {
+			procesarLineaInsertMasivo(s, conexion);
+		}
 	}
 	
 	/** ejecuta instrucciones SQL del fichero separadas por ; en bbdd uvirtual.
@@ -130,11 +162,8 @@ public class BbddRunner {
 	 * @throws FileNotFoundException si no existe fichero
 	 */
 	public static void insertMasivo(String rutaFichero) throws SQLException, FileNotFoundException {
-		try (Connection con = obtenerConexionUvirtual();
-			 Statement statement = con.createStatement()) {
-			try (Scanner s = new Scanner(new BufferedReader(new FileReader(rutaFichero)))) {
-				procesarLineaInsertMasivo(s, statement);
-			}
+		try (Connection con = obtenerConexionUvirtual()) {
+			insertMasivo(con, rutaFichero);
 		}
 	}
 	
@@ -146,15 +175,38 @@ public class BbddRunner {
 	 * @throws FileNotFoundException si no existe fichero
 	 */
 	public static void insertMasivoArcos(String rutaFichero) throws SQLException, FileNotFoundException {
-		try (Connection con = obtenerConexionArcos();
-			 Statement statement = con.createStatement()) {
-			try (Scanner s = new Scanner(new BufferedReader(new FileReader(rutaFichero)))) {
-				procesarLineaInsertMasivo(s, statement);
-			}
+		try (Connection con = obtenerConexionArcos()) {
+			insertMasivo(con, rutaFichero);
+		}
+	}
+
+	/** ejecuta instrucciones SQL del fichero separadas por ; en bbdd uxxiac.
+	 * 
+	 * <p>los comentarios deben empezar por -- y terminar en la misma linea en ;.</p>
+	 * @param rutaFichero ruta del fichero a cargar
+	 * @throws SQLException si error en bd
+	 * @throws FileNotFoundException si no existe fichero
+	 */
+	public static void insertMasivoAc(String rutaFichero) throws SQLException, FileNotFoundException {
+		try (Connection con = obtenerConexionAc()) {
+			insertMasivo(con, rutaFichero);
 		}
 	}
 	
-	private static void procesarLineaInsertMasivo(Scanner s, Statement statement) throws SQLException {
+	/** ejecuta instrucciones SQL del fichero separadas por ; en bbdd uxxiac.
+	 * 
+	 * <p>los comentarios deben empezar por -- y terminar en la misma linea en ;.</p>
+	 * @param rutaFichero ruta del fichero a cargar
+	 * @throws SQLException si error en bd
+	 * @throws FileNotFoundException si no existe fichero
+	 */
+	public static void insertMasivoRh(String rutaFichero) throws SQLException, FileNotFoundException {
+		try (Connection con = obtenerConexionRh()) {
+			insertMasivo(con, rutaFichero);
+		}
+	}
+
+	private static void procesarLineaInsertMasivo(Scanner s, Connection conexion) throws SQLException {
 		s.useDelimiter(";");
 		while (s.hasNext()) {
 			String instruccion = s.next().trim();
@@ -165,12 +217,38 @@ public class BbddRunner {
 			if (instruccion.startsWith("--")) {
 				LOGGER.log(Level.INFO, instruccion);
 			} else {
-				statement.execute(instruccion);
+				ejecutarInstruccion(conexion, instruccion, true);
 			}
 		}
 	}
 	
-	private static void procesarLineaEjecutar(Scanner s, Statement statement) throws SQLException {
+	private static void ejecutarInstruccion(Connection conexion, String instruccion) throws SQLException {
+		ejecutarInstruccion(conexion, instruccion, false);
+	}
+	
+	private static void ejecutarInstruccion(Connection conexion, String instruccion, boolean ignoreConstraint) throws SQLException {
+		final int longitudMinimaInstruccion = 4;
+		if (instruccion.length() < longitudMinimaInstruccion) {
+			return;
+		}
+		try (Statement statement = conexion.createStatement()) {
+			statement.execute(instruccion);
+		} catch (SQLIntegrityConstraintViolationException e) {
+			if (ignoreConstraint) {
+				LOGGER.log(Level.FINE, "Instruccion viola constraint {0}", instruccion);
+			} else {
+				String logSql = "Error ejecutando instruccion " + instruccion + System.lineSeparator() + Formateador.getStackTrace(e);
+				LOGGER.log(Level.SEVERE, logSql);
+				throw e;
+			}
+		} catch (SQLException e) {
+			String logSql = "Error ejecutando instruccion " + instruccion + System.lineSeparator() + Formateador.getStackTrace(e);
+			LOGGER.log(Level.SEVERE, logSql);
+			throw e;
+		}
+	}
+	
+	private static void procesarLineaEjecutar(Scanner s, Connection conexion) throws SQLException {
 		final int longitudMinimaIntruccion = 10;
 		s.useDelimiter("--/////////////////////");
 		while (s.hasNext()) {
@@ -193,14 +271,14 @@ public class BbddRunner {
 			}
 			if (instruccion.startsWith("drop")) {
 				String[] partes = instruccion.split(" ");
-				drop(partes[1], partes[2]);
+				drop(conexion, partes[1], partes[2]);
 				ejecutado = true;
 			}
 			if (instruccion.startsWith("--")) {
 				ejecutado = true;
 			}
 			if (!ejecutado && instruccion.length() > longitudMinimaIntruccion) {
-					statement.execute(instruccion);
+				ejecutarInstruccion(conexion, instruccion);
 			}
 		}
 	}
@@ -219,6 +297,13 @@ public class BbddRunner {
 		}
 		return salida.toString();
 	}
+	
+	private static void ejecutar(Connection conexion, String rutaFichero) throws IOException, SQLException {
+		LOGGER.log(Level.INFO, "ejecutar {0}", rutaFichero);
+		try (Scanner s = new Scanner(new BufferedReader(new FileReader(rutaFichero)))) {
+			procesarLineaEjecutar(s, conexion);
+		}
+	}
 
 	/** ejecutar fichero con instrucciones SQL separada por el delimitadoren bd uvirtual.
 	 * @param rutaFichero ruta del fichero a cargar en la bd
@@ -226,11 +311,8 @@ public class BbddRunner {
 	 * @throws SQLException si error en bd
 	 */
 	public static void ejecutar(String rutaFichero) throws IOException, SQLException {
-		try (Connection con = obtenerConexionUvirtual();
-			 Statement statement = con.createStatement()) {
-			try (Scanner s = new Scanner(new BufferedReader(new FileReader(rutaFichero)))) {
-				procesarLineaEjecutar(s, statement);
-			}
+		try (Connection con = obtenerConexionUvirtual()) {
+			ejecutar(con, rutaFichero);
 		}
 	}
 	
@@ -240,20 +322,40 @@ public class BbddRunner {
 	 * @throws SQLException si error en bd
 	 */
 	public static void ejecutarArcos(String rutaFichero) throws IOException, SQLException {
-		try (Connection con = obtenerConexionArcos();
-			 Statement statement = con.createStatement()) {
-			try (Scanner s = new Scanner(new BufferedReader(new FileReader(rutaFichero)))) {
-				procesarLineaEjecutar(s, statement);
-			}
+		try (Connection con = obtenerConexionArcos()) {
+			ejecutar(con, rutaFichero);
+		}
+	}
+	
+	/** ejecutar fichero con instrucciones SQL separada por el delimitadoren bd uxxiac.
+	 * @param rutaFichero ruta del fichero a cargar en la bd
+	 * @throws IOException si error lectura fichero
+	 * @throws SQLException si error en bd
+	 */
+	public static void ejecutarAc(String rutaFichero) throws IOException, SQLException {
+		try (Connection con = obtenerConexionAc()) {
+			ejecutar(con, rutaFichero);
+		}
+	}
+
+	/** ejecutar fichero con instrucciones SQL separada por el delimitadoren bd rrhh.
+	 * @param rutaFichero ruta del fichero a cargar en la bd
+	 * @throws IOException si error lectura fichero
+	 * @throws SQLException si error en bd
+	 */
+	public static void ejecutarRh(String rutaFichero) throws IOException, SQLException {
+		try (Connection con = obtenerConexionRh()) {
+			ejecutar(con, rutaFichero);
 		}
 	}
 
 	/** Borrar elemento de la bbdd.
+	 * @param conexion conexion a la bd
 	 * @param tipo tipo de elemento, como tabla, secuencia, etc
 	 * @param nombre nombre del elemento a borrar
-	 * @throws SQLException si error en bbdd
+	 * @throws SQLException si error en bd
 	 */
-	private static void drop(String tipo, String nombre) throws SQLException {
+	private static void drop(Connection conexion, String tipo, String nombre) throws SQLException {
 		String sql = "BEGIN"
 				   + "  EXECUTE IMMEDIATE 'DROP " + tipo + " " + nombre + "'; "
 				   + "  EXCEPTION " 
@@ -262,9 +364,12 @@ public class BbddRunner {
 				   + "        RAISE; "
 				   + "      END IF; "
 				   + "END;";
-		try (Connection con = obtenerConexionUvirtual();
-			 Statement stmt = con.createStatement()) {
+		try (Statement stmt = conexion.createStatement()) {
 			stmt.execute(sql);
+		} catch (SQLException e) {
+			String mensaje = "error al ejecutar drop de " + tipo + " " + nombre;
+			LOGGER.log(Level.SEVERE, mensaje);
+			throw e;
 		}
 	}
 	
@@ -285,5 +390,32 @@ public class BbddRunner {
 			return "jdbc:oracle:thin:@" + urlDbSystem + ":1521:XE";
 		}
 		return cadenaConexionDefecto;
+	}
+	
+	
+	/**
+	 * Consulta SQL para Insertar y Eliminar datos de  prueba individual.
+	 * @param consulta SQL
+	 */
+	public static void insertDelete(String consulta) {
+		LOGGER.log(Level.INFO, "insertDelete {0}", consulta);
+		try (Connection conexion = obtenerConexionUvirtual();
+			 PreparedStatement stmt = conexion.prepareStatement(consulta);) {
+			stmt.executeUpdate();
+		} catch (SQLException e) {
+			LOGGER.logp(Level.SEVERE, NOMBREDEESTACLASE, "Exception SQL ", e.getMessage());
+		} 
+	}
+	
+	/** inicializa los datos de la bd.
+	 * @throws IOException si error io
+	 * @throws SQLException si error db
+	 */
+	public static void inicializaBd() throws IOException, SQLException {
+		BbddRunner.conectarBd();
+		BbddRunner.insertMasivoArcos("Documentos/docker/init-oracle/21-arcos-datos.sql");
+		BbddRunner.insertMasivo("Documentos/docker/init-oracle/22-uvirtual-datos.sql");
+		BbddRunner.insertMasivoRh("Documentos/docker/init-oracle/23-uxxirrhh-datos.sql");
+		BbddRunner.insertMasivoAc("Documentos/docker/init-oracle/24-uxxiac-datos.sql");
 	}
 }

@@ -1,8 +1,8 @@
 <%@ page trimDirectiveWhitespaces="true"%>
 <%@ page import="es.ujaen.uvirtual.beans.UVDatos"%>
-<%@	page import="es.ujaen.uvirtual.controlador.infadministrativa.bolsaempleo.ControladorGestionTitulaciones"%>
-<%@ page import="es.ujaen.uvirtual.beans.vistas.uvirtual.bolsaempleo.VistaTitulaciones"%>
-<%@ page import="es.ujaen.uvirtual.beans.uvirtual.bolsaempleo.Area" %>
+<%@	page import="es.ujaen.uvirtual.modulo.bolsaempleo.controlador.configuracion.ControladorGestionTitulaciones"%>
+<%@ page import="es.ujaen.uvirtual.modulo.bolsaempleo.vistas.VistaTitulaciones"%>
+<%@ page import="es.ujaen.uvirtual.modulo.bolsaempleo.beans.Area" %>
 <%@ page import="es.ujaen.uvirtual.utilidades.EscapaHTML" %>
 
 <%
@@ -10,18 +10,7 @@ UVDatos uvdatos = (UVDatos) request.getAttribute(UVDatos.NOMBRE_ATRIBUTO);
 VistaTitulaciones bean = (VistaTitulaciones) uvdatos.getVistas().get(VistaTitulaciones.class.getName());
 %>
 
-<div class="bolsa-empleo">
-
-	<%
-		if (session.getAttribute(ControladorGestionTitulaciones.MENSAJE_ENVIADO) != null) {
-		%>
-		<div id="exito" class="success">
-			<%=session.getAttribute(ControladorGestionTitulaciones.MENSAJE_ENVIADO)%>
-		</div>
-	<%
-			session.removeAttribute(ControladorGestionTitulaciones.MENSAJE_ENVIADO);
-		}
-	%>
+<div class="bolsa-empleo titulacionespreferentes">
 	
 	<% if (bean.getMensajesDeExito().size() > 0) { %>
 		<div id="exito" class="success">
@@ -32,7 +21,7 @@ VistaTitulaciones bean = (VistaTitulaciones) uvdatos.getVistas().get(VistaTitula
 		<div id="error" class="error">
 			<%= bean.formatearMensajesDeError() %>
 		</div>
-	<% } else {%>
+	<% } %>
 	
 	<div class="titulo-bolsa-empleo">
 		<h2>Titulaciones</h2>
@@ -56,7 +45,7 @@ VistaTitulaciones bean = (VistaTitulaciones) uvdatos.getVistas().get(VistaTitula
 			</tr>
 		</tfoot>
 	</table>
-	<% } %>
+	
 </div>
 
 <script>
@@ -70,7 +59,7 @@ VistaTitulaciones bean = (VistaTitulaciones) uvdatos.getVistas().get(VistaTitula
 		    "filterable": true,
 		    "columns": [
 		    	{'data': 'codNum', 'filter': {'type': 'number'}},
-		        {'data': 'nombre', 'filter': true, 'class': 'overflow-auto'},
+		        {'data': 'nombre', 'filter': true, 'overflow': 'auto'},
 		        {'data': 'codnum', 'buttons': [{'label': 'Editar', 'title': 'Editar titulación', 'onClick': function(row) {
 		        	var params = {
 		    				'a': '<%=ControladorGestionTitulaciones.ACCION_EDITAR_TITULACION %>', 

@@ -15,31 +15,34 @@ import java.util.List;
 import javax.sql.DataSource;
 
 import org.junit.BeforeClass;
+import org.junit.FixMethodOrder;
 import org.junit.Test;
+import org.junit.runners.MethodSorters;
 
 import bbdd.BbddRunner;
 import bbdd.UtilsTestBolsaEmpleo;
-import es.ujaen.uvirtual.beans.Rol;
-import es.ujaen.uvirtual.beans.uvirtual.bolsaempleo.Merito;
-import es.ujaen.uvirtual.beans.uvirtual.bolsaempleo.UsuarioBolsaEmpleo;
-import es.ujaen.uvirtual.modelo.bolsaempleo.ModeloMerito;
-import es.ujaen.uvirtual.modelo.bolsaempleo.ModeloUsuarioBolsaEmpleo;
 import es.ujaen.uvirtual.modelo.conexion.Conexion;
+import es.ujaen.uvirtual.modulo.bolsaempleo.beans.Merito;
+import es.ujaen.uvirtual.modulo.bolsaempleo.beans.Rol;
+import es.ujaen.uvirtual.modulo.bolsaempleo.beans.UsuarioBolsaEmpleo;
+import es.ujaen.uvirtual.modulo.bolsaempleo.modelo.ModeloMerito;
+import es.ujaen.uvirtual.modulo.bolsaempleo.modelo.ModeloUsuarioBolsaEmpleo;
 import es.ujaen.uvirtual.utilidades.UVException;
 
 
 /** test usuarios bolsa empleo.
 *
 */
+@FixMethodOrder(MethodSorters.NAME_ASCENDING)
 public class TestBEPModeloUsuarios {
 
-	private static final Integer CODPERSONA = 100;
 	private static final String CODCUENTA = "test2";
 	private static final Rol ROL = new Rol(1050);
 	private static final String EMAIL = "test@test";
 	private static final String RAZONEXCLUIDO = "test";
 	private static final Boolean LISTADIST = true;
 	private static final Boolean EXCLUIDO = false;
+	private static final String EXCLUIDOTIPO = "EJEMPLO";
 	private static final Boolean BORRADO = true;
 	private static final String SEXO = "M";
 	private static final Date FECHAEXCLUSION = new java.sql.Date(Calendar.getInstance().getTime().getTime());
@@ -65,12 +68,12 @@ public class TestBEPModeloUsuarios {
     @Test
     public void testA01InsertaUsuario() throws SQLException, ParseException, UVException {
     	UsuarioBolsaEmpleo usuario = new UsuarioBolsaEmpleo();
-		usuario.setCodPersona(CODPERSONA);
 		usuario.setCodCuenta(CODCUENTA);
 		usuario.setRol(ROL);
 		usuario.setEmail(EMAIL);
 		usuario.setListaDist(LISTADIST);
 		usuario.setExcluido(EXCLUIDO);
+		usuario.setExcluidoTipo(EXCLUIDOTIPO);
 		usuario.setRazonExcluido(RAZONEXCLUIDO);
 		usuario.setFechaExclusion(FECHAEXCLUSION);
 		usuario.setBorrado(BORRADO);
@@ -113,8 +116,10 @@ public class TestBEPModeloUsuarios {
             	meritosAcum.add(mer.getCodNum().toString());
             }
         }
-    	
-    	modeloMeritos.eliminarMeritos(meritosAcum);
+    	if (meritosAcum.size() > 0) {
+        	modeloMeritos.eliminarMeritos(meritosAcum);
+    	}
+
     	modelo.borraUsuario(usuario);
     	try {
     		modelo.listaUsuario(usuario.getCodCuenta());

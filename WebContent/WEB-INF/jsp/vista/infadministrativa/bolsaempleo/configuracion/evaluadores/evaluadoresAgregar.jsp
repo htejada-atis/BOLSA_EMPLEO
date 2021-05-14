@@ -1,8 +1,8 @@
 <%@ page trimDirectiveWhitespaces="true"%>
 <%@ page import="es.ujaen.uvirtual.beans.UVDatos"%>
-<%@	page import="es.ujaen.uvirtual.controlador.infadministrativa.bolsaempleo.ControladorGestionEvaluadores"%>
-<%@ page import="es.ujaen.uvirtual.beans.vistas.uvirtual.bolsaempleo.VistaEvaluadores"%>
-<%@ page import="es.ujaen.uvirtual.beans.uvirtual.bolsaempleo.Area" %>
+<%@	page import="es.ujaen.uvirtual.modulo.bolsaempleo.controlador.configuracion.ControladorGestionEvaluadores"%>
+<%@ page import="es.ujaen.uvirtual.modulo.bolsaempleo.vistas.VistaEvaluadores"%>
+<%@ page import="es.ujaen.uvirtual.modulo.bolsaempleo.beans.Area" %>
 <%@ page import="es.ujaen.uvirtual.utilidades.EscapaHTML" %>
 
 <%
@@ -10,7 +10,7 @@ UVDatos uvdatos = (UVDatos) request.getAttribute(UVDatos.NOMBRE_ATRIBUTO);
 VistaEvaluadores bean = (VistaEvaluadores) uvdatos.getVistas().get(VistaEvaluadores.class.getName());
 %>
 
-<div class="bolsa-empleo">
+<div class="bolsa-empleo evaluadores-agregar">
 	
 	<% if (bean.getMensajesDeExito().size() > 0) { %>
 		<div id="exito" class="success">
@@ -21,7 +21,7 @@ VistaEvaluadores bean = (VistaEvaluadores) uvdatos.getVistas().get(VistaEvaluado
 		<div id="error" class="error">
 			<%= bean.formatearMensajesDeError() %>
 		</div>
-	<% } else {%>
+	<% } %>
 	
 	<h2>Evaluadores de un área</h2>
 	
@@ -29,7 +29,7 @@ VistaEvaluadores bean = (VistaEvaluadores) uvdatos.getVistas().get(VistaEvaluado
 		<caption class="table-title">Agregar nuevo evaluador al Área <%= bean.getArea().getDescripcion() %></caption>  
 		<tr>
 			<th scope="col" style="width:10%"></th>
-			<th scope="col" style="width:25%">D.N.I</th>
+			<th scope="col" class="dni" style="width:25%">D.N.I</th>
 			<th scope="col"	style="width:65%">Nombre</th>
 		</tr>
 		<tbody>
@@ -40,7 +40,7 @@ VistaEvaluadores bean = (VistaEvaluadores) uvdatos.getVistas().get(VistaEvaluado
 			</tr>
 		</tfoot>
 	</table>
-	<% } %>
+	
 </div>
 
 <script>

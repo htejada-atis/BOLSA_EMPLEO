@@ -12,7 +12,9 @@ import java.util.logging.Logger;
 import org.junit.AfterClass;
 import org.junit.Before;
 import org.junit.BeforeClass;
+import org.junit.FixMethodOrder;
 import org.junit.Test;
+import org.junit.runners.MethodSorters;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.ui.ExpectedConditions;
@@ -21,21 +23,22 @@ import org.openqa.selenium.support.ui.WebDriverWait;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 
-import es.ujaen.uvirtual.beans.uvirtual.bolsaempleo.Bolsa;
-import es.ujaen.uvirtual.controlador.infadministrativa.bolsaempleo.ControladorBolsas;
-import es.ujaen.uvirtual.utilidades.BolsaEmpleoDataTable;
+import es.ujaen.uvirtual.modulo.bolsaempleo.beans.Bolsa;
+import es.ujaen.uvirtual.modulo.bolsaempleo.controlador.ControladorBolsas;
+import es.ujaen.uvirtual.modulo.bolsaempleo.utilidades.BolsaEmpleoDataTable;
 
 /** Clase para probar solicitudCrud.
  * @author usig
  *
  */
+@FixMethodOrder(MethodSorters.NAME_ASCENDING)
 public class TestBEPMenusBolsaTrabajo {
 	private static final String NOMBREDEESTACLASE = TestBEPMenusBolsaTrabajo.class.getName();
 
 	private static final Logger LOGGER = Logger.getLogger(NOMBREDEESTACLASE);
 	private static final Integer WAIT_ELEMENT = 5; // segundos
 	
-	private static final String DIV_MAIN_BOLSAS = "bolsas";
+	private static final String DIV_MAIN_BOLSAS = "bolsa-empleo";
 	private static final String ID_TABLE = "table";
 	private static final String CLASS_PAGINATION = "pagination";
 	private static final String CLASS_PAGINATION_NEXT = "next";
@@ -92,13 +95,13 @@ public class TestBEPMenusBolsaTrabajo {
 		assertTrue(numElementos > 0);
 		
 		// click sobre ordenación y comprobamos que existe icono
-		WebElement th = table.findElement(By.xpath("//th[@class='area']"));
+		WebElement th = table.findElement(By.className("area"));
 		th.click();
 		WebElement img = th.findElement(By.className("order"));
-		assertTrue(img.getAttribute("src").indexOf("down.png") != -1);
+		assertTrue(img.getAttribute("src").indexOf("up.png") != -1);
 		th.click();
 		img = th.findElement(By.className("order"));
-		assertTrue(img.getAttribute("src").indexOf("up.png") != -1);
+		assertTrue(img.getAttribute("src").indexOf("down.png") != -1);
 		
 		// paginacion
 		WebElement pagination = table.findElement(By.className(CLASS_PAGINATION));

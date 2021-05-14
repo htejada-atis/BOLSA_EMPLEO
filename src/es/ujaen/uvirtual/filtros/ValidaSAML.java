@@ -62,7 +62,7 @@ public class ValidaSAML implements Filter {
 		HttpServletRequest req = (HttpServletRequest) request;
         HttpSession session = req.getSession(true);
         String uidUsuario = req.getParameter(PARAM_USUARIO);
-		if ((session.getAttribute(this.validSessionKey) == null) && (uidUsuario != null) && !"".equals(uidUsuario)) {
+		if (session.getAttribute(this.validSessionKey) == null && uidUsuario != null && !"".equals(uidUsuario)) {
 			uidUsuario = uidUsuario.trim();
 			session.setAttribute(this.userSessionAttr, uidUsuario);
 			session.setAttribute(this.validSessionKey, uidUsuario);

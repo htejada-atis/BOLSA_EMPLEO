@@ -11,14 +11,19 @@ import java.util.logging.Logger;
 import org.junit.AfterClass;
 import org.junit.Before;
 import org.junit.BeforeClass;
+import org.junit.FixMethodOrder;
 import org.junit.Test;
+import org.junit.runners.MethodSorters;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebElement;
+
+import bbdd.UtilsTestDocentia;
 
 /** Clase para probar solicitudCrud.
  * @author usig
  *
  */
+@FixMethodOrder(MethodSorters.NAME_ASCENDING)
 public class TestConvocatoriaCrud {
 	private static final String NOMBREDEESTACLASE = TestConvocatoriaCrud.class.getName();
 
@@ -42,9 +47,9 @@ public class TestConvocatoriaCrud {
 	@BeforeClass
 	public static void setUp() throws IOException, SQLException {
 		LOGGER.log(Level.INFO, "inicio");
-		DriverUv.inicializaBd();
+		UtilsTestDocentia.inicializaDocentia();	
 		DriverUv.inicializaDriver();
-		DriverUv.login();
+		DriverUv.login("usig");
 	}
 
 	/** Se ejecuta antes de cada test.
@@ -52,10 +57,10 @@ public class TestConvocatoriaCrud {
 	 */
 	@Before
 	public void navegaOpcion() {
-		DriverUv.getDriver().get("http://localhost:8080/srv/es/index");
-		DriverUv.getDriver().get("http://localhost:8080/srv/es/informacionadministrativa");
-		DriverUv.getDriver().get("http://localhost:8080/srv/es/informacionadministrativa/docentia");
-		DriverUv.getDriver().get("http://localhost:8080/srv/es/informacionadministrativa/docentia/convocatoriacrud");
+		DriverUv.getDriver().get(DriverUv.RUTA + "/srv/es/index");
+		DriverUv.getDriver().get(DriverUv.RUTA + "/srv/es/informacionadministrativa");
+		DriverUv.getDriver().get(DriverUv.RUTA + "/srv/es/informacionadministrativa/docentia");
+		DriverUv.getDriver().get(DriverUv.RUTA + "/srv/es/informacionadministrativa/docentia/convocatoriacrud");
 	}
 	
 	/** Inserta una convocatoria.

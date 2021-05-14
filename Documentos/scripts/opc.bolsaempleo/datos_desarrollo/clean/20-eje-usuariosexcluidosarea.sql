@@ -1,0 +1,7 @@
+DROP TABLE TBEP_HTO_USUARIOS_EXCLUIDOS_AREA;
+--/////////////////////
+DROP TABLE TBEP_USUARIOS_EXCLUIDOS_AREA;
+--/////////////////////
+DROP SEQUENCE QBEP_UEA;
+--/////////////////////
+DROP SEQUENCE QBEP_UEA_HTO;

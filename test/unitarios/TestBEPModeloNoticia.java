@@ -9,15 +9,19 @@ import java.text.SimpleDateFormat;
 import java.util.List;
 import javax.sql.DataSource;
 import org.junit.BeforeClass;
+import org.junit.FixMethodOrder;
 import org.junit.Test;
+import org.junit.runners.MethodSorters;
+
 import bbdd.BbddRunner;
 import bbdd.UtilsTestBolsaEmpleo;
-import es.ujaen.uvirtual.beans.uvirtual.bolsaempleo.Noticia;
-import es.ujaen.uvirtual.modelo.bolsaempleo.ModeloNoticia;
 import es.ujaen.uvirtual.modelo.conexion.Conexion;
+import es.ujaen.uvirtual.modulo.bolsaempleo.beans.Noticia;
+import es.ujaen.uvirtual.modulo.bolsaempleo.modelo.ModeloNoticia;
 import es.ujaen.uvirtual.utilidades.UVException;
 
 /** Clase para probar el modelo noticia. */
+@FixMethodOrder(MethodSorters.NAME_ASCENDING)
 public class TestBEPModeloNoticia {
 	
     private static final String FORMATO_FECHA = "dd/MM/yyyy";
@@ -147,10 +151,7 @@ public class TestBEPModeloNoticia {
      */
     @Test(expected = UVException.class)
     public void testE04InsertaNoticiaSinFecha() throws SQLException, UVException {
-    	Noticia noticia = new Noticia();
-    	noticia.setEnlace(ENLACE_NOTICIA);
-    	noticia.setTexto(TEXTO_NOTICIA);
-    	noticia.setPublica(PUBLICA_NOTICIA);
+    	Noticia noticia = null;
     	ModeloNoticia modelo = ModeloNoticia.obtenerInstancia();
     	modelo.insertaNoticia(noticia);
     	fail();

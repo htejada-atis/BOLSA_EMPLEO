@@ -21,6 +21,14 @@ function setProp( object, keys, val ){
 	object[keys[0]] = val;
 }
 
+function removeValueArray(array, val) {
+	array = Array.isArray(array) ? array : [array];
+	const index = array.indexOf(val);
+	if (index > -1) {
+		array.splice(index, 1);
+	}	
+}
+
 function formatearFecha(fecha) {
 	var sin_hora = fecha.split(" ")[0];
 	var sin_guiones = sin_hora.split("-");
@@ -66,10 +74,22 @@ function sendForm(url, params) {
 	form.submit();
 }
 
-function alertDialog(title, message) {
+function sendAjax(url, params, success, error) {
+	$.ajax({
+		type: 'GET',
+		url: url,
+		contentType: "application/json",
+		dataType: "json",
+		data: params,
+		success: success,
+		error: error
+	});
+}
+
+function alertDialog(title, message, onOk) {
 	$('<div class="atisDialog"></div>')
 		.appendTo('body')
-		.html('<div><h6>' + message + '</h6></div>')
+		.html(message)
 		.dialog({
 			modal: true,
 			title: title,
@@ -79,7 +99,13 @@ function alertDialog(title, message) {
 			resizable: false,
 			buttons: {
 				Ok: function() {
-					$(this).dialog("close");
+					if (onOk) {
+						if (onOk(this)) {
+							$(this).dialog("close");
+						}
+					} else {
+						$(this).dialog("close");
+					}
 				}
 			},
 			close: function(event, ui) {
@@ -90,7 +116,7 @@ function alertDialog(title, message) {
 
 function confirmDialog(title, message, buttons) {
 	$('<div></div>').appendTo('body')
-	    	.html('<div><h6>' + message + '</h6></div>')
+	    	.html(message)
 	    	.dialog({
 		      modal: true,
 		      title: title,
@@ -113,6 +139,18 @@ function json2Object(json) {
 	return JSON.parse(json);
 }
 
+function escapeHtml(str) {
+    //return str.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;").replace(/'/g, "&#039;");
+    return str.replace(/</g, "&lt;").replace(/>/g, "&gt;");
+}
+
+function redondearFloat(number, decimalPlaces) {
+	// https://medium.com/swlh/how-to-round-to-a-certain-number-of-decimal-places-in-javascript-ed74c471c1b8
+
+	decimalPlaces = decimalPlaces || 2;
+	return Number(Math.round(number + "e" + decimalPlaces) + "e-" + decimalPlaces);
+}
+
 window.Atis = $.extend(window.Atis ? window.Atis : {}, {
 	"getProp": getProp,
 	"setProp": setProp,
@@ -120,8 +158,12 @@ window.Atis = $.extend(window.Atis ? window.Atis : {}, {
 	"confirmDialog": confirmDialog,
 	"getErrorResponse": getErrorResponse,
 	"isFunction": isFunction,
-	"formatearFecha": formatearFecha,
+	"formatearFecha": formatearFecha,	
 	"sendForm": sendForm,
 	"object2Json": object2Json,
-	"json2Object": json2Object
+	"json2Object": json2Object,
+	"sendAjax": sendAjax,
+	"removeValueArray": removeValueArray,
+	"escapeHtml": escapeHtml,
+	"redondearFloat": redondearFloat
 });
