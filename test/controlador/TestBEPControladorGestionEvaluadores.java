@@ -246,4 +246,27 @@ public class TestBEPControladorGestionEvaluadores {
 		assertEquals(MENSAJE_SIN_EXITO, 0, bean2.getMensajesDeExito().size());
 	}
 	
+	/** agregar evaluador dentro de un área no válido .
+	 * @throws SQLException .
+	 * @throws ServletException .
+	 * @throws IOException .
+	 */
+	@Test
+	public void testE03AgregarEvaluadorNoValido() throws SQLException, ServletException, IOException {
+		PeticionHttp peticion = UtilsTestBolsaEmpleo.peticionAutenticadaPersonal();
+		peticion.setParameter(ControladorGestionEvaluadores.PARAM_ACCION, ControladorGestionEvaluadores.ACCION_AGREGAR_EVALUADORES);
+		peticion.setParameter(ControladorGestionEvaluadores.PARAM_NOMBRE_EVALUADOR, "candidato2");
+		
+		VistaEvaluadores bean2 = getVistaConAreas();
+		peticion.setParameter(ControladorGestionEvaluadores.PARAM_AREA, bean2.getAreas().get(0).getCodNum().toString());
+		
+		RespuestaHttp respuesta = new RespuestaHttp();
+		ControladorGestionEvaluadores controlador = new ControladorGestionEvaluadores();
+		controlador.doPost(peticion, respuesta);
+		VistaEvaluadores bean3 = (VistaEvaluadores) peticion.getUVDatos().getVistas().get(VistaEvaluadores.class.getName());
+		
+		assertEquals(MENSAJE_CON_ERROR, 1, bean3.getMensajesDeError().size());
+		assertEquals(MENSAJE_SIN_EXITO, 0, bean3.getMensajesDeExito().size());
+	}
+	
 }
