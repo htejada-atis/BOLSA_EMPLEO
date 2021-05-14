@@ -155,8 +155,9 @@ public class BolsaEmpleoDataTable<T> {
 			throw new UVException(ERROR_MSG_PARAMETRO_BUSQUEDA_NO_VALIDO);
 		}
 
-		if (this.orderDirection != null && !this.orderDirection.equals(PARAM_ORDER_DIRECTION_VALUE_ASC) && !this.orderDirection.equals(PARAM_ORDER_DIRECTION_VALUE_DESC)) {
-			throw new UVException(ERROR_MSG_PARAMETRO_TIPO_ORDENACION_NO_VALIDO);           
+		if (!this.orderDirection.isBlank() && !this.orderDirection.equals(PARAM_ORDER_DIRECTION_VALUE_ASC)
+				&& this.orderDirection != null && !this.orderDirection.equals(PARAM_ORDER_DIRECTION_VALUE_DESC)) {
+			throw new UVException(ERROR_MSG_PARAMETRO_TIPO_ORDENACION_NO_VALIDO);
 		}
 	}
 

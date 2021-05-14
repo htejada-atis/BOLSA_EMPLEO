@@ -3,7 +3,6 @@ package controlador;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotEquals;
 import static org.junit.Assert.assertNotNull;
-
 import java.io.IOException;
 import java.sql.SQLException;
 import javax.servlet.ServletException;
@@ -11,12 +10,12 @@ import org.junit.BeforeClass;
 import org.junit.FixMethodOrder;
 import org.junit.Test;
 import org.junit.runners.MethodSorters;
-
 import bbdd.BbddRunner;
 import bbdd.UtilsTestBolsaEmpleo;
 import controlador.implementacion.PeticionHttp;
 import controlador.implementacion.RespuestaHttp;
 import es.ujaen.uvirtual.modulo.bolsaempleo.controlador.configuracion.ControladorGestionEvaluadores;
+import es.ujaen.uvirtual.modulo.bolsaempleo.modelo.ModeloUsuarioBolsaEmpleo;
 import es.ujaen.uvirtual.modulo.bolsaempleo.utilidades.BolsaEmpleoDataTable;
 import es.ujaen.uvirtual.modulo.bolsaempleo.vistas.VistaEvaluadores;
 
@@ -30,6 +29,7 @@ public class TestBEPControladorGestionEvaluadores {
 	private static final String MENSAJE_AREAS_DEVUELTAS = "Debe devolver areas";
 	private static final String MENSAJE_EVALUADOR_DEVUELTO = "Debe devolver evaluador";
 	private static final String MENSAJE_CON_ERROR = "Debe devolver error";
+	private static final String MENSAJE_CON_ERROR_ESPERADO = "El mensaje de error debe coincidir";
 	private static final String MENSAJE_CON_EXITO_ESPERADO = "El mensaje de exito debe coincidir";
 	private static final String MENSAJE_SIN_ADVERTENCIAS = "No debe mostrar advertencias";
 	private static final String MENSAJE_SIN_ERROR = "No debe devolver error";
@@ -123,6 +123,8 @@ public class TestBEPControladorGestionEvaluadores {
 		assertEquals(MENSAJE_SIN_ADVERTENCIAS, 0, bean.getMensajesDeAdvertencia().size());
 	}
 	
+	
+	
 	/** agregar evaluadores dentro de un área .
 	 * @throws SQLException si fallo bd .
 	 * @throws IOException si error io .
@@ -132,7 +134,7 @@ public class TestBEPControladorGestionEvaluadores {
 	public void testA04AgregarEvaluadores() throws SQLException, ServletException, IOException {
 		PeticionHttp peticion = UtilsTestBolsaEmpleo.peticionAutenticadaPersonal();
 		peticion.setParameter(ControladorGestionEvaluadores.PARAM_ACCION, ControladorGestionEvaluadores.ACCION_AGREGAR_EVALUADORES);
-		peticion.setParameter(ControladorGestionEvaluadores.PARAM_NOMBRE_EVALUADOR, "comision1");
+		peticion.setParameter(ControladorGestionEvaluadores.PARAM_NOMBRE_EVALUADOR, "comision2");
 		
 		VistaEvaluadores bean2 = getVistaConAreas();
 		peticion.setParameter(ControladorGestionEvaluadores.PARAM_AREA, bean2.getAreas().get(0).getCodNum().toString());
@@ -222,28 +224,76 @@ public class TestBEPControladorGestionEvaluadores {
 		assertEquals(MENSAJE_SIN_EXITO, 0, bean2.getMensajesDeExito().size());
 	}
 	
-	/** Obtener datatable usuarios con parámetro no válido para forzar el error .
-	 * @throws SQLException si fallo bd .
-	 * @throws IOException si error io .
-	 * @throws ServletException  si error servlet .
+	/** agregar evaluador dentro de un área con rol no válido .
+	 * @throws SQLException .
+	 * @throws ServletException .
+	 * @throws IOException .
 	 */
 	@Test
-	public void testE02ObtenerUsuariosParametroNoValido() throws SQLException, ServletException, IOException {
-		VistaEvaluadores bean = getVistaConAreas();
-		
+	public void testE03AgregarEvaluadorRolNoValido() throws SQLException, ServletException, IOException {
 		PeticionHttp peticion = UtilsTestBolsaEmpleo.peticionAutenticadaPersonal();
-		peticion.setParameter(ControladorGestionEvaluadores.PARAM_ACCION, ControladorGestionEvaluadores.ACCION_DATATABLE_USUARIOS);
-		peticion.setParameter(ControladorGestionEvaluadores.PARAM_AREA, bean.getAreas().get(0).getCodNum().toString());
-		peticion.setParameter(BolsaEmpleoDataTable.PARAM_ORDER_BY, "9");
+		peticion.setParameter(ControladorGestionEvaluadores.PARAM_ACCION, ControladorGestionEvaluadores.ACCION_AGREGAR_EVALUADORES);
+		peticion.setParameter(ControladorGestionEvaluadores.PARAM_NOMBRE_EVALUADOR, "candidato2");
+		
+		VistaEvaluadores bean2 = getVistaConAreas();
+		peticion.setParameter(ControladorGestionEvaluadores.PARAM_AREA, bean2.getAreas().get(0).getCodNum().toString());
 		
 		RespuestaHttp respuesta = new RespuestaHttp();
 		ControladorGestionEvaluadores controlador = new ControladorGestionEvaluadores();
 		controlador.doPost(peticion, respuesta);
+		VistaEvaluadores bean3 = (VistaEvaluadores) peticion.getUVDatos().getVistas().get(VistaEvaluadores.class.getName());
 		
-		VistaEvaluadores bean2 = (VistaEvaluadores) peticion.getUVDatos().getVistas().get(VistaEvaluadores.class.getName());
+		assertEquals(MENSAJE_CON_ERROR, 1, bean3.getMensajesDeError().size());
+		assertEquals(MENSAJE_SIN_EXITO, 0, bean3.getMensajesDeExito().size());
+		assertEquals(MENSAJE_CON_ERROR_ESPERADO, ControladorGestionEvaluadores.MENSAJE_ERROR_ROL_COMISION, bean3.getMensajesDeError().get(0));
+	}
+	
+	/** agregar evaluador dentro de un área usuario no válido .
+	 * @throws SQLException .
+	 * @throws ServletException .
+	 * @throws IOException .
+	 */
+	@Test
+	public void testE04AgregarEvaluadorNoValido() throws SQLException, ServletException, IOException {
+		PeticionHttp peticion = UtilsTestBolsaEmpleo.peticionAutenticadaPersonal();
+		peticion.setParameter(ControladorGestionEvaluadores.PARAM_ACCION, ControladorGestionEvaluadores.ACCION_AGREGAR_EVALUADORES);
+		peticion.setParameter(ControladorGestionEvaluadores.PARAM_NOMBRE_EVALUADOR, "usuarionovalido");
 		
-		assertEquals(MENSAJE_CON_ERROR, 1, bean2.getMensajesDeError().size());
-		assertEquals(MENSAJE_SIN_EXITO, 0, bean2.getMensajesDeExito().size());
+		VistaEvaluadores bean2 = getVistaConAreas();
+		peticion.setParameter(ControladorGestionEvaluadores.PARAM_AREA, bean2.getAreas().get(0).getCodNum().toString());
+		
+		RespuestaHttp respuesta = new RespuestaHttp();
+		ControladorGestionEvaluadores controlador = new ControladorGestionEvaluadores();
+		controlador.doPost(peticion, respuesta);
+		VistaEvaluadores bean3 = (VistaEvaluadores) peticion.getUVDatos().getVistas().get(VistaEvaluadores.class.getName());
+		
+		assertEquals(MENSAJE_CON_ERROR, 1, bean3.getMensajesDeError().size());
+		assertEquals(MENSAJE_SIN_EXITO, 0, bean3.getMensajesDeExito().size());
+		assertEquals(MENSAJE_CON_ERROR_ESPERADO, ModeloUsuarioBolsaEmpleo.MENSAJE_USUARIO_NO_EXISTE, bean3.getMensajesDeError().get(0));
+	}
+	
+	/** agregar evaluador dentro de un área que ya existe .
+	 * @throws SQLException .
+	 * @throws ServletException .
+	 * @throws IOException .
+	 */
+	@Test
+	public void testE05AgregarEvaluadorYaExistente() throws SQLException, ServletException, IOException {
+		PeticionHttp peticion = UtilsTestBolsaEmpleo.peticionAutenticadaPersonal();
+		peticion.setParameter(ControladorGestionEvaluadores.PARAM_ACCION, ControladorGestionEvaluadores.ACCION_AGREGAR_EVALUADORES);
+		peticion.setParameter(ControladorGestionEvaluadores.PARAM_NOMBRE_EVALUADOR, "comision1");
+		
+		VistaEvaluadores bean2 = getVistaConAreas();
+		peticion.setParameter(ControladorGestionEvaluadores.PARAM_AREA, bean2.getAreas().get(0).getCodNum().toString());
+		
+		RespuestaHttp respuesta = new RespuestaHttp();
+		ControladorGestionEvaluadores controlador = new ControladorGestionEvaluadores();
+		controlador.doPost(peticion, respuesta);
+		VistaEvaluadores bean3 = (VistaEvaluadores) peticion.getUVDatos().getVistas().get(VistaEvaluadores.class.getName());
+		
+		assertEquals(MENSAJE_CON_ERROR, 1, bean3.getMensajesDeError().size());
+		assertEquals(MENSAJE_SIN_EXITO, 0, bean3.getMensajesDeExito().size());
+		assertEquals(MENSAJE_CON_ERROR_ESPERADO, ControladorGestionEvaluadores.MENSAJE_ERROR_EVALUADOR_YA_EXISTE, bean3.getMensajesDeError().get(0));
 	}
 	
 }
