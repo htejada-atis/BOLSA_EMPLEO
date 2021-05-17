@@ -1,17 +1,33 @@
 package es.ujaen.uvirtual.modulo.bolsaempleo.controlador.configuracion;
 
+import java.awt.Color;
+import java.io.BufferedInputStream;
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.PrintWriter;
 import java.sql.SQLException;
 import java.util.logging.Logger;
 import java.util.List;
 import java.util.logging.Level;
 import javax.servlet.ServletException;
+import javax.servlet.ServletOutputStream;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import com.google.gson.Gson;
+import com.lowagie.text.Cell;
+import com.lowagie.text.Chunk;
+import com.lowagie.text.Document;
+import com.lowagie.text.Font;
+import com.lowagie.text.FontFactory;
+import com.lowagie.text.Paragraph;
+import com.lowagie.text.Phrase;
+import com.lowagie.text.Table;
+import com.lowagie.text.alignment.HorizontalAlignment;
+import com.lowagie.text.pdf.PdfWriter;
 
 import es.ujaen.uvirtual.beans.CodigoDescripcion;
 import es.ujaen.uvirtual.beans.UVDatos;
@@ -91,6 +107,7 @@ public class ControladorItemsBaremacion extends HttpServlet {
 	public static final String ACCION_ITEM_SELECCIONADO = "itemseleccionado";
 	public static final String ACCION_ITEM_EXCLUYENTE_SELECCIONADO = "itemexcluyenteseleccionado";
 	public static final String ACCION_ITEM_EXCLUYENTE_DESELECCIONADO = "itemexcluyentedeseleccionado";
+	public static final String ACCION_DESCARGAR_FICHERO = "descargarfichero";
 	public static final String MENSAJE_EXITO_ITEM_AGREGAR = "Item agregado correctamente";
 	public static final String MENSAJE_EXITO_ITEM_EDITAR = "Item editado correctamente";
 	public static final String MENSAJE_EXITO_ITEM_DESACTIVAR = "Item desactivado correctamente";
@@ -123,6 +140,28 @@ public class ControladorItemsBaremacion extends HttpServlet {
 	public static final String PARAM_ITEM_INDIVIDUALIZADO = "individualizado";
 	public static final String PARAM_ITEMS_SELECCIONADOS = "itemsseleccionados";
 	
+	//pdf
+	public static final int PDF_ANCHO = 4;
+	public static final int PDF_ALTO = 4;
+	public static final int PDF_FORMATO = 4;
+	public static final int PDF_TABLE_COLUMNS = 5;
+	public static final int PDF_TABLE_PADDING = 5;
+	public static final int SIZE_8 = 8;
+	public static final int SIZE_10 = 10;
+	public static final int SIZE_40 = 40;
+	public static final int SIZE_100_WIDTH = 100;	
+	public static final int[] SIZE_100 = {10, 60, 10, 10, 10};	
+	
+	public static final int COLOR_51 = 51;
+	public static final int COLOR_112 = 112;
+	public static final int COLOR_153 = 153;
+	public static final int COLOR_185 = 185;
+	public static final int COLOR_201 = 201;
+	public static final int COLOR_241 = 241;
+	public static final int COLOR_254 = 254;
+	public static final int COLSPAN = 5;
+	public static final int INDENTATION_LIST = 20;
+	
 	// mensajes
 	public static final String MENSAJE_ERROR_CODIGO_VACIO = "El código no puede estar vacio";
 	public static final String MENSAJE_ERROR_CODIGO_MAXIMO = "El código no puede ser mayor que ";
@@ -141,6 +180,7 @@ public class ControladorItemsBaremacion extends HttpServlet {
 	public static final String JSP_ITEM_BAREMACION = RUTA_BEP_CONF + "itemsbaremacion.jsp";
 
 	// ajax
+	public static final String URL_PATTERN_FILES_PRIVADA = "/srv/es/informacionadministrativa/bolsaempleo/configuracion/itemsbaremacion";
 	public static final String URL_PATTERN_AJAX = "/srv/es/ajax/informacionadministrativa/bolsaempleo/configuracion/itemsbaremacion";
 	public static final String RESPONSE_AJAX_CONTENTTYPE = "application/json";
 	public static final String RESPONSE_AJAX_ENCODING = "UTF-8";
@@ -166,10 +206,13 @@ public class ControladorItemsBaremacion extends HttpServlet {
 		}
 		
 		try {
-			init(bean, datos);
+			init(bean, datos, request, response);
 			switch (nombreAccion) {
 				case ACCION_INDEX:
 					indice(bean);
+					break;
+				case ACCION_DESCARGAR_FICHERO:
+					descargarItems(bean, datos, request, response, usuario);
 					break;
 				case ACCION_DATATABLE_APARTADOS:
 				case ACCION_AGREGAR_APARTADO:
@@ -181,7 +224,6 @@ public class ControladorItemsBaremacion extends HttpServlet {
 				case ACCION_APARTADO_SELECCIONADO:
 					accionesApartados(bean, datos, request, response, nombreAccion);					
 					break;
-				
 				case ACCION_DATATABLE_BLOQUES:
 				case ACCION_AGREGAR_BLOQUE:
 				case ACCION_AGREGAR_BLOQUE_CONFIRM:
@@ -244,9 +286,15 @@ public class ControladorItemsBaremacion extends HttpServlet {
 		bean.setVista(JSP_ITEM_BAREMACION);
 	}
 	
-	private void init(VistaItemsBaremacion bean, UVDatos datos) throws SQLException, UVException {
+	private void init(VistaItemsBaremacion bean, UVDatos datos, HttpServletRequest request, HttpServletResponse response) throws SQLException, UVException, IOException {
 		bean.setVista(JSP_ITEM_BAREMACION);
-		ModeloUsuarioBolsaEmpleo.obtenerInstancia().checkUser(datos);
+		BolsaEmpleoUtils.readMensajeSession(bean, request);
+		try {
+			ModeloUsuarioBolsaEmpleo.obtenerInstancia().checkUser(datos);
+		} catch (UVException e) {
+			BolsaEmpleoUtils.addMensajeDeError(e.getMessage(), bean, request);
+			response.sendRedirect("/srv/es/informacionadministrativa/bolsaempleo/error");
+		}
 	}
 	
 	private void accionNodefinida(VistaItemsBaremacion bean) {
@@ -277,10 +325,10 @@ public class ControladorItemsBaremacion extends HttpServlet {
 				editarApartadoConfirm(bean, request);
 				break;
 			case ACCION_DESACTIVAR_APARTADO:
-				desactivarApartado(bean, request);
+				desactivarApartado(bean, request, response);
 				break;
 			case ACCION_ACTIVAR_APARTADO:
-				activarApartado(bean, request);
+				activarApartado(bean, request, response);
 				break;
 			case ACCION_APARTADO_SELECCIONADO:
 				seleccionarApartado(bean, request);
@@ -325,11 +373,11 @@ public class ControladorItemsBaremacion extends HttpServlet {
 		apartado.setActivo(true);
 		ModeloBaremacionApartados.obtenerInstancia().insertaApartado(apartado);
 		
-		bean.getMensajesDeExito().add(MENSAJE_EXITO_APARTADO_AGREGAR);
+		BolsaEmpleoUtils.addMensajeDeExito(MENSAJE_EXITO_APARTADO_AGREGAR, bean, request);
 		bean.setVista(JSP_ITEM_BAREMACION);				
 	}
 	
-	private void desactivarApartado(VistaItemsBaremacion bean, HttpServletRequest request) throws SQLException, UVException {
+	private void desactivarApartado(VistaItemsBaremacion bean, HttpServletRequest request, HttpServletResponse response) throws SQLException, UVException, IOException {
 		bean.setVista(JSP_ITEM_BAREMACION);
 		
 		ModeloBaremacionApartados modelo = ModeloBaremacionApartados.obtenerInstancia();
@@ -338,10 +386,11 @@ public class ControladorItemsBaremacion extends HttpServlet {
 		
 		modelo.desactivarApartado(apartado);
 		
-		bean.getMensajesDeExito().add(MENSAJE_EXITO_APARTADO_DESACTIVAR);
+		BolsaEmpleoUtils.addMensajeDeExito(MENSAJE_EXITO_APARTADO_DESACTIVAR, bean, request);
+		response.sendRedirect(request.getServletPath());
 	}
 	
-	private void activarApartado(VistaItemsBaremacion bean, HttpServletRequest request) throws SQLException, UVException {
+	private void activarApartado(VistaItemsBaremacion bean, HttpServletRequest request, HttpServletResponse response) throws SQLException, UVException, IOException {
 		bean.setVista(JSP_ITEM_BAREMACION);
 		
 		ModeloBaremacionApartados modelo = ModeloBaremacionApartados.obtenerInstancia();
@@ -350,7 +399,8 @@ public class ControladorItemsBaremacion extends HttpServlet {
 		
 		modelo.activarApartado(apartado);
 		
-		bean.getMensajesDeExito().add(MENSAJE_EXITO_APARTADO_ACTIVAR);	
+		BolsaEmpleoUtils.addMensajeDeExito(MENSAJE_EXITO_APARTADO_ACTIVAR, bean, request);
+		response.sendRedirect(request.getServletPath());
 	}
 	
 	private void editarApartado(VistaItemsBaremacion bean, HttpServletRequest request) throws SQLException, UVException {
@@ -359,7 +409,7 @@ public class ControladorItemsBaremacion extends HttpServlet {
 		bean.setApartadoBaremacion(modelo.getApartadoBaremacionById(codNum));
 		
 		bean.setVista(JSP_FORM_APARTADO_BAREMACION);
-		bean.setUltimoCodigo(modelo.getUltimoCodigoApartado());			
+		bean.setUltimoCodigo(modelo.getUltimoCodigoApartado());	
 	}
 	
 	private void editarApartadoConfirm(VistaItemsBaremacion bean, HttpServletRequest request) throws SQLException, UVException {
@@ -821,6 +871,173 @@ public class ControladorItemsBaremacion extends HttpServlet {
 		bean.setApartadoBaremacion(itemPadre.getBloqueBaremacion().getApartadoBaremacion());
 		bean.setBloqueBaremacion(itemPadre.getBloqueBaremacion());
 		bean.setVista(RUTA_BEP_CONF + "formItemBaremacion.jsp");
+	}
+	
+	/** descarga un fichero .
+	 * @param bean .
+	 * @param datos .
+	 * @param request .
+	 * @param response .
+	 * @param usu .
+	 * @throws SQLException excepcion de bbdd.
+	 * @throws UVException en caso de error de parametros .
+	 * @throws IOException en caso de error de input u output .
+	 */
+	private void descargarItems(VistaItemsBaremacion bean, UVDatos datos, 
+			HttpServletRequest request, HttpServletResponse response, Usuario usu) throws SQLException, UVException, IOException {
+		try (ServletOutputStream stream = response.getOutputStream(); BufferedInputStream buf = new BufferedInputStream(generarPDF(usu))) {
+			int readBytes = 0;
+			while ((readBytes = buf.read()) != -1) {
+				stream.write(readBytes);
+			}
+			stream.flush();
+		} catch (Exception ex) {
+			throw new UVException(ex.toString());
+		}
+        
+		response.setContentType("application/pdf");
+		datos.setRespuestaEnviada(true);
+	}
+	
+	/**
+	 * generar PDF de los items .
+	 * @param usu .
+	 * @return InputStream .
+	 * @throws SQLException .
+	 * @throws UVException .
+	 */
+	public InputStream generarPDF(Usuario usu) throws UVException, SQLException {
+		ByteArrayOutputStream out = new ByteArrayOutputStream();
+		ModeloBaremacionItems modelo = ModeloBaremacionItems.obtenerInstancia();
+		List<ItemBaremacion> listaItems = modelo.listaItemBaremacion();
+		
+		try (Document document = new Document()) {
+			// create a PDF writer instance and pass output stream
+			PdfWriter.getInstance(document, out);
+
+			document.open();
+			document.addAuthor(usu.getApellidosYNombre());
+			document.addTitle("Listado_Items");
+			document.addCreationDate();
+
+			document.add(new Paragraph(new Chunk("Listado de Items", FontFactory.getFont(FontFactory.HELVETICA, SIZE_40, Font.BOLDITALIC))));
+				        
+			this.generarPDFTable(listaItems, document);
+		} catch (Exception exp) {
+			throw new UVException("Error generando pdf, consulte con los administradores" + exp);
+		}
+		
+		return new ByteArrayInputStream(out.toByteArray());
+	}
+	
+	private void generarPDFTable(List<ItemBaremacion> listaItems, Document document) throws SQLException, UVException {
+		Table table = new Table(PDF_TABLE_COLUMNS, listaItems.size());
+		ModeloBaremacionBloques modeloBloque = ModeloBaremacionBloques.obtenerInstancia();
+		ModeloBaremacionApartados modeloApartado = ModeloBaremacionApartados.obtenerInstancia();
+		List<BloqueBaremacion> listaBloques = modeloBloque.listaBloqueBaremacion();
+		List<ApartadoBaremacion> listaApartados = modeloApartado.listaApartadoBaremacion();
+
+		this.generarPDFTableHeader(table);
+		
+		for (ApartadoBaremacion apa: listaApartados) {
+			Cell cell = new Cell(new Paragraph(
+					"Apartado " + apa.getCodigo() + " - " + apa.getNombre(), new Font(Font.HELVETICA, SIZE_8)));
+			cell.setBackgroundColor(new Color(COLOR_112, COLOR_112, COLOR_112));
+			cell.setColspan(COLSPAN);
+			cell.setHorizontalAlignment(HorizontalAlignment.CENTER);
+			table.addCell(cell);
+			for (BloqueBaremacion bloq: listaBloques) {
+				if (bloq.getApartadoBaremacion().getCodNum().equals(apa.getCodNum())) {
+					cell = new Cell(new Paragraph(
+							"Bloque " + bloq.getCodigo() + " - " + bloq.getNombre(), new Font(Font.HELVETICA, SIZE_8)));
+					cell.setBackgroundColor(new Color(COLOR_185, COLOR_185, COLOR_185));
+					cell.setColspan(COLSPAN);
+					cell.setHorizontalAlignment(HorizontalAlignment.CENTER);
+					table.addCell(cell);
+					for (ItemBaremacion item: listaItems) {
+						if (item.getBloqueBaremacion().getCodNum().equals(bloq.getCodNum())) {
+							String codigoItem = item.getBloqueBaremacion().getApartadoBaremacion().getCodigo() + "." 
+									+ item.getBloqueBaremacion().getCodigo() + "." 
+									+ item.getCodigo();
+							
+							cell = new Cell(new Paragraph(
+									codigoItem, new Font(Font.HELVETICA, SIZE_8)));
+							cell.setBackgroundColor(new Color(COLOR_241, COLOR_241, COLOR_241));
+							cell.setHorizontalAlignment(HorizontalAlignment.CENTER);
+							table.addCell(cell);
+							
+							String nombre = item.getNombre();
+							if (item.getDescripcion() != null) {
+								nombre = item.getNombre() + " ( " + item.getDescripcion() + " )";
+							}
+							
+							cell = new Cell(new Paragraph(nombre, new Font(Font.HELVETICA, SIZE_8)));
+							cell.setBackgroundColor(new Color(COLOR_241, COLOR_241, COLOR_241));
+							table.addCell(cell);
+							cell = new Cell(new Paragraph(
+									item.getValor().toString(), new Font(Font.HELVETICA, SIZE_8)));
+							cell.setBackgroundColor(new Color(COLOR_241, COLOR_241, COLOR_241));
+							cell.setHorizontalAlignment(HorizontalAlignment.CENTER);
+							table.addCell(cell);
+							cell = new Cell(new Paragraph(item.getAfinidad() != null ? item.getAfinidad().toString() : item.getAfinidad(),
+									new Font(Font.HELVETICA, SIZE_8)));
+							cell.setBackgroundColor(new Color(COLOR_241, COLOR_241, COLOR_241));
+							cell.setHorizontalAlignment(HorizontalAlignment.CENTER);
+							table.addCell(cell);
+							cell = new Cell(new Paragraph(item.getIndividualizado() ? "Si" : "No",
+									new Font(Font.HELVETICA, SIZE_8)));
+							cell.setBackgroundColor(new Color(COLOR_241, COLOR_241, COLOR_241));
+							cell.setHorizontalAlignment(HorizontalAlignment.CENTER);
+							table.addCell(cell);
+						}
+					}
+				}
+			}
+		}
+		document.add(table);
+	}
+	
+	private void generarPDFTableHeader(Table table) {
+		table.setBorderWidth(1);
+		table.setBorderColor(new Color(0, 0, 0));
+		table.setPadding(PDF_TABLE_PADDING);
+		table.setWidth(SIZE_100_WIDTH);
+		table.setWidths(SIZE_100);
+
+		Font font = new Font(Font.HELVETICA, SIZE_10);
+		font.setColor(new Color(0, COLOR_51, COLOR_153));
+
+		Phrase phrase = new Phrase("Código", font);
+		Cell cell = new Cell(phrase);
+		cell.setHeader(true);
+		cell.setBackgroundColor(new Color(COLOR_185, COLOR_201, COLOR_254));
+		table.addCell(cell);
+
+		Phrase phrase2 = new Phrase("Nombre", font);
+		cell = new Cell(phrase2);
+		cell.setHeader(true);
+		cell.setBackgroundColor(new Color(COLOR_185, COLOR_201, COLOR_254));
+		table.addCell(cell);
+
+		Phrase phrase3 = new Phrase("Valor Unitario", font);
+		cell = new Cell(phrase3);
+		cell.setHeader(true);
+		cell.setBackgroundColor(new Color(COLOR_185, COLOR_201, COLOR_254));
+		table.addCell(cell);
+
+		Phrase phrase4 = new Phrase("Afinidad", font);
+		cell = new Cell(phrase4);
+		cell.setHeader(true);
+		cell.setBackgroundColor(new Color(COLOR_185, COLOR_201, COLOR_254));
+		table.addCell(cell);
+		table.endHeaders();
+		
+		Phrase phrase5 = new Phrase("Individualizado", font);
+		cell = new Cell(phrase5);
+		cell.setHeader(true);
+		cell.setBackgroundColor(new Color(COLOR_185, COLOR_201, COLOR_254));
+		table.addCell(cell);
+		table.endHeaders();
 	}
 		
 	private ItemBaremacion validateItemBaremacion(ItemBaremacion item, HttpServletRequest request) throws UVException, SQLException {

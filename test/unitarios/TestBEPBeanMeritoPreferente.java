@@ -23,7 +23,8 @@ import es.ujaen.uvirtual.modulo.bolsaempleo.beans.MeritoPreferente;
 public class TestBEPBeanMeritoPreferente {
 	private static final Integer CODNUM = 100;
 	private static final String CODIGO = "codigo";
-	private static final String DESCRIPCION = "descripcion";	
+	private static final String NOMBRE = "nombre";
+	private static final String OBSERVACIONES = "observaciones";	
 	private static final String TIPO_CALCULO = "tipoCACULO";
 	private static final String TIPO = "tipo";
 	private static final String APLICABLE = "aplicable";
@@ -45,7 +46,8 @@ public class TestBEPBeanMeritoPreferente {
 		MeritoPreferente merito = new MeritoPreferente();
 		
 		merito.setCodNum(CODNUM);
-		merito.setDescripcion(DESCRIPCION);
+		merito.setNombre(NOMBRE);
+		merito.setObservaciones(OBSERVACIONES);
 		merito.setTipo(TIPO);
 		merito.setAplicable(APLICABLE);
 		merito.setFactor(FACTOR);
@@ -57,7 +59,8 @@ public class TestBEPBeanMeritoPreferente {
 		merito.setActivo(ACTIVO);
 		
 		assertEquals(CODNUM, merito.getCodNum());
-		assertEquals(DESCRIPCION, merito.getDescripcion());
+		assertEquals(NOMBRE, merito.getNombre());
+		assertEquals(OBSERVACIONES, merito.getObservaciones());
 		assertEquals(TIPO, merito.getTipo());
 		assertEquals(APLICABLE, merito.getAplicable());
 		assertEquals(FACTOR, merito.getFactor());
@@ -76,11 +79,12 @@ public class TestBEPBeanMeritoPreferente {
 	 */
 	@Test
 	public void testA02() {
-		MeritoPreferente merito = new MeritoPreferente(CODNUM, CODIGO, DESCRIPCION, TIPO, TIPO_CALCULO, APLICABLE, BASE, FACTOR,
+		MeritoPreferente merito = new MeritoPreferente(CODNUM, CODIGO, NOMBRE, OBSERVACIONES, TIPO, TIPO_CALCULO, APLICABLE, BASE, FACTOR,
 				VALORMAXIMO, ITEM, BLOQUE, APARTADO, ITEM2, ACTIVO);
 		assertEquals(CODNUM, merito.getCodNum());
 		assertEquals(CODIGO, merito.getCodigo());
-		assertEquals(DESCRIPCION, merito.getDescripcion());
+		assertEquals(NOMBRE, merito.getNombre());
+		assertEquals(OBSERVACIONES, merito.getObservaciones());
 		assertEquals(TIPO, merito.getTipo());
 		assertEquals(APLICABLE, merito.getAplicable());
 		assertEquals(BASE, merito.getBase());
@@ -99,12 +103,13 @@ public class TestBEPBeanMeritoPreferente {
 	@Test
 	public void testA03() {
 
-		MeritoPreferente merito2 = new MeritoPreferente(CODNUM, CODIGO, DESCRIPCION, TIPO, TIPO_CALCULO, APLICABLE, BASE, FACTOR,
+		MeritoPreferente merito2 = new MeritoPreferente(CODNUM, CODIGO, NOMBRE, OBSERVACIONES, TIPO, TIPO_CALCULO, APLICABLE, BASE, FACTOR,
 				VALORMAXIMO, ITEM, BLOQUE, APARTADO, ITEM2, ACTIVO);
 		MeritoPreferente merito = new MeritoPreferente(merito2);
 		merito.setCodNum(CODNUM);
 		merito.setCodigo(CODIGO);
-		merito.setDescripcion(DESCRIPCION);
+		merito.setNombre(NOMBRE);
+		merito.setObservaciones(OBSERVACIONES);
 		merito.setTipo(TIPO);
 		merito.setAplicable(APLICABLE);
 		merito.setBase(BASE);
@@ -117,7 +122,8 @@ public class TestBEPBeanMeritoPreferente {
 		merito.setActivo(ACTIVO);
 		
 		assertEquals(CODNUM, merito.getCodNum());
-		assertEquals(DESCRIPCION, merito.getDescripcion());
+		assertEquals(NOMBRE, merito.getNombre());
+		assertEquals(OBSERVACIONES, merito.getObservaciones());
 		assertEquals(TIPO, merito.getTipo());
 		assertEquals(APLICABLE, merito.getAplicable());
 		assertEquals(BASE, merito.getBase());
@@ -140,7 +146,7 @@ public class TestBEPBeanMeritoPreferente {
 	@Test
 	@SuppressWarnings("java:S2159")
 	public void testA04() {
-		MeritoPreferente merito3 = new MeritoPreferente(CODNUM, CODIGO, DESCRIPCION, TIPO, TIPO_CALCULO, APLICABLE, BASE, FACTOR,
+		MeritoPreferente merito3 = new MeritoPreferente(CODNUM, CODIGO, NOMBRE, OBSERVACIONES, TIPO, TIPO_CALCULO, APLICABLE, BASE, FACTOR,
 				VALORMAXIMO, ITEM, BLOQUE, APARTADO, ITEM2, ACTIVO);
 		MeritoPreferente merito2 = new MeritoPreferente();
 		MeritoPreferente merito = new MeritoPreferente();

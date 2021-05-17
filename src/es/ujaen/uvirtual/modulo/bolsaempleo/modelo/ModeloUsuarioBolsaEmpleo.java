@@ -47,6 +47,7 @@ public class ModeloUsuarioBolsaEmpleo {
 	public static final String USUARIO_NO_EXCLUIDO = "N";
 	
 	public static final Integer PARAM_ROL_CANDIDATO_ID = 1052;
+	public static final Integer PARAM_ROL_COMISION_ID = 1051;
 	
 	public static final int COLUMN_NOMBRE_MAXLENGTH = 20;
 	public static final int COLUMN_PRIMER_APELLIDO_MAXLENGTH = 40;
@@ -61,6 +62,8 @@ public class ModeloUsuarioBolsaEmpleo {
 	public static final int COLUMN_EMAIL_MAXLENGTH = 50;
 	public static final int COLUMN_RAZON_EXCLUSION_MAXLENGTH = 200;
 	public static final int COLUMN_RAZON_BORRADO_MAXLENGTH = 500;
+	
+	public static final String MENSAJE_USUARIO_NO_EXISTE = "El usuario no existe en el sistema";
 	
 	public static final String ROL_SERVICIO_PERSONAL = "bolemppersonal";
 	public static final String ROL_DIRECTOR_DEPARTAMENTO = "bolempdirdepartamento";
@@ -196,6 +199,42 @@ public class ModeloUsuarioBolsaEmpleo {
 						while (rsArcos.next()) {
 							usuario = setUsuario(rs, rsArcos);
 							return usuario;
+						}
+					}
+				}
+			}
+		}
+		
+		return usuario;
+	}
+	
+	/**
+	 * Devuelve un usuario por su número de documento .
+	 * @param numeroDocumento documento del usuario .
+	 * @return usuarioBolsaEmpleo .
+	 * @throws SQLException en caso de error en la BD .
+	 * @throws UVException si bolsa no es existe .
+	 */
+	public UsuarioBolsaEmpleo getUsuarioByNumeroDocumento(String numeroDocumento) throws SQLException, UVException {
+		UsuarioBolsaEmpleo usuario = null;
+		String consulta = "SELECT * FROM TBEP_USUARIOS bepusu WHERE bepusu.PRSNIF = ?";
+			
+		try (Connection conexion = ConexionUvirtual.obtenerInstancia();
+				PreparedStatement stmt = conexion.prepareStatement(consulta)) {
+			stmt.setString(1, numeroDocumento);
+
+			try (ResultSet rs = stmt.executeQuery()) {
+				if (!rs.next()) {
+					return null;
+				}
+				String consultaArcos = "SELECT * FROM VUJA_NET_BEP_AR_PERSONA WHERE PRSNIF = ?";
+
+				try (Connection conexionArcos = ConexionArcos.obtenerInstancia();
+						PreparedStatement stmtArcos = conexionArcos.prepareStatement(consultaArcos)) {
+					stmtArcos.setString(1, rs.getString("PRSNIF"));
+					try (ResultSet rsArcos = stmtArcos.executeQuery()) {
+						while (rsArcos.next()) {
+							usuario = setUsuario(rs, rsArcos);
 						}
 					}
 				}
@@ -1131,4 +1170,46 @@ public class ModeloUsuarioBolsaEmpleo {
 			stmt.executeUpdate();
 		}	
 	}
+	
+	/** método que crea un usuario en bolsa empleo y devuelve su id .
+	 * @param rol .
+	 * @param nombreUsuario .
+	 * @return usuario .
+	 * @throws SQLException .
+	 * @throws UVException .
+	 */
+	public UsuarioBolsaEmpleo crearUsuarioBolsaEmpleo(Integer rol, String nombreUsuario) throws SQLException, UVException {
+		Usuario usuArcos = CrearUsuario.usuario(nombreUsuario);
+		
+		Rol role = ModeloRol.obtenerInstancia().getRoleById(rol);
+		UsuarioBolsaEmpleo usuarioNuevo = 
+				new UsuarioBolsaEmpleo(usuArcos.getDocumentoNumero(), usuArcos.getUid(), role, true, false, null, null, null);
+		
+		insertaUsuario(usuarioNuevo);
+		CrearUsuario.refrescarUsuario(usuarioNuevo.getCodCuenta());
+		
+		return getUsuarioByNumeroDocumento(usuarioNuevo.getNumDocumento());
+	}
+	
+	/** método que comprueba si existe un usuario y lo devuelve .
+	 * @param nombreUsuario .
+	 * @return si existe o no .
+	 * @throws SQLException .
+	 * @throws UVException .
+	 */
+	public UsuarioBolsaEmpleo obtenerUsuarioBolsaEmpleoSiExiste(String nombreUsuario) throws SQLException, UVException {
+		Usuario usuArcos = CrearUsuario.usuario(nombreUsuario);
+		
+		if (usuArcos == null) {
+			throw new UVException(MENSAJE_USUARIO_NO_EXISTE);
+		}
+		
+		return getUsuarioByNumeroDocumento(usuArcos.getDocumentoNumero());
+	}
+	
 }
+
+
+
+
+

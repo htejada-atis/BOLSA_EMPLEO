@@ -18,6 +18,7 @@ import es.ujaen.uvirtual.modulo.bolsaempleo.beans.Noticia;
 import es.ujaen.uvirtual.modulo.bolsaempleo.modelo.ModeloNoticia;
 import es.ujaen.uvirtual.modulo.bolsaempleo.modelo.ModeloUsuarioBolsaEmpleo;
 import es.ujaen.uvirtual.modulo.bolsaempleo.utilidades.BolsaEmpleoDataTable;
+import es.ujaen.uvirtual.modulo.bolsaempleo.utilidades.BolsaEmpleoUtils;
 import es.ujaen.uvirtual.modulo.bolsaempleo.vistas.VistaNoticias;
 import es.ujaen.uvirtual.utilidades.EscapaHTML;
 import es.ujaen.uvirtual.utilidades.Formateador;
@@ -97,7 +98,7 @@ public class ControladorGestionNoticias extends HttpServlet {
 			nombreAccion = ACCION_INDEX;
 		}
 		try {
-			init(bean, datos);
+			init(bean, datos, request, response);
 			switch (nombreAccion) {
 				case ACCION_INDEX:
 					bean.setVista(RUTA_BEP_NOTICIAS + "indice.jsp");
@@ -136,9 +137,15 @@ public class ControladorGestionNoticias extends HttpServlet {
 		}
 	}
 	
-	private void init(VistaNoticias bean, UVDatos datos) throws SQLException, UVException {
+	private void init(VistaNoticias bean, UVDatos datos, HttpServletRequest request, HttpServletResponse response) throws SQLException, UVException, IOException {
 		bean.setVista(RUTA_BEP_NOTICIAS + "indice.jsp");
-		ModeloUsuarioBolsaEmpleo.obtenerInstancia().checkUser(datos);
+		BolsaEmpleoUtils.readMensajeSession(bean, request);
+		try {
+			ModeloUsuarioBolsaEmpleo.obtenerInstancia().checkUser(datos);
+		} catch (UVException e) {
+			BolsaEmpleoUtils.addMensajeDeError(e.getMessage(), bean, request);
+			response.sendRedirect("/srv/es/informacionadministrativa/bolsaempleo/error");
+		}
 	}
 	
 	private void errorFatal(VistaNoticias bean, String mensaje) {
@@ -171,9 +178,7 @@ public class ControladorGestionNoticias extends HttpServlet {
 			noticia.setActiva(true);
 			
 			ModeloNoticia.obtenerInstancia().insertaNoticia(noticia);
-			bean.getMensajesDeExito().add(MENSAJE_EXITO_AGREGAR);
-			HttpSession session = request.getSession(false);
-			session.setAttribute(MENSAJE_ENVIADO, MENSAJE_EXITO_AGREGAR);
+			BolsaEmpleoUtils.addMensajeDeExito(MENSAJE_EXITO_AGREGAR, bean, request);
 			response.sendRedirect(request.getServletPath());			
 		}
 	}
@@ -196,9 +201,7 @@ public class ControladorGestionNoticias extends HttpServlet {
 			Noticia noticiaForm = this.validarNoticia(request);
 			noticiaForm.setCodNum(noticia.getCodNum());
 			modelo.actualizaNoticia(noticiaForm);
-			bean.getMensajesDeExito().add(MENSAJE_EXITO_EDITAR);
-			HttpSession session = request.getSession(false);
-			session.setAttribute(MENSAJE_ENVIADO, MENSAJE_EXITO_EDITAR);
+			BolsaEmpleoUtils.addMensajeDeExito(MENSAJE_EXITO_EDITAR, bean, request);
 			response.sendRedirect(request.getServletPath());
 		}
 	}
@@ -219,9 +222,7 @@ public class ControladorGestionNoticias extends HttpServlet {
 		boolean activa = "true".equals(EscapaHTML.ajustaCodificacion(request.getParameter(PARAM_ACTIVA))); 
 		noticia.setActiva(activa);
 		modelo.borraRestauraNoticia(noticia);
-		bean.getMensajesDeExito().add(MENSAJE_EXITO_ELIMINAR);
-		HttpSession session = request.getSession(false);
-		session.setAttribute(MENSAJE_ENVIADO, activa ? MENSAJE_EXITO_RESTAURAR : MENSAJE_EXITO_ELIMINAR);
+		BolsaEmpleoUtils.addMensajeDeExito(activa ? MENSAJE_EXITO_RESTAURAR : MENSAJE_EXITO_ELIMINAR, bean, request);
 		response.sendRedirect(request.getServletPath());
 	}
 	

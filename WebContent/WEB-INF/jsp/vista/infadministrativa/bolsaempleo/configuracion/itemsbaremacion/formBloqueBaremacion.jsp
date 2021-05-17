@@ -17,20 +17,11 @@ String codigoCompleto = apartado.getCodigo() + "." + (bloque != null ? bloque.ge
 %>
 
 <div class="bolsa-empleo">
-	<% if (bean.getMensajesDeExito().size() > 0) { %>
-		<div id="exito" class="success">
-			<%= bean.formatearMensajesDeExito() %>
-		</div>
-	<% } %>
-	<% if (bean.getMensajesDeError().size() > 0) { %>
-		<div id="error" class="error">
-			<%= bean.formatearMensajesDeError() %>
-		</div>
-	<% } %>
+	<jsp:include page="/WEB-INF/jsp/vista/infadministrativa/bolsaempleo/mensajes.jsp" />
     
     <h2><%= bloque != null ? "Editar apartado" : "Nuevo apartado" %></h2>
     
-    <p>Las etiquetas en <b>negrita</b> corresponden a campos de relleno obligatorio</p>
+    <p>Las etiquetas en <strong>negrita</strong> corresponden a campos de relleno obligatorio</p>
     
     <form id="actualizar_bloque" class="be-form" method="post" action="<%= request.getRequestURI() %>">
     	<input type="hidden" name="<%= ControladorItemsBaremacion.PARAM_ACCION %>" id="accion_formulario"
@@ -60,7 +51,7 @@ String codigoCompleto = apartado.getCodigo() + "." + (bloque != null ? bloque.ge
 		</div>
 		<div class="form-group-container col2">
 			<div class="form-group">
-	    		<label for="bloque_num_maximo_meritos">Número máximo de meritos por apartado</label>
+	    		<label for="bloque_num_maximo_meritos">Número máximo de méritos por apartado</label>
 	    		<input class="form-input-custom" type="number" name="<%= ControladorItemsBaremacion.PARAM_BLOQUE_NUMEROMAXIMOMERITOS %>" id="bloque_num_maximo_meritos" 
 	    			value="<%= BolsaEmpleoUtils.getParamForm(request, ControladorItemsBaremacion.PARAM_BLOQUE_NUMEROMAXIMOMERITOS, bloque != null && bloque.getNumeroMaximoMeritos() != null ? bloque.getNumeroMaximoMeritos().toString() : "") %>"/>
 	    	</div>

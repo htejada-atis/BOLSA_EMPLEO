@@ -6,16 +6,13 @@ import java.sql.SQLException;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
-
 import es.ujaen.uvirtual.beans.CodigoDescripcion;
 import es.ujaen.uvirtual.beans.UVDatos;
 import es.ujaen.uvirtual.beans.Usuario;
@@ -110,7 +107,7 @@ public class ControladorAfinidades extends HttpServlet {
 		}
 					
 		try {
-			init(bean, datos, request);
+			init(bean, datos, request, response);
 			switch (nombreAccion) {
 				case ACCION_INDEX:
 					index(bean);
@@ -154,10 +151,15 @@ public class ControladorAfinidades extends HttpServlet {
 		}
 	}
 	
-	private void init(VistaAfinidades bean, UVDatos datos, HttpServletRequest request) throws SQLException, UVException {
+	private void init(VistaAfinidades bean, UVDatos datos, HttpServletRequest request, HttpServletResponse response) throws SQLException, UVException, IOException {
 		bean.setVista(RUTA_BEP_CON + "index.jsp");
 		BolsaEmpleoUtils.readMensajeSession(bean, request);
-		ModeloUsuarioBolsaEmpleo.obtenerInstancia().checkUser(datos);
+		try {
+			ModeloUsuarioBolsaEmpleo.obtenerInstancia().checkUser(datos);
+		} catch (UVException e) {
+			BolsaEmpleoUtils.addMensajeDeError(e.getMessage(), bean, request);
+			response.sendRedirect("/srv/es/informacionadministrativa/bolsaempleo/error");
+		}
 	}
 	
 	private void errorFatal(VistaAfinidades bean, String mensaje) {
@@ -212,25 +214,27 @@ public class ControladorAfinidades extends HttpServlet {
 	private void nuevaAfinidad(VistaAfinidades bean, HttpServletRequest request, HttpServletResponse response) throws UVException, SQLException, IOException {
 		bean.setVista(RUTA_BEP_CON + "formAfinidades.jsp");
 		
-		Afinidad afinidad = this.validarAfinidad(request);		
-		ModeloAfinidad.obtenerInstancia().nuevaAfinidad(afinidad);	
+		if (EscapaHTML.ajustaCodificacion(request.getParameter(PARAM_DESCRIPCION)) != null) {
+			Afinidad afinidad = this.validarAfinidad(request);		
+			ModeloAfinidad.obtenerInstancia().nuevaAfinidad(afinidad);	
 
-		this.index(bean);
+			this.index(bean);
 
-		BolsaEmpleoUtils.addMensajeDeExito(MENSAJE_INFO_AFINIDAD_INSERTADA_CORRECTAMENTE, bean, request);
-		response.sendRedirect(request.getServletPath());
+			BolsaEmpleoUtils.addMensajeDeExito(MENSAJE_INFO_AFINIDAD_INSERTADA_CORRECTAMENTE, bean, request);
+			response.sendRedirect(request.getServletPath());
+		}
 	}
 		
 	private void modificarAfinidad(VistaAfinidades bean, HttpServletRequest request, HttpServletResponse response) throws UVException, SQLException, IOException { 
 		bean.setVista(RUTA_BEP_CON + "formAfinidades.jsp");
-		
-		Afinidad afinidadForm = this.validarAfinidad(request); 							
+						
 		ModeloAfinidad modelo = ModeloAfinidad.obtenerInstancia();
 		
 		Afinidad afinidad = modelo.getAfinidadById(Formateador.leeParametroInteger(request.getParameter(PARAM_ID)));
 		bean.setAfinidad(afinidad);
 		
 		if (EscapaHTML.ajustaCodificacion(request.getParameter(PARAM_DESCRIPCION)) != null) {
+			Afinidad afinidadForm = this.validarAfinidad(request); 			
 			Afinidad afinidadEdit = new Afinidad(afinidad.getCodNum(), afinidadForm.getCodigo(), afinidadForm.getDescripcion(), afinidadForm.getModulacion()); 
 			modelo.actualizaAfinidad(afinidadEdit);
 			

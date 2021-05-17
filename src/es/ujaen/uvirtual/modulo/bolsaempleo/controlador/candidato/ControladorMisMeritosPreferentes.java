@@ -14,7 +14,6 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.Part;
-
 import com.google.gson.Gson;
 import es.ujaen.uvirtual.beans.CodigoDescripcion;
 import es.ujaen.uvirtual.beans.UVDatos;
@@ -115,7 +114,7 @@ public class ControladorMisMeritosPreferentes extends HttpServlet {
 		}
 		
 		try {
-			init(bean, datos, request);
+			init(bean, datos, request, response);
 			switch (nombreAccion) {
 				case ACCION_INDEX:
 					index(bean);
@@ -155,10 +154,15 @@ public class ControladorMisMeritosPreferentes extends HttpServlet {
 		}
 	}
 	
-	private void init(VistaMeritosPreferentesCandidato bean, UVDatos datos, HttpServletRequest request) throws SQLException, UVException {
+	private void init(VistaMeritosPreferentesCandidato bean, UVDatos datos, HttpServletRequest request, HttpServletResponse response) throws SQLException, UVException, IOException {
 		this.index(bean);
 		BolsaEmpleoUtils.readMensajeSession(bean, request);
-		ModeloUsuarioBolsaEmpleo.obtenerInstancia().checkUser(datos);
+		try {
+			ModeloUsuarioBolsaEmpleo.obtenerInstancia().checkUser(datos);
+		} catch (UVException e) {
+			BolsaEmpleoUtils.addMensajeDeError(e.getMessage(), bean, request);
+			response.sendRedirect("/srv/es/informacionadministrativa/bolsaempleo/error");
+		}
 	}
 	
 	private void errorFatal(VistaMeritosPreferentesCandidato bean, String mensaje) {

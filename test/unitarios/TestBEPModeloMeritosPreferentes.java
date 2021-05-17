@@ -37,11 +37,9 @@ import es.ujaen.uvirtual.utilidades.UVException;
 @FixMethodOrder(MethodSorters.NAME_ASCENDING)
 public class TestBEPModeloMeritosPreferentes {
 	private static final Integer CODNUM = 1;
-	private static final String CODIGO = "1";
-	private static final String DESCRIPCION = "descripcion";
-	private static final String DESCRIPCION_NUEVA = "descripcion nueva";
-	private static final String TIPO = ModeloMeritosPreferentes.TIPO_MERITO;
-	private static final String TIPO_FACTOR = ModeloMeritosPreferentes.TIPO_CALCULO_FACTOR;
+	private static final String NOMBRE = "nombre";
+	private static final String OBSERVACIONES = "observaciones";
+	private static final String TIPO = "MERITO";
 	private static final String APLICABLE = "BLOQUE";
 	private static final Double FACTOR = 1.3;
 	private static final Double VALORMAXIMO = 100.0;

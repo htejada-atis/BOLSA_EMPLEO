@@ -13,6 +13,7 @@ import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 import es.ujaen.uvirtual.beans.UVDatos;
 import es.ujaen.uvirtual.modulo.bolsaempleo.modelo.ModeloUsuarioBolsaEmpleo;
+import es.ujaen.uvirtual.modulo.bolsaempleo.utilidades.BolsaEmpleoUtils;
 import es.ujaen.uvirtual.modulo.bolsaempleo.vistas.VistaMisResultados;
 import es.ujaen.uvirtual.utilidades.EscapaHTML;
 import es.ujaen.uvirtual.utilidades.UVException;
@@ -71,7 +72,7 @@ public class ControladorMisResultados extends HttpServlet {
 		}
 		
 		try {
-			init(bean, datos);
+			init(bean, datos, request, response);
 			switch (nombreAccion) {
 				case ACCION_INDEX:
 					bean.setVista(RUTA_BEP + "index.jsp");
@@ -104,9 +105,15 @@ public class ControladorMisResultados extends HttpServlet {
 		}
 	}
 	
-	private void init(VistaMisResultados bean, UVDatos datos) throws SQLException, UVException {
+	private void init(VistaMisResultados bean, UVDatos datos, HttpServletRequest request, HttpServletResponse response) throws SQLException, UVException, IOException {
 		bean.setVista(RUTA_BEP + "index.jsp");
-		ModeloUsuarioBolsaEmpleo.obtenerInstancia().checkUser(datos);
+		BolsaEmpleoUtils.readMensajeSession(bean, request);
+		try {
+			ModeloUsuarioBolsaEmpleo.obtenerInstancia().checkUser(datos);
+		} catch (UVException e) {
+			BolsaEmpleoUtils.addMensajeDeError(e.getMessage(), bean, request);
+			response.sendRedirect("/srv/es/informacionadministrativa/bolsaempleo/error");
+		}
 	}
 	
 	private void errorFatal(VistaMisResultados bean, String mensaje) {

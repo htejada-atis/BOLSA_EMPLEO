@@ -17,6 +17,7 @@ import es.ujaen.uvirtual.beans.Usuario;
 import es.ujaen.uvirtual.modulo.bolsaempleo.beans.Area;
 import es.ujaen.uvirtual.modulo.bolsaempleo.modelo.ModeloArea;
 import es.ujaen.uvirtual.modulo.bolsaempleo.modelo.ModeloUsuarioBolsaEmpleo;
+import es.ujaen.uvirtual.modulo.bolsaempleo.utilidades.BolsaEmpleoUtils;
 import es.ujaen.uvirtual.modulo.bolsaempleo.vistas.VistaMiembrosComision;
 import es.ujaen.uvirtual.utilidades.EscapaHTML;
 import es.ujaen.uvirtual.utilidades.Formateador;
@@ -65,7 +66,7 @@ public class ControladorMiembrosComision extends HttpServlet {
 		}
 		
 		try {
-			init(bean, datos);
+			init(bean, datos, request, response);
 			switch (nombreAccion) {
 				case ACCION_INDEX:
 					obtenerAreas(bean);
@@ -97,9 +98,15 @@ public class ControladorMiembrosComision extends HttpServlet {
 		}
 	}
 	
-	private void init(VistaMiembrosComision bean, UVDatos datos) throws SQLException, UVException {
+	private void init(VistaMiembrosComision bean, UVDatos datos, HttpServletRequest request, HttpServletResponse response) throws SQLException, UVException, IOException {
 		bean.setVista("/WEB-INF/jsp/vista/infadministrativa/bolsaempleo/miembroscomision/index.jsp");
-		ModeloUsuarioBolsaEmpleo.obtenerInstancia().checkUser(datos);
+		BolsaEmpleoUtils.readMensajeSession(bean, request);
+		try {
+			ModeloUsuarioBolsaEmpleo.obtenerInstancia().checkUser(datos);
+		} catch (UVException e) {
+			BolsaEmpleoUtils.addMensajeDeError(e.getMessage(), bean, request);
+			response.sendRedirect("/srv/es/informacionadministrativa/bolsaempleo/error");
+		}
 	}
 	
 	private void errorFatal(VistaMiembrosComision bean, String mensaje) {

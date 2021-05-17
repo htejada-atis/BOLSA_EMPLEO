@@ -84,8 +84,8 @@ public class ControladorMisMeritos extends HttpServlet {
 	public static final String MENSAJE_ERROR_ITEM_REQUERIDO = "Debe seleccionar un ítem";
 	public static final String MENSAJE_ERROR_OBSERVACION_LARGO = "La observación no puede contener mas de %d caracteres";
 	public static final String MENSAJE_ERROR_VALOR_VACIO = "El valor no puede estar vacio";
-	public static final String MENSAJE_ERROR_VALOR_MAXIMO_PERMITIDO = "El valor máximo permitido es";
-	public static final String MENSAJE_ERROR_VALOR_MINIMO_PERMITIDO = "El valor mínimo permitido es";
+	public static final String MENSAJE_ERROR_VALOR_MAXIMO_PERMITIDO = "El valor máximo permitido es %s";
+	public static final String MENSAJE_ERROR_VALOR_MINIMO_PERMITIDO = "El valor mínimo permitido es %s";
 	public static final String MENSAJE_ERROR_MERITOS_SELECCIONADOS_INCORRECTOS = "No hay méritos seleccionados válidos";
 	public static final String MENSAJE_ERROR_ELIMINAR_MERITO = "No se puede eliminar un mérito que ya está asociado a una solicitud";
 	
@@ -124,7 +124,7 @@ public class ControladorMisMeritos extends HttpServlet {
 		}
 		
 		try {
-			init(bean, datos);
+			init(bean, datos, request, response);
 			switch (nombreAccion) {
 				case ACCION_INDEX:
 					listaMeritos(bean);
@@ -139,7 +139,7 @@ public class ControladorMisMeritos extends HttpServlet {
 					descargarFichero(bean, datos, request, response);
 					break;
 				case ACCION_ELIMINAR_MERITOS:
-					eliminarMeritos(request, response);
+					eliminarMeritos(bean, request, response);
 					break;				
 				default:
 					errorFatal(bean, "Acción no contemplada");
@@ -164,9 +164,15 @@ public class ControladorMisMeritos extends HttpServlet {
 		}
 	}
 	
-	private void init(VistaMeritos bean, UVDatos datos) throws SQLException, UVException {
+	private void init(VistaMeritos bean, UVDatos datos, HttpServletRequest request, HttpServletResponse response) throws SQLException, UVException, IOException {
 		bean.setVista(RUTA_BEP_MERITOS + "index.jsp");
-		ModeloUsuarioBolsaEmpleo.obtenerInstancia().checkUser(datos);
+		BolsaEmpleoUtils.readMensajeSession(bean, request);
+		try {
+			ModeloUsuarioBolsaEmpleo.obtenerInstancia().checkUser(datos);
+		} catch (UVException e) {
+			BolsaEmpleoUtils.addMensajeDeError(e.getMessage(), bean, request);
+			response.sendRedirect("/srv/es/informacionadministrativa/bolsaempleo/error");
+		}
 	}
 	
 	private void errorFatal(VistaMeritos bean, String mensaje) {
@@ -227,8 +233,7 @@ public class ControladorMisMeritos extends HttpServlet {
 				Integer idUsuario = ModeloUsuarioBolsaEmpleo.obtenerInstancia().listaUsuario(usuArcos.getDocumentoNumero()).getCodNum();
 				ModeloMerito.obtenerInstancia().insertaMerito(merito, idUsuario);
 							
-				HttpSession session = request.getSession(false);
-				session.setAttribute(MENSAJE_ENVIADO, MENSAJE_EXITO_AGREGAR);
+				BolsaEmpleoUtils.addMensajeDeExito(MENSAJE_EXITO_AGREGAR, bean, request);
 				response.sendRedirect(request.getServletPath());
 			}
 		}
@@ -266,13 +271,14 @@ public class ControladorMisMeritos extends HttpServlet {
 	}
 	
 	/** elimina una lista de méritos seleccionados .
+	 * @param bean .
 	 * @param request .
 	 * @param response .
 	 * @throws SQLException .
 	 * @throws UVException .
 	 * @throws IOException .
 	 */
-	private void eliminarMeritos(HttpServletRequest request, HttpServletResponse response) throws SQLException, UVException, IOException {
+	private void eliminarMeritos(VistaMeritos bean, HttpServletRequest request, HttpServletResponse response) throws SQLException, UVException, IOException {
 		ModeloMerito modelo = ModeloMerito.obtenerInstancia();
 		
 		Gson gson = new GsonBuilder().create();
@@ -280,14 +286,14 @@ public class ControladorMisMeritos extends HttpServlet {
 		try {
 			List<String> meritos = gson.fromJson(request.getParameter(PARAM_MERITOS), new TypeToken<List<String>>() { }.getType());
 			modelo.eliminarMeritos(meritos);
-			HttpSession session = request.getSession(false);
-			session.setAttribute(MENSAJE_ENVIADO, MENSAJE_EXITO_ELIMINAR);
-			response.sendRedirect(request.getServletPath());
+			BolsaEmpleoUtils.addMensajeDeExito(MENSAJE_EXITO_ELIMINAR, bean, request);
 		} catch (SQLIntegrityConstraintViolationException e) {
-			throw new UVException(MENSAJE_ERROR_ELIMINAR_MERITO);
+			BolsaEmpleoUtils.addMensajeDeError(MENSAJE_ERROR_ELIMINAR_MERITO, bean, request);
 		} catch (Exception ex) {
-			throw new UVException(MENSAJE_ERROR_MERITOS_SELECCIONADOS_INCORRECTOS);
+			BolsaEmpleoUtils.addMensajeDeError(MENSAJE_ERROR_MERITOS_SELECCIONADOS_INCORRECTOS, bean, request);
 		}
+		
+		response.sendRedirect(request.getServletPath());
 	}
 	
 	/** Listado de méritos .
@@ -395,10 +401,10 @@ public class ControladorMisMeritos extends HttpServlet {
 			throw new UVException("El valor no es válido");
 		}
 		if (valor < merito.getItemBaremacion().getValorMinimo()) {
-			throw new UVException(String.format(MENSAJE_ERROR_VALOR_MINIMO_PERMITIDO, merito.getItemBaremacion().getValorMinimo()));
+			throw new UVException(String.format(MENSAJE_ERROR_VALOR_MINIMO_PERMITIDO, merito.getItemBaremacion().getValorMinimo().toString()));
 		}
 		if (valor > merito.getItemBaremacion().getValorMaximo()) {
-			throw new UVException(String.format(MENSAJE_ERROR_VALOR_MAXIMO_PERMITIDO, merito.getItemBaremacion().getValorMaximo()));
+			throw new UVException(String.format(MENSAJE_ERROR_VALOR_MAXIMO_PERMITIDO, merito.getItemBaremacion().getValorMaximo().toString()));
 		}
 		merito.setValor(valor);
 		

@@ -14,20 +14,11 @@ ApartadoBaremacion apartado = bean.getApartadoBaremacion();
 
 
 <div class="bolsa-empleo">
-	<% if (bean.getMensajesDeExito().size() > 0) { %>
-		<div id="exito" class="success">
-			<%= bean.formatearMensajesDeExito() %>
-		</div>
-	<% } %>
-	<% if (bean.getMensajesDeError().size() > 0) { %>
-		<div id="error" class="error">
-			<%= bean.formatearMensajesDeError() %>
-		</div>
-	<% } %>
+	<jsp:include page="/WEB-INF/jsp/vista/infadministrativa/bolsaempleo/mensajes.jsp" />
 	
 	<h2><%= apartado != null ? "Editar bloque" : "Nuevo bloque" %></h2>
 	
-	<p>Las etiquetas en <b>negrita</b> corresponden a campos de relleno obligatorio</p>
+	<p>Las etiquetas en <strong>negrita</strong> corresponden a campos de relleno obligatorio</p>
 	
 	<form id="actualizar_apartado" class="be-form" method="post" action="<%= request.getRequestURI() %>">
 		<input type="hidden" 

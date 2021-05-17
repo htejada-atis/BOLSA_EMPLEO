@@ -63,7 +63,8 @@ public class ControladorMeritosPreferentes extends HttpServlet {
 	public static final String PARAM_ACCION = "a";
 	public static final String PARAM_ID = "id";
 	public static final String PARAM_MERITO_CODIGO = "codigo";
-	public static final String PARAM_MERITO_DESCRIPCION = "descripcion";
+	public static final String PARAM_MERITO_NOMBRE = "nombre";
+	public static final String PARAM_MERITO_OBSERVACIONES = "observaciones";
 	public static final String PARAM_MERITO_TIPO = "tipo";
 	public static final String PARAM_MERITO_TIPO_TITULACION = "tipoTitulacion";
 	public static final String PARAM_MERITO_TIPO_ITEMBAREMACION = "tipoItemBaremacion";
@@ -117,7 +118,7 @@ public class ControladorMeritosPreferentes extends HttpServlet {
 		}
 				
 		try {
-			init(bean, datos, request);
+			init(bean, datos, request, response);
 			switch (nombreAccion) {
 				case ACCION_INDEX:
 					indice(bean);
@@ -176,10 +177,15 @@ public class ControladorMeritosPreferentes extends HttpServlet {
 		}
 	}
 	
-	private void init(VistaMeritosPreferentes bean, UVDatos datos, HttpServletRequest request) throws SQLException, UVException {
+	private void init(VistaMeritosPreferentes bean, UVDatos datos, HttpServletRequest request, HttpServletResponse response) throws SQLException, UVException, IOException {
 		this.indice(bean);
 		BolsaEmpleoUtils.readMensajeSession(bean, request);
-		ModeloUsuarioBolsaEmpleo.obtenerInstancia().checkUser(datos);		
+		try {
+			ModeloUsuarioBolsaEmpleo.obtenerInstancia().checkUser(datos);
+		} catch (UVException e) {
+			BolsaEmpleoUtils.addMensajeDeError(e.getMessage(), bean, request);
+			response.sendRedirect("/srv/es/informacionadministrativa/bolsaempleo/error");
+		}		
 	}
 	
 	private void errorFatal(VistaMeritosPreferentes bean, String mensaje) {
@@ -345,12 +351,17 @@ public class ControladorMeritosPreferentes extends HttpServlet {
 			throw new UVException("Ya existe un mérito preferente activo con el código introducido");
 		}
 		
-		merito.setDescripcion(EscapaHTML.ajustaCodificacion(request.getParameter(PARAM_MERITO_DESCRIPCION)));
-		if (merito.getDescripcion().isBlank()) {
-			throw new UVException("La descripción del mérito es requerida");
+		merito.setNombre(EscapaHTML.ajustaCodificacion(request.getParameter(PARAM_MERITO_NOMBRE)));
+		if (merito.getNombre().isBlank()) {
+			throw new UVException("El nombre del mérito es requerido");
 		}
-		if (merito.getDescripcion().length() > ModeloMeritosPreferentes.MAX_LENGTH_COLUMN_DESCRIPCION) {
-			throw new UVException("La descripción tiene demasiados caracteres. Máximo: " + ModeloMeritosPreferentes.MAX_LENGTH_COLUMN_DESCRIPCION);
+		if (merito.getNombre().length() > ModeloMeritosPreferentes.MAX_LENGTH_COLUMN_NOMBRE) {
+			throw new UVException("El nombre tiene demasiados caracteres. Máximo: " + ModeloMeritosPreferentes.MAX_LENGTH_COLUMN_NOMBRE);
+		}
+		
+		merito.setObservaciones(EscapaHTML.ajustaCodificacion(request.getParameter(PARAM_MERITO_OBSERVACIONES)));
+		if (merito.getObservaciones().length() > ModeloMeritosPreferentes.MAX_LENGTH_COLUMN_OBSERVACIONES) {
+			throw new UVException("Las observaciones tienen demasiados caracteres. Máximo: " + ModeloMeritosPreferentes.MAX_LENGTH_COLUMN_OBSERVACIONES);
 		}
 
 		this.validateAplicable(merito, request);

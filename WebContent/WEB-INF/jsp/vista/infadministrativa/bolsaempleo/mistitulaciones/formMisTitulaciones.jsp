@@ -2,27 +2,32 @@
 <%@ page import="es.ujaen.uvirtual.beans.UVDatos"%>
 <%@	page import="es.ujaen.uvirtual.modulo.bolsaempleo.controlador.candidato.ControladorMisTitulaciones"%>
 <%@ page import="es.ujaen.uvirtual.modulo.bolsaempleo.vistas.VistaTitulaciones"%>
+<%@ page import="es.ujaen.uvirtual.modulo.bolsaempleo.utilidades.BolsaEmpleoUtils" %>
 <%@ page import="es.ujaen.uvirtual.utilidades.EscapaHTML" %>
 <%@ page import="es.ujaen.uvirtual.utilidades.Formateador"%>
 
 <% 
 UVDatos uvdatos = (UVDatos) request.getAttribute(UVDatos.NOMBRE_ATRIBUTO);
 VistaTitulaciones bean = (VistaTitulaciones) uvdatos.getVistas().get(VistaTitulaciones.class.getName());
+
+Integer titulacion;
+
+if(bean.getTitulacion()!=null){
+	titulacion = bean.getTitulacion().getCodNum();
+} else {
+	if(!BolsaEmpleoUtils.getParamForm(request, ControladorMisTitulaciones.PARAM_ID, "").equals("")){
+		titulacion = Integer.parseInt(BolsaEmpleoUtils.getParamForm(request, ControladorMisTitulaciones.PARAM_ID, ""));
+	} else {
+		titulacion = null;
+	}
+}
+
 %>
 
 
 <div class="bolsa-empleo">
 
-	<% if (bean.getMensajesDeExito().size() > 0) { %>
-		<div id="exito" class="success">
-			<%= bean.formatearMensajesDeExito() %>
-		</div>
-	<% } %>
-	<% if (bean.getMensajesDeError().size() > 0) { %>
-		<div id="error" class="error">
-			<%= bean.formatearMensajesDeError() %>
-		</div>
-	<% } %>
+	<jsp:include page="/WEB-INF/jsp/vista/infadministrativa/bolsaempleo/mensajes.jsp" />
 	
 	<div class="titulo-bolsa-empleo" style="margin-top:1rem;">
 		<h2>Nueva titulación</h2>
@@ -51,7 +56,7 @@ VistaTitulaciones bean = (VistaTitulaciones) uvdatos.getVistas().get(VistaTitula
 		</tfoot>
 	</table>
 	
-	<p>Las etiquetas en <b>negrita</b> corresponden a campos de relleno obligatorio</p>
+	<p>Las etiquetas en <strong>negrita</strong> corresponden a campos de relleno obligatorio</p>
 	
 	<form id="agregar_titulacion_usuario" class="be-form" method="post" action="<%= request.getRequestURI() %>" enctype="multipart/form-data">
     	<input type="hidden" name="<%= ControladorMisTitulaciones.PARAM_ACCION %>" id="accion_formulario" 
@@ -60,7 +65,7 @@ VistaTitulaciones bean = (VistaTitulaciones) uvdatos.getVistas().get(VistaTitula
 				value="<%= bean.getTitulacion() != null ? bean.getTitulacion().getCodNum() : "" %>" />
 		<div class="form-group">
     		<label for="razon_exclusion">Descripción</label>
-    		<textarea class="params form-input-custom" id="descripcion" name="<%= ControladorMisTitulaciones.PARAM_DESCRIPCION %>" rows="3" cols="60"></textarea>
+    		<textarea class="params form-input-custom" id="descripcion" name="<%= ControladorMisTitulaciones.PARAM_DESCRIPCION %>" rows="3" cols="60"><%=BolsaEmpleoUtils.getParamForm(request, ControladorMisTitulaciones.PARAM_DESCRIPCION, "")%></textarea>
    		</div>
    		
 	    	<div class="form-file">
@@ -94,7 +99,9 @@ $(document).ready(function() {
 			};
 			Atis.sendForm("<%= request.getRequestURI() %>", params);
     	}},
-    	<% if (bean.getTitulacion() != null) { %> "selected": <%= bean.getTitulacion().getCodNum() %> ,<% } %>
+    	<% if (titulacion!=null) { %> 
+    	"selected": <%= titulacion %> ,
+    	<% } %>
     	"columns": [
     		{'data': 'codNum'},
         	{'data': 'nombre', 'class': 'overflow-auto', 'filter': {'type': 'text'}}
@@ -104,10 +111,18 @@ $(document).ready(function() {
 
 	document.getElementById("agregar_titulacion_usuario").style.visibility = "hidden";
 
-	<% if (bean.getTitulacion() != null) { %>
+	<% if (titulacion != null) { %>
 		document.getElementById("agregar_titulacion_usuario").style.visibility = "visible";
 		document.getElementById("descripcion").value = "";
 		document.getElementById("fichero_archivo").value = null;
 	<%}%>
+	
+	$('#agregar_titulacion_usuario').submit(function(event) { 
+		$('#agregar_titulacion').prop('disabled', true);
+		$('#agregar_titulacion').attr('value', 'Guardando titulación...');			
+		return true;
+	});
+	
+	
 });
 </script>

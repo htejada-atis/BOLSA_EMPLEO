@@ -29,8 +29,6 @@ public class ModeloCandidato {
 	
 	protected static ModeloCandidato eInstancia = null;
 	
-	public static final Integer PARAM_ROL_CANDIDATO_ID = 1052;
-	
 	
 	/** Crea una instancia del objeto.
 	 *  de forma sincronizada para protegerse de posibles problemas multi-hilo
@@ -70,7 +68,7 @@ public class ModeloCandidato {
 				+ "		WHERE beptus.BEPTUS_USU_CODNUM = bepusu.CODNUM AND beptus.FLGVALIDADA = 'S'"
 				+ "	) AS COUNT_VALIDADAS"
 				+ "	FROM UVIRTUAL.TBEP_USUARIOS bepusu"
-				+ "	WHERE bepusu.rol = " + PARAM_ROL_CANDIDATO_ID + " ";
+				+ "	WHERE bepusu.rol = " + ModeloUsuarioBolsaEmpleo.PARAM_ROL_CANDIDATO_ID + " ";
 		
 		dataTable.setColumn(ORDER_COLUMN_INDEX_NOMBRE_CANDIDATO, "bepusu.CODCUENTA");
 		

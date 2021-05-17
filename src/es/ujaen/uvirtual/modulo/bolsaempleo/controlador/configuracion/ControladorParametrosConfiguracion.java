@@ -18,6 +18,7 @@ import es.ujaen.uvirtual.beans.Usuario;
 import es.ujaen.uvirtual.modulo.bolsaempleo.beans.ParametrosConfiguracion;
 import es.ujaen.uvirtual.modulo.bolsaempleo.modelo.ModeloParametrosConfiguracion;
 import es.ujaen.uvirtual.modulo.bolsaempleo.modelo.ModeloUsuarioBolsaEmpleo;
+import es.ujaen.uvirtual.modulo.bolsaempleo.utilidades.BolsaEmpleoUtils;
 import es.ujaen.uvirtual.modulo.bolsaempleo.vistas.VistaParametrosConfiguracion;
 import es.ujaen.uvirtual.utilidades.EscapaHTML;
 import es.ujaen.uvirtual.utilidades.Formateador;
@@ -81,13 +82,13 @@ public class ControladorParametrosConfiguracion extends HttpServlet {
 		}
 		
 		try {
-			init(bean, datos);
+			init(bean, datos, request, response);
 			switch (nombreAccion) {
 				case ACCION_INDEX:
 					listaParametros(bean);
 					break;
 				case ACCION_EDITAR_PARAMETROS:
-					editarParametros(request, bean);
+					editarParametros(bean, request, response);
 					break;
 				default:
 					errorFatal(bean, "Acción no contemplada");
@@ -113,9 +114,15 @@ public class ControladorParametrosConfiguracion extends HttpServlet {
 		}
 	}
 	
-	private void init(VistaParametrosConfiguracion bean, UVDatos datos) throws SQLException, UVException {
+	private void init(VistaParametrosConfiguracion bean, UVDatos datos, HttpServletRequest request, HttpServletResponse response) throws SQLException, UVException, IOException {
 		bean.setVista(RUTA_BEP_CONF + "index.jsp");
-		ModeloUsuarioBolsaEmpleo.obtenerInstancia().checkUser(datos);
+		BolsaEmpleoUtils.readMensajeSession(bean, request);
+		try {
+			ModeloUsuarioBolsaEmpleo.obtenerInstancia().checkUser(datos);
+		} catch (UVException e) {
+			BolsaEmpleoUtils.addMensajeDeError(e.getMessage(), bean, request);
+			response.sendRedirect("/srv/es/informacionadministrativa/bolsaempleo/error");
+		}
 	}
 	
 	private void errorFatal(VistaParametrosConfiguracion bean, String mensaje) {
@@ -147,13 +154,15 @@ public class ControladorParametrosConfiguracion extends HttpServlet {
 	
 	
 	/** edita los parametros de configuracion .
-	 * @param request .
 	 * @param bean bean de la vista a la que poner los valores .
+	 * @param request .
+	 * @param response .
 	 * @throws SQLException excepcion de bbdd.
+	 * @throws IOException .
 	 * @throws IOException .
 	 * @throws UVException .
 	 */
-	private void editarParametros(HttpServletRequest request, VistaParametrosConfiguracion bean) throws SQLException, UVException {
+	private void editarParametros(VistaParametrosConfiguracion bean, HttpServletRequest request, HttpServletResponse response) throws SQLException, UVException, IOException {
 		ModeloParametrosConfiguracion modelo = ModeloParametrosConfiguracion.obtenerInstancia();
 		List<ParametrosConfiguracion> parametros = modelo.listaParametros();
 		
@@ -161,12 +170,14 @@ public class ControladorParametrosConfiguracion extends HttpServlet {
 			param.setValor(EscapaHTML.ajustaCodificacion(request.getParameter(param.getNombre() + PARAM_VALOR)));
 			param.setDescripcion(EscapaHTML.ajustaCodificacion(request.getParameter(param.getNombre() + PARAM_DESCRIPCION)));
 			modelo.actualizaParametro(param);
-		}	
+		}
 		
 		List<ParametrosConfiguracion> parametrosCont = modelo.listaParametros();
 		bean.setParametros(parametrosCont);
 		bean.getMensajesDeExito().add(MENSAJE_EXITO_EDITAR);
-
+		
+		BolsaEmpleoUtils.addMensajeDeExito(MENSAJE_EXITO_EDITAR, bean, request);
+		response.sendRedirect(request.getServletPath());
 	}
 
 }

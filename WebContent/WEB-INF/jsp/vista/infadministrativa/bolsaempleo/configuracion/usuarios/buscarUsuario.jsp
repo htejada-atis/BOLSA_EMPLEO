@@ -13,16 +13,7 @@ VistaUsuarioBolsaEmpleo bean = (VistaUsuarioBolsaEmpleo) uvdatos.getVistas().get
 
 <div class="bolsa-empleo usuarios-buscar">
 
-	<% if (bean.getMensajesDeExito().size() > 0) { %>
-		<div id="exito" class="success">
-			<%= bean.formatearMensajesDeExito() %>
-		</div>
-	<% } %>
-	<% if (bean.getMensajesDeError().size() > 0) { %>
-		<div id="error" class="error">
-			<%= bean.formatearMensajesDeError() %>
-		</div>
-	<% } %>
+	<jsp:include page="/WEB-INF/jsp/vista/infadministrativa/bolsaempleo/mensajes.jsp" />
 	
 	<% if(bean.getUsuario()!=null) {%>
 		<% if(bean.getBusqueda()) {%>
@@ -43,11 +34,11 @@ VistaUsuarioBolsaEmpleo bean = (VistaUsuarioBolsaEmpleo) uvdatos.getVistas().get
     				</div>
     				<div class="form-check-custom w-64" id="fecha_excluido" style="display:none;">	
 						<div class="form-check-custom">
-	    					<label for="noticia_fecha"><b>Fecha Inicio</b>:</label>
+	    					<label for="noticia_fecha"><strong>Fecha Inicio</strong>:</label>
 	    					<input class="form-input-custom" type="text" name="<%= ControladorUsuarioBolsaEmpleo.PARAM_FECHA_EXCLUIDO_INICIO %>" id="fecha_ini" autocomplete="off" style="width:90%"/>
 	    				</div>
 	    				<div class="form-check-custom">
-	    					<label for="noticia_fecha"><b>Fecha Fin</b>:</label>
+	    					<label for="noticia_fecha"><strong>Fecha Fin</strong>:</label>
 	    					<input class="form-input-custom" type="text" name="<%= ControladorUsuarioBolsaEmpleo.PARAM_FECHA_EXCLUIDO_FIN %>" id="fecha_fin" autocomplete="off" style="width:80%"/>
 	    				</div>
     				</div>

@@ -180,7 +180,7 @@ public class ControladorMisSolicitudes extends HttpServlet {
 		}
 
 		try {
-			init(bean, datos);
+			init(bean, datos, request, response);
 			switch (nombreAccion) {
 				case ACCION_CONSULTAR_SOLICITUD:
 				case ACCION_CREAR_SOLICITUD:
@@ -231,9 +231,15 @@ public class ControladorMisSolicitudes extends HttpServlet {
 		}
 	}
 	
-	private void init(VistaSolicitudes bean, UVDatos datos) throws SQLException, UVException {
+	private void init(VistaSolicitudes bean, UVDatos datos, HttpServletRequest request, HttpServletResponse response) throws SQLException, UVException, IOException {
 		bean.setVista(JSP_INDEX);
-		ModeloUsuarioBolsaEmpleo.obtenerInstancia().checkUser(datos);
+		BolsaEmpleoUtils.readMensajeSession(bean, request);
+		try {
+			ModeloUsuarioBolsaEmpleo.obtenerInstancia().checkUser(datos);
+		} catch (UVException e) {
+			BolsaEmpleoUtils.addMensajeDeError(e.getMessage(), bean, request);
+			response.sendRedirect("/srv/es/informacionadministrativa/bolsaempleo/error");
+		}
 		bean.setCandidato(ModeloUsuarioBolsaEmpleo.obtenerInstancia().getUsuarioCandidato(datos));
 	}
 	
@@ -547,6 +553,8 @@ public class ControladorMisSolicitudes extends HttpServlet {
 		ModeloBolsa modeloBolsa = ModeloBolsa.obtenerInstancia();
 		ModeloMerito modeloMerito = ModeloMerito.obtenerInstancia();
 		ModeloBaremacionItems modeloItems = ModeloBaremacionItems.obtenerInstancia();
+		Boolean excluyente = false;
+		String meritoCadena = "";
 
 		Bolsa area = modeloBolsa.getBolsaById(Formateador.leeParametroInteger(request.getParameter(PARAM_BOLSA)));
 		bean.setArea(area);
@@ -579,14 +587,12 @@ public class ControladorMisSolicitudes extends HttpServlet {
 			List<MeritoSolicitud> listaMeritos = modeloSolicitud.getMeritosSolicitudBolsa(solicitud, area);
 			for (MeritoSolicitud mer : listaMeritos) {
 				if (modeloItems.checkItemsExcluyentes(mer.getMerito().getItemBaremacion(), merito.getItemBaremacion())) {
-					this.seleccionarBolsa(bean, request);
-					throw new UVException(MENSAJE_ERROR_ITEM_EXCLUYENTE 
-							+ mer.getMerito().getItemBaremacion().getBloqueBaremacion().getApartadoBaremacion().getCodigo()
+					excluyente = true;
+					meritoCadena = mer.getMerito().getItemBaremacion().getBloqueBaremacion().getApartadoBaremacion().getCodigo()
 							+ "." + mer.getMerito().getItemBaremacion().getBloqueBaremacion().getCodigo() 
-							+ "." + mer.getMerito().getItemBaremacion().getCodigo());
+							+ "." + mer.getMerito().getItemBaremacion().getCodigo();
 				}
 			}
-			
 			
 			modeloSolicitud.asignarMeritosASolicitudBolsa(solicitud, area, merito);
 		} else {
@@ -594,6 +600,10 @@ public class ControladorMisSolicitudes extends HttpServlet {
 		}
 
 		this.seleccionarBolsa(bean, request);
+		
+		if (excluyente) {
+			throw new UVException(MENSAJE_ERROR_ITEM_EXCLUYENTE + meritoCadena + ". Recuerde que solo se seleccionará el más adecuado para la solicitud");
+		}
 	}
 	
 	/**

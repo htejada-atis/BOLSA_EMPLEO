@@ -16,20 +16,11 @@ String tituloValue = BolsaEmpleoUtils.getParamForm(request, ControladorGestionFi
 
 <div class="bolsa-empleo">
 
-	<% if (bean.getMensajesDeExito().size() > 0) { %>
-		<div id="exito" class="success">
-			<%= bean.formatearMensajesDeExito() %>
-		</div>
-	<% } %>
-	<% if (bean.getMensajesDeError().size() > 0) { %>
-		<div id="error" class="error">
-			<%= bean.formatearMensajesDeError() %>
-		</div>
-	<% } %>
+	<jsp:include page="/WEB-INF/jsp/vista/infadministrativa/bolsaempleo/mensajes.jsp" />
 	
 	<h2>Nuevo documento</h2>
 	
-	<p>Las etiquetas en <b>negrita</b> corresponden a campos de relleno obligatorio</p>
+	<p>Las etiquetas en <strong>negrita</strong> corresponden a campos de relleno obligatorio</p>
     
     <form id="subir_fichero" class="be-form" method="post" action="<%= request.getRequestURI() %>" enctype="multipart/form-data">
     	<input type="hidden" name="<%= ControladorGestionFicheros.PARAM_ACCION %>" id="accion_formulario" 
@@ -37,7 +28,7 @@ String tituloValue = BolsaEmpleoUtils.getParamForm(request, ControladorGestionFi
     	<div class="form-group-container col1">
 	    	<div class="form-group">
 	    		<label for="fichero_titulo">Título:</label>
-	    		<input class="form-input-custom" id="fichero_titulo" name="<%= ControladorGestionFicheros.PARAM_TITULO %>" value="<%= tituloValue %>" required/>
+	    		<input class="form-input-custom" id="fichero_titulo" name="<%= ControladorGestionFicheros.PARAM_TITULO %>" value="<%= tituloValue %>"/>
 	    	</div>
     	</div>
     	<div class="form-group-container col1">

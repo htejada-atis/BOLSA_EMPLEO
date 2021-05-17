@@ -155,9 +155,6 @@ public class ModeloFichero {
 		if (fichero.getNombre() == null || fichero.getNombre().equals("")) {
 			throw new UVException("No se puede insertar un fichero sin nombre");
 		}
-		if (fichero.getTitulo() == null || fichero.getTitulo().equals("")) {
-			throw new UVException("No se puede insertar un fichero sin título");
-		}
 		if (fichero.getArchivo() == null) {
 			throw new UVException("No se puede insertar un fichero sin archivo");
 		}

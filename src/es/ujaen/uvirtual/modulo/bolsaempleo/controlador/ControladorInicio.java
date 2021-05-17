@@ -26,6 +26,7 @@ import es.ujaen.uvirtual.modulo.bolsaempleo.beans.Noticia;
 import es.ujaen.uvirtual.modulo.bolsaempleo.modelo.ModeloFichero;
 import es.ujaen.uvirtual.modulo.bolsaempleo.modelo.ModeloNoticia;
 import es.ujaen.uvirtual.modulo.bolsaempleo.modelo.ModeloUsuarioBolsaEmpleo;
+import es.ujaen.uvirtual.modulo.bolsaempleo.utilidades.BolsaEmpleoUtils;
 import es.ujaen.uvirtual.modulo.bolsaempleo.vistas.VistaInicio;
 import es.ujaen.uvirtual.utilidades.EscapaHTML;
 import es.ujaen.uvirtual.utilidades.Formateador;
@@ -97,7 +98,7 @@ public class ControladorInicio extends HttpServlet {
 			nombreAccion = ACCION_INDEX;
 		}
 		try {
-			init(bean, datos);
+			init(bean, datos, request, response);
 			
 			switch (nombreAccion) {
 				case ACCION_INDEX:
@@ -139,10 +140,18 @@ public class ControladorInicio extends HttpServlet {
 		}
 	}
 	
-	private void init(VistaInicio bean, UVDatos datos) throws SQLException, UVException {
+	private void init(VistaInicio bean, UVDatos datos, HttpServletRequest request, HttpServletResponse response) throws SQLException, UVException, IOException {
 		bean.setVista(JSP_INICIO);
-		boolean existe = ModeloUsuarioBolsaEmpleo.obtenerInstancia().checkUser(datos);
-		bean.setAnonimo(!existe);
+		BolsaEmpleoUtils.readMensajeSession(bean, request);
+		
+		try {
+			boolean existe = ModeloUsuarioBolsaEmpleo.obtenerInstancia().checkUser(datos);
+			bean.setAnonimo(!existe);
+		} catch (UVException e) {
+			BolsaEmpleoUtils.addMensajeDeError(e.getMessage(), bean, request);
+			response.sendRedirect("/srv/es/informacionadministrativa/bolsaempleo/error");
+		}
+		
 	}
 	
 	private void errorFatal(VistaInicio bean, String mensaje) {

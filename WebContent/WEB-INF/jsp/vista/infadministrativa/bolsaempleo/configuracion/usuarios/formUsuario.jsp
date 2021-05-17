@@ -16,16 +16,7 @@ VistaUsuarioBolsaEmpleo bean = (VistaUsuarioBolsaEmpleo) uvdatos.getVistas().get
 
 <div class="bolsa-empleo usuarios-form">
 
-	<% if (bean.getMensajesDeExito().size() > 0) { %>
-		<div id="exito" class="success">
-			<%= bean.formatearMensajesDeExito() %>
-		</div>
-	<% } %>
-	<% if (bean.getMensajesDeError().size() > 0) { %>
-		<div id="error" class="error">
-			<%= bean.formatearMensajesDeError() %>
-		</div>
-	<% } %>
+	<jsp:include page="/WEB-INF/jsp/vista/infadministrativa/bolsaempleo/mensajes.jsp" />
 
 	<% 
 	
@@ -84,7 +75,7 @@ VistaUsuarioBolsaEmpleo bean = (VistaUsuarioBolsaEmpleo) uvdatos.getVistas().get
 		</ul>
 	</div>
 	
-	<p>Las etiquetas en <b>negrita</b> corresponden a campos de relleno obligatorio</p>
+	<p>Las etiquetas en <strong>negrita</strong> corresponden a campos de relleno obligatorio</p>
 	
 	<form id="actualizar_usuario" class="be-form" method="post" action="<%= request.getRequestURI() %>">
     	<input type="hidden" name="<%= ControladorUsuarioBolsaEmpleo.PARAM_ACCION %>" id="accion_formulario" value="" />
@@ -142,11 +133,11 @@ VistaUsuarioBolsaEmpleo bean = (VistaUsuarioBolsaEmpleo) uvdatos.getVistas().get
     		</div>
     		<div class="form-check">
     			<div class="form-check-custom">
-	    			<label for="noticia_fecha"><b>Fecha Inicio</b>:</label>
+	    			<label for="noticia_fecha"><strong>Fecha Inicio</strong>:</label>
 	    			<input class="form-input-custom" type="text" name="<%= ControladorUsuarioBolsaEmpleo.PARAM_FECHA_EXCLUIDO_INICIO %>" id="fecha_ini" autocomplete="off" value="<%= fecha_ini!=null ? fecha_ini : "" %>" style="width:80%"/>
 	    		</div>
 	    		<div class="form-check-custom">
-	    			<label for="noticia_fecha"><b>Fecha Fin</b>:</label>
+	    			<label for="noticia_fecha"><strong>Fecha Fin</strong>:</label>
 	    			<input class="form-input-custom" type="text" name="<%= ControladorUsuarioBolsaEmpleo.PARAM_FECHA_EXCLUIDO_FIN %>" id="fecha_fin" autocomplete="off" value="<%= fecha_fin!=null ? fecha_fin : "" %>" style="width:80%"/>
 	    		</div>
 	    	</div>
@@ -158,7 +149,7 @@ VistaUsuarioBolsaEmpleo bean = (VistaUsuarioBolsaEmpleo) uvdatos.getVistas().get
    		</div>
 		
 		<div class="form-group">
-			<label for="select_role"><b>Elija el rol para asociar</b></label>
+			<label for="select_role"><strong>Elija el rol para asociar</strong></label>
 			<select class="params" id="select_role" name="<%= ControladorUsuarioBolsaEmpleo.PARAM_ROLE %>" style="width:100%;" required>
 				<option value="-1"> - </option>
     				<%for(Rol role: bean.getRoles()){

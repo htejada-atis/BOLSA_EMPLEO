@@ -24,16 +24,18 @@ import es.ujaen.uvirtual.utilidades.UVException;
 public class ModeloMeritosPreferentes {
 	// ordenación 
 	public static final int ORDER_COLUMN_INDEX_CODIGO = 0;
-	public static final int ORDER_COLUMN_INDEX_DESCRIPCION = 1;
-	public static final int ORDER_COLUMN_INDEX_TIPO = 2;
-	public static final int ORDER_COLUMN_INDEX_APLICABLE = 3;
-	public static final int ORDER_COLUMN_INDEX_FACTOR = 4;
-	public static final int ORDER_COLUMN_INDEX_ACTIVO = 5;
-	
+	public static final int ORDER_COLUMN_INDEX_NOMBRE = 1;
+	public static final int ORDER_COLUMN_INDEX_DESCRIPCION = 2;
+	public static final int ORDER_COLUMN_INDEX_TIPO = 3;
+	public static final int ORDER_COLUMN_INDEX_APLICABLE = 4;
+	public static final int ORDER_COLUMN_INDEX_FACTOR = 5;
+	public static final int ORDER_COLUMN_INDEX_ACTIVO = 6;
+
 	public static final int ORDER_COLUMN_INDEX_OPCIONES_NOMBRE = 0;
 	public static final int ORDER_COLUMN_INDEX_OPCIONES_FACTOR = 1;
 	
-	public static final int MAX_LENGTH_COLUMN_DESCRIPCION = 1000;
+	public static final int MAX_LENGTH_COLUMN_NOMBRE = 100;
+	public static final int MAX_LENGTH_COLUMN_OBSERVACIONES = 1000;
 	public static final int MAX_LENGTH_COLUMN_FACTOR = 20;
 	public static final int MAX_LENGTH_COLUMN_CODIGO = 10;
 	public static final int MAX_LENGTH_COLUMN_NOMBRE_OPCION = 50;	
@@ -126,6 +128,7 @@ public class ModeloMeritosPreferentes {
 		String consulta = "SELECT bepmep.* FROM TBEP_MERITOS_PREFERENTES bepmep WHERE 1=1 ";
 		
 		dataTable.setColumn(ORDER_COLUMN_INDEX_CODIGO, "bepmep.CODIGO");
+		dataTable.setColumn(ORDER_COLUMN_INDEX_NOMBRE, "bepmep.NOMBRE");
 		dataTable.setColumn(ORDER_COLUMN_INDEX_DESCRIPCION, "bepmep.DESCRIPCION");
 		dataTable.setColumn(ORDER_COLUMN_INDEX_TIPO, "bepmep.TIPO");
 		dataTable.setColumn(ORDER_COLUMN_INDEX_APLICABLE, "bepmep.APLICABLE");
@@ -233,15 +236,16 @@ public class ModeloMeritosPreferentes {
 		}
 		
 		String sql = "INSERT INTO TBEP_MERITOS_PREFERENTES ("
-				+ "CODIGO,DESCRIPCION,TIPO,APLICABLE,BASE,FACTOR,VALOR_MAXIMO,"
+				+ "CODIGO,NOMBRE,DESCRIPCION,TIPO,APLICABLE,BASE,FACTOR,VALOR_MAXIMO,"
 				+ "BEPITE_TIPO_CODNUM,BEPBLO_APLICABLE_CODNUM,BEPAPA_APLICABLE_CODNUM,BEPITE_APLICABLE_CODNUM) "
-				+ "VALUES (?,?,?,?,?,?,?,?,?,?,?)";
+				+ "VALUES (?,?,?,?,?,?,?,?,?,?,?,?)";
 		
 		try (Connection conexion = ConexionUvirtual.obtenerInstancia(); 
 				PreparedStatement stmt = conexion.prepareStatement(sql, new String[]{CODNUM})) {
 			int parameterIndex = 1;
 			stmt.setString(parameterIndex++, merito.getCodigo());
-			stmt.setString(parameterIndex++, merito.getDescripcion());
+			stmt.setString(parameterIndex++, merito.getNombre());
+			stmt.setString(parameterIndex++, merito.getObservaciones());
 			stmt.setString(parameterIndex++, merito.getTipo());
 			stmt.setString(parameterIndex++, merito.getAplicable());
 			
@@ -299,7 +303,8 @@ public class ModeloMeritosPreferentes {
 	public void editarMeritoPreferente(MeritoPreferente merito) throws SQLException {
 		String query = "UPDATE TBEP_MERITOS_PREFERENTES SET "
 				+ "CODIGO = ?, "
-				+ "DESCRIPCION = ?, "
+				+ "NOMBRE = ?, "
+				+ "OBSERVACIONES = ?, "
 				+ "TIPO = ?, "
 				+ "TIPO_CALCULO = ?, "
 				+ "APLICABLE = ?, "
@@ -316,7 +321,8 @@ public class ModeloMeritosPreferentes {
 		try (Connection conexion = ConexionUvirtual.obtenerInstancia(); PreparedStatement stmt = conexion.prepareStatement(query)) {
 			int parameterIndex = 1;
 			stmt.setString(parameterIndex++, merito.getCodigo());
-			stmt.setString(parameterIndex++, merito.getDescripcion());
+			stmt.setString(parameterIndex++, merito.getNombre());
+			stmt.setString(parameterIndex++, merito.getObservaciones());
 			stmt.setString(parameterIndex++, merito.getTipo());
 			stmt.setString(parameterIndex++, merito.getTipoCalculo());
 			stmt.setString(parameterIndex++, merito.getAplicable());
@@ -435,7 +441,8 @@ public class ModeloMeritosPreferentes {
 		MeritoPreferente obj = new MeritoPreferente();
 		obj.setCodNum(rs.getInt(CODNUM));
 		obj.setCodigo(rs.getString("CODIGO"));
-		obj.setDescripcion(rs.getString("DESCRIPCION"));
+		obj.setNombre(rs.getString("NOMBRE"));
+		obj.setObservaciones(rs.getString("OBSERVACIONES"));
 		obj.setTipo(rs.getString("TIPO"));
 		obj.setTipoCalculo(rs.getString("TIPO_CALCULO"));
 		obj.setAplicable(rs.getString("APLICABLE"));

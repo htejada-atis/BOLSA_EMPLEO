@@ -16,17 +16,7 @@ VistaSolicitudes bean = (VistaSolicitudes) uvdatos.getVistas().get(VistaSolicitu
 
 <div class="bolsa-empleo">
 
-	<% if (bean.getMensajesDeExito().size() > 0) { %>
-		<div id="exito" class="success">
-			<%= bean.formatearMensajesDeExito() %>
-		</div>
-	<% } %>
-	
-	<% if (bean.getMensajesDeError().size() > 0) { %>
-		<div id="error" class="error">
-			<%= bean.formatearMensajesDeError()   %>
-		</div>
-	<% } %>
+	<jsp:include page="/WEB-INF/jsp/vista/infadministrativa/bolsaempleo/mensajes.jsp" />
 	
 	<h2>Paso 2: Asignación de méritos a áreas</h2>
 	<h3><%= bean.getSolicitud().getConvocatoria().getDescripcion() %></h3>
@@ -52,7 +42,7 @@ VistaSolicitudes bean = (VistaSolicitudes) uvdatos.getVistas().get(VistaSolicitu
 		<tr>
 			<th scope="col"	style="width:5%"></th>
 			<th scope="col"	style="width:10%">Cod.</th>
-			<th scope="col"	style="width:10%">Código ítem</th>
+			<th scope="col"	style="width:10%">Código item</th>
 			<th scope="col"	style="width:40%">Mérito</th>
 			<th scope="col"	style="width:10%">Valor</th>
 			<th scope="col"	style="width:15%">Afinidad</th>
@@ -94,7 +84,7 @@ VistaSolicitudes bean = (VistaSolicitudes) uvdatos.getVistas().get(VistaSolicitu
 		var texto = "<div>";
 		
 		if (valoracion) {
-			texto += '<b title="' + valoracion.afinidad.descripcion + '">' + valoracion.afinidad.codigo + " " + valoracion.afinidad.modulacion + " %</b><br/>"; 
+			texto += '<b title="' + valoracion.afinidad.descripcion + '">' + valoracion.afinidad.codigo + " " + valoracion.afinidad.modulacion + " %</strong><br/>"; 
 		} else {
 			texto += 'Selecciona afinidad<br/>';
 		}
@@ -149,7 +139,7 @@ VistaSolicitudes bean = (VistaSolicitudes) uvdatos.getVistas().get(VistaSolicitu
 		if (row.valoraciones && row.valoraciones.length > 0) {
 			for(var i=0; i<row.valoraciones.length; i++) {
 				var valoracion = row.valoraciones[i];
-				texto += '<b title="' + valoracion.afinidad.descripcion + '">' + valoracion.valor + ' - ' + valoracion.afinidad.codigo + " " + valoracion.afinidad.modulacion + ' %</b><br/>';
+				texto += '<b title="' + valoracion.afinidad.descripcion + '">' + valoracion.valor + ' - ' + valoracion.afinidad.codigo + " " + valoracion.afinidad.modulacion + ' %</strong><br/>';
 			}
 		} else {
 			texto += 'Selecciona afinidad<br/>';
@@ -272,7 +262,7 @@ VistaSolicitudes bean = (VistaSolicitudes) uvdatos.getVistas().get(VistaSolicitu
         		Atis.sendForm("<%=request.getRequestURI()%>", params);
 		    }},
 		    "selected": <%=bean.getArea() != null ? bean.getArea().getCodNum() : "null"%>,		    
-		    "title": 'Mis Áreas para esta convocatoria',
+		    "title": 'Mis áreas para esta convocatoria',
 		    "action": '<%=ControladorMisSolicitudes.ACCION_DATATABLE_BOLSAS_SELECCIONADAS%>',
 		    "params": {'<%=ControladorMisSolicitudes.PARAM_SOLICITUD_ID%>': <%=bean.getSolicitud().getCodNum()%>},
 		    "columns": [
@@ -340,7 +330,7 @@ VistaSolicitudes bean = (VistaSolicitudes) uvdatos.getVistas().get(VistaSolicitu
 		        				return renderNoIndividualizado(row);
 		        			}
 		        		} else {
-		        			return '<span title="El mérito no tiene afinidad con el área seleccionada"></span>';
+		        			return '<span title="El mérito no tiene afinidad con el Área seleccionada"></span>';
 		        		}		        				        	
 		        	}},
 		        	{'data': 'excluido', 'order': {'active': false}, 'filter': {'type': 'selectBoolean', 'true': 'Excluido', 'false': 'No excluido', 'optionDefault': 'false'}, 'render': function(row) {

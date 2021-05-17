@@ -120,7 +120,7 @@ public class ControladorMisTitulaciones extends HttpServlet {
 		}
 		
 		try {
-			init(bean, datos);
+			init(bean, datos, request, response);
 			switch (nombreAccion) {
 				case ACCION_INDEX:
 					bean.setVista(JSP_INDEX);
@@ -170,9 +170,15 @@ public class ControladorMisTitulaciones extends HttpServlet {
 		}
 	}
 	
-	private void init(VistaTitulaciones bean, UVDatos datos) throws SQLException, UVException {
+	private void init(VistaTitulaciones bean, UVDatos datos, HttpServletRequest request, HttpServletResponse response) throws SQLException, UVException, IOException {
 		bean.setVista(JSP_INDEX);
-		ModeloUsuarioBolsaEmpleo.obtenerInstancia().checkUser(datos);
+		BolsaEmpleoUtils.readMensajeSession(bean, request);
+		try {
+			ModeloUsuarioBolsaEmpleo.obtenerInstancia().checkUser(datos);
+		} catch (UVException e) {
+			BolsaEmpleoUtils.addMensajeDeError(e.getMessage(), bean, request);
+			response.sendRedirect("/srv/es/informacionadministrativa/bolsaempleo/error");
+		}
 	}
 	
 	private void errorFatal(VistaTitulaciones bean, String mensaje) {
@@ -260,7 +266,7 @@ public class ControladorMisTitulaciones extends HttpServlet {
 		ModeloMisTitulaciones modelo = ModeloMisTitulaciones.obtenerInstancia();
 		Integer codNum = Formateador.leeParametroInteger(request.getParameter(PARAM_TITULACION));
 		Titulacion titulacion = modelo.listaTitulacion(codNum);
-				
+			
 		bean.setTitulacion(titulacion);
 		bean.setVista(RUTA_BEP_CONF + "formMisTitulaciones.jsp");
 	}

@@ -22,16 +22,7 @@ Boolean publica = noticia != null ? noticia.isPublica() : false;
 
 <div class="bolsa-empleo">
 
-	<% if (bean.getMensajesDeExito().size() > 0) { %>
-		<div id="exito" class="success">
-			<%= bean.formatearMensajesDeExito() %>
-		</div>
-	<% } %>
-	<% if (bean.getMensajesDeError().size() > 0) { %>
-		<div id="error" class="error">
-			<%= bean.formatearMensajesDeError() %>
-		</div>
-	<% } %>
+	<jsp:include page="/WEB-INF/jsp/vista/infadministrativa/bolsaempleo/mensajes.jsp" />
 
 	<% if (noticia != null) { %>
 	    <h2>Editar noticia</h2>
@@ -44,7 +35,7 @@ Boolean publica = noticia != null ? noticia.isPublica() : false;
 		<ul id="erroresFormList"></ul>
 	</div>
     
-    <p>Las etiquetas en <b>negrita</b> corresponden a campos de relleno obligatorio</p>
+    <p>Las etiquetas en <strong>negrita</strong> corresponden a campos de relleno obligatorio</p>
     
     <form id="actualizar_noticia" class="be-form" method="post" action="<%= request.getRequestURI() %>">
     	<input type="hidden" name="<%= ControladorGestionNoticias.PARAM_ACCION %>" id="accion_formulario" 
@@ -63,14 +54,14 @@ Boolean publica = noticia != null ? noticia.isPublica() : false;
 	    		<input class="form-input-custom" type="text" name="<%= ControladorGestionNoticias.PARAM_ENLACE %>" id="noticia_enlace" value="<%= enlace %>"/>
 	    	</div>
 	    	<div class="form-group">
-	    		<label for="noticia_fecha"><b>Fecha</b>:</label>
+	    		<label for="noticia_fecha"><strong>Fecha</strong>:</label>
 	    		<input class="form-input-custom" type="text" name="<%= ControladorGestionNoticias.PARAM_FECHA %>" id="noticia_fecha" autocomplete="off" 
 	    		value="<%= fecha %>" required/>
 	    	</div>
     	</div>
     	<div class="form-check">
     		<label for="noticia_publica" class="bold-label"><input type="checkbox" id="noticia_publica" name="<%= ControladorGestionNoticias.PARAM_PUBLICA %>" 
-    		value="<%= publica %>" <%= (publica ? "checked=''" : "") %> />Pï¿½blica</label>
+    		value="<%= publica %>" <%= (publica ? "checked=''" : "") %> />Pública</label>
     	</div>
     	<div class="form-btn">
     		<input id="noticia_enviar" type="submit" name="<%= ControladorGestionNoticias.PARAM_ENVIAR %>" value="<%= noticia != null ? "Guardar cambios" : "Insertar noticia" %>"/>

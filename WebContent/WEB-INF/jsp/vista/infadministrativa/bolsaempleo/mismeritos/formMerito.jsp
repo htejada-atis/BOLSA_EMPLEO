@@ -22,20 +22,11 @@ String observacion = BolsaEmpleoUtils.getParamForm(request, ControladorMisMerito
 
 <div class="bolsa-empleo">
 
-	<% if (bean.getMensajesDeExito().size() > 0) { %>
-		<div id="exito" class="success">
-			<%= bean.formatearMensajesDeExito() %>
-		</div>
-	<% } %>
-	<% if (bean.getMensajesDeError().size() > 0) { %>
-		<div id="error" class="error">
-			<%= bean.formatearMensajesDeError() %>
-		</div>
-	<% } %>
+	<jsp:include page="/WEB-INF/jsp/vista/infadministrativa/bolsaempleo/mensajes.jsp" />
 	
 	<h2>Nuevo mérito</h2>
 	
-	<p>Las etiquetas en <b>negrita</b> corresponden a campos de relleno obligatorio</p>
+	<p>Las etiquetas en <strong>negrita</strong> corresponden a campos de relleno obligatorio</p>
     
     <form id="agregar_merito" class="be-form" method="post" action="<%= request.getRequestURI() %>" enctype="multipart/form-data">
     	<input type="hidden" name="<%= ControladorMisMeritos.PARAM_ACCION %>" id="accion_formulario" 
@@ -61,9 +52,9 @@ String observacion = BolsaEmpleoUtils.getParamForm(request, ControladorMisMerito
 		
 		<% if (apartado != null) { %>
 			<div class="form-group">
-				<label class="bold-label" for="select_item">Ítem:</label>
+				<label class="bold-label" for="select_item">Item:</label>
 				<select class="form-input-custom" id="select_item" name="<%= ControladorMisMeritos.PARAM_ITEM %>" required>
-					<option value="">Elija el ítem</option>
+					<option value="">Elija el item</option>
 					<%
 					for(ItemBaremacion it: bean.getItems()) {
 					%>
@@ -85,7 +76,7 @@ String observacion = BolsaEmpleoUtils.getParamForm(request, ControladorMisMerito
 		<div id="contDescripcionItem" style="display:none;">
 			<div class="form-group">
 	    		<div class="form-group">
-	    			<p id="descripcionItem">Descripción del Ítem: </p>
+	    			<p id="descripcionItem">Descripción del item: </p>
 	    		</div>
     		</div>
 		</div>
@@ -135,7 +126,7 @@ String observacion = BolsaEmpleoUtils.getParamForm(request, ControladorMisMerito
 	//var selected = $(this).children("option:selected").val();
 				
 	if (descripcion) {
-		$('#descripcionItem').text('Descripción del Ítem: ' + descripcion);
+		$('#descripcionItem').text('Descripción del item: ' + descripcion);
 		$('#contDescripcionItem').show();
 	} else {
 		$('#contDescripcionItem').hide();
@@ -162,7 +153,7 @@ String observacion = BolsaEmpleoUtils.getParamForm(request, ControladorMisMerito
 			//var selected = $(this).children("option:selected").val();
 						
 			if (descripcion) {
-				$('#descripcionItem').text('Descripción del Ítem: ' + descripcion);
+				$('#descripcionItem').text('Descripción del item: ' + descripcion);
 				$('#contDescripcionItem').show();
 			} else {
 				$('#contDescripcionItem').hide();

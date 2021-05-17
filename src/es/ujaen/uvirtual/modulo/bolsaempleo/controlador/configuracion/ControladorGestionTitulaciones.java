@@ -19,6 +19,7 @@ import es.ujaen.uvirtual.modulo.bolsaempleo.beans.Titulacion;
 import es.ujaen.uvirtual.modulo.bolsaempleo.modelo.ModeloTitulacion;
 import es.ujaen.uvirtual.modulo.bolsaempleo.modelo.ModeloUsuarioBolsaEmpleo;
 import es.ujaen.uvirtual.modulo.bolsaempleo.utilidades.BolsaEmpleoDataTable;
+import es.ujaen.uvirtual.modulo.bolsaempleo.utilidades.BolsaEmpleoUtils;
 import es.ujaen.uvirtual.modulo.bolsaempleo.vistas.VistaTitulaciones;
 import es.ujaen.uvirtual.utilidades.EscapaHTML;
 import es.ujaen.uvirtual.utilidades.Formateador;
@@ -46,7 +47,6 @@ public class ControladorGestionTitulaciones extends HttpServlet {
 	public static final String ACCION_AGREGAR_TITULACION = "agregartitulacion";
 	public static final String ACCION_BORRAR_TITULACION = "borrartitulacion";
 	public static final String ACCION_DATATABLE_TITULACIONES = "datatabletitulaciones";
-	public static final String ACCION_EDITAR_TITULACION = "editartitulacion";
 	public static final String ACCION_INDEX = "listartitulaciones";
 	
 	// Parámetros
@@ -58,8 +58,7 @@ public class ControladorGestionTitulaciones extends HttpServlet {
 	public static final String PARAM_TITULACIONES = "titulaciones";
 
 	// Mensajes
-	public static final String MENSAJE_ENVIADO_CORRECTO = "mensajecorrectogt";
-	public static final String MENSAJE_ENVIADO_ERROR = "mensajeerrorgt";
+	public static final String MENSAJE_ENVIADO = "mensajeenviado";
 	public static final String MENSAJE_EXITO_AGREGAR = "Titulación agregada correctamente";
 	public static final String MENSAJE_EXITO_ELIMINAR = "Titulación eliminada correctamente";
 	public static final String MENSAJE_ERROR_ELIMINAR_TITULACION = "No se puede eliminar una titulación que está asignada a un área";
@@ -91,16 +90,13 @@ public class ControladorGestionTitulaciones extends HttpServlet {
 		}
 		
 		try {
-			init(bean, datos);
+			init(bean, datos, request, response);
 			switch (nombreAccion) {
 				case ACCION_INDEX:
 					bean.setVista(RUTA_BEP_CONF + "titulaciones.jsp");
 					break;
 				case ACCION_AGREGAR_TITULACION:
 					agregarTitulacion(bean, request, response);
-					break;
-				case ACCION_EDITAR_TITULACION:
-					editarTitulacion(bean, request, response);
 					break;
 				case ACCION_BORRAR_TITULACION:
 					eliminarTitulacion(bean, request, response);
@@ -130,9 +126,15 @@ public class ControladorGestionTitulaciones extends HttpServlet {
 		}
 	}
 	
-	private void init(VistaTitulaciones bean, UVDatos datos) throws SQLException, UVException {
+	private void init(VistaTitulaciones bean, UVDatos datos, HttpServletRequest request, HttpServletResponse response) throws SQLException, UVException, IOException {
 		bean.setVista(RUTA_BEP_CONF + "titulaciones.jsp");
-		ModeloUsuarioBolsaEmpleo.obtenerInstancia().checkUser(datos);
+		BolsaEmpleoUtils.readMensajeSession(bean, request);
+		try {
+			ModeloUsuarioBolsaEmpleo.obtenerInstancia().checkUser(datos);
+		} catch (UVException e) {
+			BolsaEmpleoUtils.addMensajeDeError(e.getMessage(), bean, request);
+			response.sendRedirect("/srv/es/informacionadministrativa/bolsaempleo/error");
+		}
 	}
 	
 	private void errorFatal(VistaTitulaciones bean, String mensaje) {
@@ -148,30 +150,6 @@ public class ControladorGestionTitulaciones extends HttpServlet {
 		doGet(request, response);
 	}
 	
-	/** edita una titulación .
-	 * @param request .
-	 * @param response .
-	 * @param bean bean de la vista a la que poner los valores.
-	 * @throws SQLException excepcion de bbdd.
-	 * @throws UVException en caso de error de parametros .
-	 * @throws IOException en caso de error de input u output .
-	 */
-	private void editarTitulacion(VistaTitulaciones bean, HttpServletRequest request, HttpServletResponse response) throws SQLException, UVException, IOException {
-		bean.setVista(RUTA_BEP_CONF + "formTitulacion.jsp");
-		ModeloTitulacion modelo = ModeloTitulacion.obtenerInstancia();
-		Titulacion titulacion = modelo.listaTitulacion(Formateador.leeParametroInteger(request.getParameter(PARAM_ID)));
-		bean.setTitulacion(titulacion);
-		
-		if (EscapaHTML.ajustaCodificacion(request.getParameter(PARAM_NOMBRE)) != null) {
-			Titulacion titulacionForm = this.validateTitulacion(request);
-			titulacionForm.setCodNum(titulacion.getCodNum());
-			modelo.actualizaTitulacion(titulacionForm);
-			HttpSession session = request.getSession(false);
-			session.setAttribute(MENSAJE_ENVIADO_CORRECTO, MENSAJE_EXITO_AGREGAR);
-			response.sendRedirect(request.getServletPath());
-		}
-	}
-	
 	/** eliminar una titulación.
 	 * @param bean .
 	 * @param request .
@@ -185,15 +163,12 @@ public class ControladorGestionTitulaciones extends HttpServlet {
 		ModeloTitulacion modelo = ModeloTitulacion.obtenerInstancia();
 		try {
 			modelo.borraTitulacion(new Titulacion(codNum));
-			HttpSession session = request.getSession(false);
-			session.setAttribute(MENSAJE_ENVIADO_CORRECTO, MENSAJE_EXITO_ELIMINAR);
-			response.sendRedirect(request.getServletPath());
+			BolsaEmpleoUtils.addMensajeDeExito(MENSAJE_EXITO_ELIMINAR, bean, request);
 		} catch (SQLIntegrityConstraintViolationException e) {
-			bean.getMensajesDeError().add(e.getMessage());
-			HttpSession session = request.getSession(false);
-			session.setAttribute(MENSAJE_ENVIADO_ERROR, MENSAJE_ERROR_ELIMINAR_TITULACION);
-			response.sendRedirect(request.getServletPath());
+			BolsaEmpleoUtils.addMensajeDeError(MENSAJE_ERROR_ELIMINAR_TITULACION, bean, request);
 		}
+		
+		response.sendRedirect(request.getServletPath());
 	}
 	
 	/** agrega una nueva titulación .
@@ -210,8 +185,7 @@ public class ControladorGestionTitulaciones extends HttpServlet {
 			Titulacion titulacion = this.validateTitulacion(request); 							
 			ModeloTitulacion modelo = ModeloTitulacion.obtenerInstancia();
 			modelo.insertaTitulacion(titulacion);
-			HttpSession session = request.getSession(false);
-			session.setAttribute(MENSAJE_ENVIADO_CORRECTO, MENSAJE_EXITO_AGREGAR);
+			BolsaEmpleoUtils.addMensajeDeExito(MENSAJE_EXITO_AGREGAR, bean, request);
 			response.sendRedirect(request.getServletPath());
 		}
 	}

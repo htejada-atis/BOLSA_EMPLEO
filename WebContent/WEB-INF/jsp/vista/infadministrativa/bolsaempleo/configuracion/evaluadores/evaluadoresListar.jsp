@@ -12,18 +12,9 @@ VistaEvaluadores bean = (VistaEvaluadores) uvdatos.getVistas().get(VistaEvaluado
 
 <div class="bolsa-empleo evaluadores-listar">
 
-	<% if (bean.getMensajesDeExito().size() > 0) { %>
-		<div id="exito" class="success">
-			<%= bean.formatearMensajesDeExito() %>
-		</div>
-	<% } %>
-	<% if (bean.getMensajesDeError().size() > 0) { %>
-		<div id="error" class="error">
-			<%= bean.formatearMensajesDeError() %>
-		</div>
-	<% } %>
+	<jsp:include page="/WEB-INF/jsp/vista/infadministrativa/bolsaempleo/mensajes.jsp" />
 	
-	<h2>Evaluadores de un área</h2>
+	<h2>Evaluadores de un Área</h2>
 	
 	<div class="">
 	    <div class="form-group-container col2">
@@ -31,7 +22,7 @@ VistaEvaluadores bean = (VistaEvaluadores) uvdatos.getVistas().get(VistaEvaluado
 	    		<div class="form-check-custom w-64">
 					<label>Área</label>
 					<select id="select_area">
-						<option value="0">Elija el área</option>
+						<option value="0">Elija el Área</option>
 	    				<%for(Area area: bean.getAreas()){
 	    					if(bean.getArea()!=null){
 	            				if(bean.getArea().getCodNum().equals(area.getCodNum())){%>
@@ -55,7 +46,7 @@ VistaEvaluadores bean = (VistaEvaluadores) uvdatos.getVistas().get(VistaEvaluado
 	    		</div>
 	    		<div class="form-group" style="width:20%">
 					<a class="link-btn" id="nuevo_evaluador" href="<%=request.getRequestURI()%>" style="display:inline-block !important; padding: 0; margin-top: 1.4rem" title="Buscar evaluador">
-						<img id="iconoMenu" src="/img/md/search_white.svg" width="25"/>
+						<img alt="nombre de usuario evaluador" id="iconoMenu" src="/img/md/search_white.svg" width="25"/>
 	   	 			</a>
 	   			</div>
 			</div>
@@ -116,11 +107,11 @@ VistaEvaluadores bean = (VistaEvaluadores) uvdatos.getVistas().get(VistaEvaluado
 		        	}},
 		        	{'data': 'codnum', 'buttons': [{'label': function(row) { return row.activo ? "Borrar" : "Restaurar"; }, 
 		        		'title':  function(row) { return row.activo ? "Desactivar evaluador" : "Activar evaluador"; }, 'onClick': function(row) {
-			        		var mensaje = "¿Desea borrar el evaluador seleccionado?";
+			        		var mensaje = "¿ Desea borrar el evaluador seleccionado?";
 				        	var titulo = "Borrar evaluador";
 				        	if(!row.activo) {
 				        		titulo = "Restaurar evaluador";
-				        		mensaje = "¿Desea restaurar el evaluador seleccionado?";
+				        		mensaje = "¿ Desea restaurar el evaluador seleccionado?";
 				        	}
 				        	
 				        	Atis.confirmDialog(titulo, mensaje, {

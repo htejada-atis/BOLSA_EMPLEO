@@ -49,7 +49,7 @@ public class TestBEPAreasBaremar {
 	private static final String CLASS_DIALOGO = "ui-dialog";
 	private static final String CLASS_DIALOGO_CONTENT = "ui-dialog-content";
 		
-	private static final String MENSAJE_DIALOGO_SELECCIONAR_FILAS = "Seleccione al menos un ï¿½rea.";
+	private static final String MENSAJE_DIALOGO_SELECCIONAR_FILAS = "Seleccione al menos un área.";
 		
 	/** Se ejecuta una vez al inicio de la clase.
 	 * @throws SQLException Si se produce error en bbdd
