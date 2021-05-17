@@ -26,6 +26,7 @@ public class UtilsTestDocentia {
 		BbddRunner.ejecutar("Documentos/scripts/opc.docentia/creartablasdocentia.sql");
 		BbddRunner.ejecutar("Documentos/scripts/opc.docentia/creacionsecuenciasytriggers.sql");
 		BbddRunner.insertMasivo("Documentos/scripts/opc.docentia/datos_desarrollo/creacionregistrosprueba.sql");
+		BbddRunner.insertMasivo("Documentos/scripts/opc.docentia/uv.sql");
 	}
 	
     /** obtiene una peticion autenticada con el usuario de pruebas de docentia.

@@ -3,9 +3,12 @@ package usuario;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
+import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
+import java.util.Comparator;
 import java.util.concurrent.TimeUnit;
+import java.util.stream.Stream;
 
 import org.openqa.selenium.By;
 import org.openqa.selenium.OutputType;
@@ -20,6 +23,7 @@ public class DriverUv {
 	private static WebDriver driver;
 	private static final int TIEMPO_MAXIMO_ESPERA = 10;
 	private static int contador = 1;
+	private static String directorioBase;
 	
 	public static final String RUTA = "http://localhost:8888";
 	
@@ -51,6 +55,16 @@ public class DriverUv {
 		}
 		driver = new FirefoxDriver(firefoxOptions);
 		driver.manage().timeouts().pageLoadTimeout(TIEMPO_MAXIMO_ESPERA, TimeUnit.SECONDS);
+	    directorioBase = "/tmp/";
+		if (getTipoSistema().contains("win")) {
+			directorioBase = System.getProperty("java.io.tmpdir");
+		}
+		directorioBase += "pruebasSelenium/";
+		try (Stream<File> ficherosBorrar = Files.walk(Paths.get(directorioBase)).sorted(Comparator.reverseOrder()).map(Path::toFile)) {
+			ficherosBorrar.forEach(File::delete);
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
 	}
 	
 	/** realiza el login del usuario. 
@@ -75,11 +89,6 @@ public class DriverUv {
 	 */
 	public static void capturaPantalla(String nombre) {
 		File scrFile = ((TakesScreenshot) driver).getScreenshotAs(OutputType.FILE);
-	    String directorioBase = "/tmp/";
-		if (getTipoSistema().contains("win")) {
-			directorioBase = System.getProperty("java.io.tmpdir");
-		}
-		directorioBase += "pruebasSelenium/";
 	    try {
 			Files.createDirectories(Paths.get(directorioBase));
 	    	String nombreFichero = directorioBase + contador++ + "-" + nombre + ".png";
