@@ -28,15 +28,17 @@ public final class UtilsTestBolsaEmpleo {
 	private static final String UID_CANDIDATO_PRUEBAS = "candidato1";
 	private static final String UID_CANDIDATO2_PRUEBAS = "candidato2";
 	private static final String UID_PERSONAL_PRUEBAS = "personal1";
-	private static final String ESQUEMA_ARCOS = "arcos";
-	private static final String ESQUEMA_RRHH = "rrhh";
-	private static final String ESQUEMA_UVIRTUAL = "uvirtual";
 	private static final int NUM_AREAS_INSERTAR = 35;
 	private static final Pattern RE_FILE_MIGRATION = Pattern.compile("\\d+-(im|eje)-[a-zA-Z]+\\.sql", Pattern.DOTALL);
+	private static final String ID_DEPARTAMENTO = "ID_DEPARTAMENTO";
+	private static final String CODNUM = "CODNUM";
 
+	public static final String ESQUEMA_ARCOS = "arcos";
+	public static final String ESQUEMA_RRHH = "rrhh";
+	public static final String ESQUEMA_UVIRTUAL = "uvirtual";	
 	public static final boolean VERBOSE = true;
 	
-	private static boolean cargado = false;
+	private static boolean cargado;
 
 	private UtilsTestBolsaEmpleo() {
 	}
@@ -171,6 +173,18 @@ public final class UtilsTestBolsaEmpleo {
 
 		return peticion;
 	}
+	
+	/**
+	 * Ejecuta un script en un esquema.
+	 * @param path .
+	 * @param esquema .
+	 * @throws IOException .
+	 * @throws SQLException .
+	 */
+	public static void ejecutarScript(String path, String esquema) throws IOException, SQLException {
+		File directory = new File(path);
+		UtilsTestBolsaEmpleo.ejecutarFile(directory, esquema);
+	}
 
 	private static void ejecutarMultiplesScripts(String title, String path, String esquema, boolean reverse)
 			throws IOException, SQLException {
@@ -192,7 +206,7 @@ public final class UtilsTestBolsaEmpleo {
 				UtilsTestBolsaEmpleo.ejecutarFile(filesList[i], esquema);
 			}
 		}
-	}
+	}	
 
 	private static void ejecutarFile(File file, String esquema) throws IOException, SQLException {
 		String name = file.getName();
@@ -271,7 +285,7 @@ public final class UtilsTestBolsaEmpleo {
 			try (PreparedStatement stmtSelect = conRh.prepareStatement(sqlDeptSelect)) {
 				try (ResultSet rs = stmtSelect.executeQuery()) {
 					while (rs.next()) {
-						insertDepartamento(conUv, rs.getString("ID_DEPARTAMENTO"), rs.getString("DES_DEPARTAMENTO"));
+						insertDepartamento(conUv, rs.getString(ID_DEPARTAMENTO), rs.getString("DES_DEPARTAMENTO"));
 					}
 				}
 			}
@@ -291,7 +305,7 @@ public final class UtilsTestBolsaEmpleo {
 			try (PreparedStatement stmtSelect = conRh.prepareStatement(sqlAreaSelect)) {
 				try (ResultSet rs = stmtSelect.executeQuery()) {
 					while (rs.next()) {
-						Integer idDepartamento = getDepartamentoByCodigoRh(conUv, rs.getString("ID_DEPARTAMENTO"));
+						Integer idDepartamento = getDepartamentoByCodigoRh(conUv, rs.getString(ID_DEPARTAMENTO));
 
 						if (idDepartamento != null) {
 							Integer idArea = insertArea(conUv, rs.getString("ID_AREA_CONOCIMIENTO"),
@@ -300,7 +314,7 @@ public final class UtilsTestBolsaEmpleo {
 									rs.getString("DES_SECCION"));
 						} else {
 							throw new SQLException("CARGA DE AREAS FAIL, DEPARTAMENTO NO ENCONTRADO "
-									+ rs.getString("ID_DEPARTAMENTO"));
+									+ rs.getString(ID_DEPARTAMENTO));
 						}
 					}
 				}
@@ -315,7 +329,7 @@ public final class UtilsTestBolsaEmpleo {
 			stmt.setString(1, cod);
 			try (ResultSet rs = stmt.executeQuery()) {
 				if (rs.next()) {
-					return rs.getInt("CODNUM");
+					return rs.getInt(CODNUM);
 				}
 			}
 		}
@@ -343,14 +357,14 @@ public final class UtilsTestBolsaEmpleo {
 
 			try (ResultSet rs = stmt.executeQuery()) {
 				if (rs.next()) {
-					return rs.getInt("CODNUM");
+					return rs.getInt(CODNUM);
 				}
 			}
 		}
 
 		// insertamos
 		sql = "INSERT INTO TBEP_AREAS (ID_AREA_CONOCIMIENTO, DES_AREA_CONOCIMIENTO) VALUES (?,?)";
-		try (PreparedStatement stmt = con.prepareStatement(sql, new String[] {"CODNUM"})) {
+		try (PreparedStatement stmt = con.prepareStatement(sql, new String[] {CODNUM})) {
 			int parameterIndex = 1;
 			stmt.setString(parameterIndex++, idAreaConocimiento);
 			stmt.setString(parameterIndex++, descripcion);
