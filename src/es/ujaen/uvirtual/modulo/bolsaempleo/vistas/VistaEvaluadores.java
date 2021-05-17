@@ -3,9 +3,10 @@ package es.ujaen.uvirtual.modulo.bolsaempleo.vistas;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
-
 import es.ujaen.uvirtual.beans.vistas.Vista;
 import es.ujaen.uvirtual.modulo.bolsaempleo.beans.Area;
+import es.ujaen.uvirtual.modulo.bolsaempleo.beans.Bolsa;
+import es.ujaen.uvirtual.modulo.bolsaempleo.beans.Departamento;
 import es.ujaen.uvirtual.modulo.bolsaempleo.beans.Evaluador;
 import es.ujaen.uvirtual.modulo.bolsaempleo.utilidades.BolsaEmpleoDataTable;
 
@@ -14,26 +15,36 @@ import es.ujaen.uvirtual.modulo.bolsaempleo.utilidades.BolsaEmpleoDataTable;
  */
 public class VistaEvaluadores extends Vista implements Serializable {
 	private static final long serialVersionUID = 1L;
-	private List<Area> areas = new ArrayList<>();
-	private BolsaEmpleoDataTable<Evaluador> dataTable;
+	private List<Departamento> departamentos = new ArrayList<>();
+	private BolsaEmpleoDataTable<Bolsa> dataTableAreas;
+	private BolsaEmpleoDataTable<Evaluador> dataTableEvaluadores;
 	private Area area;
+	private Departamento departamento;
 	private Evaluador evaluador;
 	private String vista;
 	
-	public List<Area> getAreas() {
-		return areas;
+	public List<Departamento> getDepartamentos() {
+		return departamentos;
 	}
 	
-	public void setAreas(List<Area> areas) {
-		this.areas = areas;
+	public void setDepartamentos(List<Departamento> departamentos) {
+		this.departamentos = departamentos;
 	}
 	
-	public BolsaEmpleoDataTable<Evaluador> getDatatableUsuarios() {
-		return dataTable;
+	public BolsaEmpleoDataTable<Bolsa> getDatatableAreas() {
+		return dataTableAreas;
 	}
 	
-	public void setDatatableUsuarios(BolsaEmpleoDataTable<Evaluador> dt) {
-		this.dataTable = dt;
+	public void setDatatableAreas(BolsaEmpleoDataTable<Bolsa> dt) {
+		this.dataTableAreas = dt;
+	}
+	
+	public BolsaEmpleoDataTable<Evaluador> getDatatableEvaluadores() {
+		return dataTableEvaluadores;
+	}
+	
+	public void setDatatableEvaluadores(BolsaEmpleoDataTable<Evaluador> dt) {
+		this.dataTableEvaluadores = dt;
 	}
 	
 	public Area getArea() {
@@ -42,6 +53,14 @@ public class VistaEvaluadores extends Vista implements Serializable {
 	
 	public void setArea(Area area) {
 		this.area = area;
+	}
+	
+	public Departamento getDepartamento() {
+		return departamento;
+	}
+	
+	public void setDepartamento(Departamento departamento) {
+		this.departamento = departamento;
 	}
 	
 	public Evaluador getEvaluador() {
