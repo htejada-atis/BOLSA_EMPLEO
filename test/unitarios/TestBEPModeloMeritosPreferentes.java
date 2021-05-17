@@ -32,7 +32,8 @@ import es.ujaen.uvirtual.utilidades.UVException;
 @FixMethodOrder(MethodSorters.NAME_ASCENDING)
 public class TestBEPModeloMeritosPreferentes {
 	private static final Integer CODNUM = 1;
-	private static final String DESCRIPCION = "descripcion";
+	private static final String NOMBRE = "nombre";
+	private static final String OBSERVACIONES = "observaciones";
 	private static final String TIPO = "MERITO";
 	private static final String APLICABLE = "BLOQUE";
 	private static final Double FACTOR = 1.3;
@@ -48,12 +49,12 @@ public class TestBEPModeloMeritosPreferentes {
 	private static final Float APARTADO_PUNTUACIONMAXIMA = (float) 1;
 	private static final Float APARTADO_PORCENTAJEMAXIMO = (float) 1;
 	
-	private static final ApartadoBaremacion APARTADO = new ApartadoBaremacion(CODNUM, DESCRIPCION, DESCRIPCION, ACTIVO, APARTADO_PUNTUACIONMAXIMA, APARTADO_PORCENTAJEMAXIMO);
-	private static final BloqueBaremacion BLOQUE = new BloqueBaremacion(CODNUM, APARTADO, DESCRIPCION, DESCRIPCION, ACTIVO, BLOQUE_NUM_MAXIMO_MERITOS);
+	private static final ApartadoBaremacion APARTADO = new ApartadoBaremacion(CODNUM, NOMBRE, OBSERVACIONES, ACTIVO, APARTADO_PUNTUACIONMAXIMA, APARTADO_PORCENTAJEMAXIMO);
+	private static final BloqueBaremacion BLOQUE = new BloqueBaremacion(CODNUM, APARTADO, NOMBRE, OBSERVACIONES, ACTIVO, BLOQUE_NUM_MAXIMO_MERITOS);
 
-	private static final ItemBaremacion ITEM = new ItemBaremacion(CODNUM, BLOQUE, DESCRIPCION, DESCRIPCION, ACTIVO, ITEM_UNIDADES, ITEM_VALOR);
+	private static final ItemBaremacion ITEM = new ItemBaremacion(CODNUM, BLOQUE, NOMBRE, OBSERVACIONES, ACTIVO, ITEM_UNIDADES, ITEM_VALOR);
 	
-	private static final ItemBaremacion ITEM2 = new ItemBaremacion(CODNUM, BLOQUE, DESCRIPCION, DESCRIPCION, ACTIVO, ITEM_UNIDADES, ITEM_VALOR);
+	private static final ItemBaremacion ITEM2 = new ItemBaremacion(CODNUM, BLOQUE, NOMBRE, OBSERVACIONES, ACTIVO, ITEM_UNIDADES, ITEM_VALOR);
     
 	/**
 	 * prepara la bd con los datos iniciales.
@@ -89,7 +90,8 @@ public class TestBEPModeloMeritosPreferentes {
 	public void testA01InsertaMeritoPreferente() throws SQLException, ParseException, UVException {
 		MeritoPreferente merito = new MeritoPreferente();
 		merito.setCodNum(CODNUM);
-		merito.setDescripcion(DESCRIPCION);
+		merito.setNombre(NOMBRE);
+		merito.setObservaciones(OBSERVACIONES);
 		merito.setTipo(TIPO);
 		merito.setAplicable(APLICABLE);
 		merito.setFactor(FACTOR);
@@ -148,10 +150,10 @@ public class TestBEPModeloMeritosPreferentes {
 		List<MeritoPreferente> meritos = modelo.listaMeritosPreferentes();
 		MeritoPreferente merito = meritos.get(0);
 		MeritoPreferente meritoCont = modelo.getMeritoPreferenteById(merito.getCodNum());
-		merito.setDescripcion("EJEMPLO");
+		merito.setObservaciones("EJEMPLO");
 		modelo.editarMeritoPreferente(merito);
 
-		assertFalse("usuario debe ser actualizado", merito.equals(meritoCont));
+		assertFalse("merito debe ser actualizado", merito.equals(meritoCont));
 	} 
     
 	/**

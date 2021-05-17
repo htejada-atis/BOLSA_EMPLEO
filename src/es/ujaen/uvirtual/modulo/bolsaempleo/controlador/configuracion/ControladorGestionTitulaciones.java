@@ -47,7 +47,6 @@ public class ControladorGestionTitulaciones extends HttpServlet {
 	public static final String ACCION_AGREGAR_TITULACION = "agregartitulacion";
 	public static final String ACCION_BORRAR_TITULACION = "borrartitulacion";
 	public static final String ACCION_DATATABLE_TITULACIONES = "datatabletitulaciones";
-	public static final String ACCION_EDITAR_TITULACION = "editartitulacion";
 	public static final String ACCION_INDEX = "listartitulaciones";
 	
 	// Parámetros
@@ -99,9 +98,6 @@ public class ControladorGestionTitulaciones extends HttpServlet {
 				case ACCION_AGREGAR_TITULACION:
 					agregarTitulacion(bean, request, response);
 					break;
-				case ACCION_EDITAR_TITULACION:
-					editarTitulacion(bean, request, response);
-					break;
 				case ACCION_BORRAR_TITULACION:
 					eliminarTitulacion(bean, request, response);
 					break;
@@ -152,29 +148,6 @@ public class ControladorGestionTitulaciones extends HttpServlet {
 	@Override
 	public void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 		doGet(request, response);
-	}
-	
-	/** edita una titulación .
-	 * @param request .
-	 * @param response .
-	 * @param bean bean de la vista a la que poner los valores.
-	 * @throws SQLException excepcion de bbdd.
-	 * @throws UVException en caso de error de parametros .
-	 * @throws IOException en caso de error de input u output .
-	 */
-	private void editarTitulacion(VistaTitulaciones bean, HttpServletRequest request, HttpServletResponse response) throws SQLException, UVException, IOException {
-		bean.setVista(RUTA_BEP_CONF + "formTitulacion.jsp");
-		ModeloTitulacion modelo = ModeloTitulacion.obtenerInstancia();
-		Titulacion titulacion = modelo.listaTitulacion(Formateador.leeParametroInteger(request.getParameter(PARAM_ID)));
-		bean.setTitulacion(titulacion);
-		
-		if (EscapaHTML.ajustaCodificacion(request.getParameter(PARAM_NOMBRE)) != null) {
-			Titulacion titulacionForm = this.validateTitulacion(request);
-			titulacionForm.setCodNum(titulacion.getCodNum());
-			modelo.actualizaTitulacion(titulacionForm);
-			BolsaEmpleoUtils.addMensajeDeExito(MENSAJE_EXITO_AGREGAR, bean, request);
-			response.sendRedirect(request.getServletPath());
-		}
 	}
 	
 	/** eliminar una titulación.

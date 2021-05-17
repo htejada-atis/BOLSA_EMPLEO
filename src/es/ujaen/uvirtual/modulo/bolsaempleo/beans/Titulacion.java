@@ -1,6 +1,7 @@
 package es.ujaen.uvirtual.modulo.bolsaempleo.beans;
 
 import java.io.Serializable;
+import java.util.Date;
 
 
 /** Clase titulación de bolsa empleo.
@@ -12,6 +13,8 @@ public class Titulacion implements Serializable {
 	private static final long serialVersionUID = 1L;
 	private Integer codNum;
 	private String nombre;
+	private Boolean borrado;
+	private Date fechaBorrado;
 
 	
 	/** Constructor por defecto.
@@ -70,9 +73,25 @@ public class Titulacion implements Serializable {
 		this.nombre = nombre;
 	}
 	
+	public Boolean getBorrado() {
+		return borrado;
+	}
+
+	public void setBorrado(Boolean borrado) {
+		this.borrado = borrado;
+	}
+	
+	public Date getFechaBorrado() {
+		return fechaBorrado;
+	}
+
+	public void setFechaBorrado(Date fechaBorrado) {
+		this.fechaBorrado = fechaBorrado;
+	}
+	
 	@Override
 	public String toString() {
-		return "Titulación [codNum=" + codNum + ", nombre=" + nombre + "]";
+		return "Titulación [codNum=" + codNum + ", nombre=" + nombre + ", borrado=" + borrado + ", fecha_borrado=" + fechaBorrado + "]";
 	}
 	
 	@Override
@@ -81,6 +100,8 @@ public class Titulacion implements Serializable {
 		int result = 1;
 		result = prime * result + ((nombre == null) ? 0 : nombre.hashCode());
 		result = prime * result + ((codNum == null) ? 0 : codNum.hashCode());
+		result = prime * result + ((borrado == null) ? 0 : borrado.hashCode());
+		result = prime * result + ((fechaBorrado == null) ? 0 : fechaBorrado.hashCode());
 		return result;
 	}
 	
@@ -102,6 +123,20 @@ public class Titulacion implements Serializable {
 				return false;
 			}
 		} else if (!nombre.equals(other.nombre)) {
+			return false;
+		}
+		if (borrado == null) {
+			if (other.borrado != null) {
+				return false;
+			}
+		} else if (!borrado.equals(other.borrado)) {
+			return false;
+		}
+		if (fechaBorrado == null) {
+			if (other.fechaBorrado != null) {
+				return false;
+			}
+		} else if (!fechaBorrado.equals(other.fechaBorrado)) {
 			return false;
 		}
 		

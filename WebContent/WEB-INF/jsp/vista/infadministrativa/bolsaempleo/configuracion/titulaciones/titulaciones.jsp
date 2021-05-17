@@ -51,13 +51,7 @@ VistaTitulaciones bean = (VistaTitulaciones) uvdatos.getVistas().get(VistaTitula
 		    "columns": [
 		    	{'data': 'codNum', 'filter': {'type': 'number'}},
 		        {'data': 'nombre', 'filter': true, 'overflow': 'auto'},
-		        {'data': 'codnum', 'buttons': [{'label': 'Editar', 'title': 'Editar titulación', 'onClick': function(row) {
-		        	var params = {
-		    				'a': '<%=ControladorGestionTitulaciones.ACCION_EDITAR_TITULACION %>', 
-		    				'<%=ControladorGestionTitulaciones.PARAM_ID%>': row.codNum};
-	        		Atis.sendForm("<%=request.getRequestURI()%>", params);
-		        	}
-		        }, {'label': 'Borrar', 'title': 'Borrar titulación', 'onClick': function(row) {
+		        {'data': 'codnum', 'buttons': [{'label': 'Borrar', 'title': 'Borrar titulación', 'onClick': function(row) {
 		        	Atis.confirmDialog("Borrar titulación", "¿Desea borrar la titulación seleccionada?", {
 				        Si: function() {
 				        	var params = {

@@ -20,7 +20,7 @@ Afinidad afinidad = bean.getAfinidad();
 	
 	<h2><%= afinidad != null ? "Editar afinidad" : "Nueva afinidad" %></h2>
 	
-	<p>Las etiquetas en <b>negrita</b> corresponden a campos de relleno obligatorio</p>
+	<p>Las etiquetas en <strong>negrita</strong> corresponden a campos de relleno obligatorio</p>
 		
 	<form id="afinidad_form" class="be-form" method="post" action="<%= request.getRequestURI() %>">
     	<input type="hidden" name="<%= ControladorAfinidades.PARAM_ACCION %>" id="accion_formulario" value="<%= afinidad != null ? ControladorAfinidades.ACCION_MODIFICAR_AFINIDAD : ControladorAfinidades.ACCION_AGREGAR_AFINIDAD %>" />

@@ -266,7 +266,7 @@ public class ControladorMisTitulaciones extends HttpServlet {
 		ModeloMisTitulaciones modelo = ModeloMisTitulaciones.obtenerInstancia();
 		Integer codNum = Formateador.leeParametroInteger(request.getParameter(PARAM_TITULACION));
 		Titulacion titulacion = modelo.listaTitulacion(codNum);
-				
+			
 		bean.setTitulacion(titulacion);
 		bean.setVista(RUTA_BEP_CONF + "formMisTitulaciones.jsp");
 	}

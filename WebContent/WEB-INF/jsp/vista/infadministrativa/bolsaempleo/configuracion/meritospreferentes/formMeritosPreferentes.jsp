@@ -41,14 +41,21 @@ MeritoPreferente merito = bean.getMeritoPreferente();
     				   value="<%= BolsaEmpleoUtils.getParamForm(request, ControladorMeritosPreferentes.PARAM_MERITO_CODIGO, merito != null ? merito.getCodigo() : "") %>"/>
     		</div>
     		<div class="form-group">
-    			<label for="descripcion">Descripción tipo mérito: </label>
+    			<label for="descripcion">Nombre: </label>
     			<input id="descripcion"
     				   class="form-input-custom"
     				   type="text"
-    				   name="<%= ControladorMeritosPreferentes.PARAM_MERITO_DESCRIPCION %>" 
-    				   value="<%= BolsaEmpleoUtils.getParamForm(request, ControladorMeritosPreferentes.PARAM_MERITO_DESCRIPCION, merito != null ? merito.getDescripcion() : "") %>"/>
+    				   name="<%= ControladorMeritosPreferentes.PARAM_MERITO_NOMBRE %>" 
+    				   value="<%= BolsaEmpleoUtils.getParamForm(request, ControladorMeritosPreferentes.PARAM_MERITO_NOMBRE, merito != null ? merito.getNombre() : "") %>"/>
     		</div>
     	</div>
+    	
+    	<div class="form-group-container col1">
+			<div class="form-group">
+    			<label for="descripcion">Observaciones</label>
+    			<textarea class="params form-input-custom" id="observaciones" name="<%=ControladorMeritosPreferentes.PARAM_MERITO_OBSERVACIONES%>" rows="3" cols="60"><%=BolsaEmpleoUtils.getParamForm(request, ControladorMeritosPreferentes.PARAM_MERITO_OBSERVACIONES, merito != null ? merito.getObservaciones() : "")%></textarea>
+   			</div>
+		</div>
 		
 		<!-- DONDE SE APLICA -->
 
