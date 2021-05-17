@@ -25,6 +25,8 @@ public class DriverUv {
 	private static int contador = 1;
 	private static String directorioBase;
 	
+	private static boolean inicializado = false;
+	
 	public static final String RUTA = "http://localhost:8888";
 	
 	private DriverUv() { }
@@ -55,15 +57,18 @@ public class DriverUv {
 		}
 		driver = new FirefoxDriver(firefoxOptions);
 		driver.manage().timeouts().pageLoadTimeout(TIEMPO_MAXIMO_ESPERA, TimeUnit.SECONDS);
-	    directorioBase = "/tmp/";
-		if (getTipoSistema().contains("win")) {
-			directorioBase = System.getProperty("java.io.tmpdir");
-		}
-		directorioBase += "pruebasSelenium/";
-		try (Stream<File> ficherosBorrar = Files.walk(Paths.get(directorioBase)).sorted(Comparator.reverseOrder()).map(Path::toFile)) {
-			ficherosBorrar.forEach(File::delete);
-		} catch (IOException e) {
-			e.printStackTrace();
+		if (!inicializado) {
+		    directorioBase = "/tmp/";
+			if (getTipoSistema().contains("win")) {
+				directorioBase = System.getProperty("java.io.tmpdir");
+			}
+			directorioBase += "pruebasSelenium/";
+			try (Stream<File> ficherosBorrar = Files.walk(Paths.get(directorioBase)).sorted(Comparator.reverseOrder()).map(Path::toFile)) {
+				ficherosBorrar.forEach(File::delete);
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+			inicializado = true;
 		}
 	}
 	
