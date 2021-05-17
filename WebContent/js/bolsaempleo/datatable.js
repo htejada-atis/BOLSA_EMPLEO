@@ -211,6 +211,10 @@ function DataTable(id, config) {
                 }
     		});
 
+            $(check).on('click', function(event) {
+                event.stopPropagation();
+            });
+
             if (columnDef.selectable.exclude && Atis.getProp(row, columnDef.selectable.exclude)) {
                 $(check).prop('disabled', true);
             }
