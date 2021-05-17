@@ -1,3 +1,4 @@
+<%@page import="es.ujaen.uvirtual.modulo.bolsaempleo.modelo.ModeloMeritosPreferentes"%>
 <%@ page trimDirectiveWhitespaces="true"%>
 <%@page import="es.ujaen.uvirtual.modulo.bolsaempleo.vistas.VistaMeritosPreferentesCandidato"%>
 <%@page import="es.ujaen.uvirtual.modulo.bolsaempleo.beans.MeritoPreferenteUsuario"%>
@@ -17,9 +18,9 @@ VistaMeritosPreferentesCandidato bean = (VistaMeritosPreferentesCandidato) uvdat
 <div class="bolsa-empleo">
 <jsp:include page="/WEB-INF/jsp/vista/infadministrativa/bolsaempleo/mensajes.jsp" />
 	
-	<h2>Nuevo mérito preferente</h2>
+	<h2>Nueva acreditación</h2>
 	
-	<p>Las etiquetas en <b>negrita</b> corresponden a campos de relleno obligatorio</p>
+	<p>Las etiquetas en <strong>negrita</strong> corresponden a campos de relleno obligatorio</p>
     
     <form id="agregar_merito" class="be-form" method="post" action="<%= request.getRequestURI() %>" enctype="multipart/form-data">
     	<input type="hidden" id="accion_formulario"
@@ -28,17 +29,36 @@ VistaMeritosPreferentesCandidato bean = (VistaMeritosPreferentesCandidato) uvdat
     		   
     	<div class="form-group-container col2">
 	    	<div class="form-group">
-				<label class="bold-label" for="select_apartado">Mérito preferente:</label>
+				<label class="bold-label" for="select_apartado">Acreditación:</label>
 				<%
 					String meritoSelected = BolsaEmpleoUtils.getParamForm(request, ControladorMisMeritosPreferentes.PARAM_MERITO_PREFERENTE, "");
 				%>
 				<select class="form-input-custom" id="select_apartado" name="<%= ControladorMisMeritosPreferentes.PARAM_MERITO_PREFERENTE %>" required>
-					<option value="">Elija el tipo de mérito preferente</option>
+					<option value="">Elija la acreditación</option>
 					<% for (MeritoPreferente m: bean.getMeritosPreferente()) { %>
-							<option value="<%= m.getCodNum() %>" <%= meritoSelected.equals(m.getCodNum().toString()) ? "selected=\"selected\"" : "" %>><%= bean.getCodigoPadreMeritoPreferente() + "." + m.getCodigo() + " - " + m.getDescripcion() %></option>					
+							<option value="<%= m.getCodNum() %>"
+									data-opciones="<%= m.getTipoCalculo().equals(ModeloMeritosPreferentes.TIPO_CALCULO_OPCIONES) ? "1" : "" %>" 
+								    data-observaciones="<%= m.getObservaciones() != null ? m.getObservaciones() : "" %>" <%= meritoSelected.equals(m.getCodNum().toString()) ? "selected=\"selected\"" : "" %>><%= bean.getCodigoPadreMeritoPreferente() + "." + m.getCodigo() + " - " + m.getNombre() %></option>				
 					<% } %>
 				</select>
-			</div>		
+			</div>
+			
+			<div class="form-group" id="opcionesLoading" style="display:none;">
+				<p>Cargando opciones...</p>
+			</div>
+			
+			<div class="form-group" id="opciones" style="display:none;">
+				<label class="bold-label" for="select_opciones">Opciones:</label>
+				<select class="form-input-custom" id="select_opciones" name="<%= ControladorMisMeritosPreferentes.PARAM_MERITO_PREFERENTE_OPCION %>" required>
+				</select>
+			</div>
+		</div>
+		
+		<div class="form-group-container col1" id="observaciones" style="display:none;">
+			<div class="form-group">
+	    		<label for="observacionesParrafo">Observaciones:</label>
+	    		<p id="observacionesParrafo"></p>
+	    	</div>
 		</div>
 		
 	
@@ -66,6 +86,58 @@ VistaMeritosPreferentesCandidato bean = (VistaMeritosPreferentesCandidato) uvdat
 			$('#merito_enviar').prop('disabled', true);
 			$('#merito_enviar').attr('value', 'Guardando mérito...');			
 			return true;
+		});
+		
+		var selectOpciones = $('#select_opciones');
+		
+		$('#select_apartado').change(function(event) {				
+			var option = $(this).children("option:selected");
+			var value = $(option).attr("value");
+			
+			// descripcion
+			if(value != "" && $(option).data('observaciones')) {
+				$("#observaciones").show();
+				$("#observacionesParrafo").html("Observaciones del mérito: " + $(option).attr('observaciones'));
+			} else {
+				$("#observaciones").hide();
+			}
+			
+			// tipos
+			if(value != "" && $(option).data('opciones')) {
+				$('#opcionesLoading').show();
+				$('#opciones').hide();
+				
+				$.ajax({
+		            async: true,
+			        type: 'GET',
+			        url: '<%= ControladorMisMeritosPreferentes.URL_PATTERN_AJAX %>',
+			        contentType: "application/json",
+			        dataType: "json",
+			        data: {
+			        	'a': '<%= ControladorMisMeritosPreferentes.ACCION_LISTADO_OPCIONES %>',
+			        	'<%= ControladorMisMeritosPreferentes.PARAM_ID %>': value
+			        },
+			        success: function(data) {
+			        	$('option', selectOpciones).remove();
+			        	for(var i=0; i<data.length; i++) {
+			        		var opcion = data[i];
+			        		$('<option value="' + opcion.codNum + '">' + opcion.nombre + '</option>').appendTo(selectOpciones);
+			        	}
+			        	$('#opcionesLoading').hide();
+						$('#opciones').show();
+			        },
+		            error: function() {
+		            	Atis.confirmDialog('Error', 'Error cargando opciones', {
+		            		'Ok': function() { $(this).dialog("close"); }
+		            	});
+		            }
+			    });
+			}
+			
+			if (!value) {
+				$('#opcionesLoading').hide();
+				$('#opciones').hide();
+			}
 		});
 	});
 </script>

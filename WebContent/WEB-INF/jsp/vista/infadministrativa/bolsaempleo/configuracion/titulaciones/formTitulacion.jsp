@@ -28,11 +28,11 @@ VistaTitulaciones bean = (VistaTitulaciones) uvdatos.getVistas().get(VistaTitula
 		
 	%>
 	
-	<p>Las etiquetas en <b>negrita</b> corresponden a campos de relleno obligatorio</p>
+	<p>Las etiquetas en <strong>negrita</strong> corresponden a campos de relleno obligatorio</p>
 	
     <form id="agregar_titulacion" class="be-form" method="post" action="<%=request.getRequestURI()%>">
     	<input type="hidden" name="<%= ControladorGestionTitulaciones.PARAM_ACCION %>" id="accion_formulario" 
-    			value="<%= bean.getTitulacion() != null ? ControladorGestionTitulaciones.ACCION_EDITAR_TITULACION : ControladorGestionTitulaciones.ACCION_AGREGAR_TITULACION %>" />
+    			value="<%= ControladorGestionTitulaciones.ACCION_AGREGAR_TITULACION %>" />
     	<input type="hidden" name="<%= ControladorGestionTitulaciones.PARAM_ID%>" id="titulacion_id" 
     			value="<%= bean.getTitulacion() != null ? bean.getTitulacion().getCodNum() : "" %>" />
     	<div class="form-group-container col1">

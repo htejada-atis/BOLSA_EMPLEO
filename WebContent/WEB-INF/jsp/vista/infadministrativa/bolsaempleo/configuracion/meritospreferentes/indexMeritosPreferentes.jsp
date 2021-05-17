@@ -25,13 +25,13 @@ VistaMeritosPreferentes bean = (VistaMeritosPreferentes) uvdatos.getVistas().get
 	
 	<table class="bluetable bolsaempleo" id="table">
 		<tr>
-			<th scope="col" style="width:10%" title="Código del mérito">Código</th>
-			<th scope="col"	style="width:24%" title="Descripción del mérito">Descripción</th>
+			<th scope="col" style="width:5%" title="Código del mérito">Código</th>
+			<th scope="col"	style="width:28%" title="Nombre del mérito">Nombre</th>
 			<th scope="col"	style="width:20%">Tipo</th>
 			<th scope="col"	style="width:15%">Aplicable</th>			
 			<th scope="col"	style="width:10%">Factor</th>
 			<th scope="col"	style="width:10%">Activo</th>
-			<th scope="col"	style="width:11%"></th>
+			<th scope="col"	style="width:12%"></th>
 		</tr>
 		<tbody>
 		</tbody>
@@ -40,7 +40,7 @@ VistaMeritosPreferentes bean = (VistaMeritosPreferentes) uvdatos.getVistas().get
 				<th colspan="7" style="width:100%"></th>
 			</tr>
 		</tfoot>
-	</table>	
+	</table>
 </div>
 
 <script>
@@ -55,7 +55,7 @@ VistaMeritosPreferentes bean = (VistaMeritosPreferentes) uvdatos.getVistas().get
 		    "defaultOrderDirection": 'asc',
 		    "columns": [
 		    	{'data': 'codigo'},
-		        {'data': 'descripcion', 'filter': true},
+		        {'data': 'nombre', 'filter': true},
 		        {'data': 'tipo', 'render': function(row) {
 		        	var text;
 		        	

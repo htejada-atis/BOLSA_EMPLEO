@@ -19,7 +19,7 @@ VistaParametrosConfiguracion bean = (VistaParametrosConfiguracion) uvdatos.getVi
 		<h2>Parámetros de configuración</h2>
 	</div>
 	
-	 <p>Las etiquetas en <b>negrita</b> corresponden a campos de relleno obligatorio</p>
+	 <p>Las etiquetas en <strong>negrita</strong> corresponden a campos de relleno obligatorio</p>
 	
 	<form id="actualizar_usuario" class="be-form" method="post" action="<%= request.getRequestURI() %>">
     	<input type="hidden" name="<%= ControladorParametrosConfiguracion.PARAM_ACCION %>" id="accion_formulario" value="<%= ControladorParametrosConfiguracion.ACCION_EDITAR_PARAMETROS %>" />

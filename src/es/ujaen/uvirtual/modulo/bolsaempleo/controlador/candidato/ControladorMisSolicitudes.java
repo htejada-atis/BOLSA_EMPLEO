@@ -553,6 +553,8 @@ public class ControladorMisSolicitudes extends HttpServlet {
 		ModeloBolsa modeloBolsa = ModeloBolsa.obtenerInstancia();
 		ModeloMerito modeloMerito = ModeloMerito.obtenerInstancia();
 		ModeloBaremacionItems modeloItems = ModeloBaremacionItems.obtenerInstancia();
+		Boolean excluyente = false;
+		String meritoCadena = "";
 
 		Bolsa area = modeloBolsa.getBolsaById(Formateador.leeParametroInteger(request.getParameter(PARAM_BOLSA)));
 		bean.setArea(area);
@@ -585,14 +587,12 @@ public class ControladorMisSolicitudes extends HttpServlet {
 			List<MeritoSolicitud> listaMeritos = modeloSolicitud.getMeritosSolicitudBolsa(solicitud, area);
 			for (MeritoSolicitud mer : listaMeritos) {
 				if (modeloItems.checkItemsExcluyentes(mer.getMerito().getItemBaremacion(), merito.getItemBaremacion())) {
-					this.seleccionarBolsa(bean, request);
-					throw new UVException(MENSAJE_ERROR_ITEM_EXCLUYENTE 
-							+ mer.getMerito().getItemBaremacion().getBloqueBaremacion().getApartadoBaremacion().getCodigo()
+					excluyente = true;
+					meritoCadena = mer.getMerito().getItemBaremacion().getBloqueBaremacion().getApartadoBaremacion().getCodigo()
 							+ "." + mer.getMerito().getItemBaremacion().getBloqueBaremacion().getCodigo() 
-							+ "." + mer.getMerito().getItemBaremacion().getCodigo());
+							+ "." + mer.getMerito().getItemBaremacion().getCodigo();
 				}
 			}
-			
 			
 			modeloSolicitud.asignarMeritosASolicitudBolsa(solicitud, area, merito);
 		} else {
@@ -600,6 +600,10 @@ public class ControladorMisSolicitudes extends HttpServlet {
 		}
 
 		this.seleccionarBolsa(bean, request);
+		
+		if (excluyente) {
+			throw new UVException(MENSAJE_ERROR_ITEM_EXCLUYENTE + meritoCadena + ". Recuerde que solo se seleccionará el más adecuado para la solicitud");
+		}
 	}
 	
 	/**

@@ -15,10 +15,10 @@ VistaMeritosPreferentesCandidato bean = (VistaMeritosPreferentesCandidato) uvdat
 	<jsp:include page="/WEB-INF/jsp/vista/infadministrativa/bolsaempleo/mensajes.jsp" />
 	
 	<div class="titulo-bolsa-empleo">
-		<h2>Mis méritos preferentes</h2>
+		<h2>Mis Acreditaciones</h2>
     
 	    <a class="link-btn" id="nuevo_merito" href="<%= request.getRequestURI() %>">
-	    	 Nuevo mérito preferente
+	    	 Nueva acreditación
 	    </a>
 	</div>
 	
@@ -62,7 +62,9 @@ VistaMeritosPreferentesCandidato bean = (VistaMeritosPreferentesCandidato) uvdat
 		    	{'data': 'codigo', 'filter': true, 'render': function(row) {
 		    		return '<%= bean.getCodigoPadreMeritoPreferente() %>.' + row.meritoPreferente.codigo;
 		    	}},
-		    	{'data': 'meritoPreferente.descripcion', 'filter': true},		    	
+		    	{'data': 'meritoPreferente.nombre', 'filter': true, 'render': function(row) {
+		    		return row.meritoPreferente.nombre + (row.meritoPreferenteOpcion ? ' (' + row.meritoPreferenteOpcion.nombre + ')' : '');
+		    	}},
 		    	{'data': 'descripcion', 'filter': true},
 		        {'data': 'codnum', 'buttons': [
 	        		{'label': 'Descargar', 'title': 'Descargar fichero del mérito', 'onClick': function(row) {

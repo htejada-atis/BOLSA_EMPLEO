@@ -15,6 +15,7 @@ import es.ujaen.uvirtual.beans.CodigoDescripcion;
 import es.ujaen.uvirtual.beans.UVDatos;
 import es.ujaen.uvirtual.beans.Usuario;
 import es.ujaen.uvirtual.modulo.bolsaempleo.beans.MeritoPreferente;
+import es.ujaen.uvirtual.modulo.bolsaempleo.beans.MeritoPreferenteOpcion;
 import es.ujaen.uvirtual.modulo.bolsaempleo.modelo.ModeloBaremacionItems;
 import es.ujaen.uvirtual.modulo.bolsaempleo.modelo.ModeloBaremacionApartados;
 import es.ujaen.uvirtual.modulo.bolsaempleo.modelo.ModeloBaremacionBloques;
@@ -54,12 +55,18 @@ public class ControladorMeritosPreferentes extends HttpServlet {
 	public static final String ACCION_MODIFICAR_MERITO_CONFIRM = "modificarMeritoConfirm";
 	public static final String ACCION_DESACTIVAR = "desactivarmerito";
 	public static final String ACCION_ACTIVAR = "activarmerito";
+	public static final String ACCION_DATATABLE_OPCIONES = "datatableopciones";
+	public static final String ACCION_NUEVA_OPCION = "nuevaopcion";
+	public static final String ACCION_NUEVA_OPCION_CONFIRM = "nuevaopcionconfirm";
+	public static final String ACCION_DESACTIVAR_OPCION = "desactivaropcion";
 			
 	// parámetros
 	public static final String PARAM_ACCION = "a";
 	public static final String PARAM_ID = "id";
+	public static final String PARAM_ID_OPCION = "idOpcion";
 	public static final String PARAM_MERITO_CODIGO = "codigo";
-	public static final String PARAM_MERITO_DESCRIPCION = "descripcion";
+	public static final String PARAM_MERITO_NOMBRE = "nombre";
+	public static final String PARAM_MERITO_OBSERVACIONES = "observaciones";
 	public static final String PARAM_MERITO_TIPO = "tipo";
 	public static final String PARAM_MERITO_TIPO_TITULACION = "tipoTitulacion";
 	public static final String PARAM_MERITO_TIPO_ITEMBAREMACION = "tipoItemBaremacion";
@@ -74,6 +81,8 @@ public class ControladorMeritosPreferentes extends HttpServlet {
 	public static final String PARAM_MERITO_FACTOR_POR_VALOR_MERITO_MAYOR_QUE = "factor_valor_merito_mayor_que";	
 	public static final String PARAM_MERITO_BASE_POR_VALOR_MERITO = "base_valor_merito";
 	public static final String PARAM_MERITO_BASE_POR_VALOR_MERITO_MAYOR_QUE = "base_valor_merito_mayor_que";
+	public static final String PARAM_MERITO_OPCION_NOMBRE = "nombre";
+	public static final String PARAM_MERITO_OPCION_FACTOR = "factor";
 	
 	// mensajes
 	public static final String MENSAJE_ERROR_CODIGO_VACIO = "El código no puede estar vacio";
@@ -83,6 +92,7 @@ public class ControladorMeritosPreferentes extends HttpServlet {
 	public static final String RUTA_BEP_CONF = "/WEB-INF/jsp/vista/infadministrativa/bolsaempleo/configuracion/meritospreferentes/";
 	public static final String JSP_INDEX = RUTA_BEP_CONF + "indexMeritosPreferentes.jsp";
 	public static final String JSP_FORM = RUTA_BEP_CONF + "formMeritosPreferentes.jsp";
+	public static final String JSP_FORM_OPCION = RUTA_BEP_CONF + "formMeritosPreferentesOpcion.jsp";
 	
 	// ajax
 	public static final String URL_PATTERN_AJAX = "/srv/es/ajax/informacionadministrativa/bolsaempleo/configuracion/meritospreferentes";
@@ -117,7 +127,10 @@ public class ControladorMeritosPreferentes extends HttpServlet {
 					break;
 				case ACCION_DATATABLE:
 					datatable(bean, datos, request, response);					
-					break;	
+					break;
+				case ACCION_DATATABLE_OPCIONES:
+					datatableOpciones(bean, datos, request, response);
+					break;
 				case ACCION_NUEVO_MERITO:
 					nuevoMerito(bean);
 					break;
@@ -135,6 +148,15 @@ public class ControladorMeritosPreferentes extends HttpServlet {
 					break;
 				case ACCION_DESACTIVAR:
 					desactivarMerito(bean, request, response);
+					break;
+				case ACCION_NUEVA_OPCION:
+					nuevaOpcion(bean, request);
+					break;
+				case ACCION_NUEVA_OPCION_CONFIRM:
+					nuevaOpcionConfirm(bean, request, response);
+					break;
+				case ACCION_DESACTIVAR_OPCION:
+					desactivarOpcion(bean, request, response);
 					break;
 				default:
 					errorFatal(bean, "Acción no contemplada");
@@ -211,6 +233,30 @@ public class ControladorMeritosPreferentes extends HttpServlet {
 		}
 	}
 	
+	private void datatableOpciones(VistaMeritosPreferentes bean, UVDatos datos, HttpServletRequest request, HttpServletResponse response) 
+			throws SQLException, UVException, IOException {
+		datos.setRespuestaEnviada(true);
+		datos.setContentType(RESPONSE_AJAX_CONTENTTYPE);		
+		response.setContentType(RESPONSE_AJAX_CONTENTTYPE);
+		response.setCharacterEncoding(RESPONSE_AJAX_ENCODING);
+		
+		try (PrintWriter writer = response.getWriter()) {
+			try {
+				MeritoPreferente merito = ModeloMeritosPreferentes.obtenerInstancia().
+						getMeritoPreferenteById(Formateador.leeParametroInteger(request.getParameter(PARAM_ID)));
+				BolsaEmpleoDataTable<MeritoPreferenteOpcion> dataTable = ModeloMeritosPreferentes.obtenerInstancia().
+						listadoOpcionesMeritosPreferentes(request.getParameterMap(), merito);
+				bean.setDatatableOpciones(dataTable);
+				writer.write(dataTable.toJson());
+			} catch (Exception ex) {
+				bean.getMensajesDeError().add(ex.getMessage());
+				CodigoDescripcion mensaje = new CodigoDescripcion(RESPONSE_AJAX_ERROR, ex.getMessage());
+				writer.write(new Gson().toJson(mensaje));
+				response.setStatus(RESPONSE_AJAX_HTTP_CODE_ERROR);
+			}
+		}
+	}
+	
 	private void nuevoMerito(VistaMeritosPreferentes bean) throws SQLException, UVException {
 		bean.setMeritoPreferente(null);
 		bean.setItemsBaremacion(ModeloBaremacionItems.obtenerInstancia().listaItemBaremacion());
@@ -259,8 +305,7 @@ public class ControladorMeritosPreferentes extends HttpServlet {
 		BolsaEmpleoUtils.addMensajeDeExito("Mérito preferente editado correctamente", bean, request);
 		response.sendRedirect(request.getServletPath());
 	}
-	
-	
+		
 	private void activarMerito(VistaMeritosPreferentes bean, HttpServletRequest request, HttpServletResponse response) throws SQLException, UVException, IOException {
 		MeritoPreferente merito = ModeloMeritosPreferentes.obtenerInstancia().getMeritoPreferenteById(Formateador.leeParametroInteger(request.getParameter(PARAM_ID)));
 		
@@ -280,6 +325,38 @@ public class ControladorMeritosPreferentes extends HttpServlet {
 		BolsaEmpleoUtils.addMensajeDeExito("Mérito preferente activado correctamente", bean, request);
 		response.sendRedirect(request.getServletPath());
 	}
+
+	private void nuevaOpcion(VistaMeritosPreferentes bean, HttpServletRequest request) throws SQLException, UVException {
+		MeritoPreferente merito = ModeloMeritosPreferentes.obtenerInstancia().getMeritoPreferenteById(Formateador.leeParametroInteger(request.getParameter(PARAM_ID)));
+		bean.setMeritoPreferente(merito);
+		bean.setVista(JSP_FORM_OPCION);
+	}
+	
+	private void nuevaOpcionConfirm(VistaMeritosPreferentes bean, HttpServletRequest request, HttpServletResponse response) throws SQLException, UVException, IOException {
+		MeritoPreferente merito = ModeloMeritosPreferentes.obtenerInstancia().getMeritoPreferenteById(Formateador.leeParametroInteger(request.getParameter(PARAM_ID)));
+		
+		bean.setMeritoPreferente(merito);
+		bean.setVista(JSP_FORM_OPCION);
+
+		ModeloMeritosPreferentes.obtenerInstancia().crearMeritoPreferenteOpcion(this.validateOpcionMerito(merito, new MeritoPreferenteOpcion(), request));
+		
+		BolsaEmpleoUtils.addMensajeDeExito("Opción mérito preferente añadido correctamente", bean, request);
+		response.sendRedirect(request.getServletPath() + "?" + PARAM_ACCION + "=" + ACCION_MODIFICAR + "&" + PARAM_ID + "=" + merito.getCodNum());		
+	}
+	
+	private void desactivarOpcion(VistaMeritosPreferentes bean, HttpServletRequest request, HttpServletResponse response) throws SQLException, UVException, IOException {
+		MeritoPreferente merito = ModeloMeritosPreferentes.obtenerInstancia().getMeritoPreferenteById(Formateador.leeParametroInteger(request.getParameter(PARAM_ID)));
+		MeritoPreferenteOpcion meritoOpcion = ModeloMeritosPreferentes.obtenerInstancia().
+				getMeritoPreferenteOpcionById(Formateador.leeParametroInteger(request.getParameter(PARAM_ID_OPCION)));
+		
+		if (!meritoOpcion.getMeritoPreferenteCodNum().equals(merito.getCodNum())) {
+			throw new UVException("La opción del mérito no es válida");
+		}
+		
+		ModeloMeritosPreferentes.obtenerInstancia().desactivarMeritoPreferenteOpcion(meritoOpcion);
+		BolsaEmpleoUtils.addMensajeDeExito("Opción mérito preferente desactivado correctamente", bean, request);
+		response.sendRedirect(request.getServletPath());		
+	}
 	
 	private MeritoPreferente validate(MeritoPreferente merito, HttpServletRequest request) throws UVException, SQLException {
 		merito.setCodigo(EscapaHTML.ajustaCodificacion(request.getParameter(PARAM_MERITO_CODIGO)));
@@ -293,13 +370,7 @@ public class ControladorMeritosPreferentes extends HttpServlet {
 			throw new UVException("Ya existe un mérito preferente activo con el código introducido");
 		}
 		
-		merito.setDescripcion(EscapaHTML.ajustaCodificacion(request.getParameter(PARAM_MERITO_DESCRIPCION)));
-		if (merito.getDescripcion().isBlank()) {
-			throw new UVException("La descripción del mérito es requerida");
-		}
-		if (merito.getDescripcion().length() > ModeloMeritosPreferentes.MAX_LENGTH_COLUMN_DESCRIPCION) {
-			throw new UVException("La descripción tiene demasiados caracteres. Máximo: " + ModeloMeritosPreferentes.MAX_LENGTH_COLUMN_DESCRIPCION);
-		}
+		this.validateNombreObservaciones(merito, request);
 
 		this.validateAplicable(merito, request);
 		
@@ -312,6 +383,23 @@ public class ControladorMeritosPreferentes extends HttpServlet {
 		}
 		
 		this.validateTipoCalculo(merito, request);
+		
+		return merito;
+	}
+	
+	private MeritoPreferente validateNombreObservaciones(MeritoPreferente merito, HttpServletRequest request) throws UVException {
+		merito.setNombre(EscapaHTML.ajustaCodificacion(request.getParameter(PARAM_MERITO_NOMBRE)));
+		if (merito.getNombre().isBlank()) {
+			throw new UVException("El nombre del mérito es requerido");
+		}
+		if (merito.getNombre().length() > ModeloMeritosPreferentes.MAX_LENGTH_COLUMN_NOMBRE) {
+			throw new UVException("El nombre tiene demasiados caracteres. Máximo: " + ModeloMeritosPreferentes.MAX_LENGTH_COLUMN_NOMBRE);
+		}
+		
+		merito.setObservaciones(EscapaHTML.ajustaCodificacion(request.getParameter(PARAM_MERITO_OBSERVACIONES)));
+		if (merito.getObservaciones().length() > ModeloMeritosPreferentes.MAX_LENGTH_COLUMN_OBSERVACIONES) {
+			throw new UVException("Las observaciones tienen demasiados caracteres. Máximo: " + ModeloMeritosPreferentes.MAX_LENGTH_COLUMN_OBSERVACIONES);
+		}
 		
 		return merito;
 	}
@@ -343,6 +431,8 @@ public class ControladorMeritosPreferentes extends HttpServlet {
 			this.validateTipoCalculoValorMerito(merito, request);
 		} else if (merito.getTipoCalculo().equals(ModeloMeritosPreferentes.TIPO_CALCULO_VALOR_MERITO_MAYOR_QUE)) {
 			this.validateTipoCalculoValorMeritoMayorQue(merito, request);
+		} else if (merito.getTipoCalculo().equals(ModeloMeritosPreferentes.TIPO_CALCULO_OPCIONES)) {
+			merito.setFactor(0.0);
 		} else {
 			throw new UVException("Tipo de cálculo no válido");
 		}
@@ -390,5 +480,24 @@ public class ControladorMeritosPreferentes extends HttpServlet {
 		}
 		
 		return merito;
+	}
+
+	private MeritoPreferenteOpcion validateOpcionMerito(MeritoPreferente merito, MeritoPreferenteOpcion meritoOpcion, HttpServletRequest request) throws UVException {
+		meritoOpcion.setNombre(EscapaHTML.ajustaCodificacion(request.getParameter(PARAM_MERITO_OPCION_NOMBRE)));
+		if (meritoOpcion.getNombre().isBlank()) {
+			throw new UVException("El nombre de la opción es requerida");
+		}
+		if (meritoOpcion.getNombre().length() > ModeloMeritosPreferentes.MAX_LENGTH_COLUMN_NOMBRE_OPCION) {
+			throw new UVException("El nombre de la opción tiene demasiados caracteres. Máximo" + ModeloMeritosPreferentes.MAX_LENGTH_COLUMN_NOMBRE_OPCION);
+		}
+		
+		meritoOpcion.setFactor(Formateador.leeParametroDouble(request.getParameter(PARAM_MERITO_OPCION_FACTOR)));
+		if (meritoOpcion.getFactor() == null) {
+			throw new UVException("El factor es requerido");
+		}
+		
+		meritoOpcion.setMeritoPreferenteCodNum(merito.getCodNum());
+		
+		return meritoOpcion;
 	}
 }

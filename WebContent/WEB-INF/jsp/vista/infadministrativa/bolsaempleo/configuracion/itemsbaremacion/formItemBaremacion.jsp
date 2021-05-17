@@ -33,7 +33,7 @@ if(item!=null){
 	
 	<h2><%=item != null ? "Editar item" : "Nuevo item"%></h2>
 	
-	<p>Las etiquetas en <b>negrita</b> corresponden a campos de relleno obligatorio</p>
+	<p>Las etiquetas en <strong>negrita</strong> corresponden a campos de relleno obligatorio</p>
 	
     <form id="actualizar_item" class="be-form" method="post" action="<%=request.getRequestURI()%>">
     	<input type="hidden" name="<%=ControladorItemsBaremacion.PARAM_ACCION%>" id="accion_formulario"
@@ -117,13 +117,13 @@ if(item!=null){
 					<% } %>
 				</select>
 	    	</div>
-	    	<div class="form-check" id="individualizadoBloque" style="<%= afinidadSelected.equals("N") ? "display:none;" : "" %> ">
+	    	<div class="form-check" id="individualizadoBloque">
 	    		<%
 					String individualizado = BolsaEmpleoUtils.getParamForm(request, ControladorItemsBaremacion.PARAM_ITEM_INDIVIDUALIZADO, item != null ? item.getIndividualizado() ? "S" : "N" : "S");
 				%>
     			<label for="individualizado">
     			<input class="params" type="checkbox" id="individualizado" name="<%= ControladorItemsBaremacion.PARAM_ITEM_INDIVIDUALIZADO %>" 
-    				value="S" <%= individualizado.equals("S") ? "checked=''" : "" %>/>Individualizado</label>
+    				value="S" <%= individualizado.equals("S") ? "checked=''" : "" %>/>No desagregable</label>
     		</div>
 		</div>
 		<div class="form-btn">
@@ -132,12 +132,12 @@ if(item!=null){
     	</div>    	
     </form>
     
-	<table class="bluetable bolsaempleo custom" id="tableMeritosExcluyentes">
+	<table class="bluetable bolsaempleo custom" id="tableMeritosExcluyentes" style="display:none;">
 		<tr>
 			<th scope="col" style="width:10%" title="Id"></th>
-			<th scope="col" style="width:20%" title="ID ítem">Id</th>
-			<th scope="col" style="width:20%" title="Código ítem">Código</th>
-			<th scope="col" style="width:60%" title="Nombre del ítem">Nombre del ítem</th>
+			<th scope="col" style="width:20%" title="ID item">Id</th>
+			<th scope="col" style="width:20%" title="Código item">Código</th>
+			<th scope="col" style="width:60%" title="Nombre del item">Nombre del item</th>
 			<th scope="col" style="width:15%">Activo</th>
 		</tr>
 		<tbody>				
@@ -176,9 +176,12 @@ if(item!=null){
 			<%}
 		}%>
 		
+		<%if (bean.getListaItemsExcluyentes() != null) {%>
+		$("#tableMeritosExcluyentes").show();
+		
 		var tableItems = new Atis.DataTable('#tableMeritosExcluyentes', {
 		    "ajax": { url: "<%= ControladorItemsBaremacion.URL_PATTERN_AJAX %>", async: false },
-		    "params": {"<%=ControladorItemsBaremacion.PARAM_ITEM%>": <%= item.getCodNum() %>},
+		    "params": {"<%=ControladorItemsBaremacion.PARAM_ITEM%>": <%= (bean.getItemBaremacion()!=null ? bean.getItemBaremacion().getCodNum() : null ) %>},
 		    "pageSize": 10,
 		    "title": "Items excluyentes:",
 		    "filterable": true,
@@ -193,7 +196,7 @@ if(item!=null){
     						: '<%=ControladorItemsBaremacion.ACCION_ITEM_EXCLUYENTE_DESELECCIONADO%>';
 	    				var params = {
 	    					'a': accion,
-	    					'<%=ControladorItemsBaremacion.PARAM_ITEM%>': '<%=item.getCodNum()%>',
+	    					'<%=ControladorItemsBaremacion.PARAM_ITEM%>': '<%= (bean.getItemBaremacion()!=null ? bean.getItemBaremacion().getCodNum() : null ) %>',
 	    					'<%=ControladorItemsBaremacion.PARAM_ITEM_EXCLUYENTE%>': row.codNum,
 	    				};
 	    				
@@ -216,13 +219,15 @@ if(item!=null){
 	        	}},
 		    ],
 		    "actions": [
-		    	{'label': 'Añadir', 'title': 'Añadir un nuevo ítem', 'onClick': function(selected) {
+		    	{'label': 'Añadir', 'title': 'Añadir un nuevo item', 'onClick': function(selected) {
 		    		var params = {'a': '<%=ControladorItemsBaremacion.ACCION_AGREGAR_ITEM%>', 
 		    				'<%=ControladorItemsBaremacion.PARAM_BLOQUE%>': '<%=bean.getBloqueBaremacion().getCodNum()%>'};
 	        		Atis.sendForm("<%=request.getRequestURI()%>", params);
 		    	}}
 		    ]
 		});
+		
+		<%}%>
 		
 	});
 </script>

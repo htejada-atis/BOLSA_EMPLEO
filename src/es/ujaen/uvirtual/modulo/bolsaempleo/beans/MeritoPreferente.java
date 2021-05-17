@@ -12,7 +12,8 @@ public class MeritoPreferente implements Serializable {
 	private static final long serialVersionUID = 1L;
 	private Integer codNum;
 	private String codigo;
-	private String descripcion;
+	private String nombre;
+	private String observaciones;
 	private String tipo;
 	private String tipoCalculo;
 	private String aplicable;
@@ -37,7 +38,7 @@ public class MeritoPreferente implements Serializable {
 	 * 
 	 * @param pcodNum                      .
 	 * @param pcodigo                 .
-	 * @param pdescripcion                 .
+	 * @param pobservaciones               .
 	 * @param ptipo                        .
 	 * @param ptipoCalculo                 .
 	 * @param paplicable                   .
@@ -50,14 +51,15 @@ public class MeritoPreferente implements Serializable {
 	 * @param paplicableItemBareamcion     .
 	 * @param pactivo                      .
 	 */
-	public MeritoPreferente(Integer pcodNum, String pcodigo, String pdescripcion, String ptipo, String ptipoCalculo, String paplicable,
+	public MeritoPreferente(Integer pcodNum, String pcodigo, String pnombre, String pobservaciones, String ptipo, String ptipoCalculo, String paplicable,
 			Double pbase, Double pfactor, Double pvalorMaximo, ItemBaremacion ptipoItemBaremacion,
 			BloqueBaremacion paplicableBloqueBaremacion, ApartadoBaremacion paplicableApartadoBaremacion,
 			ItemBaremacion paplicableItemBareamcion, Boolean pactivo) {
 		super();
 		this.codNum = pcodNum;
 		this.codigo = pcodigo;
-		this.descripcion = pdescripcion;
+		this.nombre = pnombre;
+		this.observaciones = pobservaciones;
 		this.tipo = ptipo;
 		this.tipoCalculo = ptipoCalculo;
 		this.aplicable = paplicable;
@@ -79,7 +81,8 @@ public class MeritoPreferente implements Serializable {
 	public MeritoPreferente(MeritoPreferente copia) {
 		this.codNum = copia.codNum;
 		this.codigo = copia.codigo;
-		this.descripcion = copia.descripcion;
+		this.nombre = copia.nombre;
+		this.observaciones = copia.observaciones;
 		this.tipo = copia.tipo;
 		this.tipoCalculo = copia.tipoCalculo;
 		this.aplicable = copia.aplicable;
@@ -109,12 +112,20 @@ public class MeritoPreferente implements Serializable {
 		this.codigo = codigo;
 	}
 
-	public String getDescripcion() {
-		return descripcion;
+	public String getNombre() {
+		return nombre;
 	}
 
-	public void setDescripcion(String descripcion) {
-		this.descripcion = descripcion;
+	public void setNombre(String nombre) {
+		this.nombre = nombre;
+	}
+	
+	public String getObservaciones() {
+		return observaciones;
+	}
+
+	public void setObservaciones(String observaciones) {
+		this.observaciones = observaciones;
 	}
 
 	public String getTipo() {
@@ -211,7 +222,7 @@ public class MeritoPreferente implements Serializable {
 
 	@Override
 	public String toString() {
-		return "ApartadoBaremacion [codNum=" + codNum + ", codigo=" + codigo + " , descripcion=" + descripcion + ", tipo=" + tipo
+		return "MeritoPreferente [codNum=" + codNum + ", codigo=" + codigo + " , nombre=" + nombre + " , observaciones=" + observaciones + ", tipo=" + tipo
 				+ ", tipoCalculo=" + tipoCalculo + "aplicable=" + aplicable + ", base=" + base + ", factor=" + factor
 				+ ", valorMaximo=" + valorMaximo + ", tipoItemBaremacion=" + tipoItemBaremacion
 				+ ", aplicableBloqueBaremacion" + aplicableBloqueBaremacion + ", aplicableApartadoBaremacion="
@@ -225,7 +236,8 @@ public class MeritoPreferente implements Serializable {
 		int result = 1;
 		result = prime * result + ((codNum == null) ? 0 : codNum.hashCode());
 		result = prime * result + ((codigo == null) ? 0 : codigo.hashCode());
-		result = prime * result + ((descripcion == null) ? 0 : descripcion.hashCode());
+		result = prime * result + ((nombre == null) ? 0 : nombre.hashCode());
+		result = prime * result + ((observaciones == null) ? 0 : observaciones.hashCode());
 		result = prime * result + ((tipo == null) ? 0 : tipo.hashCode());
 		result = prime * result + ((tipoCalculo == null) ? 0 : tipoCalculo.hashCode());
 		result = prime * result + ((aplicable == null) ? 0 : aplicable.hashCode());
@@ -267,11 +279,18 @@ public class MeritoPreferente implements Serializable {
 		} else if (!codigo.equals(other.codigo)) {
 			return false;
 		}
-		if (descripcion == null) {
-			if (other.descripcion != null) {
+		if (nombre == null) {
+			if (other.nombre != null) {
 				return false;
 			}
-		} else if (!descripcion.equals(other.descripcion)) {
+		} else if (!nombre.equals(other.nombre)) {
+			return false;
+		}
+		if (observaciones == null) {
+			if (other.observaciones != null) {
+				return false;
+			}
+		} else if (!observaciones.equals(other.observaciones)) {
 			return false;
 		}
 		if (tipo == null) {
@@ -354,5 +373,4 @@ public class MeritoPreferente implements Serializable {
 
 		return true;
 	}
-
 }

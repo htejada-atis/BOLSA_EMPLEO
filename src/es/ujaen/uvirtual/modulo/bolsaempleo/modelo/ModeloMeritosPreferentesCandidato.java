@@ -4,6 +4,7 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.Types;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -112,12 +113,17 @@ public class ModeloMeritosPreferentesCandidato {
 	 * @throws SQLException .
 	 */
 	public void insertaMeritoUsuario(MeritoPreferenteUsuario mp) throws SQLException {
-		String consulta = "INSERT INTO TBEP_MERITOS_PREFERENTES_USUARIO (BEPMEP_CODNUM,BEPUSU_CODNUM,DESCRIPCION,ARCHIVO) VALUES (?,?,?,?)";
+		String consulta = "INSERT INTO TBEP_MERITOS_PREFERENTES_USUARIO (BEPMEP_CODNUM,BEPUSU_CODNUM,BEPMOP_CODNUM,DESCRIPCION,ARCHIVO) VALUES (?,?,?,?,?)";
 		
 		try (Connection conexion = ConexionUvirtual.obtenerInstancia(); PreparedStatement stmt = conexion.prepareStatement(consulta)) {
 			int parameterIndex = 1;
 			stmt.setInt(parameterIndex++, mp.getMeritoPreferente().getCodNum());
 			stmt.setInt(parameterIndex++, mp.getUsuario().getCodNum());
+			if (mp.getMeritoPreferenteOpcion() != null) {
+				stmt.setInt(parameterIndex++, mp.getMeritoPreferenteOpcion().getCodNum());
+			} else {
+				stmt.setNull(parameterIndex++, Types.NULL);
+			}
 			stmt.setString(parameterIndex++, mp.getDescripcion());
 			stmt.setBinaryStream(parameterIndex++, mp.getArchivo());
 			stmt.executeUpdate();
@@ -157,11 +163,43 @@ public class ModeloMeritosPreferentesCandidato {
 		}
 	}
 	
+	/**
+	 * Comprueba que existe un solo tipo de mérito activo por usuario.
+	 * @param mpu .
+	 * @return .
+	 * @throws SQLException .
+	 */
+	public boolean compruebaSoloUnTipoDeMeritoPrefenteActivo(MeritoPreferenteUsuario mpu) throws SQLException {
+		String query = "SELECT COUNT(*) as count FROM TBEP_MERITOS_PREFERENTES_USUARIO bepmpu "
+				+ "WHERE bepmpu.BEPMEP_CODNUM = ? AND bepmpu.BEPUSU_CODNUM = ? AND bepmpu.FLGBORRADO = 'N'";
+		
+		try (Connection con = ConexionUvirtual.obtenerInstancia(); PreparedStatement stmt = con.prepareStatement(query)) {
+			int param = 1;
+			stmt.setInt(param++, mpu.getMeritoPreferente().getCodNum());
+			stmt.setInt(param++, mpu.getUsuario().getCodNum());
+			
+			try (ResultSet rs = stmt.executeQuery()) {
+				rs.next();
+				
+				if (rs.getInt("count") > 0) {
+					return false;
+				}
+			}
+		}
+		
+		return true;
+	}
+	
 	private MeritoPreferenteUsuario createMeritoUsuarioFromResultSet(ResultSet rs) throws SQLException, UVException {
 		MeritoPreferenteUsuario obj = new MeritoPreferenteUsuario();
 		obj.setCodNum(rs.getInt("CODNUM"));
 		obj.setMeritoPreferente(ModeloMeritosPreferentes.obtenerInstancia().getMeritoPreferenteById(rs.getInt("BEPMEP_CODNUM")));
 		obj.setUsuario(ModeloUsuarioBolsaEmpleo.obtenerInstancia().getUsuarioById(rs.getInt("BEPUSU_CODNUM")));
+		if (rs.getInt("BEPMOP_CODNUM") != 0) {
+			obj.setMeritoPreferenteOpcion(ModeloMeritosPreferentes.obtenerInstancia().getMeritoPreferenteOpcionById(rs.getInt("BEPMOP_CODNUM")));	
+		} else {
+			obj.setMeritoPreferenteOpcion(null);
+		}		
 		obj.setDescripcion(rs.getString("DESCRIPCION"));
 		obj.setArchivo(rs.getBinaryStream("ARCHIVO"));
 		obj.setBorrado(rs.getBoolean("FLGBORRADO"));

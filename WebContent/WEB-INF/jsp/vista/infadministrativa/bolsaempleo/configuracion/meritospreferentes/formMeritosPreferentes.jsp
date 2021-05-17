@@ -41,14 +41,22 @@ MeritoPreferente merito = bean.getMeritoPreferente();
     				   value="<%= BolsaEmpleoUtils.getParamForm(request, ControladorMeritosPreferentes.PARAM_MERITO_CODIGO, merito != null ? merito.getCodigo() : "") %>"/>
     		</div>
     		<div class="form-group">
-    			<label for="descripcion">Descripción tipo mérito: </label>
+    			<label for="descripcion">Nombre: </label>
     			<input id="descripcion"
     				   class="form-input-custom"
     				   type="text"
-    				   name="<%= ControladorMeritosPreferentes.PARAM_MERITO_DESCRIPCION %>" 
-    				   value="<%= BolsaEmpleoUtils.getParamForm(request, ControladorMeritosPreferentes.PARAM_MERITO_DESCRIPCION, merito != null ? merito.getDescripcion() : "") %>"/>
+    				   name="<%= ControladorMeritosPreferentes.PARAM_MERITO_NOMBRE %>" 
+    				   value="<%= BolsaEmpleoUtils.getParamForm(request, ControladorMeritosPreferentes.PARAM_MERITO_NOMBRE, merito != null ? merito.getNombre() : "") %>"/>
     		</div>
     	</div>
+    	
+    	<div class="form-group-container col1">
+			<div class="form-group">
+    			<label for="descripcion">Observaciones</label>
+    			<textarea class="params form-input-custom" id="observaciones" 
+    					  name="<%=ControladorMeritosPreferentes.PARAM_MERITO_OBSERVACIONES%>" rows="3" cols="60"><%=BolsaEmpleoUtils.getParamForm(request, ControladorMeritosPreferentes.PARAM_MERITO_OBSERVACIONES, merito != null && merito.getObservaciones() != null ? merito.getObservaciones() : "")%></textarea>
+   			</div>
+		</div>
 		
 		<!-- DONDE SE APLICA -->
 
@@ -181,6 +189,7 @@ MeritoPreferente merito = bean.getMeritoPreferente();
 					<option value="<%=ModeloMeritosPreferentes.TIPO_CALCULO_FACTOR%>" <%=tipoCalculoSelected.equals(ModeloMeritosPreferentes.TIPO_CALCULO_FACTOR) ? "selected=\"selected\"" : ""%>>Factor</option>
 					<option value="<%=ModeloMeritosPreferentes.TIPO_CALCULO_VALOR_MERITO_FACTOR%>" <%=tipoCalculoSelected.equals(ModeloMeritosPreferentes.TIPO_CALCULO_VALOR_MERITO_FACTOR) ? "selected=\"selected\"" : ""%>>Por valor del mérito</option>					
 					<option value="<%=ModeloMeritosPreferentes.TIPO_CALCULO_VALOR_MERITO_MAYOR_QUE%>" <%=tipoCalculoSelected.equals(ModeloMeritosPreferentes.TIPO_CALCULO_VALOR_MERITO_MAYOR_QUE) ? "selected=\"selected\"" : ""%>>Por valor del mérito mayor que</option>
+					<option value="<%=ModeloMeritosPreferentes.TIPO_CALCULO_OPCIONES%>" <%=tipoCalculoSelected.equals(ModeloMeritosPreferentes.TIPO_CALCULO_OPCIONES) ? "selected=\"selected\"" : ""%>>Opciones</option>
 				</select>
     		</div>
     	</div>
@@ -191,6 +200,7 @@ MeritoPreferente merito = bean.getMeritoPreferente();
     				<li id="tipo_calculo_helper_factor" class="<%= tipoCalculoSelected.equals(ModeloMeritosPreferentes.TIPO_CALCULO_FACTOR) ? "selected" : "" %>">Factor: es valor multiplicador es un valor decimal.</li>
     				<li id="tipo_calculo_helper_valor_merito" class="<%= tipoCalculoSelected.equals(ModeloMeritosPreferentes.TIPO_CALCULO_VALOR_MERITO_FACTOR) ? "selected" : "" %>">Por valor del mérito: el valor multiplicador se cálcula con la formula, BASE + FACTOR * VALOR_MERITO</li>
     				<li id="tipo_calculo_helper_valor_merito_mayor_que" class="<%= tipoCalculoSelected.equals(ModeloMeritosPreferentes.TIPO_CALCULO_VALOR_MERITO_MAYOR_QUE) ? "selected" : "" %>">Por valor del mérito mayor que: el valor de mérito debe ser mayor o igual al valor indicado en el campo "Valor mínimo del mérito" para aplicar el factor</li>    				
+    				<li id="tipo_calculo_helper_opciones" class="<%= tipoCalculoSelected.equals(ModeloMeritosPreferentes.TIPO_CALCULO_OPCIONES) ? "selected" : "" %>">Opciones: el valor multiplicador se selecciona de una lista</li>
     			</ul>
     		</div>
     	</div>
@@ -258,6 +268,28 @@ MeritoPreferente merito = bean.getMeritoPreferente();
     		</div>
     	</div>
     	
+    	<!-- TIPO DE CALCULO OPCIONES -->
+    	<div class="form-group-container col1" id="bloque_calculo_opciones" style="<%=tipoCalculoSelected.equals(ModeloMeritosPreferentes.TIPO_CALCULO_OPCIONES) ? "" : "display:none"%>">
+	    	<% if (merito == null) { %>
+	    		<p>Cree el mérito antes para poder añadir las opciones</p>
+	    	<% } else { %>
+	    		<table class="bluetable bolsaempleo" id="table_opciones">
+					<tr>
+						<th scope="col"	style="width:70%" title="Descripción del mérito">Nombre</th>
+						<th scope="col"	style="width:20%">Factor</th>
+						<th scope="col"	style="width:10%"></th>
+					</tr>
+					<tbody>
+					</tbody>
+					<tfoot>
+						<tr>
+							<th colspan="4" style="width:100%"></th>
+						</tr>
+					</tfoot>
+				</table>
+			<% } %>
+    	</div>
+    	
     	<div class="form-btn">
     		<input id="convocatoria_enviar" type="submit" value="<%=merito != null ? "Guardar" : "Nuevo mérito"%>" />
     	</div>
@@ -290,19 +322,23 @@ MeritoPreferente merito = bean.getMeritoPreferente();
 				$('#bloque_calculo_factor').show();							
 				$('#bloque_calculo_valor_merito').hide();
 				$('#bloque_calculo_valor_merito_mayor_que').hide();	
+				$('#bloque_calculo_opciones').hide();
 				
 				$('#tipo_calculo_helper_factor').addClass('selected');
 				$('#tipo_calculo_helper_valor_merito').removeClass('selected');
 				$('#tipo_calculo_helper_valor_merito_mayor_que').removeClass('selected');
+				$('#tipo_calculo_helper_opciones').removeClass('selected');
 				break;
 			case '<%= ModeloMeritosPreferentes.TIPO_CALCULO_VALOR_MERITO_FACTOR %>':				
 				$('#bloque_calculo_factor').hide();
 				$('#bloque_calculo_valor_merito').show();
 				$('#bloque_calculo_valor_merito_mayor_que').hide();
+				$('#bloque_calculo_opciones').hide();
 				
 				$('#tipo_calculo_helper_factor').removeClass('selected');
 				$('#tipo_calculo_helper_valor_merito').addClass('selected');
 				$('#tipo_calculo_helper_valor_merito_mayor_que').removeClass('selected');
+				$('#tipo_calculo_helper_opciones').removeClass('selected');
 				
 				$('#merito_tipo').val('<%= ModeloMeritosPreferentes.TIPO_MERITO %>');
 				onChangeTipoMerito('<%= ModeloMeritosPreferentes.TIPO_MERITO %>');
@@ -311,13 +347,26 @@ MeritoPreferente merito = bean.getMeritoPreferente();
 				$('#bloque_calculo_factor').hide();
 				$('#bloque_calculo_valor_merito').hide();
 				$('#bloque_calculo_valor_merito_mayor_que').show();
+				$('#bloque_calculo_opciones').hide();
 				
 				$('#tipo_calculo_helper_factor').removeClass('selected');
 				$('#tipo_calculo_helper_valor_merito').removeClass('selected');
 				$('#tipo_calculo_helper_valor_merito_mayor_que').addClass('selected');
+				$('#tipo_calculo_helper_opciones').removeClass('selected');
 				
 				$('#merito_tipo').val('<%= ModeloMeritosPreferentes.TIPO_MERITO %>');
 				onChangeTipoMerito('<%= ModeloMeritosPreferentes.TIPO_MERITO %>');
+				break;
+			case '<%=ModeloMeritosPreferentes.TIPO_CALCULO_OPCIONES%>':
+				$('#bloque_calculo_factor').hide();
+				$('#bloque_calculo_valor_merito').hide();
+				$('#bloque_calculo_valor_merito_mayor_que').hide();
+				$('#bloque_calculo_opciones').show();
+				
+				$('#tipo_calculo_helper_factor').removeClass('selected');
+				$('#tipo_calculo_helper_valor_merito').removeClass('selected');
+				$('#tipo_calculo_helper_valor_merito_mayor_que').removeClass('selected');
+				$('#tipo_calculo_helper_opciones').addClass('selected');
 				break;
 			}
 		});
@@ -347,5 +396,48 @@ MeritoPreferente merito = bean.getMeritoPreferente();
 				break;
 			}			
 		});
+		
+		<% if (merito != null) { %>
+			var table = new Atis.DataTable('#table_opciones', {
+			    "ajax": { url: "<%=  ControladorMeritosPreferentes.URL_PATTERN_AJAX %>" },
+			    "pageSize": 10,
+			    "action": "<%= ControladorMeritosPreferentes.ACCION_DATATABLE_OPCIONES %>",
+			    "params": {"<%= ControladorMeritosPreferentes.PARAM_ID %>": '<%= merito.getCodNum() %>'},
+			    "filterable": true,
+			    "defaultOrderBy": 1,
+			    "defaultOrderDirection": 'asc',
+			    "columns": [
+			        {'data': 'nombre'},		       
+			        {'data': 'factor'},
+			        {'data': 'codNum', 'buttons': [
+		        		{'label': 'Borrar', 'onClick': function(row) {
+		        			Atis.confirmDialog("Borrar opción", "¿Está seguro de borrar la opción?", {
+		            			Si: function() {
+		            				var params = {
+	    		        				'a': '<%= ControladorMeritosPreferentes.ACCION_DESACTIVAR_OPCION %>', 
+	    		        				'<%= ControladorMeritosPreferentes.PARAM_ID %>': '<%= merito.getCodNum() %>',
+	    		        				'<%= ControladorMeritosPreferentes.PARAM_ID_OPCION %>': row.codNum
+	    		        			};
+	    		        			Atis.sendForm("<%=request.getRequestURI()%>", params);
+		              				$(this).dialog("close");
+		            			},
+		            			No: function() {
+		              				$(this).dialog("close");
+		            			}
+		          			});
+		        		}},
+		        	]}
+				],
+				"actions": [
+			    	{'label': 'Nueva opción', 'onClick': function() {
+			    		var params = {
+		    				'a': '<%= ControladorMeritosPreferentes.ACCION_NUEVA_OPCION %>',
+		    				'<%= ControladorMeritosPreferentes.PARAM_ID %>': '<%= merito.getCodNum() %>'
+		    			};
+		    	   		Atis.sendForm("<%= request.getRequestURI() %>", params);
+					}},
+			    ]
+			});
+		<% } %>
 	});	
 </script>

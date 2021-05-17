@@ -46,7 +46,7 @@ Departamento departamento = bean.getDepartamento();
 	    		</div>
 	    		<div class="form-group" style="width:20%">
 					<a class="link-btn" id="nuevo_evaluador" href="<%=request.getRequestURI()%>" style="display:inline-block !important; padding: 0; margin-top: 1.4rem" title="Buscar evaluador">
-						<img id="iconoMenu" src="/img/md/search_white.svg" width="25"/>
+						<img alt="nombre de usuario evaluador" id="iconoMenu" src="/img/md/search_white.svg" width="25"/>
 	   	 			</a>
 	   			</div>
 			</div>
@@ -176,11 +176,11 @@ Departamento departamento = bean.getDepartamento();
 		        	}},
 		        	{'data': 'codnum', 'buttons': [{'label': function(row) { return row.activo ? "Borrar" : "Restaurar"; },
 		        		'title':  function(row) { return row.activo ? "Desactivar evaluador" : "Activar evaluador"; }, 'onClick': function(row) {
-			        		var mensaje = "¿Desea borrar el evaluador seleccionado?";
+			        		var mensaje = "¿ Desea borrar el evaluador seleccionado?";
 				        	var titulo = "Borrar evaluador";
 				        	if(!row.activo) {
 				        		titulo = "Restaurar evaluador";
-				        		mensaje = "¿Desea restaurar el evaluador seleccionado?";
+				        		mensaje = "¿ Desea restaurar el evaluador seleccionado?";
 				        	}
 				        	
 				        	Atis.confirmDialog(titulo, mensaje, {

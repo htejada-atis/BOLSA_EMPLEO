@@ -214,25 +214,27 @@ public class ControladorAfinidades extends HttpServlet {
 	private void nuevaAfinidad(VistaAfinidades bean, HttpServletRequest request, HttpServletResponse response) throws UVException, SQLException, IOException {
 		bean.setVista(RUTA_BEP_CON + "formAfinidades.jsp");
 		
-		Afinidad afinidad = this.validarAfinidad(request);		
-		ModeloAfinidad.obtenerInstancia().nuevaAfinidad(afinidad);	
+		if (EscapaHTML.ajustaCodificacion(request.getParameter(PARAM_DESCRIPCION)) != null) {
+			Afinidad afinidad = this.validarAfinidad(request);		
+			ModeloAfinidad.obtenerInstancia().nuevaAfinidad(afinidad);	
 
-		this.index(bean);
+			this.index(bean);
 
-		BolsaEmpleoUtils.addMensajeDeExito(MENSAJE_INFO_AFINIDAD_INSERTADA_CORRECTAMENTE, bean, request);
-		response.sendRedirect(request.getServletPath());
+			BolsaEmpleoUtils.addMensajeDeExito(MENSAJE_INFO_AFINIDAD_INSERTADA_CORRECTAMENTE, bean, request);
+			response.sendRedirect(request.getServletPath());
+		}
 	}
 		
 	private void modificarAfinidad(VistaAfinidades bean, HttpServletRequest request, HttpServletResponse response) throws UVException, SQLException, IOException { 
 		bean.setVista(RUTA_BEP_CON + "formAfinidades.jsp");
-		
-		Afinidad afinidadForm = this.validarAfinidad(request); 							
+						
 		ModeloAfinidad modelo = ModeloAfinidad.obtenerInstancia();
 		
 		Afinidad afinidad = modelo.getAfinidadById(Formateador.leeParametroInteger(request.getParameter(PARAM_ID)));
 		bean.setAfinidad(afinidad);
 		
 		if (EscapaHTML.ajustaCodificacion(request.getParameter(PARAM_DESCRIPCION)) != null) {
+			Afinidad afinidadForm = this.validarAfinidad(request); 			
 			Afinidad afinidadEdit = new Afinidad(afinidad.getCodNum(), afinidadForm.getCodigo(), afinidadForm.getDescripcion(), afinidadForm.getModulacion()); 
 			modelo.actualizaAfinidad(afinidadEdit);
 			
