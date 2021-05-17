@@ -3,6 +3,7 @@ package usuario;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
+import java.nio.file.NoSuchFileException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
@@ -65,6 +66,8 @@ public class DriverUv {
 			directorioBase += "pruebasSelenium/";
 			try (Stream<File> ficherosBorrar = Files.walk(Paths.get(directorioBase)).sorted(Comparator.reverseOrder()).map(Path::toFile)) {
 				ficherosBorrar.forEach(File::delete);
+			} catch (NoSuchFileException e) {
+				//ya borrado
 			} catch (IOException e) {
 				e.printStackTrace();
 			}
@@ -93,10 +96,12 @@ public class DriverUv {
 	 * @param nombre nombre del fichero de la captura
 	 */
 	public static void capturaPantalla(String nombre) {
+		String rutaUrl = driver.getCurrentUrl().replace(RUTA, "");
+		rutaUrl = rutaUrl.replace("/", "-");
+    	String nombreFichero = directorioBase + contador++ + "-" + nombre + rutaUrl + ".png";
 		File scrFile = ((TakesScreenshot) driver).getScreenshotAs(OutputType.FILE);
 	    try {
 			Files.createDirectories(Paths.get(directorioBase));
-	    	String nombreFichero = directorioBase + contador++ + "-" + nombre + ".png";
 			Files.copy(scrFile.toPath(), (new File(nombreFichero)).toPath(), StandardCopyOption.REPLACE_EXISTING);
 		} catch (IOException e) {
 			e.printStackTrace();
