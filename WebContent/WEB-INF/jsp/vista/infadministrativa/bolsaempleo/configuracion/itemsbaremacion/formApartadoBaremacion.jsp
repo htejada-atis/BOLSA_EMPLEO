@@ -18,7 +18,7 @@ ApartadoBaremacion apartado = bean.getApartadoBaremacion();
 	
 	<h2><%= apartado != null ? "Editar bloque" : "Nuevo bloque" %></h2>
 	
-	<p>Las etiquetas en <b>negrita</b> corresponden a campos de relleno obligatorio</p>
+	<p>Las etiquetas en <strong>negrita</strong> corresponden a campos de relleno obligatorio</p>
 	
 	<form id="actualizar_apartado" class="be-form" method="post" action="<%= request.getRequestURI() %>">
 		<input type="hidden" 

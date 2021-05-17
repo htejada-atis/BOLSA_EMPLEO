@@ -19,14 +19,14 @@ VistaMeritosPreferentesCandidato bean = (VistaMeritosPreferentesCandidato) uvdat
 	
 	<h2>Nuevo mérito preferente</h2>
 	
-	<p>Las etiquetas en <b>negrita</b> corresponden a campos de relleno obligatorio</p>
+	<p>Las etiquetas en <strong>negrita</strong> corresponden a campos de relleno obligatorio</p>
     
     <form id="agregar_merito" class="be-form" method="post" action="<%= request.getRequestURI() %>" enctype="multipart/form-data">
     	<input type="hidden" id="accion_formulario"
     		   name="<%= ControladorMisMeritosPreferentes.PARAM_ACCION %>"  
     		   value="<%= ControladorMisMeritosPreferentes.ACCION_AGREGAR_MERITO_CONFIRM %>" />
     		   
-    	<div class="form-group-container col2">
+    	<div class="form-group-container col1">
 	    	<div class="form-group">
 				<label class="bold-label" for="select_apartado">Mérito preferente:</label>
 				<%
@@ -35,9 +35,15 @@ VistaMeritosPreferentesCandidato bean = (VistaMeritosPreferentesCandidato) uvdat
 				<select class="form-input-custom" id="select_apartado" name="<%= ControladorMisMeritosPreferentes.PARAM_MERITO_PREFERENTE %>" required>
 					<option value="">Elija el tipo de mérito preferente</option>
 					<% for (MeritoPreferente m: bean.getMeritosPreferente()) { %>
-							<option value="<%= m.getCodNum() %>" <%= meritoSelected.equals(m.getCodNum().toString()) ? "selected=\"selected\"" : "" %>><%= bean.getCodigoPadreMeritoPreferente() + "." + m.getCodigo() + " - " + m.getDescripcion() %></option>					
+							<option value="<%= m.getCodNum() %>" observaciones="<%= m.getObservaciones() %>" <%= meritoSelected.equals(m.getCodNum().toString()) ? "selected=\"selected\"" : "" %>><%= bean.getCodigoPadreMeritoPreferente() + "." + m.getCodigo() + " - " + m.getNombre() %></option>				
 					<% } %>
 				</select>
+			</div>		
+		</div>
+		
+		<div class="form-group-container col1" id="observaciones" style="display:none;">
+	    	<div class="form-group">
+				<p id="observacionesParrafo"></p>
 			</div>		
 		</div>
 		
@@ -66,6 +72,16 @@ VistaMeritosPreferentesCandidato bean = (VistaMeritosPreferentesCandidato) uvdat
 			$('#merito_enviar').prop('disabled', true);
 			$('#merito_enviar').attr('value', 'Guardando mérito...');			
 			return true;
+		});
+		
+		$('#select_apartado').change(function(event) { 
+			if($(this).children("option:selected").attr("value") != "") {
+				$("#observaciones").show();
+				$("#observacionesParrafo").html("Observaciones del mérito: " + $(this).children("option:selected").attr('observaciones'));
+			} 
+			else {
+				$("#observaciones").hide();
+			}
 		});
 	});
 </script>

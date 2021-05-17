@@ -134,33 +134,6 @@ public class ModeloTitulacion {
 		return titulaciones.get(0);
 	}
 	
-	/** Actualiza una titulación.
-	 * @param titulacion Titulación con los datos nuevos a actualizar
-	 * @throws SQLException en caso de error en la BD
-	 * @throws UVException en caso de errores de validacion
-	 */
-	public void actualizaTitulacion(Titulacion titulacion) throws SQLException, UVException {
-		if (titulacion == null) {
-			throw new UVException("titulación obligatoria");
-		}
-		if (titulacion.getCodNum() == null) {
-			throw new UVException("id titulación no válido");
-		}
-		if (titulacion.getNombre() == null) {
-			throw new UVException("nombre obligatorio");
-		}
-		
-		String consulta = "UPDATE tbep_titulaciones "
-						+ "   SET nombre=?"
-						+ " WHERE codnum=?";
-		try (Connection conexion = ConexionUvirtual.obtenerInstancia(); PreparedStatement stmt = conexion.prepareStatement(consulta)) {
-			int parameterIndex = 1;
-			stmt.setString(parameterIndex++, titulacion.getNombre());
-			stmt.setInt(parameterIndex++, titulacion.getCodNum());
-			stmt.executeUpdate();
-		}
-	}
-	
 	/** Elimina una titulación .
 	 * @param titulacion a borrar
 	 * @throws SQLException en caso de error en la BD

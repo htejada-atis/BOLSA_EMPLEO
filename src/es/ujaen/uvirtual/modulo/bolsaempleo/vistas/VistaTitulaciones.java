@@ -18,7 +18,6 @@ public class VistaTitulaciones extends Vista implements Serializable {
 	private TitulacionUsuario titulacionUsuario;
 	private String vista;
 	
-	
 	public BolsaEmpleoDataTable<Titulacion> getDatatableTitulaciones() {
 		return dataTable;
 	}

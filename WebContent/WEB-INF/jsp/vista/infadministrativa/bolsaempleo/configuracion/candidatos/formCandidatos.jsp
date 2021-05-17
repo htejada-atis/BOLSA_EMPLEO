@@ -137,11 +137,11 @@ UsuarioBolsaEmpleo usuarioBolsa = bean.getUsuario();
     		</div>
     		<div class="form-check">
     			<div class="form-check-custom">
-	    			<label for="noticia_fecha"><b>Fecha Inicio</b>:</label>
+	    			<label for="noticia_fecha"><strong>Fecha Inicio</strong>:</label>
 	    			<input class="form-input-custom" type="text" name="<%= ControladorUsuarioBolsaEmpleo.PARAM_FECHA_EXCLUIDO_INICIO %>" id="fecha_ini" autocomplete="off" value="<%= fecha_ini!=null ? fecha_ini : "" %>" style="width:80%"/>
 	    		</div>
 	    		<div class="form-check-custom">
-	    			<label for="noticia_fecha"><b>Fecha Fin</b>:</label>
+	    			<label for="noticia_fecha"><strong>Fecha Fin</strong>:</label>
 	    			<input class="form-input-custom" type="text" name="<%= ControladorUsuarioBolsaEmpleo.PARAM_FECHA_EXCLUIDO_FIN %>" id="fecha_fin" autocomplete="off" value="<%= fecha_fin!=null ? fecha_fin : "" %>" style="width:80%"/>
 	    		</div>
 	    	</div>
@@ -196,7 +196,7 @@ UsuarioBolsaEmpleo usuarioBolsa = bean.getUsuario();
 		
 		
 		<table class="bluetable bolsaempleo" id="table_areas">
-  			<caption class="table-title">Listado de áreas</caption>  
+  			<caption class="table-title">Listado de Áreas</caption>  
 			<tr>
 				<th scope="col" style="width:5%"></th>
 				<th scope="col" style="width:20%" title="Id de la area">Id</th>
