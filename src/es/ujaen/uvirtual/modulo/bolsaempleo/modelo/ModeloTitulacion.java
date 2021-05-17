@@ -6,6 +6,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
@@ -146,9 +147,15 @@ public class ModeloTitulacion {
 		if (titulacion.getCodNum() == null) {
 			throw new UVException("No se puede eliminar una titulación con id vacío");
 		}
-		String consulta = "DELETE FROM tbep_titulaciones WHERE codnum = ? ";
+		String consulta = "UPDATE tbep_titulaciones SET FLGBORRADO = ?, FECHA_BORRADO = ? "
+				+ "WHERE CODNUM=?";
 		try (Connection conexion = ConexionUvirtual.obtenerInstancia(); PreparedStatement stmt = conexion.prepareStatement(consulta)) {
 			int parameterIndex = 1;
+			stmt.setString(parameterIndex++, "S");
+			
+			Date date = new Date(System.currentTimeMillis());
+			
+			stmt.setDate(parameterIndex++, new java.sql.Date(date.getTime()));
 			stmt.setInt(parameterIndex++, titulacion.getCodNum());
 			stmt.executeUpdate();
 		}
@@ -233,7 +240,7 @@ public class ModeloTitulacion {
 		List<Titulacion> titulaciones = new ArrayList<>();
 		BolsaEmpleoDataTable<Titulacion> dataTable = new BolsaEmpleoDataTable<>(params);
 		
-		String consulta = "SELECT beptit.* FROM tbep_titulaciones beptit WHERE 1=1 ";
+		String consulta = "SELECT beptit.* FROM tbep_titulaciones beptit WHERE FLGBORRADO!='S' ";
 		
 		dataTable.setColumn(ORDER_COLUMN_INDEX_ID, "beptit.CODNUM", DataTableColumn.COLUMN_TYPE_NUMBER);
 		dataTable.setColumn(ORDER_COLUMN_INDEX_NOMBRE, "beptit.NOMBRE");
