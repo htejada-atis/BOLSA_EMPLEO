@@ -149,7 +149,7 @@ public class MeritoPreferenteUsuario implements Serializable {
 
 	@Override
 	public String toString() {
-		return "ApartadoBaremacion [codNum=" + codNum + ", meritoPreferente=" + meritoPreferente + ", usuario=" + usuario 
+		return "MeritoPreferenteUsuario [codNum=" + codNum + ", meritoPreferente=" + meritoPreferente + ", usuario=" + usuario 
 				+ ", descripcion=" + descripcion + ", archivo=" + archivo + ", borrado=" + borrado + ", fechaBorrado=" + fechaBorrado 
 				+ ", validado=" + validado + ", fechaValidado=" + fechaValidado + "]";
 	}

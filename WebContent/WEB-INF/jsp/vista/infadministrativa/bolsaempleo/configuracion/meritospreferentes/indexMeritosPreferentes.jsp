@@ -50,7 +50,7 @@ VistaMeritosPreferentes bean = (VistaMeritosPreferentes) uvdatos.getVistas().get
 				<th colspan="7" style="width:100%"></th>
 			</tr>
 		</tfoot>
-	</table>	
+	</table>
 </div>
 
 <script>

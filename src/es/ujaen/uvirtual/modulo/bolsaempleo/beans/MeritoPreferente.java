@@ -211,7 +211,7 @@ public class MeritoPreferente implements Serializable {
 
 	@Override
 	public String toString() {
-		return "ApartadoBaremacion [codNum=" + codNum + ", codigo=" + codigo + " , descripcion=" + descripcion + ", tipo=" + tipo
+		return "MeritoPreferente [codNum=" + codNum + ", codigo=" + codigo + " , descripcion=" + descripcion + ", tipo=" + tipo
 				+ ", tipoCalculo=" + tipoCalculo + "aplicable=" + aplicable + ", base=" + base + ", factor=" + factor
 				+ ", valorMaximo=" + valorMaximo + ", tipoItemBaremacion=" + tipoItemBaremacion
 				+ ", aplicableBloqueBaremacion" + aplicableBloqueBaremacion + ", aplicableApartadoBaremacion="
@@ -354,5 +354,4 @@ public class MeritoPreferente implements Serializable {
 
 		return true;
 	}
-
 }
