@@ -80,21 +80,6 @@ public class TestBEPModeloTitulacion {
 //    	assertTrue("titulaciones debe tener un elemento menos", titulaciones.size() - 1 == titulacionesFiltradas.size());
 //    }
     
-    /** test acierto editar titulación.
-     * @throws SQLException si error en bd
-     * @throws UVException si error el validar titulación
-     */
-    @Test
-    public void testA03EditarTitulacion() throws SQLException, UVException {
-    	ModeloTitulacion modelo = ModeloTitulacion.obtenerInstancia();
-    	List<Titulacion> titulaciones = modelo.listaTitulaciones();
-    	Titulacion titulacion = titulaciones.get(0);
-    	titulacion.setNombre("nombre actualizado");
-    	modelo.actualizaTitulacion(titulacion); 
-    	Titulacion titulacionActualizada = modelo.listaTitulacion(titulacion.getCodNum());
-    	assertTrue("titulación debe ser actualizada", titulacion.equals(titulacionActualizada)); 
-    }
-    
     /** test error inserta titulación null.
      * @throws SQLException si error bd
      * @throws UVException error experado
