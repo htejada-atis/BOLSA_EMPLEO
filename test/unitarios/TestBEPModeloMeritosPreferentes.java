@@ -37,15 +37,18 @@ import es.ujaen.uvirtual.utilidades.UVException;
 @FixMethodOrder(MethodSorters.NAME_ASCENDING)
 public class TestBEPModeloMeritosPreferentes {
 	private static final Integer CODNUM = 1;
+	private static final String CODIGO = "1";
 	private static final String NOMBRE = "nombre";
 	private static final String OBSERVACIONES = "observaciones";
 	private static final String TIPO = "MERITO";
+	private static final String TIPO_FACTOR = "FACTOR";
 	private static final String APLICABLE = "BLOQUE";
 	private static final Double FACTOR = 1.3;
 	private static final Double VALORMAXIMO = 100.0;
 	private static final Boolean ACTIVO = true;
 	private static final Integer ID_MERITO_NO_EXISTE = 111_111_111;
 	private static final String MENSAJE_ERROR_HAY_EXCEPCION = "Excepción no esperada: %s";
+	
 	
 	private static ApartadoBaremacion apartado;
 	private static BloqueBaremacion bloque;
@@ -80,7 +83,7 @@ public class TestBEPModeloMeritosPreferentes {
 	public void testA01InsertaMeritoPreferente() {
 		MeritoPreferente merito = new MeritoPreferente();
 		merito.setCodigo(CODIGO);
-		merito.setDescripcion(DESCRIPCION);
+		merito.setNombre(NOMBRE);
 		merito.setTipo(TIPO);		
 		merito.setTipoCalculo(TIPO_FACTOR);
 		merito.setAplicable(APLICABLE);
@@ -117,7 +120,7 @@ public class TestBEPModeloMeritosPreferentes {
 		MeritoPreferente merito = new MeritoPreferente();
 		merito.setCodNum(CODNUM);
 		merito.setCodigo(CODIGO);
-		merito.setDescripcion(DESCRIPCION);
+		merito.setObservaciones(OBSERVACIONES);
 		merito.setTipo(TIPO);
 		merito.setTipoCalculo(TIPO_FACTOR);
 		merito.setAplicable(APLICABLE);
@@ -175,7 +178,7 @@ public class TestBEPModeloMeritosPreferentes {
 
 		try {
 			MeritoPreferente merito = modelo.getMeritoPreferenteById(CODNUM);
-			merito.setDescripcion(DESCRIPCION_NUEVA);			
+			merito.setObservaciones(OBSERVACIONES);			
 			merito.setValorMaximo(1.0);
 			merito.setTipoItemBaremacion(item);
 			merito.setAplicableBloqueBaremacion(bloque);
@@ -209,7 +212,7 @@ public class TestBEPModeloMeritosPreferentes {
 
 		try {
 			MeritoPreferente merito = modelo.getMeritoPreferenteById(CODNUM);
-			merito.setDescripcion(DESCRIPCION_NUEVA);			
+			merito.setObservaciones(null);			
 			merito.setValorMaximo(null);
 			merito.setTipoItemBaremacion(null);
 			merito.setAplicableBloqueBaremacion(null);
@@ -225,7 +228,7 @@ public class TestBEPModeloMeritosPreferentes {
 
 			merito = modelo.getMeritoPreferenteById(merito.getCodNum());
 			
-			assertEquals(merito.getDescripcion(), DESCRIPCION_NUEVA);
+			assertEquals(merito.getObservaciones(), null);
 			assertEquals(merito.getValorMaximo(), null);
 			assertEquals(merito.getTipoItemBaremacion(), null);
 			assertEquals(merito.getAplicableBloqueBaremacion(), null);

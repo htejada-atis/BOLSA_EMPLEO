@@ -27,7 +27,7 @@ MeritoPreferente merito = bean.getMeritoPreferente();
 		</div>
 	<% } %>
 	
-	<h2>Nueva opción para: <%= merito.getDescripcion() %></h2>
+	<h2>Nueva opción para: <%= merito.getNombre() %></h2>
 		
 	<form id="merito_preferente_opcion_form" class="be-form" method="post" action="<%= request.getRequestURI() %>">
     	<input type="hidden" name="<%= ControladorMeritosPreferentes.PARAM_ACCION %>" id="accion_formulario" 

@@ -1,6 +1,7 @@
 package es.ujaen.uvirtual.modulo.bolsaempleo.modelo;
 
 import java.sql.Connection;
+import java.sql.Date;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -14,6 +15,7 @@ import es.ujaen.uvirtual.modulo.bolsaempleo.beans.MeritoPreferente;
 import es.ujaen.uvirtual.modulo.bolsaempleo.beans.MeritoPreferenteOpcion;
 import es.ujaen.uvirtual.modulo.bolsaempleo.utilidades.BolsaEmpleoDataTable;
 import es.ujaen.uvirtual.modulo.bolsaempleo.utilidades.BolsaEmpleoDataTable.DataTableColumn;
+import es.ujaen.uvirtual.modulo.bolsaempleo.utilidades.BolsaEmpleoUtils;
 import es.ujaen.uvirtual.utilidades.UVException;
 
 /**
@@ -25,16 +27,15 @@ public class ModeloMeritosPreferentes {
 	// ordenación 
 	public static final int ORDER_COLUMN_INDEX_CODIGO = 0;
 	public static final int ORDER_COLUMN_INDEX_NOMBRE = 1;
-	public static final int ORDER_COLUMN_INDEX_DESCRIPCION = 2;
-	public static final int ORDER_COLUMN_INDEX_TIPO = 3;
-	public static final int ORDER_COLUMN_INDEX_APLICABLE = 4;
-	public static final int ORDER_COLUMN_INDEX_FACTOR = 5;
-	public static final int ORDER_COLUMN_INDEX_ACTIVO = 6;
+	public static final int ORDER_COLUMN_INDEX_TIPO = 2;
+	public static final int ORDER_COLUMN_INDEX_APLICABLE = 3;
+	public static final int ORDER_COLUMN_INDEX_FACTOR = 4;
+	public static final int ORDER_COLUMN_INDEX_ACTIVO = 5;
 
 	public static final int ORDER_COLUMN_INDEX_OPCIONES_NOMBRE = 0;
 	public static final int ORDER_COLUMN_INDEX_OPCIONES_FACTOR = 1;
 	
-	public static final int MAX_LENGTH_COLUMN_NOMBRE = 100;
+	public static final int MAX_LENGTH_COLUMN_NOMBRE = 500;
 	public static final int MAX_LENGTH_COLUMN_OBSERVACIONES = 1000;
 	public static final int MAX_LENGTH_COLUMN_FACTOR = 20;
 	public static final int MAX_LENGTH_COLUMN_CODIGO = 10;
@@ -113,6 +114,34 @@ public class ModeloMeritosPreferentes {
 		
 		throw new UVException(ERROR_MERITO_NOEXITE);
 	}
+	
+	/**
+	 * Devuelve la opción del mérito por su id.
+	 * @param codNum .
+	 * @return .
+	 * @throws SQLException .
+	 * @throws UVException .
+	 */
+	public MeritoPreferenteOpcion getMeritoPreferenteOpcionById(Integer codNum) throws SQLException, UVException {
+		if (codNum == null) {
+			throw new UVException("Opción de mérito requerido");
+		}
+		
+		String sql = "SELECT bepmpo.* FROM TBEP_MERITOS_PREFERENTES_OPCIONES bepmpo WHERE bepmpo.CODNUM = ?";
+		
+		try (Connection con = ConexionUvirtual.obtenerInstancia(); PreparedStatement stmt = con.prepareStatement(sql)) {
+			int parameterIndex = 1;
+			stmt.setInt(parameterIndex++, codNum);
+			
+			try (ResultSet rs = stmt.executeQuery()) {
+				if (rs.next()) {
+					return this.createMeritoPreferenteOpcionFromResultSet(rs);					
+				}
+			}
+		}
+		
+		throw new UVException("No existe la opción del mérito");
+	}
     
 	/**
 	 * Listado. 
@@ -129,7 +158,6 @@ public class ModeloMeritosPreferentes {
 		
 		dataTable.setColumn(ORDER_COLUMN_INDEX_CODIGO, "bepmep.CODIGO");
 		dataTable.setColumn(ORDER_COLUMN_INDEX_NOMBRE, "bepmep.NOMBRE");
-		dataTable.setColumn(ORDER_COLUMN_INDEX_DESCRIPCION, "bepmep.DESCRIPCION");
 		dataTable.setColumn(ORDER_COLUMN_INDEX_TIPO, "bepmep.TIPO");
 		dataTable.setColumn(ORDER_COLUMN_INDEX_APLICABLE, "bepmep.APLICABLE");
 		dataTable.setColumn(ORDER_COLUMN_INDEX_FACTOR, "bepmep.FACTOR");
@@ -169,7 +197,7 @@ public class ModeloMeritosPreferentes {
 		List<MeritoPreferenteOpcion> data = new ArrayList<>();
 		BolsaEmpleoDataTable<MeritoPreferenteOpcion> dataTable = new BolsaEmpleoDataTable<>(params);
 		
-		String consulta = "SELECT bepmpo.* FROM TBEP_MERITOS_PREFERENTES_OPCIONES bepmpo WHERE bepmpo.BEPMEP_CODNUM = ? ";
+		String consulta = "SELECT bepmpo.* FROM TBEP_MERITOS_PREFERENTES_OPCIONES bepmpo WHERE bepmpo.BEPMEP_CODNUM = ? AND bepmpo.FLGBORRADO = 'N' ";
 		
 		dataTable.setColumn(ORDER_COLUMN_INDEX_OPCIONES_NOMBRE, "bepmpo.NOMBRE");
 		dataTable.setColumn(ORDER_COLUMN_INDEX_OPCIONES_FACTOR, "bepmpo.FACTOR");
@@ -198,6 +226,34 @@ public class ModeloMeritosPreferentes {
 		}
 
 		return dataTable;
+	}
+	
+	/**
+	 * Listado opciones de un merito preferente ordenador por factor.
+	 * @param merito .
+	 * @return . 
+	 * @throws SQLException .
+	 * @throws UVException .
+	 */
+	public List<MeritoPreferenteOpcion> listadoOpcionesMeritosPreferentes(MeritoPreferente merito) throws SQLException, UVException {
+		List<MeritoPreferenteOpcion> data = new ArrayList<>();
+		
+		String consulta = "SELECT bepmpo.* FROM TBEP_MERITOS_PREFERENTES_OPCIONES bepmpo "
+				+ "WHERE bepmpo.BEPMEP_CODNUM = ? AND bepmpo.FLGBORRADO = 'N' ORDER BY bepmpo.FACTOR ";
+		
+		try (Connection conexion = ConexionUvirtual.obtenerInstancia(); PreparedStatement stmt = conexion.prepareStatement(consulta)) {			
+			int paramIndex = 1;
+			stmt.setInt(paramIndex, merito.getCodNum());
+
+			try (ResultSet rs = stmt.executeQuery()) {
+				while (rs.next()) {
+					MeritoPreferenteOpcion row = this.createMeritoPreferenteOpcionFromResultSet(rs);
+					data.add(row);
+				}
+			}					
+		}
+
+		return data;
 	}
 		
 	/**
@@ -436,6 +492,23 @@ public class ModeloMeritosPreferentes {
 			return rs.getInt(1);			
 		}
 	} 
+	
+	/**
+	 * Desactiva una opción.
+	 * @param meritoOpcion .
+	 * @throws SQLException .
+	 */
+	public void desactivarMeritoPreferenteOpcion(MeritoPreferenteOpcion meritoOpcion) throws SQLException {
+		String query = "UPDATE TBEP_MERITOS_PREFERENTES_OPCIONES SET FLGBORRADO = ?, FECHA_BORRADO = ? WHERE CODNUM IN ?";		
+		
+		try (Connection conexion = ConexionUvirtual.obtenerInstancia(); PreparedStatement stmt = conexion.prepareStatement(query)) {
+			int indexParam = 1;
+			stmt.setString(indexParam++, "S");
+			stmt.setDate(indexParam++, (Date) BolsaEmpleoUtils.getCurrentDate());
+			stmt.setInt(indexParam++, meritoOpcion.getCodNum());
+			stmt.executeUpdate();
+		}
+	}
 	
 	private MeritoPreferente createMeritoPreferenteFromResultSet(ResultSet rs) throws SQLException, UVException {
 		MeritoPreferente obj = new MeritoPreferente();

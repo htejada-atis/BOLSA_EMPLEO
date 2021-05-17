@@ -1,6 +1,7 @@
 package es.ujaen.uvirtual.modulo.bolsaempleo.vistas;
 
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.List;
 
 import es.ujaen.uvirtual.beans.vistas.Vista;
@@ -9,6 +10,7 @@ import es.ujaen.uvirtual.modulo.bolsaempleo.beans.BloqueBaremacion;
 import es.ujaen.uvirtual.modulo.bolsaempleo.beans.ItemBaremacion;
 import es.ujaen.uvirtual.modulo.bolsaempleo.beans.Merito;
 import es.ujaen.uvirtual.modulo.bolsaempleo.beans.MeritoPreferente;
+import es.ujaen.uvirtual.modulo.bolsaempleo.beans.MeritoPreferenteOpcion;
 import es.ujaen.uvirtual.modulo.bolsaempleo.beans.MeritoPreferenteUsuario;
 import es.ujaen.uvirtual.modulo.bolsaempleo.utilidades.BolsaEmpleoDataTable;
 
@@ -22,6 +24,7 @@ public class VistaMeritosPreferentesCandidato extends Vista implements Serializa
 	private String vista;
 	private BolsaEmpleoDataTable<MeritoPreferenteUsuario> dataTable;
 	private List<MeritoPreferente> meritosPreferentes;
+	private List<MeritoPreferenteOpcion> opcionesMeritoPreferente;
 	private String codigoPadreMeritoPreferente;
 
 	public String getVista() {
@@ -54,5 +57,13 @@ public class VistaMeritosPreferentesCandidato extends Vista implements Serializa
 	
 	public String getCodigoPadreMeritoPreferente() {
 		return this.codigoPadreMeritoPreferente;
+	}
+
+	public void setOpcionesMerito(List<MeritoPreferenteOpcion> opciones) {
+		this.opcionesMeritoPreferente = opciones;
+	}
+	
+	private List<MeritoPreferenteOpcion> getOpcionesMerito() {
+		return this.opcionesMeritoPreferente;
 	}
 }

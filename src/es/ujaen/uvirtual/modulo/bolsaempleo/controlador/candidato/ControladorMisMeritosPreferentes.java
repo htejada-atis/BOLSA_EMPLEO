@@ -5,6 +5,8 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.sql.SQLException;
 import java.util.logging.Logger;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.logging.Level;
 import javax.servlet.ServletException;
 import javax.servlet.ServletOutputStream;
@@ -15,13 +17,19 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.Part;
 import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
+
 import es.ujaen.uvirtual.beans.CodigoDescripcion;
 import es.ujaen.uvirtual.beans.UVDatos;
 import es.ujaen.uvirtual.beans.Usuario;
+import es.ujaen.uvirtual.modulo.bolsaempleo.beans.MeritoPreferente;
+import es.ujaen.uvirtual.modulo.bolsaempleo.beans.MeritoPreferenteOpcion;
 import es.ujaen.uvirtual.modulo.bolsaempleo.beans.MeritoPreferenteUsuario;
+import es.ujaen.uvirtual.modulo.bolsaempleo.beans.ParametrosConfiguracion;
 import es.ujaen.uvirtual.modulo.bolsaempleo.beans.UsuarioBolsaEmpleo;
 import es.ujaen.uvirtual.modulo.bolsaempleo.modelo.ModeloMeritosPreferentes;
 import es.ujaen.uvirtual.modulo.bolsaempleo.modelo.ModeloMeritosPreferentesCandidato;
+import es.ujaen.uvirtual.modulo.bolsaempleo.modelo.ModeloParametrosConfiguracion;
 import es.ujaen.uvirtual.modulo.bolsaempleo.modelo.ModeloUsuarioBolsaEmpleo;
 import es.ujaen.uvirtual.modulo.bolsaempleo.utilidades.BolsaEmpleoDataTable;
 import es.ujaen.uvirtual.modulo.bolsaempleo.utilidades.BolsaEmpleoUtils;
@@ -55,11 +63,13 @@ public class ControladorMisMeritosPreferentes extends HttpServlet {
 	public static final String ACCION_AGREGAR_MERITO_CONFIRM = "agregarmeritoconfirm";
 	public static final String ACCION_DESCARGAR_FICHERO = "descargarfichero";
 	public static final String ACCION_ELIMINAR_MERITOS = "eliminarmeritos";
+	public static final String ACCION_LISTADO_OPCIONES = "opciones";
 	
 	// parámetros
 	public static final String PARAM_ACCION = "a";
 	public static final String PARAM_ID = "id";
 	public static final String PARAM_MERITO_PREFERENTE = "meritoPreferente";
+	public static final String PARAM_MERITO_PREFERENTE_OPCION = "meritoPreferenteOpcion";
 	public static final String PARAM_ARCHIVO = "archivo";
 	public static final String PARAM_OBSERVACION = "observacion";
 	public static final String PARAM_ENVIAR = "enviar";
@@ -130,6 +140,9 @@ public class ControladorMisMeritosPreferentes extends HttpServlet {
 					break;
 				case ACCION_DESCARGAR_FICHERO:
 					descargarPdf(bean, datos, request, response);
+					break;
+				case ACCION_LISTADO_OPCIONES:
+					listadoOpciones(bean, datos, request, response);
 					break;
 				default:
 					errorFatal(bean, "Acción no contemplada");
@@ -208,19 +221,42 @@ public class ControladorMisMeritosPreferentes extends HttpServlet {
 		}
 	}
 	
+	private void listadoOpciones(VistaMeritosPreferentesCandidato bean, UVDatos datos, HttpServletRequest request, HttpServletResponse response) throws IOException {
+		datos.setRespuestaEnviada(true);
+		datos.setContentType(RESPONSE_AJAX_CONTENTTYPE);
+		response.setContentType(RESPONSE_AJAX_CONTENTTYPE);
+		response.setCharacterEncoding(RESPONSE_AJAX_ENCODING);
+		
+		try (PrintWriter writer = response.getWriter()) {
+			try {
+				List<MeritoPreferenteOpcion> opciones = ModeloMeritosPreferentes.obtenerInstancia().listadoOpcionesMeritosPreferentes(ModeloMeritosPreferentes.
+						obtenerInstancia().getMeritoPreferenteById(Formateador.leeParametroInteger(request.getParameter(PARAM_ID))));
+				bean.setOpcionesMerito(opciones);				
+				Gson gson = new GsonBuilder().setDateFormat("dd/M/yyyy").create();						
+				writer.write(gson.toJson(opciones));
+			} catch (Exception ex) {
+				bean.getMensajesDeError().add(ex.getMessage());
+				CodigoDescripcion mensaje = new CodigoDescripcion(RESPONSE_AJAX_ERROR, ex.getMessage());
+				writer.write(new Gson().toJson(mensaje));
+				response.setStatus(RESPONSE_AJAX_HTTP_CODE_ERROR);
+			}
+		}
+	}
+	
 	private void formularioAgregarMerito(VistaMeritosPreferentesCandidato bean) 
 			throws SQLException, UVException {
 		bean.setVista(JSP_FORMULARIO);
 		bean.setMeritosPreferente(ModeloMeritosPreferentes.obtenerInstancia().getMeritosPreferentesPorPosesion());
-		// bean.setCodigoPadreMeritoPreferente(ModeloParametrosConfiguracion.obtenerInstancia().getParametroByNombre("codmeritopreferente"));
-		bean.setCodigoPadreMeritoPreferente("IV");
+		
+		ParametrosConfiguracion config = ModeloParametrosConfiguracion.obtenerInstancia().getParametroByNombre("bolsaempleo.local.codMeritoPreferente");
+		bean.setCodigoPadreMeritoPreferente(config.getValor());		
 	}
 	
 	private void agregarMerito(VistaMeritosPreferentesCandidato bean, UVDatos datos, HttpServletRequest request, HttpServletResponse response) 
 			throws SQLException, UVException, IOException {
 		formularioAgregarMerito(bean);
 				
-		MeritoPreferenteUsuario mp = validateMeritoPreferenteUsuario(request, datos);		
+		MeritoPreferenteUsuario mp = validateMeritoPreferenteUsuario(request, datos);
 		ModeloMeritosPreferentesCandidato.obtenerInstancia().insertaMeritoUsuario(mp);
 		
 		BolsaEmpleoUtils.addMensajeDeExito("Mérito preferente añadido correctamente", bean, request);
@@ -253,6 +289,15 @@ public class ControladorMisMeritosPreferentes extends HttpServlet {
 		mpu.setMeritoPreferente(ModeloMeritosPreferentes.obtenerInstancia().getMeritoPreferenteById(
 				Formateador.leeParametroInteger(request.getParameter(PARAM_MERITO_PREFERENTE))));
 		
+		if (mpu.getMeritoPreferente().getTipoCalculo().equals(ModeloMeritosPreferentes.TIPO_CALCULO_OPCIONES)) {
+			mpu.setMeritoPreferenteOpcion(ModeloMeritosPreferentes.obtenerInstancia().getMeritoPreferenteOpcionById(
+					Formateador.leeParametroInteger(request.getParameter(PARAM_MERITO_PREFERENTE_OPCION))));
+			
+			if (!mpu.getMeritoPreferenteOpcion().getMeritoPreferenteCodNum().equals(mpu.getMeritoPreferente().getCodNum())) {
+				throw new UVException("Opción no válida");
+			}
+		}
+		
 		mpu.setUsuario(ModeloUsuarioBolsaEmpleo.obtenerInstancia().getUsuarioCandidato(datos));
 		if (!mpu.getUsuario().isCandidato()) {
 			throw new UVException("El usuario debe ser un candidato");
@@ -274,6 +319,11 @@ public class ControladorMisMeritosPreferentes extends HttpServlet {
 		} catch (ServletException | IOException ex) {
 			LOGGER.log(Level.WARNING, ex.toString());
 			throw new UVException("Error guardando fichero");
+		}
+		
+		// solo puede haber un mérito preferente por tipo y activo y usuario
+		if (!ModeloMeritosPreferentesCandidato.obtenerInstancia().compruebaSoloUnTipoDeMeritoPrefenteActivo(mpu)) {
+			throw new UVException("Ya tiene una acreditación del mismo tipo");
 		}
 				
 		return mpu;

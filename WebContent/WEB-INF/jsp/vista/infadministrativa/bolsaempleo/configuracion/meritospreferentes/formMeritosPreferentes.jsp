@@ -53,7 +53,8 @@ MeritoPreferente merito = bean.getMeritoPreferente();
     	<div class="form-group-container col1">
 			<div class="form-group">
     			<label for="descripcion">Observaciones</label>
-    			<textarea class="params form-input-custom" id="observaciones" name="<%=ControladorMeritosPreferentes.PARAM_MERITO_OBSERVACIONES%>" rows="3" cols="60"><%=BolsaEmpleoUtils.getParamForm(request, ControladorMeritosPreferentes.PARAM_MERITO_OBSERVACIONES, merito != null ? merito.getObservaciones() : "")%></textarea>
+    			<textarea class="params form-input-custom" id="observaciones" 
+    					  name="<%=ControladorMeritosPreferentes.PARAM_MERITO_OBSERVACIONES%>" rows="3" cols="60"><%=BolsaEmpleoUtils.getParamForm(request, ControladorMeritosPreferentes.PARAM_MERITO_OBSERVACIONES, merito != null && merito.getObservaciones() != null ? merito.getObservaciones() : "")%></textarea>
    			</div>
 		</div>
 		
@@ -408,7 +409,24 @@ MeritoPreferente merito = bean.getMeritoPreferente();
 			    "columns": [
 			        {'data': 'nombre'},		       
 			        {'data': 'factor'},
-			        {'data': 'codNum', 'render': function(row) { return "hola"; }},
+			        {'data': 'codNum', 'buttons': [
+		        		{'label': 'Borrar', 'onClick': function(row) {
+		        			Atis.confirmDialog("Borrar opción", "¿Está seguro de borrar la opción?", {
+		            			Si: function() {
+		            				var params = {
+	    		        				'a': '<%= ControladorMeritosPreferentes.ACCION_DESACTIVAR_OPCION %>', 
+	    		        				'<%= ControladorMeritosPreferentes.PARAM_ID %>': '<%= merito.getCodNum() %>',
+	    		        				'<%= ControladorMeritosPreferentes.PARAM_ID_OPCION %>': row.codNum
+	    		        			};
+	    		        			Atis.sendForm("<%=request.getRequestURI()%>", params);
+		              				$(this).dialog("close");
+		            			},
+		            			No: function() {
+		              				$(this).dialog("close");
+		            			}
+		          			});
+		        		}},
+		        	]}
 				],
 				"actions": [
 			    	{'label': 'Nueva opción', 'onClick': function() {
