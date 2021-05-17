@@ -3,6 +3,7 @@ package usuario;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
 import java.util.concurrent.TimeUnit;
 
@@ -74,12 +75,14 @@ public class DriverUv {
 	 */
 	public static void capturaPantalla(String nombre) {
 		File scrFile = ((TakesScreenshot) driver).getScreenshotAs(OutputType.FILE);
-	    String directorio = "/tmp/";
+	    String directorioBase = "/tmp/";
 		if (getTipoSistema().contains("win")) {
-			directorio = System.getProperty("java.io.tmpdir");
+			directorioBase = System.getProperty("java.io.tmpdir");
 		}
+		directorioBase += "pruebasSelenium/";
 	    try {
-	    	String nombreFichero = directorio + contador++ + "-" + nombre + ".png";
+			Files.createDirectories(Paths.get(directorioBase));
+	    	String nombreFichero = directorioBase + contador++ + "-" + nombre + ".png";
 			Files.copy(scrFile.toPath(), (new File(nombreFichero)).toPath(), StandardCopyOption.REPLACE_EXISTING);
 		} catch (IOException e) {
 			e.printStackTrace();
