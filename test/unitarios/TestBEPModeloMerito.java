@@ -46,7 +46,9 @@ public class TestBEPModeloMerito {
     @BeforeClass
     public static void preparaBd() throws SQLException, IOException, ParseException {
     	DataSource ds = BbddRunner.obtenerDataSourceUv();
+    	DataSource dsArcos = BbddRunner.obtenerDataSourceArcos();
     	Conexion.setConexionUvirtual(ds);
+    	Conexion.setConexionArcos(dsArcos);
     	UtilsTestBolsaEmpleo.inicializaBolsaEmpleo();
     }
     

@@ -34,16 +34,16 @@ import es.ujaen.uvirtual.utilidades.UVException;
 */
 @FixMethodOrder(MethodSorters.NAME_ASCENDING)
 public class TestBEPModeloMisTitulaciones {
-	private static final String CODCUENTA = "test2";
+	private static final String CODCUENTA = "testTitulacion";
 	private static final Rol ROL = new Rol(1050);
-	private static final String DOCUMENTO = "123456789A";
+	private static final String DOCUMENTO = "11111222Z";
 	private static final Boolean LISTADIST = true;
 	private static final Boolean EXCLUIDO = false;
 	private static final String EXCLUIDOTIPO = "EJEMPLO";
 	private static final Date FECHAEXCLUSIONINICIO = new java.sql.Date(Calendar.getInstance().getTime().getTime());
 	private static final Date FECHAEXCLUSIONFIN = new java.sql.Date(Calendar.getInstance().getTime().getTime());
 	
-	private static final Integer CODNUM = 10;
+	private static final Integer CODNUM = 8;
 	private static final Integer CODNUM_TITULACION = 1;
 	private static final String NOMBRE = "nombre";
 	private static final UsuarioBolsaEmpleo USUARIO = 
@@ -59,7 +59,9 @@ public class TestBEPModeloMisTitulaciones {
     @BeforeClass
     public static void preparaBd() throws SQLException, IOException, ParseException {
     	DataSource ds = BbddRunner.obtenerDataSourceUv();
+    	DataSource dsArcos = BbddRunner.obtenerDataSourceArcos();
     	Conexion.setConexionUvirtual(ds);
+    	Conexion.setConexionArcos(dsArcos);
     	UtilsTestBolsaEmpleo.inicializaBolsaEmpleo();
     }
     

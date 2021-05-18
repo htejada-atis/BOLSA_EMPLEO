@@ -48,7 +48,13 @@ public class TestBEPModeloTitulacion {
     	ModeloTitulacion modelo = ModeloTitulacion.obtenerInstancia();
     	modelo.insertaTitulacion(titulacion);
     	List<Titulacion> titulaciones = modelo.listaTitulaciones();
-    	assertTrue("titulacion insertada debe ser listada", titulaciones.contains(titulacion));
+    	Boolean insertado = false;
+    	for (Titulacion tit: titulaciones) {
+    		if (tit.getNombre().equals(titulacion.getNombre())) {
+    			insertado = true;
+    		}
+    	}
+    	assertTrue("titulacion insertada debe ser listada", insertado);
     }
     
 //    /** test acierto borrar titulacion.

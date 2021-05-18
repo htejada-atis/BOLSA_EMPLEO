@@ -11,6 +11,7 @@ import java.util.List;
 
 import javax.sql.DataSource;
 
+import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.FixMethodOrder;
 import org.junit.Test;
@@ -32,10 +33,14 @@ import es.ujaen.uvirtual.utilidades.UVException;
 */
 @FixMethodOrder(MethodSorters.NAME_ASCENDING)
 public class TestBEPModeloBaremacion {
+	private static final Integer APARTADO_CODNUM_1 = 4;
+	private static final Integer APARTADO_CODNUM_2 = 5;
+	
 	private static final Integer APARTADO_CODNUM = 4;
-	private static final String APARTADO_CODIGO = "AAA";
-	private static final String APARTADO_CODIGO2 = "AAA2";
+	private static final String APARTADO_CODIGO = "zzz";
+	private static final String APARTADO_CODIGO2 = "zzz2";
 	private static final String APARTADO_NOMBRE = "EEEE";
+	private static final String APARTADO_NOMBRE_ACT = "ZZ";
 	private static final Boolean APARTADO_ACTIVO = true;
 	private static final Float APARTADO_PUNTUACIONMAXIMA = (float) 1;
 	private static final Float APARTADO_PORCENTAJEMAXIMO = (float) 1;
@@ -44,6 +49,7 @@ public class TestBEPModeloBaremacion {
 	private static final String BLOQUE_CODIGO = "A";
 	private static final String BLOQUE_CODIGO2 = "B";
 	private static final String BLOQUE_NOMBRE = "EE";
+	private static final String BLOQUE_NOMBRE_ACT = "ZZ";
 	private static final Boolean BLOQUE_ACTIVO = true;
 	private static final ApartadoBaremacion BLOQUE_APARTADO =
 			new ApartadoBaremacion(APARTADO_CODNUM, APARTADO_CODIGO, APARTADO_NOMBRE, APARTADO_ACTIVO, APARTADO_PUNTUACIONMAXIMA, APARTADO_PORCENTAJEMAXIMO);
@@ -53,6 +59,7 @@ public class TestBEPModeloBaremacion {
 	private static final String ITEM_CODIGO = "AAA";
 	private static final String ITEM_CODIGO2 = "BBB";
 	private static final String ITEM_NOMBRE = "EEEE";
+	private static final String ITEM_NOMBRE_ACT = "ZZZ";
 	private static final String ITEM_DESCRIPCION = "EEEE";
 	private static final Boolean ITEM_ACTIVO = true;
 	private static final BloqueBaremacion ITEM_BLOQUE =
@@ -67,12 +74,20 @@ public class TestBEPModeloBaremacion {
      * @throws SQLException si error en bd
      * @throws IOException si error en ficheros
 	 * @throws ParseException si error fecha
+	 * @throws UVException .
      */
     @BeforeClass
-    public static void preparaBd() throws SQLException, IOException, ParseException {
+    public static void preparaBd() throws SQLException, IOException, ParseException, UVException {
     	DataSource ds = BbddRunner.obtenerDataSourceUv();
     	Conexion.setConexionUvirtual(ds);
     	UtilsTestBolsaEmpleo.inicializaBolsaEmpleo();
+    	
+    	//desactivamos apartado para poder operar con ellos
+    	Integer codNum = 1;
+		ModeloBaremacionApartados modelo = ModeloBaremacionApartados.obtenerInstancia();
+		ApartadoBaremacion apartado = modelo.getApartadoBaremacionById(codNum);
+		
+		modelo.desactivarApartado(apartado);
     }
     
     /** test acierto inserta apartado.
@@ -215,9 +230,9 @@ public class TestBEPModeloBaremacion {
 	public void testA04EditarApartado() throws SQLException, UVException {
 		ModeloBaremacionApartados modelo = ModeloBaremacionApartados.obtenerInstancia();
 		List<ApartadoBaremacion> apartados = modelo.listaApartadoBaremacion();
-		ApartadoBaremacion apartado = apartados.get(0);
+		ApartadoBaremacion apartado = apartados.get(apartados.size() - 1);
 		ApartadoBaremacion apartadoActualizado = modelo.getApartadoBaremacionById(apartado.getCodNum());
-		apartado.setNombre(APARTADO_NOMBRE);
+		apartado.setNombre(APARTADO_NOMBRE_ACT);
 		modelo.actualizaApartado(apartado);
 
 		assertFalse("apartado debe ser actualizado", apartado.equals(apartadoActualizado));
@@ -231,9 +246,9 @@ public class TestBEPModeloBaremacion {
 	public void testA05EditarBloque() throws SQLException, UVException {
 		ModeloBaremacionBloques modelo = ModeloBaremacionBloques.obtenerInstancia();
 		List<BloqueBaremacion> bloques = modelo.listaBloqueBaremacion();
-		BloqueBaremacion bloque = bloques.get(0);
+		BloqueBaremacion bloque = bloques.get(bloques.size() - 1);
 		BloqueBaremacion bloqueActualizado = modelo.getBloqueBaremacionById(bloque.getCodNum());
-		bloque.setNombre(BLOQUE_NOMBRE);
+		bloque.setNombre(BLOQUE_NOMBRE_ACT);
 		modelo.actualizaBloque(bloque);
 
 		assertFalse("apartado debe ser actualizado", bloque.equals(bloqueActualizado));
@@ -247,9 +262,9 @@ public class TestBEPModeloBaremacion {
     public void testA06EditarItem() throws SQLException, UVException {
     	ModeloBaremacionItems modelo = ModeloBaremacionItems.obtenerInstancia();
     	List<ItemBaremacion> items = modelo.listaItemBaremacion();
-    	ItemBaremacion item = items.get(0);
+    	ItemBaremacion item = items.get(items.size() - 1);
     	ItemBaremacion itemActualizado = modelo.getItemBaremacionById(item.getCodNum());
-    	item.setNombre(ITEM_NOMBRE);
+    	item.setNombre(ITEM_NOMBRE_ACT);
     	modelo.actualizaItem(item);
 
     	assertFalse("item debe ser actualizado", item.equals(itemActualizado));
@@ -295,4 +310,25 @@ public class TestBEPModeloBaremacion {
 		modelo.insertaItem(item);
 		fail();
 	}
+	
+	/** reactiva el apartado desactivado .
+     * @throws SQLException si error en bd
+     * @throws IOException si error en ficheros
+	 * @throws ParseException si error fecha
+	 * @throws UVException .
+     */
+    @AfterClass
+    public static void activaApartado() throws SQLException, IOException, ParseException, UVException {
+    	//desactivamos apartado para poder operar con ellos
+    	Integer codNum = 1;
+		ModeloBaremacionApartados modelo = ModeloBaremacionApartados.obtenerInstancia();
+		ApartadoBaremacion apartado = modelo.getApartadoBaremacionById(codNum);
+		ApartadoBaremacion apartadoNew1 = modelo.getApartadoBaremacionById(APARTADO_CODNUM_1);
+		ApartadoBaremacion apartadoNew2 = modelo.getApartadoBaremacionById(APARTADO_CODNUM_2);
+		
+		modelo.desactivarApartado(apartadoNew1);
+		modelo.desactivarApartado(apartadoNew2);
+		modelo.activarApartado(apartado);
+    }
+	
 }
