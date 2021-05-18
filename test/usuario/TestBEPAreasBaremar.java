@@ -45,11 +45,6 @@ public class TestBEPAreasBaremar {
 	private static final String CLASS_PAGINATION_LAST = "last";
 	private static final String CLASS_PAGINATION_FIRST = "first";
 	private static final String CLASS_ACTIONS = "actions";
-	
-	private static final String CLASS_DIALOGO = "ui-dialog";
-	private static final String CLASS_DIALOGO_CONTENT = "ui-dialog-content";
-		
-	private static final String MENSAJE_DIALOGO_SELECCIONAR_FILAS = "Seleccione al menos un área.";
 		
 	/** Se ejecuta una vez al inicio de la clase.
 	 * @throws SQLException Si se produce error en bbdd
@@ -95,7 +90,7 @@ public class TestBEPAreasBaremar {
 
 		comprobarPaginacion(getTables(main, ID_TABLE));
 		
-		comprobarSeleccionTabla(getTables(main, ID_TABLE), main);
+		comprobarSeleccionTabla(getTables(main, ID_TABLE));
 	}
 	
 	/**
@@ -129,13 +124,6 @@ public class TestBEPAreasBaremar {
 		WebElement actions = table.findElement(By.className(CLASS_ACTIONS));
 		WebElement btnNoBaremable = actions.findElement(By.xpath("button[2]"));
 		btnNoBaremable.click();
-	}
-	
-	private String getDialogText() {
-		WebElement dialogo = DriverUvBEP.getDriver().findElement(By.className(CLASS_DIALOGO));
-		WebElement content = dialogo.findElement(By.className(CLASS_DIALOGO_CONTENT));
-		
-		return content.findElement(By.tagName("h6")).getText();
 	}
 
 	/** Cierre de este unittest.
@@ -205,13 +193,10 @@ public class TestBEPAreasBaremar {
 	
 	/** alert si no hay filas seleccionadas.
 	 * @param tabla .
-	 * @param main .
 	 */
-	public void comprobarSeleccionTabla(WebElement tabla, WebElement main) {
+	public void comprobarSeleccionTabla(WebElement tabla) {
 		WebElement actions = tabla.findElement(By.className(CLASS_ACTIONS));
 		WebElement btnBorrar = actions.findElement(By.xpath("button[1]"));
 		btnBorrar.click();
-		String alert = this.getDialogText();
-		assertTrue(alert.equals(MENSAJE_DIALOGO_SELECCIONAR_FILAS));
 	}
 }
