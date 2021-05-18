@@ -24,7 +24,6 @@ if(bean.getTitulacion()!=null){
 
 %>
 
-
 <div class="bolsa-empleo">
 
 	<jsp:include page="/WEB-INF/jsp/vista/infadministrativa/bolsaempleo/mensajes.jsp" />
@@ -32,20 +31,22 @@ if(bean.getTitulacion()!=null){
 	<div class="titulo-bolsa-empleo" style="margin-top:1rem;">
 		<h2>Nueva titulación</h2>
 	</div>
-	
-	  <div class="form-group-container col2">
-    		<div class="form-group">
-    			<p>Seleccione la titulación y complete el formulario inferior:</p>
-    		</div>
-    		<div class="form-group">
-    			<p>Si no encuentra su titulación, pongase en contacto con nosotros</p>
-    		</div>
-    	</div>
+    
+    <div class="form-group-container col2">
+    	<div class="form-group">
+    		<p style="margin:0;">Seleccione la titulación y complete el formulario inferior. Si no encuentra su titulación, porfavor seleccione otra o pulse sobre <strong>"Otra titulación"</strong> e introduzca el nombre de la titulación no disponible: </p>
+   		</div>
+   		<div class="form-group" id="otraTitulacion">
+    		<a class="link-btn" href="#" style="margin-top:0">Otra titulación</a>
+   		</div>
+   		<div class="form-group" style="display:none;" id="volverTitulacion">
+    		<a class="link-btn" href="#" style="margin-top:0">Volver a titulaciones</a>
+   		</div>
+    </div>
     
 	<table class="bluetable bolsaempleo" id="tableTitulaciones">
 		<tr>
-			<th scope="col" style="width:15%">ID</th>
-			<th scope="col" style="width:85%">Nombre</th>			
+			<th scope="col" style="width:100%">Nombre</th>			
 		</tr>
 		<tbody>				
 		</tbody>
@@ -55,6 +56,10 @@ if(bean.getTitulacion()!=null){
 			</tr>
 		</tfoot>
 	</table>
+
+	<div class="form-group-container col1" id="nombreOtraTitulacion" style="display:none;">
+
+    </div>
 	
 	<p>Las etiquetas en <strong>negrita</strong> corresponden a campos de relleno obligatorio</p>
 	
@@ -63,8 +68,12 @@ if(bean.getTitulacion()!=null){
     			value="<%= ControladorMisTitulaciones.ACCION_AGREGAR_TITULACION %>" />
 		<input type="hidden" name="<%= ControladorMisTitulaciones.PARAM_ID%>" id="titulacion_id" 
 				value="<%= bean.getTitulacion() != null ? bean.getTitulacion().getCodNum() : "" %>" />
+		<div class="form-group" id="otratitulacion" style="display:none;">
+    		<label for="nombre" class="bold-label">Nombre titulación: </label>
+    		<input class="form-input-custom" id="nombre" type="text" name="<%= ControladorMisTitulaciones.PARAM_OTRA_TITULACION %>" value="<%=BolsaEmpleoUtils.getParamForm(request, ControladorMisTitulaciones.PARAM_OTRA_TITULACION, "")%>"/>
+    	</div>
 		<div class="form-group">
-    		<label for="razon_exclusion">Descripción</label>
+    		<label for="razon_exclusion" class="bold-label">Descripción</label>
     		<textarea class="params form-input-custom" id="descripcion" name="<%= ControladorMisTitulaciones.PARAM_DESCRIPCION %>" rows="3" cols="60"><%=BolsaEmpleoUtils.getParamForm(request, ControladorMisTitulaciones.PARAM_DESCRIPCION, "")%></textarea>
    		</div>
    		
@@ -103,12 +112,34 @@ $(document).ready(function() {
     	"selected": <%= titulacion %> ,
     	<% } %>
     	"columns": [
-    		{'data': 'codNum'},
         	{'data': 'nombre', 'class': 'overflow-auto', 'filter': {'type': 'text'}}
     	]
 	});
 
+	$('#otraTitulacion').click(function(event) { 
+		$('#tableTitulaciones').hide();
+		$('#otratitulacion').show();
 
+		$('#volverTitulacion').show();
+		$('#otraTitulacion').hide();
+		
+		document.getElementById("agregar_titulacion_usuario").style.visibility = "visible";
+		$('#descripcion').val("");
+		$('#fichero_archivo').val(null);
+	});
+	
+	$('#volverTitulacion').click(function(event) { 
+		$('#otratitulacion').hide();
+		$('#tableTitulaciones').show();
+
+		$('#volverTitulacion').hide();
+		$('#otraTitulacion').show();
+		
+		document.getElementById("agregar_titulacion_usuario").style.visibility = "hidden";
+		$('#descripcion').val("");
+		$('#fichero_archivo').val(null);
+	});
+	
 	document.getElementById("agregar_titulacion_usuario").style.visibility = "hidden";
 
 	<% if (titulacion != null) { %>
@@ -122,7 +153,6 @@ $(document).ready(function() {
 		$('#agregar_titulacion').attr('value', 'Guardando titulación...');			
 		return true;
 	});
-	
 	
 });
 </script>

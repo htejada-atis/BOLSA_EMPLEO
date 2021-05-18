@@ -109,10 +109,10 @@ public class TestBEPModeloAfinidad {
 		ModeloAfinidad modelo = ModeloAfinidad.obtenerInstancia();
 		List<Afinidad> afinidades = modelo.listaAfinidades();
 		Afinidad afinidad = afinidades.get(0);
+		Afinidad afinidadActualizada = modelo.getAfinidadById(afinidad.getCodNum());
 		afinidad.setCodigo(CODIGOEDITAR);
 		modelo.actualizaAfinidad(afinidad);
-		Afinidad afinidadActualizada = modelo.getAfinidadById(afinidad.getCodNum());
-		
+
 		assertFalse("afinidad debe ser actualizada", afinidad.equals(afinidadActualizada));
 	}
     

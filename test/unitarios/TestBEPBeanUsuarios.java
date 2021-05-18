@@ -42,6 +42,7 @@ public class TestBEPBeanUsuarios {
 		UsuarioBolsaEmpleo usuario = new UsuarioBolsaEmpleo();
 		usuario.setCodNum(id);
 		usuario.setCodCuenta(CODCUENTA);
+		usuario.setEmail(EMAIL);
 		usuario.setRol(ROL);
 		usuario.setListaDist(LISTADIST);
 		usuario.setExcluido(EXCLUIDO);

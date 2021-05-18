@@ -24,6 +24,7 @@ import es.ujaen.uvirtual.modulo.bolsaempleo.beans.Titulacion;
 import es.ujaen.uvirtual.modulo.bolsaempleo.beans.TitulacionUsuario;
 import es.ujaen.uvirtual.modulo.bolsaempleo.beans.UsuarioBolsaEmpleo;
 import es.ujaen.uvirtual.modulo.bolsaempleo.modelo.ModeloMisTitulaciones;
+import es.ujaen.uvirtual.modulo.bolsaempleo.modelo.ModeloTitulacion;
 import es.ujaen.uvirtual.modulo.bolsaempleo.modelo.ModeloUsuarioBolsaEmpleo;
 import es.ujaen.uvirtual.modulo.bolsaempleo.utilidades.BolsaEmpleoDataTable;
 import es.ujaen.uvirtual.modulo.bolsaempleo.utilidades.BolsaEmpleoUtils;
@@ -58,6 +59,7 @@ public class ControladorMisTitulaciones extends HttpServlet {
 	public static final String PARAM_TITULACION = "titulacion";
 	public static final String PARAM_ARCHIVO = "archivo";
 	public static final String PARAM_DESCRIPCION = "descripcion";
+	public static final String PARAM_OTRA_TITULACION = "otratitulacion";
 	public static final String PARA_AGREGAR_TITULACION = "agregartitulacion";
 	public static final String PARAM_FICHERO = "fichero";
 	public static final String PARAM_TITULACIONES_USUARIOS_SELECCIONADOS = "titulacionesusuariosselected";
@@ -263,7 +265,7 @@ public class ControladorMisTitulaciones extends HttpServlet {
 	}
 	
 	private void seleccionarTitulacion(VistaTitulaciones bean, HttpServletRequest request) throws SQLException, UVException {
-		ModeloMisTitulaciones modelo = ModeloMisTitulaciones.obtenerInstancia();
+		ModeloTitulacion modelo = ModeloTitulacion.obtenerInstancia();
 		Integer codNum = Formateador.leeParametroInteger(request.getParameter(PARAM_TITULACION));
 		Titulacion titulacion = modelo.listaTitulacion(codNum);
 			
@@ -287,20 +289,34 @@ public class ControladorMisTitulaciones extends HttpServlet {
 				
 		bean.setVista(RUTA_BEP_CONF + "formMisTitulaciones.jsp");
 		
-		Integer codNum = Formateador.leeParametroInteger(request.getParameter(PARAM_ID));		
-		Titulacion titulacionCont = modelo.listaTitulacion(codNum);
+		Titulacion titulacionCont = null;
+		String otraTitulacion = null;
+		
+		if (Formateador.leeParametroInteger(request.getParameter(PARAM_ID)) != null) {
+			Integer codNum = Formateador.leeParametroInteger(request.getParameter(PARAM_ID));		
+			titulacionCont = ModeloTitulacion.obtenerInstancia().listaTitulacion(codNum);
+		} else {
+			otraTitulacion = Formateador.leeParametroString(request.getParameter(PARAM_OTRA_TITULACION));
+		}
 		
 		Part uploadedFile = request.getPart(PARAM_ARCHIVO);
 		
 		if (uploadedFile != null) {
 			TitulacionUsuario titulacion = this.validarTitulacion(request, uploadedFile);
-			titulacion.setTitulacion(titulacionCont);
+			if (titulacionCont != null) {
+				titulacion.setTitulacion(titulacionCont);
+			} else {
+				titulacion.setOtraTitulacion(otraTitulacion);
+			}
+			
 			titulacion.setUsuario(usu);
 				
 			modelo.insertaTitulacionUsuario(titulacion);
 				
 			bean.getMensajesDeExito().add(MENSAJE_EXITO_AGREGAR);
 			bean.setVista(RUTA_BEP_CONF + "index.jsp");
+			
+			response.sendRedirect(request.getServletPath());
 		}
 	}
 	

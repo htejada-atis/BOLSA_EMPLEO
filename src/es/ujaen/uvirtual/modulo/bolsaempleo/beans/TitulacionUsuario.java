@@ -11,6 +11,7 @@ public class TitulacionUsuario implements Serializable {
 	private static final long serialVersionUID = 1L;
 	private Integer codNum;
 	private String descripcion;
+	private String otratitulacion;
 	private transient InputStream archivo;
 	private Titulacion titulacion;
 	private UsuarioBolsaEmpleo usuario;
@@ -67,6 +68,7 @@ public class TitulacionUsuario implements Serializable {
 	public TitulacionUsuario(TitulacionUsuario copia) {
 		this.codNum = copia.codNum;
 		this.descripcion = copia.descripcion;
+		this.otratitulacion = copia.otratitulacion;
 		this.archivo = copia.archivo;
 		this.titulacion = copia.titulacion;
 		this.usuario = copia.usuario;
@@ -89,6 +91,14 @@ public class TitulacionUsuario implements Serializable {
 
 	public void setDescripcion(String descripcion) {
 		this.descripcion = descripcion;
+	}
+	
+	public String getOtraTitulacion() {
+		return otratitulacion;
+	}
+
+	public void setOtraTitulacion(String potratitulacion) {
+		this.otratitulacion = potratitulacion;
 	}
 
 	public static long getSerialversionuid() {
@@ -137,7 +147,7 @@ public class TitulacionUsuario implements Serializable {
 	
 	@Override
 	public String toString() {
-		return "Titulación Usuario [codNum=" + codNum + ", descripcion=" + descripcion + ", usuario=" + usuario + ", titulacion="
+		return "Titulación Usuario [codNum=" + codNum + ", descripcion=" + descripcion + ", otratitulacion=" + otratitulacion + ", usuario=" + usuario + ", titulacion="
 				+ titulacion + ", archivo=" + archivo + ", borrado=" + borrado + ", validada=" + validada + "]";
 	}
 	
@@ -147,6 +157,7 @@ public class TitulacionUsuario implements Serializable {
 		int result = 1;
 		result = prime * result + ((codNum == null) ? 0 : codNum.hashCode());
 		result = prime * result + ((descripcion == null) ? 0 : descripcion.hashCode());
+		result = prime * result + ((otratitulacion == null) ? 0 : otratitulacion.hashCode());
 		result = prime * result + ((usuario == null) ? 0 : usuario.hashCode());
 		result = prime * result + ((titulacion == null) ? 0 : titulacion.hashCode());
 		result = prime * result + ((archivo == null) ? 0 : archivo.hashCode());
@@ -173,6 +184,13 @@ public class TitulacionUsuario implements Serializable {
 				return false;
 			}
 		} else if (!descripcion.equals(other.descripcion)) {
+			return false;
+		}
+		if (otratitulacion == null) {
+			if (other.otratitulacion != null) {
+				return false;
+			}
+		} else if (!otratitulacion.equals(other.otratitulacion)) {
 			return false;
 		}
 		if (usuario == null) {
