@@ -97,7 +97,7 @@ public class Memcache {
 			try (Socket sock = new Socket(servidor.getHostString(), servidor.getPort())) {
 				comandoTelnet("flush_all", sock);
 			} catch (IOException e) {
-				throw new UVException(e.getMessage());
+				throw new UVException("servidor " + servidor.getHostString() + " " + e.getMessage());
 			}
 		}
 	}
@@ -144,7 +144,7 @@ public class Memcache {
 			}
 			i++;
 		}
-		if (i>=lecturasMax) {
+		if (i >= lecturasMax) {
 			throw new UVException("tamaño del buffer de comandoTelnet demasiado pequeño");
 		}
 		String cadena = builder.toString();
