@@ -35,7 +35,8 @@ public final class UtilsTestBolsaEmpleo {
 	public static final String ESQUEMA_ARCOS = "arcos";
 	public static final String ESQUEMA_RRHH = "rrhh";
 	public static final String ESQUEMA_UVIRTUAL = "uvirtual";	
-	public static final boolean VERBOSE = true;
+	
+	public static final boolean VERBOSE = false;
 	
 	private static boolean cargado;
 

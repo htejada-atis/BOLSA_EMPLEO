@@ -38,7 +38,7 @@ public class BbddRunner {
     
     private static String servidorMemcacheDefecto = "jenkins.ujaen.es";
 
-    public static final boolean VERBOSE = true;
+    public static final boolean VERBOSE = false;
 	
     private BbddRunner() { }
 	
