@@ -53,8 +53,7 @@ public class TestBEPModeloMeritosPreferentes {
 	private static final Integer ID_MERITO_NO_EXISTE = 111_111_111;
 	private static final String NOMBRE_OPCION = "OPCION 1";
 	private static final String MENSAJE_ERROR_HAY_EXCEPCION = "Excepción no esperada: %s";
-	
-	
+		
 	private static ApartadoBaremacion apartado;
 	private static BloqueBaremacion bloque;
 	private static ItemBaremacion item;
@@ -484,12 +483,11 @@ public class TestBEPModeloMeritosPreferentes {
 	 */
 	@Test
 	public void testE04OpcionMeritoRequerido() {
-		Throwable throwable = assertThrows(Throwable.class, () -> 
-		ModeloMeritosPreferentes.obtenerInstancia().getMeritoPreferenteOpcionById(null)
-	);
+		Throwable throwable = assertThrows(Throwable.class,
+				() -> ModeloMeritosPreferentes.obtenerInstancia().getMeritoPreferenteOpcionById(null));
 
-	assertEquals(UVException.class, throwable.getClass());
-	assertEquals(ModeloMeritosPreferentes.OPCION_MERITO_REQUERIDO, throwable.getMessage());
+		assertEquals(UVException.class, throwable.getClass());
+		assertEquals(ModeloMeritosPreferentes.OPCION_MERITO_REQUERIDO, throwable.getMessage());
 	}
 	
 	/**
@@ -497,11 +495,10 @@ public class TestBEPModeloMeritosPreferentes {
 	 */
 	@Test
 	public void testE05OpcionMeritoNoExiste() {
-		Throwable throwable = assertThrows(Throwable.class, () -> 
-		ModeloMeritosPreferentes.obtenerInstancia().getMeritoPreferenteOpcionById(ID_MERITO_NO_EXISTE)
-	);
+		Throwable throwable = assertThrows(Throwable.class,
+				() -> ModeloMeritosPreferentes.obtenerInstancia().getMeritoPreferenteOpcionById(ID_MERITO_NO_EXISTE));
 
-	assertEquals(UVException.class, throwable.getClass());
-	assertEquals(ModeloMeritosPreferentes.OPCION_MERITO_NOEXISTE, throwable.getMessage());
+		assertEquals(UVException.class, throwable.getClass());
+		assertEquals(ModeloMeritosPreferentes.OPCION_MERITO_NOEXISTE, throwable.getMessage());
 	}
 }

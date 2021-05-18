@@ -1,14 +1,9 @@
 package es.ujaen.uvirtual.modulo.bolsaempleo.vistas;
 
 import java.io.Serializable;
-import java.util.ArrayList;
 import java.util.List;
 
 import es.ujaen.uvirtual.beans.vistas.Vista;
-import es.ujaen.uvirtual.modulo.bolsaempleo.beans.ApartadoBaremacion;
-import es.ujaen.uvirtual.modulo.bolsaempleo.beans.BloqueBaremacion;
-import es.ujaen.uvirtual.modulo.bolsaempleo.beans.ItemBaremacion;
-import es.ujaen.uvirtual.modulo.bolsaempleo.beans.Merito;
 import es.ujaen.uvirtual.modulo.bolsaempleo.beans.MeritoPreferente;
 import es.ujaen.uvirtual.modulo.bolsaempleo.beans.MeritoPreferenteOpcion;
 import es.ujaen.uvirtual.modulo.bolsaempleo.beans.MeritoPreferenteUsuario;
