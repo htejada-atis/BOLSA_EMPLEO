@@ -297,7 +297,6 @@ VistaSolicitudes bean = (VistaSolicitudes) uvdatos.getVistas().get(VistaSolicitu
 			    },
 			    "columns": [
 			    	{'data': 'codNum', 'selectable': {'onChange': function(row, checkbox) {
-			    				console.log("onChange aaa");
 			    				var accion = checkbox.checked ? '<%=ControladorMisSolicitudes.ACCION_MERITO_SELECCIONADO%>'
 			    						: '<%=ControladorMisSolicitudes.ACCION_MERITO_DESELECCIONADO%>';
 				    			var params = {

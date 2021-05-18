@@ -361,9 +361,9 @@ public class ModeloSolicitud {
 			try (ResultSet rs = stmt.executeQuery()) {
 				while (rs.next()) {
 					Bolsa bolsa = modeloBolsa.getBolsaById(rs.getInt(BEPBOL_CODNUM));
-					List<MeritoSolicitud> meritos = this.getMeritosSolicitudBolsa(solicitud, bolsa);
+					List<MeritoSolicitudTable> meritos = this.getMeritosValoracionesSolicitudBolsa(solicitud, bolsa);
 					bolsas.add(new BolsaSolicitud(bolsa, meritos));
-				}				
+				}
 			}
 		}
 		
@@ -884,6 +884,46 @@ public class ModeloSolicitud {
 							rs.getString(FLGEXCLUIDO).equals(S)
 					);
 					meritos.add(ms);
+				}
+			}
+		}
+		
+		return meritos;
+	}
+	
+	/**
+	 * Devuelve los méritos con valoraciones de la bolsa en una solicitud .
+	 * @param bolsa .
+	 * @param solicitud .
+	 * @return .
+	 * @throws SQLException .
+	 * @throws UVException .
+	 * @throws SQLException .
+	 * @throws UVException .
+	 */
+	public List<MeritoSolicitudTable> getMeritosValoracionesSolicitudBolsa(Solicitud solicitud, Bolsa bolsa) throws SQLException, UVException {
+		List<MeritoSolicitudTable> meritos = new ArrayList<>();
+		
+		String consulta = "SELECT bepsbm.BEPMER_CODNUM, bepsbm.CODNUM FROM UVIRTUAL.TBEP_SOLICITUD_BOLSAS_MERITOS bepsbm"
+				+ "	LEFT JOIN UVIRTUAL.TBEP_SOLICITUD_BOLSAS_MERITOS_VALORACION bepsbv ON bepsbm.CODNUM = bepsbv.BEPSBM_CODNUM"
+				+ "	INNER JOIN UVIRTUAL.TBEP_SOLICITUD_BOLSAS bepsbo ON bepsbo.CODNUM  = bepsbm.BEPSBO_CODNUM"
+				+ "	WHERE bepsbo.BEPBOL_CODNUM = ? AND bepsbo.BEPSOL_CODNUM = ? GROUP BY bepsbm.BEPMER_CODNUM, bepsbm.CODNUM";
+		
+		try (Connection conexion = ConexionUvirtual.obtenerInstancia(); PreparedStatement stmt = conexion.prepareStatement(consulta)) {
+			int indexParam = 1;
+			stmt.setInt(indexParam++, bolsa.getCodNum());
+			stmt.setInt(indexParam++, solicitud.getCodNum());
+			
+			try (ResultSet rs = stmt.executeQuery()) {
+				while (rs.next()) {
+					Merito merito = ModeloMerito.obtenerInstancia().getMeritoById(rs.getInt(BEPMER_CODNUM), false, false);
+					Integer idMeritoSolicitud = rs.getInt(CODNUM);
+					MeritoSolicitud ms = idMeritoSolicitud != 0 ? this.getMeritoSolicitudById(idMeritoSolicitud) : null;
+					List<MeritoSolicitudValoracion> valoraciones = idMeritoSolicitud != null 
+							? this.getValoracionesMeritoSolicitud(idMeritoSolicitud, false) : new ArrayList<>();
+					
+					MeritoSolicitudTable row = new MeritoSolicitudTable(merito, ms, valoraciones);
+					meritos.add(row);
 				}
 			}
 		}

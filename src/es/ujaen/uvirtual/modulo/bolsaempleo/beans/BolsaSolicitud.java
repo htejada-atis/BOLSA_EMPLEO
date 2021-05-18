@@ -9,7 +9,7 @@ import java.util.List;
 public class BolsaSolicitud extends Bolsa implements Serializable {
 
 	private static final long serialVersionUID = 1L;
-	private List<MeritoSolicitud> listaMeritos;
+	private List<MeritoSolicitudTable> listaMeritos;
 	
 	/** Constructor por defecto.
 	 */
@@ -21,12 +21,12 @@ public class BolsaSolicitud extends Bolsa implements Serializable {
 	 * @param pbolsa .
 	 * @param plistaMeritos .
 	 */
-	public BolsaSolicitud(Bolsa pbolsa, List<MeritoSolicitud> plistaMeritos) {
+	public BolsaSolicitud(Bolsa pbolsa, List<MeritoSolicitudTable> plistaMeritos) {
 		super(pbolsa);
 		this.listaMeritos = plistaMeritos;
 	}
 	
-	public List<MeritoSolicitud> getListaMeritos() {
+	public List<MeritoSolicitudTable> getListaMeritos() {
 		return listaMeritos;
 	}
 	
@@ -34,7 +34,7 @@ public class BolsaSolicitud extends Bolsa implements Serializable {
 		return listaMeritos.size();
 	}
 	
-	public void setListaMeritos(List<MeritoSolicitud> meritos) {
+	public void setListaMeritos(List<MeritoSolicitudTable> meritos) {
 		this.listaMeritos = meritos;
 	}
 	
