@@ -99,6 +99,8 @@ pipeline {
     	}
         always {
         	script {
+        		def summary = junit testResults: 'builds/build/rama/site/jacoco/*.xml'
+        	    sh "python3 /home/jenkins-nodo/Documentos/envioChat.py -i \"${JOB_NAME}\" -o \"resultados de las pruebas ${BUILD_NUMBER} - Total: ${summary.totalCount}, Failures: ${summary.failCount}, Skipped: ${summary.skipCount}, Passed: ${summary.passCount}\""
         	    sh "touch builds/build/rama/site/jacoco/unittest.zip"
 	    		zip zipFile: 'builds/build/rama/site/jacoco/unittest.zip', archive: false, dir: 'builds/build/rama/site/jacoco/', overwrite: true, glob: '**/*.txt'
         	}
