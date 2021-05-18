@@ -112,6 +112,7 @@ public class BolsaEmpleoDataTable<T> {
 	private String queryCount;
 	private Integer pageSize;
 	private Integer currentPage;
+	private Integer recordsTotal;
 	private Integer pagesTotal;
 	private Integer orderBy;
 	private String orderDirection;
@@ -261,8 +262,8 @@ public class BolsaEmpleoDataTable<T> {
 			if (!rs.next()) {
 				throw new UVException("Error obteniendo número total de filas");
 			}
-			Integer recordsTotal = rs.getInt("count");
-			this.pagesTotal = recordsTotal / this.pageSize;
+			this.recordsTotal = rs.getInt("count");
+			this.pagesTotal = this.recordsTotal / this.pageSize;
 			if (recordsTotal % this.pageSize == 0) {
 				this.pagesTotal -= 1;
 			}

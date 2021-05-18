@@ -229,9 +229,9 @@ function DataTable(id, config) {
     	if (!self.lastResponse) { return ''; }
     	
         // texto total
-        var selected = self.getCheckedItems();  
-        var labelTotal = self.lastResponse.recordsTotal ? 'Total ' + self.lastResponse.recordsTotal : '';
-        var labelSelected = selected.length > 0 ? ' (Seleccionados ' + selected.length + ')' : ''
+        var selected = self.getCheckedItems();
+        var labelTotal = self.lastResponse.recordsTotal ? 'Total ' + self.lastResponse.recordsTotal : 'Total 0';
+        var labelSelected = selected.length > 0 ? ' (Seleccionados ' + selected.length + ')' : '';
         var textoTotal = '<span class="total">' + labelTotal + labelSelected +'</span>';
         
         // pagination
@@ -340,7 +340,7 @@ function DataTable(id, config) {
     
     this.prepareTable = function() {
         // si es selectable check en la cabecera para marcar/desmacar todos
-    	if (self.config.selectable) {
+    	if (self.config.selectable && self.config.selectable.all != false) {
     		var check = $('<input type="checkbox"/>')
     		$(check).on('change', function() { self.checkUncheckAll(this.checked); });
     		$('th', self.thead).first().append(check);
@@ -389,7 +389,7 @@ function DataTable(id, config) {
                         case 'selectBoolean':
                             filterElement = $('<select ' + name + '></select>');
                             filterElement.append($('<option value="0">-----</option>'));
-                                                        
+
                             if (columnDef.filter.true) {
                                 filterElement.append($('<option value="true" title="' + columnDef.filter.true + '" ' + (columnDef.filter.optionDefault == "true" ? ' selected' : '') + '>' + columnDef.filter.true + '</option>'));
                             } else {
