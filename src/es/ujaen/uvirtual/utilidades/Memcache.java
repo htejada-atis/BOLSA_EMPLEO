@@ -97,7 +97,9 @@ public class Memcache {
 			try (Socket sock = new Socket(servidor.getHostString(), servidor.getPort())) {
 				comandoTelnet("flush_all", sock);
 			} catch (IOException e) {
-				throw new UVException("servidor " + servidor.getHostString() + " " + e.getMessage());
+				String logMensaje = "servidor " + servidor.getHostString() + " " + servidor.getPort();
+				logMensaje = logMensaje + e.getMessage();
+				throw new UVException(logMensaje);
 			}
 		}
 	}
