@@ -60,6 +60,8 @@ public class ModeloMeritosPreferentes {
 		
 	public static final String ERROR_MERITO_NOEXITE = "El mérito no existe";
 	public static final String ERROR_MERITO_REQUERIDO = "El merito preferente es requerido";
+	public static final String OPCION_MERITO_REQUERIDO = "Opción de mérito requerido";
+	public static final String OPCION_MERITO_NOEXISTE = "No existe la opción del mérito";
 	
 	private static final String CODNUM = "CODNUM";
 	private static final String FACTOR = "FACTOR";
@@ -124,7 +126,7 @@ public class ModeloMeritosPreferentes {
 	 */
 	public MeritoPreferenteOpcion getMeritoPreferenteOpcionById(Integer codNum) throws SQLException, UVException {
 		if (codNum == null) {
-			throw new UVException("Opción de mérito requerido");
+			throw new UVException(OPCION_MERITO_REQUERIDO);
 		}
 		
 		String sql = "SELECT bepmpo.* FROM TBEP_MERITOS_PREFERENTES_OPCIONES bepmpo WHERE bepmpo.CODNUM = ?";
@@ -140,7 +142,7 @@ public class ModeloMeritosPreferentes {
 			}
 		}
 		
-		throw new UVException("No existe la opción del mérito");
+		throw new UVException(OPCION_MERITO_NOEXISTE);
 	}
     
 	/**
@@ -235,7 +237,7 @@ public class ModeloMeritosPreferentes {
 	 * @throws SQLException .
 	 * @throws UVException .
 	 */
-	public List<MeritoPreferenteOpcion> listadoOpcionesMeritosPreferentes(MeritoPreferente merito) throws SQLException, UVException {
+	public List<MeritoPreferenteOpcion> listadoOpcionesMeritosPreferentes(MeritoPreferente merito) throws SQLException {
 		List<MeritoPreferenteOpcion> data = new ArrayList<>();
 		
 		String consulta = "SELECT bepmpo.* FROM TBEP_MERITOS_PREFERENTES_OPCIONES bepmpo "
@@ -292,7 +294,7 @@ public class ModeloMeritosPreferentes {
 		}
 		
 		String sql = "INSERT INTO TBEP_MERITOS_PREFERENTES ("
-				+ "CODIGO,NOMBRE,DESCRIPCION,TIPO,APLICABLE,BASE,FACTOR,VALOR_MAXIMO,"
+				+ "CODIGO,NOMBRE,OBSERVACIONES,TIPO,APLICABLE,BASE,FACTOR,VALOR_MAXIMO,"
 				+ "BEPITE_TIPO_CODNUM,BEPBLO_APLICABLE_CODNUM,BEPAPA_APLICABLE_CODNUM,BEPITE_APLICABLE_CODNUM) "
 				+ "VALUES (?,?,?,?,?,?,?,?,?,?,?,?)";
 		
@@ -539,7 +541,9 @@ public class ModeloMeritosPreferentes {
 		obj.setCodNum(rs.getInt(CODNUM));
 		obj.setMeritoPreferenteCodNum(rs.getInt("BEPMEP_CODNUM"));
 		obj.setNombre(rs.getString("NOMBRE"));
-		obj.setFactor(rs.getDouble(FACTOR));		
+		obj.setFactor(rs.getDouble(FACTOR));
+		obj.setBorrado("S".equals(rs.getString("FLGBORRADO")));
+		obj.setFechaBorrado(rs.getDate("FECHA_BORRADO"));
 		return obj;
 	}
 }
