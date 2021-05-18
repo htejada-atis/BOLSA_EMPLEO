@@ -25,6 +25,7 @@ import es.ujaen.uvirtual.modulo.bolsaempleo.beans.UsuarioBolsaEmpleo;
 import es.ujaen.uvirtual.modulo.bolsaempleo.modelo.ModeloArea;
 import es.ujaen.uvirtual.modulo.bolsaempleo.modelo.ModeloDepartamento;
 import es.ujaen.uvirtual.modulo.bolsaempleo.modelo.ModeloEvaluador;
+import es.ujaen.uvirtual.modulo.bolsaempleo.modelo.ModeloRol;
 import es.ujaen.uvirtual.modulo.bolsaempleo.modelo.ModeloUsuarioBolsaEmpleo;
 import es.ujaen.uvirtual.modulo.bolsaempleo.utilidades.BolsaEmpleoDataTable;
 import es.ujaen.uvirtual.modulo.bolsaempleo.utilidades.BolsaEmpleoUtils;
@@ -198,9 +199,9 @@ public class ControladorGestionEvaluadores extends HttpServlet {
 			UsuarioBolsaEmpleo usuario = modeloUsuario.obtenerUsuarioBolsaEmpleoSiExiste(nombreUsuario);
 			
 			if (usuario == null) {
-				usuario = modeloUsuario.crearUsuarioBolsaEmpleo(ModeloUsuarioBolsaEmpleo.PARAM_ROL_COMISION_ID, nombreUsuario);
+				usuario = modeloUsuario.crearUsuarioBolsaEmpleo(ModeloRol.ID_ROL_MIEMBRO_COMISION, nombreUsuario);
 			} else {
-				if (!usuario.getRol().getCodNum().equals(ModeloUsuarioBolsaEmpleo.PARAM_ROL_COMISION_ID)) {
+				if (!usuario.getRol().getCodNum().equals(ModeloRol.ID_ROL_MIEMBRO_COMISION)) {
 					throw new UVException(MENSAJE_ERROR_ROL_COMISION);
 				}
 			}

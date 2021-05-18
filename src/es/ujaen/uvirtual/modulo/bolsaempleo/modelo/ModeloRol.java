@@ -21,10 +21,24 @@ public class ModeloRol {
 	public static final int ORDER_COLUMN_INDEX_DESCRIPCION = 2;
 	public static final int ORDER_COLUMN_INDEX_VALOR = 3;
 	
-    protected static ModeloRol eInstancia = null;
+	public static final Integer ID_ROL_SERVICIO_PERSONAL = 1050;
+	public static final Integer ID_ROL_MIEMBRO_COMISION = 1051;
+	public static final Integer ID_ROL_CANDIDATO = 1052;
+	public static final Integer ID_ROL_DIRECTOR_DEPARTAMENTO = 1053;
 	
-	/** Crea una instancia del objeto.
-	 *  de forma sincronizada para protegerse de posibles problemas multi-hilo
+	public static final String ROL_SERVICIO_PERSONAL = "bolemppersonal";	
+	public static final String ROL_MIEMBRO_COMISION = "bolempcomision";
+	public static final String ROL_CANDIDATO = "bolempcandidato";
+	public static final String ROL_DIRECTOR_DEPARTAMENTO = "bolempdirdepartamento";
+	
+	public static final String ERROR_ROL_REQUERIDO = "El rol es requerido";
+	public static final String ERROR_ROL_NO_EXISTE = "El rol no existe";
+
+	protected static ModeloRol eInstancia;
+
+	/**
+	 * Crea una instancia del objeto. de forma sincronizada para protegerse de
+	 * posibles problemas multi-hilo
 	 */
 	private static synchronized void crearInstancia() {
 		if (eInstancia == null) {
@@ -32,37 +46,44 @@ public class ModeloRol {
 		}
 	}
 
-    /**
-     * Obtiene una instancia de la conexión.
-     * @return instancia
-     */
-    public static ModeloRol obtenerInstancia() {
-        if (eInstancia == null) {
-        	crearInstancia();
-        }
-        return eInstancia;
-    }
-	
+	/**
+	 * Obtiene una instancia de la conexión.
+	 * 
+	 * @return instancia
+	 */
+	public static ModeloRol obtenerInstancia() {
+		if (eInstancia == null) {
+			crearInstancia();
+		}
+		return eInstancia;
+	}
+
 	/** Consulta areas en BBDD y las devuelve.
 	 * @return areas de la base de datos
 	 * @throws SQLException en caso de error de base de datos
 	 */
 	public List<Rol> listaRoles() throws SQLException {
-		List<Rol> roles = new ArrayList<Rol>();
-		String consulta = "SELECT admrol.* FROM ADM_ROL admrol WHERE ROL_CODNUM>1049";
-		
-		try (Connection conexion = ConexionUvirtual.obtenerInstancia();
-			PreparedStatement stmt = conexion.prepareStatement(consulta);) {
-				try (ResultSet rs = stmt.executeQuery()) {
-					while (rs.next()) {
-						Rol role = new Rol();
-						role.setCodNum(rs.getInt("ROL_CODNUM"));
-						role.setDescripcion(rs.getString("DESCRIPCION"));
-						role.setValor(rs.getString("VALOR"));
-						roles.add(role);	
-					}
+		List<Rol> roles = new ArrayList<>();
+		String consulta = "SELECT admrol.* FROM ADM_ROL admrol WHERE ROL_CODNUM IN (?,?,?,?)";
+
+		try (Connection conexion = ConexionUvirtual.obtenerInstancia(); PreparedStatement stmt = conexion.prepareStatement(consulta)) {
+			int paramIndex = 1;
+			
+			stmt.setInt(paramIndex++, ModeloRol.ID_ROL_SERVICIO_PERSONAL);
+			stmt.setInt(paramIndex++, ModeloRol.ID_ROL_MIEMBRO_COMISION);
+			stmt.setInt(paramIndex++, ModeloRol.ID_ROL_CANDIDATO);
+			stmt.setInt(paramIndex++, ModeloRol.ID_ROL_DIRECTOR_DEPARTAMENTO);
+			
+			try (ResultSet rs = stmt.executeQuery()) {
+				while (rs.next()) {
+					Rol role = new Rol();
+					role.setCodNum(rs.getInt("ROL_CODNUM"));
+					role.setDescripcion(rs.getString("DESCRIPCION"));
+					role.setValor(rs.getString("VALOR"));
+					roles.add(role);
 				}
 			}
+		}
 		return roles;
 	}
 		
@@ -75,18 +96,18 @@ public class ModeloRol {
 	 */
 	public Rol getRoleById(Integer codNum) throws SQLException, UVException {
 		if (codNum == null) {
-			throw new UVException("El rol es requerido");
+			throw new UVException(ERROR_ROL_REQUERIDO);
 		}
 			
 		String consulta = "SELECT admrol.* FROM ADM_ROL admrol WHERE admrol.ROL_CODNUM = ?";				
 			
 		try (Connection conexion = ConexionUvirtual.obtenerInstancia();
-				PreparedStatement stmt = conexion.prepareStatement(consulta);) {
+				PreparedStatement stmt = conexion.prepareStatement(consulta)) {
 			stmt.setInt(1, codNum);
 						
 			try (ResultSet rs = stmt.executeQuery()) {
 				if (!rs.next()) {
-					throw new UVException("No existe el role con id " + codNum);
+					throw new UVException(ERROR_ROL_NO_EXISTE);
 				}
 				
 				Rol role = new Rol();
