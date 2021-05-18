@@ -245,7 +245,7 @@ public class ControladorGestionNoticias extends HttpServlet {
 				BolsaEmpleoDataTable<Noticia> dataTable = modelo.listaNoticiasDatatable(request.getParameterMap());
 				bean.setDatatableNoticias(dataTable);
 				writer.write(dataTable.toJson());
-			} catch (UVException ex) {
+			} catch (Exception ex) {
 				CodigoDescripcion mensaje = new CodigoDescripcion("error", ex.getMessage());
 				writer.write(new Gson().toJson(mensaje));
 				response.setStatus(RESPONSE_HTTP_CODE_ERROR);
