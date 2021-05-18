@@ -2,11 +2,14 @@ package unitarios;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertThrows;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
 import java.io.IOException;
+import java.sql.Connection;
+import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.text.ParseException;
 import java.util.HashMap;
@@ -26,6 +29,7 @@ import es.ujaen.uvirtual.modulo.bolsaempleo.beans.ApartadoBaremacion;
 import es.ujaen.uvirtual.modulo.bolsaempleo.beans.BloqueBaremacion;
 import es.ujaen.uvirtual.modulo.bolsaempleo.beans.ItemBaremacion;
 import es.ujaen.uvirtual.modulo.bolsaempleo.beans.MeritoPreferente;
+import es.ujaen.uvirtual.modulo.bolsaempleo.beans.MeritoPreferenteOpcion;
 import es.ujaen.uvirtual.modulo.bolsaempleo.modelo.ModeloBaremacionItems;
 import es.ujaen.uvirtual.modulo.bolsaempleo.modelo.ModeloMeritosPreferentes;
 import es.ujaen.uvirtual.modulo.bolsaempleo.utilidades.BolsaEmpleoDataTable;
@@ -47,6 +51,7 @@ public class TestBEPModeloMeritosPreferentes {
 	private static final Double VALORMAXIMO = 100.0;
 	private static final Boolean ACTIVO = true;
 	private static final Integer ID_MERITO_NO_EXISTE = 111_111_111;
+	private static final String NOMBRE_OPCION = "OPCION 1";
 	private static final String MENSAJE_ERROR_HAY_EXCEPCION = "Excepción no esperada: %s";
 	
 	
@@ -120,6 +125,7 @@ public class TestBEPModeloMeritosPreferentes {
 		MeritoPreferente merito = new MeritoPreferente();
 		merito.setCodNum(CODNUM);
 		merito.setCodigo(CODIGO);
+		merito.setNombre(NOMBRE);
 		merito.setObservaciones(OBSERVACIONES);
 		merito.setTipo(TIPO);
 		merito.setTipoCalculo(TIPO_FACTOR);
@@ -259,7 +265,8 @@ public class TestBEPModeloMeritosPreferentes {
 		params.put(BolsaEmpleoDataTable.PARAM_ORDER_DIRECTION, new String[] {BolsaEmpleoDataTable.PARAM_ORDER_DIRECTION_VALUE_ASC});
 
 		try {
-			ModeloMeritosPreferentes.obtenerInstancia().listadoMeritosPreferentes(params);
+			BolsaEmpleoDataTable<MeritoPreferente> dt = ModeloMeritosPreferentes.obtenerInstancia().listadoMeritosPreferentes(params);
+			assertFalse(dt.getData().isEmpty());
 		} catch (SQLException | UVException ex) {
 			fail(String.format(MENSAJE_ERROR_HAY_EXCEPCION, ex.toString()));
 		}
@@ -322,10 +329,16 @@ public class TestBEPModeloMeritosPreferentes {
 	@Test
 	public void testA10CodigoInactivo() {
 		try {
-			// desactivamos todos los meritos preferentes
-			
+			// desactivamos todos los meritos preferentes		
+			String sql = "UPDATE TBEP_MERITOS_PREFERENTES SET FLGACTIVO = 'N'"; 
+			try (Connection con = BbddRunner.obtenerConexionUvirtual()) {
+				try (PreparedStatement stmt = con.prepareStatement(sql)) {
+					stmt.executeUpdate();
+				}
+			}
+						
 			MeritoPreferente merito = ModeloMeritosPreferentes.obtenerInstancia().getMeritoPreferenteById(CODNUM);
-			merito.setActivo(false);
+			merito.setActivo(false);			
 			ModeloMeritosPreferentes.obtenerInstancia().editarMeritoPreferente(merito);
 			merito = ModeloMeritosPreferentes.obtenerInstancia().getMeritoPreferenteById(CODNUM);			
 			assertFalse(merito.getActivo());
@@ -337,6 +350,94 @@ public class TestBEPModeloMeritosPreferentes {
 			fail(String.format(MENSAJE_ERROR_HAY_EXCEPCION, ex.toString()));
 		}
 	}
+	
+	/**
+	 * Crea un opción del un mérito preferente.
+	 */
+	@Test
+	public void testA11CrearOpcionMeritoPreferente() {
+		try {
+			// activamos el merito y lo ponemos como cálculo con opciones
+			MeritoPreferente merito = ModeloMeritosPreferentes.obtenerInstancia().getMeritoPreferenteById(CODNUM);
+			merito.setActivo(true);
+			merito.setTipoCalculo(ModeloMeritosPreferentes.TIPO_CALCULO_OPCIONES);
+			ModeloMeritosPreferentes.obtenerInstancia().editarMeritoPreferente(merito);
+			merito = ModeloMeritosPreferentes.obtenerInstancia().getMeritoPreferenteById(CODNUM);
+			assertEquals(merito.getTipoCalculo(), ModeloMeritosPreferentes.TIPO_CALCULO_OPCIONES);
+			
+			// creamos una opción
+			MeritoPreferenteOpcion opcion = new MeritoPreferenteOpcion();
+			opcion.setMeritoPreferenteCodNum(merito.getCodNum());
+			opcion.setNombre(NOMBRE_OPCION);
+			opcion.setFactor(FACTOR);			
+			Integer id = ModeloMeritosPreferentes.obtenerInstancia().crearMeritoPreferenteOpcion(opcion);
+			
+			// leemos y chequeamos opción
+			MeritoPreferenteOpcion opcionRead = ModeloMeritosPreferentes.obtenerInstancia().getMeritoPreferenteOpcionById(id);
+			assertEquals(opcionRead.getCodNum(), id);
+			assertEquals(opcionRead.getMeritoPreferenteCodNum(), merito.getCodNum());
+			assertEquals(opcionRead.getNombre(), opcion.getNombre());
+			assertEquals(opcionRead.getFactor(), opcion.getFactor());
+		} catch (SQLException | UVException ex) {
+			fail(String.format(MENSAJE_ERROR_HAY_EXCEPCION, ex.toString()));
+		}
+	}
+	
+	/**
+	 * Test datatable.
+	 */
+	@Test
+	public void testA12ListadoDeOpcionesMeritosDt() {
+		HashMap<String, String[]> params = new HashMap<>();
+
+		params.put(BolsaEmpleoDataTable.PARAM_CURRENT_PAGE, new String[] {"0"});
+		params.put(BolsaEmpleoDataTable.PARAM_PAGE_SIZE, new String[] {"10"});
+		params.put(BolsaEmpleoDataTable.PARAM_ORDER_BY, new String[] {"0"});
+		params.put(BolsaEmpleoDataTable.PARAM_ORDER_DIRECTION, new String[] {BolsaEmpleoDataTable.PARAM_ORDER_DIRECTION_VALUE_ASC});
+
+		try {
+			MeritoPreferente merito = ModeloMeritosPreferentes.obtenerInstancia().getMeritoPreferenteById(CODNUM);
+			BolsaEmpleoDataTable<MeritoPreferenteOpcion> dt = ModeloMeritosPreferentes.obtenerInstancia().listadoOpcionesMeritosPreferentes(params, merito);
+			
+			assertFalse(dt.getData().isEmpty());
+		} catch (SQLException | UVException ex) {
+			fail(String.format(MENSAJE_ERROR_HAY_EXCEPCION, ex.toString()));
+		}
+	}
+	
+	/**
+	 * Test datatable.
+	 */
+	@Test
+	public void testA13ListadoDeOpcionesMeritosDt() {
+		try {
+			MeritoPreferente merito = ModeloMeritosPreferentes.obtenerInstancia().getMeritoPreferenteById(CODNUM);
+			List<MeritoPreferenteOpcion> listado = ModeloMeritosPreferentes.obtenerInstancia().listadoOpcionesMeritosPreferentes(merito);
+			
+			assertEquals(listado.size(), 1);
+		} catch (SQLException | UVException ex) {
+			fail(String.format(MENSAJE_ERROR_HAY_EXCEPCION, ex.toString()));
+		}
+	}
+	
+	/**
+	 * Desactivar opción.
+	 */
+	@Test
+	public void testA14DesactivarOpcionMerito() {
+		try {
+			MeritoPreferenteOpcion opcion = ModeloMeritosPreferentes.obtenerInstancia().getMeritoPreferenteOpcionById(1);			
+			ModeloMeritosPreferentes.obtenerInstancia().desactivarMeritoPreferenteOpcion(opcion);
+			MeritoPreferenteOpcion opcionRead = ModeloMeritosPreferentes.obtenerInstancia().getMeritoPreferenteOpcionById(1);
+			
+			assertTrue(opcionRead.isBorrado());
+			assertNotNull(opcionRead.getFechaBorrado());
+		} catch (SQLException | UVException ex) {
+			fail(String.format(MENSAJE_ERROR_HAY_EXCEPCION, ex.toString()));
+		}
+	}
+	
+	
 	
 	/**
 	 * test error inserta merito preferente null.
@@ -376,5 +477,31 @@ public class TestBEPModeloMeritosPreferentes {
 
 		assertEquals(UVException.class, throwable.getClass());
 		assertEquals(ModeloMeritosPreferentes.ERROR_MERITO_NOEXITE, throwable.getMessage());
+	}
+	
+	/**
+	 * Opción mérito requerido.
+	 */
+	@Test
+	public void testE04OpcionMeritoRequerido() {
+		Throwable throwable = assertThrows(Throwable.class, () -> 
+		ModeloMeritosPreferentes.obtenerInstancia().getMeritoPreferenteOpcionById(null)
+	);
+
+	assertEquals(UVException.class, throwable.getClass());
+	assertEquals(ModeloMeritosPreferentes.OPCION_MERITO_REQUERIDO, throwable.getMessage());
+	}
+	
+	/**
+	 * Opción mérito requerido no exixste.
+	 */
+	@Test
+	public void testE05OpcionMeritoNoExiste() {
+		Throwable throwable = assertThrows(Throwable.class, () -> 
+		ModeloMeritosPreferentes.obtenerInstancia().getMeritoPreferenteOpcionById(ID_MERITO_NO_EXISTE)
+	);
+
+	assertEquals(UVException.class, throwable.getClass());
+	assertEquals(ModeloMeritosPreferentes.OPCION_MERITO_NOEXISTE, throwable.getMessage());
 	}
 }

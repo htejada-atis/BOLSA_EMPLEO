@@ -1,6 +1,7 @@
 package es.ujaen.uvirtual.modulo.bolsaempleo.beans;
 
 import java.io.Serializable;
+import java.util.Date;
 
 /**
  * Clase opción del mérito preferente.
@@ -13,7 +14,9 @@ public class MeritoPreferenteOpcion implements Serializable {
 	private Integer codNum;
 	private Integer meritoPreferenteCodNum;
 	private String nombre;	
-	private Double factor;	
+	private Double factor;
+	private Boolean borrado;
+	private Date fechaBorrado;
 
 	/**
 	 * Constructor por defecto.
@@ -28,12 +31,16 @@ public class MeritoPreferenteOpcion implements Serializable {
 	 * @param pmeritoPreferenteCodNum .
 	 * @param pnombre .
 	 * @param pfactor .
+	 * @param pborrado .
+	 * @param pfechaBorrado .
 	 */
-	public MeritoPreferenteOpcion(Integer pcodNum, Integer pmeritoPreferenteCodNum, String pnombre, Double pfactor) {		
+	public MeritoPreferenteOpcion(Integer pcodNum, Integer pmeritoPreferenteCodNum, String pnombre, Double pfactor, Boolean pborrado, Date pfechaBorrado) {		
 		this.codNum = pcodNum;
 		this.meritoPreferenteCodNum = pmeritoPreferenteCodNum;
 		this.nombre = pnombre;
 		this.factor = pfactor;
+		this.borrado = pborrado;
+		this.fechaBorrado = pfechaBorrado;
 	}
 
 	/**
@@ -46,6 +53,8 @@ public class MeritoPreferenteOpcion implements Serializable {
 		this.meritoPreferenteCodNum = copia.codNum;
 		this.nombre = copia.nombre;
 		this.factor = copia.factor;
+		this.borrado = copia.borrado;
+		this.fechaBorrado = copia.fechaBorrado;
 	}
 
 	public Integer getCodNum() {
@@ -79,6 +88,22 @@ public class MeritoPreferenteOpcion implements Serializable {
 	public void setFactor(Double factor) {
 		this.factor = factor;
 	}
+	
+	public Boolean isBorrado() {
+		return borrado;
+	}
+
+	public void setBorrado(Boolean borrado) {
+		this.borrado = borrado;
+	}
+	
+	public Date getFechaBorrado() {
+		return fechaBorrado;
+	}
+
+	public void setFechaBorrado(Date fechaBorrado) {
+		this.fechaBorrado = fechaBorrado;
+	}
 
 	public static long getSerialversionuid() {
 		return serialVersionUID;
@@ -86,7 +111,8 @@ public class MeritoPreferenteOpcion implements Serializable {
 
 	@Override
 	public String toString() {
-		return "MeritoPreferenteOpcion [codNum=" + codNum + ", meritoPreferenteCodNum=" + meritoPreferenteCodNum + ", nombre=" + nombre + ", factor=" + factor + "]";
+		return "MeritoPreferenteOpcion [codNum=" + codNum + ", meritoPreferenteCodNum=" + meritoPreferenteCodNum + ", nombre=" + nombre + ", factor=" 
+				+ factor + ", borrado=" + borrado + ", fechaBorrado=" + fechaBorrado + "]";
 	}
 
 	@Override
@@ -97,6 +123,8 @@ public class MeritoPreferenteOpcion implements Serializable {
 		result = prime * result + ((meritoPreferenteCodNum == null) ? 0 : meritoPreferenteCodNum.hashCode());
 		result = prime * result + ((nombre == null) ? 0 : nombre.hashCode());
 		result = prime * result + ((factor == null) ? 0 : factor.hashCode());
+		result = prime * result + ((borrado == null) ? 0 : borrado.hashCode());
+		result = prime * result + ((fechaBorrado == null) ? 0 : fechaBorrado.hashCode());
 		return result;
 	}
 
@@ -139,6 +167,20 @@ public class MeritoPreferenteOpcion implements Serializable {
 				return false;
 			}
 		} else if (!factor.equals(other.factor)) {
+			return false;
+		}
+		if (borrado == null) {
+			if (other.borrado != null) {
+				return false;
+			}
+		} else if (!borrado.equals(other.borrado)) {
+			return false;
+		}
+		if (fechaBorrado == null) {
+			if (other.fechaBorrado != null) {
+				return false;
+			}
+		} else if (!fechaBorrado.equals(other.fechaBorrado)) {
 			return false;
 		}
 
