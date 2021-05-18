@@ -4,7 +4,7 @@ import java.io.Serializable;
 import java.util.Date;
 
 import es.ujaen.uvirtual.beans.Usuario;
-import es.ujaen.uvirtual.modulo.bolsaempleo.modelo.ModeloUsuarioBolsaEmpleo;
+import es.ujaen.uvirtual.modulo.bolsaempleo.modelo.ModeloRol;
 import es.ujaen.uvirtual.utilidades.Formateador;
 
 /** Clase usuario de UVIRTUAL.
@@ -447,19 +447,19 @@ public class UsuarioBolsaEmpleo implements Serializable {
 	}
 	
 	public boolean isCandidato() {
-		return this.getRol() != null && this.getRol().getValor().equals(ModeloUsuarioBolsaEmpleo.ROL_CANDIDATO);
+		return this.getRol() != null && this.getRol().getValor().equals(ModeloRol.ROL_CANDIDATO);
 	}
 	
 	public boolean isServicioPersonal() {
-		return this.getRol() != null && this.getRol().getValor().equals(ModeloUsuarioBolsaEmpleo.ROL_SERVICIO_PERSONAL);
+		return this.getRol() != null && this.getRol().getValor().equals(ModeloRol.ROL_SERVICIO_PERSONAL);
 	}
 	
 	public boolean isMiembroComision() {
-		return this.getRol() != null && this.getRol().getValor().equals(ModeloUsuarioBolsaEmpleo.ROL_MIEMBRO_COMISION);
+		return this.getRol() != null && this.getRol().getValor().equals(ModeloRol.ROL_MIEMBRO_COMISION);
 	}
 	
 	public boolean isDirectorDepartamento() {
-		return this.getRol() != null && this.getRol().getValor().equals(ModeloUsuarioBolsaEmpleo.ROL_DIRECTOR_DEPARTAMENTO);
+		return this.getRol() != null && this.getRol().getValor().equals(ModeloRol.ROL_DIRECTOR_DEPARTAMENTO);
 	}
 	
 	public static long getSerialversionuid() {

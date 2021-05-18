@@ -46,9 +46,6 @@ public class ModeloUsuarioBolsaEmpleo {
 	public static final String USUARIO_EXCLUIDO = "S";
 	public static final String USUARIO_NO_EXCLUIDO = "N";
 	
-	public static final Integer PARAM_ROL_CANDIDATO_ID = 1052;
-	public static final Integer PARAM_ROL_COMISION_ID = 1051;
-	
 	public static final int COLUMN_NOMBRE_MAXLENGTH = 20;
 	public static final int COLUMN_PRIMER_APELLIDO_MAXLENGTH = 40;
 	public static final int COLUMN_SEGUNDO_APELLIDO_MAXLENGTH = 40;
@@ -64,13 +61,8 @@ public class ModeloUsuarioBolsaEmpleo {
 	public static final int COLUMN_RAZON_BORRADO_MAXLENGTH = 500;
 	
 	public static final String MENSAJE_USUARIO_NO_EXISTE = "El usuario no existe en el sistema";
-	
-	public static final String ROL_SERVICIO_PERSONAL = "bolemppersonal";
-	public static final String ROL_DIRECTOR_DEPARTAMENTO = "bolempdirdepartamento";
-	public static final String ROL_MIEMBRO_COMISION = "bolempcomision";
-	public static final String ROL_CANDIDATO = "bolempcandidato";
 
-	protected static ModeloUsuarioBolsaEmpleo eInstancia = null;
+	protected static ModeloUsuarioBolsaEmpleo eInstancia;
 
 	/**
 	 * Crea una instancia del objeto. de forma sincronizada para protegerse de
@@ -325,7 +317,7 @@ public class ModeloUsuarioBolsaEmpleo {
 			throw new UVException("No hay usuario logeado");
 		}
 		
-		if (!usuario.getRol().getValor().equals(ROL_CANDIDATO)) {
+		if (!usuario.getRol().getValor().equals(ModeloRol.ROL_CANDIDATO)) {
 			throw new UVException("El usuario no es un candidato");
 		} 
 		
@@ -1024,7 +1016,7 @@ public class ModeloUsuarioBolsaEmpleo {
 			
 			stmt.setString(indexParam++, borrado);
 			
-			Date date = new Date(System.currentTimeMillis());
+			Date date = BolsaEmpleoUtils.getCurrentDate();
 			
 			stmt.setDate(indexParam++, new java.sql.Date(date.getTime()));
 			for (UsuarioBolsaEmpleo usuario : usuarios) {
@@ -1062,7 +1054,7 @@ public class ModeloUsuarioBolsaEmpleo {
 			Rol role;
 			
 			try {
-				role = modeloRol.getRoleById(PARAM_ROL_CANDIDATO_ID);
+				role = modeloRol.getRoleById(ModeloRol.ID_ROL_CANDIDATO);
 				
 				UsuarioBolsaEmpleo usuarioFinal = 
 				new UsuarioBolsaEmpleo(usuArcos.getDocumentoNumero(), usuArcos.getUid(), role, true, false, null, null, null);

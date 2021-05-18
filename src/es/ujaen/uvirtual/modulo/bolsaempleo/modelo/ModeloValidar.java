@@ -353,7 +353,7 @@ public class ModeloValidar {
 				+ "	INNER JOIN UVIRTUAL.TBEP_ITEMSBAREMACION bepite ON bepite.CODNUM = bepmer.BEPITE_CODNUM"
 				+ "	INNER JOIN UVIRTUAL.TBEP_SOLICITUD_BOLSAS_MERITOS bepsbm ON bepmer.CODNUM = bepsbm.BEPMER_CODNUM"
 				+ "	INNER JOIN UVIRTUAL.TBEP_SOLICITUD_BOLSAS bepsbo ON bepsbo.CODNUM = bepsbm.BEPSBO_CODNUM"
-				+ "	WHERE bepusu.ROL = " + ModeloUsuarioBolsaEmpleo.PARAM_ROL_CANDIDATO_ID + " AND bepsbo.BEPBOL_CODNUM = ?";
+				+ "	WHERE bepusu.ROL = " + ModeloRol.ID_ROL_CANDIDATO + " AND bepsbo.BEPBOL_CODNUM = ?";
 		
 		// agrega el filtro de afinidad
 		consulta += afinidad ? " AND bepite.AFINIDAD IS NOT NULL" : " AND bepite.AFINIDAD IS NULL";
