@@ -215,7 +215,7 @@ public class ControladorMisTitulaciones extends HttpServlet {
 				BolsaEmpleoDataTable<Titulacion> dataTable = modelo.listaTitulacionesDatatable(request.getParameterMap(), codnum);
 				bean.setDatatableTitulaciones(dataTable);
 				writer.write(dataTable.toJson());
-			} catch (UVException ex) {
+			} catch (Exception ex) {
 				CodigoDescripcion mensaje = new CodigoDescripcion(RESPONSE_AJAX_ERROR, ex.getMessage());
 				writer.write(new Gson().toJson(mensaje));
 				response.setStatus(RESPONSE_AJAX_HTTP_CODE_ERROR);
@@ -245,7 +245,7 @@ public class ControladorMisTitulaciones extends HttpServlet {
 				BolsaEmpleoDataTable<TitulacionUsuario> dataTable = modelo.listaTitulacionesUsuarioDatatable(request.getParameterMap(), codnum);
 				bean.setDatatableTitulacionesUsuario(dataTable);
 				writer.write(dataTable.toJson());
-			} catch (UVException ex) {
+			} catch (Exception ex) {
 				CodigoDescripcion mensaje = new CodigoDescripcion(RESPONSE_AJAX_ERROR, ex.getMessage());
 				writer.write(new Gson().toJson(mensaje));
 				response.setStatus(RESPONSE_AJAX_HTTP_CODE_ERROR);

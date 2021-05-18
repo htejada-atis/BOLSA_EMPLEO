@@ -271,7 +271,7 @@ public class ControladorGestionTitulacionesPreferentesArea extends HttpServlet {
 				BolsaEmpleoDataTable<Titulacion> dataTable = modelo.listaTitulacionesDatatable(request.getParameterMap(), area);
 				bean.setDatatableTitulaciones(dataTable);
 				writer.write(dataTable.toJson());
-			} catch (UVException ex) {
+			} catch (Exception ex) {
 				CodigoDescripcion mensaje = new CodigoDescripcion(RESPONSE_AJAX_ERROR, ex.getMessage());
 				bean.getMensajesDeError().add(mensaje.toString());
 				writer.write(new Gson().toJson(mensaje));
@@ -303,7 +303,7 @@ public class ControladorGestionTitulacionesPreferentesArea extends HttpServlet {
 				BolsaEmpleoDataTable<TitulacionArea> dataTable = modelo.listaTitulacionesAreaDatatable(request.getParameterMap(), area);
 				bean.setDatatableTitulacionesArea(dataTable);
 				writer.write(dataTable.toJson());
-			} catch (UVException ex) {
+			} catch (Exception ex) {
 				CodigoDescripcion mensaje = new CodigoDescripcion(RESPONSE_AJAX_ERROR, ex.getMessage());
 				bean.getMensajesDeError().add(mensaje.toString());
 				writer.write(new Gson().toJson(mensaje));
