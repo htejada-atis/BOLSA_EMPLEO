@@ -35,6 +35,7 @@ import es.ujaen.uvirtual.modulo.bolsaempleo.beans.Convocatoria;
 import es.ujaen.uvirtual.modulo.bolsaempleo.beans.Merito;
 import es.ujaen.uvirtual.modulo.bolsaempleo.beans.MeritoSolicitud;
 import es.ujaen.uvirtual.modulo.bolsaempleo.beans.MeritoSolicitudTable;
+import es.ujaen.uvirtual.modulo.bolsaempleo.beans.MeritoSolicitudValoracion;
 import es.ujaen.uvirtual.modulo.bolsaempleo.beans.Solicitud;
 import es.ujaen.uvirtual.modulo.bolsaempleo.beans.Titulacion;
 import es.ujaen.uvirtual.modulo.bolsaempleo.modelo.ModeloAfinidad;
@@ -149,8 +150,11 @@ public class ControladorMisSolicitudes extends HttpServlet {
 	public static final int PDF_ANCHO = 4;
 	public static final int PDF_ALTO = 4;
 	public static final int PDF_FORMATO = 4;
-	public static final int PDF_TABLE_COLUMNS = 4;
+	public static final int PDF_TABLE_COLUMNS = 5;
 	public static final int PDF_TABLE_PADDING = 5;
+	public static final int SIZE_10 = 10;
+	public static final int SIZE_20 = 20;
+	public static final int SIZE_30 = 30;
 	public static final int SIZE_40 = 40;
 	public static final int SIZE_100 = 100;	
 	public static final int COLOR_51 = 51;
@@ -159,7 +163,7 @@ public class ControladorMisSolicitudes extends HttpServlet {
 	public static final int COLOR_201 = 201;
 	public static final int COLOR_241 = 241;
 	public static final int COLOR_254 = 254;
-	public static final int COLSPAN_4 = 4;
+	public static final int COLSPAN_5 = 5;
 	
 	/** Peticion GET.
 	 * @see HttpServlet#doGet(HttpServletRequest request, HttpServletResponse response)
@@ -830,6 +834,9 @@ public class ControladorMisSolicitudes extends HttpServlet {
 			throw new UVException(MENSAJE_ERROR_SIN_MERITOS);
 		}
 		
+		// comprobamos que la afinidad de los mérios afines no esté vacía
+		
+		
 		List<BolsaSolicitud> listaBolsas = modeloSolicitud.getBolsasSolicitudMeritos(solicitud);
 		bean.setListaBolsasSolicitud(listaBolsas);
 		
@@ -957,7 +964,7 @@ public class ControladorMisSolicitudes extends HttpServlet {
 		this.generarPDFAreaHeader(table);
 
 		if (bolsa.getNumeroMeritos() != null && bolsa.getNumeroMeritos() > 0) {
-			for (MeritoSolicitud merito: bolsa.getListaMeritos()) {
+			for (MeritoSolicitudTable merito: bolsa.getListaMeritos()) {
 				String codigoItem = merito.getMerito().getItemBaremacion().getBloqueBaremacion().getApartadoBaremacion().getCodigo() + "." 
 						+ merito.getMerito().getItemBaremacion().getBloqueBaremacion().getCodigo() + "." 
 						+ merito.getMerito().getItemBaremacion().getCodigo();
@@ -974,10 +981,29 @@ public class ControladorMisSolicitudes extends HttpServlet {
 				cell = new Cell(merito.getMerito().getDescripcion());
 				cell.setBackgroundColor(new Color(COLOR_241, COLOR_241, COLOR_241));
 				table.addCell(cell);
+				
+				String afinidad = "";
+				
+				if (merito.getCodNum() != null && merito.getMeritoSolicitud() != null && merito.getMerito().getItemBaremacion().getAfinidad() != null
+						&& merito.getValoraciones().size() > 0) {
+					if (merito.getMerito().getItemBaremacion().getIndividualizado()) {
+						afinidad = merito.getValoraciones().get(0).getAfinidad().getCodigo() + " " 
+								+ merito.getValoraciones().get(0).getAfinidad().getModulacion();
+					} else {
+						for (MeritoSolicitudValoracion valoracion: merito.getValoraciones()) {
+							afinidad += valoracion.getValor() + " - " + valoracion.getAfinidad().getCodigo() + " "
+									+ valoracion.getAfinidad().getModulacion() + "%\n";
+						}
+					}
+				}
+				
+				cell = new Cell(afinidad);
+				table.addCell(cell);
+						
 			}
 		} else {
 			Cell cell = new Cell(MENSAJE_AREA_SIN_MERITOS);
-			cell.setColspan(COLSPAN_4);
+			cell.setColspan(COLSPAN_5);
 			cell.setBackgroundColor(new Color(COLOR_241, COLOR_241, COLOR_241));
 			table.addCell(cell);
 		}
@@ -998,30 +1024,23 @@ public class ControladorMisSolicitudes extends HttpServlet {
 
 		Font font = new Font();
 		font.setColor(new Color(0, COLOR_51, COLOR_153));
-
-		Phrase phrase = new Phrase("Cod. Mérito", font);
+		
+		generarColumnPDFAreaHeader(table, "Cod. Mérito", font);
+		generarColumnPDFAreaHeader(table, "Mérito", font);
+		generarColumnPDFAreaHeader(table, "Valor", font);
+		generarColumnPDFAreaHeader(table, "Descripción", font);
+		generarColumnPDFAreaHeader(table, "Afinidad", font);
+		
+		float[] columnWidths = new float[] {SIZE_10, SIZE_30, SIZE_10, SIZE_30, SIZE_20};
+		table.setWidths(columnWidths);
+	}
+	
+	private void generarColumnPDFAreaHeader(Table table, String titulo, Font font) {
+		Phrase phrase = new Phrase(titulo, font);
 		Cell cell = new Cell(phrase);
 		cell.setHeader(true);
 		cell.setBackgroundColor(new Color(COLOR_185, COLOR_201, COLOR_254));
 		table.addCell(cell);
-
-		Phrase phrase2 = new Phrase("Mérito", font);
-		cell = new Cell(phrase2);
-		cell.setHeader(true);
-		cell.setBackgroundColor(new Color(COLOR_185, COLOR_201, COLOR_254));
-		table.addCell(cell);
-
-		Phrase phrase3 = new Phrase("Valor", font);
-		cell = new Cell(phrase3);
-		cell.setHeader(true);
-		cell.setBackgroundColor(new Color(COLOR_185, COLOR_201, COLOR_254));
-		table.addCell(cell);
-
-		Phrase phrase4 = new Phrase("Descripción", font);
-		cell = new Cell(phrase4);
-		cell.setHeader(true);
-		cell.setBackgroundColor(new Color(COLOR_185, COLOR_201, COLOR_254));
-		table.addCell(cell);
-		table.endHeaders();
 	}
+	
 }

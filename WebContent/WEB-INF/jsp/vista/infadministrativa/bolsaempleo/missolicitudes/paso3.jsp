@@ -9,7 +9,8 @@
 <%@	page import="es.ujaen.uvirtual.modulo.bolsaempleo.beans.BolsaSolicitudTable" %>
 <%@	page import="es.ujaen.uvirtual.modulo.bolsaempleo.beans.BolsaSolicitud" %>
 <%@	page import="es.ujaen.uvirtual.modulo.bolsaempleo.beans.Merito" %>
-<%@	page import="es.ujaen.uvirtual.modulo.bolsaempleo.beans.MeritoSolicitud" %>
+<%@	page import="es.ujaen.uvirtual.modulo.bolsaempleo.beans.MeritoSolicitudTable" %>
+<%@	page import="es.ujaen.uvirtual.modulo.bolsaempleo.beans.MeritoSolicitudValoracion" %>
 <%@	page import="es.ujaen.uvirtual.modulo.bolsaempleo.beans.Titulacion" %>
 
 <%
@@ -34,13 +35,14 @@ VistaSolicitudes bean = (VistaSolicitudes) uvdatos.getVistas().get(VistaSolicitu
 		<table class="bluetable bolsaempleo">
 			<tr>
 				<th scope="col"	style="width:15%">Cod. mérito</th>
-				<th scope="col"	style="width:40%">Mérito</th>
+				<th scope="col"	style="width:30%">Mérito</th>
 				<th scope="col"	style="width:10%">Valor</th>	
-				<th scope="col"	style="width:35%">Descripción</th>
+				<th scope="col"	style="width:30%">Descripción</th>
+				<th scope="col" style="width:20%">Afinidad</th>
 			</tr>
 			<tbody>
 				<% if (bolsa.getListaMeritos() != null && bolsa.getListaMeritos().size() > 0) { %>
-					<% for (MeritoSolicitud merito: bolsa.getListaMeritos()) { 
+					<% for (MeritoSolicitudTable merito: bolsa.getListaMeritos()) { 
 							String codigoItem = merito.getMerito().getItemBaremacion().getBloqueBaremacion().getApartadoBaremacion().getCodigo() + "." + merito.getMerito().getItemBaremacion().getBloqueBaremacion().getCodigo() + "." + merito.getMerito().getItemBaremacion().getCodigo();
 					%>
 						<tr>
@@ -48,6 +50,19 @@ VistaSolicitudes bean = (VistaSolicitudes) uvdatos.getVistas().get(VistaSolicitu
 							<td><%= merito.getMerito().getItemBaremacion().getNombre() %></td>
 							<td><%= merito.getMerito().getValor() %></td>
 							<td><%= merito.getMerito().getDescripcion() %></td>
+							<td>
+							<% if (merito.getCodNum() != null && merito.getMeritoSolicitud() != null && merito.getMerito().getItemBaremacion().getAfinidad() != null) { %>
+								<% if (merito.getValoraciones().size() > 0) { %>
+									<% if (merito.getMerito().getItemBaremacion().getIndividualizado()) { %>
+										<%= "<b>" + merito.getValoraciones().get(0).getAfinidad().getCodigo() + " " + merito.getValoraciones().get(0).getAfinidad().getModulacion() + "</b>" %>
+									<% } else {
+										for (MeritoSolicitudValoracion valoracion: merito.getValoraciones()) { %>
+											<%= "<b>" + valoracion.getValor() + " - " + valoracion.getAfinidad().getCodigo() + " " + valoracion.getAfinidad().getModulacion() + "%</b><br/>" %>
+										<% }
+									   } %>
+								<% } %>
+							<% } %>
+							</td>
 						</tr>
 					<% } %>
 				<% } else { %>
