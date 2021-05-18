@@ -1,6 +1,8 @@
 package unitarios;
 
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertThrows;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
@@ -8,11 +10,9 @@ import java.io.IOException;
 import java.sql.SQLException;
 import java.text.ParseException;
 import java.util.ArrayList;
-import java.util.Calendar;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
-
-import javax.sql.DataSource;
 
 import org.junit.BeforeClass;
 import org.junit.FixMethodOrder;
@@ -21,160 +21,456 @@ import org.junit.runners.MethodSorters;
 
 import bbdd.BbddRunner;
 import bbdd.UtilsTestBolsaEmpleo;
+import es.ujaen.uvirtual.adm.CrearUsuario;
+import es.ujaen.uvirtual.beans.UVDatos;
+import es.ujaen.uvirtual.beans.Usuario;
 import es.ujaen.uvirtual.modelo.conexion.Conexion;
-import es.ujaen.uvirtual.modulo.bolsaempleo.beans.Merito;
-import es.ujaen.uvirtual.modulo.bolsaempleo.beans.Rol;
 import es.ujaen.uvirtual.modulo.bolsaempleo.beans.UsuarioBolsaEmpleo;
-import es.ujaen.uvirtual.modulo.bolsaempleo.modelo.ModeloMerito;
+import es.ujaen.uvirtual.modulo.bolsaempleo.modelo.ModeloArea;
 import es.ujaen.uvirtual.modulo.bolsaempleo.modelo.ModeloUsuarioBolsaEmpleo;
+import es.ujaen.uvirtual.modulo.bolsaempleo.utilidades.BolsaEmpleoDataTable;
+import es.ujaen.uvirtual.modulo.bolsaempleo.utilidades.BolsaEmpleoUtils;
+import es.ujaen.uvirtual.utilidades.Formateador;
 import es.ujaen.uvirtual.utilidades.UVException;
 
-
-/** test usuarios bolsa empleo.
-*
-*/
+/**
+ * test usuarios bolsa empleo.
+ *
+ */
 @FixMethodOrder(MethodSorters.NAME_ASCENDING)
 public class TestBEPModeloUsuarios {
 
-	private static final String CODCUENTA = "test2";
-	private static final Rol ROL = new Rol(1050);
-	private static final String EMAIL = "test@test";
-	private static final String RAZONEXCLUIDO = "test";
-	private static final Boolean LISTADIST = true;
-	private static final Boolean EXCLUIDO = false;
-	private static final String EXCLUIDOTIPO = "EJEMPLO";
-	private static final Boolean BORRADO = true;
-	private static final String SEXO = "M";
-	private static final Date FECHAEXCLUSION = new java.sql.Date(Calendar.getInstance().getTime().getTime());
-	private static final Date FECHABORRADO = new java.sql.Date(Calendar.getInstance().getTime().getTime());
-    
-	/** prepara la bd con los datos iniciales.
-     * @throws SQLException si error en bd
-     * @throws IOException si error en ficheros
+	private static final Integer CODNUM = 1;
+	private static final Integer CODNUM_OTHER = 2;
+	private static final Integer CODNUM_NOEXISTE = 111_111_111;
+	private static final String DOCUMENTO_USUARIO_UJA_NO_EXISTE = "51992686J";
+	private static final String DOCUMENTO_USUARIO_BOLSA_NO_EXISTE = "XXXXXXXXX";
+	private static final String PERSONAL1_DOCUMENTO = "62607992Z";
+	private static final String PERSONAL1_CODCUENTA = "personal1";
+	private static final String CANDIDATO1_CODCUENTA = "candidato1";
+	private static final String CANDIDATO1_DOCUMENTO = "43396488L";
+	private static final String CODCUENTA_INEXISTENTE = "DUMMY";
+	private static final String RAZON_EXCLUSION = "razon de exclusión";
+	private static final Date FECHA_EXCLUSION = BolsaEmpleoUtils.getCurrentDateTime();
+	
+	private static final String MENSAJE_ERROR_HAY_EXCEPCION = "Excepción no esperada: %s";
+
+	/**
+	 * prepara la bd con los datos iniciales.
+	 * 
+	 * @throws SQLException   si error en bd
+	 * @throws IOException    si error en ficheros
 	 * @throws ParseException si error fecha
-     */
-    @BeforeClass
-    public static void preparaBd() throws SQLException, IOException, ParseException {
-    	DataSource ds = BbddRunner.obtenerDataSourceUv();
-    	Conexion.setConexionUvirtual(ds);
-    	UtilsTestBolsaEmpleo.inicializaBolsaEmpleo();
-    }
-    
-    /** test acierto insertar usuario.
-     * @throws SQLException si error en bd
-     * @throws UVException si error al validar usuario
-     * @throws ParseException si error al validar fecha
-     */
-    @Test
-    public void testA01InsertaUsuario() throws SQLException, ParseException, UVException {
-    	UsuarioBolsaEmpleo usuario = new UsuarioBolsaEmpleo();
-		usuario.setCodCuenta(CODCUENTA);
-		usuario.setRol(ROL);
-		usuario.setEmail(EMAIL);
-		usuario.setListaDist(LISTADIST);
-		usuario.setExcluido(EXCLUIDO);
-		usuario.setExcluidoTipo(EXCLUIDOTIPO);
-		usuario.setRazonExcluido(RAZONEXCLUIDO);
-		usuario.setFechaExclusion(FECHAEXCLUSION);
-		usuario.setBorrado(BORRADO);
-		usuario.setFechaBorrado(FECHABORRADO);
-		usuario.setSexo(SEXO);
-		ModeloUsuarioBolsaEmpleo modelo = ModeloUsuarioBolsaEmpleo.obtenerInstancia();
-    	modelo.insertaUsuario(usuario);
-    	
-    	UsuarioBolsaEmpleo usuarioCont = new UsuarioBolsaEmpleo();
-    	usuarioCont = modelo.listaUsuario(usuario.getCodCuenta());
-    	List<UsuarioBolsaEmpleo> usuarios = modelo.listaUsuarios();
-    	Boolean eje = false;
-    	
-        for (UsuarioBolsaEmpleo usu : usuarios) {
-            if (usu.getCodNum() == usuarioCont.getCodNum()) {
-            	eje = true;
-            }
-        }
-    	
-    	assertTrue("usuario insertado debe ser listado", eje);
-    }
+	 */
+	@BeforeClass
+	public static void preparaBd() throws SQLException, IOException {
+		Conexion.setConexionUvirtual(BbddRunner.obtenerDataSourceUv());
+		Conexion.setConexionArcos(BbddRunner.obtenerDataSourceArcos());
+		Conexion.setConexionUxxiRrhh(BbddRunner.obtenerDataSourceRh());
+		Conexion.setConexionUxxiAc(BbddRunner.obtenerDataSourceAc());
+		UtilsTestBolsaEmpleo.inicializaBolsaEmpleo();
+	}
 
-    /** test acierto borrar usuario.
-     * @throws SQLException si error en bd
-     * @throws UVException si error al validar usuario 
-     */
-    @Test
-    public void testA02BorraUsuario() throws SQLException, UVException {
-		ModeloUsuarioBolsaEmpleo modelo = ModeloUsuarioBolsaEmpleo.obtenerInstancia();
-    	ModeloMerito modeloMeritos = ModeloMerito.obtenerInstancia();
-    	
-    	List<UsuarioBolsaEmpleo> usuarios = modelo.listaUsuarios("");
-    	UsuarioBolsaEmpleo usuario = usuarios.get(0);
-    	
-    	List<Merito> meritos = modeloMeritos.listaMeritos();
-    	List<String> meritosAcum = new ArrayList<>();
-    	
-        for (Merito mer : meritos) {
-            if (mer.getUsuario().getCodNum() == usuario.getCodNum()) {
-            	meritosAcum.add(mer.getCodNum().toString());
-            }
-        }
-    	if (meritosAcum.size() > 0) {
-        	modeloMeritos.eliminarMeritos(meritosAcum);
-    	}
+	/**
+	 * getUsuarioByPrsnif.
+	 */
+	@Test
+	public void testA01GetUsuarioByPrsnif() {
+		try {
+			UsuarioBolsaEmpleo usuario = ModeloUsuarioBolsaEmpleo.obtenerInstancia()
+					.getUsuarioByNumeroDocumento(PERSONAL1_DOCUMENTO);
+			assertEquals(usuario.getCodCuenta(), PERSONAL1_CODCUENTA);
+			assertEquals(usuario.getNumDocumento(), PERSONAL1_DOCUMENTO);
+		} catch (SQLException | UVException ex) {
+			fail(String.format(MENSAJE_ERROR_HAY_EXCEPCION, ex.toString()));
+		}
+	}
 
-    	modelo.borraUsuario(usuario);
-    	try {
-    		modelo.listaUsuario(usuario.getCodCuenta());
-    		fail();
-    	} catch (UVException e) {
-    		//se expera excepcion
-    	} 
-    	
-    	List<UsuarioBolsaEmpleo> usuariosFiltrados = modelo.listaUsuarios("");
-    	assertTrue("usuario borrado no debe ser listadao", !usuariosFiltrados.contains(usuario));
-    	assertTrue("usuarios debe tener un elemento menos", usuarios.size() - 1 == usuariosFiltrados.size());
-    }
-    
-    /** test acierto editar noticia.
-     * @throws SQLException si error en bd
-     * @throws UVException si error el validar noticia
-     */
-    @Test
-    public void testA03EditarUsuario() throws SQLException, UVException {
-		ModeloUsuarioBolsaEmpleo modelo = ModeloUsuarioBolsaEmpleo.obtenerInstancia();
-    	List<UsuarioBolsaEmpleo> usuarios = modelo.listaUsuarios("");
-    	UsuarioBolsaEmpleo usuario = usuarios.get(0);
-    	usuario.setExcluido(EXCLUIDO);
-    	modelo.actualizaUsuario(usuario);
-    	UsuarioBolsaEmpleo usuarioActualizado = modelo.listaUsuario(usuario.getCodCuenta());
-    	
-    	assertFalse("usuario debe ser actualizado", usuario.equals(usuarioActualizado));
-    }
+	/**
+	 * getUsuarioById.
+	 */
+	@Test
+	public void testA02GetUsuarioById() {
+		try {
+			UsuarioBolsaEmpleo usuario = ModeloUsuarioBolsaEmpleo.obtenerInstancia().getUsuarioById(CODNUM);
+			assertEquals(usuario.getCodNum(), CODNUM);
+		} catch (SQLException | UVException ex) {
+			fail(String.format(MENSAJE_ERROR_HAY_EXCEPCION, ex.toString()));
+		}
+	}
 
-    /** test edicion datos personales usuario.
-     * @throws SQLException si error bd
-     * @throws UVException error experado
-     */
-    @Test
-    public void testA04EditarDatosPersonalesUsuario() throws SQLException, UVException {
+	/**
+	 * getUsuarioLogeado.
+	 */
+	@Test
+	public void testA03GetUsuarioLogeado() {
+		try {
+			Usuario usu = CrearUsuario.usuario(PERSONAL1_CODCUENTA);
+			UVDatos datos = new UVDatos();
+			datos.setUsuario(usu);
+
+			UsuarioBolsaEmpleo usuario = ModeloUsuarioBolsaEmpleo.obtenerInstancia().getUsuarioLogeado(datos);
+			assertEquals(usuario.getCodCuenta(), PERSONAL1_CODCUENTA);
+		} catch (SQLException | UVException ex) {
+			fail(String.format(MENSAJE_ERROR_HAY_EXCEPCION, ex.toString()));
+		}
+	}
+
+	/**
+	 * getUsuarioLogeado borrado.
+	 */
+	@Test
+	public void testA04GetUsuarioLogeadoBorrado() {
 		ModeloUsuarioBolsaEmpleo modelo = ModeloUsuarioBolsaEmpleo.obtenerInstancia();
-    	List<UsuarioBolsaEmpleo> usuarios = modelo.listaUsuarios("");
-    	UsuarioBolsaEmpleo usuario = usuarios.get(0);
-    	usuario.setDireccion("test");
-    	modelo.actualizaUsuarioMisDatos(usuario);
-    	UsuarioBolsaEmpleo usuarioActualizado = modelo.listaUsuario(usuario.getCodCuenta());
-    	
-    	assertFalse("usuario debe ser actualizado", usuario.equals(usuarioActualizado));
-    }
-    
-    
-    /** test error inserta usuario null.
-     * @throws SQLException si error bd
-     * @throws UVException error experado
-     */
-    @Test(expected = UVException.class)
-    public void testE01InsertaUsuarioNull() throws SQLException, UVException {
-    	UsuarioBolsaEmpleo usuario = null;
+		try {
+			Usuario usu = CrearUsuario.usuario(PERSONAL1_CODCUENTA);
+			UVDatos datos = new UVDatos();
+			datos.setUsuario(usu);
+			
+			// marcamos usuario como borrado
+			ArrayList<UsuarioBolsaEmpleo> usuariosBorrar = marcarUsuarioComoBorrado(PERSONAL1_DOCUMENTO);
+
+			// obtenemos usuario logeado borrado
+			Throwable throwable = assertThrows(Throwable.class, () -> modelo.getUsuarioLogeado(datos));
+			assertEquals(UVException.class, throwable.getClass());
+			assertEquals(ModeloUsuarioBolsaEmpleo.MENSAJE_ERROR_USUARIO_BORRADO, throwable.getMessage());
+
+			// marcamos usuario como no borrado
+			marcarUsuarioComoNoBorrado(usuariosBorrar);
+		} catch (SQLException | UVException ex) {
+			fail(String.format(MENSAJE_ERROR_HAY_EXCEPCION, ex.toString()));
+		}
+	}
+
+	/**
+	 * getUsuarioLogeado excluido.
+	 */
+	@Test
+	public void testA05GetUsuarioLogeadoExcluido() {
 		ModeloUsuarioBolsaEmpleo modelo = ModeloUsuarioBolsaEmpleo.obtenerInstancia();
-    	modelo.insertaUsuario(usuario);
-    	fail();
-    }
+		try {
+			Usuario usu = CrearUsuario.usuario(PERSONAL1_CODCUENTA);
+			UVDatos datos = new UVDatos();
+			datos.setUsuario(usu);
+			
+			// marcamos usuario como excluido
+			UsuarioBolsaEmpleo usuario = marcarUsuarioComoExcluido(PERSONAL1_DOCUMENTO);
+
+			// obtenemos usuario logeado excluido
+			Throwable throwable = assertThrows(Throwable.class, () -> modelo.getUsuarioLogeado(datos));
+			assertEquals(UVException.class, throwable.getClass());
+			assertEquals(ModeloUsuarioBolsaEmpleo.MENSAJE_ERROR_USUARIO_EXCLUIDO, throwable.getMessage());
+			
+			// marcamos usuario como no excluido
+			marcarUsuarioComoNoExcluido(usuario);
+		} catch (SQLException | UVException ex) {
+			fail(String.format(MENSAJE_ERROR_HAY_EXCEPCION, ex.toString()));
+		}
+	}
+	
+	/**
+	 * getUsuarioCandidato.
+	 */
+	@Test
+	public void testA06getUsuarioCandidato() {
+		Usuario usu = CrearUsuario.usuario(CANDIDATO1_CODCUENTA);
+		UVDatos datos = new UVDatos();
+		datos.setUsuario(usu);
+				
+		try {
+			UsuarioBolsaEmpleo usuario = ModeloUsuarioBolsaEmpleo.obtenerInstancia().getUsuarioCandidato(datos);
+			assertEquals(usuario.getCodCuenta(), CANDIDATO1_CODCUENTA);
+			assertEquals(usuario.getNumDocumento(), CANDIDATO1_DOCUMENTO);
+			assertTrue(usuario.isCandidato());			
+		} catch (SQLException | UVException ex) {
+			fail(String.format(MENSAJE_ERROR_HAY_EXCEPCION, ex.toString()));
+		}
+	}
+	
+	/**
+	 * 	getUsuariosByIds.
+	 */
+	@Test
+	public void testA07getUsuariosByIds() {
+		Usuario usu = CrearUsuario.usuario(CANDIDATO1_CODCUENTA);
+		UVDatos datos = new UVDatos();
+		datos.setUsuario(usu);
+				
+		try {
+			int[] ids = new int[] {CODNUM, CODNUM_OTHER};
+			
+			List<UsuarioBolsaEmpleo> usuarios = ModeloUsuarioBolsaEmpleo.obtenerInstancia().getUsuariosByIds(ids);			
+			assertFalse(usuarios.isEmpty());			
+			assertTrue(usuarios.size() == ids.length);
+			
+			assertEquals(usuarios.get(0).getCodNum(), CODNUM);
+			assertEquals(usuarios.get(1).getCodNum(), CODNUM_OTHER);			
+		} catch (SQLException | UVException ex) {
+			fail(String.format(MENSAJE_ERROR_HAY_EXCEPCION, ex.toString()));
+		}
+	}
+	
+	/**
+	 * Test datatable.
+	 */
+	@Test
+	public void testA08listaUsuarioBolsaEmpleoDatatable() {
+		HashMap<String, String[]> params = new HashMap<>();
+
+		params.put(BolsaEmpleoDataTable.PARAM_CURRENT_PAGE, new String[] {"0"});
+		params.put(BolsaEmpleoDataTable.PARAM_PAGE_SIZE, new String[] {"10"});
+		params.put(BolsaEmpleoDataTable.PARAM_ORDER_BY, new String[] {String.valueOf(ModeloUsuarioBolsaEmpleo.ORDER_COLUMN_INDEX_TIPO_DOCUMENTO)});
+		params.put(BolsaEmpleoDataTable.PARAM_ORDER_DIRECTION, new String[] {BolsaEmpleoDataTable.PARAM_ORDER_DIRECTION_VALUE_ASC});
+
+		try {
+			BolsaEmpleoDataTable<UsuarioBolsaEmpleo> dt = ModeloUsuarioBolsaEmpleo.obtenerInstancia().listaUsuarioBolsaEmpleoDatatable(params);
+			assertFalse(dt.getData().isEmpty());
+		} catch (SQLException | UVException ex) {
+			fail(String.format(MENSAJE_ERROR_HAY_EXCEPCION, ex.toString()));
+		}
+	}
+	
+	/**
+	 * Test datatable.
+	 */
+	@Test
+	public void testA09listaUsuarioCandidatosBolsaEmpleoDatatable() {
+		HashMap<String, String[]> params = new HashMap<>();
+
+		params.put(BolsaEmpleoDataTable.PARAM_CURRENT_PAGE, new String[] {"0"});
+		params.put(BolsaEmpleoDataTable.PARAM_PAGE_SIZE, new String[] {"10"});
+		params.put(BolsaEmpleoDataTable.PARAM_ORDER_BY, new String[] {String.valueOf(ModeloUsuarioBolsaEmpleo.ORDER_COLUMN_INDEX_TIPO_DOCUMENTO)});
+		params.put(BolsaEmpleoDataTable.PARAM_ORDER_DIRECTION, new String[] {BolsaEmpleoDataTable.PARAM_ORDER_DIRECTION_VALUE_ASC});
+
+		try {
+			BolsaEmpleoDataTable<UsuarioBolsaEmpleo> dt = ModeloUsuarioBolsaEmpleo.obtenerInstancia().listaUsuarioCandidatosBolsaEmpleoDatatable(params);
+			assertFalse(dt.getData().isEmpty());
+			
+			for (UsuarioBolsaEmpleo usuario : dt.getData()) {
+				assertTrue(usuario.isCandidato());
+			}
+		} catch (SQLException | UVException ex) {
+			fail(String.format(MENSAJE_ERROR_HAY_EXCEPCION, ex.toString()));
+		}
+	}
+	
+	/**
+	 * Test datatable.
+	 */
+	@Test
+	public void testA10listaUsuarioBorradoBolsaEmpleoDatatable() {
+		HashMap<String, String[]> params = new HashMap<>();
+
+		params.put(BolsaEmpleoDataTable.PARAM_CURRENT_PAGE, new String[] {"0"});
+		params.put(BolsaEmpleoDataTable.PARAM_PAGE_SIZE, new String[] {"10"});
+		params.put(BolsaEmpleoDataTable.PARAM_ORDER_BY, new String[] {String.valueOf(ModeloUsuarioBolsaEmpleo.ORDER_COLUMN_INDEX_TIPO_DOCUMENTO)});
+		params.put(BolsaEmpleoDataTable.PARAM_ORDER_DIRECTION, new String[] {BolsaEmpleoDataTable.PARAM_ORDER_DIRECTION_VALUE_ASC});
+
+		try {
+			// marcamos usuario como borrado
+			ArrayList<UsuarioBolsaEmpleo> usuariosBorrar = marcarUsuarioComoBorrado(PERSONAL1_DOCUMENTO);
+			
+			// listamos usuarios borrados
+			BolsaEmpleoDataTable<UsuarioBolsaEmpleo> dt = ModeloUsuarioBolsaEmpleo.obtenerInstancia().listaUsuarioBorradoBolsaEmpleoDatatable(params);
+			assertFalse(dt.getData().isEmpty());
+			for (UsuarioBolsaEmpleo usuarioDelete : dt.getData()) {
+				assertTrue(usuarioDelete.getBorrado());
+			}
+						
+			// marcamos usuario como no borrado
+			marcarUsuarioComoNoBorrado(usuariosBorrar);
+		} catch (SQLException | UVException ex) {
+			fail(String.format(MENSAJE_ERROR_HAY_EXCEPCION, ex.toString()));
+		}
+	}
+	
+	/**
+	 * Test datatable.
+	 */
+	@Test
+	public void testA11listaUsuarioExcluidoBolsaEmpleoDatatable() {
+		HashMap<String, String[]> params = new HashMap<>();
+
+		params.put(BolsaEmpleoDataTable.PARAM_CURRENT_PAGE, new String[] {"0"});
+		params.put(BolsaEmpleoDataTable.PARAM_PAGE_SIZE, new String[] {"10"});
+		params.put(BolsaEmpleoDataTable.PARAM_ORDER_BY, new String[] {String.valueOf(ModeloUsuarioBolsaEmpleo.ORDER_COLUMN_INDEX_TIPO_DOCUMENTO)});
+		params.put(BolsaEmpleoDataTable.PARAM_ORDER_DIRECTION, new String[] {BolsaEmpleoDataTable.PARAM_ORDER_DIRECTION_VALUE_ASC});
+
+		try {
+			// marcamos usuario como excluido
+			UsuarioBolsaEmpleo usuario = marcarUsuarioComoExcluido(PERSONAL1_DOCUMENTO);
+
+			// listamos usuarios excluidos
+			BolsaEmpleoDataTable<UsuarioBolsaEmpleo> dt = ModeloUsuarioBolsaEmpleo.obtenerInstancia().listaUsuarioExcluidoBolsaEmpleoDatatable(params);
+			assertFalse(dt.getData().isEmpty());
+			for (UsuarioBolsaEmpleo usuarioExclu : dt.getData()) {
+				assertTrue(usuarioExclu.getExcluido());
+			}
+			
+			// marcamos usuario como no excluido
+			marcarUsuarioComoNoExcluido(usuario);			
+		} catch (SQLException | UVException ex) {
+			fail(String.format(MENSAJE_ERROR_HAY_EXCEPCION, ex.toString()));
+		}
+	}
+	
+	/**
+	 * Test datatable.
+	 */
+	@Test
+	public void testA12listaAreasExcluidasPorUsuarioDatatable() {
+		HashMap<String, String[]> params = new HashMap<>();
+
+		params.put(BolsaEmpleoDataTable.PARAM_CURRENT_PAGE, new String[] {"0"});
+		params.put(BolsaEmpleoDataTable.PARAM_PAGE_SIZE, new String[] {"10"});
+		params.put(BolsaEmpleoDataTable.PARAM_ORDER_BY, new String[] {String.valueOf(ModeloArea.ORDER_COLUMN_INDEX_ID)});
+		params.put(BolsaEmpleoDataTable.PARAM_ORDER_DIRECTION, new String[] {BolsaEmpleoDataTable.PARAM_ORDER_DIRECTION_VALUE_ASC});
+
+		try {
+			// marcamos usuario como excluido
+			UsuarioBolsaEmpleo usuario = marcarUsuarioComoExcluido(PERSONAL1_DOCUMENTO);
+
+			// listamos usuarios excluidos
+			BolsaEmpleoDataTable<UsuarioBolsaEmpleo> dt = ModeloUsuarioBolsaEmpleo.obtenerInstancia().listaUsuarioExcluidoBolsaEmpleoDatatable(params);
+			assertFalse(dt.getData().isEmpty());
+			for (UsuarioBolsaEmpleo usuarioExclu : dt.getData()) {
+				assertTrue(usuarioExclu.getExcluido());
+			}
+			
+			// marcamos usuario como no excluido
+			marcarUsuarioComoNoExcluido(usuario);			
+		} catch (SQLException | UVException ex) {
+			fail(String.format(MENSAJE_ERROR_HAY_EXCEPCION, ex.toString()));
+		}
+	}
+	
+	
+	
+
+	/**
+	 * GetUsuarioByPrsnif.
+	 */
+	@Test
+	public void testE01GetUsuarioByPrsnif() {
+		Throwable throwable = assertThrows(Throwable.class,
+				() -> ModeloUsuarioBolsaEmpleo.obtenerInstancia().getUsuarioByNumeroDocumento(null));
+
+		assertEquals(UVException.class, throwable.getClass());
+		assertEquals(ModeloUsuarioBolsaEmpleo.MENSAJE_ERROR_DOCUMENTO_REQUERIDO, throwable.getMessage());
+
+		throwable = assertThrows(Throwable.class, () -> ModeloUsuarioBolsaEmpleo.obtenerInstancia().
+				getUsuarioByNumeroDocumento(DOCUMENTO_USUARIO_BOLSA_NO_EXISTE));
+
+		assertEquals(UVException.class, throwable.getClass());
+		assertEquals(ModeloUsuarioBolsaEmpleo.MENSAJE_ERROR_USUARIO_UJA_CON_DOCUMENTO_NO_EXISTE,
+				throwable.getMessage());
+
+		throwable = assertThrows(Throwable.class, () -> ModeloUsuarioBolsaEmpleo.obtenerInstancia().
+				getUsuarioByNumeroDocumento(DOCUMENTO_USUARIO_UJA_NO_EXISTE));
+
+		assertEquals(UVException.class, throwable.getClass());
+		assertEquals(ModeloUsuarioBolsaEmpleo.MENSAJE_ERROR_USUARIO_CON_DOCUMENTO_NO_EXISTE, throwable.getMessage());
+	}
+
+	/**
+	 * getUsuarioById.
+	 */
+	@Test
+	public void testE02GetUsuarioById() {
+		Throwable throwable;
+
+		throwable = assertThrows(Throwable.class,
+				() -> ModeloUsuarioBolsaEmpleo.obtenerInstancia().getUsuarioById(CODNUM_NOEXISTE));
+
+		assertEquals(UVException.class, throwable.getClass());
+		assertEquals(ModeloUsuarioBolsaEmpleo.MENSAJE_ERROR_USUARIO_CON_ID_NO_EXISTE, throwable.getMessage());
+	}
+
+	/**
+	 * getUsuarioLogeado.
+	 */
+	@Test
+	public void testE03getUsuarioLogeadoNull() {
+		Throwable throwable;
+		UVDatos datos = new UVDatos();
+		
+		throwable = assertThrows(Throwable.class,
+				() -> ModeloUsuarioBolsaEmpleo.obtenerInstancia().getUsuarioLogeado(datos));
+
+		assertEquals(UVException.class, throwable.getClass());
+		assertEquals(ModeloUsuarioBolsaEmpleo.MENSAJE_ERROR_NO_HAY_USUARIO_LOGEADO, throwable.getMessage());
+	}
+	
+	/**
+	 * getUsuarioLogeado no es candidato.
+	 */
+	@Test
+	public void testE04getUsuarioCandidatoNoEsCandidato() {
+		Usuario usu = CrearUsuario.usuario(PERSONAL1_CODCUENTA);
+		UVDatos datos = new UVDatos();
+		datos.setUsuario(usu);
+		
+		Throwable throwable = assertThrows(Throwable.class,
+				() -> ModeloUsuarioBolsaEmpleo.obtenerInstancia().getUsuarioCandidato(datos));
+
+		assertEquals(UVException.class, throwable.getClass());
+		assertEquals(ModeloUsuarioBolsaEmpleo.MENSAJE_ERROR_NO_ES_CANDIDATO, throwable.getMessage());
+	}
+	
+	/**
+	 * getUsuarioByCodCuenta inexsitente.
+	 */
+	@Test
+	public void testE05getUsuarioByCodCuenta() {
+		Usuario usu = CrearUsuario.usuario(PERSONAL1_CODCUENTA);
+		UVDatos datos = new UVDatos();
+		datos.setUsuario(usu);
+		
+		Throwable throwable = assertThrows(Throwable.class,
+				() -> ModeloUsuarioBolsaEmpleo.obtenerInstancia().getUsuarioByCodCuenta(CODCUENTA_INEXISTENTE));
+
+		assertEquals(UVException.class, throwable.getClass());
+		assertEquals(ModeloUsuarioBolsaEmpleo.MENSAJE_ERROR_USUARIO_CON_DOCUMENTO_NO_EXISTE, throwable.getMessage());
+	}
+	
+	private void marcarUsuarioComoNoExcluido(UsuarioBolsaEmpleo usuario) throws SQLException, UVException {
+		ModeloUsuarioBolsaEmpleo.obtenerInstancia().ponerUsuarioComoNoExcluido(usuario);
+		usuario = ModeloUsuarioBolsaEmpleo.obtenerInstancia().getUsuarioByNumeroDocumento(usuario.getNumDocumento());
+		assertFalse(usuario.getExcluido());
+	}
+
+	private UsuarioBolsaEmpleo marcarUsuarioComoExcluido(String documento) throws SQLException, UVException {
+		UsuarioBolsaEmpleo usuario = ModeloUsuarioBolsaEmpleo.obtenerInstancia().getUsuarioByNumeroDocumento(documento);
+		usuario.setExcluidoTipo(ModeloUsuarioBolsaEmpleo.EXCLUSION_TIPO_INDEFINIDO);
+		usuario.setRazonExcluido(RAZON_EXCLUSION);
+		usuario.setFechaExclusion(FECHA_EXCLUSION);
+		
+		ModeloUsuarioBolsaEmpleo.obtenerInstancia().ponerUsuarioComoExcluido(usuario);
+		
+		usuario = ModeloUsuarioBolsaEmpleo.obtenerInstancia().getUsuarioByNumeroDocumento(usuario.getNumDocumento());
+		assertTrue(usuario.getExcluido());
+		assertEquals(usuario.getRazonExcluido(), RAZON_EXCLUSION);
+		assertEquals(Formateador.formatoFecha(usuario.getFechaExclusion(), Formateador.FORMATO_FECHA_DDMMYYYY), 
+				Formateador.formatoFecha(FECHA_EXCLUSION, Formateador.FORMATO_FECHA_DDMMYYYY));
+		
+		return usuario;
+	}
+	
+	private ArrayList<UsuarioBolsaEmpleo> marcarUsuarioComoBorrado(String documento) throws SQLException, UVException {
+		UsuarioBolsaEmpleo usuario = ModeloUsuarioBolsaEmpleo.obtenerInstancia().getUsuarioByNumeroDocumento(documento);
+		assertFalse(usuario.getBorrado());
+		ArrayList<UsuarioBolsaEmpleo> usuariosBorrar = new ArrayList<>();
+		usuariosBorrar.add(usuario);
+		ModeloUsuarioBolsaEmpleo.obtenerInstancia().ponerUsuarioComoBorrado(usuariosBorrar);
+		usuario = ModeloUsuarioBolsaEmpleo.obtenerInstancia().getUsuarioByNumeroDocumento(usuario.getNumDocumento());
+		assertTrue(usuario.getBorrado());
+		return usuariosBorrar;
+	}
+	
+	private void marcarUsuarioComoNoBorrado(ArrayList<UsuarioBolsaEmpleo> usuariosBorrar) throws SQLException, UVException {
+		UsuarioBolsaEmpleo usuario;
+		ModeloUsuarioBolsaEmpleo.obtenerInstancia().ponerUsuarioComoNoBorrado(usuariosBorrar);
+		usuario = ModeloUsuarioBolsaEmpleo.obtenerInstancia().getUsuarioByNumeroDocumento(PERSONAL1_DOCUMENTO);
+		assertFalse(usuario.getBorrado());
+	}
 }

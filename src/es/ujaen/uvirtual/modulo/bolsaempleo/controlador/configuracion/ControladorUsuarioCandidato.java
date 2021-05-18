@@ -392,7 +392,7 @@ public class ControladorUsuarioCandidato extends HttpServlet {
 		ModeloUsuarioBolsaEmpleo modelo = ModeloUsuarioBolsaEmpleo.obtenerInstancia();
 		
 		try {
-			UsuarioBolsaEmpleo usu = modelo.listaUsuario(usuArcos.getDocumentoNumero());
+			UsuarioBolsaEmpleo usu = modelo.getUsuarioByNumeroDocumento(usuArcos.getDocumentoNumero());
 			
 			bean.setBusqueda(true);
 			
@@ -456,7 +456,7 @@ public class ControladorUsuarioCandidato extends HttpServlet {
 		}
 		
 		ModeloUsuarioBolsaEmpleo modelo = ModeloUsuarioBolsaEmpleo.obtenerInstancia();
-		UsuarioBolsaEmpleo usu = modelo.listaUsuario(usuArcos.getDocumentoNumero());
+		UsuarioBolsaEmpleo usu = modelo.getUsuarioByNumeroDocumento(usuArcos.getDocumentoNumero());
 		
 		bean.setBusqueda(false);
 		bean.setUsuarioArcos(usuArcos);
@@ -521,7 +521,7 @@ public class ControladorUsuarioCandidato extends HttpServlet {
 		
 		obtenerRoles(bean);
 		
-		UsuarioBolsaEmpleo usu = modelo.listaUsuario(Formateador.leeParametroString(request.getParameter(PARAM_NOMBRE_USUARIO)));
+		UsuarioBolsaEmpleo usu = modelo.getUsuarioByNumeroDocumento(Formateador.leeParametroString(request.getParameter(PARAM_NOMBRE_USUARIO)));
 		Usuario usuArcos = CrearUsuario.usuario(request.getParameter(PARAM_NOMBRE_USUARIO));
 		
 		bean.setBusqueda(true);

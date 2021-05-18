@@ -115,7 +115,11 @@ public class BbddRunner {
 		return odsArcos.getConnection();
 	}
 	
-	private static Connection obtenerConexionAc() throws SQLException {
+	/** obtiene la conexión con ac.
+	 * @return .
+	 * @throws SQLException .
+	 */
+	public static Connection obtenerConexionAc() throws SQLException {
 		return odsAc.getConnection();
 	}	
 	

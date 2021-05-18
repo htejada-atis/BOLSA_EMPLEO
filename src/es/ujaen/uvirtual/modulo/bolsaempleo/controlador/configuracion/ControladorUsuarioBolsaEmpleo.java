@@ -368,7 +368,7 @@ public class ControladorUsuarioBolsaEmpleo extends HttpServlet {
 		ModeloUsuarioBolsaEmpleo modelo = ModeloUsuarioBolsaEmpleo.obtenerInstancia();
 		
 		try {
-			UsuarioBolsaEmpleo usu = modelo.listaUsuario(Formateador.leeParametroString(usuArcos.getDocumentoNumero()));
+			UsuarioBolsaEmpleo usu = modelo.getUsuarioByNumeroDocumento(Formateador.leeParametroString(usuArcos.getDocumentoNumero()));
 			
 			bean.setBusqueda(true);
 			
@@ -497,7 +497,7 @@ public class ControladorUsuarioBolsaEmpleo extends HttpServlet {
 			throw new UVException(MENSAJE_ERROR_EXCLUSION_USUARIO_LOGUEADO);
 		}
 		
-		UsuarioBolsaEmpleo usu = modelo.listaUsuario(usuArcos.getDocumentoNumero());
+		UsuarioBolsaEmpleo usu = modelo.getUsuarioByNumeroDocumento(usuArcos.getDocumentoNumero());
 
 		bean.setBusqueda(true);
 		
