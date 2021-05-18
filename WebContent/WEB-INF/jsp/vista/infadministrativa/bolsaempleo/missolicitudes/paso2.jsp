@@ -297,6 +297,7 @@ VistaSolicitudes bean = (VistaSolicitudes) uvdatos.getVistas().get(VistaSolicitu
 			    },
 			    "columns": [
 			    	{'data': 'codNum', 'selectable': {'onChange': function(row, checkbox) {
+			    				console.log("onChange aaa");
 			    				var accion = checkbox.checked ? '<%=ControladorMisSolicitudes.ACCION_MERITO_SELECCIONADO%>'
 			    						: '<%=ControladorMisSolicitudes.ACCION_MERITO_DESELECCIONADO%>';
 				    			var params = {
@@ -344,7 +345,7 @@ VistaSolicitudes bean = (VistaSolicitudes) uvdatos.getVistas().get(VistaSolicitu
 			});
 			
 			document.getElementById("tableMeritos").style.visibility = "visible";
-		
+			window.scrollTo(0,document.body.scrollHeight);
 		<% } %>
 		
 		document.getElementById("paso2_volver").addEventListener("click", function(event) {
