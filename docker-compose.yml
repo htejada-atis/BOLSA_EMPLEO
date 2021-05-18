@@ -3,6 +3,8 @@ version: '3'
 services:
   memcached:
     image: memcached:latest
+    ports:
+      - 11211:11211
 
   oracledb:
     image: usig-registrydocker.ujaen.es:5044/uvirtual/oracle/database:18.4.0-xe
