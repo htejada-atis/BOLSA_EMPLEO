@@ -3,7 +3,6 @@ package es.ujaen.uvirtual.modulo.bolsaempleo.controlador.configuracion;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.sql.SQLException;
-import java.sql.SQLIntegrityConstraintViolationException;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -16,7 +15,6 @@ import javax.servlet.http.HttpSession;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.reflect.TypeToken;
-
 import es.ujaen.uvirtual.beans.CodigoDescripcion;
 import es.ujaen.uvirtual.beans.UVDatos;
 import es.ujaen.uvirtual.modulo.bolsaempleo.beans.Area;
@@ -75,6 +73,7 @@ public class ControladorGestionEvaluadores extends HttpServlet {
 
 	// Mensajes
 	public static final String MENSAJE_ENVIADO = "mensaje";
+	public static final String MENSAJE_ERROR_ACCION_NO_CONTEMPLADA = "Acción no contemplada";
 	public static final String MENSAJE_ERROR_EVALUADOR_YA_EXISTE = "El evaluador ya forma parte del área: %s";
 	public static final String MENSAJE_ERROR_ROL_COMISION = "El usuario no tiene rol de comisión";
 	public static final String MENSAJE_ERROR_USUARIOS_SELECCIONADOS_INCORRECTOS = "Usuarios seleccionados incorrectos";
@@ -132,7 +131,7 @@ public class ControladorGestionEvaluadores extends HttpServlet {
 					listadoAreas(bean, datos, request, response);
 					break;
 				default:
-					errorFatal(bean, "Acción no contemplada");
+					errorFatal(bean, MENSAJE_ERROR_ACCION_NO_CONTEMPLADA);
 			}
 		} catch (SQLException e) {
 			LOGGER.log(Level.WARNING, e.toString());
@@ -277,7 +276,7 @@ public class ControladorGestionEvaluadores extends HttpServlet {
 		bean.setVista(JSP_INDEX);
 		
 		ModeloDepartamento modeloDepartamento = ModeloDepartamento.obtenerInstancia();
-		bean.setDepartamentos(modeloDepartamento.listaDepartamentos());
+		bean.setDepartamentos(modeloDepartamento.listaDepartamentosOrderByDesc());
 		
 		HttpSession session = request.getSession(false);
 		if (session.getAttribute(PARAM_AREA) != null) {
@@ -319,7 +318,7 @@ public class ControladorGestionEvaluadores extends HttpServlet {
 				eliminarEvaluador(bean, request, response);
 				break;
 			default:
-				errorFatal(bean, "Acción no contemplada");
+				errorFatal(bean, MENSAJE_ERROR_ACCION_NO_CONTEMPLADA);
 		}
 		
 	}
@@ -384,7 +383,6 @@ public class ControladorGestionEvaluadores extends HttpServlet {
 	private void listadoEvaluadores(VistaEvaluadores bean, UVDatos datos, HttpServletRequest request, HttpServletResponse response)
 			throws IOException, SQLException {
 		ModeloEvaluador modeloEvaluador = ModeloEvaluador.obtenerInstancia();
-		ModeloArea modeloArea = ModeloArea.obtenerInstancia();
 		datos.setContentType(RESPONSE_AJAX_CONTENTTYPE);
 		response.setContentType(RESPONSE_AJAX_CONTENTTYPE);
 		response.setCharacterEncoding(RESPONSE_AJAX_ENCODING);

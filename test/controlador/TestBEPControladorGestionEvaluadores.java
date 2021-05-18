@@ -66,7 +66,7 @@ public class TestBEPControladorGestionEvaluadores {
     	peticion.setParameter(ControladorGestionEvaluadores.PARAM_ACCION, ControladorGestionEvaluadores.ACCION_DATATABLE_AREAS);
     	
     	VistaEvaluadores bean = getVistaConDepartamentos();
-    	peticion.setParameter(ControladorGestionEvaluadores.PARAM_DEPARTAMENTO, bean.getDepartamentos().get(0).getCodNum().toString());
+    	peticion.setParameter(ControladorGestionEvaluadores.PARAM_DEPARTAMENTO, bean.getDepartamentos().get(1).getCodNum().toString());
 		
 		RespuestaHttp respuesta = new RespuestaHttp();
 		ControladorGestionEvaluadores controlador = new ControladorGestionEvaluadores();
@@ -154,7 +154,7 @@ public class TestBEPControladorGestionEvaluadores {
 		VistaEvaluadores bean = getVistaConDepartamentos();
 		VistaEvaluadores bean2 = getVistaConAreas();
 		peticion.setParameter(ControladorGestionEvaluadores.PARAM_AREAS, "[" + bean2.getDatatableAreas().getData().get(0).getCodNum().toString() + "]");
-		peticion.setParameter(ControladorGestionEvaluadores.PARAM_DEPARTAMENTO, bean.getDepartamentos().get(0).getCodNum().toString());
+		peticion.setParameter(ControladorGestionEvaluadores.PARAM_DEPARTAMENTO, bean.getDepartamentos().get(1).getCodNum().toString());
 		
 		RespuestaHttp respuesta = new RespuestaHttp();
 		ControladorGestionEvaluadores controlador = new ControladorGestionEvaluadores();
@@ -194,7 +194,7 @@ public class TestBEPControladorGestionEvaluadores {
 		peticion.setParameter(ControladorGestionEvaluadores.PARAM_USUARIO, bean2.getDatatableEvaluadores().getData().get(0).getCodNum().toString());
 		peticion.setParameter(ControladorGestionEvaluadores.PARAM_AREA, bean2.getArea().getCodNum().toString());
 		peticion.setParameter(ControladorGestionEvaluadores.PARAM_ACTIVO, "false");
-		peticion.setParameter(ControladorGestionEvaluadores.PARAM_DEPARTAMENTO, bean.getDepartamentos().get(0).getCodNum().toString());
+		peticion.setParameter(ControladorGestionEvaluadores.PARAM_DEPARTAMENTO, bean.getDepartamentos().get(1).getCodNum().toString());
 		
 		RespuestaHttp respuesta = new RespuestaHttp();
 		ControladorGestionEvaluadores controlador = new ControladorGestionEvaluadores();
@@ -222,7 +222,7 @@ public class TestBEPControladorGestionEvaluadores {
 		peticion.setParameter(ControladorGestionEvaluadores.PARAM_USUARIO, bean2.getDatatableEvaluadores().getData().get(0).getCodNum().toString());
 		peticion.setParameter(ControladorGestionEvaluadores.PARAM_AREA, bean2.getArea().getCodNum().toString());
 		peticion.setParameter(ControladorGestionEvaluadores.PARAM_ACTIVO, "true");
-		peticion.setParameter(ControladorGestionEvaluadores.PARAM_DEPARTAMENTO, bean.getDepartamentos().get(0).getCodNum().toString());
+		peticion.setParameter(ControladorGestionEvaluadores.PARAM_DEPARTAMENTO, bean.getDepartamentos().get(1).getCodNum().toString());
 		
 		RespuestaHttp respuesta = new RespuestaHttp();
 		ControladorGestionEvaluadores controlador = new ControladorGestionEvaluadores();
@@ -248,7 +248,7 @@ public class TestBEPControladorGestionEvaluadores {
 		PeticionHttp peticion = UtilsTestBolsaEmpleo.peticionAutenticadaPersonal();
 		peticion.setParameter(ControladorGestionEvaluadores.PARAM_ACCION, ControladorGestionEvaluadores.ACCION_AREA_SELECCIONADA);
 		peticion.setParameter(ControladorGestionEvaluadores.PARAM_AREA, bean2.getDatatableAreas().getData().get(0).getCodNum().toString());
-		peticion.setParameter(ControladorGestionEvaluadores.PARAM_DEPARTAMENTO, bean.getDepartamentos().get(0).getCodNum().toString());
+		peticion.setParameter(ControladorGestionEvaluadores.PARAM_DEPARTAMENTO, bean.getDepartamentos().get(1).getCodNum().toString());
 		
 		RespuestaHttp respuesta = new RespuestaHttp();
 		ControladorGestionEvaluadores controlador = new ControladorGestionEvaluadores();
@@ -284,6 +284,30 @@ public class TestBEPControladorGestionEvaluadores {
 		assertEquals(MENSAJE_SIN_EXITO, 0, bean2.getMensajesDeExito().size());
 	}
 	
+	/** Obtener datatable áreas con parámetro no válido para forzar el error .
+	 * @throws SQLException si fallo bd .
+	 * @throws IOException si error io .
+	 * @throws ServletException  si error servlet .
+	 */
+	@Test
+	public void testE02ObtenerAreasParametroNoValido() throws SQLException, ServletException, IOException {
+		PeticionHttp peticion = UtilsTestBolsaEmpleo.peticionAutenticadaPersonal();
+    	peticion.setParameter(ControladorGestionEvaluadores.PARAM_ACCION, ControladorGestionEvaluadores.ACCION_DATATABLE_AREAS);
+    	
+    	VistaEvaluadores bean = getVistaConDepartamentos();
+    	peticion.setParameter(ControladorGestionEvaluadores.PARAM_DEPARTAMENTO, bean.getDepartamentos().get(1).getCodNum().toString());
+		peticion.setParameter(BolsaEmpleoDataTable.PARAM_ORDER_BY, "9");
+		
+		RespuestaHttp respuesta = new RespuestaHttp();
+		ControladorGestionEvaluadores controlador = new ControladorGestionEvaluadores();
+		controlador.doPost(peticion, respuesta);
+		
+		VistaEvaluadores bean2 = (VistaEvaluadores) peticion.getUVDatos().getVistas().get(VistaEvaluadores.class.getName());
+		
+		assertEquals(MENSAJE_CON_ERROR, 1, bean2.getMensajesDeError().size());
+		assertEquals(MENSAJE_SIN_EXITO, 0, bean2.getMensajesDeExito().size());
+	}
+	
 	/** agregar evaluador dentro de un área con rol no válido .
 	 * @throws SQLException .
 	 * @throws ServletException .
@@ -298,7 +322,7 @@ public class TestBEPControladorGestionEvaluadores {
 		VistaEvaluadores bean = getVistaConDepartamentos();
 		VistaEvaluadores bean2 = getVistaConAreas();
 		peticion.setParameter(ControladorGestionEvaluadores.PARAM_AREA, bean2.getDatatableAreas().getData().get(0).getCodNum().toString());
-		peticion.setParameter(ControladorGestionEvaluadores.PARAM_DEPARTAMENTO, bean.getDepartamentos().get(0).getCodNum().toString());
+		peticion.setParameter(ControladorGestionEvaluadores.PARAM_DEPARTAMENTO, bean.getDepartamentos().get(1).getCodNum().toString());
 		
 		RespuestaHttp respuesta = new RespuestaHttp();
 		ControladorGestionEvaluadores controlador = new ControladorGestionEvaluadores();
@@ -324,7 +348,7 @@ public class TestBEPControladorGestionEvaluadores {
 		VistaEvaluadores bean = getVistaConDepartamentos();
 		VistaEvaluadores bean2 = getVistaConAreas();
 		peticion.setParameter(ControladorGestionEvaluadores.PARAM_AREA, bean2.getDatatableAreas().getData().get(0).getCodNum().toString());
-		peticion.setParameter(ControladorGestionEvaluadores.PARAM_DEPARTAMENTO, bean.getDepartamentos().get(0).getCodNum().toString());
+		peticion.setParameter(ControladorGestionEvaluadores.PARAM_DEPARTAMENTO, bean.getDepartamentos().get(1).getCodNum().toString());
 		
 		RespuestaHttp respuesta = new RespuestaHttp();
 		ControladorGestionEvaluadores controlador = new ControladorGestionEvaluadores();
@@ -349,8 +373,8 @@ public class TestBEPControladorGestionEvaluadores {
 		
 		VistaEvaluadores bean = getVistaConDepartamentos();
 		VistaEvaluadores bean2 = getVistaConAreas();
-		peticion.setParameter(ControladorGestionEvaluadores.PARAM_AREA, "[" + bean2.getDatatableAreas().getData().get(0).getCodNum().toString() + "]");
-		peticion.setParameter(ControladorGestionEvaluadores.PARAM_DEPARTAMENTO, bean.getDepartamentos().get(0).getCodNum().toString());
+		peticion.setParameter(ControladorGestionEvaluadores.PARAM_AREAS, "[" + bean2.getDatatableAreas().getData().get(0).getCodNum().toString() + "]");
+		peticion.setParameter(ControladorGestionEvaluadores.PARAM_DEPARTAMENTO, bean.getDepartamentos().get(1).getCodNum().toString());
 		
 		RespuestaHttp respuesta = new RespuestaHttp();
 		ControladorGestionEvaluadores controlador = new ControladorGestionEvaluadores();
@@ -359,7 +383,29 @@ public class TestBEPControladorGestionEvaluadores {
 		
 		assertEquals(MENSAJE_CON_ERROR, 1, bean3.getMensajesDeError().size());
 		assertEquals(MENSAJE_SIN_EXITO, 0, bean3.getMensajesDeExito().size());
-		assertEquals(MENSAJE_CON_ERROR_ESPERADO, ControladorGestionEvaluadores.MENSAJE_ERROR_EVALUADOR_YA_EXISTE, bean3.getMensajesDeError().get(0));
+		assertEquals(MENSAJE_CON_ERROR_ESPERADO, String.format(ControladorGestionEvaluadores.MENSAJE_ERROR_EVALUADOR_YA_EXISTE,
+				bean2.getDatatableAreas().getData().get(0).getArea().getDescripcion()), bean3.getMensajesDeError().get(0));
+	}
+	
+	/** acción no válida .
+	 * @throws SQLException si fallo bd .
+	 * @throws IOException si error io .
+	 * @throws ServletException si error servlet .
+	 */
+	@Test
+	public void testE06AccionNoValida() throws SQLException, ServletException, IOException {
+		PeticionHttp peticion = UtilsTestBolsaEmpleo.peticionAutenticadaPersonal();
+    	peticion.setParameter(ControladorGestionEvaluadores.PARAM_ACCION, "accionnovalida");
+    	
+    	RespuestaHttp respuesta = new RespuestaHttp();
+		ControladorGestionEvaluadores controlador = new ControladorGestionEvaluadores();
+		controlador.doGet(peticion, respuesta);
+		
+		VistaEvaluadores bean = (VistaEvaluadores) peticion.getUVDatos().getVistas().get(VistaEvaluadores.class.getName());
+		
+		assertEquals(MENSAJE_CON_ERROR, 1, bean.getMensajesDeError().size());
+		assertEquals(MENSAJE_SIN_EXITO, 0, bean.getMensajesDeExito().size());
+		assertEquals(MENSAJE_CON_ERROR_ESPERADO, ControladorGestionEvaluadores.MENSAJE_ERROR_ACCION_NO_CONTEMPLADA, bean.getMensajesDeError().get(0));
 	}
 	
 }

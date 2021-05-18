@@ -44,7 +44,6 @@ public class ModeloDepartamento {
 	
     
     /** Consulta departamentos en BBDD y los devuelve.
-	 * @param clausula para filtrar los departamentos de la bd .
 	 * @return departamentos de la base de datos .
 	 * @throws SQLException en caso de error de base de datos .
 	 * @throws UVException .
@@ -52,6 +51,30 @@ public class ModeloDepartamento {
 	public List<Departamento> listaDepartamentos() throws SQLException, UVException {
 		List<Departamento> departamentos = new ArrayList<>();
 		String consulta = "SELECT bepdep.* FROM TBEP_DEPARTAMENTOS bepdep ";
+		
+		try (Connection conexion = ConexionUvirtual.obtenerInstancia();
+			PreparedStatement stmt = conexion.prepareStatement(consulta);) {
+				try (ResultSet rs = stmt.executeQuery()) {
+					while (rs.next()) {
+							Departamento dep = new Departamento();
+							dep.setCodNum(rs.getInt("CODNUM"));
+							dep.setIdDepartamentoExterno(rs.getString("ID_DEPARTAMENTO"));
+							dep.setDescripcion(rs.getString("DES_DEPARTAMENTO"));
+							departamentos.add(dep);	
+					}
+				}
+			}
+		return departamentos;
+	}
+	
+	/** Consulta departamentos en BBDD y los devuelve ordenados por descripción .
+	 * @return departamentos de la base de datos .
+	 * @throws SQLException en caso de error de base de datos .
+	 * @throws UVException .
+	 */
+	public List<Departamento> listaDepartamentosOrderByDesc() throws SQLException, UVException {
+		List<Departamento> departamentos = new ArrayList<>();
+		String consulta = "SELECT bepdep.* FROM TBEP_DEPARTAMENTOS bepdep ORDER BY DES_DEPARTAMENTO ";
 		
 		try (Connection conexion = ConexionUvirtual.obtenerInstancia();
 			PreparedStatement stmt = conexion.prepareStatement(consulta);) {
