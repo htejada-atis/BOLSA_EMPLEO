@@ -1,6 +1,5 @@
 package unitarios;
 
-import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 import java.io.IOException;
@@ -18,16 +17,17 @@ import org.junit.runners.MethodSorters;
 import bbdd.BbddRunner;
 import bbdd.UtilsTestBolsaEmpleo;
 import es.ujaen.uvirtual.modelo.conexion.Conexion;
-import es.ujaen.uvirtual.modulo.bolsaempleo.beans.Afinidad;
 import es.ujaen.uvirtual.modulo.bolsaempleo.beans.Evaluador;
 import es.ujaen.uvirtual.modulo.bolsaempleo.beans.Rol;
-import es.ujaen.uvirtual.modulo.bolsaempleo.modelo.ModeloAfinidad;
+import es.ujaen.uvirtual.modulo.bolsaempleo.beans.UsuarioBolsaEmpleo;
+import es.ujaen.uvirtual.modulo.bolsaempleo.modelo.ModeloEvaluador;
 import es.ujaen.uvirtual.utilidades.UVException;
 
 
 /** Clase para probar el modelo evaluador. */
 @FixMethodOrder(MethodSorters.NAME_ASCENDING)
 public class TestBEPModeloEvaluador {
+	private static final Integer CODNUM = 1000;
 	private static final String CODCUENTA = "test2";
 	private static final Rol ROL = new Rol(1050);
 	private static final String EMAIL = "test@test";
@@ -47,7 +47,9 @@ public class TestBEPModeloEvaluador {
     @BeforeClass
     public static void preparaBd() throws SQLException, IOException, ParseException {
     	DataSource ds = BbddRunner.obtenerDataSourceUv();
+    	DataSource dsArcos = BbddRunner.obtenerDataSourceArcos();
     	Conexion.setConexionUvirtual(ds);
+    	Conexion.setConexionArcos(dsArcos);
     	UtilsTestBolsaEmpleo.inicializaBolsaEmpleo();
     }
     
@@ -57,8 +59,9 @@ public class TestBEPModeloEvaluador {
      * @throws ParseException si error al validar fecha
      */
     @Test
-    public void testA01InsertaAfinidad() throws SQLException, ParseException, UVException {
+    public void testA01InsertaEvaluador() throws SQLException, ParseException, UVException {
 		Evaluador evaluador = new Evaluador();
+		evaluador.setCodNum(CODNUM);
 		evaluador.setCodCuenta(CODCUENTA);
 		evaluador.setRol(ROL);
 		evaluador.setEmail(EMAIL);
@@ -70,42 +73,25 @@ public class TestBEPModeloEvaluador {
 		evaluador.setFechaBorrado(FECHABORRADO);
 		evaluador.setCodNumArea(AREA);    	
 
+		ModeloEvaluador.obtenerInstancia().insertaEvaluador(evaluador, AREA);
     }
 
-    /** test acierto borrar afinidad.
+    /** test acierto borrar evaluador.
      * @throws SQLException si error en bd
-     * @throws UVException si error al validar afinidad 
+     * @throws UVException si error al validar evaluador 
      */
     @Test
-    public void testA02BorraAfinidad() throws SQLException, UVException {
-		ModeloAfinidad modelo = ModeloAfinidad.obtenerInstancia();
-    	List<Afinidad> afinidades = modelo.listaAfinidades();
-    	Afinidad afinidad = afinidades.get(0);
-    	modelo.borraAfinidad(afinidad);
-    	try {
-    		modelo.getAfinidadById(afinidad.getCodNum());
-    		fail();
-    	} catch (UVException e) {
-    		//se expera excepcion
-    	}
-    	List<Afinidad> afinidadesFiltradas = modelo.listaAfinidades();
-    	assertTrue("fichero borrado no debe ser listado", !afinidadesFiltradas.contains(afinidad));
+    public void testA02BorraEvaluador() throws SQLException, UVException {
+		ModeloEvaluador modelo = ModeloEvaluador.obtenerInstancia();
+    	List<Evaluador> evaluadores = modelo.listaEvaluadores();
+    	Evaluador evaluador = evaluadores.get(evaluadores.size() - 1);
+    	Evaluador evaluadorAcum = modelo.getEvaluadorById(evaluador.getCodNum());
+    	modelo.borraRestauraEvaluador(evaluador);
+
+    	assertTrue("evaluador borrado no debe ser listado", !evaluadorAcum.getBorrado().equals(evaluador.getBorrado()));
     }
     
-    /** test acierto editar afinidad.
-     * @throws SQLException si error en bd
-     * @throws UVException si error el validar afinidad
-     */
-    @Test
-    public void testA03EditarAfinidad() throws SQLException, UVException {
-		ModeloAfinidad modelo = ModeloAfinidad.obtenerInstancia();
-    	List<Afinidad> afinidades = modelo.listaAfinidades();
-    	Afinidad afinidad = afinidades.get(0);
-    	modelo.actualizaAfinidad(afinidad);
-    	Afinidad afinidadActualizada = modelo.getAfinidadById(afinidad.getCodNum());
-    	
-    	assertFalse("afinidad debe ser actualizada", afinidad.equals(afinidadActualizada));
-    }
+
     
     
     /** test error inserta usuario null.
@@ -113,10 +99,10 @@ public class TestBEPModeloEvaluador {
      * @throws UVException error experado
      */
     @Test(expected = UVException.class)
-    public void testE01InsertaAfinidadNull() throws SQLException, UVException {
-    	Afinidad afinidad = null;
-		ModeloAfinidad modelo = ModeloAfinidad.obtenerInstancia();
-    	modelo.nuevaAfinidad(afinidad);
+    public void testE01InsertaEvaluadorNull() throws SQLException, UVException {
+    	UsuarioBolsaEmpleo evaluador = null;
+    	ModeloEvaluador modelo = ModeloEvaluador.obtenerInstancia();
+    	modelo.insertaEvaluador(evaluador, AREA);
     	fail();
     }
 }

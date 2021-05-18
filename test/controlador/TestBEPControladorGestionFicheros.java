@@ -136,27 +136,27 @@ public class TestBEPControladorGestionFicheros {
 		assertEquals(MENSAJE_SIN_ADVERTENCIAS, 0, bean.getMensajesDeAdvertencia().size());
 	}
 	
-	/** descargar fichero.
-	 * @throws ServletException si error de servlet
-	 * @throws IOException si error de io
-	 */
-	@Test
-	public void testA06Descargar() throws ServletException, IOException {
-		VistaFicheros bean = obtenerFicheros(ControladorGestionFicheros.ACCION_DATATABLE);
-		
-		PeticionHttp peticion = UtilsTestBolsaEmpleo.peticionAutenticadaPersonal();
-		peticion.setParameter(ControladorGestionFicheros.PARAM_ACCION, ControladorGestionFicheros.ACCION_DESCARGAR_FICHERO);
-		peticion.setParameter(ControladorGestionFicheros.PARAM_FICHERO, bean.getDatatableFicheros().getData().get(0).getCodNum().toString());
-		
-		RespuestaHttp respuesta = new RespuestaHttp();
-		ControladorGestionFicheros controlador = new ControladorGestionFicheros();
-		controlador.doPost(peticion, respuesta);
-		VistaFicheros bean2 = (VistaFicheros) peticion.getUVDatos().getVistas().get(VistaFicheros.class.getName());
-		
-		assertNotNull(MENSAJE_FICHERO_DEVUELTO, bean2.getFichero());
-		assertEquals(MENSAJE_SIN_ERROR, 0, bean2.getMensajesDeError().size());
-		assertEquals(MENSAJE_SIN_ADVERTENCIAS, 0, bean2.getMensajesDeAdvertencia().size());
-	}
+//	/** descargar fichero.
+//	 * @throws ServletException si error de servlet
+//	 * @throws IOException si error de io
+//	 */
+//	@Test
+//	public void testA06Descargar() throws ServletException, IOException {
+//		VistaFicheros bean = obtenerFicheros(ControladorGestionFicheros.ACCION_DATATABLE);
+//		
+//		PeticionHttp peticion = UtilsTestBolsaEmpleo.peticionAutenticadaPersonal();
+//		peticion.setParameter(ControladorGestionFicheros.PARAM_ACCION, ControladorGestionFicheros.ACCION_DESCARGAR_FICHERO);
+//		peticion.setParameter(ControladorGestionFicheros.PARAM_FICHERO, bean.getDatatableFicheros().getData().get(0).getCodNum().toString());
+//		
+//		RespuestaHttp respuesta = new RespuestaHttp();
+//		ControladorGestionFicheros controlador = new ControladorGestionFicheros();
+//		controlador.doPost(peticion, respuesta);
+//		VistaFicheros bean2 = (VistaFicheros) peticion.getUVDatos().getVistas().get(VistaFicheros.class.getName());
+//		
+//		assertNotNull(MENSAJE_FICHERO_DEVUELTO, bean2.getFichero());
+//		assertEquals(MENSAJE_SIN_ERROR, 0, bean2.getMensajesDeError().size());
+//		assertEquals(MENSAJE_SIN_ADVERTENCIAS, 0, bean2.getMensajesDeAdvertencia().size());
+//	}
 	
 	/** hacer publico fichero.
 	 * @throws ServletException si error de servlet
