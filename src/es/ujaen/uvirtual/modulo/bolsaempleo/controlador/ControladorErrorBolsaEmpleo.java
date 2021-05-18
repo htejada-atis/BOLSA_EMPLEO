@@ -1,7 +1,6 @@
 package es.ujaen.uvirtual.modulo.bolsaempleo.controlador;
 
 import java.io.IOException;
-
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
@@ -15,7 +14,8 @@ import es.ujaen.uvirtual.modulo.bolsaempleo.vistas.VistaError;
  * Clase controlador para mostrar errores .
  */
 @WebServlet(
-		name = "informacionadministrativa.bolsaempleo.error", 
+		name = "informacionadministrativa.bolsaempleo.error",
+		displayName = "bolsaempleo.error",
 		description = "Controlador para los errores de bolsa empleo", 
 		urlPatterns = { 
 				"/srv/es/informacionadministrativa/bolsaempleo/error", 
