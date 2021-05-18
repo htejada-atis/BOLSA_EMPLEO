@@ -207,7 +207,6 @@ Departamento departamento = bean.getDepartamento();
 		
 		<% } %>
 		
-		
 		<% if (departamento != null) { %>
 			document.getElementById("select_departamento").value = "<%= departamento.getCodNum() %>";
 			document.getElementById("nuevo_evaluador_cont").style.visibility = "visible";
