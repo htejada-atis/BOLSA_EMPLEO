@@ -17,6 +17,7 @@ import es.ujaen.uvirtual.modulo.bolsaempleo.beans.UsuarioBolsaEmpleo;
 import es.ujaen.uvirtual.modulo.bolsaempleo.utilidades.BolsaEmpleoDataTable;
 import es.ujaen.uvirtual.modulo.bolsaempleo.utilidades.BolsaEmpleoUtils;
 import es.ujaen.uvirtual.modulo.bolsaempleo.utilidades.BolsaEmpleoDataTable.DataTableColumn;
+import es.ujaen.uvirtual.utilidades.EscapaHTML;
 import es.ujaen.uvirtual.utilidades.UVException;
 
 /**
@@ -62,20 +63,6 @@ public class ModeloMisTitulaciones {
 	 * @return titulación con el id especificado
 	 * @throws SQLException en caso de error en la BD
 	 */
-	public Titulacion listaTitulacion(int id) throws SQLException, UVException {
-		String clausulaWhere = "WHERE codnum = " + id;
-		List<Titulacion> titulaciones = listaTitulaciones(clausulaWhere);
-		if (titulaciones.isEmpty()) {
-			throw new UVException("No existe titulación");
-		}
-		return titulaciones.get(0);
-	}
-	
-	/** obtiene una titulación a partir de su id.
-	 * @param id codigo de la titulación
-	 * @return titulación con el id especificado
-	 * @throws SQLException en caso de error en la BD
-	 */
 	public TitulacionUsuario listaTitulacionUsuario(int id) throws SQLException, UVException {
 		String clausulaWhere = "WHERE codnum = " + id;
 		List<TitulacionUsuario> titulaciones = listaTitulacionesUsuarios(clausulaWhere);
@@ -108,31 +95,6 @@ public class ModeloMisTitulaciones {
 		return titulaciones;
 	}
 	
-	
-	/** Consulta titulaciones en BBDD y las devuelve.
-	 * @param clausula para filtrar las titulaciones de la bd
-	 * @return todas las titulaciones de la base de datos
-	 * @throws SQLException en caso de error de base de datos
-	 */
-	private List<Titulacion> listaTitulaciones(String clausula) throws SQLException {
-		List<Titulacion> titulaciones = new ArrayList<>();
-		String consulta = "SELECT beptit.* FROM tbep_titulaciones beptit " + clausula;
-		
-		try (Connection conexion = ConexionUvirtual.obtenerInstancia();
-			PreparedStatement stmt = conexion.prepareStatement(consulta);) {
-				try (ResultSet rs = stmt.executeQuery()) {
-					while (rs.next()) {
-						Titulacion tit = new Titulacion();
-						tit.setCodNum(rs.getInt("CODNUM"));
-						tit.setNombre(rs.getString("NOMBRE"));
-						titulaciones.add(tit);
-					}
-				}
-			}
-		
-		return titulaciones;
-	}
-	
 	/**
 	 * Listado de titulaciones en una tabla .
 	 * @param params para leer los parametros de paginación, ordenacion, etc
@@ -150,7 +112,7 @@ public class ModeloMisTitulaciones {
 				+ "LEFT JOIN tbep_titulaciones_usuario beptus "
 				+ "ON beptit.CODNUM = beptus.BEPTUS_TIT_CODNUM AND beptus.BEPTUS_USU_CODNUM = ? "
 				+ "AND beptus.FLGBORRADO != 'S' "
-				+ "WHERE beptus.BEPTUS_USU_CODNUM IS NULL";
+				+ "WHERE beptit.FLGBORRADO != 'S' AND beptus.BEPTUS_USU_CODNUM IS NULL";
 		
 		dataTable.setColumn(ORDER_COLUMN_INDEX_ID, "beptit.CODNUM", DataTableColumn.COLUMN_TYPE_NUMBER);
 		dataTable.setColumn(ORDER_COLUMN_INDEX_NOMBRE, "beptit.NOMBRE");
@@ -199,9 +161,9 @@ public class ModeloMisTitulaciones {
 		BolsaEmpleoDataTable<TitulacionUsuario> dataTable = new BolsaEmpleoDataTable<TitulacionUsuario>(params);
 		
 		String consulta = "SELECT beptit.CODNUM as beptitcod, beptit.NOMBRE AS beptitnombre, beptus.CODNUM, beptus.BEPTUS_USU_CODNUM, beptus.BEPTUS_TIT_CODNUM, "
-				+ "beptus.DESCRIPCION, beptus.FLGBORRADO, beptus.FLGVALIDADA, beptus.FECHA_BORRADO, beptus.FECHA_VALIDADA "
+				+ "beptus.DESCRIPCION, beptus.FLGBORRADO, beptus.FLGVALIDADA, beptus.FECHA_BORRADO, beptus.FECHA_VALIDADA, beptus.OTRATITULACION "
 				+ "FROM tbep_titulaciones_usuario beptus "
-				+ "INNER JOIN tbep_titulaciones beptit ON beptit.codnum=beptus.beptus_tit_codnum "
+				+ "left JOIN tbep_titulaciones beptit ON beptit.codnum=beptus.beptus_tit_codnum "
 				+ "WHERE beptus.BEPTUS_USU_CODNUM = ? AND beptus.FLGBORRADO != 'S'";
 		
 		dataTable.setColumn(ORDER_COLUMN_INDEX_NOMBRE_USUARIO, "beptitnombre");
@@ -264,18 +226,36 @@ public class ModeloMisTitulaciones {
 			throw new UVException("No se puede insertar una titulación sin archivo");
 		}
 		
-		String consulta = "INSERT INTO tbep_titulaciones_usuario " 
-						+ " (BEPTUS_TIT_CODNUM,BEPTUS_USU_CODNUM,DESCRIPCION,ARCHIVO) "
-						+ "VALUES (?,?,?,?)";
-		
-		try (Connection conexion = ConexionUvirtual.obtenerInstancia();
-			 PreparedStatement stmt = conexion.prepareStatement(consulta);) {
-			int parameterIndex = 1;
-			stmt.setInt(parameterIndex++, titulacion.getTitulacion().getCodNum());
-			stmt.setInt(parameterIndex++, titulacion.getUsuario().getCodNum());
-			stmt.setString(parameterIndex++, titulacion.getDescripcion());
-			stmt.setBinaryStream(parameterIndex++, titulacion.getArchivo());
-			stmt.executeUpdate();
+		if (titulacion.getTitulacion() != null) {
+			String consulta = "INSERT INTO tbep_titulaciones_usuario " 
+					+ " (BEPTUS_TIT_CODNUM,BEPTUS_USU_CODNUM,DESCRIPCION,ARCHIVO) "
+					+ "VALUES (?,?,?,?)";
+	
+			try (Connection conexion = ConexionUvirtual.obtenerInstancia();
+					PreparedStatement stmt = conexion.prepareStatement(consulta);) {
+				int parameterIndex = 1;
+				stmt.setInt(parameterIndex++, titulacion.getTitulacion().getCodNum());
+				stmt.setInt(parameterIndex++, titulacion.getUsuario().getCodNum());
+				stmt.setString(parameterIndex++, titulacion.getDescripcion());
+				stmt.setBinaryStream(parameterIndex++, titulacion.getArchivo());
+				stmt.executeUpdate();
+			}
+		} else {
+			
+			String consulta = "INSERT INTO tbep_titulaciones_usuario " 
+					+ " (BEPTUS_USU_CODNUM,DESCRIPCION,ARCHIVO,OTRATITULACION) "
+					+ "VALUES (?,?,?,?)";
+	
+			try (Connection conexion = ConexionUvirtual.obtenerInstancia();
+					PreparedStatement stmt = conexion.prepareStatement(consulta);) {
+				int parameterIndex = 1;
+				stmt.setInt(parameterIndex++, titulacion.getUsuario().getCodNum());
+				stmt.setString(parameterIndex++, titulacion.getDescripcion());
+				stmt.setBinaryStream(parameterIndex++, titulacion.getArchivo());
+				stmt.setString(parameterIndex++, titulacion.getOtraTitulacion());
+				stmt.executeUpdate();
+			}
+			
 		}
 	}
 	
@@ -318,11 +298,15 @@ public class ModeloMisTitulaciones {
 		tit.setDescripcion(rs.getString("DESCRIPCION"));
 		
 		UsuarioBolsaEmpleo usu = ModeloUsuarioBolsaEmpleo.obtenerInstancia().getUsuarioById(rs.getInt("BEPTUS_USU_CODNUM"));
-		tit.setUsuario(usu);
-		
-		Titulacion titu = listaTitulacion(rs.getInt("BEPTUS_TIT_CODNUM"));
-		tit.setTitulacion(titu);
-		
+		tit.setUsuario(usu);		
+
+		if (rs.getInt("BEPTUS_TIT_CODNUM") != 0) {
+			Titulacion titu = ModeloTitulacion.obtenerInstancia().listaTitulacion(rs.getInt("BEPTUS_TIT_CODNUM"));
+			tit.setTitulacion(titu);
+		} else {
+			tit.setOtraTitulacion(EscapaHTML.ajustaCodificacion(rs.getString("OTRATITULACION")));
+		}
+
 		if (archivo) {
 			tit.setArchivo(rs.getBlob("ARCHIVO").getBinaryStream());
 		}

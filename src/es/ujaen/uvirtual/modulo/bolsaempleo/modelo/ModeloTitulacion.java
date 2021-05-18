@@ -11,8 +11,10 @@ import java.util.List;
 import java.util.Map;
 
 import es.ujaen.uvirtual.modelo.conexion.ConexionUvirtual;
+import es.ujaen.uvirtual.modulo.bolsaempleo.beans.Area;
 import es.ujaen.uvirtual.modulo.bolsaempleo.beans.Titulacion;
 import es.ujaen.uvirtual.modulo.bolsaempleo.beans.TitulacionArea;
+import es.ujaen.uvirtual.modulo.bolsaempleo.beans.UsuarioBolsaEmpleo;
 import es.ujaen.uvirtual.modulo.bolsaempleo.utilidades.BolsaEmpleoDataTable;
 import es.ujaen.uvirtual.modulo.bolsaempleo.utilidades.BolsaEmpleoUtils;
 import es.ujaen.uvirtual.modulo.bolsaempleo.utilidades.BolsaEmpleoDataTable.DataTableColumn;
@@ -79,6 +81,8 @@ public class ModeloTitulacion {
 					Titulacion tit = new Titulacion();
 					tit.setCodNum(rs.getInt(CODNUM));
 					tit.setNombre(rs.getString(NOMBRE));
+					tit.setBorrado(rs.getString("FLGBORRADO").equals("S"));
+					tit.setFechaBorrado(rs.getTimestamp("FECHA_BORRADO"));
 					titulaciones.add(tit);
 
 				}
@@ -114,6 +118,8 @@ public class ModeloTitulacion {
 					Titulacion tit = new Titulacion();
 					tit.setCodNum(rs.getInt(CODNUM));
 					tit.setNombre(rs.getString(NOMBRE));
+					tit.setBorrado(rs.getString("FLGBORRADO").equals("S"));
+					tit.setFechaBorrado(rs.getTimestamp("FECHA_BORRADO"));
 					titulaciones.add(tit);
 				}
 			}
@@ -147,6 +153,11 @@ public class ModeloTitulacion {
 		if (titulacion.getCodNum() == null) {
 			throw new UVException("No se puede eliminar una titulación con id vacío");
 		}
+		
+		if (checkTitulacionArea(titulacion)) {
+			throw new UVException("No se puede eliminar una titulación asociada a un área");
+		}
+		
 		String consulta = "UPDATE tbep_titulaciones SET FLGBORRADO = ?, FECHA_BORRADO = ? "
 				+ "WHERE CODNUM=?";
 		try (Connection conexion = ConexionUvirtual.obtenerInstancia(); PreparedStatement stmt = conexion.prepareStatement(consulta)) {
@@ -447,5 +458,30 @@ public class ModeloTitulacion {
 		}
 		
 		throw new UVException(ERROR_TITULACION_NOEXITE);	
+	}
+	
+	/**
+	 * Devuelve si el usuario está excluido de la area.
+	 * @param tit .
+	 * @return true o false si está excluido o no
+	 * @throws SQLException .
+	 */
+	public boolean checkTitulacionArea(Titulacion tit) throws SQLException {
+		String query = "SELECT COUNT(*) as count FROM TBEP_TITULACIONES_PREFERENTES_AREA WHERE BEPTIT_CODNUM = ?";		
+		
+		try (Connection con = ConexionUvirtual.obtenerInstancia(); PreparedStatement stmt = con.prepareStatement(query)) {
+			int param = 1;
+			stmt.setInt(param++, tit.getCodNum());
+			
+			try (ResultSet rs = stmt.executeQuery()) {
+				rs.next();
+				
+				if (rs.getInt("count") > 0) {
+					return true;
+				}
+			}
+		}
+		
+		return false;
 	}
 }

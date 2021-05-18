@@ -34,7 +34,7 @@ public class TestBEPControladorUsuariosBolsaEmpleo {
 	private static final String MENSAJE_SIN_EXITO = "No debe exito";
 	
 	private static final String CODNUM = "3";
-	private static final String CODCUENTA = "pruebas1";
+	private static final String CODCUENTA = "test";
 	private static final String ROL = "1050";
 	private static final String EMAIL = "test@test";
 	private static final String LISTADIST = "S";
@@ -219,6 +219,7 @@ public class TestBEPControladorUsuariosBolsaEmpleo {
 		peticion.setParameter(ControladorUsuarioBolsaEmpleo.PARAM_EXCLUIDO, "N");
 		peticion.setParameter(ControladorUsuarioBolsaEmpleo.PARAM_RAZON_EXCLUIDO, "EJEMPLO");
 		peticion.setParameter(ControladorUsuarioBolsaEmpleo.PARAM_ROLE, ROL);
+		peticion.setParameter(ControladorUsuarioBolsaEmpleo.PARAM_NOMBRE_USUARIO, CODCUENTA);
 		peticion.setParameter(ControladorUsuarioBolsaEmpleo.PARAM_ID, CODCUENTA);
 		peticion.setParameter(ControladorUsuarioBolsaEmpleo.PARAM_EMAIL, EMAIL);
 		RespuestaHttp respuesta = new RespuestaHttp();

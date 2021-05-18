@@ -60,7 +60,7 @@ public class TestBEPControladorGestionTitulacionesPreferentesArea {
 		
 		if (area) {
 			VistaTitulacionesArea bean = getVistaConAreas();
-			peticion.setParameter(ControladorGestionTitulacionesPreferentesArea.PARAM_AREA, bean.getAreas().get(0).getCodNum().toString());
+			peticion.setParameter(ControladorGestionTitulacionesPreferentesArea.PARAM_AREA, bean.getAreas().get(9).getCodNum().toString());
 		}
 		
 		RespuestaHttp respuesta = new RespuestaHttp();

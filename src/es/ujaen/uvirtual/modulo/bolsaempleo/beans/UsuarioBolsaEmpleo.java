@@ -465,4 +465,251 @@ public class UsuarioBolsaEmpleo implements Serializable {
 	public static long getSerialversionuid() {
 		return serialVersionUID;
 	}
+	
+	@Override
+	public String toString() {
+		return "Usuario [codNum=" + codNum + ", codcuenta=" + codcuenta + ", tipodocumento=" + tipodocumento + ", numdocumento=" + numdocumento + ", nombre="
+				+ nombre + ", apellido1=" + apellido1 + ", apellido2=" + apellido2 + ", email=" + email + ", direccion=" + direccion + ", codigopostal=" 
+				+ codigopostal + ", localidad=" + localidad + ", provincia=" + provincia + ", telefono=" + telefono + ", nacionalidad=" + nacionalidad + ", sexo=" 
+				+ sexo + ", usuarioArcos=" + usuarioArcos + ", rol=" + rol + ", listaDist=" + listaDist + ", excluido=" + excluido + ", excluidoTipo=" 
+				+ excluidoTipo + ", fechaExclusionInicio=" + fechaExclusionInicio + ", fechaExclusionFin=" + fechaExclusionFin + ", razonExclusion=" 
+				+ razonExclusion + ", fechaExclusion=" + fechaExclusion + ", borrado=" + borrado + ", razonBorrado=" + razonBorrado + ", fechaBorrado=" 
+				+ fechaBorrado + "]";
+	}
+	
+	@Override
+	public int hashCode() {
+		final int prime = 31;
+		int result = 1;
+		result = prime * result + ((codNum == null) ? 0 : codNum.hashCode());
+		result = prime * result + ((codcuenta == null) ? 0 : codcuenta.hashCode());
+		result = prime * result + ((tipodocumento == null) ? 0 : tipodocumento.hashCode());
+		result = prime * result + ((numdocumento == null) ? 0 : numdocumento.hashCode());
+		result = prime * result + ((nombre == null) ? 0 : nombre.hashCode());
+		result = prime * result + ((apellido1 == null) ? 0 : apellido1.hashCode());
+		result = prime * result + ((apellido2 == null) ? 0 : apellido2.hashCode());
+		result = prime * result + ((email == null) ? 0 : email.hashCode());
+		result = prime * result + ((direccion == null) ? 0 : direccion.hashCode());
+		result = prime * result + ((codigopostal == null) ? 0 : codigopostal.hashCode());
+		result = prime * result + ((localidad == null) ? 0 : localidad.hashCode());
+		result = prime * result + ((provincia == null) ? 0 : provincia.hashCode());
+		result = prime * result + ((telefono == null) ? 0 : telefono.hashCode());
+		result = prime * result + ((nacionalidad == null) ? 0 : nacionalidad.hashCode());
+		result = prime * result + ((sexo == null) ? 0 : sexo.hashCode());
+		result = prime * result + ((usuarioArcos == null) ? 0 : usuarioArcos.hashCode());
+		result = prime * result + ((rol == null) ? 0 : rol.hashCode());
+		result = prime * result + ((listaDist == null) ? 0 : listaDist.hashCode());
+		result = prime * result + ((excluido == null) ? 0 : excluido.hashCode());
+		result = prime * result + ((excluidoTipo == null) ? 0 : excluidoTipo.hashCode());
+		result = prime * result + ((fechaExclusionInicio == null) ? 0 : fechaExclusionInicio.hashCode());
+		result = prime * result + ((fechaExclusionFin == null) ? 0 : fechaExclusionFin.hashCode());
+		result = prime * result + ((razonExclusion == null) ? 0 : razonExclusion.hashCode());
+		result = prime * result + ((fechaExclusion == null) ? 0 : fechaExclusion.hashCode());
+		result = prime * result + ((borrado == null) ? 0 : borrado.hashCode());
+		result = prime * result + ((razonBorrado == null) ? 0 : razonBorrado.hashCode());
+		result = prime * result + ((fechaBorrado == null) ? 0 : fechaBorrado.hashCode());
+		
+		return result;
+	}
+	
+	@Override
+	@SuppressWarnings({"checkstyle:CyclomaticComplexity", "checkstyle:NPathComplexity"})
+	public boolean equals(Object obj) {
+		if (this == obj) {
+			return true;
+		}
+		if (obj == null) {
+			return false;
+		}
+		if (getClass() != obj.getClass()) {
+			return false;
+		}
+		UsuarioBolsaEmpleo other = (UsuarioBolsaEmpleo) obj;
+		if (codcuenta == null) {
+			if (other.codcuenta != null) {
+				return false;
+			}
+		} else if (!codcuenta.equals(other.codcuenta)) {
+			return false;
+		}
+		if (tipodocumento == null) {
+			if (other.tipodocumento != null) {
+				return false;
+			}
+		} else if (!tipodocumento.equals(other.tipodocumento)) {
+			return false;
+		}
+		if (numdocumento == null) {
+			if (other.numdocumento != null) {
+				return false;
+			}
+		} else if (!numdocumento.equals(other.numdocumento)) {
+			return false;
+		}
+		if (nombre == null) {
+			if (other.nombre != null) {
+				return false;
+			}
+		} else if (!nombre.equals(other.nombre)) {
+			return false;
+		}
+		if (apellido1 == null) {
+			if (other.apellido1 != null) {
+				return false;
+			}
+		} else if (!apellido1.equals(other.apellido1)) {
+			return false;
+		}
+		if (apellido2 == null) {
+			if (other.apellido2 != null) {
+				return false;
+			}
+		} else if (!apellido2.equals(other.apellido2)) {
+			return false;
+		}
+		if (email == null) {
+			if (other.email != null) {
+				return false;
+			}
+		} else if (!email.equals(other.email)) {
+			return false;
+		}
+		if (direccion == null) {
+			if (other.direccion != null) {
+				return false;
+			}
+		} else if (!direccion.equals(other.direccion)) {
+			return false;
+		}
+		if (codigopostal == null) {
+			if (other.codigopostal != null) {
+				return false;
+			}
+		} else if (!codigopostal.equals(other.codigopostal)) {
+			return false;
+		}
+		if (localidad == null) {
+			if (other.localidad != null) {
+				return false;
+			}
+		} else if (!localidad.equals(other.localidad)) {
+			return false;
+		}
+		if (provincia == null) {
+			if (other.provincia != null) {
+				return false;
+			}
+		} else if (!provincia.equals(other.provincia)) {
+			return false;
+		}
+		if (telefono == null) {
+			if (other.telefono != null) {
+				return false;
+			}
+		} else if (!telefono.equals(other.telefono)) {
+			return false;
+		}
+		if (nacionalidad == null) {
+			if (other.nacionalidad != null) {
+				return false;
+			}
+		} else if (!nacionalidad.equals(other.nacionalidad)) {
+			return false;
+		}
+		if (sexo == null) {
+			if (other.sexo != null) {
+				return false;
+			}
+		} else if (!sexo.equals(other.sexo)) {
+			return false;
+		}
+		if (usuarioArcos == null) {
+			if (other.usuarioArcos != null) {
+				return false;
+			}
+		} else if (!usuarioArcos.equals(other.usuarioArcos)) {
+			return false;
+		}
+		if (rol == null) {
+			if (other.rol != null) {
+				return false;
+			}
+		} else if (!rol.equals(other.rol)) {
+			return false;
+		}
+		if (listaDist == null) {
+			if (other.listaDist != null) {
+				return false;
+			}
+		} else if (!listaDist.equals(other.listaDist)) {
+			return false;
+		}
+		if (excluido == null) {
+			if (other.excluido != null) {
+				return false;
+			}
+		} else if (!excluido.equals(other.excluido)) {
+			return false;
+		}
+		if (excluidoTipo == null) {
+			if (other.excluidoTipo != null) {
+				return false;
+			}
+		} else if (!excluidoTipo.equals(other.excluidoTipo)) {
+			return false;
+		}
+		if (fechaExclusionInicio == null) {
+			if (other.fechaExclusionInicio != null) {
+				return false;
+			}
+		} else if (!fechaExclusionInicio.equals(other.fechaExclusionInicio)) {
+			return false;
+		}
+		if (fechaExclusionFin == null) {
+			if (other.fechaExclusionFin != null) {
+				return false;
+			}
+		} else if (!fechaExclusionFin.equals(other.fechaExclusionFin)) {
+			return false;
+		}
+		if (razonExclusion == null) {
+			if (other.razonExclusion != null) {
+				return false;
+			}
+		} else if (!razonExclusion.equals(other.razonExclusion)) {
+			return false;
+		}
+		if (fechaExclusion == null) {
+			if (other.fechaExclusion != null) {
+				return false;
+			}
+		} else if (!fechaExclusion.equals(other.fechaExclusion)) {
+			return false;
+		}
+		if (borrado == null) {
+			if (other.borrado != null) {
+				return false;
+			}
+		} else if (!borrado.equals(other.borrado)) {
+			return false;
+		}
+		if (razonBorrado == null) {
+			if (other.razonBorrado != null) {
+				return false;
+			}
+		} else if (!razonBorrado.equals(other.razonBorrado)) {
+			return false;
+		}
+		if (fechaBorrado == null) {
+			if (other.fechaBorrado != null) {
+				return false;
+			}
+		} else if (!fechaBorrado.equals(other.fechaBorrado)) {
+			return false;
+		}	
+		
+		return true;
+	}
+	
+	
 }

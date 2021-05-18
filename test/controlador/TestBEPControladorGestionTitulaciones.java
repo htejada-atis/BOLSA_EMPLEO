@@ -121,28 +121,6 @@ public class TestBEPControladorGestionTitulaciones {
 		assertEquals(0, bean.getMensajesDeAdvertencia().size());
 	}
 	
-	/** editar titulación .
-	 * @throws ServletException si error de servlet .
-	 * @throws IOException si error de io .
-	 */
-	@Test
-	public void testA05EditarTitulacion() throws ServletException, IOException {
-		VistaTitulaciones bean = getVistaTitulaciones(ControladorGestionTitulaciones.ACCION_DATATABLE_TITULACIONES);
-		
-		PeticionHttp peticion = UtilsTestBolsaEmpleo.peticionAutenticadaPersonal();
-		peticion.setParameter(ControladorGestionTitulaciones.PARAM_ID, bean.getDatatableTitulaciones().getData().get(0).getCodNum().toString());
-		peticion.setParameter(ControladorGestionTitulaciones.PARAM_NOMBRE, NOMBRE_TITULACION);
-		
-		RespuestaHttp respuesta = new RespuestaHttp();
-		ControladorGestionTitulaciones controlador = new ControladorGestionTitulaciones();
-		controlador.doPost(peticion, respuesta);
-		VistaTitulaciones bean2 = (VistaTitulaciones) peticion.getUVDatos().getVistas().get(VistaTitulaciones.class.getName());
-		
-		assertNotNull(MENSAJE_TITULACION_DEVUELTA, bean2.getTitulacion());
-		assertEquals(MENSAJE_SIN_ERROR, 0, bean2.getMensajesDeError().size());
-		assertEquals(MENSAJE_SIN_ADVERTENCIAS, 0, bean2.getMensajesDeAdvertencia().size());
-	}
-	
 	/** eliminar titulación .
 	 * @throws ServletException si error de servlet .
 	 * @throws IOException si error de io .
@@ -151,7 +129,7 @@ public class TestBEPControladorGestionTitulaciones {
 	public void testA06EliminarTitulacion() throws ServletException, IOException {
 		PeticionHttp peticion = UtilsTestBolsaEmpleo.peticionAutenticadaPersonal();
 		peticion.setParameter(ControladorGestionTitulaciones.PARAM_ACCION, ControladorGestionTitulaciones.ACCION_BORRAR_TITULACION);
-		peticion.setParameter(ControladorGestionTitulaciones.PARAM_ID, "8");
+		peticion.setParameter(ControladorGestionTitulaciones.PARAM_ID, "175");
 		
 		RespuestaHttp respuesta = new RespuestaHttp();
 		ControladorGestionTitulaciones controlador = new ControladorGestionTitulaciones();
@@ -215,29 +193,6 @@ public class TestBEPControladorGestionTitulaciones {
 		peticion.setParameter(ControladorGestionTitulaciones.PARAM_ACCION, ControladorGestionTitulaciones.ACCION_BORRAR_TITULACION);
 		peticion.setParameter(ControladorGestionTitulaciones.PARAM_ID, bean.getDatatableTitulaciones().getData().get(0).getCodNum().toString());
 		
-		RespuestaHttp respuesta = new RespuestaHttp();
-		ControladorGestionTitulaciones controlador = new ControladorGestionTitulaciones();
-		controlador.doPost(peticion, respuesta);
-		VistaTitulaciones bean2 = (VistaTitulaciones) peticion.getUVDatos().getVistas().get(VistaTitulaciones.class.getName());
-		
-		assertEquals(MENSAJE_CON_ERROR, 1, bean2.getMensajesDeError().size());
-		assertEquals(MENSAJE_SIN_EXITO, 0, bean2.getMensajesDeExito().size());
-	}
-	
-	/** editar titulación nombre vacío .
-	 * @throws SQLException si fallo bd .
-	 * @throws UVException si error uv .
-	 * @throws IOException si error io .
-	 * @throws ServletException  si error servlet .
-	 */
-	@Test
-	public void testE04EditarTitulacionNombreVacio() throws SQLException, ServletException, IOException {
-		VistaTitulaciones bean = getVistaTitulaciones(ControladorGestionTitulaciones.ACCION_DATATABLE_TITULACIONES);
-		
-		PeticionHttp peticion = UtilsTestBolsaEmpleo.peticionAutenticadaPersonal();
-		peticion.setParameter(ControladorGestionTitulaciones.PARAM_ID, bean.getDatatableTitulaciones().getData().get(0).getCodNum().toString());
-		peticion.setParameter(ControladorGestionTitulaciones.PARAM_NOMBRE, "");
-
 		RespuestaHttp respuesta = new RespuestaHttp();
 		ControladorGestionTitulaciones controlador = new ControladorGestionTitulaciones();
 		controlador.doPost(peticion, respuesta);

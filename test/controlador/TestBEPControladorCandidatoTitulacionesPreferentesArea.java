@@ -63,7 +63,7 @@ public class TestBEPControladorCandidatoTitulacionesPreferentesArea {
     	
     	PeticionHttp peticion = UtilsTestBolsaEmpleo.peticionAutenticadaCandidato();
     	peticion.setParameter(ControladorCandidatoTitulacionesPreferentesArea.PARAM_ACCION, ControladorCandidatoTitulacionesPreferentesArea.ACCION_DATATABLE_TITULACIONES);
-    	peticion.setParameter(ControladorCandidatoTitulacionesPreferentesArea.PARAM_AREA, bean.getDatatableAreas().getData().get(0).getArea().getCodNum().toString());
+    	peticion.setParameter(ControladorCandidatoTitulacionesPreferentesArea.PARAM_AREA, bean.getDatatableAreas().getData().get(9).getArea().getCodNum().toString());
 		
 		RespuestaHttp respuesta = new RespuestaHttp();
 		ControladorCandidatoTitulacionesPreferentesArea controlador = new ControladorCandidatoTitulacionesPreferentesArea();

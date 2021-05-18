@@ -300,7 +300,7 @@ public final class UtilsTestBolsaEmpleo {
 					+ "		MIN(uvnbrdsa.DES_AREA_CONOCIMIENTO) DES_AREA_CONOCIMIENTO "
 					+ " FROM VUJA_NET_BEP_RH_DEPTO_SECC_AREA uvnbrdsa "
 					+ " GROUP BY uvnbrdsa.ID_DEPARTAMENTO, uvnbrdsa.ID_AREA_CONOCIMIENTO "
-					+ " ORDER BY uvnbrdsa.ID_AREA_CONOCIMIENTO " + " FETCH FIRST " + NUM_AREAS_INSERTAR + " ROW ONLY";
+					+ " ORDER BY uvnbrdsa.ID_AREA_CONOCIMIENTO";
 
 			try (PreparedStatement stmtSelect = conRh.prepareStatement(sqlAreaSelect)) {
 				try (ResultSet rs = stmtSelect.executeQuery()) {

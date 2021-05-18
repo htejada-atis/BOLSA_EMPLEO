@@ -77,7 +77,15 @@ $(document).ready(function() {
 	    "action": "<%=ControladorMisTitulaciones.ACCION_DATATABLE_TITULACIONES_USUARIO%>",
 	    "columns": [
 	    	{'data': 'codNum', 'selectable': true},
-	        {'data': 'titulacion.nombre', 'class': 'overflow-auto', 'filter': {'type': 'text'}},
+	        {'data': 'titulacion.nombre', 'class': 'overflow-auto', 'filter': {'type': 'text'},
+	    		'render': function(row) {
+        		if (row.otratitulacion!=null) {
+        			return "Otra titulación: " + row.otratitulacion; 
+        		}
+        		else{
+        			return row.titulacion.nombre; 
+        		}
+    		}},
 	    	{'data': 'descripcion'},
         	{'data': 'validada', 'order': {'active': false}, 'filter': {'type': 'select', 'options':{'true': 'Validado', 'false': 'Pendiente'}},
 	    		'render': function(row) {
