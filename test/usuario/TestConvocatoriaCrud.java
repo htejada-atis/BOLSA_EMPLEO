@@ -23,6 +23,7 @@ import org.openqa.selenium.By;
 import org.openqa.selenium.WebElement;
 
 import bbdd.UtilsTestDocentia;
+import es.ujaen.uvirtual.utilidades.UVException;
 
 /** Clase para probar solicitudCrud.
  * @author usig
@@ -50,9 +51,10 @@ public class TestConvocatoriaCrud {
 	/** Se ejecuta una vez al inicio de la clase.
 	 * @throws SQLException Si se produce error en bbdd
 	 * @throws IOException Si no se puede cargar los ficheros
+	 * @throws UVException si error uv
 	 */
 	@BeforeClass
-	public static void setUp() throws IOException, SQLException {
+	public static void setUp() throws IOException, SQLException, UVException {
 		LOGGER.log(Level.INFO, "inicio");
 		UtilsTestDocentia.inicializaDocentia();	
 		DriverUv.inicializaDriver();

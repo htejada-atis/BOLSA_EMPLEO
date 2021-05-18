@@ -6,7 +6,9 @@ import java.nio.ByteBuffer;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.security.SecureRandom;
+import java.util.ArrayList;
 import java.util.Base64;
+import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -24,6 +26,10 @@ public class ModeloClaveArcos {
     private static final String CARACTER_TIPO_VOCAL = "vocal";
     private static final String CARACTER_TIPO_CONSONANTE = "consonante";
     private static final String CARACTER_TIPO_ESPECIAL = "especial";
+    private static final String CARACTER_TIPO_NUMERO = "numero";
+    private static final String CARACTER_TIPO_MAYUSCULA = "mayuscula";
+    private static final String CARACTER_TIPO_MINUSCULA = "minuscula";
+    private static final String CARACTER_TIPO_CUALQUIERA = "cualquiera";
 	
 	/** genera ssha512 de una clave y un salt.
 	 * @param miClave clave en claro
@@ -112,9 +118,8 @@ public class ModeloClaveArcos {
 		return salida;
 	}
 	
-	private boolean validaFormatoCaracteresClave(String clave) {
-		boolean salida = true;
-		final int minimoTamClave = 8;
+	private List<Integer> cuentaNumeroCaracteres(String clave) {
+		ArrayList<Integer> salida = new ArrayList<>();
 		int pcount = 0;
 		int num = 0;
 		int alfa = 0;
@@ -139,6 +144,46 @@ public class ModeloClaveArcos {
 				especial++;
 			}
 		}
+		salida.add(pcount);
+		salida.add(num);
+		salida.add(alfa);
+		salida.add(alfaMay);
+		salida.add(especial);
+		return salida;
+	}
+	
+	private int cuentaNumeroCaracteres(String clave, String tipo) {
+		List<Integer> cuenta = cuentaNumeroCaracteres(clave);
+		int salida = 0;
+		final int posicionMayuscula = 3;
+		final int posicionEspecial = 4;
+		switch (tipo) {
+		case CARACTER_TIPO_NUMERO:
+			salida = cuenta.get(1);
+			break;
+		case CARACTER_TIPO_MINUSCULA:
+			salida = cuenta.get(2);
+			break;
+		case CARACTER_TIPO_MAYUSCULA:
+			salida = cuenta.get(posicionMayuscula);
+			break;
+		case CARACTER_TIPO_ESPECIAL:
+			salida = cuenta.get(posicionEspecial);
+			break;
+		default:
+			salida = cuenta.get(0);
+		}
+		return salida;
+	}
+	
+	private boolean validaFormatoCaracteresClave(String clave) {
+		boolean salida = true;
+		final int minimoTamClave = 8;
+		int pcount = cuentaNumeroCaracteres(clave, CARACTER_TIPO_CUALQUIERA);
+		int num = cuentaNumeroCaracteres(clave, CARACTER_TIPO_NUMERO);
+		int alfa = cuentaNumeroCaracteres(clave, CARACTER_TIPO_MINUSCULA);
+		int alfaMay = cuentaNumeroCaracteres(clave, CARACTER_TIPO_MAYUSCULA);
+		int especial = cuentaNumeroCaracteres(clave, CARACTER_TIPO_ESPECIAL);
 		if (pcount < minimoTamClave || num < 1 || alfa < 1 || alfaMay < 1 || especial < 1) {
 			salida = false;
 		}

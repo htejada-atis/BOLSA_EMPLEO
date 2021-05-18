@@ -42,9 +42,10 @@ public class TestControladorConvocatoriaCrud {
     /** prepara la bd con los datos iniciales.
      * @throws SQLException si error en bd
      * @throws IOException si error en ficheros
+     * @throws UVException si error uv
      */
     @BeforeClass
-    public static void preparaBd() throws IOException, SQLException {
+    public static void preparaBd() throws IOException, SQLException, UVException {
     	BbddRunner.conectarBd();
     	UtilsTestDocentia.inicializaDocentia();
     }

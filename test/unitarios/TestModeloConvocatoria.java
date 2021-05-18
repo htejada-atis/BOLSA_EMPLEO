@@ -33,9 +33,10 @@ public class TestModeloConvocatoria {
      * @throws SQLException si error en bd
      * @throws IOException si error en ficheros
 	 * @throws ParseException si error fecha
+	 * @throws UVException si error uv
      */
     @BeforeClass
-    public static void preparaBd() throws SQLException, IOException, ParseException {
+    public static void preparaBd() throws SQLException, IOException, ParseException, UVException {
     	DataSource ds = BbddRunner.obtenerDataSourceUv();
     	Conexion.setConexionUvirtual(ds);
     	UtilsTestDocentia.inicializaDocentia();
