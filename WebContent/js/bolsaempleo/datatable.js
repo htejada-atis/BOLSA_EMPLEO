@@ -326,6 +326,7 @@ function DataTable(id, config) {
 
                 dropdown.on('click', function() {
                     $(self.node).children('tbody').toggle('fast');
+                    $('th span:lt(3)', self.tfoot).toggle('fast');
                     $(this).find('img').toggleClass('show');
                 });
 
