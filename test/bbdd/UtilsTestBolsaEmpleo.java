@@ -28,7 +28,6 @@ public final class UtilsTestBolsaEmpleo {
 	private static final String UID_CANDIDATO_PRUEBAS = "candidato1";
 	private static final String UID_CANDIDATO2_PRUEBAS = "candidato2";
 	private static final String UID_PERSONAL_PRUEBAS = "personal1";
-	private static final int NUM_AREAS_INSERTAR = 35;
 	private static final Pattern RE_FILE_MIGRATION = Pattern.compile("\\d+-(im|eje)-[a-zA-Z]+\\.sql", Pattern.DOTALL);
 	private static final String ID_DEPARTAMENTO = "ID_DEPARTAMENTO";
 	private static final String CODNUM = "CODNUM";
@@ -70,7 +69,7 @@ public final class UtilsTestBolsaEmpleo {
 	
 			// datos de pruebas => areas
 			try {
-				logFile("Insertando " + NUM_AREAS_INSERTAR + " primeras areas ...");
+				logFile("Insertando areas ...");
 				UtilsTestBolsaEmpleo.insertarDepartamentosAreas();
 				logFile("Insertando areas => OK");
 			} catch (SQLException ex) {

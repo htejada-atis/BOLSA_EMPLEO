@@ -2,7 +2,6 @@ package controlador;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotEquals;
-import static org.junit.Assert.assertNotNull;
 
 import java.io.IOException;
 import java.sql.SQLException;
@@ -30,7 +29,6 @@ public class TestBEPControladorGestionTitulaciones {
 	
 	private static final String MENSAJE_CON_ERROR = "Debe devolver error";
 	private static final String MENSAJE_TITULACIONES_DEVUELTAS = "Debe devolver titulaciones";
-	private static final String MENSAJE_TITULACION_DEVUELTA = "Debe devolver titulación";
 	private static final String MENSAJE_SIN_ADVERTENCIAS = "No debe mostrar advertencias";
 	private static final String MENSAJE_SIN_ERROR = "No debe devolver error";
 	private static final String MENSAJE_SIN_EXITO = "No debe exito";

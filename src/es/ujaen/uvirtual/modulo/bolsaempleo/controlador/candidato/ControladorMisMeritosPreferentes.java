@@ -205,7 +205,7 @@ public class ControladorMisMeritosPreferentes extends HttpServlet {
 			try {
 				Usuario usuArcos = datos.getUsuario();
 				ModeloUsuarioBolsaEmpleo modeloUsuarioBolsaEmpleo = ModeloUsuarioBolsaEmpleo.obtenerInstancia();
-				UsuarioBolsaEmpleo usuario = modeloUsuarioBolsaEmpleo.listaUsuario(usuArcos.getDocumentoNumero());
+				UsuarioBolsaEmpleo usuario = modeloUsuarioBolsaEmpleo.getUsuarioByNumeroDocumento(usuArcos.getDocumentoNumero());
 				BolsaEmpleoDataTable<MeritoPreferenteUsuario> dataTable = ModeloMeritosPreferentesCandidato.obtenerInstancia().
 						listaMeritosCandidatoDatatable(request.getParameterMap(), usuario);
 				bean.setDatatable(dataTable);

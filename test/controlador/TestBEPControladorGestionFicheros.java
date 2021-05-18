@@ -2,7 +2,6 @@ package controlador;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotEquals;
-import static org.junit.Assert.assertNotNull;
 
 import java.io.IOException;
 import java.sql.SQLException;
@@ -26,7 +25,6 @@ import es.ujaen.uvirtual.modulo.bolsaempleo.vistas.VistaFicheros;
 @FixMethodOrder(MethodSorters.NAME_ASCENDING)
 public class TestBEPControladorGestionFicheros {
 	
-	private static final String MENSAJE_FICHERO_DEVUELTO = "Debe devolver fichero";
 	private static final String MENSAJE_SIN_ERROR = "No debe devolver error";
 	private static final String MENSAJE_SIN_ADVERTENCIAS = "No debe mostrar advertencias";
 	private static final String TITULO_FICHERO = "titulo";

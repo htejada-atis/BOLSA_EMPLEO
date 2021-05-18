@@ -229,7 +229,7 @@ public class ControladorMisMeritos extends HttpServlet {
 				Merito merito = this.validarMerito(request, uploadedFile);
 				
 				Usuario usuArcos = datos.getUsuario();
-				Integer idUsuario = ModeloUsuarioBolsaEmpleo.obtenerInstancia().listaUsuario(usuArcos.getDocumentoNumero()).getCodNum();
+				Integer idUsuario = ModeloUsuarioBolsaEmpleo.obtenerInstancia().getUsuarioByNumeroDocumento(usuArcos.getDocumentoNumero()).getCodNum();
 				ModeloMerito.obtenerInstancia().insertaMerito(merito, idUsuario);
 							
 				BolsaEmpleoUtils.addMensajeDeExito(MENSAJE_EXITO_AGREGAR, bean, request);
@@ -314,7 +314,7 @@ public class ControladorMisMeritos extends HttpServlet {
 			try {
 				Usuario usuArcos = datos.getUsuario();
 				ModeloUsuarioBolsaEmpleo modeloUsuarioBolsaEmpleo = ModeloUsuarioBolsaEmpleo.obtenerInstancia();
-				Integer idUsuario = modeloUsuarioBolsaEmpleo.listaUsuario(usuArcos.getDocumentoNumero()).getCodNum();
+				Integer idUsuario = modeloUsuarioBolsaEmpleo.getUsuarioByNumeroDocumento(usuArcos.getDocumentoNumero()).getCodNum();
 				BolsaEmpleoDataTable<Merito> dataTable = modelo.listaMeritosDatatable(request.getParameterMap(), idUsuario);
 				bean.setDatatable(dataTable);
 				writer.write(dataTable.toJson());
