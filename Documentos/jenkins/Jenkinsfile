@@ -22,6 +22,7 @@ pipeline {
 	        	echo 'Inicio compile'
 	        	git branch: "${BRANCH_NAME}", credentialsId:'gitlab-jenkins', url: "${GIT_URL}"
 	        	withAnt(installation: 'LocalAnt') {
+	        		sh "ant cleanall"
 		            sh "ant war"
 	        	}
         	}
