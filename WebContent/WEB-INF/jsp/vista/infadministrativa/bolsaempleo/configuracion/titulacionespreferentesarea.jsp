@@ -35,8 +35,7 @@ VistaTitulacionesArea bean = (VistaTitulacionesArea) uvdatos.getVistas().get(Vis
 		<table class="bluetable bolsaempleo" id="table_titulaciones_preferentes_area">
 			<tr>
 				<th scope="col" style="width:5%"></th>
-				<th scope="col" style="width:10%" title="Id de la titulación">Id</th>
-				<th scope="col"	class="nombre" style="width:70%">Nombre</th>
+				<th scope="col"	class="nombre" style="width:100%">Nombre</th>
 			</tr>
 			<tbody>		
 			</tbody>
@@ -50,8 +49,7 @@ VistaTitulacionesArea bean = (VistaTitulacionesArea) uvdatos.getVistas().get(Vis
 	    <table class="bluetable bolsaempleo" id="table_titulaciones">
 			<tr>
 				<th scope="col" style="width:5%"></th>
-				<th scope="col" style="width:10%" title="Id de la titulación">Id</th>
-				<th scope="col"	class="nombre" style="width:85%">Nombre</th>
+				<th scope="col"	class="nombre" style="width:100%">Nombre</th>
 			</tr>
 			<tbody>
 			</tbody>
@@ -82,7 +80,6 @@ VistaTitulacionesArea bean = (VistaTitulacionesArea) uvdatos.getVistas().get(Vis
 			    "action": "<%=ControladorGestionTitulacionesPreferentesArea.ACCION_DATATABLE_TITULACIONES_PREFERENTES_AREA%>",
 			    "columns": [
 			    	{'data': 'codNum', 'selectable': true},
-			    	{'data': 'codNum', 'filter': {'type': 'number'}},
 			        {'data': 'nombre', 'class': 'overflow-auto', 'filter': {'type': 'text'}},
 			    ],
 			    "actions": [
@@ -110,7 +107,6 @@ VistaTitulacionesArea bean = (VistaTitulacionesArea) uvdatos.getVistas().get(Vis
 			    "action": "<%=ControladorGestionTitulacionesPreferentesArea.ACCION_DATATABLE_TITULACIONES%>",
 			    "columns": [
 			    	{'data': 'codNum', 'selectable': true},
-			    	{'data': 'codNum', 'filter': {'type': 'number'}},
 			        {'data': 'nombre', 'class': 'overflow-auto', 'filter': {'type': 'text'}},
 			    ],
 			    "actions": [

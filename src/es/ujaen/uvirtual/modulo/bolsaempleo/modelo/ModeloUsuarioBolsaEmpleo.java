@@ -880,7 +880,6 @@ public class ModeloUsuarioBolsaEmpleo {
 				
 		try (Connection conexion = ConexionUvirtual.obtenerInstancia(); PreparedStatement stmt = conexion.prepareStatement(query)) {
 			int indexParam = 1;
-
 			
 			stmt.setString(indexParam++, borrado);
 			
