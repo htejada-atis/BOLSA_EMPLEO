@@ -1,13 +1,17 @@
 package es.ujaen.uvirtual.modulo.bolsaempleo.utilidades;
 
+import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.nio.charset.StandardCharsets;
 import java.sql.SQLException;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.Date;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 
 import javax.servlet.ServletRequest;
 import javax.servlet.http.HttpServletRequest;
@@ -149,6 +153,16 @@ public final class BolsaEmpleoUtils {
 	public static String getParametroConfiguracion(String nombre) throws SQLException, UVException {
 		ModeloParametrosConfiguracion modeloParam = ModeloParametrosConfiguracion.obtenerInstancia();
 		return modeloParam.getParametroByNombre(nombre).getValor();
+	}
+	
+	/**
+	 * Devuelve el contenido en string utf8 del inputstream pasado.
+	 * https://www.baeldung.com/convert-input-stream-to-string
+	 * @param f .
+	 * @return .
+	 */
+	public static String inputStreamToString(InputStream f) {
+		return new BufferedReader(new InputStreamReader(f, StandardCharsets.UTF_8)).lines().collect(Collectors.joining("\n"));
 	}
 	
 	/**

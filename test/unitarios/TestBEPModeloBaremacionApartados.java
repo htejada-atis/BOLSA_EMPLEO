@@ -17,7 +17,6 @@ import java.util.List;
 
 import javax.sql.DataSource;
 
-import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.FixMethodOrder;
 import org.junit.Test;
@@ -27,20 +26,13 @@ import bbdd.BbddRunner;
 import bbdd.UtilsTestBolsaEmpleo;
 import es.ujaen.uvirtual.modelo.conexion.Conexion;
 import es.ujaen.uvirtual.modulo.bolsaempleo.beans.ApartadoBaremacion;
-import es.ujaen.uvirtual.modulo.bolsaempleo.beans.BloqueBaremacion;
-import es.ujaen.uvirtual.modulo.bolsaempleo.beans.ItemBaremacion;
-import es.ujaen.uvirtual.modulo.bolsaempleo.beans.UsuarioBolsaEmpleo;
-import es.ujaen.uvirtual.modulo.bolsaempleo.modelo.ModeloBaremacionItems;
-import es.ujaen.uvirtual.modulo.bolsaempleo.modelo.ModeloUsuarioBolsaEmpleo;
 import es.ujaen.uvirtual.modulo.bolsaempleo.utilidades.BolsaEmpleoDataTable;
-import es.ujaen.uvirtual.modulo.bolsaempleo.modelo.ModeloArea;
 import es.ujaen.uvirtual.modulo.bolsaempleo.modelo.ModeloBaremacionApartados;
-import es.ujaen.uvirtual.modulo.bolsaempleo.modelo.ModeloBaremacionBloques;
 import es.ujaen.uvirtual.utilidades.UVException;
 
-/** test modelo baremacion.
-*
-*/
+/**
+ * test modelo apartado baremacion.
+ */
 @FixMethodOrder(MethodSorters.NAME_ASCENDING)
 public class TestBEPModeloBaremacionApartados {
 	private static final Integer CODNUM = 1;
@@ -61,12 +53,15 @@ public class TestBEPModeloBaremacionApartados {
 	 * @throws UVException    .
 	 */
 	@BeforeClass
-	public static void preparaBd() throws SQLException, IOException, UVException {
+	public static void preparaBd() throws SQLException, IOException {
 		DataSource ds = BbddRunner.obtenerDataSourceUv();
 		Conexion.setConexionUvirtual(ds);
 		UtilsTestBolsaEmpleo.inicializaBolsaEmpleo();
 	}
 	
+	/**
+	 * getApartadoBaremacionById.
+	 */
 	@Test
 	public void testA01getApartadoBaremacionById() {
 		try {
@@ -77,6 +72,9 @@ public class TestBEPModeloBaremacionApartados {
 		}
 	}
 	
+	/**
+	 * getUltimoCodigoApartado.
+	 */
 	@Test
 	public void testA02getUltimoCodigoApartado() {
 		try {
@@ -88,6 +86,9 @@ public class TestBEPModeloBaremacionApartados {
 		}
 	}
 	
+	/**
+	 * getUltimoCodigoApartado.
+	 */
 	@Test
 	public void testA03getUltimoCodigoApartado() {
 		try {
@@ -104,6 +105,9 @@ public class TestBEPModeloBaremacionApartados {
 		}
 	}
 	
+	/**
+	 * listadoApartadosGeneralesBaremacionDatatable.
+	 */
 	@Test
 	public void testA04listadoApartadosGeneralesBaremacionDatatable() {
 		HashMap<String, String[]> params = new HashMap<>();
@@ -121,6 +125,9 @@ public class TestBEPModeloBaremacionApartados {
 		}
 	}
 	
+	/**
+	 * insertaApartado.
+	 */
 	@Test
 	public void testA05insertaApartado() {
 		try {					
@@ -148,6 +155,9 @@ public class TestBEPModeloBaremacionApartados {
 		}
 	}
 	
+	/**
+	 * insertaApartado.
+	 */
 	@Test
 	public void testA06insertaApartado() {
 		try {					
@@ -175,6 +185,9 @@ public class TestBEPModeloBaremacionApartados {
 		}
 	}	
 	
+	/**
+	 * actualizaApartado.
+	 */
 	@Test
 	public void testA07actualizaApartado() {
 		try {					
@@ -200,6 +213,9 @@ public class TestBEPModeloBaremacionApartados {
 		}
 	}
 	
+	/**
+	 * listaApartadoBaremacionActivosOrdenadosPorCodigo.
+	 */
 	@Test
 	public void testA08listaApartadoBaremacionActivosOrdenadosPorCodigo() {
 		try {
@@ -214,6 +230,9 @@ public class TestBEPModeloBaremacionApartados {
 	
 	// ERRORES
 	
+	/**
+	 * getApartadoBaremacionById.
+	 */
 	@Test
 	public void testE01getApartadoBaremacionById() {
 		Throwable throwable = assertThrows(Throwable.class,
@@ -223,6 +242,9 @@ public class TestBEPModeloBaremacionApartados {
 		assertEquals(ModeloBaremacionApartados.ERROR_APARTADO_REQUERIDO, throwable.getMessage());
 	}
 	
+	/**
+	 * getApartadoBaremacionById.
+	 */
 	@Test
 	public void testE02getApartadoBaremacionById() {
 		Throwable throwable = assertThrows(Throwable.class,
@@ -232,6 +254,9 @@ public class TestBEPModeloBaremacionApartados {
 		assertEquals(ModeloBaremacionApartados.ERROR_APARTADO_NOEXITE, throwable.getMessage());
 	}
 	
+	/**
+	 * insertaApartado.
+	 */
 	@Test
 	public void testE03insertaApartado() {
 		Throwable throwable = assertThrows(Throwable.class,
@@ -241,6 +266,9 @@ public class TestBEPModeloBaremacionApartados {
 		assertEquals(ModeloBaremacionApartados.ERROR_APARTADO_REQUERIDO, throwable.getMessage());
 	}
 	
+	/**
+	 * existeOtroApartadoActivoPorCodigo.
+	 */
 	@Test
 	public void testE04existeOtroApartadoActivoPorCodigo() {
 		Throwable throwable = assertThrows(Throwable.class, () -> {

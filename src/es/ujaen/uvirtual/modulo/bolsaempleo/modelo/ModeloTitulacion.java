@@ -385,7 +385,7 @@ public class ModeloTitulacion {
 		List<TitulacionArea> titulaciones = new ArrayList<>();
 		BolsaEmpleoDataTable<TitulacionArea> dataTable = new BolsaEmpleoDataTable<>(params);
 		
-		String consulta = "SELECT beptit.CODNUM, beptit.NOMBRE FROM tbep_titulaciones beptit "
+		String consulta = "SELECT beptit.* FROM tbep_titulaciones beptit "
 				+ "INNER JOIN tbep_titulaciones_preferentes_area beptpa ON beptit.codnum = beptpa.beptit_codnum "
 				+ "INNER JOIN TBEP_AREAS bepare ON bepare.codnum = beptpa.bepare_codnum "
 				+ "WHERE bepare.CODNUM = ? ";
@@ -403,9 +403,7 @@ public class ModeloTitulacion {
 			dataTable.setFiltersParams(stmt, stmtCount, indexParam);
 			try (ResultSet rs = stmt.executeQuery()) {
 				while (rs.next()) {
-					Titulacion tit = new Titulacion();
-					tit.setCodNum(rs.getInt(CODNUM));
-					tit.setNombre(rs.getString(NOMBRE));
+					Titulacion tit = this.createTitulacionFromResultSet(rs);
 					ModeloArea modeloArea = ModeloArea.obtenerInstancia();
 					titulaciones.add(new TitulacionArea(tit, modeloArea.getAreaById(area)));
 				}
@@ -437,11 +435,7 @@ public class ModeloTitulacion {
 			
 			try (ResultSet rs = stmt.executeQuery()) {
 				while (rs.next()) {
-					Titulacion t = new Titulacion();
-					t.setCodNum(rs.getInt(CODNUM));
-					t.setNombre(rs.getString(NOMBRE));
-					
-					return t;
+					return this.createTitulacionFromResultSet(rs);
 				}
 			}
 		}
@@ -518,5 +512,14 @@ public class ModeloTitulacion {
 				}
 			}
 		}
+	}
+
+	private Titulacion createTitulacionFromResultSet(ResultSet rs) throws SQLException {
+		Titulacion t = new Titulacion();
+		t.setCodNum(rs.getInt(CODNUM));
+		t.setNombre(rs.getString(NOMBRE));
+		t.setBorrado("S".equals(rs.getString("FLGBORRADO")));
+		t.setFechaBorrado(rs.getDate("FECHA_BORRADO"));
+		return t;
 	}
 }

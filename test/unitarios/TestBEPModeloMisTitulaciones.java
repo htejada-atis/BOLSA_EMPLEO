@@ -1,15 +1,20 @@
 package unitarios;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertThrows;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
-import java.io.InputStream;
 import java.sql.SQLException;
 import java.text.ParseException;
-import java.util.Calendar;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
 
 import javax.sql.DataSource;
@@ -22,115 +27,385 @@ import org.junit.runners.MethodSorters;
 import bbdd.BbddRunner;
 import bbdd.UtilsTestBolsaEmpleo;
 import es.ujaen.uvirtual.modelo.conexion.Conexion;
-import es.ujaen.uvirtual.modulo.bolsaempleo.beans.Rol;
 import es.ujaen.uvirtual.modulo.bolsaempleo.beans.Titulacion;
 import es.ujaen.uvirtual.modulo.bolsaempleo.beans.TitulacionUsuario;
 import es.ujaen.uvirtual.modulo.bolsaempleo.beans.UsuarioBolsaEmpleo;
 import es.ujaen.uvirtual.modulo.bolsaempleo.modelo.ModeloMisTitulaciones;
+import es.ujaen.uvirtual.modulo.bolsaempleo.modelo.ModeloTitulacion;
+import es.ujaen.uvirtual.modulo.bolsaempleo.modelo.ModeloUsuarioBolsaEmpleo;
+import es.ujaen.uvirtual.modulo.bolsaempleo.utilidades.BolsaEmpleoDataTable;
+import es.ujaen.uvirtual.modulo.bolsaempleo.utilidades.BolsaEmpleoUtils;
+import es.ujaen.uvirtual.utilidades.Formateador;
 import es.ujaen.uvirtual.utilidades.UVException;
 
-/** test modelo mis titulaciones.
-*
-*/
+/**
+ * test modelo mis titulaciones.
+ */
 @FixMethodOrder(MethodSorters.NAME_ASCENDING)
 public class TestBEPModeloMisTitulaciones {
-	private static final String CODCUENTA = "testTitulacion";
-	private static final Rol ROL = new Rol(1050);
-	private static final String DOCUMENTO = "11111222Z";
-	private static final Boolean LISTADIST = true;
-	private static final Boolean EXCLUIDO = false;
-	private static final String EXCLUIDOTIPO = "EJEMPLO";
-	private static final Date FECHAEXCLUSIONINICIO = new java.sql.Date(Calendar.getInstance().getTime().getTime());
-	private static final Date FECHAEXCLUSIONFIN = new java.sql.Date(Calendar.getInstance().getTime().getTime());
-	
-	private static final Integer CODNUM = 8;
-	private static final Integer CODNUM_TITULACION = 1;
-	private static final String NOMBRE = "nombre";
-	private static final UsuarioBolsaEmpleo USUARIO = 
-			new UsuarioBolsaEmpleo(DOCUMENTO, CODCUENTA, ROL, LISTADIST, EXCLUIDO, EXCLUIDOTIPO, FECHAEXCLUSIONINICIO, FECHAEXCLUSIONFIN);
-	private static final Titulacion TITULACION = new Titulacion(CODNUM, NOMBRE);
-	private static final InputStream ARCHIVO = new ByteArrayInputStream("archivo de prueba".getBytes());
+	private static final Integer CODNUM = 1;
+	private static final Integer CODNUM_NOEXISTE = 111_111_111;
+	private static final Integer CODNUM_CANDITATO = 4;
+	private static final Integer TITULACION_CODNUM = 1;
+	private static final Integer TITULACION_USUARIO_1 = 1;
+	private static final Integer TITULACION_USUARIO_2 = 2;
+	private static final Integer TITULACION_USUARIO_3 = 3;
+	private static final String DESCRIPCION = "mi titulación";
+	private static final String DESCRIPCION_OTRATITULACION = "OTRA TITULAC";
+	private static final byte[] CONTENIDO_ARCHIVO = "archivo de prueba".getBytes();	
+	private static final String MENSAJE_ERROR_HAY_EXCEPCION = "Excepción no esperada: %s";
     
 	/** prepara la bd con los datos iniciales.
      * @throws SQLException si error en bd
      * @throws IOException si error en ficheros
 	 * @throws ParseException si error fecha
      */
-    @BeforeClass
-    public static void preparaBd() throws SQLException, IOException, ParseException {
-    	DataSource ds = BbddRunner.obtenerDataSourceUv();
-    	DataSource dsArcos = BbddRunner.obtenerDataSourceArcos();
-    	Conexion.setConexionUvirtual(ds);
-    	Conexion.setConexionArcos(dsArcos);
-    	UtilsTestBolsaEmpleo.inicializaBolsaEmpleo();
-    }
-    
-    /** test acierto insertar usuario.
-     * @throws SQLException si error en bd
-     * @throws UVException si error al validar usuario
-     * @throws ParseException si error al validar fecha
-     * @throws IOException .
-     */
-    @Test
-    public void testA01InsertaUsuario() throws SQLException, ParseException, UVException, IOException {
-    	TitulacionUsuario titulacion = new TitulacionUsuario();
-    	titulacion.setCodNum(CODNUM_TITULACION);
-    	titulacion.setTitulacion(TITULACION);
-    	USUARIO.setCodNum(CODNUM);
-    	titulacion.setUsuario(USUARIO);
-    	titulacion.setDescripcion(NOMBRE);
-    	titulacion.setArchivo(ARCHIVO);
-		ModeloMisTitulaciones modelo = ModeloMisTitulaciones.obtenerInstancia();
-    	modelo.insertaTitulacionUsuario(titulacion);
-    	
-    	TitulacionUsuario titulacionCont = modelo.listaTitulacionUsuario(titulacion.getCodNum());
-    	List<TitulacionUsuario> titulaciones = modelo.listaTitulacionesUsuarios("");
-    	Boolean eje = false;
-    	
-        for (TitulacionUsuario tit : titulaciones) {
-            if (tit.getCodNum().equals(titulacionCont.getCodNum())) {
-            	eje = true;
-            }
-        }
-    	
-    	assertTrue("titulacion de usuario insertada debe ser listado", eje);
-    }
+	@BeforeClass
+	public static void preparaBd() throws SQLException, IOException {
+		DataSource ds = BbddRunner.obtenerDataSourceUv();
+		DataSource dsArcos = BbddRunner.obtenerDataSourceArcos();
+		Conexion.setConexionUvirtual(ds);
+		Conexion.setConexionArcos(dsArcos);
+		UtilsTestBolsaEmpleo.inicializaBolsaEmpleo();
+	}
+	
+	/**
+	 * getTitulacionById.
+	 */
+	@Test
+	public void testA01getTitulacionById() {
+		try {
+			TitulacionUsuario item = ModeloMisTitulaciones.obtenerInstancia().getTitulacionUsuarioById(CODNUM);
+			assertEquals(item.getCodNum(), CODNUM);			
+		} catch (SQLException | UVException ex) {
+			fail(String.format(MENSAJE_ERROR_HAY_EXCEPCION, ex.toString()));
+		}
+	}
+	
+	/**
+	 * listaTitulacionesDatatable.
+	 */
+	@Test
+	public void testA02listaTitulacionesDatatable() {
+		HashMap<String, String[]> params = new HashMap<>();
 
-    /** test acierto borrar titulacion usuario.
-     * @throws SQLException si error en bd
-     * @throws UVException si error al validar titulacion 
-     */
-    @Test
-    public void testA02BorraTitulacion() throws SQLException, UVException {
-    	ModeloMisTitulaciones modelo = ModeloMisTitulaciones.obtenerInstancia();
-    	
-    	List<TitulacionUsuario> titulaciones = modelo.listaTitulacionesUsuarios("");
-    	TitulacionUsuario titulacion = titulaciones.get(0);
-    	
-    	modelo.borraTitulacionUsuario(titulaciones);
-    	
-    	List<TitulacionUsuario> titulacionesFiltrados = modelo.listaTitulacionesUsuarios("");
-    	TitulacionUsuario titulacion2 = titulacionesFiltrados.get(0);
-    	
-    	Boolean eje = false;
-    	
-        if (!titulacion.getBorrado().equals(titulacion2.getBorrado())) {
-        	eje = true;
-        }
-    	
-    	assertTrue("titulacion borrada", eje);
-    }
-    
-    /** test error inserta titulacion null.
-     * @throws SQLException si error bd
-     * @throws UVException error experado
-     * @throws IOException .
-     */
-    @Test(expected = UVException.class)
-    public void testE01InsertaTitulacionNull() throws SQLException, UVException, IOException {
-    	TitulacionUsuario titulacion = null;
-    	ModeloMisTitulaciones modelo = ModeloMisTitulaciones.obtenerInstancia();
-    	modelo.insertaTitulacionUsuario(titulacion);
-    	fail();
-    }
+		params.put(BolsaEmpleoDataTable.PARAM_CURRENT_PAGE, new String[] {"0"});
+		params.put(BolsaEmpleoDataTable.PARAM_PAGE_SIZE, new String[] {"10"});
+		params.put(BolsaEmpleoDataTable.PARAM_ORDER_BY, new String[] {String.valueOf(ModeloMisTitulaciones.ORDER_COLUMN_INDEX_ID)});
+		params.put(BolsaEmpleoDataTable.PARAM_ORDER_DIRECTION, new String[] {BolsaEmpleoDataTable.PARAM_ORDER_DIRECTION_VALUE_ASC});
+
+		try {
+			UsuarioBolsaEmpleo usuario = ModeloUsuarioBolsaEmpleo.obtenerInstancia().getUsuarioById(CODNUM_CANDITATO);
+			
+			BolsaEmpleoDataTable<Titulacion> dt = ModeloMisTitulaciones.obtenerInstancia().listaTitulacionesDatatable(params, usuario.getCodNum());
+			assertFalse(dt.getData().isEmpty());
+		} catch (SQLException | UVException ex) {
+			fail(String.format(MENSAJE_ERROR_HAY_EXCEPCION, ex.toString()));
+		}
+	}
+	
+	/**
+	 * listaTitulacionesUsuarioDatatable.
+	 */
+	@Test
+	public void testA03listaTitulacionesUsuarioDatatable() {
+		HashMap<String, String[]> params = new HashMap<>();
+
+		params.put(BolsaEmpleoDataTable.PARAM_CURRENT_PAGE, new String[] {"0"});
+		params.put(BolsaEmpleoDataTable.PARAM_PAGE_SIZE, new String[] {"10"});
+		params.put(BolsaEmpleoDataTable.PARAM_ORDER_BY, new String[] {String.valueOf(ModeloMisTitulaciones.ORDER_COLUMN_INDEX_NOMBRE_USUARIO)});
+		params.put(BolsaEmpleoDataTable.PARAM_ORDER_DIRECTION, new String[] {BolsaEmpleoDataTable.PARAM_ORDER_DIRECTION_VALUE_ASC});
+
+		try {
+			UsuarioBolsaEmpleo usuario = ModeloUsuarioBolsaEmpleo.obtenerInstancia().getUsuarioById(CODNUM_CANDITATO);
+			
+			BolsaEmpleoDataTable<TitulacionUsuario> dt = ModeloMisTitulaciones.obtenerInstancia().listaTitulacionesUsuarioDatatable(params, usuario.getCodNum());
+			assertFalse(dt.getData().isEmpty());
+		} catch (SQLException | UVException ex) {
+			fail(String.format(MENSAJE_ERROR_HAY_EXCEPCION, ex.toString()));
+		}
+	}
+	
+	/**
+	 * getTitulacionesUsuarios.
+	 */
+	@Test
+	public void testA04getTitulacionesUsuarios() {
+		HashMap<String, String[]> params = new HashMap<>();
+
+		params.put(BolsaEmpleoDataTable.PARAM_CURRENT_PAGE, new String[] {"0"});
+		params.put(BolsaEmpleoDataTable.PARAM_PAGE_SIZE, new String[] {"10"});
+		params.put(BolsaEmpleoDataTable.PARAM_ORDER_BY, new String[] {String.valueOf(ModeloMisTitulaciones.ORDER_COLUMN_INDEX_NOMBRE_USUARIO)});
+		params.put(BolsaEmpleoDataTable.PARAM_ORDER_DIRECTION, new String[] {BolsaEmpleoDataTable.PARAM_ORDER_DIRECTION_VALUE_ASC});
+
+		try {
+			int[] ids = new int[] {TITULACION_USUARIO_1, TITULACION_USUARIO_2, TITULACION_USUARIO_3};
+			
+			List<TitulacionUsuario> titulaciones = ModeloMisTitulaciones.obtenerInstancia().getTitulacionesUsuarioByIds(ids);
+			assertEquals(titulaciones.size(), ids.length);
+		} catch (SQLException | UVException ex) {
+			fail(String.format(MENSAJE_ERROR_HAY_EXCEPCION, ex.toString()));
+		}
+	}
+	
+	/**
+	 * insertaTitulacionUsuario.
+	 */
+	@Test
+	public void testA05insertaTitulacionUsuario() {
+		try {		
+			// insertamos titulacion
+			Titulacion t = ModeloTitulacion.obtenerInstancia().getTitulacionById(TITULACION_CODNUM);
+			assertEquals(t.getCodNum(), TITULACION_CODNUM);
+			TitulacionUsuario tu = insertarTitulacion(t);
+			
+			// la borramos
+			borrarTitulacion(tu);
+		} catch (SQLException | UVException ex) {
+			fail(String.format(MENSAJE_ERROR_HAY_EXCEPCION, ex.toString()));
+		}
+	}
+
+	
+	
+	/**
+	 * insertaTitulacionUsuario.
+	 */
+	@Test
+	public void testA06insertaTitulacionUsuario() {
+		try {
+			TitulacionUsuario tu = insertarTitulacion(null);			
+			borrarTitulacion(tu);
+		} catch (SQLException | UVException ex) {
+			fail(String.format(MENSAJE_ERROR_HAY_EXCEPCION, ex.toString()));
+		}
+	}
+	
+	/**
+	 * listaTitulacionesValidadasCandidato.
+	 */
+	@Test
+	public void testA07listaTitulacionesValidadasCandidato() {
+		try {
+			UsuarioBolsaEmpleo usuario = ModeloUsuarioBolsaEmpleo.obtenerInstancia().getUsuarioById(CODNUM_CANDITATO);
+			assertEquals(usuario.getCodNum(), CODNUM_CANDITATO);
+			
+			List<TitulacionUsuario> listado = ModeloMisTitulaciones.obtenerInstancia().listaTitulacionesValidadasCandidato(usuario.getCodNum());
+			assertFalse(listado.isEmpty());
+		} catch (SQLException | UVException ex) {
+			fail(String.format(MENSAJE_ERROR_HAY_EXCEPCION, ex.toString()));
+		}
+	}
+	
+	/**
+	 * validaTitulacion.
+	 */
+	@Test
+	public void testA08validaTitulacion() {
+		try {
+			Titulacion t = ModeloTitulacion.obtenerInstancia().getTitulacionById(TITULACION_CODNUM);
+			TitulacionUsuario tu = insertarTitulacion(t);
+			
+			Date now = BolsaEmpleoUtils.getCurrentDateTime();
+			ModeloMisTitulaciones.obtenerInstancia().validaTitulacion(tu, tu.getUsuario(), now);
+			TitulacionUsuario tuValidado = ModeloMisTitulaciones.obtenerInstancia().getTitulacionUsuarioById(tu.getCodNum());			
+			assertEquals(tuValidado.getCodNum(), tu.getCodNum());
+			assertTrue(tuValidado.getValidada());
+			assertEquals(Formateador.formatoFecha(tuValidado.getFechaValidada(), Formateador.FORMATO_FECHA_DDMMYYYY_HHMMSS), 
+					Formateador.formatoFecha(now, Formateador.FORMATO_FECHA_DDMMYYYY_HHMMSS));
+			
+			borrarTitulacion(tu);
+		} catch (SQLException | UVException ex) {
+			fail(String.format(MENSAJE_ERROR_HAY_EXCEPCION, ex.toString()));
+		}
+	}
+	
+	/**
+	 * desvalidaTitulacion.
+	 */
+	@Test
+	public void testA09desvalidaTitulacion() {
+		try {
+			Titulacion t = ModeloTitulacion.obtenerInstancia().getTitulacionById(TITULACION_CODNUM);
+			TitulacionUsuario tu = insertarTitulacion(t);
+			
+			ModeloMisTitulaciones.obtenerInstancia().desvalidaTitulacion(tu, tu.getUsuario());
+			TitulacionUsuario tuNew = ModeloMisTitulaciones.obtenerInstancia().getTitulacionUsuarioById(tu.getCodNum());			
+			assertEquals(tuNew.getCodNum(), tu.getCodNum());
+			assertFalse(tuNew.getValidada());
+			assertNull(tuNew.getFechaValidada());
+			
+			borrarTitulacion(tu);
+		} catch (SQLException | UVException ex) {
+			fail(String.format(MENSAJE_ERROR_HAY_EXCEPCION, ex.toString()));
+		}
+	}
+	
+	// ERRORES
+	
+	/**
+	 * getTitulacionById.
+	 */
+	@Test
+	public void testE01getTitulacionById() {
+		Throwable throwable = assertThrows(Throwable.class,
+				() -> ModeloMisTitulaciones.obtenerInstancia().getTitulacionUsuarioById(CODNUM_NOEXISTE));
+		
+		assertEquals(UVException.class, throwable.getClass());
+		assertEquals(ModeloMisTitulaciones.ERROR_NO_EXISTE_TITULACION, throwable.getMessage());
+	}
+	
+	/**
+	 * listaTitulacionesUsuarioDatatable.
+	 */
+	@Test
+	public void testE02listaTitulacionesUsuarioDatatable() {
+		HashMap<String, String[]> params = new HashMap<>();
+
+		params.put(BolsaEmpleoDataTable.PARAM_CURRENT_PAGE, new String[] {"0"});
+		params.put(BolsaEmpleoDataTable.PARAM_PAGE_SIZE, new String[] {"10"});
+		params.put(BolsaEmpleoDataTable.PARAM_ORDER_BY, new String[] {String.valueOf(ModeloMisTitulaciones.ORDER_COLUMN_INDEX_NOMBRE_USUARIO)});
+		params.put(BolsaEmpleoDataTable.PARAM_ORDER_DIRECTION, new String[] {BolsaEmpleoDataTable.PARAM_ORDER_DIRECTION_VALUE_ASC});
+		
+		Throwable throwable = assertThrows(Throwable.class,
+				() -> ModeloMisTitulaciones.obtenerInstancia().listaTitulacionesUsuarioDatatable(params, null));
+		
+		assertEquals(UVException.class, throwable.getClass());
+		assertEquals(ModeloMisTitulaciones.ERROR_EL_USUARIO_ES_REQUERIDO, throwable.getMessage());
+	}
+	
+	/**
+	 * insertaTitulacionUsuario.
+	 */
+	@Test
+	public void testE03insertaTitulacionUsuario() {
+		Throwable throwable = assertThrows(Throwable.class,
+				() -> ModeloMisTitulaciones.obtenerInstancia().insertaTitulacionUsuario(null));
+		
+		assertEquals(UVException.class, throwable.getClass());
+		assertEquals(ModeloMisTitulaciones.ERROR_TITULACION_VACIA, throwable.getMessage());
+		
+		throwable = assertThrows(Throwable.class,
+				() -> ModeloMisTitulaciones.obtenerInstancia().insertaTitulacionUsuario(new TitulacionUsuario()));
+		
+		assertEquals(UVException.class, throwable.getClass());
+		assertEquals(ModeloMisTitulaciones.ERROR_TITULACION_SIN_ARCHIVO, throwable.getMessage());
+	}
+	
+	/**
+	 * validaTitulacion.
+	 */
+	@Test
+	public void testE04validaTitulacion() {
+		Throwable throwable = assertThrows(Throwable.class,
+				() -> ModeloMisTitulaciones.obtenerInstancia().validaTitulacion(null, null, null));		
+		assertEquals(UVException.class, throwable.getClass());
+		assertEquals(ModeloMisTitulaciones.ERROR_TITULACION_OBLIGATORIA, throwable.getMessage());
+		
+		TitulacionUsuario t = new TitulacionUsuario();		
+		throwable = assertThrows(Throwable.class,
+				() -> ModeloMisTitulaciones.obtenerInstancia().validaTitulacion(t, null, null));		
+		assertEquals(UVException.class, throwable.getClass());
+		assertEquals(ModeloMisTitulaciones.ERROR_ID_TITULACION_OBLIGATORIO, throwable.getMessage());
+		
+		t.setCodNum(CODNUM);
+		throwable = assertThrows(Throwable.class,
+				() -> ModeloMisTitulaciones.obtenerInstancia().validaTitulacion(t, null, null));		
+		assertEquals(UVException.class, throwable.getClass());
+		assertEquals(ModeloMisTitulaciones.ERROR_CANDIDATO_OBLIGATORIO, throwable.getMessage());
+		
+		UsuarioBolsaEmpleo u = new UsuarioBolsaEmpleo();
+		throwable = assertThrows(Throwable.class,
+				() -> ModeloMisTitulaciones.obtenerInstancia().validaTitulacion(t, u, null));		
+		assertEquals(UVException.class, throwable.getClass());
+		assertEquals(ModeloMisTitulaciones.ERROR_ID_USUARIO_NO_VALIDO, throwable.getMessage());
+		
+		u.setCodNum(CODNUM);
+		throwable = assertThrows(Throwable.class,
+				() -> ModeloMisTitulaciones.obtenerInstancia().validaTitulacion(t, u, null));		
+		assertEquals(UVException.class, throwable.getClass());
+		assertEquals(ModeloMisTitulaciones.ERROR_SIN_TITULACION, throwable.getMessage());
+	}
+	
+	/**
+	 * desvalidaTitulacion.
+	 */
+	@Test
+	public void testE05validaTitulacion() {
+		Throwable throwable = assertThrows(Throwable.class,
+				() -> ModeloMisTitulaciones.obtenerInstancia().desvalidaTitulacion(null, null));		
+		assertEquals(UVException.class, throwable.getClass());
+		assertEquals(ModeloMisTitulaciones.ERROR_TITULACION_OBLIGATORIA, throwable.getMessage());
+		
+		TitulacionUsuario t = new TitulacionUsuario();		
+		throwable = assertThrows(Throwable.class,
+				() -> ModeloMisTitulaciones.obtenerInstancia().desvalidaTitulacion(t, null));		
+		assertEquals(UVException.class, throwable.getClass());
+		assertEquals(ModeloMisTitulaciones.ERROR_ID_TITULACION_OBLIGATORIO, throwable.getMessage());
+		
+		t.setCodNum(CODNUM);
+		throwable = assertThrows(Throwable.class,
+				() -> ModeloMisTitulaciones.obtenerInstancia().desvalidaTitulacion(t, null));		
+		assertEquals(UVException.class, throwable.getClass());
+		assertEquals(ModeloMisTitulaciones.ERROR_CANDIDATO_OBLIGATORIO, throwable.getMessage());
+		
+		UsuarioBolsaEmpleo u = new UsuarioBolsaEmpleo();
+		throwable = assertThrows(Throwable.class,
+				() -> ModeloMisTitulaciones.obtenerInstancia().desvalidaTitulacion(t, u));		
+		assertEquals(UVException.class, throwable.getClass());
+		assertEquals(ModeloMisTitulaciones.ERROR_ID_USUARIO_NO_VALIDO, throwable.getMessage());
+		
+		u.setCodNum(CODNUM);
+		throwable = assertThrows(Throwable.class,
+				() -> ModeloMisTitulaciones.obtenerInstancia().desvalidaTitulacion(t, u));		
+		assertEquals(UVException.class, throwable.getClass());
+		assertEquals(ModeloMisTitulaciones.ERROR_SIN_TITULACION, throwable.getMessage());
+	}
+	
+	private TitulacionUsuario insertarTitulacion(Titulacion t) throws SQLException, UVException {			
+		ByteArrayInputStream archivo = new ByteArrayInputStream(CONTENIDO_ARCHIVO);
+		
+		TitulacionUsuario tusuario = new TitulacionUsuario();
+		tusuario.setArchivo(archivo);
+		tusuario.setBorrado(false);
+		tusuario.setDescripcion(DESCRIPCION);
+		
+		if (t != null) {
+			tusuario.setTitulacion(t);
+			tusuario.setOtraTitulacion(null);	
+		} else {
+			tusuario.setTitulacion(null);
+			tusuario.setOtraTitulacion(DESCRIPCION_OTRATITULACION);
+		}
+		
+		UsuarioBolsaEmpleo usuario = ModeloUsuarioBolsaEmpleo.obtenerInstancia().getUsuarioById(CODNUM_CANDITATO);
+		assertEquals(usuario.getCodNum(), CODNUM_CANDITATO);
+		tusuario.setUsuario(usuario);
+		
+		Integer codNum = ModeloMisTitulaciones.obtenerInstancia().insertaTitulacionUsuario(tusuario);
+		TitulacionUsuario tusuarioNew = ModeloMisTitulaciones.obtenerInstancia().getTitulacionUsuarioById(codNum);
+		
+		assertEquals(BolsaEmpleoUtils.inputStreamToString(tusuario.getArchivo()), BolsaEmpleoUtils.inputStreamToString(archivo));
+		assertEquals(tusuarioNew.getBorrado(), false);
+		assertEquals(tusuarioNew.getDescripcion(), DESCRIPCION);
+		
+		if (t != null) {
+			assertEquals(tusuarioNew.getTitulacion(), t);
+			assertEquals(tusuarioNew.getOtraTitulacion(), null);
+		} else {
+			assertEquals(tusuarioNew.getTitulacion(), null);
+			assertEquals(tusuarioNew.getOtraTitulacion(), DESCRIPCION_OTRATITULACION);
+		}
+		
+		return tusuarioNew;
+	}
+
+	private void borrarTitulacion(TitulacionUsuario tu) throws SQLException, UVException {
+		ArrayList<TitulacionUsuario> titulacionesABorrar = new ArrayList<>();
+		titulacionesABorrar.add(tu);
+		ModeloMisTitulaciones.obtenerInstancia().borraTitulacionUsuario(titulacionesABorrar);
+		TitulacionUsuario tusuarioDel = ModeloMisTitulaciones.obtenerInstancia().getTitulacionUsuarioById(tu.getCodNum());
+		assertTrue(tusuarioDel.getBorrado());
+		assertNotNull(tusuarioDel.getFechaBorrado());
+	}
 }

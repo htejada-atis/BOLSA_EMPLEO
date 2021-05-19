@@ -326,7 +326,7 @@ public class ControladorMisTitulaciones extends HttpServlet {
 		
 		ModeloMisTitulaciones modelo = ModeloMisTitulaciones.obtenerInstancia();
 		
-		List<TitulacionUsuario> titulaciones = modelo.getTitulacionesUsuarios(selected);
+		List<TitulacionUsuario> titulaciones = modelo.getTitulacionesUsuarioByIds(selected);
 
 		modelo.borraTitulacionUsuario(titulaciones);
 		
@@ -348,7 +348,7 @@ public class ControladorMisTitulaciones extends HttpServlet {
 			throws SQLException, UVException, IOException {
 		ModeloMisTitulaciones modelo = ModeloMisTitulaciones.obtenerInstancia();
 		if (EscapaHTML.ajustaCodificacion(request.getParameter(PARAM_FICHERO)) != null) {
-			TitulacionUsuario titulacion = modelo.listaTitulacionUsuario(Formateador.leeParametroInteger(request.getParameter(PARAM_FICHERO)));
+			TitulacionUsuario titulacion = modelo.getTitulacionUsuarioById(Formateador.leeParametroInteger(request.getParameter(PARAM_FICHERO)));
 			bean.setTitulacionUsuario(titulacion);
 			
 			response.setContentType("application/pdf");

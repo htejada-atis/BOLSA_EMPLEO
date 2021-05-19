@@ -3,10 +3,10 @@ package es.ujaen.uvirtual.modulo.bolsaempleo.beans;
 import java.io.Serializable;
 import java.util.Date;
 
-
-/** Clase titulación de bolsa empleo.
- * @author jlopez
- *
+/**
+ * Clase titulación de bolsa empleo.
+ * 
+ * @author ATISoluciones
  */
 public class Titulacion implements Serializable {
 
@@ -16,14 +16,16 @@ public class Titulacion implements Serializable {
 	private Boolean borrado;
 	private Date fechaBorrado;
 
-	
-	/** Constructor por defecto.
+	/**
+	 * Constructor por defecto.
 	 */
 	public Titulacion() {
-		
+
 	}
-	
-	/** Constructor con parametros.
+
+	/**
+	 * Constructor con parametros.
+	 * 
 	 * @param pcodNum .
 	 * @param pnombre .
 	 */
@@ -32,31 +34,37 @@ public class Titulacion implements Serializable {
 		this.codNum = pcodNum;
 		this.nombre = pnombre;
 	}
-	
-	/** Constructor con parametros.
+
+	/**
+	 * Constructor con parametros.
+	 * 
 	 * @param pnombre .
 	 */
 	public Titulacion(String pnombre) {
 		super();
 		this.nombre = pnombre;
 	}
-	
-	/** Constructor con parametros.
+
+	/**
+	 * Constructor con parametros.
+	 * 
 	 * @param pcodNum .
 	 */
 	public Titulacion(Integer pcodNum) {
 		super();
 		this.codNum = pcodNum;
 	}
-	
-	/** Constructor copia.
+
+	/**
+	 * Constructor copia.
+	 * 
 	 * @param copia Titulación a copiar
 	 */
 	public Titulacion(Titulacion copia) {
 		this.codNum = copia.codNum;
 		this.nombre = copia.nombre;
 	}
-	
+
 	public Integer getCodNum() {
 		return codNum;
 	}
@@ -72,7 +80,7 @@ public class Titulacion implements Serializable {
 	public void setNombre(String nombre) {
 		this.nombre = nombre;
 	}
-	
+
 	public Boolean getBorrado() {
 		return borrado;
 	}
@@ -80,7 +88,7 @@ public class Titulacion implements Serializable {
 	public void setBorrado(Boolean borrado) {
 		this.borrado = borrado;
 	}
-	
+
 	public Date getFechaBorrado() {
 		return fechaBorrado;
 	}
@@ -88,25 +96,26 @@ public class Titulacion implements Serializable {
 	public void setFechaBorrado(Date fechaBorrado) {
 		this.fechaBorrado = fechaBorrado;
 	}
-	
+
 	@Override
 	public String toString() {
-		return "Titulación [codNum=" + codNum + ", nombre=" + nombre + ", borrado=" + borrado + ", fecha_borrado=" + fechaBorrado + "]";
+		return "Titulación [codNum=" + codNum + ", nombre=" + nombre + ", borrado=" + borrado + ", fecha_borrado="
+				+ fechaBorrado + "]";
 	}
-	
+
 	@Override
 	public int hashCode() {
 		final int prime = 31;
 		int result = 1;
-		result = prime * result + ((nombre == null) ? 0 : nombre.hashCode());
 		result = prime * result + ((codNum == null) ? 0 : codNum.hashCode());
+		result = prime * result + ((nombre == null) ? 0 : nombre.hashCode());		
 		result = prime * result + ((borrado == null) ? 0 : borrado.hashCode());
 		result = prime * result + ((fechaBorrado == null) ? 0 : fechaBorrado.hashCode());
 		return result;
 	}
-	
+
 	@Override
-	@SuppressWarnings({"checkstyle:CyclomaticComplexity", "checkstyle:NPathComplexity"})
+	@SuppressWarnings({ "checkstyle:CyclomaticComplexity", "checkstyle:NPathComplexity" })
 	public boolean equals(Object obj) {
 		if (this == obj) {
 			return true;
@@ -118,6 +127,13 @@ public class Titulacion implements Serializable {
 			return false;
 		}
 		Titulacion other = (Titulacion) obj;
+		if (codNum == null) {
+			if (other.codNum != null) {
+				return false;
+			}
+		} else if (!codNum.equals(other.codNum)) {
+			return false;
+		}
 		if (nombre == null) {
 			if (other.nombre != null) {
 				return false;
@@ -139,8 +155,8 @@ public class Titulacion implements Serializable {
 		} else if (!fechaBorrado.equals(other.fechaBorrado)) {
 			return false;
 		}
-		
+
 		return true;
 	}
-	
+
 }
