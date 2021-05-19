@@ -11,6 +11,8 @@ import java.util.Map;
 import es.ujaen.uvirtual.modelo.conexion.ConexionArcos;
 import es.ujaen.uvirtual.modelo.conexion.ConexionUvirtual;
 import es.ujaen.uvirtual.modulo.bolsaempleo.beans.Area;
+import es.ujaen.uvirtual.modulo.bolsaempleo.beans.Bolsa;
+import es.ujaen.uvirtual.modulo.bolsaempleo.beans.AreaEvaluadoresTable;
 import es.ujaen.uvirtual.modulo.bolsaempleo.beans.Evaluador;
 import es.ujaen.uvirtual.modulo.bolsaempleo.beans.UsuarioBolsaEmpleo;
 import es.ujaen.uvirtual.modulo.bolsaempleo.utilidades.BolsaEmpleoDataTable;
@@ -30,10 +32,16 @@ public class ModeloEvaluador {
 	public static final int ORDER_COLUMN_INDEX_NOMBRE_Y_APELLIDOS_EVALUADORES = 1;
 	public static final int ORDER_COLUMN_INDEX_ACTIVO_EVALUADORES = 2;
 	
+	public static final int ORDER_COLUMN_INDEX_ID = 1;
+	public static final int ORDER_COLUMN_INDEX_CODIGO = 2;
+	public static final int ORDER_COLUMN_INDEX_AREA = 3;
+	
 	protected static ModeloEvaluador eInstancia = null;
 	public static final String MENSAJE_ERROR_NO_EXISTE_EVALUADOR = "No existe el evaluador sin ID";
 	
 	public static final Integer PARAM_ROL_ID = 1051;
+	
+	public static final String CODNUM = "CODNUM";
 	
 	
 	/** Crea una instancia del objeto.
@@ -156,6 +164,57 @@ public class ModeloEvaluador {
 		}
 		
 		return evaluador;
+	}
+	
+	/**
+	 * Listado de áreas de un departamento . 
+	 * @param params .
+	 * @param idDepartamento .
+	 * @return listado de áreas .
+	 * @throws SQLException .
+	 * @throws UVException .
+	 */
+	public BolsaEmpleoDataTable<AreaEvaluadoresTable> listaAreaDepartamentoDatatable(Map<String, String[]> params, Integer idDepartamento) throws SQLException, UVException {
+		List<AreaEvaluadoresTable> bolsas = new ArrayList<>();
+		ModeloArea modeloArea = ModeloArea.obtenerInstancia();
+		BolsaEmpleoDataTable<AreaEvaluadoresTable> dataTable = new BolsaEmpleoDataTable<>(params);
+		
+		String consulta = "SELECT bepare.*,"
+				+ " (SELECT COUNT(*) FROM UVIRTUAL.TBEP_USUARIOS bepusu"
+				+ "		INNER JOIN UVIRTUAL.TBEP_EVALUADORES bepeva ON bepusu.CODNUM = bepeva.BEPUSU_CODNUM"
+				+ "		WHERE FLGBORRADO!='S' AND FLGEXCLUIDO!='S' AND bepeva.BEPARE_CODNUM = bepare.CODNUM"
+				+ "		AND bepusu.ROL = 1051) COUNT_EVALUADORES"
+				+ " FROM UVIRTUAL.TBEP_AREAS bepare"
+				+ "	INNER JOIN UVIRTUAL.TBEP_AREAS_DEPARTAMENTOS bepade ON bepade.BEPARE_CODNUM = bepare.CODNUM"
+				+ "	WHERE bepade.BEPDEP_CODNUM = ? ";
+		
+		dataTable.setColumn(ORDER_COLUMN_INDEX_ID, "bepbol.CODNUM", DataTableColumn.COLUMN_TYPE_NUMBER);
+		dataTable.setColumn(ORDER_COLUMN_INDEX_CODIGO, "bepare.ID_AREA_CONOCIMIENTO");
+		dataTable.setColumn(ORDER_COLUMN_INDEX_AREA, "bepare.DES_AREA_CONOCIMIENTO");
+		dataTable.setQuery(consulta);
+		
+		try (Connection conexion = ConexionUvirtual.obtenerInstancia();
+				PreparedStatement stmtCount = conexion.prepareStatement(dataTable.getQueryCount());
+				PreparedStatement stmt = conexion.prepareStatement(dataTable.getQuery())
+		) {
+			int indexParam = 1;
+			stmt.setInt(indexParam, idDepartamento);
+			stmtCount.setInt(indexParam++, idDepartamento);
+			
+			dataTable.setFiltersParams(stmt, stmtCount, indexParam);
+			
+			try (ResultSet rs = stmt.executeQuery()) {
+				while (rs.next()) {
+					Area area = modeloArea.getAreaById(rs.getInt(CODNUM));
+					bolsas.add(new AreaEvaluadoresTable(area, rs.getInt("COUNT_EVALUADORES")));
+				}
+			}
+			
+			dataTable.setRecordsTotalFromQuery(stmtCount);
+			dataTable.setData(bolsas);
+		}
+		
+		return dataTable;
 	}
 	
 	/** Listado de usuarios en función de un área . 

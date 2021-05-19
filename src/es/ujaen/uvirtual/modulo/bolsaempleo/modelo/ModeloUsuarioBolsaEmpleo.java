@@ -1064,7 +1064,11 @@ public class ModeloUsuarioBolsaEmpleo {
 			throw new UVException(MENSAJE_USUARIO_NO_EXISTE);
 		}
 		
-		return getUsuarioByNumeroDocumento(usuArcos.getDocumentoNumero());
+		try {
+			return getUsuarioByNumeroDocumento(usuArcos.getDocumentoNumero());
+		} catch (Exception ex) {
+			return null;
+		}
 	}
 	
 }

@@ -56,14 +56,15 @@ Departamento departamento = bean.getDepartamento();
 		<tr>
 			<th scope="col" style="width:5%"></th>
 			<th scope="col" style="width:10%" title="Id de la area">Id</th>
-			<th scope="col" style="width:25%" class="codigo" title="Código de area">Código</th>
-			<th scope="col" style="width:70%">Area</th>
+			<th scope="col" style="width:20%" class="codigo" title="Código de area">Código</th>
+			<th scope="col" style="width:60%">Area</th>
+			<th scope="col" style="width:15%">Nº Evaluadores</th>
 		</tr>
 		<tbody>
 		</tbody>
 		<tfoot>
 			<tr>
-				<th colSpan="4" style="width:100%"></th>
+				<th colSpan="5" style="width:100%"></th>
 			</tr>
 		</tfoot>
 	</table>
@@ -102,6 +103,7 @@ Departamento departamento = bean.getDepartamento();
 			    "params": {"<%=ControladorGestionEvaluadores.PARAM_DEPARTAMENTO%>": id},
 			    "filterable": true,
 			    "selectable": true,
+			    "title": title,
 			    "clickable": {'onClick': function(row) {
 			    	var params = {
 		    				'a': '<%= ControladorGestionEvaluadores.ACCION_AREA_SELECCIONADA %>', 
@@ -113,8 +115,9 @@ Departamento departamento = bean.getDepartamento();
 			    "columns": [
 			    	{'data': 'codNum', 'selectable': true},
 			        {'data': 'codNum', 'filter': {'type': 'number'}},
-			        {'data': 'area.idAreaExterno', 'filter': true},
-			        {'data': 'area.descripcion', 'filter': true},
+			        {'data': 'idAreaExterno', 'filter': true},
+			        {'data': 'descripcion', 'filter': true},
+			        {'data': 'numeroEvaluadores', 'order': {'active': false}}
 				]
 			});
 		}
@@ -211,7 +214,7 @@ Departamento departamento = bean.getDepartamento();
 			document.getElementById("select_departamento").value = "<%= departamento.getCodNum() %>";
 			document.getElementById("nuevo_evaluador_cont").style.visibility = "visible";
 			document.getElementById("tableAreas").style.visibility = "visible";
-			inicializarTablas("<%= departamento.getCodNum() %>");
+			inicializarTablas("<%= departamento.getCodNum() %>", "Áreas del Departamento: <%= departamento.getDescripcion() %>");
 		<%} else { %>
 			document.getElementById("select_departamento").options[0].selected = true;
 			document.getElementById("nuevo_evaluador_cont").style.visibility = "hidden";
