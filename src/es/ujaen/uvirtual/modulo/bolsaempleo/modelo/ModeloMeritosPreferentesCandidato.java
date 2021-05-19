@@ -6,6 +6,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Types;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
@@ -13,6 +14,7 @@ import es.ujaen.uvirtual.modelo.conexion.ConexionUvirtual;
 import es.ujaen.uvirtual.modulo.bolsaempleo.beans.MeritoPreferenteUsuario;
 import es.ujaen.uvirtual.modulo.bolsaempleo.beans.UsuarioBolsaEmpleo;
 import es.ujaen.uvirtual.modulo.bolsaempleo.utilidades.BolsaEmpleoDataTable;
+import es.ujaen.uvirtual.modulo.bolsaempleo.utilidades.BolsaEmpleoUtils;
 import es.ujaen.uvirtual.utilidades.UVException;
 
 /**
@@ -74,7 +76,7 @@ public class ModeloMeritosPreferentesCandidato {
 				"SELECT bepmpu.* "
 				+ "FROM TBEP_MERITOS_PREFERENTES_USUARIO bepmpu "
 				+ "INNER JOIN TBEP_MERITOS_PREFERENTES bepmep ON bepmep.CODNUM = bepmpu.BEPMEP_CODNUM "
-				+ "WHERE bepmep.TIPO = ? AND bepmpu.BEPUSU_CODNUM = ? ";
+				+ "WHERE bepmep.TIPO = ? AND bepmpu.BEPUSU_CODNUM = ? AND bepmpu.FLGBORRADO != 'S'";
 		
 		dataTable.setColumn(ORDER_COLUMN_INDEX_ID, "bepmpu.CODNUM");
 		dataTable.setColumn(ORDER_COLUMN_INDEX_CODIGO, "bepmep.CODIGO");
@@ -208,7 +210,31 @@ public class ModeloMeritosPreferentesCandidato {
 		obj.setFechaValidado(rs.getDate("FECHA_VALIDADO"));
 		return obj;
 	}
+	
+	
+	/**
+	 * cambia flag de meritos a borrado.
+	 * @param meritos .
+	 * @throws SQLException .
+	 */
+	public void cambiarFlagBorradoMeritos(List<MeritoPreferenteUsuario> meritos) throws SQLException {
+		String params = BolsaEmpleoUtils.consultaMultiplesParametros(meritos.size());
+		String query = "UPDATE TBEP_MERITOS_PREFERENTES_USUARIO SET FLGBORRADO = ?, FECHA_BORRADO = ? WHERE CODNUM IN  (" + params + ")";		
+				
+		try (Connection conexion = ConexionUvirtual.obtenerInstancia(); PreparedStatement stmt = conexion.prepareStatement(query)) {
+			int indexParam = 1;
 
+			stmt.setString(indexParam++, "S");
+			
+			Date date = BolsaEmpleoUtils.getCurrentDate();
+			
+			stmt.setDate(indexParam++, new java.sql.Date(date.getTime()));
+			for (MeritoPreferenteUsuario mer : meritos) {
+				stmt.setInt(indexParam++, mer.getCodNum()); 
+			}
+			stmt.executeUpdate();
+		}	
+	}
 	
 
 	

@@ -5,6 +5,7 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.sql.SQLException;
 import java.util.logging.Logger;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Level;
 import javax.servlet.ServletException;
@@ -17,6 +18,7 @@ import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.Part;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+import com.google.gson.reflect.TypeToken;
 
 import es.ujaen.uvirtual.beans.CodigoDescripcion;
 import es.ujaen.uvirtual.beans.UVDatos;
@@ -135,6 +137,9 @@ public class ControladorMisMeritosPreferentes extends HttpServlet {
 					break;
 				case ACCION_AGREGAR_MERITO_CONFIRM:
 					agregarMerito(bean, datos, request, response);
+					break;
+				case ACCION_ELIMINAR_MERITOS:
+					eliminarMeritos(bean, datos, request, response);
 					break;
 				case ACCION_DESCARGAR_FICHERO:
 					descargarPdf(bean, datos, request, response);
@@ -258,6 +263,28 @@ public class ControladorMisMeritosPreferentes extends HttpServlet {
 		ModeloMeritosPreferentesCandidato.obtenerInstancia().insertaMeritoUsuario(mp);
 		
 		BolsaEmpleoUtils.addMensajeDeExito("Mérito preferente añadido correctamente", bean, request);
+		response.sendRedirect(request.getServletPath());
+	}
+	
+	
+	
+	private void eliminarMeritos(VistaMeritosPreferentesCandidato bean, UVDatos datos, HttpServletRequest request, HttpServletResponse response) throws SQLException, UVException, IOException {
+		String selectedJson = EscapaHTML.ajustaCodificacion(request.getParameter(PARAM_MERITOS));
+		int[] selected = (new Gson()).fromJson(selectedJson, new TypeToken<int[]>() { }.getType());
+		
+		ModeloMeritosPreferentesCandidato modelo = ModeloMeritosPreferentesCandidato.obtenerInstancia();
+		List<MeritoPreferenteUsuario> meritos = new ArrayList<>();
+		
+		Usuario usuario = datos.getUsuario();
+		UsuarioBolsaEmpleo usu = ModeloUsuarioBolsaEmpleo.obtenerInstancia().getUsuarioByNumeroDocumento(usuario.getDocumentoNumero());
+		
+		for (int sel : selected) {
+			meritos.add(modelo.getMeritoPreferenteUsuarioById(sel, usu));
+		}
+
+		modelo.cambiarFlagBorradoMeritos(meritos);
+
+		BolsaEmpleoUtils.addMensajeDeExito(MENSAJE_EXITO_ELIMINAR, bean, request);
 		response.sendRedirect(request.getServletPath());
 	}
 	

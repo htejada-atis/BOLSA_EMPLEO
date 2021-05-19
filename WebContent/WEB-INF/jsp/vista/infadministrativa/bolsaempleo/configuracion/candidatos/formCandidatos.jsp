@@ -162,15 +162,15 @@ UsuarioBolsaEmpleo usuarioBolsa = bean.getUsuario();
     	</div>
     	
 
-		<div class="form-group-container col3" style="margin-top:1rem;">
+		<div class="form-group-container col3" style="margin-top:1rem; display:none;" id="buttonsEdit">
     	    <div class="form-group">
-    			<a class="link-btn" id="areas_excluidas" href="#" style="margin-top:0; visibility: hidden;">Áreas excluidas</a>
+    			<a class="link-btn" id="areas_excluidas" href="#" style="margin-top:0;">Áreas excluidas</a>
     		</div>
     		<div class="form-group">
-				<a class="link-btn" id="solicitudes" href="#" style="margin-top:0; visibility: hidden;">Solicitudes</a>
+				<a class="link-btn" id="solicitudes" href="#" style="margin-top:0;">Solicitudes</a>
     		</div>
     		<div class="form-group">
-				<a class="link-btn" id="comunicaciones" href="#" style="margin-top:0; visibility: hidden;">Comunicaciones</a>
+				<a class="link-btn" id="comunicaciones" href="#" style="margin-top:0;">Comunicaciones</a>
     		</div>
     	</div>
     </form>
@@ -454,6 +454,10 @@ UsuarioBolsaEmpleo usuarioBolsa = bean.getUsuario();
 
 			return day + "/" + month + "/" + now.getFullYear();
 		}
+		
+		<%if(usuarioBolsa!=null && !bean.getBusqueda()){%>
+			$("#buttonsEdit").show();
+		<%}%>
 
 	});
 	

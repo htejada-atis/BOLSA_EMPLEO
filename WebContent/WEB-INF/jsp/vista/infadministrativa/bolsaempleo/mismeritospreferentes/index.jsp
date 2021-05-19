@@ -75,6 +75,10 @@ VistaMeritosPreferentesCandidato bean = (VistaMeritosPreferentesCandidato) uvdat
 		    ],
 		    "actions": [
 		    	{'label': 'Eliminar', 'title': 'Eliminar méritos seleccionados', 'onClick': function(selected) {
+		    		if (selected.length == 0) {
+		    			Atis.alertDialog('Borrado de acreditaciones', 'Seleccione al menos una acreditación.');
+		    			return;
+		    		}
 		    		if(selected.length) {
 		    			var mensaje = "¿Desea borrar el mérito seleccionado?";
 			        	var titulo = "Borrar mérito";
