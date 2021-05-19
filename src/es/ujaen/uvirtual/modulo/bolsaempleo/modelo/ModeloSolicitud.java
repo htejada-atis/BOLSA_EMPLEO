@@ -1076,5 +1076,35 @@ public class ModeloSolicitud {
 			stmt.executeUpdate();
 		}
 	}
+	
+	/**
+	 * Comprueba los méritos que tienen afinidad y no tienen valoración .
+	 * @param solicitud .
+	 * @return booleano que devuelve si hay méritos con afinidad sin valorar .
+	 * @throws SQLException .
+	 */
+	public boolean comprobarMeritosAfinidadSinValoracion(Solicitud solicitud) throws SQLException {
+		String consulta = "SELECT * FROM UVIRTUAL.TBEP_SOLICITUD_BOLSAS_MERITOS bepsbm"
+				+ "	INNER JOIN UVIRTUAL.TBEP_SOLICITUD_BOLSAS bepsbo ON bepsbm.BEPSBO_CODNUM = bepsbo.CODNUM"
+				+ "	LEFT JOIN UVIRTUAL.TBEP_SOLICITUD_BOLSAS_MERITOS_VALORACION bepsbv ON bepsbv.BEPSBM_CODNUM  = bepsbm.CODNUM"
+				+ "	INNER JOIN UVIRTUAL.TBEP_MERITOS bepmer ON bepmer.CODNUM  = bepsbm.BEPMER_CODNUM"
+				+ "	INNER JOIN UVIRTUAL.TBEP_ITEMSBAREMACION bepite ON bepite.CODNUM = bepmer.BEPITE_CODNUM"
+				+ "	WHERE bepsbo.BEPSOL_CODNUM = ? AND bepite.AFINIDAD IS NOT NULL AND bepsbv.VALOR IS NULL";
+		
+		try (Connection conexion = ConexionUvirtual.obtenerInstancia(); PreparedStatement stmt = conexion.prepareStatement(consulta)) {
+			int parameterIndex = 1;
+			stmt.setInt(parameterIndex++, solicitud.getCodNum());
+			stmt.executeUpdate();
+			
+			try (ResultSet rs = stmt.executeQuery()) {
+				if (rs.next()) {
+					return true;
+				}
+			}
+		}
+		
+		return false;
+	}
+	
 }
 

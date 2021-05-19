@@ -118,18 +118,18 @@ public class ControladorMisSolicitudes extends HttpServlet {
 	// mensajes
 	public static final String MENSAJE_AREA_SIN_MERITOS = "No hay méritos asignados a éste área.";
 	public static final String MENSAJE_ENVIADO = "enviadomissolicitudes";
+	public static final String MENSAJE_ERROR_ACCION_NO_CONTEMPLADA = "Acción no contemplada";
 	public static final String MENSAJE_ERROR_BOLSAS_SELECCIONADAS_INCORRECTAS = "No hay bolsas seleccionadas válidas";
 	public static final String MENSAJE_ERROR_BORRAR_BOLSA = "No puede deseleccionar ésta bolsa, tiene méritos asociados";
 	public static final String MENSAJE_ERROR_CONVOCATORIA_ID_REQUERIDA = "El id de la convocatoria es requerído";
+	public static final String MENSAJE_ERROR_ITEM_EXCLUYENTE = "El item que ha seleccionado es excluyente con los items: ";
+	public static final String MENSAJE_ERROR_MERITOS_SIN_VALORACION = "No puede haber méritos con afinidad sin valoración";
+	public static final String MENSAJE_ERROR_MERITO_NO_NULO = "Merito no puede ser nulo";
 	public static final String MENSAJE_ERROR_NUMERO_MAXIMO_MERITOS_BLOQUE = "Se ha alcanzado el número máximo de méritos por bloque";
 	public static final String MENSAJE_ERROR_SIN_MERITOS = "Dene incluir al menos un mérito en una bolsa para continuar";
 	public static final String MENSAJE_ERROR_SOLICITUD_ID_REQUERIDO = "El id de la solicitud es requerído";
-	public static final String MENSAJE_ERROR_ACCION_NO_CONTEMPLADA = "Acción no contemplada";
-	public static final String MENSAJE_ERROR_MERITO_NO_NULO = "Merito no puede ser nulo";
 	public static final String MENSAJE_ERROR_SOLICITUD_NO_NULO = "Solicitud no puede ser nula";
-		
 	public static final String MENSAJE_EXITO_SOLICITUD_CONFIRMADA = "La solicitud ha sido confirmada correctamente";
-	public static final String MENSAJE_ERROR_ITEM_EXCLUYENTE = "El item que ha seleccionado es excluyente con los items: ";
 		
 	public static final int RESPONSE_HTTP_CODE_ERROR = 400;
 	
@@ -834,8 +834,10 @@ public class ControladorMisSolicitudes extends HttpServlet {
 			throw new UVException(MENSAJE_ERROR_SIN_MERITOS);
 		}
 		
-		// comprobamos que la afinidad de los mérios afines no esté vacía
-		
+		// comprobamos que la valoración de los méritos con afinidad no esté vacía
+		if (modeloSolicitud.comprobarMeritosAfinidadSinValoracion(solicitud)) {
+			throw new UVException(MENSAJE_ERROR_MERITOS_SIN_VALORACION);
+		}
 		
 		List<BolsaSolicitud> listaBolsas = modeloSolicitud.getBolsasSolicitudMeritos(solicitud);
 		bean.setListaBolsasSolicitud(listaBolsas);

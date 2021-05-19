@@ -285,7 +285,7 @@ VistaSolicitudes bean = (VistaSolicitudes) uvdatos.getVistas().get(VistaSolicitu
 			var tableMeritos = new Atis.DataTable('#tableMeritos', {
 				"ajax": { url: "<%=ControladorMisSolicitudes.URL_PATTERN_AJAX%>", async: false },
 			    "pageSize": 10,
-			    "selectable": true,
+			    "selectable": {'all': false},
 			    "filterable": true,
 			    "title": 'Mis méritos: <%=bean.getArea().getArea().getDescripcion()%>',
 			    "selected": meritosBolsaSolicitud,
