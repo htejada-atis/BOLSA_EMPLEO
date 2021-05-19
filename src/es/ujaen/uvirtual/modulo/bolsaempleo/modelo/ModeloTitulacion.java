@@ -26,8 +26,7 @@ public class ModeloTitulacion {
 	public static final int ORDER_COLUMN_INDEX_ID = 0;
 	public static final int ORDER_COLUMN_INDEX_NOMBRE = 1;
 	
-	public static final int ORDER_COLUMN_INDEX_ID_SELECTABLE = 1;
-	public static final int ORDER_COLUMN_INDEX_NOMBRE_SELECTABLE = 2;
+	public static final int ORDER_COLUMN_INDEX_NOMBRE_SELECTABLE = 1;
 	
 	public static final int ORDER_COLUMN_INDEX_NOMBRE_CANDIDATO = 0;
 	
@@ -205,19 +204,10 @@ public class ModeloTitulacion {
 			throw new UVException("No se puede incluir titulación sin el id del área");
 		}
 		
-		String params = BolsaEmpleoUtils.consultaMultiplesParametros(titulaciones.size());
-		String consulta = "INSERT INTO TBEP_TITULACIONES_PREFERENTES_AREA (BEPARE_CODNUM, BEPTIT_CODNUM)"
-				+ " SELECT bepare.CODNUM AS BEPARE_CODNUM, beptit.CODNUM AS BEPTIT_CODNUM"
-				+ " FROM TBEP_TITULACIONES beptit, TBEP_AREAS bepare WHERE bepare.CODNUM = ? AND "
-				+ " beptit.CODNUM IN (" + params + ")";
-		try (Connection conexion = ConexionUvirtual.obtenerInstancia(); PreparedStatement stmt = conexion.prepareStatement(consulta)) {
-			int indexParam = 1;
-			stmt.setInt(indexParam++, area);
-			for (String titulacion: titulaciones) {
-				stmt.setString(indexParam++, titulacion);		
-			}
-			stmt.executeUpdate();
+		for (String titu : titulaciones) {
+			checkTitulacionAreaBorrado(titu, area);
 		}
+		
 	}
 	
 	/**	Función que elimina titulaciones preferentes a un area .
@@ -227,9 +217,12 @@ public class ModeloTitulacion {
 	 */
 	public void eliminarTitulacionesPreferentesArea(Collection<String> titulaciones, Integer area) throws SQLException {
 		String params = BolsaEmpleoUtils.consultaMultiplesParametros(titulaciones.size());
-		String consulta = "DELETE FROM TBEP_TITULACIONES_PREFERENTES_AREA WHERE BEPARE_CODNUM = ? AND BEPTIT_CODNUM IN (" + params + ")";
+		String consulta = "UPDATE TBEP_TITULACIONES_PREFERENTES_AREA SET FLGBORRADO = ?, FECHA_BORRADO = ? WHERE BEPARE_CODNUM = ? AND BEPTIT_CODNUM IN (" + params + ")";
 		try (Connection conexion = ConexionUvirtual.obtenerInstancia(); PreparedStatement stmt = conexion.prepareStatement(consulta)) {
 			int indexParam = 1;
+			stmt.setString(indexParam++, "S");
+			Date date = BolsaEmpleoUtils.getCurrentDate();
+			stmt.setDate(indexParam++, new java.sql.Date(date.getTime()));
 			stmt.setInt(indexParam++, area);
 			for (String titulacion: titulaciones) {
 				stmt.setString(indexParam++, titulacion);	
@@ -296,10 +289,9 @@ public class ModeloTitulacion {
 		String consultaNotIn = "SELECT beptit.CODNUM FROM tbep_titulaciones beptit "
 				+ "INNER JOIN tbep_titulaciones_preferentes_area beptpa ON beptit.codnum = beptpa.beptit_codnum "
 				+ "INNER JOIN TBEP_AREAS bepare ON bepare.codnum = beptpa.bepare_codnum "
-				+ "WHERE bepare.CODNUM = ? ";
+				+ "WHERE bepare.CODNUM = ? AND beptpa.FLGBORRADO != 'S'";
 		String consulta = "SELECT beptit.* FROM tbep_titulaciones beptit WHERE beptit.CODNUM NOT IN (" + consultaNotIn + ")";
 		
-		dataTable.setColumn(ORDER_COLUMN_INDEX_ID_SELECTABLE, "beptit.CODNUM", DataTableColumn.COLUMN_TYPE_NUMBER);
 		dataTable.setColumn(ORDER_COLUMN_INDEX_NOMBRE_SELECTABLE, "beptit.NOMBRE");
 		dataTable.setQuery(consulta);
 				
@@ -347,9 +339,8 @@ public class ModeloTitulacion {
 		String consulta = "SELECT beptit.CODNUM, beptit.NOMBRE FROM tbep_titulaciones beptit "
 				+ "INNER JOIN tbep_titulaciones_preferentes_area beptpa ON beptit.codnum = beptpa.beptit_codnum "
 				+ "INNER JOIN TBEP_AREAS bepare ON bepare.codnum = beptpa.bepare_codnum "
-				+ "WHERE bepare.CODNUM = ? ";
+				+ "WHERE bepare.CODNUM = ? AND beptpa.FLGBORRADO != 'S'";
 		
-		dataTable.setColumn(ORDER_COLUMN_INDEX_ID_SELECTABLE, "beptit.CODNUM", DataTableColumn.COLUMN_TYPE_NUMBER);
 		dataTable.setColumn(ORDER_COLUMN_INDEX_NOMBRE_SELECTABLE, "beptit.NOMBRE");
 		dataTable.setQuery(consulta);
 				
@@ -481,5 +472,51 @@ public class ModeloTitulacion {
 		}
 		
 		return false;
+	}
+	
+	
+	/**
+	 * Devuelve si la titulación excluida del area ha sido borrada .
+	 * @param tit .
+	 * @param area .
+	 * @throws SQLException .
+	 */
+	public void checkTitulacionAreaBorrado(String tit, Integer area) throws SQLException {
+		String query = "SELECT COUNT(*) as count FROM TBEP_TITULACIONES_PREFERENTES_AREA WHERE BEPTIT_CODNUM = ? AND BEPARE_CODNUM = ? AND FLGBORRADO = 'S'";		
+		
+		try (Connection con = ConexionUvirtual.obtenerInstancia(); PreparedStatement stmt = con.prepareStatement(query)) {
+			int param = 1;
+			stmt.setString(param++, tit);
+			stmt.setInt(param++, area);
+			
+			try (ResultSet rs = stmt.executeQuery()) {
+				rs.next();
+				if (rs.getInt("count") > 0) {
+					
+					String consulta = "UPDATE TBEP_TITULACIONES_PREFERENTES_AREA SET FLGBORRADO = ?,"
+							+ " FECHA_BORRADO = ? WHERE BEPARE_CODNUM = ? AND BEPTIT_CODNUM = ?";
+
+					try (Connection conexion = ConexionUvirtual.obtenerInstancia(); PreparedStatement stmtUpdate = conexion.prepareStatement(consulta)) {
+						int indexParam = 1;
+						stmtUpdate.setString(indexParam++, "N");
+						stmtUpdate.setDate(indexParam++, null);
+						stmtUpdate.setInt(indexParam++, area);
+						stmtUpdate.setString(indexParam++, tit);	
+						stmtUpdate.executeUpdate();
+					}
+				} else {
+					String consulta = "INSERT INTO TBEP_TITULACIONES_PREFERENTES_AREA (BEPARE_CODNUM, BEPTIT_CODNUM)"
+							+ " SELECT bepare.CODNUM AS BEPARE_CODNUM, beptit.CODNUM AS BEPTIT_CODNUM"
+							+ " FROM TBEP_TITULACIONES beptit, TBEP_AREAS bepare WHERE bepare.CODNUM = ? AND "
+							+ " beptit.CODNUM = ?";
+					try (Connection conexion = ConexionUvirtual.obtenerInstancia(); PreparedStatement stmtInsert = conexion.prepareStatement(consulta)) {
+						int indexParam = 1;
+						stmtInsert.setInt(indexParam++, area);
+						stmtInsert.setString(indexParam++, tit);		
+						stmtInsert.executeUpdate();
+					}
+				}
+			}
+		}
 	}
 }
