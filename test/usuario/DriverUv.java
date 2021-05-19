@@ -80,9 +80,9 @@ public class DriverUv {
 	 */
 	public static void login(String userLogin) {
 		driver.get(RUTA + "/srv/es/index");
-		capturaPantalla("index");
 		WebElement username = driver.findElement(By.name("usuario"));
 		username.sendKeys(userLogin);
+		capturaPantalla("login");
 		username.submit();
 	}
 	
@@ -112,7 +112,6 @@ public class DriverUv {
 	 * @return driver
 	 */
 	public static WebDriver getDriver() {
-		capturaPantalla("");
 		return driver;
 	}
 }
