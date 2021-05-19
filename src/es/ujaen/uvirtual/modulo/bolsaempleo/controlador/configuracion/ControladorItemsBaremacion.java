@@ -440,7 +440,7 @@ public class ControladorItemsBaremacion extends HttpServlet {
 		if (apartado.getCodigo().isBlank()) {
 			throw new UVException(MENSAJE_ERROR_CODIGO_VACIO);
 		}
-		if (apartado.getCodigo().length() > ModeloBaremacionItems.COLUMN_CODIGO_MAXLENGTH) {
+		if (apartado.getCodigo().length() > ModeloBaremacionApartados.COLUMN_CODIGO_MAXLENGTH) {
 			throw new UVException(String.format(MENSAJE_ERROR_CODIGO_MAXIMO, ModeloBaremacionItems.COLUMN_CODIGO_MAXLENGTH));
 		}
 		
@@ -448,7 +448,7 @@ public class ControladorItemsBaremacion extends HttpServlet {
 		if (apartado.getNombre().isBlank()) {
 			throw new UVException(MENSAJE_ERROR_NOMBRE_VACIO);
 		}
-		if (apartado.getNombre().length() > ModeloBaremacionItems.COLUMN_NOMBRE_MAXLENGTH) {
+		if (apartado.getNombre().length() > ModeloBaremacionApartados.COLUMN_NOMBRE_MAXLENGTH) {
 			throw new UVException(String.format(MENSAJE_ERROR_NOMBRE_MAXIMO, ModeloBaremacionItems.COLUMN_NOMBRE_MAXLENGTH));
 		}
 		
@@ -935,7 +935,7 @@ public class ControladorItemsBaremacion extends HttpServlet {
 		ModeloBaremacionBloques modeloBloque = ModeloBaremacionBloques.obtenerInstancia();
 		ModeloBaremacionApartados modeloApartado = ModeloBaremacionApartados.obtenerInstancia();
 		List<BloqueBaremacion> listaBloques = modeloBloque.listaBloqueBaremacion();
-		List<ApartadoBaremacion> listaApartados = modeloApartado.listaApartadoBaremacion();
+		List<ApartadoBaremacion> listaApartados = modeloApartado.listaApartadoBaremacionActivosOrdenadosPorCodigo();
 
 		this.generarPDFTableHeader(table);
 		

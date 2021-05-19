@@ -261,7 +261,7 @@ public class ControladorMeritosPreferentes extends HttpServlet {
 		bean.setMeritoPreferente(null);
 		bean.setItemsBaremacion(ModeloBaremacionItems.obtenerInstancia().listaItemBaremacion());
 		bean.setBloqueBaremacion(ModeloBaremacionBloques.obtenerInstancia().listaBloqueBaremacion());
-		bean.setApartadoBaremacion(ModeloBaremacionApartados.obtenerInstancia().listaApartadoBaremacion());
+		bean.setApartadoBaremacion(ModeloBaremacionApartados.obtenerInstancia().listaApartadoBaremacionActivosOrdenadosPorCodigo());
 		bean.setVista(JSP_FORM);		
 	}
 	
@@ -269,7 +269,7 @@ public class ControladorMeritosPreferentes extends HttpServlet {
 		bean.setMeritoPreferente(null);
 		bean.setItemsBaremacion(ModeloBaremacionItems.obtenerInstancia().listaItemBaremacion());
 		bean.setBloqueBaremacion(ModeloBaremacionBloques.obtenerInstancia().listaBloqueBaremacion());
-		bean.setApartadoBaremacion(ModeloBaremacionApartados.obtenerInstancia().listaApartadoBaremacion());
+		bean.setApartadoBaremacion(ModeloBaremacionApartados.obtenerInstancia().listaApartadoBaremacionActivosOrdenadosPorCodigo());
 		bean.setVista(JSP_FORM);
 		
 		MeritoPreferente merito = new MeritoPreferente();
@@ -287,7 +287,7 @@ public class ControladorMeritosPreferentes extends HttpServlet {
 		bean.setMeritoPreferente(merito);
 		bean.setItemsBaremacion(ModeloBaremacionItems.obtenerInstancia().listaItemBaremacion());
 		bean.setBloqueBaremacion(ModeloBaremacionBloques.obtenerInstancia().listaBloqueBaremacion());
-		bean.setApartadoBaremacion(ModeloBaremacionApartados.obtenerInstancia().listaApartadoBaremacion());
+		bean.setApartadoBaremacion(ModeloBaremacionApartados.obtenerInstancia().listaApartadoBaremacionActivosOrdenadosPorCodigo());
 		bean.setVista(JSP_FORM);
 	}
 	
@@ -297,7 +297,7 @@ public class ControladorMeritosPreferentes extends HttpServlet {
 		bean.setMeritoPreferente(merito);
 		bean.setItemsBaremacion(ModeloBaremacionItems.obtenerInstancia().listaItemBaremacion());
 		bean.setBloqueBaremacion(ModeloBaremacionBloques.obtenerInstancia().listaBloqueBaremacion());
-		bean.setApartadoBaremacion(ModeloBaremacionApartados.obtenerInstancia().listaApartadoBaremacion());
+		bean.setApartadoBaremacion(ModeloBaremacionApartados.obtenerInstancia().listaApartadoBaremacionActivosOrdenadosPorCodigo());
 		bean.setVista(JSP_FORM);
 		
 		ModeloMeritosPreferentes.obtenerInstancia().editarMeritoPreferente(this.validate(merito, request));

@@ -30,18 +30,17 @@ public class ModeloBaremacionApartados {
 	public static final int ORDER_COLUMN_INDEX_APARTADOS_ACTIVO = 4;
 	
 	// errores
-	public static final String ERROR_APARTADO_NOEXITE = "Apartado no encontrado";
-	public static final String ERROR_APARTADO_OBTENIENDO_TOTAL = "No hay conteo de apartados";
+	public static final String ERROR_APARTADO_REQUERIDO = "El bloque es requerido";
+	public static final String ERROR_APARTADO_NOEXITE = "Bloque no encontrado";
+	public static final String ERROR_APARTADO_OBTENIENDO_TOTAL = "No hay conteo de bloques";
 	public static final String ERROR_PUNTUACION_PORCENTAJE_MAXIMO = "Debe introducir una puntuación o un porcentaje máximo, pero no ambos";
-	public static final String ERROR_APARTADO_EXISTEOTROCONMISMOCODIGO = "Ya existe otro apartado activo con el código introducido";
-	public static final String ERROR_APARTADO_EXISTEN_APARTADOS_CON_PORCENTAJE = "Existen apartados que se evaluan con porcentaje";
-	public static final String ERROR_APARTADO_EXISTEN_APARTADOS_CON_PUNTUACION = "Existen apartados que se evaluan con puntuación";
-
+	public static final String ERROR_APARTADO_EXISTEN_APARTADOS_CON_PORCENTAJE = "Existen bloques que se evaluan con porcentaje";
+	public static final String ERROR_APARTADO_EXISTEN_APARTADOS_CON_PUNTUACION = "Existen bloques que se evaluan con puntuación";
+	public static final String ERROR_APARTADO_MISMO_CODIGO = "Ya existe un apartado con el código introducido";
+	
 	public static final Integer COLUMN_CODIGO_MAXLENGTH = 3; 
 	public static final Integer COLUMN_NOMBRE_MAXLENGTH = 100;
-	public static final Integer COLUMN_DESCRIPCION_MAXLENGTH = 250;
 
-	public static final Float MINIMO_VALOR_FLOAT = (float) 0.01;
 	public static final Float MAXIMO_VALOR_PORCENTAGE = (float) 100.0;
 	
 	public static final String CODIGO = "CODIGO";
@@ -80,7 +79,7 @@ public class ModeloBaremacionApartados {
 	 */
 	public ApartadoBaremacion getApartadoBaremacionById(Integer codNum) throws SQLException, UVException {
 		if (codNum == null) {
-			throw new UVException("El bloque es requerido");	
+			throw new UVException(ERROR_APARTADO_REQUERIDO);	
 		}
 			
 		String sql = "SELECT bepapa.* FROM TBEP_APARTADOSBAREMACION bepapa WHERE bepapa.CODNUM = ?";
@@ -90,13 +89,12 @@ public class ModeloBaremacionApartados {
 			stmt.setInt(parameterIndex++, codNum);
 			
 			try (ResultSet rs = stmt.executeQuery()) {
-				while (rs.next()) {
-					return this.createApartadoFromResultSet(rs);					
+				if (!rs.next()) {
+					throw new UVException(ERROR_APARTADO_NOEXITE);
 				}
+				return this.createApartadoFromResultSet(rs);									
 			}
 		}
-		
-		throw new UVException(ERROR_APARTADO_NOEXITE);		
 	}
 	
     /** Consulta para obtener el último código de los apartados .
@@ -104,8 +102,10 @@ public class ModeloBaremacionApartados {
 	 * @throws SQLException .
 	 */
 	public String getUltimoCodigoApartado() throws SQLException {
-		String consulta = "SELECT bepapa.CODIGO FROM TBEP_APARTADOSBAREMACION bepapa "
+		String consulta = 
+				"SELECT bepapa.CODIGO FROM TBEP_APARTADOSBAREMACION bepapa WHERE bepapa.FLGACTIVO = 'S' "
 				+ " ORDER BY bepapa.CODIGO DESC FETCH FIRST 1 ROW ONLY";
+		
 		String ultimoCodigo = "";
 		
 		try (Connection conexion = ConexionUvirtual.obtenerInstancia(); PreparedStatement stmt = conexion.prepareStatement(consulta)) {
@@ -163,12 +163,13 @@ public class ModeloBaremacionApartados {
 
 	/** Función que inserta un apartado en la BD.
 	 * @param apartado .
+	 * @return .
 	 * @throws SQLException .
 	 * @throws UVException .
 	 */
-	public void insertaApartado(ApartadoBaremacion apartado) throws SQLException, UVException {
+	public Integer insertaApartado(ApartadoBaremacion apartado) throws SQLException, UVException {
 		if (apartado == null) {
-			throw new UVException("No se puede insertar un apartado vacio");
+			throw new UVException(ERROR_APARTADO_REQUERIDO);
 		}
 		
 		this.chequearApartadoParaInsertarOActualizar(apartado);
@@ -176,7 +177,9 @@ public class ModeloBaremacionApartados {
 		String consulta = "INSERT INTO TBEP_APARTADOSBAREMACION (CODIGO,NOMBRE,FLGACTIVO,PUNTUACIONMAXIMA,PORCENTAJEMAXIMO) "
 				+ " VALUES (?,?,?,?,?)";
 		
-		try (Connection conexion = ConexionUvirtual.obtenerInstancia(); PreparedStatement stmt = conexion.prepareStatement(consulta)) {
+		try (Connection conexion = ConexionUvirtual.obtenerInstancia(); 
+				PreparedStatement stmt = conexion.prepareStatement(consulta, new String[]{CODNUM})) {
+			
 			int parameterIndex = 1;
 			stmt.setString(parameterIndex++, apartado.getCodigo());
 			stmt.setString(parameterIndex++, apartado.getNombre());
@@ -188,12 +191,14 @@ public class ModeloBaremacionApartados {
 			} else if (apartado.getPorcentajeMaximo() != null) {
 				stmt.setNull(parameterIndex++, Types.NULL);
 				stmt.setFloat(parameterIndex++, apartado.getPorcentajeMaximo());
-			} else {
-				stmt.setNull(parameterIndex++, Types.NULL);
-				stmt.setNull(parameterIndex++, Types.NULL);				
 			}
 			
 			stmt.executeUpdate();
+			
+			ResultSet rs = stmt.getGeneratedKeys();
+			rs.next();
+			
+			return rs.getInt(1);
 		}
 	}
 		
@@ -240,9 +245,6 @@ public class ModeloBaremacionApartados {
 			} else if (apartado.getPorcentajeMaximo() != null) {
 				stmt.setNull(parameterIndex++, Types.NULL);
 				stmt.setFloat(parameterIndex++, apartado.getPorcentajeMaximo());
-			} else {
-				stmt.setNull(parameterIndex++, Types.NULL);
-				stmt.setNull(parameterIndex++, Types.NULL);				
 			}
 			
 			stmt.setInt(parameterIndex++, apartado.getCodNum());
@@ -279,7 +281,7 @@ public class ModeloBaremacionApartados {
 	 * @throws UVException .
 	 * @throws SQLException .
 	 */
-	public List<ApartadoBaremacion> listaApartadoBaremacion() throws SQLException {
+	public List<ApartadoBaremacion> listaApartadoBaremacionActivosOrdenadosPorCodigo() throws SQLException {
 		return listaApartadoBaremacion(" WHERE FLGACTIVO = 'S' ORDER BY CODIGO");
 	} 
 	
@@ -389,7 +391,7 @@ public class ModeloBaremacionApartados {
 			}
 						
 			try (ResultSet rs = stmt.executeQuery()) {
-				while (rs.next()) {
+				if (rs.next()) {
 					return true;									
 				}
 			}
@@ -400,7 +402,7 @@ public class ModeloBaremacionApartados {
 			
 	private void chequearApartadoParaInsertarOActualizar(ApartadoBaremacion apartado) throws SQLException, UVException {
 		if (this.existeOtroApartadoActivoPorCodigo(apartado)) {
-			throw new UVException("Ya existe un apartado con el código introducido");
+			throw new UVException(ERROR_APARTADO_MISMO_CODIGO);
 		}
 		
 		if (this.checkSumaPorcentagesApartados(apartado, "Superar")) {
