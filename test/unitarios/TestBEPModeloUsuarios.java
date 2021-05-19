@@ -77,8 +77,7 @@ public class TestBEPModeloUsuarios {
 	@Test
 	public void testA01GetUsuarioByPrsnif() {
 		try {
-			UsuarioBolsaEmpleo usuario = ModeloUsuarioBolsaEmpleo.obtenerInstancia()
-					.getUsuarioByNumeroDocumento(PERSONAL1_DOCUMENTO);
+			UsuarioBolsaEmpleo usuario = ModeloUsuarioBolsaEmpleo.obtenerInstancia().getUsuarioByNumeroDocumento(PERSONAL1_DOCUMENTO);
 			assertEquals(usuario.getCodCuenta(), PERSONAL1_CODCUENTA);
 			assertEquals(usuario.getNumDocumento(), PERSONAL1_DOCUMENTO);
 		} catch (SQLException | UVException ex) {
