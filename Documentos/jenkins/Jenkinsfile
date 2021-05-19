@@ -105,6 +105,7 @@ pipeline {
         	    def rutaCapturas = '/tmp/pruebasSelenium/'
         	    sh "touch builds/build/rama/site/jacoco/unittest.zip"
 	    		zip zipFile: 'builds/build/rama/site/jacoco/unittest.zip', archive: false, dir: "${rutaCapturas}", overwrite: true, glob: '**/*.png'
+	    		zip zipFile: 'builds/build/rama/site/jacoco/unittest.zip', archive: false, dir: 'builds/build/rama/site/jacoco/', overwrite: false, glob: '**/*.txt'
         	}
 			emailext mimeType: "text/html", to: 'jmoral@ujaen.es',
 				attachLog: true, attachmentsPattern: 'builds/build/rama/site/jacoco/unittest.zip',
