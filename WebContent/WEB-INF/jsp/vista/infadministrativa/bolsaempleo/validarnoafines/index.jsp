@@ -20,26 +20,16 @@ VistaValidarNoAfines bean = (VistaValidarNoAfines)uvdatos.getVistas().get(VistaV
 		}
 	%>
 	
-	<% if (bean.getMensajesDeExito().size() > 0) { %>
-		<div id="exito" class="success">
-			<%= bean.formatearMensajesDeExito() %>
-		</div>
-	<% } %>
+	<jsp:include page="/WEB-INF/jsp/vista/infadministrativa/bolsaempleo/mensajes.jsp" />
 	
-	<% if (bean.getMensajesDeError().size() > 0) { %>
-		<div id="error" class="error">
-			<%= bean.formatearMensajesDeError() %>
-		</div>
-	<% } %>
-	
-	<h2>Validar meritos no sujetos a afinidad</h2>
+	<h2>Validar meritos sujetos afinidad</h2>
 	<h3><%= descripcion %></h3>
-	
+		
 	<table class="bluetable bolsaempleo" id="table">
 		<tr>
 			<th scope="col" style="width:10%" title="Código área">Cod. Area.</th>
 			<th scope="col" style="width:50%" class="area">Area</th>
-			<th scope="col" style="width:10%" class="center">No validados</th>			
+			<th scope="col" style="width:10%" class="center">No validados</th>	
 			<th scope="col" style="width:10%" class="center">Validados</th>
 			<th scope="col" style="width:10%" class="center">Excluidos</th>	
 			<th scope="col" style="width:10%" class="center">Total</th>	
@@ -51,9 +41,9 @@ VistaValidarNoAfines bean = (VistaValidarNoAfines)uvdatos.getVistas().get(VistaV
 				<th colSpan="6" style="width:100%"></th>
 			</tr>
 		</tfoot>
-	</table>
+	</table>	
 </div>
-
+	
 <script>
 $(document).ready(function() {
 	var table = new Atis.DataTable('#table', {
@@ -61,7 +51,8 @@ $(document).ready(function() {
 	    "pageSize": 10,
 	    "filterable": true,
 	    "action": "<%= ControladorValidarNoAfines.ACCION_DATATABLE_BOLSAS %>",
-	    "defaultOrderBy": 1,
+	    "defaultOrderBy": 5,
+	    "defaultOrderDirection": 'desc',
 	    "clickable": {'onClick': function(row) {
 	    	var params = {
     				'a': '<%= ControladorValidarNoAfines.ACCION_BOLSA_SELECCIONADA %>', 
@@ -71,11 +62,11 @@ $(document).ready(function() {
 	    "columns": [
 	    	{'data': 'area.idAreaExterno', 'filter': {'type': 'number'}},
 	        {'data': 'area.descripcion', 'filter': true},
-	        {'data': 'totalMeritosNoValidados', 'order': false, 'class': 'center', 'render': function(row) { return isNaN(row.totalMeritosNoValidados) ? 0 : row.totalMeritosNoValidados; } },
-	        {'data': 'totalMeritosValidados', 'order': false, 'class': 'center', 'render': function(row) { return isNaN(row.totalMeritosValidados) ? 0 : row.totalMeritosValidados; } },
-	        {'data': 'totalMeritosExcluidos', 'order': false, 'class': 'center', 'render': function(row) { return isNaN(row.totalMeritosExcluidos) ? 0 : row.totalMeritosExcluidos; } },
-	        {'data': 'totalMeritos', 'order': false, 'class': 'center'} 
-	    ]
+	        {'data': 'totalMeritosNoValidados', 'class': 'center', 'render': function(row) { return isNaN(row.totalMeritosNoValidados) ? 0 : row.totalMeritosNoValidados; } },
+	        {'data': 'totalMeritosValidados', 'class': 'center', 'render': function(row) { return isNaN(row.totalMeritosValidados) ? 0 : row.totalMeritosValidados; } },
+	        {'data': 'totalMeritosExcluidos', 'class': 'center', 'render': function(row) { return isNaN(row.totalMeritosExcluidos) ? 0 : row.totalMeritosExcluidos; } },
+	        {'data': 'totalMeritos', 'class': 'center'} 
+	    ]	    
 	});		
 }); 
 </script>
