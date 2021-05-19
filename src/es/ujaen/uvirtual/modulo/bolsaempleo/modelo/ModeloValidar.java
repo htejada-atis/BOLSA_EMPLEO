@@ -15,6 +15,7 @@ import es.ujaen.uvirtual.modulo.bolsaempleo.beans.BolsaValidacion;
 import es.ujaen.uvirtual.modulo.bolsaempleo.beans.CandidatoValidacion;
 import es.ujaen.uvirtual.modulo.bolsaempleo.beans.Convocatoria;
 import es.ujaen.uvirtual.modulo.bolsaempleo.beans.Merito;
+import es.ujaen.uvirtual.modulo.bolsaempleo.beans.MeritoValidarTable;
 import es.ujaen.uvirtual.modulo.bolsaempleo.beans.UsuarioBolsaEmpleo;
 import es.ujaen.uvirtual.modulo.bolsaempleo.utilidades.BolsaEmpleoDataTable;
 import es.ujaen.uvirtual.modulo.bolsaempleo.utilidades.BolsaEmpleoDataTable.DataTableColumn;
@@ -163,7 +164,7 @@ public class ModeloValidar {
 	 * @throws SQLException .
 	 * @throws UVException  .
 	 */
-	public BolsaEmpleoDataTable<Merito> listadoMeritosSujetosAfinidad(Convocatoria convocatoria, Bolsa bolsa, UsuarioBolsaEmpleo candidato, Map<String, String[]> params)
+	public BolsaEmpleoDataTable<MeritoValidarTable> listadoMeritosSujetosAfinidad(Convocatoria convocatoria, Bolsa bolsa, UsuarioBolsaEmpleo candidato, Map<String, String[]> params)
 			throws SQLException, UVException {
 		return this.listadoMeritos(convocatoria, bolsa, candidato, params, true);
 	}
@@ -178,7 +179,7 @@ public class ModeloValidar {
 	 * @throws SQLException .
 	 * @throws UVException  .
 	 */
-	public BolsaEmpleoDataTable<Merito> listadoMeritosNoSujetosAfinidad(Convocatoria convocatoria, Bolsa bolsa, UsuarioBolsaEmpleo candidato, Map<String, String[]> params)
+	public BolsaEmpleoDataTable<MeritoValidarTable> listadoMeritosNoSujetosAfinidad(Convocatoria convocatoria, Bolsa bolsa, UsuarioBolsaEmpleo candidato, Map<String, String[]> params)
 			throws SQLException, UVException {
 		return this.listadoMeritos(convocatoria, bolsa, candidato, params, false);
 	}
@@ -425,10 +426,10 @@ public class ModeloValidar {
 	 * @throws SQLException .
 	 * @throws UVException .
 	 */
-	private BolsaEmpleoDataTable<Merito> listadoMeritos(Convocatoria convocatoria, Bolsa bolsa, UsuarioBolsaEmpleo candidato,
+	private BolsaEmpleoDataTable<MeritoValidarTable> listadoMeritos(Convocatoria convocatoria, Bolsa bolsa, UsuarioBolsaEmpleo candidato,
 			Map<String, String[]> params, boolean afinidad) throws SQLException, UVException {
-		List<Merito> rows = new ArrayList<>();
-		BolsaEmpleoDataTable<Merito> dataTable = new BolsaEmpleoDataTable<Merito>(params);
+		List<MeritoValidarTable> rows = new ArrayList<>();
+		BolsaEmpleoDataTable<MeritoValidarTable> dataTable = new BolsaEmpleoDataTable<MeritoValidarTable>(params);
 		ModeloMerito modeloMerito = ModeloMerito.obtenerInstancia();
 		
 		if (convocatoria == null || bolsa == null || candidato == null) {
@@ -436,7 +437,7 @@ public class ModeloValidar {
 			return dataTable;
 		}
 		
-		String consulta = "SELECT bepmer.*, bepite.*"
+		String consulta = "SELECT bepmer.*, bepite.*, bepsbm.*"
 				+ " FROM UVIRTUAL.TBEP_SOLICITUD_BOLSAS_MERITOS bepsbm"
 				+ "	INNER JOIN UVIRTUAL.TBEP_SOLICITUD_BOLSAS bepsbo ON bepsbo.CODNUM = bepsbm.BEPSBO_CODNUM"
 				+ "	INNER JOIN UVIRTUAL.TBEP_SOLICITUDES bepsol ON bepsol.CODNUM = bepsbo.BEPSOL_CODNUM"
@@ -471,7 +472,9 @@ public class ModeloValidar {
 			try (ResultSet rs = stmt.executeQuery()) {
 				while (rs.next()) {
 					Merito merito = modeloMerito.createMeritoFromResultset(rs, false, true);
-					rows.add(merito);
+					Boolean excluido = rs.getString("FLGEXCLUIDO").equals("S");
+					Boolean validado = rs.getString("FLGVALIDADO").equals("S");
+					rows.add(new MeritoValidarTable(merito, excluido, validado));
 				}
 			}
 

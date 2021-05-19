@@ -17,6 +17,7 @@ import es.ujaen.uvirtual.modulo.bolsaempleo.beans.Bolsa;
 import es.ujaen.uvirtual.modulo.bolsaempleo.beans.BolsaValidacion;
 import es.ujaen.uvirtual.modulo.bolsaempleo.beans.CandidatoValidacion;
 import es.ujaen.uvirtual.modulo.bolsaempleo.beans.Merito;
+import es.ujaen.uvirtual.modulo.bolsaempleo.beans.MeritoValidarTable;
 import es.ujaen.uvirtual.modulo.bolsaempleo.modelo.ModeloBolsa;
 import es.ujaen.uvirtual.modulo.bolsaempleo.modelo.ModeloConvocatoria;
 import es.ujaen.uvirtual.modulo.bolsaempleo.modelo.ModeloMerito;
@@ -305,7 +306,7 @@ public class ControladorValidar extends HttpServlet {
 		
 		try (PrintWriter writer = response.getWriter()) {
 			try {
-				BolsaEmpleoDataTable<Merito> dataTable = ModeloValidar.obtenerInstancia().
+				BolsaEmpleoDataTable<MeritoValidarTable> dataTable = ModeloValidar.obtenerInstancia().
 						listadoMeritosSujetosAfinidad(bean.getConvocatoria(), bean.getBolsa(), bean.getCandidato(), request.getParameterMap());
 				bean.setDatatableMeritos(dataTable);
 				writer.write(dataTable.toJson());
