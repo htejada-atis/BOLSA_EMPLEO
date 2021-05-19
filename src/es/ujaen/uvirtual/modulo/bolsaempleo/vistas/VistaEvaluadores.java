@@ -5,7 +5,7 @@ import java.util.ArrayList;
 import java.util.List;
 import es.ujaen.uvirtual.beans.vistas.Vista;
 import es.ujaen.uvirtual.modulo.bolsaempleo.beans.Area;
-import es.ujaen.uvirtual.modulo.bolsaempleo.beans.Bolsa;
+import es.ujaen.uvirtual.modulo.bolsaempleo.beans.AreaEvaluadoresTable;
 import es.ujaen.uvirtual.modulo.bolsaempleo.beans.Departamento;
 import es.ujaen.uvirtual.modulo.bolsaempleo.beans.Evaluador;
 import es.ujaen.uvirtual.modulo.bolsaempleo.utilidades.BolsaEmpleoDataTable;
@@ -16,7 +16,7 @@ import es.ujaen.uvirtual.modulo.bolsaempleo.utilidades.BolsaEmpleoDataTable;
 public class VistaEvaluadores extends Vista implements Serializable {
 	private static final long serialVersionUID = 1L;
 	private List<Departamento> departamentos = new ArrayList<>();
-	private BolsaEmpleoDataTable<Bolsa> dataTableAreas;
+	private BolsaEmpleoDataTable<AreaEvaluadoresTable> dataTableAreas;
 	private BolsaEmpleoDataTable<Evaluador> dataTableEvaluadores;
 	private Area area;
 	private Departamento departamento;
@@ -31,11 +31,11 @@ public class VistaEvaluadores extends Vista implements Serializable {
 		this.departamentos = departamentos;
 	}
 	
-	public BolsaEmpleoDataTable<Bolsa> getDatatableAreas() {
+	public BolsaEmpleoDataTable<AreaEvaluadoresTable> getDatatableAreas() {
 		return dataTableAreas;
 	}
 	
-	public void setDatatableAreas(BolsaEmpleoDataTable<Bolsa> dt) {
+	public void setDatatableAreas(BolsaEmpleoDataTable<AreaEvaluadoresTable> dt) {
 		this.dataTableAreas = dt;
 	}
 	

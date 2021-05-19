@@ -420,7 +420,7 @@ public class TestBEPControladorGestionEvaluadores {
 		assertEquals(MENSAJE_CON_ERROR, 1, bean3.getMensajesDeError().size());
 		assertEquals(MENSAJE_SIN_EXITO, 0, bean3.getMensajesDeExito().size());
 		assertEquals(MENSAJE_CON_ERROR_ESPERADO, String.format(ControladorGestionEvaluadores.MENSAJE_ERROR_EVALUADOR_YA_EXISTE,
-						bean2.getDatatableAreas().getData().get(0).getArea().getDescripcion()), bean3.getMensajesDeError().get(0));
+						bean2.getDatatableAreas().getData().get(0).getDescripcion()), bean3.getMensajesDeError().get(0));
 	}
 
 	/**

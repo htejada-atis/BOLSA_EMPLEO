@@ -242,61 +242,6 @@ public class ModeloArea {
 	}
 	
 	/**
-	 * Listado de áreas de un departamento . 
-	 * @param params .
-	 * @param idDepartamento .
-	 * @return listado de áreas .
-	 * @throws SQLException .
-	 * @throws UVException .
-	 */
-	public BolsaEmpleoDataTable<Bolsa> listaAreaDepartamentoDatatable(Map<String, String[]> params, Integer idDepartamento) throws SQLException, UVException {
-		List<Bolsa> bolsas = new ArrayList<>();
-		ModeloArea modeloArea = ModeloArea.obtenerInstancia();
-		BolsaEmpleoDataTable<Bolsa> dataTable = new BolsaEmpleoDataTable<>(params);
-		
-		String consulta = "SELECT bepare.*, bepbol.* FROM UVIRTUAL.TBEP_BOLSAS bepbol"
-				+ "	INNER JOIN UVIRTUAL.TBEP_AREAS bepare ON bepare.CODNUM = bepbol.BEPARE_CODNUM AND bepbol.FLGBAREMABLE = 'S'"
-				+ "	INNER JOIN UVIRTUAL.TBEP_AREAS_DEPARTAMENTOS bepade ON bepade.BEPARE_CODNUM = bepare.CODNUM"
-				+ "	WHERE bepade.BEPDEP_CODNUM = ? ";
-		
-		dataTable.setColumn(ORDER_COLUMN_INDEX_ID, "bepbol.CODNUM", DataTableColumn.COLUMN_TYPE_NUMBER);
-		dataTable.setColumn(ORDER_COLUMN_INDEX_CODIGO, "bepare.ID_AREA_CONOCIMIENTO");
-		dataTable.setColumn(ORDER_COLUMN_INDEX_AREA, "bepare.DES_AREA_CONOCIMIENTO");
-		dataTable.setQuery(consulta);
-		
-		try (Connection conexion = ConexionUvirtual.obtenerInstancia();
-				PreparedStatement stmtCount = conexion.prepareStatement(dataTable.getQueryCount());
-				PreparedStatement stmt = conexion.prepareStatement(dataTable.getQuery())
-		) {
-			int indexParam = 1;
-			stmt.setInt(indexParam, idDepartamento);
-			stmtCount.setInt(indexParam++, idDepartamento);
-			
-			dataTable.setFiltersParams(stmt, stmtCount, indexParam);
-			
-			try (ResultSet rs = stmt.executeQuery()) {
-				while (rs.next()) {
-					Bolsa bolsa = new Bolsa();
-					bolsa.setCodNum(rs.getInt(CODNUM));
-					bolsa.setArea(modeloArea.getAreaById(rs.getInt(BEPARE_CODNUM)));
-					bolsa.setEstado(rs.getString(ESTADO));
-					bolsa.setBaremable("S".equals(rs.getString("FLGBAREMABLE")));
-					bolsa.setFechaActualizacion(rs.getTimestamp("FECHAACTUALIZACION"));
-					bolsa.setFechaBloqueo(rs.getTimestamp("FECHABLOQUEO"));
-					bolsa.setFechaDesBloqueo(rs.getTimestamp("FECHADEBLOQUEO"));
-					
-					bolsas.add(bolsa);
-				}
-			}
-			
-			dataTable.setRecordsTotalFromQuery(stmtCount);
-			dataTable.setData(bolsas);
-		}
-		
-		return dataTable;
-	}
-	
-	/**
 	 * Listado de areas excluidas de un usuario.
 	 * @param params para leer los parametros de paginación, ordenacion, etc
 	 * @param codnum .

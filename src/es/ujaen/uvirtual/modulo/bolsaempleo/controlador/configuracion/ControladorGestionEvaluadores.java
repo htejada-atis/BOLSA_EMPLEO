@@ -19,6 +19,7 @@ import es.ujaen.uvirtual.beans.CodigoDescripcion;
 import es.ujaen.uvirtual.beans.UVDatos;
 import es.ujaen.uvirtual.modulo.bolsaempleo.beans.Area;
 import es.ujaen.uvirtual.modulo.bolsaempleo.beans.Bolsa;
+import es.ujaen.uvirtual.modulo.bolsaempleo.beans.AreaEvaluadoresTable;
 import es.ujaen.uvirtual.modulo.bolsaempleo.beans.Departamento;
 import es.ujaen.uvirtual.modulo.bolsaempleo.beans.Evaluador;
 import es.ujaen.uvirtual.modulo.bolsaempleo.beans.UsuarioBolsaEmpleo;
@@ -351,7 +352,7 @@ public class ControladorGestionEvaluadores extends HttpServlet {
 	 * @throws SQLException excepcion de bbdd .
 	 */
 	private void listadoAreas(VistaEvaluadores bean, UVDatos datos, HttpServletRequest request, HttpServletResponse response) throws IOException, SQLException {
-		ModeloArea modeloArea = ModeloArea.obtenerInstancia();
+		ModeloEvaluador modeloEvaluador = ModeloEvaluador.obtenerInstancia();
 		datos.setContentType(RESPONSE_AJAX_CONTENTTYPE);
 		response.setContentType(RESPONSE_AJAX_CONTENTTYPE);
 		response.setCharacterEncoding(RESPONSE_AJAX_ENCODING);
@@ -359,7 +360,7 @@ public class ControladorGestionEvaluadores extends HttpServlet {
 		try (PrintWriter writer = response.getWriter()) {
 			try {
 				Integer idDepartamento = Formateador.leeParametroInteger(request.getParameter(PARAM_DEPARTAMENTO));
-				BolsaEmpleoDataTable<Bolsa> dataTable = modeloArea.listaAreaDepartamentoDatatable(request.getParameterMap(), idDepartamento);
+				BolsaEmpleoDataTable<AreaEvaluadoresTable> dataTable = modeloEvaluador.listaAreaDepartamentoDatatable(request.getParameterMap(), idDepartamento);
 				bean.setDatatableAreas(dataTable);
 				writer.write(dataTable.toJson());
 			} catch (Exception ex) {
