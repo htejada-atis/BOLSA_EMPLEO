@@ -108,7 +108,7 @@ public class ModeloValidar {
 	 */
 	public BolsaEmpleoDataTable<Bolsa> listadoAreasCandidatoSujetasAfinidad(Convocatoria convocatoria, UsuarioBolsaEmpleo candidato, Map<String, String[]> params)
 			throws SQLException, UVException {
-		return this.listadoAreasCandidato(convocatoria, candidato, params, false);
+		return this.listadoAreasCandidato(convocatoria, candidato, params, true);
 	}
 	
 	/**
