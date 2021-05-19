@@ -2,6 +2,7 @@ package es.ujaen.uvirtual.modulo.bolsaempleo.beans;
 
 import java.io.InputStream;
 import java.io.Serializable;
+import java.util.Date;
 
 /** Clase titulación de bolsa empleo.
  * @author fcampos
@@ -16,7 +17,9 @@ public class TitulacionUsuario implements Serializable {
 	private Titulacion titulacion;
 	private UsuarioBolsaEmpleo usuario;
 	private Boolean borrado;
+	private Date fechaBorrado;
 	private Boolean validada;
+	private Date fechaValidada;
 	
 	/** Constructor por defecto.
 	 */
@@ -73,7 +76,9 @@ public class TitulacionUsuario implements Serializable {
 		this.titulacion = copia.titulacion;
 		this.usuario = copia.usuario;
 		this.borrado = copia.borrado;
+		this.fechaBorrado = copia.fechaBorrado;
 		this.validada = copia.validada;
+		this.fechaValidada = copia.fechaValidada;
 	}
 	
 	
@@ -137,6 +142,14 @@ public class TitulacionUsuario implements Serializable {
 		this.borrado = borrado;
 	}
 	
+	public Date getFechaBorrado() {
+		return fechaBorrado;
+	}
+	
+	public void setFechaBorrado(Date fechaBorrado) {
+		this.fechaBorrado = fechaBorrado;
+	}
+	
 	public Boolean getValidada() {
 		return validada;
 	}
@@ -145,10 +158,19 @@ public class TitulacionUsuario implements Serializable {
 		this.validada = validada;
 	}
 	
+	public Date getFechaValidada() {
+		return fechaValidada;
+	}
+	
+	public void setFechaValidada(Date fechaValidada) {
+		this.fechaValidada = fechaValidada;
+	}
+	
 	@Override
 	public String toString() {
 		return "Titulación Usuario [codNum=" + codNum + ", descripcion=" + descripcion + ", otratitulacion=" + otratitulacion + ", usuario=" + usuario + ", titulacion="
-				+ titulacion + ", archivo=" + archivo + ", borrado=" + borrado + ", validada=" + validada + "]";
+				+ titulacion + ", archivo=" + archivo + ", borrado=" + borrado + ", fechaBorrado=" + fechaBorrado + ", validada=" + validada + ", fechaValidada=" 
+				+ fechaValidada + "]";
 	}
 	
 	@Override
@@ -162,7 +184,9 @@ public class TitulacionUsuario implements Serializable {
 		result = prime * result + ((titulacion == null) ? 0 : titulacion.hashCode());
 		result = prime * result + ((archivo == null) ? 0 : archivo.hashCode());
 		result = prime * result + ((borrado == null) ? 0 : borrado.hashCode());
+		result = prime * result + ((fechaBorrado == null) ? 0 : fechaBorrado.hashCode());
 		result = prime * result + ((validada == null) ? 0 : validada.hashCode());
+		result = prime * result + ((fechaValidada == null) ? 0 : fechaValidada.hashCode());
 		return result;
 	}
 	
@@ -179,6 +203,13 @@ public class TitulacionUsuario implements Serializable {
 			return false;
 		}
 		TitulacionUsuario other = (TitulacionUsuario) obj;
+		if (codNum == null) {
+			if (other.codNum != null) {
+				return false;
+			}
+		} else if (!codNum.equals(other.codNum)) {
+			return false;
+		}
 		if (descripcion == null) {
 			if (other.descripcion != null) {
 				return false;
@@ -221,11 +252,25 @@ public class TitulacionUsuario implements Serializable {
 		} else if (!borrado.equals(other.borrado)) {
 			return false;
 		}
+		if (fechaBorrado == null) {
+			if (other.fechaBorrado != null) {
+				return false;
+			}
+		} else if (!fechaBorrado.equals(other.fechaBorrado)) {
+			return false;
+		}
 		if (validada == null) {
 			if (other.validada != null) {
 				return false;
 			}
 		} else if (!validada.equals(other.validada)) {
+			return false;
+		}
+		if (fechaValidada == null) {
+			if (other.fechaValidada != null) {
+				return false;
+			}
+		} else if (!fechaValidada.equals(other.fechaValidada)) {
 			return false;
 		}
 		

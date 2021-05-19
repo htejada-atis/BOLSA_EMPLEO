@@ -8,8 +8,8 @@ import static org.junit.Assert.assertEquals;
 //import javax.servlet.http.Part;
 
 import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.mockito.junit.MockitoJUnitRunner;
+//import org.junit.runner.RunWith;
+//import org.mockito.junit.MockitoJUnitRunner;
 //import org.mockito.Mock;
 
 import es.ujaen.uvirtual.modulo.bolsaempleo.utilidades.BolsaEmpleoUtils;
