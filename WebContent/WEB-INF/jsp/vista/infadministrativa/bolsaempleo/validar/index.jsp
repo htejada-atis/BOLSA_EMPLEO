@@ -51,7 +51,8 @@ $(document).ready(function() {
 	    "pageSize": 10,
 	    "filterable": true,
 	    "action": "<%= ControladorValidar.ACCION_DATATABLE_BOLSAS %>",
-	    "defaultOrderBy": 1,
+	    "defaultOrderBy": 5,
+	    "defaultOrderDirection": 'desc',
 	    "clickable": {'onClick': function(row) {
 	    	var params = {
     				'a': '<%= ControladorValidar.ACCION_BOLSA_SELECCIONADA %>', 
@@ -61,10 +62,10 @@ $(document).ready(function() {
 	    "columns": [
 	    	{'data': 'area.idAreaExterno', 'filter': {'type': 'number'}},
 	        {'data': 'area.descripcion', 'filter': true},
-	        {'data': 'totalMeritosNoValidados', 'order': false, 'class': 'center', 'render': function(row) { return isNaN(row.totalMeritosNoValidados) ? 0 : row.totalMeritosNoValidados; } },
-	        {'data': 'totalMeritosValidados', 'order': false, 'class': 'center', 'render': function(row) { return isNaN(row.totalMeritosValidados) ? 0 : row.totalMeritosValidados; } },
-	        {'data': 'totalMeritosExcluidos', 'order': false, 'class': 'center', 'render': function(row) { return isNaN(row.totalMeritosExcluidos) ? 0 : row.totalMeritosExcluidos; } },
-	        {'data': 'totalMeritos', 'order': false, 'class': 'center'} 
+	        {'data': 'totalMeritosNoValidados', 'class': 'center', 'render': function(row) { return isNaN(row.totalMeritosNoValidados) ? 0 : row.totalMeritosNoValidados; } },
+	        {'data': 'totalMeritosValidados', 'class': 'center', 'render': function(row) { return isNaN(row.totalMeritosValidados) ? 0 : row.totalMeritosValidados; } },
+	        {'data': 'totalMeritosExcluidos', 'class': 'center', 'render': function(row) { return isNaN(row.totalMeritosExcluidos) ? 0 : row.totalMeritosExcluidos; } },
+	        {'data': 'totalMeritos', 'class': 'center'} 
 	    ]	    
 	});		
 }); 

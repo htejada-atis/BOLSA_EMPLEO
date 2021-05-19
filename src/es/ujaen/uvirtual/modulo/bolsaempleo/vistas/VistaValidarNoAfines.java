@@ -19,8 +19,10 @@ public class VistaValidarNoAfines extends Vista implements Serializable {
 	private String vista;
 	private Bolsa bolsa;
 	private Convocatoria conv;
+	private Merito merito;
 	private UsuarioBolsaEmpleo usuario;
 	private BolsaEmpleoDataTable<BolsaValidacion> datatableBolsas;
+	private BolsaEmpleoDataTable<Bolsa> datatableBolsasCandidato;
 	private BolsaEmpleoDataTable<CandidatoValidacion> datatableCandidatos;
 	private BolsaEmpleoDataTable<Merito> datatableMeritos;
 	
@@ -38,6 +40,14 @@ public class VistaValidarNoAfines extends Vista implements Serializable {
 	
 	public BolsaEmpleoDataTable<BolsaValidacion> getDatatableBolsas() {
 		return this.datatableBolsas;	
+	}
+	
+	public void setDatatableBolsasCandidato(BolsaEmpleoDataTable<Bolsa> dt) {
+		this.datatableBolsasCandidato = dt;
+	}
+	
+	public BolsaEmpleoDataTable<Bolsa> getDatatableBolsasCandidato() {
+		return this.datatableBolsasCandidato;	
 	}
 	
 	public void setDatatableCandidatos(BolsaEmpleoDataTable<CandidatoValidacion> dt) {
@@ -70,6 +80,14 @@ public class VistaValidarNoAfines extends Vista implements Serializable {
 	
 	public void setConvocatoria(Convocatoria pconv) {
 		this.conv = pconv;
+	}
+	
+	public Merito getMerito() {
+		return merito;
+	}
+	
+	public void setMerito(Merito merito) {
+		this.merito = merito;
 	}
 	
 	public UsuarioBolsaEmpleo getCandidato() {

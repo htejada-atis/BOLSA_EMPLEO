@@ -117,7 +117,7 @@ Departamento departamento = bean.getDepartamento();
 			        {'data': 'codNum', 'filter': {'type': 'number'}},
 			        {'data': 'idAreaExterno', 'filter': true},
 			        {'data': 'descripcion', 'filter': true},
-			        {'data': 'numeroEvaluadores', 'order': {'active': false}}
+			        {'data': 'numeroEvaluadores', 'order': true}
 				]
 			});
 		}
