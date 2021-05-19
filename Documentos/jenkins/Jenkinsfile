@@ -104,11 +104,12 @@ pipeline {
         	    sh "python3 /home/jenkins-nodo/Documentos/envioChat.py -i \"${JOB_NAME}\" -o \"resultados de las pruebas ${BRANCH_NAME} ${BUILD_NUMBER} - Total: ${summary.totalCount}, Failures: ${summary.failCount}, Skipped: ${summary.skipCount}, Passed: ${summary.passCount}\""
         	    def rutaCapturas = '/tmp/pruebasSelenium/'
         	    sh "touch builds/build/rama/site/jacoco/unittest.zip"
-	    		zip zipFile: 'builds/build/rama/site/jacoco/unittest.zip', archive: false, dir: "${rutaCapturas}", overwrite: true, glob: '**/*.png'
+        	    sh "touch builds/build/rama/site/jacoco/capturas.zip"
+	    		zip zipFile: 'builds/build/rama/site/jacoco/capturas.zip', archive: false, dir: "${rutaCapturas}", overwrite: true, glob: '**/*.png'
 	    		zip zipFile: 'builds/build/rama/site/jacoco/unittest.zip', archive: false, dir: 'builds/build/rama/site/jacoco/', overwrite: false, glob: '**/*.txt'
         	}
 			emailext mimeType: "text/html", to: 'jmoral@ujaen.es',
-				attachLog: true, attachmentsPattern: 'builds/build/rama/site/jacoco/unittest.zip',
+				attachLog: true, attachmentsPattern: 'builds/build/rama/site/jacoco/unittest.zip, builds/build/rama/site/jacoco/capturas.zip',
 				body: '${FILE,path="builds/build/rama/site/jacoco/index.html"}', 
 				subject: "Completado jenkins pipeline ${JOB_NAME} (${BUILD_NUMBER}) "
     		sh "docker-compose down || true"
