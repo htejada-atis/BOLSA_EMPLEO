@@ -29,6 +29,10 @@ public class ModeloValidar {
 	
 	public static final int ORDER_COLUMN_INDEX_CODIGO_AREA = 0;
 	public static final int ORDER_COLUMN_INDEX_AREA = 1;
+	public static final int ORDER_COLUMN_INDEX_COUNT_NO_VALIDADOS = 2;
+	public static final int ORDER_COLUMN_INDEX_COUNT_VALIDADOS = 3;
+	public static final int ORDER_COLUMN_INDEX_COUNT_EXCLUIDOS = 4;
+	public static final int ORDER_COLUMN_INDEX_COUNT_TOTAL = 5;
 	
 	public static final int ORDER_COLUMN_INDEX_NUMDOCUMENTO_CANDIDATO = 0;
 	public static final int ORDER_COLUMN_INDEX_NOMBRE_Y_APELLIDOS_CANDIDATO = 1;
@@ -104,7 +108,7 @@ public class ModeloValidar {
 	 */
 	public BolsaEmpleoDataTable<Bolsa> listadoAreasCandidatoSujetasAfinidad(Convocatoria convocatoria, UsuarioBolsaEmpleo candidato, Map<String, String[]> params)
 			throws SQLException, UVException {
-		return this.listadoAreasCandidato(convocatoria, candidato, params, false);
+		return this.listadoAreasCandidato(convocatoria, candidato, params, true);
 	}
 	
 	/**
@@ -221,9 +225,13 @@ public class ModeloValidar {
 				+ "	FROM UVIRTUAL.TBEP_BOLSAS bepbol"
 				+ " INNER JOIN UVIRTUAL.TBEP_AREAS bepare ON bepare.CODNUM = bepbol.BEPARE_CODNUM"
 				+ "	WHERE bepbol.FLGBAREMABLE = 'S'";
-
+		
 		dataTable.setColumn(ORDER_COLUMN_INDEX_CODIGO_AREA, "bepare.ID_AREA_CONOCIMIENTO");
 		dataTable.setColumn(ORDER_COLUMN_INDEX_AREA, "bepare.DES_AREA_CONOCIMIENTO");
+		dataTable.setColumn(ORDER_COLUMN_INDEX_COUNT_NO_VALIDADOS, "COUNT_NO_VALIDADOS");
+		dataTable.setColumn(ORDER_COLUMN_INDEX_COUNT_VALIDADOS, "COUNT_VALIDADOS");
+		dataTable.setColumn(ORDER_COLUMN_INDEX_COUNT_EXCLUIDOS, "COUNT_EXCLUIDOS");
+		dataTable.setColumn(ORDER_COLUMN_INDEX_COUNT_TOTAL, "COUNT_TOTAL");
 
 		dataTable.setQuery(consulta);
 		

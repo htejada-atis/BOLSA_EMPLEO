@@ -8,12 +8,10 @@ import java.time.LocalDateTime;
 import java.util.Date;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-
 import javax.servlet.ServletRequest;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 import javax.servlet.http.Part;
-
 import es.ujaen.uvirtual.beans.vistas.Vista;
 import es.ujaen.uvirtual.modulo.bolsaempleo.modelo.ModeloParametrosConfiguracion;
 import es.ujaen.uvirtual.utilidades.Formateador;
@@ -254,13 +252,19 @@ public final class BolsaEmpleoUtils {
 		
 		String mensajeExito = (String) session.getAttribute(MENSAJE_REDIRECT_SESSION_EXITO);		
 		if (mensajeExito != null) {
-			bean.getMensajesDeExito().add(mensajeExito);
+			String[] mensajeExitoSplit = mensajeExito.split(Pattern.quote("|"));
+			for (String m : mensajeExitoSplit) {
+				bean.getMensajesDeExito().add(m);
+			}
 			session.removeAttribute(MENSAJE_REDIRECT_SESSION_EXITO);
 		}
 		
 		String mensajeError = (String) session.getAttribute(MENSAJE_REDIRECT_SESSION_ERROR);		
 		if (mensajeError != null) {
-			bean.getMensajesDeError().add(mensajeError);
+			String[] mensajeErrorSplit = mensajeError.split(Pattern.quote("|"));
+			for (String m : mensajeErrorSplit) {
+				bean.getMensajesDeError().add(m);
+			}
 			session.removeAttribute(MENSAJE_REDIRECT_SESSION_ERROR);
 		}
 	}
@@ -270,11 +274,23 @@ public final class BolsaEmpleoUtils {
 		
 		switch (tipo) {
 			case TIPO_MENSAJE_EXITO:
-				session.setAttribute(MENSAJE_REDIRECT_SESSION_EXITO, mensaje);
+				String mensajeExito = (String) session.getAttribute(MENSAJE_REDIRECT_SESSION_EXITO);
+				if (mensajeExito != null) {
+					mensajeExito += "|" + mensaje;
+				} else {
+					mensajeExito = mensaje;
+				}
+				session.setAttribute(MENSAJE_REDIRECT_SESSION_EXITO, mensajeExito);
 				bean.getMensajesDeExito().add(mensaje);
 				break;
 			case TIPO_MENSAJE_ERROR:
-				session.setAttribute(MENSAJE_REDIRECT_SESSION_ERROR, mensaje);
+				String mensajeError = (String) session.getAttribute(MENSAJE_REDIRECT_SESSION_ERROR);
+				if (mensajeError != null) {
+					mensajeError += "|" + mensaje;
+				} else {
+					mensajeError = mensaje;
+				}
+				session.setAttribute(MENSAJE_REDIRECT_SESSION_ERROR, mensajeError); 
 				bean.getMensajesDeError().add(mensaje);
 				break;
 			default:
