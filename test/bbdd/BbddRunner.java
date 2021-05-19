@@ -38,7 +38,7 @@ public class BbddRunner {
     
     private static String servidorMemcacheDefecto = "jenkins.ujaen.es";
 
-    public static final boolean VERBOSE = true;
+    public static final boolean VERBOSE = false;
 	
     private BbddRunner() { }
 	
@@ -115,7 +115,11 @@ public class BbddRunner {
 		return odsArcos.getConnection();
 	}
 	
-	private static Connection obtenerConexionAc() throws SQLException {
+	/** obtiene la conexión con ac.
+	 * @return .
+	 * @throws SQLException .
+	 */
+	public static Connection obtenerConexionAc() throws SQLException {
 		return odsAc.getConnection();
 	}	
 	

@@ -19,7 +19,7 @@ import es.ujaen.uvirtual.modulo.bolsaempleo.utilidades.BolsaEmpleoUtils;
  * 
  * @author ATISoluciones
  */
-@RunWith(MockitoJUnitRunner.class)
+// @RunWith(MockitoJUnitRunner.class)
 public class TestBEPUtils {
 	public static final int COUNT_1 = 1;
 	public static final int COUNT_3 = 3;	

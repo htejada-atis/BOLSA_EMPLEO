@@ -144,7 +144,7 @@ public class TestBEPModeloMeritosPreferentes {
 			MeritoPreferente meritoNew = modelo.getMeritoPreferenteById(codNum);
 			
 			merito.setCodNum(codNum);
-			assertEquals(merito, meritoNew);			
+			assertEquals(merito, meritoNew);
 		} catch (SQLException | UVException ex) {
 			fail(String.format(MENSAJE_ERROR_HAY_EXCEPCION, ex.toString()));
 		}
@@ -260,7 +260,7 @@ public class TestBEPModeloMeritosPreferentes {
 
 		params.put(BolsaEmpleoDataTable.PARAM_CURRENT_PAGE, new String[] {"0"});
 		params.put(BolsaEmpleoDataTable.PARAM_PAGE_SIZE, new String[] {"10"});
-		params.put(BolsaEmpleoDataTable.PARAM_ORDER_BY, new String[] {"0"});
+		params.put(BolsaEmpleoDataTable.PARAM_ORDER_BY, new String[] {String.valueOf(ModeloMeritosPreferentes.ORDER_COLUMN_INDEX_CODIGO)});
 		params.put(BolsaEmpleoDataTable.PARAM_ORDER_DIRECTION, new String[] {BolsaEmpleoDataTable.PARAM_ORDER_DIRECTION_VALUE_ASC});
 
 		try {

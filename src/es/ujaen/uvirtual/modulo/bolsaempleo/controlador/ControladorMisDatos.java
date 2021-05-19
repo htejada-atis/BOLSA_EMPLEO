@@ -177,7 +177,7 @@ public class ControladorMisDatos extends HttpServlet {
 	
 	private void index(VistaUsuarioBolsaEmpleo bean, UVDatos datos) throws SQLException, UVException {
 		Usuario usuario = datos.getUsuario();
-		bean.setUsuario(ModeloUsuarioBolsaEmpleo.obtenerInstancia().listaUsuario(usuario.getDocumentoNumero()));
+		bean.setUsuario(ModeloUsuarioBolsaEmpleo.obtenerInstancia().getUsuarioByNumeroDocumento(usuario.getDocumentoNumero()));
 		bean.setUsuarioArcos(usuario);
 		bean.setVista(JSP_INDEX);
 	}

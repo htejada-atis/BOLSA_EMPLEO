@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.sql.SQLException;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.Date;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -208,6 +209,17 @@ public final class BolsaEmpleoUtils {
 	public static Date getCurrentDate() {
 		LocalDate ld = LocalDate.now();
 		return java.sql.Date.valueOf(ld);
+	}
+	
+	/**
+	 * Devuelve la fecha actual del sistema.
+	 * Según "java.time" classes should be used for dates and times (java:S2143)
+	 * https://www.baeldung.com/java-date-to-localdate-and-localdatetime
+	 * @return .
+	 */
+	public static Date getCurrentDateTime() {
+		LocalDateTime ld = LocalDateTime.now();
+		return java.sql.Timestamp.valueOf(ld);
 	}
 	
 	/**
