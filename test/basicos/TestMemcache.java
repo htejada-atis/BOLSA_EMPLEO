@@ -3,6 +3,7 @@ package basicos;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
+import static org.junit.Assert.fail;
 
 import java.io.IOException;
 import java.net.SocketAddress;
@@ -18,6 +19,7 @@ import org.junit.Test;
 import bbdd.BbddRunner;
 import es.ujaen.uvirtual.modelo.conexion.Conexion;
 import es.ujaen.uvirtual.utilidades.Memcache;
+import es.ujaen.uvirtual.utilidades.UVException;
 
 /** Clase para probar memcache. */
 public class TestMemcache {
@@ -101,5 +103,21 @@ public class TestMemcache {
 		Map<SocketAddress, Map<String, String>> salidaDisabled = Memcache.getStats();
 		assertNull(salidaDisabled);
 	}
-	
+
+	/** test flush all.
+	 */
+	@Test
+	public void testA6FlushAll() {
+		Memcache.enable();
+		Memcache mc = Memcache.getInstance();
+		mc.set(clave, valor);
+		try {
+			mc.flushAll();
+		} catch (UVException e) {
+			fail();
+		}
+		String devueltoDisabled = (String) mc.get(clave);
+		assertEquals(MENSAJE_IGUAL, null, devueltoDisabled);
+		Memcache.disable();
+	}	
 }

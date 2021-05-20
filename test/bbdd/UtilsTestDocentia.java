@@ -7,6 +7,8 @@ import controlador.implementacion.PeticionHttp;
 import es.ujaen.uvirtual.adm.CrearUsuario;
 import es.ujaen.uvirtual.beans.UVDatos;
 import es.ujaen.uvirtual.beans.Usuario;
+import es.ujaen.uvirtual.utilidades.Memcache;
+import es.ujaen.uvirtual.utilidades.UVException;
 
 /** utilidades para los test docentia.
  *
@@ -20,12 +22,16 @@ public class UtilsTestDocentia {
 	/** Inicializa la bd para docentia.
 	 * @throws SQLException si error sql
 	 * @throws IOException si error io
+	 * @throws UVException si error uv en memcache
 	 */
-	public static void inicializaDocentia() throws SQLException, IOException {
+	public static void inicializaDocentia() throws SQLException, IOException, UVException {
 		BbddRunner.ejecutar("Documentos/scripts/opc.docentia/datos_desarrollo/dropTables.sql");
 		BbddRunner.ejecutar("Documentos/scripts/opc.docentia/creartablasdocentia.sql");
 		BbddRunner.ejecutar("Documentos/scripts/opc.docentia/creacionsecuenciasytriggers.sql");
 		BbddRunner.insertMasivo("Documentos/scripts/opc.docentia/datos_desarrollo/creacionregistrosprueba.sql");
+		BbddRunner.insertMasivo("Documentos/scripts/opc.docentia/uv.sql");
+		Memcache mc = Memcache.getInstance();
+		mc.flushAll();
 	}
 	
     /** obtiene una peticion autenticada con el usuario de pruebas de docentia.
