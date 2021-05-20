@@ -9,6 +9,8 @@ import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
 import java.util.Comparator;
 import java.util.concurrent.TimeUnit;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import java.util.stream.Stream;
 
 import org.openqa.selenium.By;
@@ -21,6 +23,9 @@ import org.openqa.selenium.firefox.FirefoxOptions;
 
 /** Clase para obtener el driver de firefox. */
 public class DriverUv {
+	private static final String NOMBREDEESTACLASE = DriverUv.class.getName();
+
+	private static final Logger LOGGER = Logger.getLogger(NOMBREDEESTACLASE);
 	private static WebDriver driver;
 	private static final int TIEMPO_MAXIMO_ESPERA = 10;
 	private static int contador = 1;
@@ -96,16 +101,23 @@ public class DriverUv {
 	 * @param nombre nombre del fichero de la captura
 	 */
 	public static void capturaPantalla(String nombre) {
-		String rutaUrl = driver.getCurrentUrl().replace(RUTA, "");
+		String rutaUrl = "";
+		if (driver != null && driver.getCurrentUrl() != null) {
+			rutaUrl = driver.getCurrentUrl().replace(RUTA, "");
+		}
 		rutaUrl = rutaUrl.replace("/", "-");
     	String nombreFichero = directorioBase + contador++ + "-" + nombre + rutaUrl + ".png";
-		File scrFile = ((TakesScreenshot) driver).getScreenshotAs(OutputType.FILE);
-	    try {
-			Files.createDirectories(Paths.get(directorioBase));
-			Files.copy(scrFile.toPath(), (new File(nombreFichero)).toPath(), StandardCopyOption.REPLACE_EXISTING);
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
+    	if (driver != null) {
+			File scrFile = ((TakesScreenshot) driver).getScreenshotAs(OutputType.FILE);
+		    try {
+				Files.createDirectories(Paths.get(directorioBase));
+				Files.copy(scrFile.toPath(), (new File(nombreFichero)).toPath(), StandardCopyOption.REPLACE_EXISTING);
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+    	} else {
+    		LOGGER.log(Level.SEVERE, "hay que inicializar driver para hacer captura");
+    	}
 	}
 	
 	/** obtiene el driver.
