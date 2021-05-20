@@ -387,7 +387,7 @@ public class BbddRunner {
 			}
 			salida = "jdbc:oracle:thin:@" + urlDbSystem + ":" + dbPuerto + ":" + dbSid;
 		}
-		String tnsDbSystem = System.getProperty("dnTnsname");
+		String tnsDbSystem = System.getProperty("dbTnsname");
 		if (tnsDbSystem != null) {
 			salida = tnsDbSystem;
 		}
