@@ -67,7 +67,7 @@ public class ModeloParametrosConfiguracion {
 			}
 		}
 		
-		String consultaBep = "SELECT * FROM TBEP_PARAMETROS_CONFIGURACION";
+		String consultaBep = "SELECT * FROM TBEP_PARAMETROS_CONFIG";
 		
 		try (Connection conexion = ConexionUvirtual.obtenerInstancia(); PreparedStatement stmt = conexion.prepareStatement(consultaBep)) {
 			try (ResultSet rs = stmt.executeQuery()) {
@@ -113,7 +113,7 @@ public class ModeloParametrosConfiguracion {
 				stmt.executeUpdate();
 			}
 		} else {
-			String consulta = "UPDATE TBEP_PARAMETROS_CONFIGURACION "
+			String consulta = "UPDATE TBEP_PARAMETROS_CONFIG "
 					+ " SET DESCRIPCION=?, VALOR=? "
 					+ " WHERE CODNUM=? AND NOMBRE=?";
 			try (Connection conexion = ConexionUvirtual.obtenerInstancia();
@@ -141,7 +141,7 @@ public class ModeloParametrosConfiguracion {
 		}
 		String[] nombreSplit = nombre.split("\\.");
 		if (nombreSplit[1].equals("local")) {
-			String consulta = "SELECT * FROM TBEP_PARAMETROS_CONFIGURACION "
+			String consulta = "SELECT * FROM TBEP_PARAMETROS_CONFIG "
 					+ " WHERE NOMBRE = ?";
 				
 				try (Connection conexion = ConexionUvirtual.obtenerInstancia();
