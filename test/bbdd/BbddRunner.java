@@ -389,6 +389,7 @@ public class BbddRunner {
 	}
 	
 	private static String getCadenaConexionBd() {
+		String salida = cadenaConexionDefecto;
 		String urlDbSystem = System.getProperty("dbUrl");
 		if (urlDbSystem != null && !"".equals(urlDbSystem)) {
 			String dbPuerto = "1521";
@@ -401,9 +402,13 @@ public class BbddRunner {
 			if (dbSidSystem != null && dbSidSystem.length() > 1) {
 				dbSid = System.getProperty("dbSid");
 			}
-			return "jdbc:oracle:thin:@" + urlDbSystem + ":" + dbPuerto + ":" + dbSid;
+			salida = "jdbc:oracle:thin:@" + urlDbSystem + ":" + dbPuerto + ":" + dbSid;
 		}
-		return cadenaConexionDefecto;
+		String tnsDbSystem = System.getProperty("dnTnsname");
+		if (tnsDbSystem != null) {
+			salida = tnsDbSystem;
+		}
+		return salida;
 	}
 	
 	private static String getUsuarioConexionUv() {
