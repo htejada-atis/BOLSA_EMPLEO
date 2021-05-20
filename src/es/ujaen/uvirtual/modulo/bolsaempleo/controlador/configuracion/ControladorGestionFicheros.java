@@ -134,14 +134,13 @@ public class ControladorGestionFicheros extends HttpServlet {
 				default:
 					errorFatal(bean, "Acción no contemplada");
 			}
-		} catch (SQLException e) {
-			bean.getMensajesDeError().add("Error al acceder a la base de datos");
-		} catch (ServletException e) {
-			LOGGER.log(Level.WARNING, e.toString());
-			bean.getMensajesDeError().add(e.toString());
 		} catch (UVException e) {
 			LOGGER.log(Level.WARNING, e.toString());
 			bean.getMensajesDeError().add(e.getMessage());
+		} catch (SQLException e) {
+			LOGGER.log(Level.SEVERE, Formateador.getStackTrace(e));
+			LOGGER.log(Level.SEVERE, e.toString());
+			bean.getMensajesDeError().add("Error al acceder a la base de datos");
 		} finally {
 			datos.getVistas().put(bean.getClass().getName(), bean);
 			datos.getFicherosJSP().add(bean.getVista());
