@@ -12,7 +12,6 @@ import java.util.ArrayList;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
-import bbdd.BbddRunner;
 import bbdd.UtilsTestDocentia;
 import es.ujaen.uvirtual.adm.CompruebaAcceso;
 import es.ujaen.uvirtual.adm.CrearUsuario;
@@ -42,7 +41,6 @@ public class TestCompruebaAcceso {
      */
     @BeforeClass
     public static void preparaBd() throws SQLException, IOException, UVException {
-    	BbddRunner.conectarBd();
     	UtilsTestDocentia.inicializaDocentia();
     }
 
