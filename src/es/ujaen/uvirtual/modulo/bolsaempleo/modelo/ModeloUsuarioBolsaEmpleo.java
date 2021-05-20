@@ -466,7 +466,7 @@ public class ModeloUsuarioBolsaEmpleo {
 		String consulta = "SELECT bepare.CODNUM as CODNUMAREA, bepbol.CODNUM AS CODNUMBOLSA, bepare.ID_AREA_CONOCIMIENTO, "
 		+ "bepare.DES_AREA_CONOCIMIENTO, bepbol.FLGBAREMABLE , bepbol.BEPARE_CODNUM, "
 		+ "bepbol.ESTADO, bepbol.FECHAACTUALIZACION , bepbol.FECHABLOQUEO ,bepbol.FECHADEBLOQUEO "
-		+ "FROM UVIRTUAL.TBEP_USUARIOS_EXCLUIDOS_AREA bepuea "
+		+ "FROM UVIRTUAL.TBEP_USU_EXCLUIDOS_AREA bepuea "
 		+ "INNER JOIN UVIRTUAL.TBEP_AREAS bepare ON bepuea.AREA=bepare.CODNUM "
 		+ "INNER JOIN TBEP_BOLSAS bepbol ON bepare.CODNUM = bepbol.BEPARE_CODNUM "
 		+ "INNER JOIN uvirtual.TBEP_USUARIOS bepusu ON bepuea.USUARIO = bepusu.CODNUM "
@@ -767,7 +767,7 @@ public class ModeloUsuarioBolsaEmpleo {
 	}
 	
 	private void excluirUsuarioAreas(List<Area> areas, UsuarioBolsaEmpleo usu) throws SQLException {
-		String query = "INSERT INTO TBEP_USUARIOS_EXCLUIDOS_AREA (USUARIO,AREA) VALUES (?,?)";		
+		String query = "INSERT INTO TBEP_USU_EXCLUIDOS_AREA (USUARIO,AREA) VALUES (?,?)";		
 		
 		try (Connection conexion = ConexionUvirtual.obtenerInstancia(); PreparedStatement stmt = conexion.prepareStatement(query)) {
 			
@@ -790,7 +790,7 @@ public class ModeloUsuarioBolsaEmpleo {
 	}
 	
 	private void incluirUsuarioAreas(List<Area> areas, UsuarioBolsaEmpleo usu) throws SQLException {
-		String query = "DELETE FROM TBEP_USUARIOS_EXCLUIDOS_AREA WHERE usuario = ? AND area = ?";		
+		String query = "DELETE FROM TBEP_USU_EXCLUIDOS_AREA WHERE usuario = ? AND area = ?";		
 		
 		try (Connection conexion = ConexionUvirtual.obtenerInstancia(); PreparedStatement stmt = conexion.prepareStatement(query)) {
 

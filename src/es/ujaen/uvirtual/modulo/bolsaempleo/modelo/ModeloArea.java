@@ -258,7 +258,7 @@ public class ModeloArea {
 		"SELECT bepbol.* "
 		+ "FROM TBEP_BOLSAS bepbol "
 		+ "INNER JOIN TBEP_AREAS bepare ON bepare.CODNUM = bepbol.BEPARE_CODNUM AND bepbol.FLGBAREMABLE = 'S' "
-		+ "LEFT JOIN UVIRTUAL.TBEP_USUARIOS_EXCLUIDOS_AREA bepuea "
+		+ "LEFT JOIN UVIRTUAL.TBEP_USU_EXCLUIDOS_AREA bepuea "
 		+ "ON bepare.CODNUM = bepuea.AREA AND bepuea.USUARIO = ? "
 		+ "WHERE bepuea.USUARIO IS NULL";
 		
@@ -318,7 +318,7 @@ public class ModeloArea {
 		"SELECT bepbol.*, bepuea.USUARIO "
 		+ " FROM TBEP_BOLSAS bepbol"
 		+ " INNER JOIN TBEP_AREAS bepare ON bepare.CODNUM = bepbol.BEPARE_CODNUM"
-		+ " LEFT JOIN UVIRTUAL.TBEP_USUARIOS_EXCLUIDOS_AREA bepuea "
+		+ " LEFT JOIN UVIRTUAL.TBEP_USU_EXCLUIDOS_AREA bepuea "
 		+ " ON bepare.CODNUM = bepuea.AREA AND bepuea.USUARIO = ?"
 		+ " WHERE bepbol.FLGBAREMABLE = 'S' ";
 		
@@ -368,7 +368,7 @@ public class ModeloArea {
 	 * @throws SQLException .
 	 */
 	public boolean isUsuarioExcluidoBolsa(UsuarioBolsaEmpleo usuario, Area area) throws SQLException {
-		String query = "SELECT COUNT(*) as count FROM TBEP_USUARIOS_EXCLUIDOS_AREA WHERE USUARIO = ? AND AREA = ?";		
+		String query = "SELECT COUNT(*) as count FROM TBEP_USU_EXCLUIDOS_AREA WHERE USUARIO = ? AND AREA = ?";		
 		
 		try (Connection con = ConexionUvirtual.obtenerInstancia(); PreparedStatement stmt = con.prepareStatement(query)) {
 			int param = 1;
