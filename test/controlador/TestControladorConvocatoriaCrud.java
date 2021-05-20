@@ -13,7 +13,6 @@ import javax.servlet.ServletException;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
-import bbdd.BbddRunner;
 import bbdd.UtilsTestDocentia;
 import controlador.implementacion.PeticionHttp;
 import controlador.implementacion.RespuestaHttp;
@@ -46,7 +45,6 @@ public class TestControladorConvocatoriaCrud {
      */
     @BeforeClass
     public static void preparaBd() throws IOException, SQLException, UVException {
-    	BbddRunner.conectarBd();
     	UtilsTestDocentia.inicializaDocentia();
     }
     

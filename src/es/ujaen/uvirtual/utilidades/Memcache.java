@@ -121,23 +121,14 @@ public class Memcache {
 		final int reintentos = 3;
 		int reintento = 0;
 		boolean continuar = true;
-        boolean anteriorPaqueteDividido = false;
 		while (continuar && br > -1 && i <= lecturasMax && reintento < reintentos) {
 			try (InputStream inputStream = sock.getInputStream()) {
 				br = inputStream.read(buf, 0, buf.length);
 				builder.append(new String(buf, 0, br));
 				Matcher m = p.matcher(builder.toString().toUpperCase()); // get a matcher object
-				FLOGGER.logp(Level.FINEST, fClassName, nombreMetodo, new String(buf, 0, br));
-                if (anteriorPaqueteDividido) {
-                	FLOGGER.logp(Level.FINEST, fClassName, nombreMetodo, "Anterior Paquete dividido....");
-                	FLOGGER.logp(Level.FINEST, fClassName, nombreMetodo, new String(buf, 0, br));
-                }
 				if (m.find() /*|| br < buf.length*/) {
 					continuar = false;
 				} else {
-					FLOGGER.logp(Level.FINEST, fClassName, nombreMetodo, "Paquete dividido....");
-                    anteriorPaqueteDividido = true;
-                    FLOGGER.logp(Level.FINEST, fClassName, nombreMetodo, new String(buf, 0, br));
 					reintento++;
 					br = 2; // no sale por condicion br... espera
 				}
@@ -149,10 +140,8 @@ public class Memcache {
 		if (i >= lecturasMax) {
 			throw new UVException("tamaño del buffer de comandoTelnet demasiado pequeño");
 		}
-		String cadena = builder.toString();
-		cadena = cadena.trim();
-		cadena = cadena.replace("\r", "");
-		return cadena;
+		String cadena = builder.toString().trim();
+		return cadena.replace("\r", "");
     }
 	
 	/**

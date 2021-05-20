@@ -48,8 +48,8 @@ public class BbddRunner {
 			LOGGER.log(Level.INFO, "Conexión BBDD: {0}", getCadenaConexionBd());
 			odsUv = new OracleDataSource();
 			odsUv.setURL(getCadenaConexionBd());
-			odsUv.setUser(usuarioBdUv);
-			odsUv.setPassword(pwBd);
+			odsUv.setUser(getUsuarioConexionUv());
+			odsUv.setPassword(getClaveConexionUv());
 
 			odsArcos = new OracleDataSource();
 			odsArcos.setURL(getCadenaConexionBd());
@@ -391,12 +391,37 @@ public class BbddRunner {
 	private static String getCadenaConexionBd() {
 		String urlDbSystem = System.getProperty("dbUrl");
 		if (urlDbSystem != null && !"".equals(urlDbSystem)) {
-			return "jdbc:oracle:thin:@" + urlDbSystem + ":1521:XE";
+			String dbPuerto = "1521";
+			String dbSid = "XE";
+			String dbPuertoSystem = System.getProperty("dbPuerto");
+			String dbSidSystem = System.getProperty("dbSid");
+			if (dbPuertoSystem != null && dbPuertoSystem.length() > 1) {
+				dbPuerto = System.getProperty("dbPuerto");
+			}
+			if (dbSidSystem != null && dbSidSystem.length() > 1) {
+				dbSid = System.getProperty("dbSid");
+			}
+			return "jdbc:oracle:thin:@" + urlDbSystem + ":" + dbPuerto + ":" + dbSid;
 		}
 		return cadenaConexionDefecto;
 	}
 	
+	private static String getUsuarioConexionUv() {
+		String usuarioBdUvSystem = System.getProperty("usuarioBdUv");
+		if (usuarioBdUvSystem != null && !"".equals(usuarioBdUvSystem)) {
+			return usuarioBdUvSystem;
+		}
+		return usuarioBdUv;
+	}
 	
+	private static String getClaveConexionUv() {
+		String claveBdUvSystem = System.getProperty("claveBdUv");
+		if (claveBdUvSystem != null && !"".equals(claveBdUvSystem)) {
+			return claveBdUvSystem;
+		}
+		return pwBd;
+	}
+
 	/**
 	 * Consulta SQL para Insertar y Eliminar datos de  prueba individual.
 	 * @param consulta SQL

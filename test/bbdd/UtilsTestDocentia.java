@@ -16,6 +16,8 @@ import es.ujaen.uvirtual.utilidades.UVException;
 public class UtilsTestDocentia {
 	
 	private static final String UID_PRUEBAS = "usig";
+	
+	private static boolean inicializado = false;
 
 	private UtilsTestDocentia() { }
 	
@@ -25,13 +27,17 @@ public class UtilsTestDocentia {
 	 * @throws UVException si error uv en memcache
 	 */
 	public static void inicializaDocentia() throws SQLException, IOException, UVException {
-		BbddRunner.ejecutar("Documentos/scripts/opc.docentia/datos_desarrollo/dropTables.sql");
-		BbddRunner.ejecutar("Documentos/scripts/opc.docentia/creartablasdocentia.sql");
-		BbddRunner.ejecutar("Documentos/scripts/opc.docentia/creacionsecuenciasytriggers.sql");
-		BbddRunner.insertMasivo("Documentos/scripts/opc.docentia/datos_desarrollo/creacionregistrosprueba.sql");
-		BbddRunner.insertMasivo("Documentos/scripts/opc.docentia/uv.sql");
-		Memcache mc = Memcache.getInstance();
-		mc.flushAll();
+		if (!inicializado) {
+			BbddRunner.conectarBd();
+			BbddRunner.ejecutar("Documentos/scripts/opc.docentia/datos_desarrollo/dropTables.sql");
+			BbddRunner.ejecutar("Documentos/scripts/opc.docentia/creartablasdocentia.sql");
+			BbddRunner.ejecutar("Documentos/scripts/opc.docentia/creacionsecuenciasytriggers.sql");
+			BbddRunner.insertMasivo("Documentos/scripts/opc.docentia/datos_desarrollo/creacionregistrosprueba.sql");
+			BbddRunner.insertMasivo("Documentos/scripts/opc.docentia/uv.sql");
+			Memcache mc = Memcache.getInstance();
+			mc.flushAll();
+			inicializado = true;
+		}
 	}
 	
     /** obtiene una peticion autenticada con el usuario de pruebas de docentia.
