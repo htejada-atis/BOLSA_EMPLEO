@@ -240,7 +240,7 @@ function DataTable(id, config) {
         var btnNext = $('<button class="btn next" title="Ir a la p&aacute;gina siguiente" type="button">&gt;</button>');
         var btnLast = $('<button class="btn last" title="Ir a la &uacute;ltima p&aacute;gina" type="button">&gt;&gt;</button>');
 
-        if ((self.lastResponse.pagesTotal + 1) > 1) {
+        if (self.lastResponse.pagesTotal > 1) {
             $(btnFirst).on("click", function() { self.paginateFirst(); });
             $(btnBack).on("click", function() { self.paginationPrevious(); });
             $(btnNext).on("click", function() { self.paginationNext(); });
@@ -255,7 +255,7 @@ function DataTable(id, config) {
         var pagination = $('<span class="pagination"></span>');
         $(pagination).append(btnFirst);
         $(pagination).append(btnBack);
-        $(pagination).append(' P&aacute;gina ' + (self.params.page + 1) + ' / ' + (self.lastResponse.pagesTotal ? self.lastResponse.pagesTotal + 1 : '1') + ' ');
+        $(pagination).append(' P&aacute;gina ' + (self.params.page + 1) + ' / ' + self.lastResponse.pagesTotal + ' ');
         $(pagination).append(btnNext);
         $(pagination).append(btnLast);
 
@@ -490,15 +490,15 @@ function DataTable(id, config) {
     };
 
     this.paginationNext = function() {
-        if (self.params.page < self.lastResponse.pagesTotal) {
+        if ((self.params.page + 1) < self.lastResponse.pagesTotal) {
             self.params.page++;
             self.refresh();
         }
     };
 
     this.paginationLast = function() {
-        if (self.params.page < self.lastResponse.pagesTotal) {
-            self.params.page = self.lastResponse.pagesTotal;
+        if ((self.params.page + 1) < self.lastResponse.pagesTotal) {
+            self.params.page = self.lastResponse.pagesTotal - 1;
             self.refresh();
         }
     };

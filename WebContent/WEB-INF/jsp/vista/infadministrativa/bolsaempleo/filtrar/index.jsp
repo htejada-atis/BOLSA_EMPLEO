@@ -78,7 +78,7 @@ UsuarioBolsaEmpleo candidato = bean.getCandidato();
 	        	}},
 	        	{'data': 'totalTitulaciones', 'order': {'active': false}},
 	        	{'data': 'totalTitulacionesValidadas', 'order': {'active': false}},
-		        {'data': 'codnum', 'buttons': [{'label': 'Excluir', 'onClick': function(row) {}}]}
+		        {'data': 'codnum', 'buttons': [{'label': 'Excluir', 'onClick': function(row) { console.log(row); }}]}
 		    ],
 		});
 		

@@ -24,8 +24,7 @@ import es.ujaen.uvirtual.utilidades.UVException;
 
 /**
  * Métodos para la bolsa de empleo.
- * @author jlopez
- *
+ * @author ATISoluciones 
  */
 public final class BolsaEmpleoUtils {
 	private static final String MENSAJE_REDIRECT_SESSION_EXITO = "BEP_MENSAJE_REDIRECT_SESSION_EXITO";	
