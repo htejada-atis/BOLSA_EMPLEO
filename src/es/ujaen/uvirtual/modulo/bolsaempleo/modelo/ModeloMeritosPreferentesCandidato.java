@@ -74,7 +74,7 @@ public class ModeloMeritosPreferentesCandidato {
 		
 		String consulta = 
 				"SELECT bepmpu.* "
-				+ "FROM TBEP_MERITOS_PREFERENTES_USUARIO bepmpu "
+				+ "FROM TBEP_MER_PRE_USUARIO bepmpu "
 				+ "INNER JOIN TBEP_MERITOS_PREFERENTES bepmep ON bepmep.CODNUM = bepmpu.BEPMEP_CODNUM "
 				+ "WHERE bepmep.TIPO = ? AND bepmpu.BEPUSU_CODNUM = ? AND bepmpu.FLGBORRADO != 'S'";
 		
@@ -115,7 +115,7 @@ public class ModeloMeritosPreferentesCandidato {
 	 * @throws SQLException .
 	 */
 	public void insertaMeritoUsuario(MeritoPreferenteUsuario mp) throws SQLException {
-		String consulta = "INSERT INTO TBEP_MERITOS_PREFERENTES_USUARIO (BEPMEP_CODNUM,BEPUSU_CODNUM,BEPMOP_CODNUM,DESCRIPCION,ARCHIVO) VALUES (?,?,?,?,?)";
+		String consulta = "INSERT INTO TBEP_MER_PRE_USUARIO (BEPMEP_CODNUM,BEPUSU_CODNUM,BEPMOP_CODNUM,DESCRIPCION,ARCHIVO) VALUES (?,?,?,?,?)";
 		
 		try (Connection conexion = ConexionUvirtual.obtenerInstancia(); PreparedStatement stmt = conexion.prepareStatement(consulta)) {
 			int parameterIndex = 1;
@@ -148,7 +148,7 @@ public class ModeloMeritosPreferentesCandidato {
 			throw new UVException("El usuario es requerido");
 		}
 		
-		String consulta = "SELECT * FROM TBEP_MERITOS_PREFERENTES_USUARIO WHERE CODNUM = ? AND BEPUSU_CODNUM = ?";
+		String consulta = "SELECT * FROM TBEP_MER_PRE_USUARIO WHERE CODNUM = ? AND BEPUSU_CODNUM = ?";
 		
 		try (Connection conexion = ConexionUvirtual.obtenerInstancia(); PreparedStatement stmt = conexion.prepareStatement(consulta)) {
 			int parameterIndex = 1;
@@ -172,7 +172,7 @@ public class ModeloMeritosPreferentesCandidato {
 	 * @throws SQLException .
 	 */
 	public boolean compruebaSoloUnTipoDeMeritoPrefenteActivo(MeritoPreferenteUsuario mpu) throws SQLException {
-		String query = "SELECT COUNT(*) as count FROM TBEP_MERITOS_PREFERENTES_USUARIO bepmpu "
+		String query = "SELECT COUNT(*) as count FROM TBEP_MER_PRE_USUARIO bepmpu "
 				+ "WHERE bepmpu.BEPMEP_CODNUM = ? AND bepmpu.BEPUSU_CODNUM = ? AND bepmpu.FLGBORRADO = 'N'";
 		
 		try (Connection con = ConexionUvirtual.obtenerInstancia(); PreparedStatement stmt = con.prepareStatement(query)) {
@@ -219,7 +219,7 @@ public class ModeloMeritosPreferentesCandidato {
 	 */
 	public void cambiarFlagBorradoMeritos(List<MeritoPreferenteUsuario> meritos) throws SQLException {
 		String params = BolsaEmpleoUtils.consultaMultiplesParametros(meritos.size());
-		String query = "UPDATE TBEP_MERITOS_PREFERENTES_USUARIO SET FLGBORRADO = ?, FECHA_BORRADO = ? WHERE CODNUM IN  (" + params + ")";		
+		String query = "UPDATE TBEP_MER_PRE_USUARIO SET FLGBORRADO = ?, FECHA_BORRADO = ? WHERE CODNUM IN  (" + params + ")";		
 				
 		try (Connection conexion = ConexionUvirtual.obtenerInstancia(); PreparedStatement stmt = conexion.prepareStatement(query)) {
 			int indexParam = 1;

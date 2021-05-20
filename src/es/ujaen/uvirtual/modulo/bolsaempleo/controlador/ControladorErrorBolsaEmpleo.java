@@ -30,21 +30,24 @@ public class ControladorErrorBolsaEmpleo extends HttpServlet {
 	private static final String RUTA_BEP = "/WEB-INF/jsp/vista/infadministrativa/bolsaempleo/";
 	private static final String JSP_ERROR = RUTA_BEP + "error.jsp";
     
-	/** do get.
-	 * @param request peticion
+	/**
+	 * do get.
+	 * 
+	 * @param request  peticion
 	 * @param response respuesta
-	 * @see HttpServlet#doGet(HttpServletRequest request, HttpServletResponse response)
+	 * @see HttpServlet#doGet(HttpServletRequest request, HttpServletResponse
+	 *      response)
 	 */
-    @Override
+	@Override
 	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 		UVDatos datos = (UVDatos) request.getAttribute(UVDatos.NOMBRE_ATRIBUTO);
 		datos.setDocType("<!DOCTYPE html>");
 		datos.setContentType("text/html");
-		
+
 		VistaError bean = new VistaError();
-		
-		init(bean, datos, request);
-		
+
+		init(bean, request);
+
 		datos.getVistas().put(bean.getClass().getName(), bean);
 		datos.getFicherosJSP().add(bean.getVista());
 		datos.getFicherosJS().add("/js/jquery-1.latest.min.js");
@@ -55,20 +58,21 @@ public class ControladorErrorBolsaEmpleo extends HttpServlet {
 		datos.getFicherosCSS().add("/css/ujaen_bolsa_empleo.css");
 	}
 
-	/** do post.
-	 * @param request peticion
+	/**
+	 * do post.
+	 * 
+	 * @param request  peticion
 	 * @param response respuesta
-	 * @see HttpServlet#doPost(HttpServletRequest request, HttpServletResponse response)
+	 * @see HttpServlet#doPost(HttpServletRequest request, HttpServletResponse
+	 *      response)
 	 */
-    @Override
+	@Override
 	public void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 		doGet(request, response);
 	}
-    
-    private void init(VistaError bean, UVDatos datos, HttpServletRequest request) {
-    	bean.setVista(JSP_ERROR);
+
+	private void init(VistaError bean, HttpServletRequest request) {
+		bean.setVista(JSP_ERROR);
 		BolsaEmpleoUtils.readMensajeSession(bean, request);
 	}
-	
-    
 }
