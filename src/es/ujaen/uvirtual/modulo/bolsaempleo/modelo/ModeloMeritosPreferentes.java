@@ -129,7 +129,7 @@ public class ModeloMeritosPreferentes {
 			throw new UVException(OPCION_MERITO_REQUERIDO);
 		}
 		
-		String sql = "SELECT bepmpo.* FROM TBEP_MERITOS_PREFERENTES_OPCIONES bepmpo WHERE bepmpo.CODNUM = ?";
+		String sql = "SELECT bepmpo.* FROM TBEP_MER_PRE_OPCIONES bepmpo WHERE bepmpo.CODNUM = ?";
 		
 		try (Connection con = ConexionUvirtual.obtenerInstancia(); PreparedStatement stmt = con.prepareStatement(sql)) {
 			int parameterIndex = 1;
@@ -199,7 +199,7 @@ public class ModeloMeritosPreferentes {
 		List<MeritoPreferenteOpcion> data = new ArrayList<>();
 		BolsaEmpleoDataTable<MeritoPreferenteOpcion> dataTable = new BolsaEmpleoDataTable<>(params);
 		
-		String consulta = "SELECT bepmpo.* FROM TBEP_MERITOS_PREFERENTES_OPCIONES bepmpo WHERE bepmpo.BEPMEP_CODNUM = ? AND bepmpo.FLGBORRADO = 'N' ";
+		String consulta = "SELECT bepmpo.* FROM TBEP_MER_PRE_OPCIONES bepmpo WHERE bepmpo.BEPMEP_CODNUM = ? AND bepmpo.FLGBORRADO = 'N' ";
 		
 		dataTable.setColumn(ORDER_COLUMN_INDEX_OPCIONES_NOMBRE, "bepmpo.NOMBRE");
 		dataTable.setColumn(ORDER_COLUMN_INDEX_OPCIONES_FACTOR, "bepmpo.FACTOR");
@@ -240,7 +240,7 @@ public class ModeloMeritosPreferentes {
 	public List<MeritoPreferenteOpcion> listadoOpcionesMeritosPreferentes(MeritoPreferente merito) throws SQLException {
 		List<MeritoPreferenteOpcion> data = new ArrayList<>();
 		
-		String consulta = "SELECT bepmpo.* FROM TBEP_MERITOS_PREFERENTES_OPCIONES bepmpo "
+		String consulta = "SELECT bepmpo.* FROM TBEP_MER_PRE_OPCIONES bepmpo "
 				+ "WHERE bepmpo.BEPMEP_CODNUM = ? AND bepmpo.FLGBORRADO = 'N' ORDER BY bepmpo.FACTOR ";
 		
 		try (Connection conexion = ConexionUvirtual.obtenerInstancia(); PreparedStatement stmt = conexion.prepareStatement(consulta)) {			
@@ -478,7 +478,7 @@ public class ModeloMeritosPreferentes {
 	 * @throws SQLException .
 	 */
 	public Integer crearMeritoPreferenteOpcion(MeritoPreferenteOpcion meritoOpcion) throws SQLException {
-		String sql = "INSERT INTO TBEP_MERITOS_PREFERENTES_OPCIONES (BEPMEP_CODNUM,NOMBRE,FACTOR) VALUES (?,?,?)";
+		String sql = "INSERT INTO TBEP_MER_PRE_OPCIONES (BEPMEP_CODNUM,NOMBRE,FACTOR) VALUES (?,?,?)";
 		
 		try (Connection conexion = ConexionUvirtual.obtenerInstancia(); 
 				PreparedStatement stmt = conexion.prepareStatement(sql, new String[]{CODNUM})) {
@@ -501,7 +501,7 @@ public class ModeloMeritosPreferentes {
 	 * @throws SQLException .
 	 */
 	public void desactivarMeritoPreferenteOpcion(MeritoPreferenteOpcion meritoOpcion) throws SQLException {
-		String query = "UPDATE TBEP_MERITOS_PREFERENTES_OPCIONES SET FLGBORRADO = ?, FECHA_BORRADO = ? WHERE CODNUM IN ?";		
+		String query = "UPDATE TBEP_MER_PRE_OPCIONES SET FLGBORRADO = ?, FECHA_BORRADO = ? WHERE CODNUM IN ?";		
 		
 		try (Connection conexion = ConexionUvirtual.obtenerInstancia(); PreparedStatement stmt = conexion.prepareStatement(query)) {
 			int indexParam = 1;
