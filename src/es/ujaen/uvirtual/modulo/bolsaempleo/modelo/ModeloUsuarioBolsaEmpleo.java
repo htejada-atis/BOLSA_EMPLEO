@@ -108,7 +108,7 @@ public class ModeloUsuarioBolsaEmpleo {
 		}
 		
 		String consulta = "SELECT * FROM TBEP_USUARIOS bepusu WHERE bepusu.PRSNIF = ?";
-		String consultaArcos = "SELECT * FROM VUJA_NET_BEP_AR_PERSONA WHERE PRSNIF = ?";
+		String consultaArcos = "SELECT * FROM arcos.VUJA_NET_BEP_AR_PERSONA WHERE PRSNIF = ?";
 		
 		try (Connection conexion = ConexionUvirtual.obtenerInstancia();
 				Connection conexionArcos = ConexionArcos.obtenerInstancia();
@@ -140,7 +140,7 @@ public class ModeloUsuarioBolsaEmpleo {
 	 */
 	public UsuarioBolsaEmpleo getUsuarioById(int codNum) throws SQLException, UVException {
 		String consulta = "SELECT * FROM TBEP_USUARIOS bepusu WHERE bepusu.CODNUM = ?";
-		String consultaArcos = "SELECT * FROM VUJA_NET_BEP_AR_PERSONA WHERE PRSNIF = ?";
+		String consultaArcos = "SELECT * FROM arcos.VUJA_NET_BEP_AR_PERSONA WHERE PRSNIF = ?";
 			
 		try (Connection conexion = ConexionUvirtual.obtenerInstancia();
 				Connection conexionArcos = ConexionArcos.obtenerInstancia();
@@ -237,7 +237,7 @@ public class ModeloUsuarioBolsaEmpleo {
 	 */
 	public UsuarioBolsaEmpleo getUsuarioByCodCuenta(String codcuenta) throws SQLException, UVException {
 		String consulta = "SELECT * FROM TBEP_USUARIOS bepusu WHERE bepusu.CODCUENTA = ?";
-		String consultaArcos = "SELECT * FROM VUJA_NET_BEP_AR_PERSONA WHERE PRSNIF = ?";
+		String consultaArcos = "SELECT * FROM arcos.VUJA_NET_BEP_AR_PERSONA WHERE PRSNIF = ?";
 			
 		try (Connection conexion = ConexionUvirtual.obtenerInstancia();
 				Connection conexionArcos = ConexionArcos.obtenerInstancia();
@@ -282,7 +282,7 @@ public class ModeloUsuarioBolsaEmpleo {
 			dataTable.setFiltersParams(stmt, stmtCount, 1);
 			try (ResultSet rs = stmt.executeQuery()) {
 				while (rs.next()) {
-					String consultaArcos = "SELECT * FROM VUJA_NET_BEP_AR_PERSONA WHERE PRSNIF = ?";
+					String consultaArcos = "SELECT * FROM arcos.VUJA_NET_BEP_AR_PERSONA WHERE PRSNIF = ?";
 
 					try (Connection conexionArcos = ConexionArcos.obtenerInstancia();
 							PreparedStatement stmtArcos = conexionArcos.prepareStatement(consultaArcos)) {
@@ -332,7 +332,7 @@ public class ModeloUsuarioBolsaEmpleo {
 			
 			try (ResultSet rs = stmt.executeQuery()) {
 				while (rs.next()) {
-					String consultaArcos = "SELECT * FROM VUJA_NET_BEP_AR_PERSONA WHERE PRSNIF = ?";
+					String consultaArcos = "SELECT * FROM arcos.VUJA_NET_BEP_AR_PERSONA WHERE PRSNIF = ?";
 
 					try (PreparedStatement stmtArcos = conexionArcos.prepareStatement(consultaArcos)) {
 						stmtArcos.setString(1, rs.getString("PRSNIF"));
@@ -379,7 +379,7 @@ public class ModeloUsuarioBolsaEmpleo {
 			
 			try (ResultSet rs = stmt.executeQuery()) {
 				while (rs.next()) {
-					String consultaArcos = "SELECT * FROM VUJA_NET_BEP_AR_PERSONA WHERE PRSNIF = ?";
+					String consultaArcos = "SELECT * FROM arcos.VUJA_NET_BEP_AR_PERSONA WHERE PRSNIF = ?";
 
 					try (PreparedStatement stmtArcos = conexionArcos.prepareStatement(consultaArcos)) {
 						stmtArcos.setString(1, rs.getString("PRSNIF"));
@@ -426,7 +426,7 @@ public class ModeloUsuarioBolsaEmpleo {
 			
 			try (ResultSet rs = stmt.executeQuery()) {
 				while (rs.next()) {
-					String consultaArcos = "SELECT * FROM VUJA_NET_BEP_AR_PERSONA WHERE PRSNIF = ?";
+					String consultaArcos = "SELECT * FROM arcos.VUJA_NET_BEP_AR_PERSONA WHERE PRSNIF = ?";
 
 					try (PreparedStatement stmtArcos = conexionArcos.prepareStatement(consultaArcos)) {
 						stmtArcos.setString(1, rs.getString("PRSNIF"));

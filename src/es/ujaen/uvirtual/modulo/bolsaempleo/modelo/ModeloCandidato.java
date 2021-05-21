@@ -82,7 +82,7 @@ public class ModeloCandidato {
 			
 			try (ResultSet rs = stmt.executeQuery()) {
 				while (rs.next()) {
-					String consultaArcos = "SELECT * FROM VUJA_NET_BEP_AR_PERSONA WHERE PRSNIF = ?";
+					String consultaArcos = "SELECT * FROM arcos.VUJA_NET_BEP_AR_PERSONA WHERE PRSNIF = ?";
 					
 				    try (Connection conexionArcos = ConexionArcos.obtenerInstancia();
 				    	PreparedStatement stmtArcos = conexionArcos.prepareStatement(consultaArcos);) {
