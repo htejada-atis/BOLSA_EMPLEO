@@ -101,6 +101,13 @@ public class Memcache {
 				logMensaje = logMensaje + e.getMessage();
 				throw new UVException(logMensaje);
 			}
+			try {
+				final int tiempoEspera = 1000;
+				Thread.sleep(tiempoEspera);
+			} catch (InterruptedException e) {
+			    FLOGGER.log(Level.WARNING, "Interrupted!", e);
+			    Thread.currentThread().interrupt();
+			}
 		}
 	}
 	
