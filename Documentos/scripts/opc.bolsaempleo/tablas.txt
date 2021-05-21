@@ -6,7 +6,6 @@ TBEP_AREAS                          ARE     bepare		Area
 TBEP_AREAS_DEPARTAMENTOS            ADE     bepade      
 TBEP_BLOQUESBAREMACION              BLO     bepblo		BloqueBaremacion
 TBEP_BOLSAS                         BOL     bepbol		Bolsa, BolsaCandidato, BolsaSolicitud
-TBEP_CATEGORIABAREMACION            CAT     bepcat		
 TBEP_CONVOCATORIAS                  CON     bepcon		Convocatoria
 TBEP_DEPARTAMENTOS                  DEP     bepdep		Departamento
 TBEP_EVALUADORES					EVA		bepeva		Evaluador

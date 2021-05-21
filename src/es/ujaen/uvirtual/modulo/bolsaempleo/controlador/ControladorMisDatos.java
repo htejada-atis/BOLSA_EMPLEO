@@ -58,7 +58,6 @@ public class ControladorMisDatos extends HttpServlet {
 	public static final String PARAM_MOVIL = "movil";
 	public static final String PARAM_TELEFONO = "telefono";
 	public static final String PARAM_NACIONALIDAD = "nacionalidad";
-	public static final String PARAM_SEXO = "sexo";
 	public static final String PARAM_DARSE_BAJA = "baja";
 	public static final String PARAM_RAZON_BORRADO = "razonborrado";
 

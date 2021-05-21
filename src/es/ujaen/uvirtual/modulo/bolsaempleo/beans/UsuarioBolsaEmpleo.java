@@ -26,7 +26,6 @@ public class UsuarioBolsaEmpleo implements Serializable {
 	private String provincia;
 	private String telefono;
 	private String nacionalidad;
-	private String sexo;
 	
 	private Usuario usuarioArcos;
 	private Rol rol;
@@ -157,11 +156,10 @@ public class UsuarioBolsaEmpleo implements Serializable {
 	 * @param pprovincia .
 	 * @param ptelefono .
 	 * @param pnacionalidad .
-	 * @param psexo .
 	 * @param plistaDist .
 	 */
 	public UsuarioBolsaEmpleo(Integer pcodNum, String pnombre, String primerapellido, String segundoapellido, String pemail, String pdireccion, String pcodigopostal,
-			String plocalidad, String pprovincia, String ptelefono, String pnacionalidad, String psexo, Boolean plistaDist) {
+			String plocalidad, String pprovincia, String ptelefono, String pnacionalidad, Boolean plistaDist) {
 		super();
 		this.codNum = pcodNum;
 		this.nombre = pnombre;
@@ -174,7 +172,6 @@ public class UsuarioBolsaEmpleo implements Serializable {
 		this.provincia = pprovincia;
 		this.telefono = ptelefono;
 		this.nacionalidad = pnacionalidad;
-		this.sexo = psexo;
 		this.listaDist = plistaDist;
 	}
 	
@@ -191,7 +188,6 @@ public class UsuarioBolsaEmpleo implements Serializable {
 		this.nombre = copia.nombre;
 		this.apellido1 = copia.apellido1;
 		this.apellido2 = copia.apellido2;
-		this.sexo = copia.sexo;
 		this.email = copia.email;
 		this.usuarioArcos = copia.usuarioArcos;
 		this.rol = copia.rol;
@@ -262,14 +258,6 @@ public class UsuarioBolsaEmpleo implements Serializable {
 		this.apellido2 = papellido2;
 	}
 	
-	public String getSexo() {
-		return sexo;
-	}
-
-	public void setSexo(String psexo) {
-		this.sexo = psexo;
-	}
-
 	public String getEmail() {
 		return email;
 	}
@@ -470,8 +458,8 @@ public class UsuarioBolsaEmpleo implements Serializable {
 	public String toString() {
 		return "Usuario [codNum=" + codNum + ", codcuenta=" + codcuenta + ", tipodocumento=" + tipodocumento + ", numdocumento=" + numdocumento + ", nombre="
 				+ nombre + ", apellido1=" + apellido1 + ", apellido2=" + apellido2 + ", email=" + email + ", direccion=" + direccion + ", codigopostal=" 
-				+ codigopostal + ", localidad=" + localidad + ", provincia=" + provincia + ", telefono=" + telefono + ", nacionalidad=" + nacionalidad + ", sexo=" 
-				+ sexo + ", usuarioArcos=" + usuarioArcos + ", rol=" + rol + ", listaDist=" + listaDist + ", excluido=" + excluido + ", excluidoTipo=" 
+				+ codigopostal + ", localidad=" + localidad + ", provincia=" + provincia + ", telefono=" + telefono + ", nacionalidad=" + nacionalidad 
+				+ ", usuarioArcos=" + usuarioArcos + ", rol=" + rol + ", listaDist=" + listaDist + ", excluido=" + excluido + ", excluidoTipo=" 
 				+ excluidoTipo + ", fechaExclusionInicio=" + fechaExclusionInicio + ", fechaExclusionFin=" + fechaExclusionFin + ", razonExclusion=" 
 				+ razonExclusion + ", fechaExclusion=" + fechaExclusion + ", borrado=" + borrado + ", razonBorrado=" + razonBorrado + ", fechaBorrado=" 
 				+ fechaBorrado + "]";
@@ -495,7 +483,6 @@ public class UsuarioBolsaEmpleo implements Serializable {
 		result = prime * result + ((provincia == null) ? 0 : provincia.hashCode());
 		result = prime * result + ((telefono == null) ? 0 : telefono.hashCode());
 		result = prime * result + ((nacionalidad == null) ? 0 : nacionalidad.hashCode());
-		result = prime * result + ((sexo == null) ? 0 : sexo.hashCode());
 		result = prime * result + ((usuarioArcos == null) ? 0 : usuarioArcos.hashCode());
 		result = prime * result + ((rol == null) ? 0 : rol.hashCode());
 		result = prime * result + ((listaDist == null) ? 0 : listaDist.hashCode());
@@ -614,13 +601,6 @@ public class UsuarioBolsaEmpleo implements Serializable {
 				return false;
 			}
 		} else if (!nacionalidad.equals(other.nacionalidad)) {
-			return false;
-		}
-		if (sexo == null) {
-			if (other.sexo != null) {
-				return false;
-			}
-		} else if (!sexo.equals(other.sexo)) {
 			return false;
 		}
 		if (usuarioArcos == null) {

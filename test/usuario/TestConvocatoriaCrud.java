@@ -8,16 +8,11 @@ import java.sql.SQLException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import org.junit.After;
 import org.junit.AfterClass;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.FixMethodOrder;
-import org.junit.Rule;
 import org.junit.Test;
-import org.junit.rules.TestRule;
-import org.junit.rules.TestWatcher;
-import org.junit.runner.Description;
 import org.junit.runners.MethodSorters;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebElement;
@@ -30,12 +25,10 @@ import es.ujaen.uvirtual.utilidades.UVException;
  *
  */
 @FixMethodOrder(MethodSorters.NAME_ASCENDING)
-public class TestConvocatoriaCrud {
+public class TestConvocatoriaCrud extends UtilsTestUsuarioBase {
 	private static final String NOMBREDEESTACLASE = TestConvocatoriaCrud.class.getName();
 
 	private static final Logger LOGGER = Logger.getLogger(NOMBREDEESTACLASE);
-	
-	private String nombrePrueba;
 	
 	private static final String ID_NOMBRE_FORMULARIO = "#nombreCampoFormulario";
 	private static final String ID_FECHA_FORMULARIO = "#fechaCampoFormulario";
@@ -61,14 +54,6 @@ public class TestConvocatoriaCrud {
 		DriverUv.login("usig");
 	}
 
-	@Rule
-	public TestRule watcher = new TestWatcher() {
-		@Override
-		protected void starting(Description description) {
-			nombrePrueba = description.getMethodName();
-		}
-	};
-	
 	/** Se ejecuta antes de cada test.
 	 * Aqui navegamos hasta la opcion que vamos a probar
 	 */
@@ -80,18 +65,10 @@ public class TestConvocatoriaCrud {
 		DriverUv.getDriver().get(DriverUv.RUTA + "/srv/es/informacionadministrativa/docentia/convocatoriacrud");
 	}
 	
-	/** Se ejecuta despues de cada test.
-	 * Aqui grabamos una captura de pantalla
-	 */
-	@After
-	public void capturaPantalla() {
-		DriverUv.capturaPantalla(nombrePrueba);
-	}
-
 	/** Inserta una convocatoria.
 	 */
 	@Test
-	public void testA1() {
+	public void testA01() {
 		DriverUv.getDriver().findElement(By.cssSelector(ID_NOMBRE_FORMULARIO)).sendKeys("prueba 1");
 		DriverUv.getDriver().findElement(By.cssSelector(ID_FECHA_FORMULARIO)).sendKeys(FECHA_EJEMPLO);
 		DriverUv.getDriver().findElement(By.cssSelector(ID_FECHA_COMISION_FORMULARIO)).sendKeys(FECHA_EJEMPLO);
