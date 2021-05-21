@@ -280,7 +280,7 @@ public final class UtilsTestBolsaEmpleo {
 			// departamentos
 
 			String sqlDeptSelect = "SELECT DISTINCT uvnbrdsa.ID_DEPARTAMENTO, uvnbrdsa.DES_DEPARTAMENTO "
-					+ "FROM VUJA_NET_BEP_RH_DEPTO_SECC_AREA uvnbrdsa";
+					+ "FROM UXXIRRHH.VUJA_NET_BEP_RH_DEPTO_SECC_AREA uvnbrdsa";
 
 			try (PreparedStatement stmtSelect = conRh.prepareStatement(sqlDeptSelect)) {
 				try (ResultSet rs = stmtSelect.executeQuery()) {
@@ -298,7 +298,7 @@ public final class UtilsTestBolsaEmpleo {
 					+ "		MIN(uvnbrdsa.DES_SECCION) DES_SECCION,"
 					+ "		MIN(uvnbrdsa.ID_SECCION) ID_SECCION, "
 					+ "		MIN(uvnbrdsa.DES_AREA_CONOCIMIENTO) DES_AREA_CONOCIMIENTO "
-					+ " FROM VUJA_NET_BEP_RH_DEPTO_SECC_AREA uvnbrdsa "
+					+ " FROM UXXIRRHH.VUJA_NET_BEP_RH_DEPTO_SECC_AREA uvnbrdsa "
 					+ " GROUP BY uvnbrdsa.ID_DEPARTAMENTO, uvnbrdsa.ID_AREA_CONOCIMIENTO "
 					+ " ORDER BY uvnbrdsa.ID_AREA_CONOCIMIENTO";
 

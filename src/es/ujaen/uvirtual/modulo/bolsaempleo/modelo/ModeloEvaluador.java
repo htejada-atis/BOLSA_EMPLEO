@@ -52,15 +52,16 @@ public class ModeloEvaluador {
 	}
 	
 	/**
-     * Obtiene una instancia de la conexión.
-     * @return instancia
-     */
-    public static ModeloEvaluador obtenerInstancia() {
-        if (eInstancia == null) {
-        	crearInstancia();
-        }
-        return eInstancia;
-    }
+	 * Obtiene una instancia de la conexión.
+	 * 
+	 * @return instancia
+	 */
+	public static ModeloEvaluador obtenerInstancia() {
+		if (eInstancia == null) {
+			crearInstancia();
+		}
+		return eInstancia;
+	}
     
     /** Consulta evaluadores en BBDD y los devuelve.
 	 * @return todos los evaluadores .
@@ -77,7 +78,7 @@ public class ModeloEvaluador {
 				PreparedStatement stmt = conexion.prepareStatement(consulta)) {
 			try (ResultSet rs = stmt.executeQuery()) {
 				while (rs.next()) {
-					String consultaArcos = "SELECT * FROM VUJA_NET_BEP_AR_PERSONA WHERE PRSNIF = ?";
+					String consultaArcos = "SELECT * FROM arcos.VUJA_NET_BEP_AR_PERSONA WHERE PRSNIF = ?";
 					
 				    try (Connection conexionArcos = ConexionArcos.obtenerInstancia();
 				    	PreparedStatement stmtArcos = conexionArcos.prepareStatement(consultaArcos);) {
@@ -125,7 +126,7 @@ public class ModeloEvaluador {
 			stmt.setInt(1, codNum);
 			try (ResultSet rs = stmt.executeQuery()) {
 				while (rs.next()) {
-					String consultaArcos = "SELECT * FROM VUJA_NET_BEP_AR_PERSONA WHERE PRSNIF = ?";
+					String consultaArcos = "SELECT * FROM arcos.VUJA_NET_BEP_AR_PERSONA WHERE PRSNIF = ?";
 					
 				    try (Connection conexionArcos = ConexionArcos.obtenerInstancia();
 				    	PreparedStatement stmtArcos = conexionArcos.prepareStatement(consultaArcos);) {
@@ -252,7 +253,7 @@ public class ModeloEvaluador {
 			dataTable.setFiltersParams(stmt, stmtCount, indexParam);
 			try (ResultSet rs = stmt.executeQuery()) {
 				while (rs.next()) {
-					String consultaArcos = "SELECT * FROM VUJA_NET_BEP_AR_PERSONA WHERE PRSNIF = ?";
+					String consultaArcos = "SELECT * FROM arcos.VUJA_NET_BEP_AR_PERSONA WHERE PRSNIF = ?";
 					
 				    try (Connection conexionArcos = ConexionArcos.obtenerInstancia();
 				    	PreparedStatement stmtArcos = conexionArcos.prepareStatement(consultaArcos);) {
@@ -276,68 +277,6 @@ public class ModeloEvaluador {
 				    }
 				}				
 			}
-			
-			dataTable.setRecordsTotalFromQuery(stmtCount);
-			dataTable.setData(usuarios);
-		}
-		
-		return dataTable;
-	}
-	
-	/** Listado de usuarios con rol 1052 excluyendo la lista de evaluadores de un área . 
-	 * @param params para leer los parametros de paginación, ordenacion, etc .
-	 * @param area .
-	 * @return listado de usuarios .
-	 * @throws SQLException en caso de error de base de datos .
-	 * @throws UVException error si no existe la area .
-	 */
-	public BolsaEmpleoDataTable<Evaluador> listaUsuariosRestantesDatatable(Map<String, String[]> params, Integer area) throws SQLException, UVException {
-		if (area == null) {
-			throw new UVException("No se pueden listar evaluadores sin area");
-		}
-		
-		List<Evaluador> usuarios = new ArrayList<>();
-		BolsaEmpleoDataTable<Evaluador> dataTable = new BolsaEmpleoDataTable<Evaluador>(params);
-		
-		String consulta2 = "SELECT bepeva.BEPUSU_CODNUM FROM TBEP_EVALUADORES bepeva "
-				+ "INNER JOIN TBEP_USUARIOS bepusu ON bepusu.CODNUM = bepeva.BEPUSU_CODNUM "
-				+ "WHERE bepusu.FLGBORRADO!='S' "
-				+ "AND bepusu.FLGEXCLUIDO!='S' "
-				+ "AND bepeva.BEPARE_CODNUM = ? ";
-		
-		String consulta = "SELECT * FROM TBEP_USUARIOS bepusu "
-				+ "INNER JOIN VUJA_NET_BEP_AR_PERSONA uvpersona ON uvpersona.CODINT=bepusu.CODPERSONA "
-				+ "WHERE FLGBORRADO!='S' "
-				+ "AND FLGEXCLUIDO!='S' "
-				+ "AND bepusu.CODNUM NOT IN (" + consulta2 + ") "
-				+ "AND bepusu.ROL = " + PARAM_ROL_ID;
-		
-		dataTable.setColumn(ORDER_COLUMN_INDEX_NUMDOCUMENTO_EVALUADORES + 1, "uvpersona.IDNIF");
-		dataTable.setColumn(ORDER_COLUMN_INDEX_NOMBRE_Y_APELLIDOS_EVALUADORES + 1, "uvpersona.STRAPELLIDO1");
-		
-		dataTable.setQuery(consulta);
-		
-		try (Connection conexion = ConexionUvirtual.obtenerInstancia();
-				PreparedStatement stmtCount = conexion.prepareStatement(dataTable.getQueryCount());
-				PreparedStatement stmt = conexion.prepareStatement(dataTable.getQuery());
-		) {
-			int indexParam = 1;
-			stmt.setInt(indexParam, area);
-			stmtCount.setInt(indexParam++, area);
-			dataTable.setFiltersParams(stmt, stmtCount, indexParam);
-			try (ResultSet rs = stmt.executeQuery()) {
-				while (rs.next()) {
-					UsuarioBolsaEmpleo usuario = new UsuarioBolsaEmpleo();
-					usuario.setCodNum(rs.getInt("CODNUM"));
-					usuario.setTipoDocumento(rs.getString("STRTIPODOCUMENTO"));
-					usuario.setNumDocumento(rs.getString("IDNIF") + rs.getString("LETRANIF"));
-					usuario.setNombre(rs.getString("STRNOMBRE"));
-					usuario.setPrimerApellido(rs.getString("STRAPELLIDO1"));
-					usuario.setSegundoApellido(rs.getString("STRAPELLIDO2"));
-					
-					usuarios.add(new Evaluador(usuario));
-				}				
-			}	
 			
 			dataTable.setRecordsTotalFromQuery(stmtCount);
 			dataTable.setData(usuarios);
