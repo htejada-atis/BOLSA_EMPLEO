@@ -126,8 +126,6 @@ public class TestBEPModeloAfinidad {
 			fail(String.format(MENSAJE_ERROR_HAY_EXCEPCION, ex.toString()));
 		}
     }
-	
-	
     
 	/**
 	 * nuevaAfinidad null.

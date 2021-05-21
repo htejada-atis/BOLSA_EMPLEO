@@ -12,6 +12,10 @@
     cursor: pointer;
 }
 
+.bolsa-empleo .ta-right {
+	text-align: right;
+}
+
 .bolsa-empleo a.disabled {
     pointer-events: none;
 }
