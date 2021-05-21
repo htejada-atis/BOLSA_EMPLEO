@@ -11,21 +11,19 @@ import es.ujaen.uvirtual.modelo.conexion.ConexionUvirtual;
 import es.ujaen.uvirtual.modulo.bolsaempleo.beans.ParametrosConfiguracion;
 import es.ujaen.uvirtual.utilidades.UVException;
 
-
 /**
- * Clase de modelo para la gestión de parametros de configuracion de la bolsa de empleo . 
- * @author fcampos
+ * Clase de modelo para la gestión de parametros de configuracion de la bolsa de
+ * empleo .
+ * 
+ * @author ATISoluciones
  */
 public class ModeloParametrosConfiguracion {
-	
-	public static final int COLUMN_DESCRIPCION_MAXLENGTH = 250;
-	
-	public static final int MAX_FILE_SIZE = 5_000_000;
-	
-	protected static ModeloParametrosConfiguracion eInstancia = null;
-	
-	/** Crea una instancia del objeto.
-	 *  de forma sincronizada para protegerse de posibles problemas multi-hilo
+	private static final String VERSION = "0.1";
+	protected static ModeloParametrosConfiguracion eInstancia;
+
+	/**
+	 * Crea una instancia del objeto. de forma sincronizada para protegerse de
+	 * posibles problemas multi-hilo
 	 */
 	private static synchronized void crearInstancia() {
 		if (eInstancia == null) {
@@ -33,27 +31,38 @@ public class ModeloParametrosConfiguracion {
 		}
 	}
 
-    /**
-     * Obtiene una instancia de la conexión.
-     * @return instancia
-     */
+	/**
+	 * Obtiene una instancia de la conexión.
+	 * 
+	 * @return instancia
+	 */
 	public static ModeloParametrosConfiguracion obtenerInstancia() {
 		if (eInstancia == null) {
 			crearInstancia();
-        }
+		}
 		return eInstancia;
-    }
+	}
+
+	/**
+	 * Devuelve la versión actual de la app.
+	 * @return .
+	 */
+	public String getVersion() {
+		return ModeloParametrosConfiguracion.VERSION;
+	}
 	
-	/** Consulta los parametros en BBDD y los devuelve.
+	/**
+	 * Consulta los parametros en BBDD y los devuelve.
+	 * 
 	 * @return todas las titulaciones de la base de datos .
 	 * @throws SQLException en caso de error de base de datos
 	 */
 	public List<ParametrosConfiguracion> listaParametros() throws SQLException {
 		List<ParametrosConfiguracion> parametros = new ArrayList<>();
-		String consulta = "SELECT * FROM ADM_PARAMETROS "
-				+ "WHERE PARAM_CODALF LIKE '%bolsaempleo%'";
-		
-		try (Connection conexion = ConexionUvirtual.obtenerInstancia(); PreparedStatement stmt = conexion.prepareStatement(consulta)) {
+		String consulta = "SELECT * FROM ADM_PARAMETROS " + "WHERE PARAM_CODALF LIKE '%bolsaempleo%'";
+
+		try (Connection conexion = ConexionUvirtual.obtenerInstancia();
+				PreparedStatement stmt = conexion.prepareStatement(consulta)) {
 			try (ResultSet rs = stmt.executeQuery()) {
 				while (rs.next()) {
 					ParametrosConfiguracion param = new ParametrosConfiguracion();
@@ -62,14 +71,15 @@ public class ModeloParametrosConfiguracion {
 					param.setValor(rs.getString("VALOR"));
 					param.setDescripcion(rs.getString("DESID"));
 					param.setAdm(true);
-					parametros.add(param);	
+					parametros.add(param);
 				}
 			}
 		}
-		
+
 		String consultaBep = "SELECT * FROM TBEP_PARAMETROS_CONFIG";
-		
-		try (Connection conexion = ConexionUvirtual.obtenerInstancia(); PreparedStatement stmt = conexion.prepareStatement(consultaBep)) {
+
+		try (Connection conexion = ConexionUvirtual.obtenerInstancia();
+				PreparedStatement stmt = conexion.prepareStatement(consultaBep)) {
 			try (ResultSet rs = stmt.executeQuery()) {
 				while (rs.next()) {
 					ParametrosConfiguracion param = new ParametrosConfiguracion();
@@ -78,19 +88,20 @@ public class ModeloParametrosConfiguracion {
 					param.setDescripcion(rs.getString("DESCRIPCION"));
 					param.setValor(rs.getString("VALOR"));
 					param.setAdm(false);
-					parametros.add(param);	
+					parametros.add(param);
 				}
 			}
 		}
-		
+
 		return parametros;
 	}
-	
-	
-	/** Actualiza un parametro de configuración.
+
+	/**
+	 * Actualiza un parametro de configuración.
+	 * 
 	 * @param param ParametrosConfiguracion con los datos nuevos a actualizar
 	 * @throws SQLException en caso de error en la BD
-	 * @throws UVException en caso de errores de validacion
+	 * @throws UVException  en caso de errores de validacion
 	 */
 	public void actualizaParametro(ParametrosConfiguracion param) throws SQLException, UVException {
 		if (param == null) {
@@ -100,8 +111,7 @@ public class ModeloParametrosConfiguracion {
 			throw new UVException("id parametro no válido");
 		}
 		if (param.getAdm()) {
-			String consulta = "UPDATE ADM_PARAMETROS "
-					+ " SET DESID=?, VALOR=? "
+			String consulta = "UPDATE ADM_PARAMETROS " + " SET DESID=?, VALOR=? "
 					+ " WHERE CONFIG_CODALF=? AND PARAM_CODALF=?";
 			try (Connection conexion = ConexionUvirtual.obtenerInstancia();
 					PreparedStatement stmt = conexion.prepareStatement(consulta);) {
@@ -113,8 +123,7 @@ public class ModeloParametrosConfiguracion {
 				stmt.executeUpdate();
 			}
 		} else {
-			String consulta = "UPDATE TBEP_PARAMETROS_CONFIG "
-					+ " SET DESCRIPCION=?, VALOR=? "
+			String consulta = "UPDATE TBEP_PARAMETROS_CONFIG " + " SET DESCRIPCION=?, VALOR=? "
 					+ " WHERE CODNUM=? AND NOMBRE=?";
 			try (Connection conexion = ConexionUvirtual.obtenerInstancia();
 					PreparedStatement stmt = conexion.prepareStatement(consulta);) {
@@ -127,13 +136,14 @@ public class ModeloParametrosConfiguracion {
 			}
 		}
 	}
-	
-	
-	/** Devuelve un parametro de configuración.
+
+	/**
+	 * Devuelve un parametro de configuración.
+	 * 
 	 * @param nombre del parametro a buscar .
 	 * @return param .
 	 * @throws SQLException en caso de error en la BD
-	 * @throws UVException en caso de errores de validacion
+	 * @throws UVException  en caso de errores de validacion
 	 */
 	public ParametrosConfiguracion getParametroByNombre(String nombre) throws SQLException, UVException {
 		if (nombre == null) {
@@ -141,51 +151,49 @@ public class ModeloParametrosConfiguracion {
 		}
 		String[] nombreSplit = nombre.split("\\.");
 		if (nombreSplit[1].equals("local")) {
-			String consulta = "SELECT * FROM TBEP_PARAMETROS_CONFIG "
-					+ " WHERE NOMBRE = ?";
-				
-				try (Connection conexion = ConexionUvirtual.obtenerInstancia();
-						PreparedStatement stmt = conexion.prepareStatement(consulta)) {
-					stmt.setString(1, nombre);
-								
-					try (ResultSet rs = stmt.executeQuery()) {
-						if (!rs.next()) {
-							throw new UVException("No existe el parametro con nombre" + nombre);
-						}
-						
-						ParametrosConfiguracion param = new ParametrosConfiguracion();
-						param.setCodNum(rs.getString("CODNUM"));
-						param.setNombre(rs.getString("NOMBRE"));
-						param.setDescripcion(rs.getString("DESCRIPCION"));
-						param.setValor(rs.getString("VALOR"));
-						
-						return param;
-					}
-				}
-		} else {
+			String consulta = "SELECT * FROM TBEP_PARAMETROS_CONFIG " + " WHERE NOMBRE = ?";
 
-			String consulta = "SELECT * FROM ADM_PARAMETROS "
-				+ " WHERE PARAM_CODALF=?";
-			
 			try (Connection conexion = ConexionUvirtual.obtenerInstancia();
 					PreparedStatement stmt = conexion.prepareStatement(consulta)) {
 				stmt.setString(1, nombre);
-							
+
 				try (ResultSet rs = stmt.executeQuery()) {
 					if (!rs.next()) {
 						throw new UVException("No existe el parametro con nombre" + nombre);
 					}
-					
+
+					ParametrosConfiguracion param = new ParametrosConfiguracion();
+					param.setCodNum(rs.getString("CODNUM"));
+					param.setNombre(rs.getString("NOMBRE"));
+					param.setDescripcion(rs.getString("DESCRIPCION"));
+					param.setValor(rs.getString("VALOR"));
+
+					return param;
+				}
+			}
+		} else {
+
+			String consulta = "SELECT * FROM ADM_PARAMETROS " + " WHERE PARAM_CODALF=?";
+
+			try (Connection conexion = ConexionUvirtual.obtenerInstancia();
+					PreparedStatement stmt = conexion.prepareStatement(consulta)) {
+				stmt.setString(1, nombre);
+
+				try (ResultSet rs = stmt.executeQuery()) {
+					if (!rs.next()) {
+						throw new UVException("No existe el parametro con nombre" + nombre);
+					}
+
 					ParametrosConfiguracion param = new ParametrosConfiguracion();
 					param.setCodNum(rs.getString("CONFIG_CODALF"));
 					param.setNombre(rs.getString("PARAM_CODALF"));
 					param.setDescripcion(rs.getString("DESID"));
 					param.setValor(rs.getString("VALOR"));
-					
+
 					return param;
 				}
 			}
 		}
 	}
-	
+
 }
