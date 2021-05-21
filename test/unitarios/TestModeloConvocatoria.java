@@ -9,18 +9,15 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.List;
 
-import javax.sql.DataSource;
 
 import org.junit.BeforeClass;
 import org.junit.FixMethodOrder;
 import org.junit.Test;
 import org.junit.runners.MethodSorters;
 
-import bbdd.BbddRunner;
 import bbdd.UtilsTestDocentia;
 import es.ujaen.uvirtual.beans.uvirtual.docentia.Convocatoria;
 import es.ujaen.uvirtual.modelo.ModeloDocentia;
-import es.ujaen.uvirtual.modelo.conexion.Conexion;
 import es.ujaen.uvirtual.utilidades.UVException;
 
 /** Clase para probar el modelo convocatoria. */
@@ -36,11 +33,10 @@ public class TestModeloConvocatoria {
      * @throws SQLException si error en bd
      * @throws IOException si error en ficheros
 	 * @throws ParseException si error fecha
+	 * @throws UVException si error uv
      */
     @BeforeClass
-    public static void preparaBd() throws SQLException, IOException, ParseException {
-    	DataSource ds = BbddRunner.obtenerDataSourceUv();
-    	Conexion.setConexionUvirtual(ds);
+    public static void preparaBd() throws SQLException, IOException, ParseException, UVException {
     	UtilsTestDocentia.inicializaDocentia();
     	fechaEjemplo = new SimpleDateFormat(FORMATO_FECHA).parse(FECHA_STRING_EJEMPLO);
     }

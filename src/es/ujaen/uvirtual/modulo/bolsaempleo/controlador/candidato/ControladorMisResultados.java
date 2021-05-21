@@ -2,7 +2,6 @@ package es.ujaen.uvirtual.modulo.bolsaempleo.controlador.candidato;
 
 import java.io.IOException;
 import java.sql.SQLException;
-import java.sql.SQLIntegrityConstraintViolationException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.servlet.ServletException;
@@ -10,12 +9,12 @@ import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import javax.servlet.http.HttpSession;
 import es.ujaen.uvirtual.beans.UVDatos;
 import es.ujaen.uvirtual.modulo.bolsaempleo.modelo.ModeloUsuarioBolsaEmpleo;
 import es.ujaen.uvirtual.modulo.bolsaempleo.utilidades.BolsaEmpleoUtils;
 import es.ujaen.uvirtual.modulo.bolsaempleo.vistas.VistaMisResultados;
 import es.ujaen.uvirtual.utilidades.EscapaHTML;
+import es.ujaen.uvirtual.utilidades.Formateador;
 import es.ujaen.uvirtual.utilidades.UVException;
 
 /**
@@ -80,18 +79,13 @@ public class ControladorMisResultados extends HttpServlet {
 				default:
 					errorFatal(bean, "Acción no contemplada");
 			}
-		} catch (SQLIntegrityConstraintViolationException e) {
-			LOGGER.log(Level.WARNING, e.toString());
-			bean.getMensajesDeError().add(e.toString());
-			HttpSession session = request.getSession(false);
-			session.setAttribute(MENSAJE_ENVIADO, e.toString());
-			response.sendRedirect(request.getServletPath());
-		} catch (SQLException e) {
-			LOGGER.log(Level.WARNING, e.toString());
-			bean.getMensajesDeError().add("Error al acceder a la base de datos");
 		} catch (UVException e) {
 			LOGGER.log(Level.WARNING, e.toString());
 			bean.getMensajesDeError().add(e.getMessage());
+		} catch (SQLException e) {
+			LOGGER.log(Level.SEVERE, Formateador.getStackTrace(e));
+			LOGGER.log(Level.SEVERE, e.toString());
+			bean.getMensajesDeError().add("Error al acceder a la base de datos");
 		} finally {
 			datos.getVistas().put(bean.getClass().getName(), bean);
 			datos.getFicherosJSP().add(bean.getVista());

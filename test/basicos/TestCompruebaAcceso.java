@@ -12,7 +12,6 @@ import java.util.ArrayList;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
-import bbdd.BbddRunner;
 import bbdd.UtilsTestDocentia;
 import es.ujaen.uvirtual.adm.CompruebaAcceso;
 import es.ujaen.uvirtual.adm.CrearUsuario;
@@ -22,6 +21,7 @@ import es.ujaen.uvirtual.beans.MenuSubred;
 import es.ujaen.uvirtual.beans.Usuario;
 import es.ujaen.uvirtual.modelo.ModeloAdministracion;
 import es.ujaen.uvirtual.utilidades.AyudaURL;
+import es.ujaen.uvirtual.utilidades.UVException;
 
 /** test compruebaAcceso.
  *
@@ -37,10 +37,10 @@ public class TestCompruebaAcceso {
     /** prepara la bd con los datos iniciales.
      * @throws SQLException si error en bd
      * @throws IOException si error en ficheros
+     * @throws UVException si error uv
      */
     @BeforeClass
-    public static void preparaBd() throws SQLException, IOException {
-    	BbddRunner.conectarBd();
+    public static void preparaBd() throws SQLException, IOException, UVException {
     	UtilsTestDocentia.inicializaDocentia();
     }
 

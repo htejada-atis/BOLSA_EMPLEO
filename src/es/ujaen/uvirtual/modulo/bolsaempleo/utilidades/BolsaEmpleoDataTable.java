@@ -148,8 +148,9 @@ public class BolsaEmpleoDataTable<T> {
 		try {
 			String paramFilters = String.join("", params.getOrDefault(PARAM_FILTER, new String[] {""}));
 			if (paramFilters != null && !paramFilters.isBlank()) {
-				filters = new GsonBuilder().create().fromJson(paramFilters, new TypeToken<HashMap<Integer, String>>() {
-				}.getType());
+				filters = new GsonBuilder().create().fromJson(paramFilters, 
+						new TypeToken<HashMap<Integer, String>>() { }.getType()
+				);
 			}
 		} catch (Exception ex) {
 			LOGGER.log(Level.WARNING, "Error Datatable {0}", ex.toString());
@@ -263,10 +264,7 @@ public class BolsaEmpleoDataTable<T> {
 				throw new UVException("Error obteniendo número total de filas");
 			}
 			this.recordsTotal = rs.getInt("count");
-			this.pagesTotal = this.recordsTotal / this.pageSize;
-			if (recordsTotal % this.pageSize == 0) {
-				this.pagesTotal -= 1;
-			}
+			this.pagesTotal = (int) Math.ceil((this.recordsTotal * 1.0) / this.pageSize);			
 		}
 	}
 
@@ -343,30 +341,32 @@ public class BolsaEmpleoDataTable<T> {
 
 		for (Map.Entry<Integer, String> filter : filters.entrySet()) {
 			Integer key = filter.getKey();
-			String column = this.columns.get(key).getName();
-
-			if (column == null) {
+			DataTableColumn column = this.columns.get(key);
+			
+			if (column == null || column.getName() == null) {
 				throw new UVException(ERROR_MSG_COLUMNA_FILTRADO_NO_VALIDA);
 			}
+			
+			String columnName = column.getName();
 
 			switch (this.columns.get(key).getType()) {
 				case DataTableColumn.COLUMN_TYPE_DATE:
-					consultaResult.append(" AND TO_CHAR(" + column + ",'yyyy-mm-dd') LIKE ? ");
+					consultaResult.append(" AND TO_CHAR(" + columnName + ",'yyyy-mm-dd') LIKE ? ");
 					break;
 				case DataTableColumn.COLUMN_TYPE_NUMBER:
 				case DataTableColumn.COLUMN_TYPE_BOOLEAN:
 				case DataTableColumn.COLUMN_TYPE_OPTION:
-					consultaResult.append(" AND " + column + " = ? ");
+					consultaResult.append(" AND " + columnName + " = ? ");
 					break;
 				case DataTableColumn.COLUMN_TYPE_IS_NULL:
 					consultaResult.append(
-							" AND " + column + " IS" + (Boolean.parseBoolean(filter.getValue()) ? " NOT" : "") + " NULL");
+							" AND " + columnName + " IS" + (Boolean.parseBoolean(filter.getValue()) ? " NOT" : "") + " NULL");
 					break;
 				case DataTableColumn.COLUMN_TYPE_TEXT:
-					consultaResult.append(" AND lower(" + column + ") LIKE lower(?) ");
+					consultaResult.append(" AND lower(" + columnName + ") LIKE lower(?) ");
 					break;
 				default:
-					consultaResult.append(" AND lower(" + column + ") LIKE lower(?) ");
+					consultaResult.append(" AND lower(" + columnName + ") LIKE lower(?) ");
 					break;
 			}
 		}

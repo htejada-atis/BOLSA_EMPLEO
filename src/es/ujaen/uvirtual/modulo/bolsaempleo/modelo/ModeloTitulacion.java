@@ -217,7 +217,7 @@ public class ModeloTitulacion {
 	 */
 	public void eliminarTitulacionesPreferentesArea(Collection<String> titulaciones, Integer area) throws SQLException {
 		String params = BolsaEmpleoUtils.consultaMultiplesParametros(titulaciones.size());
-		String consulta = "UPDATE TBEP_TITULACIONES_PREFERENTES_AREA SET FLGBORRADO = ?, FECHA_BORRADO = ? WHERE BEPARE_CODNUM = ? AND BEPTIT_CODNUM IN (" + params + ")";
+		String consulta = "UPDATE TBEP_TIT_PREFERENTES_AREA SET FLGBORRADO = ?, FECHA_BORRADO = ? WHERE BEPARE_CODNUM = ? AND BEPTIT_CODNUM IN (" + params + ")";
 		try (Connection conexion = ConexionUvirtual.obtenerInstancia(); PreparedStatement stmt = conexion.prepareStatement(consulta)) {
 			int indexParam = 1;
 			stmt.setString(indexParam++, "S");
@@ -287,7 +287,7 @@ public class ModeloTitulacion {
 		BolsaEmpleoDataTable<Titulacion> dataTable = new BolsaEmpleoDataTable<>(params);
 		
 		String consultaNotIn = "SELECT beptit.CODNUM FROM tbep_titulaciones beptit "
-				+ "INNER JOIN tbep_titulaciones_preferentes_area beptpa ON beptit.codnum = beptpa.beptit_codnum "
+				+ "INNER JOIN TBEP_TIT_PREFERENTES_AREA beptpa ON beptit.codnum = beptpa.beptit_codnum "
 				+ "INNER JOIN TBEP_AREAS bepare ON bepare.codnum = beptpa.bepare_codnum "
 				+ "WHERE bepare.CODNUM = ? AND beptpa.FLGBORRADO != 'S'";
 		String consulta = "SELECT beptit.* FROM tbep_titulaciones beptit WHERE beptit.CODNUM NOT IN (" + consultaNotIn + ")";
@@ -337,7 +337,7 @@ public class ModeloTitulacion {
 		BolsaEmpleoDataTable<TitulacionArea> dataTable = new BolsaEmpleoDataTable<>(params);
 		
 		String consulta = "SELECT beptit.CODNUM, beptit.NOMBRE FROM tbep_titulaciones beptit "
-				+ "INNER JOIN tbep_titulaciones_preferentes_area beptpa ON beptit.codnum = beptpa.beptit_codnum "
+				+ "INNER JOIN TBEP_TIT_PREFERENTES_AREA beptpa ON beptit.codnum = beptpa.beptit_codnum "
 				+ "INNER JOIN TBEP_AREAS bepare ON bepare.codnum = beptpa.bepare_codnum "
 				+ "WHERE bepare.CODNUM = ? AND beptpa.FLGBORRADO != 'S'";
 		
@@ -385,8 +385,8 @@ public class ModeloTitulacion {
 		List<TitulacionArea> titulaciones = new ArrayList<>();
 		BolsaEmpleoDataTable<TitulacionArea> dataTable = new BolsaEmpleoDataTable<>(params);
 		
-		String consulta = "SELECT beptit.CODNUM, beptit.NOMBRE FROM tbep_titulaciones beptit "
-				+ "INNER JOIN tbep_titulaciones_preferentes_area beptpa ON beptit.codnum = beptpa.beptit_codnum "
+		String consulta = "SELECT beptit.* FROM tbep_titulaciones beptit "
+				+ "INNER JOIN TBEP_TIT_PREFERENTES_AREA beptpa ON beptit.codnum = beptpa.beptit_codnum "
 				+ "INNER JOIN TBEP_AREAS bepare ON bepare.codnum = beptpa.bepare_codnum "
 				+ "WHERE bepare.CODNUM = ? ";
 		
@@ -403,9 +403,7 @@ public class ModeloTitulacion {
 			dataTable.setFiltersParams(stmt, stmtCount, indexParam);
 			try (ResultSet rs = stmt.executeQuery()) {
 				while (rs.next()) {
-					Titulacion tit = new Titulacion();
-					tit.setCodNum(rs.getInt(CODNUM));
-					tit.setNombre(rs.getString(NOMBRE));
+					Titulacion tit = this.createTitulacionFromResultSet(rs);
 					ModeloArea modeloArea = ModeloArea.obtenerInstancia();
 					titulaciones.add(new TitulacionArea(tit, modeloArea.getAreaById(area)));
 				}
@@ -437,11 +435,7 @@ public class ModeloTitulacion {
 			
 			try (ResultSet rs = stmt.executeQuery()) {
 				while (rs.next()) {
-					Titulacion t = new Titulacion();
-					t.setCodNum(rs.getInt(CODNUM));
-					t.setNombre(rs.getString(NOMBRE));
-					
-					return t;
+					return this.createTitulacionFromResultSet(rs);
 				}
 			}
 		}
@@ -456,7 +450,7 @@ public class ModeloTitulacion {
 	 * @throws SQLException .
 	 */
 	public boolean checkTitulacionArea(Titulacion tit) throws SQLException {
-		String query = "SELECT COUNT(*) as count FROM TBEP_TITULACIONES_PREFERENTES_AREA WHERE BEPTIT_CODNUM = ?";		
+		String query = "SELECT COUNT(*) as count FROM TBEP_TIT_PREFERENTES_AREA WHERE BEPTIT_CODNUM = ?";		
 		
 		try (Connection con = ConexionUvirtual.obtenerInstancia(); PreparedStatement stmt = con.prepareStatement(query)) {
 			int param = 1;
@@ -482,7 +476,7 @@ public class ModeloTitulacion {
 	 * @throws SQLException .
 	 */
 	public void checkTitulacionAreaBorrado(String tit, Integer area) throws SQLException {
-		String query = "SELECT COUNT(*) as count FROM TBEP_TITULACIONES_PREFERENTES_AREA WHERE BEPTIT_CODNUM = ? AND BEPARE_CODNUM = ? AND FLGBORRADO = 'S'";		
+		String query = "SELECT COUNT(*) as count FROM TBEP_TIT_PREFERENTES_AREA WHERE BEPTIT_CODNUM = ? AND BEPARE_CODNUM = ? AND FLGBORRADO = 'S'";		
 		
 		try (Connection con = ConexionUvirtual.obtenerInstancia(); PreparedStatement stmt = con.prepareStatement(query)) {
 			int param = 1;
@@ -493,7 +487,7 @@ public class ModeloTitulacion {
 				rs.next();
 				if (rs.getInt("count") > 0) {
 					
-					String consulta = "UPDATE TBEP_TITULACIONES_PREFERENTES_AREA SET FLGBORRADO = ?,"
+					String consulta = "UPDATE TBEP_TIT_PREFERENTES_AREA SET FLGBORRADO = ?,"
 							+ " FECHA_BORRADO = ? WHERE BEPARE_CODNUM = ? AND BEPTIT_CODNUM = ?";
 
 					try (Connection conexion = ConexionUvirtual.obtenerInstancia(); PreparedStatement stmtUpdate = conexion.prepareStatement(consulta)) {
@@ -505,7 +499,7 @@ public class ModeloTitulacion {
 						stmtUpdate.executeUpdate();
 					}
 				} else {
-					String consulta = "INSERT INTO TBEP_TITULACIONES_PREFERENTES_AREA (BEPARE_CODNUM, BEPTIT_CODNUM)"
+					String consulta = "INSERT INTO TBEP_TIT_PREFERENTES_AREA (BEPARE_CODNUM, BEPTIT_CODNUM)"
 							+ " SELECT bepare.CODNUM AS BEPARE_CODNUM, beptit.CODNUM AS BEPTIT_CODNUM"
 							+ " FROM TBEP_TITULACIONES beptit, TBEP_AREAS bepare WHERE bepare.CODNUM = ? AND "
 							+ " beptit.CODNUM = ?";
@@ -518,5 +512,14 @@ public class ModeloTitulacion {
 				}
 			}
 		}
+	}
+
+	private Titulacion createTitulacionFromResultSet(ResultSet rs) throws SQLException {
+		Titulacion t = new Titulacion();
+		t.setCodNum(rs.getInt(CODNUM));
+		t.setNombre(rs.getString(NOMBRE));
+		t.setBorrado("S".equals(rs.getString("FLGBORRADO")));
+		t.setFechaBorrado(rs.getDate("FECHA_BORRADO"));
+		return t;
 	}
 }

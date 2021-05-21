@@ -125,13 +125,13 @@ public class ControladorFiltrar extends HttpServlet {
 				default:
 					errorFatal(bean, "Acción no contemplada");
 			}
+		} catch (UVException e) {
+			LOGGER.log(Level.WARNING, e.toString());
+			bean.getMensajesDeError().add(e.getMessage());
 		} catch (SQLException e) {
 			LOGGER.log(Level.SEVERE, Formateador.getStackTrace(e));
 			LOGGER.log(Level.SEVERE, e.toString());
 			bean.getMensajesDeError().add("Error al acceder a la base de datos");
-		} catch (UVException e) {
-			LOGGER.log(Level.WARNING, e.toString());
-			bean.getMensajesDeError().add(e.getMessage());
 		} finally {
 			datos.getVistas().put(bean.getClass().getName(), bean);
 			datos.getFicherosJSP().add(bean.getVista());
@@ -211,7 +211,7 @@ public class ControladorFiltrar extends HttpServlet {
 		
 		try (PrintWriter writer = response.getWriter()) {
 			try {
-				TitulacionUsuario titulacion = modeloTitulacion.listaTitulacionUsuario(Formateador.leeParametroInteger(request.getParameter(PARAM_TITULACION)));
+				TitulacionUsuario titulacion = modeloTitulacion.getTitulacionUsuarioById(Formateador.leeParametroInteger(request.getParameter(PARAM_TITULACION)));
 				bean.setTitulacion(titulacion);
 				UsuarioBolsaEmpleo candidato = modeloUsuario.getUsuarioById(Formateador.leeParametroInteger(request.getParameter(PARAM_CANDIDATO)));
 				bean.setCandidato(candidato);
@@ -315,7 +315,7 @@ public class ControladorFiltrar extends HttpServlet {
 			throws SQLException, UVException, IOException {
 		ModeloMisTitulaciones modelo = ModeloMisTitulaciones.obtenerInstancia();
 		if (EscapaHTML.ajustaCodificacion(request.getParameter(PARAM_FICHERO)) != null) {
-			TitulacionUsuario titulacion = modelo.listaTitulacionUsuario(Formateador.leeParametroInteger(request.getParameter(PARAM_FICHERO)));
+			TitulacionUsuario titulacion = modelo.getTitulacionUsuarioById(Formateador.leeParametroInteger(request.getParameter(PARAM_FICHERO)));
 			bean.setTitulacion(titulacion);
 			
 			response.setContentType("application/pdf");

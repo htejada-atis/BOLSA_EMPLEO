@@ -14,16 +14,16 @@ TBEP_FICHEROS                       FIC     bepfic		Fichero
 TBEP_ITEMSBAREMACION                ITE     bepite		ItemBaremacion
 TBEP_MERITOS                        MER     bepmer		Merito
 TBEP_MERITOS_PREFERENTES            MEP     bepmep		MeritoPreferente
-TBEP_MERITOS_PREFERENTES_OPCIONES   MPO     bepmpo      MeritoPreferenteOpciones
-TBEP_MERITOS_PREFERENTES_USUARIO    MPU     bepmpu      MeritoPreferenteUsuario
+TBEP_MER_PRE_OPCIONES   			MPO     bepmpo      MeritoPreferenteOpciones
+TBEP_MER_PRE_USUARIO    			MPU     bepmpu      MeritoPreferenteUsuario
 TBEP_MERITOS_EXCLUYENTES       		MEX     bepmex		MeritosExcluyentes
 TBEP_NOTICIAS                       NOT     bepnot		Noticia
 TBEP_SOLICITUDES                    SOL     bepsol		Solicitud
 TBEP_SOLICITUD_BOLSAS				SBO		bepsbo
-TBEP_SOLICITUD_BOLSAS_MERITOS		SBM     bepsbm		MeritoSolicitud
+TBEP_SOL_BOL_MERITOS				SBM     bepsbm		MeritoSolicitud
 TBEP_TITULACIONES                   TIT     beptit		Titulacion
-TBEP_TITULACIONES_PREFERENTES_AREA  TPA		beptpa		TitulacionArea
+TBEP_TIT_PREFERENTES_AREA  			TPA		beptpa		TitulacionArea
 TBEP_TITULACIONES_USUARIO        	TUS     beptus		TitulacionesUsuario
 TBEP_USUARIOS                       USU     bepusu		UsuarioBolsaEmpleo
-TBEP_USUARIOS_EXCLUIDOS_AREA        UEA     bepuea		UsuarioExcluidoArea
-TBEP_PARAMETROS_CONFIGURACION       PAC     beppac		ParametrosConfiguracion
+TBEP_USU_EXCLUIDOS_AREA        		UEA     bepuea		UsuarioExcluidoArea
+TBEP_PARAMETROS_CONFIG      		PAC     beppac		ParametrosConfiguracion

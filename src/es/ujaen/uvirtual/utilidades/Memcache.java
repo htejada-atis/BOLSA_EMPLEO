@@ -1,6 +1,12 @@
 package es.ujaen.uvirtual.utilidades;
 
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.PrintWriter;
+import java.net.InetSocketAddress;
+import java.net.Socket;
 import java.net.SocketAddress;
+import java.net.SocketTimeoutException;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
@@ -8,6 +14,8 @@ import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import es.ujaen.uvirtual.beans.ConfiguracionGlobal;
 import net.spy.memcached.AddrUtil;
@@ -77,6 +85,71 @@ public class Memcache {
     	getConnection();
     }
 
+
+	/** Elimina todos los datos del servidor a bajo nivel.
+	 * @throws UVException si error uv
+	 * */
+	public void flushAll() throws UVException {
+		ConfiguracionGlobal.getMemcacheServers();
+		Iterator<InetSocketAddress> it = AddrUtil.getAddresses(ConfiguracionGlobal.getMemcacheServers()).iterator();
+		while (it.hasNext()) {
+			InetSocketAddress servidor = it.next();
+			try (Socket sock = new Socket(servidor.getHostString(), servidor.getPort())) {
+				comandoTelnet("flush_all", sock);
+			} catch (IOException e) {
+				String logMensaje = "servidor " + servidor.getHostString() + " " + servidor.getPort();
+				logMensaje = logMensaje + e.getMessage();
+				throw new UVException(logMensaje);
+			}
+			try {
+				final int tiempoEspera = 1000;
+				Thread.sleep(tiempoEspera);
+			} catch (InterruptedException e) {
+			    FLOGGER.log(Level.WARNING, "Interrupted!", e);
+			    Thread.currentThread().interrupt();
+			}
+		}
+	}
+	
+	private static String comandoTelnet(String comando, Socket sock) throws IOException, UVException {
+		final String nombreMetodo = "comandoTelnet";
+		PrintWriter out = new PrintWriter(sock.getOutputStream(), true);
+		StringBuilder builder = new StringBuilder();
+		final int valorTimeout = 2000; 
+		sock.setSoTimeout(valorTimeout);
+		out.println(comando);
+		FLOGGER.logp(Level.INFO, fClassName, nombreMetodo, comando);
+		Pattern p = Pattern.compile("((END)|(DELETE)|(OK)|(ERROR)|(NOT\\sFOUND))\\s*$");
+		final int tamBuffer = 128 * 1024;
+		byte[] buf = new byte[tamBuffer];
+		int br = 0;
+		int i = 0;
+		final int lecturasMax = 100;
+		final int reintentos = 3;
+		int reintento = 0;
+		boolean continuar = true;
+		while (continuar && br > -1 && i <= lecturasMax && reintento < reintentos) {
+			try (InputStream inputStream = sock.getInputStream()) {
+				br = inputStream.read(buf, 0, buf.length);
+				builder.append(new String(buf, 0, br));
+				Matcher m = p.matcher(builder.toString().toUpperCase()); // get a matcher object
+				if (m.find() /*|| br < buf.length*/) {
+					continuar = false;
+				} else {
+					reintento++;
+					br = 2; // no sale por condicion br... espera
+				}
+			} catch (SocketTimeoutException e) {
+				reintento = reintentos;
+			}
+			i++;
+		}
+		if (i >= lecturasMax) {
+			throw new UVException("tamaño del buffer de comandoTelnet demasiado pequeño");
+		}
+		String cadena = builder.toString().trim();
+		return cadena.replace("\r", "");
+    }
 	
 	/**
 	 * Obtiene la instancia singleton del memcache.

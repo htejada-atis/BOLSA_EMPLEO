@@ -74,7 +74,6 @@ public class ConfiguracionGlobal implements Serializable {
 	 * Lee un parámetro de la configuración como un valor entero.
 	 * @param parametro parametro
 	 * @return el valor en modo entero
-	 * @throws UVException si no existe la clave o no se puede convertir a entero 
 	 */
 	public static Integer getParametroEnteroNE(String parametro) {
 		init();
@@ -103,7 +102,6 @@ public class ConfiguracionGlobal implements Serializable {
 	 * Lee un parámetro de la configuración como un valor entero largo.
 	 * @param parametro parametro
 	 * @return el valor en modo entero largo
-	 * @throws Exception si no existe la clave o no se puede convertir a entero largo 
 	 */
 	public static Long getParametroEnteroLargoNE(String parametro) {
 		init();

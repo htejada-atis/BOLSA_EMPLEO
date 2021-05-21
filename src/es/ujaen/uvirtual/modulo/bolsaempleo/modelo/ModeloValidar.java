@@ -212,7 +212,7 @@ public class ModeloValidar {
 		
 		// subconsultas para seleccionar el número de méritos que contiene cada bolsa de la solicitud
 		// en la convocatoria pasada, agregando después varios filtros
-		String consultaCount = "SELECT COUNT(*) FROM UVIRTUAL.TBEP_SOLICITUD_BOLSAS_MERITOS bepsbm"
+		String consultaCount = "SELECT COUNT(*) FROM UVIRTUAL.TBEP_SOL_BOL_MERITOS bepsbm"
 				+ "	INNER JOIN UVIRTUAL.TBEP_SOLICITUD_BOLSAS bepsbo ON bepsbo.CODNUM = bepsbm.BEPSBO_CODNUM"
 				+ "	INNER JOIN UVIRTUAL.TBEP_SOLICITUDES bepsol ON bepsol.CODNUM = bepsbo.BEPSOL_CODNUM"
 				+ "	INNER JOIN UVIRTUAL.TBEP_MERITOS bepmer ON bepmer.CODNUM = bepsbm.BEPMER_CODNUM"
@@ -353,7 +353,7 @@ public class ModeloValidar {
 		
 		// subconsultas para seleccionar el número de méritos que contiene cada bolsa de la solicitud
 		// en la convocatoria pasada, agregando después varios filtros
-		String consultaCount = "SELECT COUNT(*) FROM UVIRTUAL.TBEP_SOLICITUD_BOLSAS_MERITOS bepsbm"
+		String consultaCount = "SELECT COUNT(*) FROM UVIRTUAL.TBEP_SOL_BOL_MERITOS bepsbm"
 				+ "	INNER JOIN UVIRTUAL.TBEP_SOLICITUD_BOLSAS bepsbo ON bepsbo.CODNUM = bepsbm.BEPSBO_CODNUM"
 				+ "	INNER JOIN UVIRTUAL.TBEP_SOLICITUDES bepsol ON bepsol.CODNUM = bepsbo.BEPSOL_CODNUM"
 				+ "	INNER JOIN UVIRTUAL.TBEP_MERITOS bepmer ON bepmer.CODNUM = bepsbm.BEPMER_CODNUM"
@@ -373,7 +373,7 @@ public class ModeloValidar {
 				+ "	FROM UVIRTUAL.TBEP_USUARIOS bepusu"
 				+ "	INNER JOIN UVIRTUAL.TBEP_MERITOS bepmer ON bepusu.CODNUM = bepmer.BEPUSU_CODNUM"
 				+ "	INNER JOIN UVIRTUAL.TBEP_ITEMSBAREMACION bepite ON bepite.CODNUM = bepmer.BEPITE_CODNUM"
-				+ "	INNER JOIN UVIRTUAL.TBEP_SOLICITUD_BOLSAS_MERITOS bepsbm ON bepmer.CODNUM = bepsbm.BEPMER_CODNUM"
+				+ "	INNER JOIN UVIRTUAL.TBEP_SOL_BOL_MERITOS bepsbm ON bepmer.CODNUM = bepsbm.BEPMER_CODNUM"
 				+ "	INNER JOIN UVIRTUAL.TBEP_SOLICITUD_BOLSAS bepsbo ON bepsbo.CODNUM = bepsbm.BEPSBO_CODNUM"
 				+ "	WHERE bepusu.ROL = " + ModeloRol.ID_ROL_CANDIDATO + " AND bepsbo.BEPBOL_CODNUM = ?";
 		
@@ -406,7 +406,7 @@ public class ModeloValidar {
 
 			try (ResultSet rs = stmt.executeQuery()) {
 				while (rs.next()) {
-					String consultaArcos = "SELECT * FROM VUJA_NET_BEP_AR_PERSONA WHERE PRSNIF = ?";
+					String consultaArcos = "SELECT * FROM arcos.VUJA_NET_BEP_AR_PERSONA WHERE PRSNIF = ?";
 					
 					 try (Connection conexionArcos = ConexionArcos.obtenerInstancia();
 				    	PreparedStatement stmtArcos = conexionArcos.prepareStatement(consultaArcos);) {
@@ -451,7 +451,7 @@ public class ModeloValidar {
 		}
 		
 		String consulta = "SELECT bepmer.*, bepite.*, bepsbm.*"
-				+ " FROM UVIRTUAL.TBEP_SOLICITUD_BOLSAS_MERITOS bepsbm"
+				+ " FROM UVIRTUAL.TBEP_SOL_BOL_MERITOS bepsbm"
 				+ "	INNER JOIN UVIRTUAL.TBEP_SOLICITUD_BOLSAS bepsbo ON bepsbo.CODNUM = bepsbm.BEPSBO_CODNUM"
 				+ "	INNER JOIN UVIRTUAL.TBEP_SOLICITUDES bepsol ON bepsol.CODNUM = bepsbo.BEPSOL_CODNUM"
 				+ "	INNER JOIN UVIRTUAL.TBEP_MERITOS bepmer ON bepmer.CODNUM = bepsbm.BEPMER_CODNUM"

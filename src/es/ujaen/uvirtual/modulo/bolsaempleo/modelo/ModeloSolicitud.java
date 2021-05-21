@@ -386,7 +386,7 @@ public class ModeloSolicitud {
 		String consulta = ""
 				+ "SELECT "
 				+ "		bepsbo.*, "
-				+ "		(SELECT COUNT(*) FROM TBEP_SOLICITUD_BOLSAS_MERITOS bepsbm WHERE bepsbm.BEPSBO_CODNUM = bepsbo.CODNUM) COUNT_MERITOS "
+				+ "		(SELECT COUNT(*) FROM TBEP_SOL_BOL_MERITOS bepsbm WHERE bepsbm.BEPSBO_CODNUM = bepsbo.CODNUM) COUNT_MERITOS "
 				+ "FROM TBEP_SOLICITUD_BOLSAS bepsbo "
 				+ "WHERE bepsbo.BEPSOL_CODNUM = ? ";
 		
@@ -440,7 +440,7 @@ public class ModeloSolicitud {
 				+ " INNER JOIN TBEP_ITEMSBAREMACION bepite ON bepite.CODNUM = bepmer.BEPITE_CODNUM "
 				+ " LEFT JOIN ( "
 				+ " 	SELECT bepsbm.* "
-				+ " 	FROM TBEP_SOLICITUD_BOLSAS_MERITOS bepsbm "
+				+ " 	FROM TBEP_SOL_BOL_MERITOS bepsbm "
 				+ "		INNER JOIN TBEP_SOLICITUD_BOLSAS bepsbo ON bepsbo.CODNUM = bepsbm.BEPSBO_CODNUM"
 				+ "		WHERE bepsbo.BEPBOL_CODNUM = ? "				
 				+ " ) MERITOS_BOLSAS ON MERITOS_BOLSAS.BEPMER_CODNUM = bepmer.CODNUM "							
@@ -494,7 +494,7 @@ public class ModeloSolicitud {
 	 */
 	public void asignarMeritosASolicitudBolsa(Solicitud solicitud, Bolsa bolsa, Merito merito) throws SQLException {
 		// insertamos el mérito en la solicitud bolsa
-		String consulta = "INSERT INTO TBEP_SOLICITUD_BOLSAS_MERITOS (BEPSBO_CODNUM, BEPMER_CODNUM)"
+		String consulta = "INSERT INTO TBEP_SOL_BOL_MERITOS (BEPSBO_CODNUM, BEPMER_CODNUM)"
 				+ " SELECT bepsbo.CODNUM AS BEPSBO_CODNUM, bepmer.CODNUM AS BEPMER_CODNUM"
 				+ " FROM TBEP_SOLICITUD_BOLSAS bepsbo, TBEP_MERITOS bepmer"
 				+ " WHERE bepsbo.BEPSOL_CODNUM = ? AND bepsbo.BEPBOL_CODNUM = ? AND bepmer.CODNUM = ? ";
@@ -520,9 +520,9 @@ public class ModeloSolicitud {
 						
 			// eliminamos valoraciones
 			String sqlValoraciones = ""
-					+ "DELETE FROM TBEP_SOLICITUD_BOLSAS_MERITOS_VALORACION bepsbv WHERE bepsbv.BEPSBM_CODNUM IN ( "
+					+ "DELETE FROM TBEP_SOL_BOL_MER_VALORACION bepsbv WHERE bepsbv.BEPSBM_CODNUM IN ( "
 					+ "		SELECT bepsbm.CODNUM "
-					+ "		FROM TBEP_SOLICITUD_BOLSAS_MERITOS bepsbm "
+					+ "		FROM TBEP_SOL_BOL_MERITOS bepsbm "
 					+ "		WHERE bepsbm.BEPMER_CODNUM = ? AND bepsbm.BEPSBO_CODNUM IN ( "
 					+ "			SELECT bepsbo.CODNUM "
 					+ "			FROM TBEP_SOLICITUD_BOLSAS bepsbo "
@@ -544,7 +544,7 @@ public class ModeloSolicitud {
 			
 			// eliminamos merito en la solicitud
 			String sqlMeritos = ""
-					+ "DELETE FROM TBEP_SOLICITUD_BOLSAS_MERITOS bepsbm "
+					+ "DELETE FROM TBEP_SOL_BOL_MERITOS bepsbm "
 					+ "WHERE bepsbm.BEPSBO_CODNUM IN ( "
 					+ "		SELECT bepsbo.CODNUM "
 					+ "		FROM TBEP_SOLICITUD_BOLSAS bepsbo "
@@ -592,7 +592,7 @@ public class ModeloSolicitud {
 			}
 						
 			// insertamos la afinidad del mérito
-			String sqlInsert = "INSERT INTO TBEP_SOLICITUD_BOLSAS_MERITOS_VALORACION (BEPSBM_CODNUM, BEPAFI_CODNUM, VALOR) VALUES (?,?,NULL)";			
+			String sqlInsert = "INSERT INTO TBEP_SOL_BOL_MER_VALORACION (BEPSBM_CODNUM, BEPAFI_CODNUM, VALOR) VALUES (?,?,NULL)";			
 			try (PreparedStatement stmt = conexion.prepareStatement(sqlInsert)) {
 				int indexParam = 1;
 				stmt.setInt(indexParam++, meritoSolicitud.getCodNum());
@@ -634,7 +634,7 @@ public class ModeloSolicitud {
 									
 			// insertamos las afinidades del mérito
 			for (Map.Entry<Afinidad, Float> entry : afinidades.entrySet()) {
-				String sqlInsert = "INSERT INTO TBEP_SOLICITUD_BOLSAS_MERITOS_VALORACION (BEPSBM_CODNUM, BEPAFI_CODNUM, VALOR) VALUES (?,?,?)";
+				String sqlInsert = "INSERT INTO TBEP_SOL_BOL_MER_VALORACION (BEPSBM_CODNUM, BEPAFI_CODNUM, VALOR) VALUES (?,?,?)";
 				
 				try (PreparedStatement stmt = conexion.prepareStatement(sqlInsert)) {
 					int indexParam = 1;
@@ -665,7 +665,7 @@ public class ModeloSolicitud {
 	 */
 	public MeritoSolicitud getMeritoSolicitud(Integer idSolicitud, Integer idBolsa, Integer idMerito) throws SQLException, UVException {
 		String consulta = "SELECT bepsbm.* "
-				+ "FROM TBEP_SOLICITUD_BOLSAS_MERITOS bepsbm "
+				+ "FROM TBEP_SOL_BOL_MERITOS bepsbm "
 				+ "INNER JOIN TBEP_SOLICITUD_BOLSAS bepsbo ON bepsbo.CODNUM = bepsbm.BEPSBO_CODNUM "
 				+ "WHERE 1=1 "
 				+ "AND bepsbm.BEPMER_CODNUM = ? "
@@ -742,7 +742,7 @@ public class ModeloSolicitud {
 			throw new UVException(MENSAJE_ERROR_NO_EXISTE_MERITO_SOLICITUD);
 		}
 		
-		String consulta = "SELECT bepsbm.* FROM TBEP_SOLICITUD_BOLSAS_MERITOS bepsbm WHERE bepsbm.CODNUM = ?";
+		String consulta = "SELECT bepsbm.* FROM TBEP_SOL_BOL_MERITOS bepsbm WHERE bepsbm.CODNUM = ?";
 			
 		try (Connection conexion = ConexionUvirtual.obtenerInstancia();
 				PreparedStatement stmt = conexion.prepareStatement(consulta)) {
@@ -775,7 +775,7 @@ public class ModeloSolicitud {
 	public List<MeritoSolicitudValoracion> getValoracionesMeritoSolicitud(int idMeritoSolicitud, boolean loadMeritoSolicitud) throws SQLException, UVException {
 		List<MeritoSolicitudValoracion> valoraciones = new ArrayList<>();
 		
-		String consulta = "SELECT * FROM TBEP_SOLICITUD_BOLSAS_MERITOS_VALORACION bepsbv WHERE bepsbv.BEPSBM_CODNUM = ?";
+		String consulta = "SELECT * FROM TBEP_SOL_BOL_MER_VALORACION bepsbv WHERE bepsbv.BEPSBM_CODNUM = ?";
 		
 		try (Connection conexion = ConexionUvirtual.obtenerInstancia(); PreparedStatement stmt = conexion.prepareStatement(consulta)) {
 			int indexParam = 1;
@@ -806,7 +806,7 @@ public class ModeloSolicitud {
 	 */
 	public Integer obtenerTotalMeritosPorBloqueSolicitud(Solicitud solicitud, Merito merito) throws SQLException {
 		Integer total = 0;
-		String consulta = "SELECT COUNT(*) AS total FROM TBEP_SOLICITUD_BOLSAS_MERITOS bepsbm"
+		String consulta = "SELECT COUNT(*) AS total FROM TBEP_SOL_BOL_MERITOS bepsbm"
 				+ "	INNER JOIN TBEP_SOLICITUD_BOLSAS bepsbo ON bepsbm.BEPSBO_CODNUM = bepsbo.CODNUM"
 				+ "	INNER JOIN TBEP_MERITOS bepmer ON bepsbm.BEPMER_CODNUM = bepmer.CODNUM"
 				+ "	INNER JOIN TBEP_ITEMSBAREMACION bepite ON bepmer.BEPITE_CODNUM = bepite.CODNUM"
@@ -837,7 +837,7 @@ public class ModeloSolicitud {
 	 */
 	public Integer obtenerTotalMeritosSolicitud(Solicitud solicitud) throws SQLException {
 		Integer total = 0;
-		String consulta = "SELECT COUNT(*) AS total FROM TBEP_SOLICITUD_BOLSAS_MERITOS bepsbm"
+		String consulta = "SELECT COUNT(*) AS total FROM TBEP_SOL_BOL_MERITOS bepsbm"
 				+ "	INNER JOIN TBEP_SOLICITUD_BOLSAS bepsbo ON bepsbm.BEPSBO_CODNUM = bepsbo.CODNUM"
 				+ "	WHERE bepsbo.BEPSOL_CODNUM = ? ";
 		
@@ -906,7 +906,7 @@ public class ModeloSolicitud {
 		ArrayList<MeritoSolicitud> meritos = new ArrayList<>();
 		
 		String consulta = "SELECT bepsbm.* "
-				+ " FROM TBEP_SOLICITUD_BOLSAS_MERITOS bepsbm "
+				+ " FROM TBEP_SOL_BOL_MERITOS bepsbm "
 				+ " INNER JOIN TBEP_SOLICITUD_BOLSAS bepsbo ON bepsbm.BEPSBO_CODNUM = bepsbo.CODNUM"
 				+ " WHERE bepsbo.BEPSOL_CODNUM = ? AND bepsbo.BEPBOL_CODNUM = ?";
 		
@@ -942,8 +942,8 @@ public class ModeloSolicitud {
 	public List<MeritoSolicitudTable> getMeritosValoracionesSolicitudBolsa(Solicitud solicitud, Bolsa bolsa) throws SQLException, UVException {
 		List<MeritoSolicitudTable> meritos = new ArrayList<>();
 		
-		String consulta = "SELECT bepsbm.BEPMER_CODNUM, bepsbm.CODNUM FROM UVIRTUAL.TBEP_SOLICITUD_BOLSAS_MERITOS bepsbm"
-				+ "	LEFT JOIN UVIRTUAL.TBEP_SOLICITUD_BOLSAS_MERITOS_VALORACION bepsbv ON bepsbm.CODNUM = bepsbv.BEPSBM_CODNUM"
+		String consulta = "SELECT bepsbm.BEPMER_CODNUM, bepsbm.CODNUM FROM UVIRTUAL.TBEP_SOL_BOL_MERITOS bepsbm"
+				+ "	LEFT JOIN UVIRTUAL.TBEP_SOL_BOL_MER_VALORACION bepsbv ON bepsbm.CODNUM = bepsbv.BEPSBM_CODNUM"
 				+ "	INNER JOIN UVIRTUAL.TBEP_SOLICITUD_BOLSAS bepsbo ON bepsbo.CODNUM  = bepsbm.BEPSBO_CODNUM"
 				+ "	WHERE bepsbo.BEPBOL_CODNUM = ? AND bepsbo.BEPSOL_CODNUM = ? GROUP BY bepsbm.BEPMER_CODNUM, bepsbm.CODNUM";
 		
@@ -1068,7 +1068,7 @@ public class ModeloSolicitud {
 		String paramsExcluidas = BolsaEmpleoUtils.consultaMultiplesParametros(bolsasExcluidas.size());
 		
 		// eliminamos meritos
-		String sqlDeleteMeritos = "DELETE FROM TBEP_SOLICITUD_BOLSAS_MERITOS bepsbm"
+		String sqlDeleteMeritos = "DELETE FROM TBEP_SOL_BOL_MERITOS bepsbm"
 				+ " WHERE bepsbm.BEPSBO_CODNUM IN ("
 				+ "		SELECT bepsbo.CODNUM "
 				+ "		FROM TBEP_SOLICITUD_BOLSAS bepsbo "
@@ -1107,7 +1107,7 @@ public class ModeloSolicitud {
 	 * @throws SQLException .
 	 */
 	private void eliminarValoracionesDelMeritoSolicitud(Connection conexion, MeritoSolicitud meritoSolicitud) throws SQLException {
-		String sqlDelete = "DELETE FROM TBEP_SOLICITUD_BOLSAS_MERITOS_VALORACION bepsbv WHERE bepsbv.BEPSBM_CODNUM = ?";
+		String sqlDelete = "DELETE FROM TBEP_SOL_BOL_MER_VALORACION bepsbv WHERE bepsbv.BEPSBM_CODNUM = ?";
 		try (PreparedStatement stmt = conexion.prepareStatement(sqlDelete)) {
 			int indexParam = 1;
 			stmt.setInt(indexParam++, meritoSolicitud.getCodNum());
@@ -1122,9 +1122,9 @@ public class ModeloSolicitud {
 	 * @throws SQLException .
 	 */
 	public boolean comprobarMeritosAfinidadSinValoracion(Solicitud solicitud) throws SQLException {
-		String consulta = "SELECT * FROM UVIRTUAL.TBEP_SOLICITUD_BOLSAS_MERITOS bepsbm"
+		String consulta = "SELECT * FROM UVIRTUAL.TBEP_SOL_BOL_MERITOS bepsbm"
 				+ "	INNER JOIN UVIRTUAL.TBEP_SOLICITUD_BOLSAS bepsbo ON bepsbm.BEPSBO_CODNUM = bepsbo.CODNUM"
-				+ "	LEFT JOIN UVIRTUAL.TBEP_SOLICITUD_BOLSAS_MERITOS_VALORACION bepsbv ON bepsbv.BEPSBM_CODNUM  = bepsbm.CODNUM"
+				+ "	LEFT JOIN UVIRTUAL.TBEP_SOL_BOL_MER_VALORACION bepsbv ON bepsbv.BEPSBM_CODNUM  = bepsbm.CODNUM"
 				+ "	INNER JOIN UVIRTUAL.TBEP_MERITOS bepmer ON bepmer.CODNUM  = bepsbm.BEPMER_CODNUM"
 				+ "	INNER JOIN UVIRTUAL.TBEP_ITEMSBAREMACION bepite ON bepite.CODNUM = bepmer.BEPITE_CODNUM"
 				+ "	WHERE bepsbo.BEPSOL_CODNUM = ? AND bepite.AFINIDAD IS NOT NULL AND bepsbv.VALOR IS NULL";

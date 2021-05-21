@@ -93,13 +93,13 @@ public class ControladorParametrosConfiguracion extends HttpServlet {
 				default:
 					errorFatal(bean, "Acción no contemplada");
 			}
+		} catch (UVException e) {
+			LOGGER.log(Level.WARNING, e.toString());
+			bean.getMensajesDeError().add(e.getMessage());
 		} catch (SQLException e) {
 			LOGGER.log(Level.SEVERE, Formateador.getStackTrace(e));
 			LOGGER.log(Level.SEVERE, e.toString());
 			bean.getMensajesDeError().add("Error al acceder a la base de datos");
-		} catch (UVException e) {
-			LOGGER.log(Level.WARNING, e.toString());
-			bean.getMensajesDeError().add(e.getMessage());
 		} finally {
 			datos.getVistas().put(bean.getClass().getName(), bean);
 			datos.getFicherosJSP().add(bean.getVista());
@@ -114,7 +114,8 @@ public class ControladorParametrosConfiguracion extends HttpServlet {
 		}
 	}
 	
-	private void init(VistaParametrosConfiguracion bean, UVDatos datos, HttpServletRequest request, HttpServletResponse response) throws SQLException, UVException, IOException {
+	private void init(VistaParametrosConfiguracion bean, UVDatos datos, HttpServletRequest request, HttpServletResponse response) 
+			throws SQLException, UVException, IOException {
 		bean.setVista(RUTA_BEP_CONF + "index.jsp");
 		BolsaEmpleoUtils.readMensajeSession(bean, request);
 		try {

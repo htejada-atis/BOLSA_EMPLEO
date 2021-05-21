@@ -151,13 +151,13 @@ public class ControladorMisTitulaciones extends HttpServlet {
 				default:
 					errorFatal(bean, "Acción no contemplada");
 			}
+		} catch (UVException e) {
+			LOGGER.log(Level.WARNING, e.toString());
+			bean.getMensajesDeError().add(e.getMessage());
 		} catch (SQLException e) {
 			LOGGER.log(Level.SEVERE, Formateador.getStackTrace(e));
 			LOGGER.log(Level.SEVERE, e.toString());
 			bean.getMensajesDeError().add("Error al acceder a la base de datos");
-		} catch (UVException e) {
-			LOGGER.log(Level.WARNING, e.toString());
-			bean.getMensajesDeError().add(e.getMessage());
 		} finally {
 			datos.getVistas().put(bean.getClass().getName(), bean);
 			datos.getFicherosJSP().add(bean.getVista());
@@ -326,7 +326,7 @@ public class ControladorMisTitulaciones extends HttpServlet {
 		
 		ModeloMisTitulaciones modelo = ModeloMisTitulaciones.obtenerInstancia();
 		
-		List<TitulacionUsuario> titulaciones = modelo.getTitulacionesUsuarios(selected);
+		List<TitulacionUsuario> titulaciones = modelo.getTitulacionesUsuarioByIds(selected);
 
 		modelo.borraTitulacionUsuario(titulaciones);
 		
@@ -348,7 +348,7 @@ public class ControladorMisTitulaciones extends HttpServlet {
 			throws SQLException, UVException, IOException {
 		ModeloMisTitulaciones modelo = ModeloMisTitulaciones.obtenerInstancia();
 		if (EscapaHTML.ajustaCodificacion(request.getParameter(PARAM_FICHERO)) != null) {
-			TitulacionUsuario titulacion = modelo.listaTitulacionUsuario(Formateador.leeParametroInteger(request.getParameter(PARAM_FICHERO)));
+			TitulacionUsuario titulacion = modelo.getTitulacionUsuarioById(Formateador.leeParametroInteger(request.getParameter(PARAM_FICHERO)));
 			bean.setTitulacionUsuario(titulacion);
 			
 			response.setContentType("application/pdf");
