@@ -186,7 +186,7 @@ public final class UtilsTestBolsaEmpleo {
 		UtilsTestBolsaEmpleo.ejecutarFile(directory, esquema);
 	}
 
-	private static void ejecutarMultiplesScripts(String title, String path, String esquema, boolean reverse)
+	public static void ejecutarMultiplesScripts(String title, String path, String esquema, boolean reverse)
 			throws IOException, SQLException {
 		if (VERBOSE) {
 			LOGGER.log(Level.INFO, "[{0}]", title + " esquema: " + esquema);
