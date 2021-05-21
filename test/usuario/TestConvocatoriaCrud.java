@@ -25,7 +25,7 @@ import es.ujaen.uvirtual.utilidades.UVException;
  *
  */
 @FixMethodOrder(MethodSorters.NAME_ASCENDING)
-public class TestConvocatoriaCrud extends TestUsuarioBase {
+public class TestConvocatoriaCrud extends UtilsTestUsuarioBase {
 	private static final String NOMBREDEESTACLASE = TestConvocatoriaCrud.class.getName();
 
 	private static final Logger LOGGER = Logger.getLogger(NOMBREDEESTACLASE);

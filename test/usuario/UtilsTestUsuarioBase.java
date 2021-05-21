@@ -8,7 +8,7 @@ import org.junit.runner.Description;
 
 /** Clase de la que heredar los test de usuario.
  */
-public class TestUsuarioBase {
+public class UtilsTestUsuarioBase {
 	
 	protected String nombrePrueba;
 	
