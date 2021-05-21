@@ -527,7 +527,6 @@ public class ModeloUsuarioBolsaEmpleo {
 		usuario.setNumDocumento(rsArcos.getString("PRSNIF"));
 		usuario.setTipoDocumento(rsArcos.getString("STRTIPODOCUMENTO"));
 		usuario.setEmail(rsArcos.getString("EMAIL_ALTA"));
-		usuario.setSexo(rsArcos.getString("SEXO"));
 		usuario.setNombre(rsArcos.getString("STRNOMBRE"));
 		usuario.setPrimerApellido(rsArcos.getString("STRAPELLIDO1"));
 		usuario.setSegundoApellido(rsArcos.getString("STRAPELLIDO2"));
@@ -579,7 +578,6 @@ public class ModeloUsuarioBolsaEmpleo {
 		usuario.setProvincia(rs.getString("PROVINCIA"));
 		usuario.setTelefono(rs.getString("TELEFONO"));
 		usuario.setNacionalidad(rs.getString("NACIONALIDAD"));
-		usuario.setSexo(rs.getString("SEXO"));
 		usuario.setRol(modeloRol.getRoleById(rs.getInt("ROL")));
 		usuario.setListaDist(rs.getString("FLGLISTADISTRIBUCION").equals("S"));
 		usuario.setExcluido(rs.getString("FLGEXCLUIDO").equals("S"));
