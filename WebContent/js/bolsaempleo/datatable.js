@@ -189,6 +189,9 @@ function DataTable(id, config) {
     		var check = $('<input type="checkbox"/>');
 
             if (row.selected) {
+                if (columnDef.selectable.hasOwnProperty('disabled') && columnDef.selectable.disabled) {
+                    $(check).attr("disabled", true);
+                }
                 self.checked[value] = true;
                 check.prop('checked', true);
                 self.renderFooter();

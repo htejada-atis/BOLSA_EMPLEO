@@ -178,7 +178,6 @@ UsuarioBolsaEmpleo usuarioBolsa = bean.getUsuario();
     
 	<% if(bean.getApartadoAreasExcluidas()!=null){ %>
 		<table class="bluetable bolsaempleo" id="table_areas_excluidas">
-  			<caption class="table-title">햞eas excluidas para el usuario</caption>  
 			<tr>
 				<th scope="col" style="width:5%"></th>
 				<th scope="col" style="width:20%" title="Id de la area">Id</th>
@@ -196,7 +195,6 @@ UsuarioBolsaEmpleo usuarioBolsa = bean.getUsuario();
 		
 		
 		<table class="bluetable bolsaempleo" id="table_areas">
-  			<caption class="table-title">Listado de 햞eas</caption>  
 			<tr>
 				<th scope="col" style="width:5%"></th>
 				<th scope="col" style="width:20%" title="Id de la area">Id</th>
@@ -338,6 +336,7 @@ UsuarioBolsaEmpleo usuarioBolsa = bean.getUsuario();
 		    "selectable": true,
 		    "pageSize": 10,
 		    "filterable": true,
+		    "title": 'Listado de 햞eas',
 		    "action": "<%= ControladorAreasABaremar.ACCION_DATATABLE_EXCLUIDOS %>",
 		    "columns": [
 		    	{'data': 'area.codNum', 'selectable': true},
@@ -356,6 +355,7 @@ UsuarioBolsaEmpleo usuarioBolsa = bean.getUsuario();
 		    "selectable": true,
 		    "pageSize": 10,
 		    "filterable": true,
+		    "title": '햞eas excluidas para el usuario',
 		    "action": "<%= ControladorUsuarioBolsaEmpleo.ACCION_DATATABLE_USUARIOS_EXCLUIDOS_AREA %>",
 		    "columns": [
 		    	{'data': 'area.codNum', 'selectable': true},

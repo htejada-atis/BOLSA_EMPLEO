@@ -46,6 +46,10 @@
 	text-overflow: ellipsis;
 }
 
+.bolsa-empleo .icon {
+	line-height: 12px;
+}
+
 .bolsa-empleo .only-icon {
 	padding: 0px;
 }
@@ -559,6 +563,7 @@ nav-bolsa-empleo a:active, nav-bolsa-empleo a:hover {
 	width: 10px !important;
 }
 
+/* circles */
 .circle-true, .circle-false, .circle-neutral {
 	width: 10px;
 	height: 10px;
@@ -567,24 +572,25 @@ nav-bolsa-empleo a:active, nav-bolsa-empleo a:hover {
 	border-radius: 50%;
 	margin: 0 auto;
 }
-
 .circle-true {
 	background: #5cb85c;
 }
-
 .circle-false {
 	background: #cc0000;
 }
-
 .circle-neutral {
 	background: #babdb6;
 }
 
-.table-title{
-	background-color:#B9C9FE;
-	font-size: 13px;
-	color:#003399;
-	padding:0.5rem;
+/* text colors */
+.text-danger {
+    color: #cc0000!important;
+}
+.text-success {
+	color: #5cb85c!important;
+}
+.text-primary {
+	color: #003399!important;
 }
 
 /* Botones */
