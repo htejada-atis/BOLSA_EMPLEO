@@ -234,9 +234,10 @@ public class ControladorAfinidades extends HttpServlet {
 		bean.setAfinidad(afinidad);
 		
 		if (EscapaHTML.ajustaCodificacion(request.getParameter(PARAM_DESCRIPCION)) != null) {
-			Afinidad afinidadForm = this.validarAfinidad(request); 			
-			Afinidad afinidadEdit = new Afinidad(afinidad.getCodNum(), afinidadForm.getCodigo(), afinidadForm.getDescripcion(), afinidadForm.getModulacion()); 
-			modelo.actualizaAfinidad(afinidadEdit);
+			Afinidad afinidadForm = this.validarAfinidad(request);
+			afinidadForm.setCodNum(afinidad.getCodNum());
+			
+			modelo.actualizaAfinidad(afinidadForm);
 			
 			this.index(bean);
 			
