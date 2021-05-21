@@ -30,6 +30,9 @@ public class ModeloAfinidad {
 	public static final int COLUMN_CODIGO_MAXLENGTH = 4;
 	
 	public static final String MENSAJE_ERROR_NO_EXISTE_AFINIDAD = "No existe la afinidad";
+	public static final String MENSAJE_ERROR_AFINIDAD_NULL = "No se puede insertar una afinidad vacio";
+	public static final String MENSAJE_AFINIDAD_OBLIGATORIA = "Afinidad obligatorio";
+	public static final String MENSAJE_AFINIDAD_CODNUM_REQUERIDO = "id afinidad no válido";
 	
 	public static final String CODNUM = "CODNUM";
 	public static final String CODIGO = "CODIGO";
@@ -38,8 +41,9 @@ public class ModeloAfinidad {
 	
 	protected static ModeloAfinidad eInstancia;
 
-	/** Crea una instancia del objeto.
-	 *  de forma sincronizada para protegerse de posibles problemas multi-hilo
+	/**
+	 * Crea una instancia del objeto. de forma sincronizada para protegerse de
+	 * posibles problemas multi-hilo
 	 */
 	private static synchronized void crearInstancia() {
 		if (eInstancia == null) {
@@ -47,10 +51,11 @@ public class ModeloAfinidad {
 		}
 	}
 
-    /**
-     * Obtiene una instancia de la conexión.
-     * @return instancia
-     */
+	/**
+	 * Obtiene una instancia de la conexión.
+	 * 
+	 * @return instancia
+	 */
 	public static ModeloAfinidad obtenerInstancia() {
 		if (eInstancia == null) {
 			crearInstancia();
@@ -59,11 +64,12 @@ public class ModeloAfinidad {
 	}
 	
 	/**
-	 * Listado de afinidades. 
+	 * Listado de afinidades.
+	 * 
 	 * @param params para leer los parametros de paginación, ordenacion, etc
 	 * @return listado de afinidades
 	 * @throws SQLException en caso de error de base de datos
-	 * @throws UVException error si no existe la area
+	 * @throws UVException  error si no existe la area
 	 */
 	public BolsaEmpleoDataTable<Afinidad> listaAfinidadesDatatable(Map<String, String[]> params) throws SQLException, UVException {
 		List<Afinidad> afinidades = new ArrayList<>();
@@ -88,11 +94,7 @@ public class ModeloAfinidad {
 			
 			try (ResultSet rs = stmt.executeQuery()) {
 				while (rs.next()) {
-					Afinidad afinidad = new Afinidad();
-					afinidad.setCodNum(rs.getInt(CODNUM));
-					afinidad.setCodigo(rs.getString(CODIGO));
-					afinidad.setDescripcion(rs.getString(DESCRIPCION));
-					afinidad.setModulacion(rs.getDouble(MODULACION));	
+					Afinidad afinidad = createAfinidadFromResultSet(rs);
 					afinidades.add(afinidad);
 				}				
 			}	
@@ -103,6 +105,60 @@ public class ModeloAfinidad {
 		
 		return dataTable;
 	}	
+	
+	/**
+	 * Consulta afinidades en BBDD y las devuelve.
+	 * 
+	 * @return todas las afinidades de la base de datos ordenadas por modulacion de mayor a menor
+	 * @throws SQLException en caso de error de base de datos
+	 */
+	public List<Afinidad> listaAfinidades() throws SQLException {
+		List<Afinidad> afinidades = new ArrayList<>();
+		String consulta = "SELECT * FROM TBEP_AFINIDADES bepafi " + "WHERE bepafi.FLGBORRADO != 'S' "
+				+ "ORDER BY bepafi.MODULACION DESC";
+
+		try (Connection conexion = ConexionUvirtual.obtenerInstancia();
+				PreparedStatement stmt = conexion.prepareStatement(consulta)) {
+			try (ResultSet rs = stmt.executeQuery()) {
+				while (rs.next()) {
+					Afinidad afinidad = createAfinidadFromResultSet(rs);
+					afinidades.add(afinidad);
+				}
+			}
+		}
+
+		return afinidades;
+	}
+
+	/**
+	 * Añade una afinidad al sistema cerrada.
+	 * @param afinidad .	 
+	 * @return id afinidad creada.
+	 * @throws UVException .
+	 * @throws SQLException .
+	 */
+	public Integer nuevaAfinidad(Afinidad afinidad) throws SQLException, UVException {
+		if (afinidad == null) {
+			throw new UVException(MENSAJE_ERROR_AFINIDAD_NULL);
+		}
+		
+		String consulta = "INSERT INTO TBEP_AFINIDADES (CODIGO, DESCRIPCION, MODULACION) VALUES (?, ?, ?)";
+			
+		try (Connection conexion = ConexionUvirtual.obtenerInstancia();
+				PreparedStatement stmt = conexion.prepareStatement(consulta, new String[]{CODNUM})) {
+			int parameterIndex = 1;
+			
+			stmt.setString(parameterIndex++, afinidad.getCodigo());
+			stmt.setString(parameterIndex++, afinidad.getDescripcion());
+			stmt.setDouble(parameterIndex++, afinidad.getModulacion());
+			stmt.executeUpdate();
+			
+			ResultSet rs = stmt.getGeneratedKeys();
+			rs.next();
+			
+			return rs.getInt(1);
+		}	
+	}
 	
 	/**
 	 * Devuelve un listado de afinidades por su id.
@@ -119,98 +175,6 @@ public class ModeloAfinidad {
 	    }
 		
 		return afinidades;
-	}
-	
-	/** Consulta afinidades en BBDD y las devuelve.
-	 * @return todas las afinidades de la base de datos ordenadas por modulacion de mayor a menor
-	 * @throws SQLException en caso de error de base de datos
-	 */
-	public List<Afinidad> listaAfinidades() throws SQLException {
-		List<Afinidad> afinidades = new ArrayList<>();
-		String consulta = "SELECT * FROM TBEP_AFINIDADES bepafi "
-				+ "WHERE bepafi.FLGBORRADO != 'S' "
-				+ "ORDER BY bepafi.MODULACION DESC";
-		
-		try (Connection conexion = ConexionUvirtual.obtenerInstancia();
-				PreparedStatement stmt = conexion.prepareStatement(consulta)) {
-			try (ResultSet rs = stmt.executeQuery()) {
-				while (rs.next()) {
-					Afinidad afinidad = new Afinidad();
-					afinidad.setCodNum(rs.getInt(CODNUM));
-					afinidad.setCodigo(rs.getString(CODIGO));
-					afinidad.setDescripcion(rs.getString(DESCRIPCION));
-					afinidad.setModulacion(rs.getDouble(MODULACION));
-					afinidades.add(afinidad);
-				}
-			}
-		}
-
-		return afinidades;
-	}
-	
-	/** Consulta afinidades en BBDD y las devuelve.
-	 * @return todas las afinidades de la base de datos
-	 * @throws SQLException en caso de error de base de datos
-	 */
-	public List<Afinidad> listaAfinidadesSelect() throws SQLException {
-		List<Afinidad> afinidades = new ArrayList<>();
-		String consulta = "SELECT bepafi.CODIGO, bepafi.DESCRIPCION FROM TBEP_AFINIDADES bepafi "
-				+ "WHERE bepafi.FLGBORRADO != 'S' GROUP BY CODIGO, DESCRIPCION";
-		
-		try (Connection conexion = ConexionUvirtual.obtenerInstancia();
-				PreparedStatement stmt = conexion.prepareStatement(consulta)) {
-			try (ResultSet rs = stmt.executeQuery()) {
-				while (rs.next()) {
-					Afinidad afinidad = new Afinidad();
-					afinidad.setCodigo(rs.getString(CODIGO));
-					afinidad.setDescripcion(rs.getString(DESCRIPCION));
-					afinidades.add(afinidad);
-				}
-			}
-		}
-
-		return afinidades;
-	}
-	
-	/**
-	 * Añade una afinidad al sistema cerrada.
-	 * @param afinidad .	 
-	 * @throws UVException .
-	 * @throws SQLException .
-	 */
-	public void nuevaAfinidad(Afinidad afinidad) throws SQLException, UVException {
-		if (afinidad == null) {
-			throw new UVException("No se puede insertar una afinidad vacio");
-		}
-		if (afinidad.getCodNum() != null) {
-			String consulta =
-					"INSERT INTO TBEP_AFINIDADES (CODNUM, CODIGO, DESCRIPCION, MODULACION) " 
-					+ "VALUES (?, ?, ?, ?)";
-				
-			try (Connection conexion = ConexionUvirtual.obtenerInstancia();
-					PreparedStatement stmt = conexion.prepareStatement(consulta)) {
-				int parameterIndex = 1;
-				stmt.setInt(parameterIndex++, afinidad.getCodNum());
-				stmt.setString(parameterIndex++, afinidad.getCodigo());
-				stmt.setString(parameterIndex++, afinidad.getDescripcion());
-				stmt.setDouble(parameterIndex++, afinidad.getModulacion());
-				stmt.executeUpdate();
-			}
-		} else {
-			String consulta =
-					"INSERT INTO TBEP_AFINIDADES (CODIGO, DESCRIPCION, MODULACION) " 
-					+ "VALUES (?, ?, ?)";
-				
-			try (Connection conexion = ConexionUvirtual.obtenerInstancia();
-					PreparedStatement stmt = conexion.prepareStatement(consulta)) {
-				int parameterIndex = 1;
-				stmt.setString(parameterIndex++, afinidad.getCodigo());
-				stmt.setString(parameterIndex++, afinidad.getDescripcion());
-				stmt.setDouble(parameterIndex++, afinidad.getModulacion());
-				stmt.executeUpdate();
-			}	
-		}
-
 	}
 	
 	/**
@@ -234,51 +198,11 @@ public class ModeloAfinidad {
 					throw new UVException(MENSAJE_ERROR_NO_EXISTE_AFINIDAD);
 				}
 				
-				Afinidad afinidad = new Afinidad();
-				afinidad.setCodNum(rs.getInt(CODNUM));
-				afinidad.setCodigo(rs.getString(CODIGO));
-				afinidad.setDescripcion(rs.getString(DESCRIPCION));
-				afinidad.setModulacion(rs.getDouble(MODULACION));
-				
-				if ("S".equals(rs.getString("FLGBORRADO"))) {
-					throw new UVException("La afinidad ha sido borrada");
-				}
-				
-				return afinidad;
+				return this.createAfinidadFromResultSet(rs);				
 			}
 		}
 	}
-	
-	/**
-	 * Devuelve una afinidad por su codigo.
-	 * @param codigo .
-	 * @return Afinidad o null si no existe
-	 * @throws SQLException .
-	 */
-	public Afinidad getAfinidadByCodigo(String codigo) throws SQLException, UVException {
-		if (codigo == null) {
-			throw new UVException(MENSAJE_ERROR_NO_EXISTE_AFINIDAD);
-		}
-		String consulta = "SELECT bepafi.CODIGO, bepafi.DESCRIPCION FROM TBEP_AFINIDADES bepafi WHERE bepafi.CODIGO = ? GROUP BY CODIGO, DESCRIPCION";
-			
-		try (Connection conexion = ConexionUvirtual.obtenerInstancia();
-				PreparedStatement stmt = conexion.prepareStatement(consulta)) {
-			stmt.setString(1, codigo);
-						
-			try (ResultSet rs = stmt.executeQuery()) {
-				if (!rs.next()) {
-					throw new UVException(MENSAJE_ERROR_NO_EXISTE_AFINIDAD);
-				}
-				
-				Afinidad afinidad = new Afinidad();
-				afinidad.setCodigo(rs.getString(CODIGO));
-				afinidad.setDescripcion(rs.getString(DESCRIPCION));
-				
-				return afinidad;
-			}
-		}
-	}
-	
+		
 	/** Actualiza una afinidad.
 	 * @param afi Afinidad con los datos nuevos a actualizar
 	 * @throws SQLException en caso de error en la BD
@@ -286,10 +210,10 @@ public class ModeloAfinidad {
 	 */
 	public void actualizaAfinidad(Afinidad afi) throws SQLException, UVException {
 		if (afi == null) {
-			throw new UVException("Afinidad obligatorio");
+			throw new UVException(MENSAJE_AFINIDAD_OBLIGATORIA);
 		}
 		if (afi.getCodNum() == null) {
-			throw new UVException("id afinidad no válido");
+			throw new UVException(MENSAJE_AFINIDAD_CODNUM_REQUERIDO);
 		}
 		
 		String consulta = "UPDATE tbep_afinidades "
@@ -326,25 +250,6 @@ public class ModeloAfinidad {
 		}
 	}
 	
-	/** Elimina una afinidad.
-	 * @param afinidad a borrar
-	 * @throws SQLException en caso de error en la BD
-	 * @throws UVException si noticia no es valida
-	 */
-	public void borraAfinidad(Afinidad afinidad) throws SQLException, UVException {
-		if (afinidad == null) {
-			throw new UVException("No se puede eliminar una afinidad vacía");
-		}
-		if (afinidad.getCodNum() == null) {
-			throw new UVException("No se puede eliminar una afinidad con id vacío");
-		}
-		
-		List<Afinidad> afinidades = new ArrayList<>();
-		afinidades.add(this.getAfinidadById(afinidad.getCodNum()));
-		
-		borraAfinidades(afinidades);
-	}
-
 	/** Devuelve los tipos de afinidad disponibles.
 	 * 
 	 * @return lista de tipos de afinidad.
@@ -367,5 +272,16 @@ public class ModeloAfinidad {
 		}
 
 		return afinidades;
+	}
+	
+	private Afinidad createAfinidadFromResultSet(ResultSet rs) throws SQLException {
+		Afinidad afinidad = new Afinidad();
+		afinidad.setCodNum(rs.getInt(CODNUM));
+		afinidad.setCodigo(rs.getString(CODIGO));
+		afinidad.setDescripcion(rs.getString(DESCRIPCION));
+		afinidad.setModulacion(rs.getDouble(MODULACION));
+		afinidad.setBorrada("S".equals(rs.getString("FLGBORRADO")));
+		afinidad.setFechaBorrada(rs.getDate("FECHA_BORRADO"));
+		return afinidad;
 	}
 }
