@@ -29,6 +29,7 @@ public class UtilsTestDocentia {
 	public static void inicializaDocentia() throws SQLException, IOException, UVException {
 		if (!inicializado) {
 			BbddRunner.conectarBd();
+			BbddRunner.inicializaBd();
 			BbddRunner.ejecutar("Documentos/scripts/opc.docentia/datos_desarrollo/dropTables.sql");
 			BbddRunner.ejecutar("Documentos/scripts/opc.docentia/creartablasdocentia.sql");
 			BbddRunner.ejecutar("Documentos/scripts/opc.docentia/creacionsecuenciasytriggers.sql");
