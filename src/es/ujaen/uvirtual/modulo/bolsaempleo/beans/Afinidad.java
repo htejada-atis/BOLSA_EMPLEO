@@ -1,8 +1,11 @@
 package es.ujaen.uvirtual.modulo.bolsaempleo.beans;
 
-/** Clase afinidades de bolsa empleo.
- * @author fcampos
- *
+import java.util.Date;
+
+/**
+ * Clase afinidades de bolsa empleo.
+ * 
+ * @author ATISoluciones
  */
 public class Afinidad {
 	private static final long serialVersionUID = 1L;
@@ -10,6 +13,8 @@ public class Afinidad {
 	private String codigo;
 	private String descripcion;
 	private Double modulacion;
+	private Boolean borrada;
+	private Date fechaBorrada;
 	
 	/** Constructor por defecto.
 	 */
@@ -19,6 +24,8 @@ public class Afinidad {
 		this.codigo = "";
 		this.descripcion = "";
 		this.modulacion = null;
+		this.borrada = null;
+		this.fechaBorrada = null;
 	}
 	
 	/** Constructor con parametros.
@@ -26,13 +33,17 @@ public class Afinidad {
 	 * @param pcodigo .
 	 * @param pdescripcion .
 	 * @param pmodulacion .
+	 * @param pborrada .
+	 * @param pfechaBorrada .
 	 */
-	public Afinidad(Integer pcodNum, String pcodigo, String pdescripcion, Double pmodulacion) {
+	public Afinidad(Integer pcodNum, String pcodigo, String pdescripcion, Double pmodulacion, Boolean pborrada, Date pfechaBorrada) {
 		super();
 		this.codNum = pcodNum;
 		this.codigo = pcodigo;
 		this.descripcion = pdescripcion;
 		this.modulacion = pmodulacion;
+		this.borrada = pborrada;
+		this.fechaBorrada = pfechaBorrada;
 	}
 
 	/** Constructor copia.
@@ -43,6 +54,8 @@ public class Afinidad {
 		this.codigo = copia.codigo;
 		this.descripcion = copia.descripcion;
 		this.modulacion = copia.modulacion;
+		this.borrada = copia.borrada;
+		this.fechaBorrada = copia.fechaBorrada;
 	}
 	
 	public Integer getCodNum() {
@@ -77,6 +90,22 @@ public class Afinidad {
 		this.modulacion = pmodulacion;
 	}
 	
+	public void setBorrada(Boolean borrada) {
+		this.borrada = borrada;
+	}
+	
+	public Boolean getBorrada() {
+		return this.borrada;
+	}
+	
+	public void setFechaBorrada(Date f) {
+		this.fechaBorrada = f;
+	}
+	
+	public Date getFechaBorrada() {
+		return this.fechaBorrada;
+	}
+	
 	public String getCodigoDescripcion() {
 		return this.getCodigo() + " - " + this.getDescripcion() + " (" + this.getModulacion() + " %)"; 
 	}
@@ -88,7 +117,7 @@ public class Afinidad {
 	@Override
 	public String toString() {
 		return "Afinidad [codNum=" + codNum + ", codigo=" + codigo + ", descripcion=" + descripcion + ", modulacion="
-				+ modulacion + "]";
+				+ modulacion + ", borrada=" + borrada + ", fechaBorrada=" + fechaBorrada + "]";
 	}
 	
 	@Override
@@ -99,6 +128,8 @@ public class Afinidad {
 		result = prime * result + ((codigo == null) ? 0 : codigo.hashCode());
 		result = prime * result + ((descripcion == null) ? 0 : descripcion.hashCode());
 		result = prime * result + ((modulacion == null) ? 0 : modulacion.hashCode());
+		result = prime * result + ((borrada == null) ? 0 : borrada.hashCode());
+		result = prime * result + ((fechaBorrada == null) ? 0 : fechaBorrada.hashCode());
 		return result;
 	}
 
@@ -141,6 +172,20 @@ public class Afinidad {
 				return false;
 			}
 		} else if (!modulacion.equals(other.modulacion)) {
+			return false;
+		}
+		if (borrada == null) {
+			if (other.borrada != null) {
+				return false;
+			}
+		} else if (!borrada.equals(other.borrada)) {
+			return false;
+		}
+		if (fechaBorrada == null) {
+			if (other.fechaBorrada != null) {
+				return false;
+			}
+		} else if (!fechaBorrada.equals(other.fechaBorrada)) {
 			return false;
 		}
 		
