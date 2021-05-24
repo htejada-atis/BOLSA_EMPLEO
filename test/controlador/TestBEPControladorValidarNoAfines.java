@@ -36,9 +36,6 @@ public class TestBEPControladorValidarNoAfines {
 	private static final String MENSAJE_SIN_ADVERTENCIAS = "No debe mostrar advertencias";
 	private static final String MENSAJE_SIN_ERROR = "No debe devolver error";
 	private static final String MENSAJE_SIN_EXITO = "No debe exito";
-	private static final String MENSAJE_SOLICITUDES_DEVUELTAS = "Debe devolver solicitudes";
-	private static final String MENSAJE_SOLICITUD_DEVUELTA = "Debe devolver solicitud";
-	
 	
     /** prepara la bd con los datos iniciales.
      * @throws SQLException si error en bd .
