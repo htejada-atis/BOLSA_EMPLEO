@@ -3,7 +3,6 @@ package es.ujaen.uvirtual.modulo.bolsaempleo.controlador;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.sql.SQLException;
-import java.sql.SQLIntegrityConstraintViolationException;
 import java.util.logging.Logger;
 import java.util.List;
 import java.util.logging.Level;
@@ -15,7 +14,6 @@ import javax.servlet.http.HttpServletResponse;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.reflect.TypeToken;
-
 import es.ujaen.uvirtual.beans.CodigoDescripcion;
 import es.ujaen.uvirtual.beans.UVDatos;
 import es.ujaen.uvirtual.modulo.bolsaempleo.beans.BolsaCandidatoValidacionTable;
@@ -265,22 +263,21 @@ public class ControladorValidarNoAfines extends HttpServlet {
 		ModeloValidar modeloValidar = ModeloValidar.obtenerInstancia();
 		Gson gson = new GsonBuilder().create();
 		
-		if (EscapaHTML.ajustaCodificacion(request.getParameter(PARAM_ACEPTAR_MERITO)) != null) {
-			try {
-				List<String> bolsas = gson.fromJson(request.getParameter(PARAM_BOLSAS), new TypeToken<List<String>>() { }.getType());
-				System.out.println(bolsas.toString());
-				BolsaEmpleoUtils.addMensajeDeExito("", bean, request);
-			} catch (Exception ex) {
-				BolsaEmpleoUtils.addMensajeDeError(MENSAJE_ERROR_MERITOS_SELECCIONADOS_INCORRECTOS, bean, request);
+		try {
+			List<String> bolsas = gson.fromJson(request.getParameter(PARAM_BOLSAS), new TypeToken<List<String>>() { }.getType());
+			System.out.println(bolsas.toString());
+			BolsaEmpleoUtils.addMensajeDeExito("", bean, request);
+			
+			if (EscapaHTML.ajustaCodificacion(request.getParameter(PARAM_ACEPTAR_MERITO)) != null) {
+				System.out.println("entra en aceptar");
+			} else if (EscapaHTML.ajustaCodificacion(request.getParameter(PARAM_EXCLUIR_MERITO)) != null) {
+				System.out.println("entra excluir");
+			} else if (EscapaHTML.ajustaCodificacion(request.getParameter(PARAM_GUARDAR_MERITO)) != null) {
+				System.out.println("entra en guardar");
 			}
-		}
-
-		if (EscapaHTML.ajustaCodificacion(request.getParameter(PARAM_EXCLUIR_MERITO)) != null) {
 			
-		}
-		
-		if (EscapaHTML.ajustaCodificacion(request.getParameter(PARAM_GUARDAR_MERITO)) != null) {
-			
+		} catch (Exception ex) {
+			BolsaEmpleoUtils.addMensajeDeError(MENSAJE_ERROR_MERITOS_SELECCIONADOS_INCORRECTOS, bean, request);
 		}
 		
 	}
