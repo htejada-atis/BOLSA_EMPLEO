@@ -176,7 +176,7 @@ UsuarioBolsaEmpleo candidato = bean.getCandidato();
 		    	<div class="form-group-container col1">
 			    	<div class="form-group">
 			    		<label for="merito_observacion_candidato">Observación para el candidato:</label>
-			    		<textarea class="form-input-custom" id="merito_observacion_candidato" name="" rows="2" cols="50"></textarea>
+			    		<textarea class="form-input-custom" id="merito_observacion_candidato" name="<%= ControladorValidarNoAfines.PARAM_OBSERVACIONES_CANDIDATO %>" rows="2" cols="50"></textarea>
 			    	</div>
 		    	</div>
 		    	<div class="form-btn">
@@ -342,12 +342,6 @@ $(document).ready(function() {
 		        		}
 		        	}}
 			    ]
-			});
-			
-			$("#validar_merito").on("submit", function() {
-				console.log(Atis.object2Json(tableBolsasCandidato.getCheckedItems()));
-				this.elements['<%= ControladorValidarNoAfines.PARAM_BOLSAS %>'].value = Atis.object2Json(tableBolsasCandidato.getCheckedItems());
-				return false;
 			});
 			
 			document.getElementById("validar_merito").addEventListener("submit", function() {

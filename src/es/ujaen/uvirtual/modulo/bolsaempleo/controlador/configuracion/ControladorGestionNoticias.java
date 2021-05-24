@@ -41,7 +41,6 @@ public class ControladorGestionNoticias extends HttpServlet {
 	private static final String NOMBREDEESTACLASE = ControladorGestionNoticias.class.getName();
 	private static final Logger LOGGER = Logger.getLogger(NOMBREDEESTACLASE);
 	
-	
 	// Acciones
 	public static final String ACCION_AGREGAR_NOTICIA = "agregarnoticia";
 	public static final String ACCION_DATATABLE = "datatable";

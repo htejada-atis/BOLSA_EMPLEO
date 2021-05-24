@@ -192,7 +192,7 @@ function DataTable(id, config) {
                 if (columnDef.selectable.hasOwnProperty('disabled') && columnDef.selectable.disabled) {
                     $(check).attr("disabled", true);
                 }
-                
+                typeof value !== 'undefined' ? self.checked[value] = true : '';
                 check.prop('checked', true);
                 self.renderFooter();
             }

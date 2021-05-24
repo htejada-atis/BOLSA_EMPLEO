@@ -13,7 +13,6 @@ import es.ujaen.uvirtual.modelo.conexion.ConexionUvirtual;
 import es.ujaen.uvirtual.modulo.bolsaempleo.beans.Bolsa;
 import es.ujaen.uvirtual.modulo.bolsaempleo.beans.BolsaCandidatoValidacionTable;
 import es.ujaen.uvirtual.modulo.bolsaempleo.beans.BolsaValidacion;
-import es.ujaen.uvirtual.modulo.bolsaempleo.beans.Candidato;
 import es.ujaen.uvirtual.modulo.bolsaempleo.beans.CandidatoValidacion;
 import es.ujaen.uvirtual.modulo.bolsaempleo.beans.Convocatoria;
 import es.ujaen.uvirtual.modulo.bolsaempleo.beans.Merito;
@@ -552,25 +551,79 @@ public class ModeloValidar {
 	}
 	
 	/**
-	 * Validar méritos no afines .
-	 * @param meritosSolicitud .
+	 * Método para validar mérito .
+	 * @param idBolsa .
+	 * @param idMerito .
+	 * @param observacion .
+	 * @throws SQLException .
 	 */
-	public void validarMeritos(Collection<String> meritosSolicitud) throws SQLException, UVException {
-		
-		for (String mer : meritosSolicitud) {
-			validarMerito(mer);
-		}
-		
-	}
-	
-	private void validarMerito(String idMeritoSolicitud) throws SQLException {
-		String consulta = "UPDATE UVIRTUAL.TBEP_SOL_BOL_MERITOS bepsbm"
-				+ " SET FLGEXCLUIDO = 'N', FLGVALIDADO = 'S'"
-				+ " WHERE bepsbm.CODNUM = ?";
+	public void validarMerito(String idBolsa, Integer idMerito, String observacion) throws SQLException {
+		String consulta = "UPDATE"
+				+ " (SELECT bepsbm.FLGEXCLUIDO AS EXCLUIDO, bepsbm.FLGVALIDADO AS VALIDADO, bepsbm.OBSERVACION_CANDIDATO AS OBSERVACION"
+				+ "  FROM UVIRTUAL.TBEP_SOL_BOL_MERITOS bepsbm"
+				+ "  INNER JOIN UVIRTUAL.TBEP_SOLICITUD_BOLSAS bepsbo"
+				+ "  ON bepsbo.CODNUM = bepsbm.BEPSBO_CODNUM"
+				+ "  WHERE bepsbo.BEPBOL_CODNUM = ? AND bepsbm.BEPMER_CODNUM = ?"
+				+ " ) MERITO"
+				+ " SET EXCLUIDO = 'N', VALIDADO = 'S', OBSERVACION = ?";
 
 		try (Connection conexion = ConexionUvirtual.obtenerInstancia(); PreparedStatement stmtUpdate = conexion.prepareStatement(consulta)) {
 			int indexParam = 1;
-			stmtUpdate.setString(indexParam++, idMeritoSolicitud);
+			stmtUpdate.setString(indexParam++, idBolsa);
+			stmtUpdate.setInt(indexParam++, idMerito);
+			stmtUpdate.setString(indexParam++, observacion);
+			stmtUpdate.executeUpdate();
+		}
+	}
+	
+	/**
+	 * Método para excluir un mérito .
+	 * @param idBolsa .
+	 * @param idMerito .
+	 * @param observacion .
+	 * @throws SQLException .
+	 */
+	public void excluirMerito(String idBolsa, Integer idMerito, String observacion) throws SQLException {
+		String consulta = "UPDATE"
+				+ " (SELECT bepsbm.FLGEXCLUIDO AS EXCLUIDO, bepsbm.FLGVALIDADO AS VALIDADO, bepsbm.OBSERVACION_CANDIDATO AS OBSERVACION"
+				+ "  FROM UVIRTUAL.TBEP_SOL_BOL_MERITOS bepsbm"
+				+ "  INNER JOIN UVIRTUAL.TBEP_SOLICITUD_BOLSAS bepsbo"
+				+ "  ON bepsbo.CODNUM = bepsbm.BEPSBO_CODNUM"
+				+ "  WHERE bepsbo.BEPBOL_CODNUM = ? AND bepsbm.BEPMER_CODNUM = ?"
+				+ " ) MERITO"
+				+ " SET EXCLUIDO = 'S', VALIDADO = 'N', OBSERVACION = ?";
+
+		try (Connection conexion = ConexionUvirtual.obtenerInstancia(); PreparedStatement stmtUpdate = conexion.prepareStatement(consulta)) {
+			int indexParam = 1;
+			stmtUpdate.setString(indexParam++, idBolsa);
+			stmtUpdate.setInt(indexParam++, idMerito);
+			stmtUpdate.setString(indexParam++, observacion);
+			stmtUpdate.executeUpdate();
+		}
+	}
+	
+	/**
+	 * Método para guardar un mérito .
+	 * @param idBolsa .
+	 * @param idMerito .
+	 * @param observacion .
+	 * @throws SQLException .
+	 */
+	public void guardarMerito(String idBolsa, Integer idMerito, String observacion) throws SQLException {
+		String consulta = "UPDATE"
+				+ " (SELECT bepsbm.OBSERVACION_CANDIDATO AS OBSERVACION"
+				+ "  FROM UVIRTUAL.TBEP_SOL_BOL_MERITOS bepsbm"
+				+ "  INNER JOIN UVIRTUAL.TBEP_SOLICITUD_BOLSAS bepsbo"
+				+ "  ON bepsbo.CODNUM = bepsbm.BEPSBO_CODNUM"
+				+ "  WHERE bepsbo.BEPBOL_CODNUM = ? AND bepsbm.BEPMER_CODNUM = ?"
+				+ " ) MERITO"
+				+ " SET OBSERVACION = ?";
+
+		try (Connection conexion = ConexionUvirtual.obtenerInstancia(); PreparedStatement stmtUpdate = conexion.prepareStatement(consulta)) {
+			int indexParam = 1;
+			stmtUpdate.setString(indexParam++, idBolsa);
+			stmtUpdate.setInt(indexParam++, idMerito);
+			stmtUpdate.setString(indexParam++, observacion);
 			stmtUpdate.executeUpdate();
 		}
 	}
