@@ -88,6 +88,7 @@ public class ControladorValidarNoAfines extends HttpServlet {
 	
 	// mensajes
 	public static final String MENSAJE_MERITO_ENVIADO = "meritoenviado";
+	public static final String MENSAJE_ERROR_ACCION_NO_CONTEMPLADA = "Acción no contemplada";
 	public static final String MENSAJE_ERROR_NO_HAY_BOLSAS_SELECCIONADAS = "No hay bolsas seleccionadas";
 	public static final String MENSAJE_EXITO_MERITO_EXCLUIDO = "Mérito excluido correctamente para la bolsa: %s";
 	public static final String MENSAJE_EXITO_MERITO_GUARDAR = "Mérito guardado correctamente para la bolsa: %s";
@@ -207,7 +208,7 @@ public class ControladorValidarNoAfines extends HttpServlet {
 	
 	private void accionNodefinida(VistaValidarNoAfines bean) {
 		bean.setVista("/WEB-INF/jsp/vista/infadministrativa/bolsaempleo/error.jsp");
-		bean.getMensajesDeError().add("Acción no definida");
+		bean.getMensajesDeError().add(MENSAJE_ERROR_ACCION_NO_CONTEMPLADA);
 	}
 	
 	private void bolsaSeleccionada(VistaValidarNoAfines bean, UVDatos datos, HttpServletRequest request, HttpServletResponse response, String nombreAccion) 
