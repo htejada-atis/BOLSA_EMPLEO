@@ -3,7 +3,9 @@ package es.ujaen.uvirtual.modulo.bolsaempleo.controlador;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.sql.SQLException;
+import java.sql.SQLIntegrityConstraintViolationException;
 import java.util.logging.Logger;
+import java.util.List;
 import java.util.logging.Level;
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
@@ -11,6 +13,9 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
+import com.google.gson.reflect.TypeToken;
+
 import es.ujaen.uvirtual.beans.CodigoDescripcion;
 import es.ujaen.uvirtual.beans.UVDatos;
 import es.ujaen.uvirtual.modulo.bolsaempleo.beans.BolsaCandidatoValidacionTable;
@@ -67,15 +72,20 @@ public class ControladorValidarNoAfines extends HttpServlet {
 	public static final String PARAM_ACCION = "a";
 	public static final String PARAM_ACEPTAR_MERITO = "aceptarmerito";
 	public static final String PARAM_BOLSA = "bolsa";
+	public static final String PARAM_BOLSAS = "bolsas";
 	public static final String PARAM_CANDIDATO = "candidato";
 	public static final String PARAM_EXCLUIR_MERITO = "excluirmerito";
 	public static final String PARAM_GUARDAR_MERITO = "guardarmerito";
 	public static final String PARAM_MERITO = "merito";
 	
+	
 	// vistas
 	public static final String RUTA_BEP_VALIDAR_NO_AFINES = "/WEB-INF/jsp/vista/infadministrativa/bolsaempleo/validarnoafines/";
 	public static final String JSQP_INDEX = RUTA_BEP_VALIDAR_NO_AFINES + "index.jsp";
 	public static final String JSP_MERITOS_CANDIDATOS = RUTA_BEP_VALIDAR_NO_AFINES + "meritoscandidatos.jsp";
+	
+	// mensajes
+	public static final String MENSAJE_ERROR_MERITOS_SELECCIONADOS_INCORRECTOS = "No hay méritos seleccionados válidos";
 	
 	// ajax 
 	public static final String URL_PATTERN_AJAX = "/srv/es/ajax/informacionadministrativa/bolsaempleo/validarnoafines";
@@ -253,9 +263,16 @@ public class ControladorValidarNoAfines extends HttpServlet {
 	
 	private void validarMerito(VistaValidarNoAfines bean, HttpServletRequest request, HttpServletResponse response) throws SQLException, UVException {
 		ModeloValidar modeloValidar = ModeloValidar.obtenerInstancia();
+		Gson gson = new GsonBuilder().create();
 		
 		if (EscapaHTML.ajustaCodificacion(request.getParameter(PARAM_ACEPTAR_MERITO)) != null) {
-			
+			try {
+				List<String> bolsas = gson.fromJson(request.getParameter(PARAM_BOLSAS), new TypeToken<List<String>>() { }.getType());
+				System.out.println(bolsas.toString());
+				BolsaEmpleoUtils.addMensajeDeExito("", bean, request);
+			} catch (Exception ex) {
+				BolsaEmpleoUtils.addMensajeDeError(MENSAJE_ERROR_MERITOS_SELECCIONADOS_INCORRECTOS, bean, request);
+			}
 		}
 
 		if (EscapaHTML.ajustaCodificacion(request.getParameter(PARAM_EXCLUIR_MERITO)) != null) {

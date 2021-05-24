@@ -288,7 +288,7 @@ public class ModeloValidar {
 		
 		String consulta = 
 				"SELECT bepbol.*, bepare.*,"
-				+ " (SELECT COUNT(*) FROM UVIRTUAL.TBEP_SOLICITUD_BOLSAS_MERITOS bepsbm"
+				+ " (SELECT COUNT(*) FROM UVIRTUAL.TBEP_SOL_BOL_MERITOS bepsbm"
 				+ "		INNER JOIN UVIRTUAL.TBEP_SOLICITUD_BOLSAS bepsbo ON bepsbo.CODNUM = bepsbm.BEPSBO_CODNUM"
 				+ "		WHERE bepsbm.BEPMER_CODNUM = ? AND bepsbo.BEPBOL_CODNUM = bepbol.CODNUM"
 				+ "	) AS CONTIENE_MERITO"
@@ -516,7 +516,7 @@ public class ModeloValidar {
 				+ "	INNER JOIN UVIRTUAL.TBEP_AREAS bepare ON bepare.CODNUM = bepbol.BEPARE_CODNUM"
 				+ "	INNER JOIN UVIRTUAL.TBEP_SOLICITUD_BOLSAS bepsbo ON bepbol.CODNUM = bepsbo.BEPBOL_CODNUM"
 				+ "	INNER JOIN UVIRTUAL.TBEP_SOLICITUDES bepsol ON bepsol.CODNUM = bepsbo.BEPSOL_CODNUM"
-				+ "	LEFT JOIN UVIRTUAL.TBEP_SOLICITUD_BOLSAS_MERITOS bepsbm ON bepsbm.BEPSBO_CODNUM = bepsbo.CODNUM AND bepsbm.BEPMER_CODNUM = ?"
+				+ "	LEFT JOIN UVIRTUAL.TBEP_SOL_BOL_MERITOS bepsbm ON bepsbm.BEPSBO_CODNUM = bepsbo.CODNUM AND bepsbm.BEPMER_CODNUM = ?"
 				+ "	WHERE bepbol.FLGBAREMABLE = 'S' AND bepsol.BEPCON_CODNUM = ? AND bepsol.BEPUSU_CODNUM = ?";
 		
 		dataTable.setQuery(consulta);
@@ -553,14 +553,26 @@ public class ModeloValidar {
 	
 	/**
 	 * Validar méritos no afines .
-	 * @param meritos .
+	 * @param meritosSolicitud .
 	 */
 	public void validarMeritos(Collection<String> meritosSolicitud) throws SQLException, UVException {
 		
 		for (String mer : meritosSolicitud) {
-			
+			validarMerito(mer);
 		}
 		
+	}
+	
+	private void validarMerito(String idMeritoSolicitud) throws SQLException {
+		String consulta = "UPDATE UVIRTUAL.TBEP_SOL_BOL_MERITOS bepsbm"
+				+ " SET FLGEXCLUIDO = 'N', FLGVALIDADO = 'S'"
+				+ " WHERE bepsbm.CODNUM = ?";
+
+		try (Connection conexion = ConexionUvirtual.obtenerInstancia(); PreparedStatement stmtUpdate = conexion.prepareStatement(consulta)) {
+			int indexParam = 1;
+			stmtUpdate.setString(indexParam++, idMeritoSolicitud);
+			stmtUpdate.executeUpdate();
+		}
 	}
 	
 	/**

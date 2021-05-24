@@ -113,6 +113,7 @@ UsuarioBolsaEmpleo candidato = bean.getCandidato();
 		    	<input type="hidden" name="<%= ControladorValidarNoAfines.PARAM_BOLSA %>" value="<%= bolsa.getCodNum() %>" />
 		    	<input type="hidden" name="<%= ControladorValidarNoAfines.PARAM_CANDIDATO %>" value="<%= candidato.getCodNum() %>" />
 		    	<input type="hidden" name="<%= ControladorValidarNoAfines.PARAM_MERITO %>" value="<%= merito.getMerito().getCodNum() %>" />
+		    	<input type="hidden" name="<%= ControladorValidarNoAfines.PARAM_BOLSAS %>" value="[<%= bolsa.getCodNum() %>]" />
 		    	<div class="form-group-container col1">
 			    	<div class="form-group">
 						<label class="bold-label" for="select_item">Categoría:</label>
@@ -193,11 +194,9 @@ UsuarioBolsaEmpleo candidato = bean.getCandidato();
 		    </form>
 				<% } else { %>
 					<p>Elija un mérito para cargar el formulario de edición</p>
-				
-				<% } %>
-				
 				</div>
 			</div>
+				<% } %>
 	<% } %>
 	
 </div>
@@ -343,6 +342,16 @@ $(document).ready(function() {
 		        		}
 		        	}}
 			    ]
+			});
+			
+			$("#validar_merito").on("submit", function() {
+				console.log(Atis.object2Json(tableBolsasCandidato.getCheckedItems()));
+				this.elements['<%= ControladorValidarNoAfines.PARAM_BOLSAS %>'].value = Atis.object2Json(tableBolsasCandidato.getCheckedItems());
+				return false;
+			});
+			
+			document.getElementById("validar_merito").addEventListener("submit", function() {
+				this.elements['<%= ControladorValidarNoAfines.PARAM_BOLSAS %>'].value = Atis.object2Json(tableBolsasCandidato.getCheckedItems());
 			});
 			
 		<% } %>

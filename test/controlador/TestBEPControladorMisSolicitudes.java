@@ -37,6 +37,11 @@ public class TestBEPControladorMisSolicitudes {
 	private static final String MENSAJE_SOLICITUDES_DEVUELTAS = "Debe devolver solicitudes";
 	private static final String MENSAJE_SOLICITUD_DEVUELTA = "Debe devolver solicitud";
 	
+	private static final int ELEMENT_0 = 0;
+	private static final int ELEMENT_1 = 1;
+	private static final int ELEMENT_2 = 2;
+	private static final int ELEMENT_3 = 2;
+	
 	
     /** prepara la bd con los datos iniciales.
      * @throws SQLException si error en bd .
@@ -50,7 +55,7 @@ public class TestBEPControladorMisSolicitudes {
     
     // método para obtener la vista con una lista de solicitudes .
     private VistaSolicitudes obtenerSolicitudes() throws ServletException, IOException {
-    	PeticionHttp peticion = UtilsTestBolsaEmpleo.peticionAutenticadaCandidato();
+    	PeticionHttp peticion = UtilsTestBolsaEmpleo.peticionAutenticadaCandidato2();
 		peticion.setParameter(ControladorMisSolicitudes.PARAM_ACCION, ControladorMisSolicitudes.ACCION_DATATABLE_SOLICITUDES);
 
 		RespuestaHttp respuesta = new RespuestaHttp();
@@ -61,7 +66,7 @@ public class TestBEPControladorMisSolicitudes {
     
     // método para obtener la vista con una lista de bolsas del usuario .
     private VistaSolicitudes obtenerAreas() throws ServletException, IOException {
-    	PeticionHttp peticion = UtilsTestBolsaEmpleo.peticionAutenticadaCandidato();
+    	PeticionHttp peticion = UtilsTestBolsaEmpleo.peticionAutenticadaCandidato2();
 		peticion.setParameter(ControladorMisSolicitudes.PARAM_ACCION, ControladorMisSolicitudes.ACCION_DATATABLE_AREAS);
 
 		RespuestaHttp respuesta = new RespuestaHttp();
@@ -74,7 +79,7 @@ public class TestBEPControladorMisSolicitudes {
     private VistaSolicitudes obtenerBolsasCandidato() throws ServletException, IOException {
     	VistaSolicitudes bean = obtenerSolicitudes();
     	
-    	PeticionHttp peticion = UtilsTestBolsaEmpleo.peticionAutenticadaCandidato();
+    	PeticionHttp peticion = UtilsTestBolsaEmpleo.peticionAutenticadaCandidato2();
 		peticion.setParameter(ControladorMisSolicitudes.PARAM_ACCION, ControladorMisSolicitudes.ACCION_DATATABLE_BOLSAS_SELECCIONADAS);
 		peticion.setParameter(ControladorMisSolicitudes.PARAM_SOLICITUD_ID, bean.getDatatableSolicitudes().getData().get(0).getCodNum().toString());
 
@@ -89,7 +94,7 @@ public class TestBEPControladorMisSolicitudes {
     	VistaSolicitudes bean = obtenerSolicitudes();
     	VistaSolicitudes bean2 = obtenerBolsasCandidato();
     	
-    	PeticionHttp peticion = UtilsTestBolsaEmpleo.peticionAutenticadaCandidato();
+    	PeticionHttp peticion = UtilsTestBolsaEmpleo.peticionAutenticadaCandidato2();
 		peticion.setParameter(ControladorMisSolicitudes.PARAM_ACCION, ControladorMisSolicitudes.ACCION_DATATABLE_MERITOS_BOLSA);
 		peticion.setParameter(ControladorMisSolicitudes.PARAM_SOLICITUD_ID, bean.getDatatableSolicitudes().getData().get(0).getCodNum().toString());
 		peticion.setParameter(ControladorMisSolicitudes.PARAM_BOLSA, bean2.getDatatableBolsasSolicitud().getData().get(0).getCodNum().toString());
@@ -111,7 +116,7 @@ public class TestBEPControladorMisSolicitudes {
 	 */
 	@Test
 	public void testA01() throws SQLException, ServletException, IOException {
-		PeticionHttp peticion = UtilsTestBolsaEmpleo.peticionAutenticadaCandidato();
+		PeticionHttp peticion = UtilsTestBolsaEmpleo.peticionAutenticadaCandidato2();
 		
 		RespuestaHttp respuesta = new RespuestaHttp();
 		ControladorMisSolicitudes controlador = new ControladorMisSolicitudes();
@@ -130,7 +135,7 @@ public class TestBEPControladorMisSolicitudes {
 	 */
 	@Test
 	public void testA02() throws SQLException, ServletException, IOException {
-		PeticionHttp peticion = UtilsTestBolsaEmpleo.peticionAutenticadaCandidato();
+		PeticionHttp peticion = UtilsTestBolsaEmpleo.peticionAutenticadaCandidato2();
 		peticion.setParameter(ControladorMisSolicitudes.PARAM_ACCION, ControladorMisSolicitudes.ACCION_INDEX);
 		
 		RespuestaHttp respuesta = new RespuestaHttp();
@@ -143,36 +148,13 @@ public class TestBEPControladorMisSolicitudes {
 		assertEquals(MENSAJE_SIN_ADVERTENCIAS, 0, bean.getMensajesDeAdvertencia().size());
 	}
 	
-	/** Consultar solicitud .
-	 * @throws SQLException si fallo bd .
-	 * @throws IOException si error io .
-	 * @throws ServletException  si error servlet .
-	 */
-	@Test
-	public void testA03ConsultarSolicitud() throws SQLException, ServletException, IOException {
-		VistaSolicitudes bean = obtenerSolicitudes();
-		
-		PeticionHttp peticion = UtilsTestBolsaEmpleo.peticionAutenticadaCandidato();
-		peticion.setParameter(ControladorMisSolicitudes.PARAM_ACCION, ControladorMisSolicitudes.ACCION_CONSULTAR_SOLICITUD);
-		peticion.setParameter(ControladorMisSolicitudes.PARAM_SOLICITUD_ID, bean.getDatatableSolicitudes().getData().get(0).getCodNum().toString());
-
-		RespuestaHttp respuesta = new RespuestaHttp();
-		ControladorMisSolicitudes controlador = new ControladorMisSolicitudes();
-		controlador.doGet(peticion, respuesta);
-		VistaSolicitudes bean2 = (VistaSolicitudes) peticion.getUVDatos().getVistas().get(VistaSolicitudes.class.getName());
-		
-		assertNotNull(MENSAJE_SOLICITUD_DEVUELTA, bean2.getSolicitud());
-		assertEquals(MENSAJE_SIN_ERROR, 0, bean2.getMensajesDeError().size());
-		assertEquals(MENSAJE_SIN_ADVERTENCIAS, 0, bean2.getMensajesDeAdvertencia().size());
-	}
-	
 	/** Crear solicitud .
 	 * @throws SQLException si fallo bd .
 	 * @throws IOException si error io .
 	 * @throws ServletException  si error servlet .
 	 */
 	@Test
-	public void testA04CrearSolicitud() throws SQLException, ServletException, IOException {
+	public void testA03CrearSolicitud() throws SQLException, ServletException, IOException {
 		PeticionHttp peticion = UtilsTestBolsaEmpleo.peticionAutenticadaCandidato2();
 		peticion.setParameter(ControladorMisSolicitudes.PARAM_ACCION, ControladorMisSolicitudes.ACCION_CREAR_SOLICITUD);
 		peticion.setParameter(ControladorMisSolicitudes.PARAM_CONVOCATORIA_ID, "1");
@@ -185,6 +167,29 @@ public class TestBEPControladorMisSolicitudes {
 		assertNotNull(MENSAJE_SOLICITUD_DEVUELTA, bean.getSolicitud());
 		assertEquals(MENSAJE_SIN_ERROR, 0, bean.getMensajesDeError().size());
 		assertEquals(MENSAJE_SIN_ADVERTENCIAS, 0, bean.getMensajesDeAdvertencia().size());
+	}
+	
+	/** Consultar solicitud .
+	 * @throws SQLException si fallo bd .
+	 * @throws IOException si error io .
+	 * @throws ServletException  si error servlet .
+	 */
+	@Test
+	public void testA04ConsultarSolicitud() throws SQLException, ServletException, IOException {
+		VistaSolicitudes bean = obtenerSolicitudes();
+		
+		PeticionHttp peticion = UtilsTestBolsaEmpleo.peticionAutenticadaCandidato2();
+		peticion.setParameter(ControladorMisSolicitudes.PARAM_ACCION, ControladorMisSolicitudes.ACCION_CONSULTAR_SOLICITUD);
+		peticion.setParameter(ControladorMisSolicitudes.PARAM_SOLICITUD_ID, bean.getDatatableSolicitudes().getData().get(0).getCodNum().toString());
+
+		RespuestaHttp respuesta = new RespuestaHttp();
+		ControladorMisSolicitudes controlador = new ControladorMisSolicitudes();
+		controlador.doGet(peticion, respuesta);
+		VistaSolicitudes bean2 = (VistaSolicitudes) peticion.getUVDatos().getVistas().get(VistaSolicitudes.class.getName());
+		
+		assertNotNull(MENSAJE_SOLICITUD_DEVUELTA, bean2.getSolicitud());
+		assertEquals(MENSAJE_SIN_ERROR, 0, bean2.getMensajesDeError().size());
+		assertEquals(MENSAJE_SIN_ADVERTENCIAS, 0, bean2.getMensajesDeAdvertencia().size());
 	}
 	
 	/** obtener datatable solicitudes de una convocatoria .
@@ -208,7 +213,7 @@ public class TestBEPControladorMisSolicitudes {
 	 */
 	@Test
 	public void testE01ObtenerSolicitudesParametroErroneo() throws SQLException, ServletException, IOException {
-		PeticionHttp peticion = UtilsTestBolsaEmpleo.peticionAutenticadaCandidato();
+		PeticionHttp peticion = UtilsTestBolsaEmpleo.peticionAutenticadaCandidato2();
 		peticion.setParameter(ControladorMisSolicitudes.PARAM_ACCION, ControladorMisSolicitudes.ACCION_DATATABLE_SOLICITUDES);
 		peticion.setParameter(BolsaEmpleoDataTable.PARAM_ORDER_BY, "9");
 
@@ -235,10 +240,14 @@ public class TestBEPControladorMisSolicitudes {
 		VistaSolicitudes bean = obtenerSolicitudes();
 		VistaSolicitudes bean2 = obtenerAreas();
 		
-		PeticionHttp peticion = UtilsTestBolsaEmpleo.peticionAutenticadaCandidato();
+		PeticionHttp peticion = UtilsTestBolsaEmpleo.peticionAutenticadaCandidato2();
 		peticion.setParameter(ControladorMisSolicitudes.PARAM_ACCION, ControladorMisSolicitudes.ACCION_SELECCIONAR_BOLSAS);
 		peticion.setParameter(ControladorMisSolicitudes.PARAM_SOLICITUD_ID, bean.getDatatableSolicitudes().getData().get(0).getCodNum().toString());
-		peticion.setParameter(ControladorMisSolicitudes.PARAM_BOLSAS, "[" + bean2.getDataTableBolsasCandidato().getData().get(0).getCodNum().toString() + "]");
+		peticion.setParameter(ControladorMisSolicitudes.PARAM_BOLSAS, 
+				"[" + bean2.getDataTableBolsasCandidato().getData().get(ELEMENT_0).getCodNum().toString()
+				+ "," + bean2.getDataTableBolsasCandidato().getData().get(ELEMENT_1).getCodNum().toString() 
+				+ "," + bean2.getDataTableBolsasCandidato().getData().get(ELEMENT_2).getCodNum().toString()
+				+ "," + bean2.getDataTableBolsasCandidato().getData().get(ELEMENT_3).getCodNum().toString() + "]");
 
 		RespuestaHttp respuesta = new RespuestaHttp();
 		ControladorMisSolicitudes controlador = new ControladorMisSolicitudes();
@@ -273,7 +282,7 @@ public class TestBEPControladorMisSolicitudes {
 		VistaSolicitudes bean = obtenerSolicitudes();
 		VistaSolicitudes bean2 = obtenerAreas();
 		
-		PeticionHttp peticion = UtilsTestBolsaEmpleo.peticionAutenticadaCandidato();
+		PeticionHttp peticion = UtilsTestBolsaEmpleo.peticionAutenticadaCandidato2();
 		peticion.setParameter(ControladorMisSolicitudes.PARAM_ACCION, ControladorMisSolicitudes.ACCION_SELECCIONAR_BOLSAS);
 		peticion.setParameter(ControladorMisSolicitudes.PARAM_SOLICITUD_ID, bean.getDatatableSolicitudes().getData().get(0).getCodNum().toString());
 		peticion.setParameter(ControladorMisSolicitudes.PARAM_BOLSAS, bean2.getDataTableBolsasCandidato().getData().get(0).getCodNum().toString());
@@ -294,7 +303,7 @@ public class TestBEPControladorMisSolicitudes {
 	 */
 	@Test
 	public void testE03ObtenerAreasParametroErroneo() throws SQLException, ServletException, IOException {
-    	PeticionHttp peticion = UtilsTestBolsaEmpleo.peticionAutenticadaCandidato();
+    	PeticionHttp peticion = UtilsTestBolsaEmpleo.peticionAutenticadaCandidato2();
 		peticion.setParameter(ControladorMisSolicitudes.PARAM_ACCION, ControladorMisSolicitudes.ACCION_DATATABLE_AREAS);
 		peticion.setParameter(BolsaEmpleoDataTable.PARAM_ORDER_BY, "9");
 
@@ -321,7 +330,7 @@ public class TestBEPControladorMisSolicitudes {
 		VistaSolicitudes bean = obtenerSolicitudes();
 		VistaSolicitudes bean2 = obtenerBolsasCandidato();
 		
-		PeticionHttp peticion = UtilsTestBolsaEmpleo.peticionAutenticadaCandidato();
+		PeticionHttp peticion = UtilsTestBolsaEmpleo.peticionAutenticadaCandidato2();
 		peticion.setParameter(ControladorMisSolicitudes.PARAM_ACCION, ControladorMisSolicitudes.ACCION_BOLSA_SELECCIONADA);
 		peticion.setParameter(ControladorMisSolicitudes.PARAM_SOLICITUD_ID, bean.getDatatableSolicitudes().getData().get(0).getCodNum().toString());
 		peticion.setParameter(ControladorMisSolicitudes.PARAM_BOLSA, bean2.getDatatableBolsasSolicitud().getData().get(0).getCodNum().toString());
@@ -374,7 +383,7 @@ public class TestBEPControladorMisSolicitudes {
 	public void testA11ObtenerBolsasSolicitud() throws SQLException, ServletException, IOException {
 		VistaSolicitudes bean = obtenerSolicitudes();
 		
-		PeticionHttp peticion = UtilsTestBolsaEmpleo.peticionAutenticadaCandidato();
+		PeticionHttp peticion = UtilsTestBolsaEmpleo.peticionAutenticadaCandidato2();
 		peticion.setParameter(ControladorMisSolicitudes.PARAM_ACCION, ControladorMisSolicitudes.ACCION_LISTAR_BOLSAS_SOLICITUD);
 		peticion.setParameter(ControladorMisSolicitudes.PARAM_SOLICITUD_ID, bean.getDatatableSolicitudes().getData().get(0).getCodNum().toString());
 		
@@ -399,7 +408,7 @@ public class TestBEPControladorMisSolicitudes {
 		VistaSolicitudes bean2 = obtenerBolsasCandidato();
 		VistaSolicitudes bean3 = obtenerMeritosBolsa();
 		
-		PeticionHttp peticion = UtilsTestBolsaEmpleo.peticionAutenticadaCandidato();
+		PeticionHttp peticion = UtilsTestBolsaEmpleo.peticionAutenticadaCandidato2();
 		peticion.setParameter(ControladorMisSolicitudes.PARAM_ACCION, ControladorMisSolicitudes.ACCION_MERITO_DESELECCIONADO);
 		peticion.setParameter(ControladorMisSolicitudes.PARAM_SOLICITUD_ID, bean.getDatatableSolicitudes().getData().get(0).getCodNum().toString());
 		peticion.setParameter(ControladorMisSolicitudes.PARAM_BOLSA, bean2.getDatatableBolsasSolicitud().getData().get(0).getCodNum().toString());
@@ -427,7 +436,7 @@ public class TestBEPControladorMisSolicitudes {
 		VistaSolicitudes bean2 = obtenerBolsasCandidato();
 		VistaSolicitudes bean3 = obtenerMeritosBolsa();
 		
-		PeticionHttp peticion = UtilsTestBolsaEmpleo.peticionAutenticadaCandidato();
+		PeticionHttp peticion = UtilsTestBolsaEmpleo.peticionAutenticadaCandidato2();
 		peticion.setParameter(ControladorMisSolicitudes.PARAM_ACCION, ControladorMisSolicitudes.ACCION_MERITO_SELECCIONADO);
 		peticion.setParameter(ControladorMisSolicitudes.PARAM_SOLICITUD_ID, bean.getDatatableSolicitudes().getData().get(0).getCodNum().toString());
 		peticion.setParameter(ControladorMisSolicitudes.PARAM_BOLSA, bean2.getDatatableBolsasSolicitud().getData().get(0).getCodNum().toString());
@@ -453,7 +462,7 @@ public class TestBEPControladorMisSolicitudes {
 	public void testE04ObtenerBolsasSolicitudParametroErroneo() throws SQLException, ServletException, IOException {
 		VistaSolicitudes bean = obtenerSolicitudes();
 		
-		PeticionHttp peticion = UtilsTestBolsaEmpleo.peticionAutenticadaCandidato();
+		PeticionHttp peticion = UtilsTestBolsaEmpleo.peticionAutenticadaCandidato2();
 		peticion.setParameter(ControladorMisSolicitudes.PARAM_ACCION, ControladorMisSolicitudes.ACCION_DATATABLE_BOLSAS_SELECCIONADAS);
 		peticion.setParameter(ControladorMisSolicitudes.PARAM_SOLICITUD_ID, bean.getDatatableSolicitudes().getData().get(0).getCodNum().toString());
 		peticion.setParameter(BolsaEmpleoDataTable.PARAM_ORDER_BY, "9");
@@ -478,7 +487,7 @@ public class TestBEPControladorMisSolicitudes {
 		VistaSolicitudes bean = obtenerSolicitudes();
     	VistaSolicitudes bean2 = obtenerBolsasCandidato();
     	
-    	PeticionHttp peticion = UtilsTestBolsaEmpleo.peticionAutenticadaCandidato();
+    	PeticionHttp peticion = UtilsTestBolsaEmpleo.peticionAutenticadaCandidato2();
 		peticion.setParameter(ControladorMisSolicitudes.PARAM_ACCION, ControladorMisSolicitudes.ACCION_DATATABLE_MERITOS_BOLSA);
 		peticion.setParameter(ControladorMisSolicitudes.PARAM_SOLICITUD_ID, bean.getDatatableSolicitudes().getData().get(0).getCodNum().toString());
 		peticion.setParameter(ControladorMisSolicitudes.PARAM_BOLSA, bean2.getDatatableBolsasSolicitud().getData().get(0).getCodNum().toString());
@@ -507,7 +516,7 @@ public class TestBEPControladorMisSolicitudes {
 	public void testA14ResumenSolicitud() throws SQLException, ServletException, IOException {
 		VistaSolicitudes bean = obtenerSolicitudes();
 		
-		PeticionHttp peticion = UtilsTestBolsaEmpleo.peticionAutenticadaCandidato();
+		PeticionHttp peticion = UtilsTestBolsaEmpleo.peticionAutenticadaCandidato2();
 		peticion.setParameter(ControladorMisSolicitudes.PARAM_ACCION, ControladorMisSolicitudes.ACCION_RESUMEN_SOLICITUD);
 		peticion.setParameter(ControladorMisSolicitudes.PARAM_SOLICITUD_ID, bean.getDatatableSolicitudes().getData().get(0).getCodNum().toString());
 		
@@ -531,7 +540,7 @@ public class TestBEPControladorMisSolicitudes {
 	public void testA15ConfirmarSolicitud() throws SQLException, ServletException, IOException {
 		VistaSolicitudes bean = obtenerSolicitudes();
 		
-		PeticionHttp peticion = UtilsTestBolsaEmpleo.peticionAutenticadaCandidato();
+		PeticionHttp peticion = UtilsTestBolsaEmpleo.peticionAutenticadaCandidato2();
 		peticion.setParameter(ControladorMisSolicitudes.PARAM_ACCION, ControladorMisSolicitudes.ACCION_CONFIRMAR_SOLICITUD);
 		peticion.setParameter(ControladorMisSolicitudes.PARAM_SOLICITUD_ID, bean.getDatatableSolicitudes().getData().get(0).getCodNum().toString());
 		
@@ -555,7 +564,7 @@ public class TestBEPControladorMisSolicitudes {
 	public void testE06ErrorPdfSolicitud() throws SQLException, ServletException, IOException {
 		VistaSolicitudes bean = obtenerSolicitudes();
 		
-		PeticionHttp peticion = UtilsTestBolsaEmpleo.peticionAutenticadaCandidato();
+		PeticionHttp peticion = UtilsTestBolsaEmpleo.peticionAutenticadaCandidato2();
 		peticion.setParameter(ControladorMisSolicitudes.PARAM_ACCION, ControladorMisSolicitudes.ACCION_DESCARGAR_PDF);
 		peticion.setParameter(ControladorMisSolicitudes.PARAM_SOLICITUD_ID, bean.getDatatableSolicitudes().getData().get(0).getCodNum().toString());
 		

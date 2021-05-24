@@ -51,6 +51,8 @@ public class ModeloSolicitud {
 	public static final String BEPBOL_CODNUM = "BEPBOL_CODNUM";
 	public static final String BEPMER_CODNUM = "BEPMER_CODNUM";
 	public static final String FLGEXCLUIDO = "FLGEXCLUIDO";
+	public static final String FLGVALIDADO = "FLGVALIDADO";
+	public static final String OBSERVACION_CANDIDATO = "OBSERVACION_CANDIDATO";
 	public static final String S = "S";
 		
 	protected static ModeloSolicitud eInstancia;
@@ -703,7 +705,7 @@ public class ModeloSolicitud {
 	 */
 	public MeritoSolicitud getMeritoSolicitudBy(Convocatoria convocatoria, Bolsa bolsa, Merito merito) throws SQLException, UVException {
 		String consulta = "SELECT bepsbm.*"
-				+ "	FROM UVIRTUAL.TBEP_SOLICITUD_BOLSAS_MERITOS bepsbm"
+				+ "	FROM UVIRTUAL.TBEP_SOL_BOL_MERITOS bepsbm"
 				+ "	INNER JOIN UVIRTUAL.TBEP_SOLICITUD_BOLSAS bepsbo ON bepsbo.CODNUM = bepsbm.BEPSBO_CODNUM"
 				+ "	INNER JOIN UVIRTUAL.TBEP_SOLICITUDES bepsol ON bepsol.CODNUM = bepsbo.BEPSOL_CODNUM"
 				+ "	WHERE bepsbm.BEPMER_CODNUM = ?"
@@ -724,8 +726,11 @@ public class ModeloSolicitud {
 				}
 				
 				Merito mer = ModeloMerito.obtenerInstancia().getMeritoById(rs.getInt(BEPMER_CODNUM), false, false);
-				
-				return new MeritoSolicitud(rs.getInt(CODNUM), mer, rs.getString(FLGEXCLUIDO).equals(S));
+				int codNum = rs.getInt(CODNUM);
+				Boolean excluido = rs.getString(FLGEXCLUIDO).equals(S);
+				Boolean validado = rs.getString(FLGVALIDADO).equals(S);
+				String observacion = rs.getString(OBSERVACION_CANDIDATO);
+				return new MeritoSolicitud(codNum, mer, excluido, validado, observacion);
 			}
 		}
 	}
