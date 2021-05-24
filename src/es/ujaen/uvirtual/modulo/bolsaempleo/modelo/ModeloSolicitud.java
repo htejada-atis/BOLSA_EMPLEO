@@ -51,6 +51,8 @@ public class ModeloSolicitud {
 	public static final String BEPBOL_CODNUM = "BEPBOL_CODNUM";
 	public static final String BEPMER_CODNUM = "BEPMER_CODNUM";
 	public static final String FLGEXCLUIDO = "FLGEXCLUIDO";
+	public static final String FLGVALIDADO = "FLGVALIDADO";
+	public static final String OBSERVACION_CANDIDATO = "OBSERVACION_CANDIDATO";
 	public static final String S = "S";
 		
 	protected static ModeloSolicitud eInstancia;
@@ -655,7 +657,7 @@ public class ModeloSolicitud {
 	}
 	
 	/**
-	 * Devuelve un merito solicitud asociando a una solicitud y una bolsa.
+	 * Devuelve un merito solicitud asociado a una solicitud y una bolsa.
 	 * @param idSolicitud .
 	 * @param idBolsa .
 	 * @param idMerito .
@@ -688,6 +690,47 @@ public class ModeloSolicitud {
 				Merito merito = ModeloMerito.obtenerInstancia().getMeritoById(rs.getInt(BEPMER_CODNUM), false, false);
 				
 				return new MeritoSolicitud(rs.getInt(CODNUM), merito, rs.getString(FLGEXCLUIDO).equals(S));
+			}
+		}
+	}
+	
+	/**
+	 * Devuelve un merito solicitud asociado a una solicitud y una bolsa.
+	 * @param convocatoria .
+	 * @param bolsa .
+	 * @param merito .
+	 * @return .
+	 * @throws SQLException .
+	 * @throws UVException .
+	 */
+	public MeritoSolicitud getMeritoSolicitudBy(Convocatoria convocatoria, Bolsa bolsa, Merito merito) throws SQLException, UVException {
+		String consulta = "SELECT bepsbm.*"
+				+ "	FROM UVIRTUAL.TBEP_SOL_BOL_MERITOS bepsbm"
+				+ "	INNER JOIN UVIRTUAL.TBEP_SOLICITUD_BOLSAS bepsbo ON bepsbo.CODNUM = bepsbm.BEPSBO_CODNUM"
+				+ "	INNER JOIN UVIRTUAL.TBEP_SOLICITUDES bepsol ON bepsol.CODNUM = bepsbo.BEPSOL_CODNUM"
+				+ "	WHERE bepsbm.BEPMER_CODNUM = ?"
+				+ "	AND bepsol.BEPCON_CODNUM = ?"
+				+ "	AND bepsbo.BEPBOL_CODNUM = ?";
+			
+		try (Connection conexion = ConexionUvirtual.obtenerInstancia();
+				PreparedStatement stmt = conexion.prepareStatement(consulta)) {
+			
+			int params = 1;
+			stmt.setInt(params++, merito.getCodNum());
+			stmt.setInt(params++, convocatoria.getCodNum());
+			stmt.setInt(params++, bolsa.getCodNum());
+									
+			try (ResultSet rs = stmt.executeQuery()) {
+				if (!rs.next()) {
+					throw new UVException(MENSAJE_ERROR_NO_EXISTE_MERITO_SOLICITUD);
+				}
+				
+				Merito mer = ModeloMerito.obtenerInstancia().getMeritoById(rs.getInt(BEPMER_CODNUM), false, false);
+				int codNum = rs.getInt(CODNUM);
+				Boolean excluido = rs.getString(FLGEXCLUIDO).equals(S);
+				Boolean validado = rs.getString(FLGVALIDADO).equals(S);
+				String observacion = rs.getString(OBSERVACION_CANDIDATO);
+				return new MeritoSolicitud(codNum, mer, excluido, validado, observacion);
 			}
 		}
 	}

@@ -12,8 +12,8 @@ VALUES (
     (SELECT bepite.CODNUM FROM TBEP_ITEMSBAREMACION bepite WHERE bepite.CODNUM = 4),
     (SELECT bepusu.CODNUM FROM TBEP_USUARIOS bepusu WHERE bepusu.CODCUENTA = 'candidato1'),
     4,
-    'descripción mérito 1',
-    'observación mérito 1',
+    'descripción mérito 2',
+    'observación mérito 2',
     hextoraw('453d7a34')
 );
 INSERT INTO TBEP_MERITOS (BEPITE_CODNUM,BEPUSU_CODNUM,VALOR,DESCRIPCION,OBSERVACION,ARCHIVO)
@@ -21,7 +21,52 @@ VALUES (
     (SELECT bepite.CODNUM FROM TBEP_ITEMSBAREMACION bepite WHERE bepite.CODNUM = 3),
     (SELECT bepusu.CODNUM FROM TBEP_USUARIOS bepusu WHERE bepusu.CODCUENTA = 'candidato1'),
     3,
-    'descripción mérito 1',
-    'observación mérito 1',
+    'descripción mérito 3',
+    'observación mérito 3',
+    hextoraw('453d7a34')
+);
+INSERT INTO TBEP_MERITOS (BEPITE_CODNUM,BEPUSU_CODNUM,VALOR,DESCRIPCION,OBSERVACION,ARCHIVO)
+VALUES (
+    (SELECT bepite.CODNUM FROM TBEP_ITEMSBAREMACION bepite WHERE bepite.CODNUM = 7),
+    (SELECT bepusu.CODNUM FROM TBEP_USUARIOS bepusu WHERE bepusu.CODCUENTA = 'candidato1'),
+    3,
+    'descripción mérito 4',
+    'observación mérito 4',
+    hextoraw('453d7a34')
+);
+INSERT INTO TBEP_MERITOS (BEPITE_CODNUM,BEPUSU_CODNUM,VALOR,DESCRIPCION,OBSERVACION,ARCHIVO)
+VALUES (
+    (SELECT bepite.CODNUM FROM TBEP_ITEMSBAREMACION bepite WHERE bepite.CODNUM = 8),
+    (SELECT bepusu.CODNUM FROM TBEP_USUARIOS bepusu WHERE bepusu.CODCUENTA = 'candidato1'),
+    4,
+    'descripción mérito 5',
+    'observación mérito 5',
+    hextoraw('453d7a34')
+);
+INSERT INTO TBEP_MERITOS (BEPITE_CODNUM,BEPUSU_CODNUM,VALOR,DESCRIPCION,OBSERVACION,ARCHIVO)
+VALUES (
+    (SELECT bepite.CODNUM FROM TBEP_ITEMSBAREMACION bepite WHERE bepite.CODNUM = 1),
+    (SELECT bepusu.CODNUM FROM TBEP_USUARIOS bepusu WHERE bepusu.CODCUENTA = 'candidato2'),
+    2.4,
+    'descripción mérito 6',
+    'observación mérito 6',
+    hextoraw('453d7a34')
+);
+INSERT INTO TBEP_MERITOS (BEPITE_CODNUM,BEPUSU_CODNUM,VALOR,DESCRIPCION,OBSERVACION,ARCHIVO)
+VALUES (
+    (SELECT bepite.CODNUM FROM TBEP_ITEMSBAREMACION bepite WHERE bepite.CODNUM = 4),
+    (SELECT bepusu.CODNUM FROM TBEP_USUARIOS bepusu WHERE bepusu.CODCUENTA = 'candidato2'),
+    4,
+    'descripción mérito 7',
+    'observación mérito 7',
+    hextoraw('453d7a34')
+);
+INSERT INTO TBEP_MERITOS (BEPITE_CODNUM,BEPUSU_CODNUM,VALOR,DESCRIPCION,OBSERVACION,ARCHIVO)
+VALUES (
+    (SELECT bepite.CODNUM FROM TBEP_ITEMSBAREMACION bepite WHERE bepite.CODNUM = 3),
+    (SELECT bepusu.CODNUM FROM TBEP_USUARIOS bepusu WHERE bepusu.CODCUENTA = 'candidato2'),
+    3,
+    'descripción mérito 8',
+    'observación mérito 8',
     hextoraw('453d7a34')
 );

@@ -14,9 +14,10 @@ import com.google.gson.Gson;
 import es.ujaen.uvirtual.beans.CodigoDescripcion;
 import es.ujaen.uvirtual.beans.UVDatos;
 import es.ujaen.uvirtual.modulo.bolsaempleo.beans.Bolsa;
+import es.ujaen.uvirtual.modulo.bolsaempleo.beans.BolsaCandidatoValidacionTable;
 import es.ujaen.uvirtual.modulo.bolsaempleo.beans.BolsaValidacion;
 import es.ujaen.uvirtual.modulo.bolsaempleo.beans.CandidatoValidacion;
-import es.ujaen.uvirtual.modulo.bolsaempleo.beans.Merito;
+import es.ujaen.uvirtual.modulo.bolsaempleo.beans.MeritoValidarTable;
 import es.ujaen.uvirtual.modulo.bolsaempleo.modelo.ModeloBolsa;
 import es.ujaen.uvirtual.modulo.bolsaempleo.modelo.ModeloConvocatoria;
 import es.ujaen.uvirtual.modulo.bolsaempleo.modelo.ModeloMerito;
@@ -261,8 +262,8 @@ public class ControladorValidar extends HttpServlet {
 		
 		try (PrintWriter writer = response.getWriter()) {
 			try {
-				BolsaEmpleoDataTable<Bolsa> dataTable = ModeloValidar.obtenerInstancia().
-						listadoAreasCandidatoSujetasAfinidad(bean.getConvocatoria(), bean.getCandidato(), request.getParameterMap());
+				BolsaEmpleoDataTable<BolsaCandidatoValidacionTable> dataTable = ModeloValidar.obtenerInstancia().
+						listadoAreasCandidatoSujetasAfinidad(bean.getConvocatoria(), bean.getCandidato(), bean.getMerito(), request.getParameterMap());
 				bean.setDatatableBolsasCandidato(dataTable);
 				writer.write(dataTable.toJson());
 			} catch (Exception ex) {
@@ -305,7 +306,7 @@ public class ControladorValidar extends HttpServlet {
 		
 		try (PrintWriter writer = response.getWriter()) {
 			try {
-				BolsaEmpleoDataTable<Merito> dataTable = ModeloValidar.obtenerInstancia().
+				BolsaEmpleoDataTable<MeritoValidarTable> dataTable = ModeloValidar.obtenerInstancia().
 						listadoMeritosSujetosAfinidad(bean.getConvocatoria(), bean.getBolsa(), bean.getCandidato(), request.getParameterMap());
 				bean.setDatatableMeritos(dataTable);
 				writer.write(dataTable.toJson());

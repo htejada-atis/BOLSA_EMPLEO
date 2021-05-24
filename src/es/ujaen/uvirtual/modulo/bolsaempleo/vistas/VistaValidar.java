@@ -3,10 +3,12 @@ package es.ujaen.uvirtual.modulo.bolsaempleo.vistas;
 import java.io.Serializable;
 import es.ujaen.uvirtual.beans.vistas.Vista;
 import es.ujaen.uvirtual.modulo.bolsaempleo.beans.Bolsa;
+import es.ujaen.uvirtual.modulo.bolsaempleo.beans.BolsaCandidatoValidacionTable;
 import es.ujaen.uvirtual.modulo.bolsaempleo.beans.BolsaValidacion;
 import es.ujaen.uvirtual.modulo.bolsaempleo.beans.CandidatoValidacion;
 import es.ujaen.uvirtual.modulo.bolsaempleo.beans.Convocatoria;
 import es.ujaen.uvirtual.modulo.bolsaempleo.beans.Merito;
+import es.ujaen.uvirtual.modulo.bolsaempleo.beans.MeritoValidarTable;
 import es.ujaen.uvirtual.modulo.bolsaempleo.beans.UsuarioBolsaEmpleo;
 import es.ujaen.uvirtual.modulo.bolsaempleo.utilidades.BolsaEmpleoDataTable;
 
@@ -21,9 +23,9 @@ public class VistaValidar extends Vista implements Serializable {
 	private Merito merito;
 	private UsuarioBolsaEmpleo usuario;
 	private BolsaEmpleoDataTable<BolsaValidacion> datatableBolsas;
-	private BolsaEmpleoDataTable<Bolsa> datatableBolsasCandidato;
+	private BolsaEmpleoDataTable<BolsaCandidatoValidacionTable> datatableBolsasCandidato;
 	private BolsaEmpleoDataTable<CandidatoValidacion> datatableCandidatos;
-	private BolsaEmpleoDataTable<Merito> datatableMeritos;
+	private BolsaEmpleoDataTable<MeritoValidarTable> datatableMeritos;
 	
 	public String getVista() {
 		return vista;
@@ -41,11 +43,11 @@ public class VistaValidar extends Vista implements Serializable {
 		return this.datatableBolsas;	
 	}
 	
-	public void setDatatableBolsasCandidato(BolsaEmpleoDataTable<Bolsa> dt) {
+	public void setDatatableBolsasCandidato(BolsaEmpleoDataTable<BolsaCandidatoValidacionTable> dt) {
 		this.datatableBolsasCandidato = dt;
 	}
 	
-	public BolsaEmpleoDataTable<Bolsa> getDatatableBolsasCandidato() {
+	public BolsaEmpleoDataTable<BolsaCandidatoValidacionTable> getDatatableBolsasCandidato() {
 		return this.datatableBolsasCandidato;	
 	}
 	
@@ -57,11 +59,11 @@ public class VistaValidar extends Vista implements Serializable {
 		return this.datatableCandidatos;	
 	}
 	
-	public void setDatatableMeritos(BolsaEmpleoDataTable<Merito> dt) {
+	public void setDatatableMeritos(BolsaEmpleoDataTable<MeritoValidarTable> dt) {
 		this.datatableMeritos = dt;
 	}
 	
-	public BolsaEmpleoDataTable<Merito> getDatatableMeritos() {
+	public BolsaEmpleoDataTable<MeritoValidarTable> getDatatableMeritos() {
 		return this.datatableMeritos;
 	}
 	

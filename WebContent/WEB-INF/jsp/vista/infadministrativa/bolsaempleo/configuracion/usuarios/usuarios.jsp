@@ -22,7 +22,6 @@ VistaUsuarioBolsaEmpleo bean = (VistaUsuarioBolsaEmpleo) uvdatos.getVistas().get
 	</div>
 	
 	<table class="bluetable bolsaempleo" id="table_usuarios">
-	  	<caption class="table-title">Usuarios</caption>  
 		<tr>
 			<th scope="col" style="width:5%"></th>
 			<th scope="col" style="width:7%" title="Tipo de documento">Tipo</th>
@@ -60,6 +59,7 @@ $(document).ready(function() {
 	    "pageSize": 10,
 	    "filterable": true,
 	    "action": "<%=ControladorUsuarioBolsaEmpleo.ACCION_DATATABLE_USUARIOS%>",
+	    "title": 'Usuarios',
 	    "columns": [
 	    	{'data': 'codNum', 'selectable': true},
 	        {'data': 'tipodocumento', 'filter': true, 'class': 'overflow-auto'},
