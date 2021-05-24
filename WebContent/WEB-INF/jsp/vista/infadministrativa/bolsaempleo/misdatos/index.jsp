@@ -49,7 +49,6 @@ VistaUsuarioBolsaEmpleo bean = (VistaUsuarioBolsaEmpleo) uvdatos.getVistas().get
 	if(bean.getUsuario().getProvincia()!=null) provincia = bean.getUsuario().getProvincia();
 	if(bean.getUsuario().getTelefono()!=null) telefono = bean.getUsuario().getTelefono();
 	if(bean.getUsuario().getNacionalidad()!=null) nacionalidad = bean.getUsuario().getNacionalidad();
-	if(bean.getUsuario().getSexo()!=null) sexo = bean.getUsuario().getSexo();
 	if(bean.getUsuario()!=null) lista_dist = bean.getUsuario().getListaDist();
 	
 	%>
@@ -120,15 +119,6 @@ VistaUsuarioBolsaEmpleo bean = (VistaUsuarioBolsaEmpleo) uvdatos.getVistas().get
     	
     	
     	<div class="form-group-container">
-    		<div class="form-group-custom">
-    			<label>Sexo: </label>
-    			<br><br>
-				<input class="form-input" type="radio" id="masculino" name="<%= ControladorMisDatos.PARAM_SEXO %>" style="display: inline;" disabled>
-				<label class="form-label-custom" for="male" style="float: none; margin-right:0px">Masculino</label>
-				<br>
-    			<input class="form-input" type="radio" id="femenino" name="<%= ControladorMisDatos.PARAM_SEXO %>" style="display: inline;" disabled>
-				<label class="form-label-custom" for="female" style="float: none; margin-right:0px;">Femenino</label>
-    		</div>
     		<div class="form-check">
     			<label for="usuario_lista_dist">Lista Distribucion:</label>
     			<input class="params" type="checkbox" id="usuario_lista_dist" name="<%= ControladorMisDatos.PARAM_LISTA %>" value="<%= lista_dist %>" <%= (lista_dist ? "checked=''" : "") %>/>
@@ -150,20 +140,6 @@ VistaUsuarioBolsaEmpleo bean = (VistaUsuarioBolsaEmpleo) uvdatos.getVistas().get
 </div>
 
 <script>
-$(document).ready(function() {	
-	
-	<% String acum = bean.getUsuario().getSexo();
-	if(bean.getUsuario().getSexo()!=null){
-	if(bean.getUsuario().getSexo().equals("V")) { %>
-	document.getElementById("masculino").checked = true;
-	<%} else { 
-		if(bean.getUsuario().getSexo().equals("M")) { %>
-			document.getElementById("femenino").checked = true;
-		<%}%>
-	<%}}%>
-	
-});
-
 function enviarUsuario(event, submit_input) {
 	event.preventDefault();
 
@@ -171,18 +147,7 @@ function enviarUsuario(event, submit_input) {
 	input_accion.value = '<%= ControladorMisDatos.ACCION_ENVIAR_MISDATOS %>';
 	input_id = document.getElementById("usuario_id");
 	input_id.value = '<%= bean.getUsuario().getCodNum() %>';
-	input_sexo_m = document.getElementById("masculino");
-	input_sexo_f = document.getElementById("femenino");
 	
-	if(input_sexo_m.checked){
-		input_sexo_m.value = "M";
-		input_sexo_f.value = "M";
-	}
-	else{
-		input_sexo_m.value = "F";
-		input_sexo_f.value = "F";
-	}
-
 	submit_input.form.submit();
 }
 

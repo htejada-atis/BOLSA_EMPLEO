@@ -3,7 +3,6 @@ package usuario;
 import static org.junit.Assert.assertTrue;
 
 import java.io.IOException;
-import java.lang.reflect.Type;
 import java.net.MalformedURLException;
 import java.sql.SQLException;
 import java.util.logging.Level;
@@ -20,19 +19,14 @@ import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.WebDriverWait;
 
-import com.google.gson.Gson;
-import com.google.gson.reflect.TypeToken;
-
-import es.ujaen.uvirtual.modulo.bolsaempleo.beans.UsuarioBolsaEmpleo;
-import es.ujaen.uvirtual.modulo.bolsaempleo.controlador.configuracion.ControladorUsuarioBolsaEmpleo;
-import es.ujaen.uvirtual.modulo.bolsaempleo.utilidades.BolsaEmpleoDataTable;
+import bbdd.UtilsTestBolsaEmpleo;
 
 /** Clase para probar configuracion.usuarios BEP .
  * @author fcampos
  *
  */
 @FixMethodOrder(MethodSorters.NAME_ASCENDING)
-public class TestBEPUsuariosBolsaEmpleo {
+public class TestBEPUsuariosBolsaEmpleo extends UtilsTestUsuarioBase {
 	private static final String NOMBREDEESTACLASE = TestBEPUsuariosBolsaEmpleo.class.getName();
 
 	private static final Logger LOGGER = Logger.getLogger(NOMBREDEESTACLASE);
@@ -59,9 +53,9 @@ public class TestBEPUsuariosBolsaEmpleo {
 	@BeforeClass
 	public static void setUp() throws IOException, SQLException {
 		LOGGER.log(Level.INFO, "inicio");
-		DriverUvBEP.inicializaBd();
-		DriverUvBEP.inicializaDriver();
-		DriverUvBEP.login();
+		UtilsTestBolsaEmpleo.inicializaBolsaEmpleo();
+		DriverUv.inicializaDriver();
+		DriverUv.login("personal1");
 	}
 
 	/** Se ejecuta antes de cada test.
@@ -69,18 +63,18 @@ public class TestBEPUsuariosBolsaEmpleo {
 	 */
 	@Before
 	public void navegaOpcion() {
-		DriverUvBEP.getDriver().get("http://localhost:8080/srv/es/index");
-		DriverUvBEP.getDriver().get("http://localhost:8080/srv/es/informacionadministrativa");
-		DriverUvBEP.getDriver().get("http://localhost:8080/srv/es/informacionadministrativa/bolsaempleo");		
-		DriverUvBEP.getDriver().get("http://localhost:8080/srv/es/informacionadministrativa/bolsaempleo/configuracion");
-		DriverUvBEP.getDriver().get("http://localhost:8080/srv/es/informacionadministrativa/bolsaempleo/configuracion/usuarios");
+		DriverUv.getDriver().get(DriverUv.RUTA + "/srv/es/index");
+		DriverUv.getDriver().get(DriverUv.RUTA + "/srv/es/informacionadministrativa");
+		DriverUv.getDriver().get(DriverUv.RUTA + "/srv/es/informacionadministrativa/bolsaempleo");		
+		DriverUv.getDriver().get(DriverUv.RUTA + "/srv/es/informacionadministrativa/bolsaempleo/configuracion");
+		DriverUv.getDriver().get(DriverUv.RUTA + "/srv/es/informacionadministrativa/bolsaempleo/configuracion/usuarios");
 	}
 	
 	/** Listado de usuarios.
 	 */
 	@Test
 	public void testA1() {
-		WebDriverWait wait = new WebDriverWait(DriverUvBEP.getDriver(), WAIT_ELEMENT);
+		WebDriverWait wait = new WebDriverWait(DriverUv.getDriver(), WAIT_ELEMENT);
 
 		// esperamos div principal
 		WebElement main = wait.until(ExpectedConditions.visibilityOfElementLocated(By.className(DIV_MAIN_USUARIOS)));		
@@ -96,26 +90,7 @@ public class TestBEPUsuariosBolsaEmpleo {
 
 		comprobarPaginacion(getTables(main, ID_TABLE));
 		
-		comprobarSeleccionTabla(getTables(main, ID_TABLE), main);
-	}
-	
-	/**
-	 * Probamos petición datatable .
-	 * @throws MalformedURLException .
-	 * @throws IOException .
-	 */
-	@Test
-	public void testA2() throws MalformedURLException, IOException {
-		String u = "http://localhost:8080/srv/es/informacionadministrativa/bolsaempleo/configuracion/usuarios?a=" + ControladorUsuarioBolsaEmpleo.ACCION_DATATABLE_USUARIOS;
-		String json = DriverUvBEP.getAjaxRequestJson(u);
-		
-		Type typeDt = new TypeToken<BolsaEmpleoDataTable<UsuarioBolsaEmpleo>>() { }.getType();
-		BolsaEmpleoDataTable<UsuarioBolsaEmpleo> dt = new Gson().fromJson(json, typeDt);
-		
-		assertTrue(dt.getData().size() > 0);
-		
-		//DriverUv.getDriver().get();
-		//String json = DriverUv.getDriver().getPageSource();
+		comprobarSeleccionTabla(getTables(main, ID_TABLE));
 	}
 	
 	/**
@@ -124,8 +99,8 @@ public class TestBEPUsuariosBolsaEmpleo {
 	 * @throws IOException .
 	 */
 	@Test
-	public void testA3() throws MalformedURLException, IOException {
-		WebDriverWait wait = new WebDriverWait(DriverUvBEP.getDriver(), WAIT_ELEMENT);
+	public void testA3() {
+		WebDriverWait wait = new WebDriverWait(DriverUv.getDriver(), WAIT_ELEMENT);
 		WebElement pmain = wait.until(ExpectedConditions.visibilityOfElementLocated(By.className(DIV_MAIN_USUARIOS)));	
 		WebElement btnNuevo = pmain.findElement(By.id("nuevo_usuario"));
 		btnNuevo.click();
@@ -143,7 +118,7 @@ public class TestBEPUsuariosBolsaEmpleo {
 	}
 	
 	private String getDialogText() {
-		WebElement dialogo = DriverUvBEP.getDriver().findElement(By.className(CLASS_DIALOGO));
+		WebElement dialogo = DriverUv.getDriver().findElement(By.className(CLASS_DIALOGO));
 		WebElement content = dialogo.findElement(By.className(CLASS_DIALOGO_CONTENT));
 		
 		return content.findElement(By.tagName("h6")).getText();
@@ -154,7 +129,7 @@ public class TestBEPUsuariosBolsaEmpleo {
 	@AfterClass
 	public static void cerrar() {
 		LOGGER.log(Level.INFO, "final");
-		DriverUvBEP.getDriver().quit();
+		DriverUv.getDriver().quit();
 	}
 	
 	/** GetTables.
@@ -180,7 +155,6 @@ public class TestBEPUsuariosBolsaEmpleo {
 	 * @param tabla .
 	 */
 	public void comprobarOrdenacion(WebElement tabla) {
-		System.out.print(tabla);
 		WebElement th = tabla.findElement(By.className("user"));
 		th.click();
 		WebElement img = th.findElement(By.className("order"));
@@ -216,9 +190,8 @@ public class TestBEPUsuariosBolsaEmpleo {
 	
 	/** alert si no hay filas seleccionadas.
 	 * @param tabla .
-	 * @param main .
 	 */
-	public void comprobarSeleccionTabla(WebElement tabla, WebElement main) {
+	public void comprobarSeleccionTabla(WebElement tabla) {
 		WebElement actions = tabla.findElement(By.className(CLASS_ACTIONS));
 		WebElement btnBorrar = actions.findElement(By.xpath("button[1]"));
 		btnBorrar.click();
