@@ -268,7 +268,7 @@ public class TestBEPControladorGestionEvaluadores {
 		VistaEvaluadores bean2 = getVistaConAreas();
 
 		PeticionHttp peticion = UtilsTestBolsaEmpleo.peticionAutenticadaPersonal();
-		peticion.setParameter(ControladorGestionEvaluadores.PARAM_ACCION, ControladorGestionEvaluadores.ACCION_AREA_SELECCIONADA);
+		peticion.setParameter(ControladorGestionEvaluadores.PARAM_ACCION, ControladorGestionEvaluadores.ACCION_SELECCIONAR_AREA);
 		peticion.setParameter(ControladorGestionEvaluadores.PARAM_AREA, bean2.getDatatableAreas().getData().get(0).getCodNum().toString());
 		peticion.setParameter(ControladorGestionEvaluadores.PARAM_DEPARTAMENTO, bean.getDepartamentos().get(1).getCodNum().toString());
 

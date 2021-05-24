@@ -16,6 +16,8 @@ import org.junit.Test;
 import org.junit.runners.MethodSorters;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebElement;
+import org.openqa.selenium.firefox.FirefoxDriverLogLevel;
+import org.openqa.selenium.firefox.FirefoxOptions;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.WebDriverWait;
 
@@ -27,11 +29,10 @@ import bbdd.UtilsTestBolsaEmpleo;
  * @author ATISoluciones
  */
 @FixMethodOrder(MethodSorters.NAME_ASCENDING)
-public class TestBEPAfinidad extends UtilsTestUsuarioBase {
+public class TestBEPAfinidad extends UtilsTestBEP {
 	private static final String NOMBREDEESTACLASE = TestBEPUsuariosBolsaEmpleo.class.getName();
 
 	private static final Logger LOGGER = Logger.getLogger(NOMBREDEESTACLASE);
-	private static final Integer WAIT_ELEMENT = 5; // segundos
 
 	private static final String DIV_MAIN_AFINIDADES = "afinidades";
 	private static final String DIV_MAIN_AFINIDAD_FORM = "afinidad-form";

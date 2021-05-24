@@ -27,11 +27,10 @@ import bbdd.UtilsTestBolsaEmpleo;
  * @author ATISoluciones
  */
 @FixMethodOrder(MethodSorters.NAME_ASCENDING)
-public class TestBEPConvocatorias extends UtilsTestUsuarioBase {
+public class TestBEPConvocatorias extends UtilsTestBEP {
 	private static final String NOMBREDEESTACLASE = TestBEPConvocatorias.class.getName();
 
 	private static final Logger LOGGER = Logger.getLogger(NOMBREDEESTACLASE);
-	private static final Integer WAIT_ELEMENT = 5; // segundos
 
 	private static final String DIV_MAIN_CONVOCATORIAS = "convocatorias";
 	private static final String DIV_FORM_CONVOCATORIAS = "convocatoria-form";

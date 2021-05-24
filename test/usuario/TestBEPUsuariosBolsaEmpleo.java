@@ -26,11 +26,10 @@ import bbdd.UtilsTestBolsaEmpleo;
  *
  */
 @FixMethodOrder(MethodSorters.NAME_ASCENDING)
-public class TestBEPUsuariosBolsaEmpleo extends UtilsTestUsuarioBase {
+public class TestBEPUsuariosBolsaEmpleo extends UtilsTestBEP {
 	private static final String NOMBREDEESTACLASE = TestBEPUsuariosBolsaEmpleo.class.getName();
 
 	private static final Logger LOGGER = Logger.getLogger(NOMBREDEESTACLASE);
-	private static final Integer WAIT_ELEMENT = 5; // segundos
 	
 	private static final String DIV_MAIN_USUARIOS = "usuarios";
 	private static final String DIV_MAIN_USUARIOS_BUSQUEDA = "usuarios-buscar";

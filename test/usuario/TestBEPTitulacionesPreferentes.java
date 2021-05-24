@@ -27,11 +27,10 @@ import bbdd.UtilsTestBolsaEmpleo;
  * @author ATISoluciones
  */
 @FixMethodOrder(MethodSorters.NAME_ASCENDING)
-public class TestBEPTitulacionesPreferentes extends UtilsTestUsuarioBase {
+public class TestBEPTitulacionesPreferentes extends UtilsTestBEP {
 	private static final String NOMBREDEESTACLASE = TestBEPTitulacionesPreferentes.class.getName();
 
 	private static final Logger LOGGER = Logger.getLogger(NOMBREDEESTACLASE);
-	private static final Integer WAIT_ELEMENT = 5; // segundos
 
 	private static final String DIV_MAIN_TITULACIONES = "titulacionespreferentes";
 	private static final String ID_TABLE = "table_titulaciones_preferentes_area";
