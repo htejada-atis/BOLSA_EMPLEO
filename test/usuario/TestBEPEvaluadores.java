@@ -1,9 +1,11 @@
 package usuario;
 
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
 import java.io.IOException;
 import java.sql.SQLException;
+import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -27,24 +29,14 @@ import bbdd.UtilsTestBolsaEmpleo;
  * @author ATISoluciones
  */
 @FixMethodOrder(MethodSorters.NAME_ASCENDING)
-public class TestBEPEvaluadores extends UtilsTestUsuarioBase {
+public class TestBEPEvaluadores extends UtilsTestBEP {
 	private static final String NOMBREDEESTACLASE = TestBEPAreasBaremar.class.getName();
 
 	private static final Logger LOGGER = Logger.getLogger(NOMBREDEESTACLASE);
-	private static final Integer WAIT_ELEMENT = 5; // segundos
-
+	
 	private static final String DIV_MAIN_EVALUADORES = "evaluadores-listar";
-	private static final String DIV_FORM_EVALUADORES = "evaluadores-agregar";
-	private static final String ID_TABLE = "table_evaluadores_area";
-	private static final String ID_TABLE_EVALUADOR = "table_usuarios";
-	private static final String CLASS_PAGINATION = "pagination";
-	private static final String CLASS_PAGINATION_LAST = "last";
-	private static final String CLASS_PAGINATION_FIRST = "first";
-	private static final String CLASS_ACTIONS = "actions";
-
-	private static final String CLASS_DIALOGO = "ui-dialog";
-	private static final String CLASS_DIALOGO_BUTTON_PANEL = "ui-dialog-buttonpane";
-	private static final String CLASS_DIALOGO_BUTTON = "ui-button";
+	private static final String ID_TABLE_AREAS = "tableAreas";	
+	private static final String ID_TABLE_EVALUADORES = "tableEvaluadoresArea";
 
 	/**
 	 * Se ejecuta una vez al inicio de la clase.
@@ -74,152 +66,199 @@ public class TestBEPEvaluadores extends UtilsTestUsuarioBase {
 	}
 
 	/**
-	 * Agregado de evaluadores.
+	 * Agregar evaluador a todas las areas del departamento.
 	 */
 	@Test
 	public void testA1() {
-		WebDriverWait wait = new WebDriverWait(DriverUv.getDriver(), WAIT_ELEMENT);
+		// comprobamos titulo de la página
+		assertTitlePage(waitVisibility(By.className(DIV_MAIN_EVALUADORES)), "Evaluadores de un departamento");
 
-		// esperamos div principal
-		WebElement main = wait.until(ExpectedConditions.visibilityOfElementLocated(By.className(DIV_MAIN_EVALUADORES)));
-		WebElement h2 = main.findElement(By.tagName("h2"));
-		assertTrue(h2.getText().equals("Evaluadores de un área"));
-
-		// seleccionamos en select
-		Select area = new Select(DriverUv.getDriver().findElement(By.id("select_area")));
-		area.selectByIndex(1);
-
-		WebElement pmain = wait.until(ExpectedConditions.visibilityOfElementLocated(By.className(DIV_MAIN_EVALUADORES)));
-		WebElement btnNuevo = pmain.findElement(By.id("nuevo_evaluador"));
-		btnNuevo.click();
-
-		WebElement pmain2 = wait.until(ExpectedConditions.visibilityOfElementLocated(By.className(DIV_FORM_EVALUADORES)));
-		WebElement table = getTables(pmain2, ID_TABLE_EVALUADOR);
-		WebElement th = table.findElement(By.cssSelector("input[type='checkbox']"));
-		th.click();
-		WebElement actions = table.findElement(By.className(CLASS_ACTIONS));
-		WebElement btnAgregar = actions.findElement(By.xpath("button[1]"));
-		btnAgregar.click();
+		// seleccionamos el departamento (refresh)
+		WebElement tableAreas = seleccionarDepartamento(1);
+				
+		// añadimos evaluador (refresh)
+		WebElement input = waitVisibility(By.id("nombre_evaluador"));
+		input.sendKeys("comision1");
+		WebElement btn = waitClickable(By.id("nuevo_evaluador"));
+		btn.click();
+		tableAreas = waitVisibility(By.id(ID_TABLE_AREAS));
+		
+		// mensaje 			
+		List<String> mensajes = getMensajesDeExito();
+		assertEquals(getTotalTable(tableAreas), mensajes.size());
+		
+		// seleccionamos el primer item de la tabla
+		tableAreas = waitVisibility(By.id(ID_TABLE_AREAS));
+		WebElement trArea = getRowByIndex(tableAreas, 0);
+		WebElement tdId = getColumnByIndex(trArea, 1);
+		tdId.click();
+		
+		// comprobamos tabla de evaluadores del area
+		WebElement tableEvaluadores = waitVisibility(By.id(ID_TABLE_EVALUADORES));
+		assertTotalTable(tableEvaluadores, 1);
 	}
-
+	
 	/**
-	 * Listado evaluadores .
-	 * 
-	 * @throws IOException           .
-	 * @throws MalformedURLException .
+	 * Agregar evaluador a ciertas areas del departamento.
 	 */
 	@Test
 	public void testA2() {
-		WebDriverWait wait = new WebDriverWait(DriverUv.getDriver(), WAIT_ELEMENT);
-
-		// esperamos div principal
-		WebElement main = wait.until(ExpectedConditions.visibilityOfElementLocated(By.className(DIV_MAIN_EVALUADORES)));
-		WebElement h2 = main.findElement(By.tagName("h2"));
-		assertTrue(h2.getText().equals("Evaluadores de un área"));
-
-		// seleccionamos en select
-		Select area = new Select(DriverUv.getDriver().findElement(By.id("select_area")));
-		area.selectByIndex(1);
-
-		// esperamos a que se renderice la table
-		WebElement total = wait.until(
-				ExpectedConditions.presenceOfNestedElementLocatedBy(getTables(main, ID_TABLE), By.className("total")));
-
-		comprobarNumUsu(total);
-
-		comprobarOrdenacion(getTables(main, ID_TABLE));
-
-		comprobarPaginacion(getTables(main, ID_TABLE));
+		// seleccionamos el departamento (refresh)
+		WebElement tableAreas = seleccionarDepartamento(2);
+		
+		// seleccionamos las dos primeras areas
+		selectRowTable(tableAreas, 0);
+		selectRowTable(tableAreas, 1);
+		assertTotalSelectedTable(tableAreas, 2);
+		
+		// añadimos evaluador (refresh)
+		WebElement input = waitVisibility(By.id("nombre_evaluador"));
+		input.sendKeys("comision1");
+		WebElement btn = waitClickable(By.id("nuevo_evaluador"));
+		btn.click();
+		
+		// mensaje 
+		List<String> mExito = getMensajesDeExito();
+		List<String> mError = getMensajesDeError();
+		assertEquals(1, mExito.size());
+		assertEquals(1, mError.size());
+		
+		// seleccionamos el primer item de la tabla
+		tableAreas = waitVisibility(By.id(ID_TABLE_AREAS));
+		WebElement trArea = getRowByIndex(tableAreas, 0);
+		WebElement tdId = getColumnByIndex(trArea, 1);
+		tdId.click();
+		WebElement tableEvaluadores = waitVisibility(By.id(ID_TABLE_EVALUADORES));
+		assertTotalTable(tableEvaluadores, 1);
+		assertEquals(getTextCellTable(tableEvaluadores, 0, 0), "36393760D");
+		
+		// seleccionamos el segundo item de la tabla
+		tableAreas = waitVisibility(By.id(ID_TABLE_AREAS));
+		trArea = getRowByIndex(tableAreas, 0);
+		tdId = getColumnByIndex(trArea, 2);
+		tdId.click();
+		tableEvaluadores = waitVisibility(By.id(ID_TABLE_EVALUADORES));
+		assertTotalTable(tableEvaluadores, 1);
+		assertEquals(getTextCellTable(tableEvaluadores, 0, 0), "36393760D");
 	}
-
+	
 	/**
-	 * Probamos a borrar evaluador .
-	 * 
-	 * @throws MalformedURLException .
-	 * @throws IOException           .
+	 * Borrar evaluador.
+	 */
+	@Test
+	public void testA3() {
+		// seleccionamos el departamento (refresh)
+		WebElement tableAreas = seleccionarDepartamento(1);
+		
+		// seleccionamos la primera area
+		WebElement trArea = getRowByIndex(tableAreas, 0);
+		WebElement tdId = getColumnByIndex(trArea, 1);
+		tdId.click();	
+		
+		// borramos el primer item
+		WebElement tableEvaluadores = waitVisibility(By.id(ID_TABLE_EVALUADORES));
+		assertTotalTable(tableEvaluadores, 1);
+		assertEquals(getTextCellTable(tableEvaluadores, 0, 0), "36393760D");
+		WebElement trEvaluador = getRowByIndex(tableEvaluadores, 0);
+		WebElement btnBorrar = trEvaluador.findElement(By.className("btn-borrar")); 
+		btnBorrar.click();
+		
+		// dialogo
+		WebElement dialog = getDialog();
+		assertTitleDialgo(dialog, "Borrar evaluador");
+		WebElement btnSi = getButtonDialog(dialog, "Si");
+		btnSi.click();
+		
+		tableEvaluadores = waitVisibility(By.id(ID_TABLE_EVALUADORES));
+		assertEquals(getTextCellTable(tableEvaluadores, 0, 0), "Sin resultados");
+	}
+	
+	/**
+	 * Restaurar evaluador.
 	 */
 	@Test
 	public void testA4() {
-		// seleccionamos en select
-		Select area = new Select(DriverUv.getDriver().findElement(By.id("select_area")));
-		area.selectByIndex(1);
-
-		WebDriverWait wait = new WebDriverWait(DriverUv.getDriver(), WAIT_ELEMENT);
-		WebElement pmain = wait.until(ExpectedConditions.visibilityOfElementLocated(By.className(DIV_MAIN_EVALUADORES)));
-		WebElement table = getTables(pmain, ID_TABLE);
-		WebElement th = table.findElement(By.cssSelector("button[type='button']"));
-		th.click();
-		WebElement dialogo = DriverUv.getDriver().findElement(By.className(CLASS_DIALOGO));
-		WebElement buttonPanel = dialogo.findElement(By.className(CLASS_DIALOGO_BUTTON_PANEL));
-		WebElement button = buttonPanel.findElement(By.className(CLASS_DIALOGO_BUTTON));
-		button.click();
+		// seleccionamos el departamento (refresh)
+		WebElement tableAreas = seleccionarDepartamento(1);
+		
+		// seleccionamos la primera area
+		WebElement trArea = getRowByIndex(tableAreas, 0);
+		WebElement tdId = getColumnByIndex(trArea, 1);
+		tdId.click();	
+		
+		// seleccionamos el filtro
+		WebElement tableEvaluadores = waitVisibility(By.id(ID_TABLE_EVALUADORES));
+		Select filtro = getFilterSelectByIndex(tableEvaluadores, 2);
+		filtro.selectByValue("false");
+		
+		// restauramos
+		tableEvaluadores = waitVisibility(By.id(ID_TABLE_EVALUADORES));
+		assertTotalTable(tableEvaluadores, 1);
+		assertEquals(getTextCellTable(tableEvaluadores, 0, 0), "36393760D");
+		WebElement trEvaluador = getRowByIndex(tableEvaluadores, 0);
+		WebElement btn = trEvaluador.findElement(By.className("btn-restaurar")); 
+		btn.click();
+		
+		// dialogo
+		WebElement dialog = getDialog();
+		assertTitleDialgo(dialog, "Restaurar evaluador");
+		WebElement btnSi = getButtonDialog(dialog, "Si");
+		btnSi.click();
+		
+		tableEvaluadores = waitVisibility(By.id(ID_TABLE_EVALUADORES));
+		assertTotalTable(tableEvaluadores, 1);
+		assertEquals(getTextCellTable(tableEvaluadores, 0, 0), "36393760D");
 	}
-
+	
 	/**
-	 * Cierre de este unittest.
+	 * Error no existe el usuario.
 	 */
-	@AfterClass
-	public static void cerrar() {
-		LOGGER.log(Level.INFO, "final");
-		DriverUv.getDriver().quit();
+	@Test
+	public void testE1() {
+		// seleccionamos el departamento (refresh)
+		seleccionarDepartamento(1);
+		
+		// añadimos evaluador (refresh)
+		WebElement input = waitVisibility(By.id("nombre_evaluador"));
+		input.sendKeys("pepe");
+		WebElement btn = waitClickable(By.id("nuevo_evaluador"));
+		btn.click();
+		
+		List<String> mensajes = getMensajesDeError();
+		assertEquals(1, mensajes.size());
+		assertEquals(mensajes.get(0), "El usuario no existe en el sistema");		
 	}
-
+	
 	/**
-	 * GetTables.
-	 * 
-	 * @param main  .
-	 * @param tabla .
-	 * @return Web.
+	 * Error usuario no evaluador.
 	 */
-	public WebElement getTables(WebElement main, String tabla) {
-		return main.findElement(By.id(tabla));
+	@Test
+	public void testE2() {
+		// seleccionamos el departamento (refresh)
+		seleccionarDepartamento(1);
+		
+		// añadimos evaluador (refresh)
+		WebElement input = waitVisibility(By.id("nombre_evaluador"));
+		input.sendKeys("personal1");
+		WebElement btn = waitClickable(By.id("nuevo_evaluador"));
+		btn.click();
+		
+		List<String> mensajes = getMensajesDeError();
+		assertEquals(1, mensajes.size());
+		assertEquals(mensajes.get(0), "El usuario no tiene rol de comisión");		
 	}
-
-	/**
-	 * Comprueba que el numero de usuarios es mayor a 0.
-	 * 
-	 * @param total .
-	 */
-	public void comprobarNumUsu(WebElement total) {
-		Integer numElementos = Integer.parseInt(total.getText().split(" ")[1]);
-		assertTrue(numElementos > 0);
-	}
-
-	/**
-	 * click sobre ordenación y comprobamos que existe icono.
-	 * 
-	 * @param tabla .
-	 */
-	public void comprobarOrdenacion(WebElement tabla) {
-		WebElement th = tabla.findElement(By.className("dni"));
-		th.click();
-		WebElement img = th.findElement(By.className("order"));
-		assertTrue(img.getAttribute("src").indexOf("down.png") != -1);
-		th.click();
-		img = th.findElement(By.className("order"));
-		assertTrue(img.getAttribute("src").indexOf("up.png") != -1);
-	}
-
-	/**
-	 * comprobacion de la paginación.
-	 * 
-	 * @param tabla .
-	 */
-	public void comprobarPaginacion(WebElement tabla) {
-		WebElement pagination = tabla.findElement(By.className(CLASS_PAGINATION));
-		Integer totalPages = Integer.parseInt(pagination.getText().split("/")[1].trim().split(" ")[0].trim());
-		assertTrue(totalPages > 0);
-
-		WebElement btnLast = pagination.findElement(By.className(CLASS_PAGINATION_LAST));
-		btnLast.click();
-		pagination = tabla.findElement(By.className(CLASS_PAGINATION));
-		Integer firstPage = Integer.parseInt(pagination.getText().split("/")[0].trim().split(" ")[2].trim());
-		assertTrue(firstPage == totalPages);
-
-		WebElement btnFirst = pagination.findElement(By.className(CLASS_PAGINATION_FIRST));
-		btnFirst.click();
-		pagination = tabla.findElement(By.className(CLASS_PAGINATION));
-		Integer firstPageAgain = Integer.parseInt(pagination.getText().split("/")[0].trim().split(" ")[2].trim());
-		assertTrue(firstPageAgain == 1);
+	
+	private WebElement seleccionarDepartamento(int index) {
+		Select dep = new Select(waitVisibility(By.id("select_departamento")));
+		dep.selectByIndex(index);
+		dep = new Select(waitVisibility(By.id("select_departamento")));
+		String textoSelect = dep.getFirstSelectedOption().getText();
+		
+		WebElement tableAreas = waitVisibility(By.id(ID_TABLE_AREAS));
+		assertTitleTable(tableAreas, "Áreas del Departamento: " + textoSelect);
+		int totalAreas = getTotalTable(tableAreas); 
+		assertTrue(totalAreas > 0);
+		
+		return tableAreas;
 	}
 }

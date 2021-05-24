@@ -5,10 +5,11 @@
 
 function DataTable(id, config) {
     this.id = id;
+    this.idFinal = id.substring(1);
     this.node = $(id);
     this.thead = $('tr', this.node).first();
     this.tbody = $('tbody', this.node).last();
-    this.tfoot = $('tfoot', this.node).last();
+    this.tfoot = $('tfoot', this.node).last();    
     this.config = config;
     this.params = {
         'a': Atis.getProp(config, 'action', 'datatable'),
@@ -75,7 +76,7 @@ function DataTable(id, config) {
         beforeRender && beforeRender(self);
     	
         // limpiamos
-        $('tr', self.tbody).empty();
+        $(self.tbody).empty();
     	
     	if (response.data.length > 0) {
 	    	response.data.forEach(function(row, index) {
@@ -83,7 +84,7 @@ function DataTable(id, config) {
 	    	});
     	} else {
     		// sin resultados
-    		$(self.tbody).append('<tr><td colSpan="'+ self.config.columns.length + '">Sin resultados</tr>');	
+    		$(self.tbody).append('<tr id="' + this.idFinal + '_row_0"><td colSpan="'+ self.config.columns.length + '">Sin resultados</tr>');	
         }   
 
         // eventos after render
@@ -99,7 +100,7 @@ function DataTable(id, config) {
     };
     
     this.addRow = function(row, index) {
-    	var tr = $('<tr id="' + this.id + '_row_' + index + '"></tr>');
+    	var tr = $('<tr id="' + this.idFinal + '_row_' + index + '"></tr>');
 
         if (self.config.clickable) {
             $(tr).addClass('clickable');
@@ -165,7 +166,7 @@ function DataTable(id, config) {
     			var btn = $('<button class="btn"' + (title ? 'title="' + title + '"' : '') + ' type="button">'+ (label ? label : '')+'</button>');
     			
     			if (buttonDef.hasOwnProperty('class')) {
-    				$(btn).addClass(buttonDef.class);
+    				$(btn).addClass(isFunction(buttonDef.class) ? buttonDef.class(row) : buttonDef.class);
     			}
 
                 if (buttonDef.hasOwnProperty('icon')) {
@@ -343,6 +344,8 @@ function DataTable(id, config) {
     };
     
     this.prepareTable = function() {
+    	$(this.thead).addClass('header');
+    
         // si es selectable check en la cabecera para marcar/desmacar todos
     	if (self.config.selectable && self.config.selectable.all != false) {
     		var check = $('<input type="checkbox"/>')

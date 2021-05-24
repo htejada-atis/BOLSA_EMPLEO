@@ -1005,7 +1005,6 @@ public class ModeloUsuarioBolsaEmpleo {
 		return roles;
 	}
 	
-	
 	/** Cambia flag usuario a borrado con razon de borrado .
 	 * @param usuario .
 	 * @throws SQLException en caso de error en la BD
@@ -1048,22 +1047,25 @@ public class ModeloUsuarioBolsaEmpleo {
 		return getUsuarioByNumeroDocumento(usuarioNuevo.getNumDocumento());
 	}
 	
-	/** método que comprueba si existe un usuario y lo devuelve .
+	/**
+	 * Devuelve el usuario de la bolsa del empleo por su nombre de usuario. O null
+	 * si no está creado en la bolsa de empleo.
+	 * 
 	 * @param nombreUsuario .
 	 * @return si existe o no .
 	 * @throws SQLException .
-	 * @throws UVException .
+	 * @throws UVException  .
 	 */
-	public UsuarioBolsaEmpleo obtenerUsuarioBolsaEmpleoSiExiste(String nombreUsuario) throws SQLException, UVException {
+	public UsuarioBolsaEmpleo obtenerUsuarioBolsaEmpleoSiExiste(String nombreUsuario) throws UVException, SQLException {
 		Usuario usuArcos = CrearUsuario.usuario(nombreUsuario);
-		
+
 		if (usuArcos == null) {
 			throw new UVException(MENSAJE_USUARIO_NO_EXISTE);
 		}
-		
+
 		try {
 			return getUsuarioByNumeroDocumento(usuArcos.getDocumentoNumero());
-		} catch (Exception ex) {
+		} catch (UVException ex) {
 			return null;
 		}
 	}
