@@ -204,6 +204,8 @@ public class ControladorInicio extends HttpServlet {
 						response.sendRedirect(request.getServletPath());
 				    }
 				} catch (IOException ex) {
+					LOGGER.log(Level.SEVERE, Formateador.getStackTrace(ex));
+					LOGGER.log(Level.SEVERE, ex.toString());
 					throw new UVException("Erro descargando fichero");
 				}
 			}
