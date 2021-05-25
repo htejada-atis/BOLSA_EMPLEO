@@ -180,12 +180,19 @@ public class ControladorCandidatoTitulacionesPreferentesArea extends HttpServlet
 				BolsaEmpleoDataTable<Bolsa> dataTable = modelo.listaAreaCandidatoDatatable(request.getParameterMap());
 				bean.setDatatableAreas(dataTable);
 				writer.write(dataTable.toJson());
-			} catch (Exception ex) {
-				bean.getMensajesDeError().add(ex.getMessage());
-				
-				CodigoDescripcion mensaje = new CodigoDescripcion(RESPONSE_AJAX_ERROR, ex.getMessage());
+			} catch (UVException e) {
+				LOGGER.log(Level.WARNING, e.toString());
+				bean.getMensajesDeError().add(e.getMessage());
+				CodigoDescripcion mensaje = new CodigoDescripcion(RESPONSE_AJAX_ERROR, e.getMessage());
 				writer.write(new Gson().toJson(mensaje));
-				response.setStatus(RESPONSE_HTTP_CODE_ERROR);
+				response.setStatus(RESPONSE_AJAX_HTTP_CODE_ERROR);
+			} catch (SQLException e) { 
+				LOGGER.log(Level.SEVERE, Formateador.getStackTrace(e));
+				LOGGER.log(Level.SEVERE, e.toString());
+				bean.getMensajesDeError().add(e.getMessage());
+				CodigoDescripcion mensaje = new CodigoDescripcion(RESPONSE_AJAX_ERROR, e.getMessage());
+				writer.write(new Gson().toJson(mensaje));
+				response.setStatus(RESPONSE_AJAX_HTTP_CODE_ERROR);
 			}
 		}
 	}
@@ -212,11 +219,19 @@ public class ControladorCandidatoTitulacionesPreferentesArea extends HttpServlet
 				BolsaEmpleoDataTable<TitulacionArea> dataTable = modelo.listaTitulacionesAreaCandidatoDatatable(request.getParameterMap(), area);
 				bean.setDatatableTitulaciones(dataTable);
 				writer.write(dataTable.toJson());
-			} catch (Exception ex) {
-				CodigoDescripcion mensaje = new CodigoDescripcion(RESPONSE_AJAX_ERROR, ex.getMessage());
-				bean.getMensajesDeError().add(mensaje.toString());
+			} catch (UVException e) {
+				LOGGER.log(Level.WARNING, e.toString());
+				bean.getMensajesDeError().add(e.getMessage());
+				CodigoDescripcion mensaje = new CodigoDescripcion(RESPONSE_AJAX_ERROR, e.getMessage());
 				writer.write(new Gson().toJson(mensaje));
-				response.setStatus(RESPONSE_HTTP_CODE_ERROR);
+				response.setStatus(RESPONSE_AJAX_HTTP_CODE_ERROR);
+			} catch (SQLException e) { 
+				LOGGER.log(Level.SEVERE, Formateador.getStackTrace(e));
+				LOGGER.log(Level.SEVERE, e.toString());
+				bean.getMensajesDeError().add(e.getMessage());
+				CodigoDescripcion mensaje = new CodigoDescripcion(RESPONSE_AJAX_ERROR, e.getMessage());
+				writer.write(new Gson().toJson(mensaje));
+				response.setStatus(RESPONSE_AJAX_HTTP_CODE_ERROR);
 			}
 		}
 	}	

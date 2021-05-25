@@ -17,7 +17,6 @@ import com.google.gson.GsonBuilder;
 import com.google.gson.reflect.TypeToken;
 import es.ujaen.uvirtual.beans.CodigoDescripcion;
 import es.ujaen.uvirtual.beans.UVDatos;
-import es.ujaen.uvirtual.modulo.bolsaempleo.beans.Area;
 import es.ujaen.uvirtual.modulo.bolsaempleo.beans.Bolsa;
 import es.ujaen.uvirtual.modulo.bolsaempleo.beans.BolsaCandidatoValidacionTable;
 import es.ujaen.uvirtual.modulo.bolsaempleo.beans.BolsaValidacion;
@@ -348,10 +347,17 @@ public class ControladorValidarNoAfines extends HttpServlet {
 						listadoAreasNoSujetasAfinidad(bean.getConvocatoria(), request.getParameterMap());
 				bean.setDatatableBolsas(dataTable);
 				writer.write(dataTable.toJson());
-			} catch (Exception ex) {
-				bean.getMensajesDeError().add(ex.getMessage());
-				
-				CodigoDescripcion mensaje = new CodigoDescripcion(RESPONSE_AJAX_ERROR, ex.getMessage());
+			} catch (UVException e) {
+				LOGGER.log(Level.WARNING, e.toString());
+				bean.getMensajesDeError().add(e.getMessage());
+				CodigoDescripcion mensaje = new CodigoDescripcion(RESPONSE_AJAX_ERROR, e.getMessage());
+				writer.write(new Gson().toJson(mensaje));
+				response.setStatus(RESPONSE_AJAX_HTTP_CODE_ERROR);
+			} catch (SQLException e) { 
+				LOGGER.log(Level.SEVERE, Formateador.getStackTrace(e));
+				LOGGER.log(Level.SEVERE, e.toString());
+				bean.getMensajesDeError().add(e.getMessage());
+				CodigoDescripcion mensaje = new CodigoDescripcion(RESPONSE_AJAX_ERROR, e.getMessage());
 				writer.write(new Gson().toJson(mensaje));
 				response.setStatus(RESPONSE_AJAX_HTTP_CODE_ERROR);
 			}
@@ -371,10 +377,17 @@ public class ControladorValidarNoAfines extends HttpServlet {
 						bean.getConvocatoria(), bean.getCandidato(), bean.getMerito().getMerito(), request.getParameterMap());
 				bean.setDatatableBolsasCandidato(dataTable);
 				writer.write(dataTable.toJson());
-			} catch (Exception ex) {
-				bean.getMensajesDeError().add(ex.getMessage());
-				
-				CodigoDescripcion mensaje = new CodigoDescripcion(RESPONSE_AJAX_ERROR, ex.getMessage());
+			} catch (UVException e) {
+				LOGGER.log(Level.WARNING, e.toString());
+				bean.getMensajesDeError().add(e.getMessage());
+				CodigoDescripcion mensaje = new CodigoDescripcion(RESPONSE_AJAX_ERROR, e.getMessage());
+				writer.write(new Gson().toJson(mensaje));
+				response.setStatus(RESPONSE_AJAX_HTTP_CODE_ERROR);
+			} catch (SQLException e) { 
+				LOGGER.log(Level.SEVERE, Formateador.getStackTrace(e));
+				LOGGER.log(Level.SEVERE, e.toString());
+				bean.getMensajesDeError().add(e.getMessage());
+				CodigoDescripcion mensaje = new CodigoDescripcion(RESPONSE_AJAX_ERROR, e.getMessage());
 				writer.write(new Gson().toJson(mensaje));
 				response.setStatus(RESPONSE_AJAX_HTTP_CODE_ERROR);
 			}
@@ -394,10 +407,17 @@ public class ControladorValidarNoAfines extends HttpServlet {
 						listadoCandidatosNoSujetosAfinidad(bean.getConvocatoria(), bean.getBolsa(), request.getParameterMap());
 				bean.setDatatableCandidatos(dataTable);
 				writer.write(dataTable.toJson());
-			} catch (Exception ex) {
-				bean.getMensajesDeError().add(ex.getMessage());
-				
-				CodigoDescripcion mensaje = new CodigoDescripcion(RESPONSE_AJAX_ERROR, ex.getMessage());
+			} catch (UVException e) {
+				LOGGER.log(Level.WARNING, e.toString());
+				bean.getMensajesDeError().add(e.getMessage());
+				CodigoDescripcion mensaje = new CodigoDescripcion(RESPONSE_AJAX_ERROR, e.getMessage());
+				writer.write(new Gson().toJson(mensaje));
+				response.setStatus(RESPONSE_AJAX_HTTP_CODE_ERROR);
+			} catch (SQLException e) { 
+				LOGGER.log(Level.SEVERE, Formateador.getStackTrace(e));
+				LOGGER.log(Level.SEVERE, e.toString());
+				bean.getMensajesDeError().add(e.getMessage());
+				CodigoDescripcion mensaje = new CodigoDescripcion(RESPONSE_AJAX_ERROR, e.getMessage());
 				writer.write(new Gson().toJson(mensaje));
 				response.setStatus(RESPONSE_AJAX_HTTP_CODE_ERROR);
 			}
@@ -417,10 +437,17 @@ public class ControladorValidarNoAfines extends HttpServlet {
 						listadoMeritosNoSujetosAfinidad(bean.getConvocatoria(), bean.getBolsa(), bean.getCandidato(), request.getParameterMap());
 				bean.setDatatableMeritos(dataTable);
 				writer.write(dataTable.toJson());
-			} catch (Exception ex) {
-				bean.getMensajesDeError().add(ex.getMessage());
-				
-				CodigoDescripcion mensaje = new CodigoDescripcion(RESPONSE_AJAX_ERROR, ex.getMessage());
+			} catch (UVException e) {
+				LOGGER.log(Level.WARNING, e.toString());
+				bean.getMensajesDeError().add(e.getMessage());
+				CodigoDescripcion mensaje = new CodigoDescripcion(RESPONSE_AJAX_ERROR, e.getMessage());
+				writer.write(new Gson().toJson(mensaje));
+				response.setStatus(RESPONSE_AJAX_HTTP_CODE_ERROR);
+			} catch (SQLException e) { 
+				LOGGER.log(Level.SEVERE, Formateador.getStackTrace(e));
+				LOGGER.log(Level.SEVERE, e.toString());
+				bean.getMensajesDeError().add(e.getMessage());
+				CodigoDescripcion mensaje = new CodigoDescripcion(RESPONSE_AJAX_ERROR, e.getMessage());
 				writer.write(new Gson().toJson(mensaje));
 				response.setStatus(RESPONSE_AJAX_HTTP_CODE_ERROR);
 			}
@@ -440,10 +467,17 @@ public class ControladorValidarNoAfines extends HttpServlet {
 						listadoValoresMeritoBolsa(bean.getConvocatoria(), bean.getCandidato(), bean.getMerito().getMerito(), request.getParameterMap());
 				bean.setDatatableValoresMeritoBolsa(dataTable);
 				writer.write(dataTable.toJson());
-			} catch (Exception ex) {
-				bean.getMensajesDeError().add(ex.getMessage());
-				
-				CodigoDescripcion mensaje = new CodigoDescripcion(RESPONSE_AJAX_ERROR, ex.getMessage());
+			} catch (UVException e) {
+				LOGGER.log(Level.WARNING, e.toString());
+				bean.getMensajesDeError().add(e.getMessage());
+				CodigoDescripcion mensaje = new CodigoDescripcion(RESPONSE_AJAX_ERROR, e.getMessage());
+				writer.write(new Gson().toJson(mensaje));
+				response.setStatus(RESPONSE_AJAX_HTTP_CODE_ERROR);
+			} catch (SQLException e) { 
+				LOGGER.log(Level.SEVERE, Formateador.getStackTrace(e));
+				LOGGER.log(Level.SEVERE, e.toString());
+				bean.getMensajesDeError().add(e.getMessage());
+				CodigoDescripcion mensaje = new CodigoDescripcion(RESPONSE_AJAX_ERROR, e.getMessage());
 				writer.write(new Gson().toJson(mensaje));
 				response.setStatus(RESPONSE_AJAX_HTTP_CODE_ERROR);
 			}

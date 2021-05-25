@@ -353,12 +353,19 @@ public class ControladorMisSolicitudes extends HttpServlet {
 				BolsaEmpleoDataTable<Solicitud> dataTable = modelo.listaSolicitudesDatatable(bean.getCandidato(), request.getParameterMap());
 				bean.setDatatableSolicitudes(dataTable);
 				writer.write(dataTable.toJson());
-			} catch (Exception ex) {
-				bean.getMensajesDeError().add(ex.getMessage());
-				
-				CodigoDescripcion mensaje = new CodigoDescripcion(RESPONSE_AJAX_ERROR, ex.getMessage());
+			} catch (UVException e) {
+				LOGGER.log(Level.WARNING, e.toString());
+				bean.getMensajesDeError().add(e.getMessage());
+				CodigoDescripcion mensaje = new CodigoDescripcion(RESPONSE_AJAX_ERROR, e.getMessage());
 				writer.write(new Gson().toJson(mensaje));
-				response.setStatus(RESPONSE_HTTP_CODE_ERROR);
+				response.setStatus(RESPONSE_AJAX_HTTP_CODE_ERROR);
+			} catch (SQLException e) { 
+				LOGGER.log(Level.SEVERE, Formateador.getStackTrace(e));
+				LOGGER.log(Level.SEVERE, e.toString());
+				bean.getMensajesDeError().add(e.getMessage());
+				CodigoDescripcion mensaje = new CodigoDescripcion(RESPONSE_AJAX_ERROR, e.getMessage());
+				writer.write(new Gson().toJson(mensaje));
+				response.setStatus(RESPONSE_AJAX_HTTP_CODE_ERROR);
 			}
 		}
 	}
@@ -472,11 +479,19 @@ public class ControladorMisSolicitudes extends HttpServlet {
 				BolsaEmpleoDataTable<BolsaCandidato> dataTable = modelo.listaAreaSolicitudDatatable(request.getParameterMap(), bean.getCandidato().getCodNum());
 				bean.setDataTableBolsasCandidato(dataTable);
 				writer.write(dataTable.toJson());
-			} catch (Exception ex) {
-				bean.getMensajesDeError().add(ex.getMessage());
-				CodigoDescripcion mensaje = new CodigoDescripcion(RESPONSE_AJAX_ERROR, ex.getMessage());
+			} catch (UVException e) {
+				LOGGER.log(Level.WARNING, e.toString());
+				bean.getMensajesDeError().add(e.getMessage());
+				CodigoDescripcion mensaje = new CodigoDescripcion(RESPONSE_AJAX_ERROR, e.getMessage());
 				writer.write(new Gson().toJson(mensaje));
-				response.setStatus(RESPONSE_HTTP_CODE_ERROR);
+				response.setStatus(RESPONSE_AJAX_HTTP_CODE_ERROR);
+			} catch (SQLException e) { 
+				LOGGER.log(Level.SEVERE, Formateador.getStackTrace(e));
+				LOGGER.log(Level.SEVERE, e.toString());
+				bean.getMensajesDeError().add(e.getMessage());
+				CodigoDescripcion mensaje = new CodigoDescripcion(RESPONSE_AJAX_ERROR, e.getMessage());
+				writer.write(new Gson().toJson(mensaje));
+				response.setStatus(RESPONSE_AJAX_HTTP_CODE_ERROR);
 			}
 		}
 	}
@@ -740,11 +755,19 @@ public class ControladorMisSolicitudes extends HttpServlet {
 				BolsaEmpleoDataTable<BolsaSolicitudTable> dataTable = modelo.listaBolsasSolicitudesDatatable(solicitud, request.getParameterMap());
 				bean.setDatatableBolsasSolicitud(dataTable);
 				writer.write(dataTable.toJson());
-			} catch (Exception ex) {
-				bean.getMensajesDeError().add(ex.getMessage());
-				CodigoDescripcion mensaje = new CodigoDescripcion(RESPONSE_AJAX_ERROR, ex.getMessage());
+			} catch (UVException e) {
+				LOGGER.log(Level.WARNING, e.toString());
+				bean.getMensajesDeError().add(e.getMessage());
+				CodigoDescripcion mensaje = new CodigoDescripcion(RESPONSE_AJAX_ERROR, e.getMessage());
 				writer.write(new Gson().toJson(mensaje));
-				response.setStatus(RESPONSE_HTTP_CODE_ERROR);
+				response.setStatus(RESPONSE_AJAX_HTTP_CODE_ERROR);
+			} catch (SQLException e) { 
+				LOGGER.log(Level.SEVERE, Formateador.getStackTrace(e));
+				LOGGER.log(Level.SEVERE, e.toString());
+				bean.getMensajesDeError().add(e.getMessage());
+				CodigoDescripcion mensaje = new CodigoDescripcion(RESPONSE_AJAX_ERROR, e.getMessage());
+				writer.write(new Gson().toJson(mensaje));
+				response.setStatus(RESPONSE_AJAX_HTTP_CODE_ERROR);
 			}
 		}
 	}
@@ -774,12 +797,19 @@ public class ControladorMisSolicitudes extends HttpServlet {
 						listaMeritosSolicitudDatatable(request.getParameterMap(), bean.getCandidato(), bolsa);
 				bean.setDataTableMeritos(dataTable);
 				writer.write(dataTable.toJson());
-			} catch (Exception ex) {
-				bean.getMensajesDeError().add(ex.getMessage());
-				
-				CodigoDescripcion mensaje = new CodigoDescripcion(RESPONSE_AJAX_ERROR, ex.getMessage());
+			} catch (UVException e) {
+				LOGGER.log(Level.WARNING, e.toString());
+				bean.getMensajesDeError().add(e.getMessage());
+				CodigoDescripcion mensaje = new CodigoDescripcion(RESPONSE_AJAX_ERROR, e.getMessage());
 				writer.write(new Gson().toJson(mensaje));
-				response.setStatus(RESPONSE_HTTP_CODE_ERROR);
+				response.setStatus(RESPONSE_AJAX_HTTP_CODE_ERROR);
+			} catch (SQLException e) { 
+				LOGGER.log(Level.SEVERE, Formateador.getStackTrace(e));
+				LOGGER.log(Level.SEVERE, e.toString());
+				bean.getMensajesDeError().add(e.getMessage());
+				CodigoDescripcion mensaje = new CodigoDescripcion(RESPONSE_AJAX_ERROR, e.getMessage());
+				writer.write(new Gson().toJson(mensaje));
+				response.setStatus(RESPONSE_AJAX_HTTP_CODE_ERROR);
 			}
 		}
 	}
@@ -908,6 +938,8 @@ public class ControladorMisSolicitudes extends HttpServlet {
 			}
 			stream.flush();
 		} catch (Exception ex) {
+			LOGGER.log(Level.SEVERE, Formateador.getStackTrace(ex));
+			LOGGER.log(Level.SEVERE, ex.toString());
 			throw new UVException(ex.toString());
 		}
         

@@ -9,6 +9,8 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import es.ujaen.uvirtual.adm.CrearUsuario;
 import es.ujaen.uvirtual.beans.UVDatos;
@@ -31,6 +33,8 @@ import es.ujaen.uvirtual.utilidades.UVException;
  * @author ATISoluciones 2021
  */
 public class ModeloUsuarioBolsaEmpleo {
+	private static final String NOMBREDEESTACLASE = ModeloUsuarioBolsaEmpleo.class.getName();
+	private static final Logger LOGGER = Logger.getLogger(NOMBREDEESTACLASE);
 	
 	public static final int ORDER_COLUMN_INDEX_TIPO_DOCUMENTO = 1;
 	public static final int ORDER_COLUMN_INDEX_NUMDOCUMENTO = 2;
@@ -114,11 +118,13 @@ public class ModeloUsuarioBolsaEmpleo {
 				Connection conexionArcos = ConexionArcos.obtenerInstancia();
 				PreparedStatement stmt = conexion.prepareStatement(consulta);
 				PreparedStatement stmtArcos = conexionArcos.prepareStatement(consultaArcos)) {
+			
 			stmt.setString(1, documento);
 			stmtArcos.setString(1, documento);
 			
 			try (ResultSet rs = stmt.executeQuery(); ResultSet rsArcos = stmtArcos.executeQuery()) {
 				if (!rsArcos.next()) {
+					LOGGER.log(Level.SEVERE, String.format("No existe el usuario en VUJA_NET_BEP_AR_PERSONA [%s]", documento));
 					throw new UVException(MENSAJE_ERROR_USUARIO_UJA_CON_DOCUMENTO_NO_EXISTE);
 				}
 				
@@ -615,7 +621,9 @@ public class ModeloUsuarioBolsaEmpleo {
 		return dataTable;
 	}
 	
-	/**	Función que inserta un usuario en la BD.
+	/**
+	 * Función que inserta un usuario en la BD.
+	 * 
 	 * @param usuario a insertar en la BD
 	 * @throws SQLException en caso de error en la BD
 	 */
@@ -624,13 +632,11 @@ public class ModeloUsuarioBolsaEmpleo {
 			throw new UVException("No se puede insertar un usuario vacio");
 		}
 		if (usuario.getRol() == null) {
-			throw new UVException("No se puede insertar un usuario sin role");
+			throw new UVException("No se puede insertar un usuario sin rol");
 		}
 		
-		if (!usuario.getExcluido()) {
-			String consulta = "INSERT INTO tbep_usuarios " 
-					+ " (CODCUENTA,PRSNIF,ROL,FLGLISTADISTRIBUCION) "
-					+ "VALUES (?, ?, ?, ?)";
+		if (Boolean.FALSE.equals(usuario.getExcluido())) {
+			String consulta = "INSERT INTO TBEP_USUARIOS (CODCUENTA,PRSNIF,ROL,FLGLISTADISTRIBUCION) VALUES (?, ?, ?, ?)";
 			
 			try (Connection conexion = ConexionUvirtual.obtenerInstancia();
 					PreparedStatement stmt = conexion.prepareStatement(consulta);) {
@@ -638,11 +644,11 @@ public class ModeloUsuarioBolsaEmpleo {
 				stmt.setString(parameterIndex++, usuario.getCodCuenta());
 				stmt.setString(parameterIndex++, usuario.getNumDocumento());
 				stmt.setInt(parameterIndex++, usuario.getRol().getCodNum());
-				stmt.setString(parameterIndex++, usuario.getListaDist() ? "S" : "N");
+				stmt.setString(parameterIndex++, Boolean.TRUE.equals(usuario.getListaDist()) ? "S" : "N");
 				stmt.executeUpdate();
 			}
 		} else {
-			String consulta = "INSERT INTO tbep_usuarios " + " (CODCUENTA,PRSNIF,ROL,FLGLISTADISTRIBUCION,"
+			String consulta = "INSERT INTO TBEP_USUARIOS (CODCUENTA,PRSNIF,ROL,FLGLISTADISTRIBUCION,"
 					+ "FLGEXCLUIDO,FLGEXCLUIDOTIPO,RAZON_EXCLUSION,FECHA_EXCLUSION";
 
 			if (usuario.getExcluidoTipo() != null && usuario.getExcluidoTipo().equals(EXCLUSION_TIPO_TEMPORAL)) {
@@ -657,8 +663,8 @@ public class ModeloUsuarioBolsaEmpleo {
 				stmt.setString(parameterIndex++, usuario.getCodCuenta());
 				stmt.setString(parameterIndex++, usuario.getNumDocumento());
 				stmt.setInt(parameterIndex++, usuario.getRol().getCodNum());
-				stmt.setString(parameterIndex++, usuario.getListaDist() ? "S" : "N");
-				stmt.setString(parameterIndex++, usuario.getExcluido() ? "S" : "N");
+				stmt.setString(parameterIndex++, Boolean.TRUE.equals(usuario.getListaDist()) ? "S" : "N");
+				stmt.setString(parameterIndex++, Boolean.TRUE.equals(usuario.getExcluido()) ? "S" : "N");
 				stmt.setString(parameterIndex++, usuario.getExcluidoTipo());
 				stmt.setString(parameterIndex++, usuario.getRazonExcluido());
 				stmt.setDate(parameterIndex++, new java.sql.Date(usuario.getFechaExclusion().getTime()));
@@ -907,31 +913,25 @@ public class ModeloUsuarioBolsaEmpleo {
 		// no hay usuario logeado, salimos
 		if (usuArcos == null) {
 			return false;
-		} 
-		
-		UsuarioBolsaEmpleo usuario = null;
+		}
+					
+		UsuarioBolsaEmpleo usuario;
 		
 		try {
 			// comprobamos si el usuario existe en uvirtual (excepción si no existe)
 			usuario = getUsuarioByNumeroDocumento(usuArcos.getDocumentoNumero());			
 		} catch (UVException e) {
-			ModeloRol modeloRol = ModeloRol.obtenerInstancia();
-			Rol role;
+			// no existe el usuario en la bolsa de empleo lo creamos como candidato			
+			UsuarioBolsaEmpleo usuarioFinal = new UsuarioBolsaEmpleo(
+				usuArcos.getDocumentoNumero(), 
+				usuArcos.getUid(),
+				ModeloRol.obtenerInstancia().getRoleById(ModeloRol.ID_ROL_CANDIDATO),
+				true, false, null, null, null
+			);
 			
-			try {
-				role = modeloRol.getRoleById(ModeloRol.ID_ROL_CANDIDATO);
-				
-				UsuarioBolsaEmpleo usuarioFinal = 
-				new UsuarioBolsaEmpleo(usuArcos.getDocumentoNumero(), usuArcos.getUid(), role, true, false, null, null, null);
-				
-				insertaUsuario(usuarioFinal);
-			
-				CrearUsuario.refrescarUsuario(usuarioFinal.getCodCuenta());
-				
-				return true;				
-			} catch (SQLException | UVException ex) {
-				throw new UVException("Error creando usuario de bolsa de empleo");
-			}
+			insertaUsuario(usuarioFinal);
+			usuario = getUsuarioByNumeroDocumento(usuArcos.getDocumentoNumero());
+			CrearUsuario.refrescarUsuario(usuario.getCodCuenta());				
 		}
 		
 		// comprobamos si está borrado o excluido
@@ -939,9 +939,9 @@ public class ModeloUsuarioBolsaEmpleo {
 			throw new UVException("No puede acceder, su perfil ha sido excluido por los siguientes motivos: " + usuario.getRazonExcluido());
 		} else if (Boolean.TRUE.equals(usuario.getBorrado())) {
 			throw new UVException("No puede acceder, su perfil ha sido borrado de la base de datos");
-		} else {
-			return true;
-		}
+		} 
+		
+		return true;		
 	}
 	
 	/** Elimina un usuario.
@@ -981,19 +981,19 @@ public class ModeloUsuarioBolsaEmpleo {
 		}
 	}	
 	
-	/** Devuelve una lista con los roles de un usuario .
+	/**
+	 * Devuelve una lista con los roles de un usuario .
+	 * 
 	 * @param uid del usuario
 	 * @return Lista de roles del usuario
 	 * @throws SQLException en caso de error en la BD
-	 * @throws UVException si noticia no es valida
+	 * @throws UVException  si noticia no es valida
 	 */
 	public List<String> listaRolesUsuario(String uid) throws SQLException {
 		ArrayList<String> roles = new ArrayList<>();
-		String consultaRol = "SELECT admrol.valor " + "FROM TBEP_USUARIOS bepusu "
-				+ "LEFT JOIN ADM_ROL admrol ON admrol.ROL_CODNUM=bepusu.ROL " + "WHERE bepusu.CODCUENTA= ? ";
+		String consultaRol = "SELECT admrol.valor FROM TBEP_USUARIOS bepusu LEFT JOIN ADM_ROL admrol ON admrol.ROL_CODNUM = bepusu.ROL WHERE bepusu.CODCUENTA = ?";
 
-		try (Connection conexion = ConexionUvirtual.obtenerInstancia();
-				PreparedStatement stmt = conexion.prepareStatement(consultaRol)) {
+		try (Connection conexion = ConexionUvirtual.obtenerInstancia(); PreparedStatement stmt = conexion.prepareStatement(consultaRol)) {
 			int parameterIndex = 1;
 			stmt.setString(parameterIndex++, uid);
 			try (ResultSet rs = stmt.executeQuery();) {
@@ -1002,6 +1002,7 @@ public class ModeloUsuarioBolsaEmpleo {
 				}
 			}
 		}
+		
 		return roles;
 	}
 	
