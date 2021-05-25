@@ -9,6 +9,7 @@ import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import org.junit.AfterClass;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.FixMethodOrder;
@@ -31,7 +32,7 @@ public class TestBEPEvaluadores extends UtilsTestBEP {
 
 	private static final Logger LOGGER = Logger.getLogger(NOMBREDEESTACLASE);
 	
-	private static final String DIV_MAIN_EVALUADORES = "evaluadores-listar";
+	private static final String DIV_MAIN = "evaluadores-listar";
 	private static final String ID_TABLE_AREAS = "tableAreas";	
 	private static final String ID_TABLE_EVALUADORES = "tableEvaluadoresArea";
 
@@ -47,6 +48,15 @@ public class TestBEPEvaluadores extends UtilsTestBEP {
 		UtilsTestBolsaEmpleo.inicializaBolsaEmpleo();
 		DriverUv.inicializaDriver();
 		DriverUv.login("personal1");
+	}
+	
+	/**
+	 * Cierre de este unittest.
+	 */
+	@AfterClass
+	public static void cerrar() {
+		LOGGER.log(Level.INFO, "final");
+		DriverUv.getDriver().quit();
 	}
 
 	/**
@@ -68,7 +78,7 @@ public class TestBEPEvaluadores extends UtilsTestBEP {
 	@Test
 	public void testA1() {
 		// comprobamos titulo de la página
-		assertTitlePage(waitVisibility(By.className(DIV_MAIN_EVALUADORES)), "Evaluadores de un departamento");
+		assertTitlePage(waitVisibility(By.className(DIV_MAIN)), "Evaluadores de un departamento");
 
 		// seleccionamos el departamento (refresh)
 		WebElement tableAreas = seleccionarDepartamento(1);

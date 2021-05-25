@@ -126,7 +126,8 @@ public class ControladorCandidatoTitulacionesPreferentesArea extends HttpServlet
 		}
 	}
 	
-	private void init(VistaCandidatoTitulacionesArea bean, UVDatos datos, HttpServletRequest request, HttpServletResponse response) throws SQLException, UVException, IOException {
+	private void init(VistaCandidatoTitulacionesArea bean, UVDatos datos, HttpServletRequest request, HttpServletResponse response) 
+			throws SQLException, UVException, IOException {
 		BolsaEmpleoUtils.readMensajeSession(bean, request);
 		try {
 			ModeloUsuarioBolsaEmpleo.obtenerInstancia().checkUser(datos);

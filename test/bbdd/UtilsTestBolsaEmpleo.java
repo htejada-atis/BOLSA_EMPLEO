@@ -53,22 +53,18 @@ public final class UtilsTestBolsaEmpleo {
 	public static void inicializaBolsaEmpleo() throws SQLException, IOException {
 		if (!cargado) {
 			// mocks esquema arcos
-			UtilsTestBolsaEmpleo.ejecutarMultiplesScripts("MOCKS ARCOS", "Documentos/scripts/opc.bolsaempleo/mock_arcos",
-					ESQUEMA_ARCOS, false);
+			UtilsTestBolsaEmpleo.ejecutarMultiplesScripts("MOCKS ARCOS", "Documentos/scripts/opc.bolsaempleo/mock_arcos", ESQUEMA_ARCOS, false);
 	
 			// mocks esquema rrhh
-			UtilsTestBolsaEmpleo.ejecutarMultiplesScripts("MOCKS RRHH", "Documentos/scripts/opc.bolsaempleo/mock_rrhh",
-					ESQUEMA_RRHH, false);
+			UtilsTestBolsaEmpleo.ejecutarMultiplesScripts("MOCKS RRHH", "Documentos/scripts/opc.bolsaempleo/mock_rrhh", ESQUEMA_RRHH, false);
 	
 			// limpieza uvirtual
-			UtilsTestBolsaEmpleo.ejecutarMultiplesScripts("UVIRTUAL CLEAN",
-					"Documentos/scripts/opc.bolsaempleo/datos_desarrollo/clean", ESQUEMA_UVIRTUAL, true);
+			UtilsTestBolsaEmpleo.ejecutarMultiplesScripts("UVIRTUAL CLEAN", "Documentos/scripts/opc.bolsaempleo/datos_desarrollo/clean", ESQUEMA_UVIRTUAL, true);
 	
 			// creación tablas uvirtual
-			UtilsTestBolsaEmpleo.ejecutarMultiplesScripts("UVIRTUAL TABLAS", "Documentos/scripts/opc.bolsaempleo",
-					ESQUEMA_UVIRTUAL, false);
+			UtilsTestBolsaEmpleo.ejecutarMultiplesScripts("UVIRTUAL TABLAS", "Documentos/scripts/opc.bolsaempleo", ESQUEMA_UVIRTUAL, false);
 	
-			// datos de pruebas => areas
+			// carga datos de departamentos y areas desde uvirtual
 			try {
 				logFile("Insertando areas ...");
 				UtilsTestBolsaEmpleo.insertarDepartamentosAreas();
@@ -77,10 +73,12 @@ public final class UtilsTestBolsaEmpleo {
 				logFile("Error insertando areas y departamentos: " + ex, false);
 				throw ex;
 			}
+			
+			// carga de datos para produccion
+			UtilsTestBolsaEmpleo.ejecutarMultiplesScripts("DATOS PRODUCCION", "Documentos/scripts/opc.bolsaempleo/datos_produccion", ESQUEMA_UVIRTUAL, false);
 	
 			// datos para pruebas
-			UtilsTestBolsaEmpleo.ejecutarMultiplesScripts("UVIRTUAL DATOS PRUEBA",
-					"Documentos/scripts/opc.bolsaempleo/datos_desarrollo/datos_prueba", ESQUEMA_UVIRTUAL, false);
+			UtilsTestBolsaEmpleo.ejecutarMultiplesScripts("DATOS PRUEBA", "Documentos/scripts/opc.bolsaempleo/datos_desarrollo/datos_prueba", ESQUEMA_UVIRTUAL, false);
 			cargado = true;
 		}
 	}
@@ -186,8 +184,16 @@ public final class UtilsTestBolsaEmpleo {
 		UtilsTestBolsaEmpleo.ejecutarFile(directory, esquema);
 	}
 
-	public static void ejecutarMultiplesScripts(String title, String path, String esquema, boolean reverse)
-			throws IOException, SQLException {
+	/**
+	 * Ejecuta todos los scripts de un path.
+	 * @param title .
+	 * @param path .
+	 * @param esquema .
+	 * @param reverse .
+	 * @throws IOException .
+	 * @throws SQLException .
+	 */
+	public static void ejecutarMultiplesScripts(String title, String path, String esquema, boolean reverse) throws IOException, SQLException {
 		if (VERBOSE) {
 			LOGGER.log(Level.INFO, "[{0}]", title + " esquema: " + esquema);
 		}
@@ -207,7 +213,14 @@ public final class UtilsTestBolsaEmpleo {
 			}
 		}
 	}	
-
+	
+	/**
+	 * Ejecuta un script concreto sobre un esquema.
+	 * @param file .
+	 * @param esquema .
+	 * @throws IOException .
+	 * @throws SQLException .
+	 */
 	private static void ejecutarFile(File file, String esquema) throws IOException, SQLException {
 		String name = file.getName();
 
@@ -275,7 +288,11 @@ public final class UtilsTestBolsaEmpleo {
 		}
 	}
 
-	private static void insertarDepartamentosAreas() throws SQLException {
+	/**
+	 * Importa departamentos y areas de vuja.
+	 * @throws SQLException .
+	 */
+	public static void insertarDepartamentosAreas() throws SQLException {
 		try (Connection conRh = BbddRunner.obtenerConexionRh(); Connection conUv = BbddRunner.obtenerConexionUvirtual()) {
 			// departamentos
 
