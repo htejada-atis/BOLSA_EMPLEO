@@ -14,7 +14,6 @@ import bbdd.BbddRunner;
 import bbdd.UtilsTestBolsaEmpleo;
 import controlador.implementacion.PeticionHttp;
 import controlador.implementacion.RespuestaHttp;
-import controlador.implementacion.SesionHttp;
 import es.ujaen.uvirtual.modulo.bolsaempleo.controlador.ControladorValidarNoAfines;
 import es.ujaen.uvirtual.modulo.bolsaempleo.utilidades.BolsaEmpleoDataTable;
 import es.ujaen.uvirtual.modulo.bolsaempleo.vistas.VistaValidarNoAfines;

@@ -285,19 +285,18 @@ public class ModeloEvaluador {
 		return dataTable;
 	}
 	
-	/** Consulta titulaciones en BBDD y las devuelve.
+	/** Comprueba si el usuario está como evaluador del area.
 	 * @param area .
 	 * @param usu .
 	 * @return boolean si el evaluador ya se encuentra asignado a ese area
 	 * @throws SQLException en caso de error de base de datos
 	 * @throws UVException .
 	 */
-	public Boolean checkEvaluadorArea(Area area, UsuarioBolsaEmpleo usu) throws SQLException, UVException {
+	public boolean checkEvaluadorArea(Area area, UsuarioBolsaEmpleo usu) throws SQLException, UVException {
 		String consulta = "SELECT * FROM TBEP_USUARIOS bepusu "
 				+ "INNER JOIN TBEP_EVALUADORES bepeva ON bepusu.CODNUM = bepeva.BEPUSU_CODNUM "
 				+ "WHERE bepeva.BEPARE_CODNUM = ? AND BEPUSU_CODNUM = ?";
-		try (Connection conexion = ConexionUvirtual.obtenerInstancia();
-				PreparedStatement stmt = conexion.prepareStatement(consulta)) {
+		try (Connection conexion = ConexionUvirtual.obtenerInstancia(); PreparedStatement stmt = conexion.prepareStatement(consulta)) {
 			int indexParam = 1;
 			stmt.setInt(indexParam++, area.getCodNum());
 			stmt.setInt(indexParam, usu.getCodNum());
@@ -377,7 +376,7 @@ public class ModeloEvaluador {
 			throw new UVException("No se puede eliminar un evaluador vacío");
 		}
 		if (evaluador.getCodNum() == null) {
-			throw new UVException("No se puede eliminar un evaluador con id de usuario vacío");
+			throw new UVException("No se puede eliminar un evaluador con id vacío");
 		}
 		if (evaluador.getCodNumArea() == null) {
 			throw new UVException("No se puede eliminar un evaluador con id de area vacío");

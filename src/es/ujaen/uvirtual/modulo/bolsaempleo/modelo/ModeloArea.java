@@ -41,6 +41,8 @@ public class ModeloArea {
 	public static final String BEPARE_CODNUM = "BEPARE_CODNUM";
 	public static final String ESTADO = "ESTADO";
 	
+	public static final String MENSAJE_ERROR_AREA_REQUERIDA = "El área es requerida";
+	
 	protected static ModeloArea eInstancia;
 	
 	/** Crea una instancia del objeto.
@@ -77,17 +79,14 @@ public class ModeloArea {
 				PreparedStatement stmt = conexion.prepareStatement(consulta)) {
 			try (ResultSet rs = stmt.executeQuery()) {
 				while (rs.next()) {
-					Area are = new Area();
-					are.setCodNum(rs.getInt(CODNUM));
-					are.setIdAreaExterno(rs.getString("ID_AREA_CONOCIMIENTO"));
-					are.setDescripcion(rs.getString("DES_AREA_CONOCIMIENTO"));
+					Area are = createAreaFromResulSet(rs);
 					areas.add(are);
 				}
 			}
 		}
 		return areas;
 	}
-	
+
 	/** lista todas las areas.
 	 * @return lista de todas las areas
 	 * @throws SQLException si hay un error en la base de datos
@@ -104,7 +103,11 @@ public class ModeloArea {
 	 * @throws SQLException en caso de error en la BD
 	 * @throws UVException si area no es existe
 	 */
-	public Area getAreaById(int codNum) throws SQLException, UVException {
+	public Area getAreaById(Integer codNum) throws SQLException, UVException {
+		if (codNum == null) {
+			throw new UVException(MENSAJE_ERROR_AREA_REQUERIDA);
+		}
+			
 		String consulta = "SELECT bepare.* FROM TBEP_AREAS bepare WHERE bepare.CODNUM = ?";				
 			
 		try (Connection conexion = ConexionUvirtual.obtenerInstancia();
@@ -143,6 +146,33 @@ public class ModeloArea {
 		return areas;
 	}
 		
+	/**
+	 * Devuelve las areas de un departamento.
+	 * @param dep .
+	 * @return .
+	 * @throws SQLException .
+	 */
+	public List<Area> getAreasByDepartamento(Departamento dep) throws SQLException {
+		ArrayList<Area> areas = new ArrayList<>();
+		String consulta = 
+				"   SELECT bepare.* FROM TBEP_AREAS bepare "
+				+ " INNER JOIN TBEP_AREAS_DEPARTAMENTOS bepade ON bepade.BEPARE_CODNUM = bepare.CODNUM "
+				+ " WHERE bepade.BEPDEP_CODNUM = ? ";
+		
+		try (Connection conexion = ConexionUvirtual.obtenerInstancia(); PreparedStatement stmt = conexion.prepareStatement(consulta)) {
+			int indexParam = 1;
+			stmt.setInt(indexParam, dep.getCodNum());
+			
+			try (ResultSet rs = stmt.executeQuery()) {
+				while (rs.next()) {
+					areas.add(this.createAreaFromResulSet(rs));					
+				}
+			}			
+		}
+		
+		return areas;
+	}
+	
 	/**
 	 * Listado de areas. 
 	 * @param params para leer los parametros de paginación, ordenacion, etc
@@ -387,7 +417,6 @@ public class ModeloArea {
 		return false;
 	}
 	
-	
 	///////////////////////////////////////////////////////////////////////////////////////////////////////////
 	// MÉTODOS PARA IMPORTAR ÁREAS DE UVIRTUAL
 	///////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -428,8 +457,7 @@ public class ModeloArea {
 		Integer totalInsertadas = 0;
 				
 		// leemos las areas externas omitiendo aquellas que ya existen en el sistema .
-		String consulta = "SELECT * FROM UXXIRRHH.VUJA_NET_BEP_RH_DEPTO_SECC_AREA uvnbrdsa"
-				+ " WHERE uvnbrdsa.ID_AREA_CONOCIMIENTO NOT IN ("
+		String consulta = "SELECT * FROM UXXIRRHH.VUJA_NET_BEP_RH_DEPTO_SECC_AREA uvnbrdsa WHERE uvnbrdsa.ID_AREA_CONOCIMIENTO NOT IN ("
 				+ obtenerStringIdsAreas(this.listaAreas("")) + ")";
 		
 		try (Connection conexionUxxiRrhh = ConexionUxxiRrhh.obtenerInstancia(); PreparedStatement stmt = conexionUxxiRrhh.prepareStatement(consulta)) {
@@ -488,7 +516,6 @@ public class ModeloArea {
 			List<Departamento> departamentosInternos = ModeloDepartamento.obtenerInstancia().listaDepartamentos();
 			
 			try {
-				
 				total += actualizaAreasPorDescripcion(conexionUxxiRrhh, areasInternas);
 				total += actualizaAreasPorDepartamento(conexionUxxiRrhh, areasInternas, departamentosInternos);
 				
@@ -510,8 +537,7 @@ public class ModeloArea {
 	 * @throws UVException .
 	 */
 	private void actualizaArea(Area area) throws SQLException {
-		String consulta = "UPDATE TBEP_AREAS "
-				+ "   SET ID_AREA_CONOCIMIENTO=?, DES_AREA_CONOCIMIENTO=? "
+		String consulta = "UPDATE TBEP_AREAS SET ID_AREA_CONOCIMIENTO=?, DES_AREA_CONOCIMIENTO=? "
 				+ " WHERE ID_AREA_CONOCIMIENTO = ? ";
 		
 		try (Connection conexion = ConexionUvirtual.obtenerInstancia();
@@ -669,8 +695,7 @@ public class ModeloArea {
 	 * @throws SQLException .
 	 * @throws UVException .
 	 */
-	private Departamento insertarDepartamentoSiNoExiste(Connection conexion, String idDepartamentoExterno, String descDepartamentoExterno)
-			throws SQLException, UVException {
+	private Departamento insertarDepartamentoSiNoExiste(Connection conexion, String idDepartamentoExterno, String descDepartamentoExterno) throws SQLException, UVException {
 		ModeloDepartamento modeloDepartamento = ModeloDepartamento.obtenerInstancia();
 		Departamento departamento = modeloDepartamento.getDepartamentoByIdExterno(idDepartamentoExterno);
 		
@@ -693,8 +718,7 @@ public class ModeloArea {
 	 * @throws SQLException .
 	 * @throws UVException .
 	 */
-	private Area insertarAreaSiNoExiste(Connection conexion, String idAreaExterna, String descAreaExterna)
-			throws SQLException, UVException {
+	private Area insertarAreaSiNoExiste(Connection conexion, String idAreaExterna, String descAreaExterna) throws SQLException, UVException {
 		Area area = getAreaByIdExterno(conexion, idAreaExterna);
 		
 		if (area == null) {
@@ -726,14 +750,17 @@ public class ModeloArea {
 					return null;
 				}
 				
-				Area area = new Area();
-				area.setCodNum(rs.getInt(CODNUM));
-				area.setIdAreaExterno(rs.getString("ID_AREA_CONOCIMIENTO"));
-				area.setDescripcion(rs.getString("DES_AREA_CONOCIMIENTO"));
-				
-				return area;
+				return this.createAreaFromResulSet(rs);
 			}
 		}
+	}
+	
+	private Area createAreaFromResulSet(ResultSet rs) throws SQLException {
+		Area are = new Area();
+		are.setCodNum(rs.getInt(CODNUM));
+		are.setIdAreaExterno(rs.getString("ID_AREA_CONOCIMIENTO"));
+		are.setDescripcion(rs.getString("DES_AREA_CONOCIMIENTO"));
+		return are;
 	}
 	
 }

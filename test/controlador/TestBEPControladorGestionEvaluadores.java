@@ -2,7 +2,6 @@ package controlador;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotEquals;
-import static org.junit.Assert.assertNotNull;
 import java.io.IOException;
 import java.sql.SQLException;
 import javax.servlet.ServletException;
@@ -30,7 +29,6 @@ public class TestBEPControladorGestionEvaluadores {
 	private static final String MENSAJE_AREAS_DEVUELTAS = "Debe devolver areas";
 	private static final String MENSAJE_AREA_DEVUELTA = "Debe devolver area";
 	private static final String MENSAJE_DEPARTAMENTOS_DEVUELTOS = "Debe devolver departamentos";
-	private static final String MENSAJE_EVALUADOR_DEVUELTO = "Debe devolver evaluador";
 	private static final String MENSAJE_CON_ERROR = "Debe devolver error";
 	private static final String MENSAJE_CON_ERROR_ESPERADO = "El mensaje de error debe coincidir";
 	private static final String MENSAJE_CON_EXITO_ESPERADO = "El mensaje de exito debe coincidir";
@@ -219,7 +217,6 @@ public class TestBEPControladorGestionEvaluadores {
 		controlador.doPost(peticion, respuesta);
 		VistaEvaluadores bean3 = (VistaEvaluadores) peticion.getUVDatos().getVistas().get(VistaEvaluadores.class.getName());
 
-		assertNotNull(MENSAJE_EVALUADOR_DEVUELTO, bean3.getEvaluador());
 		assertEquals(MENSAJE_CON_EXITO_ESPERADO, ControladorGestionEvaluadores.MENSAJE_EXITO_BORRAR, bean3.getMensajesDeExito().get(0));
 		assertEquals(MENSAJE_SIN_ERROR, 0, bean3.getMensajesDeError().size());
 		assertEquals(MENSAJE_SIN_ADVERTENCIAS, 0, bean3.getMensajesDeAdvertencia().size());
@@ -249,7 +246,6 @@ public class TestBEPControladorGestionEvaluadores {
 		controlador.doPost(peticion, respuesta);
 		VistaEvaluadores bean3 = (VistaEvaluadores) peticion.getUVDatos().getVistas().get(VistaEvaluadores.class.getName());
 
-		assertNotNull(MENSAJE_EVALUADOR_DEVUELTO, bean3.getEvaluador());
 		assertEquals(MENSAJE_CON_EXITO_ESPERADO, ControladorGestionEvaluadores.MENSAJE_EXITO_RESTAURAR, bean3.getMensajesDeExito().get(0));
 		assertEquals(MENSAJE_SIN_ERROR, 0, bean3.getMensajesDeError().size());
 		assertEquals(MENSAJE_SIN_ADVERTENCIAS, 0, bean3.getMensajesDeAdvertencia().size());
@@ -268,7 +264,7 @@ public class TestBEPControladorGestionEvaluadores {
 		VistaEvaluadores bean2 = getVistaConAreas();
 
 		PeticionHttp peticion = UtilsTestBolsaEmpleo.peticionAutenticadaPersonal();
-		peticion.setParameter(ControladorGestionEvaluadores.PARAM_ACCION, ControladorGestionEvaluadores.ACCION_AREA_SELECCIONADA);
+		peticion.setParameter(ControladorGestionEvaluadores.PARAM_ACCION, ControladorGestionEvaluadores.ACCION_SELECCIONAR_AREA);
 		peticion.setParameter(ControladorGestionEvaluadores.PARAM_AREA, bean2.getDatatableAreas().getData().get(0).getCodNum().toString());
 		peticion.setParameter(ControladorGestionEvaluadores.PARAM_DEPARTAMENTO, bean.getDepartamentos().get(1).getCodNum().toString());
 
