@@ -17,7 +17,6 @@ import org.openqa.selenium.support.ui.WebDriverWait;
  * Utilidades comunes a los test de usuario de bolsa de empleo.
  */
 public class UtilsTestBEP extends UtilsTestUsuarioBase {
-	protected static WebDriverWait eInstanciaWait;	 
 	private static final Pattern REGEX_TOTAL_TABLE = Pattern.compile("Total (\\d+)( \\(Seleccionados (\\d+)\\))?");
 	private static final Integer REGEX_TOTAL = 1;
 	private static final Integer REGEX_TOTAL_SELECTED = 3;
@@ -29,10 +28,7 @@ public class UtilsTestBEP extends UtilsTestUsuarioBase {
 	 * @return .
 	 */
 	public static WebDriverWait getWaiter() {
-		if (eInstanciaWait == null) {
-			eInstanciaWait = new WebDriverWait(DriverUv.getDriver(), WAIT_ELEMENT);
-		}
-		return eInstanciaWait;
+		return new WebDriverWait(DriverUv.getDriver(), WAIT_ELEMENT);		
     }
 		
 	/**
@@ -158,10 +154,58 @@ public class UtilsTestBEP extends UtilsTestUsuarioBase {
 	}
 	
 	/**
-	 * Devuelve el dialgo ui-dialog.
+	 * Devuelve un filtro de tipo input de la tabla de la columna indicada.
+	 * @param table .
+	 * @param indexFilter .
 	 * @return .
 	 */
- 	public WebElement getDialog() {
+	public WebElement getFilterInputByIndex(WebElement table, int indexFilter) {
+		WebElement tr = table.findElement(By.cssSelector("tr.filterable"));
+		WebElement th = tr.findElement(By.xpath("th[" + (indexFilter + 1) + "]"));
+		
+		return th.findElement(By.tagName("input"));		
+	}
+	
+	/**
+	 * Devuelve un botón de acción de la tabla.
+	 * @param table .
+	 * @param text .
+	 * @return .
+	 */
+	public WebElement getActionTableByText(WebElement table, String text) {
+		WebElement footer = table.findElement(By.tagName("tfoot"));
+		WebElement actions = footer.findElement(By.className("actions"));
+		
+		for (WebElement btn : actions.findElements(By.tagName("button"))) {
+			if (btn.getText().equals(text)) {
+				return btn;
+			}
+		}
+		
+		return null;
+	}
+	
+	/**
+	 * Hace click sobre el check de la fila de la tabla. Devuelve al fila.
+	 * @param table .
+	 * @param index indice de la fila.
+	 * @return fila .
+	 */
+	public WebElement selectRowTable(WebElement table, Integer index) {
+		WebElement tr = getRowByIndex(table, index); 
+		WebElement td = getColumnByIndex(tr, 0);
+		WebElement check = td.findElement(By.tagName("input"));
+		check.click();	
+		
+		return tr;
+	}
+	
+	/**
+	 * Devuelve el dialgo ui-dialog.
+	 * 
+	 * @return .
+	 */
+	public WebElement getDialog() {
 		return waitVisibility(By.className("ui-dialog"));
 	}
 	
@@ -191,19 +235,7 @@ public class UtilsTestBEP extends UtilsTestUsuarioBase {
 				
 		return null;		
 	}
-	
-	/**
-	 * Hace click sobre el check de la fila de la tabla.
-	 * @param table .
-	 * @param index indice de la fila.
-	 */
-	public void selectRowTable(WebElement table, Integer index) {
-		WebElement tr = getRowByIndex(table, index); 
-		WebElement td = getColumnByIndex(tr, 0);
-		WebElement check = td.findElement(By.tagName("input"));
-		check.click();	
-	}
-	
+		
 	/**
 	 * Comprueba el titulo de la página. Devuelve el div principal.
 	 * @param main .

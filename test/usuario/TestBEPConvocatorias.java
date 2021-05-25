@@ -57,6 +57,15 @@ public class TestBEPConvocatorias extends UtilsTestBEP {
 		DriverUv.inicializaDriver();
 		DriverUv.login("personal1");
 	}
+	
+	/**
+	 * Cierre de este unittest.
+	 */
+	@AfterClass
+	public static void cerrar() {
+		LOGGER.log(Level.INFO, "final");
+		DriverUv.getDriver().quit();
+	}
 
 	/**
 	 * Se ejecuta antes de cada test. Aqui navegamos hasta la opcion que vamos a
@@ -154,14 +163,7 @@ public class TestBEPConvocatorias extends UtilsTestBEP {
 		return content.findElement(By.tagName("h6")).getText();
 	}
 
-	/**
-	 * Cierre de este unittest.
-	 */
-	@AfterClass
-	public static void cerrar() {
-		LOGGER.log(Level.INFO, "final");
-		DriverUv.getDriver().quit();
-	}
+
 
 	/**
 	 * GetTables.

@@ -9,12 +9,14 @@ import java.sql.SQLException;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.Date;
+import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 import javax.servlet.ServletRequest;
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 import javax.servlet.http.Part;
 import es.ujaen.uvirtual.beans.vistas.Vista;
@@ -281,6 +283,41 @@ public final class BolsaEmpleoUtils {
 			}
 			session.removeAttribute(MENSAJE_REDIRECT_SESSION_ERROR);
 		}
+	}
+	
+	/**
+	 * Redirecciona a la url actual con parametros en la sessión.
+	 * @param request .
+	 * @param response .
+	 * @param params .
+	 * @throws IOException .
+	 */
+	public static void redirectWithParams(HttpServletRequest request, HttpServletResponse response, Map<String, String> params) throws IOException {
+		HttpSession session = request.getSession(false);
+		
+		for (Map.Entry<String, String> entry : params.entrySet()) {
+			session.setAttribute(entry.getKey(), entry.getValue());	
+		}
+		
+		response.sendRedirect(request.getServletPath());		
+	}
+	
+	/**
+	 * Devuelve un parámetro guardado en sessión y si no, leemos lo que viene del request.
+	 * @param request .
+	 * @param param .
+	 * @return .
+	 */
+	public static String getParamRequestOrSession(HttpServletRequest request, String param) {
+		HttpSession session = request.getSession(false);
+		String valueSession = (String) session.getAttribute(param);
+		session.removeAttribute(param);
+		
+		if (valueSession == null || valueSession.isBlank()) {
+			return request.getParameter(param);
+		}
+		
+		return valueSession;		
 	}
 	
 	private static void addMensajeSession(String mensaje, Vista bean, HttpServletRequest request, int tipo) throws UVException {		
