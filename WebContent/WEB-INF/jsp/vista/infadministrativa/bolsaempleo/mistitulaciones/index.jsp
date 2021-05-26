@@ -15,14 +15,14 @@ VistaTitulaciones bean = (VistaTitulaciones) uvdatos.getVistas().get(VistaTitula
 <div class="bolsa-empleo misdatos-form">
 	<jsp:include page="/WEB-INF/jsp/vista/infadministrativa/bolsaempleo/mensajes.jsp" />
 
-	<div class="titulo-bolsa-empleo" style="float:right; margin-top:1.2rem">
-		<a class="link-btn" id="nueva_titulacion" href="<%= request.getRequestURI() %>" style="margin-top:0">Nueva titulación</a>
+	<div class="titulo-bolsa-empleo">
+		<h2>Mis titulaciones</h2>
+    
+	    <a class="link-btn" id="nueva_titulacion" href="<%= request.getRequestURI() %>">
+	    	 Nueva acreditación
+	    </a>
 	</div>
-	
-	<div class="titulo-bolsa-empleo" style="margin-top:1rem;">
-		<h2>Mis Titulaciones</h2>
-	</div>
-	
+		
 	<table class="bluetable bolsaempleo" id="tableTitulacionesUsuario">
 		<tr>
 			<th scope="col" style="width:10%"></th>

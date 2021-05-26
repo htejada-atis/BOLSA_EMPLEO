@@ -91,7 +91,7 @@ public class TestBEPModeloMisTitulaciones {
 
 		params.put(BolsaEmpleoDataTable.PARAM_CURRENT_PAGE, new String[] {"0"});
 		params.put(BolsaEmpleoDataTable.PARAM_PAGE_SIZE, new String[] {"10"});
-		params.put(BolsaEmpleoDataTable.PARAM_ORDER_BY, new String[] {String.valueOf(ModeloMisTitulaciones.ORDER_COLUMN_INDEX_ID)});
+		params.put(BolsaEmpleoDataTable.PARAM_ORDER_BY, new String[] {String.valueOf(ModeloMisTitulaciones.ORDER_COLUMN_INDEX_NOMBRE)});
 		params.put(BolsaEmpleoDataTable.PARAM_ORDER_DIRECTION, new String[] {BolsaEmpleoDataTable.PARAM_ORDER_DIRECTION_VALUE_ASC});
 
 		try {
