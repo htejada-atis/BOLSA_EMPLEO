@@ -328,6 +328,10 @@ public class BolsaEmpleoDataTable<T> {
 	}
 
 	private String orderByQuery() throws UVException {
+		if (this.columns.get(this.orderBy) == null) {
+			throw new UVException(ERROR_MSG_COLUMNA_ORDENACION_NO_VALIDA);
+		}
+			
 		String column = this.columns.get(this.orderBy).getName();
 		if (column == null) {
 			throw new UVException(ERROR_MSG_COLUMNA_ORDENACION_NO_VALIDA);
