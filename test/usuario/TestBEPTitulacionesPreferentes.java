@@ -31,10 +31,12 @@ public class TestBEPTitulacionesPreferentes extends UtilsTestUsuarioBase {
 	private static final String NOMBREDEESTACLASE = TestBEPTitulacionesPreferentes.class.getName();
 
 	private static final Logger LOGGER = Logger.getLogger(NOMBREDEESTACLASE);
-
+	
 	private static final String DIV_MAIN = "titulacionespreferentes";
 	private static final String ID_TABLE_TITULACIONES_AREA = "table_titulaciones_preferentes_area";
 	private static final String ID_TABLE_TITULACIONES_DISPONIBLES = "table_titulaciones";
+	private static final String AREA_NAME = "DERECHO CIVIL";
+	private static final int TITULACIONES_AREA = 2;
 
 	/**
 	 * Se ejecuta una vez al inicio de la clase.
@@ -78,11 +80,11 @@ public class TestBEPTitulacionesPreferentes extends UtilsTestUsuarioBase {
 	@Test
 	public void testA1() {
 		UtilsTestBEP.assertTitlePage(UtilsTestBEP.waitVisibility(By.className(DIV_MAIN)), "Titulaciones preferentes por área");
-		seleccionarArea(2);
+		seleccionarArea(AREA_NAME);
 		
 		// seleccionamos la primera fila
 		WebElement tableTitulaciones = UtilsTestBEP.waitVisibility(By.id(ID_TABLE_TITULACIONES_AREA));
-		UtilsTestBEP.assertTotalTable(tableTitulaciones, 5);
+		UtilsTestBEP.assertTotalTable(tableTitulaciones, TITULACIONES_AREA);
 		UtilsTestBEP.selectRowTable(tableTitulaciones, 0);
 		UtilsTestBEP.assertTotalSelectedTable(tableTitulaciones, 1);
 		
@@ -94,7 +96,7 @@ public class TestBEPTitulacionesPreferentes extends UtilsTestUsuarioBase {
 		WebElement btn = UtilsTestBEP.getActionTableByText(tableTitulaciones, "Eliminar");
 		btn.click();		
 		tableTitulaciones = UtilsTestBEP.waitVisibility(By.id(ID_TABLE_TITULACIONES_AREA));
-		UtilsTestBEP.assertTotalTable(tableTitulaciones, 4);
+		UtilsTestBEP.assertTotalTable(tableTitulaciones, TITULACIONES_AREA - 1);
 		
 		// restauramos titulacion
 		WebElement tableDisponibles = UtilsTestBEP.waitVisibility(By.id(ID_TABLE_TITULACIONES_DISPONIBLES));
@@ -107,12 +109,12 @@ public class TestBEPTitulacionesPreferentes extends UtilsTestUsuarioBase {
 		btn.click();
 		
 		tableTitulaciones = UtilsTestBEP.waitVisibility(By.id(ID_TABLE_TITULACIONES_AREA));
-		UtilsTestBEP.assertTotalTable(tableTitulaciones, 5);
+		UtilsTestBEP.assertTotalTable(tableTitulaciones, TITULACIONES_AREA);
 	}
 
-	private void seleccionarArea(int index) {
+	private void seleccionarArea(String name) {
 		Select sel = new Select(UtilsTestBEP.waitVisibility(By.id("select_area")));
-		sel.selectByIndex(index);
+		sel.selectByVisibleText(name);
 		sel = new Select(UtilsTestBEP.waitVisibility(By.id("select_area")));
 		String textoSelect = sel.getFirstSelectedOption().getText();
 		

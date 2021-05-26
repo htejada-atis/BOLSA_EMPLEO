@@ -45,7 +45,7 @@ import es.ujaen.uvirtual.utilidades.UVException;
 public class TestBEPModeloMisTitulaciones {
 	private static final Integer CODNUM = 1;
 	private static final Integer CODNUM_NOEXISTE = 111_111_111;
-	private static final Integer CODNUM_CANDITATO = 4;
+	private static final Integer CODNUM_CANDITATO = 5;
 	private static final Integer TITULACION_CODNUM = 1;
 	private static final Integer TITULACION_USUARIO_1 = 1;
 	private static final Integer TITULACION_USUARIO_2 = 2;
