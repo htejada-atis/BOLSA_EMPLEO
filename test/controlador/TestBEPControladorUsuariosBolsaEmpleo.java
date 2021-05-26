@@ -20,9 +20,10 @@ import controlador.implementacion.RespuestaHttp;
 import es.ujaen.uvirtual.modulo.bolsaempleo.controlador.configuracion.ControladorUsuarioBolsaEmpleo;
 import es.ujaen.uvirtual.modulo.bolsaempleo.vistas.VistaUsuarioBolsaEmpleo;
 
-/** test controlador usuarios bolsa empleo.
- * @author fcampos
- *
+/**
+ * Test controlador usuarios bolsa empleo.
+ * 
+ * @author ATISoluciones
  */
 @FixMethodOrder(MethodSorters.NAME_ASCENDING)
 public class TestBEPControladorUsuariosBolsaEmpleo {
@@ -325,13 +326,11 @@ public class TestBEPControladorUsuariosBolsaEmpleo {
 	@Test
 	public void testA12RecuperarUsuario() throws ServletException, IOException {
 		VistaUsuarioBolsaEmpleo bean = obtenerUsuariosBorrados();
-		String selected = "[" + bean.getDatatable().getData().get(0).getCodNum() + ","
-				+ bean.getDatatable().getData().get(1).getCodNum() + "]";
+		String selected = "[" + bean.getDatatable().getData().get(0).getCodNum() + "," + bean.getDatatable().getData().get(1).getCodNum() + "]";
 
 		PeticionHttp peticion = UtilsTestBolsaEmpleo.peticionAutenticadaPersonal();
 		peticion.setParameter(ControladorUsuarioBolsaEmpleo.PARAM_ACCION, ControladorUsuarioBolsaEmpleo.ACCION_USUARIO);
-		peticion.setParameter(ControladorUsuarioBolsaEmpleo.PARAM_ACCION_USUARIO,
-				ControladorUsuarioBolsaEmpleo.ACCION_RECUPERAR_USUARIO);
+		peticion.setParameter(ControladorUsuarioBolsaEmpleo.PARAM_ACCION_USUARIO, ControladorUsuarioBolsaEmpleo.ACCION_RECUPERAR_USUARIO);
 		peticion.setParameter(ControladorUsuarioBolsaEmpleo.PARAM_USUARIOS_SELECCIONADOS, selected);
 
 		RespuestaHttp respuesta = new RespuestaHttp();
@@ -342,9 +341,7 @@ public class TestBEPControladorUsuariosBolsaEmpleo {
 
 		assertEquals(MENSAJE_SIN_ERROR, 0, bean2.getMensajesDeError().size());
 		assertEquals(MENSAJE_SIN_ADVERTENCIAS, 0, bean2.getMensajesDeAdvertencia().size());
-		assertEquals(MENSAJE_CON_EXITO_ESPERADO,
-				ControladorUsuarioBolsaEmpleo.MENSAJE_EXITO_USUARIO_MODIFICADO_CORRECTAMENTE,
-				bean2.getMensajesDeExito().get(0));
+		assertEquals(MENSAJE_CON_EXITO_ESPERADO, ControladorUsuarioBolsaEmpleo.MENSAJE_EXITO_USUARIO_MODIFICADO_CORRECTAMENTE, bean2.getMensajesDeExito().get(0));
 	}
 	
 	/** editar apartado .
