@@ -58,17 +58,18 @@ public class TestBEPBeanApartadoBaremacion {
 		assertNotNull(apartado.toString());
 	}
 	
-	/** test equals.
+	/**
+	 * test equals.
 	 */
 	@Test
 	public void testA03() {
 		ApartadoBaremacion apartado2 = new ApartadoBaremacion(CODNUM, CODIGO, NOMBRE, ACTIVO, PUNTUACIONMAXIMA, PORCENTAJEMAXIMO);
 		ApartadoBaremacion apartado = new ApartadoBaremacion(apartado2);
-    	apartado.setCodNum(CODNUM);
-    	apartado.setCodigo(CODIGO);
-    	apartado.setNombre(NOMBRE);
-    	apartado.setActivo(ACTIVO);
-    	apartado.setPorcentajeMaximo(PORCENTAJEMAXIMO);
+		apartado.setCodNum(CODNUM);
+		apartado.setCodigo(CODIGO);
+		apartado.setNombre(NOMBRE);
+		apartado.setActivo(ACTIVO);
+		apartado.setPorcentajeMaximo(PORCENTAJEMAXIMO);
 		assertEquals(CODNUM, apartado.getCodNum());
 		assertEquals(CODIGO, apartado.getCodigo());
 		assertEquals(NOMBRE, apartado.getNombre());
@@ -84,10 +85,9 @@ public class TestBEPBeanApartadoBaremacion {
 	@Test
 	@SuppressWarnings("java:S2159")
 	public void testA04() {
-
-    	ApartadoBaremacion apartado3 = new ApartadoBaremacion(CODNUM, CODIGO, NOMBRE, ACTIVO, PUNTUACIONMAXIMA, PORCENTAJEMAXIMO);
-    	ApartadoBaremacion apartado2 = new ApartadoBaremacion();
-    	ApartadoBaremacion apartado = new ApartadoBaremacion();
+		ApartadoBaremacion apartado3 = new ApartadoBaremacion(CODNUM, CODIGO, NOMBRE, ACTIVO, PUNTUACIONMAXIMA, PORCENTAJEMAXIMO);
+		ApartadoBaremacion apartado2 = new ApartadoBaremacion();
+		ApartadoBaremacion apartado = new ApartadoBaremacion();
 		assertTrue(apartado.equals(apartado2));
 		assertTrue(apartado2.equals(apartado));
 		assertEquals(apartado.hashCode(), apartado2.hashCode());

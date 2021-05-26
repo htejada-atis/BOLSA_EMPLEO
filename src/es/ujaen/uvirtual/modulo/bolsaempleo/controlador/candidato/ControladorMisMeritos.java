@@ -102,7 +102,11 @@ public class ControladorMisMeritos extends HttpServlet {
 	// urls
 	public static final String URL_PATTERN_AJAX = "/srv/es/ajax/informacionadministrativa/bolsaempleo/mismeritos";
 	
-	public static final int RESPONSE_HTTP_CODE_ERROR = 400;
+	// ajax
+	public static final String RESPONSE_AJAX_CONTENTTYPE = "application/json";
+	public static final String RESPONSE_AJAX_ENCODING = "UTF-8";
+	public static final String RESPONSE_AJAX_ERROR = "error";
+	public static final int RESPONSE_AJAX_HTTP_CODE_ERROR = 400;
 	
 	/** Peticion GET.
 	 * @see HttpServlet#doGet(HttpServletRequest request, HttpServletResponse response)
@@ -264,6 +268,8 @@ public class ControladorMisMeritos extends HttpServlet {
 	            }
 				stream.flush();
 			} catch (Exception ex) {
+				LOGGER.log(Level.SEVERE, Formateador.getStackTrace(ex));
+				LOGGER.log(Level.SEVERE, ex.toString());
 				bean.getMensajesDeError().add(ex.getMessage());
 	        }
 		}
@@ -305,10 +311,10 @@ public class ControladorMisMeritos extends HttpServlet {
 	private void listadoMeritos(VistaMeritos bean, UVDatos datos, HttpServletRequest request, HttpServletResponse response) throws IOException, SQLException, UVException {
 		ModeloMerito modelo = ModeloMerito.obtenerInstancia();
 		
-		datos.setContentType("application/json");
+		datos.setContentType(RESPONSE_AJAX_CONTENTTYPE);
 		datos.setRespuestaEnviada(true);
-		response.setContentType("application/json");
-		response.setCharacterEncoding("UTF-8");
+		response.setContentType(RESPONSE_AJAX_CONTENTTYPE);
+		response.setCharacterEncoding(RESPONSE_AJAX_ENCODING);
 		
 		try (PrintWriter writer = response.getWriter()) {
 			try {
@@ -318,12 +324,19 @@ public class ControladorMisMeritos extends HttpServlet {
 				BolsaEmpleoDataTable<Merito> dataTable = modelo.listaMeritosDatatable(request.getParameterMap(), idUsuario);
 				bean.setDatatable(dataTable);
 				writer.write(dataTable.toJson());
-			} catch (Exception ex) {
-				bean.getMensajesDeError().add(ex.getMessage());
-				
-				CodigoDescripcion mensaje = new CodigoDescripcion("error", ex.getMessage());
+			} catch (UVException e) {
+				LOGGER.log(Level.WARNING, e.toString());
+				bean.getMensajesDeError().add(e.getMessage());
+				CodigoDescripcion mensaje = new CodigoDescripcion(RESPONSE_AJAX_ERROR, e.getMessage());
 				writer.write(new Gson().toJson(mensaje));
-				response.setStatus(RESPONSE_HTTP_CODE_ERROR);
+				response.setStatus(RESPONSE_AJAX_HTTP_CODE_ERROR);
+			} catch (SQLException e) { 
+				LOGGER.log(Level.SEVERE, Formateador.getStackTrace(e));
+				LOGGER.log(Level.SEVERE, e.toString());
+				bean.getMensajesDeError().add(e.getMessage());
+				CodigoDescripcion mensaje = new CodigoDescripcion(RESPONSE_AJAX_ERROR, e.getMessage());
+				writer.write(new Gson().toJson(mensaje));
+				response.setStatus(RESPONSE_AJAX_HTTP_CODE_ERROR);
 			}
 		}
 	}

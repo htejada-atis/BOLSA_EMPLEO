@@ -15,7 +15,7 @@ import bbdd.BbddRunner;
 import bbdd.UtilsTestBolsaEmpleo;
 import controlador.implementacion.PeticionHttp;
 import controlador.implementacion.RespuestaHttp;
-import es.ujaen.uvirtual.modulo.bolsaempleo.controlador.configuracion.ControladorGestionNoticias;
+import es.ujaen.uvirtual.modulo.bolsaempleo.controlador.ControladorGestionNoticias;
 import es.ujaen.uvirtual.modulo.bolsaempleo.vistas.VistaNoticias;
 import es.ujaen.uvirtual.utilidades.UVException;
 

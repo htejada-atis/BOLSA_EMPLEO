@@ -145,7 +145,6 @@ public class ControladorInicio extends HttpServlet {
 	private void init(VistaInicio bean, UVDatos datos, HttpServletRequest request, HttpServletResponse response) throws SQLException, UVException, IOException {
 		bean.setVista(JSP_INICIO);
 		BolsaEmpleoUtils.readMensajeSession(bean, request);
-		
 		try {
 			boolean existe = ModeloUsuarioBolsaEmpleo.obtenerInstancia().checkUser(datos);
 			bean.setAnonimo(!existe);
@@ -153,7 +152,6 @@ public class ControladorInicio extends HttpServlet {
 			BolsaEmpleoUtils.addMensajeDeError(e.getMessage(), bean, request);
 			response.sendRedirect("/srv/es/informacionadministrativa/bolsaempleo/error");
 		}
-		
 	}
 	
 	private void errorFatal(VistaInicio bean, String mensaje) {
@@ -206,6 +204,8 @@ public class ControladorInicio extends HttpServlet {
 						response.sendRedirect(request.getServletPath());
 				    }
 				} catch (IOException ex) {
+					LOGGER.log(Level.SEVERE, Formateador.getStackTrace(ex));
+					LOGGER.log(Level.SEVERE, ex.toString());
 					throw new UVException("Erro descargando fichero");
 				}
 			}

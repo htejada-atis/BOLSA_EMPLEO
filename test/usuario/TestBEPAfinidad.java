@@ -58,6 +58,15 @@ public class TestBEPAfinidad extends UtilsTestBEP {
 	}
 
 	/**
+	 * Cierre de este unittest.
+	 */
+	@AfterClass
+	public static void cerrar() {
+		LOGGER.log(Level.INFO, "final");
+		DriverUv.getDriver().quit();
+	}
+
+	/**
 	 * Se ejecuta antes de cada test. Aqui navegamos hasta la opcion que vamos a
 	 * probar
 	 */
@@ -128,14 +137,6 @@ public class TestBEPAfinidad extends UtilsTestBEP {
 		return content.getText();
 	}
 
-	/**
-	 * Cierre de este unittest.
-	 */
-	@AfterClass
-	public static void cerrar() {
-		LOGGER.log(Level.INFO, "final");
-		DriverUv.getDriver().quit();
-	}
 
 	/**
 	 * GetTables.
