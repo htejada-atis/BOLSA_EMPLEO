@@ -20,12 +20,13 @@ import org.openqa.selenium.support.ui.WebDriverWait;
 
 import bbdd.UtilsTestBolsaEmpleo;
 
-/** Clase para probar configuracion.usuarios BEP .
- * @author fcampos
- *
+/**
+ * Clase para probar configuracion.usuarios BEP .
+ * 
+ * @author ATISoluciones 
  */
 @FixMethodOrder(MethodSorters.NAME_ASCENDING)
-public class TestBEPUsuariosBolsaEmpleo extends UtilsTestBEP {
+public class TestBEPUsuariosBolsaEmpleo extends UtilsTestUsuarioBase {
 	private static final String NOMBREDEESTACLASE = TestBEPUsuariosBolsaEmpleo.class.getName();
 
 	private static final Logger LOGGER = Logger.getLogger(NOMBREDEESTACLASE);
@@ -80,7 +81,7 @@ public class TestBEPUsuariosBolsaEmpleo extends UtilsTestBEP {
 	 */
 	@Test
 	public void testA1() {
-		WebDriverWait wait = new WebDriverWait(DriverUv.getDriver(), WAIT_ELEMENT);
+		WebDriverWait wait = new WebDriverWait(DriverUv.getDriver(), UtilsTestBEP.WAIT_ELEMENT);
 
 		// esperamos div principal
 		WebElement main = wait.until(ExpectedConditions.visibilityOfElementLocated(By.className(DIV_MAIN_USUARIOS)));		
@@ -106,7 +107,7 @@ public class TestBEPUsuariosBolsaEmpleo extends UtilsTestBEP {
 	 */
 	@Test
 	public void testA3() {
-		WebDriverWait wait = new WebDriverWait(DriverUv.getDriver(), WAIT_ELEMENT);
+		WebDriverWait wait = new WebDriverWait(DriverUv.getDriver(), UtilsTestBEP.WAIT_ELEMENT);
 		WebElement pmain = wait.until(ExpectedConditions.visibilityOfElementLocated(By.className(DIV_MAIN_USUARIOS)));	
 		WebElement btnNuevo = pmain.findElement(By.id("nuevo_usuario"));
 		btnNuevo.click();

@@ -27,7 +27,7 @@ import bbdd.UtilsTestBolsaEmpleo;
  * @author ATISoluciones
  */
 @FixMethodOrder(MethodSorters.NAME_ASCENDING)
-public class TestBEPAfinidad extends UtilsTestBEP {
+public class TestBEPAfinidad extends UtilsTestUsuarioBase {
 	private static final String NOMBREDEESTACLASE = TestBEPUsuariosBolsaEmpleo.class.getName();
 
 	private static final Logger LOGGER = Logger.getLogger(NOMBREDEESTACLASE);
@@ -84,7 +84,7 @@ public class TestBEPAfinidad extends UtilsTestBEP {
 	 */
 	@Test
 	public void testA1() {
-		WebDriverWait wait = new WebDriverWait(DriverUv.getDriver(), WAIT_ELEMENT);
+		WebDriverWait wait = new WebDriverWait(DriverUv.getDriver(), UtilsTestBEP.WAIT_ELEMENT);
 
 		// esperamos div principal
 		WebElement main = wait.until(ExpectedConditions.visibilityOfElementLocated(By.className(DIV_MAIN_AFINIDADES)));
@@ -112,12 +112,12 @@ public class TestBEPAfinidad extends UtilsTestBEP {
 	 */
 	@Test
 	public void testA2() {
-		WebDriverWait wait = new WebDriverWait(DriverUv.getDriver(), WAIT_ELEMENT);
+		WebDriverWait wait = new WebDriverWait(DriverUv.getDriver(), UtilsTestBEP.WAIT_ELEMENT);
 		WebElement pmain = wait.until(ExpectedConditions.visibilityOfElementLocated(By.className(DIV_MAIN_AFINIDADES)));
 		WebElement btnNuevo = pmain.findElement(By.id("nueva_afinidad"));
 		btnNuevo.click();
 
-		WebDriverWait wait2 = new WebDriverWait(DriverUv.getDriver(), WAIT_ELEMENT);
+		WebDriverWait wait2 = new WebDriverWait(DriverUv.getDriver(), UtilsTestBEP.WAIT_ELEMENT);
 		WebElement pmain2 = wait2.until(ExpectedConditions.visibilityOfElementLocated(By.className(DIV_MAIN_AFINIDAD_FORM)));
 
 		WebElement descripcion = pmain2.findElement(By.name("descripcion"));
@@ -131,7 +131,7 @@ public class TestBEPAfinidad extends UtilsTestBEP {
 	}
 
 	private String getDialogText() {
-		WebDriverWait wait = new WebDriverWait(DriverUv.getDriver(), WAIT_ELEMENT);
+		WebDriverWait wait = new WebDriverWait(DriverUv.getDriver(), UtilsTestBEP.WAIT_ELEMENT);
 		WebElement content = wait.until(ExpectedConditions.visibilityOfElementLocated(By.className("atisDialog")));
 
 		return content.getText();
