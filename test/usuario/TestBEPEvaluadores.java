@@ -27,7 +27,7 @@ import bbdd.UtilsTestBolsaEmpleo;
  * @author ATISoluciones
  */
 @FixMethodOrder(MethodSorters.NAME_ASCENDING)
-public class TestBEPEvaluadores extends UtilsTestBEP {
+public class TestBEPEvaluadores extends UtilsTestUsuarioBase {
 	private static final String NOMBREDEESTACLASE = TestBEPAreasBaremar.class.getName();
 
 	private static final Logger LOGGER = Logger.getLogger(NOMBREDEESTACLASE);
@@ -78,31 +78,31 @@ public class TestBEPEvaluadores extends UtilsTestBEP {
 	@Test
 	public void testA1() {
 		// comprobamos titulo de la página
-		assertTitlePage(waitVisibility(By.className(DIV_MAIN)), "Evaluadores de un departamento");
+		UtilsTestBEP.assertTitlePage(UtilsTestBEP.waitVisibility(By.className(DIV_MAIN)), "Evaluadores de un departamento");
 
 		// seleccionamos el departamento (refresh)
 		WebElement tableAreas = seleccionarDepartamento(1);
 				
 		// añadimos evaluador (refresh)
-		WebElement input = waitVisibility(By.id("nombre_evaluador"));
+		WebElement input = UtilsTestBEP.waitVisibility(By.id("nombre_evaluador"));
 		input.sendKeys("comision1");
-		WebElement btn = waitClickable(By.id("nuevo_evaluador"));
+		WebElement btn = UtilsTestBEP.waitClickable(By.id("nuevo_evaluador"));
 		btn.click();
-		tableAreas = waitVisibility(By.id(ID_TABLE_AREAS));
+		tableAreas = UtilsTestBEP.waitVisibility(By.id(ID_TABLE_AREAS));
 		
 		// mensaje 			
-		List<String> mensajes = getMensajesDeExito();
-		assertEquals(getTotalTable(tableAreas), mensajes.size());
+		List<String> mensajes = UtilsTestBEP.getMensajesDeExito();
+		assertEquals(UtilsTestBEP.getTotalTable(tableAreas), mensajes.size());
 		
 		// seleccionamos el primer item de la tabla
-		tableAreas = waitVisibility(By.id(ID_TABLE_AREAS));
-		WebElement trArea = getRowByIndex(tableAreas, 0);
-		WebElement tdId = getColumnByIndex(trArea, 1);
+		tableAreas = UtilsTestBEP.waitVisibility(By.id(ID_TABLE_AREAS));
+		WebElement trArea = UtilsTestBEP.getRowByIndex(tableAreas, 0);
+		WebElement tdId = UtilsTestBEP.getColumnByIndex(trArea, 1);
 		tdId.click();
 		
 		// comprobamos tabla de evaluadores del area
-		WebElement tableEvaluadores = waitVisibility(By.id(ID_TABLE_EVALUADORES));
-		assertTotalTable(tableEvaluadores, 1);
+		WebElement tableEvaluadores = UtilsTestBEP.waitVisibility(By.id(ID_TABLE_EVALUADORES));
+		UtilsTestBEP.assertTotalTable(tableEvaluadores, 1);
 	}
 	
 	/**
@@ -114,39 +114,39 @@ public class TestBEPEvaluadores extends UtilsTestBEP {
 		WebElement tableAreas = seleccionarDepartamento(2);
 		
 		// seleccionamos las dos primeras areas
-		selectRowTable(tableAreas, 0);
-		selectRowTable(tableAreas, 1);
-		assertTotalSelectedTable(tableAreas, 2);
+		UtilsTestBEP.selectRowTable(tableAreas, 0);
+		UtilsTestBEP.selectRowTable(tableAreas, 1);
+		UtilsTestBEP.assertTotalSelectedTable(tableAreas, 2);
 		
 		// añadimos evaluador (refresh)
-		WebElement input = waitVisibility(By.id("nombre_evaluador"));
+		WebElement input = UtilsTestBEP.waitVisibility(By.id("nombre_evaluador"));
 		input.sendKeys("comision1");
-		WebElement btn = waitClickable(By.id("nuevo_evaluador"));
+		WebElement btn = UtilsTestBEP.waitClickable(By.id("nuevo_evaluador"));
 		btn.click();
 		
 		// mensaje 
-		List<String> mExito = getMensajesDeExito();
-		List<String> mError = getMensajesDeError();
+		List<String> mExito = UtilsTestBEP.getMensajesDeExito();
+		List<String> mError = UtilsTestBEP.getMensajesDeError();
 		assertEquals(1, mExito.size());
 		assertEquals(1, mError.size());
 		
 		// seleccionamos el primer item de la tabla
-		tableAreas = waitVisibility(By.id(ID_TABLE_AREAS));
-		WebElement trArea = getRowByIndex(tableAreas, 0);
-		WebElement tdId = getColumnByIndex(trArea, 1);
+		tableAreas = UtilsTestBEP.waitVisibility(By.id(ID_TABLE_AREAS));
+		WebElement trArea = UtilsTestBEP.getRowByIndex(tableAreas, 0);
+		WebElement tdId = UtilsTestBEP.getColumnByIndex(trArea, 1);
 		tdId.click();
-		WebElement tableEvaluadores = waitVisibility(By.id(ID_TABLE_EVALUADORES));
-		assertTotalTable(tableEvaluadores, 1);
-		assertEquals(getTextCellTable(tableEvaluadores, 0, 0), "36393760D");
+		WebElement tableEvaluadores = UtilsTestBEP.waitVisibility(By.id(ID_TABLE_EVALUADORES));
+		UtilsTestBEP.assertTotalTable(tableEvaluadores, 1);
+		assertEquals(UtilsTestBEP.getTextCellTable(tableEvaluadores, 0, 0), "36393760D");
 		
 		// seleccionamos el segundo item de la tabla
-		tableAreas = waitVisibility(By.id(ID_TABLE_AREAS));
-		trArea = getRowByIndex(tableAreas, 0);
-		tdId = getColumnByIndex(trArea, 2);
+		tableAreas = UtilsTestBEP.waitVisibility(By.id(ID_TABLE_AREAS));
+		trArea = UtilsTestBEP.getRowByIndex(tableAreas, 0);
+		tdId = UtilsTestBEP.getColumnByIndex(trArea, 2);
 		tdId.click();
-		tableEvaluadores = waitVisibility(By.id(ID_TABLE_EVALUADORES));
-		assertTotalTable(tableEvaluadores, 1);
-		assertEquals(getTextCellTable(tableEvaluadores, 0, 0), "36393760D");
+		tableEvaluadores = UtilsTestBEP.waitVisibility(By.id(ID_TABLE_EVALUADORES));
+		UtilsTestBEP.assertTotalTable(tableEvaluadores, 1);
+		assertEquals(UtilsTestBEP.getTextCellTable(tableEvaluadores, 0, 0), "36393760D");
 	}
 	
 	/**
@@ -158,26 +158,26 @@ public class TestBEPEvaluadores extends UtilsTestBEP {
 		WebElement tableAreas = seleccionarDepartamento(1);
 		
 		// seleccionamos la primera area
-		WebElement trArea = getRowByIndex(tableAreas, 0);
-		WebElement tdId = getColumnByIndex(trArea, 1);
+		WebElement trArea = UtilsTestBEP.getRowByIndex(tableAreas, 0);
+		WebElement tdId = UtilsTestBEP.getColumnByIndex(trArea, 1);
 		tdId.click();	
 		
 		// borramos el primer item
-		WebElement tableEvaluadores = waitVisibility(By.id(ID_TABLE_EVALUADORES));
-		assertTotalTable(tableEvaluadores, 1);
-		assertEquals(getTextCellTable(tableEvaluadores, 0, 0), "36393760D");
-		WebElement trEvaluador = getRowByIndex(tableEvaluadores, 0);
+		WebElement tableEvaluadores = UtilsTestBEP.waitVisibility(By.id(ID_TABLE_EVALUADORES));
+		UtilsTestBEP.assertTotalTable(tableEvaluadores, 1);
+		assertEquals(UtilsTestBEP.getTextCellTable(tableEvaluadores, 0, 0), "36393760D");
+		WebElement trEvaluador = UtilsTestBEP.getRowByIndex(tableEvaluadores, 0);
 		WebElement btnBorrar = trEvaluador.findElement(By.className("btn-borrar")); 
 		btnBorrar.click();
 		
 		// dialogo
-		WebElement dialog = getDialog();
-		assertTitleDialgo(dialog, "Borrar evaluador");
-		WebElement btnSi = getButtonDialog(dialog, "Si");
+		WebElement dialog = UtilsTestBEP.getDialog();
+		UtilsTestBEP.assertTitleDialgo(dialog, "Borrar evaluador");
+		WebElement btnSi = UtilsTestBEP.getButtonDialog(dialog, "Si");
 		btnSi.click();
 		
-		tableEvaluadores = waitVisibility(By.id(ID_TABLE_EVALUADORES));
-		assertEquals(getTextCellTable(tableEvaluadores, 0, 0), "Sin resultados");
+		tableEvaluadores = UtilsTestBEP.waitVisibility(By.id(ID_TABLE_EVALUADORES));
+		assertEquals(UtilsTestBEP.getTextCellTable(tableEvaluadores, 0, 0), "Sin resultados");
 	}
 	
 	/**
@@ -189,32 +189,32 @@ public class TestBEPEvaluadores extends UtilsTestBEP {
 		WebElement tableAreas = seleccionarDepartamento(1);
 		
 		// seleccionamos la primera area
-		WebElement trArea = getRowByIndex(tableAreas, 0);
-		WebElement tdId = getColumnByIndex(trArea, 1);
+		WebElement trArea = UtilsTestBEP.getRowByIndex(tableAreas, 0);
+		WebElement tdId = UtilsTestBEP.getColumnByIndex(trArea, 1);
 		tdId.click();	
 		
 		// seleccionamos el filtro
-		WebElement tableEvaluadores = waitVisibility(By.id(ID_TABLE_EVALUADORES));
-		Select filtro = getFilterSelectByIndex(tableEvaluadores, 2);
+		WebElement tableEvaluadores = UtilsTestBEP.waitVisibility(By.id(ID_TABLE_EVALUADORES));
+		Select filtro = UtilsTestBEP.getFilterSelectByIndex(tableEvaluadores, 2);
 		filtro.selectByValue("false");
 		
 		// restauramos
-		tableEvaluadores = waitVisibility(By.id(ID_TABLE_EVALUADORES));
-		assertTotalTable(tableEvaluadores, 1);
-		assertEquals(getTextCellTable(tableEvaluadores, 0, 0), "36393760D");
-		WebElement trEvaluador = getRowByIndex(tableEvaluadores, 0);
+		tableEvaluadores = UtilsTestBEP.waitVisibility(By.id(ID_TABLE_EVALUADORES));
+		UtilsTestBEP.assertTotalTable(tableEvaluadores, 1);
+		assertEquals(UtilsTestBEP.getTextCellTable(tableEvaluadores, 0, 0), "36393760D");
+		WebElement trEvaluador = UtilsTestBEP.getRowByIndex(tableEvaluadores, 0);
 		WebElement btn = trEvaluador.findElement(By.className("btn-restaurar")); 
 		btn.click();
 		
 		// dialogo
-		WebElement dialog = getDialog();
-		assertTitleDialgo(dialog, "Restaurar evaluador");
-		WebElement btnSi = getButtonDialog(dialog, "Si");
+		WebElement dialog = UtilsTestBEP.getDialog();
+		UtilsTestBEP.assertTitleDialgo(dialog, "Restaurar evaluador");
+		WebElement btnSi = UtilsTestBEP.getButtonDialog(dialog, "Si");
 		btnSi.click();
 		
-		tableEvaluadores = waitVisibility(By.id(ID_TABLE_EVALUADORES));
-		assertTotalTable(tableEvaluadores, 1);
-		assertEquals(getTextCellTable(tableEvaluadores, 0, 0), "36393760D");
+		tableEvaluadores = UtilsTestBEP.waitVisibility(By.id(ID_TABLE_EVALUADORES));
+		UtilsTestBEP.assertTotalTable(tableEvaluadores, 1);
+		assertEquals(UtilsTestBEP.getTextCellTable(tableEvaluadores, 0, 0), "36393760D");
 	}
 	
 	/**
@@ -226,12 +226,12 @@ public class TestBEPEvaluadores extends UtilsTestBEP {
 		seleccionarDepartamento(1);
 		
 		// añadimos evaluador (refresh)
-		WebElement input = waitVisibility(By.id("nombre_evaluador"));
+		WebElement input = UtilsTestBEP.waitVisibility(By.id("nombre_evaluador"));
 		input.sendKeys("pepe");
-		WebElement btn = waitClickable(By.id("nuevo_evaluador"));
+		WebElement btn = UtilsTestBEP.waitClickable(By.id("nuevo_evaluador"));
 		btn.click();
 		
-		List<String> mensajes = getMensajesDeError();
+		List<String> mensajes = UtilsTestBEP.getMensajesDeError();
 		assertEquals(1, mensajes.size());
 		assertEquals(mensajes.get(0), "El usuario no existe en el sistema");		
 	}
@@ -245,25 +245,25 @@ public class TestBEPEvaluadores extends UtilsTestBEP {
 		seleccionarDepartamento(1);
 		
 		// añadimos evaluador (refresh)
-		WebElement input = waitVisibility(By.id("nombre_evaluador"));
+		WebElement input = UtilsTestBEP.waitVisibility(By.id("nombre_evaluador"));
 		input.sendKeys("personal1");
-		WebElement btn = waitClickable(By.id("nuevo_evaluador"));
+		WebElement btn = UtilsTestBEP.waitClickable(By.id("nuevo_evaluador"));
 		btn.click();
 		
-		List<String> mensajes = getMensajesDeError();
+		List<String> mensajes = UtilsTestBEP.getMensajesDeError();
 		assertEquals(1, mensajes.size());
 		assertEquals(mensajes.get(0), "El usuario no tiene rol de comisión");		
 	}
 	
 	private WebElement seleccionarDepartamento(int index) {
-		Select dep = new Select(waitVisibility(By.id("select_departamento")));
+		Select dep = new Select(UtilsTestBEP.waitVisibility(By.id("select_departamento")));
 		dep.selectByIndex(index);
-		dep = new Select(waitVisibility(By.id("select_departamento")));
+		dep = new Select(UtilsTestBEP.waitVisibility(By.id("select_departamento")));
 		String textoSelect = dep.getFirstSelectedOption().getText();
 		
-		WebElement tableAreas = waitVisibility(By.id(ID_TABLE_AREAS));
-		assertTitleTable(tableAreas, "Áreas del Departamento: " + textoSelect);
-		int totalAreas = getTotalTable(tableAreas); 
+		WebElement tableAreas = UtilsTestBEP.waitVisibility(By.id(ID_TABLE_AREAS));
+		UtilsTestBEP.assertTitleTable(tableAreas, "Áreas del Departamento: " + textoSelect);
+		int totalAreas = UtilsTestBEP.getTotalTable(tableAreas); 
 		assertTrue(totalAreas > 0);
 		
 		return tableAreas;

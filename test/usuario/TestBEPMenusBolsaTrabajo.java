@@ -26,7 +26,7 @@ import bbdd.UtilsTestBolsaEmpleo;
  * @author ATISoluciones
  */
 @FixMethodOrder(MethodSorters.NAME_ASCENDING)
-public class TestBEPMenusBolsaTrabajo extends UtilsTestBEP {
+public class TestBEPMenusBolsaTrabajo extends UtilsTestUsuarioBase {
 	private static final String NOMBREDEESTACLASE = TestBEPMenusBolsaTrabajo.class.getName();
 
 	private static final Logger LOGGER = Logger.getLogger(NOMBREDEESTACLASE);
@@ -85,7 +85,7 @@ public class TestBEPMenusBolsaTrabajo extends UtilsTestBEP {
 	 */
 	@Test
 	public void testA1() {
-		WebDriverWait wait = new WebDriverWait(DriverUv.getDriver(), WAIT_ELEMENT);
+		WebDriverWait wait = new WebDriverWait(DriverUv.getDriver(), UtilsTestBEP.WAIT_ELEMENT);
 
 		// esperamos div principal
 		WebElement main = wait.until(ExpectedConditions.visibilityOfElementLocated(By.className(DIV_MAIN_BOLSAS)));

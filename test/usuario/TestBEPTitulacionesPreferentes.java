@@ -27,7 +27,7 @@ import bbdd.UtilsTestBolsaEmpleo;
  * @author ATISoluciones
  */
 @FixMethodOrder(MethodSorters.NAME_ASCENDING)
-public class TestBEPTitulacionesPreferentes extends UtilsTestBEP {
+public class TestBEPTitulacionesPreferentes extends UtilsTestUsuarioBase {
 	private static final String NOMBREDEESTACLASE = TestBEPTitulacionesPreferentes.class.getName();
 
 	private static final Logger LOGGER = Logger.getLogger(NOMBREDEESTACLASE);
@@ -77,50 +77,50 @@ public class TestBEPTitulacionesPreferentes extends UtilsTestBEP {
 	 */
 	@Test
 	public void testA1() {
-		assertTitlePage(waitVisibility(By.className(DIV_MAIN)), "Titulaciones preferentes por área");
+		UtilsTestBEP.assertTitlePage(UtilsTestBEP.waitVisibility(By.className(DIV_MAIN)), "Titulaciones preferentes por área");
 		seleccionarArea(2);
 		
 		// seleccionamos la primera fila
-		WebElement tableTitulaciones = waitVisibility(By.id(ID_TABLE_TITULACIONES_AREA));
-		assertTotalTable(tableTitulaciones, 5);
-		selectRowTable(tableTitulaciones, 0);
-		assertTotalSelectedTable(tableTitulaciones, 1);
+		WebElement tableTitulaciones = UtilsTestBEP.waitVisibility(By.id(ID_TABLE_TITULACIONES_AREA));
+		UtilsTestBEP.assertTotalTable(tableTitulaciones, 5);
+		UtilsTestBEP.selectRowTable(tableTitulaciones, 0);
+		UtilsTestBEP.assertTotalSelectedTable(tableTitulaciones, 1);
 		
 		// leemos la titulación de la primera fila
-		String titulacion = getTextCellTable(tableTitulaciones, 0, 1);
+		String titulacion = UtilsTestBEP.getTextCellTable(tableTitulaciones, 0, 1);
 		assertNotNull(titulacion);
 		
 		// eliminamos
-		WebElement btn = getActionTableByText(tableTitulaciones, "Eliminar");
+		WebElement btn = UtilsTestBEP.getActionTableByText(tableTitulaciones, "Eliminar");
 		btn.click();		
-		tableTitulaciones = waitVisibility(By.id(ID_TABLE_TITULACIONES_AREA));
-		assertTotalTable(tableTitulaciones, 4);
+		tableTitulaciones = UtilsTestBEP.waitVisibility(By.id(ID_TABLE_TITULACIONES_AREA));
+		UtilsTestBEP.assertTotalTable(tableTitulaciones, 4);
 		
 		// restauramos titulacion
-		WebElement tableDisponibles = waitVisibility(By.id(ID_TABLE_TITULACIONES_DISPONIBLES));
-		WebElement input = getFilterInputByIndex(tableDisponibles, 1);
+		WebElement tableDisponibles = UtilsTestBEP.waitVisibility(By.id(ID_TABLE_TITULACIONES_DISPONIBLES));
+		WebElement input = UtilsTestBEP.getFilterInputByIndex(tableDisponibles, 1);
 		input.sendKeys(titulacion);
 		input.sendKeys(Keys.ENTER);
-		assertTotalTable(tableDisponibles, 1);
-		selectRowTable(tableDisponibles, 0);
-		btn = getActionTableByText(tableDisponibles, "Incluir");
+		UtilsTestBEP.assertTotalTable(tableDisponibles, 1);
+		UtilsTestBEP.selectRowTable(tableDisponibles, 0);
+		btn = UtilsTestBEP.getActionTableByText(tableDisponibles, "Incluir");
 		btn.click();
 		
-		tableTitulaciones = waitVisibility(By.id(ID_TABLE_TITULACIONES_AREA));
-		assertTotalTable(tableTitulaciones, 5);
+		tableTitulaciones = UtilsTestBEP.waitVisibility(By.id(ID_TABLE_TITULACIONES_AREA));
+		UtilsTestBEP.assertTotalTable(tableTitulaciones, 5);
 	}
 
 	private void seleccionarArea(int index) {
-		Select sel = new Select(waitVisibility(By.id("select_area")));
+		Select sel = new Select(UtilsTestBEP.waitVisibility(By.id("select_area")));
 		sel.selectByIndex(index);
-		sel = new Select(waitVisibility(By.id("select_area")));
+		sel = new Select(UtilsTestBEP.waitVisibility(By.id("select_area")));
 		String textoSelect = sel.getFirstSelectedOption().getText();
 		
-		WebElement tableTitulaciones = waitVisibility(By.id(ID_TABLE_TITULACIONES_AREA));
-		assertTitleTable(tableTitulaciones, "Titulaciones Preferentes al Área: " + textoSelect);
+		WebElement tableTitulaciones = UtilsTestBEP.waitVisibility(By.id(ID_TABLE_TITULACIONES_AREA));
+		UtilsTestBEP.assertTitleTable(tableTitulaciones, "Titulaciones Preferentes al Área: " + textoSelect);
 		
-		WebElement tableDisponibles = waitVisibility(By.id(ID_TABLE_TITULACIONES_DISPONIBLES));
-		assertTitleTable(tableDisponibles, "Titulaciones Disponibles");
-		assertTrue(getTotalTable(tableDisponibles) > 0);
+		WebElement tableDisponibles = UtilsTestBEP.waitVisibility(By.id(ID_TABLE_TITULACIONES_DISPONIBLES));
+		UtilsTestBEP.assertTitleTable(tableDisponibles, "Titulaciones Disponibles");
+		assertTrue(UtilsTestBEP.getTotalTable(tableDisponibles) > 0);
 	}
 }

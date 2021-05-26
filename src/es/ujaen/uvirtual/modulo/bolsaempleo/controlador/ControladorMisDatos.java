@@ -166,9 +166,12 @@ public class ControladorMisDatos extends HttpServlet {
 		bean.getMensajesDeError().add(mensaje);
     }
     
-    /** Redireccion de do post.
-     * @see HttpServlet#doPost(HttpServletRequest request, HttpServletResponse response)
-     */
+	/**
+	 * Redireccion de do post.
+	 * 
+	 * @see HttpServlet#doPost(HttpServletRequest request, HttpServletResponse
+	 *      response)
+	 */
 	@Override
     public void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 		doGet(request, response);
@@ -181,12 +184,14 @@ public class ControladorMisDatos extends HttpServlet {
 		bean.setVista(JSP_INDEX);
 	}
     
-    /** Envia el formulario con los datos del usuario logueado.
-     * @param bean .
-     * @param request .
-     * @throws UVException .
-     * @throws SQLException .
-     */
+	/**
+	 * Envia el formulario con los datos del usuario logueado.
+	 * 
+	 * @param bean    .
+	 * @param request .
+	 * @throws UVException  .
+	 * @throws SQLException .
+	 */
 	public void enviarMisDatos(HttpServletRequest request, VistaUsuarioBolsaEmpleo bean) throws SQLException, UVException {
 		bean.setVista(JSP_INDEX);
                                         
@@ -232,16 +237,16 @@ public class ControladorMisDatos extends HttpServlet {
 		}
 	}
     
-    
-    
-    /** Valida el formulario de Mis Datos.
-     * @param request .
-     * @return validator .
-     * @throws UVException .
-     * @throws SQLException .
-     * @throws IOException .
-     * @throws IOException .
-     */
+	/**
+	 * Valida el formulario de Mis Datos.
+	 * 
+	 * @param request .
+	 * @return validator .
+	 * @throws UVException  .
+	 * @throws SQLException .
+	 * @throws IOException  .
+	 * @throws IOException  .
+	 */
 	private UsuarioBolsaEmpleo validarDatosUsuario(HttpServletRequest request) throws UVException {
 		UsuarioBolsaEmpleo u = this.validarDatosUsuarioDireccion(request, new UsuarioBolsaEmpleo());
 		        
