@@ -730,7 +730,9 @@ public class ModeloSolicitud {
 				Boolean excluido = rs.getString(FLGEXCLUIDO).equals(S);
 				Boolean validado = rs.getString(FLGVALIDADO).equals(S);
 				String observacion = rs.getString(OBSERVACION_CANDIDATO);
-				return new MeritoSolicitud(codNum, mer, excluido, validado, observacion);
+				MeritoSolicitud merSol = new MeritoSolicitud(codNum, mer, excluido, validado, observacion);
+				merSol.setValoraciones(this.getValoracionesMeritoSolicitud(codNum, false));
+				return merSol;
 			}
 		}
 	}
@@ -762,7 +764,8 @@ public class ModeloSolicitud {
 				
 				Merito merito = ModeloMerito.obtenerInstancia().getMeritoById(rs.getInt(BEPMER_CODNUM), false, false);
 				
-				return new MeritoSolicitud(rs.getInt(CODNUM), merito, rs.getString(FLGEXCLUIDO).equals(S));
+				return new MeritoSolicitud(rs.getInt(CODNUM), merito, rs.getString(FLGEXCLUIDO).equals(S),
+						rs.getString(FLGVALIDADO).equals(S), rs.getString(OBSERVACION_CANDIDATO));
 			}
 		}
 	}

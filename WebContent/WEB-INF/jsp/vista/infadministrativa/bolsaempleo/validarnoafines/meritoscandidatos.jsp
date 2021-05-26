@@ -108,6 +108,9 @@ UsuarioBolsaEmpleo candidato = bean.getCandidato();
 					</table>
 				</div>
 			</div>
+			
+			<h3>Evaluar mérito: <%= merito.getMerito().getCodNum() %></h3>
+			
 			<form id="validar_merito" class="be-form" method="post" action="<%= request.getRequestURI() %>">
 		    	<input type="hidden" name="<%= ControladorValidarNoAfines.PARAM_ACCION %>" id="accion_formulario" value="<%= ControladorValidarNoAfines.ACCION_VALIDAR_MERITO %>" />
 		    	<input type="hidden" name="<%= ControladorValidarNoAfines.PARAM_BOLSA %>" value="<%= bolsa.getCodNum() %>" />
@@ -163,14 +166,14 @@ UsuarioBolsaEmpleo candidato = bean.getCandidato();
 				<div class="form-group-container col1">
 		    		<div class="form-group">
 		    			<label for="merito_descripcion" class="bold-label">Descripción:</label>
-		    			<textarea class="form-input-custom" id="merito_descripcion" name=""><%= merito.getMerito().getDescripcion() %></textarea>
+		    			<textarea class="form-input-custom" id="merito_descripcion" name="" disabled><%= merito.getMerito().getDescripcion() %></textarea>
 		    		</div>
 				</div>
 			
 		    	<div class="form-group-container col1">
 			    	<div class="form-group">
 			    		<label for="merito_observacion_comision">Observación para la comisión:</label>
-			    		<textarea class="form-input-custom" id="merito_observacion_comision" name="" rows="2" cols="50"><%= merito.getMerito().getObservacion() %></textarea>
+			    		<textarea class="form-input-custom" id="merito_observacion_comision" name="" rows="2" cols="50" disabled><%= merito.getMerito().getObservacion() %></textarea>
 			    	</div>
 		    	</div>
 		    	<div class="form-group-container col1">

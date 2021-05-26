@@ -16,6 +16,7 @@ import es.ujaen.uvirtual.modulo.bolsaempleo.beans.CandidatoValidacion;
 import es.ujaen.uvirtual.modulo.bolsaempleo.beans.Convocatoria;
 import es.ujaen.uvirtual.modulo.bolsaempleo.beans.Merito;
 import es.ujaen.uvirtual.modulo.bolsaempleo.beans.MeritoSolicitud;
+import es.ujaen.uvirtual.modulo.bolsaempleo.beans.MeritoSolicitudValoracion;
 import es.ujaen.uvirtual.modulo.bolsaempleo.beans.MeritoValidarTable;
 import es.ujaen.uvirtual.modulo.bolsaempleo.beans.UsuarioBolsaEmpleo;
 import es.ujaen.uvirtual.modulo.bolsaempleo.beans.ValorMeritoBolsaTable;
@@ -186,6 +187,56 @@ public class ModeloValidar {
 	public BolsaEmpleoDataTable<MeritoValidarTable> listadoMeritosNoSujetosAfinidad(Convocatoria convocatoria, Bolsa bolsa, UsuarioBolsaEmpleo candidato,
 			Map<String, String[]> params) throws SQLException, UVException {
 		return this.listadoMeritos(convocatoria, bolsa, candidato, params, false);
+	}
+	
+	/** Devuelve las bolsas en las que está inscrito el usuario.
+	 * @param convocatoria .
+	 * @param candidato .
+	 * @param merito .
+	 * @return bolsas .
+	 * @throws SQLException en caso de error en la BD .
+	 * @throws UVException .
+	 */
+	public List<ValorMeritoBolsaTable> getBolsasCandidato(Convocatoria convocatoria, UsuarioBolsaEmpleo candidato, MeritoSolicitud merito, boolean comision)
+			throws SQLException, UVException {
+		List<ValorMeritoBolsaTable> bolsas = new ArrayList<>();
+		ModeloBolsa modeloBolsa = ModeloBolsa.obtenerInstancia();
+		ModeloSolicitud modeloSolicitud = ModeloSolicitud.obtenerInstancia();
+		
+		String consulta = 
+				"SELECT bepbol.*, bepare.*, bepsbm.BEPMER_CODNUM, bepsbm.CODNUM AS BEPSBM_CODNUM"
+				+ "	FROM UVIRTUAL.TBEP_BOLSAS bepbol"
+				+ "	INNER JOIN UVIRTUAL.TBEP_AREAS bepare ON bepare.CODNUM = bepbol.BEPARE_CODNUM"
+				+ "	INNER JOIN UVIRTUAL.TBEP_SOLICITUD_BOLSAS bepsbo ON bepbol.CODNUM = bepsbo.BEPBOL_CODNUM"
+				+ "	INNER JOIN UVIRTUAL.TBEP_SOLICITUDES bepsol ON bepsol.CODNUM = bepsbo.BEPSOL_CODNUM"
+				+ "	LEFT JOIN UVIRTUAL.TBEP_SOL_BOL_MERITOS bepsbm ON bepsbm.BEPSBO_CODNUM = bepsbo.CODNUM AND bepsbm.BEPMER_CODNUM = ?"
+				+ "	WHERE bepbol.FLGBAREMABLE = 'S' AND bepsol.BEPCON_CODNUM = ? AND bepsol.BEPUSU_CODNUM = ?";
+		
+		try (Connection conexion = ConexionUvirtual.obtenerInstancia();
+			PreparedStatement stmt = conexion.prepareStatement(consulta);) {
+				int paramIndex = 1;
+				stmt.setInt(paramIndex++, merito.getMerito().getCodNum());
+				stmt.setInt(paramIndex++, convocatoria.getCodNum());
+				stmt.setInt(paramIndex++, candidato.getCodNum());
+	
+				try (ResultSet rs = stmt.executeQuery()) {
+					while (rs.next()) {
+						Bolsa bol = modeloBolsa.createFromResultSet(rs);
+						int idMeritoSolicitud = rs.getInt("BEPSBM_CODNUM");
+						MeritoSolicitud ms = merito;
+						List<MeritoSolicitudValoracion> valoraciones = new ArrayList<>();
+						
+						if (idMeritoSolicitud != 0) {
+							ms = modeloSolicitud.getMeritoSolicitudById(idMeritoSolicitud);
+							valoraciones = modeloSolicitud.getValoracionesMeritoSolicitud(idMeritoSolicitud, false);
+							ms.setValoraciones(valoraciones);
+						}
+						
+						bolsas.add(new ValorMeritoBolsaTable(ms, bol));
+					}
+				}
+			}
+		return bolsas;
 	}
 	
 	/**
@@ -496,6 +547,15 @@ public class ModeloValidar {
 		return dataTable;
 	}
 	
+	/** datatable que devuelve una lista de méritos con su valor en una bolsa .
+	 * @param convocatoria .
+	 * @param candidato .
+	 * @param merito .
+	 * @param params .
+	 * @return valores méritos .
+	 * @throws SQLException .
+	 * @throws UVException .
+	 */
 	public BolsaEmpleoDataTable<ValorMeritoBolsaTable> listadoValoresMeritoBolsa(Convocatoria convocatoria, UsuarioBolsaEmpleo candidato, Merito merito, 
 			Map<String, String[]> params) throws SQLException, UVException {
 		List<ValorMeritoBolsaTable> rows = new ArrayList<>();
@@ -537,7 +597,7 @@ public class ModeloValidar {
 					Bolsa bol = modeloBolsa.createFromResultSet(rs);
 					int idMeritoSolicitud = rs.getInt("BEPSBM_CODNUM");
 					MeritoSolicitud ms = idMeritoSolicitud != 0 ? modeloSolicitud.getMeritoSolicitudById(idMeritoSolicitud)
-							: new MeritoSolicitud(merito, false);
+							: new MeritoSolicitud(merito, false, false);
 					rows.add(new ValorMeritoBolsaTable(ms, bol));
 				}
 			}
