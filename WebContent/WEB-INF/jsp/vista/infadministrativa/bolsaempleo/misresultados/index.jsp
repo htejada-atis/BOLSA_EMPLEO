@@ -10,7 +10,6 @@ VistaMisResultados bean = (VistaMisResultados)uvdatos.getVistas().get(VistaMisRe
 %>
 
 <div class='bolsa-empleo'>
-	
 	<jsp:include page="/WEB-INF/jsp/vista/infadministrativa/bolsaempleo/mensajes.jsp" />
 
 	<h2>Resultados</h2>	

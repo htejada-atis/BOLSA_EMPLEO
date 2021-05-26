@@ -24,8 +24,7 @@ import es.ujaen.uvirtual.utilidades.UVException;
  * @author ATISoluciones
  */
 public class ModeloMisTitulaciones {
-	public static final int ORDER_COLUMN_INDEX_ID = 0;
-	public static final int ORDER_COLUMN_INDEX_NOMBRE = 1;
+	public static final int ORDER_COLUMN_INDEX_NOMBRE = 0;
 	
 	public static final int ORDER_COLUMN_INDEX_NOMBRE_USUARIO = 1;
 	public static final int ORDER_COLUMN_INDEX_DESCRIPCION = 2;
@@ -126,7 +125,6 @@ public class ModeloMisTitulaciones {
 				+ "AND beptus.FLGBORRADO != 'S' "
 				+ "WHERE beptit.FLGBORRADO != 'S' AND beptus.BEPTUS_USU_CODNUM IS NULL";
 		
-		dataTable.setColumn(ORDER_COLUMN_INDEX_ID, "beptit.CODNUM", DataTableColumn.COLUMN_TYPE_NUMBER);
 		dataTable.setColumn(ORDER_COLUMN_INDEX_NOMBRE, "beptit.NOMBRE");
 		dataTable.setQuery(consulta);
 				
