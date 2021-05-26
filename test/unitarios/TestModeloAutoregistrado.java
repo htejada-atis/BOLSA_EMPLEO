@@ -48,8 +48,7 @@ public class TestModeloAutoregistrado {
     	usuario.setDocumentoTipo("PAS");
     	usuario.setDominio("ujaen.es");
     	usuario.setUid(TEXTO);
-    	usuario.setSexo("M");
-    	usuario.setEmailCuentaPersona("prueba@prueba.com");
+    	usuario.setEmailCuentaPersona("prueba@pruebaNoexssta3384.com");
     }
     
     /** inserta un usuario basico.
