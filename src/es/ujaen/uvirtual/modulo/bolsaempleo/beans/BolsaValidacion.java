@@ -95,7 +95,7 @@ public class BolsaValidacion extends Bolsa implements Serializable {
 	public int hashCode() {
 		final int prime = 31;
 		int result = 1;
-		result = prime * super.hashCode();
+		result = prime * result + super.hashCode();
 		result = prime * result + ((totalMeritosNoValidados == null) ? 0 : totalMeritosNoValidados.hashCode());
 		result = prime * result + ((totalMeritosValidados == null) ? 0 : totalMeritosValidados.hashCode());
 		result = prime * result + ((totalMeritosExcluidos == null) ? 0 : totalMeritosExcluidos.hashCode());
@@ -115,12 +115,10 @@ public class BolsaValidacion extends Bolsa implements Serializable {
 		if (getClass() != obj.getClass()) {
 			return false;
 		}
-		
 		BolsaValidacion other = (BolsaValidacion) obj;
 		if (!super.equals(other)) {
 			return false;
 		}
-
 		if (totalMeritosNoValidados == null) {
 			if (other.totalMeritosNoValidados != null) {
 				return false;

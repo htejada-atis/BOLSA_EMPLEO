@@ -42,7 +42,7 @@ public class AreaEvaluadoresTable extends Area implements Serializable {
 	public int hashCode() {
 		final int prime = 31;
 		int result = 1;
-		result = prime * super.hashCode();
+		result = prime * result + super.hashCode();
 		result = prime * result + ((numeroEvaluadores == null) ? 0 : numeroEvaluadores.hashCode());		
 		return result;
 	}
@@ -59,12 +59,10 @@ public class AreaEvaluadoresTable extends Area implements Serializable {
 		if (getClass() != obj.getClass()) {
 			return false;
 		}
-		
 		AreaEvaluadoresTable other = (AreaEvaluadoresTable) obj;
 		if (!super.equals(other)) {
 			return false;
 		}
-		
 		if (numeroEvaluadores == null) {
 			if (other.numeroEvaluadores != null) {
 				return false;

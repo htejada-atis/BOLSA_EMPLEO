@@ -96,6 +96,14 @@ public class ModeloTitulacion {
 		return listaTitulaciones(" ORDER BY nombre");
 	}
 	
+	/** lista todas las titulaciones activas.
+	 * @return lista de todas las titulaciones
+	 * @throws SQLException si hay un error en la base de datos
+	 */
+	public List<Titulacion> listaTitulacionesActivas() throws SQLException {
+		return listaTitulaciones(" WHERE beptit.FLGBORRADO = 'N' ORDER BY nombre");
+	}
+	
 	/** lista todas las titulaciones del candidato .
 	 * @param usuario .
 	 * @return lista de todas las titulaciones .
@@ -242,7 +250,7 @@ public class ModeloTitulacion {
 		List<Titulacion> titulaciones = new ArrayList<>();
 		BolsaEmpleoDataTable<Titulacion> dataTable = new BolsaEmpleoDataTable<>(params);
 		
-		String consulta = "SELECT beptit.* FROM tbep_titulaciones beptit WHERE FLGBORRADO!='S' ";
+		String consulta = "SELECT beptit.* FROM tbep_titulaciones beptit WHERE FLGBORRADO != 'S' ";
 		
 		dataTable.setColumn(ORDER_COLUMN_INDEX_ID, "beptit.CODNUM", DataTableColumn.COLUMN_TYPE_NUMBER);
 		dataTable.setColumn(ORDER_COLUMN_INDEX_NOMBRE, "beptit.NOMBRE");
@@ -467,8 +475,7 @@ public class ModeloTitulacion {
 		
 		return false;
 	}
-	
-	
+		
 	/**
 	 * Devuelve si la titulación excluida del area ha sido borrada .
 	 * @param tit .
