@@ -313,7 +313,7 @@ $(document).ready(function() {
 			        		return "<div class='text-danger'>No inscrito</div>";
 			        	}
 			        }},
-		        	{'data': 'codnum', 'order': false, 'selectable': {'disabled': true}}
+		        	{'data': 'codNum', 'order': false, 'selectable': {'disabled': true}}
 			    ]
 			});
 			
@@ -351,6 +351,7 @@ $(document).ready(function() {
 				this.elements['<%= ControladorValidarNoAfines.PARAM_BOLSAS %>'].value = Atis.object2Json(tableBolsasCandidato.getCheckedItems());
 			});
 			
+			Atis.scrollToAnchor("#tableBolsasCandidato");
 		<% } %>
 		
 	<% } %>

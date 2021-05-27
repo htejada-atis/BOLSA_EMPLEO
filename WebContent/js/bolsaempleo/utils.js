@@ -151,6 +151,12 @@ function redondearFloat(number, decimalPlaces) {
 	return Number(Math.round(number + "e" + decimalPlaces) + "e-" + decimalPlaces);
 }
 
+function scrollToAnchor(id) {
+	$('html, body').animate({
+		scrollTop: $(id).offset().top
+	}, 1000);
+}
+
 window.Atis = $.extend(window.Atis ? window.Atis : {}, {
 	"getProp": getProp,
 	"setProp": setProp,
@@ -165,5 +171,6 @@ window.Atis = $.extend(window.Atis ? window.Atis : {}, {
 	"sendAjax": sendAjax,
 	"removeValueArray": removeValueArray,
 	"escapeHtml": escapeHtml,
-	"redondearFloat": redondearFloat
+	"redondearFloat": redondearFloat,
+	"scrollToAnchor": scrollToAnchor
 });

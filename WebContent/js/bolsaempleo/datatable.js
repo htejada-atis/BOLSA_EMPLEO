@@ -206,7 +206,7 @@ function DataTable(id, config) {
                     checked ? selected.push(value) : Atis.removeValueArray(selected, value);
                 }
                 
-    			self.checked[value] = checked;
+                typeof value !== 'undefined' ? self.checked[value] = checked : '';
                 checked ? $(this).parent().parent().addClass("selected") : $(this).parent().parent().removeClass("selected");
     			self.renderFooter();
 

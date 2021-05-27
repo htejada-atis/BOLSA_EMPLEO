@@ -161,7 +161,6 @@ table.bluetable.bolsaempleo caption .dropdown {
     background-color: #F0F0F0;
     cursor: pointer;
 }
-/* invert(10%) sepia(62%) saturate(6451%) hue-rotate(216deg) brightness(97%) contrast(103%) */
 table.bluetable.bolsaempleo caption .dropdown img {
 	width: 15px;
     height: 15px;
@@ -637,8 +636,12 @@ a.consultar-fichero:hover {
 
 table.bluetable.bolsaempleo input.validar-afinidad {
 	border-radius: 3px;
-	margin-top: 2px;
+	
 	width: 100%;
 	max-width: 150px;
+}
+
+table.bluetable.bolsaempleo input + input {
+   margin-top: 2px;
 }
 

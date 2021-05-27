@@ -163,6 +163,44 @@ public class ModeloSolicitud {
 	}
 	
 	/**
+	 * Comprueba si hay solicitudes cerradas de un usuario para una convocatoria.
+	 * @param usuario .
+	 * @param convocatoria .
+	 * @return .
+	 * @throws UVException .
+	 * @throws SQLException .
+	 */
+	public Solicitud getSolicitudByConvocatoriaUsuario(UsuarioBolsaEmpleo usuario, Convocatoria convocatoria) throws SQLException, UVException {
+		String consulta = "SELECT *"
+			  + " FROM TBEP_SOLICITUDES bepsol"
+			  + " WHERE bepsol.ESTADO = ? "
+			  + " AND bepsol.BEPCON_CODNUM = ?"
+			  + " AND bepsol.BEPUSU_CODNUM = ?";
+		
+		try (Connection conexion = ConexionUvirtual.obtenerInstancia(); 
+				PreparedStatement stmt = conexion.prepareStatement(consulta)) {
+			
+			int paramIndex = 1;
+			stmt.setString(paramIndex++, SOLICITUD_ESTADO_CERRADA);
+			stmt.setInt(paramIndex++, convocatoria.getCodNum());			
+			stmt.setInt(paramIndex++, usuario.getCodNum());
+
+			try (ResultSet rs = stmt.executeQuery()) {
+				if (!rs.next()) {
+					throw new UVException("No existe solicitud cerrada");
+				}
+				
+				Solicitud solicitud = new Solicitud();
+				solicitud.setCodNum(rs.getInt("CODNUM"));		
+				solicitud.setConvocatoria(convocatoria);				
+				solicitud.setEstado(rs.getString("ESTADO") != null ? rs.getString("ESTADO") : ModeloSolicitud.SOLICITUD_ESTADO_CERRADA);
+				return solicitud;
+    		}
+		}
+		
+	}
+	
+	/**
 	 * Crea una nueva solicitud para una convocatoria.
 	 * @param usuario .
 	 * @param convocatoria .
@@ -643,6 +681,43 @@ public class ModeloSolicitud {
 					stmt.setInt(indexParam++, meritoSolicitud.getCodNum());
 					stmt.setInt(indexParam++, entry.getKey().getCodNum());
 					stmt.setFloat(indexParam++, entry.getValue());
+					stmt.executeUpdate();
+				} catch (SQLException e) {
+					conexion.rollback();
+					conexion.setAutoCommit(true);
+					throw e;
+				}				
+			}
+			
+			conexion.commit();
+			conexion.setAutoCommit(true);
+		}
+	}
+	
+	/** El evaluador ha modificado la afinidad del mérito no individualizado . 
+	 * @param solicitud .
+	 * @param bolsa .
+	 * @param merito .
+	 * @param afinidades .
+	 * @throws SQLException .
+	 * @throws UVException .
+	 */
+	public void actualizarAfinidadesMeritoNoIndividualizado(Solicitud solicitud, Bolsa bolsa, Merito merito, Map<Afinidad, Float> afinidades) throws SQLException, UVException {
+		try (Connection conexion = ConexionUvirtual.obtenerInstancia()) {
+			conexion.setAutoCommit(false);
+			
+			MeritoSolicitud meritoSolicitud = this.getMeritoSolicitud(solicitud.getCodNum(), bolsa.getCodNum(), merito.getCodNum());
+			
+			for (Map.Entry<Afinidad, Float> entry : afinidades.entrySet()) {
+				String sqlInsert = "UPDATE TBEP_SOL_BOL_MER_VALORACION"
+						+ " SET VALOR = ?"
+						+ " WHERE BEPSBM_CODNUM = ? AND BEPAFI_CODNUM = ?";
+				
+				try (PreparedStatement stmt = conexion.prepareStatement(sqlInsert)) {
+					int indexParam = 1;
+					stmt.setFloat(indexParam++, entry.getValue());
+					stmt.setInt(indexParam++, meritoSolicitud.getCodNum());
+					stmt.setInt(indexParam++, entry.getKey().getCodNum());
 					stmt.executeUpdate();
 				} catch (SQLException e) {
 					conexion.rollback();
