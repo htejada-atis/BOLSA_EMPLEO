@@ -449,11 +449,12 @@ public class ModeloArea {
 	}
 	
 	/** Agrega las áreas de UVirtual que no están en el sistema .
+	 * @param usuario .
 	 * @return total de áreas nuevas insertadas .
 	 * @throws UVException .
 	 * @throws SQLException .
 	 */
-	public Integer insertarAreasNuevasExternas() throws SQLException, UVException {
+	public Integer insertarAreasNuevasExternas(UsuarioBolsaEmpleo usuario) throws SQLException, UVException {
 		Integer totalInsertadas = 0;
 				
 		// leemos las areas externas omitiendo aquellas que ya existen en el sistema .
@@ -475,13 +476,14 @@ public class ModeloArea {
 						
 						try {
 							// insertamos el área
-							Area area = insertarAreaSiNoExiste(conexionUvirtual, idArea, descArea);
+							Area area = insertarAreaSiNoExiste(conexionUvirtual, idArea, descArea, usuario);
 							if (area != null) {
 								// insertamos el departamento si no existe en la base de datos interna
-								Departamento departamento = insertarDepartamentoSiNoExiste(conexionUvirtual, idDepartamento, descDepartamento);
+								Departamento departamento = insertarDepartamentoSiNoExiste(
+										conexionUvirtual, idDepartamento, descDepartamento, usuario);
 								
 								// insertamos la relación de área y departamento
-								insertaAreaDepartamento(conexionUvirtual, area, departamento, idSeccion, descSeccion);
+								insertaAreaDepartamento(conexionUvirtual, area, departamento, idSeccion, descSeccion, usuario);
 								
 								totalInsertadas++;
 							}
@@ -502,11 +504,12 @@ public class ModeloArea {
 	}
 	
 	/** Actualiza las áreas del sistema con las de UVirtual .
+	 * @param usuario .
 	 * @return total de áreas nuevas actualizadas .
 	 * @throws SQLException .
 	 * @throws UVException .
 	 */
-	public Integer actualizaAreasDeExternas() throws SQLException, UVException {
+	public Integer actualizaAreasDeExternas(UsuarioBolsaEmpleo usuario) throws SQLException, UVException {
 		Integer total = 0;
 		
 		try (Connection conexionUxxiRrhh = ConexionUxxiRrhh.obtenerInstancia()) {
@@ -516,8 +519,8 @@ public class ModeloArea {
 			List<Departamento> departamentosInternos = ModeloDepartamento.obtenerInstancia().listaDepartamentos();
 			
 			try {
-				total += actualizaAreasPorDescripcion(conexionUxxiRrhh, areasInternas);
-				total += actualizaAreasPorDepartamento(conexionUxxiRrhh, areasInternas, departamentosInternos);
+				total += actualizaAreasPorDescripcion(conexionUxxiRrhh, areasInternas, usuario);
+				total += actualizaAreasPorDepartamento(conexionUxxiRrhh, areasInternas, departamentosInternos, usuario);
 				
 				conexionUxxiRrhh.commit();
 				conexionUxxiRrhh.setAutoCommit(true);
@@ -533,18 +536,19 @@ public class ModeloArea {
 	
 	/** Función que actualiza un área en la BD.
 	 * @param area .
+	 * @param usuario .
 	 * @throws SQLException .
 	 * @throws UVException .
 	 */
-	private void actualizaArea(Area area) throws SQLException {
-		String consulta = "UPDATE TBEP_AREAS SET ID_AREA_CONOCIMIENTO=?, DES_AREA_CONOCIMIENTO=? "
-				+ " WHERE ID_AREA_CONOCIMIENTO = ? ";
+	private void actualizaArea(Area area, UsuarioBolsaEmpleo usuario) throws SQLException {
+		String consulta = "UPDATE TBEP_AREAS SET ID_AREA_CONOCIMIENTO=?, DES_AREA_CONOCIMIENTO=?, UID_USUARIO=? WHERE ID_AREA_CONOCIMIENTO = ?";
 		
 		try (Connection conexion = ConexionUvirtual.obtenerInstancia();
 			 PreparedStatement stmt = conexion.prepareStatement(consulta)) {
 			int parameterIndex = 1;
 			stmt.setString(parameterIndex++, area.getIdAreaExterno());
 			stmt.setString(parameterIndex++, area.getDescripcion());
+			stmt.setString(parameterIndex++, usuario.getUsuarioArcos().getUid());
 			stmt.setString(parameterIndex++, area.getIdAreaExterno());
 			stmt.executeUpdate();
 		}
@@ -553,11 +557,12 @@ public class ModeloArea {
 	/** Función que compara la áreas del sistema con las de uvirtual y actualiza sus descripciones en caso de no coincidir .
 	 * @param conexion .
 	 * @param areasInternas .
+	 * @param usuario .
 	 * @return .
 	 * @throws SQLException .
 	 * @throws UVException .
 	 */
-	private Integer actualizaAreasPorDescripcion(Connection conexion, List<Area> areasInternas) throws SQLException {
+	private Integer actualizaAreasPorDescripcion(Connection conexion, List<Area> areasInternas, UsuarioBolsaEmpleo usuario) throws SQLException {
 		Integer total = 0;
 		String consulta = "SELECT * FROM UXXIRRHH.VUJA_NET_BEP_RH_DEPTO_SECC_AREA uvnbrdsa"
 				+ "	WHERE uvnbrdsa.ID_AREA_CONOCIMIENTO IN ("
@@ -571,7 +576,7 @@ public class ModeloArea {
 					Area area = new Area();
 					area.setIdAreaExterno(rs.getString("ID_AREA_CONOCIMIENTO"));
 					area.setDescripcion(rs.getString("DES_AREA_CONOCIMIENTO"));
-					this.actualizaArea(area);
+					this.actualizaArea(area, usuario);
 					total++;
 				}
 			}
@@ -584,11 +589,13 @@ public class ModeloArea {
 	 * @param conexion .
 	 * @param areasInternas .
 	 * @param departamentosInternos .
+	 * @param usuario .
 	 * @return total de áreas actualizadas .
 	 * @throws SQLException .
 	 * @throws UVException .
 	 */
-	private Integer actualizaAreasPorDepartamento(Connection conexion, List<Area> areasInternas, List<Departamento> departamentosInternos) throws SQLException, UVException {
+	private Integer actualizaAreasPorDepartamento(Connection conexion, List<Area> areasInternas, List<Departamento> departamentosInternos, UsuarioBolsaEmpleo usuario) 
+			throws SQLException, UVException {
 		Integer total = 0;
 		
 		String consulta = "SELECT * FROM UXXIRRHH.VUJA_NET_BEP_RH_DEPTO_SECC_AREA uvnbrdsa"
@@ -612,13 +619,14 @@ public class ModeloArea {
 						
 						try {
 							// insertamos el área
-							Area area = insertarAreaSiNoExiste(conexionUvirtual, idArea, descArea);
+							Area area = insertarAreaSiNoExiste(conexionUvirtual, idArea, descArea, usuario);
 							if (area != null) {
 								// insertamos el departamento si no existe en la base de datos interna
-								Departamento departamento = insertarDepartamentoSiNoExiste(conexionUvirtual, idDepartamento, descDepartamento);
+								Departamento departamento = insertarDepartamentoSiNoExiste(
+										conexionUvirtual, idDepartamento, descDepartamento, usuario);
 								
 								// insertamos la relación de área y departamento
-								insertaAreaDepartamento(conexionUvirtual, area, departamento, idSeccion, descSeccion);
+								insertaAreaDepartamento(conexionUvirtual, area, departamento, idSeccion, descSeccion, usuario);
 								total++;
 							}
 							
@@ -643,13 +651,13 @@ public class ModeloArea {
 	 * @param departamento .
 	 * @param idSeccion .
 	 * @param desSeccion .
+	 * @param usuario .
 	 * @throws SQLException en caso de error en la BD .
 	 * @throws UVException en caso de error de parametros .
 	 */
-	private void insertaAreaDepartamento(Connection conexion, Area area, Departamento departamento, String idSeccion, String desSeccion) throws SQLException {
-		String consulta = "INSERT INTO TBEP_AREAS_DEPARTAMENTOS " 
-				+ " (BEPARE_CODNUM,BEPDEP_CODNUM,ID_SECCION,DES_SECCION)"
-				+ " VALUES (?, ?, ?, ?)";
+	private void insertaAreaDepartamento(Connection conexion, Area area, Departamento departamento, String idSeccion, String desSeccion, UsuarioBolsaEmpleo usuario) 
+			throws SQLException {
+		String consulta = "INSERT INTO TBEP_AREAS_DEPARTAMENTOS (BEPARE_CODNUM,BEPDEP_CODNUM,ID_SECCION,DES_SECCION,UID_USUARIO) VALUES (?,?,?,?,?)";
 		
 		try (PreparedStatement stmt = conexion.prepareStatement(consulta)) {
 			int parameterIndex = 1;
@@ -657,6 +665,7 @@ public class ModeloArea {
 			stmt.setInt(parameterIndex++, departamento.getCodNum());
 			stmt.setString(parameterIndex++, idSeccion);
 			stmt.setString(parameterIndex++, desSeccion);
+			stmt.setString(parameterIndex++, usuario.getUsuarioArcos().getUid());
 			stmt.executeUpdate();
 		}
 	}
@@ -664,10 +673,11 @@ public class ModeloArea {
 	/**	Función que inserta un área en la BD.
 	 * @param conexion .
 	 * @param area a insertar en la BD .
+	 * @param usuario .
 	 * @throws SQLException en caso de error en la BD .
 	 * @throws UVException en caso de error de parametros .
 	 */
-	private void insertaArea(Connection conexion, Area area) throws SQLException, UVException {
+	private void insertaArea(Connection conexion, Area area, UsuarioBolsaEmpleo usuario) throws SQLException, UVException {
 		if (area == null) {
 			throw new UVException("No se puede insertar un área vacio");
 		}
@@ -675,14 +685,13 @@ public class ModeloArea {
 			throw new UVException("No se puede insertar un área sin id externo");
 		}
 		
-		String consulta = "INSERT INTO TBEP_AREAS " 
-				+ " (ID_AREA_CONOCIMIENTO,DES_AREA_CONOCIMIENTO)"
-				+ " VALUES (?, ?)";
+		String consulta = "INSERT INTO TBEP_AREAS (ID_AREA_CONOCIMIENTO,DES_AREA_CONOCIMIENTO,UID_USUARIO) VALUES (?, ?, ?)";
 		
 		try (PreparedStatement stmt = conexion.prepareStatement(consulta)) {
 			int parameterIndex = 1;
 			stmt.setString(parameterIndex++, area.getIdAreaExterno());
 			stmt.setString(parameterIndex++, area.getDescripcion());
+			stmt.setString(parameterIndex++, usuario.getUsuarioArcos().getUid());
 			stmt.executeUpdate();
 		}
 	}
@@ -691,11 +700,13 @@ public class ModeloArea {
 	 * @param conexion .
 	 * @param idDepartamentoExterno .
 	 * @param descDepartamentoExterno .
+	 * @param usuario .
 	 * @return departamento .
 	 * @throws SQLException .
 	 * @throws UVException .
 	 */
-	private Departamento insertarDepartamentoSiNoExiste(Connection conexion, String idDepartamentoExterno, String descDepartamentoExterno) throws SQLException, UVException {
+	private Departamento insertarDepartamentoSiNoExiste(Connection conexion, String idDepartamentoExterno, String descDepartamentoExterno, UsuarioBolsaEmpleo usuario) 
+			throws SQLException, UVException {
 		ModeloDepartamento modeloDepartamento = ModeloDepartamento.obtenerInstancia();
 		Departamento departamento = modeloDepartamento.getDepartamentoByIdExterno(idDepartamentoExterno);
 		
@@ -703,7 +714,7 @@ public class ModeloArea {
 			departamento = new Departamento();
 			departamento.setIdDepartamentoExterno(idDepartamentoExterno);
 			departamento.setDescripcion(descDepartamentoExterno);
-			modeloDepartamento.insertaDepartamento(conexion, departamento);
+			modeloDepartamento.insertaDepartamento(conexion, departamento, usuario);
 			departamento = modeloDepartamento.getDepartamentoByIdExterno(idDepartamentoExterno);
 		}
 		
@@ -714,18 +725,19 @@ public class ModeloArea {
 	 * @param conexion .
 	 * @param idAreaExterna .
 	 * @param descAreaExterna .
+	 * @param usuario .
 	 * @return area .
 	 * @throws SQLException .
 	 * @throws UVException .
 	 */
-	private Area insertarAreaSiNoExiste(Connection conexion, String idAreaExterna, String descAreaExterna) throws SQLException, UVException {
+	private Area insertarAreaSiNoExiste(Connection conexion, String idAreaExterna, String descAreaExterna, UsuarioBolsaEmpleo usuario) throws SQLException, UVException {
 		Area area = getAreaByIdExterno(conexion, idAreaExterna);
 		
 		if (area == null) {
 			area = new Area();
 			area.setIdAreaExterno(idAreaExterna);
 			area.setDescripcion(descAreaExterna);
-			this.insertaArea(conexion, area);
+			this.insertaArea(conexion, area, usuario);
 			area = getAreaByIdExterno(conexion, idAreaExterna);
 		}
 		

@@ -23,6 +23,7 @@ import es.ujaen.uvirtual.beans.CodigoDescripcion;
 import es.ujaen.uvirtual.beans.UVDatos;
 import es.ujaen.uvirtual.modulo.bolsaempleo.beans.Fichero;
 import es.ujaen.uvirtual.modulo.bolsaempleo.beans.Noticia;
+import es.ujaen.uvirtual.modulo.bolsaempleo.beans.UsuarioBolsaEmpleo;
 import es.ujaen.uvirtual.modulo.bolsaempleo.modelo.ModeloFichero;
 import es.ujaen.uvirtual.modulo.bolsaempleo.modelo.ModeloNoticia;
 import es.ujaen.uvirtual.modulo.bolsaempleo.modelo.ModeloUsuarioBolsaEmpleo;
@@ -146,8 +147,8 @@ public class ControladorInicio extends HttpServlet {
 		bean.setVista(JSP_INICIO);
 		BolsaEmpleoUtils.readMensajeSession(bean, request);
 		try {
-			boolean existe = ModeloUsuarioBolsaEmpleo.obtenerInstancia().checkUser(datos);
-			bean.setAnonimo(!existe);
+			UsuarioBolsaEmpleo usuario = ModeloUsuarioBolsaEmpleo.obtenerInstancia().getOrCreateUsuarioBolsaEmpleo(datos);
+			bean.setAnonimo(usuario == null);
 		} catch (UVException e) {
 			BolsaEmpleoUtils.addMensajeDeError(e.getMessage(), bean, request);
 			response.sendRedirect("/srv/es/informacionadministrativa/bolsaempleo/error");

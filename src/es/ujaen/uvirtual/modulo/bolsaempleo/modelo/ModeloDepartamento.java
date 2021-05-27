@@ -9,6 +9,7 @@ import java.util.List;
 
 import es.ujaen.uvirtual.modelo.conexion.ConexionUvirtual;
 import es.ujaen.uvirtual.modulo.bolsaempleo.beans.Departamento;
+import es.ujaen.uvirtual.modulo.bolsaempleo.beans.UsuarioBolsaEmpleo;
 import es.ujaen.uvirtual.utilidades.UVException;
 
 /**
@@ -148,10 +149,11 @@ public class ModeloDepartamento {
 	 * 
 	 * @param conexion     .
 	 * @param departamento a insertar en la BD .
+	 * @param usuario .
 	 * @throws SQLException en caso de error en la BD .
 	 * @throws UVException  en caso de error de parametros .
 	 */
-	public void insertaDepartamento(Connection conexion, Departamento departamento) throws SQLException, UVException {
+	public void insertaDepartamento(Connection conexion, Departamento departamento, UsuarioBolsaEmpleo usuario) throws SQLException, UVException {
 		if (departamento == null) {
 			throw new UVException("No se puede insertar un departamento vacio");
 		}
@@ -159,12 +161,13 @@ public class ModeloDepartamento {
 			throw new UVException("No se puede insertar un departamento sin id externo");
 		}
 
-		String consulta = "INSERT INTO TBEP_DEPARTAMENTOS " + " (ID_DEPARTAMENTO,DES_DEPARTAMENTO)" + " VALUES (?, ?)";
+		String consulta = "INSERT INTO TBEP_DEPARTAMENTOS (ID_DEPARTAMENTO, DES_DEPARTAMENTO, UID_USUARIO) VALUES (?, ?, ?)";
 
 		try (PreparedStatement stmt = conexion.prepareStatement(consulta)) {
 			int parameterIndex = 1;
 			stmt.setString(parameterIndex++, departamento.getIdDepartamentoExterno());
 			stmt.setString(parameterIndex++, departamento.getDescripcion());
+			stmt.setString(parameterIndex++, usuario.getUsuarioArcos().getUid());
 			stmt.executeUpdate();
 		}
 	}

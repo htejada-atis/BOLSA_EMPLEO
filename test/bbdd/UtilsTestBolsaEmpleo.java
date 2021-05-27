@@ -355,7 +355,7 @@ public final class UtilsTestBolsaEmpleo {
 	}
 
 	private static void insertDepartamento(Connection con, String idDept, String descripcion) throws SQLException {
-		String sql = "INSERT INTO UVIRTUAL.TBEP_DEPARTAMENTOS (ID_DEPARTAMENTO, DES_DEPARTAMENTO) VALUES (?,?)";
+		String sql = "INSERT INTO UVIRTUAL.TBEP_DEPARTAMENTOS (ID_DEPARTAMENTO, DES_DEPARTAMENTO, UID_USUARIO) VALUES (?,?,'CARGA_INICIAL')";
 
 		try (PreparedStatement stmt = con.prepareStatement(sql)) {
 			int parameterIndex = 1;
@@ -380,7 +380,7 @@ public final class UtilsTestBolsaEmpleo {
 		}
 
 		// insertamos
-		sql = "INSERT INTO TBEP_AREAS (ID_AREA_CONOCIMIENTO, DES_AREA_CONOCIMIENTO) VALUES (?,?)";
+		sql = "INSERT INTO TBEP_AREAS (ID_AREA_CONOCIMIENTO, DES_AREA_CONOCIMIENTO, UID_USUARIO) VALUES (?,?,'CARGA_INICIAL')";
 		try (PreparedStatement stmt = con.prepareStatement(sql, new String[] {CODNUM})) {
 			int parameterIndex = 1;
 			stmt.setString(parameterIndex++, idAreaConocimiento);
@@ -394,7 +394,7 @@ public final class UtilsTestBolsaEmpleo {
 	}
 
 	private static void insertAreaDepartamento(Integer idDepartamento, Integer idArea, String idSeccion, String descSeccion) throws SQLException {
-		String sql = "INSERT INTO TBEP_AREAS_DEPARTAMENTOS (BEPARE_CODNUM,BEPDEP_CODNUM,ID_SECCION,DES_SECCION) VALUES (?,?,?,?)";
+		String sql = "INSERT INTO TBEP_AREAS_DEPARTAMENTOS (BEPARE_CODNUM,BEPDEP_CODNUM,ID_SECCION,DES_SECCION,UID_USUARIO) VALUES (?,?,?,?,'CARGA_INICIAL')";
 		try (Connection con = BbddRunner.obtenerConexionUvirtual(); PreparedStatement stmt = con.prepareStatement(sql)) {
 			int parameterIndex = 1;
 			stmt.setInt(parameterIndex++, idArea);

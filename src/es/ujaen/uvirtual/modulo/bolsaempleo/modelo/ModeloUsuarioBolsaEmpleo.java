@@ -638,8 +638,7 @@ public class ModeloUsuarioBolsaEmpleo {
 		if (Boolean.FALSE.equals(usuario.getExcluido())) {
 			String consulta = "INSERT INTO TBEP_USUARIOS (CODCUENTA,PRSNIF,ROL,FLGLISTADISTRIBUCION) VALUES (?, ?, ?, ?)";
 			
-			try (Connection conexion = ConexionUvirtual.obtenerInstancia();
-					PreparedStatement stmt = conexion.prepareStatement(consulta);) {
+			try (Connection conexion = ConexionUvirtual.obtenerInstancia(); PreparedStatement stmt = conexion.prepareStatement(consulta)) {
 				int parameterIndex = 1;
 				stmt.setString(parameterIndex++, usuario.getCodCuenta());
 				stmt.setString(parameterIndex++, usuario.getNumDocumento());
@@ -657,8 +656,7 @@ public class ModeloUsuarioBolsaEmpleo {
 				consulta += ") VALUES (?, ?, ?, ?, ?, ?, ?, ?) ";
 			}
 
-			try (Connection conexion = ConexionUvirtual.obtenerInstancia();
-					PreparedStatement stmt = conexion.prepareStatement(consulta);) {
+			try (Connection conexion = ConexionUvirtual.obtenerInstancia(); PreparedStatement stmt = conexion.prepareStatement(consulta)) {
 				int parameterIndex = 1;
 				stmt.setString(parameterIndex++, usuario.getCodCuenta());
 				stmt.setString(parameterIndex++, usuario.getNumDocumento());
@@ -745,8 +743,7 @@ public class ModeloUsuarioBolsaEmpleo {
 		String consulta = "UPDATE tbep_usuarios "
 			+ " SET DIRECCION=?, CODIGOPOSTAL=?, LOCALIDAD=?, PROVINCIA=?, NACIONALIDAD=?, TELEFONO=?, FLGLISTADISTRIBUCION=?"
 			+ " WHERE codnum=?";
-		try (Connection conexion = ConexionUvirtual.obtenerInstancia();
-			PreparedStatement stmt = conexion.prepareStatement(consulta);) {
+		try (Connection conexion = ConexionUvirtual.obtenerInstancia(); PreparedStatement stmt = conexion.prepareStatement(consulta)) {
 			int parameterIndex = 1;
 			stmt.setString(parameterIndex++, usuario.getDireccion());
 			stmt.setString(parameterIndex++, usuario.getCodigoPostal());
@@ -903,16 +900,16 @@ public class ModeloUsuarioBolsaEmpleo {
 	 * Si no tenemos usuario en nuestro sistema, lo crea como candidato.
 	 *  
 	 * @param  datos .
-	 * @return Boolean true si hay usuario logeado en el sistema o false en otro caso.
+	 * @return usuario bolsa de empleo o null si no hay usuario logeado.
 	 * @throws SQLException en caso de error en la BD.
 	 * @throws UVException si noticia no es valida.
 	 */
-	public Boolean checkUser(UVDatos datos) throws SQLException, UVException {
+	public UsuarioBolsaEmpleo getOrCreateUsuarioBolsaEmpleo(UVDatos datos) throws SQLException, UVException {
 		Usuario usuArcos = datos.getUsuario();
 		
 		// no hay usuario logeado, salimos
 		if (usuArcos == null) {
-			return false;
+			return null;
 		}
 					
 		UsuarioBolsaEmpleo usuario;
@@ -941,7 +938,9 @@ public class ModeloUsuarioBolsaEmpleo {
 			throw new UVException("No puede acceder, su perfil ha sido borrado de la base de datos");
 		} 
 		
-		return true;		
+		usuario.setUsuarioArcos(usuArcos);
+		
+		return usuario;
 	}
 	
 	/** Elimina un usuario.

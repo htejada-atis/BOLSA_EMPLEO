@@ -174,7 +174,7 @@ public class ControladorMisMeritosPreferentes extends HttpServlet {
 		this.index(bean);
 		BolsaEmpleoUtils.readMensajeSession(bean, request);
 		try {
-			ModeloUsuarioBolsaEmpleo.obtenerInstancia().checkUser(datos);
+			ModeloUsuarioBolsaEmpleo.obtenerInstancia().getOrCreateUsuarioBolsaEmpleo(datos);
 		} catch (UVException e) {
 			BolsaEmpleoUtils.addMensajeDeError(e.getMessage(), bean, request);
 			response.sendRedirect("/srv/es/informacionadministrativa/bolsaempleo/error");
