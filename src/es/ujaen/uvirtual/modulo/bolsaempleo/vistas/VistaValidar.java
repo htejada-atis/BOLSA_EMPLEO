@@ -1,31 +1,36 @@
 package es.ujaen.uvirtual.modulo.bolsaempleo.vistas;
 
 import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.List;
 import es.ujaen.uvirtual.beans.vistas.Vista;
 import es.ujaen.uvirtual.modulo.bolsaempleo.beans.Bolsa;
-import es.ujaen.uvirtual.modulo.bolsaempleo.beans.BolsaCandidatoValidacionTable;
 import es.ujaen.uvirtual.modulo.bolsaempleo.beans.BolsaValidacion;
 import es.ujaen.uvirtual.modulo.bolsaempleo.beans.CandidatoValidacion;
 import es.ujaen.uvirtual.modulo.bolsaempleo.beans.Convocatoria;
-import es.ujaen.uvirtual.modulo.bolsaempleo.beans.Merito;
+import es.ujaen.uvirtual.modulo.bolsaempleo.beans.ItemBaremacion;
+import es.ujaen.uvirtual.modulo.bolsaempleo.beans.MeritoSolicitud;
 import es.ujaen.uvirtual.modulo.bolsaempleo.beans.MeritoValidarTable;
 import es.ujaen.uvirtual.modulo.bolsaempleo.beans.UsuarioBolsaEmpleo;
+import es.ujaen.uvirtual.modulo.bolsaempleo.beans.ValorMeritoBolsaTable;
 import es.ujaen.uvirtual.modulo.bolsaempleo.utilidades.BolsaEmpleoDataTable;
 
 /** Bean para la vista.
- * @author fcampos
+ * @author ATISoluciones 2021
  */
 public class VistaValidar extends Vista implements Serializable {
 	private static final long serialVersionUID = 1L;
 	private String vista;
 	private Bolsa bolsa;
 	private Convocatoria conv;
-	private Merito merito;
+	private MeritoSolicitud merito;
 	private UsuarioBolsaEmpleo usuario;
 	private BolsaEmpleoDataTable<BolsaValidacion> datatableBolsas;
-	private BolsaEmpleoDataTable<BolsaCandidatoValidacionTable> datatableBolsasCandidato;
 	private BolsaEmpleoDataTable<CandidatoValidacion> datatableCandidatos;
 	private BolsaEmpleoDataTable<MeritoValidarTable> datatableMeritos;
+	private List<ItemBaremacion> items = new ArrayList<>();
+	private List<ValorMeritoBolsaTable> bolsas = new ArrayList<>();
+	
 	
 	public String getVista() {
 		return vista;
@@ -41,14 +46,6 @@ public class VistaValidar extends Vista implements Serializable {
 	
 	public BolsaEmpleoDataTable<BolsaValidacion> getDatatableBolsas() {
 		return this.datatableBolsas;	
-	}
-	
-	public void setDatatableBolsasCandidato(BolsaEmpleoDataTable<BolsaCandidatoValidacionTable> dt) {
-		this.datatableBolsasCandidato = dt;
-	}
-	
-	public BolsaEmpleoDataTable<BolsaCandidatoValidacionTable> getDatatableBolsasCandidato() {
-		return this.datatableBolsasCandidato;	
 	}
 	
 	public void setDatatableCandidatos(BolsaEmpleoDataTable<CandidatoValidacion> dt) {
@@ -83,11 +80,11 @@ public class VistaValidar extends Vista implements Serializable {
 		this.conv = pconv;
 	}
 	
-	public Merito getMerito() {
+	public MeritoSolicitud getMerito() {
 		return merito;
 	}
 	
-	public void setMerito(Merito merito) {
+	public void setMerito(MeritoSolicitud merito) {
 		this.merito = merito;
 	}
 	
@@ -98,4 +95,21 @@ public class VistaValidar extends Vista implements Serializable {
 	public void setCandidato(UsuarioBolsaEmpleo pusuario) {
 		this.usuario = pusuario;
 	}
+	
+	public List<ItemBaremacion> getItems() {
+		return items;
+	}
+	
+	public void setItems(List<ItemBaremacion> items) {
+		this.items = items;
+	}
+	
+	public List<ValorMeritoBolsaTable> getBolsas() {
+		return bolsas;
+	}
+	
+	public void setBolsas(List<ValorMeritoBolsaTable> bolsas) {
+		this.bolsas = bolsas;
+	}
+	
 }

@@ -16,6 +16,7 @@ import es.ujaen.uvirtual.modulo.bolsaempleo.beans.CandidatoValidacion;
 import es.ujaen.uvirtual.modulo.bolsaempleo.beans.Convocatoria;
 import es.ujaen.uvirtual.modulo.bolsaempleo.beans.Merito;
 import es.ujaen.uvirtual.modulo.bolsaempleo.beans.MeritoSolicitud;
+import es.ujaen.uvirtual.modulo.bolsaempleo.beans.MeritoSolicitudValoracion;
 import es.ujaen.uvirtual.modulo.bolsaempleo.beans.MeritoValidarTable;
 import es.ujaen.uvirtual.modulo.bolsaempleo.beans.UsuarioBolsaEmpleo;
 import es.ujaen.uvirtual.modulo.bolsaempleo.beans.ValorMeritoBolsaTable;
@@ -77,60 +78,6 @@ public class ModeloValidar {
 	}
 
 	/**
-	 * Listado de bolsas sujetas a afinidad en una solicitud.
-	 * @param convocatoria .
-	 * @param params .
-	 * @return datatable de bolsas de validación .
-	 * @throws SQLException .
-	 * @throws UVException  .
-	 */
-	public BolsaEmpleoDataTable<BolsaValidacion> listadoAreasSujetasAfinidad(Convocatoria convocatoria, Map<String, String[]> params) throws SQLException, UVException {
-		return this.listadoAreas(convocatoria, params, true);
-	}
-
-	/**
-	 * Listado de bolsas NO sujetas a afinidad en una solicitud.
-	 * @param convocatoria .
-	 * @param params .
-	 * @return datatable de bolsas de validación .
-	 * @throws SQLException .
-	 * @throws UVException  .
-	 */
-	public BolsaEmpleoDataTable<BolsaValidacion> listadoAreasNoSujetasAfinidad(Convocatoria convocatoria, Map<String, String[]> params) throws SQLException, UVException {
-		return this.listadoAreas(convocatoria, params, false);
-	}
-	
-	/**
-	 * Listado de bolsas en las que está apuntado actualmente el candidato sujetas a afinidad en una solicitud.
-	 * @param convocatoria .
-	 * @param merito .
-	 * @param candidato .
-	 * @param params .
-	 * @return datatable de bolsas de un candidato .
-	 * @throws SQLException .
-	 * @throws UVException  .
-	 */
-	public BolsaEmpleoDataTable<BolsaCandidatoValidacionTable> listadoAreasCandidatoSujetasAfinidad(Convocatoria convocatoria, UsuarioBolsaEmpleo candidato, Merito merito,
-			Map<String, String[]> params) throws SQLException, UVException {
-		return this.listadoAreasCandidato(convocatoria, candidato, merito, params, false);
-	}
-	
-	/**
-	 * Listado de bolsas en las que está apuntado actualmente el candidato NO sujetas a afinidad en una solicitud.
-	 * @param convocatoria .
-	 * @param merito .
-	 * @param candidato .
-	 * @param params .
-	 * @return datatable de bolsas de un candidato .
-	 * @throws SQLException .
-	 * @throws UVException  .
-	 */
-	public BolsaEmpleoDataTable<BolsaCandidatoValidacionTable> listadoAreasCandidatoNoSujetasAfinidad(Convocatoria convocatoria, UsuarioBolsaEmpleo candidato, Merito merito, 
-			Map<String, String[]> params) throws SQLException, UVException {
-		return this.listadoAreasCandidato(convocatoria, candidato, merito, params, false);
-	}
-	
-	/**
 	 * Listado de candidatos con bolsas sujetas a afinidad en una solicitud.
 	 * @param convocatoria .
 	 * @param bolsa .
@@ -188,20 +135,84 @@ public class ModeloValidar {
 		return this.listadoMeritos(convocatoria, bolsa, candidato, params, false);
 	}
 	
+	/** Devuelve las bolsas en las que está inscrito el usuario.
+	 * @param convocatoria .
+	 * @param candidato .
+	 * @param merito .
+	 * @param usuario .
+	 * @return bolsas .
+	 * @throws SQLException en caso de error en la BD .
+	 * @throws UVException .
+	 */
+	public List<ValorMeritoBolsaTable> listadoAreasCandidatoSujetasAfinidad(Convocatoria convocatoria, UsuarioBolsaEmpleo candidato, MeritoSolicitud merito, 
+			UsuarioBolsaEmpleo usuario) throws SQLException, UVException {
+		List<ValorMeritoBolsaTable> bolsas = new ArrayList<>();
+		ModeloBolsa modeloBolsa = ModeloBolsa.obtenerInstancia();
+		ModeloSolicitud modeloSolicitud = ModeloSolicitud.obtenerInstancia();
+		
+		boolean comision = false;
+		if (usuario.getRol().getValor().equals(ModeloRol.ROL_MIEMBRO_COMISION)) {
+			comision = true;
+		}
+		
+		String consulta = 
+				"SELECT bepbol.*, bepare.*, bepsbm.BEPMER_CODNUM, bepsbm.CODNUM AS BEPSBM_CODNUM"
+				+ "	FROM UVIRTUAL.TBEP_BOLSAS bepbol"
+				+ "	INNER JOIN UVIRTUAL.TBEP_AREAS bepare ON bepare.CODNUM = bepbol.BEPARE_CODNUM"
+				+ "	INNER JOIN UVIRTUAL.TBEP_SOLICITUD_BOLSAS bepsbo ON bepbol.CODNUM = bepsbo.BEPBOL_CODNUM"
+				+ "	INNER JOIN UVIRTUAL.TBEP_SOLICITUDES bepsol ON bepsol.CODNUM = bepsbo.BEPSOL_CODNUM"
+				+ (comision ? " INNER JOIN UVIRTUAL.TBEP_EVALUADORES bepeva ON bepeva.BEPARE_CODNUM = bepare.CODNUM" : "")
+				+ "	LEFT JOIN UVIRTUAL.TBEP_SOL_BOL_MERITOS bepsbm ON bepsbm.BEPSBO_CODNUM = bepsbo.CODNUM AND bepsbm.BEPMER_CODNUM = ?"
+				+ "	WHERE bepbol.FLGBAREMABLE = 'S' AND bepsol.BEPCON_CODNUM = ? AND bepsol.BEPUSU_CODNUM = ?"
+				+ (comision ? " AND bepeva.BEPUSU_CODNUM = ?" : "");
+		
+		try (Connection conexion = ConexionUvirtual.obtenerInstancia();
+			PreparedStatement stmt = conexion.prepareStatement(consulta);) {
+				int paramIndex = 1;
+				stmt.setInt(paramIndex++, merito.getMerito().getCodNum());
+				stmt.setInt(paramIndex++, convocatoria.getCodNum());
+				stmt.setInt(paramIndex++, candidato.getCodNum());
+				
+				if (comision) {
+					stmt.setInt(paramIndex++, usuario.getCodNum());
+				}
+	
+				try (ResultSet rs = stmt.executeQuery()) {
+					while (rs.next()) {
+						Bolsa bol = modeloBolsa.createFromResultSet(rs);
+						int idMeritoSolicitud = rs.getInt("BEPSBM_CODNUM");
+						MeritoSolicitud ms = new MeritoSolicitud();
+						ms.setMerito(merito.getMerito());
+						ms.setValoraciones(merito.getValoraciones());
+						ms.setExcluido(false);
+						ms.setValidado(false);
+						List<MeritoSolicitudValoracion> valoraciones = new ArrayList<>();
+						
+						if (idMeritoSolicitud != 0) {
+							ms = modeloSolicitud.getMeritoSolicitudById(idMeritoSolicitud);
+							valoraciones = modeloSolicitud.getValoracionesMeritoSolicitud(idMeritoSolicitud, false);
+							ms.setValoraciones(valoraciones);
+						}
+						
+						bolsas.add(new ValorMeritoBolsaTable(ms, bol));
+					}
+				}
+			}
+		return bolsas;
+	}
+	
 	/**
-	 * Lista de bolsas para una convocatoria .
+	 * Lista de bolsas no sujetas a afinidad para una convocatoria .
 	 * @param convocatoria .
 	 * @param params .
-	 * @param afinidad .
 	 * @return datatable de bolsas de validación .
 	 * @throws SQLException .
 	 * @throws UVException .
 	 */
-	private BolsaEmpleoDataTable<BolsaValidacion> listadoAreas(Convocatoria convocatoria, Map<String, String[]> params, boolean afinidad) 
+	public BolsaEmpleoDataTable<BolsaValidacion> listadoAreasNoSujetasAfinidad(Convocatoria convocatoria, Map<String, String[]> params) 
 			throws SQLException, UVException {
 		List<BolsaValidacion> rows = new ArrayList<>();
 		BolsaEmpleoDataTable<BolsaValidacion> dataTable = new BolsaEmpleoDataTable<BolsaValidacion>(params);
-		ModeloBolsa modeloBolsa = ModeloBolsa.obtenerInstancia();
 
 		if (convocatoria == null) {
 			dataTable.setData(rows);
@@ -215,10 +226,8 @@ public class ModeloValidar {
 				+ "	INNER JOIN UVIRTUAL.TBEP_SOLICITUDES bepsol ON bepsol.CODNUM = bepsbo.BEPSOL_CODNUM"
 				+ "	INNER JOIN UVIRTUAL.TBEP_MERITOS bepmer ON bepmer.CODNUM = bepsbm.BEPMER_CODNUM"
 				+ "	INNER JOIN UVIRTUAL.TBEP_ITEMSBAREMACION bepite ON bepite.CODNUM = bepmer.BEPITE_CODNUM"
-				+ "	WHERE bepsbo.BEPBOL_CODNUM = bepbol.CODNUM AND bepsol.BEPCON_CODNUM = ? AND bepsol.ESTADO = 'CERRADA'";
-		
-		// agrega el filtro de afinidad
-		consultaCount += afinidad ? " AND bepite.AFINIDAD IS NOT NULL " : " AND bepite.AFINIDAD IS NULL ";
+				+ "	WHERE bepsbo.BEPBOL_CODNUM = bepbol.CODNUM AND bepsol.BEPCON_CODNUM = ? AND bepsol.ESTADO = 'CERRADA'"
+				+ "	AND bepite.AFINIDAD IS NULL";
 		
 		// seleccionamos las bolsas, con meritos, en la convocatoria pasada
 		String consulta = 
@@ -255,14 +264,7 @@ public class ModeloValidar {
 
 			try (ResultSet rs = stmt.executeQuery()) {
 				while (rs.next()) {
-					Bolsa bolsa = modeloBolsa.createFromResultSet(rs);
-					BolsaValidacion bolsaValidacion = new BolsaValidacion(bolsa);
-					bolsaValidacion.setTotalMeritosNoValidados(rs.getInt("COUNT_TOTAL"));
-					bolsaValidacion.setTotalMeritosValidados(rs.getInt("COUNT_VALIDADOS"));
-					bolsaValidacion.setTotalMeritosExcluidos(rs.getInt("COUNT_EXCLUIDOS"));
-					bolsaValidacion.setTotalMeritos(rs.getInt("COUNT_TOTAL"));
-					
-					rows.add(bolsaValidacion);
+					rows.add(createBolsaValidacionFromResultSet(rs));
 				}
 			}
 
@@ -273,8 +275,104 @@ public class ModeloValidar {
 		return dataTable;
 	}
 	
-	private BolsaEmpleoDataTable<BolsaCandidatoValidacionTable> listadoAreasCandidato(Convocatoria convocatoria, UsuarioBolsaEmpleo candidato, Merito merito,  
-			Map<String, String[]> params, boolean afinidad) throws SQLException, UVException {
+	/**
+	 * Lista de bolsas sujetas a afinidad para una convocatoria .
+	 * @param convocatoria .
+	 * @param usuario .
+	 * @param params .
+	 * @return datatable de bolsas de validación .
+	 * @throws SQLException .
+	 * @throws UVException .
+	 */
+	public BolsaEmpleoDataTable<BolsaValidacion> listadoAreasSujetasAfinidad(Convocatoria convocatoria, UsuarioBolsaEmpleo usuario, Map<String, String[]> params) 
+			throws SQLException, UVException {
+		List<BolsaValidacion> rows = new ArrayList<>();
+		BolsaEmpleoDataTable<BolsaValidacion> dataTable = new BolsaEmpleoDataTable<BolsaValidacion>(params);
+
+		if (convocatoria == null) {
+			dataTable.setData(rows);
+			return dataTable;
+		}
+		
+		boolean comision = false;
+		if (usuario.getRol().getValor().equals(ModeloRol.ROL_MIEMBRO_COMISION)) {
+			comision = true;
+		}
+		
+		// subconsultas para seleccionar el número de méritos que contiene cada bolsa de la solicitud
+		// en la convocatoria pasada, agregando después varios filtros
+		String consultaCount = "SELECT COUNT(*) FROM UVIRTUAL.TBEP_SOL_BOL_MERITOS bepsbm"
+				+ "	INNER JOIN UVIRTUAL.TBEP_SOLICITUD_BOLSAS bepsbo ON bepsbo.CODNUM = bepsbm.BEPSBO_CODNUM"
+				+ "	INNER JOIN UVIRTUAL.TBEP_SOLICITUDES bepsol ON bepsol.CODNUM = bepsbo.BEPSOL_CODNUM"
+				+ "	INNER JOIN UVIRTUAL.TBEP_MERITOS bepmer ON bepmer.CODNUM = bepsbm.BEPMER_CODNUM"
+				+ "	INNER JOIN UVIRTUAL.TBEP_ITEMSBAREMACION bepite ON bepite.CODNUM = bepmer.BEPITE_CODNUM"
+				+ "	WHERE bepsbo.BEPBOL_CODNUM = bepbol.CODNUM AND bepsol.BEPCON_CODNUM = ? AND bepsol.ESTADO = 'CERRADA'"
+				+ "	AND bepite.AFINIDAD IS NOT NULL";
+		
+		// seleccionamos las bolsas, con meritos, en la convocatoria pasada
+		String consulta = 
+				"SELECT bepbol.*,"
+				+ "	(" + consultaCount + " AND bepsbm.FLGVALIDADO = 'N' AND bepsbm.FLGEXCLUIDO = 'N') COUNT_NO_VALIDADOS, "
+				+ "	(" + consultaCount + " AND bepsbm.FLGVALIDADO = 'S' AND bepsbm.FLGEXCLUIDO = 'N') COUNT_VALIDADOS, "
+				+ "	(" + consultaCount + " AND bepsbm.FLGEXCLUIDO = 'S') COUNT_EXCLUIDOS, "
+				+ "	(" + consultaCount + ") COUNT_TOTAL"
+				+ "	FROM UVIRTUAL.TBEP_BOLSAS bepbol"
+				+ " INNER JOIN UVIRTUAL.TBEP_AREAS bepare ON bepare.CODNUM = bepbol.BEPARE_CODNUM"
+				+ (comision ? " INNER JOIN UVIRTUAL.TBEP_EVALUADORES bepeva ON bepeva.BEPARE_CODNUM = bepare.CODNUM" : "")
+				+ "	WHERE bepbol.FLGBAREMABLE = 'S'" + (comision ? " AND bepeva.BEPUSU_CODNUM = ?" : "");
+		
+		dataTable.setColumn(ORDER_COLUMN_INDEX_CODIGO_AREA, "bepare.ID_AREA_CONOCIMIENTO");
+		dataTable.setColumn(ORDER_COLUMN_INDEX_AREA, "bepare.DES_AREA_CONOCIMIENTO");
+		dataTable.setColumn(ORDER_COLUMN_INDEX_COUNT_NO_VALIDADOS, "COUNT_NO_VALIDADOS");
+		dataTable.setColumn(ORDER_COLUMN_INDEX_COUNT_VALIDADOS, "COUNT_VALIDADOS");
+		dataTable.setColumn(ORDER_COLUMN_INDEX_COUNT_EXCLUIDOS, "COUNT_EXCLUIDOS");
+		dataTable.setColumn(ORDER_COLUMN_INDEX_COUNT_TOTAL, "COUNT_TOTAL");
+
+		dataTable.setQuery(consulta);
+		
+		try (Connection conexion = ConexionUvirtual.obtenerInstancia();
+				PreparedStatement stmtCount = conexion.prepareStatement(dataTable.getQueryCount());
+				PreparedStatement stmt = conexion.prepareStatement(dataTable.getQuery());) {
+			int paramIndex = 1;
+			
+			// bucle para rellenar los parámetros de las 4 subconsultas
+			while (paramIndex <= TOTAL_COUNT_SUBQUERIES) {
+				stmt.setInt(paramIndex, convocatoria.getCodNum());
+				stmtCount.setInt(paramIndex++, convocatoria.getCodNum());
+			}
+			
+			if (comision) {
+				stmt.setInt(paramIndex, usuario.getCodNum());
+				stmtCount.setInt(paramIndex++, usuario.getCodNum());
+			}
+
+			dataTable.setFiltersParams(stmt, stmtCount, paramIndex);
+
+			try (ResultSet rs = stmt.executeQuery()) {
+				while (rs.next()) {
+					rows.add(createBolsaValidacionFromResultSet(rs));
+				}
+			}
+
+			dataTable.setRecordsTotalFromQuery(stmtCount);
+			dataTable.setData(rows);
+		}
+
+		return dataTable;
+	}
+	
+	/** 
+	 * Lista de bolsas para la vista de no sujetas a afinidad en las que se apuntó un candidato .
+	 * @param convocatoria .
+	 * @param candidato .
+	 * @param merito .
+	 * @param params .
+	 * @return datatable de bolsas .
+	 * @throws SQLException .
+	 * @throws UVException .
+	 */
+	public BolsaEmpleoDataTable<BolsaCandidatoValidacionTable> listadoAreasCandidatoNoSujetasAfinidad(Convocatoria convocatoria, UsuarioBolsaEmpleo candidato, Merito merito,  
+			Map<String, String[]> params) throws SQLException, UVException {
 		List<BolsaCandidatoValidacionTable> rows = new ArrayList<>();
 		BolsaEmpleoDataTable<BolsaCandidatoValidacionTable> dataTable = new BolsaEmpleoDataTable<BolsaCandidatoValidacionTable>(params);
 		ModeloBolsa modeloBolsa = ModeloBolsa.obtenerInstancia();
@@ -411,7 +509,7 @@ public class ModeloValidar {
 				    	stmtArcos.setString(1, rs.getString("PRSNIF"));
 				    	try (ResultSet rsArcos = stmtArcos.executeQuery();) {
 					    	while (rsArcos.next()) {
-								CandidatoValidacion candidato = createCandidatoFromResultSet(rs, rsArcos);
+								CandidatoValidacion candidato = createCandidatoValidacionFromResultSet(rs, rsArcos);
 								rows.add(candidato);
 					    	}
 				    	}
@@ -496,6 +594,15 @@ public class ModeloValidar {
 		return dataTable;
 	}
 	
+	/** datatable que devuelve una lista de méritos con su valor en una bolsa .
+	 * @param convocatoria .
+	 * @param candidato .
+	 * @param merito .
+	 * @param params .
+	 * @return valores méritos .
+	 * @throws SQLException .
+	 * @throws UVException .
+	 */
 	public BolsaEmpleoDataTable<ValorMeritoBolsaTable> listadoValoresMeritoBolsa(Convocatoria convocatoria, UsuarioBolsaEmpleo candidato, Merito merito, 
 			Map<String, String[]> params) throws SQLException, UVException {
 		List<ValorMeritoBolsaTable> rows = new ArrayList<>();
@@ -537,7 +644,7 @@ public class ModeloValidar {
 					Bolsa bol = modeloBolsa.createFromResultSet(rs);
 					int idMeritoSolicitud = rs.getInt("BEPSBM_CODNUM");
 					MeritoSolicitud ms = idMeritoSolicitud != 0 ? modeloSolicitud.getMeritoSolicitudById(idMeritoSolicitud)
-							: new MeritoSolicitud(merito, false);
+							: new MeritoSolicitud(merito, false, false);
 					rows.add(new ValorMeritoBolsaTable(ms, bol));
 				}
 			}
@@ -635,7 +742,7 @@ public class ModeloValidar {
 	 * @throws UVException .
 	 * @throws SQLException .
 	 */
-	private CandidatoValidacion createCandidatoFromResultSet(ResultSet rs, ResultSet rsArcos) throws SQLException, UVException {
+	private CandidatoValidacion createCandidatoValidacionFromResultSet(ResultSet rs, ResultSet rsArcos) throws SQLException, UVException {
 		UsuarioBolsaEmpleo usuario = new UsuarioBolsaEmpleo();
 		usuario.setTipoDocumento(rsArcos.getString("STRTIPODOCUMENTO"));
 		usuario.setNumDocumento(rsArcos.getString("PRSNIF"));
@@ -651,6 +758,17 @@ public class ModeloValidar {
 		candidato.setTotalMeritos(rs.getInt("COUNT_TOTAL"));
 		
 		return candidato;
+	}
+	
+	private BolsaValidacion createBolsaValidacionFromResultSet(ResultSet rs) throws SQLException, UVException {
+		ModeloBolsa modeloBolsa = ModeloBolsa.obtenerInstancia();
+		Bolsa bolsa = modeloBolsa.createFromResultSet(rs);
+		BolsaValidacion bolsaValidacion = new BolsaValidacion(bolsa);
+		bolsaValidacion.setTotalMeritosNoValidados(rs.getInt("COUNT_TOTAL"));
+		bolsaValidacion.setTotalMeritosValidados(rs.getInt("COUNT_VALIDADOS"));
+		bolsaValidacion.setTotalMeritosExcluidos(rs.getInt("COUNT_EXCLUIDOS"));
+		bolsaValidacion.setTotalMeritos(rs.getInt("COUNT_TOTAL"));
+		return bolsaValidacion;
 	}
 	
 }

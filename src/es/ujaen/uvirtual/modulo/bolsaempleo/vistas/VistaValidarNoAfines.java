@@ -17,7 +17,7 @@ import es.ujaen.uvirtual.modulo.bolsaempleo.beans.ValorMeritoBolsaTable;
 import es.ujaen.uvirtual.modulo.bolsaempleo.utilidades.BolsaEmpleoDataTable;
 
 /** Bean para la vista.
- * @author fcampos
+ * @author ATISoluciones 2021
  */
 public class VistaValidarNoAfines extends Vista implements Serializable {
 	private static final long serialVersionUID = 1L;

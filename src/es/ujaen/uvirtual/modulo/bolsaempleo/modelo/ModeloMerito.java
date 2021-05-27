@@ -162,6 +162,41 @@ public class ModeloMerito {
 		}
 	}
 	
+	/** Función que edita un mérito .
+	 * @param merito .
+	 * @throws SQLException .
+	 * @throws UVException .
+	 */
+	public void actualizaMerito(Merito merito) throws SQLException, UVException {
+		if (merito == null) {
+			throw new UVException("No se puede modificar un mérito vacío");
+		}
+		if (merito.getCodNum() == null) {
+			throw new UVException("No se puede modificar un mérito sin id");
+		}
+		if (merito.getItemBaremacion().getCodNum() == null) {
+			throw new UVException("No se puede modificar un mérito sin ítem de baremación");
+		}
+		if (merito.getValor() == null) {
+			throw new UVException("No se puede modificar un mérito sin valor");
+		}
+		if (merito.getUsuario() == null) {
+			throw new UVException("No se puede modificar un mérito sin usuario");
+		}
+		
+		String consulta = "UPDATE TBEP_MERITOS bepmer" 
+				+ " SET BEPITE_CODNUM = ?, VALOR = ?"
+				+ " WHERE bepmer.CODNUM = ?";
+		try (Connection conexion = ConexionUvirtual.obtenerInstancia();
+				 PreparedStatement stmt = conexion.prepareStatement(consulta)) {
+				int parameterIndex = 1;
+				stmt.setInt(parameterIndex++, merito.getItemBaremacion().getCodNum());
+				stmt.setFloat(parameterIndex++, merito.getValor());
+				stmt.setInt(parameterIndex++, merito.getCodNum());
+				stmt.executeUpdate();
+			}
+	}
+	
 	/**
 	 * Listado de méritos de un usuario .
 	 * @param params para leer los parametros de paginación, ordenacion, etc .

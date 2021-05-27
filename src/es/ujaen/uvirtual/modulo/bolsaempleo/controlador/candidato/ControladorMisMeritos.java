@@ -386,7 +386,7 @@ public class ControladorMisMeritos extends HttpServlet {
 		}		
 	}
 	
-	private Float validateValorDelMerito(HttpServletRequest request, Merito merito) throws UVException {
+	public static Float validateValorDelMerito(HttpServletRequest request, Merito merito) throws UVException {
 		// chequeo tipo de valor
 		String valorStr = request.getParameter(PARAM_VALOR);
 		switch (merito.getItemBaremacion().getUnidades()) {
