@@ -16,12 +16,13 @@ import org.openqa.selenium.support.ui.WebDriverWait;
 /**
  * Utilidades comunes a los test de usuario de bolsa de empleo.
  */
-public class UtilsTestBEP extends UtilsTestUsuarioBase {
+public class UtilsTestBEP {
 	private static final Pattern REGEX_TOTAL_TABLE = Pattern.compile("Total (\\d+)( \\(Seleccionados (\\d+)\\))?");
 	private static final Integer REGEX_TOTAL = 1;
 	private static final Integer REGEX_TOTAL_SELECTED = 3;
+	public static final Integer WAIT_ELEMENT = 5; // segundos
 	
-	public static final Integer WAIT_ELEMENT = 5; // segundos		
+	private UtilsTestBEP() { }
 	
 	/**
 	 * Devuelve el waiter de elementos.
@@ -36,7 +37,7 @@ public class UtilsTestBEP extends UtilsTestUsuarioBase {
 	 * @param main .
 	 * @return .
 	 */
-	public String getTitlePage(WebElement main) {
+	public static String getTitlePage(WebElement main) {
 		WebElement h2 = main.findElement(By.tagName("h2"));
 		return h2.getText();
 	}
@@ -46,7 +47,7 @@ public class UtilsTestBEP extends UtilsTestUsuarioBase {
 	 * @param tabla .
 	 * @return .
 	 */
-	public String getTitleTable(WebElement tabla) {		
+	public static String getTitleTable(WebElement tabla) {		
 		WebElement caption = tabla.findElement(By.tagName("caption"));
 		return caption.getText();
 	}
@@ -56,7 +57,7 @@ public class UtilsTestBEP extends UtilsTestUsuarioBase {
 	 * @param table .
 	 * @return .
 	 */
-	public int getTotalTable(WebElement table) {
+	public static int getTotalTable(WebElement table) {
 		WebElement foot = table.findElement(By.tagName("tfoot"));
 		WebElement total = foot.findElement(By.className("total"));
 		
@@ -73,7 +74,7 @@ public class UtilsTestBEP extends UtilsTestUsuarioBase {
 	 * @param table .
 	 * @return .
 	 */
-	public int getTotalSelectedTable(WebElement table) {
+	public static int getTotalSelectedTable(WebElement table) {
 		WebElement foot = table.findElement(By.tagName("tfoot"));
 		WebElement total = foot.findElement(By.className("total"));
 		
@@ -92,7 +93,7 @@ public class UtilsTestBEP extends UtilsTestUsuarioBase {
 	 * @param indexCol .
 	 * @return .
 	 */
-	public String getTextCellTable(WebElement table, int indexTr, int indexCol) {
+	public static String getTextCellTable(WebElement table, int indexTr, int indexCol) {
 		WebElement tr = getRowByIndex(table, indexTr); 
 		WebElement td = getColumnByIndex(tr, indexCol);
 		
@@ -103,7 +104,7 @@ public class UtilsTestBEP extends UtilsTestUsuarioBase {
 	 * Devuelve un array de mensajes de exito.
 	 * @return .
 	 */
-	public List<String> getMensajesDeExito() {
+	public static List<String> getMensajesDeExito() {
 		return getMensajesDeExito("exito");		
 	}
 	
@@ -111,7 +112,7 @@ public class UtilsTestBEP extends UtilsTestUsuarioBase {
 	 * Devuelve un array de mensajes de error.
 	 * @return .
 	 */
-	public List<String> getMensajesDeError() {
+	public static List<String> getMensajesDeError() {
 		return getMensajesDeExito("error");
 	}
 	
@@ -121,7 +122,7 @@ public class UtilsTestBEP extends UtilsTestUsuarioBase {
 	 * @param indexTr indice de la fila, comenzando por 0.
 	 * @return .
 	 */
-	public WebElement getRowByIndex(WebElement table, int indexTr) {
+	public static WebElement getRowByIndex(WebElement table, int indexTr) {
 		String idTable = table.getAttribute("id");
 		String idTr = idTable + "_row_" + indexTr;
 		
@@ -134,7 +135,7 @@ public class UtilsTestBEP extends UtilsTestUsuarioBase {
 	 * @param indexCol indice de la columna, comenzando por 0.
 	 * @return .
 	 */
-	public WebElement getColumnByIndex(WebElement tr, int indexCol) {
+	public static WebElement getColumnByIndex(WebElement tr, int indexCol) {
 		return tr.findElement(By.xpath("td[" + (indexCol + 1) + "]"));
 	}
 	
@@ -144,7 +145,7 @@ public class UtilsTestBEP extends UtilsTestUsuarioBase {
 	 * @param indexFilter .
 	 * @return .
 	 */
-	public Select getFilterSelectByIndex(WebElement table, int indexFilter) {
+	public static Select getFilterSelectByIndex(WebElement table, int indexFilter) {
 		WebElement tr = table.findElement(By.cssSelector("tr.filterable"));
 		WebElement th = tr.findElement(By.xpath("th[" + (indexFilter + 1) + "]"));
 		
@@ -159,7 +160,7 @@ public class UtilsTestBEP extends UtilsTestUsuarioBase {
 	 * @param indexFilter .
 	 * @return .
 	 */
-	public WebElement getFilterInputByIndex(WebElement table, int indexFilter) {
+	public static WebElement getFilterInputByIndex(WebElement table, int indexFilter) {
 		WebElement tr = table.findElement(By.cssSelector("tr.filterable"));
 		WebElement th = tr.findElement(By.xpath("th[" + (indexFilter + 1) + "]"));
 		
@@ -172,7 +173,7 @@ public class UtilsTestBEP extends UtilsTestUsuarioBase {
 	 * @param text .
 	 * @return .
 	 */
-	public WebElement getActionTableByText(WebElement table, String text) {
+	public static WebElement getActionTableByText(WebElement table, String text) {
 		WebElement footer = table.findElement(By.tagName("tfoot"));
 		WebElement actions = footer.findElement(By.className("actions"));
 		
@@ -191,7 +192,7 @@ public class UtilsTestBEP extends UtilsTestUsuarioBase {
 	 * @param index indice de la fila.
 	 * @return fila .
 	 */
-	public WebElement selectRowTable(WebElement table, Integer index) {
+	public static WebElement selectRowTable(WebElement table, Integer index) {
 		WebElement tr = getRowByIndex(table, index); 
 		WebElement td = getColumnByIndex(tr, 0);
 		WebElement check = td.findElement(By.tagName("input"));
@@ -205,7 +206,7 @@ public class UtilsTestBEP extends UtilsTestUsuarioBase {
 	 * 
 	 * @return .
 	 */
-	public WebElement getDialog() {
+	public static WebElement getDialog() {
 		return waitVisibility(By.className("ui-dialog"));
 	}
 	
@@ -214,7 +215,7 @@ public class UtilsTestBEP extends UtilsTestUsuarioBase {
 	 * @param dialog .
 	 * @return .
 	 */
-	public String getTitlePopup(WebElement dialog) {
+	public static String getTitlePopup(WebElement dialog) {
 		return dialog.findElement(By.className("ui-dialog-title")).getText();		
 	}
 	
@@ -224,7 +225,7 @@ public class UtilsTestBEP extends UtilsTestUsuarioBase {
 	 * @param text .
 	 * @return .
 	 */
-	public WebElement getButtonDialog(WebElement dialog, String text) {
+	public static WebElement getButtonDialog(WebElement dialog, String text) {
 		WebElement div = dialog.findElement(By.className("ui-dialog-buttonset"));
 		
 		for (WebElement btn : div.findElements(By.tagName("button"))) {
@@ -241,7 +242,7 @@ public class UtilsTestBEP extends UtilsTestUsuarioBase {
 	 * @param main .
 	 * @param title .
 	 */
-	public void assertTitlePage(WebElement main, String title) {
+	public static void assertTitlePage(WebElement main, String title) {
 		assertEquals(getTitlePage(main), title);
 	}
 	
@@ -251,7 +252,7 @@ public class UtilsTestBEP extends UtilsTestUsuarioBase {
 	 * @param tabla .
 	 * @param title .
 	 */
-	public void assertTitleTable(WebElement tabla, String title) {
+	public static void assertTitleTable(WebElement tabla, String title) {
 		assertEquals(getTitleTable(tabla), title);
 	}
 
@@ -260,7 +261,7 @@ public class UtilsTestBEP extends UtilsTestUsuarioBase {
 	 * @param tabla .
 	 * @param total .
 	 */
-	public void assertTotalTable(WebElement tabla, int total) {
+	public static void assertTotalTable(WebElement tabla, int total) {
 		assertEquals(getTotalTable(tabla), total);		
 	}
 	
@@ -269,7 +270,7 @@ public class UtilsTestBEP extends UtilsTestUsuarioBase {
 	 * @param tabla .
 	 * @param total .
 	 */
-	public void assertTotalSelectedTable(WebElement tabla, int total) {
+	public static void assertTotalSelectedTable(WebElement tabla, int total) {
 		assertEquals(getTotalSelectedTable(tabla), total);		
 	}	
 	
@@ -278,7 +279,7 @@ public class UtilsTestBEP extends UtilsTestUsuarioBase {
 	 * @param title .
 	 * @param dialog .
 	 */
-	public void assertTitleDialgo(WebElement dialog, String title) {
+	public static void assertTitleDialgo(WebElement dialog, String title) {
 		assertEquals(getTitlePopup(dialog), title);
 	}
 	
@@ -287,7 +288,7 @@ public class UtilsTestBEP extends UtilsTestUsuarioBase {
 	 * @param by condición de búsqueda.
 	 * @return .
 	 */
-	public WebElement waitVisibility(By by) {
+	public static WebElement waitVisibility(By by) {
 		return getWaiter().until(ExpectedConditions.visibilityOfElementLocated(by));		
 	}
 	
@@ -296,11 +297,11 @@ public class UtilsTestBEP extends UtilsTestUsuarioBase {
 	 * @param by condición de búsqueda.
 	 * @return .
 	 */
-	public WebElement waitClickable(By by) {
+	public static WebElement waitClickable(By by) {
 		return getWaiter().until(ExpectedConditions.elementToBeClickable(by));		
 	} 
 
-	private List<String> getMensajesDeExito(String idDivMensaje) {
+	private static List<String> getMensajesDeExito(String idDivMensaje) {
 		List<String> mensajes = null;
 		WebElement div = waitVisibility(By.id(idDivMensaje));
 		
@@ -309,6 +310,6 @@ public class UtilsTestBEP extends UtilsTestUsuarioBase {
 			mensajes.add(div.getText());			
 		}
 		
-		return mensajes;		
+		return mensajes;
 	} 
 }

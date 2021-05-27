@@ -26,7 +26,7 @@ import bbdd.UtilsTestBolsaEmpleo;
  * @author ATISoluciones
  */
 @FixMethodOrder(MethodSorters.NAME_ASCENDING)
-public class TestBEPAreasBaremar extends UtilsTestBEP {
+public class TestBEPAreasBaremar extends UtilsTestUsuarioBase {
 	private static final String NOMBREDEESTACLASE = TestBEPAreasBaremar.class.getName();
 
 	private static final Logger LOGGER = Logger.getLogger(NOMBREDEESTACLASE);
@@ -79,7 +79,7 @@ public class TestBEPAreasBaremar extends UtilsTestBEP {
 	 */
 	@Test
 	public void testA1() {
-		WebDriverWait wait = new WebDriverWait(DriverUv.getDriver(), WAIT_ELEMENT);
+		WebDriverWait wait = new WebDriverWait(DriverUv.getDriver(), UtilsTestBEP.WAIT_ELEMENT);
 
 		// esperamos div principal
 		WebElement main = wait.until(ExpectedConditions.visibilityOfElementLocated(By.className(DIV_MAIN_AREAS)));
@@ -107,7 +107,7 @@ public class TestBEPAreasBaremar extends UtilsTestBEP {
 	 */
 	@Test
 	public void testA3() {
-		WebDriverWait wait = new WebDriverWait(DriverUv.getDriver(), WAIT_ELEMENT);
+		WebDriverWait wait = new WebDriverWait(DriverUv.getDriver(), UtilsTestBEP.WAIT_ELEMENT);
 		WebElement pmain = wait.until(ExpectedConditions.visibilityOfElementLocated(By.className(DIV_MAIN_AREAS)));
 		WebElement table = getTables(pmain, ID_TABLE);
 		WebElement th = table.findElement(By.cssSelector("input[type='checkbox']"));
