@@ -180,6 +180,7 @@ function DataTable(id, config) {
                 }
     			
     			$(btn).on('click', buttonDef.onClick.bind($(btn), row, self));
+                $(btn).on('click', event => event.stopPropagation());
     			$(buttons).append(btn);
     		});
 

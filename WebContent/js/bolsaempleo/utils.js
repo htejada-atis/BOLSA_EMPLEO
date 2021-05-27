@@ -151,10 +151,19 @@ function redondearFloat(number, decimalPlaces) {
 	return Number(Math.round(number + "e" + decimalPlaces) + "e-" + decimalPlaces);
 }
 
-function scrollToAnchor(id) {
+function smoothScrollToAnchor(id) {
 	$('html, body').animate({
 		scrollTop: $(id).offset().top
-	}, 1000);
+	}, 900);
+}
+
+function smoothScrollFromOneToAnotherAnchor(origin, destination) {
+	$('html, body').animate({
+		scrollTop: $(origin).offset().top
+	}, 0);
+	$('html, body').animate({
+		scrollTop: $(destination).offset().top
+	}, 900);
 }
 
 window.Atis = $.extend(window.Atis ? window.Atis : {}, {
@@ -172,5 +181,6 @@ window.Atis = $.extend(window.Atis ? window.Atis : {}, {
 	"removeValueArray": removeValueArray,
 	"escapeHtml": escapeHtml,
 	"redondearFloat": redondearFloat,
-	"scrollToAnchor": scrollToAnchor
+	"smoothScrollToAnchor": smoothScrollToAnchor,
+	"smoothScrollFromOneToAnotherAnchor": smoothScrollFromOneToAnotherAnchor
 });

@@ -91,35 +91,35 @@ VistaItemsBaremacion bean = (VistaItemsBaremacion) uvdatos.getVistas().get(Vista
 		var activatorBloque = false;
 		var activatorItem = false;
 		
-		<%if (bean.getApartadoBaremacion() != null) {
+	<%	if (bean.getApartadoBaremacion() != null) {
     		if (bean.getApartadoBaremacion().getActivo()) {%>
 				$("#selectApartado").show();
 				$("#selectBloque").hide();
     			activatorBloque = false;
-    	<% } else { %>
+    	<%	} else { %>
 				$("#selectBloque").show();
 				$("#selectApartado").hide();
     			activatorBloque = true;
-    	<% }
+    	<%	}
     		if (bean.getBloqueBaremacion() != null) {
     			if (bean.getBloqueBaremacion().isActivo()) {%>
 					$("#selectItem").show();
 					$("#selectApartado").hide();
     				activatorApartado = false;
-        	<% } else { %>
+        	<%	} else { %>
 					$("#selectApartado").show();
 					$("#selectItem").hide();
         			activatorApartado = true;
-        	<% }
+        	<%	}
     			if (bean.getItemBaremacion() != null) {
     				if (bean.getItemBaremacion().getActivo()) {%>
     					activatorItem = false;
-        		<% } else { %>
+        		<%	} else { %>
     					activatorItem = true;
-        		<% }
+        		<%	}
     			}
     		}
-    	} %>
+		} %>
     	
     	var activatorApartadoName = activatorApartado ? "Activar" : "Desactivar";
     	var activatorBloqueName = activatorBloque ? "Activar" : "Desactivar";
@@ -139,7 +139,7 @@ VistaItemsBaremacion bean = (VistaItemsBaremacion) uvdatos.getVistas().get(Vista
 	    				'<%= ControladorItemsBaremacion.PARAM_APARTADO %>': row.codNum};
         		Atis.sendForm("<%= request.getRequestURI() %>", params);
 		    }},
-		    <% if (bean.getApartadoBaremacion() != null) { %> "selected": <%= bean.getApartadoBaremacion().getCodNum() %> ,<% } %>
+		 	<%	if (bean.getApartadoBaremacion() != null) { %> "selected": <%= bean.getApartadoBaremacion().getCodNum() %> ,<% } %>
 		    "columns": [
 		    	{'data': 'codigo', 'filter': true},
 		        {'data': 'nombre', 'filter': true},
@@ -185,7 +185,7 @@ VistaItemsBaremacion bean = (VistaItemsBaremacion) uvdatos.getVistas().get(Vista
 		document.getElementById("tableApartados").style.visibility = "hidden";
 		document.getElementById("tableItems").style.visibility = "hidden";
 		
-		<% if (bean.getApartadoBaremacion() != null) { %>
+	<%	if (bean.getApartadoBaremacion() != null) { %>
 			var tableApartados = new Atis.DataTable('#tableApartados', {
 			    "ajax": { url: "<%= ControladorItemsBaremacion.URL_PATTERN_AJAX %>", async: false },
 			    "params": {"<%=ControladorItemsBaremacion.PARAM_APARTADO%>": <%= bean.getApartadoBaremacion().getCodNum() %>},
@@ -201,7 +201,7 @@ VistaItemsBaremacion bean = (VistaItemsBaremacion) uvdatos.getVistas().get(Vista
 		    				'<%= ControladorItemsBaremacion.PARAM_BLOQUE %>': row.codNum};
 	        		Atis.sendForm("<%= request.getRequestURI() %>", params);
 			    }},
-			    <% if (bean.getBloqueBaremacion() != null) { %> "selected": <%= bean.getBloqueBaremacion().getCodNum() %> ,<% } %>
+		<%	if (bean.getBloqueBaremacion() != null) { %> "selected": <%= bean.getBloqueBaremacion().getCodNum() %> ,<% } %>
 			    "columns": [
 			    	{'data': 'codigo', 'filter': true, 'render': function(row) {
 			    		return row.apartado.codigo + "." + row.codigo;
@@ -247,7 +247,7 @@ VistaItemsBaremacion bean = (VistaItemsBaremacion) uvdatos.getVistas().get(Vista
 			});
 			document.getElementById("tableApartados").style.visibility = "visible";
 			
-			<% if (bean.getBloqueBaremacion() != null) { %>
+		<%	if (bean.getBloqueBaremacion() != null) { %>
 				var tableItems = new Atis.DataTable('#tableItems', {
 				    "ajax": { url: "<%= ControladorItemsBaremacion.URL_PATTERN_AJAX %>", async: false },
 				    "params": {"<%=ControladorItemsBaremacion.PARAM_BLOQUE%>": <%= bean.getBloqueBaremacion().getCodNum() %>},
@@ -263,7 +263,7 @@ VistaItemsBaremacion bean = (VistaItemsBaremacion) uvdatos.getVistas().get(Vista
 			    				'<%= ControladorItemsBaremacion.PARAM_ITEM %>': row.codNum};
 		        		Atis.sendForm("<%= request.getRequestURI() %>", params);
 				    }},
-				    <% if (bean.getItemBaremacion() != null) { %> "selected": <%= bean.getItemBaremacion().getCodNum() %> ,<% } %>
+			<%	if (bean.getItemBaremacion() != null) { %> "selected": <%= bean.getItemBaremacion().getCodNum() %> ,<% } %>
 				    "columns": [
 				    	{'data': 'codigo', 'filter': true, 'render': function(row) {
 				    		return row.bloque.apartado.codigo + "." + row.bloque.codigo + "." + row.codigo;
@@ -321,10 +321,15 @@ VistaItemsBaremacion bean = (VistaItemsBaremacion) uvdatos.getVistas().get(Vista
 				});
 				
 				document.getElementById("tableItems").style.visibility = "visible";
-				window.scrollTo(0,document.body.scrollHeight);
-			<% } %>
+			<%	if (bean.getItemBaremacion() != null) { %>
+					Atis.smoothScrollFromOneToAnotherAnchor("#tableApartados", "#tableItems");
+			<%	} else { %>
+					Atis.smoothScrollToAnchor("#tableApartados");
+			<%	} %>
+				
+		<%	} %>
 			
-		<% } %>
+	<%	} %>
 		
 		document.getElementById("descargar_items").addEventListener("click", function(event) {
 			event.preventDefault();

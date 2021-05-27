@@ -351,7 +351,7 @@ $(document).ready(function() {
 				this.elements['<%= ControladorValidarNoAfines.PARAM_BOLSAS %>'].value = Atis.object2Json(tableBolsasCandidato.getCheckedItems());
 			});
 			
-			Atis.scrollToAnchor("#tableBolsasCandidato");
+			Atis.smoothScrollToAnchor("#tableBolsasCandidato");
 		<% } %>
 		
 	<% } %>
