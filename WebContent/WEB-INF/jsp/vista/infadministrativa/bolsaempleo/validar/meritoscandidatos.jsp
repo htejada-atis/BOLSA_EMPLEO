@@ -429,7 +429,7 @@ $(document).ready(function() {
 				onClickAccionMerito(this, '<%= ControladorValidar.PARAM_EXCLUIR_MERITO %>');
 			});
 			
-			Atis.scrollToAnchor("#anchor_modificar_merito");
+			Atis.smoothScrollToAnchor("#anchor_modificar_merito");
 	<%	} %>
 		
 <%	} %>
