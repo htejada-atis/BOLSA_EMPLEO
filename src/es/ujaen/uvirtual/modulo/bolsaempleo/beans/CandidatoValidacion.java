@@ -101,7 +101,7 @@ public class CandidatoValidacion extends UsuarioBolsaEmpleo implements Serializa
 	public int hashCode() {
 		final int prime = 31;
 		int result = 1;
-		result = prime * super.hashCode();
+		result = prime * result + super.hashCode();
 		result = prime * result + ((totalMeritosNoValidados == null) ? 0 : totalMeritosNoValidados.hashCode());
 		result = prime * result + ((totalMeritosValidados == null) ? 0 : totalMeritosValidados.hashCode());
 		result = prime * result + ((totalMeritosExcluidos == null) ? 0 : totalMeritosExcluidos.hashCode());
@@ -125,7 +125,6 @@ public class CandidatoValidacion extends UsuarioBolsaEmpleo implements Serializa
 		if (!super.equals(other)) {
 			return false;
 		}
-		
 		if (totalMeritosNoValidados == null) {
 			if (other.totalMeritosNoValidados != null) {
 				return false;

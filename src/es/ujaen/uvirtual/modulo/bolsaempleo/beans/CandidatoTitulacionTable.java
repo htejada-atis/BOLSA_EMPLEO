@@ -2,42 +2,47 @@ package es.ujaen.uvirtual.modulo.bolsaempleo.beans;
 
 import java.io.Serializable;
 
-
-/** Clase candidato de bolsa empleo.
- * @author jlopez
- *
+/**
+ * Clase candidato de bolsa empleo.
+ * 
+ * @author ATISoluciones
  */
-public class Candidato extends UsuarioBolsaEmpleo implements Serializable {
+public class CandidatoTitulacionTable extends UsuarioBolsaEmpleo implements Serializable {
 
 	private static final long serialVersionUID = 1L;
 	private Integer totalTitulaciones;
 	private Integer totalTitulacionesValidadas;
-	
-	/** Constructor por defecto.
+
+	/**
+	 * Constructor por defecto.
 	 */
-	public Candidato() {
+	public CandidatoTitulacionTable() {
 		super();
 	}
-	
-	/** Constructor con parametros.
-	 * @param pusuario .
-	 * @param ptotalTitulaciones .
+
+	/**
+	 * Constructor con parametros.
+	 * 
+	 * @param pusuario                    .
+	 * @param ptotalTitulaciones          .
 	 * @param ptotalTitulacionesValidadas .
 	 */
-	public Candidato(UsuarioBolsaEmpleo pusuario, Integer ptotalTitulaciones, Integer ptotalTitulacionesValidadas) {
+	public CandidatoTitulacionTable(UsuarioBolsaEmpleo pusuario, Integer ptotalTitulaciones, Integer ptotalTitulacionesValidadas) {
 		super(pusuario);
 		this.totalTitulaciones = ptotalTitulaciones;
 		this.totalTitulacionesValidadas = ptotalTitulacionesValidadas;
 	}
-	
-	/** Constructor copia.
+
+	/**
+	 * Constructor copia.
+	 * 
 	 * @param copia Evaluador a copiar
 	 */
-	public Candidato(Candidato copia) {
+	public CandidatoTitulacionTable(CandidatoTitulacionTable copia) {
 		this.totalTitulaciones = copia.totalTitulaciones;
 		this.totalTitulacionesValidadas = copia.totalTitulacionesValidadas;
 	}
-	
+
 	public Integer getTotalTitulaciones() {
 		return totalTitulaciones;
 	}
@@ -45,7 +50,7 @@ public class Candidato extends UsuarioBolsaEmpleo implements Serializable {
 	public void setTotalTitulaciones(Integer titulaciones) {
 		this.totalTitulaciones = titulaciones;
 	}
-	
+
 	public Integer getTotalTitulacionesValidadas() {
 		return totalTitulacionesValidadas;
 	}
@@ -57,23 +62,24 @@ public class Candidato extends UsuarioBolsaEmpleo implements Serializable {
 	public static long getSerialversionuid() {
 		return serialVersionUID;
 	}
-	
+
 	@Override
 	public String toString() {
 		return "Candidato [totalTitulaciones=" + totalTitulaciones + ", totalTitulacionesValidadas=" + totalTitulacionesValidadas + "]";
 	}
-	
+
 	@Override
 	public int hashCode() {
 		final int prime = 31;
 		int result = 1;
+		result = prime * result + super.hashCode();
 		result = prime * result + ((totalTitulaciones == null) ? 0 : totalTitulaciones.hashCode());
 		result = prime * result + ((totalTitulacionesValidadas == null) ? 0 : totalTitulacionesValidadas.hashCode());
 		return result;
 	}
-	
+
 	@Override
-	@SuppressWarnings({"checkstyle:CyclomaticComplexity", "checkstyle:NPathComplexity"})
+	@SuppressWarnings({ "checkstyle:CyclomaticComplexity", "checkstyle:NPathComplexity" })
 	public boolean equals(Object obj) {
 		if (this == obj) {
 			return true;
@@ -84,7 +90,10 @@ public class Candidato extends UsuarioBolsaEmpleo implements Serializable {
 		if (getClass() != obj.getClass()) {
 			return false;
 		}
-		Candidato other = (Candidato) obj;
+		CandidatoTitulacionTable other = (CandidatoTitulacionTable) obj;
+		if (!super.equals(other)) {
+			return false;
+		}		
 		if (totalTitulaciones == null) {
 			if (other.totalTitulaciones != null) {
 				return false;
@@ -99,8 +108,8 @@ public class Candidato extends UsuarioBolsaEmpleo implements Serializable {
 		} else if (!totalTitulacionesValidadas.equals(other.totalTitulacionesValidadas)) {
 			return false;
 		}
-		
+
 		return true;
 	}
-	
+
 }
