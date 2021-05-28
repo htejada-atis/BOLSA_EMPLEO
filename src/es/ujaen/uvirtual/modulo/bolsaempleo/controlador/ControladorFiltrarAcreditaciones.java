@@ -16,9 +16,11 @@ import es.ujaen.uvirtual.beans.UVDatos;
 import es.ujaen.uvirtual.beans.Usuario;
 import es.ujaen.uvirtual.modulo.bolsaempleo.beans.CandidatoAcreditacionesTable;
 import es.ujaen.uvirtual.modulo.bolsaempleo.beans.MeritoPreferenteUsuario;
+import es.ujaen.uvirtual.modulo.bolsaempleo.beans.ParametrosConfiguracion;
 import es.ujaen.uvirtual.modulo.bolsaempleo.beans.UsuarioBolsaEmpleo;
 import es.ujaen.uvirtual.modulo.bolsaempleo.modelo.ModeloCandidato;
 import es.ujaen.uvirtual.modulo.bolsaempleo.modelo.ModeloMeritosPreferentesCandidato;
+import es.ujaen.uvirtual.modulo.bolsaempleo.modelo.ModeloParametrosConfiguracion;
 import es.ujaen.uvirtual.modulo.bolsaempleo.modelo.ModeloUsuarioBolsaEmpleo;
 import es.ujaen.uvirtual.modulo.bolsaempleo.utilidades.BolsaEmpleoDataTable;
 import es.ujaen.uvirtual.modulo.bolsaempleo.utilidades.BolsaEmpleoUtils;
@@ -162,12 +164,18 @@ public class ControladorFiltrarAcreditaciones extends HttpServlet {
 			case ACCION_ACREDITACION_SELECCIONADA:
 				seleccionarAcreditacion(bean, datos, request, response, true);
 			case ACCION_CANDIDATO_SELECCIONADO:
+				obtenerCodigoPadreAcreditacion(bean);
 				break;
 			case ACCION_DATATABLE_ACREDITACIONES_CANDIDATO:
 				listadoAcreditacionesCandidato(bean, datos, request, response);
 				break;
 		}
 		
+	}
+	
+	private void obtenerCodigoPadreAcreditacion(VistaFiltrarAcreditaciones bean) throws SQLException, UVException {
+		ParametrosConfiguracion config = ModeloParametrosConfiguracion.obtenerInstancia().getParametroByNombre("bolsaempleo.local.codMeritoPreferente");
+		bean.setCodigoPadreMeritoPreferente(config.getValor());
 	}
 	
 	/** Selecciona una acreditación para validarla o no .

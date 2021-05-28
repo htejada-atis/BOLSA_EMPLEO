@@ -17,6 +17,7 @@ public class VistaFiltrarAcreditaciones extends Vista implements Serializable {
 	private transient BolsaEmpleoDataTable<MeritoPreferenteUsuario> dataTableAcreditaciones;
 	private UsuarioBolsaEmpleo candidato;
 	private MeritoPreferenteUsuario acreditacion;
+	private String codigoPadreMeritoPreferente;
 	
 	
 	public BolsaEmpleoDataTable<CandidatoAcreditacionesTable> getDatatableCandidatos() {
@@ -49,6 +50,14 @@ public class VistaFiltrarAcreditaciones extends Vista implements Serializable {
 	
 	public void setAcreditacion(MeritoPreferenteUsuario acreditacion) {
 		this.acreditacion = acreditacion;
+	}
+	
+	public void setCodigoPadreMeritoPreferente(String codigo) {
+		this.codigoPadreMeritoPreferente = codigo;		
+	}
+	
+	public String getCodigoPadreMeritoPreferente() {
+		return this.codigoPadreMeritoPreferente;
 	}
 	
 	public String getVista() {

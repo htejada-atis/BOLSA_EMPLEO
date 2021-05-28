@@ -4,8 +4,6 @@
 <%@ page import="es.ujaen.uvirtual.beans.UVDatos"%>
 <%@ page import="es.ujaen.uvirtual.utilidades.Formateador"%>
 <%@	page import="es.ujaen.uvirtual.modulo.bolsaempleo.beans.UsuarioBolsaEmpleo" %>
-<%@	page import="es.ujaen.uvirtual.modulo.bolsaempleo.beans.Titulacion" %>
-<%@	page import="es.ujaen.uvirtual.modulo.bolsaempleo.beans.TitulacionUsuario" %>
 
 <% 
 UVDatos uvdatos = (UVDatos)request.getAttribute(UVDatos.NOMBRE_ATRIBUTO);
@@ -90,6 +88,7 @@ UsuarioBolsaEmpleo candidato = bean.getCandidato();
 			    "params": {"<%=ControladorFiltrarAcreditaciones.PARAM_CANDIDATO%>": <%= candidato.getCodNum() %>},
 			    "selectable": true,
 			    "filterable": true,
+			    "title": 'Acreditaciones: <%=candidato.getNombre() + " " + candidato.getPrimerApellido() + " " + candidato.getSegundoApellido()%>',
 			    "columns": [
 			    	{'data': 'codNum', 'selectable': {'onChange': function(row, checkbox) {
 			    				var accion = checkbox.checked ? '<%= ControladorFiltrarAcreditaciones.ACCION_ACREDITACION_SELECCIONADA %>'
@@ -116,7 +115,7 @@ UsuarioBolsaEmpleo candidato = bean.getCandidato();
 			    	},
 			    	{'data': 'codNum', 'filter': {'type': 'number'}},
 			    	{'data': 'codigo', 'filter': true, 'render': function(row) {
-			    		return 'piripi';
+			    		return '<%= bean.getCodigoPadreMeritoPreferente() %>.' + row.meritoPreferente.codigo;
 			    	}},
 			    	{'data': 'meritoPreferente.nombre', 'filter': true, 'render': function(row) {
 			    		return row.meritoPreferente.nombre + (row.meritoPreferenteOpcion ? ' (' + row.meritoPreferenteOpcion.nombre + ')' : '');
