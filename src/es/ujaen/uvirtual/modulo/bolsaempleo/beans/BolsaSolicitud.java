@@ -47,6 +47,7 @@ public class BolsaSolicitud extends Bolsa implements Serializable {
 	public int hashCode() {
 		final int prime = 31;
 		int result = 1;
+		result = prime * result + super.hashCode();
 		result = prime * result + ((listaMeritos == null) ? 0 : listaMeritos.hashCode());
 		return result;
 	}
@@ -62,9 +63,11 @@ public class BolsaSolicitud extends Bolsa implements Serializable {
 		}
 		if (getClass() != obj.getClass()) {
 			return false;
-		}
-		
+		}		
 		BolsaSolicitud other = (BolsaSolicitud) obj;
+		if (!super.equals(other)) {
+			return false;
+		}
 		if (listaMeritos == null) {
 			if (other.listaMeritos != null) {
 				return false;

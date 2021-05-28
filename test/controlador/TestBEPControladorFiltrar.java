@@ -15,7 +15,7 @@ import bbdd.BbddRunner;
 import bbdd.UtilsTestBolsaEmpleo;
 import controlador.implementacion.PeticionHttp;
 import controlador.implementacion.RespuestaHttp;
-import es.ujaen.uvirtual.modulo.bolsaempleo.controlador.ControladorFiltrar;
+import es.ujaen.uvirtual.modulo.bolsaempleo.controlador.ControladorFiltrarTitulacion;
 import es.ujaen.uvirtual.modulo.bolsaempleo.vistas.VistaFiltrar;
 
 /** test controlador filtrar.
@@ -48,10 +48,10 @@ public class TestBEPControladorFiltrar {
     // método para obtener la vista con una lista de candidatos .
     private VistaFiltrar obtenerCandidatos() throws ServletException, IOException {
     	PeticionHttp peticion = UtilsTestBolsaEmpleo.peticionAutenticadaPersonal();
-		peticion.setParameter(ControladorFiltrar.PARAM_ACCION, ControladorFiltrar.ACCION_DATATABLE_CANDIDATOS);
+		peticion.setParameter(ControladorFiltrarTitulacion.PARAM_ACCION, ControladorFiltrarTitulacion.ACCION_DATATABLE_CANDIDATOS);
 
 		RespuestaHttp respuesta = new RespuestaHttp();
-		ControladorFiltrar controlador = new ControladorFiltrar();
+		ControladorFiltrarTitulacion controlador = new ControladorFiltrarTitulacion();
 		controlador.doPost(peticion, respuesta);
 		return (VistaFiltrar) peticion.getUVDatos().getVistas().get(VistaFiltrar.class.getName());
     }
@@ -61,11 +61,11 @@ public class TestBEPControladorFiltrar {
     	VistaFiltrar bean = obtenerCandidatos();
 		
 		PeticionHttp peticion = UtilsTestBolsaEmpleo.peticionAutenticadaPersonal();
-		peticion.setParameter(ControladorFiltrar.PARAM_ACCION, ControladorFiltrar.ACCION_DATATABLE_TITULACIONES_CANDIDATO);
-		peticion.setParameter(ControladorFiltrar.PARAM_CANDIDATO, bean.getDatatableCandidatos().getData().get(0).getCodNum().toString());
+		peticion.setParameter(ControladorFiltrarTitulacion.PARAM_ACCION, ControladorFiltrarTitulacion.ACCION_DATATABLE_TITULACIONES_CANDIDATO);
+		peticion.setParameter(ControladorFiltrarTitulacion.PARAM_CANDIDATO, bean.getDatatableCandidatos().getData().get(0).getCodNum().toString());
 		
 		RespuestaHttp respuesta = new RespuestaHttp();
-		ControladorFiltrar controlador = new ControladorFiltrar();
+		ControladorFiltrarTitulacion controlador = new ControladorFiltrarTitulacion();
 		controlador.doPost(peticion, respuesta);
 		return (VistaFiltrar) peticion.getUVDatos().getVistas().get(VistaFiltrar.class.getName());
     }
@@ -80,7 +80,7 @@ public class TestBEPControladorFiltrar {
 		PeticionHttp peticion = UtilsTestBolsaEmpleo.peticionAutenticadaPersonal();
 		
 		RespuestaHttp respuesta = new RespuestaHttp();
-		ControladorFiltrar controlador = new ControladorFiltrar();
+		ControladorFiltrarTitulacion controlador = new ControladorFiltrarTitulacion();
 		controlador.doGet(peticion, respuesta);
 		
 		VistaFiltrar bean = (VistaFiltrar) peticion.getUVDatos().getVistas().get(VistaFiltrar.class.getName());
@@ -113,11 +113,11 @@ public class TestBEPControladorFiltrar {
 		VistaFiltrar bean = obtenerCandidatos();
 		
 		PeticionHttp peticion = UtilsTestBolsaEmpleo.peticionAutenticadaPersonal();
-		peticion.setParameter(ControladorFiltrar.PARAM_ACCION, ControladorFiltrar.ACCION_CANDIDATO_SELECCIONADO);
-		peticion.setParameter(ControladorFiltrar.PARAM_CANDIDATO, bean.getDatatableCandidatos().getData().get(0).getCodNum().toString());
+		peticion.setParameter(ControladorFiltrarTitulacion.PARAM_ACCION, ControladorFiltrarTitulacion.ACCION_CANDIDATO_SELECCIONADO);
+		peticion.setParameter(ControladorFiltrarTitulacion.PARAM_CANDIDATO, bean.getDatatableCandidatos().getData().get(0).getCodNum().toString());
 		
 		RespuestaHttp respuesta = new RespuestaHttp();
-		ControladorFiltrar controlador = new ControladorFiltrar();
+		ControladorFiltrarTitulacion controlador = new ControladorFiltrarTitulacion();
 		controlador.doGet(peticion, respuesta);
 		
 		VistaFiltrar bean2 = (VistaFiltrar) peticion.getUVDatos().getVistas().get(VistaFiltrar.class.getName());
@@ -152,12 +152,12 @@ public class TestBEPControladorFiltrar {
 		VistaFiltrar bean2 = obtenerTitulaciones();
 		
 		PeticionHttp peticion = UtilsTestBolsaEmpleo.peticionAutenticadaPersonal();
-		peticion.setParameter(ControladorFiltrar.PARAM_ACCION, ControladorFiltrar.ACCION_TITULACION_SELECCIONADA);
-		peticion.setParameter(ControladorFiltrar.PARAM_CANDIDATO, bean.getDatatableCandidatos().getData().get(0).getCodNum().toString());
-		peticion.setParameter(ControladorFiltrar.PARAM_TITULACION, bean2.getDatatableTitulaciones().getData().get(0).getCodNum().toString());
+		peticion.setParameter(ControladorFiltrarTitulacion.PARAM_ACCION, ControladorFiltrarTitulacion.ACCION_TITULACION_SELECCIONADA);
+		peticion.setParameter(ControladorFiltrarTitulacion.PARAM_CANDIDATO, bean.getDatatableCandidatos().getData().get(0).getCodNum().toString());
+		peticion.setParameter(ControladorFiltrarTitulacion.PARAM_TITULACION_USUARIO, bean2.getDatatableTitulaciones().getData().get(0).getCodNum().toString());
 		
 		RespuestaHttp respuesta = new RespuestaHttp();
-		ControladorFiltrar controlador = new ControladorFiltrar();
+		ControladorFiltrarTitulacion controlador = new ControladorFiltrarTitulacion();
 		controlador.doGet(peticion, respuesta);
 		
 		VistaFiltrar bean3 = (VistaFiltrar) peticion.getUVDatos().getVistas().get(VistaFiltrar.class.getName());
@@ -177,11 +177,11 @@ public class TestBEPControladorFiltrar {
 		VistaFiltrar bean = obtenerCandidatos();
 		
 		PeticionHttp peticion = UtilsTestBolsaEmpleo.peticionAutenticadaPersonal();
-		peticion.setParameter(ControladorFiltrar.PARAM_ACCION, ControladorFiltrar.ACCION_CANDIDATO_SELECCIONADO);
-		peticion.setParameter(ControladorFiltrar.PARAM_CANDIDATO, bean.getDatatableCandidatos().getData().get(0).getCodNum().toString());
+		peticion.setParameter(ControladorFiltrarTitulacion.PARAM_ACCION, ControladorFiltrarTitulacion.ACCION_CANDIDATO_SELECCIONADO);
+		peticion.setParameter(ControladorFiltrarTitulacion.PARAM_CANDIDATO, bean.getDatatableCandidatos().getData().get(0).getCodNum().toString());
 		
 		RespuestaHttp respuesta = new RespuestaHttp();
-		ControladorFiltrar controlador = new ControladorFiltrar();
+		ControladorFiltrarTitulacion controlador = new ControladorFiltrarTitulacion();
 		controlador.doGet(peticion, respuesta);
 		
 		VistaFiltrar bean2 = (VistaFiltrar) peticion.getUVDatos().getVistas().get(VistaFiltrar.class.getName());
@@ -202,12 +202,12 @@ public class TestBEPControladorFiltrar {
 		VistaFiltrar bean2 = obtenerTitulaciones();
 		
 		PeticionHttp peticion = UtilsTestBolsaEmpleo.peticionAutenticadaPersonal();
-		peticion.setParameter(ControladorFiltrar.PARAM_ACCION, ControladorFiltrar.ACCION_TITULACION_DESELECCIONADA);
-		peticion.setParameter(ControladorFiltrar.PARAM_CANDIDATO, bean.getDatatableCandidatos().getData().get(0).getCodNum().toString());
-		peticion.setParameter(ControladorFiltrar.PARAM_TITULACION, bean2.getDatatableTitulaciones().getData().get(0).getCodNum().toString());
+		peticion.setParameter(ControladorFiltrarTitulacion.PARAM_ACCION, ControladorFiltrarTitulacion.ACCION_TITULACION_DESELECCIONADA);
+		peticion.setParameter(ControladorFiltrarTitulacion.PARAM_CANDIDATO, bean.getDatatableCandidatos().getData().get(0).getCodNum().toString());
+		peticion.setParameter(ControladorFiltrarTitulacion.PARAM_TITULACION_USUARIO, bean2.getDatatableTitulaciones().getData().get(0).getCodNum().toString());
 		
 		RespuestaHttp respuesta = new RespuestaHttp();
-		ControladorFiltrar controlador = new ControladorFiltrar();
+		ControladorFiltrarTitulacion controlador = new ControladorFiltrarTitulacion();
 		controlador.doGet(peticion, respuesta);
 		
 		VistaFiltrar bean3 = (VistaFiltrar) peticion.getUVDatos().getVistas().get(VistaFiltrar.class.getName());
@@ -226,11 +226,11 @@ public class TestBEPControladorFiltrar {
 		VistaFiltrar bean = obtenerTitulaciones();
 		
 		PeticionHttp peticion = UtilsTestBolsaEmpleo.peticionAutenticadaPersonal();
-		peticion.setParameter(ControladorFiltrar.PARAM_ACCION, ControladorFiltrar.ACCION_DESCARGAR_FICHERO);
-		peticion.setParameter(ControladorFiltrar.PARAM_FICHERO, bean.getDatatableTitulaciones().getData().get(0).getCodNum().toString());
+		peticion.setParameter(ControladorFiltrarTitulacion.PARAM_ACCION, ControladorFiltrarTitulacion.ACCION_DESCARGAR_FICHERO);
+		peticion.setParameter(ControladorFiltrarTitulacion.PARAM_FICHERO, bean.getDatatableTitulaciones().getData().get(0).getCodNum().toString());
 		
 		RespuestaHttp respuesta = new RespuestaHttp();
-		ControladorFiltrar controlador = new ControladorFiltrar();
+		ControladorFiltrarTitulacion controlador = new ControladorFiltrarTitulacion();
 		controlador.doGet(peticion, respuesta);
 		VistaFiltrar bean2 = (VistaFiltrar) peticion.getUVDatos().getVistas().get(VistaFiltrar.class.getName());
 		
@@ -245,11 +245,11 @@ public class TestBEPControladorFiltrar {
 	@Test
 	public void testE02SeleccionarCandidatoNoValido() throws SQLException, ServletException, IOException {
 		PeticionHttp peticion = UtilsTestBolsaEmpleo.peticionAutenticadaPersonal();
-		peticion.setParameter(ControladorFiltrar.PARAM_ACCION, ControladorFiltrar.ACCION_CANDIDATO_SELECCIONADO);
-		peticion.setParameter(ControladorFiltrar.PARAM_CANDIDATO, "0");
+		peticion.setParameter(ControladorFiltrarTitulacion.PARAM_ACCION, ControladorFiltrarTitulacion.ACCION_CANDIDATO_SELECCIONADO);
+		peticion.setParameter(ControladorFiltrarTitulacion.PARAM_CANDIDATO, "0");
 		
 		RespuestaHttp respuesta = new RespuestaHttp();
-		ControladorFiltrar controlador = new ControladorFiltrar();
+		ControladorFiltrarTitulacion controlador = new ControladorFiltrarTitulacion();
 		controlador.doGet(peticion, respuesta);
 		
 		VistaFiltrar bean = (VistaFiltrar) peticion.getUVDatos().getVistas().get(VistaFiltrar.class.getName());
@@ -265,11 +265,11 @@ public class TestBEPControladorFiltrar {
 	@Test
 	public void testE03SeleccionarTitulacionNoValida() throws SQLException, ServletException, IOException {
 		PeticionHttp peticion = UtilsTestBolsaEmpleo.peticionAutenticadaPersonal();
-		peticion.setParameter(ControladorFiltrar.PARAM_ACCION, ControladorFiltrar.ACCION_TITULACION_SELECCIONADA);
-		peticion.setParameter(ControladorFiltrar.PARAM_TITULACION, "0");
+		peticion.setParameter(ControladorFiltrarTitulacion.PARAM_ACCION, ControladorFiltrarTitulacion.ACCION_TITULACION_SELECCIONADA);
+		peticion.setParameter(ControladorFiltrarTitulacion.PARAM_TITULACION_USUARIO, "0");
 		
 		RespuestaHttp respuesta = new RespuestaHttp();
-		ControladorFiltrar controlador = new ControladorFiltrar();
+		ControladorFiltrarTitulacion controlador = new ControladorFiltrarTitulacion();
 		controlador.doGet(peticion, respuesta);
 		
 		VistaFiltrar bean = (VistaFiltrar) peticion.getUVDatos().getVistas().get(VistaFiltrar.class.getName());
@@ -285,10 +285,10 @@ public class TestBEPControladorFiltrar {
 	@Test
 	public void testE04ObtenerTitulacionesCandidatoNulo() throws SQLException, ServletException, IOException {
 		PeticionHttp peticion = UtilsTestBolsaEmpleo.peticionAutenticadaPersonal();
-		peticion.setParameter(ControladorFiltrar.PARAM_ACCION, ControladorFiltrar.ACCION_DATATABLE_TITULACIONES_CANDIDATO);
+		peticion.setParameter(ControladorFiltrarTitulacion.PARAM_ACCION, ControladorFiltrarTitulacion.ACCION_DATATABLE_TITULACIONES_CANDIDATO);
 		
 		RespuestaHttp respuesta = new RespuestaHttp();
-		ControladorFiltrar controlador = new ControladorFiltrar();
+		ControladorFiltrarTitulacion controlador = new ControladorFiltrarTitulacion();
 		controlador.doPost(peticion, respuesta);
 		
 		VistaFiltrar bean = (VistaFiltrar) peticion.getUVDatos().getVistas().get(VistaFiltrar.class.getName());

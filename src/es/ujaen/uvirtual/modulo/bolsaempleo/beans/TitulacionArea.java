@@ -45,7 +45,7 @@ public class TitulacionArea extends Titulacion implements Serializable {
 	public int hashCode() {
 		final int prime = 31;
 		int result = 1;
-		result = prime * super.hashCode();
+		result = prime * result + super.hashCode();
 		result = prime * result + ((area == null) ? 0 : area.hashCode());
 		return result;
 	}
@@ -66,7 +66,6 @@ public class TitulacionArea extends Titulacion implements Serializable {
 		if (!super.equals(other)) {
 			return false;
 		}
-		
 		if (area == null) {
 			if (other.area != null) {
 				return false;

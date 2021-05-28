@@ -12,6 +12,7 @@ import es.ujaen.uvirtual.modelo.conexion.ConexionArcos;
 import es.ujaen.uvirtual.modelo.conexion.ConexionUvirtual;
 import es.ujaen.uvirtual.modulo.bolsaempleo.beans.Candidato;
 import es.ujaen.uvirtual.modulo.bolsaempleo.beans.CandidatoAcreditacionesTable;
+import es.ujaen.uvirtual.modulo.bolsaempleo.beans.CandidatoTitulacionTable;
 import es.ujaen.uvirtual.modulo.bolsaempleo.beans.UsuarioBolsaEmpleo;
 import es.ujaen.uvirtual.modulo.bolsaempleo.utilidades.BolsaEmpleoDataTable;
 import es.ujaen.uvirtual.utilidades.UVException;
@@ -61,9 +62,9 @@ public class ModeloCandidato {
 	 * @throws SQLException en caso de error de base de datos .
 	 * @throws UVException  error si no existe la area .
 	 */
-	public BolsaEmpleoDataTable<Candidato> listaCandidatosDatatable(Map<String, String[]> params) throws SQLException, UVException {
-		List<Candidato> usuarios = new ArrayList<>();
-		BolsaEmpleoDataTable<Candidato> dataTable = new BolsaEmpleoDataTable<>(params);
+	public BolsaEmpleoDataTable<CandidatoTitulacionTable> listaCandidatosDatatable(Map<String, String[]> params) throws SQLException, UVException {
+		List<CandidatoTitulacionTable> usuarios = new ArrayList<>();
+		BolsaEmpleoDataTable<CandidatoTitulacionTable> dataTable = new BolsaEmpleoDataTable<>(params);
 
 		String consulta = "SELECT bepusu.CODNUM, bepusu.PRSNIF, "
 				+ "	(SELECT COUNT(*) FROM UVIRTUAL.TBEP_TITULACIONES_USUARIO beptus"
@@ -100,7 +101,7 @@ public class ModeloCandidato {
 								Integer titulaciones = rs.getInt("COUNT_TITULACIONES");
 								Integer validadas = rs.getInt("COUNT_VALIDADAS");
 
-								usuarios.add(new Candidato(usuario, titulaciones, validadas));
+								usuarios.add(new CandidatoTitulacionTable(usuario, titulaciones, validadas));
 							}
 						}
 					}
