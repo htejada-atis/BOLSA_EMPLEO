@@ -22,7 +22,7 @@ VistaValidarNoAfines bean = (VistaValidarNoAfines)uvdatos.getVistas().get(VistaV
 	
 	<jsp:include page="/WEB-INF/jsp/vista/infadministrativa/bolsaempleo/mensajes.jsp" />
 	
-	<h2>Validar meritos sujetos afinidad</h2>
+	<h2>Validar meritos no sujetos afinidad</h2>
 	<h3><%= descripcion %></h3>
 		
 	<table class="bluetable bolsaempleo" id="table">

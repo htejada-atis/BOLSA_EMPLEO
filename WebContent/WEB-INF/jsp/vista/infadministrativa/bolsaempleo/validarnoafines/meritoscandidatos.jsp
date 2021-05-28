@@ -29,7 +29,7 @@ UsuarioBolsaEmpleo candidato = bean.getCandidato();
 	
 	<jsp:include page="/WEB-INF/jsp/vista/infadministrativa/bolsaempleo/mensajes.jsp" />
 	
-	<h2>Validar meritos sujetos afinidad</h2>
+	<h2>Validar meritos no sujetos afinidad</h2>
 	<h3><%= descripcion %></h3>
 	<h4><%= bolsa.getArea().getDescripcion() %></h4>
 	
