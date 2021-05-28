@@ -4,7 +4,7 @@ import java.io.Serializable;
 
 
 /** Clase candidato de bolsa empleo.
- * @author jlopez
+ * @author ATISoluciones 2021
  *
  */
 public class Candidato extends UsuarioBolsaEmpleo implements Serializable {

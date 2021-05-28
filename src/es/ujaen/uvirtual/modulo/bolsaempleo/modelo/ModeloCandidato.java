@@ -11,6 +11,7 @@ import java.util.Map;
 import es.ujaen.uvirtual.modelo.conexion.ConexionArcos;
 import es.ujaen.uvirtual.modelo.conexion.ConexionUvirtual;
 import es.ujaen.uvirtual.modulo.bolsaempleo.beans.Candidato;
+import es.ujaen.uvirtual.modulo.bolsaempleo.beans.CandidatoAcreditacionesTable;
 import es.ujaen.uvirtual.modulo.bolsaempleo.beans.UsuarioBolsaEmpleo;
 import es.ujaen.uvirtual.modulo.bolsaempleo.utilidades.BolsaEmpleoDataTable;
 import es.ujaen.uvirtual.utilidades.UVException;
@@ -27,7 +28,7 @@ public class ModeloCandidato {
 	public static final int ORDER_COLUMN_INDEX_NOMBRE_CANDIDATO = 0;
 	public static final int ORDER_COLUMN_INDEX_TITULACIONES_CANDIDATO = 1;
 	public static final int ORDER_COLUMN_INDEX_TIT_VALIDADAS_CANDIDATO = 2;
-
+	
 	protected static ModeloCandidato eInstancia;
 
 	/**
@@ -100,6 +101,74 @@ public class ModeloCandidato {
 								Integer validadas = rs.getInt("COUNT_VALIDADAS");
 
 								usuarios.add(new Candidato(usuario, titulaciones, validadas));
+							}
+						}
+					}
+				}
+			}
+
+			dataTable.setRecordsTotalFromQuery(stmtCount);
+			dataTable.setData(usuarios);
+		}
+
+		return dataTable;
+	}
+	
+	/**
+	 * Listado de candidatos en función de un área .
+	 * @param params para leer los parametros de paginación, ordenacion, etc .
+	 * @return listado de candidatos .
+	 * @throws SQLException en caso de error de base de datos .
+	 * @throws UVException  error si no existe la area .
+	 */
+	public BolsaEmpleoDataTable<CandidatoAcreditacionesTable> listaCandidatosAcreditacionesDatatable(Map<String, String[]> params) throws SQLException, UVException {
+		List<CandidatoAcreditacionesTable> usuarios = new ArrayList<>();
+		BolsaEmpleoDataTable<CandidatoAcreditacionesTable> dataTable = new BolsaEmpleoDataTable<>(params);
+
+		String consulta = "SELECT bepusu.CODNUM, bepusu.PRSNIF,"
+				+ "	(SELECT COUNT(*) FROM UVIRTUAL.TBEP_MER_PRE_USUARIO bepmpu"
+				+ "		INNER JOIN UVIRTUAL.TBEP_MERITOS_PREFERENTES bepmep ON bepmep.CODNUM = bepmpu.BEPMEP_CODNUM"
+				+ "		WHERE bepmpu.BEPUSU_CODNUM = bepusu.CODNUM AND bepmep.TIPO = ?"
+				+ "	) AS COUNT_ACREDITACIONES,"
+				+ "	(SELECT COUNT(*) FROM UVIRTUAL.TBEP_MER_PRE_USUARIO bepmpu"
+				+ "		INNER JOIN UVIRTUAL.TBEP_MERITOS_PREFERENTES bepmep ON bepmep.CODNUM = bepmpu.BEPMEP_CODNUM"
+				+ "		WHERE bepmpu.BEPUSU_CODNUM = bepusu.CODNUM AND bepmpu.FLGVALIDADO = 'S' AND bepmep.TIPO = ?"
+				+ "	) AS COUNT_VALIDADAS FROM UVIRTUAL.TBEP_USUARIOS bepusu WHERE bepusu.rol = "
+				+ ModeloRol.ID_ROL_CANDIDATO + " ";
+		
+		dataTable.setColumn(ORDER_COLUMN_INDEX_NOMBRE_CANDIDATO, "bepusu.CODCUENTA");
+
+		dataTable.setQuery(consulta);
+
+		try (Connection conexion = ConexionUvirtual.obtenerInstancia();
+				PreparedStatement stmtCount = conexion.prepareStatement(dataTable.getQueryCount());
+				PreparedStatement stmt = conexion.prepareStatement(dataTable.getQuery())) {
+			int paramIndex = 1;
+			stmt.setString(paramIndex, ModeloMeritosPreferentes.TIPO_POSESION);
+			stmtCount.setString(paramIndex++, ModeloMeritosPreferentes.TIPO_POSESION);
+			stmt.setString(paramIndex, ModeloMeritosPreferentes.TIPO_POSESION);
+			stmtCount.setString(paramIndex++, ModeloMeritosPreferentes.TIPO_POSESION);
+			dataTable.setFiltersParams(stmt, stmtCount, paramIndex);
+
+			try (ResultSet rs = stmt.executeQuery()) {
+				while (rs.next()) {
+					String consultaArcos = "SELECT * FROM arcos.VUJA_NET_BEP_AR_PERSONA WHERE PRSNIF = ?";
+
+					try (Connection conexionArcos = ConexionArcos.obtenerInstancia();
+							PreparedStatement stmtArcos = conexionArcos.prepareStatement(consultaArcos)) {
+						stmtArcos.setString(1, rs.getString("PRSNIF"));
+						try (ResultSet rsArcos = stmtArcos.executeQuery()) {
+							while (rsArcos.next()) {
+								UsuarioBolsaEmpleo usuario = new UsuarioBolsaEmpleo();
+								usuario.setCodNum(rs.getInt("CODNUM"));
+								usuario.setNombre(rsArcos.getString("STRNOMBRE"));
+								usuario.setPrimerApellido(rsArcos.getString("STRAPELLIDO1"));
+								usuario.setSegundoApellido(rsArcos.getString("STRAPELLIDO2"));
+
+								Integer acreditaciones = rs.getInt("COUNT_ACREDITACIONES");
+								Integer validadas = rs.getInt("COUNT_VALIDADAS");
+
+								usuarios.add(new CandidatoAcreditacionesTable(usuario, acreditaciones, validadas));
 							}
 						}
 					}
