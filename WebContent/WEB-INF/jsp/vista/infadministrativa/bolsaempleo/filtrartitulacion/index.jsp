@@ -68,7 +68,7 @@ UsuarioBolsaEmpleo candidato = bean.getCandidato();
 		    "title": 'Candidatos',
 		    "clickable": {'onClick': function(row) {
 		    	var params = {
-	    				'a': '<%=ControladorFiltrarTitulacion.ACCION_CANDIDATO_SELECCIONADO%>',
+	    				'<%=ControladorFiltrarTitulacion.PARAM_ACCION %>': '<%=ControladorFiltrarTitulacion.ACCION_CANDIDATO_SELECCIONADO%>',
 	    				'<%=ControladorFiltrarTitulacion.PARAM_CANDIDATO%>': row.codNum
 		    	};
         		Atis.sendForm("<%=request.getRequestURI()%>", params);

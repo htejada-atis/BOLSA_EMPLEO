@@ -54,7 +54,12 @@ function getErrorResponse(response) {
 }
 
 function isFunction(functionToCheck) {
- return functionToCheck && {}.toString.call(functionToCheck) === '[object Function]';
+	return functionToCheck && {}.toString.call(functionToCheck) === '[object Function]';
+}
+
+
+function isUndefined(myVar) {
+	return typeof myVar === 'undefined'; 
 }
 
 function sendForm(url, params) {
@@ -172,6 +177,7 @@ window.Atis = $.extend(window.Atis ? window.Atis : {}, {
 	"alertDialog": alertDialog,
 	"confirmDialog": confirmDialog,
 	"getErrorResponse": getErrorResponse,
+	"isUndefined": isUndefined,
 	"isFunction": isFunction,
 	"formatearFecha": formatearFecha,	
 	"sendForm": sendForm,

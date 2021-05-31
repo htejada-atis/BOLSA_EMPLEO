@@ -1,0 +1,7 @@
+DROP TABLE TBEP_HTO_MEN_DESTINATARIOS;
+--/////////////////////
+DROP TABLE TBEP_MEN_DESTINATARIOS;
+--/////////////////////
+DROP SEQUENCE QBEP_MDE;
+--/////////////////////
+DROP SEQUENCE QBEP_HTO_MDE;
