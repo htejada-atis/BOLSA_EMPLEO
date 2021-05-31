@@ -16,13 +16,13 @@ VistaConfiguracion bean = (VistaConfiguracion) uvdatos.getVistas().get(VistaConf
 	
 	<div class="form-group-container col3">
    	    <div class="form-group">
-   			<a class="link-btn" href="/srv/es/informacionadministrativa/bolsaempleo/configuracion/candidatos">Candidatos</a>
+   			<button class="link-btn">Candidatos</button>
    		</div>
    		<div class="form-group">
-			<a class="link-btn" href="/srv/es/informacionadministrativa/bolsaempleo/configuracion/ficheros">Ficheros</a>
+			<button class="link-btn">Ficheros</button>
    		</div>
    		<div class="form-group">
-			<a class="link-btn" href="#">Mensajería</a>
+			<button class="link-btn">Mensajería</button>
    		</div>
    	</div>
 	

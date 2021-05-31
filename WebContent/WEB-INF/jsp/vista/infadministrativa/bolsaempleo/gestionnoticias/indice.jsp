@@ -17,9 +17,9 @@ VistaNoticias bean = (VistaNoticias) uvdatos.getVistas().get(VistaNoticias.class
 	<div class="titulo-bolsa-empleo">
 		<h2>Noticias</h2>
     
-	    <a class="link-btn" id="nueva_noticia" href="<%= request.getRequestURI() %>">
+	    <button class="link-btn" id="nueva_noticia">
 	    	 Nueva noticia
-	    </a>
+	    </button>
 	</div>
     
     <table class="bluetable bolsaempleo" id="table_noticias_insertadas">
@@ -45,8 +45,7 @@ VistaNoticias bean = (VistaNoticias) uvdatos.getVistas().get(VistaNoticias.class
 <script>
 	$(document).ready(function() {
 		
-		document.getElementById("nueva_noticia").addEventListener("click", function(event) {
-			event.preventDefault();
+		document.getElementById("nueva_noticia").addEventListener("click", function() {
 			Atis.sendForm("<%= request.getRequestURI() %>", {'a': '<%= ControladorGestionNoticias.ACCION_AGREGAR_NOTICIA %>'});
 		});
 

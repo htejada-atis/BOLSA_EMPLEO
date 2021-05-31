@@ -161,27 +161,31 @@ function DataTable(id, config) {
     		var buttons = $('<span class="btns"></span>');
     		
     		columnDef.buttons.forEach(function(buttonDef) {
-                var label = isFunction(buttonDef.label) ? buttonDef.label(row) : buttonDef.label;
-                var title = isFunction(buttonDef.title) ? buttonDef.title(row) : buttonDef.title;
-    			var btn = $('<button class="btn"' + (title ? 'title="' + title + '"' : '') + ' type="button">'+ (label ? label : '')+'</button>');
+                var label = Atis.isFunction(buttonDef.label) ? buttonDef.label(row) : buttonDef.label;
+                var title = Atis.isFunction(buttonDef.title) ? buttonDef.title(row) : buttonDef.title;
+                var visible = Atis.isFunction(buttonDef.visible) ? buttonDef.visible(row) : !Atis.isUndefined(buttonDef.visible) ? buttonDef.visible : true;
+                
+                if (visible) {
+                	var btn = $('<button class="btn"' + (title ? 'title="' + title + '"' : '') + ' type="button">'+ (label ? label : '')+'</button>');
     			
-    			if (buttonDef.hasOwnProperty('class')) {
-    				$(btn).addClass(isFunction(buttonDef.class) ? buttonDef.class(row) : buttonDef.class);
-    			}
-
-                if (buttonDef.hasOwnProperty('icon')) {
-                    var position = buttonDef.icon.position ? buttonDef.icon.position : 'left';
-                    var icon = $('<i class="' + buttonDef.icon.class + '"></i>');
-                    if (position == 'left') {
-                        btn.prepend(icon);
-                    } else {
-                        btn.append(icon);
-                    }
-                }
-    			
-    			$(btn).on('click', buttonDef.onClick.bind($(btn), row, self));
-                $(btn).on('click', event => event.stopPropagation());
-    			$(buttons).append(btn);
+	    			if (buttonDef.hasOwnProperty('class')) {
+	    				$(btn).addClass(Atis.isFunction(buttonDef.class) ? buttonDef.class(row) : buttonDef.class);
+	    			}
+	
+	                if (buttonDef.hasOwnProperty('icon')) {
+	                    var position = buttonDef.icon.position ? buttonDef.icon.position : 'left';
+	                    var icon = $('<i class="' + buttonDef.icon.class + '"></i>');
+	                    if (position == 'left') {
+	                        btn.prepend(icon);
+	                    } else {
+	                        btn.append(icon);
+	                    }
+	                }
+	    			
+	    			$(btn).on('click', buttonDef.onClick.bind($(btn), row, self));
+	                $(btn).on('click', event => event.stopPropagation());
+	    			$(buttons).append(btn);
+                }    			
     		});
 
     		return buttons;

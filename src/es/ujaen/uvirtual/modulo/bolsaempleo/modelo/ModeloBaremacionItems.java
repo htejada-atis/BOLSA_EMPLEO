@@ -218,8 +218,8 @@ public class ModeloBaremacionItems {
 	public List<ItemBaremacion> getItemsExcluyentes(ItemBaremacion item) throws SQLException, UVException {
 		ArrayList<ItemBaremacion> items = new ArrayList<>();
 		
-		String consulta = "SELECT bepite.*,bepmex.BEPITE_CODNUM_HIJO FROM uvirtual.TBEP_ITEMSBAREMACION bepite "
-				+ "LEFT JOIN uvirtual.TBEP_MERITOS_EXCLUYENTES bepmex "
+		String consulta = "SELECT bepite.*,bepmex.BEPITE_CODNUM_HIJO FROM TBEP_ITEMSBAREMACION bepite "
+				+ "LEFT JOIN TBEP_MERITOS_EXCLUYENTES bepmex "
 				+ "ON bepite.CODNUM = bepmex.BEPITE_CODNUM_HIJO "
 				+ "AND bepmex.BEPITE_CODNUM_PADRE = ? "
 				+ "WHERE bepmex.BEPITE_CODNUM_PADRE = ?";

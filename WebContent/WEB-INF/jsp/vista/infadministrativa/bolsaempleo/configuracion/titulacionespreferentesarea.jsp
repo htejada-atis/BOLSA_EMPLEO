@@ -17,7 +17,7 @@ Area area = bean.getArea();
 	
 	<h2>Titulaciones preferentes por área</h2>
 	
-	<div class="form-select">
+	<div class="form-select form-group">
 		<label>Área</label>
 		<select id="select_area">
 			<option value="0">Elija el área</option>

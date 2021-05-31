@@ -23,9 +23,9 @@ VistaTitulaciones bean = (VistaTitulaciones) uvdatos.getVistas().get(VistaTitula
 				<p>Seleccione la titulación y complete el formulario inferior. Si no encuentra su titulación, por favor pulse sobre <strong>"Otra titulación"</strong> e introduzca el nombre de la titulación no disponible</p>
 			</div>
 			<div class="form-group">
-				<a class="link-btn" id="btnOtraTitulacion" href="#">Otra titulación</a>
+				<button class="link-btn" id="btnOtraTitulacion">Otra titulación</button>
 			    
-			    <a class="link-btn" id="btnVolver" href="#" style="display:none;">Volver</a>
+			    <button class="link-btn" id="btnVolver" style="display:none;">Volver</button>
 			</div>
 		</div>
 	</div>

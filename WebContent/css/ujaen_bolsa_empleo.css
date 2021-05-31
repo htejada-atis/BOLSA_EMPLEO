@@ -20,18 +20,20 @@
     pointer-events: none;
 }
 
-.bolsa-empleo select, .bolsa-empleo input[type=text], .bolsa-empleo input[type=number], .bolsa-empleo textarea {
+.bolsa-empleo select, .bolsa-empleo input[type=text], .bolsa-empleo input[type=submit], .bolsa-empleo input[type=number],
+ .bolsa-empleo textarea, .bolsa-empleo button {
 	border: 1px solid rgb(118, 118, 118);
 	border-radius: 3px;
 	box-sizing: border-box;
 }
 
-.bolsa-empleo input[type=text]:disabled, .bolsa-empleo input[type=number]:disabled, .bolsa-empleo textarea:disabled {
+.bolsa-empleo input[type=text]:disabled, .bolsa-empleo input[type=submit]:disabled, .bolsa-empleo input[type=number]:disabled,
+ .bolsa-empleo textarea:disabled, .bolsa-empleo button:disabled {
 	border: 1px solid rgba(118, 118, 118, 0.3);
 }
 
 .bolsa-empleo select {
-	padding: 4px;
+	padding: 3px;
 	background-color: white;
 }
 
@@ -39,8 +41,12 @@
 	background-color: #FFFF99;
 }
 
-.bolsa-empleo input[type=text], .bolsa-empleo input[type=number], .bolsa-empleo textarea {
+.bolsa-empleo input[type=text], .bolsa-empleo input[type=number], .bolsa-empleo textarea, .bolsa-empleo input[type=submit], .bolsa-empleo button {
 	padding: 4px 6px;
+}
+
+.bolsa-empleo button:hover, .bolsa-empleo input[type=submit]:hover {
+	cursor: pointer;
 }
 
 /* icons */
@@ -119,6 +125,9 @@ table.bluetable.bolsaempleo tfoot span.total {
 }
 table.bluetable.bolsaempleo tfoot button.btn.last {
 	margin-right: 5px;
+}
+table.bluetable.bolsaempleo button {
+	padding: 1px 6px;
 }
 table.bluetable.bolsaempleo .btn:hover:enabled {
 	background-color: #83a8ff;
@@ -356,27 +365,6 @@ nav-bolsa-empleo a:active, nav-bolsa-empleo a:hover {
 
 /* Botón añadir */
 
-.bolsa-empleo .link-btn {
-	display: flex;
-	color: #fff;
-	background-color: var(--principal);
-	border-color: #005cbf;
-	padding: 8px;
-	font-size: 15px;
-	border-radius: .3rem;
-    font-weight: 400;
-    text-align: center;
-    white-space: nowrap;
-    align-items: center;
-    justify-content: center;
-    user-select: none;
-    border: 1px solid transparent;
-}
-
-.link-btn:hover, .link-btn:focus {
-	text-decoration: none;
-}
-
 .link-btn.disabled {
 	pointer-events: none;
 	opacity: .65;
@@ -454,29 +442,54 @@ nav-bolsa-empleo a:active, nav-bolsa-empleo a:hover {
 
 /* tooltip clipboard */
 
-.tooltip {
+.tooltip:hover {
+    position: relative;
+}
+.tooltip span {
+    display: none;
+    color: #fff;
+}
+.tooltip:hover span {
+    border-radius: 6px;
+    padding: 5px 20px 5px 5px;
+    display: block;
+    z-index: 120;
+    background-color: #555;
+    left: 0px;
+    margin: 10px;
+    width: 150px;
+    text-align: center;
+    position: absolute;
+    top: 10px;
+    text-decoration: none;
+}
+
+.tooltip-ficheros {
   position: relative;
   display: inline-block;
 }
 
-.tooltip .tooltiptext {
-  visibility: hidden;
-  width: 140px;
-  background-color: #555;
-  color: #fff;
-  text-align: center;
-  border-radius: 6px;
-  padding: 5px;
-  position: absolute;
-  z-index: 1;
-  bottom: 160%;
-  left: 110%;
-  margin-left: -50px;
-  opacity: 0;
-  transition: opacity 0.35s;
+.tooltip-ficheros .tooltiptext-ficheros {
+	visibility: hidden;
+	background-color: #555;
+	color: #fff;
+	text-align: center;
+	border-radius: 6px;
+	padding: 5px;
+	position: absolute;
+	z-index: 1;
+	bottom: 160%;
+	opacity: 0;
+	transition: opacity 0.35s;
 }
 
-.tooltip .tooltiptext::after {
+.tooltip-ficheros .tooltiptext-ficheros {
+	width: 140px;
+	margin-left: -50px;
+	left: 110%;
+}
+
+.tooltip-ficheros .tooltiptext-ficheros::after {
   content: "";
   position: absolute;
   top: 100%;
@@ -487,7 +500,7 @@ nav-bolsa-empleo a:active, nav-bolsa-empleo a:hover {
   border-color: #555 transparent transparent transparent;
 }
 
-.tooltip:hover .tooltiptext {
+.tooltip-ficheros:hover .tooltiptext-ficheros {
   visibility: visible;
   opacity: 1;
 }
@@ -549,6 +562,10 @@ nav-bolsa-empleo a:active, nav-bolsa-empleo a:hover {
     display: grid;
     grid-template-columns: 4fr 1fr;
     grid-gap: 20px;
+}
+
+.gap-5 {
+	grid-gap: 5px;
 }
 
 .form-group-container.col1 {

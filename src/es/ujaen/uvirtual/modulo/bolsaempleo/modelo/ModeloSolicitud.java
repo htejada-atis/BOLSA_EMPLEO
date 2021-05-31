@@ -780,9 +780,9 @@ public class ModeloSolicitud {
 	 */
 	public MeritoSolicitud getMeritoSolicitudBy(Convocatoria convocatoria, Bolsa bolsa, Merito merito) throws SQLException, UVException {
 		String consulta = "SELECT bepsbm.*"
-				+ "	FROM UVIRTUAL.TBEP_SOL_BOL_MERITOS bepsbm"
-				+ "	INNER JOIN UVIRTUAL.TBEP_SOLICITUD_BOLSAS bepsbo ON bepsbo.CODNUM = bepsbm.BEPSBO_CODNUM"
-				+ "	INNER JOIN UVIRTUAL.TBEP_SOLICITUDES bepsol ON bepsol.CODNUM = bepsbo.BEPSOL_CODNUM"
+				+ "	FROM TBEP_SOL_BOL_MERITOS bepsbm"
+				+ "	INNER JOIN TBEP_SOLICITUD_BOLSAS bepsbo ON bepsbo.CODNUM = bepsbm.BEPSBO_CODNUM"
+				+ "	INNER JOIN TBEP_SOLICITUDES bepsol ON bepsol.CODNUM = bepsbo.BEPSOL_CODNUM"
 				+ "	WHERE bepsbm.BEPMER_CODNUM = ?"
 				+ "	AND bepsol.BEPCON_CODNUM = ?"
 				+ "	AND bepsbo.BEPBOL_CODNUM = ?";
@@ -1025,9 +1025,9 @@ public class ModeloSolicitud {
 	public List<MeritoSolicitudTable> getMeritosValoracionesSolicitudBolsa(Solicitud solicitud, Bolsa bolsa) throws SQLException, UVException {
 		List<MeritoSolicitudTable> meritos = new ArrayList<>();
 		
-		String consulta = "SELECT bepsbm.BEPMER_CODNUM, bepsbm.CODNUM FROM UVIRTUAL.TBEP_SOL_BOL_MERITOS bepsbm"
-				+ "	LEFT JOIN UVIRTUAL.TBEP_SOL_BOL_MER_VALORACION bepsbv ON bepsbm.CODNUM = bepsbv.BEPSBM_CODNUM"
-				+ "	INNER JOIN UVIRTUAL.TBEP_SOLICITUD_BOLSAS bepsbo ON bepsbo.CODNUM  = bepsbm.BEPSBO_CODNUM"
+		String consulta = "SELECT bepsbm.BEPMER_CODNUM, bepsbm.CODNUM FROM TBEP_SOL_BOL_MERITOS bepsbm"
+				+ "	LEFT JOIN TBEP_SOL_BOL_MER_VALORACION bepsbv ON bepsbm.CODNUM = bepsbv.BEPSBM_CODNUM"
+				+ "	INNER JOIN TBEP_SOLICITUD_BOLSAS bepsbo ON bepsbo.CODNUM  = bepsbm.BEPSBO_CODNUM"
 				+ "	WHERE bepsbo.BEPBOL_CODNUM = ? AND bepsbo.BEPSOL_CODNUM = ? GROUP BY bepsbm.BEPMER_CODNUM, bepsbm.CODNUM";
 		
 		try (Connection conexion = ConexionUvirtual.obtenerInstancia(); PreparedStatement stmt = conexion.prepareStatement(consulta)) {
@@ -1205,11 +1205,11 @@ public class ModeloSolicitud {
 	 * @throws SQLException .
 	 */
 	public boolean comprobarMeritosAfinidadSinValoracion(Solicitud solicitud) throws SQLException {
-		String consulta = "SELECT * FROM UVIRTUAL.TBEP_SOL_BOL_MERITOS bepsbm"
-				+ "	INNER JOIN UVIRTUAL.TBEP_SOLICITUD_BOLSAS bepsbo ON bepsbm.BEPSBO_CODNUM = bepsbo.CODNUM"
-				+ "	LEFT JOIN UVIRTUAL.TBEP_SOL_BOL_MER_VALORACION bepsbv ON bepsbv.BEPSBM_CODNUM  = bepsbm.CODNUM"
-				+ "	INNER JOIN UVIRTUAL.TBEP_MERITOS bepmer ON bepmer.CODNUM  = bepsbm.BEPMER_CODNUM"
-				+ "	INNER JOIN UVIRTUAL.TBEP_ITEMSBAREMACION bepite ON bepite.CODNUM = bepmer.BEPITE_CODNUM"
+		String consulta = "SELECT * FROM TBEP_SOL_BOL_MERITOS bepsbm"
+				+ "	INNER JOIN TBEP_SOLICITUD_BOLSAS bepsbo ON bepsbm.BEPSBO_CODNUM = bepsbo.CODNUM"
+				+ "	LEFT JOIN TBEP_SOL_BOL_MER_VALORACION bepsbv ON bepsbv.BEPSBM_CODNUM  = bepsbm.CODNUM"
+				+ "	INNER JOIN TBEP_MERITOS bepmer ON bepmer.CODNUM  = bepsbm.BEPMER_CODNUM"
+				+ "	INNER JOIN TBEP_ITEMSBAREMACION bepite ON bepite.CODNUM = bepmer.BEPITE_CODNUM"
 				+ "	WHERE bepsbo.BEPSOL_CODNUM = ? AND bepite.AFINIDAD IS NOT NULL AND bepsbv.VALOR IS NULL";
 		
 		try (Connection conexion = ConexionUvirtual.obtenerInstancia(); PreparedStatement stmt = conexion.prepareStatement(consulta)) {
