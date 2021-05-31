@@ -13,12 +13,9 @@ VistaMensajes bean = (VistaMensajes) uvdatos.getVistas().get(VistaMensajes.class
 	
 	<jsp:include page="/WEB-INF/jsp/vista/infadministrativa/bolsaempleo/mensajes.jsp" />
 	
-	<div class="titulo-bolsa-empleo" style="float:right; margin-top:1.2rem">
-		<a class="link-btn" id="nuevo_mensaje" href="<%= request.getRequestURI() %>" style="margin-top:0">Nuevo Mensaje</a>
-	</div>
-	
-	<div class="titulo-bolsa-empleo" style="margin-top:1rem;">
+	<div class="titulo-bolsa-empleo">
 		<h2>Mensajes</h2>
+		<a class="link-btn" id="nuevo_mensaje" href="<%= request.getRequestURI() %>">Nuevo mensaje</a>
 	</div>
 	
 	<table class="bluetable bolsaempleo" id="tableMensajes">
@@ -50,13 +47,11 @@ $(document).ready(function() {
 	var borrar = function(row) {
 		Atis.confirmDialog("Borrar mensaje", "¿Está seguro de borrar el mensaje?", {
          	'Borrar': function() {
-         		console.log(row);
-         			
           		var params = {
       				'<%= ControladorMensajes.PARAM_ACCION %>': '<%= ControladorMensajes.ACCION_BORRAR_MENSAJE %>',
       				'<%= ControladorMensajes.PARAM_MENSAJE_ID %>': row.codNum
      			};
-     			Atis.sendForm("<%= ControladorMensajes.URL_PATTERN_AJAX %>", params);
+     			Atis.sendForm("<%= request.getRequestURI() %>", params);
      			
            		$(this).dialog("close");
            	},

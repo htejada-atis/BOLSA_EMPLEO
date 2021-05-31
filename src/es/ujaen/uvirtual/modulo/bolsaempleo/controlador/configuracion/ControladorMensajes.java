@@ -39,7 +39,6 @@ import es.ujaen.uvirtual.utilidades.UVException;
 		"/srv/es/ajax/informacionadministrativa/bolsaempleo/configuracion/mensajeria",
 		"/srv/en/ajax/informacionadministrativa/bolsaempleo/configuracion/mensajeria" 
 })
-
 public class ControladorMensajes extends HttpServlet {
 	private static final long serialVersionUID = 1L;
 	private static final String NOMBREDEESTACLASE = ControladorMensajes.class.getName();
@@ -214,7 +213,7 @@ public class ControladorMensajes extends HttpServlet {
 		Mensaje mensaje = ModeloMensajes.obtenerInstancia().getMensajeById(Formateador.leeParametroInteger(request.getParameter(PARAM_MENSAJE_ID))); 
 		
 		ModeloMensajes.obtenerInstancia().eliminarMensajeBorrador(mensaje);
-		BolsaEmpleoUtils.addMensajeDeError("Mensaje en eliminado correctamente", bean, request);
+		BolsaEmpleoUtils.addMensajeDeExito("Mensaje en eliminado correctamentessssss", bean, request);
 		response.sendRedirect(request.getServletPath());
 	}
 	

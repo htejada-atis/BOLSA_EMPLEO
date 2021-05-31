@@ -13,12 +13,10 @@ VistaUsuarioBolsaEmpleo bean = (VistaUsuarioBolsaEmpleo) uvdatos.getVistas().get
 
 	<jsp:include page="/WEB-INF/jsp/vista/infadministrativa/bolsaempleo/mensajes.jsp" />
 	
-	<div class="titulo-bolsa-empleo" style="float:right; margin-top:1.2rem">
-		<a class="link-btn" id="nuevo_usuario" href="<%= request.getRequestURI() %>" style="margin-top:0">Nuevo candidato</a>
-	</div>
-	
-	<div class="titulo-bolsa-empleo" style="margin-top:1rem;">
+	<div class="titulo-bolsa-empleo">
 		<h2>Usuarios Candidatos</h2>
+		
+		<a class="link-btn" id="nuevo_usuario" href="<%= request.getRequestURI() %>">Nuevo candidato</a>
 	</div>
 	
 	<table class="bluetable bolsaempleo" id="table_usuarios">
