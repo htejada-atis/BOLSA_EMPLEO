@@ -2,7 +2,7 @@
  * Datatable
  * @copyright ATISoluciones 2021
  */
-
+ 
 function DataTable(id, config) {
     this.id = id;
     this.idFinal = id.substring(1);
@@ -112,8 +112,14 @@ function DataTable(id, config) {
 
         row.selected = false;
         
-        if (Array.isArray(self.config.selected)) {            
-            self.config.selected.forEach(function (element) {
+        if (self.config.selectedAll) {
+        	if (!Array.isArray(self.config.selected)) {
+        		self.config.selected = [];
+        	}        	      
+        	self.config.selected.push(row.codNum);
+        	row.selected = true;
+        } else if (Array.isArray(self.config.selected)) {
+        	self.config.selected.forEach(function (element) {
                 if (element === row.codNum) {
                     row.selected = true;
                 }
@@ -549,6 +555,10 @@ function DataTable(id, config) {
         self.filterParams[indexColumnDef] = value;
         self.params.page = 0;
         
+        if (self.config.selectedAll) {
+        	self.config.selected = [];
+        }
+                
         if (value == "" || value == 0) {
             delete self.filterParams[indexColumnDef];
         }

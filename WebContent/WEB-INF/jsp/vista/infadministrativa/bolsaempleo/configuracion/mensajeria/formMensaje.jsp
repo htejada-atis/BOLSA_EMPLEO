@@ -1,3 +1,5 @@
+<%@page import="es.ujaen.uvirtual.modulo.bolsaempleo.modelo.ModeloRol"%>
+<%@page import="es.ujaen.uvirtual.modulo.bolsaempleo.modelo.ModeloUsuarioBolsaEmpleo"%>
 <%@ page trimDirectiveWhitespaces="true" %>
 <%@ page import="es.ujaen.uvirtual.modulo.bolsaempleo.beans.Mensaje" %>
 <%@ page import="es.ujaen.uvirtual.beans.UVDatos" %>
@@ -147,14 +149,26 @@ $(document).ready(function() {
 	    "ajax": { url: '<%= ControladorMensajes.URL_PATTERN_AJAX %>', async: false },
 	    "params": {"<%= ControladorMensajes.PARAM_MENSAJE_ID%>": <%= mensaje.getCodNum() %>},
 	    "pageSize": 10,
+	    "filterable": true,
+	    "selectedAll": true,
     	"action": "<%= ControladorMensajes.ACCION_DATATABLE_DESTINATARIOS_DISPONIBLES %>",
 	    "columns": [
 	    	{'data': 'codNum', 'selectable': {'onChange': onClickRowDestinatario}},
-	        {'data': 'numdocumento'},
+	        {'data': 'numdocumento', 'overflow': 'auto', 'filter': true,},
 	        {'data': 'codNum',  'overflow': 'auto', 'render': function(row) { return row.nombre + ", " + row.apellido1 + " " + row.apellido2; }},
 	        {'data': 'email', 'overflow': 'auto'},
-	        {'data': 'rol.descripcion'},
-	        {'data': 'listaDist', 'render': function(row) {
+	        {'data': 'rol.descripcion', 
+	         'filter': {
+	        	'type': 'select', 
+	        	'options': {
+		        	'<%= ModeloRol.ID_ROL_SERVICIO_PERSONAL %>': 'Personal', 
+		        	'<%= ModeloRol.ID_ROL_DIRECTOR_DEPARTAMENTO %>': 'Director departamento',
+		        	'<%= ModeloRol.ID_ROL_MIEMBRO_COMISION %>': 'Comisión',
+		        	'<%= ModeloRol.ID_ROL_CANDIDATO %>': 'Candidato'
+	        	}
+	         }
+	        },
+	        {'data': 'listaDist', 'filter': {'type': 'selectBoolean', 'true': 'En Lista', 'false': 'Sin Lista', 'optionDefault': 'true'}, 'render': function(row) {
         		if(row.listaDist) {
         			return "<div title='En la lista de distribución' class='circle-true'></div>"; 
         		} else {
@@ -164,7 +178,7 @@ $(document).ready(function() {
 	    ],
     	"actions": [
 	    	{'label': 'Añadir al mensaje', 'onClick': addDestinatarios},	    		    
-	    	{'label': 'Añadir todos', 'onClick': addTodos},
+	    	{'label': 'Añadir todos al mensaje', 'onClick': addTodos},
 	    ]
 	});
 	
