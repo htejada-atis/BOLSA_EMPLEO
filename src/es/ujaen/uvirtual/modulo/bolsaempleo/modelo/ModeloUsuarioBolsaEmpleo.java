@@ -188,6 +188,7 @@ public class ModeloUsuarioBolsaEmpleo {
 		}
 		
 		UsuarioBolsaEmpleo usuarioBolsa = getUsuarioByCodCuenta(usuario.getUid());
+		usuarioBolsa.setUsuarioArcos(usuario);
 		
 		if (Boolean.TRUE.equals(usuarioBolsa.getBorrado())) {
 			throw new UVException(MENSAJE_ERROR_USUARIO_BORRADO);
@@ -905,12 +906,12 @@ public class ModeloUsuarioBolsaEmpleo {
 	 * @throws SQLException en caso de error en la BD.
 	 * @throws UVException si noticia no es valida.
 	 */
-	public Boolean checkUser(UVDatos datos) throws SQLException, UVException {
+	public UsuarioBolsaEmpleo getOrCreateCandidato(UVDatos datos) throws SQLException, UVException {
 		Usuario usuArcos = datos.getUsuario();
 		
 		// no hay usuario logeado, salimos
 		if (usuArcos == null) {			
-			return false;
+			return null;
 		}
 		
 		UsuarioBolsaEmpleo usuario;
@@ -947,8 +948,9 @@ public class ModeloUsuarioBolsaEmpleo {
 		}
 		
 		LOGGER.log(Level.FINER, String.format("Fin chequeo usuario Bolsa Empleo [%s]. Todo correcto.", usuArcos.getDocumentoNumero()));
+		usuario.setUsuarioArcos(usuArcos);
 		
-		return true;
+		return usuario;
 	}
 	
 	/** Comprueba si existe un usuario de bolsa de empleo por su documento.

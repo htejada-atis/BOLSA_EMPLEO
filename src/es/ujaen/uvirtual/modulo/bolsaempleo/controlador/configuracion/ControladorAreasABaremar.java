@@ -141,7 +141,7 @@ public class ControladorAreasABaremar extends HttpServlet {
 		bean.setVista(RUTA_BEP_CONF + "areasbaremar.jsp");
 		BolsaEmpleoUtils.readMensajeSession(bean, request);
 		try {
-			ModeloUsuarioBolsaEmpleo.obtenerInstancia().checkUser(datos);
+			ModeloUsuarioBolsaEmpleo.obtenerInstancia().getOrCreateCandidato(datos);
 			bean.setUsuarioBolsa(ModeloUsuarioBolsaEmpleo.obtenerInstancia().getUsuarioByNumeroDocumento(datos.getUsuario().getDocumentoNumero()));
 		} catch (UVException e) {
 			BolsaEmpleoUtils.addMensajeDeError(e.getMessage(), bean, request);
@@ -253,10 +253,10 @@ public class ControladorAreasABaremar extends HttpServlet {
 
 		switch (nombreAccionBolsa) {
 			case ACCION_AREA_PASAR_A_BAREMALE:
-				modelo.ponerAreaComoBaremable(bolsas);
+				modelo.ponerAreaComoBaremable(bolsas, bean.getUsuarioBolsa());
 				break;
 			case ACCION_AREA_PASAR_A_NO_BAREMALE:
-				modelo.ponerAreaComoNoBaremable(bolsas);
+				modelo.ponerAreaComoNoBaremable(bolsas, bean.getUsuarioBolsa());
 				break;
 			default:
 				BolsaEmpleoUtils.addMensajeDeError(MENSAJE_ERROR_ACCION_AREA_NO_VALIDA, bean, request);
