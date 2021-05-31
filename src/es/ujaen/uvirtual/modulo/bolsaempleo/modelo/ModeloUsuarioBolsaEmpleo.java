@@ -472,10 +472,10 @@ public class ModeloUsuarioBolsaEmpleo {
 		String consulta = "SELECT bepare.CODNUM as CODNUMAREA, bepbol.CODNUM AS CODNUMBOLSA, bepare.ID_AREA_CONOCIMIENTO, "
 		+ "bepare.DES_AREA_CONOCIMIENTO, bepbol.FLGBAREMABLE , bepbol.BEPARE_CODNUM, "
 		+ "bepbol.ESTADO, bepbol.FECHAACTUALIZACION , bepbol.FECHABLOQUEO ,bepbol.FECHADEBLOQUEO "
-		+ "FROM UVIRTUAL.TBEP_USU_EXCLUIDOS_AREA bepuea "
-		+ "INNER JOIN UVIRTUAL.TBEP_AREAS bepare ON bepuea.AREA=bepare.CODNUM "
+		+ "FROM TBEP_USU_EXCLUIDOS_AREA bepuea "
+		+ "INNER JOIN TBEP_AREAS bepare ON bepuea.AREA=bepare.CODNUM "
 		+ "INNER JOIN TBEP_BOLSAS bepbol ON bepare.CODNUM = bepbol.BEPARE_CODNUM "
-		+ "INNER JOIN uvirtual.TBEP_USUARIOS bepusu ON bepuea.USUARIO = bepusu.CODNUM "
+		+ "INNER JOIN TBEP_USUARIOS bepusu ON bepuea.USUARIO = bepusu.CODNUM "
 		+ "WHERE bepuea.USUARIO = ? ";
 		
 		BolsaEmpleoDataTable<Bolsa> dataTable = new BolsaEmpleoDataTable<>(params);
@@ -917,10 +917,8 @@ public class ModeloUsuarioBolsaEmpleo {
 					
 		UsuarioBolsaEmpleo usuario;
 		
-		try {
-			// comprobamos si el usuario existe en uvirtual (excepción si no existe)
-			usuario = getUsuarioByNumeroDocumento(usuArcos.getDocumentoNumero());			
-		} catch (UVException e) {
+		// comprobamos si existe el usuario en uvirtual
+		if (!existeUsuarioBolsaEmpleoByNumeroDocumento(usuArcos.getDocumentoNumero())) {
 			// no existe el usuario en la bolsa de empleo lo creamos como candidato			
 			UsuarioBolsaEmpleo usuarioFinal = new UsuarioBolsaEmpleo(
 				usuArcos.getDocumentoNumero(), 
@@ -931,7 +929,10 @@ public class ModeloUsuarioBolsaEmpleo {
 			
 			insertaUsuario(usuarioFinal);
 			usuario = getUsuarioByNumeroDocumento(usuArcos.getDocumentoNumero());
-			CrearUsuario.refrescarUsuario(usuario.getCodCuenta());				
+			CrearUsuario.refrescarUsuario(usuario.getCodCuenta());
+		} else {
+			// cargamos los datos del usuario de bolsa de empleo
+			usuario = getUsuarioByNumeroDocumento(usuArcos.getDocumentoNumero());
 		}
 		
 		// comprobamos si está borrado o excluido
@@ -942,6 +943,27 @@ public class ModeloUsuarioBolsaEmpleo {
 		} 
 		
 		return true;		
+	}
+	
+	/** Comprueba si existe un usuario de bolsa de empleo por su documento.
+	 * @param documento del usuario
+	 * @return usuario con el nombre especificado
+	 * @throws SQLException en caso de error en la BD
+	 */
+	public boolean existeUsuarioBolsaEmpleoByNumeroDocumento(String documento) throws SQLException, UVException {
+		if (documento == null) {
+			throw new UVException(MENSAJE_ERROR_DOCUMENTO_REQUERIDO);
+		}
+		
+		String consulta = "SELECT * FROM TBEP_USUARIOS bepusu WHERE bepusu.PRSNIF = ?";
+		
+		try (Connection conexion = ConexionUvirtual.obtenerInstancia(); PreparedStatement stmt = conexion.prepareStatement(consulta)) {			
+			stmt.setString(1, documento);			
+			
+			try (ResultSet rs = stmt.executeQuery()) {
+				return rs.next();
+			}
+		}		
 	}
 	
 	/** Elimina un usuario.

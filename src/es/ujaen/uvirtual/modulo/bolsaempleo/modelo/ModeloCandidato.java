@@ -65,11 +65,11 @@ public class ModeloCandidato {
 		BolsaEmpleoDataTable<CandidatoTitulacionTable> dataTable = new BolsaEmpleoDataTable<>(params);
 
 		String consulta = "SELECT bepusu.CODNUM, bepusu.PRSNIF, "
-				+ "	(SELECT COUNT(*) FROM UVIRTUAL.TBEP_TITULACIONES_USUARIO beptus"
+				+ "	(SELECT COUNT(*) FROM TBEP_TITULACIONES_USUARIO beptus"
 				+ "		WHERE beptus.BEPTUS_USU_CODNUM = bepusu.CODNUM" + "	) AS COUNT_TITULACIONES,"
-				+ "	(SELECT COUNT(*) FROM UVIRTUAL.TBEP_TITULACIONES_USUARIO beptus"
+				+ "	(SELECT COUNT(*) FROM TBEP_TITULACIONES_USUARIO beptus"
 				+ "		WHERE beptus.BEPTUS_USU_CODNUM = bepusu.CODNUM AND beptus.FLGVALIDADA = 'S'"
-				+ "	) AS COUNT_VALIDADAS" + "	FROM UVIRTUAL.TBEP_USUARIOS bepusu" + "	WHERE bepusu.rol = "
+				+ "	) AS COUNT_VALIDADAS" + "	FROM TBEP_USUARIOS bepusu" + "	WHERE bepusu.rol = "
 				+ ModeloRol.ID_ROL_CANDIDATO + " ";
 
 		dataTable.setColumn(ORDER_COLUMN_INDEX_NOMBRE_CANDIDATO, "bepusu.CODCUENTA");
@@ -125,14 +125,14 @@ public class ModeloCandidato {
 		BolsaEmpleoDataTable<CandidatoAcreditacionesTable> dataTable = new BolsaEmpleoDataTable<>(params);
 
 		String consulta = "SELECT bepusu.CODNUM, bepusu.PRSNIF,"
-				+ "	(SELECT COUNT(*) FROM UVIRTUAL.TBEP_MER_PRE_USUARIO bepmpu"
-				+ "		INNER JOIN UVIRTUAL.TBEP_MERITOS_PREFERENTES bepmep ON bepmep.CODNUM = bepmpu.BEPMEP_CODNUM"
+				+ "	(SELECT COUNT(*) FROM TBEP_MER_PRE_USUARIO bepmpu"
+				+ "		INNER JOIN TBEP_MERITOS_PREFERENTES bepmep ON bepmep.CODNUM = bepmpu.BEPMEP_CODNUM"
 				+ "		WHERE bepmpu.BEPUSU_CODNUM = bepusu.CODNUM AND bepmep.TIPO = ?"
 				+ "	) AS COUNT_ACREDITACIONES,"
-				+ "	(SELECT COUNT(*) FROM UVIRTUAL.TBEP_MER_PRE_USUARIO bepmpu"
-				+ "		INNER JOIN UVIRTUAL.TBEP_MERITOS_PREFERENTES bepmep ON bepmep.CODNUM = bepmpu.BEPMEP_CODNUM"
+				+ "	(SELECT COUNT(*) FROM TBEP_MER_PRE_USUARIO bepmpu"
+				+ "		INNER JOIN TBEP_MERITOS_PREFERENTES bepmep ON bepmep.CODNUM = bepmpu.BEPMEP_CODNUM"
 				+ "		WHERE bepmpu.BEPUSU_CODNUM = bepusu.CODNUM AND bepmpu.FLGVALIDADO = 'S' AND bepmep.TIPO = ?"
-				+ "	) AS COUNT_VALIDADAS FROM UVIRTUAL.TBEP_USUARIOS bepusu WHERE bepusu.rol = "
+				+ "	) AS COUNT_VALIDADAS FROM TBEP_USUARIOS bepusu WHERE bepusu.rol = "
 				+ ModeloRol.ID_ROL_CANDIDATO + " ";
 		
 		dataTable.setColumn(ORDER_COLUMN_INDEX_NOMBRE_CANDIDATO, "bepusu.CODCUENTA");

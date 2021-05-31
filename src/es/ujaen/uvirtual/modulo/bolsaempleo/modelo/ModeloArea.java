@@ -288,7 +288,7 @@ public class ModeloArea {
 		"SELECT bepbol.* "
 		+ "FROM TBEP_BOLSAS bepbol "
 		+ "INNER JOIN TBEP_AREAS bepare ON bepare.CODNUM = bepbol.BEPARE_CODNUM AND bepbol.FLGBAREMABLE = 'S' "
-		+ "LEFT JOIN UVIRTUAL.TBEP_USU_EXCLUIDOS_AREA bepuea "
+		+ "LEFT JOIN TBEP_USU_EXCLUIDOS_AREA bepuea "
 		+ "ON bepare.CODNUM = bepuea.AREA AND bepuea.USUARIO = ? "
 		+ "WHERE bepuea.USUARIO IS NULL";
 		
@@ -348,7 +348,7 @@ public class ModeloArea {
 		"SELECT bepbol.*, bepuea.USUARIO "
 		+ " FROM TBEP_BOLSAS bepbol"
 		+ " INNER JOIN TBEP_AREAS bepare ON bepare.CODNUM = bepbol.BEPARE_CODNUM"
-		+ " LEFT JOIN UVIRTUAL.TBEP_USU_EXCLUIDOS_AREA bepuea "
+		+ " LEFT JOIN TBEP_USU_EXCLUIDOS_AREA bepuea "
 		+ " ON bepare.CODNUM = bepuea.AREA AND bepuea.USUARIO = ?"
 		+ " WHERE bepbol.FLGBAREMABLE = 'S' ";
 		
