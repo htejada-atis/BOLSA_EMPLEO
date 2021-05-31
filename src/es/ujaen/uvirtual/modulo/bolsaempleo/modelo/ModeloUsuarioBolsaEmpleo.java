@@ -638,8 +638,7 @@ public class ModeloUsuarioBolsaEmpleo {
 		if (Boolean.FALSE.equals(usuario.getExcluido())) {
 			String consulta = "INSERT INTO TBEP_USUARIOS (CODCUENTA,PRSNIF,ROL,FLGLISTADISTRIBUCION) VALUES (?, ?, ?, ?)";
 			
-			try (Connection conexion = ConexionUvirtual.obtenerInstancia();
-					PreparedStatement stmt = conexion.prepareStatement(consulta);) {
+			try (Connection conexion = ConexionUvirtual.obtenerInstancia(); PreparedStatement stmt = conexion.prepareStatement(consulta)) {
 				int parameterIndex = 1;
 				stmt.setString(parameterIndex++, usuario.getCodCuenta());
 				stmt.setString(parameterIndex++, usuario.getNumDocumento());
@@ -657,8 +656,7 @@ public class ModeloUsuarioBolsaEmpleo {
 				consulta += ") VALUES (?, ?, ?, ?, ?, ?, ?, ?) ";
 			}
 
-			try (Connection conexion = ConexionUvirtual.obtenerInstancia();
-					PreparedStatement stmt = conexion.prepareStatement(consulta);) {
+			try (Connection conexion = ConexionUvirtual.obtenerInstancia(); PreparedStatement stmt = conexion.prepareStatement(consulta)) {
 				int parameterIndex = 1;
 				stmt.setString(parameterIndex++, usuario.getCodCuenta());
 				stmt.setString(parameterIndex++, usuario.getNumDocumento());
@@ -911,14 +909,18 @@ public class ModeloUsuarioBolsaEmpleo {
 		Usuario usuArcos = datos.getUsuario();
 		
 		// no hay usuario logeado, salimos
-		if (usuArcos == null) {
+		if (usuArcos == null) {			
 			return false;
 		}
-					
+		
 		UsuarioBolsaEmpleo usuario;
 		
 		// comprobamos si existe el usuario en uvirtual
+		LOGGER.log(Level.FINER, String.format("Chequeando si existe usuario en Bolsa Empleo [%s]", usuArcos.getDocumentoNumero()));		
+		
 		if (!existeUsuarioBolsaEmpleoByNumeroDocumento(usuArcos.getDocumentoNumero())) {
+			LOGGER.log(Level.FINER, String.format("No existe usuario en Bolsa Empleo [%s]. Lo creamos como candidato.", usuArcos.getDocumentoNumero()));
+			
 			// no existe el usuario en la bolsa de empleo lo creamos como candidato			
 			UsuarioBolsaEmpleo usuarioFinal = new UsuarioBolsaEmpleo(
 				usuArcos.getDocumentoNumero(), 
@@ -932,6 +934,8 @@ public class ModeloUsuarioBolsaEmpleo {
 			CrearUsuario.refrescarUsuario(usuario.getCodCuenta());
 		} else {
 			// cargamos los datos del usuario de bolsa de empleo
+			LOGGER.log(Level.FINER, String.format("Existe usuario en Bolsa Empleo [%s]. Leemos sus datos.", usuArcos.getDocumentoNumero()));
+			
 			usuario = getUsuarioByNumeroDocumento(usuArcos.getDocumentoNumero());
 		}
 		
@@ -940,9 +944,11 @@ public class ModeloUsuarioBolsaEmpleo {
 			throw new UVException("No puede acceder, su perfil ha sido excluido por los siguientes motivos: " + usuario.getRazonExcluido());
 		} else if (Boolean.TRUE.equals(usuario.getBorrado())) {
 			throw new UVException("No puede acceder, su perfil ha sido borrado de la base de datos");
-		} 
+		}
 		
-		return true;		
+		LOGGER.log(Level.FINER, String.format("Fin chequeo usuario Bolsa Empleo [%s]. Todo correcto.", usuArcos.getDocumentoNumero()));
+		
+		return true;
 	}
 	
 	/** Comprueba si existe un usuario de bolsa de empleo por su documento.
@@ -958,7 +964,7 @@ public class ModeloUsuarioBolsaEmpleo {
 		String consulta = "SELECT * FROM TBEP_USUARIOS bepusu WHERE bepusu.PRSNIF = ?";
 		
 		try (Connection conexion = ConexionUvirtual.obtenerInstancia(); PreparedStatement stmt = conexion.prepareStatement(consulta)) {			
-			stmt.setString(1, documento);			
+			stmt.setString(1, documento);
 			
 			try (ResultSet rs = stmt.executeQuery()) {
 				return rs.next();
