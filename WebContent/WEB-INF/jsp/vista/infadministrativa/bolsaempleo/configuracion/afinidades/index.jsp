@@ -13,12 +13,10 @@ VistaAfinidades bean = (VistaAfinidades) uvdatos.getVistas().get(VistaAfinidades
 	
 	<jsp:include page="/WEB-INF/jsp/vista/infadministrativa/bolsaempleo/mensajes.jsp" />
 	
-	<div class="titulo-bolsa-empleo" style="float:right; margin-top:1.2rem">
-		<a class="link-btn" id="nueva_afinidad" href="<%= request.getRequestURI() %>" style="margin-top:0">Nueva Afinidad</a>
-	</div>
-	
-	<div class="titulo-bolsa-empleo" style="margin-top:1rem;">
+	<div class="titulo-bolsa-empleo">
 		<h2>Afinidades</h2>
+		
+		<a class="link-btn" id="nueva_afinidad" href="<%= request.getRequestURI() %>">Nueva afinidad</a>
 	</div>
 	
 	<table class="bluetable bolsaempleo" id="tableAfinidades">
@@ -53,8 +51,7 @@ $(document).ready(function() {
 	    "selectable": true,
 	    "pageSize": 10,
     	"defaultOrderBy": 1,
-    	"defaultOrderDirection": 'desc',
-	    "action": "<%= ControladorAfinidades.ACCION_DATATABLE %>",
+    	"action": "<%= ControladorAfinidades.ACCION_DATATABLE %>",
 	    "columns": [
 	    	{'data': 'codNum', 'selectable': true},
 	        {'data': 'codigo', 'class': 'center'},
