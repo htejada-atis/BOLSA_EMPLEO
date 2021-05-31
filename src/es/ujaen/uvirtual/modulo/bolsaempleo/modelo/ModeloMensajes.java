@@ -30,7 +30,9 @@ public class ModeloMensajes {
 	public static final int MENSAJES_COLUMN_INDEX_ESTADO = 3;
 	
 	public static final int DESTINATARIOS_COLUMN_INDEX_DOCUMENTO = 1;
-
+	public static final int DESTINATARIOS_COLUMN_INDEX_ROL = 4;
+	public static final int DESTINATARIOS_COLUMN_INDEX_DISTRIBUCION = 5;
+	
 	public static final int MENSAJES_COLUMN_TITULO_MAXLENGTH = 500;
 	
 	public static final String MENSAJE_ERROR_MENSAJE_NULL = "No se puede insertar un mensaje vacio";	
@@ -173,6 +175,8 @@ public class ModeloMensajes {
 		String consulta = "SELECT bepusu.* FROM TBEP_USUARIOS bepusu WHERE bepusu.FLGBORRADO = 'N'";
 
 		dataTable.setColumn(DESTINATARIOS_COLUMN_INDEX_DOCUMENTO, "bepusu.PRSNIF");
+		dataTable.setColumn(DESTINATARIOS_COLUMN_INDEX_ROL, "bepusu.ROL");
+		dataTable.setColumn(DESTINATARIOS_COLUMN_INDEX_DISTRIBUCION, "bepusu.FLGLISTADISTRIBUCION", DataTableColumn.COLUMN_TYPE_BOOLEAN);		
 		dataTable.setQuery(consulta);
 
 		try (Connection conexion = ConexionUvirtual.obtenerInstancia();
