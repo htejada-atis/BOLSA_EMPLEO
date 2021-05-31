@@ -67,8 +67,8 @@ VistaFicheros bean = (VistaFicheros) uvdatos.getVistas().get(VistaFicheros.class
 	        			return "<div title='Privado' class='circle-false'></div>"; 
 	        		}
 	        	}},
-		        {'data': 'codnum', 'buttons': [{'label': '<label class="tooltiptext">Copiar enlace</label>Copiar', 'class': 'tooltip', 'onClick': function(row) {
-			        	$(this).parent().parent().parent().find(".tooltiptext").text("¡Enlace copiado!");
+		        {'data': 'codnum', 'buttons': [{'label': '<label class="tooltiptext-ficheros">Copiar enlace</label>Copiar', 'class': 'tooltip-ficheros', 'onClick': function(row) {
+			        	$(this).parent().parent().parent().find(".tooltiptext-ficheros").text("¡Enlace copiado!");
 			        	
 			        	var link = "<%= ControladorGestionFicheros.URL_PATTERN_FILES_PRIVADA %>"
 				        	+ "?a=<%= ControladorGestionFicheros.ACCION_DESCARGAR_FICHERO %>&<%= ControladorGestionFicheros.PARAM_FICHERO %>=" + row.codNum;

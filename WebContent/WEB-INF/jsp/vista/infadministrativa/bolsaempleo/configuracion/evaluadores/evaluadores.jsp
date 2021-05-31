@@ -32,14 +32,15 @@ Area area = bean.getArea();
 					</select>
 				</div>
 			</div>
-			<div class="form-group-container-offset col2"  id="nuevo_evaluador_cont" style="<%= departamento == null ? "visibility: hidden" : "" %>">   
+			<div class="form-group-container-offset col2 gap-5"  id="nuevo_evaluador_cont" style="<%= departamento == null ? "visibility: hidden" : "" %>">   
 	    		<div class="form-group" style="width:80%">
-					<label for="bloque_nombre">Nombre Evaluador</label>
+					<label for="bloque_nombre">Cuenta TIC evaluador <i class="tooltip">(?)<span>Introduzca su cuenta TIC sin @ujaen.es</span></i></label>
 	    			<input class="form-input-custom" type="text" name="<%= ControladorGestionEvaluadores.PARAM_NOMBRE_EVALUADOR %>" id="nombre_evaluador" value=""/>
 	    		</div>
 	    		<div class="form-group" style="width:20%;">
-					<button class="link-btn" id="nuevo_evaluador" style="display:inline-block !important; padding: 0; margin-top: 1.4rem" title="Añadir evaluador">
-						<img alt="nombre de usuario evaluador" id="iconoMenu" src="/img/md/search_white.svg" width="25"/>
+	    			<label style="visibility: hidden">.</label>
+					<button class="link-btn" id="nuevo_evaluador" title="Añadir evaluador">
+						Buscar
 	   	 			</button>
 	   			</div>
 			</div>
