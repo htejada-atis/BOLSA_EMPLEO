@@ -15,8 +15,6 @@ import org.junit.Test;
 import org.junit.runners.MethodSorters;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebElement;
-import org.openqa.selenium.support.ui.ExpectedConditions;
-import org.openqa.selenium.support.ui.WebDriverWait;
 
 import bbdd.UtilsTestBolsaEmpleo;
 
@@ -26,26 +24,14 @@ import bbdd.UtilsTestBolsaEmpleo;
  * @author ATISoluciones
  */
 @FixMethodOrder(MethodSorters.NAME_ASCENDING)
-public class TestBEPMenusBolsaTrabajo extends UtilsTestUsuarioBase {
-	private static final String NOMBREDEESTACLASE = TestBEPMenusBolsaTrabajo.class.getName();
+public class TestBEPBolsasBaremar extends UtilsTestUsuarioBase {
+	private static final String NOMBREDEESTACLASE = TestBEPBolsasBaremar.class.getName();
 
 	private static final Logger LOGGER = Logger.getLogger(NOMBREDEESTACLASE);
 
 	private static final String DIV_MAIN = "bolsa-empleo";	
 	private static final String ID_TABLE = "table";
 	
-	private static final String CLASS_PAGINATION = "pagination";
-	private static final String CLASS_PAGINATION_NEXT = "next";
-	private static final String CLASS_PAGINATION_LAST = "last";
-	private static final String CLASS_PAGINATION_BACK = "back";
-	private static final String CLASS_PAGINATION_FIRST = "first";
-	private static final String CLASS_ACTIONS = "actions";
-
-	private static final String CLASS_DIALOGO = "ui-dialog";
-	private static final String CLASS_DIALOGO_CONTENT = "ui-dialog-content";
-
-	private static final String MENSAJE_DIALOGO_SELECCIONAR_FILAS = "Seleccione al menos una bolsa para cambiar su estado.";
-
 	/**
 	 * Se ejecuta una vez al inicio de la clase.
 	 * 
