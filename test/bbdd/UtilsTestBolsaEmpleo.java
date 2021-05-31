@@ -355,7 +355,7 @@ public final class UtilsTestBolsaEmpleo {
 	}
 
 	private static void insertDepartamento(Connection con, String idDept, String descripcion) throws SQLException {
-		String sql = "INSERT INTO UVIRTUAL.TBEP_DEPARTAMENTOS (ID_DEPARTAMENTO, DES_DEPARTAMENTO) VALUES (?,?)";
+		String sql = "INSERT INTO TBEP_DEPARTAMENTOS (ID_DEPARTAMENTO, DES_DEPARTAMENTO) VALUES (?,?)";
 
 		try (PreparedStatement stmt = con.prepareStatement(sql)) {
 			int parameterIndex = 1;
