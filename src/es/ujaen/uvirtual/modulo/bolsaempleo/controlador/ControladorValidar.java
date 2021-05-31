@@ -334,6 +334,8 @@ public class ControladorValidar extends HttpServlet {
 		UsuarioBolsaEmpleo usuario = modeloUsuario.getUsuarioByNumeroDocumento(usuArcos.getDocumentoNumero());
 		
 		bean.setBolsas(modeloValidar.listadoAreasCandidatoSujetasAfinidad(bean.getConvocatoria(), bean.getCandidato(), bean.getMerito(), usuario));
+		bean.setListaAfinidades(ModeloAfinidad.obtenerInstancia().listaAfinidades());
+		bean.setListaTipoAfinidades(ModeloAfinidad.obtenerInstancia().getTiposAfinidad());
 	}
 	
 	private void validarMerito(VistaValidar bean, HttpServletRequest request, HttpServletResponse response) throws SQLException, UVException, IOException {
@@ -350,7 +352,6 @@ public class ControladorValidar extends HttpServlet {
 			String observacionesCandidato = EscapaHTML.ajustaCodificacion(request.getParameter(PARAM_OBSERVACION_CANDIDATO));
 			Integer idBolsa = Formateador.leeParametroInteger(request.getParameter(PARAM_BOLSA_MERITO));
 			Bolsa bolsa = modeloBolsa.getBolsaById(idBolsa);
-			
 			actualizaAfinidades(bean, request, bolsa);
 			
 			if (EscapaHTML.ajustaCodificacion(request.getParameter(PARAM_ACEPTAR_MERITO)) != null) {
@@ -383,24 +384,31 @@ public class ControladorValidar extends HttpServlet {
 			throw new UVException("Afinidades incorrectas");
 		}
 		
-		// comprobamos validez de las afinidades
-		HashMap<Afinidad, Float> afinidades = new HashMap<>();
-		ModeloAfinidad modeloAfinidad = ModeloAfinidad.obtenerInstancia();
-		Float total = (float) 0.0;
-		for (Map.Entry<String, Float> entry : afinidadesRaw.entrySet()) {
-			Afinidad a = modeloAfinidad.getAfinidadById(Formateador.leeParametroInteger(entry.getKey()));
-			afinidades.put(a, entry.getValue());
-			total += entry.getValue();
+		if (!bean.getMerito().getMerito().getItemBaremacion().getIndividualizado()) {
+			
+		} else {
+			// comprobamos validez de las afinidades
+			HashMap<Afinidad, Float> afinidades = new HashMap<>();
+			ModeloAfinidad modeloAfinidad = ModeloAfinidad.obtenerInstancia();
+			Float total = (float) 0.0;
+			for (Map.Entry<String, Float> entry : afinidadesRaw.entrySet()) {
+				Afinidad a = modeloAfinidad.getAfinidadById(Formateador.leeParametroInteger(entry.getKey()));
+				afinidades.put(a, entry.getValue());
+				total += entry.getValue();
+			}
+			
+			Float totalRounder = (float) BolsaEmpleoUtils.redondeo(total);
+			if (!totalRounder.equals(bean.getMerito().getMerito().getValor())) {
+				throw new UVException("El total de afinidades tiene que ser igual al valor del mérito");
+			}
+			
+			// actualizamos afinidades del merito en la bolsa
+			ModeloSolicitud modeloSolicitud = ModeloSolicitud.obtenerInstancia();
+			Solicitud solicitud = modeloSolicitud.getSolicitudByConvocatoriaUsuario(bean.getCandidato(), bean.getConvocatoria());
+			modeloSolicitud.actualizarAfinidadesMeritoNoIndividualizado(solicitud, bolsa, bean.getMerito().getMerito(), afinidades);
 		}
 		
-		Float totalRounder = (float) BolsaEmpleoUtils.redondeo(total);
-		if (!totalRounder.equals(bean.getMerito().getMerito().getValor())) {
-			throw new UVException("El total de afinidades tiene que ser igual al valor del mérito");
-		}
-		// actualizamos afinidades del merito en la bolsa
-		ModeloSolicitud modeloSolicitud = ModeloSolicitud.obtenerInstancia();
-		Solicitud solicitud = modeloSolicitud.getSolicitudByConvocatoriaUsuario(bean.getCandidato(), bean.getConvocatoria());
-		modeloSolicitud.actualizarAfinidadesMeritoNoIndividualizado(solicitud, bolsa, bean.getMerito().getMerito(), afinidades);
+		
 	}
 	
 	private void listadoBolsas(VistaValidar bean, UVDatos datos, HttpServletRequest request, HttpServletResponse response)
