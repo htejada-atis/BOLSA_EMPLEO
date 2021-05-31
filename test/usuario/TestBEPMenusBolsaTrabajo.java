@@ -31,8 +31,9 @@ public class TestBEPMenusBolsaTrabajo extends UtilsTestUsuarioBase {
 
 	private static final Logger LOGGER = Logger.getLogger(NOMBREDEESTACLASE);
 
-	private static final String DIV_MAIN_BOLSAS = "bolsa-empleo";
+	private static final String DIV_MAIN = "bolsa-empleo";	
 	private static final String ID_TABLE = "table";
+	
 	private static final String CLASS_PAGINATION = "pagination";
 	private static final String CLASS_PAGINATION_NEXT = "next";
 	private static final String CLASS_PAGINATION_LAST = "last";
@@ -85,73 +86,8 @@ public class TestBEPMenusBolsaTrabajo extends UtilsTestUsuarioBase {
 	 */
 	@Test
 	public void testA1() {
-		WebDriverWait wait = new WebDriverWait(DriverUv.getDriver(), UtilsTestBEP.WAIT_ELEMENT);
-
-		// esperamos div principal
-		WebElement main = wait.until(ExpectedConditions.visibilityOfElementLocated(By.className(DIV_MAIN_BOLSAS)));
-		WebElement h2 = main.findElement(By.tagName("h2"));
-		assertTrue(h2.getText().equals("Estado de las bolsas"));
-
-		// esperamos a que se renderice la table
-		WebElement table = main.findElement(By.id(ID_TABLE));
-		WebElement total = wait.until(ExpectedConditions.presenceOfNestedElementLocatedBy(table, By.className("total")));
-
-		// comprobamos que el número de bolsas es mayor que cero
-		Integer numElementos = Integer.parseInt(total.getText().split(" ")[1]);
-		assertTrue(numElementos > 0);
-
-		// click sobre ordenación y comprobamos que existe icono
-		WebElement th = table.findElement(By.className("area"));
-		th.click();
-		WebElement img = th.findElement(By.className("order"));
-		assertTrue(img.getAttribute("src").indexOf("up.png") != -1);
-		th.click();
-		img = th.findElement(By.className("order"));
-		assertTrue(img.getAttribute("src").indexOf("down.png") != -1);
-
-		// paginacion
-		WebElement pagination = table.findElement(By.className(CLASS_PAGINATION));
-		Integer totalPages = Integer.parseInt(pagination.getText().split("/")[1].trim().split(" ")[0].trim());
-		assertTrue(totalPages > 0);
-
-		// paginacion botones
-		WebElement btnNext = pagination.findElement(By.className(CLASS_PAGINATION_NEXT));
-		btnNext.click();
-		pagination = table.findElement(By.className(CLASS_PAGINATION));
-		assertTrue(pagination.getText().indexOf("Página 2") != -1);
-
-		WebElement btnLast = pagination.findElement(By.className(CLASS_PAGINATION_LAST));
-		btnLast.click();
-		pagination = table.findElement(By.className(CLASS_PAGINATION));
-		Integer firstPage = Integer.parseInt(pagination.getText().split("/")[0].trim().split(" ")[2].trim());
-		assertTrue(firstPage == totalPages);
-
-		WebElement btnBack = pagination.findElement(By.className(CLASS_PAGINATION_BACK));
-		btnBack.click();
-		pagination = table.findElement(By.className(CLASS_PAGINATION));
-		Integer penultimatePage = Integer.parseInt(pagination.getText().split("/")[0].trim().split(" ")[2].trim());
-		assertTrue(penultimatePage == totalPages - 1);
-
-		WebElement btnFist = pagination.findElement(By.className(CLASS_PAGINATION_FIRST));
-		btnFist.click();
-		pagination = table.findElement(By.className(CLASS_PAGINATION));
-		Integer firstPageAgain = Integer.parseInt(pagination.getText().split("/")[0].trim().split(" ")[2].trim());
-		assertTrue(firstPageAgain == 1);
-
-		// alert si no hay filas seleccionadas
-		WebElement actions = table.findElement(By.className(CLASS_ACTIONS));
-		WebElement btnBloquear = actions.findElement(By.xpath("button[1]"));
-		btnBloquear.click();
-		String alert = this.getDialogText();
-		assertTrue(alert.equals(MENSAJE_DIALOGO_SELECCIONAR_FILAS));
+		UtilsTestBEP.assertTitlePage(UtilsTestBEP.waitVisibility(By.className(DIV_MAIN)), "Estado de las bolsas");
+		WebElement table = UtilsTestBEP.waitVisibility(By.id(ID_TABLE));
+		assertTrue(UtilsTestBEP.getTotalTable(table) > 0);		
 	}
-
-	private String getDialogText() {
-		WebElement dialogo = DriverUv.getDriver().findElement(By.className(CLASS_DIALOGO));
-		WebElement content = dialogo.findElement(By.className(CLASS_DIALOGO_CONTENT));
-
-		return content.findElement(By.tagName("h6")).getText();
-	}
-
-
 }
