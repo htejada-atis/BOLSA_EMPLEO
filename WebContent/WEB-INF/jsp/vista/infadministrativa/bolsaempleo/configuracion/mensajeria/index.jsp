@@ -15,7 +15,7 @@ VistaMensajes bean = (VistaMensajes) uvdatos.getVistas().get(VistaMensajes.class
 	
 	<div class="titulo-bolsa-empleo">
 		<h2>Mensajes</h2>
-		<a class="link-btn" id="nuevo_mensaje" href="<%= request.getRequestURI() %>">Nuevo mensaje</a>
+		<button class="link-btn" id="nuevo_mensaje">Nuevo mensaje</button>
 	</div>
 	
 	<table class="bluetable bolsaempleo" id="tableMensajes">

@@ -38,9 +38,9 @@ Area area = bean.getArea();
 	    			<input class="form-input-custom" type="text" name="<%= ControladorGestionEvaluadores.PARAM_NOMBRE_EVALUADOR %>" id="nombre_evaluador" value=""/>
 	    		</div>
 	    		<div class="form-group" style="width:20%;">
-					<a class="link-btn" id="nuevo_evaluador" href="<%= request.getRequestURI() %>" style="display:inline-block !important; padding: 0; margin-top: 1.4rem" title="Añadir evaluador">
+					<button class="link-btn" id="nuevo_evaluador" style="display:inline-block !important; padding: 0; margin-top: 1.4rem" title="Añadir evaluador">
 						<img alt="nombre de usuario evaluador" id="iconoMenu" src="/img/md/search_white.svg" width="25"/>
-	   	 			</a>
+	   	 			</button>
 	   			</div>
 			</div>
 		</div>

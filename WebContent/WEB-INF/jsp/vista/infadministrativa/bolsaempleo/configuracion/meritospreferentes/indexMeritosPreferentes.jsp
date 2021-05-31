@@ -18,9 +18,9 @@ VistaMeritosPreferentes bean = (VistaMeritosPreferentes) uvdatos.getVistas().get
 	<div class="titulo-bolsa-empleo">
 		<h2>Tipos méritos preferentes</h2>
     
-	    <a class="link-btn" id="nuevo_meritopreferente" href="<%= request.getRequestURI() %>">
+	    <button class="link-btn" id="nuevo_meritopreferente">
 	    	Nuevo tipo mérito preferente
-	    </a>
+	    </button>
 	</div>
 	
 	<table class="bluetable bolsaempleo" id="table">

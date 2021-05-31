@@ -18,9 +18,9 @@ VistaMeritos bean = (VistaMeritos) uvdatos.getVistas().get(VistaMeritos.class.ge
 	<div class="titulo-bolsa-empleo">
 		<h2>Mis méritos</h2>
     
-	    <a class="link-btn" id="nuevo_merito" href="<%= request.getRequestURI() %>">
+	    <button class="link-btn" id="nuevo_merito">
 	    	 Nuevo mérito
-	    </a>
+	    </button>
 	</div>
 	
 	<table class="bluetable bolsaempleo" id="tableMeritos">

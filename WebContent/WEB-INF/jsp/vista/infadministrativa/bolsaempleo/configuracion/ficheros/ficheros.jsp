@@ -15,9 +15,9 @@ VistaFicheros bean = (VistaFicheros) uvdatos.getVistas().get(VistaFicheros.class
 	<div class="titulo-bolsa-empleo">
 		<h2>Documentos del sistema</h2>
     
-	    <a class="link-btn" id="nuevo_fichero" href="<%= request.getRequestURI() %>">
+	    <button class="link-btn" id="nuevo_fichero">
 	    	 Nuevo documento
-	    </a>
+	    </button>
 	</div>
 
     <table class="bluetable bolsaempleo" id="table_ficheros">

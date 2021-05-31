@@ -74,12 +74,12 @@ VistaSolicitudes bean = (VistaSolicitudes) uvdatos.getVistas().get(VistaSolicitu
 	
 	<% if (bean.getSolicitud().getEstado().equals(ModeloSolicitud.SOLICITUD_ESTADO_ABIERTA)) { %>
 		<div class="btns-by-steps">
-			<a class="link-btn" id="paso3_volver" href="<%= request.getRequestURI() %>">
+			<button class="link-btn" id="paso3_volver">
 		    	 Volver
-		    </a>
-		    <a class="link-btn" id="paso3_confirmar" href="<%= request.getRequestURI() %>">
+		    </button>
+		    <button class="link-btn" id="paso3_confirmar">
 		    	 Confirmar Solicitud
-		    </a>
+		    </button>
 		</div>
 	<% } %>
 	
