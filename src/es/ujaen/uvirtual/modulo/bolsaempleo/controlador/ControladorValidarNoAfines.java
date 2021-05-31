@@ -302,7 +302,6 @@ public class ControladorValidarNoAfines extends HttpServlet {
 		try {
 			String observacionesCandidato = EscapaHTML.ajustaCodificacion(request.getParameter(PARAM_OBSERVACIONES_CANDIDATO));
 			Collection<String> bolsas = gson.fromJson(request.getParameter(PARAM_BOLSAS), new TypeToken<Collection<String>>() { }.getType());
-			
 			if (bolsas.size() < 0) {
 				throw new UVException(MENSAJE_ERROR_NO_HAY_BOLSAS_SELECCIONADAS);
 			}
@@ -310,19 +309,19 @@ public class ControladorValidarNoAfines extends HttpServlet {
 			if (EscapaHTML.ajustaCodificacion(request.getParameter(PARAM_ACEPTAR_MERITO)) != null) {
 				for (String idBolsa : bolsas) {
 					modeloValidar.validarMerito(idBolsa, bean.getMerito().getMerito().getCodNum(), observacionesCandidato);
-					Bolsa bolsa = modeloBolsa.getBolsaById(Formateador.leeParametroInteger(request.getParameter(PARAM_BOLSA)));
+					Bolsa bolsa = modeloBolsa.getBolsaById(Integer.parseInt(idBolsa));
 					BolsaEmpleoUtils.addMensajeDeExito(String.format(MENSAJE_EXITO_MERITO_VALIDADO, bolsa.getArea().getDescripcion()), bean, request);
 				}
 			} else if (EscapaHTML.ajustaCodificacion(request.getParameter(PARAM_EXCLUIR_MERITO)) != null) {
 				for (String idBolsa : bolsas) {
 					modeloValidar.excluirMerito(idBolsa, bean.getMerito().getMerito().getCodNum(), observacionesCandidato);
-					Bolsa bolsa = modeloBolsa.getBolsaById(Formateador.leeParametroInteger(request.getParameter(PARAM_BOLSA)));
+					Bolsa bolsa = modeloBolsa.getBolsaById(Integer.parseInt(idBolsa));
 					BolsaEmpleoUtils.addMensajeDeExito(String.format(MENSAJE_EXITO_MERITO_EXCLUIDO, bolsa.getArea().getDescripcion()), bean, request);
 				}
 			} else if (EscapaHTML.ajustaCodificacion(request.getParameter(PARAM_GUARDAR_MERITO)) != null) {
 				for (String idBolsa : bolsas) {
 					modeloValidar.guardarMerito(idBolsa, bean.getMerito().getMerito().getCodNum(), observacionesCandidato);
-					Bolsa bolsa = modeloBolsa.getBolsaById(Formateador.leeParametroInteger(request.getParameter(PARAM_BOLSA)));
+					Bolsa bolsa = modeloBolsa.getBolsaById(Integer.parseInt(idBolsa));
 					BolsaEmpleoUtils.addMensajeDeExito(String.format(MENSAJE_EXITO_MERITO_GUARDAR, bolsa.getArea().getDescripcion()), bean, request);
 				}
 			}

@@ -36,7 +36,6 @@ import es.ujaen.uvirtual.utilidades.UVException;
 				"/srv/es/ajax/informacionadministrativa/bolsaempleo/configuracion/parametros",
 				"/srv/en/ajax/informacionadministrativa/bolsaempleo/configuracion/parametros"
 		})
-@MultipartConfig
 public class ControladorParametrosConfiguracion extends HttpServlet {
 	private static final long serialVersionUID = 1L;
 	private static final String NOMBREDEESTACLASE = ControladorParametrosConfiguracion.class.getName();

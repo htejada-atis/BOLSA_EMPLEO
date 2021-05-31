@@ -46,7 +46,6 @@ import es.ujaen.uvirtual.utilidades.UVException;
 				"/srv/en/ajax/informacionadministrativa/bolsaempleo/configuracion/candidatos"
 		})
 public class ControladorUsuarioCandidato extends HttpServlet {
-	
 	private static final long serialVersionUID = 1L;
 	private static final String NOMBREDEESTACLASE = ControladorUsuarioBolsaEmpleo.class.getName();
 	private static final Logger LOGGER = Logger.getLogger(NOMBREDEESTACLASE);

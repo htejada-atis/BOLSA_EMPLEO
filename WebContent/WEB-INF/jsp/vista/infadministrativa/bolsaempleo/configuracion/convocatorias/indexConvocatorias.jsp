@@ -17,9 +17,9 @@ VistaConvocatorias bean = (VistaConvocatorias) uvdatos.getVistas().get(VistaConv
 	<div class="titulo-bolsa-empleo">
 		<h2>Convocatorias</h2>
     
-	    <a class="link-btn" id="nueva_convocatoria" href="<%= request.getRequestURI() %>">
+	    <button class="link-btn" id="nueva_convocatoria">
 	    	Nueva convocatoria
-	    </a>
+	    </button>
 	</div>
 	
 	<table class="bluetable bolsaempleo" id="table_convocatorias">

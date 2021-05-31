@@ -97,7 +97,7 @@ public class ControladorUsuarioBolsaEmpleo extends HttpServlet {
 	
 	// mensajes
 	public static final String MENSAJE_ENVIADO = "mensaje";
-	public static final String MENSAJE_EXITO_AGREGAR = "usuario creado correctamente";
+	public static final String MENSAJE_EXITO_AGREGAR = "Usuario creado correctamente";
 	public static final String MENSAJE_EXITO_EDITAR = "usuario editadi correctamente";
 	public static final String MENSAJE_EXITO_ELIMINAR = "usuario eliminado correctamente";
 	public static final String MENSAJE_ERROR_ACCION_USUARIO_NO_VALIDA = "Acción no válida";

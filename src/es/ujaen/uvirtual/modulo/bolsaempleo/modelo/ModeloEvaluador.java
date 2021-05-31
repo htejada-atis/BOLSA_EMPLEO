@@ -179,12 +179,12 @@ public class ModeloEvaluador {
 		BolsaEmpleoDataTable<AreaEvaluadoresTable> dataTable = new BolsaEmpleoDataTable<>(params);
 		
 		String consulta = "SELECT bepare.*,"
-				+ " (SELECT COUNT(*) FROM UVIRTUAL.TBEP_USUARIOS bepusu"
-				+ "		INNER JOIN UVIRTUAL.TBEP_EVALUADORES bepeva ON bepusu.CODNUM = bepeva.BEPUSU_CODNUM"
+				+ " (SELECT COUNT(*) FROM TBEP_USUARIOS bepusu"
+				+ "		INNER JOIN TBEP_EVALUADORES bepeva ON bepusu.CODNUM = bepeva.BEPUSU_CODNUM"
 				+ "		WHERE FLGBORRADO!='S' AND FLGEXCLUIDO!='S' AND bepeva.BEPARE_CODNUM = bepare.CODNUM"
-				+ "		AND bepusu.ROL = 1051) COUNT_EVALUADORES"
-				+ " FROM UVIRTUAL.TBEP_AREAS bepare"
-				+ "	INNER JOIN UVIRTUAL.TBEP_AREAS_DEPARTAMENTOS bepade ON bepade.BEPARE_CODNUM = bepare.CODNUM"
+				+ "		AND bepusu.ROL = 1051 AND bepeva.FLGACTIVO = 'S') COUNT_EVALUADORES"
+				+ " FROM TBEP_AREAS bepare"
+				+ "	INNER JOIN TBEP_AREAS_DEPARTAMENTOS bepade ON bepade.BEPARE_CODNUM = bepare.CODNUM"
 				+ "	WHERE bepade.BEPDEP_CODNUM = ? ";
 		
 		dataTable.setColumn(ORDER_COLUMN_INDEX_ID, "bepbol.CODNUM", DataTableColumn.COLUMN_TYPE_NUMBER);

@@ -1,6 +1,7 @@
 package es.ujaen.uvirtual.modulo.bolsaempleo.beans;
 
 import java.io.Serializable;
+import java.util.List;
 
 /**
  * Clase mérito solicitud de bolsa empleo.
@@ -15,6 +16,7 @@ public class MeritoSolicitud implements Serializable {
 	private Boolean excluido;
 	private Boolean validado;
 	private String observacionCandidato;
+	private List<MeritoSolicitudValoracion> valoraciones;
 
 	/**
 	 * Constructor por defecto.
@@ -57,10 +59,12 @@ public class MeritoSolicitud implements Serializable {
 	 * Constructor con parametros .
 	 * @param pmerito .
 	 * @param pexcluido .
+	 * @param pvalidado .
 	 */
-	public MeritoSolicitud(Merito pmerito, Boolean pexcluido) {
+	public MeritoSolicitud(Merito pmerito, Boolean pexcluido, Boolean pvalidado) {
 		this.merito = pmerito;		
 		this.excluido = pexcluido;		
+		this.validado = pvalidado;
 	}
 
 	public Integer getCodNum() {
@@ -102,6 +106,14 @@ public class MeritoSolicitud implements Serializable {
 	public void setObservacionCandidato(String observacion) {
 		this.observacionCandidato = observacion;
 	}
+	
+	public List<MeritoSolicitudValoracion> getValoraciones() {
+		return this.valoraciones;
+	}
+
+	public void setValoraciones(List<MeritoSolicitudValoracion> valoraciones) {
+		this.valoraciones = valoraciones;
+	}
 		
 	public static long getSerialversionuid() {
 		return serialVersionUID;
@@ -110,7 +122,7 @@ public class MeritoSolicitud implements Serializable {
 	@Override
 	public String toString() {
 		return "MeritoSolicitud [codNum=" + codNum + ", merito=" + merito + ", excluido=" + excluido
-				+ ", validado=" + validado + ", observacionCandidato=" + observacionCandidato + "]";
+				+ ", validado=" + validado + ", observacionCandidato=" + observacionCandidato + ", valoraciones=" + valoraciones + "]";
 	}
 
 	@Override
@@ -121,7 +133,8 @@ public class MeritoSolicitud implements Serializable {
 		result = prime * result + ((merito == null) ? 0 : merito.hashCode());
 		result = prime * result + ((excluido == null) ? 0 : excluido.hashCode());
 		result = prime * result + ((validado == null) ? 0 : validado.hashCode());	
-		result = prime * result + ((observacionCandidato == null) ? 0 : observacionCandidato.hashCode());	
+		result = prime * result + ((observacionCandidato == null) ? 0 : observacionCandidato.hashCode());
+		result = prime * result + ((valoraciones == null) ? 0 : valoraciones.hashCode());
 		return result;
 	}
 
@@ -171,6 +184,13 @@ public class MeritoSolicitud implements Serializable {
 				return false;
 			}
 		} else if (!observacionCandidato.equals(other.observacionCandidato)) {
+			return false;
+		}
+		if (valoraciones == null) {
+			if (other.valoraciones != null) {
+				return false;
+			}
+		} else if (!valoraciones.equals(other.valoraciones)) {
 			return false;
 		}
 		

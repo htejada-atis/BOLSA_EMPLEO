@@ -54,7 +54,12 @@ function getErrorResponse(response) {
 }
 
 function isFunction(functionToCheck) {
- return functionToCheck && {}.toString.call(functionToCheck) === '[object Function]';
+	return functionToCheck && {}.toString.call(functionToCheck) === '[object Function]';
+}
+
+
+function isUndefined(myVar) {
+	return typeof myVar === 'undefined'; 
 }
 
 function sendForm(url, params) {
@@ -151,12 +156,28 @@ function redondearFloat(number, decimalPlaces) {
 	return Number(Math.round(number + "e" + decimalPlaces) + "e-" + decimalPlaces);
 }
 
+function smoothScrollToAnchor(id) {
+	$('html, body').animate({
+		scrollTop: $(id).offset().top
+	}, 900);
+}
+
+function smoothScrollFromOneToAnotherAnchor(origin, destination) {
+	$('html, body').animate({
+		scrollTop: $(origin).offset().top
+	}, 0);
+	$('html, body').animate({
+		scrollTop: $(destination).offset().top
+	}, 900);
+}
+
 window.Atis = $.extend(window.Atis ? window.Atis : {}, {
 	"getProp": getProp,
 	"setProp": setProp,
 	"alertDialog": alertDialog,
 	"confirmDialog": confirmDialog,
 	"getErrorResponse": getErrorResponse,
+	"isUndefined": isUndefined,
 	"isFunction": isFunction,
 	"formatearFecha": formatearFecha,	
 	"sendForm": sendForm,
@@ -165,5 +186,7 @@ window.Atis = $.extend(window.Atis ? window.Atis : {}, {
 	"sendAjax": sendAjax,
 	"removeValueArray": removeValueArray,
 	"escapeHtml": escapeHtml,
-	"redondearFloat": redondearFloat
+	"redondearFloat": redondearFloat,
+	"smoothScrollToAnchor": smoothScrollToAnchor,
+	"smoothScrollFromOneToAnotherAnchor": smoothScrollFromOneToAnotherAnchor
 });

@@ -1,14 +1,11 @@
 package es.ujaen.uvirtual.modulo.bolsaempleo.controlador;
 
-import java.io.BufferedInputStream;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.sql.SQLException;
 import java.util.logging.Logger;
-import java.util.List;
 import java.util.logging.Level;
 import javax.servlet.ServletException;
-import javax.servlet.ServletOutputStream;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
@@ -17,64 +14,60 @@ import com.google.gson.Gson;
 import es.ujaen.uvirtual.beans.CodigoDescripcion;
 import es.ujaen.uvirtual.beans.UVDatos;
 import es.ujaen.uvirtual.beans.Usuario;
-import es.ujaen.uvirtual.modulo.bolsaempleo.beans.Candidato;
-import es.ujaen.uvirtual.modulo.bolsaempleo.beans.TitulacionUsuario;
+import es.ujaen.uvirtual.modulo.bolsaempleo.beans.CandidatoAcreditacionesTable;
+import es.ujaen.uvirtual.modulo.bolsaempleo.beans.MeritoPreferenteUsuario;
+import es.ujaen.uvirtual.modulo.bolsaempleo.beans.ParametrosConfiguracion;
 import es.ujaen.uvirtual.modulo.bolsaempleo.beans.UsuarioBolsaEmpleo;
 import es.ujaen.uvirtual.modulo.bolsaempleo.modelo.ModeloCandidato;
-import es.ujaen.uvirtual.modulo.bolsaempleo.modelo.ModeloMisTitulaciones;
+import es.ujaen.uvirtual.modulo.bolsaempleo.modelo.ModeloMeritosPreferentesCandidato;
+import es.ujaen.uvirtual.modulo.bolsaempleo.modelo.ModeloParametrosConfiguracion;
 import es.ujaen.uvirtual.modulo.bolsaempleo.modelo.ModeloUsuarioBolsaEmpleo;
 import es.ujaen.uvirtual.modulo.bolsaempleo.utilidades.BolsaEmpleoDataTable;
 import es.ujaen.uvirtual.modulo.bolsaempleo.utilidades.BolsaEmpleoUtils;
-import es.ujaen.uvirtual.modulo.bolsaempleo.vistas.VistaFiltrar;
+import es.ujaen.uvirtual.modulo.bolsaempleo.vistas.VistaFiltrarAcreditaciones;
 import es.ujaen.uvirtual.utilidades.EscapaHTML;
 import es.ujaen.uvirtual.utilidades.Formateador;
 import es.ujaen.uvirtual.utilidades.UVException;
 
 /**
- * Listado de bolsas y su estado.
+ * Clase controlador para filtrar candidatos por acreditaciones .
  */
 @WebServlet(
-		name = "informacionadministrativa.bolsaempleo.filtrar", 
-		description = "Filtrar candidatos de las bolsas", 
+		name = "informacionadministrativa.bolsaempleo.filtraracreditaciones", 
+		description = "Filtrar candidatos de las bolsas por acreditaciones", 
 		urlPatterns = { 
-				"/srv/es/informacionadministrativa/bolsaempleo/filtrar", 
-				"/srv/en/informacionadministrativa/bolsaempleo/filtrar",
-				"/srv/es/ajax/informacionadministrativa/bolsaempleo/filtrar", 
-				"/srv/en/ajax/informacionadministrativa/bolsaempleo/filtrar"
+				"/srv/es/informacionadministrativa/bolsaempleo/filtraracreditaciones", 
+				"/srv/en/informacionadministrativa/bolsaempleo/filtraracreditaciones",
+				"/srv/es/ajax/informacionadministrativa/bolsaempleo/filtraracreditaciones", 
+				"/srv/en/ajax/informacionadministrativa/bolsaempleo/filtraracreditaciones"
 		})
-public class ControladorFiltrar extends HttpServlet {
+public class ControladorFiltrarAcreditaciones extends HttpServlet {
 	private static final long serialVersionUID = 1L;
-	private static final String NOMBREDEESTACLASE = ControladorFiltrar.class.getName();
+	private static final String NOMBREDEESTACLASE = ControladorFiltrarAcreditaciones.class.getName();
 	private static final Logger LOGGER = Logger.getLogger(NOMBREDEESTACLASE);
 	
 	// acciones
+	public static final String ACCION_ACREDITACION_DESELECCIONADA = "acreditaciondeseleccionada";
+	public static final String ACCION_ACREDITACION_SELECCIONADA = "acreditacionseleccionada";
 	public static final String ACCION_CANDIDATO_SELECCIONADO = "candidatoseleccionado";
+	public static final String ACCION_DATATABLE_ACREDITACIONES_CANDIDATO = "datatableacreditacionescandidato";
 	public static final String ACCION_DATATABLE_CANDIDATOS = "datatablecandidatos";
-	public static final String ACCION_DATATABLE_TITULACIONES_CANDIDATO = "datatabletitulacionescandidato";
-	public static final String ACCION_DESCARGAR_FICHERO = "descargarfichero";
 	public static final String ACCION_INDEX = "listar";
-	public static final String ACCION_TITULACION_DESELECCIONADA = "titulaciondeseleccionada";
-	public static final String ACCION_TITULACION_SELECCIONADA = "titulacionseleccionada";
 	
 	// mensajes
-	public static final String MENSAJE_ERROR_FOO = "Mensaje de error";
-	public static final String MENSAJE_EXITO_BAR = "Mensaje de exito";
+	public static final String MENSAJE_ERROR_ACCION_NO_CONTEMPLADA = "Acción no contemplada";
 	
 	// Parámetros
 	public static final String PARAM_ACCION = "a";
+	public static final String PARAM_ACREDITACION = "acreditacion";
 	public static final String PARAM_CANDIDATO = "candidato";
-	public static final String PARAM_FICHERO = "fichero";
-	public static final String PARAM_TITULACION = "titulacion";
 	
 	// ruta vistas
-	public static final String RUTA_BEP_FILTRAR = "/WEB-INF/jsp/vista/infadministrativa/bolsaempleo/filtrar/";
-	public static final String JSP_INDEX = RUTA_BEP_FILTRAR + "index.jsp";
-	
-	// urls	
-	public static final String URL_PATTERN_FILES_PRIVADA = "/srv/es/informacionadministrativa/bolsaempleo/filtrar";
+	public static final String RUTA_BEP_FILACRE = "/WEB-INF/jsp/vista/infadministrativa/bolsaempleo/filtraracreditaciones/";
+	public static final String JSP_INDEX = RUTA_BEP_FILACRE + "index.jsp";
 	
 	// ajax
-	public static final String URL_PATTERN_AJAX = "/srv/es/ajax/informacionadministrativa/bolsaempleo/filtrar";
+	public static final String URL_PATTERN_AJAX = "/srv/es/ajax/informacionadministrativa/bolsaempleo/filtraracreditaciones";
 	public static final String RESPONSE_AJAX_CONTENTTYPE = "application/json";
 	public static final String RESPONSE_AJAX_ENCODING = "UTF-8";
 	public static final String RESPONSE_AJAX_ERROR = "error";
@@ -89,7 +82,7 @@ public class ControladorFiltrar extends HttpServlet {
 		datos.setDocType("<!DOCTYPE html>");
 		datos.setContentType("text/html");
 		
-		VistaFiltrar bean = new VistaFiltrar();		
+		VistaFiltrarAcreditaciones bean = new VistaFiltrarAcreditaciones();		
 		Usuario usuario = datos.getUsuario();
 		LOGGER.log(Level.FINEST, "usuario que ha entrado en el servlet es {0}", usuario.getUid());
 		
@@ -101,29 +94,19 @@ public class ControladorFiltrar extends HttpServlet {
 		try {
 			init(bean, datos, request, response);
 			switch (nombreAccion) {
-				case ACCION_INDEX:
-					bean.setVista(JSP_INDEX);
-					break;
+				case ACCION_ACREDITACION_DESELECCIONADA:
+				case ACCION_ACREDITACION_SELECCIONADA:
 				case ACCION_CANDIDATO_SELECCIONADO:
-					seleccionarCandidato(bean, request);
+				case ACCION_DATATABLE_ACREDITACIONES_CANDIDATO:
+					candidatoSeleccionado(bean, datos, request, response, nombreAccion);
 					break;
 				case ACCION_DATATABLE_CANDIDATOS:
 					listadoCandidatos(bean, datos, request, response);
 					break;
-				case ACCION_DATATABLE_TITULACIONES_CANDIDATO:
-					listadoTitulacionesCandidato(bean, datos, request, response);
-					break;
-				case ACCION_DESCARGAR_FICHERO:
-					descargarFichero(bean, datos, request, response);
-					break;				
-				case ACCION_TITULACION_DESELECCIONADA:
-					seleccionarTitulacion(bean, datos, request, response, false);
-					break;
-				case ACCION_TITULACION_SELECCIONADA:
-					seleccionarTitulacion(bean, datos, request, response, true);
+				case ACCION_INDEX:
 					break;
 				default:
-					errorFatal(bean, "Acción no contemplada");
+					errorFatal(bean, MENSAJE_ERROR_ACCION_NO_CONTEMPLADA);
 			}
 		} catch (UVException e) {
 			LOGGER.log(Level.WARNING, e.toString());
@@ -146,18 +129,18 @@ public class ControladorFiltrar extends HttpServlet {
 		}
 	}
 	
-	private void init(VistaFiltrar bean, UVDatos datos, HttpServletRequest request, HttpServletResponse response) throws SQLException, UVException, IOException {
+	private void init(VistaFiltrarAcreditaciones bean, UVDatos datos, HttpServletRequest request, HttpServletResponse response) throws SQLException, UVException, IOException {
 		bean.setVista(JSP_INDEX);
 		BolsaEmpleoUtils.readMensajeSession(bean, request);
 		try {
-			ModeloUsuarioBolsaEmpleo.obtenerInstancia().getOrCreateUsuarioBolsaEmpleo(datos);
+			ModeloUsuarioBolsaEmpleo.obtenerInstancia().checkUser(datos);
 		} catch (UVException e) {
 			BolsaEmpleoUtils.addMensajeDeError(e.getMessage(), bean, request);
 			response.sendRedirect("/srv/es/informacionadministrativa/bolsaempleo/error");
 		}
 	}
 	
-	private void errorFatal(VistaFiltrar bean, String mensaje) {
+	private void errorFatal(VistaFiltrarAcreditaciones bean, String mensaje) {
 		bean.setVista("/WEB-INF/jsp/vista/infadministrativa/bolsaempleo/error.jsp");
 		bean.getMensajesDeError().add(mensaje);
 	}
@@ -170,40 +153,43 @@ public class ControladorFiltrar extends HttpServlet {
 		doGet(request, response);
 	}
 	
-	/**
-	 * Selecciona un candidato para mostrar sus titulaciones .
-	 * @param bean .
-	 * @param request .
-	 * @throws UVException .
-	 * @throws SQLException .
-	 */
-	private void seleccionarCandidato(VistaFiltrar bean, HttpServletRequest request) throws UVException, SQLException {
-		bean.setVista(JSP_INDEX);
-		
-		ModeloMisTitulaciones modeloTitulacion = ModeloMisTitulaciones.obtenerInstancia();
-		ModeloUsuarioBolsaEmpleo modeloUsuario = ModeloUsuarioBolsaEmpleo.obtenerInstancia();
-		
-		UsuarioBolsaEmpleo candidato = modeloUsuario.getUsuarioById(Formateador.leeParametroInteger(request.getParameter(PARAM_CANDIDATO)));
+	private void candidatoSeleccionado(VistaFiltrarAcreditaciones bean, UVDatos datos, HttpServletRequest request, HttpServletResponse response, String nombreAccion) 
+			throws SQLException, UVException, IOException {
+		UsuarioBolsaEmpleo candidato = ModeloUsuarioBolsaEmpleo.obtenerInstancia().getUsuarioById(Formateador.leeParametroInteger(request.getParameter(PARAM_CANDIDATO)));
 		bean.setCandidato(candidato);
 		
-		List<TitulacionUsuario> listaValidadas = modeloTitulacion.listaTitulacionesValidadasCandidato(candidato.getCodNum());
-		bean.setValidadas(listaValidadas);
+		switch (nombreAccion) {
+			case ACCION_ACREDITACION_DESELECCIONADA:
+				seleccionarAcreditacion(bean, datos, request, response, false);
+			case ACCION_ACREDITACION_SELECCIONADA:
+				seleccionarAcreditacion(bean, datos, request, response, true);
+			case ACCION_CANDIDATO_SELECCIONADO:
+				obtenerCodigoPadreAcreditacion(bean);
+				break;
+			case ACCION_DATATABLE_ACREDITACIONES_CANDIDATO:
+				listadoAcreditacionesCandidato(bean, datos, request, response);
+				break;
+		}
+		
 	}
 	
-	/** 
-	 * Selecciona una titulación para validarla o no .
+	private void obtenerCodigoPadreAcreditacion(VistaFiltrarAcreditaciones bean) throws SQLException, UVException {
+		ParametrosConfiguracion config = ModeloParametrosConfiguracion.obtenerInstancia().getParametroByNombre("bolsaempleo.local.codMeritoPreferente");
+		bean.setCodigoPadreMeritoPreferente(config.getValor());
+	}
+	
+	/** Selecciona una acreditación para validarla o no .
 	 * @param bean .
 	 * @param datos .
 	 * @param request .
 	 * @param response .
-	 * @param seleccionado .
+	 * @param seleccionada .
 	 * @throws IOException .
+	 * @throws UVException .
 	 * @throws SQLException .
 	 */
-	private void seleccionarTitulacion(VistaFiltrar bean, UVDatos datos, HttpServletRequest request, HttpServletResponse response, boolean seleccionado)
+	private void seleccionarAcreditacion(VistaFiltrarAcreditaciones bean, UVDatos datos, HttpServletRequest request, HttpServletResponse response, boolean seleccionada)
 			throws IOException, UVException, SQLException {
-		ModeloMisTitulaciones modeloTitulacion = ModeloMisTitulaciones.obtenerInstancia();
-		ModeloUsuarioBolsaEmpleo modeloUsuario = ModeloUsuarioBolsaEmpleo.obtenerInstancia();
 		datos.setContentType(RESPONSE_AJAX_CONTENTTYPE);
 		datos.setRespuestaEnviada(true);
 		response.setContentType(RESPONSE_AJAX_CONTENTTYPE);
@@ -211,26 +197,18 @@ public class ControladorFiltrar extends HttpServlet {
 		
 		try (PrintWriter writer = response.getWriter()) {
 			try {
-				TitulacionUsuario titulacion = modeloTitulacion.getTitulacionUsuarioById(Formateador.leeParametroInteger(request.getParameter(PARAM_TITULACION)));
-				bean.setTitulacion(titulacion);
-				UsuarioBolsaEmpleo candidato = modeloUsuario.getUsuarioById(Formateador.leeParametroInteger(request.getParameter(PARAM_CANDIDATO)));
-				bean.setCandidato(candidato);
+				Integer acreditacionId = Formateador.leeParametroInteger(request.getParameter(PARAM_ACREDITACION));
+				ModeloMeritosPreferentesCandidato modeloAcreditacion = ModeloMeritosPreferentesCandidato.obtenerInstancia();
+				MeritoPreferenteUsuario acreditacion = modeloAcreditacion.getMeritoPreferenteUsuarioById(acreditacionId, bean.getCandidato());
+				bean.setAcreditacion(acreditacion);
 				
-				if (titulacion == null) {
-					throw new UVException("titulacion no puede ser nula");
-				}
-				
-				if (candidato == null) {
-					throw new UVException("candidato no puede ser nulo");
-				}
-				
-				if (seleccionado) {
-					modeloTitulacion.validaTitulacion(titulacion, candidato, BolsaEmpleoUtils.getCurrentDate());
+				if (seleccionada) {
+					modeloAcreditacion.validaAcreditacion(acreditacion, bean.getCandidato(), BolsaEmpleoUtils.getCurrentDate());
 				} else {
-					modeloTitulacion.desvalidaTitulacion(titulacion, candidato);
+					modeloAcreditacion.desvalidaAcreditacion(acreditacion, bean.getCandidato());
 				}
 				
-				CodigoDescripcion mensaje = new CodigoDescripcion("ok", seleccionado ? "titulación validada" : "titulación no validada");
+				CodigoDescripcion mensaje = new CodigoDescripcion("ok", seleccionada ? "acreditación validada" : "acreditación no validada");
 				writer.write(new Gson().toJson(mensaje));
 			} catch (Exception ex) {
 				bean.getMensajesDeError().add(ex.getMessage());
@@ -250,7 +228,7 @@ public class ControladorFiltrar extends HttpServlet {
 	 * @throws IOException .
 	 * @throws SQLException .
 	 */
-	private void listadoCandidatos(VistaFiltrar bean, UVDatos datos, HttpServletRequest request, HttpServletResponse response) throws IOException, SQLException {
+	private void listadoCandidatos(VistaFiltrarAcreditaciones bean, UVDatos datos, HttpServletRequest request, HttpServletResponse response) throws IOException, SQLException {
 		ModeloCandidato modeloCandidato = ModeloCandidato.obtenerInstancia();
 		
 		datos.setContentType(RESPONSE_AJAX_CONTENTTYPE);
@@ -260,7 +238,7 @@ public class ControladorFiltrar extends HttpServlet {
 		
 		try (PrintWriter writer = response.getWriter()) {
 			try {
-				BolsaEmpleoDataTable<Candidato> dataTable = modeloCandidato.listaCandidatosDatatable(request.getParameterMap());
+				BolsaEmpleoDataTable<CandidatoAcreditacionesTable> dataTable = modeloCandidato.listaCandidatosAcreditacionesDatatable(request.getParameterMap());
 				bean.setDatatableCandidatos(dataTable);
 				writer.write(dataTable.toJson());
 			} catch (UVException e) {
@@ -278,27 +256,29 @@ public class ControladorFiltrar extends HttpServlet {
 				response.setStatus(RESPONSE_AJAX_HTTP_CODE_ERROR);
 			}
 		}
-	}	
+	}
 	
-	/** carga las titulaciones de un usuario en una tabla .
+	/**
+	 * Lista de acreditaciones candidato datatable .
 	 * @param bean .
 	 * @param datos .
 	 * @param request .
 	 * @param response .
-	 * @throws IOException en caso de error de input u output .
-	 * @throws SQLException excepcion de bbdd.
+	 * @throws IOException .
+	 * @throws SQLException .
 	 */
-	private void listadoTitulacionesCandidato(VistaFiltrar bean, UVDatos datos, HttpServletRequest request, HttpServletResponse response) throws IOException, SQLException {
-		ModeloMisTitulaciones modelo = ModeloMisTitulaciones.obtenerInstancia();
+	private void listadoAcreditacionesCandidato(VistaFiltrarAcreditaciones bean, UVDatos datos, HttpServletRequest request, HttpServletResponse response)
+			throws IOException, SQLException {
 		datos.setContentType(RESPONSE_AJAX_CONTENTTYPE);
+		datos.setRespuestaEnviada(true);
 		response.setContentType(RESPONSE_AJAX_CONTENTTYPE);
 		response.setCharacterEncoding(RESPONSE_AJAX_ENCODING);
 		
 		try (PrintWriter writer = response.getWriter()) {
 			try {
-				Integer candidato = Formateador.leeParametroInteger(request.getParameter(PARAM_CANDIDATO));
-				BolsaEmpleoDataTable<TitulacionUsuario> dataTable = modelo.listaTitulacionesUsuarioDatatable(request.getParameterMap(), candidato);
-				bean.setDatatableTitulaciones(dataTable);
+				BolsaEmpleoDataTable<MeritoPreferenteUsuario> dataTable = ModeloMeritosPreferentesCandidato.obtenerInstancia().
+						listaMeritosCandidatoDatatable(request.getParameterMap(), bean.getCandidato());
+				bean.setDataTableAcreditaciones(dataTable);
 				writer.write(dataTable.toJson());
 			} catch (UVException e) {
 				LOGGER.log(Level.WARNING, e.toString());
@@ -317,36 +297,4 @@ public class ControladorFiltrar extends HttpServlet {
 		}
 	}
 	
-	/** descarga un fichero .
-	 * @param bean .
-	 * @param datos .
-	 * @param request .
-	 * @param response .
-	 * @throws SQLException excepcion de bbdd.
-	 * @throws UVException en caso de error de parametros .
-	 * @throws IOException en caso de error de input u output .
-	 */
-	private void descargarFichero(VistaFiltrar bean, UVDatos datos, HttpServletRequest request, HttpServletResponse response)
-			throws SQLException, UVException, IOException {
-		ModeloMisTitulaciones modelo = ModeloMisTitulaciones.obtenerInstancia();
-		if (EscapaHTML.ajustaCodificacion(request.getParameter(PARAM_FICHERO)) != null) {
-			TitulacionUsuario titulacion = modelo.getTitulacionUsuarioById(Formateador.leeParametroInteger(request.getParameter(PARAM_FICHERO)));
-			bean.setTitulacion(titulacion);
-			
-			response.setContentType("application/pdf");
-			datos.setRespuestaEnviada(true);
-	        
-			try (ServletOutputStream stream = response.getOutputStream(); BufferedInputStream buf = new BufferedInputStream(titulacion.getArchivo())) {
-				int readBytes = 0;
-				while ((readBytes = buf.read()) != -1) {
-					stream.write(readBytes);
-				}
-				stream.flush();
-			} catch (Exception ex) {
-				LOGGER.log(Level.SEVERE, Formateador.getStackTrace(ex));
-				LOGGER.log(Level.SEVERE, ex.toString());
-				bean.getMensajesDeError().add(ex.getMessage());
-	        }			
-		}
-	}
 }

@@ -2,7 +2,7 @@
  * Datatable
  * @copyright ATISoluciones 2021
  */
-
+ 
 function DataTable(id, config) {
     this.id = id;
     this.idFinal = id.substring(1);
@@ -112,8 +112,14 @@ function DataTable(id, config) {
 
         row.selected = false;
         
-        if (Array.isArray(self.config.selected)) {            
-            self.config.selected.forEach(function (element) {
+        if (self.config.selectedAll) {
+        	if (!Array.isArray(self.config.selected)) {
+        		self.config.selected = [];
+        	}        	      
+        	self.config.selected.push(row.codNum);
+        	row.selected = true;
+        } else if (Array.isArray(self.config.selected)) {
+        	self.config.selected.forEach(function (element) {
                 if (element === row.codNum) {
                     row.selected = true;
                 }
@@ -161,26 +167,31 @@ function DataTable(id, config) {
     		var buttons = $('<span class="btns"></span>');
     		
     		columnDef.buttons.forEach(function(buttonDef) {
-                var label = isFunction(buttonDef.label) ? buttonDef.label(row) : buttonDef.label;
-                var title = isFunction(buttonDef.title) ? buttonDef.title(row) : buttonDef.title;
-    			var btn = $('<button class="btn"' + (title ? 'title="' + title + '"' : '') + ' type="button">'+ (label ? label : '')+'</button>');
+                var label = Atis.isFunction(buttonDef.label) ? buttonDef.label(row) : buttonDef.label;
+                var title = Atis.isFunction(buttonDef.title) ? buttonDef.title(row) : buttonDef.title;
+                var visible = Atis.isFunction(buttonDef.visible) ? buttonDef.visible(row) : !Atis.isUndefined(buttonDef.visible) ? buttonDef.visible : true;
+                
+                if (visible) {
+                	var btn = $('<button class="btn"' + (title ? 'title="' + title + '"' : '') + ' type="button">'+ (label ? label : '')+'</button>');
     			
-    			if (buttonDef.hasOwnProperty('class')) {
-    				$(btn).addClass(isFunction(buttonDef.class) ? buttonDef.class(row) : buttonDef.class);
-    			}
-
-                if (buttonDef.hasOwnProperty('icon')) {
-                    var position = buttonDef.icon.position ? buttonDef.icon.position : 'left';
-                    var icon = $('<i class="' + buttonDef.icon.class + '"></i>');
-                    if (position == 'left') {
-                        btn.prepend(icon);
-                    } else {
-                        btn.append(icon);
-                    }
-                }
-    			
-    			$(btn).on('click', buttonDef.onClick.bind($(btn), row, self));
-    			$(buttons).append(btn);
+	    			if (buttonDef.hasOwnProperty('class')) {
+	    				$(btn).addClass(Atis.isFunction(buttonDef.class) ? buttonDef.class(row) : buttonDef.class);
+	    			}
+	
+	                if (buttonDef.hasOwnProperty('icon')) {
+	                    var position = buttonDef.icon.position ? buttonDef.icon.position : 'left';
+	                    var icon = $('<i class="' + buttonDef.icon.class + '"></i>');
+	                    if (position == 'left') {
+	                        btn.prepend(icon);
+	                    } else {
+	                        btn.append(icon);
+	                    }
+	                }
+	    			
+	    			$(btn).on('click', buttonDef.onClick.bind($(btn), row, self));
+	                $(btn).on('click', event => event.stopPropagation());
+	    			$(buttons).append(btn);
+                }    			
     		});
 
     		return buttons;
@@ -206,7 +217,7 @@ function DataTable(id, config) {
                     checked ? selected.push(value) : Atis.removeValueArray(selected, value);
                 }
                 
-    			self.checked[value] = checked;
+                typeof value !== 'undefined' ? self.checked[value] = checked : '';
                 checked ? $(this).parent().parent().addClass("selected") : $(this).parent().parent().removeClass("selected");
     			self.renderFooter();
 
@@ -544,6 +555,10 @@ function DataTable(id, config) {
         self.filterParams[indexColumnDef] = value;
         self.params.page = 0;
         
+        if (self.config.selectedAll) {
+        	self.config.selected = [];
+        }
+                
         if (value == "" || value == 0) {
             delete self.filterParams[indexColumnDef];
         }

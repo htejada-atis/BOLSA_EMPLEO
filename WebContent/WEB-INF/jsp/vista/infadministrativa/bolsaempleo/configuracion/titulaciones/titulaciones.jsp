@@ -17,9 +17,9 @@ VistaTitulaciones bean = (VistaTitulaciones) uvdatos.getVistas().get(VistaTitula
 	<div class="titulo-bolsa-empleo">
 		<h2>Titulaciones</h2>
     
-	    <a class="link-btn" id="nueva_titulacion" href="<%= request.getRequestURI() %>">
+	    <button class="link-btn" id="nueva_titulacion">
 	    	 Nueva titulación
-	    </a>
+	    </button>
 	</div>
 	
 	<table class="bluetable bolsaempleo" id="table_titulaciones">

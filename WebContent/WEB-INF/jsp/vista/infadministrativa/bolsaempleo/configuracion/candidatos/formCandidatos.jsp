@@ -164,13 +164,13 @@ UsuarioBolsaEmpleo usuarioBolsa = bean.getUsuario();
 
 		<div class="form-group-container col3" style="margin-top:1rem; display:none;" id="buttonsEdit">
     	    <div class="form-group">
-    			<a class="link-btn" id="areas_excluidas" href="#" style="margin-top:0;">Áreas excluidas</a>
+    			<button id="areas_excluidas" style="margin-top:0;">Áreas excluidas</button>
     		</div>
     		<div class="form-group">
-				<a class="link-btn" id="solicitudes" href="#" style="margin-top:0;">Solicitudes</a>
+				<button id="solicitudes" style="margin-top:0;">Solicitudes</button>
     		</div>
     		<div class="form-group">
-				<a class="link-btn" id="comunicaciones" href="#" style="margin-top:0;">Comunicaciones</a>
+				<button id="comunicaciones" style="margin-top:0;">Comunicaciones</button>
     		</div>
     	</div>
     </form>

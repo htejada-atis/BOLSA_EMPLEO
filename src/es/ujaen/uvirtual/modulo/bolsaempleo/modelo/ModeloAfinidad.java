@@ -19,7 +19,7 @@ import es.ujaen.uvirtual.utilidades.UVException;
 /**
  * Clase de modelo para la gestión de afinidades .
  * 
- * @author fcampos
+ * @author ATISoluciones
  */
 public class ModeloAfinidad {
 	public static final int ORDER_COLUMN_INDEX_CODIGO = 1;

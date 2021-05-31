@@ -9,7 +9,6 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
-
 import es.ujaen.uvirtual.modelo.conexion.ConexionUvirtual;
 import es.ujaen.uvirtual.modulo.bolsaempleo.beans.MeritoPreferenteUsuario;
 import es.ujaen.uvirtual.modulo.bolsaempleo.beans.UsuarioBolsaEmpleo;
@@ -31,7 +30,13 @@ public class ModeloMeritosPreferentesCandidato {
 	
 	public static final int MAX_LENGTH_COLUMN_DESCRIPCION = 250;
 	public static final int MAX_LENGTH_COLUMN_FACTOR = 20;
-						
+	
+	public static final String ERROR_ACREDITACION_OBLIGATORIA = "Acreditacion obligatoria";
+	public static final String ERROR_CANDIDATO_OBLIGATORIO = "Candidato obligatorio";
+	public static final String ERROR_ID_ACREDITACION_OBLIGATORIA = "Id acreditacion no válida";
+	public static final String ERROR_ID_USUARIO_NO_VALIDO = "Id usuario no válido";
+	public static final String ERROR_SIN_MERITO_PREFERENTE = "Mérito preferente requerido";
+	
 	protected static ModeloMeritosPreferentesCandidato eInstancia;
 
 	/** Crea una instancia del objeto.
@@ -115,7 +120,7 @@ public class ModeloMeritosPreferentesCandidato {
 	 * @throws SQLException .
 	 */
 	public void insertaMeritoUsuario(MeritoPreferenteUsuario mp) throws SQLException {
-		String consulta = "INSERT INTO TBEP_MER_PRE_USUARIO (BEPMEP_CODNUM,BEPUSU_CODNUM,BEPMOP_CODNUM,DESCRIPCION,ARCHIVO) VALUES (?,?,?,?,?)";
+		String consulta = "INSERT INTO TBEP_MER_PRE_USUARIO (BEPMEP_CODNUM,BEPUSU_CODNUM,BEPMPO_CODNUM,DESCRIPCION,ARCHIVO) VALUES (?,?,?,?,?)";
 		
 		try (Connection conexion = ConexionUvirtual.obtenerInstancia(); PreparedStatement stmt = conexion.prepareStatement(consulta)) {
 			int parameterIndex = 1;
@@ -197,16 +202,16 @@ public class ModeloMeritosPreferentesCandidato {
 		obj.setCodNum(rs.getInt("CODNUM"));
 		obj.setMeritoPreferente(ModeloMeritosPreferentes.obtenerInstancia().getMeritoPreferenteById(rs.getInt("BEPMEP_CODNUM")));
 		obj.setUsuario(ModeloUsuarioBolsaEmpleo.obtenerInstancia().getUsuarioById(rs.getInt("BEPUSU_CODNUM")));
-		if (rs.getInt("BEPMOP_CODNUM") != 0) {
-			obj.setMeritoPreferenteOpcion(ModeloMeritosPreferentes.obtenerInstancia().getMeritoPreferenteOpcionById(rs.getInt("BEPMOP_CODNUM")));	
+		if (rs.getInt("BEPMPO_CODNUM") != 0) {
+			obj.setMeritoPreferenteOpcion(ModeloMeritosPreferentes.obtenerInstancia().getMeritoPreferenteOpcionById(rs.getInt("BEPMPO_CODNUM")));	
 		} else {
 			obj.setMeritoPreferenteOpcion(null);
 		}		
 		obj.setDescripcion(rs.getString("DESCRIPCION"));
 		obj.setArchivo(rs.getBinaryStream("ARCHIVO"));
-		obj.setBorrado(rs.getBoolean("FLGBORRADO"));
+		obj.setBorrado(rs.getString("FLGBORRADO").equals("S"));
 		obj.setFechaBorrado(rs.getDate("FECHA_BORRADO"));
-		obj.setValidado(rs.getBoolean("FLGVALIDADO"));
+		obj.setValidado(rs.getString("FLGVALIDADO").equals("S"));
 		obj.setFechaValidado(rs.getDate("FECHA_VALIDADO"));
 		return obj;
 	}
@@ -236,6 +241,66 @@ public class ModeloMeritosPreferentesCandidato {
 		}	
 	}
 	
-
+	/**
+	 * Desvalida una acreditacion .
+	 * @param acreditacion .
+	 * @param candidato .
+	 * @throws SQLException .
+	 * @throws UVException .
+	 */
+	public void desvalidaAcreditacion(MeritoPreferenteUsuario acreditacion, UsuarioBolsaEmpleo candidato) throws SQLException, UVException {
+		checkeosValidadDesvalida(acreditacion, candidato);
+		
+		String consulta = "UPDATE TBEP_MER_PRE_USUARIO "
+				+ "	SET FLGVALIDADO = 'N', FECHA_VALIDADO = null"
+				+ " WHERE CODNUM = ? AND BEPUSU_CODNUM = ?";
+		try (Connection conexion = ConexionUvirtual.obtenerInstancia(); PreparedStatement stmt = conexion.prepareStatement(consulta)) {
+			int parameterIndex = 1;
+			stmt.setInt(parameterIndex++, acreditacion.getCodNum());
+			stmt.setInt(parameterIndex++, candidato.getCodNum());
+			stmt.executeUpdate();
+		}
+	}
+	
+	/**
+	 * Valida una acreditacion .
+	 * @param acreditacion .
+	 * @param candidato .
+	 * @param date .
+	 * @throws SQLException .
+	 * @throws UVException .
+	 */
+	public void validaAcreditacion(MeritoPreferenteUsuario acreditacion, UsuarioBolsaEmpleo candidato, Date date) throws SQLException, UVException {
+		checkeosValidadDesvalida(acreditacion, candidato);
+		
+		String consulta = "UPDATE TBEP_MER_PRE_USUARIO "
+				+ "	SET FLGVALIDADO = 'S', FECHA_VALIDADO = ?"
+				+ " WHERE CODNUM = ? AND BEPUSU_CODNUM = ?";
+		try (Connection conexion = ConexionUvirtual.obtenerInstancia(); PreparedStatement stmt = conexion.prepareStatement(consulta)) {
+			int parameterIndex = 1;
+			stmt.setDate(parameterIndex++, new java.sql.Date(date.getTime()));
+			stmt.setInt(parameterIndex++, acreditacion.getCodNum());
+			stmt.setInt(parameterIndex++, candidato.getCodNum());
+			stmt.executeUpdate();
+		}
+	}
+	
+	private void checkeosValidadDesvalida(MeritoPreferenteUsuario acreditacion, UsuarioBolsaEmpleo candidato) throws UVException {
+		if (acreditacion == null) {
+			throw new UVException(ERROR_ACREDITACION_OBLIGATORIA);
+		}
+		if (acreditacion.getCodNum() == null) {
+			throw new UVException(ERROR_ID_ACREDITACION_OBLIGATORIA);
+		}
+		if (candidato == null) {
+			throw new UVException(ERROR_CANDIDATO_OBLIGATORIO);
+		}
+		if (candidato.getCodNum() == null) {
+			throw new UVException(ERROR_ID_USUARIO_NO_VALIDO);
+		}
+		if (acreditacion.getMeritoPreferente() == null) {
+			throw new UVException(ERROR_SIN_MERITO_PREFERENTE);
+		}
+	}
 	
 }

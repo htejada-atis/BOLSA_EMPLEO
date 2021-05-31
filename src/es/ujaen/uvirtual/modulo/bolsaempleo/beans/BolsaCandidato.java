@@ -42,7 +42,7 @@ public class BolsaCandidato extends Bolsa implements Serializable {
 	public int hashCode() {
 		final int prime = 31;
 		int result = 1;
-		result = prime * super.hashCode();
+		result = prime * result + super.hashCode();
 		result = prime * result + ((excluido == null) ? 0 : excluido.hashCode());
 		return result;
 	}
@@ -59,12 +59,10 @@ public class BolsaCandidato extends Bolsa implements Serializable {
 		if (getClass() != obj.getClass()) {
 			return false;
 		}
-		
 		BolsaCandidato other = (BolsaCandidato) obj;
 		if (!super.equals(other)) {
 			return false;
 		}
-		
 		if (excluido == null) {
 			if (other.excluido != null) {
 				return false;

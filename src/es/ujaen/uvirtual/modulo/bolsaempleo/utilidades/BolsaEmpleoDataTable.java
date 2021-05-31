@@ -310,7 +310,16 @@ public class BolsaEmpleoDataTable<T> {
 	 * @return .
 	 */
 	public String toJson() {
-		Gson gson = new GsonBuilder().setDateFormat("dd/M/yyyy").setExclusionStrategies(BolsaEmpleoDataTable.GSONEXCLUSIONSTRATEGY).create();		
+		return toJson("dd/M/yyyy");
+	}
+	
+	/**
+	 * Devuleve el json del estado actual del datatable, con un formato de fecha personalizado.
+	 * @param dateFormat .
+	 * @return .
+	 */
+	public String toJson(String dateFormat) {
+		Gson gson = new GsonBuilder().setDateFormat(dateFormat).setExclusionStrategies(BolsaEmpleoDataTable.GSONEXCLUSIONSTRATEGY).create();		
 		return gson.toJson(this);
 	}
 	

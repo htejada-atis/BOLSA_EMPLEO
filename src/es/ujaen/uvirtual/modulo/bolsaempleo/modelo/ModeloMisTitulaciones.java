@@ -43,7 +43,6 @@ public class ModeloMisTitulaciones {
 	public static final String ERROR_ID_USUARIO_NO_VALIDO = "Id usuario no válido";
 	public static final String ERROR_SIN_TITULACION = "La titulación requerida";
 	
-	
 	public static final int COLUMN_DESCRIPCION_MAXLENGTH = 250;
 
 	protected static ModeloMisTitulaciones eInstancia;
@@ -152,7 +151,6 @@ public class ModeloMisTitulaciones {
 		
 		return dataTable;
 	}
-	
 	
 	/**
 	 * Listado de titulaciones de un usuario en una tabla .
@@ -278,8 +276,6 @@ public class ModeloMisTitulaciones {
 		}
 	}
 	
-	
-	
 	/** Elimina una titulación de un usuario .
 	 * @param titulaciones a borrar
 	 * @throws SQLException en caso de error en la BD
@@ -300,31 +296,6 @@ public class ModeloMisTitulaciones {
 			stmt.executeUpdate();
 		}
 	}
-	
-	private TitulacionUsuario setTitulacionUsuarioFromResultSet(ResultSet rs, Boolean archivo) throws SQLException, UVException {
-		TitulacionUsuario tit = new TitulacionUsuario();
-		tit.setCodNum(rs.getInt("CODNUM"));
-		tit.setDescripcion(rs.getString("DESCRIPCION"));
-		tit.setUsuario(ModeloUsuarioBolsaEmpleo.obtenerInstancia().getUsuarioById(rs.getInt("BEPTUS_USU_CODNUM")));
-		
-		if (rs.getInt("BEPTUS_TIT_CODNUM") != 0) {
-			tit.setTitulacion(ModeloTitulacion.obtenerInstancia().getTitulacionById(rs.getInt("BEPTUS_TIT_CODNUM")));
-		} else {
-			tit.setOtraTitulacion(EscapaHTML.ajustaCodificacion(rs.getString("OTRATITULACION")));
-		}
-
-		if (Boolean.TRUE.equals(archivo)) {
-			tit.setArchivo(rs.getBlob("ARCHIVO").getBinaryStream());
-		}
-
-		tit.setBorrado("S".equals(rs.getString("FLGBORRADO")));
-		tit.setFechaBorrado(rs.getDate("FECHA_BORRADO"));
-		tit.setValidada("S".equals(rs.getString("FLGVALIDADA")));
-		tit.setFechaValidada(rs.getDate("FECHA_VALIDADA"));
-		
-		return tit;
-	}
-	
 	
 	/** lista todas las titulaciones validadas del candidato .
 	 * @param usuario .
@@ -385,12 +356,46 @@ public class ModeloMisTitulaciones {
 	public void desvalidaTitulacion(TitulacionUsuario titulacion, UsuarioBolsaEmpleo candidato) throws SQLException, UVException {
 		checkeosValidadDesvalida(titulacion, candidato);
 		
-		String consulta = "UPDATE TBEP_TITULACIONES_USUARIO "
-				+ " SET FLGVALIDADA='N', FECHA_VALIDADA=null"
+		String consulta = "UPDATE TBEP_TITULACIONES_USUARIO SET FLGVALIDADA='N', FECHA_VALIDADA=null"
 				+ " WHERE BEPTUS_TIT_CODNUM = ? AND BEPTUS_USU_CODNUM = ?";
 		try (Connection conexion = ConexionUvirtual.obtenerInstancia(); PreparedStatement stmt = conexion.prepareStatement(consulta)) {
 			int parameterIndex = 1;
 			stmt.setInt(parameterIndex++, titulacion.getTitulacion().getCodNum());
+			stmt.setInt(parameterIndex++, candidato.getCodNum());
+			stmt.executeUpdate();
+		}
+	}
+	
+	/**
+	 * Cambia la titulación (fk) del usuario.
+	 * @param titulacionUsuario .
+	 * @param candidato .
+	 * @param titulacion .
+	 * @throws SQLException .
+	 * @throws UVException .
+	 */
+	public void cambiarTitulacion(TitulacionUsuario titulacionUsuario, UsuarioBolsaEmpleo candidato, Titulacion titulacion) throws UVException, SQLException {
+		if (titulacionUsuario == null) {
+			throw new UVException(ERROR_TITULACION_OBLIGATORIA);
+		}
+		if (titulacionUsuario.getCodNum() == null) {
+			throw new UVException(ERROR_ID_TITULACION_OBLIGATORIO);
+		}
+		if (candidato == null) {
+			throw new UVException(ERROR_CANDIDATO_OBLIGATORIO);
+		}
+		if (candidato.getCodNum() == null) {
+			throw new UVException(ERROR_ID_USUARIO_NO_VALIDO);
+		}
+		if (titulacion == null || titulacion.getCodNum() == null) {
+			throw new UVException(ERROR_TITULACION_OBLIGATORIA);
+		}
+		
+		String consulta = "UPDATE TBEP_TITULACIONES_USUARIO SET BEPTUS_TIT_CODNUM = ? WHERE CODNUM = ? AND BEPTUS_USU_CODNUM = ?";
+		try (Connection conexion = ConexionUvirtual.obtenerInstancia(); PreparedStatement stmt = conexion.prepareStatement(consulta)) {
+			int parameterIndex = 1;
+			stmt.setInt(parameterIndex++, titulacion.getCodNum());
+			stmt.setInt(parameterIndex++, titulacionUsuario.getCodNum());
 			stmt.setInt(parameterIndex++, candidato.getCodNum());
 			stmt.executeUpdate();
 		}
@@ -412,5 +417,29 @@ public class ModeloMisTitulaciones {
 		if (titulacion.getTitulacion() == null) {
 			throw new UVException(ERROR_SIN_TITULACION);
 		}
+	}
+
+	private TitulacionUsuario setTitulacionUsuarioFromResultSet(ResultSet rs, Boolean archivo) throws SQLException, UVException {
+		TitulacionUsuario tit = new TitulacionUsuario();
+		tit.setCodNum(rs.getInt("CODNUM"));
+		tit.setDescripcion(rs.getString("DESCRIPCION"));
+		tit.setUsuario(ModeloUsuarioBolsaEmpleo.obtenerInstancia().getUsuarioById(rs.getInt("BEPTUS_USU_CODNUM")));
+		
+		if (rs.getInt("BEPTUS_TIT_CODNUM") != 0) {
+			tit.setTitulacion(ModeloTitulacion.obtenerInstancia().getTitulacionById(rs.getInt("BEPTUS_TIT_CODNUM")));
+		} else {
+			tit.setOtraTitulacion(EscapaHTML.ajustaCodificacion(rs.getString("OTRATITULACION")));
+		}
+
+		if (Boolean.TRUE.equals(archivo)) {
+			tit.setArchivo(rs.getBlob("ARCHIVO").getBinaryStream());
+		}
+
+		tit.setBorrado("S".equals(rs.getString("FLGBORRADO")));
+		tit.setFechaBorrado(rs.getDate("FECHA_BORRADO"));
+		tit.setValidada("S".equals(rs.getString("FLGVALIDADA")));
+		tit.setFechaValidada(rs.getDate("FECHA_VALIDADA"));
+		
+		return tit;
 	}
 }

@@ -132,23 +132,23 @@ public class ModeloConvocatoria {
 	public List<Convocatoria> listaConvocatorias() throws SQLException {
 		List<Convocatoria> convocatorias = new ArrayList<>();
 		String consulta = "SELECT bepcon.* FROM TBEP_CONVOCATORIAS bepcon";
-		
+
 		try (Connection conexion = ConexionUvirtual.obtenerInstancia();
-			PreparedStatement stmt = conexion.prepareStatement(consulta);) {
-				try (ResultSet rs = stmt.executeQuery()) {
-					while (rs.next()) {
-						Convocatoria convocatoria = new Convocatoria();
-						convocatoria.setCodNum(rs.getInt("CODNUM"));
-						convocatoria.setDescripcion(rs.getString("DESCRIPCION"));
-						convocatoria.setFechaCierre(rs.getDate("FECHACIERRE"));
-						convocatoria.setEstado(rs.getString("ESTADO"));		
-						convocatoria.setNumBolsasMaximo(rs.getInt("NUMBOLSASMAXIMO"));		
-						convocatoria.setNumMeritosPorBloque(rs.getInt("NUMMERITOSPORBLOQUE"));		
-						convocatorias.add(convocatoria);
-					}
+				PreparedStatement stmt = conexion.prepareStatement(consulta)) {
+			try (ResultSet rs = stmt.executeQuery()) {
+				while (rs.next()) {
+					Convocatoria convocatoria = new Convocatoria();
+					convocatoria.setCodNum(rs.getInt("CODNUM"));
+					convocatoria.setDescripcion(rs.getString("DESCRIPCION"));
+					convocatoria.setFechaCierre(rs.getDate("FECHACIERRE"));
+					convocatoria.setEstado(rs.getString("ESTADO"));
+					convocatoria.setNumBolsasMaximo(rs.getInt("NUMBOLSASMAXIMO"));
+					convocatoria.setNumMeritosPorBloque(rs.getInt("NUMMERITOSPORBLOQUE"));
+					convocatorias.add(convocatoria);
 				}
 			}
-		
+		}
+
 		return convocatorias;
 	}
 	

@@ -225,7 +225,6 @@ public class ControladorGestionEvaluadores extends HttpServlet {
 			default:
 				errorFatal(bean, MENSAJE_ERROR_ACCION_NO_CONTEMPLADA);
 		}
-		
 	}
 	
 	private void seleccionarArea(VistaEvaluadores bean, HttpServletRequest request, HttpServletResponse response) throws SQLException, UVException {

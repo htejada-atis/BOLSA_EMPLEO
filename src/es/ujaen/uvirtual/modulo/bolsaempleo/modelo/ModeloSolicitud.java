@@ -163,6 +163,44 @@ public class ModeloSolicitud {
 	}
 	
 	/**
+	 * Comprueba si hay solicitudes cerradas de un usuario para una convocatoria.
+	 * @param usuario .
+	 * @param convocatoria .
+	 * @return .
+	 * @throws UVException .
+	 * @throws SQLException .
+	 */
+	public Solicitud getSolicitudByConvocatoriaUsuario(UsuarioBolsaEmpleo usuario, Convocatoria convocatoria) throws SQLException, UVException {
+		String consulta = "SELECT *"
+			  + " FROM TBEP_SOLICITUDES bepsol"
+			  + " WHERE bepsol.ESTADO = ? "
+			  + " AND bepsol.BEPCON_CODNUM = ?"
+			  + " AND bepsol.BEPUSU_CODNUM = ?";
+		
+		try (Connection conexion = ConexionUvirtual.obtenerInstancia(); 
+				PreparedStatement stmt = conexion.prepareStatement(consulta)) {
+			
+			int paramIndex = 1;
+			stmt.setString(paramIndex++, SOLICITUD_ESTADO_CERRADA);
+			stmt.setInt(paramIndex++, convocatoria.getCodNum());			
+			stmt.setInt(paramIndex++, usuario.getCodNum());
+
+			try (ResultSet rs = stmt.executeQuery()) {
+				if (!rs.next()) {
+					throw new UVException("No existe solicitud cerrada");
+				}
+				
+				Solicitud solicitud = new Solicitud();
+				solicitud.setCodNum(rs.getInt("CODNUM"));		
+				solicitud.setConvocatoria(convocatoria);				
+				solicitud.setEstado(rs.getString("ESTADO") != null ? rs.getString("ESTADO") : ModeloSolicitud.SOLICITUD_ESTADO_CERRADA);
+				return solicitud;
+    		}
+		}
+		
+	}
+	
+	/**
 	 * Crea una nueva solicitud para una convocatoria.
 	 * @param usuario .
 	 * @param convocatoria .
@@ -656,6 +694,43 @@ public class ModeloSolicitud {
 		}
 	}
 	
+	/** El evaluador ha modificado la afinidad del mérito no individualizado . 
+	 * @param solicitud .
+	 * @param bolsa .
+	 * @param merito .
+	 * @param afinidades .
+	 * @throws SQLException .
+	 * @throws UVException .
+	 */
+	public void actualizarAfinidadesMeritoNoIndividualizado(Solicitud solicitud, Bolsa bolsa, Merito merito, Map<Afinidad, Float> afinidades) throws SQLException, UVException {
+		try (Connection conexion = ConexionUvirtual.obtenerInstancia()) {
+			conexion.setAutoCommit(false);
+			
+			MeritoSolicitud meritoSolicitud = this.getMeritoSolicitud(solicitud.getCodNum(), bolsa.getCodNum(), merito.getCodNum());
+			
+			for (Map.Entry<Afinidad, Float> entry : afinidades.entrySet()) {
+				String sqlInsert = "UPDATE TBEP_SOL_BOL_MER_VALORACION"
+						+ " SET VALOR = ?"
+						+ " WHERE BEPSBM_CODNUM = ? AND BEPAFI_CODNUM = ?";
+				
+				try (PreparedStatement stmt = conexion.prepareStatement(sqlInsert)) {
+					int indexParam = 1;
+					stmt.setFloat(indexParam++, entry.getValue());
+					stmt.setInt(indexParam++, meritoSolicitud.getCodNum());
+					stmt.setInt(indexParam++, entry.getKey().getCodNum());
+					stmt.executeUpdate();
+				} catch (SQLException e) {
+					conexion.rollback();
+					conexion.setAutoCommit(true);
+					throw e;
+				}				
+			}
+			
+			conexion.commit();
+			conexion.setAutoCommit(true);
+		}
+	}
+	
 	/**
 	 * Devuelve un merito solicitud asociado a una solicitud y una bolsa.
 	 * @param idSolicitud .
@@ -705,9 +780,9 @@ public class ModeloSolicitud {
 	 */
 	public MeritoSolicitud getMeritoSolicitudBy(Convocatoria convocatoria, Bolsa bolsa, Merito merito) throws SQLException, UVException {
 		String consulta = "SELECT bepsbm.*"
-				+ "	FROM UVIRTUAL.TBEP_SOL_BOL_MERITOS bepsbm"
-				+ "	INNER JOIN UVIRTUAL.TBEP_SOLICITUD_BOLSAS bepsbo ON bepsbo.CODNUM = bepsbm.BEPSBO_CODNUM"
-				+ "	INNER JOIN UVIRTUAL.TBEP_SOLICITUDES bepsol ON bepsol.CODNUM = bepsbo.BEPSOL_CODNUM"
+				+ "	FROM TBEP_SOL_BOL_MERITOS bepsbm"
+				+ "	INNER JOIN TBEP_SOLICITUD_BOLSAS bepsbo ON bepsbo.CODNUM = bepsbm.BEPSBO_CODNUM"
+				+ "	INNER JOIN TBEP_SOLICITUDES bepsol ON bepsol.CODNUM = bepsbo.BEPSOL_CODNUM"
 				+ "	WHERE bepsbm.BEPMER_CODNUM = ?"
 				+ "	AND bepsol.BEPCON_CODNUM = ?"
 				+ "	AND bepsbo.BEPBOL_CODNUM = ?";
@@ -730,7 +805,9 @@ public class ModeloSolicitud {
 				Boolean excluido = rs.getString(FLGEXCLUIDO).equals(S);
 				Boolean validado = rs.getString(FLGVALIDADO).equals(S);
 				String observacion = rs.getString(OBSERVACION_CANDIDATO);
-				return new MeritoSolicitud(codNum, mer, excluido, validado, observacion);
+				MeritoSolicitud merSol = new MeritoSolicitud(codNum, mer, excluido, validado, observacion);
+				merSol.setValoraciones(this.getValoracionesMeritoSolicitud(codNum, false));
+				return merSol;
 			}
 		}
 	}
@@ -762,7 +839,8 @@ public class ModeloSolicitud {
 				
 				Merito merito = ModeloMerito.obtenerInstancia().getMeritoById(rs.getInt(BEPMER_CODNUM), false, false);
 				
-				return new MeritoSolicitud(rs.getInt(CODNUM), merito, rs.getString(FLGEXCLUIDO).equals(S));
+				return new MeritoSolicitud(rs.getInt(CODNUM), merito, rs.getString(FLGEXCLUIDO).equals(S),
+						rs.getString(FLGVALIDADO).equals(S), rs.getString(OBSERVACION_CANDIDATO));
 			}
 		}
 	}
@@ -947,9 +1025,9 @@ public class ModeloSolicitud {
 	public List<MeritoSolicitudTable> getMeritosValoracionesSolicitudBolsa(Solicitud solicitud, Bolsa bolsa) throws SQLException, UVException {
 		List<MeritoSolicitudTable> meritos = new ArrayList<>();
 		
-		String consulta = "SELECT bepsbm.BEPMER_CODNUM, bepsbm.CODNUM FROM UVIRTUAL.TBEP_SOL_BOL_MERITOS bepsbm"
-				+ "	LEFT JOIN UVIRTUAL.TBEP_SOL_BOL_MER_VALORACION bepsbv ON bepsbm.CODNUM = bepsbv.BEPSBM_CODNUM"
-				+ "	INNER JOIN UVIRTUAL.TBEP_SOLICITUD_BOLSAS bepsbo ON bepsbo.CODNUM  = bepsbm.BEPSBO_CODNUM"
+		String consulta = "SELECT bepsbm.BEPMER_CODNUM, bepsbm.CODNUM FROM TBEP_SOL_BOL_MERITOS bepsbm"
+				+ "	LEFT JOIN TBEP_SOL_BOL_MER_VALORACION bepsbv ON bepsbm.CODNUM = bepsbv.BEPSBM_CODNUM"
+				+ "	INNER JOIN TBEP_SOLICITUD_BOLSAS bepsbo ON bepsbo.CODNUM  = bepsbm.BEPSBO_CODNUM"
 				+ "	WHERE bepsbo.BEPBOL_CODNUM = ? AND bepsbo.BEPSOL_CODNUM = ? GROUP BY bepsbm.BEPMER_CODNUM, bepsbm.CODNUM";
 		
 		try (Connection conexion = ConexionUvirtual.obtenerInstancia(); PreparedStatement stmt = conexion.prepareStatement(consulta)) {
@@ -1127,11 +1205,11 @@ public class ModeloSolicitud {
 	 * @throws SQLException .
 	 */
 	public boolean comprobarMeritosAfinidadSinValoracion(Solicitud solicitud) throws SQLException {
-		String consulta = "SELECT * FROM UVIRTUAL.TBEP_SOL_BOL_MERITOS bepsbm"
-				+ "	INNER JOIN UVIRTUAL.TBEP_SOLICITUD_BOLSAS bepsbo ON bepsbm.BEPSBO_CODNUM = bepsbo.CODNUM"
-				+ "	LEFT JOIN UVIRTUAL.TBEP_SOL_BOL_MER_VALORACION bepsbv ON bepsbv.BEPSBM_CODNUM  = bepsbm.CODNUM"
-				+ "	INNER JOIN UVIRTUAL.TBEP_MERITOS bepmer ON bepmer.CODNUM  = bepsbm.BEPMER_CODNUM"
-				+ "	INNER JOIN UVIRTUAL.TBEP_ITEMSBAREMACION bepite ON bepite.CODNUM = bepmer.BEPITE_CODNUM"
+		String consulta = "SELECT * FROM TBEP_SOL_BOL_MERITOS bepsbm"
+				+ "	INNER JOIN TBEP_SOLICITUD_BOLSAS bepsbo ON bepsbm.BEPSBO_CODNUM = bepsbo.CODNUM"
+				+ "	LEFT JOIN TBEP_SOL_BOL_MER_VALORACION bepsbv ON bepsbv.BEPSBM_CODNUM  = bepsbm.CODNUM"
+				+ "	INNER JOIN TBEP_MERITOS bepmer ON bepmer.CODNUM  = bepsbm.BEPMER_CODNUM"
+				+ "	INNER JOIN TBEP_ITEMSBAREMACION bepite ON bepite.CODNUM = bepmer.BEPITE_CODNUM"
 				+ "	WHERE bepsbo.BEPSOL_CODNUM = ? AND bepite.AFINIDAD IS NOT NULL AND bepsbv.VALOR IS NULL";
 		
 		try (Connection conexion = ConexionUvirtual.obtenerInstancia(); PreparedStatement stmt = conexion.prepareStatement(consulta)) {

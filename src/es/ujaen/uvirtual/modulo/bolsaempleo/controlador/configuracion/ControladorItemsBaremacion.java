@@ -250,7 +250,7 @@ public class ControladorItemsBaremacion extends HttpServlet {
 					break;
 				
 				default:
-					accionNodefinida(bean);
+					errorFatal(bean);
 			}
 		} catch (UVException e) {
 			LOGGER.log(Level.WARNING, e.toString());
@@ -297,7 +297,7 @@ public class ControladorItemsBaremacion extends HttpServlet {
 		}
 	}
 	
-	private void accionNodefinida(VistaItemsBaremacion bean) {
+	private void errorFatal(VistaItemsBaremacion bean) {
 		bean.getMensajesDeError().add("Acción no definida");
 		this.indice(bean);
 	}
@@ -334,7 +334,7 @@ public class ControladorItemsBaremacion extends HttpServlet {
 				seleccionarApartado(bean, request);
 				break;	
 			default:
-				this.accionNodefinida(bean);
+				this.errorFatal(bean);
 		}
 	}
 	
@@ -497,7 +497,7 @@ public class ControladorItemsBaremacion extends HttpServlet {
 				seleccionarBloque(bean, request);
 				break;	
 			default:
-				this.accionNodefinida(bean);
+				this.errorFatal(bean);
 		}
 	}
 	
@@ -693,7 +693,7 @@ public class ControladorItemsBaremacion extends HttpServlet {
 				seleccionarItemExcluyente(bean, request, false);
 				break;
 			default:
-				this.accionNodefinida(bean);
+				this.errorFatal(bean);
 		}
 	}
 	

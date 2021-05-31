@@ -15,9 +15,7 @@ VistaParametrosConfiguracion bean = (VistaParametrosConfiguracion) uvdatos.getVi
 
 	<jsp:include page="/WEB-INF/jsp/vista/infadministrativa/bolsaempleo/mensajes.jsp" />
 	
-	<div class="titulo-bolsa-empleo" style="margin-top:1rem;">
-		<h2>Parámetros de configuración</h2>
-	</div>
+	<h2>Parámetros de configuración</h2>
 	
 	 <p>Las etiquetas en <strong>negrita</strong> corresponden a campos de relleno obligatorio</p>
 	
