@@ -16,7 +16,7 @@ VistaUsuarioBolsaEmpleo bean = (VistaUsuarioBolsaEmpleo) uvdatos.getVistas().get
 	<div class="titulo-bolsa-empleo">
 		<h2>Usuarios Candidatos</h2>
 		
-		<a class="link-btn" id="nuevo_usuario" href="<%= request.getRequestURI() %>">Nuevo candidato</a>
+		<button class="link-btn" id="nuevo_usuario">Nuevo candidato</button>
 	</div>
 	
 	<table class="bluetable bolsaempleo" id="table_usuarios">

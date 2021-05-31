@@ -17,9 +17,9 @@ VistaMeritosPreferentesCandidato bean = (VistaMeritosPreferentesCandidato) uvdat
 	<div class="titulo-bolsa-empleo">
 		<h2>Mis Acreditaciones</h2>
     
-	    <a class="link-btn" id="nuevo_merito" href="<%= request.getRequestURI() %>">
+	    <button class="link-btn" id="nuevo_merito">
 	    	 Nueva acreditación
-	    </a>
+	    </button>
 	</div>
 	
 	<table class="bluetable bolsaempleo" id="tableMeritos">

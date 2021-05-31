@@ -16,7 +16,7 @@ VistaAfinidades bean = (VistaAfinidades) uvdatos.getVistas().get(VistaAfinidades
 	<div class="titulo-bolsa-empleo">
 		<h2>Afinidades</h2>
 		
-		<a class="link-btn" id="nueva_afinidad" href="<%= request.getRequestURI() %>">Nueva afinidad</a>
+		<button class="link-btn" id="nueva_afinidad">Nueva afinidad</button>
 	</div>
 	
 	<table class="bluetable bolsaempleo" id="tableAfinidades">

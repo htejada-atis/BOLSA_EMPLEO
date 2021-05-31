@@ -17,9 +17,9 @@ VistaItemsBaremacion bean = (VistaItemsBaremacion) uvdatos.getVistas().get(Vista
 	<div class="titulo-bolsa-empleo">
 	<h2>Items para las baremaciones</h2>
     
-	    <a class="link-btn" id="descargar_items" href="<%= request.getRequestURI() %>">
+	    <button class="link-btn" id="descargar_items">
 	    	 Descargar Items
-	    </a>
+	    </button>
 	</div>
 	
 	<p id="selectBloque">Seleccione un <strong>BLOQUE</strong> para mostrar los apartados</p>

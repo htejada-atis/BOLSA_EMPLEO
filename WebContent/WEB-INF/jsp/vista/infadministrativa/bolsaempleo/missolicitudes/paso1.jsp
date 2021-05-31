@@ -38,12 +38,12 @@ VistaSolicitudes bean = (VistaSolicitudes) uvdatos.getVistas().get(VistaSolicitu
 	</table>
 	
 	<div class="btns-by-steps">
-		<a class="link-btn" id="paso1_volver" href="<%= request.getRequestURI() %>">
+		<button class="link-btn" id="paso1_volver">
 	    	 Volver
-	    </a>
-	    <a class="link-btn" id="paso1_siguiente" href="<%= request.getRequestURI() %>">
+	    </button>
+	    <button class="link-btn" id="paso1_siguiente">
 	    	 Ir a 'Méritos por Área'
-	    </a>	   	
+	    </button>
 	</div>
 	
 </div>
