@@ -443,7 +443,6 @@ nav-bolsa-empleo a:active, nav-bolsa-empleo a:hover {
 /* tooltip clipboard */
 
 .tooltip:hover {
-    cursor: help;
     position: relative;
 }
 .tooltip span {
