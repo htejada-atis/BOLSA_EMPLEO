@@ -141,7 +141,7 @@ public class ControladorAreasABaremar extends HttpServlet {
 		bean.setVista(RUTA_BEP_CONF + "areasbaremar.jsp");
 		BolsaEmpleoUtils.readMensajeSession(bean, request);
 		try {
-			ModeloUsuarioBolsaEmpleo.obtenerInstancia().getOrCreateCandidato(datos);
+			ModeloUsuarioBolsaEmpleo.obtenerInstancia().getOrCreateUsuario(datos);
 			bean.setUsuarioBolsa(ModeloUsuarioBolsaEmpleo.obtenerInstancia().getUsuarioByNumeroDocumento(datos.getUsuario().getDocumentoNumero()));
 		} catch (UVException e) {
 			BolsaEmpleoUtils.addMensajeDeError(e.getMessage(), bean, request);

@@ -155,7 +155,7 @@ public class ControladorAfinidades extends HttpServlet {
 		bean.setVista(RUTA_BEP_CON + "index.jsp");
 		BolsaEmpleoUtils.readMensajeSession(bean, request);
 		try {
-			ModeloUsuarioBolsaEmpleo.obtenerInstancia().getOrCreateCandidato(datos);
+			ModeloUsuarioBolsaEmpleo.obtenerInstancia().getOrCreateUsuario(datos);
 		} catch (UVException e) {
 			BolsaEmpleoUtils.addMensajeDeError(e.getMessage(), bean, request);
 			response.sendRedirect("/srv/es/informacionadministrativa/bolsaempleo/error");

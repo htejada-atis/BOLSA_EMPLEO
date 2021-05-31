@@ -9,7 +9,6 @@ import java.io.InputStream;
 import java.sql.SQLException;
 import java.text.ParseException;
 import java.util.List;
-import javax.sql.DataSource;
 import org.junit.BeforeClass;
 import org.junit.FixMethodOrder;
 import org.junit.Test;
@@ -41,8 +40,10 @@ public class TestBEPModeloFichero {
 	 */
 	@BeforeClass
 	public static void preparaBd() throws SQLException, IOException {
-		DataSource ds = BbddRunner.obtenerDataSourceUv();
-		Conexion.setConexionUvirtual(ds);
+		Conexion.setConexionUvirtual(BbddRunner.obtenerDataSourceUv());
+		Conexion.setConexionArcos(BbddRunner.obtenerDataSourceArcos());
+		Conexion.setConexionUxxiRrhh(BbddRunner.obtenerDataSourceRh());
+		Conexion.setConexionUxxiAc(BbddRunner.obtenerDataSourceAc());
 		UtilsTestBolsaEmpleo.inicializaBolsaEmpleo();
 	}
 
@@ -61,7 +62,7 @@ public class TestBEPModeloFichero {
 		fichero.setArchivo(ARCHIVO_FICHERO);
 		fichero.setPublico(PUBLICO_FICHERO);
 		ModeloFichero modelo = ModeloFichero.obtenerInstancia();
-		modelo.insertaFichero(fichero);
+		modelo.insertaFichero(fichero, UtilsTestBolsaEmpleo.getUsuarioPersonalLogeado());
 		List<Fichero> ficheros = modelo.listaFicheros();
 
 		Boolean eje = false;
@@ -108,7 +109,7 @@ public class TestBEPModeloFichero {
 	public void testE01InsertaFicheroNull() throws SQLException, UVException {
 		Fichero fichero = null;
 		ModeloFichero modelo = ModeloFichero.obtenerInstancia();
-		modelo.insertaFichero(fichero);
+		modelo.insertaFichero(fichero, UtilsTestBolsaEmpleo.getUsuarioPersonalLogeado());
 		fail();
 	}
 
@@ -124,7 +125,7 @@ public class TestBEPModeloFichero {
 		fichero.setTitulo(TITULO_FICHERO);
 		fichero.setArchivo(ARCHIVO_FICHERO);
 		ModeloFichero modelo = ModeloFichero.obtenerInstancia();
-		modelo.insertaFichero(fichero);
+		modelo.insertaFichero(fichero, UtilsTestBolsaEmpleo.getUsuarioPersonalLogeado());
 		fail();
 	}
 
@@ -140,7 +141,7 @@ public class TestBEPModeloFichero {
 		fichero.setNombre(NOMBRE_FICHERO);
 		fichero.setArchivo(ARCHIVO_FICHERO);
 		ModeloFichero modelo = ModeloFichero.obtenerInstancia();
-		modelo.insertaFichero(fichero);
+		modelo.insertaFichero(fichero, UtilsTestBolsaEmpleo.getUsuarioPersonalLogeado());
 		fail();
 	}
 
@@ -156,7 +157,7 @@ public class TestBEPModeloFichero {
 		fichero.setNombre(NOMBRE_FICHERO);
 		fichero.setTitulo(TITULO_FICHERO);
 		ModeloFichero modelo = ModeloFichero.obtenerInstancia();
-		modelo.insertaFichero(fichero);
+		modelo.insertaFichero(fichero, UtilsTestBolsaEmpleo.getUsuarioPersonalLogeado());
 		fail();
 	}
 

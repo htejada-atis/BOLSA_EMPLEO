@@ -227,7 +227,7 @@ public class ControladorUsuarioBolsaEmpleo extends HttpServlet {
 		bean.setVista(JSP_USUARIOS);
 		BolsaEmpleoUtils.readMensajeSession(bean, request);
 		try {
-			ModeloUsuarioBolsaEmpleo.obtenerInstancia().getOrCreateCandidato(datos);
+			ModeloUsuarioBolsaEmpleo.obtenerInstancia().getOrCreateUsuario(datos);
 		} catch (UVException e) {
 			BolsaEmpleoUtils.addMensajeDeError(e.getMessage(), bean, request);
 			response.sendRedirect("/srv/es/informacionadministrativa/bolsaempleo/error");

@@ -906,7 +906,7 @@ public class ModeloUsuarioBolsaEmpleo {
 	 * @throws SQLException en caso de error en la BD.
 	 * @throws UVException si noticia no es valida.
 	 */
-	public UsuarioBolsaEmpleo getOrCreateCandidato(UVDatos datos) throws SQLException, UVException {
+	public UsuarioBolsaEmpleo getOrCreateUsuario(UVDatos datos) throws SQLException, UVException {
 		Usuario usuArcos = datos.getUsuario();
 		
 		// no hay usuario logeado, salimos

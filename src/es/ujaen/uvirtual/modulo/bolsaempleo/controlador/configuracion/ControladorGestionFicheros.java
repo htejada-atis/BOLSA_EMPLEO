@@ -158,7 +158,7 @@ public class ControladorGestionFicheros extends HttpServlet {
 		bean.setVista(RUTA_BEP_CONF + "ficheros.jsp");
 		BolsaEmpleoUtils.readMensajeSession(bean, request);
 		try {
-			ModeloUsuarioBolsaEmpleo.obtenerInstancia().getOrCreateCandidato(datos);
+			bean.setUsuarioBolsa(ModeloUsuarioBolsaEmpleo.obtenerInstancia().getOrCreateUsuario(datos));
 		} catch (UVException e) {
 			BolsaEmpleoUtils.addMensajeDeError(e.getMessage(), bean, request);
 			response.sendRedirect("/srv/es/informacionadministrativa/bolsaempleo/error");
@@ -201,7 +201,7 @@ public class ControladorGestionFicheros extends HttpServlet {
 					
 					BolsaEmpleoUtils.checkFileSize(fichero.getArchivo());
 					
-					modelo.insertaFichero(fichero);
+					modelo.insertaFichero(fichero, bean.getUsuarioBolsa());
 					BolsaEmpleoUtils.addMensajeDeExito(MENSAJE_EXITO_AGREGAR, bean, request);
 					response.sendRedirect(request.getServletPath());
 				} else {
@@ -230,7 +230,7 @@ public class ControladorGestionFicheros extends HttpServlet {
 			List<Integer> ficheros = gson.fromJson(request.getParameter(PARAM_FICHEROS), new TypeToken<List<Integer>>() { }.getType());
 			
 			for (Integer fichero: ficheros) {
-				modelo.modificarPublicoFichero(new Fichero(fichero, publico));
+				modelo.modificarPublicoFichero(new Fichero(fichero, publico), bean.getUsuarioBolsa());
 			}
 			
 			BolsaEmpleoUtils.addMensajeDeExito(MENSAJE_EXITO_CAMBIAR_PUBLICO, bean, request);
