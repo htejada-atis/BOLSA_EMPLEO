@@ -67,7 +67,7 @@ public class ModeloUsuarioBolsaEmpleo {
 	public static final int COLUMN_RAZON_EXCLUSION_MAXLENGTH = 200;
 	public static final int COLUMN_RAZON_BORRADO_MAXLENGTH = 500;
 	
-	public static final String MENSAJE_USUARIO_NO_EXISTE = "El usuario no existe en el sistema";
+	public static final String MENSAJE_BUSCAR_USUARIO_NO_EXISTE = "El usuario no existe en el sistema: introduzca cuenta TIC sin @ujaen.es";
 	public static final String MENSAJE_ERROR_DOCUMENTO_REQUERIDO = "El documento es requerido";
 	public static final String MENSAJE_ERROR_USUARIO_CON_DOCUMENTO_NO_EXISTE = "No existe el usuario con el documento indicado";
 	public static final String MENSAJE_ERROR_USUARIO_UJA_CON_DOCUMENTO_NO_EXISTE = "No existe el usuario en UJA con el documento indicado";
@@ -1089,7 +1089,7 @@ public class ModeloUsuarioBolsaEmpleo {
 		Usuario usuArcos = CrearUsuario.usuario(nombreUsuario);
 
 		if (usuArcos == null) {
-			throw new UVException(MENSAJE_USUARIO_NO_EXISTE);
+			throw new UVException(MENSAJE_BUSCAR_USUARIO_NO_EXISTE);
 		}
 
 		try {
