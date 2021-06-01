@@ -342,8 +342,8 @@ public class ControladorMisSolicitudes extends HttpServlet {
 	private void listadoSolicitudes(VistaSolicitudes bean, UVDatos datos, HttpServletRequest request, HttpServletResponse response) throws IOException, SQLException {
 		ModeloSolicitud modelo = ModeloSolicitud.obtenerInstancia(); 
 		
-		datos.setContentType(RESPONSE_AJAX_CONTENTTYPE);
 		datos.setRespuestaEnviada(true);
+		datos.setContentType(RESPONSE_AJAX_CONTENTTYPE);		
 		response.setContentType(RESPONSE_AJAX_CONTENTTYPE);
 		response.setCharacterEncoding(RESPONSE_AJAX_ENCODING);
 		

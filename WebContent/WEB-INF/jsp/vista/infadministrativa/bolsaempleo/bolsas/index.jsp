@@ -92,10 +92,9 @@ $(document).ready(function() {
 	        {'data': 'fechaBloqueo', 'filter': {'type': 'date'}},
 	        {'data': 'fechaDesBloqueo', 'filter': {'type': 'date'}},
 	        {'data': 'baremable', 'filter': {'type': 'select', 'options': {'true': 'Baremable', 'false': 'No Baremable'} , 'optionDefault': 'true'}, 'render': function(row) {
-        		if(row.baremable){
+        		if(row.baremable) {
         			return "<div title='Baremable' class='circle-true'></div>"; 
-        		}
-        		else{
+        		} else {
         			return "<div title='No Baremable' class='circle-false'></div>"; 
         		}
         	}},

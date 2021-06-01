@@ -114,7 +114,7 @@ VistaMeritosPreferentesCandidato bean = (VistaMeritosPreferentesCandidato) uvdat
 			        contentType: "application/json",
 			        dataType: "json",
 			        data: {
-			        	'a': '<%= ControladorMisMeritosPreferentes.ACCION_LISTADO_OPCIONES %>',
+			        	'<%= ControladorMisMeritosPreferentes.PARAM_ACCION %>': '<%= ControladorMisMeritosPreferentes.ACCION_LISTADO_OPCIONES %>',
 			        	'<%= ControladorMisMeritosPreferentes.PARAM_ID %>': value
 			        },
 			        success: function(data) {

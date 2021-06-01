@@ -92,13 +92,13 @@ public class ModeloSolicitud {
 		BolsaEmpleoDataTable<Solicitud> dataTable = new BolsaEmpleoDataTable<>(params);
 		
 		String consulta =
-			"SELECT bepcon.CODNUM, bepcon.DESCRIPCION, bepcon.FECHACIERRE, bepcon.ESTADO ESTADO_CONVOCATORIA, "
-		  + "       bepsol.CODNUM SOLICITUD_CODNUM, bepsol.ESTADO ESTADO_SOLICITUD "
-		  + "FROM TBEP_CONVOCATORIAS bepcon "
-		  + "LEFT JOIN TBEP_SOLICITUDES bepsol ON bepsol.BEPCON_CODNUM = bepcon.CODNUM "
-		  + "WHERE (bepsol.BEPUSU_CODNUM IS NULL OR bepsol.BEPUSU_CODNUM = ?) "
-		  + "ORDER BY bepcon.CODNUM desc";
-		
+			"SELECT "
+			+ "	bepcon.CODNUM, bepcon.DESCRIPCION, bepcon.FECHACIERRE, bepcon.ESTADO ESTADO_CONVOCATORIA, "
+			+ "	bepsol.CODNUM SOLICITUD_CODNUM, bepsol.ESTADO ESTADO_SOLICITUD "
+			+ "FROM TBEP_CONVOCATORIAS bepcon LEFT JOIN TBEP_SOLICITUDES bepsol "
+			+ "	ON bepsol.BEPCON_CODNUM = bepcon.CODNUM AND (bepsol.BEPUSU_CODNUM IS NULL OR bepsol.BEPUSU_CODNUM = ?) "
+			+ "ORDER BY bepcon.CODNUM desc";
+						
 		dataTable.setQuery(consulta);
 				
 		try (Connection conexion = ConexionUvirtual.obtenerInstancia();
