@@ -300,6 +300,21 @@ public final class UtilsTestBolsaEmpleo {
 	}
 	
 	/**
+	 * Devuelve el usuario candidato1 logeado en el sistema.
+	 * @return .
+	 * @throws SQLException .
+	 * @throws UVException .
+	 */
+	public static UsuarioBolsaEmpleo getUsuarioCandidatoLogeado() throws SQLException, UVException {
+		UVDatos datos = new UVDatos();
+		datos.setIdentificadorUsuario(UID_CANDIDATO_PRUEBAS);
+		Usuario usuario = CrearUsuario.usuario(UID_CANDIDATO_PRUEBAS);
+		datos.setUsuario(usuario);
+
+		return ModeloUsuarioBolsaEmpleo.obtenerInstancia().getUsuarioLogeado(datos);
+	}
+	
+	/**
 	 * Devuelve el waiter de elementos.
 	 * @return .
 	 */

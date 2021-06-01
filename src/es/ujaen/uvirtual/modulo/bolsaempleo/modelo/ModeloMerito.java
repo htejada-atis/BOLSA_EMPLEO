@@ -10,6 +10,7 @@ import java.util.Map;
 
 import es.ujaen.uvirtual.modelo.conexion.ConexionUvirtual;
 import es.ujaen.uvirtual.modulo.bolsaempleo.beans.Merito;
+import es.ujaen.uvirtual.modulo.bolsaempleo.beans.UsuarioBolsaEmpleo;
 import es.ujaen.uvirtual.modulo.bolsaempleo.utilidades.BolsaEmpleoDataTable;
 import es.ujaen.uvirtual.modulo.bolsaempleo.utilidades.BolsaEmpleoUtils;
 import es.ujaen.uvirtual.utilidades.UVException;
@@ -106,27 +107,55 @@ public class ModeloMerito {
 	
 	/**	Función que elimina méritos .
 	 * @param meritos a eliminar .
+	 * @param usuarioUpdate .
 	 * @throws SQLException en caso de error en la BD .
 	 */
-	public void eliminarMeritos(List<String> meritos) throws SQLException {
-		String params = BolsaEmpleoUtils.consultaMultiplesParametros(meritos.size());
-		String consulta = "DELETE FROM tbep_meritos WHERE CODNUM IN (" + params + ")";
-		try (Connection conexion = ConexionUvirtual.obtenerInstancia(); PreparedStatement stmt = conexion.prepareStatement(consulta)) {
-			int indexParam = 1;
-			for (String merito: meritos) {
-				stmt.setString(indexParam++, merito);	
+	public void eliminarMeritos(List<String> meritos, UsuarioBolsaEmpleo usuarioUpdate) throws SQLException {
+		try (Connection conexion = ConexionUvirtual.obtenerInstancia()) {
+			conexion.setAutoCommit(false);
+			
+			String params = BolsaEmpleoUtils.consultaMultiplesParametros(meritos.size());
+			
+			// actualiza el usuario de los méritos antes de eliminar
+			String consultaUpdate = "UPDATE TBEP_MERITOS SET UID_USUARIO = ? WHERE CODNUM IN (" + params + ")";
+			
+			try (PreparedStatement stmt = conexion.prepareStatement(consultaUpdate)) {
+				int indexParam = 1;
+				stmt.setString(indexParam++, usuarioUpdate.getCodCuenta());
+				for (String merito: meritos) {
+					stmt.setString(indexParam++, merito);
+				}
+				stmt.executeUpdate();
+			} catch (SQLException e) {
+				conexion.rollback();
+				conexion.setAutoCommit(true);
+				throw e;
 			}
-			stmt.executeUpdate();
+			
+			// delete usuarios seleccionados
+			String consultaDelete = "DELETE FROM TBEP_MERITOS WHERE CODNUM IN (" + params + ")";
+			
+			try (PreparedStatement stmt = conexion.prepareStatement(consultaDelete)) {
+				int indexParam = 1;
+				for (String merito: meritos) {
+					stmt.setString(indexParam++, merito);
+				}
+				stmt.executeUpdate();
+			} catch (SQLException e) {
+				conexion.rollback();
+				conexion.setAutoCommit(true);
+				throw e;
+			}
 		}
 	}
 	
 	/**	Función que inserta un mérito .
 	 * @param merito a insertar .
-	 * @param usuarioId id del usuario .
+	 * @param usuarioUpdate .
 	 * @throws SQLException en caso de error en la BD .
 	 * @throws UVException en caso de error de parametros .
 	 */
-	public void insertaMerito(Merito merito, Integer usuarioId) throws SQLException, UVException {
+	public void insertaMerito(Merito merito, UsuarioBolsaEmpleo usuarioUpdate) throws SQLException, UVException {
 		if (merito == null) {
 			throw new UVException("No se puede insertar un mérito vacío");
 		}
@@ -142,32 +171,34 @@ public class ModeloMerito {
 		if (merito.getItemBaremacion().getCodNum() == null) {
 			throw new UVException("No se puede insertar un mérito sin ítem de baremación");
 		}
-		if (usuarioId == null) {
+		if (usuarioUpdate == null) {
 			throw new UVException("No se puede insertar un mérito sin usuario");
 		}
 		
 		String consulta = "INSERT INTO tbep_meritos " 
-				+ " (BEPITE_CODNUM,BEPUSU_CODNUM,VALOR,DESCRIPCION,OBSERVACION,ARCHIVO) "
-				+ "VALUES (?,?,?,?,?,?)";
+				+ " (BEPITE_CODNUM,BEPUSU_CODNUM,VALOR,DESCRIPCION,OBSERVACION,ARCHIVO,UID_USUARIO) "
+				+ "VALUES (?,?,?,?,?,?,?)";
 		try (Connection conexion = ConexionUvirtual.obtenerInstancia();
 			 PreparedStatement stmt = conexion.prepareStatement(consulta)) {
 			int parameterIndex = 1;
 			stmt.setInt(parameterIndex++, merito.getItemBaremacion().getCodNum());
-			stmt.setInt(parameterIndex++, usuarioId);
+			stmt.setInt(parameterIndex++, usuarioUpdate.getCodNum());
 			stmt.setFloat(parameterIndex++, merito.getValor());
 			stmt.setString(parameterIndex++, merito.getDescripcion());
 			stmt.setString(parameterIndex++, merito.getObservacion());
 			stmt.setBinaryStream(parameterIndex++, merito.getArchivo());
+			stmt.setString(parameterIndex++, usuarioUpdate.getCodCuenta());
 			stmt.executeUpdate();
 		}
 	}
 	
 	/** Función que edita un mérito .
 	 * @param merito .
+	 * @param usuarioUpdate .
 	 * @throws SQLException .
 	 * @throws UVException .
 	 */
-	public void actualizaMerito(Merito merito) throws SQLException, UVException {
+	public void actualizaMerito(Merito merito, UsuarioBolsaEmpleo usuarioUpdate) throws SQLException, UVException {
 		if (merito == null) {
 			throw new UVException("No se puede modificar un mérito vacío");
 		}
@@ -180,12 +211,12 @@ public class ModeloMerito {
 		if (merito.getValor() == null) {
 			throw new UVException("No se puede modificar un mérito sin valor");
 		}
-		if (merito.getUsuario() == null) {
+		if (usuarioUpdate == null) {
 			throw new UVException("No se puede modificar un mérito sin usuario");
 		}
 		
 		String consulta = "UPDATE TBEP_MERITOS bepmer" 
-				+ " SET BEPITE_CODNUM = ?, VALOR = ?"
+				+ " SET BEPITE_CODNUM = ?, VALOR = ?, UID_USUARIO = ?"
 				+ " WHERE bepmer.CODNUM = ?";
 		try (Connection conexion = ConexionUvirtual.obtenerInstancia();
 				 PreparedStatement stmt = conexion.prepareStatement(consulta)) {
@@ -193,6 +224,7 @@ public class ModeloMerito {
 				stmt.setInt(parameterIndex++, merito.getItemBaremacion().getCodNum());
 				stmt.setFloat(parameterIndex++, merito.getValor());
 				stmt.setInt(parameterIndex++, merito.getCodNum());
+				stmt.setString(parameterIndex++, usuarioUpdate.getCodCuenta());
 				stmt.executeUpdate();
 			}
 	}
