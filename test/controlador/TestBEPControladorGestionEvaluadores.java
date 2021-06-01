@@ -387,7 +387,7 @@ public class TestBEPControladorGestionEvaluadores {
 
 		assertEquals(MENSAJE_CON_ERROR, 1, bean3.getMensajesDeError().size());
 		assertEquals(MENSAJE_SIN_EXITO, 0, bean3.getMensajesDeExito().size());
-		assertEquals(MENSAJE_CON_ERROR_ESPERADO, ModeloUsuarioBolsaEmpleo.MENSAJE_USUARIO_NO_EXISTE, bean3.getMensajesDeError().get(0));
+		assertEquals(MENSAJE_CON_ERROR_ESPERADO, ModeloUsuarioBolsaEmpleo.MENSAJE_BUSCAR_USUARIO_NO_EXISTE, bean3.getMensajesDeError().get(0));
 	}
 
 	/**

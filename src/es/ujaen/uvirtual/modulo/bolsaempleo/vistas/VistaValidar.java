@@ -4,6 +4,7 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 import es.ujaen.uvirtual.beans.vistas.Vista;
+import es.ujaen.uvirtual.modulo.bolsaempleo.beans.Afinidad;
 import es.ujaen.uvirtual.modulo.bolsaempleo.beans.Bolsa;
 import es.ujaen.uvirtual.modulo.bolsaempleo.beans.BolsaValidacion;
 import es.ujaen.uvirtual.modulo.bolsaempleo.beans.CandidatoValidacion;
@@ -30,7 +31,8 @@ public class VistaValidar extends Vista implements Serializable {
 	private BolsaEmpleoDataTable<MeritoValidarTable> datatableMeritos;
 	private List<ItemBaremacion> items = new ArrayList<>();
 	private List<ValorMeritoBolsaTable> bolsas = new ArrayList<>();
-	
+	private List<Afinidad> listaAfinidades;
+	private List<String> listaTiposAfinidades;
 	
 	public String getVista() {
 		return vista;
@@ -110,6 +112,14 @@ public class VistaValidar extends Vista implements Serializable {
 	
 	public void setBolsas(List<ValorMeritoBolsaTable> bolsas) {
 		this.bolsas = bolsas;
+	}
+	
+	public List<Afinidad> getListaAfinidades() {
+		return listaAfinidades;
+	}
+	
+	public void setListaAfinidades(List<Afinidad> afinidades) {
+		this.listaAfinidades = afinidades;
 	}
 	
 }

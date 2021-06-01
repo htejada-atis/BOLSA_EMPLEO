@@ -1,6 +1,7 @@
 <%@ page trimDirectiveWhitespaces="true"%>
 <%@	page import="es.ujaen.uvirtual.modulo.bolsaempleo.controlador.ControladorValidar"%>
 <%@ page import="es.ujaen.uvirtual.modulo.bolsaempleo.vistas.VistaValidar" %>
+<%@ page import="es.ujaen.uvirtual.modulo.bolsaempleo.beans.Afinidad" %>
 <%@ page import="es.ujaen.uvirtual.modulo.bolsaempleo.beans.Area" %>
 <%@ page import="es.ujaen.uvirtual.modulo.bolsaempleo.beans.Bolsa" %>
 <%@ page import="es.ujaen.uvirtual.modulo.bolsaempleo.beans.ItemBaremacion" %>
@@ -10,6 +11,8 @@
 <%@ page import="es.ujaen.uvirtual.modulo.bolsaempleo.beans.ValorMeritoBolsaTable" %>
 <%@ page import="es.ujaen.uvirtual.beans.UVDatos"%>
 <%@ page import="es.ujaen.uvirtual.utilidades.Formateador"%>
+<%@ page import="es.ujaen.uvirtual.utilidades.EscapaHTML" %>
+<%@ page import="java.util.stream.Collectors" %>
 
 <% 
 UVDatos uvdatos = (UVDatos)request.getAttribute(UVDatos.NOMBRE_ATRIBUTO);
@@ -165,7 +168,8 @@ UsuarioBolsaEmpleo candidato = bean.getCandidato();
 							Boolean individualizado = valoraciones && meritoBolsa.getMeritoSolicitud().getMerito().getItemBaremacion().getIndividualizado() ? true : false;
 					%>
 					
-						<tr data-individualizado="<%= individualizado %>" data-bolsa="<%= meritoBolsa.getBolsa().getCodNum() %>">
+						<tr data-individualizado="<%= individualizado %>" data-bolsa="<%= meritoBolsa.getBolsa().getCodNum() %>" 
+								data-afinidad="<%= meritoBolsa.getMeritoSolicitud().getMerito().getItemBaremacion().getAfinidad() %>">
 							<td><b><%= meritoBolsa.getBolsa().getArea().getIdAreaExterno() %></b><br/>
 								<%= meritoBolsa.getBolsa().getArea().getDescripcion() %>
 							</td>
@@ -173,24 +177,34 @@ UsuarioBolsaEmpleo candidato = bean.getCandidato();
 								<b>Afinidad: </b>
 								<br/>
 							<%	if (individualizado) { %>
-									<%= meritoBolsa.getMeritoSolicitud().getValoraciones().get(0).getAfinidad().getCodigo() + " " + meritoBolsa.getMeritoSolicitud().getValoraciones().get(0).getAfinidad().getModulacion() %>
+									<%= meritoBolsa.getMeritoSolicitud().getValoraciones().get(0).getAfinidad().getCodigo() + " " + meritoBolsa.getMeritoSolicitud().getValoraciones().get(0).getAfinidad().getModulacion() + "</br>" %>
 							<%	} else {
 									for (MeritoSolicitudValoracion valoracion: meritoBolsa.getMeritoSolicitud().getValoraciones()) { %>
 										<%= valoracion.getValor() + " - " + valoracion.getAfinidad().getCodigo() + " " + valoracion.getAfinidad().getModulacion() + "%</br>" %>
 								<%	}
 								} %>
 								<b>Estado: </b>
-								<% if (meritoBolsa.getBolsa().getCodNum() == bolsa.getCodNum()) { %>
-			        				<div class='text-primary'>Baremación actual</div>
-			        			<% } else if (meritoBolsa.getMeritoSolicitud().getCodNum() != null) { %>
-			        				<div class='text-success'>Inscrito actualmente</div>
+								<% if (meritoBolsa.getMeritoSolicitud().isValidado()) { %>
+			        				<div class='text-success'>Incluido</div>
+			        			<% } else if (meritoBolsa.getMeritoSolicitud().isExcluido()) { %>
+			        				<div class='text-danger'>Excluido</div>
 			        			<% } else { %>
-			        				<div class='text-danger'>No inscrito</div>
+			        				<div class='text-primary'>Sin validar</div>
 			        			<% } %>
 							</td>
 							<td class='cell-afinidad'>
 							<%	if (individualizado) { %>
-									<div>hola</div>
+									<select id="afinidad-individualizada" data-valoracion="<%= meritoBolsa.getMeritoSolicitud().getValoraciones().get(0).getCodNum() %>">
+									<% 	for (Afinidad afinidad : bean.getListaAfinidades()) { %>
+										<%	if (afinidad.getCodigo().equals(meritoBolsa.getMeritoSolicitud().getMerito().getItemBaremacion().getAfinidad())) { %>
+											<% 	if (meritoBolsa.getMeritoSolicitud().getValoraciones().get(0).getAfinidad().getCodNum() == afinidad.getCodNum()) { %>
+												<option value="<%= afinidad.getCodNum() %>" selected><%= afinidad.getModulacion() + ": " + afinidad.getDescripcion() %></option>
+											<%	} else { %>
+												<option value="<%= afinidad.getCodNum() %>"><%= afinidad.getModulacion() + ": " + afinidad.getDescripcion() %></option>
+											<%	} %>
+										<%	} %>
+									<%	} %>
+									</select>
 							<%	} else {
 									if (meritoBolsa.getMeritoSolicitud().getValoraciones().size() > 0) {
 										int total = 0;
@@ -334,21 +348,22 @@ $(document).ready(function() {
 				var self = this;
 				
 				this.getValoresAfinidades = function() {
-					var afinidades = {};
+					var noIndividualizadas = {};
 					$(cell).children('.field-no-individualizado').each(function(index, input) {
 						var afinidad = $(input).data('afinidad');
 						var value = parseFloat($(input).val());
-						afinidades[afinidad] = value;
+						noIndividualizadas[afinidad] = value;
 					});
-					return afinidades;
+					return noIndividualizadas;
 				}
 				
 				this.sumaTotal = function() {
 					var total = 0.0;
-					var afinidades = self.getValoresAfinidades();				
-					Object.keys(afinidades).forEach(function(key) {
-						total += afinidades[key];
-					});				
+					var noIndividualizadas = self.getValoresAfinidades();	
+					console.log(noIndividualizadas)
+					Object.keys(noIndividualizadas).forEach(function(key) {
+						total += noIndividualizadas[key];
+					});	
 					return total;
 				}
 				
@@ -387,7 +402,8 @@ $(document).ready(function() {
 				
 				var afinidades = {};
 				if (tr.data('individualizado')) {
-					
+					var selectAfinidad = $(tr).find('select');
+					afinidades[selectAfinidad.val()] = selectAfinidad.data('valoracion');
 				} else {
 					var noIndividualizado = new NoIndividualizado(tr.find('.cell-afinidad'));
 					noIndividualizado.comparaTotal(tr.data('valor'));
