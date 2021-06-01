@@ -203,9 +203,9 @@ public class ControladorFiltrarAcreditaciones extends HttpServlet {
 				bean.setAcreditacion(acreditacion);
 				
 				if (seleccionada) {
-					modeloAcreditacion.validaAcreditacion(acreditacion, bean.getCandidato(), BolsaEmpleoUtils.getCurrentDate());
+					modeloAcreditacion.validaAcreditacion(acreditacion, bean.getCandidato(), BolsaEmpleoUtils.getCurrentDate(), bean.getUsuarioLogeado());
 				} else {
-					modeloAcreditacion.desvalidaAcreditacion(acreditacion, bean.getCandidato());
+					modeloAcreditacion.desvalidaAcreditacion(acreditacion, bean.getCandidato(), bean.getUsuarioLogeado());
 				}
 				
 				CodigoDescripcion mensaje = new CodigoDescripcion("ok", seleccionada ? "acreditación validada" : "acreditación no validada");
