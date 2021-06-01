@@ -1,6 +1,6 @@
 
 :root {
-  --principal: #049FE1;
+  --principal: #006D38;
   --gris: #F1F1F1;
 }
 
@@ -130,8 +130,11 @@ table.bluetable.bolsaempleo button {
 	padding: 1px 6px;
 }
 table.bluetable.bolsaempleo .btn:hover:enabled {
-	background-color: #83a8ff;
-	border: 1px solid #83a8ff;
+	background-color: var(--principal);
+	border: 1px solid var(--principal);
+}
+table.bluetable.bolsaempleo span.pagination, table.bluetable.bolsaempleo span.total {
+	color: #fff;
 }
 
 table.bluetable.bolsaempleo p.loading {
@@ -140,7 +143,6 @@ table.bluetable.bolsaempleo p.loading {
 
 table.bluetable.bolsaempleo .selected {
 	background: none repeat scroll 0 0 #FFDA84;
-	color: #333399;
 }
 
 table.bluetable.bolsaempleo .clickable:hover {
@@ -155,9 +157,9 @@ table.bluetable.bolsaempleo .page-size select {
 }
 /* datatable header */
 table.bluetable.bolsaempleo caption {
-	background-color:#B9C9FE;
+	background-color:var(--principal);
 	font-size: 13px;
-	color:#003399;
+	color:#fff;
 	padding:0.5rem;
 }
 table.bluetable.bolsaempleo caption .dropdown {
@@ -210,7 +212,7 @@ table.bluetable.bolsaempleo label {
 /* datatable buttons */
 table.bluetable.bolsaempleo .btns .btn {
 	width: 100%;
-	border: 1px solid #83a8ff;
+	border: 1px solid var(--principal);
 	margin-bottom: 1px;
 }
 table.bluetable.bolsaempleo .btns .btn.only-icon {
@@ -494,7 +496,7 @@ nav-bolsa-empleo a:active, nav-bolsa-empleo a:hover {
 
 .tooltip-ficheros .tooltiptext-ficheros {
 	width: 140px;
-	margin-left: -50px;
+	margin-left: -60px;
 	left: 110%;
 }
 
@@ -646,15 +648,15 @@ nav-bolsa-empleo a:active, nav-bolsa-empleo a:hover {
 
 
 a.consultar-fichero {
-  background-color: #B9C9FE;
-  color: #003399;
+  background-color: var(--principal);
+  color: #fff;
   padding: 2px 6px 2px 6px;
   text-decoration: none;
   margin: 0 auto;
 }
 
 a.consultar-fichero:hover {
-  background-color: #049FE1;
+  background-color: var(--principal);
   cursor: pointer;
 }
 
