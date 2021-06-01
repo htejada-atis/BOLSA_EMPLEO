@@ -13,6 +13,7 @@ import java.util.Map;
 import es.ujaen.uvirtual.modelo.conexion.ConexionUvirtual;
 import es.ujaen.uvirtual.modulo.bolsaempleo.beans.Titulacion;
 import es.ujaen.uvirtual.modulo.bolsaempleo.beans.TitulacionArea;
+import es.ujaen.uvirtual.modulo.bolsaempleo.beans.UsuarioBolsaEmpleo;
 import es.ujaen.uvirtual.modulo.bolsaempleo.utilidades.BolsaEmpleoDataTable;
 import es.ujaen.uvirtual.modulo.bolsaempleo.utilidades.BolsaEmpleoUtils;
 import es.ujaen.uvirtual.modulo.bolsaempleo.utilidades.BolsaEmpleoDataTable.DataTableColumn;
@@ -148,10 +149,11 @@ public class ModeloTitulacion {
 	
 	/** Elimina una titulación .
 	 * @param titulacion a borrar
+	 * @param usuarioUpdate .
 	 * @throws SQLException en caso de error en la BD
 	 * @throws UVException si titulación no es valida
 	 */
-	public void borraTitulacion(Titulacion titulacion) throws SQLException, UVException {
+	public void borraTitulacion(Titulacion titulacion, UsuarioBolsaEmpleo usuarioUpdate) throws SQLException, UVException {
 		if (titulacion == null) {
 			throw new UVException("No se puede eliminar una titulación vacía");
 		}
@@ -163,15 +165,12 @@ public class ModeloTitulacion {
 			throw new UVException("No se puede eliminar una titulación asociada a un área");
 		}
 		
-		String consulta = "UPDATE tbep_titulaciones SET FLGBORRADO = ?, FECHA_BORRADO = ? "
-				+ "WHERE CODNUM=?";
+		String consulta = "UPDATE tbep_titulaciones SET FLGBORRADO=?,FECHA_BORRADO=?,UID_USUARIO=? WHERE CODNUM=?";
 		try (Connection conexion = ConexionUvirtual.obtenerInstancia(); PreparedStatement stmt = conexion.prepareStatement(consulta)) {
 			int parameterIndex = 1;
 			stmt.setString(parameterIndex++, "S");
-			
-			Date date = new Date(System.currentTimeMillis());
-			
-			stmt.setDate(parameterIndex++, new java.sql.Date(date.getTime()));
+			stmt.setDate(parameterIndex++, new java.sql.Date(BolsaEmpleoUtils.getCurrentDateTime().getTime()));
+			stmt.setString(parameterIndex++, usuarioUpdate.getCodCuenta());
 			stmt.setInt(parameterIndex++, titulacion.getCodNum());
 			stmt.executeUpdate();
 		}
@@ -179,9 +178,10 @@ public class ModeloTitulacion {
 	
 	/**	Función que inserta una titulacion en la BD.
 	 * @param titulacion a insertar en la BD
+	 * @param usuarioInsert .
 	 * @throws SQLException en caso de error en la BD
 	 */
-	public void insertaTitulacion(Titulacion titulacion) throws SQLException, UVException {
+	public void insertaTitulacion(Titulacion titulacion, UsuarioBolsaEmpleo usuarioInsert) throws SQLException, UVException {
 		if (titulacion == null) {
 			throw new UVException("No se puede insertar una titulación vacia");
 		}
@@ -189,13 +189,12 @@ public class ModeloTitulacion {
 			throw new UVException("No se puede insertar una titulación sin nombre");
 		}
 		
-		String consulta = "INSERT INTO tbep_titulaciones " 
-						+ " (NOMBRE) "
-						+ "VALUES (?)";
+		String consulta = "INSERT INTO tbep_titulaciones (NOMBRE, UID_USUARIO) VALUES (?,?)";
 		try (Connection conexion = ConexionUvirtual.obtenerInstancia();
 			 PreparedStatement stmt = conexion.prepareStatement(consulta)) {
 			int parameterIndex = 1;
 			stmt.setString(parameterIndex++, titulacion.getNombre());
+			stmt.setString(parameterIndex++, usuarioInsert.getCodCuenta());
 			stmt.executeUpdate();
 		}
 	}
@@ -203,34 +202,35 @@ public class ModeloTitulacion {
 	/**	Función que inserta titulaciones preferentes a un area .
 	 * @param titulaciones a insertar en las titulaciones preferentes por area .
 	 * @param area id del area por el que se va a filtrar .
+	 * @param usuario .
 	 * @throws SQLException en caso de error en la BD .
 	 * @throws UVException en caso de error de parámetros .
 	 */
-	public void incluirTitulacionesPreferentesArea(Collection<String> titulaciones, Integer area) throws SQLException, UVException {
+	public void incluirTitulacionesPreferentesArea(Collection<String> titulaciones, Integer area, UsuarioBolsaEmpleo usuario) throws SQLException, UVException {
 		
 		if (area == null) {
 			throw new UVException("No se puede incluir titulación sin el id del área");
 		}
 		
 		for (String titu : titulaciones) {
-			checkTitulacionAreaBorrado(titu, area);
+			checkTitulacionAreaBorrado(titu, area, usuario);
 		}
-		
 	}
 	
 	/**	Función que elimina titulaciones preferentes a un area .
 	 * @param titulaciones a eliminar en las titulaciones preferentes por area .
+	 * @param usuarioUpdate .
 	 * @param area id del area por el que se va a filtrar .
 	 * @throws SQLException en caso de error en la BD .
 	 */
-	public void eliminarTitulacionesPreferentesArea(Collection<String> titulaciones, Integer area) throws SQLException {
+	public void eliminarTitulacionesPreferentesArea(Collection<String> titulaciones, Integer area, UsuarioBolsaEmpleo usuarioUpdate) throws SQLException {
 		String params = BolsaEmpleoUtils.consultaMultiplesParametros(titulaciones.size());
-		String consulta = "UPDATE TBEP_TIT_PREFERENTES_AREA SET FLGBORRADO = ?, FECHA_BORRADO = ? WHERE BEPARE_CODNUM = ? AND BEPTIT_CODNUM IN (" + params + ")";
+		String consulta = "UPDATE TBEP_TIT_PREFERENTES_AREA SET FLGBORRADO=?,FECHA_BORRADO=?,UID_USUARIO=? WHERE BEPARE_CODNUM=? AND BEPTIT_CODNUM IN (" + params + ")";
 		try (Connection conexion = ConexionUvirtual.obtenerInstancia(); PreparedStatement stmt = conexion.prepareStatement(consulta)) {
 			int indexParam = 1;
 			stmt.setString(indexParam++, "S");
-			Date date = BolsaEmpleoUtils.getCurrentDate();
-			stmt.setDate(indexParam++, new java.sql.Date(date.getTime()));
+			stmt.setDate(indexParam++, new java.sql.Date(BolsaEmpleoUtils.getCurrentDate().getTime()));
+			stmt.setString(indexParam++, usuarioUpdate.getCodCuenta());
 			stmt.setInt(indexParam++, area);
 			for (String titulacion: titulaciones) {
 				stmt.setString(indexParam++, titulacion);	
@@ -480,9 +480,10 @@ public class ModeloTitulacion {
 	 * Devuelve si la titulación excluida del area ha sido borrada .
 	 * @param tit .
 	 * @param area .
+	 * @param usuarioUpdate .
 	 * @throws SQLException .
 	 */
-	public void checkTitulacionAreaBorrado(String tit, Integer area) throws SQLException {
+	public void checkTitulacionAreaBorrado(String tit, Integer area, UsuarioBolsaEmpleo usuarioUpdate) throws SQLException {
 		String query = "SELECT COUNT(*) as count FROM TBEP_TIT_PREFERENTES_AREA WHERE BEPTIT_CODNUM = ? AND BEPARE_CODNUM = ? AND FLGBORRADO = 'S'";		
 		
 		try (Connection con = ConexionUvirtual.obtenerInstancia(); PreparedStatement stmt = con.prepareStatement(query)) {
@@ -494,24 +495,26 @@ public class ModeloTitulacion {
 				rs.next();
 				if (rs.getInt("count") > 0) {
 					
-					String consulta = "UPDATE TBEP_TIT_PREFERENTES_AREA SET FLGBORRADO = ?,"
-							+ " FECHA_BORRADO = ? WHERE BEPARE_CODNUM = ? AND BEPTIT_CODNUM = ?";
+					String consulta = "UPDATE TBEP_TIT_PREFERENTES_AREA SET FLGBORRADO=?,FECHA_BORRADO=?,UID_USUARIO=? "
+							+ "WHERE BEPARE_CODNUM=? AND BEPTIT_CODNUM = ?";
 
 					try (Connection conexion = ConexionUvirtual.obtenerInstancia(); PreparedStatement stmtUpdate = conexion.prepareStatement(consulta)) {
 						int indexParam = 1;
 						stmtUpdate.setString(indexParam++, "N");
 						stmtUpdate.setDate(indexParam++, null);
+						stmtUpdate.setString(indexParam++, usuarioUpdate.getCodCuenta());
 						stmtUpdate.setInt(indexParam++, area);
-						stmtUpdate.setString(indexParam++, tit);	
+						stmtUpdate.setString(indexParam++, tit);
 						stmtUpdate.executeUpdate();
 					}
 				} else {
-					String consulta = "INSERT INTO TBEP_TIT_PREFERENTES_AREA (BEPARE_CODNUM, BEPTIT_CODNUM)"
-							+ " SELECT bepare.CODNUM AS BEPARE_CODNUM, beptit.CODNUM AS BEPTIT_CODNUM"
+					String consulta = "INSERT INTO TBEP_TIT_PREFERENTES_AREA (BEPARE_CODNUM,BEPTIT_CODNUM,UID_USUARIO)"
+							+ " SELECT bepare.CODNUM AS BEPARE_CODNUM, beptit.CODNUM AS BEPTIT_CODNUM, ? AS UID_USUARIO"
 							+ " FROM TBEP_TITULACIONES beptit, TBEP_AREAS bepare WHERE bepare.CODNUM = ? AND "
 							+ " beptit.CODNUM = ?";
 					try (Connection conexion = ConexionUvirtual.obtenerInstancia(); PreparedStatement stmtInsert = conexion.prepareStatement(consulta)) {
 						int indexParam = 1;
+						stmtInsert.setString(indexParam++, usuarioUpdate.getCodCuenta());
 						stmtInsert.setInt(indexParam++, area);
 						stmtInsert.setString(indexParam++, tit);		
 						stmtInsert.executeUpdate();

@@ -166,7 +166,7 @@ public class ControladorGestionTitulaciones extends HttpServlet {
 		Integer codNum = Formateador.leeParametroInteger(request.getParameter(PARAM_ID));
 		ModeloTitulacion modelo = ModeloTitulacion.obtenerInstancia();
 		try {
-			modelo.borraTitulacion(new Titulacion(codNum));
+			modelo.borraTitulacion(new Titulacion(codNum), bean.getUsuarioLogeado());
 			BolsaEmpleoUtils.addMensajeDeExito(MENSAJE_EXITO_ELIMINAR, bean, request);
 		} catch (SQLIntegrityConstraintViolationException e) {
 			BolsaEmpleoUtils.addMensajeDeError(MENSAJE_ERROR_ELIMINAR_TITULACION, bean, request);
@@ -188,7 +188,7 @@ public class ControladorGestionTitulaciones extends HttpServlet {
 		if (EscapaHTML.ajustaCodificacion(request.getParameter(PARAM_NOMBRE)) != null) {
 			Titulacion titulacion = this.validateTitulacion(request); 							
 			ModeloTitulacion modelo = ModeloTitulacion.obtenerInstancia();
-			modelo.insertaTitulacion(titulacion);
+			modelo.insertaTitulacion(titulacion, bean.getUsuarioLogeado());
 			BolsaEmpleoUtils.addMensajeDeExito(MENSAJE_EXITO_AGREGAR, bean, request);
 			response.sendRedirect(request.getServletPath());
 		}
