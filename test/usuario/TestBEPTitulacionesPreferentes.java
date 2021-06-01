@@ -79,50 +79,50 @@ public class TestBEPTitulacionesPreferentes extends UtilsTestUsuarioBase {
 	 */
 	@Test
 	public void testA1() {
-		UtilsTestBEP.assertTitlePage(UtilsTestBEP.waitVisibility(By.className(DIV_MAIN)), "Titulaciones preferentes por área");
+		UtilsTestBolsaEmpleo.assertTitlePage(UtilsTestBolsaEmpleo.waitVisibility(By.className(DIV_MAIN)), "Titulaciones preferentes por área");
 		seleccionarArea(AREA_NAME);
 		
 		// seleccionamos la primera fila
-		WebElement tableTitulaciones = UtilsTestBEP.waitVisibility(By.id(ID_TABLE_TITULACIONES_AREA));
-		UtilsTestBEP.assertTotalTable(tableTitulaciones, TITULACIONES_AREA);
-		UtilsTestBEP.selectRowTable(tableTitulaciones, 0);
-		UtilsTestBEP.assertTotalSelectedTable(tableTitulaciones, 1);
+		WebElement tableTitulaciones = UtilsTestBolsaEmpleo.waitVisibility(By.id(ID_TABLE_TITULACIONES_AREA));
+		UtilsTestBolsaEmpleo.assertTotalTable(tableTitulaciones, TITULACIONES_AREA);
+		UtilsTestBolsaEmpleo.selectRowTable(tableTitulaciones, 0);
+		UtilsTestBolsaEmpleo.assertTotalSelectedTable(tableTitulaciones, 1);
 		
 		// leemos la titulación de la primera fila
-		String titulacion = UtilsTestBEP.getTextCellTable(tableTitulaciones, 0, 1);
+		String titulacion = UtilsTestBolsaEmpleo.getTextCellTable(tableTitulaciones, 0, 1);
 		assertNotNull(titulacion);
 		
 		// eliminamos
-		WebElement btn = UtilsTestBEP.getActionTableByText(tableTitulaciones, "Eliminar");
+		WebElement btn = UtilsTestBolsaEmpleo.getActionTableByText(tableTitulaciones, "Eliminar");
 		btn.click();		
-		tableTitulaciones = UtilsTestBEP.waitVisibility(By.id(ID_TABLE_TITULACIONES_AREA));
-		UtilsTestBEP.assertTotalTable(tableTitulaciones, TITULACIONES_AREA - 1);
+		tableTitulaciones = UtilsTestBolsaEmpleo.waitVisibility(By.id(ID_TABLE_TITULACIONES_AREA));
+		UtilsTestBolsaEmpleo.assertTotalTable(tableTitulaciones, TITULACIONES_AREA - 1);
 		
 		// restauramos titulacion
-		WebElement tableDisponibles = UtilsTestBEP.waitVisibility(By.id(ID_TABLE_TITULACIONES_DISPONIBLES));
-		WebElement input = UtilsTestBEP.getFilterInputByIndex(tableDisponibles, 1);
+		WebElement tableDisponibles = UtilsTestBolsaEmpleo.waitVisibility(By.id(ID_TABLE_TITULACIONES_DISPONIBLES));
+		WebElement input = UtilsTestBolsaEmpleo.getFilterInputByIndex(tableDisponibles, 1);
 		input.sendKeys(titulacion);
 		input.sendKeys(Keys.ENTER);
-		UtilsTestBEP.assertTotalTable(tableDisponibles, 1);
-		UtilsTestBEP.selectRowTable(tableDisponibles, 0);
-		btn = UtilsTestBEP.getActionTableByText(tableDisponibles, "Incluir");
+		UtilsTestBolsaEmpleo.assertTotalTable(tableDisponibles, 1);
+		UtilsTestBolsaEmpleo.selectRowTable(tableDisponibles, 0);
+		btn = UtilsTestBolsaEmpleo.getActionTableByText(tableDisponibles, "Incluir");
 		btn.click();
 		
-		tableTitulaciones = UtilsTestBEP.waitVisibility(By.id(ID_TABLE_TITULACIONES_AREA));
-		UtilsTestBEP.assertTotalTable(tableTitulaciones, TITULACIONES_AREA);
+		tableTitulaciones = UtilsTestBolsaEmpleo.waitVisibility(By.id(ID_TABLE_TITULACIONES_AREA));
+		UtilsTestBolsaEmpleo.assertTotalTable(tableTitulaciones, TITULACIONES_AREA);
 	}
 
 	private void seleccionarArea(String name) {
-		Select sel = new Select(UtilsTestBEP.waitVisibility(By.id("select_area")));
+		Select sel = new Select(UtilsTestBolsaEmpleo.waitVisibility(By.id("select_area")));
 		sel.selectByVisibleText(name);
-		sel = new Select(UtilsTestBEP.waitVisibility(By.id("select_area")));
+		sel = new Select(UtilsTestBolsaEmpleo.waitVisibility(By.id("select_area")));
 		String textoSelect = sel.getFirstSelectedOption().getText();
 		
-		WebElement tableTitulaciones = UtilsTestBEP.waitVisibility(By.id(ID_TABLE_TITULACIONES_AREA));
-		UtilsTestBEP.assertTitleTable(tableTitulaciones, "Titulaciones Preferentes al Área: " + textoSelect);
+		WebElement tableTitulaciones = UtilsTestBolsaEmpleo.waitVisibility(By.id(ID_TABLE_TITULACIONES_AREA));
+		UtilsTestBolsaEmpleo.assertTitleTable(tableTitulaciones, "Titulaciones Preferentes al Área: " + textoSelect);
 		
-		WebElement tableDisponibles = UtilsTestBEP.waitVisibility(By.id(ID_TABLE_TITULACIONES_DISPONIBLES));
-		UtilsTestBEP.assertTitleTable(tableDisponibles, "Titulaciones Disponibles");
-		assertTrue(UtilsTestBEP.getTotalTable(tableDisponibles) > 0);
+		WebElement tableDisponibles = UtilsTestBolsaEmpleo.waitVisibility(By.id(ID_TABLE_TITULACIONES_DISPONIBLES));
+		UtilsTestBolsaEmpleo.assertTitleTable(tableDisponibles, "Titulaciones Disponibles");
+		assertTrue(UtilsTestBolsaEmpleo.getTotalTable(tableDisponibles) > 0);
 	}
 }

@@ -83,9 +83,9 @@ public class TestBEPUsuariosBolsaEmpleo extends UtilsTestUsuarioBase {
 	 */
 	@Test
 	public void testA1() {
-		UtilsTestBEP.assertTitlePage(UtilsTestBEP.waitVisibility(By.className(DIV_MAIN)), "Usuarios del sistema");
-		WebElement table = UtilsTestBEP.waitVisibility(By.id(ID_TABLE));
-		assertTrue(UtilsTestBEP.getTotalTable(table) > 0);
+		UtilsTestBolsaEmpleo.assertTitlePage(UtilsTestBolsaEmpleo.waitVisibility(By.className(DIV_MAIN)), "Usuarios del sistema");
+		WebElement table = UtilsTestBolsaEmpleo.waitVisibility(By.id(ID_TABLE));
+		assertTrue(UtilsTestBolsaEmpleo.getTotalTable(table) > 0);
 	}
 
 	/**
@@ -96,21 +96,21 @@ public class TestBEPUsuariosBolsaEmpleo extends UtilsTestUsuarioBase {
 	 */
 	@Test
 	public void testA3() {
-		WebElement btnNuevo = UtilsTestBEP.waitVisibility(By.id(ID_BOTON_NUEVO));
+		WebElement btnNuevo = UtilsTestBolsaEmpleo.waitVisibility(By.id(ID_BOTON_NUEVO));
 		btnNuevo.click();
 		
-		WebElement input = UtilsTestBEP.waitVisibility(By.id(ID_INPUT_NUEVO));
+		WebElement input = UtilsTestBolsaEmpleo.waitVisibility(By.id(ID_INPUT_NUEVO));
 		input.sendKeys("personal2");
 		
-		WebElement buscar = UtilsTestBEP.waitVisibility(By.id(ID_INPUT_BUSCAR));
+		WebElement buscar = UtilsTestBolsaEmpleo.waitVisibility(By.id(ID_INPUT_BUSCAR));
 		buscar.click();
 		
-		Select rol = new Select(UtilsTestBEP.waitVisibility(By.id(SELECT_ROL)));
+		Select rol = new Select(UtilsTestBolsaEmpleo.waitVisibility(By.id(SELECT_ROL)));
 		rol.selectByValue(ModeloRol.ID_ROL_DIRECTOR_DEPARTAMENTO.toString());
-		WebElement nuevo = UtilsTestBEP.waitVisibility(By.id(ID_INPUT_ENVIAR_NUEVO));
+		WebElement nuevo = UtilsTestBolsaEmpleo.waitVisibility(By.id(ID_INPUT_ENVIAR_NUEVO));
 		nuevo.click();
 		
-		List<String> mensajes = UtilsTestBEP.getMensajesDeExito();
+		List<String> mensajes = UtilsTestBolsaEmpleo.getMensajesDeExito();
 		assertTrue(mensajes.size() == 1);
 		assertEquals(mensajes.get(0), ControladorUsuarioBolsaEmpleo.MENSAJE_EXITO_AGREGAR);
 	}

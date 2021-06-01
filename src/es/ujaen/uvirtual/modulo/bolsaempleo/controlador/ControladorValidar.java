@@ -210,7 +210,7 @@ public class ControladorValidar extends HttpServlet {
 		bean.setConvocatoria(ModeloConvocatoria.obtenerInstancia().getUltimaConvocatoria());
 		BolsaEmpleoUtils.readMensajeSession(bean, request);
 		try {
-			ModeloUsuarioBolsaEmpleo.obtenerInstancia().checkUser(datos);
+			bean.setUsuarioLogeado(ModeloUsuarioBolsaEmpleo.obtenerInstancia().getOrCreateUsuario(datos));
 		} catch (UVException e) {
 			BolsaEmpleoUtils.addMensajeDeError(e.getMessage(), bean, request);
 			response.sendRedirect("/srv/es/informacionadministrativa/bolsaempleo/error");
@@ -315,7 +315,7 @@ public class ControladorValidar extends HttpServlet {
 				merito.setValor(ControladorMisMeritos.validateValorDelMerito(request, merito));
 				merito.setUsuario(bean.getCandidato());
 				
-				ModeloMerito.obtenerInstancia().actualizaMerito(merito);
+				ModeloMerito.obtenerInstancia().actualizaMerito(merito, bean.getUsuarioLogeado());
 				BolsaEmpleoUtils.addMensajeDeExito(MENSAJE_EXITO_MERITO_MODIFICAR, bean, request);
 			}
 		} catch (Exception ex) {
@@ -354,10 +354,10 @@ public class ControladorValidar extends HttpServlet {
 			actualizaAfinidades(bean, request, bolsa);
 			
 			if (EscapaHTML.ajustaCodificacion(request.getParameter(PARAM_ACEPTAR_MERITO)) != null) {
-				modeloValidar.validarMerito(idBolsa.toString(), bean.getMerito().getMerito().getCodNum(), observacionesCandidato);
+				modeloValidar.validarMerito(idBolsa.toString(), bean.getMerito().getMerito().getCodNum(), observacionesCandidato, bean.getUsuarioLogeado());
 				BolsaEmpleoUtils.addMensajeDeExito(String.format(MENSAJE_EXITO_MERITO_VALIDADO, bolsa.getArea().getDescripcion()), bean, request);
 			} else if (EscapaHTML.ajustaCodificacion(request.getParameter(PARAM_EXCLUIR_MERITO)) != null) {
-				modeloValidar.excluirMerito(idBolsa.toString(), bean.getMerito().getMerito().getCodNum(), observacionesCandidato);
+				modeloValidar.excluirMerito(idBolsa.toString(), bean.getMerito().getMerito().getCodNum(), observacionesCandidato, bean.getUsuarioLogeado());
 				BolsaEmpleoUtils.addMensajeDeExito(String.format(MENSAJE_EXITO_MERITO_EXCLUIDO, bolsa.getArea().getDescripcion()), bean, request);
 			} else if (EscapaHTML.ajustaCodificacion(request.getParameter(PARAM_GUARDAR_MERITO)) != null) {
 				modeloValidar.guardarMerito(idBolsa.toString(), bean.getMerito().getMerito().getCodNum(), observacionesCandidato);
@@ -403,14 +403,14 @@ public class ControladorValidar extends HttpServlet {
 				throw new UVException("El total de afinidades tiene que ser igual al valor del mérito");
 			}
 			
-			modeloSolicitud.actualizarAfinidadesMeritoNoIndividualizado(solicitud, bolsa, bean.getMerito().getMerito(), afinidades);
+			modeloSolicitud.actualizarAfinidadesMeritoNoIndividualizado(solicitud, bolsa, bean.getMerito().getMerito(), afinidades, bean.getUsuarioLogeado());
 		} else {
 			Map.Entry<String, Float> entry = afinidadesRaw.entrySet().iterator().next();
 			String idAfinidad = entry.getKey();
 			Float idValoracion = entry.getValue();
 			Afinidad afinidad = modeloAfinidad.getAfinidadById(Formateador.leeParametroInteger(idAfinidad));
 			modeloSolicitud.actualizarAfinidadesMeritoIndividualizado(solicitud, bolsa, bean.getMerito().getMerito(), afinidad,
-					Math.round(idValoracion));
+					Math.round(idValoracion), bean.getUsuarioLogeado());
 		}
 	}
 	

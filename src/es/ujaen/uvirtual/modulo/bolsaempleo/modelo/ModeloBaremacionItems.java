@@ -13,6 +13,7 @@ import es.ujaen.uvirtual.modelo.conexion.ConexionUvirtual;
 import es.ujaen.uvirtual.modulo.bolsaempleo.beans.ApartadoBaremacion;
 import es.ujaen.uvirtual.modulo.bolsaempleo.beans.BloqueBaremacion;
 import es.ujaen.uvirtual.modulo.bolsaempleo.beans.ItemBaremacion;
+import es.ujaen.uvirtual.modulo.bolsaempleo.beans.UsuarioBolsaEmpleo;
 import es.ujaen.uvirtual.modulo.bolsaempleo.utilidades.BolsaEmpleoDataTable;
 import es.ujaen.uvirtual.modulo.bolsaempleo.utilidades.BolsaEmpleoDataTable.DataTableColumn;
 import es.ujaen.uvirtual.utilidades.UVException;
@@ -268,10 +269,11 @@ public class ModeloBaremacionItems {
 	
 	/** Actualiza un item .
 	 * @param item con los datos nuevos a actualizar .
+	 * @param usuarioUpdate .
 	 * @throws SQLException en caso de error en la BD .
 	 * @throws UVException en caso de errores de validacion .
 	 */
-	public void actualizaItem(ItemBaremacion item) throws SQLException, UVException {
+	public void actualizaItem(ItemBaremacion item, UsuarioBolsaEmpleo usuarioUpdate) throws SQLException, UVException {
 		this.chequearItemParaInsertarOActualizar(item);
 		
 		String consulta = "UPDATE TBEP_ITEMSBAREMACION SET "
@@ -284,7 +286,8 @@ public class ModeloBaremacionItems {
 				+ "VALOR_MINIMO = ?, "
 				+ "VALOR_MAXIMO = ?, "
 				+ "AFINIDAD = ?, "
-				+ "INDIVIDUALIZADO = ? "
+				+ "INDIVIDUALIZADO = ?, "
+				+ "UID_USUARIO = ?"
 				+ "WHERE CODNUM = ?";
 		
 		try (Connection conexion = ConexionUvirtual.obtenerInstancia(); PreparedStatement stmt = conexion.prepareStatement(consulta)) {
@@ -307,6 +310,7 @@ public class ModeloBaremacionItems {
 			} else {
 				stmt.setString(parameterIndex++, Boolean.TRUE.equals(item.getIndividualizado()) ? "S" : "N");
 			}			
+			stmt.setString(parameterIndex++, usuarioUpdate.getCodCuenta());
 			stmt.setInt(parameterIndex++, item.getCodNum());
 			stmt.executeUpdate();
 		}
@@ -315,29 +319,32 @@ public class ModeloBaremacionItems {
 	/** 
 	 * Desactiva un item de baremación.
 	 * @param item .
+	 * @param usuarioUpdate .
 	 * @throws SQLException .
 	 * @throws UVException .
 	 */
-	public void desactivarItem(ItemBaremacion item) throws SQLException {
-		this.activaDesactivaItem(item, false);
+	public void desactivarItem(ItemBaremacion item, UsuarioBolsaEmpleo usuarioUpdate) throws SQLException {
+		this.activaDesactivaItem(item, false, usuarioUpdate);
 	}
 	
 	/** 
 	 * Activa un item de baremación.
 	 * @param item .
+	 * @param usuarioUpdate .
 	 * @throws SQLException .
 	 * @throws UVException .
 	 */
-	public void activarItem(ItemBaremacion item) throws SQLException {
-		this.activaDesactivaItem(item, true);
+	public void activarItem(ItemBaremacion item, UsuarioBolsaEmpleo usuarioUpdate) throws SQLException {
+		this.activaDesactivaItem(item, true, usuarioUpdate);
 	}
 
 	/** Función que inserta un ítem en la BD.
 	 * @param item .
+	 * @param usuarioInsert .
 	 * @throws SQLException .
 	 * @throws UVException .
 	 */
-	public void insertaItem(ItemBaremacion item) throws SQLException, UVException {
+	public void insertaItem(ItemBaremacion item, UsuarioBolsaEmpleo usuarioInsert) throws SQLException, UVException {
 		if (item == null) {
 			throw new UVException("No se puede insertar un item vacio");
 		}
@@ -345,8 +352,8 @@ public class ModeloBaremacionItems {
 		this.chequearItemParaInsertarOActualizar(item);
 		
 		String consulta = "INSERT INTO TBEP_ITEMSBAREMACION "
-				+ " (CODIGO,NOMBRE,DESCRIPCION,BEPBLO_CODNUM,UNIDADES,VALOR,VALOR_MINIMO,VALOR_MAXIMO,AFINIDAD,INDIVIDUALIZADO)"
-				+ " VALUES (?,?,?,?,?,?,?,?,?,?)";
+				+ " (CODIGO,NOMBRE,DESCRIPCION,BEPBLO_CODNUM,UNIDADES,VALOR,VALOR_MINIMO,VALOR_MAXIMO,AFINIDAD,INDIVIDUALIZADO,UID_USUARIO)"
+				+ " VALUES (?,?,?,?,?,?,?,?,?,?,?)";
 		
 		try (Connection conexion = ConexionUvirtual.obtenerInstancia(); PreparedStatement stmt = conexion.prepareStatement(consulta)) {
 			int parameterIndex = 1;
@@ -362,8 +369,9 @@ public class ModeloBaremacionItems {
 			if (item.getIndividualizado() == null) {
 				stmt.setString(parameterIndex++, "N");
 			} else {
-				stmt.setString(parameterIndex++, item.getIndividualizado() ? "S" : "N");
+				stmt.setString(parameterIndex++, Boolean.TRUE.equals(item.getIndividualizado()) ? "S" : "N");
 			}			
+			stmt.setString(parameterIndex++, usuarioInsert.getCodCuenta());
 			stmt.executeUpdate();
 		}
 	}
@@ -440,13 +448,14 @@ public class ModeloBaremacionItems {
 		return item;
 	}
 	
-	private void activaDesactivaItem(ItemBaremacion item, Boolean activo) throws SQLException {
-		String consulta = "UPDATE TBEP_ITEMSBAREMACION SET FLGACTIVO = ? WHERE CODNUM = ?";
+	private void activaDesactivaItem(ItemBaremacion item, Boolean activo, UsuarioBolsaEmpleo usuarioUpdate) throws SQLException {
+		String consulta = "UPDATE TBEP_ITEMSBAREMACION SET FLGACTIVO = ?, UID_USUARIO = ? WHERE CODNUM = ?";
 		
 		try (Connection conexion = ConexionUvirtual.obtenerInstancia(); PreparedStatement stmt = conexion.prepareStatement(consulta)) {
 			int parameterIndex = 1;
 			
-			stmt.setString(parameterIndex++, activo ? "S" : "N");
+			stmt.setString(parameterIndex++, Boolean.TRUE.equals(activo) ? "S" : "N");
+			stmt.setString(parameterIndex++, usuarioUpdate.getCodCuenta());
 			stmt.setInt(parameterIndex++, item.getCodNum());
 			stmt.executeUpdate();
 		}	
@@ -515,17 +524,19 @@ public class ModeloBaremacionItems {
 	/** El usuario selecciona un item para excluirlo de otro item .
 	 * @param itemPadre .
 	 * @param itemHijo .
+	 * @param usuarioInsert .
 	 * @throws SQLException .
 	 * @throws UVException .
 	 */
-	public void asignarItemsExcluyentesAItem(ItemBaremacion itemPadre, ItemBaremacion itemHijo) throws SQLException {
+	public void asignarItemsExcluyentesAItem(ItemBaremacion itemPadre, ItemBaremacion itemHijo, UsuarioBolsaEmpleo usuarioInsert) throws SQLException {
 		try (Connection conexion = ConexionUvirtual.obtenerInstancia()) {			
-			String consulta = "INSERT INTO TBEP_MERITOS_EXCLUYENTES (BEPITE_CODNUM_PADRE, BEPITE_CODNUM_HIJO) VALUES (?,?)";
+			String consulta = "INSERT INTO TBEP_MERITOS_EXCLUYENTES (BEPITE_CODNUM_PADRE, BEPITE_CODNUM_HIJO, UID_USUARIO) VALUES (?,?,?)";
 			
 			try (PreparedStatement stmt = conexion.prepareStatement(consulta)) {
 				int indexParam = 1;
 				stmt.setInt(indexParam++, itemPadre.getCodNum());
 				stmt.setInt(indexParam++, itemHijo.getCodNum());
+				stmt.setString(indexParam++, usuarioInsert.getCodCuenta());
 				stmt.executeUpdate();
 			}
 		}
@@ -535,15 +546,22 @@ public class ModeloBaremacionItems {
 	/** El usuario deselecciona un item para borrarlo de su lista de excluyentes de otro .
 	 * @param itemPadre .
 	 * @param itemHijo .
+	 * @param usuarioDelete .
 	 * @throws SQLException .
 	 * @throws UVException .
 	 */
-	public void borrarItemsExcluyentesAItem(ItemBaremacion itemPadre, ItemBaremacion itemHijo) throws SQLException {
-		try (Connection conexion = ConexionUvirtual.obtenerInstancia()) {			
-			String consulta = "DELETE FROM TBEP_MERITOS_EXCLUYENTES bepmex "
-				+ " WHERE BEPITE_CODNUM_PADRE = ? AND "
-				+ " BEPITE_CODNUM_HIJO = ?";
-		
+	public void borrarItemsExcluyentesAItem(ItemBaremacion itemPadre, ItemBaremacion itemHijo, UsuarioBolsaEmpleo usuarioDelete) throws SQLException {
+		try (Connection conexion = ConexionUvirtual.obtenerInstancia()) {
+			String consultaUpdate = "UPDATE TBEP_MERITOS_EXCLUYENTES SET UID_USUARIO = ? WHERE BEPITE_CODNUM_PADRE = ? AND BEPITE_CODNUM_HIJO = ?";			
+			try (PreparedStatement stmt = conexion.prepareStatement(consultaUpdate)) {
+				int indexParam = 1;
+				stmt.setString(indexParam++, usuarioDelete.getCodCuenta());
+				stmt.setInt(indexParam++, itemPadre.getCodNum());
+				stmt.setInt(indexParam++, itemHijo.getCodNum());
+				stmt.executeUpdate();
+			}
+			
+			String consulta = "DELETE FROM TBEP_MERITOS_EXCLUYENTES WHERE BEPITE_CODNUM_PADRE = ? AND BEPITE_CODNUM_HIJO = ?";		
 			try (PreparedStatement stmt = conexion.prepareStatement(consulta)) {
 				int indexParam = 1;
 				stmt.setInt(indexParam++, itemPadre.getCodNum());

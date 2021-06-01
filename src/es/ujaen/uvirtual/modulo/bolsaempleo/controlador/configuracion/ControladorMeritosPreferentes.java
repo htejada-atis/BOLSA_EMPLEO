@@ -186,7 +186,7 @@ public class ControladorMeritosPreferentes extends HttpServlet {
 		this.indice(bean);
 		BolsaEmpleoUtils.readMensajeSession(bean, request);
 		try {
-			ModeloUsuarioBolsaEmpleo.obtenerInstancia().checkUser(datos);
+			bean.setUsuarioLogeado(ModeloUsuarioBolsaEmpleo.obtenerInstancia().getOrCreateUsuario(datos));
 		} catch (UVException e) {
 			BolsaEmpleoUtils.addMensajeDeError(e.getMessage(), bean, request);
 			response.sendRedirect("/srv/es/informacionadministrativa/bolsaempleo/error");
@@ -290,7 +290,7 @@ public class ControladorMeritosPreferentes extends HttpServlet {
 		MeritoPreferente merito = new MeritoPreferente();
 		merito.setActivo(true);
 		
-		ModeloMeritosPreferentes.obtenerInstancia().crearMeritoPreferente(this.validate(merito, request));
+		ModeloMeritosPreferentes.obtenerInstancia().crearMeritoPreferente(this.validate(merito, request), bean.getUsuarioLogeado());
 					
 		BolsaEmpleoUtils.addMensajeDeExito("Mérito preferente añadido correctamente", bean, request);
 		response.sendRedirect(request.getServletPath());
@@ -315,7 +315,7 @@ public class ControladorMeritosPreferentes extends HttpServlet {
 		bean.setApartadoBaremacion(ModeloBaremacionApartados.obtenerInstancia().listaApartadoBaremacionActivosOrdenadosPorCodigo());
 		bean.setVista(JSP_FORM);
 		
-		ModeloMeritosPreferentes.obtenerInstancia().editarMeritoPreferente(this.validate(merito, request));
+		ModeloMeritosPreferentes.obtenerInstancia().editarMeritoPreferente(this.validate(merito, request), bean.getUsuarioLogeado());
 		
 		BolsaEmpleoUtils.addMensajeDeExito("Mérito preferente editado correctamente", bean, request);
 		response.sendRedirect(request.getServletPath());
@@ -324,7 +324,7 @@ public class ControladorMeritosPreferentes extends HttpServlet {
 	private void activarMerito(VistaMeritosPreferentes bean, HttpServletRequest request, HttpServletResponse response) throws SQLException, UVException, IOException {
 		MeritoPreferente merito = ModeloMeritosPreferentes.obtenerInstancia().getMeritoPreferenteById(Formateador.leeParametroInteger(request.getParameter(PARAM_ID)));
 		
-		ModeloMeritosPreferentes.obtenerInstancia().cambiaFlagActivoMeritoPreferente(merito, "S");
+		ModeloMeritosPreferentes.obtenerInstancia().cambiaFlagActivoMeritoPreferente(merito, "S", bean.getUsuarioLogeado());
 		bean.setVista(JSP_INDEX);
 		
 		BolsaEmpleoUtils.addMensajeDeExito("Mérito preferente activado correctamente", bean, request);
@@ -334,7 +334,7 @@ public class ControladorMeritosPreferentes extends HttpServlet {
 	private void desactivarMerito(VistaMeritosPreferentes bean, HttpServletRequest request, HttpServletResponse response) throws SQLException, UVException, IOException {
 		MeritoPreferente merito = ModeloMeritosPreferentes.obtenerInstancia().getMeritoPreferenteById(Formateador.leeParametroInteger(request.getParameter(PARAM_ID)));
 		
-		ModeloMeritosPreferentes.obtenerInstancia().cambiaFlagActivoMeritoPreferente(merito, "N");
+		ModeloMeritosPreferentes.obtenerInstancia().cambiaFlagActivoMeritoPreferente(merito, "N", bean.getUsuarioLogeado());
 		bean.setVista(JSP_INDEX);
 		
 		BolsaEmpleoUtils.addMensajeDeExito("Mérito preferente activado correctamente", bean, request);
@@ -353,7 +353,8 @@ public class ControladorMeritosPreferentes extends HttpServlet {
 		bean.setMeritoPreferente(merito);
 		bean.setVista(JSP_FORM_OPCION);
 
-		ModeloMeritosPreferentes.obtenerInstancia().crearMeritoPreferenteOpcion(this.validateOpcionMerito(merito, new MeritoPreferenteOpcion(), request));
+		ModeloMeritosPreferentes.obtenerInstancia().crearMeritoPreferenteOpcion(this.validateOpcionMerito(merito, new MeritoPreferenteOpcion(), request),
+				bean.getUsuarioLogeado());
 		
 		BolsaEmpleoUtils.addMensajeDeExito("Opción mérito preferente añadido correctamente", bean, request);
 		response.sendRedirect(request.getServletPath() + "?" + PARAM_ACCION + "=" + ACCION_MODIFICAR + "&" + PARAM_ID + "=" + merito.getCodNum());		
@@ -368,7 +369,7 @@ public class ControladorMeritosPreferentes extends HttpServlet {
 			throw new UVException("La opción del mérito no es válida");
 		}
 		
-		ModeloMeritosPreferentes.obtenerInstancia().desactivarMeritoPreferenteOpcion(meritoOpcion);
+		ModeloMeritosPreferentes.obtenerInstancia().desactivarMeritoPreferenteOpcion(meritoOpcion, bean.getUsuarioLogeado());
 		BolsaEmpleoUtils.addMensajeDeExito("Opción mérito preferente desactivado correctamente", bean, request);
 		response.sendRedirect(request.getServletPath());		
 	}

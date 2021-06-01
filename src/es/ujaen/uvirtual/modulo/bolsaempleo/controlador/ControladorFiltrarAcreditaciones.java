@@ -133,7 +133,7 @@ public class ControladorFiltrarAcreditaciones extends HttpServlet {
 		bean.setVista(JSP_INDEX);
 		BolsaEmpleoUtils.readMensajeSession(bean, request);
 		try {
-			ModeloUsuarioBolsaEmpleo.obtenerInstancia().checkUser(datos);
+			bean.setUsuarioLogeado(ModeloUsuarioBolsaEmpleo.obtenerInstancia().getOrCreateUsuario(datos));
 		} catch (UVException e) {
 			BolsaEmpleoUtils.addMensajeDeError(e.getMessage(), bean, request);
 			response.sendRedirect("/srv/es/informacionadministrativa/bolsaempleo/error");
@@ -161,8 +161,10 @@ public class ControladorFiltrarAcreditaciones extends HttpServlet {
 		switch (nombreAccion) {
 			case ACCION_ACREDITACION_DESELECCIONADA:
 				seleccionarAcreditacion(bean, datos, request, response, false);
+				break;
 			case ACCION_ACREDITACION_SELECCIONADA:
 				seleccionarAcreditacion(bean, datos, request, response, true);
+				break;
 			case ACCION_CANDIDATO_SELECCIONADO:
 				obtenerCodigoPadreAcreditacion(bean);
 				break;
@@ -203,9 +205,9 @@ public class ControladorFiltrarAcreditaciones extends HttpServlet {
 				bean.setAcreditacion(acreditacion);
 				
 				if (seleccionada) {
-					modeloAcreditacion.validaAcreditacion(acreditacion, bean.getCandidato(), BolsaEmpleoUtils.getCurrentDate());
+					modeloAcreditacion.validaAcreditacion(acreditacion, bean.getCandidato(), BolsaEmpleoUtils.getCurrentDate(), bean.getUsuarioLogeado());
 				} else {
-					modeloAcreditacion.desvalidaAcreditacion(acreditacion, bean.getCandidato());
+					modeloAcreditacion.desvalidaAcreditacion(acreditacion, bean.getCandidato(), bean.getUsuarioLogeado());
 				}
 				
 				CodigoDescripcion mensaje = new CodigoDescripcion("ok", seleccionada ? "acreditación validada" : "acreditación no validada");

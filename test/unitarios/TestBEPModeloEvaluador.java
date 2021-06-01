@@ -8,7 +8,6 @@ import java.text.ParseException;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
-import javax.sql.DataSource;
 import org.junit.BeforeClass;
 import org.junit.FixMethodOrder;
 import org.junit.Test;
@@ -46,11 +45,11 @@ public class TestBEPModeloEvaluador {
      */
     @BeforeClass
     public static void preparaBd() throws SQLException, IOException, ParseException {
-    	DataSource ds = BbddRunner.obtenerDataSourceUv();
-    	DataSource dsArcos = BbddRunner.obtenerDataSourceArcos();
-    	Conexion.setConexionUvirtual(ds);
-    	Conexion.setConexionArcos(dsArcos);
-    	UtilsTestBolsaEmpleo.inicializaBolsaEmpleo();
+    	Conexion.setConexionUvirtual(BbddRunner.obtenerDataSourceUv());
+		Conexion.setConexionArcos(BbddRunner.obtenerDataSourceArcos());
+		Conexion.setConexionUxxiRrhh(BbddRunner.obtenerDataSourceRh());
+		Conexion.setConexionUxxiAc(BbddRunner.obtenerDataSourceAc());
+		UtilsTestBolsaEmpleo.inicializaBolsaEmpleo();
     }
     
     /** test acierto insertar evaluador.
@@ -73,7 +72,7 @@ public class TestBEPModeloEvaluador {
 		evaluador.setFechaBorrado(FECHABORRADO);
 		evaluador.setCodNumArea(AREA);    	
 
-		ModeloEvaluador.obtenerInstancia().insertaEvaluador(evaluador, AREA);
+		ModeloEvaluador.obtenerInstancia().insertaEvaluador(evaluador, AREA, UtilsTestBolsaEmpleo.getUsuarioPersonalLogeado());
     }
 
     /** test acierto borrar evaluador.
@@ -86,7 +85,7 @@ public class TestBEPModeloEvaluador {
     	List<Evaluador> evaluadores = modelo.listaEvaluadores();
     	Evaluador evaluador = evaluadores.get(evaluadores.size() - 1);
     	Evaluador evaluadorAcum = modelo.getEvaluadorById(evaluador.getCodNum());
-    	modelo.borraRestauraEvaluador(evaluador);
+    	modelo.borraRestauraEvaluador(evaluador, UtilsTestBolsaEmpleo.getUsuarioPersonalLogeado());
 
     	assertTrue("evaluador borrado no debe ser listado", !evaluadorAcum.getBorrado().equals(evaluador.getBorrado()));
     }
@@ -102,7 +101,7 @@ public class TestBEPModeloEvaluador {
     public void testE01InsertaEvaluadorNull() throws SQLException, UVException {
     	UsuarioBolsaEmpleo evaluador = null;
     	ModeloEvaluador modelo = ModeloEvaluador.obtenerInstancia();
-    	modelo.insertaEvaluador(evaluador, AREA);
+    	modelo.insertaEvaluador(evaluador, AREA, UtilsTestBolsaEmpleo.getUsuarioPersonalLogeado());
     	fail();
     }
 }

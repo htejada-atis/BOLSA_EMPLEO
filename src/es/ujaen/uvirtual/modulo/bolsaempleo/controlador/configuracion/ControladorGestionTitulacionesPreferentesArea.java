@@ -146,7 +146,7 @@ public class ControladorGestionTitulacionesPreferentesArea extends HttpServlet {
 		bean.setVista(RUTA_BEP_CONF + "titulacionespreferentesarea.jsp");
 		BolsaEmpleoUtils.readMensajeSession(bean, request);
 		try {
-			ModeloUsuarioBolsaEmpleo.obtenerInstancia().checkUser(datos);
+			bean.setUsuarioLogeado(ModeloUsuarioBolsaEmpleo.obtenerInstancia().getOrCreateUsuario(datos));
 		} catch (UVException e) {
 			BolsaEmpleoUtils.addMensajeDeError(e.getMessage(), bean, request);
 			response.sendRedirect("/srv/es/informacionadministrativa/bolsaempleo/error");
@@ -189,7 +189,7 @@ public class ControladorGestionTitulacionesPreferentesArea extends HttpServlet {
 		try {
 			Gson gson = new GsonBuilder().create();
 			List<String> titulaciones = gson.fromJson(request.getParameter(PARAM_TITULACIONES), new TypeToken<List<String>>() { }.getType());
-			ModeloTitulacion.obtenerInstancia().eliminarTitulacionesPreferentesArea(titulaciones, area.getCodNum());
+			ModeloTitulacion.obtenerInstancia().eliminarTitulacionesPreferentesArea(titulaciones, area.getCodNum(), bean.getUsuarioLogeado());
 			
 			BolsaEmpleoUtils.addMensajeDeExito(MENSAJE_EXITO_TITULACIONES_ELIMINADAS_CORRECTAMENTE, bean, request);
 			redireccionConAreaSeleccionada(request, response, area);
@@ -205,7 +205,7 @@ public class ControladorGestionTitulacionesPreferentesArea extends HttpServlet {
 		try {
 			Gson gson = new GsonBuilder().create();
 			List<String> titulaciones = gson.fromJson(request.getParameter(PARAM_TITULACIONES), new TypeToken<List<String>>() { }.getType());
-			ModeloTitulacion.obtenerInstancia().incluirTitulacionesPreferentesArea(titulaciones, area.getCodNum());
+			ModeloTitulacion.obtenerInstancia().incluirTitulacionesPreferentesArea(titulaciones, area.getCodNum(), bean.getUsuarioLogeado());
 			
 			BolsaEmpleoUtils.addMensajeDeExito(MENSAJE_EXITO_TITULACIONES_INCLUIDAS_CORRECTAMENTE, bean, request);						
 			redireccionConAreaSeleccionada(request, response, area);

@@ -15,8 +15,6 @@ import java.text.ParseException;
 import java.util.HashMap;
 import java.util.List;
 
-import javax.sql.DataSource;
-
 import org.junit.BeforeClass;
 import org.junit.FixMethodOrder;
 import org.junit.Test;
@@ -54,8 +52,10 @@ public class TestBEPModeloBaremacionApartados {
 	 */
 	@BeforeClass
 	public static void preparaBd() throws SQLException, IOException {
-		DataSource ds = BbddRunner.obtenerDataSourceUv();
-		Conexion.setConexionUvirtual(ds);
+		Conexion.setConexionUvirtual(BbddRunner.obtenerDataSourceUv());
+		Conexion.setConexionArcos(BbddRunner.obtenerDataSourceArcos());
+		Conexion.setConexionUxxiRrhh(BbddRunner.obtenerDataSourceRh());
+		Conexion.setConexionUxxiAc(BbddRunner.obtenerDataSourceAc());
 		UtilsTestBolsaEmpleo.inicializaBolsaEmpleo();
 	}
 	
@@ -139,7 +139,7 @@ public class TestBEPModeloBaremacionApartados {
 			apartado.setPorcentajeMaximo(PORCENTAJE_MAXIMO);
 			
 			List<ApartadoBaremacion> lista = desactivarTodosApartados();
-			Integer codNum = ModeloBaremacionApartados.obtenerInstancia().insertaApartado(apartado);
+			Integer codNum = ModeloBaremacionApartados.obtenerInstancia().insertaApartado(apartado, UtilsTestBolsaEmpleo.getUsuarioPersonalLogeado());
 			ApartadoBaremacion creado = ModeloBaremacionApartados.obtenerInstancia().getApartadoBaremacionById(codNum);			
 			activarApartadosLista(lista);
 			
@@ -169,7 +169,7 @@ public class TestBEPModeloBaremacionApartados {
 			apartado.setPorcentajeMaximo(null);
 			
 			List<ApartadoBaremacion> lista = desactivarTodosApartados();
-			Integer codNum = ModeloBaremacionApartados.obtenerInstancia().insertaApartado(apartado);
+			Integer codNum = ModeloBaremacionApartados.obtenerInstancia().insertaApartado(apartado, UtilsTestBolsaEmpleo.getUsuarioPersonalLogeado());
 			ApartadoBaremacion creado = ModeloBaremacionApartados.obtenerInstancia().getApartadoBaremacionById(codNum);			
 			activarApartadosLista(lista);
 			
@@ -200,7 +200,7 @@ public class TestBEPModeloBaremacionApartados {
 			apartado.setPuntuacionMaxima(null);
 			apartado.setPorcentajeMaximo(PORCENTAJE_MAXIMO);
 			
-			ModeloBaremacionApartados.obtenerInstancia().actualizaApartado(apartado);
+			ModeloBaremacionApartados.obtenerInstancia().actualizaApartado(apartado, UtilsTestBolsaEmpleo.getUsuarioPersonalLogeado());
 			ApartadoBaremacion apartadoUpd = ModeloBaremacionApartados.obtenerInstancia().getApartadoBaremacionById(CODNUM);
 			
 			assertEquals(apartadoUpd.getCodigo(), CODIGO);
@@ -260,7 +260,7 @@ public class TestBEPModeloBaremacionApartados {
 	@Test
 	public void testE03insertaApartado() {
 		Throwable throwable = assertThrows(Throwable.class,
-				() -> ModeloBaremacionApartados.obtenerInstancia().insertaApartado(null));
+				() -> ModeloBaremacionApartados.obtenerInstancia().insertaApartado(null, UtilsTestBolsaEmpleo.getUsuarioPersonalLogeado()));
 		
 		assertEquals(UVException.class, throwable.getClass());
 		assertEquals(ModeloBaremacionApartados.ERROR_APARTADO_REQUERIDO, throwable.getMessage());
@@ -274,7 +274,7 @@ public class TestBEPModeloBaremacionApartados {
 		Throwable throwable = assertThrows(Throwable.class, () -> {
 			ApartadoBaremacion a = ModeloBaremacionApartados.obtenerInstancia().getApartadoBaremacionById(CODNUM);
 			a.setCodNum(CODNUM_NOEXISTE);
-			ModeloBaremacionApartados.obtenerInstancia().insertaApartado(a);
+			ModeloBaremacionApartados.obtenerInstancia().insertaApartado(a, UtilsTestBolsaEmpleo.getUsuarioPersonalLogeado());
 		});
 		
 		assertEquals(UVException.class, throwable.getClass());
@@ -309,7 +309,7 @@ public class TestBEPModeloBaremacionApartados {
 			ModeloBaremacionApartados modelo = ModeloBaremacionApartados.obtenerInstancia();
 			ApartadoBaremacion apartado = modelo.getApartadoBaremacionById(codNum);
 			assertEquals(apartado.getCodNum(), codNum);
-			modelo.desactivarApartado(apartado);
+			modelo.desactivarApartado(apartado, UtilsTestBolsaEmpleo.getUsuarioPersonalLogeado());
 			apartado = modelo.getApartadoBaremacionById(codNum);
 			assertFalse(apartado.getActivo());
 		} catch (SQLException | UVException ex) {
@@ -322,7 +322,7 @@ public class TestBEPModeloBaremacionApartados {
 			ModeloBaremacionApartados modelo = ModeloBaremacionApartados.obtenerInstancia();
 			ApartadoBaremacion apartado = modelo.getApartadoBaremacionById(codNum);
 			assertEquals(apartado.getCodNum(), codNum);
-			modelo.activarApartado(apartado);
+			modelo.activarApartado(apartado, UtilsTestBolsaEmpleo.getUsuarioPersonalLogeado());
 			apartado = modelo.getApartadoBaremacionById(codNum);
 			assertTrue(apartado.getActivo());
 		} catch (SQLException | UVException ex) {

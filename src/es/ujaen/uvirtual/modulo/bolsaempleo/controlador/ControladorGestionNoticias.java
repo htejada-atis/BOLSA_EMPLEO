@@ -145,7 +145,7 @@ public class ControladorGestionNoticias extends HttpServlet {
 		bean.setVista(RUTA_BEP_NOTICIAS + "indice.jsp");
 		BolsaEmpleoUtils.readMensajeSession(bean, request);
 		try {
-			ModeloUsuarioBolsaEmpleo.obtenerInstancia().checkUser(datos);
+			bean.setUsuarioLogeado(ModeloUsuarioBolsaEmpleo.obtenerInstancia().getOrCreateUsuario(datos));
 		} catch (UVException e) {
 			BolsaEmpleoUtils.addMensajeDeError(e.getMessage(), bean, request);
 			response.sendRedirect("/srv/es/informacionadministrativa/bolsaempleo/error");
@@ -181,7 +181,7 @@ public class ControladorGestionNoticias extends HttpServlet {
 			Noticia noticia = this.validarNoticia(request);
 			noticia.setActiva(true);
 			
-			ModeloNoticia.obtenerInstancia().insertaNoticia(noticia);
+			ModeloNoticia.obtenerInstancia().insertaNoticia(noticia, bean.getUsuarioLogeado());
 			BolsaEmpleoUtils.addMensajeDeExito(MENSAJE_EXITO_AGREGAR, bean, request);
 			response.sendRedirect(request.getServletPath());			
 		}
@@ -204,7 +204,7 @@ public class ControladorGestionNoticias extends HttpServlet {
 		if (EscapaHTML.ajustaCodificacion(request.getParameter(PARAM_TEXTO)) != null) {
 			Noticia noticiaForm = this.validarNoticia(request);
 			noticiaForm.setCodNum(noticia.getCodNum());
-			modelo.actualizaNoticia(noticiaForm);
+			modelo.actualizaNoticia(noticiaForm, bean.getUsuarioLogeado());
 			BolsaEmpleoUtils.addMensajeDeExito(MENSAJE_EXITO_EDITAR, bean, request);
 			response.sendRedirect(request.getServletPath());
 		}
@@ -225,7 +225,7 @@ public class ControladorGestionNoticias extends HttpServlet {
 		noticia.setCodNum(codNum);
 		boolean activa = "true".equals(EscapaHTML.ajustaCodificacion(request.getParameter(PARAM_ACTIVA))); 
 		noticia.setActiva(activa);
-		modelo.borraRestauraNoticia(noticia);
+		modelo.borraRestauraNoticia(noticia, bean.getUsuarioLogeado());
 		BolsaEmpleoUtils.addMensajeDeExito(activa ? MENSAJE_EXITO_RESTAURAR : MENSAJE_EXITO_ELIMINAR, bean, request);
 		response.sendRedirect(request.getServletPath());
 	}
@@ -241,9 +241,9 @@ public class ControladorGestionNoticias extends HttpServlet {
 	private void listadoNoticias(VistaNoticias bean, UVDatos datos, HttpServletRequest request, HttpServletResponse response) throws IOException, SQLException {
 		ModeloNoticia modelo = ModeloNoticia.obtenerInstancia();
 		
-		datos.setContentType("application/json");
-		response.setContentType("application/json");
-		response.setCharacterEncoding("UTF-8");
+		datos.setContentType(RESPONSE_AJAX_CONTENTTYPE);
+		response.setContentType(RESPONSE_AJAX_CONTENTTYPE);
+		response.setCharacterEncoding(RESPONSE_AJAX_ENCODING);
 		
 		try (PrintWriter writer = response.getWriter()) {
 			try {

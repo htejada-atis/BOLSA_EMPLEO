@@ -661,23 +661,26 @@ public class ModeloValidar {
 	 * @param idBolsa .
 	 * @param idMerito .
 	 * @param observacion .
+	 * @param usuarioUpdate .
 	 * @throws SQLException .
 	 */
-	public void validarMerito(String idBolsa, Integer idMerito, String observacion) throws SQLException {
+	public void validarMerito(String idBolsa, Integer idMerito, String observacion, UsuarioBolsaEmpleo usuarioUpdate) throws SQLException {
 		String consulta = "UPDATE"
-				+ " (SELECT bepsbm.FLGEXCLUIDO AS EXCLUIDO, bepsbm.FLGVALIDADO AS VALIDADO, bepsbm.OBSERVACION_CANDIDATO AS OBSERVACION"
+				+ " (SELECT bepsbm.FLGEXCLUIDO AS EXCLUIDO, bepsbm.FLGVALIDADO AS VALIDADO, bepsbm.OBSERVACION_CANDIDATO AS OBSERVACION, "
+				+ "			bepsbm.UID_USUARIO AS UID_USUARIO"
 				+ "  FROM TBEP_SOL_BOL_MERITOS bepsbm"
 				+ "  INNER JOIN TBEP_SOLICITUD_BOLSAS bepsbo"
 				+ "  ON bepsbo.CODNUM = bepsbm.BEPSBO_CODNUM"
 				+ "  WHERE bepsbo.BEPBOL_CODNUM = ? AND bepsbm.BEPMER_CODNUM = ?"
 				+ " ) MERITO"
-				+ " SET EXCLUIDO = 'N', VALIDADO = 'S', OBSERVACION = ?";
+				+ " SET EXCLUIDO = 'N', VALIDADO = 'S', OBSERVACION = ?, UID_USUARIO = ?";
 
 		try (Connection conexion = ConexionUvirtual.obtenerInstancia(); PreparedStatement stmtUpdate = conexion.prepareStatement(consulta)) {
 			int indexParam = 1;
 			stmtUpdate.setString(indexParam++, idBolsa);
 			stmtUpdate.setInt(indexParam++, idMerito);
 			stmtUpdate.setString(indexParam++, observacion);
+			stmtUpdate.setString(indexParam++, usuarioUpdate.getCodCuenta());
 			stmtUpdate.executeUpdate();
 		}
 	}
@@ -687,23 +690,26 @@ public class ModeloValidar {
 	 * @param idBolsa .
 	 * @param idMerito .
 	 * @param observacion .
+	 * @param usuarioUpdate .
 	 * @throws SQLException .
 	 */
-	public void excluirMerito(String idBolsa, Integer idMerito, String observacion) throws SQLException {
+	public void excluirMerito(String idBolsa, Integer idMerito, String observacion, UsuarioBolsaEmpleo usuarioUpdate) throws SQLException {
 		String consulta = "UPDATE"
-				+ " (SELECT bepsbm.FLGEXCLUIDO AS EXCLUIDO, bepsbm.FLGVALIDADO AS VALIDADO, bepsbm.OBSERVACION_CANDIDATO AS OBSERVACION"
+				+ " (SELECT bepsbm.FLGEXCLUIDO AS EXCLUIDO, bepsbm.FLGVALIDADO AS VALIDADO, bepsbm.OBSERVACION_CANDIDATO AS OBSERVACION,"
+				+ "			bepsbm.UID_USUARIO AS UID_USUARIO"
 				+ "  FROM TBEP_SOL_BOL_MERITOS bepsbm"
 				+ "  INNER JOIN TBEP_SOLICITUD_BOLSAS bepsbo"
 				+ "  ON bepsbo.CODNUM = bepsbm.BEPSBO_CODNUM"
 				+ "  WHERE bepsbo.BEPBOL_CODNUM = ? AND bepsbm.BEPMER_CODNUM = ?"
 				+ " ) MERITO"
-				+ " SET EXCLUIDO = 'S', VALIDADO = 'N', OBSERVACION = ?";
+				+ " SET EXCLUIDO = 'S', VALIDADO = 'N', OBSERVACION = ?, UID_USUARIO = ?";
 
 		try (Connection conexion = ConexionUvirtual.obtenerInstancia(); PreparedStatement stmtUpdate = conexion.prepareStatement(consulta)) {
 			int indexParam = 1;
 			stmtUpdate.setString(indexParam++, idBolsa);
 			stmtUpdate.setInt(indexParam++, idMerito);
 			stmtUpdate.setString(indexParam++, observacion);
+			stmtUpdate.setString(indexParam++, usuarioUpdate.getCodCuenta());
 			stmtUpdate.executeUpdate();
 		}
 	}

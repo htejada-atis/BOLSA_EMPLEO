@@ -312,23 +312,25 @@ public class ModeloEvaluador {
 	/**	Función que agrega evaluadores a un área .
 	 * @param usuarios .
 	 * @param area id del area por el que se va a filtrar .
+	 * @param usuarioUpdate .
 	 * @throws SQLException en caso de error en la BD .
 	 * @throws UVException en caso de error de parámetros .
 	 */
-	public void insertaEvaluadores(List<String> usuarios, Integer area) throws SQLException, UVException {
+	public void insertaEvaluadores(List<String> usuarios, Integer area, UsuarioBolsaEmpleo usuarioUpdate) throws SQLException, UVException {
 		
 		if (area == null) {
 			throw new UVException("No se puede agregar un evaluador sin el id del área");
 		}
 		
 		String params = BolsaEmpleoUtils.consultaMultiplesParametros(usuarios.size());
-		String consulta = "INSERT INTO TBEP_EVALUADORES (BEPARE_CODNUM, BEPUSU_CODNUM)"
-				+ " SELECT bepare.CODNUM AS BEPARE_CODNUM, bepusu.CODNUM AS BEPUSU_CODNUM"
+		String consulta = "INSERT INTO TBEP_EVALUADORES (BEPARE_CODNUM, BEPUSU_CODNUM, UID_USUARIO)"
+				+ " SELECT bepare.CODNUM AS BEPARE_CODNUM, bepusu.CODNUM AS BEPUSU_CODNUM, ? AS UID_USUARIO"
 				+ " FROM TBEP_USUARIOS bepusu, TBEP_AREAS bepare WHERE bepare.CODNUM = ? AND "
 				+ " bepusu.CODNUM IN (" + params + ")";
 		
 		try (Connection conexion = ConexionUvirtual.obtenerInstancia(); PreparedStatement stmt = conexion.prepareStatement(consulta)) {
 			int indexParam = 1;
+			stmt.setString(indexParam++, usuarioUpdate.getCodCuenta());
 			stmt.setInt(indexParam++, area);
 			for (String usuario: usuarios) {
 				stmt.setString(indexParam++, usuario);
@@ -340,10 +342,11 @@ public class ModeloEvaluador {
 	/**	Función que agrega un evaluador a un área .
 	 * @param usuario .
 	 * @param area id del area por el que se va a filtrar .
+	 * @param usuarioUpdate .
 	 * @throws SQLException en caso de error en la BD .
 	 * @throws UVException en caso de error de parámetros .
 	 */
-	public void insertaEvaluador(UsuarioBolsaEmpleo usuario, Integer area) throws SQLException, UVException {
+	public void insertaEvaluador(UsuarioBolsaEmpleo usuario, Integer area, UsuarioBolsaEmpleo usuarioUpdate) throws SQLException, UVException {
 		
 		if (area == null) {
 			throw new UVException("No se puede agregar un evaluador sin el id del área");
@@ -353,13 +356,14 @@ public class ModeloEvaluador {
 			throw new UVException("No se puede agregar un evaluador si el usuario esta vacio");
 		}
 
-		String consulta = "INSERT INTO TBEP_EVALUADORES (BEPARE_CODNUM, BEPUSU_CODNUM)"
-				+ " SELECT bepare.CODNUM AS BEPARE_CODNUM, bepusu.CODNUM AS BEPUSU_CODNUM"
+		String consulta = "INSERT INTO TBEP_EVALUADORES (BEPARE_CODNUM, BEPUSU_CODNUM, UID_USUARIO)"
+				+ " SELECT bepare.CODNUM AS BEPARE_CODNUM, bepusu.CODNUM AS BEPUSU_CODNUM, ? AS UID_USUARIO"
 				+ " FROM TBEP_USUARIOS bepusu, TBEP_AREAS bepare WHERE bepare.CODNUM = ? AND"
 				+ " bepusu.CODNUM = ?";
 		
 		try (Connection conexion = ConexionUvirtual.obtenerInstancia(); PreparedStatement stmt = conexion.prepareStatement(consulta)) {
 			int indexParam = 1;
+			stmt.setString(indexParam++, usuarioUpdate.getCodCuenta());
 			stmt.setInt(indexParam++, area);
 			stmt.setInt(indexParam++, usuario.getCodNum());
 			stmt.executeUpdate();
@@ -368,10 +372,11 @@ public class ModeloEvaluador {
 	
 	/** Borra o restaura un evaluador .
 	 * @param evaluador a borrar .
+	 * @param usuarioUpdate .
 	 * @throws SQLException en caso de error en la BD .
 	 * @throws UVException si noticia no es valida .
 	 */
-	public void borraRestauraEvaluador(Evaluador evaluador) throws SQLException, UVException {
+	public void borraRestauraEvaluador(Evaluador evaluador, UsuarioBolsaEmpleo usuarioUpdate) throws SQLException, UVException {
 		if (evaluador == null) {
 			throw new UVException("No se puede eliminar un evaluador vacío");
 		}
@@ -381,11 +386,12 @@ public class ModeloEvaluador {
 		if (evaluador.getCodNumArea() == null) {
 			throw new UVException("No se puede eliminar un evaluador con id de area vacío");
 		}
-		String consulta = "UPDATE TBEP_EVALUADORES SET flgactivo=? WHERE bepusu_codnum=? AND bepare_codnum=? ";
+		String consulta = "UPDATE TBEP_EVALUADORES SET flgactivo=?, UID_USUARIO=? WHERE bepusu_codnum=? AND bepare_codnum=? ";
 		try (Connection conexion = ConexionUvirtual.obtenerInstancia();
 			 PreparedStatement stmt = conexion.prepareStatement(consulta);) {
 			int parameterIndex = 1;
 			stmt.setString(parameterIndex++, evaluador.isActivo() ? "S" : "N");
+			stmt.setString(parameterIndex++, usuarioUpdate.getCodCuenta());
 			stmt.setInt(parameterIndex++, evaluador.getCodNum());
 			stmt.setInt(parameterIndex++, evaluador.getCodNumArea());
 			stmt.executeUpdate();

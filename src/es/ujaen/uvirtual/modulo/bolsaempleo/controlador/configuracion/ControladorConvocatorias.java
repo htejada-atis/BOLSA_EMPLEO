@@ -170,7 +170,7 @@ public class ControladorConvocatorias extends HttpServlet {
 		bean.setVista(JSP_INDEX);
 		BolsaEmpleoUtils.readMensajeSession(bean, request);
 		try {
-			ModeloUsuarioBolsaEmpleo.obtenerInstancia().checkUser(datos);
+			bean.setUsuarioLogeado(ModeloUsuarioBolsaEmpleo.obtenerInstancia().getOrCreateUsuario(datos));
 		} catch (UVException e) {
 			BolsaEmpleoUtils.addMensajeDeError(e.getMessage(), bean, request);
 			response.sendRedirect("/srv/es/informacionadministrativa/bolsaempleo/error");
@@ -240,7 +240,7 @@ public class ControladorConvocatorias extends HttpServlet {
 			// creamos convocatoria, por defecto cerrada
 			
 			convocatoria.setEstado(ModeloConvocatoria.CONVOCATORIA_ESTADO_CERRADA);
-			modelo.nuevaConvocatoria(convocatoria);
+			modelo.nuevaConvocatoria(convocatoria, bean.getUsuarioLogeado());
 						
 			BolsaEmpleoUtils.addMensajeDeExito(MENSAJE_INFO_CONVOCATORIAS_INSERTADA_CORRECTAMENTE, bean, request);
 			response.sendRedirect(request.getServletPath());
@@ -270,7 +270,7 @@ public class ControladorConvocatorias extends HttpServlet {
 					convocatoriaForm.getNumBolsasMaximo(),
 					convocatoriaForm.getNumMeritosPorBloque()
 			); 
-			modelo.actualizaConvocatoria(conFinal);	
+			modelo.actualizaConvocatoria(conFinal, bean.getUsuarioLogeado());	
 			
 			BolsaEmpleoUtils.addMensajeDeExito(MENSAJE_INFO_CONVOCATORIA_ACTUALIZADA_CORRECTAMENTE, bean, request);
 			response.sendRedirect(request.getServletPath());
@@ -298,7 +298,7 @@ public class ControladorConvocatorias extends HttpServlet {
 		} else {
 			Integer codNum = Formateador.leeParametroInteger(request.getParameter(PARAM_CONVOCATORIA_ID));
 			Convocatoria conFinal = new Convocatoria(codNum, ModeloConvocatoria.CONVOCATORIA_ESTADO_ABIERTA); 
-			modelo.cambiaEstadoConvocatoria(conFinal);	
+			modelo.cambiaEstadoConvocatoria(conFinal, bean.getUsuarioLogeado());	
 
 			BolsaEmpleoUtils.addMensajeDeExito(MENSAJE_INFO_CONVOCATORIA_ACTUALIZADA_CORRECTAMENTE, bean, request);
 		}
@@ -315,7 +315,7 @@ public class ControladorConvocatorias extends HttpServlet {
 		
 		Integer codNum = Formateador.leeParametroInteger(request.getParameter(PARAM_CONVOCATORIA_ID));
 		Convocatoria conFinal = new Convocatoria(codNum, ModeloConvocatoria.CONVOCATORIA_ESTADO_CERRADA);
-		modelo.cambiaEstadoConvocatoria(conFinal);
+		modelo.cambiaEstadoConvocatoria(conFinal, bean.getUsuarioLogeado());
 
 		BolsaEmpleoUtils.addMensajeDeExito(MENSAJE_INFO_CONVOCATORIA_ACTUALIZADA_CORRECTAMENTE, bean, request);
 		response.sendRedirect(request.getServletPath());
@@ -369,7 +369,7 @@ public class ControladorConvocatorias extends HttpServlet {
 		Integer codNum = Formateador.leeParametroInteger(request.getParameter(PARAM_CONVOCATORIA_ID));
 		Convocatoria convocatoria = new Convocatoria();
 		convocatoria.setCodNum(codNum);
-		modelo.borraConvocatoria(convocatoria);
+		modelo.borraConvocatoria(convocatoria, bean.getUsuarioLogeado());
 		BolsaEmpleoUtils.addMensajeDeExito(MENSAJE_EXITO_ELIMINAR, bean, request);
 		response.sendRedirect(request.getServletPath());
 	}

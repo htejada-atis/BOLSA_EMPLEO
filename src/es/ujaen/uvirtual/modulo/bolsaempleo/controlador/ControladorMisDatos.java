@@ -154,7 +154,7 @@ public class ControladorMisDatos extends HttpServlet {
 		this.index(bean, datos);
 		BolsaEmpleoUtils.readMensajeSession(bean, request);
 		try {
-			ModeloUsuarioBolsaEmpleo.obtenerInstancia().checkUser(datos);
+			bean.setUsuarioLogeado(ModeloUsuarioBolsaEmpleo.obtenerInstancia().getOrCreateUsuario(datos));
 		} catch (UVException e) {
 			BolsaEmpleoUtils.addMensajeDeError(e.getMessage(), bean, request);
 			response.sendRedirect("/srv/es/informacionadministrativa/bolsaempleo/error");
@@ -202,7 +202,7 @@ public class ControladorMisDatos extends HttpServlet {
 		UsuarioBolsaEmpleo usuarioForm = this.validarDatosUsuario(request);
 		usuarioForm.setCodNum(usuario.getCodNum());
 		    
-		modelo.actualizaUsuarioMisDatos(usuarioForm);
+		modelo.actualizaUsuarioMisDatos(usuarioForm, bean.getUsuarioLogeado());
 		
 		UsuarioBolsaEmpleo usuaCont = modelo.getUsuarioById(codNum);
 		Usuario usuArcos = CrearUsuario.usuario(usuaCont.getCodCuenta());
@@ -231,7 +231,7 @@ public class ControladorMisDatos extends HttpServlet {
 			
 			usu.setRazonBorrado(razonBorrado);
 			
-			modelo.cambiarFlagBorradoUsuarioRazon(usu);
+			modelo.cambiarFlagBorradoUsuarioRazon(usu, bean.getUsuarioLogeado());
 			
 			bean.getMensajesDeExito().add(MENSAJE_EXITO_DARSE_BAJA);
 		}

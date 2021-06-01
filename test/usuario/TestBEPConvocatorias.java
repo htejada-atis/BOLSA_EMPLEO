@@ -87,7 +87,7 @@ public class TestBEPConvocatorias extends UtilsTestUsuarioBase {
 	 */
 	@Test
 	public void testA1() {
-		WebDriverWait wait = new WebDriverWait(DriverUv.getDriver(), UtilsTestBEP.WAIT_ELEMENT);
+		WebDriverWait wait = new WebDriverWait(DriverUv.getDriver(), UtilsTestBolsaEmpleo.WAIT_ELEMENT);
 
 		// esperamos div principal
 		WebElement main = wait.until(ExpectedConditions.visibilityOfElementLocated(By.className(DIV_MAIN_CONVOCATORIAS)));
@@ -123,7 +123,7 @@ public class TestBEPConvocatorias extends UtilsTestUsuarioBase {
 	 */
 	@Test
 	public void testA2() {
-		WebDriverWait wait = new WebDriverWait(DriverUv.getDriver(), UtilsTestBEP.WAIT_ELEMENT);
+		WebDriverWait wait = new WebDriverWait(DriverUv.getDriver(), UtilsTestBolsaEmpleo.WAIT_ELEMENT);
 
 		// esperamos div principal
 		WebElement main = wait.until(ExpectedConditions.visibilityOfElementLocated(By.className(DIV_MAIN_CONVOCATORIAS)));
@@ -149,7 +149,7 @@ public class TestBEPConvocatorias extends UtilsTestUsuarioBase {
 	 */
 	@Test
 	public void testA4() {
-		WebDriverWait wait = new WebDriverWait(DriverUv.getDriver(), UtilsTestBEP.WAIT_ELEMENT);
+		WebDriverWait wait = new WebDriverWait(DriverUv.getDriver(), UtilsTestBolsaEmpleo.WAIT_ELEMENT);
 		WebElement pmain = wait.until(ExpectedConditions.visibilityOfElementLocated(By.className(DIV_MAIN_CONVOCATORIAS)));
 		WebElement table = getTables(pmain, ID_TABLE);
 		WebElement th = table.findElement(By.cssSelector("button[type='button']"));

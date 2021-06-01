@@ -136,7 +136,7 @@ public class ControladorBolsas extends HttpServlet {
 		
 		BolsaEmpleoUtils.readMensajeSession(bean, request);
 		try {
-			ModeloUsuarioBolsaEmpleo.obtenerInstancia().checkUser(datos);
+			bean.setUsuarioLogeado(ModeloUsuarioBolsaEmpleo.obtenerInstancia().getOrCreateUsuario(datos));
 		} catch (UVException e) {
 			BolsaEmpleoUtils.addMensajeDeError(e.getMessage(), bean, request);
 			response.sendRedirect("/srv/es/informacionadministrativa/bolsaempleo/error");
@@ -202,19 +202,19 @@ public class ControladorBolsas extends HttpServlet {
 		String nombreAccionBolsa = EscapaHTML.ajustaCodificacion(request.getParameter(PARAM_ACCION_BOLSA));
 		switch (nombreAccionBolsa) {
 			case ACCION_BOLSAS_BLOQUEAR:
-				modelo.bloquearBolsas(bolsas);
+				modelo.bloquearBolsas(bolsas, bean.getUsuarioLogeado());
 				break;
 			case ACCION_BOLSAS_REVISION:
-				modelo.ponerBolsasEnRevision(bolsas);
+				modelo.ponerBolsasEnRevision(bolsas, bean.getUsuarioLogeado());
 				break;
 			case ACCION_BOLSAS_BAREMACION:
-				modelo.ponerBolsasEnBaremacion(bolsas);
+				modelo.ponerBolsasEnBaremacion(bolsas, bean.getUsuarioLogeado());
 				break;
 			case ACCION_BOLSAS_ALEGACION:
-				modelo.ponerBolsasEnAlegaciones(bolsas);
+				modelo.ponerBolsasEnAlegaciones(bolsas, bean.getUsuarioLogeado());
 				break;
 			case ACCION_BOLSAS_DESBLOQUEAR:
-				modelo.desbloquearBolsas(bolsas);
+				modelo.desbloquearBolsas(bolsas, bean.getUsuarioLogeado());
 				break;
 			case ACCION_BOLSAS_BAREMAR:
 				modelo.baremarBolsas(bolsas);
