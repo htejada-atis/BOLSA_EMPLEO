@@ -213,6 +213,9 @@ table.bluetable.bolsaempleo .btns .btn {
 	border: 1px solid #83a8ff;
 	margin-bottom: 1px;
 }
+table.bluetable.bolsaempleo .btns .btn.only-icon {
+	width: inherit;
+}
 table.bluetable.bolsaempleo span button {
 	margin-left: 1px;
 	border: 1px solid rgb(118, 118, 118);
