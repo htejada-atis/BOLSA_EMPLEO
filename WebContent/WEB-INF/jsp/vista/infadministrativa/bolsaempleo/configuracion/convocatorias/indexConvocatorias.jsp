@@ -69,11 +69,11 @@ VistaConvocatorias bean = (VistaConvocatorias) uvdatos.getVistas().get(VistaConv
 			    			}
 			    		},
 			    	'onClick': function(row) {
-				    		if(row.estado=="CERRADA"){
+				    		if(row.estado=="CERRADA") {
 				    			Atis.confirmDialog("Cambio de estado", "¿Desea abrir la convocatoria? Recuerde revisar áreas a baremar, titulaciones, etc ...", {
 					            	Si: function() {
 					            		var params = {
-					            				'a': '<%=ControladorConvocatorias.ACCION_ABRIR_CONVOCATORIA%>', 
+					            				'<%=ControladorConvocatorias.PARAM_ACCION%>': '<%=ControladorConvocatorias.ACCION_ABRIR_CONVOCATORIA%>', 
 					            				'<%=ControladorConvocatorias.PARAM_CONVOCATORIA_ID%>': row.codNum
 					            			};
 					        			Atis.sendForm("<%= request.getRequestURI() %>", params);
@@ -83,12 +83,11 @@ VistaConvocatorias bean = (VistaConvocatorias) uvdatos.getVistas().get(VistaConv
 					              		$(this).dialog("close");
 					            	}
 					          	});
-				    		}
-				    		else{
-				    			Atis.confirmDialog("Cambio de estado", "¿Desea cerrar la convocatoria? Recuerde revisar áreas a baremar, titulaciones, etc ...", {
+				    		} else {
+				    			Atis.confirmDialog("Cambio de estado", "¿Desea cerrar la convocatoria?", {
 					            	Si: function() {
 					            		var params = {
-					            				'a': '<%=ControladorConvocatorias.ACCION_CERRAR_CONVOCATORIA%>',
+					            				'<%=ControladorConvocatorias.PARAM_ACCION%>': '<%=ControladorConvocatorias.ACCION_CERRAR_CONVOCATORIA%>',
 					            				'<%=ControladorConvocatorias.PARAM_CONVOCATORIA_ID%>': row.codNum
 					            			};
 					        			Atis.sendForm("<%= request.getRequestURI() %>", params);
@@ -105,7 +104,7 @@ VistaConvocatorias bean = (VistaConvocatorias) uvdatos.getVistas().get(VistaConv
 		        		Atis.confirmDialog("¿Desea borrar la convocatoria?", "Borrado de convocatoria", {
 			            	Si: function() {
 			            		var params = {
-			            				'a': '<%=ControladorConvocatorias.ACCION_BORRAR_CONVOCATORIA%>',
+			            				'<%=ControladorConvocatorias.PARAM_ACCION%>': '<%=ControladorConvocatorias.ACCION_BORRAR_CONVOCATORIA%>',
 			            				'<%=ControladorConvocatorias.PARAM_CONVOCATORIA_ID%>': row.codNum
 			            			};
 			        			Atis.sendForm("<%= request.getRequestURI() %>", params);

@@ -311,6 +311,9 @@ public class ModeloConvocatoria {
 		if (conv.getCodNum() == null) {
 			throw new UVException("No se puede eliminar una convocatoria con id vacío");
 		}
+		if (this.getNumSolicitudesByConvocatoriaId(conv.getCodNum()) > 0) {
+			throw new UVException("No se puede eliminar, hay solicitudes en la convocatoria");
+		}
 				
 		try (Connection conexion = ConexionUvirtual.obtenerInstancia()) {
 			String consultaUpdate = "UPDATE tbep_convocatorias SET UID_USUARIO=? WHERE codnum = ?";

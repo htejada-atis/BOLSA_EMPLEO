@@ -45,7 +45,7 @@ $(document).ready(function() {
 	var table = new Atis.DataTable('#table', {
 	    "ajax": { url: "/srv/es/ajax/informacionadministrativa/bolsaempleo/configuracion/areasbaremar" },
 	    "selectable": true,
-	    "pageSize": 10,
+	    "pageSize": 100,
 	    "action": "<%= ControladorAreasABaremar.ACCION_DATATABLE %>",
 	    "filterable": true,
 	    "columns": [
@@ -53,7 +53,7 @@ $(document).ready(function() {
 	        {'data': 'codNum', 'filter': {'type': 'number'}},
 	        {'data': 'area.idAreaExterno', 'filter': true},
 	        {'data': 'area.descripcion', 'filter': true},
-	        {'data': 'baremable', 'filter': {'type': 'select', 'options': {'true': 'baremable', 'false': 'no baremable'}}, 'render': function(row) {
+	        {'data': 'baremable', 'filter': {'type': 'select', 'options': {'true': 'Baremable', 'false': 'No baremable'}}, 'render': function(row) {
         		if(row.baremable){
         			return "<div title='Baremable' class='circle-true'></div>"; 
         		}

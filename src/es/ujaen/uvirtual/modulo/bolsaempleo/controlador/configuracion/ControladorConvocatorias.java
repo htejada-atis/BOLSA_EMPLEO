@@ -253,7 +253,7 @@ public class ControladorConvocatorias extends HttpServlet {
 		Integer solicitudes = modelo.getNumSolicitudesByConvocatoriaId(convocatoria.getCodNum());
 		if (solicitudes > 0) {
 			bean.setVista(JSP_INDEX);
-			throw new UVException("No puede editar la convocatoria, ya existen solicitudes abiertas para ella");
+			throw new UVException("No puede editar la convocatoria, ya existen solicitudes para ella");
 		}
 		
 		bean.setVista(JSP_FORM_CONVOCATORIA);

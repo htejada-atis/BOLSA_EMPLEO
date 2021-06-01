@@ -58,6 +58,7 @@ public class BolsaEmpleoDataTable<T> {
 		public static final int COLUMN_TYPE_BOOLEAN = 3;
 		public static final int COLUMN_TYPE_OPTION = 4;
 		public static final int COLUMN_TYPE_IS_NULL = 5;
+		public static final int COLUMN_TYPE_EXACT = 6;
 		
 		private String columnName;
 		private int columnType;
@@ -112,7 +113,6 @@ public class BolsaEmpleoDataTable<T> {
 	private String queryCount;
 	private Integer pageSize;
 	private Integer currentPage;
-	private Integer recordsTotal;
 	private Integer pagesTotal;
 	private Integer orderBy;
 	private String orderDirection;
@@ -240,7 +240,8 @@ public class BolsaEmpleoDataTable<T> {
 				} else if (this.columns.get(key).getType() == DataTableColumn.COLUMN_TYPE_BOOLEAN) {
 					stmt.setString(index, Boolean.parseBoolean(value) ? "S" : "N");
 					stmtCount.setString(index++, Boolean.parseBoolean(value) ? "S" : "N");
-				} else if (this.columns.get(key).getType() == DataTableColumn.COLUMN_TYPE_OPTION) {
+				} else if (this.columns.get(key).getType() == DataTableColumn.COLUMN_TYPE_OPTION 
+						|| this.columns.get(key).getType() == DataTableColumn.COLUMN_TYPE_EXACT) {
 					stmt.setString(index, value);
 					stmtCount.setString(index++, value);
 				} else if (this.columns.get(key).getType() == DataTableColumn.COLUMN_TYPE_TEXT) {
@@ -263,8 +264,8 @@ public class BolsaEmpleoDataTable<T> {
 			if (!rs.next()) {
 				throw new UVException("Error obteniendo número total de filas");
 			}
-			this.recordsTotal = rs.getInt("count");
-			this.pagesTotal = (int) Math.ceil((this.recordsTotal * 1.0) / this.pageSize);			
+			Integer recordsTotal = rs.getInt("count");
+			this.pagesTotal = (int) Math.ceil((recordsTotal * 1.0) / this.pageSize);			
 		}
 	}
 
@@ -372,17 +373,18 @@ public class BolsaEmpleoDataTable<T> {
 					consultaResult.append(" AND " + columnName + " = ? ");
 					break;
 				case DataTableColumn.COLUMN_TYPE_IS_NULL:
-					consultaResult.append(
-							" AND " + columnName + " IS" + (Boolean.parseBoolean(filter.getValue()) ? " NOT" : "") + " NULL");
+					consultaResult.append(" AND " + columnName + " IS" + (Boolean.parseBoolean(filter.getValue()) ? " NOT" : "") + " NULL");
+					break;
+				case DataTableColumn.COLUMN_TYPE_EXACT:
+					consultaResult.append(" AND lower(" + columnName + ") = lower(?) ");
 					break;
 				case DataTableColumn.COLUMN_TYPE_TEXT:
-					consultaResult.append(" AND lower(" + columnName + ") LIKE lower(?) ");
-					break;
 				default:
 					consultaResult.append(" AND lower(" + columnName + ") LIKE lower(?) ");
 					break;
 			}
 		}
+		
 		return consultaResult.toString();
 	}
 

@@ -69,7 +69,8 @@ public class ControladorAreasABaremar extends HttpServlet {
 	public static final String PARAM_ID = "id";
 	
 	// ruta vistas
-	public static final String RUTA_BEP_CONF = "/WEB-INF/jsp/vista/infadministrativa/bolsaempleo/configuracion/";
+	public static final String RUTA_BEP_CONF = "/WEB-INF/jsp/vista/infadministrativa/bolsaempleo/configuracion/areasbaremar/";
+	public static final String JSP_INDEX = RUTA_BEP_CONF + "areasbaremar.jsp"; 
 		
 	// ajax
 	public static final String URL_PATTERN_AJAX = "/srv/es/ajax/informacionadministrativa/bolsaempleo/configuracion/titulacionespreferentesarea";
@@ -138,7 +139,7 @@ public class ControladorAreasABaremar extends HttpServlet {
 	}
 	
 	private void init(VistaAreasBaremar bean, UVDatos datos, HttpServletRequest request, HttpServletResponse response) throws SQLException, UVException, IOException {
-		bean.setVista(RUTA_BEP_CONF + "areasbaremar.jsp");
+		bean.setVista(JSP_INDEX);
 		BolsaEmpleoUtils.readMensajeSession(bean, request);
 		try {
 			bean.setUsuarioLogeado(ModeloUsuarioBolsaEmpleo.obtenerInstancia().getOrCreateUsuario(datos));

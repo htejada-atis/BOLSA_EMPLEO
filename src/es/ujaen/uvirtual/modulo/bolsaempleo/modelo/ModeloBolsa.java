@@ -81,14 +81,12 @@ public class ModeloBolsa {
 		List<Bolsa> bolsas = new ArrayList<>();
 		BolsaEmpleoDataTable<Bolsa> dataTable = new BolsaEmpleoDataTable<>(params);
 
-		String consulta = "SELECT bepbol.* " + "FROM TBEP_BOLSAS bepbol "
-				+ "INNER JOIN TBEP_AREAS bepare ON bepare.CODNUM = bepbol.BEPARE_CODNUM " + "WHERE 1=1 ";
+		String consulta = "SELECT bepbol.* FROM TBEP_BOLSAS bepbol INNER JOIN TBEP_AREAS bepare ON bepare.CODNUM = bepbol.BEPARE_CODNUM WHERE 1=1 ";
 
 		dataTable.setColumn(ORDER_COLUMN_INDEX_ID, "bepbol.CODNUM", DataTableColumn.COLUMN_TYPE_NUMBER);
 		dataTable.setColumn(ORDER_COLUMN_INDEX_AREA, "bepare.DES_AREA_CONOCIMIENTO");
-		dataTable.setColumn(ORDER_COLUMN_INDEX_ESTADO, "bepbol.ESTADO");
-		dataTable.setColumn(ORDER_COLUMN_INDEX_ACTUALIZADA, "bepbol.FECHAACTUALIZACION",
-				DataTableColumn.COLUMN_TYPE_DATE);
+		dataTable.setColumn(ORDER_COLUMN_INDEX_ESTADO, "bepbol.ESTADO", DataTableColumn.COLUMN_TYPE_EXACT);
+		dataTable.setColumn(ORDER_COLUMN_INDEX_ACTUALIZADA, "bepbol.FECHAACTUALIZACION", DataTableColumn.COLUMN_TYPE_DATE);
 		dataTable.setColumn(ORDER_COLUMN_INDEX_BLOQUEO, "bepbol.FECHABLOQUEO", DataTableColumn.COLUMN_TYPE_DATE);
 		dataTable.setColumn(ORDER_COLUMN_INDEX_DESBLOQUEO, "bepbol.FECHADEBLOQUEO", DataTableColumn.COLUMN_TYPE_DATE);
 		dataTable.setColumn(ORDER_COLUMN_INDEX_BAREMALE, "bepbol.FLGBAREMABLE", DataTableColumn.COLUMN_TYPE_BOOLEAN);

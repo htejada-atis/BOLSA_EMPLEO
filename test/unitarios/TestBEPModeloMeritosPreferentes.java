@@ -15,8 +15,6 @@ import java.text.ParseException;
 import java.util.HashMap;
 import java.util.List;
 
-import javax.sql.DataSource;
-
 import org.junit.BeforeClass;
 import org.junit.FixMethodOrder;
 import org.junit.Test;

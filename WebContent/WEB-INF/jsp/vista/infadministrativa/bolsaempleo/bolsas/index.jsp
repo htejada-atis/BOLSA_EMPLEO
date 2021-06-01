@@ -1,3 +1,4 @@
+<%@page import="es.ujaen.uvirtual.modulo.bolsaempleo.modelo.ModeloBolsa"%>
 <%@ page trimDirectiveWhitespaces="true"%>
 <%@ page import="es.ujaen.uvirtual.beans.UVDatos"%>
 <%@	page import="es.ujaen.uvirtual.modulo.bolsaempleo.controlador.ControladorBolsas"%>
@@ -86,7 +87,7 @@ $(document).ready(function() {
 	    	{'data': 'codNum', 'selectable': true},
 	        {'data': 'codNum', 'filter': {'type': 'number'}},
 	        {'data': 'area.descripcion', 'filter': true},
-	        {'data': 'estado', 'filter': {'type': 'select', 'options': {'BLOQUEADA':'Bloqueada', 'REVISION':'Revisión', 'BAREMACION':'Baremación', 'ALEGACIONES':'Alegaciones', 'DESBLOQUEADA':'Desbloqueada'}} },
+	        {'data': 'estado', 'filter': {'type': 'select', 'options': {'<%= ModeloBolsa.BOLSA_ESTADO_BLOQUEADA %>': 'Bloqueada', '<%= ModeloBolsa.BOLSA_ESTADO_REVISION %>': 'Revisión', '<%= ModeloBolsa.BOLSA_ESTADO_BAREMACION %>': 'Baremación', '<%= ModeloBolsa.BOLSA_ESTADO_ALEGACIONES %>':'Alegaciones', '<%= ModeloBolsa.BOLSA_ESTADO_DESBLOQUEADA %>':'Desbloqueada'}} },
 	        {'data': 'fechaActualizacion', 'filter': {'type': 'date'}},
 	        {'data': 'fechaBloqueo', 'filter': {'type': 'date'}},
 	        {'data': 'fechaDesBloqueo', 'filter': {'type': 'date'}},
