@@ -177,27 +177,31 @@ UsuarioBolsaEmpleo candidato = bean.getCandidato();
 								<b>Afinidad: </b>
 								<br/>
 							<%	if (individualizado) { %>
-									<%= meritoBolsa.getMeritoSolicitud().getValoraciones().get(0).getAfinidad().getCodigo() + " " + meritoBolsa.getMeritoSolicitud().getValoraciones().get(0).getAfinidad().getModulacion() %>
+									<%= meritoBolsa.getMeritoSolicitud().getValoraciones().get(0).getAfinidad().getCodigo() + " " + meritoBolsa.getMeritoSolicitud().getValoraciones().get(0).getAfinidad().getModulacion() + "</br>" %>
 							<%	} else {
 									for (MeritoSolicitudValoracion valoracion: meritoBolsa.getMeritoSolicitud().getValoraciones()) { %>
 										<%= valoracion.getValor() + " - " + valoracion.getAfinidad().getCodigo() + " " + valoracion.getAfinidad().getModulacion() + "%</br>" %>
 								<%	}
 								} %>
 								<b>Estado: </b>
-								<% if (meritoBolsa.getBolsa().getCodNum() == bolsa.getCodNum()) { %>
-			        				<div class='text-primary'>Baremación actual</div>
-			        			<% } else if (meritoBolsa.getMeritoSolicitud().getCodNum() != null) { %>
-			        				<div class='text-success'>Inscrito actualmente</div>
+								<% if (meritoBolsa.getMeritoSolicitud().isValidado()) { %>
+			        				<div class='text-success'>Incluido</div>
+			        			<% } else if (meritoBolsa.getMeritoSolicitud().isExcluido()) { %>
+			        				<div class='text-danger'>Excluido</div>
 			        			<% } else { %>
-			        				<div class='text-danger'>No inscrito</div>
+			        				<div class='text-primary'>Sin validar</div>
 			        			<% } %>
 							</td>
 							<td class='cell-afinidad'>
 							<%	if (individualizado) { %>
-									<select id="afinidad-individualizada">
+									<select id="afinidad-individualizada" data-valoracion="<%= meritoBolsa.getMeritoSolicitud().getValoraciones().get(0).getCodNum() %>">
 									<% 	for (Afinidad afinidad : bean.getListaAfinidades()) { %>
 										<%	if (afinidad.getCodigo().equals(meritoBolsa.getMeritoSolicitud().getMerito().getItemBaremacion().getAfinidad())) { %>
-												<option value="<%= afinidad.getCodNum() %>"><%= afinidad.getDescripcion() %></option>
+											<% 	if (meritoBolsa.getMeritoSolicitud().getValoraciones().get(0).getAfinidad().getCodNum() == afinidad.getCodNum()) { %>
+												<option value="<%= afinidad.getCodNum() %>" selected><%= afinidad.getModulacion() + ": " + afinidad.getDescripcion() %></option>
+											<%	} else { %>
+												<option value="<%= afinidad.getCodNum() %>"><%= afinidad.getModulacion() + ": " + afinidad.getDescripcion() %></option>
+											<%	} %>
 										<%	} %>
 									<%	} %>
 									</select>
@@ -344,21 +348,22 @@ $(document).ready(function() {
 				var self = this;
 				
 				this.getValoresAfinidades = function() {
-					var afinidades = {};
+					var noIndividualizadas = {};
 					$(cell).children('.field-no-individualizado').each(function(index, input) {
 						var afinidad = $(input).data('afinidad');
 						var value = parseFloat($(input).val());
-						afinidades[afinidad] = value;
+						noIndividualizadas[afinidad] = value;
 					});
-					return afinidades;
+					return noIndividualizadas;
 				}
 				
 				this.sumaTotal = function() {
 					var total = 0.0;
-					var afinidades = self.getValoresAfinidades();				
-					Object.keys(afinidades).forEach(function(key) {
-						total += afinidades[key];
-					});				
+					var noIndividualizadas = self.getValoresAfinidades();	
+					console.log(noIndividualizadas)
+					Object.keys(noIndividualizadas).forEach(function(key) {
+						total += noIndividualizadas[key];
+					});	
 					return total;
 				}
 				
@@ -397,8 +402,8 @@ $(document).ready(function() {
 				
 				var afinidades = {};
 				if (tr.data('individualizado')) {
-					var idAfinidad = $(tr).find('select').val();
-					afinidades[idAfinidad] = null;
+					var selectAfinidad = $(tr).find('select');
+					afinidades[selectAfinidad.val()] = selectAfinidad.data('valoracion');
 				} else {
 					var noIndividualizado = new NoIndividualizado(tr.find('.cell-afinidad'));
 					noIndividualizado.comparaTotal(tr.data('valor'));

@@ -110,24 +110,16 @@ public class VistaValidar extends Vista implements Serializable {
 		return bolsas;
 	}
 	
+	public void setBolsas(List<ValorMeritoBolsaTable> bolsas) {
+		this.bolsas = bolsas;
+	}
+	
 	public List<Afinidad> getListaAfinidades() {
 		return listaAfinidades;
 	}
 	
 	public void setListaAfinidades(List<Afinidad> afinidades) {
 		this.listaAfinidades = afinidades;
-	}
-	
-	public List<String> getListaTipoAfinidades() {
-		return listaTiposAfinidades;
-	}
-	
-	public void setListaTipoAfinidades(List<String> afinidades) {
-		this.listaTiposAfinidades = afinidades;
-	}
-	
-	public void setBolsas(List<ValorMeritoBolsaTable> bolsas) {
-		this.bolsas = bolsas;
 	}
 	
 }

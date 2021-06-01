@@ -197,8 +197,11 @@ table.bluetable.bolsaempleo input[type=text], table.bluetable.bolsaempleo input[
 table.bluetable.bolsaempleo input[type=text], table.bluetable.bolsaempleo input[type=number] {
 	padding: 1px 2px;
 }
-table.bluetable.bolsaempleo select {
+table.bluetable.bolsaempleo tbody select {
 	padding: 0px;
+}
+table.bluetable.bolsaempleo tbody select {
+	width: 100%;
 }
 table.bluetable.bolsaempleo label {
 	margin-right: 0px !important;
@@ -220,6 +223,9 @@ table.bluetable.bolsaempleo span button:disabled {
 table.bluetable.bolsaempleo .btn, table.bluetable.bolsaempleo .page-size select {
 	font-size: 11px; /* Set a font size */
 	cursor: pointer; /* Mouse pointer on hover */
+}
+table.bluetable.bolsaempleo .page-size select {
+	padding: 0px;
 }
 
 /* overflow */
