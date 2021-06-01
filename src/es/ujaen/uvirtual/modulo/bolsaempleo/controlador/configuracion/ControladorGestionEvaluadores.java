@@ -265,7 +265,7 @@ public class ControladorGestionEvaluadores extends HttpServlet {
 				continue;
 			}
 			
-			ModeloEvaluador.obtenerInstancia().insertaEvaluador(usuario, area.getCodNum());
+			ModeloEvaluador.obtenerInstancia().insertaEvaluador(usuario, area.getCodNum(), bean.getUsuarioLogeado());
 			BolsaEmpleoUtils.addMensajeDeExito(String.format(MENSAJE_EXITO_AGREGAR_EVALUADOR, area.getDescripcion()), bean, request);
 		}
 				
@@ -351,7 +351,7 @@ public class ControladorGestionEvaluadores extends HttpServlet {
 		boolean activo = "true".equals(EscapaHTML.ajustaCodificacion(request.getParameter(PARAM_ACTIVO)));
 		Evaluador evaluador = new Evaluador(bean.getArea().getCodNum(), activo);
 		evaluador.setCodNum(Formateador.leeParametroInteger(request.getParameter(PARAM_USUARIO)));
-		ModeloEvaluador.obtenerInstancia().borraRestauraEvaluador(evaluador);
+		ModeloEvaluador.obtenerInstancia().borraRestauraEvaluador(evaluador, bean.getUsuarioLogeado());
 		
 		BolsaEmpleoUtils.addMensajeDeExito(activo ? MENSAJE_EXITO_RESTAURAR : MENSAJE_EXITO_BORRAR, bean, request);
 		String url = request.getServletPath() + "?" 
