@@ -42,7 +42,7 @@ public class ModeloBaremacionApartados {
 	public static final Integer COLUMN_CODIGO_MAXLENGTH = 3; 
 	public static final Integer COLUMN_NOMBRE_MAXLENGTH = 100;
 
-	public static final Float MAXIMO_VALOR_PORCENTAGE = (float) 100.0;
+	public static final Float MAXIMO_VALOR_PORCENTAGE = (float) 1.0;
 	
 	public static final String CODIGO = "CODIGO";
 	public static final String CODNUM = "CODNUM";
@@ -415,12 +415,12 @@ public class ModeloBaremacionApartados {
 		}
 		
 		if (this.checkSumaPorcentagesApartados(apartado, "Superar")) {
-			throw new UVException("Los porcentages maximos de los bloques ya suman el 100%");
+			throw new UVException("La suma de los factores de los bloques suman más de 1");
 		}
 		
 		// puntuación o porcentaje
 		if (apartado.getPuntuacionMaxima() == null && apartado.getPorcentajeMaximo() == null) {
-			throw new UVException("Introduce una puntuación máxima o un porcentaje máximo");			
+			throw new UVException("Introduce una puntuación máxima o factores");			
 		}
 		
 		// puntuaciones o porcentaje pero no ambos
