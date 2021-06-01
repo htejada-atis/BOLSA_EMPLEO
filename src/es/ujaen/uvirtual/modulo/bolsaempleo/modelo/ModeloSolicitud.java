@@ -307,10 +307,11 @@ public class ModeloSolicitud {
 	 * El usuario selecciona las bolsas para su solicitud.
 	 * @param bolsas .
 	 * @param solicitud .
+	 * @param usuarioUpdate .
 	 * @throws SQLException .
 	 * @throws UVException .
 	 */
-	public void asignarBolsasASolicitud(Solicitud solicitud, List<Bolsa> bolsas) throws SQLException, UVException {
+	public void asignarBolsasASolicitud(Solicitud solicitud, List<Bolsa> bolsas, UsuarioBolsaEmpleo usuarioUpdate) throws SQLException, UVException {
 		if (solicitud.getEstado().equals(SOLICITUD_ESTADO_CERRADA)) {
 			throw new UVException("La solicitud está cerrada");
 		}
@@ -324,20 +325,21 @@ public class ModeloSolicitud {
 			try {				
 				// eliminamos las bolsas excluidas de la solicitud
 				if (!bolsasExcluidas.isEmpty()) {
-					this.eliminarBolsasExcluidasDeLaSolicitud(conexion, solicitud, bolsasExcluidas);
+					this.eliminarBolsasExcluidasDeLaSolicitud(conexion, solicitud, bolsasExcluidas, usuarioUpdate);
 				}
 				
 				// insertamos la bolsas agregadas a la solicitud
 				if (!bolsasAgregadas.isEmpty()) {
 					String paramsAgregadas = BolsaEmpleoUtils.consultaMultiplesParametros(bolsasAgregadas.size());
 
-					String consultaInsert = "INSERT INTO TBEP_SOLICITUD_BOLSAS (BEPBOL_CODNUM, BEPSOL_CODNUM)"
-							+ " SELECT bepbol.CODNUM AS BEPBOL_CODNUM, bepsol.CODNUM AS BEPSOL_CODNUM"
+					String consultaInsert = "INSERT INTO TBEP_SOLICITUD_BOLSAS (BEPBOL_CODNUM, BEPSOL_CODNUM, UID_USUARIO)"
+							+ " SELECT bepbol.CODNUM AS BEPBOL_CODNUM, bepsol.CODNUM AS BEPSOL_CODNUM, ? AS UID_USUARIO"
 							+ " FROM TBEP_BOLSAS bepbol, TBEP_SOLICITUDES bepsol WHERE bepsol.CODNUM = ? AND "
 							+ " bepbol.CODNUM IN (" + paramsAgregadas + ")";
 					
 					try (PreparedStatement stmt = conexion.prepareStatement(consultaInsert)) {
 						int indexParam = 1;
+						stmt.setString(indexParam++, usuarioUpdate.getCodCuenta());
 						stmt.setInt(indexParam++, solicitud.getCodNum());
 						for (Bolsa bolsa: bolsasAgregadas) {
 							stmt.setInt(indexParam++, bolsa.getCodNum());
@@ -532,6 +534,7 @@ public class ModeloSolicitud {
 	 * @param solicitud .
 	 * @param bolsa .
 	 * @param merito .
+	 * @param usuarioUpdate .
 	 * @throws SQLException .
 	 */
 	public void asignarMeritosASolicitudBolsa(Solicitud solicitud, Bolsa bolsa, Merito merito, UsuarioBolsaEmpleo usuarioUpdate) throws SQLException {
@@ -1241,10 +1244,32 @@ public class ModeloSolicitud {
 	 * @param conexion . 
 	 * @param solicitud .
 	 * @param bolsasExcluidas .
+	 * @param usuarioUpdate .
 	 * @throws SQLException .
 	 */
-	private void eliminarBolsasExcluidasDeLaSolicitud(Connection conexion, Solicitud solicitud, ArrayList<Bolsa> bolsasExcluidas) throws SQLException {
+	private void eliminarBolsasExcluidasDeLaSolicitud(Connection conexion, Solicitud solicitud, ArrayList<Bolsa> bolsasExcluidas, UsuarioBolsaEmpleo usuarioUpdate)
+			throws SQLException {
 		String paramsExcluidas = BolsaEmpleoUtils.consultaMultiplesParametros(bolsasExcluidas.size());
+		
+		// actualiza usuario de los méritos las bolsas eliminadas de la solicitud
+		String sqlUpdateMeritos = "UPDATE TBEP_SOL_BOL_MERITOS bepsbm"
+				+ "	SET bepsbm.UID_USUARIO = ?"
+				+ " WHERE bepsbm.BEPSBO_CODNUM IN ("
+				+ "		SELECT bepsbo.CODNUM "
+				+ "		FROM TBEP_SOLICITUD_BOLSAS bepsbo "
+				+ "		WHERE bepsbo.BEPSOL_CODNUM = ? "
+				+ "		AND bepsbo.BEPBOL_CODNUM IN (" + paramsExcluidas + ")"
+				+ " )";
+		
+		try (PreparedStatement stmt = conexion.prepareStatement(sqlUpdateMeritos)) {
+			int indexParam = 1;
+			stmt.setString(indexParam++, usuarioUpdate.getCodCuenta());
+			stmt.setInt(indexParam++, solicitud.getCodNum());
+			for (Bolsa bolsaExcluida: bolsasExcluidas) {
+				stmt.setInt(indexParam++, bolsaExcluida.getCodNum());
+			}
+			stmt.executeUpdate();
+		}
 		
 		// eliminamos meritos
 		String sqlDeleteMeritos = "DELETE FROM TBEP_SOL_BOL_MERITOS bepsbm"
@@ -1264,12 +1289,28 @@ public class ModeloSolicitud {
 			stmt.executeUpdate();
 		}
 		
-		// eliminamos bolsas
-		String sqlDelete = "DELETE FROM TBEP_SOLICITUD_BOLSAS bepsbo"
+		// actualiza usuario de las bolsas de la solicitud
+		String sqlUpdateBolsas = "UPDATE TBEP_SOLICITUD_BOLSAS bepsbo"
+				+ "	SET bepsbm.UID_USUARIO = ?"
 				+ " WHERE bepsbo.BEPSOL_CODNUM = ?"
 				+ " AND bepsbo.BEPBOL_CODNUM IN (" + paramsExcluidas + ")";
 		
-		try (PreparedStatement stmt = conexion.prepareStatement(sqlDelete)) {
+		try (PreparedStatement stmt = conexion.prepareStatement(sqlUpdateBolsas)) {
+			int indexParam = 1;
+			stmt.setString(indexParam++, usuarioUpdate.getCodCuenta());
+			stmt.setInt(indexParam++, solicitud.getCodNum());
+			for (Bolsa bolsaExcluida: bolsasExcluidas) {
+				stmt.setInt(indexParam++, bolsaExcluida.getCodNum());		
+			}
+			stmt.executeUpdate();
+		}
+		
+		// eliminamos bolsas
+		String sqlDeleteBolsas = "DELETE FROM TBEP_SOLICITUD_BOLSAS bepsbo"
+				+ " WHERE bepsbo.BEPSOL_CODNUM = ?"
+				+ " AND bepsbo.BEPBOL_CODNUM IN (" + paramsExcluidas + ")";
+		
+		try (PreparedStatement stmt = conexion.prepareStatement(sqlDeleteBolsas)) {
 			int indexParam = 1;
 			stmt.setInt(indexParam++, solicitud.getCodNum());
 			for (Bolsa bolsaExcluida: bolsasExcluidas) {
