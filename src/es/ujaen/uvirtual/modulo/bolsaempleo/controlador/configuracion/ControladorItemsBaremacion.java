@@ -378,7 +378,7 @@ public class ControladorItemsBaremacion extends HttpServlet {
 		
 		ApartadoBaremacion apartado = this.validateApartadoBaremacion(new ApartadoBaremacion(), request);
 		apartado.setActivo(true);
-		ModeloBaremacionApartados.obtenerInstancia().insertaApartado(apartado);
+		ModeloBaremacionApartados.obtenerInstancia().insertaApartado(apartado, bean.getUsuarioLogeado());
 		
 		BolsaEmpleoUtils.addMensajeDeExito(MENSAJE_EXITO_APARTADO_AGREGAR, bean, request);
 		bean.setVista(JSP_ITEM_BAREMACION);				

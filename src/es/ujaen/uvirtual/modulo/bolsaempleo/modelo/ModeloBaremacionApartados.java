@@ -11,6 +11,7 @@ import java.util.Map;
 
 import es.ujaen.uvirtual.modelo.conexion.ConexionUvirtual;
 import es.ujaen.uvirtual.modulo.bolsaempleo.beans.ApartadoBaremacion;
+import es.ujaen.uvirtual.modulo.bolsaempleo.beans.UsuarioBolsaEmpleo;
 import es.ujaen.uvirtual.modulo.bolsaempleo.utilidades.BolsaEmpleoDataTable;
 import es.ujaen.uvirtual.modulo.bolsaempleo.utilidades.BolsaEmpleoDataTable.DataTableColumn;
 import es.ujaen.uvirtual.utilidades.UVException;
@@ -163,19 +164,20 @@ public class ModeloBaremacionApartados {
 
 	/** Función que inserta un apartado en la BD.
 	 * @param apartado .
+	 * @param usuarioUpdate .
 	 * @return .
 	 * @throws SQLException .
 	 * @throws UVException .
 	 */
-	public Integer insertaApartado(ApartadoBaremacion apartado) throws SQLException, UVException {
+	public Integer insertaApartado(ApartadoBaremacion apartado, UsuarioBolsaEmpleo usuarioUpdate) throws SQLException, UVException {
 		if (apartado == null) {
 			throw new UVException(ERROR_APARTADO_REQUERIDO);
 		}
 		
 		this.chequearApartadoParaInsertarOActualizar(apartado);
 		
-		String consulta = "INSERT INTO TBEP_APARTADOSBAREMACION (CODIGO,NOMBRE,FLGACTIVO,PUNTUACIONMAXIMA,PORCENTAJEMAXIMO) "
-				+ " VALUES (?,?,?,?,?)";
+		String consulta = "INSERT INTO TBEP_APARTADOSBAREMACION (CODIGO,NOMBRE,FLGACTIVO,PUNTUACIONMAXIMA,PORCENTAJEMAXIMO,UID_USUARIO) "
+				+ " VALUES (?,?,?,?,?,?)";
 		
 		try (Connection conexion = ConexionUvirtual.obtenerInstancia(); 
 				PreparedStatement stmt = conexion.prepareStatement(consulta, new String[]{CODNUM})) {
@@ -192,6 +194,8 @@ public class ModeloBaremacionApartados {
 				stmt.setNull(parameterIndex++, Types.NULL);
 				stmt.setFloat(parameterIndex++, apartado.getPorcentajeMaximo());
 			}
+			
+			stmt.setString(parameterIndex++, usuarioUpdate.getCodCuenta());
 			
 			stmt.executeUpdate();
 			

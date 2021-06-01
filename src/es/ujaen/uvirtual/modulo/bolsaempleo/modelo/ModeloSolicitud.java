@@ -5,6 +5,7 @@ import java.sql.Date;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.Types;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -709,11 +710,11 @@ public class ModeloSolicitud {
 			MeritoSolicitud meritoSolicitud = this.getMeritoSolicitud(solicitud.getCodNum(), bolsa.getCodNum(), merito.getCodNum());
 			
 			for (Map.Entry<Afinidad, Float> entry : afinidades.entrySet()) {
-				String sqlInsert = "UPDATE TBEP_SOL_BOL_MER_VALORACION"
+				String consulta = "UPDATE TBEP_SOL_BOL_MER_VALORACION"
 						+ " SET VALOR = ?"
 						+ " WHERE BEPSBM_CODNUM = ? AND BEPAFI_CODNUM = ?";
 				
-				try (PreparedStatement stmt = conexion.prepareStatement(sqlInsert)) {
+				try (PreparedStatement stmt = conexion.prepareStatement(consulta)) {
 					int indexParam = 1;
 					stmt.setFloat(indexParam++, entry.getValue());
 					stmt.setInt(indexParam++, meritoSolicitud.getCodNum());
@@ -729,6 +730,35 @@ public class ModeloSolicitud {
 			conexion.commit();
 			conexion.setAutoCommit(true);
 		}
+	}
+	
+	/** El evaluador ha modificado la afinidad del mérito no individualizado . 
+	 * @param solicitud .
+	 * @param bolsa .
+	 * @param merito .
+	 * @param afinidad .
+	 * @param idValoracion .
+	 * @throws SQLException .
+	 * @throws UVException .
+	 */
+	public void actualizarAfinidadesMeritoIndividualizado(Solicitud solicitud, Bolsa bolsa, Merito merito, Afinidad afinidad, Integer idValoracion)
+			throws SQLException, UVException {
+			MeritoSolicitud meritoSolicitud = this.getMeritoSolicitud(solicitud.getCodNum(), bolsa.getCodNum(), merito.getCodNum());
+			
+			String consulta = "UPDATE TBEP_SOL_BOL_MER_VALORACION"
+					+ " SET VALOR = ?, BEPAFI_CODNUM = ?"
+					+ " WHERE BEPSBM_CODNUM = ? AND CODNUM = ?";
+			
+			try (Connection conexion = ConexionUvirtual.obtenerInstancia(); PreparedStatement stmt = conexion.prepareStatement(consulta)) {
+				int indexParam = 1;
+				stmt.setNull(indexParam++, Types.FLOAT);
+				stmt.setInt(indexParam++, afinidad.getCodNum());
+				stmt.setInt(indexParam++, meritoSolicitud.getCodNum());
+				stmt.setInt(indexParam++, idValoracion);
+				stmt.executeUpdate();
+			} catch (SQLException e) {
+				throw e;
+			}				
 	}
 	
 	/**

@@ -139,7 +139,7 @@ public class TestBEPModeloBaremacionApartados {
 			apartado.setPorcentajeMaximo(PORCENTAJE_MAXIMO);
 			
 			List<ApartadoBaremacion> lista = desactivarTodosApartados();
-			Integer codNum = ModeloBaremacionApartados.obtenerInstancia().insertaApartado(apartado);
+			Integer codNum = ModeloBaremacionApartados.obtenerInstancia().insertaApartado(apartado, UtilsTestBolsaEmpleo.getUsuarioPersonalLogeado());
 			ApartadoBaremacion creado = ModeloBaremacionApartados.obtenerInstancia().getApartadoBaremacionById(codNum);			
 			activarApartadosLista(lista);
 			
@@ -169,7 +169,7 @@ public class TestBEPModeloBaremacionApartados {
 			apartado.setPorcentajeMaximo(null);
 			
 			List<ApartadoBaremacion> lista = desactivarTodosApartados();
-			Integer codNum = ModeloBaremacionApartados.obtenerInstancia().insertaApartado(apartado);
+			Integer codNum = ModeloBaremacionApartados.obtenerInstancia().insertaApartado(apartado, UtilsTestBolsaEmpleo.getUsuarioPersonalLogeado());
 			ApartadoBaremacion creado = ModeloBaremacionApartados.obtenerInstancia().getApartadoBaremacionById(codNum);			
 			activarApartadosLista(lista);
 			
@@ -260,7 +260,7 @@ public class TestBEPModeloBaremacionApartados {
 	@Test
 	public void testE03insertaApartado() {
 		Throwable throwable = assertThrows(Throwable.class,
-				() -> ModeloBaremacionApartados.obtenerInstancia().insertaApartado(null));
+				() -> ModeloBaremacionApartados.obtenerInstancia().insertaApartado(null, UtilsTestBolsaEmpleo.getUsuarioPersonalLogeado()));
 		
 		assertEquals(UVException.class, throwable.getClass());
 		assertEquals(ModeloBaremacionApartados.ERROR_APARTADO_REQUERIDO, throwable.getMessage());
@@ -274,7 +274,7 @@ public class TestBEPModeloBaremacionApartados {
 		Throwable throwable = assertThrows(Throwable.class, () -> {
 			ApartadoBaremacion a = ModeloBaremacionApartados.obtenerInstancia().getApartadoBaremacionById(CODNUM);
 			a.setCodNum(CODNUM_NOEXISTE);
-			ModeloBaremacionApartados.obtenerInstancia().insertaApartado(a);
+			ModeloBaremacionApartados.obtenerInstancia().insertaApartado(a, UtilsTestBolsaEmpleo.getUsuarioPersonalLogeado());
 		});
 		
 		assertEquals(UVException.class, throwable.getClass());

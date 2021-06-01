@@ -16,15 +16,35 @@ VistaConfiguracion bean = (VistaConfiguracion) uvdatos.getVistas().get(VistaConf
 	
 	<div class="form-group-container col3">
    	    <div class="form-group">
-   			<button class="link-btn">Candidatos</button>
+   			<button id="btn_candidatos" class="link-btn">Candidatos</button>
    		</div>
    		<div class="form-group">
-			<button class="link-btn">Ficheros</button>
+			<button id="btn_ficheros" class="link-btn">Ficheros</button>
    		</div>
    		<div class="form-group">
-			<button class="link-btn">Mensajería</button>
+			<button id="btn_mensajeria" class="link-btn">Mensajería</button>
    		</div>
    	</div>
 	
 	<p class="ta-right">Versión: <%= bean.getVersion() %></p>
 </div>
+
+<script>
+
+	$(document).ready(function() {
+		
+		document.getElementById("btn_candidatos").addEventListener("click", function() {
+			window.location.replace("/srv/es/informacionadministrativa/bolsaempleo/configuracion/candidatos");
+		});
+		
+		document.getElementById("btn_ficheros").addEventListener("click", function() {
+			window.location.replace("/srv/es/informacionadministrativa/bolsaempleo/configuracion/ficheros");
+		});
+		
+		document.getElementById("btn_mensajeria").addEventListener("click", function() {
+			window.location.replace("/srv/es/informacionadministrativa/bolsaempleo/configuracion/mensajeria");
+		});
+		
+	});
+
+</script>

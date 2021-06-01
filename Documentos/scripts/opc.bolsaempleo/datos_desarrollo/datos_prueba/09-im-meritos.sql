@@ -78,3 +78,12 @@ VALUES (
     hextoraw('453d7a34'),
     'CARGA_INICIAL'
 );
+INSERT INTO TBEP_MERITOS (BEPITE_CODNUM,BEPUSU_CODNUM,VALOR,DESCRIPCION,OBSERVACION,ARCHIVO,UID_USUARIO)
+VALUES (
+    (SELECT bepite.CODNUM FROM TBEP_ITEMSBAREMACION bepite WHERE bepite.CODNUM = 17),
+    (SELECT bepusu.CODNUM FROM TBEP_USUARIOS bepusu WHERE bepusu.CODCUENTA = 'candidato1'),
+    3,
+    'descripción mérito 9',
+    'observación mérito 9',
+    'CARGA_INICIAL'
+);
