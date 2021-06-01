@@ -219,8 +219,8 @@ public class ModeloSolicitud {
 		}
 				
 		String consulta =
-			"INSERT INTO TBEP_SOLICITUDES (BEPUSU_CODNUM, BEPCON_CODNUM, ESTADO) " 
-			+ "VALUES (?, ?, ?)";
+			"INSERT INTO TBEP_SOLICITUDES (BEPUSU_CODNUM, BEPCON_CODNUM, ESTADO, UID_USUARIO) " 
+			+ "VALUES (?, ?, ?, ?)";
 		
 		try (Connection conexion = ConexionUvirtual.obtenerInstancia();
 				PreparedStatement stmt = conexion.prepareStatement(consulta, new String[]{CODNUM})) {
@@ -229,6 +229,7 @@ public class ModeloSolicitud {
 			stmt.setInt(parameterIndex++, usuario.getCodNum());
 			stmt.setInt(parameterIndex++, convocatoria.getCodNum());
 			stmt.setString(parameterIndex++, ModeloSolicitud.SOLICITUD_ESTADO_ABIERTA);
+			stmt.setString(parameterIndex++, usuario.getCodCuenta());
 			stmt.executeUpdate();
 			
 			ResultSet rs = stmt.getGeneratedKeys();

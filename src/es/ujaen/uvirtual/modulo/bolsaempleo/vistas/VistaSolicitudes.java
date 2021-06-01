@@ -38,7 +38,6 @@ public class VistaSolicitudes extends VistaBEP implements Serializable {
 	private Solicitud solicitud;
 	private Bolsa area;
 	private Merito merito;
-	private UsuarioBolsaEmpleo candidato;
 
 	public BolsaEmpleoDataTable<Solicitud> getDatatableSolicitudes() {
 		return dataTable;
@@ -160,11 +159,4 @@ public class VistaSolicitudes extends VistaBEP implements Serializable {
 		this.merito = merito;
 	}
 
-	public void setCandidato(UsuarioBolsaEmpleo usuarioCandidato) {
-		this.candidato = usuarioCandidato;
-	}
-
-	public UsuarioBolsaEmpleo getCandidato() {
-		return this.candidato;
-	}
 }

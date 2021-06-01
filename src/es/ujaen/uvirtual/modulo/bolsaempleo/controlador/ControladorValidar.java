@@ -315,7 +315,7 @@ public class ControladorValidar extends HttpServlet {
 				merito.setValor(ControladorMisMeritos.validateValorDelMerito(request, merito));
 				merito.setUsuario(bean.getCandidato());
 				
-				ModeloMerito.obtenerInstancia().actualizaMerito(merito);
+				ModeloMerito.obtenerInstancia().actualizaMerito(merito, bean.getUsuarioLogeado());
 				BolsaEmpleoUtils.addMensajeDeExito(MENSAJE_EXITO_MERITO_MODIFICAR, bean, request);
 			}
 		} catch (Exception ex) {
