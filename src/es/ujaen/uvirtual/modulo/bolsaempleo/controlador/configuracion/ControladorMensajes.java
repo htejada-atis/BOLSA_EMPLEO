@@ -203,7 +203,7 @@ public class ControladorMensajes extends HttpServlet {
 	}
 	
 	private void nuevoMensaje(VistaMensajes bean, HttpServletRequest request, HttpServletResponse response) throws SQLException, UVException, IOException {
-		ModeloMensajes.obtenerInstancia().nuevoMensajeEnBorrador();
+		ModeloMensajes.obtenerInstancia().nuevoMensajeEnBorrador(bean.getUsuarioLogeado());
 		BolsaEmpleoUtils.addMensajeDeExito("Mensaje en borrador añadido correctamente", bean, request);
 		response.sendRedirect(request.getServletPath());
 	}
@@ -211,7 +211,7 @@ public class ControladorMensajes extends HttpServlet {
 	private void borrarMensaje(VistaMensajes bean, HttpServletRequest request, HttpServletResponse response) throws SQLException, UVException, IOException {
 		Mensaje mensaje = ModeloMensajes.obtenerInstancia().getMensajeById(Formateador.leeParametroInteger(request.getParameter(PARAM_MENSAJE_ID))); 
 		
-		ModeloMensajes.obtenerInstancia().eliminarMensajeBorrador(mensaje);
+		ModeloMensajes.obtenerInstancia().eliminarMensajeBorrador(mensaje, bean.getUsuarioLogeado());
 		BolsaEmpleoUtils.addMensajeDeExito("Mensaje en eliminado correctamentessssss", bean, request);
 		response.sendRedirect(request.getServletPath());
 	}

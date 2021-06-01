@@ -230,16 +230,17 @@ public class ModeloMensajes {
 	 * Añade un mensaje.
 	 * 
 	 * @param mensaje .
+	 * @param usuarioUpdate .
 	 * @return id mensaje creado.
 	 * @throws UVException  .
 	 * @throws SQLException .
 	 */
-	public Integer nuevoMensaje(Mensaje mensaje) throws SQLException, UVException {
+	public Integer nuevoMensaje(Mensaje mensaje, UsuarioBolsaEmpleo usuarioUpdate) throws SQLException, UVException {
 		if (mensaje == null) {
 			throw new UVException(MENSAJE_ERROR_MENSAJE_NULL);
 		}
 
-		String consulta = "INSERT INTO TBEP_MENSAJES (TITULO,CUERPO,FECHA_CREACION,ESTADO) VALUES (?,?,?,?)";
+		String consulta = "INSERT INTO TBEP_MENSAJES (TITULO,CUERPO,FECHA_CREACION,ESTADO,UID_USUARIO) VALUES (?,?,?,?,?)";
 
 		try (Connection conexion = ConexionUvirtual.obtenerInstancia();
 				PreparedStatement stmt = conexion.prepareStatement(consulta, new String[] {CODNUM})) {
@@ -249,6 +250,7 @@ public class ModeloMensajes {
 			stmt.setClob(parameterIndex++, BolsaEmpleoUtils.stringToClob(mensaje.getCuerpo(), conexion));
 			stmt.setDate(parameterIndex++, new java.sql.Date(mensaje.getFechaCreacion().getTime()));
 			stmt.setString(parameterIndex++, mensaje.getEstado());
+			stmt.setString(parameterIndex++, usuarioUpdate.getCodCuenta());
 			stmt.executeUpdate();
 
 			ResultSet rs = stmt.getGeneratedKeys();
@@ -260,27 +262,29 @@ public class ModeloMensajes {
 
 	/**
 	 * Crea un nuevo mensaje en estado en borrador con un titulo en borrador.
+	 * @param usuarioUpdate .
 	 * @return .
 	 * @throws UVException .
 	 * @throws SQLException .
 	 */
-	public Integer nuevoMensajeEnBorrador() throws SQLException, UVException {
+	public Integer nuevoMensajeEnBorrador(UsuarioBolsaEmpleo usuarioUpdate) throws SQLException, UVException {
 		Mensaje mensaje = new Mensaje();
 		mensaje.setTitulo(ESTADO_BORRADOR);
 		mensaje.setEstado(ESTADO_BORRADOR);
 		mensaje.setFechaCreacion(BolsaEmpleoUtils.getCurrentDateTime());
 		mensaje.setCuerpo(ESTADO_BORRADOR);
 		
-		return nuevoMensaje(mensaje);
+		return nuevoMensaje(mensaje, usuarioUpdate);
 	}
 	
 	/**
 	 * Elimina un mensaje en borrador.
 	 * @param mensaje .
+	 * @param usuarioUpdate .
 	 * @throws SQLException .
 	 * @throws UVException .
 	 */
-	public void eliminarMensajeBorrador(Mensaje mensaje) throws UVException, SQLException {
+	public void eliminarMensajeBorrador(Mensaje mensaje, UsuarioBolsaEmpleo usuarioUpdate) throws UVException, SQLException {
 		if (mensaje == null) {
 			throw new UVException(MENSAJE_ERROR_NO_EXISTE_MENSAJE);
 		}
@@ -288,12 +292,34 @@ public class ModeloMensajes {
 			throw new UVException("El mensaje no está en borrador");
 		}
 		
-		String consulta = "DELETE FROM TBEP_MENSAJES WHERE CODNUM = ?";
-
-		try (Connection conexion = ConexionUvirtual.obtenerInstancia(); PreparedStatement stmt = conexion.prepareStatement(consulta)) {
-			int parameterIndex = 1;
-			stmt.setInt(parameterIndex++, mensaje.getCodNum());
-			stmt.executeUpdate();
+		try (Connection conexion = ConexionUvirtual.obtenerInstancia()) {
+			conexion.setAutoCommit(false);
+			
+			String consultaUpdate = "UPDATE TBEP_MENSAJES SET UID_USUARIO = ? WHERE CODNUM = ?";
+			try (PreparedStatement stmt = conexion.prepareStatement(consultaUpdate)) {
+				int parameterIndex = 1;
+				stmt.setString(parameterIndex++, usuarioUpdate.getCodCuenta());
+				stmt.setInt(parameterIndex++, mensaje.getCodNum());
+				stmt.executeUpdate();
+			} catch (SQLException e) {
+				conexion.rollback();
+				conexion.setAutoCommit(true);
+				throw e;
+			}
+			
+			String consultaDelete = "DELETE FROM TBEP_MENSAJES WHERE CODNUM = ?";
+			try (PreparedStatement stmt = conexion.prepareStatement(consultaDelete)) {
+				int parameterIndex = 1;
+				stmt.setInt(parameterIndex++, mensaje.getCodNum());
+				stmt.executeUpdate();
+			} catch (SQLException e) {
+				conexion.rollback();
+				conexion.setAutoCommit(true);
+				throw e;
+			}
+			
+			conexion.commit();
+			conexion.setAutoCommit(true);
 		}
 	}
 	
