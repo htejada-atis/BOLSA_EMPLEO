@@ -2,9 +2,7 @@ package es.ujaen.uvirtual.modulo.bolsaempleo.vistas;
 
 import java.io.Serializable;
 import java.util.List;
-import es.ujaen.uvirtual.beans.vistas.Vista;
 import es.ujaen.uvirtual.modulo.bolsaempleo.beans.Bolsa;
-import es.ujaen.uvirtual.modulo.bolsaempleo.beans.UsuarioBolsaEmpleo;
 import es.ujaen.uvirtual.modulo.bolsaempleo.utilidades.BolsaEmpleoDataTable;
 
 /**
@@ -12,12 +10,10 @@ import es.ujaen.uvirtual.modulo.bolsaempleo.utilidades.BolsaEmpleoDataTable;
  * 
  * @author ATISoluciones
  */
-public class VistaAreasBaremar extends Vista implements Serializable {
+public class VistaAreasBaremar extends VistaBEP implements Serializable {
 	private static final long serialVersionUID = 1L;
 	private BolsaEmpleoDataTable<Bolsa> dataTableAreas;
 	private List<Bolsa> listaBolsas;
-	private String vista;
-	private UsuarioBolsaEmpleo usuario;
 
 	public BolsaEmpleoDataTable<Bolsa> getDatatableAreas() {
 		return dataTableAreas;
@@ -33,21 +29,5 @@ public class VistaAreasBaremar extends Vista implements Serializable {
 
 	public void setListaBolsas(List<Bolsa> bolsas) {
 		this.listaBolsas = bolsas;
-	}
-
-	public String getVista() {
-		return vista;
-	}
-
-	public void setVista(String vista) {
-		this.vista = vista;
-	}
-
-	public void setUsuarioBolsa(UsuarioBolsaEmpleo pusuario) {
-		this.usuario = pusuario;
-	}
-	
-	public UsuarioBolsaEmpleo getUsuarioBolsa() {
-		return this.usuario;
 	}
 }

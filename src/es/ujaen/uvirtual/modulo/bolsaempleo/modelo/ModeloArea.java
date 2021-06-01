@@ -548,7 +548,7 @@ public class ModeloArea {
 			int parameterIndex = 1;
 			stmt.setString(parameterIndex++, area.getIdAreaExterno());
 			stmt.setString(parameterIndex++, area.getDescripcion());
-			stmt.setString(parameterIndex++, usuario.getUsuarioArcos().getUid());
+			stmt.setString(parameterIndex++, usuario.getCodCuenta());
 			stmt.setString(parameterIndex++, area.getIdAreaExterno());
 			stmt.executeUpdate();
 		}
@@ -665,7 +665,7 @@ public class ModeloArea {
 			stmt.setInt(parameterIndex++, departamento.getCodNum());
 			stmt.setString(parameterIndex++, idSeccion);
 			stmt.setString(parameterIndex++, desSeccion);
-			stmt.setString(parameterIndex++, usuario.getUsuarioArcos().getUid());
+			stmt.setString(parameterIndex++, usuario.getCodCuenta());
 			stmt.executeUpdate();
 		}
 	}
@@ -691,7 +691,7 @@ public class ModeloArea {
 			int parameterIndex = 1;
 			stmt.setString(parameterIndex++, area.getIdAreaExterno());
 			stmt.setString(parameterIndex++, area.getDescripcion());
-			stmt.setString(parameterIndex++, usuario.getUsuarioArcos().getUid());
+			stmt.setString(parameterIndex++, usuario.getCodCuenta());
 			stmt.executeUpdate();
 		}
 	}

@@ -3,7 +3,6 @@ package es.ujaen.uvirtual.modulo.bolsaempleo.vistas;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
-import es.ujaen.uvirtual.beans.vistas.Vista;
 import es.ujaen.uvirtual.modulo.bolsaempleo.beans.Area;
 import es.ujaen.uvirtual.modulo.bolsaempleo.beans.AreaEvaluadoresTable;
 import es.ujaen.uvirtual.modulo.bolsaempleo.beans.Departamento;
@@ -11,9 +10,9 @@ import es.ujaen.uvirtual.modulo.bolsaempleo.beans.Evaluador;
 import es.ujaen.uvirtual.modulo.bolsaempleo.utilidades.BolsaEmpleoDataTable;
 
 /** Bean para la vista.
- * @author jlopez
+ * @author ATISoluciones
  */
-public class VistaEvaluadores extends Vista implements Serializable {
+public class VistaEvaluadores extends VistaBEP implements Serializable {
 	private static final long serialVersionUID = 1L;
 	private List<Departamento> departamentos = new ArrayList<>();
 	private BolsaEmpleoDataTable<AreaEvaluadoresTable> dataTableAreas;
@@ -21,7 +20,6 @@ public class VistaEvaluadores extends Vista implements Serializable {
 	private Area area;
 	private Departamento departamento;
 	private Evaluador evaluador;
-	private String vista;
 	
 	public List<Departamento> getDepartamentos() {
 		return departamentos;
@@ -70,13 +68,4 @@ public class VistaEvaluadores extends Vista implements Serializable {
 	public void setEvaluador(Evaluador evaluador) {
 		this.evaluador = evaluador;
 	}
-	
-	public String getVista() {
-		return vista;
-	}
-	
-	public void setVista(String vista) {
-		this.vista = vista;
-	}
-	
 }

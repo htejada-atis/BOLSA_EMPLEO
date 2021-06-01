@@ -269,7 +269,7 @@ public class ModeloNoticia {
 				stmt.setNull(parameterIndex++, Types.DATE);
 			}
 			stmt.setString(parameterIndex++, Boolean.TRUE.equals(noticia.isPublica()) ? PUBLICA : PRIVADA);
-			stmt.setString(parameterIndex++, usuario.getUsuarioArcos().getUid());
+			stmt.setString(parameterIndex++, usuario.getCodCuenta());
 			stmt.executeUpdate();
 		}
 	}
@@ -295,7 +295,7 @@ public class ModeloNoticia {
 			int parameterIndex = 1;
 			stmt.setString(parameterIndex++, Boolean.TRUE.equals(noticia.isActiva()) ? ACTIVA : INACTIVA);
 			stmt.setInt(parameterIndex++, noticia.getCodNum());
-			stmt.setString(parameterIndex++, usuario.getUsuarioArcos().getUid());
+			stmt.setString(parameterIndex++, usuario.getCodCuenta());
 			stmt.executeUpdate();
 		}
 	}
@@ -333,7 +333,7 @@ public class ModeloNoticia {
 			stmt.setDate(parameterIndex++, new Date(noticia.getFecha().getTime()));
 			stmt.setString(parameterIndex++, Boolean.TRUE.equals(noticia.isPublica()) ? PUBLICA : PRIVADA);
 			stmt.setInt(parameterIndex++, noticia.getCodNum());
-			stmt.setString(parameterIndex++, usuario.getUsuarioArcos().getUid());
+			stmt.setString(parameterIndex++, usuario.getCodCuenta());
 			stmt.executeUpdate();
 		}
 	}

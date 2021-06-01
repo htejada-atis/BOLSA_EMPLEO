@@ -237,7 +237,7 @@ public class ControladorUsuarioCandidato extends HttpServlet {
 		bean.setVista(JSP_INDEX);
 		BolsaEmpleoUtils.readMensajeSession(bean, request);
 		try {
-			ModeloUsuarioBolsaEmpleo.obtenerInstancia().getOrCreateUsuario(datos);
+			bean.setUsuarioLogeado(ModeloUsuarioBolsaEmpleo.obtenerInstancia().getOrCreateUsuario(datos));
 		} catch (UVException e) {
 			BolsaEmpleoUtils.addMensajeDeError(e.getMessage(), bean, request);
 			response.sendRedirect("/srv/es/informacionadministrativa/bolsaempleo/error");
@@ -344,10 +344,10 @@ public class ControladorUsuarioCandidato extends HttpServlet {
 
 		switch (nombreAccionUsuario) {
 			case ACCION_ELIMINAR_USUARIO:
-				modelo.ponerUsuarioComoBorrado(usuarios);							
+				modelo.ponerUsuarioComoBorrado(usuarios, bean.getUsuarioLogeado());							
 				break;
 			case ACCION_RECUPERAR_USUARIO:
-				modelo.ponerUsuarioComoNoBorrado(usuarios);
+				modelo.ponerUsuarioComoNoBorrado(usuarios, bean.getUsuarioLogeado());
 				break;
 			case ACCION_EXCLUIR_USUARIO_AREA:
 				excluirUsuarioArea(bean, codNum, modelo, areas);
@@ -379,7 +379,7 @@ public class ControladorUsuarioCandidato extends HttpServlet {
 	private void excluirUsuarioArea(VistaUsuarioBolsaEmpleo bean, Integer codNum, ModeloUsuarioBolsaEmpleo modelo, List<Area> areas) throws SQLException, UVException {
 		UsuarioBolsaEmpleo usu = modelo.getUsuarioById(codNum);
 		Usuario usuArcos = CrearUsuario.usuario(usu.getCodCuenta());
-		modelo.excluirUsuarioArea(usu, areas);
+		modelo.excluirUsuarioArea(usu, areas, bean.getUsuarioLogeado());
 		
 		bean.setUsuarioArcos(usuArcos);
 		bean.setBusqueda(false);
@@ -445,7 +445,7 @@ public class ControladorUsuarioCandidato extends HttpServlet {
 		usuarioForm.setCodCuenta(EscapaHTML.ajustaCodificacion(request.getParameter(PARAM_ID)));		
 		usuarioForm.setNumDocumento(usuArcos.getDocumentoNumero());
 						
-		modelo.insertaUsuario(usuarioForm);
+		modelo.insertaUsuario(usuarioForm, bean.getUsuarioLogeado());
 			
 		BolsaEmpleoUtils.addMensajeDeExito(MENSAJE_EXITO_AGREGAR, bean, request);
 		response.sendRedirect(request.getServletPath());
@@ -492,7 +492,7 @@ public class ControladorUsuarioCandidato extends HttpServlet {
 		UsuarioBolsaEmpleo usuarioForm = this.getValidatorUsuarios(request);
 		usuarioForm.setCodNum(Formateador.leeParametroInteger(request.getParameter(PARAM_ID)));
 		
-		modelo.actualizaUsuario(usuarioForm);
+		modelo.actualizaUsuario(usuarioForm, bean.getUsuarioLogeado());
 		BolsaEmpleoUtils.addMensajeDeExito(MENSAJE_EXITO_EDITAR, bean, request);
 		response.sendRedirect(request.getServletPath());
 	}
@@ -513,7 +513,7 @@ public class ControladorUsuarioCandidato extends HttpServlet {
 		
 		UsuarioBolsaEmpleo usu = modelo.getUsuarioById(Formateador.leeParametroInteger(request.getParameter(PARAM_ID)));
 			
-		modelo.ponerUsuarioComoNoExcluido(usu);
+		modelo.ponerUsuarioComoNoExcluido(usu, bean.getUsuarioLogeado());
 		BolsaEmpleoUtils.addMensajeDeExito(MENSAJE_EXITO_EDITAR, bean, request);
 		response.sendRedirect(request.getServletPath());
 	}
@@ -548,7 +548,7 @@ public class ControladorUsuarioCandidato extends HttpServlet {
 			usuarioForm.setCodNum(Formateador.leeParametroInteger(request.getParameter(PARAM_ID)));
 			usuarioForm.setExcluido(true);
 
-			modelo.ponerUsuarioComoExcluido(usuarioForm);
+			modelo.ponerUsuarioComoExcluido(usuarioForm, bean.getUsuarioLogeado());
 			BolsaEmpleoUtils.addMensajeDeExito(MENSAJE_EXITO_EDITAR, bean, request);
 			response.sendRedirect(request.getServletPath());
 		}

@@ -167,7 +167,7 @@ public class ModeloDepartamento {
 			int parameterIndex = 1;
 			stmt.setString(parameterIndex++, departamento.getIdDepartamentoExterno());
 			stmt.setString(parameterIndex++, departamento.getDescripcion());
-			stmt.setString(parameterIndex++, usuario.getUsuarioArcos().getUid());
+			stmt.setString(parameterIndex++, usuario.getCodCuenta());
 			stmt.executeUpdate();
 		}
 	}

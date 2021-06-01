@@ -145,7 +145,7 @@ public class ControladorGestionNoticias extends HttpServlet {
 		bean.setVista(RUTA_BEP_NOTICIAS + "indice.jsp");
 		BolsaEmpleoUtils.readMensajeSession(bean, request);
 		try {
-			bean.setUsuarioBolsa(ModeloUsuarioBolsaEmpleo.obtenerInstancia().getOrCreateUsuario(datos));
+			bean.setUsuarioLogeado(ModeloUsuarioBolsaEmpleo.obtenerInstancia().getOrCreateUsuario(datos));
 		} catch (UVException e) {
 			BolsaEmpleoUtils.addMensajeDeError(e.getMessage(), bean, request);
 			response.sendRedirect("/srv/es/informacionadministrativa/bolsaempleo/error");
@@ -181,7 +181,7 @@ public class ControladorGestionNoticias extends HttpServlet {
 			Noticia noticia = this.validarNoticia(request);
 			noticia.setActiva(true);
 			
-			ModeloNoticia.obtenerInstancia().insertaNoticia(noticia, bean.getUsuarioBolsa());
+			ModeloNoticia.obtenerInstancia().insertaNoticia(noticia, bean.getUsuarioLogeado());
 			BolsaEmpleoUtils.addMensajeDeExito(MENSAJE_EXITO_AGREGAR, bean, request);
 			response.sendRedirect(request.getServletPath());			
 		}
@@ -204,7 +204,7 @@ public class ControladorGestionNoticias extends HttpServlet {
 		if (EscapaHTML.ajustaCodificacion(request.getParameter(PARAM_TEXTO)) != null) {
 			Noticia noticiaForm = this.validarNoticia(request);
 			noticiaForm.setCodNum(noticia.getCodNum());
-			modelo.actualizaNoticia(noticiaForm, bean.getUsuarioBolsa());
+			modelo.actualizaNoticia(noticiaForm, bean.getUsuarioLogeado());
 			BolsaEmpleoUtils.addMensajeDeExito(MENSAJE_EXITO_EDITAR, bean, request);
 			response.sendRedirect(request.getServletPath());
 		}
@@ -225,7 +225,7 @@ public class ControladorGestionNoticias extends HttpServlet {
 		noticia.setCodNum(codNum);
 		boolean activa = "true".equals(EscapaHTML.ajustaCodificacion(request.getParameter(PARAM_ACTIVA))); 
 		noticia.setActiva(activa);
-		modelo.borraRestauraNoticia(noticia, bean.getUsuarioBolsa());
+		modelo.borraRestauraNoticia(noticia, bean.getUsuarioLogeado());
 		BolsaEmpleoUtils.addMensajeDeExito(activa ? MENSAJE_EXITO_RESTAURAR : MENSAJE_EXITO_ELIMINAR, bean, request);
 		response.sendRedirect(request.getServletPath());
 	}

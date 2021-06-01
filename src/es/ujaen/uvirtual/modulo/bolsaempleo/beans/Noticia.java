@@ -6,10 +6,10 @@ import java.util.Date;
 
 import es.ujaen.uvirtual.utilidades.Formateador;
 
-
-/** Clase noticia de bolsa empleo.
- * @author jlopez
- *
+/**
+ * Clase noticia de bolsa empleo.
+ * 
+ * @author ATISoluciones
  */
 public class Noticia implements Serializable {
 
@@ -20,21 +20,23 @@ public class Noticia implements Serializable {
 	private Date fecha;
 	private Boolean publica;
 	private Boolean activa;
-	
-	
-	/** Constructor por defecto.
+
+	/**
+	 * Constructor por defecto.
 	 */
 	public Noticia() {
-		
+
 	}
-	
-	/** Constructor con parametros.
-	 * @param pcodNum .
-	 * @param penlace .
-	 * @param ptexto .
-	 * @param pfecha .
+
+	/**
+	 * Constructor con parametros.
+	 * 
+	 * @param pcodNum  .
+	 * @param penlace  .
+	 * @param ptexto   .
+	 * @param pfecha   .
 	 * @param ppublica .
-	 * @param pactiva .
+	 * @param pactiva  .
 	 */
 	public Noticia(Integer pcodNum, String penlace, String ptexto, Date pfecha, Boolean ppublica, Boolean pactiva) {
 		super();
@@ -45,13 +47,15 @@ public class Noticia implements Serializable {
 		this.publica = ppublica;
 		this.activa = pactiva;
 	}
-	
-	/** Constructor con parametros.
-	 * @param penlace .
-	 * @param ptexto .
-	 * @param pfecha .
+
+	/**
+	 * Constructor con parametros.
+	 * 
+	 * @param penlace  .
+	 * @param ptexto   .
+	 * @param pfecha   .
 	 * @param ppublica .
-	 * @param pactiva .
+	 * @param pactiva  .
 	 */
 	public Noticia(String penlace, String ptexto, Date pfecha, Boolean ppublica, Boolean pactiva) {
 		super();
@@ -61,8 +65,10 @@ public class Noticia implements Serializable {
 		this.publica = ppublica;
 		this.activa = pactiva;
 	}
-	
-	/** Constructor copia.
+
+	/**
+	 * Constructor copia.
+	 * 
 	 * @param copia Noticia a copiar
 	 */
 	public Noticia(Noticia copia) {
@@ -72,7 +78,7 @@ public class Noticia implements Serializable {
 		this.fecha = copia.fecha;
 		this.publica = copia.publica;
 	}
-	
+
 	public Integer getCodNum() {
 		return codNum;
 	}
@@ -100,11 +106,11 @@ public class Noticia implements Serializable {
 	public Date getFecha() {
 		return fecha;
 	}
-	
+
 	public String getFechaFormato() {
 		return Formateador.formatoFecha(fecha, Formateador.FORMATO_FECHA_DDMMYYYY);
 	}
-	
+
 	public String getFechaHoraFormato() {
 		return Formateador.formatoFecha(fecha, Formateador.FORMATO_FECHA_DDMMYYYY_HHMMSS);
 	}
@@ -112,7 +118,7 @@ public class Noticia implements Serializable {
 	public void setFecha(Date fecha) {
 		this.fecha = fecha;
 	}
-	
+
 	public Boolean isPublica() {
 		return publica;
 	}
@@ -120,7 +126,7 @@ public class Noticia implements Serializable {
 	public void setPublica(Boolean publica) {
 		this.publica = publica;
 	}
-	
+
 	public Boolean isActiva() {
 		return activa;
 	}
@@ -132,16 +138,13 @@ public class Noticia implements Serializable {
 	public static long getSerialversionuid() {
 		return serialVersionUID;
 	}
-	
-	
-	
+
 	@Override
 	public String toString() {
-		return "Noticia [codNum=" + codNum + ", enlace=" + enlace
-				+ ", texto=" + texto + ", fecha=" + fecha 
+		return "Noticia [codNum=" + codNum + ", enlace=" + enlace + ", texto=" + texto + ", fecha=" + fecha
 				+ ", publica=" + publica + ", activa=" + activa + "]";
 	}
-	
+
 	@Override
 	public int hashCode() {
 		final int prime = 31;
@@ -154,9 +157,9 @@ public class Noticia implements Serializable {
 		result = prime * result + ((codNum == null) ? 0 : codNum.hashCode());
 		return result;
 	}
-	
+
 	@Override
-	@SuppressWarnings({"checkstyle:CyclomaticComplexity", "checkstyle:NPathComplexity"})
+	@SuppressWarnings({ "checkstyle:CyclomaticComplexity", "checkstyle:NPathComplexity" })
 	public boolean equals(Object obj) {
 		if (this == obj) {
 			return true;
@@ -204,8 +207,8 @@ public class Noticia implements Serializable {
 		} else if (!activa.equals(other.activa)) {
 			return false;
 		}
-		
+
 		return true;
 	}
-	
+
 }

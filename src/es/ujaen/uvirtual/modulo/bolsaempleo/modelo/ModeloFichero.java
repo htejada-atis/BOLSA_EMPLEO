@@ -188,7 +188,7 @@ public class ModeloFichero {
 			stmt.setString(parameterIndex++, fichero.getTitulo());
 			stmt.setBinaryStream(parameterIndex++, fichero.getArchivo());
 			stmt.setString(parameterIndex++, Boolean.TRUE.equals(fichero.isPublico()) ? PUBLICO : PRIVADO);
-			stmt.setString(parameterIndex++, usuario.getUsuarioArcos().getUid());
+			stmt.setString(parameterIndex++, usuario.getCodCuenta());
 			stmt.executeUpdate();
 		}
 	}
@@ -217,7 +217,7 @@ public class ModeloFichero {
 				PreparedStatement stmt = conexion.prepareStatement(consulta)) {
 			int parameterIndex = 1;
 			stmt.setString(parameterIndex++, Boolean.TRUE.equals(fichero.isPublico()) ? PUBLICO : PRIVADO);
-			stmt.setString(parameterIndex++, usuario.getUsuarioArcos().getUid());
+			stmt.setString(parameterIndex++, usuario.getCodCuenta());
 			stmt.setInt(parameterIndex++, fichero.getCodNum());
 			stmt.executeUpdate();
 		}

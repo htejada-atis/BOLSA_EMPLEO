@@ -1,5 +1,6 @@
 package es.ujaen.uvirtual.modulo.bolsaempleo.beans;
 
+import java.io.Serializable;
 import java.util.Date;
 
 /**
@@ -7,7 +8,7 @@ import java.util.Date;
  * 
  * @author ATISoluciones
  */
-public class Afinidad {
+public class Afinidad implements Serializable {
 	private static final long serialVersionUID = 1L;
 	private Integer codNum;
 	private String codigo;

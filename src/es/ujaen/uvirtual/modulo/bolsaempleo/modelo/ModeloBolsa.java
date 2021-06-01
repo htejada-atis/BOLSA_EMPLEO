@@ -247,7 +247,7 @@ public class ModeloBolsa {
 	 * @throws UVException  si bolsa no es existe
 	 */
 	public Integer getBolsasBaremables() throws SQLException, UVException {
-		String consulta = "SELECT COUNT(*) AS total " + "FROM TBEP_BOLSAS " + "WHERE FLGBAREMABLE='S'";
+		String consulta = "SELECT COUNT(*) AS total FROM TBEP_BOLSAS WHERE FLGBAREMABLE='S'";
 
 		try (Connection conexion = ConexionUvirtual.obtenerInstancia(); PreparedStatement stmt = conexion.prepareStatement(consulta)) {
 			try (ResultSet rs = stmt.executeQuery()) {
@@ -396,7 +396,7 @@ public class ModeloBolsa {
 			int indexParam = 1;
 
 			stmt.setString(indexParam++, estado);
-			stmt.setString(indexParam++, usuario.getUsuarioArcos().getUid());
+			stmt.setString(indexParam++, usuario.getCodCuenta());
 
 			if (estado.equals(BOLSA_ESTADO_BLOQUEADA)) {
 				stmt.setDate(indexParam++, new java.sql.Date(BolsaEmpleoUtils.getCurrentDateTime().getTime()));
@@ -422,7 +422,7 @@ public class ModeloBolsa {
 				PreparedStatement stmt = conexion.prepareStatement(query)) {
 			int indexParam = 1;
 			stmt.setString(indexParam++, baremable);
-			stmt.setString(indexParam++, usuario.getUsuarioArcos().getUid());
+			stmt.setString(indexParam++, usuario.getCodCuenta());
 
 			for (Bolsa bolsa : bolsas) {
 				stmt.setInt(indexParam++, bolsa.getCodNum());

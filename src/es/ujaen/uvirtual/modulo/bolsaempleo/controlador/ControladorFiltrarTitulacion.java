@@ -157,7 +157,7 @@ public class ControladorFiltrarTitulacion extends HttpServlet {
 		bean.setVista(JSP_INDEX);
 		BolsaEmpleoUtils.readMensajeSession(bean, request);
 		try {
-			ModeloUsuarioBolsaEmpleo.obtenerInstancia().getOrCreateUsuario(datos);
+			bean.setUsuarioLogeado(ModeloUsuarioBolsaEmpleo.obtenerInstancia().getOrCreateUsuario(datos));
 		} catch (UVException e) {
 			BolsaEmpleoUtils.addMensajeDeError(e.getMessage(), bean, request);
 			response.sendRedirect("/srv/es/informacionadministrativa/bolsaempleo/error");
