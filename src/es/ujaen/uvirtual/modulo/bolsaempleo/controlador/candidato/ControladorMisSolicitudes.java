@@ -435,7 +435,7 @@ public class ControladorMisSolicitudes extends HttpServlet {
 		}
 		
 		// añadimos las bolsas a la solicitud
-		modeloSolicitud.asignarBolsasASolicitud(solicitud, bolsas);
+		modeloSolicitud.asignarBolsasASolicitud(solicitud, bolsas, bean.getUsuarioLogeado());
 				
 		bean.setVista(JSP_PASO2);
 		bean.setListaAfinidades(ModeloAfinidad.obtenerInstancia().listaAfinidades());
