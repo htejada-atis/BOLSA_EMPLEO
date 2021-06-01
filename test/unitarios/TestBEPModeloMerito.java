@@ -102,7 +102,7 @@ public class TestBEPModeloMerito {
     	Bolsa bolsa = new Bolsa();
     	bolsa.setCodNum(2);
     	
-    	modeloSolicitud.borrarMeritoDeSolicitudBolsa(solicitud, bolsa, meritoAcum);
+    	modeloSolicitud.borrarMeritoDeSolicitudBolsa(solicitud, bolsa, meritoAcum, UtilsTestBolsaEmpleo.getUsuarioPersonalLogeado());
     	
 //    	modelo.eliminarMeritos(idsMeritos);
 //    	

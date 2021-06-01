@@ -611,9 +611,9 @@ public class ControladorMisSolicitudes extends HttpServlet {
 				}
 			}
 			
-			modeloSolicitud.asignarMeritosASolicitudBolsa(solicitud, area, merito);
+			modeloSolicitud.asignarMeritosASolicitudBolsa(solicitud, area, merito, bean.getUsuarioLogeado());
 		} else {
-			modeloSolicitud.borrarMeritoDeSolicitudBolsa(solicitud, area, merito);
+			modeloSolicitud.borrarMeritoDeSolicitudBolsa(solicitud, area, merito, bean.getUsuarioLogeado());
 		}
 
 		this.seleccionarBolsa(bean, request);
@@ -705,7 +705,7 @@ public class ControladorMisSolicitudes extends HttpServlet {
 		}
 		
 		// asignamos afinidades al merito de la bolsa
-		ModeloSolicitud.obtenerInstancia().asignarAfinidadMeritoNoIndividualizado(solicitud, area, merito, afinidades);
+		ModeloSolicitud.obtenerInstancia().asignarAfinidadMeritoNoIndividualizado(solicitud, area, merito, afinidades, bean.getUsuarioLogeado());
 
 		this.seleccionarBolsa(bean, request);
 	}
@@ -900,7 +900,7 @@ public class ControladorMisSolicitudes extends HttpServlet {
 		solicitud.setFechaConfirmacion(BolsaEmpleoUtils.getCurrentDate());
 		solicitud.setArchivo(generarPDF(bean, solicitud, listaBolsas));
 		
-		modeloSolicitud.confirmacionSolicitud(solicitud);
+		modeloSolicitud.confirmacionSolicitud(solicitud, bean.getUsuarioLogeado());
 		
 		bean.getMensajesDeExito().add(MENSAJE_EXITO_SOLICITUD_CONFIRMADA);
 		HttpSession session = request.getSession(false);
