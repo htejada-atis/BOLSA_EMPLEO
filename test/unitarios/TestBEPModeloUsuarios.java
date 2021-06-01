@@ -27,6 +27,7 @@ import es.ujaen.uvirtual.beans.Usuario;
 import es.ujaen.uvirtual.modelo.conexion.Conexion;
 import es.ujaen.uvirtual.modulo.bolsaempleo.beans.UsuarioBolsaEmpleo;
 import es.ujaen.uvirtual.modulo.bolsaempleo.modelo.ModeloArea;
+import es.ujaen.uvirtual.modulo.bolsaempleo.modelo.ModeloRol;
 import es.ujaen.uvirtual.modulo.bolsaempleo.modelo.ModeloUsuarioBolsaEmpleo;
 import es.ujaen.uvirtual.modulo.bolsaempleo.utilidades.BolsaEmpleoDataTable;
 import es.ujaen.uvirtual.modulo.bolsaempleo.utilidades.BolsaEmpleoUtils;
@@ -45,8 +46,8 @@ public class TestBEPModeloUsuarios {
 	private static final Integer CODNUM_NOEXISTE = 111_111_111;
 	private static final String DOCUMENTO_USUARIO_UJA_NO_EXISTE = "51992686J";
 	private static final String DOCUMENTO_USUARIO_BOLSA_NO_EXISTE = "XXXXXXXXX";
-	private static final String PERSONAL1_DOCUMENTO = "62607992Z";
-	private static final String PERSONAL1_CODCUENTA = "personal1";
+	private static final String ATISOLUCIONES_DOCUMENTO = "B18865253";
+	private static final String ATISOLUCIONES_CODCUENTA = "atisoluciones";
 	private static final String CANDIDATO1_CODCUENTA = "candidato1";
 	private static final String CANDIDATO1_DOCUMENTO = "43396488L";
 	private static final String CODCUENTA_INEXISTENTE = "DUMMY";
@@ -77,9 +78,9 @@ public class TestBEPModeloUsuarios {
 	@Test
 	public void testA01GetUsuarioByPrsnif() {
 		try {
-			UsuarioBolsaEmpleo usuario = ModeloUsuarioBolsaEmpleo.obtenerInstancia().getUsuarioByNumeroDocumento(PERSONAL1_DOCUMENTO);
-			assertEquals(usuario.getCodCuenta(), PERSONAL1_CODCUENTA);
-			assertEquals(usuario.getNumDocumento(), PERSONAL1_DOCUMENTO);
+			UsuarioBolsaEmpleo usuario = ModeloUsuarioBolsaEmpleo.obtenerInstancia().getUsuarioByNumeroDocumento(ATISOLUCIONES_DOCUMENTO);
+			assertEquals(usuario.getCodCuenta(), ATISOLUCIONES_CODCUENTA);
+			assertEquals(usuario.getNumDocumento(), ATISOLUCIONES_DOCUMENTO);
 		} catch (SQLException | UVException ex) {
 			fail(String.format(MENSAJE_ERROR_HAY_EXCEPCION, ex.toString()));
 		}
@@ -104,12 +105,12 @@ public class TestBEPModeloUsuarios {
 	@Test
 	public void testA03GetUsuarioLogeado() {
 		try {
-			Usuario usu = CrearUsuario.usuario(PERSONAL1_CODCUENTA);
+			Usuario usu = CrearUsuario.usuario(ATISOLUCIONES_CODCUENTA);
 			UVDatos datos = new UVDatos();
 			datos.setUsuario(usu);
 
 			UsuarioBolsaEmpleo usuario = ModeloUsuarioBolsaEmpleo.obtenerInstancia().getUsuarioLogeado(datos);
-			assertEquals(usuario.getCodCuenta(), PERSONAL1_CODCUENTA);
+			assertEquals(usuario.getCodCuenta(), ATISOLUCIONES_CODCUENTA);
 		} catch (SQLException | UVException ex) {
 			fail(String.format(MENSAJE_ERROR_HAY_EXCEPCION, ex.toString()));
 		}
@@ -122,12 +123,12 @@ public class TestBEPModeloUsuarios {
 	public void testA04GetUsuarioLogeadoBorrado() {
 		ModeloUsuarioBolsaEmpleo modelo = ModeloUsuarioBolsaEmpleo.obtenerInstancia();
 		try {
-			Usuario usu = CrearUsuario.usuario(PERSONAL1_CODCUENTA);
+			Usuario usu = CrearUsuario.usuario(ATISOLUCIONES_CODCUENTA);
 			UVDatos datos = new UVDatos();
 			datos.setUsuario(usu);
 			
 			// marcamos usuario como borrado
-			ArrayList<UsuarioBolsaEmpleo> usuariosBorrar = marcarUsuarioComoBorrado(PERSONAL1_DOCUMENTO);
+			ArrayList<UsuarioBolsaEmpleo> usuariosBorrar = marcarUsuarioComoBorrado(ATISOLUCIONES_DOCUMENTO);
 
 			// obtenemos usuario logeado borrado
 			Throwable throwable = assertThrows(Throwable.class, () -> modelo.getUsuarioLogeado(datos));
@@ -148,12 +149,12 @@ public class TestBEPModeloUsuarios {
 	public void testA05GetUsuarioLogeadoExcluido() {
 		ModeloUsuarioBolsaEmpleo modelo = ModeloUsuarioBolsaEmpleo.obtenerInstancia();
 		try {
-			Usuario usu = CrearUsuario.usuario(PERSONAL1_CODCUENTA);
+			Usuario usu = CrearUsuario.usuario(ATISOLUCIONES_CODCUENTA);
 			UVDatos datos = new UVDatos();
 			datos.setUsuario(usu);
 			
 			// marcamos usuario como excluido
-			UsuarioBolsaEmpleo usuario = marcarUsuarioComoExcluido(PERSONAL1_DOCUMENTO);
+			UsuarioBolsaEmpleo usuario = marcarUsuarioComoExcluido(ATISOLUCIONES_DOCUMENTO);
 
 			// obtenemos usuario logeado excluido
 			Throwable throwable = assertThrows(Throwable.class, () -> modelo.getUsuarioLogeado(datos));
@@ -267,7 +268,7 @@ public class TestBEPModeloUsuarios {
 
 		try {
 			// marcamos usuario como borrado
-			ArrayList<UsuarioBolsaEmpleo> usuariosBorrar = marcarUsuarioComoBorrado(PERSONAL1_DOCUMENTO);
+			ArrayList<UsuarioBolsaEmpleo> usuariosBorrar = marcarUsuarioComoBorrado(ATISOLUCIONES_DOCUMENTO);
 			
 			// listamos usuarios borrados
 			BolsaEmpleoDataTable<UsuarioBolsaEmpleo> dt = ModeloUsuarioBolsaEmpleo.obtenerInstancia().listaUsuarioBorradoBolsaEmpleoDatatable(params);
@@ -297,7 +298,7 @@ public class TestBEPModeloUsuarios {
 
 		try {
 			// marcamos usuario como excluido
-			UsuarioBolsaEmpleo usuario = marcarUsuarioComoExcluido(PERSONAL1_DOCUMENTO);
+			UsuarioBolsaEmpleo usuario = marcarUsuarioComoExcluido(ATISOLUCIONES_DOCUMENTO);
 
 			// listamos usuarios excluidos
 			BolsaEmpleoDataTable<UsuarioBolsaEmpleo> dt = ModeloUsuarioBolsaEmpleo.obtenerInstancia().listaUsuarioExcluidoBolsaEmpleoDatatable(params);
@@ -327,7 +328,7 @@ public class TestBEPModeloUsuarios {
 
 		try {
 			// marcamos usuario como excluido
-			UsuarioBolsaEmpleo usuario = marcarUsuarioComoExcluido(PERSONAL1_DOCUMENTO);
+			UsuarioBolsaEmpleo usuario = marcarUsuarioComoExcluido(ATISOLUCIONES_DOCUMENTO);
 
 			// listamos usuarios excluidos
 			BolsaEmpleoDataTable<UsuarioBolsaEmpleo> dt = ModeloUsuarioBolsaEmpleo.obtenerInstancia().listaUsuarioExcluidoBolsaEmpleoDatatable(params);
@@ -344,7 +345,70 @@ public class TestBEPModeloUsuarios {
 	}
 	
 	
+	/**
+	 * Test insertaUsuario.
+	 */
+	@Test
+	public void testA13insertaUsuario() {
+		try {
+			UsuarioBolsaEmpleo nuevo = new UsuarioBolsaEmpleo();
+			nuevo.setRol(ModeloRol.obtenerInstancia().getRoleById(ModeloRol.ID_ROL_CANDIDATO));
+			nuevo.setCodCuenta("candidato3");
+			nuevo.setNumDocumento("51906000Z");
+			
+			ModeloUsuarioBolsaEmpleo.obtenerInstancia().insertaUsuario(nuevo, UtilsTestBolsaEmpleo.getUsuarioPersonalLogeado());
+			UsuarioBolsaEmpleo nuevoRead = ModeloUsuarioBolsaEmpleo.obtenerInstancia().getUsuarioByNumeroDocumento("51906000Z");
+			
+			assertEquals(nuevo.getCodCuenta(), nuevoRead.getCodCuenta());
+			assertEquals(nuevo.getNumDocumento(), nuevoRead.getNumDocumento());
+			assertEquals(nuevo.getRol(), nuevoRead.getRol());
+			assertFalse(nuevoRead.getExcluido());
+		} catch (SQLException | UVException ex) {
+			fail(String.format(MENSAJE_ERROR_HAY_EXCEPCION, ex.toString()));
+		}
+	}
 	
+	/**
+	 * Test insertaUsuario excluido.
+	 */
+	@Test
+	public void testA13insertaUsuarioExcluido() {
+		try {
+			Date fechaExclusion = BolsaEmpleoUtils.getCurrentDateTime();
+			Date fechaInicioExclusion = BolsaEmpleoUtils.getCurrentDateTime();
+			Date fechaFinExclusion = BolsaEmpleoUtils.getCurrentDateTime();
+			
+			UsuarioBolsaEmpleo nuevo = new UsuarioBolsaEmpleo();
+			nuevo.setRol(ModeloRol.obtenerInstancia().getRoleById(ModeloRol.ID_ROL_CANDIDATO));
+			nuevo.setCodCuenta("candidato4");
+			nuevo.setNumDocumento("00834172P");
+			nuevo.setExcluido(true);
+			nuevo.setExcluidoTipo(ModeloUsuarioBolsaEmpleo.EXCLUSION_TIPO_TEMPORAL);
+			nuevo.setRazonExcluido("test");
+			nuevo.setFechaExclusion(fechaExclusion);
+			nuevo.setFechaExclusionInicio(fechaInicioExclusion);
+			nuevo.setFechaExclusionFin(fechaFinExclusion);
+			
+			ModeloUsuarioBolsaEmpleo.obtenerInstancia().insertaUsuario(nuevo, UtilsTestBolsaEmpleo.getUsuarioPersonalLogeado());
+			UsuarioBolsaEmpleo nuevoRead = ModeloUsuarioBolsaEmpleo.obtenerInstancia().getUsuarioByNumeroDocumento("00834172P");
+			
+			assertEquals(nuevo.getCodCuenta(), nuevoRead.getCodCuenta());
+			assertEquals(nuevo.getNumDocumento(), nuevoRead.getNumDocumento());
+			assertEquals(nuevo.getRol(), nuevoRead.getRol());
+			assertTrue(nuevoRead.getExcluido());
+			
+			assertEquals(Formateador.formatoFecha(nuevoRead.getFechaExclusion(), Formateador.FORMATO_FECHA_DDMMYYYY), 
+					Formateador.formatoFecha(fechaExclusion, Formateador.FORMATO_FECHA_DDMMYYYY));
+			
+			assertEquals(Formateador.formatoFecha(nuevoRead.getFechaExclusionInicio(), Formateador.FORMATO_FECHA_DDMMYYYY), 
+					Formateador.formatoFecha(fechaInicioExclusion, Formateador.FORMATO_FECHA_DDMMYYYY));
+			
+			assertEquals(Formateador.formatoFecha(nuevoRead.getFechaExclusionFin(), Formateador.FORMATO_FECHA_DDMMYYYY), 
+					Formateador.formatoFecha(fechaFinExclusion, Formateador.FORMATO_FECHA_DDMMYYYY));
+		} catch (SQLException | UVException ex) {
+			fail(String.format(MENSAJE_ERROR_HAY_EXCEPCION, ex.toString()));
+		}
+	}
 
 	/**
 	 * GetUsuarioByPrsnif.
@@ -405,7 +469,7 @@ public class TestBEPModeloUsuarios {
 	 */
 	@Test
 	public void testE04getUsuarioCandidatoNoEsCandidato() {
-		Usuario usu = CrearUsuario.usuario(PERSONAL1_CODCUENTA);
+		Usuario usu = CrearUsuario.usuario(ATISOLUCIONES_CODCUENTA);
 		UVDatos datos = new UVDatos();
 		datos.setUsuario(usu);
 		
@@ -421,7 +485,7 @@ public class TestBEPModeloUsuarios {
 	 */
 	@Test
 	public void testE05getUsuarioByCodCuenta() {
-		Usuario usu = CrearUsuario.usuario(PERSONAL1_CODCUENTA);
+		Usuario usu = CrearUsuario.usuario(ATISOLUCIONES_CODCUENTA);
 		UVDatos datos = new UVDatos();
 		datos.setUsuario(usu);
 		
@@ -433,7 +497,7 @@ public class TestBEPModeloUsuarios {
 	}
 	
 	private void marcarUsuarioComoNoExcluido(UsuarioBolsaEmpleo usuario) throws SQLException, UVException {
-		ModeloUsuarioBolsaEmpleo.obtenerInstancia().ponerUsuarioComoNoExcluido(usuario);
+		ModeloUsuarioBolsaEmpleo.obtenerInstancia().ponerUsuarioComoNoExcluido(usuario, UtilsTestBolsaEmpleo.getUsuarioPersonalLogeado());
 		usuario = ModeloUsuarioBolsaEmpleo.obtenerInstancia().getUsuarioByNumeroDocumento(usuario.getNumDocumento());
 		assertFalse(usuario.getExcluido());
 	}
@@ -444,7 +508,7 @@ public class TestBEPModeloUsuarios {
 		usuario.setRazonExcluido(RAZON_EXCLUSION);
 		usuario.setFechaExclusion(FECHA_EXCLUSION);
 		
-		ModeloUsuarioBolsaEmpleo.obtenerInstancia().ponerUsuarioComoExcluido(usuario);
+		ModeloUsuarioBolsaEmpleo.obtenerInstancia().ponerUsuarioComoExcluido(usuario, UtilsTestBolsaEmpleo.getUsuarioPersonalLogeado());
 		
 		usuario = ModeloUsuarioBolsaEmpleo.obtenerInstancia().getUsuarioByNumeroDocumento(usuario.getNumDocumento());
 		assertTrue(usuario.getExcluido());
@@ -460,7 +524,7 @@ public class TestBEPModeloUsuarios {
 		assertFalse(usuario.getBorrado());
 		ArrayList<UsuarioBolsaEmpleo> usuariosBorrar = new ArrayList<>();
 		usuariosBorrar.add(usuario);
-		ModeloUsuarioBolsaEmpleo.obtenerInstancia().ponerUsuarioComoBorrado(usuariosBorrar);
+		ModeloUsuarioBolsaEmpleo.obtenerInstancia().ponerUsuarioComoBorrado(usuariosBorrar, UtilsTestBolsaEmpleo.getUsuarioPersonalLogeado());
 		usuario = ModeloUsuarioBolsaEmpleo.obtenerInstancia().getUsuarioByNumeroDocumento(usuario.getNumDocumento());
 		assertTrue(usuario.getBorrado());
 		return usuariosBorrar;
@@ -468,8 +532,8 @@ public class TestBEPModeloUsuarios {
 	
 	private void marcarUsuarioComoNoBorrado(ArrayList<UsuarioBolsaEmpleo> usuariosBorrar) throws SQLException, UVException {
 		UsuarioBolsaEmpleo usuario;
-		ModeloUsuarioBolsaEmpleo.obtenerInstancia().ponerUsuarioComoNoBorrado(usuariosBorrar);
-		usuario = ModeloUsuarioBolsaEmpleo.obtenerInstancia().getUsuarioByNumeroDocumento(PERSONAL1_DOCUMENTO);
+		ModeloUsuarioBolsaEmpleo.obtenerInstancia().ponerUsuarioComoNoBorrado(usuariosBorrar, UtilsTestBolsaEmpleo.getUsuarioPersonalLogeado());
+		usuario = ModeloUsuarioBolsaEmpleo.obtenerInstancia().getUsuarioByNumeroDocumento(ATISOLUCIONES_DOCUMENTO);
 		assertFalse(usuario.getBorrado());
 	}
 }

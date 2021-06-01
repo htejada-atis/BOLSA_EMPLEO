@@ -1,5 +1,7 @@
 package bbdd;
 
+import static org.junit.Assert.assertEquals;
+
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -8,15 +10,27 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.Arrays;
+import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
+
+import org.openqa.selenium.By;
+import org.openqa.selenium.WebElement;
+import org.openqa.selenium.support.ui.ExpectedConditions;
+import org.openqa.selenium.support.ui.Select;
+import org.openqa.selenium.support.ui.WebDriverWait;
 
 import controlador.implementacion.PeticionHttp;
 import es.ujaen.uvirtual.adm.CrearUsuario;
 import es.ujaen.uvirtual.beans.UVDatos;
 import es.ujaen.uvirtual.beans.Usuario;
+import es.ujaen.uvirtual.modulo.bolsaempleo.beans.UsuarioBolsaEmpleo;
+import es.ujaen.uvirtual.modulo.bolsaempleo.modelo.ModeloUsuarioBolsaEmpleo;
+import es.ujaen.uvirtual.utilidades.UVException;
+import usuario.DriverUv;
 
 /**
  * Utilidades para los test bolsa de empleo.
@@ -35,6 +49,11 @@ public final class UtilsTestBolsaEmpleo {
 	public static final String ESQUEMA_ARCOS = "arcos";
 	public static final String ESQUEMA_RRHH = "rrhh";
 	public static final String ESQUEMA_UVIRTUAL = "uvirtual";	
+	
+	private static final Pattern REGEX_TOTAL_TABLE = Pattern.compile("Total (\\d+)( \\(Seleccionados (\\d+)\\))?");
+	private static final Integer REGEX_TOTAL = 1;
+	private static final Integer REGEX_TOTAL_SELECTED = 3;	
+	public static final Integer WAIT_ELEMENT = 5; // segundos
 	
 	public static final boolean VERBOSE = false;
 	
@@ -215,12 +234,363 @@ public final class UtilsTestBolsaEmpleo {
 	}	
 	
 	/**
-	 * Ejecuta un script concreto sobre un esquema.
-	 * @param file .
-	 * @param esquema .
-	 * @throws IOException .
+	 * Importa departamentos y areas de vuja.
 	 * @throws SQLException .
 	 */
+	public static void insertarDepartamentosAreas() throws SQLException {
+		try (Connection conRh = BbddRunner.obtenerConexionRh(); Connection conUv = BbddRunner.obtenerConexionUvirtual()) {
+			// departamentos
+
+			String sqlDeptSelect = "SELECT DISTINCT uvnbrdsa.ID_DEPARTAMENTO, uvnbrdsa.DES_DEPARTAMENTO "
+					+ "FROM UXXIRRHH.VUJA_NET_BEP_RH_DEPTO_SECC_AREA uvnbrdsa";
+
+			try (PreparedStatement stmtSelect = conRh.prepareStatement(sqlDeptSelect)) {
+				try (ResultSet rs = stmtSelect.executeQuery()) {
+					while (rs.next()) {
+						insertDepartamento(conUv, rs.getString(ID_DEPARTAMENTO), rs.getString("DES_DEPARTAMENTO"));
+					}
+				}
+			}
+
+			// areas
+
+			String sqlAreaSelect = "SELECT " 
+					+ "		uvnbrdsa.ID_DEPARTAMENTO, "
+					+ "		uvnbrdsa.ID_AREA_CONOCIMIENTO, " 
+					+ "		MIN(uvnbrdsa.DES_SECCION) DES_SECCION,"
+					+ "		MIN(uvnbrdsa.ID_SECCION) ID_SECCION, "
+					+ "		MIN(uvnbrdsa.DES_AREA_CONOCIMIENTO) DES_AREA_CONOCIMIENTO "
+					+ " FROM UXXIRRHH.VUJA_NET_BEP_RH_DEPTO_SECC_AREA uvnbrdsa "
+					+ " GROUP BY uvnbrdsa.ID_DEPARTAMENTO, uvnbrdsa.ID_AREA_CONOCIMIENTO "
+					+ " ORDER BY uvnbrdsa.ID_AREA_CONOCIMIENTO";
+
+			try (PreparedStatement stmtSelect = conRh.prepareStatement(sqlAreaSelect)) {
+				try (ResultSet rs = stmtSelect.executeQuery()) {
+					while (rs.next()) {
+						Integer idDepartamento = getDepartamentoByCodigoRh(conUv, rs.getString(ID_DEPARTAMENTO));
+
+						if (idDepartamento != null) {
+							Integer idArea = insertArea(conUv, rs.getString("ID_AREA_CONOCIMIENTO"),
+									rs.getString("DES_AREA_CONOCIMIENTO"));
+							insertAreaDepartamento(idDepartamento, idArea, rs.getString("ID_SECCION"),
+									rs.getString("DES_SECCION"));
+						} else {
+							throw new SQLException("CARGA DE AREAS FAIL, DEPARTAMENTO NO ENCONTRADO "
+									+ rs.getString(ID_DEPARTAMENTO));
+						}
+					}
+				}
+			}
+		}
+	}
+	
+	/**
+	 * Devuelve el usuario personal1 logeado en el sistema.
+	 * @return .
+	 * @throws SQLException .
+	 * @throws UVException .
+	 */
+	public static UsuarioBolsaEmpleo getUsuarioPersonalLogeado() throws SQLException, UVException {
+		UVDatos datos = new UVDatos();
+		datos.setIdentificadorUsuario(UID_PERSONAL_PRUEBAS);
+		Usuario usuario = CrearUsuario.usuario(UID_PERSONAL_PRUEBAS);
+		datos.setUsuario(usuario);
+
+		return ModeloUsuarioBolsaEmpleo.obtenerInstancia().getUsuarioLogeado(datos);
+	}
+	
+	/**
+	 * Devuelve el usuario candidato1 logeado en el sistema.
+	 * @return .
+	 * @throws SQLException .
+	 * @throws UVException .
+	 */
+	public static UsuarioBolsaEmpleo getUsuarioCandidatoLogeado() throws SQLException, UVException {
+		UVDatos datos = new UVDatos();
+		datos.setIdentificadorUsuario(UID_CANDIDATO_PRUEBAS);
+		Usuario usuario = CrearUsuario.usuario(UID_CANDIDATO_PRUEBAS);
+		datos.setUsuario(usuario);
+
+		return ModeloUsuarioBolsaEmpleo.obtenerInstancia().getUsuarioLogeado(datos);
+	}
+	
+	/**
+	 * Devuelve el waiter de elementos.
+	 * @return .
+	 */
+	public static WebDriverWait getWaiter() {
+		return new WebDriverWait(DriverUv.getDriver(), WAIT_ELEMENT);		
+    }
+		
+	/**
+	 * Devuelve el titulo de la página.
+	 * @param main .
+	 * @return .
+	 */
+	public static String getTitlePage(WebElement main) {
+		WebElement h2 = main.findElement(By.tagName("h2"));
+		return h2.getText();
+	}
+	
+	/**
+	 * Devuelve el titulo de la tabla.
+	 * @param tabla .
+	 * @return .
+	 */
+	public static String getTitleTable(WebElement tabla) {		
+		WebElement caption = tabla.findElement(By.tagName("caption"));
+		return caption.getText();
+	}
+	
+	/**
+	 * Devuelve el total de la tabla.
+	 * @param table .
+	 * @return .
+	 */
+	public static int getTotalTable(WebElement table) {
+		WebElement foot = table.findElement(By.tagName("tfoot"));
+		WebElement total = foot.findElement(By.className("total"));
+		
+		Matcher matcher = REGEX_TOTAL_TABLE.matcher(total.getText());
+		if (!matcher.find()) {
+			return 0;
+		}
+		
+		return Integer.parseInt(matcher.group(REGEX_TOTAL));
+	}
+	
+	/**
+	 * Devuelve el total de filas seleccionadas de la tabla.
+	 * @param table .
+	 * @return .
+	 */
+	public static int getTotalSelectedTable(WebElement table) {
+		WebElement foot = table.findElement(By.tagName("tfoot"));
+		WebElement total = foot.findElement(By.className("total"));
+		
+		Matcher matcher = REGEX_TOTAL_TABLE.matcher(total.getText());
+		if (!matcher.find()) {
+			return 0;
+		}
+		
+		return Integer.parseInt(matcher.group(REGEX_TOTAL_SELECTED));
+	}
+	
+	/**
+	 * Devuelve el texto de una celda de la tabla.
+	 * @param table .
+	 * @param indexTr .
+	 * @param indexCol .
+	 * @return .
+	 */
+	public static String getTextCellTable(WebElement table, int indexTr, int indexCol) {
+		WebElement tr = getRowByIndex(table, indexTr); 
+		WebElement td = getColumnByIndex(tr, indexCol);
+		
+		return td.getText();
+	}
+	
+	/**
+	 * Devuelve un array de mensajes de exito.
+	 * @return .
+	 */
+	public static List<String> getMensajesDeExito() {
+		return getMensajesDeExito("exito");		
+	}
+	
+	/**
+	 * Devuelve un array de mensajes de error.
+	 * @return .
+	 */
+	public static List<String> getMensajesDeError() {
+		return getMensajesDeExito("error");
+	}
+	
+	/**
+	 * Devuelve la primera fila de la tabla.
+	 * @param table .
+	 * @param indexTr indice de la fila, comenzando por 0.
+	 * @return .
+	 */
+	public static WebElement getRowByIndex(WebElement table, int indexTr) {
+		String idTable = table.getAttribute("id");
+		String idTr = idTable + "_row_" + indexTr;
+		
+		return waitVisibility(By.id(idTr));
+	}
+	
+	/**
+	 * Devuelve el td de una fila, por su indice.
+	 * @param tr .
+	 * @param indexCol indice de la columna, comenzando por 0.
+	 * @return .
+	 */
+	public static WebElement getColumnByIndex(WebElement tr, int indexCol) {
+		return tr.findElement(By.xpath("td[" + (indexCol + 1) + "]"));
+	}
+	
+	/**
+	 * Devuelve un filtro select de la tabla.
+	 * @param table .
+	 * @param indexFilter .
+	 * @return .
+	 */
+	public static Select getFilterSelectByIndex(WebElement table, int indexFilter) {
+		WebElement tr = table.findElement(By.cssSelector("tr.filterable"));
+		WebElement th = tr.findElement(By.xpath("th[" + (indexFilter + 1) + "]"));
+		
+		List<WebElement> elementos = th.findElements(By.xpath("*"));
+		
+		return new Select(elementos.get(0));		
+	}
+	
+	/**
+	 * Devuelve un filtro de tipo input de la tabla de la columna indicada.
+	 * @param table .
+	 * @param indexFilter .
+	 * @return .
+	 */
+	public static WebElement getFilterInputByIndex(WebElement table, int indexFilter) {
+		WebElement tr = table.findElement(By.cssSelector("tr.filterable"));
+		WebElement th = tr.findElement(By.xpath("th[" + (indexFilter + 1) + "]"));
+		
+		return th.findElement(By.tagName("input"));		
+	}
+	
+	/**
+	 * Devuelve un botón de acción de la tabla.
+	 * @param table .
+	 * @param text .
+	 * @return .
+	 */
+	public static WebElement getActionTableByText(WebElement table, String text) {
+		WebElement footer = table.findElement(By.tagName("tfoot"));
+		WebElement actions = footer.findElement(By.className("actions"));
+		
+		for (WebElement btn : actions.findElements(By.tagName("button"))) {
+			if (btn.getText().equals(text)) {
+				return btn;
+			}
+		}
+		
+		return null;
+	}
+	
+	/**
+	 * Hace click sobre el check de la fila de la tabla. Devuelve al fila.
+	 * @param table .
+	 * @param index indice de la fila.
+	 * @return fila .
+	 */
+	public static WebElement selectRowTable(WebElement table, Integer index) {
+		WebElement tr = getRowByIndex(table, index); 
+		WebElement td = getColumnByIndex(tr, 0);
+		WebElement check = td.findElement(By.tagName("input"));
+		check.click();	
+		
+		return tr;
+	}
+	
+	/**
+	 * Devuelve el dialgo ui-dialog.
+	 * 
+	 * @return .
+	 */
+	public static WebElement getDialog() {
+		return waitVisibility(By.className("ui-dialog"));
+	}
+	
+	/**
+	 * Devuelve el titulo del popup.
+	 * @param dialog .
+	 * @return .
+	 */
+	public static String getTitlePopup(WebElement dialog) {
+		return dialog.findElement(By.className("ui-dialog-title")).getText();		
+	}
+	
+	/**
+	 * Devuelve el btn del dialogo con el texto indicando.
+	 * @param dialog .
+	 * @param text .
+	 * @return .
+	 */
+	public static WebElement getButtonDialog(WebElement dialog, String text) {
+		WebElement div = dialog.findElement(By.className("ui-dialog-buttonset"));
+		
+		for (WebElement btn : div.findElements(By.tagName("button"))) {
+			if (btn.getAttribute("class").contains("ui-button") && btn.findElement(By.tagName("span")).getText().equals(text)) {
+				return btn;
+			}
+		}
+				
+		return null;		
+	}
+		
+	/**
+	 * Comprueba el titulo de la página. Devuelve el div principal.
+	 * @param main .
+	 * @param title .
+	 */
+	public static void assertTitlePage(WebElement main, String title) {
+		assertEquals(getTitlePage(main), title);
+	}
+	
+	/**
+	 * Devuelve el título de la tabla.
+	 * 
+	 * @param tabla .
+	 * @param title .
+	 */
+	public static void assertTitleTable(WebElement tabla, String title) {
+		assertEquals(getTitleTable(tabla), title);
+	}
+
+	/**
+	 * Comprueba si el total de elementos de la tabla conincide.
+	 * @param tabla .
+	 * @param total .
+	 */
+	public static void assertTotalTable(WebElement tabla, int total) {
+		assertEquals(getTotalTable(tabla), total);		
+	}
+	
+	/**
+	 * Comprueba si el total de elementos seleccionados de la tabla conincide.
+	 * @param tabla .
+	 * @param total .
+	 */
+	public static void assertTotalSelectedTable(WebElement tabla, int total) {
+		assertEquals(getTotalSelectedTable(tabla), total);		
+	}	
+	
+	/**
+	 * Comprueba si el dialgo tiene el titulo pasado.
+	 * @param title .
+	 * @param dialog .
+	 */
+	public static void assertTitleDialgo(WebElement dialog, String title) {
+		assertEquals(getTitlePopup(dialog), title);
+	}
+	
+	/**
+	 * Espera hasta que un elemento sea visible.
+	 * @param by condición de búsqueda.
+	 * @return .
+	 */
+	public static WebElement waitVisibility(By by) {
+		return getWaiter().until(ExpectedConditions.visibilityOfElementLocated(by));		
+	}
+	
+	/**
+	 * Espera hasta que un elemento sea clickable.
+	 * @param by condición de búsqueda.
+	 * @return .
+	 */
+	public static WebElement waitClickable(By by) {
+		return getWaiter().until(ExpectedConditions.elementToBeClickable(by));		
+	} 
+	
 	private static void ejecutarFile(File file, String esquema) throws IOException, SQLException {
 		String name = file.getName();
 
@@ -287,58 +657,7 @@ public final class UtilsTestBolsaEmpleo {
 				LOGGER.log(Level.WARNING, "Error ejecutando fichero. No entiendo el esquema: {0}", esquema);
 		}
 	}
-
-	/**
-	 * Importa departamentos y areas de vuja.
-	 * @throws SQLException .
-	 */
-	public static void insertarDepartamentosAreas() throws SQLException {
-		try (Connection conRh = BbddRunner.obtenerConexionRh(); Connection conUv = BbddRunner.obtenerConexionUvirtual()) {
-			// departamentos
-
-			String sqlDeptSelect = "SELECT DISTINCT uvnbrdsa.ID_DEPARTAMENTO, uvnbrdsa.DES_DEPARTAMENTO "
-					+ "FROM UXXIRRHH.VUJA_NET_BEP_RH_DEPTO_SECC_AREA uvnbrdsa";
-
-			try (PreparedStatement stmtSelect = conRh.prepareStatement(sqlDeptSelect)) {
-				try (ResultSet rs = stmtSelect.executeQuery()) {
-					while (rs.next()) {
-						insertDepartamento(conUv, rs.getString(ID_DEPARTAMENTO), rs.getString("DES_DEPARTAMENTO"));
-					}
-				}
-			}
-
-			// areas
-
-			String sqlAreaSelect = "SELECT " 
-					+ "		uvnbrdsa.ID_DEPARTAMENTO, "
-					+ "		uvnbrdsa.ID_AREA_CONOCIMIENTO, " 
-					+ "		MIN(uvnbrdsa.DES_SECCION) DES_SECCION,"
-					+ "		MIN(uvnbrdsa.ID_SECCION) ID_SECCION, "
-					+ "		MIN(uvnbrdsa.DES_AREA_CONOCIMIENTO) DES_AREA_CONOCIMIENTO "
-					+ " FROM UXXIRRHH.VUJA_NET_BEP_RH_DEPTO_SECC_AREA uvnbrdsa "
-					+ " GROUP BY uvnbrdsa.ID_DEPARTAMENTO, uvnbrdsa.ID_AREA_CONOCIMIENTO "
-					+ " ORDER BY uvnbrdsa.ID_AREA_CONOCIMIENTO";
-
-			try (PreparedStatement stmtSelect = conRh.prepareStatement(sqlAreaSelect)) {
-				try (ResultSet rs = stmtSelect.executeQuery()) {
-					while (rs.next()) {
-						Integer idDepartamento = getDepartamentoByCodigoRh(conUv, rs.getString(ID_DEPARTAMENTO));
-
-						if (idDepartamento != null) {
-							Integer idArea = insertArea(conUv, rs.getString("ID_AREA_CONOCIMIENTO"),
-									rs.getString("DES_AREA_CONOCIMIENTO"));
-							insertAreaDepartamento(idDepartamento, idArea, rs.getString("ID_SECCION"),
-									rs.getString("DES_SECCION"));
-						} else {
-							throw new SQLException("CARGA DE AREAS FAIL, DEPARTAMENTO NO ENCONTRADO "
-									+ rs.getString(ID_DEPARTAMENTO));
-						}
-					}
-				}
-			}
-		}
-	}
-
+	
 	private static Integer getDepartamentoByCodigoRh(Connection con, String cod) throws SQLException {
 		String sql = "SELECT bepdep.CODNUM FROM TBEP_DEPARTAMENTOS bepdep WHERE bepdep.ID_DEPARTAMENTO = ? FETCH FIRST 1 ROW ONLY";
 
@@ -355,7 +674,7 @@ public final class UtilsTestBolsaEmpleo {
 	}
 
 	private static void insertDepartamento(Connection con, String idDept, String descripcion) throws SQLException {
-		String sql = "INSERT INTO TBEP_DEPARTAMENTOS (ID_DEPARTAMENTO, DES_DEPARTAMENTO) VALUES (?,?)";
+		String sql = "INSERT INTO TBEP_DEPARTAMENTOS (ID_DEPARTAMENTO, DES_DEPARTAMENTO, UID_USUARIO) VALUES (?,?,'CARGA_INICIAL')";
 
 		try (PreparedStatement stmt = con.prepareStatement(sql)) {
 			int parameterIndex = 1;
@@ -380,7 +699,7 @@ public final class UtilsTestBolsaEmpleo {
 		}
 
 		// insertamos
-		sql = "INSERT INTO TBEP_AREAS (ID_AREA_CONOCIMIENTO, DES_AREA_CONOCIMIENTO) VALUES (?,?)";
+		sql = "INSERT INTO TBEP_AREAS (ID_AREA_CONOCIMIENTO, DES_AREA_CONOCIMIENTO, UID_USUARIO) VALUES (?,?,'CARGA_INICIAL')";
 		try (PreparedStatement stmt = con.prepareStatement(sql, new String[] {CODNUM})) {
 			int parameterIndex = 1;
 			stmt.setString(parameterIndex++, idAreaConocimiento);
@@ -394,7 +713,7 @@ public final class UtilsTestBolsaEmpleo {
 	}
 
 	private static void insertAreaDepartamento(Integer idDepartamento, Integer idArea, String idSeccion, String descSeccion) throws SQLException {
-		String sql = "INSERT INTO TBEP_AREAS_DEPARTAMENTOS (BEPARE_CODNUM,BEPDEP_CODNUM,ID_SECCION,DES_SECCION) VALUES (?,?,?,?)";
+		String sql = "INSERT INTO TBEP_AREAS_DEPARTAMENTOS (BEPARE_CODNUM,BEPDEP_CODNUM,ID_SECCION,DES_SECCION,UID_USUARIO) VALUES (?,?,?,?,'CARGA_INICIAL')";
 		try (Connection con = BbddRunner.obtenerConexionUvirtual(); PreparedStatement stmt = con.prepareStatement(sql)) {
 			int parameterIndex = 1;
 			stmt.setInt(parameterIndex++, idArea);
@@ -414,4 +733,16 @@ public final class UtilsTestBolsaEmpleo {
 			LOGGER.log(Level.INFO, "SQL {0}", name);
 		}
 	}
+
+	private static List<String> getMensajesDeExito(String idDivMensaje) {
+		List<String> mensajes = null;
+		WebElement div = waitVisibility(By.id(idDivMensaje));
+		
+		mensajes = div.findElements(By.tagName("li")).stream().map(WebElement::getText).collect(Collectors.toList());
+		if (mensajes.isEmpty()) {
+			mensajes.add(div.getText());			
+		}
+		
+		return mensajes;
+	} 
 }

@@ -118,7 +118,7 @@ public class ControladorGestionEvaluadores extends HttpServlet {
 			init(bean, datos, request, response);
 			switch (nombreAccion) {
 				case ACCION_INDEX:
-					index(bean, request);
+					index(bean);
 					break;
 				case ACCION_SELECCIONAR_DEPARTAMENTO:
 					seleccionarDepartamento(bean, request, response);
@@ -161,7 +161,7 @@ public class ControladorGestionEvaluadores extends HttpServlet {
 		bean.setVista(JSP_INDEX);
 		BolsaEmpleoUtils.readMensajeSession(bean, request);
 		try {
-			ModeloUsuarioBolsaEmpleo.obtenerInstancia().checkUser(datos);
+			bean.setUsuarioLogeado(ModeloUsuarioBolsaEmpleo.obtenerInstancia().getOrCreateUsuario(datos));
 		} catch (UVException e) {
 			BolsaEmpleoUtils.addMensajeDeError(e.getMessage(), bean, request);
 			response.sendRedirect("/srv/es/informacionadministrativa/bolsaempleo/error");
@@ -181,24 +181,11 @@ public class ControladorGestionEvaluadores extends HttpServlet {
 		doGet(request, response);
 	}
 	
-	private void index(VistaEvaluadores bean, HttpServletRequest request) throws SQLException, UVException {
+	private void index(VistaEvaluadores bean) throws SQLException, UVException {
 		bean.setVista(JSP_INDEX);
 		
 		ModeloDepartamento modeloDepartamento = ModeloDepartamento.obtenerInstancia();
 		bean.setDepartamentos(modeloDepartamento.listaDepartamentosOrderByDesc());
-		
-//		HttpSession session = request.getSession(false);
-//		if (session.getAttribute(PARAM_AREA) != null) {
-//			ModeloArea modeloArea = ModeloArea.obtenerInstancia();
-//			Area area = modeloArea.getAreaById((Integer) session.getAttribute(PARAM_AREA));
-//			bean.setArea(area);
-//			session.removeAttribute(PARAM_AREA);
-//		}
-//		if (session.getAttribute(PARAM_DEPARTAMENTO) != null) {
-//			Departamento departamento = modeloDepartamento.getDepartamentoByCodNum((Integer) session.getAttribute(PARAM_DEPARTAMENTO));
-//			bean.setDepartamento(departamento);
-//			session.removeAttribute(PARAM_DEPARTAMENTO);
-//		}
 	}
 	
 	private void seleccionarDepartamento(VistaEvaluadores bean, HttpServletRequest request, HttpServletResponse response) throws SQLException, UVException {
@@ -251,7 +238,7 @@ public class ControladorGestionEvaluadores extends HttpServlet {
 		String nombreUsuario = request.getParameter(PARAM_NOMBRE_EVALUADOR);
 		UsuarioBolsaEmpleo usuario = ModeloUsuarioBolsaEmpleo.obtenerInstancia().obtenerUsuarioBolsaEmpleoSiExiste(nombreUsuario);
 		if (usuario == null) {
-			usuario = ModeloUsuarioBolsaEmpleo.obtenerInstancia().crearUsuarioBolsaEmpleo(ModeloRol.ID_ROL_MIEMBRO_COMISION, nombreUsuario);
+			usuario = ModeloUsuarioBolsaEmpleo.obtenerInstancia().crearUsuarioBolsaEmpleo(ModeloRol.ID_ROL_MIEMBRO_COMISION, nombreUsuario, bean.getUsuarioLogeado());
 		} else if (!usuario.getRol().getCodNum().equals(ModeloRol.ID_ROL_MIEMBRO_COMISION)) {
 			throw new UVException(MENSAJE_ERROR_ROL_COMISION);			
 		}
@@ -278,7 +265,7 @@ public class ControladorGestionEvaluadores extends HttpServlet {
 				continue;
 			}
 			
-			ModeloEvaluador.obtenerInstancia().insertaEvaluador(usuario, area.getCodNum());
+			ModeloEvaluador.obtenerInstancia().insertaEvaluador(usuario, area.getCodNum(), bean.getUsuarioLogeado());
 			BolsaEmpleoUtils.addMensajeDeExito(String.format(MENSAJE_EXITO_AGREGAR_EVALUADOR, area.getDescripcion()), bean, request);
 		}
 				
@@ -364,7 +351,7 @@ public class ControladorGestionEvaluadores extends HttpServlet {
 		boolean activo = "true".equals(EscapaHTML.ajustaCodificacion(request.getParameter(PARAM_ACTIVO)));
 		Evaluador evaluador = new Evaluador(bean.getArea().getCodNum(), activo);
 		evaluador.setCodNum(Formateador.leeParametroInteger(request.getParameter(PARAM_USUARIO)));
-		ModeloEvaluador.obtenerInstancia().borraRestauraEvaluador(evaluador);
+		ModeloEvaluador.obtenerInstancia().borraRestauraEvaluador(evaluador, bean.getUsuarioLogeado());
 		
 		BolsaEmpleoUtils.addMensajeDeExito(activo ? MENSAJE_EXITO_RESTAURAR : MENSAJE_EXITO_BORRAR, bean, request);
 		String url = request.getServletPath() + "?" 

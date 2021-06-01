@@ -1,20 +1,12 @@
 package es.ujaen.uvirtual.modulo.bolsaempleo.vistas;
 
 import java.io.Serializable;
-import es.ujaen.uvirtual.beans.vistas.Vista;
 
-/** Bean para la vista.
- * @author jlopez
+/**
+ * Bean para la vista.
+ * 
+ * @author ATISoluciones
  */
-public class VistaError extends Vista implements Serializable {
+public class VistaError extends VistaBEP implements Serializable {
 	private static final long serialVersionUID = 1L;
-	private String vista;
-	
-	public String getVista() {
-		return vista;
-	}
-	
-	public void setVista(String vista) {
-		this.vista = vista;
-	}
 }

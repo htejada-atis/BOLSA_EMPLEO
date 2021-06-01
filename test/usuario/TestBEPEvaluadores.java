@@ -78,31 +78,31 @@ public class TestBEPEvaluadores extends UtilsTestUsuarioBase {
 	@Test
 	public void testA1() {
 		// comprobamos titulo de la página
-		UtilsTestBEP.assertTitlePage(UtilsTestBEP.waitVisibility(By.className(DIV_MAIN)), "Evaluadores de un departamento");
+		UtilsTestBolsaEmpleo.assertTitlePage(UtilsTestBolsaEmpleo.waitVisibility(By.className(DIV_MAIN)), "Evaluadores de un departamento");
 
 		// seleccionamos el departamento (refresh)
 		WebElement tableAreas = seleccionarDepartamento(1);
 				
 		// añadimos evaluador (refresh)
-		WebElement input = UtilsTestBEP.waitVisibility(By.id("nombre_evaluador"));
+		WebElement input = UtilsTestBolsaEmpleo.waitVisibility(By.id("nombre_evaluador"));
 		input.sendKeys("comision1");
-		WebElement btn = UtilsTestBEP.waitClickable(By.id("nuevo_evaluador"));
+		WebElement btn = UtilsTestBolsaEmpleo.waitClickable(By.id("nuevo_evaluador"));
 		btn.click();
-		tableAreas = UtilsTestBEP.waitVisibility(By.id(ID_TABLE_AREAS));
+		tableAreas = UtilsTestBolsaEmpleo.waitVisibility(By.id(ID_TABLE_AREAS));
 		
 		// mensaje 			
-		List<String> mensajes = UtilsTestBEP.getMensajesDeExito();
-		assertEquals(UtilsTestBEP.getTotalTable(tableAreas), mensajes.size());
+		List<String> mensajes = UtilsTestBolsaEmpleo.getMensajesDeExito();
+		assertEquals(UtilsTestBolsaEmpleo.getTotalTable(tableAreas), mensajes.size());
 		
 		// seleccionamos el primer item de la tabla
-		tableAreas = UtilsTestBEP.waitVisibility(By.id(ID_TABLE_AREAS));
-		WebElement trArea = UtilsTestBEP.getRowByIndex(tableAreas, 0);
-		WebElement tdId = UtilsTestBEP.getColumnByIndex(trArea, 1);
+		tableAreas = UtilsTestBolsaEmpleo.waitVisibility(By.id(ID_TABLE_AREAS));
+		WebElement trArea = UtilsTestBolsaEmpleo.getRowByIndex(tableAreas, 0);
+		WebElement tdId = UtilsTestBolsaEmpleo.getColumnByIndex(trArea, 1);
 		tdId.click();
 		
 		// comprobamos tabla de evaluadores del area
-		WebElement tableEvaluadores = UtilsTestBEP.waitVisibility(By.id(ID_TABLE_EVALUADORES));
-		UtilsTestBEP.assertTotalTable(tableEvaluadores, 1);
+		WebElement tableEvaluadores = UtilsTestBolsaEmpleo.waitVisibility(By.id(ID_TABLE_EVALUADORES));
+		UtilsTestBolsaEmpleo.assertTotalTable(tableEvaluadores, 1);
 	}
 	
 	/**
@@ -114,39 +114,39 @@ public class TestBEPEvaluadores extends UtilsTestUsuarioBase {
 		WebElement tableAreas = seleccionarDepartamento(2);
 		
 		// seleccionamos las dos primeras areas
-		UtilsTestBEP.selectRowTable(tableAreas, 0);
-		UtilsTestBEP.selectRowTable(tableAreas, 1);
-		UtilsTestBEP.assertTotalSelectedTable(tableAreas, 2);
+		UtilsTestBolsaEmpleo.selectRowTable(tableAreas, 0);
+		UtilsTestBolsaEmpleo.selectRowTable(tableAreas, 1);
+		UtilsTestBolsaEmpleo.assertTotalSelectedTable(tableAreas, 2);
 		
 		// añadimos evaluador (refresh)
-		WebElement input = UtilsTestBEP.waitVisibility(By.id("nombre_evaluador"));
+		WebElement input = UtilsTestBolsaEmpleo.waitVisibility(By.id("nombre_evaluador"));
 		input.sendKeys("comision1");
-		WebElement btn = UtilsTestBEP.waitClickable(By.id("nuevo_evaluador"));
+		WebElement btn = UtilsTestBolsaEmpleo.waitClickable(By.id("nuevo_evaluador"));
 		btn.click();
 		
 		// mensaje 
-		List<String> mExito = UtilsTestBEP.getMensajesDeExito();
-		List<String> mError = UtilsTestBEP.getMensajesDeError();
+		List<String> mExito = UtilsTestBolsaEmpleo.getMensajesDeExito();
+		List<String> mError = UtilsTestBolsaEmpleo.getMensajesDeError();
 		assertEquals(1, mExito.size());
 		assertEquals(1, mError.size());
 		
 		// seleccionamos el primer item de la tabla
-		tableAreas = UtilsTestBEP.waitVisibility(By.id(ID_TABLE_AREAS));
-		WebElement trArea = UtilsTestBEP.getRowByIndex(tableAreas, 0);
-		WebElement tdId = UtilsTestBEP.getColumnByIndex(trArea, 1);
+		tableAreas = UtilsTestBolsaEmpleo.waitVisibility(By.id(ID_TABLE_AREAS));
+		WebElement trArea = UtilsTestBolsaEmpleo.getRowByIndex(tableAreas, 0);
+		WebElement tdId = UtilsTestBolsaEmpleo.getColumnByIndex(trArea, 1);
 		tdId.click();
-		WebElement tableEvaluadores = UtilsTestBEP.waitVisibility(By.id(ID_TABLE_EVALUADORES));
-		UtilsTestBEP.assertTotalTable(tableEvaluadores, 1);
-		assertEquals(UtilsTestBEP.getTextCellTable(tableEvaluadores, 0, 0), "36393760D");
+		WebElement tableEvaluadores = UtilsTestBolsaEmpleo.waitVisibility(By.id(ID_TABLE_EVALUADORES));
+		UtilsTestBolsaEmpleo.assertTotalTable(tableEvaluadores, 1);
+		assertEquals(UtilsTestBolsaEmpleo.getTextCellTable(tableEvaluadores, 0, 0), "36393760D");
 		
 		// seleccionamos el segundo item de la tabla
-		tableAreas = UtilsTestBEP.waitVisibility(By.id(ID_TABLE_AREAS));
-		trArea = UtilsTestBEP.getRowByIndex(tableAreas, 0);
-		tdId = UtilsTestBEP.getColumnByIndex(trArea, 2);
+		tableAreas = UtilsTestBolsaEmpleo.waitVisibility(By.id(ID_TABLE_AREAS));
+		trArea = UtilsTestBolsaEmpleo.getRowByIndex(tableAreas, 0);
+		tdId = UtilsTestBolsaEmpleo.getColumnByIndex(trArea, 2);
 		tdId.click();
-		tableEvaluadores = UtilsTestBEP.waitVisibility(By.id(ID_TABLE_EVALUADORES));
-		UtilsTestBEP.assertTotalTable(tableEvaluadores, 1);
-		assertEquals(UtilsTestBEP.getTextCellTable(tableEvaluadores, 0, 0), "36393760D");
+		tableEvaluadores = UtilsTestBolsaEmpleo.waitVisibility(By.id(ID_TABLE_EVALUADORES));
+		UtilsTestBolsaEmpleo.assertTotalTable(tableEvaluadores, 1);
+		assertEquals(UtilsTestBolsaEmpleo.getTextCellTable(tableEvaluadores, 0, 0), "36393760D");
 	}
 	
 	/**
@@ -158,26 +158,26 @@ public class TestBEPEvaluadores extends UtilsTestUsuarioBase {
 		WebElement tableAreas = seleccionarDepartamento(1);
 		
 		// seleccionamos la primera area
-		WebElement trArea = UtilsTestBEP.getRowByIndex(tableAreas, 0);
-		WebElement tdId = UtilsTestBEP.getColumnByIndex(trArea, 1);
+		WebElement trArea = UtilsTestBolsaEmpleo.getRowByIndex(tableAreas, 0);
+		WebElement tdId = UtilsTestBolsaEmpleo.getColumnByIndex(trArea, 1);
 		tdId.click();	
 		
 		// borramos el primer item
-		WebElement tableEvaluadores = UtilsTestBEP.waitVisibility(By.id(ID_TABLE_EVALUADORES));
-		UtilsTestBEP.assertTotalTable(tableEvaluadores, 1);
-		assertEquals(UtilsTestBEP.getTextCellTable(tableEvaluadores, 0, 0), "36393760D");
-		WebElement trEvaluador = UtilsTestBEP.getRowByIndex(tableEvaluadores, 0);
+		WebElement tableEvaluadores = UtilsTestBolsaEmpleo.waitVisibility(By.id(ID_TABLE_EVALUADORES));
+		UtilsTestBolsaEmpleo.assertTotalTable(tableEvaluadores, 1);
+		assertEquals(UtilsTestBolsaEmpleo.getTextCellTable(tableEvaluadores, 0, 0), "36393760D");
+		WebElement trEvaluador = UtilsTestBolsaEmpleo.getRowByIndex(tableEvaluadores, 0);
 		WebElement btnBorrar = trEvaluador.findElement(By.className("btn-borrar")); 
 		btnBorrar.click();
 		
 		// dialogo
-		WebElement dialog = UtilsTestBEP.getDialog();
-		UtilsTestBEP.assertTitleDialgo(dialog, "Borrar evaluador");
-		WebElement btnSi = UtilsTestBEP.getButtonDialog(dialog, "Si");
+		WebElement dialog = UtilsTestBolsaEmpleo.getDialog();
+		UtilsTestBolsaEmpleo.assertTitleDialgo(dialog, "Borrar evaluador");
+		WebElement btnSi = UtilsTestBolsaEmpleo.getButtonDialog(dialog, "Si");
 		btnSi.click();
 		
-		tableEvaluadores = UtilsTestBEP.waitVisibility(By.id(ID_TABLE_EVALUADORES));
-		assertEquals(UtilsTestBEP.getTextCellTable(tableEvaluadores, 0, 0), "Sin resultados");
+		tableEvaluadores = UtilsTestBolsaEmpleo.waitVisibility(By.id(ID_TABLE_EVALUADORES));
+		assertEquals(UtilsTestBolsaEmpleo.getTextCellTable(tableEvaluadores, 0, 0), "Sin resultados");
 	}
 	
 	/**
@@ -189,32 +189,32 @@ public class TestBEPEvaluadores extends UtilsTestUsuarioBase {
 		WebElement tableAreas = seleccionarDepartamento(1);
 		
 		// seleccionamos la primera area
-		WebElement trArea = UtilsTestBEP.getRowByIndex(tableAreas, 0);
-		WebElement tdId = UtilsTestBEP.getColumnByIndex(trArea, 1);
+		WebElement trArea = UtilsTestBolsaEmpleo.getRowByIndex(tableAreas, 0);
+		WebElement tdId = UtilsTestBolsaEmpleo.getColumnByIndex(trArea, 1);
 		tdId.click();	
 		
 		// seleccionamos el filtro
-		WebElement tableEvaluadores = UtilsTestBEP.waitVisibility(By.id(ID_TABLE_EVALUADORES));
-		Select filtro = UtilsTestBEP.getFilterSelectByIndex(tableEvaluadores, 2);
+		WebElement tableEvaluadores = UtilsTestBolsaEmpleo.waitVisibility(By.id(ID_TABLE_EVALUADORES));
+		Select filtro = UtilsTestBolsaEmpleo.getFilterSelectByIndex(tableEvaluadores, 2);
 		filtro.selectByValue("false");
 		
 		// restauramos
-		tableEvaluadores = UtilsTestBEP.waitVisibility(By.id(ID_TABLE_EVALUADORES));
-		UtilsTestBEP.assertTotalTable(tableEvaluadores, 1);
-		assertEquals(UtilsTestBEP.getTextCellTable(tableEvaluadores, 0, 0), "36393760D");
-		WebElement trEvaluador = UtilsTestBEP.getRowByIndex(tableEvaluadores, 0);
+		tableEvaluadores = UtilsTestBolsaEmpleo.waitVisibility(By.id(ID_TABLE_EVALUADORES));
+		UtilsTestBolsaEmpleo.assertTotalTable(tableEvaluadores, 1);
+		assertEquals(UtilsTestBolsaEmpleo.getTextCellTable(tableEvaluadores, 0, 0), "36393760D");
+		WebElement trEvaluador = UtilsTestBolsaEmpleo.getRowByIndex(tableEvaluadores, 0);
 		WebElement btn = trEvaluador.findElement(By.className("btn-restaurar")); 
 		btn.click();
 		
 		// dialogo
-		WebElement dialog = UtilsTestBEP.getDialog();
-		UtilsTestBEP.assertTitleDialgo(dialog, "Restaurar evaluador");
-		WebElement btnSi = UtilsTestBEP.getButtonDialog(dialog, "Si");
+		WebElement dialog = UtilsTestBolsaEmpleo.getDialog();
+		UtilsTestBolsaEmpleo.assertTitleDialgo(dialog, "Restaurar evaluador");
+		WebElement btnSi = UtilsTestBolsaEmpleo.getButtonDialog(dialog, "Si");
 		btnSi.click();
 		
-		tableEvaluadores = UtilsTestBEP.waitVisibility(By.id(ID_TABLE_EVALUADORES));
-		UtilsTestBEP.assertTotalTable(tableEvaluadores, 1);
-		assertEquals(UtilsTestBEP.getTextCellTable(tableEvaluadores, 0, 0), "36393760D");
+		tableEvaluadores = UtilsTestBolsaEmpleo.waitVisibility(By.id(ID_TABLE_EVALUADORES));
+		UtilsTestBolsaEmpleo.assertTotalTable(tableEvaluadores, 1);
+		assertEquals(UtilsTestBolsaEmpleo.getTextCellTable(tableEvaluadores, 0, 0), "36393760D");
 	}
 	
 	/**
@@ -226,12 +226,12 @@ public class TestBEPEvaluadores extends UtilsTestUsuarioBase {
 		seleccionarDepartamento(1);
 		
 		// añadimos evaluador (refresh)
-		WebElement input = UtilsTestBEP.waitVisibility(By.id("nombre_evaluador"));
+		WebElement input = UtilsTestBolsaEmpleo.waitVisibility(By.id("nombre_evaluador"));
 		input.sendKeys("pepe");
-		WebElement btn = UtilsTestBEP.waitClickable(By.id("nuevo_evaluador"));
+		WebElement btn = UtilsTestBolsaEmpleo.waitClickable(By.id("nuevo_evaluador"));
 		btn.click();
 		
-		List<String> mensajes = UtilsTestBEP.getMensajesDeError();
+		List<String> mensajes = UtilsTestBolsaEmpleo.getMensajesDeError();
 		assertEquals(1, mensajes.size());
 		assertEquals(mensajes.get(0), "El usuario no existe en el sistema");		
 	}
@@ -245,25 +245,25 @@ public class TestBEPEvaluadores extends UtilsTestUsuarioBase {
 		seleccionarDepartamento(1);
 		
 		// añadimos evaluador (refresh)
-		WebElement input = UtilsTestBEP.waitVisibility(By.id("nombre_evaluador"));
+		WebElement input = UtilsTestBolsaEmpleo.waitVisibility(By.id("nombre_evaluador"));
 		input.sendKeys("personal1");
-		WebElement btn = UtilsTestBEP.waitClickable(By.id("nuevo_evaluador"));
+		WebElement btn = UtilsTestBolsaEmpleo.waitClickable(By.id("nuevo_evaluador"));
 		btn.click();
 		
-		List<String> mensajes = UtilsTestBEP.getMensajesDeError();
+		List<String> mensajes = UtilsTestBolsaEmpleo.getMensajesDeError();
 		assertEquals(1, mensajes.size());
 		assertEquals(mensajes.get(0), "El usuario no tiene rol de comisión");		
 	}
 	
 	private WebElement seleccionarDepartamento(int index) {
-		Select dep = new Select(UtilsTestBEP.waitVisibility(By.id("select_departamento")));
+		Select dep = new Select(UtilsTestBolsaEmpleo.waitVisibility(By.id("select_departamento")));
 		dep.selectByIndex(index);
-		dep = new Select(UtilsTestBEP.waitVisibility(By.id("select_departamento")));
+		dep = new Select(UtilsTestBolsaEmpleo.waitVisibility(By.id("select_departamento")));
 		String textoSelect = dep.getFirstSelectedOption().getText();
 		
-		WebElement tableAreas = UtilsTestBEP.waitVisibility(By.id(ID_TABLE_AREAS));
-		UtilsTestBEP.assertTitleTable(tableAreas, "Áreas del Departamento: " + textoSelect);
-		int totalAreas = UtilsTestBEP.getTotalTable(tableAreas); 
+		WebElement tableAreas = UtilsTestBolsaEmpleo.waitVisibility(By.id(ID_TABLE_AREAS));
+		UtilsTestBolsaEmpleo.assertTitleTable(tableAreas, "Áreas del Departamento: " + textoSelect);
+		int totalAreas = UtilsTestBolsaEmpleo.getTotalTable(tableAreas); 
 		assertTrue(totalAreas > 0);
 		
 		return tableAreas;

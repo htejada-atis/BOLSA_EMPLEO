@@ -174,7 +174,7 @@ public class ControladorMisMeritosPreferentes extends HttpServlet {
 		this.index(bean);
 		BolsaEmpleoUtils.readMensajeSession(bean, request);
 		try {
-			ModeloUsuarioBolsaEmpleo.obtenerInstancia().checkUser(datos);
+			bean.setUsuarioLogeado(ModeloUsuarioBolsaEmpleo.obtenerInstancia().getOrCreateUsuario(datos));
 		} catch (UVException e) {
 			BolsaEmpleoUtils.addMensajeDeError(e.getMessage(), bean, request);
 			response.sendRedirect("/srv/es/informacionadministrativa/bolsaempleo/error");
@@ -276,7 +276,7 @@ public class ControladorMisMeritosPreferentes extends HttpServlet {
 		formularioAgregarMerito(bean);
 				
 		MeritoPreferenteUsuario mp = validateMeritoPreferenteUsuario(request, datos);
-		ModeloMeritosPreferentesCandidato.obtenerInstancia().insertaMeritoUsuario(mp);
+		ModeloMeritosPreferentesCandidato.obtenerInstancia().insertaMeritoUsuario(mp, bean.getUsuarioLogeado());
 		
 		BolsaEmpleoUtils.addMensajeDeExito("Mérito preferente añadido correctamente", bean, request);
 		response.sendRedirect(request.getServletPath());
@@ -284,7 +284,8 @@ public class ControladorMisMeritosPreferentes extends HttpServlet {
 	
 	
 	
-	private void eliminarMeritos(VistaMeritosPreferentesCandidato bean, UVDatos datos, HttpServletRequest request, HttpServletResponse response) throws SQLException, UVException, IOException {
+	private void eliminarMeritos(VistaMeritosPreferentesCandidato bean, UVDatos datos, HttpServletRequest request, HttpServletResponse response) 
+			throws SQLException, UVException, IOException {
 		String selectedJson = EscapaHTML.ajustaCodificacion(request.getParameter(PARAM_MERITOS));
 		int[] selected = (new Gson()).fromJson(selectedJson, new TypeToken<int[]>() { }.getType());
 		
@@ -298,7 +299,7 @@ public class ControladorMisMeritosPreferentes extends HttpServlet {
 			meritos.add(modelo.getMeritoPreferenteUsuarioById(sel, usu));
 		}
 
-		modelo.cambiarFlagBorradoMeritos(meritos);
+		modelo.cambiarFlagBorradoMeritos(meritos, bean.getUsuarioLogeado());
 
 		BolsaEmpleoUtils.addMensajeDeExito(MENSAJE_EXITO_ELIMINAR, bean, request);
 		response.sendRedirect(request.getServletPath());

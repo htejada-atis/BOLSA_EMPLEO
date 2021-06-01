@@ -13,6 +13,7 @@ import java.util.Map;
 import es.ujaen.uvirtual.modelo.conexion.ConexionUvirtual;
 import es.ujaen.uvirtual.modulo.bolsaempleo.beans.MeritoPreferente;
 import es.ujaen.uvirtual.modulo.bolsaempleo.beans.MeritoPreferenteOpcion;
+import es.ujaen.uvirtual.modulo.bolsaempleo.beans.UsuarioBolsaEmpleo;
 import es.ujaen.uvirtual.modulo.bolsaempleo.utilidades.BolsaEmpleoDataTable;
 import es.ujaen.uvirtual.modulo.bolsaempleo.utilidades.BolsaEmpleoDataTable.DataTableColumn;
 import es.ujaen.uvirtual.modulo.bolsaempleo.utilidades.BolsaEmpleoUtils;
@@ -284,19 +285,20 @@ public class ModeloMeritosPreferentes {
 	/**
 	 * Inserta un merito en la db y devuelve el objeto insertado.
 	 * @param merito .
+	 * @param usuarioUpdate .
 	 * @return codNum creado .
 	 * @throws SQLException .
 	 * @throws UVException .
 	 */
-	public Integer crearMeritoPreferente(MeritoPreferente merito) throws UVException, SQLException {
+	public Integer crearMeritoPreferente(MeritoPreferente merito, UsuarioBolsaEmpleo usuarioUpdate) throws UVException, SQLException {
 		if (merito == null) {
 			throw new UVException("No se puede insertar un merito preferente vacio");
 		}
 		
 		String sql = "INSERT INTO TBEP_MERITOS_PREFERENTES ("
 				+ "CODIGO,NOMBRE,OBSERVACIONES,TIPO,APLICABLE,BASE,FACTOR,VALOR_MAXIMO,"
-				+ "BEPITE_TIPO_CODNUM,BEPBLO_APLICABLE_CODNUM,BEPAPA_APLICABLE_CODNUM,BEPITE_APLICABLE_CODNUM) "
-				+ "VALUES (?,?,?,?,?,?,?,?,?,?,?,?)";
+				+ "BEPITE_TIPO_CODNUM,BEPBLO_APLICABLE_CODNUM,BEPAPA_APLICABLE_CODNUM,BEPITE_APLICABLE_CODNUM,UID_USUARIO) "
+				+ "VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?)";
 		
 		try (Connection conexion = ConexionUvirtual.obtenerInstancia(); 
 				PreparedStatement stmt = conexion.prepareStatement(sql, new String[]{CODNUM})) {
@@ -343,6 +345,8 @@ public class ModeloMeritosPreferentes {
 				stmt.setNull(parameterIndex++, Types.NULL);
 			}
 			
+			stmt.setString(parameterIndex++, usuarioUpdate.getCodCuenta());
+			
 			stmt.executeUpdate();
 			
 			ResultSet rs = stmt.getGeneratedKeys();
@@ -355,26 +359,28 @@ public class ModeloMeritosPreferentes {
 	/**
 	 * Edita un mérito preferente .
 	 * @param merito .
+	 * @param usuarioUpdate .
 	 * @throws SQLException .
 	 * @throws UVException . 
 	 */
-	public void editarMeritoPreferente(MeritoPreferente merito) throws SQLException {
+	public void editarMeritoPreferente(MeritoPreferente merito, UsuarioBolsaEmpleo usuarioUpdate) throws SQLException {
 		String query = "UPDATE TBEP_MERITOS_PREFERENTES SET "
-				+ "CODIGO = ?, "
-				+ "NOMBRE = ?, "
-				+ "OBSERVACIONES = ?, "
-				+ "TIPO = ?, "
-				+ "TIPO_CALCULO = ?, "
-				+ "APLICABLE = ?, "
-				+ "BASE = ?, "
-				+ "FACTOR = ?, "
-				+ "VALOR_MAXIMO = ?, "
-				+ "BEPITE_TIPO_CODNUM = ?, "
-				+ "BEPBLO_APLICABLE_CODNUM = ?, "
-				+ "BEPAPA_APLICABLE_CODNUM = ?, "
-				+ "BEPITE_APLICABLE_CODNUM = ?, "
-				+ "FLGACTIVO = ? "
-				+ "WHERE CODNUM = ?";
+				+ "	CODIGO = ?,"
+				+ "	NOMBRE = ?,"
+				+ "	OBSERVACIONES = ?,"
+				+ "	TIPO = ?,"
+				+ "	TIPO_CALCULO = ?,"
+				+ "	APLICABLE = ?,"
+				+ "	BASE = ?,"
+				+ "	FACTOR = ?,"
+				+ "	VALOR_MAXIMO = ?,"
+				+ "	BEPITE_TIPO_CODNUM = ?,"
+				+ "	BEPBLO_APLICABLE_CODNUM = ?,"
+				+ "	BEPAPA_APLICABLE_CODNUM = ?,"
+				+ "	BEPITE_APLICABLE_CODNUM = ?,"
+				+ "	FLGACTIVO = ?,"
+				+ "	UID_USUARIO = ?"
+				+ "	WHERE CODNUM = ?";
 		
 		try (Connection conexion = ConexionUvirtual.obtenerInstancia(); PreparedStatement stmt = conexion.prepareStatement(query)) {
 			int parameterIndex = 1;
@@ -416,6 +422,7 @@ public class ModeloMeritosPreferentes {
 				stmt.setNull(parameterIndex++, Types.NULL);
 			}
 			stmt.setString(parameterIndex++, Boolean.TRUE.equals(merito.getActivo()) ? "S" : "N");
+			stmt.setString(parameterIndex++, usuarioUpdate.getCodCuenta());
 			stmt.setInt(parameterIndex++, merito.getCodNum());
 			
 			stmt.executeUpdate();
@@ -426,14 +433,16 @@ public class ModeloMeritosPreferentes {
 	 * Activa el merito. 
 	 * @param merito .
 	 * @param flgactivo .
+	 * @param usuarioUpdate .
 	 * @throws SQLException .
 	 */
-	public void cambiaFlagActivoMeritoPreferente(MeritoPreferente merito, String flgactivo) throws SQLException {
-		String query = "UPDATE TBEP_MERITOS_PREFERENTES SET FLGACTIVO = ? WHERE CODNUM IN ?";		
+	public void cambiaFlagActivoMeritoPreferente(MeritoPreferente merito, String flgactivo, UsuarioBolsaEmpleo usuarioUpdate) throws SQLException {
+		String query = "UPDATE TBEP_MERITOS_PREFERENTES SET FLGACTIVO = ?, UID_USUARIO = ? WHERE CODNUM IN ?";
 		
 		try (Connection conexion = ConexionUvirtual.obtenerInstancia(); PreparedStatement stmt = conexion.prepareStatement(query)) {
 			int indexParam = 1;
 			stmt.setString(indexParam++, flgactivo);
+			stmt.setString(indexParam++, usuarioUpdate.getCodCuenta());
 			stmt.setInt(indexParam++, merito.getCodNum());
 			stmt.executeUpdate();
 		}
@@ -474,11 +483,12 @@ public class ModeloMeritosPreferentes {
 	/**
 	 * Crea un merito preferente opción.
 	 * @param meritoOpcion .
+	 * @param usuarioUpdate .
 	 * @return .
 	 * @throws SQLException .
 	 */
-	public Integer crearMeritoPreferenteOpcion(MeritoPreferenteOpcion meritoOpcion) throws SQLException {
-		String sql = "INSERT INTO TBEP_MER_PRE_OPCIONES (BEPMEP_CODNUM,NOMBRE,FACTOR) VALUES (?,?,?)";
+	public Integer crearMeritoPreferenteOpcion(MeritoPreferenteOpcion meritoOpcion, UsuarioBolsaEmpleo usuarioUpdate) throws SQLException {
+		String sql = "INSERT INTO TBEP_MER_PRE_OPCIONES (BEPMEP_CODNUM,NOMBRE,FACTOR,UID_USUARIO) VALUES (?,?,?,?)";
 		
 		try (Connection conexion = ConexionUvirtual.obtenerInstancia(); 
 				PreparedStatement stmt = conexion.prepareStatement(sql, new String[]{CODNUM})) {
@@ -486,6 +496,7 @@ public class ModeloMeritosPreferentes {
 			stmt.setInt(parameterIndex++, meritoOpcion.getMeritoPreferenteCodNum());
 			stmt.setString(parameterIndex++, meritoOpcion.getNombre());
 			stmt.setDouble(parameterIndex++, meritoOpcion.getFactor());
+			stmt.setString(parameterIndex++, usuarioUpdate.getCodCuenta());
 			stmt.executeUpdate();
 			
 			ResultSet rs = stmt.getGeneratedKeys();
@@ -496,17 +507,19 @@ public class ModeloMeritosPreferentes {
 	} 
 	
 	/**
-	 * Desactiva una opción.
+	 * Desactiva una opción .
 	 * @param meritoOpcion .
+	 * @param usuarioUpdate .
 	 * @throws SQLException .
 	 */
-	public void desactivarMeritoPreferenteOpcion(MeritoPreferenteOpcion meritoOpcion) throws SQLException {
-		String query = "UPDATE TBEP_MER_PRE_OPCIONES SET FLGBORRADO = ?, FECHA_BORRADO = ? WHERE CODNUM IN ?";		
+	public void desactivarMeritoPreferenteOpcion(MeritoPreferenteOpcion meritoOpcion, UsuarioBolsaEmpleo usuarioUpdate) throws SQLException {
+		String query = "UPDATE TBEP_MER_PRE_OPCIONES SET FLGBORRADO = ?, FECHA_BORRADO = ?, UID_USUARIO = ? WHERE CODNUM IN ?";		
 		
 		try (Connection conexion = ConexionUvirtual.obtenerInstancia(); PreparedStatement stmt = conexion.prepareStatement(query)) {
 			int indexParam = 1;
 			stmt.setString(indexParam++, "S");
 			stmt.setDate(indexParam++, (Date) BolsaEmpleoUtils.getCurrentDate());
+			stmt.setString(indexParam++, usuarioUpdate.getCodCuenta());
 			stmt.setInt(indexParam++, meritoOpcion.getCodNum());
 			stmt.executeUpdate();
 		}

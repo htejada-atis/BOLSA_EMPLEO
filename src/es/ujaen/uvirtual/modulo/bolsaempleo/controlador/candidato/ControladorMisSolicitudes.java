@@ -237,12 +237,11 @@ public class ControladorMisSolicitudes extends HttpServlet {
 		bean.setVista(JSP_INDEX);
 		BolsaEmpleoUtils.readMensajeSession(bean, request);
 		try {
-			ModeloUsuarioBolsaEmpleo.obtenerInstancia().checkUser(datos);
+			bean.setUsuarioLogeado(ModeloUsuarioBolsaEmpleo.obtenerInstancia().getOrCreateUsuario(datos));
 		} catch (UVException e) {
 			BolsaEmpleoUtils.addMensajeDeError(e.getMessage(), bean, request);
 			response.sendRedirect("/srv/es/informacionadministrativa/bolsaempleo/error");
 		}
-		bean.setCandidato(ModeloUsuarioBolsaEmpleo.obtenerInstancia().getUsuarioCandidato(datos));
 	}
 	
 	private void errorFatal(VistaSolicitudes bean, String mensaje) {
@@ -297,7 +296,7 @@ public class ControladorMisSolicitudes extends HttpServlet {
 		
 		Convocatoria convocatoria = modeloConvocatoria.getConvocatoriaById(Formateador.leeParametroInteger(request.getParameter(PARAM_CONVOCATORIA_ID)));
 				
-		Solicitud solicitud = modeloSolicitud.nuevaSolicitud(bean.getCandidato(), convocatoria);
+		Solicitud solicitud = modeloSolicitud.nuevaSolicitud(bean.getUsuarioLogeado(), convocatoria);
 				
 		bean.setSolicitud(solicitud);
 		listaBolsas(bean, solicitud);
@@ -350,7 +349,7 @@ public class ControladorMisSolicitudes extends HttpServlet {
 		
 		try (PrintWriter writer = response.getWriter()) {
 			try {
-				BolsaEmpleoDataTable<Solicitud> dataTable = modelo.listaSolicitudesDatatable(bean.getCandidato(), request.getParameterMap());
+				BolsaEmpleoDataTable<Solicitud> dataTable = modelo.listaSolicitudesDatatable(bean.getUsuarioLogeado(), request.getParameterMap());
 				bean.setDatatableSolicitudes(dataTable);
 				writer.write(dataTable.toJson());
 			} catch (UVException e) {
@@ -424,7 +423,7 @@ public class ControladorMisSolicitudes extends HttpServlet {
 				throw new UVException("Ha selecciona una bolsa no baremable");
 			}
 			
-			if (ModeloArea.obtenerInstancia().isUsuarioExcluidoBolsa(bean.getCandidato(), bolsa.getArea())) {
+			if (ModeloArea.obtenerInstancia().isUsuarioExcluidoBolsa(bean.getUsuarioLogeado(), bolsa.getArea())) {
 				throw new UVException("Usuario excluido de la bolsa");
 			}
 							
@@ -436,7 +435,7 @@ public class ControladorMisSolicitudes extends HttpServlet {
 		}
 		
 		// añadimos las bolsas a la solicitud
-		modeloSolicitud.asignarBolsasASolicitud(solicitud, bolsas);
+		modeloSolicitud.asignarBolsasASolicitud(solicitud, bolsas, bean.getUsuarioLogeado());
 				
 		bean.setVista(JSP_PASO2);
 		bean.setListaAfinidades(ModeloAfinidad.obtenerInstancia().listaAfinidades());
@@ -476,7 +475,7 @@ public class ControladorMisSolicitudes extends HttpServlet {
 		
 		try (PrintWriter writer = response.getWriter()) {
 			try {
-				BolsaEmpleoDataTable<BolsaCandidato> dataTable = modelo.listaAreaSolicitudDatatable(request.getParameterMap(), bean.getCandidato().getCodNum());
+				BolsaEmpleoDataTable<BolsaCandidato> dataTable = modelo.listaAreaSolicitudDatatable(request.getParameterMap(), bean.getUsuarioLogeado().getCodNum());
 				bean.setDataTableBolsasCandidato(dataTable);
 				writer.write(dataTable.toJson());
 			} catch (UVException e) {
@@ -611,9 +610,9 @@ public class ControladorMisSolicitudes extends HttpServlet {
 				}
 			}
 			
-			modeloSolicitud.asignarMeritosASolicitudBolsa(solicitud, area, merito);
+			modeloSolicitud.asignarMeritosASolicitudBolsa(solicitud, area, merito, bean.getUsuarioLogeado());
 		} else {
-			modeloSolicitud.borrarMeritoDeSolicitudBolsa(solicitud, area, merito);
+			modeloSolicitud.borrarMeritoDeSolicitudBolsa(solicitud, area, merito, bean.getUsuarioLogeado());
 		}
 
 		this.seleccionarBolsa(bean, request);
@@ -705,7 +704,7 @@ public class ControladorMisSolicitudes extends HttpServlet {
 		}
 		
 		// asignamos afinidades al merito de la bolsa
-		ModeloSolicitud.obtenerInstancia().asignarAfinidadMeritoNoIndividualizado(solicitud, area, merito, afinidades);
+		ModeloSolicitud.obtenerInstancia().asignarAfinidadMeritoNoIndividualizado(solicitud, area, merito, afinidades, bean.getUsuarioLogeado());
 
 		this.seleccionarBolsa(bean, request);
 	}
@@ -794,7 +793,7 @@ public class ControladorMisSolicitudes extends HttpServlet {
 				Bolsa bolsa = ModeloBolsa.obtenerInstancia().getBolsaById(Formateador.leeParametroInteger(request.getParameter(PARAM_BOLSA)));
 				
 				BolsaEmpleoDataTable<MeritoSolicitudTable> dataTable = ModeloSolicitud.obtenerInstancia().
-						listaMeritosSolicitudDatatable(request.getParameterMap(), bean.getCandidato(), bolsa);
+						listaMeritosSolicitudDatatable(request.getParameterMap(), bean.getUsuarioLogeado(), bolsa);
 				bean.setDataTableMeritos(dataTable);
 				writer.write(dataTable.toJson());
 			} catch (UVException e) {
@@ -854,7 +853,7 @@ public class ControladorMisSolicitudes extends HttpServlet {
 		bean.setSolicitud(solicitud);
 		
 		
-		List<Titulacion> titulaciones = modeloTitulacion.listaTitulacionesCandidato(bean.getCandidato().getCodNum());
+		List<Titulacion> titulaciones = modeloTitulacion.listaTitulacionesCandidato(bean.getUsuarioLogeado().getCodNum());
 		bean.setListaTitulaciones(titulaciones);
 		
 		// comprobamos que el total de méritos sea mayor que 0
@@ -900,7 +899,7 @@ public class ControladorMisSolicitudes extends HttpServlet {
 		solicitud.setFechaConfirmacion(BolsaEmpleoUtils.getCurrentDate());
 		solicitud.setArchivo(generarPDF(bean, solicitud, listaBolsas));
 		
-		modeloSolicitud.confirmacionSolicitud(solicitud);
+		modeloSolicitud.confirmacionSolicitud(solicitud, bean.getUsuarioLogeado());
 		
 		bean.getMensajesDeExito().add(MENSAJE_EXITO_SOLICITUD_CONFIRMADA);
 		HttpSession session = request.getSession(false);
@@ -923,7 +922,7 @@ public class ControladorMisSolicitudes extends HttpServlet {
 		Solicitud solicitud = modeloSolicitud.getSolicitudByIdArchivo(Formateador.leeParametroInteger(request.getParameter(PARAM_SOLICITUD_ID)));
 		bean.setSolicitud(solicitud);
 		
-		if (!bean.getCandidato().getCodNum().equals(solicitud.getUsuario().getCodNum())) {
+		if (!bean.getUsuarioLogeado().getCodNum().equals(solicitud.getUsuario().getCodNum())) {
 			throw new UVException("No tienes permisos");
 		}
 		
@@ -963,7 +962,8 @@ public class ControladorMisSolicitudes extends HttpServlet {
 			PdfWriter.getInstance(document, out);
 
 			document.open();
-			document.addAuthor(bean.getCandidato().getNombre() + " " + bean.getCandidato().getPrimerApellido() + " " + bean.getCandidato().getSegundoApellido());
+			document.addAuthor(bean.getUsuarioLogeado().getNombre() + " " + bean.getUsuarioLogeado().getPrimerApellido() + " " 
+					+ bean.getUsuarioLogeado().getSegundoApellido());
 			document.addTitle("Solicitud_" + solicitud.getConvocatoria().getDescripcion());
 			document.addCreationDate();
 
@@ -974,8 +974,8 @@ public class ControladorMisSolicitudes extends HttpServlet {
 			Font font2 = new Font(Font.BOLD);
 			font2.setStyle("bold");
 			
-			document.add(new Paragraph("Usuario: " + bean.getCandidato().getNombre() + " " + bean.getCandidato().getPrimerApellido() + " " 
-					+ bean.getCandidato().getSegundoApellido(), font2));
+			document.add(new Paragraph("Usuario: " + bean.getUsuarioLogeado().getNombre() + " " + bean.getUsuarioLogeado().getPrimerApellido() + " " 
+					+ bean.getUsuarioLogeado().getSegundoApellido(), font2));
 			document.add(new Paragraph("Convocatoria: " + solicitud.getConvocatoria().getDescripcion(), font2));
 			document.add(new Paragraph("Fecha confirmación de solicitud: " 
 					+ Formateador.formatoFecha(solicitud.getFechaConfirmacion(), Formateador.FORMATO_FECHA_DDMMYYYY_HHMMSS), font2));

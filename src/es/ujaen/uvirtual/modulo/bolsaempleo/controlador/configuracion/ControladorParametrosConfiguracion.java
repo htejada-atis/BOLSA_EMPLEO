@@ -7,7 +7,6 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import javax.servlet.ServletException;
-import javax.servlet.annotation.MultipartConfig;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
@@ -118,7 +117,7 @@ public class ControladorParametrosConfiguracion extends HttpServlet {
 		bean.setVista(RUTA_BEP_CONF + "index.jsp");
 		BolsaEmpleoUtils.readMensajeSession(bean, request);
 		try {
-			ModeloUsuarioBolsaEmpleo.obtenerInstancia().checkUser(datos);
+			bean.setUsuarioLogeado(ModeloUsuarioBolsaEmpleo.obtenerInstancia().getOrCreateUsuario(datos));
 		} catch (UVException e) {
 			BolsaEmpleoUtils.addMensajeDeError(e.getMessage(), bean, request);
 			response.sendRedirect("/srv/es/informacionadministrativa/bolsaempleo/error");
@@ -169,7 +168,7 @@ public class ControladorParametrosConfiguracion extends HttpServlet {
 		for (ParametrosConfiguracion param : parametros) {
 			param.setValor(EscapaHTML.ajustaCodificacion(request.getParameter(param.getNombre() + PARAM_VALOR)));
 			param.setDescripcion(EscapaHTML.ajustaCodificacion(request.getParameter(param.getNombre() + PARAM_DESCRIPCION)));
-			modelo.actualizaParametro(param);
+			modelo.actualizaParametro(param, bean.getUsuarioLogeado());
 		}
 		
 		List<ParametrosConfiguracion> parametrosCont = modelo.listaParametros();

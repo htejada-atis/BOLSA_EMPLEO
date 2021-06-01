@@ -223,11 +223,12 @@ public class ModeloMisTitulaciones {
 	
 	/**	Función que inserta una titulacion de usuario en la BD.
 	 * @param titulacion a insertar en la BD
+	 * @param usuarioInsert .
 	 * @return id de titulacion insertada.
 	 * @throws SQLException en caso de error en la BD
 	 * @throws IOException .
 	 */
-	public Integer insertaTitulacionUsuario(TitulacionUsuario titulacion) throws SQLException, UVException {
+	public Integer insertaTitulacionUsuario(TitulacionUsuario titulacion, UsuarioBolsaEmpleo usuarioInsert) throws SQLException, UVException {
 		if (titulacion == null) {
 			throw new UVException(ERROR_TITULACION_VACIA);
 		}
@@ -237,8 +238,8 @@ public class ModeloMisTitulaciones {
 		
 		if (titulacion.getTitulacion() != null) {
 			String consulta = "INSERT INTO tbep_titulaciones_usuario " 
-					+ " (BEPTUS_TIT_CODNUM,BEPTUS_USU_CODNUM,DESCRIPCION,ARCHIVO) "
-					+ "VALUES (?,?,?,?)";
+					+ " (BEPTUS_TIT_CODNUM,BEPTUS_USU_CODNUM,DESCRIPCION,ARCHIVO,UID_USUARIO) "
+					+ "VALUES (?,?,?,?,?)";
 	
 			try (Connection conexion = ConexionUvirtual.obtenerInstancia(); 
 					PreparedStatement stmt = conexion.prepareStatement(consulta, new String[]{CODNUM})) {
@@ -247,6 +248,7 @@ public class ModeloMisTitulaciones {
 				stmt.setInt(parameterIndex++, titulacion.getUsuario().getCodNum());
 				stmt.setString(parameterIndex++, titulacion.getDescripcion());
 				stmt.setBinaryStream(parameterIndex++, titulacion.getArchivo());
+				stmt.setString(parameterIndex++, usuarioInsert.getCodCuenta());
 				stmt.executeUpdate();
 				
 				ResultSet rs = stmt.getGeneratedKeys();
@@ -256,8 +258,8 @@ public class ModeloMisTitulaciones {
 			}
 		} else {
 			String consulta = "INSERT INTO tbep_titulaciones_usuario " 
-					+ " (BEPTUS_USU_CODNUM,DESCRIPCION,ARCHIVO,OTRATITULACION) "
-					+ "VALUES (?,?,?,?)";
+					+ " (BEPTUS_USU_CODNUM,DESCRIPCION,ARCHIVO,OTRATITULACION,UID_USUARIO) "
+					+ "VALUES (?,?,?,?,?)";
 	
 			try (Connection conexion = ConexionUvirtual.obtenerInstancia();
 					PreparedStatement stmt = conexion.prepareStatement(consulta, new String[]{CODNUM})) {
@@ -266,6 +268,7 @@ public class ModeloMisTitulaciones {
 				stmt.setString(parameterIndex++, titulacion.getDescripcion());
 				stmt.setBinaryStream(parameterIndex++, titulacion.getArchivo());
 				stmt.setString(parameterIndex++, titulacion.getOtraTitulacion());
+				stmt.setString(parameterIndex++, usuarioInsert.getCodCuenta());
 				stmt.executeUpdate();
 				
 				ResultSet rs = stmt.getGeneratedKeys();
@@ -278,17 +281,19 @@ public class ModeloMisTitulaciones {
 	
 	/** Elimina una titulación de un usuario .
 	 * @param titulaciones a borrar
+	 * @param usuarioInserta .
 	 * @throws SQLException en caso de error en la BD
 	 * @throws UVException si titulación no es valida
 	 */
-	public void borraTitulacionUsuario(List<TitulacionUsuario> titulaciones) throws SQLException, UVException {
+	public void borraTitulacionUsuario(List<TitulacionUsuario> titulaciones, UsuarioBolsaEmpleo usuarioInserta) throws SQLException, UVException {
 		String params = BolsaEmpleoUtils.consultaMultiplesParametros(titulaciones.size());
-		String query = "UPDATE TBEP_TITULACIONES_USUARIO SET FLGBORRADO = ?, FECHA_BORRADO = ? WHERE CODNUM IN  (" + params + ")";		
+		String query = "UPDATE TBEP_TITULACIONES_USUARIO SET FLGBORRADO=?,FECHA_BORRADO=?,UID_USUARIO=? WHERE CODNUM IN (" + params + ")";		
 				
 		try (Connection conexion = ConexionUvirtual.obtenerInstancia(); PreparedStatement stmt = conexion.prepareStatement(query)) {
 			int parameterIndex = 1;
 			stmt.setString(parameterIndex++, "S");
 			stmt.setDate(parameterIndex++, new java.sql.Date(BolsaEmpleoUtils.getCurrentDateTime().getTime()));
+			stmt.setString(parameterIndex++, usuarioInserta.getCodCuenta());
 			
 			for (TitulacionUsuario titulacion : titulaciones) {
 				stmt.setInt(parameterIndex++, titulacion.getCodNum()); 
@@ -327,19 +332,20 @@ public class ModeloMisTitulaciones {
 	 * Valida una titulación .
 	 * @param titulacion .
 	 * @param candidato .
+	 * @param usuarioUpdate .
 	 * @param date .
 	 * @throws SQLException .
 	 * @throws UVException .
 	 */
-	public void validaTitulacion(TitulacionUsuario titulacion, UsuarioBolsaEmpleo candidato, Date date) throws SQLException, UVException {
+	public void validaTitulacion(TitulacionUsuario titulacion, UsuarioBolsaEmpleo candidato, Date date, UsuarioBolsaEmpleo usuarioUpdate) throws SQLException, UVException {
 		checkeosValidadDesvalida(titulacion, candidato);
 		
-		String consulta = "UPDATE TBEP_TITULACIONES_USUARIO "
-				+ "	SET FLGVALIDADA = 'S', FECHA_VALIDADA = ?"
+		String consulta = "UPDATE TBEP_TITULACIONES_USUARIO SET FLGVALIDADA='S',FECHA_VALIDADA=?,UID_USUARIO=?"
 				+ " WHERE BEPTUS_TIT_CODNUM = ? AND BEPTUS_USU_CODNUM = ?";
 		try (Connection conexion = ConexionUvirtual.obtenerInstancia(); PreparedStatement stmt = conexion.prepareStatement(consulta)) {
 			int parameterIndex = 1;
 			stmt.setDate(parameterIndex++, new java.sql.Date(date.getTime()));
+			stmt.setString(parameterIndex++, usuarioUpdate.getCodCuenta());
 			stmt.setInt(parameterIndex++, titulacion.getTitulacion().getCodNum());
 			stmt.setInt(parameterIndex++, candidato.getCodNum());
 			stmt.executeUpdate();
@@ -350,16 +356,18 @@ public class ModeloMisTitulaciones {
 	 * Valida una titulación a false .
 	 * @param titulacion .
 	 * @param candidato .
+	 * @param usuarioUpdate .
 	 * @throws SQLException .
 	 * @throws UVException .
 	 */
-	public void desvalidaTitulacion(TitulacionUsuario titulacion, UsuarioBolsaEmpleo candidato) throws SQLException, UVException {
+	public void desvalidaTitulacion(TitulacionUsuario titulacion, UsuarioBolsaEmpleo candidato, UsuarioBolsaEmpleo usuarioUpdate) throws SQLException, UVException {
 		checkeosValidadDesvalida(titulacion, candidato);
 		
-		String consulta = "UPDATE TBEP_TITULACIONES_USUARIO SET FLGVALIDADA='N', FECHA_VALIDADA=null"
+		String consulta = "UPDATE TBEP_TITULACIONES_USUARIO SET FLGVALIDADA='N', FECHA_VALIDADA=null, UID_USUARIO=?"
 				+ " WHERE BEPTUS_TIT_CODNUM = ? AND BEPTUS_USU_CODNUM = ?";
 		try (Connection conexion = ConexionUvirtual.obtenerInstancia(); PreparedStatement stmt = conexion.prepareStatement(consulta)) {
 			int parameterIndex = 1;
+			stmt.setString(parameterIndex++, usuarioUpdate.getCodCuenta());
 			stmt.setInt(parameterIndex++, titulacion.getTitulacion().getCodNum());
 			stmt.setInt(parameterIndex++, candidato.getCodNum());
 			stmt.executeUpdate();
@@ -371,10 +379,12 @@ public class ModeloMisTitulaciones {
 	 * @param titulacionUsuario .
 	 * @param candidato .
 	 * @param titulacion .
+	 * @param usuarioUpdate .
 	 * @throws SQLException .
 	 * @throws UVException .
 	 */
-	public void cambiarTitulacion(TitulacionUsuario titulacionUsuario, UsuarioBolsaEmpleo candidato, Titulacion titulacion) throws UVException, SQLException {
+	public void cambiarTitulacion(TitulacionUsuario titulacionUsuario, UsuarioBolsaEmpleo candidato, Titulacion titulacion, UsuarioBolsaEmpleo usuarioUpdate) 
+			throws UVException, SQLException {
 		if (titulacionUsuario == null) {
 			throw new UVException(ERROR_TITULACION_OBLIGATORIA);
 		}
@@ -391,10 +401,11 @@ public class ModeloMisTitulaciones {
 			throw new UVException(ERROR_TITULACION_OBLIGATORIA);
 		}
 		
-		String consulta = "UPDATE TBEP_TITULACIONES_USUARIO SET BEPTUS_TIT_CODNUM = ? WHERE CODNUM = ? AND BEPTUS_USU_CODNUM = ?";
+		String consulta = "UPDATE TBEP_TITULACIONES_USUARIO SET BEPTUS_TIT_CODNUM = ?,UID_USUARIO=? WHERE CODNUM = ? AND BEPTUS_USU_CODNUM = ?";
 		try (Connection conexion = ConexionUvirtual.obtenerInstancia(); PreparedStatement stmt = conexion.prepareStatement(consulta)) {
 			int parameterIndex = 1;
 			stmt.setInt(parameterIndex++, titulacion.getCodNum());
+			stmt.setString(parameterIndex++, usuarioUpdate.getCodCuenta());
 			stmt.setInt(parameterIndex++, titulacionUsuario.getCodNum());
 			stmt.setInt(parameterIndex++, candidato.getCodNum());
 			stmt.executeUpdate();

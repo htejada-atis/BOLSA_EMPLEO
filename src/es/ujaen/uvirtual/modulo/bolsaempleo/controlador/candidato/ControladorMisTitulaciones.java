@@ -176,7 +176,7 @@ public class ControladorMisTitulaciones extends HttpServlet {
 		bean.setVista(JSP_INDEX);
 		BolsaEmpleoUtils.readMensajeSession(bean, request);
 		try {
-			ModeloUsuarioBolsaEmpleo.obtenerInstancia().checkUser(datos);
+			bean.setUsuarioLogeado(ModeloUsuarioBolsaEmpleo.obtenerInstancia().getOrCreateUsuario(datos));
 		} catch (UVException e) {
 			BolsaEmpleoUtils.addMensajeDeError(e.getMessage(), bean, request);
 			response.sendRedirect("/srv/es/informacionadministrativa/bolsaempleo/error");
@@ -329,7 +329,7 @@ public class ControladorMisTitulaciones extends HttpServlet {
 			
 			titulacion.setUsuario(usu);
 				
-			modelo.insertaTitulacionUsuario(titulacion);
+			modelo.insertaTitulacionUsuario(titulacion, bean.getUsuarioLogeado());
 				
 			bean.getMensajesDeExito().add(MENSAJE_EXITO_AGREGAR);
 			bean.setVista(RUTA_BEP_CONF + "index.jsp");
@@ -346,7 +346,7 @@ public class ControladorMisTitulaciones extends HttpServlet {
 		
 		List<TitulacionUsuario> titulaciones = modelo.getTitulacionesUsuarioByIds(selected);
 
-		modelo.borraTitulacionUsuario(titulaciones);
+		modelo.borraTitulacionUsuario(titulaciones, bean.getUsuarioLogeado());
 		
 		bean.setVista(JSP_INDEX);
 

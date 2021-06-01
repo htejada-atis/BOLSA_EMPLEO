@@ -72,8 +72,8 @@ public class TestBEPBolsasBaremar extends UtilsTestUsuarioBase {
 	 */
 	@Test
 	public void testA1() {
-		UtilsTestBEP.assertTitlePage(UtilsTestBEP.waitVisibility(By.className(DIV_MAIN)), "Estado de las bolsas");
-		WebElement table = UtilsTestBEP.waitVisibility(By.id(ID_TABLE));
-		assertTrue(UtilsTestBEP.getTotalTable(table) > 0);		
+		UtilsTestBolsaEmpleo.assertTitlePage(UtilsTestBolsaEmpleo.waitVisibility(By.className(DIV_MAIN)), "Estado de las bolsas");
+		WebElement table = UtilsTestBolsaEmpleo.waitVisibility(By.id(ID_TABLE));
+		assertTrue(UtilsTestBolsaEmpleo.getTotalTable(table) > 0);		
 	}
 }

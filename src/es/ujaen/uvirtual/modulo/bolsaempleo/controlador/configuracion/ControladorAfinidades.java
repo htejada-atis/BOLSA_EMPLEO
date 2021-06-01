@@ -155,7 +155,7 @@ public class ControladorAfinidades extends HttpServlet {
 		bean.setVista(RUTA_BEP_CON + "index.jsp");
 		BolsaEmpleoUtils.readMensajeSession(bean, request);
 		try {
-			ModeloUsuarioBolsaEmpleo.obtenerInstancia().checkUser(datos);
+			bean.setUsuarioLogeado(ModeloUsuarioBolsaEmpleo.obtenerInstancia().getOrCreateUsuario(datos));
 		} catch (UVException e) {
 			BolsaEmpleoUtils.addMensajeDeError(e.getMessage(), bean, request);
 			response.sendRedirect("/srv/es/informacionadministrativa/bolsaempleo/error");
@@ -223,7 +223,7 @@ public class ControladorAfinidades extends HttpServlet {
 		
 		if (EscapaHTML.ajustaCodificacion(request.getParameter(PARAM_DESCRIPCION)) != null) {
 			Afinidad afinidad = this.validarAfinidad(request);		
-			ModeloAfinidad.obtenerInstancia().nuevaAfinidad(afinidad);	
+			ModeloAfinidad.obtenerInstancia().nuevaAfinidad(afinidad, bean.getUsuarioLogeado());	
 
 			this.index(bean);
 
@@ -244,7 +244,7 @@ public class ControladorAfinidades extends HttpServlet {
 			Afinidad afinidadForm = this.validarAfinidad(request);
 			afinidadForm.setCodNum(afinidad.getCodNum());
 			
-			modelo.actualizaAfinidad(afinidadForm);
+			modelo.actualizaAfinidad(afinidadForm, bean.getUsuarioLogeado());
 			
 			this.index(bean);
 			
@@ -268,7 +268,7 @@ public class ControladorAfinidades extends HttpServlet {
 		
 		List<Afinidad> afinidades = modelo.getAfinidadesByIds(selected);
 		
-		modelo.borraAfinidades(afinidades);
+		modelo.borraAfinidades(afinidades, bean.getUsuarioLogeado());
 		
 		BolsaEmpleoUtils.addMensajeDeExito(MENSAJE_EXITO_ELIMINAR, bean, request);
 		response.sendRedirect(request.getServletPath());

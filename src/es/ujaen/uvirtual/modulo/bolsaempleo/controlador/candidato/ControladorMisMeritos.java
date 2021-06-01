@@ -171,7 +171,7 @@ public class ControladorMisMeritos extends HttpServlet {
 		bean.setVista(RUTA_BEP_MERITOS + "index.jsp");
 		BolsaEmpleoUtils.readMensajeSession(bean, request);
 		try {
-			ModeloUsuarioBolsaEmpleo.obtenerInstancia().checkUser(datos);
+			bean.setUsuarioLogeado(ModeloUsuarioBolsaEmpleo.obtenerInstancia().getOrCreateUsuario(datos));
 		} catch (UVException e) {
 			BolsaEmpleoUtils.addMensajeDeError(e.getMessage(), bean, request);
 			response.sendRedirect("/srv/es/informacionadministrativa/bolsaempleo/error");
@@ -232,9 +232,7 @@ public class ControladorMisMeritos extends HttpServlet {
 				Part uploadedFile = request.getPart(PARAM_ARCHIVO);
 				Merito merito = this.validarMerito(request, uploadedFile);
 				
-				Usuario usuArcos = datos.getUsuario();
-				Integer idUsuario = ModeloUsuarioBolsaEmpleo.obtenerInstancia().getUsuarioByNumeroDocumento(usuArcos.getDocumentoNumero()).getCodNum();
-				ModeloMerito.obtenerInstancia().insertaMerito(merito, idUsuario);
+				ModeloMerito.obtenerInstancia().insertaMerito(merito, bean.getUsuarioLogeado());
 							
 				BolsaEmpleoUtils.addMensajeDeExito(MENSAJE_EXITO_AGREGAR, bean, request);
 				response.sendRedirect(request.getServletPath());
@@ -290,7 +288,7 @@ public class ControladorMisMeritos extends HttpServlet {
 		
 		try {
 			List<String> meritos = gson.fromJson(request.getParameter(PARAM_MERITOS), new TypeToken<List<String>>() { }.getType());
-			modelo.eliminarMeritos(meritos);
+			modelo.eliminarMeritos(meritos, bean.getUsuarioLogeado());
 			BolsaEmpleoUtils.addMensajeDeExito(MENSAJE_EXITO_ELIMINAR, bean, request);
 		} catch (SQLIntegrityConstraintViolationException e) {
 			BolsaEmpleoUtils.addMensajeDeError(MENSAJE_ERROR_ELIMINAR_MERITO, bean, request);

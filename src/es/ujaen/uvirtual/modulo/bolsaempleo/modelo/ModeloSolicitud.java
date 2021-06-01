@@ -219,8 +219,8 @@ public class ModeloSolicitud {
 		}
 				
 		String consulta =
-			"INSERT INTO TBEP_SOLICITUDES (BEPUSU_CODNUM, BEPCON_CODNUM, ESTADO) " 
-			+ "VALUES (?, ?, ?)";
+			"INSERT INTO TBEP_SOLICITUDES (BEPUSU_CODNUM, BEPCON_CODNUM, ESTADO, UID_USUARIO) " 
+			+ "VALUES (?, ?, ?, ?)";
 		
 		try (Connection conexion = ConexionUvirtual.obtenerInstancia();
 				PreparedStatement stmt = conexion.prepareStatement(consulta, new String[]{CODNUM})) {
@@ -229,6 +229,7 @@ public class ModeloSolicitud {
 			stmt.setInt(parameterIndex++, usuario.getCodNum());
 			stmt.setInt(parameterIndex++, convocatoria.getCodNum());
 			stmt.setString(parameterIndex++, ModeloSolicitud.SOLICITUD_ESTADO_ABIERTA);
+			stmt.setString(parameterIndex++, usuario.getCodCuenta());
 			stmt.executeUpdate();
 			
 			ResultSet rs = stmt.getGeneratedKeys();
@@ -306,10 +307,11 @@ public class ModeloSolicitud {
 	 * El usuario selecciona las bolsas para su solicitud.
 	 * @param bolsas .
 	 * @param solicitud .
+	 * @param usuarioUpdate .
 	 * @throws SQLException .
 	 * @throws UVException .
 	 */
-	public void asignarBolsasASolicitud(Solicitud solicitud, List<Bolsa> bolsas) throws SQLException, UVException {
+	public void asignarBolsasASolicitud(Solicitud solicitud, List<Bolsa> bolsas, UsuarioBolsaEmpleo usuarioUpdate) throws SQLException, UVException {
 		if (solicitud.getEstado().equals(SOLICITUD_ESTADO_CERRADA)) {
 			throw new UVException("La solicitud está cerrada");
 		}
@@ -323,20 +325,21 @@ public class ModeloSolicitud {
 			try {				
 				// eliminamos las bolsas excluidas de la solicitud
 				if (!bolsasExcluidas.isEmpty()) {
-					this.eliminarBolsasExcluidasDeLaSolicitud(conexion, solicitud, bolsasExcluidas);
+					this.eliminarBolsasExcluidasDeLaSolicitud(conexion, solicitud, bolsasExcluidas, usuarioUpdate);
 				}
 				
 				// insertamos la bolsas agregadas a la solicitud
 				if (!bolsasAgregadas.isEmpty()) {
 					String paramsAgregadas = BolsaEmpleoUtils.consultaMultiplesParametros(bolsasAgregadas.size());
 
-					String consultaInsert = "INSERT INTO TBEP_SOLICITUD_BOLSAS (BEPBOL_CODNUM, BEPSOL_CODNUM)"
-							+ " SELECT bepbol.CODNUM AS BEPBOL_CODNUM, bepsol.CODNUM AS BEPSOL_CODNUM"
+					String consultaInsert = "INSERT INTO TBEP_SOLICITUD_BOLSAS (BEPBOL_CODNUM, BEPSOL_CODNUM, UID_USUARIO)"
+							+ " SELECT bepbol.CODNUM AS BEPBOL_CODNUM, bepsol.CODNUM AS BEPSOL_CODNUM, ? AS UID_USUARIO"
 							+ " FROM TBEP_BOLSAS bepbol, TBEP_SOLICITUDES bepsol WHERE bepsol.CODNUM = ? AND "
 							+ " bepbol.CODNUM IN (" + paramsAgregadas + ")";
 					
 					try (PreparedStatement stmt = conexion.prepareStatement(consultaInsert)) {
 						int indexParam = 1;
+						stmt.setString(indexParam++, usuarioUpdate.getCodCuenta());
 						stmt.setInt(indexParam++, solicitud.getCodNum());
 						for (Bolsa bolsa: bolsasAgregadas) {
 							stmt.setInt(indexParam++, bolsa.getCodNum());
@@ -531,17 +534,19 @@ public class ModeloSolicitud {
 	 * @param solicitud .
 	 * @param bolsa .
 	 * @param merito .
+	 * @param usuarioUpdate .
 	 * @throws SQLException .
 	 */
-	public void asignarMeritosASolicitudBolsa(Solicitud solicitud, Bolsa bolsa, Merito merito) throws SQLException {
+	public void asignarMeritosASolicitudBolsa(Solicitud solicitud, Bolsa bolsa, Merito merito, UsuarioBolsaEmpleo usuarioUpdate) throws SQLException {
 		// insertamos el mérito en la solicitud bolsa
-		String consulta = "INSERT INTO TBEP_SOL_BOL_MERITOS (BEPSBO_CODNUM, BEPMER_CODNUM)"
-				+ " SELECT bepsbo.CODNUM AS BEPSBO_CODNUM, bepmer.CODNUM AS BEPMER_CODNUM"
+		String consulta = "INSERT INTO TBEP_SOL_BOL_MERITOS (BEPSBO_CODNUM, BEPMER_CODNUM, UID_USUARIO)"
+				+ " SELECT bepsbo.CODNUM AS BEPSBO_CODNUM, bepmer.CODNUM AS BEPMER_CODNUM, ? AS UID_USUARIO"
 				+ " FROM TBEP_SOLICITUD_BOLSAS bepsbo, TBEP_MERITOS bepmer"
 				+ " WHERE bepsbo.BEPSOL_CODNUM = ? AND bepsbo.BEPBOL_CODNUM = ? AND bepmer.CODNUM = ? ";
 					
 		try (Connection conexion = ConexionUvirtual.obtenerInstancia(); PreparedStatement stmt = conexion.prepareStatement(consulta)) {
 			int indexParam = 1;
+			stmt.setString(indexParam++, usuarioUpdate.getCodCuenta());
 			stmt.setInt(indexParam++, solicitud.getCodNum());
 			stmt.setInt(indexParam++, bolsa.getCodNum());
 			stmt.setInt(indexParam++, merito.getCodNum());
@@ -553,29 +558,30 @@ public class ModeloSolicitud {
 	 * @param solicitud .
 	 * @param bolsa .
 	 * @param merito .
+	 * @param usuarioUpdate .
 	 * @throws SQLException .
 	 */
-	public void borrarMeritoDeSolicitudBolsa(Solicitud solicitud, Bolsa bolsa, Merito merito) throws SQLException {
+	public void borrarMeritoDeSolicitudBolsa(Solicitud solicitud, Bolsa bolsa, Merito merito, UsuarioBolsaEmpleo usuarioUpdate) throws SQLException {
 		try (Connection conexion = ConexionUvirtual.obtenerInstancia()) {
 			conexion.setAutoCommit(false);
-						
-			// eliminamos valoraciones
-			String sqlValoraciones = ""
-					+ "DELETE FROM TBEP_SOL_BOL_MER_VALORACION bepsbv WHERE bepsbv.BEPSBM_CODNUM IN ( "
-					+ "		SELECT bepsbm.CODNUM "
-					+ "		FROM TBEP_SOL_BOL_MERITOS bepsbm "
-					+ "		WHERE bepsbm.BEPMER_CODNUM = ? AND bepsbm.BEPSBO_CODNUM IN ( "
-					+ "			SELECT bepsbo.CODNUM "
-					+ "			FROM TBEP_SOLICITUD_BOLSAS bepsbo "
-					+ "			WHERE bepsbo.BEPSOL_CODNUM = ? AND bepsbo.BEPBOL_CODNUM = ? "						
-					+ "		)"
-					+ ")";
 			
-			try (PreparedStatement stmt = conexion.prepareStatement(sqlValoraciones)) {
+			borrarValoracionesMeritoSolicitudBolsa(solicitud, bolsa, merito, usuarioUpdate, conexion);
+			
+			// actualizamos usuario en valoraciones
+			String sqlUpdateMeritos = "UPDATE TBEP_SOL_BOL_MERITOS bepsbm"
+					+ " SET bepsbm.UID_USUARIO = ?"
+					+ "	WHERE bepsbm.BEPSBO_CODNUM IN ("
+					+ "		SELECT bepsbo.CODNUM"
+					+ "		FROM TBEP_SOLICITUD_BOLSAS bepsbo"
+					+ "		WHERE bepsbo.BEPSOL_CODNUM = ? AND bepsbo.BEPBOL_CODNUM = ?"
+					+ "	) AND bepsbm.BEPMER_CODNUM = ?";
+			
+			try (PreparedStatement stmt = conexion.prepareStatement(sqlUpdateMeritos)) {
 				int indexParam = 1;
-				stmt.setInt(indexParam++, merito.getCodNum());
+				stmt.setString(indexParam++, usuarioUpdate.getCodCuenta());
 				stmt.setInt(indexParam++, solicitud.getCodNum());
-				stmt.setInt(indexParam++, bolsa.getCodNum());				
+				stmt.setInt(indexParam++, bolsa.getCodNum());
+				stmt.setInt(indexParam++, merito.getCodNum());
 				stmt.executeUpdate();
 			} catch (SQLException e) {
 				conexion.rollback();
@@ -606,6 +612,59 @@ public class ModeloSolicitud {
 			
 			conexion.commit();
 			conexion.setAutoCommit(true);
+		}
+	}
+	
+	private void borrarValoracionesMeritoSolicitudBolsa(Solicitud solicitud, Bolsa bolsa, Merito merito, UsuarioBolsaEmpleo usuarioUpdate,
+			Connection conexion) throws SQLException {
+		// actualizamos usuario en valoraciones
+		String sqlUpdateValoraciones = "UPDATE TBEP_SOL_BOL_MER_VALORACION"
+				+ " SET UID_USUARIO = ?"
+				+ " WHERE BEPSBM_CODNUM IN ("
+				+ "		SELECT bepsbm.CODNUM "
+				+ "		FROM TBEP_SOL_BOL_MERITOS bepsbm "
+				+ "		WHERE bepsbm.BEPMER_CODNUM = ? AND bepsbm.BEPSBO_CODNUM IN ( "
+				+ "			SELECT bepsbo.CODNUM "
+				+ "			FROM TBEP_SOLICITUD_BOLSAS bepsbo "
+				+ "			WHERE bepsbo.BEPSOL_CODNUM = ? AND bepsbo.BEPBOL_CODNUM = ? "						
+				+ "		)"
+				+ ")";
+		
+		try (PreparedStatement stmt = conexion.prepareStatement(sqlUpdateValoraciones)) {
+			int indexParam = 1;
+			stmt.setString(indexParam++, usuarioUpdate.getCodCuenta());
+			stmt.setInt(indexParam++, merito.getCodNum());
+			stmt.setInt(indexParam++, solicitud.getCodNum());
+			stmt.setInt(indexParam++, bolsa.getCodNum());
+			stmt.executeUpdate();
+		} catch (SQLException e) {
+			conexion.rollback();
+			conexion.setAutoCommit(true);
+			throw e;
+		}
+					
+		// eliminamos valoraciones
+		String sqlValoraciones = ""
+				+ "DELETE FROM TBEP_SOL_BOL_MER_VALORACION bepsbv WHERE bepsbv.BEPSBM_CODNUM IN ( "
+				+ "		SELECT bepsbm.CODNUM "
+				+ "		FROM TBEP_SOL_BOL_MERITOS bepsbm "
+				+ "		WHERE bepsbm.BEPMER_CODNUM = ? AND bepsbm.BEPSBO_CODNUM IN ( "
+				+ "			SELECT bepsbo.CODNUM "
+				+ "			FROM TBEP_SOLICITUD_BOLSAS bepsbo "
+				+ "			WHERE bepsbo.BEPSOL_CODNUM = ? AND bepsbo.BEPBOL_CODNUM = ? "						
+				+ "		)"
+				+ ")";
+		
+		try (PreparedStatement stmt = conexion.prepareStatement(sqlValoraciones)) {
+			int indexParam = 1;
+			stmt.setInt(indexParam++, merito.getCodNum());
+			stmt.setInt(indexParam++, solicitud.getCodNum());
+			stmt.setInt(indexParam++, bolsa.getCodNum());
+			stmt.executeUpdate();
+		} catch (SQLException e) {
+			conexion.rollback();
+			conexion.setAutoCommit(true);
+			throw e;
 		}
 	}
 	 
@@ -653,12 +712,14 @@ public class ModeloSolicitud {
 	/** El usuario ha seleccionado la afinidad del mérito no individualizado. 
 	 * @param solicitud .
 	 * @param bolsa .
-	 * @param merito -
+	 * @param merito .
 	 * @param afinidades .
+	 * @param usuarioUpdate .
 	 * @throws UVException .
 	 * @throws SQLException .
 	 */
-	public void asignarAfinidadMeritoNoIndividualizado(Solicitud solicitud, Bolsa bolsa, Merito merito, Map<Afinidad, Float> afinidades) throws SQLException, UVException {
+	public void asignarAfinidadMeritoNoIndividualizado(Solicitud solicitud, Bolsa bolsa, Merito merito, Map<Afinidad, Float> afinidades, UsuarioBolsaEmpleo usuarioUpdate)
+			throws SQLException, UVException {
 		try (Connection conexion = ConexionUvirtual.obtenerInstancia()) {
 			conexion.setAutoCommit(false);
 			
@@ -675,13 +736,14 @@ public class ModeloSolicitud {
 									
 			// insertamos las afinidades del mérito
 			for (Map.Entry<Afinidad, Float> entry : afinidades.entrySet()) {
-				String sqlInsert = "INSERT INTO TBEP_SOL_BOL_MER_VALORACION (BEPSBM_CODNUM, BEPAFI_CODNUM, VALOR) VALUES (?,?,?)";
+				String sqlInsert = "INSERT INTO TBEP_SOL_BOL_MER_VALORACION (BEPSBM_CODNUM, BEPAFI_CODNUM, VALOR, UID_USUARIO) VALUES (?,?,?,?)";
 				
 				try (PreparedStatement stmt = conexion.prepareStatement(sqlInsert)) {
 					int indexParam = 1;
 					stmt.setInt(indexParam++, meritoSolicitud.getCodNum());
 					stmt.setInt(indexParam++, entry.getKey().getCodNum());
 					stmt.setFloat(indexParam++, entry.getValue());
+					stmt.setString(indexParam++, usuarioUpdate.getCodCuenta());
 					stmt.executeUpdate();
 				} catch (SQLException e) {
 					conexion.rollback();
@@ -700,10 +762,12 @@ public class ModeloSolicitud {
 	 * @param bolsa .
 	 * @param merito .
 	 * @param afinidades .
+	 * @param usuarioUpdate .
 	 * @throws SQLException .
 	 * @throws UVException .
 	 */
-	public void actualizarAfinidadesMeritoNoIndividualizado(Solicitud solicitud, Bolsa bolsa, Merito merito, Map<Afinidad, Float> afinidades) throws SQLException, UVException {
+	public void actualizarAfinidadesMeritoNoIndividualizado(Solicitud solicitud, Bolsa bolsa, Merito merito, Map<Afinidad, Float> afinidades, UsuarioBolsaEmpleo usuarioUpdate)
+			throws SQLException, UVException {
 		try (Connection conexion = ConexionUvirtual.obtenerInstancia()) {
 			conexion.setAutoCommit(false);
 			
@@ -711,12 +775,13 @@ public class ModeloSolicitud {
 			
 			for (Map.Entry<Afinidad, Float> entry : afinidades.entrySet()) {
 				String consulta = "UPDATE TBEP_SOL_BOL_MER_VALORACION"
-						+ " SET VALOR = ?"
+						+ " SET VALOR = ?, UID_USUARIO = ?"
 						+ " WHERE BEPSBM_CODNUM = ? AND BEPAFI_CODNUM = ?";
 				
 				try (PreparedStatement stmt = conexion.prepareStatement(consulta)) {
 					int indexParam = 1;
 					stmt.setFloat(indexParam++, entry.getValue());
+					stmt.setString(indexParam++, usuarioUpdate.getCodCuenta());
 					stmt.setInt(indexParam++, meritoSolicitud.getCodNum());
 					stmt.setInt(indexParam++, entry.getKey().getCodNum());
 					stmt.executeUpdate();
@@ -732,33 +797,35 @@ public class ModeloSolicitud {
 		}
 	}
 	
-	/** El evaluador ha modificado la afinidad del mérito no individualizado . 
+	/** El evaluador ha modificado la afinidad del mérito no individualizado .
 	 * @param solicitud .
 	 * @param bolsa .
 	 * @param merito .
 	 * @param afinidad .
 	 * @param idValoracion .
+	 * @param usuarioUpdate .
 	 * @throws SQLException .
 	 * @throws UVException .
 	 */
-	public void actualizarAfinidadesMeritoIndividualizado(Solicitud solicitud, Bolsa bolsa, Merito merito, Afinidad afinidad, Integer idValoracion)
-			throws SQLException, UVException {
-			MeritoSolicitud meritoSolicitud = this.getMeritoSolicitud(solicitud.getCodNum(), bolsa.getCodNum(), merito.getCodNum());
-			
-			String consulta = "UPDATE TBEP_SOL_BOL_MER_VALORACION"
-					+ " SET VALOR = ?, BEPAFI_CODNUM = ?"
-					+ " WHERE BEPSBM_CODNUM = ? AND CODNUM = ?";
-			
-			try (Connection conexion = ConexionUvirtual.obtenerInstancia(); PreparedStatement stmt = conexion.prepareStatement(consulta)) {
-				int indexParam = 1;
-				stmt.setNull(indexParam++, Types.FLOAT);
-				stmt.setInt(indexParam++, afinidad.getCodNum());
-				stmt.setInt(indexParam++, meritoSolicitud.getCodNum());
-				stmt.setInt(indexParam++, idValoracion);
-				stmt.executeUpdate();
-			} catch (SQLException e) {
-				throw e;
-			}				
+	public void actualizarAfinidadesMeritoIndividualizado(Solicitud solicitud, Bolsa bolsa, Merito merito, Afinidad afinidad, Integer idValoracion,
+			UsuarioBolsaEmpleo usuarioUpdate) throws SQLException, UVException {
+		MeritoSolicitud meritoSolicitud = this.getMeritoSolicitud(solicitud.getCodNum(), bolsa.getCodNum(), merito.getCodNum());
+		
+		String consulta = "UPDATE TBEP_SOL_BOL_MER_VALORACION"
+				+ " SET VALOR = ?, BEPAFI_CODNUM = ?, UID_USUARIO = ?"
+				+ " WHERE BEPSBM_CODNUM = ? AND CODNUM = ?";
+		
+		try (Connection conexion = ConexionUvirtual.obtenerInstancia(); PreparedStatement stmt = conexion.prepareStatement(consulta)) {
+			int indexParam = 1;
+			stmt.setNull(indexParam++, Types.FLOAT);
+			stmt.setInt(indexParam++, afinidad.getCodNum());
+			stmt.setString(indexParam++, usuarioUpdate.getCodCuenta());
+			stmt.setInt(indexParam++, meritoSolicitud.getCodNum());
+			stmt.setInt(indexParam++, idValoracion);
+			stmt.executeUpdate();
+		} catch (SQLException e) {
+			throw e;
+		}
 	}
 	
 	/**
@@ -971,10 +1038,11 @@ public class ModeloSolicitud {
 	/**
 	 * Actualiza el estado de la solicitud a cerrado .
 	 * @param solicitud .
+	 * @param usuarioUpdate .
 	 * @throws SQLException .
 	 * @throws UVException .
 	 */
-	public void confirmacionSolicitud(Solicitud solicitud) throws SQLException, UVException {
+	public void confirmacionSolicitud(Solicitud solicitud, UsuarioBolsaEmpleo usuarioUpdate) throws SQLException, UVException {
 		if (solicitud == null) {
 			throw new UVException("No se puede confirmar una solicitud vacía");
 		}
@@ -996,13 +1064,14 @@ public class ModeloSolicitud {
 		}
 		
 		String consulta = "UPDATE TBEP_SOLICITUDES "
-				+ " SET ESTADO=?, FECHACONFIRMACION=?, ARCHIVO=?"
+				+ " SET ESTADO=?, FECHACONFIRMACION=?, ARCHIVO=?, UID_USUARIO=?"
 				+ " WHERE CODNUM=?";
 		try (Connection conexion = ConexionUvirtual.obtenerInstancia(); PreparedStatement stmt = conexion.prepareStatement(consulta)) {
 			int parameterIndex = 1;
 			stmt.setString(parameterIndex++, solicitud.getEstado());
 			stmt.setDate(parameterIndex++, new Date(solicitud.getFechaConfirmacion().getTime()));
 			stmt.setBinaryStream(parameterIndex++, solicitud.getArchivo());
+			stmt.setString(parameterIndex++, usuarioUpdate.getCodCuenta());
 			stmt.setInt(parameterIndex++, solicitud.getCodNum());
 			stmt.executeUpdate();
 		}
@@ -1175,10 +1244,32 @@ public class ModeloSolicitud {
 	 * @param conexion . 
 	 * @param solicitud .
 	 * @param bolsasExcluidas .
+	 * @param usuarioUpdate .
 	 * @throws SQLException .
 	 */
-	private void eliminarBolsasExcluidasDeLaSolicitud(Connection conexion, Solicitud solicitud, ArrayList<Bolsa> bolsasExcluidas) throws SQLException {
+	private void eliminarBolsasExcluidasDeLaSolicitud(Connection conexion, Solicitud solicitud, ArrayList<Bolsa> bolsasExcluidas, UsuarioBolsaEmpleo usuarioUpdate)
+			throws SQLException {
 		String paramsExcluidas = BolsaEmpleoUtils.consultaMultiplesParametros(bolsasExcluidas.size());
+		
+		// actualiza usuario de los méritos las bolsas eliminadas de la solicitud
+		String sqlUpdateMeritos = "UPDATE TBEP_SOL_BOL_MERITOS bepsbm"
+				+ "	SET bepsbm.UID_USUARIO = ?"
+				+ " WHERE bepsbm.BEPSBO_CODNUM IN ("
+				+ "		SELECT bepsbo.CODNUM "
+				+ "		FROM TBEP_SOLICITUD_BOLSAS bepsbo "
+				+ "		WHERE bepsbo.BEPSOL_CODNUM = ? "
+				+ "		AND bepsbo.BEPBOL_CODNUM IN (" + paramsExcluidas + ")"
+				+ " )";
+		
+		try (PreparedStatement stmt = conexion.prepareStatement(sqlUpdateMeritos)) {
+			int indexParam = 1;
+			stmt.setString(indexParam++, usuarioUpdate.getCodCuenta());
+			stmt.setInt(indexParam++, solicitud.getCodNum());
+			for (Bolsa bolsaExcluida: bolsasExcluidas) {
+				stmt.setInt(indexParam++, bolsaExcluida.getCodNum());
+			}
+			stmt.executeUpdate();
+		}
 		
 		// eliminamos meritos
 		String sqlDeleteMeritos = "DELETE FROM TBEP_SOL_BOL_MERITOS bepsbm"
@@ -1198,12 +1289,28 @@ public class ModeloSolicitud {
 			stmt.executeUpdate();
 		}
 		
-		// eliminamos bolsas
-		String sqlDelete = "DELETE FROM TBEP_SOLICITUD_BOLSAS bepsbo"
+		// actualiza usuario de las bolsas de la solicitud
+		String sqlUpdateBolsas = "UPDATE TBEP_SOLICITUD_BOLSAS bepsbo"
+				+ "	SET bepsbm.UID_USUARIO = ?"
 				+ " WHERE bepsbo.BEPSOL_CODNUM = ?"
 				+ " AND bepsbo.BEPBOL_CODNUM IN (" + paramsExcluidas + ")";
 		
-		try (PreparedStatement stmt = conexion.prepareStatement(sqlDelete)) {
+		try (PreparedStatement stmt = conexion.prepareStatement(sqlUpdateBolsas)) {
+			int indexParam = 1;
+			stmt.setString(indexParam++, usuarioUpdate.getCodCuenta());
+			stmt.setInt(indexParam++, solicitud.getCodNum());
+			for (Bolsa bolsaExcluida: bolsasExcluidas) {
+				stmt.setInt(indexParam++, bolsaExcluida.getCodNum());		
+			}
+			stmt.executeUpdate();
+		}
+		
+		// eliminamos bolsas
+		String sqlDeleteBolsas = "DELETE FROM TBEP_SOLICITUD_BOLSAS bepsbo"
+				+ " WHERE bepsbo.BEPSOL_CODNUM = ?"
+				+ " AND bepsbo.BEPBOL_CODNUM IN (" + paramsExcluidas + ")";
+		
+		try (PreparedStatement stmt = conexion.prepareStatement(sqlDeleteBolsas)) {
 			int indexParam = 1;
 			stmt.setInt(indexParam++, solicitud.getCodNum());
 			for (Bolsa bolsaExcluida: bolsasExcluidas) {

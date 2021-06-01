@@ -146,8 +146,8 @@ public class ControladorInicio extends HttpServlet {
 		bean.setVista(JSP_INICIO);
 		BolsaEmpleoUtils.readMensajeSession(bean, request);
 		try {
-			boolean existe = ModeloUsuarioBolsaEmpleo.obtenerInstancia().checkUser(datos);
-			bean.setAnonimo(!existe);
+			bean.setUsuarioLogeado(ModeloUsuarioBolsaEmpleo.obtenerInstancia().getOrCreateUsuario(datos));
+			bean.setAnonimo(bean.getUsuarioLogeado() == null);
 		} catch (UVException e) {
 			BolsaEmpleoUtils.addMensajeDeError(e.getMessage(), bean, request);
 			response.sendRedirect("/srv/es/informacionadministrativa/bolsaempleo/error");

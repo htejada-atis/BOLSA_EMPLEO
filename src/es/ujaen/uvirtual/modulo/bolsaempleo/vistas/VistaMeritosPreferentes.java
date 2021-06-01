@@ -3,7 +3,6 @@ package es.ujaen.uvirtual.modulo.bolsaempleo.vistas;
 import java.io.Serializable;
 import java.util.List;
 
-import es.ujaen.uvirtual.beans.vistas.Vista;
 import es.ujaen.uvirtual.modulo.bolsaempleo.beans.ApartadoBaremacion;
 import es.ujaen.uvirtual.modulo.bolsaempleo.beans.BloqueBaremacion;
 import es.ujaen.uvirtual.modulo.bolsaempleo.beans.ItemBaremacion;
@@ -16,23 +15,14 @@ import es.ujaen.uvirtual.modulo.bolsaempleo.utilidades.BolsaEmpleoDataTable;
  * 
  * @author ATISoluciones 2021
  */
-public class VistaMeritosPreferentes extends Vista implements Serializable {
+public class VistaMeritosPreferentes extends VistaBEP implements Serializable {
 	private static final long serialVersionUID = 1L;
-	private String vista;
 	private BolsaEmpleoDataTable<MeritoPreferente> dataTable;
-	private BolsaEmpleoDataTable<MeritoPreferenteOpcion> dataTableOpciones;	
+	private BolsaEmpleoDataTable<MeritoPreferenteOpcion> dataTableOpciones;
 	private MeritoPreferente merito;
 	private List<ItemBaremacion> itemsBaremacion;
 	private List<ApartadoBaremacion> apartadoBaremacion;
 	private List<BloqueBaremacion> bloqueBaremacion;
-
-	public String getVista() {
-		return vista;
-	}
-
-	public void setVista(String vista) {
-		this.vista = vista;
-	}
 
 	public MeritoPreferente getMeritoPreferente() {
 		return merito;
@@ -73,7 +63,7 @@ public class VistaMeritosPreferentes extends Vista implements Serializable {
 	public void setDatatable(BolsaEmpleoDataTable<MeritoPreferente> dt) {
 		this.dataTable = dt;
 	}
-	
+
 	public BolsaEmpleoDataTable<MeritoPreferenteOpcion> getDatatableOpciones() {
 		return dataTableOpciones;
 	}

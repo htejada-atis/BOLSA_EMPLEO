@@ -9,12 +9,10 @@ import java.sql.SQLException;
 import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.List;
-import javax.sql.DataSource;
 import org.junit.BeforeClass;
 import org.junit.FixMethodOrder;
 import org.junit.Test;
 import org.junit.runners.MethodSorters;
-
 import bbdd.BbddRunner;
 import bbdd.UtilsTestBolsaEmpleo;
 import es.ujaen.uvirtual.modelo.conexion.Conexion;
@@ -45,11 +43,11 @@ public class TestBEPModeloMerito {
      */
     @BeforeClass
     public static void preparaBd() throws SQLException, IOException, ParseException {
-    	DataSource ds = BbddRunner.obtenerDataSourceUv();
-    	DataSource dsArcos = BbddRunner.obtenerDataSourceArcos();
-    	Conexion.setConexionUvirtual(ds);
-    	Conexion.setConexionArcos(dsArcos);
-    	UtilsTestBolsaEmpleo.inicializaBolsaEmpleo();
+    	Conexion.setConexionUvirtual(BbddRunner.obtenerDataSourceUv());
+		Conexion.setConexionArcos(BbddRunner.obtenerDataSourceArcos());
+		Conexion.setConexionUxxiRrhh(BbddRunner.obtenerDataSourceRh());
+		Conexion.setConexionUxxiAc(BbddRunner.obtenerDataSourceAc());
+		UtilsTestBolsaEmpleo.inicializaBolsaEmpleo();
     }
     
     /** test acierto insertar merito.
@@ -68,7 +66,7 @@ public class TestBEPModeloMerito {
     	merito.setArchivo(ARCHIVO_MERITO);
     	merito.setItemBaremacion(item);
     	ModeloMerito modelo = ModeloMerito.obtenerInstancia();
-    	modelo.insertaMerito(merito, 1);
+    	modelo.insertaMerito(merito, UtilsTestBolsaEmpleo.getUsuarioCandidatoLogeado());
     	List<Merito> meritos = modelo.listaMeritos();
     	
     	Boolean eje = false;
@@ -102,7 +100,7 @@ public class TestBEPModeloMerito {
     	Bolsa bolsa = new Bolsa();
     	bolsa.setCodNum(2);
     	
-    	modeloSolicitud.borrarMeritoDeSolicitudBolsa(solicitud, bolsa, meritoAcum);
+    	modeloSolicitud.borrarMeritoDeSolicitudBolsa(solicitud, bolsa, meritoAcum, UtilsTestBolsaEmpleo.getUsuarioCandidatoLogeado());
     	
 //    	modelo.eliminarMeritos(idsMeritos);
 //    	
@@ -125,7 +123,7 @@ public class TestBEPModeloMerito {
     public void testE01InsertaMeritoNull() throws SQLException, UVException {
     	Merito merito = null;
     	ModeloMerito modelo = ModeloMerito.obtenerInstancia();
-    	modelo.insertaMerito(merito, 1);
+    	modelo.insertaMerito(merito, UtilsTestBolsaEmpleo.getUsuarioCandidatoLogeado());
     	fail();
     }
     

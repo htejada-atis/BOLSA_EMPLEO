@@ -3,7 +3,6 @@ package es.ujaen.uvirtual.modulo.bolsaempleo.vistas;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
-import es.ujaen.uvirtual.beans.vistas.Vista;
 import es.ujaen.uvirtual.modulo.bolsaempleo.beans.Afinidad;
 import es.ujaen.uvirtual.modulo.bolsaempleo.beans.Bolsa;
 import es.ujaen.uvirtual.modulo.bolsaempleo.beans.BolsaValidacion;
@@ -19,9 +18,8 @@ import es.ujaen.uvirtual.modulo.bolsaempleo.utilidades.BolsaEmpleoDataTable;
 /** Bean para la vista.
  * @author ATISoluciones 2021
  */
-public class VistaValidar extends Vista implements Serializable {
+public class VistaValidar extends VistaBEP implements Serializable {
 	private static final long serialVersionUID = 1L;
-	private String vista;
 	private Bolsa bolsa;
 	private Convocatoria conv;
 	private MeritoSolicitud merito;
@@ -33,14 +31,6 @@ public class VistaValidar extends Vista implements Serializable {
 	private List<ValorMeritoBolsaTable> bolsas = new ArrayList<>();
 	private List<Afinidad> listaAfinidades;
 	private List<String> listaTiposAfinidades;
-	
-	public String getVista() {
-		return vista;
-	}
-	
-	public void setVista(String vista) {
-		this.vista = vista;
-	}
 	
 	public void setDatatableBolsas(BolsaEmpleoDataTable<BolsaValidacion> dt) {
 		this.datatableBolsas = dt;

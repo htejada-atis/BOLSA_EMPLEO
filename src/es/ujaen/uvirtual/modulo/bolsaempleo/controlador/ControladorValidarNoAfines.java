@@ -197,7 +197,7 @@ public class ControladorValidarNoAfines extends HttpServlet {
 		bean.setConvocatoria(ModeloConvocatoria.obtenerInstancia().getUltimaConvocatoria());
 		BolsaEmpleoUtils.readMensajeSession(bean, request);
 		try {
-			ModeloUsuarioBolsaEmpleo.obtenerInstancia().checkUser(datos);
+			bean.setUsuarioLogeado(ModeloUsuarioBolsaEmpleo.obtenerInstancia().getOrCreateUsuario(datos));
 		} catch (UVException e) {
 			BolsaEmpleoUtils.addMensajeDeError(e.getMessage(), bean, request);
 			response.sendRedirect("/srv/es/informacionadministrativa/bolsaempleo/error");
@@ -308,13 +308,13 @@ public class ControladorValidarNoAfines extends HttpServlet {
 			
 			if (EscapaHTML.ajustaCodificacion(request.getParameter(PARAM_ACEPTAR_MERITO)) != null) {
 				for (String idBolsa : bolsas) {
-					modeloValidar.validarMerito(idBolsa, bean.getMerito().getMerito().getCodNum(), observacionesCandidato);
+					modeloValidar.validarMerito(idBolsa, bean.getMerito().getMerito().getCodNum(), observacionesCandidato, bean.getUsuarioLogeado());
 					Bolsa bolsa = modeloBolsa.getBolsaById(Integer.parseInt(idBolsa));
 					BolsaEmpleoUtils.addMensajeDeExito(String.format(MENSAJE_EXITO_MERITO_VALIDADO, bolsa.getArea().getDescripcion()), bean, request);
 				}
 			} else if (EscapaHTML.ajustaCodificacion(request.getParameter(PARAM_EXCLUIR_MERITO)) != null) {
 				for (String idBolsa : bolsas) {
-					modeloValidar.excluirMerito(idBolsa, bean.getMerito().getMerito().getCodNum(), observacionesCandidato);
+					modeloValidar.excluirMerito(idBolsa, bean.getMerito().getMerito().getCodNum(), observacionesCandidato, bean.getUsuarioLogeado());
 					Bolsa bolsa = modeloBolsa.getBolsaById(Integer.parseInt(idBolsa));
 					BolsaEmpleoUtils.addMensajeDeExito(String.format(MENSAJE_EXITO_MERITO_EXCLUIDO, bolsa.getArea().getDescripcion()), bean, request);
 				}

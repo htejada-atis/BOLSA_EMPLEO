@@ -290,7 +290,7 @@ public class ControladorItemsBaremacion extends HttpServlet {
 		bean.setVista(JSP_ITEM_BAREMACION);
 		BolsaEmpleoUtils.readMensajeSession(bean, request);
 		try {
-			ModeloUsuarioBolsaEmpleo.obtenerInstancia().checkUser(datos);
+			bean.setUsuarioLogeado(ModeloUsuarioBolsaEmpleo.obtenerInstancia().getOrCreateUsuario(datos));
 		} catch (UVException e) {
 			BolsaEmpleoUtils.addMensajeDeError(e.getMessage(), bean, request);
 			response.sendRedirect("/srv/es/informacionadministrativa/bolsaempleo/error");
@@ -378,7 +378,7 @@ public class ControladorItemsBaremacion extends HttpServlet {
 		
 		ApartadoBaremacion apartado = this.validateApartadoBaremacion(new ApartadoBaremacion(), request);
 		apartado.setActivo(true);
-		ModeloBaremacionApartados.obtenerInstancia().insertaApartado(apartado);
+		ModeloBaremacionApartados.obtenerInstancia().insertaApartado(apartado, bean.getUsuarioLogeado());
 		
 		BolsaEmpleoUtils.addMensajeDeExito(MENSAJE_EXITO_APARTADO_AGREGAR, bean, request);
 		bean.setVista(JSP_ITEM_BAREMACION);				
@@ -391,7 +391,7 @@ public class ControladorItemsBaremacion extends HttpServlet {
 		Integer codNum = Formateador.leeParametroInteger(request.getParameter(PARAM_APARTADO));
 		ApartadoBaremacion apartado = modelo.getApartadoBaremacionById(codNum);
 		
-		modelo.desactivarApartado(apartado);
+		modelo.desactivarApartado(apartado, bean.getUsuarioLogeado());
 		
 		BolsaEmpleoUtils.addMensajeDeExito(MENSAJE_EXITO_APARTADO_DESACTIVAR, bean, request);
 		response.sendRedirect(request.getServletPath());
@@ -404,7 +404,7 @@ public class ControladorItemsBaremacion extends HttpServlet {
 		Integer codNum = Formateador.leeParametroInteger(request.getParameter(PARAM_APARTADO));
 		ApartadoBaremacion apartado = modelo.getApartadoBaremacionById(codNum);
 		
-		modelo.activarApartado(apartado);
+		modelo.activarApartado(apartado, bean.getUsuarioLogeado());
 		
 		BolsaEmpleoUtils.addMensajeDeExito(MENSAJE_EXITO_APARTADO_ACTIVAR, bean, request);
 		response.sendRedirect(request.getServletPath());
@@ -427,7 +427,7 @@ public class ControladorItemsBaremacion extends HttpServlet {
 		bean.setVista(JSP_FORM_APARTADO_BAREMACION);
 		bean.setApartadoBaremacion(apartado);
 		
-		modelo.actualizaApartado(apartado);
+		modelo.actualizaApartado(apartado, bean.getUsuarioLogeado());
 		
 		bean.getMensajesDeExito().add(MENSAJE_EXITO_APARTADO_EDITAR);
 		
@@ -561,7 +561,7 @@ public class ControladorItemsBaremacion extends HttpServlet {
 		bloque.setApartadoBaremacion(apartado);
 		
 		// agregamos
-		ModeloBaremacionBloques.obtenerInstancia().insertaBloque(bloque);
+		ModeloBaremacionBloques.obtenerInstancia().insertaBloque(bloque, bean.getUsuarioLogeado());
 		
 		bean.getMensajesDeExito().add(MENSAJE_EXITO_BLOQUE_AGREGAR);
 		bean.setVista(JSP_ITEM_BAREMACION);	
@@ -573,7 +573,7 @@ public class ControladorItemsBaremacion extends HttpServlet {
 		ModeloBaremacionBloques modelo = ModeloBaremacionBloques.obtenerInstancia();
 		BloqueBaremacion bloque = modelo.getBloqueBaremacionById(Formateador.leeParametroInteger(request.getParameter(PARAM_BLOQUE)));
 		
-		modelo.desactivarBloque(bloque);		
+		modelo.desactivarBloque(bloque, bean.getUsuarioLogeado());		
 		
 		bean.getMensajesDeExito().add(MENSAJE_EXITO_BLOQUE_DESACTIVAR);
 		this.seleccionarBloque(bean, request);
@@ -585,7 +585,7 @@ public class ControladorItemsBaremacion extends HttpServlet {
 		ModeloBaremacionBloques modelo = ModeloBaremacionBloques.obtenerInstancia();
 		BloqueBaremacion bloque = modelo.getBloqueBaremacionById(Formateador.leeParametroInteger(request.getParameter(PARAM_BLOQUE)));
 		
-		modelo.activarBloque(bloque);
+		modelo.activarBloque(bloque, bean.getUsuarioLogeado());
 		
 		bean.getMensajesDeExito().add(MENSAJE_EXITO_BLOQUE_ACTIVAR);
 		this.seleccionarBloque(bean, request);			
@@ -611,7 +611,7 @@ public class ControladorItemsBaremacion extends HttpServlet {
 		bean.setApartadoBaremacion(bloque.getApartadoBaremacion());
 		bean.setBloqueBaremacion(bloque);
 
-		modelo.actualizaBloque(this.validateBloqueBaremacion(bloque, request));
+		modelo.actualizaBloque(this.validateBloqueBaremacion(bloque, request), bean.getUsuarioLogeado());
 
 		bean.getMensajesDeExito().add(MENSAJE_EXITO_BLOQUE_EDITAR);
 
@@ -798,7 +798,7 @@ public class ControladorItemsBaremacion extends HttpServlet {
 		ItemBaremacion item = this.validateItemBaremacion(new ItemBaremacion(), request);
 		item.setBloqueBaremacion(bloque);
 		item.setActivo(true);
-		ModeloBaremacionItems.obtenerInstancia().insertaItem(item);
+		ModeloBaremacionItems.obtenerInstancia().insertaItem(item, bean.getUsuarioLogeado());
 
 		bean.getMensajesDeExito().add(MENSAJE_EXITO_ITEM_AGREGAR);
 		bean.setVista(JSP_ITEM_BAREMACION);
@@ -831,7 +831,7 @@ public class ControladorItemsBaremacion extends HttpServlet {
 		bean.setBloqueBaremacion(item.getBloqueBaremacion());
 		bean.setItemBaremacion(item);
 
-		modelo.actualizaItem(this.validateItemBaremacion(item, request));
+		modelo.actualizaItem(this.validateItemBaremacion(item, request), bean.getUsuarioLogeado());
 
 		bean.getMensajesDeExito().add(MENSAJE_EXITO_ITEM_EDITAR);
 
@@ -844,7 +844,7 @@ public class ControladorItemsBaremacion extends HttpServlet {
 		ModeloBaremacionItems modelo = ModeloBaremacionItems.obtenerInstancia();
 		ItemBaremacion item = modelo.getItemBaremacionById(Formateador.leeParametroInteger(request.getParameter(PARAM_ITEM)));
 		
-		modelo.desactivarItem(item);		
+		modelo.desactivarItem(item, bean.getUsuarioLogeado());		
 		
 		bean.getMensajesDeExito().add(MENSAJE_EXITO_ITEM_DESACTIVAR);
 		this.seleccionarItem(bean, request);
@@ -856,7 +856,7 @@ public class ControladorItemsBaremacion extends HttpServlet {
 		ModeloBaremacionItems modelo = ModeloBaremacionItems.obtenerInstancia();
 		ItemBaremacion item = modelo.getItemBaremacionById(Formateador.leeParametroInteger(request.getParameter(PARAM_ITEM)));
 		
-		modelo.activarItem(item);
+		modelo.activarItem(item, bean.getUsuarioLogeado());
 		
 		bean.getMensajesDeExito().add(MENSAJE_EXITO_ITEM_ACTIVAR);
 		this.seleccionarItem(bean, request);			
@@ -889,9 +889,9 @@ public class ControladorItemsBaremacion extends HttpServlet {
 		ItemBaremacion itemHijo = modelo.getItemBaremacionById(Formateador.leeParametroInteger(request.getParameter(PARAM_ITEM_EXCLUYENTE)));
 
 		if (Boolean.TRUE.equals(seleccionado)) {
-			modelo.asignarItemsExcluyentesAItem(itemPadre, itemHijo);
+			modelo.asignarItemsExcluyentesAItem(itemPadre, itemHijo, bean.getUsuarioLogeado());
 		} else {
-			modelo.borrarItemsExcluyentesAItem(itemPadre, itemHijo);
+			modelo.borrarItemsExcluyentesAItem(itemPadre, itemHijo, bean.getUsuarioLogeado());
 		}
 
 		List<ItemBaremacion> listaItemsExcluyentes = modelo.getItemsExcluyentes(itemPadre);
