@@ -155,10 +155,11 @@ public class ModeloConvocatoria {
 	 * 
 	 * @param convocatoria .
 	 * @param usuarioInsert .
+	 * @return .
 	 * @throws UVException  .
 	 * @throws SQLException .
 	 */
-	public void nuevaConvocatoria(Convocatoria convocatoria, UsuarioBolsaEmpleo usuarioInsert) throws SQLException, UVException {
+	public Integer nuevaConvocatoria(Convocatoria convocatoria, UsuarioBolsaEmpleo usuarioInsert) throws SQLException, UVException {
 		if (convocatoria == null) {
 			throw new UVException("No se puede insertar una convocatoria vacio");
 		}
@@ -166,7 +167,8 @@ public class ModeloConvocatoria {
 		String consulta = "INSERT INTO TBEP_CONVOCATORIAS (DESCRIPCION, FECHACIERRE, ESTADO, NUMBOLSASMAXIMO, NUMMERITOSPORBLOQUE, UID_USUARIO) "
 				+ "VALUES (?, ?, ?, ?, ?, ?)";
 
-		try (Connection conexion = ConexionUvirtual.obtenerInstancia(); PreparedStatement stmt = conexion.prepareStatement(consulta)) {
+		try (Connection conexion = ConexionUvirtual.obtenerInstancia(); 
+				PreparedStatement stmt = conexion.prepareStatement(consulta, new String[]{"CODNUM"})) {
 			int parameterIndex = 1;
 			stmt.setString(parameterIndex++, convocatoria.getDescripcion());
 			stmt.setDate(parameterIndex++, new java.sql.Date(convocatoria.getFechaCierre().getTime()));
@@ -175,6 +177,11 @@ public class ModeloConvocatoria {
 			stmt.setInt(parameterIndex++, convocatoria.getNumMeritosPorBloque());
 			stmt.setString(parameterIndex++, usuarioInsert.getCodCuenta());
 			stmt.executeUpdate();
+			
+			ResultSet rs = stmt.getGeneratedKeys();
+			rs.next();
+			
+			return rs.getInt(1);
 		}
 	}
 

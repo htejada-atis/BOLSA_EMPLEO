@@ -20,6 +20,7 @@ import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.ui.Select;
 
 import bbdd.UtilsTestBolsaEmpleo;
+import es.ujaen.uvirtual.modulo.bolsaempleo.modelo.ModeloUsuarioBolsaEmpleo;
 
 /**
  * Clase para probar configuracion.evaluadores BEP .
@@ -233,7 +234,7 @@ public class TestBEPEvaluadores extends UtilsTestUsuarioBase {
 		
 		List<String> mensajes = UtilsTestBolsaEmpleo.getMensajesDeError();
 		assertEquals(1, mensajes.size());
-		assertEquals(mensajes.get(0), "El usuario no existe en el sistema");		
+		assertEquals(mensajes.get(0), ModeloUsuarioBolsaEmpleo.MENSAJE_BUSCAR_USUARIO_NO_EXISTE);		
 	}
 	
 	/**

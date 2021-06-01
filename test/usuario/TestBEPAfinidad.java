@@ -168,10 +168,10 @@ public class TestBEPAfinidad extends UtilsTestUsuarioBase {
 		WebElement th = tabla.findElement(By.className("codigo"));
 		th.click();
 		WebElement img = th.findElement(By.className("order"));
-		assertTrue(img.getAttribute("src").indexOf("down.png") != -1);
+		assertTrue(img.getAttribute("src").indexOf("up.png") != -1);
 		th.click();
 		img = th.findElement(By.className("order"));
-		assertTrue(img.getAttribute("src").indexOf("up.png") != -1);
+		assertTrue(img.getAttribute("src").indexOf("down.png") != -1);
 	}
 
 	/**
