@@ -561,7 +561,7 @@ public class ControladorItemsBaremacion extends HttpServlet {
 		bloque.setApartadoBaremacion(apartado);
 		
 		// agregamos
-		ModeloBaremacionBloques.obtenerInstancia().insertaBloque(bloque);
+		ModeloBaremacionBloques.obtenerInstancia().insertaBloque(bloque, bean.getUsuarioLogeado());
 		
 		bean.getMensajesDeExito().add(MENSAJE_EXITO_BLOQUE_AGREGAR);
 		bean.setVista(JSP_ITEM_BAREMACION);	
@@ -573,7 +573,7 @@ public class ControladorItemsBaremacion extends HttpServlet {
 		ModeloBaremacionBloques modelo = ModeloBaremacionBloques.obtenerInstancia();
 		BloqueBaremacion bloque = modelo.getBloqueBaremacionById(Formateador.leeParametroInteger(request.getParameter(PARAM_BLOQUE)));
 		
-		modelo.desactivarBloque(bloque);		
+		modelo.desactivarBloque(bloque, bean.getUsuarioLogeado());		
 		
 		bean.getMensajesDeExito().add(MENSAJE_EXITO_BLOQUE_DESACTIVAR);
 		this.seleccionarBloque(bean, request);
@@ -585,7 +585,7 @@ public class ControladorItemsBaremacion extends HttpServlet {
 		ModeloBaremacionBloques modelo = ModeloBaremacionBloques.obtenerInstancia();
 		BloqueBaremacion bloque = modelo.getBloqueBaremacionById(Formateador.leeParametroInteger(request.getParameter(PARAM_BLOQUE)));
 		
-		modelo.activarBloque(bloque);
+		modelo.activarBloque(bloque, bean.getUsuarioLogeado());
 		
 		bean.getMensajesDeExito().add(MENSAJE_EXITO_BLOQUE_ACTIVAR);
 		this.seleccionarBloque(bean, request);			
@@ -611,7 +611,7 @@ public class ControladorItemsBaremacion extends HttpServlet {
 		bean.setApartadoBaremacion(bloque.getApartadoBaremacion());
 		bean.setBloqueBaremacion(bloque);
 
-		modelo.actualizaBloque(this.validateBloqueBaremacion(bloque, request));
+		modelo.actualizaBloque(this.validateBloqueBaremacion(bloque, request), bean.getUsuarioLogeado());
 
 		bean.getMensajesDeExito().add(MENSAJE_EXITO_BLOQUE_EDITAR);
 

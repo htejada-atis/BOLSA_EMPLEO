@@ -12,6 +12,7 @@ import java.util.Map;
 import es.ujaen.uvirtual.modelo.conexion.ConexionUvirtual;
 import es.ujaen.uvirtual.modulo.bolsaempleo.beans.ApartadoBaremacion;
 import es.ujaen.uvirtual.modulo.bolsaempleo.beans.BloqueBaremacion;
+import es.ujaen.uvirtual.modulo.bolsaempleo.beans.UsuarioBolsaEmpleo;
 import es.ujaen.uvirtual.modulo.bolsaempleo.utilidades.BolsaEmpleoDataTable;
 import es.ujaen.uvirtual.modulo.bolsaempleo.utilidades.BolsaEmpleoDataTable.DataTableColumn;
 import es.ujaen.uvirtual.utilidades.UVException;
@@ -31,7 +32,7 @@ public class ModeloBaremacionBloques {
 	// errores
 	public static final String ERROR_BLOQUE_NOEXITE = "Bloque no encontrado";	
 
-	public static final Integer COLUMN_CODIGO_MAXLENGTH = 3; 
+	public static final Integer COLUMN_CODIGO_MAXLENGTH = 3;
 	public static final Integer COLUMN_NOMBRE_MAXLENGTH = 100;
 	public static final Integer COLUMN_DESCRIPCION_MAXLENGTH = 250;
 
@@ -60,7 +61,7 @@ public class ModeloBaremacionBloques {
 		return eInstancia;
 	}
 		
-	/********************************************** METODOS PÚBLICOS PARA CONSULTAS BLOQUEBAREMACION  ********************************************/
+	/********************************************** METODOS PÚBLICOS PARA CONSULTAS BLOQUEBAREMACION ********************************************/
 	
 	/**
 	 * Devuelve un bloque de baremación por su id.
@@ -140,36 +141,40 @@ public class ModeloBaremacionBloques {
 	/** 
 	 * Desactiva un bloque de baremación.
 	 * @param bloque .
+	 * @param usuarioUpdate .
 	 * @throws SQLException .
 	 * @throws UVException .
 	 */
-	public void desactivarBloque(BloqueBaremacion bloque) throws SQLException {
-		this.activaDesactivaBloque(bloque, false);
+	public void desactivarBloque(BloqueBaremacion bloque, UsuarioBolsaEmpleo usuarioUpdate) throws SQLException {
+		this.activaDesactivaBloque(bloque, false, usuarioUpdate);
 	}
 	
 	/** 
 	 * Actia un apartado de baremación.
 	 * @param bloque .
+	 * @param usuarioUpdate .
 	 * @throws SQLException .
 	 * @throws UVException .
 	 */
-	public void activarBloque(BloqueBaremacion bloque) throws SQLException {
-		this.activaDesactivaBloque(bloque, true);
+	public void activarBloque(BloqueBaremacion bloque, UsuarioBolsaEmpleo usuarioUpdate) throws SQLException {
+		this.activaDesactivaBloque(bloque, true, usuarioUpdate);
 	}
 	
 	/** Actualiza un bloque .
 	 * @param bloque con los datos nuevos a actualizar .
+	 * @param usuarioUpdate .
 	 * @throws SQLException en caso de error en la BD .
 	 * @throws UVException en caso de errores de validacion .
 	 */
-	public void actualizaBloque(BloqueBaremacion bloque) throws SQLException, UVException {
+	public void actualizaBloque(BloqueBaremacion bloque, UsuarioBolsaEmpleo usuarioUpdate) throws SQLException, UVException {
 		this.chequearBloqueParaInsertarOActualizar(bloque);
 		
 		String consulta = "UPDATE TBEP_BLOQUESBAREMACION SET "
 				+ "CODIGO = ?, "
 				+ "NOMBRE = ?, "
 				+ "FLGACTIVO = ?, "
-				+ "NUMERO_MAXIMO_MERITOS = ? "
+				+ "NUMERO_MAXIMO_MERITOS = ?,"
+				+ "UID_USUARIO = ? "
 				+ "WHERE CODNUM = ?";
 		
 		try (Connection conexion = ConexionUvirtual.obtenerInstancia(); PreparedStatement stmt = conexion.prepareStatement(consulta)) {
@@ -184,6 +189,7 @@ public class ModeloBaremacionBloques {
 				stmt.setNull(parameterIndex++, Types.NULL);
 			}
 			
+			stmt.setString(parameterIndex++, usuarioUpdate.getCodCuenta());
 			stmt.setInt(parameterIndex++, bloque.getCodNum());
 			stmt.executeUpdate();
 		}
@@ -191,10 +197,11 @@ public class ModeloBaremacionBloques {
 	
 	/** Función que inserta un bloque en la BD.
 	 * @param bloque .
+	 * @param usuarioInsert .
 	 * @throws SQLException .
 	 * @throws UVException .
 	 */
-	public void insertaBloque(BloqueBaremacion bloque) throws SQLException, UVException {
+	public void insertaBloque(BloqueBaremacion bloque, UsuarioBolsaEmpleo usuarioInsert) throws SQLException, UVException {
 		if (bloque == null) {
 			throw new UVException("No se puede insertar un bloque vacio");
 		}
@@ -202,8 +209,8 @@ public class ModeloBaremacionBloques {
 		this.chequearBloqueParaInsertarOActualizar(bloque);
 		
 		String consulta = "INSERT INTO TBEP_BLOQUESBAREMACION " 
-				+ " (CODIGO,NOMBRE,BEPAPA_CODNUM,NUMERO_MAXIMO_MERITOS)"
-				+ " VALUES (?,?,?,?)";
+				+ " (CODIGO,NOMBRE,BEPAPA_CODNUM,NUMERO_MAXIMO_MERITOS,UID_USUARIO)"
+				+ " VALUES (?,?,?,?,?)";
 		
 		try (Connection conexion = ConexionUvirtual.obtenerInstancia(); PreparedStatement stmt = conexion.prepareStatement(consulta)) {
 			int parameterIndex = 1;
@@ -215,6 +222,7 @@ public class ModeloBaremacionBloques {
 			} else {
 				stmt.setNull(parameterIndex++, Types.NULL);
 			}
+			stmt.setString(parameterIndex++, usuarioInsert.getCodCuenta());
 			stmt.executeUpdate();
 		}
 	}
@@ -284,13 +292,14 @@ public class ModeloBaremacionBloques {
 		}		
 	}
 
-	private void activaDesactivaBloque(BloqueBaremacion bloque, Boolean activo) throws SQLException {
-		String consulta = "UPDATE TBEP_BLOQUESBAREMACION SET FLGACTIVO = ? WHERE CODNUM = ?";
+	private void activaDesactivaBloque(BloqueBaremacion bloque, Boolean activo, UsuarioBolsaEmpleo usuarioUpdate) throws SQLException {
+		String consulta = "UPDATE TBEP_BLOQUESBAREMACION SET FLGACTIVO = ?, UID_USUARIO = ? WHERE CODNUM = ?";
 		
 		try (Connection conexion = ConexionUvirtual.obtenerInstancia(); PreparedStatement stmt = conexion.prepareStatement(consulta)) {
 			int parameterIndex = 1;
 			
 			stmt.setString(parameterIndex++, Boolean.TRUE.equals(activo) ? "S" : "N");
+			stmt.setString(parameterIndex++, usuarioUpdate.getCodCuenta());
 			stmt.setInt(parameterIndex++, bloque.getCodNum());
 			stmt.executeUpdate();
 		}	
