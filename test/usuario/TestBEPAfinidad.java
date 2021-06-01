@@ -92,10 +92,8 @@ public class TestBEPAfinidad extends UtilsTestUsuarioBase {
 		assertTrue(h2.getText().equals("Afinidades"));
 
 		// esperamos a que se renderice la table
-		WebElement total = wait.until(
-				ExpectedConditions.presenceOfNestedElementLocatedBy(getTables(main, ID_TABLE), By.className("total")));
-
-		comprobarNumUsu(total);
+		WebElement table = UtilsTestBolsaEmpleo.waitVisibility(By.id(ID_TABLE));
+		assertTrue(UtilsTestBolsaEmpleo.getTotalTable(table) > 0);
 
 		comprobarOrdenacion(getTables(main, ID_TABLE));
 

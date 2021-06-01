@@ -38,7 +38,7 @@ public class TestBEPModeloBaremacionApartados {
 	private static final String CODIGO = "1";
 	private static final String NOMBRE = "NOMBRE APARTADO";
 	private static final Float PUNTACION_MAXIMA = (float) 1.1;
-	private static final Float PORCENTAJE_MAXIMO = (float) 10.1;
+	private static final Float PORCENTAJE_MAXIMO = (float) 0.2;
 	
 	private static final String MENSAJE_ERROR_HAY_EXCEPCION = "Excepción no esperada: %s";
     
