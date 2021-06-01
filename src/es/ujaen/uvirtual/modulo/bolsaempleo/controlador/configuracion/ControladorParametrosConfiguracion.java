@@ -168,7 +168,7 @@ public class ControladorParametrosConfiguracion extends HttpServlet {
 		for (ParametrosConfiguracion param : parametros) {
 			param.setValor(EscapaHTML.ajustaCodificacion(request.getParameter(param.getNombre() + PARAM_VALOR)));
 			param.setDescripcion(EscapaHTML.ajustaCodificacion(request.getParameter(param.getNombre() + PARAM_DESCRIPCION)));
-			modelo.actualizaParametro(param);
+			modelo.actualizaParametro(param, bean.getUsuarioLogeado());
 		}
 		
 		List<ParametrosConfiguracion> parametrosCont = modelo.listaParametros();

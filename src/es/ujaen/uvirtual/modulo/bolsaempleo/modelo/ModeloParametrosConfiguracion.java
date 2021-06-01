@@ -9,6 +9,7 @@ import java.util.List;
 
 import es.ujaen.uvirtual.modelo.conexion.ConexionUvirtual;
 import es.ujaen.uvirtual.modulo.bolsaempleo.beans.ParametrosConfiguracion;
+import es.ujaen.uvirtual.modulo.bolsaempleo.beans.UsuarioBolsaEmpleo;
 import es.ujaen.uvirtual.utilidades.UVException;
 
 /**
@@ -59,7 +60,7 @@ public class ModeloParametrosConfiguracion {
 	 */
 	public List<ParametrosConfiguracion> listaParametros() throws SQLException {
 		List<ParametrosConfiguracion> parametros = new ArrayList<>();
-		String consulta = "SELECT * FROM ADM_PARAMETROS " + "WHERE PARAM_CODALF LIKE '%bolsaempleo%'";
+		String consulta = "SELECT * FROM ADM_PARAMETROS WHERE PARAM_CODALF LIKE '%bolsaempleo%'";
 
 		try (Connection conexion = ConexionUvirtual.obtenerInstancia();
 				PreparedStatement stmt = conexion.prepareStatement(consulta)) {
@@ -100,21 +101,20 @@ public class ModeloParametrosConfiguracion {
 	 * Actualiza un parametro de configuración.
 	 * 
 	 * @param param ParametrosConfiguracion con los datos nuevos a actualizar
+	 * @param usuarioUpdate .
 	 * @throws SQLException en caso de error en la BD
 	 * @throws UVException  en caso de errores de validacion
 	 */
-	public void actualizaParametro(ParametrosConfiguracion param) throws SQLException, UVException {
+	public void actualizaParametro(ParametrosConfiguracion param, UsuarioBolsaEmpleo usuarioUpdate) throws SQLException, UVException {
 		if (param == null) {
 			throw new UVException("parametro obligatorio");
 		}
 		if (param.getCodNum() == null) {
 			throw new UVException("id parametro no válido");
 		}
-		if (param.getAdm()) {
-			String consulta = "UPDATE ADM_PARAMETROS " + " SET DESID=?, VALOR=? "
-					+ " WHERE CONFIG_CODALF=? AND PARAM_CODALF=?";
-			try (Connection conexion = ConexionUvirtual.obtenerInstancia();
-					PreparedStatement stmt = conexion.prepareStatement(consulta);) {
+		if (Boolean.TRUE.equals(param.getAdm())) {
+			String consulta = "UPDATE ADM_PARAMETROS SET DESID=?, VALOR=? WHERE CONFIG_CODALF=? AND PARAM_CODALF=?";
+			try (Connection conexion = ConexionUvirtual.obtenerInstancia(); PreparedStatement stmt = conexion.prepareStatement(consulta)) {
 				int parameterIndex = 1;
 				stmt.setString(parameterIndex++, param.getDescripcion());
 				stmt.setString(parameterIndex++, param.getValor());
@@ -123,14 +123,13 @@ public class ModeloParametrosConfiguracion {
 				stmt.executeUpdate();
 			}
 		} else {
-			String consulta = "UPDATE TBEP_PARAMETROS_CONFIG " + " SET DESCRIPCION=?, VALOR=? "
-					+ " WHERE CODNUM=? AND NOMBRE=?";
-			try (Connection conexion = ConexionUvirtual.obtenerInstancia();
-					PreparedStatement stmt = conexion.prepareStatement(consulta);) {
+			String consulta = "UPDATE TBEP_PARAMETROS_CONFIG SET DESCRIPCION=?,VALOR=?,UID_USUARIO=? WHERE CODNUM=? AND NOMBRE=?";
+			try (Connection conexion = ConexionUvirtual.obtenerInstancia(); PreparedStatement stmt = conexion.prepareStatement(consulta)) {
 				int parameterIndex = 1;
 				stmt.setString(parameterIndex++, param.getDescripcion());
 				stmt.setString(parameterIndex++, param.getValor());
-				stmt.setString(parameterIndex++, param.getCodNum());
+				stmt.setString(parameterIndex++, usuarioUpdate.getCodCuenta());
+				stmt.setString(parameterIndex++, param.getCodNum());				
 				stmt.setString(parameterIndex++, param.getNombre());
 				stmt.executeUpdate();
 			}
@@ -172,11 +171,9 @@ public class ModeloParametrosConfiguracion {
 				}
 			}
 		} else {
-
 			String consulta = "SELECT * FROM ADM_PARAMETROS " + " WHERE PARAM_CODALF=?";
 
-			try (Connection conexion = ConexionUvirtual.obtenerInstancia();
-					PreparedStatement stmt = conexion.prepareStatement(consulta)) {
+			try (Connection conexion = ConexionUvirtual.obtenerInstancia(); PreparedStatement stmt = conexion.prepareStatement(consulta)) {
 				stmt.setString(1, nombre);
 
 				try (ResultSet rs = stmt.executeQuery()) {
