@@ -11,6 +11,7 @@ import java.util.Map;
 
 import es.ujaen.uvirtual.modelo.conexion.ConexionUvirtual;
 import es.ujaen.uvirtual.modulo.bolsaempleo.beans.Afinidad;
+import es.ujaen.uvirtual.modulo.bolsaempleo.beans.UsuarioBolsaEmpleo;
 import es.ujaen.uvirtual.modulo.bolsaempleo.utilidades.BolsaEmpleoDataTable;
 import es.ujaen.uvirtual.modulo.bolsaempleo.utilidades.BolsaEmpleoUtils;
 import es.ujaen.uvirtual.modulo.bolsaempleo.utilidades.BolsaEmpleoDataTable.DataTableColumn;
@@ -133,16 +134,17 @@ public class ModeloAfinidad {
 	/**
 	 * Añade una afinidad al sistema cerrada.
 	 * @param afinidad .	 
+	 * @param usuarioInsert .
 	 * @return id afinidad creada.
 	 * @throws UVException .
 	 * @throws SQLException .
 	 */
-	public Integer nuevaAfinidad(Afinidad afinidad) throws SQLException, UVException {
+	public Integer nuevaAfinidad(Afinidad afinidad, UsuarioBolsaEmpleo usuarioInsert) throws SQLException, UVException {
 		if (afinidad == null) {
 			throw new UVException(MENSAJE_ERROR_AFINIDAD_NULL);
 		}
 		
-		String consulta = "INSERT INTO TBEP_AFINIDADES (CODIGO, DESCRIPCION, MODULACION) VALUES (?, ?, ?)";
+		String consulta = "INSERT INTO TBEP_AFINIDADES (CODIGO, DESCRIPCION, MODULACION, UID_USUARIO) VALUES (?, ?, ?, ?)";
 			
 		try (Connection conexion = ConexionUvirtual.obtenerInstancia();
 				PreparedStatement stmt = conexion.prepareStatement(consulta, new String[]{CODNUM})) {
@@ -151,6 +153,7 @@ public class ModeloAfinidad {
 			stmt.setString(parameterIndex++, afinidad.getCodigo());
 			stmt.setString(parameterIndex++, afinidad.getDescripcion());
 			stmt.setDouble(parameterIndex++, afinidad.getModulacion());
+			stmt.setString(parameterIndex++, usuarioInsert.getCodCuenta());
 			stmt.executeUpdate();
 			
 			ResultSet rs = stmt.getGeneratedKeys();
@@ -205,10 +208,11 @@ public class ModeloAfinidad {
 		
 	/** Actualiza una afinidad.
 	 * @param afi Afinidad con los datos nuevos a actualizar
+	 * @param usuarioUpdate .
 	 * @throws SQLException en caso de error en la BD
 	 * @throws UVException en caso de errores de validacion
 	 */
-	public void actualizaAfinidad(Afinidad afi) throws SQLException, UVException {
+	public void actualizaAfinidad(Afinidad afi, UsuarioBolsaEmpleo usuarioUpdate) throws SQLException, UVException {
 		if (afi == null) {
 			throw new UVException(MENSAJE_AFINIDAD_OBLIGATORIA);
 		}
@@ -216,15 +220,14 @@ public class ModeloAfinidad {
 			throw new UVException(MENSAJE_AFINIDAD_CODNUM_REQUERIDO);
 		}
 		
-		String consulta = "UPDATE tbep_afinidades "
-			+ " SET CODIGO=?, DESCRIPCION=?, MODULACION=? "
-			+ " WHERE codnum=?";
+		String consulta = "UPDATE tbep_afinidades SET CODIGO=?, DESCRIPCION=?, MODULACION=?, UID_USUARIO=? WHERE codnum=?";
 		try (Connection conexion = ConexionUvirtual.obtenerInstancia();
 		PreparedStatement stmt = conexion.prepareStatement(consulta)) {
 			int parameterIndex = 1;
 			stmt.setString(parameterIndex++, afi.getCodigo());
 			stmt.setString(parameterIndex++, afi.getDescripcion());
 			stmt.setDouble(parameterIndex++, afi.getModulacion());
+			stmt.setString(parameterIndex++, usuarioUpdate.getCodCuenta());
 			stmt.setInt(parameterIndex++, afi.getCodNum());
 			stmt.executeUpdate();
 		}
@@ -232,19 +235,20 @@ public class ModeloAfinidad {
 	
 	/** Elimina afinidades.
 	 * @param afinidades Afinidades a borrar
+	 * @param usuarioUpdate .
 	 * @throws SQLException en caso de error en la BD
 	 * @throws UVException si afinidad no es valida
 	 */
-	public void borraAfinidades(Collection<Afinidad> afinidades) throws SQLException, UVException {
+	public void borraAfinidades(Collection<Afinidad> afinidades, UsuarioBolsaEmpleo usuarioUpdate) throws SQLException, UVException {
 		String params = BolsaEmpleoUtils.consultaMultiplesParametros(afinidades.size());
-		String query = "UPDATE tbep_afinidades SET FLGBORRADO= ?, FECHA_BORRADO = ? WHERE CODNUM IN (" + params + ")";		
+		String query = "UPDATE tbep_afinidades SET FLGBORRADO=?,FECHA_BORRADO=?,UID_USUARIO=? WHERE CODNUM IN (" + params + ")";		
 		try (Connection conexion = ConexionUvirtual.obtenerInstancia(); PreparedStatement stmt = conexion.prepareStatement(query)) {
 			int indexParam = 1;
 			stmt.setString(indexParam++, "S");
-			
-			stmt.setDate(indexParam++, (java.sql.Date) BolsaEmpleoUtils.getCurrentDate());
+			stmt.setDate(indexParam++, new java.sql.Date(BolsaEmpleoUtils.getCurrentDate().getTime()));
+			stmt.setString(indexParam++, usuarioUpdate.getCodCuenta());
 			for (Afinidad afiniad : afinidades) {
-				stmt.setInt(indexParam++, afiniad.getCodNum()); 	
+				stmt.setInt(indexParam++, afiniad.getCodNum());
 			}
 			stmt.executeUpdate();
 		}
