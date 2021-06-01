@@ -85,5 +85,6 @@ VALUES (
     3,
     'descripción mérito 9',
     'observación mérito 9',
+    hextoraw('453d7a34'),
     'CARGA_INICIAL'
 );
