@@ -798,7 +798,7 @@ public class ControladorItemsBaremacion extends HttpServlet {
 		ItemBaremacion item = this.validateItemBaremacion(new ItemBaremacion(), request);
 		item.setBloqueBaremacion(bloque);
 		item.setActivo(true);
-		ModeloBaremacionItems.obtenerInstancia().insertaItem(item);
+		ModeloBaremacionItems.obtenerInstancia().insertaItem(item, bean.getUsuarioLogeado());
 
 		bean.getMensajesDeExito().add(MENSAJE_EXITO_ITEM_AGREGAR);
 		bean.setVista(JSP_ITEM_BAREMACION);
@@ -831,7 +831,7 @@ public class ControladorItemsBaremacion extends HttpServlet {
 		bean.setBloqueBaremacion(item.getBloqueBaremacion());
 		bean.setItemBaremacion(item);
 
-		modelo.actualizaItem(this.validateItemBaremacion(item, request));
+		modelo.actualizaItem(this.validateItemBaremacion(item, request), bean.getUsuarioLogeado());
 
 		bean.getMensajesDeExito().add(MENSAJE_EXITO_ITEM_EDITAR);
 
@@ -844,7 +844,7 @@ public class ControladorItemsBaremacion extends HttpServlet {
 		ModeloBaremacionItems modelo = ModeloBaremacionItems.obtenerInstancia();
 		ItemBaremacion item = modelo.getItemBaremacionById(Formateador.leeParametroInteger(request.getParameter(PARAM_ITEM)));
 		
-		modelo.desactivarItem(item);		
+		modelo.desactivarItem(item, bean.getUsuarioLogeado());		
 		
 		bean.getMensajesDeExito().add(MENSAJE_EXITO_ITEM_DESACTIVAR);
 		this.seleccionarItem(bean, request);
@@ -856,7 +856,7 @@ public class ControladorItemsBaremacion extends HttpServlet {
 		ModeloBaremacionItems modelo = ModeloBaremacionItems.obtenerInstancia();
 		ItemBaremacion item = modelo.getItemBaremacionById(Formateador.leeParametroInteger(request.getParameter(PARAM_ITEM)));
 		
-		modelo.activarItem(item);
+		modelo.activarItem(item, bean.getUsuarioLogeado());
 		
 		bean.getMensajesDeExito().add(MENSAJE_EXITO_ITEM_ACTIVAR);
 		this.seleccionarItem(bean, request);			
@@ -889,9 +889,9 @@ public class ControladorItemsBaremacion extends HttpServlet {
 		ItemBaremacion itemHijo = modelo.getItemBaremacionById(Formateador.leeParametroInteger(request.getParameter(PARAM_ITEM_EXCLUYENTE)));
 
 		if (Boolean.TRUE.equals(seleccionado)) {
-			modelo.asignarItemsExcluyentesAItem(itemPadre, itemHijo);
+			modelo.asignarItemsExcluyentesAItem(itemPadre, itemHijo, bean.getUsuarioLogeado());
 		} else {
-			modelo.borrarItemsExcluyentesAItem(itemPadre, itemHijo);
+			modelo.borrarItemsExcluyentesAItem(itemPadre, itemHijo, bean.getUsuarioLogeado());
 		}
 
 		List<ItemBaremacion> listaItemsExcluyentes = modelo.getItemsExcluyentes(itemPadre);
