@@ -13,8 +13,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
-import javax.sql.DataSource;
-
 import org.junit.BeforeClass;
 import org.junit.FixMethodOrder;
 import org.junit.Test;
@@ -49,8 +47,10 @@ public class TestBEPModeloAfinidad {
      */
 	@BeforeClass
     public static void preparaBd() throws SQLException, IOException {
-		DataSource ds = BbddRunner.obtenerDataSourceUv();
-		Conexion.setConexionUvirtual(ds);
+		Conexion.setConexionUvirtual(BbddRunner.obtenerDataSourceUv());
+		Conexion.setConexionArcos(BbddRunner.obtenerDataSourceArcos());
+		Conexion.setConexionUxxiRrhh(BbddRunner.obtenerDataSourceRh());
+		Conexion.setConexionUxxiAc(BbddRunner.obtenerDataSourceAc());
 		UtilsTestBolsaEmpleo.inicializaBolsaEmpleo();
     }
     
@@ -66,7 +66,7 @@ public class TestBEPModeloAfinidad {
 			a.setCodigo(CODIGOEDITAR);
 			a.setDescripcion(DESCRIPCIONEDITAR);
 			a.setModulacion(MODULACIONEDITAR);			
-			ModeloAfinidad.obtenerInstancia().actualizaAfinidad(a);			
+			ModeloAfinidad.obtenerInstancia().actualizaAfinidad(a, UtilsTestBolsaEmpleo.getUsuarioCandidatoLogeado());			
 			Afinidad b = ModeloAfinidad.obtenerInstancia().getAfinidadById(codNum);
 			assertEquals(b.getCodigo(), CODIGOEDITAR);
 			assertEquals(b.getDescripcion(), DESCRIPCIONEDITAR);
@@ -131,7 +131,7 @@ public class TestBEPModeloAfinidad {
 	@Test
 	public void testE01nuevaAfinidad() {
 		Throwable throwable = assertThrows(Throwable.class,
-				() -> ModeloAfinidad.obtenerInstancia().nuevaAfinidad(null));
+				() -> ModeloAfinidad.obtenerInstancia().nuevaAfinidad(null, UtilsTestBolsaEmpleo.getUsuarioPersonalLogeado()));
 
 		assertEquals(UVException.class, throwable.getClass());
 		assertEquals(ModeloAfinidad.MENSAJE_ERROR_AFINIDAD_NULL, throwable.getMessage());
@@ -142,11 +142,14 @@ public class TestBEPModeloAfinidad {
 	 */
 	@Test
 	public void testE02actualizaAfinidad() {
-		Throwable throwable = assertThrows(Throwable.class, () -> ModeloAfinidad.obtenerInstancia().actualizaAfinidad(null));
+		Throwable throwable = assertThrows(Throwable.class, () -> 
+			ModeloAfinidad.obtenerInstancia().actualizaAfinidad(null, UtilsTestBolsaEmpleo.getUsuarioPersonalLogeado()));
 		assertEquals(UVException.class, throwable.getClass());
 		assertEquals(ModeloAfinidad.MENSAJE_AFINIDAD_OBLIGATORIA, throwable.getMessage());
 		
-		throwable = assertThrows(Throwable.class, () -> ModeloAfinidad.obtenerInstancia().actualizaAfinidad(new Afinidad()));
+		throwable = assertThrows(Throwable.class, () -> 
+			ModeloAfinidad.obtenerInstancia().actualizaAfinidad(new Afinidad(), UtilsTestBolsaEmpleo.getUsuarioPersonalLogeado()));
+		
 		assertEquals(UVException.class, throwable.getClass());
 		assertEquals(ModeloAfinidad.MENSAJE_AFINIDAD_CODNUM_REQUERIDO, throwable.getMessage());
 	}
@@ -169,7 +172,7 @@ public class TestBEPModeloAfinidad {
 		afinidad.setDescripcion(DESCRIPCION);
 		afinidad.setModulacion(MODULACION);
 		
-		int codNum = ModeloAfinidad.obtenerInstancia().nuevaAfinidad(afinidad);
+		int codNum = ModeloAfinidad.obtenerInstancia().nuevaAfinidad(afinidad, UtilsTestBolsaEmpleo.getUsuarioPersonalLogeado());
 		Afinidad anew = ModeloAfinidad.obtenerInstancia().getAfinidadById(codNum);
 		assertEquals(afinidad.getCodigo(), anew.getCodigo());
 		assertEquals(afinidad.getCodigoDescripcion(), anew.getCodigoDescripcion());
@@ -183,7 +186,7 @@ public class TestBEPModeloAfinidad {
 	private void borraAfinidad(Integer codNum) throws SQLException, UVException {
 		ArrayList<Afinidad> borrar = new ArrayList<>();
 		borrar.add(ModeloAfinidad.obtenerInstancia().getAfinidadById(codNum));		
-		ModeloAfinidad.obtenerInstancia().borraAfinidades(borrar);
+		ModeloAfinidad.obtenerInstancia().borraAfinidades(borrar, UtilsTestBolsaEmpleo.getUsuarioPersonalLogeado());
 		Afinidad borrada = ModeloAfinidad.obtenerInstancia().getAfinidadById(codNum);
 		assertEquals(borrada.getCodNum(), codNum);
 		assertTrue(borrada.getBorrada());
