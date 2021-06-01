@@ -218,9 +218,9 @@ public class ControladorFiltrarTitulacion extends HttpServlet {
 				}
 				
 				if (seleccionado) {
-					modeloTitulacion.validaTitulacion(titulacion, candidato, BolsaEmpleoUtils.getCurrentDate());
+					modeloTitulacion.validaTitulacion(titulacion, candidato, BolsaEmpleoUtils.getCurrentDate(), bean.getUsuarioLogeado());
 				} else {
-					modeloTitulacion.desvalidaTitulacion(titulacion, candidato);
+					modeloTitulacion.desvalidaTitulacion(titulacion, candidato, bean.getUsuarioLogeado());
 				}
 				
 				CodigoDescripcion mensaje = new CodigoDescripcion("ok", seleccionado ? "titulación validada" : "titulación no validada");
@@ -344,7 +344,7 @@ public class ControladorFiltrarTitulacion extends HttpServlet {
 					throw new UVException("Titulación requerida");
 				}
 				
-				ModeloMisTitulaciones.obtenerInstancia().cambiarTitulacion(titulacionUsuario, candidato, titulacion);
+				ModeloMisTitulaciones.obtenerInstancia().cambiarTitulacion(titulacionUsuario, candidato, titulacion, bean.getUsuarioLogeado());
 				CodigoDescripcion mensaje = new CodigoDescripcion("ok", "Titulación actualizada");
 				writer.write(new Gson().toJson(mensaje));				
 			} catch (UVException e) {
