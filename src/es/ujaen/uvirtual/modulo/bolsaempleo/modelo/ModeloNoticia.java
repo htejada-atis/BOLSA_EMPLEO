@@ -294,8 +294,8 @@ public class ModeloNoticia {
 		try (Connection conexion = ConexionUvirtual.obtenerInstancia(); PreparedStatement stmt = conexion.prepareStatement(consulta)) {
 			int parameterIndex = 1;
 			stmt.setString(parameterIndex++, Boolean.TRUE.equals(noticia.isActiva()) ? ACTIVA : INACTIVA);
-			stmt.setInt(parameterIndex++, noticia.getCodNum());
 			stmt.setString(parameterIndex++, usuario.getCodCuenta());
+			stmt.setInt(parameterIndex++, noticia.getCodNum());			
 			stmt.executeUpdate();
 		}
 	}
@@ -332,8 +332,8 @@ public class ModeloNoticia {
 			stmt.setString(parameterIndex++, noticia.getTexto());
 			stmt.setDate(parameterIndex++, new Date(noticia.getFecha().getTime()));
 			stmt.setString(parameterIndex++, Boolean.TRUE.equals(noticia.isPublica()) ? PUBLICA : PRIVADA);
-			stmt.setInt(parameterIndex++, noticia.getCodNum());
 			stmt.setString(parameterIndex++, usuario.getCodCuenta());
+			stmt.setInt(parameterIndex++, noticia.getCodNum());			
 			stmt.executeUpdate();
 		}
 	}

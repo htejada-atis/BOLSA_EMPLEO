@@ -161,8 +161,10 @@ public class ControladorFiltrarAcreditaciones extends HttpServlet {
 		switch (nombreAccion) {
 			case ACCION_ACREDITACION_DESELECCIONADA:
 				seleccionarAcreditacion(bean, datos, request, response, false);
+				break;
 			case ACCION_ACREDITACION_SELECCIONADA:
 				seleccionarAcreditacion(bean, datos, request, response, true);
+				break;
 			case ACCION_CANDIDATO_SELECCIONADO:
 				obtenerCodigoPadreAcreditacion(bean);
 				break;
