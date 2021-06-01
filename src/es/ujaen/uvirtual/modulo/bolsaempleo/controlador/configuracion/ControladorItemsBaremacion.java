@@ -391,7 +391,7 @@ public class ControladorItemsBaremacion extends HttpServlet {
 		Integer codNum = Formateador.leeParametroInteger(request.getParameter(PARAM_APARTADO));
 		ApartadoBaremacion apartado = modelo.getApartadoBaremacionById(codNum);
 		
-		modelo.desactivarApartado(apartado);
+		modelo.desactivarApartado(apartado, bean.getUsuarioLogeado());
 		
 		BolsaEmpleoUtils.addMensajeDeExito(MENSAJE_EXITO_APARTADO_DESACTIVAR, bean, request);
 		response.sendRedirect(request.getServletPath());
@@ -404,7 +404,7 @@ public class ControladorItemsBaremacion extends HttpServlet {
 		Integer codNum = Formateador.leeParametroInteger(request.getParameter(PARAM_APARTADO));
 		ApartadoBaremacion apartado = modelo.getApartadoBaremacionById(codNum);
 		
-		modelo.activarApartado(apartado);
+		modelo.activarApartado(apartado, bean.getUsuarioLogeado());
 		
 		BolsaEmpleoUtils.addMensajeDeExito(MENSAJE_EXITO_APARTADO_ACTIVAR, bean, request);
 		response.sendRedirect(request.getServletPath());
@@ -427,7 +427,7 @@ public class ControladorItemsBaremacion extends HttpServlet {
 		bean.setVista(JSP_FORM_APARTADO_BAREMACION);
 		bean.setApartadoBaremacion(apartado);
 		
-		modelo.actualizaApartado(apartado);
+		modelo.actualizaApartado(apartado, bean.getUsuarioLogeado());
 		
 		bean.getMensajesDeExito().add(MENSAJE_EXITO_APARTADO_EDITAR);
 		

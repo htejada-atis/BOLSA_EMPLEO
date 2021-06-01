@@ -209,33 +209,36 @@ public class ModeloBaremacionApartados {
 	/** 
 	 * Desactiva un apartado de baremación.
 	 * @param apartado .
+	 * @param usuarioUpdate .
 	 * @throws SQLException .
 	 * @throws UVException .
 	 */
-	public void desactivarApartado(ApartadoBaremacion apartado) throws SQLException {
-		this.activaDesactivaApartado(apartado, false);
+	public void desactivarApartado(ApartadoBaremacion apartado, UsuarioBolsaEmpleo usuarioUpdate) throws SQLException {
+		this.activaDesactivaApartado(apartado, false, usuarioUpdate);
 	}
 	
 	/** 
 	 * Actia un apartado de baremación.
 	 * @param apartado .
+	 * @param usuarioUpdate .
 	 * @throws SQLException .
 	 * @throws UVException .
 	 */
-	public void activarApartado(ApartadoBaremacion apartado) throws SQLException {
-		this.activaDesactivaApartado(apartado, true);
+	public void activarApartado(ApartadoBaremacion apartado, UsuarioBolsaEmpleo usuarioUpdate) throws SQLException {
+		this.activaDesactivaApartado(apartado, true, usuarioUpdate);
 	}
 	
 	/** Actualiza un apartado .
 	 * @param apartado con los datos nuevos a actualizar .
+	 * @param usuarioUpdate .
 	 * @throws SQLException en caso de error en la BD .
 	 * @throws UVException en caso de errores de validacion .
 	 */
-	public void actualizaApartado(ApartadoBaremacion apartado) throws SQLException, UVException {
+	public void actualizaApartado(ApartadoBaremacion apartado, UsuarioBolsaEmpleo usuarioUpdate) throws SQLException, UVException {
 		this.chequearApartadoParaInsertarOActualizar(apartado);
 		
 		String consulta = "UPDATE TBEP_APARTADOSBAREMACION SET "
-				+ "CODIGO=?, NOMBRE=?, FLGACTIVO=?, PUNTUACIONMAXIMA=?, PORCENTAJEMAXIMO=? WHERE CODNUM =?";
+				+ "CODIGO=?,NOMBRE=?,FLGACTIVO=?,PUNTUACIONMAXIMA=?,PORCENTAJEMAXIMO=?,UID_USUARIO=? WHERE CODNUM =?";
 		
 		try (Connection conexion = ConexionUvirtual.obtenerInstancia(); PreparedStatement stmt = conexion.prepareStatement(consulta)) {
 			int parameterIndex = 1;
@@ -251,6 +254,7 @@ public class ModeloBaremacionApartados {
 				stmt.setFloat(parameterIndex++, apartado.getPorcentajeMaximo());
 			}
 			
+			stmt.setString(parameterIndex++, usuarioUpdate.getCodCuenta());
 			stmt.setInt(parameterIndex++, apartado.getCodNum());
 			stmt.executeUpdate();
 		}		
@@ -365,13 +369,14 @@ public class ModeloBaremacionApartados {
 		return apartado;
 	}
 	
-	private void activaDesactivaApartado(ApartadoBaremacion apartado, Boolean activo) throws SQLException {
-		String consulta = "UPDATE TBEP_APARTADOSBAREMACION SET FLGACTIVO = ? WHERE CODNUM = ?";
+	private void activaDesactivaApartado(ApartadoBaremacion apartado, Boolean activo, UsuarioBolsaEmpleo usuarioUpdate) throws SQLException {
+		String consulta = "UPDATE TBEP_APARTADOSBAREMACION SET FLGACTIVO = ?, UID_USUARIO = ? WHERE CODNUM = ?";
 		
 		try (Connection conexion = ConexionUvirtual.obtenerInstancia(); PreparedStatement stmt = conexion.prepareStatement(consulta)) {
 			int parameterIndex = 1;
 			
 			stmt.setString(parameterIndex++, Boolean.TRUE.equals(activo) ? "S" : "N");
+			stmt.setString(parameterIndex++, usuarioUpdate.getCodCuenta());
 			stmt.setInt(parameterIndex++, apartado.getCodNum());
 			stmt.executeUpdate();
 		}	
