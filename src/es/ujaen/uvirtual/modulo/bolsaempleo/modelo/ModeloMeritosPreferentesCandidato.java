@@ -37,6 +37,9 @@ public class ModeloMeritosPreferentesCandidato {
 	public static final String ERROR_ID_USUARIO_NO_VALIDO = "Id usuario no válido";
 	public static final String ERROR_SIN_MERITO_PREFERENTE = "Mérito preferente requerido";
 	
+	private static final String BORRADO = "S";
+	private static final String VALIDADO = "S";
+		
 	protected static ModeloMeritosPreferentesCandidato eInstancia;
 
 	/** Crea una instancia del objeto.
@@ -117,10 +120,11 @@ public class ModeloMeritosPreferentesCandidato {
 	/**
 	 * Inserta un merito preferente del candidato.
 	 * @param mp .
+	 * @param usuarioInsert .
 	 * @throws SQLException .
 	 */
-	public void insertaMeritoUsuario(MeritoPreferenteUsuario mp) throws SQLException {
-		String consulta = "INSERT INTO TBEP_MER_PRE_USUARIO (BEPMEP_CODNUM,BEPUSU_CODNUM,BEPMPO_CODNUM,DESCRIPCION,ARCHIVO) VALUES (?,?,?,?,?)";
+	public void insertaMeritoUsuario(MeritoPreferenteUsuario mp, UsuarioBolsaEmpleo usuarioInsert) throws SQLException {
+		String consulta = "INSERT INTO TBEP_MER_PRE_USUARIO (BEPMEP_CODNUM,BEPUSU_CODNUM,BEPMPO_CODNUM,DESCRIPCION,ARCHIVO,UID_USUARIO) VALUES (?,?,?,?,?,?)";
 		
 		try (Connection conexion = ConexionUvirtual.obtenerInstancia(); PreparedStatement stmt = conexion.prepareStatement(consulta)) {
 			int parameterIndex = 1;
@@ -133,6 +137,7 @@ public class ModeloMeritosPreferentesCandidato {
 			}
 			stmt.setString(parameterIndex++, mp.getDescripcion());
 			stmt.setBinaryStream(parameterIndex++, mp.getArchivo());
+			stmt.setString(parameterIndex++, usuarioInsert.getCodCuenta());
 			stmt.executeUpdate();
 		}
 	}
@@ -209,9 +214,9 @@ public class ModeloMeritosPreferentesCandidato {
 		}		
 		obj.setDescripcion(rs.getString("DESCRIPCION"));
 		obj.setArchivo(rs.getBinaryStream("ARCHIVO"));
-		obj.setBorrado(rs.getString("FLGBORRADO").equals("S"));
+		obj.setBorrado(rs.getString("FLGBORRADO").equals(BORRADO));
 		obj.setFechaBorrado(rs.getDate("FECHA_BORRADO"));
-		obj.setValidado(rs.getString("FLGVALIDADO").equals("S"));
+		obj.setValidado(rs.getString("FLGVALIDADO").equals(VALIDADO));
 		obj.setFechaValidado(rs.getDate("FECHA_VALIDADO"));
 		return obj;
 	}
@@ -220,20 +225,19 @@ public class ModeloMeritosPreferentesCandidato {
 	/**
 	 * cambia flag de meritos a borrado.
 	 * @param meritos .
+	 * @param usuarioUpdate .
 	 * @throws SQLException .
 	 */
-	public void cambiarFlagBorradoMeritos(List<MeritoPreferenteUsuario> meritos) throws SQLException {
+	public void cambiarFlagBorradoMeritos(List<MeritoPreferenteUsuario> meritos, UsuarioBolsaEmpleo usuarioUpdate) throws SQLException {
 		String params = BolsaEmpleoUtils.consultaMultiplesParametros(meritos.size());
-		String query = "UPDATE TBEP_MER_PRE_USUARIO SET FLGBORRADO = ?, FECHA_BORRADO = ? WHERE CODNUM IN  (" + params + ")";		
+		String query = "UPDATE TBEP_MER_PRE_USUARIO SET FLGBORRADO=?,FECHA_BORRADO=?,UID_USUARIO=? WHERE CODNUM IN  (" + params + ")";		
 				
 		try (Connection conexion = ConexionUvirtual.obtenerInstancia(); PreparedStatement stmt = conexion.prepareStatement(query)) {
 			int indexParam = 1;
 
 			stmt.setString(indexParam++, "S");
-			
-			Date date = BolsaEmpleoUtils.getCurrentDate();
-			
-			stmt.setDate(indexParam++, new java.sql.Date(date.getTime()));
+			stmt.setDate(indexParam++, new java.sql.Date(BolsaEmpleoUtils.getCurrentDate().getTime()));
+			stmt.setString(indexParam++, usuarioUpdate.getCodCuenta());
 			for (MeritoPreferenteUsuario mer : meritos) {
 				stmt.setInt(indexParam++, mer.getCodNum()); 
 			}
@@ -245,17 +249,17 @@ public class ModeloMeritosPreferentesCandidato {
 	 * Desvalida una acreditacion .
 	 * @param acreditacion .
 	 * @param candidato .
+	 * @param usuarioUpdate .
 	 * @throws SQLException .
 	 * @throws UVException .
 	 */
-	public void desvalidaAcreditacion(MeritoPreferenteUsuario acreditacion, UsuarioBolsaEmpleo candidato) throws SQLException, UVException {
+	public void desvalidaAcreditacion(MeritoPreferenteUsuario acreditacion, UsuarioBolsaEmpleo candidato, UsuarioBolsaEmpleo usuarioUpdate) throws SQLException, UVException {
 		checkeosValidadDesvalida(acreditacion, candidato);
 		
-		String consulta = "UPDATE TBEP_MER_PRE_USUARIO "
-				+ "	SET FLGVALIDADO = 'N', FECHA_VALIDADO = null"
-				+ " WHERE CODNUM = ? AND BEPUSU_CODNUM = ?";
+		String consulta = "UPDATE TBEP_MER_PRE_USUARIO SET FLGVALIDADO='N', FECHA_VALIDADO=null, UID_USUARIO=? WHERE CODNUM = ? AND BEPUSU_CODNUM = ?";
 		try (Connection conexion = ConexionUvirtual.obtenerInstancia(); PreparedStatement stmt = conexion.prepareStatement(consulta)) {
 			int parameterIndex = 1;
+			stmt.setString(parameterIndex++, usuarioUpdate.getCodCuenta());
 			stmt.setInt(parameterIndex++, acreditacion.getCodNum());
 			stmt.setInt(parameterIndex++, candidato.getCodNum());
 			stmt.executeUpdate();
@@ -267,18 +271,19 @@ public class ModeloMeritosPreferentesCandidato {
 	 * @param acreditacion .
 	 * @param candidato .
 	 * @param date .
+	 * @param usuarioUpdate .
 	 * @throws SQLException .
 	 * @throws UVException .
 	 */
-	public void validaAcreditacion(MeritoPreferenteUsuario acreditacion, UsuarioBolsaEmpleo candidato, Date date) throws SQLException, UVException {
+	public void validaAcreditacion(MeritoPreferenteUsuario acreditacion, UsuarioBolsaEmpleo candidato, Date date, UsuarioBolsaEmpleo usuarioUpdate) 
+			throws SQLException, UVException {
 		checkeosValidadDesvalida(acreditacion, candidato);
 		
-		String consulta = "UPDATE TBEP_MER_PRE_USUARIO "
-				+ "	SET FLGVALIDADO = 'S', FECHA_VALIDADO = ?"
-				+ " WHERE CODNUM = ? AND BEPUSU_CODNUM = ?";
+		String consulta = "UPDATE TBEP_MER_PRE_USUARIO SET FLGVALIDADO='S', FECHA_VALIDADO=?, UID_USUARIO=? WHERE CODNUM = ? AND BEPUSU_CODNUM = ?";
 		try (Connection conexion = ConexionUvirtual.obtenerInstancia(); PreparedStatement stmt = conexion.prepareStatement(consulta)) {
 			int parameterIndex = 1;
 			stmt.setDate(parameterIndex++, new java.sql.Date(date.getTime()));
+			stmt.setString(parameterIndex++, usuarioUpdate.getCodCuenta());
 			stmt.setInt(parameterIndex++, acreditacion.getCodNum());
 			stmt.setInt(parameterIndex++, candidato.getCodNum());
 			stmt.executeUpdate();
