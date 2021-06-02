@@ -72,7 +72,7 @@ public class ModeloUsuarioBolsaEmpleo {
 	public static final String MENSAJE_BUSCAR_USUARIO_NO_EXISTE = "El usuario no existe en el sistema: introduzca cuenta TIC sin @ujaen.es";
 	public static final String MENSAJE_ERROR_DOCUMENTO_REQUERIDO = "El documento es requerido";
 	public static final String MENSAJE_ERROR_USUARIO_CON_DOCUMENTO_NO_EXISTE = "No existe el usuario con el documento indicado";
-	public static final String MENSAJE_ERROR_USUARIO_UJA_CON_DOCUMENTO_NO_EXISTE = "No existe el usuario en UJA con el documento indicado";
+	public static final String MENSAJE_ERROR_USUARIO_UJA_CON_DOCUMENTO_NO_EXISTE = "No existe el usuario en UJA con el documento indicado [%s]";
 	public static final String MENSAJE_ERROR_USUARIO_CON_ID_NO_EXISTE = "No existe el usuario con el id indicando";
 	public static final String MENSAJE_ERROR_NO_HAY_USUARIO_LOGEADO = "No hay usuario logeado";
 	public static final String MENSAJE_ERROR_USUARIO_BORRADO = "El usuario está borrado de la bolsa de empleo";
@@ -130,7 +130,7 @@ public class ModeloUsuarioBolsaEmpleo {
 				if (!rsArcos.next()) {
 					LOGGER.log(Level.SEVERE,
 							String.format("No existe el usuario en VUJA_NET_BEP_AR_PERSONA [%s]", documento));
-					throw new UVException(MENSAJE_ERROR_USUARIO_UJA_CON_DOCUMENTO_NO_EXISTE);
+					throw new UVException(String.format(MENSAJE_ERROR_USUARIO_UJA_CON_DOCUMENTO_NO_EXISTE, documento));
 				}
 
 				if (!rs.next()) {
@@ -164,11 +164,13 @@ public class ModeloUsuarioBolsaEmpleo {
 				if (!rs.next()) {
 					throw new UVException(MENSAJE_ERROR_USUARIO_CON_ID_NO_EXISTE);
 				}
-
-				stmtArcos.setString(1, rs.getString("PRSNIF"));
+				
+				String documento = rs.getString("PRSNIF");
+				stmtArcos.setString(1, documento);
+				
 				try (ResultSet rsArcos = stmtArcos.executeQuery()) {
 					if (!rsArcos.next()) {
-						throw new UVException(MENSAJE_ERROR_USUARIO_UJA_CON_DOCUMENTO_NO_EXISTE);
+						throw new UVException(String.format(MENSAJE_ERROR_USUARIO_UJA_CON_DOCUMENTO_NO_EXISTE, documento));
 					}
 
 					return setUsuario(rs, rsArcos);
@@ -265,11 +267,13 @@ public class ModeloUsuarioBolsaEmpleo {
 				if (!rs.next()) {
 					throw new UVException(MENSAJE_ERROR_USUARIO_CON_DOCUMENTO_NO_EXISTE);
 				}
+				
+				String documento = rs.getString("PRSNIF");
 
-				stmtArcos.setString(1, rs.getString("PRSNIF"));
+				stmtArcos.setString(1, documento);
 				try (ResultSet rsArcos = stmtArcos.executeQuery()) {
 					if (!rsArcos.next()) {
-						throw new UVException(MENSAJE_ERROR_USUARIO_UJA_CON_DOCUMENTO_NO_EXISTE);
+						throw new UVException(String.format(MENSAJE_ERROR_USUARIO_UJA_CON_DOCUMENTO_NO_EXISTE, documento));
 					}
 
 					return setUsuario(rs, rsArcos);
@@ -300,12 +304,15 @@ public class ModeloUsuarioBolsaEmpleo {
 				while (rs.next()) {
 					String consultaArcos = "SELECT * FROM arcos.VUJA_NET_BEP_AR_PERSONA WHERE PRSNIF = ?";
 
-					try (Connection conexionArcos = ConexionArcos.obtenerInstancia();
+					try (Connection conexionArcos = ConexionArcos.obtenerInstancia(); 
 							PreparedStatement stmtArcos = conexionArcos.prepareStatement(consultaArcos)) {
-						stmtArcos.setString(1, rs.getString("PRSNIF"));
+						
+						String documento = rs.getString("PRSNIF");
+						stmtArcos.setString(1, documento);
+						
 						try (ResultSet rsArcos = stmtArcos.executeQuery()) {
 							if (!rsArcos.next()) {
-								throw new UVException(MENSAJE_ERROR_USUARIO_UJA_CON_DOCUMENTO_NO_EXISTE);
+								throw new UVException(String.format(MENSAJE_ERROR_USUARIO_UJA_CON_DOCUMENTO_NO_EXISTE, documento));
 							}
 
 							UsuarioBolsaEmpleo usuario = setUsuario(rs, rsArcos);
@@ -352,10 +359,11 @@ public class ModeloUsuarioBolsaEmpleo {
 					String consultaArcos = "SELECT * FROM arcos.VUJA_NET_BEP_AR_PERSONA WHERE PRSNIF = ?";
 
 					try (PreparedStatement stmtArcos = conexionArcos.prepareStatement(consultaArcos)) {
-						stmtArcos.setString(1, rs.getString("PRSNIF"));
+						String documento = rs.getString("PRSNIF");
+						stmtArcos.setString(1, documento);
 						try (ResultSet rsArcos = stmtArcos.executeQuery()) {
 							if (!rsArcos.next()) {
-								throw new UVException(MENSAJE_ERROR_USUARIO_UJA_CON_DOCUMENTO_NO_EXISTE);
+								throw new UVException(String.format(MENSAJE_ERROR_USUARIO_UJA_CON_DOCUMENTO_NO_EXISTE, documento));
 							}
 
 							UsuarioBolsaEmpleo usuario = setUsuario(rs, rsArcos);
@@ -399,10 +407,11 @@ public class ModeloUsuarioBolsaEmpleo {
 					String consultaArcos = "SELECT * FROM arcos.VUJA_NET_BEP_AR_PERSONA WHERE PRSNIF = ?";
 
 					try (PreparedStatement stmtArcos = conexionArcos.prepareStatement(consultaArcos)) {
-						stmtArcos.setString(1, rs.getString("PRSNIF"));
+						String documento = rs.getString("PRSNIF");
+						stmtArcos.setString(1, documento);
 						try (ResultSet rsArcos = stmtArcos.executeQuery()) {
 							if (!rsArcos.next()) {
-								throw new UVException(MENSAJE_ERROR_USUARIO_UJA_CON_DOCUMENTO_NO_EXISTE);
+								throw new UVException(String.format(MENSAJE_ERROR_USUARIO_UJA_CON_DOCUMENTO_NO_EXISTE, documento));
 							}
 
 							UsuarioBolsaEmpleo usuario = setUsuario(rs, rsArcos);
@@ -446,10 +455,11 @@ public class ModeloUsuarioBolsaEmpleo {
 					String consultaArcos = "SELECT * FROM arcos.VUJA_NET_BEP_AR_PERSONA WHERE PRSNIF = ?";
 
 					try (PreparedStatement stmtArcos = conexionArcos.prepareStatement(consultaArcos)) {
-						stmtArcos.setString(1, rs.getString("PRSNIF"));
+						String documento = rs.getString("PRSNIF");
+						stmtArcos.setString(1, documento);
 						try (ResultSet rsArcos = stmtArcos.executeQuery()) {
 							if (!rsArcos.next()) {
-								throw new UVException(MENSAJE_ERROR_USUARIO_UJA_CON_DOCUMENTO_NO_EXISTE);
+								throw new UVException(String.format(MENSAJE_ERROR_USUARIO_UJA_CON_DOCUMENTO_NO_EXISTE, documento));
 							}
 
 							UsuarioBolsaEmpleo usuario = setUsuario(rs, rsArcos);

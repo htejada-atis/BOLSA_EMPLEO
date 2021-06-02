@@ -425,8 +425,8 @@ public class TestBEPModeloUsuarios {
 				getUsuarioByNumeroDocumento(DOCUMENTO_USUARIO_BOLSA_NO_EXISTE));
 
 		assertEquals(UVException.class, throwable.getClass());
-		assertEquals(ModeloUsuarioBolsaEmpleo.MENSAJE_ERROR_USUARIO_UJA_CON_DOCUMENTO_NO_EXISTE,
-				throwable.getMessage());
+		assertEquals(String.format(ModeloUsuarioBolsaEmpleo.MENSAJE_ERROR_USUARIO_UJA_CON_DOCUMENTO_NO_EXISTE, 
+				DOCUMENTO_USUARIO_BOLSA_NO_EXISTE), throwable.getMessage());
 
 		throwable = assertThrows(Throwable.class, () -> ModeloUsuarioBolsaEmpleo.obtenerInstancia().
 				getUsuarioByNumeroDocumento(DOCUMENTO_USUARIO_UJA_NO_EXISTE));
