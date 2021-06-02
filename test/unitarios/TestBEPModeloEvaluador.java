@@ -1,12 +1,12 @@
 package unitarios;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 import java.io.IOException;
 import java.sql.SQLException;
 import java.text.ParseException;
-import java.util.Date;
-import java.util.List;
 import org.junit.BeforeClass;
 import org.junit.FixMethodOrder;
 import org.junit.Test;
@@ -16,27 +16,19 @@ import bbdd.BbddRunner;
 import bbdd.UtilsTestBolsaEmpleo;
 import es.ujaen.uvirtual.modelo.conexion.Conexion;
 import es.ujaen.uvirtual.modulo.bolsaempleo.beans.Evaluador;
-import es.ujaen.uvirtual.modulo.bolsaempleo.beans.Rol;
 import es.ujaen.uvirtual.modulo.bolsaempleo.beans.UsuarioBolsaEmpleo;
 import es.ujaen.uvirtual.modulo.bolsaempleo.modelo.ModeloEvaluador;
-import es.ujaen.uvirtual.modulo.bolsaempleo.utilidades.BolsaEmpleoUtils;
 import es.ujaen.uvirtual.utilidades.UVException;
 
 
 /** Clase para probar el modelo evaluador. */
 @FixMethodOrder(MethodSorters.NAME_ASCENDING)
 public class TestBEPModeloEvaluador {
-	private static final Integer CODNUM = 1000;
-	private static final String CODCUENTA = "test2";
-	private static final Rol ROL = new Rol(1050);
-	private static final String EMAIL = "test@test";
-	private static final String RAZONEXCLUIDO = "test";
-	private static final Boolean LISTADIST = true;
-	private static final Boolean EXCLUIDO = false;
-	private static final Boolean BORRADO = true;
-	private static final Date FECHAEXCLUSION = new java.sql.Date(BolsaEmpleoUtils.getCurrentDateTime().getTime());
-	private static final Date FECHABORRADO = new java.sql.Date(BolsaEmpleoUtils.getCurrentDateTime().getTime());
+	private static final Integer CODNUM = 3;  // comision1
+	private static final String CODCUENTA = "comision1";
 	private static final Integer AREA = 3;
+	
+	private static final String MENSAJE_ERROR_HAY_EXCEPCION = "Excepción no esperada: %s";
     
 	/** prepara la bd con los datos iniciales.
      * @throws SQLException si error en bd
@@ -58,36 +50,23 @@ public class TestBEPModeloEvaluador {
      * @throws ParseException si error al validar fecha
      */
 	@Test
-	public void testA01InsertaEvaluador() throws SQLException, ParseException, UVException {
-		Evaluador evaluador = new Evaluador();
-		evaluador.setCodNum(CODNUM);
-		evaluador.setCodCuenta(CODCUENTA);
-		evaluador.setRol(ROL);
-		evaluador.setEmail(EMAIL);
-		evaluador.setListaDist(LISTADIST);
-		evaluador.setExcluido(EXCLUIDO);
-		evaluador.setRazonExcluido(RAZONEXCLUIDO);
-		evaluador.setFechaExclusion(FECHAEXCLUSION);
-		evaluador.setBorrado(BORRADO);
-		evaluador.setFechaBorrado(FECHABORRADO);
-		evaluador.setCodNumArea(AREA);
-
-		ModeloEvaluador.obtenerInstancia().insertaEvaluador(evaluador, AREA, UtilsTestBolsaEmpleo.getUsuarioPersonalLogeado());
-	}
-
-    /** test acierto borrar evaluador.
-     * @throws SQLException si error en bd
-     * @throws UVException si error al validar evaluador 
-     */
-	@Test
-	public void testA02BorraEvaluador() throws SQLException, UVException {
-		ModeloEvaluador modelo = ModeloEvaluador.obtenerInstancia();
-		List<Evaluador> evaluadores = modelo.listaEvaluadores();
-		Evaluador evaluador = evaluadores.get(evaluadores.size() - 1);
-		Evaluador evaluadorAcum = modelo.getEvaluadorById(evaluador.getCodNum());
-		modelo.borraRestauraEvaluador(evaluador, UtilsTestBolsaEmpleo.getUsuarioPersonalLogeado());
-
-		assertTrue("evaluador borrado no debe ser listado", !evaluadorAcum.getBorrado().equals(evaluador.getBorrado()));
+	public void testA01InsertaYBorraEvaluador() {
+		try {
+			Evaluador evaluador = insertaUsuario(AREA);
+			Boolean activo = evaluador.isActivo();
+			evaluador.setActivo(!activo);
+			
+			ModeloEvaluador.obtenerInstancia().borraRestauraEvaluador(evaluador, UtilsTestBolsaEmpleo.getUsuarioPersonalLogeado());
+			evaluador = ModeloEvaluador.obtenerInstancia().getEvaluadorById(evaluador.getCodNum(), evaluador.getCodNumArea());
+			
+			if (Boolean.TRUE.equals(activo)) {
+				assertFalse(evaluador.isActivo());
+			} else {
+				assertTrue(evaluador.isActivo());
+			}
+		} catch (SQLException | UVException ex) {
+			fail(String.format(MENSAJE_ERROR_HAY_EXCEPCION, ex.toString()));
+		}
 	}
     
     /** test error inserta usuario null.
@@ -100,5 +79,23 @@ public class TestBEPModeloEvaluador {
 		ModeloEvaluador modelo = ModeloEvaluador.obtenerInstancia();
 		modelo.insertaEvaluador(evaluador, AREA, UtilsTestBolsaEmpleo.getUsuarioPersonalLogeado());
 		fail();
+	}
+	
+	private Evaluador insertaUsuario(Integer idArea) throws SQLException, UVException {
+		Evaluador evaluador = new Evaluador();
+		evaluador.setCodNum(CODNUM);
+		
+		// comprobamos si existe
+		Evaluador eva = ModeloEvaluador.obtenerInstancia().getEvaluadorById(CODNUM, idArea);		
+		if (eva == null) {
+			ModeloEvaluador.obtenerInstancia().insertaEvaluador(evaluador, idArea, UtilsTestBolsaEmpleo.getUsuarioPersonalLogeado());
+			eva = ModeloEvaluador.obtenerInstancia().getEvaluadorById(CODNUM, idArea);
+			
+			assertEquals(eva.getCodNum(), CODNUM);
+			assertEquals(eva.getCodCuenta(), CODCUENTA);
+			assertEquals(eva.getCodNumArea(), AREA);
+		}
+		
+		return eva; 		
 	}
 }

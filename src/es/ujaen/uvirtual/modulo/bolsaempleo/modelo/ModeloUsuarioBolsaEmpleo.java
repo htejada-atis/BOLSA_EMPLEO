@@ -946,10 +946,9 @@ public class ModeloUsuarioBolsaEmpleo {
 
 		// comprobamos si está borrado o excluido
 		if (Boolean.TRUE.equals(usuario.getExcluido())) {
-			throw new UVException("No puede acceder, su perfil ha sido excluido por los siguientes motivos: "
-					+ usuario.getRazonExcluido());
+			throw new UVException(String.format("No puede acceder, su perfil ha sido excluido: [%s]", usuario.getCodCuenta()));
 		} else if (Boolean.TRUE.equals(usuario.getBorrado())) {
-			throw new UVException("No puede acceder, su perfil ha sido borrado de la base de datos");
+			throw new UVException(String.format("No puede acceder, su perfil ha sido borrado de la base de datos: [%s]", usuario.getCodCuenta()));
 		}
 
 		LOGGER.log(Level.FINER,
@@ -980,28 +979,6 @@ public class ModeloUsuarioBolsaEmpleo {
 			try (ResultSet rs = stmt.executeQuery()) {
 				return rs.next();
 			}
-		}
-	}
-
-	/**
-	 * Elimina un usuario.
-	 * 
-	 * @param usuario a borrar
-	 * @throws SQLException en caso de error en la BD
-	 * @throws UVException  si noticia no es valida
-	 */
-	public void borraUsuario(UsuarioBolsaEmpleo usuario) throws SQLException, UVException {
-		if (usuario == null) {
-			throw new UVException("No se puede eliminar un usuario vacía");
-		}
-		if (usuario.getCodNum() == null) {
-			throw new UVException("No se puede eliminar un usuario con id vacío");
-		}
-		String consulta = "DELETE FROM tbep_usuarios WHERE codnum = ? ";
-		try (Connection conexion = ConexionUvirtual.obtenerInstancia(); PreparedStatement stmt = conexion.prepareStatement(consulta)) {
-			int parameterIndex = 1;
-			stmt.setInt(parameterIndex++, usuario.getCodNum());
-			stmt.executeUpdate();
 		}
 	}
 
