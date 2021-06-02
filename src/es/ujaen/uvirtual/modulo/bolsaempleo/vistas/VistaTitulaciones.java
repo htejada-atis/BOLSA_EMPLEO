@@ -2,8 +2,10 @@ package es.ujaen.uvirtual.modulo.bolsaempleo.vistas;
 
 import java.io.Serializable;
 
+import es.ujaen.uvirtual.beans.vistas.Vista;
 import es.ujaen.uvirtual.modulo.bolsaempleo.beans.Titulacion;
 import es.ujaen.uvirtual.modulo.bolsaempleo.beans.TitulacionUsuario;
+import es.ujaen.uvirtual.modulo.bolsaempleo.beans.UsuarioBolsaEmpleo;
 import es.ujaen.uvirtual.modulo.bolsaempleo.utilidades.BolsaEmpleoDataTable;
 
 /**
@@ -11,12 +13,30 @@ import es.ujaen.uvirtual.modulo.bolsaempleo.utilidades.BolsaEmpleoDataTable;
  * 
  * @author ATISoluciones 2021
  */
-public class VistaTitulaciones extends VistaBEP implements Serializable {
+public class VistaTitulaciones extends Vista implements Serializable {
 	private static final long serialVersionUID = 1L;
-	private BolsaEmpleoDataTable<Titulacion> dataTable;
-	private BolsaEmpleoDataTable<TitulacionUsuario> dataTableUsuario;
+	private transient BolsaEmpleoDataTable<Titulacion> dataTable;
+	private transient BolsaEmpleoDataTable<TitulacionUsuario> dataTableUsuario;
 	private Titulacion titulacion;
 	private TitulacionUsuario titulacionUsuario;
+	private String vista;
+	private UsuarioBolsaEmpleo usuarioLogeado;
+	
+	public String getVista() {
+		return vista;
+	}
+
+	public void setVista(String vista) {
+		this.vista = vista;
+	}
+	
+	public UsuarioBolsaEmpleo getUsuarioLogeado() {
+		return this.usuarioLogeado;
+	}
+	
+	public void setUsuarioLogeado(UsuarioBolsaEmpleo usuario) {
+		this.usuarioLogeado = usuario;
+	}
 
 	public BolsaEmpleoDataTable<Titulacion> getDatatableTitulaciones() {
 		return dataTable;

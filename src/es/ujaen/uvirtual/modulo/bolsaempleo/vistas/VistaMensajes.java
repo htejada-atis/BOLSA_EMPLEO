@@ -3,6 +3,7 @@ package es.ujaen.uvirtual.modulo.bolsaempleo.vistas;
 import java.io.Serializable;
 import java.util.List;
 
+import es.ujaen.uvirtual.beans.vistas.Vista;
 import es.ujaen.uvirtual.modulo.bolsaempleo.beans.Area;
 import es.ujaen.uvirtual.modulo.bolsaempleo.beans.Convocatoria;
 import es.ujaen.uvirtual.modulo.bolsaempleo.beans.Mensaje;
@@ -14,13 +15,31 @@ import es.ujaen.uvirtual.modulo.bolsaempleo.utilidades.BolsaEmpleoDataTable;
  * 
  * @author ATISoluciones 2021.
  */
-public class VistaMensajes extends VistaBEP implements Serializable {
+public class VistaMensajes extends Vista implements Serializable {
 	private static final long serialVersionUID = 1L;
-	private BolsaEmpleoDataTable<Mensaje> dataTable;
-	private BolsaEmpleoDataTable<UsuarioBolsaEmpleo> dataTableDestinatarios;
+	private transient BolsaEmpleoDataTable<Mensaje> dataTable;
+	private transient BolsaEmpleoDataTable<UsuarioBolsaEmpleo> dataTableDestinatarios;
 	private Mensaje mensaje;
 	private List<Convocatoria> convocatorias;
 	private List<Area> areas;
+	private String vista;
+	private UsuarioBolsaEmpleo usuarioLogeado;
+	
+	public String getVista() {
+		return vista;
+	}
+
+	public void setVista(String vista) {
+		this.vista = vista;
+	}
+	
+	public UsuarioBolsaEmpleo getUsuarioLogeado() {
+		return this.usuarioLogeado;
+	}
+	
+	public void setUsuarioLogeado(UsuarioBolsaEmpleo usuario) {
+		this.usuarioLogeado = usuario;
+	}
 
 	public BolsaEmpleoDataTable<Mensaje> getDatatableMensajes() {
 		return dataTable;

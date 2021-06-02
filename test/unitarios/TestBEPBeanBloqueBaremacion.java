@@ -41,12 +41,12 @@ public class TestBEPBeanBloqueBaremacion {
 	public void testA01() {
 
 		BloqueBaremacion bloque = new BloqueBaremacion();
-    	bloque.setCodNum(BLOQUE_CODNUM);
-    	bloque.setCodigo(BLOQUE_CODIGO);
-    	bloque.setNombre(BLOQUE_NOMBRE);
-    	bloque.setActivo(BLOQUE_ACTIVO);
-    	bloque.setApartadoBaremacion(BLOQUE_APARTADO);
-    	bloque.setNumeroMaximoMeritos(BLOQUE_NUM_MAXIMO_MERITOS);
+		bloque.setCodNum(BLOQUE_CODNUM);
+		bloque.setCodigo(BLOQUE_CODIGO);
+		bloque.setNombre(BLOQUE_NOMBRE);
+		bloque.setActivo(BLOQUE_ACTIVO);
+		bloque.setApartadoBaremacion(BLOQUE_APARTADO);
+		bloque.setNumeroMaximoMeritos(BLOQUE_NUM_MAXIMO_MERITOS);
 		assertEquals(BLOQUE_CODNUM, bloque.getCodNum());
 		assertEquals(BLOQUE_CODIGO, bloque.getCodigo());
 		assertEquals(BLOQUE_NOMBRE, bloque.getNombre());

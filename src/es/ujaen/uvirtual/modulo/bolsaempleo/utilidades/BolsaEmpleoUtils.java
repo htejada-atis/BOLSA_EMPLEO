@@ -13,6 +13,8 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.Date;
 import java.util.Map;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
@@ -39,6 +41,9 @@ public final class BolsaEmpleoUtils {
 	private static final int TIPO_MENSAJE_EXITO = 1;
 	private static final double ROUNDER = 100.0;
 	private static final int NUMBER_2 = 2;
+	
+	private static final String NOMBREDEESTACLASE = BolsaEmpleoUtils.class.getName();
+	private static final Logger LOGGER = Logger.getLogger(NOMBREDEESTACLASE);
 
 	private BolsaEmpleoUtils() {
 	}
@@ -321,9 +326,14 @@ public final class BolsaEmpleoUtils {
 	 * @param request .
 	 */
 	public static void readMensajeSession(Vista bean, HttpServletRequest request) {
+		LOGGER.log(Level.FINER, "Leyendo mensajes sessión");
+		
 		HttpSession session = request.getSession(false);
 
 		String mensajeExito = (String) session.getAttribute(MENSAJE_REDIRECT_SESSION_EXITO);
+		
+		LOGGER.log(Level.FINER, String.format("MensajeExito [%s]", mensajeExito));
+		
 		if (mensajeExito != null) {
 			String[] mensajeExitoSplit = mensajeExito.split(Pattern.quote("|"));
 			for (String m : mensajeExitoSplit) {
@@ -333,6 +343,9 @@ public final class BolsaEmpleoUtils {
 		}
 
 		String mensajeError = (String) session.getAttribute(MENSAJE_REDIRECT_SESSION_ERROR);
+		
+		LOGGER.log(Level.FINER, String.format("MensajeError [%s]", mensajeError));
+		
 		if (mensajeError != null) {
 			String[] mensajeErrorSplit = mensajeError.split(Pattern.quote("|"));
 			for (String m : mensajeErrorSplit) {
@@ -340,6 +353,8 @@ public final class BolsaEmpleoUtils {
 			}
 			session.removeAttribute(MENSAJE_REDIRECT_SESSION_ERROR);
 		}
+		
+		LOGGER.log(Level.FINER, "Fin leyendo mensajes sessión");
 	}
 
 	/**
@@ -381,8 +396,9 @@ public final class BolsaEmpleoUtils {
 		return valueSession;
 	}
 
-	private static void addMensajeSession(String mensaje, Vista bean, HttpServletRequest request, int tipo)
-			throws UVException {
+	private static void addMensajeSession(String mensaje, Vista bean, HttpServletRequest request, int tipo) throws UVException {
+		LOGGER.log(Level.FINER, String.format("Añadiendo mensajes de sessión [%d][%s]", tipo, mensaje));
+		
 		HttpSession session = request.getSession(false);
 
 		switch (tipo) {
@@ -393,6 +409,7 @@ public final class BolsaEmpleoUtils {
 				} else {
 					mensajeExito = mensaje;
 				}
+				LOGGER.log(Level.FINER, String.format("Session set atribute [%s]", mensajeExito));
 				session.setAttribute(MENSAJE_REDIRECT_SESSION_EXITO, mensajeExito);
 				bean.getMensajesDeExito().add(mensaje);
 				break;
@@ -403,6 +420,7 @@ public final class BolsaEmpleoUtils {
 				} else {
 					mensajeError = mensaje;
 				}
+				LOGGER.log(Level.FINER, String.format("Session set atribute [%s]", mensajeError));
 				session.setAttribute(MENSAJE_REDIRECT_SESSION_ERROR, mensajeError);
 				bean.getMensajesDeError().add(mensaje);
 				break;

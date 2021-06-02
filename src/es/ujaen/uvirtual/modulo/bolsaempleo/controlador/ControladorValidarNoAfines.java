@@ -42,14 +42,14 @@ import es.ujaen.uvirtual.utilidades.UVException;
  * Validación meritos de bolsas no sujetos a afinidad.
  */
 @WebServlet(
-		name = "informacionadministrativa.bolsaempleo.validarnoafines", 
-		description = "Validación de méritos no sujetos a afinidad", 
-		urlPatterns = { 
-				"/srv/es/informacionadministrativa/bolsaempleo/validarnoafines", 
-				"/srv/en/informacionadministrativa/bolsaempleo/validarnoafines",
-				"/srv/es/ajax/informacionadministrativa/bolsaempleo/validarnoafines", 
-				"/srv/en/ajax/informacionadministrativa/bolsaempleo/validarnoafines"
-		})
+	name = "informacionadministrativa.bolsaempleo.validarnoafines", 
+	description = "Validación de méritos no sujetos a afinidad", 
+	urlPatterns = { 
+			"/srv/es/informacionadministrativa/bolsaempleo/validarnoafines", 
+			"/srv/en/informacionadministrativa/bolsaempleo/validarnoafines",
+			"/srv/es/ajax/informacionadministrativa/bolsaempleo/validarnoafines", 
+			"/srv/en/ajax/informacionadministrativa/bolsaempleo/validarnoafines"
+	})
 public class ControladorValidarNoAfines extends HttpServlet {
 	private static final long serialVersionUID = 1L;
 	private static final String NOMBREDEESTACLASE = ControladorValidarNoAfines.class.getName();
@@ -199,6 +199,9 @@ public class ControladorValidarNoAfines extends HttpServlet {
 		try {
 			bean.setUsuarioLogeado(ModeloUsuarioBolsaEmpleo.obtenerInstancia().getOrCreateUsuario(datos));
 		} catch (UVException e) {
+			LOGGER.log(Level.SEVERE, Formateador.getStackTrace(e));
+			LOGGER.log(Level.SEVERE, e.toString());
+			
 			BolsaEmpleoUtils.addMensajeDeError(e.getMessage(), bean, request);
 			response.sendRedirect("/srv/es/informacionadministrativa/bolsaempleo/error");
 		}

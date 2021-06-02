@@ -37,14 +37,14 @@ import es.ujaen.uvirtual.utilidades.UVException;
  * por área . Controlador - Opers. con nombres: obtener, incluir, eliminar .
  */
 @WebServlet(
-		name = "informacionadministrativa.bolsaempleo.configuracion.titulacionespreferentesarea", 
-		description = "Gestión de titulaciones preferentes por área", 
-		urlPatterns = { 
-				"/srv/es/informacionadministrativa/bolsaempleo/configuracion/titulacionespreferentesarea", 
-				"/srv/en/informacionadministrativa/bolsaempleo/configuracion/titulacionespreferentesarea",
-				"/srv/es/ajax/informacionadministrativa/bolsaempleo/configuracion/titulacionespreferentesarea",
-				"/srv/en/ajax/informacionadministrativa/bolsaempleo/configuracion/titulacionespreferentesarea"
-		})
+	name = "informacionadministrativa.bolsaempleo.configuracion.titulacionespreferentesarea", 
+	description = "Gestión de titulaciones preferentes por área", 
+	urlPatterns = { 
+			"/srv/es/informacionadministrativa/bolsaempleo/configuracion/titulacionespreferentesarea", 
+			"/srv/en/informacionadministrativa/bolsaempleo/configuracion/titulacionespreferentesarea",
+			"/srv/es/ajax/informacionadministrativa/bolsaempleo/configuracion/titulacionespreferentesarea",
+			"/srv/en/ajax/informacionadministrativa/bolsaempleo/configuracion/titulacionespreferentesarea"
+	})
 public class ControladorGestionTitulacionesPreferentesArea extends HttpServlet {
 	private static final long serialVersionUID = 1L;
 	private static final String NOMBREDEESTACLASE = ControladorGestionTitulacionesPreferentesArea.class.getName();
@@ -148,6 +148,9 @@ public class ControladorGestionTitulacionesPreferentesArea extends HttpServlet {
 		try {
 			bean.setUsuarioLogeado(ModeloUsuarioBolsaEmpleo.obtenerInstancia().getOrCreateUsuario(datos));
 		} catch (UVException e) {
+			LOGGER.log(Level.SEVERE, Formateador.getStackTrace(e));
+			LOGGER.log(Level.SEVERE, e.toString());
+			
 			BolsaEmpleoUtils.addMensajeDeError(e.getMessage(), bean, request);
 			response.sendRedirect("/srv/es/informacionadministrativa/bolsaempleo/error");
 		}

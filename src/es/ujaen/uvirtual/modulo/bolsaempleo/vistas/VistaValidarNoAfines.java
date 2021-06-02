@@ -3,6 +3,8 @@ package es.ujaen.uvirtual.modulo.bolsaempleo.vistas;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
+
+import es.ujaen.uvirtual.beans.vistas.Vista;
 import es.ujaen.uvirtual.modulo.bolsaempleo.beans.Bolsa;
 import es.ujaen.uvirtual.modulo.bolsaempleo.beans.BolsaCandidatoValidacionTable;
 import es.ujaen.uvirtual.modulo.bolsaempleo.beans.BolsaValidacion;
@@ -20,18 +22,36 @@ import es.ujaen.uvirtual.modulo.bolsaempleo.utilidades.BolsaEmpleoDataTable;
  * 
  * @author ATISoluciones 2021
  */
-public class VistaValidarNoAfines extends VistaBEP implements Serializable {
+public class VistaValidarNoAfines extends Vista implements Serializable {
 	private static final long serialVersionUID = 1L;
 	private Bolsa bolsa;
 	private Convocatoria conv;
 	private MeritoSolicitud merito;
 	private UsuarioBolsaEmpleo usuario;
-	private BolsaEmpleoDataTable<BolsaValidacion> datatableBolsas;
-	private BolsaEmpleoDataTable<BolsaCandidatoValidacionTable> datatableBolsasCandidato;
-	private BolsaEmpleoDataTable<CandidatoValidacion> datatableCandidatos;
-	private BolsaEmpleoDataTable<MeritoValidarTable> datatableMeritos;
-	private BolsaEmpleoDataTable<ValorMeritoBolsaTable> datatableValoresMeritoBolsa;
+	private transient BolsaEmpleoDataTable<BolsaValidacion> datatableBolsas;
+	private transient BolsaEmpleoDataTable<BolsaCandidatoValidacionTable> datatableBolsasCandidato;
+	private transient BolsaEmpleoDataTable<CandidatoValidacion> datatableCandidatos;
+	private transient BolsaEmpleoDataTable<MeritoValidarTable> datatableMeritos;
+	private transient BolsaEmpleoDataTable<ValorMeritoBolsaTable> datatableValoresMeritoBolsa;
 	private List<ItemBaremacion> items = new ArrayList<>();
+	private String vista;
+	private UsuarioBolsaEmpleo usuarioLogeado;
+	
+	public String getVista() {
+		return vista;
+	}
+
+	public void setVista(String vista) {
+		this.vista = vista;
+	}
+	
+	public UsuarioBolsaEmpleo getUsuarioLogeado() {
+		return this.usuarioLogeado;
+	}
+	
+	public void setUsuarioLogeado(UsuarioBolsaEmpleo pusuario) {
+		this.usuarioLogeado = pusuario;
+	}
 
 	public void setDatatableBolsas(BolsaEmpleoDataTable<BolsaValidacion> dt) {
 		this.datatableBolsas = dt;

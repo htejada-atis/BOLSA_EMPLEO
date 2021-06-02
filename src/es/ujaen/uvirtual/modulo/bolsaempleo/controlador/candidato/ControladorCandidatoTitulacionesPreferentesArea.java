@@ -30,14 +30,14 @@ import es.ujaen.uvirtual.utilidades.UVException;
  * Controlador de titulaciones preferentes.
  */
 @WebServlet(
-		name = "informacionadministrativa.bolsaempleo.titulacionespreferentesarea", 
-		description = "Controlador de configuración de bolsa empleo", 
-		urlPatterns = { 
-				"/srv/es/informacionadministrativa/bolsaempleo/titulacionespreferentesarea", 
-				"/srv/en/informacionadministrativa/bolsaempleo/titulacionespreferentesarea",
-				"/srv/es/ajax/informacionadministrativa/bolsaempleo/titulacionespreferentesarea",
-				"/srv/en/ajax/informacionadministrativa/bolsaempleo/titulacionespreferentesarea"
-		})
+	name = "informacionadministrativa.bolsaempleo.titulacionespreferentesarea", 
+	description = "Controlador de configuración de bolsa empleo", 
+	urlPatterns = { 
+			"/srv/es/informacionadministrativa/bolsaempleo/titulacionespreferentesarea", 
+			"/srv/en/informacionadministrativa/bolsaempleo/titulacionespreferentesarea",
+			"/srv/es/ajax/informacionadministrativa/bolsaempleo/titulacionespreferentesarea",
+			"/srv/en/ajax/informacionadministrativa/bolsaempleo/titulacionespreferentesarea"
+	})
 public class ControladorCandidatoTitulacionesPreferentesArea extends HttpServlet {
 	private static final long serialVersionUID = 1L;
 	private static final String NOMBREDEESTACLASE = ControladorCandidatoTitulacionesPreferentesArea.class.getName();
@@ -132,6 +132,9 @@ public class ControladorCandidatoTitulacionesPreferentesArea extends HttpServlet
 		try {
 			bean.setUsuarioLogeado(ModeloUsuarioBolsaEmpleo.obtenerInstancia().getOrCreateUsuario(datos));
 		} catch (UVException e) {
+			LOGGER.log(Level.SEVERE, Formateador.getStackTrace(e));
+			LOGGER.log(Level.SEVERE, e.toString());
+			
 			BolsaEmpleoUtils.addMensajeDeError(e.getMessage(), bean, request);
 			response.sendRedirect("/srv/es/informacionadministrativa/bolsaempleo/error");
 		}

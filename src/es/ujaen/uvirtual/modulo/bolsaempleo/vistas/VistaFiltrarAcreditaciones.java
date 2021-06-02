@@ -1,6 +1,8 @@
 package es.ujaen.uvirtual.modulo.bolsaempleo.vistas;
 
 import java.io.Serializable;
+
+import es.ujaen.uvirtual.beans.vistas.Vista;
 import es.ujaen.uvirtual.modulo.bolsaempleo.beans.CandidatoAcreditacionesTable;
 import es.ujaen.uvirtual.modulo.bolsaempleo.beans.MeritoPreferenteUsuario;
 import es.ujaen.uvirtual.modulo.bolsaempleo.beans.UsuarioBolsaEmpleo;
@@ -11,13 +13,15 @@ import es.ujaen.uvirtual.modulo.bolsaempleo.utilidades.BolsaEmpleoDataTable;
  * 
  * @author ATISoluciones 2021
  */
-public class VistaFiltrarAcreditaciones extends VistaBEP implements Serializable {
+public class VistaFiltrarAcreditaciones extends Vista implements Serializable {
 	private static final long serialVersionUID = 1L;
 	private transient BolsaEmpleoDataTable<CandidatoAcreditacionesTable> dataTableCandidatos;
 	private transient BolsaEmpleoDataTable<MeritoPreferenteUsuario> dataTableAcreditaciones;
 	private UsuarioBolsaEmpleo candidato;
 	private MeritoPreferenteUsuario acreditacion;
 	private String codigoPadreMeritoPreferente;
+	private String vista;
+	private UsuarioBolsaEmpleo usuarioLogeado;
 
 	public BolsaEmpleoDataTable<CandidatoAcreditacionesTable> getDatatableCandidatos() {
 		return dataTableCandidatos;
@@ -57,5 +61,21 @@ public class VistaFiltrarAcreditaciones extends VistaBEP implements Serializable
 
 	public String getCodigoPadreMeritoPreferente() {
 		return this.codigoPadreMeritoPreferente;
+	}
+	
+	public String getVista() {
+		return vista;
+	}
+
+	public void setVista(String vista) {
+		this.vista = vista;
+	}
+	
+	public UsuarioBolsaEmpleo getUsuarioLogeado() {
+		return this.usuarioLogeado;
+	}
+	
+	public void setUsuarioLogeado(UsuarioBolsaEmpleo usuario) {
+		this.usuarioLogeado = usuario;
 	}
 }

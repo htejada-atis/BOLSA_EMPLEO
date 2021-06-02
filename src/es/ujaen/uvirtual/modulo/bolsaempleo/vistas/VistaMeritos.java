@@ -4,6 +4,7 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
+import es.ujaen.uvirtual.beans.vistas.Vista;
 import es.ujaen.uvirtual.modulo.bolsaempleo.beans.ApartadoBaremacion;
 import es.ujaen.uvirtual.modulo.bolsaempleo.beans.ItemBaremacion;
 import es.ujaen.uvirtual.modulo.bolsaempleo.beans.Merito;
@@ -15,15 +16,32 @@ import es.ujaen.uvirtual.modulo.bolsaempleo.utilidades.BolsaEmpleoDataTable;
  * 
  * @author ATISoluciones
  */
-public class VistaMeritos extends VistaBEP implements Serializable {
+public class VistaMeritos extends Vista implements Serializable {
 	private static final long serialVersionUID = 1L;
-	private BolsaEmpleoDataTable<Merito> dataTable;
+	private transient BolsaEmpleoDataTable<Merito> dataTable;
 	private List<ApartadoBaremacion> apartados = new ArrayList<>();
 	private List<ItemBaremacion> items = new ArrayList<>();
 	private ApartadoBaremacion apartado;
 	private ItemBaremacion item;
 	private Merito merito;
+	private String vista;
 	private UsuarioBolsaEmpleo usuarioLogeado;
+	
+	public String getVista() {
+		return vista;
+	}
+
+	public void setVista(String vista) {
+		this.vista = vista;
+	}
+	
+	public UsuarioBolsaEmpleo getUsuarioLogeado() {
+		return this.usuarioLogeado;
+	}
+	
+	public void setUsuarioLogeado(UsuarioBolsaEmpleo usuario) {
+		this.usuarioLogeado = usuario;
+	}
 
 	public BolsaEmpleoDataTable<Merito> getDatatable() {
 		return dataTable;
@@ -71,13 +89,5 @@ public class VistaMeritos extends VistaBEP implements Serializable {
 
 	public void setMerito(Merito merito) {
 		this.merito = merito;
-	}
-
-	public void setUsuarioLogeado(UsuarioBolsaEmpleo pusuario) {
-		this.usuarioLogeado = pusuario;
-	}
-
-	public UsuarioBolsaEmpleo getUsuarioLogeado() {
-		return this.usuarioLogeado;
-	}
+	}	
 }

@@ -74,7 +74,7 @@ import com.lowagie.text.Table;
 			"/srv/en/informacionadministrativa/bolsaempleo/missolicitudes",
 			"/srv/es/ajax/informacionadministrativa/bolsaempleo/missolicitudes",
 			"/srv/en/ajax/informacionadministrativa/bolsaempleo/missolicitudes"
-})
+	})
 public class ControladorMisSolicitudes extends HttpServlet {
 	private static final long serialVersionUID = 1L;
 	private static final String NOMBREDEESTACLASE = ControladorMisSolicitudes.class.getName();
@@ -239,6 +239,9 @@ public class ControladorMisSolicitudes extends HttpServlet {
 		try {
 			bean.setUsuarioLogeado(ModeloUsuarioBolsaEmpleo.obtenerInstancia().getOrCreateUsuario(datos));
 		} catch (UVException e) {
+			LOGGER.log(Level.SEVERE, Formateador.getStackTrace(e));
+			LOGGER.log(Level.SEVERE, e.toString());
+			
 			BolsaEmpleoUtils.addMensajeDeError(e.getMessage(), bean, request);
 			response.sendRedirect("/srv/es/informacionadministrativa/bolsaempleo/error");
 		}

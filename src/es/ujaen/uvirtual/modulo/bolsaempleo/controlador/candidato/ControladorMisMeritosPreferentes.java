@@ -42,14 +42,14 @@ import es.ujaen.uvirtual.utilidades.UVException;
  * Apartado de mis méritos preferentes de bolsa empleo.
  */
 @WebServlet(
-		name = "informacionadministrativa.bolsaempleo.mismeritospreferentes", 
-		description = "Méritos preferentes del candidato", 
-		urlPatterns = { 
-				"/srv/es/informacionadministrativa/bolsaempleo/mismeritospreferentes", 
-				"/srv/en/informacionadministrativa/bolsaempleo/mismeritospreferentes",
-				"/srv/es/ajax/informacionadministrativa/bolsaempleo/mismeritospreferentes", 
-				"/srv/en/ajax/informacionadministrativa/bolsaempleo/mismeritospreferentes"
-		})
+	name = "informacionadministrativa.bolsaempleo.mismeritospreferentes", 
+	description = "Méritos preferentes del candidato", 
+	urlPatterns = { 
+			"/srv/es/informacionadministrativa/bolsaempleo/mismeritospreferentes", 
+			"/srv/en/informacionadministrativa/bolsaempleo/mismeritospreferentes",
+			"/srv/es/ajax/informacionadministrativa/bolsaempleo/mismeritospreferentes", 
+			"/srv/en/ajax/informacionadministrativa/bolsaempleo/mismeritospreferentes"
+	})
 @MultipartConfig
 public class ControladorMisMeritosPreferentes extends HttpServlet {
 	private static final long serialVersionUID = 1L;
@@ -170,12 +170,16 @@ public class ControladorMisMeritosPreferentes extends HttpServlet {
 		}
 	}
 	
-	private void init(VistaMeritosPreferentesCandidato bean, UVDatos datos, HttpServletRequest request, HttpServletResponse response) throws SQLException, UVException, IOException {
+	private void init(VistaMeritosPreferentesCandidato bean, UVDatos datos, HttpServletRequest request, HttpServletResponse response) 
+			throws SQLException, UVException, IOException {
 		this.index(bean);
 		BolsaEmpleoUtils.readMensajeSession(bean, request);
 		try {
 			bean.setUsuarioLogeado(ModeloUsuarioBolsaEmpleo.obtenerInstancia().getOrCreateUsuario(datos));
 		} catch (UVException e) {
+			LOGGER.log(Level.SEVERE, Formateador.getStackTrace(e));
+			LOGGER.log(Level.SEVERE, e.toString());
+			
 			BolsaEmpleoUtils.addMensajeDeError(e.getMessage(), bean, request);
 			response.sendRedirect("/srv/es/informacionadministrativa/bolsaempleo/error");
 		}

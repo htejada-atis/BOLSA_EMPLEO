@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import es.ujaen.uvirtual.beans.Usuario;
+import es.ujaen.uvirtual.beans.vistas.Vista;
 import es.ujaen.uvirtual.modulo.bolsaempleo.beans.Bolsa;
 import es.ujaen.uvirtual.modulo.bolsaempleo.beans.Rol;
 import es.ujaen.uvirtual.modulo.bolsaempleo.beans.UsuarioBolsaEmpleo;
@@ -15,7 +16,7 @@ import es.ujaen.uvirtual.modulo.bolsaempleo.utilidades.BolsaEmpleoDataTable;
  * 
  * @author ATISoluciones 2021
  */
-public class VistaUsuarioBolsaEmpleo extends VistaBEP implements Serializable {
+public class VistaUsuarioBolsaEmpleo extends Vista implements Serializable {
 	private static final long serialVersionUID = 1L;
 	private List<UsuarioBolsaEmpleo> usuarios = new ArrayList<>();
 	private UsuarioBolsaEmpleo usuario;
@@ -23,11 +24,29 @@ public class VistaUsuarioBolsaEmpleo extends VistaBEP implements Serializable {
 	private Rol role;
 	private List<Rol> roles = new ArrayList<>();
 	private Boolean busqueda;
-	private BolsaEmpleoDataTable<UsuarioBolsaEmpleo> dataTable;
-	private BolsaEmpleoDataTable<Bolsa> dataTableBolsa;
+	private transient BolsaEmpleoDataTable<UsuarioBolsaEmpleo> dataTable;
+	private transient BolsaEmpleoDataTable<Bolsa> dataTableBolsa;
 	private Boolean apartadoAreasExcluidas;
 	private Boolean apartadoSolicitudes;
 	private Boolean apartadoComunicaciones;
+	private String vista;
+	private UsuarioBolsaEmpleo usuarioLogeado;
+	
+	public String getVista() {
+		return vista;
+	}
+
+	public void setVista(String vista) {
+		this.vista = vista;
+	}
+	
+	public UsuarioBolsaEmpleo getUsuarioLogeado() {
+		return this.usuarioLogeado;
+	}
+	
+	public void setUsuarioLogeado(UsuarioBolsaEmpleo pusuario) {
+		this.usuarioLogeado = pusuario;
+	}
 
 	public List<UsuarioBolsaEmpleo> getUsuarios() {
 		return usuarios;

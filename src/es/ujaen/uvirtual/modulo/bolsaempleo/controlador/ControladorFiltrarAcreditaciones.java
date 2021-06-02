@@ -33,14 +33,14 @@ import es.ujaen.uvirtual.utilidades.UVException;
  * Clase controlador para filtrar candidatos por acreditaciones .
  */
 @WebServlet(
-		name = "informacionadministrativa.bolsaempleo.filtraracreditaciones", 
-		description = "Filtrar candidatos de las bolsas por acreditaciones", 
-		urlPatterns = { 
-				"/srv/es/informacionadministrativa/bolsaempleo/filtraracreditaciones", 
-				"/srv/en/informacionadministrativa/bolsaempleo/filtraracreditaciones",
-				"/srv/es/ajax/informacionadministrativa/bolsaempleo/filtraracreditaciones", 
-				"/srv/en/ajax/informacionadministrativa/bolsaempleo/filtraracreditaciones"
-		})
+	name = "informacionadministrativa.bolsaempleo.filtraracreditaciones", 
+	description = "Filtrar candidatos de las bolsas por acreditaciones", 
+	urlPatterns = { 
+			"/srv/es/informacionadministrativa/bolsaempleo/filtraracreditaciones", 
+			"/srv/en/informacionadministrativa/bolsaempleo/filtraracreditaciones",
+			"/srv/es/ajax/informacionadministrativa/bolsaempleo/filtraracreditaciones", 
+			"/srv/en/ajax/informacionadministrativa/bolsaempleo/filtraracreditaciones"
+	})
 public class ControladorFiltrarAcreditaciones extends HttpServlet {
 	private static final long serialVersionUID = 1L;
 	private static final String NOMBREDEESTACLASE = ControladorFiltrarAcreditaciones.class.getName();
@@ -135,6 +135,9 @@ public class ControladorFiltrarAcreditaciones extends HttpServlet {
 		try {
 			bean.setUsuarioLogeado(ModeloUsuarioBolsaEmpleo.obtenerInstancia().getOrCreateUsuario(datos));
 		} catch (UVException e) {
+			LOGGER.log(Level.SEVERE, Formateador.getStackTrace(e));
+			LOGGER.log(Level.SEVERE, e.toString());
+			
 			BolsaEmpleoUtils.addMensajeDeError(e.getMessage(), bean, request);
 			response.sendRedirect("/srv/es/informacionadministrativa/bolsaempleo/error");
 		}

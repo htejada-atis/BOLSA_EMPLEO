@@ -21,12 +21,12 @@ import es.ujaen.uvirtual.utilidades.UVException;
  * Clase controlador de los resultados del candidato .
  */
 @WebServlet(
-		name = "informacionadministrativa.bolsaempleo.misresultados", 
-		description = "Controlador de mis resultados bolsa empleo", 
-		urlPatterns = { 
-				"/srv/es/informacionadministrativa/bolsaempleo/misresultados", 
-				"/srv/en/informacionadministrativa/bolsaempleo/misresultados"
-		})
+	name = "informacionadministrativa.bolsaempleo.misresultados", 
+	description = "Controlador de mis resultados bolsa empleo", 
+	urlPatterns = { 
+			"/srv/es/informacionadministrativa/bolsaempleo/misresultados", 
+			"/srv/en/informacionadministrativa/bolsaempleo/misresultados"
+	})
 public class ControladorMisResultados extends HttpServlet {
 	private static final long serialVersionUID = 1L;
 	private static final String NOMBREDEESTACLASE = ControladorMisResultados.class.getName();
@@ -105,6 +105,9 @@ public class ControladorMisResultados extends HttpServlet {
 		try {
 			bean.setUsuarioLogeado(ModeloUsuarioBolsaEmpleo.obtenerInstancia().getOrCreateUsuario(datos));
 		} catch (UVException e) {
+			LOGGER.log(Level.SEVERE, Formateador.getStackTrace(e));
+			LOGGER.log(Level.SEVERE, e.toString());
+			
 			BolsaEmpleoUtils.addMensajeDeError(e.getMessage(), bean, request);
 			response.sendRedirect("/srv/es/informacionadministrativa/bolsaempleo/error");
 		}

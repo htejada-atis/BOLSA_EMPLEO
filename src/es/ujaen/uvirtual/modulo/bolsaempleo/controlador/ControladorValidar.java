@@ -49,14 +49,14 @@ import es.ujaen.uvirtual.utilidades.UVException;
  * Validación de meritos de bolsas sujetas a afinidad.
  */
 @WebServlet(
-		name = "informacionadministrativa.bolsaempleo.validar", 
-		description = "Validación de méritos sujetos a afinidad", 
-		urlPatterns = { 
-				"/srv/es/informacionadministrativa/bolsaempleo/validar", 
-				"/srv/en/informacionadministrativa/bolsaempleo/validar",
-				"/srv/es/ajax/informacionadministrativa/bolsaempleo/validar",
-				"/srv/en/ajax/informacionadministrativa/bolsaempleo/validar"
-		})
+	name = "informacionadministrativa.bolsaempleo.validar", 
+	description = "Validación de méritos sujetos a afinidad", 
+	urlPatterns = { 
+			"/srv/es/informacionadministrativa/bolsaempleo/validar", 
+			"/srv/en/informacionadministrativa/bolsaempleo/validar",
+			"/srv/es/ajax/informacionadministrativa/bolsaempleo/validar",
+			"/srv/en/ajax/informacionadministrativa/bolsaempleo/validar"
+	})
 public class ControladorValidar extends HttpServlet {
 	private static final long serialVersionUID = 1L;
 	private static final String NOMBREDEESTACLASE = ControladorValidar.class.getName();
@@ -212,6 +212,9 @@ public class ControladorValidar extends HttpServlet {
 		try {
 			bean.setUsuarioLogeado(ModeloUsuarioBolsaEmpleo.obtenerInstancia().getOrCreateUsuario(datos));
 		} catch (UVException e) {
+			LOGGER.log(Level.SEVERE, Formateador.getStackTrace(e));
+			LOGGER.log(Level.SEVERE, e.toString());
+			
 			BolsaEmpleoUtils.addMensajeDeError(e.getMessage(), bean, request);
 			response.sendRedirect("/srv/es/informacionadministrativa/bolsaempleo/error");
 		}

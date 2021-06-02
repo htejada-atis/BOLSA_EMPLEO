@@ -33,12 +33,11 @@ import es.ujaen.uvirtual.utilidades.UVException;
 	name = "informacionadministrativa.bolsaempleo.configuracion.afinidades", 
 	description = "Gestión de afinidades", 
 	urlPatterns = { 
-			"/srv/es/informacionadministrativa/bolsaempleo/configuracion/afinidades", 
-			"/srv/en/informacionadministrativa/bolsaempleo/configuracion/afinidades",
-			"/srv/es/ajax/informacionadministrativa/bolsaempleo/configuracion/afinidades",
-			"/srv/en/ajax/informacionadministrativa/bolsaempleo/configuracion/afinidades"
-})
-
+		"/srv/es/informacionadministrativa/bolsaempleo/configuracion/afinidades", 
+		"/srv/en/informacionadministrativa/bolsaempleo/configuracion/afinidades",
+		"/srv/es/ajax/informacionadministrativa/bolsaempleo/configuracion/afinidades",
+		"/srv/en/ajax/informacionadministrativa/bolsaempleo/configuracion/afinidades"
+	})
 public class ControladorAfinidades extends HttpServlet {
 	private static final long serialVersionUID = 1L;
 	private static final String NOMBREDEESTACLASE = ControladorAfinidades.class.getName();
@@ -157,6 +156,9 @@ public class ControladorAfinidades extends HttpServlet {
 		try {
 			bean.setUsuarioLogeado(ModeloUsuarioBolsaEmpleo.obtenerInstancia().getOrCreateUsuario(datos));
 		} catch (UVException e) {
+			LOGGER.log(Level.SEVERE, Formateador.getStackTrace(e));
+			LOGGER.log(Level.SEVERE, e.toString());
+			
 			BolsaEmpleoUtils.addMensajeDeError(e.getMessage(), bean, request);
 			response.sendRedirect("/srv/es/informacionadministrativa/bolsaempleo/error");
 		}

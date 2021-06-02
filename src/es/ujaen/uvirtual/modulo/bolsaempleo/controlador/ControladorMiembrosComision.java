@@ -27,12 +27,12 @@ import es.ujaen.uvirtual.utilidades.UVException;
  * Listado de bolsas y su estado.
  */
 @WebServlet(
-		name = "informacionadministrativa.bolsaempleo.miembroscomision", 
-		description = "Quien ha baremabo cada area", 
-		urlPatterns = { 
-				"/srv/es/informacionadministrativa/bolsaempleo/miembroscomision", 
-				"/srv/en/informacionadministrativa/bolsaempleo/miembroscomision"
-		})
+	name = "informacionadministrativa.bolsaempleo.miembroscomision", 
+	description = "Quien ha baremabo cada area", 
+	urlPatterns = { 
+			"/srv/es/informacionadministrativa/bolsaempleo/miembroscomision", 
+			"/srv/en/informacionadministrativa/bolsaempleo/miembroscomision"
+	})
 public class ControladorMiembrosComision extends HttpServlet {
 	private static final long serialVersionUID = 1L;
 	private static final String NOMBREDEESTACLASE = ControladorMiembrosComision.class.getName();
@@ -104,6 +104,9 @@ public class ControladorMiembrosComision extends HttpServlet {
 		try {
 			bean.setUsuarioLogeado(ModeloUsuarioBolsaEmpleo.obtenerInstancia().getOrCreateUsuario(datos));
 		} catch (UVException e) {
+			LOGGER.log(Level.SEVERE, Formateador.getStackTrace(e));
+			LOGGER.log(Level.SEVERE, e.toString());
+			
 			BolsaEmpleoUtils.addMensajeDeError(e.getMessage(), bean, request);
 			response.sendRedirect("/srv/es/informacionadministrativa/bolsaempleo/error");
 		}

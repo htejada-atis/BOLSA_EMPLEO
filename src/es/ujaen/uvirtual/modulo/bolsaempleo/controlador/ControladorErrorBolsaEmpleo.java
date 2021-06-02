@@ -14,15 +14,15 @@ import es.ujaen.uvirtual.modulo.bolsaempleo.vistas.VistaError;
  * Clase controlador para mostrar errores .
  */
 @WebServlet(
-		name = "informacionadministrativa.bolsaempleo.error",
-		displayName = "bolsaempleo.error",
-		description = "Controlador para los errores de bolsa empleo", 
-		urlPatterns = { 
-				"/srv/es/informacionadministrativa/bolsaempleo/error", 
-				"/srv/en/informacionadministrativa/bolsaempleo/error",
-				"/pub/es/ajax/informacionadministrativa/bolsaempleo/error",
-				"/pub/en/ajax/informacionadministrativa/bolsaempleo/error"
-		})
+	name = "informacionadministrativa.bolsaempleo.error",
+	displayName = "bolsaempleo.error",
+	description = "Controlador para los errores de bolsa empleo", 
+	urlPatterns = { 
+			"/srv/es/informacionadministrativa/bolsaempleo/error", 
+			"/srv/en/informacionadministrativa/bolsaempleo/error",
+			"/pub/es/ajax/informacionadministrativa/bolsaempleo/error",
+			"/pub/en/ajax/informacionadministrativa/bolsaempleo/error"
+	})
 public class ControladorErrorBolsaEmpleo extends HttpServlet {
 	private static final long serialVersionUID = 1L;
 	

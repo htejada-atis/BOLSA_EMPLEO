@@ -14,6 +14,7 @@ import org.junit.runners.MethodSorters;
 
 import es.ujaen.uvirtual.modulo.bolsaempleo.beans.Area;
 import es.ujaen.uvirtual.modulo.bolsaempleo.beans.Bolsa;
+import es.ujaen.uvirtual.modulo.bolsaempleo.utilidades.BolsaEmpleoUtils;
 
 /** test bolsas.
  *
@@ -22,9 +23,9 @@ import es.ujaen.uvirtual.modulo.bolsaempleo.beans.Bolsa;
 public class TestBEPBeanBolsa {	
 	private static final String ESTADO = "BLOQUEADA";
 	private static final Boolean BAREAMABLE = true;
-	private static final Date FECHAATUALIZACION = new java.sql.Date(Calendar.getInstance().getTime().getTime());
-	private static final Date FECHABLOQUEO = new java.sql.Date(Calendar.getInstance().getTime().getTime());
-	private static final Date FECHADESBLOQUEO = new java.sql.Date(Calendar.getInstance().getTime().getTime());
+	private static final Date FECHAATUALIZACION = new java.sql.Date(BolsaEmpleoUtils.getCurrentDateTime().getTime());
+	private static final Date FECHABLOQUEO = new java.sql.Date(BolsaEmpleoUtils.getCurrentDateTime().getTime());
+	private static final Date FECHADESBLOQUEO = new java.sql.Date(BolsaEmpleoUtils.getCurrentDateTime().getTime());
 		
 	/** test constructor.
 	 * 

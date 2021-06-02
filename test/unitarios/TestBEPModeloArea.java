@@ -18,7 +18,6 @@ import bbdd.UtilsTestBolsaEmpleo;
 import es.ujaen.uvirtual.modelo.conexion.Conexion;
 import es.ujaen.uvirtual.modulo.bolsaempleo.beans.Area;
 import es.ujaen.uvirtual.modulo.bolsaempleo.modelo.ModeloArea;
-import es.ujaen.uvirtual.utilidades.UVException;
 
 /**
  * test modelo area.
@@ -35,7 +34,7 @@ public class TestBEPModeloArea {
 	 * @throws ParseException si error fecha
 	 */
 	@BeforeClass
-	public static void preparaBd() throws SQLException, IOException, ParseException {
+	public static void preparaBd() throws SQLException, IOException {
 		Conexion.setConexionUvirtual(BbddRunner.obtenerDataSourceUv());
 		Conexion.setConexionArcos(BbddRunner.obtenerDataSourceArcos());
 		Conexion.setConexionUxxiRrhh(BbddRunner.obtenerDataSourceRh());

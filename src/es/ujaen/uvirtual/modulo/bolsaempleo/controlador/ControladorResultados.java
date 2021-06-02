@@ -28,14 +28,14 @@ import es.ujaen.uvirtual.utilidades.UVException;
  * Listado de bolsas y su estado.
  */
 @WebServlet(
-		name = "informacionadministrativa.bolsaempleo.resultados", 
-		description = "Resultado de la última baremación", 
-		urlPatterns = { 
-				"/srv/es/informacionadministrativa/bolsaempleo/resultados", 
-				"/srv/en/informacionadministrativa/bolsaempleo/resultados",
-				"/srv/es/ajax/informacionadministrativa/bolsaempleo/resultados", 
-				"/srv/en/ajax/informacionadministrativa/bolsaempleo/resultados"
-		})
+	name = "informacionadministrativa.bolsaempleo.resultados", 
+	description = "Resultado de la última baremación", 
+	urlPatterns = { 
+			"/srv/es/informacionadministrativa/bolsaempleo/resultados", 
+			"/srv/en/informacionadministrativa/bolsaempleo/resultados",
+			"/srv/es/ajax/informacionadministrativa/bolsaempleo/resultados", 
+			"/srv/en/ajax/informacionadministrativa/bolsaempleo/resultados"
+	})
 public class ControladorResultados extends HttpServlet {
 	private static final long serialVersionUID = 1L;
 	private static final String NOMBREDEESTACLASE = ControladorResultados.class.getName();
@@ -115,6 +115,9 @@ public class ControladorResultados extends HttpServlet {
 		try {
 			bean.setUsuarioLogeado(ModeloUsuarioBolsaEmpleo.obtenerInstancia().getOrCreateUsuario(datos));
 		} catch (UVException e) {
+			LOGGER.log(Level.SEVERE, Formateador.getStackTrace(e));
+			LOGGER.log(Level.SEVERE, e.toString());
+			
 			BolsaEmpleoUtils.addMensajeDeError(e.getMessage(), bean, request);
 			response.sendRedirect("/srv/es/informacionadministrativa/bolsaempleo/error");
 		}

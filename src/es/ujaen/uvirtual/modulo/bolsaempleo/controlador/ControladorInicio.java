@@ -36,18 +36,18 @@ import es.ujaen.uvirtual.utilidades.UVException;
  * Servlet implementation class ControladorIndice.
  */
 @WebServlet(
-		name = "informacionadministrativa.bolsaempleo", 
-		description = "Informacion bolsa empleo, raiz", 
-		urlPatterns = { 
-				"/srv/es/informacionadministrativa/bolsaempleo", 
-				"/srv/en/informacionadministrativa/bolsaempleo",
-				"/srv/es/ajax/informacionadministrativa/bolsaempleo",
-				"/srv/en/ajax/informacionadministrativa/bolsaempleo",
-				"/pub/es/ajax/informacionadministrativa/bolsaempleo",
-				"/pub/en/ajax/informacionadministrativa/bolsaempleo",
-				"/pub/es/informacionadministrativa/bolsaempleo", 
-				"/pub/en/informacionadministrativa/bolsaempleo"
-		})
+	name = "informacionadministrativa.bolsaempleo", 
+	description = "Informacion bolsa empleo, raiz", 
+	urlPatterns = { 
+			"/srv/es/informacionadministrativa/bolsaempleo", 
+			"/srv/en/informacionadministrativa/bolsaempleo",
+			"/srv/es/ajax/informacionadministrativa/bolsaempleo",
+			"/srv/en/ajax/informacionadministrativa/bolsaempleo",
+			"/pub/es/ajax/informacionadministrativa/bolsaempleo",
+			"/pub/en/ajax/informacionadministrativa/bolsaempleo",
+			"/pub/es/informacionadministrativa/bolsaempleo", 
+			"/pub/en/informacionadministrativa/bolsaempleo"
+	})
 @MultipartConfig
 public class ControladorInicio extends HttpServlet {
 	private static final long serialVersionUID = 1L;
@@ -149,6 +149,9 @@ public class ControladorInicio extends HttpServlet {
 			bean.setUsuarioLogeado(ModeloUsuarioBolsaEmpleo.obtenerInstancia().getOrCreateUsuario(datos));
 			bean.setAnonimo(bean.getUsuarioLogeado() == null);
 		} catch (UVException e) {
+			LOGGER.log(Level.SEVERE, Formateador.getStackTrace(e));
+			LOGGER.log(Level.SEVERE, e.toString());
+			
 			BolsaEmpleoUtils.addMensajeDeError(e.getMessage(), bean, request);
 			response.sendRedirect("/srv/es/informacionadministrativa/bolsaempleo/error");
 		}

@@ -29,14 +29,14 @@ import es.ujaen.uvirtual.utilidades.UVException;
  * Controlador - Opers. con nombres: obtener, modificar, eliminar .
  * */
 @WebServlet(
-		name = "informacionadministrativa.bolsaempleo.configuracion.titulaciones", 
-		description = "Gestión de titulaciones", 
-		urlPatterns = { 
-				"/srv/es/informacionadministrativa/bolsaempleo/configuracion/titulaciones", 
-				"/srv/en/informacionadministrativa/bolsaempleo/configuracion/titulaciones",
-				"/srv/es/ajax/informacionadministrativa/bolsaempleo/configuracion/titulaciones",
-				"/srv/en/ajax/informacionadministrativa/bolsaempleo/configuracion/titulaciones"
-		})
+	name = "informacionadministrativa.bolsaempleo.configuracion.titulaciones", 
+	description = "Gestión de titulaciones", 
+	urlPatterns = { 
+			"/srv/es/informacionadministrativa/bolsaempleo/configuracion/titulaciones", 
+			"/srv/en/informacionadministrativa/bolsaempleo/configuracion/titulaciones",
+			"/srv/es/ajax/informacionadministrativa/bolsaempleo/configuracion/titulaciones",
+			"/srv/en/ajax/informacionadministrativa/bolsaempleo/configuracion/titulaciones"
+	})
 public class ControladorGestionTitulaciones extends HttpServlet {
 	private static final long serialVersionUID = 1L;
 	private static final String NOMBREDEESTACLASE = ControladorGestionTitulaciones.class.getName();
@@ -136,6 +136,9 @@ public class ControladorGestionTitulaciones extends HttpServlet {
 		try {
 			bean.setUsuarioLogeado(ModeloUsuarioBolsaEmpleo.obtenerInstancia().getOrCreateUsuario(datos));
 		} catch (UVException e) {
+			LOGGER.log(Level.SEVERE, Formateador.getStackTrace(e));
+			LOGGER.log(Level.SEVERE, e.toString());
+			
 			BolsaEmpleoUtils.addMensajeDeError(e.getMessage(), bean, request);
 			response.sendRedirect("/srv/es/informacionadministrativa/bolsaempleo/error");
 		}

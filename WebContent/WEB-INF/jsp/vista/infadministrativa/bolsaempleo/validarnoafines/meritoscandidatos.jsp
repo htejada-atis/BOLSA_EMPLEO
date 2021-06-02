@@ -176,12 +176,14 @@ UsuarioBolsaEmpleo candidato = bean.getCandidato();
 			    		<textarea class="form-input-custom" id="merito_observacion_comision" name="" rows="2" cols="50" disabled><%= merito.getMerito().getObservacion() %></textarea>
 			    	</div>
 		    	</div>
+		    	
 		    	<div class="form-group-container col1">
 			    	<div class="form-group">
 			    		<label for="merito_observacion_candidato">Observación para el candidato:</label>
 			    		<textarea class="form-input-custom" id="merito_observacion_candidato" name="<%= ControladorValidarNoAfines.PARAM_OBSERVACIONES_CANDIDATO %>" rows="2" cols="50"></textarea>
 			    	</div>
 		    	</div>
+		    	
 		    	<div class="form-btn">
 		    		<% if (merito.isExcluido()) { %>
 		    			<input id="merito_guardar" type="submit" name="<%= ControladorValidarNoAfines.PARAM_GUARDAR_MERITO %>" value="Guardar"/>

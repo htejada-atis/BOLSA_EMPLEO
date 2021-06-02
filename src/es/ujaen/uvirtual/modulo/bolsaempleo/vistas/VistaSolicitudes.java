@@ -3,6 +3,7 @@ package es.ujaen.uvirtual.modulo.bolsaempleo.vistas;
 import java.io.Serializable;
 import java.util.List;
 
+import es.ujaen.uvirtual.beans.vistas.Vista;
 import es.ujaen.uvirtual.modulo.bolsaempleo.beans.Afinidad;
 import es.ujaen.uvirtual.modulo.bolsaempleo.beans.Bolsa;
 import es.ujaen.uvirtual.modulo.bolsaempleo.beans.BolsaCandidato;
@@ -12,6 +13,7 @@ import es.ujaen.uvirtual.modulo.bolsaempleo.beans.MeritoSolicitud;
 import es.ujaen.uvirtual.modulo.bolsaempleo.beans.MeritoSolicitudTable;
 import es.ujaen.uvirtual.modulo.bolsaempleo.beans.Solicitud;
 import es.ujaen.uvirtual.modulo.bolsaempleo.beans.Titulacion;
+import es.ujaen.uvirtual.modulo.bolsaempleo.beans.UsuarioBolsaEmpleo;
 import es.ujaen.uvirtual.modulo.bolsaempleo.utilidades.BolsaEmpleoDataTable;
 import es.ujaen.uvirtual.modulo.bolsaempleo.beans.BolsaSolicitudTable;
 
@@ -20,13 +22,13 @@ import es.ujaen.uvirtual.modulo.bolsaempleo.beans.BolsaSolicitudTable;
  * 
  * @author ATISoluciones 2021
  */
-public class VistaSolicitudes extends VistaBEP implements Serializable {
+public class VistaSolicitudes extends Vista implements Serializable {
 	private static final long serialVersionUID = 1L;
-	private BolsaEmpleoDataTable<Solicitud> dataTable;
-	private BolsaEmpleoDataTable<Bolsa> dataTableAreas;
-	private BolsaEmpleoDataTable<BolsaSolicitudTable> dataTableBolsasSolicitud;
-	private BolsaEmpleoDataTable<BolsaCandidato> dataTableBolsasCandidato;
-	private BolsaEmpleoDataTable<MeritoSolicitudTable> dataTableMeritos;
+	private transient BolsaEmpleoDataTable<Solicitud> dataTable;
+	private transient BolsaEmpleoDataTable<Bolsa> dataTableAreas;
+	private transient BolsaEmpleoDataTable<BolsaSolicitudTable> dataTableBolsasSolicitud;
+	private transient BolsaEmpleoDataTable<BolsaCandidato> dataTableBolsasCandidato;
+	private transient BolsaEmpleoDataTable<MeritoSolicitudTable> dataTableMeritos;
 	private List<Bolsa> listaBolsas;
 	private List<BolsaSolicitudTable> listaTablaBolsasSolicitud;
 	private List<BolsaSolicitud> listaBolsasSolicitud;
@@ -37,6 +39,24 @@ public class VistaSolicitudes extends VistaBEP implements Serializable {
 	private Solicitud solicitud;
 	private Bolsa area;
 	private Merito merito;
+	private String vista;
+	private UsuarioBolsaEmpleo usuarioLogeado;
+	
+	public String getVista() {
+		return vista;
+	}
+
+	public void setVista(String vista) {
+		this.vista = vista;
+	}
+	
+	public UsuarioBolsaEmpleo getUsuarioLogeado() {
+		return this.usuarioLogeado;
+	}
+	
+	public void setUsuarioLogeado(UsuarioBolsaEmpleo usuario) {
+		this.usuarioLogeado = usuario;
+	}
 
 	public BolsaEmpleoDataTable<Solicitud> getDatatableSolicitudes() {
 		return dataTable;

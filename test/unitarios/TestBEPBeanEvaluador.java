@@ -4,6 +4,7 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotEquals;
 import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 import java.util.Calendar;
 import java.util.Date;
@@ -15,6 +16,7 @@ import org.junit.runners.MethodSorters;
 import es.ujaen.uvirtual.modulo.bolsaempleo.beans.Evaluador;
 import es.ujaen.uvirtual.modulo.bolsaempleo.beans.Rol;
 import es.ujaen.uvirtual.modulo.bolsaempleo.beans.UsuarioBolsaEmpleo;
+import es.ujaen.uvirtual.modulo.bolsaempleo.utilidades.BolsaEmpleoUtils;
 
 /** test evaluador.
 *
@@ -28,11 +30,11 @@ public class TestBEPBeanEvaluador {
 	private static final Boolean LISTADIST = true;
 	private static final Boolean EXCLUIDO = false;
 	private static final String EXCLUIDOTIPO = "EJEMPLO";
-	private static final Date FECHAEXCLUSIONINICIO = new java.sql.Date(Calendar.getInstance().getTime().getTime());
-	private static final Date FECHAEXCLUSIONFIN = new java.sql.Date(Calendar.getInstance().getTime().getTime());
+	private static final Date FECHAEXCLUSIONINICIO = new java.sql.Date(BolsaEmpleoUtils.getCurrentDateTime().getTime());
+	private static final Date FECHAEXCLUSIONFIN = new java.sql.Date(BolsaEmpleoUtils.getCurrentDateTime().getTime());
 	private static final Boolean BORRADO = true;
-	private static final Date FECHAEXCLUSION = new java.sql.Date(Calendar.getInstance().getTime().getTime());
-	private static final Date FECHABORRADO = new java.sql.Date(Calendar.getInstance().getTime().getTime());
+	private static final Date FECHAEXCLUSION = new java.sql.Date(BolsaEmpleoUtils.getCurrentDateTime().getTime());
+	private static final Date FECHABORRADO = new java.sql.Date(BolsaEmpleoUtils.getCurrentDateTime().getTime());
 	private static final Boolean ACTIVO = false;
 	private static final Integer AREA = 3;
 	
@@ -103,7 +105,7 @@ public class TestBEPBeanEvaluador {
 		assertTrue(evaluador.equals(evaluador2));
 		assertTrue(evaluador2.equals(evaluador));
 		assertEquals(evaluador.hashCode(), evaluador2.hashCode());
-		assertFalse(evaluador.equals(null));
+		assertNull(evaluador);
 		assertFalse(evaluador.equals(evaluador3));
 		assertFalse(evaluador3.equals(evaluador));
 		assertNotEquals(evaluador.hashCode(), evaluador3.hashCode());

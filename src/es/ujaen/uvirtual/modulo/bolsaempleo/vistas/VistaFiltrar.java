@@ -3,6 +3,7 @@ package es.ujaen.uvirtual.modulo.bolsaempleo.vistas;
 import java.io.Serializable;
 import java.util.List;
 
+import es.ujaen.uvirtual.beans.vistas.Vista;
 import es.ujaen.uvirtual.modulo.bolsaempleo.beans.CandidatoTitulacionTable;
 import es.ujaen.uvirtual.modulo.bolsaempleo.beans.Titulacion;
 import es.ujaen.uvirtual.modulo.bolsaempleo.beans.TitulacionUsuario;
@@ -14,7 +15,7 @@ import es.ujaen.uvirtual.modulo.bolsaempleo.utilidades.BolsaEmpleoDataTable;
  * 
  * @author ATISoluciones.
  */
-public class VistaFiltrar extends VistaBEP implements Serializable {
+public class VistaFiltrar extends Vista implements Serializable {
 	private static final long serialVersionUID = 1L;
 	private transient BolsaEmpleoDataTable<CandidatoTitulacionTable> dataTableCandidatos;
 	private transient BolsaEmpleoDataTable<TitulacionUsuario> dataTableTitulaciones;
@@ -22,6 +23,8 @@ public class VistaFiltrar extends VistaBEP implements Serializable {
 	private TitulacionUsuario titulacion;
 	private List<TitulacionUsuario> listaValidadas;
 	private List<Titulacion> listaTitulacion;
+	private String vista;
+	private UsuarioBolsaEmpleo usuarioLogeado;
 
 	public BolsaEmpleoDataTable<CandidatoTitulacionTable> getDatatableCandidatos() {
 		return dataTableCandidatos;
@@ -69,5 +72,21 @@ public class VistaFiltrar extends VistaBEP implements Serializable {
 
 	public void setTitulaciones(List<Titulacion> titulaciones) {
 		this.listaTitulacion = titulaciones;
+	}
+	
+	public String getVista() {
+		return vista;
+	}
+
+	public void setVista(String vista) {
+		this.vista = vista;
+	}
+	
+	public UsuarioBolsaEmpleo getUsuarioLogeado() {
+		return this.usuarioLogeado;
+	}
+	
+	public void setUsuarioLogeado(UsuarioBolsaEmpleo usuario) {
+		this.usuarioLogeado = usuario;
 	}
 }

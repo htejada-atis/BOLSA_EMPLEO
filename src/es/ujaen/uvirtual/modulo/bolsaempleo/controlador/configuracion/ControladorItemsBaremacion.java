@@ -51,14 +51,14 @@ import es.ujaen.uvirtual.utilidades.UVException;
  * Gestión de los items de baremación.
  */
 @WebServlet(
-		name = "informacionadministrativa.bolsaempleo.configuracion.itemsbaremacion", 
-		description = "Gestión de los items de baremación", 
-		urlPatterns = { 
-				"/srv/es/informacionadministrativa/bolsaempleo/configuracion/itemsbaremacion", 
-				"/srv/en/informacionadministrativa/bolsaempleo/configuracion/itemsbaremacion",
-				"/srv/es/ajax/informacionadministrativa/bolsaempleo/configuracion/itemsbaremacion", 
-				"/srv/en/ajax/informacionadministrativa/bolsaempleo/configuracion/itemsbaremacion"
-		})
+	name = "informacionadministrativa.bolsaempleo.configuracion.itemsbaremacion", 
+	description = "Gestión de los items de baremación", 
+	urlPatterns = { 
+			"/srv/es/informacionadministrativa/bolsaempleo/configuracion/itemsbaremacion", 
+			"/srv/en/informacionadministrativa/bolsaempleo/configuracion/itemsbaremacion",
+			"/srv/es/ajax/informacionadministrativa/bolsaempleo/configuracion/itemsbaremacion", 
+			"/srv/en/ajax/informacionadministrativa/bolsaempleo/configuracion/itemsbaremacion"
+	})
 public class ControladorItemsBaremacion extends HttpServlet {
 	private static final long serialVersionUID = 1L;
 	private static final String NOMBREDEESTACLASE = ControladorItemsBaremacion.class.getName();
@@ -292,6 +292,9 @@ public class ControladorItemsBaremacion extends HttpServlet {
 		try {
 			bean.setUsuarioLogeado(ModeloUsuarioBolsaEmpleo.obtenerInstancia().getOrCreateUsuario(datos));
 		} catch (UVException e) {
+			LOGGER.log(Level.SEVERE, Formateador.getStackTrace(e));
+			LOGGER.log(Level.SEVERE, e.toString());
+			
 			BolsaEmpleoUtils.addMensajeDeError(e.getMessage(), bean, request);
 			response.sendRedirect("/srv/es/informacionadministrativa/bolsaempleo/error");
 		}

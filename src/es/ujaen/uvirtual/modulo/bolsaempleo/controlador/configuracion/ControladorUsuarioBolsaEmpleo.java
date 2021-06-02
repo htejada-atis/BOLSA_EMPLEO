@@ -35,14 +35,14 @@ import es.ujaen.uvirtual.utilidades.UVException;
  * Gestión de los uauarios de UVIRTUAL.
  */
 @WebServlet(
-		name = "informacionadministrativa.bolsaempleo.configuracion.usuarios", 
-		description = "Gestión de las áreas a baremar", 
-		urlPatterns = { 
-				"/srv/es/informacionadministrativa/bolsaempleo/configuracion/usuarios", 
-				"/srv/en/informacionadministrativa/bolsaempleo/configuracion/usuarios",
-				"/srv/es/ajax/informacionadministrativa/bolsaempleo/configuracion/usuarios",
-				"/srv/en/ajax/informacionadministrativa/bolsaempleo/configuracion/usuarios"
-		})
+	name = "informacionadministrativa.bolsaempleo.configuracion.usuarios", 
+	description = "Gestión de las áreas a baremar", 
+	urlPatterns = { 
+			"/srv/es/informacionadministrativa/bolsaempleo/configuracion/usuarios", 
+			"/srv/en/informacionadministrativa/bolsaempleo/configuracion/usuarios",
+			"/srv/es/ajax/informacionadministrativa/bolsaempleo/configuracion/usuarios",
+			"/srv/en/ajax/informacionadministrativa/bolsaempleo/configuracion/usuarios"
+	})
 public class ControladorUsuarioBolsaEmpleo extends HttpServlet {
 	private static final long serialVersionUID = 1L;
 	private static final String NOMBREDEESTACLASE = ControladorUsuarioBolsaEmpleo.class.getName();
@@ -229,6 +229,9 @@ public class ControladorUsuarioBolsaEmpleo extends HttpServlet {
 		try {
 			bean.setUsuarioLogeado(ModeloUsuarioBolsaEmpleo.obtenerInstancia().getOrCreateUsuario(datos));
 		} catch (UVException e) {
+			LOGGER.log(Level.SEVERE, Formateador.getStackTrace(e));
+			LOGGER.log(Level.SEVERE, e.toString());
+			
 			BolsaEmpleoUtils.addMensajeDeError(e.getMessage(), bean, request);
 			response.sendRedirect("/srv/es/informacionadministrativa/bolsaempleo/error");
 		}

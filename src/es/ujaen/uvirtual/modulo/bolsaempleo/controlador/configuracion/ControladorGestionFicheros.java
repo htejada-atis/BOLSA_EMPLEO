@@ -35,14 +35,14 @@ import es.ujaen.uvirtual.utilidades.UVException;
  * Controlador - Opers. con nombres: obtener, eliminar, agregar
  * */
 @WebServlet(
-		name = "informacionadministrativa.bolsaempleo.configuracion.ficheros", 
-		description = "Gestión de ficheros", 
-		urlPatterns = { 
-				"/srv/es/informacionadministrativa/bolsaempleo/configuracion/ficheros", 
-				"/srv/en/informacionadministrativa/bolsaempleo/configuracion/ficheros",
-				"/srv/es/ajax/informacionadministrativa/bolsaempleo/configuracion/ficheros",
-				"/srv/en/ajax/informacionadministrativa/bolsaempleo/configuracion/ficheros"
-		})
+	name = "informacionadministrativa.bolsaempleo.configuracion.ficheros", 
+	description = "Gestión de ficheros", 
+	urlPatterns = { 
+			"/srv/es/informacionadministrativa/bolsaempleo/configuracion/ficheros", 
+			"/srv/en/informacionadministrativa/bolsaempleo/configuracion/ficheros",
+			"/srv/es/ajax/informacionadministrativa/bolsaempleo/configuracion/ficheros",
+			"/srv/en/ajax/informacionadministrativa/bolsaempleo/configuracion/ficheros"
+	})
 @MultipartConfig
 public class ControladorGestionFicheros extends HttpServlet {
 	private static final long serialVersionUID = 1L;
@@ -160,6 +160,9 @@ public class ControladorGestionFicheros extends HttpServlet {
 		try {
 			bean.setUsuarioLogeado(ModeloUsuarioBolsaEmpleo.obtenerInstancia().getOrCreateUsuario(datos));
 		} catch (UVException e) {
+			LOGGER.log(Level.SEVERE, Formateador.getStackTrace(e));
+			LOGGER.log(Level.SEVERE, e.toString());
+			
 			BolsaEmpleoUtils.addMensajeDeError(e.getMessage(), bean, request);
 			response.sendRedirect("/srv/es/informacionadministrativa/bolsaempleo/error");
 		}

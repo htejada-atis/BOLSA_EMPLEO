@@ -27,14 +27,14 @@ import es.ujaen.uvirtual.utilidades.UVException;
  * Gestión de los datos de usuarios de UVIRTUAL.
  */
 @WebServlet(
-        name = "informacionadministrativa.bolsaempleo.misdatos", 
-        description = "Gestión de las áreas a baremar", 
-        urlPatterns = { 
-                "/srv/es/informacionadministrativa/bolsaempleo/misdatos", 
-                "/srv/en/informacionadministrativa/bolsaempleo/misdatos",
-                "/srv/es/ajax/informacionadministrativa/bolsaempleo/misdatos",
-                "/srv/en/ajax/informacionadministrativa/bolsaempleo/misdatos"
-        })
+    name = "informacionadministrativa.bolsaempleo.misdatos", 
+    description = "Gestión de las áreas a baremar", 
+    urlPatterns = { 
+            "/srv/es/informacionadministrativa/bolsaempleo/misdatos", 
+            "/srv/en/informacionadministrativa/bolsaempleo/misdatos",
+            "/srv/es/ajax/informacionadministrativa/bolsaempleo/misdatos",
+            "/srv/en/ajax/informacionadministrativa/bolsaempleo/misdatos"
+    })
 public class ControladorMisDatos extends HttpServlet {
 	private static final long serialVersionUID = 1L;
 	private static final String NOMBREDEESTACLASE = ControladorUsuarioBolsaEmpleo.class.getName();
@@ -156,6 +156,9 @@ public class ControladorMisDatos extends HttpServlet {
 		try {
 			bean.setUsuarioLogeado(ModeloUsuarioBolsaEmpleo.obtenerInstancia().getOrCreateUsuario(datos));
 		} catch (UVException e) {
+			LOGGER.log(Level.SEVERE, Formateador.getStackTrace(e));
+			LOGGER.log(Level.SEVERE, e.toString());
+			
 			BolsaEmpleoUtils.addMensajeDeError(e.getMessage(), bean, request);
 			response.sendRedirect("/srv/es/informacionadministrativa/bolsaempleo/error");
 		}

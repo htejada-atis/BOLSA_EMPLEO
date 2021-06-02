@@ -15,7 +15,7 @@ import bbdd.BbddRunner;
 import bbdd.UtilsTestBolsaEmpleo;
 import controlador.implementacion.PeticionHttp;
 import controlador.implementacion.RespuestaHttp;
-import es.ujaen.uvirtual.modulo.bolsaempleo.controlador.ControladorGestionNoticias;
+import es.ujaen.uvirtual.modulo.bolsaempleo.controlador.ControladorNoticias;
 import es.ujaen.uvirtual.modulo.bolsaempleo.vistas.VistaNoticias;
 import es.ujaen.uvirtual.utilidades.UVException;
 
@@ -52,10 +52,10 @@ public class TestBEPControladorGestionNoticias {
     
     private VistaNoticias obtenerNoticias(String action) throws ServletException, IOException {
     	PeticionHttp peticion = UtilsTestBolsaEmpleo.peticionAutenticadaPersonal();
-		peticion.setParameter(ControladorGestionNoticias.PARAM_ACCION, action);
+		peticion.setParameter(ControladorNoticias.PARAM_ACCION, action);
 
 		RespuestaHttp respuesta = new RespuestaHttp();
-		ControladorGestionNoticias controlador = new ControladorGestionNoticias();
+		ControladorNoticias controlador = new ControladorNoticias();
 		controlador.doGet(peticion, respuesta);
 		return (VistaNoticias) peticion.getUVDatos().getVistas().get(VistaNoticias.class.getName());
     }
@@ -80,7 +80,7 @@ public class TestBEPControladorGestionNoticias {
 	 */
 	@Test
 	public void testA02Obtener() throws SQLException, ServletException, IOException {
-		VistaNoticias bean = obtenerNoticias(ControladorGestionNoticias.ACCION_INDEX);
+		VistaNoticias bean = obtenerNoticias(ControladorNoticias.ACCION_INDEX);
 
 		assertEquals(MENSAJE_SIN_ERROR, 0, bean.getMensajesDeError().size());
 		assertEquals(MENSAJE_SIN_ADVERTENCIAS, 0, bean.getMensajesDeAdvertencia().size());
@@ -93,7 +93,7 @@ public class TestBEPControladorGestionNoticias {
 	 */
 	@Test
 	public void testA03Obtener() throws SQLException, ServletException, IOException {
-		VistaNoticias bean = obtenerNoticias(ControladorGestionNoticias.ACCION_DATATABLE);
+		VistaNoticias bean = obtenerNoticias(ControladorNoticias.ACCION_DATATABLE);
 		
 		assertNotEquals(MENSAJE_NOTICIAS_DEVUELTAS, 0, bean.getDatatableNoticias().getData().size());
 		assertEquals(0, bean.getMensajesDeError().size());
@@ -109,20 +109,20 @@ public class TestBEPControladorGestionNoticias {
 	@Test
 	public void testA04Insertar() throws SQLException, UVException, ServletException, IOException {
 		PeticionHttp peticion = UtilsTestBolsaEmpleo.peticionAutenticadaPersonal();
-		peticion.setParameter(ControladorGestionNoticias.PARAM_ACCION, ControladorGestionNoticias.ACCION_AGREGAR_NOTICIA);
-		peticion.setParameter(ControladorGestionNoticias.PARAM_ENLACE, ENLACE_NOTICIA);
-		peticion.setParameter(ControladorGestionNoticias.PARAM_FECHA, FECHA_NOTICIA);
-		peticion.setParameter(ControladorGestionNoticias.PARAM_PUBLICA, PUBLICA_NOTICIA);
-		peticion.setParameter(ControladorGestionNoticias.PARAM_TEXTO, TEXTO_NOTICIA);
+		peticion.setParameter(ControladorNoticias.PARAM_ACCION, ControladorNoticias.ACCION_AGREGAR_NOTICIA);
+		peticion.setParameter(ControladorNoticias.PARAM_ENLACE, ENLACE_NOTICIA);
+		peticion.setParameter(ControladorNoticias.PARAM_FECHA, FECHA_NOTICIA);
+		peticion.setParameter(ControladorNoticias.PARAM_PUBLICA, PUBLICA_NOTICIA);
+		peticion.setParameter(ControladorNoticias.PARAM_TEXTO, TEXTO_NOTICIA);
 
 		RespuestaHttp respuesta = new RespuestaHttp();
-		ControladorGestionNoticias controlador = new ControladorGestionNoticias();
+		ControladorNoticias controlador = new ControladorNoticias();
 		controlador.doGet(peticion, respuesta);
 		VistaNoticias bean = (VistaNoticias) peticion.getUVDatos().getVistas().get(VistaNoticias.class.getName());
 		
 		assertEquals(0, bean.getMensajesDeError().size());
 		assertEquals(0, bean.getMensajesDeAdvertencia().size());
-		assertEquals(MENSAJE_CON_EXITO_ESPERADO, ControladorGestionNoticias.MENSAJE_EXITO_AGREGAR, bean.getMensajesDeExito().get(0));
+		assertEquals(MENSAJE_CON_EXITO_ESPERADO, ControladorNoticias.MENSAJE_EXITO_AGREGAR, bean.getMensajesDeExito().get(0));
 	}
 	
 	/** editar noticia.
@@ -131,25 +131,25 @@ public class TestBEPControladorGestionNoticias {
 	 */
 	@Test
 	public void testA05Editar() throws ServletException, IOException {
-		VistaNoticias bean = obtenerNoticias(ControladorGestionNoticias.ACCION_DATATABLE);
+		VistaNoticias bean = obtenerNoticias(ControladorNoticias.ACCION_DATATABLE);
 		
 		PeticionHttp peticion = UtilsTestBolsaEmpleo.peticionAutenticadaPersonal();
-		peticion.setParameter(ControladorGestionNoticias.PARAM_ACCION, ControladorGestionNoticias.ACCION_EDITAR_NOTICIA);
-		peticion.setParameter(ControladorGestionNoticias.PARAM_ID, bean.getDatatableNoticias().getData().get(0).getCodNum().toString());
-		peticion.setParameter(ControladorGestionNoticias.PARAM_ENLACE, ENLACE_NOTICIA);
-		peticion.setParameter(ControladorGestionNoticias.PARAM_FECHA, FECHA_NOTICIA);
-		peticion.setParameter(ControladorGestionNoticias.PARAM_PUBLICA, PUBLICA_NOTICIA);
-		peticion.setParameter(ControladorGestionNoticias.PARAM_TEXTO, TEXTO_NOTICIA);
+		peticion.setParameter(ControladorNoticias.PARAM_ACCION, ControladorNoticias.ACCION_EDITAR_NOTICIA);
+		peticion.setParameter(ControladorNoticias.PARAM_ID, bean.getDatatableNoticias().getData().get(0).getCodNum().toString());
+		peticion.setParameter(ControladorNoticias.PARAM_ENLACE, ENLACE_NOTICIA);
+		peticion.setParameter(ControladorNoticias.PARAM_FECHA, FECHA_NOTICIA);
+		peticion.setParameter(ControladorNoticias.PARAM_PUBLICA, PUBLICA_NOTICIA);
+		peticion.setParameter(ControladorNoticias.PARAM_TEXTO, TEXTO_NOTICIA);
 		
 		RespuestaHttp respuesta = new RespuestaHttp();
-		ControladorGestionNoticias controlador = new ControladorGestionNoticias();
+		ControladorNoticias controlador = new ControladorNoticias();
 		controlador.doPost(peticion, respuesta);
 		VistaNoticias bean2 = (VistaNoticias) peticion.getUVDatos().getVistas().get(VistaNoticias.class.getName());
 		
 		assertNotNull(MENSAJE_NOTICIA_DEVUELTA, bean2.getNoticia());
 		assertEquals(MENSAJE_SIN_ERROR, 0, bean2.getMensajesDeError().size());
 		assertEquals(MENSAJE_SIN_ADVERTENCIAS, 0, bean2.getMensajesDeAdvertencia().size());
-		assertEquals(MENSAJE_CON_EXITO_ESPERADO, ControladorGestionNoticias.MENSAJE_EXITO_EDITAR, bean2.getMensajesDeExito().get(0));
+		assertEquals(MENSAJE_CON_EXITO_ESPERADO, ControladorNoticias.MENSAJE_EXITO_EDITAR, bean2.getMensajesDeExito().get(0));
 	}
 	
 	/** eliminar noticia.
@@ -158,20 +158,20 @@ public class TestBEPControladorGestionNoticias {
 	 */
 	@Test
 	public void testA06Eliminar() throws ServletException, IOException {
-		VistaNoticias bean = obtenerNoticias(ControladorGestionNoticias.ACCION_DATATABLE);
+		VistaNoticias bean = obtenerNoticias(ControladorNoticias.ACCION_DATATABLE);
 		
 		PeticionHttp peticion = UtilsTestBolsaEmpleo.peticionAutenticadaPersonal();
-		peticion.setParameter(ControladorGestionNoticias.PARAM_ACCION, ControladorGestionNoticias.ACCION_ELIMINAR_NOTICIA);
-		peticion.setParameter(ControladorGestionNoticias.PARAM_ID, bean.getDatatableNoticias().getData().get(0).getCodNum().toString());
+		peticion.setParameter(ControladorNoticias.PARAM_ACCION, ControladorNoticias.ACCION_ELIMINAR_NOTICIA);
+		peticion.setParameter(ControladorNoticias.PARAM_ID, bean.getDatatableNoticias().getData().get(0).getCodNum().toString());
 		
 		RespuestaHttp respuesta = new RespuestaHttp();
-		ControladorGestionNoticias controlador = new ControladorGestionNoticias();
+		ControladorNoticias controlador = new ControladorNoticias();
 		controlador.doPost(peticion, respuesta);
 		VistaNoticias bean2 = (VistaNoticias) peticion.getUVDatos().getVistas().get(VistaNoticias.class.getName());
 		
 		assertEquals(MENSAJE_SIN_ERROR, 0, bean2.getMensajesDeError().size());
 		assertEquals(MENSAJE_SIN_ADVERTENCIAS, 0, bean2.getMensajesDeAdvertencia().size());
-		assertEquals(MENSAJE_CON_EXITO_ESPERADO, ControladorGestionNoticias.MENSAJE_EXITO_ELIMINAR, bean2.getMensajesDeExito().get(0));
+		assertEquals(MENSAJE_CON_EXITO_ESPERADO, ControladorNoticias.MENSAJE_EXITO_ELIMINAR, bean2.getMensajesDeExito().get(0));
 	}
 	
 	/** accion no valida.
@@ -181,10 +181,10 @@ public class TestBEPControladorGestionNoticias {
 	@Test
 	public void testE01EditarVacio() throws ServletException, IOException {
 		PeticionHttp peticion = UtilsTestBolsaEmpleo.peticionAutenticadaPersonal();
-		peticion.setParameter(ControladorGestionNoticias.PARAM_ACCION, ControladorGestionNoticias.ACCION_EDITAR_NOTICIA);
+		peticion.setParameter(ControladorNoticias.PARAM_ACCION, ControladorNoticias.ACCION_EDITAR_NOTICIA);
 
 		RespuestaHttp respuesta = new RespuestaHttp();
-		ControladorGestionNoticias controlador = new ControladorGestionNoticias();
+		ControladorNoticias controlador = new ControladorNoticias();
 		controlador.doPost(peticion, respuesta);
 		VistaNoticias bean = (VistaNoticias) peticion.getUVDatos().getVistas().get(VistaNoticias.class.getName());
 		

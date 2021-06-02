@@ -41,14 +41,14 @@ import es.ujaen.uvirtual.utilidades.UVException;
  * Apartado de mis méritos de bolsa empleo.
  */
 @WebServlet(
-		name = "informacionadministrativa.bolsaempleo.mismeritos", 
-		description = "Méritos del candidato", 
-		urlPatterns = { 
-				"/srv/es/informacionadministrativa/bolsaempleo/mismeritos", 
-				"/srv/en/informacionadministrativa/bolsaempleo/mismeritos",
-				"/srv/es/ajax/informacionadministrativa/bolsaempleo/mismeritos", 
-				"/srv/en/ajax/informacionadministrativa/bolsaempleo/mismeritos"
-		})
+	name = "informacionadministrativa.bolsaempleo.mismeritos", 
+	description = "Méritos del candidato", 
+	urlPatterns = { 
+			"/srv/es/informacionadministrativa/bolsaempleo/mismeritos", 
+			"/srv/en/informacionadministrativa/bolsaempleo/mismeritos",
+			"/srv/es/ajax/informacionadministrativa/bolsaempleo/mismeritos", 
+			"/srv/en/ajax/informacionadministrativa/bolsaempleo/mismeritos"
+	})
 @MultipartConfig
 public class ControladorMisMeritos extends HttpServlet {
 	private static final long serialVersionUID = 1L;
@@ -173,6 +173,9 @@ public class ControladorMisMeritos extends HttpServlet {
 		try {
 			bean.setUsuarioLogeado(ModeloUsuarioBolsaEmpleo.obtenerInstancia().getOrCreateUsuario(datos));
 		} catch (UVException e) {
+			LOGGER.log(Level.SEVERE, Formateador.getStackTrace(e));
+			LOGGER.log(Level.SEVERE, e.toString());
+			
 			BolsaEmpleoUtils.addMensajeDeError(e.getMessage(), bean, request);
 			response.sendRedirect("/srv/es/informacionadministrativa/bolsaempleo/error");
 		}

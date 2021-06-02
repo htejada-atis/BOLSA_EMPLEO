@@ -31,14 +31,14 @@ import es.ujaen.uvirtual.utilidades.UVException;
  * Gestión de las áreas a baremar.
  */
 @WebServlet(
-		name = "informacionadministrativa.bolsaempleo.configuracion.areasbaremar", 
-		description = "Gestión de las áreas a baremar", 
-		urlPatterns = { 
-				"/srv/es/informacionadministrativa/bolsaempleo/configuracion/areasbaremar", 
-				"/srv/en/informacionadministrativa/bolsaempleo/configuracion/areasbaremar",
-				"/srv/es/ajax/informacionadministrativa/bolsaempleo/configuracion/areasbaremar",
-				"/srv/en/ajax/informacionadministrativa/bolsaempleo/configuracion/areasbaremar"
-		})
+	name = "informacionadministrativa.bolsaempleo.configuracion.areasbaremar", 
+	description = "Gestión de las áreas a baremar", 
+	urlPatterns = { 
+			"/srv/es/informacionadministrativa/bolsaempleo/configuracion/areasbaremar", 
+			"/srv/en/informacionadministrativa/bolsaempleo/configuracion/areasbaremar",
+			"/srv/es/ajax/informacionadministrativa/bolsaempleo/configuracion/areasbaremar",
+			"/srv/en/ajax/informacionadministrativa/bolsaempleo/configuracion/areasbaremar"
+	})
 public class ControladorAreasABaremar extends HttpServlet {
 	private static final long serialVersionUID = 1L;
 	private static final String NOMBREDEESTACLASE = ControladorAreasABaremar.class.getName();
@@ -144,6 +144,9 @@ public class ControladorAreasABaremar extends HttpServlet {
 		try {
 			bean.setUsuarioLogeado(ModeloUsuarioBolsaEmpleo.obtenerInstancia().getOrCreateUsuario(datos));
 		} catch (UVException e) {
+			LOGGER.log(Level.SEVERE, Formateador.getStackTrace(e));
+			LOGGER.log(Level.SEVERE, e.toString());
+			
 			BolsaEmpleoUtils.addMensajeDeError(e.getMessage(), bean, request);
 			response.sendRedirect("/srv/es/informacionadministrativa/bolsaempleo/error");
 		}

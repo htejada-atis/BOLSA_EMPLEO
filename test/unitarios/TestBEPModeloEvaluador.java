@@ -5,7 +5,6 @@ import static org.junit.Assert.fail;
 import java.io.IOException;
 import java.sql.SQLException;
 import java.text.ParseException;
-import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 import org.junit.BeforeClass;
@@ -20,6 +19,7 @@ import es.ujaen.uvirtual.modulo.bolsaempleo.beans.Evaluador;
 import es.ujaen.uvirtual.modulo.bolsaempleo.beans.Rol;
 import es.ujaen.uvirtual.modulo.bolsaempleo.beans.UsuarioBolsaEmpleo;
 import es.ujaen.uvirtual.modulo.bolsaempleo.modelo.ModeloEvaluador;
+import es.ujaen.uvirtual.modulo.bolsaempleo.utilidades.BolsaEmpleoUtils;
 import es.ujaen.uvirtual.utilidades.UVException;
 
 
@@ -34,8 +34,8 @@ public class TestBEPModeloEvaluador {
 	private static final Boolean LISTADIST = true;
 	private static final Boolean EXCLUIDO = false;
 	private static final Boolean BORRADO = true;
-	private static final Date FECHAEXCLUSION = new java.sql.Date(Calendar.getInstance().getTime().getTime());
-	private static final Date FECHABORRADO = new java.sql.Date(Calendar.getInstance().getTime().getTime());
+	private static final Date FECHAEXCLUSION = new java.sql.Date(BolsaEmpleoUtils.getCurrentDateTime().getTime());
+	private static final Date FECHABORRADO = new java.sql.Date(BolsaEmpleoUtils.getCurrentDateTime().getTime());
 	private static final Integer AREA = 3;
     
 	/** prepara la bd con los datos iniciales.
@@ -43,22 +43,22 @@ public class TestBEPModeloEvaluador {
      * @throws IOException si error en ficheros
 	 * @throws ParseException si error fecha
      */
-    @BeforeClass
-    public static void preparaBd() throws SQLException, IOException, ParseException {
-    	Conexion.setConexionUvirtual(BbddRunner.obtenerDataSourceUv());
+	@BeforeClass
+	public static void preparaBd() throws SQLException, IOException {
+		Conexion.setConexionUvirtual(BbddRunner.obtenerDataSourceUv());
 		Conexion.setConexionArcos(BbddRunner.obtenerDataSourceArcos());
 		Conexion.setConexionUxxiRrhh(BbddRunner.obtenerDataSourceRh());
 		Conexion.setConexionUxxiAc(BbddRunner.obtenerDataSourceAc());
 		UtilsTestBolsaEmpleo.inicializaBolsaEmpleo();
-    }
+	}
     
     /** test acierto insertar evaluador.
      * @throws SQLException si error en bd
      * @throws UVException si error al validar evaluador
      * @throws ParseException si error al validar fecha
      */
-    @Test
-    public void testA01InsertaEvaluador() throws SQLException, ParseException, UVException {
+	@Test
+	public void testA01InsertaEvaluador() throws SQLException, ParseException, UVException {
 		Evaluador evaluador = new Evaluador();
 		evaluador.setCodNum(CODNUM);
 		evaluador.setCodCuenta(CODCUENTA);
@@ -70,38 +70,35 @@ public class TestBEPModeloEvaluador {
 		evaluador.setFechaExclusion(FECHAEXCLUSION);
 		evaluador.setBorrado(BORRADO);
 		evaluador.setFechaBorrado(FECHABORRADO);
-		evaluador.setCodNumArea(AREA);    	
+		evaluador.setCodNumArea(AREA);
 
 		ModeloEvaluador.obtenerInstancia().insertaEvaluador(evaluador, AREA, UtilsTestBolsaEmpleo.getUsuarioPersonalLogeado());
-    }
+	}
 
     /** test acierto borrar evaluador.
      * @throws SQLException si error en bd
      * @throws UVException si error al validar evaluador 
      */
-    @Test
-    public void testA02BorraEvaluador() throws SQLException, UVException {
+	@Test
+	public void testA02BorraEvaluador() throws SQLException, UVException {
 		ModeloEvaluador modelo = ModeloEvaluador.obtenerInstancia();
-    	List<Evaluador> evaluadores = modelo.listaEvaluadores();
-    	Evaluador evaluador = evaluadores.get(evaluadores.size() - 1);
-    	Evaluador evaluadorAcum = modelo.getEvaluadorById(evaluador.getCodNum());
-    	modelo.borraRestauraEvaluador(evaluador, UtilsTestBolsaEmpleo.getUsuarioPersonalLogeado());
+		List<Evaluador> evaluadores = modelo.listaEvaluadores();
+		Evaluador evaluador = evaluadores.get(evaluadores.size() - 1);
+		Evaluador evaluadorAcum = modelo.getEvaluadorById(evaluador.getCodNum());
+		modelo.borraRestauraEvaluador(evaluador, UtilsTestBolsaEmpleo.getUsuarioPersonalLogeado());
 
-    	assertTrue("evaluador borrado no debe ser listado", !evaluadorAcum.getBorrado().equals(evaluador.getBorrado()));
-    }
-    
-
-    
+		assertTrue("evaluador borrado no debe ser listado", !evaluadorAcum.getBorrado().equals(evaluador.getBorrado()));
+	}
     
     /** test error inserta usuario null.
      * @throws SQLException si error bd
      * @throws UVException error experado
      */
-    @Test(expected = UVException.class)
-    public void testE01InsertaEvaluadorNull() throws SQLException, UVException {
-    	UsuarioBolsaEmpleo evaluador = null;
-    	ModeloEvaluador modelo = ModeloEvaluador.obtenerInstancia();
-    	modelo.insertaEvaluador(evaluador, AREA, UtilsTestBolsaEmpleo.getUsuarioPersonalLogeado());
-    	fail();
-    }
+	@Test(expected = UVException.class)
+	public void testE01InsertaEvaluadorNull() throws SQLException, UVException {
+		UsuarioBolsaEmpleo evaluador = null;
+		ModeloEvaluador modelo = ModeloEvaluador.obtenerInstancia();
+		modelo.insertaEvaluador(evaluador, AREA, UtilsTestBolsaEmpleo.getUsuarioPersonalLogeado());
+		fail();
+	}
 }

@@ -32,14 +32,14 @@ import es.ujaen.uvirtual.utilidades.UVException;
  * Gestión de los méritos preferentes.
  */
 @WebServlet(
-		name = "informacionadministrativa.bolsaempleo.configuracion.meritospreferentes", 
-		description = "Gestión de los méritos preferentes", 
-		urlPatterns = { 
-				"/srv/es/informacionadministrativa/bolsaempleo/configuracion/meritospreferentes", 
-				"/srv/en/informacionadministrativa/bolsaempleo/configuracion/meritospreferentes",
-				"/srv/es/ajax/informacionadministrativa/bolsaempleo/configuracion/meritospreferentes", 
-				"/srv/en/ajax/informacionadministrativa/bolsaempleo/configuracion/meritospreferentes"
-		})
+	name = "informacionadministrativa.bolsaempleo.configuracion.meritospreferentes", 
+	description = "Gestión de los méritos preferentes", 
+	urlPatterns = { 
+			"/srv/es/informacionadministrativa/bolsaempleo/configuracion/meritospreferentes", 
+			"/srv/en/informacionadministrativa/bolsaempleo/configuracion/meritospreferentes",
+			"/srv/es/ajax/informacionadministrativa/bolsaempleo/configuracion/meritospreferentes", 
+			"/srv/en/ajax/informacionadministrativa/bolsaempleo/configuracion/meritospreferentes"
+	})
 public class ControladorMeritosPreferentes extends HttpServlet {
 	private static final long serialVersionUID = 1L;
 	private static final String NOMBREDEESTACLASE = ControladorMeritosPreferentes.class.getName();
@@ -188,6 +188,9 @@ public class ControladorMeritosPreferentes extends HttpServlet {
 		try {
 			bean.setUsuarioLogeado(ModeloUsuarioBolsaEmpleo.obtenerInstancia().getOrCreateUsuario(datos));
 		} catch (UVException e) {
+			LOGGER.log(Level.SEVERE, Formateador.getStackTrace(e));
+			LOGGER.log(Level.SEVERE, e.toString());
+			
 			BolsaEmpleoUtils.addMensajeDeError(e.getMessage(), bean, request);
 			response.sendRedirect("/srv/es/informacionadministrativa/bolsaempleo/error");
 		}		

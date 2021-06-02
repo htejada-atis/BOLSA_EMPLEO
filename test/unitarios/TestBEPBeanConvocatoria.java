@@ -13,6 +13,7 @@ import org.junit.Test;
 import org.junit.runners.MethodSorters;
 
 import es.ujaen.uvirtual.beans.uvirtual.docentia.Convocatoria;
+import es.ujaen.uvirtual.modulo.bolsaempleo.utilidades.BolsaEmpleoUtils;
 
 /** test convocatoria.
  *
@@ -30,7 +31,7 @@ public class TestBEPBeanConvocatoria {
 		Integer id = 1;
 		Convocatoria convocatoria = new Convocatoria();
 		convocatoria.setEstado(CADENA);
-    	java.sql.Date ahora = new java.sql.Date(Calendar.getInstance().getTime().getTime());
+		java.sql.Date ahora = new java.sql.Date(BolsaEmpleoUtils.getCurrentDateTime().getTime());
 		convocatoria.setFechaComision(ahora);
 		convocatoria.setFechaLimite(ahora);
 		convocatoria.setIdConvocatoria(id);
@@ -50,7 +51,7 @@ public class TestBEPBeanConvocatoria {
 	@Test
 	public void testA02() {
 		Integer id = 1;
-    	java.sql.Date ahora = new java.sql.Date(Calendar.getInstance().getTime().getTime());
+		java.sql.Date ahora = new java.sql.Date(BolsaEmpleoUtils.getCurrentDateTime().getTime());
 		Convocatoria convocatoria2 = new Convocatoria(id, CADENA, CADENA, CADENA, ahora, ahora);
 		Convocatoria convocatoria = new Convocatoria(convocatoria2);
 		convocatoria.setEstado(CADENA);
@@ -77,7 +78,7 @@ public class TestBEPBeanConvocatoria {
 	@SuppressWarnings("java:S2159")
 	public void testA03() {
 		Integer id = 1;
-    	java.sql.Date ahora = new java.sql.Date(Calendar.getInstance().getTime().getTime());
+		java.sql.Date ahora = new java.sql.Date(BolsaEmpleoUtils.getCurrentDateTime().getTime());
 		Convocatoria convocatoria3 = new Convocatoria(id, CADENA, CADENA, CADENA, ahora, ahora);
 		Convocatoria convocatoria2 = new Convocatoria();
 		Convocatoria convocatoria = new Convocatoria();

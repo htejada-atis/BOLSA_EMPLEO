@@ -38,14 +38,14 @@ import es.ujaen.uvirtual.utilidades.UVException;
  * Gestión de las titulaciones de usuarios de UVIRTUAL.
  */
 @WebServlet(
-		name = "informacionadministrativa.bolsaempleo.mistitulaciones", 
-		description = "Gestión de las titulaciones de usuario", 
-		urlPatterns = { 
-				"/srv/es/informacionadministrativa/bolsaempleo/mistitulaciones", 
-				"/srv/en/informacionadministrativa/bolsaempleo/mistitulaciones",
-				"/srv/es/ajax/informacionadministrativa/bolsaempleo/mistitulaciones",
-				"/srv/en/ajax/informacionadministrativa/bolsaempleo/mistitulaciones"
-		})
+	name = "informacionadministrativa.bolsaempleo.mistitulaciones", 
+	description = "Gestión de las titulaciones de usuario", 
+	urlPatterns = { 
+			"/srv/es/informacionadministrativa/bolsaempleo/mistitulaciones", 
+			"/srv/en/informacionadministrativa/bolsaempleo/mistitulaciones",
+			"/srv/es/ajax/informacionadministrativa/bolsaempleo/mistitulaciones",
+			"/srv/en/ajax/informacionadministrativa/bolsaempleo/mistitulaciones"
+	})
 @MultipartConfig
 public class ControladorMisTitulaciones extends HttpServlet {
 	private static final long serialVersionUID = 1L;
@@ -178,6 +178,9 @@ public class ControladorMisTitulaciones extends HttpServlet {
 		try {
 			bean.setUsuarioLogeado(ModeloUsuarioBolsaEmpleo.obtenerInstancia().getOrCreateUsuario(datos));
 		} catch (UVException e) {
+			LOGGER.log(Level.SEVERE, Formateador.getStackTrace(e));
+			LOGGER.log(Level.SEVERE, e.toString());
+			
 			BolsaEmpleoUtils.addMensajeDeError(e.getMessage(), bean, request);
 			response.sendRedirect("/srv/es/informacionadministrativa/bolsaempleo/error");
 		}

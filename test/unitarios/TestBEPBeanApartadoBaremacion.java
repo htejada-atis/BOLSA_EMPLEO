@@ -25,17 +25,18 @@ public class TestBEPBeanApartadoBaremacion {
 	private static final Float PUNTUACIONMAXIMA = (float) 1;
 	private static final Float PORCENTAJEMAXIMO = (float) 1;
 	
-	/** test constructor.
+	/**
+	 * test constructor.
 	 * 
 	 */
 	@Test
 	public void testA01() {
 		ApartadoBaremacion apartado = new ApartadoBaremacion();
-    	apartado.setCodNum(CODNUM);
-    	apartado.setCodigo(CODIGO);
-    	apartado.setNombre(NOMBRE);
-    	apartado.setActivo(ACTIVO);
-    	apartado.setPorcentajeMaximo(PORCENTAJEMAXIMO);
+		apartado.setCodNum(CODNUM);
+		apartado.setCodigo(CODIGO);
+		apartado.setNombre(NOMBRE);
+		apartado.setActivo(ACTIVO);
+		apartado.setPorcentajeMaximo(PORCENTAJEMAXIMO);
 		assertEquals(CODNUM, apartado.getCodNum());
 		assertEquals(CODIGO, apartado.getCodigo());
 		assertEquals(NOMBRE, apartado.getNombre());

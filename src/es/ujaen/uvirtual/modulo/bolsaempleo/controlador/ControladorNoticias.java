@@ -24,21 +24,22 @@ import es.ujaen.uvirtual.utilidades.Formateador;
 import es.ujaen.uvirtual.utilidades.UVException;
 
 
-/** Clase controlador para obtener, cambiar, eliminar y agregar noticias.
- * Controlador - Opers. con nombres: obtener,  cambiar, eliminar, agregar
- * */
+/**
+ * Clase controlador para obtener, cambiar, eliminar y agregar noticias.
+ * Controlador - Opers. con nombres: obtener, cambiar, eliminar, agregar
+ */
 @WebServlet(
-		name = "informacionadministrativa.bolsaempleo.noticias", 
-		description = "Gestión de noticias", 
-		urlPatterns = { 
-				"/srv/es/informacionadministrativa/bolsaempleo/noticias", 
-				"/srv/en/informacionadministrativa/bolsaempleo/noticias",
-				"/srv/es/ajax/informacionadministrativa/bolsaempleo/noticias",
-				"/srv/en/ajax/informacionadministrativa/bolsaempleo/noticias"
-		})
-public class ControladorGestionNoticias extends HttpServlet {
+	name = "informacionadministrativa.bolsaempleo.noticias", 
+	description = "Gestión de noticias", 
+	urlPatterns = { 
+			"/srv/es/informacionadministrativa/bolsaempleo/noticias", 
+			"/srv/en/informacionadministrativa/bolsaempleo/noticias",
+			"/srv/es/ajax/informacionadministrativa/bolsaempleo/noticias",
+			"/srv/en/ajax/informacionadministrativa/bolsaempleo/noticias"
+	})
+public class ControladorNoticias extends HttpServlet {
 	private static final long serialVersionUID = 1L;
-	private static final String NOMBREDEESTACLASE = ControladorGestionNoticias.class.getName();
+	private static final String NOMBREDEESTACLASE = ControladorNoticias.class.getName();
 	private static final Logger LOGGER = Logger.getLogger(NOMBREDEESTACLASE);
 	
 	// Acciones
@@ -80,6 +81,7 @@ public class ControladorGestionNoticias extends HttpServlet {
 	
 	// ruta vistas
 	public static final String RUTA_BEP_NOTICIAS = "/WEB-INF/jsp/vista/infadministrativa/bolsaempleo/gestionnoticias/";
+	public static final String JSP_INDEX = RUTA_BEP_NOTICIAS + "indice.jsp";
 	
 	// urls
 	public static final String URL_PATTERN_AJAX = "/srv/es/ajax/informacionadministrativa/bolsaempleo/noticias";
@@ -89,6 +91,8 @@ public class ControladorGestionNoticias extends HttpServlet {
 	 */
 	@Override
 	public void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+		LOGGER.log(Level.FINER, "doGet inicio");
+		
 		UVDatos datos = (UVDatos) request.getAttribute(UVDatos.NOMBRE_ATRIBUTO);
 		datos.setDocType("<!DOCTYPE html>");
 		datos.setContentType("text/html");
@@ -99,11 +103,14 @@ public class ControladorGestionNoticias extends HttpServlet {
 		if (nombreAccion == null) {
 			nombreAccion = ACCION_INDEX;
 		}
+		
+		LOGGER.log(Level.FINER, String.format("acción [%s]", nombreAccion));
+		
 		try {
 			init(bean, datos, request, response);
 			switch (nombreAccion) {
 				case ACCION_INDEX:
-					bean.setVista(RUTA_BEP_NOTICIAS + "indice.jsp");
+					bean.setVista(JSP_INDEX);
 					break;
 				case ACCION_AGREGAR_NOTICIA:
 					agregarNoticia(bean, request, response);
@@ -142,11 +149,18 @@ public class ControladorGestionNoticias extends HttpServlet {
 	}
 	
 	private void init(VistaNoticias bean, UVDatos datos, HttpServletRequest request, HttpServletResponse response) throws SQLException, UVException, IOException {
-		bean.setVista(RUTA_BEP_NOTICIAS + "indice.jsp");
+		bean.setVista(JSP_INDEX);
+		LOGGER.log(Level.FINER, String.format("init jsp [%s]", JSP_INDEX));
+		
 		BolsaEmpleoUtils.readMensajeSession(bean, request);
 		try {
+			LOGGER.log(Level.FINER, "Chequeando usuario logeado");
 			bean.setUsuarioLogeado(ModeloUsuarioBolsaEmpleo.obtenerInstancia().getOrCreateUsuario(datos));
 		} catch (UVException e) {
+			LOGGER.log(Level.FINER, "Error chequeando usuario logeado");
+			LOGGER.log(Level.SEVERE, Formateador.getStackTrace(e));
+			LOGGER.log(Level.SEVERE, e.toString());
+			
 			BolsaEmpleoUtils.addMensajeDeError(e.getMessage(), bean, request);
 			response.sendRedirect("/srv/es/informacionadministrativa/bolsaempleo/error");
 		}

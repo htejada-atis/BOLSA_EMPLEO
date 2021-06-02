@@ -1,10 +1,10 @@
 <%@ page trimDirectiveWhitespaces="true"%>
 <%@ page import="es.ujaen.uvirtual.beans.UVDatos"%>
-<%@	page import="es.ujaen.uvirtual.modulo.bolsaempleo.controlador.ControladorGestionNoticias"%>
+<%@	page import="es.ujaen.uvirtual.modulo.bolsaempleo.controlador.ControladorNoticias"%>
 <%@ page import="es.ujaen.uvirtual.modulo.bolsaempleo.vistas.VistaNoticias"%>
 <%@ page import="es.ujaen.uvirtual.utilidades.EscapaHTML" %>
 
-<% 
+<%
 UVDatos uvdatos = (UVDatos) request.getAttribute(UVDatos.NOMBRE_ATRIBUTO);
 VistaNoticias bean = (VistaNoticias) uvdatos.getVistas().get(VistaNoticias.class.getName());
 %>
@@ -46,11 +46,11 @@ VistaNoticias bean = (VistaNoticias) uvdatos.getVistas().get(VistaNoticias.class
 	$(document).ready(function() {
 		
 		document.getElementById("nueva_noticia").addEventListener("click", function() {
-			Atis.sendForm("<%= request.getRequestURI() %>", {'a': '<%= ControladorGestionNoticias.ACCION_AGREGAR_NOTICIA %>'});
+			Atis.sendForm("<%=request.getRequestURI()%>", {'a': '<%=ControladorNoticias.ACCION_AGREGAR_NOTICIA%>'});
 		});
 
 		var table = new Atis.DataTable('#table_noticias_insertadas', {
-		    "ajax": { url: "<%= ControladorGestionNoticias.URL_PATTERN_AJAX %>" },
+		    "ajax": { url: "<%=ControladorNoticias.URL_PATTERN_AJAX%>" },
 		    "pageSize": 10,
 	    	"defaultOrderBy": 0,
 		    "filterable": true,
@@ -78,8 +78,8 @@ VistaNoticias bean = (VistaNoticias) uvdatos.getVistas().get(VistaNoticias.class
 	        		}
 	        	}},
 		        {'data': 'codnum', 'buttons': [{'label': 'Editar', 'onClick': function(row) {
-			        		var params = {'a': '<%= ControladorGestionNoticias.ACCION_EDITAR_NOTICIA %>', 'id': row.codNum};
-			        		Atis.sendForm("<%= request.getRequestURI() %>", params);
+			        		var params = {'a': '<%=ControladorNoticias.ACCION_EDITAR_NOTICIA%>', 'id': row.codNum};
+			        		Atis.sendForm("<%=request.getRequestURI()%>", params);
 			        	}
 			        }, {'label': function(row) { return row.activa ? "Borrar" : "Restaurar"; }, 
 			        	'title':  function(row) { return row.activa ? "Borrar noticia" : "Restaurar noticia"; }, 'onClick': function(row) {
@@ -92,9 +92,9 @@ VistaNoticias bean = (VistaNoticias) uvdatos.getVistas().get(VistaNoticias.class
 			        	
 			        	Atis.confirmDialog(titulo, mensaje, {
 					        Si: function() {
-					        	var params = {'a': '<%= ControladorGestionNoticias.ACCION_ELIMINAR_NOTICIA %>',
+					        	var params = {'a': '<%=ControladorNoticias.ACCION_ELIMINAR_NOTICIA%>',
 					        			'id': row.codNum,
-					        			'<%= ControladorGestionNoticias.PARAM_ACTIVA %>': !row.activa};
+					        			'<%=ControladorNoticias.PARAM_ACTIVA%>': !row.activa};
 				        		Atis.sendForm("<%= request.getRequestURI() %>", params);
 					          	$(this).dialog("close");
 					        },

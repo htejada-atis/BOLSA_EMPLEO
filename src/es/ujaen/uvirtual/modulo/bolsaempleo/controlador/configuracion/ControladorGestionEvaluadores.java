@@ -38,14 +38,14 @@ import es.ujaen.uvirtual.utilidades.UVException;
  * Controlador - Opers. con nombres: obtener, eliminar .
  * */
 @WebServlet(
-		name = "informacionadministrativa.bolsaempleo.configuracion.evaluadores", 
-		description = "Gestión de evaluadores de un área", 
-		urlPatterns = { 
-				"/srv/es/informacionadministrativa/bolsaempleo/configuracion/evaluadores", 
-				"/srv/en/informacionadministrativa/bolsaempleo/configuracion/evaluadores",
-				"/srv/es/ajax/informacionadministrativa/bolsaempleo/configuracion/evaluadores",
-				"/srv/en/ajax/informacionadministrativa/bolsaempleo/configuracion/evaluadores"
-		})
+	name = "informacionadministrativa.bolsaempleo.configuracion.evaluadores", 
+	description = "Gestión de evaluadores de un área", 
+	urlPatterns = { 
+			"/srv/es/informacionadministrativa/bolsaempleo/configuracion/evaluadores", 
+			"/srv/en/informacionadministrativa/bolsaempleo/configuracion/evaluadores",
+			"/srv/es/ajax/informacionadministrativa/bolsaempleo/configuracion/evaluadores",
+			"/srv/en/ajax/informacionadministrativa/bolsaempleo/configuracion/evaluadores"
+	})
 public class ControladorGestionEvaluadores extends HttpServlet {
 	private static final long serialVersionUID = 1L;
 	private static final String NOMBREDEESTACLASE = ControladorGestionEvaluadores.class.getName();
@@ -163,6 +163,9 @@ public class ControladorGestionEvaluadores extends HttpServlet {
 		try {
 			bean.setUsuarioLogeado(ModeloUsuarioBolsaEmpleo.obtenerInstancia().getOrCreateUsuario(datos));
 		} catch (UVException e) {
+			LOGGER.log(Level.SEVERE, Formateador.getStackTrace(e));
+			LOGGER.log(Level.SEVERE, e.toString());
+			
 			BolsaEmpleoUtils.addMensajeDeError(e.getMessage(), bean, request);
 			response.sendRedirect("/srv/es/informacionadministrativa/bolsaempleo/error");
 		}

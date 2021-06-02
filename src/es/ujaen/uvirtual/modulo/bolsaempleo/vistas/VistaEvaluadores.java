@@ -3,23 +3,30 @@ package es.ujaen.uvirtual.modulo.bolsaempleo.vistas;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
+
+import es.ujaen.uvirtual.beans.vistas.Vista;
 import es.ujaen.uvirtual.modulo.bolsaempleo.beans.Area;
 import es.ujaen.uvirtual.modulo.bolsaempleo.beans.AreaEvaluadoresTable;
 import es.ujaen.uvirtual.modulo.bolsaempleo.beans.Departamento;
 import es.ujaen.uvirtual.modulo.bolsaempleo.beans.Evaluador;
+import es.ujaen.uvirtual.modulo.bolsaempleo.beans.UsuarioBolsaEmpleo;
 import es.ujaen.uvirtual.modulo.bolsaempleo.utilidades.BolsaEmpleoDataTable;
 
-/** Bean para la vista.
+/**
+ * Bean para la vista.
+ * 
  * @author ATISoluciones
  */
-public class VistaEvaluadores extends VistaBEP implements Serializable {
+public class VistaEvaluadores extends Vista implements Serializable {
 	private static final long serialVersionUID = 1L;
 	private List<Departamento> departamentos = new ArrayList<>();
-	private BolsaEmpleoDataTable<AreaEvaluadoresTable> dataTableAreas;
-	private BolsaEmpleoDataTable<Evaluador> dataTableEvaluadores;
+	private transient BolsaEmpleoDataTable<AreaEvaluadoresTable> dataTableAreas;
+	private transient BolsaEmpleoDataTable<Evaluador> dataTableEvaluadores;
 	private Area area;
 	private Departamento departamento;
 	private Evaluador evaluador;
+	private String vista;
+	private UsuarioBolsaEmpleo usuarioLogeado;
 	
 	public List<Departamento> getDepartamentos() {
 		return departamentos;
@@ -67,5 +74,21 @@ public class VistaEvaluadores extends VistaBEP implements Serializable {
 	
 	public void setEvaluador(Evaluador evaluador) {
 		this.evaluador = evaluador;
+	}
+	
+	public String getVista() {
+		return vista;
+	}
+
+	public void setVista(String vista) {
+		this.vista = vista;
+	}
+	
+	public UsuarioBolsaEmpleo getUsuarioLogeado() {
+		return this.usuarioLogeado;
+	}
+	
+	public void setUsuarioLogeado(UsuarioBolsaEmpleo usuario) {
+		this.usuarioLogeado = usuario;
 	}
 }
