@@ -31,7 +31,7 @@ public class ModeloBaremacionApartados {
 	public static final int ORDER_COLUMN_INDEX_APARTADOS_ACTIVO = 4;
 	
 	// errores
-	public static final String ERROR_APARTADO_REQUERIDO = "El bloque es requerido";
+	public static final String ERROR_BLOQUE_REQUERIDO = "El bloque es requerido";
 	public static final String ERROR_APARTADO_NOEXITE = "Bloque no encontrado";
 	public static final String ERROR_APARTADO_OBTENIENDO_TOTAL = "No hay conteo de bloques";
 	public static final String ERROR_PUNTUACION_PORCENTAJE_MAXIMO = "Debe introducir una puntuación o un porcentaje máximo, pero no ambos";
@@ -80,7 +80,7 @@ public class ModeloBaremacionApartados {
 	 */
 	public ApartadoBaremacion getApartadoBaremacionById(Integer codNum) throws SQLException, UVException {
 		if (codNum == null) {
-			throw new UVException(ERROR_APARTADO_REQUERIDO);	
+			throw new UVException(ERROR_BLOQUE_REQUERIDO);	
 		}
 			
 		String sql = "SELECT bepapa.* FROM TBEP_APARTADOSBAREMACION bepapa WHERE bepapa.CODNUM = ?";
@@ -171,7 +171,7 @@ public class ModeloBaremacionApartados {
 	 */
 	public Integer insertaApartado(ApartadoBaremacion apartado, UsuarioBolsaEmpleo usuarioUpdate) throws SQLException, UVException {
 		if (apartado == null) {
-			throw new UVException(ERROR_APARTADO_REQUERIDO);
+			throw new UVException(ERROR_BLOQUE_REQUERIDO);
 		}
 		
 		this.chequearApartadoParaInsertarOActualizar(apartado);

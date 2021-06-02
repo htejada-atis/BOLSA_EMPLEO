@@ -30,7 +30,9 @@ public class ModeloBaremacionBloques {
 	public static final int ORDER_COLUMN_INDEX_BLOQUES_ACTIVO = 3;
 		
 	// errores
-	public static final String ERROR_BLOQUE_NOEXITE = "Bloque no encontrado";	
+	public static final String ERROR_BLOQUE_NOEXITE = "Apartado no encontrado";	
+	public static final String ERROR_BLOQUE_REQUERIDO = "El bloque de baremación es requerido";
+	public static final String ERROR_BLOQUE_MISMO_CODIGO = "Ya existe un bloque con el código introducido";
 
 	public static final Integer COLUMN_CODIGO_MAXLENGTH = 3;
 	public static final Integer COLUMN_NOMBRE_MAXLENGTH = 100;
@@ -72,7 +74,7 @@ public class ModeloBaremacionBloques {
 	 */
 	public BloqueBaremacion getBloqueBaremacionById(Integer codNum) throws SQLException, UVException {
 		if (codNum == null) {
-			throw new UVException("El bloque de baremación es requerido");
+			throw new UVException(ERROR_BLOQUE_REQUERIDO);
 		}
 		
 		String sql = "SELECT bepblo.* FROM TBEP_BLOQUESBAREMACION bepblo WHERE bepblo.CODNUM = ?";
@@ -198,12 +200,13 @@ public class ModeloBaremacionBloques {
 	/** Función que inserta un bloque en la BD.
 	 * @param bloque .
 	 * @param usuarioInsert .
+	 * @return .
 	 * @throws SQLException .
 	 * @throws UVException .
 	 */
-	public void insertaBloque(BloqueBaremacion bloque, UsuarioBolsaEmpleo usuarioInsert) throws SQLException, UVException {
+	public Integer insertaBloque(BloqueBaremacion bloque, UsuarioBolsaEmpleo usuarioInsert) throws SQLException, UVException {
 		if (bloque == null) {
-			throw new UVException("No se puede insertar un bloque vacio");
+			throw new UVException(ERROR_BLOQUE_REQUERIDO);
 		}
 		
 		this.chequearBloqueParaInsertarOActualizar(bloque);
@@ -212,7 +215,7 @@ public class ModeloBaremacionBloques {
 				+ " (CODIGO,NOMBRE,BEPAPA_CODNUM,NUMERO_MAXIMO_MERITOS,UID_USUARIO)"
 				+ " VALUES (?,?,?,?,?)";
 		
-		try (Connection conexion = ConexionUvirtual.obtenerInstancia(); PreparedStatement stmt = conexion.prepareStatement(consulta)) {
+		try (Connection conexion = ConexionUvirtual.obtenerInstancia(); PreparedStatement stmt = conexion.prepareStatement(consulta, new String[]{CODNUM})) {
 			int parameterIndex = 1;
 			stmt.setString(parameterIndex++, bloque.getCodigo());
 			stmt.setString(parameterIndex++, bloque.getNombre());
@@ -224,6 +227,11 @@ public class ModeloBaremacionBloques {
 			}
 			stmt.setString(parameterIndex++, usuarioInsert.getCodCuenta());
 			stmt.executeUpdate();
+			
+			ResultSet rs = stmt.getGeneratedKeys();
+			rs.next();
+			
+			return rs.getInt(1);
 		}
 	}
 		
@@ -288,7 +296,7 @@ public class ModeloBaremacionBloques {
 	
 	private void chequearBloqueParaInsertarOActualizar(BloqueBaremacion bloque) throws SQLException, UVException {
 		if (this.existeOtroBloqueActivoPorCodigo(bloque)) {
-			throw new UVException("Ya existe un bloque con el código introducido");
+			throw new UVException(ERROR_BLOQUE_MISMO_CODIGO);
 		}		
 	}
 
