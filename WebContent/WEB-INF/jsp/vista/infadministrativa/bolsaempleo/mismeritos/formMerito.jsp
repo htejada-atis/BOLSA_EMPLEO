@@ -166,6 +166,11 @@ String observacion = BolsaEmpleoUtils.getParamForm(request, ControladorMisMerito
 			else $('#merito_valor_label').text('Valor');		
 		})
 		
+		$('#agregar_merito').submit(function(event) { 
+			$('#merito_enviar').prop('disabled', true);
+			$('#merito_enviar').attr('value', 'Guardando mérito...');		
+			return true;
+		});
 		
 	});
 
