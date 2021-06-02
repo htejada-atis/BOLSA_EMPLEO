@@ -7,7 +7,6 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import es.ujaen.uvirtual.modelo.conexion.ConexionArcos;
 import es.ujaen.uvirtual.modelo.conexion.ConexionUvirtual;
 import es.ujaen.uvirtual.modulo.bolsaempleo.beans.Area;
 import es.ujaen.uvirtual.modulo.bolsaempleo.beans.AreaEvaluadoresTable;
@@ -34,12 +33,14 @@ public class ModeloEvaluador {
 	public static final int ORDER_COLUMN_INDEX_CODIGO = 2;
 	public static final int ORDER_COLUMN_INDEX_AREA = 3;
 	
-	protected static ModeloEvaluador eInstancia = null;
+	protected static ModeloEvaluador eInstancia;
 	public static final String MENSAJE_ERROR_NO_EXISTE_EVALUADOR = "No existe el evaluador sin ID";
 	
 	public static final Integer PARAM_ROL_ID = 1051;
 	
 	public static final String CODNUM = "CODNUM";
+	public static final String ACTIVO = "S";
+	public static final String INACTIVO = "N";
 	
 	
 	/** Crea una instancia del objeto.
@@ -63,106 +64,33 @@ public class ModeloEvaluador {
 		return eInstancia;
 	}
     
-    /** Consulta evaluadores en BBDD y los devuelve.
-	 * @return todos los evaluadores .
-	 * @throws SQLException en caso de error de base de datos
-	 */
-	public List<Evaluador> listaEvaluadores() throws SQLException {
-		List<Evaluador> evaluadores = new ArrayList<>();
-		String consulta = "SELECT * FROM TBEP_USUARIOS bepusu "
-				+ "INNER JOIN TBEP_EVALUADORES bepeva ON bepusu.CODNUM = bepeva.BEPUSU_CODNUM "
-				+ "WHERE FLGBORRADO!='S' AND FLGEXCLUIDO!='S' "
-				+ "AND bepusu.ROL = " + PARAM_ROL_ID;
-		
-		try (Connection conexion = ConexionUvirtual.obtenerInstancia();
-				PreparedStatement stmt = conexion.prepareStatement(consulta)) {
-			try (ResultSet rs = stmt.executeQuery()) {
-				while (rs.next()) {
-					String consultaArcos = "SELECT * FROM arcos.VUJA_NET_BEP_AR_PERSONA WHERE PRSNIF = ?";
-					
-				    try (Connection conexionArcos = ConexionArcos.obtenerInstancia();
-				    	PreparedStatement stmtArcos = conexionArcos.prepareStatement(consultaArcos);) {
-				    	stmtArcos.setString(1, rs.getString("PRSNIF"));
-				    	try (ResultSet rsArcos = stmtArcos.executeQuery();) {
-					    	while (rsArcos.next()) {
-								UsuarioBolsaEmpleo usuario = new UsuarioBolsaEmpleo();
-								usuario.setCodNum(rs.getInt("CODNUM"));
-								usuario.setTipoDocumento(rsArcos.getString("STRTIPODOCUMENTO"));
-								usuario.setNumDocumento(rsArcos.getString("PRSNIF"));
-								usuario.setNombre(rsArcos.getString("STRNOMBRE"));
-								usuario.setPrimerApellido(rsArcos.getString("STRAPELLIDO1"));
-								usuario.setSegundoApellido(rsArcos.getString("STRAPELLIDO2"));
-								
-								Integer codNumArea = rs.getInt("BEPARE_CODNUM");
-								Boolean activo = rs.getString("FLGACTIVO").equals("S");
-								Evaluador evaluador = new Evaluador(usuario, codNumArea, activo);
-								evaluadores.add(evaluador);
-					    	}
-				    	}
-				    }
-				}
-			}
-		}
-
-		return evaluadores;
-	}
-	
 	/**
-	 * Devuelve un evaluador por su id.
+	 * Devuelve un evaluador por su id y por su area.
 	 * @param codNum .
+	 * @param idArea .
 	 * @return Evaluador o null si no existe
 	 * @throws SQLException .
 	 */
-	public Evaluador getEvaluadorById(Integer codNum) throws SQLException, UVException {
+	public Evaluador getEvaluadorById(Integer codNum, Integer idArea) throws SQLException, UVException {
+		String consulta = "SELECT * FROM TBEP_EVALUADORES bepeva WHERE bepeva.BEPUSU_CODNUM = ? and bepeva.BEPARE_CODNUM = ?";
 
-		String consulta = "SELECT * FROM TBEP_USUARIOS bepusu "
-				+ "INNER JOIN TBEP_EVALUADORES bepeva ON bepusu.CODNUM = bepeva.BEPUSU_CODNUM "
-				+ "WHERE FLGBORRADO!='S' AND FLGEXCLUIDO!='S' "
-				+ "AND bepusu.ROL = " + PARAM_ROL_ID + " AND bepusu.CODNUM = ?";
-		
-		Evaluador evaluador = null;
-		try (Connection conexion = ConexionUvirtual.obtenerInstancia();
-				PreparedStatement stmt = conexion.prepareStatement(consulta)) {
-			stmt.setInt(1, codNum);
+		try (Connection conexion = ConexionUvirtual.obtenerInstancia(); PreparedStatement stmt = conexion.prepareStatement(consulta)) {
+			int paramIndex = 1;
+			stmt.setInt(paramIndex++, codNum);
+			stmt.setInt(paramIndex++, idArea);
+			
 			try (ResultSet rs = stmt.executeQuery()) {
 				while (rs.next()) {
-					String consultaArcos = "SELECT * FROM arcos.VUJA_NET_BEP_AR_PERSONA WHERE PRSNIF = ?";
+					UsuarioBolsaEmpleo usuario = ModeloUsuarioBolsaEmpleo.obtenerInstancia().getUsuarioById(rs.getInt("BEPUSU_CODNUM"));
 					
-				    try (Connection conexionArcos = ConexionArcos.obtenerInstancia();
-				    	PreparedStatement stmtArcos = conexionArcos.prepareStatement(consultaArcos);) {
-				    	stmtArcos.setString(1, rs.getString("PRSNIF"));
-				    	try (ResultSet rsArcos = stmtArcos.executeQuery();) {
-					    	while (rsArcos.next()) {
-								UsuarioBolsaEmpleo usuario = new UsuarioBolsaEmpleo();
-								usuario.setCodNum(rs.getInt("CODNUM"));
-								usuario.setTipoDocumento(rsArcos.getString("STRTIPODOCUMENTO"));
-								usuario.setNumDocumento(rsArcos.getString("PRSNIF"));
-								usuario.setNombre(rsArcos.getString("STRNOMBRE"));
-								usuario.setPrimerApellido(rsArcos.getString("STRAPELLIDO1"));
-								usuario.setSegundoApellido(rsArcos.getString("STRAPELLIDO2"));
-								usuario.setListaDist(rs.getString("FLGLISTADISTRIBUCION").equals("S"));
-								usuario.setExcluido(rs.getString("FLGEXCLUIDO").equals("S"));
-								usuario.setExcluidoTipo(rs.getString("FLGEXCLUIDOTIPO"));
-								usuario.setFechaExclusionInicio(rs.getTimestamp("FECHA_EXCLUSION_INICIO"));
-								usuario.setFechaExclusionFin(rs.getTimestamp("FECHA_EXCLUSION_FIN"));
-								usuario.setRazonExcluido(rs.getString("RAZON_EXCLUSION"));
-								usuario.setFechaExclusion(rs.getTimestamp("FECHA_EXCLUSION"));
-								usuario.setBorrado(rs.getString("FLGBORRADO").equals("S"));
-								usuario.setFechaBorrado(rs.getTimestamp("FECHA_BORRADO"));
-								
-								Integer codNumArea = rs.getInt("BEPARE_CODNUM");
-								Boolean activo = rs.getString("FLGACTIVO").equals("S");
-								evaluador = new Evaluador(usuario, codNumArea, activo);
-								
-								return evaluador;
-					    	}
-				    	}
-				    }
+					Integer codNumArea = rs.getInt("BEPARE_CODNUM");
+					Boolean activo = rs.getString("FLGACTIVO").equals(ACTIVO);
+					return new Evaluador(usuario, codNumArea, activo);
 				}
 			}
 		}
-		
-		return evaluador;
+
+		return null;
 	}
 	
 	/**
@@ -230,7 +158,7 @@ public class ModeloEvaluador {
 		}
 		
 		List<Evaluador> usuarios = new ArrayList<>();
-		BolsaEmpleoDataTable<Evaluador> dataTable = new BolsaEmpleoDataTable<Evaluador>(params);
+		BolsaEmpleoDataTable<Evaluador> dataTable = new BolsaEmpleoDataTable<>(params);
 		
 		String consulta = "SELECT * FROM TBEP_USUARIOS bepusu "
 				+ "INNER JOIN TBEP_EVALUADORES bepeva ON bepusu.CODNUM = bepeva.BEPUSU_CODNUM "
@@ -245,7 +173,7 @@ public class ModeloEvaluador {
 		
 		try (Connection conexion = ConexionUvirtual.obtenerInstancia();
 				PreparedStatement stmtCount = conexion.prepareStatement(dataTable.getQueryCount());
-				PreparedStatement stmt = conexion.prepareStatement(dataTable.getQuery());
+				PreparedStatement stmt = conexion.prepareStatement(dataTable.getQuery())
 		) {
 			int indexParam = 1;
 			stmt.setInt(indexParam, area);
@@ -253,28 +181,11 @@ public class ModeloEvaluador {
 			dataTable.setFiltersParams(stmt, stmtCount, indexParam);
 			try (ResultSet rs = stmt.executeQuery()) {
 				while (rs.next()) {
-					String consultaArcos = "SELECT * FROM arcos.VUJA_NET_BEP_AR_PERSONA WHERE PRSNIF = ?";
-					
-				    try (Connection conexionArcos = ConexionArcos.obtenerInstancia();
-				    	PreparedStatement stmtArcos = conexionArcos.prepareStatement(consultaArcos);) {
-				    	stmtArcos.setString(1, rs.getString("PRSNIF"));
-				    	try (ResultSet rsArcos = stmtArcos.executeQuery();) {
-					    	while (rsArcos.next()) {
-								UsuarioBolsaEmpleo usuario = new UsuarioBolsaEmpleo();
-								usuario.setCodNum(rs.getInt("CODNUM"));
-								usuario.setTipoDocumento(rsArcos.getString("STRTIPODOCUMENTO"));
-								usuario.setNumDocumento(rsArcos.getString("PRSNIF"));
-								usuario.setNombre(rsArcos.getString("STRNOMBRE"));
-								usuario.setPrimerApellido(rsArcos.getString("STRAPELLIDO1"));
-								usuario.setSegundoApellido(rsArcos.getString("STRAPELLIDO2"));
-								
-								Integer codNumArea = rs.getInt("BEPARE_CODNUM");
-								Boolean activo = rs.getString("FLGACTIVO").equals("S");
-								Evaluador evaluador = new Evaluador(usuario, codNumArea, activo);
-								usuarios.add(evaluador);
-					    	}
-				    	}
-				    }
+					UsuarioBolsaEmpleo usuario = ModeloUsuarioBolsaEmpleo.obtenerInstancia().getUsuarioById(rs.getInt("CODNUM"));
+					Integer codNumArea = rs.getInt("BEPARE_CODNUM");
+					Boolean activo = rs.getString("FLGACTIVO").equals(ACTIVO);
+					Evaluador evaluador = new Evaluador(usuario, codNumArea, activo);
+					usuarios.add(evaluador);
 				}				
 			}
 			
@@ -292,7 +203,7 @@ public class ModeloEvaluador {
 	 * @throws SQLException en caso de error de base de datos
 	 * @throws UVException .
 	 */
-	public boolean checkEvaluadorArea(Area area, UsuarioBolsaEmpleo usu) throws SQLException, UVException {
+	public boolean checkEvaluadorArea(Area area, UsuarioBolsaEmpleo usu) throws SQLException {
 		String consulta = "SELECT * FROM TBEP_USUARIOS bepusu "
 				+ "INNER JOIN TBEP_EVALUADORES bepeva ON bepusu.CODNUM = bepeva.BEPUSU_CODNUM "
 				+ "WHERE bepeva.BEPARE_CODNUM = ? AND BEPUSU_CODNUM = ?";
@@ -356,16 +267,13 @@ public class ModeloEvaluador {
 			throw new UVException("No se puede agregar un evaluador si el usuario esta vacio");
 		}
 
-		String consulta = "INSERT INTO TBEP_EVALUADORES (BEPARE_CODNUM, BEPUSU_CODNUM, UID_USUARIO)"
-				+ " SELECT bepare.CODNUM AS BEPARE_CODNUM, bepusu.CODNUM AS BEPUSU_CODNUM, ? AS UID_USUARIO"
-				+ " FROM TBEP_USUARIOS bepusu, TBEP_AREAS bepare WHERE bepare.CODNUM = ? AND"
-				+ " bepusu.CODNUM = ?";
+		String consulta = "INSERT INTO TBEP_EVALUADORES (BEPARE_CODNUM, BEPUSU_CODNUM, UID_USUARIO) VALUES (?,?,?)";
 		
 		try (Connection conexion = ConexionUvirtual.obtenerInstancia(); PreparedStatement stmt = conexion.prepareStatement(consulta)) {
-			int indexParam = 1;
-			stmt.setString(indexParam++, usuarioUpdate.getCodCuenta());
+			int indexParam = 1;			
 			stmt.setInt(indexParam++, area);
 			stmt.setInt(indexParam++, usuario.getCodNum());
+			stmt.setString(indexParam++, usuarioUpdate.getCodCuenta());
 			stmt.executeUpdate();
 		}
 	}
@@ -387,10 +295,9 @@ public class ModeloEvaluador {
 			throw new UVException("No se puede eliminar un evaluador con id de area vacío");
 		}
 		String consulta = "UPDATE TBEP_EVALUADORES SET flgactivo=?, UID_USUARIO=? WHERE bepusu_codnum=? AND bepare_codnum=? ";
-		try (Connection conexion = ConexionUvirtual.obtenerInstancia();
-			 PreparedStatement stmt = conexion.prepareStatement(consulta);) {
+		try (Connection conexion = ConexionUvirtual.obtenerInstancia(); PreparedStatement stmt = conexion.prepareStatement(consulta)) {
 			int parameterIndex = 1;
-			stmt.setString(parameterIndex++, evaluador.isActivo() ? "S" : "N");
+			stmt.setString(parameterIndex++, evaluador.isActivo() ? ACTIVO : INACTIVO);
 			stmt.setString(parameterIndex++, usuarioUpdate.getCodCuenta());
 			stmt.setInt(parameterIndex++, evaluador.getCodNum());
 			stmt.setInt(parameterIndex++, evaluador.getCodNumArea());
