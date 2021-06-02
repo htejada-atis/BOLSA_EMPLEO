@@ -274,7 +274,7 @@ function DataTable(id, config) {
         var pagination = $('<span class="pagination"></span>');
         $(pagination).append(btnFirst);
         $(pagination).append(btnBack);
-        $(pagination).append(' P&aacute;gina ' + (self.params.page + 1) + ' / ' + self.lastResponse.pagesTotal + ' ');
+        $(pagination).append(' P&aacute;gina ' + (self.lastResponse.pagesTotal > 0 ? self.params.page + 1 : 0) + ' / ' + self.lastResponse.pagesTotal + ' ');
         $(pagination).append(btnNext);
         $(pagination).append(btnLast);
 
