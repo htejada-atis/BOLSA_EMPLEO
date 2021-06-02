@@ -7,8 +7,6 @@ import static org.junit.Assert.fail;
 import java.io.IOException;
 import java.sql.SQLException;
 import java.text.ParseException;
-import java.util.Date;
-import java.util.List;
 import org.junit.BeforeClass;
 import org.junit.FixMethodOrder;
 import org.junit.Test;
@@ -18,11 +16,8 @@ import bbdd.BbddRunner;
 import bbdd.UtilsTestBolsaEmpleo;
 import es.ujaen.uvirtual.modelo.conexion.Conexion;
 import es.ujaen.uvirtual.modulo.bolsaempleo.beans.Evaluador;
-import es.ujaen.uvirtual.modulo.bolsaempleo.beans.Rol;
 import es.ujaen.uvirtual.modulo.bolsaempleo.beans.UsuarioBolsaEmpleo;
 import es.ujaen.uvirtual.modulo.bolsaempleo.modelo.ModeloEvaluador;
-import es.ujaen.uvirtual.modulo.bolsaempleo.modelo.ModeloRol;
-import es.ujaen.uvirtual.modulo.bolsaempleo.utilidades.BolsaEmpleoUtils;
 import es.ujaen.uvirtual.utilidades.UVException;
 
 
@@ -31,14 +26,6 @@ import es.ujaen.uvirtual.utilidades.UVException;
 public class TestBEPModeloEvaluador {
 	private static final Integer CODNUM = 3;  // comision1
 	private static final String CODCUENTA = "comision1";
-	
-	private static final String EMAIL = "test@test";
-	private static final String RAZONEXCLUIDO = "test";
-	private static final Boolean LISTADIST = true;
-	private static final Boolean EXCLUIDO = false;
-	private static final Boolean BORRADO = true;
-	private static final Date FECHAEXCLUSION = new java.sql.Date(BolsaEmpleoUtils.getCurrentDateTime().getTime());
-	private static final Date FECHABORRADO = new java.sql.Date(BolsaEmpleoUtils.getCurrentDateTime().getTime());
 	private static final Integer AREA = 3;
 	
 	private static final String MENSAJE_ERROR_HAY_EXCEPCION = "Excepción no esperada: %s";

@@ -946,10 +946,9 @@ public class ModeloUsuarioBolsaEmpleo {
 
 		// comprobamos si está borrado o excluido
 		if (Boolean.TRUE.equals(usuario.getExcluido())) {
-			throw new UVException("No puede acceder, su perfil ha sido excluido por los siguientes motivos: "
-					+ usuario.getRazonExcluido());
+			throw new UVException(String.format("No puede acceder, su perfil ha sido excluido: [%s]", usuario.getCodCuenta()));
 		} else if (Boolean.TRUE.equals(usuario.getBorrado())) {
-			throw new UVException("No puede acceder, su perfil ha sido borrado de la base de datos");
+			throw new UVException(String.format("No puede acceder, su perfil ha sido borrado de la base de datos: [%s]", usuario.getCodCuenta()));
 		}
 
 		LOGGER.log(Level.FINER,
