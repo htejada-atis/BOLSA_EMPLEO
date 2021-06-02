@@ -217,17 +217,15 @@ if(item!=null){
 	        			return "<div class='circle-false'></div>"; 
 	        		}
 	        	}},
-		    ],
-		    "actions": [
-		    	{'label': 'Añadir', 'title': 'Añadir un nuevo item', 'onClick': function(selected) {
-		    		var params = {'a': '<%=ControladorItemsBaremacion.ACCION_AGREGAR_ITEM%>', 
-		    				'<%=ControladorItemsBaremacion.PARAM_BLOQUE%>': '<%=bean.getBloqueBaremacion().getCodNum()%>'};
-	        		Atis.sendForm("<%=request.getRequestURI()%>", params);
-		    	}}
 		    ]
 		});
 		
 		<%}%>
+		
+		<%	if (EscapaHTML.ajustaCodificacion(request.getParameter(ControladorItemsBaremacion.PARAM_ACCION)).equals(ControladorItemsBaremacion.ACCION_ITEM_EXCLUYENTE_SELECCIONADO)
+					|| EscapaHTML.ajustaCodificacion(request.getParameter(ControladorItemsBaremacion.PARAM_ACCION)).equals(ControladorItemsBaremacion.ACCION_ITEM_EXCLUYENTE_DESELECCIONADO)) { %>
+					Atis.smoothScrollToAnchor("#tableMeritosExcluyentes");
+		<%	} %>
 		
 	});
 </script>
