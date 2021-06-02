@@ -24,6 +24,7 @@ import es.ujaen.uvirtual.modulo.bolsaempleo.beans.UsuarioBolsaEmpleo;
 import es.ujaen.uvirtual.modulo.bolsaempleo.utilidades.BolsaEmpleoDataTable;
 import es.ujaen.uvirtual.modulo.bolsaempleo.utilidades.BolsaEmpleoUtils;
 import es.ujaen.uvirtual.modulo.bolsaempleo.utilidades.BolsaEmpleoDataTable.DataTableColumn;
+import es.ujaen.uvirtual.utilidades.Memcache;
 import es.ujaen.uvirtual.utilidades.UVException;
 
 /**
@@ -193,7 +194,6 @@ public class ModeloUsuarioBolsaEmpleo {
 		}
 
 		UsuarioBolsaEmpleo usuarioBolsa = getUsuarioByCodCuenta(usuario.getUid());
-		usuarioBolsa.setUsuarioArcos(usuario);
 
 		if (Boolean.TRUE.equals(usuarioBolsa.getBorrado())) {
 			throw new UVException(MENSAJE_ERROR_USUARIO_BORRADO);
@@ -745,6 +745,8 @@ public class ModeloUsuarioBolsaEmpleo {
 			stmt.setInt(parameterIndex++, usuario.getCodNum());
 			stmt.executeUpdate();
 		}
+		
+		refrescarUsuario(usuario.getCodCuenta(), usuario.getNumDocumento());
 	}
 
 	/**
@@ -804,9 +806,11 @@ public class ModeloUsuarioBolsaEmpleo {
 	 * Establece el usuario como excluido.
 	 * 
 	 * @param usuario .
+	 * @param usuarioQueExcluye .
+	 * @throws UVException .
 	 * @throws SQLException .
 	 */
-	public void ponerUsuarioComoExcluido(UsuarioBolsaEmpleo usuario, UsuarioBolsaEmpleo usuarioQueExcluye) throws SQLException {
+	public void ponerUsuarioComoExcluido(UsuarioBolsaEmpleo usuario, UsuarioBolsaEmpleo usuarioQueExcluye) throws SQLException, UVException {
 		String query = "UPDATE TBEP_USUARIOS SET UID_USUARIO=?,FLGEXCLUIDO=?,FLGEXCLUIDOTIPO=?,RAZON_EXCLUSION=?,FECHA_EXCLUSION=?";
 
 		if (EXCLUSION_TIPO_TEMPORAL.equals(usuario.getExcluidoTipo())) {
@@ -832,6 +836,8 @@ public class ModeloUsuarioBolsaEmpleo {
 			stmt.setInt(indexParam++, usuario.getCodNum());
 			stmt.executeUpdate();
 		}
+		
+		refrescarUsuario(usuario.getCodCuenta(), usuario.getNumDocumento());
 	}
 
 	/**
@@ -839,9 +845,10 @@ public class ModeloUsuarioBolsaEmpleo {
 	 * 
 	 * @param usuario .
 	 * @param usuarioQueNoExcluye .
+	 * @throws UVException .
 	 * @throws SQLException .
 	 */
-	public void ponerUsuarioComoNoExcluido(UsuarioBolsaEmpleo usuario, UsuarioBolsaEmpleo usuarioQueNoExcluye) throws SQLException {
+	public void ponerUsuarioComoNoExcluido(UsuarioBolsaEmpleo usuario, UsuarioBolsaEmpleo usuarioQueNoExcluye) throws SQLException, UVException {
 		String query = "UPDATE TBEP_USUARIOS SET UID_USUARIO=?,FLGEXCLUIDO=?,FLGEXCLUIDOTIPO=?,FECHA_EXCLUSION_INICIO=?,FECHA_EXCLUSION_FIN=?,"
 				+ "RAZON_EXCLUSION=?,FECHA_EXCLUSION=? WHERE CODNUM IN ?";
 
@@ -858,6 +865,8 @@ public class ModeloUsuarioBolsaEmpleo {
 			stmt.setInt(indexParam++, usuario.getCodNum());
 			stmt.executeUpdate();
 		}
+		
+		refrescarUsuario(usuario.getCodCuenta(), usuario.getNumDocumento());
 	}
 
 	/**
@@ -917,43 +926,60 @@ public class ModeloUsuarioBolsaEmpleo {
 		if (usuArcos == null) {
 			return null;
 		}
-
-		UsuarioBolsaEmpleo usuario;
-
-		// comprobamos si existe el usuario en uvirtual
-		LOGGER.log(Level.FINER,
-				String.format("Chequeando si existe usuario en Bolsa Empleo [%s]", usuArcos.getDocumentoNumero()));
-
-		if (!existeUsuarioBolsaEmpleoByNumeroDocumento(usuArcos.getDocumentoNumero())) {
-			LOGGER.log(Level.FINER, String.format("No existe usuario en Bolsa Empleo [%s]. Lo creamos como candidato.",
-					usuArcos.getDocumentoNumero()));
-
-			// no existe el usuario en la bolsa de empleo lo creamos como candidato
-			UsuarioBolsaEmpleo usuarioFinal = new UsuarioBolsaEmpleo(usuArcos.getDocumentoNumero(), usuArcos.getUid(),
-					ModeloRol.obtenerInstancia().getRoleById(ModeloRol.ID_ROL_CANDIDATO), true, false, null, null,
-					null);
-
-			insertaUsuario(usuarioFinal, usuarioFinal);
-			usuario = getUsuarioByNumeroDocumento(usuArcos.getDocumentoNumero());
-			CrearUsuario.refrescarUsuario(usuario.getCodCuenta());
-		} else {
-			// cargamos los datos del usuario de bolsa de empleo
-			LOGGER.log(Level.FINER, String.format("Existe usuario en Bolsa Empleo [%s]. Leemos sus datos.",
-					usuArcos.getDocumentoNumero()));
-
-			usuario = getUsuarioByNumeroDocumento(usuArcos.getDocumentoNumero());
+		
+		// comprobamos si está en caché, lo devolvemos
+		Memcache mc = Memcache.getInstance();
+		UsuarioBolsaEmpleo usuario = (UsuarioBolsaEmpleo) mc.get("usuarioBEP." + usuArcos.getUid());
+		if (usuario == null) {
+			usuario = refrescarUsuario(usuArcos.getUid(), usuArcos.getDocumentoNumero());
 		}
-
+		
 		// comprobamos si está borrado o excluido
 		if (Boolean.TRUE.equals(usuario.getExcluido())) {
 			throw new UVException(String.format("No puede acceder, su perfil ha sido excluido: [%s]", usuario.getCodCuenta()));
 		} else if (Boolean.TRUE.equals(usuario.getBorrado())) {
 			throw new UVException(String.format("No puede acceder, su perfil ha sido borrado de la base de datos: [%s]", usuario.getCodCuenta()));
 		}
+		
+		return usuario; 
+	}
+	
+	/**
+	 * Crear el usuario si es necesario como candidato y lo guarda en el memcaché.
+	 * @param uid del usuario.
+	 * @param documentoNumero nif/dni/etc
+	 * @return .
+	 * @throws UVException .
+	 * @throws SQLException .
+	 */
+	public UsuarioBolsaEmpleo refrescarUsuario(String uid, String documentoNumero) throws SQLException, UVException {
+		UsuarioBolsaEmpleo usuario;
 
-		LOGGER.log(Level.FINER,
-				String.format("Fin chequeo usuario Bolsa Empleo [%s]. Todo correcto.", usuArcos.getDocumentoNumero()));
-		usuario.setUsuarioArcos(usuArcos);
+		// comprobamos si existe el usuario en uvirtual
+		LOGGER.log(Level.FINER, String.format("Chequeando si existe usuario en Bolsa Empleo [%s]", documentoNumero));
+
+		if (!existeUsuarioBolsaEmpleoByNumeroDocumento(documentoNumero)) {
+			LOGGER.log(Level.FINER, String.format("No existe usuario en Bolsa Empleo [%s]. Lo creamos como candidato.", documentoNumero));
+
+			// no existe el usuario en la bolsa de empleo lo creamos como candidato
+			UsuarioBolsaEmpleo usuarioFinal = new UsuarioBolsaEmpleo(
+					documentoNumero, uid, ModeloRol.obtenerInstancia().getRoleById(ModeloRol.ID_ROL_CANDIDATO), true, false, null, null, null
+			);
+
+			insertaUsuario(usuarioFinal, usuarioFinal);
+			usuario = getUsuarioByNumeroDocumento(documentoNumero);
+			CrearUsuario.refrescarUsuario(usuario.getCodCuenta());
+		} else {
+			// cargamos los datos del usuario de bolsa de empleo
+			LOGGER.log(Level.FINER, String.format("Existe usuario en Bolsa Empleo [%s]. Leemos sus datos.", documentoNumero));
+
+			usuario = getUsuarioByNumeroDocumento(documentoNumero);
+		}
+
+		LOGGER.log(Level.FINER, String.format("Fin chequeo usuario Bolsa Empleo [%s]. Todo correcto, cacheamos", documentoNumero));
+		
+		Memcache mc = Memcache.getInstance();
+		mc.set("usuarioBEP." + uid, usuario);
 
 		return usuario;
 	}
@@ -989,16 +1015,17 @@ public class ModeloUsuarioBolsaEmpleo {
 	 * @throws SQLException en caso de error en la BD
 	 * @throws UVException  si noticia no es valida
 	 */
-	public void actualizaRol(UsuarioBolsaEmpleo usu) throws SQLException {
-		String consultaRol = "UPDATE ADM_USUARIO_ROL " + " SET ROL_CODNUM=?, FLG_ADMIN=?" + " WHERE USERUID=?";
-		try (Connection conexion = ConexionUvirtual.obtenerInstancia();
-				PreparedStatement stmt = conexion.prepareStatement(consultaRol)) {
+	public void actualizaRol(UsuarioBolsaEmpleo usu) throws SQLException, UVException {
+		String consultaRol = "UPDATE ADM_USUARIO_ROL SET ROL_CODNUM=?, FLG_ADMIN=? WHERE USERUID=?";
+		try (Connection conexion = ConexionUvirtual.obtenerInstancia(); PreparedStatement stmt = conexion.prepareStatement(consultaRol)) {
 			int parameterIndex = 1;
 			stmt.setInt(parameterIndex++, usu.getRol().getCodNum());
 			stmt.setString(parameterIndex++, "N");
 			stmt.setString(parameterIndex++, usu.getCodCuenta());
 			stmt.executeUpdate();
 		}
+		
+		refrescarUsuario(usu.getCodCuenta(), usu.getNumDocumento());
 	}
 
 	/**

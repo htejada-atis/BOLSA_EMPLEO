@@ -22,7 +22,6 @@ import es.ujaen.uvirtual.modulo.bolsaempleo.beans.UsuarioBolsaEmpleo;
 import es.ujaen.uvirtual.modulo.bolsaempleo.controlador.configuracion.ControladorUsuarioBolsaEmpleo;
 import es.ujaen.uvirtual.modulo.bolsaempleo.modelo.ModeloRol;
 import es.ujaen.uvirtual.modulo.bolsaempleo.vistas.VistaUsuarioBolsaEmpleo;
-import es.ujaen.uvirtual.utilidades.UVException;
 
 /**
  * Test controlador usuarios bolsa empleo.
@@ -257,13 +256,15 @@ public class TestBEPControladorUsuariosBolsaEmpleo {
 		assertEquals(MENSAJE_SIN_ADVERTENCIAS, 0, bean2.getMensajesDeAdvertencia().size());
 	}
 	
-	/** desactivar apartado .
+	/** excluir .
 	 * @throws SQLException .
 	 * @throws ServletException .
 	 * @throws IOException .
 	 */
 	@Test
 	public void testA10ExcluirUsuario() throws ServletException, IOException {
+		UsuarioBolsaEmpleo usu = buscarUsuario(CODCUENTA);
+		
 		PeticionHttp peticion = UtilsTestBolsaEmpleo.peticionAutenticadaPersonal();
 		peticion.setParameter(ControladorUsuarioBolsaEmpleo.PARAM_ACCION, ControladorUsuarioBolsaEmpleo.ACCION_EXCLUIR_USUARIO);
 		peticion.setParameter(ControladorUsuarioBolsaEmpleo.PARAM_LISTA, LISTADIST);
@@ -274,8 +275,8 @@ public class TestBEPControladorUsuariosBolsaEmpleo {
 		peticion.setParameter(ControladorUsuarioBolsaEmpleo.PARAM_FECHA_EXCLUIDO_INICIO, "12/05/2021");
 		peticion.setParameter(ControladorUsuarioBolsaEmpleo.PARAM_FECHA_EXCLUIDO_FIN, "12/05/2021");
 		peticion.setParameter(ControladorUsuarioBolsaEmpleo.PARAM_ROLE, ROL);
-		peticion.setParameter(ControladorUsuarioBolsaEmpleo.PARAM_NOMBRE_USUARIO, CODCUENTA);
-		peticion.setParameter(ControladorUsuarioBolsaEmpleo.PARAM_ID, CODNUM);
+		peticion.setParameter(ControladorUsuarioBolsaEmpleo.PARAM_NOMBRE_USUARIO, usu.getCodCuenta());
+		peticion.setParameter(ControladorUsuarioBolsaEmpleo.PARAM_ID, usu.getCodNum().toString());
 		RespuestaHttp respuesta = new RespuestaHttp();
 		ControladorUsuarioBolsaEmpleo controlador = new ControladorUsuarioBolsaEmpleo();
 		controlador.doPost(peticion, respuesta);

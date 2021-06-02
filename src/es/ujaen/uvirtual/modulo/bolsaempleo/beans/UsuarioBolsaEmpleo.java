@@ -3,12 +3,13 @@ package es.ujaen.uvirtual.modulo.bolsaempleo.beans;
 import java.io.Serializable;
 import java.util.Date;
 
-import es.ujaen.uvirtual.beans.Usuario;
 import es.ujaen.uvirtual.modulo.bolsaempleo.modelo.ModeloRol;
 import es.ujaen.uvirtual.utilidades.Formateador;
 
-/** Clase usuario de UVIRTUAL.
- * @author ATISoluciones 2021 
+/**
+ * Clase usuario de UVIRTUAL.
+ * 
+ * @author ATISoluciones 2021
  */
 public class UsuarioBolsaEmpleo implements Serializable {
 	private static final long serialVersionUID = 1L;
@@ -26,8 +27,7 @@ public class UsuarioBolsaEmpleo implements Serializable {
 	private String provincia;
 	private String telefono;
 	private String nacionalidad;
-	
-	private Usuario usuarioArcos;
+
 	private Rol rol;
 	private Boolean listaDist;
 	private Boolean excluido;
@@ -40,25 +40,27 @@ public class UsuarioBolsaEmpleo implements Serializable {
 	private String razonBorrado;
 	private Date fechaBorrado;
 
-	
-	/** Constructor por defecto.
+	/**
+	 * Constructor por defecto.
 	 */
 	public UsuarioBolsaEmpleo() {
-		
+
 	}
-	
-	/** Constructor con parametros para Bolsa Empleo.
-	 * @param pdocumento .
-	 * @param prol .
-	 * @param plistaDist .
-	 * @param pexcluido .
-	 * @param pexcluidotipo .
+
+	/**
+	 * Constructor con parametros para Bolsa Empleo.
+	 * 
+	 * @param pdocumento         .
+	 * @param prol               .
+	 * @param plistaDist         .
+	 * @param pexcluido          .
+	 * @param pexcluidotipo      .
 	 * @param pfechaexclusionini .
 	 * @param pfechaexclusionfin .
-	 * @param pusu .
+	 * @param pusu               .
 	 */
-	public UsuarioBolsaEmpleo(String pdocumento, String pusu, Rol prol, Boolean plistaDist,
-			Boolean pexcluido, String pexcluidotipo, Date pfechaexclusionini, Date pfechaexclusionfin) {
+	public UsuarioBolsaEmpleo(String pdocumento, String pusu, Rol prol, Boolean plistaDist, Boolean pexcluido,
+			String pexcluidotipo, Date pfechaexclusionini, Date pfechaexclusionfin) {
 		super();
 		this.numdocumento = pdocumento;
 		this.codcuenta = pusu;
@@ -69,17 +71,19 @@ public class UsuarioBolsaEmpleo implements Serializable {
 		this.fechaExclusionInicio = pfechaexclusionini;
 		this.fechaExclusionFin = pfechaexclusionfin;
 	}
-	
-	/** Constructor con parametros para Bolsa Empleo excluir usuario.
-	 * @param pcodNum .
-	 * @param pexcluido .
-	 * @param pexcluidotipo .
-	 * @param prazonexcluido .
-	 * @param pfechaexclusion .
+
+	/**
+	 * Constructor con parametros para Bolsa Empleo excluir usuario.
+	 * 
+	 * @param pcodNum            .
+	 * @param pexcluido          .
+	 * @param pexcluidotipo      .
+	 * @param prazonexcluido     .
+	 * @param pfechaexclusion    .
 	 * @param pfechaexclusionini .
 	 * @param pfechaexclusionfin .
 	 */
-	public UsuarioBolsaEmpleo(Integer pcodNum, Boolean pexcluido, String pexcluidotipo, String prazonexcluido, 
+	public UsuarioBolsaEmpleo(Integer pcodNum, Boolean pexcluido, String pexcluidotipo, String prazonexcluido,
 			Date pfechaexclusion, Date pfechaexclusionini, Date pfechaexclusionfin) {
 		super();
 		this.codNum = pcodNum;
@@ -90,21 +94,22 @@ public class UsuarioBolsaEmpleo implements Serializable {
 		this.razonExclusion = prazonexcluido;
 		this.fechaExclusion = pfechaexclusion;
 	}
-	
-	
-	/** Constructor con parametros.
-	 * @param prol .
-	 * @param plistaDist .
-	 * @param pexcluido .
-	 * @param pexcluidotipo .
+
+	/**
+	 * Constructor con parametros.
+	 * 
+	 * @param prol               .
+	 * @param plistaDist         .
+	 * @param pexcluido          .
+	 * @param pexcluidotipo      .
 	 * @param pfechaexclusionini .
 	 * @param pfechaexclusionfin .
-	 * @param prazonexcluido .
-	 * @param pfechaexclusion .
-	 * @param pcodNum .
+	 * @param prazonexcluido     .
+	 * @param pfechaexclusion    .
+	 * @param pcodNum            .
 	 */
-	public UsuarioBolsaEmpleo(Integer pcodNum, Rol prol, Boolean plistaDist, Boolean pexcluido, 
-			String pexcluidotipo, String prazonexcluido, Date pfechaexclusion, Date pfechaexclusionini, Date pfechaexclusionfin) {
+	public UsuarioBolsaEmpleo(Integer pcodNum, Rol prol, Boolean plistaDist, Boolean pexcluido, String pexcluidotipo,
+			String prazonexcluido, Date pfechaexclusion, Date pfechaexclusionini, Date pfechaexclusionfin) {
 		super();
 		this.codNum = pcodNum;
 		this.rol = prol;
@@ -116,21 +121,24 @@ public class UsuarioBolsaEmpleo implements Serializable {
 		this.razonExclusion = prazonexcluido;
 		this.fechaExclusion = pfechaexclusion;
 	}
-	
-	/** Constructor con parametros.
-	 * @param prol .
-	 * @param plistaDist .
-	 * @param pexcluido .
-	 * @param pexcluidotipo .
+
+	/**
+	 * Constructor con parametros.
+	 * 
+	 * @param prol               .
+	 * @param plistaDist         .
+	 * @param pexcluido          .
+	 * @param pexcluidotipo      .
 	 * @param pfechaexclusionini .
 	 * @param pfechaexclusionfin .
-	 * @param prazonexcluido .
-	 * @param pfechaexclusion .
-	 * @param pusu .
-	 * @param pdocumento .
+	 * @param prazonexcluido     .
+	 * @param pfechaexclusion    .
+	 * @param pusu               .
+	 * @param pdocumento         .
 	 */
-	public UsuarioBolsaEmpleo(String pusu, String pdocumento, Rol prol, Boolean plistaDist, Boolean pexcluido, String pexcluidotipo, String prazonexcluido, 
-			Date pfechaexclusion, Date pfechaexclusionini, Date pfechaexclusionfin) {
+	public UsuarioBolsaEmpleo(String pusu, String pdocumento, Rol prol, Boolean plistaDist, Boolean pexcluido,
+			String pexcluidotipo, String prazonexcluido, Date pfechaexclusion, Date pfechaexclusionini,
+			Date pfechaexclusionfin) {
 		super();
 		this.codcuenta = pusu;
 		this.numdocumento = pdocumento;
@@ -143,23 +151,26 @@ public class UsuarioBolsaEmpleo implements Serializable {
 		this.razonExclusion = prazonexcluido;
 		this.fechaExclusion = pfechaexclusion;
 	}
-	
-	/** Constructor con parametros para envio de datos personales.
-	 * @param pcodNum .
-	 * @param pnombre .
-	 * @param primerapellido .
+
+	/**
+	 * Constructor con parametros para envio de datos personales.
+	 * 
+	 * @param pcodNum         .
+	 * @param pnombre         .
+	 * @param primerapellido  .
 	 * @param segundoapellido .
-	 * @param pemail .
-	 * @param pdireccion .
-	 * @param pcodigopostal .
-	 * @param plocalidad .
-	 * @param pprovincia .
-	 * @param ptelefono .
-	 * @param pnacionalidad .
-	 * @param plistaDist .
+	 * @param pemail          .
+	 * @param pdireccion      .
+	 * @param pcodigopostal   .
+	 * @param plocalidad      .
+	 * @param pprovincia      .
+	 * @param ptelefono       .
+	 * @param pnacionalidad   .
+	 * @param plistaDist      .
 	 */
-	public UsuarioBolsaEmpleo(Integer pcodNum, String pnombre, String primerapellido, String segundoapellido, String pemail, String pdireccion, String pcodigopostal,
-			String plocalidad, String pprovincia, String ptelefono, String pnacionalidad, Boolean plistaDist) {
+	public UsuarioBolsaEmpleo(Integer pcodNum, String pnombre, String primerapellido, String segundoapellido,
+			String pemail, String pdireccion, String pcodigopostal, String plocalidad, String pprovincia,
+			String ptelefono, String pnacionalidad, Boolean plistaDist) {
 		super();
 		this.codNum = pcodNum;
 		this.nombre = pnombre;
@@ -174,10 +185,10 @@ public class UsuarioBolsaEmpleo implements Serializable {
 		this.nacionalidad = pnacionalidad;
 		this.listaDist = plistaDist;
 	}
-	
-	
-	
-	/** Constructor copia.
+
+	/**
+	 * Constructor copia.
+	 * 
 	 * @param copia Usuario a copiar
 	 */
 	public UsuarioBolsaEmpleo(UsuarioBolsaEmpleo copia) {
@@ -189,7 +200,6 @@ public class UsuarioBolsaEmpleo implements Serializable {
 		this.apellido1 = copia.apellido1;
 		this.apellido2 = copia.apellido2;
 		this.email = copia.email;
-		this.usuarioArcos = copia.usuarioArcos;
 		this.rol = copia.rol;
 		this.listaDist = copia.listaDist;
 		this.excluido = copia.excluido;
@@ -201,7 +211,7 @@ public class UsuarioBolsaEmpleo implements Serializable {
 		this.borrado = copia.borrado;
 		this.fechaBorrado = copia.fechaBorrado;
 	}
-	
+
 	public Integer getCodNum() {
 		return codNum;
 	}
@@ -209,7 +219,7 @@ public class UsuarioBolsaEmpleo implements Serializable {
 	public void setCodNum(Integer codNum) {
 		this.codNum = codNum;
 	}
-	
+
 	public String getCodCuenta() {
 		return codcuenta;
 	}
@@ -217,7 +227,7 @@ public class UsuarioBolsaEmpleo implements Serializable {
 	public void setCodCuenta(String pcodcuenta) {
 		this.codcuenta = pcodcuenta;
 	}
-	
+
 	public String getTipoDocumento() {
 		return tipodocumento;
 	}
@@ -225,7 +235,7 @@ public class UsuarioBolsaEmpleo implements Serializable {
 	public void setTipoDocumento(String ptipodocumento) {
 		this.tipodocumento = ptipodocumento;
 	}
-	
+
 	public String getNumDocumento() {
 		return numdocumento;
 	}
@@ -233,7 +243,7 @@ public class UsuarioBolsaEmpleo implements Serializable {
 	public void setNumDocumento(String pnumdocumento) {
 		this.numdocumento = pnumdocumento;
 	}
-	
+
 	public String getNombre() {
 		return nombre;
 	}
@@ -241,7 +251,7 @@ public class UsuarioBolsaEmpleo implements Serializable {
 	public void setNombre(String nombre) {
 		this.nombre = nombre;
 	}
-	
+
 	public String getPrimerApellido() {
 		return apellido1;
 	}
@@ -249,7 +259,7 @@ public class UsuarioBolsaEmpleo implements Serializable {
 	public void setPrimerApellido(String papellido1) {
 		this.apellido1 = papellido1;
 	}
-	
+
 	public String getSegundoApellido() {
 		return apellido2;
 	}
@@ -257,7 +267,7 @@ public class UsuarioBolsaEmpleo implements Serializable {
 	public void setSegundoApellido(String papellido2) {
 		this.apellido2 = papellido2;
 	}
-	
+
 	public String getEmail() {
 		return email;
 	}
@@ -265,7 +275,7 @@ public class UsuarioBolsaEmpleo implements Serializable {
 	public void setEmail(String email) {
 		this.email = email;
 	}
-	
+
 	public String getDireccion() {
 		return direccion;
 	}
@@ -273,7 +283,7 @@ public class UsuarioBolsaEmpleo implements Serializable {
 	public void setDireccion(String pdireccion) {
 		this.direccion = pdireccion;
 	}
-	
+
 	public String getCodigoPostal() {
 		return codigopostal;
 	}
@@ -281,7 +291,7 @@ public class UsuarioBolsaEmpleo implements Serializable {
 	public void setCodigoPostal(String pcodigopostal) {
 		this.codigopostal = pcodigopostal;
 	}
-	
+
 	public String getLocalidad() {
 		return localidad;
 	}
@@ -289,7 +299,7 @@ public class UsuarioBolsaEmpleo implements Serializable {
 	public void setLocalidad(String plocalidad) {
 		this.localidad = plocalidad;
 	}
-	
+
 	public String getProvincia() {
 		return provincia;
 	}
@@ -297,7 +307,7 @@ public class UsuarioBolsaEmpleo implements Serializable {
 	public void setProvincia(String pprovincia) {
 		this.provincia = pprovincia;
 	}
-	
+
 	public String getTelefono() {
 		return telefono;
 	}
@@ -305,7 +315,7 @@ public class UsuarioBolsaEmpleo implements Serializable {
 	public void setTelefono(String ptelefono) {
 		this.telefono = ptelefono;
 	}
-	
+
 	public String getNacionalidad() {
 		return nacionalidad;
 	}
@@ -313,15 +323,7 @@ public class UsuarioBolsaEmpleo implements Serializable {
 	public void setNacionalidad(String pnacionalidad) {
 		this.nacionalidad = pnacionalidad;
 	}
-	
-	public Usuario getUsuarioArcos() {
-		return usuarioArcos;
-	}
 
-	public void setUsuarioArcos(Usuario pusuarioArcos) {
-		this.usuarioArcos = pusuarioArcos;
-	}
-	
 	public Rol getRol() {
 		return rol;
 	}
@@ -329,7 +331,7 @@ public class UsuarioBolsaEmpleo implements Serializable {
 	public void setRol(Rol rol) {
 		this.rol = rol;
 	}
-	
+
 	public Boolean getListaDist() {
 		return listaDist;
 	}
@@ -337,7 +339,7 @@ public class UsuarioBolsaEmpleo implements Serializable {
 	public void setListaDist(Boolean listaDist) {
 		this.listaDist = listaDist;
 	}
-	
+
 	public Boolean getExcluido() {
 		return excluido;
 	}
@@ -345,7 +347,7 @@ public class UsuarioBolsaEmpleo implements Serializable {
 	public void setExcluido(Boolean excluido) {
 		this.excluido = excluido;
 	}
-	
+
 	public String getExcluidoTipo() {
 		return excluidoTipo;
 	}
@@ -353,7 +355,7 @@ public class UsuarioBolsaEmpleo implements Serializable {
 	public void setExcluidoTipo(String excluidoTipo) {
 		this.excluidoTipo = excluidoTipo;
 	}
-	
+
 	public String getRazonExcluido() {
 		return razonExclusion;
 	}
@@ -361,7 +363,7 @@ public class UsuarioBolsaEmpleo implements Serializable {
 	public void setRazonExcluido(String prazonExclusion) {
 		this.razonExclusion = prazonExclusion;
 	}
-	
+
 	public Date getFechaExclusion() {
 		return fechaExclusion;
 	}
@@ -369,15 +371,15 @@ public class UsuarioBolsaEmpleo implements Serializable {
 	public void setFechaExclusion(Date fechaExclusion) {
 		this.fechaExclusion = fechaExclusion;
 	}
-	
+
 	public String getFechaExclusionFormato() {
 		return Formateador.formatoFecha(fechaExclusion, Formateador.FORMATO_FECHA_DDMMYYYY);
 	}
-	
+
 	public String getFechaHoraExclusionFormato() {
 		return Formateador.formatoFecha(fechaExclusion, Formateador.FORMATO_FECHA_DDMMYYYY_HHMMSS);
 	}
-	
+
 	public Date getFechaExclusionInicio() {
 		return fechaExclusionInicio;
 	}
@@ -385,15 +387,15 @@ public class UsuarioBolsaEmpleo implements Serializable {
 	public void setFechaExclusionInicio(Date fechaExclusionIni) {
 		this.fechaExclusionInicio = fechaExclusionIni;
 	}
-	
+
 	public String getFechaExclusionInicioFormato() {
 		return Formateador.formatoFecha(fechaExclusionInicio, Formateador.FORMATO_FECHA_DDMMYYYY);
 	}
-	
+
 	public String getFechaHoraExclusionInicioFormato() {
 		return Formateador.formatoFecha(fechaExclusionInicio, Formateador.FORMATO_FECHA_DDMMYYYY_HHMMSS);
 	}
-	
+
 	public Date getFechaExclusionFin() {
 		return fechaExclusionFin;
 	}
@@ -401,15 +403,15 @@ public class UsuarioBolsaEmpleo implements Serializable {
 	public void setFechaExclusionFin(Date fechaExclusionFin) {
 		this.fechaExclusionFin = fechaExclusionFin;
 	}
-	
+
 	public String getFechaExclusionFinFormato() {
 		return Formateador.formatoFecha(fechaExclusionFin, Formateador.FORMATO_FECHA_DDMMYYYY);
 	}
-	
+
 	public String getFechaHoraExclusionFinFormato() {
 		return Formateador.formatoFecha(fechaExclusionFin, Formateador.FORMATO_FECHA_DDMMYYYY_HHMMSS);
 	}
-	
+
 	public Boolean getBorrado() {
 		return borrado;
 	}
@@ -417,7 +419,7 @@ public class UsuarioBolsaEmpleo implements Serializable {
 	public void setBorrado(Boolean borrado) {
 		this.borrado = borrado;
 	}
-	
+
 	public String getRazonBorrado() {
 		return razonBorrado;
 	}
@@ -425,7 +427,7 @@ public class UsuarioBolsaEmpleo implements Serializable {
 	public void setRazonBorrado(String prazonBorrado) {
 		this.razonBorrado = prazonBorrado;
 	}
-	
+
 	public Date getFechaBorrado() {
 		return fechaBorrado;
 	}
@@ -433,38 +435,40 @@ public class UsuarioBolsaEmpleo implements Serializable {
 	public void setFechaBorrado(Date fechaBorrado) {
 		this.fechaBorrado = fechaBorrado;
 	}
-	
+
 	public boolean isCandidato() {
 		return this.getRol() != null && this.getRol().getValor().equals(ModeloRol.ROL_CANDIDATO);
 	}
-	
+
 	public boolean isServicioPersonal() {
 		return this.getRol() != null && this.getRol().getValor().equals(ModeloRol.ROL_SERVICIO_PERSONAL);
 	}
-	
+
 	public boolean isMiembroComision() {
 		return this.getRol() != null && this.getRol().getValor().equals(ModeloRol.ROL_MIEMBRO_COMISION);
 	}
-	
+
 	public boolean isDirectorDepartamento() {
 		return this.getRol() != null && this.getRol().getValor().equals(ModeloRol.ROL_DIRECTOR_DEPARTAMENTO);
 	}
-	
+
 	public static long getSerialversionuid() {
 		return serialVersionUID;
 	}
-	
+
 	@Override
 	public String toString() {
-		return "Usuario [codNum=" + codNum + ", codcuenta=" + codcuenta + ", tipodocumento=" + tipodocumento + ", numdocumento=" + numdocumento + ", nombre="
-				+ nombre + ", apellido1=" + apellido1 + ", apellido2=" + apellido2 + ", email=" + email + ", direccion=" + direccion + ", codigopostal=" 
-				+ codigopostal + ", localidad=" + localidad + ", provincia=" + provincia + ", telefono=" + telefono + ", nacionalidad=" + nacionalidad 
-				+ ", usuarioArcos=" + usuarioArcos + ", rol=" + rol + ", listaDist=" + listaDist + ", excluido=" + excluido + ", excluidoTipo=" 
-				+ excluidoTipo + ", fechaExclusionInicio=" + fechaExclusionInicio + ", fechaExclusionFin=" + fechaExclusionFin + ", razonExclusion=" 
-				+ razonExclusion + ", fechaExclusion=" + fechaExclusion + ", borrado=" + borrado + ", razonBorrado=" + razonBorrado + ", fechaBorrado=" 
-				+ fechaBorrado + "]";
+		return "Usuario [codNum=" + codNum + ", codcuenta=" + codcuenta + ", tipodocumento=" + tipodocumento
+				+ ", numdocumento=" + numdocumento + ", nombre=" + nombre + ", apellido1=" + apellido1 + ", apellido2="
+				+ apellido2 + ", email=" + email + ", direccion=" + direccion + ", codigopostal=" + codigopostal
+				+ ", localidad=" + localidad + ", provincia=" + provincia + ", telefono=" + telefono + ", nacionalidad="
+				+ nacionalidad + ", rol=" + rol + ", listaDist=" + listaDist
+				+ ", excluido=" + excluido + ", excluidoTipo=" + excluidoTipo + ", fechaExclusionInicio="
+				+ fechaExclusionInicio + ", fechaExclusionFin=" + fechaExclusionFin + ", razonExclusion="
+				+ razonExclusion + ", fechaExclusion=" + fechaExclusion + ", borrado=" + borrado + ", razonBorrado="
+				+ razonBorrado + ", fechaBorrado=" + fechaBorrado + "]";
 	}
-	
+
 	@Override
 	public int hashCode() {
 		final int prime = 31;
@@ -483,7 +487,6 @@ public class UsuarioBolsaEmpleo implements Serializable {
 		result = prime * result + ((provincia == null) ? 0 : provincia.hashCode());
 		result = prime * result + ((telefono == null) ? 0 : telefono.hashCode());
 		result = prime * result + ((nacionalidad == null) ? 0 : nacionalidad.hashCode());
-		result = prime * result + ((usuarioArcos == null) ? 0 : usuarioArcos.hashCode());
 		result = prime * result + ((rol == null) ? 0 : rol.hashCode());
 		result = prime * result + ((listaDist == null) ? 0 : listaDist.hashCode());
 		result = prime * result + ((excluido == null) ? 0 : excluido.hashCode());
@@ -495,12 +498,12 @@ public class UsuarioBolsaEmpleo implements Serializable {
 		result = prime * result + ((borrado == null) ? 0 : borrado.hashCode());
 		result = prime * result + ((razonBorrado == null) ? 0 : razonBorrado.hashCode());
 		result = prime * result + ((fechaBorrado == null) ? 0 : fechaBorrado.hashCode());
-		
+
 		return result;
 	}
-	
+
 	@Override
-	@SuppressWarnings({"checkstyle:CyclomaticComplexity", "checkstyle:NPathComplexity"})
+	@SuppressWarnings({ "checkstyle:CyclomaticComplexity", "checkstyle:NPathComplexity" })
 	public boolean equals(Object obj) {
 		if (this == obj) {
 			return true;
@@ -603,13 +606,6 @@ public class UsuarioBolsaEmpleo implements Serializable {
 		} else if (!nacionalidad.equals(other.nacionalidad)) {
 			return false;
 		}
-		if (usuarioArcos == null) {
-			if (other.usuarioArcos != null) {
-				return false;
-			}
-		} else if (!usuarioArcos.equals(other.usuarioArcos)) {
-			return false;
-		}
 		if (rol == null) {
 			if (other.rol != null) {
 				return false;
@@ -686,10 +682,8 @@ public class UsuarioBolsaEmpleo implements Serializable {
 			}
 		} else if (!fechaBorrado.equals(other.fechaBorrado)) {
 			return false;
-		}	
-		
+		}
+
 		return true;
 	}
-	
-	
 }
