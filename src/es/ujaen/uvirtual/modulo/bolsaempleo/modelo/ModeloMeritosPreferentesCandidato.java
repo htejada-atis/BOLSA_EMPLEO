@@ -88,7 +88,6 @@ public class ModeloMeritosPreferentesCandidato {
 		
 		dataTable.setColumn(ORDER_COLUMN_INDEX_ID, "bepmpu.CODNUM");
 		dataTable.setColumn(ORDER_COLUMN_INDEX_CODIGO, "bepmep.CODIGO");
-		dataTable.setColumn(ORDER_COLUMN_INDEX_NOMBRE, "bepmep.DESCRIPCION");
 		dataTable.setColumn(ORDER_COLUMN_INDEX_DESCRIPCION, "bepmpu.DESCRIPCION");
 		dataTable.setQuery(consulta);
 

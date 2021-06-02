@@ -117,7 +117,7 @@ UsuarioBolsaEmpleo candidato = bean.getCandidato();
 			    	{'data': 'codigo', 'filter': true, 'render': function(row) {
 			    		return '<%= bean.getCodigoPadreMeritoPreferente() %>.' + row.meritoPreferente.codigo;
 			    	}},
-			    	{'data': 'meritoPreferente.nombre', 'filter': true, 'render': function(row) {
+			    	{'data': 'meritoPreferente.nombre', 'filter': false, 'order': {'active': false}, 'render': function(row) {
 			    		return row.meritoPreferente.nombre + (row.meritoPreferenteOpcion ? ' (' + row.meritoPreferenteOpcion.nombre + ')' : '');
 			    	}},
 			    	{'data': 'descripcion', 'filter': true},
