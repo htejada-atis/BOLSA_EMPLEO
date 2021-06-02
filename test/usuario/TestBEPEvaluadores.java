@@ -263,7 +263,7 @@ public class TestBEPEvaluadores extends UtilsTestUsuarioBase {
 		String textoSelect = dep.getFirstSelectedOption().getText();
 		
 		WebElement tableAreas = UtilsTestBolsaEmpleo.waitVisibility(By.id(ID_TABLE_AREAS));
-		UtilsTestBolsaEmpleo.assertTitleTable(tableAreas, "Áreas del Departamento: " + textoSelect);
+		UtilsTestBolsaEmpleo.assertTitleTable(tableAreas, "ÁREAS DEL DEPARTAMENTO: " + textoSelect);
 		int totalAreas = UtilsTestBolsaEmpleo.getTotalTable(tableAreas); 
 		assertTrue(totalAreas > 0);
 		

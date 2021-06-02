@@ -119,10 +119,10 @@ public class TestBEPTitulacionesPreferentes extends UtilsTestUsuarioBase {
 		String textoSelect = sel.getFirstSelectedOption().getText();
 		
 		WebElement tableTitulaciones = UtilsTestBolsaEmpleo.waitVisibility(By.id(ID_TABLE_TITULACIONES_AREA));
-		UtilsTestBolsaEmpleo.assertTitleTable(tableTitulaciones, "Titulaciones Preferentes al Área: " + textoSelect);
+		UtilsTestBolsaEmpleo.assertTitleTable(tableTitulaciones, "TITULACIONES PREFERENTES AL ÁREA: " + textoSelect);
 		
 		WebElement tableDisponibles = UtilsTestBolsaEmpleo.waitVisibility(By.id(ID_TABLE_TITULACIONES_DISPONIBLES));
-		UtilsTestBolsaEmpleo.assertTitleTable(tableDisponibles, "Titulaciones Disponibles");
+		UtilsTestBolsaEmpleo.assertTitleTable(tableDisponibles, "TITULACIONES DISPONIBLES");
 		assertTrue(UtilsTestBolsaEmpleo.getTotalTable(tableDisponibles) > 0);
 	}
 }

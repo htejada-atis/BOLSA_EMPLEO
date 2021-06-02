@@ -13,6 +13,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
+
 import es.ujaen.uvirtual.beans.CodigoDescripcion;
 import es.ujaen.uvirtual.beans.UVDatos;
 import es.ujaen.uvirtual.beans.Usuario;
@@ -418,8 +419,8 @@ public class ControladorUsuarioBolsaEmpleo extends HttpServlet {
 	 * @throws SQLException excepcion de bbdd.
 	 * @throws UVException en caso de error en bd
 	 */
-	public void agregarUsuario(HttpServletRequest request, HttpServletResponse response,
-			VistaUsuarioBolsaEmpleo bean, Usuario usu) throws SQLException, UVException, IOException {
+	public void agregarUsuario(HttpServletRequest request, HttpServletResponse response, VistaUsuarioBolsaEmpleo bean, Usuario usu) 
+			throws SQLException, UVException, IOException {
 		bean.setVista(JSP_USUARIOS);
 		
 		Usuario usuArcos = CrearUsuario.usuario(request.getParameter(PARAM_ID));
@@ -461,6 +462,9 @@ public class ControladorUsuarioBolsaEmpleo extends HttpServlet {
 		
 		if (EscapaHTML.ajustaCodificacion(request.getParameter(PARAM_ROLE)) != null) {
 			UsuarioBolsaEmpleo usuarioForm = this.getValidatorUsuarios(request, usuar);
+			
+			usuarioForm.setNumDocumento(usu.getNumDocumento());
+			usuarioForm.setCodCuenta(usu.getCodCuenta());
 			usuarioForm.setCodNum(Formateador.leeParametroInteger(request.getParameter(PARAM_ID)));
 			
 			modelo.actualizaUsuario(usuarioForm, bean.getUsuarioLogeado());
@@ -527,6 +531,8 @@ public class ControladorUsuarioBolsaEmpleo extends HttpServlet {
 			UsuarioBolsaEmpleo usuarioForm = this.validateExclusion(request);			
 			usuarioForm.setCodNum(Formateador.leeParametroInteger(request.getParameter(PARAM_ID)));
 			usuarioForm.setExcluido(true);
+			usuarioForm.setCodCuenta(usu.getCodCuenta());
+			usuarioForm.setNumDocumento(usu.getNumDocumento());
 
 			modelo.ponerUsuarioComoExcluido(usuarioForm, bean.getUsuarioLogeado());
 			BolsaEmpleoUtils.addMensajeDeExito(MENSAJE_EXITO_EDITAR, bean, request);
@@ -613,13 +619,24 @@ public class ControladorUsuarioBolsaEmpleo extends HttpServlet {
 			}
 			
 			u.setFechaExclusion(Formateador.leeParametroFecha(request.getParameter(PARAM_FECHA_EXCLUIDO), Formateador.FORMATO_FECHA_DDMMYYYY, "/"));
+			if (u.getFechaExclusion() == null) {
+				u.setFechaExclusion(BolsaEmpleoUtils.getCurrentDateTime());
+			}
 			
 			u.setExcluidoTipo(EscapaHTML.ajustaCodificacion(request.getParameter(PARAM_EXCLUIDO_TIPO)));
-			if ("T".equals(u.getExcluidoTipo())) {
+			if ("T".equals(u.getExcluidoTipo())) {				
 				u.setFechaExclusionInicio(Formateador.leeParametroFecha(request.getParameter(PARAM_FECHA_EXCLUIDO_INICIO), 
 						Formateador.FORMATO_FECHA_DDMMYYYY, "/"));
 				u.setFechaExclusionFin(Formateador.leeParametroFecha(request.getParameter(PARAM_FECHA_EXCLUIDO_FIN), 
 						Formateador.FORMATO_FECHA_DDMMYYYY, "/"));
+				
+				if (u.getFechaExclusionInicio() == null) {
+					throw new UVException("Fecha de inicio de exclusión requerida");
+				}
+				
+				if (u.getFechaExclusionFin() == null) {
+					throw new UVException("Fecha de fin de exclusión requerida");
+				}
 			}
 		}
 		
