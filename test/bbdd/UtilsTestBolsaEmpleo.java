@@ -45,19 +45,17 @@ public final class UtilsTestBolsaEmpleo {
 	private static final Pattern RE_FILE_MIGRATION = Pattern.compile("\\d+-(im|eje)-[a-zA-Z]+\\.sql", Pattern.DOTALL);
 	private static final String ID_DEPARTAMENTO = "ID_DEPARTAMENTO";
 	private static final String CODNUM = "CODNUM";
-
+	private static final Pattern REGEX_TOTAL_TABLE = Pattern.compile("Total (\\d+)( \\(Seleccionados (\\d+)\\))?");
+	private static final Integer REGEX_TOTAL = 1;
+	private static final Integer REGEX_TOTAL_SELECTED = 3;
+	
 	public static final String ESQUEMA_ARCOS = "arcos";
 	public static final String ESQUEMA_RRHH = "rrhh";
 	public static final String ESQUEMA_UVIRTUAL = "uvirtual";	
-	
-	private static final Pattern REGEX_TOTAL_TABLE = Pattern.compile("Total (\\d+)( \\(Seleccionados (\\d+)\\))?");
-	private static final Integer REGEX_TOTAL = 1;
-	private static final Integer REGEX_TOTAL_SELECTED = 3;	
 	public static final Integer WAIT_ELEMENT = 5; // segundos
-	
 	public static final boolean VERBOSE = false;
 	
-	private static boolean cargado;
+	private static boolean cargado = false;
 
 	private UtilsTestBolsaEmpleo() {
 	}

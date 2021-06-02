@@ -98,7 +98,7 @@ $(document).ready(function() {
     	"selected": <%= bean.getTitulacion().getCodNum() %> ,
     	<% } %>
     	"columns": [
-        	{'data': 'nombre', 'class': 'overflow-auto', 'filter': {'type': 'text'}}
+        	{'data': 'nombre', 'overflow': 'auto', 'filter': {'type': 'text'}}
     	]
 	});
 

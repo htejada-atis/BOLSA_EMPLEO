@@ -36,7 +36,9 @@ public class TestBEPEvaluadores extends UtilsTestUsuarioBase {
 	private static final String DIV_MAIN = "evaluadores-listar";
 	private static final String ID_TABLE_AREAS = "tableAreas";	
 	private static final String ID_TABLE_EVALUADORES = "tableEvaluadoresArea";
-
+	private static final String DEP1 = "34"; // "CIENCIAS DE LA SALUD";
+	private static final String DEP2 = "14"; // ECONOMIA
+	
 	/**
 	 * Se ejecuta una vez al inicio de la clase.
 	 * 
@@ -82,7 +84,7 @@ public class TestBEPEvaluadores extends UtilsTestUsuarioBase {
 		UtilsTestBolsaEmpleo.assertTitlePage(UtilsTestBolsaEmpleo.waitVisibility(By.className(DIV_MAIN)), "Evaluadores de un departamento");
 
 		// seleccionamos el departamento (refresh)
-		WebElement tableAreas = seleccionarDepartamento(1);
+		WebElement tableAreas = seleccionarDepartamento(DEP1);
 				
 		// añadimos evaluador (refresh)
 		WebElement input = UtilsTestBolsaEmpleo.waitVisibility(By.id("nombre_evaluador"));
@@ -112,7 +114,7 @@ public class TestBEPEvaluadores extends UtilsTestUsuarioBase {
 	@Test
 	public void testA2() {
 		// seleccionamos el departamento (refresh)
-		WebElement tableAreas = seleccionarDepartamento(2);
+		WebElement tableAreas = seleccionarDepartamento(DEP2);
 		
 		// seleccionamos las dos primeras areas
 		UtilsTestBolsaEmpleo.selectRowTable(tableAreas, 0);
@@ -127,9 +129,7 @@ public class TestBEPEvaluadores extends UtilsTestUsuarioBase {
 		
 		// mensaje 
 		List<String> mExito = UtilsTestBolsaEmpleo.getMensajesDeExito();
-		List<String> mError = UtilsTestBolsaEmpleo.getMensajesDeError();
-		assertEquals(1, mExito.size());
-		assertEquals(1, mError.size());
+		assertEquals(2, mExito.size());
 		
 		// seleccionamos el primer item de la tabla
 		tableAreas = UtilsTestBolsaEmpleo.waitVisibility(By.id(ID_TABLE_AREAS));
@@ -156,7 +156,7 @@ public class TestBEPEvaluadores extends UtilsTestUsuarioBase {
 	@Test
 	public void testA3() {
 		// seleccionamos el departamento (refresh)
-		WebElement tableAreas = seleccionarDepartamento(1);
+		WebElement tableAreas = seleccionarDepartamento(DEP1);
 		
 		// seleccionamos la primera area
 		WebElement trArea = UtilsTestBolsaEmpleo.getRowByIndex(tableAreas, 0);
@@ -187,7 +187,7 @@ public class TestBEPEvaluadores extends UtilsTestUsuarioBase {
 	@Test
 	public void testA4() {
 		// seleccionamos el departamento (refresh)
-		WebElement tableAreas = seleccionarDepartamento(1);
+		WebElement tableAreas = seleccionarDepartamento(DEP1);
 		
 		// seleccionamos la primera area
 		WebElement trArea = UtilsTestBolsaEmpleo.getRowByIndex(tableAreas, 0);
@@ -224,7 +224,7 @@ public class TestBEPEvaluadores extends UtilsTestUsuarioBase {
 	@Test
 	public void testE1() {
 		// seleccionamos el departamento (refresh)
-		seleccionarDepartamento(1);
+		seleccionarDepartamento(DEP1);
 		
 		// añadimos evaluador (refresh)
 		WebElement input = UtilsTestBolsaEmpleo.waitVisibility(By.id("nombre_evaluador"));
@@ -243,7 +243,7 @@ public class TestBEPEvaluadores extends UtilsTestUsuarioBase {
 	@Test
 	public void testE2() {
 		// seleccionamos el departamento (refresh)
-		seleccionarDepartamento(1);
+		seleccionarDepartamento(DEP1);
 		
 		// añadimos evaluador (refresh)
 		WebElement input = UtilsTestBolsaEmpleo.waitVisibility(By.id("nombre_evaluador"));
@@ -256,9 +256,9 @@ public class TestBEPEvaluadores extends UtilsTestUsuarioBase {
 		assertEquals(mensajes.get(0), "El usuario no tiene rol de comisión");		
 	}
 	
-	private WebElement seleccionarDepartamento(int index) {
+	private WebElement seleccionarDepartamento(String value) {
 		Select dep = new Select(UtilsTestBolsaEmpleo.waitVisibility(By.id("select_departamento")));
-		dep.selectByIndex(index);
+		dep.selectByValue(value);		
 		dep = new Select(UtilsTestBolsaEmpleo.waitVisibility(By.id("select_departamento")));
 		String textoSelect = dep.getFirstSelectedOption().getText();
 		

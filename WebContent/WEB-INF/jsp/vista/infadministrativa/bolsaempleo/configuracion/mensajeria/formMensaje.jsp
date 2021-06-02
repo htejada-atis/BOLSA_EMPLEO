@@ -67,7 +67,7 @@ Mensaje mensaje = bean.getMensaje();
 	</table>
 	
 	<table class="bluetable bolsaempleo" style="margin-top: 2rem;">
-		<caption>Añadir usuarios del sistema al mensaje</caption>		
+		<caption>AÑADIR USUARIOS DEL SISTEMA AL MENSAJE</caption>		
 	</table>
 	
 	<div class="form-group-container col2 helper">
@@ -132,7 +132,7 @@ $(document).ready(function() {
 	};
 	
 	var tableDestinatarios = new Atis.DataTable('#tableDestinatarios', {
-		"title": "Destinatarios del mensaje",
+		"title": "DESTINATARIOS DEL MENSAJE",
 	    "ajax": { url: '<%= ControladorMensajes.URL_PATTERN_AJAX %>', async: false },
 	    "params": {"<%=ControladorMensajes.PARAM_MENSAJE_ID%>": <%= mensaje.getCodNum() %>},
 	    "pageSize": 10,

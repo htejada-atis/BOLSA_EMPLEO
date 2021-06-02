@@ -65,7 +65,7 @@ UsuarioBolsaEmpleo candidato = bean.getCandidato();
 		    "action": "<%=ControladorFiltrarTitulacion.ACCION_DATATABLE_CANDIDATOS%>",
 		    "pageSize": 5,
 		    "filterable": true,
-		    "title": 'Candidatos',
+		    "title": 'CANDIDATOS',
 		    "clickable": {'onClick': function(row) {
 		    	var params = {
 	    				'<%=ControladorFiltrarTitulacion.PARAM_ACCION %>': '<%=ControladorFiltrarTitulacion.ACCION_CANDIDATO_SELECCIONADO%>',
@@ -75,8 +75,8 @@ UsuarioBolsaEmpleo candidato = bean.getCandidato();
 		    }},
 		    <%if (candidato != null) {%> "selected": <%= candidato.getCodNum() %> ,<%}%>
 		    "columns": [
-		    	{'data': 'apellido1', 'filter': true, 'render': function(row) {
-	        		return "<div class='overflow-auto'>" + row.nombre + "\n" + row.apellido1 + "\n" + row.apellido2 + "</div>"; 
+		    	{'data': 'apellido1', 'filter': true, 'overflow': 'auto', 'render': function(row) {
+	        		return row.nombre + " " + row.apellido1 + " " + row.apellido2; 
 	        	}},
 	        	{'data': 'totalTitulaciones', 'order': {'active': false}},
 	        	{'data': 'totalTitulacionesValidadas', 'order': {'active': false}},
@@ -124,7 +124,7 @@ UsuarioBolsaEmpleo candidato = bean.getCandidato();
 				"ajax": { url: "<%=ControladorFiltrarTitulacion.URL_PATTERN_AJAX%>", async: false },
 				"selectable": true,
 			    "filterable": true,
-			    "title": 'Titulaciones: <%=candidato.getNombre() + " " + candidato.getPrimerApellido() + " " + candidato.getSegundoApellido()%>',
+			    "title": 'TITULACIONES: <%=candidato.getNombre() + " " + candidato.getPrimerApellido() + " " + candidato.getSegundoApellido()%>',
 			    "pageSize": 10,
 			    "action": "<%=ControladorFiltrarTitulacion.ACCION_DATATABLE_TITULACIONES_CANDIDATO%>",
 			    "params": {"<%=ControladorFiltrarTitulacion.PARAM_CANDIDATO%>": <%=candidato.getCodNum()%>},
@@ -157,7 +157,7 @@ UsuarioBolsaEmpleo candidato = bean.getCandidato();
 			        {'data': 'titulacion.nombre', 'filter': {'type': 'text'}, 'render': function(row) {
 			        	return !row.titulacion ? 'OTRA TITULACION' : row.titulacion.nombre;
 			        }},
-			    	{'data': 'descripcion', 'class': 'overflow-auto'},
+			    	{'data': 'descripcion', 'overflow': 'auto'},
 		        	{'data': 'codnum', 'buttons': [
 		        		{'label': 'Descargar', 'onClick': function(row) {
 		        			window.open("<%=ControladorFiltrarTitulacion.URL_PATTERN_FILES_PRIVADA%>"

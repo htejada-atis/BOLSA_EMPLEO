@@ -1,6 +1,8 @@
 /**
  * Datatable
  * @copyright ATISoluciones 2021
+ * 
+ * 20210602 overflow-auto y render
  */
  
 function DataTable(id, config) {
@@ -148,20 +150,22 @@ function DataTable(id, config) {
     	var data = columnDef.data;
     	var value = Atis.getProp(row, data);
 
-    	if (columnDef.hasOwnProperty('render')) {
-    		return columnDef.render(row);
-    	}
-
-        if (columnDef.hasOwnProperty('overflow')) {
-            var overflow;
+    	if (columnDef.hasOwnProperty('overflow')) {
+            var overflow = $('<div></div>');
 
             if (columnDef.overflow == 'auto') {
-                overflow = $('<div></div>');
                 overflow.addClass('overflow-auto');
             }
 
-            return overflow.append(typeof value !== 'undefined' ? '' + value : '');
+            return overflow.append(
+                columnDef.hasOwnProperty('render') ? columnDef.render(row) :
+                typeof value !== 'undefined' ? '' + value : ''
+            );
         }
+
+        if (columnDef.hasOwnProperty('render')) {
+    		return columnDef.render(row);
+    	}
     	
     	if (columnDef.hasOwnProperty('buttons')) {
     		var buttons = $('<span class="btns"></span>');

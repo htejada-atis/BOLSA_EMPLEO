@@ -62,7 +62,7 @@ UsuarioBolsaEmpleo candidato = bean.getCandidato();
 		    "action": "<%= ControladorFiltrarAcreditaciones.ACCION_DATATABLE_CANDIDATOS %>",
 		    "pageSize": 5,
 		    "filterable": true,
-		    "title": 'Candidatos',
+		    "title": 'CANDIDATOS',
 		    "clickable": {'onClick': function(row) {
 		    	var params = {
 	    				'a': '<%= ControladorFiltrarAcreditaciones.ACCION_CANDIDATO_SELECCIONADO %>',
@@ -72,8 +72,8 @@ UsuarioBolsaEmpleo candidato = bean.getCandidato();
 		    }},
 		    <% if (candidato != null) { %> "selected": <%= candidato.getCodNum() %> ,<% } %>
 		    "columns": [
-		    	{'data': 'apellido1', 'filter': true, 'render': function(row) {
-	        		return "<div class='overflow-auto'>" + row.nombre + "\n" + row.apellido1 + "\n" + row.apellido2 + "</div>"; 
+		    	{'data': 'apellido1', 'filter': true, 'overflow': 'auto', 'render': function(row) {
+	        		return row.nombre + " " + row.apellido1 + " " + row.apellido2; 
 	        	}},
 	        	{'data': 'totalAcreditaciones', 'order': {'active': false}},
 	        	{'data': 'totalAcreditacionesValidadas', 'order': {'active': false}},
@@ -88,7 +88,7 @@ UsuarioBolsaEmpleo candidato = bean.getCandidato();
 			    "params": {"<%=ControladorFiltrarAcreditaciones.PARAM_CANDIDATO%>": <%= candidato.getCodNum() %>},
 			    "selectable": true,
 			    "filterable": true,
-			    "title": 'Acreditaciones: <%=candidato.getNombre() + " " + candidato.getPrimerApellido() + " " + candidato.getSegundoApellido()%>',
+			    "title": 'ACREDITACIONES: <%=candidato.getNombre() + " " + candidato.getPrimerApellido() + " " + candidato.getSegundoApellido()%>',
 			    "columns": [
 			    	{'data': 'codNum', 'selectable': {'onChange': function(row, checkbox) {
 			    				var accion = checkbox.checked ? '<%= ControladorFiltrarAcreditaciones.ACCION_ACREDITACION_SELECCIONADA %>'

@@ -341,8 +341,8 @@ UsuarioBolsaEmpleo usuarioBolsa = bean.getUsuario();
 		    "columns": [
 		    	{'data': 'area.codNum', 'selectable': true},
 		        {'data': 'area.codNum', 'filter': {'type': 'number'}},
-		        {'data': 'area.idAreaExterno' , 'filter': true, 'class': 'overflow-auto'},
-		        {'data': 'area.descripcion', 'filter': true, 'class': 'overflow-auto'}
+		        {'data': 'area.idAreaExterno' , 'filter': true, 'overflow': 'auto'},
+		        {'data': 'area.descripcion', 'filter': true, 'overflow': 'auto'}
 		    ],
 		    "actions": [
 		    	{'label': 'Excluir Areas', 'onClick': function(selected) { enviaAccion("<%=ControladorUsuarioBolsaEmpleo.ACCION_EXCLUIR_USUARIO_AREA%>", selected); } }
@@ -360,8 +360,8 @@ UsuarioBolsaEmpleo usuarioBolsa = bean.getUsuario();
 		    "columns": [
 		    	{'data': 'area.codNum', 'selectable': true},
 		        {'data': 'area.codNum', 'filter': {'type': 'number'}},
-		        {'data': 'area.idAreaExterno', 'filter': true, 'class': 'overflow-auto'},
-		        {'data': 'area.descripcion', 'filter': true, 'class': 'overflow-auto'}
+		        {'data': 'area.idAreaExterno', 'filter': true, 'overflow': 'auto'},
+		        {'data': 'area.descripcion', 'filter': true, 'overflow': 'auto'}
 		    ],
 		    "actions": [
 		    	{'label': 'Borrar Areas excluidas', 'onClick': function(selected) { enviaAccion("<%= ControladorUsuarioBolsaEmpleo.ACCION_INCLUIR_USUARIO_AREA %>", selected); } }

@@ -227,8 +227,8 @@ $(document).ready(function() {
 	    <% if (candidato != null) { %> "selected": <%= candidato.getCodNum() %> ,<% } %>
 	    "columns": [
 	    	{'data': 'numdocumento', 'filter': true},
-	    	{'data': 'apellido1', 'filter': true, 'render': function(row) {
-        		return "<div class='overflow-auto'>" + row.nombre + "\n" + row.apellido1 + "\n" + row.apellido2 + "</div>"; 
+	    	{'data': 'apellido1', 'filter': true, 'overflow': 'auto', 'render': function(row) {
+        		return row.nombre + " " + row.apellido1 + " " + row.apellido2; 
         	}},
 	        {'data': 'totalMeritosNoValidados', 'order': false, 'class': 'center', 'render': function(row) { return isNaN(row.totalMeritosNoValidados) ? 0 : row.totalMeritosNoValidados; } },
 	        {'data': 'totalMeritosValidados', 'order': false, 'class': 'center', 'render': function(row) { return isNaN(row.totalMeritosValidados) ? 0 : row.totalMeritosValidados; } },

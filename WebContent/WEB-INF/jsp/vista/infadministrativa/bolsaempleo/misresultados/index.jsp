@@ -45,7 +45,7 @@ $(document).ready(function() {
 	    "columns": [
 	    	{'data': 'codNum', 'filter': {'type': 'number'}},
 	    	{'data': 'area.idAreaExterno', 'filter': {'type': 'number'}},	    	
-	        {'data': 'area.descripcion', 'filter': true, 'class': 'overflow-auto'},
+	        {'data': 'area.descripcion', 'filter': true, 'overflow': 'auto'},
 	        {'data': 'codNum', 'filter': {'type': 'date'}, 'render': function(row) { return ""; } },
 	        {'data': 'codnum', 'buttons': [{'label': 'Ver resultados', 'onClick': function(row) {}}]}        
 	    ],

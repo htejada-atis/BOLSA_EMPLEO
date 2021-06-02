@@ -106,7 +106,7 @@ Area area = bean.getArea();
 	            "filterable": true,
 	            "selectable": true,
 	            "defaultOrderBy": 2,
-	            "title": "Áreas del Departamento: <%= departamento.getDescripcion() %>",
+	            "title": "ÁREAS DEL DEPARTAMENTO: <%= departamento.getDescripcion() %>",
 	            "clickable": {'onClick': function(row) {
 	                var params = {
 	                        '<%= ControladorGestionEvaluadores.PARAM_ACCION %>': '<%=ControladorGestionEvaluadores.ACCION_SELECCIONAR_AREA%>', 
@@ -143,14 +143,14 @@ Area area = bean.getArea();
 	            "ajax": { url: "<%=ControladorGestionEvaluadores.URL_PATTERN_AJAX%>", async: false },
 	            "params": {"<%=ControladorGestionEvaluadores.PARAM_AREA%>": "<%= area.getCodNum() %>"},
 	            "pageSize": 10,
-	            "title": "Evaluadores del área: <%= area.getDescripcion() %>",
+	            "title": "EVALUADORES DEL ÁREA: <%= area.getDescripcion() %>",
 	            "filterable": true,
 	            "defaultOrderBy": 1,
 	            "action": "<%=ControladorGestionEvaluadores.ACCION_DATATABLE_EVALUADORES%>",
 	            "columns": [
 	                {'data': 'numdocumento', 'filter': true},
-	                {'data': 'apellido1', 'filter': true, 'render': function(row) {
-	                    return "<div class='overflow-auto'>" + row.nombre + "\n" + row.apellido1 + "\n" + row.apellido2 + "</div>";
+	                {'data': 'apellido1', 'filter': true, 'overflow': 'auto', 'render': function(row) {
+	                    return row.nombre + " " + row.apellido1 + " " + row.apellido2;
 	                }},
 	                {'data': 'activo', 'filter': {'type': 'select', 'options':{'true': 'Activo', 'false': 'Inactivo'}, 'optionDefault': 'true'}, 'order': {'active': false}, 'render': function(row) {
 	                    if (row.activo) {

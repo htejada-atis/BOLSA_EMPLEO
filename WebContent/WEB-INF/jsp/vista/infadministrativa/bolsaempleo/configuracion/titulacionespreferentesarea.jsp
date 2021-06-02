@@ -81,11 +81,11 @@ Area area = bean.getArea();
 			    "selectable": true,
 			    "filterable": true,
 			    "pageSize": 5,
-			    "title": "Titulaciones Preferentes al Área: <%= area.getDescripcion() %>",
+			    "title": "TITULACIONES PREFERENTES AL ÁREA: <%= area.getDescripcion() %>",
 			    "action": "<%=ControladorGestionTitulacionesPreferentesArea.ACCION_DATATABLE_TITULACIONES_PREFERENTES_AREA%>",
 			    "columns": [
 			    	{'data': 'codNum', 'selectable': true},
-			        {'data': 'nombre', 'class': 'overflow-auto', 'filter': {'type': 'text'}},
+			        {'data': 'nombre', 'overflow': 'auto', 'filter': {'type': 'text'}},
 			    ],
 			    "actions": [
 			    	{'label': 'Eliminar', 'title': 'Eliminar titulación del área', 'onClick': function(selected) {
@@ -108,11 +108,11 @@ Area area = bean.getArea();
 			    "selectable": true,
 			    "filterable": true,
 			    "pageSize": 5,
-			    "title": 'Titulaciones Disponibles',
+			    "title": 'TITULACIONES DISPONIBLES',
 			    "action": "<%=ControladorGestionTitulacionesPreferentesArea.ACCION_DATATABLE_TITULACIONES%>",
 			    "columns": [
 			    	{'data': 'codNum', 'selectable': true},
-			        {'data': 'nombre', 'class': 'overflow-auto', 'filter': {'type': 'text'}},
+			        {'data': 'nombre', 'overflow': 'auto', 'filter': {'type': 'text'}},
 			    ],
 			    "actions": [
 			    	{'label': 'Incluir', 'title': 'Incluir titulación en el área', 'onClick': function(selected) {

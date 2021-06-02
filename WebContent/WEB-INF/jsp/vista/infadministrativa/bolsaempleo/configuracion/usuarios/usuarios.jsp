@@ -57,21 +57,19 @@ $(document).ready(function() {
 	    "pageSize": 10,
 	    "filterable": true,
 	    "action": "<%=ControladorUsuarioBolsaEmpleo.ACCION_DATATABLE_USUARIOS%>",
-	    "title": 'Usuarios',
 	    "columns": [
 	    	{'data': 'codNum', 'selectable': true},
-	        {'data': 'tipodocumento', 'filter': true, 'class': 'overflow-auto'},
-	        {'data': 'numdocumento', 'filter': true, 'class': 'overflow-auto'},
-	        {'data': 'codcuenta', 'filter': true, 'class': 'overflow-auto'},
-	        {'data': 'apellido1', 'filter': true, 'class': 'overflow-auto', 'render': function(row) {
-        		return row.nombre + "\n" + row.apellido1 + "\n" + row.apellido2; 
+	        {'data': 'tipodocumento', 'filter': true, 'overflow': 'auto'},
+	        {'data': 'numdocumento', 'filter': true, 'overflow': 'auto'},
+	        {'data': 'codcuenta', 'filter': true, 'overflow': 'auto'},
+	        {'data': 'apellido1', 'filter': true, 'overflow': 'auto', 'render': function(row) {
+	        	return row.nombre + " " + row.apellido1 + " " + row.apellido2;         		
         	}},
 	        {'data': 'rol.descripcion', 'filter': {'type': 'select', 'options': {'1050':'Personal', '1051':'Comision'}}  , 'order': {'active': false}},
 	        {'data': 'listaDist', 'filter': {'type': 'selectBoolean', 'true': 'En Lista', 'false': 'Sin Lista'}, 'render': function(row) {
 	        	if(row.listaDist==true){
         			return "<div title='En lista distribución' class='circle-true'></div>"; 
-        		}
-        		else{
+        		} else {
         			return "<div title='Excluido de lista distribución' class='circle-false'></div>"; 
         		}
         	}},
