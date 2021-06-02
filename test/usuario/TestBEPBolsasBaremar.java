@@ -15,6 +15,7 @@ import org.junit.Test;
 import org.junit.runners.MethodSorters;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebElement;
+import org.openqa.selenium.support.ui.Select;
 
 import bbdd.UtilsTestBolsaEmpleo;
 
@@ -31,6 +32,7 @@ public class TestBEPBolsasBaremar extends UtilsTestUsuarioBase {
 
 	private static final String DIV_MAIN = "bolsa-empleo";	
 	private static final String ID_TABLE = "table";
+	private static final int FILTER_BAREMABLE_INDEX = 7;
 	
 	/**
 	 * Se ejecuta una vez al inicio de la clase.
@@ -74,6 +76,10 @@ public class TestBEPBolsasBaremar extends UtilsTestUsuarioBase {
 	public void testA1() {
 		UtilsTestBolsaEmpleo.assertTitlePage(UtilsTestBolsaEmpleo.waitVisibility(By.className(DIV_MAIN)), "Estado de las bolsas");
 		WebElement table = UtilsTestBolsaEmpleo.waitVisibility(By.id(ID_TABLE));
+		Select filtro = UtilsTestBolsaEmpleo.getFilterSelectByIndex(table, FILTER_BAREMABLE_INDEX);
+		filtro.selectByValue("0");
+		table = UtilsTestBolsaEmpleo.waitVisibility(By.id(ID_TABLE));
+		
 		assertTrue(UtilsTestBolsaEmpleo.getTotalTable(table) > 0);		
 	}
 }

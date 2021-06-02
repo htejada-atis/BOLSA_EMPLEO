@@ -105,7 +105,7 @@ public class TestBEPBeanEvaluador {
 		assertTrue(evaluador.equals(evaluador2));
 		assertTrue(evaluador2.equals(evaluador));
 		assertEquals(evaluador.hashCode(), evaluador2.hashCode());
-		assertNull(evaluador);
+		assertFalse(evaluador.equals(null));
 		assertFalse(evaluador.equals(evaluador3));
 		assertFalse(evaluador3.equals(evaluador));
 		assertNotEquals(evaluador.hashCode(), evaluador3.hashCode());
