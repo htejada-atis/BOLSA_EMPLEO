@@ -131,6 +131,7 @@ table.bluetable.bolsaempleo button {
 }
 table.bluetable.bolsaempleo .btn:hover:enabled {
 	background-color: var(--principal);
+	color: #fff;
 	border: 1px solid var(--principal);
 }
 table.bluetable.bolsaempleo span.pagination, table.bluetable.bolsaempleo span.total {
