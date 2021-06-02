@@ -30,6 +30,7 @@ import es.ujaen.uvirtual.modulo.bolsaempleo.beans.UsuarioBolsaEmpleo;
 import es.ujaen.uvirtual.modulo.bolsaempleo.modelo.ModeloMeritosPreferentes;
 import es.ujaen.uvirtual.modulo.bolsaempleo.modelo.ModeloMeritosPreferentesCandidato;
 import es.ujaen.uvirtual.modulo.bolsaempleo.modelo.ModeloParametrosConfiguracion;
+import es.ujaen.uvirtual.modulo.bolsaempleo.modelo.ModeloRol;
 import es.ujaen.uvirtual.modulo.bolsaempleo.modelo.ModeloUsuarioBolsaEmpleo;
 import es.ujaen.uvirtual.modulo.bolsaempleo.utilidades.BolsaEmpleoDataTable;
 import es.ujaen.uvirtual.modulo.bolsaempleo.utilidades.BolsaEmpleoUtils;
@@ -174,6 +175,7 @@ public class ControladorMisMeritosPreferentes extends HttpServlet {
 			throws SQLException, UVException, IOException {
 		this.index(bean);
 		BolsaEmpleoUtils.readMensajeSession(bean, request);
+		
 		try {
 			bean.setUsuarioLogeado(ModeloUsuarioBolsaEmpleo.obtenerInstancia().getOrCreateUsuario(datos));
 		} catch (UVException e) {
@@ -182,6 +184,10 @@ public class ControladorMisMeritosPreferentes extends HttpServlet {
 			
 			BolsaEmpleoUtils.addMensajeDeError(e.getMessage(), bean, request);
 			response.sendRedirect("/srv/es/informacionadministrativa/bolsaempleo/error");
+		}
+		
+		if (!bean.getUsuarioLogeado().getRol().getCodNum().equals(ModeloRol.ID_ROL_CANDIDATO)) {
+			throw new UVException("No eres un candidato");
 		}
 	}
 	
