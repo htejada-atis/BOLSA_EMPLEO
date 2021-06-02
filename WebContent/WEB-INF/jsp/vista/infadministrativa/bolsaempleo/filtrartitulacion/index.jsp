@@ -122,7 +122,7 @@ UsuarioBolsaEmpleo candidato = bean.getCandidato();
 			
 			var tableTitulaciones = new Atis.DataTable('#tableTitulacionesCandidato', {
 				"ajax": { url: "<%=ControladorFiltrarTitulacion.URL_PATTERN_AJAX%>", async: false },
-				"selectable": true,
+				"selectable": {'all': false},
 			    "filterable": true,
 			    "title": 'TITULACIONES: <%=candidato.getNombre() + " " + candidato.getPrimerApellido() + " " + candidato.getSegundoApellido()%>',
 			    "pageSize": 10,
