@@ -68,8 +68,7 @@ public class TestBEPControladorUsuariosBolsaEmpleo {
 	// método para obtener la vista con una lista de bloques .
 	private VistaUsuarioBolsaEmpleo obtenerUsuariosBorrados() throws ServletException, IOException {
 		PeticionHttp peticion = UtilsTestBolsaEmpleo.peticionAutenticadaPersonal();
-		peticion.setParameter(ControladorUsuarioBolsaEmpleo.PARAM_ACCION,
-				ControladorUsuarioBolsaEmpleo.ACCION_DATATABLE_USUARIOS_BORRADOS);
+		peticion.setParameter(ControladorUsuarioBolsaEmpleo.PARAM_ACCION, ControladorUsuarioBolsaEmpleo.ACCION_DATATABLE_USUARIOS_BORRADOS);
 
 		RespuestaHttp respuesta = new RespuestaHttp();
 		ControladorUsuarioBolsaEmpleo controlador = new ControladorUsuarioBolsaEmpleo();

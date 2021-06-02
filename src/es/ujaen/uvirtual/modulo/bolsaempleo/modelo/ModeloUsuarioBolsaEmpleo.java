@@ -984,28 +984,6 @@ public class ModeloUsuarioBolsaEmpleo {
 	}
 
 	/**
-	 * Elimina un usuario.
-	 * 
-	 * @param usuario a borrar
-	 * @throws SQLException en caso de error en la BD
-	 * @throws UVException  si noticia no es valida
-	 */
-	public void borraUsuario(UsuarioBolsaEmpleo usuario) throws SQLException, UVException {
-		if (usuario == null) {
-			throw new UVException("No se puede eliminar un usuario vacía");
-		}
-		if (usuario.getCodNum() == null) {
-			throw new UVException("No se puede eliminar un usuario con id vacío");
-		}
-		String consulta = "DELETE FROM tbep_usuarios WHERE codnum = ? ";
-		try (Connection conexion = ConexionUvirtual.obtenerInstancia(); PreparedStatement stmt = conexion.prepareStatement(consulta)) {
-			int parameterIndex = 1;
-			stmt.setInt(parameterIndex++, usuario.getCodNum());
-			stmt.executeUpdate();
-		}
-	}
-
-	/**
 	 * Actualiza Rol usuario.
 	 * 
 	 * @param usu para asociar
