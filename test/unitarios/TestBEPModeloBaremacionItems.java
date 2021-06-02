@@ -33,6 +33,7 @@ import es.ujaen.uvirtual.utilidades.UVException;
 public class TestBEPModeloBaremacionItems {
 	
 	private static final Integer CODNUM = 1;
+	private static final Integer CODNUM_2 = 2;
 	private static final Integer CODNUM_NOEXISTE = 111_111_111;
 	private static final String CODIGO = "1";
 	private static final String NOMBRE = "NOMBRE ÍTEM";
@@ -211,12 +212,74 @@ public class TestBEPModeloBaremacionItems {
 	public void testA08listaItemsBaremacionDeUnApartado() {
 		try {
 			List<ItemBaremacion> listaItems = ModeloBaremacionItems.obtenerInstancia().getItemsDeApartado(this.obtenerPrimerBloque().getApartadoBaremacion());
-			assertNotEquals(MENSAJE_ITEMS_DEVUELTOS, 0, listaItems);
+			assertNotEquals(MENSAJE_ITEMS_DEVUELTOS, 0, listaItems.size());
 		} catch (SQLException | UVException ex) {
 			fail(String.format(MENSAJE_ERROR_HAY_EXCEPCION, ex.toString()));
 		}
 	}
 	
+	/**
+	 * asignarItemsExcluyente .
+	 */
+	@Test
+	public void testA09asignarItemsExcluyente() {
+		try {
+			ModeloBaremacionItems modeloItems = ModeloBaremacionItems.obtenerInstancia();
+			ItemBaremacion itemPadre = modeloItems.getItemBaremacionById(CODNUM);
+			ItemBaremacion itemHijo = modeloItems.getItemBaremacionById(CODNUM_2);
+			
+			modeloItems.asignarItemsExcluyentesAItem(itemPadre, itemHijo, UtilsTestBolsaEmpleo.getUsuarioPersonalLogeado());
+			
+			List<ItemBaremacion> itemsExcluyentes = modeloItems.getItemsExcluyentes(itemPadre);
+			boolean excluyentes = modeloItems.checkItemsExcluyentes(itemPadre, itemHijo);
+			assertNotEquals(MENSAJE_ITEMS_DEVUELTOS, 0, itemsExcluyentes.size());
+			assertEquals(true, excluyentes);
+		} catch (SQLException | UVException ex) {
+			fail(String.format(MENSAJE_ERROR_HAY_EXCEPCION, ex.toString()));
+		}
+	}
+	
+	/**
+	 * listadoItemsBaremacionExcluyentesDatatable.
+	 */
+	@Test
+	public void testA10listadoItemsBaremacionExcluyentesDatatable() {
+		HashMap<String, String[]> params = new HashMap<>();
+
+		params.put(BolsaEmpleoDataTable.PARAM_CURRENT_PAGE, new String[] {"0"});
+		params.put(BolsaEmpleoDataTable.PARAM_PAGE_SIZE, new String[] {"10"});
+		params.put(BolsaEmpleoDataTable.PARAM_ORDER_BY, new String[] {String.valueOf(ModeloBaremacionItems.ORDER_COLUMN_INDEX_ITEMS_EXCLUYENTES_CODIGO)});
+		params.put(BolsaEmpleoDataTable.PARAM_ORDER_DIRECTION, new String[] {BolsaEmpleoDataTable.PARAM_ORDER_DIRECTION_VALUE_ASC});
+
+		try {
+			ItemBaremacion itemPadre = ModeloBaremacionItems.obtenerInstancia().getItemBaremacionById(CODNUM);
+			BolsaEmpleoDataTable<ItemBaremacion> dt = ModeloBaremacionItems.obtenerInstancia().listadoItemsBaremacionExcluyentesDatatable(params, itemPadre);
+			assertFalse(dt.getData().isEmpty());
+		} catch (SQLException | UVException ex) {
+			fail(String.format(MENSAJE_ERROR_HAY_EXCEPCION, ex.toString()));
+		}
+	}
+	
+	/**
+	 * borrarItemExcluyenteAItem .
+	 */
+	@Test
+	public void testA11borrarItemExcluyenteAItem() {
+		try {
+			ModeloBaremacionItems modeloItems = ModeloBaremacionItems.obtenerInstancia();
+			ItemBaremacion itemPadre = modeloItems.getItemBaremacionById(CODNUM);
+			ItemBaremacion itemHijo = modeloItems.getItemBaremacionById(CODNUM_2);
+			
+			modeloItems.borrarItemsExcluyentesAItem(itemPadre, itemHijo, UtilsTestBolsaEmpleo.getUsuarioPersonalLogeado());
+			
+			List<ItemBaremacion> itemsExcluyentes = modeloItems.getItemsExcluyentes(itemPadre);
+			boolean excluyentes = modeloItems.checkItemsExcluyentes(itemPadre, itemHijo);
+			assertEquals(0, itemsExcluyentes.size());
+			assertNotEquals(true, excluyentes);
+		} catch (SQLException | UVException ex) {
+			fail(String.format(MENSAJE_ERROR_HAY_EXCEPCION, ex.toString()));
+		}
+	}
 	
 	
 	// ERRORES

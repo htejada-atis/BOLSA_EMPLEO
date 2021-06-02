@@ -123,7 +123,9 @@ UsuarioBolsaEmpleo candidato = bean.getCandidato();
 			    	{'data': 'descripcion', 'filter': true},
 			        {'data': 'codnum', 'buttons': [
 		        		{'label': 'Descargar', 'title': 'Descargar fichero del mérito', 'onClick': function(row) {
-		        			console.log(row);
+		        			window.open("<%=ControladorFiltrarAcreditaciones.URL_PATTERN_FILES_PRIVADA%>"
+		        		        	+ "?a=<%=ControladorFiltrarAcreditaciones.ACCION_DESCARGAR_FICHERO%>&<%=ControladorFiltrarAcreditaciones.PARAM_FICHERO%>=" + row.codNum
+		        		        	+ "&<%=ControladorFiltrarAcreditaciones.PARAM_CANDIDATO%>=" + "<%= bean.getCandidato().getCodNum() %>");
 		        		}},
 		   			]}
 			    ],
