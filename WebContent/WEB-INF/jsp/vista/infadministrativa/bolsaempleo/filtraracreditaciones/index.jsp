@@ -86,7 +86,7 @@ UsuarioBolsaEmpleo candidato = bean.getCandidato();
 			    "pageSize": 10,
 			    "action": "<%= ControladorFiltrarAcreditaciones.ACCION_DATATABLE_ACREDITACIONES_CANDIDATO %>",
 			    "params": {"<%=ControladorFiltrarAcreditaciones.PARAM_CANDIDATO%>": <%= candidato.getCodNum() %>},
-			    "selectable": true,
+			    "selectable": {'all': false},
 			    "filterable": true,
 			    "title": 'ACREDITACIONES: <%=candidato.getNombre() + " " + candidato.getPrimerApellido() + " " + candidato.getSegundoApellido()%>',
 			    "columns": [
