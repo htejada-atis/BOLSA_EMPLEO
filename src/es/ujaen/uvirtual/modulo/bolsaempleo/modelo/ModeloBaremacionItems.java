@@ -49,7 +49,9 @@ public class ModeloBaremacionItems {
 	public static final String ITEM_UNIDADES_MEDICION_SINO = "SI/NO";
 		
 	// errores
-	public static final String ERROR_ITEM_NOEXITE = "Item no encontrado";	
+	public static final String ERROR_ITEM_MISMO_CODIGO = "Ya existe un ítem con el código introducido";
+	public static final String ERROR_ITEM_NOEXITE = "Item no encontrado";
+	public static final String ERROR_ITEM_REQUERIDO = "El ítem de baremación es requerido";
 	
 	public static final Integer COLUMN_CODIGO_MAXLENGTH = 3; 
 	public static final Integer COLUMN_NOMBRE_MAXLENGTH = 100;
@@ -92,7 +94,7 @@ public class ModeloBaremacionItems {
 	 */
 	public ItemBaremacion getItemBaremacionById(Integer codNum) throws SQLException, UVException {
 		if (codNum == null) {
-			throw new UVException("El mérito es requerido");
+			throw new UVException(ERROR_ITEM_REQUERIDO);
 		}
 		
 		String sql = "SELECT bepite.* FROM TBEP_ITEMSBAREMACION bepite WHERE bepite.CODNUM = ?";
@@ -341,12 +343,13 @@ public class ModeloBaremacionItems {
 	/** Función que inserta un ítem en la BD.
 	 * @param item .
 	 * @param usuarioInsert .
+	 * @return .
 	 * @throws SQLException .
 	 * @throws UVException .
 	 */
-	public void insertaItem(ItemBaremacion item, UsuarioBolsaEmpleo usuarioInsert) throws SQLException, UVException {
+	public Integer insertaItem(ItemBaremacion item, UsuarioBolsaEmpleo usuarioInsert) throws SQLException, UVException {
 		if (item == null) {
-			throw new UVException("No se puede insertar un item vacio");
+			throw new UVException(ERROR_ITEM_REQUERIDO);
 		}
 		
 		this.chequearItemParaInsertarOActualizar(item);
@@ -355,7 +358,7 @@ public class ModeloBaremacionItems {
 				+ " (CODIGO,NOMBRE,DESCRIPCION,BEPBLO_CODNUM,UNIDADES,VALOR,VALOR_MINIMO,VALOR_MAXIMO,AFINIDAD,INDIVIDUALIZADO,UID_USUARIO)"
 				+ " VALUES (?,?,?,?,?,?,?,?,?,?,?)";
 		
-		try (Connection conexion = ConexionUvirtual.obtenerInstancia(); PreparedStatement stmt = conexion.prepareStatement(consulta)) {
+		try (Connection conexion = ConexionUvirtual.obtenerInstancia(); PreparedStatement stmt = conexion.prepareStatement(consulta, new String[]{CODNUM})) {
 			int parameterIndex = 1;
 			stmt.setString(parameterIndex++, item.getCodigo());
 			stmt.setString(parameterIndex++, item.getNombre());
@@ -373,6 +376,11 @@ public class ModeloBaremacionItems {
 			}			
 			stmt.setString(parameterIndex++, usuarioInsert.getCodCuenta());
 			stmt.executeUpdate();
+			
+			ResultSet rs = stmt.getGeneratedKeys();
+			rs.next();
+			
+			return rs.getInt(1);
 		}
 	}
 	
@@ -463,7 +471,7 @@ public class ModeloBaremacionItems {
 	
 	private void chequearItemParaInsertarOActualizar(ItemBaremacion item) throws SQLException, UVException {
 		if (this.existeOtroItemActivoPorCodigo(item)) {
-			throw new UVException("Ya existe un item con el código introducido");
+			throw new UVException(ERROR_ITEM_MISMO_CODIGO);
 		}
 		
 		ArrayList<String> unidades = new ArrayList<>();

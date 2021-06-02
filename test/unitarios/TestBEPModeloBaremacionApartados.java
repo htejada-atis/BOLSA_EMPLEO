@@ -239,7 +239,7 @@ public class TestBEPModeloBaremacionApartados {
 				() -> ModeloBaremacionApartados.obtenerInstancia().getApartadoBaremacionById(null));
 		
 		assertEquals(UVException.class, throwable.getClass());
-		assertEquals(ModeloBaremacionApartados.ERROR_APARTADO_REQUERIDO, throwable.getMessage());
+		assertEquals(ModeloBaremacionApartados.ERROR_BLOQUE_REQUERIDO, throwable.getMessage());
 	}
 	
 	/**
@@ -263,7 +263,7 @@ public class TestBEPModeloBaremacionApartados {
 				() -> ModeloBaremacionApartados.obtenerInstancia().insertaApartado(null, UtilsTestBolsaEmpleo.getUsuarioPersonalLogeado()));
 		
 		assertEquals(UVException.class, throwable.getClass());
-		assertEquals(ModeloBaremacionApartados.ERROR_APARTADO_REQUERIDO, throwable.getMessage());
+		assertEquals(ModeloBaremacionApartados.ERROR_BLOQUE_REQUERIDO, throwable.getMessage());
 	}
 	
 	/**
