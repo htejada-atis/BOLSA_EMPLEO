@@ -29,7 +29,7 @@ public class ModeloUsuarioAutoregistrado {
 				+ " (usuario, correo, clave, fecha_creacion) "
 				+ " VALUES (?, ?, ?, sysdate)";
 		try (PreparedStatement stmt = conexion.prepareStatement(consulta)) {
-			ModeloClaveArcos modelo = new ModeloClaveArcos();
+			ModeloClaveArcos modelo = ModeloClaveArcos.obtenerInstancia();
 			int parameterIndex = 1;
 			stmt.setString(parameterIndex++, usuario.getUid());
 			stmt.setString(parameterIndex++, usuario.getEmailCuentaPersona());
@@ -234,7 +234,7 @@ public class ModeloUsuarioAutoregistrado {
 			stmt.setString(parameterIndex++, idSolicitud);
 			int actualizados = stmt.executeUpdate();
 			if (actualizados == 1) {
-				ModeloClaveArcos modeloClaveArcos = new ModeloClaveArcos();
+				ModeloClaveArcos modeloClaveArcos = ModeloClaveArcos.obtenerInstancia();
 				String passwordAleatorio = modeloClaveArcos.passwordAleatorio();
 				actualizaClaveUsuario(correo, passwordAleatorio);
 				salida = passwordAleatorio;
@@ -276,7 +276,7 @@ public class ModeloUsuarioAutoregistrado {
 	public boolean validaClaveUsuario(String correo, String clave) throws SQLException {
 		boolean salida = false;
 		String ultimoHash = listaClaveUsuarioExterno(correo);
-		ModeloClaveArcos modeloClaveArcos = new ModeloClaveArcos();
+		ModeloClaveArcos modeloClaveArcos = ModeloClaveArcos.obtenerInstancia();
 		if (modeloClaveArcos.isClaveIgualHash(clave, ultimoHash)) {
 			salida = true;
 		}
@@ -314,7 +314,7 @@ public class ModeloUsuarioAutoregistrado {
 			+ " where correo = ? ";
 		try (Connection conexion = ConexionArcos.obtenerInstancia();
 			 PreparedStatement stmt = conexion.prepareStatement(consulta);) {
-			ModeloClaveArcos modeloClaveArcos = new ModeloClaveArcos();
+			ModeloClaveArcos modeloClaveArcos = ModeloClaveArcos.obtenerInstancia();
 			String claveHaseada = modeloClaveArcos.generaSsha512(clave, null);
 			int parameterIndex = 1;
 			stmt.setString(parameterIndex++, claveHaseada);
@@ -334,7 +334,7 @@ public class ModeloUsuarioAutoregistrado {
 	 */
 	public String mandarClaveTemporal(String correo, String ip) throws SQLException, UVException {
 		ArrayList<String> destinatariosCorreo = new ArrayList<>();
-		ModeloClaveArcos modeloClaveArcos = new ModeloClaveArcos();
+		ModeloClaveArcos modeloClaveArcos = ModeloClaveArcos.obtenerInstancia();
 		final int numeroBitsId = 512;
 		final int moduloConversionACaracter = 32;
 		String codigoPin = modeloClaveArcos.pinAleatorioTemporal();
