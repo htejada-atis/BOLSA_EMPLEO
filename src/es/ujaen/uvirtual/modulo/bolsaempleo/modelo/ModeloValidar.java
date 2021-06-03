@@ -7,7 +7,6 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import es.ujaen.uvirtual.modelo.conexion.ConexionArcos;
 import es.ujaen.uvirtual.modelo.conexion.ConexionUvirtual;
 import es.ujaen.uvirtual.modulo.bolsaempleo.beans.Bolsa;
 import es.ujaen.uvirtual.modulo.bolsaempleo.beans.BolsaCandidatoValidacionTable;
@@ -19,6 +18,7 @@ import es.ujaen.uvirtual.modulo.bolsaempleo.beans.MeritoSolicitud;
 import es.ujaen.uvirtual.modulo.bolsaempleo.beans.MeritoSolicitudValoracion;
 import es.ujaen.uvirtual.modulo.bolsaempleo.beans.MeritoValidarTable;
 import es.ujaen.uvirtual.modulo.bolsaempleo.beans.UsuarioBolsaEmpleo;
+import es.ujaen.uvirtual.modulo.bolsaempleo.beans.UsuarioBolsaEmpleoVuja;
 import es.ujaen.uvirtual.modulo.bolsaempleo.beans.ValorMeritoBolsaTable;
 import es.ujaen.uvirtual.modulo.bolsaempleo.utilidades.BolsaEmpleoDataTable;
 import es.ujaen.uvirtual.modulo.bolsaempleo.utilidades.BolsaEmpleoDataTable.DataTableColumn;
@@ -502,19 +502,12 @@ public class ModeloValidar {
 			dataTable.setFiltersParams(stmt, stmtCount, paramIndex);
 
 			try (ResultSet rs = stmt.executeQuery()) {
+				ModeloUsuarioBolsaEmpleo modeloUsuario = ModeloUsuarioBolsaEmpleo.obtenerInstancia(); 
+				
 				while (rs.next()) {
-					String consultaArcos = "SELECT * FROM arcos.VUJA_NET_BEP_AR_PERSONA WHERE PRSNIF = ?";
-
-					try (Connection conexionArcos = ConexionArcos.obtenerInstancia();
-							PreparedStatement stmtArcos = conexionArcos.prepareStatement(consultaArcos)) {
-						stmtArcos.setString(1, rs.getString("PRSNIF"));
-						try (ResultSet rsArcos = stmtArcos.executeQuery()) {
-							while (rsArcos.next()) {
-								CandidatoValidacion candidato = createCandidatoValidacionFromResultSet(rs, rsArcos);
-								rows.add(candidato);
-							}
-						}
-					}
+					String documento = rs.getString("PRSNIF");
+					CandidatoValidacion candidato = createCandidatoValidacionFromResultSet(rs, modeloUsuario.getResultSetPersonaArcosByPrsnif(documento));
+					rows.add(candidato);
 				}
 			}
 
@@ -751,13 +744,13 @@ public class ModeloValidar {
 	 * @throws UVException .
 	 * @throws SQLException .
 	 */
-	private CandidatoValidacion createCandidatoValidacionFromResultSet(ResultSet rs, ResultSet rsArcos) throws SQLException {
+	private CandidatoValidacion createCandidatoValidacionFromResultSet(ResultSet rs, UsuarioBolsaEmpleoVuja rsArcos) throws SQLException {
 		UsuarioBolsaEmpleo usuario = new UsuarioBolsaEmpleo();
-		usuario.setTipoDocumento(rsArcos.getString("STRTIPODOCUMENTO"));
-		usuario.setNumDocumento(rsArcos.getString("PRSNIF"));
-		usuario.setNombre(rsArcos.getString("STRNOMBRE"));
-		usuario.setPrimerApellido(rsArcos.getString("STRAPELLIDO1"));
-		usuario.setSegundoApellido(rsArcos.getString("STRAPELLIDO2"));
+		usuario.setTipoDocumento(rsArcos.getStrTipoDocumento());
+		usuario.setNumDocumento(rsArcos.getPrsNif());
+		usuario.setNombre(rsArcos.getStrNombre());
+		usuario.setPrimerApellido(rsArcos.getStrApellido1());
+		usuario.setSegundoApellido(rsArcos.getStrApellido2());
 		usuario.setCodNum(rs.getInt("CODNUM"));
 		
 		CandidatoValidacion candidato = new CandidatoValidacion(usuario);

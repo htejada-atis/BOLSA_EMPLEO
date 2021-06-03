@@ -27,6 +27,7 @@ public class UtilsTestAutoregistrado {
 		if (!cargado) {
 			BbddRunner.ejecutarArcos("Documentos/scripts/opc.autoaprovisionado/Desarrollo/dropTables.sql");
 			BbddRunner.ejecutarArcos("Documentos/scripts/opc.autoaprovisionado/01-createTable.sql");
+			BbddRunner.ejecutarArcos("Documentos/scripts/opc.autoaprovisionado/02-createTrigger.sql");
 			BbddRunner.insertMasivo("Documentos/scripts/opc.autoaprovisionado/uv.sql");
 			cargado = true;
 		}
