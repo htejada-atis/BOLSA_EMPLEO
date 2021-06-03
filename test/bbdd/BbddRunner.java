@@ -20,7 +20,7 @@ import es.ujaen.uvirtual.utilidades.Formateador;
 import es.ujaen.uvirtual.utilidades.Memcache;
 import oracle.jdbc.pool.OracleDataSource;
 
-/** Clase para conexión a bbdd y carga de datos para las pruebas. */
+/** Clase para conexiÃ³n a bbdd y carga de datos para las pruebas. */
 public class BbddRunner {
 	private static final String NOMBREDEESTACLASE = BbddRunner.class.getName();
 	private static final Logger LOGGER = Logger.getLogger(NOMBREDEESTACLASE);
@@ -43,7 +43,8 @@ public class BbddRunner {
     static {
     	LOGGER.log(Level.INFO, "inicializacion de oracle");
 		try {
-			LOGGER.log(Level.INFO, "Conexión BBDD: {0}", getCadenaConexionBd("Uv"));
+			LOGGER.log(Level.INFO, "Conexion BBDD Uv: {0}", getCadenaConexionBd("Uv"));
+			LOGGER.log(Level.INFO, "Conexion BBDD Arcos: {0}", getCadenaConexionBd("Arcos"));
 			odsUv = new OracleDataSource();
 			odsUv.setURL(getCadenaConexionBd("Uv"));
 			odsUv.setUser(getUsuarioConexion("uvirtual"));
@@ -52,7 +53,7 @@ public class BbddRunner {
 			odsArcos = new OracleDataSource();
 			odsArcos.setURL(getCadenaConexionBd("Arcos"));
 			odsArcos.setUser(usuarioBdArcos);
-			odsArcos.setPassword(pwBd);
+			odsArcos.setPassword(getClaveConexion("Arcos"));
 
 			odsRh = new OracleDataSource();
 			odsRh.setURL(getCadenaConexionBd("Rh"));
@@ -97,7 +98,7 @@ public class BbddRunner {
 		return odsAc;
 	}
 
-	/** obtiene la conexión con uvirtual.
+	/** obtiene la conexion con uvirtual.
 	 * @return conexion
 	 * @throws SQLException si error bd
 	 */
@@ -105,7 +106,7 @@ public class BbddRunner {
 		return odsUv.getConnection();
 	}
 
-	/** obtiene la conexión con arcos.
+	/** obtiene la conexion con arcos.
 	 * @return conexion
 	 * @throws SQLException si error en bd
 	 */
@@ -113,7 +114,7 @@ public class BbddRunner {
 		return odsArcos.getConnection();
 	}
 	
-	/** obtiene la conexión con ac.
+	/** obtiene la conexion con ac.
 	 * @return conexion
 	 * @throws SQLException si error en bd
 	 */
@@ -121,7 +122,7 @@ public class BbddRunner {
 		return odsAc.getConnection();
 	}	
 	
-	/** obtiene la conexión con rrhh.
+	/** obtiene la conexion con rrhh.
 	 * @return conexion
 	 * @throws SQLException si error en bd
 	 */
