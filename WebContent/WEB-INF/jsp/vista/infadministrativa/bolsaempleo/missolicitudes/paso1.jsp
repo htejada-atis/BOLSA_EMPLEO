@@ -65,7 +65,7 @@ VistaSolicitudes bean = (VistaSolicitudes) uvdatos.getVistas().get(VistaSolicitu
 		    "pageSize": 10,
 		    "selectable": true,
 		    "filterable": true,
-		    "title": 'Lista de Áreas',
+		    "title": 'LISTA DE ÁREAS',
 		    "action": "<%=ControladorMisSolicitudes.ACCION_DATATABLE_AREAS%>",
 		    "selected": bolsasSolicitud,
 		    "columns": [

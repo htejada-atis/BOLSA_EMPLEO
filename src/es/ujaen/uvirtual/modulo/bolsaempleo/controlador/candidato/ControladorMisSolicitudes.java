@@ -38,6 +38,7 @@ import es.ujaen.uvirtual.modulo.bolsaempleo.beans.MeritoSolicitudTable;
 import es.ujaen.uvirtual.modulo.bolsaempleo.beans.MeritoSolicitudValoracion;
 import es.ujaen.uvirtual.modulo.bolsaempleo.beans.Solicitud;
 import es.ujaen.uvirtual.modulo.bolsaempleo.beans.Titulacion;
+import es.ujaen.uvirtual.modulo.bolsaempleo.beans.UsuarioBolsaEmpleo;
 import es.ujaen.uvirtual.modulo.bolsaempleo.modelo.ModeloAfinidad;
 import es.ujaen.uvirtual.modulo.bolsaempleo.modelo.ModeloArea;
 import es.ujaen.uvirtual.modulo.bolsaempleo.modelo.ModeloBaremacionItems;
@@ -298,8 +299,11 @@ public class ControladorMisSolicitudes extends HttpServlet {
 		bean.setVista(JSP_INDEX);
 		
 		Convocatoria convocatoria = modeloConvocatoria.getConvocatoriaById(Formateador.leeParametroInteger(request.getParameter(PARAM_CONVOCATORIA_ID)));
-				
-		Solicitud solicitud = modeloSolicitud.nuevaSolicitud(bean.getUsuarioLogeado(), convocatoria);
+		
+		UsuarioBolsaEmpleo usuario = bean.getUsuarioLogeado();
+		UsuarioBolsaEmpleo creador = bean.getUsuarioLogeado();
+		
+		Solicitud solicitud = modeloSolicitud.nuevaSolicitud(usuario, convocatoria, creador);
 				
 		bean.setSolicitud(solicitud);
 		listaBolsas(bean, solicitud);
@@ -570,11 +574,8 @@ public class ControladorMisSolicitudes extends HttpServlet {
 	private void seleccionarMerito(VistaSolicitudes bean, HttpServletRequest request, Boolean seleccionado)
 			throws UVException, SQLException {
 		ModeloBolsa modeloBolsa = ModeloBolsa.obtenerInstancia();
-		ModeloMerito modeloMerito = ModeloMerito.obtenerInstancia();
-		ModeloBaremacionItems modeloItems = ModeloBaremacionItems.obtenerInstancia();
-		Boolean excluyente = false;
-		String meritoCadena = "";
-
+		ModeloMerito modeloMerito = ModeloMerito.obtenerInstancia();				
+		
 		Bolsa area = modeloBolsa.getBolsaById(Formateador.leeParametroInteger(request.getParameter(PARAM_BOLSA)));
 		bean.setArea(area);
 
@@ -591,17 +592,21 @@ public class ControladorMisSolicitudes extends HttpServlet {
 			throw new UVException(MENSAJE_ERROR_SOLICITUD_NO_NULO);
 		}
 
+		String meritoCadena = "";
+		boolean excluyente = false;
 		ModeloSolicitud modeloSolicitud = ModeloSolicitud.obtenerInstancia();
-		
+				
 		if (Boolean.TRUE.equals(seleccionado)) {
 			// comprobamos que el total de méritos por bloque de la solicitud sea menor que
 			// el permitido por la convocatoria
-			Integer totalMeritos = modeloSolicitud.obtenerTotalMeritosPorBloqueSolicitud(solicitud, merito);
+			Integer totalMeritos = modeloSolicitud.obtenerTotalMeritosPorBloqueSolicitud(solicitud, area, merito);
 
 			if (totalMeritos >= solicitud.getConvocatoria().getNumMeritosPorBloque()) {
 				this.seleccionarBolsa(bean, request);
 				throw new UVException(MENSAJE_ERROR_NUMERO_MAXIMO_MERITOS_BLOQUE);
 			}
+			
+			ModeloBaremacionItems modeloItems = ModeloBaremacionItems.obtenerInstancia();
 			
 			List<MeritoSolicitud> listaMeritos = modeloSolicitud.getMeritosSolicitudBolsa(solicitud, area);
 			for (MeritoSolicitud mer : listaMeritos) {
@@ -651,7 +656,7 @@ public class ControladorMisSolicitudes extends HttpServlet {
 		}
 		
 		Afinidad afinidad = ModeloAfinidad.obtenerInstancia().getAfinidadById(Formateador.leeParametroInteger(request.getParameter(PARAM_AFINIDAD_ID)));
-		ModeloSolicitud.obtenerInstancia().asignarAfinidadMeritoIndividualizado(solicitud, area, merito, afinidad);
+		ModeloSolicitud.obtenerInstancia().asignarAfinidadMeritoIndividualizado(solicitud, area, merito, afinidad, bean.getUsuarioLogeado());
 
 		this.seleccionarBolsa(bean, request);
 	}

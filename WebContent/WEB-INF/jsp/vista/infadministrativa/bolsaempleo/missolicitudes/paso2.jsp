@@ -262,7 +262,7 @@ VistaSolicitudes bean = (VistaSolicitudes) uvdatos.getVistas().get(VistaSolicitu
         		Atis.sendForm("<%=request.getRequestURI()%>", params);
 		    }},
 		    "selected": <%=bean.getArea() != null ? bean.getArea().getCodNum() : "null"%>,		    
-		    "title": 'Mis áreas para esta convocatoria',
+		    "title": 'MIS ÁREAS PARA ESTA CONVOCATORIA',
 		    "action": '<%=ControladorMisSolicitudes.ACCION_DATATABLE_BOLSAS_SELECCIONADAS%>',
 		    "params": {'<%=ControladorMisSolicitudes.PARAM_SOLICITUD_ID%>': <%=bean.getSolicitud().getCodNum()%>},
 		    "columns": [
@@ -287,7 +287,7 @@ VistaSolicitudes bean = (VistaSolicitudes) uvdatos.getVistas().get(VistaSolicitu
 			    "pageSize": 10,
 			    "selectable": {'all': false},
 			    "filterable": true,
-			    "title": 'Mis méritos: <%=bean.getArea().getArea().getDescripcion()%>',
+			    "title": 'MIS MÉRITOS: <%=bean.getArea().getArea().getDescripcion()%>',
 			    "selected": meritosBolsaSolicitud,
 			    "defaultOrderBy": 1,
 			    "action": "<%=ControladorMisSolicitudes.ACCION_DATATABLE_MERITOS_BOLSA%>",
