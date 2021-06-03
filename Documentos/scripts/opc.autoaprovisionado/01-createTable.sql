@@ -105,4 +105,24 @@ COMMENT ON COLUMN ARCOS.ARG_HTO_CAMBIOS.OPERACION IS 'operacion que se ha realiz
 COMMENT ON COLUMN ARCOS.ARG_HTO_CAMBIOS.VALORANTERIOR IS 'Valor que tenía antes de realizar el cambio';
 --/////////////////////
 COMMENT ON COLUMN ARCOS.ARG_HTO_CAMBIOS.VALORNUEVO IS 'Valor que tiene despues de realizar el cambio';
-
+--/////////////////////
+CREATE TABLE ARCOS.ARG_CONFIGURACION (
+	SERVIDOR VARCHAR2(100) NOT NULL, 
+	USERADMINPASS VARCHAR2(200) NOT NULL, 
+	ESTADO VARCHAR2(100) NOT NULL, 
+	ULTIMO_CAMBIO NUMBER,
+	FECHA_ULT_CAMBIO DATE,
+	CONSTRAINT pk_arg_configuracion PRIMARY KEY (servidor)
+);
+--/////////////////////
+COMMENT ON TABLE ARCOS.ARG_CONFIGURACION IS 'Configuracion de los servidores ldap que almacenan la información';
+--/////////////////////
+COMMENT ON COLUMN ARCOS.ARG_CONFIGURACION.SERVIDOR IS 'direccion del servidor';
+--/////////////////////
+COMMENT ON COLUMN ARCOS.ARG_CONFIGURACION.USERADMINPASS IS 'Clave del servidor';
+--/////////////////////
+COMMENT ON COLUMN ARCOS.ARG_CONFIGURACION.ESTADO IS 'Estado del servidor';
+--/////////////////////
+COMMENT ON COLUMN ARCOS.ARG_CONFIGURACION.ULTIMO_CAMBIO IS 'ultimo cambio realizado en el servidor';
+--/////////////////////
+COMMENT ON COLUMN ARCOS.ARG_CONFIGURACION.FECHA_ULT_CAMBIO IS 'Fecha del ultimo cambio realizado en el servidor';

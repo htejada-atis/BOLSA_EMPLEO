@@ -20,15 +20,13 @@ import es.ujaen.uvirtual.utilidades.Formateador;
 import es.ujaen.uvirtual.utilidades.Memcache;
 import oracle.jdbc.pool.OracleDataSource;
 
-/** Clase para conexión a bbdd y carga de datos para las pruebas. */
+/** Clase para conexiÃ³n a bbdd y carga de datos para las pruebas. */
 public class BbddRunner {
 	private static final String NOMBREDEESTACLASE = BbddRunner.class.getName();
 	private static final Logger LOGGER = Logger.getLogger(NOMBREDEESTACLASE);
 	
     private static String cadenaConexionDefecto = "jdbc:oracle:thin:@jenkins.ujaen.es:1521:XE";
-    private static String usuarioBdUv = "uvirtual";
     private static String usuarioBdArcos = "arcos";
-    private static String usuarioBdRh = "uxxirrhh";
     private static String usuarioBdAc = "uxxiac";
     private static String pwBd = "pwd123";
     private static OracleDataSource odsUv = null;
@@ -45,24 +43,25 @@ public class BbddRunner {
     static {
     	LOGGER.log(Level.INFO, "inicializacion de oracle");
 		try {
-			LOGGER.log(Level.INFO, "Conexión BBDD: {0}", getCadenaConexionBd());
+			LOGGER.log(Level.INFO, "Conexion BBDD Uv: {0}", getCadenaConexionBd("Uv"));
+			LOGGER.log(Level.INFO, "Conexion BBDD Arcos: {0}", getCadenaConexionBd("Arcos"));
 			odsUv = new OracleDataSource();
-			odsUv.setURL(getCadenaConexionBd());
-			odsUv.setUser(getUsuarioConexionUv());
-			odsUv.setPassword(getClaveConexionUv());
+			odsUv.setURL(getCadenaConexionBd("Uv"));
+			odsUv.setUser(getUsuarioConexion("uvirtual"));
+			odsUv.setPassword(getClaveConexion("Uv"));
 
 			odsArcos = new OracleDataSource();
-			odsArcos.setURL(getCadenaConexionBd());
+			odsArcos.setURL(getCadenaConexionBd("Arcos"));
 			odsArcos.setUser(usuarioBdArcos);
-			odsArcos.setPassword(pwBd);
+			odsArcos.setPassword(getClaveConexion("Arcos"));
 
 			odsRh = new OracleDataSource();
-			odsRh.setURL(getCadenaConexionBd());
-			odsRh.setUser(usuarioBdRh);
-			odsRh.setPassword(pwBd);
+			odsRh.setURL(getCadenaConexionBd("Rh"));
+			odsRh.setUser(getUsuarioConexion("uxxirrhh"));
+			odsRh.setPassword(getClaveConexion("Rh"));
 
 			odsAc = new OracleDataSource();
-			odsAc.setURL(getCadenaConexionBd());
+			odsAc.setURL(getCadenaConexionBd("Ac"));
 			odsAc.setUser(usuarioBdAc);
 			odsAc.setPassword(pwBd);
 			
@@ -99,19 +98,35 @@ public class BbddRunner {
 		return odsAc;
 	}
 
-	private static Connection obtenerConexionUvirtual() throws SQLException {
+	/** obtiene la conexiÃ³n con uvirtual.
+	 * @return conexion
+	 * @throws SQLException si error bd
+	 */
+	public static Connection obtenerConexionUvirtual() throws SQLException {
 		return odsUv.getConnection();
 	}
 
-	private static Connection obtenerConexionArcos() throws SQLException {
+	/** obtiene la conexiÃ³n con arcos.
+	 * @return conexion
+	 * @throws SQLException si error en bd
+	 */
+	public static Connection obtenerConexionArcos() throws SQLException {
 		return odsArcos.getConnection();
 	}
 	
-	private static Connection obtenerConexionAc() throws SQLException {
+	/** obtiene la conexiÃ³n con ac.
+	 * @return conexion
+	 * @throws SQLException si error en bd
+	 */
+	public static Connection obtenerConexionAc() throws SQLException {
 		return odsAc.getConnection();
 	}	
 	
-	private static Connection obtenerConexionRh() throws SQLException {
+	/** obtiene la conexiÃ³n con rrhh.
+	 * @return conexion
+	 * @throws SQLException si error en bd
+	 */
+	public static Connection obtenerConexionRh() throws SQLException {
 		return odsRh.getConnection();
 	}	
 	
@@ -347,7 +362,7 @@ public class BbddRunner {
 				   + "  EXECUTE IMMEDIATE 'DROP " + tipo + " " + nombre + "'; "
 				   + "  EXCEPTION " 
 				   + "    WHEN OTHERS THEN "
-				   + "      IF ((SQLCODE != -942) AND (SQLCODE != -2289)) THEN "
+				   + "      IF ((SQLCODE != -942) AND (SQLCODE != -2289) AND (SQLCODE != -972)) THEN "
 				   + "        RAISE; "
 				   + "      END IF; "
 				   + "END;";
@@ -371,7 +386,7 @@ public class BbddRunner {
 		return servidorMemcacheDefecto;
 	}
 	
-	private static String getCadenaConexionBd() {
+	private static String getCadenaConexionBd(String nombre) {
 		String salida = cadenaConexionDefecto;
 		String urlDbSystem = System.getProperty("dbUrl");
 		if (urlDbSystem != null && !"".equals(urlDbSystem)) {
@@ -387,25 +402,25 @@ public class BbddRunner {
 			}
 			salida = "jdbc:oracle:thin:@" + urlDbSystem + ":" + dbPuerto + ":" + dbSid;
 		}
-		String tnsDbSystem = System.getProperty("dbTnsname");
+		String tnsDbSystem = System.getProperty("dbTnsname" + nombre);
 		if (tnsDbSystem != null) {
 			salida = tnsDbSystem;
 		}
 		return salida;
 	}
 	
-	private static String getUsuarioConexionUv() {
-		String usuarioBdUvSystem = System.getProperty("usuarioBdUv");
-		if (usuarioBdUvSystem != null && !"".equals(usuarioBdUvSystem)) {
-			return usuarioBdUvSystem;
+	private static String getUsuarioConexion(String nombre) {
+		String usuarioBdSystem = System.getProperty("usuarioBd" + nombre);
+		if (usuarioBdSystem != null && !"".equals(usuarioBdSystem)) {
+			return usuarioBdSystem;
 		}
-		return usuarioBdUv;
+		return nombre;
 	}
 	
-	private static String getClaveConexionUv() {
-		String claveBdUvSystem = System.getProperty("claveBdUv");
-		if (claveBdUvSystem != null && !"".equals(claveBdUvSystem)) {
-			return claveBdUvSystem;
+	private static String getClaveConexion(String nombre) {
+		String claveBdSystem = System.getProperty("claveBd" + nombre);
+		if (claveBdSystem != null && !"".equals(claveBdSystem)) {
+			return claveBdSystem;
 		}
 		return pwBd;
 	}

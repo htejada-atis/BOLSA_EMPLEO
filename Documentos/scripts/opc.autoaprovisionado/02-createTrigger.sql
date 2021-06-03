@@ -5,7 +5,7 @@ FOR EACH ROW
 DECLARE
 BEGIN
     INSERT INTO ARG_HTO_CAMBIOS (CODCAMBIO,	DATCAMBIO, USUARIO,	CORREO,	ATRIBUTO, OPERACION, VALORANTERIOR, VALORNUEVO)
-    VALUES (sec_arg_cambio_hto.nextval, sysdate, :New.USUARIO, null, 'usuario', 'A', null, :New.USUARIO);
+    VALUES (sec_arg_cambio_hto.nextval, sysdate, :New.USUARIO, null, 'USUARIO', 'A', null, :New.USUARIO);
 END DARG_USUARIO_BRI;
 --/////////////////////
 CREATE TRIGGER DARG_USUARIO_BRU
@@ -16,7 +16,7 @@ DECLARE
 BEGIN
 	IF UPDATING ('USUARIO') THEN
 	    INSERT INTO ARG_HTO_CAMBIOS (CODCAMBIO,	DATCAMBIO, USUARIO,	CORREO,	ATRIBUTO, OPERACION, VALORANTERIOR, VALORNUEVO)
-	    VALUES (sec_arg_cambio_hto.nextval, sysdate, :New.USUARIO, null, 'usuario', 'C', :old.USUARIO, :New.USUARIO);
+	    VALUES (sec_arg_cambio_hto.nextval, sysdate, :New.USUARIO, null, 'USUARIO', 'C', :old.USUARIO, :New.USUARIO);
     END IF;
 	IF UPDATING ('NOMBRE') THEN
 	    INSERT INTO ARG_HTO_CAMBIOS (CODCAMBIO,	DATCAMBIO, USUARIO,	CORREO,	ATRIBUTO, OPERACION, VALORANTERIOR, VALORNUEVO)
@@ -47,7 +47,7 @@ FOR EACH ROW
 DECLARE
 BEGIN
     INSERT INTO ARG_HTO_CAMBIOS (CODCAMBIO,	DATCAMBIO, USUARIO,	CORREO,	ATRIBUTO, OPERACION, VALORANTERIOR, VALORNUEVO)
-    VALUES (sec_arg_cambio_hto.nextval, sysdate, :Old.USUARIO, null, 'usuario', 'B', :old.USUARIO, null);
+    VALUES (sec_arg_cambio_hto.nextval, sysdate, :Old.USUARIO, null, 'USUARIO', 'B', :old.USUARIO, null);
 END DARG_USUARIO_BRD;
 --/////////////////////
 --/////////////////////
@@ -58,7 +58,7 @@ FOR EACH ROW
 DECLARE
 BEGIN
     INSERT INTO ARG_HTO_CAMBIOS (CODCAMBIO,	DATCAMBIO, USUARIO,	CORREO,	ATRIBUTO, OPERACION, VALORANTERIOR, VALORNUEVO)
-    VALUES (sec_arg_cambio_hto.nextval, sysdate, :New.USUARIO, :new.CORREO, 'cuenta', 'A', null, :New.USUARIO);
+    VALUES (sec_arg_cambio_hto.nextval, sysdate, :New.USUARIO, :new.CORREO, 'CUENTA', 'A', null, :New.USUARIO);
 END DARG_CUENTA_BRI;
 --/////////////////////
 CREATE TRIGGER DARG_CUENTA_BRU
@@ -84,5 +84,5 @@ FOR EACH ROW
 DECLARE
 BEGIN
     INSERT INTO ARG_HTO_CAMBIOS (CODCAMBIO,	DATCAMBIO, USUARIO,	CORREO,	ATRIBUTO, OPERACION, VALORANTERIOR, VALORNUEVO)
-    VALUES (sec_arg_cambio_hto.nextval, sysdate, :Old.USUARIO, :old.correo, 'cuenta', 'B', :old.USUARIO, null);
+    VALUES (sec_arg_cambio_hto.nextval, sysdate, :Old.USUARIO, :old.correo, 'CUENTA', 'B', :old.USUARIO, null);
 END DARG_CUENTA_BRD;
