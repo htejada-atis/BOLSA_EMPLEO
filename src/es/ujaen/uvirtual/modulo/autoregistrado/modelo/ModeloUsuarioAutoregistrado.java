@@ -47,7 +47,7 @@ public class ModeloUsuarioAutoregistrado {
 	private void insertaUsuarioAutoregistradoBd(Connection conexion, Usuario usuario) throws SQLException {
 		String consulta = " INSERT INTO arcos.ARG_USUARIO " 
 				+ " (usuario, nombre, apellido1, apellido2, documento, tipodocumento) "
-				+ " VALUES ('autoregistrado'||LPAD(sec_arg_usuario.nextval, 8, '0'), ?, ?, ?, ?, ?)";
+				+ " VALUES ('autoregistrado'||LPAD(arcos.sec_arg_usuario.nextval, 8, '0'), ?, ?, ?, ?, ?)";
 		try (PreparedStatement stmt = conexion.prepareStatement(consulta, new String[]{"usuario"})) {
 			int parameterIndex = 1;
 			stmt.setString(parameterIndex++, usuario.getNombre());
