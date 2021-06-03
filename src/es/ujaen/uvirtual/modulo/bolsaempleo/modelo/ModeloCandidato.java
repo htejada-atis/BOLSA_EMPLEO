@@ -7,11 +7,11 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import es.ujaen.uvirtual.modelo.conexion.ConexionArcos;
 import es.ujaen.uvirtual.modelo.conexion.ConexionUvirtual;
 import es.ujaen.uvirtual.modulo.bolsaempleo.beans.CandidatoAcreditacionesTable;
 import es.ujaen.uvirtual.modulo.bolsaempleo.beans.CandidatoTitulacionTable;
 import es.ujaen.uvirtual.modulo.bolsaempleo.beans.UsuarioBolsaEmpleo;
+import es.ujaen.uvirtual.modulo.bolsaempleo.beans.UsuarioBolsaEmpleoVuja;
 import es.ujaen.uvirtual.modulo.bolsaempleo.utilidades.BolsaEmpleoDataTable;
 import es.ujaen.uvirtual.utilidades.UVException;
 
@@ -82,27 +82,22 @@ public class ModeloCandidato {
 			dataTable.setFiltersParams(stmt, stmtCount, 1);
 
 			try (ResultSet rs = stmt.executeQuery()) {
+				ModeloUsuarioBolsaEmpleo modeloUsuario = ModeloUsuarioBolsaEmpleo.obtenerInstancia(); 
+				
 				while (rs.next()) {
-					String consultaArcos = "SELECT * FROM arcos.VUJA_NET_BEP_AR_PERSONA WHERE PRSNIF = ?";
+					String documento = rs.getString("PRSNIF");
+					UsuarioBolsaEmpleoVuja usuArcos = modeloUsuario.getResultSetPersonaArcosByPrsnif(documento);
+										
+					UsuarioBolsaEmpleo usuario = new UsuarioBolsaEmpleo();
+					usuario.setCodNum(rs.getInt("CODNUM"));
+					usuario.setNombre(usuArcos.getStrNombre());
+					usuario.setPrimerApellido(usuArcos.getStrApellido1());
+					usuario.setSegundoApellido(usuArcos.getStrApellido2());
 
-					try (Connection conexionArcos = ConexionArcos.obtenerInstancia();
-							PreparedStatement stmtArcos = conexionArcos.prepareStatement(consultaArcos)) {
-						stmtArcos.setString(1, rs.getString("PRSNIF"));
-						try (ResultSet rsArcos = stmtArcos.executeQuery()) {
-							while (rsArcos.next()) {
-								UsuarioBolsaEmpleo usuario = new UsuarioBolsaEmpleo();
-								usuario.setCodNum(rs.getInt("CODNUM"));
-								usuario.setNombre(rsArcos.getString("STRNOMBRE"));
-								usuario.setPrimerApellido(rsArcos.getString("STRAPELLIDO1"));
-								usuario.setSegundoApellido(rsArcos.getString("STRAPELLIDO2"));
+					Integer titulaciones = rs.getInt("COUNT_TITULACIONES");
+					Integer validadas = rs.getInt("COUNT_VALIDADAS");
 
-								Integer titulaciones = rs.getInt("COUNT_TITULACIONES");
-								Integer validadas = rs.getInt("COUNT_VALIDADAS");
-
-								usuarios.add(new CandidatoTitulacionTable(usuario, titulaciones, validadas));
-							}
-						}
-					}
+					usuarios.add(new CandidatoTitulacionTable(usuario, titulaciones, validadas));					
 				}
 			}
 
@@ -142,6 +137,7 @@ public class ModeloCandidato {
 		try (Connection conexion = ConexionUvirtual.obtenerInstancia();
 				PreparedStatement stmtCount = conexion.prepareStatement(dataTable.getQueryCount());
 				PreparedStatement stmt = conexion.prepareStatement(dataTable.getQuery())) {
+			
 			int paramIndex = 1;
 			stmt.setString(paramIndex, ModeloMeritosPreferentes.TIPO_POSESION);
 			stmtCount.setString(paramIndex++, ModeloMeritosPreferentes.TIPO_POSESION);
@@ -150,27 +146,22 @@ public class ModeloCandidato {
 			dataTable.setFiltersParams(stmt, stmtCount, paramIndex);
 
 			try (ResultSet rs = stmt.executeQuery()) {
+				ModeloUsuarioBolsaEmpleo modeloUsuario = ModeloUsuarioBolsaEmpleo.obtenerInstancia();
+				
 				while (rs.next()) {
-					String consultaArcos = "SELECT * FROM arcos.VUJA_NET_BEP_AR_PERSONA WHERE PRSNIF = ?";
+					String documento = rs.getString("PRSNIF");
+					UsuarioBolsaEmpleoVuja usuArcos = modeloUsuario.getResultSetPersonaArcosByPrsnif(documento);
+					
+					UsuarioBolsaEmpleo usuario = new UsuarioBolsaEmpleo();
+					usuario.setCodNum(rs.getInt("CODNUM"));
+					usuario.setNombre(usuArcos.getStrNombre());
+					usuario.setPrimerApellido(usuArcos.getStrApellido1());
+					usuario.setSegundoApellido(usuArcos.getStrApellido2());
 
-					try (Connection conexionArcos = ConexionArcos.obtenerInstancia();
-							PreparedStatement stmtArcos = conexionArcos.prepareStatement(consultaArcos)) {
-						stmtArcos.setString(1, rs.getString("PRSNIF"));
-						try (ResultSet rsArcos = stmtArcos.executeQuery()) {
-							while (rsArcos.next()) {
-								UsuarioBolsaEmpleo usuario = new UsuarioBolsaEmpleo();
-								usuario.setCodNum(rs.getInt("CODNUM"));
-								usuario.setNombre(rsArcos.getString("STRNOMBRE"));
-								usuario.setPrimerApellido(rsArcos.getString("STRAPELLIDO1"));
-								usuario.setSegundoApellido(rsArcos.getString("STRAPELLIDO2"));
+					Integer acreditaciones = rs.getInt("COUNT_ACREDITACIONES");
+					Integer validadas = rs.getInt("COUNT_VALIDADAS");
 
-								Integer acreditaciones = rs.getInt("COUNT_ACREDITACIONES");
-								Integer validadas = rs.getInt("COUNT_VALIDADAS");
-
-								usuarios.add(new CandidatoAcreditacionesTable(usuario, acreditaciones, validadas));
-							}
-						}
-					}
+					usuarios.add(new CandidatoAcreditacionesTable(usuario, acreditaciones, validadas));
 				}
 			}
 
