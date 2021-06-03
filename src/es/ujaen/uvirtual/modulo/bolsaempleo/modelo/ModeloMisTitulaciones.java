@@ -174,9 +174,9 @@ public class ModeloMisTitulaciones {
 				+ "left JOIN tbep_titulaciones beptit ON beptit.codnum=beptus.beptus_tit_codnum "
 				+ "WHERE beptus.BEPTUS_USU_CODNUM = ? AND beptus.FLGBORRADO != 'S'";
 		
-		dataTable.setColumn(ORDER_COLUMN_INDEX_NOMBRE_USUARIO, "beptitnombre");
-		dataTable.setColumn(ORDER_COLUMN_INDEX_DESCRIPCION, "DESCRIPCION");
-		dataTable.setColumn(ORDER_COLUMN_INDEX_VALIDADA, "FLGVALIDADA", DataTableColumn.COLUMN_TYPE_BOOLEAN);
+		dataTable.setColumn(ORDER_COLUMN_INDEX_NOMBRE_USUARIO, "beptit.NOMBRE");
+		dataTable.setColumn(ORDER_COLUMN_INDEX_DESCRIPCION, "beptus.DESCRIPCION");
+		dataTable.setColumn(ORDER_COLUMN_INDEX_VALIDADA, "beptus.FLGVALIDADA", DataTableColumn.COLUMN_TYPE_BOOLEAN);
 		dataTable.setColumn(ORDER_COLUMN_INDEX_ARCHIVO, "beptus.CODNUM", DataTableColumn.COLUMN_TYPE_NUMBER);
 		dataTable.setQuery(consulta);
 				
