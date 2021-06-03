@@ -205,11 +205,12 @@ public class ModeloSolicitud {
 	 * Crea una nueva solicitud para una convocatoria.
 	 * @param usuario .
 	 * @param convocatoria .
+	 * @param usuarioInsert .
 	 * @return solicitud creada	 
 	 * @throws UVException .
 	 * @throws SQLException .
 	 */
-	public Solicitud nuevaSolicitud(UsuarioBolsaEmpleo usuario, Convocatoria convocatoria) throws SQLException, UVException {
+	public Solicitud nuevaSolicitud(UsuarioBolsaEmpleo usuario, Convocatoria convocatoria, UsuarioBolsaEmpleo usuarioInsert) throws SQLException, UVException {
 		if (!convocatoria.getEstado().equals(ModeloConvocatoria.CONVOCATORIA_ESTADO_ABIERTA)) {
 			throw new UVException(MENSAJE_ERROR_CONVOCATORIA_NO_ABIERTA);
 		}
@@ -229,7 +230,7 @@ public class ModeloSolicitud {
 			stmt.setInt(parameterIndex++, usuario.getCodNum());
 			stmt.setInt(parameterIndex++, convocatoria.getCodNum());
 			stmt.setString(parameterIndex++, ModeloSolicitud.SOLICITUD_ESTADO_ABIERTA);
-			stmt.setString(parameterIndex++, usuario.getCodCuenta());
+			stmt.setString(parameterIndex++, usuarioInsert.getCodCuenta());
 			stmt.executeUpdate();
 			
 			ResultSet rs = stmt.getGeneratedKeys();
@@ -673,10 +674,12 @@ public class ModeloSolicitud {
 	 * @param bolsa .
 	 * @param merito -
 	 * @param afinidad .
+	 * @param usuarioInsert .
 	 * @throws UVException .
 	 * @throws SQLException .
 	 */
-	public void asignarAfinidadMeritoIndividualizado(Solicitud solicitud, Bolsa bolsa, Merito merito, Afinidad afinidad) throws SQLException, UVException {
+	public void asignarAfinidadMeritoIndividualizado(Solicitud solicitud, Bolsa bolsa, Merito merito, Afinidad afinidad, UsuarioBolsaEmpleo usuarioInsert) 
+			throws SQLException, UVException {
 		try (Connection conexion = ConexionUvirtual.obtenerInstancia()) {
 			conexion.setAutoCommit(false);
 			
@@ -692,11 +695,12 @@ public class ModeloSolicitud {
 			}
 						
 			// insertamos la afinidad del mérito
-			String sqlInsert = "INSERT INTO TBEP_SOL_BOL_MER_VALORACION (BEPSBM_CODNUM, BEPAFI_CODNUM, VALOR) VALUES (?,?,NULL)";			
+			String sqlInsert = "INSERT INTO TBEP_SOL_BOL_MER_VALORACION (BEPSBM_CODNUM, BEPAFI_CODNUM, VALOR, UID_USUARIO) VALUES (?,?,NULL,?)";			
 			try (PreparedStatement stmt = conexion.prepareStatement(sqlInsert)) {
 				int indexParam = 1;
 				stmt.setInt(indexParam++, meritoSolicitud.getCodNum());
-				stmt.setInt(indexParam++, afinidad.getCodNum());				
+				stmt.setInt(indexParam++, afinidad.getCodNum());	
+				stmt.setString(indexParam++, usuarioInsert.getCodCuenta());
 				stmt.executeUpdate();
 			} catch (SQLException e) {
 				conexion.rollback();
@@ -980,23 +984,27 @@ public class ModeloSolicitud {
 	/**
 	 * Obtiene el total de méritos por bloque que hay en la solicitud .
 	 * @param solicitud .
+	 * @param bolsa .
 	 * @param merito .
 	 * @return total .
 	 * @throws SQLException .
 	 */
-	public Integer obtenerTotalMeritosPorBloqueSolicitud(Solicitud solicitud, Merito merito) throws SQLException {
+	public Integer obtenerTotalMeritosPorBloqueSolicitud(Solicitud solicitud, Bolsa bolsa, Merito merito) throws SQLException {
 		Integer total = 0;
-		String consulta = "SELECT COUNT(*) AS total FROM TBEP_SOL_BOL_MERITOS bepsbm"
-				+ "	INNER JOIN TBEP_SOLICITUD_BOLSAS bepsbo ON bepsbm.BEPSBO_CODNUM = bepsbo.CODNUM"
-				+ "	INNER JOIN TBEP_MERITOS bepmer ON bepsbm.BEPMER_CODNUM = bepmer.CODNUM"
-				+ "	INNER JOIN TBEP_ITEMSBAREMACION bepite ON bepmer.BEPITE_CODNUM = bepite.CODNUM"
-				+ "	INNER JOIN TBEP_BLOQUESBAREMACION bepblo ON bepite.BEPBLO_CODNUM = bepblo.CODNUM"
-				+ "	INNER JOIN TBEP_APARTADOSBAREMACION bepapa ON bepblo.CODNUM = bepapa.CODNUM"
-				+ "	WHERE bepsbo.BEPSOL_CODNUM = ? AND bepapa.CODNUM = ?";
+		String consulta = 
+				"   SELECT COUNT(*) AS total " 
+				+ " FROM TBEP_SOL_BOL_MERITOS bepsbm "
+				+ " INNER JOIN TBEP_SOLICITUD_BOLSAS bepsbo ON bepsbo.CODNUM = bepsbm.BEPSBO_CODNUM "
+				+ " INNER JOIN TBEP_MERITOS bepmer ON bepmer.CODNUM = bepsbm.BEPMER_CODNUM "
+				+ " INNER JOIN TBEP_ITEMSBAREMACION bepite ON bepite.CODNUM = bepmer.BEPITE_CODNUM "
+				+ " INNER JOIN TBEP_BLOQUESBAREMACION bepblo ON bepblo.CODNUM = bepite.BEPBLO_CODNUM "
+				+ " INNER JOIN TBEP_APARTADOSBAREMACION bepapa ON bepapa.CODNUM = bepblo.BEPAPA_CODNUM "
+				+ " WHERE bepsbo.BEPSOL_CODNUM = ? AND bepsbo.BEPBOL_CODNUM = ? AND bepapa.CODNUM = ?";
 		
 		try (Connection conexion = ConexionUvirtual.obtenerInstancia(); PreparedStatement stmt = conexion.prepareStatement(consulta)) {
 			int parameterIndex = 1;
 			stmt.setInt(parameterIndex++, solicitud.getCodNum());
+			stmt.setInt(parameterIndex++, bolsa.getCodNum());
 			stmt.setInt(parameterIndex++, merito.getItemBaremacion().getBloqueBaremacion().getApartadoBaremacion().getCodNum());
 			stmt.executeUpdate();
 			
@@ -1291,7 +1299,7 @@ public class ModeloSolicitud {
 		
 		// actualiza usuario de las bolsas de la solicitud
 		String sqlUpdateBolsas = "UPDATE TBEP_SOLICITUD_BOLSAS bepsbo"
-				+ "	SET bepsbm.UID_USUARIO = ?"
+				+ "	SET bepsbo.UID_USUARIO = ?"
 				+ " WHERE bepsbo.BEPSOL_CODNUM = ?"
 				+ " AND bepsbo.BEPBOL_CODNUM IN (" + paramsExcluidas + ")";
 		

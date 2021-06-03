@@ -587,7 +587,7 @@ public class ModeloBaremacionItems {
 	 * @throws SQLException .
 	 * @throws UVException .
 	 */
-	public Boolean checkItemsExcluyentes(ItemBaremacion itemPadre, ItemBaremacion itemHijo) throws SQLException {
+	public boolean checkItemsExcluyentes(ItemBaremacion itemPadre, ItemBaremacion itemHijo) throws SQLException {
 		String consulta = "SELECT bepite.*,bepmex.BEPITE_CODNUM_HIJO FROM TBEP_ITEMSBAREMACION bepite "
 				+ "LEFT JOIN TBEP_MERITOS_EXCLUYENTES bepmex "
 				+ "ON bepite.CODNUM = bepmex.BEPITE_CODNUM_HIJO "

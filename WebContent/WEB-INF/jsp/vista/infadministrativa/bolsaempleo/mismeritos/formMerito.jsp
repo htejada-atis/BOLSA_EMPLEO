@@ -121,22 +121,30 @@ String observacion = BolsaEmpleoUtils.getParamForm(request, ControladorMisMerito
 	<% if (item.isEmpty()) { %>
 		$('#select_item').prop('selectedIndex',0);
 	<%} else {%>
-	var unidades = $(this).children("option:selected").data('unidades');
-	var descripcion = $(this).children("option:selected").data('descripcion');
-	//var selected = $(this).children("option:selected").val();
-				
-	if (descripcion) {
-		$('#descripcionItem').text('Descripción del item: ' + descripcion);
-		$('#contDescripcionItem').show();
-	} else {
-		$('#contDescripcionItem').hide();
-	}	
-	
-	if (unidades=="SI/NO") $('#contValor').hide();
-	else $('#contValor').show();
-	
-	if (unidades) $('#merito_valor_label').text('Valor (' + unidades + ')');
-	else $('#merito_valor_label').text('Valor');
+		var unidades = $(this).children("option:selected").data('unidades');
+		var descripcion = $(this).children("option:selected").data('descripcion');
+		//var selected = $(this).children("option:selected").val();
+					
+		if (descripcion) {
+			$('#descripcionItem').text('Descripción del item: ' + descripcion);
+			$('#contDescripcionItem').show();
+		} else {
+			$('#contDescripcionItem').hide();
+		}	
+		
+		if (unidades=="SI/NO") {
+			$('#contValor').hide();
+			$('#merito_valor').removeAttr('required');				
+		} else {
+			$('#contValor').show();	
+			$('#merito_valor').attr('required', true);
+		}
+		
+		if (unidades) {
+			$('#merito_valor_label').text('Valor (' + unidades + ')');
+		} else {
+			$('#merito_valor_label').text('Valor');
+		}
 	<%}%>
 
 	$(document).ready(function() {
@@ -159,11 +167,19 @@ String observacion = BolsaEmpleoUtils.getParamForm(request, ControladorMisMerito
 				$('#contDescripcionItem').hide();
 			}	
 			
-			if (unidades=="SI/NO") $('#contValor').hide();
-			else $('#contValor').show();
+			if (unidades=="SI/NO") {
+				$('#contValor').hide();
+				$('#merito_valor').removeAttr('required');				
+			} else {
+				$('#contValor').show();	
+				$('#merito_valor').attr('required', true);
+			}
 			
-			if (unidades) $('#merito_valor_label').text('Valor (' + unidades + ')');
-			else $('#merito_valor_label').text('Valor');		
+			if (unidades) {
+				$('#merito_valor_label').text('Valor (' + unidades + ')');
+			} else {
+				$('#merito_valor_label').text('Valor');
+			}		
 		})
 		
 		$('#agregar_merito').submit(function(event) { 
