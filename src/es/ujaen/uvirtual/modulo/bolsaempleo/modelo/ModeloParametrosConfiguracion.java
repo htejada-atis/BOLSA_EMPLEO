@@ -19,7 +19,7 @@ import es.ujaen.uvirtual.utilidades.UVException;
  * @author ATISoluciones
  */
 public class ModeloParametrosConfiguracion {
-	private static final String VERSION = "0.9";
+	private static final String VERSION = "0.10";
 	protected static ModeloParametrosConfiguracion eInstancia;
 
 	/**
