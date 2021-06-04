@@ -49,6 +49,10 @@
 	cursor: pointer;
 }
 
+.bolsa-empleo button:hover:disabled, .bolsa-empleo input[type=submit]:hover:disabled {
+	cursor: inherit;
+}
+
 /* icons */
 .bolsa-empleo .icon, .bolsa-empleo .only-icon {
 	white-space: nowrap;

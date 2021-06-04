@@ -53,9 +53,11 @@ VistaUsuarioBolsaEmpleo bean = (VistaUsuarioBolsaEmpleo) uvdatos.getVistas().get
 	
 	%>
 	
+	<p>Las etiquetas en <strong>negrita</strong> corresponden a campos de relleno obligatorio</p>
+	
 	<form id="actualizar_usuario" class="be-form" method="post" action="<%= request.getRequestURI() %>">
-    	<input type="hidden" name="<%= ControladorMisDatos.PARAM_ACCION %>" id="accion_formulario" value="" />
-		<input type="hidden" name="<%= ControladorMisDatos.PARAM_ID%>" id="usuario_id" value="" />
+    	<input type="hidden" name="<%= ControladorMisDatos.PARAM_ACCION %>" id="accion_formulario" value="<%= ControladorMisDatos.ACCION_ENVIAR_MISDATOS %>" />
+		<input type="hidden" name="<%= ControladorMisDatos.PARAM_ID%>" id="usuario_id" value="<%= bean.getUsuario().getCodNum() %>" />
 		
 		<div class="form-group-container">
     		<div class="form-group">
@@ -63,48 +65,48 @@ VistaUsuarioBolsaEmpleo bean = (VistaUsuarioBolsaEmpleo) uvdatos.getVistas().get
     			<input class="form-input-custom" id="n_documento" type="text" name="<%= ControladorMisDatos.PARAM_DOCUMENTO %>" value="<%= n_documento %>" disabled/>
     		</div>
     		<div class="form-group">
-    			<label for="nombre">Nombre: </label>
+    			<label for="nombre" class="bold-label">Nombre: </label>
     			<input class="form-input-custom" id="nombre" type="text" name="<%= ControladorMisDatos.PARAM_NOMBRE %>" value="<%= nombre %>" disabled/>
     		</div>
 		</div>
     	
     	<div class="form-group-container">
     	    <div class="form-group">
-    			<label for="primer_apellido">Primer apellido: </label>
+    			<label for="primer_apellido" class="bold-label">Primer apellido: </label>
     			<input class="form-input-custom" id="primer_apellido" type="text" name="<%= ControladorMisDatos.PARAM_PRIMER_APELLIDO %>" value="<%= primer_apellido %>" disabled/>
     		</div>
     		<div class="form-group">
-    			<label for="segundo_apellido">Segundo apellido: </label>
+    			<label for="segundo_apellido" class="bold-label">Segundo apellido: </label>
     			<input class="form-input-custom" id="segundo_apellido" type="text" name="<%= ControladorMisDatos.PARAM_SEGUNDO_APELLIDO %>" value="<%= segundo_apellido %>" disabled/>
     		</div>
     	</div>
     	
     	<div class="form-group-container">
     	    <div class="form-group">
-    			<label for="direccion">Direcci&oacute;n: </label>
-    			<input class="form-input-custom" id="direccion" type="text" name="<%= ControladorMisDatos.PARAM_DIRECCION %>" value="<%= direccion %>" />
+    			<label for="direccion" class="bold-label">Direcci&oacute;n: </label>
+    			<input class="form-input-custom" id="direccion" type="text" name="<%= ControladorMisDatos.PARAM_DIRECCION %>" value="<%= direccion %>" required/>
     		</div>
     		<div class="form-group">
-    			<label for="codigo_postal">Codigo Postal: </label>
-    			<input class="form-input-custom" id="codigo_postal" type="text" name="<%= ControladorMisDatos.PARAM_CODIGO_POSTAL %>" value="<%= codigo_postal %>"/>
+    			<label for="codigo_postal" class="bold-label">Codigo Postal: </label>
+    			<input class="form-input-custom" id="codigo_postal" type="text" name="<%= ControladorMisDatos.PARAM_CODIGO_POSTAL %>" value="<%= codigo_postal %>" required/>
     		</div>
     	</div>
     	
     	<div class="form-group-container">
     	    <div class="form-group">
-    			<label for="localidad">Localidad: </label>
-    			<input class="form-input-custom" id="localidad" type="text" name="<%= ControladorMisDatos.PARAM_LOCALIDAD %>" value="<%= localidad %>"/>
+    			<label for="localidad" class="bold-label">Localidad: </label>
+    			<input class="form-input-custom" id="localidad" type="text" name="<%= ControladorMisDatos.PARAM_LOCALIDAD %>" value="<%= localidad %>" required/>
     		</div>
     		<div class="form-group">
-    			<label for="provincia">Provincia: </label>
-    			<input class="form-input-custom" id="provincia" type="text" name="<%= ControladorMisDatos.PARAM_PROVINCIA %>" value="<%= provincia %>"/>
+    			<label for="provincia" class="bold-label">Provincia: </label>
+    			<input class="form-input-custom" id="provincia" type="text" name="<%= ControladorMisDatos.PARAM_PROVINCIA %>" value="<%= provincia %>" required/>
     		</div>
     	</div>
     	
     	<div class="form-group-container">
     		<div class="form-group">
-    			<label for="telefono">Tel&eacute;fono: </label>
-    			<input class="form-input-custom" id="telefono" type="text" name="<%= ControladorMisDatos.PARAM_TELEFONO %>" value="<%= telefono %>"/>
+    			<label for="telefono" class="bold-label">Tel&eacute;fono: </label>
+    			<input class="form-input-custom" pattern="[0-9]{1,11}" id="telefono"  type="text" name="<%= ControladorMisDatos.PARAM_TELEFONO %>" value="<%= telefono %>" required/>
     		</div>
     		    	    <div class="form-group">
     			<label for="nacionalidad">Nacionalidad: </label>
@@ -113,7 +115,7 @@ VistaUsuarioBolsaEmpleo bean = (VistaUsuarioBolsaEmpleo) uvdatos.getVistas().get
     	</div>
     	
     	    	    <div class="form-group">
-    			<label for="apellidos">Email: </label>
+    			<label for="apellidos" class="bold-label">Email: </label>
     			<input class="form-input-custom" id="apellidos" type="text" name="<%= ControladorMisDatos.PARAM_EMAIL %>" value="<%= email %>" disabled/>
     		</div>
     	
@@ -125,50 +127,30 @@ VistaUsuarioBolsaEmpleo bean = (VistaUsuarioBolsaEmpleo) uvdatos.getVistas().get
     		</div>
     	</div>
 
-    	<div class="form-group-container">
-    		<div class="form-group-custom w100">
-
-    		</div>
-    		<div class="form-group-custom w100">
-    		    <input id="baja_usuario" type="submit" name="<%= ControladorMisDatos.PARAM_DARSE_BAJA %> " 
-    			value="Darse de baja de la bolsa" style="float:left;"/>
-    			<input id="usuario_enviar" type="submit" name="<%= ControladorMisDatos.PARAM_ENVIAR %> " 
-    			value="Enviar" style="float:right;"/>
-    		</div>
-    	</div>
+   		<div class="form-btn">
+   		    <input id="baja_usuario" type="submit" name="<%= ControladorMisDatos.PARAM_DARSE_BAJA %> " 
+   			value="Darse de baja de la bolsa" style="margin-right: 8px;"/>
+   			<input id="usuario_enviar" type="submit" name="<%= ControladorMisDatos.PARAM_ENVIAR %> " 
+   			value="Guardar"/>
+   		</div>
     </form>
 </div>
 
 <script>
-function enviarUsuario(event, submit_input) {
-	event.preventDefault();
-
-	input_accion = document.getElementById("accion_formulario");
-	input_accion.value = '<%= ControladorMisDatos.ACCION_ENVIAR_MISDATOS %>';
-	input_id = document.getElementById("usuario_id");
-	input_id.value = '<%= bean.getUsuario().getCodNum() %>';
 	
-	submit_input.form.submit();
-}
-
-function bajaUsuario(event, submit_input) {
-	event.preventDefault();
-
-	input_accion = document.getElementById("accion_formulario");
-	input_accion.value = '<%= ControladorMisDatos.ACCION_BAJA_USUARIO %>';
-	input_id = document.getElementById("usuario_id");
-	input_id.value = '<%= bean.getUsuario().getCodNum() %>';
-
-	submit_input.form.submit();
-}
-
-document.getElementById("usuario_enviar").addEventListener("click", function(event) {
-	enviarUsuario(event, this);
-});
-
-document.getElementById("baja_usuario").addEventListener("click", function(event) {
-	bajaUsuario(event, this);
-});
-
+	function bajaUsuario(event, submit_input) {
+		event.preventDefault();
+	
+		input_accion = document.getElementById("accion_formulario");
+		input_accion.value = '<%= ControladorMisDatos.ACCION_BAJA_USUARIO %>';
+		input_id = document.getElementById("usuario_id");
+		input_id.value = '<%= bean.getUsuario().getCodNum() %>';
+	
+		submit_input.form.submit();
+	}
+	
+	document.getElementById("baja_usuario").addEventListener("click", function(event) {
+		bajaUsuario(event, this);
+	});
 
 </script>

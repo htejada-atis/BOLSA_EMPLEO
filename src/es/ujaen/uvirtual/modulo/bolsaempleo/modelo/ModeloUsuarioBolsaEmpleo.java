@@ -675,6 +675,39 @@ public class ModeloUsuarioBolsaEmpleo {
 		
 		refrescarUsuario(usuario.getCodCuenta(), usuario.getNumDocumento());
 	}
+	
+	/** Comprueba si alguno de los datos del usuario es nulo .
+	 * @param usuario .
+	 * @return true o false dependiendo de si falta algún dato .
+	 * @throws SQLException .
+	 * @throws UVException .
+	 */
+	public boolean compruebaUsuarioMisDatosValidos(UsuarioBolsaEmpleo usuario) throws SQLException, UVException {
+		if (usuario == null) {
+			throw new UVException("usuario obligatorio");
+		}
+		if (usuario.getCodNum() == null) {
+			throw new UVException("id usuario no válido");
+		}
+		
+		String consulta = "SELECT * FROM TBEP_USUARIOS"
+				+ "	WHERE (CODNUM = ?) AND (CODIGOPOSTAL IS NULL OR LOCALIDAD IS NULL OR PROVINCIA IS NULL"
+				+ "	OR TELEFONO IS NULL OR DIRECCION IS NULL)";
+		
+		try (Connection conexion = ConexionUvirtual.obtenerInstancia(); PreparedStatement stmt = conexion.prepareStatement(consulta)) {
+			int parameterIndex = 1;
+			stmt.setInt(parameterIndex++, usuario.getCodNum());
+			stmt.executeUpdate();
+			
+			try (ResultSet rs = stmt.executeQuery()) {
+				if (rs.next()) {
+					return true;
+				}
+			}
+		}
+		
+		return false;
+	}
 
 	/**
 	 * Establece el usuario como borrado.

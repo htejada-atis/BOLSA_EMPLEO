@@ -73,11 +73,16 @@ VistaSolicitudes bean = (VistaSolicitudes) uvdatos.getVistas().get(VistaSolicitu
 	<% } %>
 	
 	<% if (bean.getSolicitud().getEstado().equals(ModeloSolicitud.SOLICITUD_ESTADO_ABIERTA)) { %>
+		<div class="form-check" style="margin-top: 1.5rem">
+    		<label for="confirmar_datos" class="bold-label"><input type="checkbox" id="confirmar_datos" name="confirmar_datos">
+    		Confirmo que los datos introducidos son correctos</label>
+    	</div>
+	
 		<div class="btns-by-steps">
 			<button class="link-btn" id="paso3_volver">
 		    	 Volver
 		    </button>
-		    <button class="link-btn" id="paso3_confirmar">
+		    <button class="link-btn" id="paso3_confirmar" title="Debe marcar el check de confirmar datos">
 		    	 Confirmar Solicitud
 		    </button>
 		</div>
@@ -152,6 +157,13 @@ VistaSolicitudes bean = (VistaSolicitudes) uvdatos.getVistas().get(VistaSolicitu
 			
 			backBtn.addEventListener("click", handleBackEvent);
 			confirmBtn.addEventListener("click", handleConfirmEvent);
+			
+			confirmBtn.disabled = true;
+			
+			document.getElementById("confirmar_datos").addEventListener('change', function() {
+				confirmBtn.title = this.checked ? "" : "Debe marcar el check de confirmar datos";
+				confirmBtn.disabled = !this.checked;
+			});
 			
 		<% } %>
 		
