@@ -45,7 +45,8 @@ $(document).ready(function() {
 	var table = new Atis.DataTable('#table', {
 	    "ajax": { url: "/srv/es/ajax/informacionadministrativa/bolsaempleo/configuracion/areasbaremar" },
 	    "selectable": true,
-	    "pageSize": 100,
+	    "pageSize": 200,
+	    "pageSizeOptions": [10, 100, 200],
 	    "action": "<%= ControladorAreasABaremar.ACCION_DATATABLE %>",
 	    "filterable": true,
 	    "columns": [
