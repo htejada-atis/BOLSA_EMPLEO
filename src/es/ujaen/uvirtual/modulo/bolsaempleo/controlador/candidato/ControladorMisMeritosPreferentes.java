@@ -30,6 +30,7 @@ import es.ujaen.uvirtual.modulo.bolsaempleo.beans.UsuarioBolsaEmpleo;
 import es.ujaen.uvirtual.modulo.bolsaempleo.modelo.ModeloMeritosPreferentes;
 import es.ujaen.uvirtual.modulo.bolsaempleo.modelo.ModeloMeritosPreferentesCandidato;
 import es.ujaen.uvirtual.modulo.bolsaempleo.modelo.ModeloParametrosConfiguracion;
+import es.ujaen.uvirtual.modulo.bolsaempleo.modelo.ModeloRol;
 import es.ujaen.uvirtual.modulo.bolsaempleo.modelo.ModeloUsuarioBolsaEmpleo;
 import es.ujaen.uvirtual.modulo.bolsaempleo.utilidades.BolsaEmpleoDataTable;
 import es.ujaen.uvirtual.modulo.bolsaempleo.utilidades.BolsaEmpleoUtils;
@@ -125,31 +126,7 @@ public class ControladorMisMeritosPreferentes extends HttpServlet {
 		
 		try {
 			init(bean, datos, request, response);
-			switch (nombreAccion) {
-				case ACCION_INDEX:
-					index(bean);
-					break;
-				case ACCION_DATATABLE:
-					listadoMeritos(bean, datos, request, response);
-					break;
-				case ACCION_AGREGAR_MERITO:
-					formularioAgregarMerito(bean);
-					break;
-				case ACCION_AGREGAR_MERITO_CONFIRM:
-					agregarMerito(bean, datos, request, response);
-					break;
-				case ACCION_ELIMINAR_MERITOS:
-					eliminarMeritos(bean, datos, request, response);
-					break;
-				case ACCION_DESCARGAR_FICHERO:
-					descargarPdf(bean, datos, request, response);
-					break;
-				case ACCION_LISTADO_OPCIONES:
-					listadoOpciones(bean, datos, request, response);
-					break;
-				default:
-					errorFatal(bean, "Acción no contemplada");
-			}
+			accionesMeritos(bean, datos, request, response, nombreAccion);
 		} catch (UVException e) {
 			LOGGER.log(Level.WARNING, e.toString());
 			bean.getMensajesDeError().add(e.getMessage());
@@ -174,6 +151,7 @@ public class ControladorMisMeritosPreferentes extends HttpServlet {
 			throws SQLException, UVException, IOException {
 		this.index(bean);
 		BolsaEmpleoUtils.readMensajeSession(bean, request);
+		
 		try {
 			bean.setUsuarioLogeado(ModeloUsuarioBolsaEmpleo.obtenerInstancia().getOrCreateUsuario(datos));
 		} catch (UVException e) {
@@ -182,6 +160,10 @@ public class ControladorMisMeritosPreferentes extends HttpServlet {
 			
 			BolsaEmpleoUtils.addMensajeDeError(e.getMessage(), bean, request);
 			response.sendRedirect("/srv/es/informacionadministrativa/bolsaempleo/error");
+		}
+		
+		if (!bean.getUsuarioLogeado().getRol().getCodNum().equals(ModeloRol.ID_ROL_CANDIDATO)) {
+			throw new UVException("No eres un candidato");
 		}
 	}
 	
@@ -196,11 +178,41 @@ public class ControladorMisMeritosPreferentes extends HttpServlet {
 	@Override
 	public void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 		doGet(request, response);
-	}
+	}	
 	
 	private void index(VistaMeritosPreferentesCandidato bean) {
 		bean.setVista(JSP_INDEX);
 		bean.setCodigoPadreMeritoPreferente("IV");
+	}
+	
+	private void accionesMeritos(VistaMeritosPreferentesCandidato bean, UVDatos datos, HttpServletRequest request, HttpServletResponse response, String nombreAccion) 
+			throws IOException, SQLException, UVException {
+		
+		switch (nombreAccion) {
+			case ACCION_INDEX:
+				index(bean);
+				break;
+			case ACCION_DATATABLE:
+				listadoMeritos(bean, datos, request, response);
+				break;
+			case ACCION_AGREGAR_MERITO:
+				formularioAgregarMerito(bean);
+				break;
+			case ACCION_AGREGAR_MERITO_CONFIRM:
+				agregarMerito(bean, datos, request, response);
+				break;
+			case ACCION_ELIMINAR_MERITOS:
+				eliminarMeritos(bean, datos, request, response);
+				break;
+			case ACCION_DESCARGAR_FICHERO:
+				descargarPdf(bean, datos, request, response);
+				break;
+			case ACCION_LISTADO_OPCIONES:
+				listadoOpciones(bean, datos, request, response);
+				break;
+			default:
+				errorFatal(bean, "Acción no contemplada");
+		}
 	}
 	
 	private void listadoMeritos(VistaMeritosPreferentesCandidato bean, UVDatos datos, HttpServletRequest request, HttpServletResponse response) 

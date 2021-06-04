@@ -857,6 +857,8 @@ public class ModeloUsuarioBolsaEmpleo {
 		// comprobamos si está en caché, lo devolvemos
 		Memcache mc = Memcache.getInstance();
 		UsuarioBolsaEmpleo usuario = (UsuarioBolsaEmpleo) mc.get("usuarioBEP." + usuArcos.getUid());
+		LOGGER.log(Level.FINER, String.format("LEYENDO USUARIO CACHEADO BEP [%s]", usuArcos.getUid()));
+		
 		if (usuario == null) {
 			usuario = refrescarUsuario(usuArcos.getUid(), usuArcos.getDocumentoNumero());
 		}
@@ -907,6 +909,8 @@ public class ModeloUsuarioBolsaEmpleo {
 		
 		Memcache mc = Memcache.getInstance();
 		mc.set("usuarioBEP." + uid, usuario);
+		
+		LOGGER.log(Level.FINER, String.format("CACHEANDO USUARIO BEP [%s]", uid));
 
 		return usuario;
 	}

@@ -15,6 +15,7 @@ import es.ujaen.uvirtual.beans.CodigoDescripcion;
 import es.ujaen.uvirtual.beans.UVDatos;
 import es.ujaen.uvirtual.modulo.bolsaempleo.beans.Noticia;
 import es.ujaen.uvirtual.modulo.bolsaempleo.modelo.ModeloNoticia;
+import es.ujaen.uvirtual.modulo.bolsaempleo.modelo.ModeloRol;
 import es.ujaen.uvirtual.modulo.bolsaempleo.modelo.ModeloUsuarioBolsaEmpleo;
 import es.ujaen.uvirtual.modulo.bolsaempleo.utilidades.BolsaEmpleoDataTable;
 import es.ujaen.uvirtual.modulo.bolsaempleo.utilidades.BolsaEmpleoUtils;
@@ -151,8 +152,8 @@ public class ControladorNoticias extends HttpServlet {
 	private void init(VistaNoticias bean, UVDatos datos, HttpServletRequest request, HttpServletResponse response) throws SQLException, UVException, IOException {
 		bean.setVista(JSP_INDEX);
 		LOGGER.log(Level.FINER, String.format("init jsp [%s]", JSP_INDEX));
-		
 		BolsaEmpleoUtils.readMensajeSession(bean, request);
+		
 		try {
 			LOGGER.log(Level.FINER, "Chequeando usuario logeado");
 			bean.setUsuarioLogeado(ModeloUsuarioBolsaEmpleo.obtenerInstancia().getOrCreateUsuario(datos));
@@ -163,6 +164,10 @@ public class ControladorNoticias extends HttpServlet {
 			
 			BolsaEmpleoUtils.addMensajeDeError(e.getMessage(), bean, request);
 			response.sendRedirect("/srv/es/informacionadministrativa/bolsaempleo/error");
+		}
+		
+		if (!bean.getUsuarioLogeado().getRol().getCodNum().equals(ModeloRol.ID_ROL_SERVICIO_PERSONAL)) {
+			throw new UVException("No tienes permiso de personal");
 		}
 	}
 	

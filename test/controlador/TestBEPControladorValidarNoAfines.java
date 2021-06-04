@@ -44,15 +44,15 @@ public class TestBEPControladorValidarNoAfines {
      * @throws SQLException si error en bd .
      * @throws IOException si error en io .
      */
-    @BeforeClass
-    public static void preparaBd() throws IOException, SQLException {
-    	BbddRunner.conectarBd();
-    	UtilsTestBolsaEmpleo.inicializaBolsaEmpleo();
-    }
+	@BeforeClass
+	public static void preparaBd() throws IOException, SQLException {
+		BbddRunner.conectarBd();
+		UtilsTestBolsaEmpleo.inicializaBolsaEmpleo();
+	}
     
-    // método para obtener la vista con una lista de áreas .
-    private VistaValidarNoAfines obtenerAreas() throws ServletException, IOException {
-    	PeticionHttp peticion = UtilsTestBolsaEmpleo.peticionAutenticadaCandidato();
+	// método para obtener la vista con una lista de áreas .
+	private VistaValidarNoAfines obtenerAreas() throws ServletException, IOException {
+		PeticionHttp peticion = UtilsTestBolsaEmpleo.peticionAutenticadaPersonal();
 		peticion.setParameter(ControladorValidarNoAfines.PARAM_ACCION, ControladorValidarNoAfines.ACCION_DATATABLE_BOLSAS);
 		peticion.setParameter(BolsaEmpleoDataTable.PARAM_ORDER_BY, "5");
 		peticion.setParameter(BolsaEmpleoDataTable.PARAM_ORDER_DIRECTION, BolsaEmpleoDataTable.PARAM_ORDER_DIRECTION_VALUE_DESC);
@@ -61,13 +61,13 @@ public class TestBEPControladorValidarNoAfines {
 		ControladorValidarNoAfines controlador = new ControladorValidarNoAfines();
 		controlador.doPost(peticion, respuesta);
 		return (VistaValidarNoAfines) peticion.getUVDatos().getVistas().get(VistaValidarNoAfines.class.getName());
-    }
+	}
     
     // método para obtener la vista con una lista de candidatos .
-    private VistaValidarNoAfines obtenerCandidatos() throws ServletException, IOException {
-    	VistaValidarNoAfines bean = obtenerAreas();
-    	
-    	PeticionHttp peticion = UtilsTestBolsaEmpleo.peticionAutenticadaCandidato();
+	private VistaValidarNoAfines obtenerCandidatos() throws ServletException, IOException {
+		VistaValidarNoAfines bean = obtenerAreas();
+
+		PeticionHttp peticion = UtilsTestBolsaEmpleo.peticionAutenticadaPersonal();
 		peticion.setParameter(ControladorValidarNoAfines.PARAM_ACCION, ControladorValidarNoAfines.ACCION_DATATABLE_CANDIDATOS);
 		peticion.setParameter(ControladorValidarNoAfines.PARAM_BOLSA, bean.getDatatableBolsas().getData().get(0).getCodNum().toString());
 
@@ -75,13 +75,13 @@ public class TestBEPControladorValidarNoAfines {
 		ControladorValidarNoAfines controlador = new ControladorValidarNoAfines();
 		controlador.doPost(peticion, respuesta);
 		return (VistaValidarNoAfines) peticion.getUVDatos().getVistas().get(VistaValidarNoAfines.class.getName());
-    }
+	}
     
-    // método para obtener la vista con una lista de méritos .
-    private VistaValidarNoAfines obtenerMeritos() throws ServletException, IOException {
-    	VistaValidarNoAfines bean = obtenerCandidatos();
-    	
-    	PeticionHttp peticion = UtilsTestBolsaEmpleo.peticionAutenticadaCandidato();
+	// método para obtener la vista con una lista de méritos .
+	private VistaValidarNoAfines obtenerMeritos() throws ServletException, IOException {
+		VistaValidarNoAfines bean = obtenerCandidatos();
+
+		PeticionHttp peticion = UtilsTestBolsaEmpleo.peticionAutenticadaPersonal();
 		peticion.setParameter(ControladorValidarNoAfines.PARAM_ACCION, ControladorValidarNoAfines.ACCION_DATATABLE_MERITOS);
 		peticion.setParameter(ControladorValidarNoAfines.PARAM_BOLSA, bean.getBolsa().getCodNum().toString());
 		peticion.setParameter(ControladorValidarNoAfines.PARAM_CANDIDATO, bean.getDatatableCandidatos().getData().get(0).getCodNum().toString());
@@ -90,7 +90,7 @@ public class TestBEPControladorValidarNoAfines {
 		ControladorValidarNoAfines controlador = new ControladorValidarNoAfines();
 		controlador.doPost(peticion, respuesta);
 		return (VistaValidarNoAfines) peticion.getUVDatos().getVistas().get(VistaValidarNoAfines.class.getName());
-    }
+	}
     
     /** Obtener áreas, sin parametro definido .
 	 * @throws SQLException si fallo bd .
@@ -99,14 +99,14 @@ public class TestBEPControladorValidarNoAfines {
 	 */
 	@Test
 	public void testA01() throws SQLException, ServletException, IOException {
-    	PeticionHttp peticion = UtilsTestBolsaEmpleo.peticionAutenticadaCandidato();
-		
+		PeticionHttp peticion = UtilsTestBolsaEmpleo.peticionAutenticadaPersonal();
+
 		RespuestaHttp respuesta = new RespuestaHttp();
 		ControladorValidarNoAfines controlador = new ControladorValidarNoAfines();
 		controlador.doGet(peticion, respuesta);
-		
+
 		VistaValidarNoAfines bean = (VistaValidarNoAfines) peticion.getUVDatos().getVistas().get(VistaValidarNoAfines.class.getName());
-		
+
 		assertEquals(MENSAJE_SIN_ERROR, 0, bean.getMensajesDeError().size());
 		assertEquals(MENSAJE_SIN_ADVERTENCIAS, 0, bean.getMensajesDeAdvertencia().size());
 	}
@@ -133,17 +133,18 @@ public class TestBEPControladorValidarNoAfines {
 	@Test
 	public void testA03SeleccionarArea() throws SQLException, ServletException, IOException {
 		VistaValidarNoAfines bean = obtenerAreas();
-    	
-    	PeticionHttp peticion = UtilsTestBolsaEmpleo.peticionAutenticadaCandidato();
+
+		PeticionHttp peticion = UtilsTestBolsaEmpleo.peticionAutenticadaPersonal();
 		peticion.setParameter(ControladorValidarNoAfines.PARAM_ACCION, ControladorValidarNoAfines.ACCION_BOLSA_SELECCIONADA);
-		peticion.setParameter(ControladorValidarNoAfines.PARAM_BOLSA, bean.getDatatableBolsas().getData().get(0).getCodNum().toString());
+		peticion.setParameter(ControladorValidarNoAfines.PARAM_BOLSA,
+				bean.getDatatableBolsas().getData().get(0).getCodNum().toString());
 
 		RespuestaHttp respuesta = new RespuestaHttp();
 		ControladorValidarNoAfines controlador = new ControladorValidarNoAfines();
 		controlador.doPost(peticion, respuesta);
-		
+
 		VistaValidarNoAfines bean2 = (VistaValidarNoAfines) peticion.getUVDatos().getVistas().get(VistaValidarNoAfines.class.getName());
-		
+
 		assertNotNull(MENSAJE_BOLSA_DEVUELTA, bean2.getBolsa());
 		assertEquals(MENSAJE_SIN_ERROR, 0, bean2.getMensajesDeError().size());
 		assertEquals(MENSAJE_SIN_ADVERTENCIAS, 0, bean2.getMensajesDeAdvertencia().size());
@@ -155,7 +156,7 @@ public class TestBEPControladorValidarNoAfines {
 	 * @throws IOException .
 	 */
 	@Test
-	public void testA04ObtenerCandidatos() throws SQLException, ServletException, IOException {
+	public void testA04ObtenerCandidatos() throws ServletException, IOException {
 		VistaValidarNoAfines bean = obtenerCandidatos();
 		
 		assertNotEquals(MENSAJE_CANDIDATOS_DEVUELTOS, 0, bean.getDatatableCandidatos().getData().size());
@@ -169,20 +170,21 @@ public class TestBEPControladorValidarNoAfines {
 	 * @throws IOException .
 	 */
 	@Test
-	public void testA05SeleccionarCandidato() throws SQLException, ServletException, IOException {
+	public void testA05SeleccionarCandidato() throws ServletException, IOException {
 		VistaValidarNoAfines bean = obtenerCandidatos();
-    	
-    	PeticionHttp peticion = UtilsTestBolsaEmpleo.peticionAutenticadaCandidato();
+
+		PeticionHttp peticion = UtilsTestBolsaEmpleo.peticionAutenticadaPersonal();
 		peticion.setParameter(ControladorValidarNoAfines.PARAM_ACCION, ControladorValidarNoAfines.ACCION_CANDIDATO_SELECCIONADO);
 		peticion.setParameter(ControladorValidarNoAfines.PARAM_BOLSA, bean.getBolsa().getCodNum().toString());
-		peticion.setParameter(ControladorValidarNoAfines.PARAM_CANDIDATO, bean.getDatatableCandidatos().getData().get(0).getCodNum().toString());
+		peticion.setParameter(ControladorValidarNoAfines.PARAM_CANDIDATO,
+				bean.getDatatableCandidatos().getData().get(0).getCodNum().toString());
 
 		RespuestaHttp respuesta = new RespuestaHttp();
 		ControladorValidarNoAfines controlador = new ControladorValidarNoAfines();
 		controlador.doPost(peticion, respuesta);
-		
+
 		VistaValidarNoAfines bean2 = (VistaValidarNoAfines) peticion.getUVDatos().getVistas().get(VistaValidarNoAfines.class.getName());
-		
+
 		assertNotNull(MENSAJE_CANDIDATO_DEVUELTO, bean2.getCandidato());
 		assertEquals(MENSAJE_SIN_ERROR, 0, bean2.getMensajesDeError().size());
 		assertEquals(MENSAJE_SIN_ADVERTENCIAS, 0, bean2.getMensajesDeAdvertencia().size());
@@ -194,7 +196,7 @@ public class TestBEPControladorValidarNoAfines {
 	 * @throws IOException .
 	 */
 	@Test
-	public void testA06ObtenerMeritos() throws SQLException, ServletException, IOException {
+	public void testA06ObtenerMeritos() throws ServletException, IOException {
 		VistaValidarNoAfines bean = obtenerMeritos();
 		
 		assertNotEquals(MENSAJE_MERITOS_DEVUELTOS, 0, bean.getDatatableMeritos().getData().size());
@@ -208,10 +210,10 @@ public class TestBEPControladorValidarNoAfines {
 	 * @throws IOException .
 	 */
 	@Test
-	public void testA07SeleccionarMerito() throws SQLException, ServletException, IOException {
+	public void testA07SeleccionarMerito() throws ServletException, IOException {
 		VistaValidarNoAfines bean = obtenerMeritos();
-    	
-    	PeticionHttp peticion = UtilsTestBolsaEmpleo.peticionAutenticadaCandidato();
+
+		PeticionHttp peticion = UtilsTestBolsaEmpleo.peticionAutenticadaPersonal();
 		peticion.setParameter(ControladorValidarNoAfines.PARAM_ACCION, ControladorValidarNoAfines.ACCION_MERITO_SELECCIONADO);
 		peticion.setParameter(ControladorValidarNoAfines.PARAM_BOLSA, bean.getBolsa().getCodNum().toString());
 		peticion.setParameter(ControladorValidarNoAfines.PARAM_CANDIDATO, bean.getCandidato().getCodNum().toString());
@@ -220,9 +222,9 @@ public class TestBEPControladorValidarNoAfines {
 		RespuestaHttp respuesta = new RespuestaHttp();
 		ControladorValidarNoAfines controlador = new ControladorValidarNoAfines();
 		controlador.doPost(peticion, respuesta);
-		
+
 		VistaValidarNoAfines bean2 = (VistaValidarNoAfines) peticion.getUVDatos().getVistas().get(VistaValidarNoAfines.class.getName());
-		
+
 		assertNotNull(MENSAJE_MERITO_DEVUELTO, bean2.getMerito());
 		assertEquals(MENSAJE_SIN_ERROR, 0, bean2.getMensajesDeError().size());
 		assertEquals(MENSAJE_SIN_ADVERTENCIAS, 0, bean2.getMensajesDeAdvertencia().size());
@@ -234,10 +236,10 @@ public class TestBEPControladorValidarNoAfines {
 	 * @throws IOException .
 	 */
 	@Test
-	public void testA08ObtenerBolsasCandidato() throws SQLException, ServletException, IOException {
+	public void testA08ObtenerBolsasCandidato() throws ServletException, IOException {
 		VistaValidarNoAfines bean = obtenerMeritos();
-    	
-    	PeticionHttp peticion = UtilsTestBolsaEmpleo.peticionAutenticadaCandidato();
+
+		PeticionHttp peticion = UtilsTestBolsaEmpleo.peticionAutenticadaPersonal();
 		peticion.setParameter(ControladorValidarNoAfines.PARAM_ACCION, ControladorValidarNoAfines.ACCION_DATATABLE_BOLSAS_CANDIDATO);
 		peticion.setParameter(ControladorValidarNoAfines.PARAM_BOLSA, bean.getBolsa().getCodNum().toString());
 		peticion.setParameter(ControladorValidarNoAfines.PARAM_CANDIDATO, bean.getCandidato().getCodNum().toString());
@@ -246,9 +248,9 @@ public class TestBEPControladorValidarNoAfines {
 		RespuestaHttp respuesta = new RespuestaHttp();
 		ControladorValidarNoAfines controlador = new ControladorValidarNoAfines();
 		controlador.doPost(peticion, respuesta);
-		
+
 		VistaValidarNoAfines bean2 = (VistaValidarNoAfines) peticion.getUVDatos().getVistas().get(VistaValidarNoAfines.class.getName());
-		
+
 		assertNotEquals(MENSAJE_BOLSAS_DEVUELTAS, bean2.getDatatableBolsasCandidato().getData().size());
 		assertEquals(MENSAJE_SIN_ERROR, 0, bean2.getMensajesDeError().size());
 		assertEquals(MENSAJE_SIN_ADVERTENCIAS, 0, bean2.getMensajesDeAdvertencia().size());
@@ -260,10 +262,10 @@ public class TestBEPControladorValidarNoAfines {
 	 * @throws IOException .
 	 */
 	@Test
-	public void testA09ObtenerValoresMeritoBolsas() throws SQLException, ServletException, IOException {
+	public void testA09ObtenerValoresMeritoBolsas() throws ServletException, IOException {
 		VistaValidarNoAfines bean = obtenerMeritos();
-    	
-    	PeticionHttp peticion = UtilsTestBolsaEmpleo.peticionAutenticadaCandidato();
+
+		PeticionHttp peticion = UtilsTestBolsaEmpleo.peticionAutenticadaPersonal();
 		peticion.setParameter(ControladorValidarNoAfines.PARAM_ACCION, ControladorValidarNoAfines.ACCION_DATATABLE_VALORES_MERITO_BOLSA);
 		peticion.setParameter(ControladorValidarNoAfines.PARAM_BOLSA, bean.getBolsa().getCodNum().toString());
 		peticion.setParameter(ControladorValidarNoAfines.PARAM_CANDIDATO, bean.getCandidato().getCodNum().toString());
@@ -272,9 +274,9 @@ public class TestBEPControladorValidarNoAfines {
 		RespuestaHttp respuesta = new RespuestaHttp();
 		ControladorValidarNoAfines controlador = new ControladorValidarNoAfines();
 		controlador.doPost(peticion, respuesta);
-		
+
 		VistaValidarNoAfines bean2 = (VistaValidarNoAfines) peticion.getUVDatos().getVistas().get(VistaValidarNoAfines.class.getName());
-		
+
 		assertNotEquals(MENSAJE_MERITOS_DEVUELTOS, 0, bean2.getDatatableValoresMeritoBolsa().getData().size());
 		assertEquals(MENSAJE_SIN_ERROR, 0, bean2.getMensajesDeError().size());
 		assertEquals(MENSAJE_SIN_ADVERTENCIAS, 0, bean2.getMensajesDeAdvertencia().size());
@@ -286,24 +288,25 @@ public class TestBEPControladorValidarNoAfines {
 	 * @throws IOException .
 	 */
 	@Test
-	public void testA10AceptarMerito() throws SQLException, ServletException, IOException {
+	public void testA10AceptarMerito() throws ServletException, IOException {
 		VistaValidarNoAfines bean = obtenerMeritos();
-    	
-    	PeticionHttp peticion = UtilsTestBolsaEmpleo.peticionAutenticadaCandidato();
+
+		PeticionHttp peticion = UtilsTestBolsaEmpleo.peticionAutenticadaPersonal();
 		peticion.setParameter(ControladorValidarNoAfines.PARAM_ACCION, ControladorValidarNoAfines.ACCION_VALIDAR_MERITO);
 		peticion.setParameter(ControladorValidarNoAfines.PARAM_ACEPTAR_MERITO, "");
 		peticion.setParameter(ControladorValidarNoAfines.PARAM_OBSERVACIONES_CANDIDATO, OBSERVACIONES);
 		peticion.setParameter(ControladorValidarNoAfines.PARAM_BOLSA, bean.getBolsa().getCodNum().toString());
 		peticion.setParameter(ControladorValidarNoAfines.PARAM_CANDIDATO, bean.getCandidato().getCodNum().toString());
 		peticion.setParameter(ControladorValidarNoAfines.PARAM_MERITO, bean.getDatatableMeritos().getData().get(0).getCodNum().toString());
-		peticion.setParameter(ControladorValidarNoAfines.PARAM_BOLSAS, "[" + bean.getBolsa().getCodNum().toString() + "]");
+		peticion.setParameter(ControladorValidarNoAfines.PARAM_BOLSAS,
+				"[" + bean.getBolsa().getCodNum().toString() + "]");
 
 		RespuestaHttp respuesta = new RespuestaHttp();
 		ControladorValidarNoAfines controlador = new ControladorValidarNoAfines();
 		controlador.doPost(peticion, respuesta);
-		
+
 		VistaValidarNoAfines bean2 = (VistaValidarNoAfines) peticion.getUVDatos().getVistas().get(VistaValidarNoAfines.class.getName());
-		
+
 		assertNotNull(MENSAJE_MERITO_DEVUELTO, bean2.getMerito());
 		assertEquals(MENSAJE_SIN_ERROR, 0, bean2.getMensajesDeError().size());
 		assertEquals(MENSAJE_SIN_ADVERTENCIAS, 0, bean2.getMensajesDeAdvertencia().size());
@@ -315,10 +318,10 @@ public class TestBEPControladorValidarNoAfines {
 	 * @throws IOException .
 	 */
 	@Test
-	public void testA11ExcluirMerito() throws SQLException, ServletException, IOException {
+	public void testA11ExcluirMerito() throws ServletException, IOException {
 		VistaValidarNoAfines bean = obtenerMeritos();
-    	
-    	PeticionHttp peticion = UtilsTestBolsaEmpleo.peticionAutenticadaCandidato();
+
+		PeticionHttp peticion = UtilsTestBolsaEmpleo.peticionAutenticadaPersonal();
 		peticion.setParameter(ControladorValidarNoAfines.PARAM_ACCION, ControladorValidarNoAfines.ACCION_VALIDAR_MERITO);
 		peticion.setParameter(ControladorValidarNoAfines.PARAM_EXCLUIR_MERITO, "");
 		peticion.setParameter(ControladorValidarNoAfines.PARAM_OBSERVACIONES_CANDIDATO, OBSERVACIONES);
@@ -330,9 +333,9 @@ public class TestBEPControladorValidarNoAfines {
 		RespuestaHttp respuesta = new RespuestaHttp();
 		ControladorValidarNoAfines controlador = new ControladorValidarNoAfines();
 		controlador.doPost(peticion, respuesta);
-		
+
 		VistaValidarNoAfines bean2 = (VistaValidarNoAfines) peticion.getUVDatos().getVistas().get(VistaValidarNoAfines.class.getName());
-		
+
 		assertNotNull(MENSAJE_MERITO_DEVUELTO, bean2.getMerito());
 		assertEquals(MENSAJE_SIN_ERROR, 0, bean2.getMensajesDeError().size());
 		assertEquals(MENSAJE_SIN_ADVERTENCIAS, 0, bean2.getMensajesDeAdvertencia().size());
@@ -344,10 +347,10 @@ public class TestBEPControladorValidarNoAfines {
 	 * @throws IOException .
 	 */
 	@Test
-	public void testA12GuardarMerito() throws SQLException, ServletException, IOException {
+	public void testA12GuardarMerito() throws ServletException, IOException {
 		VistaValidarNoAfines bean = obtenerMeritos();
-    	
-    	PeticionHttp peticion = UtilsTestBolsaEmpleo.peticionAutenticadaCandidato();
+
+		PeticionHttp peticion = UtilsTestBolsaEmpleo.peticionAutenticadaPersonal();
 		peticion.setParameter(ControladorValidarNoAfines.PARAM_ACCION, ControladorValidarNoAfines.ACCION_VALIDAR_MERITO);
 		peticion.setParameter(ControladorValidarNoAfines.PARAM_GUARDAR_MERITO, "");
 		peticion.setParameter(ControladorValidarNoAfines.PARAM_OBSERVACIONES_CANDIDATO, OBSERVACIONES);
@@ -359,9 +362,9 @@ public class TestBEPControladorValidarNoAfines {
 		RespuestaHttp respuesta = new RespuestaHttp();
 		ControladorValidarNoAfines controlador = new ControladorValidarNoAfines();
 		controlador.doPost(peticion, respuesta);
-		
+
 		VistaValidarNoAfines bean2 = (VistaValidarNoAfines) peticion.getUVDatos().getVistas().get(VistaValidarNoAfines.class.getName());
-		
+
 		assertNotNull(MENSAJE_MERITO_DEVUELTO, bean2.getMerito());
 		assertEquals(MENSAJE_SIN_ERROR, 0, bean2.getMensajesDeError().size());
 		assertEquals(MENSAJE_SIN_ADVERTENCIAS, 0, bean2.getMensajesDeAdvertencia().size());
@@ -373,7 +376,7 @@ public class TestBEPControladorValidarNoAfines {
 	 * @throws IOException .
 	 */
 	@Test
-	public void testA13ParametrosSesion() throws SQLException, ServletException, IOException {
+	public void testA13ParametrosSesion() throws ServletException, IOException {
 		VistaValidarNoAfines bean = obtenerMeritos();
 		
 		PeticionHttp peticion = UtilsTestBolsaEmpleo.peticionAutenticadaPersonal();
@@ -420,7 +423,7 @@ public class TestBEPControladorValidarNoAfines {
 	 */
 	@Test
 	public void testE02ObtenerAreasParametroNoValido() throws SQLException, ServletException, IOException {
-		PeticionHttp peticion = UtilsTestBolsaEmpleo.peticionAutenticadaCandidato();
+		PeticionHttp peticion = UtilsTestBolsaEmpleo.peticionAutenticadaPersonal();
 		peticion.setParameter(ControladorValidarNoAfines.PARAM_ACCION, ControladorValidarNoAfines.ACCION_DATATABLE_BOLSAS);
 		peticion.setParameter(BolsaEmpleoDataTable.PARAM_ORDER_BY, "9");
 
@@ -442,8 +445,8 @@ public class TestBEPControladorValidarNoAfines {
 	@Test
 	public void testE03ObtenerCandidatosParametroNoValido() throws SQLException, ServletException, IOException {
 		VistaValidarNoAfines bean = obtenerAreas();
-    	
-    	PeticionHttp peticion = UtilsTestBolsaEmpleo.peticionAutenticadaCandidato();
+
+		PeticionHttp peticion = UtilsTestBolsaEmpleo.peticionAutenticadaPersonal();
 		peticion.setParameter(ControladorValidarNoAfines.PARAM_ACCION, ControladorValidarNoAfines.ACCION_DATATABLE_CANDIDATOS);
 		peticion.setParameter(ControladorValidarNoAfines.PARAM_BOLSA, bean.getDatatableBolsas().getData().get(0).getCodNum().toString());
 		peticion.setParameter(BolsaEmpleoDataTable.PARAM_ORDER_BY, "9");
@@ -451,9 +454,9 @@ public class TestBEPControladorValidarNoAfines {
 		RespuestaHttp respuesta = new RespuestaHttp();
 		ControladorValidarNoAfines controlador = new ControladorValidarNoAfines();
 		controlador.doPost(peticion, respuesta);
-		
+
 		VistaValidarNoAfines bean2 = (VistaValidarNoAfines) peticion.getUVDatos().getVistas().get(VistaValidarNoAfines.class.getName());
-		
+
 		assertEquals(MENSAJE_CON_ERROR, 1, bean2.getMensajesDeError().size());
 		assertEquals(MENSAJE_SIN_EXITO, 0, bean2.getMensajesDeExito().size());
 	}
@@ -466,8 +469,8 @@ public class TestBEPControladorValidarNoAfines {
 	@Test
 	public void testE03ObtenerMeritosParametroNoValido() throws SQLException, ServletException, IOException {
 		VistaValidarNoAfines bean = obtenerCandidatos();
-    	
-    	PeticionHttp peticion = UtilsTestBolsaEmpleo.peticionAutenticadaCandidato();
+
+		PeticionHttp peticion = UtilsTestBolsaEmpleo.peticionAutenticadaPersonal();
 		peticion.setParameter(ControladorValidarNoAfines.PARAM_ACCION, ControladorValidarNoAfines.ACCION_DATATABLE_MERITOS);
 		peticion.setParameter(ControladorValidarNoAfines.PARAM_BOLSA, bean.getBolsa().getCodNum().toString());
 		peticion.setParameter(ControladorValidarNoAfines.PARAM_CANDIDATO, bean.getDatatableCandidatos().getData().get(0).getCodNum().toString());
@@ -476,9 +479,9 @@ public class TestBEPControladorValidarNoAfines {
 		RespuestaHttp respuesta = new RespuestaHttp();
 		ControladorValidarNoAfines controlador = new ControladorValidarNoAfines();
 		controlador.doPost(peticion, respuesta);
-		
+
 		VistaValidarNoAfines bean2 = (VistaValidarNoAfines) peticion.getUVDatos().getVistas().get(VistaValidarNoAfines.class.getName());
-		
+
 		assertEquals(MENSAJE_CON_ERROR, 1, bean2.getMensajesDeError().size());
 		assertEquals(MENSAJE_SIN_EXITO, 0, bean2.getMensajesDeExito().size());
 	}
@@ -491,8 +494,8 @@ public class TestBEPControladorValidarNoAfines {
 	@Test
 	public void testE04ObtenerBolsasCandidatoParametroNoValido() throws SQLException, ServletException, IOException {
 		VistaValidarNoAfines bean = obtenerMeritos();
-    	
-    	PeticionHttp peticion = UtilsTestBolsaEmpleo.peticionAutenticadaCandidato();
+
+		PeticionHttp peticion = UtilsTestBolsaEmpleo.peticionAutenticadaPersonal();
 		peticion.setParameter(ControladorValidarNoAfines.PARAM_ACCION, ControladorValidarNoAfines.ACCION_DATATABLE_BOLSAS_CANDIDATO);
 		peticion.setParameter(ControladorValidarNoAfines.PARAM_BOLSA, bean.getBolsa().getCodNum().toString());
 		peticion.setParameter(ControladorValidarNoAfines.PARAM_CANDIDATO, bean.getCandidato().getCodNum().toString());
@@ -502,9 +505,9 @@ public class TestBEPControladorValidarNoAfines {
 		RespuestaHttp respuesta = new RespuestaHttp();
 		ControladorValidarNoAfines controlador = new ControladorValidarNoAfines();
 		controlador.doPost(peticion, respuesta);
-		
+
 		VistaValidarNoAfines bean2 = (VistaValidarNoAfines) peticion.getUVDatos().getVistas().get(VistaValidarNoAfines.class.getName());
-		
+
 		assertEquals(MENSAJE_CON_ERROR, 1, bean2.getMensajesDeError().size());
 		assertEquals(MENSAJE_SIN_EXITO, 0, bean2.getMensajesDeExito().size());
 	}
@@ -517,8 +520,8 @@ public class TestBEPControladorValidarNoAfines {
 	@Test
 	public void testE05ObtenerValoresMeritoBolsasParametroNoValido() throws SQLException, ServletException, IOException {
 		VistaValidarNoAfines bean = obtenerMeritos();
-    	
-    	PeticionHttp peticion = UtilsTestBolsaEmpleo.peticionAutenticadaCandidato();
+
+		PeticionHttp peticion = UtilsTestBolsaEmpleo.peticionAutenticadaPersonal();
 		peticion.setParameter(ControladorValidarNoAfines.PARAM_ACCION, ControladorValidarNoAfines.ACCION_DATATABLE_VALORES_MERITO_BOLSA);
 		peticion.setParameter(ControladorValidarNoAfines.PARAM_BOLSA, bean.getBolsa().getCodNum().toString());
 		peticion.setParameter(ControladorValidarNoAfines.PARAM_CANDIDATO, bean.getCandidato().getCodNum().toString());
@@ -528,9 +531,9 @@ public class TestBEPControladorValidarNoAfines {
 		RespuestaHttp respuesta = new RespuestaHttp();
 		ControladorValidarNoAfines controlador = new ControladorValidarNoAfines();
 		controlador.doPost(peticion, respuesta);
-		
+
 		VistaValidarNoAfines bean2 = (VistaValidarNoAfines) peticion.getUVDatos().getVistas().get(VistaValidarNoAfines.class.getName());
-		
+
 		assertEquals(MENSAJE_CON_ERROR, 1, bean2.getMensajesDeError().size());
 		assertEquals(MENSAJE_SIN_EXITO, 0, bean2.getMensajesDeExito().size());
 	}
@@ -541,10 +544,10 @@ public class TestBEPControladorValidarNoAfines {
 	 * @throws IOException .
 	 */
 	@Test
-	public void testE06GuardarMeritoSinBolsas() throws SQLException, ServletException, IOException {
+	public void testE06GuardarMeritoSinBolsas() throws ServletException, IOException {
 		VistaValidarNoAfines bean = obtenerMeritos();
-    	
-    	PeticionHttp peticion = UtilsTestBolsaEmpleo.peticionAutenticadaCandidato();
+
+		PeticionHttp peticion = UtilsTestBolsaEmpleo.peticionAutenticadaPersonal();
 		peticion.setParameter(ControladorValidarNoAfines.PARAM_ACCION, ControladorValidarNoAfines.ACCION_VALIDAR_MERITO);
 		peticion.setParameter(ControladorValidarNoAfines.PARAM_GUARDAR_MERITO, "");
 		peticion.setParameter(ControladorValidarNoAfines.PARAM_OBSERVACIONES_CANDIDATO, OBSERVACIONES);
@@ -556,9 +559,9 @@ public class TestBEPControladorValidarNoAfines {
 		RespuestaHttp respuesta = new RespuestaHttp();
 		ControladorValidarNoAfines controlador = new ControladorValidarNoAfines();
 		controlador.doPost(peticion, respuesta);
-		
+
 		VistaValidarNoAfines bean2 = (VistaValidarNoAfines) peticion.getUVDatos().getVistas().get(VistaValidarNoAfines.class.getName());
-		
+
 		assertNotNull(MENSAJE_MERITO_DEVUELTO, bean2.getMerito());
 		assertEquals(MENSAJE_SIN_ERROR, 0, bean2.getMensajesDeError().size());
 		assertEquals(MENSAJE_SIN_ADVERTENCIAS, 0, bean2.getMensajesDeAdvertencia().size());
