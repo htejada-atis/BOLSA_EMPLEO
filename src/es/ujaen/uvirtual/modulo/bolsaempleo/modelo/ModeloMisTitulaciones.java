@@ -117,12 +117,12 @@ public class ModeloMisTitulaciones {
 		List<Titulacion> titulaciones = new ArrayList<>();
 		BolsaEmpleoDataTable<Titulacion> dataTable = new BolsaEmpleoDataTable<>(params);
 		
-		String consulta = "SELECT beptit.*, beptus.*"
-				+ "FROM tbep_titulaciones beptit "
-				+ "LEFT JOIN tbep_titulaciones_usuario beptus "
-				+ "ON beptit.CODNUM = beptus.BEPTUS_TIT_CODNUM AND beptus.BEPTUS_USU_CODNUM = ? "
-				+ "AND beptus.FLGBORRADO != 'S' "
-				+ "WHERE beptit.FLGBORRADO != 'S' AND beptus.BEPTUS_USU_CODNUM IS NULL";
+		String consulta = ""
+				+ " SELECT beptit.CODNUM, beptit.NOMBRE "
+				+ " FROM TBEP_TITULACIONES beptit "
+				+ " LEFT JOIN TBEP_TITULACIONES_USUARIO beptus "
+				+ "		ON beptit.CODNUM = beptus.BEPTUS_TIT_CODNUM AND beptus.BEPTUS_USU_CODNUM = ? AND beptus.FLGBORRADO != 'S' "
+				+ "	WHERE beptit.FLGBORRADO != 'S' AND beptus.BEPTUS_USU_CODNUM IS NULL ";
 		
 		dataTable.setColumn(ORDER_COLUMN_INDEX_NOMBRE, "beptit.NOMBRE");
 		dataTable.setQuery(consulta);
