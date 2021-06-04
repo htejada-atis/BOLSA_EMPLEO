@@ -295,31 +295,29 @@ public class ModeloMensajes {
 		try (Connection conexion = ConexionUvirtual.obtenerInstancia()) {
 			conexion.setAutoCommit(false);
 			
-			String consultaUpdate = "UPDATE TBEP_MENSAJES SET UID_USUARIO = ? WHERE CODNUM = ?";
-			try (PreparedStatement stmt = conexion.prepareStatement(consultaUpdate)) {
-				int parameterIndex = 1;
-				stmt.setString(parameterIndex++, usuarioUpdate.getCodCuenta());
-				stmt.setInt(parameterIndex++, mensaje.getCodNum());
-				stmt.executeUpdate();
-			} catch (SQLException e) {
+			try {
+				String consultaUpdate = "UPDATE TBEP_MENSAJES SET UID_USUARIO = ? WHERE CODNUM = ?";
+				try (PreparedStatement stmt = conexion.prepareStatement(consultaUpdate)) {
+					int parameterIndex = 1;
+					stmt.setString(parameterIndex++, usuarioUpdate.getCodCuenta());
+					stmt.setInt(parameterIndex++, mensaje.getCodNum());
+					stmt.executeUpdate();
+				}
+				
+				String consultaDelete = "DELETE FROM TBEP_MENSAJES WHERE CODNUM = ?";
+				try (PreparedStatement stmt = conexion.prepareStatement(consultaDelete)) {
+					int parameterIndex = 1;
+					stmt.setInt(parameterIndex++, mensaje.getCodNum());
+					stmt.executeUpdate();
+				}
+				
+				conexion.commit();
+				conexion.setAutoCommit(true);
+			} catch (Exception e) {
 				conexion.rollback();
 				conexion.setAutoCommit(true);
 				throw e;
 			}
-			
-			String consultaDelete = "DELETE FROM TBEP_MENSAJES WHERE CODNUM = ?";
-			try (PreparedStatement stmt = conexion.prepareStatement(consultaDelete)) {
-				int parameterIndex = 1;
-				stmt.setInt(parameterIndex++, mensaje.getCodNum());
-				stmt.executeUpdate();
-			} catch (SQLException e) {
-				conexion.rollback();
-				conexion.setAutoCommit(true);
-				throw e;
-			}
-			
-			conexion.commit();
-			conexion.setAutoCommit(true);
 		}
 	}
 	

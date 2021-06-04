@@ -21,7 +21,7 @@ VistaSolicitudes bean = (VistaSolicitudes) uvdatos.getVistas().get(VistaSolicitu
 	<h2>Paso 2: Asignación de méritos a áreas</h2>
 	<h3><%= bean.getSolicitud().getConvocatoria().getDescripcion() %></h3>
 	
-	<p>Para cada área seleccione hasta un máximo de [<%= bean.getSolicitud().getConvocatoria().getNumMeritosPorBloque() %>] méritos por bloque</p>
+	<p>Para cada área seleccione hasta un máximo de [<%= bean.getSolicitud().getConvocatoria().getNumMeritosPorBloque() %>] méritos por bloque. Pinche sobre una área para asignar sus méritos.</p>
 	
 	<table class="bluetable bolsaempleo" id="tableAreas">
 		<tr>
