@@ -108,7 +108,7 @@ public class Afinidad implements Serializable {
 	}
 	
 	public String getCodigoDescripcion() {
-		return this.getCodigo() + " - " + this.getDescripcion() + " (" + this.getModulacion() + " %)"; 
+		return this.getCodigo() + " - " + this.getDescripcion() + " (" + this.getModulacion() * 100 + " %)"; 
 	}
 	
 	public static long getSerialversionuid() {
