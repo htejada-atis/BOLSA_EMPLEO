@@ -204,6 +204,7 @@ public class ControladorMisDatos extends HttpServlet {
 		
 		UsuarioBolsaEmpleo usuarioForm = this.validarDatosUsuario(request);
 		usuarioForm.setCodNum(usuario.getCodNum());
+		usuarioForm.setNumDocumento(usuario.getNumDocumento());
 		    
 		modelo.actualizaUsuarioMisDatos(usuarioForm, bean.getUsuarioLogeado());
 		
@@ -264,9 +265,6 @@ public class ControladorMisDatos extends HttpServlet {
 		}
 		
 		u.setNacionalidad(EscapaHTML.ajustaCodificacion(request.getParameter(PARAM_NACIONALIDAD)));
-		if (u.getNacionalidad() == null || u.getNacionalidad().isBlank()) {
-			throw new UVException(MENSAJE_ERROR_NACIONALIDAD_VACIO);
-		}
 		if (u.getNacionalidad().length() > ModeloUsuarioBolsaEmpleo.COLUMN_NACIONALIDAD_MAXLENGTH) {
 			throw new UVException(String.format(MENSAJE_ERROR_NACIONALIDAD_LARGO, ModeloUsuarioBolsaEmpleo.COLUMN_NACIONALIDAD_MAXLENGTH));
 		}

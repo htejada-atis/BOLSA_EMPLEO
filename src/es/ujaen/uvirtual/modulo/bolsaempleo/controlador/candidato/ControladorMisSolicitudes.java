@@ -135,6 +135,8 @@ public class ControladorMisSolicitudes extends HttpServlet {
 	public static final String MENSAJE_ERROR_SOLICITUD_ID_REQUERIDO = "El id de la solicitud es requerído";
 	public static final String MENSAJE_ERROR_SOLICITUD_NO_NULO = "Solicitud no puede ser nula";
 	public static final String MENSAJE_EXITO_SOLICITUD_CONFIRMADA = "La solicitud ha sido confirmada correctamente";
+	public static final String MENSAJE_ERROR_FALTAN_DATOS_CONFIRMAR_SLICITUD = "Para confirmar la solicitud debe primero completar sus datos personales."
+			+ " Completelos en la sección 'Mis Datos'.";
 		
 	public static final int RESPONSE_HTTP_CODE_ERROR = 400;
 	
@@ -927,6 +929,10 @@ public class ControladorMisSolicitudes extends HttpServlet {
 		
 		List<BolsaSolicitud> listaBolsas = modeloSolicitud.getBolsasSolicitudMeritos(solicitud);
 		bean.setListaBolsasSolicitud(listaBolsas);
+		
+		if (ModeloUsuarioBolsaEmpleo.obtenerInstancia().compruebaUsuarioMisDatosValidos(bean.getUsuarioLogeado())) {
+			throw new UVException(MENSAJE_ERROR_FALTAN_DATOS_CONFIRMAR_SLICITUD);
+		}
 		
 		solicitud.setEstado(ModeloSolicitud.SOLICITUD_ESTADO_CERRADA);
 		solicitud.setFechaConfirmacion(BolsaEmpleoUtils.getCurrentDate());
