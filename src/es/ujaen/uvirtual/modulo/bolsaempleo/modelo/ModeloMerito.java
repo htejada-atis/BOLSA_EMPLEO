@@ -114,34 +114,35 @@ public class ModeloMerito {
 		try (Connection conexion = ConexionUvirtual.obtenerInstancia()) {
 			conexion.setAutoCommit(false);
 			
-			String params = BolsaEmpleoUtils.consultaMultiplesParametros(meritos.size());
-			
-			// actualiza el usuario de los méritos antes de eliminar
-			String consultaUpdate = "UPDATE TBEP_MERITOS SET UID_USUARIO = ? WHERE CODNUM IN (" + params + ")";
-			
-			try (PreparedStatement stmt = conexion.prepareStatement(consultaUpdate)) {
-				int indexParam = 1;
-				stmt.setString(indexParam++, usuarioUpdate.getCodCuenta());
-				for (String merito: meritos) {
-					stmt.setString(indexParam++, merito);
+			try {
+				String params = BolsaEmpleoUtils.consultaMultiplesParametros(meritos.size());
+				
+				// actualiza el usuario de los méritos antes de eliminar
+				String consultaUpdate = "UPDATE TBEP_MERITOS SET UID_USUARIO = ? WHERE CODNUM IN (" + params + ")";
+				
+				try (PreparedStatement stmt = conexion.prepareStatement(consultaUpdate)) {
+					int indexParam = 1;
+					stmt.setString(indexParam++, usuarioUpdate.getCodCuenta());
+					for (String merito: meritos) {
+						stmt.setString(indexParam++, merito);
+					}
+					stmt.executeUpdate();
 				}
-				stmt.executeUpdate();
-			} catch (SQLException e) {
-				conexion.rollback();
+				
+				// delete usuarios seleccionados
+				String consultaDelete = "DELETE FROM TBEP_MERITOS WHERE CODNUM IN (" + params + ")";
+				
+				try (PreparedStatement stmt = conexion.prepareStatement(consultaDelete)) {
+					int indexParam = 1;
+					for (String merito: meritos) {
+						stmt.setString(indexParam++, merito);
+					}
+					stmt.executeUpdate();
+				}
+				
+				conexion.commit();
 				conexion.setAutoCommit(true);
-				throw e;
-			}
-			
-			// delete usuarios seleccionados
-			String consultaDelete = "DELETE FROM TBEP_MERITOS WHERE CODNUM IN (" + params + ")";
-			
-			try (PreparedStatement stmt = conexion.prepareStatement(consultaDelete)) {
-				int indexParam = 1;
-				for (String merito: meritos) {
-					stmt.setString(indexParam++, merito);
-				}
-				stmt.executeUpdate();
-			} catch (SQLException e) {
+			} catch (Exception e) {
 				conexion.rollback();
 				conexion.setAutoCommit(true);
 				throw e;

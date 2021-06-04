@@ -18,8 +18,35 @@ VistaSolicitudes bean = (VistaSolicitudes) uvdatos.getVistas().get(VistaSolicitu
 	<jsp:include page="/WEB-INF/jsp/vista/infadministrativa/bolsaempleo/mensajes.jsp" />
 	
 	<h2>Paso 1: Selección de áreas</h2>
+	
 	<h3><%= bean.getSolicitud().getConvocatoria().getDescripcion() %></h3>
-	<p>Seleccione las áreas donde desee participar, hasta un máximo de [<%=bean.getSolicitud().getConvocatoria().getNumBolsasMaximo()%>].</p>
+	<p>Seleccione las áreas donde desee participar, hasta un máximo de [<%=bean.getSolicitud().getConvocatoria().getNumBolsasMaximo()%>]. 
+	Pulse el botón añadir áreas seleccionadas al final de la página.</p>
+	<p>A continuación pulse "Ir a 'Méritos por Área'"</p>
+	
+	<table class="bluetable bolsaempleo" id="tableAreasSeleccionadas">
+		<tr>
+			<th scope="col" style="width:5%"></th>
+			<th scope="col"	style="width:15%">Código</th>
+			<th scope="col"	style="width:80%">Nombre</th>			
+		</tr>
+		<tbody>
+		</tbody>
+		<tfoot>
+			<tr>
+				<th colspan="3" style="width:100%"></th>
+			</tr>
+		</tfoot>
+	</table>
+	
+	<div class="btns-by-steps">
+		<button class="link-btn" id="paso2_volver">
+	    	 Volver a mis solicitudes
+	    </button>
+		<button class="link-btn" id="paso1_siguiente">
+	    	 Ir a 'Méritos por Área'
+	    </button>
+	</div>
 	
 	<table class="bluetable bolsaempleo" id="tableAreas">
 		<tr>
@@ -38,36 +65,89 @@ VistaSolicitudes bean = (VistaSolicitudes) uvdatos.getVistas().get(VistaSolicitu
 	</table>
 	
 	<div class="btns-by-steps">
-		<button class="link-btn" id="paso1_volver">
-	    	 Volver
-	    </button>
-	    <button class="link-btn" id="paso1_siguiente">
-	    	 Ir a 'Méritos por Área'
+		<div class="link-btn"></div>
+		<button class="link-btn" id="addAreas">
+	    	 Añadir áreas seleccionadas
 	    </button>
 	</div>
-	
 </div>
 
 <script>
 
 	$(document).ready(function() {
+		var quitarBolsasSeleccionadas = function(selected) {
+			if (selected.length > 0) {
+				var params = {
+					'<%= ControladorMisSolicitudes.PARAM_ACCION %>': '<%= ControladorMisSolicitudes.ACCION_DESELECCIONAR_BOLSAS %>',
+					'<%= ControladorMisSolicitudes.PARAM_SOLICITUD_ID %>': '<%= bean.getSolicitud().getCodNum() %>',
+					'<%= ControladorMisSolicitudes.PARAM_BOLSAS %>': JSON.stringify(selected)
+				};
+				Atis.sendForm("<%= request.getRequestURI() %>", params);
+			}			
+		};
+		
+		var tableAreasSeleccionadas = new Atis.DataTable('#tableAreasSeleccionadas', {
+			"ajax": { url: "<%=ControladorMisSolicitudes.URL_PATTERN_AJAX%>", async: false },		    
+		    "selectable": true,
+		    "filterable": true,
+		    "title": 'LISTA DE ÁREAS SELECCIONADAS',
+		    "action": "<%=ControladorMisSolicitudes.ACCION_DATATABLE_AREAS_SELECCIONADAS%>",
+		    "params": {"<%=ControladorMisSolicitudes.PARAM_SOLICITUD_ID%>": "<%= bean.getSolicitud().getCodNum() %>"},
+		    "columns": [
+		    	{'data': 'codNum', 'selectable': {'exclude': 'excluido'}},
+		    	{'data': 'area.idAreaExterno', 'filter': true},
+		    	{'data': 'area.descripcion', 'filter': true},		        
+	        ],
+	        "actions": [
+		    	{'label': 'Eliminar', 'onClick': quitarBolsasSeleccionadas },	    	
+		    ]
+		});
+		
+		var checkAreasSeleccionadas = function (selected) {
+			if (selected.length == 0) {
+				Atis.alertDialog("Seleccionar áreas", "Seleccione al menos un área");
+				return false;
+			}
+			
+			if (selected.length > <%= bean.getSolicitud().getConvocatoria().getNumBolsasMaximo() %>) {
+				var message = "No puedes superar el número máximo de áreas permitido de la convocatoria. <br/>"
+					+ "Máximo perimitido: <%= bean.getSolicitud().getConvocatoria().getNumBolsasMaximo() %>. <br/>"
+					+ "Áreas seleccionadas: " + selected.length + ".";
+				Atis.alertDialog("Seleccionar áreas", message);
+				return false;
+			}
+			
+			return true;
+		}
+		
+		var addAreas = function(selected) {
+			if (checkAreasSeleccionadas(selected)) {
+				var params = {
+						'<%= ControladorMisSolicitudes.PARAM_ACCION %>': '<%= ControladorMisSolicitudes.ACCION_SELECCIONAR_BOLSAS %>',
+						'<%= ControladorMisSolicitudes.PARAM_SOLICITUD_ID %>': '<%= bean.getSolicitud().getCodNum() %>',
+						'<%= ControladorMisSolicitudes.PARAM_BOLSAS %>': JSON.stringify(selected)
+				};
+				Atis.sendForm("<%= request.getRequestURI() %>", params);	
+			}
+		}
 		
 		var bolsasSolicitud = [];
 		
 		<%  if (bean.getListaBolsas() != null) {
-				for (Bolsa bolsa: bean.getListaBolsas()) { %>
-					bolsasSolicitud.push(<%=bolsa.getCodNum()%>);
-				<% }
-			} %>
+			for (Bolsa bolsa: bean.getListaBolsas()) { %>
+				bolsasSolicitud.push(<%=bolsa.getCodNum()%>);
+			<% }
+		} %>
 		
 		var tableAreas = new Atis.DataTable('#tableAreas', {
-			"ajax": { url: "<%=ControladorMisSolicitudes.URL_PATTERN_AJAX%>" },
-		    "pageSize": 10,
+			"ajax": { url: "<%=ControladorMisSolicitudes.URL_PATTERN_AJAX%>", async: false },
+			"pageSize": 200,
+		    "pageSizeOptions": [10, 100, 200],
 		    "selectable": true,
 		    "filterable": true,
-		    "title": 'LISTA DE ÁREAS',
+		    "title": 'ÁREAS DISPONIBLES',
 		    "action": "<%=ControladorMisSolicitudes.ACCION_DATATABLE_AREAS%>",
-		    "selected": bolsasSolicitud,
+		    "selected": bolsasSolicitud,		    
 		    "columns": [
 		    	{'data': 'codNum', 'selectable': {'exclude': 'excluido'}},
 		    	{'data': 'area.idAreaExterno', 'filter': true},
@@ -82,39 +162,33 @@ VistaSolicitudes bean = (VistaSolicitudes) uvdatos.getVistas().get(VistaSolicitu
 	        		}
 		        },
 	        ],
+	        "actions": [
+		    	{'label': 'Añadir áreas seleccionadas', 'onClick': addAreas },	    	
+		    ]
 		});
 		
-		document.getElementById("paso1_volver").addEventListener("click", function(event) {
-			
-		});
+		$('#addAreas').click(function() {
+			addAreas(tableAreas.getCheckedItems());
+		})
 		
+		document.getElementById("paso2_volver").addEventListener("click", function(event) {
+			event.preventDefault();
+			var params = {
+				'<%= ControladorMisSolicitudes.PARAM_ACCION %>': '<%= ControladorMisSolicitudes.ACCION_INDEX %>'
+			};
+			Atis.sendForm("<%= request.getRequestURI() %>", params);
+		});
+				
 		document.getElementById("paso1_siguiente").addEventListener("click", function(event) {
 			event.preventDefault();
-			if (tableAreas.getCheckedItems().length < 1) {
-				Atis.alertDialog("Seleccionar áreas", "Debes seleccionar al menos un área para continuar");
-			} else if (tableAreas.getCheckedItems().length > <%= bean.getSolicitud().getConvocatoria().getNumBolsasMaximo() %>) {
-				var message = "No puedes superar el número máximo de áreas permitido de la convocatoria. <br/>"
-							+ "Máximo perimitido: <%= bean.getSolicitud().getConvocatoria().getNumBolsasMaximo() %>. <br/>"
-							+ "Áreas seleccionadas: " + tableAreas.getCheckedItems().length + ".";
-				Atis.alertDialog("Seleccionar áreas", message);
-			} else {
+			if (checkAreasSeleccionadas(tableAreas.getCheckedItems())) {
 				var params = {
-						'a': '<%= ControladorMisSolicitudes.ACCION_SELECCIONAR_BOLSAS %>',
-						'<%= ControladorMisSolicitudes.PARAM_SOLICITUD_ID %>': '<%= bean.getSolicitud().getCodNum() %>',
-						'<%= ControladorMisSolicitudes.PARAM_BOLSAS %>': JSON.stringify(tableAreas.getCheckedItems())
+					'<%= ControladorMisSolicitudes.PARAM_ACCION %>': '<%= ControladorMisSolicitudes.ACCION_IR_A_MERITOS_POR_AREA %>',
+					'<%= ControladorMisSolicitudes.PARAM_SOLICITUD_ID %>': '<%= bean.getSolicitud().getCodNum() %>',
 				};
 				Atis.sendForm("<%= request.getRequestURI() %>", params);
 			}
 		});
-		
-		/*
-		document.getElementById("descargar_pdf").addEventListener("click", function(event) {
-			event.preventDefault();
-			window.open("<%= request.getRequestURI() %>"
-		        	+ "?a=<%= ControladorMisSolicitudes.ACCION_DESCARGAR_PDF %>&<%= ControladorMisSolicitudes.PARAM_SOLICITUD_ID %>=" + '<%= bean.getSolicitud().getCodNum() %>');			
-		});
-		*/
-		
 	});
 	
 </script>

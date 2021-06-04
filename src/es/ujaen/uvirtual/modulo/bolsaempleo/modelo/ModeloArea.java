@@ -345,7 +345,7 @@ public class ModeloArea {
 		BolsaEmpleoDataTable<BolsaCandidato> dataTable = new BolsaEmpleoDataTable<>(params);
 		
 		String consulta =
-		"SELECT bepbol.*, bepuea.USUARIO "
+		"   SELECT bepbol.*, bepuea.USUARIO "
 		+ " FROM TBEP_BOLSAS bepbol"
 		+ " INNER JOIN TBEP_AREAS bepare ON bepare.CODNUM = bepbol.BEPARE_CODNUM"
 		+ " LEFT JOIN TBEP_USU_EXCLUIDOS_AREA bepuea "
