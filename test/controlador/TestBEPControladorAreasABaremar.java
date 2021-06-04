@@ -48,7 +48,7 @@ public class TestBEPControladorAreasABaremar {
     
 	// método para obtener la vista con una lista de áreas .
 	private VistaAreasBaremar obtenerAreas() throws ServletException, IOException {
-		PeticionHttp peticion = UtilsTestBolsaEmpleo.peticionAutenticadaCandidato();
+		PeticionHttp peticion = UtilsTestBolsaEmpleo.peticionAutenticadaPersonal();
 		peticion.setParameter(ControladorAreasABaremar.PARAM_ACCION, ControladorAreasABaremar.ACCION_DATATABLE);
 
 		RespuestaHttp respuesta = new RespuestaHttp();
@@ -64,7 +64,7 @@ public class TestBEPControladorAreasABaremar {
 	 */
 	@Test
 	public void testA01() throws SQLException, ServletException, IOException {
-		PeticionHttp peticion = UtilsTestBolsaEmpleo.peticionAutenticadaCandidato();
+		PeticionHttp peticion = UtilsTestBolsaEmpleo.peticionAutenticadaPersonal();
 		
 		RespuestaHttp respuesta = new RespuestaHttp();
 		ControladorAreasABaremar controlador = new ControladorAreasABaremar();
@@ -83,7 +83,7 @@ public class TestBEPControladorAreasABaremar {
 	 */
 	@Test
 	public void testA02() throws SQLException, ServletException, IOException {
-		PeticionHttp peticion = UtilsTestBolsaEmpleo.peticionAutenticadaCandidato();
+		PeticionHttp peticion = UtilsTestBolsaEmpleo.peticionAutenticadaPersonal();
 		peticion.setParameter(ControladorAreasABaremar.PARAM_ACCION, ControladorAreasABaremar.ACCION_INDEX);
 		
 		RespuestaHttp respuesta = new RespuestaHttp();
@@ -119,7 +119,7 @@ public class TestBEPControladorAreasABaremar {
 	public void testA04AccionAreaPasarABaremable() throws SQLException, ServletException, IOException {
 		VistaAreasBaremar bean = obtenerAreas();
 		
-		PeticionHttp peticion = UtilsTestBolsaEmpleo.peticionAutenticadaCandidato();
+		PeticionHttp peticion = UtilsTestBolsaEmpleo.peticionAutenticadaPersonal();
 		peticion.setParameter(ControladorAreasABaremar.PARAM_ACCION, ControladorAreasABaremar.ACCION_AREA);
 		peticion.setParameter(ControladorAreasABaremar.PARAM_ACCION_AREA, ControladorAreasABaremar.ACCION_AREA_PASAR_A_BAREMALE);
 		peticion.setParameter(ControladorAreasABaremar.PARAM_AREAS_SELECCIONADAS, "[" + bean.getDatatableAreas().getData().get(0).getCodNum().toString() + "]");
@@ -144,7 +144,7 @@ public class TestBEPControladorAreasABaremar {
 	public void testA05AccionAreaPasarANoBaremable() throws SQLException, ServletException, IOException {
 		VistaAreasBaremar bean = obtenerAreas();
 		
-		PeticionHttp peticion = UtilsTestBolsaEmpleo.peticionAutenticadaCandidato();
+		PeticionHttp peticion = UtilsTestBolsaEmpleo.peticionAutenticadaPersonal();
 		peticion.setParameter(ControladorAreasABaremar.PARAM_ACCION, ControladorAreasABaremar.ACCION_AREA);
 		peticion.setParameter(ControladorAreasABaremar.PARAM_ACCION_AREA, ControladorAreasABaremar.ACCION_AREA_PASAR_A_NO_BAREMALE);
 		peticion.setParameter(ControladorAreasABaremar.PARAM_AREAS_SELECCIONADAS, 
@@ -168,7 +168,7 @@ public class TestBEPControladorAreasABaremar {
 	 */
 	@Test
 	public void testA06ImportarAreasUVirtual() throws SQLException, ServletException, IOException {
-		PeticionHttp peticion = UtilsTestBolsaEmpleo.peticionAutenticadaCandidato();
+		PeticionHttp peticion = UtilsTestBolsaEmpleo.peticionAutenticadaPersonal();
 		peticion.setParameter(ControladorAreasABaremar.PARAM_ACCION, ControladorAreasABaremar.ACCION_IMPORTAR_AREAS_UVIRTUAL);
 		
 		RespuestaHttp respuesta = new RespuestaHttp();
@@ -189,7 +189,7 @@ public class TestBEPControladorAreasABaremar {
 	 */
 	@Test
 	public void testA07ObtenerAreasExcluidasUsuario() throws SQLException, ServletException, IOException {
-		PeticionHttp peticion = UtilsTestBolsaEmpleo.peticionAutenticadaCandidato();
+		PeticionHttp peticion = UtilsTestBolsaEmpleo.peticionAutenticadaPersonal();
 		peticion.setParameter(ControladorAreasABaremar.PARAM_ACCION, ControladorAreasABaremar.ACCION_DATATABLE_EXCLUIDOS);
 		peticion.setParameter(ControladorAreasABaremar.PARAM_ID, "1");
 		
@@ -211,7 +211,7 @@ public class TestBEPControladorAreasABaremar {
 	 */
 	@Test
 	public void testE01ObtenerAreasParametroNoValido() throws ServletException, IOException {
-		PeticionHttp peticion = UtilsTestBolsaEmpleo.peticionAutenticadaCandidato();
+		PeticionHttp peticion = UtilsTestBolsaEmpleo.peticionAutenticadaPersonal();
 		peticion.setParameter(ControladorAreasABaremar.PARAM_ACCION, ControladorAreasABaremar.ACCION_DATATABLE);
 		peticion.setParameter(BolsaEmpleoDataTable.PARAM_ORDER_BY, "9");
 		
@@ -232,7 +232,7 @@ public class TestBEPControladorAreasABaremar {
 	 */
 	@Test
 	public void testE02ObtenerAreasExcluidasUsuarioParametroNoValido() throws ServletException, IOException {
-		PeticionHttp peticion = UtilsTestBolsaEmpleo.peticionAutenticadaCandidato();
+		PeticionHttp peticion = UtilsTestBolsaEmpleo.peticionAutenticadaPersonal();
 		peticion.setParameter(ControladorAreasABaremar.PARAM_ACCION, ControladorAreasABaremar.ACCION_DATATABLE_EXCLUIDOS);
 		peticion.setParameter(ControladorAreasABaremar.PARAM_ID, "1");
 		peticion.setParameter(BolsaEmpleoDataTable.PARAM_ORDER_BY, "9");
@@ -254,7 +254,7 @@ public class TestBEPControladorAreasABaremar {
 	 */
 	@Test
 	public void testE03AccionNoValida() throws SQLException, ServletException, IOException {
-		PeticionHttp peticion = UtilsTestBolsaEmpleo.peticionAutenticadaCandidato();
+		PeticionHttp peticion = UtilsTestBolsaEmpleo.peticionAutenticadaPersonal();
 		peticion.setParameter(ControladorAreasABaremar.PARAM_ACCION, ACCION_NO_VALIDA);
 		
 		RespuestaHttp respuesta = new RespuestaHttp();
@@ -276,7 +276,7 @@ public class TestBEPControladorAreasABaremar {
 	public void testE04AccionAreaNoValida() throws SQLException, ServletException, IOException {
 		VistaAreasBaremar bean = obtenerAreas();
 		
-		PeticionHttp peticion = UtilsTestBolsaEmpleo.peticionAutenticadaCandidato();
+		PeticionHttp peticion = UtilsTestBolsaEmpleo.peticionAutenticadaPersonal();
 		peticion.setParameter(ControladorAreasABaremar.PARAM_ACCION, ControladorAreasABaremar.ACCION_AREA);
 		peticion.setParameter(ControladorAreasABaremar.PARAM_ACCION_AREA, ACCION_NO_VALIDA);
 		peticion.setParameter(ControladorAreasABaremar.PARAM_AREAS_SELECCIONADAS, 

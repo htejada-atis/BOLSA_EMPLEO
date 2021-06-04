@@ -407,7 +407,7 @@ public class ControladorMisSolicitudes extends HttpServlet {
 				seleccionarBolsas(bean, request);
 				break;
 			case ACCION_IR_A_MERITOS_POR_AREA:
-				irAMeritosPorBolsa(bean, datos, request, response);
+				irAMeritosPorBolsa(bean, request);
 				break;
 			default:
 				errorFatal(bean, MENSAJE_ERROR_ACCION_NO_CONTEMPLADA);
@@ -525,7 +525,7 @@ public class ControladorMisSolicitudes extends HttpServlet {
 		}
 	}
 	
-	private void irAMeritosPorBolsa(VistaSolicitudes bean, UVDatos datos, HttpServletRequest request, HttpServletResponse response) throws UVException, SQLException {
+	private void irAMeritosPorBolsa(VistaSolicitudes bean, HttpServletRequest request) throws UVException, SQLException {
 		bean.setVista(JSP_PASO1);
 		
 		Solicitud solicitud = this.getSolicitud(bean, request);
@@ -626,10 +626,6 @@ public class ControladorMisSolicitudes extends HttpServlet {
 		}
 
 		Solicitud solicitud = this.listaBolsasSolicitud(bean, request);
-		
-		if (solicitud == null) {
-			throw new UVException(MENSAJE_ERROR_SOLICITUD_NO_NULO);
-		}
 
 		String meritoCadena = "";
 		boolean excluyente = false;
@@ -690,10 +686,6 @@ public class ControladorMisSolicitudes extends HttpServlet {
 
 		Solicitud solicitud = this.listaBolsasSolicitud(bean, request);
 		
-		if (solicitud == null) {
-			throw new UVException(MENSAJE_ERROR_SOLICITUD_NO_NULO);
-		}
-		
 		Afinidad afinidad = ModeloAfinidad.obtenerInstancia().getAfinidadById(Formateador.leeParametroInteger(request.getParameter(PARAM_AFINIDAD_ID)));
 		ModeloSolicitud.obtenerInstancia().asignarAfinidadMeritoIndividualizado(solicitud, area, merito, afinidad, bean.getUsuarioLogeado());
 
@@ -719,12 +711,6 @@ public class ControladorMisSolicitudes extends HttpServlet {
 			throw new UVException(MENSAJE_ERROR_MERITO_NO_NULO);
 		}
 
-		Solicitud solicitud = this.listaBolsasSolicitud(bean, request);
-		
-		if (solicitud == null) {
-			throw new UVException(MENSAJE_ERROR_SOLICITUD_NO_NULO);
-		}
-		
 		// parseamos json bolsas
 		Gson gson = new GsonBuilder().create();
 		HashMap<String, Float> afinidadesRaw;
@@ -749,6 +735,8 @@ public class ControladorMisSolicitudes extends HttpServlet {
 		if (!totalRounder.equals(merito.getValor())) {
 			throw new UVException("El total de afinidades tiene que ser igual al valor del mérito");
 		}
+		
+		Solicitud solicitud = this.listaBolsasSolicitud(bean, request);
 		
 		// asignamos afinidades al merito de la bolsa
 		ModeloSolicitud.obtenerInstancia().asignarAfinidadMeritoNoIndividualizado(solicitud, area, merito, afinidades, bean.getUsuarioLogeado());

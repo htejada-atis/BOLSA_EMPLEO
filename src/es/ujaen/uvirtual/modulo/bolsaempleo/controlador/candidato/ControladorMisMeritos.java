@@ -129,25 +129,7 @@ public class ControladorMisMeritos extends HttpServlet {
 		
 		try {
 			init(bean, datos, request, response);
-			switch (nombreAccion) {
-				case ACCION_INDEX:
-					listaMeritos(bean);
-					break;
-				case ACCION_DATATABLE:
-					listadoMeritos(bean, datos, request, response);
-					break;
-				case ACCION_AGREGAR_MERITO:
-					agregarMerito(bean, datos, request, response);
-					break;
-				case ACCION_DESCARGAR_FICHERO:
-					descargarFichero(bean, datos, request, response);
-					break;
-				case ACCION_ELIMINAR_MERITOS:
-					eliminarMeritos(bean, request, response);
-					break;				
-				default:
-					errorFatal(bean, "Acción no contemplada");
-			}
+			accionesMeritos(bean, datos, request, response, nombreAccion);
 		} catch (UVException e) {
 			LOGGER.log(Level.WARNING, e.toString());
 			bean.getMensajesDeError().add(e.getMessage());
@@ -200,6 +182,30 @@ public class ControladorMisMeritos extends HttpServlet {
 		doGet(request, response);
 	}
 	
+	private void accionesMeritos(VistaMeritos bean, UVDatos datos, HttpServletRequest request, HttpServletResponse response, String nombreAccion) 
+			throws SQLException, IOException, UVException, ServletException {
+		
+		switch (nombreAccion) {
+			case ACCION_INDEX:
+				listaMeritos(bean);
+				break;
+			case ACCION_DATATABLE:
+				listadoMeritos(bean, datos, request, response);
+				break;
+			case ACCION_AGREGAR_MERITO:
+				agregarMerito(bean, request, response);
+				break;
+			case ACCION_DESCARGAR_FICHERO:
+				descargarFichero(bean, datos, request, response);
+				break;
+			case ACCION_ELIMINAR_MERITOS:
+				eliminarMeritos(bean, request, response);
+				break;				
+			default:
+				errorFatal(bean, "Acción no contemplada");
+		}
+	}
+	
 	/**
 	 * lista meritos .
 	 * @param bean .
@@ -217,7 +223,6 @@ public class ControladorMisMeritos extends HttpServlet {
 	
 	/** agrega un nuevo mérito.
 	 * @param bean .
-	 * @param datos .
 	 * @param request .
 	 * @param response .
 	 * @throws SQLException excepcion de bbdd .
@@ -225,7 +230,7 @@ public class ControladorMisMeritos extends HttpServlet {
 	 * @throws IOException en caso de error de input u output .
 	 * @throws ServletException .
 	 */
-	private void agregarMerito(VistaMeritos bean, UVDatos datos, HttpServletRequest request, HttpServletResponse response)
+	private void agregarMerito(VistaMeritos bean, HttpServletRequest request, HttpServletResponse response)
 			throws SQLException, UVException, IOException, ServletException {
 		bean.setVista(RUTA_BEP_MERITOS + "formMerito.jsp");
 		
@@ -356,7 +361,7 @@ public class ControladorMisMeritos extends HttpServlet {
 		merito.setItemBaremacion(item);
 		
 		// valor
-		merito.setValor(this.validateValorDelMerito(request, merito));
+		merito.setValor(ControladorMisMeritos.validateValorDelMerito(request, merito));
 				
 		// descripcion
 		merito.setDescripcion(EscapaHTML.ajustaCodificacion(request.getParameter(PARAM_DESCRIPCION)));
@@ -393,6 +398,13 @@ public class ControladorMisMeritos extends HttpServlet {
 		}		
 	}
 	
+	/**
+	 * Valora el request con los datos del mérito.
+	 * @param request .
+	 * @param merito .
+	 * @return .
+	 * @throws UVException .
+	 */
 	public static Float validateValorDelMerito(HttpServletRequest request, Merito merito) throws UVException {
 		// chequeo tipo de valor
 		String valorStr = request.getParameter(PARAM_VALOR);
