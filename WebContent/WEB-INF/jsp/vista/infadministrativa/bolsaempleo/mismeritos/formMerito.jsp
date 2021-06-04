@@ -76,7 +76,7 @@ String observacion = BolsaEmpleoUtils.getParamForm(request, ControladorMisMerito
 		<div id="contDescripcionItem" style="display:none;">
 			<div class="form-group">
 	    		<div class="form-group">
-	    			<p id="descripcionItem">Descripción del item: </p>
+	    			<p id="descripcionItem">Nota aclaratoria: </p>
 	    		</div>
     		</div>
 		</div>
@@ -126,7 +126,7 @@ String observacion = BolsaEmpleoUtils.getParamForm(request, ControladorMisMerito
 		//var selected = $(this).children("option:selected").val();
 					
 		if (descripcion) {
-			$('#descripcionItem').text('Descripción del item: ' + descripcion);
+			$('#descripcionItem').html('Nota aclaratoria: <br/>' + descripcion);
 			$('#contDescripcionItem').show();
 		} else {
 			$('#contDescripcionItem').hide();
@@ -161,7 +161,7 @@ String observacion = BolsaEmpleoUtils.getParamForm(request, ControladorMisMerito
 			//var selected = $(this).children("option:selected").val();
 						
 			if (descripcion) {
-				$('#descripcionItem').text('Descripción del item: ' + descripcion);
+				$('#descripcionItem').html('Nota aclaratoria: <br/>' + descripcion);
 				$('#contDescripcionItem').show();
 			} else {
 				$('#contDescripcionItem').hide();

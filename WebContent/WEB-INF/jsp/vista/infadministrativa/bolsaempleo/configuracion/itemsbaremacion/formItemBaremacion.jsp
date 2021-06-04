@@ -42,19 +42,19 @@ if(item!=null){
 		<input type="hidden" name="<%=ControladorItemsBaremacion.PARAM_BLOQUE%>" id="bloque_id" value="<%=bloque.getCodNum()%>" />
 		<input type="hidden" name="<%=ControladorItemsBaremacion.PARAM_ITEM%>" id="item_id" value="<%=item != null ? item.getCodNum() : ""%>" />
 		
-		<div class="form-group-container col1">
+		<div class="form-group-container col2">
 			<div class="form-group">
 	    		<label for="bloque_apartado_codigo">Código completo</label>
 	    		<input class="form-input-custom" type="text" name="<%=ControladorItemsBaremacion.PARAM_BLOQUE_CODIGO%>" id="item_bloque_codigo" value="<%=codigoCompleto%>" disabled/>
 	    	</div>
-		</div>
-		<div class="form-group-container col2">
-			<div class="form-group">
+	    	<div class="form-group">
 	    		<label for="bloque_codigo" class="bold-label">Código</label>
 	    		<input class="form-input-custom" type="text" name="<%=ControladorItemsBaremacion.PARAM_ITEM_CODIGO%>" id="bloque_codigo" 
 	    			   value="<%=BolsaEmpleoUtils.getParamForm(request, ControladorItemsBaremacion.PARAM_ITEM_CODIGO, item != null ? item.getCodigo() : bean.getUltimoCodigo())%>"
 	    			   required/>
 	    	</div>
+		</div>
+		<div class="form-group-container col1">
 	    	<div class="form-group">
 	    		<label for="bloque_nombre" class="bold-label">Nombre</label>
 	    		<input class="form-input-custom" type="text" name="<%=ControladorItemsBaremacion.PARAM_ITEM_NOMBRE%>" id="bloque_nombre" 
@@ -65,7 +65,7 @@ if(item!=null){
 		
 		<div class="form-group-container col1">
 			<div class="form-group">
-    			<label for="descripcion">Descripción</label>
+    			<label for="descripcion">Nota aclaratoria</label>
     			<textarea class="params form-input-custom" id="descripcion" name="<%=ControladorItemsBaremacion.PARAM_ITEM_DESCRIPCION%>" rows="3" cols="60"><%=BolsaEmpleoUtils.getParamForm(request, ControladorItemsBaremacion.PARAM_ITEM_DESCRIPCION, item != null ? descripcion : "")%></textarea>
    			</div>
 		</div>
