@@ -164,10 +164,10 @@ public class ControladorItemsBaremacion extends HttpServlet {
 	
 	// mensajes
 	public static final String MENSAJE_ERROR_CODIGO_VACIO = "El código no puede estar vacio";
-	public static final String MENSAJE_ERROR_CODIGO_MAXIMO = "El código no puede ser mayor que ";
+	public static final String MENSAJE_ERROR_CODIGO_MAXIMO = "El código no puede ser mayor que %d caracteres";
 	public static final String MENSAJE_ERROR_CODIGO_NUMERO = "El código debe ser un número";
 	public static final String MENSAJE_ERROR_NOMBRE_VACIO = "El nombre no puede estar vacio";
-	public static final String MENSAJE_ERROR_NOMBRE_MAXIMO = "El nombre no puede ser mayor que ";
+	public static final String MENSAJE_ERROR_NOMBRE_MAXIMO = "El nombre no puede contener mas de %d caracteres";
 	public static final String MENSAJE_ERROR_DESCRIPCION_MAXIMO = "La descripción no puede ser mayor que ";
 	public static final String MENSAJE_ERROR_VALOR_NO_VALIDO = "Valor no válido";
 	public static final String MENSAJE_ERROR_AFINIDAD_VACIO = "La afinidad no puede estar vacia";
@@ -828,7 +828,9 @@ public class ControladorItemsBaremacion extends HttpServlet {
 	private void editarItemConfirm(VistaItemsBaremacion bean, HttpServletRequest request) throws SQLException, UVException {
 		ModeloBaremacionItems modelo = ModeloBaremacionItems.obtenerInstancia();
 		ItemBaremacion item = modelo.getItemBaremacionById(Formateador.leeParametroInteger(request.getParameter(PARAM_ITEM)));
-
+		List<ItemBaremacion> listaItemsExcluyentes = modelo.getItemsExcluyentes(item);
+		bean.setListaItemsExcluyentes(listaItemsExcluyentes);
+		
 		bean.setVista(JSP_FORM_ITEM_BAREMACION);
 		bean.setApartadoBaremacion(item.getBloqueBaremacion().getApartadoBaremacion());
 		bean.setBloqueBaremacion(item.getBloqueBaremacion());

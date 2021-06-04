@@ -38,6 +38,15 @@ VistaSolicitudes bean = (VistaSolicitudes) uvdatos.getVistas().get(VistaSolicitu
 		</tfoot>
 	</table>
 	
+	<div class="btns-by-steps">
+		<button class="link-btn" id="paso2_volver">
+	    	 Volver
+	    </button>
+	    <button class="link-btn" id="paso2_siguiente">
+	    	 Ir a 'Confirmar Solicitud'
+	    </button>
+	</div>
+	
 	<table class="bluetable bolsaempleo" id="tableMeritos" style="visibility: collapse">
 		<tr>
 			<th scope="col"	style="width:5%"></th>
@@ -56,15 +65,6 @@ VistaSolicitudes bean = (VistaSolicitudes) uvdatos.getVistas().get(VistaSolicitu
 			</tr>
 		</tfoot>
 	</table>	
-	
-	<div class="btns-by-steps">
-		<button class="link-btn" id="paso2_volver">
-	    	 Volver
-	    </button>
-	    <button class="link-btn" id="paso2_siguiente">
-	    	 Ir a 'Confirmar Solicitud'
-	    </button>
-	</div>
 </div>
 
 <script>
@@ -344,7 +344,7 @@ VistaSolicitudes bean = (VistaSolicitudes) uvdatos.getVistas().get(VistaSolicitu
 			});
 			
 			document.getElementById("tableMeritos").style.visibility = "visible";
-			window.scrollTo(0,document.body.scrollHeight);
+			Atis.smoothScrollToAnchor("#tableMeritos");
 		<% } %>
 		
 		document.getElementById("paso2_volver").addEventListener("click", function(event) {

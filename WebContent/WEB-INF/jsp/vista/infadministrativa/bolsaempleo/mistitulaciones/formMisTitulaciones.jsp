@@ -83,7 +83,7 @@ $(document).ready(function() {
     	"filterable": true,
     	"pageSize": 5,
     	"defaultOrderBy": 1,
-    	"title": 'Titulaciones',
+    	"title": 'TITULACIONES',
     	"action": "<%=ControladorMisTitulaciones.ACCION_DATATABLE_TITULACIONES%>",
     	"defaultOrderBy": 0,
     	"defaultOrderDirection": "asc",
