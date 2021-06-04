@@ -1030,16 +1030,17 @@ public class ControladorMisSolicitudes extends HttpServlet {
 						&& merito.getValoraciones().size() > 0) {
 					if (merito.getMerito().getItemBaremacion().getIndividualizado()) {
 						afinidad = merito.getValoraciones().get(0).getAfinidad().getCodigo() + " " 
-								+ merito.getValoraciones().get(0).getAfinidad().getModulacion();
+								+ merito.getValoraciones().get(0).getAfinidad().getModulacion() * 100 + "%";
 					} else {
 						for (MeritoSolicitudValoracion valoracion: merito.getValoraciones()) {
 							afinidad += valoracion.getValor() + " - " + valoracion.getAfinidad().getCodigo() + " "
-									+ valoracion.getAfinidad().getModulacion() + "%\n";
+									+ valoracion.getAfinidad().getModulacion() * 100 + "%\n";
 						}
 					}
 				}
 				
 				cell = new Cell(afinidad);
+				cell.setBackgroundColor(new Color(COLOR_241, COLOR_241, COLOR_241));
 				table.addCell(cell);
 						
 			}
