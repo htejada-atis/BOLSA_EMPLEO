@@ -26,22 +26,26 @@ VistaUsuarioAutoregistrado bean = (VistaUsuarioAutoregistrado)uvdatos.getVistas(
 	<%
 	} else {
 	%>
-	<h2>Convocatorias</h2>
+	<h2>Acceso de usuarios autoregistrados</h2>
 	<div>
-		<a href="/srv">acceso con usuario de la UJA</a>
-		<hr/>	
+		Si ya tiene usuario acceda con este <a href="/srv">enlace</a>
+		<hr/>
+		Verificación usuario	
 		<form method="post" action="<%=request.getRequestURI()%>" id="formularioExiste"> 
 			<input type="hidden" name="<%=ControladorUsuarioAutoregistrado.PARAM_ACCION%>" id="accionFormulario" value="<%=ControladorUsuarioAutoregistrado.ACCION_VALIDA%>" />
 			<input type="text" name="<%=ControladorUsuarioAutoregistrado.PARAM_CORREO%>">
 			<input type="password" name="<%=ControladorUsuarioAutoregistrado.PARAM_CLAVE%>">
 			<input type="submit" value="usuario ya existente">
 		</form>
+		
 		<hr/>	
+		Para crear un nuevo usuario
 		<form method="post" action="<%=request.getRequestURI()%>" id="formularioNoExiste"> 
 			<input type="hidden" name="<%=ControladorUsuarioAutoregistrado.PARAM_ACCION%>" id="accionFormulario" value="<%=ControladorUsuarioAutoregistrado.ACCION_MOSTRAR_CREAR%>" />
 			<input type="submit" value="Crear nuevo usuario">
 		</form>
 		<hr/>	
+		Para recuperar su clave 
 		<form method="post" action="<%=request.getRequestURI()%>" id="formularioOlvido"> 
 			<input type="hidden" name="<%=ControladorUsuarioAutoregistrado.PARAM_ACCION%>" id="accionFormulario" value="<%=ControladorUsuarioAutoregistrado.ACCION_OLVIDO%>" />
 			<input type="text" name="<%=ControladorUsuarioAutoregistrado.PARAM_CORREO%>">

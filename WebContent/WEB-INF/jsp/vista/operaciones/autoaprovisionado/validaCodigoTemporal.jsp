@@ -18,6 +18,7 @@ VistaUsuarioAutoregistrado bean = (VistaUsuarioAutoregistrado)uvdatos.getVistas(
 			<%=bean.formatearMensajesDeError()%>
 		</div>
 	<% } else { %>
+		Se ha mandado un código temporal a su correo electrónico. Introduzca el código temporal en el siguiente formulario para validarlo.
 		<form method="post" action="<%=request.getRequestURI()%>" id="formularioCrear">
 			<input type="hidden" name="<%=ControladorUsuarioAutoregistrado.PARAM_ACCION%>" id="accionFormulario" value="<%=ControladorUsuarioAutoregistrado.ACCION_VALIDA_CODIGO_TEMPORAL%>" />
 			<input type="hidden" name="<%=ControladorUsuarioAutoregistrado.PARAM_CORREO%>" value="<%=bean.getCorreo()%>" />

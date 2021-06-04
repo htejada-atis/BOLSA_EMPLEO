@@ -10,6 +10,7 @@ import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
 
 import es.ujaen.uvirtual.beans.UVDatos;
 import es.ujaen.uvirtual.beans.Usuario;
@@ -71,6 +72,9 @@ public class ControladorUsuarioAutoregistrado extends HttpServlet {
 		}
 		try {
 			switch (nombreAccion) {
+				case ACCION_VALIDA:
+					validaUsuario(request, bean);
+					break;
 				case ACCION_MOSTRAR_CREAR:
 					mostrarCrear(bean);
 					break;
@@ -112,22 +116,22 @@ public class ControladorUsuarioAutoregistrado extends HttpServlet {
 		doGet(request, response);
 	}
 	
-//	private void validaUsuario(HttpServletRequest request, VistaUsuarioAutoregistrado bean) throws SQLException {
-//		String correo = Formateador.leeParametroString(request.getParameter(PARAM_CORREO));
-//		usuario = usuario.trim();
-//		String clave = Formateador.leeParametroString(request.getParameter(PARAM_CLAVE));
-//		ModeloUsuarioAutoregistrado modelo = new ModeloUsuarioAutoregistrado();
-//		if (modelo.validaClaveUsuario(usuario, clave)) {
-//	        HttpSession session = request.getSession(true);
-//			session.setAttribute("esValidaLaSesion", usuario);
-//			session.setAttribute(UVDatos.ID_USUARIO_SESION, usuario);
-//			
-//			// 20121009 - define el usuario que se ha logueado para que se registre el valor correcto.
-//			UVDatos uvdatos = (UVDatos) request.getAttribute(UVDatos.NOMBRE_ATRIBUTO);
-//			uvdatos.getAcceso().setUsuario(usuario);
-//			uvdatos.setIdentificadorUsuario(usuario);			
-//		}
-//	}
+	private void validaUsuario(HttpServletRequest request, VistaUsuarioAutoregistrado bean) throws SQLException {
+		String correo = Formateador.leeParametroString(request.getParameter(PARAM_CORREO));
+		correo = correo.trim();
+		String clave = Formateador.leeParametroString(request.getParameter(PARAM_CLAVE));
+		ModeloUsuarioAutoregistrado modelo = new ModeloUsuarioAutoregistrado();
+		if (modelo.validaClaveUsuario(correo, clave)) {
+	        HttpSession session = request.getSession(true);
+			session.setAttribute("esValidaLaSesion", correo);
+			session.setAttribute(UVDatos.ID_USUARIO_SESION, correo);
+			
+			// 20121009 - define el usuario que se ha logueado para que se registre el valor correcto.
+			UVDatos uvdatos = (UVDatos) request.getAttribute(UVDatos.NOMBRE_ATRIBUTO);
+			uvdatos.getAcceso().setUsuario(correo);
+			uvdatos.setIdentificadorUsuario(correo);			
+		}
+	}
 
 	private void mostrarCrear(VistaUsuarioAutoregistrado bean) {
 		bean.setVista("/WEB-INF/jsp/vista/operaciones/autoaprovisionado/crearUsuario.jsp");

@@ -108,11 +108,14 @@ public class Usuario implements Serializable {
 	 * @return email calculado
 	 */
 	public String getEmailCalculado() {
-		if ("estudiante.ujaen.es".equals(this.dominio)) {
-			return this.uid + "@red.ujaen.es";
-		} else {
-			return this.uid + "@" + dominio;
+		String salida = this.uid + "@" + dominio;
+		if ("autoregistrado.ujaen.es".equals(this.dominio)) {
+			salida = this.uid;
 		}
+		if ("estudiante.ujaen.es".equals(this.dominio)) {
+			salida = this.uid + "@red.ujaen.es";
+		} 
+		return salida;
 	}
 	
 	public String getUid() {

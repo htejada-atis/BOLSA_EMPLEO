@@ -9,6 +9,7 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.HashMap;
 
 import javax.mail.internet.AddressException;
 import javax.mail.internet.InternetAddress;
@@ -283,20 +284,60 @@ public class ModeloUsuarioAutoregistrado {
 		return salida;
 	}	
 	
-	/** Obtiene el usuario a partir del uid.
-	 * @param uid identificador del usuario
+	private Usuario listaDatosUsuario(String correo) throws SQLException {
+		String consulta = "select * "
+						+ "  from ARCOS.ARG_CUENTA c, arcos.arg_usuario u "
+						+ " where c.correo = ?"
+						+ "   and c.usuario = u.usuario ";
+		Usuario salida = null;
+		try (Connection conexion = ConexionArcos.obtenerInstancia();
+			PreparedStatement stmt = conexion.prepareStatement(consulta)) {
+			int parameterIndex = 1; 
+			stmt.setString(parameterIndex++, correo);
+			try (ResultSet rs = stmt.executeQuery()) {
+				while (rs.next()) {
+					salida = new Usuario();
+					salida.setUid(rs.getString("correo"));
+					salida.setCuentaInstitucional(false);
+					salida.setCuentaBloqueada(false);
+					salida.setDominio("autoregistrado.ujaen.es");
+					salida.setCuentaDN(null);
+					salida.setCodigoCuentaArcos(null);
+					salida.setCorreoRuta(null);
+					salida.setCuentaGoogle(false);
+					salida.setCuentaGoogleSuspendida(false);
+					salida.setNombre(rs.getString("nombre"));
+					salida.setApellido1(rs.getString("apellido1"));
+					salida.setApellido2(rs.getString("apellido2"));
+					salida.setDocumentoNumero(rs.getString("documento"));
+					salida.setDocumentoTipo(rs.getString("tipodocumento"));
+					salida.setCodigoPersonaArcos(null);
+					salida.setCodigoRRHH(null);
+					salida.setCodigoUXXIAC(null);
+					salida.setPersonaManual(false);
+					salida.setSexo(null);
+				}
+			}
+		}
+		if (salida == null) {
+			throw new SQLException("no existe cuenta del usuario" + correo);
+		}
+		return salida;
+	}	
+	
+	/** Obtiene el usuario a partir del correo autoregistrado.
+	 * @param correo correo del usuario autoregistrado
 	 * @return usuario usuario
+	 * @throws SQLException si fallo bd
 	 */
-	public Usuario cargaUsuarioExterno(String uid) {
-		Usuario usuario = new Usuario();
-		usuario.setApellido1(uid);
-		usuario.setApellido2(uid);
-		usuario.setDocumentoNumero(uid);
-		usuario.setDocumentoTipo(uid);
-		usuario.setNombre(uid);
-		usuario.setUid(uid);
+	public Usuario cargaUsuarioExterno(String correo) throws SQLException {
+		Usuario usuario = listaDatosUsuario(correo);
 		ArrayList<String> roles = new ArrayList<>();
-		roles.add("UsuarioNoVerificado");
+		roles.add("UsuarioAutoregistrado");
+		roles.add("publico");
+		HashMap<String, ArrayList<String>> rolesDominio = new HashMap<>();
+		rolesDominio.put(usuario.getDominio(), roles);
+		usuario.setRolesPorDominio(rolesDominio);
 		usuario.setRoles(roles);
 		return usuario;
 	}
