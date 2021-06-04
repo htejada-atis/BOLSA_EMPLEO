@@ -21,7 +21,7 @@ VistaSolicitudes bean = (VistaSolicitudes) uvdatos.getVistas().get(VistaSolicitu
 	<h2>Paso 2: Asignación de méritos a áreas</h2>
 	<h3><%= bean.getSolicitud().getConvocatoria().getDescripcion() %></h3>
 	
-	<p>Para cada área seleccione hasta un máximo de [<%= bean.getSolicitud().getConvocatoria().getNumMeritosPorBloque() %>] méritos por bloque</p>
+	<p>Para cada área seleccione hasta un máximo de [<%= bean.getSolicitud().getConvocatoria().getNumMeritosPorBloque() %>] méritos por bloque. Pinche sobre una área para asignar sus méritos.</p>
 	
 	<table class="bluetable bolsaempleo" id="tableAreas">
 		<tr>
@@ -37,6 +37,15 @@ VistaSolicitudes bean = (VistaSolicitudes) uvdatos.getVistas().get(VistaSolicitu
 			</tr>
 		</tfoot>
 	</table>
+	
+	<div class="btns-by-steps">
+		<button class="link-btn" id="paso2_volver">
+	    	 Volver
+	    </button>
+	    <button class="link-btn" id="paso2_siguiente">
+	    	 Ir a 'Confirmar Solicitud'
+	    </button>
+	</div>
 	
 	<table class="bluetable bolsaempleo" id="tableMeritos" style="visibility: collapse">
 		<tr>
@@ -56,15 +65,6 @@ VistaSolicitudes bean = (VistaSolicitudes) uvdatos.getVistas().get(VistaSolicitu
 			</tr>
 		</tfoot>
 	</table>	
-	
-	<div class="btns-by-steps">
-		<button class="link-btn" id="paso2_volver">
-	    	 Volver
-	    </button>
-	    <button class="link-btn" id="paso2_siguiente">
-	    	 Ir a 'Confirmar Solicitud'
-	    </button>
-	</div>
 </div>
 
 <script>

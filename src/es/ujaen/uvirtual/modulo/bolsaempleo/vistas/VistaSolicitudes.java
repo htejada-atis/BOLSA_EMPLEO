@@ -26,8 +26,9 @@ public class VistaSolicitudes extends Vista implements Serializable {
 	private static final long serialVersionUID = 1L;
 	private transient BolsaEmpleoDataTable<Solicitud> dataTable;
 	private transient BolsaEmpleoDataTable<Bolsa> dataTableAreas;
-	private transient BolsaEmpleoDataTable<BolsaSolicitudTable> dataTableBolsasSolicitud;
+	private transient BolsaEmpleoDataTable<BolsaSolicitudTable> dataTableBolsasSolicitud;	
 	private transient BolsaEmpleoDataTable<BolsaCandidato> dataTableBolsasCandidato;
+	private transient BolsaEmpleoDataTable<Bolsa> dataTableBolsasCandidatoSeleccionadas;
 	private transient BolsaEmpleoDataTable<MeritoSolicitudTable> dataTableMeritos;
 	private List<Bolsa> listaBolsas;
 	private List<BolsaSolicitudTable> listaTablaBolsasSolicitud;
@@ -92,6 +93,14 @@ public class VistaSolicitudes extends Vista implements Serializable {
 
 	public BolsaEmpleoDataTable<MeritoSolicitudTable> getDataTableMeritos() {
 		return dataTableMeritos;
+	}
+	
+	public void setDataTableBolsasCandidatoSeleccionadas(BolsaEmpleoDataTable<Bolsa> dt) {
+		this.dataTableBolsasCandidatoSeleccionadas = dt;
+	}
+
+	public BolsaEmpleoDataTable<Bolsa> getDataTableBolsasCandidatoSeleccionadas() {
+		return dataTableBolsasCandidatoSeleccionadas;
 	}
 
 	public void setDataTableMeritos(BolsaEmpleoDataTable<MeritoSolicitudTable> dataTable2) {
