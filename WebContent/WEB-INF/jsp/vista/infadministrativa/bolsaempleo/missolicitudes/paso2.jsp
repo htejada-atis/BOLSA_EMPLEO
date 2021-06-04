@@ -344,7 +344,7 @@ VistaSolicitudes bean = (VistaSolicitudes) uvdatos.getVistas().get(VistaSolicitu
 			});
 			
 			document.getElementById("tableMeritos").style.visibility = "visible";
-			window.scrollTo(0,document.body.scrollHeight);
+			Atis.smoothScrollToAnchor("#tableMeritos");
 		<% } %>
 		
 		document.getElementById("paso2_volver").addEventListener("click", function(event) {
