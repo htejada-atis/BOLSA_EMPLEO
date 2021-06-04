@@ -1,5 +1,7 @@
 create sequence sec_arg_usuario start with 1 increment by 1; 
 --/////////////////////
+create sequence sec_arg_cambio_hto start with 1 increment by 1; 
+--/////////////////////
 CREATE TABLE ARCOS.ARG_USUARIO (	
 	USUARIO VARCHAR2(100) NOT NULL, 
 	NOMBRE VARCHAR2(100 BYTE) NOT NULL, 
@@ -7,9 +9,7 @@ CREATE TABLE ARCOS.ARG_USUARIO (
 	APELLIDO2 VARCHAR2(100 BYTE) DEFAULT NULL,  
 	DOCUMENTO VARCHAR2(100 BYTE) NOT NULL,
 	TIPODOCUMENTO VARCHAR2(6 BYTE) NOT NULL,
-	SEXO VARCHAR2(1) NOT NULL,
 	CONSTRAINT CH_ARG_TIPODOCUMENTO CHECK (TIPODOCUMENTO in('NIF','PAS','NIE')), 
-	CONSTRAINT CH_ARG_SEXO CHECK (SEXO in('H','M','N')),
 	CONSTRAINT pk_arg_usuario PRIMARY KEY (USUARIO)
 );
 --/////////////////////
@@ -26,8 +26,6 @@ COMMENT ON COLUMN ARCOS.ARG_USUARIO.APELLIDO2 IS 'Segundo apellido del usuario';
 COMMENT ON COLUMN ARCOS.ARG_USUARIO.DOCUMENTO IS 'Documento identificativo del usuario';
 --/////////////////////
 COMMENT ON COLUMN ARCOS.ARG_USUARIO.TIPODOCUMENTO IS 'Tipo de Documento identificativo del usuario (NIF, PAS, NIE)';
---/////////////////////
-COMMENT ON COLUMN ARCOS.ARG_USUARIO.SEXO IS 'Sexo del usuario H-Hombre, M-Mujer, N-No informado';
 --/////////////////////
 
 CREATE TABLE ARCOS.ARG_CUENTA (
@@ -49,7 +47,6 @@ COMMENT ON COLUMN ARCOS.ARG_CUENTA.CLAVE IS 'Clave de la cuenta';
 --/////////////////////
 COMMENT ON COLUMN ARCOS.ARG_CUENTA.FECHA_CREACION IS 'Fecha de creación de la cuenta';
 --/////////////////////
-
 CREATE TABLE ARCOS.ARG_PETICION_CAMBIO_CLAVE (
 	CORREO VARCHAR2(200) NOT NULL,
 	CODIGO_TEMPORAL VARCHAR2(100) NOT NULL,
@@ -78,3 +75,54 @@ COMMENT ON COLUMN ARCOS.ARG_PETICION_CAMBIO_CLAVE.IP_SOLICITUD IS 'ip desde que 
 COMMENT ON COLUMN ARCOS.ARG_PETICION_CAMBIO_CLAVE.IP_VERIFICACION IS 'ip desde la que se ha verificado';
 --/////////////////////
 COMMENT ON COLUMN ARCOS.ARG_PETICION_CAMBIO_CLAVE.IDENTIFICADOR IS 'Identificador aleatorio para referencial al cambio de clave';
+--/////////////////////
+CREATE TABLE ARCOS.ARG_HTO_CAMBIOS (
+	CODCAMBIO NUMBER,
+	DATCAMBIO DATE NOT NULL,
+	USUARIO VARCHAR2(100) NOT NULL, 
+	CORREO VARCHAR2(200), 
+	ATRIBUTO VARCHAR2(100) NOT NULL, 
+	OPERACION VARCHAR2(1) NOT NULL,
+	VALORANTERIOR VARCHAR2(200),
+	VALORNUEVO VARCHAR2(200),
+	CONSTRAINT pk_arg_hto_cambio PRIMARY KEY (CODCAMBIO)
+);
+--/////////////////////
+COMMENT ON TABLE ARCOS.ARG_HTO_CAMBIOS IS 'Tabla para el histtorico de cambios de las cuentas y usuarios';
+--/////////////////////
+COMMENT ON COLUMN ARCOS.ARG_HTO_CAMBIOS.CODCAMBIO IS 'Codigo de cambio';
+--/////////////////////
+COMMENT ON COLUMN ARCOS.ARG_HTO_CAMBIOS.DATCAMBIO IS 'Fecha en que se realiza el cambio';
+--/////////////////////
+COMMENT ON COLUMN ARCOS.ARG_HTO_CAMBIOS.USUARIO IS 'Usuario asociado al cambio';
+--/////////////////////
+COMMENT ON COLUMN ARCOS.ARG_HTO_CAMBIOS.CORREO IS 'Correo asociado al cambio';
+--/////////////////////
+COMMENT ON COLUMN ARCOS.ARG_HTO_CAMBIOS.ATRIBUTO IS 'Atributo que cambia';
+--/////////////////////
+COMMENT ON COLUMN ARCOS.ARG_HTO_CAMBIOS.OPERACION IS 'operacion que se ha realizado (A-Alta, C-Cambio, B-Baja)';
+--/////////////////////
+COMMENT ON COLUMN ARCOS.ARG_HTO_CAMBIOS.VALORANTERIOR IS 'Valor que tenía antes de realizar el cambio';
+--/////////////////////
+COMMENT ON COLUMN ARCOS.ARG_HTO_CAMBIOS.VALORNUEVO IS 'Valor que tiene despues de realizar el cambio';
+--/////////////////////
+CREATE TABLE ARCOS.ARG_CONFIGURACION (
+	SERVIDOR VARCHAR2(100) NOT NULL, 
+	USERADMINPASS VARCHAR2(200) NOT NULL, 
+	ESTADO VARCHAR2(100) NOT NULL, 
+	ULTIMO_CAMBIO NUMBER,
+	FECHA_ULT_CAMBIO DATE,
+	CONSTRAINT pk_arg_configuracion PRIMARY KEY (servidor)
+);
+--/////////////////////
+COMMENT ON TABLE ARCOS.ARG_CONFIGURACION IS 'Configuracion de los servidores ldap que almacenan la información';
+--/////////////////////
+COMMENT ON COLUMN ARCOS.ARG_CONFIGURACION.SERVIDOR IS 'direccion del servidor';
+--/////////////////////
+COMMENT ON COLUMN ARCOS.ARG_CONFIGURACION.USERADMINPASS IS 'Clave del servidor';
+--/////////////////////
+COMMENT ON COLUMN ARCOS.ARG_CONFIGURACION.ESTADO IS 'Estado del servidor';
+--/////////////////////
+COMMENT ON COLUMN ARCOS.ARG_CONFIGURACION.ULTIMO_CAMBIO IS 'ultimo cambio realizado en el servidor';
+--/////////////////////
+COMMENT ON COLUMN ARCOS.ARG_CONFIGURACION.FECHA_ULT_CAMBIO IS 'Fecha del ultimo cambio realizado en el servidor';

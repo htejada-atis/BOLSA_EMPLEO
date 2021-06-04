@@ -40,22 +40,22 @@ public class TestBEPControladorAreasABaremar {
      * @throws SQLException si error en bd
      * @throws IOException si error en ficheros
      */
-    @BeforeClass
-    public static void preparaBd() throws IOException, SQLException {
-    	BbddRunner.conectarBd();
-    	UtilsTestBolsaEmpleo.inicializaBolsaEmpleo();
-    }
+	@BeforeClass
+	public static void preparaBd() throws IOException, SQLException {
+		BbddRunner.conectarBd();
+		UtilsTestBolsaEmpleo.inicializaBolsaEmpleo();
+	}
     
-    // método para obtener la vista con una lista de áreas .
-    private VistaAreasBaremar obtenerAreas() throws ServletException, IOException {
-    	PeticionHttp peticion = UtilsTestBolsaEmpleo.peticionAutenticadaCandidato();
+	// método para obtener la vista con una lista de áreas .
+	private VistaAreasBaremar obtenerAreas() throws ServletException, IOException {
+		PeticionHttp peticion = UtilsTestBolsaEmpleo.peticionAutenticadaCandidato();
 		peticion.setParameter(ControladorAreasABaremar.PARAM_ACCION, ControladorAreasABaremar.ACCION_DATATABLE);
 
 		RespuestaHttp respuesta = new RespuestaHttp();
 		ControladorAreasABaremar controlador = new ControladorAreasABaremar();
 		controlador.doPost(peticion, respuesta);
 		return (VistaAreasBaremar) peticion.getUVDatos().getVistas().get(VistaAreasBaremar.class.getName());
-    }
+	}
     
     /** Obtener áreas, sin parametro definido .
 	 * @throws SQLException si fallo bd .
@@ -210,7 +210,7 @@ public class TestBEPControladorAreasABaremar {
 	 * @throws IOException .
 	 */
 	@Test
-	public void testE01ObtenerAreasParametroNoValido() throws SQLException, ServletException, IOException {
+	public void testE01ObtenerAreasParametroNoValido() throws ServletException, IOException {
 		PeticionHttp peticion = UtilsTestBolsaEmpleo.peticionAutenticadaCandidato();
 		peticion.setParameter(ControladorAreasABaremar.PARAM_ACCION, ControladorAreasABaremar.ACCION_DATATABLE);
 		peticion.setParameter(BolsaEmpleoDataTable.PARAM_ORDER_BY, "9");
@@ -231,7 +231,7 @@ public class TestBEPControladorAreasABaremar {
 	 * @throws IOException .
 	 */
 	@Test
-	public void testE02ObtenerAreasExcluidasUsuarioParametroNoValido() throws SQLException, ServletException, IOException {
+	public void testE02ObtenerAreasExcluidasUsuarioParametroNoValido() throws ServletException, IOException {
 		PeticionHttp peticion = UtilsTestBolsaEmpleo.peticionAutenticadaCandidato();
 		peticion.setParameter(ControladorAreasABaremar.PARAM_ACCION, ControladorAreasABaremar.ACCION_DATATABLE_EXCLUIDOS);
 		peticion.setParameter(ControladorAreasABaremar.PARAM_ID, "1");

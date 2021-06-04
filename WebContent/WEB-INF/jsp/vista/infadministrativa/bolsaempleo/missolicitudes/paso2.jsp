@@ -21,7 +21,7 @@ VistaSolicitudes bean = (VistaSolicitudes) uvdatos.getVistas().get(VistaSolicitu
 	<h2>Paso 2: Asignación de méritos a áreas</h2>
 	<h3><%= bean.getSolicitud().getConvocatoria().getDescripcion() %></h3>
 	
-	<p>Para cada área seleccione hasta un máximo de [<%= bean.getSolicitud().getConvocatoria().getNumMeritosPorBloque() %>] méritos por bloque</p>
+	<p>Para cada área seleccione hasta un máximo de [<%= bean.getSolicitud().getConvocatoria().getNumMeritosPorBloque() %>] méritos por bloque. Pinche sobre una área para asignar sus méritos.</p>
 	
 	<table class="bluetable bolsaempleo" id="tableAreas">
 		<tr>
@@ -37,6 +37,15 @@ VistaSolicitudes bean = (VistaSolicitudes) uvdatos.getVistas().get(VistaSolicitu
 			</tr>
 		</tfoot>
 	</table>
+	
+	<div class="btns-by-steps">
+		<button class="link-btn" id="paso2_volver">
+	    	 Volver
+	    </button>
+	    <button class="link-btn" id="paso2_siguiente">
+	    	 Ir a 'Confirmar Solicitud'
+	    </button>
+	</div>
 	
 	<table class="bluetable bolsaempleo" id="tableMeritos" style="visibility: collapse">
 		<tr>
@@ -56,15 +65,6 @@ VistaSolicitudes bean = (VistaSolicitudes) uvdatos.getVistas().get(VistaSolicitu
 			</tr>
 		</tfoot>
 	</table>	
-	
-	<div class="btns-by-steps">
-		<button class="link-btn" id="paso2_volver">
-	    	 Volver
-	    </button>
-	    <button class="link-btn" id="paso2_siguiente">
-	    	 Ir a 'Confirmar Solicitud'
-	    </button>
-	</div>
 </div>
 
 <script>
@@ -262,7 +262,7 @@ VistaSolicitudes bean = (VistaSolicitudes) uvdatos.getVistas().get(VistaSolicitu
         		Atis.sendForm("<%=request.getRequestURI()%>", params);
 		    }},
 		    "selected": <%=bean.getArea() != null ? bean.getArea().getCodNum() : "null"%>,		    
-		    "title": 'Mis áreas para esta convocatoria',
+		    "title": 'MIS ÁREAS PARA ESTA CONVOCATORIA',
 		    "action": '<%=ControladorMisSolicitudes.ACCION_DATATABLE_BOLSAS_SELECCIONADAS%>',
 		    "params": {'<%=ControladorMisSolicitudes.PARAM_SOLICITUD_ID%>': <%=bean.getSolicitud().getCodNum()%>},
 		    "columns": [
@@ -287,7 +287,7 @@ VistaSolicitudes bean = (VistaSolicitudes) uvdatos.getVistas().get(VistaSolicitu
 			    "pageSize": 10,
 			    "selectable": {'all': false},
 			    "filterable": true,
-			    "title": 'Mis méritos: <%=bean.getArea().getArea().getDescripcion()%>',
+			    "title": 'MIS MÉRITOS: <%=bean.getArea().getArea().getDescripcion()%>',
 			    "selected": meritosBolsaSolicitud,
 			    "defaultOrderBy": 1,
 			    "action": "<%=ControladorMisSolicitudes.ACCION_DATATABLE_MERITOS_BOLSA%>",
@@ -344,7 +344,7 @@ VistaSolicitudes bean = (VistaSolicitudes) uvdatos.getVistas().get(VistaSolicitu
 			});
 			
 			document.getElementById("tableMeritos").style.visibility = "visible";
-			window.scrollTo(0,document.body.scrollHeight);
+			Atis.smoothScrollToAnchor("#tableMeritos");
 		<% } %>
 		
 		document.getElementById("paso2_volver").addEventListener("click", function(event) {

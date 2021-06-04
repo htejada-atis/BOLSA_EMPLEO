@@ -26,7 +26,9 @@ public class Conexion {
     /**
      * Constructor privado de modo que no se pueden crear clases del objeto. 
      */
-    protected Conexion() { }
+    protected Conexion() { 
+    	// no se puede crear directamente una conexion, hay que crear clases hijas
+    }
     
     /**
      * Establece la conexión con la base de datos.

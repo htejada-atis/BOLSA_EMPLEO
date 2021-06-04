@@ -398,7 +398,6 @@ public class ControladorMisMeritos extends HttpServlet {
 		String valorStr = request.getParameter(PARAM_VALOR);
 		switch (merito.getItemBaremacion().getUnidades()) {
 			case ModeloBaremacionItems.ITEM_UNIDADES_MEDICION_SINO:
-				merito.setValor((float) 1);
 				break;
 			case ModeloBaremacionItems.ITEM_UNIDADES_MEDICION_ENTERO:
 				if (!BolsaEmpleoUtils.isInteger(valorStr)) {
@@ -415,7 +414,9 @@ public class ControladorMisMeritos extends HttpServlet {
 		}
 		
 		// chequeo máximo y mínimo
-		Float valor = BolsaEmpleoUtils.leeParametroFloat(valorStr);
+		Float valor = merito.getItemBaremacion().getUnidades().equals(ModeloBaremacionItems.ITEM_UNIDADES_MEDICION_SINO) 
+				? BolsaEmpleoUtils.leeParametroFloat("1.0") : BolsaEmpleoUtils.leeParametroFloat(valorStr);
+		
 		if (valor == null) {
 			throw new UVException("El valor no es válido");
 		}
@@ -425,6 +426,7 @@ public class ControladorMisMeritos extends HttpServlet {
 		if (valor > merito.getItemBaremacion().getValorMaximo()) {
 			throw new UVException(String.format(MENSAJE_ERROR_VALOR_MAXIMO_PERMITIDO, merito.getItemBaremacion().getValorMaximo().toString()));
 		}
+		
 		merito.setValor(valor);
 		
 		return merito.getValor();

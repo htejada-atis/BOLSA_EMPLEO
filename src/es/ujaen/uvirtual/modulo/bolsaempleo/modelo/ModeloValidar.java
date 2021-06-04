@@ -7,7 +7,6 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import es.ujaen.uvirtual.modelo.conexion.ConexionArcos;
 import es.ujaen.uvirtual.modelo.conexion.ConexionUvirtual;
 import es.ujaen.uvirtual.modulo.bolsaempleo.beans.Bolsa;
 import es.ujaen.uvirtual.modulo.bolsaempleo.beans.BolsaCandidatoValidacionTable;
@@ -19,6 +18,7 @@ import es.ujaen.uvirtual.modulo.bolsaempleo.beans.MeritoSolicitud;
 import es.ujaen.uvirtual.modulo.bolsaempleo.beans.MeritoSolicitudValoracion;
 import es.ujaen.uvirtual.modulo.bolsaempleo.beans.MeritoValidarTable;
 import es.ujaen.uvirtual.modulo.bolsaempleo.beans.UsuarioBolsaEmpleo;
+import es.ujaen.uvirtual.modulo.bolsaempleo.beans.UsuarioBolsaEmpleoVuja;
 import es.ujaen.uvirtual.modulo.bolsaempleo.beans.ValorMeritoBolsaTable;
 import es.ujaen.uvirtual.modulo.bolsaempleo.utilidades.BolsaEmpleoDataTable;
 import es.ujaen.uvirtual.modulo.bolsaempleo.utilidades.BolsaEmpleoDataTable.DataTableColumn;
@@ -53,7 +53,7 @@ public class ModeloValidar {
 	
 	private static final int TOTAL_COUNT_SUBQUERIES = 4;
 
-	protected static ModeloValidar eInstancia = null;
+	protected static ModeloValidar eInstancia;
 
 	/**
 	 * Crea una instancia del objeto. de forma sincronizada para protegerse de
@@ -167,37 +167,37 @@ public class ModeloValidar {
 				+ (comision ? " AND bepeva.BEPUSU_CODNUM = ?" : "");
 		
 		try (Connection conexion = ConexionUvirtual.obtenerInstancia();
-			PreparedStatement stmt = conexion.prepareStatement(consulta);) {
-				int paramIndex = 1;
-				stmt.setInt(paramIndex++, merito.getMerito().getCodNum());
-				stmt.setInt(paramIndex++, convocatoria.getCodNum());
-				stmt.setInt(paramIndex++, candidato.getCodNum());
-				
-				if (comision) {
-					stmt.setInt(paramIndex++, usuario.getCodNum());
-				}
-	
-				try (ResultSet rs = stmt.executeQuery()) {
-					while (rs.next()) {
-						Bolsa bol = modeloBolsa.createFromResultSet(rs);
-						int idMeritoSolicitud = rs.getInt("BEPSBM_CODNUM");
-						MeritoSolicitud ms = new MeritoSolicitud();
-						ms.setMerito(merito.getMerito());
-						ms.setValoraciones(merito.getValoraciones());
-						ms.setExcluido(false);
-						ms.setValidado(false);
-						List<MeritoSolicitudValoracion> valoraciones = new ArrayList<>();
-						
-						if (idMeritoSolicitud != 0) {
-							ms = modeloSolicitud.getMeritoSolicitudById(idMeritoSolicitud);
-							valoraciones = modeloSolicitud.getValoracionesMeritoSolicitud(idMeritoSolicitud, false);
-							ms.setValoraciones(valoraciones);
-						}
-						
-						bolsas.add(new ValorMeritoBolsaTable(ms, bol));
+				PreparedStatement stmt = conexion.prepareStatement(consulta)) {
+			int paramIndex = 1;
+			stmt.setInt(paramIndex++, merito.getMerito().getCodNum());
+			stmt.setInt(paramIndex++, convocatoria.getCodNum());
+			stmt.setInt(paramIndex++, candidato.getCodNum());
+
+			if (comision) {
+				stmt.setInt(paramIndex++, usuario.getCodNum());
+			}
+
+			try (ResultSet rs = stmt.executeQuery()) {
+				while (rs.next()) {
+					Bolsa bol = modeloBolsa.createFromResultSet(rs);
+					int idMeritoSolicitud = rs.getInt("BEPSBM_CODNUM");
+					MeritoSolicitud ms = new MeritoSolicitud();
+					ms.setMerito(merito.getMerito());
+					ms.setValoraciones(merito.getValoraciones());
+					ms.setExcluido(false);
+					ms.setValidado(false);
+					List<MeritoSolicitudValoracion> valoraciones = new ArrayList<>();
+
+					if (idMeritoSolicitud != 0) {
+						ms = modeloSolicitud.getMeritoSolicitudById(idMeritoSolicitud);
+						valoraciones = modeloSolicitud.getValoracionesMeritoSolicitud(idMeritoSolicitud, false);
+						ms.setValoraciones(valoraciones);
 					}
+
+					bolsas.add(new ValorMeritoBolsaTable(ms, bol));
 				}
 			}
+		}
 		return bolsas;
 	}
 	
@@ -212,7 +212,7 @@ public class ModeloValidar {
 	public BolsaEmpleoDataTable<BolsaValidacion> listadoAreasNoSujetasAfinidad(Convocatoria convocatoria, Map<String, String[]> params) 
 			throws SQLException, UVException {
 		List<BolsaValidacion> rows = new ArrayList<>();
-		BolsaEmpleoDataTable<BolsaValidacion> dataTable = new BolsaEmpleoDataTable<BolsaValidacion>(params);
+		BolsaEmpleoDataTable<BolsaValidacion> dataTable = new BolsaEmpleoDataTable<>(params);
 
 		if (convocatoria == null) {
 			dataTable.setData(rows);
@@ -251,7 +251,7 @@ public class ModeloValidar {
 		
 		try (Connection conexion = ConexionUvirtual.obtenerInstancia();
 				PreparedStatement stmtCount = conexion.prepareStatement(dataTable.getQueryCount());
-				PreparedStatement stmt = conexion.prepareStatement(dataTable.getQuery());) {
+				PreparedStatement stmt = conexion.prepareStatement(dataTable.getQuery())) {
 			int paramIndex = 1;
 			
 			// bucle para rellenar los parámetros de las 4 subconsultas
@@ -332,7 +332,7 @@ public class ModeloValidar {
 		
 		try (Connection conexion = ConexionUvirtual.obtenerInstancia();
 				PreparedStatement stmtCount = conexion.prepareStatement(dataTable.getQueryCount());
-				PreparedStatement stmt = conexion.prepareStatement(dataTable.getQuery());) {
+				PreparedStatement stmt = conexion.prepareStatement(dataTable.getQuery())) {
 			int paramIndex = 1;
 			
 			// bucle para rellenar los parámetros de las 4 subconsultas
@@ -374,9 +374,8 @@ public class ModeloValidar {
 	public BolsaEmpleoDataTable<BolsaCandidatoValidacionTable> listadoAreasCandidatoNoSujetasAfinidad(Convocatoria convocatoria, UsuarioBolsaEmpleo candidato, Merito merito,  
 			Map<String, String[]> params) throws SQLException, UVException {
 		List<BolsaCandidatoValidacionTable> rows = new ArrayList<>();
-		BolsaEmpleoDataTable<BolsaCandidatoValidacionTable> dataTable = new BolsaEmpleoDataTable<BolsaCandidatoValidacionTable>(params);
-		ModeloBolsa modeloBolsa = ModeloBolsa.obtenerInstancia();
-
+		BolsaEmpleoDataTable<BolsaCandidatoValidacionTable> dataTable = new BolsaEmpleoDataTable<>(params);
+		
 		if (convocatoria == null) {
 			dataTable.setData(rows);
 			return dataTable;
@@ -399,9 +398,11 @@ public class ModeloValidar {
 
 		dataTable.setQuery(consulta);
 		
+		ModeloBolsa modeloBolsa = ModeloBolsa.obtenerInstancia();
+		
 		try (Connection conexion = ConexionUvirtual.obtenerInstancia();
 				PreparedStatement stmtCount = conexion.prepareStatement(dataTable.getQueryCount());
-				PreparedStatement stmt = conexion.prepareStatement(dataTable.getQuery());) {
+				PreparedStatement stmt = conexion.prepareStatement(dataTable.getQuery())) {
 			int paramIndex = 1;
 			stmt.setInt(paramIndex, merito.getCodNum());
 			stmtCount.setInt(paramIndex++, merito.getCodNum());
@@ -440,7 +441,7 @@ public class ModeloValidar {
 	private BolsaEmpleoDataTable<CandidatoValidacion> listadoCandidatos(Convocatoria convocatoria, Bolsa bolsa, Map<String, String[]> params, boolean afinidad) 
 			throws SQLException, UVException {
 		List<CandidatoValidacion> rows = new ArrayList<>();
-		BolsaEmpleoDataTable<CandidatoValidacion> dataTable = new BolsaEmpleoDataTable<CandidatoValidacion>(params);
+		BolsaEmpleoDataTable<CandidatoValidacion> dataTable = new BolsaEmpleoDataTable<>(params);
 
 		if (convocatoria == null || bolsa == null) {
 			dataTable.setData(rows);
@@ -484,7 +485,7 @@ public class ModeloValidar {
 		
 		try (Connection conexion = ConexionUvirtual.obtenerInstancia();
 				PreparedStatement stmtCount = conexion.prepareStatement(dataTable.getQueryCount());
-				PreparedStatement stmt = conexion.prepareStatement(dataTable.getQuery());) {
+				PreparedStatement stmt = conexion.prepareStatement(dataTable.getQuery())) {
 			int paramIndex = 1;
 			
 			// bucle para rellenar los parámetros de las 4 subconsultas
@@ -501,19 +502,12 @@ public class ModeloValidar {
 			dataTable.setFiltersParams(stmt, stmtCount, paramIndex);
 
 			try (ResultSet rs = stmt.executeQuery()) {
+				ModeloUsuarioBolsaEmpleo modeloUsuario = ModeloUsuarioBolsaEmpleo.obtenerInstancia(); 
+				
 				while (rs.next()) {
-					String consultaArcos = "SELECT * FROM arcos.VUJA_NET_BEP_AR_PERSONA WHERE PRSNIF = ?";
-					
-					 try (Connection conexionArcos = ConexionArcos.obtenerInstancia();
-				    	PreparedStatement stmtArcos = conexionArcos.prepareStatement(consultaArcos);) {
-				    	stmtArcos.setString(1, rs.getString("PRSNIF"));
-				    	try (ResultSet rsArcos = stmtArcos.executeQuery();) {
-					    	while (rsArcos.next()) {
-								CandidatoValidacion candidato = createCandidatoValidacionFromResultSet(rs, rsArcos);
-								rows.add(candidato);
-					    	}
-				    	}
-				    }
+					String documento = rs.getString("PRSNIF");
+					CandidatoValidacion candidato = createCandidatoValidacionFromResultSet(rs, modeloUsuario.getResultSetPersonaArcosByPrsnif(documento));
+					rows.add(candidato);
 				}
 			}
 
@@ -538,9 +532,8 @@ public class ModeloValidar {
 	private BolsaEmpleoDataTable<MeritoValidarTable> listadoMeritos(Convocatoria convocatoria, Bolsa bolsa, UsuarioBolsaEmpleo candidato,
 			Map<String, String[]> params, boolean afinidad) throws SQLException, UVException {
 		List<MeritoValidarTable> rows = new ArrayList<>();
-		BolsaEmpleoDataTable<MeritoValidarTable> dataTable = new BolsaEmpleoDataTable<MeritoValidarTable>(params);
-		ModeloMerito modeloMerito = ModeloMerito.obtenerInstancia();
-		
+		BolsaEmpleoDataTable<MeritoValidarTable> dataTable = new BolsaEmpleoDataTable<>(params);
+				
 		if (convocatoria == null || bolsa == null || candidato == null) {
 			dataTable.setData(rows);
 			return dataTable;
@@ -564,9 +557,11 @@ public class ModeloValidar {
 		
 		dataTable.setQuery(consulta);
 		
+		ModeloMerito modeloMerito = ModeloMerito.obtenerInstancia();
+		
 		try (Connection conexion = ConexionUvirtual.obtenerInstancia();
 				PreparedStatement stmtCount = conexion.prepareStatement(dataTable.getQueryCount());
-				PreparedStatement stmt = conexion.prepareStatement(dataTable.getQuery());) {
+				PreparedStatement stmt = conexion.prepareStatement(dataTable.getQuery())) {
 			int paramIndex = 1;
 			
 			stmt.setInt(paramIndex, bolsa.getCodNum());
@@ -606,10 +601,8 @@ public class ModeloValidar {
 	public BolsaEmpleoDataTable<ValorMeritoBolsaTable> listadoValoresMeritoBolsa(Convocatoria convocatoria, UsuarioBolsaEmpleo candidato, Merito merito, 
 			Map<String, String[]> params) throws SQLException, UVException {
 		List<ValorMeritoBolsaTable> rows = new ArrayList<>();
-		BolsaEmpleoDataTable<ValorMeritoBolsaTable> dataTable = new BolsaEmpleoDataTable<ValorMeritoBolsaTable>(params);
-		ModeloBolsa modeloBolsa = ModeloBolsa.obtenerInstancia();
-		ModeloSolicitud modeloSolicitud = ModeloSolicitud.obtenerInstancia();
-		
+		BolsaEmpleoDataTable<ValorMeritoBolsaTable> dataTable = new BolsaEmpleoDataTable<>(params);
+						
 		if (convocatoria == null || merito == null || candidato == null) {
 			dataTable.setData(rows);
 			return dataTable;
@@ -628,7 +621,7 @@ public class ModeloValidar {
 		
 		try (Connection conexion = ConexionUvirtual.obtenerInstancia();
 				PreparedStatement stmtCount = conexion.prepareStatement(dataTable.getQueryCount());
-				PreparedStatement stmt = conexion.prepareStatement(dataTable.getQuery());) {
+				PreparedStatement stmt = conexion.prepareStatement(dataTable.getQuery())) {
 			int paramIndex = 1;
 			stmt.setInt(paramIndex, merito.getCodNum());
 			stmtCount.setInt(paramIndex++, merito.getCodNum());
@@ -638,6 +631,9 @@ public class ModeloValidar {
 			stmtCount.setInt(paramIndex++, candidato.getCodNum());
 
 			dataTable.setFiltersParams(stmt, stmtCount, paramIndex);
+			
+			ModeloBolsa modeloBolsa = ModeloBolsa.obtenerInstancia();
+			ModeloSolicitud modeloSolicitud = ModeloSolicitud.obtenerInstancia();
 
 			try (ResultSet rs = stmt.executeQuery()) {
 				while (rs.next()) {
@@ -748,13 +744,13 @@ public class ModeloValidar {
 	 * @throws UVException .
 	 * @throws SQLException .
 	 */
-	private CandidatoValidacion createCandidatoValidacionFromResultSet(ResultSet rs, ResultSet rsArcos) throws SQLException, UVException {
+	private CandidatoValidacion createCandidatoValidacionFromResultSet(ResultSet rs, UsuarioBolsaEmpleoVuja rsArcos) throws SQLException {
 		UsuarioBolsaEmpleo usuario = new UsuarioBolsaEmpleo();
-		usuario.setTipoDocumento(rsArcos.getString("STRTIPODOCUMENTO"));
-		usuario.setNumDocumento(rsArcos.getString("PRSNIF"));
-		usuario.setNombre(rsArcos.getString("STRNOMBRE"));
-		usuario.setPrimerApellido(rsArcos.getString("STRAPELLIDO1"));
-		usuario.setSegundoApellido(rsArcos.getString("STRAPELLIDO2"));
+		usuario.setTipoDocumento(rsArcos.getStrTipoDocumento());
+		usuario.setNumDocumento(rsArcos.getPrsNif());
+		usuario.setNombre(rsArcos.getStrNombre());
+		usuario.setPrimerApellido(rsArcos.getStrApellido1());
+		usuario.setSegundoApellido(rsArcos.getStrApellido2());
 		usuario.setCodNum(rs.getInt("CODNUM"));
 		
 		CandidatoValidacion candidato = new CandidatoValidacion(usuario);

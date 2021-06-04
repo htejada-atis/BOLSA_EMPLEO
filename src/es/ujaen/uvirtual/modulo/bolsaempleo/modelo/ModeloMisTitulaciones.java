@@ -117,12 +117,12 @@ public class ModeloMisTitulaciones {
 		List<Titulacion> titulaciones = new ArrayList<>();
 		BolsaEmpleoDataTable<Titulacion> dataTable = new BolsaEmpleoDataTable<>(params);
 		
-		String consulta = "SELECT beptit.*, beptus.*"
-				+ "FROM tbep_titulaciones beptit "
-				+ "LEFT JOIN tbep_titulaciones_usuario beptus "
-				+ "ON beptit.CODNUM = beptus.BEPTUS_TIT_CODNUM AND beptus.BEPTUS_USU_CODNUM = ? "
-				+ "AND beptus.FLGBORRADO != 'S' "
-				+ "WHERE beptit.FLGBORRADO != 'S' AND beptus.BEPTUS_USU_CODNUM IS NULL";
+		String consulta = ""
+				+ " SELECT beptit.CODNUM, beptit.NOMBRE "
+				+ " FROM TBEP_TITULACIONES beptit "
+				+ " LEFT JOIN TBEP_TITULACIONES_USUARIO beptus "
+				+ "		ON beptit.CODNUM = beptus.BEPTUS_TIT_CODNUM AND beptus.BEPTUS_USU_CODNUM = ? AND beptus.FLGBORRADO != 'S' "
+				+ "	WHERE beptit.FLGBORRADO != 'S' AND beptus.BEPTUS_USU_CODNUM IS NULL ";
 		
 		dataTable.setColumn(ORDER_COLUMN_INDEX_NOMBRE, "beptit.NOMBRE");
 		dataTable.setQuery(consulta);
@@ -174,9 +174,9 @@ public class ModeloMisTitulaciones {
 				+ "left JOIN tbep_titulaciones beptit ON beptit.codnum=beptus.beptus_tit_codnum "
 				+ "WHERE beptus.BEPTUS_USU_CODNUM = ? AND beptus.FLGBORRADO != 'S'";
 		
-		dataTable.setColumn(ORDER_COLUMN_INDEX_NOMBRE_USUARIO, "beptitnombre");
-		dataTable.setColumn(ORDER_COLUMN_INDEX_DESCRIPCION, "DESCRIPCION");
-		dataTable.setColumn(ORDER_COLUMN_INDEX_VALIDADA, "FLGVALIDADA", DataTableColumn.COLUMN_TYPE_BOOLEAN);
+		dataTable.setColumn(ORDER_COLUMN_INDEX_NOMBRE_USUARIO, "beptit.NOMBRE");
+		dataTable.setColumn(ORDER_COLUMN_INDEX_DESCRIPCION, "beptus.DESCRIPCION");
+		dataTable.setColumn(ORDER_COLUMN_INDEX_VALIDADA, "beptus.FLGVALIDADA", DataTableColumn.COLUMN_TYPE_BOOLEAN);
 		dataTable.setColumn(ORDER_COLUMN_INDEX_ARCHIVO, "beptus.CODNUM", DataTableColumn.COLUMN_TYPE_NUMBER);
 		dataTable.setQuery(consulta);
 				

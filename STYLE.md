@@ -87,6 +87,11 @@ Por ejemplo: KBEP_GESTION_SOLICITUDES
 ## JAVA
 El código java debe estar formateado siguiendo las reglas definidas en el fichero checkstyle.xml y los ejemplos proporcionados.
 
+Para la verificación se podrán usar los plugins checkstyle y sonarlint con mas de 500K instalaciones
+1. help -> eclipse Marketplace -> buscar "checkstyle plug-in"
+2. help -> eclipse Marketplace -> buscar "sonarlint"
+
+
 Si surge alguna duda, se seguiran las recomendaciones de 
 1. [JavaSE](https://www.oracle.com/java/technologies/javase/codeconventions-contents.html)
 2. [Google](https://google.github.io/styleguide/javaguide.html)

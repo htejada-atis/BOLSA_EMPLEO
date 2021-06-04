@@ -41,7 +41,7 @@ public class TestBEPModeloBaremacionItems {
 	private static final Float VALOR = (float) 2.1;
 	private static final Float VALOR_MINIMO = (float) 0.1;
 	private static final Float VALOR_MAXIMO = (float) 1000;
-	private static final String AFINIDAD = "N";
+	private static final String AFINIDAD = null;
 	
 	private static final String MENSAJE_ERROR_HAY_EXCEPCION = "Excepción no esperada: %s";
 	private static final String MENSAJE_ITEMS_DEVUELTOS = "Debe devolver ítems";

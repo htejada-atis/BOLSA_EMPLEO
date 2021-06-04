@@ -118,6 +118,7 @@ table.bluetable.bolsaempleo td.center {
 /* datatable ordenacion */
 table.bluetable.bolsaempleo th img.order {
 	height: 12px;
+	filter: invert(100%) sepia(0%) saturate(7493%) hue-rotate(198deg) brightness(101%) contrast(103%);
 }
 /* datatable footer */
 table.bluetable.bolsaempleo tfoot span.total {
@@ -179,7 +180,7 @@ table.bluetable.bolsaempleo caption .dropdown {
 table.bluetable.bolsaempleo caption .dropdown img {
 	width: 15px;
     height: 15px;
-	filter: invert(89%) sepia(5%) saturate(6124%) hue-rotate(184deg) brightness(95%) contrast(112%);
+	filter: invert(29%) sepia(33%) saturate(1565%) hue-rotate(108deg) brightness(98%) contrast(104%);
 }
 table.bluetable.bolsaempleo caption .dropdown .show {
 	transform: scaleY(-1);

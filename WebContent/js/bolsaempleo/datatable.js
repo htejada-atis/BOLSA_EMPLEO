@@ -3,6 +3,7 @@
  * @copyright ATISoluciones 2021
  * 
  * 20210602 overflow-auto y render
+ * 20210604 select all y columnas preseleccionadas
  */
  
 function DataTable(id, config) {
@@ -364,7 +365,7 @@ function DataTable(id, config) {
         // si es selectable check en la cabecera para marcar/desmacar todos
     	if (self.config.selectable && self.config.selectable.all != false) {
     		var check = $('<input type="checkbox"/>')
-    		$(check).on('change', function() { self.checkUncheckAll(this.checked); });
+    		$(check).on('change', function() { self.checkUncheckAll(this.checked, true); });
     		$('th', self.thead).first().append(check);
     	}
     	
@@ -485,8 +486,13 @@ function DataTable(id, config) {
         }
     };
     
-    this.checkUncheckAll = function(check) {
+    this.checkUncheckAll = function(check, changeSelected) {
     	if (self.lastResponse.data) {
+    	
+    		if (changeSelected && self.config.selected) {
+    			self.config.selected = [];
+    		}
+    	
 			self.lastResponse.data.forEach(function (row) {
 				var firstColumnDef = self.config.columns[0];
 				var value = Atis.getProp(row, firstColumnDef.data);
@@ -495,8 +501,13 @@ function DataTable(id, config) {
 				self.checked[value] = check;
                 
                 check ? $("tr", self.tbody).addClass("selected") : $("tr", self.tbody).removeClass("selected");
+                
+                if (changeSelected && self.config.selected && check) {
+                	self.config.selected.push(row.codNum);
+                }                              
 			});
 		}
+		
 		self.renderFooter();
     };
     

@@ -38,6 +38,7 @@ import es.ujaen.uvirtual.modulo.bolsaempleo.beans.MeritoSolicitudTable;
 import es.ujaen.uvirtual.modulo.bolsaempleo.beans.MeritoSolicitudValoracion;
 import es.ujaen.uvirtual.modulo.bolsaempleo.beans.Solicitud;
 import es.ujaen.uvirtual.modulo.bolsaempleo.beans.Titulacion;
+import es.ujaen.uvirtual.modulo.bolsaempleo.beans.UsuarioBolsaEmpleo;
 import es.ujaen.uvirtual.modulo.bolsaempleo.modelo.ModeloAfinidad;
 import es.ujaen.uvirtual.modulo.bolsaempleo.modelo.ModeloArea;
 import es.ujaen.uvirtual.modulo.bolsaempleo.modelo.ModeloBaremacionItems;
@@ -98,8 +99,11 @@ public class ControladorMisSolicitudes extends HttpServlet {
 	public static final String ACCION_INDEX = "listar";
 	
 	// acciones paso 1: Selección de áreas
+	public static final String ACCION_DATATABLE_AREAS_SELECCIONADAS = "datatableareasseleccionadas";
 	public static final String ACCION_DATATABLE_AREAS = "datatableareas";
 	public static final String ACCION_SELECCIONAR_BOLSAS = "seleccionarbolsas";
+	public static final String ACCION_DESELECCIONAR_BOLSAS = "deseleccionarbolsas";
+	public static final String ACCION_IR_A_MERITOS_POR_AREA = "meritosporarea";
 	
 	// acciones paso 2: Asignación de méritos a áreas
 	public static final String ACCION_BOLSA_SELECCIONADA = "bolsaseleccionada";
@@ -137,6 +141,7 @@ public class ControladorMisSolicitudes extends HttpServlet {
 	// ruta vistas
 	public static final String RUTA_BEP_SOL = "/WEB-INF/jsp/vista/infadministrativa/bolsaempleo/missolicitudes/";
 	public static final String JSP_INDEX = RUTA_BEP_SOL + "indexSolicitudes.jsp";
+	public static final String JSP_PASO1 = RUTA_BEP_SOL + "paso1.jsp";
 	public static final String JSP_PASO2 = RUTA_BEP_SOL + "paso2.jsp";
 	public static final String JSP_PASO3 = RUTA_BEP_SOL + "paso3.jsp";
 		
@@ -191,8 +196,11 @@ public class ControladorMisSolicitudes extends HttpServlet {
 				case ACCION_INDEX:
 					accionesSolicitudes(bean, datos, request, response, nombreAccion);
 					break;
+				case ACCION_DATATABLE_AREAS_SELECCIONADAS:
 				case ACCION_DATATABLE_AREAS:
 				case ACCION_SELECCIONAR_BOLSAS:
+				case ACCION_DESELECCIONAR_BOLSAS:
+				case ACCION_IR_A_MERITOS_POR_AREA:
 					accionesPaso1(bean, datos, request, response, nombreAccion);
 					break;
 				case ACCION_BOLSA_SELECCIONADA:
@@ -304,8 +312,11 @@ public class ControladorMisSolicitudes extends HttpServlet {
 		bean.setVista(JSP_INDEX);
 		
 		Convocatoria convocatoria = modeloConvocatoria.getConvocatoriaById(Formateador.leeParametroInteger(request.getParameter(PARAM_CONVOCATORIA_ID)));
-				
-		Solicitud solicitud = modeloSolicitud.nuevaSolicitud(bean.getUsuarioLogeado(), convocatoria);
+		
+		UsuarioBolsaEmpleo usuario = bean.getUsuarioLogeado();
+		UsuarioBolsaEmpleo creador = bean.getUsuarioLogeado();
+		
+		Solicitud solicitud = modeloSolicitud.nuevaSolicitud(usuario, convocatoria, creador);
 				
 		bean.setSolicitud(solicitud);
 		listaBolsas(bean, solicitud);
@@ -319,11 +330,9 @@ public class ControladorMisSolicitudes extends HttpServlet {
 	 * @throws SQLException .
 	 */
 	private void consultarSolicitud(VistaSolicitudes bean, HttpServletRequest request) throws UVException, SQLException {
-		ModeloSolicitud modeloSolicitud = new ModeloSolicitud();
-		
 		bean.setVista(JSP_INDEX);
 		
-		Solicitud solicitud = modeloSolicitud.getSolicitudById(Formateador.leeParametroInteger(request.getParameter(PARAM_SOLICITUD_ID)));
+		Solicitud solicitud = this.getSolicitud(bean, request);
 		bean.setSolicitud(solicitud);
 		
 		if (solicitud.getConvocatoria().getEstado().equals(ModeloConvocatoria.CONVOCATORIA_ESTADO_CERRADA)) {
@@ -333,7 +342,7 @@ public class ControladorMisSolicitudes extends HttpServlet {
 		if (solicitud.getEstado().equals(ModeloSolicitud.SOLICITUD_ESTADO_ABIERTA)) {
 			listaBolsas(bean, solicitud);
 		} else {
-			List<BolsaSolicitud> listaBolsas = modeloSolicitud.getBolsasSolicitudMeritos(solicitud);
+			List<BolsaSolicitud> listaBolsas = ModeloSolicitud.obtenerInstancia().getBolsasSolicitudMeritos(solicitud);
 			bean.setListaBolsasSolicitud(listaBolsas);
 			bean.setVista(JSP_PASO3);
 		}
@@ -385,96 +394,107 @@ public class ControladorMisSolicitudes extends HttpServlet {
 	private void accionesPaso1(VistaSolicitudes bean, UVDatos datos, HttpServletRequest request, HttpServletResponse response, String nombreAccion)
 			throws IOException, SQLException, UVException {
 		switch (nombreAccion) {
+			case ACCION_DATATABLE_AREAS_SELECCIONADAS:
+				listadoAreasSeleccionadas(bean, datos, request, response);
+				break;
 			case ACCION_DATATABLE_AREAS:
 				listadoAreas(bean, datos, request, response);
 				break;
+			case ACCION_DESELECCIONAR_BOLSAS:
+				deseleccionarBolsas(bean, request);
+				break;
 			case ACCION_SELECCIONAR_BOLSAS:
 				seleccionarBolsas(bean, request);
+				break;
+			case ACCION_IR_A_MERITOS_POR_AREA:
+				irAMeritosPorBolsa(bean, datos, request, response);
 				break;
 			default:
 				errorFatal(bean, MENSAJE_ERROR_ACCION_NO_CONTEMPLADA);
 		}
 	}
 	
-	/**
-	 * Seleccionar bolsas para la solicitud .
-	 * @param bean .
-	 * @param request .
-	 * @throws UVException .
-	 * @throws SQLException .
-	 */
-	private void seleccionarBolsas(VistaSolicitudes bean, HttpServletRequest request)
-			throws UVException, SQLException {
-		bean.setVista(RUTA_BEP_SOL + "paso1.jsp");
+	private void seleccionarBolsas(VistaSolicitudes bean, HttpServletRequest request) throws UVException, SQLException {
+		bean.setVista(JSP_PASO1);
 		
-		Gson gson = new GsonBuilder().create();
-		ModeloSolicitud modeloSolicitud = ModeloSolicitud.obtenerInstancia();
-		
-		Solicitud solicitud = modeloSolicitud.getSolicitudById(Formateador.leeParametroInteger(request.getParameter(PARAM_SOLICITUD_ID)));
-		bean.setSolicitud(solicitud);		
+		Solicitud solicitud = this.getSolicitud(bean, request);
+		bean.setSolicitud(solicitud);
 		listaBolsas(bean, solicitud);
 		
-		List<String> idBolsas = null;
+		ArrayList<Bolsa> bolsas = getListadoBolsasFromJson(bean, request, solicitud);
 			
-		// parseamos json bolsas
-		try {			
-			idBolsas = gson.fromJson(request.getParameter(PARAM_BOLSAS), new TypeToken<List<String>>() { }.getType());					
-		} catch (Exception e) {
-			throw new UVException(MENSAJE_ERROR_BOLSAS_SELECCIONADAS_INCORRECTAS);
-		}
-		
-		// comprobamos si son bolsas válidas
-		List<Bolsa> bolsas = new ArrayList<>();
-		for (String idBolsa : idBolsas) {
-			Bolsa bolsa = ModeloBolsa.obtenerInstancia().getBolsaById(Integer.parseInt(idBolsa));
-			
-			if (Boolean.FALSE.equals(bolsa.getBaremable())) {
-				throw new UVException("Ha selecciona una bolsa no baremable");
-			}
-			
-			if (ModeloArea.obtenerInstancia().isUsuarioExcluidoBolsa(bean.getUsuarioLogeado(), bolsa.getArea())) {
-				throw new UVException("Usuario excluido de la bolsa");
-			}
-							
-			bolsas.add(bolsa);
-		}
-		
-		if (bolsas.size() > solicitud.getConvocatoria().getNumBolsasMaximo()) {
-			throw new UVException("Número de bolsas seleccionada no valido");
-		}
-		
 		// añadimos las bolsas a la solicitud
-		modeloSolicitud.asignarBolsasASolicitud(solicitud, bolsas, bean.getUsuarioLogeado());
+		ModeloSolicitud.obtenerInstancia().asignarBolsasASolicitud(solicitud, bolsas, bean.getUsuarioLogeado());
 				
-		bean.setVista(JSP_PASO2);
+		// recargamos el listado de bolsas seleccionadas
+		listaBolsas(bean, solicitud);
+		
+		bean.setListaAfinidades(ModeloAfinidad.obtenerInstancia().listaAfinidades());
+		bean.setListaTipoAfinidades(ModeloAfinidad.obtenerInstancia().getTiposAfinidad());
+	}
+
+	private void deseleccionarBolsas(VistaSolicitudes bean, HttpServletRequest request) throws SQLException, UVException {
+		bean.setVista(JSP_PASO1);
+		
+		Solicitud solicitud = this.getSolicitud(bean, request);
+		bean.setSolicitud(solicitud);
+		listaBolsas(bean, solicitud);
+		
+		ArrayList<Bolsa> bolsas = getListadoBolsasFromJson(bean, request, solicitud);
+		
+		// quitamos bolsas de la solicitud
+		ModeloSolicitud.obtenerInstancia().desasignarBolsasASolicitud(solicitud, bolsas, bean.getUsuarioLogeado());
+		
+		// recargamos el listado de bolsas seleccionadas
+		listaBolsas(bean, solicitud);
+
 		bean.setListaAfinidades(ModeloAfinidad.obtenerInstancia().listaAfinidades());
 		bean.setListaTipoAfinidades(ModeloAfinidad.obtenerInstancia().getTiposAfinidad());
 	}
 	
-	/** 
-	 * Agrega la vista del paso 1 y le añade la lista de bolsas de la solicitud .
-	 * @param bean .
-	 * @param solicitud .
-	 * @throws UVException .
-	 * @throws SQLException .
-	 */
 	private void listaBolsas(VistaSolicitudes bean, Solicitud solicitud) throws UVException, SQLException {
 		ModeloSolicitud modelo = ModeloSolicitud.obtenerInstancia();
-		bean.setVista(RUTA_BEP_SOL + "paso1.jsp");
+		bean.setVista(JSP_PASO1);
 		
 		List<Bolsa> listaBolsas = modelo.getBolsasSolicitud(solicitud);
 		bean.setListaBolsas(listaBolsas);
 	}
 	
-	/**
-	 * Lista de áreas datatable .
-	 * @param bean .
-	 * @param datos .
-	 * @param request .
-	 * @param response .
-	 * @throws IOException .
-	 * @throws SQLException .
-	 */
+	private void listadoAreasSeleccionadas(VistaSolicitudes bean, UVDatos datos, HttpServletRequest request, HttpServletResponse response) throws IOException, SQLException {
+		datos.setRespuestaEnviada(true);
+		datos.setContentType(RESPONSE_AJAX_CONTENTTYPE);
+		response.setContentType(RESPONSE_AJAX_CONTENTTYPE);
+		response.setCharacterEncoding(RESPONSE_AJAX_ENCODING);
+		
+		try (PrintWriter writer = response.getWriter()) {
+			try {
+				Solicitud solicitud = this.getSolicitud(bean, request);
+				
+				BolsaEmpleoDataTable<Bolsa> dataTable = ModeloSolicitud.obtenerInstancia().listaAreaSolicitudSeleccionadasDatatable(
+						request.getParameterMap(), 
+						bean.getUsuarioLogeado().getCodNum(),
+						solicitud
+				);
+				
+				bean.setDataTableBolsasCandidatoSeleccionadas(dataTable);
+				writer.write(dataTable.toJson());
+			} catch (UVException e) {
+				LOGGER.log(Level.WARNING, e.toString());
+				bean.getMensajesDeError().add(e.getMessage());
+				CodigoDescripcion mensaje = new CodigoDescripcion(RESPONSE_AJAX_ERROR, e.getMessage());
+				writer.write(new Gson().toJson(mensaje));
+				response.setStatus(RESPONSE_AJAX_HTTP_CODE_ERROR);
+			} catch (SQLException e) { 
+				LOGGER.log(Level.SEVERE, Formateador.getStackTrace(e));
+				LOGGER.log(Level.SEVERE, e.toString());
+				bean.getMensajesDeError().add(e.getMessage());
+				CodigoDescripcion mensaje = new CodigoDescripcion(RESPONSE_AJAX_ERROR, e.getMessage());
+				writer.write(new Gson().toJson(mensaje));
+				response.setStatus(RESPONSE_AJAX_HTTP_CODE_ERROR);
+			}
+		}
+	}
+	
 	private void listadoAreas(VistaSolicitudes bean, UVDatos datos, HttpServletRequest request, HttpServletResponse response) throws IOException, SQLException {
 		ModeloArea modelo = ModeloArea.obtenerInstancia();
 		datos.setContentType(RESPONSE_AJAX_CONTENTTYPE);
@@ -484,7 +504,8 @@ public class ControladorMisSolicitudes extends HttpServlet {
 		
 		try (PrintWriter writer = response.getWriter()) {
 			try {
-				BolsaEmpleoDataTable<BolsaCandidato> dataTable = modelo.listaAreaSolicitudDatatable(request.getParameterMap(), bean.getUsuarioLogeado().getCodNum());
+				BolsaEmpleoDataTable<BolsaCandidato> dataTable = modelo.listaAreaSolicitudDatatable(
+						request.getParameterMap(), bean.getUsuarioLogeado().getCodNum());
 				bean.setDataTableBolsasCandidato(dataTable);
 				writer.write(dataTable.toJson());
 			} catch (UVException e) {
@@ -504,6 +525,22 @@ public class ControladorMisSolicitudes extends HttpServlet {
 		}
 	}
 	
+	private void irAMeritosPorBolsa(VistaSolicitudes bean, UVDatos datos, HttpServletRequest request, HttpServletResponse response) throws UVException, SQLException {
+		bean.setVista(JSP_PASO1);
+		
+		Solicitud solicitud = this.getSolicitud(bean, request);
+		bean.setSolicitud(solicitud);
+		listaBolsas(bean, solicitud);
+		
+		if (bean.getListaBolsas().isEmpty()) {
+			throw new UVException("Debe seleccionar al menos una bolsa");
+		}
+		
+		bean.setListaAfinidades(ModeloAfinidad.obtenerInstancia().listaAfinidades());
+		bean.setListaTipoAfinidades(ModeloAfinidad.obtenerInstancia().getTiposAfinidad());
+		bean.setVista(JSP_PASO2);
+	}
+
 	///////////////////////////////////////////////////////////////////////////////////////////////////////////
 	// PASO 2: ASIGNACIÓN DE MÉRITOS A ÁREAS
 	///////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -558,7 +595,7 @@ public class ControladorMisSolicitudes extends HttpServlet {
 		Bolsa area = modeloBolsa.getBolsaById(Formateador.leeParametroInteger(request.getParameter(PARAM_BOLSA)));
 		bean.setArea(area);
 		
-		Solicitud solicitud = modeloSolicitud.getSolicitudById(Formateador.leeParametroInteger(request.getParameter(PARAM_SOLICITUD_ID)));
+		Solicitud solicitud = this.getSolicitud(bean, request);
 		bean.setSolicitud(solicitud);
 		
 		List<MeritoSolicitud> listaMeritos = modeloSolicitud.getMeritosSolicitudBolsa(solicitud, area);
@@ -576,11 +613,8 @@ public class ControladorMisSolicitudes extends HttpServlet {
 	private void seleccionarMerito(VistaSolicitudes bean, HttpServletRequest request, Boolean seleccionado)
 			throws UVException, SQLException {
 		ModeloBolsa modeloBolsa = ModeloBolsa.obtenerInstancia();
-		ModeloMerito modeloMerito = ModeloMerito.obtenerInstancia();
-		ModeloBaremacionItems modeloItems = ModeloBaremacionItems.obtenerInstancia();
-		Boolean excluyente = false;
-		String meritoCadena = "";
-
+		ModeloMerito modeloMerito = ModeloMerito.obtenerInstancia();				
+		
 		Bolsa area = modeloBolsa.getBolsaById(Formateador.leeParametroInteger(request.getParameter(PARAM_BOLSA)));
 		bean.setArea(area);
 
@@ -597,17 +631,21 @@ public class ControladorMisSolicitudes extends HttpServlet {
 			throw new UVException(MENSAJE_ERROR_SOLICITUD_NO_NULO);
 		}
 
+		String meritoCadena = "";
+		boolean excluyente = false;
 		ModeloSolicitud modeloSolicitud = ModeloSolicitud.obtenerInstancia();
-		
+				
 		if (Boolean.TRUE.equals(seleccionado)) {
 			// comprobamos que el total de méritos por bloque de la solicitud sea menor que
 			// el permitido por la convocatoria
-			Integer totalMeritos = modeloSolicitud.obtenerTotalMeritosPorBloqueSolicitud(solicitud, merito);
+			Integer totalMeritos = modeloSolicitud.obtenerTotalMeritosPorBloqueSolicitud(solicitud, area, merito);
 
 			if (totalMeritos >= solicitud.getConvocatoria().getNumMeritosPorBloque()) {
 				this.seleccionarBolsa(bean, request);
 				throw new UVException(MENSAJE_ERROR_NUMERO_MAXIMO_MERITOS_BLOQUE);
 			}
+			
+			ModeloBaremacionItems modeloItems = ModeloBaremacionItems.obtenerInstancia();
 			
 			List<MeritoSolicitud> listaMeritos = modeloSolicitud.getMeritosSolicitudBolsa(solicitud, area);
 			for (MeritoSolicitud mer : listaMeritos) {
@@ -657,7 +695,7 @@ public class ControladorMisSolicitudes extends HttpServlet {
 		}
 		
 		Afinidad afinidad = ModeloAfinidad.obtenerInstancia().getAfinidadById(Formateador.leeParametroInteger(request.getParameter(PARAM_AFINIDAD_ID)));
-		ModeloSolicitud.obtenerInstancia().asignarAfinidadMeritoIndividualizado(solicitud, area, merito, afinidad);
+		ModeloSolicitud.obtenerInstancia().asignarAfinidadMeritoIndividualizado(solicitud, area, merito, afinidad, bean.getUsuarioLogeado());
 
 		this.seleccionarBolsa(bean, request);
 	}
@@ -727,8 +765,7 @@ public class ControladorMisSolicitudes extends HttpServlet {
 	 * @throws SQLException .
 	 */
 	private Solicitud listaBolsasSolicitud(VistaSolicitudes bean, HttpServletRequest request) throws UVException, SQLException {
-		ModeloSolicitud modeloSolicitud = ModeloSolicitud.obtenerInstancia();
-		Solicitud solicitud = modeloSolicitud.getSolicitudById(Formateador.leeParametroInteger(request.getParameter(PARAM_SOLICITUD_ID)));
+		Solicitud solicitud = this.getSolicitud(bean, request);
 		
 		bean.setVista(JSP_PASO2);
 		bean.setListaAfinidades(ModeloAfinidad.obtenerInstancia().listaAfinidades());
@@ -755,11 +792,10 @@ public class ControladorMisSolicitudes extends HttpServlet {
 		datos.setRespuestaEnviada(true);
 		response.setContentType(RESPONSE_AJAX_CONTENTTYPE);
 		response.setCharacterEncoding(RESPONSE_AJAX_ENCODING);
-		
-		Solicitud solicitud = modelo.getSolicitudById(Formateador.leeParametroInteger(request.getParameter(PARAM_SOLICITUD_ID)));
-		
+				
 		try (PrintWriter writer = response.getWriter()) {
 			try {
+				Solicitud solicitud = this.getSolicitud(bean, request);
 				BolsaEmpleoDataTable<BolsaSolicitudTable> dataTable = modelo.listaBolsasSolicitudesDatatable(solicitud, request.getParameterMap());
 				bean.setDatatableBolsasSolicitud(dataTable);
 				writer.write(dataTable.toJson());
@@ -858,7 +894,7 @@ public class ControladorMisSolicitudes extends HttpServlet {
 		ModeloSolicitud modeloSolicitud = ModeloSolicitud.obtenerInstancia();
 		ModeloTitulacion modeloTitulacion = ModeloTitulacion.obtenerInstancia();
 		
-		Solicitud solicitud = modeloSolicitud.getSolicitudById(Formateador.leeParametroInteger(request.getParameter(PARAM_SOLICITUD_ID)));
+		Solicitud solicitud = this.getSolicitud(bean, request);
 		bean.setSolicitud(solicitud);
 		
 		
@@ -1086,4 +1122,63 @@ public class ControladorMisSolicitudes extends HttpServlet {
 		table.addCell(cell);
 	}
 	
+	private ArrayList<Bolsa> getListadoBolsasFromJson(VistaSolicitudes bean, HttpServletRequest request, Solicitud solicitud) throws UVException, SQLException {
+		Gson gson = new GsonBuilder().create();		
+		List<String> idBolsas = null;
+
+		// parseamos json bolsas
+		try {			
+			idBolsas = gson.fromJson(request.getParameter(PARAM_BOLSAS), new TypeToken<List<String>>() { }.getType());					
+		} catch (Exception e) {
+			throw new UVException(MENSAJE_ERROR_BOLSAS_SELECCIONADAS_INCORRECTAS);
+		}
+		
+		// comprobamos si son bolsas válidas
+		ArrayList<Bolsa> bolsas = new ArrayList<>();
+		for (String idBolsa : idBolsas) {
+			Bolsa bolsa = ModeloBolsa.obtenerInstancia().getBolsaById(Integer.parseInt(idBolsa));
+			
+			if (Boolean.FALSE.equals(bolsa.getBaremable())) {
+				throw new UVException("Ha selecciona una bolsa no baremable");
+			}
+			
+			if (ModeloArea.obtenerInstancia().isUsuarioExcluidoBolsa(bean.getUsuarioLogeado(), bolsa.getArea())) {
+				throw new UVException("Usuario excluido de la bolsa");
+			}
+
+			bolsas.add(bolsa);
+		}
+		
+		if (bolsas.size() > solicitud.getConvocatoria().getNumBolsasMaximo()) {
+			throw new UVException("Número de bolsas seleccionada no valido");
+		}
+		
+		return bolsas;
+	}
+	
+	/**
+	 * Lee la solicitud del formulario y comprueba si le pertenece al usuario logeado.
+	 * @param bean . 
+	 * @param request .
+	 * @return .
+	 * @throws SQLException .
+	 * @throws UVException .
+	 */
+	private Solicitud getSolicitud(VistaSolicitudes bean, HttpServletRequest request) throws SQLException, UVException {
+		Solicitud solicitud = ModeloSolicitud.obtenerInstancia().getSolicitudById(Formateador.leeParametroInteger(request.getParameter(PARAM_SOLICITUD_ID)));
+		
+		if (!solicitud.getUsuario().getCodNum().equals(bean.getUsuarioLogeado().getCodNum())) {
+			throw new UVException("No tienes permiso");
+		}
+		
+		if (solicitud.getEstado().equals(ModeloSolicitud.SOLICITUD_ESTADO_CERRADA)) {
+			throw new UVException("La solicitud está cerrada");
+		}
+		
+		if (solicitud.getConvocatoria().getEstado().equals(ModeloConvocatoria.CONVOCATORIA_ESTADO_CERRADA)) {
+			throw new UVException("La convocatoria está cerrada");
+		}
+		
+		return solicitud;
+	}	
 }
