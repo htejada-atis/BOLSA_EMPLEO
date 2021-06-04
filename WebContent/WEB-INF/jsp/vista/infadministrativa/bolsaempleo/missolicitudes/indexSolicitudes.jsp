@@ -56,23 +56,18 @@ VistaSolicitudes bean = (VistaSolicitudes) uvdatos.getVistas().get(VistaSolicitu
 			
 			if (convocatoriaAbierta && solicitudNoCreada) {
 				// convocatoria abierta, solicitud no creada
-				console.log("convocatoria abierta, solicitud no creada");
 				html = 'Actualmente no tiene ninguna solicitud en esta convocatoria. ' + btnCrear;
 			} else if (convocatoriaAbierta && solicitudAbierta) {
 				// convocatoria abierta, solicitud abierta
-				console.log("convocatoria abierta, solicitud abierta");
 				html = 'Tiene un solicitud abierta. No olvide CERRAR antes de la fecha de cierre de la convocatoria. ' + btnConsultar;
 			} else if (convocatoriaCerrada && solicitudNoCreada) {
 				// convocatoria cerrada, solicitud no creada
-				console.log("convocatoria cerrada, solicitud no creada");
 				html = 'No tiene ninguna solicitud en esta convocatoria.';
 			} else if (convocatoriaCerrada && solicitudAbierta) {
 				// convocatoria cerrada, solicitud abierta
-				console.log("convocatoria cerrada, solicitud abierta");
 				html = 'No ha validado la solicitud antes de la fecha de cierre de la convocatoria.';
 			} else if ((convocatoriaAbierta || convocatoriaCerrada) && solicitudCerrada) {
 				// convocatoria abierta o cerrada y solicitud cerrada
-				console.log("convocatoria abierta o cerrada y solicitud cerrada");
 				html = 'Solicitud cerrada. ' + btnDescargarPDF;
 			} 
 			
