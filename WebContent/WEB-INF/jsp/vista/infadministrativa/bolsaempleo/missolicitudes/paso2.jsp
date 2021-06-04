@@ -84,7 +84,7 @@ VistaSolicitudes bean = (VistaSolicitudes) uvdatos.getVistas().get(VistaSolicitu
 		var texto = "<div>";
 		
 		if (valoracion) {
-			texto += '<b title="' + valoracion.afinidad.descripcion + '">' + valoracion.afinidad.codigo + " " + valoracion.afinidad.modulacion + " %</strong><br/>"; 
+			texto += '<b title="' + valoracion.afinidad.descripcion + '">' + valoracion.afinidad.codigo + " " + valoracion.afinidad.modulacion * 100 + " %</strong><br/>"; 
 		} else {
 			texto += 'Selecciona afinidad<br/>';
 		}
@@ -139,7 +139,7 @@ VistaSolicitudes bean = (VistaSolicitudes) uvdatos.getVistas().get(VistaSolicitu
 		if (row.valoraciones && row.valoraciones.length > 0) {
 			for(var i=0; i<row.valoraciones.length; i++) {
 				var valoracion = row.valoraciones[i];
-				texto += '<b title="' + valoracion.afinidad.descripcion + '">' + valoracion.valor + ' - ' + valoracion.afinidad.codigo + " " + valoracion.afinidad.modulacion + ' %</strong><br/>';
+				texto += '<b title="' + valoracion.afinidad.descripcion + '">' + valoracion.valor + ' - ' + valoracion.afinidad.codigo + " " + valoracion.afinidad.modulacion * 100 + ' %</strong><br/>';
 			}
 		} else {
 			texto += 'Selecciona afinidad<br/>';

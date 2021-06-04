@@ -54,10 +54,10 @@ VistaSolicitudes bean = (VistaSolicitudes) uvdatos.getVistas().get(VistaSolicitu
 							<% if (merito.getCodNum() != null && merito.getMeritoSolicitud() != null && merito.getMerito().getItemBaremacion().getAfinidad() != null) { %>
 								<% if (merito.getValoraciones().size() > 0) { %>
 									<% if (merito.getMerito().getItemBaremacion().getIndividualizado()) { %>
-										<%= "<b>" + merito.getValoraciones().get(0).getAfinidad().getCodigo() + " " + merito.getValoraciones().get(0).getAfinidad().getModulacion() + "</b>" %>
+										<%= "<b>" + merito.getValoraciones().get(0).getAfinidad().getCodigo() + " " + merito.getValoraciones().get(0).getAfinidad().getModulacion() * 100 + "%</b>" %>
 									<% } else {
 										for (MeritoSolicitudValoracion valoracion: merito.getValoraciones()) { %>
-											<%= "<b>" + valoracion.getValor() + " - " + valoracion.getAfinidad().getCodigo() + " " + valoracion.getAfinidad().getModulacion() + "%</b><br/>" %>
+											<%= "<b>" + valoracion.getValor() + " - " + valoracion.getAfinidad().getCodigo() + " " + valoracion.getAfinidad().getModulacion() * 100 + "%</b><br/>" %>
 										<% }
 									   } %>
 								<% } %>
@@ -66,7 +66,7 @@ VistaSolicitudes bean = (VistaSolicitudes) uvdatos.getVistas().get(VistaSolicitu
 						</tr>
 					<% } %>
 				<% } else { %>
-					<tr><td colspan="4"><%= ControladorMisSolicitudes.MENSAJE_AREA_SIN_MERITOS %></td><tr>
+					<tr><td colspan="5"><%= ControladorMisSolicitudes.MENSAJE_AREA_SIN_MERITOS %></td><tr>
 				<% } %>
 			</tbody>
 		</table>
