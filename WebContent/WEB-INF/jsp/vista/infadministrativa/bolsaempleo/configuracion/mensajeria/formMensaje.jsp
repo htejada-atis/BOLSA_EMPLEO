@@ -154,8 +154,8 @@ $(document).ready(function() {
     	"action": "<%= ControladorMensajes.ACCION_DATATABLE_DESTINATARIOS_DISPONIBLES %>",
 	    "columns": [
 	    	{'data': 'codNum', 'selectable': {'onChange': onClickRowDestinatario}},
-	        {'data': 'numdocumento', 'overflow': 'auto', 'filter': true,},
-	        {'data': 'codNum',  'overflow': 'auto', 'render': function(row) { return row.nombre + ", " + row.apellido1 + " " + row.apellido2; }},
+	        {'data': 'prsnif', 'overflow': 'auto', 'filter': true,},
+	        {'data': 'codNum', 'filter': false, 'order': false, 'overflow': 'auto', 'render': function(row) { return row.nombre + ", " + row.apellido1 + " " + row.apellido2; }},
 	        {'data': 'email', 'overflow': 'auto'},
 	        {'data': 'rol.descripcion', 
 	         'filter': {
@@ -170,9 +170,9 @@ $(document).ready(function() {
 	        },
 	        {'data': 'listaDist', 'filter': {'type': 'selectBoolean', 'true': 'En Lista', 'false': 'Sin Lista', 'optionDefault': 'true'}, 'render': function(row) {
         		if(row.listaDist) {
-        			return "<div title='En la lista de distribución' class='circle-true'></div>"; 
+        			return "<div title='En la lista de distribución' class='circle-true'></div>";
         		} else {
-        			return "<div title='No está en la lista de distribución' class='circle-false'></div>"; 
+        			return "<div title='No está en la lista de distribución' class='circle-false'></div>";
         		}
         	}},
 	    ],

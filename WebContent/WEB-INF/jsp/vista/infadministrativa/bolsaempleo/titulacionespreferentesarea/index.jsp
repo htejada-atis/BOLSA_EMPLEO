@@ -56,7 +56,7 @@ $(document).ready(function() {
 	    "filterable": true,
 	    "action": "<%= ControladorCandidatoTitulacionesPreferentesArea.ACCION_DATATABLE_BOLSAS %>",
 	    "defaultOrderBy": 1,
-	    "title": 'Areas de conocimiento',
+	    "title": 'AREAS DE CONOCIMIENTO',
 	    "clickable": {'onClick': function(row) {
 	    	var params = {
     				'a': '<%= ControladorCandidatoTitulacionesPreferentesArea.ACCION_BOLSA_SELECCIONADA %>',
@@ -78,7 +78,7 @@ $(document).ready(function() {
 		    "filterable": true,
 		    "pageSize": 5,
 		    "defaultOrderBy": 0,
-		    "title": 'Titulaciones Preferentes: <%=bolsa.getArea().getDescripcion()%>',
+		    "title": 'TITULACIONES PREFERENTES: <%=bolsa.getArea().getDescripcion()%>',
 		    "action": "<%=ControladorCandidatoTitulacionesPreferentesArea.ACCION_DATATABLE_TITULACIONES%>",
 		    "columns": [
 		        {'data': 'nombre', 'filter': {'type': 'text'}},

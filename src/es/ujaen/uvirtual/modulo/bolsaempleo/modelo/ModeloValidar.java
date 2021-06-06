@@ -18,7 +18,6 @@ import es.ujaen.uvirtual.modulo.bolsaempleo.beans.MeritoSolicitud;
 import es.ujaen.uvirtual.modulo.bolsaempleo.beans.MeritoSolicitudValoracion;
 import es.ujaen.uvirtual.modulo.bolsaempleo.beans.MeritoValidarTable;
 import es.ujaen.uvirtual.modulo.bolsaempleo.beans.UsuarioBolsaEmpleo;
-import es.ujaen.uvirtual.modulo.bolsaempleo.beans.UsuarioBolsaEmpleoVuja;
 import es.ujaen.uvirtual.modulo.bolsaempleo.beans.ValorMeritoBolsaTable;
 import es.ujaen.uvirtual.modulo.bolsaempleo.utilidades.BolsaEmpleoDataTable;
 import es.ujaen.uvirtual.modulo.bolsaempleo.utilidades.BolsaEmpleoDataTable.DataTableColumn;
@@ -52,6 +51,9 @@ public class ModeloValidar {
 	public static final String TOTAL_MERITOS = "TOTAL_MERITOS";
 	
 	private static final int TOTAL_COUNT_SUBQUERIES = 4;
+	
+	public static final String MERITO_EXCLUIDO = "S";
+	public static final String MERITO_VALIDADO = "S";	
 
 	protected static ModeloValidar eInstancia;
 
@@ -287,7 +289,7 @@ public class ModeloValidar {
 	public BolsaEmpleoDataTable<BolsaValidacion> listadoAreasSujetasAfinidad(Convocatoria convocatoria, UsuarioBolsaEmpleo usuario, Map<String, String[]> params) 
 			throws SQLException, UVException {
 		List<BolsaValidacion> rows = new ArrayList<>();
-		BolsaEmpleoDataTable<BolsaValidacion> dataTable = new BolsaEmpleoDataTable<BolsaValidacion>(params);
+		BolsaEmpleoDataTable<BolsaValidacion> dataTable = new BolsaEmpleoDataTable<>(params);
 
 		if (convocatoria == null) {
 			dataTable.setData(rows);
@@ -462,7 +464,7 @@ public class ModeloValidar {
 		
 		// seleccionamos los candidatos, con meritos, en la convocatoria pasada
 		String consulta = 
-				"SELECT bepusu.CODNUM, bepusu.PRSNIF,"
+				"SELECT bepusu.CODNUM, "
 				+ "	(" + consultaCount + " AND bepsbm.FLGVALIDADO = 'N' AND bepsbm.FLGEXCLUIDO = 'N') COUNT_NO_VALIDADOS,"
 				+ "	(" + consultaCount + " AND bepsbm.FLGVALIDADO = 'S' AND bepsbm.FLGEXCLUIDO = 'N') COUNT_VALIDADOS,"
 				+ "	(" + consultaCount + " AND bepsbm.FLGEXCLUIDO = 'S') COUNT_EXCLUIDOS,"
@@ -477,9 +479,10 @@ public class ModeloValidar {
 		// agrega el filtro de afinidad
 		consulta += afinidad ? " AND bepite.AFINIDAD IS NOT NULL" : " AND bepite.AFINIDAD IS NULL";
 		
-		consulta += " GROUP BY bepusu.CODNUM, bepusu.PRSNIF";
+		consulta += " GROUP BY bepusu.CODNUM ";
 
-		dataTable.setColumn(ORDER_COLUMN_INDEX_NUMDOCUMENTO_CANDIDATO, "bepusu.PRSNIF");
+		dataTable.setColumn(ORDER_COLUMN_INDEX_NUMDOCUMENTO_CANDIDATO, "bepusu.VUAJA_PRSNIF");
+		dataTable.setColumn(ORDER_COLUMN_INDEX_NOMBRE_Y_APELLIDOS_CANDIDATO, "bepusu.VUAJA_PRSNIF");
 
 		dataTable.setQuery(consulta);
 		
@@ -505,8 +508,8 @@ public class ModeloValidar {
 				ModeloUsuarioBolsaEmpleo modeloUsuario = ModeloUsuarioBolsaEmpleo.obtenerInstancia(); 
 				
 				while (rs.next()) {
-					String documento = rs.getString("PRSNIF");
-					CandidatoValidacion candidato = createCandidatoValidacionFromResultSet(rs, modeloUsuario.getResultSetPersonaArcosByPrsnif(documento));
+					UsuarioBolsaEmpleo usuario = modeloUsuario.getUsuarioById(rs.getInt("CODNUM"));
+					CandidatoValidacion candidato = createCandidatoValidacionFromResultSet(rs, usuario);
 					rows.add(candidato);
 				}
 			}
@@ -576,8 +579,8 @@ public class ModeloValidar {
 			try (ResultSet rs = stmt.executeQuery()) {
 				while (rs.next()) {
 					Merito merito = modeloMerito.createMeritoFromResultset(rs, false, true);
-					Boolean excluido = rs.getString("FLGEXCLUIDO").equals("S");
-					Boolean validado = rs.getString("FLGVALIDADO").equals("S");
+					Boolean excluido = rs.getString("FLGEXCLUIDO").equals(MERITO_EXCLUIDO);
+					Boolean validado = rs.getString("FLGVALIDADO").equals(MERITO_VALIDADO);
 					rows.add(new MeritoValidarTable(merito, excluido, validado));
 				}
 			}
@@ -739,20 +742,12 @@ public class ModeloValidar {
 	/**
 	 * Crea un candidato validación a partir de un ResultSet.
 	 * @param rs .
-	 * @param rsArcos .
+	 * @param usuario .
 	 * @return .
 	 * @throws UVException .
 	 * @throws SQLException .
 	 */
-	private CandidatoValidacion createCandidatoValidacionFromResultSet(ResultSet rs, UsuarioBolsaEmpleoVuja rsArcos) throws SQLException {
-		UsuarioBolsaEmpleo usuario = new UsuarioBolsaEmpleo();
-		usuario.setTipoDocumento(rsArcos.getStrTipoDocumento());
-		usuario.setNumDocumento(rsArcos.getPrsNif());
-		usuario.setNombre(rsArcos.getStrNombre());
-		usuario.setPrimerApellido(rsArcos.getStrApellido1());
-		usuario.setSegundoApellido(rsArcos.getStrApellido2());
-		usuario.setCodNum(rs.getInt("CODNUM"));
-		
+	private CandidatoValidacion createCandidatoValidacionFromResultSet(ResultSet rs, UsuarioBolsaEmpleo usuario) throws SQLException {
 		CandidatoValidacion candidato = new CandidatoValidacion(usuario);
 		candidato.setTotalMeritosNoValidados(rs.getInt("COUNT_TOTAL"));
 		candidato.setTotalMeritosValidados(rs.getInt("COUNT_VALIDADOS"));

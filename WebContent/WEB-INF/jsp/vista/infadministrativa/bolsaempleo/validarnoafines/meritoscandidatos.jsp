@@ -213,7 +213,7 @@ $(document).ready(function() {
 	    "pageSize": 10,
 	    "filterable": true,
 	    "action": "<%= ControladorValidarNoAfines.ACCION_DATATABLE_CANDIDATOS %>",
-	    "title": 'Lista de usuarios',
+	    "title": 'LISTA DE USUARIOS',
 	    "dropdown": true,
 	    "params": {'<%=ControladorValidarNoAfines.PARAM_BOLSA%>': '<%= bolsa.getCodNum() %>'},
 	    "clickable": {'onClick': function(row) {
@@ -226,7 +226,7 @@ $(document).ready(function() {
 	    }},
 	    <% if (candidato != null) { %> "selected": <%= candidato.getCodNum() %> ,<% } %>
 	    "columns": [
-	    	{'data': 'numdocumento', 'filter': true},
+	    	{'data': 'prsnif', 'filter': true},
 	    	{'data': 'apellido1', 'filter': true, 'overflow': 'auto', 'render': function(row) {
         		return row.nombre + " " + row.apellido1 + " " + row.apellido2; 
         	}},
@@ -244,7 +244,7 @@ $(document).ready(function() {
 		    "pageSize": 10,
 		    "filterable": true,
 		    "action": "<%= ControladorValidarNoAfines.ACCION_DATATABLE_MERITOS %>",
-		    "title": 'Méritos para el usuario: <%= candidato.getNumDocumento() %>',
+		    "title": 'MÉRITOS PARA EL USUARIO: <%=candidato.getIdNif()%>',
 		    "dropdown": true,
 		    "params": {
 		    	'<%=ControladorValidarNoAfines.PARAM_BOLSA%>': '<%= bolsa.getCodNum() %>',
@@ -295,7 +295,7 @@ $(document).ready(function() {
 			    "pageSize": 10,
 			    "selectable": {'all': false},
 			    "action": "<%= ControladorValidarNoAfines.ACCION_DATATABLE_BOLSAS_CANDIDATO %>",
-			    "title": 'Bolsas en las que está apuntado actualmente el candidato',
+			    "title": 'BOLSAS EN LAS QUE ESTÁ APUNTADO ACTUALMENTE EL CANDIDATo',
 			    "dropdown": true,
 			    "params": {
 			    	'<%=ControladorValidarNoAfines.PARAM_BOLSA%>': '<%= bolsa.getCodNum() %>',
@@ -323,7 +323,7 @@ $(document).ready(function() {
 			    "ajax": { url: "<%= ControladorValidarNoAfines.URL_PATTERN_AJAX %>", async: false },
 			    "pageSize": 10,
 			    "action": "<%= ControladorValidarNoAfines.ACCION_DATATABLE_VALORES_MERITO_BOLSA %>",
-			    "title": 'Valores actuales de un mérito en las distintas bolsas',
+			    "title": 'VALORES ACTUALES DE UN MÉRITO EN LAS DISTINTAS BOLSAS',
 			    "dropdown": true,
 			    "params": {
 			    	'<%=ControladorValidarNoAfines.PARAM_BOLSA%>': '<%= bolsa.getCodNum() %>',

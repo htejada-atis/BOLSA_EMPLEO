@@ -71,7 +71,16 @@ public class TestBEPBeanEvaluador {
 	 */
 	@Test
 	public void testA02() {
-		UsuarioBolsaEmpleo usuario = new UsuarioBolsaEmpleo(DOCUMENTO, CODCUENTA, ROL, LISTADIST, EXCLUIDO, EXCLUIDOTIPO, FECHAEXCLUSIONINICIO, FECHAEXCLUSIONFIN);
+		UsuarioBolsaEmpleo usuario = new UsuarioBolsaEmpleo();
+		usuario.setPrsNif(DOCUMENTO);
+		usuario.setCodCuenta(CODCUENTA);
+		usuario.setRol(ROL);
+		usuario.setListaDist(LISTADIST);
+		usuario.setExcluido(EXCLUIDO);
+		usuario.setExcluidoTipo(EXCLUIDOTIPO);
+		usuario.setFechaExclusionInicio(FECHAEXCLUSIONINICIO);
+		usuario.setFechaExclusionFin(FECHAEXCLUSIONFIN);
+		
 		Evaluador evaluador = new Evaluador(usuario, AREA, ACTIVO);
 		Evaluador evaluador2 = new Evaluador(evaluador);
 		
@@ -94,7 +103,15 @@ public class TestBEPBeanEvaluador {
 	 */
 	@Test
 	public void testA03() {
-		UsuarioBolsaEmpleo usuario = new UsuarioBolsaEmpleo(DOCUMENTO, CODCUENTA, ROL, LISTADIST, EXCLUIDO, EXCLUIDOTIPO, FECHAEXCLUSIONINICIO, FECHAEXCLUSIONFIN);
+		UsuarioBolsaEmpleo usuario = new UsuarioBolsaEmpleo();
+		usuario.setPrsNif(DOCUMENTO);
+		usuario.setCodCuenta(CODCUENTA);
+		usuario.setRol(ROL);
+		usuario.setListaDist(LISTADIST);
+		usuario.setExcluido(EXCLUIDO);
+		usuario.setExcluidoTipo(EXCLUIDOTIPO);
+		usuario.setFechaExclusionInicio(FECHAEXCLUSIONINICIO);
+		usuario.setFechaExclusionFin(FECHAEXCLUSIONFIN);
 		
 		Evaluador evaluador = new Evaluador();
 		Evaluador evaluador2 = new Evaluador();

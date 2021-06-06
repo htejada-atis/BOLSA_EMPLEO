@@ -145,6 +145,7 @@ public class ControladorInicio extends HttpServlet {
 	private void init(VistaInicio bean, UVDatos datos, HttpServletRequest request, HttpServletResponse response) throws SQLException, UVException, IOException {
 		bean.setVista(JSP_INICIO);
 		BolsaEmpleoUtils.readMensajeSession(bean, request);
+		
 		try {
 			bean.setUsuarioLogeado(ModeloUsuarioBolsaEmpleo.obtenerInstancia().getOrCreateUsuario(datos));
 			bean.setAnonimo(bean.getUsuarioLogeado() == null);
@@ -153,7 +154,7 @@ public class ControladorInicio extends HttpServlet {
 			LOGGER.log(Level.SEVERE, e.toString());
 			
 			BolsaEmpleoUtils.addMensajeDeError(e.getMessage(), bean, request);
-			response.sendRedirect("/srv/es/informacionadministrativa/bolsaempleo/error");
+			response.sendRedirect("/srv/es/informacionadministrativa/bolsaempleo/error");			
 		}
 	}
 	

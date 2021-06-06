@@ -76,10 +76,8 @@ public class ControladorUsuarioCandidato extends HttpServlet {
 	public static final String ACCION_DATATABLE = "datatable";
 	public static final String ACCION_USUARIO = "accionusuario";
 	public static final String ACCION_VOLVER_USUARIO = "volverusuario";
-	
 	public static final String ACCION_FORMULARIO_USUARIO = "formulariousuario";
 	public static final String ACCION_BUSCAR_USUARIO = "buscarusuario";
-	public static final String ACCION_AGREGAR_USUARIO = "agregarusuario";
 	public static final String ACCION_EDITAR_USUARIO_FORM = "editarusuarioform";
 	public static final String ACCION_EDITAR_USUARIO = "editarusuario";
 	public static final String ACCION_ELIMINAR_USUARIO = "eliminarusuario";
@@ -174,9 +172,6 @@ public class ControladorUsuarioCandidato extends HttpServlet {
 				case ACCION_LISTAR_ROLES:
 					obtenerRoles(bean);
 					break;
-				case ACCION_AGREGAR_USUARIO:
-					agregarUsuario(request, response, bean);
-					break;
 				case ACCION_EDITAR_USUARIO_FORM:
 					editarUsuarioForm(request, bean);
 					break;
@@ -239,17 +234,17 @@ public class ControladorUsuarioCandidato extends HttpServlet {
 		
 		try {
 			bean.setUsuarioLogeado(ModeloUsuarioBolsaEmpleo.obtenerInstancia().getOrCreateUsuario(datos));
+
+			if (!bean.getUsuarioLogeado().getRol().getCodNum().equals(ModeloRol.ID_ROL_SERVICIO_PERSONAL)) {
+				throw new UVException("No tienes permiso de personal");
+			}
 		} catch (UVException e) {
 			LOGGER.log(Level.SEVERE, Formateador.getStackTrace(e));
 			LOGGER.log(Level.SEVERE, e.toString());
 			
 			BolsaEmpleoUtils.addMensajeDeError(e.getMessage(), bean, request);
 			response.sendRedirect("/srv/es/informacionadministrativa/bolsaempleo/error");
-		}
-		
-		if (!bean.getUsuarioLogeado().getRol().getCodNum().equals(ModeloRol.ID_ROL_SERVICIO_PERSONAL)) {
-			throw new UVException("No tienes permiso de personal");
-		}
+		}		
 	}
 	
 	private void errorFatal(VistaUsuarioBolsaEmpleo bean, String mensaje) {
@@ -413,10 +408,9 @@ public class ControladorUsuarioCandidato extends HttpServlet {
 		ModeloUsuarioBolsaEmpleo modelo = ModeloUsuarioBolsaEmpleo.obtenerInstancia();
 		
 		try {
-			UsuarioBolsaEmpleo usu = modelo.getUsuarioByNumeroDocumento(usuArcos.getDocumentoNumero());
+			UsuarioBolsaEmpleo usu = modelo.getUsuarioByCodCuenta(usuArcos.getUid());
 			
 			bean.setBusqueda(true);
-			
 			bean.setUsuarioArcos(usuArcos);
 			bean.setUsuario(usu);
 			bean.setRol(usu.getRol());
@@ -433,30 +427,6 @@ public class ControladorUsuarioCandidato extends HttpServlet {
 				throw new UVException("No existe el usuario");
 			}
 		}
-	}
-	
-	
-	
-	/** agrega un nuevo usuario.
-	 * @param request .
-	 * @param response .
-	 * @param bean bean de la vista a la que poner los valores.
-	 * @throws SQLException excepcion de bbdd.
-	 * @throws UVException en caso de error en bd
-	 */
-	public void agregarUsuario(HttpServletRequest request, HttpServletResponse response, VistaUsuarioBolsaEmpleo bean) throws SQLException, UVException, IOException {
-		bean.setVista(RUTA_BEP_CONF_USU + "usuarios.jsp");
-		
-		Usuario usuArcos = CrearUsuario.usuario(request.getParameter(PARAM_ID));
-		ModeloUsuarioBolsaEmpleo modelo = ModeloUsuarioBolsaEmpleo.obtenerInstancia();		
-		UsuarioBolsaEmpleo usuarioForm = this.getValidatorUsuarios(request);
-		usuarioForm.setCodCuenta(EscapaHTML.ajustaCodificacion(request.getParameter(PARAM_ID)));		
-		usuarioForm.setNumDocumento(usuArcos.getDocumentoNumero());
-						
-		modelo.insertaUsuario(usuarioForm, bean.getUsuarioLogeado());
-			
-		BolsaEmpleoUtils.addMensajeDeExito(MENSAJE_EXITO_AGREGAR, bean, request);
-		response.sendRedirect(request.getServletPath());
 	}
 	
 	/** edita un usuario .
@@ -477,7 +447,7 @@ public class ControladorUsuarioCandidato extends HttpServlet {
 		}
 		
 		ModeloUsuarioBolsaEmpleo modelo = ModeloUsuarioBolsaEmpleo.obtenerInstancia();
-		UsuarioBolsaEmpleo usu = modelo.getUsuarioByNumeroDocumento(usuArcos.getDocumentoNumero());
+		UsuarioBolsaEmpleo usu = modelo.getUsuarioByCodCuenta(usuArcos.getUid());
 		
 		bean.setBusqueda(false);
 		bean.setUsuarioArcos(usuArcos);
@@ -541,12 +511,14 @@ public class ControladorUsuarioCandidato extends HttpServlet {
 		ModeloUsuarioBolsaEmpleo modelo = ModeloUsuarioBolsaEmpleo.obtenerInstancia();
 		
 		obtenerRoles(bean);
-		
-		UsuarioBolsaEmpleo usu = modelo.getUsuarioByNumeroDocumento(Formateador.leeParametroString(request.getParameter(PARAM_NOMBRE_USUARIO)));
+				
 		Usuario usuArcos = CrearUsuario.usuario(request.getParameter(PARAM_NOMBRE_USUARIO));
-		
+		if (usuArcos == null) {
+			throw new UVException("No existe el usuario");
+		}
+		UsuarioBolsaEmpleo usu = modelo.getUsuarioByCodCuenta(usuArcos.getUid());
+
 		bean.setBusqueda(true);
-		
 		bean.setUsuarioArcos(usuArcos);
 		bean.setUsuario(usu);
 		bean.setRol(usu.getRol());

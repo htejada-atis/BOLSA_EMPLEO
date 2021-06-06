@@ -22,13 +22,10 @@ VistaUsuarioBolsaEmpleo bean = (VistaUsuarioBolsaEmpleo) uvdatos.getVistas().get
 	<table class="bluetable bolsaempleo" id="table_usuarios">
 		<tr>
 			<th scope="col" style="width:5%"></th>
-			<th scope="col" style="width:7%" title="Tipo de documento">Tipo</th>
-			<th scope="col" style="width:15%" title="N Documento">Documento</th>
+			<th scope="col" style="width:15%" title="Documento">Documento</th>
 			<th scope="col" style="width:14%" title="Nombre de usuario" class="user">Usuario</th>
 			<th scope="col" style="width:30%" title="Nombre y apellidos">Nombre y Apellidos</th>
 			<th scope="col" style="width:20%" title="Rol del usuario">Rol</th>
-			<th scope="col" style="width:15%" class="center" title="Lista del usuario">Lista</th>
-			<th scope="col" style="width:15%" class="center" title="Excluido">Excluido</th>
 			<th scope="col" style="width:15%" class="center" title="Eliminado">Eliminado</th>
 			<th scope="col" style="width:15%"></th>
 		</tr>
@@ -36,7 +33,7 @@ VistaUsuarioBolsaEmpleo bean = (VistaUsuarioBolsaEmpleo) uvdatos.getVistas().get
 		</tbody>
 		<tfoot>
 			<tr>
-				<th colSpan="10" style="width:100%"></th>
+				<th colSpan="7" style="width:100%"></th>
 			</tr>
 		</tfoot>
 	</table>
@@ -59,27 +56,12 @@ $(document).ready(function() {
 	    "action": "<%=ControladorUsuarioBolsaEmpleo.ACCION_DATATABLE_USUARIOS%>",
 	    "columns": [
 	    	{'data': 'codNum', 'selectable': true},
-	        {'data': 'tipodocumento', 'filter': true, 'overflow': 'auto'},
-	        {'data': 'numdocumento', 'filter': true, 'overflow': 'auto'},
+	        {'data': 'prsnif', 'filter': true, 'overflow': 'auto'},
 	        {'data': 'codcuenta', 'filter': true, 'overflow': 'auto'},
-	        {'data': 'apellido1', 'filter': true, 'overflow': 'auto', 'render': function(row) {
+	        {'data': 'apellido1', 'filter': false, 'order': false, 'overflow': 'auto', 'render': function(row) {
 	        	return row.nombre + " " + row.apellido1 + " " + row.apellido2;         		
         	}},
 	        {'data': 'rol.descripcion', 'filter': {'type': 'select', 'options': {'1050':'Personal', '1051':'Comision'}}  , 'order': {'active': false}},
-	        {'data': 'listaDist', 'filter': {'type': 'selectBoolean', 'true': 'En Lista', 'false': 'Sin Lista'}, 'render': function(row) {
-	        	if(row.listaDist==true){
-        			return "<div title='En lista distribución' class='circle-true'></div>"; 
-        		} else {
-        			return "<div title='Excluido de lista distribución' class='circle-false'></div>"; 
-        		}
-        	}},
-        	{'data': 'excluido', 'order': {'active': false}, 'filter': {'type': 'select', 'options':{'true': 'Excluido', 'false': 'Incluido'}, 'optionDefault': 'false'},
-	    		'render': function(row) {
-	        		if (row.excluido) {
-	        			return "<div title='Excluido' class='circle-true'></div>"; 
-	        		}
-        		}
-	        },
         	{'data': 'borrado', 'order': {'active': false}, 'filter': {'type': 'select', 'options':{'true': 'Borrado', 'false': 'No Borrado'}, 'optionDefault': 'false'},
 	    		'render': function(row) {
 	        		if (row.borrado) {
