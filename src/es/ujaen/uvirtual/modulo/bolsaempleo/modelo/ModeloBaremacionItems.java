@@ -55,7 +55,7 @@ public class ModeloBaremacionItems {
 	
 	public static final Integer COLUMN_CODIGO_MAXLENGTH = 3; 
 	public static final Integer COLUMN_NOMBRE_MAXLENGTH = 1000;
-	public static final Integer COLUMN_DESCRIPCION_MAXLENGTH = 250;
+	public static final Integer COLUMN_DESCRIPCION_MAXLENGTH = 1000;
 
 	public static final Float MINIMO_VALOR_FLOAT = (float) 0.01;
 	public static final Float MAXIMO_VALOR_PORCENTAGE = (float) 100.0;

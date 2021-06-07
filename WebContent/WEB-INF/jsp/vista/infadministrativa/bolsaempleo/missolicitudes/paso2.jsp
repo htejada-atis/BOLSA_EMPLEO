@@ -232,7 +232,7 @@ VistaSolicitudes bean = (VistaSolicitudes) uvdatos.getVistas().get(VistaSolicitu
 				
 				// enviamos afinidad
 				var params = {
-    				'a': '<%=ControladorMisSolicitudes.ACCION_MERITO_AFINIDAD_NOINDIVIDUALIZADO%>',
+    				'<%=ControladorMisSolicitudes.PARAM_ACCION%>': '<%=ControladorMisSolicitudes.ACCION_MERITO_AFINIDAD_NOINDIVIDUALIZADO%>',
     				'<%=ControladorMisSolicitudes.PARAM_BOLSA %>': '<%= bean.getArea() != null ? bean.getArea().getCodNum() : "" %>',
     				'<%=ControladorMisSolicitudes.PARAM_SOLICITUD_ID %>': '<%= bean.getSolicitud().getCodNum() %>',
     				'<%=ControladorMisSolicitudes.PARAM_MERITO_ID%>': row.merito.codNum,
@@ -256,7 +256,7 @@ VistaSolicitudes bean = (VistaSolicitudes) uvdatos.getVistas().get(VistaSolicitu
 		    "filterable": true,
 		    "clickable": {'onClick': function(row) {
 		    	var params = {
-	    				'a': '<%=ControladorMisSolicitudes.ACCION_BOLSA_SELECCIONADA%>',
+	    				'<%=ControladorMisSolicitudes.PARAM_ACCION%>': '<%=ControladorMisSolicitudes.ACCION_BOLSA_SELECCIONADA%>',
 	    				'<%=ControladorMisSolicitudes.PARAM_BOLSA%>': row.codNum,
 	    				'<%=ControladorMisSolicitudes.PARAM_SOLICITUD_ID%>': <%=bean.getSolicitud().getCodNum()%>};
         		Atis.sendForm("<%=request.getRequestURI()%>", params);
@@ -300,7 +300,7 @@ VistaSolicitudes bean = (VistaSolicitudes) uvdatos.getVistas().get(VistaSolicitu
 			    				var accion = checkbox.checked ? '<%=ControladorMisSolicitudes.ACCION_MERITO_SELECCIONADO%>'
 			    						: '<%=ControladorMisSolicitudes.ACCION_MERITO_DESELECCIONADO%>';
 				    			var params = {
-				    				'a': accion,
+				    				'<%=ControladorMisSolicitudes.PARAM_ACCION%>': accion,
 				    				'<%=ControladorMisSolicitudes.PARAM_BOLSA%>': '<%=bean.getArea().getCodNum()%>',
 				    				'<%=ControladorMisSolicitudes.PARAM_SOLICITUD_ID%>': '<%=bean.getSolicitud().getCodNum()%>',
 				    				'<%=ControladorMisSolicitudes.PARAM_MERITO_ID%>': row.merito.codNum,
@@ -333,7 +333,7 @@ VistaSolicitudes bean = (VistaSolicitudes) uvdatos.getVistas().get(VistaSolicitu
 		        			return '<span title="El mérito no tiene afinidad con el Área seleccionada"></span>';
 		        		}		        				        	
 		        	}},
-		        	{'data': 'excluido', 'order': {'active': false}, 'filter': {'type': 'selectBoolean', 'true': 'Excluido', 'false': 'No excluido', 'optionDefault': 'false'}, 'render': function(row) {
+		        	{'data': 'excluido', 'order': false, 'filter': false, 'render': function(row) {
 		        		if (row.excluido) {
 		        			return "<div title='Mérito excluido' class='circle-false'></div>";
 		        		} else {

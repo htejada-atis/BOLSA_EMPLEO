@@ -11,10 +11,11 @@ import java.util.List;
 public class MeritoSolicitudTable implements Serializable {
 
 	private static final long serialVersionUID = 1L;
-	private Integer codNum; // id del merito 
+	private Integer codNum; // id del merito
 	private Merito merito;
 	private MeritoSolicitud meritoSolicitud;
 	private List<MeritoSolicitudValoracion> valoraciones;
+	private Boolean excluido;
 
 	/**
 	 * Constructor por defecto.
@@ -26,18 +27,19 @@ public class MeritoSolicitudTable implements Serializable {
 	/**
 	 * Constructor con parametros.
 	 *
-	 * @param pmerito .
+	 * @param pmerito          .
 	 * @param pmeritoSolicitud .
-	 * @param pvaloraciones .
+	 * @param pvaloraciones    .
+	 * @param excluido .
 	 */
-	public MeritoSolicitudTable(Merito pmerito, MeritoSolicitud pmeritoSolicitud, List<MeritoSolicitudValoracion> pvaloraciones) {		
+	public MeritoSolicitudTable(Merito pmerito, MeritoSolicitud pmeritoSolicitud, List<MeritoSolicitudValoracion> pvaloraciones, Boolean excluido) {
 		this.merito = pmerito;
-		this.codNum = pmerito != null ? pmerito.getCodNum() : null; 
-		
+		this.codNum = pmerito != null ? pmerito.getCodNum() : null;
 		this.meritoSolicitud = pmeritoSolicitud;
-		this.valoraciones = pvaloraciones;		
+		this.valoraciones = pvaloraciones;
+		this.excluido = excluido;
 	}
-	
+
 	public Integer getCodNum() {
 		return this.codNum;
 	}
@@ -48,6 +50,7 @@ public class MeritoSolicitudTable implements Serializable {
 
 	/**
 	 * Establece el merito.
+	 * 
 	 * @param merito .
 	 */
 	public void setMerito(Merito merito) {
@@ -62,7 +65,7 @@ public class MeritoSolicitudTable implements Serializable {
 	public void setMeritoSolicitud(MeritoSolicitud meritoSolicitud) {
 		this.meritoSolicitud = meritoSolicitud;
 	}
-		
+
 	public List<MeritoSolicitudValoracion> getValoraciones() {
 		return this.valoraciones;
 	}
@@ -70,23 +73,34 @@ public class MeritoSolicitudTable implements Serializable {
 	public void setValoraciones(List<MeritoSolicitudValoracion> valoraciones) {
 		this.valoraciones = valoraciones;
 	}
-		
+	
+	public Boolean getExcluido() {
+		return this.excluido;
+	}
+	
+	public void setExcluido(Boolean excluido) {
+		this.excluido = excluido;
+	}
+
 	public static long getSerialversionuid() {
 		return serialVersionUID;
 	}
 
 	@Override
 	public String toString() {
-		return "MeritoSolicitud [merito=" + merito + ", meritoSolicitud=" + meritoSolicitud + ", valoraciones=" + valoraciones + "]";
+		return "MeritoSolicitudTable [merito=" + merito + ", meritoSolicitud=" + meritoSolicitud + ", valoraciones="
+				+ valoraciones + ", exclusivo=" + excluido + "]";
 	}
 
 	@Override
 	public int hashCode() {
 		final int prime = 31;
 		int result = 1;
+		result = prime * result + ((codNum == null) ? 0 : codNum.hashCode());
 		result = prime * result + ((merito == null) ? 0 : merito.hashCode());
 		result = prime * result + ((meritoSolicitud == null) ? 0 : meritoSolicitud.hashCode());
-		result = prime * result + ((valoraciones == null) ? 0 : valoraciones.hashCode());	
+		result = prime * result + ((valoraciones == null) ? 0 : valoraciones.hashCode());
+		result = prime * result + ((excluido == null) ? 0 : excluido.hashCode());
 		return result;
 	}
 
@@ -124,7 +138,14 @@ public class MeritoSolicitudTable implements Serializable {
 		} else if (!valoraciones.equals(other.valoraciones)) {
 			return false;
 		}
-		
+		if (excluido == null) {
+			if (other.excluido != null) {
+				return false;
+			}
+		} else if (!excluido.equals(other.excluido)) {
+			return false;
+		}
+
 		return true;
 	}
 
