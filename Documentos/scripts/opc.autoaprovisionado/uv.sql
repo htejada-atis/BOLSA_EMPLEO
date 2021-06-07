@@ -16,7 +16,7 @@ VALUES ( DEFAULT,
 
 El código de autorización para autorizar el uso del correo es: %%CODIGO%%
 
-Puede acceder a la siguiente dirección https://uvirtual.ujaen.es/pub/es/operaciones/autoregistrado/usuarioautoresgistrado?id=%%IDSOLICITUD%%
+Puede acceder a la siguiente dirección https://uvirtual.ujaen.es/pub/es/operaciones/autoregistrado/usuarioautoresgistrado?idCambio=%%IDSOLICITUD%%&email=%%CORREO%%
 
 En caso de que no haya realizado esta petición ignore este email.');
 

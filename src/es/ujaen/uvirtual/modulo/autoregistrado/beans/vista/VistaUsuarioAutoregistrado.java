@@ -15,6 +15,9 @@ public class VistaUsuarioAutoregistrado extends Vista implements Serializable {
 	private String clave;
 	private String codigoTemporal;
 	private String idSolicitud;
+	private String paginaRedireccion;
+	
+	private String idModulo;
 	public String getVista() {
 		return vista;
 	}
@@ -53,5 +56,21 @@ public class VistaUsuarioAutoregistrado extends Vista implements Serializable {
 
 	public void setIdSolicitud(String idSolicitud) {
 		this.idSolicitud = idSolicitud;
+	}
+
+	public String getPaginaRedireccion() {
+		return paginaRedireccion;
+	}
+
+	public void setPaginaRedireccion(String paginaRedireccion) {
+		this.paginaRedireccion = paginaRedireccion;
+	}
+
+	public String getIdModulo() {
+		return idModulo;
+	}
+
+	public void setIdModulo(String idModulo) {
+		this.idModulo = idModulo;
 	}
 }

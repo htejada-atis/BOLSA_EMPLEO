@@ -12,10 +12,14 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
+import es.ujaen.uvirtual.adm.CrearUsuario;
+import es.ujaen.uvirtual.beans.Acceso;
+import es.ujaen.uvirtual.beans.ConfiguracionGlobal;
 import es.ujaen.uvirtual.beans.UVDatos;
 import es.ujaen.uvirtual.beans.Usuario;
 import es.ujaen.uvirtual.modulo.autoregistrado.beans.vista.VistaUsuarioAutoregistrado;
 import es.ujaen.uvirtual.modulo.autoregistrado.modelo.ModeloUsuarioAutoregistrado;
+import es.ujaen.uvirtual.utilidades.AyudaURL;
 import es.ujaen.uvirtual.utilidades.EscapaHTML;
 import es.ujaen.uvirtual.utilidades.Formateador;
 import es.ujaen.uvirtual.utilidades.UVException;
@@ -28,6 +32,7 @@ import es.ujaen.uvirtual.utilidades.UVException;
 		description = "Usuario autoregistrado", 
 		urlPatterns = { 
 				"/pub/es/operaciones/autoregistrado/usuarioautoresgistrado", 
+				"/pub/es/operaciones/autoregistrado/usuarioautoresgistrado/*", 
 				"/pub/en/operaciones/autoregistrado/usuarioautoresgistrado"
 		})
 public class ControladorUsuarioAutoregistrado extends HttpServlet {
@@ -47,6 +52,7 @@ public class ControladorUsuarioAutoregistrado extends HttpServlet {
 	public static final String PARAM_CODIGO_TEMPORAL = "codigoTemporal";
 	public static final String PARAM_ID_CAMBIO = "idCambio";
 	public static final String PARAM_CLAVE = "cla";
+	public static final String PARAM_ID_MODULO = "idmodulo";
 	
 	public static final String ACCION_WAYF = "wayf";
 	public static final String ACCION_VALIDA = "valida";
@@ -70,10 +76,15 @@ public class ControladorUsuarioAutoregistrado extends HttpServlet {
 		if (nombreAccion == null) {
 			nombreAccion = ACCION_WAYF;
 		}
+		String idCambio = EscapaHTML.ajustaCodificacion(request.getParameter(PARAM_ID_CAMBIO));
+		if (idCambio != null) {
+			nombreAccion = ACCION_VALIDA_CODIGO_TEMPORAL;
+		}
+		
 		try {
 			switch (nombreAccion) {
 				case ACCION_VALIDA:
-					validaUsuario(request, bean);
+					validaUsuario(request, response, bean);
 					break;
 				case ACCION_MOSTRAR_CREAR:
 					mostrarCrear(bean);
@@ -88,6 +99,7 @@ public class ControladorUsuarioAutoregistrado extends HttpServlet {
 					validaClaveTemporal(request, bean);
 					break;
 				default:
+					validaWayf(request, response, bean);
 					break;
 			}
 		} catch (UVException e) {
@@ -116,21 +128,79 @@ public class ControladorUsuarioAutoregistrado extends HttpServlet {
 		doGet(request, response);
 	}
 	
-	private void validaUsuario(HttpServletRequest request, VistaUsuarioAutoregistrado bean) throws SQLException {
+	private String obtenerIdModulo(HttpServletRequest request) {
+		String[] parametros = AyudaURL.obtenerParametros(request.getRequestURI());
+		String modulo = "defecto";
+		if (parametros != null && parametros.length >= 1) {
+			modulo = Formateador.leeParametroString(parametros[0]);
+		}
+		return modulo;
+	}
+	
+	private String obtenerUrlModulo(HttpServletRequest request, String idModulo) {
+		String salida = null;
+		String servidor = request.getServerName();
+		int puerto = request.getServerPort();
+		final int puertoHttps = 443;
+		if (puerto != puertoHttps) {
+			servidor = servidor + ":" + puerto;
+		}
+		
+		salida = request.getScheme() + "://" + servidor + "/srv/es/index";
+		if ("bep".equals(idModulo)) {
+			salida = request.getScheme() + "://" + servidor + "/srv/es/informacionadministrativa/bolsaempleo";
+		}
+		return salida;
+	}
+
+	private void validaWayf(HttpServletRequest request, HttpServletResponse response, VistaUsuarioAutoregistrado bean) throws IOException {
+		UVDatos datos = (UVDatos) request.getAttribute(UVDatos.NOMBRE_ATRIBUTO);
+		String uid = datos.getIdentificadorUsuario();
+		if (uid == null) {
+			uid = (String) request.getSession().getAttribute(ConfiguracionGlobal.getAtributoUsuario());
+		}
+		String modulo = obtenerIdModulo(request); 
+		String urlModulo = obtenerUrlModulo(request, modulo);
+		bean.setPaginaRedireccion(urlModulo);
+		bean.setIdModulo(modulo);
+		if (uid != null) {
+			response.sendRedirect(bean.getPaginaRedireccion());
+		}
+	}
+	
+	private void meterUsuarioEnSesion(HttpServletRequest request, String correo) {
+        HttpSession session = request.getSession(true);
+		session.setAttribute("esValidaLaSesion", correo);
+		session.setAttribute(UVDatos.ID_USUARIO_SESION, correo);
+		// 20121009 - define el usuario que se ha logueado para que se registre el valor correcto.
+		Acceso acceso = (Acceso) request.getAttribute(ConfiguracionGlobal.getAtributoLog());
+		if (acceso != null) {
+			acceso.setUsuario(correo);
+		}
+		request.setAttribute(ConfiguracionGlobal.getAtributoLog(), acceso);
+		// 20121009 - define el usuario que se ha logueado para que se registre el valor correcto.
+		UVDatos uvdatos = (UVDatos) request.getAttribute(UVDatos.NOMBRE_ATRIBUTO);
+		uvdatos.getAcceso().setUsuario(correo);
+		uvdatos.setIdentificadorUsuario(correo);
+		Usuario usuario = CrearUsuario.usuario(correo);
+		uvdatos.setUsuario(usuario);
+	}
+	
+	private void validaUsuario(HttpServletRequest request, HttpServletResponse response, VistaUsuarioAutoregistrado bean) throws SQLException, IOException {
 		String correo = Formateador.leeParametroString(request.getParameter(PARAM_CORREO));
 		correo = correo.trim();
 		String clave = Formateador.leeParametroString(request.getParameter(PARAM_CLAVE));
 		ModeloUsuarioAutoregistrado modelo = new ModeloUsuarioAutoregistrado();
-		if (modelo.validaClaveUsuario(correo, clave)) {
-	        HttpSession session = request.getSession(true);
-			session.setAttribute("esValidaLaSesion", correo);
-			session.setAttribute(UVDatos.ID_USUARIO_SESION, correo);
-			
-			// 20121009 - define el usuario que se ha logueado para que se registre el valor correcto.
-			UVDatos uvdatos = (UVDatos) request.getAttribute(UVDatos.NOMBRE_ATRIBUTO);
-			uvdatos.getAcceso().setUsuario(correo);
-			uvdatos.setIdentificadorUsuario(correo);			
+		String ip = request.getRemoteAddr();
+		if (modelo.validaClaveUsuario(correo, clave, ip)) {
+			meterUsuarioEnSesion(request, correo);
+			String idModulo = obtenerIdModulo(request);
+			String paginaRedirect = obtenerUrlModulo(request, idModulo);
+			response.sendRedirect(paginaRedirect);
+		} else {
+			bean.getMensajesDeError().add("Usuario/clave no válidos");
 		}
+		
 	}
 
 	private void mostrarCrear(VistaUsuarioAutoregistrado bean) {
@@ -167,9 +237,15 @@ public class ControladorUsuarioAutoregistrado extends HttpServlet {
 		String correo = Formateador.leeParametroString(request.getParameter(PARAM_CORREO));
 		String ip = request.getRemoteAddr();
 		ModeloUsuarioAutoregistrado modelo = new ModeloUsuarioAutoregistrado();
-		String idSolicitud = modelo.mandarClaveTemporal(correo, ip);
-		bean.setIdSolicitud(idSolicitud);
+		String idSolicitud;
 		bean.setCorreo(correo);
+		try {
+			idSolicitud = modelo.mandarClaveTemporal(correo, ip);
+			bean.setIdSolicitud(idSolicitud);
+		} catch (SQLException | UVException e) {
+			bean.setVista("/WEB-INF/jsp/vista/operaciones/autoaprovisionado/usuarioExternoWayf.jsp");
+			bean.getMensajesDeError().add(e.getMessage());
+		}
 	}
 
 	private void validaClaveTemporal(HttpServletRequest request, VistaUsuarioAutoregistrado bean) throws SQLException, UVException {
@@ -177,11 +253,27 @@ public class ControladorUsuarioAutoregistrado extends HttpServlet {
 		String correo = Formateador.leeParametroString(request.getParameter(PARAM_CORREO));
 		String temporal = Formateador.leeParametroString(request.getParameter(PARAM_CODIGO_TEMPORAL));
 		String idSolicitud = Formateador.leeParametroString(request.getParameter(PARAM_ID_CAMBIO));
+		String modulo = obtenerIdModulo(request); 
+		String urlModulo = obtenerUrlModulo(request, modulo);
+		bean.setPaginaRedireccion(urlModulo);
+		bean.setIdModulo(modulo);
 		String ip = request.getRemoteAddr();
 		ModeloUsuarioAutoregistrado modelo = new ModeloUsuarioAutoregistrado();
-		String clave = modelo.verificaPeticionCambio(correo, idSolicitud, temporal, ip);
-		bean.setClave(clave);
 		bean.setCorreo(correo);
+		bean.setIdSolicitud(idSolicitud);
+		String clave;
+		if (temporal != null && !temporal.isBlank()) {
+			try {
+				clave = modelo.verificaPeticionCambio(correo, idSolicitud, temporal, ip);
+				bean.setClave(clave);
+				meterUsuarioEnSesion(request, correo);
+			} catch (SQLException | UVException e) {
+				bean.setVista("/WEB-INF/jsp/vista/operaciones/autoaprovisionado/validaCodigoTemporal.jsp");
+				bean.getMensajesDeError().add(e.getMessage());
+			}
+		} else {
+			bean.setVista("/WEB-INF/jsp/vista/operaciones/autoaprovisionado/validaCodigoTemporal.jsp");
+		}
 	}
 	
 }

@@ -95,7 +95,7 @@ public class ModeloUsuarioAutoregistrado {
 			throw new UVException("No se puede registrar una cuenta ujaen como autoregistrado");
 		}
 		if (isCorreoRegistrado(usuario.getEmailCuentaPersona())) {
-			throw new UVException("Correo ya registrado");
+			throw new UVException("Correo ya registrado. Intente recuperar su clave");
 		}
 	}
 	
@@ -165,6 +165,28 @@ public class ModeloUsuarioAutoregistrado {
 		} 
 		return salida;
 	}
+
+	/** inserta un registro de intento de validacion de usuario.
+	 * @param correo correo del usuario externo
+	 * @param valido si ha accedido correctamente
+	 * @param ip ip desde la que se solicita el acceso
+	 * @throws SQLException si error en bbdd
+	 * @throws UVException si error en parametros
+	 */
+	public void insertaLogAcceso(String correo, boolean valido, String ip) throws SQLException {
+		String consulta = " INSERT INTO arcos.ARG_LOG_ACCESO " 
+						+ " (correo, valido, ip, fecha) "
+						+ " VALUES (?, ?, ?, sysdate)";
+		try (Connection conexion = ConexionArcos.obtenerInstancia();
+			 PreparedStatement stmt = conexion.prepareStatement(consulta);) {
+			int parameterIndex = 1;
+			stmt.setString(parameterIndex++, correo);
+			stmt.setString(parameterIndex++, valido ? "S" : "N");
+			stmt.setString(parameterIndex++, ip);
+			stmt.executeUpdate();
+		}
+	}
+	
 
 	/** inserta una nueva petición de cambio de clave de usuario autoregistrado.
 	 * @param correo correo del usuario externo
@@ -271,16 +293,18 @@ public class ModeloUsuarioAutoregistrado {
 	 * Valida si la clave de un usuario externo es valida.
 	 * @param correo correo del usuario externo
 	 * @param clave clave del usuairo
+	 * @param ip ip desde la que se valida el usuario
 	 * @return true en caso de ser valida, false en caso contrario
 	 * @throws SQLException en caso de error en la base de datos
 	 */
-	public boolean validaClaveUsuario(String correo, String clave) throws SQLException {
+	public boolean validaClaveUsuario(String correo, String clave, String ip) throws SQLException {
 		boolean salida = false;
 		String ultimoHash = listaClaveUsuarioExterno(correo);
 		ModeloClaveArcos modeloClaveArcos = ModeloClaveArcos.obtenerInstancia();
 		if (modeloClaveArcos.isClaveIgualHash(clave, ultimoHash)) {
 			salida = true;
 		}
+		insertaLogAcceso(correo, salida, ip);
 		return salida;
 	}	
 	
@@ -380,11 +404,14 @@ public class ModeloUsuarioAutoregistrado {
 		final int moduloConversionACaracter = 32;
 		String codigoPin = modeloClaveArcos.pinAleatorioTemporal();
 		String idsolicitud = new BigInteger(numeroBitsId, new SecureRandom()).toString(moduloConversionACaracter);
+		if (!isCorreoRegistrado(correo)) {
+			throw new UVException("primero debe registrar su usuario");
+		}
 		insertaPeticionCambio(correo, idsolicitud, codigoPin, ip);
 		destinatariosCorreo.add(correo);
 		String asunto = ConfiguracionGlobal.getParametroCadena("autoaprovisionado.mail.asunto");
 		String cuerpo = ConfiguracionGlobal.getParametroCadena("autoaprovisionado.mail.cuerpo");
-		cuerpo = aplicaPlantilla(cuerpo, codigoPin, idsolicitud);
+		cuerpo = aplicaPlantilla(cuerpo, codigoPin, idsolicitud, correo);
 		try {
 			EnviaCorreo.enviaCorreoExcepcion(null, destinatariosCorreo, null, null, null, asunto, cuerpo);
 		} catch (Exception e) {
@@ -398,12 +425,14 @@ public class ModeloUsuarioAutoregistrado {
 	 * @param plantilla plantilla con marcas
 	 * @param codigoPin codigo de pin para aplicar a la plantilla
 	 * @param idSolicitud idSolicitud para aplicar a la plantilla
+	 * @param correo para aplicar a la plantilla
 	 * @return texto de la plantilla con los valores cambiados
 	 */
-	private String aplicaPlantilla(String plantilla, String codigoPin, String idSolicitud) {
+	private String aplicaPlantilla(String plantilla, String codigoPin, String idSolicitud, String correo) {
 		String salida = plantilla;
 		salida = salida.replace("%%CODIGO%%", codigoPin);
 		salida = salida.replace("%%IDSOLICITUD%%", idSolicitud);
+		salida = salida.replace("%%CORREO%%", correo);
 		return salida;
 	}
 }

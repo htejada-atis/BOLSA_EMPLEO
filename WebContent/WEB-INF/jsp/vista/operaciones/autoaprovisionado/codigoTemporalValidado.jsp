@@ -19,4 +19,5 @@ VistaUsuarioAutoregistrado bean = (VistaUsuarioAutoregistrado)uvdatos.getVistas(
 	<% } else { %>
 		Se ha creado su cuenta <%=bean.getCorreo() %> con la clave <%=bean.getClave() %>
 	<% } %>
+	Pulse en el siguiente enlace para <a href="<%=bean.getPaginaRedireccion() %>">acceder</a>
 </div>	
