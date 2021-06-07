@@ -1022,8 +1022,8 @@ public class ModeloSolicitud {
 	public List<MeritoSolicitudValoracion> getValoracionesMeritoSolicitud(int idMeritoSolicitud, boolean loadMeritoSolicitud) throws SQLException, UVException {
 		List<MeritoSolicitudValoracion> valoraciones = new ArrayList<>();
 		
-		String consulta = "SELECT bepsbv.* FROM UVIRTUAL.TBEP_SOL_BOL_MER_VALORACION bepsbv"
-				+ "	INNER JOIN UVIRTUAL.TBEP_AFINIDADES bepafi ON bepafi.CODNUM = bepsbv.BEPAFI_CODNUM"
+		String consulta = "SELECT bepsbv.* FROM TBEP_SOL_BOL_MER_VALORACION bepsbv"
+				+ "	INNER JOIN TBEP_AFINIDADES bepafi ON bepafi.CODNUM = bepsbv.BEPAFI_CODNUM"
 				+ "	WHERE bepsbv.BEPSBM_CODNUM = ? ORDER BY bepafi.MODULACION DESC";
 		
 		try (Connection conexion = ConexionUvirtual.obtenerInstancia(); PreparedStatement stmt = conexion.prepareStatement(consulta)) {
