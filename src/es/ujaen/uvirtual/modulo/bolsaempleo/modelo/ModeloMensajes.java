@@ -319,11 +319,11 @@ public class ModeloMensajes {
 				}
 				
 				conexion.commit();
-				conexion.setAutoCommit(true);
 			} catch (Exception e) {
 				conexion.rollback();
-				conexion.setAutoCommit(true);
 				throw e;
+			} finally {
+				conexion.setAutoCommit(true);
 			}
 		}
 	}
