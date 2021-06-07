@@ -172,13 +172,6 @@ public class ControladorUsuarioAutoregistrado extends HttpServlet {
         HttpSession session = request.getSession(true);
 		session.setAttribute("esValidaLaSesion", correo);
 		session.setAttribute(UVDatos.ID_USUARIO_SESION, correo);
-		// 20121009 - define el usuario que se ha logueado para que se registre el valor correcto.
-		Acceso acceso = (Acceso) request.getAttribute(ConfiguracionGlobal.getAtributoLog());
-		if (acceso != null) {
-			acceso.setUsuario(correo);
-		}
-		request.setAttribute(ConfiguracionGlobal.getAtributoLog(), acceso);
-		// 20121009 - define el usuario que se ha logueado para que se registre el valor correcto.
 		UVDatos uvdatos = (UVDatos) request.getAttribute(UVDatos.NOMBRE_ATRIBUTO);
 		uvdatos.getAcceso().setUsuario(correo);
 		uvdatos.setIdentificadorUsuario(correo);
