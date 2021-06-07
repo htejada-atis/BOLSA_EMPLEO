@@ -202,7 +202,6 @@ public class ControladorUsuarioAutoregistrado extends HttpServlet {
 		} else {
 			bean.getMensajesDeError().add("Usuario/clave no válidos");
 		}
-		
 	}
 
 	private void mostrarCrear(VistaUsuarioAutoregistrado bean) {
