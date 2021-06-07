@@ -43,3 +43,9 @@ En caso de que no haya realizado esta petición ignore este email.');
    (MNU_CODNUM, RED, DESCRIPCION, FLG_DESACT)
  Values
    (398, '0.0.0.0/0', 'Publico', 'N');
+   
+Insert into ADM_ROL
+   (ROL_CODNUM, DESCRIPCION, VALOR)
+ Values
+   (335, 'Usuario que se ha autoregistrado en uvirtual', 'UsuarioAutoregistrado');
+
