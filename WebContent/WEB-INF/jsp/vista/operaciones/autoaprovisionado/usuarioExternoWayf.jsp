@@ -18,7 +18,7 @@ VistaUsuarioAutoregistrado bean = (VistaUsuarioAutoregistrado)uvdatos.getVistas(
 			<%=bean.formatearMensajesDeError()%>
 		</div>
   	<% } %>
-	<h2>Acceso de usuarios autoregistrados</h2>
+	<h2>Acceso de usuarios autoregistrados a <%=bean.getDescripcionModulo() %></h2>
 	<div>
 		Si ya tiene usuario, introduzca su correo y contraseña
 		<form method="post" action="<%=request.getRequestURI()%>" id="formularioExiste"> 

@@ -32,7 +32,7 @@ VistaUsuarioAutoregistrado bean = (VistaUsuarioAutoregistrado)uvdatos.getVistas(
 			Segundo apellido <input type="text" name="<%=ControladorUsuarioAutoregistrado.PARAM_APELLIDO2%>"/> <br/>
 			Email <input type="text" name="<%=ControladorUsuarioAutoregistrado.PARAM_CORREO%>"/> <br/>
 			Repetir email <input type="text" name="<%=ControladorUsuarioAutoregistrado.PARAM_CORREO_REPETIDO%>"/> <br/>
-			<input type="submit" value="crear" />
+			<input type="submit" value="Crear" />
 		</form>
 	<% } %>
 </div>	

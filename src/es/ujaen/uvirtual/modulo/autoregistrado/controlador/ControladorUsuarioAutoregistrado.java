@@ -137,6 +137,14 @@ public class ControladorUsuarioAutoregistrado extends HttpServlet {
 		return modulo;
 	}
 	
+	private String obtenerDescripcionModulo(String idModulo) {
+		String salida = "Universidad Virtual";
+		if ("bep".equals(idModulo)) {
+			salida = "Bolsa de empleo";
+		}
+		return salida;
+	}
+	
 	private String obtenerUrlModulo(HttpServletRequest request, String idModulo) {
 		String salida = null;
 		String servidor = request.getServerName();
@@ -163,6 +171,7 @@ public class ControladorUsuarioAutoregistrado extends HttpServlet {
 		String urlModulo = obtenerUrlModulo(request, modulo);
 		bean.setPaginaRedireccion(urlModulo);
 		bean.setIdModulo(modulo);
+		bean.setDescripcionModulo(obtenerDescripcionModulo(modulo));
 		if (uid != null) {
 			response.sendRedirect(bean.getPaginaRedireccion());
 		}
