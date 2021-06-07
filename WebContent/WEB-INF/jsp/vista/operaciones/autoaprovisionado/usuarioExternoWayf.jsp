@@ -20,7 +20,7 @@ VistaUsuarioAutoregistrado bean = (VistaUsuarioAutoregistrado)uvdatos.getVistas(
   	<% } %>
 	<h2>Acceso de usuarios a <%=bean.getDescripcionModulo() %></h2>
 	<div>
-		si tiene usuario de SIDUJA, pulse en <a href="<%=bean.getPaginaRedireccion()%>"><%=bean.getPaginaRedireccion()%></a>
+		Si tiene usuario de SIDUJA, pulse en <a href="<%=bean.getPaginaRedireccion()%>"><%=bean.getPaginaRedireccion()%></a>
 		<hr/>	
 
 		Si ya tiene usuario, introduzca su correo y contraseña
