@@ -13,8 +13,6 @@ import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
 import es.ujaen.uvirtual.adm.CrearUsuario;
-import es.ujaen.uvirtual.beans.Acceso;
-import es.ujaen.uvirtual.beans.ConfiguracionGlobal;
 import es.ujaen.uvirtual.beans.UVDatos;
 import es.ujaen.uvirtual.beans.Usuario;
 import es.ujaen.uvirtual.modulo.autoregistrado.beans.vista.VistaUsuarioAutoregistrado;
@@ -60,6 +58,8 @@ public class ControladorUsuarioAutoregistrado extends HttpServlet {
 	public static final String ACCION_CREAR = "crearUsuario";
 	public static final String ACCION_OLVIDO = "olvido";
 	public static final String ACCION_VALIDA_CODIGO_TEMPORAL = "validaTemporal";
+	
+	final private String JSP_VALIDA_CODIGO_TEMPORAL = "/WEB-INF/jsp/vista/operaciones/autoaprovisionado/validaCodigoTemporal.jsp";
 
 	/** Peticion GET.
 	 * @see HttpServlet#doGet(HttpServletRequest request, HttpServletResponse response)
@@ -226,7 +226,7 @@ public class ControladorUsuarioAutoregistrado extends HttpServlet {
 	}
 	
 	private void mandarClaveTemporal(HttpServletRequest request, VistaUsuarioAutoregistrado bean) throws SQLException, UVException {
-		bean.setVista("/WEB-INF/jsp/vista/operaciones/autoaprovisionado/validaCodigoTemporal.jsp");
+		bean.setVista(JSP_VALIDA_CODIGO_TEMPORAL);
 		String correo = Formateador.leeParametroString(request.getParameter(PARAM_CORREO));
 		String ip = request.getRemoteAddr();
 		ModeloUsuarioAutoregistrado modelo = new ModeloUsuarioAutoregistrado();
@@ -261,11 +261,11 @@ public class ControladorUsuarioAutoregistrado extends HttpServlet {
 				bean.setClave(clave);
 				meterUsuarioEnSesion(request, correo);
 			} catch (SQLException | UVException e) {
-				bean.setVista("/WEB-INF/jsp/vista/operaciones/autoaprovisionado/validaCodigoTemporal.jsp");
+				bean.setVista(JSP_VALIDA_CODIGO_TEMPORAL);
 				bean.getMensajesDeError().add(e.getMessage());
 			}
 		} else {
-			bean.setVista("/WEB-INF/jsp/vista/operaciones/autoaprovisionado/validaCodigoTemporal.jsp");
+			bean.setVista(JSP_VALIDA_CODIGO_TEMPORAL);
 		}
 	}
 	

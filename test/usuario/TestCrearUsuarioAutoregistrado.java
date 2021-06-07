@@ -32,7 +32,7 @@ public class TestCrearUsuarioAutoregistrado extends UtilsTestUsuarioBase {
 
 	private static final Logger LOGGER = Logger.getLogger(NOMBREDEESTACLASE);
 	
-	private static final Integer WAITTIME = 5; 
+	private static final Integer WAITTIME = 10; 
 	
 	private static final String TEXTO = "texto prueba";
 	private static final String CORREO = "juanmoralcardenas@gmail.com";
