@@ -11,6 +11,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Random;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.regex.Matcher;
@@ -48,6 +49,8 @@ public final class UtilsTestBolsaEmpleo {
 	private static final Pattern REGEX_TOTAL_TABLE = Pattern.compile("Total (\\d+)( \\(Seleccionados (\\d+)\\))?");
 	private static final Integer REGEX_TOTAL = 1;
 	private static final Integer REGEX_TOTAL_SELECTED = 3;
+	private static final int LETRA_A = 97;
+	private static final int LETRA_Z = 122;
 	
 	public static final String ESQUEMA_ARCOS = "arcos";
 	public static final String ESQUEMA_RRHH = "rrhh";
@@ -300,6 +303,27 @@ public final class UtilsTestBolsaEmpleo {
 	 */
 	public static UsuarioBolsaEmpleo getUsuarioCandidatoLogeado() throws SQLException, UVException {
 		return ModeloUsuarioBolsaEmpleo.obtenerInstancia().getUsuarioByCodCuenta(UID_CANDIDATO_PRUEBAS);
+	}
+	
+	/**
+	 * Genera una string random de longitud indicada.
+	 * @param targetStringLength .
+	 * @return .
+	 */
+	public static String generateRandomString(int targetStringLength) {
+		// letter 'a'
+		int leftLimit = LETRA_A;
+		
+		// letter 'z'
+		int rightLimit = LETRA_Z;
+
+		Random random = new Random();
+		StringBuilder buffer = new StringBuilder(targetStringLength);
+		for (int i = 0; i < targetStringLength; i++) {
+			int randomLimitedInt = leftLimit + (int) (random.nextFloat() * (rightLimit - leftLimit + 1));
+			buffer.append((char) randomLimitedInt);
+		}
+		return buffer.toString();
 	}
 	
 	/**

@@ -60,23 +60,18 @@ public class ControladorAfinidades extends HttpServlet {
 	public static final String ACCION_BORRAR_AFINIDAD = "borrarafinidad";
 	
 	// mensajes
-	public static final String MENSAJE_ENVIADO = "mensaje";
 	public static final String MENSAJE_EXITO_ELIMINAR = "Afinidad eliminada correctamente";
-	
 	public static final String MENSAJE_ERROR_DESCRIPCION_LARGA = "La descripción no puede ser superior a %d";
 	public static final String MENSAJE_ERROR_DESCRIPCION_REQUERIDA = "La descripción es requerida";
-	public static final String MENSAJE_ERROR_DESCRIPCION_VACIA = "La descripción no puede estar vacia";
-	
 	public static final String MENSAJE_ERROR_CODIGO_LARGA = "El código no puede ser superior a %d";
 	public static final String MENSAJE_ERROR_CODIGO_REQUERIDO = "El código es requerido";
-	public static final String MENSAJE_ERROR_CODIGO_VACIO = "El código no puede estar vacio";
-	
-	public static final String MENSAJE_ERROR_MODULACION_LARGA = "La modulación no puede ser superior a %d";
-	public static final String MENSAJE_ERROR_MODULACION_REQUERIDA = "La modulación es requerida";
 	public static final String MENSAJE_ERROR_MODULACION_VACIA = "La modulación no puede estar vacia";	
-	
 	public static final String MENSAJE_INFO_AFINIDAD_INSERTADA_CORRECTAMENTE = "Afinidad insertada correctamente.";
 	public static final String MENSAJE_INFO_AFINIDAD_ACTUALIZADA_CORRECTAMENTE = "Afinidad actualizada correctamente.";
+	
+	// mensajes de error comunes en los controladores
+	public static final String MENSAJE_ERROR_ACCION_NO_CONTEMPLADA = "Acción no contemplada";
+	public static final String MENSAJE_ERROR_SIN_PERMISOS = "No tienes permiso";
 
 	// ruta vistas
 	public static final String RUTA_BEP_CON = "/WEB-INF/jsp/vista/infadministrativa/bolsaempleo/configuracion/afinidades/";
@@ -128,7 +123,7 @@ public class ControladorAfinidades extends HttpServlet {
 					borrarAfinidad(bean, request, response);
 					break;
 				default:
-					errorFatal(bean, "Acción no contemplada");
+					errorFatal(bean, MENSAJE_ERROR_ACCION_NO_CONTEMPLADA);
 			}			
 		} catch (UVException e) {
 			LOGGER.log(Level.WARNING, e.toString());
@@ -158,7 +153,7 @@ public class ControladorAfinidades extends HttpServlet {
 			bean.setUsuarioLogeado(ModeloUsuarioBolsaEmpleo.obtenerInstancia().getOrCreateUsuario(datos));
 
 			if (!bean.getUsuarioLogeado().getRol().getCodNum().equals(ModeloRol.ID_ROL_SERVICIO_PERSONAL)) {
-				throw new UVException("No tienes permiso de personal");
+				throw new UVException(MENSAJE_ERROR_SIN_PERMISOS);
 			}
 		} catch (UVException e) {
 			LOGGER.log(Level.SEVERE, Formateador.getStackTrace(e));
@@ -207,7 +202,7 @@ public class ControladorAfinidades extends HttpServlet {
 			try {
 				BolsaEmpleoDataTable<Afinidad> dataTable = modelo.listaAfinidadesDatatable(request.getParameterMap());
 				bean.setDatatableAfinidades(dataTable);
-				writer.write(dataTable.toJson());				
+				writer.write(dataTable.toJson());
 			} catch (UVException e) {
 				LOGGER.log(Level.WARNING, e.toString());
 				bean.getMensajesDeError().add(e.getMessage());
@@ -232,8 +227,6 @@ public class ControladorAfinidades extends HttpServlet {
 			Afinidad afinidad = this.validarAfinidad(request);		
 			ModeloAfinidad.obtenerInstancia().nuevaAfinidad(afinidad, bean.getUsuarioLogeado());	
 
-			this.index(bean);
-
 			BolsaEmpleoUtils.addMensajeDeExito(MENSAJE_INFO_AFINIDAD_INSERTADA_CORRECTAMENTE, bean, request);
 			response.sendRedirect(request.getServletPath());
 		}
@@ -252,8 +245,6 @@ public class ControladorAfinidades extends HttpServlet {
 			afinidadForm.setCodNum(afinidad.getCodNum());
 			
 			modelo.actualizaAfinidad(afinidadForm, bean.getUsuarioLogeado());
-			
-			this.index(bean);
 			
 			BolsaEmpleoUtils.addMensajeDeExito(MENSAJE_INFO_AFINIDAD_ACTUALIZADA_CORRECTAMENTE, bean, request);
 			response.sendRedirect(request.getServletPath());
