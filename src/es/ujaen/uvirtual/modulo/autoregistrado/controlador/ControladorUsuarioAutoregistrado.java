@@ -59,7 +59,7 @@ public class ControladorUsuarioAutoregistrado extends HttpServlet {
 	public static final String ACCION_OLVIDO = "olvido";
 	public static final String ACCION_VALIDA_CODIGO_TEMPORAL = "validaTemporal";
 	
-	final private String JSP_VALIDA_CODIGO_TEMPORAL = "/WEB-INF/jsp/vista/operaciones/autoaprovisionado/validaCodigoTemporal.jsp";
+	private static final String JSP_VALIDA_CODIGO_TEMPORAL = "/WEB-INF/jsp/vista/operaciones/autoaprovisionado/validaCodigoTemporal.jsp";
 
 	/** Peticion GET.
 	 * @see HttpServlet#doGet(HttpServletRequest request, HttpServletResponse response)
@@ -237,7 +237,7 @@ public class ControladorUsuarioAutoregistrado extends HttpServlet {
 			bean.setIdSolicitud(idSolicitud);
 		} catch (SQLException | UVException e) {
 			bean.setVista("/WEB-INF/jsp/vista/operaciones/autoaprovisionado/usuarioExternoWayf.jsp");
-			bean.getMensajesDeError().add(e.getMessage());
+			throw e;
 		}
 	}
 
@@ -262,7 +262,7 @@ public class ControladorUsuarioAutoregistrado extends HttpServlet {
 				meterUsuarioEnSesion(request, correo);
 			} catch (SQLException | UVException e) {
 				bean.setVista(JSP_VALIDA_CODIGO_TEMPORAL);
-				bean.getMensajesDeError().add(e.getMessage());
+				throw e;
 			}
 		} else {
 			bean.setVista(JSP_VALIDA_CODIGO_TEMPORAL);
