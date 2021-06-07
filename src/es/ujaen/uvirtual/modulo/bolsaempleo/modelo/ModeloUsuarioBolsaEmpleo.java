@@ -939,6 +939,7 @@ public class ModeloUsuarioBolsaEmpleo {
 		usuarioFinal.setPrimerApellido(usuArcos.getApellido1());
 		usuarioFinal.setSegundoApellido(usuArcos.getApellido2());
 		usuarioFinal.setEmail(usuArcos.getEmailCalculado());
+		usuarioFinal.setListaDist(true);
 		
 		Integer codNum = insertaUsuario(usuarioFinal, usuarioQueCrea == null ? usuarioFinal : usuarioQueCrea);
 		

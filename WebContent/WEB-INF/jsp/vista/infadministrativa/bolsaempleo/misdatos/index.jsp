@@ -123,7 +123,9 @@ VistaUsuarioBolsaEmpleo bean = (VistaUsuarioBolsaEmpleo) uvdatos.getVistas().get
     	<div class="form-group-container">
     		<div class="form-check">
     			<label for="usuario_lista_dist">Lista Distribucion:</label>
-    			<input class="params" type="checkbox" id="usuario_lista_dist" name="<%= ControladorMisDatos.PARAM_LISTA %>" value="<%= lista_dist %>" <%= (lista_dist ? "checked=''" : "") %>/>
+    			<input class="params" type="checkbox" id="usuario_lista_dist" 
+    				   name="<%= ControladorMisDatos.PARAM_LISTA %>"
+    				   value="true" <%= (lista_dist ? "checked=''" : "") %>/>
     		</div>
     	</div>
 
