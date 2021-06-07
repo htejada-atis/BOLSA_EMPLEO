@@ -157,7 +157,7 @@ public class ControladorUsuarioAutoregistrado extends HttpServlet {
 		UVDatos datos = (UVDatos) request.getAttribute(UVDatos.NOMBRE_ATRIBUTO);
 		String uid = datos.getIdentificadorUsuario();
 		if (uid == null) {
-			uid = (String) request.getSession().getAttribute(ConfiguracionGlobal.getAtributoUsuario());
+			uid = (String) request.getSession().getAttribute(UVDatos.ID_USUARIO_SESION);
 		}
 		String modulo = obtenerIdModulo(request); 
 		String urlModulo = obtenerUrlModulo(request, modulo);
