@@ -1457,7 +1457,6 @@ public class ModeloSolicitud {
 			conexion.setAutoCommit(false);
 			
 			try {
-				
 				// comprobar individualizados
 				String consultaIndividualizados = "SELECT * FROM TBEP_SOL_BOL_MERITOS bepsbm"
 						+ "	INNER JOIN TBEP_SOLICITUD_BOLSAS bepsbo ON bepsbm.BEPSBO_CODNUM = bepsbo.CODNUM"

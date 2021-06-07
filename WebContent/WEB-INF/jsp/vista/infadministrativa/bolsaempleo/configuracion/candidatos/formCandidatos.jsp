@@ -245,7 +245,7 @@ UsuarioBolsaEmpleo usuarioBolsa = bean.getUsuario();
 		    "ajax": { url: "/srv/es/ajax/informacionadministrativa/bolsaempleo/configuracion/candidatos" },
 		    "params": {"<%=ControladorUsuarioCandidato.PARAM_ID%>": <%= usuarioBolsa.getCodNum() %>},
 		    "pageSize": 10,
-		    "title": "Solicitudes",
+		    "title": "SOLICITUDES",
 		    "filterable": true,
 		    "action": "<%= ControladorUsuarioCandidato.ACCION_DATATABLE_SOLICITUDES %>",
 		    "columns": [
@@ -336,7 +336,7 @@ UsuarioBolsaEmpleo usuarioBolsa = bean.getUsuario();
 		    "selectable": true,
 		    "pageSize": 10,
 		    "filterable": true,
-		    "title": 'Listado de Áreas',
+		    "title": 'LISTADO DE ÁREAS',
 		    "action": "<%= ControladorAreasABaremar.ACCION_DATATABLE_EXCLUIDOS %>",
 		    "columns": [
 		    	{'data': 'area.codNum', 'selectable': true},
@@ -345,7 +345,7 @@ UsuarioBolsaEmpleo usuarioBolsa = bean.getUsuario();
 		        {'data': 'area.descripcion', 'filter': true, 'overflow': 'auto'}
 		    ],
 		    "actions": [
-		    	{'label': 'Excluir Areas', 'onClick': function(selected) { enviaAccion("<%=ControladorUsuarioBolsaEmpleo.ACCION_EXCLUIR_USUARIO_AREA%>", selected); } }
+		    	{'label': 'Excluir Areas', 'onClick': function(selected) { enviaAccion("<%=ControladorUsuarioCandidato.ACCION_EXCLUIR_USUARIO_AREA%>", selected); } }
 		    ]
 		});	
 		
@@ -355,8 +355,8 @@ UsuarioBolsaEmpleo usuarioBolsa = bean.getUsuario();
 		    "selectable": true,
 		    "pageSize": 10,
 		    "filterable": true,
-		    "title": 'Áreas excluidas para el usuario',
-		    "action": "<%= ControladorUsuarioBolsaEmpleo.ACCION_DATATABLE_USUARIOS_EXCLUIDOS_AREA %>",
+		    "title": 'ÁREAS EXCLUIDAS PARA EL USUARIO',
+		    "action": "<%= ControladorUsuarioCandidato.ACCION_DATATABLE_USUARIOS_EXCLUIDOS_AREA %>",
 		    "columns": [
 		    	{'data': 'area.codNum', 'selectable': true},
 		        {'data': 'area.codNum', 'filter': {'type': 'number'}},
@@ -364,7 +364,7 @@ UsuarioBolsaEmpleo usuarioBolsa = bean.getUsuario();
 		        {'data': 'area.descripcion', 'filter': true, 'overflow': 'auto'}
 		    ],
 		    "actions": [
-		    	{'label': 'Borrar Areas excluidas', 'onClick': function(selected) { enviaAccion("<%= ControladorUsuarioBolsaEmpleo.ACCION_INCLUIR_USUARIO_AREA %>", selected); } }
+		    	{'label': 'Borrar Areas excluidas', 'onClick': function(selected) { enviaAccion("<%= ControladorUsuarioCandidato.ACCION_INCLUIR_USUARIO_AREA %>", selected); } }
 		    ]
 		});	
 		
@@ -379,11 +379,11 @@ UsuarioBolsaEmpleo usuarioBolsa = bean.getUsuario();
 			Atis.confirmDialog("Exclusión de areas", "¿ Desea excluir las areas seleccionadas del usuario ?", {
 	        	Si: function() {
 	        		var params = {
-	        				'a': '<%=ControladorUsuarioBolsaEmpleo.ACCION_USUARIO%>', 
-	        				'aa': '<%=ControladorUsuarioBolsaEmpleo.ACCION_EXCLUIR_USUARIO_AREA%>', 
-	        				'<%=ControladorUsuarioBolsaEmpleo.PARAM_ACCION_USUARIO%>': accion, 
-	        				'<%=ControladorUsuarioBolsaEmpleo.PARAM_ID%>': <%= usuarioBolsa.getCodNum() %>, 
-	        				'<%=ControladorUsuarioBolsaEmpleo.PARAM_USUARIOS_SELECCIONADOS%>': Atis.object2Json(selected)
+	        				'<%=ControladorUsuarioCandidato.PARAM_ACCION%>': '<%=ControladorUsuarioCandidato.ACCION_USUARIO%>', 
+	        				'<%=ControladorUsuarioCandidato.PARAM_ACCION_USUARIO%>': '<%=ControladorUsuarioCandidato.ACCION_EXCLUIR_USUARIO_AREA%>', 
+	        				'<%=ControladorUsuarioCandidato.PARAM_ACCION_USUARIO%>': accion, 
+	        				'<%=ControladorUsuarioCandidato.PARAM_ID%>': <%= usuarioBolsa.getCodNum() %>, 
+	        				'<%=ControladorUsuarioCandidato.PARAM_USUARIOS_SELECCIONADOS%>': Atis.object2Json(selected)
 	        			};
 	    			Atis.sendForm("<%= request.getRequestURI() %>", params);
 	          		$(this).dialog("close");

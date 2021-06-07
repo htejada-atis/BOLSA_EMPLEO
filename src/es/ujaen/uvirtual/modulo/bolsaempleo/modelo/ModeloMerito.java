@@ -238,7 +238,7 @@ public class ModeloMerito {
 	 * @throws SQLException en caso de error de base de datos .
 	 * @throws UVException error si no existe titulación .
 	 */
-	public BolsaEmpleoDataTable<Merito> listaMeritosDatatable(Map<String, String[]> params, Integer usuario) throws SQLException, UVException {
+	public BolsaEmpleoDataTable<Merito> listaMeritosDatatable(Map<String, String[]> params, UsuarioBolsaEmpleo usuario) throws SQLException, UVException {
 		
 		if (usuario == null) {
 			throw new UVException("No se pueden listar méritos sin el id del usuario");
@@ -266,8 +266,8 @@ public class ModeloMerito {
 				PreparedStatement stmt = conexion.prepareStatement(dataTable.getQuery())
 		) {
 			int indexParam = 1;
-			stmt.setInt(indexParam, usuario);
-			stmtCount.setInt(indexParam++, usuario);
+			stmt.setInt(indexParam, usuario.getCodNum());
+			stmtCount.setInt(indexParam++, usuario.getCodNum());
 			dataTable.setFiltersParams(stmt, stmtCount, indexParam);
 			try (ResultSet rs = stmt.executeQuery()) {
 				while (rs.next()) {					

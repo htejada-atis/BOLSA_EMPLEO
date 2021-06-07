@@ -11,7 +11,6 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import es.ujaen.uvirtual.adm.CrearUsuario;
 import es.ujaen.uvirtual.beans.UVDatos;
 import es.ujaen.uvirtual.beans.Usuario;
 import es.ujaen.uvirtual.modulo.bolsaempleo.beans.UsuarioBolsaEmpleo;
@@ -121,10 +120,10 @@ public class ControladorMisDatos extends HttpServlet {
 					index(bean, datos);
 					break;
 				case ACCION_ENVIAR_MISDATOS:
-					enviarMisDatos(request, bean);
+					enviarMisDatos(request, response, bean);
 					break;
 				case ACCION_BAJA_USUARIO:
-					bajaUsuario(request, bean);
+					bajaUsuario(request, response, bean);
 					break;
 				default:
 					errorFatal(bean, "Acción no contemplada");
@@ -180,22 +179,11 @@ public class ControladorMisDatos extends HttpServlet {
 		doGet(request, response);
 	}   
 	
-	private void index(VistaUsuarioBolsaEmpleo bean, UVDatos datos) throws SQLException, UVException {
-		Usuario usuario = datos.getUsuario();
-		bean.setUsuario(ModeloUsuarioBolsaEmpleo.obtenerInstancia().getUsuarioByNumeroDocumento(usuario.getDocumentoNumero()));
-		bean.setUsuarioArcos(usuario);
+	private void index(VistaUsuarioBolsaEmpleo bean, UVDatos datos) {
 		bean.setVista(JSP_INDEX);
 	}
     
-	/**
-	 * Envia el formulario con los datos del usuario logueado.
-	 * 
-	 * @param bean    .
-	 * @param request .
-	 * @throws UVException  .
-	 * @throws SQLException .
-	 */
-	public void enviarMisDatos(HttpServletRequest request, VistaUsuarioBolsaEmpleo bean) throws SQLException, UVException {
+	private void enviarMisDatos(HttpServletRequest request, HttpServletResponse response, VistaUsuarioBolsaEmpleo bean) throws SQLException, UVException, IOException {
 		bean.setVista(JSP_INDEX);
                                         
 		ModeloUsuarioBolsaEmpleo modelo = ModeloUsuarioBolsaEmpleo.obtenerInstancia();
@@ -203,20 +191,17 @@ public class ControladorMisDatos extends HttpServlet {
 		UsuarioBolsaEmpleo usuario = modelo.getUsuarioById(codNum);
 		
 		UsuarioBolsaEmpleo usuarioForm = this.validarDatosUsuario(request);
+		usuarioForm.setCodCuenta(usuario.getCodCuenta());
 		usuarioForm.setCodNum(usuario.getCodNum());
-		usuarioForm.setNumDocumento(usuario.getNumDocumento());
+		usuarioForm.setIdNif(usuario.getIdNif());
 		    
 		modelo.actualizaUsuarioMisDatos(usuarioForm, bean.getUsuarioLogeado());
 		
-		UsuarioBolsaEmpleo usuaCont = modelo.getUsuarioById(codNum);
-		Usuario usuArcos = CrearUsuario.usuario(usuaCont.getCodCuenta());
-		bean.setUsuarioArcos(usuArcos);
-		bean.setUsuario(usuaCont);
-		
-		bean.getMensajesDeExito().add(MENSAJE_EXITO_ENVIAR);
+		BolsaEmpleoUtils.addMensajeDeExito(MENSAJE_EXITO_ENVIAR, bean, request);
+		response.sendRedirect(request.getServletPath());
     }
     
-	private void bajaUsuario(HttpServletRequest request, VistaUsuarioBolsaEmpleo bean) throws SQLException, UVException {
+	private void bajaUsuario(HttpServletRequest request, HttpServletResponse response, VistaUsuarioBolsaEmpleo bean) throws SQLException, UVException, IOException {
 		bean.setVista("/WEB-INF/jsp/vista/infadministrativa/bolsaempleo/misdatos/formBaja.jsp");
 		
 		if (EscapaHTML.ajustaCodificacion(request.getParameter(PARAM_RAZON_BORRADO)) != null) {
@@ -229,15 +214,13 @@ public class ControladorMisDatos extends HttpServlet {
 			}
 			bean.setVista("/WEB-INF/jsp/vista/infadministrativa/bolsaempleo/inicio/indice.jsp");
 			ModeloUsuarioBolsaEmpleo modelo = ModeloUsuarioBolsaEmpleo.obtenerInstancia();
+			UsuarioBolsaEmpleo usu = modelo.getUsuarioById(bean.getUsuarioLogeado().getCodNum());
 			
-			Integer codNum = Formateador.leeParametroInteger(request.getParameter(PARAM_ID));
-			UsuarioBolsaEmpleo usu = modelo.getUsuarioById(codNum);
-			
-			usu.setRazonBorrado(razonBorrado);
-			
+			usu.setRazonBorrado(razonBorrado);			
 			modelo.cambiarFlagBorradoUsuarioRazon(usu, bean.getUsuarioLogeado());
 			
-			bean.getMensajesDeExito().add(MENSAJE_EXITO_DARSE_BAJA);
+			BolsaEmpleoUtils.addMensajeDeExito(MENSAJE_EXITO_DARSE_BAJA, bean, request);			
+			response.sendRedirect(request.getServletPath());
 		}
 	}
     

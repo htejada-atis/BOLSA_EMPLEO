@@ -156,17 +156,17 @@ public class ControladorMisMeritos extends HttpServlet {
 		
 		try {
 			bean.setUsuarioLogeado(ModeloUsuarioBolsaEmpleo.obtenerInstancia().getOrCreateUsuario(datos));
+
+			if (!bean.getUsuarioLogeado().getRol().getCodNum().equals(ModeloRol.ID_ROL_CANDIDATO)) {
+				throw new UVException("No eres un candidato");
+			}
 		} catch (UVException e) {
 			LOGGER.log(Level.SEVERE, Formateador.getStackTrace(e));
 			LOGGER.log(Level.SEVERE, e.toString());
 			
 			BolsaEmpleoUtils.addMensajeDeError(e.getMessage(), bean, request);
 			response.sendRedirect("/srv/es/informacionadministrativa/bolsaempleo/error");
-		}
-		
-		if (!bean.getUsuarioLogeado().getRol().getCodNum().equals(ModeloRol.ID_ROL_CANDIDATO)) {
-			throw new UVException("No eres un candidato");
-		}
+		}		
 	}
 	
 	private void errorFatal(VistaMeritos bean, String mensaje) {
@@ -330,10 +330,7 @@ public class ControladorMisMeritos extends HttpServlet {
 		
 		try (PrintWriter writer = response.getWriter()) {
 			try {
-				Usuario usuArcos = datos.getUsuario();
-				ModeloUsuarioBolsaEmpleo modeloUsuarioBolsaEmpleo = ModeloUsuarioBolsaEmpleo.obtenerInstancia();
-				Integer idUsuario = modeloUsuarioBolsaEmpleo.getUsuarioByNumeroDocumento(usuArcos.getDocumentoNumero()).getCodNum();
-				BolsaEmpleoDataTable<Merito> dataTable = modelo.listaMeritosDatatable(request.getParameterMap(), idUsuario);
+				BolsaEmpleoDataTable<Merito> dataTable = modelo.listaMeritosDatatable(request.getParameterMap(), bean.getUsuarioLogeado());
 				bean.setDatatable(dataTable);
 				writer.write(dataTable.toJson());
 			} catch (UVException e) {

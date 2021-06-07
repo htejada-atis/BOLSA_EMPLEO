@@ -148,8 +148,8 @@ Area area = bean.getArea();
 	            "defaultOrderBy": 1,
 	            "action": "<%=ControladorGestionEvaluadores.ACCION_DATATABLE_EVALUADORES%>",
 	            "columns": [
-	                {'data': 'numdocumento', 'filter': true},
-	                {'data': 'apellido1', 'filter': true, 'overflow': 'auto', 'render': function(row) {
+	                {'data': 'prsnif', 'filter': true},
+	                {'data': 'apellido1', 'filter': false, 'order': false, 'overflow': 'auto', 'render': function(row) {
 	                    return row.nombre + " " + row.apellido1 + " " + row.apellido2;
 	                }},
 	                {'data': 'activo', 'filter': {'type': 'select', 'options':{'true': 'Activo', 'false': 'Inactivo'}, 'optionDefault': 'true'}, 'order': {'active': false}, 'render': function(row) {

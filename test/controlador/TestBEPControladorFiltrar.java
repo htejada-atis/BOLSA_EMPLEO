@@ -39,36 +39,36 @@ public class TestBEPControladorFiltrar {
      * @throws SQLException si error en bd
      * @throws IOException si error en io
      */
-    @BeforeClass
-    public static void preparaBd() throws IOException, SQLException {
-    	BbddRunner.conectarBd();
-    	UtilsTestBolsaEmpleo.inicializaBolsaEmpleo();
-    }
+	@BeforeClass
+	public static void preparaBd() throws IOException, SQLException {
+		BbddRunner.conectarBd();
+		UtilsTestBolsaEmpleo.inicializaBolsaEmpleo();
+	}
     
-    // método para obtener la vista con una lista de candidatos .
-    private VistaFiltrar obtenerCandidatos() throws ServletException, IOException {
-    	PeticionHttp peticion = UtilsTestBolsaEmpleo.peticionAutenticadaPersonal();
+	// método para obtener la vista con una lista de candidatos .
+	private VistaFiltrar obtenerCandidatos() throws ServletException, IOException {
+		PeticionHttp peticion = UtilsTestBolsaEmpleo.peticionAutenticadaPersonal();
 		peticion.setParameter(ControladorFiltrarTitulacion.PARAM_ACCION, ControladorFiltrarTitulacion.ACCION_DATATABLE_CANDIDATOS);
 
 		RespuestaHttp respuesta = new RespuestaHttp();
 		ControladorFiltrarTitulacion controlador = new ControladorFiltrarTitulacion();
 		controlador.doPost(peticion, respuesta);
 		return (VistaFiltrar) peticion.getUVDatos().getVistas().get(VistaFiltrar.class.getName());
-    }
+	}
     
-    // método para obtener la vista con una lista de titulaciones de un candidato .
-    private VistaFiltrar obtenerTitulaciones() throws ServletException, IOException {
-    	VistaFiltrar bean = obtenerCandidatos();
-		
+	// método para obtener la vista con una lista de titulaciones de un candidato .
+	private VistaFiltrar obtenerTitulaciones() throws ServletException, IOException {
+		VistaFiltrar bean = obtenerCandidatos();
+
 		PeticionHttp peticion = UtilsTestBolsaEmpleo.peticionAutenticadaPersonal();
 		peticion.setParameter(ControladorFiltrarTitulacion.PARAM_ACCION, ControladorFiltrarTitulacion.ACCION_DATATABLE_TITULACIONES_CANDIDATO);
 		peticion.setParameter(ControladorFiltrarTitulacion.PARAM_CANDIDATO, bean.getDatatableCandidatos().getData().get(0).getCodNum().toString());
-		
+
 		RespuestaHttp respuesta = new RespuestaHttp();
 		ControladorFiltrarTitulacion controlador = new ControladorFiltrarTitulacion();
 		controlador.doPost(peticion, respuesta);
 		return (VistaFiltrar) peticion.getUVDatos().getVistas().get(VistaFiltrar.class.getName());
-    }
+	}
     
     /** Obtener candidatos, sin parametro definido .
 	 * @throws SQLException si fallo bd 
@@ -243,7 +243,7 @@ public class TestBEPControladorFiltrar {
 	 * @throws IOException si error de io
 	 */
 	@Test
-	public void testE02SeleccionarCandidatoNoValido() throws SQLException, ServletException, IOException {
+	public void testE02SeleccionarCandidatoNoValido() throws ServletException, IOException {
 		PeticionHttp peticion = UtilsTestBolsaEmpleo.peticionAutenticadaPersonal();
 		peticion.setParameter(ControladorFiltrarTitulacion.PARAM_ACCION, ControladorFiltrarTitulacion.ACCION_CANDIDATO_SELECCIONADO);
 		peticion.setParameter(ControladorFiltrarTitulacion.PARAM_CANDIDATO, "0");
@@ -263,7 +263,7 @@ public class TestBEPControladorFiltrar {
 	 * @throws IOException si error de io
 	 */
 	@Test
-	public void testE03SeleccionarTitulacionNoValida() throws SQLException, ServletException, IOException {
+	public void testE03SeleccionarTitulacionNoValida() throws ServletException, IOException {
 		PeticionHttp peticion = UtilsTestBolsaEmpleo.peticionAutenticadaPersonal();
 		peticion.setParameter(ControladorFiltrarTitulacion.PARAM_ACCION, ControladorFiltrarTitulacion.ACCION_TITULACION_SELECCIONADA);
 		peticion.setParameter(ControladorFiltrarTitulacion.PARAM_TITULACION_USUARIO, "0");
@@ -283,7 +283,7 @@ public class TestBEPControladorFiltrar {
 	 * @throws IOException si error de io
 	 */
 	@Test
-	public void testE04ObtenerTitulacionesCandidatoNulo() throws SQLException, ServletException, IOException {
+	public void testE04ObtenerTitulacionesCandidatoNulo() throws ServletException, IOException {
 		PeticionHttp peticion = UtilsTestBolsaEmpleo.peticionAutenticadaPersonal();
 		peticion.setParameter(ControladorFiltrarTitulacion.PARAM_ACCION, ControladorFiltrarTitulacion.ACCION_DATATABLE_TITULACIONES_CANDIDATO);
 		

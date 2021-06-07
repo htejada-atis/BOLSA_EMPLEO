@@ -15,20 +15,25 @@ public class UsuarioBolsaEmpleo implements Serializable {
 	private static final long serialVersionUID = 1L;
 	private Integer codNum;
 	private String codcuenta;
+	
+	// datos vuja
 	private String tipodocumento;
-	private String numdocumento;
+	private String idnif;
+	private String letranif;
+	private String prsnif;
 	private String nombre;
 	private String apellido1;
 	private String apellido2;
 	private String email;
+	
+	// datos bep
+	private Rol rol;
 	private String direccion;
 	private String codigopostal;
 	private String localidad;
 	private String provincia;
 	private String telefono;
-	private String nacionalidad;
-
-	private Rol rol;
+	private String nacionalidad;	
 	private Boolean listaDist;
 	private Boolean excluido;
 	private String excluidoTipo;
@@ -50,157 +55,36 @@ public class UsuarioBolsaEmpleo implements Serializable {
 	/**
 	 * Constructor con parametros para Bolsa Empleo.
 	 * 
-	 * @param pdocumento         .
-	 * @param prol               .
-	 * @param plistaDist         .
-	 * @param pexcluido          .
-	 * @param pexcluidotipo      .
-	 * @param pfechaexclusionini .
-	 * @param pfechaexclusionfin .
-	 * @param pusu               .
+	 * @param prol         .
+	 * @param pcodCuenta               .
 	 */
-	public UsuarioBolsaEmpleo(String pdocumento, String pusu, Rol prol, Boolean plistaDist, Boolean pexcluido,
-			String pexcluidotipo, Date pfechaexclusionini, Date pfechaexclusionfin) {
+	public UsuarioBolsaEmpleo(Rol prol, String pcodCuenta) {
 		super();
-		this.numdocumento = pdocumento;
-		this.codcuenta = pusu;
 		this.rol = prol;
-		this.listaDist = plistaDist;
-		this.excluido = pexcluido;
-		this.excluidoTipo = pexcluidotipo;
-		this.fechaExclusionInicio = pfechaexclusionini;
-		this.fechaExclusionFin = pfechaexclusionfin;
+		this.codcuenta = pcodCuenta;				
 	}
-
-	/**
-	 * Constructor con parametros para Bolsa Empleo excluir usuario.
-	 * 
-	 * @param pcodNum            .
-	 * @param pexcluido          .
-	 * @param pexcluidotipo      .
-	 * @param prazonexcluido     .
-	 * @param pfechaexclusion    .
-	 * @param pfechaexclusionini .
-	 * @param pfechaexclusionfin .
-	 */
-	public UsuarioBolsaEmpleo(Integer pcodNum, Boolean pexcluido, String pexcluidotipo, String prazonexcluido,
-			Date pfechaexclusion, Date pfechaexclusionini, Date pfechaexclusionfin) {
-		super();
-		this.codNum = pcodNum;
-		this.excluido = pexcluido;
-		this.excluidoTipo = pexcluidotipo;
-		this.fechaExclusionInicio = pfechaexclusionini;
-		this.fechaExclusionFin = pfechaexclusionfin;
-		this.razonExclusion = prazonexcluido;
-		this.fechaExclusion = pfechaexclusion;
-	}
-
-	/**
-	 * Constructor con parametros.
-	 * 
-	 * @param prol               .
-	 * @param plistaDist         .
-	 * @param pexcluido          .
-	 * @param pexcluidotipo      .
-	 * @param pfechaexclusionini .
-	 * @param pfechaexclusionfin .
-	 * @param prazonexcluido     .
-	 * @param pfechaexclusion    .
-	 * @param pcodNum            .
-	 */
-	public UsuarioBolsaEmpleo(Integer pcodNum, Rol prol, Boolean plistaDist, Boolean pexcluido, String pexcluidotipo,
-			String prazonexcluido, Date pfechaexclusion, Date pfechaexclusionini, Date pfechaexclusionfin) {
-		super();
-		this.codNum = pcodNum;
-		this.rol = prol;
-		this.listaDist = plistaDist;
-		this.excluido = pexcluido;
-		this.excluidoTipo = pexcluidotipo;
-		this.fechaExclusionInicio = pfechaexclusionini;
-		this.fechaExclusionFin = pfechaexclusionfin;
-		this.razonExclusion = prazonexcluido;
-		this.fechaExclusion = pfechaexclusion;
-	}
-
-	/**
-	 * Constructor con parametros.
-	 * 
-	 * @param prol               .
-	 * @param plistaDist         .
-	 * @param pexcluido          .
-	 * @param pexcluidotipo      .
-	 * @param pfechaexclusionini .
-	 * @param pfechaexclusionfin .
-	 * @param prazonexcluido     .
-	 * @param pfechaexclusion    .
-	 * @param pusu               .
-	 * @param pdocumento         .
-	 */
-	public UsuarioBolsaEmpleo(String pusu, String pdocumento, Rol prol, Boolean plistaDist, Boolean pexcluido,
-			String pexcluidotipo, String prazonexcluido, Date pfechaexclusion, Date pfechaexclusionini,
-			Date pfechaexclusionfin) {
-		super();
-		this.codcuenta = pusu;
-		this.numdocumento = pdocumento;
-		this.rol = prol;
-		this.listaDist = plistaDist;
-		this.excluido = pexcluido;
-		this.excluidoTipo = pexcluidotipo;
-		this.fechaExclusionInicio = pfechaexclusionini;
-		this.fechaExclusionFin = pfechaexclusionfin;
-		this.razonExclusion = prazonexcluido;
-		this.fechaExclusion = pfechaexclusion;
-	}
-
-	/**
-	 * Constructor con parametros para envio de datos personales.
-	 * 
-	 * @param pcodNum         .
-	 * @param pnombre         .
-	 * @param primerapellido  .
-	 * @param segundoapellido .
-	 * @param pemail          .
-	 * @param pdireccion      .
-	 * @param pcodigopostal   .
-	 * @param plocalidad      .
-	 * @param pprovincia      .
-	 * @param ptelefono       .
-	 * @param pnacionalidad   .
-	 * @param plistaDist      .
-	 */
-	public UsuarioBolsaEmpleo(Integer pcodNum, String pnombre, String primerapellido, String segundoapellido,
-			String pemail, String pdireccion, String pcodigopostal, String plocalidad, String pprovincia,
-			String ptelefono, String pnacionalidad, Boolean plistaDist) {
-		super();
-		this.codNum = pcodNum;
-		this.nombre = pnombre;
-		this.apellido1 = primerapellido;
-		this.apellido2 = segundoapellido;
-		this.email = pemail;
-		this.direccion = pdireccion;
-		this.codigopostal = pcodigopostal;
-		this.localidad = plocalidad;
-		this.provincia = pprovincia;
-		this.telefono = ptelefono;
-		this.nacionalidad = pnacionalidad;
-		this.listaDist = plistaDist;
-	}
-
-	/**
-	 * Constructor copia.
-	 * 
-	 * @param copia Usuario a copiar
+	
+	/** Constructor copia.
+	 * @param copia .
 	 */
 	public UsuarioBolsaEmpleo(UsuarioBolsaEmpleo copia) {
 		this.codNum = copia.codNum;
 		this.codcuenta = copia.codcuenta;
 		this.tipodocumento = copia.tipodocumento;
-		this.numdocumento = copia.numdocumento;
+		this.idnif = copia.idnif;
+		this.letranif = copia.letranif;
+		this.prsnif = copia.prsnif;
 		this.nombre = copia.nombre;
 		this.apellido1 = copia.apellido1;
 		this.apellido2 = copia.apellido2;
 		this.email = copia.email;
 		this.rol = copia.rol;
+		this.direccion = copia.direccion;
+		this.codigopostal = copia.codigopostal;
+		this.localidad = copia.localidad;
+		this.provincia = copia.provincia;
+		this.telefono = copia.telefono;
+		this.nacionalidad = copia.nacionalidad;
 		this.listaDist = copia.listaDist;
 		this.excluido = copia.excluido;
 		this.excluidoTipo = copia.excluidoTipo;
@@ -209,6 +93,7 @@ public class UsuarioBolsaEmpleo implements Serializable {
 		this.razonExclusion = copia.razonExclusion;
 		this.fechaExclusion = copia.fechaExclusion;
 		this.borrado = copia.borrado;
+		this.razonBorrado = copia.razonBorrado;
 		this.fechaBorrado = copia.fechaBorrado;
 	}
 
@@ -227,7 +112,9 @@ public class UsuarioBolsaEmpleo implements Serializable {
 	public void setCodCuenta(String pcodcuenta) {
 		this.codcuenta = pcodcuenta;
 	}
-
+		
+	// datos vuja
+	
 	public String getTipoDocumento() {
 		return tipodocumento;
 	}
@@ -236,14 +123,30 @@ public class UsuarioBolsaEmpleo implements Serializable {
 		this.tipodocumento = ptipodocumento;
 	}
 
-	public String getNumDocumento() {
-		return numdocumento;
+	public String getIdNif() {
+		return idnif;
 	}
 
-	public void setNumDocumento(String pnumdocumento) {
-		this.numdocumento = pnumdocumento;
+	public void setIdNif(String pidnif) {
+		this.idnif = pidnif;
+	}
+	
+	public String getLetraNif() {
+		return letranif;
 	}
 
+	public void setLetraNif(String pletranif) {
+		this.letranif = pletranif;
+	}
+	
+	public String getPrsNif() {
+		return prsnif;
+	}
+
+	public void setPrsNif(String pprsnif) {
+		this.prsnif = pprsnif;
+	}	
+	
 	public String getNombre() {
 		return nombre;
 	}
@@ -251,7 +154,7 @@ public class UsuarioBolsaEmpleo implements Serializable {
 	public void setNombre(String nombre) {
 		this.nombre = nombre;
 	}
-
+	
 	public String getPrimerApellido() {
 		return apellido1;
 	}
@@ -267,13 +170,23 @@ public class UsuarioBolsaEmpleo implements Serializable {
 	public void setSegundoApellido(String papellido2) {
 		this.apellido2 = papellido2;
 	}
-
+	
 	public String getEmail() {
 		return email;
 	}
 
 	public void setEmail(String email) {
 		this.email = email;
+	}
+	
+	// datos bep
+	
+	public Rol getRol() {
+		return rol;
+	}
+
+	public void setRol(Rol rol) {
+		this.rol = rol;
 	}
 
 	public String getDireccion() {
@@ -322,14 +235,6 @@ public class UsuarioBolsaEmpleo implements Serializable {
 
 	public void setNacionalidad(String pnacionalidad) {
 		this.nacionalidad = pnacionalidad;
-	}
-
-	public Rol getRol() {
-		return rol;
-	}
-
-	public void setRol(Rol rol) {
-		this.rol = rol;
 	}
 
 	public Boolean getListaDist() {
@@ -458,36 +363,37 @@ public class UsuarioBolsaEmpleo implements Serializable {
 
 	@Override
 	public String toString() {
-		return "Usuario [codNum=" + codNum + ", codcuenta=" + codcuenta + ", tipodocumento=" + tipodocumento
-				+ ", numdocumento=" + numdocumento + ", nombre=" + nombre + ", apellido1=" + apellido1 + ", apellido2="
-				+ apellido2 + ", email=" + email + ", direccion=" + direccion + ", codigopostal=" + codigopostal
-				+ ", localidad=" + localidad + ", provincia=" + provincia + ", telefono=" + telefono + ", nacionalidad="
-				+ nacionalidad + ", rol=" + rol + ", listaDist=" + listaDist
-				+ ", excluido=" + excluido + ", excluidoTipo=" + excluidoTipo + ", fechaExclusionInicio="
-				+ fechaExclusionInicio + ", fechaExclusionFin=" + fechaExclusionFin + ", razonExclusion="
-				+ razonExclusion + ", fechaExclusion=" + fechaExclusion + ", borrado=" + borrado + ", razonBorrado="
-				+ razonBorrado + ", fechaBorrado=" + fechaBorrado + "]";
+		return "Usuario [codNum=" + codNum + ", codcuenta=" + codcuenta + ", tipodocumento=" + tipodocumento + ", idnif=" + idnif + ", letranif=" 
+				+ letranif + ", prsnif=" + prsnif + ", nombre=" + nombre + ", apellido1=" + apellido1 + ", apellido2=" + apellido2 + ", email=" 
+				+ email + ", rol=" + rol + ", direccion=" + direccion + ", codigopostal=" + codigopostal + ", localidad=" + localidad + ", provincia="
+				+ provincia + ", telefono=" + telefono + ", nacionalidad=" + nacionalidad + ", listaDist=" + listaDist + ", excluido=" + excluido 
+				+ ", excluidoTipo=" + excluidoTipo + ", fechaExclusionInicio=" + fechaExclusionInicio + ", fechaExclusionFin=" + fechaExclusionFin 
+				+ ", razonExclusion=" + razonExclusion + ", fechaExclusion=" + fechaExclusion + ", borrado=" + borrado + ", razonBorrado=" + razonBorrado
+				+ ", fechaBorrado=" + fechaBorrado + "]";
 	}
 
 	@Override
 	public int hashCode() {
 		final int prime = 31;
 		int result = 1;
+
 		result = prime * result + ((codNum == null) ? 0 : codNum.hashCode());
 		result = prime * result + ((codcuenta == null) ? 0 : codcuenta.hashCode());
 		result = prime * result + ((tipodocumento == null) ? 0 : tipodocumento.hashCode());
-		result = prime * result + ((numdocumento == null) ? 0 : numdocumento.hashCode());
+		result = prime * result + ((idnif == null) ? 0 : idnif.hashCode());
+		result = prime * result + ((letranif == null) ? 0 : letranif.hashCode());
+		result = prime * result + ((prsnif == null) ? 0 : prsnif.hashCode());
 		result = prime * result + ((nombre == null) ? 0 : nombre.hashCode());
 		result = prime * result + ((apellido1 == null) ? 0 : apellido1.hashCode());
 		result = prime * result + ((apellido2 == null) ? 0 : apellido2.hashCode());
 		result = prime * result + ((email == null) ? 0 : email.hashCode());
+		result = prime * result + ((rol == null) ? 0 : rol.hashCode());
 		result = prime * result + ((direccion == null) ? 0 : direccion.hashCode());
 		result = prime * result + ((codigopostal == null) ? 0 : codigopostal.hashCode());
 		result = prime * result + ((localidad == null) ? 0 : localidad.hashCode());
 		result = prime * result + ((provincia == null) ? 0 : provincia.hashCode());
 		result = prime * result + ((telefono == null) ? 0 : telefono.hashCode());
 		result = prime * result + ((nacionalidad == null) ? 0 : nacionalidad.hashCode());
-		result = prime * result + ((rol == null) ? 0 : rol.hashCode());
 		result = prime * result + ((listaDist == null) ? 0 : listaDist.hashCode());
 		result = prime * result + ((excluido == null) ? 0 : excluido.hashCode());
 		result = prime * result + ((excluidoTipo == null) ? 0 : excluidoTipo.hashCode());
@@ -515,6 +421,13 @@ public class UsuarioBolsaEmpleo implements Serializable {
 			return false;
 		}
 		UsuarioBolsaEmpleo other = (UsuarioBolsaEmpleo) obj;
+		if (codNum == null) {
+			if (other.codNum != null) {
+				return false;
+			}
+		} else if (!codNum.equals(other.codNum)) {
+			return false;
+		}
 		if (codcuenta == null) {
 			if (other.codcuenta != null) {
 				return false;
@@ -529,11 +442,25 @@ public class UsuarioBolsaEmpleo implements Serializable {
 		} else if (!tipodocumento.equals(other.tipodocumento)) {
 			return false;
 		}
-		if (numdocumento == null) {
-			if (other.numdocumento != null) {
+		if (idnif == null) {
+			if (other.idnif != null) {
 				return false;
 			}
-		} else if (!numdocumento.equals(other.numdocumento)) {
+		} else if (!idnif.equals(other.idnif)) {
+			return false;
+		}
+		if (letranif == null) {
+			if (other.letranif != null) {
+				return false;
+			}
+		} else if (!letranif.equals(other.letranif)) {
+			return false;
+		}
+		if (prsnif == null) {
+			if (other.prsnif != null) {
+				return false;
+			}
+		} else if (!prsnif.equals(other.prsnif)) {
 			return false;
 		}
 		if (nombre == null) {
@@ -562,6 +489,13 @@ public class UsuarioBolsaEmpleo implements Serializable {
 				return false;
 			}
 		} else if (!email.equals(other.email)) {
+			return false;
+		}
+		if (rol == null) {
+			if (other.rol != null) {
+				return false;
+			}
+		} else if (!rol.equals(other.rol)) {
 			return false;
 		}
 		if (direccion == null) {
@@ -604,13 +538,6 @@ public class UsuarioBolsaEmpleo implements Serializable {
 				return false;
 			}
 		} else if (!nacionalidad.equals(other.nacionalidad)) {
-			return false;
-		}
-		if (rol == null) {
-			if (other.rol != null) {
-				return false;
-			}
-		} else if (!rol.equals(other.rol)) {
 			return false;
 		}
 		if (listaDist == null) {
@@ -683,7 +610,7 @@ public class UsuarioBolsaEmpleo implements Serializable {
 		} else if (!fechaBorrado.equals(other.fechaBorrado)) {
 			return false;
 		}
-
+		
 		return true;
 	}
 }

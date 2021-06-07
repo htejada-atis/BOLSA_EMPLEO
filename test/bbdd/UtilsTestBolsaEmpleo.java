@@ -289,12 +289,7 @@ public final class UtilsTestBolsaEmpleo {
 	 * @throws UVException .
 	 */
 	public static UsuarioBolsaEmpleo getUsuarioPersonalLogeado() throws SQLException, UVException {
-		UVDatos datos = new UVDatos();
-		datos.setIdentificadorUsuario(UID_PERSONAL_PRUEBAS);
-		Usuario usuario = CrearUsuario.usuario(UID_PERSONAL_PRUEBAS);
-		datos.setUsuario(usuario);
-
-		return ModeloUsuarioBolsaEmpleo.obtenerInstancia().getUsuarioLogeado(datos);
+		return ModeloUsuarioBolsaEmpleo.obtenerInstancia().getUsuarioByCodCuenta(UID_PERSONAL_PRUEBAS);
 	}
 	
 	/**
@@ -304,12 +299,7 @@ public final class UtilsTestBolsaEmpleo {
 	 * @throws UVException .
 	 */
 	public static UsuarioBolsaEmpleo getUsuarioCandidatoLogeado() throws SQLException, UVException {
-		UVDatos datos = new UVDatos();
-		datos.setIdentificadorUsuario(UID_CANDIDATO_PRUEBAS);
-		Usuario usuario = CrearUsuario.usuario(UID_CANDIDATO_PRUEBAS);
-		datos.setUsuario(usuario);
-
-		return ModeloUsuarioBolsaEmpleo.obtenerInstancia().getUsuarioLogeado(datos);
+		return ModeloUsuarioBolsaEmpleo.obtenerInstancia().getUsuarioByCodCuenta(UID_CANDIDATO_PRUEBAS);
 	}
 	
 	/**
