@@ -378,10 +378,9 @@ public class ControladorValidar extends HttpServlet {
 		Gson gson = new GsonBuilder().create();
 		
 		// parseamos json afinidades
-		HashMap<String, Float> afinidadesRaw;
+		HashMap<String, Double> afinidadesRaw;
 		try {			
-			afinidadesRaw = gson.fromJson(request.getParameter(PARAM_AFINIDADES), 
-					new TypeToken<HashMap<String, Float>>() { }.getType());			
+			afinidadesRaw = gson.fromJson(request.getParameter(PARAM_AFINIDADES), new TypeToken<HashMap<String, Double>>() { }.getType());			
 		} catch (Exception e) {
 			throw new UVException("Afinidades incorrectas");
 		}
@@ -393,27 +392,27 @@ public class ControladorValidar extends HttpServlet {
 		
 		if (!bean.getMerito().getMerito().getItemBaremacion().getIndividualizado()) {
 			// comprobamos validez de las afinidades
-			HashMap<Afinidad, Float> afinidades = new HashMap<>();
-			Float total = (float) 0.0;
-			for (Map.Entry<String, Float> entry : afinidadesRaw.entrySet()) {
+			HashMap<Afinidad, Double> afinidades = new HashMap<>();
+			Double total = 0.0;
+			for (Map.Entry<String, Double> entry : afinidadesRaw.entrySet()) {
 				Afinidad a = modeloAfinidad.getAfinidadById(Formateador.leeParametroInteger(entry.getKey()));
 				afinidades.put(a, entry.getValue());
 				total += entry.getValue();
 			}
 			
-			Float totalRounder = (float) BolsaEmpleoUtils.redondeo(total);
+			Double totalRounder = BolsaEmpleoUtils.redondeo(total);
 			if (!totalRounder.equals(bean.getMerito().getMerito().getValor())) {
 				throw new UVException("El total de afinidades tiene que ser igual al valor del mérito");
 			}
 			
 			modeloSolicitud.actualizarAfinidadesMeritoNoIndividualizado(solicitud, bolsa, bean.getMerito().getMerito(), afinidades, bean.getUsuarioLogeado());
 		} else {
-			Map.Entry<String, Float> entry = afinidadesRaw.entrySet().iterator().next();
-			String idAfinidad = entry.getKey();
-			Float idValoracion = entry.getValue();
-			Afinidad afinidad = modeloAfinidad.getAfinidadById(Formateador.leeParametroInteger(idAfinidad));
-			modeloSolicitud.actualizarAfinidadesMeritoIndividualizado(solicitud, bolsa, bean.getMerito().getMerito(), afinidad,
-					Math.round(idValoracion), bean.getUsuarioLogeado());
+//			Map.Entry<String, Double> entry = afinidadesRaw.entrySet().iterator().next();
+//			String idAfinidad = entry.getKey();
+//			Float idValoracion = entry.getValue();
+//			Afinidad afinidad = modeloAfinidad.getAfinidadById(Formateador.leeParametroInteger(idAfinidad));
+//			modeloSolicitud.actualizarAfinidadesMeritoIndividualizado(solicitud, bolsa, bean.getMerito().getMerito(), afinidad,
+//					Math.round(idValoracion), bean.getUsuarioLogeado());
 		}
 	}
 	

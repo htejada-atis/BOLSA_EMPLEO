@@ -22,8 +22,8 @@ public class TestBEPBeanApartadoBaremacion {
 	private static final String CODIGO = "AAA";
 	private static final String NOMBRE = "EEEE";
 	private static final Boolean ACTIVO = true;
-	private static final Float PUNTUACIONMAXIMA = (float) 1;
-	private static final Float PORCENTAJEMAXIMO = (float) 1;
+	private static final Double PUNTUACIONMAXIMA = (double) 1;
+	private static final Double PORCENTAJEMAXIMO = (double) 1;
 	
 	/**
 	 * test constructor.

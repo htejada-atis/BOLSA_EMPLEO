@@ -33,7 +33,7 @@ import es.ujaen.uvirtual.utilidades.UVException;
 public class TestBEPModeloAfinidad {
 	private static final String CODIGO = "AAA";
 	private static final String DESCRIPCION = "pruebas de afinidad";
-	private static final Double MODULACION = (double) 10000;
+	private static final Double MODULACION = (double) 1000;
 	
 	private static final String CODIGOEDITAR = "EEEE";
 	private static final String DESCRIPCIONEDITAR = "NUEVA DESCRIPCON";

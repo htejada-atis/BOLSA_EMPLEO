@@ -16,9 +16,9 @@ public class ItemBaremacion implements Serializable {
 	private String descripcion;
 	private Boolean activo;	
 	private String unidades;
-	private Float valor;
-	private Float valorMinimo;
-	private Float valorMaximo;
+	private Double valor;
+	private Double valorMinimo;
+	private Double valorMaximo;
 	private String afinidad;
 	private Boolean individualizado;
 	
@@ -27,28 +27,7 @@ public class ItemBaremacion implements Serializable {
 	public ItemBaremacion() {
 		
 	}
-	
-	/** Constructor con parametros.
-	 * @param pcodNum .
-	 * @param pbloque .
-	 * @param pcodigo .
-	 * @param pnombre .
-	 * @param pactivo .
-	 * @param punidades .
-	 * @param pvalor .
-	 */
-	public ItemBaremacion(Integer pcodNum, BloqueBaremacion pbloque, String pcodigo, String pnombre, Boolean pactivo, 
-			String punidades, Float pvalor) {
-		super();
-		this.bloque = pbloque;
-		this.codNum = pcodNum;
-		this.codigo = pcodigo;
-		this.nombre = pnombre;
-		this.activo = pactivo;
-		this.unidades = punidades;
-		this.valor = pvalor;		
-	}
-		
+			
 	/** Constructor copia.
 	 * @param copia .
 	 */
@@ -122,27 +101,27 @@ public class ItemBaremacion implements Serializable {
 		this.unidades = unidades;
 	}
 	
-	public Float getValor() {
+	public Double getValor() {
 		return this.valor;
 	}
 
-	public void setValor(Float valor) {
+	public void setValor(Double valor) {
 		this.valor = valor;
 	}
 	
-	public Float getValorMinimo() {
+	public Double getValorMinimo() {
 		return this.valorMinimo;
 	}
 
-	public void setValorMinimo(Float valorMinimo) {
+	public void setValorMinimo(Double valorMinimo) {
 		this.valorMinimo = valorMinimo;
 	}
 	
-	public Float getValorMaximo() {
+	public Double getValorMaximo() {
 		return this.valorMaximo;
 	}
 
-	public void setValorMaximo(Float valorMaximo) {
+	public void setValorMaximo(Double valorMaximo) {
 		this.valorMaximo = valorMaximo;
 	}
 	
