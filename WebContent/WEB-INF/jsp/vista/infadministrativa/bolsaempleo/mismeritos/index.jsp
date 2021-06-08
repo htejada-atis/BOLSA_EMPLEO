@@ -52,7 +52,7 @@ VistaMeritos bean = (VistaMeritos) uvdatos.getVistas().get(VistaMeritos.class.ge
 		
 		document.getElementById("nuevo_merito").addEventListener("click", function(event) {
 			event.preventDefault();
-			Atis.sendForm("<%= request.getRequestURI() %>", {'a': '<%= ControladorMisMeritos.ACCION_AGREGAR_MERITO %>'});
+			Atis.sendForm("<%= request.getRequestURI() %>", {'<%= ControladorMisMeritos.PARAM_ACCION %>': '<%= ControladorMisMeritos.ACCION_AGREGAR_MERITO %>'});
 		});
 		
 		var optionsApartados = {};
@@ -69,6 +69,9 @@ VistaMeritos bean = (VistaMeritos) uvdatos.getVistas().get(VistaMeritos.class.ge
 		    "action": "<%=ControladorMisMeritos.ACCION_DATATABLE%>",
 		    "selectable": true,
 		    "filterable": true,
+		    "defaultOrderBy": 3,
+		    "pageSize": 50,
+		    "pageSizeOptions": [10, 50, 100],
 		    "columns": [
 		    	{'data': 'codNum', 'selectable': true},
 		    	{'data': 'codNum', 'filter': {'type': 'number'}},

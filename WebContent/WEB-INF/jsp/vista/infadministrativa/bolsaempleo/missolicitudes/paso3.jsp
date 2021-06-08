@@ -27,9 +27,7 @@ VistaSolicitudes bean = (VistaSolicitudes) uvdatos.getVistas().get(VistaSolicitu
 	
 	<p>Revise su solicitud para la convocatoria <%=bean.getSolicitud().getConvocatoria().getDescripcion()%>. Una vez confirmada no podrá ser editada</p>
 	
-	<%
-		for (BolsaSolicitud bolsa: bean.getListaBolsasSolicitud()) {
-		%>
+	<% for (BolsaSolicitud bolsa: bean.getListaBolsasSolicitud()) { %>
 		
 		<h4>Área - <%= bolsa.getArea().getDescripcion() %></h4>
 		<table class="bluetable bolsaempleo">

@@ -12,6 +12,7 @@ import es.ujaen.uvirtual.modelo.conexion.ConexionUvirtual;
 import es.ujaen.uvirtual.modulo.bolsaempleo.beans.Merito;
 import es.ujaen.uvirtual.modulo.bolsaempleo.beans.UsuarioBolsaEmpleo;
 import es.ujaen.uvirtual.modulo.bolsaempleo.utilidades.BolsaEmpleoDataTable;
+import es.ujaen.uvirtual.modulo.bolsaempleo.utilidades.BolsaEmpleoDataTable.DataTableColumn;
 import es.ujaen.uvirtual.modulo.bolsaempleo.utilidades.BolsaEmpleoUtils;
 import es.ujaen.uvirtual.utilidades.UVException;
 
@@ -219,15 +220,15 @@ public class ModeloMerito {
 		String consulta = "UPDATE TBEP_MERITOS bepmer" 
 				+ " SET BEPITE_CODNUM = ?, VALOR = ?, UID_USUARIO = ?"
 				+ " WHERE bepmer.CODNUM = ?";
-		try (Connection conexion = ConexionUvirtual.obtenerInstancia();
-				 PreparedStatement stmt = conexion.prepareStatement(consulta)) {
-				int parameterIndex = 1;
-				stmt.setInt(parameterIndex++, merito.getItemBaremacion().getCodNum());
-				stmt.setFloat(parameterIndex++, merito.getValor());
-				stmt.setInt(parameterIndex++, merito.getCodNum());
-				stmt.setString(parameterIndex++, usuarioUpdate.getCodCuenta());
-				stmt.executeUpdate();
-			}
+		
+		try (Connection conexion = ConexionUvirtual.obtenerInstancia(); PreparedStatement stmt = conexion.prepareStatement(consulta)) {
+			int parameterIndex = 1;
+			stmt.setInt(parameterIndex++, merito.getItemBaremacion().getCodNum());
+			stmt.setFloat(parameterIndex++, merito.getValor());
+			stmt.setInt(parameterIndex++, merito.getCodNum());
+			stmt.setString(parameterIndex++, usuarioUpdate.getCodCuenta());
+			stmt.executeUpdate();
+		}
 	}
 	
 	/**
@@ -247,14 +248,20 @@ public class ModeloMerito {
 		List<Merito> meritos = new ArrayList<>();
 		BolsaEmpleoDataTable<Merito> dataTable = new BolsaEmpleoDataTable<>(params);
 		
-		String consulta = "SELECT bepmer.*, bepblo.BEPAPA_CODNUM FROM tbep_meritos bepmer"
-				+ " INNER JOIN tbep_itemsbaremacion bepite ON bepite.CODNUM = bepmer.BEPITE_CODNUM"
-				+ " INNER JOIN tbep_bloquesbaremacion bepblo ON bepblo.CODNUM = bepite.BEPBLO_CODNUM"
+		String consulta = ""
+				+ " SELECT bepmer.*, bepblo.BEPAPA_CODNUM "
+				+ " FROM TBEP_MERITOS bepmer "
+				+ " INNER JOIN TBEP_ITEMSBAREMACION bepite ON bepite.CODNUM = bepmer.BEPITE_CODNUM "
+				+ " INNER JOIN TBEP_BLOQUESBAREMACION bepblo ON bepblo.CODNUM = bepite.BEPBLO_CODNUM "
+				+ " INNER JOIN TBEP_APARTADOSBAREMACION bepapa ON bepapa.CODNUM  = bepblo.BEPAPA_CODNUM "
 				+ " WHERE bepmer.BEPUSU_CODNUM = ? ";
+		
+		String whereCodigo = String.format("(%s || '.' || %s || '.' || %s)", "bepapa.CODIGO", "bepblo.CODIGO", "bepite.CODIGO");
+		String orderCodigo = String.format("(%s || '.' || %s || '.' || %s) %%s", "LPAD(bepapa.CODIGO, 2)", "LPAD(bepblo.CODIGO, 2)", "LPAD(bepite.CODIGO, 2)");
 		
 		dataTable.setColumn(ORDER_COLUMN_INDEX_ID, "bepmer.CODNUM");
 		dataTable.setColumn(ORDER_COLUMN_INDEX_BLOQUE, "bepblo.BEPAPA_CODNUM");
-		dataTable.setColumn(ORDER_COLUMN_INDEX_ITEM, "bepmer.BEPITE_CODNUM");
+		dataTable.setColumn(ORDER_COLUMN_INDEX_ITEM, whereCodigo, DataTableColumn.COLUMN_TYPE_TEXT, orderCodigo);
 		dataTable.setColumn(ORDER_COLUMN_INDEX_NOMBRE_ITEM, "bepite.NOMBRE");
 		dataTable.setColumn(ORDER_COLUMN_INDEX_DESCRIPCION, "bepmer.DESCRIPCION");
 		dataTable.setColumn(ORDER_COLUMN_INDEX_VALOR, "bepmer.VALOR");
