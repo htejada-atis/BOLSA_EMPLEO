@@ -13,7 +13,7 @@ public class MeritoSolicitudValoracion implements Serializable {
 	private Integer codNum;
 	private MeritoSolicitud meritoSolicitud;
 	private Afinidad afinidad;
-	private Float valor;
+	private Double valor;
 
 	/**
 	 * Constructor por defecto.
@@ -30,7 +30,7 @@ public class MeritoSolicitudValoracion implements Serializable {
 	 * @param pafinidad   .
 	 * @param pvalor .
 	 */
-	public MeritoSolicitudValoracion(Integer pcodNum, MeritoSolicitud pmeritoSolicitud, Afinidad pafinidad, Float pvalor) {
+	public MeritoSolicitudValoracion(Integer pcodNum, MeritoSolicitud pmeritoSolicitud, Afinidad pafinidad, Double pvalor) {
 		this.codNum = pcodNum;
 		this.meritoSolicitud = pmeritoSolicitud;
 		this.afinidad = pafinidad;
@@ -61,11 +61,11 @@ public class MeritoSolicitudValoracion implements Serializable {
 		this.afinidad = afinidad;
 	}
 	
-	public Float getValor() {
+	public Double getValor() {
 		return valor;
 	}
 
-	public void setValor(Float valor) {
+	public void setValor(Double valor) {
 		this.valor = valor;
 	}
 			

@@ -37,8 +37,8 @@ public class TestBEPModeloBaremacionApartados {
 	private static final Integer CODNUM_NOEXISTE = 111_111_111;
 	private static final String CODIGO = "1";
 	private static final String NOMBRE = "NOMBRE APARTADO";
-	private static final Float PUNTACION_MAXIMA = (float) 1.1;
-	private static final Float PORCENTAJE_MAXIMO = (float) 0.2;
+	private static final Double PUNTACION_MAXIMA = (double) 1.1;
+	private static final Double PORCENTAJE_MAXIMO = (double) 0.2;
 	
 	private static final String MENSAJE_ERROR_HAY_EXCEPCION = "Excepción no esperada: %s";
     

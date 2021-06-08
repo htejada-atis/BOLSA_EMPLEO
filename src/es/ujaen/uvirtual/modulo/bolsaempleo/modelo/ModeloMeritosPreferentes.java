@@ -312,7 +312,7 @@ public class ModeloMeritosPreferentes {
 			if (merito.getBase() != null) {
 				stmt.setDouble(parameterIndex++, merito.getBase());
 			} else {
-				stmt.setNull(parameterIndex++, Types.NULL);
+				stmt.setNull(parameterIndex++, Types.NUMERIC);
 			}
 			
 			stmt.setDouble(parameterIndex++, merito.getFactor());
@@ -320,29 +320,29 @@ public class ModeloMeritosPreferentes {
 			if (merito.getValorMaximo() != null) {
 				stmt.setDouble(parameterIndex++, merito.getValorMaximo());
 			} else {
-				stmt.setNull(parameterIndex++, Types.NULL);
+				stmt.setNull(parameterIndex++, Types.NUMERIC);
 			}
 			
 			if (merito.getTipoItemBaremacion() != null) {
 				stmt.setInt(parameterIndex++, merito.getTipoItemBaremacion().getCodNum());				
 			} else {
-				stmt.setNull(parameterIndex++, Types.NULL);
+				stmt.setNull(parameterIndex++, Types.INTEGER);
 			}
 			
 			if (merito.getAplicableBloqueBaremacion() != null) {
 				stmt.setInt(parameterIndex++, merito.getAplicableBloqueBaremacion().getCodNum());				
 			} else {
-				stmt.setNull(parameterIndex++, Types.NULL);
+				stmt.setNull(parameterIndex++, Types.INTEGER);
 			}
 			if (merito.getAplicableApartadoBaremacion() != null) {
 				stmt.setInt(parameterIndex++, merito.getAplicableApartadoBaremacion().getCodNum());				
 			} else {
-				stmt.setNull(parameterIndex++, Types.NULL);
+				stmt.setNull(parameterIndex++, Types.INTEGER);
 			}
 			if (merito.getAplicableItemBaremacion() != null) {
 				stmt.setInt(parameterIndex++, merito.getAplicableItemBaremacion().getCodNum());				
 			} else {
-				stmt.setNull(parameterIndex++, Types.NULL);
+				stmt.setNull(parameterIndex++, Types.INTEGER);
 			}
 			
 			stmt.setString(parameterIndex++, usuarioUpdate.getCodCuenta());
@@ -393,33 +393,33 @@ public class ModeloMeritosPreferentes {
 			if (merito.getBase() != null) {
 				stmt.setDouble(parameterIndex++, merito.getBase());
 			} else {
-				stmt.setNull(parameterIndex++, Types.NULL);
+				stmt.setNull(parameterIndex++, Types.NUMERIC);
 			}
 			stmt.setDouble(parameterIndex++, merito.getFactor());
 			if (merito.getValorMaximo() != null) {
 				stmt.setDouble(parameterIndex++, merito.getValorMaximo());
 			} else {
-				stmt.setNull(parameterIndex++, Types.NULL);
+				stmt.setNull(parameterIndex++, Types.NUMERIC);
 			}
 			if (merito.getTipoItemBaremacion() != null) {
 				stmt.setInt(parameterIndex++, merito.getTipoItemBaremacion().getCodNum());	
 			} else {
-				stmt.setNull(parameterIndex++, Types.NULL);
+				stmt.setNull(parameterIndex++, Types.INTEGER);
 			}
 			if (merito.getAplicableBloqueBaremacion() != null) {
 				stmt.setInt(parameterIndex++, merito.getAplicableBloqueBaremacion().getCodNum());
 			} else {
-				stmt.setNull(parameterIndex++, Types.NULL);
+				stmt.setNull(parameterIndex++, Types.INTEGER);
 			}
 			if (merito.getAplicableApartadoBaremacion() != null) {
 				stmt.setInt(parameterIndex++, merito.getAplicableApartadoBaremacion().getCodNum());
 			} else {
-				stmt.setNull(parameterIndex++, Types.NULL);
+				stmt.setNull(parameterIndex++, Types.INTEGER);
 			}
 			if (merito.getAplicableItemBaremacion() != null) {
 				stmt.setInt(parameterIndex++, merito.getAplicableItemBaremacion().getCodNum());
 			} else {
-				stmt.setNull(parameterIndex++, Types.NULL);
+				stmt.setNull(parameterIndex++, Types.INTEGER);
 			}
 			stmt.setString(parameterIndex++, Boolean.TRUE.equals(merito.getActivo()) ? "S" : "N");
 			stmt.setString(parameterIndex++, usuarioUpdate.getCodCuenta());

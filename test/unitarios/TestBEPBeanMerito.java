@@ -22,7 +22,7 @@ import es.ujaen.uvirtual.modulo.bolsaempleo.beans.Merito;
 public class TestBEPBeanMerito {
 
 	private static final String CADENA = "cadena";
-	private static final Float FLOAT = 1.1f;
+	private static final Double FLOAT = 1.1;
 	private static final InputStream ARCHIVO = new ByteArrayInputStream("archivo de prueba".getBytes());
 	
 	/** test constructor.

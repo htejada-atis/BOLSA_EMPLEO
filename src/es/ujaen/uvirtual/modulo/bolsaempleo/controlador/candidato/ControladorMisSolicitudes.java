@@ -706,25 +706,25 @@ public class ControladorMisSolicitudes extends HttpServlet {
 
 		// parseamos json bolsas
 		Gson gson = new GsonBuilder().create();
-		HashMap<String, Float> afinidadesRaw;
+		HashMap<String, Double> afinidadesRaw;
 		try {			
 			afinidadesRaw = gson.fromJson(request.getParameter(PARAM_AFINIDADES), 
-					new TypeToken<HashMap<String, Float>>() { }.getType());					
+					new TypeToken<HashMap<String, Double>>() { }.getType());					
 		} catch (Exception e) {
 			throw new UVException("Afinidades incorrectas");
 		}
 		
 		// comprobamos validez de las afinidades
-		HashMap<Afinidad, Float> afinidades = new HashMap<>();
+		HashMap<Afinidad, Double> afinidades = new HashMap<>();
 		ModeloAfinidad modeloAfinidad = ModeloAfinidad.obtenerInstancia();
-		Float total = (float) 0.0;				
-		for (Map.Entry<String, Float> entry : afinidadesRaw.entrySet()) {
+		Double total = 0.0;				
+		for (Map.Entry<String, Double> entry : afinidadesRaw.entrySet()) {
 			Afinidad a = modeloAfinidad.getAfinidadById(Formateador.leeParametroInteger(entry.getKey()));
 			afinidades.put(a, entry.getValue());
 			total += entry.getValue(); 
 		}
 		
-		Float totalRounder = (float) BolsaEmpleoUtils.redondeo(total);		
+		Double totalRounder = BolsaEmpleoUtils.redondeo(total);		
 		if (!totalRounder.equals(merito.getValor())) {
 			throw new UVException("El total de afinidades tiene que ser igual al valor del mérito");
 		}
