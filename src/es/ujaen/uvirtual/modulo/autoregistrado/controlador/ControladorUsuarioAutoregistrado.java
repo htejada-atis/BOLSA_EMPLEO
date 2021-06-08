@@ -13,6 +13,7 @@ import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
 import es.ujaen.uvirtual.adm.CrearUsuario;
+import es.ujaen.uvirtual.beans.ConfiguracionGlobal;
 import es.ujaen.uvirtual.beans.UVDatos;
 import es.ujaen.uvirtual.beans.Usuario;
 import es.ujaen.uvirtual.modulo.autoregistrado.beans.vista.VistaUsuarioAutoregistrado;
@@ -20,6 +21,7 @@ import es.ujaen.uvirtual.modulo.autoregistrado.modelo.ModeloUsuarioAutoregistrad
 import es.ujaen.uvirtual.utilidades.AyudaURL;
 import es.ujaen.uvirtual.utilidades.EscapaHTML;
 import es.ujaen.uvirtual.utilidades.Formateador;
+import es.ujaen.uvirtual.utilidades.RecaptchaUtils;
 import es.ujaen.uvirtual.utilidades.UVException;
 
 /** Clase controlador para obtener, cambiar, eliminar y agregar convocatorias.
@@ -61,6 +63,65 @@ public class ControladorUsuarioAutoregistrado extends HttpServlet {
 	
 	private static final String JSP_VALIDA_CODIGO_TEMPORAL = "/WEB-INF/jsp/vista/operaciones/autoaprovisionado/validaCodigoTemporal.jsp";
 
+	private void compruebaNoRobot(HttpServletRequest request) throws UVException {
+		boolean recaptchaActivo = false;
+		try {
+			recaptchaActivo = ConfiguracionGlobal.getParametroLogico("autoaprovisionado.recaptcha.activado");
+		} catch (UVException e) {
+			LOGGER.log(Level.WARNING, e.toString());
+			recaptchaActivo = false;
+		}
+		if (recaptchaActivo) {
+			try {
+				RecaptchaUtils.validaRechaptcha(request);
+			} catch (UVException e) {
+				throw e;
+			} catch (IOException e) {
+				LOGGER.log(Level.WARNING, e.toString());
+			}
+		}
+	}
+	
+	private void realizaAccion(HttpServletRequest request, HttpServletResponse response, VistaUsuarioAutoregistrado bean,
+		                       String nombreAccion) throws SQLException, IOException, UVException {
+		bean.setVista("/WEB-INF/jsp/vista/operaciones/autoaprovisionado/usuarioExternoWayf.jsp");
+		String modulo = obtenerIdModulo(request); 
+		bean.setIdModulo(modulo);
+		bean.setDescripcionModulo(obtenerDescripcionModulo(modulo));
+		String urlModulo = obtenerUrlModulo(request, modulo);
+		bean.setPaginaRedireccion(urlModulo);
+		bean.setMostrarCaptcha(true);
+		try {
+			bean.setCaptchaPublica(ConfiguracionGlobal.getParametroCadena("administracion.recaptcha.claveDelSitio"));
+		} catch (UVException e) {
+			LOGGER.log(Level.WARNING, e.toString());
+		}
+
+		switch (nombreAccion) {
+			case ACCION_VALIDA:
+				compruebaNoRobot(request);
+				validaUsuario(request, response, bean);
+				break;
+			case ACCION_MOSTRAR_CREAR:
+				mostrarCrear(bean);
+				break;
+			case ACCION_CREAR:
+				compruebaNoRobot(request);
+				crearUsuario(request, bean);
+				break;
+			case ACCION_OLVIDO:
+				compruebaNoRobot(request);
+				mandarClaveTemporal(request, bean);
+				break;
+			case ACCION_VALIDA_CODIGO_TEMPORAL:
+				validaClaveTemporal(request, bean);
+				break;
+			default:
+				validaWayf(request, response, bean);
+				break;
+		}
+	}
+	
 	/** Peticion GET.
 	 * @see HttpServlet#doGet(HttpServletRequest request, HttpServletResponse response)
 	 */
@@ -71,7 +132,6 @@ public class ControladorUsuarioAutoregistrado extends HttpServlet {
 		datos.setContentType("text/html");
 		VistaUsuarioAutoregistrado bean = new VistaUsuarioAutoregistrado();
 		
-		bean.setVista("/WEB-INF/jsp/vista/operaciones/autoaprovisionado/usuarioExternoWayf.jsp");
 		String nombreAccion = EscapaHTML.ajustaCodificacion(request.getParameter(PARAM_ACCION));
 		if (nombreAccion == null) {
 			nombreAccion = ACCION_WAYF;
@@ -82,26 +142,7 @@ public class ControladorUsuarioAutoregistrado extends HttpServlet {
 		}
 		
 		try {
-			switch (nombreAccion) {
-				case ACCION_VALIDA:
-					validaUsuario(request, response, bean);
-					break;
-				case ACCION_MOSTRAR_CREAR:
-					mostrarCrear(bean);
-					break;
-				case ACCION_CREAR:
-					crearUsuario(request, bean);
-					break;
-				case ACCION_OLVIDO:
-					mandarClaveTemporal(request, bean);
-					break;
-				case ACCION_VALIDA_CODIGO_TEMPORAL:
-					validaClaveTemporal(request, bean);
-					break;
-				default:
-					validaWayf(request, response, bean);
-					break;
-			}
+			realizaAccion(request, response, bean, nombreAccion);
 		} catch (UVException e) {
 			LOGGER.log(Level.WARNING, e.toString());
 			bean.getMensajesDeError().add(e.getMensajeUsuario());
@@ -170,8 +211,6 @@ public class ControladorUsuarioAutoregistrado extends HttpServlet {
 		String modulo = obtenerIdModulo(request); 
 		String urlModulo = obtenerUrlModulo(request, modulo);
 		bean.setPaginaRedireccion(urlModulo);
-		bean.setIdModulo(modulo);
-		bean.setDescripcionModulo(obtenerDescripcionModulo(modulo));
 		if (uid != null) {
 			response.sendRedirect(bean.getPaginaRedireccion());
 		}

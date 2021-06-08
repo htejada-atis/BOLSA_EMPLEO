@@ -1,3 +1,20 @@
+Insert into ADM_PARAMETROS
+   (CONFIG_CODALF, PARAM_CODALF, DESID, VALOR)
+ Values
+   ('default', 'administracion.recaptcha.claveDelSitio', 'clave del sitio para recaptcha', '6LfN36sUAAAAAIJvKq9WgOnlTxoCiumJPKks0l_2');
+Insert into ADM_PARAMETROS
+   (CONFIG_CODALF, PARAM_CODALF, DESID, VALOR)
+ Values
+   ('default', 'administracion.recaptcha.claveSecreta', 'clave secreta para recaptcha', '6LfN36sUAAAAAFbswh6onFXl8Z9uCppEnuMBx5q2');
+
+INSERT INTO adm_parametros (
+   config_codalf, param_codalf, desid, 
+   valor) 
+VALUES ( DEFAULT,
+ 'autoaprovisionado.recaptcha.activado',
+ 'indica si está activado recaptcha para autoregistrados',
+  'S');
+
 INSERT INTO adm_parametros (
    config_codalf, param_codalf, desid, 
    valor) 
