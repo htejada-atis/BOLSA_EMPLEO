@@ -360,7 +360,6 @@ $(document).ready(function() {
 				this.sumaTotal = function() {
 					var total = 0.0;
 					var noIndividualizadas = self.getValoresAfinidades();	
-					console.log(noIndividualizadas)
 					Object.keys(noIndividualizadas).forEach(function(key) {
 						total += noIndividualizadas[key];
 					});	
