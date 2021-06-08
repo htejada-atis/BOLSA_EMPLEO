@@ -464,7 +464,7 @@ public class ModeloValidar {
 		
 		// seleccionamos los candidatos, con meritos, en la convocatoria pasada
 		String consulta = 
-				"SELECT bepusu.CODNUM, "
+				"SELECT bepusu.CODNUM, bepusu.VUAJA_PRSNIF,"
 				+ "	(" + consultaCount + " AND bepsbm.FLGVALIDADO = 'N' AND bepsbm.FLGEXCLUIDO = 'N') COUNT_NO_VALIDADOS,"
 				+ "	(" + consultaCount + " AND bepsbm.FLGVALIDADO = 'S' AND bepsbm.FLGEXCLUIDO = 'N') COUNT_VALIDADOS,"
 				+ "	(" + consultaCount + " AND bepsbm.FLGEXCLUIDO = 'S') COUNT_EXCLUIDOS,"
@@ -479,10 +479,9 @@ public class ModeloValidar {
 		// agrega el filtro de afinidad
 		consulta += afinidad ? " AND bepite.AFINIDAD IS NOT NULL" : " AND bepite.AFINIDAD IS NULL";
 		
-		consulta += " GROUP BY bepusu.CODNUM ";
+		consulta += " GROUP BY bepusu.CODNUM, bepusu.VUAJA_PRSNIF ";
 
 		dataTable.setColumn(ORDER_COLUMN_INDEX_NUMDOCUMENTO_CANDIDATO, "bepusu.VUAJA_PRSNIF");
-		dataTable.setColumn(ORDER_COLUMN_INDEX_NOMBRE_Y_APELLIDOS_CANDIDATO, "bepusu.VUAJA_PRSNIF");
 
 		dataTable.setQuery(consulta);
 		
