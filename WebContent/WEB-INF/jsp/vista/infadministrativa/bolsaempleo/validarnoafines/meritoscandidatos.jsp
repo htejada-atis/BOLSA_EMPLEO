@@ -330,15 +330,15 @@ $(document).ready(function() {
 			    	'<%= ControladorValidarNoAfines.PARAM_MERITO %>': '<%= merito.getMerito().getCodNum() %>'
 			    	},
 			    "columns": [
-			    	{'data': 'meritoSolicitud.merito.codNum', 'filter': {'type': 'number'}},
-			        {'data': 'bolsa.codNum', 'filter': true, 'render': function(row) {
+			    	{'data': 'meritoSolicitud.merito.codNum', 'order': false},
+			        {'data': 'bolsa.codNum', 'render': function(row) {
 			        	return row.bolsa.area.idAreaExterno + " : " + row.bolsa.area.descripcion;
 		        	}},
-		        	{'data': 'meritoSolicitud.merito.valor'},
-		        	{'data': 'meritoSolicitud.excluido', 'render': function(row) {
+		        	{'data': 'meritoSolicitud.merito.valor', 'order': false},
+		        	{'data': 'meritoSolicitud.excluido', 'order': false, 'render': function(row) {
 		        		return row.meritoSolicitud && row.meritoSolicitud.excluido ? 'SI' : 'NO';
 		        	}},
-		        	{'data': 'meritoSolicitud.codNum', 'render': function(row) {
+		        	{'data': 'meritoSolicitud.codNum', 'order': false, 'render': function(row) {
 		        		if (row.meritoSolicitud.codNum) {
 		        			return 'SI';
 		        		} else {
