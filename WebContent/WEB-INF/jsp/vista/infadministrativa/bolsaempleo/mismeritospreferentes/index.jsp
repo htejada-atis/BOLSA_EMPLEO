@@ -1,6 +1,7 @@
 <%@ page trimDirectiveWhitespaces="true"%>
 <%@ page import="es.ujaen.uvirtual.beans.UVDatos"%>
 <%@	page import="es.ujaen.uvirtual.modulo.bolsaempleo.controlador.candidato.ControladorMisMeritosPreferentes"%>
+<%@	page import="es.ujaen.uvirtual.modulo.bolsaempleo.controlador.ControladorDescargaFicheros"%>
 <%@ page import="es.ujaen.uvirtual.modulo.bolsaempleo.vistas.VistaMeritosPreferentesCandidato"%>
 <%@ page import="es.ujaen.uvirtual.utilidades.EscapaHTML" %>
 <%@ page import="es.ujaen.uvirtual.utilidades.Formateador"%>
@@ -68,8 +69,8 @@ VistaMeritosPreferentesCandidato bean = (VistaMeritosPreferentesCandidato) uvdat
 		    	{'data': 'descripcion', 'filter': true},
 		        {'data': 'codnum', 'buttons': [
 	        		{'label': 'Descargar', 'title': 'Descargar fichero del mérito', 'onClick': function(row) {
-	        			window.open("<%= request.getRequestURI() %>"
-	        		        	+ "?a=<%= ControladorMisMeritosPreferentes.ACCION_DESCARGAR_FICHERO %>&<%= ControladorMisMeritosPreferentes.PARAM_ID %>=" + row.codNum);
+	        			window.open("<%= ControladorDescargaFicheros.URL_DESCARGA_FICHEROS %>"
+	        		        	+ "<%= "?a=" + ControladorDescargaFicheros.ACCION_DESCARGAR_ACREDITACION_CANDIDATO + "&" + ControladorDescargaFicheros.PARAM_ACREDITACION %>=" + row.codNum);
 	        		}},
 	   			]}
 		    ],

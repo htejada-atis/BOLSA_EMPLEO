@@ -200,7 +200,7 @@ public class ControladorFiltrarAcreditaciones extends HttpServlet {
 		ModeloMeritosPreferentesCandidato modeloAcreditacion = ModeloMeritosPreferentesCandidato.obtenerInstancia();
 		if (EscapaHTML.ajustaCodificacion(request.getParameter(PARAM_FICHERO)) != null) {
 			MeritoPreferenteUsuario acreditacion = modeloAcreditacion.getMeritoPreferenteUsuarioById(
-					Formateador.leeParametroInteger(request.getParameter(PARAM_FICHERO)), bean.getCandidato());
+					Formateador.leeParametroInteger(request.getParameter(PARAM_FICHERO)));
 			bean.setAcreditacion(acreditacion);
 			
 			response.setContentType("application/pdf");
@@ -246,7 +246,7 @@ public class ControladorFiltrarAcreditaciones extends HttpServlet {
 			try {
 				Integer acreditacionId = Formateador.leeParametroInteger(request.getParameter(PARAM_ACREDITACION));
 				ModeloMeritosPreferentesCandidato modeloAcreditacion = ModeloMeritosPreferentesCandidato.obtenerInstancia();
-				MeritoPreferenteUsuario acreditacion = modeloAcreditacion.getMeritoPreferenteUsuarioById(acreditacionId, bean.getCandidato());
+				MeritoPreferenteUsuario acreditacion = modeloAcreditacion.getMeritoPreferenteUsuarioById(acreditacionId);
 				bean.setAcreditacion(acreditacion);
 				
 				if (seleccionada) {

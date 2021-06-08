@@ -312,7 +312,7 @@ public class ControladorMisMeritosPreferentes extends HttpServlet {
 		UsuarioBolsaEmpleo usu = ModeloUsuarioBolsaEmpleo.obtenerInstancia().getUsuarioByNumeroDocumento(usuario.getDocumentoNumero());
 		
 		for (int sel : selected) {
-			meritos.add(modelo.getMeritoPreferenteUsuarioById(sel, usu));
+			meritos.add(modelo.getMeritoPreferenteUsuarioById(sel));
 		}
 
 		modelo.cambiarFlagBorradoMeritos(meritos, bean.getUsuarioLogeado());
@@ -325,7 +325,7 @@ public class ControladorMisMeritosPreferentes extends HttpServlet {
 		this.index(bean);
 		
 		MeritoPreferenteUsuario mpu = ModeloMeritosPreferentesCandidato.obtenerInstancia().getMeritoPreferenteUsuarioById(
-				Formateador.leeParametroInteger(request.getParameter(PARAM_ID)), ModeloUsuarioBolsaEmpleo.obtenerInstancia().getUsuarioCandidato(datos));
+				Formateador.leeParametroInteger(request.getParameter(PARAM_ID)));
 		
 		response.setContentType("application/pdf");
 		datos.setRespuestaEnviada(true);

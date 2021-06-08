@@ -1,6 +1,7 @@
 <%@ page trimDirectiveWhitespaces="true"%>
 <%@ page import="es.ujaen.uvirtual.beans.UVDatos"%>
 <%@	page import="es.ujaen.uvirtual.modulo.bolsaempleo.controlador.configuracion.ControladorGestionFicheros"%>
+<%@	page import="es.ujaen.uvirtual.modulo.bolsaempleo.controlador.ControladorDescargaFicheros"%>
 <%@ page import="es.ujaen.uvirtual.modulo.bolsaempleo.vistas.VistaFicheros"%>
 <%@ page import="es.ujaen.uvirtual.utilidades.EscapaHTML" %>
 
@@ -54,8 +55,8 @@ VistaFicheros bean = (VistaFicheros) uvdatos.getVistas().get(VistaFicheros.class
 		        {'data': 'nombre', 'filter': true, 'overflow': 'auto'},
 		        {'data': 'titulo', 'filter': true, 'overflow': 'auto'},
 		        {'data': 'codnum', 'order': {'active': false}, 'class': 'overflow-ellipsis', 'render': function(row) {
-		        	var link = "<%= ControladorGestionFicheros.URL_PATTERN_FILES_PRIVADA %>"
-		        	+ "?a=<%= ControladorGestionFicheros.ACCION_DESCARGAR_FICHERO %>&<%= ControladorGestionFicheros.PARAM_FICHERO %>=" + row.codNum;
+		        	var link = "<%= ControladorDescargaFicheros.URL_DESCARGA_FICHEROS %>"
+		        	+ "?a=<%= ControladorDescargaFicheros.ACCION_DESCARGAR_DOCUMENTO %>&<%= ControladorDescargaFicheros.PARAM_ARCHIVO %>=" + row.codNum;
 		        	return "<a class='consultar-fichero' title='Descargar fichero' href='" +link +"' target='_blank'>" +link +"</a>"; 
 		        	}
 		        },
@@ -70,8 +71,8 @@ VistaFicheros bean = (VistaFicheros) uvdatos.getVistas().get(VistaFicheros.class
 		        {'data': 'codnum', 'buttons': [{'label': '<label class="tooltiptext-ficheros">Copiar enlace</label>Copiar', 'class': 'tooltip-ficheros', 'onClick': function(row) {
 			        	$(this).parent().parent().parent().find(".tooltiptext-ficheros").text("¡Enlace copiado!");
 			        	
-			        	var link = "<%= ControladorGestionFicheros.URL_PATTERN_FILES_PRIVADA %>"
-				        	+ "?a=<%= ControladorGestionFicheros.ACCION_DESCARGAR_FICHERO %>&<%= ControladorGestionFicheros.PARAM_FICHERO %>=" + row.codNum;
+			        	var link = "<%= ControladorDescargaFicheros.URL_DESCARGA_FICHEROS %>"
+				        	+ "?a=<%= ControladorDescargaFicheros.ACCION_DESCARGAR_DOCUMENTO %>&<%= ControladorDescargaFicheros.PARAM_ARCHIVO %>=" + row.codNum;
 			        	navigator.clipboard.writeText(link);
 			        }
 			    }]}

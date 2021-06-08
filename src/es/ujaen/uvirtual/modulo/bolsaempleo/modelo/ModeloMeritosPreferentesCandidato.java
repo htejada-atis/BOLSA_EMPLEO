@@ -144,25 +144,19 @@ public class ModeloMeritosPreferentesCandidato {
 	/**
 	 * Devuelve el merito preferente de un usuario.
 	 * @param codNum .
-	 * @param usuario .
 	 * @return .
 	 * @throws UVException .
 	 * @throws SQLException .
 	 */
-	public MeritoPreferenteUsuario getMeritoPreferenteUsuarioById(Integer codNum, UsuarioBolsaEmpleo usuario) throws SQLException, UVException {
+	public MeritoPreferenteUsuario getMeritoPreferenteUsuarioById(Integer codNum) throws SQLException, UVException {
 		if (codNum == null) {
 			throw new UVException("El mérito preferente del canditato es requerido");
 		}
-		if (usuario == null) {
-			throw new UVException("El usuario es requerido");
-		}
 		
-		String consulta = "SELECT * FROM TBEP_MER_PRE_USUARIO WHERE CODNUM = ? AND BEPUSU_CODNUM = ?";
+		String consulta = "SELECT * FROM TBEP_MER_PRE_USUARIO WHERE CODNUM = ?";
 		
 		try (Connection conexion = ConexionUvirtual.obtenerInstancia(); PreparedStatement stmt = conexion.prepareStatement(consulta)) {
-			int parameterIndex = 1;
-			stmt.setInt(parameterIndex++, codNum);
-			stmt.setInt(parameterIndex++, usuario.getCodNum());
+			stmt.setInt(1, codNum);
 			
 			try (ResultSet rs = stmt.executeQuery()) {
 				if (!rs.next()) {
@@ -201,7 +195,7 @@ public class ModeloMeritosPreferentesCandidato {
 		return true;
 	}
 	
-	private MeritoPreferenteUsuario createMeritoUsuarioFromResultSet(ResultSet rs) throws SQLException, UVException {
+	public MeritoPreferenteUsuario createMeritoUsuarioFromResultSet(ResultSet rs) throws SQLException, UVException {
 		MeritoPreferenteUsuario obj = new MeritoPreferenteUsuario();
 		obj.setCodNum(rs.getInt("CODNUM"));
 		obj.setMeritoPreferente(ModeloMeritosPreferentes.obtenerInstancia().getMeritoPreferenteById(rs.getInt("BEPMEP_CODNUM")));

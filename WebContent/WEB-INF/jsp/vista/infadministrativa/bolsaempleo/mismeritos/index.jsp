@@ -1,6 +1,7 @@
 <%@ page trimDirectiveWhitespaces="true"%>
 <%@ page import="es.ujaen.uvirtual.beans.UVDatos"%>
 <%@	page import="es.ujaen.uvirtual.modulo.bolsaempleo.controlador.candidato.ControladorMisMeritos"%>
+<%@	page import="es.ujaen.uvirtual.modulo.bolsaempleo.controlador.ControladorDescargaFicheros"%>
 <%@ page import="es.ujaen.uvirtual.modulo.bolsaempleo.vistas.VistaMeritos"%>
 <%@ page import="es.ujaen.uvirtual.utilidades.EscapaHTML" %>
 <%@ page import="es.ujaen.uvirtual.utilidades.Formateador"%>
@@ -82,8 +83,8 @@ VistaMeritos bean = (VistaMeritos) uvdatos.getVistas().get(VistaMeritos.class.ge
 		        {'data': 'observacion', 'filter': true},
 		        {'data': 'codnum', 'buttons': [
 	        		{'label': 'Descargar', 'title': 'Descargar fichero del mérito', 'onClick': function(row) {
-	        			window.open("<%= request.getRequestURI() %>"
-	        		        	+ "?a=<%= ControladorMisMeritos.ACCION_DESCARGAR_FICHERO %>&<%= ControladorMisMeritos.PARAM_ID %>=" + row.codNum);
+	        			window.open("<%= ControladorDescargaFicheros.URL_DESCARGA_FICHEROS %>"
+	        		        	+ "?a=<%= ControladorDescargaFicheros.ACCION_DESCARGAR_MERITO_CANDIDATO %>&<%= ControladorDescargaFicheros.PARAM_MERITO %>=" + row.codNum);
 	        		}},
 	   			]}
 		    ],
@@ -110,13 +111,11 @@ VistaMeritos bean = (VistaMeritos) uvdatos.getVistas().get(VistaMeritos.class.ge
 					          	$(this).dialog("close");
 					        }
 					    });
-		    			
 		    		}
 		    	}},
 		    ]
 		});
 		
 	});
-
 
 </script>
