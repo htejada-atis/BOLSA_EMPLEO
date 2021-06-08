@@ -180,7 +180,7 @@ public class ModeloBaremacionItems {
 				+ "SEL ON SEL.HIJO = bepite.CODNUM "
 				+ "WHERE bepite.CODNUM != ? ";
 		
-		dataTable.setColumn(ORDER_COLUMN_INDEX_ITEMS_EXCLUYENTES_ID, "SEL.HIJO", DataTableColumn.COLUMN_TYPE_NUMBER);
+		dataTable.setColumn(ORDER_COLUMN_INDEX_ITEMS_EXCLUYENTES_ID, "bepite.CODNUM", DataTableColumn.COLUMN_TYPE_NUMBER);
 		dataTable.setColumn(ORDER_COLUMN_INDEX_ITEMS_EXCLUYENTES_CODIGO, "bepite.CODIGO");
 		dataTable.setColumn(ORDER_COLUMN_INDEX_ITEMS_EXCLUYENTES_NOMBRE, "bepite.NOMBRE");	
 		dataTable.setColumn(ORDER_COLUMN_INDEX_ITEMS_EXCLUYENTES_ACTIVO, "bepite.FLGACTIVO", DataTableColumn.COLUMN_TYPE_BOOLEAN);
