@@ -11,6 +11,8 @@ import java.sql.Connection;
 import java.sql.SQLException;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.LocalTime;
+import java.time.ZoneId;
 import java.util.Date;
 import java.util.Map;
 import java.util.logging.Level;
@@ -41,6 +43,8 @@ public final class BolsaEmpleoUtils {
 	private static final int TIPO_MENSAJE_EXITO = 1;
 	private static final double ROUNDER = 100.0;
 	private static final int NUMBER_2 = 2;
+	private static final int HOURS_END = 23;
+	private static final int MINUTES_SECONDS_END = 59;
 	
 	private static final String NOMBREDEESTACLASE = BolsaEmpleoUtils.class.getName();
 	private static final Logger LOGGER = Logger.getLogger(NOMBREDEESTACLASE);
@@ -239,8 +243,8 @@ public final class BolsaEmpleoUtils {
 	}
 
 	/**
-	 * Devuelve la fecha actual del sistema. Según "java.time" classes should be
-	 * used for dates and times (java:S2143)
+	 * Devuelve la fecha actual del sistema. Con 00:00:00 
+	 * Según "java.time" classes should be used for dates and times (java:S2143)
 	 * https://www.baeldung.com/java-date-to-localdate-and-localdatetime
 	 * 
 	 * @return .
@@ -249,7 +253,7 @@ public final class BolsaEmpleoUtils {
 		LocalDate ld = LocalDate.now();
 		return java.sql.Date.valueOf(ld);
 	}
-
+	
 	/**
 	 * Devuelve la fecha actual del sistema. Según "java.time" classes should be
 	 * used for dates and times (java:S2143)
@@ -260,6 +264,19 @@ public final class BolsaEmpleoUtils {
 	public static Date getCurrentDateTime() {
 		LocalDateTime ld = LocalDateTime.now();
 		return java.sql.Timestamp.valueOf(ld);
+	}
+	
+	/**
+	 * Establece la fecha y hora de la fecha a las 23:59:59.
+	 * https://www.baeldung.com/java-date-to-localdate-and-localdatetime
+	 * @param date .
+	 * @return .
+	 */
+	public static Date setDateTimeAtEndOfDay(Date date) {
+		LocalDate currentDate = date.toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
+		LocalTime currentTime = LocalTime.of(HOURS_END, MINUTES_SECONDS_END, MINUTES_SECONDS_END);
+		LocalDateTime fromDateAndTime = LocalDateTime.of(currentDate, currentTime);
+		return java.sql.Timestamp.valueOf(fromDateAndTime);
 	}
 	
 	/**
