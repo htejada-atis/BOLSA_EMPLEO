@@ -150,21 +150,21 @@ VistaUsuarioBolsaEmpleo bean = (VistaUsuarioBolsaEmpleo) uvdatos.getVistas().get
 		<div class="form-group">
 			<label for="select_role"><strong>Elija el rol para asociar</strong></label>
 			<select class="params" id="select_role" name="<%= ControladorUsuarioBolsaEmpleo.PARAM_ROLE %>" style="width:100%;" required>
-				<option value="-1"> - </option>
-    				<%for(Rol role: bean.getRoles()){
-    					if(bean.getUsuario()!=null){
-            				if(bean.getRol().getCodNum().equals(role.getCodNum())){%>
-        						<option value="<%=role.getCodNum()%>" selected="selected"><%=role.getDescripcion()%></option>
-        					<%}
-    						else{%>
-								<option value="<%=role.getCodNum()%>"><%=role.getDescripcion()%></option>
-							<%}
-    					}
-						else{%>
+			<% 	if(bean.getUsuario() == null) { %>
+					<option value="-1"> - </option>
+			<%	} %>
+   			<%	for(Rol role: bean.getRoles()) {
+   					if(bean.getUsuario()!=null) {
+           				if(bean.getRol().getCodNum().equals(role.getCodNum())){%>
+       						<option value="<%=role.getCodNum()%>" selected="selected"><%=role.getDescripcion()%></option>
+       				<%	} else {%>
 							<option value="<%=role.getCodNum()%>"><%=role.getDescripcion()%></option>
-						<%}
-							
-					}%>
+					<%	}
+   					} else {%>
+						<option value="<%=role.getCodNum()%>"><%=role.getDescripcion()%></option>
+				<%	}
+						
+				}%>
 			</select>
 		</div>
 		
