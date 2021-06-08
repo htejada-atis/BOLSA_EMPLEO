@@ -61,8 +61,7 @@ public class TestBEPControladorUsuariosBolsaEmpleo {
 	private VistaUsuarioBolsaEmpleo obtenerUsuarios() throws ServletException, IOException {
 		PeticionHttp peticion = UtilsTestBolsaEmpleo.peticionAutenticadaPersonal();
 
-		peticion.setParameter(ControladorUsuarioBolsaEmpleo.PARAM_ACCION,
-				ControladorUsuarioBolsaEmpleo.ACCION_DATATABLE_USUARIOS);
+		peticion.setParameter(ControladorUsuarioBolsaEmpleo.PARAM_ACCION, ControladorUsuarioBolsaEmpleo.ACCION_DATATABLE_USUARIOS);
 
 		RespuestaHttp respuesta = new RespuestaHttp();
 		ControladorUsuarioBolsaEmpleo controlador = new ControladorUsuarioBolsaEmpleo();
@@ -70,22 +69,10 @@ public class TestBEPControladorUsuariosBolsaEmpleo {
 		return (VistaUsuarioBolsaEmpleo) peticion.getUVDatos().getVistas().get(VistaUsuarioBolsaEmpleo.class.getName());
 	}
     
-	// método para obtener la vista con una lista de bloques .
 	private VistaUsuarioBolsaEmpleo obtenerUsuariosBorrados() throws ServletException, IOException {
 		PeticionHttp peticion = UtilsTestBolsaEmpleo.peticionAutenticadaPersonal();
-		peticion.setParameter(ControladorUsuarioBolsaEmpleo.PARAM_ACCION, ControladorUsuarioBolsaEmpleo.ACCION_DATATABLE_USUARIOS_BORRADOS);
-
-		RespuestaHttp respuesta = new RespuestaHttp();
-		ControladorUsuarioBolsaEmpleo controlador = new ControladorUsuarioBolsaEmpleo();
-		controlador.doGet(peticion, respuesta);
-		return (VistaUsuarioBolsaEmpleo) peticion.getUVDatos().getVistas().get(VistaUsuarioBolsaEmpleo.class.getName());
-	}
-    
-	// método para obtener la vista con una lista de ítems .
-	private VistaUsuarioBolsaEmpleo obtenerUsuariosExcluidos() throws ServletException, IOException {
-		PeticionHttp peticion = UtilsTestBolsaEmpleo.peticionAutenticadaPersonal();
-		peticion.setParameter(ControladorUsuarioBolsaEmpleo.PARAM_ACCION,
-				ControladorUsuarioBolsaEmpleo.ACCION_DATATABLE_USUARIOS_EXCLUIDOS);
+		peticion.setParameter(ControladorUsuarioBolsaEmpleo.PARAM_ACCION, ControladorUsuarioBolsaEmpleo.ACCION_DATATABLE_USUARIOS);
+		peticion.setParameter("filter", "{\"5\":\"true\"}");
 
 		RespuestaHttp respuesta = new RespuestaHttp();
 		ControladorUsuarioBolsaEmpleo controlador = new ControladorUsuarioBolsaEmpleo();
@@ -138,20 +125,6 @@ public class TestBEPControladorUsuariosBolsaEmpleo {
 		assertEquals(MENSAJE_SIN_ERROR, 0, bean.getMensajesDeError().size());
 		assertEquals(MENSAJE_SIN_ADVERTENCIAS, 0, bean.getMensajesDeAdvertencia().size());
 	}
-	
-	/** obtener datatable usuarios excluidos .
-	 * @throws SQLException .
-	 * @throws ServletException .
-	 * @throws IOException .
-	 */
-	@Test
-	public void testA04ObtenerUsuariosExcluidos() throws ServletException, IOException {
-		VistaUsuarioBolsaEmpleo bean = obtenerUsuariosExcluidos();
-		
-		assertEquals(MENSAJE_SIN_ERROR, 0, bean.getMensajesDeError().size());
-		assertEquals(MENSAJE_SIN_ADVERTENCIAS, 0, bean.getMensajesDeAdvertencia().size());
-	}
-	
 	
 	/** seleccionar apartado .
 	 * @throws SQLException .

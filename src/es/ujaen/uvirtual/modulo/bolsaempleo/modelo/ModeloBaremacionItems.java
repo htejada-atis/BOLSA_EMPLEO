@@ -55,7 +55,7 @@ public class ModeloBaremacionItems {
 	
 	public static final Integer COLUMN_CODIGO_MAXLENGTH = 3; 
 	public static final Integer COLUMN_NOMBRE_MAXLENGTH = 1000;
-	public static final Integer COLUMN_DESCRIPCION_MAXLENGTH = 250;
+	public static final Integer COLUMN_DESCRIPCION_MAXLENGTH = 1000;
 
 	public static final Float MINIMO_VALOR_FLOAT = (float) 0.01;
 	public static final Float MAXIMO_VALOR_PORCENTAGE = (float) 100.0;
@@ -393,10 +393,12 @@ public class ModeloBaremacionItems {
 	public List<ItemBaremacion> getItemsDeApartado(ApartadoBaremacion apartado) throws SQLException, UVException {
 		List<ItemBaremacion> items = new ArrayList<>();
 		
-		String consulta = "SELECT bepite.* "
+		String consulta = ""
+				+ "SELECT bepite.* "
 				+ "FROM TBEP_ITEMSBAREMACION bepite "
 				+ "INNER JOIN TBEP_BLOQUESBAREMACION bepblo ON bepblo.CODNUM = bepite.BEPBLO_CODNUM "
-				+ "WHERE bepblo.BEPAPA_CODNUM = ? ";
+				+ "WHERE bepblo.BEPAPA_CODNUM = ? "
+				+ "ORDER BY lpad(bepblo.CODIGO, 2), lpad(bepite.CODIGO, 2)";
 		
 		try (Connection conexion = ConexionUvirtual.obtenerInstancia(); PreparedStatement stmt = conexion.prepareStatement(consulta)
 		) {

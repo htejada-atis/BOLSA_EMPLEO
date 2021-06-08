@@ -4,6 +4,7 @@
  * 
  * 20210602 overflow-auto y render
  * 20210604 select all y columnas preseleccionadas
+ * 20210607 opción por defecto en select boolean
  */
  
 function DataTable(id, config) {
@@ -423,6 +424,11 @@ function DataTable(id, config) {
                                 filterElement.append($('<option value="false" title="' + columnDef.filter.true + '"' + (columnDef.filter.optionDefault == "false" ? ' selected' : '') + '>' + columnDef.filter.false + '</option>'));
                             } else {
                                 filterElement.append($('<option>' + false + '</option>'));
+                            }
+                            
+                            if (columnDef.filter.optionDefault) {
+                                self.filterParams[index] = $(filterElement).val();
+                                self.params.filter = JSON.stringify(self.filterParams);
                             }
                             
                             break;

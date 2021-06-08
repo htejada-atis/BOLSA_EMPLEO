@@ -157,6 +157,10 @@ public class ControladorNoticias extends HttpServlet {
 		try {
 			LOGGER.log(Level.FINER, "Chequeando usuario logeado");
 			bean.setUsuarioLogeado(ModeloUsuarioBolsaEmpleo.obtenerInstancia().getOrCreateUsuario(datos));
+			
+			if (!bean.getUsuarioLogeado().getRol().getCodNum().equals(ModeloRol.ID_ROL_SERVICIO_PERSONAL)) {
+				throw new UVException("No tienes permiso de personal");
+			}
 		} catch (UVException e) {
 			LOGGER.log(Level.FINER, "Error chequeando usuario logeado");
 			LOGGER.log(Level.SEVERE, Formateador.getStackTrace(e));
@@ -164,10 +168,6 @@ public class ControladorNoticias extends HttpServlet {
 			
 			BolsaEmpleoUtils.addMensajeDeError(e.getMessage(), bean, request);
 			response.sendRedirect("/srv/es/informacionadministrativa/bolsaempleo/error");
-		}
-		
-		if (!bean.getUsuarioLogeado().getRol().getCodNum().equals(ModeloRol.ID_ROL_SERVICIO_PERSONAL)) {
-			throw new UVException("No tienes permiso de personal");
 		}
 	}
 	

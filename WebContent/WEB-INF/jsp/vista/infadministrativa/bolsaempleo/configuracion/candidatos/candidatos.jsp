@@ -22,11 +22,9 @@ VistaUsuarioBolsaEmpleo bean = (VistaUsuarioBolsaEmpleo) uvdatos.getVistas().get
 	<table class="bluetable bolsaempleo" id="table_usuarios">
 		<tr>
 			<th scope="col" style="width:5%"></th>
-			<th scope="col" style="width:6%" title="Tipo de documento">Tipo</th>
-			<th scope="col" style="width:13%" title="N Documento">Documento</th>
+			<th scope="col" style="width:13%" title="Documento">Documento</th>
 			<th scope="col" style="width:14%" title="Nombre de usuario" class="user">Usuario</th>
 			<th scope="col" style="width:30%" title="Nombre y apellidos">Nombre y Apellidos</th>
-			<th scope="col" style="width:20%" title="Rol del usuario">Rol</th>
 			<th scope="col" style="width:10%" class="center" title="Lista del usuario">Lista</th>
 			<th scope="col" style="width:10%" class="center" title="Excluido">Excluido</th>
 			<th scope="col" style="width:10%" class="center" title="Eliminado">Eliminado</th>
@@ -36,7 +34,7 @@ VistaUsuarioBolsaEmpleo bean = (VistaUsuarioBolsaEmpleo) uvdatos.getVistas().get
 		</tbody>
 		<tfoot>
 			<tr>
-				<th colSpan="10" style="width:100%"></th>
+				<th colSpan="9" style="width:100%"></th>
 			</tr>
 		</tfoot>
 	</table>
@@ -58,13 +56,11 @@ $(document).ready(function() {
 	    "action": "<%=ControladorUsuarioCandidato.ACCION_DATATABLE_USUARIOS_CANDIDATOS%>",
 	    "columns": [
 	    	{'data': 'codNum', 'selectable': true},
-	        {'data': 'tipodocumento', 'filter': true, 'overflow': 'auto'},
-	        {'data': 'numdocumento', 'filter': true, 'overflow': 'auto'},
+	        {'data': 'prsnif', 'filter': true, 'overflow': 'auto'},
 	        {'data': 'codcuenta', 'filter': true, 'overflow': 'auto'},
-	        {'data': 'apellido1', 'filter': true, 'overflow': 'auto', 'render': function(row) {
+	        {'data': 'apellido1', 'filter': false, 'order': false, 'overflow': 'auto', 'render': function(row) {
         		return row.nombre + " " + row.apellido1 + " " + row.apellido2; 
         	}},
-	        {'data': 'rol.descripcion', 'order': {'active': false}},
 	        {'data': 'listaDist', 'filter': {'type': 'selectBoolean', 'true': 'En Lista', 'false': 'Sin Lista'}, 'render': function(row) {
 	        	if(row.listaDist==true){
         			return "<div title='En lista distribución' class='circle-true'></div>"; 

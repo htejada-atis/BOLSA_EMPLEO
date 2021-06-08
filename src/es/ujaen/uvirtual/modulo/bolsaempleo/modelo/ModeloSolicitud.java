@@ -134,6 +134,7 @@ public class ModeloSolicitud {
 	 * Listado de bolsas seleccionadas de una solicitud.
 	 * @param params .
 	 * @param solicitud .
+	 * @param codNumUsuario .
 	 * @return .
 	 * @throws SQLException .
 	 * @throws UVException .
@@ -396,11 +397,11 @@ public class ModeloSolicitud {
 				}
 				
 				conexion.commit();
-				conexion.setAutoCommit(true);
 			} catch (Exception e) {
 				conexion.rollback();
-				conexion.setAutoCommit(true);
 				throw e;
+			} finally {
+				conexion.setAutoCommit(true);
 			}
 		} 	
 	}
@@ -424,13 +425,12 @@ public class ModeloSolicitud {
 				
 				try {
 					this.eliminarBolsasExcluidasDeLaSolicitud(conexion, solicitud, bolsas, usuarioUpdate);
-					
 					conexion.commit();
-					conexion.setAutoCommit(true);
 				} catch (Exception e) {
 					conexion.rollback();
-					conexion.setAutoCommit(true);
 					throw e;
+				} finally {
+					conexion.setAutoCommit(true);
 				}
 			}
 		}
@@ -559,7 +559,7 @@ public class ModeloSolicitud {
 		BolsaEmpleoDataTable<MeritoSolicitudTable> dataTable = new BolsaEmpleoDataTable<>(params);
 		
 		String consulta = ""
-				+ " SELECT bepmer.CODNUM, bepmer.VALOR, bepite.CODIGO, bepite.NOMBRE, MERITOS_BOLSAS.CODNUM SBM_CODNUM, MERITOS_BOLSAS.FLGEXCLUIDO "
+				+ " SELECT bepmer.CODNUM, bepmer.VALOR, bepite.CODIGO, bepite.NOMBRE, MERITOS_BOLSAS.CODNUM SBM_CODNUM "
 				+ " FROM TBEP_MERITOS bepmer "
 				+ " INNER JOIN TBEP_ITEMSBAREMACION bepite ON bepite.CODNUM = bepmer.BEPITE_CODNUM "
 				+ " LEFT JOIN ( "
@@ -576,7 +576,6 @@ public class ModeloSolicitud {
 		dataTable.setColumn(ORDER_COLUMN_INDEX_MERITOS_ITEM_NOMBRE, "bepite.NOMBRE");
 		dataTable.setColumn(ORDER_COLUMN_INDEX_MERITOS_VALOR, "bepmer.VALOR");
 		dataTable.setColumn(ORDER_COLUMN_INDEX_MERITOS_AFINIDAD, "bepmer.CODNUM");
-		dataTable.setColumn(ORDER_COLUMN_INDEX_MERITOS_EXCLUIDO, "bepsbm.FLGEXCLUIDO");
 		dataTable.setQuery(consulta);
 		
 		try (Connection conexion = ConexionUvirtual.obtenerInstancia();
@@ -598,7 +597,7 @@ public class ModeloSolicitud {
 					List<MeritoSolicitudValoracion> valoraciones = idMeritoSolicitud != null 
 							? this.getValoracionesMeritoSolicitud(idMeritoSolicitud, false) : new ArrayList<>();
 					
-					MeritoSolicitudTable row = new MeritoSolicitudTable(merito, ms, valoraciones);
+					MeritoSolicitudTable row = new MeritoSolicitudTable(merito, ms, valoraciones, this.isMeritoExcluido(merito, ms, bolsa));
 					meritos.add(row);
 				}
 			}
@@ -610,6 +609,17 @@ public class ModeloSolicitud {
 		return dataTable;
 	}
 	
+	/**
+	 * Comprueba si un mérito está excluido en una bolsa.
+	 * @param merito .
+	 * @param ms .
+	 * @param bolsa .
+	 * @return .
+	 */
+	private Boolean isMeritoExcluido(Merito merito, MeritoSolicitud ms, Bolsa bolsa) {
+		return false;
+	}
+
 	/** El usuario selecciona un mérito para una bolsa en la solicitud .
 	 * @param solicitud .
 	 * @param bolsa .
@@ -684,11 +694,11 @@ public class ModeloSolicitud {
 				}
 				
 				conexion.commit();
-				conexion.setAutoCommit(true);
 			} catch (Exception e) {
 				conexion.rollback();
-				conexion.setAutoCommit(true);
 				throw e;
+			} finally {
+				conexion.setAutoCommit(true);				
 			}
 		}
 	}
@@ -771,11 +781,11 @@ public class ModeloSolicitud {
 				}		
 				
 				conexion.commit();
-				conexion.setAutoCommit(true);
 			} catch (Exception e) {				
 				conexion.rollback();
-				conexion.setAutoCommit(true);
 				throw e;
+			} finally {
+				conexion.setAutoCommit(true);
 			}
 		}
 	}
@@ -816,11 +826,11 @@ public class ModeloSolicitud {
 				}
 				
 				conexion.commit();
-				conexion.setAutoCommit(true);
 			} catch (Exception e) {
 				conexion.rollback();
-				conexion.setAutoCommit(true);
 				throw e;
+			} finally {
+				conexion.setAutoCommit(true);
 			}
 		}
 	}
@@ -859,12 +869,12 @@ public class ModeloSolicitud {
 				}
 				
 				conexion.commit();
-				conexion.setAutoCommit(true);
 			} catch (Exception e) {
 				conexion.rollback();
-				conexion.setAutoCommit(true);
 				throw e;
-			}	
+			} finally {
+				conexion.setAutoCommit(true);
+			}
 		}
 	}
 	
@@ -1215,7 +1225,7 @@ public class ModeloSolicitud {
 					List<MeritoSolicitudValoracion> valoraciones = idMeritoSolicitud != null 
 							? this.getValoracionesMeritoSolicitud(idMeritoSolicitud, false) : new ArrayList<>();
 					
-					MeritoSolicitudTable row = new MeritoSolicitudTable(merito, ms, valoraciones);
+					MeritoSolicitudTable row = new MeritoSolicitudTable(merito, ms, valoraciones, this.isMeritoExcluido(merito, ms, bolsa));
 					meritos.add(row);
 				}
 			}
@@ -1454,56 +1464,44 @@ public class ModeloSolicitud {
 	 */
 	public boolean comprobarMeritosAfinidadSinValoracion(Solicitud solicitud) throws SQLException {
 		try (Connection conexion = ConexionUvirtual.obtenerInstancia()) {
-			conexion.setAutoCommit(false);
+			// comprobar individualizados
+			String consultaIndividualizados = "SELECT * FROM TBEP_SOL_BOL_MERITOS bepsbm"
+					+ "	INNER JOIN TBEP_SOLICITUD_BOLSAS bepsbo ON bepsbm.BEPSBO_CODNUM = bepsbo.CODNUM"
+					+ "	LEFT JOIN TBEP_SOL_BOL_MER_VALORACION bepsbv ON bepsbv.BEPSBM_CODNUM  = bepsbm.CODNUM"
+					+ "	INNER JOIN TBEP_MERITOS bepmer ON bepmer.CODNUM  = bepsbm.BEPMER_CODNUM"
+					+ "	INNER JOIN TBEP_ITEMSBAREMACION bepite ON bepite.CODNUM = bepmer.BEPITE_CODNUM"
+					+ "	WHERE bepsbo.BEPSOL_CODNUM = ? AND bepite.AFINIDAD IS NOT NULL AND bepsbv.CODNUM IS NULL AND bepite.INDIVIDUALIZADO = 'S'";
 			
-			try {
+			try (PreparedStatement stmt = conexion.prepareStatement(consultaIndividualizados)) {
+				int parameterIndex = 1;
+				stmt.setInt(parameterIndex++, solicitud.getCodNum());
+				stmt.executeUpdate();
 				
-				// comprobar individualizados
-				String consultaIndividualizados = "SELECT * FROM TBEP_SOL_BOL_MERITOS bepsbm"
-						+ "	INNER JOIN TBEP_SOLICITUD_BOLSAS bepsbo ON bepsbm.BEPSBO_CODNUM = bepsbo.CODNUM"
-						+ "	LEFT JOIN TBEP_SOL_BOL_MER_VALORACION bepsbv ON bepsbv.BEPSBM_CODNUM  = bepsbm.CODNUM"
-						+ "	INNER JOIN TBEP_MERITOS bepmer ON bepmer.CODNUM  = bepsbm.BEPMER_CODNUM"
-						+ "	INNER JOIN TBEP_ITEMSBAREMACION bepite ON bepite.CODNUM = bepmer.BEPITE_CODNUM"
-						+ "	WHERE bepsbo.BEPSOL_CODNUM = ? AND bepite.AFINIDAD IS NOT NULL AND bepsbv.CODNUM IS NULL AND bepite.INDIVIDUALIZADO = 'S'";
-				
-				try (PreparedStatement stmt = conexion.prepareStatement(consultaIndividualizados)) {
-					int parameterIndex = 1;
-					stmt.setInt(parameterIndex++, solicitud.getCodNum());
-					stmt.executeUpdate();
-					
-					try (ResultSet rs = stmt.executeQuery()) {
-						if (rs.next()) {
-							return true;
-						}
+				try (ResultSet rs = stmt.executeQuery()) {
+					if (rs.next()) {
+						return true;
 					}
 				}
+			}
+			
+			// comprobar no individualizados
+			String consultaNoIndividualizados = "SELECT * FROM TBEP_SOL_BOL_MERITOS bepsbm"
+					+ "	INNER JOIN TBEP_SOLICITUD_BOLSAS bepsbo ON bepsbm.BEPSBO_CODNUM = bepsbo.CODNUM"
+					+ "	LEFT JOIN TBEP_SOL_BOL_MER_VALORACION bepsbv ON bepsbv.BEPSBM_CODNUM  = bepsbm.CODNUM"
+					+ "	INNER JOIN TBEP_MERITOS bepmer ON bepmer.CODNUM  = bepsbm.BEPMER_CODNUM"
+					+ "	INNER JOIN TBEP_ITEMSBAREMACION bepite ON bepite.CODNUM = bepmer.BEPITE_CODNUM"
+					+ "	WHERE bepsbo.BEPSOL_CODNUM = ? AND bepite.AFINIDAD IS NOT NULL AND bepsbv.VALOR IS NULL AND bepite.INDIVIDUALIZADO = 'N'";
+			
+			try (PreparedStatement stmt = conexion.prepareStatement(consultaNoIndividualizados)) {
+				int parameterIndex = 1;
+				stmt.setInt(parameterIndex++, solicitud.getCodNum());
+				stmt.executeUpdate();
 				
-				// comprobar no individualizados
-				String consultaNoIndividualizados = "SELECT * FROM TBEP_SOL_BOL_MERITOS bepsbm"
-						+ "	INNER JOIN TBEP_SOLICITUD_BOLSAS bepsbo ON bepsbm.BEPSBO_CODNUM = bepsbo.CODNUM"
-						+ "	LEFT JOIN TBEP_SOL_BOL_MER_VALORACION bepsbv ON bepsbv.BEPSBM_CODNUM  = bepsbm.CODNUM"
-						+ "	INNER JOIN TBEP_MERITOS bepmer ON bepmer.CODNUM  = bepsbm.BEPMER_CODNUM"
-						+ "	INNER JOIN TBEP_ITEMSBAREMACION bepite ON bepite.CODNUM = bepmer.BEPITE_CODNUM"
-						+ "	WHERE bepsbo.BEPSOL_CODNUM = ? AND bepite.AFINIDAD IS NOT NULL AND bepsbv.VALOR IS NULL AND bepite.INDIVIDUALIZADO = 'N'";
-				
-				try (PreparedStatement stmt = conexion.prepareStatement(consultaNoIndividualizados)) {
-					int parameterIndex = 1;
-					stmt.setInt(parameterIndex++, solicitud.getCodNum());
-					stmt.executeUpdate();
-					
-					try (ResultSet rs = stmt.executeQuery()) {
-						if (rs.next()) {
-							return true;
-						}
+				try (ResultSet rs = stmt.executeQuery()) {
+					if (rs.next()) {
+						return true;
 					}
 				}
-				
-				conexion.commit();
-				conexion.setAutoCommit(true);
-			} catch (SQLException e) {
-				conexion.rollback();
-				conexion.setAutoCommit(true);
-				throw e;
 			}
 		}
 		

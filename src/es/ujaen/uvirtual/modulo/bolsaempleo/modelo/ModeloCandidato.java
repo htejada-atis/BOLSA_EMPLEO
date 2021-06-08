@@ -11,7 +11,6 @@ import es.ujaen.uvirtual.modelo.conexion.ConexionUvirtual;
 import es.ujaen.uvirtual.modulo.bolsaempleo.beans.CandidatoAcreditacionesTable;
 import es.ujaen.uvirtual.modulo.bolsaempleo.beans.CandidatoTitulacionTable;
 import es.ujaen.uvirtual.modulo.bolsaempleo.beans.UsuarioBolsaEmpleo;
-import es.ujaen.uvirtual.modulo.bolsaempleo.beans.UsuarioBolsaEmpleoVuja;
 import es.ujaen.uvirtual.modulo.bolsaempleo.utilidades.BolsaEmpleoDataTable;
 import es.ujaen.uvirtual.utilidades.UVException;
 
@@ -64,7 +63,7 @@ public class ModeloCandidato {
 		List<CandidatoTitulacionTable> usuarios = new ArrayList<>();
 		BolsaEmpleoDataTable<CandidatoTitulacionTable> dataTable = new BolsaEmpleoDataTable<>(params);
 
-		String consulta = "SELECT bepusu.CODNUM, bepusu.PRSNIF, "
+		String consulta = "SELECT bepusu.CODNUM, "
 				+ "	(SELECT COUNT(*) FROM TBEP_TITULACIONES_USUARIO beptus"
 				+ "		WHERE beptus.BEPTUS_USU_CODNUM = bepusu.CODNUM" + "	) AS COUNT_TITULACIONES,"
 				+ "	(SELECT COUNT(*) FROM TBEP_TITULACIONES_USUARIO beptus"
@@ -85,15 +84,7 @@ public class ModeloCandidato {
 				ModeloUsuarioBolsaEmpleo modeloUsuario = ModeloUsuarioBolsaEmpleo.obtenerInstancia(); 
 				
 				while (rs.next()) {
-					String documento = rs.getString("PRSNIF");
-					UsuarioBolsaEmpleoVuja usuArcos = modeloUsuario.getResultSetPersonaArcosByPrsnif(documento);
-										
-					UsuarioBolsaEmpleo usuario = new UsuarioBolsaEmpleo();
-					usuario.setCodNum(rs.getInt("CODNUM"));
-					usuario.setNombre(usuArcos.getStrNombre());
-					usuario.setPrimerApellido(usuArcos.getStrApellido1());
-					usuario.setSegundoApellido(usuArcos.getStrApellido2());
-
+					UsuarioBolsaEmpleo usuario = modeloUsuario.getUsuarioById(rs.getInt("CODNUM"));					
 					Integer titulaciones = rs.getInt("COUNT_TITULACIONES");
 					Integer validadas = rs.getInt("COUNT_VALIDADAS");
 
@@ -119,16 +110,16 @@ public class ModeloCandidato {
 		List<CandidatoAcreditacionesTable> usuarios = new ArrayList<>();
 		BolsaEmpleoDataTable<CandidatoAcreditacionesTable> dataTable = new BolsaEmpleoDataTable<>(params);
 
-		String consulta = "SELECT bepusu.CODNUM, bepusu.PRSNIF,"
-				+ "	(SELECT COUNT(*) FROM TBEP_MER_PRE_USUARIO bepmpu"
-				+ "		INNER JOIN TBEP_MERITOS_PREFERENTES bepmep ON bepmep.CODNUM = bepmpu.BEPMEP_CODNUM"
-				+ "		WHERE bepmpu.BEPUSU_CODNUM = bepusu.CODNUM AND bepmep.TIPO = ?"
-				+ "	) AS COUNT_ACREDITACIONES,"
-				+ "	(SELECT COUNT(*) FROM TBEP_MER_PRE_USUARIO bepmpu"
-				+ "		INNER JOIN TBEP_MERITOS_PREFERENTES bepmep ON bepmep.CODNUM = bepmpu.BEPMEP_CODNUM"
-				+ "		WHERE bepmpu.BEPUSU_CODNUM = bepusu.CODNUM AND bepmpu.FLGVALIDADO = 'S' AND bepmep.TIPO = ?"
-				+ "	) AS COUNT_VALIDADAS FROM TBEP_USUARIOS bepusu WHERE bepusu.rol = "
-				+ ModeloRol.ID_ROL_CANDIDATO + " ";
+		String consulta = ""
+				+ " SELECT bepusu.*, "
+				+ "		(SELECT COUNT(*) FROM TBEP_MER_PRE_USUARIO bepmpu"
+				+ "		 INNER JOIN TBEP_MERITOS_PREFERENTES bepmep ON bepmep.CODNUM = bepmpu.BEPMEP_CODNUM"
+				+ "	 	 WHERE bepmpu.BEPUSU_CODNUM = bepusu.CODNUM AND bepmep.TIPO = ?) AS COUNT_ACREDITACIONES,"
+				+ "	    (SELECT COUNT(*) FROM TBEP_MER_PRE_USUARIO bepmpu"
+				+ "		 INNER JOIN TBEP_MERITOS_PREFERENTES bepmep ON bepmep.CODNUM = bepmpu.BEPMEP_CODNUM"
+				+ "		 WHERE bepmpu.BEPUSU_CODNUM = bepusu.CODNUM AND bepmpu.FLGVALIDADO = 'S' AND bepmep.TIPO = ?) AS COUNT_VALIDADAS "
+				+ " FROM TBEP_USUARIOS bepusu "
+				+ " WHERE bepusu.rol = " + ModeloRol.ID_ROL_CANDIDATO + " ";
 		
 		dataTable.setColumn(ORDER_COLUMN_INDEX_NOMBRE_CANDIDATO, "bepusu.CODCUENTA");
 
@@ -149,15 +140,7 @@ public class ModeloCandidato {
 				ModeloUsuarioBolsaEmpleo modeloUsuario = ModeloUsuarioBolsaEmpleo.obtenerInstancia();
 				
 				while (rs.next()) {
-					String documento = rs.getString("PRSNIF");
-					UsuarioBolsaEmpleoVuja usuArcos = modeloUsuario.getResultSetPersonaArcosByPrsnif(documento);
-					
-					UsuarioBolsaEmpleo usuario = new UsuarioBolsaEmpleo();
-					usuario.setCodNum(rs.getInt("CODNUM"));
-					usuario.setNombre(usuArcos.getStrNombre());
-					usuario.setPrimerApellido(usuArcos.getStrApellido1());
-					usuario.setSegundoApellido(usuArcos.getStrApellido2());
-
+					UsuarioBolsaEmpleo usuario = modeloUsuario.getUsuarioFromResultSet(rs);					
 					Integer acreditaciones = rs.getInt("COUNT_ACREDITACIONES");
 					Integer validadas = rs.getInt("COUNT_VALIDADAS");
 

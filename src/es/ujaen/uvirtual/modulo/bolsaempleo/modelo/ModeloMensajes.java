@@ -28,6 +28,7 @@ public class ModeloMensajes {
 	public static final int MENSAJES_COLUMN_INDEX_ESTADO = 3;
 	
 	public static final int DESTINATARIOS_COLUMN_INDEX_DOCUMENTO = 1;
+	public static final int DESTINATARIOS_COLUMN_INDEX_CORREO = 3;
 	public static final int DESTINATARIOS_COLUMN_INDEX_ROL = 4;
 	public static final int DESTINATARIOS_COLUMN_INDEX_DISTRIBUCION = 5;
 	
@@ -123,11 +124,15 @@ public class ModeloMensajes {
 		List<UsuarioBolsaEmpleo> destinatarios = new ArrayList<>();
 		BolsaEmpleoDataTable<UsuarioBolsaEmpleo> dataTable = new BolsaEmpleoDataTable<>(params);
 
-		String consulta = "SELECT bepusu.* FROM TBEP_MEN_DESTINATARIOS bepmde "
-				+ "INNER JOIN TBEP_USUARIOS bepusu ON bepusu.CODNUM = bepmde.BEPUSU_CODNUM "
-				+ "WHERE bepmde.BEPMEN_CODNUM = ?";
+		String consulta = ""
+				+ " SELECT bepusu.* "
+				+ " FROM TBEP_MEN_DESTINATARIOS bepmde "
+				+ " INNER JOIN TBEP_USUARIOS bepusu ON bepusu.CODNUM = bepmde.BEPUSU_CODNUM "
+				+ " WHERE bepmde.BEPMEN_CODNUM = ? ";
 
-		dataTable.setColumn(DESTINATARIOS_COLUMN_INDEX_DOCUMENTO, "bepusu.PRSNIF");
+		dataTable.setColumn(DESTINATARIOS_COLUMN_INDEX_DOCUMENTO, "bepusu.VUAJA_PRSNIF");
+		dataTable.setColumn(DESTINATARIOS_COLUMN_INDEX_CORREO, "bepusu.VUAJA_EMAIL_ALTA");
+		dataTable.setColumn(DESTINATARIOS_COLUMN_INDEX_ROL, "bepusu.ROL");
 		dataTable.setQuery(consulta);
 
 		try (Connection conexion = ConexionUvirtual.obtenerInstancia();
@@ -170,11 +175,15 @@ public class ModeloMensajes {
 		List<UsuarioBolsaEmpleo> destinatarios = new ArrayList<>();
 		BolsaEmpleoDataTable<UsuarioBolsaEmpleo> dataTable = new BolsaEmpleoDataTable<>(params);
 
-		String consulta = "SELECT bepusu.* FROM TBEP_USUARIOS bepusu WHERE bepusu.FLGBORRADO = 'N'";
+		String consulta = ""
+				+ "SELECT bepusu.* "
+				+ "FROM TBEP_USUARIOS bepusu "
+				+ "WHERE bepusu.FLGBORRADO = 'N'";
 
-		dataTable.setColumn(DESTINATARIOS_COLUMN_INDEX_DOCUMENTO, "bepusu.PRSNIF");
+		dataTable.setColumn(DESTINATARIOS_COLUMN_INDEX_DOCUMENTO, "bepusu.VUAJA_PRSNIF");
+		dataTable.setColumn(DESTINATARIOS_COLUMN_INDEX_CORREO, "bepusu.VUAJA_EMAIL_ALTA");
 		dataTable.setColumn(DESTINATARIOS_COLUMN_INDEX_ROL, "bepusu.ROL");
-		dataTable.setColumn(DESTINATARIOS_COLUMN_INDEX_DISTRIBUCION, "bepusu.FLGLISTADISTRIBUCION", DataTableColumn.COLUMN_TYPE_BOOLEAN);		
+		dataTable.setColumn(DESTINATARIOS_COLUMN_INDEX_DISTRIBUCION, "bepusu.FLGLISTADISTRIBUCION", DataTableColumn.COLUMN_TYPE_BOOLEAN);
 		dataTable.setQuery(consulta);
 
 		try (Connection conexion = ConexionUvirtual.obtenerInstancia();
@@ -182,8 +191,6 @@ public class ModeloMensajes {
 				PreparedStatement stmt = conexion.prepareStatement(dataTable.getQuery())) {
 
 			int indexParams = 1;
-//			stmt.setInt(indexParams, mensaje.getCodNum());
-//			stmtCount.setInt(indexParams++, mensaje.getCodNum());			
 			dataTable.setFiltersParams(stmt, stmtCount, indexParams);
 
 			try (ResultSet rs = stmt.executeQuery()) {
@@ -312,11 +319,11 @@ public class ModeloMensajes {
 				}
 				
 				conexion.commit();
-				conexion.setAutoCommit(true);
 			} catch (Exception e) {
 				conexion.rollback();
-				conexion.setAutoCommit(true);
 				throw e;
+			} finally {
+				conexion.setAutoCommit(true);
 			}
 		}
 	}

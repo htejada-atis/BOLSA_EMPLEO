@@ -99,6 +99,8 @@ public class ControladorMisMeritos extends HttpServlet {
 	
 	// ruta vistas
 	public static final String RUTA_BEP_MERITOS = "/WEB-INF/jsp/vista/infadministrativa/bolsaempleo/mismeritos/";
+	public static final String JSP_INDEX = RUTA_BEP_MERITOS + "index.jsp";
+	public static final String JSP_FORM = RUTA_BEP_MERITOS + "formMerito.jsp";
 	
 	// urls
 	public static final String URL_PATTERN_AJAX = "/srv/es/ajax/informacionadministrativa/bolsaempleo/mismeritos";
@@ -151,22 +153,22 @@ public class ControladorMisMeritos extends HttpServlet {
 	}
 	
 	private void init(VistaMeritos bean, UVDatos datos, HttpServletRequest request, HttpServletResponse response) throws SQLException, UVException, IOException {
-		bean.setVista(RUTA_BEP_MERITOS + "index.jsp");
+		bean.setVista(JSP_INDEX);
 		BolsaEmpleoUtils.readMensajeSession(bean, request);
 		
 		try {
 			bean.setUsuarioLogeado(ModeloUsuarioBolsaEmpleo.obtenerInstancia().getOrCreateUsuario(datos));
+
+			if (!bean.getUsuarioLogeado().getRol().getCodNum().equals(ModeloRol.ID_ROL_CANDIDATO)) {
+				throw new UVException("No eres un candidato");
+			}
 		} catch (UVException e) {
 			LOGGER.log(Level.SEVERE, Formateador.getStackTrace(e));
 			LOGGER.log(Level.SEVERE, e.toString());
 			
 			BolsaEmpleoUtils.addMensajeDeError(e.getMessage(), bean, request);
 			response.sendRedirect("/srv/es/informacionadministrativa/bolsaempleo/error");
-		}
-		
-		if (!bean.getUsuarioLogeado().getRol().getCodNum().equals(ModeloRol.ID_ROL_CANDIDATO)) {
-			throw new UVException("No eres un candidato");
-		}
+		}		
 	}
 	
 	private void errorFatal(VistaMeritos bean, String mensaje) {
@@ -215,7 +217,7 @@ public class ControladorMisMeritos extends HttpServlet {
 	 * @throws IOException .
 	 */
 	private void listaMeritos(VistaMeritos bean) throws SQLException {
-		bean.setVista(RUTA_BEP_MERITOS + "index.jsp");
+		bean.setVista(JSP_INDEX);
 		
 		ModeloBaremacionApartados modeloBaremacion = ModeloBaremacionApartados.obtenerInstancia();
 		bean.setApartados(modeloBaremacion.getApartadosActivos());
@@ -232,7 +234,7 @@ public class ControladorMisMeritos extends HttpServlet {
 	 */
 	private void agregarMerito(VistaMeritos bean, HttpServletRequest request, HttpServletResponse response)
 			throws SQLException, UVException, IOException, ServletException {
-		bean.setVista(RUTA_BEP_MERITOS + "formMerito.jsp");
+		bean.setVista(JSP_FORM);
 		
 		ModeloBaremacionApartados modelo = ModeloBaremacionApartados.obtenerInstancia();
 		bean.setApartados(modelo.getApartadosActivos());
@@ -330,10 +332,7 @@ public class ControladorMisMeritos extends HttpServlet {
 		
 		try (PrintWriter writer = response.getWriter()) {
 			try {
-				Usuario usuArcos = datos.getUsuario();
-				ModeloUsuarioBolsaEmpleo modeloUsuarioBolsaEmpleo = ModeloUsuarioBolsaEmpleo.obtenerInstancia();
-				Integer idUsuario = modeloUsuarioBolsaEmpleo.getUsuarioByNumeroDocumento(usuArcos.getDocumentoNumero()).getCodNum();
-				BolsaEmpleoDataTable<Merito> dataTable = modelo.listaMeritosDatatable(request.getParameterMap(), idUsuario);
+				BolsaEmpleoDataTable<Merito> dataTable = modelo.listaMeritosDatatable(request.getParameterMap(), bean.getUsuarioLogeado());
 				bean.setDatatable(dataTable);
 				writer.write(dataTable.toJson());
 			} catch (UVException e) {

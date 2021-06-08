@@ -22,11 +22,9 @@ import com.google.gson.reflect.TypeToken;
 
 import es.ujaen.uvirtual.beans.CodigoDescripcion;
 import es.ujaen.uvirtual.beans.UVDatos;
-import es.ujaen.uvirtual.beans.Usuario;
 import es.ujaen.uvirtual.modulo.bolsaempleo.beans.MeritoPreferenteOpcion;
 import es.ujaen.uvirtual.modulo.bolsaempleo.beans.MeritoPreferenteUsuario;
 import es.ujaen.uvirtual.modulo.bolsaempleo.beans.ParametrosConfiguracion;
-import es.ujaen.uvirtual.modulo.bolsaempleo.beans.UsuarioBolsaEmpleo;
 import es.ujaen.uvirtual.modulo.bolsaempleo.modelo.ModeloMeritosPreferentes;
 import es.ujaen.uvirtual.modulo.bolsaempleo.modelo.ModeloMeritosPreferentesCandidato;
 import es.ujaen.uvirtual.modulo.bolsaempleo.modelo.ModeloParametrosConfiguracion;
@@ -154,17 +152,17 @@ public class ControladorMisMeritosPreferentes extends HttpServlet {
 		
 		try {
 			bean.setUsuarioLogeado(ModeloUsuarioBolsaEmpleo.obtenerInstancia().getOrCreateUsuario(datos));
+
+			if (!bean.getUsuarioLogeado().getRol().getCodNum().equals(ModeloRol.ID_ROL_CANDIDATO)) {
+				throw new UVException("No eres un candidato");
+			}
 		} catch (UVException e) {
 			LOGGER.log(Level.SEVERE, Formateador.getStackTrace(e));
 			LOGGER.log(Level.SEVERE, e.toString());
 			
 			BolsaEmpleoUtils.addMensajeDeError(e.getMessage(), bean, request);
 			response.sendRedirect("/srv/es/informacionadministrativa/bolsaempleo/error");
-		}
-		
-		if (!bean.getUsuarioLogeado().getRol().getCodNum().equals(ModeloRol.ID_ROL_CANDIDATO)) {
-			throw new UVException("No eres un candidato");
-		}
+		}		
 	}
 	
 	private void errorFatal(VistaMeritosPreferentesCandidato bean, String mensaje) {
@@ -224,11 +222,8 @@ public class ControladorMisMeritosPreferentes extends HttpServlet {
 		
 		try (PrintWriter writer = response.getWriter()) {
 			try {
-				Usuario usuArcos = datos.getUsuario();
-				ModeloUsuarioBolsaEmpleo modeloUsuarioBolsaEmpleo = ModeloUsuarioBolsaEmpleo.obtenerInstancia();
-				UsuarioBolsaEmpleo usuario = modeloUsuarioBolsaEmpleo.getUsuarioByNumeroDocumento(usuArcos.getDocumentoNumero());
 				BolsaEmpleoDataTable<MeritoPreferenteUsuario> dataTable = ModeloMeritosPreferentesCandidato.obtenerInstancia().
-						listaMeritosCandidatoDatatable(request.getParameterMap(), usuario);
+						listaMeritosCandidatoDatatable(request.getParameterMap(), bean.getUsuarioLogeado());
 				bean.setDatatable(dataTable);
 				writer.write(dataTable.toJson());
 			} catch (UVException e) {
@@ -291,7 +286,7 @@ public class ControladorMisMeritosPreferentes extends HttpServlet {
 			throws SQLException, UVException, IOException {
 		formularioAgregarMerito(bean);
 				
-		MeritoPreferenteUsuario mp = validateMeritoPreferenteUsuario(request, datos);
+		MeritoPreferenteUsuario mp = validateMeritoPreferenteUsuario(bean, request);
 		ModeloMeritosPreferentesCandidato.obtenerInstancia().insertaMeritoUsuario(mp, bean.getUsuarioLogeado());
 		
 		BolsaEmpleoUtils.addMensajeDeExito("Mérito preferente añadido correctamente", bean, request);
@@ -307,9 +302,6 @@ public class ControladorMisMeritosPreferentes extends HttpServlet {
 		
 		ModeloMeritosPreferentesCandidato modelo = ModeloMeritosPreferentesCandidato.obtenerInstancia();
 		List<MeritoPreferenteUsuario> meritos = new ArrayList<>();
-		
-		Usuario usuario = datos.getUsuario();
-		UsuarioBolsaEmpleo usu = ModeloUsuarioBolsaEmpleo.obtenerInstancia().getUsuarioByNumeroDocumento(usuario.getDocumentoNumero());
 		
 		for (int sel : selected) {
 			meritos.add(modelo.getMeritoPreferenteUsuarioById(sel));
@@ -343,7 +335,9 @@ public class ControladorMisMeritosPreferentes extends HttpServlet {
         }		
 	}
 	
-	private MeritoPreferenteUsuario validateMeritoPreferenteUsuario(HttpServletRequest request, UVDatos datos) throws SQLException, UVException {
+	private MeritoPreferenteUsuario validateMeritoPreferenteUsuario(VistaMeritosPreferentesCandidato bean, HttpServletRequest request) 
+			throws SQLException, UVException {
+		
 		MeritoPreferenteUsuario mpu = new MeritoPreferenteUsuario();
 		
 		mpu.setMeritoPreferente(ModeloMeritosPreferentes.obtenerInstancia().getMeritoPreferenteById(
@@ -358,7 +352,7 @@ public class ControladorMisMeritosPreferentes extends HttpServlet {
 			}
 		}
 		
-		mpu.setUsuario(ModeloUsuarioBolsaEmpleo.obtenerInstancia().getUsuarioCandidato(datos));
+		mpu.setUsuario(bean.getUsuarioLogeado());
 		if (!mpu.getUsuario().isCandidato()) {
 			throw new UVException("El usuario debe ser un candidato");
 		}

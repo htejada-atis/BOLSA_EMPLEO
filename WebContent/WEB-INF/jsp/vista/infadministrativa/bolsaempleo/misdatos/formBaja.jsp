@@ -37,7 +37,7 @@ VistaUsuarioBolsaEmpleo bean = (VistaUsuarioBolsaEmpleo) uvdatos.getVistas().get
 		input_accion = document.getElementById("accion_formulario");
 		input_accion.value = '<%= ControladorMisDatos.ACCION_BAJA_USUARIO %>';
 		input_id = document.getElementById("usuario_id");
-		input_id.value = '<%= bean.getUsuario().getCodNum() %>';
+		input_id.value = '<%= bean.getUsuarioLogeado().getCodNum() %>';
 
 		submit_input.form.submit();
 	}

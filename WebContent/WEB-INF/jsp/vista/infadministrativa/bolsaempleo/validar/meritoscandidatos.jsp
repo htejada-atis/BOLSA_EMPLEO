@@ -268,7 +268,7 @@ $(document).ready(function() {
 	    "pageSize": 10,
 	    "filterable": true,
 	    "action": "<%= ControladorValidar.ACCION_DATATABLE_CANDIDATOS %>",
-	    "title": 'Lista de usuarios',
+	    "title": 'LISTA DE USUARIOS',
 	    "dropdown": true,
 	    "params": {'<%=ControladorValidar.PARAM_BOLSA%>': '<%= bolsa.getCodNum() %>'},
 	    "clickable": {'onClick': function(row) {
@@ -281,7 +281,7 @@ $(document).ready(function() {
 	    }},
 	    <% if (candidato != null) { %> "selected": <%= candidato.getCodNum() %> ,<% } %>
 	    "columns": [
-	    	{'data': 'numdocumento', 'filter': true},
+	    	{'data': 'prsnif', 'filter': true},
 	    	{'data': 'apellido1', 'filter': true, 'overflow': 'auto', 'render': function(row) {
         		return row.nombre + " " + row.apellido1 + " " + row.apellido2; 
         	}},
@@ -299,7 +299,7 @@ $(document).ready(function() {
 		    "pageSize": 10,
 		    "filterable": true,
 		    "action": "<%= ControladorValidar.ACCION_DATATABLE_MERITOS %>",
-		    "title": 'Méritos para el usuario: <%= candidato.getNumDocumento() %>',
+		    "title": 'MÉRITOS PARA EL USUARIO: <%=candidato.getIdNif()%>',
 		    "dropdown": true,
 		    "params": {
 		    	'<%=ControladorValidar.PARAM_BOLSA%>': '<%= bolsa.getCodNum() %>',
