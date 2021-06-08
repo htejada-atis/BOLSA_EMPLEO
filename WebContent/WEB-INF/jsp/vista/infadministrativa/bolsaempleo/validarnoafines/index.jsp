@@ -60,7 +60,7 @@ $(document).ready(function() {
     		Atis.sendForm("<%= request.getRequestURI() %>", params);
 	    }},
 	    "columns": [
-	    	{'data': 'area.idAreaExterno', 'filter': {'type': 'number'}},
+	    	{'data': 'area.idAreaExterno', 'filter': true},
 	        {'data': 'area.descripcion', 'filter': true},
 	        {'data': 'totalMeritosNoValidados', 'class': 'center', 'render': function(row) { return isNaN(row.totalMeritosNoValidados) ? 0 : row.totalMeritosNoValidados; } },
 	        {'data': 'totalMeritosValidados', 'class': 'center', 'render': function(row) { return isNaN(row.totalMeritosValidados) ? 0 : row.totalMeritosValidados; } },

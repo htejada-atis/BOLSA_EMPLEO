@@ -265,7 +265,6 @@ $(document).ready(function() {
 	var tableCandidatos = new Atis.DataTable('#tableCandidatos', {
 	    "ajax": { url: "<%= ControladorValidar.URL_PATTERN_AJAX %>", async: false },
 	    "pageSize": 10,
-	    "filterable": true,
 	    "action": "<%= ControladorValidar.ACCION_DATATABLE_CANDIDATOS %>",
 	    "title": 'LISTA DE USUARIOS',
 	    "dropdown": true,
@@ -280,8 +279,8 @@ $(document).ready(function() {
 	    }},
 	    <% if (candidato != null) { %> "selected": <%= candidato.getCodNum() %> ,<% } %>
 	    "columns": [
-	    	{'data': 'prsnif', 'filter': true},
-	    	{'data': 'apellido1', 'filter': true, 'overflow': 'auto', 'render': function(row) {
+	    	{'data': 'prsnif'},
+	    	{'data': 'apellido1', 'order': false, 'overflow': 'auto', 'render': function(row) {
         		return row.nombre + " " + row.apellido1 + " " + row.apellido2; 
         	}},
 	        {'data': 'totalMeritosNoValidados', 'order': false, 'class': 'center', 'render': function(row) { return isNaN(row.totalMeritosNoValidados) ? 0 : row.totalMeritosNoValidados; } },
@@ -360,7 +359,6 @@ $(document).ready(function() {
 				this.sumaTotal = function() {
 					var total = 0.0;
 					var noIndividualizadas = self.getValoresAfinidades();	
-					console.log(noIndividualizadas)
 					Object.keys(noIndividualizadas).forEach(function(key) {
 						total += noIndividualizadas[key];
 					});	

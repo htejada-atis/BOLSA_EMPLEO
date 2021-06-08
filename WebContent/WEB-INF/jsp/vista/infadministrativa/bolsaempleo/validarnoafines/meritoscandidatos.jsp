@@ -211,7 +211,6 @@ $(document).ready(function() {
 	var tableCandidatos = new Atis.DataTable('#tableCandidatos', {
 	    "ajax": { url: "<%= ControladorValidarNoAfines.URL_PATTERN_AJAX %>", async: false },
 	    "pageSize": 10,
-	    "filterable": true,
 	    "action": "<%= ControladorValidarNoAfines.ACCION_DATATABLE_CANDIDATOS %>",
 	    "title": 'LISTA DE USUARIOS',
 	    "dropdown": true,
@@ -226,8 +225,8 @@ $(document).ready(function() {
 	    }},
 	    <% if (candidato != null) { %> "selected": <%= candidato.getCodNum() %> ,<% } %>
 	    "columns": [
-	    	{'data': 'prsnif', 'filter': true},
-	    	{'data': 'apellido1', 'filter': true, 'overflow': 'auto', 'render': function(row) {
+	    	{'data': 'prsnif'},
+	    	{'data': 'apellido1', 'order': false, 'overflow': 'auto', 'render': function(row) {
         		return row.nombre + " " + row.apellido1 + " " + row.apellido2; 
         	}},
 	        {'data': 'totalMeritosNoValidados', 'order': false, 'class': 'center', 'render': function(row) { return isNaN(row.totalMeritosNoValidados) ? 0 : row.totalMeritosNoValidados; } },
@@ -295,7 +294,7 @@ $(document).ready(function() {
 			    "pageSize": 10,
 			    "selectable": {'all': false},
 			    "action": "<%= ControladorValidarNoAfines.ACCION_DATATABLE_BOLSAS_CANDIDATO %>",
-			    "title": 'BOLSAS EN LAS QUE ESTÁ APUNTADO ACTUALMENTE EL CANDIDATo',
+			    "title": 'BOLSAS EN LAS QUE ESTÁ APUNTADO ACTUALMENTE EL CANDIDATO',
 			    "dropdown": true,
 			    "params": {
 			    	'<%=ControladorValidarNoAfines.PARAM_BOLSA%>': '<%= bolsa.getCodNum() %>',
