@@ -138,13 +138,12 @@ if(item!=null){
 			<th scope="col" style="width:20%" title="ID item">Id</th>
 			<th scope="col" style="width:20%" title="Código item">Código</th>
 			<th scope="col" style="width:60%" title="Nombre del item">Nombre del item</th>
-			<th scope="col" style="width:15%">Activo</th>
 		</tr>
 		<tbody>				
 		</tbody>
 		<tfoot>
 			<tr>
-				<th colSpan="15" style="width:100%"></th>
+				<th colSpan="4"></th>
 			</tr>
 		</tfoot>
 	</table>
@@ -209,14 +208,6 @@ if(item!=null){
 		    		return row.bloque.apartado.codigo + "." + row.bloque.codigo + "." + row.codigo;
 		    	}},
 		        {'data': 'nombre', 'filter': true},
-		        {'data': 'activo', 'filter': {'type': 'select', 'options':{'true': 'Activo', 'false': 'Inactivo'}, 'optionDefault': 'true'}, 'render': function(row) {
-	        		if(row.activo){
-	        			return "<div class='circle-true'></div>"; 
-	        		}
-	        		else{
-	        			return "<div class='circle-false'></div>"; 
-	        		}
-	        	}},
 		    ]
 		});
 		

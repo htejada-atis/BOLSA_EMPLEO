@@ -157,18 +157,20 @@ function redondearFloat(number, decimalPlaces) {
 }
 
 function smoothScrollToAnchor(id) {
-	$('html, body').animate({
-		scrollTop: $(id).offset().top
-	}, 900);
+	//$('html, body').animate({
+	//	scrollTop: $(id).offset().top
+	//}, 900);
+	window.scrollTo(0,$(id).offset().top);
 }
 
 function smoothScrollFromOneToAnotherAnchor(origin, destination) {
-	$('html, body').animate({
-		scrollTop: $(origin).offset().top
-	}, 0);
-	$('html, body').animate({
-		scrollTop: $(destination).offset().top
-	}, 900);
+	//$('html, body').animate({
+	//	scrollTop: $(origin).offset().top
+	//}, 0);
+	//$('html, body').animate({
+	//	scrollTop: $(destination).offset().top
+	//}, 900);
+	window.scrollTo(0,$(id).offset().top);
 }
 
 window.Atis = $.extend(window.Atis ? window.Atis : {}, {
