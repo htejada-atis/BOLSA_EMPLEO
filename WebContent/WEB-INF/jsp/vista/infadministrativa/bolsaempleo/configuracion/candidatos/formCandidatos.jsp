@@ -154,24 +154,21 @@ UsuarioBolsaEmpleo usuarioBolsa = bean.getUsuario();
 		
 		<div class="form-group-container">
 		 	<div class="form-group-custom w100">
-    					
+    		<%	if (usuarioBolsa != null && usuarioBolsa.getBorrado()) { %>
+    				<label for="usuario_restaurar" style="margin-top: 4px">Usuario Borrado</label>
+    				<input id="usuario_restaurar" type="submit" name="<%= ControladorUsuarioCandidato.PARAM_RESTAURAR %> " value="Restaurar"/>
+    		<%	} %>
     		</div>
     		<div class="form-group-custom w100" style="float:right;">
-    			<input id="usuario_enviar" type="submit" name="<%= ControladorUsuarioBolsaEmpleo.PARAM_ENVIAR %> " value="<%if(usuarioBolsa!=null){%><%if(bean.getBusqueda()){%>Volver<%}else{%>Guardar candidato<%}%><%}else{%>Añadir candidato<%}%>" style="float:right;"/>
+    			<input id="usuario_enviar" type="submit" name="<%= ControladorUsuarioBolsaEmpleo.PARAM_ENVIAR %>" value="<%= usuarioBolsa != null ? bean.getBusqueda() ? "Volver" : "Guardar candidato" : "Añadir candidato"%>" style="float:right;"/>
     		</div>
     	</div>
     	
 
-		<div class="form-group-container col3" style="margin-top:1rem; display:none;" id="buttonsEdit">
-    	    <div class="form-group">
-    			<button id="areas_excluidas" style="margin-top:0;">Áreas excluidas</button>
-    		</div>
-    		<div class="form-group">
-				<button id="solicitudes" style="margin-top:0;">Solicitudes</button>
-    		</div>
-    		<div class="form-group">
-				<button id="comunicaciones" style="margin-top:0;">Comunicaciones</button>
-    		</div>
+		<div class="tabpanel-widget" style="margin-top:1rem; display:none;" id="buttonsEdit">
+    	    <button id="areas_excluidas" style="margin-top:0;">Áreas excluidas</button>
+    		<button id="solicitudes" style="margin-top:0;">Solicitudes</button>
+    		<button id="comunicaciones" style="margin-top:0;">Comunicaciones</button>
     	</div>
     </form>
     

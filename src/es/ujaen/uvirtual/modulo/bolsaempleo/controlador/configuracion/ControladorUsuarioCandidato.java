@@ -67,6 +67,7 @@ public class ControladorUsuarioCandidato extends HttpServlet {
 	public static final String PARAM_ID = "id";
 	public static final String PARAM_BORRADO = "borrar";
 	public static final String PARAM_EMAIL = "email";
+	public static final String PARAM_RESTAURAR = "restaurar";
 	
 	public static final Integer PARAM_ROLE_CANDIDATO = 1052;
 	

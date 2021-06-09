@@ -654,8 +654,6 @@ nav-bolsa-empleo a:active, nav-bolsa-empleo a:hover {
 	margin: 10px 0px;
 }
 
-
-
 a.consultar-fichero {
   background-color: var(--principal);
   color: #fff;
@@ -681,4 +679,16 @@ table.bluetable.bolsaempleo input.validar-afinidad {
 table.bluetable.bolsaempleo input + input {
    margin-top: 2px;
 }
+
+/* tab widget */
+
+.tabpanel-widget {
+	position: relative;
+    background: #333333;
+    border: 2px solid #e8e8e8;
+}
+
+
+
+
 
