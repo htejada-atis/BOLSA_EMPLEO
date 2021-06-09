@@ -398,7 +398,7 @@ public class ModeloBaremacionItems {
 				+ "FROM TBEP_ITEMSBAREMACION bepite "
 				+ "INNER JOIN TBEP_BLOQUESBAREMACION bepblo ON bepblo.CODNUM = bepite.BEPBLO_CODNUM "
 				+ "WHERE bepblo.BEPAPA_CODNUM = ? "
-				+ "ORDER BY LPAD(bepblo.CODIGO, 2) || LPAD(bepite.CODIGO, 2)";
+				+ "ORDER BY LPAD(bepblo.CODIGO, 3) || LPAD(bepite.CODIGO, 3)";
 		
 		try (Connection conexion = ConexionUvirtual.obtenerInstancia(); PreparedStatement stmt = conexion.prepareStatement(consulta)
 		) {

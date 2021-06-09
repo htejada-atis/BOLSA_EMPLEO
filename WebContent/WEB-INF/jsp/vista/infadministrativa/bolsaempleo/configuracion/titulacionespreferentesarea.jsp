@@ -81,6 +81,7 @@ Area area = bean.getArea();
 			    "selectable": true,
 			    "filterable": true,
 			    "pageSize": 5,
+			    "defaultOrderBy": 1,
 			    "title": "TITULACIONES PREFERENTES AL ÁREA: <%= area.getDescripcion() %>",
 			    "action": "<%=ControladorGestionTitulacionesPreferentesArea.ACCION_DATATABLE_TITULACIONES_PREFERENTES_AREA%>",
 			    "columns": [
@@ -108,6 +109,7 @@ Area area = bean.getArea();
 			    "selectable": true,
 			    "filterable": true,
 			    "pageSize": 5,
+			    "defaultOrderBy": 1,
 			    "title": 'TITULACIONES DISPONIBLES',
 			    "action": "<%=ControladorGestionTitulacionesPreferentesArea.ACCION_DATATABLE_TITULACIONES%>",
 			    "columns": [

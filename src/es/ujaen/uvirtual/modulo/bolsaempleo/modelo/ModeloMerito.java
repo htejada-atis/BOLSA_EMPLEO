@@ -257,7 +257,7 @@ public class ModeloMerito {
 				+ " WHERE bepmer.BEPUSU_CODNUM = ? ";
 		
 		String whereCodigo = String.format("(%s || '.' || %s || '.' || %s)", "bepapa.CODIGO", "bepblo.CODIGO", "bepite.CODIGO");
-		String orderCodigo = String.format("(%s || '.' || %s || '.' || %s) %%s", "LPAD(bepapa.CODIGO, 2)", "LPAD(bepblo.CODIGO, 2)", "LPAD(bepite.CODIGO, 2)");
+		String orderCodigo = String.format("(%s || '.' || %s || '.' || %s) %%s", "LPAD(bepapa.CODIGO, 3)", "LPAD(bepblo.CODIGO, 3)", "LPAD(bepite.CODIGO, 3)");
 		
 		dataTable.setColumn(ORDER_COLUMN_INDEX_ID, "bepmer.CODNUM");
 		dataTable.setColumn(ORDER_COLUMN_INDEX_BLOQUE, "bepblo.BEPAPA_CODNUM");
