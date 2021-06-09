@@ -41,6 +41,8 @@ public class ModeloSolicitud {
 	public static final String MENSAJE_ERROR_SOLICITUDES_ABIERTAS = "Ya existen solicitides abiertas";
 	public static final String MENSAJE_ERROR_SOLICITUDE_NO_EXISTE = "No existe la solicitud";
 	public static final String MENSAJE_ERROR_NO_EXISTE_MERITO_SOLICITUD = "No existe el merito de la solicitud";
+	public static final String MENSAJE_ERROR_FALTAN_DATOS_CONFIRMAR_SLICITUD = 
+		"Para confirmar la solicitud debe primero completar sus datos personales. Completelos en la sección 'Mis Datos'.";
 
 	public static final int ORDER_COLUMN_INDEX_MERITOS_ID_MERITO = 1;
 	public static final int ORDER_COLUMN_INDEX_MERITOS_ITEM_CODIGO = 2;
@@ -1546,6 +1548,37 @@ public class ModeloSolicitud {
 		}
 		
 		return false;
+	}
+
+	/**
+	 * Comprueba si se puede confirmar la solicitud.
+	 * @param solicitud .
+	 * @throws UVException .
+	 * @throws SQLException .
+	 */
+	public void comprobarSolicitudCorrecta(Solicitud solicitud) throws SQLException, UVException {
+		ModeloBaremacionItems modeloItems = ModeloBaremacionItems.obtenerInstancia();
+		
+		// comprobamos datos de usuario completos
+		if (ModeloUsuarioBolsaEmpleo.obtenerInstancia().compruebaUsuarioMisDatosValidos(solicitud.getUsuario())) {
+			throw new UVException(MENSAJE_ERROR_FALTAN_DATOS_CONFIRMAR_SLICITUD);
+		}
+		
+		// comprobamos problemas con items excluyentes
+//		for (BolsaSolicitud bs : this.getBolsasSolicitudMeritos(solicitud)) {
+//			List<MeritoSolicitud> meritos = this.getMeritosSolicitudBolsa(solicitud, (Bolsa) bs); 
+//			
+//			for (MeritoSolicitud padre : meritos) {
+//				for (MeritoSolicitud hijo : meritos) {
+//					if (!padre.getCodNum().equals(hijo.getCodNum())) {
+//						modeloItems.checkItemsExcluyentes(
+//							padre.getMerito().getItemBaremacion(), 
+//							hijo.getMerito().getItemBaremacion()
+//						);
+//					}
+//				}
+//			}
+//		}				
 	}
 	
 }
