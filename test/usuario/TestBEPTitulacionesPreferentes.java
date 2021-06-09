@@ -84,7 +84,8 @@ public class TestBEPTitulacionesPreferentes extends UtilsTestUsuarioBase {
 		
 		// seleccionamos la primera fila
 		WebElement tableTitulaciones = UtilsTestBolsaEmpleo.waitVisibility(By.id(ID_TABLE_TITULACIONES_AREA));
-		UtilsTestBolsaEmpleo.assertTotalTable(tableTitulaciones, TITULACIONES_AREA);
+		int totalTitulaciones = UtilsTestBolsaEmpleo.getTotalTable(tableTitulaciones);
+		UtilsTestBolsaEmpleo.assertTotalTable(tableTitulaciones, totalTitulaciones);
 		UtilsTestBolsaEmpleo.selectRowTable(tableTitulaciones, 0);
 		UtilsTestBolsaEmpleo.assertTotalSelectedTable(tableTitulaciones, 1);
 		
@@ -96,14 +97,14 @@ public class TestBEPTitulacionesPreferentes extends UtilsTestUsuarioBase {
 		WebElement btn = UtilsTestBolsaEmpleo.getActionTableByText(tableTitulaciones, "Eliminar");
 		btn.click();		
 		tableTitulaciones = UtilsTestBolsaEmpleo.waitVisibility(By.id(ID_TABLE_TITULACIONES_AREA));
-		UtilsTestBolsaEmpleo.assertTotalTable(tableTitulaciones, TITULACIONES_AREA - 1);
+		UtilsTestBolsaEmpleo.assertTotalTable(tableTitulaciones, totalTitulaciones - 1);
 		
 		// restauramos titulacion
 		WebElement tableDisponibles = UtilsTestBolsaEmpleo.waitVisibility(By.id(ID_TABLE_TITULACIONES_DISPONIBLES));
 		WebElement input = UtilsTestBolsaEmpleo.getFilterInputByIndex(tableDisponibles, 1);
 		input.sendKeys(titulacion);
 		input.sendKeys(Keys.ENTER);
-		UtilsTestBolsaEmpleo.assertTotalTable(tableDisponibles, 1);
+		UtilsTestBolsaEmpleo.assertTotalTable(tableDisponibles, totalTitulaciones);
 		UtilsTestBolsaEmpleo.selectRowTable(tableDisponibles, 0);
 		btn = UtilsTestBolsaEmpleo.getActionTableByText(tableDisponibles, "Incluir");
 		btn.click();
