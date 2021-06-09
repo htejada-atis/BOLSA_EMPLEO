@@ -57,8 +57,8 @@ public class ModeloBaremacionItems {
 	public static final Integer COLUMN_NOMBRE_MAXLENGTH = 1000;
 	public static final Integer COLUMN_DESCRIPCION_MAXLENGTH = 1000;
 
-	public static final Float MINIMO_VALOR_FLOAT = (float) 0.01;
-	public static final Float MAXIMO_VALOR_PORCENTAGE = (float) 100.0;
+	public static final Double MINIMO_VALOR_FLOAT = 0.01;
+	public static final Double MAXIMO_VALOR_PORCENTAGE = 100.0;
 	
 	public static final String CODIGO = "CODIGO";
 	public static final String CODNUM = "CODNUM";
@@ -299,9 +299,9 @@ public class ModeloBaremacionItems {
 			stmt.setString(parameterIndex++, item.getDescripcion());
 			stmt.setString(parameterIndex++, Boolean.TRUE.equals(item.getActivo()) ? "S" : "N");
 			stmt.setString(parameterIndex++, item.getUnidades());
-			stmt.setFloat(parameterIndex++, item.getValor());
-			stmt.setFloat(parameterIndex++, item.getValorMinimo());
-			stmt.setFloat(parameterIndex++, item.getValorMaximo());
+			stmt.setDouble(parameterIndex++, item.getValor());
+			stmt.setDouble(parameterIndex++, item.getValorMinimo());
+			stmt.setDouble(parameterIndex++, item.getValorMaximo());
 			if (item.getAfinidad() == null) {
 				stmt.setNull(parameterIndex++, Types.NULL);
 			} else {
@@ -365,9 +365,9 @@ public class ModeloBaremacionItems {
 			stmt.setString(parameterIndex++, item.getDescripcion());
 			stmt.setInt(parameterIndex++, item.getBloqueBaremacion().getCodNum());
 			stmt.setString(parameterIndex++, item.getUnidades());
-			stmt.setFloat(parameterIndex++, item.getValor());
-			stmt.setFloat(parameterIndex++, item.getValorMinimo());
-			stmt.setFloat(parameterIndex++, item.getValorMaximo());
+			stmt.setDouble(parameterIndex++, item.getValor());
+			stmt.setDouble(parameterIndex++, item.getValorMinimo());
+			stmt.setDouble(parameterIndex++, item.getValorMaximo());
 			stmt.setString(parameterIndex++, item.getAfinidad());
 			if (item.getIndividualizado() == null) {
 				stmt.setString(parameterIndex++, "N");
@@ -398,7 +398,7 @@ public class ModeloBaremacionItems {
 				+ "FROM TBEP_ITEMSBAREMACION bepite "
 				+ "INNER JOIN TBEP_BLOQUESBAREMACION bepblo ON bepblo.CODNUM = bepite.BEPBLO_CODNUM "
 				+ "WHERE bepblo.BEPAPA_CODNUM = ? "
-				+ "ORDER BY LPAD(bepblo.CODIGO, 2) || LPAD(bepite.CODIGO, 2)";
+				+ "ORDER BY LPAD(bepblo.CODIGO, 3) || LPAD(bepite.CODIGO, 3)";
 		
 		try (Connection conexion = ConexionUvirtual.obtenerInstancia(); PreparedStatement stmt = conexion.prepareStatement(consulta)
 		) {
@@ -450,9 +450,9 @@ public class ModeloBaremacionItems {
 		item.setDescripcion(rs.getString("DESCRIPCION"));
 		item.setActivo("S".equals(rs.getString("FLGACTIVO")));		
 		item.setUnidades(rs.getString("UNIDADES"));
-		item.setValor(rs.getFloat("VALOR"));
-		item.setValorMinimo(rs.getFloat("VALOR_MINIMO"));
-		item.setValorMaximo(rs.getFloat("VALOR_MAXIMO"));
+		item.setValor(rs.getDouble("VALOR"));
+		item.setValorMinimo(rs.getDouble("VALOR_MINIMO"));
+		item.setValorMaximo(rs.getDouble("VALOR_MAXIMO"));
 		item.setAfinidad(rs.getString("AFINIDAD"));
 		item.setIndividualizado("S".equals(rs.getString("INDIVIDUALIZADO")));
 		return item;

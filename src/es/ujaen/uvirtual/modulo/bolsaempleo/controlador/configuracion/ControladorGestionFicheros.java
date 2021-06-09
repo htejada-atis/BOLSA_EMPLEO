@@ -284,7 +284,7 @@ public class ControladorGestionFicheros extends HttpServlet {
 					BolsaEmpleoUtils.addMensajeDeError(MENSAJE_ERROR_EXTENSION_FICHERO, bean, request);
 					response.sendRedirect(request.getServletPath());
 			    }
-			}			
+			}
 		}
 	}
 	

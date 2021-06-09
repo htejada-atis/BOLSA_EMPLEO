@@ -2,6 +2,7 @@
 <%@ page import="es.ujaen.uvirtual.beans.UVDatos"%>
 <%@ page import="es.ujaen.uvirtual.modulo.bolsaempleo.beans.Rol"%>
 <%@	page import="es.ujaen.uvirtual.modulo.bolsaempleo.controlador.candidato.ControladorMisTitulaciones"%>
+<%@	page import="es.ujaen.uvirtual.modulo.bolsaempleo.controlador.ControladorDescargaFicheros"%>
 <%@ page import="es.ujaen.uvirtual.modulo.bolsaempleo.vistas.VistaTitulaciones"%>
 <%@ page import="es.ujaen.uvirtual.utilidades.EscapaHTML" %>
 <%@ page import="es.ujaen.uvirtual.utilidades.Formateador"%>
@@ -94,8 +95,8 @@ $(document).ready(function() {
 	        },
         	{'data': 'codnum', 'buttons': [
         		{'label': 'Descargar', 'onClick': function(row) {
-        			window.open("<%= ControladorMisTitulaciones.URL_PATTERN_FILES_PRIVADA %>"
-        		        	+ "?a=<%= ControladorMisTitulaciones.ACCION_DESCARGAR_FICHERO %>&<%= ControladorMisTitulaciones.PARAM_FICHERO %>=" + row.codNum);
+        			window.open("<%= ControladorDescargaFicheros.URL_DESCARGA_FICHEROS %>"
+        		        	+ "<%= "?a=" + ControladorDescargaFicheros.ACCION_DESCARGAR_TITULACION_CANDIDATO + "&" + ControladorDescargaFicheros.PARAM_TITULACION %>=" + row.codNum);
         		}},
    			]}	
 	    ],

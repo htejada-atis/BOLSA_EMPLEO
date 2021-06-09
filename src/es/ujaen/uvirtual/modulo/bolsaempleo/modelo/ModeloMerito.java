@@ -185,7 +185,7 @@ public class ModeloMerito {
 			int parameterIndex = 1;
 			stmt.setInt(parameterIndex++, merito.getItemBaremacion().getCodNum());
 			stmt.setInt(parameterIndex++, usuarioUpdate.getCodNum());
-			stmt.setFloat(parameterIndex++, merito.getValor());
+			stmt.setDouble(parameterIndex++, merito.getValor());
 			stmt.setString(parameterIndex++, merito.getDescripcion());
 			stmt.setString(parameterIndex++, merito.getObservacion());
 			stmt.setBinaryStream(parameterIndex++, merito.getArchivo());
@@ -224,7 +224,7 @@ public class ModeloMerito {
 		try (Connection conexion = ConexionUvirtual.obtenerInstancia(); PreparedStatement stmt = conexion.prepareStatement(consulta)) {
 			int parameterIndex = 1;
 			stmt.setInt(parameterIndex++, merito.getItemBaremacion().getCodNum());
-			stmt.setFloat(parameterIndex++, merito.getValor());
+			stmt.setDouble(parameterIndex++, merito.getValor());
 			stmt.setInt(parameterIndex++, merito.getCodNum());
 			stmt.setString(parameterIndex++, usuarioUpdate.getCodCuenta());
 			stmt.executeUpdate();
@@ -257,7 +257,7 @@ public class ModeloMerito {
 				+ " WHERE bepmer.BEPUSU_CODNUM = ? ";
 		
 		String whereCodigo = String.format("(%s || '.' || %s || '.' || %s)", "bepapa.CODIGO", "bepblo.CODIGO", "bepite.CODIGO");
-		String orderCodigo = String.format("(%s || '.' || %s || '.' || %s) %%s", "LPAD(bepapa.CODIGO, 2)", "LPAD(bepblo.CODIGO, 2)", "LPAD(bepite.CODIGO, 2)");
+		String orderCodigo = String.format("(%s || '.' || %s || '.' || %s) %%s", "LPAD(bepapa.CODIGO, 3)", "LPAD(bepblo.CODIGO, 3)", "LPAD(bepite.CODIGO, 3)");
 		
 		dataTable.setColumn(ORDER_COLUMN_INDEX_ID, "bepmer.CODNUM");
 		dataTable.setColumn(ORDER_COLUMN_INDEX_BLOQUE, "bepblo.BEPAPA_CODNUM");
@@ -360,7 +360,7 @@ public class ModeloMerito {
 		Merito mer = new Merito();		
 		mer.setCodNum(rs.getInt("CODNUM"));
 		mer.setItemBaremacion(modeloBar.getItemBaremacionById(rs.getInt("BEPITE_CODNUM")));		
-		mer.setValor(rs.getFloat("VALOR"));
+		mer.setValor(rs.getDouble("VALOR"));
 		mer.setDescripcion(rs.getString("DESCRIPCION"));
 		mer.setObservacion(rs.getString("OBSERVACION"));
 		

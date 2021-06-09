@@ -430,7 +430,7 @@ public class ModeloMisTitulaciones {
 		}
 	}
 
-	private TitulacionUsuario setTitulacionUsuarioFromResultSet(ResultSet rs, Boolean archivo) throws SQLException, UVException {
+	public TitulacionUsuario setTitulacionUsuarioFromResultSet(ResultSet rs, Boolean archivo) throws SQLException, UVException {
 		TitulacionUsuario tit = new TitulacionUsuario();
 		tit.setCodNum(rs.getInt("CODNUM"));
 		tit.setDescripcion(rs.getString("DESCRIPCION"));
