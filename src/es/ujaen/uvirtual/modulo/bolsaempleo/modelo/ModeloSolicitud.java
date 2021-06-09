@@ -577,7 +577,7 @@ public class ModeloSolicitud {
 				+ " WHERE bepmer.BEPUSU_CODNUM = ? ";
 
 		String whereCodigo = String.format("(%s || '.' || %s || '.' || %s)", "bepapa.CODIGO", "bepblo.CODIGO", "bepite.CODIGO");
-		String orderCodigo = String.format("(%s || '.' || %s || '.' || %s) %%s", "LPAD(bepapa.CODIGO, 2)", "LPAD(bepblo.CODIGO, 2)", "LPAD(bepite.CODIGO, 2)");
+		String orderCodigo = String.format("(%s || '.' || %s || '.' || %s) %%s", "LPAD(bepapa.CODIGO, 3)", "LPAD(bepblo.CODIGO, 3)", "LPAD(bepite.CODIGO, 3)");
 		
 		dataTable.setColumn(ORDER_COLUMN_INDEX_MERITOS_ID_MERITO, "bepmer.CODNUM");
 		dataTable.setColumn(ORDER_COLUMN_INDEX_MERITOS_ITEM_CODIGO, whereCodigo, DataTableColumn.COLUMN_TYPE_TEXT, orderCodigo);
@@ -1224,7 +1224,7 @@ public class ModeloSolicitud {
 				+ " INNER JOIN TBEP_BLOQUESBAREMACION bepblo ON bepblo.CODNUM = bepite.BEPBLO_CODNUM "
 				+ " INNER JOIN TBEP_APARTADOSBAREMACION bepapa ON bepapa.CODNUM  = bepblo.BEPAPA_CODNUM "				
 				+ "	WHERE bepsbo.BEPBOL_CODNUM = ? AND bepsbo.BEPSOL_CODNUM = ? "
-				+ " ORDER BY (LPAD(bepapa.CODIGO, 2) || '.' || LPAD(bepblo.CODIGO, 2) || '.' || LPAD(bepite.CODIGO, 2)) ASC";
+				+ " ORDER BY (LPAD(bepapa.CODIGO, 3) || '.' || LPAD(bepblo.CODIGO, 3) || '.' || LPAD(bepite.CODIGO, 3)) ASC";
 		
 		try (Connection conexion = ConexionUvirtual.obtenerInstancia(); PreparedStatement stmt = conexion.prepareStatement(consulta)) {
 			int indexParam = 1;
