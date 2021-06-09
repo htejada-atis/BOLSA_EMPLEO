@@ -117,6 +117,38 @@ public class ModeloMeritosPreferentesCandidato {
 	}
 	
 	/**
+	 * Listado de meritos preferenetes del candidato.
+	 * @param usuario .
+	 * @return .
+	 * @throws SQLException .
+	 * @throws UVException .
+	 */
+	public List<MeritoPreferenteUsuario> listaMeritosCandidatoPorPosesion(UsuarioBolsaEmpleo usuario) throws SQLException, UVException {
+		String consulta = "" 
+				+ " SELECT bepmpu.* "
+				+ " FROM TBEP_MER_PRE_USUARIO bepmpu "
+				+ " INNER JOIN TBEP_MERITOS_PREFERENTES bepmep ON bepmep.CODNUM = bepmpu.BEPMEP_CODNUM "
+				+ " WHERE bepmep.TIPO = ? AND bepmpu.BEPUSU_CODNUM = ? AND bepmpu.FLGBORRADO != 'S'";
+		
+		List<MeritoPreferenteUsuario> meritos = new ArrayList<>();
+		
+		try (Connection conexion = ConexionUvirtual.obtenerInstancia(); PreparedStatement stmt = conexion.prepareStatement(consulta)) {
+			int paramIndex = 1;
+			stmt.setString(paramIndex++, ModeloMeritosPreferentes.TIPO_POSESION);
+			stmt.setInt(paramIndex++, usuario.getCodNum());
+			
+			try (ResultSet rs = stmt.executeQuery()) {
+				while (rs.next()) {
+					MeritoPreferenteUsuario row = this.createMeritoUsuarioFromResultSet(rs);
+					meritos.add(row);					
+				}				
+			}				
+		}
+		
+		return meritos;
+	}
+	
+	/**
 	 * Inserta un merito preferente del candidato.
 	 * @param mp .
 	 * @param usuarioInsert .
@@ -213,7 +245,6 @@ public class ModeloMeritosPreferentesCandidato {
 		obj.setFechaValidado(rs.getDate("FECHA_VALIDADO"));
 		return obj;
 	}
-	
 	
 	/**
 	 * cambia flag de meritos a borrado.
