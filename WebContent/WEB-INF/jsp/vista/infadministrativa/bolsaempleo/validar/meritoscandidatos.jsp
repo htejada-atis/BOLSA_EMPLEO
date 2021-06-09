@@ -1,5 +1,6 @@
 <%@ page trimDirectiveWhitespaces="true"%>
 <%@	page import="es.ujaen.uvirtual.modulo.bolsaempleo.controlador.ControladorValidar"%>
+<%@	page import="es.ujaen.uvirtual.modulo.bolsaempleo.controlador.ControladorDescargaFicheros"%>
 <%@ page import="es.ujaen.uvirtual.modulo.bolsaempleo.vistas.VistaValidar" %>
 <%@ page import="es.ujaen.uvirtual.modulo.bolsaempleo.beans.Afinidad" %>
 <%@ page import="es.ujaen.uvirtual.modulo.bolsaempleo.beans.Area" %>
@@ -118,7 +119,7 @@ UsuarioBolsaEmpleo candidato = bean.getCandidato();
 				<div class="form-group-container col1">
 					<div class="form-file">
 						<label for="merito_archivo" class="bold-label">Fichero:</label>
-						<button class="btn icon icon-download" title="Descargar fichero del mérito" type="button">Descargar fichero del mérito</button>
+						<button id="merito_descargar_fichero" class="btn icon icon-download" title="Descargar fichero del mérito" type="button">Descargar fichero del mérito</button>
 					</div>
 				</div>
 				
@@ -334,8 +335,8 @@ $(document).ready(function() {
 	        	}},
 	        	{'data': 'codnum', 'buttons': [
 	        		{'title': 'Descargar fichero del mérito', 'class': 'only-icon icon-download', 'onClick': function(row) {
-	        			window.open("<%= request.getRequestURI() %>"
-	        		        	+ "?a=<%= ControladorValidar.ACCION_DESCARGAR_FICHERO %>&<%= ControladorValidar.PARAM_MERITO %>=" + row.codNum);
+	        			window.open("<%= ControladorDescargaFicheros.URL_DESCARGA_FICHEROS %>"
+	        		        	+ "?a=<%= bean.getUsuarioLogeado().isMiembroComision() ? ControladorDescargaFicheros.ACCION_DESCARGAR_MERITO_COMISION : ControladorDescargaFicheros.ACCION_DESCARGAR_MERITO_PERSONAL %>&<%= ControladorDescargaFicheros.PARAM_MERITO %>=" + row.codNum);
 	        		}},
 	   			]}
 		    ]
@@ -426,6 +427,11 @@ $(document).ready(function() {
 				Atis.sendForm("<%=request.getRequestURI()%>", params);
 			}
 			
+			document.getElementById("merito_descargar_fichero").addEventListener("click", function() {
+				console.log("au")
+				window.open("<%= ControladorDescargaFicheros.URL_DESCARGA_FICHEROS %>"
+    		        	+ "<%= "?a=" + ControladorDescargaFicheros.ACCION_DESCARGAR_MERITO_PERSONAL + "&" + ControladorDescargaFicheros.PARAM_MERITO + "=" + bean.getMerito().getMerito().getCodNum() %>");
+			});
 		
 			$('.bluetable').on('input', '.field-no-individualizado', function() {
 				var noIndividualizado = new NoIndividualizado($(this).closest('td'));

@@ -1,5 +1,6 @@
 <%@ page trimDirectiveWhitespaces="true"%>
 <%@	page import="es.ujaen.uvirtual.modulo.bolsaempleo.controlador.ControladorFiltrarAcreditaciones"%>
+<%@	page import="es.ujaen.uvirtual.modulo.bolsaempleo.controlador.ControladorDescargaFicheros"%>
 <%@ page import="es.ujaen.uvirtual.modulo.bolsaempleo.vistas.VistaFiltrarAcreditaciones" %>
 <%@ page import="es.ujaen.uvirtual.beans.UVDatos"%>
 <%@ page import="es.ujaen.uvirtual.utilidades.Formateador"%>
@@ -123,9 +124,8 @@ UsuarioBolsaEmpleo candidato = bean.getCandidato();
 			    	{'data': 'descripcion', 'filter': true},
 			        {'data': 'codnum', 'buttons': [
 		        		{'label': 'Descargar', 'title': 'Descargar fichero del mérito', 'onClick': function(row) {
-		        			window.open("<%=ControladorFiltrarAcreditaciones.URL_PATTERN_FILES_PRIVADA%>"
-		        		        	+ "?a=<%=ControladorFiltrarAcreditaciones.ACCION_DESCARGAR_FICHERO%>&<%=ControladorFiltrarAcreditaciones.PARAM_FICHERO%>=" + row.codNum
-		        		        	+ "&<%=ControladorFiltrarAcreditaciones.PARAM_CANDIDATO%>=" + "<%= bean.getCandidato().getCodNum() %>");
+		        			window.open("<%= ControladorDescargaFicheros.URL_DESCARGA_FICHEROS %>"
+		        		        	+ "<%= "?a=" + ControladorDescargaFicheros.ACCION_DESCARGAR_ACREDITACION_PERSONAL + "&" + ControladorDescargaFicheros.PARAM_ACREDITACION %>=" + row.codNum);
 		        		}},
 		   			]}
 			    ],
