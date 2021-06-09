@@ -28,6 +28,7 @@ import es.ujaen.uvirtual.modulo.bolsaempleo.modelo.ModeloBaremacionItems;
 import es.ujaen.uvirtual.modulo.bolsaempleo.modelo.ModeloBaremacionApartados;
 import es.ujaen.uvirtual.modulo.bolsaempleo.modelo.ModeloMerito;
 import es.ujaen.uvirtual.modulo.bolsaempleo.modelo.ModeloRol;
+import es.ujaen.uvirtual.modulo.bolsaempleo.modelo.ModeloSolicitud;
 import es.ujaen.uvirtual.modulo.bolsaempleo.modelo.ModeloUsuarioBolsaEmpleo;
 import es.ujaen.uvirtual.modulo.bolsaempleo.utilidades.BolsaEmpleoDataTable;
 import es.ujaen.uvirtual.modulo.bolsaempleo.utilidades.BolsaEmpleoUtils;
@@ -75,6 +76,8 @@ public class ControladorMisMeritos extends HttpServlet {
 	// mensajes
 	public static final String MENSAJE_ERROR_DESCRIPCION_LARGO = "La descripción no puede contener mas de %d caracteres";
 	public static final String MENSAJE_ERROR_DESCRIPCION_VACIA = "La descripción no puede estar vacía";
+	public static final String MENSAJE_ERROR_ELIMINAR = "El mérito con id %s no se ha podido borrar porque está asociado a una solicitud";
+	public static final String MENSAJE_ERROR_MERITOS_SELECCIONADOS_INCORRECTOS = "Méritos seleccionados incorrectos";
 	public static final String MENSAJE_ERROR_OBSERVACION_LARGO = "La observación no puede contener mas de %d caracteres";
 	public static final String MENSAJE_ERROR_VALOR_MAXIMO_PERMITIDO = "El valor máximo permitido es %s";
 	public static final String MENSAJE_ERROR_VALOR_MINIMO_PERMITIDO = "El valor mínimo permitido es %s";
@@ -251,7 +254,12 @@ public class ControladorMisMeritos extends HttpServlet {
 		
 		Gson gson = new GsonBuilder().create();
 		
-		List<String> idMeritos = gson.fromJson(request.getParameter(PARAM_MERITOS), new TypeToken<List<String>>() { }.getType());
+		List<String> idMeritos = new ArrayList<>();
+		try {
+			idMeritos = gson.fromJson(request.getParameter(PARAM_MERITOS), new TypeToken<List<String>>() { }.getType());
+		} catch (Exception ex) {
+			BolsaEmpleoUtils.addMensajeDeError(MENSAJE_ERROR_MERITOS_SELECCIONADOS_INCORRECTOS, bean, request);
+		}
 		
 		// comprobamos si lo mérito son los del usuario logeado
 		List<Merito> meritos = new ArrayList<>();
@@ -260,11 +268,17 @@ public class ControladorMisMeritos extends HttpServlet {
 			if (!m.getUsuario().getCodNum().equals(bean.getUsuarioLogeado().getCodNum())) {
 				throw new UVException("No tienes permisos");
 			}
-			meritos.add(m);
+			if (ModeloSolicitud.obtenerInstancia().comprobarMeritosSolicitud(m)) {
+				BolsaEmpleoUtils.addMensajeDeError(String.format(MENSAJE_ERROR_ELIMINAR, idMerito), bean, request);
+			} else {
+				meritos.add(m);
+			}
 		}
 		
-		modelo.eliminarMeritos(meritos, bean.getUsuarioLogeado());
-		BolsaEmpleoUtils.addMensajeDeExito(MENSAJE_EXITO_ELIMINAR, bean, request);
+		if (meritos.size() > 0) {
+			modelo.eliminarMeritos(meritos, bean.getUsuarioLogeado());
+			BolsaEmpleoUtils.addMensajeDeExito(MENSAJE_EXITO_ELIMINAR, bean, request);
+		}
 		
 		response.sendRedirect(request.getServletPath());
 	}

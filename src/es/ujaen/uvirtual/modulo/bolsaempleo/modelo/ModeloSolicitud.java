@@ -1523,6 +1523,32 @@ public class ModeloSolicitud {
 		
 		return false;
 	}
+	
+	/** Comprueba si un mérito está asociado a una solicitud .
+	 * @param merito .
+	 * @return booleano que devuelve si la consulta obtiene resultados . 
+	 * @throws SQLException .
+	 */
+	public boolean comprobarMeritosSolicitud(Merito merito) throws SQLException {
+		
+		String consulta = "SELECT besbm.*"
+				+ "	FROM UVIRTUAL.TBEP_SOL_BOL_MERITOS besbm"
+				+ "	WHERE besbm.BEPMER_CODNUM = ?";
+		
+		try (Connection conexion = ConexionUvirtual.obtenerInstancia(); PreparedStatement stmt = conexion.prepareStatement(consulta)) {
+			int parameterIndex = 1;
+			stmt.setInt(parameterIndex++, merito.getCodNum());
+			stmt.executeUpdate();
+			
+			try (ResultSet rs = stmt.executeQuery()) {
+				if (rs.next()) {
+					return true;
+				}
+			}
+		}
+		
+		return false;
+	}
 
 	/**
 	 * Comprueba si se puede confirmar la solicitud.
@@ -1554,5 +1580,6 @@ public class ModeloSolicitud {
 //			}
 //		}				
 	}
+	
 }
 

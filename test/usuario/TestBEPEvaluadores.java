@@ -116,10 +116,12 @@ public class TestBEPEvaluadores extends UtilsTestUsuarioBase {
 		// seleccionamos el departamento (refresh)
 		WebElement tableAreas = seleccionarDepartamento(DEP2);
 		
-		// seleccionamos las dos primeras areas
-		UtilsTestBolsaEmpleo.selectRowTable(tableAreas, 0);
-		UtilsTestBolsaEmpleo.selectRowTable(tableAreas, 1);
-		UtilsTestBolsaEmpleo.assertTotalSelectedTable(tableAreas, 2);
+		// seleccionamos todas las áreas menos una
+		int totalAreas = UtilsTestBolsaEmpleo.getTotalTable(tableAreas);
+		for (int i = 0; i < (totalAreas - 1); i++) {
+			UtilsTestBolsaEmpleo.selectRowTable(tableAreas, i);
+		}
+		UtilsTestBolsaEmpleo.assertTotalSelectedTable(tableAreas, totalAreas - 1);
 		
 		// añadimos evaluador (refresh)
 		WebElement input = UtilsTestBolsaEmpleo.waitVisibility(By.id("nombre_evaluador"));

@@ -181,7 +181,7 @@ public class TestBEPControladorMisMeritos {
 	public void testE01EliminarMeritosNoValidos() throws SQLException, ServletException, IOException {
 		PeticionHttp peticion = UtilsTestBolsaEmpleo.peticionAutenticadaCandidato();
 		peticion.setParameter(ControladorMisMeritos.PARAM_ACCION, ControladorMisMeritos.ACCION_ELIMINAR_MERITOS);
-		peticion.setParameter(ControladorMisMeritos.PARAM_MERITOS, "");
+		peticion.setParameter(ControladorMisMeritos.PARAM_MERITOS, "meritonovalido");
 
 		RespuestaHttp respuesta = new RespuestaHttp();
 		ControladorMisMeritos controlador = new ControladorMisMeritos();
