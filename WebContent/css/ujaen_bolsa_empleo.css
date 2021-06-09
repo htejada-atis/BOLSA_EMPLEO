@@ -684,8 +684,10 @@ table.bluetable.bolsaempleo input + input {
 
 .tabpanel-widget {
 	position: relative;
-    background: #333333;
-    border: 2px solid #e8e8e8;
+    border: 2px solid #F1F1F1;
+}
+
+.tabpanel-widget button {
 }
 
 
