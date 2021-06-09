@@ -31,6 +31,7 @@ import es.ujaen.uvirtual.modulo.bolsaempleo.beans.BolsaSolicitud;
 import es.ujaen.uvirtual.modulo.bolsaempleo.beans.BolsaSolicitudTable;
 import es.ujaen.uvirtual.modulo.bolsaempleo.beans.Convocatoria;
 import es.ujaen.uvirtual.modulo.bolsaempleo.beans.Merito;
+import es.ujaen.uvirtual.modulo.bolsaempleo.beans.MeritoPreferenteUsuario;
 import es.ujaen.uvirtual.modulo.bolsaempleo.beans.MeritoSolicitud;
 import es.ujaen.uvirtual.modulo.bolsaempleo.beans.MeritoSolicitudTable;
 import es.ujaen.uvirtual.modulo.bolsaempleo.beans.MeritoSolicitudValoracion;
@@ -43,6 +44,8 @@ import es.ujaen.uvirtual.modulo.bolsaempleo.modelo.ModeloBaremacionItems;
 import es.ujaen.uvirtual.modulo.bolsaempleo.modelo.ModeloBolsa;
 import es.ujaen.uvirtual.modulo.bolsaempleo.modelo.ModeloConvocatoria;
 import es.ujaen.uvirtual.modulo.bolsaempleo.modelo.ModeloMerito;
+import es.ujaen.uvirtual.modulo.bolsaempleo.modelo.ModeloMeritosPreferentes;
+import es.ujaen.uvirtual.modulo.bolsaempleo.modelo.ModeloMeritosPreferentesCandidato;
 import es.ujaen.uvirtual.modulo.bolsaempleo.modelo.ModeloRol;
 import es.ujaen.uvirtual.modulo.bolsaempleo.modelo.ModeloSolicitud;
 import es.ujaen.uvirtual.modulo.bolsaempleo.modelo.ModeloTitulacion;
@@ -56,6 +59,7 @@ import es.ujaen.uvirtual.utilidades.UVException;
 import com.lowagie.text.Cell;
 import com.lowagie.text.Chunk;
 import com.lowagie.text.Document;
+import com.lowagie.text.DocumentException;
 import com.lowagie.text.Font;
 import com.lowagie.text.FontFactory;
 import com.lowagie.text.Paragraph;
@@ -979,7 +983,13 @@ public class ControladorMisSolicitudes extends HttpServlet {
 			for (BolsaSolicitud bolsa: bolsasSolicitud) {
 				this.generarPDFArea(bolsa, bolsasSolicitud, document);
 			}
-		} catch (Exception exp) {
+			
+			this.generarTitulaciones(solicitud.getUsuario(), document);
+			
+			this.generarAcreditaciones(solicitud.getUsuario(), document);
+		} catch (Exception e) {
+			LOGGER.log(Level.SEVERE, Formateador.getStackTrace(e));
+			LOGGER.log(Level.SEVERE, e.toString());
 			throw new UVException("Error generando pdf, consulte con los administradores");
 		}
 		
@@ -1000,7 +1010,8 @@ public class ControladorMisSolicitudes extends HttpServlet {
 
 		if (bolsa.getNumeroMeritos() != null && bolsa.getNumeroMeritos() > 0) {
 			for (MeritoSolicitudTable merito: bolsa.getListaMeritos()) {
-				String codigoItem = merito.getMerito().getItemBaremacion().getBloqueBaremacion().getApartadoBaremacion().getCodigo() + "." 
+				String codigoItem = merito.getCodNum() + " " 
+						+ merito.getMerito().getItemBaremacion().getBloqueBaremacion().getApartadoBaremacion().getCodigo() + "." 
 						+ merito.getMerito().getItemBaremacion().getBloqueBaremacion().getCodigo() + "." 
 						+ merito.getMerito().getItemBaremacion().getCodigo();
 				
@@ -1076,6 +1087,32 @@ public class ControladorMisSolicitudes extends HttpServlet {
 		cell.setHeader(true);
 		cell.setBackgroundColor(new Color(COLOR_185, COLOR_201, COLOR_254));
 		table.addCell(cell);
+	}
+	
+	private void generarTitulaciones(UsuarioBolsaEmpleo usuario, Document document) throws DocumentException, SQLException {
+		Font font2 = new Font(Font.BOLD);
+		font2.setStyle("bold");		
+		
+		document.add(new Paragraph("Titulaciones", font2));
+		document.add(new Paragraph("\n"));
+		
+		for (Titulacion t : ModeloTitulacion.obtenerInstancia().listaTitulacionesCandidato(usuario.getCodNum())) {
+			document.add(new Paragraph(t.getCodNum() + " " + t.getNombre()));
+			document.add(new Paragraph("\n"));
+		}			
+	}
+	
+	private void generarAcreditaciones(UsuarioBolsaEmpleo usuario, Document document) throws DocumentException, SQLException, UVException {
+		Font font2 = new Font(Font.BOLD);
+		font2.setStyle("bold");		
+		
+		document.add(new Paragraph("Acreditaciones", font2));
+		document.add(new Paragraph("\n"));
+					
+		for (MeritoPreferenteUsuario m : ModeloMeritosPreferentesCandidato.obtenerInstancia().listaMeritosCandidatoPorPosesion(usuario)) {			
+			document.add(new Paragraph(m.getCodNum() + " " + m.getDescripcion()));
+			document.add(new Paragraph("\n"));
+		}
 	}
 	
 	private ArrayList<Bolsa> getListadoBolsasFromJson(VistaSolicitudes bean, HttpServletRequest request, Solicitud solicitud) throws UVException, SQLException {
