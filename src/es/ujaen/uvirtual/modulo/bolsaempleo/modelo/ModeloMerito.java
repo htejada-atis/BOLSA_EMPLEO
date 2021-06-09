@@ -111,7 +111,7 @@ public class ModeloMerito {
 	 * @param usuarioUpdate .
 	 * @throws SQLException en caso de error en la BD .
 	 */
-	public void eliminarMeritos(List<String> meritos, UsuarioBolsaEmpleo usuarioUpdate) throws SQLException {
+	public void eliminarMeritos(List<Merito> meritos, UsuarioBolsaEmpleo usuarioUpdate) throws SQLException {
 		try (Connection conexion = ConexionUvirtual.obtenerInstancia()) {
 			conexion.setAutoCommit(false);
 			
@@ -124,8 +124,8 @@ public class ModeloMerito {
 				try (PreparedStatement stmt = conexion.prepareStatement(consultaUpdate)) {
 					int indexParam = 1;
 					stmt.setString(indexParam++, usuarioUpdate.getCodCuenta());
-					for (String merito: meritos) {
-						stmt.setString(indexParam++, merito);
+					for (Merito merito: meritos) {
+						stmt.setInt(indexParam++, merito.getCodNum());
 					}
 					stmt.executeUpdate();
 				}
@@ -135,8 +135,8 @@ public class ModeloMerito {
 				
 				try (PreparedStatement stmt = conexion.prepareStatement(consultaDelete)) {
 					int indexParam = 1;
-					for (String merito: meritos) {
-						stmt.setString(indexParam++, merito);
+					for (Merito merito: meritos) {
+						stmt.setInt(indexParam++, merito.getCodNum());
 					}
 					stmt.executeUpdate();
 				}

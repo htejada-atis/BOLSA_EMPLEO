@@ -1,6 +1,5 @@
 package es.ujaen.uvirtual.modulo.bolsaempleo.controlador.candidato;
 
-import java.io.BufferedInputStream;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.sql.SQLException;
@@ -9,7 +8,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Level;
 import javax.servlet.ServletException;
-import javax.servlet.ServletOutputStream;
 import javax.servlet.annotation.MultipartConfig;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
@@ -60,7 +58,6 @@ public class ControladorMisMeritosPreferentes extends HttpServlet {
 	public static final String ACCION_DATATABLE = "datatable";
 	public static final String ACCION_AGREGAR_MERITO = "agregarmerito";	
 	public static final String ACCION_AGREGAR_MERITO_CONFIRM = "agregarmeritoconfirm";
-	public static final String ACCION_DESCARGAR_FICHERO = "descargarfichero";
 	public static final String ACCION_ELIMINAR_MERITOS = "eliminarmeritos";
 	public static final String ACCION_LISTADO_OPCIONES = "opciones";
 	
@@ -202,9 +199,6 @@ public class ControladorMisMeritosPreferentes extends HttpServlet {
 			case ACCION_ELIMINAR_MERITOS:
 				eliminarMeritos(bean, datos, request, response);
 				break;
-			case ACCION_DESCARGAR_FICHERO:
-				descargarPdf(bean, datos, request, response);
-				break;
 			case ACCION_LISTADO_OPCIONES:
 				listadoOpciones(bean, datos, request, response);
 				break;
@@ -304,35 +298,17 @@ public class ControladorMisMeritosPreferentes extends HttpServlet {
 		List<MeritoPreferenteUsuario> meritos = new ArrayList<>();
 		
 		for (int sel : selected) {
-			meritos.add(modelo.getMeritoPreferenteUsuarioById(sel));
+			MeritoPreferenteUsuario m = modelo.getMeritoPreferenteUsuarioById(sel);
+			if (!m.getUsuario().getCodNum().equals(bean.getUsuarioLogeado().getCodNum())) {
+				throw new UVException("No tienes permisos");
+			}			
+			meritos.add(m);
 		}
 
 		modelo.cambiarFlagBorradoMeritos(meritos, bean.getUsuarioLogeado());
 
 		BolsaEmpleoUtils.addMensajeDeExito(MENSAJE_EXITO_ELIMINAR, bean, request);
 		response.sendRedirect(request.getServletPath());
-	}
-	
-	private void descargarPdf(VistaMeritosPreferentesCandidato bean, UVDatos datos, HttpServletRequest request, HttpServletResponse response) throws SQLException, UVException {
-		this.index(bean);
-		
-		MeritoPreferenteUsuario mpu = ModeloMeritosPreferentesCandidato.obtenerInstancia().getMeritoPreferenteUsuarioById(
-				Formateador.leeParametroInteger(request.getParameter(PARAM_ID)));
-		
-		response.setContentType("application/pdf");
-		datos.setRespuestaEnviada(true);
-        
-		try (ServletOutputStream stream = response.getOutputStream(); BufferedInputStream buf = new BufferedInputStream(mpu.getArchivo())) {
-			int readBytes = 0;
-			while ((readBytes = buf.read()) != -1) {
-				stream.write(readBytes);
-            }
-			stream.flush();
-		} catch (Exception ex) {
-			LOGGER.log(Level.SEVERE, Formateador.getStackTrace(ex));
-			LOGGER.log(Level.SEVERE, ex.toString());
-			bean.getMensajesDeError().add(ex.getMessage());
-        }		
 	}
 	
 	private MeritoPreferenteUsuario validateMeritoPreferenteUsuario(VistaMeritosPreferentesCandidato bean, HttpServletRequest request) 

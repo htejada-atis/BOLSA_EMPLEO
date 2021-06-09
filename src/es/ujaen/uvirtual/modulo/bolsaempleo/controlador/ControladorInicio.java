@@ -1,6 +1,5 @@
 package es.ujaen.uvirtual.modulo.bolsaempleo.controlador;
 
-import java.io.BufferedInputStream;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.sql.SQLException;
@@ -9,7 +8,6 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import javax.servlet.ServletException;
-import javax.servlet.ServletOutputStream;
 import javax.servlet.annotation.MultipartConfig;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
@@ -56,7 +54,6 @@ public class ControladorInicio extends HttpServlet {
 	
 	// acciones
 	public static final String ACCION_AYUDA = "ayuda";
-	public static final String ACCION_DESCARGAR_FICHERO = "descargarfichero";
 	public static final String ACCION_DOCUMENTOS = "documentos";
 	public static final String ACCION_FAQ = "faq";
 	public static final String ACCION_INDEX = "listar_noticias";
@@ -106,9 +103,6 @@ public class ControladorInicio extends HttpServlet {
 					break;
 				case ACCION_AYUDA:
 					bean.setVista(RUTA_BEP_INICIO + "ayuda.jsp");
-					break;
-				case ACCION_DESCARGAR_FICHERO:
-					descargarFichero(bean, datos, request, response);
 					break;
 				case ACCION_DOCUMENTOS:
 					obtenerFicheros(bean);
@@ -171,54 +165,6 @@ public class ControladorInicio extends HttpServlet {
 		doGet(request, response);
 	}
 		
-	/** descarga un fichero .
-	 * @param bean .
-	 * @param datos .
-	 * @param request .
-	 * @param response .
-	 * @throws SQLException excepcion de bbdd.
-	 * @throws UVException en caso de error de parametros .
-	 * @throws IOException en caso de error de input u output .
-	 */
-	private void descargarFichero(VistaInicio bean, UVDatos datos, HttpServletRequest request, HttpServletResponse response) throws SQLException, UVException {
-		bean.setVista(RUTA_BEP_INICIO + "documentos.jsp");
-		ModeloFichero modelo = ModeloFichero.obtenerInstancia();
-		
-		if (EscapaHTML.ajustaCodificacion(request.getParameter(PARAM_FICHERO)) != null) {
-			Fichero fichero = modelo.listaFichero(Formateador.leeParametroInteger(request.getParameter(PARAM_FICHERO)));
-			bean.setFichero(fichero);
-			
-			int i = fichero.getNombre().lastIndexOf('.');
-			if (i > 0) {
-				try {
-					String extension = fichero.getNombre().substring(i + 1);
-					if ("pdf".equalsIgnoreCase(extension)) {
-						response.setContentType("application/pdf");
-						datos.setRespuestaEnviada(true);
-						
-						try (ServletOutputStream stream = response.getOutputStream(); 
-								BufferedInputStream buf = new BufferedInputStream(fichero.getArchivo())) {
-							int readBytes = 0;
-							while ((readBytes = buf.read()) != -1) {
-								stream.write(readBytes);
-						    }
-							stream.flush();
-						} 
-					} else {
-						response.sendRedirect(request.getServletPath());
-				    }
-				} catch (IOException ex) {
-					LOGGER.log(Level.SEVERE, Formateador.getStackTrace(ex));
-					LOGGER.log(Level.SEVERE, ex.toString());
-					throw new UVException("Erro descargando fichero");
-				}
-			}
-			
-		} else {
-			bean.getMensajesDeAdvertencia().add("El fichero no puede ser nulo");
-		}
-	}
-	
 	/** muestra todas las noticias.
 	 * @param bean bean de la vista a la que poner los valores.
 	 * @param request de la petición del servidor .

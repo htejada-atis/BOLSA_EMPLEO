@@ -217,27 +217,6 @@ public class TestBEPControladorFiltrar {
 		assertEquals(MENSAJE_SIN_ADVERTENCIAS, 0, bean3.getMensajesDeAdvertencia().size());
 	}
 	
-	/** descargar fichero titulación .
-	 * @throws ServletException si error de servlet
-	 * @throws IOException si error de io
-	 */
-	@Test
-	public void testE01Descargar() throws ServletException, IOException {
-		VistaFiltrar bean = obtenerTitulaciones();
-		
-		PeticionHttp peticion = UtilsTestBolsaEmpleo.peticionAutenticadaPersonal();
-		peticion.setParameter(ControladorFiltrarTitulacion.PARAM_ACCION, ControladorFiltrarTitulacion.ACCION_DESCARGAR_FICHERO);
-		peticion.setParameter(ControladorFiltrarTitulacion.PARAM_FICHERO, bean.getDatatableTitulaciones().getData().get(0).getCodNum().toString());
-		
-		RespuestaHttp respuesta = new RespuestaHttp();
-		ControladorFiltrarTitulacion controlador = new ControladorFiltrarTitulacion();
-		controlador.doGet(peticion, respuesta);
-		VistaFiltrar bean2 = (VistaFiltrar) peticion.getUVDatos().getVistas().get(VistaFiltrar.class.getName());
-		
-		assertEquals(MENSAJE_CON_ERROR, 1, bean2.getMensajesDeError().size());
-		assertEquals(MENSAJE_SIN_EXITO, 0, bean2.getMensajesDeExito().size());
-	}
-	
 	/** Seleccionar candidato no válido .
 	 * @throws ServletException si error de servlet
 	 * @throws IOException si error de io
