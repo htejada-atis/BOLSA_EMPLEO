@@ -1,6 +1,7 @@
 <%@ page trimDirectiveWhitespaces="true"%>
 <%@ page import="es.ujaen.uvirtual.beans.UVDatos"%>
 <%@	page import="es.ujaen.uvirtual.modulo.bolsaempleo.controlador.configuracion.ControladorItemsBaremacion"%>
+<%@	page import="es.ujaen.uvirtual.modulo.bolsaempleo.controlador.ControladorDescargaFicheros"%>
 <%@ page import="es.ujaen.uvirtual.modulo.bolsaempleo.vistas.VistaItemsBaremacion"%>
 <%@ page import="es.ujaen.uvirtual.modulo.bolsaempleo.beans.ApartadoBaremacion" %>
 <%@ page import="es.ujaen.uvirtual.utilidades.EscapaHTML" %>
@@ -333,8 +334,8 @@ VistaItemsBaremacion bean = (VistaItemsBaremacion) uvdatos.getVistas().get(Vista
 		
 		document.getElementById("descargar_items").addEventListener("click", function(event) {
 			event.preventDefault();
-			window.open("<%= ControladorItemsBaremacion.URL_PATTERN_FILES_PRIVADA %>"
-		        	+ "?a=<%= ControladorItemsBaremacion.ACCION_DESCARGAR_FICHERO %>");
+			window.open("<%= ControladorDescargaFicheros.URL_DESCARGA_FICHEROS %>"
+		        	+ "?<%= ControladorDescargaFicheros.PARAM_ACCION %>=<%= ControladorDescargaFicheros.ACCION_DESCARGAR_RESUMEN_ITEM_BAREMACION %>");
 		});
 		
 	});

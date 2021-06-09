@@ -1,6 +1,5 @@
 package es.ujaen.uvirtual.modulo.bolsaempleo.controlador;
 
-import java.io.BufferedInputStream;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.sql.SQLException;
@@ -8,7 +7,6 @@ import java.util.logging.Logger;
 import java.util.List;
 import java.util.logging.Level;
 import javax.servlet.ServletException;
-import javax.servlet.ServletOutputStream;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
@@ -54,7 +52,6 @@ public class ControladorFiltrarTitulacion extends HttpServlet {
 	public static final String ACCION_CANDIDATO_SELECCIONADO = "candidatoseleccionado";
 	public static final String ACCION_DATATABLE_CANDIDATOS = "datatablecandidatos";
 	public static final String ACCION_DATATABLE_TITULACIONES_CANDIDATO = "datatabletitulacionescandidato";
-	public static final String ACCION_DESCARGAR_FICHERO = "descargarfichero";
 	public static final String ACCION_INDEX = "listar";
 	public static final String ACCION_TITULACION_DESELECCIONADA = "titulaciondeseleccionada";
 	public static final String ACCION_TITULACION_SELECCIONADA = "titulacionseleccionada";
@@ -118,9 +115,6 @@ public class ControladorFiltrarTitulacion extends HttpServlet {
 				case ACCION_DATATABLE_TITULACIONES_CANDIDATO:
 					listadoTitulacionesCandidato(bean, datos, request, response);
 					break;
-				case ACCION_DESCARGAR_FICHERO:
-					descargarFichero(bean, datos, request, response);
-					break;				
 				case ACCION_TITULACION_DESELECCIONADA:
 					seleccionarTitulacion(bean, datos, request, response, false);
 					break;
@@ -302,30 +296,6 @@ public class ControladorFiltrarTitulacion extends HttpServlet {
 		}
 	}
 	
-	private void descargarFichero(VistaFiltrar bean, UVDatos datos, HttpServletRequest request, HttpServletResponse response)
-			throws SQLException, UVException, IOException {
-		ModeloMisTitulaciones modelo = ModeloMisTitulaciones.obtenerInstancia();
-		if (EscapaHTML.ajustaCodificacion(request.getParameter(PARAM_FICHERO)) != null) {
-			TitulacionUsuario titulacion = modelo.getTitulacionUsuarioById(Formateador.leeParametroInteger(request.getParameter(PARAM_FICHERO)));
-			bean.setTitulacion(titulacion);
-			
-			response.setContentType("application/pdf");
-			datos.setRespuestaEnviada(true);
-	        
-			try (ServletOutputStream stream = response.getOutputStream(); BufferedInputStream buf = new BufferedInputStream(titulacion.getArchivo())) {
-				int readBytes = 0;
-				while ((readBytes = buf.read()) != -1) {
-					stream.write(readBytes);
-				}
-				stream.flush();
-			} catch (Exception ex) {
-				LOGGER.log(Level.SEVERE, Formateador.getStackTrace(ex));
-				LOGGER.log(Level.SEVERE, ex.toString());
-				bean.getMensajesDeError().add(ex.getMessage());
-	        }			
-		}
-	}
-
 	private void cambiarTitulacion(VistaFiltrar bean, UVDatos datos, HttpServletRequest request, HttpServletResponse response) throws IOException {
 		ModeloUsuarioBolsaEmpleo modeloUsuario = ModeloUsuarioBolsaEmpleo.obtenerInstancia();
 		
