@@ -463,6 +463,35 @@ public class TestBEPControladorMisSolicitudes {
 		assertEquals(MENSAJE_SIN_ADVERTENCIAS, 0, bean4.getMensajesDeAdvertencia().size());
 	}
 	
+	/** selecciona afinidad de un mérito .
+	 * @throws SQLException .
+	 * @throws ServletException .
+	 * @throws IOException .
+	 */
+	@Test
+	public void testA14SeleccionarAfinidadMeritoNoIndividualizado() throws ServletException, IOException {
+		VistaSolicitudes bean = obtenerSolicitudes();
+		VistaSolicitudes bean2 = obtenerBolsasCandidato();
+		VistaSolicitudes bean3 = obtenerMeritosBolsa();
+		
+		PeticionHttp peticion = UtilsTestBolsaEmpleo.peticionAutenticadaCandidato2();
+		peticion.setParameter(ControladorMisSolicitudes.PARAM_ACCION, ControladorMisSolicitudes.ACCION_MERITO_AFINIDAD_INDIVIDUALIZADO);
+		peticion.setParameter(ControladorMisSolicitudes.PARAM_SOLICITUD_ID, bean.getDatatableSolicitudes().getData().get(0).getCodNum().toString());
+		peticion.setParameter(ControladorMisSolicitudes.PARAM_BOLSA, bean2.getDatatableBolsasSolicitud().getData().get(0).getCodNum().toString());
+		peticion.setParameter(ControladorMisSolicitudes.PARAM_MERITO_ID, bean3.getDataTableMeritos().getData().get(0).getCodNum().toString());
+		peticion.setParameter(ControladorMisSolicitudes.PARAM_AFINIDAD_ID, "4");
+		
+		RespuestaHttp respuesta = new RespuestaHttp();
+		ControladorMisSolicitudes controlador = new ControladorMisSolicitudes();
+		controlador.doGet(peticion, respuesta);
+		
+		VistaSolicitudes bean4 = (VistaSolicitudes) peticion.getUVDatos().getVistas().get(VistaSolicitudes.class.getName());
+		
+		assertNotNull(MENSAJE_MERITO_DEVUELTO, bean4.getMerito());
+		assertEquals(MENSAJE_SIN_ERROR, 0, bean4.getMensajesDeError().size());
+		assertEquals(MENSAJE_SIN_ADVERTENCIAS, 0, bean4.getMensajesDeAdvertencia().size());
+	}
+	
 	/** Obtener datatable areas de la solicitud con parámetro erróneo de la tabla para forzar error .
 	 * @throws SQLException si fallo bd .
 	 * @throws IOException si error io .
@@ -497,7 +526,7 @@ public class TestBEPControladorMisSolicitudes {
 	 * @throws ServletException  si error servlet .
 	 */
 	@Test
-	public void testA14ResumenSolicitud() throws SQLException, ServletException, IOException {
+	public void testA15ResumenSolicitud() throws SQLException, ServletException, IOException {
 		VistaSolicitudes bean = obtenerSolicitudes();
 		
 		PeticionHttp peticion = UtilsTestBolsaEmpleo.peticionAutenticadaCandidato2();
@@ -521,7 +550,7 @@ public class TestBEPControladorMisSolicitudes {
 	 * @throws ServletException  si error servlet .
 	 */
 	@Test
-	public void testA15ConfirmarSolicitud() throws SQLException, ServletException, IOException {
+	public void testA16ConfirmarSolicitud() throws SQLException, ServletException, IOException {
 		VistaSolicitudes bean = obtenerSolicitudes();
 		
 		PeticionHttp peticion = UtilsTestBolsaEmpleo.peticionAutenticadaCandidato2();
