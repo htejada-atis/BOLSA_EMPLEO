@@ -1095,7 +1095,10 @@ public class ControladorMisSolicitudes extends HttpServlet {
 		document.add(new Paragraph("\n"));
 					
 		for (MeritoPreferenteUsuario m : ModeloMeritosPreferentesCandidato.obtenerInstancia().listaMeritosCandidatoPorPosesion(usuario)) {			
-			document.add(new Paragraph(m.getCodNum() + " " + m.getDescripcion()));
+			document.add(new Paragraph(m.getCodNum() + " " 
+					+ m.getMeritoPreferente().getNombre() 
+					+ (m.getMeritoPreferenteOpcion() != null ? (" " + m.getMeritoPreferenteOpcion().getNombre()) : "")
+					+ (m.getDescripcion() != null ? (" " + m.getDescripcion()) : "")));
 			document.add(new Paragraph("\n"));
 		}
 	}
