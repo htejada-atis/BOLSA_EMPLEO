@@ -25,7 +25,7 @@ VistaUsuarioAutoregistrado bean = (VistaUsuarioAutoregistrado)uvdatos.getVistas(
 			<select name="<%=ControladorUsuarioAutoregistrado.PARAM_TIPO_DOCUMENTO%>">
 				<option value="NIF">(NIF) N&uacute;mero de Identificaci&oacute;n Fiscal</option>
 				<option value="PAS">(PAS) Pasaporte</option>
-				<option value="NIE">(NIF) N&uacute;mero de Identificaci&oacute;n de Extranjero</option>
+				<option value="NIE">(NIE) N&uacute;mero de Identificaci&oacute;n de Extranjero</option>
 			</select> <br/>
 			N&uacute;mero documento <input type="text" name="<%=ControladorUsuarioAutoregistrado.PARAM_DOCUMENTO%>"/> <br/>
 			Nombre <input type="text" name="<%=ControladorUsuarioAutoregistrado.PARAM_NOMBRE%>"/> <br/>

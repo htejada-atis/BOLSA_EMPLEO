@@ -1,6 +1,10 @@
 Insert into ADM_PARAMETROS
    (CONFIG_CODALF, PARAM_CODALF, DESID, VALOR)
  Values
+   ('default', 'autoregistrado.validaNif', 'indica si hay que validad la letra del nif', 'S');
+Insert into ADM_PARAMETROS
+   (CONFIG_CODALF, PARAM_CODALF, DESID, VALOR)
+ Values
    ('default', 'administracion.recaptcha.claveDelSitio', 'clave del sitio para recaptcha', '6LfN36sUAAAAAIJvKq9WgOnlTxoCiumJPKks0l_2');
 Insert into ADM_PARAMETROS
    (CONFIG_CODALF, PARAM_CODALF, DESID, VALOR)
