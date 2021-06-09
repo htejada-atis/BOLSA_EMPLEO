@@ -212,7 +212,6 @@ $(document).ready(function() {
 	var tableCandidatos = new Atis.DataTable('#tableCandidatos', {
 	    "ajax": { url: "<%= ControladorValidarNoAfines.URL_PATTERN_AJAX %>", async: false },
 	    "pageSize": 10,
-	    "filterable": true,
 	    "action": "<%= ControladorValidarNoAfines.ACCION_DATATABLE_CANDIDATOS %>",
 	    "title": 'LISTA DE USUARIOS',
 	    "dropdown": true,
@@ -227,8 +226,8 @@ $(document).ready(function() {
 	    }},
 	    <% if (candidato != null) { %> "selected": <%= candidato.getCodNum() %> ,<% } %>
 	    "columns": [
-	    	{'data': 'prsnif', 'filter': true},
-	    	{'data': 'apellido1', 'filter': true, 'overflow': 'auto', 'render': function(row) {
+	    	{'data': 'prsnif'},
+	    	{'data': 'apellido1', 'order': false, 'overflow': 'auto', 'render': function(row) {
         		return row.nombre + " " + row.apellido1 + " " + row.apellido2; 
         	}},
 	        {'data': 'totalMeritosNoValidados', 'order': false, 'class': 'center', 'render': function(row) { return isNaN(row.totalMeritosNoValidados) ? 0 : row.totalMeritosNoValidados; } },
@@ -296,7 +295,7 @@ $(document).ready(function() {
 			    "pageSize": 10,
 			    "selectable": {'all': false},
 			    "action": "<%= ControladorValidarNoAfines.ACCION_DATATABLE_BOLSAS_CANDIDATO %>",
-			    "title": 'BOLSAS EN LAS QUE ESTÁ APUNTADO ACTUALMENTE EL CANDIDATo',
+			    "title": 'BOLSAS EN LAS QUE ESTÁ APUNTADO ACTUALMENTE EL CANDIDATO',
 			    "dropdown": true,
 			    "params": {
 			    	'<%=ControladorValidarNoAfines.PARAM_BOLSA%>': '<%= bolsa.getCodNum() %>',
@@ -332,15 +331,15 @@ $(document).ready(function() {
 			    	'<%= ControladorValidarNoAfines.PARAM_MERITO %>': '<%= merito.getMerito().getCodNum() %>'
 			    	},
 			    "columns": [
-			    	{'data': 'meritoSolicitud.merito.codNum', 'filter': {'type': 'number'}},
-			        {'data': 'bolsa.codNum', 'filter': true, 'render': function(row) {
+			    	{'data': 'meritoSolicitud.merito.codNum', 'order': false},
+			        {'data': 'bolsa.codNum', 'render': function(row) {
 			        	return row.bolsa.area.idAreaExterno + " : " + row.bolsa.area.descripcion;
 		        	}},
-		        	{'data': 'meritoSolicitud.merito.valor'},
-		        	{'data': 'meritoSolicitud.excluido', 'render': function(row) {
+		        	{'data': 'meritoSolicitud.merito.valor', 'order': false},
+		        	{'data': 'meritoSolicitud.excluido', 'order': false, 'render': function(row) {
 		        		return row.meritoSolicitud && row.meritoSolicitud.excluido ? 'SI' : 'NO';
 		        	}},
-		        	{'data': 'meritoSolicitud.codNum', 'render': function(row) {
+		        	{'data': 'meritoSolicitud.codNum', 'order': false, 'render': function(row) {
 		        		if (row.meritoSolicitud.codNum) {
 		        			return 'SI';
 		        		} else {

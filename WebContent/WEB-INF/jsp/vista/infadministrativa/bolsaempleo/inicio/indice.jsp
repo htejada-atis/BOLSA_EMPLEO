@@ -110,7 +110,7 @@ VistaUsuarioBolsaEmpleo beanUsuario = (VistaUsuarioBolsaEmpleo) uvdatos.getVista
 		
 		comprobarNoticiasCargadas();
 		
-		if(!ids_noticias.length > 3) {
+		if(ids_noticias.length < 3) {
 			$("#view_all").hide();
 		}
 		

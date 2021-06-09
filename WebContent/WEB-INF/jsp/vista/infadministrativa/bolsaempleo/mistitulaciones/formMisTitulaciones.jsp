@@ -43,35 +43,42 @@ VistaTitulaciones bean = (VistaTitulaciones) uvdatos.getVistas().get(VistaTitula
 		</tfoot>
 	</table>
 	
-	<p>Las etiquetas en <strong>negrita</strong> corresponden a campos de relleno obligatorio</p>
-	
-	<form id="agregar_titulacion_usuario" class="be-form" method="post" action="<%= request.getRequestURI() %>" enctype="multipart/form-data" style="<%= bean.getTitulacion() != null ? "" : "display:none;" %>">
-    	<input type="hidden" name="<%= ControladorMisTitulaciones.PARAM_ACCION %>" id="accion_formulario" 
-    			value="<%= ControladorMisTitulaciones.ACCION_AGREGAR_TITULACION %>" />
-		<input type="hidden" name="<%= ControladorMisTitulaciones.PARAM_ID%>" id="titulacion_id" 
-				value="<%= bean.getTitulacion() != null ? bean.getTitulacion().getCodNum() : "" %>" />
-				
-		<div class="form-group" id="otratitulacion" style="display:none;">
-    		<label for="nombre" class="bold-label">Nombre titulación: </label>
-    		<input class="form-input-custom" id="nombre" type="text"
-    			name="<%= ControladorMisTitulaciones.PARAM_OTRA_TITULACION %>" 
-    			value="<%=BolsaEmpleoUtils.getParamForm(request, ControladorMisTitulaciones.PARAM_OTRA_TITULACION, "")%>"/>
-    	</div>
-    	
-		<div class="form-group">
-    		<label for="razon_exclusion" class="bold-label">Descripción</label>
-    		<textarea class="params form-input-custom" id="descripcion" name="<%= ControladorMisTitulaciones.PARAM_DESCRIPCION %>" rows="3" cols="60" required><%=BolsaEmpleoUtils.getParamForm(request, ControladorMisTitulaciones.PARAM_DESCRIPCION, "")%></textarea>
-   		</div>
-   		   		
-    	<div class="form-file">
-			<label for="fichero_archivo" class="bold-label">Fichero:</label>
-			<input id="fichero_archivo" type="file" name="<%= ControladorMisTitulaciones.PARAM_ARCHIVO %>" required/>
-		</div>
+	<div id="contenedor_agregar_titulacion" style="<%= bean.getTitulacion() != null ? "" : "display:none;" %>">
 		
-    	<div class="form-btn">
-    		<input id="agregar_titulacion" type="submit" name="<%= ControladorMisTitulaciones.ACCION_AGREGAR_TITULACION %>" value="Enviar titulación"/>
-    	</div>
-    </form>
+	<%	if (bean.getTitulacion() != null) { %>
+			<h3 style="margin-top: 16px"><%= bean.getTitulacion().getNombre() %></h3>
+	<%	} %>
+		
+		<p>Las etiquetas en <strong>negrita</strong> corresponden a campos de relleno obligatorio</p>
+		
+		<form id="agregar_titulacion_usuario" class="be-form" method="post" action="<%= request.getRequestURI() %>" enctype="multipart/form-data">
+	    	<input type="hidden" name="<%= ControladorMisTitulaciones.PARAM_ACCION %>" id="accion_formulario" 
+	    			value="<%= ControladorMisTitulaciones.ACCION_AGREGAR_TITULACION %>" />
+			<input type="hidden" name="<%= ControladorMisTitulaciones.PARAM_ID%>" id="titulacion_id" 
+					value="<%= bean.getTitulacion() != null ? bean.getTitulacion().getCodNum() : "" %>" />
+					
+			<div class="form-group" id="otratitulacion" style="display:none;">
+	    		<label for="nombre" class="bold-label">Nombre titulación: </label>
+	    		<input class="form-input-custom" id="nombre" type="text"
+	    			name="<%= ControladorMisTitulaciones.PARAM_OTRA_TITULACION %>" 
+	    			value="<%=BolsaEmpleoUtils.getParamForm(request, ControladorMisTitulaciones.PARAM_OTRA_TITULACION, "")%>"/>
+	    	</div>
+	    	
+			<div class="form-group">
+	    		<label for="razon_exclusion" class="bold-label">Descripción</label>
+	    		<textarea class="params form-input-custom" id="descripcion" name="<%= ControladorMisTitulaciones.PARAM_DESCRIPCION %>" rows="3" cols="60" required><%=BolsaEmpleoUtils.getParamForm(request, ControladorMisTitulaciones.PARAM_DESCRIPCION, "")%></textarea>
+	   		</div>
+	   		   		
+	    	<div class="form-file">
+				<label for="fichero_archivo" class="bold-label">Fichero:</label>
+				<input id="fichero_archivo" type="file" name="<%= ControladorMisTitulaciones.PARAM_ARCHIVO %>" required/>
+			</div>
+			
+	    	<div class="form-btn">
+	    		<input id="agregar_titulacion" type="submit" name="<%= ControladorMisTitulaciones.ACCION_AGREGAR_TITULACION %>" value="Enviar titulación"/>
+	    	</div>
+	    </form>
+    </div>
 </div>
 
 <script>
@@ -111,7 +118,7 @@ $(document).ready(function() {
 		$('#btnVolver').show();
 		$('#btnOtraTitulacion').hide();
 		
-		$('#agregar_titulacion_usuario').show();
+		$('#contenedor_agregar_titulacion').show();
 		
 		$('#descripcion').val("");
 		$('#fichero_archivo').val(null);
@@ -128,7 +135,7 @@ $(document).ready(function() {
 		$('#btnVolver').hide();
 		$('#btnOtraTitulacion').show();
 		
-		$('#agregar_titulacion_usuario').hide();
+		$('#contenedor_agregar_titulacion').hide();
 
 		$('#descripcion').val("");
 		$('#fichero_archivo').val(null);

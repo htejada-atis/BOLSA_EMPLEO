@@ -289,7 +289,9 @@ VistaSolicitudes bean = (VistaSolicitudes) uvdatos.getVistas().get(VistaSolicitu
 			    "filterable": true,
 			    "title": 'MIS MÉRITOS: <%=bean.getArea().getArea().getDescripcion()%>',
 			    "selected": meritosBolsaSolicitud,
-			    "defaultOrderBy": 1,
+			    "defaultOrderBy": 2,
+			    "pageSize": 50,
+			    "pageSizeOptions": [10, 50, 100],
 			    "action": "<%=ControladorMisSolicitudes.ACCION_DATATABLE_MERITOS_BOLSA%>",
 			    "params": {
 			    	"<%=ControladorMisSolicitudes.PARAM_SOLICITUD_ID%>": <%=bean.getSolicitud().getCodNum()%>,

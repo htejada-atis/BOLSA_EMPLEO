@@ -76,24 +76,15 @@ public class ControladorMisMeritos extends HttpServlet {
 	public static final String PARAM_VALOR = "valor";
 	
 	// mensajes
-	public static final String MENSAJE_ENVIADO = "mensaje";
-	
-	public static final String MENSAJE_ERROR_APARTADO_REQUERIDO = "Debe seleccionar un apartado";
 	public static final String MENSAJE_ERROR_DESCRIPCION_LARGO = "La descripción no puede contener mas de %d caracteres";
 	public static final String MENSAJE_ERROR_DESCRIPCION_VACIA = "La descripción no puede estar vacía";
-	public static final String MENSAJE_ERROR_ITEM_REQUERIDO = "Debe seleccionar un ítem";
 	public static final String MENSAJE_ERROR_OBSERVACION_LARGO = "La observación no puede contener mas de %d caracteres";
-	public static final String MENSAJE_ERROR_VALOR_VACIO = "El valor no puede estar vacio";
 	public static final String MENSAJE_ERROR_VALOR_MAXIMO_PERMITIDO = "El valor máximo permitido es %s";
 	public static final String MENSAJE_ERROR_VALOR_MINIMO_PERMITIDO = "El valor mínimo permitido es %s";
 	public static final String MENSAJE_ERROR_MERITOS_SELECCIONADOS_INCORRECTOS = "No hay méritos seleccionados válidos";
 	public static final String MENSAJE_ERROR_ELIMINAR_MERITO = "No se puede eliminar un mérito que ya está asociado a una solicitud";
-	
-	
 	public static final String MENSAJE_ERROR_VALOR_DECIMAL_NO_PERMITIDO = "El valor debe ser decimal";
 	public static final String MENSAJE_ERROR_VALOR_ENTERO_NO_PERMITIDO = "El valor debe ser entero";
-	
-	
 	public static final String MENSAJE_EXITO_AGREGAR = "Mérito agregado correctamente";
 	public static final String MENSAJE_EXITO_ELIMINAR = "Mérito eliminado correctamente";
 	
@@ -102,10 +93,8 @@ public class ControladorMisMeritos extends HttpServlet {
 	public static final String JSP_INDEX = RUTA_BEP_MERITOS + "index.jsp";
 	public static final String JSP_FORM = RUTA_BEP_MERITOS + "formMerito.jsp";
 	
-	// urls
-	public static final String URL_PATTERN_AJAX = "/srv/es/ajax/informacionadministrativa/bolsaempleo/mismeritos";
-	
 	// ajax
+	public static final String URL_PATTERN_AJAX = "/srv/es/ajax/informacionadministrativa/bolsaempleo/mismeritos";
 	public static final String RESPONSE_AJAX_CONTENTTYPE = "application/json";
 	public static final String RESPONSE_AJAX_ENCODING = "UTF-8";
 	public static final String RESPONSE_AJAX_ERROR = "error";
@@ -404,7 +393,7 @@ public class ControladorMisMeritos extends HttpServlet {
 	 * @return .
 	 * @throws UVException .
 	 */
-	public static Float validateValorDelMerito(HttpServletRequest request, Merito merito) throws UVException {
+	public static Double validateValorDelMerito(HttpServletRequest request, Merito merito) throws UVException {
 		// chequeo tipo de valor
 		String valorStr = request.getParameter(PARAM_VALOR);
 		switch (merito.getItemBaremacion().getUnidades()) {
@@ -425,8 +414,8 @@ public class ControladorMisMeritos extends HttpServlet {
 		}
 		
 		// chequeo máximo y mínimo
-		Float valor = merito.getItemBaremacion().getUnidades().equals(ModeloBaremacionItems.ITEM_UNIDADES_MEDICION_SINO) 
-				? BolsaEmpleoUtils.leeParametroFloat("1.0") : BolsaEmpleoUtils.leeParametroFloat(valorStr);
+		Double valor = merito.getItemBaremacion().getUnidades().equals(ModeloBaremacionItems.ITEM_UNIDADES_MEDICION_SINO) 
+				? Formateador.leeParametroDouble("1.0") : Formateador.leeParametroDouble(valorStr);
 		
 		if (valor == null) {
 			throw new UVException("El valor no es válido");

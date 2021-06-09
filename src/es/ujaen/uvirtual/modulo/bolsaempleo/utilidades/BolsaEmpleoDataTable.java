@@ -62,26 +62,19 @@ public class BolsaEmpleoDataTable<T> {
 		
 		private String columnName;
 		private int columnType;
-
-		/**
-		 * Constructor por parámetros .
-		 * 
-		 * @param pcolumnName .
-		 */
-		public DataTableColumn(String pcolumnName) {
-			this.columnName = pcolumnName;
-			this.columnType = COLUMN_TYPE_TEXT;
-		}
+		private String columnOrder;
 
 		/**
 		 * Constructor por parámetros .
 		 * 
 		 * @param pcolumnName .
 		 * @param pcolumnType .
+		 * @param pcolumnOrder .
 		 */
-		public DataTableColumn(String pcolumnName, int pcolumnType) {
+		public DataTableColumn(String pcolumnName, int pcolumnType, String pcolumnOrder) {
 			this.columnName = pcolumnName;
 			this.columnType = pcolumnType;
+			this.columnOrder = pcolumnOrder;
 		}
 
 		public String getName() {
@@ -90,6 +83,10 @@ public class BolsaEmpleoDataTable<T> {
 
 		public int getType() {
 			return columnType;
+		}
+		
+		public String getOrder() {
+			return columnOrder;
 		}
 	}
 
@@ -107,7 +104,6 @@ public class BolsaEmpleoDataTable<T> {
 			return list.contains(arg0.getName());
 		}
 	};
-	
 
 	private String query;
 	private String queryCount;
@@ -130,10 +126,8 @@ public class BolsaEmpleoDataTable<T> {
 	 */
 	public BolsaEmpleoDataTable(Map<String, String[]> params) throws UVException {
 		try {
-			this.currentPage = Integer.parseInt(String.join("",
-					params.getOrDefault(PARAM_CURRENT_PAGE, new String[] {PARAM_CURRENT_PAGE_VALUE_DEFAULT})));
-			this.pageSize = Integer.parseInt(String.join("",
-					params.getOrDefault(PARAM_PAGE_SIZE, new String[] {PARAM_PAGE_SIZE_VALUE_DEFAULT})));
+			this.currentPage = Integer.parseInt(String.join("", params.getOrDefault(PARAM_CURRENT_PAGE, new String[] {PARAM_CURRENT_PAGE_VALUE_DEFAULT})));
+			this.pageSize = Integer.parseInt(String.join("", params.getOrDefault(PARAM_PAGE_SIZE, new String[] {PARAM_PAGE_SIZE_VALUE_DEFAULT})));
 
 			String paramOrderBy = String.join("", params.getOrDefault(PARAM_ORDER_BY, new String[] {""}));
 			if (paramOrderBy != null && !paramOrderBy.isBlank()) {
@@ -149,9 +143,7 @@ public class BolsaEmpleoDataTable<T> {
 		try {
 			String paramFilters = String.join("", params.getOrDefault(PARAM_FILTER, new String[] {""}));
 			if (paramFilters != null && !paramFilters.isBlank()) {
-				filters = new GsonBuilder().create().fromJson(paramFilters, 
-						new TypeToken<HashMap<Integer, String>>() { }.getType()
-				);
+				filters = new GsonBuilder().create().fromJson(paramFilters, new TypeToken<HashMap<Integer, String>>() { }.getType());
 			}
 		} catch (Exception ex) {
 			LOGGER.log(Level.WARNING, "Error Datatable {0}", ex.toString());
@@ -175,8 +167,7 @@ public class BolsaEmpleoDataTable<T> {
 		String consulta = this.prepareQuery(pconsulta);
 		
 		this.queryCount = "SELECT COUNT(*) AS count FROM (" + consulta + ")";
-		this.query = consulta + " OFFSET " + (this.pageSize * this.currentPage) + " ROWS FETCH NEXT "
-				+ this.pageSize + " ROWS ONLY";
+		this.query = consulta + " OFFSET " + (this.pageSize * this.currentPage) + " ROWS FETCH NEXT " + this.pageSize + " ROWS ONLY";
 
 		if (VERBOSE) {
 			LOGGER.log(Level.INFO, "DATATABLE ---------------------------------------");
@@ -293,7 +284,7 @@ public class BolsaEmpleoDataTable<T> {
 	 * @param column .
 	 */
 	public void setColumn(Integer index, String column) {
-		columns.put(index, new DataTableColumn(column));
+		this.setColumn(index, column, DataTableColumn.COLUMN_TYPE_TEXT, null);		
 	}
 
 	/**
@@ -304,9 +295,20 @@ public class BolsaEmpleoDataTable<T> {
 	 * @param type   .
 	 */
 	public void setColumn(Integer index, String column, int type) {
-		columns.put(index, new DataTableColumn(column, type));
+		this.setColumn(index, column, type, null);
 	}
 
+	/**
+	 * Establece la lista de columnas ordenables, con su tipo de where y custom order.
+	 * @param index .
+	 * @param column .
+	 * @param type .
+	 * @param order .
+	 */
+	public void setColumn(Integer index, String column, int type, String order) {
+		columns.put(index, new DataTableColumn(column, type, order));
+	}
+	
 	/**
 	 * Devuleve el json del estado actual del datatable.
 	 * @return .
@@ -342,13 +344,20 @@ public class BolsaEmpleoDataTable<T> {
 		if (this.columns.get(this.orderBy) == null) {
 			throw new UVException(ERROR_MSG_COLUMNA_ORDENACION_NO_VALIDA);
 		}
-			
-		String column = this.columns.get(this.orderBy).getName();
+		
+		DataTableColumn column = this.columns.get(this.orderBy);
 		if (column == null) {
 			throw new UVException(ERROR_MSG_COLUMNA_ORDENACION_NO_VALIDA);
 		}
+							
+		String columnOrder = column.getOrder();
+		
+		if (columnOrder != null) {
+			return " ORDER BY " + String.format(columnOrder, this.orderDirection);
+		}
 
-		return " ORDER BY " + column + " " + this.orderDirection;
+		String columnName = column.getName();
+		return " ORDER BY " + columnName + " " + this.orderDirection;
 	}
 
 	private String filterByQuery() throws UVException {

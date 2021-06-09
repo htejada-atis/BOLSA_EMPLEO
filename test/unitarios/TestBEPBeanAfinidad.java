@@ -21,7 +21,7 @@ public class TestBEPBeanAfinidad {
 	private static final Integer ID_AFINIDAD = 1000;
 	private static final String CODIGO = "AAA";
 	private static final String DESCRIPCION = "pruebas de afinidad";
-	private static final Double MODULACION = (double) 10000;
+	private static final Double MODULACION = (double) 1000;
 	private static final Boolean BORRADA = false;
 	private static final Date FECHA_BORRADA = null;
 

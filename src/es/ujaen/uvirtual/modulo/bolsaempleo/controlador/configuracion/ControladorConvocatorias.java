@@ -215,7 +215,7 @@ public class ControladorConvocatorias extends HttpServlet {
 			try {
 				BolsaEmpleoDataTable<Convocatoria> dataTable = modelo.listaConvocatoriasDatatable(request.getParameterMap());
 				bean.setDatatableConvocatorias(dataTable);				
-				writer.write(dataTable.toJson());
+				writer.write(dataTable.toJson("dd/M/yyyy HH:mm:ss"));
 			} catch (UVException e) {
 				LOGGER.log(Level.WARNING, e.toString());
 				bean.getMensajesDeError().add(e.getMessage());
@@ -345,6 +345,7 @@ public class ControladorConvocatorias extends HttpServlet {
 		if (c.getFechaCierre().before(BolsaEmpleoUtils.getCurrentDate())) {
 			throw new UVException(MENSAJE_ERROR_FECHACIERRE_MINIMA);
 		}
+		c.setFechaCierre(BolsaEmpleoUtils.setDateTimeAtEndOfDay(c.getFechaCierre()));
 		
 		c.setNumBolsasMaximo(Formateador.leeParametroInteger(request.getParameter(PARAM_CONVOCATORIA_NUMEROBOLSASMAXIMO)));
 		if (c.getNumBolsasMaximo() == null) {

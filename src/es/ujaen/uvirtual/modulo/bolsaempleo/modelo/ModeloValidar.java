@@ -45,6 +45,10 @@ public class ModeloValidar {
 	public static final int ORDER_COLUMN_INDEX_CODIGO_MERITO = 2;
 	public static final int ORDER_COLUMN_INDEX_VALOR_MERITO = 3;
 	
+	public static final int ORDER_COLUMN_INDEX_ID_MERITO_VALORES = 0;
+	public static final int ORDER_COLUMN_INDEX_ID_AREA_VALORES = 1;
+	public static final int ORDER_COLUMN_INDEX_VALOR_MERITO_VALORES = 2;
+	
 	public static final String TOTAL_NO_VALIDADO = "TOTAL_NO_VALIDADO";
 	public static final String TOTAL_VALIDADO = "TOTAL_VALIDADO";
 	public static final String TOTAL_EXCLUIDO = "TOTAL_EXCLUIDO";
@@ -464,7 +468,7 @@ public class ModeloValidar {
 		
 		// seleccionamos los candidatos, con meritos, en la convocatoria pasada
 		String consulta = 
-				"SELECT bepusu.CODNUM, "
+				"SELECT bepusu.CODNUM, bepusu.VUAJA_PRSNIF,"
 				+ "	(" + consultaCount + " AND bepsbm.FLGVALIDADO = 'N' AND bepsbm.FLGEXCLUIDO = 'N') COUNT_NO_VALIDADOS,"
 				+ "	(" + consultaCount + " AND bepsbm.FLGVALIDADO = 'S' AND bepsbm.FLGEXCLUIDO = 'N') COUNT_VALIDADOS,"
 				+ "	(" + consultaCount + " AND bepsbm.FLGEXCLUIDO = 'S') COUNT_EXCLUIDOS,"
@@ -479,10 +483,9 @@ public class ModeloValidar {
 		// agrega el filtro de afinidad
 		consulta += afinidad ? " AND bepite.AFINIDAD IS NOT NULL" : " AND bepite.AFINIDAD IS NULL";
 		
-		consulta += " GROUP BY bepusu.CODNUM ";
+		consulta += " GROUP BY bepusu.CODNUM, bepusu.VUAJA_PRSNIF ";
 
 		dataTable.setColumn(ORDER_COLUMN_INDEX_NUMDOCUMENTO_CANDIDATO, "bepusu.VUAJA_PRSNIF");
-		dataTable.setColumn(ORDER_COLUMN_INDEX_NOMBRE_Y_APELLIDOS_CANDIDATO, "bepusu.VUAJA_PRSNIF");
 
 		dataTable.setQuery(consulta);
 		
@@ -619,6 +622,9 @@ public class ModeloValidar {
 				+ "	INNER JOIN TBEP_SOLICITUDES bepsol ON bepsol.CODNUM = bepsbo.BEPSOL_CODNUM"
 				+ "	LEFT JOIN TBEP_SOL_BOL_MERITOS bepsbm ON bepsbm.BEPSBO_CODNUM = bepsbo.CODNUM AND bepsbm.BEPMER_CODNUM = ?"
 				+ "	WHERE bepbol.FLGBAREMABLE = 'S' AND bepsol.BEPCON_CODNUM = ? AND bepsol.BEPUSU_CODNUM = ?";
+		
+		dataTable.setColumn(ORDER_COLUMN_INDEX_ID_MERITO_VALORES, "bepsbm.BEPMER_CODNUM", DataTableColumn.COLUMN_TYPE_NUMBER);
+		dataTable.setColumn(ORDER_COLUMN_INDEX_ID_AREA_VALORES, "bepare.CODNUM", DataTableColumn.COLUMN_TYPE_NUMBER);
 		
 		dataTable.setQuery(consulta);
 		

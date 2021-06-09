@@ -23,8 +23,8 @@ public class TestBEPBeanBloqueBaremacion {
 	private static final String APARTADO_CODIGO = "AAA";
 	private static final String APARTADO_NOMBRE = "EEEE";
 	private static final Boolean APARTADO_ACTIVO = true;
-	private static final Float APARTADO_PUNTUACIONMAXIMA = (float) 1;
-	private static final Float APARTADO_PORCENTAJEMAXIMO = (float) 1;
+	private static final Double APARTADO_PUNTUACIONMAXIMA = (double) 1;
+	private static final Double APARTADO_PORCENTAJEMAXIMO = (double) 1;
 	
 	private static final Integer BLOQUE_CODNUM = 7;
 	private static final String BLOQUE_CODIGO = "A";

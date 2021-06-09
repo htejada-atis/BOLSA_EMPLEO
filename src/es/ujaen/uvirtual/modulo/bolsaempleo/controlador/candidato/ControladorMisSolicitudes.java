@@ -82,14 +82,12 @@ public class ControladorMisSolicitudes extends HttpServlet {
 	private static final String NOMBREDEESTACLASE = ControladorMisSolicitudes.class.getName();
 	private static final Logger LOGGER = Logger.getLogger(NOMBREDEESTACLASE);
 	public static final String PARAM_ACCION = "a";
-	public static final String PARAM_ACCION_ENVIAR = "enviar"; 
 	public static final String PARAM_BOLSA = "bolsa";
 	public static final String PARAM_BOLSAS = "bolsas";
 	public static final String PARAM_CONVOCATORIA_ID = "idConvocatoria";
 	public static final String PARAM_MERITO_ID = "merito";
 	public static final String PARAM_SOLICITUD_ID = "idSolicitud";
 	public static final String PARAM_AFINIDAD_ID = "idAfinidad";
-	public static final String PARAM_MERITO_SOLICITUD_ID = "idMeritoSolicitud";
 	public static final String PARAM_AFINIDADES = "afinidades";
 	
 	// acciones solicitudes
@@ -125,21 +123,15 @@ public class ControladorMisSolicitudes extends HttpServlet {
 	public static final String MENSAJE_ENVIADO = "enviadomissolicitudes";
 	public static final String MENSAJE_ERROR_ACCION_NO_CONTEMPLADA = "Acción no contemplada";
 	public static final String MENSAJE_ERROR_BOLSAS_SELECCIONADAS_INCORRECTAS = "No hay bolsas seleccionadas válidas";
-	public static final String MENSAJE_ERROR_BORRAR_BOLSA = "No puede deseleccionar ésta bolsa, tiene méritos asociados";
-	public static final String MENSAJE_ERROR_CONVOCATORIA_ID_REQUERIDA = "El id de la convocatoria es requerído";
 	public static final String MENSAJE_ERROR_ITEM_EXCLUYENTE = "El item que ha seleccionado es excluyente con los items: ";
 	public static final String MENSAJE_ERROR_MERITOS_SIN_VALORACION = "No puede haber méritos con afinidad sin valoración";
 	public static final String MENSAJE_ERROR_MERITO_NO_NULO = "Merito no puede ser nulo";
 	public static final String MENSAJE_ERROR_NUMERO_MAXIMO_MERITOS_BLOQUE = "Se ha alcanzado el número máximo de méritos por bloque";
 	public static final String MENSAJE_ERROR_SIN_MERITOS = "Dene incluir al menos un mérito en una bolsa para continuar";
-	public static final String MENSAJE_ERROR_SOLICITUD_ID_REQUERIDO = "El id de la solicitud es requerído";
-	public static final String MENSAJE_ERROR_SOLICITUD_NO_NULO = "Solicitud no puede ser nula";
 	public static final String MENSAJE_EXITO_SOLICITUD_CONFIRMADA = "La solicitud ha sido confirmada correctamente";
 	public static final String MENSAJE_ERROR_FALTAN_DATOS_CONFIRMAR_SLICITUD = "Para confirmar la solicitud debe primero completar sus datos personales."
 			+ " Completelos en la sección 'Mis Datos'.";
 		
-	public static final int RESPONSE_HTTP_CODE_ERROR = 400;
-	
 	// ruta vistas
 	public static final String RUTA_BEP_SOL = "/WEB-INF/jsp/vista/infadministrativa/bolsaempleo/missolicitudes/";
 	public static final String JSP_INDEX = RUTA_BEP_SOL + "indexSolicitudes.jsp";
@@ -163,7 +155,6 @@ public class ControladorMisSolicitudes extends HttpServlet {
 	public static final int SIZE_10 = 10;
 	public static final int SIZE_20 = 20;
 	public static final int SIZE_30 = 30;
-	public static final int SIZE_40 = 40;
 	public static final int SIZE_100 = 100;	
 	public static final int COLOR_51 = 51;
 	public static final int COLOR_153 = 153;
@@ -715,25 +706,25 @@ public class ControladorMisSolicitudes extends HttpServlet {
 
 		// parseamos json bolsas
 		Gson gson = new GsonBuilder().create();
-		HashMap<String, Float> afinidadesRaw;
+		HashMap<String, Double> afinidadesRaw;
 		try {			
 			afinidadesRaw = gson.fromJson(request.getParameter(PARAM_AFINIDADES), 
-					new TypeToken<HashMap<String, Float>>() { }.getType());					
+					new TypeToken<HashMap<String, Double>>() { }.getType());					
 		} catch (Exception e) {
 			throw new UVException("Afinidades incorrectas");
 		}
 		
 		// comprobamos validez de las afinidades
-		HashMap<Afinidad, Float> afinidades = new HashMap<>();
+		HashMap<Afinidad, Double> afinidades = new HashMap<>();
 		ModeloAfinidad modeloAfinidad = ModeloAfinidad.obtenerInstancia();
-		Float total = (float) 0.0;				
-		for (Map.Entry<String, Float> entry : afinidadesRaw.entrySet()) {
+		Double total = 0.0;				
+		for (Map.Entry<String, Double> entry : afinidadesRaw.entrySet()) {
 			Afinidad a = modeloAfinidad.getAfinidadById(Formateador.leeParametroInteger(entry.getKey()));
 			afinidades.put(a, entry.getValue());
 			total += entry.getValue(); 
 		}
 		
-		Float totalRounder = (float) BolsaEmpleoUtils.redondeo(total);		
+		Double totalRounder = BolsaEmpleoUtils.redondeo(total);		
 		if (!totalRounder.equals(merito.getValor())) {
 			throw new UVException("El total de afinidades tiene que ser igual al valor del mérito");
 		}
@@ -818,8 +809,8 @@ public class ControladorMisSolicitudes extends HttpServlet {
 	private void listadoMeritosCandidato(VistaSolicitudes bean, UVDatos datos, HttpServletRequest request, HttpServletResponse response)
 			throws IOException, SQLException, UVException {
 		
-		datos.setContentType(RESPONSE_AJAX_CONTENTTYPE);
 		datos.setRespuestaEnviada(true);
+		datos.setContentType(RESPONSE_AJAX_CONTENTTYPE);		
 		response.setContentType(RESPONSE_AJAX_CONTENTTYPE);
 		response.setCharacterEncoding(RESPONSE_AJAX_ENCODING);
 		
@@ -887,7 +878,6 @@ public class ControladorMisSolicitudes extends HttpServlet {
 		Solicitud solicitud = this.getSolicitud(bean, request);
 		bean.setSolicitud(solicitud);
 		
-		
 		List<Titulacion> titulaciones = modeloTitulacion.listaTitulacionesCandidato(bean.getUsuarioLogeado().getCodNum());
 		bean.setListaTitulaciones(titulaciones);
 		
@@ -935,7 +925,7 @@ public class ControladorMisSolicitudes extends HttpServlet {
 		}
 		
 		solicitud.setEstado(ModeloSolicitud.SOLICITUD_ESTADO_CERRADA);
-		solicitud.setFechaConfirmacion(BolsaEmpleoUtils.getCurrentDate());
+		solicitud.setFechaConfirmacion(BolsaEmpleoUtils.getCurrentDateTime());
 		solicitud.setArchivo(generarPDF(bean, solicitud, listaBolsas));
 		
 		modeloSolicitud.confirmacionSolicitud(solicitud, bean.getUsuarioLogeado());
@@ -1006,19 +996,30 @@ public class ControladorMisSolicitudes extends HttpServlet {
 			document.addTitle("Solicitud_" + solicitud.getConvocatoria().getDescripcion());
 			document.addCreationDate();
 
-			document.add(new Paragraph(new Chunk("SOLICITUD", FontFactory.getFont(FontFactory.HELVETICA, SIZE_40, Font.BOLDITALIC))));
+			document.add(new Paragraph(new Chunk("SOLICITUD", FontFactory.getFont(FontFactory.HELVETICA, SIZE_30, Font.BOLDITALIC))));
 			
 			document.add(new Paragraph("\n"));
 			
 			Font font2 = new Font(Font.BOLD);
 			font2.setStyle("bold");
 			
-			document.add(new Paragraph("Usuario: " + bean.getUsuarioLogeado().getNombre() + " " + bean.getUsuarioLogeado().getPrimerApellido() + " " 
-					+ bean.getUsuarioLogeado().getSegundoApellido(), font2));
 			document.add(new Paragraph("Convocatoria: " + solicitud.getConvocatoria().getDescripcion(), font2));
 			document.add(new Paragraph("Fecha confirmación de solicitud: " 
 					+ Formateador.formatoFecha(solicitud.getFechaConfirmacion(), Formateador.FORMATO_FECHA_DDMMYYYY_HHMMSS), font2));
-
+			
+			document.add(new Paragraph("Usuario: " 
+					+ getStringOrBlack(bean.getUsuarioLogeado().getPrsNif()) + " " 
+					+ getStringOrBlack(bean.getUsuarioLogeado().getNombre()) + " " 
+					+ getStringOrBlack(bean.getUsuarioLogeado().getPrimerApellido()) + " " 
+					+ getStringOrBlack(bean.getUsuarioLogeado().getSegundoApellido()), font2));
+			
+			document.add(new Paragraph("Dirección: " 
+					+ getStringOrBlack(bean.getUsuarioLogeado().getDireccion()) + " " 
+					+ getStringOrBlack(bean.getUsuarioLogeado().getCodigoPostal()) + " "
+					+ getStringOrBlack(bean.getUsuarioLogeado().getLocalidad()) + " "
+					+ getStringOrBlack(bean.getUsuarioLogeado().getProvincia()) + " "
+					+ getStringOrBlack(bean.getUsuarioLogeado().getTelefono()), font2));
+			
 			document.add(new Paragraph("\n"));
 				        
 			for (BolsaSolicitud bolsa: bolsasSolicitud) {
@@ -1029,6 +1030,13 @@ public class ControladorMisSolicitudes extends HttpServlet {
 		}
 		
 		return new ByteArrayInputStream(out.toByteArray());
+	}
+	
+	private String getStringOrBlack(String txt) {
+		if (txt == null) {
+			return "";
+		}
+		return txt;
 	}
 	
 	private void generarPDFArea(BolsaSolicitud bolsa, List<BolsaSolicitud> bolsasSolicitud, Document document) {
@@ -1082,12 +1090,11 @@ public class ControladorMisSolicitudes extends HttpServlet {
 			table.addCell(cell);
 		}
 
-		com.lowagie.text.List lista = new com.lowagie.text.List();
-		lista.setListSymbol("• ");
-		lista.add("Área - " + bolsa.getArea().getDescripcion());
-
-		document.add(lista);
+		Font font2 = new Font(Font.BOLD);
+		font2.setStyle("bold");		
+		document.add(new Paragraph("Área - " + bolsa.getArea().getDescripcion(), font2));
 		document.add(table);
+		document.add(new Paragraph("\n"));
 	}
 	
 	private void generarPDFAreaHeader(Table table) {
