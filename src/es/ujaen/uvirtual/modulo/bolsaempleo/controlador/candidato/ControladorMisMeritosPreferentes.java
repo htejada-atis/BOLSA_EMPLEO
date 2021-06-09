@@ -72,23 +72,6 @@ public class ControladorMisMeritosPreferentes extends HttpServlet {
 	public static final String PARAM_MERITOS = "meritos";
 	
 	// mensajes
-	public static final String MENSAJE_ENVIADO = "mensaje";
-	
-	public static final String MENSAJE_ERROR_APARTADO_REQUERIDO = "Debe seleccionar un apartado";
-	public static final String MENSAJE_ERROR_DESCRIPCION_LARGO = "La descripción no puede contener mas de %d caracteres";
-	public static final String MENSAJE_ERROR_DESCRIPCION_VACIA = "La descripción no puede estar vacía";
-	public static final String MENSAJE_ERROR_ITEM_REQUERIDO = "Debe seleccionar un ítem";
-	public static final String MENSAJE_ERROR_OBSERVACION_LARGO = "La observación no puede contener mas de %d caracteres";
-	public static final String MENSAJE_ERROR_VALOR_VACIO = "El valor no puede estar vacio";
-	public static final String MENSAJE_ERROR_VALOR_MAXIMO_PERMITIDO = "El valor máximo permitido es";
-	public static final String MENSAJE_ERROR_VALOR_MINIMO_PERMITIDO = "El valor mínimo permitido es";
-	public static final String MENSAJE_ERROR_MERITOS_SELECCIONADOS_INCORRECTOS = "No hay méritos seleccionados válidos";
-	public static final String MENSAJE_ERROR_ELIMINAR_MERITO = "No se puede eliminar un mérito que ya está asociado a una solicitud";
-	
-	public static final String MENSAJE_ERROR_VALOR_DECIMAL_NO_PERMITIDO = "El valor debe ser decimal";
-	public static final String MENSAJE_ERROR_VALOR_ENTERO_NO_PERMITIDO = "El valor debe ser entero";
-	
-	public static final String MENSAJE_EXITO_AGREGAR = "Mérito agregado correctamente";
 	public static final String MENSAJE_EXITO_ELIMINAR = "Mérito eliminado correctamente";
 	
 	// ruta vistas
