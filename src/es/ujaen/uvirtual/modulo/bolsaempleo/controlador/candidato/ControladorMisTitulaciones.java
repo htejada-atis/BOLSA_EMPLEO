@@ -1,6 +1,5 @@
 package es.ujaen.uvirtual.modulo.bolsaempleo.controlador.candidato;
 
-import java.io.BufferedInputStream;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.sql.SQLException;
@@ -8,7 +7,6 @@ import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.servlet.ServletException;
-import javax.servlet.ServletOutputStream;
 import javax.servlet.annotation.MultipartConfig;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
@@ -22,7 +20,6 @@ import es.ujaen.uvirtual.beans.UVDatos;
 import es.ujaen.uvirtual.beans.Usuario;
 import es.ujaen.uvirtual.modulo.bolsaempleo.beans.Titulacion;
 import es.ujaen.uvirtual.modulo.bolsaempleo.beans.TitulacionUsuario;
-import es.ujaen.uvirtual.modulo.bolsaempleo.beans.UsuarioBolsaEmpleo;
 import es.ujaen.uvirtual.modulo.bolsaempleo.modelo.ModeloMisTitulaciones;
 import es.ujaen.uvirtual.modulo.bolsaempleo.modelo.ModeloRol;
 import es.ujaen.uvirtual.modulo.bolsaempleo.modelo.ModeloTitulacion;
@@ -72,7 +69,6 @@ public class ControladorMisTitulaciones extends HttpServlet {
 	public static final String ACCION_FORMULARIO_TITULACIONES_USUARIO = "formulariotitulacionesusuario";
 	public static final String ACCION_TITULACION_SELECCIONADA = "titulacionseleccionada";
 	public static final String ACCION_AGREGAR_TITULACION = "agregartitulacion";
-	public static final String ACCION_DESCARGAR_FICHERO = "descargarfichero";
 	public static final String ACCION_ELIMINAR_TITULACION_USUARIO = "eliminartitulacionusuario";
 	
 	// mensajes
@@ -114,7 +110,6 @@ public class ControladorMisTitulaciones extends HttpServlet {
 		
 		VistaTitulaciones bean = new VistaTitulaciones();		
 		Usuario usuario = datos.getUsuario();
-		ModeloUsuarioBolsaEmpleo modeloUsuario = ModeloUsuarioBolsaEmpleo.obtenerInstancia();
 		LOGGER.log(Level.FINEST, "usuario que ha entrado en el servlet es {0}", usuario.getUid());
 		
 		String nombreAccion = EscapaHTML.ajustaCodificacion(request.getParameter(PARAM_ACCION));
@@ -129,10 +124,10 @@ public class ControladorMisTitulaciones extends HttpServlet {
 					bean.setVista(JSP_INDEX);
 					break;					
 				case ACCION_DATATABLE_TITULACIONES_USUARIO:
-					listadoTitulacionesUsuario(bean, datos, request, response, modeloUsuario.getUsuarioByCodCuenta(usuario.getUid()).getCodNum());
+					listadoTitulacionesUsuario(bean, datos, request, response);
 					break;
 				case ACCION_DATATABLE_TITULACIONES:
-					listadoTitulaciones(bean, datos, request, response, modeloUsuario.getUsuarioByCodCuenta(usuario.getUid()).getCodNum());
+					listadoTitulaciones(bean, datos, request, response);
 					break;
 				case ACCION_FORMULARIO_TITULACIONES_USUARIO:
 					formularioTitulacionesUsuario(bean);
@@ -141,13 +136,10 @@ public class ControladorMisTitulaciones extends HttpServlet {
 					seleccionarTitulacion(bean, request);
 					break;
 				case ACCION_AGREGAR_TITULACION:
-					agregarTitulacion(request, response, bean, modeloUsuario.getUsuarioByCodCuenta(usuario.getUid()));
+					agregarTitulacion(request, response, bean);
 					break;
 				case ACCION_ELIMINAR_TITULACION_USUARIO:
 					eliminarTitulacionUsuario(request, bean);
-					break;
-				case ACCION_DESCARGAR_FICHERO:
-					descargarFichero(bean, datos, request, response);
 					break;
 				default:
 					errorFatal(bean, "Acción no contemplada");
@@ -210,12 +202,10 @@ public class ControladorMisTitulaciones extends HttpServlet {
 	 * @param datos .
 	 * @param request .
 	 * @param response .
-	 * @param codnum .
 	 * @throws IOException en caso de error de input u output .
 	 * @throws SQLException excepcion de bbdd.
 	 */
-	private void listadoTitulaciones(VistaTitulaciones bean, UVDatos datos, HttpServletRequest request, HttpServletResponse response, Integer codnum) 
-			throws IOException, SQLException {
+	private void listadoTitulaciones(VistaTitulaciones bean, UVDatos datos, HttpServletRequest request, HttpServletResponse response) throws IOException, SQLException {
 		ModeloMisTitulaciones modelo = ModeloMisTitulaciones.obtenerInstancia();
 		datos.setContentType(RESPONSE_AJAX_CONTENTTYPE);
 		response.setContentType(RESPONSE_AJAX_CONTENTTYPE);
@@ -223,7 +213,7 @@ public class ControladorMisTitulaciones extends HttpServlet {
 		
 		try (PrintWriter writer = response.getWriter()) {
 			try {
-				BolsaEmpleoDataTable<Titulacion> dataTable = modelo.listaTitulacionesDatatable(request.getParameterMap(), codnum);
+				BolsaEmpleoDataTable<Titulacion> dataTable = modelo.listaTitulacionesDatatable(request.getParameterMap(), bean.getUsuarioLogeado().getCodNum());
 				bean.setDatatableTitulaciones(dataTable);
 				writer.write(dataTable.toJson());
 			} catch (UVException e) {
@@ -249,12 +239,10 @@ public class ControladorMisTitulaciones extends HttpServlet {
 	 * @param datos .
 	 * @param request .
 	 * @param response .
-	 * @param codnum .
 	 * @throws IOException en caso de error de input u output .
 	 * @throws SQLException excepcion de bbdd.
 	 */
-	private void listadoTitulacionesUsuario(VistaTitulaciones bean, UVDatos datos,
-			HttpServletRequest request, HttpServletResponse response, Integer codnum) throws IOException, SQLException {
+	private void listadoTitulacionesUsuario(VistaTitulaciones bean, UVDatos datos, HttpServletRequest request, HttpServletResponse response) throws IOException, SQLException {
 		ModeloMisTitulaciones modelo = ModeloMisTitulaciones.obtenerInstancia();
 		datos.setContentType(RESPONSE_AJAX_CONTENTTYPE);
 		response.setContentType(RESPONSE_AJAX_CONTENTTYPE);
@@ -262,7 +250,10 @@ public class ControladorMisTitulaciones extends HttpServlet {
 		
 		try (PrintWriter writer = response.getWriter()) {
 			try {
-				BolsaEmpleoDataTable<TitulacionUsuario> dataTable = modelo.listaTitulacionesUsuarioDatatable(request.getParameterMap(), codnum);
+				BolsaEmpleoDataTable<TitulacionUsuario> dataTable = modelo.listaTitulacionesUsuarioDatatable(
+						request.getParameterMap(),
+						bean.getUsuarioLogeado().getCodNum()
+				);
 				bean.setDatatableTitulacionesUsuario(dataTable);
 				writer.write(dataTable.toJson());
 			} catch (UVException e) {
@@ -305,12 +296,11 @@ public class ControladorMisTitulaciones extends HttpServlet {
 	 * @param request .
 	 * @param response .
 	 * @param bean bean de la vista a la que poner los valores.
-	 * @param usu .
 	 * @throws SQLException excepcion de bbdd.
 	 * @throws UVException en caso de error en bd
 	 * @throws ServletException .
 	 */
-	public void agregarTitulacion(HttpServletRequest request, HttpServletResponse response, VistaTitulaciones bean, UsuarioBolsaEmpleo usu) 
+	public void agregarTitulacion(HttpServletRequest request, HttpServletResponse response, VistaTitulaciones bean) 
 			throws SQLException, UVException, IOException, ServletException {
 		ModeloMisTitulaciones modelo = ModeloMisTitulaciones.obtenerInstancia();		
 				
@@ -336,7 +326,7 @@ public class ControladorMisTitulaciones extends HttpServlet {
 				titulacion.setOtraTitulacion(otraTitulacion);
 			}
 			
-			titulacion.setUsuario(usu);
+			titulacion.setUsuario(bean.getUsuarioLogeado());
 				
 			modelo.insertaTitulacionUsuario(titulacion, bean.getUsuarioLogeado());
 				
@@ -354,41 +344,17 @@ public class ControladorMisTitulaciones extends HttpServlet {
 		ModeloMisTitulaciones modelo = ModeloMisTitulaciones.obtenerInstancia();
 		
 		List<TitulacionUsuario> titulaciones = modelo.getTitulacionesUsuarioByIds(selected);
+		for (TitulacionUsuario tu : titulaciones) {
+			if (!tu.getUsuario().getCodNum().equals(bean.getUsuarioLogeado().getCodNum())) {
+				throw new UVException("No tienes permisos");
+			}
+		}
 
 		modelo.borraTitulacionUsuario(titulaciones, bean.getUsuarioLogeado());
 		
 		bean.setVista(JSP_INDEX);
 
 		bean.getMensajesDeExito().add(MENSAJE_EXITO_TITULACION_BORRADA);
-	}
-	
-	/** descarga un fichero .
-	 * @param bean .
-	 * @param datos .
-	 * @param request .
-	 * @param response .
-	 * @throws SQLException excepcion de bbdd.
-	 * @throws UVException en caso de error de parametros .
-	 * @throws IOException en caso de error de input u output .
-	 */
-	private void descargarFichero(VistaTitulaciones bean, UVDatos datos, HttpServletRequest request, HttpServletResponse response)
-			throws SQLException, UVException, IOException {
-		ModeloMisTitulaciones modelo = ModeloMisTitulaciones.obtenerInstancia();
-		if (EscapaHTML.ajustaCodificacion(request.getParameter(PARAM_FICHERO)) != null) {
-			TitulacionUsuario titulacion = modelo.getTitulacionUsuarioById(Formateador.leeParametroInteger(request.getParameter(PARAM_FICHERO)));
-			bean.setTitulacionUsuario(titulacion);
-			
-			response.setContentType("application/pdf");
-			datos.setRespuestaEnviada(true);
-
-			try (ServletOutputStream stream = response.getOutputStream(); BufferedInputStream buf = new BufferedInputStream(titulacion.getArchivo())) {
-				int readBytes = 0;
-				while ((readBytes = buf.read()) != -1) {
-					stream.write(readBytes);
-				}
-				stream.flush();
-	        }
-		}
 	}
 	
 	private TitulacionUsuario validarTitulacion(HttpServletRequest request, Part uploadedFile) throws UVException, IOException, SQLException {

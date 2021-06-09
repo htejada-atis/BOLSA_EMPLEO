@@ -246,42 +246,4 @@ public class TestBEPControladorInicio {
 		assertEquals(MENSAJE_CON_ERROR, 1, bean2.getMensajesDeError().size());
 		assertEquals(MENSAJE_SIN_EXITO, 0, bean2.getMensajesDeExito().size());
 	}
-	
-	/** Descargar fichero no válido .
-	 * @throws ServletException .
-	 * @throws IOException .
-	 */
-	@Test
-	public void testE02DescargarFicheroNoValido() throws ServletException, IOException {
-		PeticionHttp peticion = UtilsTestBolsaEmpleo.peticionAutenticadaPersonal();
-		peticion.setParameter(ControladorInicio.PARAM_ACCION, ControladorInicio.ACCION_DESCARGAR_FICHERO);
-		peticion.setParameter(ControladorInicio.PARAM_FICHERO, "-1");
-		
-		RespuestaHttp respuesta = new RespuestaHttp();
-		ControladorInicio controlador = new ControladorInicio();
-		controlador.doPost(peticion, respuesta);
-		VistaInicio bean = (VistaInicio) peticion.getUVDatos().getVistas().get(VistaInicio.class.getName());
-		
-		assertEquals(MENSAJE_CON_ERROR, 1, bean.getMensajesDeError().size());
-		assertEquals(MENSAJE_SIN_EXITO, 0, bean.getMensajesDeExito().size());
-	}
-	
-	/** Descargar fichero sin fichero .
-	 * @throws ServletException .
-	 * @throws IOException .
-	 */
-	@Test
-	public void testE03DescargarFicheroSinFichero() throws ServletException, IOException {
-		PeticionHttp peticion = UtilsTestBolsaEmpleo.peticionAutenticadaPersonal();
-		peticion.setParameter(ControladorInicio.PARAM_ACCION, ControladorInicio.ACCION_DESCARGAR_FICHERO);
-		
-		RespuestaHttp respuesta = new RespuestaHttp();
-		ControladorInicio controlador = new ControladorInicio();
-		controlador.doPost(peticion, respuesta);
-		VistaInicio bean = (VistaInicio) peticion.getUVDatos().getVistas().get(VistaInicio.class.getName());
-		
-		assertEquals(MENSAJE_CON_ERROR, 1, bean.getMensajesDeAdvertencia().size());
-		assertEquals(MENSAJE_SIN_EXITO, 0, bean.getMensajesDeExito().size());
-	}
-
 }

@@ -208,30 +208,6 @@ public class TestBEPControladorMisMeritos {
 	}
 
 	/**
-	 * descargar fichero mérito error.
-	 * 
-	 * @throws ServletException si error de servlet
-	 * @throws IOException      si error de io
-	 */
-	@Test
-	public void testE03DescargarError() throws ServletException, IOException {
-		VistaMeritos bean = obtenerMeritos();
-
-		PeticionHttp peticion = UtilsTestBolsaEmpleo.peticionAutenticadaCandidato();
-		peticion.setParameter(ControladorMisMeritos.PARAM_ACCION, ControladorMisMeritos.ACCION_DESCARGAR_FICHERO);
-		peticion.setParameter(ControladorMisMeritos.PARAM_ID,
-				bean.getDatatable().getData().get(0).getCodNum().toString());
-
-		RespuestaHttp respuesta = new RespuestaHttp();
-		ControladorMisMeritos controlador = new ControladorMisMeritos();
-		controlador.doGet(peticion, respuesta);
-		VistaMeritos bean2 = (VistaMeritos) peticion.getUVDatos().getVistas().get(VistaMeritos.class.getName());
-
-		assertEquals(MENSAJE_CON_ERROR, 1, bean2.getMensajesDeError().size());
-		assertEquals(MENSAJE_SIN_EXITO, 0, bean2.getMensajesDeExito().size());
-	}
-
-	/**
 	 * obtener datatable méritos con parámetro no válido .
 	 * 
 	 * @throws SQLException     .

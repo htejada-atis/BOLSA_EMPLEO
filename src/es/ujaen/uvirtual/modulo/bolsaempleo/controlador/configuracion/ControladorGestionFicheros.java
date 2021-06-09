@@ -1,6 +1,5 @@
 package es.ujaen.uvirtual.modulo.bolsaempleo.controlador.configuracion;
 
-import java.io.BufferedInputStream;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.sql.SQLException;
@@ -8,7 +7,6 @@ import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.servlet.ServletException;
-import javax.servlet.ServletOutputStream;
 import javax.servlet.annotation.MultipartConfig;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
@@ -54,7 +52,6 @@ public class ControladorGestionFicheros extends HttpServlet {
 	
 	public static final String ACCION_BORRAR_FICHEROS = "borrarficheros";
 	public static final String ACCION_DATATABLE = "datatable";
-	public static final String ACCION_DESCARGAR_FICHERO = "descargarfichero";
 	public static final String ACCION_HACER_FICHEROS_PUBLICOS = "ficherospublicos";
 	public static final String ACCION_HACER_FICHEROS_PRIVADOS = "ficherosprivados";
 	public static final String ACCION_INDEX = "listarficheros";
@@ -120,9 +117,6 @@ public class ControladorGestionFicheros extends HttpServlet {
 				case ACCION_DATATABLE:
 					listadoFicheros(bean, datos, request, response);
 					return;
-				case ACCION_DESCARGAR_FICHERO:
-					descargarFichero(bean, datos, request, response);
-					break;
 				case ACCION_HACER_FICHEROS_PUBLICOS:
 					cambiarFicherosPublico(bean, request, response, true);
 					break;
@@ -248,44 +242,6 @@ public class ControladorGestionFicheros extends HttpServlet {
 		}
 		
 		response.sendRedirect(request.getServletPath());
-	}
-	
-	/** descarga un fichero .
-	 * @param bean .
-	 * @param datos .
-	 * @param request .
-	 * @param response .
-	 * @throws SQLException excepcion de bbdd.
-	 * @throws UVException en caso de error de parametros .
-	 * @throws IOException en caso de error de input u output .
-	 */
-	private void descargarFichero(VistaFicheros bean, UVDatos datos, HttpServletRequest request, HttpServletResponse response) throws SQLException, UVException, IOException {
-		ModeloFichero modelo = ModeloFichero.obtenerInstancia();
-		if (EscapaHTML.ajustaCodificacion(request.getParameter(PARAM_FICHERO)) != null) {
-			Fichero fichero = modelo.listaFichero(Formateador.leeParametroInteger(request.getParameter(PARAM_FICHERO)));
-			bean.setFichero(fichero);
-			
-			int i = fichero.getNombre().lastIndexOf('.');
-			if (i > 0) {
-				String extension = fichero.getNombre().substring(i + 1);
-				if ("pdf".equalsIgnoreCase(extension)) {
-					response.setContentType("application/pdf");
-					datos.setRespuestaEnviada(true);
-			        
-					try (ServletOutputStream stream = response.getOutputStream();
-			             BufferedInputStream buf = new BufferedInputStream(fichero.getArchivo())) {
-						int readBytes = 0;
-						while ((readBytes = buf.read()) != -1) {
-							stream.write(readBytes);
-						}
-						stream.flush();
-			        }
-				} else {
-					BolsaEmpleoUtils.addMensajeDeError(MENSAJE_ERROR_EXTENSION_FICHERO, bean, request);
-					response.sendRedirect(request.getServletPath());
-			    }
-			}
-		}
 	}
 	
 	/** eliminar ficheros .

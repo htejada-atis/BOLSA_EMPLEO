@@ -1,7 +1,6 @@
 package es.ujaen.uvirtual.modulo.bolsaempleo.controlador.candidato;
 
 import java.awt.Color;
-import java.io.BufferedInputStream;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -15,7 +14,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.logging.Level;
 import javax.servlet.ServletException;
-import javax.servlet.ServletOutputStream;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
@@ -116,7 +114,6 @@ public class ControladorMisSolicitudes extends HttpServlet {
 	// acciones paso 3: Confirmar Solicitud
 	public static final String ACCION_CONFIRMAR_SOLICITUD = "confirmarsolicitud";
 	public static final String ACCION_RESUMEN_SOLICITUD = "resumensolicitud";
-	public static final String ACCION_DESCARGAR_PDF = "descargarpdf";
 	
 	// mensajes
 	public static final String MENSAJE_AREA_SIN_MERITOS = "No hay méritos asignados a éste área.";
@@ -208,7 +205,6 @@ public class ControladorMisSolicitudes extends HttpServlet {
 					break;
 				case ACCION_CONFIRMAR_SOLICITUD:
 				case ACCION_RESUMEN_SOLICITUD:
-				case ACCION_DESCARGAR_PDF:
 					accionesPaso3(bean, datos, request, response, nombreAccion);
 					break;
 				default:
@@ -852,9 +848,6 @@ public class ControladorMisSolicitudes extends HttpServlet {
 			case ACCION_RESUMEN_SOLICITUD:
 				resumenSolicitud(bean, request);
 				break;
-			case ACCION_DESCARGAR_PDF:
-				descargarPDF(bean, datos, request, response);
-				break;
 			default:
 				errorFatal(bean, MENSAJE_ERROR_ACCION_NO_CONTEMPLADA);
 		}
@@ -934,45 +927,6 @@ public class ControladorMisSolicitudes extends HttpServlet {
 		HttpSession session = request.getSession(false);
 		session.setAttribute(MENSAJE_ENVIADO, MENSAJE_EXITO_SOLICITUD_CONFIRMADA);
 		response.sendRedirect(request.getServletPath());
-	}
-	
-	/**
-	 * descarga de pdf .
-	 * @param response .
-	 * @param datos    .
-	 * @param bean     .
-	 * @param request  .
-	 * @throws SQLException .
-	 * @throws UVException  .
-	 */
-	private void descargarPDF(VistaSolicitudes bean, UVDatos datos, HttpServletRequest request, HttpServletResponse response)
-			throws SQLException, UVException, IOException {
-		ModeloSolicitud modeloSolicitud = ModeloSolicitud.obtenerInstancia();
-		Solicitud solicitud = modeloSolicitud.getSolicitudByIdArchivo(Formateador.leeParametroInteger(request.getParameter(PARAM_SOLICITUD_ID)));
-		bean.setSolicitud(solicitud);
-		
-		if (!bean.getUsuarioLogeado().getCodNum().equals(solicitud.getUsuario().getCodNum())) {
-			throw new UVException("No tienes permisos");
-		}
-		
-		if (solicitud.getArchivo() == null) {
-			throw new UVException("El archivo no existe");
-		}
-        
-		try (ServletOutputStream stream = response.getOutputStream(); BufferedInputStream buf = new BufferedInputStream(solicitud.getArchivo())) {
-			int readBytes = 0;
-			while ((readBytes = buf.read()) != -1) {
-				stream.write(readBytes);
-			}
-			stream.flush();
-		} catch (Exception ex) {
-			LOGGER.log(Level.SEVERE, Formateador.getStackTrace(ex));
-			LOGGER.log(Level.SEVERE, ex.toString());
-			throw new UVException(ex.toString());
-		}
-        
-		response.setContentType("application/pdf");
-		datos.setRespuestaEnviada(true);
 	}
 	
 	/**

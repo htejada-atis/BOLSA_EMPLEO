@@ -1,16 +1,15 @@
 package es.ujaen.uvirtual.modulo.bolsaempleo.controlador.candidato;
 
-import java.io.BufferedInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.PrintWriter;
 import java.sql.SQLException;
 import java.sql.SQLIntegrityConstraintViolationException;
 import java.util.logging.Logger;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Level;
 import javax.servlet.ServletException;
-import javax.servlet.ServletOutputStream;
 import javax.servlet.annotation.MultipartConfig;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
@@ -59,7 +58,6 @@ public class ControladorMisMeritos extends HttpServlet {
 	// acciones
 	public static final String ACCION_AGREGAR_MERITO = "agregarmerito";
 	public static final String ACCION_DATATABLE = "datatable";
-	public static final String ACCION_DESCARGAR_FICHERO = "descargarfichero";
 	public static final String ACCION_ELIMINAR_MERITOS = "eliminarmeritos";
 	public static final String ACCION_INDEX = "listar";
 	
@@ -186,9 +184,6 @@ public class ControladorMisMeritos extends HttpServlet {
 			case ACCION_AGREGAR_MERITO:
 				agregarMerito(bean, request, response);
 				break;
-			case ACCION_DESCARGAR_FICHERO:
-				descargarFichero(bean, datos, request, response);
-				break;
 			case ACCION_ELIMINAR_MERITOS:
 				eliminarMeritos(bean, request, response);
 				break;				
@@ -246,38 +241,6 @@ public class ControladorMisMeritos extends HttpServlet {
 		
 	}
 	
-	/** descarga un fichero .
-	 * @param bean .
-	 * @param datos .
-	 * @param request .
-	 * @param response .
-	 * @throws SQLException excepcion de bbdd.
-	 * @throws UVException en caso de error de parametros .
-	 * @throws IOException en caso de error de input u output .
-	 */
-	private void descargarFichero(VistaMeritos bean, UVDatos datos, HttpServletRequest request, HttpServletResponse response) throws SQLException, UVException, IOException {
-		ModeloMerito modelo = ModeloMerito.obtenerInstancia();
-		if (EscapaHTML.ajustaCodificacion(request.getParameter(PARAM_ID)) != null) {
-			Merito merito = modelo.listaMerito(Formateador.leeParametroInteger(request.getParameter(PARAM_ID)));
-			bean.setMerito(merito);
-			
-			response.setContentType("application/pdf");
-			datos.setRespuestaEnviada(true);
-	        
-			try (ServletOutputStream stream = response.getOutputStream(); BufferedInputStream buf = new BufferedInputStream(merito.getArchivo())) {
-				int readBytes = 0;
-				while ((readBytes = buf.read()) != -1) {
-					stream.write(readBytes);
-	            }
-				stream.flush();
-			} catch (Exception ex) {
-				LOGGER.log(Level.SEVERE, Formateador.getStackTrace(ex));
-				LOGGER.log(Level.SEVERE, ex.toString());
-				bean.getMensajesDeError().add(ex.getMessage());
-	        }
-		}
-	}
-	
 	/** elimina una lista de méritos seleccionados .
 	 * @param bean .
 	 * @param request .
@@ -292,7 +255,18 @@ public class ControladorMisMeritos extends HttpServlet {
 		Gson gson = new GsonBuilder().create();
 		
 		try {
-			List<String> meritos = gson.fromJson(request.getParameter(PARAM_MERITOS), new TypeToken<List<String>>() { }.getType());
+			List<String> idMeritos = gson.fromJson(request.getParameter(PARAM_MERITOS), new TypeToken<List<String>>() { }.getType());
+			
+			// comprobamos si lo mérito son los del usuario logeado
+			List<Merito> meritos = new ArrayList<>();
+			for (String idMerito : idMeritos) {
+				Merito m = modelo.getMeritoById(Formateador.leeParametroInteger(idMerito));
+				if (!m.getUsuario().getCodNum().equals(bean.getUsuarioLogeado().getCodNum())) {
+					throw new UVException("No tienes permisos");
+				}
+				meritos.add(m);
+			}
+			
 			modelo.eliminarMeritos(meritos, bean.getUsuarioLogeado());
 			BolsaEmpleoUtils.addMensajeDeExito(MENSAJE_EXITO_ELIMINAR, bean, request);
 		} catch (SQLIntegrityConstraintViolationException e) {
