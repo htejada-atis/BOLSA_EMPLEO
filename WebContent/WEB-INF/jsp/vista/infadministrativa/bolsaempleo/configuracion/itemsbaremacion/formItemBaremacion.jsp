@@ -186,7 +186,7 @@ if(item!=null){
 		    "title": "ITEMS EXCLUYENTES",
 		    "filterable": true,
 		    "selectable": true,
-	    	"defaultOrderBy": 1,
+	    	"defaultOrderBy": 2,
 	    	"defaultOrderDirection": 'asc',
 		    "selected": itemsExcluyentes,
 		    "action": "<%=ControladorItemsBaremacion.ACCION_DATATABLE_ITEMS_EXCLUYENTES%>",

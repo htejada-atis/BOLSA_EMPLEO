@@ -591,31 +591,46 @@ public class ModeloBaremacionItems {
 	/** Comprueba que el item que se ha seleccionado no es excluyente con uno ya existente en la solicitud .
 	 * @param itemPadre .
 	 * @param itemHijo .
-	 * @return bool .
-	 * @throws SQLException .
 	 * @throws UVException .
+	 * @throws SQLException .
 	 */
-	public boolean checkItemsExcluyentes(ItemBaremacion itemPadre, ItemBaremacion itemHijo) throws SQLException {
-		String consulta = "SELECT bepite.*,bepmex.BEPITE_CODNUM_HIJO FROM TBEP_ITEMSBAREMACION bepite "
-				+ "LEFT JOIN TBEP_MERITOS_EXCLUYENTES bepmex "
-				+ "ON bepite.CODNUM = bepmex.BEPITE_CODNUM_HIJO "
-				+ "AND bepmex.BEPITE_CODNUM_PADRE = ? "
-				+ "WHERE bepmex.BEPITE_CODNUM_PADRE = ?"
-				+ "AND bepmex.BEPITE_CODNUM_HIJO = ?";
+	public void checkItemsExcluyentes(ItemBaremacion itemPadre, ItemBaremacion itemHijo) throws SQLException, UVException {
+		String consulta = ""
+				+ "SELECT bepite.* "
+				+ "FROM TBEP_ITEMSBAREMACION bepite "
+				+ "LEFT JOIN TBEP_MERITOS_EXCLUYENTES bepmex ON bepite.CODNUM = bepmex.BEPITE_CODNUM_HIJO AND bepmex.BEPITE_CODNUM_PADRE = ? "
+				+ "WHERE bepmex.BEPITE_CODNUM_PADRE = ? AND bepmex.BEPITE_CODNUM_HIJO = ?";
 		
-		try (Connection conexion = ConexionUvirtual.obtenerInstancia(); PreparedStatement stmt = conexion.prepareStatement(consulta)) {
-			int parameterIndex = 1;
-			stmt.setInt(parameterIndex++, itemPadre.getCodNum());
-			stmt.setInt(parameterIndex++, itemPadre.getCodNum());
-			stmt.setInt(parameterIndex++, itemHijo.getCodNum());
-			stmt.executeUpdate();
+		try (Connection conexion = ConexionUvirtual.obtenerInstancia()) {
+			try (PreparedStatement stmt = conexion.prepareStatement(consulta)) {
+				int parameterIndex = 1;
+				stmt.setInt(parameterIndex++, itemPadre.getCodNum());
+				stmt.setInt(parameterIndex++, itemPadre.getCodNum());
+				stmt.setInt(parameterIndex++, itemHijo.getCodNum());
+				stmt.executeUpdate();
+				
+				try (ResultSet rs = stmt.executeQuery()) {
+					while (rs.next()) {
+						throw new UVException("El item " + itemPadre.getFullCode() 
+							+ " es excluyente con el item " + itemHijo.getFullCode());						
+					}
+				}
+			}
 			
-			try (ResultSet rs = stmt.executeQuery()) {
-				while (rs.next()) {
-					return true;
+			try (PreparedStatement stmt = conexion.prepareStatement(consulta)) {
+				int parameterIndex = 1;
+				stmt.setInt(parameterIndex++, itemHijo.getCodNum());
+				stmt.setInt(parameterIndex++, itemHijo.getCodNum());
+				stmt.setInt(parameterIndex++, itemPadre.getCodNum());
+				stmt.executeUpdate();
+				
+				try (ResultSet rs = stmt.executeQuery()) {
+					while (rs.next()) {
+						throw new UVException("El item " + itemHijo.getFullCode() 
+							+ " es excluyente con el item " + itemPadre.getFullCode());
+					}
 				}
 			}
 		}
-		return false;
 	}
 }

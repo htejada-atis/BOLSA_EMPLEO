@@ -22,7 +22,6 @@ import es.ujaen.uvirtual.modelo.conexion.Conexion;
 import es.ujaen.uvirtual.modulo.bolsaempleo.beans.BloqueBaremacion;
 import es.ujaen.uvirtual.modulo.bolsaempleo.beans.ItemBaremacion;
 import es.ujaen.uvirtual.modulo.bolsaempleo.utilidades.BolsaEmpleoDataTable;
-import es.ujaen.uvirtual.modulo.bolsaempleo.modelo.ModeloBaremacionBloques;
 import es.ujaen.uvirtual.modulo.bolsaempleo.modelo.ModeloBaremacionItems;
 import es.ujaen.uvirtual.utilidades.UVException;
 
@@ -231,9 +230,10 @@ public class TestBEPModeloBaremacionItems {
 			modeloItems.asignarItemsExcluyentesAItem(itemPadre, itemHijo, UtilsTestBolsaEmpleo.getUsuarioPersonalLogeado());
 			
 			List<ItemBaremacion> itemsExcluyentes = modeloItems.getItemsExcluyentes(itemPadre);
-			boolean excluyentes = modeloItems.checkItemsExcluyentes(itemPadre, itemHijo);
 			assertNotEquals(MENSAJE_ITEMS_DEVUELTOS, 0, itemsExcluyentes.size());
-			assertEquals(true, excluyentes);
+			
+			Throwable throwable = assertThrows(Throwable.class, () -> modeloItems.checkItemsExcluyentes(itemPadre, itemHijo));			
+			assertEquals(UVException.class, throwable.getClass());
 		} catch (SQLException | UVException ex) {
 			fail(String.format(MENSAJE_ERROR_HAY_EXCEPCION, ex.toString()));
 		}
@@ -273,9 +273,10 @@ public class TestBEPModeloBaremacionItems {
 			modeloItems.borrarItemsExcluyentesAItem(itemPadre, itemHijo, UtilsTestBolsaEmpleo.getUsuarioPersonalLogeado());
 			
 			List<ItemBaremacion> itemsExcluyentes = modeloItems.getItemsExcluyentes(itemPadre);
-			boolean excluyentes = modeloItems.checkItemsExcluyentes(itemPadre, itemHijo);
 			assertEquals(0, itemsExcluyentes.size());
-			assertNotEquals(true, excluyentes);
+			
+			Throwable throwable = assertThrows(Throwable.class, () -> modeloItems.checkItemsExcluyentes(itemPadre, itemHijo));			
+			assertEquals(UVException.class, throwable.getClass());			
 		} catch (SQLException | UVException ex) {
 			fail(String.format(MENSAJE_ERROR_HAY_EXCEPCION, ex.toString()));
 		}
