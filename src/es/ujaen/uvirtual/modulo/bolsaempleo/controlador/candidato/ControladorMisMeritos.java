@@ -4,7 +4,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.PrintWriter;
 import java.sql.SQLException;
-import java.sql.SQLIntegrityConstraintViolationException;
 import java.util.logging.Logger;
 import java.util.ArrayList;
 import java.util.List;
@@ -79,8 +78,6 @@ public class ControladorMisMeritos extends HttpServlet {
 	public static final String MENSAJE_ERROR_OBSERVACION_LARGO = "La observación no puede contener mas de %d caracteres";
 	public static final String MENSAJE_ERROR_VALOR_MAXIMO_PERMITIDO = "El valor máximo permitido es %s";
 	public static final String MENSAJE_ERROR_VALOR_MINIMO_PERMITIDO = "El valor mínimo permitido es %s";
-	public static final String MENSAJE_ERROR_MERITOS_SELECCIONADOS_INCORRECTOS = "No hay méritos seleccionados válidos";
-	public static final String MENSAJE_ERROR_ELIMINAR_MERITO = "No se puede eliminar un mérito que ya está asociado a una solicitud";
 	public static final String MENSAJE_ERROR_VALOR_DECIMAL_NO_PERMITIDO = "El valor debe ser decimal";
 	public static final String MENSAJE_ERROR_VALOR_ENTERO_NO_PERMITIDO = "El valor debe ser entero";
 	public static final String MENSAJE_EXITO_AGREGAR = "Mérito agregado correctamente";
@@ -254,26 +251,20 @@ public class ControladorMisMeritos extends HttpServlet {
 		
 		Gson gson = new GsonBuilder().create();
 		
-		try {
-			List<String> idMeritos = gson.fromJson(request.getParameter(PARAM_MERITOS), new TypeToken<List<String>>() { }.getType());
-			
-			// comprobamos si lo mérito son los del usuario logeado
-			List<Merito> meritos = new ArrayList<>();
-			for (String idMerito : idMeritos) {
-				Merito m = modelo.getMeritoById(Formateador.leeParametroInteger(idMerito));
-				if (!m.getUsuario().getCodNum().equals(bean.getUsuarioLogeado().getCodNum())) {
-					throw new UVException("No tienes permisos");
-				}
-				meritos.add(m);
+		List<String> idMeritos = gson.fromJson(request.getParameter(PARAM_MERITOS), new TypeToken<List<String>>() { }.getType());
+		
+		// comprobamos si lo mérito son los del usuario logeado
+		List<Merito> meritos = new ArrayList<>();
+		for (String idMerito : idMeritos) {
+			Merito m = modelo.getMeritoById(Formateador.leeParametroInteger(idMerito));
+			if (!m.getUsuario().getCodNum().equals(bean.getUsuarioLogeado().getCodNum())) {
+				throw new UVException("No tienes permisos");
 			}
-			
-			modelo.eliminarMeritos(meritos, bean.getUsuarioLogeado());
-			BolsaEmpleoUtils.addMensajeDeExito(MENSAJE_EXITO_ELIMINAR, bean, request);
-		} catch (SQLIntegrityConstraintViolationException e) {
-			BolsaEmpleoUtils.addMensajeDeError(MENSAJE_ERROR_ELIMINAR_MERITO, bean, request);
-		} catch (Exception ex) {
-			BolsaEmpleoUtils.addMensajeDeError(MENSAJE_ERROR_MERITOS_SELECCIONADOS_INCORRECTOS, bean, request);
+			meritos.add(m);
 		}
+		
+		modelo.eliminarMeritos(meritos, bean.getUsuarioLogeado());
+		BolsaEmpleoUtils.addMensajeDeExito(MENSAJE_EXITO_ELIMINAR, bean, request);
 		
 		response.sendRedirect(request.getServletPath());
 	}
