@@ -50,14 +50,6 @@ public class ModeloUsuarioBolsaEmpleo {
 	public static final int ORDER_COLUMN_INDEX_CANDIDATO_EXCLUIDO = 5;
 	public static final int ORDER_COLUMN_INDEX_CANDIDATO_BORRADO = 6;
 		
-//	public static final int ORDER_COLUMN_INDEX_TIPO_DOCUMENTO = 1;
-//	public static final int ORDER_COLUMN_INDEX_NUMDOCUMENTO = 2;
-//	public static final int ORDER_COLUMN_INDEX_COD_CUENTA = 3;
-//	public static final int ORDER_COLUMN_INDEX_NOMBRE_Y_APELLIDOS = 4;
-//	public static final int ORDER_COLUMN_INDEX_LISTA_DIST = 6;
-//	public static final int ORDER_COLUMN_INDEX_EXCLUIDO = 7;
-//	public static final int ORDER_COLUMN_INDEX_BORRADO = 8;
-
 	public static final String USUARIO_BORRADO = "S";
 	public static final String USUARIO_NO_BORRADO = "N";
 	public static final String USUARIO_EXCLUIDO = "S";
