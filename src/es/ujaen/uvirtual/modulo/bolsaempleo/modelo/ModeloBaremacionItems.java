@@ -33,7 +33,7 @@ public class ModeloBaremacionItems {
 	public static final int ORDER_COLUMN_INDEX_ITEMS_VALOR_MINIMO = 4; 
 	public static final int ORDER_COLUMN_INDEX_ITEMS_VALOR_MAXIMO = 5;
 	public static final int ORDER_COLUMN_INDEX_ITEMS_AFINIDAD = 6;
-	public static final int ORDER_COLUMN_INDEX_ITEMS_ACTIVO = 7;
+	public static final int ORDER_COLUMN_INDEX_ITEMS_ACTIVO = 8;
 	
 	// ordenación ítems de baremación exclusiones
 	
