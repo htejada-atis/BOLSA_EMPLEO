@@ -10,6 +10,8 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import javax.mail.internet.AddressException;
 import javax.mail.internet.InternetAddress;
@@ -18,13 +20,16 @@ import es.ujaen.uvirtual.beans.ConfiguracionGlobal;
 import es.ujaen.uvirtual.beans.Usuario;
 import es.ujaen.uvirtual.modelo.ModeloClaveArcos;
 import es.ujaen.uvirtual.modelo.conexion.ConexionArcos;
+import es.ujaen.uvirtual.utilidades.AdaptadorDocumentoIdentidad;
 import es.ujaen.uvirtual.utilidades.EnviaCorreo;
 import es.ujaen.uvirtual.utilidades.UVException;
 
 /** Modelo para usuario autoregistrado.
  */
 public class ModeloUsuarioAutoregistrado {
-	
+	private static final String NOMBREDEESTACLASE = ModeloUsuarioAutoregistrado.class.getName();
+	private static final Logger LOGGER = Logger.getLogger(NOMBREDEESTACLASE);
+
 	private void insertaCuentaAutoregistradoBd(Connection conexion, Usuario usuario) throws SQLException, UVException {
 		String consulta = " INSERT INTO arcos.ARG_CUENTA " 
 				+ " (usuario, correo, clave, fecha_creacion) "
@@ -66,7 +71,30 @@ public class ModeloUsuarioAutoregistrado {
 		}
 	}
 	
-	private void validaInsertaUsuarioAutoregistrado(Usuario usuario) throws UVException, SQLException {
+	private void validaTipoDocumento(Usuario usuario) throws UVException {
+		if ("NIF".equals(usuario.getDocumentoTipo())) {
+			final int numeroCaracteresNif = 9;
+			if (usuario.getDocumentoNumero().length() != numeroCaracteresNif) {
+				throw new UVException("el nif debe tener 9 caracteres incluyendo la letra");
+			}
+			String numeroNif = AdaptadorDocumentoIdentidad.numeroDocumento(AdaptadorDocumentoIdentidad.UXXIAC, usuario);
+			String letraNif = AdaptadorDocumentoIdentidad.letraNIF(usuario.getDocumentoTipo(), numeroNif);
+			String letraNifCalculada = calculaLetraNIFJava(numeroNif);
+			if (!letraNif.equals(letraNifCalculada)) {
+				throw new UVException("letra de NIF no correcta");
+			}
+		}
+	}
+	
+	private String calculaLetraNIFJava(String nif) {
+		final int modulo = 23;
+		String caracteres = "TRWAGMYFPDXBNJZSQVHLCKE";
+		String nifTratado = nif.replace("X", "0").replace("Y", "1").replace("Z", "2");
+		int resto = Integer.parseInt(nifTratado) % modulo;
+		return Character.toString(caracteres.charAt(resto));
+	}
+	
+	private void validaCamposUsuarioAutoregistrado(Usuario usuario) throws UVException {
 		if (usuario == null) {
 			throw new UVException("No se puede insertar un usuario vacio");
 		}
@@ -79,8 +107,21 @@ public class ModeloUsuarioAutoregistrado {
 		if (usuario.getDocumentoNumero() == null || "".equals(usuario.getDocumentoNumero())) {
 			throw new UVException("No se puede insertar un usuario sin numero de documento");
 		}
+	}
+	
+	private void validaInsertaUsuarioAutoregistrado(Usuario usuario) throws UVException, SQLException {
+		validaCamposUsuarioAutoregistrado(usuario);
 		if (isDocumentoRegistrado(usuario.getDocumentoNumero(), usuario.getDocumentoTipo())) {
 			throw new UVException("Documento ya dado de alta, pongase en contracto con los gestores de la aplicacióna la que desea acceder");
+		}
+		boolean validarDocumento = false;
+		try {
+			validarDocumento = ConfiguracionGlobal.getParametroLogico("autoregistrado.validaNif");
+		} catch (UVException e) {
+			LOGGER.log(Level.WARNING, e.toString());
+		}
+		if (validarDocumento) {
+			validaTipoDocumento(usuario);
 		}
 	}
 	
