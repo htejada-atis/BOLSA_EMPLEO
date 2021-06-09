@@ -111,9 +111,11 @@ public class ModeloTitulacion {
 	 */
 	public List<Titulacion> listaTitulacionesCandidato(Integer usuario) throws SQLException {
 		List<Titulacion> titulaciones = new ArrayList<>();
-		String consulta = "SELECT beptit.* FROM TBEP_TITULACIONES beptit"
-				+ " INNER JOIN TBEP_TITULACIONES_USUARIO beptus ON beptus.BEPTUS_TIT_CODNUM = beptit.CODNUM"
-				+ " WHERE beptus.BEPTUS_USU_CODNUM = ?";
+		String consulta = ""
+				+ " SELECT beptit.* "
+				+ " FROM TBEP_TITULACIONES beptit "
+				+ " INNER JOIN TBEP_TITULACIONES_USUARIO beptus ON beptus.BEPTUS_TIT_CODNUM = beptit.CODNUM "
+				+ " WHERE beptus.BEPTUS_USU_CODNUM = ? ";
 		
 		try (Connection conexion = ConexionUvirtual.obtenerInstancia(); PreparedStatement stmt = conexion.prepareStatement(consulta)) {
 			int parameterIndex = 1;

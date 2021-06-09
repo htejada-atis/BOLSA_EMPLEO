@@ -1,6 +1,7 @@
 <%@ page trimDirectiveWhitespaces="true"%>
 <%@	page import="es.ujaen.uvirtual.modulo.bolsaempleo.controlador.ControladorInicio"%>
 <%@	page import="es.ujaen.uvirtual.modulo.bolsaempleo.controlador.configuracion.ControladorGestionFicheros"%>
+<%@	page import="es.ujaen.uvirtual.modulo.bolsaempleo.controlador.ControladorDescargaFicheros"%>
 <%@ page import="es.ujaen.uvirtual.modulo.bolsaempleo.vistas.VistaInicio" %>
 <%@ page import="es.ujaen.uvirtual.modulo.bolsaempleo.beans.Fichero" %>
 <%@ page import="es.ujaen.uvirtual.beans.UVDatos"%>
@@ -25,9 +26,9 @@ VistaInicio bean = (VistaInicio)uvdatos.getVistas().get(VistaInicio.class.getNam
     		<% 
     			if(bean.getFicheros().size() > 0) {
     				for(Fichero fichero: bean.getFicheros()) { 
-    	    			String link = (fichero.isPublico() ? ControladorInicio.URL_PATTERN_FILES_PUBLICA : ControladorInicio.URL_PATTERN_FILES_PRIVADA)
-    	    					+ "?a=" + ControladorInicio.ACCION_DESCARGAR_FICHERO + "&" + ControladorInicio.PARAM_FICHERO
-    	    					+ "=" + fichero.getCodNum();
+    	    			String link = ControladorDescargaFicheros.getUrl(bean.getUsuarioLogeado(), ControladorDescargaFicheros.ACCION_DESCARGAR_DOCUMENTO) 
+    	    					+ "&" + ControladorDescargaFicheros.PARAM_ARCHIVO + "=" + fichero.getCodNum();
+    	    					
     	    			String titulo = "";
     	    			
     	    			if(fichero.getTitulo() != null) {

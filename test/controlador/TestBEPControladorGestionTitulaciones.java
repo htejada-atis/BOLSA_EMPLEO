@@ -16,6 +16,7 @@ import bbdd.UtilsTestBolsaEmpleo;
 import controlador.implementacion.PeticionHttp;
 import controlador.implementacion.RespuestaHttp;
 import es.ujaen.uvirtual.modulo.bolsaempleo.controlador.configuracion.ControladorGestionTitulaciones;
+import es.ujaen.uvirtual.modulo.bolsaempleo.modelo.ModeloTitulacion;
 import es.ujaen.uvirtual.modulo.bolsaempleo.utilidades.BolsaEmpleoDataTable;
 import es.ujaen.uvirtual.modulo.bolsaempleo.vistas.VistaTitulaciones;
 import es.ujaen.uvirtual.utilidades.UVException;
@@ -126,13 +127,22 @@ public class TestBEPControladorGestionTitulaciones {
 	@Test
 	public void testA06EliminarTitulacion() throws ServletException, IOException {
 		PeticionHttp peticion = UtilsTestBolsaEmpleo.peticionAutenticadaPersonal();
-		peticion.setParameter(ControladorGestionTitulaciones.PARAM_ACCION, ControladorGestionTitulaciones.ACCION_BORRAR_TITULACION);
-		peticion.setParameter(ControladorGestionTitulaciones.PARAM_ID, "175");
+		peticion.setParameter(ControladorGestionTitulaciones.PARAM_ACCION, ControladorGestionTitulaciones.ACCION_DATATABLE_TITULACIONES);	
+		peticion.setParameter(BolsaEmpleoDataTable.PARAM_FILTER, "{" + "'" + ModeloTitulacion.ORDER_COLUMN_INDEX_NOMBRE + "':'" + NOMBRE_TITULACION + "'}");
 		
 		RespuestaHttp respuesta = new RespuestaHttp();
 		ControladorGestionTitulaciones controlador = new ControladorGestionTitulaciones();
 		controlador.doPost(peticion, respuesta);
-		VistaTitulaciones bean2 = (VistaTitulaciones) peticion.getUVDatos().getVistas().get(VistaTitulaciones.class.getName());
+		VistaTitulaciones bean = (VistaTitulaciones) peticion.getUVDatos().getVistas().get(VistaTitulaciones.class.getName());
+		
+		PeticionHttp peticion2 = UtilsTestBolsaEmpleo.peticionAutenticadaPersonal();
+		peticion.setParameter(ControladorGestionTitulaciones.PARAM_ACCION, ControladorGestionTitulaciones.ACCION_BORRAR_TITULACION);
+		peticion.setParameter(ControladorGestionTitulaciones.PARAM_ID, bean.getDatatableTitulaciones().getData().get(0).getCodNum().toString());
+		
+		RespuestaHttp respuesta2 = new RespuestaHttp();
+		ControladorGestionTitulaciones controlador2 = new ControladorGestionTitulaciones();
+		controlador2.doPost(peticion2, respuesta2);
+		VistaTitulaciones bean2 = (VistaTitulaciones) peticion2.getUVDatos().getVistas().get(VistaTitulaciones.class.getName());
 		
 		assertEquals(MENSAJE_SIN_ERROR, 0, bean2.getMensajesDeError().size());
 		assertEquals(MENSAJE_SIN_ADVERTENCIAS, 0, bean2.getMensajesDeAdvertencia().size());

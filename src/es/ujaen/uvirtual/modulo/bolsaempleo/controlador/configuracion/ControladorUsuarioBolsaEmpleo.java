@@ -25,6 +25,7 @@ import es.ujaen.uvirtual.modulo.bolsaempleo.modelo.ModeloUsuarioBolsaEmpleo;
 import es.ujaen.uvirtual.modulo.bolsaempleo.utilidades.BolsaEmpleoDataTable;
 import es.ujaen.uvirtual.modulo.bolsaempleo.utilidades.BolsaEmpleoUtils;
 import es.ujaen.uvirtual.modulo.bolsaempleo.vistas.VistaUsuarioBolsaEmpleo;
+import es.ujaen.uvirtual.utilidades.AdaptadorDocumentoIdentidad;
 import es.ujaen.uvirtual.utilidades.EscapaHTML;
 import es.ujaen.uvirtual.utilidades.Formateador;
 import es.ujaen.uvirtual.utilidades.UVException;
@@ -328,7 +329,7 @@ public class ControladorUsuarioBolsaEmpleo extends HttpServlet {
 		
 		Usuario usuArcos = CrearUsuario.usuario(request.getParameter(PARAM_ID));
 		ModeloUsuarioBolsaEmpleo modelo = ModeloUsuarioBolsaEmpleo.obtenerInstancia();		
-		UsuarioBolsaEmpleo usuarioForm = this.getValidatorUsuarios(request, usu);
+		UsuarioBolsaEmpleo usuarioForm = this.getValidatorUsuario(request, usu);
 						
 		modelo.crearUsuarioBolsaEmpleo(usuarioForm.getRol().getCodNum(), usuArcos.getUid(), bean.getUsuarioLogeado());
 		
@@ -350,7 +351,6 @@ public class ControladorUsuarioBolsaEmpleo extends HttpServlet {
 		bean.setVista(JSP_FORM_USUARIO);
 		
 		ModeloUsuarioBolsaEmpleo modelo = ModeloUsuarioBolsaEmpleo.obtenerInstancia();
-		
 		obtenerRoles(bean);
 		
 		UsuarioBolsaEmpleo usu = modelo.getUsuarioByCodCuenta(Formateador.leeParametroString(request.getParameter(PARAM_NOMBRE_USUARIO)));
@@ -362,11 +362,9 @@ public class ControladorUsuarioBolsaEmpleo extends HttpServlet {
 		bean.setRol(usu.getRol());
 		
 		if (EscapaHTML.ajustaCodificacion(request.getParameter(PARAM_ROLE)) != null) {
-			UsuarioBolsaEmpleo usuarioForm = this.getValidatorUsuarios(request, usuar);
-			
-			usuarioForm.setIdNif(usu.getIdNif());
+			UsuarioBolsaEmpleo usuarioForm = this.getValidatorUsuario(request, usuar);
 			usuarioForm.setCodCuenta(usu.getCodCuenta());
-			usuarioForm.setCodNum(Formateador.leeParametroInteger(request.getParameter(PARAM_ID)));
+			usuarioForm.setCodNum(usu.getCodNum());
 			
 			modelo.actualizaUsuario(usuarioForm, bean.getUsuarioLogeado());
 			BolsaEmpleoUtils.addMensajeDeExito(MENSAJE_EXITO_EDITAR, bean, request);
@@ -469,7 +467,7 @@ public class ControladorUsuarioBolsaEmpleo extends HttpServlet {
 		bean.setVista(JSP_USUARIOS);
 	}
 	
-	private UsuarioBolsaEmpleo getValidatorUsuarios(HttpServletRequest request, Usuario usu) throws UVException, SQLException {
+	private UsuarioBolsaEmpleo getValidatorUsuario(HttpServletRequest request, Usuario usu) throws UVException, SQLException {
 		UsuarioBolsaEmpleo u = new UsuarioBolsaEmpleo();
 	
 		String excluido = request.getParameter(PARAM_EXCLUIDO);
@@ -502,6 +500,15 @@ public class ControladorUsuarioBolsaEmpleo extends HttpServlet {
 		
 		u.setListaDist("true".equals(EscapaHTML.ajustaCodificacion(request.getParameter(PARAM_LISTA))));
 		u.setExcluido("true".equals(EscapaHTML.ajustaCodificacion(request.getParameter(PARAM_EXCLUIDO))));
+		
+		u.setTipoDocumento(usu.getDocumentoTipo());
+		u.setIdNif(AdaptadorDocumentoIdentidad.numeroDocumento(AdaptadorDocumentoIdentidad.UXXIAC, usu));
+		u.setLetraNif(AdaptadorDocumentoIdentidad.letraNIF(usu.getDocumentoTipo(), usu.getDocumentoNumero()));
+		u.setPrsNif(usu.getDocumentoNumero());
+		u.setNombre(usu.getNombre());
+		u.setPrimerApellido(usu.getApellido1());
+		u.setSegundoApellido(usu.getApellido2());
+		u.setEmail(usu.getEmailCalculado());
 		
 		return u;
 	}

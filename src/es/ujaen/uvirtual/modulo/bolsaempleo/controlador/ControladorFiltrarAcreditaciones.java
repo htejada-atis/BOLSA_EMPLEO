@@ -1,13 +1,11 @@
 package es.ujaen.uvirtual.modulo.bolsaempleo.controlador;
 
-import java.io.BufferedInputStream;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.sql.SQLException;
 import java.util.logging.Logger;
 import java.util.logging.Level;
 import javax.servlet.ServletException;
-import javax.servlet.ServletOutputStream;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
@@ -55,7 +53,6 @@ public class ControladorFiltrarAcreditaciones extends HttpServlet {
 	public static final String ACCION_CANDIDATO_SELECCIONADO = "candidatoseleccionado";
 	public static final String ACCION_DATATABLE_ACREDITACIONES_CANDIDATO = "datatableacreditacionescandidato";
 	public static final String ACCION_DATATABLE_CANDIDATOS = "datatablecandidatos";
-	public static final String ACCION_DESCARGAR_FICHERO = "descargarfichero";
 	public static final String ACCION_INDEX = "listar";
 	
 	// mensajes
@@ -106,7 +103,6 @@ public class ControladorFiltrarAcreditaciones extends HttpServlet {
 				case ACCION_ACREDITACION_SELECCIONADA:
 				case ACCION_CANDIDATO_SELECCIONADO:
 				case ACCION_DATATABLE_ACREDITACIONES_CANDIDATO:
-				case ACCION_DESCARGAR_FICHERO:
 					candidatoSeleccionado(bean, datos, request, response, nombreAccion);
 					break;
 				case ACCION_DATATABLE_CANDIDATOS:
@@ -188,36 +184,8 @@ public class ControladorFiltrarAcreditaciones extends HttpServlet {
 			case ACCION_DATATABLE_ACREDITACIONES_CANDIDATO:
 				listadoAcreditacionesCandidato(bean, datos, request, response);
 				break;
-			case ACCION_DESCARGAR_FICHERO:
-				descargarFichero(bean, datos, request, response);
-				break;
 		}
 		
-	}
-	
-	private void descargarFichero(VistaFiltrarAcreditaciones bean, UVDatos datos, HttpServletRequest request, HttpServletResponse response)
-			throws SQLException, UVException, IOException {
-		ModeloMeritosPreferentesCandidato modeloAcreditacion = ModeloMeritosPreferentesCandidato.obtenerInstancia();
-		if (EscapaHTML.ajustaCodificacion(request.getParameter(PARAM_FICHERO)) != null) {
-			MeritoPreferenteUsuario acreditacion = modeloAcreditacion.getMeritoPreferenteUsuarioById(
-					Formateador.leeParametroInteger(request.getParameter(PARAM_FICHERO)));
-			bean.setAcreditacion(acreditacion);
-			
-			response.setContentType("application/pdf");
-			datos.setRespuestaEnviada(true);
-	        
-			try (ServletOutputStream stream = response.getOutputStream(); BufferedInputStream buf = new BufferedInputStream(acreditacion.getArchivo())) {
-				int readBytes = 0;
-				while ((readBytes = buf.read()) != -1) {
-					stream.write(readBytes);
-				}
-				stream.flush();
-			} catch (Exception ex) {
-				LOGGER.log(Level.SEVERE, Formateador.getStackTrace(ex));
-				LOGGER.log(Level.SEVERE, ex.toString());
-				bean.getMensajesDeError().add(ex.getMessage());
-	        }			
-		}
 	}
 	
 	private void obtenerCodigoPadreAcreditacion(VistaFiltrarAcreditaciones bean) throws SQLException, UVException {

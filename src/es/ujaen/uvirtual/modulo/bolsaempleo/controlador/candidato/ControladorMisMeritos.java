@@ -1,16 +1,14 @@
 package es.ujaen.uvirtual.modulo.bolsaempleo.controlador.candidato;
 
-import java.io.BufferedInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.PrintWriter;
 import java.sql.SQLException;
-import java.sql.SQLIntegrityConstraintViolationException;
 import java.util.logging.Logger;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Level;
 import javax.servlet.ServletException;
-import javax.servlet.ServletOutputStream;
 import javax.servlet.annotation.MultipartConfig;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
@@ -30,6 +28,7 @@ import es.ujaen.uvirtual.modulo.bolsaempleo.modelo.ModeloBaremacionItems;
 import es.ujaen.uvirtual.modulo.bolsaempleo.modelo.ModeloBaremacionApartados;
 import es.ujaen.uvirtual.modulo.bolsaempleo.modelo.ModeloMerito;
 import es.ujaen.uvirtual.modulo.bolsaempleo.modelo.ModeloRol;
+import es.ujaen.uvirtual.modulo.bolsaempleo.modelo.ModeloSolicitud;
 import es.ujaen.uvirtual.modulo.bolsaempleo.modelo.ModeloUsuarioBolsaEmpleo;
 import es.ujaen.uvirtual.modulo.bolsaempleo.utilidades.BolsaEmpleoDataTable;
 import es.ujaen.uvirtual.modulo.bolsaempleo.utilidades.BolsaEmpleoUtils;
@@ -59,7 +58,6 @@ public class ControladorMisMeritos extends HttpServlet {
 	// acciones
 	public static final String ACCION_AGREGAR_MERITO = "agregarmerito";
 	public static final String ACCION_DATATABLE = "datatable";
-	public static final String ACCION_DESCARGAR_FICHERO = "descargarfichero";
 	public static final String ACCION_ELIMINAR_MERITOS = "eliminarmeritos";
 	public static final String ACCION_INDEX = "listar";
 	
@@ -78,11 +76,11 @@ public class ControladorMisMeritos extends HttpServlet {
 	// mensajes
 	public static final String MENSAJE_ERROR_DESCRIPCION_LARGO = "La descripción no puede contener mas de %d caracteres";
 	public static final String MENSAJE_ERROR_DESCRIPCION_VACIA = "La descripción no puede estar vacía";
+	public static final String MENSAJE_ERROR_ELIMINAR = "El mérito con id %s no se ha podido borrar porque está asociado a una solicitud";
+	public static final String MENSAJE_ERROR_MERITOS_SELECCIONADOS_INCORRECTOS = "Méritos seleccionados incorrectos";
 	public static final String MENSAJE_ERROR_OBSERVACION_LARGO = "La observación no puede contener mas de %d caracteres";
 	public static final String MENSAJE_ERROR_VALOR_MAXIMO_PERMITIDO = "El valor máximo permitido es %s";
 	public static final String MENSAJE_ERROR_VALOR_MINIMO_PERMITIDO = "El valor mínimo permitido es %s";
-	public static final String MENSAJE_ERROR_MERITOS_SELECCIONADOS_INCORRECTOS = "No hay méritos seleccionados válidos";
-	public static final String MENSAJE_ERROR_ELIMINAR_MERITO = "No se puede eliminar un mérito que ya está asociado a una solicitud";
 	public static final String MENSAJE_ERROR_VALOR_DECIMAL_NO_PERMITIDO = "El valor debe ser decimal";
 	public static final String MENSAJE_ERROR_VALOR_ENTERO_NO_PERMITIDO = "El valor debe ser entero";
 	public static final String MENSAJE_EXITO_AGREGAR = "Mérito agregado correctamente";
@@ -186,9 +184,6 @@ public class ControladorMisMeritos extends HttpServlet {
 			case ACCION_AGREGAR_MERITO:
 				agregarMerito(bean, request, response);
 				break;
-			case ACCION_DESCARGAR_FICHERO:
-				descargarFichero(bean, datos, request, response);
-				break;
 			case ACCION_ELIMINAR_MERITOS:
 				eliminarMeritos(bean, request, response);
 				break;				
@@ -246,38 +241,6 @@ public class ControladorMisMeritos extends HttpServlet {
 		
 	}
 	
-	/** descarga un fichero .
-	 * @param bean .
-	 * @param datos .
-	 * @param request .
-	 * @param response .
-	 * @throws SQLException excepcion de bbdd.
-	 * @throws UVException en caso de error de parametros .
-	 * @throws IOException en caso de error de input u output .
-	 */
-	private void descargarFichero(VistaMeritos bean, UVDatos datos, HttpServletRequest request, HttpServletResponse response) throws SQLException, UVException, IOException {
-		ModeloMerito modelo = ModeloMerito.obtenerInstancia();
-		if (EscapaHTML.ajustaCodificacion(request.getParameter(PARAM_ID)) != null) {
-			Merito merito = modelo.listaMerito(Formateador.leeParametroInteger(request.getParameter(PARAM_ID)));
-			bean.setMerito(merito);
-			
-			response.setContentType("application/pdf");
-			datos.setRespuestaEnviada(true);
-	        
-			try (ServletOutputStream stream = response.getOutputStream(); BufferedInputStream buf = new BufferedInputStream(merito.getArchivo())) {
-				int readBytes = 0;
-				while ((readBytes = buf.read()) != -1) {
-					stream.write(readBytes);
-	            }
-				stream.flush();
-			} catch (Exception ex) {
-				LOGGER.log(Level.SEVERE, Formateador.getStackTrace(ex));
-				LOGGER.log(Level.SEVERE, ex.toString());
-				bean.getMensajesDeError().add(ex.getMessage());
-	        }
-		}
-	}
-	
 	/** elimina una lista de méritos seleccionados .
 	 * @param bean .
 	 * @param request .
@@ -291,14 +254,30 @@ public class ControladorMisMeritos extends HttpServlet {
 		
 		Gson gson = new GsonBuilder().create();
 		
+		List<String> idMeritos = new ArrayList<>();
 		try {
-			List<String> meritos = gson.fromJson(request.getParameter(PARAM_MERITOS), new TypeToken<List<String>>() { }.getType());
-			modelo.eliminarMeritos(meritos, bean.getUsuarioLogeado());
-			BolsaEmpleoUtils.addMensajeDeExito(MENSAJE_EXITO_ELIMINAR, bean, request);
-		} catch (SQLIntegrityConstraintViolationException e) {
-			BolsaEmpleoUtils.addMensajeDeError(MENSAJE_ERROR_ELIMINAR_MERITO, bean, request);
+			idMeritos = gson.fromJson(request.getParameter(PARAM_MERITOS), new TypeToken<List<String>>() { }.getType());
 		} catch (Exception ex) {
 			BolsaEmpleoUtils.addMensajeDeError(MENSAJE_ERROR_MERITOS_SELECCIONADOS_INCORRECTOS, bean, request);
+		}
+		
+		// comprobamos si lo mérito son los del usuario logeado
+		List<Merito> meritos = new ArrayList<>();
+		for (String idMerito : idMeritos) {
+			Merito m = modelo.getMeritoById(Formateador.leeParametroInteger(idMerito));
+			if (!m.getUsuario().getCodNum().equals(bean.getUsuarioLogeado().getCodNum())) {
+				throw new UVException("No tienes permisos");
+			}
+			if (ModeloSolicitud.obtenerInstancia().comprobarMeritosSolicitud(m)) {
+				BolsaEmpleoUtils.addMensajeDeError(String.format(MENSAJE_ERROR_ELIMINAR, idMerito), bean, request);
+			} else {
+				meritos.add(m);
+			}
+		}
+		
+		if (meritos.size() > 0) {
+			modelo.eliminarMeritos(meritos, bean.getUsuarioLogeado());
+			BolsaEmpleoUtils.addMensajeDeExito(MENSAJE_EXITO_ELIMINAR, bean, request);
 		}
 		
 		response.sendRedirect(request.getServletPath());

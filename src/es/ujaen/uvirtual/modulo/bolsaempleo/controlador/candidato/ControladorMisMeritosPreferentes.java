@@ -1,6 +1,5 @@
 package es.ujaen.uvirtual.modulo.bolsaempleo.controlador.candidato;
 
-import java.io.BufferedInputStream;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.sql.SQLException;
@@ -9,7 +8,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Level;
 import javax.servlet.ServletException;
-import javax.servlet.ServletOutputStream;
 import javax.servlet.annotation.MultipartConfig;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
@@ -60,7 +58,6 @@ public class ControladorMisMeritosPreferentes extends HttpServlet {
 	public static final String ACCION_DATATABLE = "datatable";
 	public static final String ACCION_AGREGAR_MERITO = "agregarmerito";	
 	public static final String ACCION_AGREGAR_MERITO_CONFIRM = "agregarmeritoconfirm";
-	public static final String ACCION_DESCARGAR_FICHERO = "descargarfichero";
 	public static final String ACCION_ELIMINAR_MERITOS = "eliminarmeritos";
 	public static final String ACCION_LISTADO_OPCIONES = "opciones";
 	
@@ -75,23 +72,6 @@ public class ControladorMisMeritosPreferentes extends HttpServlet {
 	public static final String PARAM_MERITOS = "meritos";
 	
 	// mensajes
-	public static final String MENSAJE_ENVIADO = "mensaje";
-	
-	public static final String MENSAJE_ERROR_APARTADO_REQUERIDO = "Debe seleccionar un apartado";
-	public static final String MENSAJE_ERROR_DESCRIPCION_LARGO = "La descripción no puede contener mas de %d caracteres";
-	public static final String MENSAJE_ERROR_DESCRIPCION_VACIA = "La descripción no puede estar vacía";
-	public static final String MENSAJE_ERROR_ITEM_REQUERIDO = "Debe seleccionar un ítem";
-	public static final String MENSAJE_ERROR_OBSERVACION_LARGO = "La observación no puede contener mas de %d caracteres";
-	public static final String MENSAJE_ERROR_VALOR_VACIO = "El valor no puede estar vacio";
-	public static final String MENSAJE_ERROR_VALOR_MAXIMO_PERMITIDO = "El valor máximo permitido es";
-	public static final String MENSAJE_ERROR_VALOR_MINIMO_PERMITIDO = "El valor mínimo permitido es";
-	public static final String MENSAJE_ERROR_MERITOS_SELECCIONADOS_INCORRECTOS = "No hay méritos seleccionados válidos";
-	public static final String MENSAJE_ERROR_ELIMINAR_MERITO = "No se puede eliminar un mérito que ya está asociado a una solicitud";
-	
-	public static final String MENSAJE_ERROR_VALOR_DECIMAL_NO_PERMITIDO = "El valor debe ser decimal";
-	public static final String MENSAJE_ERROR_VALOR_ENTERO_NO_PERMITIDO = "El valor debe ser entero";
-	
-	public static final String MENSAJE_EXITO_AGREGAR = "Mérito agregado correctamente";
 	public static final String MENSAJE_EXITO_ELIMINAR = "Mérito eliminado correctamente";
 	
 	// ruta vistas
@@ -202,9 +182,6 @@ public class ControladorMisMeritosPreferentes extends HttpServlet {
 			case ACCION_ELIMINAR_MERITOS:
 				eliminarMeritos(bean, datos, request, response);
 				break;
-			case ACCION_DESCARGAR_FICHERO:
-				descargarPdf(bean, datos, request, response);
-				break;
 			case ACCION_LISTADO_OPCIONES:
 				listadoOpciones(bean, datos, request, response);
 				break;
@@ -304,35 +281,17 @@ public class ControladorMisMeritosPreferentes extends HttpServlet {
 		List<MeritoPreferenteUsuario> meritos = new ArrayList<>();
 		
 		for (int sel : selected) {
-			meritos.add(modelo.getMeritoPreferenteUsuarioById(sel));
+			MeritoPreferenteUsuario m = modelo.getMeritoPreferenteUsuarioById(sel);
+			if (!m.getUsuario().getCodNum().equals(bean.getUsuarioLogeado().getCodNum())) {
+				throw new UVException("No tienes permisos");
+			}			
+			meritos.add(m);
 		}
 
 		modelo.cambiarFlagBorradoMeritos(meritos, bean.getUsuarioLogeado());
 
 		BolsaEmpleoUtils.addMensajeDeExito(MENSAJE_EXITO_ELIMINAR, bean, request);
 		response.sendRedirect(request.getServletPath());
-	}
-	
-	private void descargarPdf(VistaMeritosPreferentesCandidato bean, UVDatos datos, HttpServletRequest request, HttpServletResponse response) throws SQLException, UVException {
-		this.index(bean);
-		
-		MeritoPreferenteUsuario mpu = ModeloMeritosPreferentesCandidato.obtenerInstancia().getMeritoPreferenteUsuarioById(
-				Formateador.leeParametroInteger(request.getParameter(PARAM_ID)));
-		
-		response.setContentType("application/pdf");
-		datos.setRespuestaEnviada(true);
-        
-		try (ServletOutputStream stream = response.getOutputStream(); BufferedInputStream buf = new BufferedInputStream(mpu.getArchivo())) {
-			int readBytes = 0;
-			while ((readBytes = buf.read()) != -1) {
-				stream.write(readBytes);
-            }
-			stream.flush();
-		} catch (Exception ex) {
-			LOGGER.log(Level.SEVERE, Formateador.getStackTrace(ex));
-			LOGGER.log(Level.SEVERE, ex.toString());
-			bean.getMensajesDeError().add(ex.getMessage());
-        }		
 	}
 	
 	private MeritoPreferenteUsuario validateMeritoPreferenteUsuario(VistaMeritosPreferentesCandidato bean, HttpServletRequest request) 

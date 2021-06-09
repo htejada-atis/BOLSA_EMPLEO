@@ -567,28 +567,4 @@ public class TestBEPControladorMisSolicitudes {
 		assertEquals(MENSAJE_SIN_ERROR, 0, bean2.getMensajesDeError().size());
 		assertEquals(MENSAJE_SIN_ADVERTENCIAS, 0, bean2.getMensajesDeAdvertencia().size());
 	}
-	
-	/** descargar pdf de la solicitud error .
-	 * @throws SQLException si fallo bd .
-	 * @throws IOException si error io .
-	 * @throws ServletException  si error servlet .
-	 */
-	@Test
-	public void testE06ErrorPdfSolicitud() throws SQLException, ServletException, IOException {
-		VistaSolicitudes bean = obtenerSolicitudes();
-		
-		PeticionHttp peticion = UtilsTestBolsaEmpleo.peticionAutenticadaCandidato2();
-		peticion.setParameter(ControladorMisSolicitudes.PARAM_ACCION, ControladorMisSolicitudes.ACCION_DESCARGAR_PDF);
-		peticion.setParameter(ControladorMisSolicitudes.PARAM_SOLICITUD_ID, bean.getDatatableSolicitudes().getData().get(0).getCodNum().toString());
-		
-		RespuestaHttp respuesta = new RespuestaHttp();
-		ControladorMisSolicitudes controlador = new ControladorMisSolicitudes();
-		controlador.doGet(peticion, respuesta);
-		
-		VistaSolicitudes bean2 = (VistaSolicitudes) peticion.getUVDatos().getVistas().get(VistaSolicitudes.class.getName());
-		
-		assertEquals(MENSAJE_CON_ERROR, 1, bean2.getMensajesDeError().size());
-		assertEquals(MENSAJE_SIN_EXITO, 0, bean2.getMensajesDeExito().size());
-	}
-	
 }

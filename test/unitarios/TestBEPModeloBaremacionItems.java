@@ -35,7 +35,7 @@ public class TestBEPModeloBaremacionItems {
 	private static final Integer CODNUM = 1;
 	private static final Integer CODNUM_2 = 2;
 	private static final Integer CODNUM_NOEXISTE = 111_111_111;
-	private static final String CODIGO = "1";
+	private static final String CODIGO = "12";
 	private static final String NOMBRE = "NOMBRE ÍTEM";
 	private static final String DESCRIPCION = "DESCRIPCIÓN ÍTEM";
 	private static final Double VALOR = 2.1;
@@ -82,7 +82,7 @@ public class TestBEPModeloBaremacionItems {
 	@Test
 	public void testA02getUltimoCodigoItem() {
 		try {
-			String codigo = ModeloBaremacionItems.obtenerInstancia().getUltimoCodigoItem(this.obtenerPrimerBloque());
+			String codigo = ModeloBaremacionItems.obtenerInstancia().getUltimoCodigoItem(this.obtenerBloque());
 			assertNotNull(codigo);
 			assertNotEquals(codigo, "0");
 		} catch (SQLException | UVException ex) {
@@ -103,7 +103,7 @@ public class TestBEPModeloBaremacionItems {
 		params.put(BolsaEmpleoDataTable.PARAM_ORDER_DIRECTION, new String[] {BolsaEmpleoDataTable.PARAM_ORDER_DIRECTION_VALUE_ASC});
 
 		try {
-			BolsaEmpleoDataTable<ItemBaremacion> dt = ModeloBaremacionItems.obtenerInstancia().listadoItemsBaremacionDatatable(params, this.obtenerPrimerBloque());
+			BolsaEmpleoDataTable<ItemBaremacion> dt = ModeloBaremacionItems.obtenerInstancia().listadoItemsBaremacionDatatable(params, this.obtenerBloque());
 			assertFalse(dt.getData().isEmpty());
 		} catch (SQLException | UVException ex) {
 			fail(String.format(MENSAJE_ERROR_HAY_EXCEPCION, ex.toString()));
@@ -116,7 +116,7 @@ public class TestBEPModeloBaremacionItems {
 	@Test
 	public void testA04insertaItem() {
 		try {
-			BloqueBaremacion bloque = this.obtenerPrimerBloque();
+			BloqueBaremacion bloque = this.obtenerBloque();
 			ItemBaremacion item = new ItemBaremacion();
 			item.setBloqueBaremacion(bloque);
 			item.setCodigo(CODIGO);
@@ -157,7 +157,7 @@ public class TestBEPModeloBaremacionItems {
 	@Test
 	public void testA06actualizaItem() {
 		try {					
-			BloqueBaremacion bloque = this.obtenerPrimerBloque();
+			BloqueBaremacion bloque = this.obtenerBloque();
 			ItemBaremacion item = ModeloBaremacionItems.obtenerInstancia().getItemBaremacionById(CODNUM);
 			assertEquals(item.getCodNum(), CODNUM);
 			
@@ -211,7 +211,7 @@ public class TestBEPModeloBaremacionItems {
 	@Test
 	public void testA08listaItemsBaremacionDeUnApartado() {
 		try {
-			List<ItemBaremacion> listaItems = ModeloBaremacionItems.obtenerInstancia().getItemsDeApartado(this.obtenerPrimerBloque().getApartadoBaremacion());
+			List<ItemBaremacion> listaItems = ModeloBaremacionItems.obtenerInstancia().getItemsDeApartado(this.obtenerBloque().getApartadoBaremacion());
 			assertNotEquals(MENSAJE_ITEMS_DEVUELTOS, 0, listaItems.size());
 		} catch (SQLException | UVException ex) {
 			fail(String.format(MENSAJE_ERROR_HAY_EXCEPCION, ex.toString()));
@@ -337,8 +337,8 @@ public class TestBEPModeloBaremacionItems {
 	
 	// UTILS
 	
-	private BloqueBaremacion obtenerPrimerBloque() throws SQLException, UVException {
-		return ModeloBaremacionBloques.obtenerInstancia().getBloqueBaremacionById(CODNUM);
+	private BloqueBaremacion obtenerBloque() throws SQLException, UVException {
+		return ModeloBaremacionItems.obtenerInstancia().getItemBaremacionById(CODNUM).getBloqueBaremacion();
 	}
 	
 	private List<ItemBaremacion> desactivarTodosItems() throws UVException {
