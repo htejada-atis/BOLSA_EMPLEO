@@ -252,7 +252,7 @@ public class TestBEPControladorAfinidades {
 			ControladorAfinidades controlador = new ControladorAfinidades();
 			controlador.doPost(peticion, respuesta);
 			return (VistaAfinidades) peticion.getUVDatos().getVistas().get(VistaAfinidades.class.getName());			
-		} catch (ServletException | IOException ex) {
+		} catch (Exception ex) {
 			fail(String.format(MENSAJE_ERROR_HAY_EXCEPCION, ex.toString()));
 		}
 		return null;

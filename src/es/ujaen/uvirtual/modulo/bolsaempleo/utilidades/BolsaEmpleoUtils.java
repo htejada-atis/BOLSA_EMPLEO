@@ -153,13 +153,13 @@ public final class BolsaEmpleoUtils {
 	 * @param valor valor
 	 * @return El valor convertido a float, o null si no es posible
 	 */
-	public static Float leeParametroFloat(String valor) {
+	public static Double leeParametroDouble(String valor) {
 		try {
 			String[] valueSplitted = valor.split(",");
 			if (valueSplitted.length > 1) {
 				valor = valor.replace(',', '.');
 			}
-			return Float.parseFloat(valor);
+			return Double.parseDouble(valor);
 		} catch (Exception e) {
 			return null;
 		}

@@ -14,8 +14,8 @@ public class ApartadoBaremacion implements Serializable {
 	private String codigo;
 	private String nombre;
 	private Boolean activo;
-	private Float puntuacionMaxima;
-	private Float porcentajeMaximo;
+	private Double puntuacionMaxima;
+	private Double porcentajeMaximo;
 
 	/**
 	 * Constructor por defecto.
@@ -34,8 +34,7 @@ public class ApartadoBaremacion implements Serializable {
 	 * @param ppuntuacionMaxima .
 	 * @param pporcentajeMaximo .
 	 */
-	public ApartadoBaremacion(Integer pcodNum, String pcodigo, String pnombre, Boolean pactivo, Float ppuntuacionMaxima,
-			Float pporcentajeMaximo) {
+	public ApartadoBaremacion(Integer pcodNum, String pcodigo, String pnombre, Boolean pactivo, Double ppuntuacionMaxima, Double pporcentajeMaximo) {
 		super();
 		this.codNum = pcodNum;
 		this.codigo = pcodigo;
@@ -91,19 +90,19 @@ public class ApartadoBaremacion implements Serializable {
 		this.activo = activo;
 	}
 	
-	public Float getPuntuacionMaxima() {
+	public Double getPuntuacionMaxima() {
 		return puntuacionMaxima;
 	}
 
-	public void setPuntuacionMaxima(Float puntuacionMaxima) {
+	public void setPuntuacionMaxima(Double puntuacionMaxima) {
 		this.puntuacionMaxima = puntuacionMaxima;
 	}
 	
-	public Float getPorcentajeMaximo() {
+	public Double getPorcentajeMaximo() {
 		return porcentajeMaximo;
 	}
 
-	public void setPorcentajeMaximo(Float porcentajeMaximo) {
+	public void setPorcentajeMaximo(Double porcentajeMaximo) {
 		this.porcentajeMaximo = porcentajeMaximo;
 	}
 

@@ -577,7 +577,7 @@ public class ModeloSolicitud {
 				+ " WHERE bepmer.BEPUSU_CODNUM = ? ";
 
 		String whereCodigo = String.format("(%s || '.' || %s || '.' || %s)", "bepapa.CODIGO", "bepblo.CODIGO", "bepite.CODIGO");
-		String orderCodigo = String.format("(%s || '.' || %s || '.' || %s) %%s", "LPAD(bepapa.CODIGO, 2)", "LPAD(bepblo.CODIGO, 2)", "LPAD(bepite.CODIGO, 2)");
+		String orderCodigo = String.format("(%s || '.' || %s || '.' || %s) %%s", "LPAD(bepapa.CODIGO, 3)", "LPAD(bepblo.CODIGO, 3)", "LPAD(bepite.CODIGO, 3)");
 		
 		dataTable.setColumn(ORDER_COLUMN_INDEX_MERITOS_ID_MERITO, "bepmer.CODNUM");
 		dataTable.setColumn(ORDER_COLUMN_INDEX_MERITOS_ITEM_CODIGO, whereCodigo, DataTableColumn.COLUMN_TYPE_TEXT, orderCodigo);
@@ -807,7 +807,7 @@ public class ModeloSolicitud {
 	 * @throws UVException .
 	 * @throws SQLException .
 	 */
-	public void asignarAfinidadMeritoNoIndividualizado(Solicitud solicitud, Bolsa bolsa, Merito merito, Map<Afinidad, Float> afinidades, UsuarioBolsaEmpleo usuarioUpdate)
+	public void asignarAfinidadMeritoNoIndividualizado(Solicitud solicitud, Bolsa bolsa, Merito merito, Map<Afinidad, Double> afinidades, UsuarioBolsaEmpleo usuarioUpdate)
 			throws SQLException, UVException {
 		
 		try (Connection conexion = ConexionUvirtual.obtenerInstancia()) {
@@ -820,14 +820,14 @@ public class ModeloSolicitud {
 				this.eliminarValoracionesDelMeritoSolicitud(conexion, meritoSolicitud);
 										
 				// insertamos las afinidades del mérito
-				for (Map.Entry<Afinidad, Float> entry : afinidades.entrySet()) {
+				for (Map.Entry<Afinidad, Double> entry : afinidades.entrySet()) {
 					String sqlInsert = "INSERT INTO TBEP_SOL_BOL_MER_VALORACION (BEPSBM_CODNUM, BEPAFI_CODNUM, VALOR, UID_USUARIO) VALUES (?,?,?,?)";
 					
 					try (PreparedStatement stmt = conexion.prepareStatement(sqlInsert)) {
 						int indexParam = 1;
 						stmt.setInt(indexParam++, meritoSolicitud.getCodNum());
 						stmt.setInt(indexParam++, entry.getKey().getCodNum());
-						stmt.setFloat(indexParam++, entry.getValue());
+						stmt.setDouble(indexParam++, entry.getValue());
 						stmt.setString(indexParam++, usuarioUpdate.getCodCuenta());
 						stmt.executeUpdate();
 					}			
@@ -852,7 +852,7 @@ public class ModeloSolicitud {
 	 * @throws SQLException .
 	 * @throws UVException .
 	 */
-	public void actualizarAfinidadesMeritoNoIndividualizado(Solicitud solicitud, Bolsa bolsa, Merito merito, Map<Afinidad, Float> afinidades, UsuarioBolsaEmpleo usuarioUpdate)
+	public void actualizarAfinidadesMeritoNoIndividualizado(Solicitud solicitud, Bolsa bolsa, Merito merito, Map<Afinidad, Double> afinidades, UsuarioBolsaEmpleo usuarioUpdate)
 			throws SQLException, UVException {
 		
 		try (Connection conexion = ConexionUvirtual.obtenerInstancia()) {
@@ -861,14 +861,14 @@ public class ModeloSolicitud {
 			try {
 				MeritoSolicitud meritoSolicitud = this.getMeritoSolicitud(solicitud.getCodNum(), bolsa.getCodNum(), merito.getCodNum());
 				
-				for (Map.Entry<Afinidad, Float> entry : afinidades.entrySet()) {
+				for (Map.Entry<Afinidad, Double> entry : afinidades.entrySet()) {
 					String consulta = "UPDATE TBEP_SOL_BOL_MER_VALORACION"
 							+ " SET VALOR = ?, UID_USUARIO = ?"
 							+ " WHERE BEPSBM_CODNUM = ? AND BEPAFI_CODNUM = ?";
 					
 					try (PreparedStatement stmt = conexion.prepareStatement(consulta)) {
 						int indexParam = 1;
-						stmt.setFloat(indexParam++, entry.getValue());
+						stmt.setDouble(indexParam++, entry.getValue());
 						stmt.setString(indexParam++, usuarioUpdate.getCodCuenta());
 						stmt.setInt(indexParam++, meritoSolicitud.getCodNum());
 						stmt.setInt(indexParam++, entry.getKey().getCodNum());
@@ -906,7 +906,7 @@ public class ModeloSolicitud {
 		
 		try (Connection conexion = ConexionUvirtual.obtenerInstancia(); PreparedStatement stmt = conexion.prepareStatement(consulta)) {
 			int indexParam = 1;
-			stmt.setNull(indexParam++, Types.FLOAT);
+			stmt.setNull(indexParam++, Types.NUMERIC);
 			stmt.setInt(indexParam++, afinidad.getCodNum());
 			stmt.setString(indexParam++, usuarioUpdate.getCodCuenta());
 			stmt.setInt(indexParam++, meritoSolicitud.getCodNum());
@@ -1051,10 +1051,10 @@ public class ModeloSolicitud {
 			try (ResultSet rs = stmt.executeQuery()) {
 				while (rs.next()) {
 					MeritoSolicitudValoracion msv = new MeritoSolicitudValoracion(
-							rs.getInt(CODNUM),
-							loadMeritoSolicitud ? this.getMeritoSolicitudById(rs.getInt("BEPSBM_CODNUM")) : null,
-							ModeloAfinidad.obtenerInstancia().getAfinidadById(rs.getInt("BEPAFI_CODNUM")),
-							rs.getFloat("VALOR")
+						rs.getInt(CODNUM),
+						loadMeritoSolicitud ? this.getMeritoSolicitudById(rs.getInt("BEPSBM_CODNUM")) : null,
+						ModeloAfinidad.obtenerInstancia().getAfinidadById(rs.getInt("BEPAFI_CODNUM")),
+						rs.getDouble("VALOR")
 					);
 					valoraciones.add(msv);
 				}
@@ -1224,7 +1224,7 @@ public class ModeloSolicitud {
 				+ " INNER JOIN TBEP_BLOQUESBAREMACION bepblo ON bepblo.CODNUM = bepite.BEPBLO_CODNUM "
 				+ " INNER JOIN TBEP_APARTADOSBAREMACION bepapa ON bepapa.CODNUM  = bepblo.BEPAPA_CODNUM "				
 				+ "	WHERE bepsbo.BEPBOL_CODNUM = ? AND bepsbo.BEPSOL_CODNUM = ? "
-				+ " ORDER BY (LPAD(bepapa.CODIGO, 2) || '.' || LPAD(bepblo.CODIGO, 2) || '.' || LPAD(bepite.CODIGO, 2)) ASC";
+				+ " ORDER BY (LPAD(bepapa.CODIGO, 3) || '.' || LPAD(bepblo.CODIGO, 3) || '.' || LPAD(bepite.CODIGO, 3)) ASC";
 		
 		try (Connection conexion = ConexionUvirtual.obtenerInstancia(); PreparedStatement stmt = conexion.prepareStatement(consulta)) {
 			int indexParam = 1;

@@ -24,8 +24,8 @@ public class TestBEPBeanItemBaremacion {
 	private static final String APARTADO_CODIGO = "AAA";
 	private static final String APARTADO_NOMBRE = "EEEE";
 	private static final Boolean APARTADO_ACTIVO = true;
-	private static final Float APARTADO_PUNTUACIONMAXIMA = (float) 1;
-	private static final Float APARTADO_PORCENTAJEMAXIMO = (float) 1;
+	private static final Double APARTADO_PUNTUACIONMAXIMA = (double) 1;
+	private static final Double APARTADO_PORCENTAJEMAXIMO = (double) 1;
 	
 	private static final String BLOQUE_CODIGO = "A";
 	private static final String BLOQUE_NOMBRE = "EE";
@@ -42,9 +42,9 @@ public class TestBEPBeanItemBaremacion {
 	private static final BloqueBaremacion ITEM_BLOQUE =
 			new BloqueBaremacion(5, BLOQUE_APARTADO, BLOQUE_CODIGO, BLOQUE_NOMBRE, BLOQUE_ACTIVO, BLOQUE_NUM_MAXIMO_MERITOS);
 	private static final String ITEM_UNIDADES = "ENTERO";
-	private static final Float ITEM_VALOR = (float) 10;
-	private static final Float ITEM_VALORMINIMO = (float) 1;
-	private static final Float ITEM_VALORMAXIMO = (float) 100;
+	private static final Double ITEM_VALOR = (double) 10;
+	private static final Double ITEM_VALORMINIMO = (double) 1;
+	private static final Double ITEM_VALORMAXIMO = (double) 100;
 	private static final String ITEM_AFINIDAD = "EEEE";
 	private static final Boolean ITEM_INDIVIDUALIZADO = true;
 	
@@ -84,7 +84,14 @@ public class TestBEPBeanItemBaremacion {
 	 */
 	@Test
 	public void testA02() {
-		ItemBaremacion item = new ItemBaremacion(ITEM_CODNUM, ITEM_BLOQUE, ITEM_CODIGO, ITEM_NOMBRE, ITEM_ACTIVO, ITEM_UNIDADES, ITEM_VALOR);
+		ItemBaremacion item = new ItemBaremacion();
+		item.setCodNum(ITEM_CODNUM);
+		item.setBloqueBaremacion(ITEM_BLOQUE);
+		item.setCodigo(ITEM_CODIGO);
+		item.setNombre(ITEM_NOMBRE);
+		item.setActivo(ITEM_ACTIVO);
+		item.setUnidades(ITEM_UNIDADES);
+		item.setValor(ITEM_VALOR);
 		item.setValorMinimo(ITEM_VALORMINIMO);
 		item.setValorMaximo(ITEM_VALORMAXIMO);
 		item.setAfinidad(ITEM_AFINIDAD);
@@ -108,7 +115,14 @@ public class TestBEPBeanItemBaremacion {
 	 */
 	@Test
 	public void testA03() {
-		ItemBaremacion item2 = new ItemBaremacion(ITEM_CODNUM, ITEM_BLOQUE, ITEM_CODIGO, ITEM_NOMBRE, ITEM_ACTIVO, ITEM_UNIDADES, ITEM_VALOR);
+		ItemBaremacion item2 = new ItemBaremacion();
+		item2.setCodNum(ITEM_CODNUM);
+		item2.setBloqueBaremacion(ITEM_BLOQUE);
+		item2.setCodigo(ITEM_CODIGO);
+		item2.setNombre(ITEM_NOMBRE);
+		item2.setActivo(ITEM_ACTIVO);
+		item2.setUnidades(ITEM_UNIDADES);
+		item2.setValor(ITEM_VALOR);
 		item2.setValorMinimo(ITEM_VALORMINIMO);
 		item2.setValorMaximo(ITEM_VALORMAXIMO);
 		item2.setAfinidad(ITEM_AFINIDAD);
@@ -139,7 +153,14 @@ public class TestBEPBeanItemBaremacion {
 	@SuppressWarnings("java:S2159")
 	public void testA04() {
 
-		ItemBaremacion item3 = new ItemBaremacion(ITEM_CODNUM, ITEM_BLOQUE, ITEM_CODIGO, ITEM_NOMBRE, ITEM_ACTIVO, ITEM_UNIDADES, ITEM_VALOR);
+		ItemBaremacion item3 = new ItemBaremacion();
+		item3.setCodNum(ITEM_CODNUM);
+		item3.setBloqueBaremacion(ITEM_BLOQUE);
+		item3.setCodigo(ITEM_CODIGO);
+		item3.setNombre(ITEM_NOMBRE);
+		item3.setActivo(ITEM_ACTIVO);
+		item3.setUnidades(ITEM_UNIDADES);
+		item3.setValor(ITEM_VALOR);
 		item3.setValorMinimo(ITEM_VALORMINIMO);
 		item3.setValorMaximo(ITEM_VALORMAXIMO);
 		item3.setAfinidad(ITEM_AFINIDAD);

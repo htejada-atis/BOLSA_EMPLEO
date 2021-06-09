@@ -29,6 +29,9 @@ public class ControladorErrorBolsaEmpleo extends HttpServlet {
 	// ruta vistas
 	private static final String RUTA_BEP = "/WEB-INF/jsp/vista/infadministrativa/bolsaempleo/";
 	private static final String JSP_ERROR = RUTA_BEP + "error.jsp";
+	
+	// Urls
+	public static final String URL_ERROR = "/srv/es/informacionadministrativa/bolsaempleo/error";
     
 	/**
 	 * do get.

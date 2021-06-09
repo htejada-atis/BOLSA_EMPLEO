@@ -12,7 +12,7 @@ public class Merito implements Serializable {
 
 	private static final long serialVersionUID = 1L;
 	private Integer codNum;
-	private Float valor;
+	private Double valor;
 	private String descripcion;
 	private String observacion;
 	private ItemBaremacion item;
@@ -33,7 +33,7 @@ public class Merito implements Serializable {
 	 * @param pitem .
 	 * @param parchivo .
 	 */
-	public Merito(Integer pcodNum, Float pvalor, String pdescripcion, String pobservacion, ItemBaremacion pitem, InputStream parchivo) {
+	public Merito(Integer pcodNum, Double pvalor, String pdescripcion, String pobservacion, ItemBaremacion pitem, InputStream parchivo) {
 		super();
 		this.codNum = pcodNum;
 		this.valor = pvalor;
@@ -58,7 +58,7 @@ public class Merito implements Serializable {
 	 * @param pitem .
 	 * @param parchivo .
 	 */
-	public Merito(Float pvalor, String pdescripcion, String pobservacion, ItemBaremacion pitem, InputStream parchivo) {
+	public Merito(Double pvalor, String pdescripcion, String pobservacion, ItemBaremacion pitem, InputStream parchivo) {
 		super();
 		this.valor = pvalor;
 		this.descripcion = pdescripcion;
@@ -87,11 +87,11 @@ public class Merito implements Serializable {
 		this.codNum = codNum;
 	}
 
-	public Float getValor() {
+	public Double getValor() {
 		return valor;
 	}
 	
-	public void setValor(Float valor) {
+	public void setValor(Double valor) {
 		this.valor = valor;
 	}
 	

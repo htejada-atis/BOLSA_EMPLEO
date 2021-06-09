@@ -1,5 +1,6 @@
 <%@ page trimDirectiveWhitespaces="true"%>
 <%@	page import="es.ujaen.uvirtual.modulo.bolsaempleo.controlador.ControladorValidarNoAfines"%>
+<%@	page import="es.ujaen.uvirtual.modulo.bolsaempleo.controlador.ControladorDescargaFicheros"%>
 <%@ page import="es.ujaen.uvirtual.modulo.bolsaempleo.vistas.VistaValidarNoAfines" %>
 <%@ page import="es.ujaen.uvirtual.modulo.bolsaempleo.beans.Area" %>
 <%@ page import="es.ujaen.uvirtual.modulo.bolsaempleo.beans.Bolsa" %>
@@ -159,7 +160,7 @@ UsuarioBolsaEmpleo candidato = bean.getCandidato();
 				<div class="form-group-container col1">
 					<div class="form-file">
 						<label for="merito_archivo" class="bold-label">Fichero:</label>
-						<button class="btn icon icon-download" title="Descargar fichero del mérito" type="button">Descargar fichero del mérito</button>
+						<button id="merito_descargar_fichero" class="btn icon icon-download" title="Descargar fichero del mérito" type="button">Descargar fichero del mérito</button>
 					</div>
 				</div>
 				
@@ -280,8 +281,8 @@ $(document).ready(function() {
 	        	}},
 	        	{'data': 'codnum', 'buttons': [
 	        		{'title': 'Descargar fichero del mérito', 'class': 'only-icon icon-download', 'onClick': function(row) {
-	        			window.open("<%= request.getRequestURI() %>"
-	        		        	+ "?a=<%= ControladorValidarNoAfines.ACCION_DESCARGAR_FICHERO %>&<%= ControladorValidarNoAfines.PARAM_MERITO %>=" + row.codNum);
+	        			window.open("<%= ControladorDescargaFicheros.URL_DESCARGA_FICHEROS %>"
+	        		        	+ "?a=<%= ControladorDescargaFicheros.ACCION_DESCARGAR_MERITO_PERSONAL %>&<%= ControladorDescargaFicheros.PARAM_MERITO %>=" + row.codNum);
 	        		}},
 	   			]}
 		    ]
@@ -350,6 +351,12 @@ $(document).ready(function() {
 			
 			document.getElementById("validar_merito").addEventListener("submit", function() {
 				this.elements['<%= ControladorValidarNoAfines.PARAM_BOLSAS %>'].value = Atis.object2Json(tableBolsasCandidato.getCheckedItems());
+			});
+			
+			document.getElementById("merito_descargar_fichero").addEventListener("click", function() {
+				console.log("au")
+				window.open("<%= ControladorDescargaFicheros.URL_DESCARGA_FICHEROS %>"
+    		        	+ "<%= "?a=" + ControladorDescargaFicheros.ACCION_DESCARGAR_MERITO_PERSONAL + "&" + ControladorDescargaFicheros.PARAM_MERITO + "=" + bean.getMerito().getMerito().getCodNum() %>");
 			});
 			
 			Atis.smoothScrollToAnchor("#tableBolsasCandidato");

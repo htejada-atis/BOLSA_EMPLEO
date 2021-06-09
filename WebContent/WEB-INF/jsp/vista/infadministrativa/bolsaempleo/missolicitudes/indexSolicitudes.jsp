@@ -3,6 +3,7 @@
 <%@ page import="es.ujaen.uvirtual.modulo.bolsaempleo.modelo.ModeloConvocatoria" %>
 <%@ page import="es.ujaen.uvirtual.modulo.bolsaempleo.modelo.ModeloSolicitud" %>
 <%@	page import="es.ujaen.uvirtual.modulo.bolsaempleo.controlador.candidato.ControladorMisSolicitudes" %>
+<%@	page import="es.ujaen.uvirtual.modulo.bolsaempleo.controlador.ControladorDescargaFicheros"%>
 <%@ page import="es.ujaen.uvirtual.modulo.bolsaempleo.vistas.VistaSolicitudes" %>
 <%@ page import="es.ujaen.uvirtual.modulo.bolsaempleo.beans.Solicitud" %>
 <%@ page import="es.ujaen.uvirtual.utilidades.EscapaHTML" %>
@@ -94,8 +95,8 @@ VistaSolicitudes bean = (VistaSolicitudes) uvdatos.getVistas().get(VistaSolicitu
 		
 		var descargarPDFSolicitud = function() {
 			var id = $(this).data('rowid')
-			window.open("<%= request.getRequestURI() %>"
-			        	+ "?a=<%= ControladorMisSolicitudes.ACCION_DESCARGAR_PDF %>&<%= ControladorMisSolicitudes.PARAM_SOLICITUD_ID %>=" + id);
+			window.open("<%= ControladorDescargaFicheros.URL_DESCARGA_FICHEROS %>"
+		        	+ "<%= "?a=" + ControladorDescargaFicheros.ACCION_DESCARGAR_SOLICITUD + "&" + ControladorDescargaFicheros.PARAM_SOLICITUD %>=" + id);
 		}
 					
 		var beforeRender = function(table) {

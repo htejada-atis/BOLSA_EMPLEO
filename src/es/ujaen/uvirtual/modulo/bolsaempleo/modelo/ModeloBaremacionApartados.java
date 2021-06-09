@@ -42,7 +42,7 @@ public class ModeloBaremacionApartados {
 	public static final Integer COLUMN_CODIGO_MAXLENGTH = 3; 
 	public static final Integer COLUMN_NOMBRE_MAXLENGTH = 100;
 
-	public static final Float MAXIMO_VALOR_PORCENTAGE = (float) 1.0;
+	public static final Double MAXIMO_VALOR_PORCENTAGE = 1.0;
 	
 	public static final String CODIGO = "CODIGO";
 	public static final String CODNUM = "CODNUM";
@@ -188,11 +188,11 @@ public class ModeloBaremacionApartados {
 			stmt.setString(parameterIndex++, Boolean.TRUE.equals(apartado.getActivo()) ? "S" : "N");
 			
 			if (apartado.getPuntuacionMaxima() != null) {
-				stmt.setFloat(parameterIndex++, apartado.getPuntuacionMaxima());
-				stmt.setNull(parameterIndex++, Types.NULL);
+				stmt.setDouble(parameterIndex++, apartado.getPuntuacionMaxima());
+				stmt.setNull(parameterIndex++, Types.NUMERIC);
 			} else if (apartado.getPorcentajeMaximo() != null) {
-				stmt.setNull(parameterIndex++, Types.NULL);
-				stmt.setFloat(parameterIndex++, apartado.getPorcentajeMaximo());
+				stmt.setNull(parameterIndex++, Types.NUMERIC);
+				stmt.setDouble(parameterIndex++, apartado.getPorcentajeMaximo());
 			}
 			
 			stmt.setString(parameterIndex++, usuarioUpdate.getCodCuenta());
@@ -247,11 +247,11 @@ public class ModeloBaremacionApartados {
 			stmt.setString(parameterIndex++, Boolean.TRUE.equals(apartado.getActivo()) ? "S" : "N");
 			
 			if (apartado.getPuntuacionMaxima() != null) {
-				stmt.setFloat(parameterIndex++, apartado.getPuntuacionMaxima());
-				stmt.setNull(parameterIndex++, Types.NULL);
+				stmt.setDouble(parameterIndex++, apartado.getPuntuacionMaxima());
+				stmt.setNull(parameterIndex++, Types.NUMERIC);
 			} else if (apartado.getPorcentajeMaximo() != null) {
-				stmt.setNull(parameterIndex++, Types.NULL);
-				stmt.setFloat(parameterIndex++, apartado.getPorcentajeMaximo());
+				stmt.setNull(parameterIndex++, Types.NUMERIC);
+				stmt.setDouble(parameterIndex++, apartado.getPorcentajeMaximo());
 			}
 			
 			stmt.setString(parameterIndex++, usuarioUpdate.getCodCuenta());
@@ -318,11 +318,11 @@ public class ModeloBaremacionApartados {
 		
 			try (ResultSet rs = stmt.executeQuery()) {
 				while (rs.next()) {
-					Float acum = null;
+					Double acum = null;
 					if (apartado.getPorcentajeMaximo() != null) {
-						acum = rs.getFloat("SUMA") + apartado.getPorcentajeMaximo();
+						acum = rs.getDouble("SUMA") + apartado.getPorcentajeMaximo();
 					} else {
-						acum = rs.getFloat("SUMA");
+						acum = rs.getDouble("SUMA");
 					}
 					
 					if ("Superar".equals(sentido)) {
@@ -363,8 +363,8 @@ public class ModeloBaremacionApartados {
 		apartado.setCodNum(rs.getInt(CODNUM));
 		apartado.setCodigo(rs.getString(CODIGO));
 		apartado.setNombre(rs.getString("NOMBRE"));
-		apartado.setPuntuacionMaxima(rs.getFloat("PUNTUACIONMAXIMA") == 0 ? null : rs.getFloat("PUNTUACIONMAXIMA"));
-		apartado.setPorcentajeMaximo(rs.getFloat("PORCENTAJEMAXIMO") == 0 ? null : rs.getFloat("PORCENTAJEMAXIMO"));
+		apartado.setPuntuacionMaxima(rs.getDouble("PUNTUACIONMAXIMA") == 0 ? null : rs.getDouble("PUNTUACIONMAXIMA"));
+		apartado.setPorcentajeMaximo(rs.getDouble("PORCENTAJEMAXIMO") == 0 ? null : rs.getDouble("PORCENTAJEMAXIMO"));
 		apartado.setActivo("S".equals(rs.getString("FLGACTIVO")));
 		return apartado;
 	}

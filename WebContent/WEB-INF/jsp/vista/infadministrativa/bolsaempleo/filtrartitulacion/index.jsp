@@ -1,6 +1,7 @@
 <%@ page trimDirectiveWhitespaces="true"%>
 <%@ page import="java.util.stream.Collectors" %>
 <%@	page import="es.ujaen.uvirtual.modulo.bolsaempleo.controlador.ControladorFiltrarTitulacion"%>
+<%@	page import="es.ujaen.uvirtual.modulo.bolsaempleo.controlador.ControladorDescargaFicheros"%>
 <%@ page import="es.ujaen.uvirtual.modulo.bolsaempleo.vistas.VistaFiltrar" %>
 <%@ page import="es.ujaen.uvirtual.beans.UVDatos"%>
 <%@ page import="es.ujaen.uvirtual.utilidades.Formateador"%>
@@ -160,8 +161,8 @@ UsuarioBolsaEmpleo candidato = bean.getCandidato();
 			    	{'data': 'descripcion', 'overflow': 'auto'},
 		        	{'data': 'codnum', 'buttons': [
 		        		{'label': 'Descargar', 'onClick': function(row) {
-		        			window.open("<%=ControladorFiltrarTitulacion.URL_PATTERN_FILES_PRIVADA%>"
-		        		        	+ "?a=<%=ControladorFiltrarTitulacion.ACCION_DESCARGAR_FICHERO%>&<%=ControladorFiltrarTitulacion.PARAM_FICHERO%>=" + row.codNum);
+		        			window.open("<%= ControladorDescargaFicheros.URL_DESCARGA_FICHEROS %>"
+		        		        	+ "<%= "?a=" + ControladorDescargaFicheros.ACCION_DESCARGAR_TITULACION_PERSONAL + "&" + ControladorDescargaFicheros.PARAM_TITULACION %>=" + row.codNum);
 		        		}},
 		        		{'label': 'Editar', 'onClick': changeTitulacion},
 		   			]}	

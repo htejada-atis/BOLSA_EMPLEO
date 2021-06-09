@@ -393,7 +393,7 @@ public class ControladorMisMeritos extends HttpServlet {
 	 * @return .
 	 * @throws UVException .
 	 */
-	public static Float validateValorDelMerito(HttpServletRequest request, Merito merito) throws UVException {
+	public static Double validateValorDelMerito(HttpServletRequest request, Merito merito) throws UVException {
 		// chequeo tipo de valor
 		String valorStr = request.getParameter(PARAM_VALOR);
 		switch (merito.getItemBaremacion().getUnidades()) {
@@ -414,8 +414,8 @@ public class ControladorMisMeritos extends HttpServlet {
 		}
 		
 		// chequeo máximo y mínimo
-		Float valor = merito.getItemBaremacion().getUnidades().equals(ModeloBaremacionItems.ITEM_UNIDADES_MEDICION_SINO) 
-				? BolsaEmpleoUtils.leeParametroFloat("1.0") : BolsaEmpleoUtils.leeParametroFloat(valorStr);
+		Double valor = merito.getItemBaremacion().getUnidades().equals(ModeloBaremacionItems.ITEM_UNIDADES_MEDICION_SINO) 
+				? Formateador.leeParametroDouble("1.0") : Formateador.leeParametroDouble(valorStr);
 		
 		if (valor == null) {
 			throw new UVException("El valor no es válido");
