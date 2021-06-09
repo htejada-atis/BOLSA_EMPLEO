@@ -181,7 +181,8 @@ if(item!=null){
 		var tableItems = new Atis.DataTable('#tableMeritosExcluyentes', {
 		    "ajax": { url: "<%= ControladorItemsBaremacion.URL_PATTERN_AJAX %>", async: false },
 		    "params": {"<%=ControladorItemsBaremacion.PARAM_ITEM%>": <%= (bean.getItemBaremacion()!=null ? bean.getItemBaremacion().getCodNum() : null ) %>},
-		    "pageSize": 5,
+		    "pageSize": 200,
+		    "pageSizeOptions": [10, 100, 200],
 		    "title": "ITEMS EXCLUYENTES",
 		    "filterable": true,
 		    "selectable": true,
