@@ -129,7 +129,57 @@ public class ModeloSolicitud {
 		}
 		
 		return dataTable;
-	}	
+	}
+	
+	/**
+	 * Listado de solicitudes de un candidato. 
+	 * @param candidato .
+	 * @param params para leer los parametros de paginación, ordenacion, etc .
+	 * @return listado de bolsas de empleo .
+	 * @throws SQLException en caso de error de base de datos .
+	 * @throws UVException error si no existe la area .
+	 */
+	public BolsaEmpleoDataTable<Solicitud> listaSolicitudesCandidatoDatatable(UsuarioBolsaEmpleo candidato, Map<String, String[]> params) throws SQLException, UVException {
+		ModeloConvocatoria modeloConvocatoria = ModeloConvocatoria.obtenerInstancia(); 
+		List<Solicitud> data = new ArrayList<>();
+		BolsaEmpleoDataTable<Solicitud> dataTable = new BolsaEmpleoDataTable<>(params);
+		
+		String consulta =
+			"SELECT bepcon.CODNUM, bepsol.CODNUM SOLICITUD_CODNUM, bepsol.ESTADO ESTADO_SOLICITUD"
+			+ "	FROM TBEP_CONVOCATORIAS bepcon"
+			+ "	INNER JOIN TBEP_SOLICITUDES bepsol ON bepsol.BEPCON_CODNUM = bepcon.CODNUM"
+			+ " WHERE bepsol.BEPUSU_CODNUM = ?";
+		
+		dataTable.setQuery(consulta);
+		
+		try (Connection conexion = ConexionUvirtual.obtenerInstancia();
+				PreparedStatement stmtCount = conexion.prepareStatement(dataTable.getQueryCount());
+				PreparedStatement stmt = conexion.prepareStatement(dataTable.getQuery())
+		) {
+			stmt.setInt(1, candidato.getCodNum());
+			stmtCount.setInt(1, candidato.getCodNum());
+			
+			try (ResultSet rs = stmt.executeQuery()) {
+				while (rs.next()) {
+					Convocatoria convocatoria = modeloConvocatoria.getConvocatoriaById(rs.getInt(CODNUM));
+					if (convocatoria == null) {
+						throw new UVException("No existe la convocatoria con id " + rs.getInt(CODNUM));
+					}
+					
+					Solicitud solicitud = new Solicitud();
+					solicitud.setCodNum(rs.getInt("SOLICITUD_CODNUM"));			
+					solicitud.setConvocatoria(convocatoria);			
+					solicitud.setEstado(rs.getString("ESTADO_SOLICITUD") != null ? rs.getString("ESTADO_SOLICITUD") : ModeloSolicitud.SOLICITUD_ESTADO_CERRADA);
+					data.add(solicitud);
+				}
+			}
+			
+			dataTable.setRecordsTotalFromQuery(stmtCount);
+			dataTable.setData(data);
+		}
+		
+		return dataTable;
+	}
 	
 	/**
 	 * Listado de bolsas seleccionadas de una solicitud.

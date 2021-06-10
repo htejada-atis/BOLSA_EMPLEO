@@ -50,7 +50,6 @@ public class ControladorAreasABaremar extends HttpServlet {
 	public static final String ACCION_AREA_PASAR_A_BAREMALE = "accionareabaremable";
 	public static final String ACCION_AREA_PASAR_A_NO_BAREMALE = "accionareanobaremable";
 	public static final String ACCION_DATATABLE = "datatable";
-	public static final String ACCION_DATATABLE_EXCLUIDOS = "datatableexcluidos";
 	public static final String ACCION_IMPORTAR_AREAS_UVIRTUAL = "importarareasuvirtual";
 	public static final String ACCION_INDEX = "listar";
 	
@@ -108,9 +107,6 @@ public class ControladorAreasABaremar extends HttpServlet {
 					break;
 				case ACCION_DATATABLE:
 					listado(bean, datos, request, response);
-					break;
-				case ACCION_DATATABLE_EXCLUIDOS:
-					listadoAreasExcluidasUsuario(bean, datos, request, response);
 					break;
 				case ACCION_IMPORTAR_AREAS_UVIRTUAL:
 					importarAreasDeUvirtual(bean, request, response);
@@ -190,47 +186,6 @@ public class ControladorAreasABaremar extends HttpServlet {
 		try (PrintWriter writer = response.getWriter()) {
 			try {
 				BolsaEmpleoDataTable<Bolsa> dataTable = modelo.listaAreaDatatable(request.getParameterMap());
-				bean.setDatatableAreas(dataTable);
-				writer.write(dataTable.toJson());
-			} catch (UVException e) {
-				LOGGER.log(Level.WARNING, e.toString());
-				bean.getMensajesDeError().add(e.getMessage());
-				CodigoDescripcion mensaje = new CodigoDescripcion(RESPONSE_AJAX_ERROR, e.getMessage());
-				writer.write(new Gson().toJson(mensaje));
-				response.setStatus(RESPONSE_AJAX_HTTP_CODE_ERROR);
-			} catch (SQLException e) { 
-				LOGGER.log(Level.SEVERE, Formateador.getStackTrace(e));
-				LOGGER.log(Level.SEVERE, e.toString());
-				bean.getMensajesDeError().add(e.getMessage());
-				CodigoDescripcion mensaje = new CodigoDescripcion(RESPONSE_AJAX_ERROR, e.getMessage());
-				writer.write(new Gson().toJson(mensaje));
-				response.setStatus(RESPONSE_AJAX_HTTP_CODE_ERROR);
-			}
-		}
-	}
-	
-	/**
-	 * AJAX para devolver listado de areas excluidas de un usuario(bolsas).
-	 * @param bean .
-	 * @param datos .
-	 * @param request .
-	 * @param response .
-	 * @throws IOException .
-	 * @throws SQLException .
-	 */
-	private void listadoAreasExcluidasUsuario(VistaAreasBaremar bean, UVDatos datos, 
-			HttpServletRequest request, HttpServletResponse response) throws IOException, SQLException {
-		ModeloArea modelo = ModeloArea.obtenerInstancia();	
-		datos.setContentType(RESPONSE_AJAX_CONTENTTYPE);
-		datos.setRespuestaEnviada(true);
-		response.setContentType(RESPONSE_AJAX_CONTENTTYPE);
-		response.setCharacterEncoding(RESPONSE_AJAX_ENCODING);
-		
-		Integer codNum = Formateador.leeParametroInteger(request.getParameter(PARAM_ID));
-		
-		try (PrintWriter writer = response.getWriter()) {
-			try {
-				BolsaEmpleoDataTable<Bolsa> dataTable = modelo.listaAreaExcluidasUsuarioDatatable(request.getParameterMap(), codNum);
 				bean.setDatatableAreas(dataTable);
 				writer.write(dataTable.toJson());
 			} catch (UVException e) {

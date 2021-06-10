@@ -682,15 +682,46 @@ table.bluetable.bolsaempleo input + input {
 
 /* tab widget */
 
-.tabpanel-widget {
+.nav-tabs-widget {
+	border-bottom: 1px solid #DDDDDD;
+	padding-left: 0;
+	margin-bottom: 0;
+    list-style: none !important;
+    display: inline-block;
+}
+
+.nav-tabs-widget > li {
+	float: left;
+	margin-bottom: -1px;
+    position: relative;
+    display: block;
+}
+
+.nav-tabs-widget > li > a {
+	border: 1px solid rgba(0, 0, 0, 0);
+	border-radius: 4px 4px 0 0;
+	line-height: 1.42857;
+	margin-right: 2px;
 	position: relative;
-    border: 2px solid #F1F1F1;
+    display: block;
+    padding: 10px 15px;
+    color: #fff;
+    text-decoration: none;
+    background-color: var(--principal);
+    font-size: 14px;
 }
 
-.tabpanel-widget button {
+.nav-tabs-widget > li > a:hover {
+    border-color: #EEEEEE #EEEEEE #DDDDDD;
+    cursor: pointer;
 }
 
-
-
-
-
+.nav-tabs-widget > li.tab-selected > a, .nav-tabs-widget > li.tab-selected > a:hover {
+	background-color: #FFFFFF;
+    border-color: #DDDDDD #DDDDDD rgba(0, 0, 0, 0);
+    border-image: none;
+    border-style: solid;
+    border-width: 1px;
+    color: inherit;
+    cursor: default;
+}

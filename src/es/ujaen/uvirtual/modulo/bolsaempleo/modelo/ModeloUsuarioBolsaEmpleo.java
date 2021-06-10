@@ -44,11 +44,11 @@ public class ModeloUsuarioBolsaEmpleo {
 	public static final int ORDER_COLUMN_INDEX_USUARIO_ELIMINADO = 5;
 	
 	// columnas datatable candidato
-	public static final int ORDER_COLUMN_INDEX_CANDIDATO_DOCUMENTO = 1;
-	public static final int ORDER_COLUMN_INDEX_CANDIDATO_CODCUENTA = 2;
-	public static final int ORDER_COLUMN_INDEX_CANDIDATO_LISTADISTRIBUCION = 4;
-	public static final int ORDER_COLUMN_INDEX_CANDIDATO_EXCLUIDO = 5;
-	public static final int ORDER_COLUMN_INDEX_CANDIDATO_BORRADO = 6;
+	public static final int ORDER_COLUMN_INDEX_CANDIDATO_DOCUMENTO = 0;
+	public static final int ORDER_COLUMN_INDEX_CANDIDATO_CODCUENTA = 1;
+	public static final int ORDER_COLUMN_INDEX_CANDIDATO_LISTADISTRIBUCION = 3;
+	public static final int ORDER_COLUMN_INDEX_CANDIDATO_EXCLUIDO = 4;
+	public static final int ORDER_COLUMN_INDEX_CANDIDATO_BORRADO = 5;
 		
 	public static final String USUARIO_BORRADO = "S";
 	public static final String USUARIO_NO_BORRADO = "N";
@@ -585,30 +585,38 @@ public class ModeloUsuarioBolsaEmpleo {
 		return false;
 	}
 
-	/**
-	 * Establece el usuario como borrado.
-	 * 
-	 * @param usu               .
-	 * @param areas             .
+	/** Establece el usuario como borrado.
+	 * @param usu .
+	 * @param areas  .
 	 * @param usuarioQueExcluye .
+	 * @throws UVException .
 	 * @throws SQLException .
 	 */
-	public void excluirUsuarioArea(UsuarioBolsaEmpleo usu, List<Area> areas, UsuarioBolsaEmpleo usuarioQueExcluye) throws SQLException {
+	public void excluirUsuarioArea(UsuarioBolsaEmpleo usu, List<Area> areas, UsuarioBolsaEmpleo usuarioQueExcluye) throws SQLException, UVException {
 		this.excluirUsuarioAreas(areas, usu, usuarioQueExcluye);
 	}
 
-	private void excluirUsuarioAreas(List<Area> areas, UsuarioBolsaEmpleo usu, UsuarioBolsaEmpleo usuarioQueExcluye) throws SQLException {
+	private void excluirUsuarioAreas(List<Area> areas, UsuarioBolsaEmpleo usu, UsuarioBolsaEmpleo usuarioQueExcluye) throws SQLException, UVException {
 		try (Connection conexion = ConexionUvirtual.obtenerInstancia()) {
-			for (Area a : areas) {
-				String query = "INSERT INTO TBEP_USU_EXCLUIDOS_AREA (USUARIO,AREA,UID_USUARIO) VALUES (?,?,?)";
-				
-				try (PreparedStatement stmt = conexion.prepareStatement(query)) {
-					int paramIndex = 1;
-					stmt.setInt(paramIndex++, usu.getCodNum());
-					stmt.setInt(paramIndex++, a.getCodNum());
-					stmt.setString(paramIndex++, usuarioQueExcluye.getCodCuenta());
-					stmt.executeUpdate();
+			conexion.setAutoCommit(false);
+			try {
+				for (Area a : areas) {
+					String query = "INSERT INTO TBEP_USU_EXCLUIDOS_AREA (USUARIO,AREA,UID_USUARIO) VALUES (?,?,?)";
+					
+					try (PreparedStatement stmt = conexion.prepareStatement(query)) {
+						int paramIndex = 1;
+						stmt.setInt(paramIndex++, usu.getCodNum());
+						stmt.setInt(paramIndex++, a.getCodNum());
+						stmt.setString(paramIndex++, usuarioQueExcluye.getCodCuenta());
+						stmt.executeUpdate();
+					}
 				}
+				conexion.commit();
+			} catch (Exception e) {
+				conexion.rollback();
+				throw new UVException(e.getMessage());
+			} finally {
+				conexion.setAutoCommit(true);
 			}
 		}
 	}
