@@ -15,8 +15,6 @@ VistaUsuarioBolsaEmpleo bean = (VistaUsuarioBolsaEmpleo) uvdatos.getVistas().get
 	
 	<div class="titulo-bolsa-empleo">
 		<h2>Usuarios Candidatos</h2>
-		
-		<button class="link-btn" id="nuevo_usuario">Nuevo candidato</button>
 	</div>
 	
 	<table class="bluetable bolsaempleo" id="table_usuarios">
@@ -41,13 +39,7 @@ VistaUsuarioBolsaEmpleo bean = (VistaUsuarioBolsaEmpleo) uvdatos.getVistas().get
 </div>
 	
 <script>
-$(document).ready(function() {
-	document.getElementById('nuevo_usuario').addEventListener("click", function(event) {
-		event.preventDefault();
-		Atis.sendForm("<%= request.getRequestURI() %>", {'a': '<%= ControladorUsuarioCandidato.ACCION_FORMULARIO_USUARIO %>'});
-	});
-	
-	
+$(document).ready(function() {		
 	var table_usuarios = new Atis.DataTable('#table_usuarios', {
 	    "ajax": { url: "<%=ControladorUsuarioCandidato.URL_PATTERN_AJAX%>", async: false },
 	    "selectable": true,

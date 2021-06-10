@@ -737,7 +737,12 @@ public class ModeloUsuarioBolsaEmpleo {
 
 			stmt.setString(indexParam++, usuarioUpdate.getCodCuenta());
 			stmt.setString(indexParam++, borrado);
-			stmt.setDate(indexParam++, new java.sql.Date(BolsaEmpleoUtils.getCurrentDateTime().getTime()));			
+			if (borrado.equals(USUARIO_BORRADO)) {
+				stmt.setDate(indexParam++, new java.sql.Date(BolsaEmpleoUtils.getCurrentDateTime().getTime()));	
+			} else {
+				stmt.setNull(indexParam++, Types.DATE);
+			}
+
 			for (UsuarioBolsaEmpleo usuario : usuarios) {
 				stmt.setInt(indexParam++, usuario.getCodNum());
 			}

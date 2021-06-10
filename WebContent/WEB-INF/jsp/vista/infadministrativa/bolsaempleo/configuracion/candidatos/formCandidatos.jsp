@@ -156,7 +156,7 @@ UsuarioBolsaEmpleo usuarioBolsa = bean.getUsuario();
 		 	<div class="form-group-custom w100">
     		<%	if (usuarioBolsa != null && usuarioBolsa.getBorrado()) { %>
     				<label for="usuario_restaurar" style="margin-top: 4px">Usuario Borrado</label>
-    				<input id="usuario_restaurar" type="submit" name="<%= ControladorUsuarioCandidato.PARAM_RESTAURAR %> " value="Restaurar"/>
+    				<input id="usuario_restaurar" type="button" value="Restaurar"/>
     		<%	} %>
     		</div>
     		<div class="form-group-custom w100" style="float:right;">
@@ -238,19 +238,21 @@ UsuarioBolsaEmpleo usuarioBolsa = bean.getUsuario();
 	$(document).ready(function() {
 		
 		<% if(bean.getApartadoSolicitudes()!=null){ %>
-		var table = new Atis.DataTable('#table_solicitudes', {
-		    "ajax": { url: "/srv/es/ajax/informacionadministrativa/bolsaempleo/configuracion/candidatos" },
-		    "params": {"<%=ControladorUsuarioCandidato.PARAM_ID%>": <%= usuarioBolsa.getCodNum() %>},
-		    "pageSize": 10,
-		    "title": "SOLICITUDES",
-		    "filterable": true,
-		    "action": "<%= ControladorUsuarioCandidato.ACCION_DATATABLE_SOLICITUDES %>",
-		    "columns": [
-		    	{'data': 'convocatoria.descripcion', order: {'active': false}},
-		        {'data': 'convocatoria.fechaCierre', order: {'active': false}},
-		        {'data': 'convocatoria.estado', order: {'active': false}}
-		    ]
-		});	
+			/*
+			var table = new Atis.DataTable('#table_solicitudes', {
+			    "ajax": { url: "/srv/es/ajax/informacionadministrativa/bolsaempleo/configuracion/candidatos" },
+			    "params": {"<%=ControladorUsuarioCandidato.PARAM_ID%>": <%= usuarioBolsa.getCodNum() %>},
+			    "pageSize": 10,
+			    "title": "SOLICITUDES",
+			    "filterable": true,
+			    "action": "<%= ControladorUsuarioCandidato.ACCION_DATATABLE_SOLICITUDES %>",
+			    "columns": [
+			    	{'data': 'convocatoria.descripcion', order: {'active': false}},
+			        {'data': 'convocatoria.fechaCierre', order: {'active': false}},
+			        {'data': 'convocatoria.estado', order: {'active': false}}
+			    ]
+			});
+			*/
 		<%}%> 
 
 		document.getElementById("usuario_excluido").addEventListener("change", function(event) {
@@ -327,43 +329,45 @@ UsuarioBolsaEmpleo usuarioBolsa = bean.getUsuario();
 		<% } %>
 		
 		<% if(usuarioBolsa!=null) {%>
-		var table = new Atis.DataTable('#table_areas', {
-		    "ajax": { url: "/srv/es/ajax/informacionadministrativa/bolsaempleo/configuracion/areasbaremar" },
-		    "params": {"<%=ControladorUsuarioBolsaEmpleo.PARAM_ID%>": <%= usuarioBolsa.getCodNum() %>},
-		    "selectable": true,
-		    "pageSize": 10,
-		    "filterable": true,
-		    "title": 'LISTADO DE ÁREAS',
-		    "action": "<%= ControladorAreasABaremar.ACCION_DATATABLE_EXCLUIDOS %>",
-		    "columns": [
-		    	{'data': 'area.codNum', 'selectable': true},
-		        {'data': 'area.codNum', 'filter': {'type': 'number'}},
-		        {'data': 'area.idAreaExterno' , 'filter': true, 'overflow': 'auto'},
-		        {'data': 'area.descripcion', 'filter': true, 'overflow': 'auto'}
-		    ],
-		    "actions": [
-		    	{'label': 'Excluir Areas', 'onClick': function(selected) { enviaAccion("<%=ControladorUsuarioCandidato.ACCION_EXCLUIR_USUARIO_AREA%>", selected); } }
-		    ]
-		});	
-		
-		var table = new Atis.DataTable('#table_areas_excluidas', {
-		    "ajax": { url: "/srv/es/ajax/informacionadministrativa/bolsaempleo/configuracion/usuarios" },
-		    "params": {"<%=ControladorUsuarioBolsaEmpleo.PARAM_ID%>": <%= usuarioBolsa.getCodNum() %>},
-		    "selectable": true,
-		    "pageSize": 10,
-		    "filterable": true,
-		    "title": 'ÁREAS EXCLUIDAS PARA EL USUARIO',
-		    "action": "<%= ControladorUsuarioCandidato.ACCION_DATATABLE_USUARIOS_EXCLUIDOS_AREA %>",
-		    "columns": [
-		    	{'data': 'area.codNum', 'selectable': true},
-		        {'data': 'area.codNum', 'filter': {'type': 'number'}},
-		        {'data': 'area.idAreaExterno', 'filter': true, 'overflow': 'auto'},
-		        {'data': 'area.descripcion', 'filter': true, 'overflow': 'auto'}
-		    ],
-		    "actions": [
-		    	{'label': 'Borrar Areas excluidas', 'onClick': function(selected) { enviaAccion("<%= ControladorUsuarioCandidato.ACCION_INCLUIR_USUARIO_AREA %>", selected); } }
-		    ]
-		});	
+			/*
+			var table = new Atis.DataTable('#table_areas', {
+			    "ajax": { url: "/srv/es/ajax/informacionadministrativa/bolsaempleo/configuracion/areasbaremar" },
+			    "params": {"<%=ControladorUsuarioBolsaEmpleo.PARAM_ID%>": <%= usuarioBolsa.getCodNum() %>},
+			    "selectable": true,
+			    "pageSize": 10,
+			    "filterable": true,
+			    "title": 'LISTADO DE ÁREAS',
+			    "action": "<%= ControladorAreasABaremar.ACCION_DATATABLE_EXCLUIDOS %>",
+			    "columns": [
+			    	{'data': 'area.codNum', 'selectable': true},
+			        {'data': 'area.codNum', 'filter': {'type': 'number'}},
+			        {'data': 'area.idAreaExterno' , 'filter': true, 'overflow': 'auto'},
+			        {'data': 'area.descripcion', 'filter': true, 'overflow': 'auto'}
+			    ],
+			    "actions": [
+			    	{'label': 'Excluir Areas', 'onClick': function(selected) { enviaAccion("<%=ControladorUsuarioCandidato.ACCION_EXCLUIR_USUARIO_AREA%>", selected); } }
+			    ]
+			});	
+			
+			var table = new Atis.DataTable('#table_areas_excluidas', {
+			    "ajax": { url: "/srv/es/ajax/informacionadministrativa/bolsaempleo/configuracion/usuarios" },
+			    "params": {"<%=ControladorUsuarioBolsaEmpleo.PARAM_ID%>": <%= usuarioBolsa.getCodNum() %>},
+			    "selectable": true,
+			    "pageSize": 10,
+			    "filterable": true,
+			    "title": 'ÁREAS EXCLUIDAS PARA EL USUARIO',
+			    "action": "<%= ControladorUsuarioCandidato.ACCION_DATATABLE_USUARIOS_EXCLUIDOS_AREA %>",
+			    "columns": [
+			    	{'data': 'area.codNum', 'selectable': true},
+			        {'data': 'area.codNum', 'filter': {'type': 'number'}},
+			        {'data': 'area.idAreaExterno', 'filter': true, 'overflow': 'auto'},
+			        {'data': 'area.descripcion', 'filter': true, 'overflow': 'auto'}
+			    ],
+			    "actions": [
+			    	{'label': 'Borrar Areas excluidas', 'onClick': function(selected) { enviaAccion("<%= ControladorUsuarioCandidato.ACCION_INCLUIR_USUARIO_AREA %>", selected); } }
+			    ]
+			});	
+			*/
 		
 		
 		function enviaAccion(accion, selected) {
@@ -456,6 +460,14 @@ UsuarioBolsaEmpleo usuarioBolsa = bean.getUsuario();
 			$("#buttonsEdit").show();
 		<%}%>
 
+		document.getElementById("usuario_restaurar").addEventListener("click", function(event) {
+			event.preventDefault();
+			
+			Atis.sendForm("<%= request.getRequestURI() %>", {
+				'<%=ControladorUsuarioCandidato.PARAM_ACCION%>': '<%=ControladorUsuarioCandidato.ACCION_RECUPERAR_USUARIO%>', 
+				'<%=ControladorUsuarioCandidato.PARAM_ID%>': '<%=usuarioBolsa.getCodNum()%>'
+			});
+		});
 	});
 	
 	
