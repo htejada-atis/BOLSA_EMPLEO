@@ -15,6 +15,7 @@ import es.ujaen.uvirtual.modulo.bolsaempleo.beans.Bolsa;
 import es.ujaen.uvirtual.modulo.bolsaempleo.beans.BolsaSolicitud;
 import es.ujaen.uvirtual.modulo.bolsaempleo.beans.Convocatoria;
 import es.ujaen.uvirtual.modulo.bolsaempleo.beans.Merito;
+import es.ujaen.uvirtual.modulo.bolsaempleo.beans.MeritoPreferenteUsuario;
 import es.ujaen.uvirtual.modulo.bolsaempleo.beans.MeritoSolicitud;
 import es.ujaen.uvirtual.modulo.bolsaempleo.beans.MeritoSolicitudTable;
 import es.ujaen.uvirtual.modulo.bolsaempleo.beans.MeritoSolicitudValoracion;
@@ -41,13 +42,14 @@ public class ModeloSolicitud {
 	public static final String MENSAJE_ERROR_SOLICITUDES_ABIERTAS = "Ya existen solicitides abiertas";
 	public static final String MENSAJE_ERROR_SOLICITUDE_NO_EXISTE = "No existe la solicitud";
 	public static final String MENSAJE_ERROR_NO_EXISTE_MERITO_SOLICITUD = "No existe el merito de la solicitud";
+	public static final String MENSAJE_ERROR_FALTAN_DATOS_CONFIRMAR_SLICITUD = 
+		"Para confirmar la solicitud debe primero completar sus datos personales. Completelos en la sección 'Mis Datos'.";
 
 	public static final int ORDER_COLUMN_INDEX_MERITOS_ID_MERITO = 1;
 	public static final int ORDER_COLUMN_INDEX_MERITOS_ITEM_CODIGO = 2;
 	public static final int ORDER_COLUMN_INDEX_MERITOS_ITEM_NOMBRE = 3;
 	public static final int ORDER_COLUMN_INDEX_MERITOS_VALOR = 4;
 	public static final int ORDER_COLUMN_INDEX_MERITOS_AFINIDAD = 5;
-	public static final int ORDER_COLUMN_INDEX_MERITOS_EXCLUIDO = 6;
 	
 	public static final String CODNUM = "CODNUM";
 	public static final String BEPBOL_CODNUM = "BEPBOL_CODNUM";
@@ -269,7 +271,7 @@ public class ModeloSolicitud {
 	 * @throws UVException .
 	 * @throws SQLException .
 	 */
-	public Solicitud getSolicitudByConvocatoriaUsuario(UsuarioBolsaEmpleo usuario, Convocatoria convocatoria) throws SQLException, UVException {
+	public Solicitud getSolicitudCerradaByConvocatoriaUsuario(UsuarioBolsaEmpleo usuario, Convocatoria convocatoria) throws SQLException, UVException {
 		String consulta = "SELECT *"
 			  + " FROM TBEP_SOLICITUDES bepsol"
 			  + " WHERE bepsol.ESTADO = ? "
@@ -292,11 +294,43 @@ public class ModeloSolicitud {
 				Solicitud solicitud = new Solicitud();
 				solicitud.setCodNum(rs.getInt("CODNUM"));		
 				solicitud.setConvocatoria(convocatoria);				
-				solicitud.setEstado(rs.getString("ESTADO") != null ? rs.getString("ESTADO") : ModeloSolicitud.SOLICITUD_ESTADO_CERRADA);
+				solicitud.setEstado(rs.getString("ESTADO"));
 				return solicitud;
     		}
 		}
+	}
+	
+	/**
+	 * Devuelve una solicitud del usuario en un convocatoria o null si no tiene.
+	 * @param usuario .
+	 * @param convocatoria .
+	 * @return .
+	 * @throws SQLException .
+	 * @throws UVException .
+	 */
+	public Solicitud getSolicitudByConvocatoriaUsuario(UsuarioBolsaEmpleo usuario, Convocatoria convocatoria) throws SQLException, UVException {
+		String consulta = ""
+				+ " SELECT bepsol.* "
+				+ " FROM TBEP_SOLICITUDES bepsol "
+				+ " WHERE bepsol.BEPCON_CODNUM = ? AND bepsol.BEPUSU_CODNUM = ?";
 		
+		try (Connection conexion = ConexionUvirtual.obtenerInstancia(); PreparedStatement stmt = conexion.prepareStatement(consulta)) {			
+			int paramIndex = 1;
+			stmt.setInt(paramIndex++, convocatoria.getCodNum());			
+			stmt.setInt(paramIndex++, usuario.getCodNum());
+
+			try (ResultSet rs = stmt.executeQuery()) {
+				if (rs.next()) {					
+					Solicitud solicitud = new Solicitud();
+					solicitud.setCodNum(rs.getInt("CODNUM"));		
+					solicitud.setConvocatoria(convocatoria);				
+					solicitud.setEstado(rs.getString("ESTADO"));
+					return solicitud;	
+				}
+    		}
+		}
+		
+		return null;		
 	}
 	
 	/**
@@ -1577,25 +1611,76 @@ public class ModeloSolicitud {
 	 * @return booleano que devuelve si la consulta obtiene resultados . 
 	 * @throws SQLException .
 	 */
-	public boolean comprobarMeritosSolicitud(Merito merito) throws SQLException {
+	public boolean comprobarMeritoPuedeSerBorrado(Merito merito) throws SQLException {
 		
-		String consulta = "SELECT besbm.*"
-				+ "	FROM UVIRTUAL.TBEP_SOL_BOL_MERITOS besbm"
-				+ "	WHERE besbm.BEPMER_CODNUM = ?";
+		String consulta = "SELECT besbm.* FROM TBEP_SOL_BOL_MERITOS besbm WHERE besbm.BEPMER_CODNUM = ?";
 		
 		try (Connection conexion = ConexionUvirtual.obtenerInstancia(); PreparedStatement stmt = conexion.prepareStatement(consulta)) {
 			int parameterIndex = 1;
 			stmt.setInt(parameterIndex++, merito.getCodNum());
-			stmt.executeUpdate();
 			
 			try (ResultSet rs = stmt.executeQuery()) {
 				if (rs.next()) {
-					return true;
+					return false;
 				}
 			}
 		}
 		
-		return false;
+		return true;
+	}
+	
+	/**
+	 * Comprueba si el mérito preferente se puede borrar.
+	 * @param merito .
+	 * @return .
+	 * @throws UVException .
+	 * @throws SQLException .
+	 */
+	public boolean comprobarMeritoPreferentePuedeSerBorrado(MeritoPreferenteUsuario merito) throws SQLException, UVException {
+		if (merito.isValidado()) {
+			return false;
+		}
+		
+		// si tiene una solicitud para la ultima convocatoria, no puede borrar
+		Convocatoria c = ModeloConvocatoria.obtenerInstancia().getUltimaConvocatoria();		
+		if (c != null) {
+			Solicitud s = this.getSolicitudByConvocatoriaUsuario(merito.getUsuario(), c);
+			if (s != null) {
+				return false;
+			}
+		}
+				
+		return true;
+	}
+
+	/**
+	 * Comprueba si se puede confirmar la solicitud.
+	 * @param solicitud .
+	 * @throws UVException .
+	 * @throws SQLException .
+	 */
+	public void comprobarSolicitudCorrecta(Solicitud solicitud) throws SQLException, UVException {			
+		// comprobamos datos de usuario completos
+		if (ModeloUsuarioBolsaEmpleo.obtenerInstancia().compruebaUsuarioMisDatosValidos(solicitud.getUsuario())) {
+			throw new UVException(MENSAJE_ERROR_FALTAN_DATOS_CONFIRMAR_SLICITUD);
+		}
+		
+		// comprobamos problemas con items excluyentes
+//		ModeloBaremacionItems modeloItems = ModeloBaremacionItems.obtenerInstancia();
+//		for (BolsaSolicitud bs : this.getBolsasSolicitudMeritos(solicitud)) {
+//			List<MeritoSolicitud> meritos = this.getMeritosSolicitudBolsa(solicitud, (Bolsa) bs); 
+//			
+//			for (MeritoSolicitud padre : meritos) {
+//				for (MeritoSolicitud hijo : meritos) {
+//					if (!padre.getCodNum().equals(hijo.getCodNum())) {
+//						modeloItems.checkItemsExcluyentes(
+//							padre.getMerito().getItemBaremacion(), 
+//							hijo.getMerito().getItemBaremacion()
+//						);
+//					}
+//				}
+//			}
+//		}				
 	}
 	
 }

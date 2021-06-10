@@ -129,8 +129,6 @@ public class ControladorMisSolicitudes extends HttpServlet {
 	public static final String MENSAJE_ERROR_NUMERO_MAXIMO_MERITOS_BLOQUE = "Se ha alcanzado el número máximo de méritos por bloque";
 	public static final String MENSAJE_ERROR_SIN_MERITOS = "Dene incluir al menos un mérito en una bolsa para continuar";
 	public static final String MENSAJE_EXITO_SOLICITUD_CONFIRMADA = "La solicitud ha sido confirmada correctamente";
-	public static final String MENSAJE_ERROR_FALTAN_DATOS_CONFIRMAR_SLICITUD = "Para confirmar la solicitud debe primero completar sus datos personales."
-			+ " Completelos en la sección 'Mis Datos'.";
 		
 	// ruta vistas
 	public static final String RUTA_BEP_SOL = "/WEB-INF/jsp/vista/infadministrativa/bolsaempleo/missolicitudes/";
@@ -618,9 +616,8 @@ public class ControladorMisSolicitudes extends HttpServlet {
 		}
 
 		Solicitud solicitud = this.listaBolsasSolicitud(bean, request);
+		this.seleccionarBolsa(bean, request);
 
-		String meritoCadena = "";
-		boolean excluyente = false;
 		ModeloSolicitud modeloSolicitud = ModeloSolicitud.obtenerInstancia();
 				
 		if (Boolean.TRUE.equals(seleccionado)) {
@@ -637,24 +634,15 @@ public class ControladorMisSolicitudes extends HttpServlet {
 			
 			List<MeritoSolicitud> listaMeritos = modeloSolicitud.getMeritosSolicitudBolsa(solicitud, area);
 			for (MeritoSolicitud mer : listaMeritos) {
-				if (modeloItems.checkItemsExcluyentes(mer.getMerito().getItemBaremacion(), merito.getItemBaremacion())) {
-					excluyente = true;
-					meritoCadena = mer.getMerito().getItemBaremacion().getBloqueBaremacion().getApartadoBaremacion().getCodigo()
-							+ "." + mer.getMerito().getItemBaremacion().getBloqueBaremacion().getCodigo() 
-							+ "." + mer.getMerito().getItemBaremacion().getCodigo();
-				}
+				modeloItems.checkItemsExcluyentes(mer.getMerito().getItemBaremacion(), merito.getItemBaremacion());
 			}
 			
-			modeloSolicitud.asignarMeritosASolicitudBolsa(solicitud, area, merito, bean.getUsuarioLogeado());
+			modeloSolicitud.asignarMeritosASolicitudBolsa(solicitud, area, merito, bean.getUsuarioLogeado());			
 		} else {
 			modeloSolicitud.borrarMeritoDeSolicitudBolsa(solicitud, area, merito, bean.getUsuarioLogeado());
 		}
-
-		this.seleccionarBolsa(bean, request);
 		
-		if (excluyente) {
-			throw new UVException(MENSAJE_ERROR_ITEM_EXCLUYENTE + meritoCadena + ". Recuerde que solo se seleccionará el más adecuado para la solicitud");
-		}
+		this.seleccionarBolsa(bean, request);
 	}
 	
 	/**
@@ -916,9 +904,7 @@ public class ControladorMisSolicitudes extends HttpServlet {
 		List<BolsaSolicitud> listaBolsas = modeloSolicitud.getBolsasSolicitudMeritos(solicitud);
 		bean.setListaBolsasSolicitud(listaBolsas);
 		
-		if (ModeloUsuarioBolsaEmpleo.obtenerInstancia().compruebaUsuarioMisDatosValidos(bean.getUsuarioLogeado())) {
-			throw new UVException(MENSAJE_ERROR_FALTAN_DATOS_CONFIRMAR_SLICITUD);
-		}
+		modeloSolicitud.comprobarSolicitudCorrecta(solicitud);
 		
 		solicitud.setEstado(ModeloSolicitud.SOLICITUD_ESTADO_CERRADA);
 		solicitud.setFechaConfirmacion(BolsaEmpleoUtils.getCurrentDateTime());
@@ -1108,8 +1094,11 @@ public class ControladorMisSolicitudes extends HttpServlet {
 		document.add(new Paragraph("Acreditaciones", font2));
 		document.add(new Paragraph("\n"));
 					
-		for (MeritoPreferenteUsuario m : ModeloMeritosPreferentesCandidato.obtenerInstancia().listaMeritosCandidatoPorPosesion(usuario)) {			
-			document.add(new Paragraph(m.getCodNum() + " " + m.getDescripcion()));
+		for (MeritoPreferenteUsuario m : ModeloMeritosPreferentesCandidato.obtenerInstancia().listaMeritosPreferentesUsuarioPorPosesion(usuario)) {			
+			document.add(new Paragraph(m.getCodNum() + " " 
+					+ m.getMeritoPreferente().getNombre() 
+					+ (m.getMeritoPreferenteOpcion() != null ? (" " + m.getMeritoPreferenteOpcion().getNombre()) : "")
+					+ (m.getDescripcion() != null ? (" " + m.getDescripcion()) : "")));
 			document.add(new Paragraph("\n"));
 		}
 	}

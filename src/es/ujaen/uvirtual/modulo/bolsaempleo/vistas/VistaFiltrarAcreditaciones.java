@@ -1,6 +1,7 @@
 package es.ujaen.uvirtual.modulo.bolsaempleo.vistas;
 
 import java.io.Serializable;
+import java.util.List;
 
 import es.ujaen.uvirtual.beans.vistas.Vista;
 import es.ujaen.uvirtual.modulo.bolsaempleo.beans.CandidatoAcreditacionesTable;
@@ -17,6 +18,7 @@ public class VistaFiltrarAcreditaciones extends Vista implements Serializable {
 	private static final long serialVersionUID = 1L;
 	private transient BolsaEmpleoDataTable<CandidatoAcreditacionesTable> dataTableCandidatos;
 	private transient BolsaEmpleoDataTable<MeritoPreferenteUsuario> dataTableAcreditaciones;
+	private List<MeritoPreferenteUsuario> listaValidadas;
 	private UsuarioBolsaEmpleo candidato;
 	private MeritoPreferenteUsuario acreditacion;
 	private String codigoPadreMeritoPreferente;
@@ -77,5 +79,13 @@ public class VistaFiltrarAcreditaciones extends Vista implements Serializable {
 	
 	public void setUsuarioLogeado(UsuarioBolsaEmpleo usuario) {
 		this.usuarioLogeado = usuario;
+	}
+	
+	public void setValidadas(List<MeritoPreferenteUsuario> validadas) {
+		this.listaValidadas = validadas;
+	} 
+	
+	public List<MeritoPreferenteUsuario> getValidadas() {
+		return this.listaValidadas;
 	}
 }

@@ -245,7 +245,7 @@ public class ModeloAfinidad {
 		try (Connection conexion = ConexionUvirtual.obtenerInstancia(); PreparedStatement stmt = conexion.prepareStatement(query)) {
 			int indexParam = 1;
 			stmt.setString(indexParam++, "S");
-			stmt.setDate(indexParam++, new java.sql.Date(BolsaEmpleoUtils.getCurrentDate().getTime()));
+			stmt.setDate(indexParam++, new java.sql.Date(BolsaEmpleoUtils.getCurrentDateTime().getTime()));
 			stmt.setString(indexParam++, usuarioUpdate.getCodCuenta());
 			for (Afinidad afiniad : afinidades) {
 				stmt.setInt(indexParam++, afiniad.getCodNum());

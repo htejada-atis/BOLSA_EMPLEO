@@ -10,6 +10,8 @@ import java.util.List;
 import java.util.Map;
 
 import es.ujaen.uvirtual.modelo.conexion.ConexionUvirtual;
+import es.ujaen.uvirtual.modulo.bolsaempleo.beans.Convocatoria;
+import es.ujaen.uvirtual.modulo.bolsaempleo.beans.Solicitud;
 import es.ujaen.uvirtual.modulo.bolsaempleo.beans.Titulacion;
 import es.ujaen.uvirtual.modulo.bolsaempleo.beans.TitulacionUsuario;
 import es.ujaen.uvirtual.modulo.bolsaempleo.beans.UsuarioBolsaEmpleo;
@@ -25,7 +27,6 @@ import es.ujaen.uvirtual.utilidades.UVException;
  */
 public class ModeloMisTitulaciones {
 	public static final int ORDER_COLUMN_INDEX_NOMBRE = 0;
-	
 	public static final int ORDER_COLUMN_INDEX_NOMBRE_USUARIO = 1;
 	public static final int ORDER_COLUMN_INDEX_DESCRIPCION = 2;
 	public static final int ORDER_COLUMN_INDEX_VALIDADA = 3;
@@ -44,6 +45,7 @@ public class ModeloMisTitulaciones {
 	public static final String ERROR_SIN_TITULACION = "La titulación requerida";
 	
 	public static final int COLUMN_DESCRIPCION_MAXLENGTH = 250;
+	public static final int COLUMN_OTRATITULACION_MAXLENGTH = 100;
 
 	protected static ModeloMisTitulaciones eInstancia;
 
@@ -430,6 +432,14 @@ public class ModeloMisTitulaciones {
 		}
 	}
 
+	/**
+	 * Crea una titulacion de usuario a partir de un resultset.
+	 * @param rs .
+	 * @param archivo .
+	 * @return .
+	 * @throws SQLException .
+	 * @throws UVException .
+	 */
 	public TitulacionUsuario setTitulacionUsuarioFromResultSet(ResultSet rs, Boolean archivo) throws SQLException, UVException {
 		TitulacionUsuario tit = new TitulacionUsuario();
 		tit.setCodNum(rs.getInt("CODNUM"));
@@ -452,5 +462,29 @@ public class ModeloMisTitulaciones {
 		tit.setFechaValidada(rs.getDate("FECHA_VALIDADA"));
 		
 		return tit;
+	}
+	
+	/**
+	 * Devuelve si la titulación de usuario puede ser borrada.
+	 * @param t .
+	 * @return .
+	 * @throws UVException .
+	 * @throws SQLException .
+	 */
+	public boolean comprobarTitulacionUsuarioPuedeSerBorrada(TitulacionUsuario t) throws SQLException, UVException {
+		if (t.getValidada()) {
+			return false;
+		}
+		
+		// si tiene una solicitud para la ultima convocatoria, no puede borrar
+		Convocatoria c = ModeloConvocatoria.obtenerInstancia().getUltimaConvocatoria();		
+		if (c != null) {
+			Solicitud s = ModeloSolicitud.obtenerInstancia().getSolicitudByConvocatoriaUsuario(t.getUsuario(), c);
+			if (s != null) {
+				return false;
+			}
+		}
+		
+		return true;
 	}
 }

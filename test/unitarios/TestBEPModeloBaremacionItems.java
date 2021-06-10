@@ -22,7 +22,6 @@ import es.ujaen.uvirtual.modelo.conexion.Conexion;
 import es.ujaen.uvirtual.modulo.bolsaempleo.beans.BloqueBaremacion;
 import es.ujaen.uvirtual.modulo.bolsaempleo.beans.ItemBaremacion;
 import es.ujaen.uvirtual.modulo.bolsaempleo.utilidades.BolsaEmpleoDataTable;
-import es.ujaen.uvirtual.modulo.bolsaempleo.modelo.ModeloBaremacionBloques;
 import es.ujaen.uvirtual.modulo.bolsaempleo.modelo.ModeloBaremacionItems;
 import es.ujaen.uvirtual.utilidades.UVException;
 
@@ -231,9 +230,13 @@ public class TestBEPModeloBaremacionItems {
 			modeloItems.asignarItemsExcluyentesAItem(itemPadre, itemHijo, UtilsTestBolsaEmpleo.getUsuarioPersonalLogeado());
 			
 			List<ItemBaremacion> itemsExcluyentes = modeloItems.getItemsExcluyentes(itemPadre);
-			boolean excluyentes = modeloItems.checkItemsExcluyentes(itemPadre, itemHijo);
 			assertNotEquals(MENSAJE_ITEMS_DEVUELTOS, 0, itemsExcluyentes.size());
-			assertEquals(true, excluyentes);
+			
+			Throwable throwable = assertThrows(Throwable.class, () -> modeloItems.checkItemsExcluyentes(itemPadre, itemHijo));			
+			assertEquals(UVException.class, throwable.getClass());
+			
+			assertThrows(Throwable.class, () -> modeloItems.checkItemsExcluyentes(itemHijo, itemPadre));			
+			assertEquals(UVException.class, throwable.getClass());
 		} catch (SQLException | UVException ex) {
 			fail(String.format(MENSAJE_ERROR_HAY_EXCEPCION, ex.toString()));
 		}
@@ -261,21 +264,37 @@ public class TestBEPModeloBaremacionItems {
 	}
 	
 	/**
-	 * borrarItemExcluyenteAItem .
+	 * borrarItemsExcluyentesAItem .
 	 */
 	@Test
-	public void testA11borrarItemExcluyenteAItem() {
+	public void testA11borrarItemsExcluyentesAItem() {
 		try {
 			ModeloBaremacionItems modeloItems = ModeloBaremacionItems.obtenerInstancia();
-			ItemBaremacion itemPadre = modeloItems.getItemBaremacionById(CODNUM);
-			ItemBaremacion itemHijo = modeloItems.getItemBaremacionById(CODNUM_2);
+			ItemBaremacion itemPadre = modeloItems.getItemBaremacionById(61);
+			ItemBaremacion itemHijo = modeloItems.getItemBaremacionById(62);
 			
-			modeloItems.borrarItemsExcluyentesAItem(itemPadre, itemHijo, UtilsTestBolsaEmpleo.getUsuarioPersonalLogeado());
-			
+			// comprobamos que el item 62 es hijo del 61
 			List<ItemBaremacion> itemsExcluyentes = modeloItems.getItemsExcluyentes(itemPadre);
-			boolean excluyentes = modeloItems.checkItemsExcluyentes(itemPadre, itemHijo);
-			assertEquals(0, itemsExcluyentes.size());
-			assertNotEquals(true, excluyentes);
+			boolean existe = false;
+			for (ItemBaremacion tb : itemsExcluyentes) {
+				if (tb.getCodNum().equals(itemHijo.getCodNum())) {
+					existe = true;
+					break;
+				}
+			}
+			assertTrue(existe);
+			
+			// borramos relación
+			modeloItems.borrarItemsExcluyentesAItem(itemPadre, itemHijo, UtilsTestBolsaEmpleo.getUsuarioPersonalLogeado());
+			itemsExcluyentes = modeloItems.getItemsExcluyentes(itemPadre);
+			existe = false;
+			for (ItemBaremacion tb : itemsExcluyentes) {
+				if (tb.getCodNum().equals(itemHijo.getCodNum())) {
+					existe = true;
+					break;
+				}
+			}
+			assertFalse(existe);			
 		} catch (SQLException | UVException ex) {
 			fail(String.format(MENSAJE_ERROR_HAY_EXCEPCION, ex.toString()));
 		}

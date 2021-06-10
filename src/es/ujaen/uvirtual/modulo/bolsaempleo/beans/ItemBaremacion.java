@@ -145,6 +145,10 @@ public class ItemBaremacion implements Serializable {
 		this.individualizado = individualizado;
 	}
 	
+	public String getFullCode() {
+		return this.getBloqueBaremacion().getApartadoBaremacion().getCodigo() + "." + this.getBloqueBaremacion().getCodigo() + "." + this.getCodigo();
+	}
+	
 	@Override
 	public String toString() {
 		return "ApartadoBaremacion [codNum=" + codNum + ", bloque=" + bloque + ", codigo=" + codigo

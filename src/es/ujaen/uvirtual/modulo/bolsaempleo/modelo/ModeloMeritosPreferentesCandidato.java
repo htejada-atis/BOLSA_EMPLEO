@@ -6,7 +6,6 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Types;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 import java.util.Map;
 import es.ujaen.uvirtual.modelo.conexion.ConexionUvirtual;
@@ -25,11 +24,9 @@ public class ModeloMeritosPreferentesCandidato {
 	// ordenación 
 	public static final int ORDER_COLUMN_INDEX_ID = 1;
 	public static final int ORDER_COLUMN_INDEX_CODIGO = 2;
-	public static final int ORDER_COLUMN_INDEX_NOMBRE = 3;
 	public static final int ORDER_COLUMN_INDEX_DESCRIPCION = 4;
 	
 	public static final int MAX_LENGTH_COLUMN_DESCRIPCION = 250;
-	public static final int MAX_LENGTH_COLUMN_FACTOR = 20;
 	
 	public static final String ERROR_ACREDITACION_OBLIGATORIA = "Acreditacion obligatoria";
 	public static final String ERROR_CANDIDATO_OBLIGATORIO = "Candidato obligatorio";
@@ -123,14 +120,14 @@ public class ModeloMeritosPreferentesCandidato {
 	 * @throws SQLException .
 	 * @throws UVException .
 	 */
-	public List<MeritoPreferenteUsuario> listaMeritosCandidatoPorPosesion(UsuarioBolsaEmpleo usuario) throws SQLException, UVException {
+	public List<MeritoPreferenteUsuario> listaMeritosPreferentesUsuarioPorPosesion(UsuarioBolsaEmpleo usuario) throws SQLException, UVException {
+		List<MeritoPreferenteUsuario> meritos = new ArrayList<>();
+		
 		String consulta = "" 
 				+ " SELECT bepmpu.* "
 				+ " FROM TBEP_MER_PRE_USUARIO bepmpu "
 				+ " INNER JOIN TBEP_MERITOS_PREFERENTES bepmep ON bepmep.CODNUM = bepmpu.BEPMEP_CODNUM "
 				+ " WHERE bepmep.TIPO = ? AND bepmpu.BEPUSU_CODNUM = ? AND bepmpu.FLGBORRADO != 'S'";
-		
-		List<MeritoPreferenteUsuario> meritos = new ArrayList<>();
 		
 		try (Connection conexion = ConexionUvirtual.obtenerInstancia(); PreparedStatement stmt = conexion.prepareStatement(consulta)) {
 			int paramIndex = 1;
@@ -145,6 +142,36 @@ public class ModeloMeritosPreferentesCandidato {
 			}				
 		}
 		
+		return meritos;
+	}
+	
+	/** Lista todas los méritos preferentes validados del candidato .
+	 * @param usuario .
+	 * @return lista .
+	 * @throws SQLException si hay un error en la base de datos .
+	 * @throws UVException .
+	 */
+	public List<MeritoPreferenteUsuario> listaMeritosPreferentesUsuarioPorPosesionValidados(UsuarioBolsaEmpleo usuario) throws SQLException, UVException {
+		List<MeritoPreferenteUsuario> meritos = new ArrayList<>();
+		
+		String consulta = "" 
+				+ " SELECT bepmpu.* "
+				+ " FROM TBEP_MER_PRE_USUARIO bepmpu "
+				+ " INNER JOIN TBEP_MERITOS_PREFERENTES bepmep ON bepmep.CODNUM = bepmpu.BEPMEP_CODNUM "
+				+ " WHERE bepmep.TIPO = ? AND bepmpu.BEPUSU_CODNUM = ? AND bepmpu.FLGBORRADO != 'S' AND bepmpu.FLGVALIDADO = 'S' ";
+		
+		try (Connection conexion = ConexionUvirtual.obtenerInstancia(); PreparedStatement stmt = conexion.prepareStatement(consulta)) {
+			int paramIndex = 1;
+			stmt.setString(paramIndex++, ModeloMeritosPreferentes.TIPO_POSESION);
+			stmt.setInt(paramIndex++, usuario.getCodNum());
+			
+			try (ResultSet rs = stmt.executeQuery()) {
+				while (rs.next()) {
+					MeritoPreferenteUsuario row = this.createMeritoUsuarioFromResultSet(rs);
+					meritos.add(row);
+				}
+			}
+		}
 		return meritos;
 	}
 	
@@ -227,6 +254,13 @@ public class ModeloMeritosPreferentesCandidato {
 		return true;
 	}
 	
+	/**
+	 * Crea un merito preferente del usuario a partir de un resultset.
+	 * @param rs .
+	 * @return .
+	 * @throws SQLException .
+	 * @throws UVException .
+	 */
 	public MeritoPreferenteUsuario createMeritoUsuarioFromResultSet(ResultSet rs) throws SQLException, UVException {
 		MeritoPreferenteUsuario obj = new MeritoPreferenteUsuario();
 		obj.setCodNum(rs.getInt("CODNUM"));
@@ -254,13 +288,13 @@ public class ModeloMeritosPreferentesCandidato {
 	 */
 	public void cambiarFlagBorradoMeritos(List<MeritoPreferenteUsuario> meritos, UsuarioBolsaEmpleo usuarioUpdate) throws SQLException {
 		String params = BolsaEmpleoUtils.consultaMultiplesParametros(meritos.size());
-		String query = "UPDATE TBEP_MER_PRE_USUARIO SET FLGBORRADO=?,FECHA_BORRADO=?,UID_USUARIO=? WHERE CODNUM IN  (" + params + ")";		
+		String query = "UPDATE TBEP_MER_PRE_USUARIO SET FLGBORRADO=?,FECHA_BORRADO=?,UID_USUARIO=? WHERE CODNUM IN (" + params + ")";		
 				
 		try (Connection conexion = ConexionUvirtual.obtenerInstancia(); PreparedStatement stmt = conexion.prepareStatement(query)) {
 			int indexParam = 1;
 
 			stmt.setString(indexParam++, "S");
-			stmt.setDate(indexParam++, new java.sql.Date(BolsaEmpleoUtils.getCurrentDate().getTime()));
+			stmt.setDate(indexParam++, new java.sql.Date(BolsaEmpleoUtils.getCurrentDateTime().getTime()));
 			stmt.setString(indexParam++, usuarioUpdate.getCodCuenta());
 			for (MeritoPreferenteUsuario mer : meritos) {
 				stmt.setInt(indexParam++, mer.getCodNum()); 
@@ -299,14 +333,13 @@ public class ModeloMeritosPreferentesCandidato {
 	 * @throws SQLException .
 	 * @throws UVException .
 	 */
-	public void validaAcreditacion(MeritoPreferenteUsuario acreditacion, UsuarioBolsaEmpleo candidato, Date date, UsuarioBolsaEmpleo usuarioUpdate) 
-			throws SQLException, UVException {
+	public void validaAcreditacion(MeritoPreferenteUsuario acreditacion, UsuarioBolsaEmpleo candidato, UsuarioBolsaEmpleo usuarioUpdate) throws SQLException, UVException {
 		checkeosValidadDesvalida(acreditacion, candidato);
 		
 		String consulta = "UPDATE TBEP_MER_PRE_USUARIO SET FLGVALIDADO='S', FECHA_VALIDADO=?, UID_USUARIO=? WHERE CODNUM = ? AND BEPUSU_CODNUM = ?";
 		try (Connection conexion = ConexionUvirtual.obtenerInstancia(); PreparedStatement stmt = conexion.prepareStatement(consulta)) {
 			int parameterIndex = 1;
-			stmt.setDate(parameterIndex++, new java.sql.Date(date.getTime()));
+			stmt.setDate(parameterIndex++, new java.sql.Date(BolsaEmpleoUtils.getCurrentDateTime().getTime()));
 			stmt.setString(parameterIndex++, usuarioUpdate.getCodCuenta());
 			stmt.setInt(parameterIndex++, acreditacion.getCodNum());
 			stmt.setInt(parameterIndex++, candidato.getCodNum());

@@ -114,10 +114,12 @@ public class ModeloCandidato {
 				+ " SELECT bepusu.*, "
 				+ "		(SELECT COUNT(*) FROM TBEP_MER_PRE_USUARIO bepmpu"
 				+ "		 INNER JOIN TBEP_MERITOS_PREFERENTES bepmep ON bepmep.CODNUM = bepmpu.BEPMEP_CODNUM"
-				+ "	 	 WHERE bepmpu.BEPUSU_CODNUM = bepusu.CODNUM AND bepmep.TIPO = ?) AS COUNT_ACREDITACIONES,"
+				+ "	 	 WHERE bepmpu.BEPUSU_CODNUM = bepusu.CODNUM AND bepmpu.FLGBORRADO = 'N' AND bepmep.TIPO = ?"
+				+ "     ) AS COUNT_ACREDITACIONES,"
 				+ "	    (SELECT COUNT(*) FROM TBEP_MER_PRE_USUARIO bepmpu"
 				+ "		 INNER JOIN TBEP_MERITOS_PREFERENTES bepmep ON bepmep.CODNUM = bepmpu.BEPMEP_CODNUM"
-				+ "		 WHERE bepmpu.BEPUSU_CODNUM = bepusu.CODNUM AND bepmpu.FLGVALIDADO = 'S' AND bepmep.TIPO = ?) AS COUNT_VALIDADAS "
+				+ "		 WHERE bepmpu.BEPUSU_CODNUM = bepusu.CODNUM AND bepmpu.FLGBORRADO = 'N' AND bepmpu.FLGVALIDADO = 'S' AND bepmep.TIPO = ?"
+				+ "     ) AS COUNT_VALIDADAS "
 				+ " FROM TBEP_USUARIOS bepusu "
 				+ " WHERE bepusu.rol = " + ModeloRol.ID_ROL_CANDIDATO + " ";
 		

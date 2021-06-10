@@ -693,7 +693,7 @@ public class ControladorUsuarioCandidato extends HttpServlet {
 				u.setFechaExclusionFin(Formateador.leeParametroFecha(request.getParameter(PARAM_FECHA_EXCLUIDO_FIN), 
 						Formateador.FORMATO_FECHA_DDMMYYYY, "/"));
 			}
-			u.setFechaExclusion(BolsaEmpleoUtils.getCurrentDate());
+			u.setFechaExclusion(BolsaEmpleoUtils.getCurrentDateTime());
 		}
 		
 		Rol rol = ModeloRol.obtenerInstancia().getRoleById(PARAM_ROLE_CANDIDATO);

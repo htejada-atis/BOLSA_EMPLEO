@@ -18,6 +18,7 @@ import es.ujaen.uvirtual.modulo.bolsaempleo.controlador.configuracion.Controlado
 import es.ujaen.uvirtual.modulo.bolsaempleo.modelo.ModeloUsuarioBolsaEmpleo;
 import es.ujaen.uvirtual.modulo.bolsaempleo.utilidades.BolsaEmpleoUtils;
 import es.ujaen.uvirtual.modulo.bolsaempleo.vistas.VistaUsuarioBolsaEmpleo;
+import es.ujaen.uvirtual.utilidades.AdaptadorDocumentoIdentidad;
 import es.ujaen.uvirtual.utilidades.EscapaHTML;
 import es.ujaen.uvirtual.utilidades.Formateador;
 import es.ujaen.uvirtual.utilidades.UVException;
@@ -117,10 +118,10 @@ public class ControladorMisDatos extends HttpServlet {
 
 			switch (nombreAccion) {
 				case ACCION_INDEX:
-					index(bean, datos);
+					index(bean);
 					break;
 				case ACCION_ENVIAR_MISDATOS:
-					enviarMisDatos(request, response, bean);
+					enviarMisDatos(request, response, bean, datos);
 					break;
 				case ACCION_BAJA_USUARIO:
 					bajaUsuario(request, response, bean);
@@ -150,7 +151,7 @@ public class ControladorMisDatos extends HttpServlet {
     }
 	
 	private void init(VistaUsuarioBolsaEmpleo bean, UVDatos datos, HttpServletRequest request, HttpServletResponse response) throws SQLException, UVException, IOException {
-		this.index(bean, datos);
+		this.index(bean);
 		BolsaEmpleoUtils.readMensajeSession(bean, request);
 		try {
 			bean.setUsuarioLogeado(ModeloUsuarioBolsaEmpleo.obtenerInstancia().getOrCreateUsuario(datos));
@@ -179,21 +180,20 @@ public class ControladorMisDatos extends HttpServlet {
 		doGet(request, response);
 	}   
 	
-	private void index(VistaUsuarioBolsaEmpleo bean, UVDatos datos) {
+	private void index(VistaUsuarioBolsaEmpleo bean) {
 		bean.setVista(JSP_INDEX);
 	}
     
-	private void enviarMisDatos(HttpServletRequest request, HttpServletResponse response, VistaUsuarioBolsaEmpleo bean) throws SQLException, UVException, IOException {
+	private void enviarMisDatos(HttpServletRequest request, HttpServletResponse response, VistaUsuarioBolsaEmpleo bean, UVDatos datos) 
+			throws SQLException, UVException, IOException {
 		bean.setVista(JSP_INDEX);
                                         
 		ModeloUsuarioBolsaEmpleo modelo = ModeloUsuarioBolsaEmpleo.obtenerInstancia();
-		Integer codNum = Formateador.leeParametroInteger(request.getParameter(PARAM_ID));
-		UsuarioBolsaEmpleo usuario = modelo.getUsuarioById(codNum);
+		UsuarioBolsaEmpleo usuario = modelo.getUsuarioById(Formateador.leeParametroInteger(request.getParameter(PARAM_ID)));
 		
-		UsuarioBolsaEmpleo usuarioForm = this.validarDatosUsuario(request);
-		usuarioForm.setCodCuenta(usuario.getCodCuenta());
+		UsuarioBolsaEmpleo usuarioForm = this.validarDatosUsuario(request, datos.getUsuario());
 		usuarioForm.setCodNum(usuario.getCodNum());
-		usuarioForm.setIdNif(usuario.getIdNif());
+		usuarioForm.setCodCuenta(usuario.getCodCuenta());
 		    
 		modelo.actualizaUsuarioMisDatos(usuarioForm, bean.getUsuarioLogeado());
 		
@@ -228,13 +228,14 @@ public class ControladorMisDatos extends HttpServlet {
 	 * Valida el formulario de Mis Datos.
 	 * 
 	 * @param request .
+	 * @param usu .
 	 * @return validator .
 	 * @throws UVException  .
 	 * @throws SQLException .
 	 * @throws IOException  .
 	 * @throws IOException  .
 	 */
-	private UsuarioBolsaEmpleo validarDatosUsuario(HttpServletRequest request) throws UVException {
+	private UsuarioBolsaEmpleo validarDatosUsuario(HttpServletRequest request, Usuario usu) throws UVException {
 		UsuarioBolsaEmpleo u = this.validarDatosUsuarioDireccion(request, new UsuarioBolsaEmpleo());
 		        
 		u.setTelefono(EscapaHTML.ajustaCodificacion(request.getParameter(PARAM_TELEFONO)));
@@ -253,6 +254,15 @@ public class ControladorMisDatos extends HttpServlet {
 		}
 	    
 		u.setListaDist("true".equals(EscapaHTML.ajustaCodificacion(request.getParameter(PARAM_LISTA))));
+		
+		u.setTipoDocumento(usu.getDocumentoTipo());
+		u.setIdNif(AdaptadorDocumentoIdentidad.numeroDocumento(AdaptadorDocumentoIdentidad.UXXIAC, usu));
+		u.setLetraNif(AdaptadorDocumentoIdentidad.letraNIF(usu.getDocumentoTipo(), usu.getDocumentoNumero()));
+		u.setPrsNif(usu.getDocumentoNumero());
+		u.setNombre(usu.getNombre());
+		u.setPrimerApellido(usu.getApellido1());
+		u.setSegundoApellido(usu.getApellido2());
+		u.setEmail(usu.getEmailCalculado());
 	
 		return u;
 	}
