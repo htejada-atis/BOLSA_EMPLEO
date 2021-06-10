@@ -328,6 +328,10 @@ public class ControladorUsuarioBolsaEmpleo extends HttpServlet {
 		bean.setVista(JSP_USUARIOS);
 		
 		Usuario usuArcos = CrearUsuario.usuario(request.getParameter(PARAM_ID));
+		if (usuArcos == null) {
+			throw new UVException("No existe el usuario");
+		}
+			
 		ModeloUsuarioBolsaEmpleo modelo = ModeloUsuarioBolsaEmpleo.obtenerInstancia();		
 		UsuarioBolsaEmpleo usuarioForm = this.getValidatorUsuario(request, usu);
 						
@@ -364,7 +368,16 @@ public class ControladorUsuarioBolsaEmpleo extends HttpServlet {
 		if (EscapaHTML.ajustaCodificacion(request.getParameter(PARAM_ROLE)) != null) {
 			UsuarioBolsaEmpleo usuarioForm = this.getValidatorUsuario(request, usuar);
 			usuarioForm.setCodCuenta(usu.getCodCuenta());
-			usuarioForm.setCodNum(usu.getCodNum());
+			usuarioForm.setCodNum(usu.getCodNum());			
+			usuarioForm.setCodCuenta(usuArcos.getUid());
+			usuarioForm.setTipoDocumento(usuArcos.getDocumentoTipo());
+			usuarioForm.setIdNif(AdaptadorDocumentoIdentidad.numeroDocumento(AdaptadorDocumentoIdentidad.UXXIAC, usuArcos));
+			usuarioForm.setLetraNif(AdaptadorDocumentoIdentidad.letraNIF(usuArcos.getDocumentoTipo(), usuArcos.getDocumentoNumero()));
+			usuarioForm.setPrsNif(usuArcos.getDocumentoNumero());
+			usuarioForm.setNombre(usuArcos.getNombre());
+			usuarioForm.setPrimerApellido(usuArcos.getApellido1());
+			usuarioForm.setSegundoApellido(usuArcos.getApellido2());
+			usuarioForm.setEmail(usuArcos.getEmailCalculado());
 			
 			modelo.actualizaUsuario(usuarioForm, bean.getUsuarioLogeado());
 			BolsaEmpleoUtils.addMensajeDeExito(MENSAJE_EXITO_EDITAR, bean, request);
@@ -467,13 +480,13 @@ public class ControladorUsuarioBolsaEmpleo extends HttpServlet {
 		bean.setVista(JSP_USUARIOS);
 	}
 	
-	private UsuarioBolsaEmpleo getValidatorUsuario(HttpServletRequest request, Usuario usu) throws UVException, SQLException {
+	private UsuarioBolsaEmpleo getValidatorUsuario(HttpServletRequest request, Usuario usuarioLogeado) throws UVException, SQLException {
 		UsuarioBolsaEmpleo u = new UsuarioBolsaEmpleo();
 	
 		String excluido = request.getParameter(PARAM_EXCLUIDO);
 		if (excluido != null) {
 			Usuario usuArcos = CrearUsuario.usuario(request.getParameter(PARAM_NOMBRE_USUARIO));
-			if (usuArcos.getDocumentoNumero().equals(usu.getDocumentoNumero())) {
+			if (usuArcos.getDocumentoNumero().equals(usuarioLogeado.getDocumentoNumero())) {
 				throw new UVException(MENSAJE_ERROR_EXCLUSION_USUARIO_LOGUEADO);
 			}
 			
@@ -500,15 +513,6 @@ public class ControladorUsuarioBolsaEmpleo extends HttpServlet {
 		
 		u.setListaDist("true".equals(EscapaHTML.ajustaCodificacion(request.getParameter(PARAM_LISTA))));
 		u.setExcluido("true".equals(EscapaHTML.ajustaCodificacion(request.getParameter(PARAM_EXCLUIDO))));
-		
-		u.setTipoDocumento(usu.getDocumentoTipo());
-		u.setIdNif(AdaptadorDocumentoIdentidad.numeroDocumento(AdaptadorDocumentoIdentidad.UXXIAC, usu));
-		u.setLetraNif(AdaptadorDocumentoIdentidad.letraNIF(usu.getDocumentoTipo(), usu.getDocumentoNumero()));
-		u.setPrsNif(usu.getDocumentoNumero());
-		u.setNombre(usu.getNombre());
-		u.setPrimerApellido(usu.getApellido1());
-		u.setSegundoApellido(usu.getApellido2());
-		u.setEmail(usu.getEmailCalculado());
 		
 		return u;
 	}

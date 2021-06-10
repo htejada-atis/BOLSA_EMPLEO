@@ -63,13 +63,16 @@ public class ModeloCandidato {
 		List<CandidatoTitulacionTable> usuarios = new ArrayList<>();
 		BolsaEmpleoDataTable<CandidatoTitulacionTable> dataTable = new BolsaEmpleoDataTable<>(params);
 
-		String consulta = "SELECT bepusu.CODNUM, "
-				+ "	(SELECT COUNT(*) FROM TBEP_TITULACIONES_USUARIO beptus"
-				+ "		WHERE beptus.BEPTUS_USU_CODNUM = bepusu.CODNUM" + "	) AS COUNT_TITULACIONES,"
-				+ "	(SELECT COUNT(*) FROM TBEP_TITULACIONES_USUARIO beptus"
-				+ "		WHERE beptus.BEPTUS_USU_CODNUM = bepusu.CODNUM AND beptus.FLGVALIDADA = 'S'"
-				+ "	) AS COUNT_VALIDADAS" + "	FROM TBEP_USUARIOS bepusu" + "	WHERE bepusu.rol = "
-				+ ModeloRol.ID_ROL_CANDIDATO + " ";
+		String consulta = ""
+				+ " SELECT bepusu.CODNUM, "
+				+ "		(SELECT COUNT(*) FROM TBEP_TITULACIONES_USUARIO beptus "
+				+ "      WHERE beptus.BEPTUS_USU_CODNUM = bepusu.CODNUM AND beptus.FLGBORRADO = 'N'"
+				+ "	    ) AS COUNT_TITULACIONES,"
+				+ "		(SELECT COUNT(*) FROM TBEP_TITULACIONES_USUARIO beptus "
+				+ "		 WHERE beptus.BEPTUS_USU_CODNUM = bepusu.CODNUM AND beptus.FLGBORRADO = 'N' AND beptus.FLGVALIDADA = 'S'"
+				+ "		) AS COUNT_VALIDADAS" 
+				+ "	FROM TBEP_USUARIOS bepusu" 
+				+ "	WHERE bepusu.rol = " + ModeloRol.ID_ROL_CANDIDATO + " ";
 
 		dataTable.setColumn(ORDER_COLUMN_INDEX_NOMBRE_CANDIDATO, "bepusu.CODCUENTA");
 
