@@ -221,7 +221,7 @@ public class ControladorFiltrarTitulacion extends HttpServlet {
 				}
 				
 				if (seleccionado) {
-					modeloTitulacion.validaTitulacion(titulacion, candidato, BolsaEmpleoUtils.getCurrentDate(), bean.getUsuarioLogeado());
+					modeloTitulacion.validaTitulacion(titulacion, candidato, BolsaEmpleoUtils.getCurrentDateTime(), bean.getUsuarioLogeado());
 				} else {
 					modeloTitulacion.desvalidaTitulacion(titulacion, candidato, bean.getUsuarioLogeado());
 				}

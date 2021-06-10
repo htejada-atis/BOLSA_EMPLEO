@@ -3,6 +3,7 @@ package es.ujaen.uvirtual.modulo.bolsaempleo.controlador.candidato;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -58,12 +59,9 @@ public class ControladorMisTitulaciones extends HttpServlet {
 	public static final String PARAM_ARCHIVO = "archivo";
 	public static final String PARAM_DESCRIPCION = "descripcion";
 	public static final String PARAM_OTRA_TITULACION = "otratitulacion";
-	public static final String PARA_AGREGAR_TITULACION = "agregartitulacion";
-	public static final String PARAM_FICHERO = "fichero";
 	public static final String PARAM_TITULACIONES_USUARIOS_SELECCIONADOS = "titulacionesusuariosselected";
 
 	// acciones
-	public static final String ACCION_ENVIAR_MISTITULACIONES = "enviarmistitulaciones";
 	public static final String ACCION_DATATABLE_TITULACIONES_USUARIO = "datatabletitulacionesusuario";
 	public static final String ACCION_DATATABLE_TITULACIONES = "datatabletitulaciones";
 	public static final String ACCION_FORMULARIO_TITULACIONES_USUARIO = "formulariotitulacionesusuario";
@@ -72,22 +70,11 @@ public class ControladorMisTitulaciones extends HttpServlet {
 	public static final String ACCION_ELIMINAR_TITULACION_USUARIO = "eliminartitulacionusuario";
 	
 	// mensajes
-	public static final String MENSAJE_ENVIADO = "mensaje";
 	public static final String MENSAJE_EXITO_AGREGAR = "Titulación creada correctamente";
 	public static final String MENSAJE_EXITO_TITULACION_BORRADA = "Titulación eliminada correctamente";
-	
-	public static final String MENSAJE_ERROR_ARCHIVO_VACIO = "El archivo no puede estar vacio";
-
-	public static final String MENSAJE_ERROR_TELEFONO_STRING = "El telefono debe ser un número";
-	public static final String MENSAJE_ERROR_MOVIL_STRING = "El móvil debe ser un número";
-	public static final String MENSAJE_ERROR_CODIGO_POSTAL_STRING = "El código postal debe ser un número";
-	
-	public static final String MENSAJE_ERROR_DESCRIPCION_VACIO = "El campo descripción no puede estar vacio";
 	public static final String MENSAJE_ERROR_DESCRIPCION_REQUERIDO = "El campo descripción es obligatorio";
 	public static final String MENSAJE_ERROR_DESCRIPCION_LARGA = "La descripción no puede contener mas de %d caracteres";
 
-	public static final String URL_PATTERN_FILES_PRIVADA = "/srv/es/informacionadministrativa/bolsaempleo/mistitulaciones";
-	
 	// ajax
 	public static final String URL_PATTERN_AJAX = "/srv/es/ajax/informacionadministrativa/bolsaempleo/mistitulaciones";
 	public static final String RESPONSE_AJAX_CONTENTTYPE = "application/json";
@@ -139,7 +126,7 @@ public class ControladorMisTitulaciones extends HttpServlet {
 					agregarTitulacion(request, response, bean);
 					break;
 				case ACCION_ELIMINAR_TITULACION_USUARIO:
-					eliminarTitulacionUsuario(request, bean);
+					eliminarTitulacionUsuario(request, response, bean);
 					break;
 				default:
 					errorFatal(bean, "Acción no contemplada");
@@ -337,24 +324,32 @@ public class ControladorMisTitulaciones extends HttpServlet {
 		}
 	}
 	
-	private void eliminarTitulacionUsuario(HttpServletRequest request, VistaTitulaciones bean) throws SQLException, UVException {
+	private void eliminarTitulacionUsuario(HttpServletRequest request, HttpServletResponse response, VistaTitulaciones bean) throws SQLException, UVException, IOException {
 		String selectedJson = EscapaHTML.ajustaCodificacion(request.getParameter(PARAM_TITULACIONES_USUARIOS_SELECCIONADOS));
 		int[] selected = (new Gson()).fromJson(selectedJson, new TypeToken<int[]>() { }.getType());
 		
 		ModeloMisTitulaciones modelo = ModeloMisTitulaciones.obtenerInstancia();
 		
-		List<TitulacionUsuario> titulaciones = modelo.getTitulacionesUsuarioByIds(selected);
-		for (TitulacionUsuario tu : titulaciones) {
+		List<TitulacionUsuario> titulaciones = new ArrayList<>();
+		
+		for (TitulacionUsuario tu : modelo.getTitulacionesUsuarioByIds(selected)) {
 			if (!tu.getUsuario().getCodNum().equals(bean.getUsuarioLogeado().getCodNum())) {
 				throw new UVException("No tienes permisos");
 			}
+			
+			if (!modelo.comprobarTitulacionUsuarioPuedeSerBorrada(tu)) {
+				BolsaEmpleoUtils.addMensajeDeError(String.format("La titulación %s no puede ser borrada", tu.getTitulacion().getNombre()), bean, request);
+			} else {
+				titulaciones.add(tu);				
+			}			
 		}
 
-		modelo.borraTitulacionUsuario(titulaciones, bean.getUsuarioLogeado());
+		if (!titulaciones.isEmpty()) {
+			modelo.borraTitulacionUsuario(titulaciones, bean.getUsuarioLogeado());
+			bean.getMensajesDeExito().add(MENSAJE_EXITO_TITULACION_BORRADA);
+		}
 		
-		bean.setVista(JSP_INDEX);
-
-		bean.getMensajesDeExito().add(MENSAJE_EXITO_TITULACION_BORRADA);
+		response.sendRedirect(request.getServletPath());		
 	}
 	
 	private TitulacionUsuario validarTitulacion(HttpServletRequest request, Part uploadedFile) throws UVException, IOException, SQLException {

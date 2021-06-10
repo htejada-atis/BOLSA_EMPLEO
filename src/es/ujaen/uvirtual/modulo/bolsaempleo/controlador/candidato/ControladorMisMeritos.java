@@ -268,14 +268,14 @@ public class ControladorMisMeritos extends HttpServlet {
 			if (!m.getUsuario().getCodNum().equals(bean.getUsuarioLogeado().getCodNum())) {
 				throw new UVException("No tienes permisos");
 			}
-			if (ModeloSolicitud.obtenerInstancia().comprobarMeritosSolicitud(m)) {
+			if (!ModeloSolicitud.obtenerInstancia().comprobarMeritoPuedeSerBorrado(m)) {
 				BolsaEmpleoUtils.addMensajeDeError(String.format(MENSAJE_ERROR_ELIMINAR, idMerito), bean, request);
 			} else {
 				meritos.add(m);
 			}
 		}
 		
-		if (meritos.size() > 0) {
+		if (!meritos.isEmpty()) {
 			modelo.eliminarMeritos(meritos, bean.getUsuarioLogeado());
 			BolsaEmpleoUtils.addMensajeDeExito(MENSAJE_EXITO_ELIMINAR, bean, request);
 		}
