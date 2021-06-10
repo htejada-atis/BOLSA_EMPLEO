@@ -12,6 +12,7 @@ import java.util.Map;
 import es.ujaen.uvirtual.modelo.conexion.ConexionUvirtual;
 import es.ujaen.uvirtual.modulo.bolsaempleo.beans.Titulacion;
 import es.ujaen.uvirtual.modulo.bolsaempleo.beans.TitulacionArea;
+import es.ujaen.uvirtual.modulo.bolsaempleo.beans.TitulacionUsuario;
 import es.ujaen.uvirtual.modulo.bolsaempleo.beans.UsuarioBolsaEmpleo;
 import es.ujaen.uvirtual.modulo.bolsaempleo.utilidades.BolsaEmpleoDataTable;
 import es.ujaen.uvirtual.modulo.bolsaempleo.utilidades.BolsaEmpleoUtils;
@@ -106,31 +107,28 @@ public class ModeloTitulacion {
 	
 	/** lista todas las titulaciones del candidato .
 	 * @param usuario .
+	 * @param withArchivo .
 	 * @return lista de todas las titulaciones .
 	 * @throws SQLException si hay un error en la base de datos .
+	 * @throws UVException .
 	 */
-	public List<Titulacion> listaTitulacionesCandidato(Integer usuario) throws SQLException {
-		List<Titulacion> titulaciones = new ArrayList<>();
+	public List<TitulacionUsuario> listaTitulacionesCandidato(Integer usuario, boolean withArchivo) throws SQLException, UVException {
+		List<TitulacionUsuario> titulaciones = new ArrayList<>();
 		String consulta = ""
-				+ " SELECT beptit.* "
-				+ " FROM TBEP_TITULACIONES beptit "
-				+ " INNER JOIN TBEP_TITULACIONES_USUARIO beptus ON beptus.BEPTUS_TIT_CODNUM = beptit.CODNUM "
-				+ " WHERE beptus.BEPTUS_USU_CODNUM = ? ";
+				+ " SELECT beptus.* "
+				+ " FROM TBEP_TITULACIONES_USUARIO beptus "
+				+ " WHERE beptus.FLGBORRADO = 'N' AND beptus.BEPTUS_USU_CODNUM = ? ";
 		
 		try (Connection conexion = ConexionUvirtual.obtenerInstancia(); PreparedStatement stmt = conexion.prepareStatement(consulta)) {
 			int parameterIndex = 1;
 			stmt.setInt(parameterIndex++, usuario);
 			try (ResultSet rs = stmt.executeQuery()) {
 				while (rs.next()) {
-					Titulacion tit = new Titulacion();
-					tit.setCodNum(rs.getInt(CODNUM));
-					tit.setNombre(rs.getString(NOMBRE));
-					tit.setBorrado(rs.getString("FLGBORRADO").equals("S"));
-					tit.setFechaBorrado(rs.getTimestamp("FECHA_BORRADO"));
-					titulaciones.add(tit);
+					titulaciones.add(this.createTitulacionUsuarioFromResultSet(rs, withArchivo));
 				}
 			}
 		}
+
 		return titulaciones;
 	}
 	
@@ -532,5 +530,24 @@ public class ModeloTitulacion {
 		t.setBorrado("S".equals(rs.getString("FLGBORRADO")));
 		t.setFechaBorrado(rs.getDate("FECHA_BORRADO"));
 		return t;
+	}
+	
+	private TitulacionUsuario createTitulacionUsuarioFromResultSet(ResultSet rs, boolean archivo) throws SQLException, UVException {
+		TitulacionUsuario tu = new TitulacionUsuario();
+		tu.setCodNum(rs.getInt(CODNUM));
+		tu.setUsuario(ModeloUsuarioBolsaEmpleo.obtenerInstancia().getUsuarioById(rs.getInt("BEPTUS_USU_CODNUM")));		
+		tu.setDescripcion(rs.getString("DESCRIPCION"));
+		tu.setOtraTitulacion(rs.getString("OTRATITULACION"));
+		tu.setBorrado("S".equals(rs.getString("FLGBORRADO")));
+		tu.setFechaBorrado(rs.getDate("FECHA_BORRADO"));
+		tu.setValidada("S".equals(rs.getString("FLGVALIDADA")));
+		tu.setFechaValidada(rs.getDate("FECHA_VALIDADA"));
+		if (archivo) {
+			tu.setArchivo(rs.getBlob("ARCHIVO").getBinaryStream());
+		}			
+		if (rs.getInt("BEPTUS_TIT_CODNUM") != 0) {
+			tu.setTitulacion(this.getTitulacionById(rs.getInt("BEPTUS_TIT_CODNUM")));			
+		}
+		return tu;
 	}
 }

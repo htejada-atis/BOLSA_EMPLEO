@@ -12,7 +12,7 @@ import es.ujaen.uvirtual.modulo.bolsaempleo.beans.Merito;
 import es.ujaen.uvirtual.modulo.bolsaempleo.beans.MeritoSolicitud;
 import es.ujaen.uvirtual.modulo.bolsaempleo.beans.MeritoSolicitudTable;
 import es.ujaen.uvirtual.modulo.bolsaempleo.beans.Solicitud;
-import es.ujaen.uvirtual.modulo.bolsaempleo.beans.Titulacion;
+import es.ujaen.uvirtual.modulo.bolsaempleo.beans.TitulacionUsuario;
 import es.ujaen.uvirtual.modulo.bolsaempleo.beans.UsuarioBolsaEmpleo;
 import es.ujaen.uvirtual.modulo.bolsaempleo.utilidades.BolsaEmpleoDataTable;
 import es.ujaen.uvirtual.modulo.bolsaempleo.beans.BolsaSolicitudTable;
@@ -34,7 +34,7 @@ public class VistaSolicitudes extends Vista implements Serializable {
 	private List<BolsaSolicitudTable> listaTablaBolsasSolicitud;
 	private List<BolsaSolicitud> listaBolsasSolicitud;
 	private List<MeritoSolicitud> listaMeritos;
-	private List<Titulacion> listaTitulaciones;
+	private List<TitulacionUsuario> listaTitulaciones;
 	private List<Afinidad> listaAfinidades;
 	private List<String> listaTiposAfinidades;
 	private Solicitud solicitud;
@@ -139,11 +139,11 @@ public class VistaSolicitudes extends Vista implements Serializable {
 		this.listaMeritos = listaMeritos2;
 	}
 
-	public List<Titulacion> getListaTitulaciones() {
+	public List<TitulacionUsuario> getListaTitulaciones() {
 		return listaTitulaciones;
 	}
 
-	public void setListaTitulaciones(List<Titulacion> titulaciones) {
+	public void setListaTitulaciones(List<TitulacionUsuario> titulaciones) {
 		this.listaTitulaciones = titulaciones;
 	}
 

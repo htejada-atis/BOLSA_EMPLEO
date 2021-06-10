@@ -45,6 +45,7 @@ public class ModeloMisTitulaciones {
 	public static final String ERROR_SIN_TITULACION = "La titulación requerida";
 	
 	public static final int COLUMN_DESCRIPCION_MAXLENGTH = 250;
+	public static final int COLUMN_OTRATITULACION_MAXLENGTH = 100;
 
 	protected static ModeloMisTitulaciones eInstancia;
 

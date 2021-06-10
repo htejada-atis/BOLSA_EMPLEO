@@ -288,9 +288,7 @@ public class ControladorMisTitulaciones extends HttpServlet {
 	 * @throws ServletException .
 	 */
 	public void agregarTitulacion(HttpServletRequest request, HttpServletResponse response, VistaTitulaciones bean) 
-			throws SQLException, UVException, IOException, ServletException {
-		ModeloMisTitulaciones modelo = ModeloMisTitulaciones.obtenerInstancia();		
-				
+			throws SQLException, UVException, IOException, ServletException {			
 		bean.setVista(RUTA_BEP_CONF + "formMisTitulaciones.jsp");
 		
 		Titulacion titulacionCont = null;
@@ -301,6 +299,13 @@ public class ControladorMisTitulaciones extends HttpServlet {
 			titulacionCont = ModeloTitulacion.obtenerInstancia().listaTitulacion(codNum);
 		} else {
 			otraTitulacion = Formateador.leeParametroString(request.getParameter(PARAM_OTRA_TITULACION));
+			if (otraTitulacion == null) {
+				throw new UVException("Introduce un nombre para la titulación");				
+			}
+			if (otraTitulacion.length() > ModeloMisTitulaciones.COLUMN_OTRATITULACION_MAXLENGTH) {
+				throw new UVException(String.format("El nombre para la titulación debe ser como máximo %d caracteres", 
+						ModeloMisTitulaciones.COLUMN_OTRATITULACION_MAXLENGTH));
+			}
 		}
 		
 		Part uploadedFile = request.getPart(PARAM_ARCHIVO);
@@ -315,7 +320,7 @@ public class ControladorMisTitulaciones extends HttpServlet {
 			
 			titulacion.setUsuario(bean.getUsuarioLogeado());
 				
-			modelo.insertaTitulacionUsuario(titulacion, bean.getUsuarioLogeado());
+			ModeloMisTitulaciones.obtenerInstancia().insertaTitulacionUsuario(titulacion, bean.getUsuarioLogeado());
 				
 			bean.getMensajesDeExito().add(MENSAJE_EXITO_AGREGAR);
 			bean.setVista(RUTA_BEP_CONF + "index.jsp");
