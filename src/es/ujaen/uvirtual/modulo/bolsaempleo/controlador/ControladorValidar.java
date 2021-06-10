@@ -387,7 +387,7 @@ public class ControladorValidar extends HttpServlet {
 		
 		ModeloSolicitud modeloSolicitud = ModeloSolicitud.obtenerInstancia();
 		ModeloAfinidad modeloAfinidad = ModeloAfinidad.obtenerInstancia();
-		Solicitud solicitud = modeloSolicitud.getSolicitudByConvocatoriaUsuario(bean.getCandidato(), bean.getConvocatoria());
+		Solicitud solicitud = modeloSolicitud.getSolicitudCerradaByConvocatoriaUsuario(bean.getCandidato(), bean.getConvocatoria());
 		
 		
 		if (!bean.getMerito().getMerito().getItemBaremacion().getIndividualizado()) {

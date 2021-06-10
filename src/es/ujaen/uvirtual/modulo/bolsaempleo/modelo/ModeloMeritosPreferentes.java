@@ -13,6 +13,8 @@ import java.util.Map;
 import es.ujaen.uvirtual.modelo.conexion.ConexionUvirtual;
 import es.ujaen.uvirtual.modulo.bolsaempleo.beans.MeritoPreferente;
 import es.ujaen.uvirtual.modulo.bolsaempleo.beans.MeritoPreferenteOpcion;
+import es.ujaen.uvirtual.modulo.bolsaempleo.beans.MeritoPreferenteUsuario;
+import es.ujaen.uvirtual.modulo.bolsaempleo.beans.TitulacionUsuario;
 import es.ujaen.uvirtual.modulo.bolsaempleo.beans.UsuarioBolsaEmpleo;
 import es.ujaen.uvirtual.modulo.bolsaempleo.utilidades.BolsaEmpleoDataTable;
 import es.ujaen.uvirtual.modulo.bolsaempleo.utilidades.BolsaEmpleoDataTable.DataTableColumn;
@@ -38,7 +40,6 @@ public class ModeloMeritosPreferentes {
 	
 	public static final int MAX_LENGTH_COLUMN_NOMBRE = 500;
 	public static final int MAX_LENGTH_COLUMN_OBSERVACIONES = 1000;
-	public static final int MAX_LENGTH_COLUMN_FACTOR = 20;
 	public static final int MAX_LENGTH_COLUMN_CODIGO = 10;
 	public static final int MAX_LENGTH_COLUMN_NOMBRE_OPCION = 50;	
 	
@@ -518,13 +519,13 @@ public class ModeloMeritosPreferentes {
 		try (Connection conexion = ConexionUvirtual.obtenerInstancia(); PreparedStatement stmt = conexion.prepareStatement(query)) {
 			int indexParam = 1;
 			stmt.setString(indexParam++, "S");
-			stmt.setDate(indexParam++, (Date) BolsaEmpleoUtils.getCurrentDate());
+			stmt.setDate(indexParam++, new java.sql.Date(BolsaEmpleoUtils.getCurrentDateTime().getTime()));
 			stmt.setString(indexParam++, usuarioUpdate.getCodCuenta());
 			stmt.setInt(indexParam++, meritoOpcion.getCodNum());
 			stmt.executeUpdate();
 		}
 	}
-	
+		
 	private MeritoPreferente createMeritoPreferenteFromResultSet(ResultSet rs) throws SQLException, UVException {
 		MeritoPreferente obj = new MeritoPreferente();
 		obj.setCodNum(rs.getInt(CODNUM));

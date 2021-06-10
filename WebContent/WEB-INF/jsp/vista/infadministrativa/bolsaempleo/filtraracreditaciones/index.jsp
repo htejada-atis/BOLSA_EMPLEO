@@ -1,4 +1,5 @@
 <%@ page trimDirectiveWhitespaces="true"%>
+<%@ page import="java.util.stream.Collectors" %>
 <%@	page import="es.ujaen.uvirtual.modulo.bolsaempleo.controlador.ControladorFiltrarAcreditaciones"%>
 <%@	page import="es.ujaen.uvirtual.modulo.bolsaempleo.controlador.ControladorDescargaFicheros"%>
 <%@ page import="es.ujaen.uvirtual.modulo.bolsaempleo.vistas.VistaFiltrarAcreditaciones" %>
@@ -66,7 +67,7 @@ UsuarioBolsaEmpleo candidato = bean.getCandidato();
 		    "title": 'CANDIDATOS',
 		    "clickable": {'onClick': function(row) {
 		    	var params = {
-	    				'a': '<%= ControladorFiltrarAcreditaciones.ACCION_CANDIDATO_SELECCIONADO %>',
+	    				'<%= ControladorFiltrarAcreditaciones.PARAM_ACCION %>': '<%= ControladorFiltrarAcreditaciones.ACCION_CANDIDATO_SELECCIONADO %>',
 	    				'<%= ControladorFiltrarAcreditaciones.PARAM_CANDIDATO %>': row.codNum
 		    	};
         		Atis.sendForm("<%= request.getRequestURI() %>", params);
@@ -82,12 +83,15 @@ UsuarioBolsaEmpleo candidato = bean.getCandidato();
 		});
 		
 		<% if (candidato != null) { %>
+			var acreditaiconesValidadas = [<%= bean.getValidadas() != null ? bean.getValidadas().stream().map(t -> t.getCodNum().toString()).collect(Collectors.joining(",")) : "" %>];
+		
 			var table = new Atis.DataTable('#tableAcreditacionesCandidato', {
 			    "ajax": { url: "<%= ControladorFiltrarAcreditaciones.URL_PATTERN_AJAX %>" },
 			    "pageSize": 10,
 			    "action": "<%= ControladorFiltrarAcreditaciones.ACCION_DATATABLE_ACREDITACIONES_CANDIDATO %>",
 			    "params": {"<%=ControladorFiltrarAcreditaciones.PARAM_CANDIDATO%>": <%= candidato.getCodNum() %>},
 			    "selectable": {'all': false},
+			    "selected": acreditaiconesValidadas,
 			    "filterable": true,
 			    "title": 'ACREDITACIONES: <%=candidato.getNombre() + " " + candidato.getPrimerApellido() + " " + candidato.getSegundoApellido()%>',
 			    "columns": [

@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.sql.SQLException;
 import java.util.logging.Logger;
+import java.util.List;
 import java.util.logging.Level;
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
@@ -68,9 +69,6 @@ public class ControladorFiltrarAcreditaciones extends HttpServlet {
 	public static final String RUTA_BEP_FILACRE = "/WEB-INF/jsp/vista/infadministrativa/bolsaempleo/filtraracreditaciones/";
 	public static final String JSP_INDEX = RUTA_BEP_FILACRE + "index.jsp";
 
-	// urls	
-	public static final String URL_PATTERN_FILES_PRIVADA = "/srv/es/informacionadministrativa/bolsaempleo/filtraracreditaciones";
-	
 	// ajax
 	public static final String URL_PATTERN_AJAX = "/srv/es/ajax/informacionadministrativa/bolsaempleo/filtraracreditaciones";
 	public static final String RESPONSE_AJAX_CONTENTTYPE = "application/json";
@@ -179,18 +177,24 @@ public class ControladorFiltrarAcreditaciones extends HttpServlet {
 				seleccionarAcreditacion(bean, datos, request, response, true);
 				break;
 			case ACCION_CANDIDATO_SELECCIONADO:
-				obtenerCodigoPadreAcreditacion(bean);
+				obtenerCodigoPadreAcreditacion(bean, request);
 				break;
 			case ACCION_DATATABLE_ACREDITACIONES_CANDIDATO:
 				listadoAcreditacionesCandidato(bean, datos, request, response);
 				break;
+			default:
+				errorFatal(bean, MENSAJE_ERROR_ACCION_NO_CONTEMPLADA);
 		}
 		
 	}
 	
-	private void obtenerCodigoPadreAcreditacion(VistaFiltrarAcreditaciones bean) throws SQLException, UVException {
+	private void obtenerCodigoPadreAcreditacion(VistaFiltrarAcreditaciones bean, HttpServletRequest request) throws SQLException, UVException {
 		ParametrosConfiguracion config = ModeloParametrosConfiguracion.obtenerInstancia().getParametroByNombre("bolsaempleo.local.codMeritoPreferente");
 		bean.setCodigoPadreMeritoPreferente(config.getValor());
+		
+		UsuarioBolsaEmpleo candidato = ModeloUsuarioBolsaEmpleo.obtenerInstancia().getUsuarioById(Formateador.leeParametroInteger(request.getParameter(PARAM_CANDIDATO)));
+		List<MeritoPreferenteUsuario> validados = ModeloMeritosPreferentesCandidato.obtenerInstancia().listaMeritosPreferentesUsuarioPorPosesionValidados(candidato);
+		bean.setValidadas(validados);
 	}
 	
 	/** Selecciona una acreditación para validarla o no .
@@ -218,7 +222,7 @@ public class ControladorFiltrarAcreditaciones extends HttpServlet {
 				bean.setAcreditacion(acreditacion);
 				
 				if (seleccionada) {
-					modeloAcreditacion.validaAcreditacion(acreditacion, bean.getCandidato(), BolsaEmpleoUtils.getCurrentDate(), bean.getUsuarioLogeado());
+					modeloAcreditacion.validaAcreditacion(acreditacion, bean.getCandidato(), bean.getUsuarioLogeado());
 				} else {
 					modeloAcreditacion.desvalidaAcreditacion(acreditacion, bean.getCandidato(), bean.getUsuarioLogeado());
 				}
@@ -245,9 +249,9 @@ public class ControladorFiltrarAcreditaciones extends HttpServlet {
 	 */
 	private void listadoCandidatos(VistaFiltrarAcreditaciones bean, UVDatos datos, HttpServletRequest request, HttpServletResponse response) throws IOException, SQLException {
 		ModeloCandidato modeloCandidato = ModeloCandidato.obtenerInstancia();
-		
-		datos.setContentType(RESPONSE_AJAX_CONTENTTYPE);
+				
 		datos.setRespuestaEnviada(true);
+		datos.setContentType(RESPONSE_AJAX_CONTENTTYPE);
 		response.setContentType(RESPONSE_AJAX_CONTENTTYPE);
 		response.setCharacterEncoding(RESPONSE_AJAX_ENCODING);
 		

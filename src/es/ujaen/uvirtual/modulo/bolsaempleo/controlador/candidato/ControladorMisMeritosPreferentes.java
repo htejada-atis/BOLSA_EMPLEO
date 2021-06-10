@@ -27,6 +27,7 @@ import es.ujaen.uvirtual.modulo.bolsaempleo.modelo.ModeloMeritosPreferentes;
 import es.ujaen.uvirtual.modulo.bolsaempleo.modelo.ModeloMeritosPreferentesCandidato;
 import es.ujaen.uvirtual.modulo.bolsaempleo.modelo.ModeloParametrosConfiguracion;
 import es.ujaen.uvirtual.modulo.bolsaempleo.modelo.ModeloRol;
+import es.ujaen.uvirtual.modulo.bolsaempleo.modelo.ModeloSolicitud;
 import es.ujaen.uvirtual.modulo.bolsaempleo.modelo.ModeloUsuarioBolsaEmpleo;
 import es.ujaen.uvirtual.modulo.bolsaempleo.utilidades.BolsaEmpleoDataTable;
 import es.ujaen.uvirtual.modulo.bolsaempleo.utilidades.BolsaEmpleoUtils;
@@ -284,13 +285,19 @@ public class ControladorMisMeritosPreferentes extends HttpServlet {
 			MeritoPreferenteUsuario m = modelo.getMeritoPreferenteUsuarioById(sel);
 			if (!m.getUsuario().getCodNum().equals(bean.getUsuarioLogeado().getCodNum())) {
 				throw new UVException("No tienes permisos");
-			}			
-			meritos.add(m);
+			}
+			if (!ModeloSolicitud.obtenerInstancia().comprobarMeritoPreferentePuedeSerBorrado(m)) {
+				BolsaEmpleoUtils.addMensajeDeError(String.format("La acreditación %s no puede ser borrada", m.getMeritoPreferente().getNombre()), bean, request);
+			} else {
+				meritos.add(m);
+			}
 		}
 
-		modelo.cambiarFlagBorradoMeritos(meritos, bean.getUsuarioLogeado());
-
-		BolsaEmpleoUtils.addMensajeDeExito(MENSAJE_EXITO_ELIMINAR, bean, request);
+		if (!meritos.isEmpty()) {
+			modelo.cambiarFlagBorradoMeritos(meritos, bean.getUsuarioLogeado());
+			BolsaEmpleoUtils.addMensajeDeExito(MENSAJE_EXITO_ELIMINAR, bean, request);
+		}
+		
 		response.sendRedirect(request.getServletPath());
 	}
 	

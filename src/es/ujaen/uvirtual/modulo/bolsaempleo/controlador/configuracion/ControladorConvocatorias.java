@@ -342,7 +342,7 @@ public class ControladorConvocatorias extends HttpServlet {
 		}
 		
 		c.setFechaCierre(Formateador.leeParametroFecha(request.getParameter(PARAM_CONVOCATORIA_FECHACIERRE), Formateador.FORMATO_FECHA_DDMMYYYY, "/"));
-		if (c.getFechaCierre().before(BolsaEmpleoUtils.getCurrentDate())) {
+		if (c.getFechaCierre().before(BolsaEmpleoUtils.getCurrentDateTime())) {
 			throw new UVException(MENSAJE_ERROR_FECHACIERRE_MINIMA);
 		}
 		c.setFechaCierre(BolsaEmpleoUtils.setDateTimeAtEndOfDay(c.getFechaCierre()));
