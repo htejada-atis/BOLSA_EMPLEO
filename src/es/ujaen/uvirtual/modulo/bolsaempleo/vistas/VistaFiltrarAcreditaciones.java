@@ -6,7 +6,6 @@ import java.util.List;
 import es.ujaen.uvirtual.beans.vistas.Vista;
 import es.ujaen.uvirtual.modulo.bolsaempleo.beans.CandidatoAcreditacionesTable;
 import es.ujaen.uvirtual.modulo.bolsaempleo.beans.MeritoPreferenteUsuario;
-import es.ujaen.uvirtual.modulo.bolsaempleo.beans.TitulacionUsuario;
 import es.ujaen.uvirtual.modulo.bolsaempleo.beans.UsuarioBolsaEmpleo;
 import es.ujaen.uvirtual.modulo.bolsaempleo.utilidades.BolsaEmpleoDataTable;
 

@@ -1,7 +1,6 @@
 package es.ujaen.uvirtual.modulo.bolsaempleo.modelo;
 
 import java.sql.Connection;
-import java.sql.Date;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -13,8 +12,6 @@ import java.util.Map;
 import es.ujaen.uvirtual.modelo.conexion.ConexionUvirtual;
 import es.ujaen.uvirtual.modulo.bolsaempleo.beans.MeritoPreferente;
 import es.ujaen.uvirtual.modulo.bolsaempleo.beans.MeritoPreferenteOpcion;
-import es.ujaen.uvirtual.modulo.bolsaempleo.beans.MeritoPreferenteUsuario;
-import es.ujaen.uvirtual.modulo.bolsaempleo.beans.TitulacionUsuario;
 import es.ujaen.uvirtual.modulo.bolsaempleo.beans.UsuarioBolsaEmpleo;
 import es.ujaen.uvirtual.modulo.bolsaempleo.utilidades.BolsaEmpleoDataTable;
 import es.ujaen.uvirtual.modulo.bolsaempleo.utilidades.BolsaEmpleoDataTable.DataTableColumn;
