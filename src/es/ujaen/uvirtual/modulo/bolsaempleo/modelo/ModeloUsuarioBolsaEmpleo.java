@@ -711,9 +711,10 @@ public class ModeloUsuarioBolsaEmpleo {
 	 * 
 	 * @param usuarios .
 	 * @param usuarioUpdate .
+	 * @throws UVException 
 	 * @throws SQLException .
 	 */
-	public void ponerUsuarioComoBorrado(List<UsuarioBolsaEmpleo> usuarios, UsuarioBolsaEmpleo usuarioUpdate) throws SQLException {
+	public void ponerUsuarioComoBorrado(List<UsuarioBolsaEmpleo> usuarios, UsuarioBolsaEmpleo usuarioUpdate) throws SQLException, UVException {
 		this.cambiarFlagBorradoUsuario(usuarios, USUARIO_BORRADO, usuarioUpdate);
 	}
 
@@ -722,13 +723,14 @@ public class ModeloUsuarioBolsaEmpleo {
 	 * 
 	 * @param usuarios .
 	 * @param usuarioUpdate .
+	 * @throws UVException 
 	 * @throws SQLException .
 	 */
-	public void ponerUsuarioComoNoBorrado(List<UsuarioBolsaEmpleo> usuarios, UsuarioBolsaEmpleo usuarioUpdate) throws SQLException {
+	public void ponerUsuarioComoNoBorrado(List<UsuarioBolsaEmpleo> usuarios, UsuarioBolsaEmpleo usuarioUpdate) throws SQLException, UVException {
 		this.cambiarFlagBorradoUsuario(usuarios, USUARIO_NO_BORRADO, usuarioUpdate);
 	}
 
-	private void cambiarFlagBorradoUsuario(List<UsuarioBolsaEmpleo> usuarios, String borrado, UsuarioBolsaEmpleo usuarioUpdate) throws SQLException {
+	private void cambiarFlagBorradoUsuario(List<UsuarioBolsaEmpleo> usuarios, String borrado, UsuarioBolsaEmpleo usuarioUpdate) throws SQLException, UVException {
 		String params = BolsaEmpleoUtils.consultaMultiplesParametros(usuarios.size());
 		String query = "UPDATE TBEP_USUARIOS SET UID_USUARIO=?,FLGBORRADO=?,FECHA_BORRADO=? WHERE CODNUM IN  (" + params + ")";
 
@@ -747,6 +749,10 @@ public class ModeloUsuarioBolsaEmpleo {
 				stmt.setInt(indexParam++, usuario.getCodNum());
 			}
 			stmt.executeUpdate();
+		}
+		
+		for (UsuarioBolsaEmpleo usuario : usuarios) {
+			this.refrescarUsuarioBEP(usuario);
 		}
 	}
 

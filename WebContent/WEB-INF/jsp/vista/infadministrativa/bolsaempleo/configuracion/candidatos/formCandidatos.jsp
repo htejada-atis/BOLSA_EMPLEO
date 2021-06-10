@@ -460,14 +460,16 @@ UsuarioBolsaEmpleo usuarioBolsa = bean.getUsuario();
 			$("#buttonsEdit").show();
 		<%}%>
 
-		document.getElementById("usuario_restaurar").addEventListener("click", function(event) {
-			event.preventDefault();
-			
-			Atis.sendForm("<%= request.getRequestURI() %>", {
-				'<%=ControladorUsuarioCandidato.PARAM_ACCION%>': '<%=ControladorUsuarioCandidato.ACCION_RECUPERAR_USUARIO%>', 
-				'<%=ControladorUsuarioCandidato.PARAM_ID%>': '<%=usuarioBolsa.getCodNum()%>'
+		<%	if (usuarioBolsa != null && usuarioBolsa.getBorrado()) { %>
+			document.getElementById("usuario_restaurar").addEventListener("click", function(event) {
+				event.preventDefault();
+				
+				Atis.sendForm("<%= request.getRequestURI() %>", {
+					'<%=ControladorUsuarioCandidato.PARAM_ACCION%>': '<%=ControladorUsuarioCandidato.ACCION_RECUPERAR_USUARIO%>', 
+					'<%=ControladorUsuarioCandidato.PARAM_ID%>': '<%=usuarioBolsa.getCodNum()%>'
+				});
 			});
-		});
+		<% } %>
 	});
 	
 	
