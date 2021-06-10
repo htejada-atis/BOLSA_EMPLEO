@@ -1563,9 +1563,7 @@ public class ModeloSolicitud {
 	 */
 	public boolean comprobarMeritoPuedeSerBorrado(Merito merito) throws SQLException {
 		
-		String consulta = "SELECT besbm.*"
-				+ "	FROM UVIRTUAL.TBEP_SOL_BOL_MERITOS besbm"
-				+ "	WHERE besbm.BEPMER_CODNUM = ?";
+		String consulta = "SELECT besbm.* FROM TBEP_SOL_BOL_MERITOS besbm WHERE besbm.BEPMER_CODNUM = ?";
 		
 		try (Connection conexion = ConexionUvirtual.obtenerInstancia(); PreparedStatement stmt = conexion.prepareStatement(consulta)) {
 			int parameterIndex = 1;
