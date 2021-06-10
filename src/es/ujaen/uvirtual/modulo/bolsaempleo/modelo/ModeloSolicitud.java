@@ -1568,6 +1568,7 @@ public class ModeloSolicitud {
 		try (Connection conexion = ConexionUvirtual.obtenerInstancia(); PreparedStatement stmt = conexion.prepareStatement(consulta)) {
 			int parameterIndex = 1;
 			stmt.setInt(parameterIndex++, merito.getCodNum());
+			stmt.executeUpdate();
 			
 			try (ResultSet rs = stmt.executeQuery()) {
 				if (rs.next()) {
