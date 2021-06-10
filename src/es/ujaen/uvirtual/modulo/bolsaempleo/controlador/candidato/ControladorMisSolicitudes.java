@@ -36,7 +36,7 @@ import es.ujaen.uvirtual.modulo.bolsaempleo.beans.MeritoSolicitud;
 import es.ujaen.uvirtual.modulo.bolsaempleo.beans.MeritoSolicitudTable;
 import es.ujaen.uvirtual.modulo.bolsaempleo.beans.MeritoSolicitudValoracion;
 import es.ujaen.uvirtual.modulo.bolsaempleo.beans.Solicitud;
-import es.ujaen.uvirtual.modulo.bolsaempleo.beans.Titulacion;
+import es.ujaen.uvirtual.modulo.bolsaempleo.beans.TitulacionUsuario;
 import es.ujaen.uvirtual.modulo.bolsaempleo.beans.UsuarioBolsaEmpleo;
 import es.ujaen.uvirtual.modulo.bolsaempleo.modelo.ModeloAfinidad;
 import es.ujaen.uvirtual.modulo.bolsaempleo.modelo.ModeloArea;
@@ -862,7 +862,7 @@ public class ControladorMisSolicitudes extends HttpServlet {
 		Solicitud solicitud = this.getSolicitud(bean, request);
 		bean.setSolicitud(solicitud);
 		
-		List<Titulacion> titulaciones = modeloTitulacion.listaTitulacionesCandidato(bean.getUsuarioLogeado().getCodNum());
+		List<TitulacionUsuario> titulaciones = modeloTitulacion.listaTitulacionesCandidato(bean.getUsuarioLogeado().getCodNum(), false);
 		bean.setListaTitulaciones(titulaciones);
 		
 		// comprobamos que el total de méritos sea mayor que 0
@@ -1074,15 +1074,16 @@ public class ControladorMisSolicitudes extends HttpServlet {
 		table.addCell(cell);
 	}
 	
-	private void generarTitulaciones(UsuarioBolsaEmpleo usuario, Document document) throws DocumentException, SQLException {
+	private void generarTitulaciones(UsuarioBolsaEmpleo usuario, Document document) throws DocumentException, SQLException, UVException {
 		Font font2 = new Font(Font.BOLD);
 		font2.setStyle("bold");		
 		
 		document.add(new Paragraph("Titulaciones", font2));
 		document.add(new Paragraph("\n"));
 		
-		for (Titulacion t : ModeloTitulacion.obtenerInstancia().listaTitulacionesCandidato(usuario.getCodNum())) {
-			document.add(new Paragraph(t.getCodNum() + " " + t.getNombre()));
+		for (TitulacionUsuario t : ModeloTitulacion.obtenerInstancia().listaTitulacionesCandidato(usuario.getCodNum(), false)) {
+			document.add(new Paragraph(t.getCodNum() + " " 
+				+ (t.getTitulacion() != null ? t.getTitulacion().getNombre() : ("Otra titulación: " + t.getOtraTitulacion()))));
 			document.add(new Paragraph("\n"));
 		}			
 	}
