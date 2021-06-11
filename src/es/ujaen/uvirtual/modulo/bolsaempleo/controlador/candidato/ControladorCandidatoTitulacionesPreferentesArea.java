@@ -138,8 +138,7 @@ public class ControladorCandidatoTitulacionesPreferentesArea extends HttpServlet
 				throw new UVException("No eres un candidato");
 			}
 		} catch (UVException e) {
-			LOGGER.log(Level.SEVERE, Formateador.getStackTrace(e));
-			LOGGER.log(Level.SEVERE, e.toString());
+			LOGGER.log(Level.WARNING, e.toString());
 			
 			BolsaEmpleoUtils.addMensajeDeError(e.getMessage(), bean, request);
 			response.sendRedirect("/srv/es/informacionadministrativa/bolsaempleo/error");

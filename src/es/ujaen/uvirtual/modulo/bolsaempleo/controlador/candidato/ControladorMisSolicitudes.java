@@ -243,8 +243,7 @@ public class ControladorMisSolicitudes extends HttpServlet {
 				throw new UVException("No eres un candidato");
 			}
 		} catch (UVException e) {
-			LOGGER.log(Level.SEVERE, Formateador.getStackTrace(e));
-			LOGGER.log(Level.SEVERE, e.toString());
+			LOGGER.log(Level.WARNING, e.toString());
 			
 			BolsaEmpleoUtils.addMensajeDeError(e.getMessage(), bean, request);
 			response.sendRedirect("/srv/es/informacionadministrativa/bolsaempleo/error");
@@ -460,11 +459,8 @@ public class ControladorMisSolicitudes extends HttpServlet {
 			try {
 				Solicitud solicitud = this.getSolicitud(bean, request);
 				
-				BolsaEmpleoDataTable<Bolsa> dataTable = ModeloSolicitud.obtenerInstancia().listaAreaSolicitudSeleccionadasDatatable(
-						request.getParameterMap(), 
-						bean.getUsuarioLogeado().getCodNum(),
-						solicitud
-				);
+				BolsaEmpleoDataTable<Bolsa> dataTable = ModeloSolicitud.obtenerInstancia().
+						listaAreaSolicitudSeleccionadasDatatable(request.getParameterMap(), solicitud);
 				
 				bean.setDataTableBolsasCandidatoSeleccionadas(dataTable);
 				writer.write(dataTable.toJson());

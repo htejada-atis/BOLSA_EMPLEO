@@ -903,10 +903,8 @@ public class ModeloUsuarioBolsaEmpleo {
 	public void cambiarFlagBorradoUsuarioRazon(UsuarioBolsaEmpleo usuario, UsuarioBolsaEmpleo usuarioQueBorra) throws SQLException, UVException {
 		String query = "UPDATE TBEP_USUARIOS SET UID_USUARIO=?,FLGBORRADO=?,RAZON_BORRADO=?,FECHA_BORRADO=? WHERE CODNUM=?";
 
-		try (Connection conexion = ConexionUvirtual.obtenerInstancia();
-				PreparedStatement stmt = conexion.prepareStatement(query)) {
+		try (Connection conexion = ConexionUvirtual.obtenerInstancia(); PreparedStatement stmt = conexion.prepareStatement(query)) {
 			int indexParam = 1;
-
 			stmt.setString(indexParam++, usuarioQueBorra.getCodCuenta());
 			stmt.setString(indexParam++, "S");
 			stmt.setString(indexParam++, usuario.getRazonBorrado());
