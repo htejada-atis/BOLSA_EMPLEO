@@ -75,7 +75,7 @@ public class ControladorUsuarioCandidato extends HttpServlet {
 	
 	public static final Integer PARAM_ROLE_CANDIDATO = 1052;
 	
-	
+	public static final String PARAM_GUARDAR = "guardar";
 	public static final String PARAM_CANDIDATO = "candidato";
 	
 	// acciones
@@ -86,12 +86,11 @@ public class ControladorUsuarioCandidato extends HttpServlet {
 	public static final String ACCION_DATATABLE_USUARIOS_CANDIDATOS = "datatableusuarioscandidatos";
 	public static final String ACCION_INDEX = "index";
 	public static final String ACCION_SOLICITUDES_CANDIDATO = "solicitudescandidato";
+	public static final String ACCION_EDITAR_CANDIDATO = "editarcandidato";
 	
 	
 	public static final String ACCION_USUARIO = "accionusuario";
 	public static final String ACCION_VOLVER_USUARIO = "volverusuario";
-	public static final String ACCION_FORMULARIO_USUARIO = "formulariousuario";
-	public static final String ACCION_BUSCAR_USUARIO = "buscarusuario";
 	public static final String ACCION_EDITAR_USUARIO_FORM = "editarusuarioform";
 	public static final String ACCION_EDITAR_USUARIO = "editarusuario";
 	public static final String ACCION_ELIMINAR_USUARIO = "eliminarusuario";
@@ -177,6 +176,7 @@ public class ControladorUsuarioCandidato extends HttpServlet {
 				case ACCION_DATATABLE_AREAS_EXCLUIDAS_CANDIDATO:
 				case ACCION_DATATABLE_AREAS_NO_EXCLUIDAS_CANDIDATO:
 				case ACCION_DATATABLE_SOLICITUDES:
+				case ACCION_EDITAR_CANDIDATO:
 				case ACCION_EXCLUIR_USUARIO_AREA:
 				case ACCION_INCLUIR_USUARIO_AREA:
 				case ACCION_SOLICITUDES_CANDIDATO:
@@ -189,15 +189,7 @@ public class ControladorUsuarioCandidato extends HttpServlet {
 					listadoCandidatos(bean, datos, request, response);
 					break;
 				
-					
 				
-				
-				case ACCION_FORMULARIO_USUARIO:
-					formularioUsuario(bean);
-					break;
-				case ACCION_BUSCAR_USUARIO:
-					buscarUsuario(request, bean);
-					break;
 				case ACCION_LISTAR_ROLES:
 					obtenerRoles(bean);
 					break;
@@ -285,8 +277,6 @@ public class ControladorUsuarioCandidato extends HttpServlet {
 		Integer idCandidato = Formateador.leeParametroInteger(BolsaEmpleoUtils.getParamRequestOrSession(request, PARAM_CANDIDATO));
 		UsuarioBolsaEmpleo candidato = ModeloUsuarioBolsaEmpleo.obtenerInstancia().getUsuarioById(idCandidato);
 		bean.setCandidato(candidato);
-		bean.setUsuarioArcos(CrearUsuario.usuario(candidato.getCodCuenta()));
-		bean.setBusqueda(false);
 		
 		switch (nombreAccion) {
 			case ACCION_AREAS_EXCLUIDAS_CANDIDATO:
@@ -300,6 +290,9 @@ public class ControladorUsuarioCandidato extends HttpServlet {
 				break;
 			case ACCION_DATATABLE_AREAS_NO_EXCLUIDAS_CANDIDATO:
 				listadoAreasNoExcluidasCandidato(bean, datos, request, response);
+				break;
+			case ACCION_EDITAR_CANDIDATO:
+				editarCandidato(bean, request, response);
 				break;
 			case ACCION_EXCLUIR_USUARIO_AREA:
 				excluirUsuarioArea(bean, request, response, true);
@@ -315,6 +308,23 @@ public class ControladorUsuarioCandidato extends HttpServlet {
 			default:
 				errorFatal(bean, MENSAJE_ERROR_ACCION_NO_CONTEMPLADA);
 		}
+	}
+	
+	/** edita un candidato .
+	 * @param request .
+	 * @param response .
+	 * @param bean bean de la vista a la que poner los valores .
+	 * @throws SQLException excepcion de bbdd .
+	 * @throws UVException en caso de error en bd .
+	 * @throws IOException en caso error de input u output .
+	 */
+	private void editarCandidato(VistaCandidatos bean, HttpServletRequest request, HttpServletResponse response) 
+			throws SQLException, UVException, IOException {
+		
+		if (request.getParameter(PARAM_GUARDAR) != null) {
+			
+		}
+		
 	}
 	
 	private void excluirUsuarioArea(VistaCandidatos bean, HttpServletRequest request, HttpServletResponse response, boolean excluir)
@@ -499,45 +509,6 @@ public class ControladorUsuarioCandidato extends HttpServlet {
 		response.sendRedirect(request.getServletPath());
 	}
 	
-	/** Busca un usuario .
-	 * @param request .
-	 * @param bean bean de la vista a la que poner los valores .
-	 * @throws SQLException excepcion de bbdd .
-	 * @throws UVException en caso de error en bd .
-	 */
-	private void buscarUsuario(HttpServletRequest request, VistaCandidatos bean) throws SQLException, UVException {		
-		
-		obtenerRoles(bean);
-		Usuario usuArcos = CrearUsuario.usuario(request.getParameter(PARAM_NOMBRE));
-		if (usuArcos == null) {
-			bean.setVista(RUTA_BEP_CONF_USU + "buscarUsuario.jsp");
-			throw new UVException("No existe el usuario");
-		}
-		
-		ModeloUsuarioBolsaEmpleo modelo = ModeloUsuarioBolsaEmpleo.obtenerInstancia();
-		
-		try {
-			UsuarioBolsaEmpleo usu = modelo.getUsuarioByCodCuenta(usuArcos.getUid());
-			
-			bean.setBusqueda(true);
-			bean.setUsuarioArcos(usuArcos);
-			bean.setCandidato(usu);
-			bean.setRol(usu.getRol());
-			
-			bean.setVista(JSP_FORM_CANDIDATO);
-		} catch (UVException e) {
-			Usuario usuArcosCont = CrearUsuario.usuario(request.getParameter(PARAM_NOMBRE));
-			if (usuArcosCont != null) {
-				bean.setBusqueda(false);
-				bean.setUsuarioArcos(usuArcos);
-				bean.setVista(JSP_FORM_CANDIDATO);
-			} else {
-				bean.setVista(JSP_BUSCAR_USUARIO);
-				throw new UVException("No existe el usuario");
-			}
-		}
-	}
-	
 	/** edita un usuario .
 	 * @param request .
 	 * @param bean bean de la vista a la que poner los valores .
@@ -558,8 +529,6 @@ public class ControladorUsuarioCandidato extends HttpServlet {
 		ModeloUsuarioBolsaEmpleo modelo = ModeloUsuarioBolsaEmpleo.obtenerInstancia();
 		UsuarioBolsaEmpleo usu = modelo.getUsuarioByCodCuenta(usuArcos.getUid());
 		
-		bean.setBusqueda(false);
-		bean.setUsuarioArcos(usuArcos);
 		bean.setCandidato(usu);
 		bean.setRol(usu.getRol());
 	}
@@ -627,8 +596,6 @@ public class ControladorUsuarioCandidato extends HttpServlet {
 		}
 		UsuarioBolsaEmpleo usu = modelo.getUsuarioByCodCuenta(usuArcos.getUid());
 
-		bean.setBusqueda(true);
-		bean.setUsuarioArcos(usuArcos);
 		bean.setCandidato(usu);
 		bean.setRol(usu.getRol());
 		
@@ -642,17 +609,6 @@ public class ControladorUsuarioCandidato extends HttpServlet {
 			response.sendRedirect(request.getServletPath());
 		}
 	}
-	
-	/** dirige al formulario de busqueda de un usuario.
-	 * @param bean bean de la vista a la que poner los valores.
-	 * @throws SQLException excepcion de bbdd.
-	 * @throws UVException en caso de error en bd
-	 */
-	private void formularioUsuario(VistaCandidatos bean) {
-		bean.setVista(JSP_BUSCAR_USUARIO);
-		bean.setBusqueda(false);
-	}
-	
 	
 	/** muestra todos los roles en un select .
 	 * @param bean bean de la vista a la que poner los valores.
@@ -736,9 +692,6 @@ public class ControladorUsuarioCandidato extends HttpServlet {
 		
 		UsuarioBolsaEmpleo usu = modelo.getUsuarioById(codNum);
 		Usuario usuArcos = CrearUsuario.usuario(usu.getCodCuenta());
-		
-		bean.setUsuarioArcos(usuArcos);
-		bean.setBusqueda(false);
 		
 		switch (nombreAccionUsuario) {
 			case ACCION_APARTADO_AREA:

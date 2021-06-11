@@ -3,7 +3,9 @@ package es.ujaen.uvirtual.modulo.bolsaempleo.beans;
 import java.io.Serializable;
 import java.util.Date;
 
+import es.ujaen.uvirtual.beans.Usuario;
 import es.ujaen.uvirtual.modulo.bolsaempleo.modelo.ModeloRol;
+import es.ujaen.uvirtual.utilidades.AdaptadorDocumentoIdentidad;
 import es.ujaen.uvirtual.utilidades.Formateador;
 
 /**
@@ -177,6 +179,20 @@ public class UsuarioBolsaEmpleo implements Serializable {
 
 	public void setEmail(String email) {
 		this.email = email;
+	}
+	
+	/** método que establece los datos de de arcos en bolsa empleo .
+	 * @param usu .
+	 */
+	public void setUsuarioArcos(Usuario usu) {
+		this.tipodocumento = usu.getDocumentoTipo();
+		this.idnif = AdaptadorDocumentoIdentidad.numeroDocumento(AdaptadorDocumentoIdentidad.UXXIAC, usu);
+		this.letranif = AdaptadorDocumentoIdentidad.letraNIF(usu.getDocumentoTipo(), usu.getDocumentoNumero());
+		this.prsnif = usu.getDocumentoNumero();
+		this.nombre = usu.getNombre();
+		this.apellido1 = usu.getApellido1();
+		this.apellido2 = usu.getApellido2();
+		this.email = usu.getEmailCalculado();
 	}
 	
 	// datos bep

@@ -255,14 +255,16 @@ public class ControladorMisDatos extends HttpServlet {
 	    
 		u.setListaDist("true".equals(EscapaHTML.ajustaCodificacion(request.getParameter(PARAM_LISTA))));
 		
-		u.setTipoDocumento(usu.getDocumentoTipo());
-		u.setIdNif(AdaptadorDocumentoIdentidad.numeroDocumento(AdaptadorDocumentoIdentidad.UXXIAC, usu));
-		u.setLetraNif(AdaptadorDocumentoIdentidad.letraNIF(usu.getDocumentoTipo(), usu.getDocumentoNumero()));
-		u.setPrsNif(usu.getDocumentoNumero());
-		u.setNombre(usu.getNombre());
-		u.setPrimerApellido(usu.getApellido1());
-		u.setSegundoApellido(usu.getApellido2());
-		u.setEmail(usu.getEmailCalculado());
+//		u.setTipoDocumento(usu.getDocumentoTipo());
+//		u.setIdNif(AdaptadorDocumentoIdentidad.numeroDocumento(AdaptadorDocumentoIdentidad.UXXIAC, usu));
+//		u.setLetraNif(AdaptadorDocumentoIdentidad.letraNIF(usu.getDocumentoTipo(), usu.getDocumentoNumero()));
+//		u.setPrsNif(usu.getDocumentoNumero());
+//		u.setNombre(usu.getNombre());
+//		u.setPrimerApellido(usu.getApellido1());
+//		u.setSegundoApellido(usu.getApellido2());
+//		u.setEmail(usu.getEmailCalculado());
+		
+		u.setUsuarioArcos(usu);
 	
 		return u;
 	}

@@ -21,11 +21,9 @@ import es.ujaen.uvirtual.modulo.bolsaempleo.utilidades.BolsaEmpleoDataTable;
 public class VistaCandidatos extends Vista implements Serializable {
 	private static final long serialVersionUID = 1L;
 	private UsuarioBolsaEmpleo candidato;
-	private Usuario usuarioArcos;
 	private Rol role;
 	private List<Rol> roles = new ArrayList<>();
 	private List<Area> listaAreas = new ArrayList<>();
-	private Boolean busqueda;
 	private transient BolsaEmpleoDataTable<UsuarioBolsaEmpleo> dataTableCandidatos;
 	private transient BolsaEmpleoDataTable<Bolsa> dataTableAreas;
 	private transient BolsaEmpleoDataTable<Solicitud> dataTableSolicitudes;
@@ -73,22 +71,6 @@ public class VistaCandidatos extends Vista implements Serializable {
 
 	public void setCandidato(UsuarioBolsaEmpleo usuario) {
 		this.candidato = usuario;
-	}
-
-	public Usuario getUsuarioArcos() {
-		return usuarioArcos;
-	}
-
-	public void setUsuarioArcos(Usuario pusuario) {
-		this.usuarioArcos = pusuario;
-	}
-
-	public void setBusqueda(Boolean busqueda) {
-		this.busqueda = busqueda;
-	}
-
-	public Boolean getBusqueda() {
-		return busqueda;
 	}
 
 	public BolsaEmpleoDataTable<UsuarioBolsaEmpleo> getDatatableCandidatos() {
