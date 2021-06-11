@@ -141,7 +141,7 @@ UsuarioBolsaEmpleo candidato = bean.getCandidato();
 		 	<div class="form-group-custom w100">
     		<%	if (candidato != null && candidato.getBorrado()) { %>
     				<label for="usuario_restaurar" style="margin-top: 4px">Usuario Borrado</label>
-    				<input id="usuario_restaurar" type="submit" name="<%= ControladorUsuarioCandidato.PARAM_RESTAURAR %> " value="Restaurar"/>
+    				<input id="usuario_restaurar" type="button" value="Restaurar"/>
     		<%	} %>
     		</div>
     		<div class="form-group-custom w100" style="float:right;">
@@ -410,6 +410,20 @@ UsuarioBolsaEmpleo candidato = bean.getCandidato();
 			return day + "/" + month + "/" + now.getFullYear();
 		}
 		
+		<%if(usuarioBolsa!=null && !bean.getBusqueda()){%>
+			$("#buttonsEdit").show();
+		<%}%>
+
+		<%	if (usuarioBolsa != null && usuarioBolsa.getBorrado()) { %>
+			document.getElementById("usuario_restaurar").addEventListener("click", function(event) {
+				event.preventDefault();
+				
+				Atis.sendForm("<%= request.getRequestURI() %>", {
+					'<%=ControladorUsuarioCandidato.PARAM_ACCION%>': '<%=ControladorUsuarioCandidato.ACCION_RECUPERAR_USUARIO%>', 
+					'<%=ControladorUsuarioCandidato.PARAM_ID%>': '<%=usuarioBolsa.getCodNum()%>'
+				});
+			});
+		<% } %>
 	});
 	
 	

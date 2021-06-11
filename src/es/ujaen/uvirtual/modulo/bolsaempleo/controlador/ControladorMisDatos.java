@@ -67,32 +67,19 @@ public class ControladorMisDatos extends HttpServlet {
 	public static final String ACCION_BAJA_USUARIO = "bajausuario";
 
     // mensajes
-	public static final String MENSAJE_ENVIADO = "mensaje";
 	public static final String MENSAJE_EXITO_ENVIAR = "Datos personales actualizados correctamente";
 	public static final String MENSAJE_EXITO_DARSE_BAJA = "Usuario dado de baja correctamente";
-	
-	public static final String MENSAJE_ERROR_PRIMER_APELLIDO_VACIO = "El primer apellido no puede estar vacio";
-	public static final String MENSAJE_ERROR_NACIONALIDAD_VACIO = "La nacionalidad no puede estar vacia";
-	public static final String MENSAJE_ERROR_NOMBRE_VACIO = "El nombre no puede estar vacio";
 	public static final String MENSAJE_ERROR_RAZON_BORRADO_VACIO = "La razón de borrado no puede estar vacía";
 	public static final String MENSAJE_ERROR_TELEFONO_STRING = "El telefono debe ser un número";
-	public static final String MENSAJE_ERROR_MOVIL_STRING = "El móvil debe ser un número";
 	public static final String MENSAJE_ERROR_CODIGO_POSTAL_STRING = "El código postal debe ser un número";
 	public static final String MENSAJE_ERROR_NOMBRE_LARGO = "El nombre no puede contener mas de %d caracteres";
-	public static final String MENSAJE_ERROR_PRIMER_APELLIDO_LARGO = "El primer apellido no puede contener mas de %d caracteres";
-	public static final String MENSAJE_ERROR_SEGUNDO_APELLIDO_LARGO = "El segundo apellido no puede contener mas de %d caracteres";
 	public static final String MENSAJE_ERROR_DIRECCION_LARGO = "La dirección no puede contener mas de %d caracteres";
 	public static final String MENSAJE_ERROR_CODIGO_POSTAL_LARGO = "El código postal no puede contener mas de %d caracteres";
 	public static final String MENSAJE_ERROR_LOCALIDAD_LARGO = "La localidad no puede contener mas de %d caracteres";
 	public static final String MENSAJE_ERROR_PROVINCIA_LARGO = "La provincia no puede contener mas de %d caracteres";
-	public static final String MENSAJE_ERROR_MOVIL_LARGO = "El movil no puede contener mas de %d caracteres";
 	public static final String MENSAJE_ERROR_TELEFONO_LARGO = "El telefono no puede contener mas de %d caracteres";
 	public static final String MENSAJE_ERROR_NACIONALIDAD_LARGO = "La nacionalidad no puede contener mas de %d caracteres";
-	public static final String MENSAJE_ERROR_EMAIL_LARGO = "El email no puede contener mas de %d caracteres";
 	
-	public static final int RESPONSE_HTTP_CODE_ERROR = 400;
-	
-	public static final String URL_PATTERN_AJAX = "/srv/es/ajax/informacionadministrativa/bolsaempleo/misdatos";
 	public static final String JSP_INDEX = "/WEB-INF/jsp/vista/infadministrativa/bolsaempleo/misdatos/index.jsp";
 
     /** Peticion GET.
@@ -156,9 +143,7 @@ public class ControladorMisDatos extends HttpServlet {
 		try {
 			bean.setUsuarioLogeado(ModeloUsuarioBolsaEmpleo.obtenerInstancia().getOrCreateUsuario(datos));
 		} catch (UVException e) {
-			LOGGER.log(Level.SEVERE, Formateador.getStackTrace(e));
-			LOGGER.log(Level.SEVERE, e.toString());
-			
+			LOGGER.log(Level.WARNING, e.toString());
 			BolsaEmpleoUtils.addMensajeDeError(e.getMessage(), bean, request);
 			response.sendRedirect("/srv/es/informacionadministrativa/bolsaempleo/error");
 		}
@@ -212,7 +197,6 @@ public class ControladorMisDatos extends HttpServlet {
 			if (razonBorrado.length() > ModeloUsuarioBolsaEmpleo.COLUMN_RAZON_BORRADO_MAXLENGTH) {
 				throw new UVException(String.format(MENSAJE_ERROR_NOMBRE_LARGO, ModeloUsuarioBolsaEmpleo.COLUMN_RAZON_BORRADO_MAXLENGTH));
 			}
-			bean.setVista("/WEB-INF/jsp/vista/infadministrativa/bolsaempleo/inicio/indice.jsp");
 			ModeloUsuarioBolsaEmpleo modelo = ModeloUsuarioBolsaEmpleo.obtenerInstancia();
 			UsuarioBolsaEmpleo usu = modelo.getUsuarioById(bean.getUsuarioLogeado().getCodNum());
 			

@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.sql.SQLException;
 import java.util.HashMap;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.logging.Level;
@@ -32,6 +33,8 @@ import es.ujaen.uvirtual.modulo.bolsaempleo.utilidades.BolsaEmpleoDataTable;
 import es.ujaen.uvirtual.modulo.bolsaempleo.utilidades.BolsaEmpleoUtils;
 import es.ujaen.uvirtual.modulo.bolsaempleo.vistas.VistaAreasBaremar;
 import es.ujaen.uvirtual.modulo.bolsaempleo.vistas.VistaCandidatos;
+import es.ujaen.uvirtual.modulo.bolsaempleo.vistas.VistaUsuarioBolsaEmpleo;
+import es.ujaen.uvirtual.utilidades.AdaptadorDocumentoIdentidad;
 import es.ujaen.uvirtual.utilidades.EscapaHTML;
 import es.ujaen.uvirtual.utilidades.Formateador;
 import es.ujaen.uvirtual.utilidades.UVException;
@@ -197,7 +200,7 @@ public class ControladorUsuarioCandidato extends HttpServlet {
 					editarUsuarioForm(request, bean);
 					break;
 				case ACCION_EDITAR_USUARIO:
-					editarUsuario(request, response, bean);
+					editarUsuario(request, response, bean, usuario);
 					break;
 				case ACCION_INCLUIR_USUARIO:
 					incluirUsuario(request, response, bean);
@@ -213,6 +216,9 @@ public class ControladorUsuarioCandidato extends HttpServlet {
 					break;
 				case ACCION_SELECCION_APARTADO:
 					seleccionarOpcion(bean, request);
+					break;
+				case ACCION_RECUPERAR_USUARIO:
+					recuperarCantidato(bean, datos, request, response);
 					break;
 				default:
 					errorFatal(bean, MENSAJE_ERROR_ACCION_NO_CONTEMPLADA);
@@ -237,7 +243,7 @@ public class ControladorUsuarioCandidato extends HttpServlet {
 			datos.getFicherosCSS().add("/css/jqueryujaen/jquery-ui-1.8.16.custom.css");
 		}
 	}
-	
+		
 	/** Redireccion de do post.
 	 * @see HttpServlet#doPost(HttpServletRequest request, HttpServletResponse response)
 	 */
@@ -496,9 +502,9 @@ public class ControladorUsuarioCandidato extends HttpServlet {
 			case ACCION_ELIMINAR_USUARIO:
 				modelo.ponerUsuarioComoBorrado(usuarios, bean.getUsuarioLogeado());							
 				break;
-			case ACCION_RECUPERAR_USUARIO:
-				modelo.ponerUsuarioComoNoBorrado(usuarios, bean.getUsuarioLogeado());
-				break;
+//			case ACCION_RECUPERAR_USUARIO:
+//				modelo.ponerUsuarioComoNoBorrado(usuarios, bean.getUsuarioLogeado());
+//				break;
 			default:
 				BolsaEmpleoUtils.addMensajeDeError(MENSAJE_ERROR_ACCION_USUARIO_NO_VALIDA, bean, request);
 				response.sendRedirect(request.getServletPath());
@@ -544,15 +550,30 @@ public class ControladorUsuarioCandidato extends HttpServlet {
 	 */
 	private void editarUsuario(HttpServletRequest request, HttpServletResponse response, VistaCandidatos bean) 
 			throws SQLException, UVException, IOException {
-		ModeloUsuarioBolsaEmpleo modelo = ModeloUsuarioBolsaEmpleo.obtenerInstancia();
-		UsuarioBolsaEmpleo usuarioForm = this.getValidatorUsuarios(request);
-		usuarioForm.setCodNum(Formateador.leeParametroInteger(request.getParameter(PARAM_ID)));
 		
-		modelo.actualizaUsuario(usuarioForm, bean.getUsuarioLogeado());
+		Usuario usuArcos = CrearUsuario.usuario(request.getParameter(PARAM_NOMBRE_USUARIO));
+		if (usuArcos == null) {
+			throw new UVException("No existe el usuario");
+		}
+		UsuarioBolsaEmpleo usuario = ModeloUsuarioBolsaEmpleo.obtenerInstancia().getUsuarioByCodCuenta(usuArcos.getUid());
+		
+		UsuarioBolsaEmpleo usuarioForm = this.getValidatorUsuarios(request);
+		
+		usuarioForm.setCodCuenta(usuario.getCodCuenta());
+		usuarioForm.setCodNum(Formateador.leeParametroInteger(request.getParameter(PARAM_ID)));
+		usuarioForm.setTipoDocumento(usuArcos.getDocumentoTipo());
+		usuarioForm.setIdNif(AdaptadorDocumentoIdentidad.numeroDocumento(AdaptadorDocumentoIdentidad.UXXIAC, usuArcos));
+		usuarioForm.setLetraNif(AdaptadorDocumentoIdentidad.letraNIF(usuArcos.getDocumentoTipo(), usuArcos.getDocumentoNumero()));
+		usuarioForm.setPrsNif(usuArcos.getDocumentoNumero());
+		usuarioForm.setNombre(usuArcos.getNombre());
+		usuarioForm.setPrimerApellido(usuArcos.getApellido1());
+		usuarioForm.setSegundoApellido(usuArcos.getApellido2());
+		usuarioForm.setEmail(usuArcos.getEmailCalculado());
+		
+		ModeloUsuarioBolsaEmpleo.obtenerInstancia().actualizaUsuario(usuarioForm, bean.getUsuarioLogeado());
 		BolsaEmpleoUtils.addMensajeDeExito(MENSAJE_EXITO_EDITAR, bean, request);
 		response.sendRedirect(request.getServletPath());
 	}
-	
 	
 	/** incluir un usuario .
 	 * @param request .
@@ -573,7 +594,6 @@ public class ControladorUsuarioCandidato extends HttpServlet {
 		BolsaEmpleoUtils.addMensajeDeExito(MENSAJE_EXITO_EDITAR, bean, request);
 		response.sendRedirect(request.getServletPath());
 	}
-	
 	
 	/** excluir un usuario .
 	 * @param request .
@@ -652,11 +672,9 @@ public class ControladorUsuarioCandidato extends HttpServlet {
 			u.setFechaExclusion(BolsaEmpleoUtils.getCurrentDateTime());
 		}
 		
-		Rol rol = ModeloRol.obtenerInstancia().getRoleById(PARAM_ROLE_CANDIDATO);
-		u.setRol(rol);
-		
+		u.setRol(ModeloRol.obtenerInstancia().getRoleById(ModeloRol.ID_ROL_CANDIDATO));
 		u.setListaDist("true".equals(EscapaHTML.ajustaCodificacion(request.getParameter(PARAM_LISTA))));
-		u.setExcluido("true".equals(EscapaHTML.ajustaCodificacion(request.getParameter(PARAM_EXCLUIDO))));
+		u.setExcluido("true".equals(EscapaHTML.ajustaCodificacion(request.getParameter(PARAM_EXCLUIDO))));		
 		
 		return u;
 	}
@@ -749,5 +767,21 @@ public class ControladorUsuarioCandidato extends HttpServlet {
 				response.setStatus(RESPONSE_AJAX_HTTP_CODE_ERROR);
 			}
 		}
+	}
+	
+	private void recuperarCantidato(VistaUsuarioBolsaEmpleo bean, UVDatos datos, HttpServletRequest request, HttpServletResponse response) 
+			throws SQLException, UVException, IOException {
+		
+		UsuarioBolsaEmpleo usuario = ModeloUsuarioBolsaEmpleo.obtenerInstancia().getUsuarioById(Formateador.leeParametroInteger(request.getParameter(PARAM_ID)));
+		if (Boolean.FALSE.equals(usuario.getBorrado())) {
+			throw new UVException("El usuario no está borrado");
+		}
+		
+		List<UsuarioBolsaEmpleo> users = new ArrayList<>();
+		users.add(usuario);
+		
+		ModeloUsuarioBolsaEmpleo.obtenerInstancia().ponerUsuarioComoNoBorrado(users, bean.getUsuarioLogeado());
+		BolsaEmpleoUtils.addMensajeDeExito(MENSAJE_EXITO_EDITAR, bean, request);
+		response.sendRedirect(request.getServletPath());
 	}
 }

@@ -719,9 +719,10 @@ public class ModeloUsuarioBolsaEmpleo {
 	 * 
 	 * @param usuarios .
 	 * @param usuarioUpdate .
+	 * @throws UVException 
 	 * @throws SQLException .
 	 */
-	public void ponerUsuarioComoBorrado(List<UsuarioBolsaEmpleo> usuarios, UsuarioBolsaEmpleo usuarioUpdate) throws SQLException {
+	public void ponerUsuarioComoBorrado(List<UsuarioBolsaEmpleo> usuarios, UsuarioBolsaEmpleo usuarioUpdate) throws SQLException, UVException {
 		this.cambiarFlagBorradoUsuario(usuarios, USUARIO_BORRADO, usuarioUpdate);
 	}
 
@@ -730,13 +731,14 @@ public class ModeloUsuarioBolsaEmpleo {
 	 * 
 	 * @param usuarios .
 	 * @param usuarioUpdate .
+	 * @throws UVException 
 	 * @throws SQLException .
 	 */
-	public void ponerUsuarioComoNoBorrado(List<UsuarioBolsaEmpleo> usuarios, UsuarioBolsaEmpleo usuarioUpdate) throws SQLException {
+	public void ponerUsuarioComoNoBorrado(List<UsuarioBolsaEmpleo> usuarios, UsuarioBolsaEmpleo usuarioUpdate) throws SQLException, UVException {
 		this.cambiarFlagBorradoUsuario(usuarios, USUARIO_NO_BORRADO, usuarioUpdate);
 	}
 
-	private void cambiarFlagBorradoUsuario(List<UsuarioBolsaEmpleo> usuarios, String borrado, UsuarioBolsaEmpleo usuarioUpdate) throws SQLException {
+	private void cambiarFlagBorradoUsuario(List<UsuarioBolsaEmpleo> usuarios, String borrado, UsuarioBolsaEmpleo usuarioUpdate) throws SQLException, UVException {
 		String params = BolsaEmpleoUtils.consultaMultiplesParametros(usuarios.size());
 		String query = "UPDATE TBEP_USUARIOS SET UID_USUARIO=?,FLGBORRADO=?,FECHA_BORRADO=? WHERE CODNUM IN  (" + params + ")";
 
@@ -745,11 +747,20 @@ public class ModeloUsuarioBolsaEmpleo {
 
 			stmt.setString(indexParam++, usuarioUpdate.getCodCuenta());
 			stmt.setString(indexParam++, borrado);
-			stmt.setDate(indexParam++, new java.sql.Date(BolsaEmpleoUtils.getCurrentDateTime().getTime()));			
+			if (borrado.equals(USUARIO_BORRADO)) {
+				stmt.setDate(indexParam++, new java.sql.Date(BolsaEmpleoUtils.getCurrentDateTime().getTime()));	
+			} else {
+				stmt.setNull(indexParam++, Types.DATE);
+			}
+
 			for (UsuarioBolsaEmpleo usuario : usuarios) {
 				stmt.setInt(indexParam++, usuario.getCodNum());
 			}
 			stmt.executeUpdate();
+		}
+		
+		for (UsuarioBolsaEmpleo usuario : usuarios) {
+			this.refrescarUsuarioBEP(usuario);
 		}
 	}
 
@@ -900,10 +911,8 @@ public class ModeloUsuarioBolsaEmpleo {
 	public void cambiarFlagBorradoUsuarioRazon(UsuarioBolsaEmpleo usuario, UsuarioBolsaEmpleo usuarioQueBorra) throws SQLException, UVException {
 		String query = "UPDATE TBEP_USUARIOS SET UID_USUARIO=?,FLGBORRADO=?,RAZON_BORRADO=?,FECHA_BORRADO=? WHERE CODNUM=?";
 
-		try (Connection conexion = ConexionUvirtual.obtenerInstancia();
-				PreparedStatement stmt = conexion.prepareStatement(query)) {
+		try (Connection conexion = ConexionUvirtual.obtenerInstancia(); PreparedStatement stmt = conexion.prepareStatement(query)) {
 			int indexParam = 1;
-
 			stmt.setString(indexParam++, usuarioQueBorra.getCodCuenta());
 			stmt.setString(indexParam++, "S");
 			stmt.setString(indexParam++, usuario.getRazonBorrado());

@@ -1,3 +1,4 @@
+<%@page import="es.ujaen.uvirtual.modulo.bolsaempleo.beans.TitulacionUsuario"%>
 <%@ page trimDirectiveWhitespaces="true" %>
 <%@ page import="es.ujaen.uvirtual.beans.UVDatos" %>
 <%@ page import="es.ujaen.uvirtual.modulo.bolsaempleo.modelo.ModeloConvocatoria" %>
@@ -99,7 +100,7 @@ VistaSolicitudes bean = (VistaSolicitudes) uvdatos.getVistas().get(VistaSolicitu
 			function confirmRequest(message) {
 				Atis.confirmDialog(
 					"Confirmar solicitud", message, {
-	            	'Confirmar': function(row) {
+	            	'Confirmar solicitud': function(row) {
 	            		backBtn.style.pointerEvents = "none";
 	            		confirmBtn.style.pointerEvents = "none";
 	            		backBtn.removeEventListener("click", handleBackEvent);
@@ -138,16 +139,14 @@ VistaSolicitudes bean = (VistaSolicitudes) uvdatos.getVistas().get(VistaSolicitu
 					message = "¿Desea confirmar la solicitud?<br/><br/>";
 					message += "Mis titulaciones: <br/>";
 					
-					<% for (Titulacion titulacion: bean.getListaTitulaciones()) { %>
-						message += "<%= titulacion.getNombre() %><br/>";
+					<% for (TitulacionUsuario tu : bean.getListaTitulaciones()) { %>
+						message += "<%= tu.getTitulacion() != null ? tu.getTitulacion().getNombre() : tu.getOtraTitulacion() %><br/>";
 					<% } %>
-					
+				<% } else { %>					
+					message = "No ha añadido ninguna titulación.<br/>Al menos debe incluir una titulación universitaria en el apartado 'Mis titulaciones'.<br/>Si no será excluido del proceseo de selección.<br/><br/>";
+					message += "¿Desea confirmar la solicitud?<br/><br/>";
 					message += "<br/>ATENCIÓN: NO PODRA EDITAR LA SOLICITUD<br/>DESPUES DE CONFIRMAR SU SOLICITUD.<br/><br/>";
 					message += "Posteriormente podrá descargar una copia de su solicitud.<br/><br/>";
-					
-				<% } else { %>
-					message = "No tiene ninguna titulación agregada. <br/> Para confirmar la solicitud debe tener al menos una titulación <br/>" 
-							+ "agregada en el apartado 'Mis titulaciones'";
 				<% } %>
 				
 				confirmRequest(message);

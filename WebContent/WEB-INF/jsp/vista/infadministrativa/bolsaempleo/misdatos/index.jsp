@@ -36,28 +36,29 @@ VistaUsuarioBolsaEmpleo bean = (VistaUsuarioBolsaEmpleo) uvdatos.getVistas().get
 	String sexo = "";
 	Boolean lista_dist = false;
 	
-	if(bean.getUsuarioLogeado().getNombre()!=null) nombre = bean.getUsuarioLogeado().getNombre();
-	if(bean.getUsuarioLogeado().getPrimerApellido()!=null) primer_apellido = bean.getUsuarioLogeado().getPrimerApellido();
-	if(bean.getUsuarioLogeado().getSegundoApellido()!=null) segundo_apellido = bean.getUsuarioLogeado().getSegundoApellido();
-	if(bean.getUsuarioLogeado().getSegundoApellido()!=null) segundo_apellido = bean.getUsuarioLogeado().getSegundoApellido();
-	if(bean.getUsuarioLogeado().getEmail()!=null) email = bean.getUsuarioLogeado().getEmail();
-	if(bean.getUsuarioLogeado().getTipoDocumento()!=null) tipo_documento = bean.getUsuarioLogeado().getTipoDocumento();
-	if(bean.getUsuarioLogeado().getPrsNif()!=null) n_documento = bean.getUsuarioLogeado().getPrsNif();
-	if(bean.getUsuarioLogeado().getDireccion()!=null) direccion = bean.getUsuarioLogeado().getDireccion();
-	if(bean.getUsuarioLogeado().getCodigoPostal()!=null) codigo_postal = bean.getUsuarioLogeado().getCodigoPostal();
-	if(bean.getUsuarioLogeado().getLocalidad()!=null) localidad = bean.getUsuarioLogeado().getLocalidad();
-	if(bean.getUsuarioLogeado().getProvincia()!=null) provincia = bean.getUsuarioLogeado().getProvincia();
-	if(bean.getUsuarioLogeado().getTelefono()!=null) telefono = bean.getUsuarioLogeado().getTelefono();
-	if(bean.getUsuarioLogeado().getNacionalidad()!=null) nacionalidad = bean.getUsuarioLogeado().getNacionalidad();
-	if(bean.getUsuarioLogeado()!=null) lista_dist = bean.getUsuarioLogeado().getListaDist();
-	
+	if (bean.getUsuarioLogeado() != null) {
+		if(bean.getUsuarioLogeado().getNombre()!=null) nombre = bean.getUsuarioLogeado().getNombre();
+		if(bean.getUsuarioLogeado().getPrimerApellido()!=null) primer_apellido = bean.getUsuarioLogeado().getPrimerApellido();
+		if(bean.getUsuarioLogeado().getSegundoApellido()!=null) segundo_apellido = bean.getUsuarioLogeado().getSegundoApellido();
+		if(bean.getUsuarioLogeado().getSegundoApellido()!=null) segundo_apellido = bean.getUsuarioLogeado().getSegundoApellido();
+		if(bean.getUsuarioLogeado().getEmail()!=null) email = bean.getUsuarioLogeado().getEmail();
+		if(bean.getUsuarioLogeado().getTipoDocumento()!=null) tipo_documento = bean.getUsuarioLogeado().getTipoDocumento();
+		if(bean.getUsuarioLogeado().getPrsNif()!=null) n_documento = bean.getUsuarioLogeado().getPrsNif();
+		if(bean.getUsuarioLogeado().getDireccion()!=null) direccion = bean.getUsuarioLogeado().getDireccion();
+		if(bean.getUsuarioLogeado().getCodigoPostal()!=null) codigo_postal = bean.getUsuarioLogeado().getCodigoPostal();
+		if(bean.getUsuarioLogeado().getLocalidad()!=null) localidad = bean.getUsuarioLogeado().getLocalidad();
+		if(bean.getUsuarioLogeado().getProvincia()!=null) provincia = bean.getUsuarioLogeado().getProvincia();
+		if(bean.getUsuarioLogeado().getTelefono()!=null) telefono = bean.getUsuarioLogeado().getTelefono();
+		if(bean.getUsuarioLogeado().getNacionalidad()!=null) nacionalidad = bean.getUsuarioLogeado().getNacionalidad();
+		if(bean.getUsuarioLogeado()!=null) lista_dist = bean.getUsuarioLogeado().getListaDist();	
+	}
 	%>
 	
 	<p>Las etiquetas en <strong>negrita</strong> corresponden a campos de relleno obligatorio</p>
 	
 	<form id="actualizar_usuario" class="be-form" method="post" action="<%= request.getRequestURI() %>">
     	<input type="hidden" name="<%= ControladorMisDatos.PARAM_ACCION %>" id="accion_formulario" value="<%= ControladorMisDatos.ACCION_ENVIAR_MISDATOS %>" />
-		<input type="hidden" name="<%= ControladorMisDatos.PARAM_ID%>" id="usuario_id" value="<%= bean.getUsuarioLogeado().getCodNum() %>" />
+		<input type="hidden" name="<%= ControladorMisDatos.PARAM_ID%>" id="usuario_id" value="<%= bean.getUsuarioLogeado() != null ? bean.getUsuarioLogeado().getCodNum() : "" %>" />
 		
 		<div class="form-group-container">
     		<div class="form-group">
@@ -144,7 +145,7 @@ VistaUsuarioBolsaEmpleo bean = (VistaUsuarioBolsaEmpleo) uvdatos.getVistas().get
 		input_accion = document.getElementById("accion_formulario");
 		input_accion.value = '<%= ControladorMisDatos.ACCION_BAJA_USUARIO %>';
 		input_id = document.getElementById("usuario_id");
-		input_id.value = '<%= bean.getUsuarioLogeado().getCodNum() %>';
+		input_id.value = '<%= bean.getUsuarioLogeado() != null ? bean.getUsuarioLogeado().getCodNum() : "" %>';
 	
 		submit_input.form.submit();
 	}

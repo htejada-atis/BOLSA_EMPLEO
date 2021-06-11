@@ -14,6 +14,7 @@ VistaUsuarioBolsaEmpleo bean = (VistaUsuarioBolsaEmpleo) uvdatos.getVistas().get
 	<jsp:include page="/WEB-INF/jsp/vista/infadministrativa/bolsaempleo/mensajes.jsp" />
 	
 	<h2>Usuarios Candidatos</h2>
+	
 	<table class="bluetable bolsaempleo" id="table_usuarios">
 		<tr>
 			<th scope="col" style="width:13%" title="Documento">Documento</th>
