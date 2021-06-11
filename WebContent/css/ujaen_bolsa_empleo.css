@@ -21,14 +21,14 @@
 }
 
 .bolsa-empleo select, .bolsa-empleo input[type=text], .bolsa-empleo input[type=submit], .bolsa-empleo input[type=number],
- .bolsa-empleo textarea, .bolsa-empleo button {
+ .bolsa-empleo input[type=button], .bolsa-empleo textarea, .bolsa-empleo button {
 	border: 1px solid rgb(118, 118, 118);
 	border-radius: 3px;
 	box-sizing: border-box;
 }
 
 .bolsa-empleo input[type=text]:disabled, .bolsa-empleo input[type=submit]:disabled, .bolsa-empleo input[type=number]:disabled,
- .bolsa-empleo textarea:disabled, .bolsa-empleo button:disabled {
+ .bolsa-empleo input[type=button]:disabled, .bolsa-empleo textarea:disabled, .bolsa-empleo button:disabled {
 	border: 1px solid rgba(118, 118, 118, 0.3);
 }
 
@@ -41,15 +41,16 @@
 	background-color: #FFFF99;
 }
 
-.bolsa-empleo input[type=text], .bolsa-empleo input[type=number], .bolsa-empleo textarea, .bolsa-empleo input[type=submit], .bolsa-empleo button {
+.bolsa-empleo input[type=text], .bolsa-empleo input[type=number], .bolsa-empleo textarea, .bolsa-empleo button,
+ .bolsa-empleo input[type=button], .bolsa-empleo input[type=submit] {
 	padding: 4px 6px;
 }
 
-.bolsa-empleo button:hover, .bolsa-empleo input[type=submit]:hover {
+.bolsa-empleo button:hover, .bolsa-empleo input[type=submit]:hover, .bolsa-empleo input[type=button]:hover {
 	cursor: pointer;
 }
 
-.bolsa-empleo button:hover:disabled, .bolsa-empleo input[type=submit]:hover:disabled {
+.bolsa-empleo button:hover:disabled, .bolsa-empleo input[type=submit]:hover:disabled, .bolsa-empleo input[type=button]:hover:disabled {
 	cursor: inherit;
 }
 

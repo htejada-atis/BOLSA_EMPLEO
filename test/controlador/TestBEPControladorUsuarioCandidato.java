@@ -37,8 +37,14 @@ public class TestBEPControladorUsuarioCandidato {
 	private static final String MENSAJE_CON_ERROR = "Debe devolver error";
 	private static final String MENSAJE_SIN_EXITO = "No debe exito";
 	
-	private static final String ROL = ModeloRol.ID_ROL_SERVICIO_PERSONAL.toString();
-	private static final String MENSAJE_ERROR_HAY_EXCEPCION = "Excepción no esperada: %s";
+	private static final String EXCLUIDO_CANDIDATO = "true";
+	private static final String EXCLUIDO_TIPO_INDEFINIDO = "I";
+	private static final String EXCLUIDO_TIPO_TEMPORAL = "T";
+	private static final String EXCLUIDO_FECHA_INICIO = "11/06/2021";
+	private static final String EXCLUIDO_FECHA_FIN = "11/07/2021";
+	private static final String LISTA_CANDIDATO = "true";
+	private static final String RAZON_EXCLUSION_CANDIDATO = "test";
+	
 	
 	/** prepara la bd con los datos iniciales .
 	 * @throws SQLException si error en bd .
@@ -297,6 +303,164 @@ public class TestBEPControladorUsuarioCandidato {
 		assertNotEquals(MENSAJE_SOLICITUDES_DEVUELTAS, 0, bean.getDataTableSolicitudes().getData().size());
 		assertEquals(MENSAJE_SIN_ERROR, 0, bean.getMensajesDeError().size());
 		assertEquals(MENSAJE_SIN_ADVERTENCIAS, 0, bean.getMensajesDeAdvertencia().size());
+	}
+	
+	/** Guardar datos del candidato .
+	 * @throws SQLException si fallo bd .
+	 * @throws IOException si error io .
+	 * @throws ServletException  si error servlet .
+	 */
+	@Test
+	public void testA11EditarCandidato() throws ServletException, IOException {
+		VistaCandidatos bean = obtenerCandidatos();
+		
+		PeticionHttp peticion = UtilsTestBolsaEmpleo.peticionAutenticadaPersonal();
+		peticion.setParameter(ControladorUsuarioCandidato.PARAM_ACCION, ControladorUsuarioCandidato.ACCION_EDITAR_CANDIDATO);
+		peticion.setParameter(ControladorUsuarioCandidato.PARAM_CANDIDATO, bean.getDatatableCandidatos().getData().get(0).getCodNum().toString());
+		peticion.setParameter(ControladorUsuarioCandidato.PARAM_LISTA, LISTA_CANDIDATO);
+		peticion.setParameter(ControladorUsuarioCandidato.PARAM_GUARDAR, "");
+		
+		RespuestaHttp respuesta = new RespuestaHttp();
+		ControladorUsuarioCandidato controlador = new ControladorUsuarioCandidato();
+		controlador.doPost(peticion, respuesta);
+		
+		VistaCandidatos bean2 = (VistaCandidatos) peticion.getUVDatos().getVistas().get(VistaCandidatos.class.getName());
+		
+		assertEquals(MENSAJE_CON_EXITO_ESPERADO, ControladorUsuarioCandidato.MENSAJE_EXITO_EDITAR, bean2.getMensajesDeExito().get(0).toString());
+		assertEquals(MENSAJE_SIN_ERROR, 0, bean2.getMensajesDeError().size());
+		assertEquals(MENSAJE_SIN_ADVERTENCIAS, 0, bean2.getMensajesDeAdvertencia().size());
+	}
+	
+	/** Guardar datos del candidato con excluido a true tipo indefinido .
+	 * @throws SQLException si fallo bd .
+	 * @throws IOException si error io .
+	 * @throws ServletException  si error servlet .
+	 */
+	@Test
+	public void testA12ExcluirIndefinidoCandidato() throws ServletException, IOException {
+		VistaCandidatos bean = obtenerCandidatos();
+		
+		PeticionHttp peticion = UtilsTestBolsaEmpleo.peticionAutenticadaPersonal();
+		peticion.setParameter(ControladorUsuarioCandidato.PARAM_ACCION, ControladorUsuarioCandidato.ACCION_EDITAR_CANDIDATO);
+		peticion.setParameter(ControladorUsuarioCandidato.PARAM_CANDIDATO, bean.getDatatableCandidatos().getData().get(0).getCodNum().toString());
+		peticion.setParameter(ControladorUsuarioCandidato.PARAM_EXCLUIDO, EXCLUIDO_CANDIDATO);
+		peticion.setParameter(ControladorUsuarioCandidato.PARAM_EXCLUIDO_TIPO, EXCLUIDO_TIPO_INDEFINIDO);
+		peticion.setParameter(ControladorUsuarioCandidato.PARAM_RAZON_EXCLUIDO, RAZON_EXCLUSION_CANDIDATO);
+		peticion.setParameter(ControladorUsuarioCandidato.PARAM_GUARDAR, "");
+		
+		RespuestaHttp respuesta = new RespuestaHttp();
+		ControladorUsuarioCandidato controlador = new ControladorUsuarioCandidato();
+		controlador.doPost(peticion, respuesta);
+		
+		VistaCandidatos bean2 = (VistaCandidatos) peticion.getUVDatos().getVistas().get(VistaCandidatos.class.getName());
+		
+		assertEquals(MENSAJE_CON_EXITO_ESPERADO, ControladorUsuarioCandidato.MENSAJE_EXITO_EDITAR, bean2.getMensajesDeExito().get(0).toString());
+		assertEquals(MENSAJE_SIN_ERROR, 0, bean2.getMensajesDeError().size());
+		assertEquals(MENSAJE_SIN_ADVERTENCIAS, 0, bean2.getMensajesDeAdvertencia().size());
+	}
+	
+	/** Guardar datos del candidato con excluido a true tipo temporal .
+	 * @throws SQLException si fallo bd .
+	 * @throws IOException si error io .
+	 * @throws ServletException  si error servlet .
+	 */
+	@Test
+	public void testA13ExcluirTemporalCandidato() throws ServletException, IOException {
+		VistaCandidatos bean = obtenerCandidatos();
+		
+		PeticionHttp peticion = UtilsTestBolsaEmpleo.peticionAutenticadaPersonal();
+		peticion.setParameter(ControladorUsuarioCandidato.PARAM_ACCION, ControladorUsuarioCandidato.ACCION_EDITAR_CANDIDATO);
+		peticion.setParameter(ControladorUsuarioCandidato.PARAM_CANDIDATO, bean.getDatatableCandidatos().getData().get(0).getCodNum().toString());
+		peticion.setParameter(ControladorUsuarioCandidato.PARAM_EXCLUIDO, EXCLUIDO_CANDIDATO);
+		peticion.setParameter(ControladorUsuarioCandidato.PARAM_EXCLUIDO_TIPO, EXCLUIDO_TIPO_TEMPORAL);
+		peticion.setParameter(ControladorUsuarioCandidato.PARAM_FECHA_EXCLUIDO_INICIO, EXCLUIDO_FECHA_INICIO);
+		peticion.setParameter(ControladorUsuarioCandidato.PARAM_FECHA_EXCLUIDO_FIN, EXCLUIDO_FECHA_FIN);
+		peticion.setParameter(ControladorUsuarioCandidato.PARAM_RAZON_EXCLUIDO, RAZON_EXCLUSION_CANDIDATO);
+		peticion.setParameter(ControladorUsuarioCandidato.PARAM_GUARDAR, "");
+		
+		RespuestaHttp respuesta = new RespuestaHttp();
+		ControladorUsuarioCandidato controlador = new ControladorUsuarioCandidato();
+		controlador.doPost(peticion, respuesta);
+		
+		VistaCandidatos bean2 = (VistaCandidatos) peticion.getUVDatos().getVistas().get(VistaCandidatos.class.getName());
+		
+		assertEquals(MENSAJE_CON_EXITO_ESPERADO, ControladorUsuarioCandidato.MENSAJE_EXITO_EDITAR, bean2.getMensajesDeExito().get(0).toString());
+		assertEquals(MENSAJE_SIN_ERROR, 0, bean2.getMensajesDeError().size());
+		assertEquals(MENSAJE_SIN_ADVERTENCIAS, 0, bean2.getMensajesDeAdvertencia().size());
+	}
+	
+	/** Guardar datos del candidato con excluido a false .
+	 * @throws SQLException si fallo bd .
+	 * @throws IOException si error io .
+	 * @throws ServletException  si error servlet .
+	 */
+	@Test
+	public void testA14IncluirCandidato() throws ServletException, IOException {
+		VistaCandidatos bean = obtenerCandidatos();
+		
+		PeticionHttp peticion = UtilsTestBolsaEmpleo.peticionAutenticadaPersonal();
+		peticion.setParameter(ControladorUsuarioCandidato.PARAM_ACCION, ControladorUsuarioCandidato.ACCION_EDITAR_CANDIDATO);
+		peticion.setParameter(ControladorUsuarioCandidato.PARAM_CANDIDATO, bean.getDatatableCandidatos().getData().get(0).getCodNum().toString());
+		peticion.setParameter(ControladorUsuarioCandidato.PARAM_EXCLUIDO, null);
+		peticion.setParameter(ControladorUsuarioCandidato.PARAM_GUARDAR, "");
+		
+		RespuestaHttp respuesta = new RespuestaHttp();
+		ControladorUsuarioCandidato controlador = new ControladorUsuarioCandidato();
+		controlador.doPost(peticion, respuesta);
+		
+		VistaCandidatos bean2 = (VistaCandidatos) peticion.getUVDatos().getVistas().get(VistaCandidatos.class.getName());
+		
+		assertEquals(MENSAJE_CON_EXITO_ESPERADO, ControladorUsuarioCandidato.MENSAJE_EXITO_EDITAR, bean2.getMensajesDeExito().get(0).toString());
+		assertEquals(MENSAJE_SIN_ERROR, 0, bean2.getMensajesDeError().size());
+		assertEquals(MENSAJE_SIN_ADVERTENCIAS, 0, bean2.getMensajesDeAdvertencia().size());
+	}
+	
+	/** Eliminar candidato .
+	 * @throws SQLException si fallo bd .
+	 * @throws IOException si error io .
+	 * @throws ServletException  si error servlet .
+	 */
+	@Test
+	public void testA15EliminarCandidato() throws ServletException, IOException {
+		VistaCandidatos bean = obtenerCandidatos();
+		
+		PeticionHttp peticion = UtilsTestBolsaEmpleo.peticionAutenticadaPersonal();
+		peticion.setParameter(ControladorUsuarioCandidato.PARAM_ACCION, ControladorUsuarioCandidato.ACCION_ELIMINAR_CANDIDATO);
+		peticion.setParameter(ControladorUsuarioCandidato.PARAM_CANDIDATO, bean.getDatatableCandidatos().getData().get(0).getCodNum().toString());
+		
+		RespuestaHttp respuesta = new RespuestaHttp();
+		ControladorUsuarioCandidato controlador = new ControladorUsuarioCandidato();
+		controlador.doPost(peticion, respuesta);
+		
+		VistaCandidatos bean2 = (VistaCandidatos) peticion.getUVDatos().getVistas().get(VistaCandidatos.class.getName());
+		
+		assertEquals(MENSAJE_CON_EXITO_ESPERADO, ControladorUsuarioCandidato.MENSAJE_EXITO_ELIMINAR, bean2.getMensajesDeExito().get(0).toString());
+		assertEquals(MENSAJE_SIN_ERROR, 0, bean2.getMensajesDeError().size());
+		assertEquals(MENSAJE_SIN_ADVERTENCIAS, 0, bean2.getMensajesDeAdvertencia().size());
+	}
+	
+	/** Recuperar candidato .
+	 * @throws SQLException si fallo bd .
+	 * @throws IOException si error io .
+	 * @throws ServletException  si error servlet .
+	 */
+	@Test
+	public void testA16RestaurarCandidato() throws ServletException, IOException {
+		VistaCandidatos bean = obtenerCandidatos();
+		
+		PeticionHttp peticion = UtilsTestBolsaEmpleo.peticionAutenticadaPersonal();
+		peticion.setParameter(ControladorUsuarioCandidato.PARAM_ACCION, ControladorUsuarioCandidato.ACCION_RECUPERAR_CANDIDATO);
+		peticion.setParameter(ControladorUsuarioCandidato.PARAM_CANDIDATO, bean.getDatatableCandidatos().getData().get(0).getCodNum().toString());
+		
+		RespuestaHttp respuesta = new RespuestaHttp();
+		ControladorUsuarioCandidato controlador = new ControladorUsuarioCandidato();
+		controlador.doPost(peticion, respuesta);
+		
+		VistaCandidatos bean2 = (VistaCandidatos) peticion.getUVDatos().getVistas().get(VistaCandidatos.class.getName());
+		
+		assertEquals(MENSAJE_CON_EXITO_ESPERADO, ControladorUsuarioCandidato.MENSAJE_EXITO_RESTAURAR, bean2.getMensajesDeExito().get(0).toString());
+		assertEquals(MENSAJE_SIN_ERROR, 0, bean2.getMensajesDeError().size());
+		assertEquals(MENSAJE_SIN_ADVERTENCIAS, 0, bean2.getMensajesDeAdvertencia().size());
 	}
 	
 }

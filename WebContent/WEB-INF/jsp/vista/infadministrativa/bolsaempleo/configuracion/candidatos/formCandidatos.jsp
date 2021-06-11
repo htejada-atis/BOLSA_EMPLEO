@@ -61,13 +61,11 @@ UsuarioBolsaEmpleo candidato = bean.getCandidato();
 		}
 	%>
 	
-	<form id="actualizar_usuario" class="be-form" method="post" action="<%= request.getRequestURI() %>">
+	<form id="actualizar_candidato" class="be-form" method="post" action="<%= request.getRequestURI() %>">
     	<input type="hidden" name="<%= ControladorUsuarioCandidato.PARAM_ACCION %>" id="accion_formulario" 
     			value="<%= ControladorUsuarioCandidato.ACCION_EDITAR_CANDIDATO %>" />
-		<input type="hidden" name="<%= ControladorUsuarioCandidato.PARAM_ID%>" id="usuario_id" 
+		<input type="hidden" name="<%= ControladorUsuarioCandidato.PARAM_CANDIDATO%>" id="usuario_id" 
 				value="<%= candidato.getCodNum() %>" />
-		<input type="hidden" name="<%= ControladorUsuarioCandidato.PARAM_NOMBRE_USUARIO%>" id="usuario_nombre" 
-				value="<%= candidato.getCodCuenta()%>" />
 		
 		<div class="form-group-container">
     		<div class="form-group">
@@ -103,16 +101,23 @@ UsuarioBolsaEmpleo candidato = bean.getCandidato();
 		</div>
 		<div class="form-group-container">
 	    	<div class="form-check-custom">
-    			<label for="usuario_lista_dist"><input class="params" type="checkbox" id="usuario_lista_dist" name="<%= ControladorUsuarioCandidato.PARAM_LISTA %>" value="<%= lista_dist %>" <%= (lista_dist ? "checked=''" : "") %>/>Lista Distribución</label>
+    			<label for="usuario_lista_dist"><input class="params" type="checkbox" id="usuario_lista_dist" name="<%= ControladorUsuarioCandidato.PARAM_LISTA %>"
+    				 value="true" <%= (lista_dist ? "checked=''" : "") %>/>Lista Distribución</label>
     		</div>
     		<div class="form-check">
     			<div class="form-check-custom" style="float: left;">
     				<label for="usuario_excluido"><input class="params" type="checkbox" id="usuario_excluido" name="<%= ControladorUsuarioCandidato.PARAM_EXCLUIDO %>"
-    				 value="<%= excluido %>" <%= (excluido ? "checked=''" : "") %>/>Excluido</label>
-    			</div>    		
+    				 value="true" <%= (excluido ? "checked=''" : "") %>/>Excluido</label>
+    			</div>
     			<div class="form-check-custom" id="excluido_tipo" style="display:none;">
-					<label class="form-label-custom" for="indefinido" style="float: none; margin-right:0px; margin-bottom:5px;"><input class="form-input" type="radio" id="indefinido" name="<%= ControladorUsuarioBolsaEmpleo.PARAM_EXCLUIDO_TIPO %>" style="display: inline;">Indefinido</label>
-					<label class="form-label-custom" for="temporal" style="float: none; margin-right:0px;"><input class="form-input" type="radio" id="temporal" name="<%= ControladorUsuarioBolsaEmpleo.PARAM_EXCLUIDO_TIPO %>" style="display: inline;">Temporal</label>
+					<label class="form-label-custom" for="indefinido" style="float: none; margin-right:0px; margin-bottom:5px;">
+						<input class="form-input" type="radio" id="indefinido" name="<%= ControladorUsuarioBolsaEmpleo.PARAM_EXCLUIDO_TIPO %>"
+							value="I" style="display: inline;">Indefinido
+					</label>
+					<label class="form-label-custom" for="temporal" style="float: none; margin-right:0px;">
+						<input class="form-input" type="radio" id="temporal" name="<%= ControladorUsuarioBolsaEmpleo.PARAM_EXCLUIDO_TIPO %>"
+							value="T" style="display: inline;">Temporal
+					</label>
     			</div>
     		</div>
 		</div>
@@ -137,15 +142,15 @@ UsuarioBolsaEmpleo candidato = bean.getCandidato();
     		<textarea class="params form-input-custom" id="razon_exclusion" name="<%= ControladorUsuarioCandidato.PARAM_RAZON_EXCLUIDO %>" rows="3" cols="60" <%= (excluido ? "" : "disabled") %>><%= razon_excluido %></textarea>
    		</div>
 		
-		<div class="form-group-container">
-		 	<div class="form-group-custom w100">
+		<div class="form-group-container col1">
+    		<div class="form-group" style="float:right;">
+    			<input id="usuario_guardar" type="submit" name="<%= ControladorUsuarioCandidato.PARAM_GUARDAR %>" value="Guardar candidato" style="float:right; margin-left: 12px;"/>
     		<%	if (candidato != null && candidato.getBorrado()) { %>
-    				<label for="usuario_restaurar" style="margin-top: 4px">Usuario Borrado</label>
-    				<input id="usuario_restaurar" type="button" value="Restaurar"/>
+    				<label for="usuario_restaurar" style="margin-top: 5px; margin-left: 6px; float:right; width: unset !important;">Usuario Borrado</label>
+    				<input id="usuario_restaurar" type="button" value="Restaurar" style="float:right;"/>
+    		<%	} else { %>
+    				<input id="usuario_borrar" type="button" value="Borrar usuario" style="float:right;"/>
     		<%	} %>
-    		</div>
-    		<div class="form-group-custom w100" style="float:right;">
-    			<input id="usuario_guardar" type="submit" name="<%= ControladorUsuarioCandidato.PARAM_GUARDAR %>" value="Guardar candidato" style="float:right;"/>
     		</div>
     	</div>
     	
@@ -231,9 +236,9 @@ UsuarioBolsaEmpleo candidato = bean.getCandidato();
 		$("#fecha_ini").datepicker();
 		$("#fecha_fin").datepicker();
 		
-		<% if (fecha_ini == null) { %>
+	<%	if (fecha_ini == null) { %>
 			document.getElementById("fecha_ini").value = getTodayDate();
-		<% } %>
+	<%	} %>
 
 		document.getElementById("usuario_excluido").addEventListener("change", function(event) {
 			if (document.getElementById("usuario_excluido").checked) {
@@ -278,13 +283,12 @@ UsuarioBolsaEmpleo candidato = bean.getCandidato();
 		
 		document.getElementById("comunicaciones").addEventListener("click", function(event) {
 			Atis.sendForm("<%= request.getRequestURI() %>", {
-				'<%=ControladorUsuarioCandidato.PARAM_ACCION%>': '<%=ControladorUsuarioCandidato.ACCION_SELECCION_APARTADO%>',
-				'<%=ControladorUsuarioCandidato.PARAM_ACCION_USUARIO%>': '<%=ControladorUsuarioCandidato.ACCION_APARTADO_COMUNICACIONES%>',
-				'<%=ControladorUsuarioCandidato.PARAM_ID%>': <%= codnum %>
+				'<%=ControladorUsuarioCandidato.PARAM_ACCION%>': '',
+				'<%=ControladorUsuarioCandidato.PARAM_CANDIDATO%>': <%= codnum %>
 			});
 		});
 		
-		<% if(bean.getApartadoSolicitudes()!=null){ %>
+	<% if(bean.getApartadoSolicitudes()!=null) { %>
 			var table = new Atis.DataTable('#table_solicitudes', {
 			    "ajax": { url: "<%=ControladorUsuarioCandidato.URL_PATTERN_AJAX%>" },
 			    "params": {"<%=ControladorUsuarioCandidato.PARAM_CANDIDATO%>": <%= candidato.getCodNum() %>},
@@ -298,9 +302,9 @@ UsuarioBolsaEmpleo candidato = bean.getCandidato();
 			        {'data': 'convocatoria.estado', order: {'active': false}}
 			    ]
 			});	
-		<%}%> 
+	<%	} %> 
 		
-		<% if(bean.getApartadoAreasExcluidas() != null) {%>
+	<%	if(bean.getApartadoAreasExcluidas() != null) {%>
 			var table = new Atis.DataTable('#table_areas_excluidas', {
 			    "ajax": { url: "<%=ControladorUsuarioCandidato.URL_PATTERN_AJAX%>", async: false},
 			    "params": {"<%=ControladorUsuarioCandidato.PARAM_CANDIDATO%>": <%= candidato.getCodNum() %>},
@@ -363,67 +367,36 @@ UsuarioBolsaEmpleo candidato = bean.getCandidato();
 		      	});
 			}
 		
-		<%}%>
-		
-		function enviarUsuario(event, submit_input) {
-			event.preventDefault();
-		
-			input_accion = document.getElementById("accion_formulario");
-			input_accion.value = '<%= ControladorUsuarioCandidato.ACCION_EDITAR_USUARIO %>';
-			input_id = document.getElementById("usuario_id");
-			input_id.value = '<%= candidato.getCodNum() %>';
-			input_nombre_usuario = document.getElementById("usuario_nombre");
-			input_nombre_usuario.value = '<%= candidato.getCodCuenta()%>';
-		
-			input_lista_dist = document.getElementById("usuario_lista_dist");
-			input_lista_dist.value = input_lista_dist.checked;
-		
-			input_excluido = document.getElementById("usuario_excluido");
-			input_excluido.value = input_excluido.checked;
-			
-			input_excluido = document.getElementById("usuario_excluido");
-			input_excluido.value = input_excluido.checked;
-			
-			if(input_excluido.checked){
-				input_exc_indefinido = document.getElementById("indefinido");
-				input_exc_temporal = document.getElementById("temporal");
-				
-				if(input_exc_indefinido.checked){
-					input_exc_indefinido.value = "I";
-					input_exc_temporal.value = "I";
-				}
-				else{
-					input_exc_indefinido.value = "T";
-					input_exc_temporal.value = "T";
-				}
-			}
-		
-			submit_input.form.submit();
-		}
+	<%	} %>
 		
 		function getTodayDate() {
 			var now = new Date();
-
+			
 			var day = ("0" + now.getDate()).slice(-2);
 			var month = ("0" + (now.getMonth() + 1)).slice(-2);
-
+			
 			return day + "/" + month + "/" + now.getFullYear();
 		}
 		
-		<%if(usuarioBolsa!=null && !bean.getBusqueda()){%>
-			$("#buttonsEdit").show();
-		<%}%>
-
-		<%	if (usuarioBolsa != null && usuarioBolsa.getBorrado()) { %>
+	<%	if (candidato != null && candidato.getBorrado()) { %>
 			document.getElementById("usuario_restaurar").addEventListener("click", function(event) {
 				event.preventDefault();
 				
 				Atis.sendForm("<%= request.getRequestURI() %>", {
-					'<%=ControladorUsuarioCandidato.PARAM_ACCION%>': '<%=ControladorUsuarioCandidato.ACCION_RECUPERAR_USUARIO%>', 
-					'<%=ControladorUsuarioCandidato.PARAM_ID%>': '<%=usuarioBolsa.getCodNum()%>'
+					'<%=ControladorUsuarioCandidato.PARAM_ACCION%>': '<%=ControladorUsuarioCandidato.ACCION_RECUPERAR_CANDIDATO%>',
+					'<%=ControladorUsuarioCandidato.PARAM_CANDIDATO%>': '<%=candidato.getCodNum()%>'
 				});
 			});
-		<% } %>
+	<%	} else { %>
+			document.getElementById("usuario_borrar").addEventListener("click", function(event) {
+				event.preventDefault();
+				
+				Atis.sendForm("<%= request.getRequestURI() %>", {
+					'<%=ControladorUsuarioCandidato.PARAM_ACCION%>': '<%=ControladorUsuarioCandidato.ACCION_ELIMINAR_CANDIDATO%>',
+					'<%=ControladorUsuarioCandidato.PARAM_CANDIDATO%>': '<%=candidato.getCodNum()%>'
+				});
+			});
+	<%	} %>
 	});
 	
 	

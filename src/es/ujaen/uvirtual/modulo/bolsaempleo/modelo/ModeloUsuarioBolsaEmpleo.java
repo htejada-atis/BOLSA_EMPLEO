@@ -381,7 +381,7 @@ public class ModeloUsuarioBolsaEmpleo {
 			throw new UVException(MENSAJE_ERROR_USUARIO_SIN_ROL);
 		}
 
-		ArrayList<String> columns = getColumnsFromInsertOrUpdate(usuario);
+		ArrayList<String> columns = getColumnsFromInsertOrUpdate();
 		
 		String query = "INSERT INTO TBEP_USUARIOS (" + String.join(",", columns) + ") VALUES ("
 				+ BolsaEmpleoUtils.consultaMultiplesParametros(columns.size()) + ")";
@@ -415,7 +415,7 @@ public class ModeloUsuarioBolsaEmpleo {
 			throw new UVException(MENSAJE_ERROR_CODNUM_REQUERIDO);
 		}
 
-		ArrayList<String> columns = getColumnsFromInsertOrUpdate(usuario);
+		ArrayList<String> columns = getColumnsFromInsertOrUpdate();
 
 		String query = "UPDATE TBEP_USUARIOS SET "
 				+ columns.stream().map(c -> c + "=?").collect(Collectors.joining(",")) + " WHERE CODNUM = ?";
@@ -429,7 +429,7 @@ public class ModeloUsuarioBolsaEmpleo {
 		refrescarUsuarioBEP(usuario);
 	}
 	
-	private ArrayList<String> getColumnsFromInsertOrUpdate(UsuarioBolsaEmpleo usuario) {
+	private ArrayList<String> getColumnsFromInsertOrUpdate() {
 		ArrayList<String> columns = new ArrayList<>();
 		
 		columns.add("UID_USUARIO");
@@ -450,18 +450,12 @@ public class ModeloUsuarioBolsaEmpleo {
 		columns.add("NACIONALIDAD");
 		columns.add("TELEFONO");
 		columns.add("FLGLISTADISTRIBUCION");
-
-		if (Boolean.TRUE.equals(usuario.getExcluido())) {
-			columns.add("FLGEXCLUIDO");
-			columns.add("FLGEXCLUIDOTIPO");
-			columns.add("RAZON_EXCLUSION");
-			columns.add("FECHA_EXCLUSION");
-
-			if (usuario.getExcluidoTipo() != null && usuario.getExcluidoTipo().equals(EXCLUSION_TIPO_TEMPORAL)) {
-				columns.add("FECHA_EXCLUSION_INICIO");
-				columns.add("FECHA_EXCLUSION_FIN");
-			}
-		}
+		columns.add("FLGEXCLUIDO");
+		columns.add("FLGEXCLUIDOTIPO");
+		columns.add("RAZON_EXCLUSION");
+		columns.add("FECHA_EXCLUSION");
+		columns.add("FECHA_EXCLUSION_INICIO");
+		columns.add("FECHA_EXCLUSION_FIN");
 		
 		return columns;
 	}
@@ -501,7 +495,7 @@ public class ModeloUsuarioBolsaEmpleo {
 		stmt.setString(parameterIndex++, Boolean.TRUE.equals(usuario.getListaDist()) ? "S" : "N");
 
 		if (Boolean.TRUE.equals(usuario.getExcluido())) {
-			stmt.setString(parameterIndex++, Boolean.TRUE.equals(usuario.getExcluido()) ? "S" : "N");
+			stmt.setString(parameterIndex++, "S");
 			stmt.setString(parameterIndex++, usuario.getExcluidoTipo());
 			stmt.setString(parameterIndex++, usuario.getRazonExcluido());
 			stmt.setDate(parameterIndex++, new java.sql.Date(usuario.getFechaExclusion().getTime()));
@@ -509,7 +503,17 @@ public class ModeloUsuarioBolsaEmpleo {
 			if (usuario.getExcluidoTipo() != null && usuario.getExcluidoTipo().equals(EXCLUSION_TIPO_TEMPORAL)) {
 				stmt.setDate(parameterIndex++, new java.sql.Date(usuario.getFechaExclusionInicio().getTime()));
 				stmt.setDate(parameterIndex++, new java.sql.Date(usuario.getFechaExclusionFin().getTime()));
+			} else {
+				stmt.setDate(parameterIndex++, null);
+				stmt.setDate(parameterIndex++, null);
 			}
+		} else {
+			stmt.setString(parameterIndex++, "N");
+			stmt.setString(parameterIndex++, "");
+			stmt.setString(parameterIndex++, "");
+			stmt.setDate(parameterIndex++, null);
+			stmt.setDate(parameterIndex++, null);
+			stmt.setDate(parameterIndex++, null);
 		}
 		
 		return parameterIndex;
@@ -714,24 +718,20 @@ public class ModeloUsuarioBolsaEmpleo {
 		refrescarUsuarioBEP(usuario);
 	}
 
-	/**
-	 * Establece el usuario como borrado.
-	 * 
+	/** Establece el usuario como borrado.
 	 * @param usuarios .
 	 * @param usuarioUpdate .
-	 * @throws UVException 
+	 * @throws UVException .
 	 * @throws SQLException .
 	 */
 	public void ponerUsuarioComoBorrado(List<UsuarioBolsaEmpleo> usuarios, UsuarioBolsaEmpleo usuarioUpdate) throws SQLException, UVException {
 		this.cambiarFlagBorradoUsuario(usuarios, USUARIO_BORRADO, usuarioUpdate);
 	}
 
-	/**
-	 * Establece el usuario como NO borrado.
-	 * 
+	/** Establece el usuario como NO borrado.
 	 * @param usuarios .
 	 * @param usuarioUpdate .
-	 * @throws UVException 
+	 * @throws UVException .
 	 * @throws SQLException .
 	 */
 	public void ponerUsuarioComoNoBorrado(List<UsuarioBolsaEmpleo> usuarios, UsuarioBolsaEmpleo usuarioUpdate) throws SQLException, UVException {
