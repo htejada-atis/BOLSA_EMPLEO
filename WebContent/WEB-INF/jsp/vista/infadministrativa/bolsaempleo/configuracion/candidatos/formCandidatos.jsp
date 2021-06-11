@@ -215,7 +215,7 @@ UsuarioBolsaEmpleo candidato = bean.getCandidato();
 			<tr>
 				<th scope="col"	style="width:50%">Descripción</th>
 				<th scope="col"	style="width:20%">Fecha cierre</th>
-				<th scope="col"	style="width:30%">Estado convocatoria</th>				
+				<th scope="col"	style="width:30%">Estado solicitud</th>				
 			</tr>
 			<tbody>				
 			</tbody>
@@ -295,16 +295,23 @@ UsuarioBolsaEmpleo candidato = bean.getCandidato();
 			    "pageSize": 10,
 			    "title": "SOLICITUDES",
 			    "filterable": true,
+			    "clickable": {'onClick': function(row) {
+			    	var params = {
+		    				'a': '<%= ControladorUsuarioCandidato.ACCION_SELECCIONAR_SOLICITUD %>', 
+		    				'<%= ControladorUsuarioCandidato.PARAM_CANDIDATO %>': '<%= bean.getCandidato().getCodNum() %>',
+		    				'<%= ControladorUsuarioCandidato.PARAM_SOLICITUD %>': row.codNum};
+		    		Atis.sendForm("<%= request.getRequestURI() %>", params);
+			    }},
 			    "action": "<%= ControladorUsuarioCandidato.ACCION_DATATABLE_SOLICITUDES %>",
 			    "columns": [
 			    	{'data': 'convocatoria.descripcion', order: {'active': false}},
 			        {'data': 'convocatoria.fechaCierre', order: {'active': false}},
-			        {'data': 'convocatoria.estado', order: {'active': false}}
+			        {'data': 'estado', order: {'active': false}}
 			    ]
-			});	
-	<%	} %> 
-		
-	<%	if(bean.getApartadoAreasExcluidas() != null) {%>
+			});
+	<%	} %>
+	
+	<%	if(bean.getApartadoAreasExcluidas() != null) { %>
 			var table = new Atis.DataTable('#table_areas_excluidas', {
 			    "ajax": { url: "<%=ControladorUsuarioCandidato.URL_PATTERN_AJAX%>", async: false},
 			    "params": {"<%=ControladorUsuarioCandidato.PARAM_CANDIDATO%>": <%= candidato.getCodNum() %>},

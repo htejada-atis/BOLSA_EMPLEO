@@ -66,6 +66,7 @@ public class ControladorUsuarioCandidato extends HttpServlet {
 	public static final String PARAM_NOMBRE = "nombre";
 	public static final String PARAM_NOMBRE_USUARIO = "nombreusuario";
 	public static final String PARAM_RAZON_EXCLUIDO = "razonexcluido";
+	public static final String PARAM_SOLICITUD = "solicitud";
 	
 	// acciones
 	public static final String ACCION_APARTADO_AREA = "apartadoarea";
@@ -83,6 +84,7 @@ public class ControladorUsuarioCandidato extends HttpServlet {
 	public static final String ACCION_INDEX = "index";
 	public static final String ACCION_RECUPERAR_CANDIDATO = "recuperarusuario";
 	public static final String ACCION_SELECCIONAR_CANDIDATO = "seleccionarcandidato";
+	public static final String ACCION_SELECCIONAR_SOLICITUD = "seleccionarsolicitud";
 	public static final String ACCION_SOLICITUDES_CANDIDATO = "solicitudescandidato";
 	
 	// mensajes
@@ -143,7 +145,6 @@ public class ControladorUsuarioCandidato extends HttpServlet {
 			init(bean, datos, request, response);
 			switch (nombreAccion) {
 				case ACCION_AREAS_EXCLUIDAS_CANDIDATO:
-				case ACCION_SELECCIONAR_CANDIDATO:
 				case ACCION_DATATABLE_AREAS_EXCLUIDAS_CANDIDATO:
 				case ACCION_DATATABLE_AREAS_NO_EXCLUIDAS_CANDIDATO:
 				case ACCION_DATATABLE_SOLICITUDES:
@@ -152,6 +153,8 @@ public class ControladorUsuarioCandidato extends HttpServlet {
 				case ACCION_EXCLUIR_USUARIO_AREA:
 				case ACCION_INCLUIR_USUARIO_AREA:
 				case ACCION_RECUPERAR_CANDIDATO:
+				case ACCION_SELECCIONAR_CANDIDATO:
+				case ACCION_SELECCIONAR_SOLICITUD:
 				case ACCION_SOLICITUDES_CANDIDATO:
 					accionesCandidato(bean, datos, request, response, nombreAccion);
 					break;
@@ -255,6 +258,9 @@ public class ControladorUsuarioCandidato extends HttpServlet {
 			case ACCION_RECUPERAR_CANDIDATO:
 				recuperarCantidato(bean, request, response);
 				break;
+			case ACCION_SELECCIONAR_SOLICITUD:
+				resumenSolicitudCandidato(bean, request, response);
+				break;
 			case ACCION_SOLICITUDES_CANDIDATO:
 				bean.setApartadoSolicitudes(true);
 				break;
@@ -349,6 +355,11 @@ public class ControladorUsuarioCandidato extends HttpServlet {
 		ModeloUsuarioBolsaEmpleo.obtenerInstancia().ponerUsuarioComoNoBorrado(users, bean.getUsuarioLogeado());
 		BolsaEmpleoUtils.addMensajeDeExito(MENSAJE_EXITO_RESTAURAR, bean, request);
 		response.sendRedirect(request.getServletPath());
+	}
+	
+	private void resumenSolicitudCandidato(VistaCandidatos bean, HttpServletRequest request, HttpServletResponse response)
+			throws SQLException, UVException, IOException {
+		
 	}
 	
 	/**
