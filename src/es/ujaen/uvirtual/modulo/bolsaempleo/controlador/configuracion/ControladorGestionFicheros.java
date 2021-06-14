@@ -201,9 +201,6 @@ public class ControladorGestionFicheros extends HttpServlet {
 				if (uploadedFile.getSize() > 0) {
 					
 					Fichero fichero = this.validatorFichero(request, uploadedFile);										
-					fichero.setArchivo(uploadedFile.getInputStream());
-					
-					BolsaEmpleoUtils.checkFileSize(fichero.getArchivo());
 					
 					modelo.insertaFichero(fichero, bean.getUsuarioLogeado());
 					BolsaEmpleoUtils.addMensajeDeExito(MENSAJE_EXITO_AGREGAR, bean, request);
@@ -316,19 +313,21 @@ public class ControladorGestionFicheros extends HttpServlet {
 	 * @param request .
 	 * @param uploadedFile .
 	 * @return BolsaEmpleoValidator validator .
+	 * @throws SQLException . 
 	 * @throws UVException .
-	 * @throws SQLException .
-	 * @throws IOException .
 	 * @throws IOException .
 	 */
-	private Fichero validatorFichero(HttpServletRequest request, Part uploadedFile) throws UVException {			
+	private Fichero validatorFichero(HttpServletRequest request, Part uploadedFile) throws UVException, SQLException, IOException {
+		String nombre = uploadedFile.getSubmittedFileName(); 
+				
 		// nombre fichero
-		if (!BolsaEmpleoUtils.checkFileIsPDF(uploadedFile)) {
+		if (!BolsaEmpleoUtils.checkFileIsPDF(nombre)) {
 			throw new UVException("El fichero debe ser un pdf válido");
 		}
 		
 		Fichero f = new Fichero();
-		f.setNombre(BolsaEmpleoUtils.obtenerNombreFichero(uploadedFile));
+		f.setNombre(nombre);
+		f.setArchivo(BolsaEmpleoUtils.checkFileSize(uploadedFile.getInputStream()));
 		
 		// titulo
 		f.setTitulo(EscapaHTML.ajustaCodificacion(request.getParameter(PARAM_TITULO)));

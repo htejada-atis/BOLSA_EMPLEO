@@ -70,7 +70,8 @@ VistaMeritos bean = (VistaMeritos) uvdatos.getVistas().get(VistaMeritos.class.ge
 		    "action": "<%=ControladorMisMeritos.ACCION_DATATABLE%>",
 		    "selectable": true,
 		    "filterable": true,
-		    "defaultOrderBy": 3,
+		    "defaultOrderBy": 1,
+		    "defaultOrderDirection": 'desc',
 		    "pageSize": 50,
 		    "pageSizeOptions": [10, 50, 100],
 		    "columns": [

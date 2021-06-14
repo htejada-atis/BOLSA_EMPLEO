@@ -346,23 +346,22 @@ public class ControladorMisMeritos extends HttpServlet {
 		}
 		
 		merito.setArchivo(this.validateFicheroMerito(uploadedFile));
-		BolsaEmpleoUtils.checkFileSize(merito.getArchivo());
-				
+						
 		return merito;
 	}
 	
 	
-	private InputStream validateFicheroMerito(Part uploadedFile) throws UVException {
-		if (!BolsaEmpleoUtils.checkFileIsPDF(uploadedFile)) {
+	private InputStream validateFicheroMerito(Part uploadedFile) throws UVException, SQLException {
+		if (!BolsaEmpleoUtils.checkFileIsPDF(uploadedFile.getSubmittedFileName())) {
 			throw new UVException("El fichero debe ser un pdf válido");
 		}
 		
 		try {
-			return uploadedFile.getInputStream();
+			return BolsaEmpleoUtils.checkFileSize(uploadedFile.getInputStream());
 		} catch (IOException ex) {
 			LOGGER.log(Level.WARNING, ex.toString());
 			throw new UVException("Error guardando fichero");
-		}		
+		}
 	}
 	
 	/**
