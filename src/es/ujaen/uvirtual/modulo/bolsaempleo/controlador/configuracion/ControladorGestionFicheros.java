@@ -20,6 +20,7 @@ import es.ujaen.uvirtual.beans.CodigoDescripcion;
 import es.ujaen.uvirtual.beans.UVDatos;
 import es.ujaen.uvirtual.modulo.bolsaempleo.beans.Fichero;
 import es.ujaen.uvirtual.modulo.bolsaempleo.modelo.ModeloFichero;
+import es.ujaen.uvirtual.modulo.bolsaempleo.modelo.ModeloParametrosConfiguracion;
 import es.ujaen.uvirtual.modulo.bolsaempleo.modelo.ModeloRol;
 import es.ujaen.uvirtual.modulo.bolsaempleo.modelo.ModeloUsuarioBolsaEmpleo;
 import es.ujaen.uvirtual.modulo.bolsaempleo.utilidades.BolsaEmpleoDataTable;
@@ -32,7 +33,7 @@ import es.ujaen.uvirtual.utilidades.UVException;
 
 /** Clase controlador para obtener, eliminar y agregar ficheros.
  * Controlador - Opers. con nombres: obtener, eliminar, agregar
- * */
+ */
 @WebServlet(
 	name = "informacionadministrativa.bolsaempleo.configuracion.ficheros", 
 	description = "Gestión de ficheros", 
@@ -42,7 +43,7 @@ import es.ujaen.uvirtual.utilidades.UVException;
 			"/srv/es/ajax/informacionadministrativa/bolsaempleo/configuracion/ficheros",
 			"/srv/en/ajax/informacionadministrativa/bolsaempleo/configuracion/ficheros"
 	})
-@MultipartConfig
+@MultipartConfig(maxFileSize = ModeloParametrosConfiguracion.MAX_FILE_SIZE)
 public class ControladorGestionFicheros extends HttpServlet {
 	private static final long serialVersionUID = 1L;
 	private static final String NOMBREDEESTACLASE = ControladorGestionFicheros.class.getName();

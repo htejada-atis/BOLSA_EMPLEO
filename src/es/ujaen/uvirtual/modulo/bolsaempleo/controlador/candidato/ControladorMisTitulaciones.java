@@ -22,6 +22,7 @@ import es.ujaen.uvirtual.beans.Usuario;
 import es.ujaen.uvirtual.modulo.bolsaempleo.beans.Titulacion;
 import es.ujaen.uvirtual.modulo.bolsaempleo.beans.TitulacionUsuario;
 import es.ujaen.uvirtual.modulo.bolsaempleo.modelo.ModeloMisTitulaciones;
+import es.ujaen.uvirtual.modulo.bolsaempleo.modelo.ModeloParametrosConfiguracion;
 import es.ujaen.uvirtual.modulo.bolsaempleo.modelo.ModeloRol;
 import es.ujaen.uvirtual.modulo.bolsaempleo.modelo.ModeloTitulacion;
 import es.ujaen.uvirtual.modulo.bolsaempleo.modelo.ModeloUsuarioBolsaEmpleo;
@@ -34,7 +35,7 @@ import es.ujaen.uvirtual.utilidades.UVException;
 
 
 /**
- * Gestión de las titulaciones de usuarios de UVIRTUAL.
+ * Gestión de las titulacionesde usuarios de UVIRTUAL.
  */
 @WebServlet(
 	name = "informacionadministrativa.bolsaempleo.mistitulaciones", 
@@ -45,7 +46,7 @@ import es.ujaen.uvirtual.utilidades.UVException;
 			"/srv/es/ajax/informacionadministrativa/bolsaempleo/mistitulaciones",
 			"/srv/en/ajax/informacionadministrativa/bolsaempleo/mistitulaciones"
 	})
-@MultipartConfig
+@MultipartConfig(maxFileSize = ModeloParametrosConfiguracion.MAX_FILE_SIZE)
 public class ControladorMisTitulaciones extends HttpServlet {
 	private static final long serialVersionUID = 1L;
 	private static final String NOMBREDEESTACLASE = ControladorMisTitulaciones.class.getName();
