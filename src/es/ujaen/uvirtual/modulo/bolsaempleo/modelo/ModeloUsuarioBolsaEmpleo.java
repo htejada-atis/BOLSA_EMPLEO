@@ -38,10 +38,10 @@ public class ModeloUsuarioBolsaEmpleo {
 	private static final Logger LOGGER = Logger.getLogger(NOMBREDEESTACLASE);
 
 	// columnas datatable usuario	
-	public static final int ORDER_COLUMN_INDEX_USUARIO_DOCUMENTO = 1;
-	public static final int ORDER_COLUMN_INDEX_USUARIO_CODCUENTA = 2;
-	public static final int ORDER_COLUMN_INDEX_USUARIO_ROL = 4;
-	public static final int ORDER_COLUMN_INDEX_USUARIO_ELIMINADO = 5;
+	public static final int ORDER_COLUMN_INDEX_USUARIO_DOCUMENTO = 0;
+	public static final int ORDER_COLUMN_INDEX_USUARIO_CODCUENTA = 1;
+	public static final int ORDER_COLUMN_INDEX_USUARIO_ROL = 3;
+	public static final int ORDER_COLUMN_INDEX_USUARIO_ELIMINADO = 4;
 	
 	// columnas datatable candidato
 	public static final int ORDER_COLUMN_INDEX_CANDIDATO_DOCUMENTO = 0;

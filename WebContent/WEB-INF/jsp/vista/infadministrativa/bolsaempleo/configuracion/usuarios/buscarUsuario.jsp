@@ -20,40 +20,44 @@ VistaUsuarioBolsaEmpleo bean = (VistaUsuarioBolsaEmpleo) uvdatos.getVistas().get
 		<h2>Excluir Usuario</h2>
 		<form id="actualizar_usuario" class="be-form" method="post" action="<%= request.getRequestURI() %>">
    			<input type="hidden" name="<%= ControladorUsuarioBolsaEmpleo.PARAM_ACCION %>" id="accion_formulario" value="" />
-			<input type="hidden" name="<%= ControladorUsuarioBolsaEmpleo.PARAM_ID%>" id="usuario_id" value="" />
-			<input type="hidden" name="<%= ControladorUsuarioBolsaEmpleo.PARAM_NOMBRE_USUARIO%>" id="usuario_nombre" value="" />
+			<input type="hidden" name="<%=ControladorUsuarioBolsaEmpleo.PARAM_USUARIO%>" id="usuario_id" value="" />
+			<input type="hidden" name="<%=ControladorUsuarioBolsaEmpleo.PARAM_NOMBRE_USUARIO%>" id="usuario_nombre" value="" />
 			<div class="form-group-container">
     			<div class="form-group">
     				<label for="razon_exclusion">Razón exclusión</label>
-    				<textarea class="params" id="razon_exclusion" name="<%= ControladorUsuarioBolsaEmpleo.PARAM_RAZON_EXCLUIDO %>" rows="3" style="width:100%;"></textarea>
+    				<textarea class="params" id="razon_exclusion" name="<%=ControladorUsuarioBolsaEmpleo.PARAM_RAZON_EXCLUIDO%>" rows="3" style="width:100%;"></textarea>
     			</div>
     			<div class="form-check" style="margin-top:1.35rem;">	
     			   	<div class="form-check-custom w-35">	
-						<label class="form-label-custom" for="indefinido" style="float: none; margin-right:0px;"><input class="form-input" type="radio" id="indefinido" name="<%= ControladorUsuarioBolsaEmpleo.PARAM_EXCLUIDO_TIPO %>" style="display: inline;">Indefinido</label>
-						<label class="form-label-custom" for="temporal" style="float: none; margin-right:0px; margin-top:1rem;"><input class="form-input" type="radio" id="temporal" name="<%= ControladorUsuarioBolsaEmpleo.PARAM_EXCLUIDO_TIPO %>" style="display: inline;">Temporal</label>
+						<label class="form-label-custom" for="indefinido" style="float: none; margin-right:0px;"><input class="form-input" type="radio" id="indefinido" name="<%=ControladorUsuarioBolsaEmpleo.PARAM_EXCLUIDO_TIPO%>" style="display: inline;">Indefinido</label>
+						<label class="form-label-custom" for="temporal" style="float: none; margin-right:0px; margin-top:1rem;"><input class="form-input" type="radio" id="temporal" name="<%=ControladorUsuarioBolsaEmpleo.PARAM_EXCLUIDO_TIPO%>" style="display: inline;">Temporal</label>
     				</div>
     				<div class="form-check-custom w-64" id="fecha_excluido" style="display:none;">	
 						<div class="form-check-custom">
 	    					<label for="noticia_fecha"><strong>Fecha Inicio</strong>:</label>
-	    					<input class="form-input-custom" type="text" name="<%= ControladorUsuarioBolsaEmpleo.PARAM_FECHA_EXCLUIDO_INICIO %>" id="fecha_ini" autocomplete="off" style="width:90%"/>
+	    					<input class="form-input-custom" type="text" name="<%=ControladorUsuarioBolsaEmpleo.PARAM_FECHA_EXCLUIDO_INICIO%>" id="fecha_ini" autocomplete="off" style="width:90%"/>
 	    				</div>
 	    				<div class="form-check-custom">
 	    					<label for="noticia_fecha"><strong>Fecha Fin</strong>:</label>
-	    					<input class="form-input-custom" type="text" name="<%= ControladorUsuarioBolsaEmpleo.PARAM_FECHA_EXCLUIDO_FIN %>" id="fecha_fin" autocomplete="off" style="width:80%"/>
+	    					<input class="form-input-custom" type="text" name="<%=ControladorUsuarioBolsaEmpleo.PARAM_FECHA_EXCLUIDO_FIN%>" id="fecha_fin" autocomplete="off" style="width:80%"/>
 	    				</div>
     				</div>
     			</div>
     			<div class="form-btn">
-   					<input id="usuario_excluir" type="submit" name="<%= ControladorUsuarioBolsaEmpleo.ACCION_EXCLUIR_USUARIO %>" value="Excluir"/>
+   					<input id="usuario_excluir" type="submit" name="<%=ControladorUsuarioBolsaEmpleo.ACCION_EXCLUIR_USUARIO%>" value="Excluir"/>
     			</div>
 			</div>
     	</form>
-    	<% }%>
-	<% } else { %>
+    	<%
+    	}
+    	%>
+	<%
+	} else {
+	%>
 		<h2>Nuevo Usuario</h2>
-		<form id="actualizar_usuario" class="be-form" method="post" action="<%= request.getRequestURI() %>">
-    		<input type="hidden" name="<%= ControladorUsuarioBolsaEmpleo.PARAM_ACCION %>" id="accion_formulario" value="" />
-			<input type="hidden" name="<%= ControladorUsuarioBolsaEmpleo.PARAM_ID%>" id="usuario_id" value="" />
+		<form id="actualizar_usuario" class="be-form" method="post" action="<%=request.getRequestURI()%>">
+    		<input type="hidden" name="<%=ControladorUsuarioBolsaEmpleo.PARAM_ACCION%>" id="accion_formulario" value="" />
+			<input type="hidden" name="<%=ControladorUsuarioBolsaEmpleo.PARAM_USUARIO%>" id="usuario_id" value="" />
     		<div class="form-group">
     			<label for="usuario_nombre">Nombre de usuario</label>
     			<input type="text" name="nombre" id="usuario_nombre"/>

@@ -449,7 +449,7 @@ public class ControladorMisSolicitudes extends HttpServlet {
 		bean.setListaBolsas(listaBolsas);
 	}
 	
-	private void listadoAreasSeleccionadas(VistaSolicitudes bean, UVDatos datos, HttpServletRequest request, HttpServletResponse response) throws IOException, SQLException {
+	private void listadoAreasSeleccionadas(VistaSolicitudes bean, UVDatos datos, HttpServletRequest request, HttpServletResponse response) throws IOException {
 		datos.setRespuestaEnviada(true);
 		datos.setContentType(RESPONSE_AJAX_CONTENTTYPE);
 		response.setContentType(RESPONSE_AJAX_CONTENTTYPE);
@@ -460,7 +460,7 @@ public class ControladorMisSolicitudes extends HttpServlet {
 				Solicitud solicitud = this.getSolicitud(bean, request);
 				
 				BolsaEmpleoDataTable<Bolsa> dataTable = ModeloSolicitud.obtenerInstancia().
-						listaAreaSolicitudSeleccionadasDatatable(request.getParameterMap(), bean.getUsuarioLogeado().getCodNum(), solicitud);
+						listaAreaSolicitudSeleccionadasDatatable(request.getParameterMap(), solicitud);
 				
 				bean.setDataTableBolsasCandidatoSeleccionadas(dataTable);
 				writer.write(dataTable.toJson());

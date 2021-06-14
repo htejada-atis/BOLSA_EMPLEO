@@ -188,7 +188,7 @@ public class TestBEPControladorUsuariosBolsaEmpleo {
 		peticion.setParameter(ControladorUsuarioBolsaEmpleo.PARAM_RAZON_EXCLUIDO, "EJEMPLO");
 		peticion.setParameter(ControladorUsuarioBolsaEmpleo.PARAM_ROLE, ROL);
 		peticion.setParameter(ControladorUsuarioBolsaEmpleo.PARAM_NOMBRE_USUARIO, CODCUENTA);
-		peticion.setParameter(ControladorUsuarioBolsaEmpleo.PARAM_ID, CODCUENTA);
+		peticion.setParameter(ControladorUsuarioBolsaEmpleo.PARAM_USUARIO, CODCUENTA);
 		peticion.setParameter(ControladorUsuarioBolsaEmpleo.PARAM_EMAIL, EMAIL);
 		RespuestaHttp respuesta = new RespuestaHttp();
 		ControladorUsuarioBolsaEmpleo controlador = new ControladorUsuarioBolsaEmpleo();
@@ -217,7 +217,7 @@ public class TestBEPControladorUsuariosBolsaEmpleo {
 		peticion.setParameter(ControladorUsuarioBolsaEmpleo.PARAM_RAZON_EXCLUIDO, "EJEMPLO");
 		peticion.setParameter(ControladorUsuarioBolsaEmpleo.PARAM_ROLE, ROL);
 		peticion.setParameter(ControladorUsuarioBolsaEmpleo.PARAM_NOMBRE_USUARIO, usu.getCodCuenta());
-		peticion.setParameter(ControladorUsuarioBolsaEmpleo.PARAM_ID, usu.getCodNum().toString());
+		peticion.setParameter(ControladorUsuarioBolsaEmpleo.PARAM_USUARIO, usu.getCodNum().toString());
 		
 		RespuestaHttp respuesta = new RespuestaHttp();
 		ControladorUsuarioBolsaEmpleo controlador = new ControladorUsuarioBolsaEmpleo();
@@ -249,7 +249,7 @@ public class TestBEPControladorUsuariosBolsaEmpleo {
 		peticion.setParameter(ControladorUsuarioBolsaEmpleo.PARAM_FECHA_EXCLUIDO_FIN, "12/05/2021");
 		peticion.setParameter(ControladorUsuarioBolsaEmpleo.PARAM_ROLE, ROL);
 		peticion.setParameter(ControladorUsuarioBolsaEmpleo.PARAM_NOMBRE_USUARIO, usu.getCodCuenta());
-		peticion.setParameter(ControladorUsuarioBolsaEmpleo.PARAM_ID, usu.getCodNum().toString());
+		peticion.setParameter(ControladorUsuarioBolsaEmpleo.PARAM_USUARIO, usu.getCodNum().toString());
 		RespuestaHttp respuesta = new RespuestaHttp();
 		ControladorUsuarioBolsaEmpleo controlador = new ControladorUsuarioBolsaEmpleo();
 		controlador.doPost(peticion, respuesta);
@@ -339,7 +339,7 @@ public class TestBEPControladorUsuariosBolsaEmpleo {
 	public void testA13IncluirUsuario() throws ServletException, IOException {
 		PeticionHttp peticion = UtilsTestBolsaEmpleo.peticionAutenticadaPersonal();
 		peticion.setParameter(ControladorUsuarioBolsaEmpleo.PARAM_ACCION, ControladorUsuarioBolsaEmpleo.ACCION_INCLUIR_USUARIO);
-		peticion.setParameter(ControladorUsuarioBolsaEmpleo.PARAM_ID, CODNUM);
+		peticion.setParameter(ControladorUsuarioBolsaEmpleo.PARAM_USUARIO, CODNUM);
 		RespuestaHttp respuesta = new RespuestaHttp();
 		ControladorUsuarioBolsaEmpleo controlador = new ControladorUsuarioBolsaEmpleo();
 		controlador.doPost(peticion, respuesta);
@@ -408,7 +408,7 @@ public class TestBEPControladorUsuariosBolsaEmpleo {
 			assertEquals(MENSAJE_SIN_ADVERTENCIAS, 0, bean.getMensajesDeAdvertencia().size());
 			
 			return usu;
-		} catch (ServletException | IOException ex) {
+		} catch (IOException ex) {
 			fail(String.format(MENSAJE_ERROR_HAY_EXCEPCION, ex.toString()));
 		}
 		

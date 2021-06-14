@@ -63,24 +63,25 @@ public class ControladorUsuarioBolsaEmpleo extends HttpServlet {
 	public static final String PARAM_RAZON_EXCLUIDO = "razonexcluido";
 	public static final String PARAM_ROLE = "rol";
 	public static final String PARAM_ENVIAR = "enviar";
-	public static final String PARAM_ID = "id";
+	public static final String PARAM_USUARIO = "usuario";
 	public static final String PARAM_BORRADO = "borrar";
 	public static final String PARAM_EMAIL = "email";
 	
-	// acciones	
-	public static final String ACCION_INDEX = "index";
-	public static final String ACCION_USUARIO = "accionusuario";
-	public static final String ACCION_VOLVER_USUARIO = "volverusuario";
-	public static final String ACCION_FORMULARIO_USUARIO = "formulariousuario";
-	public static final String ACCION_BUSCAR_USUARIO = "buscarusuario";
+	// acciones
 	public static final String ACCION_AGREGAR_USUARIO = "agregarusuario";
+	public static final String ACCION_BUSCAR_USUARIO = "buscarusuario";
+	public static final String ACCION_DATATABLE_USUARIOS = "datatableusuarios";
 	public static final String ACCION_EDITAR_USUARIO = "editarusuario";
 	public static final String ACCION_ELIMINAR_USUARIO = "eliminarusuario";
-	public static final String ACCION_LISTAR_ROLES = "listar_roles";
 	public static final String ACCION_EXCLUIR_USUARIO = "excluirusuario";
-	public static final String ACCION_RECUPERAR_USUARIO = "recuperarusuario";
+	public static final String ACCION_FORMULARIO_USUARIO = "formulariousuario";
 	public static final String ACCION_INCLUIR_USUARIO = "incluirusuario";
-	public static final String ACCION_DATATABLE_USUARIOS = "datatableusuarios";
+	public static final String ACCION_INDEX = "index";
+	public static final String ACCION_LISTAR_ROLES = "listar_roles";
+	public static final String ACCION_RECUPERAR_USUARIO = "recuperarusuario";
+	public static final String ACCION_SELECCIONAR_USUARIO = "seleccionarusuario";
+	public static final String ACCION_USUARIO = "accionusuario";
+	public static final String ACCION_VOLVER_USUARIO = "volverusuario";
 	
 	// mensajes
 	public static final String MENSAJE_EXITO_AGREGAR = "Usuario creado correctamente";
@@ -109,7 +110,7 @@ public class ControladorUsuarioBolsaEmpleo extends HttpServlet {
 	 * @see HttpServlet#doGet(HttpServletRequest request, HttpServletResponse response)
 	 */
 	@Override
-	public void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+	public void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException {
 		UVDatos datos = (UVDatos) request.getAttribute(UVDatos.NOMBRE_ATRIBUTO);
 		datos.setDocType("<!DOCTYPE html>");
 		datos.setContentType("text/html");
@@ -122,7 +123,7 @@ public class ControladorUsuarioBolsaEmpleo extends HttpServlet {
 		if (nombreAccion == null) {
 			nombreAccion = ACCION_INDEX;
 		}
-					
+		
 		try {
 			init(bean, datos, request, response);
 			switch (nombreAccion) {
@@ -136,7 +137,7 @@ public class ControladorUsuarioBolsaEmpleo extends HttpServlet {
 					buscarUsuario(request, bean);
 					break;
 				case ACCION_DATATABLE_USUARIOS:
-					listado(bean, datos, request, response);
+					listadoUsuarios(bean, datos, request, response);
 					break;
 				case ACCION_LISTAR_ROLES:
 					obtenerRoles(bean);
@@ -154,7 +155,7 @@ public class ControladorUsuarioBolsaEmpleo extends HttpServlet {
 					excluirUsuario(request, response, bean, usuario);
 					break;
 				case ACCION_USUARIO:
-					accionSobreUsuario(bean, request, response);						
+					accionSobreUsuario(bean, request, response);
 					break;
 				case ACCION_VOLVER_USUARIO:
 					volverUsuario(bean);
@@ -187,7 +188,7 @@ public class ControladorUsuarioBolsaEmpleo extends HttpServlet {
 	 * @see HttpServlet#doPost(HttpServletRequest request, HttpServletResponse response)
 	 */
 	@Override
-	public void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+	public void doPost(HttpServletRequest request, HttpServletResponse response) throws IOException {
 		doGet(request, response);
 	}
 	
@@ -224,7 +225,7 @@ public class ControladorUsuarioBolsaEmpleo extends HttpServlet {
 	 * @throws IOException . 
 	 * @throws SQLException .
 	 */
-	private void listado(VistaUsuarioBolsaEmpleo bean, UVDatos datos, HttpServletRequest request, HttpServletResponse response) throws IOException {
+	private void listadoUsuarios(VistaUsuarioBolsaEmpleo bean, UVDatos datos, HttpServletRequest request, HttpServletResponse response) throws IOException {
 		ModeloUsuarioBolsaEmpleo modelo = ModeloUsuarioBolsaEmpleo.obtenerInstancia();	
 		datos.setContentType(RESPONSE_AJAX_CONTENTTYPE);
 		datos.setRespuestaEnviada(true);
@@ -327,7 +328,7 @@ public class ControladorUsuarioBolsaEmpleo extends HttpServlet {
 			throws SQLException, UVException, IOException {
 		bean.setVista(JSP_USUARIOS);
 		
-		Usuario usuArcos = CrearUsuario.usuario(request.getParameter(PARAM_ID));
+		Usuario usuArcos = CrearUsuario.usuario(request.getParameter(PARAM_USUARIO));
 		if (usuArcos == null) {
 			throw new UVException("No existe el usuario");
 		}
@@ -399,7 +400,7 @@ public class ControladorUsuarioBolsaEmpleo extends HttpServlet {
 		
 		obtenerRoles(bean);
 		
-		UsuarioBolsaEmpleo usu = modelo.getUsuarioById(Formateador.leeParametroInteger(request.getParameter(PARAM_ID)));
+		UsuarioBolsaEmpleo usu = modelo.getUsuarioById(Formateador.leeParametroInteger(request.getParameter(PARAM_USUARIO)));
 			
 		modelo.ponerUsuarioComoNoExcluido(usu, bean.getUsuarioLogeado());
 		BolsaEmpleoUtils.addMensajeDeExito(MENSAJE_EXITO_EDITAR, bean, request);
@@ -440,7 +441,7 @@ public class ControladorUsuarioBolsaEmpleo extends HttpServlet {
 		
 		if (EscapaHTML.ajustaCodificacion(request.getParameter(PARAM_RAZON_EXCLUIDO)) != null) {
 			UsuarioBolsaEmpleo usuarioForm = this.validateExclusion(request);			
-			usuarioForm.setCodNum(Formateador.leeParametroInteger(request.getParameter(PARAM_ID)));
+			usuarioForm.setCodNum(Formateador.leeParametroInteger(request.getParameter(PARAM_USUARIO)));
 			usuarioForm.setExcluido(true);
 			usuarioForm.setCodCuenta(usu.getCodCuenta());
 			usuarioForm.setIdNif(usu.getIdNif());
