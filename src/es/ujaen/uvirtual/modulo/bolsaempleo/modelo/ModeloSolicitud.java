@@ -1264,16 +1264,7 @@ public class ModeloSolicitud {
 	public boolean comprobarMeritoPreferentePuedeSerBorrado(MeritoPreferenteUsuario merito) throws SQLException, UVException {
 		if (merito.isValidado()) {
 			return false;
-		}
-		
-		// si tiene una solicitud para la ultima convocatoria, no puede borrar
-		Convocatoria c = ModeloConvocatoria.obtenerInstancia().getUltimaConvocatoria();		
-		if (c != null) {
-			Solicitud s = this.getSolicitudByConvocatoriaUsuario(merito.getUsuario(), c);
-			if (s != null) {
-				return false;
-			}
-		}
+		}		
 				
 		return true;
 	}

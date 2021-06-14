@@ -13,6 +13,7 @@ import es.ujaen.uvirtual.modulo.bolsaempleo.beans.MeritoPreferenteUsuario;
 import es.ujaen.uvirtual.modulo.bolsaempleo.beans.UsuarioBolsaEmpleo;
 import es.ujaen.uvirtual.modulo.bolsaempleo.utilidades.BolsaEmpleoDataTable;
 import es.ujaen.uvirtual.modulo.bolsaempleo.utilidades.BolsaEmpleoUtils;
+import es.ujaen.uvirtual.modulo.bolsaempleo.utilidades.BolsaEmpleoDataTable.DataTableColumn;
 import es.ujaen.uvirtual.utilidades.UVException;
 
 /**
@@ -25,6 +26,7 @@ public class ModeloMeritosPreferentesCandidato {
 	public static final int ORDER_COLUMN_INDEX_ID = 1;
 	public static final int ORDER_COLUMN_INDEX_CODIGO = 2;
 	public static final int ORDER_COLUMN_INDEX_DESCRIPCION = 4;
+	public static final int ORDER_COLUMN_INDEX_VALIDADO = 5;
 	
 	public static final int MAX_LENGTH_COLUMN_DESCRIPCION = 250;
 	
@@ -86,6 +88,7 @@ public class ModeloMeritosPreferentesCandidato {
 		dataTable.setColumn(ORDER_COLUMN_INDEX_ID, "bepmpu.CODNUM");
 		dataTable.setColumn(ORDER_COLUMN_INDEX_CODIGO, "bepmep.CODIGO");
 		dataTable.setColumn(ORDER_COLUMN_INDEX_DESCRIPCION, "bepmpu.DESCRIPCION");
+		dataTable.setColumn(ORDER_COLUMN_INDEX_VALIDADO, "bepmpu.FLGVALIDADO", DataTableColumn.COLUMN_TYPE_BOOLEAN);
 		dataTable.setQuery(consulta);
 
 		try (Connection conexion = ConexionUvirtual.obtenerInstancia();
