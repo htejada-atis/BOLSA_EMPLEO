@@ -19,7 +19,11 @@ import es.ujaen.uvirtual.utilidades.UVException;
  * @author ATISoluciones
  */
 public class ModeloParametrosConfiguracion {
-	private static final String VERSION = "0.25";
+	public static final String VERSION = "0.25";
+	
+	// 10MB = 1024 * 1024 * 10 = 10485760
+	public static final int MAX_FILE_SIZE = 10_485_760;
+	
 	protected static ModeloParametrosConfiguracion eInstancia;
 
 	/**
