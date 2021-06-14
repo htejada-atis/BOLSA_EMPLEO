@@ -27,16 +27,17 @@ VistaMeritosPreferentesCandidato bean = (VistaMeritosPreferentesCandidato) uvdat
 		<tr>
 			<th scope="col" style="width:5%"></th>
 			<th scope="col" style="width:10%">Id</th>
-			<th scope="col" style="width:10%">Código</th>
-			<th scope="col"	style="width:48%">Nombre</th>
+			<th scope="col" style="width:8%">Código</th>
+			<th scope="col"	style="width:40%">Nombre</th>
 			<th scope="col"	style="width:15%">Descripción</th>
+			<th scope="col" style="width:10%">Validada</th>
 			<th scope="col"	style="width:12%"></th>
 		</tr>
 		<tbody>		
 		</tbody>
 		<tfoot>
 			<tr>
-				<th colspan="6" style="width:100%"></th>
+				<th colspan="7" style="width:100%"></th>
 			</tr>
 		</tfoot>
 	</table>
@@ -67,6 +68,13 @@ VistaMeritosPreferentesCandidato bean = (VistaMeritosPreferentesCandidato) uvdat
 		    		return row.meritoPreferente.nombre + (row.meritoPreferenteOpcion ? ' (' + row.meritoPreferenteOpcion.nombre + ')' : '');
 		    	}},
 		    	{'data': 'descripcion', 'filter': true},
+		    	{'data': 'validado', 'order': {'active': false}, 'filter': {'type': 'select', 'options':{'true': 'Validada', 'false': 'Pendiente'}},
+		    		'render': function(row) {
+		        		if (row.validado) {
+		        			return "<div title='Validada' class='circle-true'></div>"; 
+		        		}
+	        		}
+		        },
 		        {'data': 'codnum', 'buttons': [
 	        		{'label': 'Descargar', 'title': 'Descargar fichero del mérito', 'onClick': function(row) {
 	        			window.open("<%= ControladorDescargaFicheros.URL_DESCARGA_FICHEROS %>"
