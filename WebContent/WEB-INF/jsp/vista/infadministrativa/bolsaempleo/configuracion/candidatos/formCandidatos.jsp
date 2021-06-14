@@ -355,7 +355,6 @@ UsuarioBolsaEmpleo candidato = bean.getCandidato();
 			    "params": {"<%=ControladorUsuarioCandidato.PARAM_CANDIDATO%>": <%= candidato.getCodNum() %>},
 			    "pageSize": 10,
 			    "title": "SOLICITUDES",
-			    "filterable": true,
 			    "clickable": {'onClick': function(row) {
 			    	var params = {
 		    				'a': '<%= ControladorUsuarioCandidato.ACCION_SELECCIONAR_SOLICITUD %>',

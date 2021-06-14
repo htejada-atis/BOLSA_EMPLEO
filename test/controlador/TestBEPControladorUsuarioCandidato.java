@@ -14,9 +14,12 @@ import bbdd.BbddRunner;
 import bbdd.UtilsTestBolsaEmpleo;
 import controlador.implementacion.PeticionHttp;
 import controlador.implementacion.RespuestaHttp;
+import es.ujaen.uvirtual.modulo.bolsaempleo.beans.Solicitud;
 import es.ujaen.uvirtual.modulo.bolsaempleo.controlador.configuracion.ControladorUsuarioCandidato;
+import es.ujaen.uvirtual.modulo.bolsaempleo.modelo.ModeloSolicitud;
 import es.ujaen.uvirtual.modulo.bolsaempleo.utilidades.BolsaEmpleoDataTable;
 import es.ujaen.uvirtual.modulo.bolsaempleo.vistas.VistaCandidatos;
+import es.ujaen.uvirtual.utilidades.UVException;
 
 /**
  * Test controlador usuarios candidatos bolsa empleo.
@@ -611,6 +614,35 @@ public class TestBEPControladorUsuarioCandidato {
 		assertNotNull(MENSAJE_CANDIDATO_DEVUELTO, bean2.getCandidato());
 		assertEquals(MENSAJE_SIN_ERROR, 0, bean2.getMensajesDeError().size());
 		assertEquals(MENSAJE_SIN_ADVERTENCIAS, 0, bean2.getMensajesDeAdvertencia().size());
+	}
+	
+	/** Reabrir la solicitud de un candidato .
+	 * @throws SQLException si fallo bd .
+	 * @throws IOException si error io .
+	 * @throws ServletException  si error servlet .
+	 * @throws UVException .
+	 */
+	@Test
+	public void testA23ReabrirSolicitud() throws ServletException, IOException, SQLException, UVException {
+		VistaCandidatos bean = obtenerSolicitudesCandidato();
+		
+		PeticionHttp peticion = UtilsTestBolsaEmpleo.peticionAutenticadaPersonal();
+		peticion.setParameter(ControladorUsuarioCandidato.PARAM_ACCION, ControladorUsuarioCandidato.ACCION_REABRIR_SOLICITUD);
+		peticion.setParameter(ControladorUsuarioCandidato.PARAM_CANDIDATO, bean.getCandidato().getCodNum().toString());
+		Solicitud solicitud = bean.getDataTableSolicitudes().getData().get(0);
+		peticion.setParameter(ControladorUsuarioCandidato.PARAM_SOLICITUD, solicitud.getCodNum().toString());
+		
+		RespuestaHttp respuesta = new RespuestaHttp();
+		ControladorUsuarioCandidato controlador = new ControladorUsuarioCandidato();
+		controlador.doPost(peticion, respuesta);
+		
+		VistaCandidatos bean2 = (VistaCandidatos) peticion.getUVDatos().getVistas().get(VistaCandidatos.class.getName());
+		
+		assertEquals(MENSAJE_CON_EXITO_ESPERADO, ControladorUsuarioCandidato.MENSAJE_EXITO_REABRIR_SOLICITUD, bean2.getMensajesDeExito().get(0).toString());
+		assertEquals(MENSAJE_SIN_ERROR, 0, bean2.getMensajesDeError().size());
+		assertEquals(MENSAJE_SIN_ADVERTENCIAS, 0, bean2.getMensajesDeAdvertencia().size());
+		
+		ModeloSolicitud.obtenerInstancia().confirmacionSolicitud(solicitud, UtilsTestBolsaEmpleo.getUsuario("personal1"));
 	}
 	
 	/** Obtener datatable candidatos con parámetro no válido para forzar el error .

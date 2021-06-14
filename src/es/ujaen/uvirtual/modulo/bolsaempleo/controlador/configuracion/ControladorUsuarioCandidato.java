@@ -94,6 +94,7 @@ public class ControladorUsuarioCandidato extends HttpServlet {
 	public static final String ACCION_EXCLUIR_USUARIO_AREA = "excluirusuarioarea";
 	public static final String ACCION_INCLUIR_USUARIO_AREA = "incluirusuarioarea";
 	public static final String ACCION_INDEX = "index";
+	public static final String ACCION_REABRIR_SOLICITUD = "reabrirsolicitud";
 	public static final String ACCION_RECUPERAR_CANDIDATO = "recuperarusuario";
 	public static final String ACCION_SELECCIONAR_CANDIDATO = "seleccionarcandidato";
 	public static final String ACCION_SELECCIONAR_SOLICITUD = "seleccionarsolicitud";
@@ -120,6 +121,7 @@ public class ControladorUsuarioCandidato extends HttpServlet {
 	public static final String MENSAJE_EXITO_AREA_INCLUIDA = "Área excluida borrada correctamente para el candidato: %s";
 	public static final String MENSAJE_EXITO_EDITAR = "Usuario editado correctamente";
 	public static final String MENSAJE_EXITO_ELIMINAR = "Usuario eliminado correctamente";
+	public static final String MENSAJE_EXITO_REABRIR_SOLICITUD = "Solicitud reabrierta correctamente";
 	public static final String MENSAJE_EXITO_RESTAURAR = "Usuario restaurado correctamente";
 	public static final String MENSAJE_EXITO_USUARIO_MODIFICADO_CORRECTAMENTE = "Usuario/s modificado/s correctamente";
 
@@ -168,6 +170,7 @@ public class ControladorUsuarioCandidato extends HttpServlet {
 				case ACCION_ELIMINAR_CANDIDATO:
 				case ACCION_EXCLUIR_USUARIO_AREA:
 				case ACCION_INCLUIR_USUARIO_AREA:
+				case ACCION_REABRIR_SOLICITUD:
 				case ACCION_RECUPERAR_CANDIDATO:
 				case ACCION_SELECCIONAR_CANDIDATO:
 				case ACCION_SELECCIONAR_SOLICITUD:
@@ -280,14 +283,16 @@ public class ControladorUsuarioCandidato extends HttpServlet {
 			case ACCION_INCLUIR_USUARIO_AREA:
 				excluirUsuarioArea(bean, request, response, false);
 				break;
+			case ACCION_REABRIR_SOLICITUD:
+			case ACCION_SELECCIONAR_SOLICITUD:
+				accionesSolicitud(bean, request, response, nombreAccion);
+				break;
 			case ACCION_RECUPERAR_CANDIDATO:
 				recuperarCantidato(bean, request, response);
 				break;
 			case ACCION_SELECCIONAR_CANDIDATO:
 				break;
-			case ACCION_SELECCIONAR_SOLICITUD:
-				resumenSolicitudCandidato(bean, request, response);
-				break;
+			
 			case ACCION_SOLICITUDES_CANDIDATO:
 				bean.setApartadoSolicitudes(true);
 				break;
@@ -296,6 +301,24 @@ public class ControladorUsuarioCandidato extends HttpServlet {
 				break;
 			case ACCION_VOLVER_CANDIDATO:
 				redireccionConCandidatoSeleccionado(bean, request, response, ACCION_SOLICITUDES_CANDIDATO);
+				break;
+			default:
+				errorFatal(bean, MENSAJE_ERROR_ACCION_NO_CONTEMPLADA);
+		}
+	}
+	
+	private void accionesSolicitud(VistaCandidatos bean, HttpServletRequest request, HttpServletResponse response, String nombreAccion)
+			throws SQLException, UVException, IOException {
+		Integer idSolicitud = Formateador.leeParametroInteger(BolsaEmpleoUtils.getParamRequestOrSession(request, PARAM_SOLICITUD));
+		Solicitud solicitud = ModeloSolicitud.obtenerInstancia().getSolicitudById(idSolicitud);
+		bean.setSolicitud(solicitud);
+		
+		switch (nombreAccion) {
+			case ACCION_REABRIR_SOLICITUD:
+				reabrirSolicitudCandidato(bean, request, response);
+				break;
+			case ACCION_SELECCIONAR_SOLICITUD:
+				resumenSolicitudCandidato(bean);
 				break;
 			default:
 				errorFatal(bean, MENSAJE_ERROR_ACCION_NO_CONTEMPLADA);
@@ -368,11 +391,31 @@ public class ControladorUsuarioCandidato extends HttpServlet {
 		bean.setApartadoAcreditaciones(true);
 	}
 	
+	private void reabrirSolicitudCandidato(VistaCandidatos bean, HttpServletRequest request, HttpServletResponse response) 
+			throws IOException, SQLException, UVException {
+		ModeloSolicitud modeloSolicitud = ModeloSolicitud.obtenerInstancia();
+		Solicitud solicitud = bean.getSolicitud();
+		solicitud.setEstado(ModeloSolicitud.SOLICITUD_ESTADO_ABIERTA);
+		modeloSolicitud.reabrirSolicitud(solicitud, bean.getUsuarioLogeado());
+		
+		BolsaEmpleoUtils.addMensajeDeExito(MENSAJE_EXITO_REABRIR_SOLICITUD, bean, request);
+		redireccionConSolicitudSeleccionada(bean, request, response, ACCION_SELECCIONAR_SOLICITUD);
+	}
+	
 	private void redireccionConCandidatoSeleccionado(VistaCandidatos bean, HttpServletRequest request, HttpServletResponse response, String accion)
 			throws IOException {
 		Map<String, String> params = new HashMap<>();
 		params.put(PARAM_ACCION, accion);
 		params.put(PARAM_CANDIDATO, bean.getCandidato().getCodNum().toString());
+		BolsaEmpleoUtils.redirectWithParams(request, response, params);
+	}
+	
+	private void redireccionConSolicitudSeleccionada(VistaCandidatos bean, HttpServletRequest request, HttpServletResponse response, String accion)
+			throws IOException {
+		Map<String, String> params = new HashMap<>();
+		params.put(PARAM_ACCION, accion);
+		params.put(PARAM_CANDIDATO, bean.getCandidato().getCodNum().toString());
+		params.put(PARAM_SOLICITUD, bean.getSolicitud().getCodNum().toString());
 		BolsaEmpleoUtils.redirectWithParams(request, response, params);
 	}
 	
@@ -396,16 +439,10 @@ public class ControladorUsuarioCandidato extends HttpServlet {
 		response.sendRedirect(request.getServletPath());
 	}
 	
-	private void resumenSolicitudCandidato(VistaCandidatos bean, HttpServletRequest request, HttpServletResponse response)
+	private void resumenSolicitudCandidato(VistaCandidatos bean)
 			throws SQLException, UVException {
-		ModeloSolicitud modeloSolicitud = ModeloSolicitud.obtenerInstancia();
-		Integer idSolicitud = Formateador.leeParametroInteger(BolsaEmpleoUtils.getParamRequestOrSession(request, PARAM_SOLICITUD));
-		Solicitud solicitud = modeloSolicitud.getSolicitudById(idSolicitud);
-		bean.setSolicitud(solicitud);
-		
-		List<BolsaSolicitud> listaBolsas = modeloSolicitud.getBolsasSolicitudMeritos(solicitud);
+		List<BolsaSolicitud> listaBolsas = ModeloSolicitud.obtenerInstancia().getBolsasSolicitudMeritos(bean.getSolicitud());
 		bean.setListaBolsasSolicitud(listaBolsas);
-		
 		bean.setVista(JSP_RESUMEN_SOLICITUD);
 	}
 	
