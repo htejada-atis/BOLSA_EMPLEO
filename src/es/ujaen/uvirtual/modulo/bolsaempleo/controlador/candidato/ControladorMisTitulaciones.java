@@ -368,12 +368,11 @@ public class ControladorMisTitulaciones extends HttpServlet {
 			throw new UVException(String.format(MENSAJE_ERROR_DESCRIPCION_LARGA, ModeloMisTitulaciones.COLUMN_DESCRIPCION_MAXLENGTH));
 		}
 		
-		if (!BolsaEmpleoUtils.checkFileIsPDF(uploadedFile)) {
+		if (!BolsaEmpleoUtils.checkFileIsPDF(uploadedFile.getSubmittedFileName())) {
 			throw new UVException("El fichero debe ser un pdf válido");
 		}
 		
-		t.setArchivo(uploadedFile.getInputStream());
-		BolsaEmpleoUtils.checkFileSize(t.getArchivo());
+		t.setArchivo(BolsaEmpleoUtils.checkFileSize(uploadedFile.getInputStream()));
 		
 		return t;
 	}

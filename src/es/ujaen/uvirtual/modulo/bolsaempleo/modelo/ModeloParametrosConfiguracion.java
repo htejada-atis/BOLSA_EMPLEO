@@ -10,6 +10,8 @@ import java.util.List;
 import es.ujaen.uvirtual.modelo.conexion.ConexionUvirtual;
 import es.ujaen.uvirtual.modulo.bolsaempleo.beans.ParametrosConfiguracion;
 import es.ujaen.uvirtual.modulo.bolsaempleo.beans.UsuarioBolsaEmpleo;
+import es.ujaen.uvirtual.modulo.bolsaempleo.utilidades.BolsaEmpleoUtils;
+import es.ujaen.uvirtual.utilidades.Formateador;
 import es.ujaen.uvirtual.utilidades.UVException;
 
 /**
@@ -19,10 +21,10 @@ import es.ujaen.uvirtual.utilidades.UVException;
  * @author ATISoluciones
  */
 public class ModeloParametrosConfiguracion {
-	public static final String VERSION = "0.26";
+	public static final String VERSION = "0.27";
 	
-	// 10MB = 1024 * 1024 * 10 = 10485760
-	public static final int MAX_FILE_SIZE = 10_485_760;
+	// 50MB = 1024 * 1024 * 50 = 52428800
+	public static final int MAX_FILE_SIZE = 52_428_800;
 	
 	protected static ModeloParametrosConfiguracion eInstancia;
 
@@ -197,4 +199,15 @@ public class ModeloParametrosConfiguracion {
 		}
 	}
 
+	/**
+	 * Devuelve una cadena de texto con el valor máximo de subida de ficheros.
+	 * @return .
+	 * @throws UVException .
+	 * @throws SQLException .
+	 */
+	public String getMaxEspacioArchivoHuman() throws SQLException, UVException {
+		Integer maxSize = Formateador.leeParametroInteger(this.getParametroByNombre("bolsaempleo.maxEspacioArchivo").getValor());
+		return BolsaEmpleoUtils.humanReadableByteCountSI(maxSize);
+	}
+	
 }

@@ -1,3 +1,4 @@
+<%@page import="es.ujaen.uvirtual.modulo.bolsaempleo.modelo.ModeloParametrosConfiguracion"%>
 <%@page import="es.ujaen.uvirtual.modulo.bolsaempleo.modelo.ModeloMeritosPreferentes"%>
 <%@ page trimDirectiveWhitespaces="true"%>
 <%@page import="es.ujaen.uvirtual.modulo.bolsaempleo.vistas.VistaMeritosPreferentesCandidato"%>
@@ -65,6 +66,7 @@ VistaMeritosPreferentesCandidato bean = (VistaMeritosPreferentesCandidato) uvdat
     	<div class="form-file">
 			<label for="merito_archivo" class="bold-label">Fichero:</label>
 			<input id="merito_archivo" type="file" name="<%= ControladorMisMeritosPreferentes.PARAM_ARCHIVO %>" required/>
+			<p class="bold-label">El tamaño máximo del fichero son: <%= ModeloParametrosConfiguracion.obtenerInstancia().getMaxEspacioArchivoHuman() %>
 		</div>
 		
     	<div class="form-group-container col1">
@@ -88,10 +90,8 @@ VistaMeritosPreferentesCandidato bean = (VistaMeritosPreferentesCandidato) uvdat
 			return true;
 		});
 		
-		var selectOpciones = $('#select_opciones');
-		
-		$('#select_apartado').change(function(event) {				
-			var option = $(this).children("option:selected");
+		var onChangeApartado = function(option) {
+			var selectOpciones = $('#select_opciones');
 			var value = $(option).attr("value");
 			
 			// descripcion
@@ -119,6 +119,7 @@ VistaMeritosPreferentesCandidato bean = (VistaMeritosPreferentesCandidato) uvdat
 			        },
 			        success: function(data) {
 			        	$('option', selectOpciones).remove();
+			        	$('<option value="">---</option>').appendTo(selectOpciones);			        	
 			        	for(var i=0; i<data.length; i++) {
 			        		var opcion = data[i];
 			        		$('<option value="' + opcion.codNum + '">' + opcion.nombre + '</option>').appendTo(selectOpciones);
@@ -137,7 +138,15 @@ VistaMeritosPreferentesCandidato bean = (VistaMeritosPreferentesCandidato) uvdat
 			if (!value) {
 				$('#opcionesLoading').hide();
 				$('#opciones').hide();
-			}
+			}	
+		};
+		
+		$('#select_apartado').change(function() {
+			onChangeApartado($(this).children("option:selected"));			
 		});
+		
+		if ($('#select_apartado').val()) {			
+			onChangeApartado($('#select_apartado').children("option:selected"));
+		}
 	});
 </script>
