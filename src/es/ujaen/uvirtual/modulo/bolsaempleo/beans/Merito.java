@@ -141,7 +141,7 @@ public class Merito implements Serializable {
 	
 	@Override
 	public String toString() {
-		return "Noticia [codNum=" + codNum + ", valor=" + valor
+		return "Merito [codNum=" + codNum + ", valor=" + valor
 				+ ", descripcion=" + descripcion + ", observacion=" + observacion 
 				+ ", item=" + item + "]";
 	}

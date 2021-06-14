@@ -51,7 +51,7 @@ public class TestBEPModeloTitulacion {
 		Titulacion titulacion = new Titulacion();
 		titulacion.setNombre(NOMBRE_TITULACION);
 		ModeloTitulacion modelo = ModeloTitulacion.obtenerInstancia();
-		modelo.insertaTitulacion(titulacion, UtilsTestBolsaEmpleo.getUsuarioPersonalLogeado());
+		modelo.insertaTitulacion(titulacion, UtilsTestBolsaEmpleo.getUsuario("personal1"));
 		List<Titulacion> titulaciones = modelo.listaTitulaciones();
 		Boolean insertado = false;
 		for (Titulacion tit : titulaciones) {
@@ -72,7 +72,7 @@ public class TestBEPModeloTitulacion {
 	public void testE01InsertaTitulacionNull() throws SQLException, UVException {
 		Titulacion titulacion = null;
 		ModeloTitulacion modelo = ModeloTitulacion.obtenerInstancia();
-		modelo.insertaTitulacion(titulacion, UtilsTestBolsaEmpleo.getUsuarioPersonalLogeado());
+		modelo.insertaTitulacion(titulacion, UtilsTestBolsaEmpleo.getUsuario("personal1"));
 		fail();
 	}
 
@@ -86,7 +86,7 @@ public class TestBEPModeloTitulacion {
 	public void testE02InsertaTitulacionSinNombre() throws SQLException, UVException {
 		Titulacion titulacion = new Titulacion();
 		ModeloTitulacion modelo = ModeloTitulacion.obtenerInstancia();
-		modelo.insertaTitulacion(titulacion, UtilsTestBolsaEmpleo.getUsuarioPersonalLogeado());
+		modelo.insertaTitulacion(titulacion, UtilsTestBolsaEmpleo.getUsuario("personal1"));
 		fail();
 	}
 

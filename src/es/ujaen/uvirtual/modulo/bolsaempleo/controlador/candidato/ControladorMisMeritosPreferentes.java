@@ -48,7 +48,7 @@ import es.ujaen.uvirtual.utilidades.UVException;
 			"/srv/es/ajax/informacionadministrativa/bolsaempleo/mismeritospreferentes", 
 			"/srv/en/ajax/informacionadministrativa/bolsaempleo/mismeritospreferentes"
 	})
-@MultipartConfig
+@MultipartConfig(maxFileSize = ModeloParametrosConfiguracion.MAX_FILE_SIZE)
 public class ControladorMisMeritosPreferentes extends HttpServlet {
 	private static final long serialVersionUID = 1L;
 	private static final String NOMBREDEESTACLASE = ControladorMisMeritosPreferentes.class.getName();

@@ -56,7 +56,7 @@ public class TestBEPModeloEvaluador {
 			Boolean activo = evaluador.isActivo();
 			evaluador.setActivo(!activo);
 			
-			ModeloEvaluador.obtenerInstancia().borraRestauraEvaluador(evaluador, UtilsTestBolsaEmpleo.getUsuarioPersonalLogeado());
+			ModeloEvaluador.obtenerInstancia().borraRestauraEvaluador(evaluador, UtilsTestBolsaEmpleo.getUsuario("personal1"));
 			evaluador = ModeloEvaluador.obtenerInstancia().getEvaluadorById(evaluador.getCodNum(), evaluador.getCodNumArea());
 			
 			if (Boolean.TRUE.equals(activo)) {
@@ -77,7 +77,7 @@ public class TestBEPModeloEvaluador {
 	public void testE01InsertaEvaluadorNull() throws SQLException, UVException {
 		UsuarioBolsaEmpleo evaluador = null;
 		ModeloEvaluador modelo = ModeloEvaluador.obtenerInstancia();
-		modelo.insertaEvaluador(evaluador, AREA, UtilsTestBolsaEmpleo.getUsuarioPersonalLogeado());
+		modelo.insertaEvaluador(evaluador, AREA, UtilsTestBolsaEmpleo.getUsuario("personal1"));
 		fail();
 	}
 	
@@ -88,7 +88,7 @@ public class TestBEPModeloEvaluador {
 		// comprobamos si existe
 		Evaluador eva = ModeloEvaluador.obtenerInstancia().getEvaluadorById(CODNUM, idArea);		
 		if (eva == null) {
-			ModeloEvaluador.obtenerInstancia().insertaEvaluador(evaluador, idArea, UtilsTestBolsaEmpleo.getUsuarioPersonalLogeado());
+			ModeloEvaluador.obtenerInstancia().insertaEvaluador(evaluador, idArea, UtilsTestBolsaEmpleo.getUsuario("personal1"));
 			eva = ModeloEvaluador.obtenerInstancia().getEvaluadorById(CODNUM, idArea);
 			
 			assertEquals(eva.getCodNum(), CODNUM);

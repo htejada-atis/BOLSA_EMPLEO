@@ -102,7 +102,7 @@ public class TestBEPModeloMeritosPreferentes {
 		
 		try {
 			ModeloMeritosPreferentes modelo = ModeloMeritosPreferentes.obtenerInstancia();
-			Integer codNum = modelo.crearMeritoPreferente(merito, UtilsTestBolsaEmpleo.getUsuarioPersonalLogeado());
+			Integer codNum = modelo.crearMeritoPreferente(merito, UtilsTestBolsaEmpleo.getUsuario("personal1"));
 			MeritoPreferente meritoNew = modelo.getMeritoPreferenteById(codNum);
 			
 			merito.setCodNum(codNum);
@@ -140,7 +140,7 @@ public class TestBEPModeloMeritosPreferentes {
 		
 		try {
 			ModeloMeritosPreferentes modelo = ModeloMeritosPreferentes.obtenerInstancia();
-			Integer codNum = modelo.crearMeritoPreferente(merito, UtilsTestBolsaEmpleo.getUsuarioPersonalLogeado());
+			Integer codNum = modelo.crearMeritoPreferente(merito, UtilsTestBolsaEmpleo.getUsuario("personal1"));
 			MeritoPreferente meritoNew = modelo.getMeritoPreferenteById(codNum);
 			
 			merito.setCodNum(codNum);
@@ -162,7 +162,7 @@ public class TestBEPModeloMeritosPreferentes {
 
 		try {
 			MeritoPreferente merito = modelo.getMeritoPreferenteById(CODNUM);
-			modelo.cambiaFlagActivoMeritoPreferente(merito, "N", UtilsTestBolsaEmpleo.getUsuarioPersonalLogeado());
+			modelo.cambiaFlagActivoMeritoPreferente(merito, "N", UtilsTestBolsaEmpleo.getUsuario("personal1"));
 			merito = modelo.getMeritoPreferenteById(CODNUM);
 			
 			assertEquals(merito.getActivo(), Boolean.FALSE);			
@@ -196,7 +196,7 @@ public class TestBEPModeloMeritosPreferentes {
 			merito.setAplicableBloqueBaremacion(bloque);
 			merito.setAplicableItemBaremacion(item);
 			
-			modelo.editarMeritoPreferente(merito, UtilsTestBolsaEmpleo.getUsuarioPersonalLogeado());
+			modelo.editarMeritoPreferente(merito, UtilsTestBolsaEmpleo.getUsuario("personal1"));
 			MeritoPreferente meritoDb = modelo.getMeritoPreferenteById(CODNUM);
 						
 			assertEquals(merito, meritoDb);
@@ -229,7 +229,7 @@ public class TestBEPModeloMeritosPreferentes {
 			merito.setTipoItemBaremacion(null);
 			merito.setAplicableBloqueBaremacion(null);
 			merito.setAplicableItemBaremacion(null);
-			modelo.editarMeritoPreferente(merito, UtilsTestBolsaEmpleo.getUsuarioPersonalLogeado());
+			modelo.editarMeritoPreferente(merito, UtilsTestBolsaEmpleo.getUsuario("personal1"));
 
 			merito = modelo.getMeritoPreferenteById(merito.getCodNum());
 			
@@ -295,7 +295,7 @@ public class TestBEPModeloMeritosPreferentes {
 		try {
 			MeritoPreferente merito = ModeloMeritosPreferentes.obtenerInstancia().getMeritoPreferenteById(CODNUM);
 			merito.setActivo(true);
-			ModeloMeritosPreferentes.obtenerInstancia().editarMeritoPreferente(merito, UtilsTestBolsaEmpleo.getUsuarioPersonalLogeado());
+			ModeloMeritosPreferentes.obtenerInstancia().editarMeritoPreferente(merito, UtilsTestBolsaEmpleo.getUsuario("personal1"));
 			merito = ModeloMeritosPreferentes.obtenerInstancia().getMeritoPreferenteById(CODNUM);			
 			assertTrue(merito.getActivo());
 			
@@ -338,7 +338,7 @@ public class TestBEPModeloMeritosPreferentes {
 						
 			MeritoPreferente merito = ModeloMeritosPreferentes.obtenerInstancia().getMeritoPreferenteById(CODNUM);
 			merito.setActivo(false);			
-			ModeloMeritosPreferentes.obtenerInstancia().editarMeritoPreferente(merito, UtilsTestBolsaEmpleo.getUsuarioPersonalLogeado());
+			ModeloMeritosPreferentes.obtenerInstancia().editarMeritoPreferente(merito, UtilsTestBolsaEmpleo.getUsuario("personal1"));
 			merito = ModeloMeritosPreferentes.obtenerInstancia().getMeritoPreferenteById(CODNUM);			
 			assertFalse(merito.getActivo());
 			merito.setCodNum(null);
@@ -360,7 +360,7 @@ public class TestBEPModeloMeritosPreferentes {
 			MeritoPreferente merito = ModeloMeritosPreferentes.obtenerInstancia().getMeritoPreferenteById(CODNUM);
 			merito.setActivo(true);
 			merito.setTipoCalculo(ModeloMeritosPreferentes.TIPO_CALCULO_OPCIONES);
-			ModeloMeritosPreferentes.obtenerInstancia().editarMeritoPreferente(merito, UtilsTestBolsaEmpleo.getUsuarioPersonalLogeado());
+			ModeloMeritosPreferentes.obtenerInstancia().editarMeritoPreferente(merito, UtilsTestBolsaEmpleo.getUsuario("personal1"));
 			merito = ModeloMeritosPreferentes.obtenerInstancia().getMeritoPreferenteById(CODNUM);
 			assertEquals(merito.getTipoCalculo(), ModeloMeritosPreferentes.TIPO_CALCULO_OPCIONES);
 			
@@ -369,7 +369,7 @@ public class TestBEPModeloMeritosPreferentes {
 			opcion.setMeritoPreferenteCodNum(merito.getCodNum());
 			opcion.setNombre(NOMBRE_OPCION);
 			opcion.setFactor(FACTOR);			
-			Integer id = ModeloMeritosPreferentes.obtenerInstancia().crearMeritoPreferenteOpcion(opcion, UtilsTestBolsaEmpleo.getUsuarioPersonalLogeado());
+			Integer id = ModeloMeritosPreferentes.obtenerInstancia().crearMeritoPreferenteOpcion(opcion, UtilsTestBolsaEmpleo.getUsuario("personal1"));
 			
 			// leemos y chequeamos opción
 			MeritoPreferenteOpcion opcionRead = ModeloMeritosPreferentes.obtenerInstancia().getMeritoPreferenteOpcionById(id);
@@ -426,7 +426,7 @@ public class TestBEPModeloMeritosPreferentes {
 	public void testA14DesactivarOpcionMerito() {
 		try {
 			MeritoPreferenteOpcion opcion = ModeloMeritosPreferentes.obtenerInstancia().getMeritoPreferenteOpcionById(1);			
-			ModeloMeritosPreferentes.obtenerInstancia().desactivarMeritoPreferenteOpcion(opcion, UtilsTestBolsaEmpleo.getUsuarioPersonalLogeado());
+			ModeloMeritosPreferentes.obtenerInstancia().desactivarMeritoPreferenteOpcion(opcion, UtilsTestBolsaEmpleo.getUsuario("personal1"));
 			MeritoPreferenteOpcion opcionRead = ModeloMeritosPreferentes.obtenerInstancia().getMeritoPreferenteOpcionById(1);
 			
 			assertTrue(opcionRead.isBorrado());
@@ -448,7 +448,7 @@ public class TestBEPModeloMeritosPreferentes {
 	public void testE01InsertaMeritoPreferenteNull() throws SQLException, UVException {
 		MeritoPreferente merito = null;
 		ModeloMeritosPreferentes modelo = ModeloMeritosPreferentes.obtenerInstancia();
-		modelo.crearMeritoPreferente(merito, UtilsTestBolsaEmpleo.getUsuarioPersonalLogeado());
+		modelo.crearMeritoPreferente(merito, UtilsTestBolsaEmpleo.getUsuario("personal1"));
 		fail();
 	}
 

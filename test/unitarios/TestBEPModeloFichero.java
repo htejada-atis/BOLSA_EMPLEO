@@ -62,7 +62,7 @@ public class TestBEPModeloFichero {
 		fichero.setArchivo(ARCHIVO_FICHERO);
 		fichero.setPublico(PUBLICO_FICHERO);
 		ModeloFichero modelo = ModeloFichero.obtenerInstancia();
-		modelo.insertaFichero(fichero, UtilsTestBolsaEmpleo.getUsuarioPersonalLogeado());
+		modelo.insertaFichero(fichero, UtilsTestBolsaEmpleo.getUsuario("personal1"));
 		List<Fichero> ficheros = modelo.listaFicheros();
 
 		Boolean eje = false;
@@ -109,7 +109,7 @@ public class TestBEPModeloFichero {
 	public void testE01InsertaFicheroNull() throws SQLException, UVException {
 		Fichero fichero = null;
 		ModeloFichero modelo = ModeloFichero.obtenerInstancia();
-		modelo.insertaFichero(fichero, UtilsTestBolsaEmpleo.getUsuarioPersonalLogeado());
+		modelo.insertaFichero(fichero, UtilsTestBolsaEmpleo.getUsuario("personal1"));
 		fail();
 	}
 
@@ -125,7 +125,7 @@ public class TestBEPModeloFichero {
 		fichero.setTitulo(TITULO_FICHERO);
 		fichero.setArchivo(ARCHIVO_FICHERO);
 		ModeloFichero modelo = ModeloFichero.obtenerInstancia();
-		modelo.insertaFichero(fichero, UtilsTestBolsaEmpleo.getUsuarioPersonalLogeado());
+		modelo.insertaFichero(fichero, UtilsTestBolsaEmpleo.getUsuario("personal1"));
 		fail();
 	}
 
@@ -141,7 +141,7 @@ public class TestBEPModeloFichero {
 		fichero.setNombre(NOMBRE_FICHERO);
 		fichero.setArchivo(ARCHIVO_FICHERO);
 		ModeloFichero modelo = ModeloFichero.obtenerInstancia();
-		modelo.insertaFichero(fichero, UtilsTestBolsaEmpleo.getUsuarioPersonalLogeado());
+		modelo.insertaFichero(fichero, UtilsTestBolsaEmpleo.getUsuario("personal1"));
 		fail();
 	}
 
@@ -157,7 +157,7 @@ public class TestBEPModeloFichero {
 		fichero.setNombre(NOMBRE_FICHERO);
 		fichero.setTitulo(TITULO_FICHERO);
 		ModeloFichero modelo = ModeloFichero.obtenerInstancia();
-		modelo.insertaFichero(fichero, UtilsTestBolsaEmpleo.getUsuarioPersonalLogeado());
+		modelo.insertaFichero(fichero, UtilsTestBolsaEmpleo.getUsuario("personal1"));
 		fail();
 	}
 

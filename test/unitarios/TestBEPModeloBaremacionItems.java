@@ -129,7 +129,7 @@ public class TestBEPModeloBaremacionItems {
 			item.setActivo(true);
 			
 			List<ItemBaremacion> lista = desactivarTodosItems();
-			Integer codNum = ModeloBaremacionItems.obtenerInstancia().insertaItem(item, UtilsTestBolsaEmpleo.getUsuarioPersonalLogeado());
+			Integer codNum = ModeloBaremacionItems.obtenerInstancia().insertaItem(item, UtilsTestBolsaEmpleo.getUsuario("personal1"));
 			ItemBaremacion creado = ModeloBaremacionItems.obtenerInstancia().getItemBaremacionById(codNum);			
 			activarItemsLista(lista);
 			
@@ -171,7 +171,7 @@ public class TestBEPModeloBaremacionItems {
 			item.setAfinidad(AFINIDAD);
 			item.setActivo(true);
 			
-			ModeloBaremacionItems.obtenerInstancia().actualizaItem(item, UtilsTestBolsaEmpleo.getUsuarioPersonalLogeado());
+			ModeloBaremacionItems.obtenerInstancia().actualizaItem(item, UtilsTestBolsaEmpleo.getUsuario("personal1"));
 			ItemBaremacion itemUpd = ModeloBaremacionItems.obtenerInstancia().getItemBaremacionById(CODNUM);
 			
 			assertEquals(itemUpd.getCodigo(), CODIGO);
@@ -227,7 +227,7 @@ public class TestBEPModeloBaremacionItems {
 			ItemBaremacion itemPadre = modeloItems.getItemBaremacionById(CODNUM);
 			ItemBaremacion itemHijo = modeloItems.getItemBaremacionById(CODNUM_2);
 			
-			modeloItems.asignarItemsExcluyentesAItem(itemPadre, itemHijo, UtilsTestBolsaEmpleo.getUsuarioPersonalLogeado());
+			modeloItems.asignarItemsExcluyentesAItem(itemPadre, itemHijo, UtilsTestBolsaEmpleo.getUsuario("personal1"));
 			
 			List<ItemBaremacion> itemsExcluyentes = modeloItems.getItemsExcluyentes(itemPadre);
 			assertNotEquals(MENSAJE_ITEMS_DEVUELTOS, 0, itemsExcluyentes.size());
@@ -285,7 +285,7 @@ public class TestBEPModeloBaremacionItems {
 			assertTrue(existe);
 			
 			// borramos relación
-			modeloItems.borrarItemsExcluyentesAItem(itemPadre, itemHijo, UtilsTestBolsaEmpleo.getUsuarioPersonalLogeado());
+			modeloItems.borrarItemsExcluyentesAItem(itemPadre, itemHijo, UtilsTestBolsaEmpleo.getUsuario("personal1"));
 			itemsExcluyentes = modeloItems.getItemsExcluyentes(itemPadre);
 			existe = false;
 			for (ItemBaremacion tb : itemsExcluyentes) {
@@ -333,7 +333,7 @@ public class TestBEPModeloBaremacionItems {
 	@Test
 	public void testE03insertaItem() {
 		Throwable throwable = assertThrows(Throwable.class,
-				() -> ModeloBaremacionItems.obtenerInstancia().insertaItem(null, UtilsTestBolsaEmpleo.getUsuarioPersonalLogeado()));
+				() -> ModeloBaremacionItems.obtenerInstancia().insertaItem(null, UtilsTestBolsaEmpleo.getUsuario("personal1")));
 		
 		assertEquals(UVException.class, throwable.getClass());
 		assertEquals(ModeloBaremacionItems.ERROR_ITEM_REQUERIDO, throwable.getMessage());
@@ -347,7 +347,7 @@ public class TestBEPModeloBaremacionItems {
 		Throwable throwable = assertThrows(Throwable.class, () -> {
 			ItemBaremacion item = ModeloBaremacionItems.obtenerInstancia().getItemBaremacionById(CODNUM);
 			item.setCodNum(CODNUM_NOEXISTE);
-			ModeloBaremacionItems.obtenerInstancia().insertaItem(item, UtilsTestBolsaEmpleo.getUsuarioPersonalLogeado());
+			ModeloBaremacionItems.obtenerInstancia().insertaItem(item, UtilsTestBolsaEmpleo.getUsuario("personal1"));
 		});
 		
 		assertEquals(UVException.class, throwable.getClass());
@@ -386,7 +386,7 @@ public class TestBEPModeloBaremacionItems {
 			ModeloBaremacionItems modelo = ModeloBaremacionItems.obtenerInstancia();
 			ItemBaremacion item = modelo.getItemBaremacionById(codNum);
 			assertEquals(item.getCodNum(), codNum);
-			modelo.desactivarItem(item, UtilsTestBolsaEmpleo.getUsuarioPersonalLogeado());
+			modelo.desactivarItem(item, UtilsTestBolsaEmpleo.getUsuario("personal1"));
 			item = modelo.getItemBaremacionById(codNum);
 			assertFalse(item.getActivo());
 		} catch (SQLException | UVException ex) {
@@ -399,7 +399,7 @@ public class TestBEPModeloBaremacionItems {
 			ModeloBaremacionItems modelo = ModeloBaremacionItems.obtenerInstancia();
 			ItemBaremacion item = modelo.getItemBaremacionById(codNum);
 			assertEquals(item.getCodNum(), codNum);
-			modelo.activarItem(item, UtilsTestBolsaEmpleo.getUsuarioPersonalLogeado());
+			modelo.activarItem(item, UtilsTestBolsaEmpleo.getUsuario("personal1"));
 			item = modelo.getItemBaremacionById(codNum);
 			assertTrue(item.getActivo());
 		} catch (SQLException | UVException ex) {

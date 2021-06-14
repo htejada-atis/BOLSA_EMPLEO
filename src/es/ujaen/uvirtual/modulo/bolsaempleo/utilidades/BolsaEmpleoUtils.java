@@ -9,6 +9,8 @@ import java.nio.charset.StandardCharsets;
 import java.sql.Clob;
 import java.sql.Connection;
 import java.sql.SQLException;
+import java.text.CharacterIterator;
+import java.text.StringCharacterIterator;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
@@ -45,10 +47,12 @@ public final class BolsaEmpleoUtils {
 	private static final int NUMBER_2 = 2;
 	private static final int HOURS_END = 23;
 	private static final int MINUTES_SECONDS_END = 59;
+	private static final int NUMBER_1000 = 1000;
+	private static final int NUMBER_999_950 = 999_950;
 	
 	private static final String NOMBREDEESTACLASE = BolsaEmpleoUtils.class.getName();
 	private static final Logger LOGGER = Logger.getLogger(NOMBREDEESTACLASE);
-
+	
 	private BolsaEmpleoUtils() {
 	}
 
@@ -204,12 +208,30 @@ public final class BolsaEmpleoUtils {
 
 		Integer maxSize = Formateador.leeParametroInteger(getParametroConfiguracion("bolsaempleo.maxEspacioArchivo"));
 		if (maxSize == null) {
-			throw new UVException("No se puede leer el tamañao máximo de archivo");
+			throw new UVException("No se puede leer el tamaño máximo de archivo");
 		}
 
 		if (archivo.available() > maxSize) {
-			throw new UVException("No se puede insertar un archivo tan grande");
+			throw new UVException("No se puede insertar un archivo tan grande. Máximo: " + humanReadableByteCountSI(maxSize));
 		}
+	}
+	
+	/**
+	 * Valor de bytes para pintarlo humanamente.
+	 * https://programming.guide/java/formatting-byte-size-to-human-readable-format.html
+	 * @param bytes .
+	 * @return .
+	 */
+	public static String humanReadableByteCountSI(long bytes) {
+		if (-NUMBER_1000 < bytes && bytes < NUMBER_1000) {
+			return bytes + " B";
+		}
+		CharacterIterator ci = new StringCharacterIterator("kMGTPE");
+		while (bytes <= -NUMBER_999_950 || bytes >= NUMBER_999_950) {
+			bytes /= NUMBER_1000;
+			ci.next();
+		}
+		return String.format("%.1f %cB", bytes / (NUMBER_1000 * 1.0), ci.current());
 	}
 
 	/**
