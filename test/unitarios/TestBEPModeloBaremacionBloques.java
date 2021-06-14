@@ -118,7 +118,7 @@ public class TestBEPModeloBaremacionBloques {
 			bloque.setNumeroMaximoMeritos(NUMERO_MAXIMO_MERITOS);
 			
 			List<BloqueBaremacion> lista = desactivarTodosBloques();
-			Integer codNum = ModeloBaremacionBloques.obtenerInstancia().insertaBloque(bloque, UtilsTestBolsaEmpleo.getUsuarioPersonalLogeado());
+			Integer codNum = ModeloBaremacionBloques.obtenerInstancia().insertaBloque(bloque, UtilsTestBolsaEmpleo.getUsuario("personal1"));
 			BloqueBaremacion creado = ModeloBaremacionBloques.obtenerInstancia().getBloqueBaremacionById(codNum);			
 			activarBloquesLista(lista);
 			
@@ -150,7 +150,7 @@ public class TestBEPModeloBaremacionBloques {
 			bloque.setActivo(true);
 			bloque.setNumeroMaximoMeritos(NUMERO_MAXIMO_MERITOS);
 			
-			ModeloBaremacionBloques.obtenerInstancia().actualizaBloque(bloque, UtilsTestBolsaEmpleo.getUsuarioPersonalLogeado());
+			ModeloBaremacionBloques.obtenerInstancia().actualizaBloque(bloque, UtilsTestBolsaEmpleo.getUsuario("personal1"));
 			BloqueBaremacion bloqueUpd = ModeloBaremacionBloques.obtenerInstancia().getBloqueBaremacionById(CODNUM);
 			
 			assertEquals(bloqueUpd.getCodigo(), CODIGO);
@@ -210,7 +210,7 @@ public class TestBEPModeloBaremacionBloques {
 	@Test
 	public void testE03insertaBloque() {
 		Throwable throwable = assertThrows(Throwable.class,
-				() -> ModeloBaremacionBloques.obtenerInstancia().insertaBloque(null, UtilsTestBolsaEmpleo.getUsuarioPersonalLogeado()));
+				() -> ModeloBaremacionBloques.obtenerInstancia().insertaBloque(null, UtilsTestBolsaEmpleo.getUsuario("personal1")));
 		
 		assertEquals(UVException.class, throwable.getClass());
 		assertEquals(ModeloBaremacionBloques.ERROR_BLOQUE_REQUERIDO, throwable.getMessage());
@@ -224,7 +224,7 @@ public class TestBEPModeloBaremacionBloques {
 		Throwable throwable = assertThrows(Throwable.class, () -> {
 			BloqueBaremacion bloque = ModeloBaremacionBloques.obtenerInstancia().getBloqueBaremacionById(CODNUM);
 			bloque.setCodNum(CODNUM_NOEXISTE);
-			ModeloBaremacionBloques.obtenerInstancia().insertaBloque(bloque, UtilsTestBolsaEmpleo.getUsuarioPersonalLogeado());
+			ModeloBaremacionBloques.obtenerInstancia().insertaBloque(bloque, UtilsTestBolsaEmpleo.getUsuario("personal1"));
 		});
 		
 		assertEquals(UVException.class, throwable.getClass());
@@ -263,7 +263,7 @@ public class TestBEPModeloBaremacionBloques {
 			ModeloBaremacionBloques modelo = ModeloBaremacionBloques.obtenerInstancia();
 			BloqueBaremacion bloque = modelo.getBloqueBaremacionById(codNum);
 			assertEquals(bloque.getCodNum(), codNum);
-			modelo.desactivarBloque(bloque, UtilsTestBolsaEmpleo.getUsuarioPersonalLogeado());
+			modelo.desactivarBloque(bloque, UtilsTestBolsaEmpleo.getUsuario("personal1"));
 			bloque = modelo.getBloqueBaremacionById(codNum);
 			assertFalse(bloque.isActivo());
 		} catch (SQLException | UVException ex) {
@@ -276,7 +276,7 @@ public class TestBEPModeloBaremacionBloques {
 			ModeloBaremacionBloques modelo = ModeloBaremacionBloques.obtenerInstancia();
 			BloqueBaremacion bloque = modelo.getBloqueBaremacionById(codNum);
 			assertEquals(bloque.getCodNum(), codNum);
-			modelo.activarBloque(bloque, UtilsTestBolsaEmpleo.getUsuarioPersonalLogeado());
+			modelo.activarBloque(bloque, UtilsTestBolsaEmpleo.getUsuario("personal1"));
 			bloque = modelo.getBloqueBaremacionById(codNum);
 			assertTrue(bloque.isActivo());
 		} catch (SQLException | UVException ex) {

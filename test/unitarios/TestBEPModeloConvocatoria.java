@@ -67,7 +67,7 @@ public class TestBEPModeloConvocatoria {
 		convocatoria.setNumBolsasMaximo(NUM);
 		convocatoria.setNumMeritosPorBloque(NUM);
 		ModeloConvocatoria modelo = ModeloConvocatoria.obtenerInstancia();
-		Integer codNum = modelo.nuevaConvocatoria(convocatoria, UtilsTestBolsaEmpleo.getUsuarioPersonalLogeado());
+		Integer codNum = modelo.nuevaConvocatoria(convocatoria, UtilsTestBolsaEmpleo.getUsuario("personal1"));
 
 		Convocatoria convocatoriaCont = modelo.getConvocatoriaById(codNum);
 		assertEquals(Formateador.formatoFecha(convocatoriaCont.getFechaCierre(), Formateador.FORMATO_FECHA_DDMMYYYY), 
@@ -106,12 +106,12 @@ public class TestBEPModeloConvocatoria {
 		convocatoria.setEstado(ESTADO);
 		convocatoria.setNumBolsasMaximo(NUM);
 		convocatoria.setNumMeritosPorBloque(NUM);
-		Integer codNum = modelo.nuevaConvocatoria(convocatoria, UtilsTestBolsaEmpleo.getUsuarioPersonalLogeado());
+		Integer codNum = modelo.nuevaConvocatoria(convocatoria, UtilsTestBolsaEmpleo.getUsuario("personal1"));
 		Convocatoria convocatoriaCont = modelo.getConvocatoriaById(codNum);
 		List<Convocatoria> convocatorias = modelo.listaConvocatorias();
 		
 		// borramos
-		modelo.borraConvocatoria(convocatoriaCont, UtilsTestBolsaEmpleo.getUsuarioPersonalLogeado());
+		modelo.borraConvocatoria(convocatoriaCont, UtilsTestBolsaEmpleo.getUsuario("personal1"));
 		List<Convocatoria> convocatoriasFiltradas = modelo.listaConvocatorias();
 		
 		assertTrue("convocatoria borrada no debe ser listada", !convocatoriasFiltradas.contains(convocatoria));
@@ -131,7 +131,7 @@ public class TestBEPModeloConvocatoria {
 		Convocatoria convocatoria = convocatorias.get(0);
 		Convocatoria convocatoriaActualizada = modelo.getConvocatoriaById(convocatoria.getCodNum());
 		convocatoria.setDescripcion("ejemplo");
-		modelo.actualizaConvocatoria(convocatoria, UtilsTestBolsaEmpleo.getUsuarioPersonalLogeado());
+		modelo.actualizaConvocatoria(convocatoria, UtilsTestBolsaEmpleo.getUsuario("personal1"));
 
 		assertFalse("convocatoria debe ser actualizado",
 				convocatoria.getDescripcion().equals(convocatoriaActualizada.getDescripcion()));
@@ -151,7 +151,7 @@ public class TestBEPModeloConvocatoria {
 		Convocatoria convocatoriaActualizada = modelo.getConvocatoriaById(convocatorias.get(0).getCodNum());
 		convocatoriaActualizada.setEstado("CERRADA");
 		
-		modelo.cambiaEstadoConvocatoria(convocatoriaActualizada, UtilsTestBolsaEmpleo.getUsuarioPersonalLogeado());
+		modelo.cambiaEstadoConvocatoria(convocatoriaActualizada, UtilsTestBolsaEmpleo.getUsuario("personal1"));
 		Convocatoria convocatoriaUpd = modelo.getConvocatoriaById(convocatoriaActualizada.getCodNum());
 
 		assertTrue("convocatoria debe ser actualizada", convocatoriaActualizada.getEstado().equals(convocatoriaUpd.getEstado()));
@@ -167,7 +167,7 @@ public class TestBEPModeloConvocatoria {
 	public void testE01InsertaConvocatoriaNull() throws SQLException, UVException {
 		Convocatoria convocatoria = null;
 		ModeloConvocatoria modelo = ModeloConvocatoria.obtenerInstancia();
-		modelo.nuevaConvocatoria(convocatoria, UtilsTestBolsaEmpleo.getUsuarioPersonalLogeado());
+		modelo.nuevaConvocatoria(convocatoria, UtilsTestBolsaEmpleo.getUsuario("personal1"));
 		fail();
 	}
 }

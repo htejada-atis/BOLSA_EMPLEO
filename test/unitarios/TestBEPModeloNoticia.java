@@ -64,7 +64,7 @@ public class TestBEPModeloNoticia {
 		noticia.setPublica(PUBLICA_NOTICIA);
 		noticia.setActiva(ACTIVA_NOTICIA);
 		ModeloNoticia modelo = ModeloNoticia.obtenerInstancia();
-		modelo.insertaNoticia(noticia, UtilsTestBolsaEmpleo.getUsuarioPersonalLogeado());
+		modelo.insertaNoticia(noticia, UtilsTestBolsaEmpleo.getUsuario("personal1"));
 		List<Noticia> noticias = modelo.listaNoticias();
 		assertTrue("noticia insertada debe ser listada", noticias.contains(noticia));
 	}
@@ -81,7 +81,7 @@ public class TestBEPModeloNoticia {
 		List<Noticia> noticias = modelo.listaNoticias();
 		Noticia noticia = noticias.get(0);
 		noticia.setTexto("texto actualizado");
-		modelo.actualizaNoticia(noticia, UtilsTestBolsaEmpleo.getUsuarioPersonalLogeado());
+		modelo.actualizaNoticia(noticia, UtilsTestBolsaEmpleo.getUsuario("personal1"));
 		Noticia noticiaActualizada = modelo.listaNoticia(noticia.getCodNum());
 
 		assertTrue("noticia debe ser actualizada", noticia.equals(noticiaActualizada));
@@ -97,7 +97,7 @@ public class TestBEPModeloNoticia {
 	public void testE01InsertaNoticiaNull() throws SQLException, UVException {
 		Noticia noticia = null;
 		ModeloNoticia modelo = ModeloNoticia.obtenerInstancia();
-		modelo.insertaNoticia(noticia, UtilsTestBolsaEmpleo.getUsuarioPersonalLogeado());
+		modelo.insertaNoticia(noticia, UtilsTestBolsaEmpleo.getUsuario("personal1"));
 		fail();
 	}
 
@@ -115,7 +115,7 @@ public class TestBEPModeloNoticia {
 		noticia.setFecha(fechaEjemplo);
 		noticia.setPublica(PUBLICA_NOTICIA);
 		ModeloNoticia modelo = ModeloNoticia.obtenerInstancia();
-		modelo.insertaNoticia(noticia, UtilsTestBolsaEmpleo.getUsuarioPersonalLogeado());
+		modelo.insertaNoticia(noticia, UtilsTestBolsaEmpleo.getUsuario("personal1"));
 		fail();
 	}
 
@@ -133,7 +133,7 @@ public class TestBEPModeloNoticia {
 		noticia.setFecha(fechaEjemplo);
 		noticia.setPublica(PUBLICA_NOTICIA);
 		ModeloNoticia modelo = ModeloNoticia.obtenerInstancia();
-		modelo.insertaNoticia(noticia, UtilsTestBolsaEmpleo.getUsuarioPersonalLogeado());
+		modelo.insertaNoticia(noticia, UtilsTestBolsaEmpleo.getUsuario("personal1"));
 		fail();
 	}
 
@@ -147,7 +147,7 @@ public class TestBEPModeloNoticia {
 	public void testE04InsertaNoticiaSinFecha() throws SQLException, UVException {
 		Noticia noticia = null;
 		ModeloNoticia modelo = ModeloNoticia.obtenerInstancia();
-		modelo.insertaNoticia(noticia, UtilsTestBolsaEmpleo.getUsuarioPersonalLogeado());
+		modelo.insertaNoticia(noticia, UtilsTestBolsaEmpleo.getUsuario("personal1"));
 		fail();
 	}
 

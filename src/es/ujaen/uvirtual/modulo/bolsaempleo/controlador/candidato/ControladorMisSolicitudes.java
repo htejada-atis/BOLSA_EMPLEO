@@ -460,11 +460,8 @@ public class ControladorMisSolicitudes extends HttpServlet {
 			try {
 				Solicitud solicitud = this.getSolicitud(bean, request);
 				
-				BolsaEmpleoDataTable<Bolsa> dataTable = ModeloSolicitud.obtenerInstancia().listaAreaSolicitudSeleccionadasDatatable(
-						request.getParameterMap(), 
-						bean.getUsuarioLogeado().getCodNum(),
-						solicitud
-				);
+				BolsaEmpleoDataTable<Bolsa> dataTable = ModeloSolicitud.obtenerInstancia().
+						listaAreaSolicitudSeleccionadasDatatable(request.getParameterMap(), solicitud);
 				
 				bean.setDataTableBolsasCandidatoSeleccionadas(dataTable);
 				writer.write(dataTable.toJson());

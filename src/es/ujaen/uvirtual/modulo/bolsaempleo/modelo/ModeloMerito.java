@@ -154,10 +154,11 @@ public class ModeloMerito {
 	/**	Función que inserta un mérito .
 	 * @param merito a insertar .
 	 * @param usuarioUpdate .
+	 * @return id merito insertado.
 	 * @throws SQLException en caso de error en la BD .
 	 * @throws UVException en caso de error de parametros .
 	 */
-	public void insertaMerito(Merito merito, UsuarioBolsaEmpleo usuarioUpdate) throws SQLException, UVException {
+	public Integer insertaMerito(Merito merito, UsuarioBolsaEmpleo usuarioUpdate) throws SQLException, UVException {
 		if (merito == null) {
 			throw new UVException("No se puede insertar un mérito vacío");
 		}
@@ -181,7 +182,7 @@ public class ModeloMerito {
 				+ " (BEPITE_CODNUM,BEPUSU_CODNUM,VALOR,DESCRIPCION,OBSERVACION,ARCHIVO,UID_USUARIO) "
 				+ "VALUES (?,?,?,?,?,?,?)";
 		try (Connection conexion = ConexionUvirtual.obtenerInstancia();
-			 PreparedStatement stmt = conexion.prepareStatement(consulta)) {
+			 PreparedStatement stmt = conexion.prepareStatement(consulta, new String[]{"CODNUM"})) {
 			int parameterIndex = 1;
 			stmt.setInt(parameterIndex++, merito.getItemBaremacion().getCodNum());
 			stmt.setInt(parameterIndex++, usuarioUpdate.getCodNum());
@@ -191,6 +192,11 @@ public class ModeloMerito {
 			stmt.setBinaryStream(parameterIndex++, merito.getArchivo());
 			stmt.setString(parameterIndex++, usuarioUpdate.getCodCuenta());
 			stmt.executeUpdate();
+			
+			ResultSet rs = stmt.getGeneratedKeys();
+			rs.next();
+			
+			return rs.getInt(1);
 		}
 	}
 	

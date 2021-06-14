@@ -69,7 +69,7 @@ public class TestBEPModeloMerito {
 		merito.setArchivo(ARCHIVO_MERITO);
 		merito.setItemBaremacion(item);
 		ModeloMerito modelo = ModeloMerito.obtenerInstancia();
-		modelo.insertaMerito(merito, UtilsTestBolsaEmpleo.getUsuarioCandidatoLogeado());
+		modelo.insertaMerito(merito, UtilsTestBolsaEmpleo.getUsuario("candidato1"));
 		List<Merito> meritos = modelo.listaMeritos();
 
 		Boolean eje = false;
@@ -106,7 +106,7 @@ public class TestBEPModeloMerito {
 		bolsa.setCodNum(2);
 
 		modeloSolicitud.borrarMeritoDeSolicitudBolsa(solicitud, bolsa, meritoAcum,
-				UtilsTestBolsaEmpleo.getUsuarioCandidatoLogeado());
+				UtilsTestBolsaEmpleo.getUsuario("candidato1"));
 
 //    	modelo.eliminarMeritos(idsMeritos);
 //    	
@@ -131,7 +131,7 @@ public class TestBEPModeloMerito {
 	public void testE01InsertaMeritoNull() throws SQLException, UVException {
 		Merito merito = null;
 		ModeloMerito modelo = ModeloMerito.obtenerInstancia();
-		modelo.insertaMerito(merito, UtilsTestBolsaEmpleo.getUsuarioCandidatoLogeado());
+		modelo.insertaMerito(merito, UtilsTestBolsaEmpleo.getUsuario("candidato1"));
 		fail();
 	}
 

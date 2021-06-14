@@ -286,25 +286,29 @@ public final class UtilsTestBolsaEmpleo {
 	}
 	
 	/**
-	 * Devuelve el usuario personal1 logeado en el sistema.
+	 * Devuelve un usuario por su codcuenta.
+	 * @param codCuenta .
 	 * @return .
 	 * @throws SQLException .
 	 * @throws UVException .
 	 */
-	public static UsuarioBolsaEmpleo getUsuarioPersonalLogeado() throws SQLException, UVException {
-		return ModeloUsuarioBolsaEmpleo.obtenerInstancia().getUsuarioByCodCuenta(UID_PERSONAL_PRUEBAS);
+	public static UsuarioBolsaEmpleo getUsuario(String codCuenta) throws SQLException, UVException {
+		ModeloUsuarioBolsaEmpleo u = ModeloUsuarioBolsaEmpleo.obtenerInstancia();
+		u.refrescarUsuarioBEP(CrearUsuario.refrescarUsuario(codCuenta));		
+		return u.getUsuarioByCodCuenta(codCuenta);
 	}
 	
 	/**
-	 * Devuelve el usuario candidato1 logeado en el sistema.
-	 * @return .
+	 * Ejecute un delete en uvirtual. (SOLO PARA LOS TESTS).
+	 * @param sql .
 	 * @throws SQLException .
-	 * @throws UVException .
 	 */
-	public static UsuarioBolsaEmpleo getUsuarioCandidatoLogeado() throws SQLException, UVException {
-		return ModeloUsuarioBolsaEmpleo.obtenerInstancia().getUsuarioByCodCuenta(UID_CANDIDATO_PRUEBAS);
+	public static void sqlExecute(String sql) throws SQLException {
+		try (Connection con = BbddRunner.obtenerConexionUvirtual(); PreparedStatement stmt = con.prepareStatement(sql)) {
+			stmt.executeUpdate();
+		}
 	}
-	
+		
 	/**
 	 * Genera una string random de longitud indicada.
 	 * @param targetStringLength .
@@ -756,5 +760,5 @@ public final class UtilsTestBolsaEmpleo {
 		}
 		
 		return mensajes;
-	} 
+	}
 }

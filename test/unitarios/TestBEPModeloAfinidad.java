@@ -66,7 +66,7 @@ public class TestBEPModeloAfinidad {
 			a.setCodigo(CODIGOEDITAR);
 			a.setDescripcion(DESCRIPCIONEDITAR);
 			a.setModulacion(MODULACIONEDITAR);			
-			ModeloAfinidad.obtenerInstancia().actualizaAfinidad(a, UtilsTestBolsaEmpleo.getUsuarioCandidatoLogeado());			
+			ModeloAfinidad.obtenerInstancia().actualizaAfinidad(a, UtilsTestBolsaEmpleo.getUsuario("candidato1"));			
 			Afinidad b = ModeloAfinidad.obtenerInstancia().getAfinidadById(codNum);
 			assertEquals(b.getCodigo(), CODIGOEDITAR);
 			assertEquals(b.getDescripcion(), DESCRIPCIONEDITAR);
@@ -131,7 +131,7 @@ public class TestBEPModeloAfinidad {
 	@Test
 	public void testE01nuevaAfinidad() {
 		Throwable throwable = assertThrows(Throwable.class,
-				() -> ModeloAfinidad.obtenerInstancia().nuevaAfinidad(null, UtilsTestBolsaEmpleo.getUsuarioPersonalLogeado()));
+				() -> ModeloAfinidad.obtenerInstancia().nuevaAfinidad(null, UtilsTestBolsaEmpleo.getUsuario("personal1")));
 
 		assertEquals(UVException.class, throwable.getClass());
 		assertEquals(ModeloAfinidad.MENSAJE_ERROR_AFINIDAD_NULL, throwable.getMessage());
@@ -143,12 +143,12 @@ public class TestBEPModeloAfinidad {
 	@Test
 	public void testE02actualizaAfinidad() {
 		Throwable throwable = assertThrows(Throwable.class, () -> 
-			ModeloAfinidad.obtenerInstancia().actualizaAfinidad(null, UtilsTestBolsaEmpleo.getUsuarioPersonalLogeado()));
+			ModeloAfinidad.obtenerInstancia().actualizaAfinidad(null, UtilsTestBolsaEmpleo.getUsuario("personal1")));
 		assertEquals(UVException.class, throwable.getClass());
 		assertEquals(ModeloAfinidad.MENSAJE_AFINIDAD_OBLIGATORIA, throwable.getMessage());
 		
 		throwable = assertThrows(Throwable.class, () -> 
-			ModeloAfinidad.obtenerInstancia().actualizaAfinidad(new Afinidad(), UtilsTestBolsaEmpleo.getUsuarioPersonalLogeado()));
+			ModeloAfinidad.obtenerInstancia().actualizaAfinidad(new Afinidad(), UtilsTestBolsaEmpleo.getUsuario("personal1")));
 		
 		assertEquals(UVException.class, throwable.getClass());
 		assertEquals(ModeloAfinidad.MENSAJE_AFINIDAD_CODNUM_REQUERIDO, throwable.getMessage());
@@ -172,7 +172,7 @@ public class TestBEPModeloAfinidad {
 		afinidad.setDescripcion(DESCRIPCION);
 		afinidad.setModulacion(MODULACION);
 		
-		int codNum = ModeloAfinidad.obtenerInstancia().nuevaAfinidad(afinidad, UtilsTestBolsaEmpleo.getUsuarioPersonalLogeado());
+		int codNum = ModeloAfinidad.obtenerInstancia().nuevaAfinidad(afinidad, UtilsTestBolsaEmpleo.getUsuario("personal1"));
 		Afinidad anew = ModeloAfinidad.obtenerInstancia().getAfinidadById(codNum);
 		assertEquals(afinidad.getCodigo(), anew.getCodigo());
 		assertEquals(afinidad.getCodigoDescripcion(), anew.getCodigoDescripcion());
@@ -186,7 +186,7 @@ public class TestBEPModeloAfinidad {
 	private void borraAfinidad(Integer codNum) throws SQLException, UVException {
 		ArrayList<Afinidad> borrar = new ArrayList<>();
 		borrar.add(ModeloAfinidad.obtenerInstancia().getAfinidadById(codNum));		
-		ModeloAfinidad.obtenerInstancia().borraAfinidades(borrar, UtilsTestBolsaEmpleo.getUsuarioPersonalLogeado());
+		ModeloAfinidad.obtenerInstancia().borraAfinidades(borrar, UtilsTestBolsaEmpleo.getUsuario("personal1"));
 		Afinidad borrada = ModeloAfinidad.obtenerInstancia().getAfinidadById(codNum);
 		assertEquals(borrada.getCodNum(), codNum);
 		assertTrue(borrada.getBorrada());
