@@ -182,7 +182,7 @@ public class ControladorValidarNoAfines extends HttpServlet {
 			bean.setCandidato(modeloUsuario.getUsuarioById((Integer) session.getAttribute(PARAM_CANDIDATO)));
 			
 			Merito merito = new Merito((Integer) session.getAttribute(PARAM_MERITO));
-			MeritoSolicitud meritoSolicitud = modeloSolicitud.getMeritoSolicitudBy(bean.getConvocatoria(), bean.getBolsa(), merito);
+			MeritoSolicitud meritoSolicitud = modeloSolicitud.getMeritoSolicitudByConvocatoria(bean.getConvocatoria(), bean.getBolsa(), merito);
 			
 			bean.setMerito(meritoSolicitud);
 			bean.setItems(modeloItem.getItemsDeApartado(meritoSolicitud.getMerito().getItemBaremacion().getBloqueBaremacion().getApartadoBaremacion()));
@@ -274,7 +274,7 @@ public class ControladorValidarNoAfines extends HttpServlet {
 		ModeloSolicitud modeloSolicitud = ModeloSolicitud.obtenerInstancia();
 		
 		Merito merito = new Merito(Formateador.leeParametroInteger(request.getParameter(PARAM_MERITO)));
-		MeritoSolicitud meritoSolicitud = modeloSolicitud.getMeritoSolicitudBy(bean.getConvocatoria(), bean.getBolsa(), merito);
+		MeritoSolicitud meritoSolicitud = modeloSolicitud.getMeritoSolicitudByConvocatoria(bean.getConvocatoria(), bean.getBolsa(), merito);
 		
 		bean.setMerito(meritoSolicitud);
 		bean.setItems(modeloItem.getItemsDeApartado(meritoSolicitud.getMerito().getItemBaremacion().getBloqueBaremacion().getApartadoBaremacion()));

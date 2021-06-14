@@ -57,7 +57,7 @@ public class TestBEPModeloBolsa {
 		bolsas.remove(1);
 		bolsas.remove(2);
 		Bolsa bolsaCont = bolsas.get(0);
-		modelo.bloquearBolsas(bolsas, UtilsTestBolsaEmpleo.getUsuarioPersonalLogeado());
+		modelo.bloquearBolsas(bolsas, UtilsTestBolsaEmpleo.getUsuario("personal1"));
 
 		Boolean eje = false;
 
@@ -85,7 +85,7 @@ public class TestBEPModeloBolsa {
 		bolsas.remove(1);
 		bolsas.remove(2);
 		Bolsa bolsaCont = bolsas.get(0);
-		modelo.desbloquearBolsas(bolsas, UtilsTestBolsaEmpleo.getUsuarioPersonalLogeado());
+		modelo.desbloquearBolsas(bolsas, UtilsTestBolsaEmpleo.getUsuario("personal1"));
 
 		Boolean eje = false;
 
@@ -113,7 +113,7 @@ public class TestBEPModeloBolsa {
 		bolsas.remove(1);
 		bolsas.remove(2);
 		Bolsa bolsaCont = bolsas.get(0);
-		modelo.ponerAreaComoBaremable(bolsas, UtilsTestBolsaEmpleo.getUsuarioPersonalLogeado());
+		modelo.ponerAreaComoBaremable(bolsas, UtilsTestBolsaEmpleo.getUsuario("personal1"));
 
 		Boolean eje = false;
 
@@ -141,7 +141,7 @@ public class TestBEPModeloBolsa {
 		bolsas.remove(1);
 		bolsas.remove(2);
 		Bolsa bolsaCont = bolsas.get(0);
-		modelo.ponerAreaComoNoBaremable(bolsas, UtilsTestBolsaEmpleo.getUsuarioPersonalLogeado());
+		modelo.ponerAreaComoNoBaremable(bolsas, UtilsTestBolsaEmpleo.getUsuario("personal1"));
 
 		Boolean eje = false;
 
@@ -169,7 +169,7 @@ public class TestBEPModeloBolsa {
 		bolsas.remove(1);
 		bolsas.remove(2);
 		Bolsa bolsaCont = bolsas.get(0);
-		modelo.ponerBolsasEnAlegaciones(bolsas, UtilsTestBolsaEmpleo.getUsuarioPersonalLogeado());
+		modelo.ponerBolsasEnAlegaciones(bolsas, UtilsTestBolsaEmpleo.getUsuario("personal1"));
 
 		Boolean eje = false;
 
@@ -197,7 +197,7 @@ public class TestBEPModeloBolsa {
 		bolsas.remove(1);
 		bolsas.remove(2);
 		Bolsa bolsaCont = bolsas.get(0);
-		modelo.ponerBolsasEnBaremacion(bolsas, UtilsTestBolsaEmpleo.getUsuarioPersonalLogeado());
+		modelo.ponerBolsasEnBaremacion(bolsas, UtilsTestBolsaEmpleo.getUsuario("personal1"));
 
 		Boolean eje = false;
 
@@ -225,7 +225,7 @@ public class TestBEPModeloBolsa {
 		bolsas.remove(1);
 		bolsas.remove(2);
 		Bolsa bolsaCont = bolsas.get(0);
-		modelo.ponerBolsasEnRevision(bolsas, UtilsTestBolsaEmpleo.getUsuarioPersonalLogeado());
+		modelo.ponerBolsasEnRevision(bolsas, UtilsTestBolsaEmpleo.getUsuario("personal1"));
 
 		Boolean eje = false;
 
