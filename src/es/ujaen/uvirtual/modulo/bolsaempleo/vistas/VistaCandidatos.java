@@ -8,8 +8,11 @@ import es.ujaen.uvirtual.beans.Usuario;
 import es.ujaen.uvirtual.beans.vistas.Vista;
 import es.ujaen.uvirtual.modulo.bolsaempleo.beans.Area;
 import es.ujaen.uvirtual.modulo.bolsaempleo.beans.Bolsa;
+import es.ujaen.uvirtual.modulo.bolsaempleo.beans.BolsaSolicitud;
+import es.ujaen.uvirtual.modulo.bolsaempleo.beans.MeritoPreferenteUsuario;
 import es.ujaen.uvirtual.modulo.bolsaempleo.beans.Rol;
 import es.ujaen.uvirtual.modulo.bolsaempleo.beans.Solicitud;
+import es.ujaen.uvirtual.modulo.bolsaempleo.beans.TitulacionUsuario;
 import es.ujaen.uvirtual.modulo.bolsaempleo.beans.UsuarioBolsaEmpleo;
 import es.ujaen.uvirtual.modulo.bolsaempleo.utilidades.BolsaEmpleoDataTable;
 
@@ -20,14 +23,21 @@ import es.ujaen.uvirtual.modulo.bolsaempleo.utilidades.BolsaEmpleoDataTable;
  */
 public class VistaCandidatos extends Vista implements Serializable {
 	private static final long serialVersionUID = 1L;
+	private Solicitud solicitud;
 	private UsuarioBolsaEmpleo candidato;
 	private List<Area> listaAreas = new ArrayList<>();
+	private List<BolsaSolicitud> listaBolsasSolicitud;
 	private transient BolsaEmpleoDataTable<UsuarioBolsaEmpleo> dataTableCandidatos;
 	private transient BolsaEmpleoDataTable<Bolsa> dataTableAreas;
+	private transient BolsaEmpleoDataTable<MeritoPreferenteUsuario> dataTableAcreditaciones;
 	private transient BolsaEmpleoDataTable<Solicitud> dataTableSolicitudes;
+	private transient BolsaEmpleoDataTable<TitulacionUsuario> dataTableTitulaciones;
 	private Boolean apartadoAreasExcluidas;
 	private Boolean apartadoSolicitudes;
+	private Boolean apartadoTitulaciones;
+	private Boolean apartadoAcreditaciones;
 	private Boolean apartadoComunicaciones;
+	private String codigoPadreMeritoPreferente;
 	private String vista;
 	private UsuarioBolsaEmpleo usuarioLogeado;
 	
@@ -109,5 +119,61 @@ public class VistaCandidatos extends Vista implements Serializable {
 
 	public void setDataTableSolicitudes(BolsaEmpleoDataTable<Solicitud> dataTableSolicitudes) {
 		this.dataTableSolicitudes = dataTableSolicitudes;
+	}
+
+	public Solicitud getSolicitud() {
+		return solicitud;
+	}
+
+	public void setSolicitud(Solicitud solicitud) {
+		this.solicitud = solicitud;
+	}
+
+	public List<BolsaSolicitud> getListaBolsasSolicitud() {
+		return listaBolsasSolicitud;
+	}
+
+	public void setListaBolsasSolicitud(List<BolsaSolicitud> listaBolsasSolicitud) {
+		this.listaBolsasSolicitud = listaBolsasSolicitud;
+	}
+
+	public Boolean getApartadoTitulaciones() {
+		return apartadoTitulaciones;
+	}
+
+	public void setApartadoTitulaciones(Boolean apartadoTitulaciones) {
+		this.apartadoTitulaciones = apartadoTitulaciones;
+	}
+
+	public Boolean getApartadoAcreditaciones() {
+		return apartadoAcreditaciones;
+	}
+
+	public void setApartadoAcreditaciones(Boolean apartadoAcreditaciones) {
+		this.apartadoAcreditaciones = apartadoAcreditaciones;
+	}
+
+	public BolsaEmpleoDataTable<TitulacionUsuario> getDataTableTitulaciones() {
+		return dataTableTitulaciones;
+	}
+
+	public void setDataTableTitulaciones(BolsaEmpleoDataTable<TitulacionUsuario> dataTableTitulaciones) {
+		this.dataTableTitulaciones = dataTableTitulaciones;
+	}
+
+	public BolsaEmpleoDataTable<MeritoPreferenteUsuario> getDataTableAcreditaciones() {
+		return dataTableAcreditaciones;
+	}
+
+	public void setDataTableAcreditaciones(BolsaEmpleoDataTable<MeritoPreferenteUsuario> dataTableAcreditaciones) {
+		this.dataTableAcreditaciones = dataTableAcreditaciones;
+	}
+
+	public String getCodigoPadreMeritoPreferente() {
+		return codigoPadreMeritoPreferente;
+	}
+
+	public void setCodigoPadreMeritoPreferente(String codigoPadreMeritoPreferente) {
+		this.codigoPadreMeritoPreferente = codigoPadreMeritoPreferente;
 	}
 }

@@ -26,6 +26,7 @@ import es.ujaen.uvirtual.modulo.bolsaempleo.vistas.VistaCandidatos;
 @FixMethodOrder(MethodSorters.NAME_ASCENDING)
 public class TestBEPControladorUsuarioCandidato {
 	
+	private static final String MENSAJE_ACREDITACIONES_DEVUELTAS = "Debe devolver acreditaciones";
 	private static final String MENSAJE_AREAS_DEVUELTAS = "Debe devolver áreas";
 	private static final String MENSAJE_CANDIDATOS_DEVUELTOS = "Debe devolver candidatos";
 	private static final String MENSAJE_CANDIDATO_DEVUELTO = "Debe devolver candidato";
@@ -35,7 +36,9 @@ public class TestBEPControladorUsuarioCandidato {
 	private static final String MENSAJE_SIN_ADVERTENCIAS = "No debe mostrar advertencias";
 	private static final String MENSAJE_SIN_ERROR = "No debe devolver error";
 	private static final String MENSAJE_SOLICITUDES_DEVUELTAS = "Debe devolver solicitudes";
+	private static final String MENSAJE_SOLICITUD_DEVUELTA = "Debe devolver solicitud";
 	private static final String MENSAJE_SIN_EXITO = "No debe exito";
+	private static final String MENSAJE_TITULACIONES_DEVUELTAS = "Debe devolver titulaciones";
 	
 	private static final String EXCLUIDO_CANDIDATO = "true";
 	private static final String EXCLUIDO_TIPO_INDEFINIDO = "I";
@@ -108,7 +111,7 @@ public class TestBEPControladorUsuarioCandidato {
 	 * @throws ServletException  si error servlet .
 	 */
 	@Test
-	public void testA01Obtener() throws ServletException, IOException {
+	public void testA01Obtener() throws IOException {
 		PeticionHttp peticion = UtilsTestBolsaEmpleo.peticionAutenticadaPersonal();
 		
 		RespuestaHttp respuesta = new RespuestaHttp();
@@ -305,13 +308,38 @@ public class TestBEPControladorUsuarioCandidato {
 		assertEquals(MENSAJE_SIN_ADVERTENCIAS, 0, bean.getMensajesDeAdvertencia().size());
 	}
 	
+	/** Seleccionar solicitud .
+	 * @throws SQLException si fallo bd .
+	 * @throws IOException si error io .
+	 * @throws ServletException  si error servlet .
+	 */
+	@Test
+	public void testA11SeleccionarSolicitud() throws ServletException, IOException {
+		VistaCandidatos bean = obtenerSolicitudesCandidato();
+		
+		PeticionHttp peticion = UtilsTestBolsaEmpleo.peticionAutenticadaPersonal();
+		peticion.setParameter(ControladorUsuarioCandidato.PARAM_ACCION, ControladorUsuarioCandidato.ACCION_SELECCIONAR_SOLICITUD);
+		peticion.setParameter(ControladorUsuarioCandidato.PARAM_CANDIDATO, bean.getCandidato().getCodNum().toString());
+		peticion.setParameter(ControladorUsuarioCandidato.PARAM_SOLICITUD, bean.getDataTableSolicitudes().getData().get(0).getCodNum().toString());
+		
+		RespuestaHttp respuesta = new RespuestaHttp();
+		ControladorUsuarioCandidato controlador = new ControladorUsuarioCandidato();
+		controlador.doPost(peticion, respuesta);
+		
+		VistaCandidatos bean2 = (VistaCandidatos) peticion.getUVDatos().getVistas().get(VistaCandidatos.class.getName());
+		
+		assertNotNull(MENSAJE_SOLICITUD_DEVUELTA, bean2.getSolicitud());
+		assertEquals(MENSAJE_SIN_ERROR, 0, bean2.getMensajesDeError().size());
+		assertEquals(MENSAJE_SIN_ADVERTENCIAS, 0, bean2.getMensajesDeAdvertencia().size());
+	}
+	
 	/** Guardar datos del candidato .
 	 * @throws SQLException si fallo bd .
 	 * @throws IOException si error io .
 	 * @throws ServletException  si error servlet .
 	 */
 	@Test
-	public void testA11EditarCandidato() throws ServletException, IOException {
+	public void testA12EditarCandidato() throws ServletException, IOException {
 		VistaCandidatos bean = obtenerCandidatos();
 		
 		PeticionHttp peticion = UtilsTestBolsaEmpleo.peticionAutenticadaPersonal();
@@ -337,7 +365,7 @@ public class TestBEPControladorUsuarioCandidato {
 	 * @throws ServletException  si error servlet .
 	 */
 	@Test
-	public void testA12ExcluirIndefinidoCandidato() throws ServletException, IOException {
+	public void testA13ExcluirIndefinidoCandidato() throws ServletException, IOException {
 		VistaCandidatos bean = obtenerCandidatos();
 		
 		PeticionHttp peticion = UtilsTestBolsaEmpleo.peticionAutenticadaPersonal();
@@ -365,7 +393,7 @@ public class TestBEPControladorUsuarioCandidato {
 	 * @throws ServletException  si error servlet .
 	 */
 	@Test
-	public void testA13ExcluirTemporalCandidato() throws ServletException, IOException {
+	public void testA14ExcluirTemporalCandidato() throws ServletException, IOException {
 		VistaCandidatos bean = obtenerCandidatos();
 		
 		PeticionHttp peticion = UtilsTestBolsaEmpleo.peticionAutenticadaPersonal();
@@ -395,7 +423,7 @@ public class TestBEPControladorUsuarioCandidato {
 	 * @throws ServletException  si error servlet .
 	 */
 	@Test
-	public void testA14IncluirCandidato() throws ServletException, IOException {
+	public void testA15IncluirCandidato() throws ServletException, IOException {
 		VistaCandidatos bean = obtenerCandidatos();
 		
 		PeticionHttp peticion = UtilsTestBolsaEmpleo.peticionAutenticadaPersonal();
@@ -421,7 +449,7 @@ public class TestBEPControladorUsuarioCandidato {
 	 * @throws ServletException  si error servlet .
 	 */
 	@Test
-	public void testA15EliminarCandidato() throws ServletException, IOException {
+	public void testA16EliminarCandidato() throws ServletException, IOException {
 		VistaCandidatos bean = obtenerCandidatos();
 		
 		PeticionHttp peticion = UtilsTestBolsaEmpleo.peticionAutenticadaPersonal();
@@ -445,7 +473,7 @@ public class TestBEPControladorUsuarioCandidato {
 	 * @throws ServletException  si error servlet .
 	 */
 	@Test
-	public void testA16RestaurarCandidato() throws ServletException, IOException {
+	public void testA17RestaurarCandidato() throws ServletException, IOException {
 		VistaCandidatos bean = obtenerCandidatos();
 		
 		PeticionHttp peticion = UtilsTestBolsaEmpleo.peticionAutenticadaPersonal();
@@ -463,13 +491,135 @@ public class TestBEPControladorUsuarioCandidato {
 		assertEquals(MENSAJE_SIN_ADVERTENCIAS, 0, bean2.getMensajesDeAdvertencia().size());
 	}
 	
+	/** Obtener titulaciones .
+	 * @throws SQLException si fallo bd .
+	 * @throws IOException si error io .
+	 * @throws ServletException si error servlet .
+	 */
+	@Test
+	public void testA18ObtenerTitulaciones() throws ServletException, IOException {
+		VistaCandidatos bean = obtenerCandidatos();
+		
+		PeticionHttp peticion = UtilsTestBolsaEmpleo.peticionAutenticadaPersonal();
+		peticion.setParameter(ControladorUsuarioCandidato.PARAM_ACCION, ControladorUsuarioCandidato.ACCION_DATATABLE_TITULACIONES_CANDIDATO);
+		peticion.setParameter(ControladorUsuarioCandidato.PARAM_CANDIDATO, bean.getDatatableCandidatos().getData().get(0).getCodNum().toString());
+		
+		RespuestaHttp respuesta = new RespuestaHttp();
+		ControladorUsuarioCandidato controlador = new ControladorUsuarioCandidato();
+		controlador.doPost(peticion, respuesta);
+		
+		VistaCandidatos bean2 = (VistaCandidatos) peticion.getUVDatos().getVistas().get(VistaCandidatos.class.getName());
+		
+		assertNotEquals(MENSAJE_TITULACIONES_DEVUELTAS, 0, bean2.getDataTableTitulaciones().getData().size());
+		assertEquals(MENSAJE_SIN_ERROR, 0, bean2.getMensajesDeError().size());
+		assertEquals(MENSAJE_SIN_ADVERTENCIAS, 0, bean2.getMensajesDeAdvertencia().size());
+	}
+	
+	/** Obtener acreditaciones .
+	 * @throws SQLException si fallo bd .
+	 * @throws IOException si error io .
+	 * @throws ServletException  si error servlet .
+	 */
+	@Test
+	public void testA19ObtenerAcreditaciones() throws ServletException, IOException {
+		VistaCandidatos bean = obtenerCandidatos();
+		
+		PeticionHttp peticion = UtilsTestBolsaEmpleo.peticionAutenticadaPersonal();
+		peticion.setParameter(ControladorUsuarioCandidato.PARAM_ACCION, ControladorUsuarioCandidato.ACCION_DATATABLE_ACREDITACIONES_CANDIDATO);
+		peticion.setParameter(ControladorUsuarioCandidato.PARAM_CANDIDATO, bean.getDatatableCandidatos().getData().get(0).getCodNum().toString());
+		
+		RespuestaHttp respuesta = new RespuestaHttp();
+		ControladorUsuarioCandidato controlador = new ControladorUsuarioCandidato();
+		controlador.doPost(peticion, respuesta);
+		
+		VistaCandidatos bean2 = (VistaCandidatos) peticion.getUVDatos().getVistas().get(VistaCandidatos.class.getName());
+		
+		assertNotEquals(MENSAJE_ACREDITACIONES_DEVUELTAS, 0, bean2.getDataTableAcreditaciones().getData().size());
+		assertEquals(MENSAJE_SIN_ERROR, 0, bean2.getMensajesDeError().size());
+		assertEquals(MENSAJE_SIN_ADVERTENCIAS, 0, bean2.getMensajesDeAdvertencia().size());
+	}
+	
+	/** Acción titulaciones candidato .
+	 * @throws SQLException si fallo bd .
+	 * @throws IOException si error io .
+	 * @throws ServletException  si error servlet .
+	 */
+	@Test
+	public void testA20TitulacionesCandidato() throws ServletException, IOException {
+		VistaCandidatos bean = obtenerCandidatos();
+		
+		PeticionHttp peticion = UtilsTestBolsaEmpleo.peticionAutenticadaPersonal();
+		peticion.setParameter(ControladorUsuarioCandidato.PARAM_ACCION, ControladorUsuarioCandidato.ACCION_TITULACIONES_CANDIDATO);
+		peticion.setParameter(ControladorUsuarioCandidato.PARAM_CANDIDATO, bean.getDatatableCandidatos().getData().get(0).getCodNum().toString());
+		
+		RespuestaHttp respuesta = new RespuestaHttp();
+		ControladorUsuarioCandidato controlador = new ControladorUsuarioCandidato();
+		controlador.doPost(peticion, respuesta);
+		
+		VistaCandidatos bean2 = (VistaCandidatos) peticion.getUVDatos().getVistas().get(VistaCandidatos.class.getName());
+		
+		assertNotNull(MENSAJE_CANDIDATO_DEVUELTO, bean2.getCandidato());
+		assertEquals(true, bean2.getApartadoTitulaciones());
+		assertEquals(MENSAJE_SIN_ERROR, 0, bean2.getMensajesDeError().size());
+		assertEquals(MENSAJE_SIN_ADVERTENCIAS, 0, bean2.getMensajesDeAdvertencia().size());
+	}
+	
+	/** Acción acreditaciones candidato .
+	 * @throws SQLException si fallo bd .
+	 * @throws IOException si error io .
+	 * @throws ServletException  si error servlet .
+	 */
+	@Test
+	public void testA21AcreditacionesCandidato() throws ServletException, IOException {
+		VistaCandidatos bean = obtenerCandidatos();
+		
+		PeticionHttp peticion = UtilsTestBolsaEmpleo.peticionAutenticadaPersonal();
+		peticion.setParameter(ControladorUsuarioCandidato.PARAM_ACCION, ControladorUsuarioCandidato.ACCION_ACREDITACIONES_CANDIDATO);
+		peticion.setParameter(ControladorUsuarioCandidato.PARAM_CANDIDATO, bean.getDatatableCandidatos().getData().get(0).getCodNum().toString());
+		
+		RespuestaHttp respuesta = new RespuestaHttp();
+		ControladorUsuarioCandidato controlador = new ControladorUsuarioCandidato();
+		controlador.doPost(peticion, respuesta);
+		
+		VistaCandidatos bean2 = (VistaCandidatos) peticion.getUVDatos().getVistas().get(VistaCandidatos.class.getName());
+		
+		assertNotNull(MENSAJE_CANDIDATO_DEVUELTO, bean2.getCandidato());
+		assertEquals(true, bean2.getApartadoAcreditaciones());
+		assertEquals(MENSAJE_SIN_ERROR, 0, bean2.getMensajesDeError().size());
+		assertEquals(MENSAJE_SIN_ADVERTENCIAS, 0, bean2.getMensajesDeAdvertencia().size());
+	}
+	
+	/** Acción volver candidato .
+	 * @throws SQLException si fallo bd .
+	 * @throws IOException si error io .
+	 * @throws ServletException  si error servlet .
+	 */
+	@Test
+	public void testA22VolverCandidato() throws ServletException, IOException {
+		VistaCandidatos bean = obtenerCandidatos();
+		
+		PeticionHttp peticion = UtilsTestBolsaEmpleo.peticionAutenticadaPersonal();
+		peticion.setParameter(ControladorUsuarioCandidato.PARAM_ACCION, ControladorUsuarioCandidato.ACCION_VOLVER_CANDIDATO);
+		peticion.setParameter(ControladorUsuarioCandidato.PARAM_CANDIDATO, bean.getDatatableCandidatos().getData().get(0).getCodNum().toString());
+		
+		RespuestaHttp respuesta = new RespuestaHttp();
+		ControladorUsuarioCandidato controlador = new ControladorUsuarioCandidato();
+		controlador.doPost(peticion, respuesta);
+		
+		VistaCandidatos bean2 = (VistaCandidatos) peticion.getUVDatos().getVistas().get(VistaCandidatos.class.getName());
+		
+		assertNotNull(MENSAJE_CANDIDATO_DEVUELTO, bean2.getCandidato());
+		assertEquals(MENSAJE_SIN_ERROR, 0, bean2.getMensajesDeError().size());
+		assertEquals(MENSAJE_SIN_ADVERTENCIAS, 0, bean2.getMensajesDeAdvertencia().size());
+	}
+	
 	/** Obtener datatable candidatos con parámetro no válido para forzar el error .
 	 * @throws SQLException si fallo bd .
 	 * @throws IOException si error io .
 	 * @throws ServletException si error servlet .
 	 */
 	@Test
-	public void testE01ObtenerCandidatosParametroNoValido() throws ServletException, IOException {
+	public void testE01ObtenerCandidatosParametroNoValido() throws IOException {
 		PeticionHttp peticion = UtilsTestBolsaEmpleo.peticionAutenticadaPersonal();
 		peticion.setParameter(ControladorUsuarioCandidato.PARAM_ACCION, ControladorUsuarioCandidato.ACCION_DATATABLE_USUARIOS_CANDIDATOS);
 		peticion.setParameter(BolsaEmpleoDataTable.PARAM_ORDER_BY, "9");
@@ -562,7 +712,7 @@ public class TestBEPControladorUsuarioCandidato {
 	 * @throws ServletException si error servlet .
 	 */
 	@Test
-	public void testE05AccionNoValida() throws ServletException, IOException {
+	public void testE05AccionNoValida() throws IOException {
 		PeticionHttp peticion = UtilsTestBolsaEmpleo.peticionAutenticadaPersonal();
 		peticion.setParameter(ControladorUsuarioCandidato.PARAM_ACCION, "accionnovalida");
 		
@@ -575,6 +725,54 @@ public class TestBEPControladorUsuarioCandidato {
 		assertEquals(MENSAJE_CON_ERROR, 1, bean.getMensajesDeError().size());
 		assertEquals(MENSAJE_SIN_EXITO, 0, bean.getMensajesDeExito().size());
 		assertEquals(MENSAJE_CON_ERROR_ESPERADO, ControladorUsuarioCandidato.MENSAJE_ERROR_ACCION_NO_CONTEMPLADA, bean.getMensajesDeError().get(0));
+	}
+	
+	/** Obtener titulaciones con parámetro no válido para forzar el error .
+	 * @throws SQLException si fallo bd .
+	 * @throws IOException si error io .
+	 * @throws ServletException si error servlet .
+	 */
+	@Test
+	public void testE06ObtenerTitulacionesParametroNoValido() throws ServletException, IOException {
+		VistaCandidatos bean = obtenerCandidatos();
+
+		PeticionHttp peticion = UtilsTestBolsaEmpleo.peticionAutenticadaPersonal();
+		peticion.setParameter(ControladorUsuarioCandidato.PARAM_ACCION, ControladorUsuarioCandidato.ACCION_DATATABLE_TITULACIONES_CANDIDATO);
+		peticion.setParameter(ControladorUsuarioCandidato.PARAM_CANDIDATO, bean.getDatatableCandidatos().getData().get(0).getCodNum().toString());
+		peticion.setParameter(BolsaEmpleoDataTable.PARAM_ORDER_BY, "9");
+		
+		RespuestaHttp respuesta = new RespuestaHttp();
+		ControladorUsuarioCandidato controlador = new ControladorUsuarioCandidato();
+		controlador.doGet(peticion, respuesta);
+		
+		VistaCandidatos bean2 = (VistaCandidatos) peticion.getUVDatos().getVistas().get(VistaCandidatos.class.getName());
+		
+		assertEquals(MENSAJE_CON_ERROR, 1, bean2.getMensajesDeError().size());
+		assertEquals(MENSAJE_SIN_EXITO, 0, bean2.getMensajesDeExito().size());
+	}
+	
+	/** Obtener acreditaciones con parámetro no válido para forzar el error .
+	 * @throws SQLException si fallo bd .
+	 * @throws IOException si error io .
+	 * @throws ServletException si error servlet .
+	 */
+	@Test
+	public void testE07ObtenerAcreditacionesParametroNoValido() throws ServletException, IOException {
+		VistaCandidatos bean = obtenerCandidatos();
+
+		PeticionHttp peticion = UtilsTestBolsaEmpleo.peticionAutenticadaPersonal();
+		peticion.setParameter(ControladorUsuarioCandidato.PARAM_ACCION, ControladorUsuarioCandidato.ACCION_DATATABLE_ACREDITACIONES_CANDIDATO);
+		peticion.setParameter(ControladorUsuarioCandidato.PARAM_CANDIDATO, bean.getDatatableCandidatos().getData().get(0).getCodNum().toString());
+		peticion.setParameter(BolsaEmpleoDataTable.PARAM_ORDER_BY, "9");
+		
+		RespuestaHttp respuesta = new RespuestaHttp();
+		ControladorUsuarioCandidato controlador = new ControladorUsuarioCandidato();
+		controlador.doGet(peticion, respuesta);
+		
+		VistaCandidatos bean2 = (VistaCandidatos) peticion.getUVDatos().getVistas().get(VistaCandidatos.class.getName());
+		
+		assertEquals(MENSAJE_CON_ERROR, 1, bean2.getMensajesDeError().size());
+		assertEquals(MENSAJE_SIN_EXITO, 0, bean2.getMensajesDeExito().size());
 	}
 	
 }

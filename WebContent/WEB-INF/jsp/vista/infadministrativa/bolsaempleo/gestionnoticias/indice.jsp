@@ -77,7 +77,7 @@ VistaNoticias bean = (VistaNoticias) uvdatos.getVistas().get(VistaNoticias.class
 	        			return "<div title='Desactivada' class='circle-false'></div>"; 
 	        		}
 	        	}},
-		        {'data': 'codnum', 'buttons': [{'label': 'Editar', 'onClick': function(row) {
+		        {'data': 'codNum', 'buttons': [{'label': 'Editar', 'onClick': function(row) {
 			        		var params = {'a': '<%=ControladorNoticias.ACCION_EDITAR_NOTICIA%>', 'id': row.codNum};
 			        		Atis.sendForm("<%=request.getRequestURI()%>", params);
 			        	}

@@ -227,6 +227,8 @@ table.bluetable.bolsaempleo .btns .btn {
 }
 table.bluetable.bolsaempleo .btns .btn.only-icon {
 	width: inherit;
+	margin: 0 auto;
+    display: block;
 }
 table.bluetable.bolsaempleo span button {
 	margin-left: 1px;
