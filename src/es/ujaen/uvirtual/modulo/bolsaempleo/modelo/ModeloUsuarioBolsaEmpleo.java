@@ -178,6 +178,28 @@ public class ModeloUsuarioBolsaEmpleo {
 			}
 		}
 	}
+	
+	/** Devuelve un usuario bep por su codigo de cuenta si existe, en caso contrario devuelve null.
+	 * @param codcuenta codigo de usuario .
+	 * @return usuario o null si no existe .
+	 * @throws SQLException .
+	 * @throws UVException  .
+	 */
+	public UsuarioBolsaEmpleo compruebaUsuarioByCodCuenta(String codcuenta) throws SQLException, UVException {
+		String consulta = "SELECT * FROM TBEP_USUARIOS bepusu WHERE bepusu.CODCUENTA = ?";
+		
+		try (Connection conexion = ConexionUvirtual.obtenerInstancia(); PreparedStatement stmt = conexion.prepareStatement(consulta)) {
+			stmt.setString(1, codcuenta);
+
+			try (ResultSet rs = stmt.executeQuery()) {
+				if (!rs.next()) {
+					return null;
+				}
+				
+				return getUsuarioFromResultSet(rs);
+			}
+		}
+	}
 
 	/**
 	 * Listado de usuarios de bolsa empleo.
