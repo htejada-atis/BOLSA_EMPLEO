@@ -169,7 +169,7 @@ public class ModeloMerito {
 			throw new UVException("No se puede insertar un mérito sin valor");
 		}
 		if (merito.getArchivo() == null) {
-			throw new UVException("No se puede insertar un mérito sin archivo");
+			throw new UVException("No se puede insertar un mérito sin archivo. Compruebe que es un fichero pdf válido.");
 		}
 		if (merito.getItemBaremacion().getCodNum() == null) {
 			throw new UVException("No se puede insertar un mérito sin ítem de baremación");

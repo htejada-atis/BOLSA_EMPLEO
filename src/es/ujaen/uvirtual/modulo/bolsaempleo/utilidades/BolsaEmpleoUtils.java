@@ -58,24 +58,7 @@ public final class BolsaEmpleoUtils {
 	
 	private BolsaEmpleoUtils() {
 	}
-
-	/**
-	 * Utility method to get file name from HTTP header content-disposition .
-	 * 
-	 * @param part archivo del que obtener el nombre .
-	 * @return cadena con el nombre del fichero .
-	 */
-	public static String obtenerNombreFichero(Part part) {
-		String contentDisp = part.getHeader("content-disposition");
-		String[] tokens = contentDisp.split(";");
-		for (String token : tokens) {
-			if (token.trim().startsWith("filename")) {
-				return token.substring(token.indexOf('=') + NUMBER_2, token.length() - 1);
-			}
-		}
-		return "";
-	}
-
+		
 	/**
 	 * Devuelve un string de un número '?' separadas por ',' para usarlo en
 	 * consultas de tipo where in. Por ejemplo si numParams, devuelve "?,?,?"
@@ -213,7 +196,7 @@ public final class BolsaEmpleoUtils {
 			
 			Integer maxSize = Formateador.leeParametroInteger(getParametroConfiguracion("bolsaempleo.maxEspacioArchivo"));
 			
-			while (((bytesLeidos = archivo.read(bytes)) != -1)) {
+			while ((bytesLeidos = archivo.read(bytes)) != -1) {
 				salida.write(bytes, 0, bytesLeidos);
 				bytesTotal += bytesLeidos;
 				if (bytesTotal > maxSize) {

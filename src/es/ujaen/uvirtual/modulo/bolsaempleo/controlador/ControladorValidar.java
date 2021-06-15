@@ -319,7 +319,7 @@ public class ControladorValidar extends HttpServlet {
 				merito.setItemBaremacion(item);
 				
 				// valor
-				merito.setValor(ControladorMisMeritos.validateValorDelMerito(request, merito));
+				merito.setValor(ControladorMisMeritos.validateValorDelMerito(request.getParameter(PARAM_VALOR), merito));
 				merito.setUsuario(bean.getCandidato());
 				
 				ModeloMerito.obtenerInstancia().actualizaMerito(merito, bean.getUsuarioLogeado());
