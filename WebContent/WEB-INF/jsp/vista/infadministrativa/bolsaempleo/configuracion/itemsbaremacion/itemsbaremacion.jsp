@@ -323,7 +323,7 @@ VistaItemsBaremacion bean = (VistaItemsBaremacion) uvdatos.getVistas().get(Vista
 				
 				document.getElementById("tableItems").style.visibility = "visible";
 			<%	if (bean.getItemBaremacion() != null) { %>
-					Atis.smoothScrollFromOneToAnotherAnchor("#tableApartados", "#tableItems");
+					Atis.smoothScrollToAnchor("#tableItems");
 			<%	} else { %>
 					Atis.smoothScrollToAnchor("#tableApartados");
 			<%	} %>

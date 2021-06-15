@@ -28,6 +28,12 @@ public class ModeloMeritosPreferentesCandidato {
 	public static final int ORDER_COLUMN_INDEX_DESCRIPCION = 4;
 	public static final int ORDER_COLUMN_INDEX_VALIDADO = 5;
 	
+	public static final int ORDER_COLUMN_INDEX_ID_CANDIDATO = 0;
+	public static final int ORDER_COLUMN_INDEX_CODIGO_CANDIDATO = 1;
+	public static final int ORDER_COLUMN_INDEX_DESCRIPCION_CANDIDATO = 3;
+	public static final int ORDER_COLUMN_INDEX_BORRADA_CANDIDATO = 4;
+	public static final int ORDER_COLUMN_INDEX_VALIDADA_CANDIDATO = 5;
+	
 	public static final int MAX_LENGTH_COLUMN_DESCRIPCION = 250;
 	
 	public static final String ERROR_ACREDITACION_OBLIGATORIA = "Acreditacion obligatoria";
@@ -89,6 +95,61 @@ public class ModeloMeritosPreferentesCandidato {
 		dataTable.setColumn(ORDER_COLUMN_INDEX_CODIGO, "bepmep.CODIGO");
 		dataTable.setColumn(ORDER_COLUMN_INDEX_DESCRIPCION, "bepmpu.DESCRIPCION");
 		dataTable.setColumn(ORDER_COLUMN_INDEX_VALIDADO, "bepmpu.FLGVALIDADO", DataTableColumn.COLUMN_TYPE_BOOLEAN);
+		dataTable.setQuery(consulta);
+
+		try (Connection conexion = ConexionUvirtual.obtenerInstancia();
+				PreparedStatement stmtCount = conexion.prepareStatement(dataTable.getQueryCount());
+				PreparedStatement stmt = conexion.prepareStatement(dataTable.getQuery())
+		) {
+			int paramIndex = 1;
+			stmt.setString(paramIndex, ModeloMeritosPreferentes.TIPO_POSESION);
+			stmtCount.setString(paramIndex++, ModeloMeritosPreferentes.TIPO_POSESION);
+			stmt.setInt(paramIndex, usuario.getCodNum());
+			stmtCount.setInt(paramIndex++, usuario.getCodNum());			
+			dataTable.setFiltersParams(stmt, stmtCount, paramIndex);
+			
+			try (ResultSet rs = stmt.executeQuery()) {
+				while (rs.next()) {
+					MeritoPreferenteUsuario row = this.createMeritoUsuarioFromResultSet(rs);
+					meritos.add(row);					
+				}				
+			}	
+			
+			dataTable.setRecordsTotalFromQuery(stmtCount);
+			dataTable.setData(meritos);
+		}
+		
+		return dataTable;
+	}
+	
+	/**
+	 * Listado de acreditaciones de un candidato en la vista de candidato . 
+	 * @param params .
+	 * @param usuario .
+	 * @return . 
+	 * @throws SQLException .
+	 * @throws UVException .
+	 */
+	public BolsaEmpleoDataTable<MeritoPreferenteUsuario> listaAcreditacionesCandidatoDatatable(Map<String, String[]> params, UsuarioBolsaEmpleo usuario) 
+			throws SQLException, UVException {
+		if (usuario == null) {
+			throw new UVException("El usuario es requerido");
+		}
+		
+		List<MeritoPreferenteUsuario> meritos = new ArrayList<>();
+		BolsaEmpleoDataTable<MeritoPreferenteUsuario> dataTable = new BolsaEmpleoDataTable<>(params);
+		
+		String consulta = 
+				"SELECT bepmpu.* "
+				+ " FROM TBEP_MER_PRE_USUARIO bepmpu"
+				+ " INNER JOIN TBEP_MERITOS_PREFERENTES bepmep ON bepmep.CODNUM = bepmpu.BEPMEP_CODNUM"
+				+ "	WHERE bepmep.TIPO = ? AND bepmpu.BEPUSU_CODNUM = ? ";
+		
+		dataTable.setColumn(ORDER_COLUMN_INDEX_ID_CANDIDATO, "bepmpu.CODNUM");
+		dataTable.setColumn(ORDER_COLUMN_INDEX_CODIGO_CANDIDATO, "bepmep.CODIGO");
+		dataTable.setColumn(ORDER_COLUMN_INDEX_DESCRIPCION_CANDIDATO, "bepmpu.DESCRIPCION");
+		dataTable.setColumn(ORDER_COLUMN_INDEX_BORRADA_CANDIDATO, "bepmpu.FLGBORRADO", DataTableColumn.COLUMN_TYPE_BOOLEAN);
+		dataTable.setColumn(ORDER_COLUMN_INDEX_VALIDADA_CANDIDATO, "bepmpu.FLGVALIDADO", DataTableColumn.COLUMN_TYPE_BOOLEAN);
 		dataTable.setQuery(consulta);
 
 		try (Connection conexion = ConexionUvirtual.obtenerInstancia();

@@ -32,6 +32,12 @@ public class ModeloMisTitulaciones {
 	public static final int ORDER_COLUMN_INDEX_VALIDADA = 3;
 	public static final int ORDER_COLUMN_INDEX_ARCHIVO = 4;
 	
+	public static final int ORDER_COLUMN_INDEX_ID_CANDIDATO = 0;
+	public static final int ORDER_COLUMN_INDEX_NOMBRE_CANDIDATO = 1;
+	public static final int ORDER_COLUMN_INDEX_DESCRIPCION_CANDIDATO = 2;
+	public static final int ORDER_COLUMN_INDEX_BORRADA_CANDIDATO = 3;
+	public static final int ORDER_COLUMN_INDEX_VALIDADA_CANDIDATO = 4;
+	
 	public static final String CODNUM = "CODNUM";
 	
 	public static final String ERROR_NO_EXISTE_TITULACION = "No existe titulación";
@@ -190,6 +196,60 @@ public class ModeloMisTitulaciones {
 			int indexParam = 1;
 			stmt.setInt(indexParam, codNum);
 			stmtCount.setInt(indexParam++, codNum);
+			
+			dataTable.setFiltersParams(stmt, stmtCount, indexParam);
+			try (ResultSet rs = stmt.executeQuery()) {
+				while (rs.next()) {
+					TitulacionUsuario tit = setTitulacionUsuarioFromResultSet(rs, false);
+					titulaciones.add(tit);
+				}
+			}
+			
+			dataTable.setRecordsTotalFromQuery(stmtCount);
+			dataTable.setData(titulaciones);
+		}
+		
+		return dataTable;
+	}
+	
+	/**
+	 * Listado de titulaciones de un usuario en una tabla .
+	 * @param params para leer los parametros de paginación, ordenacion, etc .
+	 * @param candidato .
+	 * @return listado de titulaciones .
+	 * @throws SQLException en caso de error de base de datos .
+	 * @throws UVException error si no existe titulación .
+	 */
+	public BolsaEmpleoDataTable<TitulacionUsuario> listaTitulacionesCandidatoDatatable(Map<String, String[]> params, UsuarioBolsaEmpleo candidato)
+			throws SQLException, UVException {
+		if (candidato.getCodNum() == null) {
+			throw new UVException(ERROR_EL_USUARIO_ES_REQUERIDO);
+		}
+		
+		List<TitulacionUsuario> titulaciones = new ArrayList<>();
+		BolsaEmpleoDataTable<TitulacionUsuario> dataTable = new BolsaEmpleoDataTable<>(params);
+		
+		String consulta = "SELECT beptit.CODNUM, beptit.NOMBRE, beptus.CODNUM, beptus.BEPTUS_USU_CODNUM, beptus.BEPTUS_TIT_CODNUM, "
+				+ "beptus.DESCRIPCION, beptus.FLGBORRADO, beptus.FLGVALIDADA, beptus.FECHA_BORRADO, beptus.FECHA_VALIDADA, beptus.OTRATITULACION "
+				+ "FROM tbep_titulaciones_usuario beptus "
+				+ "left JOIN tbep_titulaciones beptit ON beptit.codnum=beptus.beptus_tit_codnum "
+				+ "WHERE beptus.BEPTUS_USU_CODNUM = ?";
+		
+		dataTable.setColumn(ORDER_COLUMN_INDEX_ID_CANDIDATO, "beptus.CODNUM");
+		dataTable.setColumn(ORDER_COLUMN_INDEX_NOMBRE_CANDIDATO, "beptit.NOMBRE");
+		dataTable.setColumn(ORDER_COLUMN_INDEX_DESCRIPCION_CANDIDATO, "beptus.DESCRIPCION");
+		dataTable.setColumn(ORDER_COLUMN_INDEX_BORRADA_CANDIDATO, "beptus.FLGBORRADO", DataTableColumn.COLUMN_TYPE_BOOLEAN);
+		dataTable.setColumn(ORDER_COLUMN_INDEX_VALIDADA_CANDIDATO, "beptus.FLGVALIDADA", DataTableColumn.COLUMN_TYPE_BOOLEAN);
+		dataTable.setQuery(consulta);
+				
+		try (Connection conexion = ConexionUvirtual.obtenerInstancia();
+				PreparedStatement stmtCount = conexion.prepareStatement(dataTable.getQueryCount());
+				PreparedStatement stmt = conexion.prepareStatement(dataTable.getQuery())
+		) {
+			
+			int indexParam = 1;
+			stmt.setInt(indexParam, candidato.getCodNum());
+			stmtCount.setInt(indexParam++, candidato.getCodNum());
 			
 			dataTable.setFiltersParams(stmt, stmtCount, indexParam);
 			try (ResultSet rs = stmt.executeQuery()) {

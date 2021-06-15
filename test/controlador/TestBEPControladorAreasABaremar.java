@@ -182,28 +182,6 @@ public class TestBEPControladorAreasABaremar {
 		assertEquals(MENSAJE_SIN_ADVERTENCIAS, 0, bean.getMensajesDeAdvertencia().size());
 	}
 	
-	/** obtener áreas excluidas de un usuario .
-	 * @throws SQLException si fallo bd .
-	 * @throws IOException si error io .
-	 * @throws ServletException  si error servlet .
-	 */
-	@Test
-	public void testA07ObtenerAreasExcluidasUsuario() throws SQLException, ServletException, IOException {
-		PeticionHttp peticion = UtilsTestBolsaEmpleo.peticionAutenticadaPersonal();
-		peticion.setParameter(ControladorAreasABaremar.PARAM_ACCION, ControladorAreasABaremar.ACCION_DATATABLE_EXCLUIDOS);
-		peticion.setParameter(ControladorAreasABaremar.PARAM_ID, "1");
-		
-		RespuestaHttp respuesta = new RespuestaHttp();
-		ControladorAreasABaremar controlador = new ControladorAreasABaremar();
-		controlador.doGet(peticion, respuesta);
-		
-		VistaAreasBaremar bean = (VistaAreasBaremar) peticion.getUVDatos().getVistas().get(VistaAreasBaremar.class.getName());
-		
-		assertNotEquals(MENSAJE_AREAS_DEVUELTAS, 0, bean.getDatatableAreas().getData().size());
-		assertEquals(MENSAJE_SIN_ERROR, 0, bean.getMensajesDeError().size());
-		assertEquals(MENSAJE_SIN_ADVERTENCIAS, 0, bean.getMensajesDeAdvertencia().size());
-	}
-	
 	/** obtener datatable áreas con parámetro no válido .
 	 * @throws SQLException .
 	 * @throws ServletException .
@@ -213,28 +191,6 @@ public class TestBEPControladorAreasABaremar {
 	public void testE01ObtenerAreasParametroNoValido() throws ServletException, IOException {
 		PeticionHttp peticion = UtilsTestBolsaEmpleo.peticionAutenticadaPersonal();
 		peticion.setParameter(ControladorAreasABaremar.PARAM_ACCION, ControladorAreasABaremar.ACCION_DATATABLE);
-		peticion.setParameter(BolsaEmpleoDataTable.PARAM_ORDER_BY, "9");
-		
-		RespuestaHttp respuesta = new RespuestaHttp();
-		ControladorAreasABaremar controlador = new ControladorAreasABaremar();
-		controlador.doGet(peticion, respuesta);
-		
-		VistaAreasBaremar bean = (VistaAreasBaremar) peticion.getUVDatos().getVistas().get(VistaAreasBaremar.class.getName());
-		
-		assertEquals(MENSAJE_CON_ERROR, 1, bean.getMensajesDeError().size());
-		assertEquals(MENSAJE_SIN_EXITO, 0, bean.getMensajesDeExito().size());
-	}
-	
-	/** obtener datatable áreas excluidas de un usuario con parámetro no válido .
-	 * @throws SQLException .
-	 * @throws ServletException .
-	 * @throws IOException .
-	 */
-	@Test
-	public void testE02ObtenerAreasExcluidasUsuarioParametroNoValido() throws ServletException, IOException {
-		PeticionHttp peticion = UtilsTestBolsaEmpleo.peticionAutenticadaPersonal();
-		peticion.setParameter(ControladorAreasABaremar.PARAM_ACCION, ControladorAreasABaremar.ACCION_DATATABLE_EXCLUIDOS);
-		peticion.setParameter(ControladorAreasABaremar.PARAM_ID, "1");
 		peticion.setParameter(BolsaEmpleoDataTable.PARAM_ORDER_BY, "9");
 		
 		RespuestaHttp respuesta = new RespuestaHttp();
