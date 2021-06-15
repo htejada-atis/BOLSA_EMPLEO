@@ -76,7 +76,7 @@ VistaUsuarioBolsaEmpleo bean = (VistaUsuarioBolsaEmpleo) uvdatos.getVistas().get
 	
 	<p>Las etiquetas en <strong>negrita</strong> corresponden a campos de relleno obligatorio</p>
 	
-	<form id="actualizar_usuario" class="be-form" method="post" action="<%= request.getRequestURI() %>">
+	<form id="usuario_form" class="be-form" method="post" action="<%= request.getRequestURI() %>">
     	<input type="hidden" name="<%= ControladorUsuarioBolsaEmpleo.PARAM_ACCION %>" id="accion_formulario" value="" />
 		<input type="hidden" name="<%=ControladorUsuarioBolsaEmpleo.PARAM_USUARIO%>" id="usuario_id" value="" />
 		<input type="hidden" name="<%= ControladorUsuarioBolsaEmpleo.PARAM_NOMBRE_USUARIO%>" id="usuario_nombre" value="" />
@@ -87,42 +87,50 @@ VistaUsuarioBolsaEmpleo bean = (VistaUsuarioBolsaEmpleo) uvdatos.getVistas().get
     		</div>
 	   		<div class="form-group">
     			<label for="nombre">Nombre: </label>
-    			<input class="form-input-custom" id="nombre" type="text" name="<%= ControladorUsuarioBolsaEmpleo.PARAM_NOMBRE %>" value="<%= nombre %>" disabled/>
+    			<input class="form-input-custom" id="nombre" type="text" name="nombre" value="<%= nombre %>" disabled/>
     		</div>
     	</div>
     	
     	<div class="form-group-container">
     	    <div class="form-group">
     			<label for="apellidos">Apellidos: </label>
-    			<input class="form-input-custom" id="apellidos" type="text" name="<%= ControladorUsuarioBolsaEmpleo.PARAM_NOMBRE %>" value="<%= apellidos %>" disabled/>
+    			<input class="form-input-custom" id="apellidos" type="text" name="apellidos" value="<%= apellidos %>" disabled/>
     		</div>
     		<div class="form-group">
     			<label for="email">Email: </label>
-    			<input class="form-input-custom" id="email" type="text" name="<%= ControladorUsuarioBolsaEmpleo.PARAM_NOMBRE %>" value="<%= email %>" disabled/>
+    			<input class="form-input-custom" id="email" type="text" name="email" value="<%= email %>" disabled/>
     		</div>
     	</div>
 
 		<div class="form-group-container">
 	    	<div class="form-group">
     			<label for="tipo_documento">Tipo de documento: </label>
-    			<input class="form-input-custom" id="tipo_documento" type="text" name="<%= ControladorUsuarioBolsaEmpleo.PARAM_NOMBRE %>" value="<%= tipo_documento %>" disabled/>
+    			<input class="form-input-custom" id="tipo_documento" type="text" name="tipo_documento" value="<%= tipo_documento %>" disabled/>
     		</div>
     		<div class="form-group">
     			<label for="n_documento">Nº de documento: </label>
-    			<input class="form-input-custom" id="n_documento" type="text" name="<%= ControladorUsuarioBolsaEmpleo.PARAM_NOMBRE %>" value="<%= n_documento %>" disabled/>
+    			<input class="form-input-custom" id="n_documento" type="text" name="n_documento" value="<%= n_documento %>" disabled/>
     		</div>
 		</div>
 		<div class="form-group-container">
 	    	<div class="form-check-custom">
-    			<label for="usuario_lista_dist"><input class="params" type="checkbox" id="usuario_lista_dist" name="<%= ControladorUsuarioBolsaEmpleo.PARAM_LISTA %>" value="<%= lista_dist %>" <%= (lista_dist ? "checked=''" : "") %>/>Lista Distribución</label>
+    			<label for="usuario_lista_dist"><input class="params" type="checkbox" id="usuario_lista_dist" name="<%= ControladorUsuarioBolsaEmpleo.PARAM_LISTA %>" 
+    				value="true" <%= (lista_dist ? "checked=''" : "") %>/>Lista Distribución</label>
     		</div>
     		<div class="form-check">
     			<div class="form-check-custom">
-    				<label for="usuario_excluido"><input class="params" type="checkbox" id="usuario_excluido" name="<%= ControladorUsuarioBolsaEmpleo.PARAM_EXCLUIDO %>" value="<%= excluido %>" <%= (excluido ? "checked=''" : "") %>/>Excluido</label>
-    			</div>    		
+    				<label for="usuario_excluido"><input class="params" type="checkbox" id="usuario_excluido" name="<%= ControladorUsuarioBolsaEmpleo.PARAM_EXCLUIDO %>" 
+    					value="true" <%= (excluido ? "checked=''" : "") %>/>Excluido</label>
+    			</div>
     			<div class="form-check-custom" id="excluido_tipo" style="display:none;">
-					<label class="form-label-custom" for="indefinido" style="float: none; margin-right:0px; margin-bottom:5px;"><input class="form-input" type="radio" id="indefinido" name="<%= ControladorUsuarioBolsaEmpleo.PARAM_EXCLUIDO_TIPO %>" style="display: inline;">Indefinido</label>
-					<label class="form-label-custom" for="temporal" style="float: none; margin-right:0px;"><input class="form-input" type="radio" id="temporal" name="<%= ControladorUsuarioBolsaEmpleo.PARAM_EXCLUIDO_TIPO %>" style="display: inline;">Temporal</label>
+					<label class="form-label-custom" for="indefinido" style="float: none; margin-right:0px; margin-bottom:5px;">
+						<input class="form-input" type="radio" id="indefinido" name="<%= ControladorUsuarioBolsaEmpleo.PARAM_EXCLUIDO_TIPO %>"
+							value="I" style="display: inline;">Indefinido
+					</label>
+					<label class="form-label-custom" for="temporal" style="float: none; margin-right:0px;">
+						<input class="form-input" type="radio" id="temporal" name="<%= ControladorUsuarioBolsaEmpleo.PARAM_EXCLUIDO_TIPO %>"
+							value="T" style="display: inline;">Temporal
+					</label>
     			</div>
     		</div>
 		</div>
@@ -142,7 +150,7 @@ VistaUsuarioBolsaEmpleo bean = (VistaUsuarioBolsaEmpleo) uvdatos.getVistas().get
 	    	</div>
 		</div>
 	
-		<div class="form-group">
+		<div class="form-group" id="razon_excluido" style="display:none;">
     		<label for="razon_exclusion">Razón exclusión</label>
     		<textarea class="params form-input-custom" id="razon_exclusion" name="<%= ControladorUsuarioBolsaEmpleo.PARAM_RAZON_EXCLUIDO %>" rows="3" cols="60" <%= (excluido ? "" : "disabled") %>><%= razon_excluido %></textarea>
    		</div>
@@ -151,7 +159,7 @@ VistaUsuarioBolsaEmpleo bean = (VistaUsuarioBolsaEmpleo) uvdatos.getVistas().get
 			<label for="select_role"><strong>Elija el rol para asociar</strong></label>
 			<select class="params" id="select_role" name="<%= ControladorUsuarioBolsaEmpleo.PARAM_ROLE %>" style="width:100%;" required>
 			<% 	if(bean.getUsuario() == null) { %>
-					<option value="-1"> - </option>
+					<option value="">Elija el rol</option>
 			<%	} %>
    			<%	for(Rol role: bean.getRoles()) {
    					if(bean.getUsuario()!=null) {
@@ -167,10 +175,32 @@ VistaUsuarioBolsaEmpleo bean = (VistaUsuarioBolsaEmpleo) uvdatos.getVistas().get
 				}%>
 			</select>
 		</div>
-		
-    	<div class="form-btn">
-    		<input id="usuario_enviar" type="submit" name="<%= ControladorUsuarioBolsaEmpleo.PARAM_ENVIAR %> " value="<%if(bean.getUsuario()!=null){%><%if(bean.getBusqueda()){%>Volver<%}else{%>Guardar usuario<%}%><%}else{%>Añadir usuario<%}%>"/>
+    	
+    	<div class="form-group-container col1">
+    		<div class="form-group" style="float:right;">
+    		
+    		<%	if (bean.getUsuario() != null) { %>
+    				
+    			<%	if (bean.getBusqueda()) { %>
+    					<input id="usuario_volver" type="submit" name="<%= ControladorUsuarioBolsaEmpleo.PARAM_VOLVER %>" value="Volver" style="float:right; margin-left: 12px;"/>
+    			<%	} else { %>
+    					<input id="usuario_guardar" type="submit" name="<%= ControladorUsuarioBolsaEmpleo.PARAM_GUARDAR %>" value="Guardar" style="float:right; margin-left: 12px;"/>
+    				<%	if (bean.getUsuario().getBorrado()) { %>
+    						<label for="usuario_restaurar" style="margin-top: 5px; margin-left: 6px; float:right; width: unset !important;">Usuario Borrado</label>
+    						<input id="usuario_restaurar" type="button" value="Restaurar" style="float:right;"/>
+    				<%	} else { %>
+    						<input id="usuario_borrar" type="button" value="Borrar usuario" style="float:right;"/>
+    				<%	} %>
+    					
+    			<%	} %>
+    				
+    		<%	} else { %>
+    				<input id="usuario_guardar" type="submit" name="<%= ControladorUsuarioBolsaEmpleo.PARAM_AGREGAR %>" value="Añadir usuario" style="float:right; margin-left: 12px;"/>
+    		<%	} %>
+    		
+    		</div>
     	</div>
+    	
     </form>
 
 </div>
@@ -187,58 +217,26 @@ VistaUsuarioBolsaEmpleo bean = (VistaUsuarioBolsaEmpleo) uvdatos.getVistas().get
 		return true;
 	}
 
-
-	function enviarUsuario(event, submit_input) {
-		event.preventDefault();
-	
-		<% if(bean.getUsuario() != null) { 
-			
-			if(bean.getBusqueda()) {%>
-				input_accion = document.getElementById("accion_formulario");
-				input_accion.value = '<%= ControladorUsuarioBolsaEmpleo.ACCION_VOLVER_USUARIO %>';
-			<%}else{%>
-				input_accion = document.getElementById("accion_formulario");
-				input_accion.value = '<%= ControladorUsuarioBolsaEmpleo.ACCION_EDITAR_USUARIO %>';
-				input_id = document.getElementById("usuario_id");
-				input_id.value = '<%= bean.getUsuario().getCodNum() %>';
-				input_nombre_usuario = document.getElementById("usuario_nombre");
-				input_nombre_usuario.value = '<%= bean.getUsuario().getCodCuenta()%>';
-			<%}%>
-			
-		<% } else { %>
-			input_id = document.getElementById("usuario_id");
-			input_id.value = '<%= bean.getUsuarioArcos().getUid() %>';
-			input_accion = document.getElementById("accion_formulario");
-			input_accion.value = '<%= ControladorUsuarioBolsaEmpleo.ACCION_AGREGAR_USUARIO %>';
-		<% } %>
-	
-		input_lista_dist = document.getElementById("usuario_lista_dist");
-		input_lista_dist.value = input_lista_dist.checked;
-	
-		input_excluido = document.getElementById("usuario_excluido");
-		input_excluido.value = input_excluido.checked;
-		
-		if(input_excluido.checked){
-			input_exc_indefinido = document.getElementById("indefinido");
-			input_exc_temporal = document.getElementById("temporal");
-			
-			if(input_exc_indefinido.checked){
-				input_exc_indefinido.value = "I";
-				input_exc_temporal.value = "I";
-			}
-			else{
-				input_exc_indefinido.value = "T";
-				input_exc_temporal.value = "T";
-			}
-		}
-		
-		if(checkRequiredInputs()) submit_input.form.submit();
-	}
-
 	$(document).ready(function() {
 		
-		document.getElementById("usuario_enviar").addEventListener("click", function(event) {
-			enviarUsuario(event, this);
+		$("#usuario_form").on("submit", function() {
+		<%	if (bean.getUsuario() != null) { 
+			
+				if (bean.getBusqueda()) { %>
+					$(this).find("#accion_formulario").val('<%= ControladorUsuarioBolsaEmpleo.ACCION_VOLVER_USUARIO %>');
+			<%	} else { %>
+					$(this).find("#accion_formulario").val('<%= ControladorUsuarioBolsaEmpleo.ACCION_EDITAR_USUARIO %>');
+					input_id = document.getElementById("usuario_id");
+					$(this).find("#usuario_id").val('<%= bean.getUsuario().getCodNum() %>');
+					input_nombre_usuario = document.getElementById("usuario_nombre");
+					$(this).find("#usuario_nombre").val('<%= bean.getUsuario().getCodCuenta()%>');
+			<%	} %>
+				
+		<%	} else { %>
+				$(this).find("#usuario_nombre").val('<%= bean.getUsuarioArcos().getUid() %>');
+				$(this).find("#accion_formulario").val('<%= ControladorUsuarioBolsaEmpleo.ACCION_AGREGAR_USUARIO %>');
+		<%	} %>
+		
 		});
 		
 		$("#fecha_ini").datepicker();
@@ -249,17 +247,22 @@ VistaUsuarioBolsaEmpleo bean = (VistaUsuarioBolsaEmpleo) uvdatos.getVistas().get
 		<% } %>
 		
 		document.getElementById("usuario_excluido").addEventListener("change", function(event) {
-			if(document.getElementById("usuario_excluido").checked){
+			if (document.getElementById("usuario_excluido").checked) {
 				document.getElementById("razon_exclusion").value="";
 				document.getElementById("razon_exclusion").disabled=false;
 				
 				$("#excluido_tipo").show();
-			}
-			else{
+				$("#razon_excluido").show();
+				$("#razon_excluido").children("textarea").attr("required", true);
+				$("#excluido_tipo").find("input").attr("required", true);
+			} else {
 				document.getElementById("razon_exclusion").value="";
 				document.getElementById("razon_exclusion").disabled=true;
 				
 				$("#excluido_tipo").hide();
+				$("#razon_excluido").hide();
+				$("#razon_excluido").children("textarea").attr("required", false);
+				$("#excluido_tipo").find("input").attr("required", false);
 			}
 		});
 		
@@ -270,12 +273,40 @@ VistaUsuarioBolsaEmpleo bean = (VistaUsuarioBolsaEmpleo) uvdatos.getVistas().get
 			if(document.getElementById("indefinido").checked) $("#fecha_excluido").hide();
 		});
 	
-		<% if(bean.getBusqueda()) {%>
-		params = document.getElementsByClassName("params");
-		for (var i = 0; i < params.length; i++) { 
-			params[i].disabled = true;
-		}
-		<%}%>
+	<%	if (bean.getBusqueda()) { %>
+			params = document.getElementsByClassName("params");
+			for (var i = 0; i < params.length; i++) {
+				params[i].disabled = true;
+			}
+	<%	} %>
+	
+	<%	if (bean.getUsuario() != null && bean.getUsuario().getBorrado()) { %>
+			document.getElementById("usuario_restaurar").addEventListener("click", function(event) {
+				event.preventDefault();
+				
+				Atis.sendForm("<%= request.getRequestURI() %>", {
+					'<%=ControladorUsuarioBolsaEmpleo.PARAM_ACCION%>': '<%=ControladorUsuarioBolsaEmpleo.ACCION_RECUPERAR_USUARIO%>',
+					'<%=ControladorUsuarioBolsaEmpleo.PARAM_USUARIO%>': '<%=bean.getUsuario().getCodNum()%>'
+				});
+			});
+	<%	} else if (bean.getUsuario() != null && !bean.getUsuario().getBorrado()) { %>
+			document.getElementById("usuario_borrar").addEventListener("click", function(event) {
+				event.preventDefault();
+				
+				Atis.confirmDialog("Eliminar usuario", "¿Desea borrar el usuario?", {
+			    	Si: function() {
+			    		Atis.sendForm("<%= request.getRequestURI() %>", {
+							'<%=ControladorUsuarioBolsaEmpleo.PARAM_ACCION%>': '<%=ControladorUsuarioBolsaEmpleo.ACCION_ELIMINAR_USUARIO%>',
+							'<%=ControladorUsuarioBolsaEmpleo.PARAM_USUARIO%>': '<%=bean.getUsuario().getCodNum()%>'
+						});
+			          	$(this).dialog("close");
+			        },
+			        No: function() {
+			          	$(this).dialog("close");
+			        }
+			    });
+			});
+	<%	} %>
 		
 		function getTodayDate() {
 			var now = new Date();

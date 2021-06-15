@@ -416,20 +416,14 @@ public class ControladorUsuarioCandidato extends HttpServlet {
 	
 	private void eliminarCandidato(VistaCandidatos bean, HttpServletRequest request, HttpServletResponse response)
 			throws SQLException, UVException, IOException {
-		List<UsuarioBolsaEmpleo> users = new ArrayList<>();
-		users.add(bean.getCandidato());
-		
-		ModeloUsuarioBolsaEmpleo.obtenerInstancia().ponerUsuarioComoBorrado(users, bean.getUsuarioLogeado());	
+		ModeloUsuarioBolsaEmpleo.obtenerInstancia().ponerUsuarioComoBorrado(bean.getCandidato(), bean.getUsuarioLogeado());	
 		BolsaEmpleoUtils.addMensajeDeExito(MENSAJE_EXITO_ELIMINAR, bean, request);
 		response.sendRedirect(request.getServletPath());
 	}
 	
 	private void recuperarCantidato(VistaCandidatos bean, HttpServletRequest request, HttpServletResponse response) 
 			throws SQLException, UVException, IOException {
-		List<UsuarioBolsaEmpleo> users = new ArrayList<>();
-		users.add(bean.getCandidato());
-		
-		ModeloUsuarioBolsaEmpleo.obtenerInstancia().ponerUsuarioComoNoBorrado(users, bean.getUsuarioLogeado());
+		ModeloUsuarioBolsaEmpleo.obtenerInstancia().ponerUsuarioComoNoBorrado(bean.getCandidato(), bean.getUsuarioLogeado());
 		BolsaEmpleoUtils.addMensajeDeExito(MENSAJE_EXITO_RESTAURAR, bean, request);
 		response.sendRedirect(request.getServletPath());
 	}

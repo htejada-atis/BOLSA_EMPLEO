@@ -380,7 +380,7 @@ public class TestBEPControladorUsuariosBolsaEmpleo {
 		PeticionHttp peticion = UtilsTestBolsaEmpleo.peticionAutenticadaPersonal();
 		peticion.setParameter(ControladorUsuarioBolsaEmpleo.PARAM_ACCION,
 				ControladorUsuarioBolsaEmpleo.ACCION_BUSCAR_USUARIO);
-		peticion.setParameter(ControladorUsuarioBolsaEmpleo.PARAM_NOMBRE, "prueba");
+		peticion.setParameter(ControladorUsuarioBolsaEmpleo.PARAM_NOMBRE_USUARIO, "prueba");
 
 		RespuestaHttp respuesta = new RespuestaHttp();
 		ControladorUsuarioBolsaEmpleo controlador = new ControladorUsuarioBolsaEmpleo();
@@ -395,7 +395,7 @@ public class TestBEPControladorUsuariosBolsaEmpleo {
 		try {
 			PeticionHttp peticion = UtilsTestBolsaEmpleo.peticionAutenticadaPersonal();
 			peticion.setParameter(ControladorUsuarioBolsaEmpleo.PARAM_ACCION, ControladorUsuarioBolsaEmpleo.ACCION_BUSCAR_USUARIO);
-			peticion.setParameter(ControladorUsuarioBolsaEmpleo.PARAM_NOMBRE, codcuenta);
+			peticion.setParameter(ControladorUsuarioBolsaEmpleo.PARAM_NOMBRE_USUARIO, codcuenta);
 			RespuestaHttp respuesta = new RespuestaHttp();
 			ControladorUsuarioBolsaEmpleo controlador = new ControladorUsuarioBolsaEmpleo();
 			controlador.doPost(peticion, respuesta);

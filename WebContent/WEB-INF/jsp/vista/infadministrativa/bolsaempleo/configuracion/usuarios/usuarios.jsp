@@ -20,7 +20,7 @@ VistaUsuarioBolsaEmpleo bean = (VistaUsuarioBolsaEmpleo) uvdatos.getVistas().get
 		<div class="form-group-container-offset col2 gap-5"  id="nuevo_usuario_cont">   
 	   		<div class="form-group" style="width:80%">
 				<label for="nombre_usuario">Cuenta TIC usuario <i class="tooltip">(?)<span>Introduzca la cuenta TIC sin @ujaen.es</span></i></label>
-	   			<input class="form-input-custom" type="text" name="<%= ControladorUsuarioBolsaEmpleo.PARAM_NOMBRE %>" id="nombre_usuario" value=""/>
+	   			<input class="form-input-custom" type="text" name="<%= ControladorUsuarioBolsaEmpleo.PARAM_NOMBRE_USUARIO %>" id="nombre_usuario" value=""/>
 	   		</div>
 	   		<div class="form-group" style="width:20%;">
 	   			<label style="visibility: hidden">.</label>
@@ -57,7 +57,7 @@ $(document).ready(function() {
 		event.preventDefault();
 		Atis.sendForm("<%= request.getRequestURI() %>", {
 			'<%= ControladorUsuarioBolsaEmpleo.PARAM_ACCION %>': '<%= ControladorUsuarioBolsaEmpleo.ACCION_BUSCAR_USUARIO %>',
-			'<%= ControladorUsuarioBolsaEmpleo.PARAM_NOMBRE %>': document.getElementById("nombre_usuario").value
+			'<%= ControladorUsuarioBolsaEmpleo.PARAM_NOMBRE_USUARIO %>': document.getElementById("nombre_usuario").value
 		});
 	});
 	

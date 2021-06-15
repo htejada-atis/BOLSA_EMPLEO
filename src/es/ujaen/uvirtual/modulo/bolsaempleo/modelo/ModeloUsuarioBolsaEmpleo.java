@@ -741,28 +741,27 @@ public class ModeloUsuarioBolsaEmpleo {
 	}
 
 	/** Establece el usuario como borrado.
-	 * @param usuarios .
+	 * @param usuario .
 	 * @param usuarioUpdate .
 	 * @throws UVException .
 	 * @throws SQLException .
 	 */
-	public void ponerUsuarioComoBorrado(List<UsuarioBolsaEmpleo> usuarios, UsuarioBolsaEmpleo usuarioUpdate) throws SQLException, UVException {
-		this.cambiarFlagBorradoUsuario(usuarios, USUARIO_BORRADO, usuarioUpdate);
+	public void ponerUsuarioComoBorrado(UsuarioBolsaEmpleo usuario, UsuarioBolsaEmpleo usuarioUpdate) throws SQLException, UVException {
+		this.cambiarFlagBorradoUsuario(usuario, USUARIO_BORRADO, usuarioUpdate);
 	}
 
 	/** Establece el usuario como NO borrado.
-	 * @param usuarios .
+	 * @param usuario .
 	 * @param usuarioUpdate .
 	 * @throws UVException .
 	 * @throws SQLException .
 	 */
-	public void ponerUsuarioComoNoBorrado(List<UsuarioBolsaEmpleo> usuarios, UsuarioBolsaEmpleo usuarioUpdate) throws SQLException, UVException {
-		this.cambiarFlagBorradoUsuario(usuarios, USUARIO_NO_BORRADO, usuarioUpdate);
+	public void ponerUsuarioComoNoBorrado(UsuarioBolsaEmpleo usuario, UsuarioBolsaEmpleo usuarioUpdate) throws SQLException, UVException {
+		this.cambiarFlagBorradoUsuario(usuario, USUARIO_NO_BORRADO, usuarioUpdate);
 	}
 
-	private void cambiarFlagBorradoUsuario(List<UsuarioBolsaEmpleo> usuarios, String borrado, UsuarioBolsaEmpleo usuarioUpdate) throws SQLException, UVException {
-		String params = BolsaEmpleoUtils.consultaMultiplesParametros(usuarios.size());
-		String query = "UPDATE TBEP_USUARIOS SET UID_USUARIO=?,FLGBORRADO=?,FECHA_BORRADO=? WHERE CODNUM IN  (" + params + ")";
+	private void cambiarFlagBorradoUsuario(UsuarioBolsaEmpleo usuario, String borrado, UsuarioBolsaEmpleo usuarioUpdate) throws SQLException, UVException {
+		String query = "UPDATE TBEP_USUARIOS SET UID_USUARIO=?,FLGBORRADO=?,FECHA_BORRADO=? WHERE CODNUM = ?";
 
 		try (Connection conexion = ConexionUvirtual.obtenerInstancia(); PreparedStatement stmt = conexion.prepareStatement(query)) {
 			int indexParam = 1;
@@ -775,15 +774,11 @@ public class ModeloUsuarioBolsaEmpleo {
 				stmt.setNull(indexParam++, Types.DATE);
 			}
 
-			for (UsuarioBolsaEmpleo usuario : usuarios) {
-				stmt.setInt(indexParam++, usuario.getCodNum());
-			}
+			stmt.setInt(indexParam++, usuario.getCodNum());
 			stmt.executeUpdate();
 		}
 		
-		for (UsuarioBolsaEmpleo usuario : usuarios) {
-			this.refrescarUsuarioBEP(usuario);
-		}
+		this.refrescarUsuarioBEP(usuario);
 	}
 
 	/**
