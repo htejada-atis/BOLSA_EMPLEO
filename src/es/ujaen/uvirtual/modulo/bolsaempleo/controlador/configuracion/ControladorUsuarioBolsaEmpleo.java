@@ -225,13 +225,14 @@ public class ControladorUsuarioBolsaEmpleo extends HttpServlet {
 		if (usuArcos == null) {
 			throw new UVException(ModeloUsuarioBolsaEmpleo.MENSAJE_BUSCAR_USUARIO_NO_EXISTE);
 		}
+		bean.setUsuarioArcos(usuArcos);
 		
 		switch (nombreAccion) {
 			case ACCION_AGREGAR_USUARIO:
 				agregarUsuario(bean, request, response);
 				break;
 			case ACCION_BUSCAR_USUARIO:
-				buscarUsuario(bean, request);
+				buscarUsuario(bean);
 				break;
 			default:
 				errorFatal(bean, MENSAJE_ERROR_ACCION_NO_CONTEMPLADA);
@@ -247,17 +248,10 @@ public class ControladorUsuarioBolsaEmpleo extends HttpServlet {
 	 */
 	public void agregarUsuario(VistaUsuarioBolsaEmpleo bean, HttpServletRequest request, HttpServletResponse response) 
 			throws SQLException, UVException, IOException {
-		bean.setVista(JSP_USUARIOS);
-		
-		Usuario usuArcos = CrearUsuario.usuario(request.getParameter(PARAM_USUARIO));
-		if (usuArcos == null) {
-			throw new UVException(ModeloUsuarioBolsaEmpleo.MENSAJE_BUSCAR_USUARIO_NO_EXISTE);
-		}
-			
 		ModeloUsuarioBolsaEmpleo modelo = ModeloUsuarioBolsaEmpleo.obtenerInstancia();		
 		UsuarioBolsaEmpleo usuarioForm = this.getValidatorUsuario(bean, request);
-						
-		modelo.crearUsuarioBolsaEmpleo(usuarioForm.getRol().getCodNum(), usuArcos.getUid(), bean.getUsuarioLogeado());
+		
+		modelo.crearUsuarioBolsaEmpleo(usuarioForm.getRol().getCodNum(), bean.getUsuarioArcos().getUid(), bean.getUsuarioLogeado());
 		
 		BolsaEmpleoUtils.addMensajeDeExito(MENSAJE_EXITO_AGREGAR, bean, request);
 		response.sendRedirect(request.getServletPath());
@@ -269,33 +263,20 @@ public class ControladorUsuarioBolsaEmpleo extends HttpServlet {
 	 * @throws SQLException excepcion de bbdd.
 	 * @throws UVException en caso de error en bd
 	 */
-	private void buscarUsuario(VistaUsuarioBolsaEmpleo bean, HttpServletRequest request) throws SQLException, UVException {			
+	private void buscarUsuario(VistaUsuarioBolsaEmpleo bean) throws SQLException, UVException {			
 		obtenerRoles(bean);
-		
-		Usuario usuArcos = CrearUsuario.usuario(request.getParameter(PARAM_NOMBRE));
-		if (usuArcos == null) {
-			throw new UVException(ModeloUsuarioBolsaEmpleo.MENSAJE_BUSCAR_USUARIO_NO_EXISTE);
-		}
 
-		UsuarioBolsaEmpleo usu = ModeloUsuarioBolsaEmpleo.obtenerInstancia().compruebaUsuarioByCodCuenta(usuArcos.getUid());
+		UsuarioBolsaEmpleo usu = ModeloUsuarioBolsaEmpleo.obtenerInstancia().compruebaUsuarioByCodCuenta(bean.getUsuarioArcos().getUid());
 		
 		if (usu != null) {
 			bean.setBusqueda(true);
-			bean.setUsuarioArcos(usuArcos);
 			bean.setUsuario(usu);
 			bean.setRol(usu.getRol());
-			bean.setVista(JSP_FORM_USUARIO);
 		} else {
-			usuArcos = CrearUsuario.usuario(request.getParameter(PARAM_NOMBRE));
-			if (usuArcos != null) {
-				bean.setBusqueda(false);
-				bean.setUsuarioArcos(usuArcos);
-				bean.setVista(JSP_FORM_USUARIO);
-			} else {
-				bean.setVista(JSP_BUSCAR_USUARIO);
-				throw new UVException("No existe el usuario");
-			}
+			bean.setBusqueda(false);
 		}
+		
+		bean.setVista(JSP_FORM_USUARIO);
 	}
 	
 	///////////////////////////////////////////////////////////////////////////////////////////////////////////
