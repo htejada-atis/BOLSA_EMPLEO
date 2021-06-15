@@ -3,6 +3,8 @@ package controlador;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotEquals;
 import static org.junit.Assert.assertNotNull;
+
+import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.sql.SQLException;
 import javax.servlet.ServletException;
@@ -18,6 +20,7 @@ import es.ujaen.uvirtual.modulo.bolsaempleo.beans.Solicitud;
 import es.ujaen.uvirtual.modulo.bolsaempleo.controlador.configuracion.ControladorUsuarioCandidato;
 import es.ujaen.uvirtual.modulo.bolsaempleo.modelo.ModeloSolicitud;
 import es.ujaen.uvirtual.modulo.bolsaempleo.utilidades.BolsaEmpleoDataTable;
+import es.ujaen.uvirtual.modulo.bolsaempleo.utilidades.BolsaEmpleoUtils;
 import es.ujaen.uvirtual.modulo.bolsaempleo.vistas.VistaCandidatos;
 import es.ujaen.uvirtual.utilidades.UVException;
 
@@ -642,6 +645,10 @@ public class TestBEPControladorUsuarioCandidato {
 		assertEquals(MENSAJE_SIN_ERROR, 0, bean2.getMensajesDeError().size());
 		assertEquals(MENSAJE_SIN_ADVERTENCIAS, 0, bean2.getMensajesDeAdvertencia().size());
 		
+		// confirmamos la solicitud de nuevo para dejarla como estaba
+		solicitud.setEstado(ModeloSolicitud.SOLICITUD_ESTADO_CERRADA);
+		solicitud.setFechaConfirmacion(BolsaEmpleoUtils.getCurrentDateTime());
+		solicitud.setArchivo(new ByteArrayInputStream("archivo de prueba".getBytes()));
 		ModeloSolicitud.obtenerInstancia().confirmacionSolicitud(solicitud, UtilsTestBolsaEmpleo.getUsuario("personal1"));
 	}
 	
