@@ -71,7 +71,7 @@ public class ModeloConvocatoria {
 		List<Convocatoria> data = new ArrayList<>();
 		BolsaEmpleoDataTable<Convocatoria> dataTable = new BolsaEmpleoDataTable<>(params);
 
-		String consulta = "SELECT bepcon.* " + "FROM TBEP_CONVOCATORIAS bepcon " + "WHERE 1=1 ";
+		String consulta = "SELECT bepcon.* FROM TBEP_CONVOCATORIAS bepcon WHERE 1=1 ";
 
 		dataTable.setColumn(ORDER_COLUMN_INDEX_ID, "bepcon.CODNUM");
 		dataTable.setColumn(ORDER_COLUMN_INDEX_DESCRIPCION, "bepcon.DESCRIPCION");
@@ -84,12 +84,7 @@ public class ModeloConvocatoria {
 				PreparedStatement stmt = conexion.prepareStatement(dataTable.getQuery())) {
 			try (ResultSet rs = stmt.executeQuery()) {
 				while (rs.next()) {
-					Convocatoria convocatoria = new Convocatoria();
-					convocatoria.setCodNum(rs.getInt("CODNUM"));
-					convocatoria.setDescripcion(rs.getString("DESCRIPCION"));
-					convocatoria.setFechaCierre(rs.getDate("FECHACIERRE"));
-					convocatoria.setEstado(rs.getString("ESTADO"));
-					data.add(convocatoria);
+					data.add(this.createFromResultSet(rs));
 				}
 			}
 
@@ -126,23 +121,16 @@ public class ModeloConvocatoria {
 	 * 
 	 * @return todas las titulaciones de la base de datos .
 	 * @throws SQLException en caso de error de base de datos
+	 * @throws UVException .
 	 */
-	public List<Convocatoria> listaConvocatorias() throws SQLException {
+	public List<Convocatoria> listaConvocatorias() throws SQLException, UVException {
 		List<Convocatoria> convocatorias = new ArrayList<>();
 		String consulta = "SELECT bepcon.* FROM TBEP_CONVOCATORIAS bepcon";
 
-		try (Connection conexion = ConexionUvirtual.obtenerInstancia();
-				PreparedStatement stmt = conexion.prepareStatement(consulta)) {
+		try (Connection conexion = ConexionUvirtual.obtenerInstancia(); PreparedStatement stmt = conexion.prepareStatement(consulta)) {
 			try (ResultSet rs = stmt.executeQuery()) {
 				while (rs.next()) {
-					Convocatoria convocatoria = new Convocatoria();
-					convocatoria.setCodNum(rs.getInt("CODNUM"));
-					convocatoria.setDescripcion(rs.getString("DESCRIPCION"));
-					convocatoria.setFechaCierre(rs.getDate("FECHACIERRE"));
-					convocatoria.setEstado(rs.getString("ESTADO"));
-					convocatoria.setNumBolsasMaximo(rs.getInt("NUMBOLSASMAXIMO"));
-					convocatoria.setNumMeritosPorBloque(rs.getInt("NUMMERITOSPORBLOQUE"));
-					convocatorias.add(convocatoria);
+					convocatorias.add(this.createFromResultSet(rs));
 				}
 			}
 		}
@@ -150,6 +138,30 @@ public class ModeloConvocatoria {
 		return convocatorias;
 	}
 
+	/**
+	 * Lista de convocatorias a cerrar por fecha de cierre.
+	 * @return .
+	 * @throws UVException .
+	 * @throws SQLException .
+	 */
+	public List<Convocatoria> listaConvocatoriasACerrar() throws SQLException, UVException {
+		List<Convocatoria> convocatorias = new ArrayList<>();
+		String consulta = ""
+				+ " SELECT bepcon.* "
+				+ " FROM TBEP_CONVOCATORIAS bepcon "
+				+ " WHERE bepcon.ESTADO = 'ABIERTA' AND bepcon.FECHACIERRE <= SYSTIMESTAMP ";
+
+		try (Connection conexion = ConexionUvirtual.obtenerInstancia(); PreparedStatement stmt = conexion.prepareStatement(consulta)) {
+			try (ResultSet rs = stmt.executeQuery()) {
+				while (rs.next()) {
+					convocatorias.add(this.createFromResultSet(rs));
+				}
+			}
+		}
+
+		return convocatorias;
+	}
+	
 	/**
 	 * Añade una convocatoria al sistema cerrada.
 	 * 
@@ -376,7 +388,7 @@ public class ModeloConvocatoria {
 
 		return false;
 	}
-
+	
 	/**
 	 * Crea una convocatoria a partir de un resulset.
 	 * 
@@ -391,6 +403,8 @@ public class ModeloConvocatoria {
 		convocatoria.setDescripcion(rs.getString("DESCRIPCION"));
 		convocatoria.setFechaCierre(rs.getDate("FECHACIERRE"));
 		convocatoria.setEstado(rs.getString("ESTADO"));
+		convocatoria.setNumBolsasMaximo(rs.getInt("NUMBOLSASMAXIMO"));
+		convocatoria.setNumMeritosPorBloque(rs.getInt("NUMMERITOSPORBLOQUE"));
 		return convocatoria;
 	}
 
