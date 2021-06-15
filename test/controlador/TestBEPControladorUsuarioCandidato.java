@@ -3,7 +3,6 @@ package controlador;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotEquals;
 import static org.junit.Assert.assertNotNull;
-
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.sql.SQLException;
@@ -19,6 +18,7 @@ import controlador.implementacion.RespuestaHttp;
 import es.ujaen.uvirtual.modulo.bolsaempleo.beans.Solicitud;
 import es.ujaen.uvirtual.modulo.bolsaempleo.controlador.configuracion.ControladorUsuarioCandidato;
 import es.ujaen.uvirtual.modulo.bolsaempleo.modelo.ModeloSolicitud;
+import es.ujaen.uvirtual.modulo.bolsaempleo.modelo.ModeloUsuarioBolsaEmpleo;
 import es.ujaen.uvirtual.modulo.bolsaempleo.utilidades.BolsaEmpleoDataTable;
 import es.ujaen.uvirtual.modulo.bolsaempleo.utilidades.BolsaEmpleoUtils;
 import es.ujaen.uvirtual.modulo.bolsaempleo.vistas.VistaCandidatos;
@@ -46,6 +46,7 @@ public class TestBEPControladorUsuarioCandidato {
 	private static final String MENSAJE_SIN_EXITO = "No debe exito";
 	private static final String MENSAJE_TITULACIONES_DEVUELTAS = "Debe devolver titulaciones";
 	
+	private static final String CODCUENTA_CANDIDATO = "candidato1";
 	private static final String EXCLUIDO_CANDIDATO = "true";
 	private static final String EXCLUIDO_TIPO_INDEFINIDO = "I";
 	private static final String EXCLUIDO_TIPO_TEMPORAL = "T";
@@ -66,9 +67,11 @@ public class TestBEPControladorUsuarioCandidato {
 	}
     
 	// método para obtener la vista con una lista de candidatos .
-	private VistaCandidatos obtenerCandidatos() throws ServletException, IOException {
+	private VistaCandidatos obtenerCandidatos() throws IOException {
 		PeticionHttp peticion = UtilsTestBolsaEmpleo.peticionAutenticadaPersonal();
 		peticion.setParameter(ControladorUsuarioCandidato.PARAM_ACCION, ControladorUsuarioCandidato.ACCION_DATATABLE_USUARIOS_CANDIDATOS);
+		peticion.setParameter(BolsaEmpleoDataTable.PARAM_FILTER, 
+				"{" + "'" + ModeloUsuarioBolsaEmpleo.ORDER_COLUMN_INDEX_CANDIDATO_CODCUENTA + "':'" + CODCUENTA_CANDIDATO + "'}");
 
 		RespuestaHttp respuesta = new RespuestaHttp();
 		ControladorUsuarioCandidato controlador = new ControladorUsuarioCandidato();
@@ -78,7 +81,7 @@ public class TestBEPControladorUsuarioCandidato {
 	}
 	
 	// método para obtener la vista con una lista de áreas excluidas o no excluidas .
-	private VistaCandidatos obtenerAreasExcluidas(boolean excluidas) throws ServletException, IOException {
+	private VistaCandidatos obtenerAreasExcluidas(boolean excluidas) throws IOException {
 		VistaCandidatos bean = obtenerCandidatos();
 		
 		PeticionHttp peticion = UtilsTestBolsaEmpleo.peticionAutenticadaPersonal();
@@ -97,7 +100,7 @@ public class TestBEPControladorUsuarioCandidato {
 	}
 	
 	// método para obtener la vista con una lista de áreas excluidas o no excluidas .
-	private VistaCandidatos obtenerSolicitudesCandidato() throws ServletException, IOException {
+	private VistaCandidatos obtenerSolicitudesCandidato() throws IOException {
 		VistaCandidatos bean = obtenerCandidatos();
 		
 		PeticionHttp peticion = UtilsTestBolsaEmpleo.peticionAutenticadaPersonal();
@@ -136,7 +139,7 @@ public class TestBEPControladorUsuarioCandidato {
 	 * @throws ServletException  si error servlet .
 	 */
 	@Test
-	public void testA02ObtenerCandidatos() throws ServletException, IOException {
+	public void testA02ObtenerCandidatos() throws IOException {
 		VistaCandidatos bean = obtenerCandidatos();
 		
 		assertNotEquals(MENSAJE_CANDIDATOS_DEVUELTOS, 0, bean.getDatatableCandidatos().getData().size());
@@ -150,7 +153,7 @@ public class TestBEPControladorUsuarioCandidato {
 	 * @throws ServletException  si error servlet .
 	 */
 	@Test
-	public void testA03SeleccionarCandidato() throws ServletException, IOException {
+	public void testA03SeleccionarCandidato() throws IOException {
 		VistaCandidatos bean = obtenerCandidatos();
 		
 		PeticionHttp peticion = UtilsTestBolsaEmpleo.peticionAutenticadaPersonal();
@@ -174,7 +177,7 @@ public class TestBEPControladorUsuarioCandidato {
 	 * @throws ServletException  si error servlet .
 	 */
 	@Test
-	public void testA04AreasExcluidasCandidato() throws ServletException, IOException {
+	public void testA04AreasExcluidasCandidato() throws IOException {
 		VistaCandidatos bean = obtenerCandidatos();
 		
 		PeticionHttp peticion = UtilsTestBolsaEmpleo.peticionAutenticadaPersonal();
@@ -199,7 +202,7 @@ public class TestBEPControladorUsuarioCandidato {
 	 * @throws ServletException  si error servlet .
 	 */
 	@Test
-	public void testA05SolicitudesCandidato() throws ServletException, IOException {
+	public void testA05SolicitudesCandidato() throws IOException {
 		VistaCandidatos bean = obtenerCandidatos();
 		
 		PeticionHttp peticion = UtilsTestBolsaEmpleo.peticionAutenticadaPersonal();
@@ -224,7 +227,7 @@ public class TestBEPControladorUsuarioCandidato {
 	 * @throws ServletException  si error servlet .
 	 */
 	@Test
-	public void testA06ObtenerAreasNoExcluidasCandidato() throws ServletException, IOException {
+	public void testA06ObtenerAreasNoExcluidasCandidato() throws IOException {
 		VistaCandidatos bean = obtenerAreasExcluidas(false);
 		
 		assertNotEquals(MENSAJE_AREAS_DEVUELTAS, 0, bean.getDatatableAreas().getData().size());
@@ -238,7 +241,7 @@ public class TestBEPControladorUsuarioCandidato {
 	 * @throws ServletException  si error servlet .
 	 */
 	@Test
-	public void testA07ExcluirAreaCandidato() throws ServletException, IOException {
+	public void testA07ExcluirAreaCandidato() throws IOException {
 		VistaCandidatos bean = obtenerAreasExcluidas(false);
 		
 		PeticionHttp peticion = UtilsTestBolsaEmpleo.peticionAutenticadaPersonal();
@@ -265,7 +268,7 @@ public class TestBEPControladorUsuarioCandidato {
 	 * @throws ServletException  si error servlet .
 	 */
 	@Test
-	public void testA08ObtenerAreasExcluidasCandidato() throws ServletException, IOException {
+	public void testA08ObtenerAreasExcluidasCandidato() throws IOException {
 		VistaCandidatos bean = obtenerAreasExcluidas(true);
 		
 		assertNotEquals(MENSAJE_AREAS_DEVUELTAS, 0, bean.getDatatableAreas().getData().size());
@@ -279,7 +282,7 @@ public class TestBEPControladorUsuarioCandidato {
 	 * @throws ServletException  si error servlet .
 	 */
 	@Test
-	public void testA09IncluirAreaCandidato() throws ServletException, IOException {
+	public void testA09IncluirAreaCandidato() throws IOException {
 		VistaCandidatos bean = obtenerAreasExcluidas(true);
 		
 		PeticionHttp peticion = UtilsTestBolsaEmpleo.peticionAutenticadaPersonal();
@@ -306,7 +309,7 @@ public class TestBEPControladorUsuarioCandidato {
 	 * @throws ServletException  si error servlet .
 	 */
 	@Test
-	public void testA10ObtenerSolicitudes() throws ServletException, IOException {
+	public void testA10ObtenerSolicitudes() throws IOException {
 		VistaCandidatos bean = obtenerSolicitudesCandidato();
 		
 		assertNotEquals(MENSAJE_SOLICITUDES_DEVUELTAS, 0, bean.getDataTableSolicitudes().getData().size());
@@ -320,7 +323,7 @@ public class TestBEPControladorUsuarioCandidato {
 	 * @throws ServletException  si error servlet .
 	 */
 	@Test
-	public void testA11SeleccionarSolicitud() throws ServletException, IOException {
+	public void testA11SeleccionarSolicitud() throws IOException {
 		VistaCandidatos bean = obtenerSolicitudesCandidato();
 		
 		PeticionHttp peticion = UtilsTestBolsaEmpleo.peticionAutenticadaPersonal();
@@ -345,7 +348,7 @@ public class TestBEPControladorUsuarioCandidato {
 	 * @throws ServletException  si error servlet .
 	 */
 	@Test
-	public void testA12EditarCandidato() throws ServletException, IOException {
+	public void testA12EditarCandidato() throws IOException {
 		VistaCandidatos bean = obtenerCandidatos();
 		
 		PeticionHttp peticion = UtilsTestBolsaEmpleo.peticionAutenticadaPersonal();
@@ -371,7 +374,7 @@ public class TestBEPControladorUsuarioCandidato {
 	 * @throws ServletException  si error servlet .
 	 */
 	@Test
-	public void testA13ExcluirIndefinidoCandidato() throws ServletException, IOException {
+	public void testA13ExcluirIndefinidoCandidato() throws IOException {
 		VistaCandidatos bean = obtenerCandidatos();
 		
 		PeticionHttp peticion = UtilsTestBolsaEmpleo.peticionAutenticadaPersonal();
@@ -399,7 +402,7 @@ public class TestBEPControladorUsuarioCandidato {
 	 * @throws ServletException  si error servlet .
 	 */
 	@Test
-	public void testA14ExcluirTemporalCandidato() throws ServletException, IOException {
+	public void testA14ExcluirTemporalCandidato() throws IOException {
 		VistaCandidatos bean = obtenerCandidatos();
 		
 		PeticionHttp peticion = UtilsTestBolsaEmpleo.peticionAutenticadaPersonal();
@@ -429,7 +432,7 @@ public class TestBEPControladorUsuarioCandidato {
 	 * @throws ServletException  si error servlet .
 	 */
 	@Test
-	public void testA15IncluirCandidato() throws ServletException, IOException {
+	public void testA15IncluirCandidato() throws IOException {
 		VistaCandidatos bean = obtenerCandidatos();
 		
 		PeticionHttp peticion = UtilsTestBolsaEmpleo.peticionAutenticadaPersonal();
@@ -455,7 +458,7 @@ public class TestBEPControladorUsuarioCandidato {
 	 * @throws ServletException  si error servlet .
 	 */
 	@Test
-	public void testA16EliminarCandidato() throws ServletException, IOException {
+	public void testA16EliminarCandidato() throws IOException {
 		VistaCandidatos bean = obtenerCandidatos();
 		
 		PeticionHttp peticion = UtilsTestBolsaEmpleo.peticionAutenticadaPersonal();
@@ -479,7 +482,7 @@ public class TestBEPControladorUsuarioCandidato {
 	 * @throws ServletException  si error servlet .
 	 */
 	@Test
-	public void testA17RestaurarCandidato() throws ServletException, IOException {
+	public void testA17RestaurarCandidato() throws IOException {
 		VistaCandidatos bean = obtenerCandidatos();
 		
 		PeticionHttp peticion = UtilsTestBolsaEmpleo.peticionAutenticadaPersonal();
@@ -503,7 +506,7 @@ public class TestBEPControladorUsuarioCandidato {
 	 * @throws ServletException si error servlet .
 	 */
 	@Test
-	public void testA18ObtenerTitulaciones() throws ServletException, IOException {
+	public void testA18ObtenerTitulaciones() throws IOException {
 		VistaCandidatos bean = obtenerCandidatos();
 		
 		PeticionHttp peticion = UtilsTestBolsaEmpleo.peticionAutenticadaPersonal();
@@ -527,7 +530,7 @@ public class TestBEPControladorUsuarioCandidato {
 	 * @throws ServletException  si error servlet .
 	 */
 	@Test
-	public void testA19ObtenerAcreditaciones() throws ServletException, IOException {
+	public void testA19ObtenerAcreditaciones() throws IOException {
 		VistaCandidatos bean = obtenerCandidatos();
 		
 		PeticionHttp peticion = UtilsTestBolsaEmpleo.peticionAutenticadaPersonal();
@@ -551,7 +554,7 @@ public class TestBEPControladorUsuarioCandidato {
 	 * @throws ServletException  si error servlet .
 	 */
 	@Test
-	public void testA20TitulacionesCandidato() throws ServletException, IOException {
+	public void testA20TitulacionesCandidato() throws IOException {
 		VistaCandidatos bean = obtenerCandidatos();
 		
 		PeticionHttp peticion = UtilsTestBolsaEmpleo.peticionAutenticadaPersonal();
@@ -576,7 +579,7 @@ public class TestBEPControladorUsuarioCandidato {
 	 * @throws ServletException  si error servlet .
 	 */
 	@Test
-	public void testA21AcreditacionesCandidato() throws ServletException, IOException {
+	public void testA21AcreditacionesCandidato() throws IOException {
 		VistaCandidatos bean = obtenerCandidatos();
 		
 		PeticionHttp peticion = UtilsTestBolsaEmpleo.peticionAutenticadaPersonal();
@@ -601,7 +604,7 @@ public class TestBEPControladorUsuarioCandidato {
 	 * @throws ServletException  si error servlet .
 	 */
 	@Test
-	public void testA22VolverCandidato() throws ServletException, IOException {
+	public void testA22VolverCandidato() throws IOException {
 		VistaCandidatos bean = obtenerCandidatos();
 		
 		PeticionHttp peticion = UtilsTestBolsaEmpleo.peticionAutenticadaPersonal();
@@ -626,7 +629,7 @@ public class TestBEPControladorUsuarioCandidato {
 	 * @throws UVException .
 	 */
 	@Test
-	public void testA23ReabrirSolicitud() throws ServletException, IOException, SQLException, UVException {
+	public void testA23ReabrirSolicitud() throws IOException, SQLException, UVException {
 		VistaCandidatos bean = obtenerSolicitudesCandidato();
 		
 		PeticionHttp peticion = UtilsTestBolsaEmpleo.peticionAutenticadaPersonal();
@@ -679,7 +682,7 @@ public class TestBEPControladorUsuarioCandidato {
 	 * @throws ServletException si error servlet .
 	 */
 	@Test
-	public void testE02ObtenerAreasExcluidasParametroNoValido() throws ServletException, IOException {
+	public void testE02ObtenerAreasExcluidasParametroNoValido() throws IOException {
 		VistaCandidatos bean = obtenerCandidatos();
 		
 		PeticionHttp peticion = UtilsTestBolsaEmpleo.peticionAutenticadaPersonal();
@@ -703,7 +706,7 @@ public class TestBEPControladorUsuarioCandidato {
 	 * @throws ServletException si error servlet .
 	 */
 	@Test
-	public void testE03ObtenerAreasNoExcluidasParametroNoValido() throws ServletException, IOException {
+	public void testE03ObtenerAreasNoExcluidasParametroNoValido() throws IOException {
 		VistaCandidatos bean = obtenerCandidatos();
 		
 		PeticionHttp peticion = UtilsTestBolsaEmpleo.peticionAutenticadaPersonal();
@@ -727,7 +730,7 @@ public class TestBEPControladorUsuarioCandidato {
 	 * @throws ServletException si error servlet .
 	 */
 	@Test
-	public void testE04ObtenerSolicitudesCandidatoParametroNoValido() throws ServletException, IOException {
+	public void testE04ObtenerSolicitudesCandidatoParametroNoValido() throws IOException {
 		VistaCandidatos bean = obtenerCandidatos();
 		
 		PeticionHttp peticion = UtilsTestBolsaEmpleo.peticionAutenticadaPersonal();
@@ -772,7 +775,7 @@ public class TestBEPControladorUsuarioCandidato {
 	 * @throws ServletException si error servlet .
 	 */
 	@Test
-	public void testE06ObtenerTitulacionesParametroNoValido() throws ServletException, IOException {
+	public void testE06ObtenerTitulacionesParametroNoValido() throws IOException {
 		VistaCandidatos bean = obtenerCandidatos();
 
 		PeticionHttp peticion = UtilsTestBolsaEmpleo.peticionAutenticadaPersonal();
@@ -796,7 +799,7 @@ public class TestBEPControladorUsuarioCandidato {
 	 * @throws ServletException si error servlet .
 	 */
 	@Test
-	public void testE07ObtenerAcreditacionesParametroNoValido() throws ServletException, IOException {
+	public void testE07ObtenerAcreditacionesParametroNoValido() throws IOException {
 		VistaCandidatos bean = obtenerCandidatos();
 
 		PeticionHttp peticion = UtilsTestBolsaEmpleo.peticionAutenticadaPersonal();
