@@ -1,3 +1,4 @@
+<%@page import="es.ujaen.uvirtual.modulo.bolsaempleo.modelo.ModeloParametrosConfiguracion"%>
 <%@ page trimDirectiveWhitespaces="true"%>
 <%@ page import="es.ujaen.uvirtual.beans.UVDatos"%>
 <%@	page import="es.ujaen.uvirtual.modulo.bolsaempleo.controlador.candidato.ControladorMisMeritos"%>
@@ -106,6 +107,7 @@ String observacion = BolsaEmpleoUtils.getParamForm(request, ControladorMisMerito
     	<div class="form-file">
 			<label for="merito_archivo" class="bold-label">Fichero:</label>
 			<input id="merito_archivo" type="file" name="<%= ControladorMisMeritos.PARAM_ARCHIVO %>" required/>
+			<p class="bold-label">El tamaño máximo del fichero son: <%= ModeloParametrosConfiguracion.obtenerInstancia().getMaxEspacioArchivoHuman() %>
 		</div>
     	<div class="form-group-container col1">
 	    	<div class="form-group">
