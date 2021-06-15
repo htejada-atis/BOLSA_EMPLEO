@@ -148,7 +148,7 @@ public class ModeloNoticia {
 	 */
 	public List<Noticia> listaNoticiasInicio(boolean anonimo) throws SQLException {
 		return listaNoticias("WHERE flgactiva = 'S' " + (anonimo ? " AND flgpublica = 'S' " : "")
-				+ " ORDER BY fecha FETCH FIRST 3 ROWS ONLY", null);
+				+ " ORDER BY fecha DESC FETCH FIRST 9 ROWS ONLY", null);
 	}
 
 	/**
