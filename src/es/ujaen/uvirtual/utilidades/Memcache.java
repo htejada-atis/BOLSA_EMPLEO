@@ -102,7 +102,7 @@ public class Memcache {
 				throw new UVException(logMensaje);
 			}
 			try {
-				final int tiempoEspera = 1000;
+				final int tiempoEspera = 2000;
 				Thread.sleep(tiempoEspera);
 			} catch (InterruptedException e) {
 			    FLOGGER.log(Level.WARNING, "Interrupted!", e);
