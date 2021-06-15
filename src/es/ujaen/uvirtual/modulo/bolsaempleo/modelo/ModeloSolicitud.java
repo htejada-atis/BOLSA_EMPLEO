@@ -1228,6 +1228,35 @@ public class ModeloSolicitud {
 			stmt.executeUpdate();
 		}
 	}
+	
+	/**
+	 * Actualiza el estado de la solicitud a abierto .
+	 * @param solicitud .
+	 * @param usuarioUpdate .
+	 * @throws UVException .
+	 * @throws SQLException .
+	 * @throws UVException .
+	 */
+	public void reabrirSolicitud(Solicitud solicitud, UsuarioBolsaEmpleo usuarioUpdate) throws SQLException, UVException {
+		if (solicitud == null) {
+			throw new UVException("No se puede reabrir una solicitud vacía");
+		}
+		
+		if (solicitud.getCodNum() == null) {
+			throw new UVException("No se puede reabrir una solicitud con id vacío");
+		}
+		
+		String consulta = "UPDATE TBEP_SOLICITUDES "
+				+ " SET ESTADO=?, FECHACONFIRMACION=null, ARCHIVO=null, UID_USUARIO=?"
+				+ " WHERE CODNUM=?";
+		try (Connection conexion = ConexionUvirtual.obtenerInstancia(); PreparedStatement stmt = conexion.prepareStatement(consulta)) {
+			int parameterIndex = 1;
+			stmt.setString(parameterIndex++, solicitud.getEstado());
+			stmt.setString(parameterIndex++, usuarioUpdate.getCodCuenta());
+			stmt.setInt(parameterIndex++, solicitud.getCodNum());
+			stmt.executeUpdate();
+		}
+	}
 		
 	/**
 	 * Comprueba los méritos que tienen afinidad y no tienen valoración .

@@ -330,11 +330,10 @@ public class ControladorMisMeritosPreferentes extends HttpServlet {
 		
 		try {
 			Part uploadedFile = request.getPart(PARAM_ARCHIVO);
-			if (!BolsaEmpleoUtils.checkFileIsPDF(uploadedFile)) {
+			if (!BolsaEmpleoUtils.checkFileIsPDF(uploadedFile.getSubmittedFileName())) {
 				throw new UVException("El fichero debe ser un pdf válido");
 			}
-			mpu.setArchivo(uploadedFile.getInputStream());
-			BolsaEmpleoUtils.checkFileSize(mpu.getArchivo());
+			mpu.setArchivo(BolsaEmpleoUtils.checkFileSize(uploadedFile.getInputStream()));			
 		} catch (ServletException | IOException ex) {
 			LOGGER.log(Level.WARNING, ex.toString());
 			throw new UVException("Error guardando fichero");

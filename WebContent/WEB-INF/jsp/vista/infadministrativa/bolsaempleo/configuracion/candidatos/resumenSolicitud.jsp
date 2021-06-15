@@ -4,6 +4,8 @@
 <%@	page import="es.ujaen.uvirtual.modulo.bolsaempleo.controlador.ControladorDescargaFicheros"%>
 <%@	page import="es.ujaen.uvirtual.modulo.bolsaempleo.controlador.configuracion.ControladorUsuarioCandidato"%>
 <%@ page import="es.ujaen.uvirtual.modulo.bolsaempleo.controlador.candidato.ControladorMisSolicitudes" %>
+<%@ page import="es.ujaen.uvirtual.modulo.bolsaempleo.modelo.ModeloConvocatoria" %>
+<%@ page import="es.ujaen.uvirtual.modulo.bolsaempleo.modelo.ModeloSolicitud" %>
 <%@ page import="es.ujaen.uvirtual.modulo.bolsaempleo.vistas.VistaCandidatos" %>
 <%@ page import="es.ujaen.uvirtual.utilidades.EscapaHTML" %>
 <%@	page import="es.ujaen.uvirtual.modulo.bolsaempleo.beans.BolsaSolicitud" %>
@@ -28,14 +30,14 @@ VistaCandidatos bean = (VistaCandidatos) uvdatos.getVistas().get(VistaCandidatos
 			<tr>
 				<th scope="col"	style="width:15%">Cod. mérito</th>
 				<th scope="col"	style="width:30%">Mérito</th>
-				<th scope="col"	style="width:10%">Valor</th>	
+				<th scope="col"	style="width:10%">Valor</th>
 				<th scope="col"	style="width:30%">Descripción</th>
 				<th scope="col" style="width:15%">Afinidad</th>
 				<th scope="col" style="width:10%"></th>
 			</tr>
 			<tbody>
 			<%	if (bolsa.getListaMeritos() != null && bolsa.getListaMeritos().size() > 0) { %>
-				<%	for (MeritoSolicitudTable merito: bolsa.getListaMeritos()) { 
+				<%	for (MeritoSolicitudTable merito: bolsa.getListaMeritos()) {
 						String codigoItem = merito.getMerito().getItemBaremacion().getBloqueBaremacion().getApartadoBaremacion().getCodigo() + "." + merito.getMerito().getItemBaremacion().getBloqueBaremacion().getCodigo() + "." + merito.getMerito().getItemBaremacion().getCodigo();
 					%>
 						<tr>
@@ -57,7 +59,7 @@ VistaCandidatos bean = (VistaCandidatos) uvdatos.getVistas().get(VistaCandidatos
 						<%	} %>
 							</td>
 							<td>
-								<button class="btn only-icon icon-download fichero-merito" 
+								<button class="btn only-icon icon-download fichero-merito"
 										title="Descargar fichero del mérito"
 										type="button"
 										data-merito="<%= merito.getMerito().getCodNum() %>"></button>
@@ -75,6 +77,12 @@ VistaCandidatos bean = (VistaCandidatos) uvdatos.getVistas().get(VistaCandidatos
 		<button class="link-btn" id="candidato_volver">
 	    	 Volver
 	    </button>
+	<% if (bean.getSolicitud().getConvocatoria().getEstado().equals(ModeloConvocatoria.CONVOCATORIA_ESTADO_ABIERTA) &&
+			bean.getSolicitud().getEstado().equals(ModeloSolicitud.SOLICITUD_ESTADO_CERRADA)) { %>
+	    <button class="link-btn" id="reabrir_solicitud">
+	    	 Reabrir solicitud
+	    </button>
+	<%	} %>
 	</div>
 	
 </div>
@@ -95,6 +103,15 @@ VistaCandidatos bean = (VistaCandidatos) uvdatos.getVistas().get(VistaCandidatos
 				'<%=ControladorUsuarioCandidato.PARAM_CANDIDATO%>': '<%=bean.getCandidato().getCodNum()%>'
 			});
 		});
+		
+		document.getElementById("reabrir_solicitud").addEventListener("click", function() {
+			Atis.sendForm("<%= request.getRequestURI() %>", {
+				'<%=ControladorUsuarioCandidato.PARAM_ACCION%>': '<%=ControladorUsuarioCandidato.ACCION_REABRIR_SOLICITUD%>',
+				'<%=ControladorUsuarioCandidato.PARAM_CANDIDATO%>': '<%=bean.getCandidato().getCodNum()%>',
+				'<%=ControladorUsuarioCandidato.PARAM_SOLICITUD%>': '<%=bean.getSolicitud().getCodNum()%>'
+			});
+		});
+		
 	});
 
 </script>

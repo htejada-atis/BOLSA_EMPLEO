@@ -1,3 +1,4 @@
+<%@page import="es.ujaen.uvirtual.modulo.bolsaempleo.modelo.ModeloParametrosConfiguracion"%>
 <%@ page trimDirectiveWhitespaces="true"%>
 <%@ page import="es.ujaen.uvirtual.beans.UVDatos"%>
 <%@	page import="es.ujaen.uvirtual.modulo.bolsaempleo.controlador.candidato.ControladorMisTitulaciones"%>
@@ -72,6 +73,7 @@ VistaTitulaciones bean = (VistaTitulaciones) uvdatos.getVistas().get(VistaTitula
 	    	<div class="form-file">
 				<label for="fichero_archivo" class="bold-label">Fichero:</label>
 				<input id="fichero_archivo" type="file" name="<%= ControladorMisTitulaciones.PARAM_ARCHIVO %>" required/>
+				<p class="bold-label">El tamaño máximo del fichero son: <%= ModeloParametrosConfiguracion.obtenerInstancia().getMaxEspacioArchivoHuman() %>
 			</div>
 			
 	    	<div class="form-btn">

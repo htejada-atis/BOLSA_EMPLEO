@@ -1,6 +1,8 @@
 package es.ujaen.uvirtual.modulo.bolsaempleo.utilidades;
 
 import java.io.BufferedReader;
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -47,6 +49,7 @@ public final class BolsaEmpleoUtils {
 	private static final int NUMBER_2 = 2;
 	private static final int HOURS_END = 23;
 	private static final int MINUTES_SECONDS_END = 59;
+	private static final int NUMBER_1024 = 1024;
 	private static final int NUMBER_1000 = 1000;
 	private static final int NUMBER_999_950 = 999_950;
 	
@@ -197,22 +200,32 @@ public final class BolsaEmpleoUtils {
 	 * Checkea si un archivo es mas grande que una variable o no .
 	 * 
 	 * @param archivo .
+	 * @return file .
 	 * @throws SQLException .
 	 * @throws IOException  .
 	 * @throws UVException  .
 	 */
-	public static void checkFileSize(InputStream archivo) throws UVException, SQLException, IOException {
-		if (archivo.available() <= 0) {
-			throw new UVException("No se puede insertar sin archivo o archivo vacio");
-		}
-
-		Integer maxSize = Formateador.leeParametroInteger(getParametroConfiguracion("bolsaempleo.maxEspacioArchivo"));
-		if (maxSize == null) {
-			throw new UVException("No se puede leer el tamaño máximo de archivo");
-		}
-
-		if (archivo.available() > maxSize) {
-			throw new UVException("No se puede insertar un archivo tan grande. Máximo: " + humanReadableByteCountSI(maxSize));
+	public static InputStream checkFileSize(InputStream archivo) throws UVException, SQLException, IOException {
+		try (ByteArrayOutputStream salida = new ByteArrayOutputStream()) {
+			int bytesLeidos = 0;
+			byte[] bytes = new byte[NUMBER_1024];
+			long bytesTotal = 0;
+			
+			Integer maxSize = Formateador.leeParametroInteger(getParametroConfiguracion("bolsaempleo.maxEspacioArchivo"));
+			
+			while (((bytesLeidos = archivo.read(bytes)) != -1)) {
+				salida.write(bytes, 0, bytesLeidos);
+				bytesTotal += bytesLeidos;
+				if (bytesTotal > maxSize) {
+					throw new UVException("No se puede insertar un archivo tan grande. Máximo: " + humanReadableByteCountSI(maxSize));
+				}
+			}
+			
+			if (bytesTotal == 0) {
+				throw new UVException("No se puede insertar sin archivo o archivo vacio");
+			}
+			
+			return new ByteArrayInputStream(salida.toByteArray());
 		}
 	}
 	
@@ -237,21 +250,11 @@ public final class BolsaEmpleoUtils {
 	/**
 	 * Comprueba si es un fichero pdf válido.
 	 * 
-	 * @param uploadedFile .
+	 * @param nombre .
 	 * @return .
 	 */
-	public static boolean checkFileIsPDF(Part uploadedFile) {
-		if (uploadedFile != null && uploadedFile.getSize() >= 0) {
-			String nombre = BolsaEmpleoUtils.obtenerNombreFichero(uploadedFile);
-			int i = nombre.lastIndexOf('.');
-			if (i > 0) {
-				String extension = nombre.substring(i + 1);
-				if ("pdf".equalsIgnoreCase(extension)) {
-					return true;
-				}
-			}
-		}
-		return false;
+	public static boolean checkFileIsPDF(String nombre) {
+		return nombre.toLowerCase().endsWith(".pdf");
 	}
 
 	/**
