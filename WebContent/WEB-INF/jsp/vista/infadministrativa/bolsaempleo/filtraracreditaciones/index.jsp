@@ -22,15 +22,15 @@ UsuarioBolsaEmpleo candidato = bean.getCandidato();
 	
 	<table class="bluetable bolsaempleo" id="tableCandidatos">
 		<tr>
-			<th scope="col" style="width:60%">Candidato</th>
+			<th scope="col" style="width:12%">Documento</th>
+			<th scope="col" style="width:58%">Candidato</th>
 			<th scope="col" style="width:15%" title="Número de acreditaciones">Nº Acreditaciones</th>
 			<th scope="col" style="width:15%">Nº Acr. Validadas</th>
 		</tr>
-		<tbody>
-		</tbody>
+		<tbody></tbody>
 		<tfoot>
 			<tr>
-				<th colSpan="3" style="width:100%"></th>
+				<th colSpan="4" style="width:100%"></th>
 			</tr>
 		</tfoot>
 	</table>
@@ -45,8 +45,7 @@ UsuarioBolsaEmpleo candidato = bean.getCandidato();
 				<th scope="col"	style="width:15%">Descripción</th>
 				<th scope="col"	style="width:12%"></th>
 			</tr>
-			<tbody>		
-			</tbody>
+			<tbody></tbody>
 			<tfoot>
 				<tr>
 					<th colspan="6" style="width:100%"></th>
@@ -62,7 +61,7 @@ UsuarioBolsaEmpleo candidato = bean.getCandidato();
 		var tableCandidatos = new Atis.DataTable('#tableCandidatos', {
 		    "ajax": { url: "<%= ControladorFiltrarAcreditaciones.URL_PATTERN_AJAX %>", async: false },
 		    "action": "<%= ControladorFiltrarAcreditaciones.ACCION_DATATABLE_CANDIDATOS %>",
-		    "pageSize": 5,
+		    "pageSize": 100,
 		    "filterable": true,
 		    "title": 'CANDIDATOS',
 		    "clickable": {'onClick': function(row) {
@@ -74,6 +73,7 @@ UsuarioBolsaEmpleo candidato = bean.getCandidato();
 		    }},
 		    <% if (candidato != null) { %> "selected": <%= candidato.getCodNum() %> ,<% } %>
 		    "columns": [
+		    	{'data': 'prsnif', 'filter': true},
 		    	{'data': 'apellido1', 'filter': true, 'overflow': 'auto', 'render': function(row) {
 	        		return row.nombre + " " + row.apellido1 + " " + row.apellido2; 
 	        	}},

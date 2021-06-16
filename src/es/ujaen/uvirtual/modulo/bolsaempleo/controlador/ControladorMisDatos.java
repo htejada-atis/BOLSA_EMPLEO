@@ -18,7 +18,6 @@ import es.ujaen.uvirtual.modulo.bolsaempleo.controlador.configuracion.Controlado
 import es.ujaen.uvirtual.modulo.bolsaempleo.modelo.ModeloUsuarioBolsaEmpleo;
 import es.ujaen.uvirtual.modulo.bolsaempleo.utilidades.BolsaEmpleoUtils;
 import es.ujaen.uvirtual.modulo.bolsaempleo.vistas.VistaUsuarioBolsaEmpleo;
-import es.ujaen.uvirtual.utilidades.AdaptadorDocumentoIdentidad;
 import es.ujaen.uvirtual.utilidades.EscapaHTML;
 import es.ujaen.uvirtual.utilidades.Formateador;
 import es.ujaen.uvirtual.utilidades.UVException;
@@ -239,14 +238,16 @@ public class ControladorMisDatos extends HttpServlet {
 	    
 		u.setListaDist("true".equals(EscapaHTML.ajustaCodificacion(request.getParameter(PARAM_LISTA))));
 		
-		u.setTipoDocumento(usu.getDocumentoTipo());
-		u.setIdNif(AdaptadorDocumentoIdentidad.numeroDocumento(AdaptadorDocumentoIdentidad.UXXIAC, usu));
-		u.setLetraNif(AdaptadorDocumentoIdentidad.letraNIF(usu.getDocumentoTipo(), usu.getDocumentoNumero()));
-		u.setPrsNif(usu.getDocumentoNumero());
-		u.setNombre(usu.getNombre());
-		u.setPrimerApellido(usu.getApellido1());
-		u.setSegundoApellido(usu.getApellido2());
-		u.setEmail(usu.getEmailCalculado());
+//		u.setTipoDocumento(usu.getDocumentoTipo());
+//		u.setIdNif(AdaptadorDocumentoIdentidad.numeroDocumento(AdaptadorDocumentoIdentidad.UXXIAC, usu));
+//		u.setLetraNif(AdaptadorDocumentoIdentidad.letraNIF(usu.getDocumentoTipo(), usu.getDocumentoNumero()));
+//		u.setPrsNif(usu.getDocumentoNumero());
+//		u.setNombre(usu.getNombre());
+//		u.setPrimerApellido(usu.getApellido1());
+//		u.setSegundoApellido(usu.getApellido2());
+//		u.setEmail(usu.getEmailCalculado());
+		
+		u.setUsuarioArcos(usu);
 	
 		return u;
 	}

@@ -27,7 +27,7 @@ UsuarioBolsaEmpleo candidato = bean.getCandidato();
 	<% 
 		String descripcion = "";
 		if(bean.getConvocatoria() != null) {
-			descripcion = "Última convocatoria: " + bean.getConvocatoria().getDescripcion();
+			descripcion = bean.getConvocatoria().getDescripcion();
 		} else {
 			descripcion = "No existen convocatorias en este momento";
 		}
@@ -130,7 +130,7 @@ UsuarioBolsaEmpleo candidato = bean.getCandidato();
 		    		</div>
 		    		<div class="form-group">
 			    		<label for="merito_observacion_comision">Observación para la comisión:</label>
-			    		<textarea class="form-input-custom" id="merito_observacion_comision" name="" rows="2" cols="50" disabled><%= merito.getMerito().getObservacion() %></textarea>
+			    		<textarea class="form-input-custom" id="merito_observacion_comision" name="" rows="2" cols="50" disabled><%= merito.getMerito().getObservacion() != null ? merito.getMerito().getObservacion() : "" %></textarea>
 			    	</div>
 				</div>
 			
@@ -272,7 +272,7 @@ $(document).ready(function() {
 	    "params": {'<%=ControladorValidar.PARAM_BOLSA%>': '<%= bolsa.getCodNum() %>'},
 	    "clickable": {'onClick': function(row) {
 	    	var params = {
-    				'a': '<%= ControladorValidar.ACCION_CANDIDATO_SELECCIONADO %>',
+    				'<%= ControladorValidar.PARAM_ACCION %>': '<%= ControladorValidar.ACCION_CANDIDATO_SELECCIONADO %>',
     				'<%= ControladorValidar.PARAM_BOLSA%>': '<%= bolsa.getCodNum() %>',
     				'<%= ControladorValidar.PARAM_CANDIDATO %>': row.codNum
     				};

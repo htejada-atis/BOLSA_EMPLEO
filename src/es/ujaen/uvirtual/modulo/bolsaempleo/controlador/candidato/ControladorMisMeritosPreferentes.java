@@ -1,19 +1,26 @@
 package es.ujaen.uvirtual.modulo.bolsaempleo.controlador.candidato;
 
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.PrintWriter;
 import java.sql.SQLException;
 import java.util.logging.Logger;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.logging.Level;
 import javax.servlet.ServletException;
-import javax.servlet.annotation.MultipartConfig;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import javax.servlet.http.Part;
+
+import org.apache.commons.fileupload.FileItem;
+import org.apache.commons.fileupload.FileUploadException;
+import org.apache.commons.fileupload.disk.DiskFileItemFactory;
+import org.apache.commons.fileupload.servlet.ServletFileUpload;
+
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.reflect.TypeToken;
@@ -48,7 +55,6 @@ import es.ujaen.uvirtual.utilidades.UVException;
 			"/srv/es/ajax/informacionadministrativa/bolsaempleo/mismeritospreferentes", 
 			"/srv/en/ajax/informacionadministrativa/bolsaempleo/mismeritospreferentes"
 	})
-@MultipartConfig(maxFileSize = ModeloParametrosConfiguracion.MAX_FILE_SIZE)
 public class ControladorMisMeritosPreferentes extends HttpServlet {
 	private static final long serialVersionUID = 1L;
 	private static final String NOMBREDEESTACLASE = ControladorMisMeritosPreferentes.class.getName();
@@ -99,6 +105,9 @@ public class ControladorMisMeritosPreferentes extends HttpServlet {
 		VistaMeritosPreferentesCandidato bean = new VistaMeritosPreferentesCandidato();
 				
 		String nombreAccion = EscapaHTML.ajustaCodificacion(request.getParameter(PARAM_ACCION));
+		if (ServletFileUpload.isMultipartContent(request)) {
+			nombreAccion = ACCION_AGREGAR_MERITO_CONFIRM;
+		}
 		if (nombreAccion == null) {
 			nombreAccion = ACCION_INDEX;
 		}
@@ -113,6 +122,10 @@ public class ControladorMisMeritosPreferentes extends HttpServlet {
 			LOGGER.log(Level.SEVERE, Formateador.getStackTrace(e));
 			LOGGER.log(Level.SEVERE, e.toString());
 			bean.getMensajesDeError().add("Error al acceder a la base de datos");
+		} catch (FileUploadException e) {
+			LOGGER.log(Level.SEVERE, Formateador.getStackTrace(e));
+			LOGGER.log(Level.SEVERE, e.toString());
+			bean.getMensajesDeError().add("Error al subir fichero");
 		} finally {
 			datos.getVistas().put(bean.getClass().getName(), bean);
 			datos.getFicherosJSP().add(bean.getVista());
@@ -164,7 +177,7 @@ public class ControladorMisMeritosPreferentes extends HttpServlet {
 	}
 	
 	private void accionesMeritos(VistaMeritosPreferentesCandidato bean, UVDatos datos, HttpServletRequest request, HttpServletResponse response, String nombreAccion) 
-			throws IOException, SQLException, UVException {
+			throws IOException, SQLException, UVException, FileUploadException {
 		
 		switch (nombreAccion) {
 			case ACCION_INDEX:
@@ -177,10 +190,10 @@ public class ControladorMisMeritosPreferentes extends HttpServlet {
 				formularioAgregarMerito(bean);
 				break;
 			case ACCION_AGREGAR_MERITO_CONFIRM:
-				agregarMerito(bean, datos, request, response);
+				agregarMerito(bean, request, response);
 				break;
 			case ACCION_ELIMINAR_MERITOS:
-				eliminarMeritos(bean, datos, request, response);
+				eliminarMeritos(bean, request, response);
 				break;
 			case ACCION_LISTADO_OPCIONES:
 				listadoOpciones(bean, datos, request, response);
@@ -259,20 +272,33 @@ public class ControladorMisMeritosPreferentes extends HttpServlet {
 		bean.setCodigoPadreMeritoPreferente(config.getValor());		
 	}
 	
-	private void agregarMerito(VistaMeritosPreferentesCandidato bean, UVDatos datos, HttpServletRequest request, HttpServletResponse response) 
-			throws SQLException, UVException, IOException {
+	private void agregarMerito(VistaMeritosPreferentesCandidato bean, HttpServletRequest request, HttpServletResponse response) 
+			throws SQLException, UVException, IOException, FileUploadException {
 		formularioAgregarMerito(bean);
+		
+		// leemos los parametros del form, chequeando el fichero
+		List<FileItem> items = new ServletFileUpload(new DiskFileItemFactory()).parseRequest(request);
+		HashMap<String, Object> parametros = new HashMap<>();		
+		for (FileItem item : items) {
+			if (item.isFormField()) {
+				parametros.put(item.getFieldName(), item.getString());
+			} else {
+				if (item.getSize() > 0 && item.getName().toLowerCase().endsWith(".pdf")) {									
+					try (InputStream contenidoDelFichero = item.getInputStream(); ByteArrayOutputStream salida = new ByteArrayOutputStream()) {
+						parametros.put(PARAM_ARCHIVO, BolsaEmpleoUtils.checkFileSize(contenidoDelFichero));
+					}
+				}
+			}
+		}
 				
-		MeritoPreferenteUsuario mp = validateMeritoPreferenteUsuario(bean, request);
+		MeritoPreferenteUsuario mp = validateMeritoPreferenteUsuario(bean, parametros);
 		ModeloMeritosPreferentesCandidato.obtenerInstancia().insertaMeritoUsuario(mp, bean.getUsuarioLogeado());
 		
 		BolsaEmpleoUtils.addMensajeDeExito("Mérito preferente añadido correctamente", bean, request);
 		response.sendRedirect(request.getServletPath());
 	}
 	
-	
-	
-	private void eliminarMeritos(VistaMeritosPreferentesCandidato bean, UVDatos datos, HttpServletRequest request, HttpServletResponse response) 
+	private void eliminarMeritos(VistaMeritosPreferentesCandidato bean, HttpServletRequest request, HttpServletResponse response) 
 			throws SQLException, UVException, IOException {
 		String selectedJson = EscapaHTML.ajustaCodificacion(request.getParameter(PARAM_MERITOS));
 		int[] selected = (new Gson()).fromJson(selectedJson, new TypeToken<int[]>() { }.getType());
@@ -300,17 +326,17 @@ public class ControladorMisMeritosPreferentes extends HttpServlet {
 		response.sendRedirect(request.getServletPath());
 	}
 	
-	private MeritoPreferenteUsuario validateMeritoPreferenteUsuario(VistaMeritosPreferentesCandidato bean, HttpServletRequest request) 
+	private MeritoPreferenteUsuario validateMeritoPreferenteUsuario(VistaMeritosPreferentesCandidato bean, HashMap<String, Object> parametros) 
 			throws SQLException, UVException {
 		
 		MeritoPreferenteUsuario mpu = new MeritoPreferenteUsuario();
 		
 		mpu.setMeritoPreferente(ModeloMeritosPreferentes.obtenerInstancia().getMeritoPreferenteById(
-				Formateador.leeParametroInteger(request.getParameter(PARAM_MERITO_PREFERENTE))));
+				Formateador.leeParametroInteger((String) parametros.get(PARAM_MERITO_PREFERENTE))));
 		
 		if (mpu.getMeritoPreferente().getTipoCalculo().equals(ModeloMeritosPreferentes.TIPO_CALCULO_OPCIONES)) {
 			mpu.setMeritoPreferenteOpcion(ModeloMeritosPreferentes.obtenerInstancia().getMeritoPreferenteOpcionById(
-					Formateador.leeParametroInteger(request.getParameter(PARAM_MERITO_PREFERENTE_OPCION))));
+					Formateador.leeParametroInteger((String) parametros.get(PARAM_MERITO_PREFERENTE_OPCION))));
 			
 			if (!mpu.getMeritoPreferenteOpcion().getMeritoPreferenteCodNum().equals(mpu.getMeritoPreferente().getCodNum())) {
 				throw new UVException("Opción no válida");
@@ -322,22 +348,13 @@ public class ControladorMisMeritosPreferentes extends HttpServlet {
 			throw new UVException("El usuario debe ser un candidato");
 		}
 		
-		mpu.setDescripcion(request.getParameter(PARAM_OBSERVACION));
+		mpu.setDescripcion((String) parametros.get(PARAM_OBSERVACION));
 		if (mpu.getDescripcion() != null && mpu.getDescripcion().length() > ModeloMeritosPreferentesCandidato.MAX_LENGTH_COLUMN_DESCRIPCION) {
 			throw new UVException(String.format("Los comentarios para la comisión no puede contener mas de %d caracteres", 
 					ModeloMeritosPreferentesCandidato.MAX_LENGTH_COLUMN_DESCRIPCION));
 		}
 		
-		try {
-			Part uploadedFile = request.getPart(PARAM_ARCHIVO);
-			if (!BolsaEmpleoUtils.checkFileIsPDF(uploadedFile.getSubmittedFileName())) {
-				throw new UVException("El fichero debe ser un pdf válido");
-			}
-			mpu.setArchivo(BolsaEmpleoUtils.checkFileSize(uploadedFile.getInputStream()));			
-		} catch (ServletException | IOException ex) {
-			LOGGER.log(Level.WARNING, ex.toString());
-			throw new UVException("Error guardando fichero");
-		}
+		mpu.setArchivo((InputStream) parametros.get(PARAM_ARCHIVO));
 		
 		// solo puede haber un mérito preferente por tipo y activo y usuario
 		if (!ModeloMeritosPreferentesCandidato.obtenerInstancia().compruebaSoloUnTipoDeMeritoPrefenteActivo(mpu)) {

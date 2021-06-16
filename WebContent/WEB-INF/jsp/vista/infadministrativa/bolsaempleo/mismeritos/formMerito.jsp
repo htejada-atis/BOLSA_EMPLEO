@@ -30,8 +30,10 @@ String observacion = BolsaEmpleoUtils.getParamForm(request, ControladorMisMerito
 	<p>Las etiquetas en <strong>negrita</strong> corresponden a campos de relleno obligatorio</p>
     
     <form id="agregar_merito" class="be-form" method="post" action="<%= request.getRequestURI() %>" enctype="multipart/form-data">
-    	<input type="hidden" name="<%= ControladorMisMeritos.PARAM_ACCION %>" id="accion_formulario" 
-    		value="<%= ControladorMisMeritos.ACCION_AGREGAR_MERITO %>" />
+    	<input type="hidden" 
+    		   id="accion_formulario"
+    		   name="<%= ControladorMisMeritos.PARAM_ACCION %>"  
+    		   value="<%= ControladorMisMeritos.ACCION_AGREGAR_MERITO_CONFIRM %>" />
     	<div class="form-group-container col2">
 	    	<div class="form-group">
 				<label class="bold-label" for="select_apartado">Apartado:</label>
@@ -156,8 +158,10 @@ String observacion = BolsaEmpleoUtils.getParamForm(request, ControladorMisMerito
 	$(document).ready(function() {
 		
 		document.getElementById("select_apartado").onchange = function () {
-			var params = {'a': '<%= ControladorMisMeritos.ACCION_AGREGAR_MERITO %>',
-					'<%= ControladorMisMeritos.PARAM_APARTADO %>': this.value};
+			var params = {
+				'<%= ControladorMisMeritos.PARAM_ACCION %>': '<%= ControladorMisMeritos.ACCION_AGREGAR_MERITO %>',
+				'<%= ControladorMisMeritos.PARAM_APARTADO %>': this.value
+			};
 			Atis.sendForm("<%= request.getRequestURI() %>", params);
 		}
 		

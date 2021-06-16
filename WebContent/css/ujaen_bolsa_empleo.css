@@ -21,14 +21,14 @@
 }
 
 .bolsa-empleo select, .bolsa-empleo input[type=text], .bolsa-empleo input[type=submit], .bolsa-empleo input[type=number],
- .bolsa-empleo textarea, .bolsa-empleo button {
+ .bolsa-empleo input[type=button], .bolsa-empleo textarea, .bolsa-empleo button {
 	border: 1px solid rgb(118, 118, 118);
 	border-radius: 3px;
 	box-sizing: border-box;
 }
 
 .bolsa-empleo input[type=text]:disabled, .bolsa-empleo input[type=submit]:disabled, .bolsa-empleo input[type=number]:disabled,
- .bolsa-empleo textarea:disabled, .bolsa-empleo button:disabled {
+ .bolsa-empleo input[type=button]:disabled, .bolsa-empleo textarea:disabled, .bolsa-empleo button:disabled {
 	border: 1px solid rgba(118, 118, 118, 0.3);
 }
 
@@ -41,15 +41,16 @@
 	background-color: #FFFF99;
 }
 
-.bolsa-empleo input[type=text], .bolsa-empleo input[type=number], .bolsa-empleo textarea, .bolsa-empleo input[type=submit], .bolsa-empleo button {
+.bolsa-empleo input[type=text], .bolsa-empleo input[type=number], .bolsa-empleo textarea, .bolsa-empleo button,
+ .bolsa-empleo input[type=button], .bolsa-empleo input[type=submit] {
 	padding: 4px 6px;
 }
 
-.bolsa-empleo button:hover, .bolsa-empleo input[type=submit]:hover {
+.bolsa-empleo button:hover, .bolsa-empleo input[type=submit]:hover, .bolsa-empleo input[type=button]:hover {
 	cursor: pointer;
 }
 
-.bolsa-empleo button:hover:disabled, .bolsa-empleo input[type=submit]:hover:disabled {
+.bolsa-empleo button:hover:disabled, .bolsa-empleo input[type=submit]:hover:disabled, .bolsa-empleo input[type=button]:hover:disabled {
 	cursor: inherit;
 }
 
@@ -226,6 +227,8 @@ table.bluetable.bolsaempleo .btns .btn {
 }
 table.bluetable.bolsaempleo .btns .btn.only-icon {
 	width: inherit;
+	margin: 0 auto;
+    display: block;
 }
 table.bluetable.bolsaempleo span button {
 	margin-left: 1px;
@@ -682,13 +685,46 @@ table.bluetable.bolsaempleo input + input {
 
 /* tab widget */
 
-.tabpanel-widget {
-	position: relative;
-    background: #333333;
-    border: 2px solid #e8e8e8;
+.nav-tabs-widget {
+	border-bottom: 1px solid #DDDDDD;
+	padding-left: 0;
+	margin-bottom: 0;
+    list-style: none !important;
+    display: inline-block;
 }
 
+.nav-tabs-widget > li {
+	float: left;
+	margin-bottom: -1px;
+    position: relative;
+    display: block;
+}
 
+.nav-tabs-widget > li > a {
+	border: 1px solid rgba(0, 0, 0, 0);
+	border-radius: 4px 4px 0 0;
+	line-height: 1.42857;
+	margin-right: 2px;
+	position: relative;
+    display: block;
+    padding: 10px 15px;
+    color: #fff;
+    text-decoration: none;
+    background-color: var(--principal);
+    font-size: 14px;
+}
 
+.nav-tabs-widget > li > a:hover {
+    border-color: #EEEEEE #EEEEEE #DDDDDD;
+    cursor: pointer;
+}
 
-
+.nav-tabs-widget > li.tab-selected > a, .nav-tabs-widget > li.tab-selected > a:hover {
+	background-color: #FFFFFF;
+    border-color: #DDDDDD #DDDDDD rgba(0, 0, 0, 0);
+    border-image: none;
+    border-style: solid;
+    border-width: 1px;
+    color: inherit;
+    cursor: default;
+}

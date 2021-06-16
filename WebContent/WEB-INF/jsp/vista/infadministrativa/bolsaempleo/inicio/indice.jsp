@@ -98,7 +98,7 @@ VistaUsuarioBolsaEmpleo beanUsuario = (VistaUsuarioBolsaEmpleo) uvdatos.getVista
 				obtenerRestoDeNoticias();
 			} else {
 				$(".noticias-bolsa-empleo ul").children("li").each(function(i) {
-					if(i > 2) {
+					if(i > 8) {
 						$(this).remove();
 					}
 				});
@@ -110,7 +110,7 @@ VistaUsuarioBolsaEmpleo beanUsuario = (VistaUsuarioBolsaEmpleo) uvdatos.getVista
 		
 		comprobarNoticiasCargadas();
 		
-		if(ids_noticias.length < 3) {
+		if(ids_noticias.length < 9) {
 			$("#view_all").hide();
 		}
 		

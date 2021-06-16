@@ -20,21 +20,27 @@ UsuarioBolsaEmpleo candidato = bean.getCandidato();
 
 	<jsp:include page="/WEB-INF/jsp/vista/infadministrativa/bolsaempleo/mensajes.jsp" />
 	
-	<h2>Filtrado de candidatos por titulación</h2>
+	<div class="titulo-bolsa-empleo">
+		<h2>Filtrado de candidatos por titulación</h2>
+	    <button class="link-btn" id="sin_titulacion">
+	    	 Listado de candidatos sin titulación
+	    </button>
+	</div>
+
 	<p>Filtrado de candidatos por titulaciones, para su posible exclusión.</p>
 	
 	<table class="bluetable bolsaempleo" id="tableCandidatos">
 		<tr>
-			<th scope="col" style="width:60%">Candidato</th>
+			<th scope="col" style="width:12%">Documento</th>
+			<th scope="col" style="width:48%">Candidato</th>
 			<th scope="col" style="width:15%" title="Código área">Nº Titulaciones</th>
 			<th scope="col" style="width:15%" class="area">Nº Tit. Validadas</th>			
 			<th scope="col" style="width:10%"></th>			
 		</tr>
-		<tbody>				
-		</tbody>
+		<tbody></tbody>
 		<tfoot>
 			<tr>
-				<th colSpan="4" style="width:100%"></th>
+				<th colSpan="5" style="width:100%"></th>
 			</tr>
 		</tfoot>
 	</table>
@@ -47,8 +53,7 @@ UsuarioBolsaEmpleo candidato = bean.getCandidato();
 				<th scope="col" style="width:40%">Descripción</th>		
 				<th scope="col" style="width:15%"></th>		
 			</tr>
-			<tbody>
-			</tbody>
+			<tbody></tbody>
 			<tfoot>
 				<tr>
 					<th colSpan="5" style="width:100%"></th>
@@ -64,7 +69,7 @@ UsuarioBolsaEmpleo candidato = bean.getCandidato();
 		var tableCandidatos = new Atis.DataTable('#tableCandidatos', {
 		    "ajax": { url: "<%=ControladorFiltrarTitulacion.URL_PATTERN_AJAX%>", async: false },
 		    "action": "<%=ControladorFiltrarTitulacion.ACCION_DATATABLE_CANDIDATOS%>",
-		    "pageSize": 5,
+		    "pageSize": 100,
 		    "filterable": true,
 		    "title": 'CANDIDATOS',
 		    "clickable": {'onClick': function(row) {
@@ -76,6 +81,7 @@ UsuarioBolsaEmpleo candidato = bean.getCandidato();
 		    }},
 		    <%if (candidato != null) {%> "selected": <%= candidato.getCodNum() %> ,<%}%>
 		    "columns": [
+		    	{'data': 'prsnif', 'filter': true},
 		    	{'data': 'apellido1', 'filter': true, 'overflow': 'auto', 'render': function(row) {
 	        		return row.nombre + " " + row.apellido1 + " " + row.apellido2; 
 	        	}},
@@ -170,6 +176,12 @@ UsuarioBolsaEmpleo candidato = bean.getCandidato();
 			});
 		<% } %>
 		
+		$('#sin_titulacion').on('click', function() {
+			var params = {
+   				'<%=ControladorFiltrarTitulacion.PARAM_ACCION %>': '<%=ControladorFiltrarTitulacion.ACCION_CANDIDATOS_SIN_TITULACION%>'   				
+	    	};
+    		Atis.sendForm("<%=request.getRequestURI()%>", params);
+		});
 	}); 
 </script>
 	

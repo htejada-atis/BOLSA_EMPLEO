@@ -14,7 +14,7 @@ VistaValidarNoAfines bean = (VistaValidarNoAfines)uvdatos.getVistas().get(VistaV
 	<% 
 		String descripcion = "";
 		if(bean.getConvocatoria() != null) {
-			descripcion = "Última convocatoria: " + bean.getConvocatoria().getDescripcion();
+			descripcion = bean.getConvocatoria().getDescripcion();
 		} else {
 			descripcion = "No existen convocatorias en este momento";
 		}
@@ -48,14 +48,14 @@ VistaValidarNoAfines bean = (VistaValidarNoAfines)uvdatos.getVistas().get(VistaV
 $(document).ready(function() {
 	var table = new Atis.DataTable('#table', {
 	    "ajax": { url: "<%= ControladorValidarNoAfines.URL_PATTERN_AJAX %>" },
-	    "pageSize": 10,
+	    "pageSize": 100,
 	    "filterable": true,
 	    "action": "<%= ControladorValidarNoAfines.ACCION_DATATABLE_BOLSAS %>",
 	    "defaultOrderBy": 5,
 	    "defaultOrderDirection": 'desc',
 	    "clickable": {'onClick': function(row) {
 	    	var params = {
-    				'a': '<%= ControladorValidarNoAfines.ACCION_BOLSA_SELECCIONADA %>', 
+    				'<%= ControladorValidarNoAfines.PARAM_ACCION %>': '<%= ControladorValidarNoAfines.ACCION_BOLSA_SELECCIONADA %>', 
     				'<%= ControladorValidarNoAfines.PARAM_BOLSA %>': row.codNum};
     		Atis.sendForm("<%= request.getRequestURI() %>", params);
 	    }},
