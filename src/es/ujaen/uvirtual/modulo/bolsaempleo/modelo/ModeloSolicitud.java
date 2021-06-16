@@ -55,6 +55,10 @@ public class ModeloSolicitud {
 	public static final int ORDER_COLUMN_INDEX_MERITOS_VALOR = 4;
 	public static final int ORDER_COLUMN_INDEX_MERITOS_AFINIDAD = 5;
 	
+	public static final int ORDER_COLUMN_INDEX_ID_SOLICITUD_CANDIDATO = 0;
+	public static final int ORDER_COLUMN_INDEX_DESCRIPCION_CONVOCATORIA_CANDIDATO = 1;
+	public static final int ORDER_COLUMN_INDEX_ESTADO_SOLICITUD_CANDIDATO = 2;
+	
 	public static final String CODNUM = "CODNUM";
 	public static final String BEPBOL_CODNUM = "BEPBOL_CODNUM";
 	public static final String BEPMER_CODNUM = "BEPMER_CODNUM";
@@ -146,19 +150,25 @@ public class ModeloSolicitud {
 		BolsaEmpleoDataTable<Solicitud> dataTable = new BolsaEmpleoDataTable<>(params);
 		
 		String consulta =
-			"SELECT bepcon.CODNUM, bepsol.CODNUM SOLICITUD_CODNUM, bepsol.ESTADO ESTADO_SOLICITUD"
+			"SELECT bepcon.CODNUM, bepsol.CODNUM AS SOLICITUD_CODNUM, bepsol.ESTADO AS ESTADO_SOLICITUD, bepcon.DESCRIPCION, bepsol.FECHACONFIRMACION"
 			+ "	FROM TBEP_CONVOCATORIAS bepcon"
 			+ "	INNER JOIN TBEP_SOLICITUDES bepsol ON bepsol.BEPCON_CODNUM = bepcon.CODNUM"
 			+ " WHERE bepsol.BEPUSU_CODNUM = ?";
 		
+		dataTable.setColumn(ORDER_COLUMN_INDEX_ID_SOLICITUD_CANDIDATO, "bepsol.CODNUM");
+		dataTable.setColumn(ORDER_COLUMN_INDEX_DESCRIPCION_CONVOCATORIA_CANDIDATO, "bepcon.DESCRIPCION");
+		dataTable.setColumn(ORDER_COLUMN_INDEX_ESTADO_SOLICITUD_CANDIDATO, "bepsol.ESTADO");
 		dataTable.setQuery(consulta);
 		
 		try (Connection conexion = ConexionUvirtual.obtenerInstancia();
 				PreparedStatement stmtCount = conexion.prepareStatement(dataTable.getQueryCount());
 				PreparedStatement stmt = conexion.prepareStatement(dataTable.getQuery())
 		) {
-			stmt.setInt(1, candidato.getCodNum());
-			stmtCount.setInt(1, candidato.getCodNum());
+			int indexParam = 1;
+			stmt.setInt(indexParam, candidato.getCodNum());
+			stmtCount.setInt(indexParam++, candidato.getCodNum());
+			
+			dataTable.setFiltersParams(stmt, stmtCount, indexParam);
 			
 			try (ResultSet rs = stmt.executeQuery()) {
 				while (rs.next()) {
@@ -171,6 +181,7 @@ public class ModeloSolicitud {
 					solicitud.setCodNum(rs.getInt("SOLICITUD_CODNUM"));			
 					solicitud.setConvocatoria(convocatoria);			
 					solicitud.setEstado(rs.getString("ESTADO_SOLICITUD") != null ? rs.getString("ESTADO_SOLICITUD") : ModeloSolicitud.SOLICITUD_ESTADO_CERRADA);
+					solicitud.setFechaConfirmacion(rs.getDate("FECHACONFIRMACION"));
 					data.add(solicitud);
 				}
 			}

@@ -287,7 +287,6 @@ public class ControladorUsuarioCandidato extends HttpServlet {
 				break;
 			case ACCION_SELECCIONAR_CANDIDATO:
 				break;
-			
 			case ACCION_SOLICITUDES_CANDIDATO:
 				bean.setApartadoSolicitudes(true);
 				break;

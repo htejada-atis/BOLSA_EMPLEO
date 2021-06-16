@@ -1,6 +1,7 @@
 <%@ page trimDirectiveWhitespaces="true"%>
 <%@ page import="es.ujaen.uvirtual.beans.UVDatos"%>
 <%@ page import="es.ujaen.uvirtual.modulo.bolsaempleo.beans.Rol"%>
+<%@	page import="es.ujaen.uvirtual.modulo.bolsaempleo.modelo.ModeloRol"%>
 <%@	page import="es.ujaen.uvirtual.modulo.bolsaempleo.controlador.configuracion.ControladorUsuarioBolsaEmpleo"%>
 <%@	page import="es.ujaen.uvirtual.modulo.bolsaempleo.controlador.configuracion.ControladorAreasABaremar"%>
 <%@ page import="es.ujaen.uvirtual.modulo.bolsaempleo.vistas.VistaUsuarioBolsaEmpleo"%>
@@ -189,7 +190,7 @@ VistaUsuarioBolsaEmpleo bean = (VistaUsuarioBolsaEmpleo) uvdatos.getVistas().get
     						<label for="usuario_restaurar" style="margin-top: 5px; margin-left: 6px; float:right; width: unset !important;">Usuario Borrado</label>
     						<input id="usuario_restaurar" type="button" value="Restaurar" style="float:right;"/>
     				<%	} else { %>
-    						<input id="usuario_borrar" type="button" value="Borrar usuario" style="float:right;"/>
+    						<input id="usuario_borrar" type="button" value="Dar de baja usuario" style="float:right;"/>
     				<%	} %>
     					
     			<%	} %>
@@ -202,6 +203,32 @@ VistaUsuarioBolsaEmpleo bean = (VistaUsuarioBolsaEmpleo) uvdatos.getVistas().get
     	</div>
     	
     </form>
+    
+<%	if (bean.getUsuario() != null && bean.getUsuario().getRol().getCodNum().equals(ModeloRol.ID_ROL_MIEMBRO_COMISION)) { %>
+	    <ul class="nav-tabs-widget" style="margin-left: 0px; margin-top: 16px;">
+	    	<li <%= bean.getApartadoAreasEvaluables() != null ? "class='tab-selected'" : "" %>>
+	   	    	<a id="areas_evaluables">Áreas evaluables</a>
+	   	    </li>
+	   	</ul>
+	   	
+	<%	if (bean.getApartadoAreasEvaluables() != null) { %>
+			<table class="bluetable bolsaempleo" id="table_areas_evaluables">
+				<tr>
+					<th scope="col" style="width:20%" title="Id de la area">Id</th>
+					<th scope="col" style="width:25%" title="Código de area">Código</th>
+					<th scope="col" style="width:65%">Area</th>
+				</tr>
+				<tbody>		
+				</tbody>
+				<tfoot>
+					<tr>
+						<th colSpan="3"></th>
+					</tr>
+				</tfoot>
+			</table>
+	<%	} %>
+	   	
+<%	} %>
 
 </div>
 
@@ -284,16 +311,24 @@ VistaUsuarioBolsaEmpleo bean = (VistaUsuarioBolsaEmpleo) uvdatos.getVistas().get
 			document.getElementById("usuario_restaurar").addEventListener("click", function(event) {
 				event.preventDefault();
 				
-				Atis.sendForm("<%= request.getRequestURI() %>", {
-					'<%=ControladorUsuarioBolsaEmpleo.PARAM_ACCION%>': '<%=ControladorUsuarioBolsaEmpleo.ACCION_RECUPERAR_USUARIO%>',
-					'<%=ControladorUsuarioBolsaEmpleo.PARAM_USUARIO%>': '<%=bean.getUsuario().getCodNum()%>'
-				});
+				Atis.confirmDialog("Restaurar usuario", "¿Desea restaurar el usuario?", {
+			    	Si: function() {
+			    		Atis.sendForm("<%= request.getRequestURI() %>", {
+							'<%=ControladorUsuarioBolsaEmpleo.PARAM_ACCION%>': '<%=ControladorUsuarioBolsaEmpleo.ACCION_RECUPERAR_USUARIO%>',
+							'<%=ControladorUsuarioBolsaEmpleo.PARAM_USUARIO%>': '<%=bean.getUsuario().getCodNum()%>'
+						});
+			          	$(this).dialog("close");
+			        },
+			        No: function() {
+			          	$(this).dialog("close");
+			        }
+			    });
 			});
 	<%	} else if (bean.getUsuario() != null && !bean.getUsuario().getBorrado()) { %>
 			document.getElementById("usuario_borrar").addEventListener("click", function(event) {
 				event.preventDefault();
 				
-				Atis.confirmDialog("Eliminar usuario", "¿Desea borrar el usuario?", {
+				Atis.confirmDialog("Dar de baja usuario", "¿Desea dar de baja al usuario?", {
 			    	Si: function() {
 			    		Atis.sendForm("<%= request.getRequestURI() %>", {
 							'<%=ControladorUsuarioBolsaEmpleo.PARAM_ACCION%>': '<%=ControladorUsuarioBolsaEmpleo.ACCION_ELIMINAR_USUARIO%>',
@@ -306,6 +341,36 @@ VistaUsuarioBolsaEmpleo bean = (VistaUsuarioBolsaEmpleo) uvdatos.getVistas().get
 			        }
 			    });
 			});
+	<%	} %>
+	
+	<%	if (bean.getUsuario() != null && bean.getUsuario().getRol().getCodNum().equals(ModeloRol.ID_ROL_MIEMBRO_COMISION)) { %>
+	
+			document.getElementById("areas_evaluables").addEventListener("click", function(event) {
+				console.log("hola")
+				Atis.sendForm("<%= request.getRequestURI() %>", {
+					'<%=ControladorUsuarioBolsaEmpleo.PARAM_ACCION%>': '<%=ControladorUsuarioBolsaEmpleo.ACCION_AREAS_EVALUABLES%>',
+					'<%=ControladorUsuarioBolsaEmpleo.PARAM_USUARIO%>': <%= bean.getUsuario().getCodNum() %>
+				});
+			});
+			
+		<%	if (bean.getApartadoAreasEvaluables() != null) { %>
+				
+				var tableAreasEvaluables = new Atis.DataTable('#table_areas_evaluables', {
+				    "ajax": { url: "<%=ControladorUsuarioBolsaEmpleo.URL_PATTERN_AJAX%>", async: false},
+				    "params": {"<%=ControladorUsuarioBolsaEmpleo.PARAM_USUARIO%>": <%= bean.getUsuario().getCodNum() %>},
+				    "pageSize": 10,
+				    "filterable": true,
+				    "title": 'LISTADO DE ÁREAS EVALUABLES',
+				    "action": "<%= ControladorUsuarioBolsaEmpleo.ACCION_DATATABLE_AREAS_EVALUABLES_USUARIO %>",
+				    "columns": [
+				        {'data': 'area.codNum', 'filter': {'type': 'number'}},
+				        {'data': 'area.idAreaExterno' , 'filter': true, 'overflow': 'auto'},
+				        {'data': 'area.descripcion', 'filter': true, 'overflow': 'auto'}
+				    ],
+				});
+		
+		<%	} %>
+		
 	<%	} %>
 		
 		function getTodayDate() {

@@ -41,7 +41,8 @@ public class ModeloUsuarioBolsaEmpleo {
 	public static final int ORDER_COLUMN_INDEX_USUARIO_DOCUMENTO = 0;
 	public static final int ORDER_COLUMN_INDEX_USUARIO_CODCUENTA = 1;
 	public static final int ORDER_COLUMN_INDEX_USUARIO_ROL = 3;
-	public static final int ORDER_COLUMN_INDEX_USUARIO_ELIMINADO = 4;
+	public static final int ORDER_COLUMN_INDEX_USUARIO_EXCLUIDO = 4;
+	public static final int ORDER_COLUMN_INDEX_USUARIO_ELIMINADO = 5;
 	
 	// columnas datatable candidato
 	public static final int ORDER_COLUMN_INDEX_CANDIDATO_DOCUMENTO = 0;
@@ -213,11 +214,12 @@ public class ModeloUsuarioBolsaEmpleo {
 		List<UsuarioBolsaEmpleo> usuarios = new ArrayList<>();
 		BolsaEmpleoDataTable<UsuarioBolsaEmpleo> dataTable = new BolsaEmpleoDataTable<>(params);
 
-		String consulta = "SELECT * FROM TBEP_USUARIOS bepusu WHERE 1=1";
+		String consulta = "SELECT * FROM TBEP_USUARIOS bepusu WHERE bepusu.ROL != " + ModeloRol.ID_ROL_CANDIDATO + " ";
 		
 		dataTable.setColumn(ModeloUsuarioBolsaEmpleo.ORDER_COLUMN_INDEX_USUARIO_DOCUMENTO, "bepusu.VUAJA_PRSNIF");
 		dataTable.setColumn(ModeloUsuarioBolsaEmpleo.ORDER_COLUMN_INDEX_USUARIO_CODCUENTA, "bepusu.CODCUENTA");
 		dataTable.setColumn(ModeloUsuarioBolsaEmpleo.ORDER_COLUMN_INDEX_USUARIO_ROL, "bepusu.ROL");
+		dataTable.setColumn(ModeloUsuarioBolsaEmpleo.ORDER_COLUMN_INDEX_USUARIO_EXCLUIDO, "bepusu.FLGEXCLUIDO", DataTableColumn.COLUMN_TYPE_BOOLEAN);
 		dataTable.setColumn(ModeloUsuarioBolsaEmpleo.ORDER_COLUMN_INDEX_USUARIO_ELIMINADO, "bepusu.FLGBORRADO", DataTableColumn.COLUMN_TYPE_BOOLEAN);
 		dataTable.setQuery(consulta);
 		

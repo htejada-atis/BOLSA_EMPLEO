@@ -36,6 +36,10 @@ public class ModeloArea {
 	
 	public static final int ORDER_COLUMN_INDEX_CODIGO_CANDIDATO = 0;
 	public static final int ORDER_COLUMN_INDEX_AREA_CANDIDATO = 1;
+	
+	public static final int ORDER_COLUMN_INDEX_ID_AREA_EVALUADOR = 0;
+	public static final int ORDER_COLUMN_INDEX_CODIGO_EVALUADOR = 1;
+	public static final int ORDER_COLUMN_INDEX_DESCRIPCION_EVALUADOR = 2;
 		
 	public static final String CODNUM = "CODNUM";
 	public static final String BEPARE_CODNUM = "BEPARE_CODNUM";
@@ -207,6 +211,60 @@ public class ModeloArea {
 					bolsa.setArea(modeloArea.getAreaById(rs.getInt(BEPARE_CODNUM)));
 					bolsa.setEstado(rs.getString(ESTADO));
 					bolsa.setBaremable("S".equals(rs.getString("FLGBAREMABLE")));		
+					bolsa.setFechaActualizacion(rs.getTimestamp("FECHAACTUALIZACION"));
+					bolsa.setFechaBloqueo(rs.getTimestamp("FECHABLOQUEO"));
+					bolsa.setFechaDesBloqueo(rs.getTimestamp("FECHADEBLOQUEO"));
+					
+					bolsas.add(bolsa);					
+				}				
+			}	
+			
+			dataTable.setRecordsTotalFromQuery(stmtCount);
+			dataTable.setData(bolsas);
+		}
+		
+		return dataTable;
+	}
+	
+	/** Listado de areas .
+	 * @param params para leer los parametros de paginación, ordenacion, etc .
+	 * @param evaluador .
+	 * @return listado de areas .
+	 * @throws SQLException en caso de error de base de datos .
+	 * @throws UVException error si no existe la area .
+	 */
+	public BolsaEmpleoDataTable<Bolsa> listaAreasEvaluadorDatatable(Map<String, String[]> params, UsuarioBolsaEmpleo evaluador) throws SQLException, UVException {
+		List<Bolsa> bolsas = new ArrayList<>();
+		ModeloArea modeloArea = ModeloArea.obtenerInstancia();	
+		BolsaEmpleoDataTable<Bolsa> dataTable = new BolsaEmpleoDataTable<>(params);
+		
+		String consulta = "SELECT bepbol.*, bepare.*"
+				+ "	FROM TBEP_BOLSAS bepbol"
+				+ "	INNER JOIN TBEP_AREAS bepare ON bepare.CODNUM = bepbol.BEPARE_CODNUM"
+				+ "	INNER JOIN TBEP_EVALUADORES bepeva ON bepare.CODNUM = bepeva.BEPARE_CODNUM"
+				+ "	WHERE bepeva.BEPUSU_CODNUM = ?";
+				
+		dataTable.setColumn(ORDER_COLUMN_INDEX_ID_AREA_EVALUADOR, "bepbol.CODNUM");
+		dataTable.setColumn(ORDER_COLUMN_INDEX_CODIGO_EVALUADOR, "bepare.ID_AREA_CONOCIMIENTO");
+		dataTable.setColumn(ORDER_COLUMN_INDEX_DESCRIPCION_EVALUADOR, "bepare.DES_AREA_CONOCIMIENTO");
+		dataTable.setQuery(consulta);
+				
+		try (Connection conexion = ConexionUvirtual.obtenerInstancia();
+				PreparedStatement stmtCount = conexion.prepareStatement(dataTable.getQueryCount());
+				PreparedStatement stmt = conexion.prepareStatement(dataTable.getQuery())
+		) {
+			int indexParam = 1;
+			stmt.setInt(indexParam, evaluador.getCodNum());
+			stmtCount.setInt(indexParam++, evaluador.getCodNum());
+			
+			dataTable.setFiltersParams(stmt, stmtCount, indexParam);
+			try (ResultSet rs = stmt.executeQuery()) {
+				while (rs.next()) {
+					Bolsa bolsa = new Bolsa();
+					bolsa.setCodNum(rs.getInt(CODNUM));
+					bolsa.setArea(modeloArea.getAreaById(rs.getInt(BEPARE_CODNUM)));
+					bolsa.setEstado(rs.getString(ESTADO));
+					bolsa.setBaremable("S".equals(rs.getString("FLGBAREMABLE")));			
 					bolsa.setFechaActualizacion(rs.getTimestamp("FECHAACTUALIZACION"));
 					bolsa.setFechaBloqueo(rs.getTimestamp("FECHABLOQUEO"));
 					bolsa.setFechaDesBloqueo(rs.getTimestamp("FECHADEBLOQUEO"));

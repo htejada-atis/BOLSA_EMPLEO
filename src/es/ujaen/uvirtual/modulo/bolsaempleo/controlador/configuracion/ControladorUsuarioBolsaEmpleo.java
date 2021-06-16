@@ -16,8 +16,10 @@ import es.ujaen.uvirtual.beans.CodigoDescripcion;
 import es.ujaen.uvirtual.beans.UVDatos;
 import es.ujaen.uvirtual.beans.Usuario;
 import es.ujaen.uvirtual.adm.CrearUsuario;
+import es.ujaen.uvirtual.modulo.bolsaempleo.beans.Bolsa;
 import es.ujaen.uvirtual.modulo.bolsaempleo.beans.Rol;
 import es.ujaen.uvirtual.modulo.bolsaempleo.beans.UsuarioBolsaEmpleo;
+import es.ujaen.uvirtual.modulo.bolsaempleo.modelo.ModeloArea;
 import es.ujaen.uvirtual.modulo.bolsaempleo.modelo.ModeloRol;
 import es.ujaen.uvirtual.modulo.bolsaempleo.modelo.ModeloUsuarioBolsaEmpleo;
 import es.ujaen.uvirtual.modulo.bolsaempleo.utilidades.BolsaEmpleoDataTable;
@@ -47,7 +49,6 @@ public class ControladorUsuarioBolsaEmpleo extends HttpServlet {
 	
 	// parámetros
 	public static final String PARAM_ACCION = "a";
-	public static final String PARAM_ACCION_USUARIO = "aa";
 	public static final String PARAM_AGREGAR = "agregar";
 	public static final String PARAM_EXCLUIDO = "excluido";
 	public static final String PARAM_EXCLUIDO_TIPO = "excluidotipo";
@@ -63,8 +64,10 @@ public class ControladorUsuarioBolsaEmpleo extends HttpServlet {
 	public static final String PARAM_USUARIO = "usuario";
 	
 	// acciones
+	public static final String ACCION_AREAS_EVALUABLES = "areasevaluables";
 	public static final String ACCION_AGREGAR_USUARIO = "agregarusuario";
 	public static final String ACCION_BUSCAR_USUARIO = "buscarusuario";
+	public static final String ACCION_DATATABLE_AREAS_EVALUABLES_USUARIO = "datatableareasevaluablesuruario";
 	public static final String ACCION_DATATABLE_USUARIOS = "datatableusuarios";
 	public static final String ACCION_EDITAR_USUARIO = "editarusuario";
 	public static final String ACCION_ELIMINAR_USUARIO = "eliminarusuario";
@@ -76,17 +79,18 @@ public class ControladorUsuarioBolsaEmpleo extends HttpServlet {
 	
 	// mensajes
 	public static final String MENSAJE_ERROR_ACCION_NO_CONTEMPLADA = "Acción no contemplada";
-	public static final String MENSAJE_ERROR_USUARIO_NO_EXISTE = "No existe el usuario";
-	public static final String MENSAJE_ERROR_RAZON_EXCLUSION_VACIO = "Si excluye al usuario, debe especificar una razón";
-	public static final String MENSAJE_ERROR_RAZON_EXCLUSION_LARGO = "La razón de exclusión no puede contener mas de %d caracteres";
 	public static final String MENSAJE_ERROR_EXCLUSION_USUARIO_LOGUEADO =
 			"No puede auto excluirse, si desea que su perfil se excluya del sistema contacte con un administrador";
+	public static final String MENSAJE_ERROR_ELIMINAR_USUARIO_LOGUEADO =
+			"No puede auto eliminarse, si desea que su perfil sea dado de baja del sistema contacte con un administrador";
+	public static final String MENSAJE_ERROR_RAZON_EXCLUSION_VACIO = "Si excluye al usuario, debe especificar una razón";
+	public static final String MENSAJE_ERROR_RAZON_EXCLUSION_LARGO = "La razón de exclusión no puede contener mas de %d caracteres";
+	public static final String MENSAJE_ERROR_USUARIO_NO_EXISTE = "No existe el usuario";
 	
 	public static final String MENSAJE_EXITO_AGREGAR = "Usuario creado correctamente";
 	public static final String MENSAJE_EXITO_EDITAR = "usuario editado correctamente";
 	public static final String MENSAJE_EXITO_ELIMINAR = "Usuario eliminado correctamente";
 	public static final String MENSAJE_EXITO_RESTAURAR = "Usuario restaurado correctamente";
-	public static final String MENSAJE_EXITO_USUARIO_MODIFICADO_CORRECTAMENTE = "Usuario/s modificado/s correctamente"; 
 	
 	
 	// ajax	
@@ -128,11 +132,13 @@ public class ControladorUsuarioBolsaEmpleo extends HttpServlet {
 				case ACCION_DATATABLE_USUARIOS:
 					listadoUsuarios(bean, datos, request, response);
 					break;
+				case ACCION_AREAS_EVALUABLES:
+				case ACCION_DATATABLE_AREAS_EVALUABLES_USUARIO:
 				case ACCION_EDITAR_USUARIO:
 				case ACCION_ELIMINAR_USUARIO:
 				case ACCION_RECUPERAR_USUARIO:
 				case ACCION_SELECCIONAR_USUARIO:
-					accionesUsuarioBolsaEmpleo(bean, request, response, nombreAccion);
+					accionesUsuarioBolsaEmpleo(bean, datos, request, response, nombreAccion);
 					break;
 				case ACCION_INDEX:
 					bean.setVista(JSP_USUARIOS);
@@ -263,7 +269,7 @@ public class ControladorUsuarioBolsaEmpleo extends HttpServlet {
 	// USUARIOS BOLSA EMPLEO
 	///////////////////////////////////////////////////////////////////////////////////////////////////////////
 	
-	private void accionesUsuarioBolsaEmpleo(VistaUsuarioBolsaEmpleo bean, HttpServletRequest request, HttpServletResponse response, String nombreAccion)
+	private void accionesUsuarioBolsaEmpleo(VistaUsuarioBolsaEmpleo bean, UVDatos datos, HttpServletRequest request, HttpServletResponse response, String nombreAccion)
 			throws SQLException, UVException, IOException {
 		bean.setVista(JSP_FORM_USUARIO);
 		
@@ -278,6 +284,12 @@ public class ControladorUsuarioBolsaEmpleo extends HttpServlet {
 		bean.setRol(usuario.getRol());
 		
 		switch (nombreAccion) {
+			case ACCION_AREAS_EVALUABLES:
+				bean.setApartadoAreasEvaluables(true);
+				break;
+			case ACCION_DATATABLE_AREAS_EVALUABLES_USUARIO:
+				listadoAreasEvaluables(bean, datos, request, response);
+				break;
 			case ACCION_EDITAR_USUARIO:
 				editarUsuario(bean, request, response);
 				break;
@@ -296,6 +308,10 @@ public class ControladorUsuarioBolsaEmpleo extends HttpServlet {
 	
 	private void eliminarUsuario(VistaUsuarioBolsaEmpleo bean, HttpServletRequest request, HttpServletResponse response)
 			throws SQLException, UVException, IOException {
+		if (bean.getUsuarioArcos().getDocumentoNumero().equals(bean.getUsuarioLogeado().getPrsNif())) {
+			throw new UVException(MENSAJE_ERROR_ELIMINAR_USUARIO_LOGUEADO);
+		}
+		
 		ModeloUsuarioBolsaEmpleo.obtenerInstancia().ponerUsuarioComoBorrado(bean.getUsuario(), bean.getUsuarioLogeado());
 		BolsaEmpleoUtils.addMensajeDeExito(MENSAJE_EXITO_ELIMINAR, bean, request);
 		response.sendRedirect(request.getServletPath());
@@ -320,7 +336,7 @@ public class ControladorUsuarioBolsaEmpleo extends HttpServlet {
 			throws SQLException, UVException, IOException {
 		ModeloUsuarioBolsaEmpleo modelo = ModeloUsuarioBolsaEmpleo.obtenerInstancia();
 		
-		if (EscapaHTML.ajustaCodificacion(request.getParameter(PARAM_ROLE)) != null) {
+		if (EscapaHTML.ajustaCodificacion(request.getParameter(PARAM_GUARDAR)) != null) {
 			UsuarioBolsaEmpleo usuarioForm = this.getValidatorUsuario(bean, request);
 			usuarioForm.setCodCuenta(bean.getUsuario().getCodCuenta());
 			usuarioForm.setCodNum(bean.getUsuario().getCodNum());
@@ -329,6 +345,43 @@ public class ControladorUsuarioBolsaEmpleo extends HttpServlet {
 			modelo.actualizaUsuario(usuarioForm, bean.getUsuarioLogeado());
 			BolsaEmpleoUtils.addMensajeDeExito(MENSAJE_EXITO_EDITAR, bean, request);
 			response.sendRedirect(request.getServletPath());
+		}
+	}
+	
+	/**
+	 * AJAX para devolver datatable áreas de un evaluador .
+	 * @param bean .
+	 * @param datos .
+	 * @param request .
+	 * @param response .
+	 * @throws IOException .
+	 * @throws SQLException .
+	 */
+	private void listadoAreasEvaluables(VistaUsuarioBolsaEmpleo bean, UVDatos datos, HttpServletRequest request, HttpServletResponse response) throws IOException {
+		datos.setContentType(RESPONSE_AJAX_CONTENTTYPE);
+		datos.setRespuestaEnviada(true);
+		response.setContentType(RESPONSE_AJAX_CONTENTTYPE);
+		response.setCharacterEncoding(RESPONSE_AJAX_ENCODING);
+		
+		try (PrintWriter writer = response.getWriter()) {
+			try {
+				BolsaEmpleoDataTable<Bolsa> dataTable = ModeloArea.obtenerInstancia().listaAreasEvaluadorDatatable(request.getParameterMap(), bean.getUsuario());
+				bean.setDatatableAreasEvaluables(dataTable);
+				writer.write(dataTable.toJson());
+			} catch (UVException e) {
+				LOGGER.log(Level.WARNING, e.toString());
+				bean.getMensajesDeError().add(e.getMessage());
+				CodigoDescripcion mensaje = new CodigoDescripcion(RESPONSE_AJAX_ERROR, e.getMessage());
+				writer.write(new Gson().toJson(mensaje));
+				response.setStatus(RESPONSE_AJAX_HTTP_CODE_ERROR);
+			} catch (SQLException e) { 
+				LOGGER.log(Level.SEVERE, Formateador.getStackTrace(e));
+				LOGGER.log(Level.SEVERE, e.toString());
+				bean.getMensajesDeError().add(e.getMessage());
+				CodigoDescripcion mensaje = new CodigoDescripcion(RESPONSE_AJAX_ERROR, e.getMessage());
+				writer.write(new Gson().toJson(mensaje));
+				response.setStatus(RESPONSE_AJAX_HTTP_CODE_ERROR);
+			}
 		}
 	}
 	
@@ -351,7 +404,7 @@ public class ControladorUsuarioBolsaEmpleo extends HttpServlet {
 		try (PrintWriter writer = response.getWriter()) {
 			try {
 				BolsaEmpleoDataTable<UsuarioBolsaEmpleo> dataTable = modelo.listaUsuarioBolsaEmpleoDatatable(request.getParameterMap());
-				bean.setDatatable(dataTable);
+				bean.setDatatableUsuarios(dataTable);
 				writer.write(dataTable.toJson());
 			} catch (UVException e) {
 				LOGGER.log(Level.WARNING, e.toString());
@@ -383,7 +436,8 @@ public class ControladorUsuarioBolsaEmpleo extends HttpServlet {
 	private UsuarioBolsaEmpleo getValidatorUsuario(VistaUsuarioBolsaEmpleo bean, HttpServletRequest request) throws UVException, SQLException {
 		UsuarioBolsaEmpleo u = new UsuarioBolsaEmpleo();
 	
-		String excluido = request.getParameter(PARAM_EXCLUIDO);
+		String excluido = EscapaHTML.ajustaCodificacion(request.getParameter(PARAM_EXCLUIDO));
+		u.setExcluido("true".equals(excluido));
 		if (excluido != null) {
 			Usuario usuArcos = CrearUsuario.usuario(request.getParameter(PARAM_NOMBRE_USUARIO));
 			if (usuArcos.getDocumentoNumero().equals(bean.getUsuarioLogeado().getPrsNif())) {
@@ -412,44 +466,6 @@ public class ControladorUsuarioBolsaEmpleo extends HttpServlet {
 		u.setRol(rol);
 		
 		u.setListaDist("true".equals(EscapaHTML.ajustaCodificacion(request.getParameter(PARAM_LISTA))));
-		u.setExcluido("true".equals(EscapaHTML.ajustaCodificacion(request.getParameter(PARAM_EXCLUIDO))));
-		
-		return u;
-	}
-	
-	private UsuarioBolsaEmpleo validateExclusion(HttpServletRequest request) throws UVException {
-		UsuarioBolsaEmpleo u = new UsuarioBolsaEmpleo();
-				
-		if (request.getParameter(PARAM_RAZON_EXCLUIDO) != null) {
-			u.setRazonExcluido(EscapaHTML.ajustaCodificacion(request.getParameter(PARAM_RAZON_EXCLUIDO)));
-			if (u.getRazonExcluido() == null || u.getRazonExcluido().isBlank()) {
-				throw new UVException(MENSAJE_ERROR_RAZON_EXCLUSION_VACIO);
-			}
-			if (u.getRazonExcluido().length() > ModeloUsuarioBolsaEmpleo.COLUMN_RAZON_EXCLUSION_MAXLENGTH) {
-				throw new UVException(String.format(MENSAJE_ERROR_RAZON_EXCLUSION_LARGO, ModeloUsuarioBolsaEmpleo.COLUMN_RAZON_EXCLUSION_MAXLENGTH));
-			}
-			
-			u.setFechaExclusion(Formateador.leeParametroFecha(request.getParameter(PARAM_FECHA_EXCLUIDO), Formateador.FORMATO_FECHA_DDMMYYYY, "/"));
-			if (u.getFechaExclusion() == null) {
-				u.setFechaExclusion(BolsaEmpleoUtils.getCurrentDateTime());
-			}
-			
-			u.setExcluidoTipo(EscapaHTML.ajustaCodificacion(request.getParameter(PARAM_EXCLUIDO_TIPO)));
-			if ("T".equals(u.getExcluidoTipo())) {				
-				u.setFechaExclusionInicio(Formateador.leeParametroFecha(request.getParameter(PARAM_FECHA_EXCLUIDO_INICIO), 
-						Formateador.FORMATO_FECHA_DDMMYYYY, "/"));
-				u.setFechaExclusionFin(Formateador.leeParametroFecha(request.getParameter(PARAM_FECHA_EXCLUIDO_FIN), 
-						Formateador.FORMATO_FECHA_DDMMYYYY, "/"));
-				
-				if (u.getFechaExclusionInicio() == null) {
-					throw new UVException("Fecha de inicio de exclusión requerida");
-				}
-				
-				if (u.getFechaExclusionFin() == null) {
-					throw new UVException("Fecha de fin de exclusión requerida");
-				}
-			}
-		}
 		
 		return u;
 	}

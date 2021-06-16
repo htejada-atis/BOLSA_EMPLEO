@@ -149,7 +149,7 @@ UsuarioBolsaEmpleo candidato = bean.getCandidato();
     				<label for="usuario_restaurar" style="margin-top: 5px; margin-left: 6px; float:right; width: unset !important;">Usuario Borrado</label>
     				<input id="usuario_restaurar" type="button" value="Restaurar" style="float:right;"/>
     		<%	} else { %>
-    				<input id="usuario_borrar" type="button" value="Borrar usuario" style="float:right;"/>
+    				<input id="usuario_borrar" type="button" value="Dar de baja candidato" style="float:right;"/>
     		<%	} %>
     		</div>
     	</div>
@@ -350,10 +350,11 @@ UsuarioBolsaEmpleo candidato = bean.getCandidato();
 		});
 		
 	<%	if (bean.getApartadoSolicitudes() != null) { %>
-			var table = new Atis.DataTable('#table_solicitudes', {
+			var tableSolicitudes = new Atis.DataTable('#table_solicitudes', {
 			    "ajax": { url: "<%=ControladorUsuarioCandidato.URL_PATTERN_AJAX%>" },
 			    "params": {"<%=ControladorUsuarioCandidato.PARAM_CANDIDATO%>": <%= candidato.getCodNum() %>},
 			    "pageSize": 10,
+			    "filterable": true,
 			    "title": "SOLICITUDES",
 			    "clickable": {'onClick': function(row) {
 			    	var params = {
@@ -364,11 +365,12 @@ UsuarioBolsaEmpleo candidato = bean.getCandidato();
 			    }},
 			    "action": "<%= ControladorUsuarioCandidato.ACCION_DATATABLE_SOLICITUDES %>",
 			    "columns": [
-			    	{'data': 'codNum'},
-			    	{'data': 'convocatoria.descripcion', order: {'active': false}},
-			        {'data': 'estado', order: {'active': false}},
+			    	{'data': 'codNum', 'filter': {'type': 'number'}},
+			    	{'data': 'convocatoria.descripcion', 'filter': true},
+			        {'data': 'estado', 'filter': true},
 			        {'data': 'fechaConfirmacion', order: {'active': false}, 'render': function(row) {
-			        	return row.estado == 'CERRADA' ? '' : row.fechaConfirmacion;
+			        	console.log(row.estado);
+			        	return row.estado == 'CERRADA' ? row.fechaConfirmacion : '';
 			        }}
 			    ]
 			});
@@ -394,7 +396,7 @@ UsuarioBolsaEmpleo candidato = bean.getCandidato();
 		        	{'data': 'validada', 'order': {'active': false}, 'filter': {'type': 'select', 'options':{'true': 'Validada', 'false': 'No validada'}}, 'render': function(row) {
 		        		return row.validada ? "<div title='Validada' class='circle-true'></div>" : "";
 		        	}},
-		        	{'data': 'codnum', 'buttons': [
+		        	{'data': 'codNum', 'buttons': [
 		        		{'title': 'Descargar titulación', 'class': 'only-icon icon-download', 'onClick': function(row) {
 		        			window.open("<%= ControladorDescargaFicheros.URL_DESCARGA_FICHEROS %>"
 		        		        	+ "<%= "?a=" + ControladorDescargaFicheros.ACCION_DESCARGAR_TITULACION_PERSONAL + "&" + ControladorDescargaFicheros.PARAM_TITULACION %>=" + row.codNum);
@@ -438,7 +440,7 @@ UsuarioBolsaEmpleo candidato = bean.getCandidato();
 	<%	} %>
 	
 	<%	if (bean.getApartadoAreasExcluidas() != null) { %>
-			var table = new Atis.DataTable('#table_areas_excluidas', {
+			var tableAreasExcluidas = new Atis.DataTable('#table_areas_excluidas', {
 			    "ajax": { url: "<%=ControladorUsuarioCandidato.URL_PATTERN_AJAX%>", async: false},
 			    "params": {"<%=ControladorUsuarioCandidato.PARAM_CANDIDATO%>": <%= candidato.getCodNum() %>},
 			    "selectable": true,
@@ -457,7 +459,7 @@ UsuarioBolsaEmpleo candidato = bean.getCandidato();
 			    ]
 			});
 		
-			var table = new Atis.DataTable('#table_areas', {
+			var tableAreas = new Atis.DataTable('#table_areas', {
 			    "ajax": { url: "<%=ControladorUsuarioCandidato.URL_PATTERN_AJAX%>", async: false},
 			    "params": {"<%=ControladorUsuarioCandidato.PARAM_CANDIDATO%>": <%= candidato.getCodNum() %>},
 			    "selectable": true,
@@ -515,16 +517,24 @@ UsuarioBolsaEmpleo candidato = bean.getCandidato();
 			document.getElementById("usuario_restaurar").addEventListener("click", function(event) {
 				event.preventDefault();
 				
-				Atis.sendForm("<%= request.getRequestURI() %>", {
-					'<%=ControladorUsuarioCandidato.PARAM_ACCION%>': '<%=ControladorUsuarioCandidato.ACCION_RECUPERAR_CANDIDATO%>',
-					'<%=ControladorUsuarioCandidato.PARAM_CANDIDATO%>': '<%=candidato.getCodNum()%>'
-				});
+				Atis.confirmDialog("Restaurar usuario", "¿Desea restaurar el usuario?", {
+			    	Si: function() {
+			    		Atis.sendForm("<%= request.getRequestURI() %>", {
+							'<%=ControladorUsuarioCandidato.PARAM_ACCION%>': '<%=ControladorUsuarioCandidato.ACCION_RECUPERAR_CANDIDATO%>',
+							'<%=ControladorUsuarioCandidato.PARAM_CANDIDATO%>': '<%=candidato.getCodNum()%>'
+						});
+			          	$(this).dialog("close");
+			        },
+			        No: function() {
+			          	$(this).dialog("close");
+			        }
+			    });
 			});
 	<%	} else { %>
 			document.getElementById("usuario_borrar").addEventListener("click", function(event) {
 				event.preventDefault();
 				
-				Atis.confirmDialog("Eliminar candidato", "¿Desea borrar el candidato?", {
+				Atis.confirmDialog("Dar de baja candidato", "¿Desea dar de baja al candidato?", {
 			    	Si: function() {
 			    		Atis.sendForm("<%= request.getRequestURI() %>", {
 							'<%=ControladorUsuarioCandidato.PARAM_ACCION%>': '<%=ControladorUsuarioCandidato.ACCION_ELIMINAR_CANDIDATO%>',
