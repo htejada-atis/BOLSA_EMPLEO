@@ -3,6 +3,7 @@
 <%@ page trimDirectiveWhitespaces="true" %>
 <%@ page import="es.ujaen.uvirtual.modulo.bolsaempleo.beans.Mensaje" %>
 <%@ page import="es.ujaen.uvirtual.beans.UVDatos" %>
+<%@	page import="es.ujaen.uvirtual.modulo.bolsaempleo.modelo.ModeloMensajes"%>
 <%@	page import="es.ujaen.uvirtual.modulo.bolsaempleo.controlador.configuracion.ControladorMensajes"%>
 <%@ page import="es.ujaen.uvirtual.modulo.bolsaempleo.vistas.VistaMensajes" %>
 <%@ page import="es.ujaen.uvirtual.modulo.bolsaempleo.beans.Convocatoria" %>
@@ -40,14 +41,24 @@ Mensaje mensaje = bean.getMensaje();
     	
     	<div class="form-group-container col1">
 	    	<div class="form-group">
-	    		<label for="cuerpo">Cuerpo del mensaje:</label>
-	    		<textarea class="form-input-custom" id="cuerpo" name="<%= ControladorMensajes.PARAM_CUERPO %>" rows="5" cols="50"><%= BolsaEmpleoUtils.getParamForm(request, ControladorMensajes.PARAM_CUERPO, "") %></textarea>
+	    		<label for="cuerpo" class="bold-label">Cuerpo del mensaje:</label>
+	    		<textarea class="form-input-custom" id="cuerpo" 
+	    				name="<%= ControladorMensajes.PARAM_CUERPO %>" rows="5" cols="50" 
+	    				required><%= BolsaEmpleoUtils.getParamForm(request, ControladorMensajes.PARAM_CUERPO, "") %></textarea>
 	    	</div>
     	</div>
     	
-    	<div class="form-btn">
-    		<input id="mensaje_enviar" type="submit" value="Enviar" />
-    	</div>    
+    	<div class="form-group-container col2">
+    		<div class="form-group">
+    			<input id="mensaje_guardar" type="button" name="" value="Guardar" style="float:left;" />
+    		<%	if (bean.getMensaje().getEstado().equals(ModeloMensajes.ESTADO_BORRADOR)) { %>
+    			<input id="mensaje_borrar" type="button" name="" value="Borrar" style="float:left; margin-left: 10px;" />
+    		<%	} %>
+    		</div>
+    		<div class="form-group">
+    			<input id="mensaje_enviar" type="submit" name="" value="Enviar" style="float:right;"/>
+    		</div>
+    	</div>
     </form>
     
     <table class="bluetable bolsaempleo" id="tableDestinatarios">
@@ -184,6 +195,23 @@ $(document).ready(function() {
 	
 	$('#filtro_convocatoria').on('change', onFilterConvocatoria);
 	$('#filtro_area').on('change', onFilterArear);
+	
+	<%	if (bean.getMensaje().getEstado().equals(ModeloMensajes.ESTADO_BORRADOR)) { %>
+			document.getElementById("mensaje_borrar").addEventListener("click", function() {
+				Atis.confirmDialog("Eliminar mensaje", "¿Desea borrar el mensaje?", {
+		        	Si: function() {
+		        		Atis.sendForm("<%= request.getRequestURI() %>", {
+		    				'<%=ControladorMensajes.PARAM_ACCION%>': '<%=ControladorMensajes.ACCION_BORRAR_MENSAJE%>',
+		    				'<%=ControladorMensajes.PARAM_MENSAJE_ID%>': <%= bean.getMensaje().getCodNum() %>
+		    			});
+		          		$(this).dialog("close");
+		        	},
+		        	No: function() {
+		          		$(this).dialog("close");
+		        	}
+		      	});
+			});
+	<%	} %>
 	
 });
 </script>

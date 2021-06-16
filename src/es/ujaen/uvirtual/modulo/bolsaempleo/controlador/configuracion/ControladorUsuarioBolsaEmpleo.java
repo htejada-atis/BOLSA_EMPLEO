@@ -101,10 +101,9 @@ public class ControladorUsuarioBolsaEmpleo extends HttpServlet {
 	public static final int RESPONSE_AJAX_HTTP_CODE_ERROR = 400;
 
 	// ruta vistas
-	public static final String RUTA_BEP_CONF = "/WEB-INF/jsp/vista/infadministrativa/bolsaempleo/configuracion/usuarios/";
-	public static final String JSP_USUARIOS = RUTA_BEP_CONF + "usuarios.jsp";
-	public static final String JSP_BUSCAR_USUARIO = RUTA_BEP_CONF + "buscarUsuario.jsp";
-	public static final String JSP_FORM_USUARIO = RUTA_BEP_CONF + "formUsuario.jsp";
+	public static final String RUTA_BEP_CONF_USU = "/WEB-INF/jsp/vista/infadministrativa/bolsaempleo/configuracion/usuarios/";
+	public static final String JSP_USUARIOS = RUTA_BEP_CONF_USU + "usuarios.jsp";
+	public static final String JSP_FORM_USUARIO = RUTA_BEP_CONF_USU + "formUsuario.jsp";
 		
 	/** Peticion GET.
 	 * @see HttpServlet#doGet(HttpServletRequest request, HttpServletResponse response)

@@ -3,6 +3,8 @@ package es.ujaen.uvirtual.modulo.bolsaempleo.controlador.configuracion;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.sql.SQLException;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.servlet.ServletException;
@@ -63,6 +65,7 @@ public class ControladorMensajes extends HttpServlet {
 		
 	// mensajes
 	public static final String MENSAJE_ENVIADO = "mensaje";
+	public static final String MENSAJE_ERROR_ACCION_NO_CONTEMPLADA = "Acción no contemplada";
 
 	// ruta vistas
 	public static final String RUTA_BEP_MEN = "/WEB-INF/jsp/vista/infadministrativa/bolsaempleo/configuracion/mensajeria/";
@@ -91,7 +94,7 @@ public class ControladorMensajes extends HttpServlet {
 		Usuario usuario = datos.getUsuario();
 		LOGGER.log(Level.FINEST, "usuario que ha entrado en el servlet es {0}", usuario.getUid());
 
-		String nombreAccion = EscapaHTML.ajustaCodificacion(request.getParameter(PARAM_ACCION));
+		String nombreAccion = EscapaHTML.ajustaCodificacion(BolsaEmpleoUtils.getParamRequestOrSession(request, PARAM_ACCION));
 		if (nombreAccion == null) {
 			nombreAccion = ACCION_INDEX;
 		}
@@ -99,6 +102,12 @@ public class ControladorMensajes extends HttpServlet {
 		try {
 			init(bean, datos, request, response);
 			switch (nombreAccion) {
+				case ACCION_BORRAR_MENSAJE:
+				case ACCION_DATATABLE_DESTINATARIOS:
+				case ACCION_DATATABLE_DESTINATARIOS_DISPONIBLES:
+				case ACCION_DETALLE_MENSAJE:
+					accionesMensaje(bean, datos, request, response, nombreAccion);
+					break;
 				case ACCION_INDEX:
 					index(bean);
 					break;
@@ -108,20 +117,8 @@ public class ControladorMensajes extends HttpServlet {
 				case ACCION_NUEVO_MENSAJE:
 					nuevoMensaje(bean, request, response);
 					break;
-				case ACCION_BORRAR_MENSAJE:
-					borrarMensaje(bean, request, response);
-					break;
-				case ACCION_DETALLE_MENSAJE:
-					detalleMensaje(bean, request, response);
-					break;
-				case ACCION_DATATABLE_DESTINATARIOS:
-					listadoDestinatarios(bean, datos, request, response);
-					break;
-				case ACCION_DATATABLE_DESTINATARIOS_DISPONIBLES:
-					listadoDestinatariosDisponibles(bean, datos, request, response);
-					break;
 				default:
-					errorFatal(bean, "Acción no contemplada");
+					errorFatal(bean, MENSAJE_ERROR_ACCION_NO_CONTEMPLADA);
 			}
 		} catch (UVException e) {
 			LOGGER.log(Level.WARNING, e.toString());
@@ -160,7 +157,7 @@ public class ControladorMensajes extends HttpServlet {
 			
 			BolsaEmpleoUtils.addMensajeDeError(e.getMessage(), bean, request);
 			response.sendRedirect("/srv/es/informacionadministrativa/bolsaempleo/error");
-		}		
+		}
 	}
 
 	private void errorFatal(VistaMensajes bean, String mensaje) {
@@ -181,6 +178,29 @@ public class ControladorMensajes extends HttpServlet {
 
 	private void index(VistaMensajes bean) {
 		bean.setVista(JSP_INDEX);
+	}
+	
+	private void accionesMensaje(VistaMensajes bean, UVDatos datos, HttpServletRequest request, HttpServletResponse response, String nombreAccion)
+			throws IOException, SQLException, UVException {
+		Integer idMensaje = Formateador.leeParametroInteger(BolsaEmpleoUtils.getParamRequestOrSession(request, PARAM_MENSAJE_ID));
+		bean.setMensaje(ModeloMensajes.obtenerInstancia().getMensajeById(idMensaje));
+		
+		switch (nombreAccion) {
+			case ACCION_BORRAR_MENSAJE:
+				borrarMensaje(bean, request, response);
+				break;
+			case ACCION_DATATABLE_DESTINATARIOS:
+				listadoDestinatarios(bean, datos, request, response);
+				break;
+			case ACCION_DATATABLE_DESTINATARIOS_DISPONIBLES:
+				listadoDestinatariosDisponibles(bean, datos, request, response);
+				break;
+			case ACCION_DETALLE_MENSAJE:
+				detalleMensaje(bean);
+				break;
+			default:
+				errorFatal(bean, MENSAJE_ERROR_ACCION_NO_CONTEMPLADA);
+		}
 	}
 
 	private void listado(VistaMensajes bean, UVDatos datos, HttpServletRequest request, HttpServletResponse response) throws IOException, SQLException {
@@ -212,24 +232,30 @@ public class ControladorMensajes extends HttpServlet {
 	}
 	
 	private void nuevoMensaje(VistaMensajes bean, HttpServletRequest request, HttpServletResponse response) throws SQLException, UVException, IOException {
-		ModeloMensajes.obtenerInstancia().nuevoMensajeEnBorrador(bean.getUsuarioLogeado());
-		BolsaEmpleoUtils.addMensajeDeExito("Mensaje en borrador añadido correctamente", bean, request);
-		response.sendRedirect(request.getServletPath());
+		Integer idMensaje = ModeloMensajes.obtenerInstancia().nuevoMensajeEnBorrador(bean.getUsuarioLogeado());
+		bean.setMensaje(ModeloMensajes.obtenerInstancia().getMensajeById(idMensaje));
+		
+		redireccionConMensajeSeleccionado(bean, request, response, ACCION_DETALLE_MENSAJE);
 	}
 	
 	private void borrarMensaje(VistaMensajes bean, HttpServletRequest request, HttpServletResponse response) throws SQLException, UVException, IOException {
-		Mensaje mensaje = ModeloMensajes.obtenerInstancia().getMensajeById(Formateador.leeParametroInteger(request.getParameter(PARAM_MENSAJE_ID))); 
-		
-		ModeloMensajes.obtenerInstancia().eliminarMensajeBorrador(mensaje, bean.getUsuarioLogeado());
-		BolsaEmpleoUtils.addMensajeDeExito("Mensaje en eliminado correctamentessssss", bean, request);
+		ModeloMensajes.obtenerInstancia().eliminarMensajeBorrador(bean.getMensaje(), bean.getUsuarioLogeado());
+		BolsaEmpleoUtils.addMensajeDeExito("Mensaje eliminado correctamente", bean, request);
 		response.sendRedirect(request.getServletPath());
 	}
 	
-	private void detalleMensaje(VistaMensajes bean, HttpServletRequest request, HttpServletResponse response) throws SQLException, UVException, IOException {
+	private void detalleMensaje(VistaMensajes bean) throws SQLException {
 		bean.setVista(JSP_DETALLE);
-		bean.setMensaje(ModeloMensajes.obtenerInstancia().getMensajeById(Formateador.leeParametroInteger(request.getParameter(PARAM_MENSAJE_ID))));
 		bean.setConvocatorias(ModeloConvocatoria.obtenerInstancia().listaConvocatorias());
 		bean.setAreas(ModeloArea.obtenerInstancia().listaAreas());
+	}
+	
+	private void redireccionConMensajeSeleccionado(VistaMensajes bean, HttpServletRequest request, HttpServletResponse response, String accion)
+			throws IOException {
+		Map<String, String> params = new HashMap<>();
+		params.put(PARAM_ACCION, accion);
+		params.put(PARAM_MENSAJE_ID, bean.getMensaje().getCodNum().toString());
+		BolsaEmpleoUtils.redirectWithParams(request, response, params);
 	}
 	
 	private void listadoDestinatarios(VistaMensajes bean, UVDatos datos, HttpServletRequest request, HttpServletResponse response) throws IOException, SQLException {
@@ -241,9 +267,7 @@ public class ControladorMensajes extends HttpServlet {
 		try (PrintWriter writer = response.getWriter()) {
 			try {
 				ModeloMensajes modelo = ModeloMensajes.obtenerInstancia();
-				
-				Mensaje mensaje = modelo.getMensajeById(Formateador.leeParametroInteger(request.getParameter(PARAM_MENSAJE_ID)));				
-				BolsaEmpleoDataTable<UsuarioBolsaEmpleo> dataTable = modelo.listaDestinatariosMensajeDatatable(request.getParameterMap(), mensaje);
+				BolsaEmpleoDataTable<UsuarioBolsaEmpleo> dataTable = modelo.listaDestinatariosMensajeDatatable(request.getParameterMap(), bean.getMensaje());
 				bean.setDatatableDestinatarios(dataTable);
 				writer.write(dataTable.toJson());
 			} catch (UVException e) {
@@ -263,7 +287,7 @@ public class ControladorMensajes extends HttpServlet {
 		}
 	}
 	
-	private void listadoDestinatariosDisponibles(VistaMensajes bean, UVDatos datos, HttpServletRequest request, HttpServletResponse response) throws IOException, SQLException {
+	private void listadoDestinatariosDisponibles(VistaMensajes bean, UVDatos datos, HttpServletRequest request, HttpServletResponse response) throws IOException {
 		datos.setRespuestaEnviada(true);
 		datos.setContentType(RESPONSE_AJAX_CONTENTTYPE);		
 		response.setContentType(RESPONSE_AJAX_CONTENTTYPE);
@@ -272,9 +296,8 @@ public class ControladorMensajes extends HttpServlet {
 		try (PrintWriter writer = response.getWriter()) {
 			try {
 				ModeloMensajes modelo = ModeloMensajes.obtenerInstancia();
-				
-				Mensaje mensaje = modelo.getMensajeById(Formateador.leeParametroInteger(request.getParameter(PARAM_MENSAJE_ID)));				
-				BolsaEmpleoDataTable<UsuarioBolsaEmpleo> dataTable = modelo.listaDestinatariosDisponiblesMensajeDatatable(request.getParameterMap(), mensaje);
+				BolsaEmpleoDataTable<UsuarioBolsaEmpleo> dataTable = modelo.listaDestinatariosDisponiblesMensajeDatatable(
+						request.getParameterMap(), bean.getMensaje());
 				bean.setDatatableDestinatarios(dataTable);
 				writer.write(dataTable.toJson());
 			} catch (UVException e) {
