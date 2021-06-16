@@ -230,9 +230,9 @@ public class ModeloMerito {
 		try (Connection conexion = ConexionUvirtual.obtenerInstancia(); PreparedStatement stmt = conexion.prepareStatement(consulta)) {
 			int parameterIndex = 1;
 			stmt.setInt(parameterIndex++, merito.getItemBaremacion().getCodNum());
-			stmt.setDouble(parameterIndex++, merito.getValor());
-			stmt.setInt(parameterIndex++, merito.getCodNum());
+			stmt.setDouble(parameterIndex++, merito.getValor());			
 			stmt.setString(parameterIndex++, usuarioUpdate.getCodCuenta());
+			stmt.setInt(parameterIndex++, merito.getCodNum());
 			stmt.executeUpdate();
 		}
 	}
