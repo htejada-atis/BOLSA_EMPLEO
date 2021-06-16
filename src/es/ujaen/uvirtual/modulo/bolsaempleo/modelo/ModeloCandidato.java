@@ -12,6 +12,7 @@ import es.ujaen.uvirtual.modulo.bolsaempleo.beans.CandidatoAcreditacionesTable;
 import es.ujaen.uvirtual.modulo.bolsaempleo.beans.CandidatoTitulacionTable;
 import es.ujaen.uvirtual.modulo.bolsaempleo.beans.UsuarioBolsaEmpleo;
 import es.ujaen.uvirtual.modulo.bolsaempleo.utilidades.BolsaEmpleoDataTable;
+import es.ujaen.uvirtual.modulo.bolsaempleo.utilidades.BolsaEmpleoDataTable.DataTableColumn;
 import es.ujaen.uvirtual.utilidades.UVException;
 
 /**
@@ -22,10 +23,9 @@ import es.ujaen.uvirtual.utilidades.UVException;
  * @author ATISoluciones 2021
  */
 public class ModeloCandidato {
-
-	public static final int ORDER_COLUMN_INDEX_NOMBRE_CANDIDATO = 0;
-	public static final int ORDER_COLUMN_INDEX_TITULACIONES_CANDIDATO = 1;
-	public static final int ORDER_COLUMN_INDEX_TIT_VALIDADAS_CANDIDATO = 2;
+	
+	public static final int ORDER_COLUMN_INDEX_DOCUMENTO_CANDIDATO = 0;
+	public static final int ORDER_COLUMN_INDEX_NOMBRE_CANDIDATO = 1;
 	
 	protected static ModeloCandidato eInstancia;
 
@@ -62,19 +62,26 @@ public class ModeloCandidato {
 	public BolsaEmpleoDataTable<CandidatoTitulacionTable> listaCandidatosDatatable(Map<String, String[]> params) throws SQLException, UVException {
 		List<CandidatoTitulacionTable> usuarios = new ArrayList<>();
 		BolsaEmpleoDataTable<CandidatoTitulacionTable> dataTable = new BolsaEmpleoDataTable<>(params);
+		
+		String subquery = ""
+				+ " SELECT COUNT(*) "
+				+ " FROM TBEP_TITULACIONES_USUARIO beptus "
+				+ "	WHERE beptus.BEPTUS_USU_CODNUM = bepusu.CODNUM AND beptus.FLGBORRADO = 'N'";
 
 		String consulta = ""
 				+ " SELECT bepusu.CODNUM, "
-				+ "		(SELECT COUNT(*) FROM TBEP_TITULACIONES_USUARIO beptus "
-				+ "      WHERE beptus.BEPTUS_USU_CODNUM = bepusu.CODNUM AND beptus.FLGBORRADO = 'N'"
-				+ "	    ) AS COUNT_TITULACIONES,"
+				+ "		(" + subquery + ") AS COUNT_TITULACIONES,"
 				+ "		(SELECT COUNT(*) FROM TBEP_TITULACIONES_USUARIO beptus "
 				+ "		 WHERE beptus.BEPTUS_USU_CODNUM = bepusu.CODNUM AND beptus.FLGBORRADO = 'N' AND beptus.FLGVALIDADA = 'S'"
 				+ "		) AS COUNT_VALIDADAS" 
 				+ "	FROM TBEP_USUARIOS bepusu" 
-				+ "	WHERE bepusu.rol = " + ModeloRol.ID_ROL_CANDIDATO + " ";
+				+ "	WHERE bepusu.rol = " + ModeloRol.ID_ROL_CANDIDATO + " "
+				+ " AND (" + subquery + ") > 0";
+		
+		String whereNombre = String.format("(%s || ' ' || %s || ' ' || %s)", "bepusu.VUAJA_STRNOMBRE", "bepusu.VUAJA_STRAPELLIDO1", "bepusu.VUAJA_STRAPELLIDO2");
 
-		dataTable.setColumn(ORDER_COLUMN_INDEX_NOMBRE_CANDIDATO, "bepusu.CODCUENTA");
+		dataTable.setColumn(ORDER_COLUMN_INDEX_DOCUMENTO_CANDIDATO, "bepusu.VUAJA_PRSNIF");
+		dataTable.setColumn(ORDER_COLUMN_INDEX_NOMBRE_CANDIDATO, whereNombre, DataTableColumn.COLUMN_TYPE_TEXT);
 
 		dataTable.setQuery(consulta);
 
@@ -113,20 +120,27 @@ public class ModeloCandidato {
 		List<CandidatoAcreditacionesTable> usuarios = new ArrayList<>();
 		BolsaEmpleoDataTable<CandidatoAcreditacionesTable> dataTable = new BolsaEmpleoDataTable<>(params);
 
+		String subquery = ""
+				+ " SELECT COUNT(*) "
+				+ " FROM TBEP_MER_PRE_USUARIO bepmpu "
+				+ "	INNER JOIN TBEP_MERITOS_PREFERENTES bepmep ON bepmep.CODNUM = bepmpu.BEPMEP_CODNUM "
+				+ "	WHERE bepmpu.BEPUSU_CODNUM = bepusu.CODNUM AND bepmpu.FLGBORRADO = 'N' AND bepmep.TIPO = ? ";
+		
 		String consulta = ""
 				+ " SELECT bepusu.*, "
-				+ "		(SELECT COUNT(*) FROM TBEP_MER_PRE_USUARIO bepmpu"
-				+ "		 INNER JOIN TBEP_MERITOS_PREFERENTES bepmep ON bepmep.CODNUM = bepmpu.BEPMEP_CODNUM"
-				+ "	 	 WHERE bepmpu.BEPUSU_CODNUM = bepusu.CODNUM AND bepmpu.FLGBORRADO = 'N' AND bepmep.TIPO = ?"
-				+ "     ) AS COUNT_ACREDITACIONES,"
+				+ "		(" + subquery + ") AS COUNT_ACREDITACIONES,"
 				+ "	    (SELECT COUNT(*) FROM TBEP_MER_PRE_USUARIO bepmpu"
 				+ "		 INNER JOIN TBEP_MERITOS_PREFERENTES bepmep ON bepmep.CODNUM = bepmpu.BEPMEP_CODNUM"
 				+ "		 WHERE bepmpu.BEPUSU_CODNUM = bepusu.CODNUM AND bepmpu.FLGBORRADO = 'N' AND bepmpu.FLGVALIDADO = 'S' AND bepmep.TIPO = ?"
 				+ "     ) AS COUNT_VALIDADAS "
 				+ " FROM TBEP_USUARIOS bepusu "
-				+ " WHERE bepusu.rol = " + ModeloRol.ID_ROL_CANDIDATO + " ";
+				+ " WHERE bepusu.rol = " + ModeloRol.ID_ROL_CANDIDATO + " "
+				+ " AND (" + subquery + ") > 0";
 		
-		dataTable.setColumn(ORDER_COLUMN_INDEX_NOMBRE_CANDIDATO, "bepusu.CODCUENTA");
+		String whereNombre = String.format("(%s || ' ' || %s || ' ' || %s)", "bepusu.VUAJA_STRNOMBRE", "bepusu.VUAJA_STRAPELLIDO1", "bepusu.VUAJA_STRAPELLIDO2");
+
+		dataTable.setColumn(ORDER_COLUMN_INDEX_DOCUMENTO_CANDIDATO, "bepusu.VUAJA_PRSNIF");
+		dataTable.setColumn(ORDER_COLUMN_INDEX_NOMBRE_CANDIDATO, whereNombre, DataTableColumn.COLUMN_TYPE_TEXT);
 
 		dataTable.setQuery(consulta);
 
@@ -135,6 +149,8 @@ public class ModeloCandidato {
 				PreparedStatement stmt = conexion.prepareStatement(dataTable.getQuery())) {
 			
 			int paramIndex = 1;
+			stmt.setString(paramIndex, ModeloMeritosPreferentes.TIPO_POSESION);
+			stmtCount.setString(paramIndex++, ModeloMeritosPreferentes.TIPO_POSESION);
 			stmt.setString(paramIndex, ModeloMeritosPreferentes.TIPO_POSESION);
 			stmtCount.setString(paramIndex++, ModeloMeritosPreferentes.TIPO_POSESION);
 			stmt.setString(paramIndex, ModeloMeritosPreferentes.TIPO_POSESION);

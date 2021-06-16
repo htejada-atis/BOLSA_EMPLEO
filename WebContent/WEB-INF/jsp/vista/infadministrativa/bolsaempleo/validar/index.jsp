@@ -48,14 +48,14 @@ VistaValidar bean = (VistaValidar)uvdatos.getVistas().get(VistaValidar.class.get
 $(document).ready(function() {
 	var table = new Atis.DataTable('#table', {
 	    "ajax": { url: "<%= ControladorValidar.URL_PATTERN_AJAX %>" },
-	    "pageSize": 10,
+	    "pageSize": 100,
 	    "filterable": true,
 	    "action": "<%= ControladorValidar.ACCION_DATATABLE_BOLSAS %>",
 	    "defaultOrderBy": 5,
 	    "defaultOrderDirection": 'desc',
 	    "clickable": {'onClick': function(row) {
 	    	var params = {
-    				'a': '<%= ControladorValidar.ACCION_BOLSA_SELECCIONADA %>', 
+    				'<%= ControladorValidar.PARAM_ACCION %>': '<%= ControladorValidar.ACCION_BOLSA_SELECCIONADA %>', 
     				'<%= ControladorValidar.PARAM_BOLSA %>': row.codNum};
     		Atis.sendForm("<%= request.getRequestURI() %>", params);
 	    }},
