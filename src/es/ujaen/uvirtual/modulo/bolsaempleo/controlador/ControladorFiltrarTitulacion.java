@@ -52,10 +52,12 @@ public class ControladorFiltrarTitulacion extends HttpServlet {
 	public static final String ACCION_CANDIDATO_SELECCIONADO = "candidatoseleccionado";
 	public static final String ACCION_DATATABLE_CANDIDATOS = "datatablecandidatos";
 	public static final String ACCION_DATATABLE_TITULACIONES_CANDIDATO = "datatabletitulacionescandidato";
+	public static final String ACCION_DATATABLE_SIN_TITULACIONES = "datatablesintitulaciones";
 	public static final String ACCION_INDEX = "listar";
 	public static final String ACCION_TITULACION_DESELECCIONADA = "titulaciondeseleccionada";
 	public static final String ACCION_TITULACION_SELECCIONADA = "titulacionseleccionada";
 	public static final String ACCION_CAMBIAR_TITULACION = "cambiarTitulacion";
+	public static final String ACCION_CANDIDATOS_SIN_TITULACION = "sinTitulacion";
 	
 	// mensajes
 	public static final String MENSAJE_ERROR_FOO = "Mensaje de error";
@@ -71,6 +73,7 @@ public class ControladorFiltrarTitulacion extends HttpServlet {
 	// ruta vistas
 	public static final String RUTA_BEP_FILTRAR = "/WEB-INF/jsp/vista/infadministrativa/bolsaempleo/filtrartitulacion/";
 	public static final String JSP_INDEX = RUTA_BEP_FILTRAR + "index.jsp";
+	public static final String JSP_SIN_TITULACION = RUTA_BEP_FILTRAR + "sinTitulacion.jsp";
 	
 	// urls	
 	public static final String URL_PATTERN_FILES_PRIVADA = "/srv/es/informacionadministrativa/bolsaempleo/filtrar";
@@ -124,6 +127,12 @@ public class ControladorFiltrarTitulacion extends HttpServlet {
 				case ACCION_CAMBIAR_TITULACION:
 					cambiarTitulacion(bean, datos, request, response);
 					break;
+				case ACCION_CANDIDATOS_SIN_TITULACION:
+					irAListadoSinTitulacion(bean);
+					break;
+				case ACCION_DATATABLE_SIN_TITULACIONES:
+					listadoCandidatosSinTitulacion(bean, datos, request, response);
+					break;
 				default:
 					errorFatal(bean, "Acción no contemplada");
 			}
@@ -164,7 +173,7 @@ public class ControladorFiltrarTitulacion extends HttpServlet {
 			
 			BolsaEmpleoUtils.addMensajeDeError(e.getMessage(), bean, request);
 			response.sendRedirect("/srv/es/informacionadministrativa/bolsaempleo/error");
-		}		
+		}
 	}
 	
 	private void errorFatal(VistaFiltrar bean, String mensaje) {
@@ -326,6 +335,40 @@ public class ControladorFiltrarTitulacion extends HttpServlet {
 				ModeloMisTitulaciones.obtenerInstancia().cambiarTitulacion(titulacionUsuario, candidato, titulacion, bean.getUsuarioLogeado());
 				CodigoDescripcion mensaje = new CodigoDescripcion("ok", "Titulación actualizada");
 				writer.write(new Gson().toJson(mensaje));				
+			} catch (UVException e) {
+				LOGGER.log(Level.WARNING, e.toString());
+				bean.getMensajesDeError().add(e.getMessage());
+				CodigoDescripcion mensaje = new CodigoDescripcion(RESPONSE_AJAX_ERROR, e.getMessage());
+				writer.write(new Gson().toJson(mensaje));
+				response.setStatus(RESPONSE_AJAX_HTTP_CODE_ERROR);
+			} catch (SQLException e) { 
+				LOGGER.log(Level.SEVERE, Formateador.getStackTrace(e));
+				LOGGER.log(Level.SEVERE, e.toString());
+				bean.getMensajesDeError().add(e.getMessage());
+				CodigoDescripcion mensaje = new CodigoDescripcion(RESPONSE_AJAX_ERROR, e.getMessage());
+				writer.write(new Gson().toJson(mensaje));
+				response.setStatus(RESPONSE_AJAX_HTTP_CODE_ERROR);
+			}
+		}
+	}
+
+	private void irAListadoSinTitulacion(VistaFiltrar bean) {
+		bean.setVista(JSP_SIN_TITULACION);		
+	}
+	
+	private void listadoCandidatosSinTitulacion(VistaFiltrar bean, UVDatos datos, HttpServletRequest request, HttpServletResponse response) throws IOException {
+		ModeloCandidato modeloCandidato = ModeloCandidato.obtenerInstancia();
+		
+		datos.setContentType(RESPONSE_AJAX_CONTENTTYPE);
+		datos.setRespuestaEnviada(true);
+		response.setContentType(RESPONSE_AJAX_CONTENTTYPE);
+		response.setCharacterEncoding(RESPONSE_AJAX_ENCODING);
+		
+		try (PrintWriter writer = response.getWriter()) {
+			try {
+				BolsaEmpleoDataTable<CandidatoTitulacionTable> dataTable = modeloCandidato.listaCandidatosSinTitulacionDatatable(request.getParameterMap());
+				bean.setDatatableCandidatos(dataTable);
+				writer.write(dataTable.toJson());
 			} catch (UVException e) {
 				LOGGER.log(Level.WARNING, e.toString());
 				bean.getMensajesDeError().add(e.getMessage());

@@ -59,7 +59,33 @@ public class ModeloCandidato {
 	 * @throws SQLException en caso de error de base de datos .
 	 * @throws UVException  error si no existe la area .
 	 */
-	public BolsaEmpleoDataTable<CandidatoTitulacionTable> listaCandidatosDatatable(Map<String, String[]> params) throws SQLException, UVException {
+	public BolsaEmpleoDataTable<CandidatoTitulacionTable> listaCandidatosDatatable(Map<String, String[]> params) throws SQLException, UVException {		
+		return this.listaCandidatosTitulacionesDatatable(params, true);
+	}
+	
+	/**
+	 * Listado de candidatos sin titulacion (o titulación borrada)
+	 * @param params .
+	 * @return .
+	 * @throws SQLException .
+	 * @throws UVException .
+	 */
+	public BolsaEmpleoDataTable<CandidatoTitulacionTable> listaCandidatosSinTitulacionDatatable(Map<String, String[]> params) throws SQLException, UVException {		
+		return this.listaCandidatosTitulacionesDatatable(params, false);
+	}
+	
+	/**
+	 * Listado de candidatos en función de un área .
+	 * 
+	 * @param params para leer los parametros de paginación, ordenacion, etc .
+	 * @param conTitulaciones con solicitud 
+	 * @return listado de candidatos .
+	 * @throws SQLException en caso de error de base de datos .
+	 * @throws UVException  error si no existe la area .
+	 */
+	private BolsaEmpleoDataTable<CandidatoTitulacionTable> listaCandidatosTitulacionesDatatable(Map<String, String[]> params, boolean conTitulaciones) 
+			throws SQLException, UVException {
+		
 		List<CandidatoTitulacionTable> usuarios = new ArrayList<>();
 		BolsaEmpleoDataTable<CandidatoTitulacionTable> dataTable = new BolsaEmpleoDataTable<>(params);
 		
@@ -75,8 +101,13 @@ public class ModeloCandidato {
 				+ "		 WHERE beptus.BEPTUS_USU_CODNUM = bepusu.CODNUM AND beptus.FLGBORRADO = 'N' AND beptus.FLGVALIDADA = 'S'"
 				+ "		) AS COUNT_VALIDADAS" 
 				+ "	FROM TBEP_USUARIOS bepusu" 
-				+ "	WHERE bepusu.rol = " + ModeloRol.ID_ROL_CANDIDATO + " "
-				+ " AND (" + subquery + ") > 0";
+				+ "	WHERE bepusu.rol = " + ModeloRol.ID_ROL_CANDIDATO;
+						
+		if (conTitulaciones) {
+			consulta += " AND (" + subquery + ") > 0 "; 
+		} else {
+			consulta += " AND (" + subquery + ") = 0 ";
+		}
 		
 		String whereNombre = String.format("(%s || ' ' || %s || ' ' || %s)", "bepusu.VUAJA_STRNOMBRE", "bepusu.VUAJA_STRAPELLIDO1", "bepusu.VUAJA_STRAPELLIDO2");
 
