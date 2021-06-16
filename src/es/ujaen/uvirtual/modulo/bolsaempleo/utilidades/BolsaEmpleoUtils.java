@@ -29,7 +29,6 @@ import javax.servlet.ServletRequest;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
-import javax.servlet.http.Part;
 import es.ujaen.uvirtual.beans.vistas.Vista;
 import es.ujaen.uvirtual.modulo.bolsaempleo.modelo.ModeloParametrosConfiguracion;
 import es.ujaen.uvirtual.utilidades.Formateador;
@@ -46,7 +45,6 @@ public final class BolsaEmpleoUtils {
 	private static final int TIPO_MENSAJE_ERROR = 0;
 	private static final int TIPO_MENSAJE_EXITO = 1;
 	private static final double ROUNDER = 100.0;
-	private static final int NUMBER_2 = 2;
 	private static final int HOURS_END = 23;
 	private static final int MINUTES_SECONDS_END = 59;
 	private static final int NUMBER_1024 = 1024;
@@ -58,24 +56,7 @@ public final class BolsaEmpleoUtils {
 	
 	private BolsaEmpleoUtils() {
 	}
-
-	/**
-	 * Utility method to get file name from HTTP header content-disposition .
-	 * 
-	 * @param part archivo del que obtener el nombre .
-	 * @return cadena con el nombre del fichero .
-	 */
-	public static String obtenerNombreFichero(Part part) {
-		String contentDisp = part.getHeader("content-disposition");
-		String[] tokens = contentDisp.split(";");
-		for (String token : tokens) {
-			if (token.trim().startsWith("filename")) {
-				return token.substring(token.indexOf('=') + NUMBER_2, token.length() - 1);
-			}
-		}
-		return "";
-	}
-
+		
 	/**
 	 * Devuelve un string de un número '?' separadas por ',' para usarlo en
 	 * consultas de tipo where in. Por ejemplo si numParams, devuelve "?,?,?"
@@ -213,7 +194,7 @@ public final class BolsaEmpleoUtils {
 			
 			Integer maxSize = Formateador.leeParametroInteger(getParametroConfiguracion("bolsaempleo.maxEspacioArchivo"));
 			
-			while (((bytesLeidos = archivo.read(bytes)) != -1)) {
+			while ((bytesLeidos = archivo.read(bytes)) != -1) {
 				salida.write(bytes, 0, bytesLeidos);
 				bytesTotal += bytesLeidos;
 				if (bytesTotal > maxSize) {

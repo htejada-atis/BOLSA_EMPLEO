@@ -21,7 +21,7 @@ import es.ujaen.uvirtual.utilidades.UVException;
  * @author ATISoluciones
  */
 public class ModeloParametrosConfiguracion {
-	public static final String VERSION = "0.28";
+	public static final String VERSION = "0.30";
 	
 	// 50MB = 1024 * 1024 * 50 = 52428800
 	public static final int MAX_FILE_SIZE = 52_428_800;

@@ -169,7 +169,7 @@ public class ModeloMerito {
 			throw new UVException("No se puede insertar un mérito sin valor");
 		}
 		if (merito.getArchivo() == null) {
-			throw new UVException("No se puede insertar un mérito sin archivo");
+			throw new UVException("No se puede insertar un mérito sin archivo. Compruebe que es un fichero pdf válido.");
 		}
 		if (merito.getItemBaremacion().getCodNum() == null) {
 			throw new UVException("No se puede insertar un mérito sin ítem de baremación");
@@ -230,9 +230,9 @@ public class ModeloMerito {
 		try (Connection conexion = ConexionUvirtual.obtenerInstancia(); PreparedStatement stmt = conexion.prepareStatement(consulta)) {
 			int parameterIndex = 1;
 			stmt.setInt(parameterIndex++, merito.getItemBaremacion().getCodNum());
-			stmt.setDouble(parameterIndex++, merito.getValor());
-			stmt.setInt(parameterIndex++, merito.getCodNum());
+			stmt.setDouble(parameterIndex++, merito.getValor());			
 			stmt.setString(parameterIndex++, usuarioUpdate.getCodCuenta());
+			stmt.setInt(parameterIndex++, merito.getCodNum());
 			stmt.executeUpdate();
 		}
 	}

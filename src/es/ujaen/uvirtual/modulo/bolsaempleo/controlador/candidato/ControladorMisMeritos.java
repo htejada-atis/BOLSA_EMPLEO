@@ -1,33 +1,37 @@
 package es.ujaen.uvirtual.modulo.bolsaempleo.controlador.candidato;
 
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.PrintWriter;
 import java.sql.SQLException;
 import java.util.logging.Logger;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.logging.Level;
 import javax.servlet.ServletException;
-import javax.servlet.annotation.MultipartConfig;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import javax.servlet.http.Part;
+
+import org.apache.commons.fileupload.FileItem;
+import org.apache.commons.fileupload.FileUploadException;
+import org.apache.commons.fileupload.disk.DiskFileItemFactory;
+import org.apache.commons.fileupload.servlet.ServletFileUpload;
+
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.reflect.TypeToken;
 import es.ujaen.uvirtual.beans.CodigoDescripcion;
 import es.ujaen.uvirtual.beans.UVDatos;
-import es.ujaen.uvirtual.beans.Usuario;
 import es.ujaen.uvirtual.modulo.bolsaempleo.beans.ApartadoBaremacion;
 import es.ujaen.uvirtual.modulo.bolsaempleo.beans.ItemBaremacion;
 import es.ujaen.uvirtual.modulo.bolsaempleo.beans.Merito;
 import es.ujaen.uvirtual.modulo.bolsaempleo.modelo.ModeloBaremacionItems;
 import es.ujaen.uvirtual.modulo.bolsaempleo.modelo.ModeloBaremacionApartados;
 import es.ujaen.uvirtual.modulo.bolsaempleo.modelo.ModeloMerito;
-import es.ujaen.uvirtual.modulo.bolsaempleo.modelo.ModeloParametrosConfiguracion;
 import es.ujaen.uvirtual.modulo.bolsaempleo.modelo.ModeloRol;
 import es.ujaen.uvirtual.modulo.bolsaempleo.modelo.ModeloSolicitud;
 import es.ujaen.uvirtual.modulo.bolsaempleo.modelo.ModeloUsuarioBolsaEmpleo;
@@ -50,17 +54,17 @@ import es.ujaen.uvirtual.utilidades.UVException;
 			"/srv/es/ajax/informacionadministrativa/bolsaempleo/mismeritos", 
 			"/srv/en/ajax/informacionadministrativa/bolsaempleo/mismeritos"
 	})
-@MultipartConfig(maxFileSize = ModeloParametrosConfiguracion.MAX_FILE_SIZE)
 public class ControladorMisMeritos extends HttpServlet {
 	private static final long serialVersionUID = 1L;
 	private static final String NOMBREDEESTACLASE = ControladorMisMeritos.class.getName();
 	private static final Logger LOGGER = Logger.getLogger(NOMBREDEESTACLASE);
 	
-	// acciones
-	public static final String ACCION_AGREGAR_MERITO = "agregarmerito";
+	// acciones	
 	public static final String ACCION_DATATABLE = "datatable";
 	public static final String ACCION_ELIMINAR_MERITOS = "eliminarmeritos";
 	public static final String ACCION_INDEX = "listar";
+	public static final String ACCION_AGREGAR_MERITO = "agregarmerito";
+	public static final String ACCION_AGREGAR_MERITO_CONFIRM = "agregarmeritoconfirm";
 	
 	// parámetros
 	public static final String PARAM_ACCION = "a";
@@ -109,10 +113,11 @@ public class ControladorMisMeritos extends HttpServlet {
 		datos.setContentType("text/html");
 		
 		VistaMeritos bean = new VistaMeritos();		
-		Usuario usuario = datos.getUsuario();
-		LOGGER.log(Level.FINEST, "usuario que ha entrado en el servlet es {0}", usuario.getUid());
 				
 		String nombreAccion = EscapaHTML.ajustaCodificacion(request.getParameter(PARAM_ACCION));
+		if (ServletFileUpload.isMultipartContent(request)) {
+			nombreAccion = ACCION_AGREGAR_MERITO_CONFIRM;
+		}
 		if (nombreAccion == null) {
 			nombreAccion = ACCION_INDEX;
 		}
@@ -127,6 +132,10 @@ public class ControladorMisMeritos extends HttpServlet {
 			LOGGER.log(Level.SEVERE, Formateador.getStackTrace(e));
 			LOGGER.log(Level.SEVERE, e.toString());
 			bean.getMensajesDeError().add("Error al acceder a la base de datos");
+		} catch (FileUploadException e) {
+			LOGGER.log(Level.SEVERE, Formateador.getStackTrace(e));
+			LOGGER.log(Level.SEVERE, e.toString());
+			bean.getMensajesDeError().add("Error al subir fichero");
 		} finally {
 			datos.getVistas().put(bean.getClass().getName(), bean);
 			datos.getFicherosJSP().add(bean.getVista());
@@ -172,7 +181,7 @@ public class ControladorMisMeritos extends HttpServlet {
 	}
 	
 	private void accionesMeritos(VistaMeritos bean, UVDatos datos, HttpServletRequest request, HttpServletResponse response, String nombreAccion) 
-			throws SQLException, IOException, UVException, ServletException {
+			throws SQLException, IOException, UVException, FileUploadException {
 		
 		switch (nombreAccion) {
 			case ACCION_INDEX:
@@ -182,6 +191,9 @@ public class ControladorMisMeritos extends HttpServlet {
 				listadoMeritos(bean, datos, request, response);
 				break;
 			case ACCION_AGREGAR_MERITO:
+				formularioAgregarMerito(bean, request);
+				break;
+			case ACCION_AGREGAR_MERITO_CONFIRM:
 				agregarMerito(bean, request, response);
 				break;
 			case ACCION_ELIMINAR_MERITOS:
@@ -192,14 +204,6 @@ public class ControladorMisMeritos extends HttpServlet {
 		}
 	}
 	
-	/**
-	 * lista meritos .
-	 * @param bean .
-	 * @throws UVException .
-	 * @throws SQLException .
-	 * @throws ServletException .
-	 * @throws IOException .
-	 */
 	private void listaMeritos(VistaMeritos bean) throws SQLException {
 		bean.setVista(JSP_INDEX);
 		
@@ -207,30 +211,49 @@ public class ControladorMisMeritos extends HttpServlet {
 		bean.setApartados(modeloBaremacion.getApartadosActivos());
 	}
 	
-	/** agrega un nuevo mérito.
-	 * @param bean .
-	 * @param request .
-	 * @param response .
-	 * @throws SQLException excepcion de bbdd .
-	 * @throws UVException en caso de error de parametros .
-	 * @throws IOException en caso de error de input u output .
-	 * @throws ServletException .
-	 */
+	private void formularioAgregarMerito(VistaMeritos bean, HttpServletRequest request) throws SQLException, UVException {
+		bean.setVista(JSP_FORM);
+		
+		ModeloBaremacionApartados modelo = ModeloBaremacionApartados.obtenerInstancia();
+		bean.setApartados(modelo.getApartadosActivos());
+				
+		if (request.getParameter(PARAM_APARTADO) != null) {
+			ApartadoBaremacion apartado = modelo.getApartadoBaremacionById(Formateador.leeParametroInteger(request.getParameter(PARAM_APARTADO))); 
+			bean.setApartado(apartado);
+			bean.setItems(ModeloBaremacionItems.obtenerInstancia().getItemsDeApartado(apartado));
+		}
+	}
+	
 	private void agregarMerito(VistaMeritos bean, HttpServletRequest request, HttpServletResponse response)
-			throws SQLException, UVException, IOException, ServletException {
+			throws SQLException, UVException, IOException, FileUploadException {
 		bean.setVista(JSP_FORM);
 		
 		ModeloBaremacionApartados modelo = ModeloBaremacionApartados.obtenerInstancia();
 		bean.setApartados(modelo.getApartadosActivos());
 		
-		if (request.getParameter(PARAM_APARTADO) != null) {
-			ApartadoBaremacion apartado = modelo.getApartadoBaremacionById(Formateador.leeParametroInteger(request.getParameter(PARAM_APARTADO))); 
+		// leemos los parametros del form, chequeando el fichero
+		List<FileItem> items = new ServletFileUpload(new DiskFileItemFactory()).parseRequest(request);
+		HashMap<String, Object> parametros = new HashMap<>();		
+		for (FileItem item : items) {
+			if (item.isFormField()) {
+				parametros.put(item.getFieldName(), item.getString());
+			} else {
+				if (item.getSize() > 0 && item.getName().toLowerCase().endsWith(".pdf")) {									
+					try (InputStream contenidoDelFichero = item.getInputStream(); ByteArrayOutputStream salida = new ByteArrayOutputStream()) {
+						parametros.put(PARAM_ARCHIVO, BolsaEmpleoUtils.checkFileSize(contenidoDelFichero));
+					}
+				}
+			}
+		}
+		
+		// comprobamos validez de todos los parametros e insertamos en db si todo ok
+		if (parametros.get(PARAM_APARTADO) != null) {
+			ApartadoBaremacion apartado = modelo.getApartadoBaremacionById(Formateador.leeParametroInteger((String) parametros.get(PARAM_APARTADO))); 
 			bean.setApartado(apartado);
 			bean.setItems(ModeloBaremacionItems.obtenerInstancia().getItemsDeApartado(apartado));
 			
-			if (request.getParameter(PARAM_ITEM) != null) {
-				Part uploadedFile = request.getPart(PARAM_ARCHIVO);
-				Merito merito = this.validarMerito(request, uploadedFile);
+			if (parametros.get(PARAM_ITEM) != null) {
+				Merito merito = this.validarMerito(parametros);
 				
 				ModeloMerito.obtenerInstancia().insertaMerito(merito, bean.getUsuarioLogeado());
 							
@@ -238,17 +261,8 @@ public class ControladorMisMeritos extends HttpServlet {
 				response.sendRedirect(request.getServletPath());
 			}
 		}
-		
 	}
 	
-	/** elimina una lista de méritos seleccionados .
-	 * @param bean .
-	 * @param request .
-	 * @param response .
-	 * @throws SQLException .
-	 * @throws UVException .
-	 * @throws IOException .
-	 */
 	private void eliminarMeritos(VistaMeritos bean, HttpServletRequest request, HttpServletResponse response) throws SQLException, UVException, IOException {
 		ModeloMerito modelo = ModeloMerito.obtenerInstancia();
 		
@@ -283,13 +297,6 @@ public class ControladorMisMeritos extends HttpServlet {
 		response.sendRedirect(request.getServletPath());
 	}
 	
-	/** Listado de méritos .
-	 * @param bean .
-	 * @param datos .
-	 * @param request .
-	 * @param response .
-	 * @throws IOException .
-	 */
 	private void listadoMeritos(VistaMeritos bean, UVDatos datos, HttpServletRequest request, HttpServletResponse response) throws IOException, SQLException, UVException {
 		ModeloMerito modelo = ModeloMerito.obtenerInstancia();
 		
@@ -320,18 +327,18 @@ public class ControladorMisMeritos extends HttpServlet {
 		}
 	}
 	
-	private Merito validarMerito(HttpServletRequest request, Part uploadedFile) throws UVException, SQLException, IOException {		
+	private Merito validarMerito(HashMap<String, Object> parametros) throws UVException, SQLException {		
 		Merito merito = new Merito();
 				
 		// item de baremación
-		ItemBaremacion item = ModeloBaremacionItems.obtenerInstancia().getItemBaremacionById(Formateador.leeParametroInteger(request.getParameter(PARAM_ITEM)));
+		ItemBaremacion item = ModeloBaremacionItems.obtenerInstancia().getItemBaremacionById(Formateador.leeParametroInteger((String) parametros.get(PARAM_ITEM)));
 		merito.setItemBaremacion(item);
 		
 		// valor
-		merito.setValor(ControladorMisMeritos.validateValorDelMerito(request, merito));
+		merito.setValor(validateValorDelMerito((String) parametros.get(PARAM_VALOR), merito));
 				
 		// descripcion
-		merito.setDescripcion(EscapaHTML.ajustaCodificacion(request.getParameter(PARAM_DESCRIPCION)));
+		merito.setDescripcion(EscapaHTML.ajustaCodificacion((String) parametros.get(PARAM_DESCRIPCION)));
 		if (merito.getDescripcion() == null || merito.getDescripcion().isBlank()) {
 			throw new UVException(MENSAJE_ERROR_DESCRIPCION_VACIA);
 		}
@@ -340,40 +347,26 @@ public class ControladorMisMeritos extends HttpServlet {
 		}
 		
 		// observaciones
-		merito.setObservacion(EscapaHTML.ajustaCodificacion(request.getParameter(PARAM_OBSERVACION)));
+		merito.setObservacion(EscapaHTML.ajustaCodificacion((String) parametros.get(PARAM_OBSERVACION)));
 		if (merito.getObservacion() != null && merito.getObservacion().length() > ModeloMerito.COLUMN_OBSERVACION_MAXLENGTH) {
 			throw new UVException(String.format(MENSAJE_ERROR_OBSERVACION_LARGO, ModeloMerito.COLUMN_OBSERVACION_MAXLENGTH));
 		}
 		
-		merito.setArchivo(this.validateFicheroMerito(uploadedFile));
+		// fichero
+		merito.setArchivo((InputStream) parametros.get(PARAM_ARCHIVO));
 						
 		return merito;
 	}
-	
-	
-	private InputStream validateFicheroMerito(Part uploadedFile) throws UVException, SQLException {
-		if (!BolsaEmpleoUtils.checkFileIsPDF(uploadedFile.getSubmittedFileName())) {
-			throw new UVException("El fichero debe ser un pdf válido");
-		}
-		
-		try {
-			return BolsaEmpleoUtils.checkFileSize(uploadedFile.getInputStream());
-		} catch (IOException ex) {
-			LOGGER.log(Level.WARNING, ex.toString());
-			throw new UVException("Error guardando fichero");
-		}
-	}
-	
+
 	/**
-	 * Valora el request con los datos del mérito.
-	 * @param request .
+	 * Valida el valor de un mérito.
+	 * @param valorStr .
 	 * @param merito .
 	 * @return .
 	 * @throws UVException .
 	 */
-	public static Double validateValorDelMerito(HttpServletRequest request, Merito merito) throws UVException {
+	public static Double validateValorDelMerito(String valorStr, Merito merito) throws UVException {
 		// chequeo tipo de valor
-		String valorStr = request.getParameter(PARAM_VALOR);
 		switch (merito.getItemBaremacion().getUnidades()) {
 			case ModeloBaremacionItems.ITEM_UNIDADES_MEDICION_SINO:
 				break;
