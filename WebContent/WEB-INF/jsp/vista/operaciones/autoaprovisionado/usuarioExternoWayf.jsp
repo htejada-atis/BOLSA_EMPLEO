@@ -18,12 +18,12 @@ VistaUsuarioAutoregistrado bean = (VistaUsuarioAutoregistrado)uvdatos.getVistas(
 			<%=bean.formatearMensajesDeError()%>
 		</div>
   	<% } %>
-	<h2>Acceso de usuarios a <%=bean.getDescripcionModulo() %></h2>
+	<h2>Acceso a <%=bean.getDescripcionModulo() %></h2>
 	<div>
 		Si tiene usuario de SIDUJA, pulse en <a href="<%=bean.getPaginaRedireccion()%>"><%=bean.getPaginaRedireccion()%></a>
 		<hr/>	
 
-		Si ya tiene usuario, introduzca su correo y contraseña
+		Si ya se ha registrado, introduzca su correo y clave
 		<form method="post" action="<%=request.getRequestURI()%>" id="formularioExiste"> 
 			<input type="hidden" name="<%=ControladorUsuarioAutoregistrado.PARAM_ACCION%>" id="accionFormulario" value="<%=ControladorUsuarioAutoregistrado.ACCION_VALIDA%>" />
 			<input type="hidden" id="g-recaptcha-response-valida" name="g-recaptcha-response" value="" />
@@ -35,10 +35,10 @@ VistaUsuarioAutoregistrado bean = (VistaUsuarioAutoregistrado)uvdatos.getVistas(
 		</form>
 		
 		<hr/>	
-		Para crear un nuevo usuario, pulse el siguiente botón
+		Para registrarse, pulse el siguiente botón
 		<form method="post" action="<%=request.getRequestURI()%>" id="formularioNoExiste"> 
 			<input type="hidden" name="<%=ControladorUsuarioAutoregistrado.PARAM_ACCION%>" id="accionFormulario" value="<%=ControladorUsuarioAutoregistrado.ACCION_MOSTRAR_CREAR%>" />
-			<input type="submit" value="Crear nuevo usuario">
+			<input type="submit" value="Registro">
 		</form>
 		<hr/>	
 		Para recuperar su clave, introduzca su correo
