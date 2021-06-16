@@ -229,11 +229,11 @@ public class ModeloMisTitulaciones {
 		List<TitulacionUsuario> titulaciones = new ArrayList<>();
 		BolsaEmpleoDataTable<TitulacionUsuario> dataTable = new BolsaEmpleoDataTable<>(params);
 		
-		String consulta = "SELECT beptit.CODNUM, beptit.NOMBRE, beptus.CODNUM, beptus.BEPTUS_USU_CODNUM, beptus.BEPTUS_TIT_CODNUM, "
-				+ "beptus.DESCRIPCION, beptus.FLGBORRADO, beptus.FLGVALIDADA, beptus.FECHA_BORRADO, beptus.FECHA_VALIDADA, beptus.OTRATITULACION "
-				+ "FROM tbep_titulaciones_usuario beptus "
-				+ "left JOIN tbep_titulaciones beptit ON beptit.codnum=beptus.beptus_tit_codnum "
-				+ "WHERE beptus.BEPTUS_USU_CODNUM = ?";
+		String consulta = "SELECT beptit.CODNUM AS beptitcod, beptit.NOMBRE AS beptitnombre, beptus.CODNUM, beptus.BEPTUS_USU_CODNUM, beptus.BEPTUS_TIT_CODNUM,"
+				+ "	beptus.DESCRIPCION, beptus.FLGBORRADO, beptus.FLGVALIDADA, beptus.FECHA_BORRADO, beptus.FECHA_VALIDADA, beptus.OTRATITULACION"
+				+ "	FROM tbep_titulaciones_usuario beptus"
+				+ "	left JOIN tbep_titulaciones beptit ON beptit.codnum=beptus.beptus_tit_codnum"
+				+ "	WHERE beptus.BEPTUS_USU_CODNUM = ? ";
 		
 		dataTable.setColumn(ORDER_COLUMN_INDEX_ID_CANDIDATO, "beptus.CODNUM");
 		dataTable.setColumn(ORDER_COLUMN_INDEX_NOMBRE_CANDIDATO, "beptit.NOMBRE");

@@ -449,7 +449,7 @@ public class ControladorMisSolicitudes extends HttpServlet {
 		bean.setListaBolsas(listaBolsas);
 	}
 	
-	private void listadoAreasSeleccionadas(VistaSolicitudes bean, UVDatos datos, HttpServletRequest request, HttpServletResponse response) throws IOException, SQLException {
+	private void listadoAreasSeleccionadas(VistaSolicitudes bean, UVDatos datos, HttpServletRequest request, HttpServletResponse response) throws IOException {
 		datos.setRespuestaEnviada(true);
 		datos.setContentType(RESPONSE_AJAX_CONTENTTYPE);
 		response.setContentType(RESPONSE_AJAX_CONTENTTYPE);

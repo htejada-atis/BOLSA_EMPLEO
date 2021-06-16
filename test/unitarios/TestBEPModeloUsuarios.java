@@ -6,20 +6,16 @@ import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertThrows;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
-
 import java.io.IOException;
 import java.sql.SQLException;
 import java.text.ParseException;
-import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
-
 import org.junit.BeforeClass;
 import org.junit.FixMethodOrder;
 import org.junit.Test;
 import org.junit.runners.MethodSorters;
-
 import bbdd.BbddRunner;
 import bbdd.UtilsTestBolsaEmpleo;
 import es.ujaen.uvirtual.adm.CrearUsuario;
@@ -125,14 +121,14 @@ public class TestBEPModeloUsuarios {
 			datos.setUsuario(usu);
 			
 			// marcamos usuario como borrado
-			ArrayList<UsuarioBolsaEmpleo> usuariosBorrar = marcarUsuarioComoBorrado(ATISOLUCIONES_CODCUENTA);
+			UsuarioBolsaEmpleo usuarioBorrar = marcarUsuarioComoBorrado(ATISOLUCIONES_CODCUENTA);
 
 			// obtenemos usuario logeado borrado
 			UsuarioBolsaEmpleo usuarioLeido = modelo.getUsuarioByCodCuenta(ATISOLUCIONES_CODCUENTA);
 			assertTrue(usuarioLeido.getBorrado());
 
 			// marcamos usuario como no borrado
-			marcarUsuarioComoNoBorrado(usuariosBorrar);
+			marcarUsuarioComoNoBorrado(usuarioBorrar);
 		} catch (SQLException | UVException ex) {
 			fail(String.format(MENSAJE_ERROR_HAY_EXCEPCION, ex.toString()));
 		}
@@ -519,20 +515,19 @@ public class TestBEPModeloUsuarios {
 		return usuario;
 	}
 	
-	private ArrayList<UsuarioBolsaEmpleo> marcarUsuarioComoBorrado(String codCuenta) throws SQLException, UVException {
+	private UsuarioBolsaEmpleo marcarUsuarioComoBorrado(String codCuenta) throws SQLException, UVException {
 		UsuarioBolsaEmpleo usuario = ModeloUsuarioBolsaEmpleo.obtenerInstancia().getUsuarioByCodCuenta(codCuenta);
 		assertFalse(usuario.getBorrado());
-		ArrayList<UsuarioBolsaEmpleo> usuariosBorrar = new ArrayList<>();
-		usuariosBorrar.add(usuario);
-		ModeloUsuarioBolsaEmpleo.obtenerInstancia().ponerUsuarioComoBorrado(usuariosBorrar, UtilsTestBolsaEmpleo.getUsuario("personal1"));
+
+		ModeloUsuarioBolsaEmpleo.obtenerInstancia().ponerUsuarioComoBorrado(usuario, UtilsTestBolsaEmpleo.getUsuario("personal1"));
 		usuario = ModeloUsuarioBolsaEmpleo.obtenerInstancia().getUsuarioByCodCuenta(usuario.getCodCuenta());
 		assertTrue(usuario.getBorrado());
-		return usuariosBorrar;
+		return usuario;
 	}
 	
-	private void marcarUsuarioComoNoBorrado(ArrayList<UsuarioBolsaEmpleo> usuariosBorrar) throws SQLException, UVException {
+	private void marcarUsuarioComoNoBorrado(UsuarioBolsaEmpleo usuarioBorrar) throws SQLException, UVException {
 		UsuarioBolsaEmpleo usuario;
-		ModeloUsuarioBolsaEmpleo.obtenerInstancia().ponerUsuarioComoNoBorrado(usuariosBorrar, UtilsTestBolsaEmpleo.getUsuario("personal1"));
+		ModeloUsuarioBolsaEmpleo.obtenerInstancia().ponerUsuarioComoNoBorrado(usuarioBorrar, UtilsTestBolsaEmpleo.getUsuario("personal1"));
 		usuario = ModeloUsuarioBolsaEmpleo.obtenerInstancia().getUsuarioByCodCuenta(ATISOLUCIONES_CODCUENTA);
 		assertFalse(usuario.getBorrado());
 	}

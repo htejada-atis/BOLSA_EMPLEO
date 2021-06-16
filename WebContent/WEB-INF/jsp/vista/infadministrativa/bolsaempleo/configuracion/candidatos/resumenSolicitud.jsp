@@ -77,11 +77,11 @@ VistaCandidatos bean = (VistaCandidatos) uvdatos.getVistas().get(VistaCandidatos
 		<button class="link-btn" id="candidato_volver">
 	    	 Volver
 	    </button>
-	<% if (bean.getSolicitud().getConvocatoria().getEstado().equals(ModeloConvocatoria.CONVOCATORIA_ESTADO_ABIERTA) &&
+	<%	if (bean.getSolicitud().getConvocatoria().getEstado().equals(ModeloConvocatoria.CONVOCATORIA_ESTADO_ABIERTA) &&
 			bean.getSolicitud().getEstado().equals(ModeloSolicitud.SOLICITUD_ESTADO_CERRADA)) { %>
-	    <button class="link-btn" id="reabrir_solicitud">
-	    	 Reabrir solicitud
-	    </button>
+		    <button class="link-btn" id="reabrir_solicitud">
+		    	 Reabrir solicitud
+		    </button>
 	<%	} %>
 	</div>
 	
@@ -104,13 +104,16 @@ VistaCandidatos bean = (VistaCandidatos) uvdatos.getVistas().get(VistaCandidatos
 			});
 		});
 		
-		document.getElementById("reabrir_solicitud").addEventListener("click", function() {
-			Atis.sendForm("<%= request.getRequestURI() %>", {
-				'<%=ControladorUsuarioCandidato.PARAM_ACCION%>': '<%=ControladorUsuarioCandidato.ACCION_REABRIR_SOLICITUD%>',
-				'<%=ControladorUsuarioCandidato.PARAM_CANDIDATO%>': '<%=bean.getCandidato().getCodNum()%>',
-				'<%=ControladorUsuarioCandidato.PARAM_SOLICITUD%>': '<%=bean.getSolicitud().getCodNum()%>'
+	<%	if (bean.getSolicitud().getConvocatoria().getEstado().equals(ModeloConvocatoria.CONVOCATORIA_ESTADO_ABIERTA) &&
+			bean.getSolicitud().getEstado().equals(ModeloSolicitud.SOLICITUD_ESTADO_CERRADA)) { %>
+			document.getElementById("reabrir_solicitud").addEventListener("click", function() {
+				Atis.sendForm("<%= request.getRequestURI() %>", {
+					'<%=ControladorUsuarioCandidato.PARAM_ACCION%>': '<%=ControladorUsuarioCandidato.ACCION_REABRIR_SOLICITUD%>',
+					'<%=ControladorUsuarioCandidato.PARAM_CANDIDATO%>': '<%=bean.getCandidato().getCodNum()%>',
+					'<%=ControladorUsuarioCandidato.PARAM_SOLICITUD%>': '<%=bean.getSolicitud().getCodNum()%>'
+				});
 			});
-		});
+	<%	} %>
 		
 	});
 

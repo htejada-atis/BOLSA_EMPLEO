@@ -18,17 +18,14 @@ import es.ujaen.uvirtual.modulo.bolsaempleo.utilidades.BolsaEmpleoDataTable;
  */
 public class VistaUsuarioBolsaEmpleo extends Vista implements Serializable {
 	private static final long serialVersionUID = 1L;
-	private List<UsuarioBolsaEmpleo> usuarios = new ArrayList<>();
 	private UsuarioBolsaEmpleo usuario;
 	private Usuario usuarioArcos;
 	private Rol role;
 	private List<Rol> roles = new ArrayList<>();
 	private Boolean busqueda;
-	private transient BolsaEmpleoDataTable<UsuarioBolsaEmpleo> dataTable;
-	private transient BolsaEmpleoDataTable<Bolsa> dataTableBolsa;
-	private Boolean apartadoAreasExcluidas;
-	private Boolean apartadoSolicitudes;
-	private Boolean apartadoComunicaciones;
+	private transient BolsaEmpleoDataTable<UsuarioBolsaEmpleo> dataTableUsuarios;
+	private transient BolsaEmpleoDataTable<Bolsa> dataTableAreasEvaluables;
+	private Boolean apartadoAreasEvaluables;
 	private String vista;
 	private UsuarioBolsaEmpleo usuarioLogeado;
 	
@@ -46,14 +43,6 @@ public class VistaUsuarioBolsaEmpleo extends Vista implements Serializable {
 	
 	public void setUsuarioLogeado(UsuarioBolsaEmpleo pusuario) {
 		this.usuarioLogeado = pusuario;
-	}
-
-	public List<UsuarioBolsaEmpleo> getUsuarios() {
-		return usuarios;
-	}
-
-	public void setUsuarios(List<UsuarioBolsaEmpleo> pusuarios) {
-		this.usuarios = pusuarios;
 	}
 
 	public List<Rol> getRoles() {
@@ -96,43 +85,28 @@ public class VistaUsuarioBolsaEmpleo extends Vista implements Serializable {
 		return busqueda;
 	}
 
-	public BolsaEmpleoDataTable<UsuarioBolsaEmpleo> getDatatable() {
-		return dataTable;
+	public BolsaEmpleoDataTable<UsuarioBolsaEmpleo> getDatatableUsuarios() {
+		return dataTableUsuarios;
 	}
 
-	public void setDatatable(BolsaEmpleoDataTable<UsuarioBolsaEmpleo> dt) {
-		this.dataTable = dt;
+	public void setDatatableUsuarios(BolsaEmpleoDataTable<UsuarioBolsaEmpleo> dt) {
+		this.dataTableUsuarios = dt;
 	}
 
-	public void setDatatableBolsa(BolsaEmpleoDataTable<Bolsa> dt) {
-		this.dataTableBolsa = dt;
+	public void setDatatableAreasEvaluables(BolsaEmpleoDataTable<Bolsa> dt) {
+		this.dataTableAreasEvaluables = dt;
 	}
 
-	public BolsaEmpleoDataTable<Bolsa> getDatatableBolsa() {
-		return dataTableBolsa;
+	public BolsaEmpleoDataTable<Bolsa> getDatatableAreasEvaluables() {
+		return dataTableAreasEvaluables;
 	}
 
-	public void setApartadoAreasExcluidas(Boolean apartadoAreasExcluidas) {
-		this.apartadoAreasExcluidas = apartadoAreasExcluidas;
+	public void setApartadoAreasEvaluables(Boolean apartadoAreasEvaluables) {
+		this.apartadoAreasEvaluables = apartadoAreasEvaluables;
 	}
 
-	public Boolean getApartadoAreasExcluidas() {
-		return apartadoAreasExcluidas;
+	public Boolean getApartadoAreasEvaluables() {
+		return apartadoAreasEvaluables;
 	}
 
-	public void setApartadoSolicitudes(Boolean apartadoSolicitudes) {
-		this.apartadoSolicitudes = apartadoSolicitudes;
-	}
-
-	public Boolean getApartadoSolicitudes() {
-		return apartadoSolicitudes;
-	}
-
-	public void setApartadoComunicaciones(Boolean apartadoComunicaciones) {
-		this.apartadoComunicaciones = apartadoComunicaciones;
-	}
-
-	public Boolean getApartadoComunicaciones() {
-		return apartadoComunicaciones;
-	}
 }
