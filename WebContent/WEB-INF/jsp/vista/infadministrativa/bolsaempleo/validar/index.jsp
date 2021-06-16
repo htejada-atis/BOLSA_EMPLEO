@@ -14,7 +14,7 @@ VistaValidar bean = (VistaValidar)uvdatos.getVistas().get(VistaValidar.class.get
 	<% 
 		String descripcion = "";
 		if(bean.getConvocatoria() != null) {
-			descripcion = "Última convocatoria: " + bean.getConvocatoria().getDescripcion();
+			descripcion = bean.getConvocatoria().getDescripcion();
 		} else {
 			descripcion = "No existen convocatorias en este momento";
 		}

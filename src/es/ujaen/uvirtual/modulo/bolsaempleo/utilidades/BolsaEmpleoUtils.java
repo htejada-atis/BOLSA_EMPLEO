@@ -29,7 +29,6 @@ import javax.servlet.ServletRequest;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
-import javax.servlet.http.Part;
 import es.ujaen.uvirtual.beans.vistas.Vista;
 import es.ujaen.uvirtual.modulo.bolsaempleo.modelo.ModeloParametrosConfiguracion;
 import es.ujaen.uvirtual.utilidades.Formateador;
@@ -46,7 +45,6 @@ public final class BolsaEmpleoUtils {
 	private static final int TIPO_MENSAJE_ERROR = 0;
 	private static final int TIPO_MENSAJE_EXITO = 1;
 	private static final double ROUNDER = 100.0;
-	private static final int NUMBER_2 = 2;
 	private static final int HOURS_END = 23;
 	private static final int MINUTES_SECONDS_END = 59;
 	private static final int NUMBER_1024 = 1024;

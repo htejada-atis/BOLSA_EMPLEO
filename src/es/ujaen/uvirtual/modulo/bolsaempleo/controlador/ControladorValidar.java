@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.sql.SQLException;
 import java.util.logging.Logger;
+import java.util.stream.IntStream;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.logging.Level;
@@ -129,7 +130,7 @@ public class ControladorValidar extends HttpServlet {
 			init(bean, datos, request, response);
 			switch (nombreAccion) {
 				case ACCION_INDEX:
-					indice(bean, datos, request, response);
+					indice(bean, request);
 					break;
 				case ACCION_BOLSA_SELECCIONADA:
 				case ACCION_CANDIDATO_SELECCIONADO:
@@ -175,7 +176,7 @@ public class ControladorValidar extends HttpServlet {
 		doGet(request, response);
 	}
 	
-	private void indice(VistaValidar bean, UVDatos datos, HttpServletRequest request, HttpServletResponse response) throws SQLException, UVException {
+	private void indice(VistaValidar bean, HttpServletRequest request) throws SQLException, UVException {
 		bean.setVista(JSQP_INDEX);
 		
 		HttpSession session = request.getSession(false);
@@ -195,7 +196,7 @@ public class ControladorValidar extends HttpServlet {
 			bean.setMerito(meritoSolicitud);
 			bean.setItems(modeloItem.getItemsDeApartado(meritoSolicitud.getMerito().getItemBaremacion().getBloqueBaremacion().getApartadoBaremacion()));
 			
-			obtenerValoresMeritoBolsasCandidato(bean, datos, request, response);
+			obtenerValoresMeritoBolsasCandidato(bean);
 			
 			session.removeAttribute(MENSAJE_MERITO_ENVIADO);
 			session.removeAttribute(PARAM_BOLSA);
@@ -212,8 +213,13 @@ public class ControladorValidar extends HttpServlet {
 		try {
 			bean.setUsuarioLogeado(ModeloUsuarioBolsaEmpleo.obtenerInstancia().getOrCreateUsuario(datos));
 			
-			if (!bean.getUsuarioLogeado().getRol().getCodNum().equals(ModeloRol.ID_ROL_SERVICIO_PERSONAL)) {
-				throw new UVException("No tienes permiso de personal");
+			// personal, comision, direccion
+			int[] rolesValidos = {ModeloRol.ID_ROL_SERVICIO_PERSONAL, ModeloRol.ID_ROL_DIRECTOR_DEPARTAMENTO, ModeloRol.ID_ROL_MIEMBRO_COMISION};
+			boolean contains = IntStream.of(rolesValidos).
+					anyMatch(x -> x == bean.getUsuarioLogeado().getRol().getCodNum());
+			
+			if (!contains) {
+				throw new UVException("No tienes permiso");
 			}
 		} catch (UVException e) {
 			LOGGER.log(Level.SEVERE, Formateador.getStackTrace(e));
@@ -268,7 +274,7 @@ public class ControladorValidar extends HttpServlet {
 			case ACCION_MERITO_SELECCIONADO:
 			case ACCION_MODIFICAR_MERITO:
 			case ACCION_VALIDAR_MERITO:
-				meritoSeleccionado(bean, datos, request, response, nombreAccion);
+				meritoSeleccionado(bean, request, response, nombreAccion);
 				break;
 			default:
 				accionNodefinida(bean);
@@ -276,7 +282,7 @@ public class ControladorValidar extends HttpServlet {
 		
 	}
 	
-	private void meritoSeleccionado(VistaValidar bean, UVDatos datos, HttpServletRequest request, HttpServletResponse response, String nombreAccion) 
+	private void meritoSeleccionado(VistaValidar bean, HttpServletRequest request, HttpServletResponse response, String nombreAccion) 
 			throws SQLException, UVException, IOException {
 		
 		ModeloBaremacionItems modeloItem = ModeloBaremacionItems.obtenerInstancia();
@@ -290,7 +296,7 @@ public class ControladorValidar extends HttpServlet {
 		
 		switch (nombreAccion) {
 			case ACCION_MERITO_SELECCIONADO:
-				obtenerValoresMeritoBolsasCandidato(bean, datos, request, response);
+				obtenerValoresMeritoBolsasCandidato(bean);
 				break;
 			case ACCION_MODIFICAR_MERITO:
 				modificarMerito(bean, request, response, merito);
@@ -332,8 +338,7 @@ public class ControladorValidar extends HttpServlet {
 		response.sendRedirect(request.getServletPath());
 	}
 	
-	private void obtenerValoresMeritoBolsasCandidato(VistaValidar bean, UVDatos datos, HttpServletRequest request, HttpServletResponse response)
-			throws SQLException, UVException {
+	private void obtenerValoresMeritoBolsasCandidato(VistaValidar bean) throws SQLException, UVException {
 		ModeloValidar modeloValidar = ModeloValidar.obtenerInstancia();
 		
 		bean.setBolsas(modeloValidar.listadoAreasCandidatoSujetasAfinidad(bean.getConvocatoria(), bean.getCandidato(), bean.getMerito(), bean.getUsuarioLogeado()));
@@ -409,7 +414,7 @@ public class ControladorValidar extends HttpServlet {
 		} else {
 //			Map.Entry<String, Double> entry = afinidadesRaw.entrySet().iterator().next();
 //			String idAfinidad = entry.getKey();
-//			Float idValoracion = entry.getValue();
+//			Double idValoracion = entry.getValue();
 //			Afinidad afinidad = modeloAfinidad.getAfinidadById(Formateador.leeParametroInteger(idAfinidad));
 //			modeloSolicitud.actualizarAfinidadesMeritoIndividualizado(solicitud, bolsa, bean.getMerito().getMerito(), afinidad,
 //					Math.round(idValoracion), bean.getUsuarioLogeado());
