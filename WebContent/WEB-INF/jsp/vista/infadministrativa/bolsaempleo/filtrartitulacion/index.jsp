@@ -20,7 +20,13 @@ UsuarioBolsaEmpleo candidato = bean.getCandidato();
 
 	<jsp:include page="/WEB-INF/jsp/vista/infadministrativa/bolsaempleo/mensajes.jsp" />
 	
-	<h2>Filtrado de candidatos por titulación</h2>
+	<div class="titulo-bolsa-empleo">
+		<h2>Filtrado de candidatos por titulación</h2>
+	    <button class="link-btn" id="sin_titulacion">
+	    	 Listado de candidatos sin titulación
+	    </button>
+	</div>
+
 	<p>Filtrado de candidatos por titulaciones, para su posible exclusión.</p>
 	
 	<table class="bluetable bolsaempleo" id="tableCandidatos">
@@ -170,6 +176,12 @@ UsuarioBolsaEmpleo candidato = bean.getCandidato();
 			});
 		<% } %>
 		
+		$('#sin_titulacion').on('click', function() {
+			var params = {
+   				'<%=ControladorFiltrarTitulacion.PARAM_ACCION %>': '<%=ControladorFiltrarTitulacion.ACCION_CANDIDATOS_SIN_TITULACION%>'   				
+	    	};
+    		Atis.sendForm("<%=request.getRequestURI()%>", params);
+		});
 	}); 
 </script>
 	
