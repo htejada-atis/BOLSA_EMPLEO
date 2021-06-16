@@ -272,7 +272,7 @@ $(document).ready(function() {
 	    "params": {'<%=ControladorValidar.PARAM_BOLSA%>': '<%= bolsa.getCodNum() %>'},
 	    "clickable": {'onClick': function(row) {
 	    	var params = {
-    				'a': '<%= ControladorValidar.ACCION_CANDIDATO_SELECCIONADO %>',
+    				'<%= ControladorValidar.PARAM_ACCION %>': '<%= ControladorValidar.ACCION_CANDIDATO_SELECCIONADO %>',
     				'<%= ControladorValidar.PARAM_BOLSA%>': '<%= bolsa.getCodNum() %>',
     				'<%= ControladorValidar.PARAM_CANDIDATO %>': row.codNum
     				};
