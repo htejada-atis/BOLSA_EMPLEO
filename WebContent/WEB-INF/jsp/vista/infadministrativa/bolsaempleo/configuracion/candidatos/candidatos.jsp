@@ -51,7 +51,7 @@ $(document).ready(function() {
 	    "columns": [
 	        {'data': 'prsnif', 'filter': true, 'overflow': 'auto'},
 	        {'data': 'codcuenta', 'filter': true, 'overflow': 'auto'},
-	        {'data': 'apellido1', 'filter': false, 'order': false, 'overflow': 'auto', 'render': function(row) {
+	        {'data': 'apellido1', 'filter': true, 'order': false, 'overflow': 'auto', 'render': function(row) {
         		return row.nombre + " " + row.apellido1 + " " + row.apellido2; 
         	}},
 	        {'data': 'listaDist', 'filter': {'type': 'selectBoolean', 'true': 'En Lista', 'false': 'Sin Lista'}, 'render': function(row) {
