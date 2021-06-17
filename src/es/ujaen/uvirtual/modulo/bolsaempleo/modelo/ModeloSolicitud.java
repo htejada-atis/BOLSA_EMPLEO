@@ -1339,7 +1339,7 @@ public class ModeloSolicitud {
 	 * @throws UVException .
 	 * @throws SQLException .
 	 */
-	public boolean comprobarMeritoPuedeSerBorrado(Merito merito) throws SQLException, UVException {
+	public boolean comprobarMeritoPuedeSerBorrado(Merito merito) throws SQLException {
 		boolean asociadoASolicitud = false;
 		boolean evaluado = false;
 		
@@ -1383,7 +1383,7 @@ public class ModeloSolicitud {
 	 * @throws UVException .
 	 * @throws SQLException .
 	 */
-	public boolean comprobarMeritoPreferentePuedeSerBorrado(MeritoPreferenteUsuario merito) throws SQLException, UVException {
+	public boolean comprobarMeritoPreferentePuedeSerBorrado(MeritoPreferenteUsuario merito) throws SQLException {
 		// si la convocatoria está cerrada, no se puede
 		Convocatoria c = ModeloConvocatoria.obtenerInstancia().getUltimaConvocatoria();
 		boolean convocatoriaCerrada = ModeloConvocatoria.obtenerInstancia().isConvocatoriaCerrada(c);
@@ -1398,7 +1398,7 @@ public class ModeloSolicitud {
 	 * @throws UVException .
 	 * @throws SQLException .
 	 */
-	public boolean comprobarTitulacionUsuarioPuedeSerBorrada(TitulacionUsuario t) throws SQLException, UVException {
+	public boolean comprobarTitulacionUsuarioPuedeSerBorrada(TitulacionUsuario t) throws SQLException {
 		// si la convocatoria está cerrada, no se puede
 		Convocatoria c = ModeloConvocatoria.obtenerInstancia().getUltimaConvocatoria();
 		boolean convocatoriaCerrada = ModeloConvocatoria.obtenerInstancia().isConvocatoriaCerrada(c);
@@ -1412,7 +1412,7 @@ public class ModeloSolicitud {
 	 * @throws UVException .
 	 * @throws SQLException .
 	 */
-	public boolean comprobarMeritoPreferentePuedeSerCreado() throws SQLException, UVException {
+	public boolean comprobarMeritoPreferentePuedeSerCreado() throws SQLException {
 		return this.comprobarTitulacionPuedeSerCreada();
 	}
 	
@@ -1422,7 +1422,7 @@ public class ModeloSolicitud {
 	 * @throws UVException .
 	 * @throws SQLException .
 	 */
-	public boolean comprobarTitulacionPuedeSerCreada() throws SQLException, UVException {
+	public boolean comprobarTitulacionPuedeSerCreada() throws SQLException {
 		// si la convocatoria está cerrada, no se puede
 		Convocatoria c = ModeloConvocatoria.obtenerInstancia().getUltimaConvocatoria();
 		boolean convocatoriaCerrada = ModeloConvocatoria.obtenerInstancia().isConvocatoriaCerrada(c);
