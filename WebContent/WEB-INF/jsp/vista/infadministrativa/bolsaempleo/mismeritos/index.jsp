@@ -24,6 +24,10 @@ VistaMeritos bean = (VistaMeritos) uvdatos.getVistas().get(VistaMeritos.class.ge
 	    </button>
 	</div>
 	
+	<p>La aplicación permiteal usuario crear un <b>repositorio personal de méritos</b>.
+	Aquí podría incluir todos los méritos que se deseen, pero su simple inclusión en este repositorio no implica que sean evaluados. 
+	Para ello deberán con posterioridad incorporarse en la bolsa a evaluar.</p>
+	
 	<table class="bluetable bolsaempleo" id="tableMeritos">
 		<!--<caption>MÉRITOS QUE LA COMISIÓN EVALUARÁ</caption>-->
 		<tr>
