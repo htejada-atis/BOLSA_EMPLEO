@@ -4,7 +4,6 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.sql.SQLException;
 import java.util.HashMap;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.logging.Level;
@@ -47,7 +46,7 @@ import es.ujaen.uvirtual.utilidades.UVException;
 @WebServlet(
 	name = "informacionadministrativa.bolsaempleo.configuracion.candidatos", 
 	description = "Gestión de usuarios candidatos", 
-	urlPatterns = { 
+	urlPatterns = {
 			"/srv/es/informacionadministrativa/bolsaempleo/configuracion/candidatos", 
 			"/srv/en/informacionadministrativa/bolsaempleo/configuracion/candidatos",
 			"/srv/es/ajax/informacionadministrativa/bolsaempleo/configuracion/candidatos",
