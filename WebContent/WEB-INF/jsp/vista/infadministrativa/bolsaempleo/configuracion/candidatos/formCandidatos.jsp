@@ -369,7 +369,6 @@ UsuarioBolsaEmpleo candidato = bean.getCandidato();
 			    	{'data': 'convocatoria.descripcion', 'filter': true},
 			        {'data': 'estado', 'filter': true},
 			        {'data': 'fechaConfirmacion', order: {'active': false}, 'render': function(row) {
-			        	console.log(row.estado);
 			        	return row.estado == 'CERRADA' ? row.fechaConfirmacion : '';
 			        }}
 			    ]
