@@ -53,6 +53,10 @@ function DataTable(id, config) {
     	return self.params[key];
     };
 
+    this.setFilter = function(key, value) {
+        self.filterParams[key] = value;
+    };
+
     this.setTitle = function(tit) {
         self.title = tit;
     };
