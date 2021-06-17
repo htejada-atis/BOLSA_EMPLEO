@@ -22,6 +22,11 @@ UsuarioBolsaEmpleo candidato = bean.getCandidato();
 	
 	<div class="titulo-bolsa-empleo">
 		<h2>Listado de candidatos sin titulación</h2>
+		
+		<button class="link-btn" id="exportar">
+	    	 Exportar a csv
+	    </button>
+	    
 	    <button class="link-btn" id="volver">
 	    	 Volver
 	    </button>
@@ -59,10 +64,12 @@ UsuarioBolsaEmpleo candidato = bean.getCandidato();
 		});
 		
 		$('#volver').on('click', function() {
-			var params = {
-   				'<%=ControladorFiltrarTitulacion.PARAM_ACCION %>': '<%=ControladorFiltrarTitulacion.ACCION_INDEX%>'   				
-	    	};
+			var params = {'<%=ControladorFiltrarTitulacion.PARAM_ACCION %>': '<%=ControladorFiltrarTitulacion.ACCION_INDEX%>'};
     		Atis.sendForm("<%=request.getRequestURI()%>", params);
+		});
+		
+		$('#exportar').on('click', function() {
+			window.open("<%= request.getRequestURI() %>?<%= ControladorFiltrarTitulacion.PARAM_ACCION %>=<%= ControladorFiltrarTitulacion.ACCION_EXPORTAR_SIN_TITULACION %>");
 		});
 	}); 
 </script>
