@@ -26,6 +26,7 @@ public class ModeloCandidato {
 	
 	public static final int ORDER_COLUMN_INDEX_DOCUMENTO_CANDIDATO = 0;
 	public static final int ORDER_COLUMN_INDEX_NOMBRE_CANDIDATO = 1;
+	public static final int ORDER_COLUMN_INDEX_EMAIL_CANDIDATO = 2;
 	
 	protected static ModeloCandidato eInstancia;
 
@@ -75,70 +76,38 @@ public class ModeloCandidato {
 	}
 	
 	/**
-	 * Listado de candidatos en función de un área .
-	 * 
-	 * @param params para leer los parametros de paginación, ordenacion, etc .
-	 * @param conTitulaciones con solicitud 
-	 * @return listado de candidatos .
-	 * @throws SQLException en caso de error de base de datos .
-	 * @throws UVException  error si no existe la area .
+	 * Devuelve un array pereparado para exportar un csv de titulaciones.
+	 * @return .
+	 * @throws SQLException .
+	 * @throws UVException .
 	 */
-	private BolsaEmpleoDataTable<CandidatoTitulacionTable> listaCandidatosTitulacionesDatatable(Map<String, String[]> params, boolean conTitulaciones) 
-			throws SQLException, UVException {
-		
-		List<CandidatoTitulacionTable> usuarios = new ArrayList<>();
-		BolsaEmpleoDataTable<CandidatoTitulacionTable> dataTable = new BolsaEmpleoDataTable<>(params);
-		
-		String subquery = ""
-				+ " SELECT COUNT(*) "
-				+ " FROM TBEP_TITULACIONES_USUARIO beptus "
-				+ "	WHERE beptus.BEPTUS_USU_CODNUM = bepusu.CODNUM AND beptus.FLGBORRADO = 'N'";
+	public List<String[]> listaCandidatosSinTitulacionCsv() throws SQLException, UVException {
+		List<String[]> rows = new ArrayList<>();
+				
+		String consulta = getQueryFromCandidatosTitulacion(false);
 
-		String consulta = ""
-				+ " SELECT bepusu.CODNUM, "
-				+ "		(" + subquery + ") AS COUNT_TITULACIONES,"
-				+ "		(SELECT COUNT(*) FROM TBEP_TITULACIONES_USUARIO beptus "
-				+ "		 WHERE beptus.BEPTUS_USU_CODNUM = bepusu.CODNUM AND beptus.FLGBORRADO = 'N' AND beptus.FLGVALIDADA = 'S'"
-				+ "		) AS COUNT_VALIDADAS" 
-				+ "	FROM TBEP_USUARIOS bepusu" 
-				+ "	WHERE bepusu.rol = " + ModeloRol.ID_ROL_CANDIDATO;
-						
-		if (conTitulaciones) {
-			consulta += " AND (" + subquery + ") > 0 "; 
-		} else {
-			consulta += " AND (" + subquery + ") = 0 ";
-		}
-		
-		String whereNombre = String.format("(%s || ' ' || %s || ' ' || %s)", "bepusu.VUAJA_STRNOMBRE", "bepusu.VUAJA_STRAPELLIDO1", "bepusu.VUAJA_STRAPELLIDO2");
-
-		dataTable.setColumn(ORDER_COLUMN_INDEX_DOCUMENTO_CANDIDATO, "bepusu.VUAJA_PRSNIF");
-		dataTable.setColumn(ORDER_COLUMN_INDEX_NOMBRE_CANDIDATO, whereNombre, DataTableColumn.COLUMN_TYPE_TEXT);
-
-		dataTable.setQuery(consulta);
-
-		try (Connection conexion = ConexionUvirtual.obtenerInstancia();
-				PreparedStatement stmtCount = conexion.prepareStatement(dataTable.getQueryCount());
-				PreparedStatement stmt = conexion.prepareStatement(dataTable.getQuery())) {
-			dataTable.setFiltersParams(stmt, stmtCount, 1);
-
+		try (Connection conexion = ConexionUvirtual.obtenerInstancia(); PreparedStatement stmt = conexion.prepareStatement(consulta)) {
 			try (ResultSet rs = stmt.executeQuery()) {
 				ModeloUsuarioBolsaEmpleo modeloUsuario = ModeloUsuarioBolsaEmpleo.obtenerInstancia(); 
 				
 				while (rs.next()) {
-					UsuarioBolsaEmpleo usuario = modeloUsuario.getUsuarioById(rs.getInt("CODNUM"));					
-					Integer titulaciones = rs.getInt("COUNT_TITULACIONES");
-					Integer validadas = rs.getInt("COUNT_VALIDADAS");
-
-					usuarios.add(new CandidatoTitulacionTable(usuario, titulaciones, validadas));					
+					UsuarioBolsaEmpleo usuario = modeloUsuario.getUsuarioById(rs.getInt("CODNUM"));
+					
+					rows.add(new String[] {
+						String.format("\"%s\"", usuario.getCodNum().toString()),
+						String.format("\"%s\"", usuario.getPrsNif() != null ? usuario.getPrsNif() : ""),						
+						String.format("\"%s %s %s\"",
+								usuario.getNombre() != null ? usuario.getNombre() : "",
+								usuario.getPrimerApellido() != null ? usuario.getPrimerApellido() : "",
+								usuario.getSegundoApellido() != null ? usuario.getSegundoApellido() : ""),
+						String.format("\"%s\"", usuario.getEmail() != null ? usuario.getEmail() : ""),						
+					});
 				}
 			}
-
-			dataTable.setRecordsTotalFromQuery(stmtCount);
-			dataTable.setData(usuarios);
 		}
-
-		return dataTable;
-	}
+		
+		return rows;
+	} 	
 	
 	/**
 	 * Listado de candidatos en función de un área .
@@ -207,4 +176,77 @@ public class ModeloCandidato {
 		return dataTable;
 	}
 
+	/**
+	 * Listado de candidatos en función de un área .
+	 * 
+	 * @param params para leer los parametros de paginación, ordenacion, etc .
+	 * @param conTitulaciones con solicitud 
+	 * @return listado de candidatos .
+	 * @throws SQLException en caso de error de base de datos .
+	 * @throws UVException  error si no existe la area .
+	 */
+	private BolsaEmpleoDataTable<CandidatoTitulacionTable> listaCandidatosTitulacionesDatatable(Map<String, String[]> params, boolean conTitulaciones) 
+			throws SQLException, UVException {
+		
+		List<CandidatoTitulacionTable> usuarios = new ArrayList<>();
+		BolsaEmpleoDataTable<CandidatoTitulacionTable> dataTable = new BolsaEmpleoDataTable<>(params);
+		
+		String consulta = getQueryFromCandidatosTitulacion(conTitulaciones);
+								
+		String whereNombre = String.format("(%s || ' ' || %s || ' ' || %s)", "bepusu.VUAJA_STRNOMBRE", "bepusu.VUAJA_STRAPELLIDO1", "bepusu.VUAJA_STRAPELLIDO2");
+
+		dataTable.setColumn(ORDER_COLUMN_INDEX_DOCUMENTO_CANDIDATO, "bepusu.VUAJA_PRSNIF");
+		dataTable.setColumn(ORDER_COLUMN_INDEX_NOMBRE_CANDIDATO, whereNombre, DataTableColumn.COLUMN_TYPE_TEXT);
+		dataTable.setColumn(ORDER_COLUMN_INDEX_EMAIL_CANDIDATO, "bepusu.VUAJA_EMAIL_ALTA");
+
+		dataTable.setQuery(consulta);
+
+		try (Connection conexion = ConexionUvirtual.obtenerInstancia();
+				PreparedStatement stmtCount = conexion.prepareStatement(dataTable.getQueryCount());
+				PreparedStatement stmt = conexion.prepareStatement(dataTable.getQuery())) {
+			dataTable.setFiltersParams(stmt, stmtCount, 1);
+
+			try (ResultSet rs = stmt.executeQuery()) {
+				ModeloUsuarioBolsaEmpleo modeloUsuario = ModeloUsuarioBolsaEmpleo.obtenerInstancia(); 
+				
+				while (rs.next()) {
+					UsuarioBolsaEmpleo usuario = modeloUsuario.getUsuarioById(rs.getInt("CODNUM"));					
+					Integer titulaciones = rs.getInt("COUNT_TITULACIONES");
+					Integer validadas = rs.getInt("COUNT_VALIDADAS");
+
+					usuarios.add(new CandidatoTitulacionTable(usuario, titulaciones, validadas));					
+				}
+			}
+
+			dataTable.setRecordsTotalFromQuery(stmtCount);
+			dataTable.setData(usuarios);
+		}
+
+		return dataTable;
+	}
+	
+	private String getQueryFromCandidatosTitulacion(boolean conTitulaciones) {
+		String subquery = ""
+				+ " SELECT COUNT(*) "
+				+ " FROM TBEP_TITULACIONES_USUARIO beptus "
+				+ "	WHERE beptus.BEPTUS_USU_CODNUM = bepusu.CODNUM AND beptus.FLGBORRADO = 'N'";
+
+		String consulta = ""
+				+ " SELECT bepusu.CODNUM, "
+				+ "		(" + subquery + ") AS COUNT_TITULACIONES,"
+				+ "		(SELECT COUNT(*) FROM TBEP_TITULACIONES_USUARIO beptus "
+				+ "		 WHERE beptus.BEPTUS_USU_CODNUM = bepusu.CODNUM AND beptus.FLGBORRADO = 'N' AND beptus.FLGVALIDADA = 'S'"
+				+ "		) AS COUNT_VALIDADAS" 
+				+ "	FROM TBEP_USUARIOS bepusu" 
+				+ "	WHERE bepusu.rol = " + ModeloRol.ID_ROL_CANDIDATO;
+						
+		if (conTitulaciones) {
+			consulta += " AND (" + subquery + ") > 0 "; 
+		} else {
+			consulta += " AND (" + subquery + ") = 0 ";
+		}
+		
+		return consulta;
+	}
+	
 }
