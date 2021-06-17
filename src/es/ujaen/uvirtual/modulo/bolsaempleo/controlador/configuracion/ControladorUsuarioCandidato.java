@@ -144,9 +144,7 @@ public class ControladorUsuarioCandidato extends HttpServlet {
 		datos.setDocType("<!DOCTYPE html>");
 		datos.setContentType("text/html");
 		
-		VistaCandidatos bean = new VistaCandidatos();		
-		Usuario usuario = datos.getUsuario();
-		LOGGER.log(Level.FINEST, "usuario que ha entrado en el servlet es {0}", usuario.getUid());
+		VistaCandidatos bean = new VistaCandidatos();
 		
 		String nombreAccion = EscapaHTML.ajustaCodificacion(BolsaEmpleoUtils.getParamRequestOrSession(request, PARAM_ACCION));
 		if (nombreAccion == null) {
@@ -289,7 +287,6 @@ public class ControladorUsuarioCandidato extends HttpServlet {
 				break;
 			case ACCION_SELECCIONAR_CANDIDATO:
 				break;
-			
 			case ACCION_SOLICITUDES_CANDIDATO:
 				bean.setApartadoSolicitudes(true);
 				break;
@@ -418,20 +415,14 @@ public class ControladorUsuarioCandidato extends HttpServlet {
 	
 	private void eliminarCandidato(VistaCandidatos bean, HttpServletRequest request, HttpServletResponse response)
 			throws SQLException, UVException, IOException {
-		List<UsuarioBolsaEmpleo> users = new ArrayList<>();
-		users.add(bean.getCandidato());
-		
-		ModeloUsuarioBolsaEmpleo.obtenerInstancia().ponerUsuarioComoBorrado(users, bean.getUsuarioLogeado());	
+		ModeloUsuarioBolsaEmpleo.obtenerInstancia().ponerUsuarioComoBorrado(bean.getCandidato(), bean.getUsuarioLogeado());	
 		BolsaEmpleoUtils.addMensajeDeExito(MENSAJE_EXITO_ELIMINAR, bean, request);
 		response.sendRedirect(request.getServletPath());
 	}
 	
 	private void recuperarCantidato(VistaCandidatos bean, HttpServletRequest request, HttpServletResponse response) 
 			throws SQLException, UVException, IOException {
-		List<UsuarioBolsaEmpleo> users = new ArrayList<>();
-		users.add(bean.getCandidato());
-		
-		ModeloUsuarioBolsaEmpleo.obtenerInstancia().ponerUsuarioComoNoBorrado(users, bean.getUsuarioLogeado());
+		ModeloUsuarioBolsaEmpleo.obtenerInstancia().ponerUsuarioComoNoBorrado(bean.getCandidato(), bean.getUsuarioLogeado());
 		BolsaEmpleoUtils.addMensajeDeExito(MENSAJE_EXITO_RESTAURAR, bean, request);
 		response.sendRedirect(request.getServletPath());
 	}

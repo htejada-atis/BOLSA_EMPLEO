@@ -38,9 +38,10 @@ public class ModeloUsuarioBolsaEmpleo {
 	private static final Logger LOGGER = Logger.getLogger(NOMBREDEESTACLASE);
 
 	// columnas datatable usuario	
-	public static final int ORDER_COLUMN_INDEX_USUARIO_DOCUMENTO = 1;
-	public static final int ORDER_COLUMN_INDEX_USUARIO_CODCUENTA = 2;
-	public static final int ORDER_COLUMN_INDEX_USUARIO_ROL = 4;
+	public static final int ORDER_COLUMN_INDEX_USUARIO_DOCUMENTO = 0;
+	public static final int ORDER_COLUMN_INDEX_USUARIO_CODCUENTA = 1;
+	public static final int ORDER_COLUMN_INDEX_USUARIO_ROL = 3;
+	public static final int ORDER_COLUMN_INDEX_USUARIO_EXCLUIDO = 4;
 	public static final int ORDER_COLUMN_INDEX_USUARIO_ELIMINADO = 5;
 	
 	// columnas datatable candidato
@@ -178,6 +179,28 @@ public class ModeloUsuarioBolsaEmpleo {
 			}
 		}
 	}
+	
+	/** Devuelve un usuario bep por su codigo de cuenta si existe, en caso contrario devuelve null.
+	 * @param codcuenta codigo de usuario .
+	 * @return usuario o null si no existe .
+	 * @throws SQLException .
+	 * @throws UVException  .
+	 */
+	public UsuarioBolsaEmpleo compruebaUsuarioByCodCuenta(String codcuenta) throws SQLException, UVException {
+		String consulta = "SELECT * FROM TBEP_USUARIOS bepusu WHERE bepusu.CODCUENTA = ?";
+		
+		try (Connection conexion = ConexionUvirtual.obtenerInstancia(); PreparedStatement stmt = conexion.prepareStatement(consulta)) {
+			stmt.setString(1, codcuenta);
+
+			try (ResultSet rs = stmt.executeQuery()) {
+				if (!rs.next()) {
+					return null;
+				}
+				
+				return getUsuarioFromResultSet(rs);
+			}
+		}
+	}
 
 	/**
 	 * Listado de usuarios de bolsa empleo.
@@ -191,11 +214,12 @@ public class ModeloUsuarioBolsaEmpleo {
 		List<UsuarioBolsaEmpleo> usuarios = new ArrayList<>();
 		BolsaEmpleoDataTable<UsuarioBolsaEmpleo> dataTable = new BolsaEmpleoDataTable<>(params);
 
-		String consulta = "SELECT * FROM TBEP_USUARIOS bepusu WHERE 1=1";
+		String consulta = "SELECT * FROM TBEP_USUARIOS bepusu WHERE bepusu.ROL != " + ModeloRol.ID_ROL_CANDIDATO + " ";
 		
 		dataTable.setColumn(ModeloUsuarioBolsaEmpleo.ORDER_COLUMN_INDEX_USUARIO_DOCUMENTO, "bepusu.VUAJA_PRSNIF");
 		dataTable.setColumn(ModeloUsuarioBolsaEmpleo.ORDER_COLUMN_INDEX_USUARIO_CODCUENTA, "bepusu.CODCUENTA");
 		dataTable.setColumn(ModeloUsuarioBolsaEmpleo.ORDER_COLUMN_INDEX_USUARIO_ROL, "bepusu.ROL");
+		dataTable.setColumn(ModeloUsuarioBolsaEmpleo.ORDER_COLUMN_INDEX_USUARIO_EXCLUIDO, "bepusu.FLGEXCLUIDO", DataTableColumn.COLUMN_TYPE_BOOLEAN);
 		dataTable.setColumn(ModeloUsuarioBolsaEmpleo.ORDER_COLUMN_INDEX_USUARIO_ELIMINADO, "bepusu.FLGBORRADO", DataTableColumn.COLUMN_TYPE_BOOLEAN);
 		dataTable.setQuery(consulta);
 		
@@ -719,28 +743,27 @@ public class ModeloUsuarioBolsaEmpleo {
 	}
 
 	/** Establece el usuario como borrado.
-	 * @param usuarios .
+	 * @param usuario .
 	 * @param usuarioUpdate .
 	 * @throws UVException .
 	 * @throws SQLException .
 	 */
-	public void ponerUsuarioComoBorrado(List<UsuarioBolsaEmpleo> usuarios, UsuarioBolsaEmpleo usuarioUpdate) throws SQLException, UVException {
-		this.cambiarFlagBorradoUsuario(usuarios, USUARIO_BORRADO, usuarioUpdate);
+	public void ponerUsuarioComoBorrado(UsuarioBolsaEmpleo usuario, UsuarioBolsaEmpleo usuarioUpdate) throws SQLException, UVException {
+		this.cambiarFlagBorradoUsuario(usuario, USUARIO_BORRADO, usuarioUpdate);
 	}
 
 	/** Establece el usuario como NO borrado.
-	 * @param usuarios .
+	 * @param usuario .
 	 * @param usuarioUpdate .
 	 * @throws UVException .
 	 * @throws SQLException .
 	 */
-	public void ponerUsuarioComoNoBorrado(List<UsuarioBolsaEmpleo> usuarios, UsuarioBolsaEmpleo usuarioUpdate) throws SQLException, UVException {
-		this.cambiarFlagBorradoUsuario(usuarios, USUARIO_NO_BORRADO, usuarioUpdate);
+	public void ponerUsuarioComoNoBorrado(UsuarioBolsaEmpleo usuario, UsuarioBolsaEmpleo usuarioUpdate) throws SQLException, UVException {
+		this.cambiarFlagBorradoUsuario(usuario, USUARIO_NO_BORRADO, usuarioUpdate);
 	}
 
-	private void cambiarFlagBorradoUsuario(List<UsuarioBolsaEmpleo> usuarios, String borrado, UsuarioBolsaEmpleo usuarioUpdate) throws SQLException, UVException {
-		String params = BolsaEmpleoUtils.consultaMultiplesParametros(usuarios.size());
-		String query = "UPDATE TBEP_USUARIOS SET UID_USUARIO=?,FLGBORRADO=?,FECHA_BORRADO=? WHERE CODNUM IN  (" + params + ")";
+	private void cambiarFlagBorradoUsuario(UsuarioBolsaEmpleo usuario, String borrado, UsuarioBolsaEmpleo usuarioUpdate) throws SQLException, UVException {
+		String query = "UPDATE TBEP_USUARIOS SET UID_USUARIO=?,FLGBORRADO=?,FECHA_BORRADO=? WHERE CODNUM = ?";
 
 		try (Connection conexion = ConexionUvirtual.obtenerInstancia(); PreparedStatement stmt = conexion.prepareStatement(query)) {
 			int indexParam = 1;
@@ -753,15 +776,11 @@ public class ModeloUsuarioBolsaEmpleo {
 				stmt.setNull(indexParam++, Types.DATE);
 			}
 
-			for (UsuarioBolsaEmpleo usuario : usuarios) {
-				stmt.setInt(indexParam++, usuario.getCodNum());
-			}
+			stmt.setInt(indexParam++, usuario.getCodNum());
 			stmt.executeUpdate();
 		}
 		
-		for (UsuarioBolsaEmpleo usuario : usuarios) {
-			this.refrescarUsuarioBEP(usuario);
-		}
+		this.refrescarUsuarioBEP(usuario);
 	}
 
 	/**

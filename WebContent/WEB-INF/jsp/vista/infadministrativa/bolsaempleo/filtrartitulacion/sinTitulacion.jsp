@@ -22,6 +22,11 @@ UsuarioBolsaEmpleo candidato = bean.getCandidato();
 	
 	<div class="titulo-bolsa-empleo">
 		<h2>Listado de candidatos sin titulación</h2>
+		
+		<button class="link-btn" id="exportar">
+	    	 Exportar a csv
+	    </button>
+	    
 	    <button class="link-btn" id="volver">
 	    	 Volver
 	    </button>
@@ -30,18 +35,19 @@ UsuarioBolsaEmpleo candidato = bean.getCandidato();
 	<table class="bluetable bolsaempleo" id="tableCandidatos">
 		<tr>
 			<th scope="col" style="width:12%">Documento</th>
-			<th scope="col" style="width:88%">Candidato</th>					
+			<th scope="col" style="width:58%">Candidato</th>					
+			<th scope="col" style="width:30%">Email</th>
 		</tr>
 		<tbody></tbody>
 		<tfoot>
 			<tr>
-				<th colSpan="2" style="width:100%"></th>
+				<th colSpan="3" style="width:100%"></th>
 			</tr>
 		</tfoot>
 	</table>
 </div>
 	
-<script>	
+<script>
 	$(document).ready(function() {			
 		var tableCandidatos = new Atis.DataTable('#tableCandidatos', {
 		    "ajax": { url: "<%=ControladorFiltrarTitulacion.URL_PATTERN_AJAX%>", async: false },
@@ -53,14 +59,17 @@ UsuarioBolsaEmpleo candidato = bean.getCandidato();
 		    	{'data': 'apellido1', 'filter': true, 'overflow': 'auto', 'render': function(row) {
 	        		return row.nombre + " " + row.apellido1 + " " + row.apellido2; 
 	        	}},
+	        	{'data': 'email', 'filter': true, 'overflow': 'auto'},
 		    ],
 		});
 		
 		$('#volver').on('click', function() {
-			var params = {
-   				'<%=ControladorFiltrarTitulacion.PARAM_ACCION %>': '<%=ControladorFiltrarTitulacion.ACCION_INDEX%>'   				
-	    	};
+			var params = {'<%=ControladorFiltrarTitulacion.PARAM_ACCION %>': '<%=ControladorFiltrarTitulacion.ACCION_INDEX%>'};
     		Atis.sendForm("<%=request.getRequestURI()%>", params);
+		});
+		
+		$('#exportar').on('click', function() {
+			window.open("<%= request.getRequestURI() %>?<%= ControladorFiltrarTitulacion.PARAM_ACCION %>=<%= ControladorFiltrarTitulacion.ACCION_EXPORTAR_SIN_TITULACION %>");
 		});
 	}); 
 </script>
