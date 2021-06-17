@@ -21,6 +21,7 @@ public class VistaTitulaciones extends Vista implements Serializable {
 	private TitulacionUsuario titulacionUsuario;
 	private String vista;
 	private UsuarioBolsaEmpleo usuarioLogeado;
+	private boolean sePuedeAgregar;
 	
 	public String getVista() {
 		return vista;
@@ -68,5 +69,13 @@ public class VistaTitulaciones extends Vista implements Serializable {
 
 	public void setTitulacionUsuario(TitulacionUsuario titulacionUsuario) {
 		this.titulacionUsuario = titulacionUsuario;
+	}
+
+	public void setSePuedeAgregar(boolean comprobarTitulacionPuedeSerCreada) {
+		this.sePuedeAgregar = comprobarTitulacionPuedeSerCreada;		
+	}
+	
+	public boolean getSePuedeAgregar() {
+		return this.sePuedeAgregar;
 	}
 }

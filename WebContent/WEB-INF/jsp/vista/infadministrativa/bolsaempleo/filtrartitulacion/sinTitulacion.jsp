@@ -1,3 +1,4 @@
+<%@page import="es.ujaen.uvirtual.modulo.bolsaempleo.controlador.configuracion.ControladorUsuarioCandidato"%>
 <%@ page trimDirectiveWhitespaces="true"%>
 <%@ page import="java.util.stream.Collectors" %>
 <%@	page import="es.ujaen.uvirtual.modulo.bolsaempleo.controlador.ControladorFiltrarTitulacion"%>
@@ -35,13 +36,14 @@ UsuarioBolsaEmpleo candidato = bean.getCandidato();
 	<table class="bluetable bolsaempleo" id="tableCandidatos">
 		<tr>
 			<th scope="col" style="width:12%">Documento</th>
-			<th scope="col" style="width:58%">Candidato</th>					
+			<th scope="col" style="width:43%">Candidato</th>					
 			<th scope="col" style="width:30%">Email</th>
+			<th scope="col" style="width:15%"></th>
 		</tr>
 		<tbody></tbody>
 		<tfoot>
 			<tr>
-				<th colSpan="3" style="width:100%"></th>
+				<th colSpan="4" style="width:100%"></th>
 			</tr>
 		</tfoot>
 	</table>
@@ -60,6 +62,9 @@ UsuarioBolsaEmpleo candidato = bean.getCandidato();
 	        		return row.nombre + " " + row.apellido1 + " " + row.apellido2; 
 	        	}},
 	        	{'data': 'email', 'filter': true, 'overflow': 'auto'},
+	        	{'data': 'codNum', 'buttons': [{'label': 'Ir a candidato', 'onClick': function(row) { 
+		        	window.open("<%= ControladorUsuarioCandidato.getUrlCandidato("_NUM_") %>".replace("_NUM_", row.codNum));
+		        }}]}
 		    ],
 		});
 		

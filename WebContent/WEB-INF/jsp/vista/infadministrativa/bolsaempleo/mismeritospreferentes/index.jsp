@@ -18,9 +18,13 @@ VistaMeritosPreferentesCandidato bean = (VistaMeritosPreferentesCandidato) uvdat
 	<div class="titulo-bolsa-empleo">
 		<h2>Mis Acreditaciones</h2>
     
-	    <button class="link-btn" id="nuevo_merito">
-	    	 Nueva acreditación
-	    </button>
+    	<% if (bean.getSePuedeAgregar()) { %>
+		    <button class="link-btn" id="nuevo_merito">
+		    	 Nueva acreditación
+		    </button>
+		<% } else { %>
+			<p>La convocatoria se está evaluando.</p>
+		<% } %>
 	</div>
 	
 	<table class="bluetable bolsaempleo" id="tableMeritos">
@@ -47,10 +51,12 @@ VistaMeritosPreferentesCandidato bean = (VistaMeritosPreferentesCandidato) uvdat
 
 	$(document).ready(function() {
 		
-		document.getElementById("nuevo_merito").addEventListener("click", function(event) {
-			event.preventDefault();
-			Atis.sendForm("<%= request.getRequestURI() %>", {'a': '<%= ControladorMisMeritosPreferentes.ACCION_AGREGAR_MERITO %>'});
-		});
+		<% if (bean.getSePuedeAgregar()) { %>
+			document.getElementById("nuevo_merito").addEventListener("click", function(event) {
+				event.preventDefault();
+				Atis.sendForm("<%= request.getRequestURI() %>", {'a': '<%= ControladorMisMeritosPreferentes.ACCION_AGREGAR_MERITO %>'});
+			});
+		<% } %>
 		
 		var table = new Atis.DataTable('#tableMeritos', {
 		    "ajax": { url: "<%= ControladorMisMeritosPreferentes.URL_PATTERN_AJAX %>" },

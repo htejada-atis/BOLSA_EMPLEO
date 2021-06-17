@@ -12,6 +12,7 @@ import es.ujaen.uvirtual.modelo.conexion.ConexionUvirtual;
 import es.ujaen.uvirtual.modulo.bolsaempleo.beans.Convocatoria;
 import es.ujaen.uvirtual.modulo.bolsaempleo.beans.UsuarioBolsaEmpleo;
 import es.ujaen.uvirtual.modulo.bolsaempleo.utilidades.BolsaEmpleoDataTable;
+import es.ujaen.uvirtual.modulo.bolsaempleo.utilidades.BolsaEmpleoUtils;
 import es.ujaen.uvirtual.utilidades.UVException;
 
 /**
@@ -423,6 +424,16 @@ public class ModeloConvocatoria {
 				conexion.setAutoCommit(true);
 			}
 		}
+	}
+
+	/**
+	 * Devuelve si la convocatoria está cerrada o no.
+	 * @param c conv.
+	 * @return .
+	 */
+	public boolean isConvocatoriaCerrada(Convocatoria c) {
+		return c.getEstado().equals(CONVOCATORIA_ESTADO_CERRADA) 
+				|| c.getFechaCierre().before(BolsaEmpleoUtils.getCurrentDateTime());				
 	}
 	
 	/**

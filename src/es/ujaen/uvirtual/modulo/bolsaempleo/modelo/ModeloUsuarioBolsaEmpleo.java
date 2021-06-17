@@ -40,6 +40,7 @@ public class ModeloUsuarioBolsaEmpleo {
 	// columnas datatable usuario	
 	public static final int ORDER_COLUMN_INDEX_USUARIO_DOCUMENTO = 0;
 	public static final int ORDER_COLUMN_INDEX_USUARIO_CODCUENTA = 1;
+	public static final int ORDER_COLUMN_INDEX_USUARIO_NOMBRE = 2;
 	public static final int ORDER_COLUMN_INDEX_USUARIO_ROL = 3;
 	public static final int ORDER_COLUMN_INDEX_USUARIO_EXCLUIDO = 4;
 	public static final int ORDER_COLUMN_INDEX_USUARIO_ELIMINADO = 5;
@@ -47,6 +48,7 @@ public class ModeloUsuarioBolsaEmpleo {
 	// columnas datatable candidato
 	public static final int ORDER_COLUMN_INDEX_CANDIDATO_DOCUMENTO = 0;
 	public static final int ORDER_COLUMN_INDEX_CANDIDATO_CODCUENTA = 1;
+	public static final int ORDER_COLUMN_INDEX_CANDIDATO_NOMBRE = 2;
 	public static final int ORDER_COLUMN_INDEX_CANDIDATO_LISTADISTRIBUCION = 3;
 	public static final int ORDER_COLUMN_INDEX_CANDIDATO_EXCLUIDO = 4;
 	public static final int ORDER_COLUMN_INDEX_CANDIDATO_BORRADO = 5;
@@ -216,8 +218,11 @@ public class ModeloUsuarioBolsaEmpleo {
 
 		String consulta = "SELECT * FROM TBEP_USUARIOS bepusu WHERE bepusu.ROL != " + ModeloRol.ID_ROL_CANDIDATO + " ";
 		
+		String whereNombre = String.format("(%s || ' ' || %s || ' ' || %s)", "bepusu.VUAJA_STRNOMBRE", "bepusu.VUAJA_STRAPELLIDO1", "bepusu.VUAJA_STRAPELLIDO2");
+		
 		dataTable.setColumn(ModeloUsuarioBolsaEmpleo.ORDER_COLUMN_INDEX_USUARIO_DOCUMENTO, "bepusu.VUAJA_PRSNIF");
 		dataTable.setColumn(ModeloUsuarioBolsaEmpleo.ORDER_COLUMN_INDEX_USUARIO_CODCUENTA, "bepusu.CODCUENTA");
+		dataTable.setColumn(ModeloUsuarioBolsaEmpleo.ORDER_COLUMN_INDEX_USUARIO_NOMBRE, whereNombre, DataTableColumn.COLUMN_TYPE_TEXT);
 		dataTable.setColumn(ModeloUsuarioBolsaEmpleo.ORDER_COLUMN_INDEX_USUARIO_ROL, "bepusu.ROL");
 		dataTable.setColumn(ModeloUsuarioBolsaEmpleo.ORDER_COLUMN_INDEX_USUARIO_EXCLUIDO, "bepusu.FLGEXCLUIDO", DataTableColumn.COLUMN_TYPE_BOOLEAN);
 		dataTable.setColumn(ModeloUsuarioBolsaEmpleo.ORDER_COLUMN_INDEX_USUARIO_ELIMINADO, "bepusu.FLGBORRADO", DataTableColumn.COLUMN_TYPE_BOOLEAN);
@@ -256,8 +261,12 @@ public class ModeloUsuarioBolsaEmpleo {
 
 		String consulta = "SELECT * FROM TBEP_USUARIOS bepusu WHERE bepusu.rol = ?";
 		
+		String whereNombre = String.format("(%s || ' ' || %s || ' ' || %s)", "bepusu.VUAJA_STRNOMBRE", "bepusu.VUAJA_STRAPELLIDO1", "bepusu.VUAJA_STRAPELLIDO2");
+		
+		
 		dataTable.setColumn(ModeloUsuarioBolsaEmpleo.ORDER_COLUMN_INDEX_CANDIDATO_DOCUMENTO, "bepusu.VUAJA_PRSNIF");
 		dataTable.setColumn(ModeloUsuarioBolsaEmpleo.ORDER_COLUMN_INDEX_CANDIDATO_CODCUENTA, "bepusu.CODCUENTA");
+		dataTable.setColumn(ModeloUsuarioBolsaEmpleo.ORDER_COLUMN_INDEX_CANDIDATO_NOMBRE, whereNombre, DataTableColumn.COLUMN_TYPE_TEXT);
 		dataTable.setColumn(ModeloUsuarioBolsaEmpleo.ORDER_COLUMN_INDEX_CANDIDATO_LISTADISTRIBUCION, "bepusu.FLGLISTADISTRIBUCION", DataTableColumn.COLUMN_TYPE_BOOLEAN);
 		dataTable.setColumn(ModeloUsuarioBolsaEmpleo.ORDER_COLUMN_INDEX_CANDIDATO_EXCLUIDO, "bepusu.FLGEXCLUIDO", DataTableColumn.COLUMN_TYPE_BOOLEAN);
 		dataTable.setColumn(ModeloUsuarioBolsaEmpleo.ORDER_COLUMN_INDEX_CANDIDATO_BORRADO, "bepusu.FLGBORRADO", DataTableColumn.COLUMN_TYPE_BOOLEAN);

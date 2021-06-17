@@ -10,8 +10,6 @@ import java.util.List;
 import java.util.Map;
 
 import es.ujaen.uvirtual.modelo.conexion.ConexionUvirtual;
-import es.ujaen.uvirtual.modulo.bolsaempleo.beans.Convocatoria;
-import es.ujaen.uvirtual.modulo.bolsaempleo.beans.Solicitud;
 import es.ujaen.uvirtual.modulo.bolsaempleo.beans.Titulacion;
 import es.ujaen.uvirtual.modulo.bolsaempleo.beans.TitulacionUsuario;
 import es.ujaen.uvirtual.modulo.bolsaempleo.beans.UsuarioBolsaEmpleo;
@@ -524,27 +522,4 @@ public class ModeloMisTitulaciones {
 		return tit;
 	}
 	
-	/**
-	 * Devuelve si la titulación de usuario puede ser borrada.
-	 * @param t .
-	 * @return .
-	 * @throws UVException .
-	 * @throws SQLException .
-	 */
-	public boolean comprobarTitulacionUsuarioPuedeSerBorrada(TitulacionUsuario t) throws SQLException, UVException {
-		if (t.getValidada()) {
-			return false;
-		}
-		
-		// si tiene una solicitud para la ultima convocatoria, no puede borrar
-		Convocatoria c = ModeloConvocatoria.obtenerInstancia().getUltimaConvocatoria();		
-		if (c != null) {
-			Solicitud s = ModeloSolicitud.obtenerInstancia().getSolicitudByConvocatoriaUsuario(t.getUsuario(), c);
-			if (s != null) {
-				return false;
-			}
-		}
-		
-		return true;
-	}
 }

@@ -23,6 +23,7 @@ public class VistaMeritosPreferentesCandidato extends Vista implements Serializa
 	private String codigoPadreMeritoPreferente;
 	private String vista;
 	private UsuarioBolsaEmpleo usuarioLogeado;
+	private boolean sePuedeAgregar;
 	
 	public String getVista() {
 		return vista;
@@ -70,5 +71,13 @@ public class VistaMeritosPreferentesCandidato extends Vista implements Serializa
 
 	private List<MeritoPreferenteOpcion> getOpcionesMerito() {
 		return this.opcionesMeritoPreferente;
+	}
+
+	public void setSePuedeAgregar(boolean comprobarMeritoPreferentePuedeSerCreado) {
+		this.sePuedeAgregar = comprobarMeritoPreferentePuedeSerCreado;		
+	}
+	
+	public boolean getSePuedeAgregar() {
+		return this.sePuedeAgregar;
 	}
 }
