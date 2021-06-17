@@ -37,9 +37,9 @@ public class TestBEPUsuariosBolsaEmpleo extends UtilsTestUsuarioBase {
 	private static final String DIV_MAIN = "usuarios";
 	private static final String ID_TABLE = "table_usuarios";
 	private static final String ID_BOTON_NUEVO = "nuevo_usuario";
-	private static final String ID_INPUT_NUEVO = "usuario_nombre";
-	private static final String ID_INPUT_BUSCAR = "usuario_buscar";
-	private static final String ID_INPUT_ENVIAR_NUEVO = "usuario_enviar";
+	private static final String ID_INPUT_NUEVO = "nombre_usuario";
+	private static final String ID_INPUT_BUSCAR = "nuevo_usuario";
+	private static final String ID_INPUT_ENVIAR_NUEVO = "usuario_guardar";
 	private static final String SELECT_ROL = "select_role";
 	
 	/**
