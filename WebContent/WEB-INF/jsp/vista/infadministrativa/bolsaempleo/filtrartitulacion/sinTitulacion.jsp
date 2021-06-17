@@ -30,18 +30,19 @@ UsuarioBolsaEmpleo candidato = bean.getCandidato();
 	<table class="bluetable bolsaempleo" id="tableCandidatos">
 		<tr>
 			<th scope="col" style="width:12%">Documento</th>
-			<th scope="col" style="width:88%">Candidato</th>					
+			<th scope="col" style="width:58%">Candidato</th>					
+			<th scope="col" style="width:30%">Email</th>
 		</tr>
 		<tbody></tbody>
 		<tfoot>
 			<tr>
-				<th colSpan="2" style="width:100%"></th>
+				<th colSpan="3" style="width:100%"></th>
 			</tr>
 		</tfoot>
 	</table>
 </div>
 	
-<script>	
+<script>
 	$(document).ready(function() {			
 		var tableCandidatos = new Atis.DataTable('#tableCandidatos', {
 		    "ajax": { url: "<%=ControladorFiltrarTitulacion.URL_PATTERN_AJAX%>", async: false },
@@ -53,6 +54,7 @@ UsuarioBolsaEmpleo candidato = bean.getCandidato();
 		    	{'data': 'apellido1', 'filter': true, 'overflow': 'auto', 'render': function(row) {
 	        		return row.nombre + " " + row.apellido1 + " " + row.apellido2; 
 	        	}},
+	        	{'data': 'email', 'filter': true, 'overflow': 'auto'},
 		    ],
 		});
 		
