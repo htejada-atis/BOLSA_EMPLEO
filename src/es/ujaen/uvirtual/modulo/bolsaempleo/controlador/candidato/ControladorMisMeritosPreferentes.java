@@ -150,6 +150,8 @@ public class ControladorMisMeritosPreferentes extends HttpServlet {
 			if (!bean.getUsuarioLogeado().getRol().getCodNum().equals(ModeloRol.ID_ROL_CANDIDATO)) {
 				throw new UVException("No eres un candidato");
 			}
+			
+			bean.setSePuedeAgregar(ModeloSolicitud.obtenerInstancia().comprobarMeritoPreferentePuedeSerCreado());
 		} catch (UVException e) {
 			LOGGER.log(Level.WARNING, e.toString());
 			
@@ -269,13 +271,18 @@ public class ControladorMisMeritosPreferentes extends HttpServlet {
 		bean.setMeritosPreferente(ModeloMeritosPreferentes.obtenerInstancia().getMeritosPreferentesPorPosesion());
 		
 		ParametrosConfiguracion config = ModeloParametrosConfiguracion.obtenerInstancia().getParametroByNombre("bolsaempleo.local.codMeritoPreferente");
-		bean.setCodigoPadreMeritoPreferente(config.getValor());		
+		bean.setCodigoPadreMeritoPreferente(config.getValor());			
 	}
 	
 	private void agregarMerito(VistaMeritosPreferentesCandidato bean, HttpServletRequest request, HttpServletResponse response) 
 			throws SQLException, UVException, IOException, FileUploadException {
 		formularioAgregarMerito(bean);
 		
+		// comprobamos si se puede añadir meritos preferentes.
+		if (!ModeloSolicitud.obtenerInstancia().comprobarMeritoPreferentePuedeSerCreado()) {
+			throw new UVException("No se puede añadir, la convocatoria está cerrada");
+		}
+				
 		// leemos los parametros del form, chequeando el fichero
 		List<FileItem> items = new ServletFileUpload(new DiskFileItemFactory()).parseRequest(request);
 		HashMap<String, Object> parametros = new HashMap<>();		

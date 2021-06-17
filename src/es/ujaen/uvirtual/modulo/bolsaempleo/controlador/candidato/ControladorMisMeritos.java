@@ -81,7 +81,7 @@ public class ControladorMisMeritos extends HttpServlet {
 	// mensajes
 	public static final String MENSAJE_ERROR_DESCRIPCION_LARGO = "La descripción no puede contener mas de %d caracteres";
 	public static final String MENSAJE_ERROR_DESCRIPCION_VACIA = "La descripción no puede estar vacía";
-	public static final String MENSAJE_ERROR_ELIMINAR = "El mérito con id %s no se ha podido borrar porque está asociado a una solicitud";
+	public static final String MENSAJE_ERROR_ELIMINAR = "El mérito con id %s no se puede borrar";
 	public static final String MENSAJE_ERROR_MERITOS_SELECCIONADOS_INCORRECTOS = "Méritos seleccionados incorrectos";
 	public static final String MENSAJE_ERROR_OBSERVACION_LARGO = "La observación no puede contener mas de %d caracteres";
 	public static final String MENSAJE_ERROR_VALOR_MAXIMO_PERMITIDO = "El valor máximo permitido es %s";
