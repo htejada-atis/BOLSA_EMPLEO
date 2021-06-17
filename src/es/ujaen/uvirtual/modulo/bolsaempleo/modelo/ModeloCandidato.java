@@ -26,6 +26,7 @@ public class ModeloCandidato {
 	
 	public static final int ORDER_COLUMN_INDEX_DOCUMENTO_CANDIDATO = 0;
 	public static final int ORDER_COLUMN_INDEX_NOMBRE_CANDIDATO = 1;
+	public static final int ORDER_COLUMN_INDEX_EMAIL_CANDIDATO = 2;
 	
 	protected static ModeloCandidato eInstancia;
 
@@ -113,6 +114,7 @@ public class ModeloCandidato {
 
 		dataTable.setColumn(ORDER_COLUMN_INDEX_DOCUMENTO_CANDIDATO, "bepusu.VUAJA_PRSNIF");
 		dataTable.setColumn(ORDER_COLUMN_INDEX_NOMBRE_CANDIDATO, whereNombre, DataTableColumn.COLUMN_TYPE_TEXT);
+		dataTable.setColumn(ORDER_COLUMN_INDEX_EMAIL_CANDIDATO, "bepusu.VUAJA_EMAIL_ALTA");
 
 		dataTable.setQuery(consulta);
 
