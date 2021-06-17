@@ -895,6 +895,9 @@ public class ModeloSolicitud {
 		if (solicitud.getEstado().equals(SOLICITUD_ESTADO_CERRADA)) {
 			throw new UVException(MENSAJE_ERROR_SOLICITUD_CERRADA);
 		}
+		if (bolsa.getEstado().equals(ModeloBolsa.BOLSA_ESTADO_DESBLOQUEADA)) {
+			throw new UVException("La bolsa no está desbloqueada. No se puede añadir méritos.");
+		}
 		
 		// insertamos el mérito en la solicitud bolsa
 		String consulta = "INSERT INTO TBEP_SOL_BOL_MERITOS (BEPSBO_CODNUM, BEPMER_CODNUM, UID_USUARIO)"
@@ -917,9 +920,17 @@ public class ModeloSolicitud {
 	 * @param bolsa .
 	 * @param merito .
 	 * @param usuarioUpdate .
+	 * @throws UVException .
 	 * @throws SQLException .
 	 */
-	public void borrarMeritoDeSolicitudBolsa(Solicitud solicitud, Bolsa bolsa, Merito merito, UsuarioBolsaEmpleo usuarioUpdate) throws SQLException {
+	public void borrarMeritoDeSolicitudBolsa(Solicitud solicitud, Bolsa bolsa, Merito merito, UsuarioBolsaEmpleo usuarioUpdate) throws SQLException, UVException {
+		if (solicitud.getEstado().equals(SOLICITUD_ESTADO_CERRADA)) {
+			throw new UVException(MENSAJE_ERROR_SOLICITUD_CERRADA);
+		}
+		if (bolsa.getEstado().equals(ModeloBolsa.BOLSA_ESTADO_DESBLOQUEADA)) {
+			throw new UVException("La bolsa no está desbloqueada. No se puede quitar méritos.");
+		}
+		
 		try (Connection conexion = ConexionUvirtual.obtenerInstancia()) {
 			conexion.setAutoCommit(false);
 			
@@ -1328,7 +1339,7 @@ public class ModeloSolicitud {
 	 * @throws UVException .
 	 * @throws SQLException .
 	 */
-	public boolean comprobarMeritoPuedeSerBorrado(Merito merito) throws SQLException, UVException {
+	public boolean comprobarMeritoPuedeSerBorrado(Merito merito) throws SQLException {
 		boolean asociadoASolicitud = false;
 		boolean evaluado = false;
 		
@@ -1372,7 +1383,7 @@ public class ModeloSolicitud {
 	 * @throws UVException .
 	 * @throws SQLException .
 	 */
-	public boolean comprobarMeritoPreferentePuedeSerBorrado(MeritoPreferenteUsuario merito) throws SQLException, UVException {
+	public boolean comprobarMeritoPreferentePuedeSerBorrado(MeritoPreferenteUsuario merito) throws SQLException {
 		// si la convocatoria está cerrada, no se puede
 		Convocatoria c = ModeloConvocatoria.obtenerInstancia().getUltimaConvocatoria();
 		boolean convocatoriaCerrada = ModeloConvocatoria.obtenerInstancia().isConvocatoriaCerrada(c);
@@ -1387,7 +1398,7 @@ public class ModeloSolicitud {
 	 * @throws UVException .
 	 * @throws SQLException .
 	 */
-	public boolean comprobarTitulacionUsuarioPuedeSerBorrada(TitulacionUsuario t) throws SQLException, UVException {
+	public boolean comprobarTitulacionUsuarioPuedeSerBorrada(TitulacionUsuario t) throws SQLException {
 		// si la convocatoria está cerrada, no se puede
 		Convocatoria c = ModeloConvocatoria.obtenerInstancia().getUltimaConvocatoria();
 		boolean convocatoriaCerrada = ModeloConvocatoria.obtenerInstancia().isConvocatoriaCerrada(c);
@@ -1401,7 +1412,7 @@ public class ModeloSolicitud {
 	 * @throws UVException .
 	 * @throws SQLException .
 	 */
-	public boolean comprobarMeritoPreferentePuedeSerCreado() throws SQLException, UVException {
+	public boolean comprobarMeritoPreferentePuedeSerCreado() throws SQLException {
 		return this.comprobarTitulacionPuedeSerCreada();
 	}
 	
@@ -1411,7 +1422,7 @@ public class ModeloSolicitud {
 	 * @throws UVException .
 	 * @throws SQLException .
 	 */
-	public boolean comprobarTitulacionPuedeSerCreada() throws SQLException, UVException {
+	public boolean comprobarTitulacionPuedeSerCreada() throws SQLException {
 		// si la convocatoria está cerrada, no se puede
 		Convocatoria c = ModeloConvocatoria.obtenerInstancia().getUltimaConvocatoria();
 		boolean convocatoriaCerrada = ModeloConvocatoria.obtenerInstancia().isConvocatoriaCerrada(c);

@@ -72,7 +72,7 @@ public class ModeloConvocatoria {
 		List<Convocatoria> data = new ArrayList<>();
 		BolsaEmpleoDataTable<Convocatoria> dataTable = new BolsaEmpleoDataTable<>(params);
 
-		String consulta = "SELECT bepcon.* " + "FROM TBEP_CONVOCATORIAS bepcon " + "WHERE 1=1 ";
+		String consulta = "SELECT bepcon.* FROM TBEP_CONVOCATORIAS bepcon WHERE 1=1 ";
 
 		dataTable.setColumn(ORDER_COLUMN_INDEX_ID, "bepcon.CODNUM");
 		dataTable.setColumn(ORDER_COLUMN_INDEX_DESCRIPCION, "bepcon.DESCRIPCION");
@@ -85,12 +85,7 @@ public class ModeloConvocatoria {
 				PreparedStatement stmt = conexion.prepareStatement(dataTable.getQuery())) {
 			try (ResultSet rs = stmt.executeQuery()) {
 				while (rs.next()) {
-					Convocatoria convocatoria = new Convocatoria();
-					convocatoria.setCodNum(rs.getInt("CODNUM"));
-					convocatoria.setDescripcion(rs.getString("DESCRIPCION"));
-					convocatoria.setFechaCierre(rs.getDate("FECHACIERRE"));
-					convocatoria.setEstado(rs.getString("ESTADO"));
-					data.add(convocatoria);
+					data.add(this.createFromResultSet(rs));
 				}
 			}
 
@@ -127,23 +122,16 @@ public class ModeloConvocatoria {
 	 * 
 	 * @return todas las titulaciones de la base de datos .
 	 * @throws SQLException en caso de error de base de datos
+	 * @throws UVException .
 	 */
 	public List<Convocatoria> listaConvocatorias() throws SQLException {
 		List<Convocatoria> convocatorias = new ArrayList<>();
 		String consulta = "SELECT bepcon.* FROM TBEP_CONVOCATORIAS bepcon";
 
-		try (Connection conexion = ConexionUvirtual.obtenerInstancia();
-				PreparedStatement stmt = conexion.prepareStatement(consulta)) {
+		try (Connection conexion = ConexionUvirtual.obtenerInstancia(); PreparedStatement stmt = conexion.prepareStatement(consulta)) {
 			try (ResultSet rs = stmt.executeQuery()) {
 				while (rs.next()) {
-					Convocatoria convocatoria = new Convocatoria();
-					convocatoria.setCodNum(rs.getInt("CODNUM"));
-					convocatoria.setDescripcion(rs.getString("DESCRIPCION"));
-					convocatoria.setFechaCierre(rs.getDate("FECHACIERRE"));
-					convocatoria.setEstado(rs.getString("ESTADO"));
-					convocatoria.setNumBolsasMaximo(rs.getInt("NUMBOLSASMAXIMO"));
-					convocatoria.setNumMeritosPorBloque(rs.getInt("NUMMERITOSPORBLOQUE"));
-					convocatorias.add(convocatoria);
+					convocatorias.add(this.createFromResultSet(rs));
 				}
 			}
 		}
@@ -151,6 +139,30 @@ public class ModeloConvocatoria {
 		return convocatorias;
 	}
 
+	/**
+	 * Lista de convocatorias a cerrar por fecha de cierre.
+	 * @return .
+	 * @throws UVException .
+	 * @throws SQLException .
+	 */
+	public List<Convocatoria> listaConvocatoriasACerrar() throws SQLException {
+		List<Convocatoria> convocatorias = new ArrayList<>();
+		String consulta = ""
+				+ " SELECT bepcon.* "
+				+ " FROM TBEP_CONVOCATORIAS bepcon "
+				+ " WHERE bepcon.ESTADO = 'ABIERTA' AND bepcon.FECHACIERRE <= SYSDATE ";
+
+		try (Connection conexion = ConexionUvirtual.obtenerInstancia(); PreparedStatement stmt = conexion.prepareStatement(consulta)) {
+			try (ResultSet rs = stmt.executeQuery()) {
+				while (rs.next()) {
+					convocatorias.add(this.createFromResultSet(rs));
+				}
+			}
+		}
+
+		return convocatorias;
+	}
+	
 	/**
 	 * Añade una convocatoria al sistema cerrada.
 	 * 
@@ -248,12 +260,7 @@ public class ModeloConvocatoria {
 	 * @throws UVException  en caso de errores de validacion
 	 */
 	public void actualizaConvocatoria(Convocatoria conv, UsuarioBolsaEmpleo usuarioUpdate) throws SQLException, UVException {
-		if (conv == null) {
-			throw new UVException("Convocatoria obligatorio");
-		}
-		if (conv.getCodNum() == null) {
-			throw new UVException("id convocatoria no válido");
-		}
+		validateConvocatoria(conv);
 
 		String consulta = "UPDATE tbep_convocatorias SET DESCRIPCION=?, FECHACIERRE=?, ESTADO=?, NUMBOLSASMAXIMO=?, NUMMERITOSPORBLOQUE=?, UID_USUARIO=? "
 				+ " WHERE codnum=?";
@@ -280,20 +287,19 @@ public class ModeloConvocatoria {
 	 * @throws UVException  en caso de errores de validacion
 	 */
 	public void cambiaEstadoConvocatoria(Convocatoria conv, UsuarioBolsaEmpleo usuarioUpdate) throws SQLException, UVException {
-		if (conv == null) {
-			throw new UVException("Convocatoria obligatorio");
-		}
-		if (conv.getCodNum() == null) {
-			throw new UVException("id convocatoria no válido");
-		}
-
-		String consulta = "UPDATE tbep_convocatorias SET ESTADO=?,UID_USUARIO=? WHERE codnum=?";
-		try (Connection conexion = ConexionUvirtual.obtenerInstancia(); PreparedStatement stmt = conexion.prepareStatement(consulta)) {
-			int parameterIndex = 1;
-			stmt.setString(parameterIndex++, conv.getEstado());
-			stmt.setString(parameterIndex++, usuarioUpdate.getCodCuenta());
-			stmt.setInt(parameterIndex++, conv.getCodNum());			
-			stmt.executeUpdate();
+		validateConvocatoria(conv);
+		
+		if (conv.getEstado().equals(CONVOCATORIA_ESTADO_CERRADA)) {
+			this.cerrarConvocatoria(conv, usuarioUpdate);
+		} else {
+			String consulta = "UPDATE tbep_convocatorias SET ESTADO=?,UID_USUARIO=? WHERE codnum=?";
+			try (Connection conexion = ConexionUvirtual.obtenerInstancia(); PreparedStatement stmt = conexion.prepareStatement(consulta)) {
+				int parameterIndex = 1;
+				stmt.setString(parameterIndex++, conv.getEstado());
+				stmt.setString(parameterIndex++, usuarioUpdate.getCodCuenta());
+				stmt.setInt(parameterIndex++, conv.getCodNum());			
+				stmt.executeUpdate();
+			}
 		}
 	}
 
@@ -306,12 +312,8 @@ public class ModeloConvocatoria {
 	 * @throws UVException  si convocatoria no es valida
 	 */
 	public void borraConvocatoria(Convocatoria conv, UsuarioBolsaEmpleo usuarioDetele) throws SQLException, UVException {
-		if (conv == null) {
-			throw new UVException("No se puede eliminar una convocatoria vacía");
-		}
-		if (conv.getCodNum() == null) {
-			throw new UVException("No se puede eliminar una convocatoria con id vacío");
-		}
+		validateConvocatoria(conv);
+		
 		if (this.getNumSolicitudesByConvocatoriaId(conv.getCodNum()) > 0) {
 			throw new UVException("No se puede eliminar, hay solicitudes en la convocatoria");
 		}
@@ -341,7 +343,7 @@ public class ModeloConvocatoria {
 	 * @throws UVException  .
 	 * @throws SQLException .
 	 */
-	public Convocatoria getUltimaConvocatoria() throws SQLException, UVException {
+	public Convocatoria getUltimaConvocatoria() throws SQLException {
 		String consulta = "SELECT bepcon.* FROM TBEP_CONVOCATORIAS bepcon WHERE ROWNUM = 1 ORDER BY bepcon.CODNUM";
 
 		try (Connection conexion = ConexionUvirtual.obtenerInstancia(); PreparedStatement stmt = conexion.prepareStatement(consulta)) {
@@ -368,7 +370,7 @@ public class ModeloConvocatoria {
 		try (Connection con = ConexionUvirtual.obtenerInstancia(); PreparedStatement stmt = con.prepareStatement(sql)) {
 			try (ResultSet rs = stmt.executeQuery()) {
 				while (rs.next()) {
-					if (!rs.getString("ESTADO").equals("DESBLOQUEADA")) {
+					if (!rs.getString("ESTADO").equals(ModeloBolsa.BOLSA_ESTADO_DESBLOQUEADA)) {
 						return true;
 					}
 				}
@@ -376,6 +378,52 @@ public class ModeloConvocatoria {
 		}
 
 		return false;
+	}
+
+	/**
+	 * Cierra la convocatoria, y ajusta el estado de las bolsas.
+	 * 
+	 * @param conv convocatoria a cerrar .
+	 * @param usuario usuario que cierra la convocatoria, si es null, se cierra desde el cron.
+	 * @throws SQLException .
+	 * @throws UVException .
+	 */
+	public void cerrarConvocatoria(Convocatoria conv, UsuarioBolsaEmpleo usuario) throws UVException, SQLException {
+		validateConvocatoria(conv);
+		
+		String usuarioUpdate = usuario != null ? usuario.getCodCuenta() : "TAREA_PROGRAMADA";
+		
+		try (Connection conexion = ConexionUvirtual.obtenerInstancia()) {
+			conexion.setAutoCommit(false);
+			
+			try {
+				// cambiamos estado de la convocatoria
+				String updateConvocatoria = "UPDATE TBEP_CONVOCATORIAS SET ESTADO=?, UID_USUARIO=? WHERE CODNUM=?";
+				try (PreparedStatement stmt = conexion.prepareStatement(updateConvocatoria)) {
+					int parameterIndex = 1;
+					stmt.setString(parameterIndex++, CONVOCATORIA_ESTADO_CERRADA);
+					stmt.setString(parameterIndex++, usuarioUpdate);
+					stmt.setInt(parameterIndex++, conv.getCodNum());			
+					stmt.executeUpdate();
+				}
+				
+				// cambiamos estado de las bolsas a revisión
+				String updateBolsas = "UPDATE TBEP_BOLSAS SET ESTADO=?, UID_USUARIO=?";
+				try (PreparedStatement stmt = conexion.prepareStatement(updateBolsas)) {
+					int parameterIndex = 1;
+					stmt.setString(parameterIndex++, ModeloBolsa.BOLSA_ESTADO_REVISION);
+					stmt.setString(parameterIndex++, usuarioUpdate);
+					stmt.executeUpdate();
+				}
+				
+				conexion.commit();
+			} catch (Exception e) {
+				conexion.rollback();
+				throw e;
+			} finally {
+				conexion.setAutoCommit(true);
+			}
+		}
 	}
 
 	/**
@@ -396,13 +444,23 @@ public class ModeloConvocatoria {
 	 * @throws SQLException .
 	 * @throws UVException  .
 	 */
-	public Convocatoria createFromResultSet(ResultSet rs) throws SQLException, UVException {
+	public Convocatoria createFromResultSet(ResultSet rs) throws SQLException {
 		Convocatoria convocatoria = new Convocatoria();
 		convocatoria.setCodNum(rs.getInt("CODNUM"));
 		convocatoria.setDescripcion(rs.getString("DESCRIPCION"));
 		convocatoria.setFechaCierre(rs.getDate("FECHACIERRE"));
 		convocatoria.setEstado(rs.getString("ESTADO"));
+		convocatoria.setNumBolsasMaximo(rs.getInt("NUMBOLSASMAXIMO"));
+		convocatoria.setNumMeritosPorBloque(rs.getInt("NUMMERITOSPORBLOQUE"));
 		return convocatoria;
 	}
 
+	private void validateConvocatoria(Convocatoria conv) throws UVException {
+		if (conv == null) {
+			throw new UVException("Convocatoria obligatorio");
+		}
+		if (conv.getCodNum() == null) {
+			throw new UVException("id convocatoria no válido");
+		}
+	}
 }
