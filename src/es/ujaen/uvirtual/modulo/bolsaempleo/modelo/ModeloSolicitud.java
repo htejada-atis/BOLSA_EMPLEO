@@ -414,7 +414,7 @@ public class ModeloSolicitud {
 	 * @throws SQLException .
 	 * @throws UVException .
 	 */
-	public Solicitud getSolicitudByConvocatoriaUsuario(UsuarioBolsaEmpleo usuario, Convocatoria convocatoria) throws SQLException, UVException {
+	public Solicitud getSolicitudByConvocatoriaUsuario(UsuarioBolsaEmpleo usuario, Convocatoria convocatoria) throws SQLException {
 		String consulta = ""
 				+ " SELECT bepsol.* "
 				+ " FROM TBEP_SOLICITUDES bepsol "
@@ -883,6 +883,9 @@ public class ModeloSolicitud {
 		if (solicitud.getEstado().equals(SOLICITUD_ESTADO_CERRADA)) {
 			throw new UVException(MENSAJE_ERROR_SOLICITUD_CERRADA);
 		}
+		if (bolsa.getEstado().equals(ModeloBolsa.BOLSA_ESTADO_DESBLOQUEADA)) {
+			throw new UVException("La bolsa no está desbloqueada. No se puede añadir méritos.");
+		}
 		
 		// insertamos el mérito en la solicitud bolsa
 		String consulta = "INSERT INTO TBEP_SOL_BOL_MERITOS (BEPSBO_CODNUM, BEPMER_CODNUM, UID_USUARIO)"
@@ -905,9 +908,17 @@ public class ModeloSolicitud {
 	 * @param bolsa .
 	 * @param merito .
 	 * @param usuarioUpdate .
+	 * @throws UVException .
 	 * @throws SQLException .
 	 */
-	public void borrarMeritoDeSolicitudBolsa(Solicitud solicitud, Bolsa bolsa, Merito merito, UsuarioBolsaEmpleo usuarioUpdate) throws SQLException {
+	public void borrarMeritoDeSolicitudBolsa(Solicitud solicitud, Bolsa bolsa, Merito merito, UsuarioBolsaEmpleo usuarioUpdate) throws SQLException, UVException {
+		if (solicitud.getEstado().equals(SOLICITUD_ESTADO_CERRADA)) {
+			throw new UVException(MENSAJE_ERROR_SOLICITUD_CERRADA);
+		}
+		if (bolsa.getEstado().equals(ModeloBolsa.BOLSA_ESTADO_DESBLOQUEADA)) {
+			throw new UVException("La bolsa no está desbloqueada. No se puede quitar méritos.");
+		}
+		
 		try (Connection conexion = ConexionUvirtual.obtenerInstancia()) {
 			conexion.setAutoCommit(false);
 			
@@ -1340,7 +1351,7 @@ public class ModeloSolicitud {
 	 * @throws UVException .
 	 * @throws SQLException .
 	 */
-	public boolean comprobarMeritoPreferentePuedeSerBorrado(MeritoPreferenteUsuario merito) throws SQLException, UVException {
+	public boolean comprobarMeritoPreferentePuedeSerBorrado(MeritoPreferenteUsuario merito) {
 		if (merito.isValidado()) {
 			return false;
 		}		
@@ -1359,23 +1370,6 @@ public class ModeloSolicitud {
 		if (ModeloUsuarioBolsaEmpleo.obtenerInstancia().compruebaUsuarioMisDatosValidos(solicitud.getUsuario())) {
 			throw new UVException(MENSAJE_ERROR_FALTAN_DATOS_CONFIRMAR_SLICITUD);
 		}
-		
-		// comprobamos problemas con items excluyentes
-//		ModeloBaremacionItems modeloItems = ModeloBaremacionItems.obtenerInstancia();
-//		for (BolsaSolicitud bs : this.getBolsasSolicitudMeritos(solicitud)) {
-//			List<MeritoSolicitud> meritos = this.getMeritosSolicitudBolsa(solicitud, (Bolsa) bs); 
-//			
-//			for (MeritoSolicitud padre : meritos) {
-//				for (MeritoSolicitud hijo : meritos) {
-//					if (!padre.getCodNum().equals(hijo.getCodNum())) {
-//						modeloItems.checkItemsExcluyentes(
-//							padre.getMerito().getItemBaremacion(), 
-//							hijo.getMerito().getItemBaremacion()
-//						);
-//					}
-//				}
-//			}
-//		}				
 	}
 	
 	/** Lista de bolsas de la solicitud deseleccionadas por el usuario .

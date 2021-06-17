@@ -279,7 +279,7 @@ public class ControladorConvocatorias extends HttpServlet {
 					convocatoriaForm.getNumBolsasMaximo(),
 					convocatoriaForm.getNumMeritosPorBloque()
 			); 
-			modelo.actualizaConvocatoria(conFinal, bean.getUsuarioLogeado());	
+			modelo.actualizaConvocatoria(conFinal, bean.getUsuarioLogeado());
 			
 			BolsaEmpleoUtils.addMensajeDeExito(MENSAJE_INFO_CONVOCATORIA_ACTUALIZADA_CORRECTAMENTE, bean, request);
 			response.sendRedirect(request.getServletPath());
