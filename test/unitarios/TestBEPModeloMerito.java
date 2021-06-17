@@ -21,6 +21,7 @@ import es.ujaen.uvirtual.modulo.bolsaempleo.beans.ItemBaremacion;
 import es.ujaen.uvirtual.modulo.bolsaempleo.beans.Merito;
 import es.ujaen.uvirtual.modulo.bolsaempleo.beans.Solicitud;
 import es.ujaen.uvirtual.modulo.bolsaempleo.modelo.ModeloBaremacionItems;
+import es.ujaen.uvirtual.modulo.bolsaempleo.modelo.ModeloBolsa;
 import es.ujaen.uvirtual.modulo.bolsaempleo.modelo.ModeloMerito;
 import es.ujaen.uvirtual.modulo.bolsaempleo.modelo.ModeloSolicitud;
 import es.ujaen.uvirtual.utilidades.UVException;
@@ -91,34 +92,24 @@ public class TestBEPModeloMerito {
 	 */
 	@Test
 	public void testA02BorraMerito() throws SQLException, UVException {
-		ModeloMerito modelo = ModeloMerito.obtenerInstancia();
-		ModeloSolicitud modeloSolicitud = ModeloSolicitud.obtenerInstancia();
-		List<Merito> meritos = modelo.listaMeritos();
+		List<Merito> meritos = ModeloMerito.obtenerInstancia().listaMeritos();
 		Merito merito = meritos.get(0);
 		List<String> idsMeritos = new ArrayList<>();
 		idsMeritos.add(merito.getCodNum().toString());
 
 		Solicitud solicitud = new Solicitud();
 		solicitud.setCodNum(1);
+		solicitud.setEstado(ModeloSolicitud.SOLICITUD_ESTADO_ABIERTA);
+		
 		Merito meritoAcum = new Merito();
 		meritoAcum.setCodNum(1);
+		
 		Bolsa bolsa = new Bolsa();
 		bolsa.setCodNum(2);
+		bolsa.setEstado(ModeloBolsa.BOLSA_ESTADO_DESBLOQUEADA);
 
-		modeloSolicitud.borrarMeritoDeSolicitudBolsa(solicitud, bolsa, meritoAcum,
+		ModeloSolicitud.obtenerInstancia().borrarMeritoDeSolicitudBolsa(solicitud, bolsa, meritoAcum,
 				UtilsTestBolsaEmpleo.getUsuario("candidato1"));
-
-//    	modelo.eliminarMeritos(idsMeritos);
-//    	
-//    	try {
-//    		modelo.listaMerito(merito.getCodNum());
-//    		fail();
-//    	} catch (UVException e) {
-//    		//se expera excepcion
-//    	}
-//    	List<Merito> meritosFiltrados = modelo.listaMeritos();
-//    	assertTrue("mérito borrado no debe ser listado", !meritosFiltrados.contains(merito));
-//    	assertTrue("méritos debe tener un elemento menos", meritos.size() - 1 == meritosFiltrados.size());
 	}
 
 	/**

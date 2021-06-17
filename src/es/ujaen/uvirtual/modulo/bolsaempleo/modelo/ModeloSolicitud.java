@@ -895,7 +895,7 @@ public class ModeloSolicitud {
 		if (solicitud.getEstado().equals(SOLICITUD_ESTADO_CERRADA)) {
 			throw new UVException(MENSAJE_ERROR_SOLICITUD_CERRADA);
 		}
-		if (bolsa.getEstado().equals(ModeloBolsa.BOLSA_ESTADO_DESBLOQUEADA)) {
+		if (!bolsa.getEstado().equals(ModeloBolsa.BOLSA_ESTADO_DESBLOQUEADA)) {
 			throw new UVException("La bolsa no está desbloqueada. No se puede añadir méritos.");
 		}
 		
@@ -927,7 +927,7 @@ public class ModeloSolicitud {
 		if (solicitud.getEstado().equals(SOLICITUD_ESTADO_CERRADA)) {
 			throw new UVException(MENSAJE_ERROR_SOLICITUD_CERRADA);
 		}
-		if (bolsa.getEstado().equals(ModeloBolsa.BOLSA_ESTADO_DESBLOQUEADA)) {
+		if (!bolsa.getEstado().equals(ModeloBolsa.BOLSA_ESTADO_DESBLOQUEADA)) {
 			throw new UVException("La bolsa no está desbloqueada. No se puede quitar méritos.");
 		}
 		
