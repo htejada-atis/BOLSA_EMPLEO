@@ -111,7 +111,11 @@ function DataTable(id, config) {
         }
 
         if (self.config.clickable) {
-            $(tr).on('click', self.config.clickable.onClick.bind($(tr), row, self));
+            $(tr).on('click', function () {
+                if (window.getSelection && window.getSelection().toString() == '') {
+                self.config.clickable.onClick(row, self);
+                }
+            });
         }
 
         row.selected = false;
