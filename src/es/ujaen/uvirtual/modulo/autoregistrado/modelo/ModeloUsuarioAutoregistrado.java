@@ -10,6 +10,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -439,7 +440,7 @@ public class ModeloUsuarioAutoregistrado {
 	 * @throws UVException si error validacion
 	 */
 	public String mandarClaveTemporal(String correo, String ip) throws SQLException, UVException {
-		ArrayList<String> destinatariosCorreo = new ArrayList<>();
+		List<String> destinatariosCorreo = new ArrayList<String>();
 		ModeloClaveArcos modeloClaveArcos = ModeloClaveArcos.obtenerInstancia();
 		final int numeroBitsId = 512;
 		final int moduloConversionACaracter = 32;

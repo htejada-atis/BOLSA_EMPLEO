@@ -60,6 +60,7 @@ public class ControladorUsuarioAutoregistrado extends HttpServlet {
 	public static final String ACCION_CREAR = "crearUsuario";
 	public static final String ACCION_OLVIDO = "olvido";
 	public static final String ACCION_VALIDA_CODIGO_TEMPORAL = "validaTemporal";
+	public static final String ACCION_MUESTRA_LOGIN = "muestraLogin";
 	
 	private static final String JSP_VALIDA_CODIGO_TEMPORAL = "/WEB-INF/jsp/vista/operaciones/autoaprovisionado/validaCodigoTemporal.jsp";
 
@@ -115,6 +116,9 @@ public class ControladorUsuarioAutoregistrado extends HttpServlet {
 				break;
 			case ACCION_VALIDA_CODIGO_TEMPORAL:
 				validaClaveTemporal(request, bean);
+				break;
+			case ACCION_MUESTRA_LOGIN:
+				muestraLogin(request, response, bean);
 				break;
 			default:
 				validaWayf(request, response, bean);
@@ -214,6 +218,21 @@ public class ControladorUsuarioAutoregistrado extends HttpServlet {
 		if (uid != null) {
 			response.sendRedirect(bean.getPaginaRedireccion());
 		}
+	}
+	
+	private void muestraLogin(HttpServletRequest request, HttpServletResponse response, VistaUsuarioAutoregistrado bean) throws IOException {
+		UVDatos datos = (UVDatos) request.getAttribute(UVDatos.NOMBRE_ATRIBUTO);
+		String uid = datos.getIdentificadorUsuario();
+		if (uid == null) {
+			uid = (String) request.getSession().getAttribute(UVDatos.ID_USUARIO_SESION);
+		}
+		String modulo = obtenerIdModulo(request); 
+		String urlModulo = obtenerUrlModulo(request, modulo);
+		bean.setPaginaRedireccion(urlModulo);
+		if (uid != null) {
+			response.sendRedirect(bean.getPaginaRedireccion());
+		}
+		bean.setVista("/WEB-INF/jsp/vista/operaciones/autoaprovisionado/login.jsp");
 	}
 	
 	private void meterUsuarioEnSesion(HttpServletRequest request, String correo) {

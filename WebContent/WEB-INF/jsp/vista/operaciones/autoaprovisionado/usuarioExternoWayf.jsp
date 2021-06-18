@@ -19,11 +19,17 @@ VistaUsuarioAutoregistrado bean = (VistaUsuarioAutoregistrado)uvdatos.getVistas(
 		</div>
   	<% } %>
 	<h2>Acceso a <%=bean.getDescripcionModulo() %></h2>
-	<div>
-		Si tiene usuario de SIDUJA, pulse en <a href="<%=bean.getPaginaRedireccion()%>"><%=bean.getPaginaRedireccion()%></a>
+	<div style="font-size: medium;">
+		<br/>
+		Si tiene cuenta SIDUJA (.ujaen.es), pulse <a href="<%=bean.getPaginaRedireccion()%>">aquí</a>
+		<br/>
+		<br/>
 		<hr/>	
-
-		Si ya se ha registrado, introduzca su correo y clave
+		<br/>
+		<br/>
+		Si no tiene usuario de SIDUJA y ya se ha registrado, introduzca su correo y clave
+		<br/>
+		<br/>
 		<form method="post" action="<%=request.getRequestURI()%>" id="formularioExiste"> 
 			<input type="hidden" name="<%=ControladorUsuarioAutoregistrado.PARAM_ACCION%>" id="accionFormulario" value="<%=ControladorUsuarioAutoregistrado.ACCION_VALIDA%>" />
 			<input type="hidden" id="g-recaptcha-response-valida" name="g-recaptcha-response" value="" />
@@ -33,15 +39,25 @@ VistaUsuarioAutoregistrado bean = (VistaUsuarioAutoregistrado)uvdatos.getVistas(
 			
 			<input type="submit" value="Entrar">
 		</form>
+		<br/>
+		<br/>
 		
 		<hr/>	
-		Para registrarse, pulse el siguiente botón
+		<br/>
+		<br/>
+		Si no tiene usuario de SIDUJA y no se ha registrado aún, pulse el siguiente botón
+		<br/>
+		<br/>
 		<form method="post" action="<%=request.getRequestURI()%>" id="formularioNoExiste"> 
 			<input type="hidden" name="<%=ControladorUsuarioAutoregistrado.PARAM_ACCION%>" id="accionFormulario" value="<%=ControladorUsuarioAutoregistrado.ACCION_MOSTRAR_CREAR%>" />
 			<input type="submit" value="Registro">
 		</form>
+		<br/>
+		<br/>
 		<hr/>	
-		Para recuperar su clave, introduzca su correo
+		Si se ha registrado y no recuerda su clave, introduzca su correo
+		<br/>
+		<br/>
 		<form method="post" action="<%=request.getRequestURI()%>" id="formularioOlvido"> 
 			<input type="hidden" name="<%=ControladorUsuarioAutoregistrado.PARAM_ACCION%>" id="accionFormulario" value="<%=ControladorUsuarioAutoregistrado.ACCION_OLVIDO%>" />
 			<input type="hidden" id="g-recaptcha-response-olvido" name="g-recaptcha-response" value="" />
