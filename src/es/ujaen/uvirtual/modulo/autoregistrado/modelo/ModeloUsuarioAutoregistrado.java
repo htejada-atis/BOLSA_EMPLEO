@@ -79,7 +79,7 @@ public class ModeloUsuarioAutoregistrado {
 				throw new UVException("el nif debe tener 9 caracteres incluyendo la letra");
 			}
 			String numeroNif = AdaptadorDocumentoIdentidad.numeroDocumento(AdaptadorDocumentoIdentidad.UXXIAC, usuario);
-			String letraNif = AdaptadorDocumentoIdentidad.letraNIF(usuario.getDocumentoTipo(), numeroNif);
+			String letraNif = AdaptadorDocumentoIdentidad.letraNIF(usuario.getDocumentoTipo(), usuario.getDocumentoNumero());
 			String letraNifCalculada = calculaLetraNIFJava(numeroNif);
 			if (!letraNif.equals(letraNifCalculada)) {
 				throw new UVException("letra de NIF no correcta");

@@ -249,6 +249,7 @@ public class ControladorUsuarioAutoregistrado extends HttpServlet {
 	private void validaUsuario(HttpServletRequest request, HttpServletResponse response, VistaUsuarioAutoregistrado bean) throws SQLException, IOException {
 		String correo = Formateador.leeParametroString(request.getParameter(PARAM_CORREO));
 		correo = correo.trim();
+		correo = correo.toLowerCase();
 		String clave = Formateador.leeParametroString(request.getParameter(PARAM_CLAVE));
 		ModeloUsuarioAutoregistrado modelo = new ModeloUsuarioAutoregistrado();
 		String ip = request.getRemoteAddr();
@@ -269,7 +270,10 @@ public class ControladorUsuarioAutoregistrado extends HttpServlet {
 	private void crearUsuario(HttpServletRequest request, VistaUsuarioAutoregistrado bean) throws SQLException, UVException {
 		Usuario usuario = new Usuario();
 		String correo = Formateador.leeParametroString(request.getParameter(PARAM_CORREO));
+		correo = correo.trim();
+		correo = correo.toLowerCase();
 		String correoRepetido = Formateador.leeParametroString(request.getParameter(PARAM_CORREO_REPETIDO));
+		correoRepetido = correoRepetido.toLowerCase();
 		if (!correo.equals(correoRepetido)) {
 			throw new UVException("los correos deben ser iguales");
 		}
@@ -294,6 +298,7 @@ public class ControladorUsuarioAutoregistrado extends HttpServlet {
 	private void mandarClaveTemporal(HttpServletRequest request, VistaUsuarioAutoregistrado bean) throws SQLException, UVException {
 		bean.setVista(JSP_VALIDA_CODIGO_TEMPORAL);
 		String correo = Formateador.leeParametroString(request.getParameter(PARAM_CORREO));
+		correo = correo.toLowerCase();
 		String ip = request.getRemoteAddr();
 		ModeloUsuarioAutoregistrado modelo = new ModeloUsuarioAutoregistrado();
 		String idSolicitud;
