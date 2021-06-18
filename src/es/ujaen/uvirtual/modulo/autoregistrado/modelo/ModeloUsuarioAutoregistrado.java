@@ -440,7 +440,7 @@ public class ModeloUsuarioAutoregistrado {
 	 * @throws UVException si error validacion
 	 */
 	public String mandarClaveTemporal(String correo, String ip) throws SQLException, UVException {
-		List<String> destinatariosCorreo = new ArrayList<String>();
+		List<String> destinatariosCorreo = new ArrayList<>();
 		ModeloClaveArcos modeloClaveArcos = ModeloClaveArcos.obtenerInstancia();
 		final int numeroBitsId = 512;
 		final int moduloConversionACaracter = 32;
@@ -455,7 +455,7 @@ public class ModeloUsuarioAutoregistrado {
 		String cuerpo = ConfiguracionGlobal.getParametroCadena("autoaprovisionado.mail.cuerpo");
 		cuerpo = aplicaPlantilla(cuerpo, codigoPin, idsolicitud, correo);
 		try {
-			EnviaCorreo.enviaCorreoExcepcion(null, destinatariosCorreo, null, null, null, asunto, cuerpo);
+			EnviaCorreo.enviaCorreoExcepcionList(null, destinatariosCorreo, null, null, null, asunto, cuerpo);
 		} catch (Exception e) {
 			throw new UVException(e.getMessage());
 		}
