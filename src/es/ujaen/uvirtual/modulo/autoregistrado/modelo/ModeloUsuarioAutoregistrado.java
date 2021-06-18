@@ -13,6 +13,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import javax.mail.internet.AddressException;
 import javax.mail.internet.InternetAddress;
@@ -72,18 +74,38 @@ public class ModeloUsuarioAutoregistrado {
 		}
 	}
 	
+	private void validaLetraDocumento(Usuario usuario) throws UVException {
+		String numeroNif = AdaptadorDocumentoIdentidad.numeroDocumento(AdaptadorDocumentoIdentidad.UXXIAC, usuario);
+		String letraNif = AdaptadorDocumentoIdentidad.letraNIF(usuario.getDocumentoTipo(), usuario.getDocumentoNumero());
+		String letraNifCalculada = calculaLetraNIFJava(numeroNif);
+		if (!letraNif.equals(letraNifCalculada)) {
+			throw new UVException("letra de NIF no correcta");
+		}
+	}
+	
 	private void validaTipoDocumento(Usuario usuario) throws UVException {
 		if ("NIF".equals(usuario.getDocumentoTipo())) {
 			final int numeroCaracteresNif = 9;
 			if (usuario.getDocumentoNumero().length() != numeroCaracteresNif) {
 				throw new UVException("el nif debe tener 9 caracteres incluyendo la letra");
 			}
-			String numeroNif = AdaptadorDocumentoIdentidad.numeroDocumento(AdaptadorDocumentoIdentidad.UXXIAC, usuario);
-			String letraNif = AdaptadorDocumentoIdentidad.letraNIF(usuario.getDocumentoTipo(), usuario.getDocumentoNumero());
-			String letraNifCalculada = calculaLetraNIFJava(numeroNif);
-			if (!letraNif.equals(letraNifCalculada)) {
-				throw new UVException("letra de NIF no correcta");
+	        Pattern patronNif = Pattern.compile("[0-9]{8}[A-Z]");
+	        Matcher matcharNif = patronNif.matcher(usuario.getDocumentoNumero());
+	        if (!matcharNif.matches()) {
+	        	throw new UVException("formato de NIF no válido");
+	        }
+	        validaLetraDocumento(usuario);
+		}
+		if ("NIE".equals(usuario.getDocumentoTipo())) {
+	        Pattern patronNie = Pattern.compile("[X-Z][0-9]{7}[A-Z]");
+	        Matcher matcharNie = patronNie.matcher(usuario.getDocumentoNumero());
+	        if (!matcharNie.matches()) {
+	        	throw new UVException("formato de NIE no válido");
+	        }
+			if (usuario.getDocumentoNumero().charAt(0) != 'X' && usuario.getDocumentoNumero().charAt(0) != 'Y' && usuario.getDocumentoNumero().charAt(0) != 'Z') {
+				throw new UVException("primera letra NIE no válida");
 			}
+	        validaLetraDocumento(usuario);
 		}
 	}
 	

@@ -281,6 +281,7 @@ public class ControladorUsuarioAutoregistrado extends HttpServlet {
 		String apellido1 = Formateador.leeParametroString(request.getParameter(PARAM_APELLIDO1));
 		String apellido2 = Formateador.leeParametroString(request.getParameter(PARAM_APELLIDO2));
 		String documento = Formateador.leeParametroString(request.getParameter(PARAM_DOCUMENTO));
+		documento = documento.toUpperCase();
 		String tipoDocumento = Formateador.leeParametroString(request.getParameter(PARAM_TIPO_DOCUMENTO));
 		String sexo = Formateador.leeParametroString(request.getParameter(PARAM_SEXO));
 		usuario.setEmailCuentaPersona(correo);
