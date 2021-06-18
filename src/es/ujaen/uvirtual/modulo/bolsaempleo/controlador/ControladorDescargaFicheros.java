@@ -47,6 +47,7 @@ import es.ujaen.uvirtual.modulo.bolsaempleo.modelo.ModeloFichero;
 import es.ujaen.uvirtual.modulo.bolsaempleo.modelo.ModeloMerito;
 import es.ujaen.uvirtual.modulo.bolsaempleo.modelo.ModeloMeritosPreferentesCandidato;
 import es.ujaen.uvirtual.modulo.bolsaempleo.modelo.ModeloMisTitulaciones;
+import es.ujaen.uvirtual.modulo.bolsaempleo.modelo.ModeloSolicitud;
 import es.ujaen.uvirtual.modulo.bolsaempleo.modelo.ModeloUsuarioBolsaEmpleo;
 import es.ujaen.uvirtual.modulo.bolsaempleo.utilidades.BolsaEmpleoUtils;
 import es.ujaen.uvirtual.modulo.bolsaempleo.vistas.VistaDescargaFicheros;
@@ -80,7 +81,8 @@ public class ControladorDescargaFicheros extends HttpServlet {
 	public static final String ACCION_DESCARGAR_MERITO_PERSONAL = "descargarmeritopersonal";
 	public static final String ACCION_DESCARGAR_MERITO_COMISION = "descargarmeritocomision";
 	public static final String ACCION_DESCARGAR_RESUMEN_ITEM_BAREMACION = "descargarresumenitemsbaremacion";
-	public static final String ACCION_DESCARGAR_SOLICITUD = "descargarsolicitud";	
+	public static final String ACCION_DESCARGAR_SOLICITUD = "descargarsolicitud";
+	public static final String ACCION_DESCARGAR_SOLICITUD_PERSONAL = "descargarsolicitudpersonal";
 	public static final String ACCION_DESCARGAR_TITULACION_CANDIDATO = "descargartitulacioncandidato";
 	public static final String ACCION_DESCARGAR_TITULACION_PERSONAL = "descargartitulacionpersonal";	
 	
@@ -153,6 +155,7 @@ public class ControladorDescargaFicheros extends HttpServlet {
 				case ACCION_DESCARGAR_MERITO_PERSONAL:
 				case ACCION_DESCARGAR_TITULACION_PERSONAL:
 				case ACCION_DESCARGAR_RESUMEN_ITEM_BAREMACION:
+				case ACCION_DESCARGAR_SOLICITUD_PERSONAL:
 					accionesFicherosPersonal(bean, datos, request, response, nombreAccion);
 					break;
 				case ACCION_DESCARGAR_DOCUMENTO:
@@ -280,14 +283,17 @@ public class ControladorDescargaFicheros extends HttpServlet {
 				descargaTitulacionPersonal(bean, datos, request, response);
 				break;
 			case ACCION_DESCARGAR_RESUMEN_ITEM_BAREMACION:
-				descargaResumenItemsBaremacion(bean, datos, request, response);
+				descargaResumenItemsBaremacion(datos, response);
+				break;
+			case ACCION_DESCARGAR_SOLICITUD_PERSONAL:
+				descargaSolicitudPersonal(bean, datos, request, response);
 				break;
 			default:
 				errorFatal(bean, datos, MENSAJE_ERROR_ACCION_NO_CONTEMPLADA);
 		}
 	}
 	
-	private void descargarPDF(VistaDescargaFicheros bean, UVDatos datos, HttpServletResponse response, InputStream archivo) throws UVException {
+	private void descargarPDF(UVDatos datos, HttpServletResponse response, InputStream archivo) throws UVException {
 		datos.setRespuestaEnviada(true);
         
 		try (ServletOutputStream stream = response.getOutputStream(); BufferedInputStream buf = new BufferedInputStream(archivo)) {
@@ -316,7 +322,7 @@ public class ControladorDescargaFicheros extends HttpServlet {
 			BolsaEmpleoUtils.addMensajeDeError(MENSAJE_ERROR_SIN_PERMISO, bean, request);
 			response.sendRedirect(ControladorErrorBolsaEmpleo.URL_ERROR);
 		} else {
-			descargarPDF(bean, datos, response, acreditacion.getArchivo());
+			descargarPDF(datos, response, acreditacion.getArchivo());
 		}
 	}
 	
@@ -325,7 +331,7 @@ public class ControladorDescargaFicheros extends HttpServlet {
 		Integer idAcreditacion = Formateador.leeParametroInteger(request.getParameter(PARAM_ACREDITACION));
 		MeritoPreferenteUsuario acreditacion = ModeloMeritosPreferentesCandidato.obtenerInstancia().getMeritoPreferenteUsuarioById(idAcreditacion);
 		bean.setAcreditacion(acreditacion);
-		descargarPDF(bean, datos, response, acreditacion.getArchivo());
+		descargarPDF(datos, response, acreditacion.getArchivo());
 	}
 	
 	///////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -341,7 +347,7 @@ public class ControladorDescargaFicheros extends HttpServlet {
 			response.sendRedirect(ControladorErrorBolsaEmpleo.URL_ERROR);
 		} else {
 			bean.setFichero(fichero);
-			descargarPDF(bean, datos, response, fichero.getArchivo());
+			descargarPDF(datos, response, fichero.getArchivo());
 		}
 	}
 	
@@ -358,7 +364,7 @@ public class ControladorDescargaFicheros extends HttpServlet {
 			BolsaEmpleoUtils.addMensajeDeError(MENSAJE_ERROR_SIN_PERMISO, bean, request);
 			response.sendRedirect(ControladorErrorBolsaEmpleo.URL_ERROR);
 		} else {
-			descargarPDF(bean, datos, response, merito.getArchivo());
+			descargarPDF(datos, response, merito.getArchivo());
 		}
 	}
 	
@@ -371,16 +377,16 @@ public class ControladorDescargaFicheros extends HttpServlet {
 			BolsaEmpleoUtils.addMensajeDeError(MENSAJE_ERROR_SIN_PERMISO, bean, request);
 			response.sendRedirect(ControladorErrorBolsaEmpleo.URL_ERROR);
 		} else {
-			descargarPDF(bean, datos, response, merito.getArchivo());
+			descargarPDF(datos, response, merito.getArchivo());
 		}
 	}
 	
 	private void descargaMeritoPersonal(VistaDescargaFicheros bean, UVDatos datos, HttpServletRequest request, HttpServletResponse response)
-			throws SQLException, UVException, IOException {
+			throws SQLException, UVException {
 		Integer idMerito = Formateador.leeParametroInteger(request.getParameter(PARAM_MERITO));
 		Merito merito = ModeloMerito.obtenerInstancia().listaMerito(idMerito);
 		bean.setMerito(merito);
-		descargarPDF(bean, datos, response, merito.getArchivo());
+		descargarPDF(datos, response, merito.getArchivo());
 	}
 	
 	///////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -399,7 +405,23 @@ public class ControladorDescargaFicheros extends HttpServlet {
 				throw new UVException(MENSAJE_ERROR_GENERANDO_PDF_SOLICITUD);
 			}
 			
-			descargarPDF(bean, datos, response, solicitud.getArchivo());
+			descargarPDF(datos, response, solicitud.getArchivo());
+		}
+	}
+	
+	private void descargaSolicitudPersonal(VistaDescargaFicheros bean, UVDatos datos, HttpServletRequest request, HttpServletResponse response)
+			throws SQLException, UVException, IOException {
+		Integer idSolicitud = Formateador.leeParametroInteger(request.getParameter(PARAM_SOLICITUD));
+		Solicitud solicitud = ModeloSolicitud.obtenerInstancia().getSolicitudByIdArchivo(idSolicitud);
+		if (solicitud == null) {
+			BolsaEmpleoUtils.addMensajeDeError(MENSAJE_ERROR_SIN_PERMISO, bean, request);
+			response.sendRedirect(ControladorErrorBolsaEmpleo.URL_ERROR);
+		} else {
+			if (solicitud.getArchivo() == null) {
+				throw new UVException(MENSAJE_ERROR_GENERANDO_PDF_SOLICITUD);
+			}
+			
+			descargarPDF(datos, response, solicitud.getArchivo());
 		}
 	}
 	
@@ -416,7 +438,7 @@ public class ControladorDescargaFicheros extends HttpServlet {
 			BolsaEmpleoUtils.addMensajeDeError(MENSAJE_ERROR_SIN_PERMISO, bean, request);
 			response.sendRedirect(ControladorErrorBolsaEmpleo.URL_ERROR);
 		} else {
-			descargarPDF(bean, datos, response, titulacion.getArchivo());
+			descargarPDF(datos, response, titulacion.getArchivo());
 		}
 	}
 	
@@ -425,16 +447,16 @@ public class ControladorDescargaFicheros extends HttpServlet {
 		Integer idTitulacion = Formateador.leeParametroInteger(request.getParameter(PARAM_TITULACION));
 		TitulacionUsuario titulacion = ModeloMisTitulaciones.obtenerInstancia().getTitulacionUsuarioById(idTitulacion);
 		bean.setTitulacion(titulacion);
-		descargarPDF(bean, datos, response, titulacion.getArchivo());
+		descargarPDF(datos, response, titulacion.getArchivo());
 	}
 	
 	///////////////////////////////////////////////////////////////////////////////////////////////////////////
 	// ITEMS DE BAREMACION
 	///////////////////////////////////////////////////////////////////////////////////////////////////////////
 	
-	private void descargaResumenItemsBaremacion(VistaDescargaFicheros bean, UVDatos datos, HttpServletRequest request, HttpServletResponse response)
+	private void descargaResumenItemsBaremacion(UVDatos datos, HttpServletResponse response)
 			throws SQLException, UVException {
-		descargarPDF(bean, datos, response, generarPDFItemsBaremacion(datos.getUsuario()));
+		descargarPDF(datos, response, generarPDFItemsBaremacion(datos.getUsuario()));
 	}
 	
 	private InputStream generarPDFItemsBaremacion(Usuario usu) throws UVException, SQLException {

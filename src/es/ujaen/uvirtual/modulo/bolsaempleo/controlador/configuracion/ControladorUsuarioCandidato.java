@@ -21,12 +21,15 @@ import es.ujaen.uvirtual.beans.Usuario;
 import es.ujaen.uvirtual.modulo.bolsaempleo.beans.Area;
 import es.ujaen.uvirtual.modulo.bolsaempleo.beans.Bolsa;
 import es.ujaen.uvirtual.modulo.bolsaempleo.beans.BolsaSolicitud;
+import es.ujaen.uvirtual.modulo.bolsaempleo.beans.Merito;
 import es.ujaen.uvirtual.modulo.bolsaempleo.beans.MeritoPreferenteUsuario;
 import es.ujaen.uvirtual.modulo.bolsaempleo.beans.ParametrosConfiguracion;
 import es.ujaen.uvirtual.modulo.bolsaempleo.beans.Solicitud;
 import es.ujaen.uvirtual.modulo.bolsaempleo.beans.TitulacionUsuario;
 import es.ujaen.uvirtual.modulo.bolsaempleo.beans.UsuarioBolsaEmpleo;
 import es.ujaen.uvirtual.modulo.bolsaempleo.modelo.ModeloArea;
+import es.ujaen.uvirtual.modulo.bolsaempleo.modelo.ModeloBaremacionApartados;
+import es.ujaen.uvirtual.modulo.bolsaempleo.modelo.ModeloMerito;
 import es.ujaen.uvirtual.modulo.bolsaempleo.modelo.ModeloMeritosPreferentesCandidato;
 import es.ujaen.uvirtual.modulo.bolsaempleo.modelo.ModeloMisTitulaciones;
 import es.ujaen.uvirtual.modulo.bolsaempleo.modelo.ModeloParametrosConfiguracion;
@@ -75,13 +78,11 @@ public class ControladorUsuarioCandidato extends HttpServlet {
 	
 	// acciones
 	public static final String ACCION_ACREDITACIONES_CANDIDATO = "acreditacionescandidato";
-	public static final String ACCION_APARTADO_AREA = "apartadoarea";
-	public static final String ACCION_APARTADO_SOLICITUDES = "apartadosolicitudes";
-	public static final String ACCION_APARTADO_COMUNICACIONES = "apartadocomunicaciones";
 	public static final String ACCION_AREAS_EXCLUIDAS_CANDIDATO = "areasexcluidascandidato";
 	public static final String ACCION_DATATABLE_ACREDITACIONES_CANDIDATO = "datatableacreditacionescandidato";
 	public static final String ACCION_DATATABLE_AREAS_EXCLUIDAS_CANDIDATO = "datatableusuariosexcluidoscandidato";
 	public static final String ACCION_DATATABLE_AREAS_NO_EXCLUIDAS_CANDIDATO = "datatableareasnoexcluidascandidato";
+	public static final String ACCION_DATATABLE_MERITOS_CANDIDATO = "datatablemeritoscandidato";
 	public static final String ACCION_DATATABLE_SOLICITUDES = "datatablesolicitudes";
 	public static final String ACCION_DATATABLE_TITULACIONES_CANDIDATO = "datatabletitulacionescandidato";
 	public static final String ACCION_DATATABLE_USUARIOS_CANDIDATOS = "datatableusuarioscandidatos";
@@ -90,6 +91,7 @@ public class ControladorUsuarioCandidato extends HttpServlet {
 	public static final String ACCION_EXCLUIR_USUARIO_AREA = "excluirusuarioarea";
 	public static final String ACCION_INCLUIR_USUARIO_AREA = "incluirusuarioarea";
 	public static final String ACCION_INDEX = "index";
+	public static final String ACCION_MERITOS_CANDIDATO = "meritoscandidato";
 	public static final String ACCION_REABRIR_SOLICITUD = "reabrirsolicitud";
 	public static final String ACCION_RECUPERAR_CANDIDATO = "recuperarusuario";
 	public static final String ACCION_SELECCIONAR_CANDIDATO = "seleccionarcandidato";
@@ -160,12 +162,14 @@ public class ControladorUsuarioCandidato extends HttpServlet {
 				case ACCION_DATATABLE_ACREDITACIONES_CANDIDATO:
 				case ACCION_DATATABLE_AREAS_EXCLUIDAS_CANDIDATO:
 				case ACCION_DATATABLE_AREAS_NO_EXCLUIDAS_CANDIDATO:
+				case ACCION_DATATABLE_MERITOS_CANDIDATO:
 				case ACCION_DATATABLE_SOLICITUDES:
 				case ACCION_DATATABLE_TITULACIONES_CANDIDATO:
 				case ACCION_EDITAR_CANDIDATO:
 				case ACCION_ELIMINAR_CANDIDATO:
 				case ACCION_EXCLUIR_USUARIO_AREA:
 				case ACCION_INCLUIR_USUARIO_AREA:
+				case ACCION_MERITOS_CANDIDATO:
 				case ACCION_REABRIR_SOLICITUD:
 				case ACCION_RECUPERAR_CANDIDATO:
 				case ACCION_SELECCIONAR_CANDIDATO:
@@ -261,6 +265,9 @@ public class ControladorUsuarioCandidato extends HttpServlet {
 			case ACCION_DATATABLE_AREAS_NO_EXCLUIDAS_CANDIDATO:
 				listadoAreasNoExcluidasCandidato(bean, datos, request, response);
 				break;
+			case ACCION_DATATABLE_MERITOS_CANDIDATO:
+				listadoMeritosCandidato(bean, datos, request, response);
+				break;
 			case ACCION_DATATABLE_SOLICITUDES:
 				listadoSolicitudes(bean, datos, request, response);
 				break;
@@ -278,6 +285,9 @@ public class ControladorUsuarioCandidato extends HttpServlet {
 				break;
 			case ACCION_INCLUIR_USUARIO_AREA:
 				excluirUsuarioArea(bean, request, response, false);
+				break;
+			case ACCION_MERITOS_CANDIDATO:
+				meritosCandidato(bean);
 				break;
 			case ACCION_REABRIR_SOLICITUD:
 			case ACCION_SELECCIONAR_SOLICITUD:
@@ -378,6 +388,12 @@ public class ControladorUsuarioCandidato extends HttpServlet {
 		}
 		
 		redireccionConCandidatoSeleccionado(bean, request, response, ACCION_AREAS_EXCLUIDAS_CANDIDATO);
+	}
+	
+	private void meritosCandidato(VistaCandidatos bean) throws SQLException {
+		bean.setApartadoMeritos(true);
+		ModeloBaremacionApartados modeloBaremacion = ModeloBaremacionApartados.obtenerInstancia();
+		bean.setApartados(modeloBaremacion.getApartadosActivos());
 	}
 	
 	private void obtenerCodigoPadreAcreditacion(VistaCandidatos bean) throws SQLException, UVException {
@@ -573,6 +589,46 @@ public class ControladorUsuarioCandidato extends HttpServlet {
 				BolsaEmpleoDataTable<Bolsa> dataTable = ModeloArea.obtenerInstancia().
 						listaAreaExcluidasUsuarioDatatable(request.getParameterMap(), bean.getCandidato().getCodNum());
 				bean.setDatatableAreas(dataTable);
+				writer.write(dataTable.toJson());
+			} catch (UVException e) {
+				LOGGER.log(Level.WARNING, e.toString());
+				bean.getMensajesDeError().add(e.getMessage());
+				CodigoDescripcion mensaje = new CodigoDescripcion(RESPONSE_AJAX_ERROR, e.getMessage());
+				writer.write(new Gson().toJson(mensaje));
+				response.setStatus(RESPONSE_AJAX_HTTP_CODE_ERROR);
+			} catch (SQLException e) { 
+				LOGGER.log(Level.SEVERE, Formateador.getStackTrace(e));
+				LOGGER.log(Level.SEVERE, e.toString());
+				bean.getMensajesDeError().add(e.getMessage());
+				CodigoDescripcion mensaje = new CodigoDescripcion(RESPONSE_AJAX_ERROR, e.getMessage());
+				writer.write(new Gson().toJson(mensaje));
+				response.setStatus(RESPONSE_AJAX_HTTP_CODE_ERROR);
+			}
+		}
+	}
+	
+	/**
+	 * Lista de méritos del candidato .
+	 * @param bean .
+	 * @param datos .
+	 * @param request .
+	 * @param response .
+	 * @throws UVException .
+	 * @throws IOException .
+	 * @throws SQLException .
+	 */
+	private void listadoMeritosCandidato(VistaCandidatos bean, UVDatos datos,
+			HttpServletRequest request, HttpServletResponse response) throws IOException {
+		datos.setContentType(RESPONSE_AJAX_CONTENTTYPE);
+		datos.setRespuestaEnviada(true);
+		response.setContentType(RESPONSE_AJAX_CONTENTTYPE);
+		response.setCharacterEncoding(RESPONSE_AJAX_ENCODING);
+		
+		try (PrintWriter writer = response.getWriter()) {
+			try {
+				BolsaEmpleoDataTable<Merito> dataTable = ModeloMerito.obtenerInstancia().listaMeritosCandidatoDatatable(
+						request.getParameterMap(), bean.getCandidato());
+				bean.setDataTableMeritos(dataTable);
 				writer.write(dataTable.toJson());
 			} catch (UVException e) {
 				LOGGER.log(Level.WARNING, e.toString());

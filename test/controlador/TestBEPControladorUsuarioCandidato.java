@@ -655,6 +655,55 @@ public class TestBEPControladorUsuarioCandidato {
 		ModeloSolicitud.obtenerInstancia().confirmacionSolicitud(solicitud, UtilsTestBolsaEmpleo.getUsuario("personal1"));
 	}
 	
+	/** Acción méritos candidato .
+	 * @throws SQLException si fallo bd .
+	 * @throws IOException si error io .
+	 * @throws ServletException  si error servlet .
+	 */
+	@Test
+	public void testA24MeritosCandidato() throws IOException {
+		VistaCandidatos bean = obtenerCandidatos();
+		
+		PeticionHttp peticion = UtilsTestBolsaEmpleo.peticionAutenticadaPersonal();
+		peticion.setParameter(ControladorUsuarioCandidato.PARAM_ACCION, ControladorUsuarioCandidato.ACCION_MERITOS_CANDIDATO);
+		peticion.setParameter(ControladorUsuarioCandidato.PARAM_CANDIDATO, bean.getDatatableCandidatos().getData().get(0).getCodNum().toString());
+		
+		RespuestaHttp respuesta = new RespuestaHttp();
+		ControladorUsuarioCandidato controlador = new ControladorUsuarioCandidato();
+		controlador.doPost(peticion, respuesta);
+		
+		VistaCandidatos bean2 = (VistaCandidatos) peticion.getUVDatos().getVistas().get(VistaCandidatos.class.getName());
+		
+		assertNotNull(MENSAJE_CANDIDATO_DEVUELTO, bean2.getCandidato());
+		assertEquals(true, bean2.getApartadoMeritos());
+		assertEquals(MENSAJE_SIN_ERROR, 0, bean2.getMensajesDeError().size());
+		assertEquals(MENSAJE_SIN_ADVERTENCIAS, 0, bean2.getMensajesDeAdvertencia().size());
+	}
+	
+	/** Obtener méritos candidato .
+	 * @throws SQLException si fallo bd .
+	 * @throws IOException si error io .
+	 * @throws ServletException  si error servlet .
+	 */
+	@Test
+	public void testA25ObtenerMeritosCandidato() throws IOException {
+		VistaCandidatos bean = obtenerCandidatos();
+		
+		PeticionHttp peticion = UtilsTestBolsaEmpleo.peticionAutenticadaPersonal();
+		peticion.setParameter(ControladorUsuarioCandidato.PARAM_ACCION, ControladorUsuarioCandidato.ACCION_DATATABLE_MERITOS_CANDIDATO);
+		peticion.setParameter(ControladorUsuarioCandidato.PARAM_CANDIDATO, bean.getDatatableCandidatos().getData().get(0).getCodNum().toString());
+		
+		RespuestaHttp respuesta = new RespuestaHttp();
+		ControladorUsuarioCandidato controlador = new ControladorUsuarioCandidato();
+		controlador.doPost(peticion, respuesta);
+		
+		VistaCandidatos bean2 = (VistaCandidatos) peticion.getUVDatos().getVistas().get(VistaCandidatos.class.getName());
+		
+		assertNotEquals(MENSAJE_ACREDITACIONES_DEVUELTAS, 0, bean2.getDataTableMeritos().getData().size());
+		assertEquals(MENSAJE_SIN_ERROR, 0, bean2.getMensajesDeError().size());
+		assertEquals(MENSAJE_SIN_ADVERTENCIAS, 0, bean2.getMensajesDeAdvertencia().size());
+	}
+	
 	/** Obtener datatable candidatos con parámetro no válido para forzar el error .
 	 * @throws SQLException si fallo bd .
 	 * @throws IOException si error io .
@@ -804,6 +853,30 @@ public class TestBEPControladorUsuarioCandidato {
 
 		PeticionHttp peticion = UtilsTestBolsaEmpleo.peticionAutenticadaPersonal();
 		peticion.setParameter(ControladorUsuarioCandidato.PARAM_ACCION, ControladorUsuarioCandidato.ACCION_DATATABLE_ACREDITACIONES_CANDIDATO);
+		peticion.setParameter(ControladorUsuarioCandidato.PARAM_CANDIDATO, bean.getDatatableCandidatos().getData().get(0).getCodNum().toString());
+		peticion.setParameter(BolsaEmpleoDataTable.PARAM_ORDER_BY, "9");
+		
+		RespuestaHttp respuesta = new RespuestaHttp();
+		ControladorUsuarioCandidato controlador = new ControladorUsuarioCandidato();
+		controlador.doGet(peticion, respuesta);
+		
+		VistaCandidatos bean2 = (VistaCandidatos) peticion.getUVDatos().getVistas().get(VistaCandidatos.class.getName());
+		
+		assertEquals(MENSAJE_CON_ERROR, 1, bean2.getMensajesDeError().size());
+		assertEquals(MENSAJE_SIN_EXITO, 0, bean2.getMensajesDeExito().size());
+	}
+	
+	/** Obtener meritos con parámetro no válido para forzar el error .
+	 * @throws SQLException si fallo bd .
+	 * @throws IOException si error io .
+	 * @throws ServletException si error servlet .
+	 */
+	@Test
+	public void testE08ObtenerMeritosParametroNoValido() throws IOException {
+		VistaCandidatos bean = obtenerCandidatos();
+
+		PeticionHttp peticion = UtilsTestBolsaEmpleo.peticionAutenticadaPersonal();
+		peticion.setParameter(ControladorUsuarioCandidato.PARAM_ACCION, ControladorUsuarioCandidato.ACCION_DATATABLE_MERITOS_CANDIDATO);
 		peticion.setParameter(ControladorUsuarioCandidato.PARAM_CANDIDATO, bean.getDatatableCandidatos().getData().get(0).getCodNum().toString());
 		peticion.setParameter(BolsaEmpleoDataTable.PARAM_ORDER_BY, "9");
 		
