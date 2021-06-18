@@ -29,6 +29,7 @@ import es.ujaen.uvirtual.modulo.bolsaempleo.beans.Titulacion;
 import es.ujaen.uvirtual.modulo.bolsaempleo.beans.TitulacionUsuario;
 import es.ujaen.uvirtual.modulo.bolsaempleo.modelo.ModeloMisTitulaciones;
 import es.ujaen.uvirtual.modulo.bolsaempleo.modelo.ModeloRol;
+import es.ujaen.uvirtual.modulo.bolsaempleo.modelo.ModeloSolicitud;
 import es.ujaen.uvirtual.modulo.bolsaempleo.modelo.ModeloTitulacion;
 import es.ujaen.uvirtual.modulo.bolsaempleo.modelo.ModeloUsuarioBolsaEmpleo;
 import es.ujaen.uvirtual.modulo.bolsaempleo.utilidades.BolsaEmpleoDataTable;
@@ -176,6 +177,8 @@ public class ControladorMisTitulaciones extends HttpServlet {
 			if (!bean.getUsuarioLogeado().getRol().getCodNum().equals(ModeloRol.ID_ROL_CANDIDATO)) {
 				throw new UVException("No eres un candidato");
 			}
+			
+			bean.setSePuedeAgregar(ModeloSolicitud.obtenerInstancia().comprobarTitulacionPuedeSerCreada());
 		} catch (UVException e) {
 			LOGGER.log(Level.WARNING, e.toString());
 			
@@ -269,13 +272,18 @@ public class ControladorMisTitulaciones extends HttpServlet {
 		bean.setVista(RUTA_BEP_CONF + "formMisTitulaciones.jsp");
 	}
 	
-	private void agregarTitulacionFormulario(VistaTitulaciones bean) {			
+	private void agregarTitulacionFormulario(VistaTitulaciones bean) throws SQLException, UVException {			
 		bean.setVista(RUTA_BEP_CONF + "formMisTitulaciones.jsp");		
 	}
 	
 	private void agregarTitulacion(HttpServletRequest request, HttpServletResponse response, VistaTitulaciones bean) 
 			throws SQLException, UVException, IOException, FileUploadException {		
 		agregarTitulacionFormulario(bean);
+		
+		// comprobamos si se puede añadir titulaciones.
+		if (!ModeloSolicitud.obtenerInstancia().comprobarTitulacionPuedeSerCreada()) {
+			throw new UVException("No se puede añadir, la convocatoria está cerrada");
+		}
 		
 		// leemos los parametros del form, chequeando el fichero
 		List<FileItem> items = new ServletFileUpload(new DiskFileItemFactory()).parseRequest(request);
@@ -313,11 +321,11 @@ public class ControladorMisTitulaciones extends HttpServlet {
 				throw new UVException("No tienes permisos");
 			}
 			
-			if (!modelo.comprobarTitulacionUsuarioPuedeSerBorrada(tu)) {
+			if (!ModeloSolicitud.obtenerInstancia().comprobarTitulacionUsuarioPuedeSerBorrada(tu)) {
 				BolsaEmpleoUtils.addMensajeDeError(String.format("La titulación %s no puede ser borrada", tu.getTitulacion().getNombre()), bean, request);
 			} else {
-				titulaciones.add(tu);				
-			}			
+				titulaciones.add(tu);
+			}
 		}
 
 		if (!titulaciones.isEmpty()) {

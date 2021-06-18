@@ -20,6 +20,7 @@ import es.ujaen.uvirtual.modulo.bolsaempleo.beans.MeritoSolicitud;
 import es.ujaen.uvirtual.modulo.bolsaempleo.beans.MeritoSolicitudTable;
 import es.ujaen.uvirtual.modulo.bolsaempleo.beans.MeritoSolicitudValoracion;
 import es.ujaen.uvirtual.modulo.bolsaempleo.beans.Solicitud;
+import es.ujaen.uvirtual.modulo.bolsaempleo.beans.TitulacionUsuario;
 import es.ujaen.uvirtual.modulo.bolsaempleo.beans.BolsaSolicitudTable;
 import es.ujaen.uvirtual.modulo.bolsaempleo.beans.UsuarioBolsaEmpleo;
 import es.ujaen.uvirtual.modulo.bolsaempleo.utilidades.BolsaEmpleoDataTable;
@@ -425,7 +426,7 @@ public class ModeloSolicitud {
 	 * @throws SQLException .
 	 * @throws UVException .
 	 */
-	public Solicitud getSolicitudByConvocatoriaUsuario(UsuarioBolsaEmpleo usuario, Convocatoria convocatoria) throws SQLException, UVException {
+	public Solicitud getSolicitudByConvocatoriaUsuario(UsuarioBolsaEmpleo usuario, Convocatoria convocatoria) throws SQLException {
 		String consulta = ""
 				+ " SELECT bepsol.* "
 				+ " FROM TBEP_SOLICITUDES bepsol "
@@ -763,7 +764,7 @@ public class ModeloSolicitud {
 	 * @throws SQLException .
 	 */
 	public Solicitud nuevaSolicitud(UsuarioBolsaEmpleo usuario, Convocatoria convocatoria, UsuarioBolsaEmpleo usuarioInsert) throws SQLException, UVException {
-		if (!convocatoria.getEstado().equals(ModeloConvocatoria.CONVOCATORIA_ESTADO_ABIERTA)) {
+		if (ModeloConvocatoria.obtenerInstancia().isConvocatoriaCerrada(convocatoria)) {
 			throw new UVException(MENSAJE_ERROR_CONVOCATORIA_NO_ABIERTA);
 		}
 		
@@ -894,6 +895,9 @@ public class ModeloSolicitud {
 		if (solicitud.getEstado().equals(SOLICITUD_ESTADO_CERRADA)) {
 			throw new UVException(MENSAJE_ERROR_SOLICITUD_CERRADA);
 		}
+		if (!bolsa.getEstado().equals(ModeloBolsa.BOLSA_ESTADO_DESBLOQUEADA)) {
+			throw new UVException("La bolsa no está desbloqueada. No se puede añadir méritos.");
+		}
 		
 		// insertamos el mérito en la solicitud bolsa
 		String consulta = "INSERT INTO TBEP_SOL_BOL_MERITOS (BEPSBO_CODNUM, BEPMER_CODNUM, UID_USUARIO)"
@@ -916,9 +920,17 @@ public class ModeloSolicitud {
 	 * @param bolsa .
 	 * @param merito .
 	 * @param usuarioUpdate .
+	 * @throws UVException .
 	 * @throws SQLException .
 	 */
-	public void borrarMeritoDeSolicitudBolsa(Solicitud solicitud, Bolsa bolsa, Merito merito, UsuarioBolsaEmpleo usuarioUpdate) throws SQLException {
+	public void borrarMeritoDeSolicitudBolsa(Solicitud solicitud, Bolsa bolsa, Merito merito, UsuarioBolsaEmpleo usuarioUpdate) throws SQLException, UVException {
+		if (solicitud.getEstado().equals(SOLICITUD_ESTADO_CERRADA)) {
+			throw new UVException(MENSAJE_ERROR_SOLICITUD_CERRADA);
+		}
+		if (!bolsa.getEstado().equals(ModeloBolsa.BOLSA_ESTADO_DESBLOQUEADA)) {
+			throw new UVException("La bolsa no está desbloqueada. No se puede quitar méritos.");
+		}
+		
 		try (Connection conexion = ConexionUvirtual.obtenerInstancia()) {
 			conexion.setAutoCommit(false);
 			
@@ -1321,27 +1333,47 @@ public class ModeloSolicitud {
 		return false;
 	}
 	
-	/** Comprueba si un mérito está asociado a una solicitud .
+	/** Comprueba si un mérito puede ser borrado .
 	 * @param merito .
 	 * @return booleano que devuelve si la consulta obtiene resultados . 
+	 * @throws UVException .
 	 * @throws SQLException .
 	 */
 	public boolean comprobarMeritoPuedeSerBorrado(Merito merito) throws SQLException {
+		boolean asociadoASolicitud = false;
+		boolean evaluado = false;
 		
-		String consulta = "SELECT besbm.* FROM TBEP_SOL_BOL_MERITOS besbm WHERE besbm.BEPMER_CODNUM = ?";
-		
-		try (Connection conexion = ConexionUvirtual.obtenerInstancia(); PreparedStatement stmt = conexion.prepareStatement(consulta)) {
-			int parameterIndex = 1;
-			stmt.setInt(parameterIndex++, merito.getCodNum());
+		try (Connection conexion = ConexionUvirtual.obtenerInstancia()) {
+			// si el mérito está asociado a una solicitud, no se puede borrar		
+			String consultaSolicitud = "SELECT besbm.* FROM TBEP_SOL_BOL_MERITOS besbm WHERE besbm.BEPMER_CODNUM = ?";
 			
-			try (ResultSet rs = stmt.executeQuery()) {
-				if (rs.next()) {
-					return false;
+			try (PreparedStatement stmt = conexion.prepareStatement(consultaSolicitud)) {
+				int parameterIndex = 1;
+				stmt.setInt(parameterIndex++, merito.getCodNum());
+				
+				try (ResultSet rs = stmt.executeQuery()) {
+					asociadoASolicitud = rs.next();				
+				}
+			}
+			
+			// si el mérito ha sido evaludado, no se puede borrar
+			String consultaEvaluado = "SELECT bepsbm.* FROM TBEP_SOL_BOL_MERITOS bepsbm WHERE bepsbm.FLGVALIDADO = 'S' AND bepsbm.BEPMER_CODNUM = ?";
+			
+			try (PreparedStatement stmt = conexion.prepareStatement(consultaEvaluado)) {
+				int parameterIndex = 1;
+				stmt.setInt(parameterIndex++, merito.getCodNum());
+				
+				try (ResultSet rs = stmt.executeQuery()) {
+					evaluado = rs.next();				
 				}
 			}
 		}
 		
-		return true;
+		// si la convocatoria está cerrada, no se puede borrar
+		Convocatoria c = ModeloConvocatoria.obtenerInstancia().getUltimaConvocatoria();
+		boolean convocatoriaCerrada = ModeloConvocatoria.obtenerInstancia().isConvocatoriaCerrada(c);
+		
+		return !asociadoASolicitud && !evaluado && !convocatoriaCerrada;
 	}
 	
 	/**
@@ -1351,12 +1383,51 @@ public class ModeloSolicitud {
 	 * @throws UVException .
 	 * @throws SQLException .
 	 */
-	public boolean comprobarMeritoPreferentePuedeSerBorrado(MeritoPreferenteUsuario merito) throws SQLException, UVException {
-		if (merito.isValidado()) {
-			return false;
-		}		
-				
-		return true;
+	public boolean comprobarMeritoPreferentePuedeSerBorrado(MeritoPreferenteUsuario merito) throws SQLException {
+		// si la convocatoria está cerrada, no se puede
+		Convocatoria c = ModeloConvocatoria.obtenerInstancia().getUltimaConvocatoria();
+		boolean convocatoriaCerrada = ModeloConvocatoria.obtenerInstancia().isConvocatoriaCerrada(c);
+
+		return !merito.isValidado() && !convocatoriaCerrada;
+	}
+	
+	/**
+	 * Devuelve si la titulación de usuario puede ser borrada.
+	 * @param t .
+	 * @return .
+	 * @throws UVException .
+	 * @throws SQLException .
+	 */
+	public boolean comprobarTitulacionUsuarioPuedeSerBorrada(TitulacionUsuario t) throws SQLException {
+		// si la convocatoria está cerrada, no se puede
+		Convocatoria c = ModeloConvocatoria.obtenerInstancia().getUltimaConvocatoria();
+		boolean convocatoriaCerrada = ModeloConvocatoria.obtenerInstancia().isConvocatoriaCerrada(c);
+		
+		return !t.getValidada() && !convocatoriaCerrada;
+	}
+	
+	/**
+	 * Comprueba si el mérito preferente se puede crear.
+	 * @return .
+	 * @throws UVException .
+	 * @throws SQLException .
+	 */
+	public boolean comprobarMeritoPreferentePuedeSerCreado() throws SQLException {
+		return this.comprobarTitulacionPuedeSerCreada();
+	}
+	
+	/**
+	 * Comprueba si la titulación se puede crear.
+	 * @return .
+	 * @throws UVException .
+	 * @throws SQLException .
+	 */
+	public boolean comprobarTitulacionPuedeSerCreada() throws SQLException {
+		// si la convocatoria está cerrada, no se puede
+		Convocatoria c = ModeloConvocatoria.obtenerInstancia().getUltimaConvocatoria();
+		boolean convocatoriaCerrada = ModeloConvocatoria.obtenerInstancia().isConvocatoriaCerrada(c);
+
+		return !convocatoriaCerrada;
 	}
 
 	/**
@@ -1371,22 +1442,10 @@ public class ModeloSolicitud {
 			throw new UVException(MENSAJE_ERROR_FALTAN_DATOS_CONFIRMAR_SLICITUD);
 		}
 		
-		// comprobamos problemas con items excluyentes
-//		ModeloBaremacionItems modeloItems = ModeloBaremacionItems.obtenerInstancia();
-//		for (BolsaSolicitud bs : this.getBolsasSolicitudMeritos(solicitud)) {
-//			List<MeritoSolicitud> meritos = this.getMeritosSolicitudBolsa(solicitud, (Bolsa) bs); 
-//			
-//			for (MeritoSolicitud padre : meritos) {
-//				for (MeritoSolicitud hijo : meritos) {
-//					if (!padre.getCodNum().equals(hijo.getCodNum())) {
-//						modeloItems.checkItemsExcluyentes(
-//							padre.getMerito().getItemBaremacion(), 
-//							hijo.getMerito().getItemBaremacion()
-//						);
-//					}
-//				}
-//			}
-//		}				
+		// comprobamos si la convocatoria está abierta
+		if (ModeloConvocatoria.obtenerInstancia().isConvocatoriaCerrada(solicitud.getConvocatoria())) {
+			throw new UVException(MENSAJE_ERROR_CONVOCATORIA_NO_ABIERTA);
+		}
 	}
 	
 	/** Lista de bolsas de la solicitud deseleccionadas por el usuario .
@@ -1701,4 +1760,3 @@ public class ModeloSolicitud {
 		return false;
 	}	
 }
-

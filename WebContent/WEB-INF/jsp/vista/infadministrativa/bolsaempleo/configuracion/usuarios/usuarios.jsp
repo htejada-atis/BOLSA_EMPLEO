@@ -76,7 +76,7 @@ $(document).ready(function() {
 	    "columns": [
 	    	{'data': 'prsnif', 'filter': true, 'overflow': 'auto'},
 	        {'data': 'codcuenta', 'filter': true, 'overflow': 'auto'},
-	        {'data': 'apellido1', 'filter': false, 'order': false, 'overflow': 'auto', 'render': function(row) {
+	        {'data': 'apellido1', 'filter': true, 'order': false, 'overflow': 'auto', 'render': function(row) {
 	        	return row.nombre + " " + row.apellido1 + " " + row.apellido2;         		
 	        }},
 	        {'data': 'rol.descripcion', 'filter': {'type': 'select', 'options': {'1050':'Personal', '1051':'Comision', '1053': 'Director departamento'}}  , 'order': {'active': false}},

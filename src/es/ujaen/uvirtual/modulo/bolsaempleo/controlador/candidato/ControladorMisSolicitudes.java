@@ -358,7 +358,7 @@ public class ControladorMisSolicitudes extends HttpServlet {
 			try {
 				BolsaEmpleoDataTable<Solicitud> dataTable = modelo.listaSolicitudesDatatable(bean.getUsuarioLogeado(), request.getParameterMap());
 				bean.setDatatableSolicitudes(dataTable);
-				writer.write(dataTable.toJson());
+				writer.write(dataTable.toJson("dd/M/yyyy HH:mm:ss"));
 			} catch (UVException e) {
 				LOGGER.log(Level.WARNING, e.toString());
 				bean.getMensajesDeError().add(e.getMessage());
@@ -1153,7 +1153,7 @@ public class ControladorMisSolicitudes extends HttpServlet {
 			throw new UVException("La solicitud está cerrada");
 		}
 		
-		if (solicitud.getConvocatoria().getEstado().equals(ModeloConvocatoria.CONVOCATORIA_ESTADO_CERRADA)) {
+		if (ModeloConvocatoria.obtenerInstancia().isConvocatoriaCerrada(solicitud.getConvocatoria())) {
 			throw new UVException("La convocatoria está cerrada");
 		}
 		

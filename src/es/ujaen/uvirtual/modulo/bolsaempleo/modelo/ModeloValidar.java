@@ -325,7 +325,9 @@ public class ModeloValidar {
 				+ "	FROM TBEP_BOLSAS bepbol"
 				+ " INNER JOIN TBEP_AREAS bepare ON bepare.CODNUM = bepbol.BEPARE_CODNUM"
 				+ (comision ? " INNER JOIN TBEP_EVALUADORES bepeva ON bepeva.BEPARE_CODNUM = bepare.CODNUM" : "")
-				+ "	WHERE bepbol.FLGBAREMABLE = 'S'" + (comision ? " AND bepeva.BEPUSU_CODNUM = ?" : "");
+				+ "	WHERE bepbol.FLGBAREMABLE = 'S' " 
+				+ (comision ? " AND bepeva.BEPUSU_CODNUM = ? " : "")
+				+ (comision ? " AND bepbol.ESTADO = ? " : "");
 		
 		dataTable.setColumn(ORDER_COLUMN_INDEX_CODIGO_AREA, "bepare.ID_AREA_CONOCIMIENTO");
 		dataTable.setColumn(ORDER_COLUMN_INDEX_AREA, "bepare.DES_AREA_CONOCIMIENTO");
@@ -350,6 +352,9 @@ public class ModeloValidar {
 			if (comision) {
 				stmt.setInt(paramIndex, usuario.getCodNum());
 				stmtCount.setInt(paramIndex++, usuario.getCodNum());
+				
+				stmt.setString(paramIndex, ModeloBolsa.BOLSA_ESTADO_BAREMACION);
+				stmtCount.setString(paramIndex++, ModeloBolsa.BOLSA_ESTADO_BAREMACION);
 			}
 
 			dataTable.setFiltersParams(stmt, stmtCount, paramIndex);

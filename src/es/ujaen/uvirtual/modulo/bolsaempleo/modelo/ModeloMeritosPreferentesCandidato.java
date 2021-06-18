@@ -25,6 +25,7 @@ public class ModeloMeritosPreferentesCandidato {
 	// ordenación 
 	public static final int ORDER_COLUMN_INDEX_ID = 1;
 	public static final int ORDER_COLUMN_INDEX_CODIGO = 2;
+	public static final int ORDER_COLUMN_INDEX_NOMBRE = 3;
 	public static final int ORDER_COLUMN_INDEX_DESCRIPCION = 4;
 	public static final int ORDER_COLUMN_INDEX_VALIDADO = 5;
 	
@@ -93,6 +94,7 @@ public class ModeloMeritosPreferentesCandidato {
 		
 		dataTable.setColumn(ORDER_COLUMN_INDEX_ID, "bepmpu.CODNUM");
 		dataTable.setColumn(ORDER_COLUMN_INDEX_CODIGO, "bepmep.CODIGO");
+		dataTable.setColumn(ORDER_COLUMN_INDEX_NOMBRE, "bepmep.NOMBRE");
 		dataTable.setColumn(ORDER_COLUMN_INDEX_DESCRIPCION, "bepmpu.DESCRIPCION");
 		dataTable.setColumn(ORDER_COLUMN_INDEX_VALIDADO, "bepmpu.FLGVALIDADO", DataTableColumn.COLUMN_TYPE_BOOLEAN);
 		dataTable.setQuery(consulta);

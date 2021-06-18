@@ -4,7 +4,6 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.sql.SQLException;
 import java.util.HashMap;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.logging.Level;
@@ -47,7 +46,7 @@ import es.ujaen.uvirtual.utilidades.UVException;
 @WebServlet(
 	name = "informacionadministrativa.bolsaempleo.configuracion.candidatos", 
 	description = "Gestión de usuarios candidatos", 
-	urlPatterns = { 
+	urlPatterns = {
 			"/srv/es/informacionadministrativa/bolsaempleo/configuracion/candidatos", 
 			"/srv/en/informacionadministrativa/bolsaempleo/configuracion/candidatos",
 			"/srv/es/ajax/informacionadministrativa/bolsaempleo/configuracion/candidatos",
@@ -122,6 +121,8 @@ public class ControladorUsuarioCandidato extends HttpServlet {
 	public static final String MENSAJE_EXITO_RESTAURAR = "Usuario restaurado correctamente";
 	public static final String MENSAJE_EXITO_USUARIO_MODIFICADO_CORRECTAMENTE = "Usuario/s modificado/s correctamente";
 
+	public static final String URL_PATTERN = "/srv/es/informacionadministrativa/bolsaempleo/configuracion/candidatos";
+	
 	// ajax
 	public static final String URL_PATTERN_AJAX = "/srv/es/ajax/informacionadministrativa/bolsaempleo/configuracion/candidatos";
 	public static final String RESPONSE_AJAX_CONTENTTYPE = "application/json";
@@ -134,7 +135,7 @@ public class ControladorUsuarioCandidato extends HttpServlet {
 	public static final String JSP_INDEX = RUTA_BEP_CONF_CAND + "candidatos.jsp";	
 	public static final String JSP_FORM_CANDIDATO = RUTA_BEP_CONF_CAND + "formCandidatos.jsp";
 	public static final String JSP_RESUMEN_SOLICITUD = RUTA_BEP_CONF_CAND + "resumenSolicitud.jsp";
-
+		
 	/** Peticion GET.
 	 * @see HttpServlet#doGet(HttpServletRequest request, HttpServletResponse response)
 	 */
@@ -712,4 +713,12 @@ public class ControladorUsuarioCandidato extends HttpServlet {
 		return u;
 	}
 	
+	/**
+	 * Devuelve una url de. detalle de un candidato.
+	 * @param codnum .
+	 * @return .
+	 */
+	public static String getUrlCandidato(String codnum) {
+		return String.format("%s?%s=%s&%s=%s", URL_PATTERN, PARAM_ACCION, ACCION_SELECCIONAR_CANDIDATO, PARAM_CANDIDATO, codnum);
+	}
 }

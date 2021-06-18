@@ -84,7 +84,7 @@ VistaConvocatorias bean = (VistaConvocatorias) uvdatos.getVistas().get(VistaConv
 					            	}
 					          	});
 				    		} else {
-				    			Atis.confirmDialog("Cambio de estado", "¿Desea cerrar la convocatoria?", {
+				    			Atis.confirmDialog("Cambio de estado", "¿Desea cerrar la convocatoria?<br/><br/>Los candidatos no podrán confirmar solicitudes abiertas,<br/>ni añadir o quitar titulaciones y acreditaciones.", {
 					            	Si: function() {
 					            		var params = {
 					            				'<%=ControladorConvocatorias.PARAM_ACCION%>': '<%=ControladorConvocatorias.ACCION_CERRAR_CONVOCATORIA%>',
