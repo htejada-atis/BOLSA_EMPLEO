@@ -4,7 +4,9 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.sql.SQLException;
 import java.util.logging.Logger;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.logging.Level;
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
@@ -12,7 +14,6 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import com.google.gson.Gson;
-
 import es.ujaen.uvirtual.beans.CodigoDescripcion;
 import es.ujaen.uvirtual.beans.UVDatos;
 import es.ujaen.uvirtual.beans.Usuario;
@@ -162,7 +163,7 @@ public class ControladorItemsBaremacion extends HttpServlet {
 		Usuario usuario = datos.getUsuario();
 		LOGGER.log(Level.FINEST, "usuario que ha entrado en el servlet es {0}", usuario.getUid());
 				
-		String nombreAccion = EscapaHTML.ajustaCodificacion(request.getParameter(PARAM_ACCION));
+		String nombreAccion = EscapaHTML.ajustaCodificacion(BolsaEmpleoUtils.getParamRequestOrSession(request, PARAM_ACCION));
 		if (nombreAccion == null) {
 			nombreAccion = ACCION_INDEX;
 		}
@@ -654,10 +655,10 @@ public class ControladorItemsBaremacion extends HttpServlet {
 				seleccionarItem(bean, request);
 				break;
 			case ACCION_ITEM_EXCLUYENTE_SELECCIONADO:
-				seleccionarItemExcluyente(bean, request, true);
+				seleccionarItemExcluyente(bean, request, response, true);
 				break;
 			case ACCION_ITEM_EXCLUYENTE_DESELECCIONADO:
-				seleccionarItemExcluyente(bean, request, false);
+				seleccionarItemExcluyente(bean, request, response, false);
 				break;
 			default:
 				this.errorFatal(bean);
@@ -774,7 +775,7 @@ public class ControladorItemsBaremacion extends HttpServlet {
 	private void editarItem(VistaItemsBaremacion bean, HttpServletRequest request) throws SQLException, UVException {
 		ModeloBaremacionItems modelo = ModeloBaremacionItems.obtenerInstancia();
 		ModeloAfinidad modeloAfinidad = ModeloAfinidad.obtenerInstancia();
-		ItemBaremacion item = modelo.getItemBaremacionById(Formateador.leeParametroInteger(request.getParameter(PARAM_ITEM)));
+		ItemBaremacion item = modelo.getItemBaremacionById(Formateador.leeParametroInteger(BolsaEmpleoUtils.getParamRequestOrSession(request, PARAM_ITEM)));
 		
 		bean.setApartadoBaremacion(item.getBloqueBaremacion().getApartadoBaremacion());
 		bean.setBloqueBaremacion(item.getBloqueBaremacion());
@@ -846,12 +847,14 @@ public class ControladorItemsBaremacion extends HttpServlet {
 	 * Selecciona un item para excluirlo o añadirlo de otro item .
 	 * @param bean .
 	 * @param request .
+	 * @param response .
 	 * @param seleccionado .
+	 * @throws IOException .
 	 * @throws IOException .
 	 * @throws SQLException .
 	 */
-	private void seleccionarItemExcluyente(VistaItemsBaremacion bean, HttpServletRequest request, Boolean seleccionado)
-			throws UVException, SQLException {
+	private void seleccionarItemExcluyente(VistaItemsBaremacion bean, HttpServletRequest request, HttpServletResponse response, Boolean seleccionado)
+			throws UVException, SQLException, IOException {
 		ModeloBaremacionItems modelo = ModeloBaremacionItems.obtenerInstancia();
 		
 		ItemBaremacion itemPadre = modelo.getItemBaremacionById(Formateador.leeParametroInteger(request.getParameter(PARAM_ITEM)));
@@ -869,8 +872,17 @@ public class ControladorItemsBaremacion extends HttpServlet {
 		bean.setApartadoBaremacion(itemPadre.getBloqueBaremacion().getApartadoBaremacion());
 		bean.setBloqueBaremacion(itemPadre.getBloqueBaremacion());
 		bean.setVista(RUTA_BEP_CONF + "formItemBaremacion.jsp");
+		
+		redireccionConItemSeleccionado(bean, request, response, ACCION_EDITAR_ITEM);
 	}
 	
+	private void redireccionConItemSeleccionado(VistaItemsBaremacion bean, HttpServletRequest request, HttpServletResponse response, String accion)
+			throws IOException {
+		Map<String, String> params = new HashMap<>();
+		params.put(PARAM_ACCION, accion);
+		params.put(PARAM_ITEM, bean.getItemBaremacion().getCodNum().toString());
+		BolsaEmpleoUtils.redirectWithParams(request, response, params);
+	}
 	
 		
 	private ItemBaremacion validateItemBaremacion(ItemBaremacion item, HttpServletRequest request) throws UVException, SQLException {

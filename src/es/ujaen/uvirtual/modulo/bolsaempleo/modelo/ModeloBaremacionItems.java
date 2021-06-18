@@ -541,14 +541,31 @@ public class ModeloBaremacionItems {
 	 * @param itemPadre .
 	 * @param itemHijo .
 	 * @param usuarioInsert .
+	 * @throws UVException .
 	 * @throws SQLException .
 	 * @throws UVException .
 	 */
-	public void asignarItemsExcluyentesAItem(ItemBaremacion itemPadre, ItemBaremacion itemHijo, UsuarioBolsaEmpleo usuarioInsert) throws SQLException {
-		try (Connection conexion = ConexionUvirtual.obtenerInstancia()) {			
-			String consulta = "INSERT INTO TBEP_MERITOS_EXCLUYENTES (BEPITE_CODNUM_PADRE, BEPITE_CODNUM_HIJO, UID_USUARIO) VALUES (?,?,?)";
+	public void asignarItemsExcluyentesAItem(ItemBaremacion itemPadre, ItemBaremacion itemHijo, UsuarioBolsaEmpleo usuarioInsert) throws SQLException, UVException {
+		try (Connection conexion = ConexionUvirtual.obtenerInstancia()) {	
+			String consultaSelect = "SELECT *"
+					+ "	FROM TBEP_MERITOS_EXCLUYENTES"
+					+ "	WHERE BEPITE_CODNUM_PADRE = ? AND BEPITE_CODNUM_HIJO = ?";
 			
-			try (PreparedStatement stmt = conexion.prepareStatement(consulta)) {
+			try (PreparedStatement stmt = conexion.prepareStatement(consultaSelect)) {
+				int indexParam = 1;
+				stmt.setInt(indexParam++, itemPadre.getCodNum());
+				stmt.setInt(indexParam++, itemHijo.getCodNum());
+							
+				try (ResultSet rs = stmt.executeQuery()) {
+					while (rs.next()) {
+						throw new UVException("Ya existe el ítem excluyente para este ítem");								
+					}
+				}
+			}
+			
+			String consultaInsert = "INSERT INTO TBEP_MERITOS_EXCLUYENTES (BEPITE_CODNUM_PADRE, BEPITE_CODNUM_HIJO, UID_USUARIO) VALUES (?,?,?)";
+			
+			try (PreparedStatement stmt = conexion.prepareStatement(consultaInsert)) {
 				int indexParam = 1;
 				stmt.setInt(indexParam++, itemPadre.getCodNum());
 				stmt.setInt(indexParam++, itemHijo.getCodNum());
