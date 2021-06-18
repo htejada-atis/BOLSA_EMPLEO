@@ -329,15 +329,11 @@ public class ControladorMensajes extends HttpServlet {
 		}
 		
 		List<String> destinatarios = new ArrayList<>();
-		String asunto = mensaje.getTitulo();
-		String cuerpo = mensaje.getCuerpo();
-		String email = "javilinxd.jl@gmail.com";
 		
-		destinatarios.add(email);
-		EnviaCorreo.enviaCorreo(destinatarios, asunto, cuerpo);
-		EnviaCorreo.enviaCorreo(destinatarios, destinatarios, asunto, cuerpo);
-		EnviaCorreo.enviaCorreo(email, destinatarios, asunto, cuerpo);
-		EnviaCorreo.enviaCorreoCCO(email, destinatarios, destinatarios, asunto, cuerpo);
+		for (UsuarioBolsaEmpleo usuario: bean.getDestinatarios()) {
+			destinatarios.add(usuario.getEmail());
+		}
+		
 		EnviaCorreo.enviaCorreoCCO(destinatarios, destinatarios, mensaje.getTitulo(), mensaje.getCuerpo());
 		
 		response.sendRedirect(request.getServletPath());

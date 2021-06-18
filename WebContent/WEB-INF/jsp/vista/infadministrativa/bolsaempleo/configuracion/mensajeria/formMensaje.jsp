@@ -74,13 +74,13 @@ if (bean.getDestinatarios().size() > 0 && !mensaje.getCuerpo().isBlank() && !men
 			<th scope="col" style="width:5%"></th>
 			<th scope="col" style="width:20%" title="Documento">Documento</th>
 			<th scope="col" style="width:50%" title="Nombre y apellidos">Nombre y apellidos</th>
-			<th scope="col" style="width:25%" title="Correo">Correo</th>
+			<th scope="col" style="width:30%" title="Correo">Correo</th>
 		</tr>
 		<tbody>
 		</tbody>
 		<tfoot>		
 			<tr>
-				<th colSpan="6" style="width:100%"></th>
+				<th colSpan="4" style="width:100%"></th>
 			</tr>
 		</tfoot>
 	</table>
@@ -101,7 +101,7 @@ if (bean.getDestinatarios().size() > 0 && !mensaje.getCuerpo().isBlank() && !men
    		</div>
    		<div class="form-group" id="bloque_aplicable_bloque">
    			<label for="filtro_area">Filtar por área:</label>
-    		<select class="params" id="filtro_area" name="aplicableBloque" style="width:100%;">
+    		<select class="params" id="filtro_area" name="aplicableBloque" style="width:100%;" disabled>
     			<option value="">Selecciona área</option>
     			<% for (Area a : bean.getAreas()) { %>
     				<option value="<%= a.getCodNum() %>"><%= a.getDescripcion() %></option>
@@ -131,9 +131,6 @@ if (bean.getDestinatarios().size() > 0 && !mensaje.getCuerpo().isBlank() && !men
 
 <script>
 $(document).ready(function() {
-	var onClickRowDestinatario = function(row, checkbox) {
-		console.log("candidato", row, checkbox);
-	};
 	
 	var onFilterConvocatoria = function() {};
 	
@@ -142,19 +139,39 @@ $(document).ready(function() {
 	};
 	
 	var addDestinatarios = function(selected) {
-		Atis.sendForm("<%= request.getRequestURI() %>", {
-			'<%=ControladorMensajes.PARAM_ACCION%>': '<%=ControladorMensajes.ACCION_AGREGAR_DESTINATARIOS%>',
-			'<%=ControladorMensajes.PARAM_MENSAJE_ID%>': <%= mensaje.getCodNum() %>,
-			'<%=ControladorMensajes.PARAM_DESTINATARIOS %>': Atis.object2Json(selected)
-		});
+		if (selected.length > 0) {
+			Atis.confirmDialog("Añadir destinatarios", "¿Desea añadir los destinatarios seleccionados?", {
+	        	Si: function() {
+	        		Atis.sendForm("<%= request.getRequestURI() %>", {
+	        			'<%=ControladorMensajes.PARAM_ACCION%>': '<%=ControladorMensajes.ACCION_AGREGAR_DESTINATARIOS%>',
+	        			'<%=ControladorMensajes.PARAM_MENSAJE_ID%>': <%= mensaje.getCodNum() %>,
+	        			'<%=ControladorMensajes.PARAM_DESTINATARIOS %>': Atis.object2Json(selected)
+	        		});
+	          		$(this).dialog("close");
+	        	},
+	        	No: function() {
+	          		$(this).dialog("close");
+	        	}
+	      	});
+		}
 	};
 	
 	var deleteDestinatarios = function(selected) {
-		Atis.sendForm("<%= request.getRequestURI() %>", {
-			'<%=ControladorMensajes.PARAM_ACCION%>': '<%=ControladorMensajes.ACCION_ELIMINAR_DESTINATARIOS%>',
-			'<%=ControladorMensajes.PARAM_MENSAJE_ID%>': <%= mensaje.getCodNum() %>,
-			'<%=ControladorMensajes.PARAM_DESTINATARIOS %>': Atis.object2Json(selected)
-		});
+		if (selected.length > 0) {
+			Atis.confirmDialog("Eliminar destinatarios", "¿Desea eliminar los destinatarios seleccionados?", {
+	        	Si: function() {
+	        		Atis.sendForm("<%= request.getRequestURI() %>", {
+	        			'<%=ControladorMensajes.PARAM_ACCION%>': '<%=ControladorMensajes.ACCION_ELIMINAR_DESTINATARIOS%>',
+	        			'<%=ControladorMensajes.PARAM_MENSAJE_ID%>': <%= mensaje.getCodNum() %>,
+	        			'<%=ControladorMensajes.PARAM_DESTINATARIOS %>': Atis.object2Json(selected)
+	        		});
+	          		$(this).dialog("close");
+	        	},
+	        	No: function() {
+	          		$(this).dialog("close");
+	        	}
+	      	});
+		}
 	};
 	
 	var tableDestinatarios = new Atis.DataTable('#tableDestinatarios', {
@@ -165,10 +182,10 @@ $(document).ready(function() {
 	    "filterable": true,
     	"action": "<%= ControladorMensajes.ACCION_DATATABLE_DESTINATARIOS %>",
 	    "columns": [
-	    	{'data': 'codNum', 'selectable': {'onChange': onClickRowDestinatario}},
+	    	{'data': 'codNum', 'selectable': true},
 	        {'data': 'prsnif', 'filter': true,},
-	        {'data': 'codNum', 'filter': false, 'order': false, 'overflow': 'auto', 'render': function(row) { return row.nombre + ", " + row.apellido1 + " " + row.apellido2; }},
-	        {'data': 'email', 'overflow': 'auto'},
+	        {'data': 'codNum', 'filter': true, 'overflow': 'auto', 'render': function(row) { return row.nombre + ", " + row.apellido1 + " " + row.apellido2; }},
+	        {'data': 'email', 'filter': true, 'overflow': 'auto'},
 	    ],
 	    "actions": [
 	    	{'label': 'Eliminar del mensaje', 'onClick': deleteDestinatarios},	    		    
@@ -183,10 +200,10 @@ $(document).ready(function() {
 	    "selectedAll": true,
     	"action": "<%= ControladorMensajes.ACCION_DATATABLE_DESTINATARIOS_DISPONIBLES %>",
 	    "columns": [
-	    	{'data': 'codNum', 'selectable': {'onChange': onClickRowDestinatario}},
+	    	{'data': 'codNum', 'selectable': true},
 	        {'data': 'prsnif', 'overflow': 'auto', 'filter': true,},
-	        {'data': 'codNum', 'filter': false, 'order': false, 'overflow': 'auto', 'render': function(row) { return row.nombre + ", " + row.apellido1 + " " + row.apellido2; }},
-	        {'data': 'email', 'overflow': 'auto'},
+	        {'data': 'codNum', 'filter': true, 'overflow': 'auto', 'render': function(row) { return row.nombre + ", " + row.apellido1 + " " + row.apellido2; }},
+	        {'data': 'email', 'filter': true, 'overflow': 'auto'},
 	        {'data': 'rol.descripcion', 
 	         'filter': {
 	        	'type': 'select', 
@@ -264,6 +281,12 @@ $(document).ready(function() {
 	
 	document.getElementById("filtro_convocatoria").addEventListener("change", function() {
 		tableAddDestinatario.filterBy("6", this.value);
+		if (this.value == '') {
+			tableAddDestinatario.filterBy("7", '');
+			document.getElementById("filtro_area").setAttribute("disabled", "true");
+		} else {
+			document.getElementById("filtro_area").removeAttribute("disabled");
+		}
 	});
 	
 	document.getElementById("filtro_area").addEventListener("change", function() {

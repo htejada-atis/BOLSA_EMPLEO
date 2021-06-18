@@ -30,6 +30,7 @@ public class ModeloMensajes {
 	public static final int MENSAJES_COLUMN_INDEX_ESTADO = 3;
 	
 	public static final int DESTINATARIOS_COLUMN_INDEX_DOCUMENTO = 1;
+	public static final int DESTINATARIOS_COLUMN_INDEX_NOMBRE = 2;
 	public static final int DESTINATARIOS_COLUMN_INDEX_CORREO = 3;
 	public static final int DESTINATARIOS_COLUMN_INDEX_ROL = 4;
 	public static final int DESTINATARIOS_COLUMN_INDEX_DISTRIBUCION = 5;
@@ -135,8 +136,11 @@ public class ModeloMensajes {
 				+ " FROM TBEP_MEN_DESTINATARIOS bepmde "
 				+ " INNER JOIN TBEP_USUARIOS bepusu ON bepusu.CODNUM = bepmde.BEPUSU_CODNUM "
 				+ " WHERE bepmde.BEPMEN_CODNUM = ? ";
+		
+		String whereNombre = String.format("(%s || ' ' || %s || ' ' || %s)", "bepusu.VUAJA_STRNOMBRE", "bepusu.VUAJA_STRAPELLIDO1", "bepusu.VUAJA_STRAPELLIDO2");
 
 		dataTable.setColumn(DESTINATARIOS_COLUMN_INDEX_DOCUMENTO, "bepusu.VUAJA_PRSNIF");
+		dataTable.setColumn(DESTINATARIOS_COLUMN_INDEX_NOMBRE, whereNombre, DataTableColumn.COLUMN_TYPE_TEXT);
 		dataTable.setColumn(DESTINATARIOS_COLUMN_INDEX_CORREO, "bepusu.VUAJA_EMAIL_ALTA");
 		dataTable.setColumn(DESTINATARIOS_COLUMN_INDEX_ROL, "bepusu.ROL");
 		dataTable.setQuery(consulta);
@@ -182,17 +186,29 @@ public class ModeloMensajes {
 		BolsaEmpleoDataTable<UsuarioBolsaEmpleo> dataTable = new BolsaEmpleoDataTable<>(params);
 
 		String consulta = "SELECT bepusu.* FROM TBEP_USUARIOS bepusu"
-				+ "	LEFT JOIN TBEP_SOLICITUDES bepsol ON bepusu.CODNUM = bepsol.BEPUSU_CODNUM"
-				+ "	LEFT JOIN TBEP_CONVOCATORIAS bepcon ON bepcon.CODNUM  = bepsol.BEPCON_CODNUM"
+				+ (dataTable.filterExists(DESTINATARIOS_COLUMN_INDEX_CONVOCATORIA) 
+						? "	LEFT JOIN TBEP_SOLICITUDES bepsol ON bepusu.CODNUM = bepsol.BEPUSU_CODNUM" : "")
+				+ (dataTable.filterExists(DESTINATARIOS_COLUMN_INDEX_AREA)
+						? " LEFT JOIN TBEP_SOLICITUD_BOLSAS bepsbo ON bepsol.CODNUM = bepsbo.BEPSOL_CODNUM" : "")
 				+ "	LEFT JOIN TBEP_MEN_DESTINATARIOS bepmde ON bepusu.CODNUM = bepmde.BEPUSU_CODNUM AND bepmde.BEPMEN_CODNUM = ?"
 				+ "	WHERE bepusu.FLGBORRADO = 'N' AND bepmde.BEPUSU_CODNUM IS NULL AND bepusu.VUAJA_EMAIL_ALTA IS NOT NULL";
+		
+		String whereConvocatoria = "(SELECT bepsol2.BEPCON_CODNUM FROM TBEP_SOLICITUDES bepsol2"
+				+ "	WHERE bepusu.CODNUM = bepsol2.BEPUSU_CODNUM AND bepsol2.BEPCON_CODNUM = bepsol.BEPCON_CODNUM)";
+		
+		String whereArea = "(SELECT bepsbo2.BEPBOL_CODNUM FROM TBEP_SOLICITUDES bepsol2"
+				+ "	INNER JOIN TBEP_SOLICITUD_BOLSAS bepsbo2 ON bepsol2.CODNUM = bepsbo2.BEPSOL_CODNUM"
+				+ "	WHERE bepusu.CODNUM = bepsol2.BEPUSU_CODNUM AND bepsbo2.BEPBOL_CODNUM = bepsbo.BEPBOL_CODNUM)";
+		
+		String whereNombre = String.format("(%s || ' ' || %s || ' ' || %s)", "bepusu.VUAJA_STRNOMBRE", "bepusu.VUAJA_STRAPELLIDO1", "bepusu.VUAJA_STRAPELLIDO2");
 
 		dataTable.setColumn(DESTINATARIOS_COLUMN_INDEX_DOCUMENTO, "bepusu.VUAJA_PRSNIF");
+		dataTable.setColumn(DESTINATARIOS_COLUMN_INDEX_NOMBRE, whereNombre, DataTableColumn.COLUMN_TYPE_TEXT);
 		dataTable.setColumn(DESTINATARIOS_COLUMN_INDEX_CORREO, "bepusu.VUAJA_EMAIL_ALTA");
 		dataTable.setColumn(DESTINATARIOS_COLUMN_INDEX_ROL, "bepusu.ROL");
 		dataTable.setColumn(DESTINATARIOS_COLUMN_INDEX_DISTRIBUCION, "bepusu.FLGLISTADISTRIBUCION", DataTableColumn.COLUMN_TYPE_BOOLEAN);
-		dataTable.setColumn(DESTINATARIOS_COLUMN_INDEX_CONVOCATORIA, "bepcon.CODNUM");
-		dataTable.setColumn(DESTINATARIOS_COLUMN_INDEX_AREA, "bepcon.CODNUM");
+		dataTable.setColumn(DESTINATARIOS_COLUMN_INDEX_CONVOCATORIA, whereConvocatoria, DataTableColumn.COLUMN_TYPE_OPTION);
+		dataTable.setColumn(DESTINATARIOS_COLUMN_INDEX_AREA, whereArea, DataTableColumn.COLUMN_TYPE_OPTION);
 		dataTable.setQuery(consulta);
 
 		try (Connection conexion = ConexionUvirtual.obtenerInstancia();
