@@ -1,5 +1,6 @@
 package es.ujaen.uvirtual.utilidades;
 
+import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.Properties;
 import java.util.ResourceBundle;
@@ -63,7 +64,7 @@ public class EnviaCorreo {
 			List<String> conCopiaOculta, String replyTo, String asunto, String cuerpo) {
 		boolean resultado = false;
 		try {
-			resultado = enviaCorreoExcepcion(null, destinatarios, conCopia, conCopiaOculta, replyTo, asunto, cuerpo);
+			resultado = enviaCorreoExcepcionList(null, destinatarios, conCopia, conCopiaOculta, replyTo, asunto, cuerpo);
 		} catch (Exception e) {
 			ELOGGER.logp(Level.SEVERE, eNombreDeEstaClase, nombreMetodoEnvioCorreo, errorEnviarCorreo + e);
 		}
@@ -84,7 +85,7 @@ public class EnviaCorreo {
 			List<String> conCopiaOculta, String replyTo, String asunto, String cuerpo) {
 		boolean resultado = false;
 		try {
-			resultado = enviaCorreoExcepcion(remitente, destinatarios, conCopia, conCopiaOculta, replyTo, asunto, cuerpo);
+			resultado = enviaCorreoExcepcionList(remitente, destinatarios, conCopia, conCopiaOculta, replyTo, asunto, cuerpo);
 		} catch (Exception e) {
 			ELOGGER.logp(Level.SEVERE, eNombreDeEstaClase, nombreMetodoEnvioCorreo, errorEnviarCorreo + e);
 		}
@@ -102,8 +103,12 @@ public class EnviaCorreo {
 	 * @return si se ha enviado correctamente
 	 * @throws Exception si error
 	 */
-	public static boolean enviaCorreoExcepcion(String emisor, List<String> destinatarios, List<String> conCopia, 
-			List<String> conCopiaOculta, String replyTo, String asunto, String cuerpo) throws Exception {
+	public static boolean enviaCorreoExcepcion(String emisor, ArrayList<String> destinatarios, ArrayList<String> conCopia, ArrayList<String> conCopiaOculta, String replyTo, String asunto, String cuerpo) throws Exception {
+		
+		return enviaCorreoExcepcionList(emisor, destinatarios, conCopia, conCopiaOculta, replyTo, asunto, cuerpo);
+	}
+	
+	public static boolean enviaCorreoExcepcionList(String emisor, List<String> destinatarios, List<String> conCopia, List<String> conCopiaOculta, String replyTo, String asunto, String cuerpo) throws Exception {
 		Session session = Session.getDefaultInstance(fConfiguracion, null);
 		MimeMessage message = new MimeMessage(session);
 		if (emisor == null) {
