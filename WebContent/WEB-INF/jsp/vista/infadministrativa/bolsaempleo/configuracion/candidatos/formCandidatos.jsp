@@ -408,6 +408,8 @@ UsuarioBolsaEmpleo candidato = bean.getCandidato();
 			        }}
 			    ]
 			});
+			
+			Atis.smoothScrollToAnchor("#solicitudes");
 	<%	} %>
 	
 	<%	if (bean.getApartadoMeritos() != null) { %>
@@ -418,8 +420,6 @@ UsuarioBolsaEmpleo candidato = bean.getCandidato();
 					optionsApartados[<%=apartado.getCodNum()%>] = '<%=apartado.getNombre()%>';
 				<% } %>
 			<% } %>
-			
-			console.log(optionsApartados)
 	
 			var table_meritos = new Atis.DataTable('#table_meritos', {
 			    "ajax": { url: "<%= ControladorUsuarioCandidato.URL_PATTERN_AJAX %>" },
@@ -449,7 +449,8 @@ UsuarioBolsaEmpleo candidato = bean.getCandidato();
 		   			]}
 			    ]
 			});
-	
+			
+			Atis.smoothScrollToAnchor("#meritos");
 	<%	} %>
 	
 	<%	if (bean.getApartadoTitulaciones() != null) { %>
@@ -480,6 +481,8 @@ UsuarioBolsaEmpleo candidato = bean.getCandidato();
 		   			]}
 			    ],
 			});
+			
+			Atis.smoothScrollToAnchor("#titulaciones");
 	<%	} %>
 	
 	<%	if (bean.getApartadoAcreditaciones() != null) { %>
@@ -513,6 +516,8 @@ UsuarioBolsaEmpleo candidato = bean.getCandidato();
 		   			]}
 			    ],
 			});
+			
+			Atis.smoothScrollToAnchor("#acreditaciones");
 	<%	} %>
 	
 	<%	if (bean.getApartadoAreasExcluidas() != null) { %>
@@ -578,6 +583,7 @@ UsuarioBolsaEmpleo candidato = bean.getCandidato();
 		      	});
 			}
 		
+			Atis.smoothScrollToAnchor("#areas_excluidas");
 	<%	} %>
 		
 		function getTodayDate() {

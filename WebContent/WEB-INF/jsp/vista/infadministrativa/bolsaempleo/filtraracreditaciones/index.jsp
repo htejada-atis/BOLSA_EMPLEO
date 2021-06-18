@@ -134,6 +134,8 @@ UsuarioBolsaEmpleo candidato = bean.getCandidato();
 		   			]}
 			    ],
 			});
+			
+			Atis.smoothScrollToAnchor("#tableAcreditacionesCandidato");
 		<% } %>
 		
 	}); 

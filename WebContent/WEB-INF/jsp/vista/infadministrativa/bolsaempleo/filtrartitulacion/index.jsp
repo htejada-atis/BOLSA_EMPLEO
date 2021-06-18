@@ -177,6 +177,8 @@ UsuarioBolsaEmpleo candidato = bean.getCandidato();
 		   			]}	
 			    ],
 			});
+			
+			Atis.smoothScrollToAnchor("#tableTitulacionesCandidato");
 		<% } %>
 		
 		$('#sin_titulacion').on('click', function() {
