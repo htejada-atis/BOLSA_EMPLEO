@@ -5,9 +5,11 @@ import java.util.ArrayList;
 import java.util.List;
 
 import es.ujaen.uvirtual.beans.vistas.Vista;
+import es.ujaen.uvirtual.modulo.bolsaempleo.beans.ApartadoBaremacion;
 import es.ujaen.uvirtual.modulo.bolsaempleo.beans.Area;
 import es.ujaen.uvirtual.modulo.bolsaempleo.beans.Bolsa;
 import es.ujaen.uvirtual.modulo.bolsaempleo.beans.BolsaSolicitud;
+import es.ujaen.uvirtual.modulo.bolsaempleo.beans.Merito;
 import es.ujaen.uvirtual.modulo.bolsaempleo.beans.MeritoPreferenteUsuario;
 import es.ujaen.uvirtual.modulo.bolsaempleo.beans.Solicitud;
 import es.ujaen.uvirtual.modulo.bolsaempleo.beans.TitulacionUsuario;
@@ -24,14 +26,17 @@ public class VistaCandidatos extends Vista implements Serializable {
 	private Solicitud solicitud;
 	private UsuarioBolsaEmpleo candidato;
 	private List<Area> listaAreas = new ArrayList<>();
+	private List<ApartadoBaremacion> apartados = new ArrayList<>();
 	private List<BolsaSolicitud> listaBolsasSolicitud;
 	private transient BolsaEmpleoDataTable<UsuarioBolsaEmpleo> dataTableCandidatos;
 	private transient BolsaEmpleoDataTable<Bolsa> dataTableAreas;
 	private transient BolsaEmpleoDataTable<MeritoPreferenteUsuario> dataTableAcreditaciones;
+	private transient BolsaEmpleoDataTable<Merito> dataTableMeritos;
 	private transient BolsaEmpleoDataTable<Solicitud> dataTableSolicitudes;
 	private transient BolsaEmpleoDataTable<TitulacionUsuario> dataTableTitulaciones;
 	private Boolean apartadoAreasExcluidas;
 	private Boolean apartadoSolicitudes;
+	private Boolean apartadoMeritos;
 	private Boolean apartadoTitulaciones;
 	private Boolean apartadoAcreditaciones;
 	private Boolean apartadoComunicaciones;
@@ -93,6 +98,14 @@ public class VistaCandidatos extends Vista implements Serializable {
 
 	public Boolean getApartadoSolicitudes() {
 		return apartadoSolicitudes;
+	}
+	
+	public void setApartadoMeritos(Boolean apartadoMeritos) {
+		this.apartadoMeritos = apartadoMeritos;
+	}
+
+	public Boolean getApartadoMeritos() {
+		return apartadoMeritos;
 	}
 
 	public void setApartadoComunicaciones(Boolean apartadoComunicaciones) {
@@ -173,5 +186,21 @@ public class VistaCandidatos extends Vista implements Serializable {
 
 	public void setCodigoPadreMeritoPreferente(String codigoPadreMeritoPreferente) {
 		this.codigoPadreMeritoPreferente = codigoPadreMeritoPreferente;
+	}
+
+	public BolsaEmpleoDataTable<Merito> getDataTableMeritos() {
+		return dataTableMeritos;
+	}
+
+	public void setDataTableMeritos(BolsaEmpleoDataTable<Merito> dataTableMeritos) {
+		this.dataTableMeritos = dataTableMeritos;
+	}
+	
+	public List<ApartadoBaremacion> getApartados() {
+		return apartados;
+	}
+
+	public void setApartados(List<ApartadoBaremacion> apartados) {
+		this.apartados = apartados;
 	}
 }

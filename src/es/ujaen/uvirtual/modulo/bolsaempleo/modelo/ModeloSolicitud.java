@@ -45,7 +45,7 @@ public class ModeloSolicitud {
 	public static final String MENSAJE_ERROR_SOLICITUDE_NO_EXISTE = "No existe la solicitud";
 	public static final String MENSAJE_ERROR_NO_EXISTE_MERITO_SOLICITUD = "No existe el merito de la solicitud";
 	public static final String MENSAJE_ERROR_FALTAN_DATOS_CONFIRMAR_SLICITUD = 
-		"Para confirmar la solicitud debe primero completar sus datos personales. Completelos en la sección 'Mis Datos'.";
+		"Para confirmar la solicitud debe primero completar sus datos personales. Complételos en la sección 'Mis Datos'.";
 	public static final String MENSAJE_ERROR_SIN_SOLICITUD_CERRADA = "No existe solicitud cerrada";
 	public static final String MENSAJE_ERROR_SOLICITUD_CERRADA = "La solicitud está cerrada";
 	public static final String MENSAJE_ERROR_TIPO_AFINIDAD = "La afinidad no es del mismo tipo que la del item del mérito";
@@ -461,6 +461,17 @@ public class ModeloSolicitud {
 	 */
 	public Solicitud getSolicitudById(Integer codNum) throws SQLException, UVException {
 		return getSolicitudById(codNum, false);
+	}
+	
+	/**
+	 * Devuelve una solicitud por su id con el archivo .
+	 * @param codNum .
+	 * @return Solicitud o null si no existe .
+	 * @throws UVException  .
+	 * @throws SQLException .
+	 */
+	public Solicitud getSolicitudByIdArchivo(Integer codNum) throws SQLException, UVException {
+		return getSolicitudById(codNum, true);
 	}
 	
 	/**
