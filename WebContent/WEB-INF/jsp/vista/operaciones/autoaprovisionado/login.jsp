@@ -15,7 +15,6 @@ VistaUsuarioAutoregistrado bean = (VistaUsuarioAutoregistrado)uvdatos.getVistas(
     background: #F1F1F1;
     border-radius: 5px;
     border-top: 5px solid #006D38;
-    margin: 0 auto;
 }
 
 .login-block input {
@@ -72,24 +71,48 @@ VistaUsuarioAutoregistrado bean = (VistaUsuarioAutoregistrado)uvdatos.getVistas(
 .login-block input[type=submit]:hover {
     background: #004921;
 }
+
+.logintic {
+	margin-top:3em;
+	padding-right:10em;
+	padding-bottom:3em;
+}
+
+.logintic a {
+	margin-top:3em;
+	padding: 0.8em;
+    background: #006D38;
+    box-sizing: border-box;
+    border-radius: 5px;
+    border: 1px solid #004921;
+    color: #fff;
+    font-weight: bold;
+    text-transform: uppercase;
+    font-size: 14px;
+    font-family: Montserrat;
+    outline: none;
+    cursor: pointer;
+}
 </style>
 <h2>Acceso a <%=bean.getDescripcionModulo() %></h2>
-    <h3>Acceso </h3>
-	<input type="submit" value="Entrar">
-    <h3 style="padding-top: 2em;">Acceder con correo</h3>
-<div class="login-block">
-  		<form method="post" action="<%=request.getRequestURI()%>" id="formularioExiste"> 
-	<input type="hidden" name="<%=ControladorUsuarioAutoregistrado.PARAM_ACCION%>" id="accionFormulario" value="<%=ControladorUsuarioAutoregistrado.ACCION_VALIDA%>" />
-	<input type="hidden" id="g-recaptcha-response-valida" name="g-recaptcha-response" value="" />
-	<input type="hidden" name="<%=ControladorUsuarioAutoregistrado.PARAM_ID_MODULO%>" value="<%=bean.getIdModulo()%>" />
-	
-	</form>
-    <input type="text" value="" placeholder="Correo" id="username" />
-    <input type="password" value="" placeholder="Clave" id="password" />
-	<input type="submit" value="Entrar">
-</div>
-    <h4><a href="">Registrarse</a></h4>     
-    <h4><a href="">Olvido clave</a></h4>
+	<div class="logintic" align="right">
+		<a href="https://uvirtual.ujaen.es/srv/es/informacionadministrativa/bolsaempleo">Acceso cuenta TIC (SIDUJA)</a>
+	</div>
+
+	<div class="login-block">
+		<h3>Acceso usuarios externos</h3>
+		<form method="post" action="<%=request.getRequestURI()%>" id="formularioExiste"> 
+			<input type="hidden" name="<%=ControladorUsuarioAutoregistrado.PARAM_ACCION%>" id="accionFormulario" value="<%=ControladorUsuarioAutoregistrado.ACCION_VALIDA%>" />
+			<input type="hidden" id="g-recaptcha-response-valida" name="g-recaptcha-response" value="" />
+			<input type="hidden" name="<%=ControladorUsuarioAutoregistrado.PARAM_ID_MODULO%>" value="<%=bean.getIdModulo()%>" />
+		</form>
+		<input type="text" value="" placeholder="Correo electrónico" id="username" />
+		<input type="password" value="" placeholder="Clave" id="password" />
+		<input type="submit" value="Entrar">
+
+		<h4><a href="action="">Registrarse</a></h4>
+		<h4><a href="action="">He olvidado mi clave</a></h4>
+	</div>
 
 <% if (bean.isMostrarCaptcha()) { %>
 		<script src="https://www.google.com/recaptcha/api.js?render=<%=bean.getCaptchaPublica()%>"></script>
