@@ -772,7 +772,7 @@ public class ModeloUsuarioBolsaEmpleo {
 	}
 
 	private void cambiarFlagBorradoUsuario(UsuarioBolsaEmpleo usuario, String borrado, UsuarioBolsaEmpleo usuarioUpdate) throws SQLException, UVException {
-		String query = "UPDATE TBEP_USUARIOS SET UID_USUARIO=?,FLGBORRADO=?,FECHA_BORRADO=? WHERE CODNUM = ?";
+		String query = "UPDATE TBEP_USUARIOS SET UID_USUARIO=?,FLGBORRADO=?,FECHA_BORRADO=?,RAZON_BORRADO=? WHERE CODNUM = ?";
 
 		try (Connection conexion = ConexionUvirtual.obtenerInstancia(); PreparedStatement stmt = conexion.prepareStatement(query)) {
 			int indexParam = 1;
@@ -780,9 +780,11 @@ public class ModeloUsuarioBolsaEmpleo {
 			stmt.setString(indexParam++, usuarioUpdate.getCodCuenta());
 			stmt.setString(indexParam++, borrado);
 			if (borrado.equals(USUARIO_BORRADO)) {
-				stmt.setDate(indexParam++, new java.sql.Date(BolsaEmpleoUtils.getCurrentDateTime().getTime()));	
+				stmt.setDate(indexParam++, new java.sql.Date(BolsaEmpleoUtils.getCurrentDateTime().getTime()));
+				stmt.setString(indexParam++, usuario.getRazonBorrado());
 			} else {
 				stmt.setNull(indexParam++, Types.DATE);
+				stmt.setNull(indexParam++, Types.VARCHAR);
 			}
 
 			stmt.setInt(indexParam++, usuario.getCodNum());
@@ -822,9 +824,13 @@ public class ModeloUsuarioBolsaEmpleo {
 		
 		// comprobamos si está borrado o excluido
 		if (Boolean.TRUE.equals(usuario.getExcluido())) {
-			throw new UVException(String.format("No puede acceder, su perfil ha sido excluido: [%s]", usuario.getCodCuenta()));
+			throw new UVException(usuario.getRazonBorrado() != null
+					? String.format("No puede acceder, su perfil ha sido excluido: [%s]. Razón: %s", usuario.getCodCuenta(), usuario.getRazonBorrado())
+					: String.format("No puede acceder, su perfil ha sido excluido: [%s].", usuario.getCodCuenta()));
 		} else if (Boolean.TRUE.equals(usuario.getBorrado())) {
-			throw new UVException(String.format("No puede acceder, su perfil ha sido dado de baja: [%s]", usuario.getCodCuenta()));
+			throw new UVException(usuario.getRazonBorrado() != null
+					? String.format("No puede acceder, su perfil ha sido dado de baja: [%s]. Razón: %s", usuario.getCodCuenta(), usuario.getRazonBorrado())
+					: String.format("No puede acceder, su perfil ha sido dado de baja: [%s].", usuario.getCodCuenta()));
 		}
 		
 		return usuario; 
