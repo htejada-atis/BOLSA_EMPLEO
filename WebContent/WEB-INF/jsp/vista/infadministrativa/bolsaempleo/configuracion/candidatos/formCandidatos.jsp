@@ -145,7 +145,7 @@ UsuarioBolsaEmpleo candidato = bean.getCandidato();
 		
 		<div class="form-group-container col1">
     		<div class="form-group" style="float:right;">
-    			<input id="usuario_guardar" type="submit" name="<%= ControladorUsuarioCandidato.PARAM_GUARDAR %>" value="Guardar candidato" style="float:right; margin-left: 12px;"/>
+    			<input id="usuario_guardar" type="submit" name="<%= ControladorUsuarioCandidato.PARAM_GUARDAR %>" value="Guardar candidato" style="float:right; margin-left: 10px;"/>
     		<%	if (candidato != null && candidato.getBorrado()) { %>
     				<label for="usuario_restaurar" style="margin-top: 5px; margin-left: 6px; float:right; width: unset !important;">Usuario Borrado</label>
     				<input id="usuario_restaurar" type="button" value="Restaurar" style="float:right;"/>

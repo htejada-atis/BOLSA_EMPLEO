@@ -22,6 +22,7 @@ public class VistaMensajes extends Vista implements Serializable {
 	private Mensaje mensaje;
 	private List<Convocatoria> convocatorias;
 	private List<Area> areas;
+	private List<UsuarioBolsaEmpleo> destinatarios;
 	private String vista;
 	private UsuarioBolsaEmpleo usuarioLogeado;
 	
@@ -79,5 +80,13 @@ public class VistaMensajes extends Vista implements Serializable {
 
 	public void setAreas(List<Area> areas) {
 		this.areas = areas;
+	}
+	
+	public List<UsuarioBolsaEmpleo> getDestinatarios() {
+		return destinatarios;
+	}
+	
+	public void setDestinatarios(List<UsuarioBolsaEmpleo> destinatarios) {
+		this.destinatarios = destinatarios;
 	}
 }

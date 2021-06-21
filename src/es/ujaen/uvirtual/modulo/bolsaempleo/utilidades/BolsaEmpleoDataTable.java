@@ -205,14 +205,12 @@ public class BolsaEmpleoDataTable<T> {
 		return this.pagesTotal;
 	}
 
-	/**
-	 * Método para agregar parámetros de los filtros a la consulta .
-	 * 
-	 * @param stmt      .
+	/** Método para agregar parámetros de los filtros a la consulta .
+	 * @param stmt .
 	 * @param stmtCount .
-	 * @param index     .
+	 * @param index .
 	 * @throws SQLException .
-	 * @throws UVException  .
+	 * @throws UVException .
 	 */
 	public void setFiltersParams(PreparedStatement stmt, PreparedStatement stmtCount, int index)
 			throws SQLException, UVException {
@@ -242,6 +240,24 @@ public class BolsaEmpleoDataTable<T> {
 				}
 			}
 		}
+	}
+	
+	/** Método para comprobar si se ha enviado un filtro al datatable .
+	 * @param filterKey .
+	 * @return booleano si existe el filtro .
+	 */
+	public boolean filterExists(int filterKey) {
+		boolean exists = false;
+		if (Boolean.TRUE.equals(this.isFilterable())) {
+			for (Map.Entry<Integer, String> filter : filters.entrySet()) {
+				Integer key = filter.getKey();
+				if (key.equals(filterKey)) {
+					exists = true;
+				}
+			}
+		}
+		
+		return exists;
 	}
 
 	/**

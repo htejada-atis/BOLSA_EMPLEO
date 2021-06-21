@@ -24,13 +24,12 @@ VistaMensajes bean = (VistaMensajes) uvdatos.getVistas().get(VistaMensajes.class
 			<th scope="col" style="width:20%" title="Fecha creación">Fecha creación</th>
 			<th scope="col" style="width:55%">Título</th>
 			<th scope="col" class="center" style="width:15%">Estado</th>
-			<th scope="col" style="width:15%"></th>
 		</tr>
 		<tbody>
 		</tbody>
 		<tfoot>		
 			<tr>
-				<th colSpan="5" style="width:100%"></th>
+				<th colSpan="4" style="width:100%"></th>
 			</tr>
 		</tfoot>
 	</table>
@@ -81,11 +80,7 @@ $(document).ready(function() {
 	        {'data': 'fechaCreacion'},
 	        {'data': 'titulo'},
 	        {'data': 'estado'},
-        	{'data': 'codnum', 'buttons': [
-        		{'label': 'Editar', 'onClick': clickRow},
-        		{'label': 'Borrar', 'visible': function(row) { return row.estado === 'BORRADOR'; }, 'onClick': borrar},
-        	]}
-	    ]	    
+	    ]
 	});	
 }); 
 </script>
