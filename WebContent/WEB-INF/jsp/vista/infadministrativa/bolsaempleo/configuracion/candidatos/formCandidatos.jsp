@@ -261,10 +261,9 @@ UsuarioBolsaEmpleo candidato = bean.getCandidato();
 				<th scope="col"	style="width:15%">Id Solicitud</th>
 				<th scope="col"	style="width:45%">Descripción convocatoria</th>
 				<th scope="col"	style="width:20%">Estado solicitud</th>
-				<th scope="col" style="width:20%">Fecha confirmación</th>	
+				<th scope="col" style="width:20%">Fecha confirmación</th>
 			</tr>
-			<tbody>		
-			</tbody>
+			<tbody></tbody>
 			<tfoot>
 				<tr>
 					<th colSpan="4"></th>
@@ -405,7 +404,7 @@ UsuarioBolsaEmpleo candidato = bean.getCandidato();
 			        {'data': 'estado', 'filter': true},
 			        {'data': 'fechaConfirmacion', order: {'active': false}, 'render': function(row) {
 			        	return row.estado == 'CERRADA' ? row.fechaConfirmacion : '';
-			        }}
+			        }}			        
 			    ]
 			});
 			

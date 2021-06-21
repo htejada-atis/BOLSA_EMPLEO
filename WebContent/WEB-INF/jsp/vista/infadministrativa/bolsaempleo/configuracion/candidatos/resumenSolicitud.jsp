@@ -27,11 +27,17 @@ VistaCandidatos bean = (VistaCandidatos) uvdatos.getVistas().get(VistaCandidatos
 	<h4>Nº de documento: <%= bean.getCandidato().getPrsNif() %></h4>
 	<h4>Estado solicitud: <%= bean.getSolicitud().getEstado() %></h4>
 	
-	<%	if (bean.getSolicitud().getEstado().equals(ModeloSolicitud.SOLICITUD_ESTADO_CERRADA)) { %>
-			<div style="display: flex; width: 100%; justify-content: flex-end;">
-				<button class="link-btn icon icon-download" id="descargar_solicitud">Descargar solicitud</button>
-			</div>
-	<%	} %>
+	<div style="width: 100%; display: flex; flex-direction: row;">
+		<button class="link-btn" id="candidato_volver" style="align-self: flex-start">Volver</button>
+			
+		<%	if (bean.getSolicitud().getEstado().equals(ModeloSolicitud.SOLICITUD_ESTADO_CERRADA)) { %>
+		    <button class="link-btn" id="reabrir_solicitud" style="align-self: flex-end">Reabrir solicitud</button>
+		<%	} %>
+		
+		<%	if (bean.getSolicitud().getEstado().equals(ModeloSolicitud.SOLICITUD_ESTADO_CERRADA)) { %>
+			<button class="link-btn icon icon-download" id="descargar_solicitud" style="align-self: flex-end">Descargar solicitud</button>
+		<%	} %>
+	</div>
 	
 <%	for (BolsaSolicitud bolsa: bean.getListaBolsasSolicitud()) { %>
 		
@@ -84,19 +90,6 @@ VistaCandidatos bean = (VistaCandidatos) uvdatos.getVistas().get(VistaCandidatos
 			</tbody>
 		</table>
 <%	} %>
-
-	<div class="btns-by-steps">
-		<button class="link-btn" id="candidato_volver">
-	    	 Volver
-	    </button>
-	<%	if (bean.getSolicitud().getConvocatoria().getEstado().equals(ModeloConvocatoria.CONVOCATORIA_ESTADO_ABIERTA) &&
-			bean.getSolicitud().getEstado().equals(ModeloSolicitud.SOLICITUD_ESTADO_CERRADA)) { %>
-		    <button class="link-btn" id="reabrir_solicitud">
-		    	 Reabrir solicitud
-		    </button>
-	<%	} %>
-	</div>
-	
 </div>
 
 <script>

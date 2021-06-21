@@ -16,6 +16,9 @@ public class Solicitud implements Serializable {
 	private String estado;
 	private Date fechaConfirmacion;
 	private InputStream archivo;
+	private Boolean excluido;
+	private Date fechaExclusion;
+	private String razonExclusion;
 	
 	/** Constructor por defecto.
 	 */
@@ -34,7 +37,7 @@ public class Solicitud implements Serializable {
 		this.codNum = pcodNum;
 		this.usuario = pusuario;
 		this.convocatoria = pconvocatoria;
-		this.estado = pestado;		
+		this.estado = pestado;			
 	}
 		
 	/** Constructor copia.
@@ -42,9 +45,12 @@ public class Solicitud implements Serializable {
 	 */
 	public Solicitud(Solicitud copia) {
 		this.codNum = copia.codNum;
-		this.estado = copia.estado;
 		this.usuario = new UsuarioBolsaEmpleo(copia.usuario);
 		this.convocatoria = new Convocatoria(copia.convocatoria);
+		this.estado = copia.estado;
+		this.excluido = copia.excluido;
+		this.fechaExclusion = copia.fechaExclusion;
+		this.razonExclusion = copia.razonExclusion;
 	}
 	
 	public Integer getCodNum() {
@@ -95,14 +101,39 @@ public class Solicitud implements Serializable {
 		this.archivo = archivo;
 	}
 	
+	public Boolean getExcluido() {
+		return this.excluido;
+	}
+	
+	public void setExcluido(Boolean excluido) {
+		this.excluido = excluido;
+	}
+	
+	public Date getFechaExclusion() {
+		return this.fechaExclusion;
+	}
+	
+	public void setFechaExclusion(Date fechaExclusion) {
+		this.fechaExclusion = fechaExclusion;
+	}
+	
+	public String getRazonExclusion() {
+		return this.razonExclusion;
+	}
+	
+	public void setRazonExclusion(String razonExclusion) {
+		this.razonExclusion = razonExclusion;
+	}
+	
 	public static long getSerialversionuid() {
 		return serialVersionUID;
 	}
 	
 	@Override
 	public String toString() {
-		return "Solicitud [codNum=" + codNum + ", usuario=" + usuario + ", convocatoria=" 
-					+ convocatoria + ", estado=" + estado + ", fechaConfirmacion=" + fechaConfirmacion + "]";
+		return "Solicitud [codNum=" + codNum + ", usuario=" + usuario + ", convocatoria=" + convocatoria 
+				+ ", estado=" + estado + ", fechaConfirmacion=" + fechaConfirmacion + ", exluido=" + excluido 
+				+ ", fechaExclusion=" + fechaExclusion + ", razonExclusion=" + razonExclusion + "]";
 	}
 	
 	@Override
@@ -115,6 +146,9 @@ public class Solicitud implements Serializable {
 		result = prime * result + ((estado == null) ? 0 : estado.hashCode());
 		result = prime * result + ((fechaConfirmacion == null) ? 0 : fechaConfirmacion.hashCode());
 		result = prime * result + ((archivo == null) ? 0 : archivo.hashCode());
+		result = prime * result + ((excluido == null) ? 0 : excluido.hashCode());
+		result = prime * result + ((fechaExclusion == null) ? 0 : fechaExclusion.hashCode());
+		result = prime * result + ((razonExclusion == null) ? 0 : razonExclusion.hashCode());
 		return result;
 	}
 	
@@ -171,6 +205,27 @@ public class Solicitud implements Serializable {
 				return false;
 			}
 		} else if (!archivo.equals(other.archivo)) {
+			return false;
+		}
+		if (excluido == null) {
+			if (other.excluido != null) {
+				return false;
+			}
+		} else if (!excluido.equals(other.excluido)) {
+			return false;
+		}
+		if (fechaExclusion == null) {
+			if (other.fechaExclusion != null) {
+				return false;
+			}
+		} else if (!fechaExclusion.equals(other.fechaExclusion)) {
+			return false;
+		}
+		if (razonExclusion == null) {
+			if (other.razonExclusion != null) {
+				return false;
+			}
+		} else if (!razonExclusion.equals(other.razonExclusion)) {
 			return false;
 		}
 		

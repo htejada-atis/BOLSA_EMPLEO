@@ -38,6 +38,8 @@ import es.ujaen.uvirtual.utilidades.UVException;
 public class ModeloSolicitud {	
 	public static final String SOLICITUD_ESTADO_ABIERTA = "ABIERTA";
 	public static final String SOLICITUD_ESTADO_CERRADA = "CERRADA";
+	public static final String SOLICITUD_EXCLUIDA = "S";
+	public static final String SOLICITUD_NO_EXCLUIDA = "N";
 	
 	public static final String MENSAJE_ERROR_CONVOCATORIA_NO_ABIERTA = "La convocatoria no está abierta";
 	public static final String MENSAJE_ERROR_SOLICITUDES_ABIERTAS = "Ya existen solicitides abiertas";
@@ -91,7 +93,7 @@ public class ModeloSolicitud {
     }
 	
 	/**
-	 * Listado de solicitudes. 
+	 * Listado de solicitudes en mis solicitudes. 
 	 * @param usuario .
 	 * @param params para leer los parametros de paginación, ordenacion, etc
 	 * @return listado de bolsas de empleo
@@ -105,8 +107,8 @@ public class ModeloSolicitud {
 		
 		String consulta =
 			"SELECT "
-			+ "	bepcon.CODNUM, bepcon.DESCRIPCION, bepcon.FECHACIERRE, bepcon.ESTADO ESTADO_CONVOCATORIA, "
-			+ "	bepsol.CODNUM SOLICITUD_CODNUM, bepsol.ESTADO ESTADO_SOLICITUD "
+			+ "	bepcon.CODNUM, bepcon.DESCRIPCION, bepcon.FECHACIERRE, bepcon.ESTADO ESTADO_CONVOCATORIA, bepsol.CODNUM SOLICITUD_CODNUM, "
+			+ " bepsol.ESTADO ESTADO_SOLICITUD, bepsol.FLGEXCLUIDO, bepsol.RAZON_EXCLUSION, bepsol.FECHA_EXCLUSION "
 			+ "FROM TBEP_CONVOCATORIAS bepcon LEFT JOIN TBEP_SOLICITUDES bepsol "
 			+ "	ON bepsol.BEPCON_CODNUM = bepcon.CODNUM AND (bepsol.BEPUSU_CODNUM IS NULL OR bepsol.BEPUSU_CODNUM = ?) "
 			+ "ORDER BY bepcon.CODNUM desc";
@@ -126,6 +128,9 @@ public class ModeloSolicitud {
 					solicitud.setCodNum(rs.getInt("SOLICITUD_CODNUM"));					
 					solicitud.setConvocatoria(modeloConvocatoria.getConvocatoriaById(rs.getInt(CODNUM)));					
 					solicitud.setEstado(rs.getString("ESTADO_SOLICITUD") != null ? rs.getString("ESTADO_SOLICITUD") : ModeloSolicitud.SOLICITUD_ESTADO_CERRADA);
+					solicitud.setExcluido(rs.getString("FLGEXCLUIDO") != null ? rs.getString("FLGEXCLUIDO").equals(SOLICITUD_EXCLUIDA) : false);
+					solicitud.setRazonExclusion(rs.getString("RAZON_EXCLUSION"));
+					solicitud.setFechaExclusion(rs.getDate("FECHA_EXCLUSION"));
 					data.add(solicitud);
 				}
 			}
@@ -150,10 +155,9 @@ public class ModeloSolicitud {
 		List<Solicitud> data = new ArrayList<>();
 		BolsaEmpleoDataTable<Solicitud> dataTable = new BolsaEmpleoDataTable<>(params);
 		
-		String consulta =
-			"SELECT bepcon.CODNUM, bepsol.CODNUM AS SOLICITUD_CODNUM, bepsol.ESTADO AS ESTADO_SOLICITUD, bepcon.DESCRIPCION, bepsol.FECHACONFIRMACION"
-			+ "	FROM TBEP_CONVOCATORIAS bepcon"
-			+ "	INNER JOIN TBEP_SOLICITUDES bepsol ON bepsol.BEPCON_CODNUM = bepcon.CODNUM"
+		String consulta = ""
+			+ " SELECT bepsol.* "
+			+ "	FROM TBEP_SOLICITUDES bepsol "
 			+ " WHERE bepsol.BEPUSU_CODNUM = ?";
 		
 		dataTable.setColumn(ORDER_COLUMN_INDEX_ID_SOLICITUD_CANDIDATO, "bepsol.CODNUM");
@@ -177,13 +181,7 @@ public class ModeloSolicitud {
 					if (convocatoria == null) {
 						throw new UVException("No existe la convocatoria con id " + rs.getInt(CODNUM));
 					}
-					
-					Solicitud solicitud = new Solicitud();
-					solicitud.setCodNum(rs.getInt("SOLICITUD_CODNUM"));			
-					solicitud.setConvocatoria(convocatoria);			
-					solicitud.setEstado(rs.getString("ESTADO_SOLICITUD") != null ? rs.getString("ESTADO_SOLICITUD") : ModeloSolicitud.SOLICITUD_ESTADO_CERRADA);
-					solicitud.setFechaConfirmacion(rs.getDate("FECHACONFIRMACION"));
-					data.add(solicitud);
+					data.add(this.createSolicitudFromResultSet(rs, false));
 				}
 			}
 			
@@ -391,7 +389,7 @@ public class ModeloSolicitud {
 	 */
 	public Solicitud getSolicitudCerradaByConvocatoriaUsuario(UsuarioBolsaEmpleo usuario, Convocatoria convocatoria) throws SQLException, UVException {
 		String consulta = ""
-				+ " SELECT * "
+				+ " SELECT bepsol.* "
 				+ " FROM TBEP_SOLICITUDES bepsol "
 				+ " WHERE bepsol.ESTADO = ? AND bepsol.BEPCON_CODNUM = ? AND bepsol.BEPUSU_CODNUM = ? ";
 		
@@ -408,12 +406,7 @@ public class ModeloSolicitud {
 					throw new UVException(MENSAJE_ERROR_SIN_SOLICITUD_CERRADA);
 				}
 				
-				Solicitud solicitud = new Solicitud();
-				solicitud.setCodNum(rs.getInt("CODNUM"));
-				solicitud.setConvocatoria(convocatoria);
-				solicitud.setEstado(rs.getString("ESTADO"));
-				solicitud.setUsuario(usuario);
-				return solicitud;
+				return this.createSolicitudFromResultSet(rs, true);
     		}
 		}
 	}
@@ -423,10 +416,10 @@ public class ModeloSolicitud {
 	 * @param usuario .
 	 * @param convocatoria .
 	 * @return .
-	 * @throws SQLException .
 	 * @throws UVException .
+	 * @throws SQLException . 
 	 */
-	public Solicitud getSolicitudByConvocatoriaUsuario(UsuarioBolsaEmpleo usuario, Convocatoria convocatoria) throws SQLException {
+	public Solicitud getSolicitudByConvocatoriaUsuario(UsuarioBolsaEmpleo usuario, Convocatoria convocatoria) throws SQLException, UVException {
 		String consulta = ""
 				+ " SELECT bepsol.* "
 				+ " FROM TBEP_SOLICITUDES bepsol "
@@ -439,12 +432,7 @@ public class ModeloSolicitud {
 
 			try (ResultSet rs = stmt.executeQuery()) {
 				if (rs.next()) {					
-					Solicitud solicitud = new Solicitud();
-					solicitud.setCodNum(rs.getInt("CODNUM"));		
-					solicitud.setConvocatoria(convocatoria);				
-					solicitud.setEstado(rs.getString("ESTADO"));
-					solicitud.setUsuario(usuario);
-					return solicitud;	
+					return this.createSolicitudFromResultSet(rs, true);
 				}
     		}
 		}
@@ -1755,7 +1743,7 @@ public class ModeloSolicitud {
 					solicitud.setArchivo(rs.getBlob("ARCHIVO").getBinaryStream());
 				}
 				
-				return solicitud;
+				return this.createSolicitudFromResultSet(rs, archivo);
 			}
 		}
 	}
@@ -1770,4 +1758,22 @@ public class ModeloSolicitud {
 	private Boolean isMeritoExcluido(Merito merito, MeritoSolicitud ms, Bolsa bolsa) {
 		return false;
 	}	
+
+	private Solicitud createSolicitudFromResultSet(ResultSet rs, boolean archivo) throws SQLException, UVException {
+		Solicitud solicitud = new Solicitud();
+		
+		solicitud.setCodNum(rs.getInt("CODNUM"));
+		solicitud.setConvocatoria(ModeloConvocatoria.obtenerInstancia().getConvocatoriaById(rs.getInt("BEPCON_CODNUM")));
+		solicitud.setEstado(rs.getString("ESTADO") != null ? rs.getString("ESTADO") : ModeloSolicitud.SOLICITUD_ESTADO_CERRADA);
+		solicitud.setExcluido(rs.getString("FLGEXCLUIDO").equals(SOLICITUD_EXCLUIDA));
+		solicitud.setUsuario(ModeloUsuarioBolsaEmpleo.obtenerInstancia().getUsuarioById(rs.getInt("BEPUSU_CODNUM")));
+		solicitud.setRazonExclusion(rs.getString("RAZON_EXCLUSION"));
+		solicitud.setFechaExclusion(rs.getDate("FECHA_EXCLUSION"));
+		
+		if (archivo) {
+			solicitud.setArchivo(rs.getBlob("ARCHIVO").getBinaryStream());
+		}
+		
+		return solicitud;
+	}
 }
