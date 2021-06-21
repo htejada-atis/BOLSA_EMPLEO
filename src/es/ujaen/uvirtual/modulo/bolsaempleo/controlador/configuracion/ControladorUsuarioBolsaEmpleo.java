@@ -57,6 +57,7 @@ public class ControladorUsuarioBolsaEmpleo extends HttpServlet {
 	public static final String PARAM_LISTA = "listadist";
 	public static final String PARAM_NOMBRE_USUARIO = "nombreusuario";
 	public static final String PARAM_VOLVER = "volver";
+	public static final String PARAM_RAZON_BORRADO = "razonborrado";
 	public static final String PARAM_RAZON_EXCLUIDO = "razonexcluido";
 	public static final String PARAM_ROLE = "rol";
 	public static final String PARAM_USUARIO = "usuario";
@@ -309,6 +310,8 @@ public class ControladorUsuarioBolsaEmpleo extends HttpServlet {
 			throw new UVException(MENSAJE_ERROR_ELIMINAR_USUARIO_LOGUEADO);
 		}
 		
+		String razonBorrado = EscapaHTML.ajustaCodificacion(request.getParameter(PARAM_RAZON_BORRADO));
+		bean.getUsuario().setRazonBorrado(razonBorrado);
 		ModeloUsuarioBolsaEmpleo.obtenerInstancia().ponerUsuarioComoBorrado(bean.getUsuario(), bean.getUsuarioLogeado());
 		BolsaEmpleoUtils.addMensajeDeExito(MENSAJE_EXITO_ELIMINAR, bean, request);
 		response.sendRedirect(request.getServletPath());

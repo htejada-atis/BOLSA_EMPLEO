@@ -616,13 +616,26 @@ UsuarioBolsaEmpleo candidato = bean.getCandidato();
 			document.getElementById("usuario_borrar").addEventListener("click", function(event) {
 				event.preventDefault();
 				
-				Atis.confirmDialog("Dar de baja candidato", "¿Desea dar de baja al candidato?", {
+				var message = "<h3>¿Desea dar de baja al candidato?</h3><br/>" +
+						"<div class='form-group-dialog'>" +
+						"	<label for='razon_borrado'>Razón borrado: </label>" +
+						"	<textarea id='razon_borrado' name='razonborrado' rows='2' required='required'></textarea>" +
+						"</div>";
+				
+				Atis.confirmDialog("Dar de baja candidato", message, {
 			    	Si: function() {
-			    		Atis.sendForm("<%= request.getRequestURI() %>", {
-							'<%=ControladorUsuarioCandidato.PARAM_ACCION%>': '<%=ControladorUsuarioCandidato.ACCION_ELIMINAR_CANDIDATO%>',
-							'<%=ControladorUsuarioCandidato.PARAM_CANDIDATO%>': '<%=candidato.getCodNum()%>'
-						});
-			          	$(this).dialog("close");
+			    		var inputRazon = this.querySelector('#razon_borrado');
+			    		if (inputRazon.value != '') {
+				    		Atis.sendForm("<%= request.getRequestURI() %>", {
+								'<%=ControladorUsuarioCandidato.PARAM_ACCION%>': '<%=ControladorUsuarioCandidato.ACCION_ELIMINAR_CANDIDATO%>',
+								'<%=ControladorUsuarioCandidato.PARAM_CANDIDATO%>': '<%=candidato.getCodNum()%>',
+								'<%=ControladorUsuarioCandidato.PARAM_RAZON_BORRADO%>': inputRazon.value
+							});
+				          	$(this).dialog("close");
+			    		} else {
+			    			inputRazon.setCustomValidity("La razón de borrado no puede estar vacía");
+			    			inputRazon.reportValidity();
+			    		}
 			        },
 			        No: function() {
 			          	$(this).dialog("close");

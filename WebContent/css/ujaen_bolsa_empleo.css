@@ -1,3 +1,9 @@
+/**
+ * Bolsa Empleo CSS
+ * @copyright ATISoluciones 2021
+ * 
+ * 20210621 .form-group-dialog para los inputs en diálogos
+ */
 
 :root {
   --principal: #006D38;
@@ -430,13 +436,16 @@ nav-bolsa-empleo a:active, nav-bolsa-empleo a:hover {
 	font-size: .9rem;
 }
 
-.form-group label {
+.form-group label, .form-group-dialog label {
 	width: 100% !important;
 	text-align: left !important;
+}
+
+.form-group label {
 	margin-bottom: .5rem;
 }
 
-.form-group input {
+.form-group input, .form-group-dialog input, .form-group-dialog textarea {
 	display: block;
 }
 
@@ -451,6 +460,18 @@ nav-bolsa-empleo a:active, nav-bolsa-empleo a:hover {
 
 .form-file label, .form-select {
 	font-size: 15px;
+}
+
+.form-group-dialog input, .form-group-dialog textarea {
+	width: 100%;
+	padding: 1px 3px;
+	border: 1px solid rgb(118, 118, 118);
+    border-radius: 3px;
+    box-sizing: border-box;
+}
+
+.form-group-dialog label {
+	float: inherit;
 }
 
 /* Listas bolsa empleo */

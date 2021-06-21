@@ -73,6 +73,7 @@ public class ControladorUsuarioCandidato extends HttpServlet {
 	public static final String PARAM_LISTA = "lista";
 	public static final String PARAM_NOMBRE = "nombre";
 	public static final String PARAM_NOMBRE_USUARIO = "nombreusuario";
+	public static final String PARAM_RAZON_BORRADO = "razonborrado";
 	public static final String PARAM_RAZON_EXCLUIDO = "razonexcluido";
 	public static final String PARAM_SOLICITUD = "solicitud";
 	
@@ -432,6 +433,8 @@ public class ControladorUsuarioCandidato extends HttpServlet {
 	
 	private void eliminarCandidato(VistaCandidatos bean, HttpServletRequest request, HttpServletResponse response)
 			throws SQLException, UVException, IOException {
+		String razonBorrado = EscapaHTML.ajustaCodificacion(request.getParameter(PARAM_RAZON_BORRADO));
+		bean.getCandidato().setRazonBorrado(razonBorrado);
 		ModeloUsuarioBolsaEmpleo.obtenerInstancia().ponerUsuarioComoBorrado(bean.getCandidato(), bean.getUsuarioLogeado());	
 		BolsaEmpleoUtils.addMensajeDeExito(MENSAJE_EXITO_ELIMINAR, bean, request);
 		response.sendRedirect(request.getServletPath());

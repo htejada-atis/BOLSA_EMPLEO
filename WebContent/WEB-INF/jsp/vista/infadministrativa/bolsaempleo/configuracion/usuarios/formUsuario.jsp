@@ -328,13 +328,26 @@ VistaUsuarioBolsaEmpleo bean = (VistaUsuarioBolsaEmpleo) uvdatos.getVistas().get
 			document.getElementById("usuario_borrar").addEventListener("click", function(event) {
 				event.preventDefault();
 				
-				Atis.confirmDialog("Dar de baja usuario", "¿Desea dar de baja al usuario?", {
+				var message = "<h3>¿Desea dar de baja al usuario?</h3><br/>" +
+				"<div class='form-group-dialog'>" +
+				"	<label for='razon_borrado'>Razón borrado: </label>" +
+				"	<textarea id='razon_borrado' name='razonborrado' rows='2' required='required'></textarea>" +
+				"</div>";
+				
+				Atis.confirmDialog("Dar de baja usuario", message, {
 			    	Si: function() {
-			    		Atis.sendForm("<%= request.getRequestURI() %>", {
-							'<%=ControladorUsuarioBolsaEmpleo.PARAM_ACCION%>': '<%=ControladorUsuarioBolsaEmpleo.ACCION_ELIMINAR_USUARIO%>',
-							'<%=ControladorUsuarioBolsaEmpleo.PARAM_USUARIO%>': '<%=bean.getUsuario().getCodNum()%>'
-						});
-			          	$(this).dialog("close");
+			    		var inputRazon = this.querySelector('#razon_borrado');
+			    		if (inputRazon.value != '') {
+				    		Atis.sendForm("<%= request.getRequestURI() %>", {
+								'<%=ControladorUsuarioBolsaEmpleo.PARAM_ACCION%>': '<%=ControladorUsuarioBolsaEmpleo.ACCION_ELIMINAR_USUARIO%>',
+								'<%=ControladorUsuarioBolsaEmpleo.PARAM_USUARIO%>': '<%=bean.getUsuario().getCodNum()%>',
+								'<%=ControladorUsuarioBolsaEmpleo.PARAM_RAZON_BORRADO%>': inputRazon.value
+							});
+				          	$(this).dialog("close");
+				    	} else {
+			    			inputRazon.setCustomValidity("La razón de borrado no puede estar vacía");
+			    			inputRazon.reportValidity();
+			    		}
 			        },
 			        No: function() {
 			          	$(this).dialog("close");
