@@ -61,14 +61,9 @@ public class ControladorFiltrarTitulacion extends HttpServlet {
 	public static final String ACCION_CANDIDATOS_SIN_TITULACION = "sinTitulacion";
 	public static final String ACCION_EXPORTAR_SIN_TITULACION = "exportarSinTitulacion";
 	
-	// mensajes
-	public static final String MENSAJE_ERROR_FOO = "Mensaje de error";
-	public static final String MENSAJE_EXITO_BAR = "Mensaje de exito";
-	
 	// Parámetros
 	public static final String PARAM_ACCION = "a";
 	public static final String PARAM_CANDIDATO = "candidato";
-	public static final String PARAM_FICHERO = "fichero";
 	public static final String PARAM_TITULACION = "titulacion";
 	public static final String PARAM_TITULACION_USUARIO = "titulacionUsuario";
 	
@@ -76,9 +71,6 @@ public class ControladorFiltrarTitulacion extends HttpServlet {
 	public static final String RUTA_BEP_FILTRAR = "/WEB-INF/jsp/vista/infadministrativa/bolsaempleo/filtrartitulacion/";
 	public static final String JSP_INDEX = RUTA_BEP_FILTRAR + "index.jsp";
 	public static final String JSP_SIN_TITULACION = RUTA_BEP_FILTRAR + "sinTitulacion.jsp";
-	
-	// urls	
-	public static final String URL_PATTERN_FILES_PRIVADA = "/srv/es/informacionadministrativa/bolsaempleo/filtrar";
 	
 	// ajax
 	public static final String URL_PATTERN_AJAX = "/srv/es/ajax/informacionadministrativa/bolsaempleo/filtrar";
@@ -141,7 +133,7 @@ public class ControladorFiltrarTitulacion extends HttpServlet {
 					listadoCandidatosSinTitulacion(bean, datos, request, response);
 					break;
 				case ACCION_EXPORTAR_SIN_TITULACION:
-					exportarSinTitulacion(datos, request, response);
+					exportarSinTitulacion(datos, response);
 					break;
 				default:
 					errorFatal(bean, "Acción no contemplada");
@@ -396,8 +388,7 @@ public class ControladorFiltrarTitulacion extends HttpServlet {
 		}
 	}
 	
-	private void exportarSinTitulacion(UVDatos datos, HttpServletRequest request, HttpServletResponse response) 
-			throws IOException, SQLException, UVException {
+	private void exportarSinTitulacion(UVDatos datos, HttpServletResponse response) throws IOException, SQLException, UVException {
 		
 		datos.setRespuestaEnviada(true);
 		datos.setContentType(RESPONSE_CSV_CONTENTTYPE);		
