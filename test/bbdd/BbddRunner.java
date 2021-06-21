@@ -260,8 +260,9 @@ public class BbddRunner {
 			instruccion = limpiaComentarios(instruccion);
 			instruccion = instruccion.trim();
 			instruccion = instruccion.replace("CREATE TRIGGER", "create trigger");
+			instruccion = instruccion.replace("CREATE OR REPLACE TRIGGER", "create or replace trigger");
 			instruccion = instruccion.replace("DROP", "drop");
-			if (instruccion.startsWith("create trigger")) {
+			if (instruccion.startsWith("create trigger") || instruccion.startsWith("create or replace trigger")) {
 				quitarFinal = false;
 			}
 			if (quitarFinal && instruccion.endsWith(";")) {
