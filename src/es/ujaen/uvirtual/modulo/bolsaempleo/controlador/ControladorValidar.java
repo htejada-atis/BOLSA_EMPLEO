@@ -114,7 +114,7 @@ public class ControladorValidar extends HttpServlet {
 	 * @see HttpServlet#doGet(HttpServletRequest request, HttpServletResponse response)
 	 */
 	@Override
-	public void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+	public void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException {
 		UVDatos datos = (UVDatos) request.getAttribute(UVDatos.NOMBRE_ATRIBUTO);
 		datos.setDocType("<!DOCTYPE html>");
 		datos.setContentType("text/html");
@@ -172,7 +172,7 @@ public class ControladorValidar extends HttpServlet {
 	 * @see HttpServlet#doPost(HttpServletRequest request, HttpServletResponse response)
 	 */
 	@Override
-	public void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+	public void doPost(HttpServletRequest request, HttpServletResponse response) throws IOException {
 		doGet(request, response);
 	}
 	
@@ -310,7 +310,7 @@ public class ControladorValidar extends HttpServlet {
 		
 	}
 	
-	private void modificarMerito(VistaValidar bean, HttpServletRequest request, HttpServletResponse response, Merito merito) throws SQLException, UVException, IOException {
+	private void modificarMerito(VistaValidar bean, HttpServletRequest request, HttpServletResponse response, Merito merito) throws UVException, IOException {
 		HttpSession session = request.getSession(false);
 		session.setAttribute(PARAM_BOLSA, bean.getBolsa().getCodNum());
 		session.setAttribute(PARAM_CANDIDATO, bean.getCandidato().getCodNum());
@@ -345,7 +345,7 @@ public class ControladorValidar extends HttpServlet {
 		bean.setListaAfinidades(ModeloAfinidad.obtenerInstancia().listaAfinidades());
 	}
 	
-	private void validarMerito(VistaValidar bean, HttpServletRequest request, HttpServletResponse response) throws SQLException, UVException, IOException {
+	private void validarMerito(VistaValidar bean, HttpServletRequest request, HttpServletResponse response) throws UVException, IOException {
 		ModeloValidar modeloValidar = ModeloValidar.obtenerInstancia();
 		ModeloBolsa modeloBolsa = ModeloBolsa.obtenerInstancia();
 		
@@ -412,17 +412,17 @@ public class ControladorValidar extends HttpServlet {
 			
 			modeloSolicitud.actualizarAfinidadesMeritoNoIndividualizado(solicitud, bolsa, bean.getMerito().getMerito(), afinidades, bean.getUsuarioLogeado());
 		} else {
-//			Map.Entry<String, Double> entry = afinidadesRaw.entrySet().iterator().next();
-//			String idAfinidad = entry.getKey();
-//			Double idValoracion = entry.getValue();
-//			Afinidad afinidad = modeloAfinidad.getAfinidadById(Formateador.leeParametroInteger(idAfinidad));
-//			modeloSolicitud.actualizarAfinidadesMeritoIndividualizado(solicitud, bolsa, bean.getMerito().getMerito(), afinidad,
-//					Math.round(idValoracion), bean.getUsuarioLogeado());
+			Map.Entry<String, Double> entry = afinidadesRaw.entrySet().iterator().next();
+			String idAfinidad = entry.getKey();
+			Double idValoracion = entry.getValue();
+			Afinidad afinidad = modeloAfinidad.getAfinidadById(Formateador.leeParametroInteger(idAfinidad));
+			modeloSolicitud.actualizarAfinidadesMeritoIndividualizado(solicitud, bolsa, bean.getMerito().getMerito(), afinidad,
+					(int) Math.round(idValoracion), bean.getUsuarioLogeado());
 		}
 	}
 	
 	private void listadoBolsas(VistaValidar bean, UVDatos datos, HttpServletRequest request, HttpServletResponse response)
-			throws IOException, SQLException, UVException {
+			throws IOException {
 		datos.setContentType(RESPONSE_AJAX_CONTENTTYPE);
 		datos.setRespuestaEnviada(true);
 		response.setContentType(RESPONSE_AJAX_CONTENTTYPE);
@@ -452,7 +452,7 @@ public class ControladorValidar extends HttpServlet {
 	}
 	
 	private void listadoCandidatos(VistaValidar bean, UVDatos datos, HttpServletRequest request, HttpServletResponse response)
-			throws IOException, SQLException, UVException {
+			throws IOException {
 		datos.setContentType(RESPONSE_AJAX_CONTENTTYPE);
 		datos.setRespuestaEnviada(true);
 		response.setContentType(RESPONSE_AJAX_CONTENTTYPE);
@@ -482,7 +482,7 @@ public class ControladorValidar extends HttpServlet {
 	}
 	
 	private void listadoMeritos(VistaValidar bean, UVDatos datos, HttpServletRequest request, HttpServletResponse response)
-			throws IOException, SQLException, UVException {
+			throws IOException {
 		datos.setContentType(RESPONSE_AJAX_CONTENTTYPE);
 		datos.setRespuestaEnviada(true);
 		response.setContentType(RESPONSE_AJAX_CONTENTTYPE);

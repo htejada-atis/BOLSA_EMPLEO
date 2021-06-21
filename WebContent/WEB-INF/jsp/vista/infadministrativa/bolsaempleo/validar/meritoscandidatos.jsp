@@ -33,7 +33,11 @@ UsuarioBolsaEmpleo candidato = bean.getCandidato();
 		}
 	%>
 	
+<% if (merito == null) { %>
+	
 	<jsp:include page="/WEB-INF/jsp/vista/infadministrativa/bolsaempleo/mensajes.jsp" />
+	
+<%	} %>
 	
 	<h2>Validar meritos sujetos afinidad</h2>
 	<h3><%= descripcion %></h3>
@@ -77,6 +81,9 @@ UsuarioBolsaEmpleo candidato = bean.getCandidato();
 		</table>
 		
 		<% if (merito != null) { %>
+		
+			<br/>
+			<jsp:include page="/WEB-INF/jsp/vista/infadministrativa/bolsaempleo/mensajes.jsp" />
 			
 			<h3 id="anchor_modificar_merito">Modificar mérito: <%= merito.getMerito().getCodNum() %></h3>
 			
@@ -186,7 +193,7 @@ UsuarioBolsaEmpleo candidato = bean.getCandidato();
 								} %>
 								<b>Estado: </b>
 								<% if (meritoBolsa.getMeritoSolicitud().isValidado()) { %>
-			        				<div class='text-success'>Incluido</div>
+			        				<div class='text-success'>Validado</div>
 			        			<% } else if (meritoBolsa.getMeritoSolicitud().isExcluido()) { %>
 			        				<div class='text-danger'>Excluido</div>
 			        			<% } else { %>

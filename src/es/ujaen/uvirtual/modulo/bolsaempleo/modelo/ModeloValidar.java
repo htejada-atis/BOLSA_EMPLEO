@@ -312,8 +312,9 @@ public class ModeloValidar {
 				+ "	INNER JOIN TBEP_SOLICITUDES bepsol ON bepsol.CODNUM = bepsbo.BEPSOL_CODNUM"
 				+ "	INNER JOIN TBEP_MERITOS bepmer ON bepmer.CODNUM = bepsbm.BEPMER_CODNUM"
 				+ "	INNER JOIN TBEP_ITEMSBAREMACION bepite ON bepite.CODNUM = bepmer.BEPITE_CODNUM"
+				+ "	INNER JOIN TBEP_USUARIOS bepusu ON bepusu.CODNUM = bepmer.BEPUSU_CODNUM"
 				+ "	WHERE bepsbo.BEPBOL_CODNUM = bepbol.CODNUM AND bepsol.BEPCON_CODNUM = ? AND bepsol.ESTADO = 'CERRADA'"
-				+ "	AND bepite.AFINIDAD IS NOT NULL";
+				+ "	AND bepite.AFINIDAD IS NOT NULL AND bepusu.FLGBORRADO = 'N' ";
 		
 		// seleccionamos las bolsas, con meritos, en la convocatoria pasada
 		String consulta = 
@@ -483,7 +484,7 @@ public class ModeloValidar {
 				+ "	INNER JOIN TBEP_ITEMSBAREMACION bepite ON bepite.CODNUM = bepmer.BEPITE_CODNUM"
 				+ "	INNER JOIN TBEP_SOL_BOL_MERITOS bepsbm ON bepmer.CODNUM = bepsbm.BEPMER_CODNUM"
 				+ "	INNER JOIN TBEP_SOLICITUD_BOLSAS bepsbo ON bepsbo.CODNUM = bepsbm.BEPSBO_CODNUM"
-				+ "	WHERE bepusu.ROL = " + ModeloRol.ID_ROL_CANDIDATO + " AND bepsbo.BEPBOL_CODNUM = ?";
+				+ "	WHERE bepusu.ROL = " + ModeloRol.ID_ROL_CANDIDATO + " AND bepsbo.BEPBOL_CODNUM = ? AND bepusu.FLGBORRADO = 'N' ";
 		
 		// agrega el filtro de afinidad
 		consulta += afinidad ? " AND bepite.AFINIDAD IS NOT NULL" : " AND bepite.AFINIDAD IS NULL";
@@ -550,25 +551,27 @@ public class ModeloValidar {
 			return dataTable;
 		}
 		
-		String consulta = "SELECT bepmer.*, bepite.*, bepsbm.*"
+		String consulta = "SELECT bepmer.*, bepsbm.FLGEXCLUIDO, bepsbm.FLGVALIDADO"
 				+ " FROM TBEP_SOL_BOL_MERITOS bepsbm"
 				+ "	INNER JOIN TBEP_SOLICITUD_BOLSAS bepsbo ON bepsbo.CODNUM = bepsbm.BEPSBO_CODNUM"
 				+ "	INNER JOIN TBEP_SOLICITUDES bepsol ON bepsol.CODNUM = bepsbo.BEPSOL_CODNUM"
 				+ "	INNER JOIN TBEP_MERITOS bepmer ON bepmer.CODNUM = bepsbm.BEPMER_CODNUM"
 				+ "	INNER JOIN TBEP_ITEMSBAREMACION bepite ON bepite.CODNUM = bepmer.BEPITE_CODNUM"
+				+ " INNER JOIN TBEP_BLOQUESBAREMACION bepblo ON bepblo.CODNUM = bepite.BEPBLO_CODNUM "
+				+ " INNER JOIN TBEP_APARTADOSBAREMACION bepapa ON bepapa.CODNUM  = bepblo.BEPAPA_CODNUM "
 				+ "	WHERE bepsol.ESTADO = 'CERRADA' AND bepsbo.BEPBOL_CODNUM = ? AND bepsol.BEPCON_CODNUM = ? AND bepmer.BEPUSU_CODNUM = ?";
 		
 		// agrega el filtro de afinidad
 		consulta += afinidad ? " AND bepite.AFINIDAD IS NOT NULL" : " AND bepite.AFINIDAD IS NULL";
 		
+		String whereCodigo = String.format("(%s || '.' || %s || '.' || %s)", "bepapa.CODIGO", "bepblo.CODIGO", "bepite.CODIGO");
+		String orderCodigo = String.format("(%s || '.' || %s || '.' || %s) %%s", "LPAD(bepapa.CODIGO, 3)", "LPAD(bepblo.CODIGO, 3)", "LPAD(bepite.CODIGO, 3)");
+		
 		dataTable.setColumn(ORDER_COLUMN_INDEX_ID_MERITO, "bepmer.CODNUM", DataTableColumn.COLUMN_TYPE_NUMBER);
-		dataTable.setColumn(ORDER_COLUMN_INDEX_ESTADO_MERITO, "bepmer.BEPITE_CODNUM");
-		dataTable.setColumn(ORDER_COLUMN_INDEX_CODIGO_MERITO, "bepite.CODIGO");
-		dataTable.setColumn(ORDER_COLUMN_INDEX_VALOR_MERITO, "bepite.VALOR");
+		dataTable.setColumn(ORDER_COLUMN_INDEX_CODIGO_MERITO, whereCodigo, DataTableColumn.COLUMN_TYPE_TEXT, orderCodigo);
+		dataTable.setColumn(ORDER_COLUMN_INDEX_VALOR_MERITO, "bepmer.VALOR");
 		
 		dataTable.setQuery(consulta);
-		
-		ModeloMerito modeloMerito = ModeloMerito.obtenerInstancia();
 		
 		try (Connection conexion = ConexionUvirtual.obtenerInstancia();
 				PreparedStatement stmtCount = conexion.prepareStatement(dataTable.getQueryCount());
@@ -586,7 +589,14 @@ public class ModeloValidar {
 
 			try (ResultSet rs = stmt.executeQuery()) {
 				while (rs.next()) {
-					Merito merito = modeloMerito.createMeritoFromResultset(rs, false, true);
+					Merito merito = new Merito();		
+					merito.setCodNum(rs.getInt("CODNUM"));
+					merito.setItemBaremacion(ModeloBaremacionItems.obtenerInstancia().getItemBaremacionById(rs.getInt("BEPITE_CODNUM")));		
+					merito.setValor(rs.getDouble("VALOR"));
+					merito.setDescripcion(rs.getString("DESCRIPCION"));
+					merito.setObservacion(rs.getString("OBSERVACION"));
+					merito.setArchivo(rs.getBlob("ARCHIVO").getBinaryStream());
+					
 					Boolean excluido = rs.getString("FLGEXCLUIDO").equals(MERITO_EXCLUIDO);
 					Boolean validado = rs.getString("FLGVALIDADO").equals(MERITO_VALIDADO);
 					rows.add(new MeritoValidarTable(merito, excluido, validado));
