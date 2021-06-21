@@ -111,7 +111,7 @@ VistaUsuarioAutoregistrado bean = (VistaUsuarioAutoregistrado)uvdatos.getVistas(
 	</div>
 
 	<div class="login-block">
-		<h3>Acceso usuarios externos</h3>
+		<h3>Acceso usuarios externos (sin cuenta TIC)</h3>
 		<form method="post" action="<%=request.getRequestURI()%>" id="formulario"> 
 			<input type="hidden" name="<%=ControladorUsuarioAutoregistrado.PARAM_ACCION%>" id="accionFormulario" value="<%=ControladorUsuarioAutoregistrado.ACCION_VALIDA%>" />
 			<input type="hidden" id="g-recaptcha-response-valida" name="g-recaptcha-response" value="" />
