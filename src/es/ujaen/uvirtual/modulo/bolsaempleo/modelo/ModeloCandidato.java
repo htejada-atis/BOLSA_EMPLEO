@@ -134,7 +134,7 @@ public class ModeloCandidato {
 				+ "		 WHERE bepmpu.BEPUSU_CODNUM = bepusu.CODNUM AND bepmpu.FLGBORRADO = 'N' AND bepmpu.FLGVALIDADO = 'S' AND bepmep.TIPO = ?"
 				+ "     ) AS COUNT_VALIDADAS "
 				+ " FROM TBEP_USUARIOS bepusu "
-				+ " WHERE bepusu.rol = " + ModeloRol.ID_ROL_CANDIDATO + " "
+				+ " WHERE bepusu.FLGBORRADO = 'N' AND bepusu.rol = " + ModeloRol.ID_ROL_CANDIDATO + " "
 				+ " AND (" + subquery + ") > 0";
 		
 		String whereNombre = String.format("(%s || ' ' || %s || ' ' || %s)", "bepusu.VUAJA_STRNOMBRE", "bepusu.VUAJA_STRAPELLIDO1", "bepusu.VUAJA_STRAPELLIDO2");
@@ -233,12 +233,12 @@ public class ModeloCandidato {
 
 		String consulta = ""
 				+ " SELECT bepusu.CODNUM, "
-				+ "		(" + subquery + ") AS COUNT_TITULACIONES,"
+				+ "		(" + subquery + ") AS COUNT_TITULACIONES, "
 				+ "		(SELECT COUNT(*) FROM TBEP_TITULACIONES_USUARIO beptus "
-				+ "		 WHERE beptus.BEPTUS_USU_CODNUM = bepusu.CODNUM AND beptus.FLGBORRADO = 'N' AND beptus.FLGVALIDADA = 'S'"
-				+ "		) AS COUNT_VALIDADAS" 
-				+ "	FROM TBEP_USUARIOS bepusu" 
-				+ "	WHERE bepusu.rol = " + ModeloRol.ID_ROL_CANDIDATO;
+				+ "		 WHERE beptus.BEPTUS_USU_CODNUM = bepusu.CODNUM AND beptus.FLGBORRADO = 'N' AND beptus.FLGVALIDADA = 'S' "
+				+ "		) AS COUNT_VALIDADAS " 
+				+ "	FROM TBEP_USUARIOS bepusu "
+				+ "	WHERE bepusu.FLGBORRADO = 'N' AND bepusu.rol = " + ModeloRol.ID_ROL_CANDIDATO;
 						
 		if (conTitulaciones) {
 			consulta += " AND (" + subquery + ") > 0 "; 
