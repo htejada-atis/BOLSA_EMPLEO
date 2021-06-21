@@ -17,17 +17,28 @@ UVDatos uvdatos = (UVDatos) request.getAttribute(UVDatos.NOMBRE_ATRIBUTO);
 VistaCandidatos bean = (VistaCandidatos) uvdatos.getVistas().get(VistaCandidatos.class.getName());
 %>
 
-<div class="bolsa-empleo">	
+<div class="bolsa-empleo">
 	
 	<jsp:include page="/WEB-INF/jsp/vista/infadministrativa/bolsaempleo/mensajes.jsp" />
 	
 	<h2>Resumen solicitud - <%= bean.getCandidato().getCodCuenta() %></h2>
 	
+	<h4>Nombre: <%= bean.getCandidato().getNombre() + " " + bean.getCandidato().getPrimerApellido() + " " + bean.getCandidato().getSegundoApellido() %></h4>
+	<h4>Nº de documento: <%= bean.getCandidato().getPrsNif() %></h4>
+	<h4>Estado solicitud: <%= bean.getSolicitud().getEstado() %></h4>
+	
+	<%	if (bean.getSolicitud().getEstado().equals(ModeloSolicitud.SOLICITUD_ESTADO_CERRADA)) { %>
+			<div style="display: flex; width: 100%; justify-content: flex-end;">
+				<button class="link-btn icon icon-download" id="descargar_solicitud">Descargar solicitud</button>
+			</div>
+	<%	} %>
+	
 <%	for (BolsaSolicitud bolsa: bean.getListaBolsasSolicitud()) { %>
 		
 		<h4>Área - <%= bolsa.getArea().getDescripcion() %></h4>
-		<table class="bluetable bolsaempleo" id="table_solicitud">
+		<table class="bluetable bolsaempleo table-solicitud">
 			<tr>
+				<th scope="col" style="width:8%">Id</th>
 				<th scope="col"	style="width:15%">Cod. mérito</th>
 				<th scope="col"	style="width:30%">Mérito</th>
 				<th scope="col"	style="width:10%">Valor</th>
@@ -41,6 +52,7 @@ VistaCandidatos bean = (VistaCandidatos) uvdatos.getVistas().get(VistaCandidatos
 						String codigoItem = merito.getMerito().getItemBaremacion().getBloqueBaremacion().getApartadoBaremacion().getCodigo() + "." + merito.getMerito().getItemBaremacion().getBloqueBaremacion().getCodigo() + "." + merito.getMerito().getItemBaremacion().getCodigo();
 					%>
 						<tr>
+							<td><%= merito.getCodNum() %></td>
 							<td><%= codigoItem %></td>
 							<td><%= merito.getMerito().getItemBaremacion().getNombre() %></td>
 							<td><%= merito.getMerito().getValor() %></td>
@@ -67,7 +79,7 @@ VistaCandidatos bean = (VistaCandidatos) uvdatos.getVistas().get(VistaCandidatos
 						</tr>
 				<%	} %>
 			<%	} else { %>
-					<tr><td colspan="6"><%= ControladorMisSolicitudes.MENSAJE_AREA_SIN_MERITOS %></td><tr>
+					<tr><td colspan="7"><%= ControladorMisSolicitudes.MENSAJE_AREA_SIN_MERITOS %></td><tr>
 			<%	} %>
 			</tbody>
 		</table>
@@ -91,10 +103,15 @@ VistaCandidatos bean = (VistaCandidatos) uvdatos.getVistas().get(VistaCandidatos
 
 	$(document).ready(function() {
 		
-		$('#table_solicitud').on('click', '.fichero-merito', function() {
+		$('.table-solicitud').on('click', '.fichero-merito', function() {
 			var idMerito = $(this).data('merito');
 			window.open("<%= ControladorDescargaFicheros.URL_DESCARGA_FICHEROS %>"
 		        	+ "?a=<%= ControladorDescargaFicheros.ACCION_DESCARGAR_MERITO_PERSONAL %>&<%= ControladorDescargaFicheros.PARAM_MERITO %>=" + idMerito);
+		});
+		
+		document.getElementById("descargar_solicitud").addEventListener("click", function() {
+			window.open("<%= ControladorDescargaFicheros.URL_DESCARGA_FICHEROS %>"
+		        	+ "?a=<%= ControladorDescargaFicheros.ACCION_DESCARGAR_SOLICITUD_PERSONAL + "&" + ControladorDescargaFicheros.PARAM_SOLICITUD + "=" + bean.getSolicitud().getCodNum() %>");
 		});
 		
 		document.getElementById("candidato_volver").addEventListener("click", function() {
@@ -107,11 +124,19 @@ VistaCandidatos bean = (VistaCandidatos) uvdatos.getVistas().get(VistaCandidatos
 	<%	if (bean.getSolicitud().getConvocatoria().getEstado().equals(ModeloConvocatoria.CONVOCATORIA_ESTADO_ABIERTA) &&
 			bean.getSolicitud().getEstado().equals(ModeloSolicitud.SOLICITUD_ESTADO_CERRADA)) { %>
 			document.getElementById("reabrir_solicitud").addEventListener("click", function() {
-				Atis.sendForm("<%= request.getRequestURI() %>", {
-					'<%=ControladorUsuarioCandidato.PARAM_ACCION%>': '<%=ControladorUsuarioCandidato.ACCION_REABRIR_SOLICITUD%>',
-					'<%=ControladorUsuarioCandidato.PARAM_CANDIDATO%>': '<%=bean.getCandidato().getCodNum()%>',
-					'<%=ControladorUsuarioCandidato.PARAM_SOLICITUD%>': '<%=bean.getSolicitud().getCodNum()%>'
-				});
+				Atis.confirmDialog("Reabrir solicitud", "¿Desea reabrir la solicitud del candidato?", {
+			    	Si: function() {
+			    		Atis.sendForm("<%= request.getRequestURI() %>", {
+							'<%=ControladorUsuarioCandidato.PARAM_ACCION%>': '<%=ControladorUsuarioCandidato.ACCION_REABRIR_SOLICITUD%>',
+							'<%=ControladorUsuarioCandidato.PARAM_CANDIDATO%>': '<%=bean.getCandidato().getCodNum()%>',
+							'<%=ControladorUsuarioCandidato.PARAM_SOLICITUD%>': '<%=bean.getSolicitud().getCodNum()%>'
+						});
+			          	$(this).dialog("close");
+			        },
+			        No: function() {
+			          	$(this).dialog("close");
+			        }
+			    });
 			});
 	<%	} %>
 		

@@ -214,8 +214,7 @@ if(item!=null){
 		
 		<%}%>
 		
-		<%	if (EscapaHTML.ajustaCodificacion(request.getParameter(ControladorItemsBaremacion.PARAM_ACCION)).equals(ControladorItemsBaremacion.ACCION_ITEM_EXCLUYENTE_SELECCIONADO)
-					|| EscapaHTML.ajustaCodificacion(request.getParameter(ControladorItemsBaremacion.PARAM_ACCION)).equals(ControladorItemsBaremacion.ACCION_ITEM_EXCLUYENTE_DESELECCIONADO)) { %>
+		<%	if (EscapaHTML.ajustaCodificacion(request.getParameter(ControladorItemsBaremacion.PARAM_ACCION)) == null) { %>
 					Atis.smoothScrollToAnchor("#tableMeritosExcluyentes");
 		<%	} %>
 		

@@ -83,7 +83,7 @@ String observacion = BolsaEmpleoUtils.getParamForm(request, ControladorMisMerito
 		<div id="contDescripcionItem" style="display:none;">
 			<div class="form-group">
 	    		<div class="form-group">
-	    			<p id="descripcionItem">Nota aclaratoria: </p>
+	    			<p id="descripcionItem" style="white-space: pre-wrap;">Nota aclaratoria: </p>
 	    		</div>
     		</div>
 		</div>
@@ -171,11 +171,11 @@ String observacion = BolsaEmpleoUtils.getParamForm(request, ControladorMisMerito
 			//var selected = $(this).children("option:selected").val();
 						
 			if (descripcion) {
-				$('#descripcionItem').html('Nota aclaratoria: <br/>' + descripcion);
+				$('#descripcionItem').html('Nota aclaratoria: <br/><br/>' + descripcion);
 				$('#contDescripcionItem').show();
 			} else {
 				$('#contDescripcionItem').hide();
-			}	
+			}
 			
 			if (unidades=="SI/NO") {
 				$('#contValor').hide();

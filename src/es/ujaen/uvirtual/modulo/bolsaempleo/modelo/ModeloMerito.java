@@ -29,6 +29,14 @@ public class ModeloMerito {
 	public static final int ORDER_COLUMN_INDEX_VALOR = 6;
 	public static final int ORDER_COLUMN_INDEX_OBSERVACION = 7;
 	
+	public static final int ORDER_COLUMN_INDEX_ID_CANDIDATO = 0;
+	public static final int ORDER_COLUMN_INDEX_BLOQUE_CANDIDATO = 1;
+	public static final int ORDER_COLUMN_INDEX_ITEM_CANDIDATO = 2;
+	public static final int ORDER_COLUMN_INDEX_NOMBRE_ITEM_CANDIDATO = 3;
+	public static final int ORDER_COLUMN_INDEX_DESCRIPCION_CANDIDATO = 4;
+	public static final int ORDER_COLUMN_INDEX_VALOR_CANDIDATO = 5;
+	public static final int ORDER_COLUMN_INDEX_OBSERVACION_CANDIDATO = 6;
+	
 	public static final int COLUMN_DESCRIPCION_MAXLENGTH = 200;
 	public static final int COLUMN_OBSERVACION_MAXLENGTH = 300;
 
@@ -272,6 +280,65 @@ public class ModeloMerito {
 		dataTable.setColumn(ORDER_COLUMN_INDEX_DESCRIPCION, "bepmer.DESCRIPCION");
 		dataTable.setColumn(ORDER_COLUMN_INDEX_VALOR, "bepmer.VALOR");
 		dataTable.setColumn(ORDER_COLUMN_INDEX_OBSERVACION, "bepmer.OBSERVACION");
+		dataTable.setQuery(consulta);
+				
+		try (Connection conexion = ConexionUvirtual.obtenerInstancia();
+				PreparedStatement stmtCount = conexion.prepareStatement(dataTable.getQueryCount());
+				PreparedStatement stmt = conexion.prepareStatement(dataTable.getQuery())
+		) {
+			int indexParam = 1;
+			stmt.setInt(indexParam, usuario.getCodNum());
+			stmtCount.setInt(indexParam++, usuario.getCodNum());
+			dataTable.setFiltersParams(stmt, stmtCount, indexParam);
+			try (ResultSet rs = stmt.executeQuery()) {
+				while (rs.next()) {					
+					Merito mer = this.createMeritoFromResultset(rs, false, false); 
+					meritos.add(mer);
+				}				
+			}	
+			
+			dataTable.setRecordsTotalFromQuery(stmtCount);
+			dataTable.setData(meritos);
+		}
+		
+		return dataTable;
+	}
+	
+	/**
+	 * Listado de méritos en el apartado candidato .
+	 * @param params para leer los parametros de paginación, ordenacion, etc .
+	 * @param usuario id del usuario .
+	 * @return listado de titulaciones .
+	 * @throws SQLException en caso de error de base de datos .
+	 * @throws UVException error si no existe titulación .
+	 */
+	public BolsaEmpleoDataTable<Merito> listaMeritosCandidatoDatatable(Map<String, String[]> params, UsuarioBolsaEmpleo usuario) throws SQLException, UVException {
+		
+		if (usuario == null) {
+			throw new UVException("No se pueden listar méritos sin el id del usuario");
+		}
+		
+		List<Merito> meritos = new ArrayList<>();
+		BolsaEmpleoDataTable<Merito> dataTable = new BolsaEmpleoDataTable<>(params);
+		
+		String consulta = ""
+				+ " SELECT bepmer.*, bepblo.BEPAPA_CODNUM "
+				+ " FROM TBEP_MERITOS bepmer "
+				+ " INNER JOIN TBEP_ITEMSBAREMACION bepite ON bepite.CODNUM = bepmer.BEPITE_CODNUM "
+				+ " INNER JOIN TBEP_BLOQUESBAREMACION bepblo ON bepblo.CODNUM = bepite.BEPBLO_CODNUM "
+				+ " INNER JOIN TBEP_APARTADOSBAREMACION bepapa ON bepapa.CODNUM  = bepblo.BEPAPA_CODNUM "
+				+ " WHERE bepmer.BEPUSU_CODNUM = ? ";
+		
+		String whereCodigo = String.format("(%s || '.' || %s || '.' || %s)", "bepapa.CODIGO", "bepblo.CODIGO", "bepite.CODIGO");
+		String orderCodigo = String.format("(%s || '.' || %s || '.' || %s) %%s", "LPAD(bepapa.CODIGO, 3)", "LPAD(bepblo.CODIGO, 3)", "LPAD(bepite.CODIGO, 3)");
+		
+		dataTable.setColumn(ORDER_COLUMN_INDEX_ID_CANDIDATO, "bepmer.CODNUM");
+		dataTable.setColumn(ORDER_COLUMN_INDEX_BLOQUE_CANDIDATO, "bepblo.BEPAPA_CODNUM");
+		dataTable.setColumn(ORDER_COLUMN_INDEX_ITEM_CANDIDATO, whereCodigo, DataTableColumn.COLUMN_TYPE_TEXT, orderCodigo);
+		dataTable.setColumn(ORDER_COLUMN_INDEX_NOMBRE_ITEM_CANDIDATO, "bepite.NOMBRE");
+		dataTable.setColumn(ORDER_COLUMN_INDEX_DESCRIPCION_CANDIDATO, "bepmer.DESCRIPCION");
+		dataTable.setColumn(ORDER_COLUMN_INDEX_VALOR_CANDIDATO, "bepmer.VALOR");
+		dataTable.setColumn(ORDER_COLUMN_INDEX_OBSERVACION_CANDIDATO, "bepmer.OBSERVACION");
 		dataTable.setQuery(consulta);
 				
 		try (Connection conexion = ConexionUvirtual.obtenerInstancia();

@@ -7,6 +7,7 @@
 <%@ page import="es.ujaen.uvirtual.modulo.bolsaempleo.vistas.VistaCandidatos"%>
 <%@ page import="es.ujaen.uvirtual.modulo.bolsaempleo.modelo.ModeloConvocatoria" %>
 <%@ page import="es.ujaen.uvirtual.modulo.bolsaempleo.modelo.ModeloSolicitud" %>
+<%@	page import="es.ujaen.uvirtual.modulo.bolsaempleo.beans.ApartadoBaremacion" %>
 <%@	page import="es.ujaen.uvirtual.modulo.bolsaempleo.beans.UsuarioBolsaEmpleo" %>
 <%@	page import="es.ujaen.uvirtual.beans.Usuario" %>
 <%@ page import="es.ujaen.uvirtual.utilidades.EscapaHTML" %>
@@ -41,7 +42,7 @@ UsuarioBolsaEmpleo candidato = bean.getCandidato();
 		if (candidato != null) {
 			usuario = candidato.getCodCuenta();
 			nombre = candidato.getNombre();
-			apellidos = candidato.getPrimerApellido() + " " + candidato.getPrimerApellido();
+			apellidos = candidato.getPrimerApellido() + " " + candidato.getSegundoApellido();
 			email = candidato.getEmail();
 			tipo_documento = candidato.getTipoDocumento();
 			n_documento = candidato.getPrsNif();
@@ -163,6 +164,9 @@ UsuarioBolsaEmpleo candidato = bean.getCandidato();
    	    <li <%= bean.getApartadoSolicitudes() != null ? "class='tab-selected'" : "" %>>
    			<a id="solicitudes">Solicitudes</a>
    		</li>
+   		<li <%= bean.getApartadoMeritos() != null ? "class='tab-selected'" : "" %>>
+   			<a id="meritos">Méritos</a>
+   		</li>
    		<li <%= bean.getApartadoTitulaciones() != null ? "class='tab-selected'" : "" %>>
    			<a id="titulaciones">Titulaciones</a>
    		</li>
@@ -268,6 +272,30 @@ UsuarioBolsaEmpleo candidato = bean.getCandidato();
 			</tfoot>
 		</table>
 <%	}%>
+
+<%	if (bean.getApartadoMeritos() != null) { %>
+
+		<table class="bluetable bolsaempleo" id="table_meritos">
+			<tr>
+				<th scope="col" style="width:10%">Id</th>
+				<th scope="col" style="width:10%">Bloque</th>
+				<th scope="col"	style="width:12%">Código ítem</th>
+				<th scope="col"	style="width:15%">Nombre ítem</th>
+				<th scope="col"	style="width:15%">Descripción</th>
+				<th scope="col"	style="width:8%">Valor</th>
+				<th scope="col"	style="width:20%">Observación</th>
+				<th scope="col"	style="width:10%"></th>
+			</tr>
+			<tbody>		
+			</tbody>
+			<tfoot>
+				<tr>
+					<th colspan="8" style="width:100%"></th>
+				</tr>
+			</tfoot>
+		</table>
+
+<%	} %>
 	
 <%	if (bean.getApartadoComunicaciones() != null) { %>
 	
@@ -328,6 +356,13 @@ UsuarioBolsaEmpleo candidato = bean.getCandidato();
 			});
 		});
 		
+		document.getElementById("meritos").addEventListener("click", function(event) {
+			Atis.sendForm("<%= request.getRequestURI() %>", {
+				'<%=ControladorUsuarioCandidato.PARAM_ACCION%>': '<%=ControladorUsuarioCandidato.ACCION_MERITOS_CANDIDATO%>',
+				'<%=ControladorUsuarioCandidato.PARAM_CANDIDATO%>': <%= codnum %>
+			});
+		});
+		
 		document.getElementById("titulaciones").addEventListener("click", function(event) {
 			Atis.sendForm("<%= request.getRequestURI() %>", {
 				'<%=ControladorUsuarioCandidato.PARAM_ACCION%>': '<%=ControladorUsuarioCandidato.ACCION_TITULACIONES_CANDIDATO%>',
@@ -373,6 +408,49 @@ UsuarioBolsaEmpleo candidato = bean.getCandidato();
 			        }}
 			    ]
 			});
+			
+			Atis.smoothScrollToAnchor("#solicitudes");
+	<%	} %>
+	
+	<%	if (bean.getApartadoMeritos() != null) { %>
+			var optionsApartados = {};
+			
+			<% if (bean.getApartados() != null) { %>
+				<% for (ApartadoBaremacion apartado: bean.getApartados()) { %>
+					optionsApartados[<%=apartado.getCodNum()%>] = '<%=apartado.getNombre()%>';
+				<% } %>
+			<% } %>
+	
+			var table_meritos = new Atis.DataTable('#table_meritos', {
+			    "ajax": { url: "<%= ControladorUsuarioCandidato.URL_PATTERN_AJAX %>" },
+			    "action": "<%=ControladorUsuarioCandidato.ACCION_DATATABLE_MERITOS_CANDIDATO%>",
+			    "params": {"<%=ControladorUsuarioCandidato.PARAM_CANDIDATO%>": <%= candidato.getCodNum() %>},
+			    "filterable": true,
+			    "defaultOrderBy": 0,
+			    "defaultOrderDirection": 'desc',
+			    "pageSize": 10,
+			    "title": "MERITOS",
+			    "pageSizeOptions": [10, 50, 100],
+			    "columns": [
+			    	{'data': 'codNum', 'filter': {'type': 'number'}},
+			    	{'data': 'item.bloque.apartado.nombre', 'filter': {'type': 'select', 'options': optionsApartados}},
+			        {'data': 'item', 'filter': true, 'render': function(row) {
+			        	return row.item.bloque.apartado.codigo + "." + row.item.bloque.codigo + "." + row.item.codigo;
+		        	}},
+			        {'data': 'item.nombre', 'filter': true},
+			        {'data': 'descripcion', 'filter': true},
+			        {'data': 'valor', 'filter': true, 'overflow': 'auto'},
+			        {'data': 'observacion', 'filter': true},
+			        {'data': 'codnum', 'buttons': [
+		        		{'title': 'Descargar fichero del mérito', 'class': 'only-icon icon-download',  'onClick': function(row) {
+		        			window.open("<%= ControladorDescargaFicheros.URL_DESCARGA_FICHEROS %>"
+		        		        	+ "?a=<%= ControladorDescargaFicheros.ACCION_DESCARGAR_MERITO_PERSONAL %>&<%= ControladorDescargaFicheros.PARAM_MERITO %>=" + row.codNum);
+		        		}},
+		   			]}
+			    ]
+			});
+			
+			Atis.smoothScrollToAnchor("#meritos");
 	<%	} %>
 	
 	<%	if (bean.getApartadoTitulaciones() != null) { %>
@@ -403,6 +481,8 @@ UsuarioBolsaEmpleo candidato = bean.getCandidato();
 		   			]}
 			    ],
 			});
+			
+			Atis.smoothScrollToAnchor("#titulaciones");
 	<%	} %>
 	
 	<%	if (bean.getApartadoAcreditaciones() != null) { %>
@@ -436,6 +516,8 @@ UsuarioBolsaEmpleo candidato = bean.getCandidato();
 		   			]}
 			    ],
 			});
+			
+			Atis.smoothScrollToAnchor("#acreditaciones");
 	<%	} %>
 	
 	<%	if (bean.getApartadoAreasExcluidas() != null) { %>
@@ -501,6 +583,7 @@ UsuarioBolsaEmpleo candidato = bean.getCandidato();
 		      	});
 			}
 		
+			Atis.smoothScrollToAnchor("#areas_excluidas");
 	<%	} %>
 		
 		function getTodayDate() {
