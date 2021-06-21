@@ -107,6 +107,7 @@ public class TestMemcache {
 	/** test flush all.
 	 */
 	@Test
+	@Ignore
 	public void testA6FlushAll() {
 		Memcache.enable();
 		Memcache mc = Memcache.getInstance();

@@ -59,7 +59,7 @@ public class TestCrearUsuarioAutoregistrado extends UtilsTestUsuarioBase {
 	/** Inserta una convocatoria.
 	 */
 	@Test
-	public void testA01() {
+	public void testE01() {
 		DriverUv.getDriver().get(DriverUv.RUTA + "/pub/es/operaciones/autoregistrado/usuarioautoresgistrado?a=mostrarcrear");
 		DriverUv.getDriver().findElement(By.name("documento")).sendKeys(TEXTO);
 		DriverUv.getDriver().findElement(By.name("nombre")).sendKeys(TEXTO);
