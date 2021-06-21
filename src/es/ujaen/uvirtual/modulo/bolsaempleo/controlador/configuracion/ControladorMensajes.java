@@ -334,7 +334,7 @@ public class ControladorMensajes extends HttpServlet {
 			destinatarios.add(usuario.getEmail());
 		}
 		
-		EnviaCorreo.enviaCorreoCCO(destinatarios, destinatarios, mensaje.getTitulo(), mensaje.getCuerpo());
+		//EnviaCorreo.enviaCorreoCCO(destinatarios, destinatarios, mensaje.getTitulo(), mensaje.getCuerpo());
 		
 		response.sendRedirect(request.getServletPath());
 	}
