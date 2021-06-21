@@ -18,8 +18,9 @@ VistaMensajes bean = (VistaMensajes) uvdatos.getVistas().get(VistaMensajes.class
 Mensaje mensaje = bean.getMensaje();
 
 boolean enviarDisabled = true;
+boolean mensajeBorrador = mensaje.getEstado().equals(ModeloMensajes.ESTADO_BORRADOR);
 
-if (bean.getDestinatarios().size() > 0 && !mensaje.getCuerpo().isBlank() && !mensaje.getTitulo().equals("BORRADOR")) {
+if (bean.getDestinatarios().size() > 0 && !mensaje.getCuerpo().isBlank() && !mensaje.getTitulo().equals(ModeloMensajes.ESTADO_BORRADOR)) {
 	enviarDisabled = false;
 }
 
@@ -42,7 +43,8 @@ if (bean.getDestinatarios().size() > 0 && !mensaje.getCuerpo().isBlank() && !men
     				   type="text"
     				   name="<%= ControladorMensajes.PARAM_TITULO %>" 
     				   value="<%= BolsaEmpleoUtils.getParamForm(request, ControladorMensajes.PARAM_TITULO, mensaje.getTitulo()) %>"
-    				   required/>
+    				   required
+    				   <%= mensajeBorrador ? "" : "disabled" %>/>
     		</div>
     	</div>
     	
@@ -51,14 +53,15 @@ if (bean.getDestinatarios().size() > 0 && !mensaje.getCuerpo().isBlank() && !men
 	    		<label for="mensaje_cuerpo" class="bold-label">Cuerpo del mensaje:</label>
 	    		<textarea class="form-input-custom" id="mensaje_cuerpo"
 	    				name="<%= ControladorMensajes.PARAM_CUERPO %>" rows="5" cols="50"
-	    				required><%= BolsaEmpleoUtils.getParamForm(request, ControladorMensajes.PARAM_CUERPO, mensaje.getCuerpo()) %></textarea>
+	    				required
+	    				<%= mensajeBorrador ? "" : "disabled" %>><%= BolsaEmpleoUtils.getParamForm(request, ControladorMensajes.PARAM_CUERPO, mensaje.getCuerpo()) %></textarea>
 	    	</div>
     	</div>
     	
     	<div class="form-group-container col2">
     		<div class="form-group">
+    		<%	if (mensajeBorrador) { %>
     			<input id="mensaje_guardar" type="submit" name="<%= ControladorMensajes.PARAM_GUARDAR %>" value="Guardar" style="float:left;" disabled/>
-    		<%	if (mensaje.getEstado().equals(ModeloMensajes.ESTADO_BORRADOR)) { %>
     			<input id="mensaje_borrar" type="button" name="<%= ControladorMensajes.PARAM_BORRAR %>" value="Borrar" style="float:left; margin-left: 10px;" />
     		<%	} %>
     		</div>
@@ -71,10 +74,15 @@ if (bean.getDestinatarios().size() > 0 && !mensaje.getCuerpo().isBlank() && !men
     
     <table class="bluetable bolsaempleo" id="tableDestinatarios">
 		<tr>
-			<th scope="col" style="width:5%"></th>
+		<%	if (mensajeBorrador) { %>
+				<th scope="col" style="width:5%"></th>
+		<% } %>
 			<th scope="col" style="width:20%" title="Documento">Documento</th>
 			<th scope="col" style="width:50%" title="Nombre y apellidos">Nombre y apellidos</th>
 			<th scope="col" style="width:30%" title="Correo">Correo</th>
+		<%	if (!mensajeBorrador) { %>
+				<th scope="col" style="width:10%" title="Estado">Estado</th>	
+		<% } %>
 		</tr>
 		<tbody>
 		</tbody>
@@ -85,94 +93,95 @@ if (bean.getDestinatarios().size() > 0 && !mensaje.getCuerpo().isBlank() && !men
 		</tfoot>
 	</table>
 	
-	<table class="bluetable bolsaempleo" style="margin-top: 2rem;">
-		<caption>AÑADIR USUARIOS DEL SISTEMA AL MENSAJE</caption>		
-	</table>
-	
-	<div class="form-group-container col2 helper">
-   		<div class="form-group">
-  			<label for="filtro_convocatoria">Filtrar por convocatoria:</label>
-    		<select class="params" id="filtro_convocatoria" name="aplicable" style="width:100%;">
-    			<option value="">Selecciona convocatoria</option>
-    			<% for (Convocatoria c : bean.getConvocatorias()) { %>
-    				<option value="<%= c.getCodNum() %>"><%= c.getDescripcion() %></option>
-    			<% } %>									
-			</select>
-   		</div>
-   		<div class="form-group" id="bloque_aplicable_bloque">
-   			<label for="filtro_area">Filtar por área:</label>
-    		<select class="params" id="filtro_area" name="aplicableBloque" style="width:100%;" disabled>
-    			<option value="">Selecciona área</option>
-    			<% for (Area a : bean.getAreas()) { %>
-    				<option value="<%= a.getCodNum() %>"><%= a.getDescripcion() %></option>
-    			<% } %>	
-    		</select>
-   		</div>
-   	</div>
-	
-	<table class="bluetable bolsaempleo" id="tableAddDestinatario">
-		<tr>
-			<th scope="col" style="width:5%"></th>
-			<th scope="col" style="width:20%" title="Documento">Documento</th>
-			<th scope="col" style="width:55%" title="Nombre y apellidos">Nombre y apellidos</th>
-			<th scope="col" style="width:20%" title="Correo">Correo</th>
-			<th scope="col" style="width:20%" title="Rol">Rol</th>
-			<th scope="col" style="width:20%" title="Correo">Lista distribución</th>
-		</tr>
-		<tbody>
-		</tbody>
-		<tfoot>
+<%	if (mensajeBorrador) { %>
+		<table class="bluetable bolsaempleo" style="margin-top: 2rem;">
+			<caption>AÑADIR USUARIOS DEL SISTEMA AL MENSAJE</caption>		
+		</table>
+		
+		<div class="form-group-container col2 helper">
+	   		<div class="form-group">
+	  			<label for="filtro_convocatoria">Filtrar por convocatoria:</label>
+	    		<select class="params" id="filtro_convocatoria" name="aplicable" style="width:100%;">
+	    			<option value="">Selecciona convocatoria</option>
+	    			<% for (Convocatoria c : bean.getConvocatorias()) { %>
+	    				<option value="<%= c.getCodNum() %>"><%= c.getDescripcion() %></option>
+	    			<% } %>									
+				</select>
+	   		</div>
+	   		<div class="form-group" id="bloque_aplicable_bloque">
+	   			<label for="filtro_area">Filtar por área:</label>
+	    		<select class="params" id="filtro_area" name="aplicableBloque" style="width:100%;" disabled>
+	    			<option value="">Selecciona área</option>
+	    			<% for (Area a : bean.getAreas()) { %>
+	    				<option value="<%= a.getCodNum() %>"><%= a.getDescripcion() %></option>
+	    			<% } %>	
+	    		</select>
+	   		</div>
+	   	</div>
+		
+		<table class="bluetable bolsaempleo" id="tableAddDestinatario">
 			<tr>
-				<th colSpan="6" style="width:100%"></th>
+				<th scope="col" style="width:5%"></th>
+				<th scope="col" style="width:20%" title="Documento">Documento</th>
+				<th scope="col" style="width:55%" title="Nombre y apellidos">Nombre y apellidos</th>
+				<th scope="col" style="width:20%" title="Correo">Correo</th>
+				<th scope="col" style="width:20%" title="Rol">Rol</th>
+				<th scope="col" style="width:20%" title="Correo">Lista distribución</th>
 			</tr>
-		</tfoot>
-	</table>
+			<tbody>
+			</tbody>
+			<tfoot>
+				<tr>
+					<th colSpan="6" style="width:100%"></th>
+				</tr>
+			</tfoot>
+		</table>
+<%	} %>
+	
 </div>
 
 <script>
 $(document).ready(function() {
 	
-	var onFilterConvocatoria = function() {};
+	<%	if (mensajeBorrador) { %>
 	
-	var onFilterArear = function() {
-		var val = $(this).val();
-	};
+		var addDestinatarios = function(selected) {
+			if (selected.length > 0) {
+				Atis.confirmDialog("Añadir destinatarios", "¿Desea añadir los destinatarios seleccionados?", {
+		        	Si: function() {
+		        		Atis.sendForm("<%= request.getRequestURI() %>", {
+		        			'<%=ControladorMensajes.PARAM_ACCION%>': '<%=ControladorMensajes.ACCION_AGREGAR_DESTINATARIOS%>',
+		        			'<%=ControladorMensajes.PARAM_MENSAJE_ID%>': <%= mensaje.getCodNum() %>,
+		        			'<%=ControladorMensajes.PARAM_DESTINATARIOS %>': Atis.object2Json(selected)
+		        		});
+		          		$(this).dialog("close");
+		        	},
+		        	No: function() {
+		          		$(this).dialog("close");
+		        	}
+		      	});
+			}
+		};
+		
+		var deleteDestinatarios = function(selected) {
+			if (selected.length > 0) {
+				Atis.confirmDialog("Eliminar destinatarios", "¿Desea eliminar los destinatarios seleccionados?", {
+		        	Si: function() {
+		        		Atis.sendForm("<%= request.getRequestURI() %>", {
+		        			'<%=ControladorMensajes.PARAM_ACCION%>': '<%=ControladorMensajes.ACCION_ELIMINAR_DESTINATARIOS%>',
+		        			'<%=ControladorMensajes.PARAM_MENSAJE_ID%>': <%= mensaje.getCodNum() %>,
+		        			'<%=ControladorMensajes.PARAM_DESTINATARIOS %>': Atis.object2Json(selected)
+		        		});
+		          		$(this).dialog("close");
+		        	},
+		        	No: function() {
+		          		$(this).dialog("close");
+		        	}
+		      	});
+			}
+		};
 	
-	var addDestinatarios = function(selected) {
-		if (selected.length > 0) {
-			Atis.confirmDialog("Añadir destinatarios", "¿Desea añadir los destinatarios seleccionados?", {
-	        	Si: function() {
-	        		Atis.sendForm("<%= request.getRequestURI() %>", {
-	        			'<%=ControladorMensajes.PARAM_ACCION%>': '<%=ControladorMensajes.ACCION_AGREGAR_DESTINATARIOS%>',
-	        			'<%=ControladorMensajes.PARAM_MENSAJE_ID%>': <%= mensaje.getCodNum() %>,
-	        			'<%=ControladorMensajes.PARAM_DESTINATARIOS %>': Atis.object2Json(selected)
-	        		});
-	          		$(this).dialog("close");
-	        	},
-	        	No: function() {
-	          		$(this).dialog("close");
-	        	}
-	      	});
-		}
-	};
-	
-	var deleteDestinatarios = function(selected) {
-		if (selected.length > 0) {
-			Atis.confirmDialog("Eliminar destinatarios", "¿Desea eliminar los destinatarios seleccionados?", {
-	        	Si: function() {
-	        		Atis.sendForm("<%= request.getRequestURI() %>", {
-	        			'<%=ControladorMensajes.PARAM_ACCION%>': '<%=ControladorMensajes.ACCION_ELIMINAR_DESTINATARIOS%>',
-	        			'<%=ControladorMensajes.PARAM_MENSAJE_ID%>': <%= mensaje.getCodNum() %>,
-	        			'<%=ControladorMensajes.PARAM_DESTINATARIOS %>': Atis.object2Json(selected)
-	        		});
-	          		$(this).dialog("close");
-	        	},
-	        	No: function() {
-	          		$(this).dialog("close");
-	        	}
-	      	});
-		}
-	};
+<%	} %>
 	
 	var tableDestinatarios = new Atis.DataTable('#tableDestinatarios', {
 		"title": "DESTINATARIOS DEL MENSAJE",
@@ -182,54 +191,14 @@ $(document).ready(function() {
 	    "filterable": true,
     	"action": "<%= ControladorMensajes.ACCION_DATATABLE_DESTINATARIOS %>",
 	    "columns": [
-	    	{'data': 'codNum', 'selectable': true},
+	    <%	if (mensajeBorrador) { %>{'data': 'codNum', 'selectable': true},<% } %>
 	        {'data': 'prsnif', 'filter': true,},
 	        {'data': 'codNum', 'filter': true, 'overflow': 'auto', 'render': function(row) { return row.nombre + ", " + row.apellido1 + " " + row.apellido2; }},
 	        {'data': 'email', 'filter': true, 'overflow': 'auto'},
+	    <%	if (!mensajeBorrador) { %>{'data': 'estado', 'order': {'active': false}},<% } %>
 	    ],
-	    "actions": [
-	    	{'label': 'Eliminar del mensaje', 'onClick': deleteDestinatarios},	    		    
-	    ]
+	<%	if (mensajeBorrador) { %>"actions": [{'label': 'Eliminar del mensaje', 'onClick': deleteDestinatarios}] <% } %>
 	});
-	
-	var tableAddDestinatario = new Atis.DataTable('#tableAddDestinatario', {
-	    "ajax": { url: '<%= ControladorMensajes.URL_PATTERN_AJAX %>', async: false },
-	    "params": {"<%= ControladorMensajes.PARAM_MENSAJE_ID%>": <%= mensaje.getCodNum() %>},
-	    "pageSize": 10,
-	    "filterable": true,
-	    "selectedAll": true,
-    	"action": "<%= ControladorMensajes.ACCION_DATATABLE_DESTINATARIOS_DISPONIBLES %>",
-	    "columns": [
-	    	{'data': 'codNum', 'selectable': true},
-	        {'data': 'prsnif', 'overflow': 'auto', 'filter': true,},
-	        {'data': 'codNum', 'filter': true, 'overflow': 'auto', 'render': function(row) { return row.nombre + ", " + row.apellido1 + " " + row.apellido2; }},
-	        {'data': 'email', 'filter': true, 'overflow': 'auto'},
-	        {'data': 'rol.descripcion', 
-	         'filter': {
-	        	'type': 'select', 
-	        	'options': {
-		        	'<%= ModeloRol.ID_ROL_SERVICIO_PERSONAL %>': 'Personal', 
-		        	'<%= ModeloRol.ID_ROL_DIRECTOR_DEPARTAMENTO %>': 'Director departamento',
-		        	'<%= ModeloRol.ID_ROL_MIEMBRO_COMISION %>': 'Comisión',
-		        	'<%= ModeloRol.ID_ROL_CANDIDATO %>': 'Candidato'
-	        	}
-	         }
-	        },
-	        {'data': 'listaDist', 'filter': {'type': 'selectBoolean', 'true': 'En Lista', 'false': 'Sin Lista', 'optionDefault': 'true'}, 'render': function(row) {
-        		if(row.listaDist) {
-        			return "<div title='En la lista de distribución' class='circle-true'></div>";
-        		} else {
-        			return "<div title='No está en la lista de distribución' class='circle-false'></div>";
-        		}
-        	}},
-	    ],
-    	"actions": [
-	    	{'label': 'Añadir al mensaje', 'onClick': addDestinatarios},	    		    
-	    ]
-	});
-	
-	$('#filtro_convocatoria').on('change', onFilterConvocatoria);
-	$('#filtro_area').on('change', onFilterArear);
 	
 	document.getElementById("mensaje_enviar").addEventListener("click", function() {
 		Atis.confirmDialog("Enviar mensaje", "El mensaje se enviará a los destinatarios seleccionados", {
@@ -262,39 +231,76 @@ $(document).ready(function() {
 		}
 	});
 	
-	<%	if (mensaje.getEstado().equals(ModeloMensajes.ESTADO_BORRADOR)) { %>
-			document.getElementById("mensaje_borrar").addEventListener("click", function() {
-				Atis.confirmDialog("Eliminar mensaje", "¿Desea borrar el mensaje?", {
-		        	Si: function() {
-		        		Atis.sendForm("<%= request.getRequestURI() %>", {
-		    				'<%=ControladorMensajes.PARAM_ACCION%>': '<%=ControladorMensajes.ACCION_BORRAR_MENSAJE%>',
-		    				'<%=ControladorMensajes.PARAM_MENSAJE_ID%>': <%= mensaje.getCodNum() %>
-		    			});
-		          		$(this).dialog("close");
-		        	},
-		        	No: function() {
-		          		$(this).dialog("close");
+<%	if (mensajeBorrador) { %>
+			
+		var tableAddDestinatario = new Atis.DataTable('#tableAddDestinatario', {
+		    "ajax": { url: '<%= ControladorMensajes.URL_PATTERN_AJAX %>', async: false },
+		    "params": {"<%= ControladorMensajes.PARAM_MENSAJE_ID%>": <%= mensaje.getCodNum() %>},
+		    "pageSize": 10,
+		    "filterable": true,
+		    "selectedAll": true,
+	    	"action": "<%= ControladorMensajes.ACCION_DATATABLE_DESTINATARIOS_DISPONIBLES %>",
+		    "columns": [
+		    	{'data': 'codNum', 'selectable': true},
+		        {'data': 'prsnif', 'overflow': 'auto', 'filter': true,},
+		        {'data': 'codNum', 'filter': true, 'overflow': 'auto', 'render': function(row) { return row.nombre + ", " + row.apellido1 + " " + row.apellido2; }},
+		        {'data': 'email', 'filter': true, 'overflow': 'auto'},
+		        {'data': 'rol.descripcion', 
+		         'filter': {
+		        	'type': 'select', 
+		        	'options': {
+			        	'<%= ModeloRol.ID_ROL_SERVICIO_PERSONAL %>': 'Personal', 
+			        	'<%= ModeloRol.ID_ROL_DIRECTOR_DEPARTAMENTO %>': 'Director departamento',
+			        	'<%= ModeloRol.ID_ROL_MIEMBRO_COMISION %>': 'Comisión',
+			        	'<%= ModeloRol.ID_ROL_CANDIDATO %>': 'Candidato'
 		        	}
-		      	});
-			});
-	<%	} %>
+		         }
+		        },
+		        {'data': 'listaDist', 'filter': {'type': 'selectBoolean', 'true': 'En Lista', 'false': 'Sin Lista', 'optionDefault': 'true'}, 'render': function(row) {
+	        		if (row.listaDist) {
+	        			return "<div title='En la lista de distribución' class='circle-true'></div>";
+	        		} else {
+	        			return "<div title='No está en la lista de distribución' class='circle-false'></div>";
+	        		}
+	        	}},
+		    ],
+	    	"actions": [
+		    	{'label': 'Añadir al mensaje', 'onClick': addDestinatarios},	    		    
+		    ]
+		});
 	
-	document.getElementById("filtro_convocatoria").addEventListener("change", function() {
-		tableAddDestinatario.filterBy("6", this.value);
-		if (this.value == '') {
-			tableAddDestinatario.filterBy("7", '');
-			document.getElementById("filtro_area").setAttribute("disabled", "true");
-		} else {
-			document.getElementById("filtro_area").removeAttribute("disabled");
-		}
-	});
-	
-	document.getElementById("filtro_area").addEventListener("change", function() {
-		if (document.getElementById("filtro_convocatoria").value != '') {
-			tableAddDestinatario.filterBy("6", document.getElementById("filtro_convocatoria").value);
-			tableAddDestinatario.filterBy("7", this.value);
-		}
-	});
+		document.getElementById("mensaje_borrar").addEventListener("click", function() {
+			Atis.confirmDialog("Eliminar mensaje", "¿Desea borrar el mensaje?", {
+	        	Si: function() {
+	        		Atis.sendForm("<%= request.getRequestURI() %>", {
+	    				'<%=ControladorMensajes.PARAM_ACCION%>': '<%=ControladorMensajes.ACCION_BORRAR_MENSAJE%>',
+	    				'<%=ControladorMensajes.PARAM_MENSAJE_ID%>': <%= mensaje.getCodNum() %>
+	    			});
+	          		$(this).dialog("close");
+	        	},
+	        	No: function() {
+	          		$(this).dialog("close");
+	        	}
+	      	});
+		});
+		
+		document.getElementById("filtro_convocatoria").addEventListener("change", function() {
+			tableAddDestinatario.filterBy("6", this.value);
+			if (this.value == '') {
+				tableAddDestinatario.filterBy("7", '');
+				document.getElementById("filtro_area").setAttribute("disabled", "true");
+			} else {
+				document.getElementById("filtro_area").removeAttribute("disabled");
+			}
+		});
+		
+		document.getElementById("filtro_area").addEventListener("change", function() {
+			if (document.getElementById("filtro_convocatoria").value != '') {
+				tableAddDestinatario.filterBy("6", document.getElementById("filtro_convocatoria").value);
+				tableAddDestinatario.filterBy("7", this.value);
+			}
+		});
+<%	} %>
 	
 });
 </script>

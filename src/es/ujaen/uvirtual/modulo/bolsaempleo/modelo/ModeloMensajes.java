@@ -5,13 +5,11 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.sql.Types;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-
 import es.ujaen.uvirtual.modelo.conexion.ConexionUvirtual;
-import es.ujaen.uvirtual.modulo.bolsaempleo.beans.Bolsa;
+import es.ujaen.uvirtual.modulo.bolsaempleo.beans.Destinatario;
 import es.ujaen.uvirtual.modulo.bolsaempleo.beans.Mensaje;
 import es.ujaen.uvirtual.modulo.bolsaempleo.beans.UsuarioBolsaEmpleo;
 import es.ujaen.uvirtual.modulo.bolsaempleo.utilidades.BolsaEmpleoDataTable;
@@ -48,6 +46,8 @@ public class ModeloMensajes {
 	public static final String CODNUM = "CODNUM";
 	public static final String ESTADO_BORRADOR = "BORRADOR";
 	public static final String ESTADO_ENVIADO = "ENVIADO";
+	public static final String ESTADO_ENVIANDO = "ENVIANDO";
+	public static final String ESTADO_FALLO = "FALLO";
 	
 	public static final String ERROR_DESTINATARIO_YA_EXISTE = "El destinatario ya estaba agregado al mensaje previamente";
 
@@ -73,6 +73,29 @@ public class ModeloMensajes {
 			crearInstancia();
 		}
 		return eInstancia;
+	}
+	
+	/** Lista de mensajes a enviar .
+	 * @return .
+	 * @throws IOException .
+	 * @throws UVException .
+	 * @throws SQLException .
+	 */
+	public List<Mensaje> listaMensajesAEnviar() throws SQLException, IOException {
+		List<Mensaje> mensajes = new ArrayList<>();
+		String consulta = " SELECT bepcon.* "
+				+ " FROM TBEP_MENSAJES bepmen "
+				+ " WHERE bepmen.ESTADO = '" + ESTADO_ENVIANDO + "'";
+
+		try (Connection conexion = ConexionUvirtual.obtenerInstancia(); PreparedStatement stmt = conexion.prepareStatement(consulta)) {
+			try (ResultSet rs = stmt.executeQuery()) {
+				while (rs.next()) {
+					mensajes.add(createMensajeFromResultSet(rs));
+				}
+			}
+		}
+
+		return mensajes;
 	}
 
 	/**
@@ -123,16 +146,16 @@ public class ModeloMensajes {
 	 * @throws UVException .
 	 * @throws IOException .
 	 */
-	public BolsaEmpleoDataTable<UsuarioBolsaEmpleo> listaDestinatariosMensajeDatatable(Map<String, String[]> params, Mensaje mensaje) throws SQLException, UVException {
+	public BolsaEmpleoDataTable<Destinatario> listaDestinatariosMensajeDatatable(Map<String, String[]> params, Mensaje mensaje) throws SQLException, UVException {
 		if (mensaje == null) {
 			throw new UVException("El mensaje es requerido");
 		}
 			
-		List<UsuarioBolsaEmpleo> destinatarios = new ArrayList<>();
-		BolsaEmpleoDataTable<UsuarioBolsaEmpleo> dataTable = new BolsaEmpleoDataTable<>(params);
+		List<Destinatario> destinatarios = new ArrayList<>();
+		BolsaEmpleoDataTable<Destinatario> dataTable = new BolsaEmpleoDataTable<>(params);
 
 		String consulta = ""
-				+ " SELECT bepusu.* "
+				+ " SELECT bepusu.*, bepmde.ESTADO, bepmde.BEPMEN_CODNUM "
 				+ " FROM TBEP_MEN_DESTINATARIOS bepmde "
 				+ " INNER JOIN TBEP_USUARIOS bepusu ON bepusu.CODNUM = bepmde.BEPUSU_CODNUM "
 				+ " WHERE bepmde.BEPMEN_CODNUM = ? ";
@@ -156,7 +179,7 @@ public class ModeloMensajes {
 
 			try (ResultSet rs = stmt.executeQuery()) {
 				while (rs.next()) {					
-					destinatarios.add(ModeloUsuarioBolsaEmpleo.obtenerInstancia().getUsuarioById(rs.getInt("CODNUM")));
+					destinatarios.add(this.createDestinatarioFromResultSet(rs));
 				}
 			}
 
@@ -337,6 +360,46 @@ public class ModeloMensajes {
 		}
 	}
 	
+	/** Actualiza el estado de un mensaje a enviando .
+	 * @param mensaje .
+	 * @param usuarioUpdate .
+	 * @throws UVException .
+	 * @throws SQLException .
+	 */
+	public void actualizaEstadoMensajeComoEnviando(Mensaje mensaje, UsuarioBolsaEmpleo usuarioUpdate) throws SQLException, UVException {
+		this.actualizaEstadoMensaje(mensaje, ESTADO_ENVIANDO, usuarioUpdate);
+	}
+	
+	/** Actualiza el estado de un mensaje a enviado .
+	 * @param mensaje .
+	 * @param usuarioUpdate .
+	 * @throws UVException .
+	 * @throws SQLException .
+	 */
+	public void actualizaEstadoMensajeComoEnviado(Mensaje mensaje, UsuarioBolsaEmpleo usuarioUpdate) throws SQLException, UVException {
+		this.actualizaEstadoMensaje(mensaje, ESTADO_ENVIADO, usuarioUpdate);
+	}
+	
+	private void actualizaEstadoMensaje(Mensaje mensaje, String estado, UsuarioBolsaEmpleo usuarioUpdate) throws SQLException, UVException {
+		if (mensaje == null) {
+			throw new UVException(MENSAJE_ERROR_MENSAJE_NULL);
+		}
+		
+		String usuarioUp = usuarioUpdate != null ? usuarioUpdate.getCodCuenta() : "TAREA_PROGRAMADA";
+		
+		String consulta = "UPDATE TBEP_MENSAJES SET ESTADO = ?, UID_USUARIO = ?"
+				+ "	WHERE CODNUM = ?";
+		
+		try (Connection conexion = ConexionUvirtual.obtenerInstancia();
+				PreparedStatement stmt = conexion.prepareStatement(consulta)) {
+			int indexParam = 1;
+			stmt.setString(indexParam++, estado);
+			stmt.setString(indexParam++, usuarioUp);
+			stmt.setInt(indexParam++, mensaje.getCodNum());
+			stmt.executeUpdate();
+		}
+	}
+	
 	/** Agrega un destinatario a un mensaje .
 	 * @param mensaje .
 	 * @param destinatario .
@@ -466,9 +529,9 @@ public class ModeloMensajes {
 	 * @throws UVException .
 	 */
 	public void eliminaDestinatariosMensaje(Mensaje mensaje, UsuarioBolsaEmpleo usuarioUpdate) throws UVException, SQLException {
-		List<UsuarioBolsaEmpleo> listaUsuarios = obtenerDestinatariosMensaje(mensaje);
+		List<Destinatario> listaUsuarios = obtenerDestinatariosMensaje(mensaje);
 		
-		for (UsuarioBolsaEmpleo usuario: listaUsuarios) {
+		for (Destinatario usuario: listaUsuarios) {
 			this.eliminarDestinatario(mensaje, usuario, usuarioUpdate);
 		}
 	}
@@ -479,14 +542,14 @@ public class ModeloMensajes {
 	 * @throws SQLException .
 	 * @throws UVException .
 	 */
-	public List<UsuarioBolsaEmpleo> obtenerDestinatariosMensaje(Mensaje mensaje) throws UVException, SQLException {
-		List<UsuarioBolsaEmpleo> usuarios = new ArrayList<>();
+	public List<Destinatario> obtenerDestinatariosMensaje(Mensaje mensaje) throws UVException, SQLException {
+		List<Destinatario> usuarios = new ArrayList<>();
 		
 		if (mensaje == null) {
 			throw new UVException(MENSAJE_ERROR_NO_EXISTE_MENSAJE);
 		}
 		
-		String consultaSelect = "SELECT bepusu.* FROM TBEP_MEN_DESTINATARIOS bepmde"
+		String consultaSelect = "SELECT bepusu.*, bepmde.ESTADO, bepmde.BEPMEN_CODNUM FROM TBEP_MEN_DESTINATARIOS bepmde"
 				+ "	INNER JOIN TBEP_USUARIOS bepusu ON bepusu.CODNUM = bepmde.BEPUSU_CODNUM"
 				+ " WHERE BEPMEN_CODNUM = ? AND bepusu.VUAJA_EMAIL_ALTA IS NOT NULL";
 		try (Connection conexion = ConexionUvirtual.obtenerInstancia(); PreparedStatement stmt = conexion.prepareStatement(consultaSelect)) {
@@ -495,12 +558,56 @@ public class ModeloMensajes {
 			
 			try (ResultSet rs = stmt.executeQuery()) {
 				while (rs.next()) {
-					usuarios.add(ModeloUsuarioBolsaEmpleo.obtenerInstancia().getUsuarioFromResultSet(rs));
+					usuarios.add(this.createDestinatarioFromResultSet(rs));
 				}
 			}
 		}
 		
 		return usuarios;
+	}
+	
+	/** Actualiza el estado de un destinatario a enviando .
+	 * @param mensaje .
+	 * @param destinatario .
+	 * @param usuarioUpdate .
+	 * @throws UVException .
+	 * @throws SQLException .
+	 */
+	public void actualizaEstadoDestinatarioComoEnviado(Mensaje mensaje, UsuarioBolsaEmpleo destinatario, UsuarioBolsaEmpleo usuarioUpdate) throws SQLException, UVException {
+		this.actualizaEstadoDestinatario(mensaje, destinatario, ESTADO_ENVIADO, usuarioUpdate);
+	}
+	
+	/** Actualiza el estado de un destinatario a fallo .
+	 * @param mensaje .
+	 * @param destinatario .
+	 * @param usuarioUpdate .
+	 * @throws UVException .
+	 * @throws SQLException .
+	 */
+	public void actualizaEstadoDestinatarioComoFallo(Mensaje mensaje, UsuarioBolsaEmpleo destinatario, UsuarioBolsaEmpleo usuarioUpdate) throws SQLException, UVException {
+		this.actualizaEstadoDestinatario(mensaje, destinatario, ESTADO_FALLO, usuarioUpdate);
+	}
+	
+	private void actualizaEstadoDestinatario(Mensaje mensaje, UsuarioBolsaEmpleo destinatario, String estado, UsuarioBolsaEmpleo usuarioUpdate)
+			throws SQLException, UVException {
+		if (mensaje == null) {
+			throw new UVException(MENSAJE_ERROR_MENSAJE_NULL);
+		}
+		
+		String usuarioUp = usuarioUpdate != null ? usuarioUpdate.getCodCuenta() : "TAREA_PROGRAMADA";
+		
+		String consulta = "UPDATE TBEP_MEN_DESTINATARIOS SET ESTADO = ?, UID_USUARIO = ?"
+				+ "	WHERE BEPMEN_CODNUM = ? AND BEPUSU_CODNUM = ?";
+		
+		try (Connection conexion = ConexionUvirtual.obtenerInstancia();
+				PreparedStatement stmt = conexion.prepareStatement(consulta)) {
+			int indexParam = 1;
+			stmt.setString(indexParam++, estado);
+			stmt.setString(indexParam++, usuarioUp);
+			stmt.setInt(indexParam++, mensaje.getCodNum());
+			stmt.setInt(indexParam++, destinatario.getCodNum());
+			stmt.executeUpdate();
+		}
 	}
 
 	private Mensaje createMensajeFromResultSet(ResultSet rs) throws SQLException, IOException {
@@ -512,4 +619,10 @@ public class ModeloMensajes {
 		mensaje.setEstado(rs.getString("ESTADO"));		
 		return mensaje;
 	}
+	
+	private Destinatario createDestinatarioFromResultSet(ResultSet rs) throws SQLException, UVException {
+		UsuarioBolsaEmpleo usuario = ModeloUsuarioBolsaEmpleo.obtenerInstancia().getUsuarioFromResultSet(rs);
+		return new Destinatario(usuario, rs.getInt("BEPMEN_CODNUM"), rs.getString("ESTADO"));
+	}
+	
 }

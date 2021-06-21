@@ -103,6 +103,7 @@ public final class UtilsTestBolsaEmpleo {
 			
 			// migraciones
 			BbddRunner.ejecutar("Documentos/scripts/opc.bolsaempleo/migraciones/01-exclusionsolicitud.sql");
+			BbddRunner.ejecutar("Documentos/scripts/opc.bolsaempleo/migraciones/02-mensajesdestinatarios.sql");
 		}
 	}
 
