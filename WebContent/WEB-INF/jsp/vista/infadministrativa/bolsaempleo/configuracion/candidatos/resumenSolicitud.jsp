@@ -31,6 +31,8 @@ VistaCandidatos bean = (VistaCandidatos) uvdatos.getVistas().get(VistaCandidatos
 			<div style="display: flex; width: 100%; justify-content: flex-end;">
 				<button class="link-btn icon icon-download" id="descargar_solicitud">Descargar solicitud</button>
 			</div>
+	<%	} else { %>
+			<br/>
 	<%	} %>
 	
 <%	for (BolsaSolicitud bolsa: bean.getListaBolsasSolicitud()) { %>
@@ -109,10 +111,14 @@ VistaCandidatos bean = (VistaCandidatos) uvdatos.getVistas().get(VistaCandidatos
 		        	+ "?a=<%= ControladorDescargaFicheros.ACCION_DESCARGAR_MERITO_PERSONAL %>&<%= ControladorDescargaFicheros.PARAM_MERITO %>=" + idMerito);
 		});
 		
-		document.getElementById("descargar_solicitud").addEventListener("click", function() {
-			window.open("<%= ControladorDescargaFicheros.URL_DESCARGA_FICHEROS %>"
-		        	+ "?a=<%= ControladorDescargaFicheros.ACCION_DESCARGAR_SOLICITUD_PERSONAL + "&" + ControladorDescargaFicheros.PARAM_SOLICITUD + "=" + bean.getSolicitud().getCodNum() %>");
-		});
+	<%	if (bean.getSolicitud().getEstado().equals(ModeloSolicitud.SOLICITUD_ESTADO_CERRADA)) { %>
+		
+			document.getElementById("descargar_solicitud").addEventListener("click", function() {
+				window.open("<%= ControladorDescargaFicheros.URL_DESCARGA_FICHEROS %>"
+			        	+ "?a=<%= ControladorDescargaFicheros.ACCION_DESCARGAR_SOLICITUD_PERSONAL + "&" + ControladorDescargaFicheros.PARAM_SOLICITUD + "=" + bean.getSolicitud().getCodNum() %>");
+			});
+		
+	<%	} %>
 		
 		document.getElementById("candidato_volver").addEventListener("click", function() {
 			Atis.sendForm("<%= request.getRequestURI() %>", {
