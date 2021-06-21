@@ -70,9 +70,10 @@ public class TestCrearUsuarioAutoregistrado extends UtilsTestUsuarioBase {
 		DriverUv.getDriver().findElement(By.name("emailRepetido")).submit();
 
 		WebDriverWait wait = new WebDriverWait(DriverUv.getDriver(), WAITTIME);
-		WebElement codigoTemporal = wait.until(ExpectedConditions.visibilityOfElementLocated(By.name("codigoTemporal")));
-		assertNotNull(codigoTemporal);
-		assertTrue(codigoTemporal.isDisplayed());
+		WebElement error = wait.until(ExpectedConditions.visibilityOfElementLocated(By.id("error")));
+		assertNotNull(error);
+		assertTrue(error.isDisplayed());
+		assertTrue(error.getText().contains("verificación incorrecta"));
 	}
 	
 	/** Cierre de este unittest.
