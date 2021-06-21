@@ -79,7 +79,7 @@ $(document).ready(function() {
 	        {'data': 'apellido1', 'filter': true, 'order': false, 'overflow': 'auto', 'render': function(row) {
 	        	return row.nombre + " " + row.apellido1 + " " + row.apellido2;         		
 	        }},
-	        {'data': 'rol.descripcion', 'filter': {'type': 'select', 'options': {'1050':'Personal', '1051':'Comision', '1053': 'Director departamento'}}  , 'order': {'active': false}},
+	        {'data': 'rol.descripcion', 'filter': {'type': 'select', 'options': {'1050':'Personal', '1051':'Comision', '1052':'Candidatos', '1053': 'Director departamento'}}  , 'order': {'active': false}},
 	        {'data': 'excluido', 'filter': {'type': 'select', 'options':{'true': 'Excluido', 'false': 'Incluido'}, 'optionDefault': 'false'}, 'render': function(row) {
 	        	if(row.excluido==true){
         			return "<div title='Usuario excluido' class='circle-true'></div>"; 

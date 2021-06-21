@@ -216,7 +216,7 @@ public class ModeloUsuarioBolsaEmpleo {
 		List<UsuarioBolsaEmpleo> usuarios = new ArrayList<>();
 		BolsaEmpleoDataTable<UsuarioBolsaEmpleo> dataTable = new BolsaEmpleoDataTable<>(params);
 
-		String consulta = "SELECT * FROM TBEP_USUARIOS bepusu WHERE bepusu.ROL != " + ModeloRol.ID_ROL_CANDIDATO + " ";
+		String consulta = "SELECT * FROM TBEP_USUARIOS bepusu WHERE 1=1 ";
 		
 		String whereNombre = String.format("(%s || ' ' || %s || ' ' || %s)", "bepusu.VUAJA_STRNOMBRE", "bepusu.VUAJA_STRAPELLIDO1", "bepusu.VUAJA_STRAPELLIDO2");
 		
