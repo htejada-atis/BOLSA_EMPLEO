@@ -61,8 +61,10 @@ public class ControladorUsuarioAutoregistrado extends HttpServlet {
 	public static final String ACCION_OLVIDO = "olvido";
 	public static final String ACCION_VALIDA_CODIGO_TEMPORAL = "validaTemporal";
 	public static final String ACCION_MUESTRA_LOGIN = "muestraLogin";
+	public static final String ACCION_MUESTRA_OLVIDO = "muestraOlvido";
 	
 	private static final String JSP_VALIDA_CODIGO_TEMPORAL = "/WEB-INF/jsp/vista/operaciones/autoaprovisionado/validaCodigoTemporal.jsp";
+	private static final String JSP_LOGIN = "/WEB-INF/jsp/vista/operaciones/autoaprovisionado/login.jsp";
 
 	private void compruebaNoRobot(HttpServletRequest request) throws UVException {
 		boolean recaptchaActivo = false;
@@ -85,7 +87,7 @@ public class ControladorUsuarioAutoregistrado extends HttpServlet {
 	
 	private void realizaAccion(HttpServletRequest request, HttpServletResponse response, VistaUsuarioAutoregistrado bean,
 		                       String nombreAccion) throws SQLException, IOException, UVException {
-		bean.setVista("/WEB-INF/jsp/vista/operaciones/autoaprovisionado/usuarioExternoWayf.jsp");
+		bean.setVista(JSP_LOGIN);
 		String modulo = obtenerIdModulo(request); 
 		bean.setIdModulo(modulo);
 		bean.setDescripcionModulo(obtenerDescripcionModulo(modulo));
@@ -120,8 +122,11 @@ public class ControladorUsuarioAutoregistrado extends HttpServlet {
 			case ACCION_MUESTRA_LOGIN:
 				muestraLogin(request, response, bean);
 				break;
+			case ACCION_MUESTRA_OLVIDO:
+				muestraOlvido(bean);
+				break;
 			default:
-				validaWayf(request, response, bean);
+				muestraLogin(request, response, bean);
 				break;
 		}
 	}
@@ -138,7 +143,7 @@ public class ControladorUsuarioAutoregistrado extends HttpServlet {
 		
 		String nombreAccion = EscapaHTML.ajustaCodificacion(request.getParameter(PARAM_ACCION));
 		if (nombreAccion == null) {
-			nombreAccion = ACCION_WAYF;
+			nombreAccion = ACCION_MUESTRA_LOGIN;
 		}
 		String idCambio = EscapaHTML.ajustaCodificacion(request.getParameter(PARAM_ID_CAMBIO));
 		if (idCambio != null) {
@@ -206,20 +211,6 @@ public class ControladorUsuarioAutoregistrado extends HttpServlet {
 		return salida;
 	}
 
-	private void validaWayf(HttpServletRequest request, HttpServletResponse response, VistaUsuarioAutoregistrado bean) throws IOException {
-		UVDatos datos = (UVDatos) request.getAttribute(UVDatos.NOMBRE_ATRIBUTO);
-		String uid = datos.getIdentificadorUsuario();
-		if (uid == null) {
-			uid = (String) request.getSession().getAttribute(UVDatos.ID_USUARIO_SESION);
-		}
-		String modulo = obtenerIdModulo(request); 
-		String urlModulo = obtenerUrlModulo(request, modulo);
-		bean.setPaginaRedireccion(urlModulo);
-		if (uid != null) {
-			response.sendRedirect(bean.getPaginaRedireccion());
-		}
-	}
-	
 	private void muestraLogin(HttpServletRequest request, HttpServletResponse response, VistaUsuarioAutoregistrado bean) throws IOException {
 		UVDatos datos = (UVDatos) request.getAttribute(UVDatos.NOMBRE_ATRIBUTO);
 		String uid = datos.getIdentificadorUsuario();
@@ -232,7 +223,10 @@ public class ControladorUsuarioAutoregistrado extends HttpServlet {
 		if (uid != null) {
 			response.sendRedirect(bean.getPaginaRedireccion());
 		}
-		bean.setVista("/WEB-INF/jsp/vista/operaciones/autoaprovisionado/login.jsp");
+	}
+
+	private void muestraOlvido(VistaUsuarioAutoregistrado bean) {
+		bean.setVista("/WEB-INF/jsp/vista/operaciones/autoaprovisionado/olvido.jsp");
 	}
 	
 	private void meterUsuarioEnSesion(HttpServletRequest request, String correo) {
@@ -308,7 +302,7 @@ public class ControladorUsuarioAutoregistrado extends HttpServlet {
 			idSolicitud = modelo.mandarClaveTemporal(correo, ip);
 			bean.setIdSolicitud(idSolicitud);
 		} catch (SQLException | UVException e) {
-			bean.setVista("/WEB-INF/jsp/vista/operaciones/autoaprovisionado/usuarioExternoWayf.jsp");
+			bean.setVista(JSP_LOGIN);
 			throw e;
 		}
 	}

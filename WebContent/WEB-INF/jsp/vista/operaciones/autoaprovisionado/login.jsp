@@ -31,7 +31,7 @@ VistaUsuarioAutoregistrado bean = (VistaUsuarioAutoregistrado)uvdatos.getVistas(
 }
 
 .login-block input#username {
-    background: #fff url('http://i.imgur.com/u0XmBmv.png') 20px top no-repeat;
+    background: #fff url('/img/autoregistrado/usuario.png') 20px top no-repeat;
     background-size: 16px 80px;
 }
 
@@ -40,7 +40,7 @@ VistaUsuarioAutoregistrado bean = (VistaUsuarioAutoregistrado)uvdatos.getVistas(
 }
 
 .login-block input#password {
-    background: #fff url('http://i.imgur.com/Qf83FTt.png') 20px top no-repeat;
+    background: #fff url('/img/autoregistrado/candado.png') 20px top no-repeat;
     background-size: 16px 80px;
 }
 
@@ -95,23 +95,34 @@ VistaUsuarioAutoregistrado bean = (VistaUsuarioAutoregistrado)uvdatos.getVistas(
 }
 </style>
 <h2>Acceso a <%=bean.getDescripcionModulo() %></h2>
-	<div class="logintic" align="right">
-		<a href="https://uvirtual.ujaen.es/srv/es/informacionadministrativa/bolsaempleo">Acceso cuenta TIC (SIDUJA)</a>
+	<% if (bean.getMensajesDeExito().size() > 0) { %>
+		<div id="exito" class="success">
+			<%=bean.formatearMensajesDeExito()%>
+		</div>
+	<% } %>
+	<% if (bean.getMensajesDeError().size() > 0) { %>
+		<div id="error" class="error">
+			<%=bean.formatearMensajesDeError()%>
+		</div>
+  	<% } %>
+
+	<div class="logintic" style="text-align:right">
+		<a href="<%=bean.getPaginaRedireccion()%>">Acceso cuenta TIC (SIDUJA)</a>
 	</div>
 
 	<div class="login-block">
 		<h3>Acceso usuarios externos</h3>
-		<form method="post" action="<%=request.getRequestURI()%>" id="formularioExiste"> 
+		<form method="post" action="<%=request.getRequestURI()%>" id="formulario"> 
 			<input type="hidden" name="<%=ControladorUsuarioAutoregistrado.PARAM_ACCION%>" id="accionFormulario" value="<%=ControladorUsuarioAutoregistrado.ACCION_VALIDA%>" />
 			<input type="hidden" id="g-recaptcha-response-valida" name="g-recaptcha-response" value="" />
 			<input type="hidden" name="<%=ControladorUsuarioAutoregistrado.PARAM_ID_MODULO%>" value="<%=bean.getIdModulo()%>" />
-		</form>
 		<input type="text" value="" placeholder="Correo electrónico" id="username" />
 		<input type="password" value="" placeholder="Clave" id="password" />
 		<input type="submit" value="Entrar">
+		</form>
 
-		<h4><a href="action="">Registrarse</a></h4>
-		<h4><a href="action="">He olvidado mi clave</a></h4>
+		<h4><a href="" onclick="registro()">Registrarse</a></h4>
+		<h4><a href="" onclick="olvido()">He olvidado mi clave</a></h4>
 	</div>
 
 <% if (bean.isMostrarCaptcha()) { %>
@@ -119,10 +130,20 @@ VistaUsuarioAutoregistrado bean = (VistaUsuarioAutoregistrado)uvdatos.getVistas(
 		<script>
 			grecaptcha.ready(function() {
 				grecaptcha.execute('<%=bean.getCaptchaPublica()%>', {action: 'olvidoClave'}).then(function(token) {
-					console.log(token);
 					$("#g-recaptcha-response-valida").val(token);
 					$("#g-recaptcha-response-olvido").val(token);
 				});
 			});
+			function olvido() {
+				event.preventDefault()
+				document.getElementById("accionFormulario").value = "<%=ControladorUsuarioAutoregistrado.ACCION_MUESTRA_OLVIDO%>";
+				document.getElementById("formulario").submit();
+			}
+			
+			function registro() {
+				event.preventDefault()
+				document.getElementById("accionFormulario").value = "<%=ControladorUsuarioAutoregistrado.ACCION_MOSTRAR_CREAR%>";
+				document.getElementById("formulario").submit();
+			}
 		</script>
 <% } %>
