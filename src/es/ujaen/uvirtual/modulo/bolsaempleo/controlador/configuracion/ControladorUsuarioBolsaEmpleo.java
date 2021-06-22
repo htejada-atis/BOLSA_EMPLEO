@@ -341,6 +341,12 @@ public class ControladorUsuarioBolsaEmpleo extends HttpServlet {
 			usuarioForm.setCodCuenta(bean.getUsuario().getCodCuenta());
 			usuarioForm.setCodNum(bean.getUsuario().getCodNum());
 			usuarioForm.setUsuarioArcos(bean.getUsuarioArcos());
+			usuarioForm.setDireccion(bean.getUsuario().getDireccion());
+			usuarioForm.setCodigoPostal(bean.getUsuario().getCodigoPostal());
+			usuarioForm.setLocalidad(bean.getUsuario().getLocalidad());
+			usuarioForm.setProvincia(bean.getUsuario().getProvincia());
+			usuarioForm.setNacionalidad(bean.getUsuario().getNacionalidad());
+			usuarioForm.setTelefono(bean.getUsuario().getTelefono());
 			
 			modelo.actualizaUsuario(usuarioForm, bean.getUsuarioLogeado());
 			BolsaEmpleoUtils.addMensajeDeExito(MENSAJE_EXITO_EDITAR, bean, request);
