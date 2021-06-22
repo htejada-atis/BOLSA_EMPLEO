@@ -53,7 +53,7 @@ public class ModeloCandidato {
 	}
 
 	/**
-	 * Listado de candidatos en función de un área .
+	 * Listado de candidatos con titulaciones y con solicitudes.
 	 * 
 	 * @param params para leer los parametros de paginación, ordenacion, etc .
 	 * @return listado de candidatos .
@@ -65,7 +65,7 @@ public class ModeloCandidato {
 	}
 	
 	/**
-	 * Listado de candidatos sin titulacion (o titulación borrada)
+	 * Listado de candidatos sin titulacion (o titulación borrada) y con solicitudes .
 	 * @param params .
 	 * @return .
 	 * @throws SQLException .
@@ -110,7 +110,7 @@ public class ModeloCandidato {
 	} 	
 	
 	/**
-	 * Listado de candidatos en función de un área .
+	 * Listado de candidatos con acreditaciones y con solicitud cerrada .
 	 * @param params para leer los parametros de paginación, ordenacion, etc .
 	 * @return listado de candidatos .
 	 * @throws SQLException en caso de error de base de datos .
@@ -128,14 +128,18 @@ public class ModeloCandidato {
 		
 		String consulta = ""
 				+ " SELECT bepusu.*, "
-				+ "		(" + subquery + ") AS COUNT_ACREDITACIONES,"
-				+ "	    (SELECT COUNT(*) FROM TBEP_MER_PRE_USUARIO bepmpu"
-				+ "		 INNER JOIN TBEP_MERITOS_PREFERENTES bepmep ON bepmep.CODNUM = bepmpu.BEPMEP_CODNUM"
-				+ "		 WHERE bepmpu.BEPUSU_CODNUM = bepusu.CODNUM AND bepmpu.FLGBORRADO = 'N' AND bepmpu.FLGVALIDADO = 'S' AND bepmep.TIPO = ?"
+				+ "		(" + subquery + ") AS COUNT_ACREDITACIONES, "
+				+ "	    (SELECT COUNT(*) FROM TBEP_MER_PRE_USUARIO bepmpu "
+				+ "		 INNER JOIN TBEP_MERITOS_PREFERENTES bepmep ON bepmep.CODNUM = bepmpu.BEPMEP_CODNUM "
+				+ "		 WHERE bepmpu.BEPUSU_CODNUM = bepusu.CODNUM AND bepmpu.FLGBORRADO = 'N' AND bepmpu.FLGVALIDADO = 'S' AND bepmep.TIPO = ? "
 				+ "     ) AS COUNT_VALIDADAS "
 				+ " FROM TBEP_USUARIOS bepusu "
-				+ " WHERE bepusu.FLGBORRADO = 'N' AND bepusu.rol = " + ModeloRol.ID_ROL_CANDIDATO + " "
-				+ " AND (" + subquery + ") > 0";
+				+ " INNER JOIN TBEP_SOLICITUDES bepsol ON bepsol.BEPUSU_CODNUM = bepusu.CODNUM "
+				+ " WHERE 1=1 "
+				+ " 	AND bepusu.FLGBORRADO = 'N' "
+				+ "		AND bepusu.rol = " + ModeloRol.ID_ROL_CANDIDATO + " "
+				+ " 	AND (" + subquery + ") > 0 "
+				+ " 	AND bepsol.ESTADO = '" + ModeloSolicitud.SOLICITUD_ESTADO_CERRADA + "'";
 		
 		String whereNombre = String.format("(%s || ' ' || %s || ' ' || %s)", "bepusu.VUAJA_STRNOMBRE", "bepusu.VUAJA_STRAPELLIDO1", "bepusu.VUAJA_STRAPELLIDO2");
 
@@ -238,7 +242,11 @@ public class ModeloCandidato {
 				+ "		 WHERE beptus.BEPTUS_USU_CODNUM = bepusu.CODNUM AND beptus.FLGBORRADO = 'N' AND beptus.FLGVALIDADA = 'S' "
 				+ "		) AS COUNT_VALIDADAS " 
 				+ "	FROM TBEP_USUARIOS bepusu "
-				+ "	WHERE bepusu.FLGBORRADO = 'N' AND bepusu.rol = " + ModeloRol.ID_ROL_CANDIDATO;
+				+ " INNER JOIN TBEP_SOLICITUDES bepsol ON bepsol.BEPUSU_CODNUM = bepusu.CODNUM "
+				+ "	WHERE 1=1 "
+				+ "		AND bepusu.FLGBORRADO = 'N' "
+				+ "		AND bepusu.rol = " + ModeloRol.ID_ROL_CANDIDATO + " "
+				+ "		AND bepsol.ESTADO = '" + ModeloSolicitud.SOLICITUD_ESTADO_CERRADA + "'";
 						
 		if (conTitulaciones) {
 			consulta += " AND (" + subquery + ") > 0 "; 
