@@ -5,6 +5,7 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.Types;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -387,13 +388,20 @@ public class ModeloMensajes {
 		
 		String usuarioUp = usuarioUpdate != null ? usuarioUpdate.getCodCuenta() : "TAREA_PROGRAMADA";
 		
-		String consulta = "UPDATE TBEP_MENSAJES SET ESTADO = ?, UID_USUARIO = ?"
+		String consulta = "UPDATE TBEP_MENSAJES SET ESTADO = ?, FECHA_ENVIO = ?, UID_USUARIO = ?"
 				+ "	WHERE CODNUM = ?";
 		
 		try (Connection conexion = ConexionUvirtual.obtenerInstancia();
 				PreparedStatement stmt = conexion.prepareStatement(consulta)) {
 			int indexParam = 1;
 			stmt.setString(indexParam++, estado);
+			
+			if (estado.equals(ESTADO_ENVIADO)) {
+				stmt.setDate(indexParam++, new java.sql.Date(BolsaEmpleoUtils.getCurrentDateTime().getTime()));
+			} else {
+				stmt.setNull(indexParam++, Types.DATE);
+			}
+			
 			stmt.setString(indexParam++, usuarioUp);
 			stmt.setInt(indexParam++, mensaje.getCodNum());
 			stmt.executeUpdate();

@@ -20,7 +20,7 @@ Mensaje mensaje = bean.getMensaje();
 boolean enviarDisabled = true;
 boolean mensajeBorrador = mensaje.getEstado().equals(ModeloMensajes.ESTADO_BORRADOR);
 
-if (bean.getDestinatarios().size() > 0 && !mensaje.getCuerpo().isBlank() && !mensaje.getTitulo().equals(ModeloMensajes.ESTADO_BORRADOR)) {
+if (bean.getDestinatarios().size() > 0 && !mensaje.getCuerpo().isBlank() && !mensaje.getTitulo().equals(ModeloMensajes.ESTADO_BORRADOR) && mensajeBorrador) {
 	enviarDisabled = false;
 }
 
