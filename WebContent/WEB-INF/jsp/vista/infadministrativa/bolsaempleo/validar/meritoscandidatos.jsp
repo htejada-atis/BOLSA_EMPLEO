@@ -165,7 +165,7 @@ UsuarioBolsaEmpleo candidato = bean.getCandidato();
 					<th scope="col" style="width:20%">Área</th>
 					<th scope="col" style="width:20%">Datos actuales</th>
 					<th scope="col" style="width:25%">Afinidad a aplicar</th>
-					<th scope="col" style="width:25%">Observaciones</th>
+					<th scope="col" style="width:25%">Observación para el candidato</th>
 					<th scope="col" style="width:10%"></th>
 				</tr>
 				<tbody>
@@ -185,10 +185,10 @@ UsuarioBolsaEmpleo candidato = bean.getCandidato();
 								<b>Afinidad: </b>
 								<br/>
 							<%	if (individualizado) { %>
-									<%= meritoBolsa.getMeritoSolicitud().getValoraciones().get(0).getAfinidad().getCodigo() + " " + meritoBolsa.getMeritoSolicitud().getValoraciones().get(0).getAfinidad().getModulacion() + "</br>" %>
+									<%= meritoBolsa.getMeritoSolicitud().getValoraciones().get(0).getAfinidad().getCodigo() + " " + meritoBolsa.getMeritoSolicitud().getValoraciones().get(0).getAfinidad().getModulacion() * 100 + "</br>" %>
 							<%	} else {
 									for (MeritoSolicitudValoracion valoracion: meritoBolsa.getMeritoSolicitud().getValoraciones()) { %>
-										<%= valoracion.getValor() + " - " + valoracion.getAfinidad().getCodigo() + " " + valoracion.getAfinidad().getModulacion() + "%</br>" %>
+										<%= valoracion.getValor() + " - " + valoracion.getAfinidad().getCodigo() + " " + valoracion.getAfinidad().getModulacion() * 100 + "%</br>" %>
 								<%	}
 								} %>
 								<b>Estado: </b>
@@ -219,7 +219,8 @@ UsuarioBolsaEmpleo candidato = bean.getCandidato();
 										for (MeritoSolicitudValoracion valoracion: meritoBolsa.getMeritoSolicitud().getValoraciones()) {
 											total += valoracion.getValor();
 									%>
-											<input data-afinidad="<%= valoracion.getAfinidad().getCodNum() %>" class="validar-afinidad field-no-individualizado" type="number" min="0" 
+											<label for="<%= "merito_valoracion_" + valoracion.getAfinidad().getCodNum() + "_" + idMerito %>"><%=  valoracion.getAfinidad().getCodigo() + " " + valoracion.getAfinidad().getModulacion() * 100 %></label>
+											<input id="<%= "merito_valoracion_" + valoracion.getAfinidad().getCodNum() + "_" + idMerito %>" data-afinidad="<%= valoracion.getAfinidad().getCodNum() %>" class="validar-afinidad field-no-individualizado" type="number" min="0" 
 												value="<%= valoracion.getValor() %>" step="0.01"/>
 									<%	} %>
 										<input class="validar-afinidad total-no-individualizado" data-total="<%= meritoBolsa.getMeritoSolicitud().getMerito().getValor() %>" type="number" min="0" name="total"
@@ -229,7 +230,6 @@ UsuarioBolsaEmpleo candidato = bean.getCandidato();
 								} %>
 							</td>
 							<td>
-					    		<label for="merito_observacion_candidato">Observación para el candidato:</label>
 					    		<textarea class="form-input-custom merito-observacion-candidato" 
 					    				id="merito_observacion_candidato_<%= idMerito %>"
 					    				name="<%= ControladorValidar.PARAM_OBSERVACION_CANDIDATO %>" 
@@ -435,7 +435,6 @@ $(document).ready(function() {
 			}
 			
 			document.getElementById("merito_descargar_fichero").addEventListener("click", function() {
-				console.log("au")
 				window.open("<%= ControladorDescargaFicheros.URL_DESCARGA_FICHEROS %>"
     		        	+ "<%= "?a=" + ControladorDescargaFicheros.ACCION_DESCARGAR_MERITO_PERSONAL + "&" + ControladorDescargaFicheros.PARAM_MERITO + "=" + bean.getMerito().getMerito().getCodNum() %>");
 			});
