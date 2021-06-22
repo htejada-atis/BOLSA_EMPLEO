@@ -66,7 +66,6 @@ public class ControladorValidar extends HttpServlet {
 	public static final String ACCION_DATATABLE_BOLSAS = "datatablebolsas";
 	public static final String ACCION_DATATABLE_CANDIDATOS = "datatablecandidatos";
 	public static final String ACCION_DATATABLE_MERITOS = "datatablemeritos";
-	public static final String ACCION_DESCARGAR_FICHERO = "descargarfichero";
 	public static final String ACCION_BOLSA_SELECCIONADA = "bolsaseleccionada";
 	public static final String ACCION_CANDIDATO_SELECCIONADO = "candidatoseleccionado";
 	public static final String ACCION_INDEX = "listar";

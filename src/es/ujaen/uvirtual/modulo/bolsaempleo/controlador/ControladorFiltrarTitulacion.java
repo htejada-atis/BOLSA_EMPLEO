@@ -106,7 +106,7 @@ public class ControladorFiltrarTitulacion extends HttpServlet {
 			init(bean, datos, request, response);
 			switch (nombreAccion) {
 				case ACCION_INDEX:
-					bean.setVista(JSP_INDEX);
+					index(bean);
 					break;
 				case ACCION_CANDIDATO_SELECCIONADO:
 					seleccionarCandidato(bean, request);
@@ -158,6 +158,14 @@ public class ControladorFiltrarTitulacion extends HttpServlet {
 			datos.getFicherosCSS().add("/css/jqueryujaen/jquery-ui-1.8.16.custom.css");
 		}
 	}
+
+	/** redireccion de do post.
+	 * @see HttpServlet#doPost(HttpServletRequest request, HttpServletResponse response)
+	 */
+	@Override
+	public void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+		doGet(request, response);
+	}
 	
 	private void init(VistaFiltrar bean, UVDatos datos, HttpServletRequest request, HttpServletResponse response) throws SQLException, UVException, IOException {
 		bean.setVista(JSP_INDEX);
@@ -178,17 +186,13 @@ public class ControladorFiltrarTitulacion extends HttpServlet {
 		}
 	}
 	
+	private void index(VistaFiltrar bean) {
+		bean.setVista(JSP_INDEX);
+	}
+	
 	private void errorFatal(VistaFiltrar bean, String mensaje) {
 		bean.setVista("/WEB-INF/jsp/vista/infadministrativa/bolsaempleo/error.jsp");
 		bean.getMensajesDeError().add(mensaje);
-	}
-	
-	/** redireccion de do post.
-	 * @see HttpServlet#doPost(HttpServletRequest request, HttpServletResponse response)
-	 */
-	@Override
-	public void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-		doGet(request, response);
 	}
 	
 	private void seleccionarCandidato(VistaFiltrar bean, HttpServletRequest request) throws UVException, SQLException {
