@@ -34,6 +34,12 @@ UsuarioBolsaEmpleo candidato = bean.getCandidato();
 		String n_documento = "";
 		String razon_excluido = "";
 		String usuario = "";
+		String direccion = "";
+		String codigoPostal = "";
+		String localidad = "";
+		String provincia = "";
+		String telefono = "";
+		String nacionalidad = "";
 		Boolean lista_dist = false;
 		Boolean excluido = false;
 		Date fecha_ini = null;
@@ -46,7 +52,12 @@ UsuarioBolsaEmpleo candidato = bean.getCandidato();
 			email = candidato.getEmail();
 			tipo_documento = candidato.getTipoDocumento();
 			n_documento = candidato.getPrsNif();
-			
+			direccion = candidato.getDireccion() != null ? candidato.getDireccion() : "";
+			codigoPostal = candidato.getCodigoPostal() != null ? candidato.getCodigoPostal() : "";
+			localidad = candidato.getLocalidad() != null ? candidato.getLocalidad() : "";
+			provincia = candidato.getProvincia() != null ? candidato.getProvincia() : "";
+			telefono = candidato.getTelefono() != null ? candidato.getTelefono() : "";
+			nacionalidad = candidato.getNacionalidad() != null ? candidato.getNacionalidad() : "";
 			codnum = candidato.getCodNum();
 			lista_dist = candidato.getListaDist();
 			excluido = candidato.getExcluido();
@@ -104,33 +115,33 @@ UsuarioBolsaEmpleo candidato = bean.getCandidato();
 		<div class="form-group-container">
     	    <div class="form-group">
     			<label for="direccion">Direcci&oacute;n: </label>
-    			<input class="form-input-custom" id="direccion" type="text" name="direccion" value="<%= candidato.getDireccion() %>" disabled/>
+    			<input class="form-input-custom" id="direccion" type="text" name="direccion" value="<%= direccion %>" disabled/>
     		</div>
     		<div class="form-group">
     			<label for="codigo_postal">Codigo Postal: </label>
-    			<input class="form-input-custom" id="codigo_postal" type="text" name="codigo_postal" value="<%= candidato.getCodigoPostal() %>" disabled/>
+    			<input class="form-input-custom" id="codigo_postal" type="text" name="codigo_postal" value="<%= codigoPostal %>" disabled/>
     		</div>
     	</div>
     	
     	<div class="form-group-container">
     	    <div class="form-group">
     			<label for="localidad">Localidad: </label>
-    			<input class="form-input-custom" id="localidad" type="text" name="localidad" value="<%= candidato.getLocalidad() %>" disabled/>
+    			<input class="form-input-custom" id="localidad" type="text" name="localidad" value="<%= localidad %>" disabled/>
     		</div>
     		<div class="form-group">
     			<label for="provincia">Provincia: </label>
-    			<input class="form-input-custom" id="provincia" type="text" name="provincia" value="<%= candidato.getProvincia() %>" disabled/>
+    			<input class="form-input-custom" id="provincia" type="text" name="provincia" value="<%= provincia %>" disabled/>
     		</div>
     	</div>
     	
     	<div class="form-group-container">
     		<div class="form-group">
     			<label for="telefono">Tel&eacute;fono: </label>
-    			<input class="form-input-custom" pattern="[0-9]{1,11}" id="telefono" type="text" name="telefono" value="<%= candidato.getTelefono() %>" disabled/>
+    			<input class="form-input-custom" pattern="[0-9]{1,11}" id="telefono" type="text" name="telefono" value="<%= telefono %>" disabled/>
     		</div>
     		    	    <div class="form-group">
     			<label for="nacionalidad">Nacionalidad: </label>
-    			<input class="form-input-custom" id="nacionalidad" type="text" name="nacionalidad" value="<%= candidato.getNacionalidad() %>" disabled/>
+    			<input class="form-input-custom" id="nacionalidad" type="text" name="nacionalidad" value="<%= nacionalidad %>" disabled/>
     		</div>
     	</div>
 		
