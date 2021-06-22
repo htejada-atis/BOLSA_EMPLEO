@@ -704,6 +704,32 @@ public class TestBEPControladorUsuarioCandidato {
 		assertEquals(MENSAJE_SIN_ADVERTENCIAS, 0, bean2.getMensajesDeAdvertencia().size());
 	}
 	
+	/** Confirmar solicitud del candidato .
+	 * @throws SQLException si fallo bd .
+	 * @throws IOException si error io .
+	 * @throws ServletException  si error servlet .
+	 */
+	@Test
+	public void testA26ConfirmarSolicitud() throws IOException {
+		VistaCandidatos bean = obtenerSolicitudesCandidato();
+		
+		PeticionHttp peticion = UtilsTestBolsaEmpleo.peticionAutenticadaPersonal();
+		peticion.setParameter(ControladorUsuarioCandidato.PARAM_ACCION, ControladorUsuarioCandidato.ACCION_CONFIRMAR_SOLICITUD);
+		peticion.setParameter(ControladorUsuarioCandidato.PARAM_CANDIDATO, bean.getCandidato().getCodNum().toString());
+		Solicitud solicitud = bean.getDataTableSolicitudes().getData().get(0);
+		peticion.setParameter(ControladorUsuarioCandidato.PARAM_SOLICITUD, solicitud.getCodNum().toString());
+		
+		RespuestaHttp respuesta = new RespuestaHttp();
+		ControladorUsuarioCandidato controlador = new ControladorUsuarioCandidato();
+		controlador.doPost(peticion, respuesta);
+		
+		VistaCandidatos bean2 = (VistaCandidatos) peticion.getUVDatos().getVistas().get(VistaCandidatos.class.getName());
+		
+		assertEquals(MENSAJE_CON_EXITO_ESPERADO, ControladorUsuarioCandidato.MENSAJE_EXITO_SOLICITUD_CONFIRMADA, bean2.getMensajesDeExito().get(0).toString());
+		assertEquals(MENSAJE_SIN_ERROR, 0, bean2.getMensajesDeError().size());
+		assertEquals(MENSAJE_SIN_ADVERTENCIAS, 0, bean2.getMensajesDeAdvertencia().size());
+	}
+	
 	/** Obtener datatable candidatos con parámetro no válido para forzar el error .
 	 * @throws SQLException si fallo bd .
 	 * @throws IOException si error io .

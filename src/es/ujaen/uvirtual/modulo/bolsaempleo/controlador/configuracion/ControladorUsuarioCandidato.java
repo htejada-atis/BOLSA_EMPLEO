@@ -393,6 +393,12 @@ public class ControladorUsuarioCandidato extends HttpServlet {
 			usuarioForm.setUsuarioArcos(usuArcos);
 			usuarioForm.setCodCuenta(bean.getCandidato().getCodCuenta());
 			usuarioForm.setCodNum(Formateador.leeParametroInteger(request.getParameter(PARAM_CANDIDATO)));
+			usuarioForm.setDireccion(bean.getCandidato().getDireccion());
+			usuarioForm.setCodigoPostal(bean.getCandidato().getCodigoPostal());
+			usuarioForm.setLocalidad(bean.getCandidato().getLocalidad());
+			usuarioForm.setProvincia(bean.getCandidato().getProvincia());
+			usuarioForm.setNacionalidad(bean.getCandidato().getNacionalidad());
+			usuarioForm.setTelefono(bean.getCandidato().getTelefono());
 			
 			ModeloUsuarioBolsaEmpleo.obtenerInstancia().actualizaUsuario(usuarioForm, bean.getUsuarioLogeado());
 			BolsaEmpleoUtils.addMensajeDeExito(MENSAJE_EXITO_EDITAR, bean, request);
