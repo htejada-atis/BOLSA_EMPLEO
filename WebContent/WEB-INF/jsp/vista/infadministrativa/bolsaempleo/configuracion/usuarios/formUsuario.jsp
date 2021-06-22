@@ -382,6 +382,7 @@ VistaUsuarioBolsaEmpleo bean = (VistaUsuarioBolsaEmpleo) uvdatos.getVistas().get
 				    ],
 				});
 		
+				Atis.smoothScrollToAnchor("#areas_evaluables");
 		<%	} %>
 		
 	<%	} %>
