@@ -27,13 +27,30 @@ VistaCandidatos bean = (VistaCandidatos) uvdatos.getVistas().get(VistaCandidatos
 	<h4>Nº de documento: <%= bean.getCandidato().getPrsNif() %></h4>
 	<h4>Estado solicitud: <%= bean.getSolicitud().getEstado() %></h4>
 	
-	<%	if (bean.getSolicitud().getEstado().equals(ModeloSolicitud.SOLICITUD_ESTADO_CERRADA)) { %>
-			<div style="display: flex; width: 100%; justify-content: flex-end;">
-				<button class="link-btn icon icon-download" id="descargar_solicitud">Descargar solicitud</button>
-			</div>
-	<%	} else { %>
-			<br/>
+	<div class="form-group-container col2">
+		<div class="form-group">
+			<button class="link-btn" id="candidato_volver">
+		    	 Volver
+		    </button>
+		</div>
+		<div class="form-group">
+	<%	if (bean.getSolicitud().getConvocatoria().getEstado().equals(ModeloConvocatoria.CONVOCATORIA_ESTADO_ABIERTA) &&
+			bean.getSolicitud().getEstado().equals(ModeloSolicitud.SOLICITUD_ESTADO_CERRADA)) { %>
+		    <button class="link-btn" id="reabrir_solicitud" style="float:right; margin-left: 6px;">
+		    	 Reabrir solicitud
+		    </button>
+	<%	} else if (bean.getSolicitud().getEstado().equals(ModeloSolicitud.SOLICITUD_ESTADO_ABIERTA)){ %>
+			<button class="link-btn" id="cerrar_solicitud" style="float:right; margin-left: 6px;">
+		    	 Cerrar solicitud
+		    </button>
 	<%	} %>
+	
+	
+	<%	if (bean.getSolicitud().getEstado().equals(ModeloSolicitud.SOLICITUD_ESTADO_CERRADA)) { %>
+			<button class="link-btn icon icon-download" id="descargar_solicitud" style="float:right; padding: 1.5px 6px;">Descargar solicitud</button>
+	<%	} %>
+		</div>
+	</div>
 	
 <%	for (BolsaSolicitud bolsa: bean.getListaBolsasSolicitud()) { %>
 		
@@ -86,18 +103,6 @@ VistaCandidatos bean = (VistaCandidatos) uvdatos.getVistas().get(VistaCandidatos
 			</tbody>
 		</table>
 <%	} %>
-
-	<div class="btns-by-steps">
-		<button class="link-btn" id="candidato_volver">
-	    	 Volver
-	    </button>
-	<%	if (bean.getSolicitud().getConvocatoria().getEstado().equals(ModeloConvocatoria.CONVOCATORIA_ESTADO_ABIERTA) &&
-			bean.getSolicitud().getEstado().equals(ModeloSolicitud.SOLICITUD_ESTADO_CERRADA)) { %>
-		    <button class="link-btn" id="reabrir_solicitud">
-		    	 Reabrir solicitud
-		    </button>
-	<%	} %>
-	</div>
 	
 </div>
 
@@ -118,6 +123,23 @@ VistaCandidatos bean = (VistaCandidatos) uvdatos.getVistas().get(VistaCandidatos
 			        	+ "?a=<%= ControladorDescargaFicheros.ACCION_DESCARGAR_SOLICITUD_PERSONAL + "&" + ControladorDescargaFicheros.PARAM_SOLICITUD + "=" + bean.getSolicitud().getCodNum() %>");
 			});
 		
+	<%	} else { %>
+			document.getElementById("cerrar_solicitud").addEventListener("click", function() {
+				Atis.confirmDialog("Confirmar solicitud", "¿Desea confirmar la solicitud del candidato?", {
+			    	Si: function() {
+			    		var params = {
+	            				'<%= ControladorUsuarioCandidato.PARAM_ACCION %>': '<%= ControladorUsuarioCandidato.ACCION_CONFIRMAR_SOLICITUD %>',
+	            				'<%= ControladorUsuarioCandidato.PARAM_SOLICITUD %>': '<%= bean.getSolicitud().getCodNum() %>',
+	            				'<%= ControladorUsuarioCandidato.PARAM_CANDIDATO %>': '<%= bean.getCandidato().getCodNum() %>'
+	           				};
+		        			Atis.sendForm("<%= request.getRequestURI() %>", params);
+			          	$(this).dialog("close");
+			        },
+			        No: function() {
+			          	$(this).dialog("close");
+			        }
+			    });
+			});
 	<%	} %>
 		
 		document.getElementById("candidato_volver").addEventListener("click", function() {

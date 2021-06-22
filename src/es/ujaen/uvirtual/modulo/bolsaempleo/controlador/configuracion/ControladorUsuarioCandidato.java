@@ -12,6 +12,8 @@ import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
+
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 import es.ujaen.uvirtual.adm.CrearUsuario;
@@ -27,6 +29,7 @@ import es.ujaen.uvirtual.modulo.bolsaempleo.beans.ParametrosConfiguracion;
 import es.ujaen.uvirtual.modulo.bolsaempleo.beans.Solicitud;
 import es.ujaen.uvirtual.modulo.bolsaempleo.beans.TitulacionUsuario;
 import es.ujaen.uvirtual.modulo.bolsaempleo.beans.UsuarioBolsaEmpleo;
+import es.ujaen.uvirtual.modulo.bolsaempleo.controlador.candidato.ControladorMisSolicitudes;
 import es.ujaen.uvirtual.modulo.bolsaempleo.modelo.ModeloArea;
 import es.ujaen.uvirtual.modulo.bolsaempleo.modelo.ModeloBaremacionApartados;
 import es.ujaen.uvirtual.modulo.bolsaempleo.modelo.ModeloMerito;
@@ -39,6 +42,7 @@ import es.ujaen.uvirtual.modulo.bolsaempleo.modelo.ModeloUsuarioBolsaEmpleo;
 import es.ujaen.uvirtual.modulo.bolsaempleo.utilidades.BolsaEmpleoDataTable;
 import es.ujaen.uvirtual.modulo.bolsaempleo.utilidades.BolsaEmpleoUtils;
 import es.ujaen.uvirtual.modulo.bolsaempleo.vistas.VistaCandidatos;
+import es.ujaen.uvirtual.modulo.bolsaempleo.vistas.VistaSolicitudes;
 import es.ujaen.uvirtual.utilidades.EscapaHTML;
 import es.ujaen.uvirtual.utilidades.Formateador;
 import es.ujaen.uvirtual.utilidades.UVException;
@@ -80,6 +84,7 @@ public class ControladorUsuarioCandidato extends HttpServlet {
 	// acciones
 	public static final String ACCION_ACREDITACIONES_CANDIDATO = "acreditacionescandidato";
 	public static final String ACCION_AREAS_EXCLUIDAS_CANDIDATO = "areasexcluidascandidato";
+	public static final String ACCION_CONFIRMAR_SOLICITUD = "confirmarsolicitud";
 	public static final String ACCION_DATATABLE_ACREDITACIONES_CANDIDATO = "datatableacreditacionescandidato";
 	public static final String ACCION_DATATABLE_AREAS_EXCLUIDAS_CANDIDATO = "datatableusuariosexcluidoscandidato";
 	public static final String ACCION_DATATABLE_AREAS_NO_EXCLUIDAS_CANDIDATO = "datatableareasnoexcluidascandidato";
@@ -122,6 +127,7 @@ public class ControladorUsuarioCandidato extends HttpServlet {
 	public static final String MENSAJE_EXITO_ELIMINAR = "Usuario eliminado correctamente";
 	public static final String MENSAJE_EXITO_REABRIR_SOLICITUD = "Solicitud reabrierta correctamente";
 	public static final String MENSAJE_EXITO_RESTAURAR = "Usuario restaurado correctamente";
+	public static final String MENSAJE_EXITO_SOLICITUD_CONFIRMADA = "La solicitud ha sido confirmada correctamente";
 	public static final String MENSAJE_EXITO_USUARIO_MODIFICADO_CORRECTAMENTE = "Usuario/s modificado/s correctamente";
 
 	public static final String URL_PATTERN = "/srv/es/informacionadministrativa/bolsaempleo/configuracion/candidatos";
@@ -160,6 +166,7 @@ public class ControladorUsuarioCandidato extends HttpServlet {
 			switch (nombreAccion) {
 				case ACCION_ACREDITACIONES_CANDIDATO:
 				case ACCION_AREAS_EXCLUIDAS_CANDIDATO:
+				case ACCION_CONFIRMAR_SOLICITUD:
 				case ACCION_DATATABLE_ACREDITACIONES_CANDIDATO:
 				case ACCION_DATATABLE_AREAS_EXCLUIDAS_CANDIDATO:
 				case ACCION_DATATABLE_AREAS_NO_EXCLUIDAS_CANDIDATO:
@@ -290,6 +297,7 @@ public class ControladorUsuarioCandidato extends HttpServlet {
 			case ACCION_MERITOS_CANDIDATO:
 				meritosCandidato(bean);
 				break;
+			case ACCION_CONFIRMAR_SOLICITUD:
 			case ACCION_REABRIR_SOLICITUD:
 			case ACCION_SELECCIONAR_SOLICITUD:
 				accionesSolicitud(bean, request, response, nombreAccion);
@@ -320,6 +328,9 @@ public class ControladorUsuarioCandidato extends HttpServlet {
 		bean.setSolicitud(solicitud);
 		
 		switch (nombreAccion) {
+			case ACCION_CONFIRMAR_SOLICITUD:
+				confirmarSolicitudCandidato(bean, request, response);
+				break;
 			case ACCION_REABRIR_SOLICITUD:
 				reabrirSolicitudCandidato(bean, request, response);
 				break;
@@ -329,6 +340,35 @@ public class ControladorUsuarioCandidato extends HttpServlet {
 			default:
 				errorFatal(bean, MENSAJE_ERROR_ACCION_NO_CONTEMPLADA);
 		}
+	}
+	
+	/** Confirmar la solicitud del candidato .
+	 * @param bean .
+	 * @param request .
+	 * @param response .
+	 * @throws IOException .
+	 * @throws IOException .
+	 * @throws SQLException .
+	 * @throws UVException .
+	 */
+	private void confirmarSolicitudCandidato(VistaCandidatos bean, HttpServletRequest request, HttpServletResponse response) throws SQLException, UVException, IOException {
+		bean.setVista(JSP_RESUMEN_SOLICITUD);
+		
+		ModeloSolicitud modeloSolicitud = ModeloSolicitud.obtenerInstancia();
+		
+		List<BolsaSolicitud> listaBolsas = modeloSolicitud.getBolsasSolicitudMeritos(bean.getSolicitud());
+		bean.setListaBolsasSolicitud(listaBolsas);
+		
+		modeloSolicitud.comprobarSolicitudCorrecta(bean.getSolicitud(), true);
+		
+		bean.getSolicitud().setEstado(ModeloSolicitud.SOLICITUD_ESTADO_CERRADA);
+		bean.getSolicitud().setFechaConfirmacion(BolsaEmpleoUtils.getCurrentDateTime());
+		bean.getSolicitud().setArchivo(ControladorMisSolicitudes.generarPDF(bean.getCandidato(), bean.getSolicitud(), listaBolsas));
+		
+		modeloSolicitud.confirmacionSolicitud(bean.getSolicitud(), bean.getCandidato());
+		
+		BolsaEmpleoUtils.addMensajeDeExito(MENSAJE_EXITO_SOLICITUD_CONFIRMADA, bean, request);
+		redireccionConSolicitudSeleccionada(bean, request, response, ACCION_SELECCIONAR_SOLICITUD);
 	}
 	
 	/** edita un candidato .

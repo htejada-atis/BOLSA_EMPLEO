@@ -394,6 +394,7 @@ public class ModeloUsuarioBolsaEmpleo {
 		usuario.setFechaExclusion(rs.getTimestamp("FECHA_EXCLUSION"));
 		usuario.setBorrado(rs.getString("FLGBORRADO").equals(BORRADO));
 		usuario.setFechaBorrado(rs.getTimestamp("FECHA_BORRADO"));
+		usuario.setRazonBorrado(rs.getString("RAZON_BORRADO"));
 
 		return usuario;
 	}
