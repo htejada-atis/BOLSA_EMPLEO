@@ -28,7 +28,11 @@ UsuarioBolsaEmpleo candidato = bean.getCandidato();
 		}
 	%>
 	
+<% if (merito == null) { %>
+	
 	<jsp:include page="/WEB-INF/jsp/vista/infadministrativa/bolsaempleo/mensajes.jsp" />
+	
+<%	} %>
 	
 	<h2>Validar meritos no sujetos afinidad</h2>
 	<h3><%= descripcion %></h3>
@@ -72,6 +76,9 @@ UsuarioBolsaEmpleo candidato = bean.getCandidato();
 		</table>
 		
 	<%	if (merito != null) { %>
+	
+			<br/>
+			<jsp:include page="/WEB-INF/jsp/vista/infadministrativa/bolsaempleo/mensajes.jsp" />
 	
 			<div class="row">
 				<div class="col">
@@ -198,6 +205,15 @@ UsuarioBolsaEmpleo candidato = bean.getCandidato();
 		    		<% } %>
 		    	</div>
 		    </form>
+		    <br/>
+		    <div class="btns-by-steps">
+				<button class="link-btn" id="validar_volver">
+			    	 Volver
+			    </button>
+			    <button class="link-btn" id="validar_historial">
+			    	 Ver historial de validación
+			    </button>
+			</div>
 	<%	} else { %>
 			<p>Elija un mérito para cargar el formulario de edición</p>
 	<%	} %>
@@ -353,9 +369,17 @@ $(document).ready(function() {
 			});
 			
 			document.getElementById("merito_descargar_fichero").addEventListener("click", function() {
-				console.log("au")
 				window.open("<%= ControladorDescargaFicheros.URL_DESCARGA_FICHEROS %>"
     		        	+ "<%= "?a=" + ControladorDescargaFicheros.ACCION_DESCARGAR_MERITO_PERSONAL + "&" + ControladorDescargaFicheros.PARAM_MERITO + "=" + bean.getMerito().getMerito().getCodNum() %>");
+			});
+			
+			document.getElementById("validar_volver").addEventListener("click", function() {
+				var params = {
+	    				'a': '<%= ControladorValidarNoAfines.ACCION_MERITO_SELECCIONADO %>',
+	    				'<%= ControladorValidarNoAfines.PARAM_BOLSA %>': '<%= bolsa.getCodNum() %>',
+	    				'<%= ControladorValidarNoAfines.PARAM_CANDIDATO %>': '<%= candidato.getCodNum() %>',
+	    				'<%= ControladorValidarNoAfines.PARAM_MERITO %>': row.codNum};
+	    		Atis.sendForm("<%= request.getRequestURI() %>", params);
 			});
 			
 			Atis.smoothScrollToAnchor("#tableBolsasCandidato");
