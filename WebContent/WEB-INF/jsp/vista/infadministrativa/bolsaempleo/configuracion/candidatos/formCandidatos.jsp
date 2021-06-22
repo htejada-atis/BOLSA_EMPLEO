@@ -100,6 +100,40 @@ UsuarioBolsaEmpleo candidato = bean.getCandidato();
     			<input class="form-input-custom" id="n_documento" type="text" name="<%= ControladorUsuarioCandidato.PARAM_NOMBRE %>" value="<%= n_documento %>" disabled/>
     		</div>
 		</div>
+		
+		<div class="form-group-container">
+    	    <div class="form-group">
+    			<label for="direccion">Direcci&oacute;n: </label>
+    			<input class="form-input-custom" id="direccion" type="text" name="direccion" value="<%= candidato.getDireccion() %>" disabled/>
+    		</div>
+    		<div class="form-group">
+    			<label for="codigo_postal">Codigo Postal: </label>
+    			<input class="form-input-custom" id="codigo_postal" type="text" name="codigo_postal" value="<%= candidato.getCodigoPostal() %>" disabled/>
+    		</div>
+    	</div>
+    	
+    	<div class="form-group-container">
+    	    <div class="form-group">
+    			<label for="localidad">Localidad: </label>
+    			<input class="form-input-custom" id="localidad" type="text" name="localidad" value="<%= candidato.getLocalidad() %>" disabled/>
+    		</div>
+    		<div class="form-group">
+    			<label for="provincia">Provincia: </label>
+    			<input class="form-input-custom" id="provincia" type="text" name="provincia" value="<%= candidato.getProvincia() %>" disabled/>
+    		</div>
+    	</div>
+    	
+    	<div class="form-group-container">
+    		<div class="form-group">
+    			<label for="telefono">Tel&eacute;fono: </label>
+    			<input class="form-input-custom" pattern="[0-9]{1,11}" id="telefono" type="text" name="telefono" value="<%= candidato.getTelefono() %>" disabled/>
+    		</div>
+    		    	    <div class="form-group">
+    			<label for="nacionalidad">Nacionalidad: </label>
+    			<input class="form-input-custom" id="nacionalidad" type="text" name="nacionalidad" value="<%= candidato.getNacionalidad() %>" disabled/>
+    		</div>
+    	</div>
+		
 		<div class="form-group-container">
 	    	<div class="form-check-custom">
     			<label for="usuario_lista_dist"><input class="params" type="checkbox" id="usuario_lista_dist" name="<%= ControladorUsuarioCandidato.PARAM_LISTA %>"
@@ -139,17 +173,28 @@ UsuarioBolsaEmpleo candidato = bean.getCandidato();
 		</div>
 	
 		<div class="form-group" id="razon_excluido" style="display:none;">
-    		<label for="razon_exclusion">Razón exclusión</label>
+    		<label for="razon_exclusion">Razón exclusión:</label>
     		<textarea class="params form-input-custom" id="razon_exclusion" name="<%= ControladorUsuarioCandidato.PARAM_RAZON_EXCLUIDO %>" rows="3" cols="60" <%= (excluido ? "" : "disabled") %>><%= razon_excluido %></textarea>
    		</div>
+   		
+   		<%	if (candidato != null && candidato.getBorrado()) { %>
+   				<div class="form-group-container col2">
+   					<div class="form-group" style="margin-top: 0.4rem; margin-bottom: 0.5rem;">
+   						<label for="razon_borrado">Razón borrado:</label>
+   						<textarea class="form-input-custom" id="razon_borrado" name="razonborrado" rows="2" disabled><%= bean.getCandidato().getRazonBorrado() %></textarea>
+	    			</div>
+    			</div>
+   		<%	} %>
 		
-		<div class="form-group-container col1">
-    		<div class="form-group" style="float:right;">
-    			<input id="usuario_guardar" type="submit" name="<%= ControladorUsuarioCandidato.PARAM_GUARDAR %>" value="Guardar candidato" style="float:right; margin-left: 10px;"/>
-    		<%	if (candidato != null && candidato.getBorrado()) { %>
-    				<label for="usuario_restaurar" style="margin-top: 5px; margin-left: 6px; float:right; width: unset !important;">Usuario Borrado</label>
+		<div class="form-group-container col2">
+			<div class="form-group">
+				<%	if (candidato != null && candidato.getBorrado()) { %>
     				<input id="usuario_restaurar" type="button" value="Restaurar" style="float:right;"/>
-    		<%	} else { %>
+				<%	} %>
+			</div>
+    		<div class="form-group">
+    			<input id="usuario_guardar" type="submit" name="<%= ControladorUsuarioCandidato.PARAM_GUARDAR %>" value="Guardar candidato" style="float:right; margin-left: 10px;"/>
+    		<%	if (candidato != null && !candidato.getBorrado()) { %>
     				<input id="usuario_borrar" type="button" value="Dar de baja candidato" style="float:right;"/>
     		<%	} %>
     		</div>
