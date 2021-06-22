@@ -52,35 +52,34 @@ UsuarioBolsaEmpleo candidato = bean.getCandidato();
 		</tfoot>
 	</table>
 	
-	<% if (candidato != null) { %>
+<%	if (candidato != null) { %>
 	
-		<div class="row">
-			<div class="table-responsive col">
-				<table class="bluetable bolsaempleo" id="tableMeritos">
-					<tr>
-						<th scope="col" style="width:30px">Id</th>
-						<th scope="col" style="width:30px">Estado</th>
-						<th scope="col" style="width:30px">Código</th>
-						<th scope="col" style="width:100%">Valor</th>
-						<th scope="col" style="width:30px">Fichero</th>
-					</tr>
-					<tbody>
-					</tbody>
-					<tfoot>
-						<tr>
-							<th colSpan="5" style="width:100%"></th>
-						</tr>
-					</tfoot>
-				</table>
-			</div>
-			<div class="table-responsive col-md-7">
-				<% if (merito != null) { %>
+		<table class="bluetable bolsaempleo" id="tableMeritos">
+			<tr>
+				<th scope="col" style="width:10%">Id</th>
+				<th scope="col" style="width:10%">Estado</th>
+				<th scope="col" style="width:20%">Código</th>
+				<th scope="col" style="width:50%">Valor</th>
+				<th scope="col" style="width:10%">Fichero</th>
+			</tr>
+			<tbody>
+			</tbody>
+			<tfoot>
+				<tr>
+					<th colSpan="5" style="width:100%"></th>
+				</tr>
+			</tfoot>
+		</table>
+		
+	<%	if (merito != null) { %>
+	
+			<div class="row">
+				<div class="col">
 					<table class="bluetable bolsaempleo" id="tableBolsasCandidato">
 						<tr>
-							<th scope="col" style="width:30px">Bolsa</th>
-							<th scope="col" style="width:60%">Nombre</th>
+							<th scope="col" style="width:45%">Bolsa</th>
 							<th scope="col" style="width:40%">Estado</th>
-							<th scope="col" style="width:40px">Propagar</th>
+							<th scope="col" style="width:15%">Propagar</th>
 						</tr>
 						<tbody>
 						</tbody>
@@ -90,14 +89,15 @@ UsuarioBolsaEmpleo candidato = bean.getCandidato();
 							</tr>
 						</tfoot>
 					</table>
-					
+				</div>
+				<div class="col">
 					<table class="bluetable bolsaempleo" id="tableValoresMeritoBolsas">
 						<tr>
-							<th scope="col" style="width:30px">Mérito</th>
-							<th scope="col" style="width:100%">Bolsa</th>
-							<th scope="col" style="width:40px">Valor</th>
-							<th scope="col" style="width:40px">Excluido</th>
-							<th scope="col" style="width:45px">Apuntado en Bolsa</th>
+							<th scope="col" style="width:8%">Mérito</th>
+							<th scope="col" style="width:40%">Bolsa</th>
+							<th scope="col" style="width:8%">Valor</th>
+							<th scope="col" style="width:15%">Excluido</th>
+							<th scope="col" style="width:19%">Apuntado en Bolsa</th>
 						</tr>
 						<tbody>
 						</tbody>
@@ -121,7 +121,7 @@ UsuarioBolsaEmpleo candidato = bean.getCandidato();
 		    	<div class="form-group-container col1">
 			    	<div class="form-group">
 						<label class="bold-label" for="select_item">Categoría:</label>
-						<select class="form-input-custom" id="select_item" name="">
+						<select class="form-input-custom" id="select_item" name="<%= ControladorValidarNoAfines.PARAM_ITEM %>">
 							<%
 							for(ItemBaremacion it: bean.getItems()) {
 							%>
@@ -152,7 +152,7 @@ UsuarioBolsaEmpleo candidato = bean.getCandidato();
 					<div class="form-group">
 			    		<div class="form-group">
 			    			<label for="merito_valor" id="merito_valor_label" class="bold-label">Valor:</label>
-			    			<input class="form-input-custom" id="merito_valor" type="text" name="" value="<%= merito.getMerito().getValor() %>" required/>
+			    			<input class="form-input-custom" id="merito_valor" type="text" name="<%= ControladorValidarNoAfines.PARAM_VALOR %>" value="<%= merito.getMerito().getValor() %>" required/>
 			    		</div>
 		    		</div>
 				</div>
@@ -181,7 +181,7 @@ UsuarioBolsaEmpleo candidato = bean.getCandidato();
 		    	<div class="form-group-container col1">
 			    	<div class="form-group">
 			    		<label for="merito_observacion_candidato">Observación para el candidato:</label>
-			    		<textarea class="form-input-custom" id="merito_observacion_candidato" name="<%= ControladorValidarNoAfines.PARAM_OBSERVACIONES_CANDIDATO %>" rows="2" cols="50"></textarea>
+			    		<textarea class="form-input-custom" id="merito_observacion_candidato" name="<%= ControladorValidarNoAfines.PARAM_OBSERVACION_CANDIDATO %>" rows="2" cols="50"></textarea>
 			    	</div>
 		    	</div>
 		    	
@@ -198,12 +198,10 @@ UsuarioBolsaEmpleo candidato = bean.getCandidato();
 		    		<% } %>
 		    	</div>
 		    </form>
-				<% } else { %>
-					<p>Elija un mérito para cargar el formulario de edición</p>
-				</div>
-			</div>
-				<% } %>
-	<% } %>
+	<%	} else { %>
+			<p>Elija un mérito para cargar el formulario de edición</p>
+	<%	} %>
+<%	} %>
 	
 </div>
 
@@ -304,8 +302,9 @@ $(document).ready(function() {
 			    	},
 			    <% if (bolsa != null) { %> "selected": <%= bolsa.getCodNum() %> ,<% } %>
 			    "columns": [
-			    	{'data': 'area.idAreaExterno'},
-			        {'data': 'area.descripcion'},
+			    	{'data': 'bolsa.codNum', 'render': function(row) {
+			        	return row.area.idAreaExterno + " : " + row.area.descripcion;
+		        	}},
 			        {'data': 'contieneMerito', 'order': false, 'render': function(row) {
 			        	if (row.codNum == <%= bolsa.getCodNum() %>) {
 			        		return "<div class='text-primary'>Baremación actual</div>";
