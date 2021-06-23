@@ -108,7 +108,6 @@ public class ControladorUsuarioCandidato extends HttpServlet {
 	public static final String ACCION_INCLUIR_SOLICITUD = "incluirsolicitudcandidato";
 	
 	// mensajes
-	public static final String MENSAJE_ENVIADO = "mensaje";
 	public static final String MENSAJE_ERROR_INCLUIR_AREAS = "Error al borrar áreas excluidas";
 	public static final String MENSAJE_ERROR_ACCION_NO_CONTEMPLADA = "Acción no contemplada";
 	public static final String MENSAJE_ERROR_EXCLUIDO_TIPO_VACIO = "El tipo de exclusión no puede estar vacio";
@@ -118,6 +117,9 @@ public class ControladorUsuarioCandidato extends HttpServlet {
 	public static final String MENSAJE_ERROR_RAZON_EXCLUSION_LARGO = "La razón de exclusión no puede contener mas de %d caracteres";
 	public static final String MENSAJE_ERROR_RAZON_EXCLUSION_VACIO = "Si excluye al usuario, debe especificar una razón";
 	public static final String MENSAJE_ERROR_USUARIO_NO_EXISTE = "No existe el usuario";
+	public static final String MENSAJE_ERROR_RAZON_EXCLUSION_REQUERIDA = "La razón de exclusión es requerida";
+	public static final String MENSAJE_ERROR_RAZON_EXCLUSION_LARGA = "La razón de exclusión es demasiado larga. Máximo %d carácteres";
+	public static final String MENSAJE_ERROR_SIN_PERMISO_PERSONAL = "No tienes permiso de personal";
 	
 	public static final String MENSAJE_EXITO_AGREGAR = "Usuario creado correctamente";
 	public static final String MENSAJE_EXITO_AREAS_EXCLUIDAS = "Áreas excluidas correctamente para el candidato: %s";
@@ -132,7 +134,7 @@ public class ControladorUsuarioCandidato extends HttpServlet {
 	public static final String MENSAJE_EXITO_USUARIO_MODIFICADO_CORRECTAMENTE = "Usuario/s modificado/s correctamente";
 	public static final String MENSAJE_EXITO_EXCLUSION_SOLICITUD = "Solicitud excluida correctamente";
 	public static final String MENSAJE_EXITO_INCLUSION_SOLICITUD = "Solicitud incluida correctamente";
-
+	
 	public static final String URL_PATTERN = "/srv/es/informacionadministrativa/bolsaempleo/configuracion/candidatos";
 	
 	// ajax
@@ -238,7 +240,7 @@ public class ControladorUsuarioCandidato extends HttpServlet {
 			bean.setUsuarioLogeado(ModeloUsuarioBolsaEmpleo.obtenerInstancia().getOrCreateUsuario(datos));
 
 			if (!bean.getUsuarioLogeado().getRol().getCodNum().equals(ModeloRol.ID_ROL_SERVICIO_PERSONAL)) {
-				throw new UVException("No tienes permiso de personal");
+				throw new UVException(MENSAJE_ERROR_SIN_PERMISO_PERSONAL);
 			}
 		} catch (UVException e) {
 			LOGGER.log(Level.SEVERE, Formateador.getStackTrace(e));
@@ -360,10 +362,10 @@ public class ControladorUsuarioCandidato extends HttpServlet {
 		
 		solicitud.setRazonExclusion(EscapaHTML.ajustaCodificacion(request.getParameter(PARAM_RAZON_EXCLUSION_SOLICITUD)));
 		if (solicitud.getRazonExclusion() == null || solicitud.getRazonExclusion().isEmpty()) {
-			throw new UVException("La razón de exclusión es requerida");
+			throw new UVException(MENSAJE_ERROR_RAZON_EXCLUSION_REQUERIDA);
 		}
 		if (solicitud.getRazonExclusion().length() > ModeloSolicitud.RAZON_EXCLUSION_SOLICITUD_MAXLENGTH) {
-			throw new UVException(String.format("La razón de exclusión es demasiado larga. Máximo %d carácteres", ModeloSolicitud.RAZON_EXCLUSION_SOLICITUD_MAXLENGTH));
+			throw new UVException(String.format(MENSAJE_ERROR_RAZON_EXCLUSION_LARGA, ModeloSolicitud.RAZON_EXCLUSION_SOLICITUD_MAXLENGTH));
 		}
 			
 		ModeloSolicitud.obtenerInstancia().excluirIncluirSolicitud(solicitud, true, bean.getUsuarioLogeado());
