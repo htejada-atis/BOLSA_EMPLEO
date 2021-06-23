@@ -116,8 +116,8 @@ VistaUsuarioAutoregistrado bean = (VistaUsuarioAutoregistrado)uvdatos.getVistas(
 			<input type="hidden" name="<%=ControladorUsuarioAutoregistrado.PARAM_ACCION%>" id="accionFormulario" value="<%=ControladorUsuarioAutoregistrado.ACCION_VALIDA%>" />
 			<input type="hidden" id="g-recaptcha-response-valida" name="g-recaptcha-response" value="" />
 			<input type="hidden" name="<%=ControladorUsuarioAutoregistrado.PARAM_ID_MODULO%>" value="<%=bean.getIdModulo()%>" />
-		<input type="text" value="" placeholder="Correo electrónico" id="username" />
-		<input type="password" value="" placeholder="Clave" id="password" />
+		<input type="text" name="<%=ControladorUsuarioAutoregistrado.PARAM_CORREO%>" value="" placeholder="Correo electrónico" id="username" />
+		<input type="password" name="<%=ControladorUsuarioAutoregistrado.PARAM_CLAVE%>" value="" placeholder="Clave" id="password" />
 		<input type="submit" value="Entrar">
 		</form>
 
