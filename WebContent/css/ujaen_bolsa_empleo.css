@@ -3,6 +3,7 @@
  * @copyright ATISoluciones 2021
  * 
  * 20210621 .form-group-dialog para los inputs en diálogos
+ * 20210623 afinidades en validación
  */
 
 :root {
@@ -749,3 +750,24 @@ table.bluetable.bolsaempleo input + input {
     color: inherit;
     cursor: default;
 }
+
+/* afinidades en validación */
+
+.cell-afinidad .table-afinidades tr {
+	border-top: inherit;
+	background: inherit;
+}
+
+.cell-afinidad .table-afinidades td {
+	padding: 3px;
+}
+
+.cell-afinidad select {
+	border-radius: 3px !important;
+}
+
+.merito-observacion-candidato {
+	display: block;
+	padding-top: 1px !important;
+}
+

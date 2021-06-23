@@ -12,8 +12,6 @@ import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import javax.servlet.http.HttpSession;
-
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 import es.ujaen.uvirtual.adm.CrearUsuario;
@@ -42,7 +40,6 @@ import es.ujaen.uvirtual.modulo.bolsaempleo.modelo.ModeloUsuarioBolsaEmpleo;
 import es.ujaen.uvirtual.modulo.bolsaempleo.utilidades.BolsaEmpleoDataTable;
 import es.ujaen.uvirtual.modulo.bolsaempleo.utilidades.BolsaEmpleoUtils;
 import es.ujaen.uvirtual.modulo.bolsaempleo.vistas.VistaCandidatos;
-import es.ujaen.uvirtual.modulo.bolsaempleo.vistas.VistaSolicitudes;
 import es.ujaen.uvirtual.utilidades.EscapaHTML;
 import es.ujaen.uvirtual.utilidades.Formateador;
 import es.ujaen.uvirtual.utilidades.UVException;
@@ -239,8 +236,7 @@ public class ControladorUsuarioCandidato extends HttpServlet {
 			LOGGER.log(Level.SEVERE, Formateador.getStackTrace(e));
 			LOGGER.log(Level.SEVERE, e.toString());
 			
-			BolsaEmpleoUtils.addMensajeDeError(e.getMessage(), bean, request);
-			response.sendRedirect("/srv/es/informacionadministrativa/bolsaempleo/error");
+			BolsaEmpleoUtils.redirectToError(bean, datos, request, response, e.getMessage());
 		}		
 	}
 	
@@ -283,16 +279,16 @@ public class ControladorUsuarioCandidato extends HttpServlet {
 				listadoTitulacionesCandidato(bean, datos, request, response);
 				break;
 			case ACCION_EDITAR_CANDIDATO:
-				editarCandidato(bean, request, response);
+				editarCandidato(bean, datos, request, response);
 				break;
 			case ACCION_ELIMINAR_CANDIDATO:
-				eliminarCandidato(bean, request, response);
+				eliminarCandidato(bean, datos, request, response);
 				break;
 			case ACCION_EXCLUIR_USUARIO_AREA:
-				excluirUsuarioArea(bean, request, response, true);
+				excluirUsuarioArea(bean, datos, request, response, true);
 				break;
 			case ACCION_INCLUIR_USUARIO_AREA:
-				excluirUsuarioArea(bean, request, response, false);
+				excluirUsuarioArea(bean, datos, request, response, false);
 				break;
 			case ACCION_MERITOS_CANDIDATO:
 				meritosCandidato(bean);
@@ -300,10 +296,10 @@ public class ControladorUsuarioCandidato extends HttpServlet {
 			case ACCION_CONFIRMAR_SOLICITUD:
 			case ACCION_REABRIR_SOLICITUD:
 			case ACCION_SELECCIONAR_SOLICITUD:
-				accionesSolicitud(bean, request, response, nombreAccion);
+				accionesSolicitud(bean, datos, request, response, nombreAccion);
 				break;
 			case ACCION_RECUPERAR_CANDIDATO:
-				recuperarCantidato(bean, request, response);
+				recuperarCantidato(bean, datos, request, response);
 				break;
 			case ACCION_SELECCIONAR_CANDIDATO:
 				break;
@@ -314,14 +310,14 @@ public class ControladorUsuarioCandidato extends HttpServlet {
 				bean.setApartadoTitulaciones(true);
 				break;
 			case ACCION_VOLVER_CANDIDATO:
-				redireccionConCandidatoSeleccionado(bean, request, response, ACCION_SOLICITUDES_CANDIDATO);
+				redireccionConCandidatoSeleccionado(bean, datos, request, response, ACCION_SOLICITUDES_CANDIDATO);
 				break;
 			default:
 				errorFatal(bean, MENSAJE_ERROR_ACCION_NO_CONTEMPLADA);
 		}
 	}
 	
-	private void accionesSolicitud(VistaCandidatos bean, HttpServletRequest request, HttpServletResponse response, String nombreAccion)
+	private void accionesSolicitud(VistaCandidatos bean, UVDatos datos, HttpServletRequest request, HttpServletResponse response, String nombreAccion)
 			throws SQLException, UVException, IOException {
 		Integer idSolicitud = Formateador.leeParametroInteger(BolsaEmpleoUtils.getParamRequestOrSession(request, PARAM_SOLICITUD));
 		Solicitud solicitud = ModeloSolicitud.obtenerInstancia().getSolicitudById(idSolicitud);
@@ -329,10 +325,10 @@ public class ControladorUsuarioCandidato extends HttpServlet {
 		
 		switch (nombreAccion) {
 			case ACCION_CONFIRMAR_SOLICITUD:
-				confirmarSolicitudCandidato(bean, request, response);
+				confirmarSolicitudCandidato(bean, datos, request, response);
 				break;
 			case ACCION_REABRIR_SOLICITUD:
-				reabrirSolicitudCandidato(bean, request, response);
+				reabrirSolicitudCandidato(bean, datos, request, response);
 				break;
 			case ACCION_SELECCIONAR_SOLICITUD:
 				resumenSolicitudCandidato(bean);
@@ -344,6 +340,7 @@ public class ControladorUsuarioCandidato extends HttpServlet {
 	
 	/** Confirmar la solicitud del candidato .
 	 * @param bean .
+	 * @param datos .
 	 * @param request .
 	 * @param response .
 	 * @throws IOException .
@@ -351,7 +348,8 @@ public class ControladorUsuarioCandidato extends HttpServlet {
 	 * @throws SQLException .
 	 * @throws UVException .
 	 */
-	private void confirmarSolicitudCandidato(VistaCandidatos bean, HttpServletRequest request, HttpServletResponse response) throws SQLException, UVException, IOException {
+	private void confirmarSolicitudCandidato(VistaCandidatos bean, UVDatos datos, HttpServletRequest request, HttpServletResponse response)
+			throws SQLException, UVException, IOException {
 		bean.setVista(JSP_RESUMEN_SOLICITUD);
 		
 		ModeloSolicitud modeloSolicitud = ModeloSolicitud.obtenerInstancia();
@@ -368,10 +366,11 @@ public class ControladorUsuarioCandidato extends HttpServlet {
 		modeloSolicitud.confirmacionSolicitud(bean.getSolicitud(), bean.getCandidato());
 		
 		BolsaEmpleoUtils.addMensajeDeExito(MENSAJE_EXITO_SOLICITUD_CONFIRMADA, bean, request);
-		redireccionConSolicitudSeleccionada(bean, request, response, ACCION_SELECCIONAR_SOLICITUD);
+		redireccionConSolicitudSeleccionada(bean, datos, request, response, ACCION_SELECCIONAR_SOLICITUD);
 	}
 	
 	/** edita un candidato .
+	 * @param datos .
 	 * @param request .
 	 * @param response .
 	 * @param bean bean de la vista a la que poner los valores .
@@ -379,7 +378,7 @@ public class ControladorUsuarioCandidato extends HttpServlet {
 	 * @throws UVException en caso de error en bd .
 	 * @throws IOException en caso error de input u output .
 	 */
-	private void editarCandidato(VistaCandidatos bean, HttpServletRequest request, HttpServletResponse response) 
+	private void editarCandidato(VistaCandidatos bean, UVDatos datos, HttpServletRequest request, HttpServletResponse response) 
 			throws SQLException, UVException, IOException {
 		
 		if (request.getParameter(PARAM_GUARDAR) != null) {
@@ -402,11 +401,12 @@ public class ControladorUsuarioCandidato extends HttpServlet {
 			
 			ModeloUsuarioBolsaEmpleo.obtenerInstancia().actualizaUsuario(usuarioForm, bean.getUsuarioLogeado());
 			BolsaEmpleoUtils.addMensajeDeExito(MENSAJE_EXITO_EDITAR, bean, request);
+			datos.setRespuestaEnviada(true);
 			response.sendRedirect(request.getServletPath());
 		}
 	}
 	
-	private void excluirUsuarioArea(VistaCandidatos bean, HttpServletRequest request, HttpServletResponse response, boolean excluir)
+	private void excluirUsuarioArea(VistaCandidatos bean, UVDatos datos, HttpServletRequest request, HttpServletResponse response, boolean excluir)
 			throws SQLException, UVException, IOException {
 		ModeloUsuarioBolsaEmpleo modeloUsuario = ModeloUsuarioBolsaEmpleo.obtenerInstancia();
 		int[] idsAreas = (new Gson()).fromJson(request.getParameter(PARAM_AREAS_SELECCIONADAS), new TypeToken<int[]>() { }.getType());
@@ -434,7 +434,7 @@ public class ControladorUsuarioCandidato extends HttpServlet {
 			BolsaEmpleoUtils.addMensajeDeError(excluir ? MENSAJE_ERROR_EXCLUIR_AREAS : MENSAJE_ERROR_INCLUIR_AREAS, bean, request);
 		}
 		
-		redireccionConCandidatoSeleccionado(bean, request, response, ACCION_AREAS_EXCLUIDAS_CANDIDATO);
+		redireccionConCandidatoSeleccionado(bean, datos, request, response, ACCION_AREAS_EXCLUIDAS_CANDIDATO);
 	}
 	
 	private void meritosCandidato(VistaCandidatos bean) throws SQLException {
@@ -449,7 +449,7 @@ public class ControladorUsuarioCandidato extends HttpServlet {
 		bean.setApartadoAcreditaciones(true);
 	}
 	
-	private void reabrirSolicitudCandidato(VistaCandidatos bean, HttpServletRequest request, HttpServletResponse response) 
+	private void reabrirSolicitudCandidato(VistaCandidatos bean, UVDatos datos, HttpServletRequest request, HttpServletResponse response) 
 			throws IOException, SQLException, UVException {
 		ModeloSolicitud modeloSolicitud = ModeloSolicitud.obtenerInstancia();
 		Solicitud solicitud = bean.getSolicitud();
@@ -457,39 +457,41 @@ public class ControladorUsuarioCandidato extends HttpServlet {
 		modeloSolicitud.reabrirSolicitud(solicitud, bean.getUsuarioLogeado());
 		
 		BolsaEmpleoUtils.addMensajeDeExito(MENSAJE_EXITO_REABRIR_SOLICITUD, bean, request);
-		redireccionConSolicitudSeleccionada(bean, request, response, ACCION_SELECCIONAR_SOLICITUD);
+		redireccionConSolicitudSeleccionada(bean, datos, request, response, ACCION_SELECCIONAR_SOLICITUD);
 	}
 	
-	private void redireccionConCandidatoSeleccionado(VistaCandidatos bean, HttpServletRequest request, HttpServletResponse response, String accion)
+	private void redireccionConCandidatoSeleccionado(VistaCandidatos bean, UVDatos datos, HttpServletRequest request, HttpServletResponse response, String accion)
 			throws IOException {
 		Map<String, String> params = new HashMap<>();
 		params.put(PARAM_ACCION, accion);
 		params.put(PARAM_CANDIDATO, bean.getCandidato().getCodNum().toString());
-		BolsaEmpleoUtils.redirectWithParams(request, response, params);
+		BolsaEmpleoUtils.redirectWithParams(datos, request, response, params);
 	}
 	
-	private void redireccionConSolicitudSeleccionada(VistaCandidatos bean, HttpServletRequest request, HttpServletResponse response, String accion)
+	private void redireccionConSolicitudSeleccionada(VistaCandidatos bean, UVDatos datos, HttpServletRequest request, HttpServletResponse response, String accion)
 			throws IOException {
 		Map<String, String> params = new HashMap<>();
 		params.put(PARAM_ACCION, accion);
 		params.put(PARAM_CANDIDATO, bean.getCandidato().getCodNum().toString());
 		params.put(PARAM_SOLICITUD, bean.getSolicitud().getCodNum().toString());
-		BolsaEmpleoUtils.redirectWithParams(request, response, params);
+		BolsaEmpleoUtils.redirectWithParams(datos, request, response, params);
 	}
 	
-	private void eliminarCandidato(VistaCandidatos bean, HttpServletRequest request, HttpServletResponse response)
+	private void eliminarCandidato(VistaCandidatos bean, UVDatos datos, HttpServletRequest request, HttpServletResponse response)
 			throws SQLException, UVException, IOException {
 		String razonBorrado = EscapaHTML.ajustaCodificacion(request.getParameter(PARAM_RAZON_BORRADO));
 		bean.getCandidato().setRazonBorrado(razonBorrado);
 		ModeloUsuarioBolsaEmpleo.obtenerInstancia().ponerUsuarioComoBorrado(bean.getCandidato(), bean.getUsuarioLogeado());	
 		BolsaEmpleoUtils.addMensajeDeExito(MENSAJE_EXITO_ELIMINAR, bean, request);
+		datos.setRespuestaEnviada(true);
 		response.sendRedirect(request.getServletPath());
 	}
 	
-	private void recuperarCantidato(VistaCandidatos bean, HttpServletRequest request, HttpServletResponse response) 
+	private void recuperarCantidato(VistaCandidatos bean, UVDatos datos, HttpServletRequest request, HttpServletResponse response) 
 			throws SQLException, UVException, IOException {
 		ModeloUsuarioBolsaEmpleo.obtenerInstancia().ponerUsuarioComoNoBorrado(bean.getCandidato(), bean.getUsuarioLogeado());
 		BolsaEmpleoUtils.addMensajeDeExito(MENSAJE_EXITO_RESTAURAR, bean, request);
+		datos.setRespuestaEnviada(true);
 		response.sendRedirect(request.getServletPath());
 	}
 	

@@ -260,8 +260,7 @@ public class ControladorItemsBaremacion extends HttpServlet {
 			LOGGER.log(Level.SEVERE, Formateador.getStackTrace(e));
 			LOGGER.log(Level.SEVERE, e.toString());
 			
-			BolsaEmpleoUtils.addMensajeDeError(e.getMessage(), bean, request);
-			response.sendRedirect("/srv/es/informacionadministrativa/bolsaempleo/error");
+			BolsaEmpleoUtils.redirectToError(bean, datos, request, response, e.getMessage());
 		}		
 	}
 	
@@ -293,10 +292,10 @@ public class ControladorItemsBaremacion extends HttpServlet {
 				editarApartadoConfirm(bean, request);
 				break;
 			case ACCION_DESACTIVAR_APARTADO:
-				desactivarApartado(bean, request, response);
+				desactivarApartado(bean, datos, request, response);
 				break;
 			case ACCION_ACTIVAR_APARTADO:
-				activarApartado(bean, request, response);
+				activarApartado(bean, datos, request, response);
 				break;
 			case ACCION_APARTADO_SELECCIONADO:
 				seleccionarApartado(bean, request);
@@ -352,7 +351,8 @@ public class ControladorItemsBaremacion extends HttpServlet {
 		bean.setVista(JSP_ITEM_BAREMACION);				
 	}
 	
-	private void desactivarApartado(VistaItemsBaremacion bean, HttpServletRequest request, HttpServletResponse response) throws SQLException, UVException, IOException {
+	private void desactivarApartado(VistaItemsBaremacion bean, UVDatos datos, HttpServletRequest request, HttpServletResponse response)
+			throws SQLException, UVException, IOException {
 		bean.setVista(JSP_ITEM_BAREMACION);
 		
 		ModeloBaremacionApartados modelo = ModeloBaremacionApartados.obtenerInstancia();
@@ -362,10 +362,12 @@ public class ControladorItemsBaremacion extends HttpServlet {
 		modelo.desactivarApartado(apartado, bean.getUsuarioLogeado());
 		
 		BolsaEmpleoUtils.addMensajeDeExito(MENSAJE_EXITO_APARTADO_DESACTIVAR, bean, request);
+		datos.setRespuestaEnviada(true);
 		response.sendRedirect(request.getServletPath());
 	}
 	
-	private void activarApartado(VistaItemsBaremacion bean, HttpServletRequest request, HttpServletResponse response) throws SQLException, UVException, IOException {
+	private void activarApartado(VistaItemsBaremacion bean, UVDatos datos, HttpServletRequest request, HttpServletResponse response)
+			throws SQLException, UVException, IOException {
 		bean.setVista(JSP_ITEM_BAREMACION);
 		
 		ModeloBaremacionApartados modelo = ModeloBaremacionApartados.obtenerInstancia();
@@ -375,6 +377,7 @@ public class ControladorItemsBaremacion extends HttpServlet {
 		modelo.activarApartado(apartado, bean.getUsuarioLogeado());
 		
 		BolsaEmpleoUtils.addMensajeDeExito(MENSAJE_EXITO_APARTADO_ACTIVAR, bean, request);
+		datos.setRespuestaEnviada(true);
 		response.sendRedirect(request.getServletPath());
 	}
 	
@@ -655,10 +658,10 @@ public class ControladorItemsBaremacion extends HttpServlet {
 				seleccionarItem(bean, request);
 				break;
 			case ACCION_ITEM_EXCLUYENTE_SELECCIONADO:
-				seleccionarItemExcluyente(bean, request, response, true);
+				seleccionarItemExcluyente(bean, datos, request, response, true);
 				break;
 			case ACCION_ITEM_EXCLUYENTE_DESELECCIONADO:
-				seleccionarItemExcluyente(bean, request, response, false);
+				seleccionarItemExcluyente(bean, datos, request, response, false);
 				break;
 			default:
 				this.errorFatal(bean);
@@ -853,7 +856,7 @@ public class ControladorItemsBaremacion extends HttpServlet {
 	 * @throws IOException .
 	 * @throws SQLException .
 	 */
-	private void seleccionarItemExcluyente(VistaItemsBaremacion bean, HttpServletRequest request, HttpServletResponse response, Boolean seleccionado)
+	private void seleccionarItemExcluyente(VistaItemsBaremacion bean, UVDatos datos, HttpServletRequest request, HttpServletResponse response, Boolean seleccionado)
 			throws UVException, SQLException, IOException {
 		ModeloBaremacionItems modelo = ModeloBaremacionItems.obtenerInstancia();
 		
@@ -873,15 +876,15 @@ public class ControladorItemsBaremacion extends HttpServlet {
 		bean.setBloqueBaremacion(itemPadre.getBloqueBaremacion());
 		bean.setVista(RUTA_BEP_CONF + "formItemBaremacion.jsp");
 		
-		redireccionConItemSeleccionado(bean, request, response, ACCION_EDITAR_ITEM);
+		redireccionConItemSeleccionado(bean, datos, request, response, ACCION_EDITAR_ITEM);
 	}
 	
-	private void redireccionConItemSeleccionado(VistaItemsBaremacion bean, HttpServletRequest request, HttpServletResponse response, String accion)
+	private void redireccionConItemSeleccionado(VistaItemsBaremacion bean, UVDatos datos, HttpServletRequest request, HttpServletResponse response, String accion)
 			throws IOException {
 		Map<String, String> params = new HashMap<>();
 		params.put(PARAM_ACCION, accion);
 		params.put(PARAM_ITEM, bean.getItemBaremacion().getCodNum().toString());
-		BolsaEmpleoUtils.redirectWithParams(request, response, params);
+		BolsaEmpleoUtils.redirectWithParams(datos, request, response, params);
 	}
 	
 		

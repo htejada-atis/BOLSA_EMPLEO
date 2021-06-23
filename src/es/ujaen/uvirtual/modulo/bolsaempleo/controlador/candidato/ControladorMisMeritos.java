@@ -162,8 +162,7 @@ public class ControladorMisMeritos extends HttpServlet {
 		} catch (UVException e) {
 			LOGGER.log(Level.WARNING, e.toString());
 			
-			BolsaEmpleoUtils.addMensajeDeError(e.getMessage(), bean, request);
-			response.sendRedirect("/srv/es/informacionadministrativa/bolsaempleo/error");
+			BolsaEmpleoUtils.redirectToError(bean, datos, request, response, e.getMessage());
 		}		
 	}
 	
@@ -194,10 +193,10 @@ public class ControladorMisMeritos extends HttpServlet {
 				formularioAgregarMerito(bean, request);
 				break;
 			case ACCION_AGREGAR_MERITO_CONFIRM:
-				agregarMerito(bean, request, response);
+				agregarMerito(bean, datos, request, response);
 				break;
 			case ACCION_ELIMINAR_MERITOS:
-				eliminarMeritos(bean, request, response);
+				eliminarMeritos(bean, datos, request, response);
 				break;				
 			default:
 				errorFatal(bean, "Acción no contemplada");
@@ -224,7 +223,7 @@ public class ControladorMisMeritos extends HttpServlet {
 		}
 	}
 	
-	private void agregarMerito(VistaMeritos bean, HttpServletRequest request, HttpServletResponse response)
+	private void agregarMerito(VistaMeritos bean, UVDatos datos, HttpServletRequest request, HttpServletResponse response)
 			throws SQLException, UVException, IOException, FileUploadException {
 		bean.setVista(JSP_FORM);
 		
@@ -258,12 +257,13 @@ public class ControladorMisMeritos extends HttpServlet {
 				ModeloMerito.obtenerInstancia().insertaMerito(merito, bean.getUsuarioLogeado());
 							
 				BolsaEmpleoUtils.addMensajeDeExito(MENSAJE_EXITO_AGREGAR, bean, request);
+				datos.setRespuestaEnviada(true);
 				response.sendRedirect(request.getServletPath());
 			}
 		}
 	}
 	
-	private void eliminarMeritos(VistaMeritos bean, HttpServletRequest request, HttpServletResponse response) throws SQLException, UVException, IOException {
+	private void eliminarMeritos(VistaMeritos bean, UVDatos datos, HttpServletRequest request, HttpServletResponse response) throws SQLException, UVException, IOException {
 		ModeloMerito modelo = ModeloMerito.obtenerInstancia();
 		
 		Gson gson = new GsonBuilder().create();
@@ -294,6 +294,7 @@ public class ControladorMisMeritos extends HttpServlet {
 			BolsaEmpleoUtils.addMensajeDeExito(MENSAJE_EXITO_ELIMINAR, bean, request);
 		}
 		
+		datos.setRespuestaEnviada(true);
 		response.sendRedirect(request.getServletPath());
 	}
 	

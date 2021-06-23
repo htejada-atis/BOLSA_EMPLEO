@@ -146,8 +146,7 @@ public class ControladorInicio extends HttpServlet {
 			bean.setAnonimo(bean.getUsuarioLogeado() == null);
 		} catch (UVException e) {
 			LOGGER.log(Level.WARNING, e.toString());			
-			BolsaEmpleoUtils.addMensajeDeError(e.getMessage(), bean, request);
-			response.sendRedirect("/srv/es/informacionadministrativa/bolsaempleo/error");			
+			BolsaEmpleoUtils.redirectToError(bean, datos, request, response, e.getMessage());			
 		}
 	}
 	

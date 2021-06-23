@@ -467,7 +467,8 @@ public class ModeloValidar {
 				+ "	INNER JOIN TBEP_SOLICITUDES bepsol ON bepsol.CODNUM = bepsbo.BEPSOL_CODNUM"
 				+ "	INNER JOIN TBEP_MERITOS bepmer ON bepmer.CODNUM = bepsbm.BEPMER_CODNUM"
 				+ "	INNER JOIN TBEP_ITEMSBAREMACION bepite ON bepite.CODNUM = bepmer.BEPITE_CODNUM"
-				+ "	WHERE bepsol.ESTADO = 'CERRADA' AND bepsbo.BEPBOL_CODNUM = ? AND bepsol.BEPCON_CODNUM = ? AND bepmer.BEPUSU_CODNUM = bepusu.CODNUM";
+				+ "	WHERE bepsol.ESTADO = '" + ModeloSolicitud.SOLICITUD_ESTADO_CERRADA + "' AND bepsbo.BEPBOL_CODNUM = ?"
+					+ " AND bepsol.BEPCON_CODNUM = ? AND bepmer.BEPUSU_CODNUM = bepusu.CODNUM";
 		
 		// agrega el filtro de afinidad
 		consultaCount += afinidad ? " AND bepite.AFINIDAD IS NOT NULL " : " AND bepite.AFINIDAD IS NULL ";
@@ -484,7 +485,9 @@ public class ModeloValidar {
 				+ "	INNER JOIN TBEP_ITEMSBAREMACION bepite ON bepite.CODNUM = bepmer.BEPITE_CODNUM"
 				+ "	INNER JOIN TBEP_SOL_BOL_MERITOS bepsbm ON bepmer.CODNUM = bepsbm.BEPMER_CODNUM"
 				+ "	INNER JOIN TBEP_SOLICITUD_BOLSAS bepsbo ON bepsbo.CODNUM = bepsbm.BEPSBO_CODNUM"
-				+ "	WHERE bepusu.ROL = " + ModeloRol.ID_ROL_CANDIDATO + " AND bepsbo.BEPBOL_CODNUM = ? AND bepusu.FLGBORRADO = 'N' ";
+				+ "	INNER JOIN TBEP_SOLICITUDES bepsol ON bepsol.CODNUM = bepsbo.BEPSOL_CODNUM"
+				+ "	WHERE bepusu.ROL = " + ModeloRol.ID_ROL_CANDIDATO + " AND bepsbo.BEPBOL_CODNUM = ? AND bepusu.FLGBORRADO = 'N'"
+					+ "	AND bepsol.ESTADO = '" + ModeloSolicitud.SOLICITUD_ESTADO_CERRADA + "' ";
 		
 		// agrega el filtro de afinidad
 		consulta += afinidad ? " AND bepite.AFINIDAD IS NOT NULL" : " AND bepite.AFINIDAD IS NULL";
@@ -681,17 +684,18 @@ public class ModeloValidar {
 	 * @param idBolsa .
 	 * @param idMerito .
 	 * @param observacion .
+	 * @param convocatoria .
 	 * @param usuarioUpdate .
 	 * @throws SQLException .
 	 */
-	public void validarMerito(String idBolsa, Integer idMerito, String observacion, UsuarioBolsaEmpleo usuarioUpdate) throws SQLException {
+	public void validarMerito(String idBolsa, Integer idMerito, String observacion, Convocatoria convocatoria, UsuarioBolsaEmpleo usuarioUpdate) throws SQLException {
 		String consulta = "UPDATE"
 				+ " (SELECT bepsbm.FLGEXCLUIDO AS EXCLUIDO, bepsbm.FLGVALIDADO AS VALIDADO, bepsbm.OBSERVACION_CANDIDATO AS OBSERVACION, "
 				+ "			bepsbm.UID_USUARIO AS UID_USUARIO"
-				+ "  FROM TBEP_SOL_BOL_MERITOS bepsbm"
-				+ "  INNER JOIN TBEP_SOLICITUD_BOLSAS bepsbo"
-				+ "  ON bepsbo.CODNUM = bepsbm.BEPSBO_CODNUM"
-				+ "  WHERE bepsbo.BEPBOL_CODNUM = ? AND bepsbm.BEPMER_CODNUM = ?"
+				+ "  	FROM TBEP_SOL_BOL_MERITOS bepsbm"
+				+ " 	INNER JOIN TBEP_SOLICITUD_BOLSAS bepsbo ON bepsbo.CODNUM = bepsbm.BEPSBO_CODNUM"
+				+ "		INNER JOIN TBEP_SOLICITUDES bepsol ON bepsol.CODNUM = bepsbo.BEPSOL_CODNUM"
+				+ "  	WHERE bepsbo.BEPBOL_CODNUM = ? AND bepsbm.BEPMER_CODNUM = ? AND bepsol.BEPCON_CODNUM = ?"
 				+ " ) MERITO"
 				+ " SET EXCLUIDO = 'N', VALIDADO = 'S', OBSERVACION = ?, UID_USUARIO = ?";
 
@@ -699,6 +703,7 @@ public class ModeloValidar {
 			int indexParam = 1;
 			stmtUpdate.setString(indexParam++, idBolsa);
 			stmtUpdate.setInt(indexParam++, idMerito);
+			stmtUpdate.setInt(indexParam++, convocatoria.getCodNum());
 			stmtUpdate.setString(indexParam++, observacion);
 			stmtUpdate.setString(indexParam++, usuarioUpdate.getCodCuenta());
 			stmtUpdate.executeUpdate();
@@ -710,17 +715,18 @@ public class ModeloValidar {
 	 * @param idBolsa .
 	 * @param idMerito .
 	 * @param observacion .
+	 * @param convocatoria .
 	 * @param usuarioUpdate .
 	 * @throws SQLException .
 	 */
-	public void excluirMerito(String idBolsa, Integer idMerito, String observacion, UsuarioBolsaEmpleo usuarioUpdate) throws SQLException {
+	public void excluirMerito(String idBolsa, Integer idMerito, String observacion, Convocatoria convocatoria, UsuarioBolsaEmpleo usuarioUpdate) throws SQLException {
 		String consulta = "UPDATE"
 				+ " (SELECT bepsbm.FLGEXCLUIDO AS EXCLUIDO, bepsbm.FLGVALIDADO AS VALIDADO, bepsbm.OBSERVACION_CANDIDATO AS OBSERVACION,"
 				+ "			bepsbm.UID_USUARIO AS UID_USUARIO"
-				+ "  FROM TBEP_SOL_BOL_MERITOS bepsbm"
-				+ "  INNER JOIN TBEP_SOLICITUD_BOLSAS bepsbo"
-				+ "  ON bepsbo.CODNUM = bepsbm.BEPSBO_CODNUM"
-				+ "  WHERE bepsbo.BEPBOL_CODNUM = ? AND bepsbm.BEPMER_CODNUM = ?"
+				+ "  	FROM TBEP_SOL_BOL_MERITOS bepsbm"
+				+ "  	INNER JOIN TBEP_SOLICITUD_BOLSAS bepsbo ON bepsbo.CODNUM = bepsbm.BEPSBO_CODNUM"
+				+ "		INNER JOIN TBEP_SOLICITUDES bepsol ON bepsol.CODNUM = bepsbo.BEPSOL_CODNUM"
+				+ "  	WHERE bepsbo.BEPBOL_CODNUM = ? AND bepsbm.BEPMER_CODNUM = ? AND bepsol.BEPCON_CODNUM = ?"
 				+ " ) MERITO"
 				+ " SET EXCLUIDO = 'S', VALIDADO = 'N', OBSERVACION = ?, UID_USUARIO = ?";
 
@@ -728,6 +734,7 @@ public class ModeloValidar {
 			int indexParam = 1;
 			stmtUpdate.setString(indexParam++, idBolsa);
 			stmtUpdate.setInt(indexParam++, idMerito);
+			stmtUpdate.setInt(indexParam++, convocatoria.getCodNum());
 			stmtUpdate.setString(indexParam++, observacion);
 			stmtUpdate.setString(indexParam++, usuarioUpdate.getCodCuenta());
 			stmtUpdate.executeUpdate();
@@ -735,27 +742,36 @@ public class ModeloValidar {
 	}
 	
 	/**
-	 * Método para guardar un mérito .
-	 * @param idBolsa .
+	 * Método para excluir un mérito en distintas bolsas .
 	 * @param idMerito .
 	 * @param observacion .
+	 * @param convocatoria .
+	 * @param usuarioUpdate .
 	 * @throws SQLException .
 	 */
-	public void guardarMerito(String idBolsa, Integer idMerito, String observacion) throws SQLException {
+	public void excluirMeritoEnBolsas(Integer idMerito, String observacion, Convocatoria convocatoria, UsuarioBolsaEmpleo usuarioUpdate) throws SQLException {
 		String consulta = "UPDATE"
-				+ " (SELECT bepsbm.OBSERVACION_CANDIDATO AS OBSERVACION"
-				+ "  FROM TBEP_SOL_BOL_MERITOS bepsbm"
-				+ "  INNER JOIN TBEP_SOLICITUD_BOLSAS bepsbo"
-				+ "  ON bepsbo.CODNUM = bepsbm.BEPSBO_CODNUM"
-				+ "  WHERE bepsbo.BEPBOL_CODNUM = ? AND bepsbm.BEPMER_CODNUM = ?"
+				+ " (SELECT bepsbm.FLGEXCLUIDO AS EXCLUIDO, bepsbm.FLGVALIDADO AS VALIDADO, bepsbm.OBSERVACION_CANDIDATO AS OBSERVACION,"
+				+ "			bepsbm.UID_USUARIO AS UID_USUARIO"
+				+ "  	FROM TBEP_SOL_BOL_MERITOS bepsbm"
+				+ "  	INNER JOIN TBEP_SOLICITUD_BOLSAS bepsbo ON bepsbo.CODNUM = bepsbm.BEPSBO_CODNUM"
+				+ "		INNER JOIN TBEP_SOLICITUDES bepsol ON bepsol.CODNUM = bepsbo.BEPSOL_CODNUM"
+				+ (usuarioUpdate.getRol().getValor().equals(ModeloRol.ROL_MIEMBRO_COMISION)
+						? "		INNER JOIN TBEP_EVALUADORES bepeva ON bepeva.BEPARE_CODNUM = bepsbo.BEPBOL_CODNUM AND bepeva.BEPUSU_CODNUM = ?"
+						: "")
+				+ "  	WHERE bepsbm.BEPMER_CODNUM = ? AND bepsol.BEPCON_CODNUM = ?"
 				+ " ) MERITO"
-				+ " SET OBSERVACION = ?";
+				+ " SET EXCLUIDO = 'S', VALIDADO = 'N', OBSERVACION = ?, UID_USUARIO = ?";
 
 		try (Connection conexion = ConexionUvirtual.obtenerInstancia(); PreparedStatement stmtUpdate = conexion.prepareStatement(consulta)) {
 			int indexParam = 1;
-			stmtUpdate.setString(indexParam++, idBolsa);
+			if (usuarioUpdate.getRol().getValor().equals(ModeloRol.ROL_MIEMBRO_COMISION)) {
+				stmtUpdate.setInt(indexParam++, usuarioUpdate.getCodNum());
+			}
 			stmtUpdate.setInt(indexParam++, idMerito);
+			stmtUpdate.setInt(indexParam++, convocatoria.getCodNum());
 			stmtUpdate.setString(indexParam++, observacion);
+			stmtUpdate.setString(indexParam++, usuarioUpdate.getCodCuenta());
 			stmtUpdate.executeUpdate();
 		}
 	}
@@ -770,7 +786,7 @@ public class ModeloValidar {
 	 */
 	private CandidatoValidacion createCandidatoValidacionFromResultSet(ResultSet rs, UsuarioBolsaEmpleo usuario) throws SQLException {
 		CandidatoValidacion candidato = new CandidatoValidacion(usuario);
-		candidato.setTotalMeritosNoValidados(rs.getInt("COUNT_TOTAL"));
+		candidato.setTotalMeritosNoValidados(rs.getInt("COUNT_NO_VALIDADOS"));
 		candidato.setTotalMeritosValidados(rs.getInt("COUNT_VALIDADOS"));
 		candidato.setTotalMeritosExcluidos(rs.getInt("COUNT_EXCLUIDOS"));
 		candidato.setTotalMeritos(rs.getInt("COUNT_TOTAL"));
@@ -782,7 +798,7 @@ public class ModeloValidar {
 		ModeloBolsa modeloBolsa = ModeloBolsa.obtenerInstancia();
 		Bolsa bolsa = modeloBolsa.createFromResultSet(rs);
 		BolsaValidacion bolsaValidacion = new BolsaValidacion(bolsa);
-		bolsaValidacion.setTotalMeritosNoValidados(rs.getInt("COUNT_TOTAL"));
+		bolsaValidacion.setTotalMeritosNoValidados(rs.getInt("COUNT_NO_VALIDADOS"));
 		bolsaValidacion.setTotalMeritosValidados(rs.getInt("COUNT_VALIDADOS"));
 		bolsaValidacion.setTotalMeritosExcluidos(rs.getInt("COUNT_EXCLUIDOS"));
 		bolsaValidacion.setTotalMeritos(rs.getInt("COUNT_TOTAL"));
