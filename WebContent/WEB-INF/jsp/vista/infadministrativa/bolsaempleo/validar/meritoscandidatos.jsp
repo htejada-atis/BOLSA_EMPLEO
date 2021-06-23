@@ -81,11 +81,11 @@ UsuarioBolsaEmpleo candidato = bean.getCandidato();
 		</table>
 		
 		<% if (merito != null) { %>
-		
-			<br/>
+			<div id="anchor_modificar_merito" style="margin-bottom: 24px;"></div>
+			
 			<jsp:include page="/WEB-INF/jsp/vista/infadministrativa/bolsaempleo/mensajes.jsp" />
 			
-			<h3 id="anchor_modificar_merito">Modificar mérito: <%= merito.getMerito().getCodNum() %></h3>
+			<h3>Modificar mérito: <%= merito.getMerito().getCodNum() %></h3>
 			
 			<form id="validar_merito" class="be-form" method="post" action="<%= request.getRequestURI() %>">
 		    	<input type="hidden" name="<%= ControladorValidar.PARAM_ACCION %>" id="accion_formulario" value="<%= ControladorValidar.ACCION_MODIFICAR_MERITO %>" />
