@@ -63,7 +63,6 @@ public class ControladorFiltrarAcreditaciones extends HttpServlet {
 	public static final String PARAM_ACCION = "a";
 	public static final String PARAM_ACREDITACION = "acreditacion";
 	public static final String PARAM_CANDIDATO = "candidato";
-	public static final String PARAM_FICHERO = "fichero";
 	
 	// ruta vistas
 	public static final String RUTA_BEP_FILACRE = "/WEB-INF/jsp/vista/infadministrativa/bolsaempleo/filtraracreditaciones/";
