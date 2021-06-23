@@ -12,7 +12,6 @@ import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import javax.servlet.http.HttpSession;
 
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
@@ -42,7 +41,6 @@ import es.ujaen.uvirtual.modulo.bolsaempleo.modelo.ModeloUsuarioBolsaEmpleo;
 import es.ujaen.uvirtual.modulo.bolsaempleo.utilidades.BolsaEmpleoDataTable;
 import es.ujaen.uvirtual.modulo.bolsaempleo.utilidades.BolsaEmpleoUtils;
 import es.ujaen.uvirtual.modulo.bolsaempleo.vistas.VistaCandidatos;
-import es.ujaen.uvirtual.modulo.bolsaempleo.vistas.VistaSolicitudes;
 import es.ujaen.uvirtual.utilidades.EscapaHTML;
 import es.ujaen.uvirtual.utilidades.Formateador;
 import es.ujaen.uvirtual.utilidades.UVException;
@@ -80,6 +78,7 @@ public class ControladorUsuarioCandidato extends HttpServlet {
 	public static final String PARAM_RAZON_BORRADO = "razonborrado";
 	public static final String PARAM_RAZON_EXCLUIDO = "razonexcluido";
 	public static final String PARAM_SOLICITUD = "solicitud";
+	public static final String PARAM_RAZON_EXCLUSION_SOLICITUD = "razonexclusionsolicitud";
 	
 	// acciones
 	public static final String ACCION_ACREDITACIONES_CANDIDATO = "acreditacionescandidato";
@@ -105,6 +104,8 @@ public class ControladorUsuarioCandidato extends HttpServlet {
 	public static final String ACCION_SOLICITUDES_CANDIDATO = "solicitudescandidato";
 	public static final String ACCION_TITULACIONES_CANDIDATO = "titulacionescandidato";
 	public static final String ACCION_VOLVER_CANDIDATO = "volvercandidato";
+	public static final String ACCION_EXCLUIR_SOLICITUD = "excluirsolicitudcandidato";	
+	public static final String ACCION_INCLUIR_SOLICITUD = "incluirsolicitudcandidato";
 	
 	// mensajes
 	public static final String MENSAJE_ENVIADO = "mensaje";
@@ -129,6 +130,8 @@ public class ControladorUsuarioCandidato extends HttpServlet {
 	public static final String MENSAJE_EXITO_RESTAURAR = "Usuario restaurado correctamente";
 	public static final String MENSAJE_EXITO_SOLICITUD_CONFIRMADA = "La solicitud ha sido confirmada correctamente";
 	public static final String MENSAJE_EXITO_USUARIO_MODIFICADO_CORRECTAMENTE = "Usuario/s modificado/s correctamente";
+	public static final String MENSAJE_EXITO_EXCLUSION_SOLICITUD = "Solicitud excluida correctamente";
+	public static final String MENSAJE_EXITO_INCLUSION_SOLICITUD = "Solicitud incluida correctamente";
 
 	public static final String URL_PATTERN = "/srv/es/informacionadministrativa/bolsaempleo/configuracion/candidatos";
 	
@@ -185,6 +188,8 @@ public class ControladorUsuarioCandidato extends HttpServlet {
 				case ACCION_SOLICITUDES_CANDIDATO:
 				case ACCION_TITULACIONES_CANDIDATO:
 				case ACCION_VOLVER_CANDIDATO:
+				case ACCION_EXCLUIR_SOLICITUD:
+				case ACCION_INCLUIR_SOLICITUD:
 					accionesCandidato(bean, datos, request, response, nombreAccion);
 					break;
 				case ACCION_INDEX:
@@ -300,6 +305,8 @@ public class ControladorUsuarioCandidato extends HttpServlet {
 			case ACCION_CONFIRMAR_SOLICITUD:
 			case ACCION_REABRIR_SOLICITUD:
 			case ACCION_SELECCIONAR_SOLICITUD:
+			case ACCION_EXCLUIR_SOLICITUD:
+			case ACCION_INCLUIR_SOLICITUD:
 				accionesSolicitud(bean, request, response, nombreAccion);
 				break;
 			case ACCION_RECUPERAR_CANDIDATO:
@@ -337,9 +344,40 @@ public class ControladorUsuarioCandidato extends HttpServlet {
 			case ACCION_SELECCIONAR_SOLICITUD:
 				resumenSolicitudCandidato(bean);
 				break;
+			case ACCION_EXCLUIR_SOLICITUD:
+				excluirSolicitudCandidato(bean, request, response);
+				break;
+			case ACCION_INCLUIR_SOLICITUD:
+				incluirSolicitudCandidato(bean, request, response);
+				break;
 			default:
 				errorFatal(bean, MENSAJE_ERROR_ACCION_NO_CONTEMPLADA);
 		}
+	}
+	
+	private void excluirSolicitudCandidato(VistaCandidatos bean, HttpServletRequest request, HttpServletResponse response) throws UVException, SQLException, IOException {
+		Solicitud solicitud = bean.getSolicitud();
+		
+		solicitud.setRazonExclusion(EscapaHTML.ajustaCodificacion(request.getParameter(PARAM_RAZON_EXCLUSION_SOLICITUD)));
+		if (solicitud.getRazonExclusion() == null || solicitud.getRazonExclusion().isEmpty()) {
+			throw new UVException("La razón de exclusión es requerida");
+		}
+		if (solicitud.getRazonExclusion().length() > ModeloSolicitud.RAZON_EXCLUSION_SOLICITUD_MAXLENGTH) {
+			throw new UVException(String.format("La razón de exclusión es demasiado larga. Máximo %d carácteres", ModeloSolicitud.RAZON_EXCLUSION_SOLICITUD_MAXLENGTH));
+		}
+			
+		ModeloSolicitud.obtenerInstancia().excluirIncluirSolicitud(solicitud, true, bean.getUsuarioLogeado());
+		
+		BolsaEmpleoUtils.addMensajeDeExito(MENSAJE_EXITO_EXCLUSION_SOLICITUD, bean, request);
+		redireccionConSolicitudSeleccionada(bean, request, response, ACCION_SELECCIONAR_SOLICITUD);
+	}
+	
+	private void incluirSolicitudCandidato(VistaCandidatos bean, HttpServletRequest request, HttpServletResponse response) throws UVException, SQLException, IOException {
+		Solicitud solicitud = bean.getSolicitud();
+		ModeloSolicitud.obtenerInstancia().excluirIncluirSolicitud(solicitud, false, bean.getUsuarioLogeado());
+		
+		BolsaEmpleoUtils.addMensajeDeExito(MENSAJE_EXITO_INCLUSION_SOLICITUD, bean, request);
+		redireccionConSolicitudSeleccionada(bean, request, response, ACCION_SELECCIONAR_SOLICITUD);
 	}
 	
 	/** Confirmar la solicitud del candidato .
@@ -718,7 +756,7 @@ public class ControladorUsuarioCandidato extends HttpServlet {
 				BolsaEmpleoDataTable<Solicitud> dataTable = ModeloSolicitud.obtenerInstancia().listaSolicitudesCandidatoDatatable(
 						bean.getCandidato(), request.getParameterMap());
 				bean.setDataTableSolicitudes(dataTable);
-				writer.write(dataTable.toJson());
+				writer.write(dataTable.toJson("dd/M/yyyy HH:mm:ss"));
 			} catch (UVException e) {
 				LOGGER.log(Level.WARNING, e.toString());
 				bean.getMensajesDeError().add(e.getMessage());

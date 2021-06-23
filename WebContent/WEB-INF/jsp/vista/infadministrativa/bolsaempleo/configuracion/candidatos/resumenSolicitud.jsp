@@ -1,3 +1,4 @@
+<%@page import="es.ujaen.uvirtual.utilidades.Formateador"%>
 <%@page import="es.ujaen.uvirtual.modulo.bolsaempleo.beans.TitulacionUsuario"%>
 <%@ page trimDirectiveWhitespaces="true" %>
 <%@ page import="es.ujaen.uvirtual.beans.UVDatos" %>
@@ -23,17 +24,23 @@ VistaCandidatos bean = (VistaCandidatos) uvdatos.getVistas().get(VistaCandidatos
 	
 	<h2>Resumen solicitud - <%= bean.getCandidato().getCodCuenta() %></h2>
 	
+	<h4>Convocatoria: <%= bean.getSolicitud().getConvocatoria().getDescripcion() %>&nbsp;(<%= bean.getSolicitud().getConvocatoria().getEstado() %>)</h4>
 	<h4>Nombre: <%= bean.getCandidato().getNombre() + " " + bean.getCandidato().getPrimerApellido() + " " + bean.getCandidato().getSegundoApellido() %></h4>
 	<h4>Nº de documento: <%= bean.getCandidato().getPrsNif() %></h4>
 	<h4>Estado solicitud: <%= bean.getSolicitud().getEstado() %></h4>
 	
+	<% if (bean.getSolicitud().getExcluido()) { %>
+		<h4>EXCLUIDA: <%= Formateador.formatoFecha(bean.getSolicitud().getFechaExclusion(), Formateador.FORMATO_FECHA_DDMMYYYY_HHMMSS) %> - <%= bean.getSolicitud().getRazonExclusion() %></h4>
+	<% } %>
+	
 	<div class="form-group-container col2">
 		<div class="form-group">
-			<button class="link-btn" id="candidato_volver">
+			<button class="link-btn" id="candidato_volver" style="float:left;">
 		    	 Volver
 		    </button>
 		</div>
 		<div class="form-group">
+	
 	<%	if (bean.getSolicitud().getConvocatoria().getEstado().equals(ModeloConvocatoria.CONVOCATORIA_ESTADO_ABIERTA) &&
 			bean.getSolicitud().getEstado().equals(ModeloSolicitud.SOLICITUD_ESTADO_CERRADA)) { %>
 		    <button class="link-btn" id="reabrir_solicitud" style="float:right; margin-left: 6px;">
@@ -45,7 +52,16 @@ VistaCandidatos bean = (VistaCandidatos) uvdatos.getVistas().get(VistaCandidatos
 		    </button>
 	<%	} %>
 	
-	
+	<%  if (bean.getSolicitud().getExcluido()) { %>
+			<button class="link-btn" id="incluir_solicitud" style="float:right; margin-left: 6px;">
+		    	 Incluir solicitud
+		    </button>
+	<%  } else { %>
+			<button class="link-btn" id="excluir_solicitud" style="float:right; margin-left: 6px;">
+		    	 Excluir solicitud
+		    </button>
+	<%	} %>
+		
 	<%	if (bean.getSolicitud().getEstado().equals(ModeloSolicitud.SOLICITUD_ESTADO_CERRADA)) { %>
 			<button class="link-btn icon icon-download" id="descargar_solicitud" style="float:right; padding: 1.5px 6px;">Descargar solicitud</button>
 	<%	} %>
@@ -167,7 +183,59 @@ VistaCandidatos bean = (VistaCandidatos) uvdatos.getVistas().get(VistaCandidatos
 			    });
 			});
 	<%	} %>
-		
+	
+	<%  if (bean.getSolicitud().getExcluido()) { %>	
+			document.getElementById("incluir_solicitud").addEventListener("click", function() {
+				var message = "<h3>¿Desea incluir la solicitud del candidato de esta convocatoria?</h3>";
+				
+				Atis.confirmDialog("Incluir solicitud", message, {
+			    	Si: function() {
+		    			Atis.sendForm("<%= request.getRequestURI() %>", {
+							'<%=ControladorUsuarioCandidato.PARAM_ACCION%>': '<%=ControladorUsuarioCandidato.ACCION_INCLUIR_SOLICITUD%>',
+							'<%=ControladorUsuarioCandidato.PARAM_CANDIDATO%>': '<%=bean.getCandidato().getCodNum()%>',
+							'<%=ControladorUsuarioCandidato.PARAM_SOLICITUD%>': '<%=bean.getSolicitud().getCodNum()%>'
+						});
+			          	$(this).dialog("close");
+			        },
+			        No: function() {
+			          	$(this).dialog("close");
+			        }
+			    });
+			});
+	
+	<%  } else { %>
+			document.getElementById("excluir_solicitud").addEventListener("click", function() {
+				var message = 
+					"<h3>¿Desea excluir la solicitud del candidato de esta convocatoria?</h3>" +
+					"<p>Esta solicitud no entrará en el cálculo.</p><br/>" +
+					"<div class='form-group-dialog'>" +
+					"	<label for='razon_exclusion'>Razón de exclusión: </label>" +
+					"	<textarea id='razon_exclusion' name='razonexclusion' rows='2' required='required'></textarea>" +
+					"</div>";
+				
+				Atis.confirmDialog("Excluir solicitud", message, {
+			    	Si: function() {
+			    		var inputRazon = this.querySelector('#razon_exclusion');			    		
+			    		if (inputRazon.value != '') {
+				    		Atis.sendForm("<%= request.getRequestURI() %>", {
+								'<%=ControladorUsuarioCandidato.PARAM_ACCION%>': '<%=ControladorUsuarioCandidato.ACCION_EXCLUIR_SOLICITUD%>',
+								'<%=ControladorUsuarioCandidato.PARAM_CANDIDATO%>': '<%=bean.getCandidato().getCodNum()%>',
+								'<%=ControladorUsuarioCandidato.PARAM_SOLICITUD%>': '<%=bean.getSolicitud().getCodNum()%>',
+								'<%=ControladorUsuarioCandidato.PARAM_RAZON_EXCLUSION_SOLICITUD%>': inputRazon.value
+							});
+				          	$(this).dialog("close");
+			    		} else {
+			    			inputRazon.setCustomValidity("La razón de exclusión no puede estar vacía");
+			    			inputRazon.reportValidity();
+			    		}
+			        },
+			        No: function() {
+			          	$(this).dialog("close");
+			        }
+			    });
+			});
+	<%	} %>
+	
 	});
 
 </script>

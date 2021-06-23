@@ -448,7 +448,7 @@ UsuarioBolsaEmpleo candidato = bean.getCandidato();
 			    "title": "SOLICITUDES",
 			    "clickable": {'onClick': function(row) {
 			    	var params = {
-		    				'a': '<%= ControladorUsuarioCandidato.ACCION_SELECCIONAR_SOLICITUD %>',
+		    				'<%= ControladorUsuarioCandidato.PARAM_ACCION %>': '<%= ControladorUsuarioCandidato.ACCION_SELECCIONAR_SOLICITUD %>',
 		    				'<%= ControladorUsuarioCandidato.PARAM_CANDIDATO %>': '<%= bean.getCandidato().getCodNum() %>',
 		    				'<%= ControladorUsuarioCandidato.PARAM_SOLICITUD %>': row.codNum};
 		    		Atis.sendForm("<%= request.getRequestURI() %>", params);
@@ -457,7 +457,9 @@ UsuarioBolsaEmpleo candidato = bean.getCandidato();
 			    "columns": [
 			    	{'data': 'codNum', 'filter': {'type': 'number'}},
 			    	{'data': 'convocatoria.descripcion', 'filter': true},
-			        {'data': 'estado', 'filter': true},
+			        {'data': 'estado', 'filter': false, 'render': function(row) { 
+			        	return row.estado + (row.excluido ? " (excluida)" : "");
+			        }},
 			        {'data': 'fechaConfirmacion', order: {'active': false}, 'render': function(row) {
 			        	return row.estado == 'CERRADA' ? row.fechaConfirmacion : '';
 			        }}			        

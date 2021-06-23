@@ -71,6 +71,7 @@ public class ModeloSolicitud {
 	public static final String FLGVALIDADO = "FLGVALIDADO";
 	public static final String OBSERVACION_CANDIDATO = "OBSERVACION_CANDIDATO";
 	public static final String S = "S";
+	public static final int RAZON_EXCLUSION_SOLICITUD_MAXLENGTH = 500;
 		
 	protected static ModeloSolicitud eInstancia;
 	
@@ -1281,6 +1282,46 @@ public class ModeloSolicitud {
 			stmt.executeUpdate();
 		}
 	}
+	
+	/**
+	 * Excluye/incluye una solicitud de un candidato para que no se evaluada.
+	 * @param solicitud .
+	 * @param excluir .
+	 * @param usuarioUpdate .
+	 * @throws UVException .
+	 * @throws SQLException .
+	 */
+	public void excluirIncluirSolicitud(Solicitud solicitud, boolean excluir, UsuarioBolsaEmpleo usuarioUpdate) throws UVException, SQLException {
+		if (solicitud == null) {
+			throw new UVException("No se puede reabrir una solicitud vacía");
+		}
+		
+		if (solicitud.getCodNum() == null) {
+			throw new UVException("No se puede reabrir una solicitud con id vacío");
+		}
+		
+		String consulta = ""
+				+ " UPDATE TBEP_SOLICITUDES "
+				+ " SET FLGEXCLUIDO=?, RAZON_EXCLUSION=?, FECHA_EXCLUSION=?, UID_USUARIO=?"
+				+ " WHERE CODNUM=?";
+		try (Connection conexion = ConexionUvirtual.obtenerInstancia(); PreparedStatement stmt = conexion.prepareStatement(consulta)) {
+			int parameterIndex = 1;
+			
+			if (excluir) {
+				stmt.setString(parameterIndex++, SOLICITUD_EXCLUIDA);
+				stmt.setString(parameterIndex++, solicitud.getRazonExclusion());
+				stmt.setDate(parameterIndex++, new Date(BolsaEmpleoUtils.getCurrentDateTime().getTime()));
+			} else {
+				stmt.setString(parameterIndex++, SOLICITUD_NO_EXCLUIDA);
+				stmt.setNull(parameterIndex++, Types.VARCHAR);
+				stmt.setNull(parameterIndex++, Types.DATE);
+			}
+			
+			stmt.setString(parameterIndex++, usuarioUpdate.getCodCuenta());
+			stmt.setInt(parameterIndex++, solicitud.getCodNum());
+			stmt.executeUpdate();
+		}
+	} 
 		
 	/**
 	 * Comprueba los méritos que tienen afinidad y no tienen valoración .
@@ -1766,10 +1807,11 @@ public class ModeloSolicitud {
 		Solicitud solicitud = new Solicitud();
 		
 		solicitud.setCodNum(rs.getInt("CODNUM"));
+		solicitud.setUsuario(ModeloUsuarioBolsaEmpleo.obtenerInstancia().getUsuarioById(rs.getInt("BEPUSU_CODNUM")));
 		solicitud.setConvocatoria(ModeloConvocatoria.obtenerInstancia().getConvocatoriaById(rs.getInt("BEPCON_CODNUM")));
 		solicitud.setEstado(rs.getString("ESTADO") != null ? rs.getString("ESTADO") : ModeloSolicitud.SOLICITUD_ESTADO_CERRADA);
-		solicitud.setExcluido(rs.getString("FLGEXCLUIDO").equals(SOLICITUD_EXCLUIDA));
-		solicitud.setUsuario(ModeloUsuarioBolsaEmpleo.obtenerInstancia().getUsuarioById(rs.getInt("BEPUSU_CODNUM")));
+		solicitud.setFechaConfirmacion(rs.getDate("FECHACONFIRMACION"));
+		solicitud.setExcluido(rs.getString("FLGEXCLUIDO").equals(SOLICITUD_EXCLUIDA));		
 		solicitud.setRazonExclusion(rs.getString("RAZON_EXCLUSION"));
 		solicitud.setFechaExclusion(rs.getDate("FECHA_EXCLUSION"));
 		
