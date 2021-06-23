@@ -54,6 +54,7 @@ public class TestBEPControladorUsuarioCandidato {
 	private static final String EXCLUIDO_FECHA_FIN = "11/07/2021";
 	private static final String LISTA_CANDIDATO = "true";
 	private static final String RAZON_EXCLUSION_CANDIDATO = "test";
+	private static final int CARACTERES_LARGOS = 600;
 	
 	
 	/** prepara la bd con los datos iniciales .
@@ -99,7 +100,7 @@ public class TestBEPControladorUsuarioCandidato {
 		return (VistaCandidatos) peticion.getUVDatos().getVistas().get(VistaCandidatos.class.getName());
 	}
 	
-	// método para obtener la vista con una lista de áreas excluidas o no excluidas .
+	// método para obtener la vista con una lista de solicitudes .
 	private VistaCandidatos obtenerSolicitudesCandidato() throws IOException {
 		VistaCandidatos bean = obtenerCandidatos();
 		
@@ -704,6 +705,89 @@ public class TestBEPControladorUsuarioCandidato {
 		assertEquals(MENSAJE_SIN_ADVERTENCIAS, 0, bean2.getMensajesDeAdvertencia().size());
 	}
 	
+	/** Confirmar solicitud del candidato .
+	 * @throws SQLException si fallo bd .
+	 * @throws IOException si error io .
+	 * @throws ServletException  si error servlet .
+	 */
+	@Test
+	public void testA26ConfirmarSolicitud() throws IOException {
+		VistaCandidatos bean = obtenerSolicitudesCandidato();
+		
+		PeticionHttp peticion = UtilsTestBolsaEmpleo.peticionAutenticadaPersonal();
+		peticion.setParameter(ControladorUsuarioCandidato.PARAM_ACCION, ControladorUsuarioCandidato.ACCION_CONFIRMAR_SOLICITUD);
+		peticion.setParameter(ControladorUsuarioCandidato.PARAM_CANDIDATO, bean.getCandidato().getCodNum().toString());
+		Solicitud solicitud = bean.getDataTableSolicitudes().getData().get(0);
+		peticion.setParameter(ControladorUsuarioCandidato.PARAM_SOLICITUD, solicitud.getCodNum().toString());
+		
+		RespuestaHttp respuesta = new RespuestaHttp();
+		ControladorUsuarioCandidato controlador = new ControladorUsuarioCandidato();
+		controlador.doPost(peticion, respuesta);
+		
+		VistaCandidatos bean2 = (VistaCandidatos) peticion.getUVDatos().getVistas().get(VistaCandidatos.class.getName());
+		
+		assertEquals(MENSAJE_CON_EXITO_ESPERADO, ControladorUsuarioCandidato.MENSAJE_EXITO_SOLICITUD_CONFIRMADA, bean2.getMensajesDeExito().get(0).toString());
+		assertEquals(MENSAJE_SIN_ERROR, 0, bean2.getMensajesDeError().size());
+		assertEquals(MENSAJE_SIN_ADVERTENCIAS, 0, bean2.getMensajesDeAdvertencia().size());
+	}
+	
+    /**
+	 * Excluir solicitud del candidato .
+	 * 
+	 * @throws SQLException     si fallo bd .
+	 * @throws IOException      si error io .
+	 * @throws ServletException si error servlet .
+	 */
+	@Test
+	public void testA27excluirSolicitudCandidato() throws IOException {
+		VistaCandidatos bean = obtenerSolicitudesCandidato();
+
+		Solicitud solicitud = bean.getDataTableSolicitudes().getData().get(0);
+		PeticionHttp peticion = UtilsTestBolsaEmpleo.peticionAutenticadaPersonal();
+		peticion.setParameter(ControladorUsuarioCandidato.PARAM_ACCION, ControladorUsuarioCandidato.ACCION_EXCLUIR_SOLICITUD);
+		peticion.setParameter(ControladorUsuarioCandidato.PARAM_CANDIDATO, bean.getCandidato().getCodNum().toString());
+		peticion.setParameter(ControladorUsuarioCandidato.PARAM_SOLICITUD, solicitud.getCodNum().toString());
+		peticion.setParameter(ControladorUsuarioCandidato.PARAM_RAZON_EXCLUSION_SOLICITUD, "Sin titulaciones");
+
+		RespuestaHttp respuesta = new RespuestaHttp();
+		ControladorUsuarioCandidato controlador = new ControladorUsuarioCandidato();
+		controlador.doPost(peticion, respuesta);
+
+		VistaCandidatos bean2 = (VistaCandidatos) peticion.getUVDatos().getVistas().get(VistaCandidatos.class.getName());
+
+		assertEquals(MENSAJE_CON_EXITO_ESPERADO, ControladorUsuarioCandidato.MENSAJE_EXITO_EXCLUSION_SOLICITUD, bean2.getMensajesDeExito().get(0).toString());
+		assertEquals(MENSAJE_SIN_ERROR, 0, bean2.getMensajesDeError().size());
+		assertEquals(MENSAJE_SIN_ADVERTENCIAS, 0, bean2.getMensajesDeAdvertencia().size());
+	}
+	
+    /**
+	 * Incluir solicitud del candidato .
+	 * 
+	 * @throws SQLException     si fallo bd .
+	 * @throws IOException      si error io .
+	 * @throws ServletException si error servlet .
+	 */
+	@Test
+	public void testA28incluirSolicitudCandidato() throws IOException {
+		VistaCandidatos bean = obtenerSolicitudesCandidato();
+
+		Solicitud solicitud = bean.getDataTableSolicitudes().getData().get(0);
+		PeticionHttp peticion = UtilsTestBolsaEmpleo.peticionAutenticadaPersonal();
+		peticion.setParameter(ControladorUsuarioCandidato.PARAM_ACCION, ControladorUsuarioCandidato.ACCION_INCLUIR_SOLICITUD);
+		peticion.setParameter(ControladorUsuarioCandidato.PARAM_CANDIDATO, bean.getCandidato().getCodNum().toString());
+		peticion.setParameter(ControladorUsuarioCandidato.PARAM_SOLICITUD, solicitud.getCodNum().toString());
+
+		RespuestaHttp respuesta = new RespuestaHttp();
+		ControladorUsuarioCandidato controlador = new ControladorUsuarioCandidato();
+		controlador.doPost(peticion, respuesta);
+
+		VistaCandidatos bean2 = (VistaCandidatos) peticion.getUVDatos().getVistas().get(VistaCandidatos.class.getName());
+
+		assertEquals(MENSAJE_CON_EXITO_ESPERADO, ControladorUsuarioCandidato.MENSAJE_EXITO_INCLUSION_SOLICITUD, bean2.getMensajesDeExito().get(0).toString());
+		assertEquals(MENSAJE_SIN_ERROR, 0, bean2.getMensajesDeError().size());
+		assertEquals(MENSAJE_SIN_ADVERTENCIAS, 0, bean2.getMensajesDeAdvertencia().size());
+	}
+	
 	/** Obtener datatable candidatos con parámetro no válido para forzar el error .
 	 * @throws SQLException si fallo bd .
 	 * @throws IOException si error io .
@@ -890,4 +974,64 @@ public class TestBEPControladorUsuarioCandidato {
 		assertEquals(MENSAJE_SIN_EXITO, 0, bean2.getMensajesDeExito().size());
 	}
 	
+    /**
+	 * Errores al excluir solicitud del candidato .
+	 * 
+	 * @throws SQLException     si fallo bd .
+	 * @throws IOException      si error io .
+	 * @throws ServletException si error servlet .
+	 */
+	@Test
+	public void testE081excluirSolicitudCandidato() throws IOException {
+		VistaCandidatos bean = obtenerSolicitudesCandidato();
+
+		Solicitud solicitud = bean.getDataTableSolicitudes().getData().get(0);
+		PeticionHttp peticion = UtilsTestBolsaEmpleo.peticionAutenticadaPersonal();
+		peticion.setParameter(ControladorUsuarioCandidato.PARAM_ACCION, ControladorUsuarioCandidato.ACCION_EXCLUIR_SOLICITUD);
+		peticion.setParameter(ControladorUsuarioCandidato.PARAM_CANDIDATO, bean.getCandidato().getCodNum().toString());
+		peticion.setParameter(ControladorUsuarioCandidato.PARAM_SOLICITUD, solicitud.getCodNum().toString());
+		peticion.setParameter(ControladorUsuarioCandidato.PARAM_RAZON_EXCLUSION_SOLICITUD, "");
+
+		RespuestaHttp respuesta = new RespuestaHttp();
+		ControladorUsuarioCandidato controlador = new ControladorUsuarioCandidato();
+		controlador.doPost(peticion, respuesta);
+		VistaCandidatos bean2 = (VistaCandidatos) peticion.getUVDatos().getVistas().get(VistaCandidatos.class.getName());		
+		assertEquals(MENSAJE_CON_ERROR, 1, bean2.getMensajesDeError().size());
+		assertEquals(MENSAJE_SIN_EXITO, 0, bean2.getMensajesDeExito().size());			
+		assertEquals(ControladorUsuarioCandidato.MENSAJE_ERROR_RAZON_EXCLUSION_REQUERIDA, bean2.getMensajesDeError().get(0).toString());
+				
+		// CADENA LARGA
+		
+		peticion.setParameter(ControladorUsuarioCandidato.PARAM_RAZON_EXCLUSION_SOLICITUD, "*".repeat(CARACTERES_LARGOS));
+		
+		respuesta = new RespuestaHttp();
+		controlador = new ControladorUsuarioCandidato();
+		controlador.doPost(peticion, respuesta);
+		VistaCandidatos bean3 = (VistaCandidatos) peticion.getUVDatos().getVistas().get(VistaCandidatos.class.getName());
+		assertEquals(MENSAJE_CON_ERROR, 1, bean3.getMensajesDeError().size());
+		assertEquals(MENSAJE_SIN_EXITO, 0, bean3.getMensajesDeExito().size());
+		assertEquals(String.format(ControladorUsuarioCandidato.MENSAJE_ERROR_RAZON_EXCLUSION_LARGA, ModeloSolicitud.RAZON_EXCLUSION_SOLICITUD_MAXLENGTH), 
+				bean3.getMensajesDeError().get(0).toString());
+	}
+	
+    /**
+	 * Error de permiso.
+	 * 
+	 * @throws SQLException     si fallo bd .
+	 * @throws IOException      si error io .
+	 * @throws ServletException si error servlet .
+	 */
+	@Test
+	public void testE082errorUsuarioRol() throws IOException {
+		PeticionHttp peticion = UtilsTestBolsaEmpleo.peticionAutenticadaCandidato();
+		peticion.setParameter(ControladorUsuarioCandidato.PARAM_ACCION, ControladorUsuarioCandidato.ACCION_INDEX);
+
+		RespuestaHttp respuesta = new RespuestaHttp();
+		ControladorUsuarioCandidato controlador = new ControladorUsuarioCandidato();
+		controlador.doPost(peticion, respuesta);
+		VistaCandidatos bean = (VistaCandidatos) peticion.getUVDatos().getVistas().get(VistaCandidatos.class.getName());		
+		assertEquals(MENSAJE_CON_ERROR, 1, bean.getMensajesDeError().size());
+		assertEquals(MENSAJE_SIN_EXITO, 0, bean.getMensajesDeExito().size());
+		assertEquals(ControladorUsuarioCandidato.MENSAJE_ERROR_SIN_PERMISO_PERSONAL, bean.getMensajesDeError().get(0).toString());
+	}
 }

@@ -21,13 +21,16 @@ import es.ujaen.uvirtual.modulo.bolsaempleo.beans.Bolsa;
 import es.ujaen.uvirtual.modulo.bolsaempleo.beans.BolsaCandidatoValidacionTable;
 import es.ujaen.uvirtual.modulo.bolsaempleo.beans.BolsaValidacion;
 import es.ujaen.uvirtual.modulo.bolsaempleo.beans.CandidatoValidacion;
+import es.ujaen.uvirtual.modulo.bolsaempleo.beans.ItemBaremacion;
 import es.ujaen.uvirtual.modulo.bolsaempleo.beans.Merito;
 import es.ujaen.uvirtual.modulo.bolsaempleo.beans.MeritoSolicitud;
 import es.ujaen.uvirtual.modulo.bolsaempleo.beans.MeritoValidarTable;
 import es.ujaen.uvirtual.modulo.bolsaempleo.beans.ValorMeritoBolsaTable;
+import es.ujaen.uvirtual.modulo.bolsaempleo.controlador.candidato.ControladorMisMeritos;
 import es.ujaen.uvirtual.modulo.bolsaempleo.modelo.ModeloBaremacionItems;
 import es.ujaen.uvirtual.modulo.bolsaempleo.modelo.ModeloBolsa;
 import es.ujaen.uvirtual.modulo.bolsaempleo.modelo.ModeloConvocatoria;
+import es.ujaen.uvirtual.modulo.bolsaempleo.modelo.ModeloMerito;
 import es.ujaen.uvirtual.modulo.bolsaempleo.modelo.ModeloRol;
 import es.ujaen.uvirtual.modulo.bolsaempleo.modelo.ModeloSolicitud;
 import es.ujaen.uvirtual.modulo.bolsaempleo.modelo.ModeloUsuarioBolsaEmpleo;
@@ -77,8 +80,10 @@ public class ControladorValidarNoAfines extends HttpServlet {
 	public static final String PARAM_CANDIDATO = "candidato";
 	public static final String PARAM_EXCLUIR_MERITO = "excluirmerito";
 	public static final String PARAM_GUARDAR_MERITO = "guardarmerito";
+	public static final String PARAM_ITEM = "item";
 	public static final String PARAM_MERITO = "merito";
-	public static final String PARAM_OBSERVACIONES_CANDIDATO = "observacionescandidato";
+	public static final String PARAM_OBSERVACION_CANDIDATO = "observacioncandidato";
+	public static final String PARAM_VALOR = "valor";
 	
 	// vistas
 	public static final String RUTA_BEP_VALIDAR_NO_AFINES = "/WEB-INF/jsp/vista/infadministrativa/bolsaempleo/validarnoafines/";
@@ -309,7 +314,7 @@ public class ControladorValidarNoAfines extends HttpServlet {
 		session.setAttribute(MENSAJE_MERITO_ENVIADO, true);
 		
 		try {
-			String observacionesCandidato = EscapaHTML.ajustaCodificacion(request.getParameter(PARAM_OBSERVACIONES_CANDIDATO));
+			String observacionCandidato = EscapaHTML.ajustaCodificacion(request.getParameter(PARAM_OBSERVACION_CANDIDATO));
 			Collection<String> bolsas = gson.fromJson(request.getParameter(PARAM_BOLSAS), new TypeToken<Collection<String>>() { }.getType());
 			if (bolsas.size() < 0) {
 				throw new UVException(MENSAJE_ERROR_NO_HAY_BOLSAS_SELECCIONADAS);
@@ -317,22 +322,36 @@ public class ControladorValidarNoAfines extends HttpServlet {
 			
 			if (EscapaHTML.ajustaCodificacion(request.getParameter(PARAM_ACEPTAR_MERITO)) != null) {
 				for (String idBolsa : bolsas) {
-					modeloValidar.validarMerito(idBolsa, bean.getMerito().getMerito().getCodNum(), observacionesCandidato, bean.getUsuarioLogeado());
+					modeloValidar.validarMerito(idBolsa, bean.getMerito().getMerito().getCodNum(), observacionCandidato, bean.getUsuarioLogeado());
 					Bolsa bolsa = modeloBolsa.getBolsaById(Integer.parseInt(idBolsa));
 					BolsaEmpleoUtils.addMensajeDeExito(String.format(MENSAJE_EXITO_MERITO_VALIDADO, bolsa.getArea().getDescripcion()), bean, request);
 				}
 			} else if (EscapaHTML.ajustaCodificacion(request.getParameter(PARAM_EXCLUIR_MERITO)) != null) {
 				for (String idBolsa : bolsas) {
-					modeloValidar.excluirMerito(idBolsa, bean.getMerito().getMerito().getCodNum(), observacionesCandidato, bean.getUsuarioLogeado());
+					modeloValidar.excluirMerito(idBolsa, bean.getMerito().getMerito().getCodNum(), observacionCandidato, bean.getUsuarioLogeado());
 					Bolsa bolsa = modeloBolsa.getBolsaById(Integer.parseInt(idBolsa));
 					BolsaEmpleoUtils.addMensajeDeExito(String.format(MENSAJE_EXITO_MERITO_EXCLUIDO, bolsa.getArea().getDescripcion()), bean, request);
 				}
 			} else if (EscapaHTML.ajustaCodificacion(request.getParameter(PARAM_GUARDAR_MERITO)) != null) {
 				for (String idBolsa : bolsas) {
-					modeloValidar.guardarMerito(idBolsa, bean.getMerito().getMerito().getCodNum(), observacionesCandidato);
+					modeloValidar.guardarMerito(idBolsa, bean.getMerito().getMerito().getCodNum(), observacionCandidato);
 					Bolsa bolsa = modeloBolsa.getBolsaById(Integer.parseInt(idBolsa));
 					BolsaEmpleoUtils.addMensajeDeExito(String.format(MENSAJE_EXITO_MERITO_GUARDAR, bolsa.getArea().getDescripcion()), bean, request);
 				}
+			}
+			
+			if (EscapaHTML.ajustaCodificacion(request.getParameter(PARAM_VALOR)) != null) {
+				// item de baremación
+				Integer idItem = Formateador.leeParametroInteger(request.getParameter(PARAM_ITEM));
+				ItemBaremacion item = ModeloBaremacionItems.obtenerInstancia().getItemBaremacionById(idItem);
+				bean.getMerito().getMerito().setItemBaremacion(item);
+				
+				// valor
+				bean.getMerito().getMerito().setValor(ControladorMisMeritos.validateValorDelMerito(
+						request.getParameter(PARAM_VALOR), bean.getMerito().getMerito()));
+				bean.getMerito().getMerito().setUsuario(bean.getCandidato());
+				
+				ModeloMerito.obtenerInstancia().actualizaMerito(bean.getMerito().getMerito(), bean.getUsuarioLogeado());
 			}
 			
 		} catch (Exception ex) {

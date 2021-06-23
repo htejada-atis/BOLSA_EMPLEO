@@ -6,6 +6,13 @@ import java.sql.SQLException;
 import bbdd.BbddRunner;
 import bbdd.UtilsTestBolsaEmpleo;
 
+/**
+ * Migraciones 20210623 .
+ * 	- excluir solicitud
+ * 	- ajustes mensajería
+ * 
+ * @author ATISoluciones 2021
+ */
 public class CargaMigracionBolsaEmpleo01 {
 
 	public static void main(String[] args) {

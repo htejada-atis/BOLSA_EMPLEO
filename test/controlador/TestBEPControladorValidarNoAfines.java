@@ -294,7 +294,7 @@ public class TestBEPControladorValidarNoAfines {
 		PeticionHttp peticion = UtilsTestBolsaEmpleo.peticionAutenticadaPersonal();
 		peticion.setParameter(ControladorValidarNoAfines.PARAM_ACCION, ControladorValidarNoAfines.ACCION_VALIDAR_MERITO);
 		peticion.setParameter(ControladorValidarNoAfines.PARAM_ACEPTAR_MERITO, "");
-		peticion.setParameter(ControladorValidarNoAfines.PARAM_OBSERVACIONES_CANDIDATO, OBSERVACIONES);
+		peticion.setParameter(ControladorValidarNoAfines.PARAM_OBSERVACION_CANDIDATO, OBSERVACIONES);
 		peticion.setParameter(ControladorValidarNoAfines.PARAM_BOLSA, bean.getBolsa().getCodNum().toString());
 		peticion.setParameter(ControladorValidarNoAfines.PARAM_CANDIDATO, bean.getCandidato().getCodNum().toString());
 		peticion.setParameter(ControladorValidarNoAfines.PARAM_MERITO, bean.getDatatableMeritos().getData().get(0).getCodNum().toString());
@@ -324,7 +324,7 @@ public class TestBEPControladorValidarNoAfines {
 		PeticionHttp peticion = UtilsTestBolsaEmpleo.peticionAutenticadaPersonal();
 		peticion.setParameter(ControladorValidarNoAfines.PARAM_ACCION, ControladorValidarNoAfines.ACCION_VALIDAR_MERITO);
 		peticion.setParameter(ControladorValidarNoAfines.PARAM_EXCLUIR_MERITO, "");
-		peticion.setParameter(ControladorValidarNoAfines.PARAM_OBSERVACIONES_CANDIDATO, OBSERVACIONES);
+		peticion.setParameter(ControladorValidarNoAfines.PARAM_OBSERVACION_CANDIDATO, OBSERVACIONES);
 		peticion.setParameter(ControladorValidarNoAfines.PARAM_BOLSA, bean.getBolsa().getCodNum().toString());
 		peticion.setParameter(ControladorValidarNoAfines.PARAM_CANDIDATO, bean.getCandidato().getCodNum().toString());
 		peticion.setParameter(ControladorValidarNoAfines.PARAM_MERITO, bean.getDatatableMeritos().getData().get(0).getCodNum().toString());
@@ -353,7 +353,7 @@ public class TestBEPControladorValidarNoAfines {
 		PeticionHttp peticion = UtilsTestBolsaEmpleo.peticionAutenticadaPersonal();
 		peticion.setParameter(ControladorValidarNoAfines.PARAM_ACCION, ControladorValidarNoAfines.ACCION_VALIDAR_MERITO);
 		peticion.setParameter(ControladorValidarNoAfines.PARAM_GUARDAR_MERITO, "");
-		peticion.setParameter(ControladorValidarNoAfines.PARAM_OBSERVACIONES_CANDIDATO, OBSERVACIONES);
+		peticion.setParameter(ControladorValidarNoAfines.PARAM_OBSERVACION_CANDIDATO, OBSERVACIONES);
 		peticion.setParameter(ControladorValidarNoAfines.PARAM_BOLSA, bean.getBolsa().getCodNum().toString());
 		peticion.setParameter(ControladorValidarNoAfines.PARAM_CANDIDATO, bean.getCandidato().getCodNum().toString());
 		peticion.setParameter(ControladorValidarNoAfines.PARAM_MERITO, bean.getDatatableMeritos().getData().get(0).getCodNum().toString());
@@ -550,7 +550,7 @@ public class TestBEPControladorValidarNoAfines {
 		PeticionHttp peticion = UtilsTestBolsaEmpleo.peticionAutenticadaPersonal();
 		peticion.setParameter(ControladorValidarNoAfines.PARAM_ACCION, ControladorValidarNoAfines.ACCION_VALIDAR_MERITO);
 		peticion.setParameter(ControladorValidarNoAfines.PARAM_GUARDAR_MERITO, "");
-		peticion.setParameter(ControladorValidarNoAfines.PARAM_OBSERVACIONES_CANDIDATO, OBSERVACIONES);
+		peticion.setParameter(ControladorValidarNoAfines.PARAM_OBSERVACION_CANDIDATO, OBSERVACIONES);
 		peticion.setParameter(ControladorValidarNoAfines.PARAM_BOLSA, bean.getBolsa().getCodNum().toString());
 		peticion.setParameter(ControladorValidarNoAfines.PARAM_CANDIDATO, bean.getCandidato().getCodNum().toString());
 		peticion.setParameter(ControladorValidarNoAfines.PARAM_MERITO, bean.getDatatableMeritos().getData().get(0).getCodNum().toString());
