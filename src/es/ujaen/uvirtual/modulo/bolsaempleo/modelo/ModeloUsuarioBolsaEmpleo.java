@@ -216,7 +216,7 @@ public class ModeloUsuarioBolsaEmpleo {
 		List<UsuarioBolsaEmpleo> usuarios = new ArrayList<>();
 		BolsaEmpleoDataTable<UsuarioBolsaEmpleo> dataTable = new BolsaEmpleoDataTable<>(params);
 
-		String consulta = "SELECT * FROM TBEP_USUARIOS bepusu WHERE bepusu.ROL != " + ModeloRol.ID_ROL_CANDIDATO + " ";
+		String consulta = "SELECT * FROM TBEP_USUARIOS bepusu WHERE 1=1 ";
 		
 		String whereNombre = String.format("(%s || ' ' || %s || ' ' || %s)", "bepusu.VUAJA_STRNOMBRE", "bepusu.VUAJA_STRAPELLIDO1", "bepusu.VUAJA_STRAPELLIDO2");
 		
@@ -394,6 +394,7 @@ public class ModeloUsuarioBolsaEmpleo {
 		usuario.setFechaExclusion(rs.getTimestamp("FECHA_EXCLUSION"));
 		usuario.setBorrado(rs.getString("FLGBORRADO").equals(BORRADO));
 		usuario.setFechaBorrado(rs.getTimestamp("FECHA_BORRADO"));
+		usuario.setRazonBorrado(rs.getString("RAZON_BORRADO"));
 
 		return usuario;
 	}
@@ -772,7 +773,7 @@ public class ModeloUsuarioBolsaEmpleo {
 	}
 
 	private void cambiarFlagBorradoUsuario(UsuarioBolsaEmpleo usuario, String borrado, UsuarioBolsaEmpleo usuarioUpdate) throws SQLException, UVException {
-		String query = "UPDATE TBEP_USUARIOS SET UID_USUARIO=?,FLGBORRADO=?,FECHA_BORRADO=? WHERE CODNUM = ?";
+		String query = "UPDATE TBEP_USUARIOS SET UID_USUARIO=?,FLGBORRADO=?,FECHA_BORRADO=?,RAZON_BORRADO=? WHERE CODNUM = ?";
 
 		try (Connection conexion = ConexionUvirtual.obtenerInstancia(); PreparedStatement stmt = conexion.prepareStatement(query)) {
 			int indexParam = 1;
@@ -780,9 +781,11 @@ public class ModeloUsuarioBolsaEmpleo {
 			stmt.setString(indexParam++, usuarioUpdate.getCodCuenta());
 			stmt.setString(indexParam++, borrado);
 			if (borrado.equals(USUARIO_BORRADO)) {
-				stmt.setDate(indexParam++, new java.sql.Date(BolsaEmpleoUtils.getCurrentDateTime().getTime()));	
+				stmt.setDate(indexParam++, new java.sql.Date(BolsaEmpleoUtils.getCurrentDateTime().getTime()));
+				stmt.setString(indexParam++, usuario.getRazonBorrado());
 			} else {
 				stmt.setNull(indexParam++, Types.DATE);
+				stmt.setNull(indexParam++, Types.VARCHAR);
 			}
 
 			stmt.setInt(indexParam++, usuario.getCodNum());
@@ -822,9 +825,13 @@ public class ModeloUsuarioBolsaEmpleo {
 		
 		// comprobamos si está borrado o excluido
 		if (Boolean.TRUE.equals(usuario.getExcluido())) {
-			throw new UVException(String.format("No puede acceder, su perfil ha sido excluido: [%s]", usuario.getCodCuenta()));
+			throw new UVException(usuario.getRazonBorrado() != null
+					? String.format("No puede acceder, su perfil ha sido excluido: [%s]. Razón: %s", usuario.getCodCuenta(), usuario.getRazonBorrado())
+					: String.format("No puede acceder, su perfil ha sido excluido: [%s].", usuario.getCodCuenta()));
 		} else if (Boolean.TRUE.equals(usuario.getBorrado())) {
-			throw new UVException(String.format("No puede acceder, su perfil ha sido dado de baja: [%s]", usuario.getCodCuenta()));
+			throw new UVException(usuario.getRazonBorrado() != null
+					? String.format("No puede acceder, su perfil ha sido dado de baja: [%s]. Razón: %s", usuario.getCodCuenta(), usuario.getRazonBorrado())
+					: String.format("No puede acceder, su perfil ha sido dado de baja: [%s].", usuario.getCodCuenta()));
 		}
 		
 		return usuario; 

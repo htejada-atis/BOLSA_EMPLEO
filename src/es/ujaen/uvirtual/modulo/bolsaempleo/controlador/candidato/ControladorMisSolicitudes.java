@@ -900,11 +900,11 @@ public class ControladorMisSolicitudes extends HttpServlet {
 		List<BolsaSolicitud> listaBolsas = modeloSolicitud.getBolsasSolicitudMeritos(solicitud);
 		bean.setListaBolsasSolicitud(listaBolsas);
 		
-		modeloSolicitud.comprobarSolicitudCorrecta(solicitud);
+		modeloSolicitud.comprobarSolicitudCorrecta(solicitud, false);
 		
 		solicitud.setEstado(ModeloSolicitud.SOLICITUD_ESTADO_CERRADA);
 		solicitud.setFechaConfirmacion(BolsaEmpleoUtils.getCurrentDateTime());
-		solicitud.setArchivo(generarPDF(bean, solicitud, listaBolsas));
+		solicitud.setArchivo(generarPDF(bean.getUsuarioLogeado(), solicitud, listaBolsas));
 		
 		modeloSolicitud.confirmacionSolicitud(solicitud, bean.getUsuarioLogeado());
 		
@@ -922,7 +922,7 @@ public class ControladorMisSolicitudes extends HttpServlet {
 	 * @return InputStream .
 	 * @throws UVException .
 	 */
-	public InputStream generarPDF(VistaSolicitudes bean, Solicitud solicitud, List<BolsaSolicitud> bolsasSolicitud) throws UVException {
+	public static InputStream generarPDF(UsuarioBolsaEmpleo usuario, Solicitud solicitud, List<BolsaSolicitud> bolsasSolicitud) throws UVException {
 		ByteArrayOutputStream out = new ByteArrayOutputStream();
 		
 		try (Document document = new Document()) {
@@ -930,8 +930,8 @@ public class ControladorMisSolicitudes extends HttpServlet {
 			PdfWriter.getInstance(document, out);
 
 			document.open();
-			document.addAuthor(bean.getUsuarioLogeado().getNombre() + " " + bean.getUsuarioLogeado().getPrimerApellido() + " " 
-					+ bean.getUsuarioLogeado().getSegundoApellido());
+			document.addAuthor(usuario.getNombre() + " " + usuario.getPrimerApellido() + " " 
+					+ usuario.getSegundoApellido());
 			document.addTitle("Solicitud_" + solicitud.getConvocatoria().getDescripcion());
 			document.addCreationDate();
 
@@ -947,27 +947,27 @@ public class ControladorMisSolicitudes extends HttpServlet {
 					+ Formateador.formatoFecha(solicitud.getFechaConfirmacion(), Formateador.FORMATO_FECHA_DDMMYYYY_HHMMSS), font2));
 			
 			document.add(new Paragraph("Usuario: " 
-					+ getStringOrBlack(bean.getUsuarioLogeado().getPrsNif()) + " " 
-					+ getStringOrBlack(bean.getUsuarioLogeado().getNombre()) + " " 
-					+ getStringOrBlack(bean.getUsuarioLogeado().getPrimerApellido()) + " " 
-					+ getStringOrBlack(bean.getUsuarioLogeado().getSegundoApellido()), font2));
+					+ getStringOrBlack(usuario.getPrsNif()) + " " 
+					+ getStringOrBlack(usuario.getNombre()) + " " 
+					+ getStringOrBlack(usuario.getPrimerApellido()) + " " 
+					+ getStringOrBlack(usuario.getSegundoApellido()), font2));
 			
 			document.add(new Paragraph("Dirección: " 
-					+ getStringOrBlack(bean.getUsuarioLogeado().getDireccion()) + " " 
-					+ getStringOrBlack(bean.getUsuarioLogeado().getCodigoPostal()) + " "
-					+ getStringOrBlack(bean.getUsuarioLogeado().getLocalidad()) + " "
-					+ getStringOrBlack(bean.getUsuarioLogeado().getProvincia()) + " "
-					+ getStringOrBlack(bean.getUsuarioLogeado().getTelefono()), font2));
+					+ getStringOrBlack(usuario.getDireccion()) + " " 
+					+ getStringOrBlack(usuario.getCodigoPostal()) + " "
+					+ getStringOrBlack(usuario.getLocalidad()) + " "
+					+ getStringOrBlack(usuario.getProvincia()) + " "
+					+ getStringOrBlack(usuario.getTelefono()), font2));
 			
 			document.add(new Paragraph("\n"));
 				        
 			for (BolsaSolicitud bolsa: bolsasSolicitud) {
-				this.generarPDFArea(bolsa, bolsasSolicitud, document);
+				generarPDFArea(bolsa, bolsasSolicitud, document);
 			}
 			
-			this.generarTitulaciones(solicitud.getUsuario(), document);
+			generarTitulaciones(solicitud.getUsuario(), document);
 			
-			this.generarAcreditaciones(solicitud.getUsuario(), document);
+			generarAcreditaciones(solicitud.getUsuario(), document);
 		} catch (Exception e) {
 			LOGGER.log(Level.SEVERE, Formateador.getStackTrace(e));
 			LOGGER.log(Level.SEVERE, e.toString());
@@ -977,17 +977,17 @@ public class ControladorMisSolicitudes extends HttpServlet {
 		return new ByteArrayInputStream(out.toByteArray());
 	}
 	
-	private String getStringOrBlack(String txt) {
+	private static String getStringOrBlack(String txt) {
 		if (txt == null) {
 			return "";
 		}
 		return txt;
 	}
 	
-	private void generarPDFArea(BolsaSolicitud bolsa, List<BolsaSolicitud> bolsasSolicitud, Document document) {
+	private static void generarPDFArea(BolsaSolicitud bolsa, List<BolsaSolicitud> bolsasSolicitud, Document document) {
 		Table table = new Table(PDF_TABLE_COLUMNS, bolsasSolicitud.size());
 
-		this.generarPDFAreaHeader(table);
+		generarPDFAreaHeader(table);
 
 		if (bolsa.getNumeroMeritos() != null && bolsa.getNumeroMeritos() > 0) {
 			for (MeritoSolicitudTable merito: bolsa.getListaMeritos()) {
@@ -1043,7 +1043,7 @@ public class ControladorMisSolicitudes extends HttpServlet {
 		document.add(new Paragraph("\n"));
 	}
 	
-	private void generarPDFAreaHeader(Table table) {
+	private static void generarPDFAreaHeader(Table table) {
 		table.setBorderWidth(1);
 		table.setBorderColor(new Color(0, 0, 0));
 		table.setPadding(PDF_TABLE_PADDING);
@@ -1062,7 +1062,7 @@ public class ControladorMisSolicitudes extends HttpServlet {
 		table.setWidths(columnWidths);
 	}
 	
-	private void generarColumnPDFAreaHeader(Table table, String titulo, Font font) {
+	private static void generarColumnPDFAreaHeader(Table table, String titulo, Font font) {
 		Phrase phrase = new Phrase(titulo, font);
 		Cell cell = new Cell(phrase);
 		cell.setHeader(true);
@@ -1070,7 +1070,7 @@ public class ControladorMisSolicitudes extends HttpServlet {
 		table.addCell(cell);
 	}
 	
-	private void generarTitulaciones(UsuarioBolsaEmpleo usuario, Document document) throws DocumentException, SQLException, UVException {
+	private static void generarTitulaciones(UsuarioBolsaEmpleo usuario, Document document) throws DocumentException, SQLException, UVException {
 		Font font2 = new Font(Font.BOLD);
 		font2.setStyle("bold");		
 		
@@ -1084,7 +1084,7 @@ public class ControladorMisSolicitudes extends HttpServlet {
 		}			
 	}
 	
-	private void generarAcreditaciones(UsuarioBolsaEmpleo usuario, Document document) throws DocumentException, SQLException, UVException {
+	private static void generarAcreditaciones(UsuarioBolsaEmpleo usuario, Document document) throws DocumentException, SQLException, UVException {
 		Font font2 = new Font(Font.BOLD);
 		font2.setStyle("bold");		
 		

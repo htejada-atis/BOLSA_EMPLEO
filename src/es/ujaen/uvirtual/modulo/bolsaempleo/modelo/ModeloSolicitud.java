@@ -46,8 +46,10 @@ public class ModeloSolicitud {
 	public static final String MENSAJE_ERROR_YA_TIENES_SOLICITUD = "Ya tiene solicitudes";
 	public static final String MENSAJE_ERROR_SOLICITUDE_NO_EXISTE = "No existe la solicitud";
 	public static final String MENSAJE_ERROR_NO_EXISTE_MERITO_SOLICITUD = "No existe el merito de la solicitud";
-	public static final String MENSAJE_ERROR_FALTAN_DATOS_CONFIRMAR_SLICITUD = 
+	public static final String MENSAJE_ERROR_FALTAN_DATOS_CONFIRMAR_SOLICITUD = 
 		"Para confirmar la solicitud debe primero completar sus datos personales. Complételos en la sección 'Mis Datos'.";
+	public static final String MENSAJE_ERROR_FALTAN_DATOS_CONFIRMAR_SOLICITUD_PERSONAL = 
+			"Para confirmar la solicitud el candidato debe primero completar sus datos personales.";
 	public static final String MENSAJE_ERROR_SIN_SOLICITUD_CERRADA = "No existe solicitud cerrada";
 	public static final String MENSAJE_ERROR_SOLICITUD_CERRADA = "La solicitud está cerrada";
 	public static final String MENSAJE_ERROR_TIPO_AFINIDAD = "La afinidad no es del mismo tipo que la del item del mérito";
@@ -1432,17 +1434,18 @@ public class ModeloSolicitud {
 	/**
 	 * Comprueba si se puede confirmar la solicitud.
 	 * @param solicitud .
+	 * @param personal booleano que indica si es un usuario de personal el que hace la acción .
 	 * @throws UVException .
 	 * @throws SQLException .
 	 */
-	public void comprobarSolicitudCorrecta(Solicitud solicitud) throws SQLException, UVException {			
+	public void comprobarSolicitudCorrecta(Solicitud solicitud, boolean personal) throws SQLException, UVException {			
 		// comprobamos datos de usuario completos
 		if (ModeloUsuarioBolsaEmpleo.obtenerInstancia().compruebaUsuarioMisDatosValidos(solicitud.getUsuario())) {
-			throw new UVException(MENSAJE_ERROR_FALTAN_DATOS_CONFIRMAR_SLICITUD);
+			throw new UVException(personal ? MENSAJE_ERROR_FALTAN_DATOS_CONFIRMAR_SOLICITUD_PERSONAL : MENSAJE_ERROR_FALTAN_DATOS_CONFIRMAR_SOLICITUD);
 		}
 		
 		// comprobamos si la convocatoria está abierta
-		if (ModeloConvocatoria.obtenerInstancia().isConvocatoriaCerrada(solicitud.getConvocatoria())) {
+		if (ModeloConvocatoria.obtenerInstancia().isConvocatoriaCerrada(solicitud.getConvocatoria()) && !personal) {
 			throw new UVException(MENSAJE_ERROR_CONVOCATORIA_NO_ABIERTA);
 		}
 	}
