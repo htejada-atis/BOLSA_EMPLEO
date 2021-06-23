@@ -101,10 +101,10 @@ VistaUsuarioAutoregistrado bean = (VistaUsuarioAutoregistrado)uvdatos.getVistas(
 		</div>
 	<% } %>
 	<% if (bean.getMensajesDeError().size() > 0) { %>
-		<br/>
-		<br/>
-		<br/>
 		<div id="error" class="error">
+			<br/>
+			<br/>
+			<br/>
 			<%=bean.formatearMensajesDeError()%>
 		</div>
   	<% } %>
