@@ -12,18 +12,17 @@
 <%@ page import="es.ujaen.uvirtual.utilidades.Formateador" %>
 <%@ page import="es.ujaen.uvirtual.modulo.bolsaempleo.utilidades.BolsaEmpleoUtils" %>
 
-<% 
+<%
 UVDatos uvdatos = (UVDatos) request.getAttribute(UVDatos.NOMBRE_ATRIBUTO);
 VistaMensajes bean = (VistaMensajes) uvdatos.getVistas().get(VistaMensajes.class.getName());
 Mensaje mensaje = bean.getMensaje();
 
 boolean enviarDisabled = true;
-boolean mensajeBorrador = mensaje.getEstado().equals(ModeloMensajes.ESTADO_BORRADOR);
+boolean mensajeBorrador = mensaje.getEstado().equals(ModeloMensajes.MENSAJE_ESTADO_BORRADOR);
 
-if (bean.getDestinatarios().size() > 0 && !mensaje.getCuerpo().isBlank() && !mensaje.getTitulo().equals(ModeloMensajes.ESTADO_BORRADOR) && mensajeBorrador) {
+if (bean.getDestinatarios().size() > 0 && !mensaje.getCuerpo().isBlank() && !mensaje.getTitulo().equals(ModeloMensajes.MENSAJE_ESTADO_BORRADOR) && mensajeBorrador) {
 	enviarDisabled = false;
 }
-
 %>
 
 <div class="bolsa-empleo afinidad-form">
@@ -100,7 +99,7 @@ if (bean.getDestinatarios().size() > 0 && !mensaje.getCuerpo().isBlank() && !men
 		
 		<div class="form-group-container col2 helper">
 	   		<div class="form-group">
-	  			<label for="filtro_convocatoria">Filtrar por convocatoria:</label>
+	  			<label for="filtro_convocatoria">Filtrar por convocatoria: <i class="tooltip">(?)<span>Con solicitud abierta o cerrada en la convocatoria</span></i></label>
 	    		<select class="params" id="filtro_convocatoria" name="aplicable" style="width:100%;">
 	    			<option value="">Selecciona convocatoria</option>
 	    			<% for (Convocatoria c : bean.getConvocatorias()) { %>

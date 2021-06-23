@@ -322,7 +322,7 @@ public class ControladorMensajes extends HttpServlet {
 	private void enviarMensaje(VistaMensajes bean, HttpServletRequest request, HttpServletResponse response) throws IOException, UVException, SQLException {
 		Mensaje mensaje = bean.getMensaje();
 		
-		if (mensaje.getTitulo().equals(ModeloMensajes.ESTADO_BORRADOR)) {
+		if (mensaje.getTitulo().equals(ModeloMensajes.MENSAJE_ESTADO_BORRADOR)) {
 			throw new UVException("No se puede enviar un mensaje con título borrador");
 		}
 		

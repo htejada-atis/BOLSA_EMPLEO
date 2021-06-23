@@ -45,11 +45,14 @@ public class ModeloMensajes {
 	public static final String MENSAJE_AFINIDAD_CODNUM_REQUERIDO = "id afinidad no válido";
 
 	public static final String CODNUM = "CODNUM";
-	public static final String ESTADO_BORRADOR = "BORRADOR";
-	public static final String ESTADO_ENVIADO = "ENVIADO";
-	public static final String ESTADO_ENVIANDO = "ENVIANDO";
-	public static final String ESTADO_FALLO = "FALLO";
+	public static final String MENSAJE_ESTADO_BORRADOR = "BORRADOR";
+	public static final String MENSAJE_ESTADO_ENVIADO = "ENVIADO";
+	public static final String MENSAJE_ESTADO_ENVIANDO = "ENVIANDO";
 	
+	public static final String DESTINATARIO_ESTADO_ENVIADO = "ENVIADO";
+	public static final String DESTINATARIO_ESTADO_SINENVIAR = "SIN ENVIAR";
+	public static final String DESTINATARIO_ESTADO_FALLO = "FALLO";
+		
 	public static final String ERROR_DESTINATARIO_YA_EXISTE = "El destinatario ya estaba agregado al mensaje previamente";
 
 	protected static ModeloMensajes eInstancia;
@@ -86,7 +89,7 @@ public class ModeloMensajes {
 		List<Mensaje> mensajes = new ArrayList<>();
 		String consulta = " SELECT bepcon.* "
 				+ " FROM TBEP_MENSAJES bepmen "
-				+ " WHERE bepmen.ESTADO = '" + ESTADO_ENVIANDO + "'";
+				+ " WHERE bepmen.ESTADO = '" + MENSAJE_ESTADO_ENVIANDO + "'";
 
 		try (Connection conexion = ConexionUvirtual.obtenerInstancia(); PreparedStatement stmt = conexion.prepareStatement(consulta)) {
 			try (ResultSet rs = stmt.executeQuery()) {
@@ -209,13 +212,18 @@ public class ModeloMensajes {
 		List<UsuarioBolsaEmpleo> destinatarios = new ArrayList<>();
 		BolsaEmpleoDataTable<UsuarioBolsaEmpleo> dataTable = new BolsaEmpleoDataTable<>(params);
 
-		String consulta = "SELECT bepusu.* FROM TBEP_USUARIOS bepusu"
+		String consulta = ""
+				+ " SELECT bepusu.* "
+				+ " FROM TBEP_USUARIOS bepusu "
 				+ (dataTable.filterExists(DESTINATARIOS_COLUMN_INDEX_CONVOCATORIA) 
 						? "	LEFT JOIN TBEP_SOLICITUDES bepsol ON bepusu.CODNUM = bepsol.BEPUSU_CODNUM" : "")
 				+ (dataTable.filterExists(DESTINATARIOS_COLUMN_INDEX_AREA)
 						? " LEFT JOIN TBEP_SOLICITUD_BOLSAS bepsbo ON bepsol.CODNUM = bepsbo.BEPSOL_CODNUM" : "")
 				+ "	LEFT JOIN TBEP_MEN_DESTINATARIOS bepmde ON bepusu.CODNUM = bepmde.BEPUSU_CODNUM AND bepmde.BEPMEN_CODNUM = ?"
-				+ "	WHERE bepusu.FLGBORRADO = 'N' AND bepmde.BEPUSU_CODNUM IS NULL AND bepusu.VUAJA_EMAIL_ALTA IS NOT NULL";
+				+ "	WHERE 1=1 "
+				+ "		AND bepusu.FLGBORRADO = 'N' "
+				+ " 	AND bepmde.BEPUSU_CODNUM IS NULL "
+				+ "		AND bepusu.VUAJA_EMAIL_ALTA IS NOT NULL";
 		
 		String whereConvocatoria = "(SELECT bepsol2.BEPCON_CODNUM FROM TBEP_SOLICITUDES bepsol2"
 				+ "	WHERE bepusu.CODNUM = bepsol2.BEPUSU_CODNUM AND bepsol2.BEPCON_CODNUM = bepsol.BEPCON_CODNUM)";
@@ -327,10 +335,10 @@ public class ModeloMensajes {
 	 */
 	public Integer nuevoMensajeEnBorrador(UsuarioBolsaEmpleo usuarioUpdate) throws SQLException, UVException {
 		Mensaje mensaje = new Mensaje();
-		mensaje.setTitulo(ESTADO_BORRADOR);
-		mensaje.setEstado(ESTADO_BORRADOR);
+		mensaje.setTitulo(MENSAJE_ESTADO_BORRADOR);
+		mensaje.setEstado(MENSAJE_ESTADO_BORRADOR);
 		mensaje.setFechaCreacion(BolsaEmpleoUtils.getCurrentDateTime());
-		mensaje.setCuerpo(ESTADO_BORRADOR);
+		mensaje.setCuerpo(MENSAJE_ESTADO_BORRADOR);
 		
 		return nuevoMensaje(mensaje, usuarioUpdate);
 	}
@@ -368,7 +376,7 @@ public class ModeloMensajes {
 	 * @throws SQLException .
 	 */
 	public void actualizaEstadoMensajeComoEnviando(Mensaje mensaje, UsuarioBolsaEmpleo usuarioUpdate) throws SQLException, UVException {
-		this.actualizaEstadoMensaje(mensaje, ESTADO_ENVIANDO, usuarioUpdate);
+		this.actualizaEstadoMensaje(mensaje, MENSAJE_ESTADO_ENVIANDO, usuarioUpdate);
 	}
 	
 	/** Actualiza el estado de un mensaje a enviado .
@@ -378,7 +386,7 @@ public class ModeloMensajes {
 	 * @throws SQLException .
 	 */
 	public void actualizaEstadoMensajeComoEnviado(Mensaje mensaje, UsuarioBolsaEmpleo usuarioUpdate) throws SQLException, UVException {
-		this.actualizaEstadoMensaje(mensaje, ESTADO_ENVIADO, usuarioUpdate);
+		this.actualizaEstadoMensaje(mensaje, MENSAJE_ESTADO_ENVIADO, usuarioUpdate);
 	}
 	
 	private void actualizaEstadoMensaje(Mensaje mensaje, String estado, UsuarioBolsaEmpleo usuarioUpdate) throws SQLException, UVException {
@@ -396,7 +404,7 @@ public class ModeloMensajes {
 			int indexParam = 1;
 			stmt.setString(indexParam++, estado);
 			
-			if (estado.equals(ESTADO_ENVIADO)) {
+			if (estado.equals(MENSAJE_ESTADO_ENVIADO)) {
 				stmt.setDate(indexParam++, new java.sql.Date(BolsaEmpleoUtils.getCurrentDateTime().getTime()));
 			} else {
 				stmt.setNull(indexParam++, Types.DATE);
@@ -494,7 +502,7 @@ public class ModeloMensajes {
 		if (mensaje == null) {
 			throw new UVException(MENSAJE_ERROR_NO_EXISTE_MENSAJE);
 		}
-		if (!mensaje.getEstado().equals(ESTADO_BORRADOR)) {
+		if (!mensaje.getEstado().equals(MENSAJE_ESTADO_BORRADOR)) {
 			throw new UVException("El mensaje no está en borrador");
 		}
 		
@@ -582,7 +590,7 @@ public class ModeloMensajes {
 	 * @throws SQLException .
 	 */
 	public void actualizaEstadoDestinatarioComoEnviado(Mensaje mensaje, UsuarioBolsaEmpleo destinatario, UsuarioBolsaEmpleo usuarioUpdate) throws SQLException, UVException {
-		this.actualizaEstadoDestinatario(mensaje, destinatario, ESTADO_ENVIADO, usuarioUpdate);
+		this.actualizaEstadoDestinatario(mensaje, destinatario, DESTINATARIO_ESTADO_ENVIADO, usuarioUpdate);
 	}
 	
 	/** Actualiza el estado de un destinatario a fallo .
@@ -593,7 +601,7 @@ public class ModeloMensajes {
 	 * @throws SQLException .
 	 */
 	public void actualizaEstadoDestinatarioComoFallo(Mensaje mensaje, UsuarioBolsaEmpleo destinatario, UsuarioBolsaEmpleo usuarioUpdate) throws SQLException, UVException {
-		this.actualizaEstadoDestinatario(mensaje, destinatario, ESTADO_FALLO, usuarioUpdate);
+		this.actualizaEstadoDestinatario(mensaje, destinatario, DESTINATARIO_ESTADO_FALLO, usuarioUpdate);
 	}
 	
 	private void actualizaEstadoDestinatario(Mensaje mensaje, UsuarioBolsaEmpleo destinatario, String estado, UsuarioBolsaEmpleo usuarioUpdate)

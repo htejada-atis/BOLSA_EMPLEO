@@ -38,15 +38,17 @@ public final class EnviarMensaje {
 				List<Destinatario> destinatarios = modelo.obtenerDestinatariosMensaje(mensaje);
 				boolean enviado = false;
 				
-				for (UsuarioBolsaEmpleo destinatario: destinatarios) {
-					List<String> emails = new ArrayList<>();
-					emails.add(destinatario.getEmail());
-					if (EnviaCorreo.enviaCorreo(emails, mensaje.getTitulo(), mensaje.getCuerpo())) {
-						modelo.actualizaEstadoDestinatarioComoEnviado(mensaje, destinatario, null);
-						enviado = true;
-					} else {
-						modelo.actualizaEstadoDestinatarioComoFallo(mensaje, destinatario, null);
-					}
+				for (Destinatario destinatario: destinatarios) {
+					if (destinatario.getEstado().equals(ModeloMensajes.DESTINATARIO_ESTADO_SINENVIAR)) {
+						List<String> emails = new ArrayList<>();
+						emails.add(destinatario.getEmail());
+						if (EnviaCorreo.enviaCorreo(emails, mensaje.getTitulo(), mensaje.getCuerpo())) {
+							modelo.actualizaEstadoDestinatarioComoEnviado(mensaje, destinatario, null);
+							enviado = true;
+						} else {
+							modelo.actualizaEstadoDestinatarioComoFallo(mensaje, destinatario, null);
+						}
+					}					
 				}
 				
 				if (enviado) {
