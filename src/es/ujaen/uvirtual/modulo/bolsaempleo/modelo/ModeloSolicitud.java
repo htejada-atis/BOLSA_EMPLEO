@@ -69,6 +69,7 @@ public class ModeloSolicitud {
 	public static final String BEPMER_CODNUM = "BEPMER_CODNUM";
 	public static final String FLGEXCLUIDO = "FLGEXCLUIDO";
 	public static final String FLGVALIDADO = "FLGVALIDADO";
+	public static final String VALOR = "VALOR";
 	public static final String OBSERVACION_CANDIDATO = "OBSERVACION_CANDIDATO";
 	public static final String S = "S";
 	public static final int RAZON_EXCLUSION_SOLICITUD_MAXLENGTH = 500;
@@ -568,7 +569,7 @@ public class ModeloSolicitud {
 				Merito merito = ModeloMerito.obtenerInstancia().getMeritoById(rs.getInt(BEPMER_CODNUM), false, false);
 				
 				return new MeritoSolicitud(rs.getInt(CODNUM), merito, rs.getString(FLGEXCLUIDO).equals(S),
-						rs.getString(FLGVALIDADO).equals(S), rs.getString(OBSERVACION_CANDIDATO));
+						rs.getString(FLGVALIDADO).equals(S), rs.getString(OBSERVACION_CANDIDATO), rs.getDouble(VALOR));
 			}
 		}
 	}

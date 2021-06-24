@@ -8,6 +8,7 @@
 <%@ page import="es.ujaen.uvirtual.modulo.bolsaempleo.beans.MeritoSolicitud" %>
 <%@ page import="es.ujaen.uvirtual.modulo.bolsaempleo.beans.UsuarioBolsaEmpleo" %>
 <%@ page import="es.ujaen.uvirtual.beans.UVDatos"%>
+<%@ page import="es.ujaen.uvirtual.utilidades.EscapaHTML" %>
 <%@ page import="es.ujaen.uvirtual.utilidades.Formateador"%>
 
 <% 
@@ -28,7 +29,11 @@ UsuarioBolsaEmpleo candidato = bean.getCandidato();
 		}
 	%>
 	
-	<jsp:include page="/WEB-INF/jsp/vista/infadministrativa/bolsaempleo/mensajes.jsp" />
+<%	if (merito == null) { %>
+	
+		<jsp:include page="/WEB-INF/jsp/vista/infadministrativa/bolsaempleo/mensajes.jsp" />
+	
+<%	} %>
 	
 	<h2>Validar meritos no sujetos afinidad</h2>
 	<h3><%= descripcion %></h3>
@@ -72,43 +77,41 @@ UsuarioBolsaEmpleo candidato = bean.getCandidato();
 		</table>
 		
 	<%	if (merito != null) { %>
-	
-			<div class="row">
-				<div class="col">
-					<table class="bluetable bolsaempleo" id="tableBolsasCandidato">
-						<tr>
-							<th scope="col" style="width:45%">Bolsa</th>
-							<th scope="col" style="width:40%">Estado</th>
-							<th scope="col" style="width:15%">Propagar</th>
-						</tr>
-						<tbody>
-						</tbody>
-						<tfoot>
-							<tr>
-								<th colSpan="4" style="width:100%"></th>
-							</tr>
-						</tfoot>
-					</table>
-				</div>
-				<div class="col">
-					<table class="bluetable bolsaempleo" id="tableValoresMeritoBolsas">
-						<tr>
-							<th scope="col" style="width:8%">Mérito</th>
-							<th scope="col" style="width:40%">Bolsa</th>
-							<th scope="col" style="width:8%">Valor</th>
-							<th scope="col" style="width:15%">Excluido</th>
-							<th scope="col" style="width:19%">Apuntado en Bolsa</th>
-						</tr>
-						<tbody>
-						</tbody>
-						<tfoot>
-							<tr>
-								<th colSpan="5" style="width:100%"></th>
-							</tr>
-						</tfoot>
-					</table>
-				</div>
-			</div>
+			<div id="anchor_modificar_merito" style="margin-bottom: 24px;"></div>
+			
+			<jsp:include page="/WEB-INF/jsp/vista/infadministrativa/bolsaempleo/mensajes.jsp" />
+			
+			<table class="bluetable bolsaempleo" id="tableValoresMeritoBolsas">
+				<tr>
+					<th scope="col" style="width:12%">Convocatoria</th>
+					<th scope="col" style="width:60%">Bolsa</th>
+					<th scope="col" style="width:10%">Valor</th>
+					<th scope="col" style="width:10%">Excluido</th>
+					<th scope="col" style="width:15%">Último evaluador</th>
+				</tr>
+				<tbody>
+				</tbody>
+				<tfoot>
+					<tr>
+						<th colSpan="5" style="width:100%"></th>
+					</tr>
+				</tfoot>
+			</table>
+			
+			<table class="bluetable bolsaempleo" id="tableBolsasCandidato">
+				<tr>
+					<th scope="col" style="width:45%">Bolsa</th>
+					<th scope="col" style="width:40%">Estado</th>
+					<th scope="col" style="width:15%">Propagar</th>
+				</tr>
+				<tbody>
+				</tbody>
+				<tfoot>
+					<tr>
+						<th colSpan="3" style="width:100%"></th>
+					</tr>
+				</tfoot>
+			</table>
 			
 			<h3>Evaluar mérito: <%= merito.getMerito().getCodNum() %></h3>
 			
@@ -118,8 +121,9 @@ UsuarioBolsaEmpleo candidato = bean.getCandidato();
 		    	<input type="hidden" name="<%= ControladorValidarNoAfines.PARAM_CANDIDATO %>" value="<%= candidato.getCodNum() %>" />
 		    	<input type="hidden" name="<%= ControladorValidarNoAfines.PARAM_MERITO %>" value="<%= merito.getMerito().getCodNum() %>" />
 		    	<input type="hidden" name="<%= ControladorValidarNoAfines.PARAM_BOLSAS %>" value="[<%= bolsa.getCodNum() %>]" />
-		    	<div class="form-group-container col1">
-			    	<div class="form-group">
+				
+				<div class="form-group-container col2">
+					<div class="form-group">
 						<label class="bold-label" for="select_item">Categoría:</label>
 						<select class="form-input-custom" id="select_item" name="<%= ControladorValidarNoAfines.PARAM_ITEM %>">
 							<%
@@ -138,15 +142,6 @@ UsuarioBolsaEmpleo candidato = bean.getCandidato();
 				    		<%
 				    		}
 				    		%>
-						</select>
-					</div>
-				</div>
-				
-				<div class="form-group-container col2">
-			    	<div class="form-group">
-						<label class="bold-label" for="select_apartado">Afinidad-valor:</label>
-						<select class="form-input-custom" id="select_apartado" name="">
-							<option value="">Elija la Afinidad y el Valor</option>
 						</select>
 					</div>
 					<div class="form-group">
@@ -186,16 +181,8 @@ UsuarioBolsaEmpleo candidato = bean.getCandidato();
 		    	</div>
 		    	
 		    	<div class="form-btn">
-		    		<% if (merito.isExcluido()) { %>
-		    			<input id="merito_guardar" type="submit" name="<%= ControladorValidarNoAfines.PARAM_GUARDAR_MERITO %>" value="Guardar"/>
-			    		<input id="merito_aceptar" type="submit" name="<%= ControladorValidarNoAfines.PARAM_ACEPTAR_MERITO %>" value="Aceptar"/>
-		    		<% } else if (merito.isValidado()) { %>
-		    			<input id="merito_guardar" type="submit" name="<%= ControladorValidarNoAfines.PARAM_GUARDAR_MERITO %>" value="Guardar"/>
-			    		<input id="merito_excluir" type="submit" name="<%= ControladorValidarNoAfines.PARAM_EXCLUIR_MERITO %>" value="Excluir"/>
-		    		<% } else { %>
-			    		<input id="merito_aceptar" type="submit" name="<%= ControladorValidarNoAfines.PARAM_ACEPTAR_MERITO %>" value="Aceptar"/>
-			    		<input id="merito_excluir" type="submit" name="<%= ControladorValidarNoAfines.PARAM_EXCLUIR_MERITO %>" value="Excluir"/>
-		    		<% } %>
+		    		<input id="merito_aceptar" type="submit" name="<%= ControladorValidarNoAfines.PARAM_ACEPTAR_MERITO %>" value="Aceptar"/>
+			    	<input id="merito_excluir" type="submit" name="<%= ControladorValidarNoAfines.PARAM_EXCLUIR_MERITO %>" value="Excluir"/>
 		    	</div>
 		    </form>
 	<%	} else { %>
@@ -209,7 +196,7 @@ UsuarioBolsaEmpleo candidato = bean.getCandidato();
 $(document).ready(function() {
 	var tableCandidatos = new Atis.DataTable('#tableCandidatos', {
 	    "ajax": { url: "<%= ControladorValidarNoAfines.URL_PATTERN_AJAX %>", async: false },
-	    "pageSize": 10,
+	    "pageSize": 100,
 	    "action": "<%= ControladorValidarNoAfines.ACCION_DATATABLE_CANDIDATOS %>",
 	    "title": 'LISTA DE USUARIOS',
 	    "dropdown": true,
@@ -239,7 +226,7 @@ $(document).ready(function() {
 	
 		var tableMeritos = new Atis.DataTable('#tableMeritos', {
 		    "ajax": { url: "<%= ControladorValidarNoAfines.URL_PATTERN_AJAX %>", async: false },
-		    "pageSize": 10,
+		    "pageSize": 100,
 		    "filterable": true,
 		    "action": "<%= ControladorValidarNoAfines.ACCION_DATATABLE_MERITOS %>",
 		    "title": 'MÉRITOS PARA EL USUARIO: <%=candidato.getIdNif()%>',
@@ -292,8 +279,9 @@ $(document).ready(function() {
 			    "ajax": { url: "<%= ControladorValidarNoAfines.URL_PATTERN_AJAX %>", async: false },
 			    "pageSize": 10,
 			    "selectable": {'all': false},
+			    "selectedAll": true,
 			    "action": "<%= ControladorValidarNoAfines.ACCION_DATATABLE_BOLSAS_CANDIDATO %>",
-			    "title": 'BOLSAS EN LAS QUE ESTÁ APUNTADO ACTUALMENTE EL CANDIDATO',
+			    "title": 'BOLSAS EN LAS QUE ESTÁ APUNTADO EL MÉRITO EN ESTA SOLICITUD',
 			    "dropdown": true,
 			    "params": {
 			    	'<%=ControladorValidarNoAfines.PARAM_BOLSA%>': '<%= bolsa.getCodNum() %>',
@@ -308,13 +296,11 @@ $(document).ready(function() {
 			        {'data': 'contieneMerito', 'order': false, 'render': function(row) {
 			        	if (row.codNum == <%= bolsa.getCodNum() %>) {
 			        		return "<div class='text-primary'>Baremación actual</div>";
-			        	} else if (row.contieneMerito) {
-			        		return "<div class='text-success'>Inscrito actualmente</div>";
 			        	} else {
-			        		return "<div class='text-danger'>No inscrito</div>";
+			        		return "<div class='text-success'>Inscrito actualmente</div>";
 			        	}
 			        }},
-		        	{'data': 'codNum', 'order': false, 'selectable': {'disabled': true}}
+		        	{'data': 'codNum', 'order': false, 'selectable': {'disabled': '<%= bolsa.getCodNum() %>'}}
 			    ]
 			});
 			
@@ -322,7 +308,7 @@ $(document).ready(function() {
 			    "ajax": { url: "<%= ControladorValidarNoAfines.URL_PATTERN_AJAX %>", async: false },
 			    "pageSize": 10,
 			    "action": "<%= ControladorValidarNoAfines.ACCION_DATATABLE_VALORES_MERITO_BOLSA %>",
-			    "title": 'VALORES ACTUALES DE UN MÉRITO EN LAS DISTINTAS BOLSAS',
+			    "title": 'HISTORIAL DE VALORACIONES DEL MÉRITO: <%= merito.getMerito().getCodNum() %>',
 			    "dropdown": true,
 			    "params": {
 			    	'<%=ControladorValidarNoAfines.PARAM_BOLSA%>': '<%= bolsa.getCodNum() %>',
@@ -330,20 +316,19 @@ $(document).ready(function() {
 			    	'<%= ControladorValidarNoAfines.PARAM_MERITO %>': '<%= merito.getMerito().getCodNum() %>'
 			    	},
 			    "columns": [
-			    	{'data': 'meritoSolicitud.merito.codNum', 'order': false},
+			    	{'data': 'convocatoria.codNum'},
 			        {'data': 'bolsa.codNum', 'render': function(row) {
 			        	return row.bolsa.area.idAreaExterno + " : " + row.bolsa.area.descripcion;
 		        	}},
-		        	{'data': 'meritoSolicitud.merito.valor', 'order': false},
+		        	{'data': 'meritoSolicitud.valor', 'render': function(row) {
+		        		console.log(row.meritoSolicitud.valor);
+		        		return row.meritoSolicitud.valor != 0 ? row.meritoSolicitud.valor : '<%= merito.getMerito().getValor() %>';
+		        	}},
 		        	{'data': 'meritoSolicitud.excluido', 'order': false, 'render': function(row) {
 		        		return row.meritoSolicitud && row.meritoSolicitud.excluido ? 'SI' : 'NO';
 		        	}},
-		        	{'data': 'meritoSolicitud.codNum', 'order': false, 'render': function(row) {
-		        		if (row.meritoSolicitud.codNum) {
-		        			return 'SI';
-		        		} else {
-		        			return 'NO';
-		        		}
+		        	{'data': 'uidUsuario', 'order': false, 'render': function(row) {
+		        		return row.uidUsuario != '<%= EscapaHTML.escapa(candidato.getCodCuenta()) %>' ? row.uidUsuario : '';
 		        	}}
 			    ]
 			});
@@ -353,15 +338,14 @@ $(document).ready(function() {
 			});
 			
 			document.getElementById("merito_descargar_fichero").addEventListener("click", function() {
-				console.log("au")
 				window.open("<%= ControladorDescargaFicheros.URL_DESCARGA_FICHEROS %>"
-    		        	+ "<%= "?a=" + ControladorDescargaFicheros.ACCION_DESCARGAR_MERITO_PERSONAL + "&" + ControladorDescargaFicheros.PARAM_MERITO + "=" + bean.getMerito().getMerito().getCodNum() %>");
+    		        	+ "<%= "?a=" + ControladorDescargaFicheros.ACCION_DESCARGAR_MERITO_PERSONAL + "&" + ControladorDescargaFicheros.PARAM_MERITO + "=" + merito.getMerito().getCodNum() %>");
 			});
 			
-			Atis.smoothScrollToAnchor("#tableBolsasCandidato");
+			Atis.smoothScrollToAnchor("#anchor_modificar_merito");
 		<% } %>
 		
 	<% } %>
 	
-}); 
+});
 </script>

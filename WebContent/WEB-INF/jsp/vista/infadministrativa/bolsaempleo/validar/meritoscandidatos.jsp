@@ -163,7 +163,7 @@ UsuarioBolsaEmpleo candidato = bean.getCandidato();
 		    <div>Descripción de afinidades:</div>
 		    <ul>
 		    <%	for(Afinidad afinidad: bean.getListaAfinidades()) {
-		    		if (afinidad.getCodigo().equals(bean.getMerito().getMerito().getItemBaremacion().getAfinidad())) {
+		    		if (afinidad.getCodigo().equals(merito.getMerito().getItemBaremacion().getAfinidad())) {
 		    %>
 			    		<li><%= afinidad.getCodigo() + " " + afinidad.getModulacion() * 100 + "%" + " - " + afinidad.getDescripcion() %></li>
 		    <%		}
@@ -466,7 +466,7 @@ $(document).ready(function() {
 			
 			document.getElementById("merito_descargar_fichero").addEventListener("click", function() {
 				window.open("<%= ControladorDescargaFicheros.URL_DESCARGA_FICHEROS %>"
-    		        	+ "<%= "?a=" + ControladorDescargaFicheros.ACCION_DESCARGAR_MERITO_PERSONAL + "&" + ControladorDescargaFicheros.PARAM_MERITO + "=" + bean.getMerito().getMerito().getCodNum() %>");
+    		        	+ "<%= "?a=" + ControladorDescargaFicheros.ACCION_DESCARGAR_MERITO_PERSONAL + "&" + ControladorDescargaFicheros.PARAM_MERITO + "=" + merito.getMerito().getCodNum() %>");
 			});
 		
 			$('.bluetable').on('input', '.field-no-individualizado', function() {
