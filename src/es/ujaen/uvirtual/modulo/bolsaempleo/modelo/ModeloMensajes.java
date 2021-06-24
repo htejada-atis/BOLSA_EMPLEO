@@ -36,11 +36,11 @@ public class ModeloMensajes {
 	public static final int DESTINATARIOS_COLUMN_INDEX_CONVOCATORIA = 6;
 	public static final int DESTINATARIOS_COLUMN_INDEX_AREA = 7;
 	
+	public static final int NUMERO_MENSAJES_ENVIAR_BLOQUE = 100;
 	public static final int MENSAJES_COLUMN_TITULO_MAXLENGTH = 500;
 	
 	public static final String MENSAJE_ERROR_MENSAJE_NULL = "No se puede insertar un mensaje vacio";	
 	public static final String MENSAJE_ERROR_NO_EXISTE_MENSAJE = "No existe el mensaje";
-	
 	public static final String MENSAJE_AFINIDAD_OBLIGATORIA = "Afinidad obligatorio";
 	public static final String MENSAJE_AFINIDAD_CODNUM_REQUERIDO = "id afinidad no válido";
 
@@ -78,30 +78,7 @@ public class ModeloMensajes {
 		}
 		return eInstancia;
 	}
-	
-	/** Lista de mensajes a enviar .
-	 * @return .
-	 * @throws IOException .
-	 * @throws UVException .
-	 * @throws SQLException .
-	 */
-	public List<Mensaje> listaMensajesAEnviar() throws SQLException, IOException {
-		List<Mensaje> mensajes = new ArrayList<>();
-		String consulta = " SELECT bepcon.* "
-				+ " FROM TBEP_MENSAJES bepmen "
-				+ " WHERE bepmen.ESTADO = '" + MENSAJE_ESTADO_ENVIANDO + "'";
-
-		try (Connection conexion = ConexionUvirtual.obtenerInstancia(); PreparedStatement stmt = conexion.prepareStatement(consulta)) {
-			try (ResultSet rs = stmt.executeQuery()) {
-				while (rs.next()) {
-					mensajes.add(createMensajeFromResultSet(rs));
-				}
-			}
-		}
-
-		return mensajes;
-	}
-
+		
 	/**
 	 * Listado de mensajes.
 	 * 
@@ -565,6 +542,7 @@ public class ModeloMensajes {
 			throw new UVException(MENSAJE_ERROR_NO_EXISTE_MENSAJE);
 		}
 		
+		// limit de 100 en 100 destinatarios.
 		String consultaSelect = "SELECT bepusu.*, bepmde.ESTADO, bepmde.BEPMEN_CODNUM FROM TBEP_MEN_DESTINATARIOS bepmde"
 				+ "	INNER JOIN TBEP_USUARIOS bepusu ON bepusu.CODNUM = bepmde.BEPUSU_CODNUM"
 				+ " WHERE BEPMEN_CODNUM = ? AND bepusu.VUAJA_EMAIL_ALTA IS NOT NULL";
@@ -604,6 +582,74 @@ public class ModeloMensajes {
 		this.actualizaEstadoDestinatario(mensaje, destinatario, DESTINATARIO_ESTADO_FALLO, usuarioUpdate);
 	}
 	
+	/**
+	 * Devuelve los destinatarios de mensajes pendientes de envio en bloques.
+	 * @return .
+	 * @throws SQLException .
+	 * @throws UVException .
+	 */
+	public List<Destinatario> listaDestinatariosAEnviarEnBloques() throws SQLException, UVException {
+		String consulta = ""
+				+ " SELECT bepusu.*, bepmde.ESTADO, bepmde.BEPMEN_CODNUM "
+				+ " FROM TBEP_MEN_DESTINATARIOS bepmde "
+				+ " INNER JOIN TBEP_MENSAJES bepmen ON bepmen.CODNUM = bepmde.BEPMEN_CODNUM "
+				+ " INNER JOIN TBEP_USUARIOS bepusu ON bepusu.CODNUM = bepmde.BEPUSU_CODNUM "
+				+ " WHERE 1=1 "
+				+ "		AND bepmde.ESTADO = '" + ModeloMensajes.DESTINATARIO_ESTADO_SINENVIAR + "' "
+				+ "	 	AND bepusu.VUAJA_EMAIL_ALTA IS NOT NULL "
+				+ "		AND bepusu.FLGBORRADO = 'N' "
+				+ " FETCH FIRST " + ModeloMensajes.NUMERO_MENSAJES_ENVIAR_BLOQUE + " ROWS ONLY ";
+		
+		List<Destinatario> destinatarios = new ArrayList<>();
+		
+		try (Connection conexion = ConexionUvirtual.obtenerInstancia(); PreparedStatement stmt = conexion.prepareStatement(consulta)) {
+			try (ResultSet rs = stmt.executeQuery()) {
+				while (rs.next()) {
+					destinatarios.add(createDestinatarioFromResultSet(rs));
+				}
+			}
+		}
+
+		return destinatarios;
+	}
+	
+	/**
+	 * Actualiza el estado del mensaje a enviado si todos los destinatarios del mismos han
+	 * sido enviados (o si ha ocurrido un error). 
+	 * @param m .
+	 * @throws UVException .
+	 * @throws SQLException .
+	 */
+	public void actualizaEstadoMensajePorDestinatarios(Mensaje m) throws SQLException, UVException {
+		String countQuery = ""
+				+ " SELECT COUNT(*) AS TOTAL "
+				+ " FROM TBEP_MEN_DESTINATARIOS bepmde "
+				+ " INNER JOIN TBEP_MENSAJES bepmen ON bepmen.CODNUM = bepmde.BEPMEN_CODNUM "
+				+ " INNER JOIN TBEP_USUARIOS bepusu ON bepusu.CODNUM = bepmde.BEPUSU_CODNUM "
+				+ " WHERE 1=1 "
+				+ "		AND bepmde.ESTADO = '" + ModeloMensajes.DESTINATARIO_ESTADO_SINENVIAR + "' "
+				+ "	 	AND bepusu.VUAJA_EMAIL_ALTA IS NOT NULL "
+				+ "		AND bepusu.FLGBORRADO = 'N' "
+				+ "		AND bepmen.ESTADO = '" + ModeloMensajes.MENSAJE_ESTADO_ENVIANDO + "' "
+				+ "		AND bepmen.CODNUM = ? ";
+		
+		int count = 0;
+		try (Connection conexion = ConexionUvirtual.obtenerInstancia(); PreparedStatement stmt = conexion.prepareStatement(countQuery)) {
+			int indexParam = 1;
+			stmt.setInt(indexParam++, m.getCodNum());
+			
+			try (ResultSet rs = stmt.executeQuery()) {
+				if (rs.next()) {
+					count = rs.getInt("TOTAL"); 
+				}
+			}
+		}
+		
+		if (count == 0) {
+			this.actualizaEstadoMensajeComoEnviado(m, null);			
+		}
+	} 
+	
 	private void actualizaEstadoDestinatario(Mensaje mensaje, UsuarioBolsaEmpleo destinatario, String estado, UsuarioBolsaEmpleo usuarioUpdate)
 			throws SQLException, UVException {
 		if (mensaje == null) {
@@ -637,7 +683,7 @@ public class ModeloMensajes {
 	}
 	
 	private Destinatario createDestinatarioFromResultSet(ResultSet rs) throws SQLException, UVException {
-		UsuarioBolsaEmpleo usuario = ModeloUsuarioBolsaEmpleo.obtenerInstancia().getUsuarioFromResultSet(rs);
+		UsuarioBolsaEmpleo usuario = ModeloUsuarioBolsaEmpleo.obtenerInstancia().getUsuarioFromResultSet(rs);		
 		return new Destinatario(usuario, rs.getInt("BEPMEN_CODNUM"), rs.getString("ESTADO"));
 	}
 	

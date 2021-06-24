@@ -3,7 +3,9 @@ package es.ujaen.uvirtual.modulo.bolsaempleo.tareas;
 import java.io.IOException;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -33,27 +35,32 @@ public final class EnviarMensaje {
 	public static void run() {
 		try {
 			ModeloMensajes modelo = ModeloMensajes.obtenerInstancia();
-
-			for (Mensaje mensaje : modelo.listaMensajesAEnviar()) {
-				List<Destinatario> destinatarios = modelo.obtenerDestinatariosMensaje(mensaje);
-				boolean enviado = false;
-				
-				for (Destinatario destinatario: destinatarios) {
-					if (destinatario.getEstado().equals(ModeloMensajes.DESTINATARIO_ESTADO_SINENVIAR)) {
-						List<String> emails = new ArrayList<>();
-						emails.add(destinatario.getEmail());
-						if (EnviaCorreo.enviaCorreo(emails, mensaje.getTitulo(), mensaje.getCuerpo())) {
-							modelo.actualizaEstadoDestinatarioComoEnviado(mensaje, destinatario, null);
-							enviado = true;
-						} else {
-							modelo.actualizaEstadoDestinatarioComoFallo(mensaje, destinatario, null);
-						}
-					}					
+			
+			// cache de mensajes (en principio solo 1 o máximo 100 en el peor de los casos)
+			Map<Integer, Mensaje> mensajes = new HashMap<>(); 
+			
+			// leemos destinatarios pendientes de envio (max. 100)
+			List<Destinatario> destinatarios = modelo.listaDestinatariosAEnviarEnBloques(); 			
+			for (Destinatario destinatario : destinatarios) {
+				// leemos mensaje
+				if (!mensajes.containsKey(destinatario.getCodNumMensaje())) {
+					mensajes.put(destinatario.getCodNumMensaje(), modelo.getMensajeById(destinatario.getCodNumMensaje()));
 				}
+				Mensaje mensaje = mensajes.get(destinatario.getCodNumMensaje());
 				
-				if (enviado) {
-					modelo.actualizaEstadoMensajeComoEnviado(mensaje, null);
+				// enviamos mensajes
+				List<String> emails = new ArrayList<>();
+				emails.add(destinatario.getEmail());
+				if (EnviaCorreo.enviaCorreo(emails, mensaje.getTitulo(), mensaje.getCuerpo())) {
+					modelo.actualizaEstadoDestinatarioComoEnviado(mensaje, destinatario, null);					
+				} else {
+					modelo.actualizaEstadoDestinatarioComoFallo(mensaje, destinatario, null);
 				}
+			}
+			
+			// actualizamos estados de mensajes
+			for (Mensaje msg : mensajes.values()) {
+				modelo.actualizaEstadoMensajePorDestinatarios(msg);
 			}
 		} catch (SQLException | UVException | IOException e) {
 			LOGGER.log(Level.SEVERE, Formateador.getStackTrace(e));

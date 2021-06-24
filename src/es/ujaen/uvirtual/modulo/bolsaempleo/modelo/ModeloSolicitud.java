@@ -1815,7 +1815,7 @@ public class ModeloSolicitud {
 		solicitud.setRazonExclusion(rs.getString("RAZON_EXCLUSION"));
 		solicitud.setFechaExclusion(rs.getDate("FECHA_EXCLUSION"));
 		
-		if (archivo) {
+		if (archivo && rs.getBlob("ARCHIVO") != null) {
 			solicitud.setArchivo(rs.getBlob("ARCHIVO").getBinaryStream());
 		}
 		
