@@ -180,10 +180,6 @@ public class ModeloSolicitud {
 			
 			try (ResultSet rs = stmt.executeQuery()) {
 				while (rs.next()) {
-					Convocatoria convocatoria = modeloConvocatoria.getConvocatoriaById(rs.getInt(CODNUM));
-					if (convocatoria == null) {
-						throw new UVException("No existe la convocatoria con id " + rs.getInt(CODNUM));
-					}
 					data.add(this.createSolicitudFromResultSet(rs, false));
 				}
 			}
