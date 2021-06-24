@@ -33,13 +33,11 @@ VistaCandidatos bean = (VistaCandidatos) uvdatos.getVistas().get(VistaCandidatos
 		<h4>EXCLUIDA: <%= Formateador.formatoFecha(bean.getSolicitud().getFechaExclusion(), Formateador.FORMATO_FECHA_DDMMYYYY_HHMMSS) %> - <%= bean.getSolicitud().getRazonExclusion() %></h4>
 	<% } %>
 	
-	<div class="form-group-container col2">
-		<div class="form-group">
-			<button class="link-btn" id="candidato_volver" style="float:left;">
-		    	 Volver
-		    </button>
-		</div>
-		<div class="form-group">
+	<div class="row">
+		<button class="link-btn" id="candidato_volver" style="float:left;max-height: 25px">
+	    	 Volver
+	    </button>
+		<div class="col">
 	
 	<%	if (bean.getSolicitud().getConvocatoria().getEstado().equals(ModeloConvocatoria.CONVOCATORIA_ESTADO_ABIERTA) &&
 			bean.getSolicitud().getEstado().equals(ModeloSolicitud.SOLICITUD_ESTADO_CERRADA)) { %>
