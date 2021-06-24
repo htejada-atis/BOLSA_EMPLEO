@@ -136,8 +136,9 @@ VistaItemsBaremacion bean = (VistaItemsBaremacion) uvdatos.getVistas().get(Vista
 		    "defaultOrderDirection": "asc",
 		    "clickable": {'onClick': function(row) {
 		    	var params = {
-	    				'a': '<%= ControladorItemsBaremacion.ACCION_APARTADO_SELECCIONADO %>', 
-	    				'<%= ControladorItemsBaremacion.PARAM_APARTADO %>': row.codNum};
+    				'<%=ControladorItemsBaremacion.PARAM_ACCION%>': '<%=ControladorItemsBaremacion.ACCION_APARTADO_SELECCIONADO%>', 
+    				'<%=ControladorItemsBaremacion.PARAM_APARTADO%>': row.codNum
+    			};
         		Atis.sendForm("<%= request.getRequestURI() %>", params);
 		    }},
 		 	<%	if (bean.getApartadoBaremacion() != null) { %> "selected": <%= bean.getApartadoBaremacion().getCodNum() %> ,<% } %>
@@ -156,14 +157,18 @@ VistaItemsBaremacion bean = (VistaItemsBaremacion) uvdatos.getVistas().get(Vista
 	        	}},
 		    ],
 		    "actions": [		    	
-		    	{'label': 'Añadir', 'title': 'Añadir un nuevo bloque', 'onClick': function(selected) {
-		    		var params = {'a': '<%=ControladorItemsBaremacion.ACCION_AGREGAR_APARTADO%>'};
+		    	{'label': 'Añadir', 
+		    	 'title': 'Añadir un nuevo bloque', 
+		    	 'onClick': function(selected) {
+		    		var params = {'<%=ControladorItemsBaremacion.PARAM_ACCION%>': '<%=ControladorItemsBaremacion.ACCION_AGREGAR_APARTADO%>'};
 	        		Atis.sendForm("<%=request.getRequestURI()%>", params);
 		    	}},
-		    	{'label': activatorBloqueName, 
-		    	 'showWhenSelected': true, 
-		    	 'title': activatorBloqueName + ' bloque seleccionado', 
+		    	{'label': function(row) { return row.activo ? "Desactivar" : "Desactivar"; }, 
+		    	 'title': function(row) { return row.activo ? "Desactivar" : "Desactivar"; },
+		    	 'showWhenSelected': true, 		    	 
 		    	 'onClick': function(selected) {
+		    		console.log(selected);
+		    		 
 	        		Atis.confirmDialog(activatorBloqueName + " bloque", "¿ Desea " + activatorBloqueName + " el bloque seleccionado?", {
 		        		Si: function() {
 		        			var params = {

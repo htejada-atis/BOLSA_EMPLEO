@@ -5,6 +5,7 @@
  * 20210602 overflow-auto y render
  * 20210604 select all y columnas preseleccionadas
  * 20210607 opción por defecto en select boolean
+ * 20210624 title y label en los botones de acciones permiten funciones
  */
  
 function DataTable(id, config) {
@@ -311,8 +312,11 @@ function DataTable(id, config) {
         if (self.config.actions) {
             for (var i = 0; i < self.config.actions.length; i++) {
             	var action = self.config.actions[i];
+            	var label = Atis.isFunction(action.label) ? action.label(row) : action.label;
+                var title = action.title ? (Atis.isFunction(action.title) ? action.title(row) : action.title) : ''; 
+            	
             	if (action.showWhenSelected == null || action.showWhenSelected == (self.config.selected > 0)) {
-	            	var btn = $('<button class="btn"' + (action.title ? 'title="' + action.title + '"' : '') + ' type="button">' + action.label + '</button>');
+	            	var btn = $('<button class="btn" title="' + title + '" type="button">' + label + '</button>');
 	            	
 	            	if (self.config.selected) {
 	            		selected = self.config.selected;
