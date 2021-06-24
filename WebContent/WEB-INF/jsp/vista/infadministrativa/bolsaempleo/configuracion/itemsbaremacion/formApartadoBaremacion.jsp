@@ -49,12 +49,12 @@ ApartadoBaremacion apartado = bean.getApartadoBaremacion();
 			<div class="form-group">
 				<label for="apartado_puntuacionmaxima">Puntuación máxima del bloque</label> 
 				<input type="text" class="form-input-custom" name="<%= ControladorItemsBaremacion.PARAM_APARTADO_PUNTUACIONMAXIMA %>" id="apartado_puntuacionmaxima"
-					value="<%= BolsaEmpleoUtils.getParamForm(request, ControladorItemsBaremacion.PARAM_APARTADO_PUNTUACIONMAXIMA, apartado != null && apartado.getPuntuacionMaxima() != null ? apartado.getPuntuacionMaxima().toString() : "") %>"/>
+					value="<%= BolsaEmpleoUtils.getParamForm(request, ControladorItemsBaremacion.PARAM_APARTADO_PUNTUACIONMAXIMA, (apartado != null && apartado.getPuntuacionMaxima() != null) ? apartado.getPuntuacionMaxima().toString() : "") %>"/>
 			</div>
 			<div class="form-group">
 				<label for="apartado_porcentajemaximo">Porcentaje máximo del bloque</label> 
 				<input type="text" class="form-input-custom" name="<%=ControladorItemsBaremacion.PARAM_APARTADO_PORCENTAJEMAXIMO%>" id="apartado_porcentajemaximo" 
-					value="<%= BolsaEmpleoUtils.getParamForm(request, ControladorItemsBaremacion.PARAM_APARTADO_PORCENTAJEMAXIMO, apartado != null && apartado.getPorcentajeMaximo() != null ? apartado.getPorcentajeMaximo().toString() : "") %>"/>
+					value="<%= BolsaEmpleoUtils.getParamForm(request, ControladorItemsBaremacion.PARAM_APARTADO_PORCENTAJEMAXIMO, (apartado != null && apartado.getPorcentajeMaximo() != null) ? apartado.getPorcentajeMaximo().toString() : "") %>"/>
 			</div>
 		</div>
 		<div class="form-btn">

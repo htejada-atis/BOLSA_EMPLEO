@@ -78,7 +78,6 @@ public class ControladorItemsBaremacion extends HttpServlet {
 	public static final String MENSAJE_EXITO_BLOQUE_EDITAR = "Apartado editado correctamente";
 	public static final String MENSAJE_EXITO_BLOQUE_DESACTIVAR = "Apartado desactivado correctamente";
 	public static final String MENSAJE_EXITO_BLOQUE_ACTIVAR = "Apartado activado correctamente";
-	public static final String MENSAJE_ERROR_BLOQUE_NUMMAXMERITOS_NUMERICO = "El número máximo de méritos debe ser un número";
 	public static final String MENSAJE_ERROR_BLOQUE_NUMMAXMERITOS_MINIMO = "El número máximo de méritos debe ser al menos uno";
 	
 	// acciones items
@@ -132,8 +131,6 @@ public class ControladorItemsBaremacion extends HttpServlet {
 	public static final String MENSAJE_ERROR_NOMBRE_VACIO = "El nombre no puede estar vacio";
 	public static final String MENSAJE_ERROR_NOMBRE_MAXIMO = "El nombre no puede contener mas de %d caracteres";
 	public static final String MENSAJE_ERROR_DESCRIPCION_MAXIMO = "La descripción no puede ser mayor que %d caracteres";
-	public static final String MENSAJE_ERROR_VALOR_NO_VALIDO = "Valor no válido";
-	public static final String MENSAJE_ERROR_AFINIDAD_VACIO = "La afinidad no puede estar vacia";
 	
 	// vistas	
 	public static final String RUTA_BEP_CONF = "/WEB-INF/jsp/vista/infadministrativa/bolsaempleo/configuracion/itemsbaremacion/";
@@ -184,6 +181,7 @@ public class ControladorItemsBaremacion extends HttpServlet {
 				case ACCION_APARTADO_SELECCIONADO:
 					accionesApartados(bean, datos, request, response, nombreAccion);					
 					break;
+					
 				case ACCION_DATATABLE_BLOQUES:
 				case ACCION_AGREGAR_BLOQUE:
 				case ACCION_AGREGAR_BLOQUE_CONFIRM:

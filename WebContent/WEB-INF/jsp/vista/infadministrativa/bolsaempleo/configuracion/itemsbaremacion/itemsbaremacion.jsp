@@ -160,11 +160,14 @@ VistaItemsBaremacion bean = (VistaItemsBaremacion) uvdatos.getVistas().get(Vista
 		    		var params = {'a': '<%=ControladorItemsBaremacion.ACCION_AGREGAR_APARTADO%>'};
 	        		Atis.sendForm("<%=request.getRequestURI()%>", params);
 		    	}},
-		    	{'label': activatorBloqueName, 'showWhenSelected': true, 'title': activatorBloqueName + ' bloque seleccionado', 'onClick': function(selected) {
+		    	{'label': activatorBloqueName, 
+		    	 'showWhenSelected': true, 
+		    	 'title': activatorBloqueName + ' bloque seleccionado', 
+		    	 'onClick': function(selected) {
 	        		Atis.confirmDialog(activatorBloqueName + " bloque", "¿ Desea " + activatorBloqueName + " el bloque seleccionado?", {
 		        		Si: function() {
 		        			var params = {
-			    				'a': activatorApartado ? '<%=ControladorItemsBaremacion.ACCION_ACTIVAR_APARTADO%>' : '<%=ControladorItemsBaremacion.ACCION_DESACTIVAR_APARTADO%>' , 
+			    				'<%=ControladorItemsBaremacion.PARAM_ACCION%>': activatorApartado ? '<%=ControladorItemsBaremacion.ACCION_ACTIVAR_APARTADO%>' : '<%=ControladorItemsBaremacion.ACCION_DESACTIVAR_APARTADO%>' , 
 			    				'<%=ControladorItemsBaremacion.PARAM_APARTADO%>': selected
 			    			};
 			        		Atis.sendForm("<%=request.getRequestURI()%>", params);
@@ -175,9 +178,14 @@ VistaItemsBaremacion bean = (VistaItemsBaremacion) uvdatos.getVistas().get(Vista
 				    	}
 				    });
 		    	}},
-		    	{'label': 'Editar', 'showWhenSelected': true, 'title': 'Editar bloque seleccionado', 'onClick': function(selected) {
-		    		var params = {'a': '<%=ControladorItemsBaremacion.ACCION_EDITAR_APARTADO%>', 
-		    				'<%=ControladorItemsBaremacion.PARAM_APARTADO%>': selected};
+		    	{'label': 'Editar', 
+		    	 'showWhenSelected': true, 
+		    	 'title': 'Editar bloque seleccionado', 
+		    	 'onClick': function(selected) {
+		    		var params = {
+		    			'<%=ControladorItemsBaremacion.PARAM_ACCION%>': '<%=ControladorItemsBaremacion.ACCION_EDITAR_APARTADO%>', 
+		    			'<%=ControladorItemsBaremacion.PARAM_APARTADO%>': selected
+		    		};
 	        		Atis.sendForm("<%=request.getRequestURI()%>", params);
 		    	}}
 		    ]
