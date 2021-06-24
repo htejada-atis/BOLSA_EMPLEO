@@ -15,7 +15,7 @@ public class MeritoSolicitud implements Serializable {
 	private Merito merito;
 	private Boolean excluido;
 	private Boolean validado;
-	private String observacionCandidato;
+	private String observacionCandidato;	
 	private List<MeritoSolicitudValoracion> valoraciones;
 
 	/**

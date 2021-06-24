@@ -100,6 +100,10 @@ public final class UtilsTestBolsaEmpleo {
 			// datos para pruebas
 			UtilsTestBolsaEmpleo.ejecutarMultiplesScripts("DATOS PRUEBA", "Documentos/scripts/opc.bolsaempleo/datos_desarrollo/datos_prueba", ESQUEMA_UVIRTUAL, false);
 			cargado = true;
+			
+			// migraciones
+			BbddRunner.ejecutar("Documentos/scripts/opc.bolsaempleo/migraciones/01-exclusionsolicitud.sql");
+			BbddRunner.ejecutar("Documentos/scripts/opc.bolsaempleo/migraciones/02-mensajesdestinatarios.sql");
 		}
 	}
 

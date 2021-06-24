@@ -9,9 +9,8 @@ import java.sql.Types;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-
 import es.ujaen.uvirtual.modelo.conexion.ConexionUvirtual;
-import es.ujaen.uvirtual.modulo.bolsaempleo.beans.Bolsa;
+import es.ujaen.uvirtual.modulo.bolsaempleo.beans.Destinatario;
 import es.ujaen.uvirtual.modulo.bolsaempleo.beans.Mensaje;
 import es.ujaen.uvirtual.modulo.bolsaempleo.beans.UsuarioBolsaEmpleo;
 import es.ujaen.uvirtual.modulo.bolsaempleo.utilidades.BolsaEmpleoDataTable;
@@ -37,18 +36,23 @@ public class ModeloMensajes {
 	public static final int DESTINATARIOS_COLUMN_INDEX_CONVOCATORIA = 6;
 	public static final int DESTINATARIOS_COLUMN_INDEX_AREA = 7;
 	
+	public static final int NUMERO_MENSAJES_ENVIAR_BLOQUE = 100;
 	public static final int MENSAJES_COLUMN_TITULO_MAXLENGTH = 500;
 	
 	public static final String MENSAJE_ERROR_MENSAJE_NULL = "No se puede insertar un mensaje vacio";	
 	public static final String MENSAJE_ERROR_NO_EXISTE_MENSAJE = "No existe el mensaje";
-	
 	public static final String MENSAJE_AFINIDAD_OBLIGATORIA = "Afinidad obligatorio";
 	public static final String MENSAJE_AFINIDAD_CODNUM_REQUERIDO = "id afinidad no válido";
 
 	public static final String CODNUM = "CODNUM";
-	public static final String ESTADO_BORRADOR = "BORRADOR";
-	public static final String ESTADO_ENVIADO = "ENVIADO";
+	public static final String MENSAJE_ESTADO_BORRADOR = "BORRADOR";
+	public static final String MENSAJE_ESTADO_ENVIADO = "ENVIADO";
+	public static final String MENSAJE_ESTADO_ENVIANDO = "ENVIANDO";
 	
+	public static final String DESTINATARIO_ESTADO_ENVIADO = "ENVIADO";
+	public static final String DESTINATARIO_ESTADO_SINENVIAR = "SIN ENVIAR";
+	public static final String DESTINATARIO_ESTADO_FALLO = "FALLO";
+		
 	public static final String ERROR_DESTINATARIO_YA_EXISTE = "El destinatario ya estaba agregado al mensaje previamente";
 
 	protected static ModeloMensajes eInstancia;
@@ -74,7 +78,7 @@ public class ModeloMensajes {
 		}
 		return eInstancia;
 	}
-
+		
 	/**
 	 * Listado de mensajes.
 	 * 
@@ -123,16 +127,16 @@ public class ModeloMensajes {
 	 * @throws UVException .
 	 * @throws IOException .
 	 */
-	public BolsaEmpleoDataTable<UsuarioBolsaEmpleo> listaDestinatariosMensajeDatatable(Map<String, String[]> params, Mensaje mensaje) throws SQLException, UVException {
+	public BolsaEmpleoDataTable<Destinatario> listaDestinatariosMensajeDatatable(Map<String, String[]> params, Mensaje mensaje) throws SQLException, UVException {
 		if (mensaje == null) {
 			throw new UVException("El mensaje es requerido");
 		}
 			
-		List<UsuarioBolsaEmpleo> destinatarios = new ArrayList<>();
-		BolsaEmpleoDataTable<UsuarioBolsaEmpleo> dataTable = new BolsaEmpleoDataTable<>(params);
+		List<Destinatario> destinatarios = new ArrayList<>();
+		BolsaEmpleoDataTable<Destinatario> dataTable = new BolsaEmpleoDataTable<>(params);
 
 		String consulta = ""
-				+ " SELECT bepusu.* "
+				+ " SELECT bepusu.*, bepmde.ESTADO, bepmde.BEPMEN_CODNUM "
 				+ " FROM TBEP_MEN_DESTINATARIOS bepmde "
 				+ " INNER JOIN TBEP_USUARIOS bepusu ON bepusu.CODNUM = bepmde.BEPUSU_CODNUM "
 				+ " WHERE bepmde.BEPMEN_CODNUM = ? ";
@@ -156,7 +160,7 @@ public class ModeloMensajes {
 
 			try (ResultSet rs = stmt.executeQuery()) {
 				while (rs.next()) {					
-					destinatarios.add(ModeloUsuarioBolsaEmpleo.obtenerInstancia().getUsuarioById(rs.getInt("CODNUM")));
+					destinatarios.add(this.createDestinatarioFromResultSet(rs));
 				}
 			}
 
@@ -185,13 +189,18 @@ public class ModeloMensajes {
 		List<UsuarioBolsaEmpleo> destinatarios = new ArrayList<>();
 		BolsaEmpleoDataTable<UsuarioBolsaEmpleo> dataTable = new BolsaEmpleoDataTable<>(params);
 
-		String consulta = "SELECT bepusu.* FROM TBEP_USUARIOS bepusu"
+		String consulta = ""
+				+ " SELECT bepusu.* "
+				+ " FROM TBEP_USUARIOS bepusu "
 				+ (dataTable.filterExists(DESTINATARIOS_COLUMN_INDEX_CONVOCATORIA) 
 						? "	LEFT JOIN TBEP_SOLICITUDES bepsol ON bepusu.CODNUM = bepsol.BEPUSU_CODNUM" : "")
 				+ (dataTable.filterExists(DESTINATARIOS_COLUMN_INDEX_AREA)
 						? " LEFT JOIN TBEP_SOLICITUD_BOLSAS bepsbo ON bepsol.CODNUM = bepsbo.BEPSOL_CODNUM" : "")
 				+ "	LEFT JOIN TBEP_MEN_DESTINATARIOS bepmde ON bepusu.CODNUM = bepmde.BEPUSU_CODNUM AND bepmde.BEPMEN_CODNUM = ?"
-				+ "	WHERE bepusu.FLGBORRADO = 'N' AND bepmde.BEPUSU_CODNUM IS NULL AND bepusu.VUAJA_EMAIL_ALTA IS NOT NULL";
+				+ "	WHERE 1=1 "
+				+ "		AND bepusu.FLGBORRADO = 'N' "
+				+ " 	AND bepmde.BEPUSU_CODNUM IS NULL "
+				+ "		AND bepusu.VUAJA_EMAIL_ALTA IS NOT NULL";
 		
 		String whereConvocatoria = "(SELECT bepsol2.BEPCON_CODNUM FROM TBEP_SOLICITUDES bepsol2"
 				+ "	WHERE bepusu.CODNUM = bepsol2.BEPUSU_CODNUM AND bepsol2.BEPCON_CODNUM = bepsol.BEPCON_CODNUM)";
@@ -303,10 +312,10 @@ public class ModeloMensajes {
 	 */
 	public Integer nuevoMensajeEnBorrador(UsuarioBolsaEmpleo usuarioUpdate) throws SQLException, UVException {
 		Mensaje mensaje = new Mensaje();
-		mensaje.setTitulo(ESTADO_BORRADOR);
-		mensaje.setEstado(ESTADO_BORRADOR);
+		mensaje.setTitulo(MENSAJE_ESTADO_BORRADOR);
+		mensaje.setEstado(MENSAJE_ESTADO_BORRADOR);
 		mensaje.setFechaCreacion(BolsaEmpleoUtils.getCurrentDateTime());
-		mensaje.setCuerpo(ESTADO_BORRADOR);
+		mensaje.setCuerpo(MENSAJE_ESTADO_BORRADOR);
 		
 		return nuevoMensaje(mensaje, usuarioUpdate);
 	}
@@ -332,6 +341,53 @@ public class ModeloMensajes {
 			stmt.setString(indexParam++, mensaje.getCuerpo());
 			stmt.setString(indexParam++, mensaje.getEstado());
 			stmt.setString(indexParam++, usuarioUpdate.getCodCuenta());
+			stmt.setInt(indexParam++, mensaje.getCodNum());
+			stmt.executeUpdate();
+		}
+	}
+	
+	/** Actualiza el estado de un mensaje a enviando .
+	 * @param mensaje .
+	 * @param usuarioUpdate .
+	 * @throws UVException .
+	 * @throws SQLException .
+	 */
+	public void actualizaEstadoMensajeComoEnviando(Mensaje mensaje, UsuarioBolsaEmpleo usuarioUpdate) throws SQLException, UVException {
+		this.actualizaEstadoMensaje(mensaje, MENSAJE_ESTADO_ENVIANDO, usuarioUpdate);
+	}
+	
+	/** Actualiza el estado de un mensaje a enviado .
+	 * @param mensaje .
+	 * @param usuarioUpdate .
+	 * @throws UVException .
+	 * @throws SQLException .
+	 */
+	public void actualizaEstadoMensajeComoEnviado(Mensaje mensaje, UsuarioBolsaEmpleo usuarioUpdate) throws SQLException, UVException {
+		this.actualizaEstadoMensaje(mensaje, MENSAJE_ESTADO_ENVIADO, usuarioUpdate);
+	}
+	
+	private void actualizaEstadoMensaje(Mensaje mensaje, String estado, UsuarioBolsaEmpleo usuarioUpdate) throws SQLException, UVException {
+		if (mensaje == null) {
+			throw new UVException(MENSAJE_ERROR_MENSAJE_NULL);
+		}
+		
+		String usuarioUp = usuarioUpdate != null ? usuarioUpdate.getCodCuenta() : "TAREA_PROGRAMADA";
+		
+		String consulta = "UPDATE TBEP_MENSAJES SET ESTADO = ?, FECHA_ENVIO = ?, UID_USUARIO = ?"
+				+ "	WHERE CODNUM = ?";
+		
+		try (Connection conexion = ConexionUvirtual.obtenerInstancia();
+				PreparedStatement stmt = conexion.prepareStatement(consulta)) {
+			int indexParam = 1;
+			stmt.setString(indexParam++, estado);
+			
+			if (estado.equals(MENSAJE_ESTADO_ENVIADO)) {
+				stmt.setDate(indexParam++, new java.sql.Date(BolsaEmpleoUtils.getCurrentDateTime().getTime()));
+			} else {
+				stmt.setNull(indexParam++, Types.DATE);
+			}
+			
+			stmt.setString(indexParam++, usuarioUp);
 			stmt.setInt(indexParam++, mensaje.getCodNum());
 			stmt.executeUpdate();
 		}
@@ -423,7 +479,7 @@ public class ModeloMensajes {
 		if (mensaje == null) {
 			throw new UVException(MENSAJE_ERROR_NO_EXISTE_MENSAJE);
 		}
-		if (!mensaje.getEstado().equals(ESTADO_BORRADOR)) {
+		if (!mensaje.getEstado().equals(MENSAJE_ESTADO_BORRADOR)) {
 			throw new UVException("El mensaje no está en borrador");
 		}
 		
@@ -466,9 +522,9 @@ public class ModeloMensajes {
 	 * @throws UVException .
 	 */
 	public void eliminaDestinatariosMensaje(Mensaje mensaje, UsuarioBolsaEmpleo usuarioUpdate) throws UVException, SQLException {
-		List<UsuarioBolsaEmpleo> listaUsuarios = obtenerDestinatariosMensaje(mensaje);
+		List<Destinatario> listaUsuarios = obtenerDestinatariosMensaje(mensaje);
 		
-		for (UsuarioBolsaEmpleo usuario: listaUsuarios) {
+		for (Destinatario usuario: listaUsuarios) {
 			this.eliminarDestinatario(mensaje, usuario, usuarioUpdate);
 		}
 	}
@@ -479,14 +535,15 @@ public class ModeloMensajes {
 	 * @throws SQLException .
 	 * @throws UVException .
 	 */
-	public List<UsuarioBolsaEmpleo> obtenerDestinatariosMensaje(Mensaje mensaje) throws UVException, SQLException {
-		List<UsuarioBolsaEmpleo> usuarios = new ArrayList<>();
+	public List<Destinatario> obtenerDestinatariosMensaje(Mensaje mensaje) throws UVException, SQLException {
+		List<Destinatario> usuarios = new ArrayList<>();
 		
 		if (mensaje == null) {
 			throw new UVException(MENSAJE_ERROR_NO_EXISTE_MENSAJE);
 		}
 		
-		String consultaSelect = "SELECT bepusu.* FROM TBEP_MEN_DESTINATARIOS bepmde"
+		// limit de 100 en 100 destinatarios.
+		String consultaSelect = "SELECT bepusu.*, bepmde.ESTADO, bepmde.BEPMEN_CODNUM FROM TBEP_MEN_DESTINATARIOS bepmde"
 				+ "	INNER JOIN TBEP_USUARIOS bepusu ON bepusu.CODNUM = bepmde.BEPUSU_CODNUM"
 				+ " WHERE BEPMEN_CODNUM = ? AND bepusu.VUAJA_EMAIL_ALTA IS NOT NULL";
 		try (Connection conexion = ConexionUvirtual.obtenerInstancia(); PreparedStatement stmt = conexion.prepareStatement(consultaSelect)) {
@@ -495,12 +552,124 @@ public class ModeloMensajes {
 			
 			try (ResultSet rs = stmt.executeQuery()) {
 				while (rs.next()) {
-					usuarios.add(ModeloUsuarioBolsaEmpleo.obtenerInstancia().getUsuarioFromResultSet(rs));
+					usuarios.add(this.createDestinatarioFromResultSet(rs));
 				}
 			}
 		}
 		
 		return usuarios;
+	}
+	
+	/** Actualiza el estado de un destinatario a enviando .
+	 * @param mensaje .
+	 * @param destinatario .
+	 * @param usuarioUpdate .
+	 * @throws UVException .
+	 * @throws SQLException .
+	 */
+	public void actualizaEstadoDestinatarioComoEnviado(Mensaje mensaje, UsuarioBolsaEmpleo destinatario, UsuarioBolsaEmpleo usuarioUpdate) throws SQLException, UVException {
+		this.actualizaEstadoDestinatario(mensaje, destinatario, DESTINATARIO_ESTADO_ENVIADO, usuarioUpdate);
+	}
+	
+	/** Actualiza el estado de un destinatario a fallo .
+	 * @param mensaje .
+	 * @param destinatario .
+	 * @param usuarioUpdate .
+	 * @throws UVException .
+	 * @throws SQLException .
+	 */
+	public void actualizaEstadoDestinatarioComoFallo(Mensaje mensaje, UsuarioBolsaEmpleo destinatario, UsuarioBolsaEmpleo usuarioUpdate) throws SQLException, UVException {
+		this.actualizaEstadoDestinatario(mensaje, destinatario, DESTINATARIO_ESTADO_FALLO, usuarioUpdate);
+	}
+	
+	/**
+	 * Devuelve los destinatarios de mensajes pendientes de envio en bloques.
+	 * @return .
+	 * @throws SQLException .
+	 * @throws UVException .
+	 */
+	public List<Destinatario> listaDestinatariosAEnviarEnBloques() throws SQLException, UVException {
+		String consulta = ""
+				+ " SELECT bepusu.*, bepmde.ESTADO, bepmde.BEPMEN_CODNUM "
+				+ " FROM TBEP_MEN_DESTINATARIOS bepmde "
+				+ " INNER JOIN TBEP_MENSAJES bepmen ON bepmen.CODNUM = bepmde.BEPMEN_CODNUM "
+				+ " INNER JOIN TBEP_USUARIOS bepusu ON bepusu.CODNUM = bepmde.BEPUSU_CODNUM "
+				+ " WHERE 1=1 "
+				+ "		AND bepmde.ESTADO = '" + ModeloMensajes.DESTINATARIO_ESTADO_SINENVIAR + "' "
+				+ "	 	AND bepusu.VUAJA_EMAIL_ALTA IS NOT NULL "
+				+ "		AND bepusu.FLGBORRADO = 'N' "
+				+ " FETCH FIRST " + ModeloMensajes.NUMERO_MENSAJES_ENVIAR_BLOQUE + " ROWS ONLY ";
+		
+		List<Destinatario> destinatarios = new ArrayList<>();
+		
+		try (Connection conexion = ConexionUvirtual.obtenerInstancia(); PreparedStatement stmt = conexion.prepareStatement(consulta)) {
+			try (ResultSet rs = stmt.executeQuery()) {
+				while (rs.next()) {
+					destinatarios.add(createDestinatarioFromResultSet(rs));
+				}
+			}
+		}
+
+		return destinatarios;
+	}
+	
+	/**
+	 * Actualiza el estado del mensaje a enviado si todos los destinatarios del mismos han
+	 * sido enviados (o si ha ocurrido un error). 
+	 * @param m .
+	 * @throws UVException .
+	 * @throws SQLException .
+	 */
+	public void actualizaEstadoMensajePorDestinatarios(Mensaje m) throws SQLException, UVException {
+		String countQuery = ""
+				+ " SELECT COUNT(*) AS TOTAL "
+				+ " FROM TBEP_MEN_DESTINATARIOS bepmde "
+				+ " INNER JOIN TBEP_MENSAJES bepmen ON bepmen.CODNUM = bepmde.BEPMEN_CODNUM "
+				+ " INNER JOIN TBEP_USUARIOS bepusu ON bepusu.CODNUM = bepmde.BEPUSU_CODNUM "
+				+ " WHERE 1=1 "
+				+ "		AND bepmde.ESTADO = '" + ModeloMensajes.DESTINATARIO_ESTADO_SINENVIAR + "' "
+				+ "	 	AND bepusu.VUAJA_EMAIL_ALTA IS NOT NULL "
+				+ "		AND bepusu.FLGBORRADO = 'N' "
+				+ "		AND bepmen.ESTADO = '" + ModeloMensajes.MENSAJE_ESTADO_ENVIANDO + "' "
+				+ "		AND bepmen.CODNUM = ? ";
+		
+		int count = 0;
+		try (Connection conexion = ConexionUvirtual.obtenerInstancia(); PreparedStatement stmt = conexion.prepareStatement(countQuery)) {
+			int indexParam = 1;
+			stmt.setInt(indexParam++, m.getCodNum());
+			
+			try (ResultSet rs = stmt.executeQuery()) {
+				if (rs.next()) {
+					count = rs.getInt("TOTAL"); 
+				}
+			}
+		}
+		
+		if (count == 0) {
+			this.actualizaEstadoMensajeComoEnviado(m, null);			
+		}
+	} 
+	
+	private void actualizaEstadoDestinatario(Mensaje mensaje, UsuarioBolsaEmpleo destinatario, String estado, UsuarioBolsaEmpleo usuarioUpdate)
+			throws SQLException, UVException {
+		if (mensaje == null) {
+			throw new UVException(MENSAJE_ERROR_MENSAJE_NULL);
+		}
+		
+		String usuarioUp = usuarioUpdate != null ? usuarioUpdate.getCodCuenta() : "TAREA_PROGRAMADA";
+		
+		String consulta = "UPDATE TBEP_MEN_DESTINATARIOS SET ESTADO = ?, UID_USUARIO = ?"
+				+ "	WHERE BEPMEN_CODNUM = ? AND BEPUSU_CODNUM = ?";
+		
+		try (Connection conexion = ConexionUvirtual.obtenerInstancia();
+				PreparedStatement stmt = conexion.prepareStatement(consulta)) {
+			int indexParam = 1;
+			stmt.setString(indexParam++, estado);
+			stmt.setString(indexParam++, usuarioUp);
+			stmt.setInt(indexParam++, mensaje.getCodNum());
+			stmt.setInt(indexParam++, destinatario.getCodNum());
+			stmt.executeUpdate();
+		}
 	}
 
 	private Mensaje createMensajeFromResultSet(ResultSet rs) throws SQLException, IOException {
@@ -512,4 +681,10 @@ public class ModeloMensajes {
 		mensaje.setEstado(rs.getString("ESTADO"));		
 		return mensaje;
 	}
+	
+	private Destinatario createDestinatarioFromResultSet(ResultSet rs) throws SQLException, UVException {
+		UsuarioBolsaEmpleo usuario = ModeloUsuarioBolsaEmpleo.obtenerInstancia().getUsuarioFromResultSet(rs);		
+		return new Destinatario(usuario, rs.getInt("BEPMEN_CODNUM"), rs.getString("ESTADO"));
+	}
+	
 }

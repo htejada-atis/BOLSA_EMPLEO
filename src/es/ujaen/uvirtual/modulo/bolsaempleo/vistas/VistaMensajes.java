@@ -2,10 +2,10 @@ package es.ujaen.uvirtual.modulo.bolsaempleo.vistas;
 
 import java.io.Serializable;
 import java.util.List;
-
 import es.ujaen.uvirtual.beans.vistas.Vista;
 import es.ujaen.uvirtual.modulo.bolsaempleo.beans.Area;
 import es.ujaen.uvirtual.modulo.bolsaempleo.beans.Convocatoria;
+import es.ujaen.uvirtual.modulo.bolsaempleo.beans.Destinatario;
 import es.ujaen.uvirtual.modulo.bolsaempleo.beans.Mensaje;
 import es.ujaen.uvirtual.modulo.bolsaempleo.beans.UsuarioBolsaEmpleo;
 import es.ujaen.uvirtual.modulo.bolsaempleo.utilidades.BolsaEmpleoDataTable;
@@ -18,11 +18,12 @@ import es.ujaen.uvirtual.modulo.bolsaempleo.utilidades.BolsaEmpleoDataTable;
 public class VistaMensajes extends Vista implements Serializable {
 	private static final long serialVersionUID = 1L;
 	private transient BolsaEmpleoDataTable<Mensaje> dataTable;
-	private transient BolsaEmpleoDataTable<UsuarioBolsaEmpleo> dataTableDestinatarios;
+	private transient BolsaEmpleoDataTable<Destinatario> dataTableDestinatarios;
+	private transient BolsaEmpleoDataTable<UsuarioBolsaEmpleo> dataTableDestinatariosDisponibles;
 	private Mensaje mensaje;
 	private List<Convocatoria> convocatorias;
 	private List<Area> areas;
-	private List<UsuarioBolsaEmpleo> destinatarios;
+	private List<Destinatario> destinatarios;
 	private String vista;
 	private UsuarioBolsaEmpleo usuarioLogeado;
 	
@@ -50,12 +51,20 @@ public class VistaMensajes extends Vista implements Serializable {
 		this.dataTable = dt;
 	}
 
-	public BolsaEmpleoDataTable<UsuarioBolsaEmpleo> getDatatableDestinatarios() {
+	public BolsaEmpleoDataTable<Destinatario> getDatatableDestinatarios() {
 		return dataTableDestinatarios;
 	}
 
-	public void setDatatableDestinatarios(BolsaEmpleoDataTable<UsuarioBolsaEmpleo> dt) {
+	public void setDatatableDestinatarios(BolsaEmpleoDataTable<Destinatario> dt) {
 		this.dataTableDestinatarios = dt;
+	}
+	
+	public BolsaEmpleoDataTable<UsuarioBolsaEmpleo> getDatatableDestinatariosDisponibles() {
+		return dataTableDestinatariosDisponibles;
+	}
+
+	public void setDatatableDestinatariosDisponibles(BolsaEmpleoDataTable<UsuarioBolsaEmpleo> dt) {
+		this.dataTableDestinatariosDisponibles = dt;
 	}
 
 	public Mensaje getMensaje() {
@@ -82,11 +91,11 @@ public class VistaMensajes extends Vista implements Serializable {
 		this.areas = areas;
 	}
 	
-	public List<UsuarioBolsaEmpleo> getDestinatarios() {
+	public List<Destinatario> getDestinatarios() {
 		return destinatarios;
 	}
 	
-	public void setDestinatarios(List<UsuarioBolsaEmpleo> destinatarios) {
+	public void setDestinatarios(List<Destinatario> destinatarios) {
 		this.destinatarios = destinatarios;
 	}
 }
