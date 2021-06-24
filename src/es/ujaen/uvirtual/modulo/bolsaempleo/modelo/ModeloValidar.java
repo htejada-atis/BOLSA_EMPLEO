@@ -230,8 +230,12 @@ public class ModeloValidar {
 				+ "	INNER JOIN TBEP_SOLICITUDES bepsol ON bepsol.CODNUM = bepsbo.BEPSOL_CODNUM"
 				+ "	INNER JOIN TBEP_MERITOS bepmer ON bepmer.CODNUM = bepsbm.BEPMER_CODNUM"
 				+ "	INNER JOIN TBEP_ITEMSBAREMACION bepite ON bepite.CODNUM = bepmer.BEPITE_CODNUM"
-				+ "	WHERE bepsbo.BEPBOL_CODNUM = bepbol.CODNUM AND bepsol.BEPCON_CODNUM = ? AND bepsol.ESTADO = 'CERRADA'"
-				+ "	AND bepite.AFINIDAD IS NULL";
+				+ "	WHERE 1=1 "
+				+ "		AND bepsbo.BEPBOL_CODNUM = bepbol.CODNUM "
+				+ "		AND bepsol.BEPCON_CODNUM = ? "
+				+ "		AND bepsol.ESTADO = 'CERRADA' "
+				+ "		AND bepsol.FLGEXCLUIDO = 'N' "
+				+ "		AND bepite.AFINIDAD IS NULL";
 		
 		// seleccionamos las bolsas, con meritos, en la convocatoria pasada
 		String consulta = 
@@ -309,8 +313,13 @@ public class ModeloValidar {
 				+ "	INNER JOIN TBEP_MERITOS bepmer ON bepmer.CODNUM = bepsbm.BEPMER_CODNUM"
 				+ "	INNER JOIN TBEP_ITEMSBAREMACION bepite ON bepite.CODNUM = bepmer.BEPITE_CODNUM"
 				+ "	INNER JOIN TBEP_USUARIOS bepusu ON bepusu.CODNUM = bepmer.BEPUSU_CODNUM"
-				+ "	WHERE bepsbo.BEPBOL_CODNUM = bepbol.CODNUM AND bepsol.BEPCON_CODNUM = ? AND bepsol.ESTADO = 'CERRADA'"
-				+ "	AND bepite.AFINIDAD IS NOT NULL AND bepusu.FLGBORRADO = 'N' ";
+				+ "	WHERE 1=1 "
+				+ "		AND bepsbo.BEPBOL_CODNUM = bepbol.CODNUM "
+				+ " 	AND bepsol.BEPCON_CODNUM = ? "
+				+ "		AND bepsol.ESTADO = 'CERRADA' "
+				+ "		AND bepsol.FLGEXCLUIDO = 'N' "
+				+ "		AND bepite.AFINIDAD IS NOT NULL "
+				+ "	 	AND bepusu.FLGBORRADO = 'N' ";
 		
 		// seleccionamos las bolsas, con meritos, en la convocatoria pasada
 		String consulta = 
@@ -471,19 +480,23 @@ public class ModeloValidar {
 		
 		// seleccionamos los candidatos, con meritos, en la convocatoria pasada
 		String consulta = 
-				"SELECT bepusu.CODNUM, bepusu.VUAJA_PRSNIF,"
-				+ "	(" + consultaCount + " AND bepsbm.FLGVALIDADO = 'N' AND bepsbm.FLGEXCLUIDO = 'N') COUNT_NO_VALIDADOS,"
-				+ "	(" + consultaCount + " AND bepsbm.FLGVALIDADO = 'S' AND bepsbm.FLGEXCLUIDO = 'N') COUNT_VALIDADOS,"
-				+ "	(" + consultaCount + " AND bepsbm.FLGEXCLUIDO = 'S') COUNT_EXCLUIDOS,"
-				+ "	(" + consultaCount + ") COUNT_TOTAL"
-				+ "	FROM TBEP_USUARIOS bepusu"
-				+ "	INNER JOIN TBEP_MERITOS bepmer ON bepusu.CODNUM = bepmer.BEPUSU_CODNUM"
-				+ "	INNER JOIN TBEP_ITEMSBAREMACION bepite ON bepite.CODNUM = bepmer.BEPITE_CODNUM"
-				+ "	INNER JOIN TBEP_SOL_BOL_MERITOS bepsbm ON bepmer.CODNUM = bepsbm.BEPMER_CODNUM"
-				+ "	INNER JOIN TBEP_SOLICITUD_BOLSAS bepsbo ON bepsbo.CODNUM = bepsbm.BEPSBO_CODNUM"
-				+ "	INNER JOIN TBEP_SOLICITUDES bepsol ON bepsol.CODNUM = bepsbo.BEPSOL_CODNUM"
-				+ "	WHERE bepusu.ROL = " + ModeloRol.ID_ROL_CANDIDATO + " AND bepsbo.BEPBOL_CODNUM = ? AND bepusu.FLGBORRADO = 'N'"
-					+ "	AND bepsol.ESTADO = '" + ModeloSolicitud.SOLICITUD_ESTADO_CERRADA + "' ";
+				"SELECT bepusu.CODNUM, bepusu.VUAJA_PRSNIF, "
+				+ "	(" + consultaCount + " AND bepsbm.FLGVALIDADO = 'N' AND bepsbm.FLGEXCLUIDO = 'N') COUNT_NO_VALIDADOS, "
+				+ "	(" + consultaCount + " AND bepsbm.FLGVALIDADO = 'S' AND bepsbm.FLGEXCLUIDO = 'N') COUNT_VALIDADOS, "
+				+ "	(" + consultaCount + " AND bepsbm.FLGEXCLUIDO = 'S') COUNT_EXCLUIDOS, "
+				+ "	(" + consultaCount + ") COUNT_TOTAL "
+				+ "	FROM TBEP_USUARIOS bepusu "
+				+ "	INNER JOIN TBEP_MERITOS bepmer ON bepusu.CODNUM = bepmer.BEPUSU_CODNUM "
+				+ "	INNER JOIN TBEP_ITEMSBAREMACION bepite ON bepite.CODNUM = bepmer.BEPITE_CODNUM "
+				+ "	INNER JOIN TBEP_SOL_BOL_MERITOS bepsbm ON bepmer.CODNUM = bepsbm.BEPMER_CODNUM "
+				+ "	INNER JOIN TBEP_SOLICITUD_BOLSAS bepsbo ON bepsbo.CODNUM = bepsbm.BEPSBO_CODNUM "
+				+ "	INNER JOIN TBEP_SOLICITUDES bepsol ON bepsol.CODNUM = bepsbo.BEPSOL_CODNUM "
+				+ "	WHERE 1=1 "
+				+ "		AND bepusu.ROL = " + ModeloRol.ID_ROL_CANDIDATO + " "
+				+ " 	AND bepsol.FLGEXCLUIDO = 'N' "
+				+ "		AND bepsbo.BEPBOL_CODNUM = ? "
+				+ "		AND bepusu.FLGBORRADO = 'N' "
+				+ "		AND bepsol.ESTADO = '" + ModeloSolicitud.SOLICITUD_ESTADO_CERRADA + "' ";
 		
 		// agrega el filtro de afinidad
 		consulta += afinidad ? " AND bepite.AFINIDAD IS NOT NULL" : " AND bepite.AFINIDAD IS NULL";
