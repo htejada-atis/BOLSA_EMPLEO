@@ -72,6 +72,10 @@ VistaSolicitudes bean = (VistaSolicitudes) uvdatos.getVistas().get(VistaSolicitu
 				html = 'Solicitud cerrada. ' + btnDescargarPDF;
 			} 
 			
+			if (row.excluido) {
+				html += "<br/><br/>SOLICITUD EXCLUIDA: " + row.razonExclusion;
+			}
+			
 			return html
 		};
 		

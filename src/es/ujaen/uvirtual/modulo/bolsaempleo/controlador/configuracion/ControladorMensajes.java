@@ -19,6 +19,7 @@ import com.google.gson.reflect.TypeToken;
 import es.ujaen.uvirtual.beans.CodigoDescripcion;
 import es.ujaen.uvirtual.beans.UVDatos;
 import es.ujaen.uvirtual.beans.Usuario;
+import es.ujaen.uvirtual.modulo.bolsaempleo.beans.Destinatario;
 import es.ujaen.uvirtual.modulo.bolsaempleo.beans.Mensaje;
 import es.ujaen.uvirtual.modulo.bolsaempleo.beans.UsuarioBolsaEmpleo;
 import es.ujaen.uvirtual.modulo.bolsaempleo.modelo.ModeloArea;
@@ -44,7 +45,7 @@ import es.ujaen.uvirtual.utilidades.UVException;
 		"/srv/es/informacionadministrativa/bolsaempleo/configuracion/mensajeria",
 		"/srv/en/informacionadministrativa/bolsaempleo/configuracion/mensajeria",
 		"/srv/es/ajax/informacionadministrativa/bolsaempleo/configuracion/mensajeria",
-		"/srv/en/ajax/informacionadministrativa/bolsaempleo/configuracion/mensajeria" 
+		"/srv/en/ajax/informacionadministrativa/bolsaempleo/configuracion/mensajeria"
 })
 public class ControladorMensajes extends HttpServlet {
 	private static final long serialVersionUID = 1L;
@@ -85,6 +86,7 @@ public class ControladorMensajes extends HttpServlet {
 	public static final String MENSAJE_EXITO_DESTINATARIO_AGREGADO = "Destinatario agregado correctamente";
 	public static final String MENSAJE_EXITO_DESTINATARIOS_BORRADOS = "Destinatarios borrados correctamente";
 	public static final String MENSAJE_EXITO_DESTINATARIO_BORRADO = "Destinatario borrado correctamente";
+	public static final String MENSAJE_EXITO_ENVIADO = "Mensaje enviado correctamente";
 	public static final String MENSAJE_EXITO_MENSAJE_GUARDADO = "Mensaje guardado correctamente";
 
 	// ruta vistas
@@ -317,10 +319,10 @@ public class ControladorMensajes extends HttpServlet {
 		redireccionConMensajeSeleccionado(bean, request, response, ACCION_DETALLE_MENSAJE);
 	}
 	
-	private void enviarMensaje(VistaMensajes bean, HttpServletRequest request, HttpServletResponse response) throws IOException, UVException {
+	private void enviarMensaje(VistaMensajes bean, HttpServletRequest request, HttpServletResponse response) throws IOException, UVException, SQLException {
 		Mensaje mensaje = bean.getMensaje();
 		
-		if (mensaje.getTitulo().equals(ModeloMensajes.ESTADO_BORRADOR)) {
+		if (mensaje.getTitulo().equals(ModeloMensajes.MENSAJE_ESTADO_BORRADOR)) {
 			throw new UVException("No se puede enviar un mensaje con título borrador");
 		}
 		
@@ -328,14 +330,9 @@ public class ControladorMensajes extends HttpServlet {
 			throw new UVException("No se puede enviar un mensaje sin destinatarios");
 		}
 		
-		List<String> destinatarios = new ArrayList<>();
+		ModeloMensajes.obtenerInstancia().actualizaEstadoMensajeComoEnviando(bean.getMensaje(), bean.getUsuarioLogeado());
 		
-		for (UsuarioBolsaEmpleo usuario: bean.getDestinatarios()) {
-			destinatarios.add(usuario.getEmail());
-		}
-		
-		//EnviaCorreo.enviaCorreoCCO(destinatarios, destinatarios, mensaje.getTitulo(), mensaje.getCuerpo());
-		
+		BolsaEmpleoUtils.addMensajeDeExito(MENSAJE_EXITO_ENVIADO, bean, request);
 		response.sendRedirect(request.getServletPath());
 	}
 	
@@ -406,7 +403,7 @@ public class ControladorMensajes extends HttpServlet {
 		try (PrintWriter writer = response.getWriter()) {
 			try {
 				ModeloMensajes modelo = ModeloMensajes.obtenerInstancia();
-				BolsaEmpleoDataTable<UsuarioBolsaEmpleo> dataTable = modelo.listaDestinatariosMensajeDatatable(request.getParameterMap(), bean.getMensaje());
+				BolsaEmpleoDataTable<Destinatario> dataTable = modelo.listaDestinatariosMensajeDatatable(request.getParameterMap(), bean.getMensaje());
 				bean.setDatatableDestinatarios(dataTable);
 				writer.write(dataTable.toJson());
 			} catch (UVException e) {
@@ -437,7 +434,7 @@ public class ControladorMensajes extends HttpServlet {
 				ModeloMensajes modelo = ModeloMensajes.obtenerInstancia();
 				BolsaEmpleoDataTable<UsuarioBolsaEmpleo> dataTable = modelo.listaDestinatariosDisponiblesMensajeDatatable(
 						request.getParameterMap(), bean.getMensaje());
-				bean.setDatatableDestinatarios(dataTable);
+				bean.setDatatableDestinatariosDisponibles(dataTable);
 				writer.write(dataTable.toJson());
 			} catch (UVException e) {
 				LOGGER.log(Level.WARNING, e.toString());
