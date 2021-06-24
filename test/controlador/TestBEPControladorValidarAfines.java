@@ -250,7 +250,7 @@ public class TestBEPControladorValidarAfines {
 		peticion.setParameter(ControladorValidar.PARAM_BOLSA_MERITO, bean.getBolsa().getCodNum().toString());
 		peticion.setParameter(ControladorValidar.PARAM_CANDIDATO, bean.getCandidato().getCodNum().toString());
 		peticion.setParameter(ControladorValidar.PARAM_MERITO, bean.getDatatableMeritos().getData().get(0).getCodNum().toString());
-		peticion.setParameter(ControladorValidar.PARAM_AFINIDADES, "['4': 6]");
+		peticion.setParameter(ControladorValidar.PARAM_AFINIDADES, "{'4': 2}");
 		
 		RespuestaHttp respuesta = new RespuestaHttp();
 		ControladorValidar controlador = new ControladorValidar();
@@ -259,7 +259,8 @@ public class TestBEPControladorValidarAfines {
 		VistaValidar bean2 = (VistaValidar) peticion.getUVDatos().getVistas().get(VistaValidar.class.getName());
 		
 		assertNotNull(MENSAJE_MERITO_DEVUELTO, bean2.getMerito());
-		assertEquals(MENSAJE_CON_EXITO_ESPERADO, ControladorValidar.MENSAJE_EXITO_MERITO_EXCLUIDO, bean2.getMensajesDeExito().get(0));
+		assertEquals(MENSAJE_CON_EXITO_ESPERADO, String.format(
+				ControladorValidar.MENSAJE_EXITO_MERITO_EXCLUIDO, bean2.getBolsa().getArea().getDescripcion()), bean2.getMensajesDeExito().get(0));
 		assertEquals(MENSAJE_SIN_ERROR, 0, bean2.getMensajesDeError().size());
 		assertEquals(MENSAJE_SIN_ADVERTENCIAS, 0, bean2.getMensajesDeAdvertencia().size());
 	}
@@ -281,7 +282,7 @@ public class TestBEPControladorValidarAfines {
 		peticion.setParameter(ControladorValidar.PARAM_BOLSA_MERITO, bean.getBolsa().getCodNum().toString());
 		peticion.setParameter(ControladorValidar.PARAM_CANDIDATO, bean.getCandidato().getCodNum().toString());
 		peticion.setParameter(ControladorValidar.PARAM_MERITO, bean.getDatatableMeritos().getData().get(0).getCodNum().toString());
-		peticion.setParameter(ControladorValidar.PARAM_AFINIDADES, "['4': 6]");
+		peticion.setParameter(ControladorValidar.PARAM_AFINIDADES, "{'4': 2}");
 		
 		RespuestaHttp respuesta = new RespuestaHttp();
 		ControladorValidar controlador = new ControladorValidar();
@@ -290,7 +291,8 @@ public class TestBEPControladorValidarAfines {
 		VistaValidar bean2 = (VistaValidar) peticion.getUVDatos().getVistas().get(VistaValidar.class.getName());
 		
 		assertNotNull(MENSAJE_MERITO_DEVUELTO, bean2.getMerito());
-		assertEquals(MENSAJE_CON_EXITO_ESPERADO, ControladorValidar.MENSAJE_EXITO_MERITO_VALIDADO, bean2.getMensajesDeExito().get(0));
+		assertEquals(MENSAJE_CON_EXITO_ESPERADO, String.format(
+				ControladorValidar.MENSAJE_EXITO_MERITO_VALIDADO, bean2.getBolsa().getArea().getDescripcion()), bean2.getMensajesDeExito().get(0));
 		assertEquals(MENSAJE_SIN_ERROR, 0, bean2.getMensajesDeError().size());
 		assertEquals(MENSAJE_SIN_ADVERTENCIAS, 0, bean2.getMensajesDeAdvertencia().size());
 	}

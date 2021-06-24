@@ -312,6 +312,7 @@ public class ControladorValidar extends HttpServlet {
 			String observacionesCandidato = EscapaHTML.ajustaCodificacion(request.getParameter(PARAM_OBSERVACION_CANDIDATO));
 			Integer idBolsa = Formateador.leeParametroInteger(request.getParameter(PARAM_BOLSA_MERITO));
 			Bolsa bolsa = modeloBolsa.getBolsaById(idBolsa);
+			bean.setBolsa(bolsa);
 			actualizaAfinidades(bean, request, bolsa);
 			
 			if (EscapaHTML.ajustaCodificacion(request.getParameter(PARAM_ACEPTAR_MERITO)) != null) {
@@ -367,9 +368,10 @@ public class ControladorValidar extends HttpServlet {
 			Map.Entry<String, Double> entry = afinidadesRaw.entrySet().iterator().next();
 			String idAfinidad = entry.getKey();
 			Double idValoracion = entry.getValue();
+			System.out.println("idValoracion: " + idValoracion);
 			Afinidad afinidad = modeloAfinidad.getAfinidadById(Formateador.leeParametroInteger(idAfinidad));
-			modeloSolicitud.actualizarAfinidadesMeritoIndividualizado(solicitud, bolsa, bean.getMerito().getMerito(), afinidad,
-					(int) Math.round(idValoracion), bean.getUsuarioLogeado());
+//			modeloSolicitud.actualizarAfinidadesMeritoIndividualizado(solicitud, bolsa, bean.getMerito().getMerito(), afinidad,
+//					(int) Math.round(idValoracion), bean.getUsuarioLogeado());
 		}
 	}
 	

@@ -181,11 +181,11 @@ UsuarioBolsaEmpleo candidato = bean.getCandidato();
 					<th scope="col" style="width:10%">Acciones</th>
 				</tr>
 				<tbody>
-				<%	for (ValorMeritoBolsaTable meritoBolsa: bean.getBolsas()) { 
-							int idMerito = meritoBolsa.getMeritoSolicitud().getMerito().getCodNum();
-							Boolean valoraciones = meritoBolsa.getMeritoSolicitud() != null && meritoBolsa.getMeritoSolicitud().getMerito().getItemBaremacion().getAfinidad() != null
-									&& meritoBolsa.getMeritoSolicitud().getValoraciones() != null && meritoBolsa.getMeritoSolicitud().getValoraciones().size() > 0  ? true : false;
-							Boolean individualizado = valoraciones && meritoBolsa.getMeritoSolicitud().getMerito().getItemBaremacion().getIndividualizado() ? true : false;
+				<%	for (ValorMeritoBolsaTable meritoBolsa: bean.getBolsas()) {
+						int idMerito = meritoBolsa.getMeritoSolicitud().getMerito().getCodNum();
+						Boolean valoraciones = meritoBolsa.getMeritoSolicitud() != null && meritoBolsa.getMeritoSolicitud().getMerito().getItemBaremacion().getAfinidad() != null
+								&& meritoBolsa.getMeritoSolicitud().getValoraciones() != null && meritoBolsa.getMeritoSolicitud().getValoraciones().size() > 0  ? true : false;
+						Boolean individualizado = meritoBolsa.getMeritoSolicitud().getMerito().getItemBaremacion().getIndividualizado() ? true : false;
 					%>
 					
 						<tr data-individualizado="<%= individualizado %>" data-bolsa="<%= meritoBolsa.getBolsa().getCodNum() %>" 
@@ -205,10 +205,10 @@ UsuarioBolsaEmpleo candidato = bean.getCandidato();
 							</td>
 							<td class='cell-afinidad'>
 							<%	if (individualizado) { %>
-									<select id="afinidad-individualizada" data-valoracion="<%= meritoBolsa.getMeritoSolicitud().getValoraciones().get(0).getCodNum() %>">
+									<select id="afinidad-individualizada" data-valoracion="<%= valoraciones ? meritoBolsa.getMeritoSolicitud().getValoraciones().get(0).getCodNum() : "null" %>">
 									<% 	for (Afinidad afinidad : bean.getListaAfinidades()) { %>
 										<%	if (afinidad.getCodigo().equals(meritoBolsa.getMeritoSolicitud().getMerito().getItemBaremacion().getAfinidad())) { %>
-											<% 	if (meritoBolsa.getMeritoSolicitud().getValoraciones().get(0).getAfinidad().getCodNum() == afinidad.getCodNum()) { %>
+											<% 	if (valoraciones && meritoBolsa.getMeritoSolicitud().getValoraciones().get(0).getAfinidad().getCodNum() == afinidad.getCodNum()) { %>
 												<option value="<%= afinidad.getCodNum() %>" selected><%= afinidad.getModulacion() * 100 + "%: " + afinidad.getDescripcion() %></option>
 											<%	} else { %>
 												<option value="<%= afinidad.getCodNum() %>"><%= afinidad.getModulacion()* 100 + "%: " + afinidad.getDescripcion() %></option>
@@ -216,18 +216,18 @@ UsuarioBolsaEmpleo candidato = bean.getCandidato();
 										<%	} %>
 									<%	} %>
 									</select>
-							<%	} else {
-									if (meritoBolsa.getMeritoSolicitud().getValoraciones().size() > 0) { %>
-										
-										<table class="table-afinidades">
+							<%	} else { %>
+									<table class="table-afinidades">
 											<tbody>
-										<%	int total = 0;
-											for (MeritoSolicitudValoracion valoracion: meritoBolsa.getMeritoSolicitud().getValoraciones()) {
-												total += valoracion.getValor();
-										%>
+								<%	int total = 0;
+									if (valoraciones) {
+										for (MeritoSolicitudValoracion valoracion: meritoBolsa.getMeritoSolicitud().getValoraciones()) {
+												total += valoracion.getValor();	%>
 												<tr>
 													<td style="width:70px">
-														<label for="<%= "merito_valoracion_" + valoracion.getAfinidad().getCodNum() + "_" + idMerito %>"><i class="tooltip"><%=  valoracion.getAfinidad().getCodigo() + " " + valoracion.getAfinidad().getModulacion() * 100 + "%: " %><span><%= valoracion.getAfinidad().getDescripcion() %></span></i></label>
+														<label for="<%= "merito_valoracion_" + valoracion.getAfinidad().getCodNum() + "_" + idMerito %>">
+															<i class="tooltip"><%=  valoracion.getAfinidad().getCodigo() + " " + valoracion.getAfinidad().getModulacion() * 100 + "%: " %><span><%= valoracion.getAfinidad().getDescripcion() %></span></i>
+														</label>
 													</td>
 													<td>
 														<input id="<%= "merito_valoracion_" + valoracion.getAfinidad().getCodNum() + "_" + idMerito %>" data-afinidad="<%= valoracion.getAfinidad().getCodNum() %>" class="validar-afinidad field-no-individualizado" type="number" min="0" 
@@ -235,19 +235,37 @@ UsuarioBolsaEmpleo candidato = bean.getCandidato();
 													</td>
 												</tr>
 										<%	} %>
+												
+								<%	} else { %>
+									<% 	for (int i = 0; i < bean.getListaAfinidades().size(); i++) {
+											Afinidad afinidad = bean.getListaAfinidades().get(i); %>
+										<%	if (afinidad.getCodigo().equals(meritoBolsa.getMeritoSolicitud().getMerito().getItemBaremacion().getAfinidad())) { %>
 												<tr>
-													<td style="width:70px">Total:</td>
+													<td style="width:70px">
+														<label for="merito_valoracion_<%= i %>">
+															<i class="tooltip"><%=  afinidad.getCodigo() + " " + afinidad.getModulacion() * 100 + "%: " %><span><%= afinidad.getDescripcion() %></span></i>
+														</label>
+													</td>
 													<td>
-														<input class="validar-afinidad total-no-individualizado" data-total="<%= meritoBolsa.getMeritoSolicitud().getMerito().getValor() %>" type="number" min="0" name="total"
-														value="<%= total %>" disabled/>
+														<input id="merito_valoracion_<%= i %>" data-afinidad="<%= afinidad.getCodNum() %>" class="validar-afinidad field-no-individualizado" type="number" min="0" 
+															value="0" step="0.01"/>
 													</td>
 												</tr>
-											</tbody>
-										</table>
-										
-										<p class="mensaje" style="color: red; display: none;">El total es superior al valor del mérito.</p>
-								<%	}
-								} %>
+										<%	} %>
+									<%	} %>
+								<%	} %>
+										<tr>
+											<td style="width:70px">Total:</td>
+											<td>
+												<input class="validar-afinidad total-no-individualizado" data-total="<%= meritoBolsa.getMeritoSolicitud().getMerito().getValor() %>" type="number" min="0" name="total"
+												value="<%= total %>" disabled/>
+											</td>
+										</tr>
+									</tbody>
+								</table>
+								
+								<p class="mensaje" style="color: red; display: none;">El total es superior al valor del mérito.</p>
+							<%	} %>
 							</td>
 							<td>
 				    			<textarea class="form-input-custom merito-observacion-candidato" 
