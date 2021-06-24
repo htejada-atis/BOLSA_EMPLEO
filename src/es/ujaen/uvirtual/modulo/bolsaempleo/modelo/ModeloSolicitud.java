@@ -1093,18 +1093,32 @@ public class ModeloSolicitud {
 				MeritoSolicitud meritoSolicitud = this.getMeritoSolicitud(solicitud, bolsa, merito);
 				
 				for (Map.Entry<Afinidad, Double> entry : afinidades.entrySet()) {
-					String consulta = "UPDATE TBEP_SOL_BOL_MER_VALORACION"
-							+ " SET VALOR = ?, UID_USUARIO = ?"
-							+ " WHERE BEPSBM_CODNUM = ? AND BEPAFI_CODNUM = ?";
-					
-					try (PreparedStatement stmt = conexion.prepareStatement(consulta)) {
-						int indexParam = 1;
-						stmt.setDouble(indexParam++, entry.getValue());
-						stmt.setString(indexParam++, usuarioUpdate.getCodCuenta());
-						stmt.setInt(indexParam++, meritoSolicitud.getCodNum());
-						stmt.setInt(indexParam++, entry.getKey().getCodNum());
-						stmt.executeUpdate();
-					}			
+					if (compruebaSiExisteAfinidad(meritoSolicitud, entry.getKey().getCodNum(), conexion)) {
+						String consultaUpdate = "UPDATE TBEP_SOL_BOL_MER_VALORACION"
+								+ " SET VALOR = ?, UID_USUARIO = ?"
+								+ " WHERE BEPSBM_CODNUM = ? AND BEPAFI_CODNUM = ?";
+						
+						try (PreparedStatement stmt = conexion.prepareStatement(consultaUpdate)) {
+							int indexParam = 1;
+							stmt.setDouble(indexParam++, entry.getValue());
+							stmt.setString(indexParam++, usuarioUpdate.getCodCuenta());
+							stmt.setInt(indexParam++, meritoSolicitud.getCodNum());
+							stmt.setInt(indexParam++, entry.getKey().getCodNum());
+							stmt.executeUpdate();
+						}
+					} else {
+						String consultaInsert = "INSERT INTO TBEP_SOL_BOL_MER_VALORACION (BEPSBM_CODNUM, BEPAFI_CODNUM, VALOR, UID_USUARIO)"
+								+ " VALUES (?,?,?,?)";
+						
+						try (PreparedStatement stmt = conexion.prepareStatement(consultaInsert)) {
+							int indexParam = 1;
+							stmt.setInt(indexParam++, meritoSolicitud.getCodNum());
+							stmt.setInt(indexParam++, entry.getKey().getCodNum());
+							stmt.setDouble(indexParam++, entry.getValue());
+							stmt.setString(indexParam++, usuarioUpdate.getCodCuenta());
+							stmt.executeUpdate();
+						}
+					}
 				}
 				
 				conexion.commit();
@@ -1115,6 +1129,31 @@ public class ModeloSolicitud {
 				conexion.setAutoCommit(true);
 			}
 		}
+	}
+	
+	/** Método que comprueba si existe una afinidad para luego insertarla o actualizarla . 
+	 * @param meritoSolicitud .
+	 * @param idAfinidad .
+	 * @param conexion .
+	 * @return booleano que devuelve si existe o no .
+	 * @throws SQLException .
+	 */
+	private boolean compruebaSiExisteAfinidad(MeritoSolicitud meritoSolicitud, int idAfinidad, Connection conexion) throws SQLException {
+		String consultaSelect = "SELECT * FROM TBEP_SOL_BOL_MER_VALORACION"
+				+ "	WHERE BEPSBM_CODNUM = ? AND BEPAFI_CODNUM = ?";
+		
+		try (PreparedStatement stmt = conexion.prepareStatement(consultaSelect)) {			
+			int indexParam = 1;
+			stmt.setInt(indexParam++, meritoSolicitud.getCodNum());
+			stmt.setInt(indexParam++, idAfinidad);
+									
+			try (ResultSet rs = stmt.executeQuery()) {
+				if (rs.next()) {
+					return true;
+				}
+			}
+		}
+		return false;
 	}
 	
 	/** El evaluador ha modificado la afinidad del mérito no individualizado .
@@ -1131,18 +1170,35 @@ public class ModeloSolicitud {
 			UsuarioBolsaEmpleo usuarioUpdate) throws SQLException, UVException {
 		MeritoSolicitud meritoSolicitud = this.getMeritoSolicitud(solicitud, bolsa, merito);
 		
-		String consulta = "UPDATE TBEP_SOL_BOL_MER_VALORACION"
-				+ " SET VALOR = ?, BEPAFI_CODNUM = ?, UID_USUARIO = ?"
-				+ " WHERE BEPSBM_CODNUM = ? AND CODNUM = ?";
+		try (Connection conexion = ConexionUvirtual.obtenerInstancia()) {
 		
-		try (Connection conexion = ConexionUvirtual.obtenerInstancia(); PreparedStatement stmt = conexion.prepareStatement(consulta)) {
-			int indexParam = 1;
-			stmt.setNull(indexParam++, Types.NUMERIC);
-			stmt.setInt(indexParam++, afinidad.getCodNum());
-			stmt.setString(indexParam++, usuarioUpdate.getCodCuenta());
-			stmt.setInt(indexParam++, meritoSolicitud.getCodNum());
-			stmt.setInt(indexParam++, idValoracion);
-			stmt.executeUpdate();
+			if (idValoracion != 0) {
+				String consultaUpdate = "UPDATE TBEP_SOL_BOL_MER_VALORACION"
+						+ " SET VALOR = ?, BEPAFI_CODNUM = ?, UID_USUARIO = ?"
+						+ " WHERE BEPSBM_CODNUM = ? AND CODNUM = ?";
+				
+				try (PreparedStatement stmt = conexion.prepareStatement(consultaUpdate)) {
+					int indexParam = 1;
+					stmt.setNull(indexParam++, Types.NUMERIC);
+					stmt.setInt(indexParam++, afinidad.getCodNum());
+					stmt.setString(indexParam++, usuarioUpdate.getCodCuenta());
+					stmt.setInt(indexParam++, meritoSolicitud.getCodNum());
+					stmt.setInt(indexParam++, idValoracion);
+					stmt.executeUpdate();
+				}
+			} else {
+				String consultaInsert = "INSERT INTO TBEP_SOL_BOL_MER_VALORACION (BEPSBM_CODNUM, BEPAFI_CODNUM, VALOR, UID_USUARIO)"
+						+ " VALUES (?,?,?,?)";
+				
+				try (PreparedStatement stmt = conexion.prepareStatement(consultaInsert)) {
+					int indexParam = 1;
+					stmt.setInt(indexParam++, meritoSolicitud.getCodNum());
+					stmt.setInt(indexParam++, afinidad.getCodNum());
+					stmt.setNull(indexParam++, Types.NUMERIC);
+					stmt.setString(indexParam++, usuarioUpdate.getCodCuenta());
+					stmt.executeUpdate();
+				}
+			}
 		}
 	}
 	

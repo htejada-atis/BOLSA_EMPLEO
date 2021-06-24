@@ -28,7 +28,7 @@ if (bean.getDestinatarios().size() > 0 && !mensaje.getCuerpo().isBlank() && !men
 <div class="bolsa-empleo afinidad-form">
 	<jsp:include page="/WEB-INF/jsp/vista/infadministrativa/bolsaempleo/mensajes.jsp" />
 	
-	<h2>Mensaje: <%= mensaje.getTitulo() %></h2>
+	<h2>Mensaje: <%= EscapaHTML.escapa(mensaje.getTitulo()) %></h2>
 		
 	<form id="mensaje_form" class="be-form" method="post" action="<%= request.getRequestURI() %>">
     	<input type="hidden" name="<%= ControladorMensajes.PARAM_ACCION %>" id="accion_formulario" value="<%= ControladorMensajes.ACCION_MODIFICAR_MENSAJE %>" />
@@ -41,7 +41,7 @@ if (bean.getDestinatarios().size() > 0 && !mensaje.getCuerpo().isBlank() && !men
     				   class="form-input-custom"
     				   type="text"
     				   name="<%= ControladorMensajes.PARAM_TITULO %>" 
-    				   value="<%= BolsaEmpleoUtils.getParamForm(request, ControladorMensajes.PARAM_TITULO, mensaje.getTitulo()) %>"
+    				   value="<%= EscapaHTML.escapa(BolsaEmpleoUtils.getParamForm(request, ControladorMensajes.PARAM_TITULO, mensaje.getTitulo())) %>"
     				   required
     				   <%= mensajeBorrador ? "" : "disabled" %>/>
     		</div>
@@ -53,7 +53,7 @@ if (bean.getDestinatarios().size() > 0 && !mensaje.getCuerpo().isBlank() && !men
 	    		<textarea class="form-input-custom" id="mensaje_cuerpo"
 	    				name="<%= ControladorMensajes.PARAM_CUERPO %>" rows="5" cols="50"
 	    				required
-	    				<%= mensajeBorrador ? "" : "disabled" %>><%= BolsaEmpleoUtils.getParamForm(request, ControladorMensajes.PARAM_CUERPO, mensaje.getCuerpo()) %></textarea>
+	    				<%= mensajeBorrador ? "" : "disabled" %>><%= EscapaHTML.escapa(BolsaEmpleoUtils.getParamForm(request, ControladorMensajes.PARAM_CUERPO, mensaje.getCuerpo())) %></textarea>
 	    	</div>
     	</div>
     	
@@ -223,7 +223,7 @@ $(document).ready(function() {
 	});
 	
 	document.getElementById("mensaje_cuerpo").addEventListener("input", function() {
-		if (this.value == '<%= bean.getMensaje().getCuerpo() %>') {
+		if (this.value == '<%= EscapaHTML.escapa(bean.getMensaje().getCuerpo()) %>') {
 			document.getElementById("mensaje_guardar").setAttribute("disabled", "true");
 		} else {
 			document.getElementById("mensaje_guardar").removeAttribute("disabled");

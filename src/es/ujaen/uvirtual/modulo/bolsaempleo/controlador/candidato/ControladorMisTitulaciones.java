@@ -44,10 +44,10 @@ import es.ujaen.uvirtual.utilidades.UVException;
  * Gestión de las titulacionesde usuarios de UVIRTUAL.
  */
 @WebServlet(
-	name = "informacionadministrativa.bolsaempleo.mistitulaciones", 
-	description = "Gestión de las titulaciones de usuario", 
+	name = "informacionadministrativa.bolsaempleo.mistitulaciones",
+	description = "Gestión de las titulaciones de usuario",
 	urlPatterns = { 
-			"/srv/es/informacionadministrativa/bolsaempleo/mistitulaciones", 
+			"/srv/es/informacionadministrativa/bolsaempleo/mistitulaciones",
 			"/srv/en/informacionadministrativa/bolsaempleo/mistitulaciones",
 			"/srv/es/ajax/informacionadministrativa/bolsaempleo/mistitulaciones",
 			"/srv/en/ajax/informacionadministrativa/bolsaempleo/mistitulaciones"
@@ -134,10 +134,10 @@ public class ControladorMisTitulaciones extends HttpServlet {
 					agregarTitulacionFormulario(bean);
 					break;
 				case ACCION_AGREGAR_TITULACION_CONFIRM:
-					agregarTitulacion(request, response, bean);
+					agregarTitulacion(datos, request, response, bean);
 					break;
 				case ACCION_ELIMINAR_TITULACION_USUARIO:
-					eliminarTitulacionUsuario(request, response, bean);
+					eliminarTitulacionUsuario(datos, request, response, bean);
 					break;
 				default:
 					errorFatal(bean, "Acción no contemplada");
@@ -182,8 +182,7 @@ public class ControladorMisTitulaciones extends HttpServlet {
 		} catch (UVException e) {
 			LOGGER.log(Level.WARNING, e.toString());
 			
-			BolsaEmpleoUtils.addMensajeDeError(e.getMessage(), bean, request);
-			response.sendRedirect("/srv/es/informacionadministrativa/bolsaempleo/error");
+			BolsaEmpleoUtils.redirectToError(bean, datos, request, response, e.getMessage());
 		}		
 	}
 	
@@ -217,7 +216,7 @@ public class ControladorMisTitulaciones extends HttpServlet {
 				CodigoDescripcion mensaje = new CodigoDescripcion(RESPONSE_AJAX_ERROR, e.getMessage());
 				writer.write(new Gson().toJson(mensaje));
 				response.setStatus(RESPONSE_AJAX_HTTP_CODE_ERROR);
-			} catch (SQLException e) { 
+			} catch (SQLException e) {
 				LOGGER.log(Level.SEVERE, Formateador.getStackTrace(e));
 				LOGGER.log(Level.SEVERE, e.toString());
 				bean.getMensajesDeError().add(e.getMessage());
@@ -276,7 +275,7 @@ public class ControladorMisTitulaciones extends HttpServlet {
 		bean.setVista(RUTA_BEP_CONF + "formMisTitulaciones.jsp");		
 	}
 	
-	private void agregarTitulacion(HttpServletRequest request, HttpServletResponse response, VistaTitulaciones bean) 
+	private void agregarTitulacion(UVDatos datos, HttpServletRequest request, HttpServletResponse response, VistaTitulaciones bean) 
 			throws SQLException, UVException, IOException, FileUploadException {		
 		agregarTitulacionFormulario(bean);
 		
@@ -305,10 +304,11 @@ public class ControladorMisTitulaciones extends HttpServlet {
 		ModeloMisTitulaciones.obtenerInstancia().insertaTitulacionUsuario(titulacion, bean.getUsuarioLogeado());
 			
 		BolsaEmpleoUtils.addMensajeDeExito(MENSAJE_EXITO_AGREGAR, bean, request);
+		datos.setRespuestaEnviada(true);
 		response.sendRedirect(request.getServletPath());		
 	}
 	
-	private void eliminarTitulacionUsuario(HttpServletRequest request, HttpServletResponse response, VistaTitulaciones bean) throws SQLException, UVException, IOException {
+	private void eliminarTitulacionUsuario(UVDatos datos, HttpServletRequest request, HttpServletResponse response, VistaTitulaciones bean) throws SQLException, UVException, IOException {
 		String selectedJson = EscapaHTML.ajustaCodificacion(request.getParameter(PARAM_TITULACIONES_USUARIOS_SELECCIONADOS));
 		int[] selected = (new Gson()).fromJson(selectedJson, new TypeToken<int[]>() { }.getType());
 		
@@ -333,6 +333,7 @@ public class ControladorMisTitulaciones extends HttpServlet {
 			bean.getMensajesDeExito().add(MENSAJE_EXITO_TITULACION_BORRADA);
 		}
 		
+		datos.setRespuestaEnviada(true);
 		response.sendRedirect(request.getServletPath());		
 	}
 	

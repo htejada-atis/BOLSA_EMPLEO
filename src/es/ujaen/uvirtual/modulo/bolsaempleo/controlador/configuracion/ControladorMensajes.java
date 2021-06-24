@@ -141,7 +141,7 @@ public class ControladorMensajes extends HttpServlet {
 					listadoMensajes(bean, datos, request, response);
 					break;
 				case ACCION_NUEVO_MENSAJE:
-					nuevoMensaje(bean, request, response);
+					nuevoMensaje(bean, datos, request, response);
 					break;
 				default:
 					errorFatal(bean, MENSAJE_ERROR_ACCION_NO_CONTEMPLADA);
@@ -181,8 +181,7 @@ public class ControladorMensajes extends HttpServlet {
 			LOGGER.log(Level.SEVERE, Formateador.getStackTrace(e));
 			LOGGER.log(Level.SEVERE, e.toString());
 			
-			BolsaEmpleoUtils.addMensajeDeError(e.getMessage(), bean, request);
-			response.sendRedirect("/srv/es/informacionadministrativa/bolsaempleo/error");
+			BolsaEmpleoUtils.redirectToError(bean, datos, request, response, e.getMessage());
 		}
 	}
 
@@ -220,10 +219,10 @@ public class ControladorMensajes extends HttpServlet {
 		
 		switch (nombreAccion) {
 			case ACCION_AGREGAR_DESTINATARIOS:
-				agregarDestinatarios(bean, request, response);
+				agregarDestinatarios(bean, datos, request, response);
 				break;
 			case ACCION_BORRAR_MENSAJE:
-				borrarMensaje(bean, request, response);
+				borrarMensaje(bean, datos, request, response);
 				break;
 			case ACCION_DATATABLE_DESTINATARIOS:
 				listadoDestinatarios(bean, datos, request, response);
@@ -234,20 +233,20 @@ public class ControladorMensajes extends HttpServlet {
 			case ACCION_DETALLE_MENSAJE:
 				break;
 			case ACCION_ELIMINAR_DESTINATARIOS:
-				eliminarDestinatarios(bean, request, response);
+				eliminarDestinatarios(bean, datos, request, response);
 				break;
 			case ACCION_ENVIAR_MENSAJE:
-				enviarMensaje(bean, request, response);
+				enviarMensaje(bean, datos, request, response);
 				break;
 			case ACCION_MODIFICAR_MENSAJE:
-				guardarMensaje(bean, request, response); 
+				guardarMensaje(bean, datos, request, response); 
 				break;
 			default:
 				errorFatal(bean, MENSAJE_ERROR_ACCION_NO_CONTEMPLADA);
 		}
 	}
 	
-	private void agregarDestinatarios(VistaMensajes bean, HttpServletRequest request, HttpServletResponse response) throws UVException, IOException {
+	private void agregarDestinatarios(VistaMensajes bean, UVDatos datos, HttpServletRequest request, HttpServletResponse response) throws UVException, IOException {
 		ModeloMensajes modeloMensaje = ModeloMensajes.obtenerInstancia();
 		ModeloUsuarioBolsaEmpleo modeloUsuario = ModeloUsuarioBolsaEmpleo.obtenerInstancia();
 		List<UsuarioBolsaEmpleo> destinatarios = null;
@@ -277,16 +276,18 @@ public class ControladorMensajes extends HttpServlet {
 			BolsaEmpleoUtils.addMensajeDeError(ex.getMessage(), bean, request);
 		}
 		
-		redireccionConMensajeSeleccionado(bean, request, response, ACCION_DETALLE_MENSAJE);
+		redireccionConMensajeSeleccionado(bean, datos, request, response, ACCION_DETALLE_MENSAJE);
 	}
 	
-	private void borrarMensaje(VistaMensajes bean, HttpServletRequest request, HttpServletResponse response) throws SQLException, UVException, IOException {
+	private void borrarMensaje(VistaMensajes bean, UVDatos datos, HttpServletRequest request, HttpServletResponse response) throws SQLException, UVException, IOException {
 		ModeloMensajes.obtenerInstancia().eliminarMensajeBorrador(bean.getMensaje(), bean.getUsuarioLogeado());
 		BolsaEmpleoUtils.addMensajeDeExito("Mensaje eliminado correctamente", bean, request);
+		datos.setRespuestaEnviada(true);
+		datos.setRespuestaEnviada(true);
 		response.sendRedirect(request.getServletPath());
 	}
 	
-	private void eliminarDestinatarios(VistaMensajes bean, HttpServletRequest request, HttpServletResponse response) throws UVException, IOException {
+	private void eliminarDestinatarios(VistaMensajes bean, UVDatos datos, HttpServletRequest request, HttpServletResponse response) throws UVException, IOException {
 		ModeloMensajes modeloMensaje = ModeloMensajes.obtenerInstancia();
 		ModeloUsuarioBolsaEmpleo modeloUsuario = ModeloUsuarioBolsaEmpleo.obtenerInstancia();
 		List<UsuarioBolsaEmpleo> destinatarios = null;
@@ -316,10 +317,10 @@ public class ControladorMensajes extends HttpServlet {
 			BolsaEmpleoUtils.addMensajeDeError(ex.getMessage(), bean, request);
 		}
 		
-		redireccionConMensajeSeleccionado(bean, request, response, ACCION_DETALLE_MENSAJE);
+		redireccionConMensajeSeleccionado(bean, datos, request, response, ACCION_DETALLE_MENSAJE);
 	}
 	
-	private void enviarMensaje(VistaMensajes bean, HttpServletRequest request, HttpServletResponse response) throws IOException, UVException, SQLException {
+	private void enviarMensaje(VistaMensajes bean, UVDatos datos, HttpServletRequest request, HttpServletResponse response) throws IOException, UVException, SQLException {
 		Mensaje mensaje = bean.getMensaje();
 		
 		if (mensaje.getTitulo().equals(ModeloMensajes.MENSAJE_ESTADO_BORRADOR)) {
@@ -333,10 +334,11 @@ public class ControladorMensajes extends HttpServlet {
 		ModeloMensajes.obtenerInstancia().actualizaEstadoMensajeComoEnviando(bean.getMensaje(), bean.getUsuarioLogeado());
 		
 		BolsaEmpleoUtils.addMensajeDeExito(MENSAJE_EXITO_ENVIADO, bean, request);
+		datos.setRespuestaEnviada(true);
 		response.sendRedirect(request.getServletPath());
 	}
 	
-	private void guardarMensaje(VistaMensajes bean, HttpServletRequest request, HttpServletResponse response) throws IOException, SQLException, UVException {
+	private void guardarMensaje(VistaMensajes bean, UVDatos datos, HttpServletRequest request, HttpServletResponse response) throws IOException, SQLException, UVException {
 		if (EscapaHTML.ajustaCodificacion(request.getParameter(PARAM_GUARDAR)) != null) {
 			ModeloMensajes modeloMensaje = ModeloMensajes.obtenerInstancia();
 			Mensaje mensaje = this.getValidatorMensaje(request);
@@ -346,24 +348,24 @@ public class ControladorMensajes extends HttpServlet {
 			modeloMensaje.actualizarMensaje(mensaje, bean.getUsuarioLogeado());
 			
 			BolsaEmpleoUtils.addMensajeDeExito(MENSAJE_EXITO_MENSAJE_GUARDADO, bean, request);
-			redireccionConMensajeSeleccionado(bean, request, response, ACCION_DETALLE_MENSAJE);
+			redireccionConMensajeSeleccionado(bean, datos, request, response, ACCION_DETALLE_MENSAJE);
 		}
 	}
 	
-	private void nuevoMensaje(VistaMensajes bean, HttpServletRequest request, HttpServletResponse response) throws SQLException, UVException, IOException {
+	private void nuevoMensaje(VistaMensajes bean, UVDatos datos, HttpServletRequest request, HttpServletResponse response) throws SQLException, UVException, IOException {
 		ModeloMensajes modeloMensaje = ModeloMensajes.obtenerInstancia();
 		Integer idMensaje = modeloMensaje.nuevoMensajeEnBorrador(bean.getUsuarioLogeado());
 		bean.setMensaje(modeloMensaje.getMensajeById(idMensaje));
 		
-		redireccionConMensajeSeleccionado(bean, request, response, ACCION_DETALLE_MENSAJE);
+		redireccionConMensajeSeleccionado(bean, datos, request, response, ACCION_DETALLE_MENSAJE);
 	}
 	
-	private void redireccionConMensajeSeleccionado(VistaMensajes bean, HttpServletRequest request, HttpServletResponse response, String accion)
+	private void redireccionConMensajeSeleccionado(VistaMensajes bean, UVDatos datos, HttpServletRequest request, HttpServletResponse response, String accion)
 			throws IOException {
 		Map<String, String> params = new HashMap<>();
 		params.put(PARAM_ACCION, accion);
 		params.put(PARAM_MENSAJE_ID, bean.getMensaje().getCodNum().toString());
-		BolsaEmpleoUtils.redirectWithParams(request, response, params);
+		BolsaEmpleoUtils.redirectWithParams(datos, request, response, params);
 	}
 	
 	private void listadoMensajes(VistaMensajes bean, UVDatos datos, HttpServletRequest request, HttpServletResponse response) throws IOException {

@@ -100,7 +100,7 @@ public class ControladorBolsas extends HttpServlet {
 					listado(bean, datos, request, response);
 					break;
 				case ACCION_BOLSA:
-					accionSobreBolsas(bean, request, response);					
+					accionSobreBolsas(bean, datos, request, response);					
 					break;
 				default:
 					errorFatal(bean, "Acción no contemplada");
@@ -147,8 +147,7 @@ public class ControladorBolsas extends HttpServlet {
 			LOGGER.log(Level.SEVERE, Formateador.getStackTrace(e));
 			LOGGER.log(Level.SEVERE, e.toString());
 			
-			BolsaEmpleoUtils.addMensajeDeError(e.getMessage(), bean, request);
-			response.sendRedirect("/srv/es/informacionadministrativa/bolsaempleo/error");			
+			BolsaEmpleoUtils.redirectToError(bean, datos, request, response, e.getMessage());			
 		}
 	}
 	
@@ -195,7 +194,7 @@ public class ControladorBolsas extends HttpServlet {
 		}
 	}
 	
-	private void accionSobreBolsas(VistaEstadoBolsas bean, HttpServletRequest request, HttpServletResponse response) throws UVException, SQLException, IOException {
+	private void accionSobreBolsas(VistaEstadoBolsas bean, UVDatos datos, HttpServletRequest request, HttpServletResponse response) throws UVException, SQLException, IOException {
 		ModeloBolsa modelo = ModeloBolsa.obtenerInstancia();		
 		String selectedJson = EscapaHTML.ajustaCodificacion(request.getParameter(PARAM_BOLSAS_SELECCIONADAS));
 		int[] selected;
@@ -230,11 +229,13 @@ public class ControladorBolsas extends HttpServlet {
 				break;
 			default:
 				BolsaEmpleoUtils.addMensajeDeError(MENSAJE_ERROR_ACCION_BOLSA_NO_VALIDA, bean, request);
+				datos.setRespuestaEnviada(true);
 				response.sendRedirect(request.getServletPath());
 				return;
 		}
 		
 		BolsaEmpleoUtils.addMensajeDeExito(MENSAJE_EXITO_BOLSA_MODIFICADA_CORRECTAMENTE, bean, request);
+		datos.setRespuestaEnviada(true);
 		response.sendRedirect(request.getServletPath());
 	}
 }
