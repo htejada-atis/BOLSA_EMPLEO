@@ -1149,7 +1149,6 @@ public class ModeloSolicitud {
 									
 			try (ResultSet rs = stmt.executeQuery()) {
 				if (rs.next()) {
-					System.out.println("si existe");
 					return true;
 				}
 			}
@@ -1173,7 +1172,7 @@ public class ModeloSolicitud {
 		
 		try (Connection conexion = ConexionUvirtual.obtenerInstancia()) {
 		
-			if (compruebaSiExisteAfinidad(meritoSolicitud, afinidad.getCodNum(), conexion)) {
+			if (idValoracion != 0) {
 				String consultaUpdate = "UPDATE TBEP_SOL_BOL_MER_VALORACION"
 						+ " SET VALOR = ?, BEPAFI_CODNUM = ?, UID_USUARIO = ?"
 						+ " WHERE BEPSBM_CODNUM = ? AND CODNUM = ?";

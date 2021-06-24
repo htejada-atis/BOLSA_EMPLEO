@@ -205,7 +205,7 @@ UsuarioBolsaEmpleo candidato = bean.getCandidato();
 							</td>
 							<td class='cell-afinidad'>
 							<%	if (individualizado) { %>
-									<select id="afinidad-individualizada" data-valoracion="<%= valoraciones ? meritoBolsa.getMeritoSolicitud().getValoraciones().get(0).getCodNum() : "null" %>">
+									<select id="afinidad-individualizada" data-valoracion="<%= valoraciones ? meritoBolsa.getMeritoSolicitud().getValoraciones().get(0).getCodNum() : "0" %>">
 									<% 	for (Afinidad afinidad : bean.getListaAfinidades()) { %>
 										<%	if (afinidad.getCodigo().equals(meritoBolsa.getMeritoSolicitud().getMerito().getItemBaremacion().getAfinidad())) { %>
 											<% 	if (valoraciones && meritoBolsa.getMeritoSolicitud().getValoraciones().get(0).getAfinidad().getCodNum() == afinidad.getCodNum()) { %>

@@ -345,17 +345,18 @@ public class ControladorUsuarioCandidato extends HttpServlet {
 				resumenSolicitudCandidato(bean);
 				break;
 			case ACCION_EXCLUIR_SOLICITUD:
-				excluirSolicitudCandidato(bean, request, response);
+				excluirSolicitudCandidato(bean, datos, request, response);
 				break;
 			case ACCION_INCLUIR_SOLICITUD:
-				incluirSolicitudCandidato(bean, request, response);
+				incluirSolicitudCandidato(bean, datos, request, response);
 				break;
 			default:
 				errorFatal(bean, MENSAJE_ERROR_ACCION_NO_CONTEMPLADA);
 		}
 	}
 	
-	private void excluirSolicitudCandidato(VistaCandidatos bean, HttpServletRequest request, HttpServletResponse response) throws UVException, SQLException, IOException {
+	private void excluirSolicitudCandidato(VistaCandidatos bean, UVDatos datos, HttpServletRequest request, HttpServletResponse response)
+			throws UVException, SQLException, IOException {
 		Solicitud solicitud = bean.getSolicitud();
 		
 		solicitud.setRazonExclusion(EscapaHTML.ajustaCodificacion(request.getParameter(PARAM_RAZON_EXCLUSION_SOLICITUD)));
@@ -369,15 +370,16 @@ public class ControladorUsuarioCandidato extends HttpServlet {
 		ModeloSolicitud.obtenerInstancia().excluirIncluirSolicitud(solicitud, true, bean.getUsuarioLogeado());
 		
 		BolsaEmpleoUtils.addMensajeDeExito(MENSAJE_EXITO_EXCLUSION_SOLICITUD, bean, request);
-		redireccionConSolicitudSeleccionada(bean, request, response, ACCION_SELECCIONAR_SOLICITUD);
+		redireccionConSolicitudSeleccionada(bean, datos, request, response, ACCION_SELECCIONAR_SOLICITUD);
 	}
 	
-	private void incluirSolicitudCandidato(VistaCandidatos bean, HttpServletRequest request, HttpServletResponse response) throws UVException, SQLException, IOException {
+	private void incluirSolicitudCandidato(VistaCandidatos bean, UVDatos datos, HttpServletRequest request, HttpServletResponse response)
+			throws UVException, SQLException, IOException {
 		Solicitud solicitud = bean.getSolicitud();
 		ModeloSolicitud.obtenerInstancia().excluirIncluirSolicitud(solicitud, false, bean.getUsuarioLogeado());
 		
 		BolsaEmpleoUtils.addMensajeDeExito(MENSAJE_EXITO_INCLUSION_SOLICITUD, bean, request);
-		redireccionConSolicitudSeleccionada(bean, request, response, ACCION_SELECCIONAR_SOLICITUD);
+		redireccionConSolicitudSeleccionada(bean, datos, request, response, ACCION_SELECCIONAR_SOLICITUD);
 	}
 	
 	/** Confirmar la solicitud del candidato .

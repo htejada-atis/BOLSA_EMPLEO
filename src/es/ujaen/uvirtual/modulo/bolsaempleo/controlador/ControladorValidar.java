@@ -368,10 +368,9 @@ public class ControladorValidar extends HttpServlet {
 			Map.Entry<String, Double> entry = afinidadesRaw.entrySet().iterator().next();
 			String idAfinidad = entry.getKey();
 			Double idValoracion = entry.getValue();
-			System.out.println("idValoracion: " + idValoracion);
 			Afinidad afinidad = modeloAfinidad.getAfinidadById(Formateador.leeParametroInteger(idAfinidad));
-//			modeloSolicitud.actualizarAfinidadesMeritoIndividualizado(solicitud, bolsa, bean.getMerito().getMerito(), afinidad,
-//					(int) Math.round(idValoracion), bean.getUsuarioLogeado());
+			modeloSolicitud.actualizarAfinidadesMeritoIndividualizado(solicitud, bolsa, bean.getMerito().getMerito(), afinidad,
+					(int) Math.round(idValoracion), bean.getUsuarioLogeado());
 		}
 	}
 	
