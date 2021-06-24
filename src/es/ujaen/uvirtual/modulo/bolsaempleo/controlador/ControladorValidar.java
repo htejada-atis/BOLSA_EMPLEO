@@ -8,12 +8,10 @@ import java.util.stream.IntStream;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.logging.Level;
-import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import javax.servlet.http.HttpSession;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.reflect.TypeToken;
@@ -94,7 +92,6 @@ public class ControladorValidar extends HttpServlet {
 	public static final String JSP_MERITOS_CANDIDATOS = RUTA_BEP_VALIDAR + "meritoscandidatos.jsp";
 	
 	// mensajes
-	public static final String MENSAJE_MERITO_ENVIADO = "meritoenviado";
 	public static final String MENSAJE_ERROR_ACCION_NO_CONTEMPLADA = "Acción no contemplada";
 	public static final String MENSAJE_ERROR_NO_HAY_BOLSAS_SELECCIONADAS = "No hay bolsas seleccionadas";
 	public static final String MENSAJE_EXITO_MERITO_EXCLUIDO = "Mérito excluido correctamente para la bolsa: %s";
@@ -120,7 +117,7 @@ public class ControladorValidar extends HttpServlet {
 		
 		VistaValidar bean = new VistaValidar();
 		
-		String nombreAccion = EscapaHTML.ajustaCodificacion(request.getParameter(PARAM_ACCION));
+		String nombreAccion = EscapaHTML.ajustaCodificacion(BolsaEmpleoUtils.getParamRequestOrSession(request, PARAM_ACCION));
 		if (nombreAccion == null) {
 			nombreAccion = ACCION_INDEX;
 		}
@@ -129,7 +126,6 @@ public class ControladorValidar extends HttpServlet {
 			init(bean, datos, request, response);
 			switch (nombreAccion) {
 				case ACCION_INDEX:
-					indice(bean, request);
 					break;
 				case ACCION_BOLSA_SELECCIONADA:
 				case ACCION_CANDIDATO_SELECCIONADO:
@@ -175,35 +171,6 @@ public class ControladorValidar extends HttpServlet {
 		doGet(request, response);
 	}
 	
-	private void indice(VistaValidar bean, HttpServletRequest request) throws SQLException, UVException {
-		bean.setVista(JSQP_INDEX);
-		
-		HttpSession session = request.getSession(false);
-		if (session.getAttribute(MENSAJE_MERITO_ENVIADO) != null) {
-			bean.setVista(JSP_MERITOS_CANDIDATOS);
-			ModeloBolsa modeloBolsa = ModeloBolsa.obtenerInstancia();
-			ModeloUsuarioBolsaEmpleo modeloUsuario = ModeloUsuarioBolsaEmpleo.obtenerInstancia();
-			ModeloBaremacionItems modeloItem = ModeloBaremacionItems.obtenerInstancia();
-			ModeloSolicitud modeloSolicitud = ModeloSolicitud.obtenerInstancia();
-			
-			bean.setBolsa(modeloBolsa.getBolsaById((Integer) session.getAttribute(PARAM_BOLSA)));
-			bean.setCandidato(modeloUsuario.getUsuarioById((Integer) session.getAttribute(PARAM_CANDIDATO)));
-			
-			Merito merito = new Merito((Integer) session.getAttribute(PARAM_MERITO));
-			MeritoSolicitud meritoSolicitud = modeloSolicitud.getMeritoSolicitudByConvocatoria(bean.getConvocatoria(), bean.getBolsa(), merito);
-			
-			bean.setMerito(meritoSolicitud);
-			bean.setItems(modeloItem.getItemsDeApartado(meritoSolicitud.getMerito().getItemBaremacion().getBloqueBaremacion().getApartadoBaremacion()));
-			
-			obtenerValoresMeritoBolsasCandidato(bean);
-			
-			session.removeAttribute(MENSAJE_MERITO_ENVIADO);
-			session.removeAttribute(PARAM_BOLSA);
-			session.removeAttribute(PARAM_CANDIDATO);
-			session.removeAttribute(PARAM_MERITO);
-		}
-	}
-	
 	private void init(VistaValidar bean, UVDatos datos, HttpServletRequest request, HttpServletResponse response) throws SQLException, UVException, IOException {
 		bean.setVista(JSQP_INDEX);
 		bean.setConvocatoria(ModeloConvocatoria.obtenerInstancia().getUltimaConvocatoria());
@@ -224,8 +191,7 @@ public class ControladorValidar extends HttpServlet {
 			LOGGER.log(Level.SEVERE, Formateador.getStackTrace(e));
 			LOGGER.log(Level.SEVERE, e.toString());
 			
-			BolsaEmpleoUtils.addMensajeDeError(e.getMessage(), bean, request);
-			response.sendRedirect("/srv/es/informacionadministrativa/bolsaempleo/error");
+			BolsaEmpleoUtils.redirectToError(bean, datos, request, response, e.getMessage());
 		}
 	}
 	
@@ -237,7 +203,7 @@ public class ControladorValidar extends HttpServlet {
 	private void bolsaSeleccionada(VistaValidar bean, UVDatos datos, HttpServletRequest request, HttpServletResponse response, String nombreAccion) 
 			throws SQLException, UVException, IOException {
 		ModeloBolsa modeloBolsa = ModeloBolsa.obtenerInstancia();
-		bean.setBolsa(modeloBolsa.getBolsaById(Formateador.leeParametroInteger(request.getParameter(PARAM_BOLSA))));
+		bean.setBolsa(modeloBolsa.getBolsaById(Formateador.leeParametroInteger(BolsaEmpleoUtils.getParamRequestOrSession(request, PARAM_BOLSA))));
 		bean.setVista(JSP_MERITOS_CANDIDATOS);
 		
 		switch (nombreAccion) {
@@ -262,7 +228,7 @@ public class ControladorValidar extends HttpServlet {
 			throws SQLException, UVException, IOException {
 		
 		ModeloUsuarioBolsaEmpleo modeloUsuario = ModeloUsuarioBolsaEmpleo.obtenerInstancia();
-		bean.setCandidato(modeloUsuario.getUsuarioById(Formateador.leeParametroInteger(request.getParameter(PARAM_CANDIDATO))));
+		bean.setCandidato(modeloUsuario.getUsuarioById(Formateador.leeParametroInteger(BolsaEmpleoUtils.getParamRequestOrSession(request, PARAM_CANDIDATO))));
 		
 		switch (nombreAccion) {
 			case ACCION_CANDIDATO_SELECCIONADO:
@@ -273,7 +239,7 @@ public class ControladorValidar extends HttpServlet {
 			case ACCION_MERITO_SELECCIONADO:
 			case ACCION_MODIFICAR_MERITO:
 			case ACCION_VALIDAR_MERITO:
-				meritoSeleccionado(bean, request, response, nombreAccion);
+				meritoSeleccionado(bean, datos, request, response, nombreAccion);
 				break;
 			default:
 				accionNodefinida(bean);
@@ -281,13 +247,13 @@ public class ControladorValidar extends HttpServlet {
 		
 	}
 	
-	private void meritoSeleccionado(VistaValidar bean, HttpServletRequest request, HttpServletResponse response, String nombreAccion) 
+	private void meritoSeleccionado(VistaValidar bean, UVDatos datos, HttpServletRequest request, HttpServletResponse response, String nombreAccion) 
 			throws SQLException, UVException, IOException {
 		
 		ModeloBaremacionItems modeloItem = ModeloBaremacionItems.obtenerInstancia();
 		ModeloSolicitud modeloSolicitud = ModeloSolicitud.obtenerInstancia();
 		
-		Merito merito = new Merito(Formateador.leeParametroInteger(request.getParameter(PARAM_MERITO)));
+		Merito merito = new Merito(Formateador.leeParametroInteger(BolsaEmpleoUtils.getParamRequestOrSession(request, PARAM_MERITO)));
 		MeritoSolicitud meritoSolicitud = modeloSolicitud.getMeritoSolicitudByConvocatoria(bean.getConvocatoria(), bean.getBolsa(), merito);
 		
 		bean.setMerito(meritoSolicitud);
@@ -298,10 +264,10 @@ public class ControladorValidar extends HttpServlet {
 				obtenerValoresMeritoBolsasCandidato(bean);
 				break;
 			case ACCION_MODIFICAR_MERITO:
-				modificarMerito(bean, request, response, merito);
+				modificarMerito(bean, datos, request, response, merito);
 				break;
 			case ACCION_VALIDAR_MERITO:
-				validarMerito(bean, request, response);
+				validarMerito(bean, datos, request, response);
 				break;
 			default:
 				accionNodefinida(bean);
@@ -309,13 +275,7 @@ public class ControladorValidar extends HttpServlet {
 		
 	}
 	
-	private void modificarMerito(VistaValidar bean, HttpServletRequest request, HttpServletResponse response, Merito merito) throws UVException, IOException {
-		HttpSession session = request.getSession(false);
-		session.setAttribute(PARAM_BOLSA, bean.getBolsa().getCodNum());
-		session.setAttribute(PARAM_CANDIDATO, bean.getCandidato().getCodNum());
-		session.setAttribute(PARAM_MERITO, bean.getMerito().getMerito().getCodNum());
-		session.setAttribute(MENSAJE_MERITO_ENVIADO, true);
-		
+	private void modificarMerito(VistaValidar bean, UVDatos datos, HttpServletRequest request, HttpServletResponse response, Merito merito) throws UVException, IOException {
 		try {
 			if (EscapaHTML.ajustaCodificacion(request.getParameter(PARAM_GUARDAR_MERITO)) != null) {
 				// item de baremación
@@ -334,7 +294,7 @@ public class ControladorValidar extends HttpServlet {
 			BolsaEmpleoUtils.addMensajeDeError(ex.getMessage(), bean, request);
 		}
 		
-		response.sendRedirect(request.getServletPath());
+		redireccionConMeritoSeleccionado(bean, datos, request, response, ACCION_MERITO_SELECCIONADO);
 	}
 	
 	private void obtenerValoresMeritoBolsasCandidato(VistaValidar bean) throws SQLException, UVException {
@@ -344,38 +304,32 @@ public class ControladorValidar extends HttpServlet {
 		bean.setListaAfinidades(ModeloAfinidad.obtenerInstancia().listaAfinidades());
 	}
 	
-	private void validarMerito(VistaValidar bean, HttpServletRequest request, HttpServletResponse response) throws UVException, IOException {
+	private void validarMerito(VistaValidar bean, UVDatos datos, HttpServletRequest request, HttpServletResponse response) throws UVException, IOException {
 		ModeloValidar modeloValidar = ModeloValidar.obtenerInstancia();
 		ModeloBolsa modeloBolsa = ModeloBolsa.obtenerInstancia();
-		
-		HttpSession session = request.getSession(false);
-		session.setAttribute(PARAM_BOLSA, bean.getBolsa().getCodNum());
-		session.setAttribute(PARAM_CANDIDATO, bean.getCandidato().getCodNum());
-		session.setAttribute(PARAM_MERITO, bean.getMerito().getMerito().getCodNum());
-		session.setAttribute(MENSAJE_MERITO_ENVIADO, true);
 		
 		try {
 			String observacionesCandidato = EscapaHTML.ajustaCodificacion(request.getParameter(PARAM_OBSERVACION_CANDIDATO));
 			Integer idBolsa = Formateador.leeParametroInteger(request.getParameter(PARAM_BOLSA_MERITO));
 			Bolsa bolsa = modeloBolsa.getBolsaById(idBolsa);
+			bean.setBolsa(bolsa);
 			actualizaAfinidades(bean, request, bolsa);
 			
 			if (EscapaHTML.ajustaCodificacion(request.getParameter(PARAM_ACEPTAR_MERITO)) != null) {
-				modeloValidar.validarMerito(idBolsa.toString(), bean.getMerito().getMerito().getCodNum(), observacionesCandidato, bean.getUsuarioLogeado());
+				modeloValidar.validarMerito(idBolsa.toString(), bean.getMerito().getMerito().getCodNum(),
+						observacionesCandidato, bean.getConvocatoria(), bean.getUsuarioLogeado());
 				BolsaEmpleoUtils.addMensajeDeExito(String.format(MENSAJE_EXITO_MERITO_VALIDADO, bolsa.getArea().getDescripcion()), bean, request);
 			} else if (EscapaHTML.ajustaCodificacion(request.getParameter(PARAM_EXCLUIR_MERITO)) != null) {
-				modeloValidar.excluirMerito(idBolsa.toString(), bean.getMerito().getMerito().getCodNum(), observacionesCandidato, bean.getUsuarioLogeado());
+				modeloValidar.excluirMeritoEnBolsas(bean.getMerito().getMerito().getCodNum(),
+						observacionesCandidato, bean.getConvocatoria(), bean.getUsuarioLogeado());
 				BolsaEmpleoUtils.addMensajeDeExito(String.format(MENSAJE_EXITO_MERITO_EXCLUIDO, bolsa.getArea().getDescripcion()), bean, request);
-			} else if (EscapaHTML.ajustaCodificacion(request.getParameter(PARAM_GUARDAR_MERITO)) != null) {
-				modeloValidar.guardarMerito(idBolsa.toString(), bean.getMerito().getMerito().getCodNum(), observacionesCandidato);
-				BolsaEmpleoUtils.addMensajeDeExito(String.format(MENSAJE_EXITO_MERITO_GUARDAR, bolsa.getArea().getDescripcion()), bean, request);
 			}
 			
 		} catch (Exception ex) {
 			BolsaEmpleoUtils.addMensajeDeError(ex.getMessage(), bean, request);
 		}
 		
-		response.sendRedirect(request.getServletPath());
+		redireccionConMeritoSeleccionado(bean, datos, request, response, ACCION_MERITO_SELECCIONADO);
 	}
 	
 	private void actualizaAfinidades(VistaValidar bean, HttpServletRequest request, Bolsa bolsa) throws UVException, SQLException {
@@ -383,7 +337,7 @@ public class ControladorValidar extends HttpServlet {
 		
 		// parseamos json afinidades
 		HashMap<String, Double> afinidadesRaw;
-		try {			
+		try {
 			afinidadesRaw = gson.fromJson(request.getParameter(PARAM_AFINIDADES), new TypeToken<HashMap<String, Double>>() { }.getType());			
 		} catch (Exception e) {
 			throw new UVException("Afinidades incorrectas");
@@ -418,6 +372,16 @@ public class ControladorValidar extends HttpServlet {
 			modeloSolicitud.actualizarAfinidadesMeritoIndividualizado(solicitud, bolsa, bean.getMerito().getMerito(), afinidad,
 					(int) Math.round(idValoracion), bean.getUsuarioLogeado());
 		}
+	}
+	
+	private void redireccionConMeritoSeleccionado(VistaValidar bean, UVDatos datos, HttpServletRequest request, HttpServletResponse response, String accion)
+			throws IOException {
+		Map<String, String> params = new HashMap<>();
+		params.put(PARAM_BOLSA, bean.getBolsa().getCodNum().toString());
+		params.put(PARAM_CANDIDATO, bean.getCandidato().getCodNum().toString());
+		params.put(PARAM_MERITO, bean.getMerito().getMerito().getCodNum().toString());
+		params.put(PARAM_ACCION, accion);
+		BolsaEmpleoUtils.redirectWithParams(datos, request, response, params);
 	}
 	
 	private void listadoBolsas(VistaValidar bean, UVDatos datos, HttpServletRequest request, HttpServletResponse response)

@@ -110,7 +110,7 @@ public class ControladorMisDatos extends HttpServlet {
 					enviarMisDatos(request, response, bean, datos);
 					break;
 				case ACCION_BAJA_USUARIO:
-					bajaUsuario(request, response, bean);
+					bajaUsuario(request, datos, response, bean);
 					break;
 				default:
 					errorFatal(bean, "Acción no contemplada");
@@ -143,8 +143,7 @@ public class ControladorMisDatos extends HttpServlet {
 			bean.setUsuarioLogeado(ModeloUsuarioBolsaEmpleo.obtenerInstancia().getOrCreateUsuario(datos));
 		} catch (UVException e) {
 			LOGGER.log(Level.WARNING, e.toString());
-			BolsaEmpleoUtils.addMensajeDeError(e.getMessage(), bean, request);
-			response.sendRedirect("/srv/es/informacionadministrativa/bolsaempleo/error");
+			BolsaEmpleoUtils.redirectToError(bean, datos, request, response, e.getMessage());
 		}
 	}
     
@@ -182,10 +181,11 @@ public class ControladorMisDatos extends HttpServlet {
 		modelo.actualizaUsuarioMisDatos(usuarioForm, bean.getUsuarioLogeado());
 		
 		BolsaEmpleoUtils.addMensajeDeExito(MENSAJE_EXITO_ENVIAR, bean, request);
+		datos.setRespuestaEnviada(true);
 		response.sendRedirect(request.getServletPath());
     }
     
-	private void bajaUsuario(HttpServletRequest request, HttpServletResponse response, VistaUsuarioBolsaEmpleo bean) throws SQLException, UVException, IOException {
+	private void bajaUsuario(HttpServletRequest request, UVDatos datos, HttpServletResponse response, VistaUsuarioBolsaEmpleo bean) throws SQLException, UVException, IOException {
 		bean.setVista("/WEB-INF/jsp/vista/infadministrativa/bolsaempleo/misdatos/formBaja.jsp");
 		
 		if (EscapaHTML.ajustaCodificacion(request.getParameter(PARAM_RAZON_BORRADO)) != null) {
@@ -203,6 +203,7 @@ public class ControladorMisDatos extends HttpServlet {
 			modelo.cambiarFlagBorradoUsuarioRazon(usu, bean.getUsuarioLogeado());
 			
 			BolsaEmpleoUtils.addMensajeDeExito(MENSAJE_EXITO_DARSE_BAJA, bean, request);			
+			datos.setRespuestaEnviada(true);
 			response.sendRedirect(request.getServletPath());
 		}
 	}

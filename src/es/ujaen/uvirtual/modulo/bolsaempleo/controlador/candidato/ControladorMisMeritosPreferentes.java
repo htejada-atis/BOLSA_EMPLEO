@@ -155,8 +155,7 @@ public class ControladorMisMeritosPreferentes extends HttpServlet {
 		} catch (UVException e) {
 			LOGGER.log(Level.WARNING, e.toString());
 			
-			BolsaEmpleoUtils.addMensajeDeError(e.getMessage(), bean, request);
-			response.sendRedirect("/srv/es/informacionadministrativa/bolsaempleo/error");
+			BolsaEmpleoUtils.redirectToError(bean, datos, request, response, e.getMessage());
 		}		
 	}
 	
@@ -192,10 +191,10 @@ public class ControladorMisMeritosPreferentes extends HttpServlet {
 				formularioAgregarMerito(bean);
 				break;
 			case ACCION_AGREGAR_MERITO_CONFIRM:
-				agregarMerito(bean, request, response);
+				agregarMerito(bean, datos, request, response);
 				break;
 			case ACCION_ELIMINAR_MERITOS:
-				eliminarMeritos(bean, request, response);
+				eliminarMeritos(bean, datos, request, response);
 				break;
 			case ACCION_LISTADO_OPCIONES:
 				listadoOpciones(bean, datos, request, response);
@@ -274,7 +273,7 @@ public class ControladorMisMeritosPreferentes extends HttpServlet {
 		bean.setCodigoPadreMeritoPreferente(config.getValor());			
 	}
 	
-	private void agregarMerito(VistaMeritosPreferentesCandidato bean, HttpServletRequest request, HttpServletResponse response) 
+	private void agregarMerito(VistaMeritosPreferentesCandidato bean, UVDatos datos, HttpServletRequest request, HttpServletResponse response) 
 			throws SQLException, UVException, IOException, FileUploadException {
 		formularioAgregarMerito(bean);
 		
@@ -302,10 +301,11 @@ public class ControladorMisMeritosPreferentes extends HttpServlet {
 		ModeloMeritosPreferentesCandidato.obtenerInstancia().insertaMeritoUsuario(mp, bean.getUsuarioLogeado());
 		
 		BolsaEmpleoUtils.addMensajeDeExito("Mérito preferente añadido correctamente", bean, request);
+		datos.setRespuestaEnviada(true);
 		response.sendRedirect(request.getServletPath());
 	}
 	
-	private void eliminarMeritos(VistaMeritosPreferentesCandidato bean, HttpServletRequest request, HttpServletResponse response) 
+	private void eliminarMeritos(VistaMeritosPreferentesCandidato bean, UVDatos datos, HttpServletRequest request, HttpServletResponse response) 
 			throws SQLException, UVException, IOException {
 		String selectedJson = EscapaHTML.ajustaCodificacion(request.getParameter(PARAM_MERITOS));
 		int[] selected = (new Gson()).fromJson(selectedJson, new TypeToken<int[]>() { }.getType());
@@ -330,6 +330,7 @@ public class ControladorMisMeritosPreferentes extends HttpServlet {
 			BolsaEmpleoUtils.addMensajeDeExito(MENSAJE_EXITO_ELIMINAR, bean, request);
 		}
 		
+		datos.setRespuestaEnviada(true);
 		response.sendRedirect(request.getServletPath());
 	}
 	

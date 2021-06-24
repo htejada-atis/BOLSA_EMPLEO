@@ -109,10 +109,10 @@ public class ControladorGestionTitulacionesPreferentesArea extends HttpServlet {
 					selecccionarArea(bean, request);
 					break;
 				case ACCION_ELIMINAR_TITULACION_AREA:
-					eliminarTitulacionesArea(bean, request, response);
+					eliminarTitulacionesArea(bean, datos, request, response);
 					break;
 				case ACCION_INCLUIR_TITULACION_AREA:
-					incluirTitulacionesPreferentesArea(bean, request, response);
+					incluirTitulacionesPreferentesArea(bean, datos, request, response);
 					break;
 				case ACCION_DATATABLE_TITULACIONES:
 					listadoTitulaciones(bean, datos, request, response);
@@ -157,8 +157,7 @@ public class ControladorGestionTitulacionesPreferentesArea extends HttpServlet {
 			LOGGER.log(Level.SEVERE, Formateador.getStackTrace(e));
 			LOGGER.log(Level.SEVERE, e.toString());
 			
-			BolsaEmpleoUtils.addMensajeDeError(e.getMessage(), bean, request);
-			response.sendRedirect("/srv/es/informacionadministrativa/bolsaempleo/error");
+			BolsaEmpleoUtils.redirectToError(bean, datos, request, response, e.getMessage());
 		}		
 	}
 	
@@ -192,7 +191,7 @@ public class ControladorGestionTitulacionesPreferentesArea extends HttpServlet {
 		return area;
 	}
 		
-	private void eliminarTitulacionesArea(VistaTitulacionesArea bean, HttpServletRequest request, HttpServletResponse response) throws SQLException, UVException, IOException {
+	private void eliminarTitulacionesArea(VistaTitulacionesArea bean, UVDatos datos, HttpServletRequest request, HttpServletResponse response) throws SQLException, UVException, IOException {
 		Area area = selecccionarArea(bean, request);
 		
 		try {
@@ -201,13 +200,13 @@ public class ControladorGestionTitulacionesPreferentesArea extends HttpServlet {
 			ModeloTitulacion.obtenerInstancia().eliminarTitulacionesPreferentesArea(titulaciones, area.getCodNum(), bean.getUsuarioLogeado());
 			
 			BolsaEmpleoUtils.addMensajeDeExito(MENSAJE_EXITO_TITULACIONES_ELIMINADAS_CORRECTAMENTE, bean, request);
-			redireccionConAreaSeleccionada(request, response, area);
+			redireccionConAreaSeleccionada(datos, request, response, area);
 		} catch (Exception ex) {
 			BolsaEmpleoUtils.addMensajeDeError(MENSAJE_ERROR_TITULACIONES_SELECCIONADAS_INCORRECTAS, bean, request);
 		}
 	}
 	
-	private void incluirTitulacionesPreferentesArea(VistaTitulacionesArea bean, HttpServletRequest request, HttpServletResponse response) 
+	private void incluirTitulacionesPreferentesArea(VistaTitulacionesArea bean, UVDatos datos, HttpServletRequest request, HttpServletResponse response) 
 			throws SQLException, UVException, IOException {
 		Area area = selecccionarArea(bean, request);
 		
@@ -217,7 +216,7 @@ public class ControladorGestionTitulacionesPreferentesArea extends HttpServlet {
 			ModeloTitulacion.obtenerInstancia().incluirTitulacionesPreferentesArea(titulaciones, area.getCodNum(), bean.getUsuarioLogeado());
 			
 			BolsaEmpleoUtils.addMensajeDeExito(MENSAJE_EXITO_TITULACIONES_INCLUIDAS_CORRECTAMENTE, bean, request);						
-			redireccionConAreaSeleccionada(request, response, area);
+			redireccionConAreaSeleccionada(datos, request, response, area);
 		} catch (SQLIntegrityConstraintViolationException e) {
 			BolsaEmpleoUtils.addMensajeDeError(MENSAJE_ERROR_TITULACIONES_PREFERENTES_YA_SELECCIONADAS_PREVIAMENTE, bean, request);
 		} catch (Exception ex) {
@@ -291,10 +290,10 @@ public class ControladorGestionTitulacionesPreferentesArea extends HttpServlet {
 		datos.setRespuestaEnviada(true);
 	}
 
-	private void redireccionConAreaSeleccionada(HttpServletRequest request, HttpServletResponse response, Area area) throws IOException {
+	private void redireccionConAreaSeleccionada(UVDatos datos, HttpServletRequest request, HttpServletResponse response, Area area) throws IOException {
 		Map<String, String> params = new HashMap<>();
 		params.put(ControladorGestionTitulacionesPreferentesArea.PARAM_ACCION, ControladorGestionTitulacionesPreferentesArea.ACCION_SELECCIONAR_AREA);
 		params.put(ControladorGestionTitulacionesPreferentesArea.PARAM_AREA, area.getCodNum().toString());
-		BolsaEmpleoUtils.redirectWithParams(request, response, params);
+		BolsaEmpleoUtils.redirectWithParams(datos, request, response, params);
 	}
 }
