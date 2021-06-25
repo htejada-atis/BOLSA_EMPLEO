@@ -83,17 +83,18 @@ UsuarioBolsaEmpleo candidato = bean.getCandidato();
 			
 			<table class="bluetable bolsaempleo" id="tableValoresMeritoBolsas">
 				<tr>
-					<th scope="col" style="width:12%">Convocatoria</th>
-					<th scope="col" style="width:60%">Bolsa</th>
-					<th scope="col" style="width:10%">Valor</th>
-					<th scope="col" style="width:10%">Excluido</th>
-					<th scope="col" style="width:15%">Último evaluador</th>
+					<th scope="col" style="width:65px">Convocatoria</th>
+					<th scope="col" style="width:100%; min-width: 100px">Bolsa</th>
+					<th scope="col" style="width:40px">Valor</th>
+					<th scope="col" style="width:40px">Excluido</th>
+					<th scope="col" style="width:84px">Último evaluador</th>
+					<th scope="col" style="width:70px">Discordancia</th>
 				</tr>
 				<tbody>
 				</tbody>
 				<tfoot>
 					<tr>
-						<th colSpan="5" style="width:100%"></th>
+						<th colSpan="6" style="width:100%"></th>
 					</tr>
 				</tfoot>
 			</table>
@@ -306,7 +307,7 @@ $(document).ready(function() {
 			
 			var tableValoresMeritoBolsas = new Atis.DataTable('#tableValoresMeritoBolsas', {
 			    "ajax": { url: "<%= ControladorValidarNoAfines.URL_PATTERN_AJAX %>", async: false },
-			    "pageSize": 10,
+			    "pageSize": 20,
 			    "action": "<%= ControladorValidarNoAfines.ACCION_DATATABLE_VALORES_MERITO_BOLSA %>",
 			    "title": 'HISTORIAL DE VALORACIONES DEL MÉRITO: <%= merito.getMerito().getCodNum() %>',
 			    "dropdown": true,
@@ -321,7 +322,6 @@ $(document).ready(function() {
 			        	return row.bolsa.area.idAreaExterno + " : " + row.bolsa.area.descripcion;
 		        	}},
 		        	{'data': 'meritoSolicitud.valor', 'render': function(row) {
-		        		console.log(row.meritoSolicitud.valor);
 		        		return row.meritoSolicitud.valor != 0 ? row.meritoSolicitud.valor : '<%= merito.getMerito().getValor() %>';
 		        	}},
 		        	{'data': 'meritoSolicitud.excluido', 'order': false, 'render': function(row) {
@@ -329,6 +329,11 @@ $(document).ready(function() {
 		        	}},
 		        	{'data': 'uidUsuario', 'order': false, 'render': function(row) {
 		        		return row.uidUsuario != '<%= EscapaHTML.escapa(candidato.getCodCuenta()) %>' ? row.uidUsuario : '';
+		        	}},
+		        	{'data': 'codNum', 'order': false, 'render': function(row) {
+		        		var discordancia = (row.meritoSolicitud.valor != 0 && row.meritoSolicitud.valor != '<%= merito.getMerito().getValor() %>')
+		        						|| (row.meritoSolicitud.excluido != <%= merito.isExcluido() %>);
+		        		return  discordancia ? "<div title='D' class='circle-false'></div>" : "";
 		        	}}
 			    ]
 			});
