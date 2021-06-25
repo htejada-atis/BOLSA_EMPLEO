@@ -33,6 +33,7 @@ public class ModeloBaremacionBloques {
 	public static final String ERROR_BLOQUE_NOEXITE = "Apartado no encontrado";	
 	public static final String ERROR_BLOQUE_REQUERIDO = "El bloque de baremación es requerido";
 	public static final String ERROR_BLOQUE_MISMO_CODIGO = "Ya existe un bloque con el código introducido";
+	public static final String ERROR_APARTADO_USADO = "El apartado está asociado en algún mérito no se puede editar.";
 
 	public static final Integer COLUMN_CODIGO_MAXLENGTH = 3;
 	public static final Integer COLUMN_NOMBRE_MAXLENGTH = 1000;
@@ -172,7 +173,7 @@ public class ModeloBaremacionBloques {
 		this.chequearBloqueParaInsertarOActualizar(bloque);
 		
 		if (this.chequearUsandose(bloque)) {
-			throw new UVException("El apartado está asociado en algún mérito no se puede editar.");
+			throw new UVException(ERROR_APARTADO_USADO);
 		}
 				
 		String consulta = "UPDATE TBEP_BLOQUESBAREMACION SET "
@@ -261,6 +262,46 @@ public class ModeloBaremacionBloques {
 				}
 			}
 		}
+	}
+	
+	/** lista todos los bloques.
+	 * @param a .
+	 * @param activo indica si filtra por blooque activo o inactivos. Si es null. Todos.
+	 * @return vector con todos los bloques .
+	 * @throws SQLException si hay un error en la base de datos .
+	 * @throws UVException .
+	 * @throws UVException .
+	 */
+	public List<BloqueBaremacion> getBloques(ApartadoBaremacion a, Boolean activo) throws SQLException, UVException {
+		List<BloqueBaremacion> bloques = new ArrayList<>();
+		
+		String consulta = ""
+				+ " SELECT bepblo.* "
+				+ " FROM TBEP_BLOQUESBAREMACION bepblo "
+				+ " WHERE bepblo.BEPAPA_CODNUM = ? ";
+						
+		if (activo != null) {
+			consulta += " AND bepblo.FLGACTIVO = ? "; 
+		}
+		
+		try (Connection conexion = ConexionUvirtual.obtenerInstancia(); PreparedStatement stmt = conexion.prepareStatement(consulta)) {
+			int paramIndex = 1;
+			
+			stmt.setInt(paramIndex++, a.getCodNum());
+			
+			if (activo != null) {
+				stmt.setString(paramIndex++, activo ? "S" : "N");	
+			}
+			
+			try (ResultSet rs = stmt.executeQuery()) {
+				while (rs.next()) {
+					BloqueBaremacion bloque = this.createBloqueFromResultSet(rs);	
+					bloques.add(bloque);
+				}
+			}
+		}
+		
+		return bloques;
 	}
 	
 	/**

@@ -32,11 +32,9 @@ public class ModeloBaremacionApartados {
 	// errores
 	public static final String ERROR_BLOQUE_REQUERIDO = "El bloque es requerido";
 	public static final String ERROR_APARTADO_NOEXITE = "Bloque no encontrado";
-	public static final String ERROR_APARTADO_OBTENIENDO_TOTAL = "No hay conteo de bloques";
-	public static final String ERROR_PUNTUACION_PORCENTAJE_MAXIMO = "Debe introducir una puntuación o un porcentaje máximo, pero no ambos";
-	public static final String ERROR_APARTADO_EXISTEN_APARTADOS_CON_PORCENTAJE = "Existen bloques que se evaluan con porcentaje";
-	public static final String ERROR_APARTADO_EXISTEN_APARTADOS_CON_PUNTUACION = "Existen bloques que se evaluan con puntuación";
 	public static final String ERROR_APARTADO_MISMO_CODIGO = "Ya existe un apartado con el código introducido";
+	public static final String ERROR_APARTADO_USANDOSE = "El bloque está asociado en algún mérito no se puede editar.";
+	public static final String ERROR_SUMA_FACTORES_INVALIDA = "La suma de los factores de los bloques activos suman más de 1";
 	
 	public static final Integer COLUMN_CODIGO_MAXLENGTH = 3; 
 	public static final Integer COLUMN_NOMBRE_MAXLENGTH = 100;
@@ -239,7 +237,7 @@ public class ModeloBaremacionApartados {
 		this.chequearApartadoParaInsertarOActualizar(apartado);
 		
 		if (this.chequearUsandose(apartado)) {
-			throw new UVException("El bloque está asociado en algún mérito no se puede editar.");
+			throw new UVException(ERROR_APARTADO_USANDOSE);
 		}
 		
 		String consulta = ""
@@ -273,18 +271,37 @@ public class ModeloBaremacionApartados {
 	 * @throws UVException .
 	 */
 	public List<ApartadoBaremacion> getApartadosActivos() throws SQLException {
+		return this.getApartados(true);
+	}
+	
+	/** lista todos los apartados.
+	 * @param activo indica si filtra por apartado activo o inactivos. Si es null. Todos.
+	 * @return vector con todos los apartados .
+	 * @throws SQLException si hay un error en la base de datos .
+	 * @throws UVException .
+	 */
+	public List<ApartadoBaremacion> getApartados(Boolean activo) throws SQLException {
 		List<ApartadoBaremacion> apartados = new ArrayList<>();
 		
-		String consulta =
-				"SELECT bepapa.* FROM TBEP_APARTADOSBAREMACION bepapa WHERE bepapa.FLGACTIVO = 'S'";
+		String consulta = ""
+				+ " SELECT bepapa.* "
+				+ " FROM TBEP_APARTADOSBAREMACION bepapa ";
+						
+		if (activo != null) {
+			consulta += " WHERE bepapa.FLGACTIVO = ?"; 
+		}
 		
 		try (Connection conexion = ConexionUvirtual.obtenerInstancia(); PreparedStatement stmt = conexion.prepareStatement(consulta)) {
+			if (activo != null) {
+				stmt.setString(1, activo ? "S" : "N");	
+			}
+			
 			try (ResultSet rs = stmt.executeQuery()) {
 				while (rs.next()) {
 					ApartadoBaremacion apartado = this.createApartadoFromResultSet(rs);	
 					apartados.add(apartado);					
-				}				
-			}				
+				}
+			}
 		}
 		
 		return apartados;
@@ -362,9 +379,14 @@ public class ModeloBaremacionApartados {
 		
 		Double acum = 0.0;
 		
-		if (apartado != null && apartado.getCodNum() != null) {
-			acum = apartado.getPorcentajeMaximo();
-			sql += " AND bepapa.CODNUM != ? ";
+		if (apartado != null) {
+			if (apartado.getPorcentajeMaximo() != null) {
+				acum = apartado.getPorcentajeMaximo();
+			}
+			
+			if (apartado.getCodNum() != null) {
+				sql += " AND bepapa.CODNUM != ? ";	
+			}
 		}
 		
 		try (Connection con = ConexionUvirtual.obtenerInstancia(); PreparedStatement stmt = con.prepareStatement(sql)) {
@@ -376,7 +398,7 @@ public class ModeloBaremacionApartados {
 			
 			try (ResultSet rs = stmt.executeQuery()) {
 				if (rs.next()) {
-					acum = rs.getDouble("SUMA");					
+					acum += rs.getDouble("SUMA");					
 				}
 			}
 		}
@@ -413,7 +435,7 @@ public class ModeloBaremacionApartados {
 	private void activaDesactivaApartado(ApartadoBaremacion apartado, boolean activo, UsuarioBolsaEmpleo usuarioUpdate) throws SQLException, UVException {
 		// si voy a activar comprobar que la suma no supera
 		if (activo && this.checkSumaPorcentagesApartadosSuperaMaximo(apartado)) {
-			throw new UVException("La suma de los factores de los bloques activos suman más de 1");
+			throw new UVException(ERROR_SUMA_FACTORES_INVALIDA);
 		}
 		
 		String consulta = "UPDATE TBEP_APARTADOSBAREMACION SET FLGACTIVO = ?, UID_USUARIO = ? WHERE CODNUM = ?";
@@ -465,7 +487,7 @@ public class ModeloBaremacionApartados {
 		}
 		
 		if (this.checkSumaPorcentagesApartadosSuperaMaximo(apartado)) {
-			throw new UVException("La suma de los factores de los bloques suman más de 1");
+			throw new UVException(ERROR_SUMA_FACTORES_INVALIDA);
 		}		
 	}
 	

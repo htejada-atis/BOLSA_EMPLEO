@@ -37,8 +37,9 @@ public class TestBEPModeloBaremacionApartados {
 	private static final Integer CODNUM_NOEXISTE = 111_111_111;
 	private static final String CODIGO = "1";
 	private static final String NOMBRE = "NOMBRE APARTADO";
-	private static final Double PUNTACION_MAXIMA = (double) 1.1;
 	private static final Double PORCENTAJE_MAXIMO = (double) 0.2;
+	private static final Double PORCENTAJE_MAXIMO2 = (double) 0.1;
+	private static final Double PORCENTAJE_MAXIMO3 = (double) 0.9;
 	
 	private static final String MENSAJE_ERROR_HAY_EXCEPCION = "Excepción no esperada: %s";
     
@@ -126,7 +127,7 @@ public class TestBEPModeloBaremacionApartados {
 	}
 	
 	/**
-	 * insertaApartado.
+	 * insertaApartado por porcentaje.
 	 */
 	@Test
 	public void testA05insertaApartado() {
@@ -140,9 +141,7 @@ public class TestBEPModeloBaremacionApartados {
 			
 			List<ApartadoBaremacion> lista = desactivarTodosApartados();
 			Integer codNum = ModeloBaremacionApartados.obtenerInstancia().insertaApartado(apartado, UtilsTestBolsaEmpleo.getUsuario("personal1"));
-			ApartadoBaremacion creado = ModeloBaremacionApartados.obtenerInstancia().getApartadoBaremacionById(codNum);			
-			activarApartadosLista(lista);
-			
+			ApartadoBaremacion creado = ModeloBaremacionApartados.obtenerInstancia().getApartadoBaremacionById(codNum);
 			assertEquals(creado.getCodigo(), CODIGO);
 			assertEquals(creado.getNombre(), NOMBRE);
 			assertEquals(creado.getActivo(), true);
@@ -150,40 +149,11 @@ public class TestBEPModeloBaremacionApartados {
 			assertEquals(creado.getPorcentajeMaximo(), PORCENTAJE_MAXIMO);
 			
 			desactivarApartado(codNum);
+			activarApartadosLista(lista);			
 		} catch (SQLException | UVException ex) {
 			fail(String.format(MENSAJE_ERROR_HAY_EXCEPCION, ex.toString()));
 		}
 	}
-	
-	/**
-	 * insertaApartado.
-	 */
-	@Test
-	public void testA06insertaApartado() {
-		try {					
-			ApartadoBaremacion apartado = new ApartadoBaremacion();
-			apartado.setCodigo(CODIGO);
-			apartado.setNombre(NOMBRE);
-			apartado.setActivo(true);
-			apartado.setPuntuacionMaxima(PUNTACION_MAXIMA);
-			apartado.setPorcentajeMaximo(null);
-			
-			List<ApartadoBaremacion> lista = desactivarTodosApartados();
-			Integer codNum = ModeloBaremacionApartados.obtenerInstancia().insertaApartado(apartado, UtilsTestBolsaEmpleo.getUsuario("personal1"));
-			ApartadoBaremacion creado = ModeloBaremacionApartados.obtenerInstancia().getApartadoBaremacionById(codNum);			
-			activarApartadosLista(lista);
-			
-			assertEquals(creado.getCodigo(), CODIGO);
-			assertEquals(creado.getNombre(), NOMBRE);
-			assertEquals(creado.getActivo(), true);
-			assertEquals(creado.getPuntuacionMaxima(), PUNTACION_MAXIMA);
-			assertNull(creado.getPorcentajeMaximo());
-						
-			desactivarApartado(codNum);
-		} catch (SQLException | UVException ex) {
-			fail(String.format(MENSAJE_ERROR_HAY_EXCEPCION, ex.toString()));
-		}
-	}	
 	
 	/**
 	 * actualizaApartado.
@@ -191,23 +161,26 @@ public class TestBEPModeloBaremacionApartados {
 	@Test
 	public void testA07actualizaApartado() {
 		try {					
-			ApartadoBaremacion apartado = ModeloBaremacionApartados.obtenerInstancia().getApartadoBaremacionById(CODNUM);
-			assertEquals(apartado.getCodNum(), CODNUM);
+			List<ApartadoBaremacion> lista = desactivarTodosApartados();
+			ApartadoBaremacion apartado = getApartadoBaremacionPorCodigo(CODIGO);
+			assertEquals(apartado.getCodigo(), CODIGO);
 			
-			apartado.setCodigo(CODIGO);
-			apartado.setNombre(NOMBRE);
+			apartado.setCodigo("2");
+			apartado.setNombre("test");
 			apartado.setActivo(true);
 			apartado.setPuntuacionMaxima(null);
-			apartado.setPorcentajeMaximo(PORCENTAJE_MAXIMO);
+			apartado.setPorcentajeMaximo(PORCENTAJE_MAXIMO2);
 			
 			ModeloBaremacionApartados.obtenerInstancia().actualizaApartado(apartado, UtilsTestBolsaEmpleo.getUsuario("personal1"));
-			ApartadoBaremacion apartadoUpd = ModeloBaremacionApartados.obtenerInstancia().getApartadoBaremacionById(CODNUM);
+			ApartadoBaremacion apartadoUpd = getApartadoBaremacionPorCodigo("2");
 			
-			assertEquals(apartadoUpd.getCodigo(), CODIGO);
-			assertEquals(apartadoUpd.getNombre(), NOMBRE);
+			assertEquals(apartadoUpd.getCodigo(), "2");
+			assertEquals(apartadoUpd.getNombre(), "test");
 			assertEquals(apartadoUpd.getActivo(), true);
-			assertNull(null);
-			assertEquals(apartadoUpd.getPorcentajeMaximo(), PORCENTAJE_MAXIMO);
+			assertEquals(apartadoUpd.getPorcentajeMaximo(), PORCENTAJE_MAXIMO2);
+			
+			desactivarApartado(apartado.getCodNum());
+			activarApartadosLista(lista);			
 		} catch (SQLException | UVException ex) {
 			fail(String.format(MENSAJE_ERROR_HAY_EXCEPCION, ex.toString()));
 		}
@@ -224,6 +197,22 @@ public class TestBEPModeloBaremacionApartados {
 				assertTrue(a.getActivo());
 			}			
 		} catch (SQLException ex) {
+			fail(String.format(MENSAJE_ERROR_HAY_EXCEPCION, ex.toString()));
+		}
+	}
+	
+	/**
+	 * checkSumaPorcentagesApartadosInvalido.
+	 */
+	@Test
+	public void testA09checkSumaPorcentagesApartadosInvalido() {
+		try {
+			assertFalse(ModeloBaremacionApartados.obtenerInstancia().checkSumaPorcentagesApartadosInvalido());
+			desactivarApartado(CODNUM);
+			assertTrue(ModeloBaremacionApartados.obtenerInstancia().checkSumaPorcentagesApartadosInvalido());		
+			activarApartado(CODNUM);
+			assertFalse(ModeloBaremacionApartados.obtenerInstancia().checkSumaPorcentagesApartadosInvalido());
+		} catch (SQLException | UVException ex) {
 			fail(String.format(MENSAJE_ERROR_HAY_EXCEPCION, ex.toString()));
 		}
 	}
@@ -281,6 +270,42 @@ public class TestBEPModeloBaremacionApartados {
 		assertEquals(ModeloBaremacionApartados.ERROR_APARTADO_MISMO_CODIGO, throwable.getMessage());
 	}
 	
+	/**
+	 * actualiza partado usado.
+	 */
+	@Test
+	public void testE05actualizarApartadoQueSeEstaUsando() {
+		Throwable throwable = assertThrows(Throwable.class, () -> {
+			ApartadoBaremacion a = ModeloBaremacionApartados.obtenerInstancia().getApartadoBaremacionById(CODNUM);
+			a.setNombre("nombre nuevo");			
+			ModeloBaremacionApartados.obtenerInstancia().actualizaApartado(a, UtilsTestBolsaEmpleo.getUsuario("personal1"));
+		});
+		
+		assertEquals(UVException.class, throwable.getClass());
+		assertEquals(ModeloBaremacionApartados.ERROR_APARTADO_USANDOSE, throwable.getMessage());
+	}
+	
+	/**
+	 * error porcenaje inválido.
+	 */
+	@Test
+	public void testE06sumanPorcentajeInvalido() {
+		desactivarApartado(CODNUM);	
+		desactivarApartadoPorCodigo("2");
+		
+		Throwable throwable = assertThrows(Throwable.class, () -> {
+			ApartadoBaremacion a = getApartadoBaremacionPorCodigo("2");
+			a.setPorcentajeMaximo(PORCENTAJE_MAXIMO3);
+			ModeloBaremacionApartados.obtenerInstancia().actualizaApartado(a, UtilsTestBolsaEmpleo.getUsuario("personal1"));
+			ModeloBaremacionApartados.obtenerInstancia().activarApartado(a, UtilsTestBolsaEmpleo.getUsuario("personal1"));			
+		});
+		
+		assertEquals(UVException.class, throwable.getClass());
+		assertEquals(ModeloBaremacionApartados.ERROR_SUMA_FACTORES_INVALIDA, throwable.getMessage());
+		
+		activarApartado(CODNUM);
+	}
+	
 	// UTILS
 	
 	private List<ApartadoBaremacion> desactivarTodosApartados() {
@@ -328,5 +353,34 @@ public class TestBEPModeloBaremacionApartados {
 		} catch (SQLException | UVException ex) {
 			fail(String.format(MENSAJE_ERROR_HAY_EXCEPCION, ex.toString()));
 		}
+	}
+	
+	private void desactivarApartadoPorCodigo(String codigo) {
+		try {
+			ApartadoBaremacion a = getApartadoBaremacionPorCodigo(codigo);
+			assertEquals(a.getCodigo(), codigo);
+			
+			a.setActivo(false);
+			ModeloBaremacionApartados.obtenerInstancia().actualizaApartado(a, UtilsTestBolsaEmpleo.getUsuario("personal1"));
+			ApartadoBaremacion apartado = getApartadoBaremacionPorCodigo(codigo);
+			assertFalse(apartado.getActivo());
+		} catch (SQLException | UVException ex) {
+			fail(String.format(MENSAJE_ERROR_HAY_EXCEPCION, ex.toString()));
+		}
+	}
+	
+	private ApartadoBaremacion getApartadoBaremacionPorCodigo(String codigo) {
+		try {
+			List<ApartadoBaremacion> lista = ModeloBaremacionApartados.obtenerInstancia().getApartados(null); 
+			for (ApartadoBaremacion a : lista) {
+				if (a.getCodigo().equals(codigo)) {
+					return a;
+				}
+			}			
+		} catch (SQLException ex) {
+			fail(String.format(MENSAJE_ERROR_HAY_EXCEPCION, ex.toString()));
+		}
+		
+		return null;
 	}
 }

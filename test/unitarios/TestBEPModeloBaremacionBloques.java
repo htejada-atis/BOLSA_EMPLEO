@@ -141,7 +141,7 @@ public class TestBEPModeloBaremacionBloques {
 	public void testA06actualizaBloque() {
 		try {					
 			ApartadoBaremacion apartado = this.obtenerPrimerApartado();
-			BloqueBaremacion bloque = ModeloBaremacionBloques.obtenerInstancia().getBloqueBaremacionById(CODNUM);
+			BloqueBaremacion bloque = ModeloBaremacionBloques.obtenerInstancia().getBloqueBaremacionById(CODNUM); 
 			assertEquals(bloque.getCodNum(), CODNUM);
 			
 			bloque.setApartadoBaremacion(apartado);
@@ -229,6 +229,25 @@ public class TestBEPModeloBaremacionBloques {
 		
 		assertEquals(UVException.class, throwable.getClass());
 		assertEquals(ModeloBaremacionBloques.ERROR_BLOQUE_MISMO_CODIGO, throwable.getMessage());
+	}
+	
+	/**
+	 * error editar bloque usado.
+	 */
+	@Test
+	public void testE05nosepuedeeditarbloqueusandose() {
+		Throwable throwable = assertThrows(Throwable.class, () -> {
+			// bloque del item = 1
+			Integer codnum = 19;
+			BloqueBaremacion bloque = ModeloBaremacionBloques.obtenerInstancia().getBloqueBaremacionById(codnum); 
+			assertEquals(bloque.getCodNum(), codnum);
+			bloque.setNombre("foo");
+			
+			ModeloBaremacionBloques.obtenerInstancia().actualizaBloque(bloque, UtilsTestBolsaEmpleo.getUsuario("personal1"));
+		});
+		
+		assertEquals(UVException.class, throwable.getClass());
+		assertEquals(ModeloBaremacionBloques.ERROR_APARTADO_USADO, throwable.getMessage());
 	}
 	
 	// UTILS

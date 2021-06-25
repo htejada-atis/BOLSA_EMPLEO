@@ -131,6 +131,8 @@ public class ControladorItemsBaremacion extends HttpServlet {
 	public static final String MENSAJE_ERROR_NOMBRE_VACIO = "El nombre no puede estar vacio";
 	public static final String MENSAJE_ERROR_NOMBRE_MAXIMO = "El nombre no puede contener mas de %d caracteres";
 	public static final String MENSAJE_ERROR_DESCRIPCION_MAXIMO = "La descripción no puede ser mayor que %d caracteres";
+	public static final String MENSAJE_ERROR_SIN_PERMISO_PERSONAL = "No tienes permiso de personal";
+	public static final String MENSAJE_ERROR_ACCION_NO_DEFINIDA = "Acción no definida";
 	
 	// vistas	
 	public static final String RUTA_BEP_CONF = "/WEB-INF/jsp/vista/infadministrativa/bolsaempleo/configuracion/itemsbaremacion/";
@@ -208,7 +210,7 @@ public class ControladorItemsBaremacion extends HttpServlet {
 					break;
 				
 				default:
-					errorFatal(bean);
+					errorFatal(bean, datos, request, response);
 			}
 		} catch (UVException e) {
 			LOGGER.log(Level.WARNING, e.toString());
@@ -252,7 +254,7 @@ public class ControladorItemsBaremacion extends HttpServlet {
 			bean.setUsuarioLogeado(ModeloUsuarioBolsaEmpleo.obtenerInstancia().getOrCreateUsuario(datos));
 
 			if (!bean.getUsuarioLogeado().getRol().getCodNum().equals(ModeloRol.ID_ROL_SERVICIO_PERSONAL)) {
-				throw new UVException("No tienes permiso de personal");
+				throw new UVException(MENSAJE_ERROR_SIN_PERMISO_PERSONAL);
 			}
 		} catch (UVException e) {
 			LOGGER.log(Level.SEVERE, Formateador.getStackTrace(e));
@@ -262,9 +264,8 @@ public class ControladorItemsBaremacion extends HttpServlet {
 		}		
 	}
 	
-	private void errorFatal(VistaItemsBaremacion bean) {
-		bean.getMensajesDeError().add("Acción no definida");
-		this.indice(bean);
+	private void errorFatal(VistaItemsBaremacion bean, UVDatos datos, HttpServletRequest request, HttpServletResponse response) throws IOException, UVException {
+		BolsaEmpleoUtils.redirectToError(bean, datos, request, response, MENSAJE_ERROR_ACCION_NO_DEFINIDA);		
 	}
 	
 	///////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -299,7 +300,7 @@ public class ControladorItemsBaremacion extends HttpServlet {
 				seleccionarApartado(bean, request);
 				break;	
 			default:
-				this.errorFatal(bean);
+				this.errorFatal(bean, datos, request, response);
 		}
 	}
 	
@@ -466,7 +467,7 @@ public class ControladorItemsBaremacion extends HttpServlet {
 				seleccionarBloque(bean, request);
 				break;	
 			default:
-				this.errorFatal(bean);
+				this.errorFatal(bean, datos, request, response);
 		}
 	}
 	
@@ -662,7 +663,7 @@ public class ControladorItemsBaremacion extends HttpServlet {
 				seleccionarItemExcluyente(bean, datos, request, response, false);
 				break;
 			default:
-				this.errorFatal(bean);
+				this.errorFatal(bean, datos, request, response);
 		}
 	}
 	
