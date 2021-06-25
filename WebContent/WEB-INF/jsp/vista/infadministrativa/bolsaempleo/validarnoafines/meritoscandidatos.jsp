@@ -83,7 +83,7 @@ UsuarioBolsaEmpleo candidato = bean.getCandidato();
 			
 			<table class="bluetable bolsaempleo" id="tableValoresMeritoBolsas">
 				<tr>
-					<th scope="col" style="width:65px">Convocatoria</th>
+					<th scope="col" style="width:77px">Convocatoria</th>
 					<th scope="col" style="width:100%; min-width: 100px">Bolsa</th>
 					<th scope="col" style="width:40px">Valor</th>
 					<th scope="col" style="width:40px">Excluido</th>
