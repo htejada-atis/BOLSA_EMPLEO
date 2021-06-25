@@ -8,12 +8,10 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.logging.Level;
-import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import javax.servlet.http.HttpSession;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.reflect.TypeToken;
@@ -38,7 +36,6 @@ import es.ujaen.uvirtual.modulo.bolsaempleo.modelo.ModeloUsuarioBolsaEmpleo;
 import es.ujaen.uvirtual.modulo.bolsaempleo.modelo.ModeloValidar;
 import es.ujaen.uvirtual.modulo.bolsaempleo.utilidades.BolsaEmpleoDataTable;
 import es.ujaen.uvirtual.modulo.bolsaempleo.utilidades.BolsaEmpleoUtils;
-import es.ujaen.uvirtual.modulo.bolsaempleo.vistas.VistaValidar;
 import es.ujaen.uvirtual.modulo.bolsaempleo.vistas.VistaValidarNoAfines;
 import es.ujaen.uvirtual.utilidades.EscapaHTML;
 import es.ujaen.uvirtual.utilidades.Formateador;
@@ -94,6 +91,7 @@ public class ControladorValidarNoAfines extends HttpServlet {
 	// mensajes
 	public static final String MENSAJE_ERROR_ACCION_NO_CONTEMPLADA = "Acción no contemplada";
 	public static final String MENSAJE_ERROR_NO_HAY_BOLSAS_SELECCIONADAS = "No hay bolsas seleccionadas";
+	public static final String MENSAJE_ERROR_SIN_PERMISO_PERSONAL = "No tienes permiso de personal";
 	public static final String MENSAJE_EXITO_MERITO_EXCLUIDO = "Mérito excluido correctamente para la bolsa: %s";
 	public static final String MENSAJE_EXITO_MERITO_GUARDAR = "Mérito guardado correctamente para la bolsa: %s";
 	public static final String MENSAJE_EXITO_MERITO_VALIDADO = "Mérito validado correctamente para la bolsa: %s";
@@ -180,7 +178,7 @@ public class ControladorValidarNoAfines extends HttpServlet {
 			bean.setUsuarioLogeado(ModeloUsuarioBolsaEmpleo.obtenerInstancia().getOrCreateUsuario(datos));
 			
 			if (!bean.getUsuarioLogeado().getRol().getCodNum().equals(ModeloRol.ID_ROL_SERVICIO_PERSONAL)) {
-				throw new UVException("No tienes permiso de personal");
+				throw new UVException(MENSAJE_ERROR_SIN_PERMISO_PERSONAL);
 			}
 		} catch (UVException e) {
 			LOGGER.log(Level.SEVERE, Formateador.getStackTrace(e));
@@ -282,7 +280,7 @@ public class ControladorValidarNoAfines extends HttpServlet {
 		try {
 			String observacionCandidato = EscapaHTML.ajustaCodificacion(request.getParameter(PARAM_OBSERVACION_CANDIDATO));
 			Collection<String> bolsas = gson.fromJson(request.getParameter(PARAM_BOLSAS), new TypeToken<Collection<String>>() { }.getType());
-			if (bolsas.size() < 0) {
+			if (bolsas.size() <= 0) {
 				throw new UVException(MENSAJE_ERROR_NO_HAY_BOLSAS_SELECCIONADAS);
 			}
 			

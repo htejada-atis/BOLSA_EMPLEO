@@ -40,8 +40,8 @@ UsuarioBolsaEmpleo candidato = bean.getCandidato();
 <%	} %>
 	
 	<h2>Validar meritos sujetos afinidad</h2>
-	<h3><%= descripcion %></h3>
-	<h4><%= bolsa.getArea().getDescripcion() %></h4>
+	<h3><%= EscapaHTML.escapa(descripcion) %></h3>
+	<h4><%= EscapaHTML.escapa(bolsa.getArea().getDescripcion()) %></h4>
 	
 	<table class="bluetable bolsaempleo" id="tableCandidatos">
 		<tr>
@@ -104,11 +104,11 @@ UsuarioBolsaEmpleo candidato = bean.getCandidato();
 				    				<option value="<%=it.getCodNum()%>" 
 				    						data-unidades="<%= it.getUnidades() %>" 
 				    						data-descripcion="<%= it.getDescripcion() %>" 
-				    						selected><%=it.getBloqueBaremacion().getApartadoBaremacion().getCodigo() + "." + it.getBloqueBaremacion().getCodigo() + "." + it.getCodigo() + "-" + it.getNombre()%></option>
+				    						selected><%=EscapaHTML.escapa(it.getBloqueBaremacion().getApartadoBaremacion().getCodigo() + "." + it.getBloqueBaremacion().getCodigo() + "." + it.getCodigo() + "-" + it.getNombre())%></option>
 				    			<% } else { %>
 				    				<option value="<%=it.getCodNum()%>" 
 				    						data-unidades="<%= it.getUnidades() %>" 
-				    						data-descripcion="<%= it.getDescripcion() %>"><%=merito.getMerito().getItemBaremacion().getBloqueBaremacion().getApartadoBaremacion().getCodigo() + "." + it.getBloqueBaremacion().getCodigo() + "." + it.getCodigo() + "-" + it.getNombre()%></option>
+				    						data-descripcion="<%= it.getDescripcion() %>"><%=EscapaHTML.escapa(merito.getMerito().getItemBaremacion().getBloqueBaremacion().getApartadoBaremacion().getCodigo() + "." + it.getBloqueBaremacion().getCodigo() + "." + it.getCodigo() + "-" + it.getNombre())%></option>
 				    			<% } %>
 				    		<%
 				    		}
@@ -133,11 +133,11 @@ UsuarioBolsaEmpleo candidato = bean.getCandidato();
 				<div class="form-group-container col2">
 		    		<div class="form-group">
 		    			<label for="merito_descripcion" class="bold-label">Descripción:</label>
-		    			<textarea class="form-input-custom" id="merito_descripcion" name="" disabled><%= merito.getMerito().getDescripcion() %></textarea>
+		    			<textarea class="form-input-custom" id="merito_descripcion" name="" disabled><%= EscapaHTML.escapa(merito.getMerito().getDescripcion()) %></textarea>
 		    		</div>
 		    		<div class="form-group">
 			    		<label for="merito_observacion_comision">Observación para la comisión:</label>
-			    		<textarea class="form-input-custom" id="merito_observacion_comision" name="" rows="2" cols="50" disabled><%= merito.getMerito().getObservacion() != null ? merito.getMerito().getObservacion() : "" %></textarea>
+			    		<textarea class="form-input-custom" id="merito_observacion_comision" name="" rows="2" cols="50" disabled><%= EscapaHTML.escapa(merito.getMerito().getObservacion()) %></textarea>
 			    	</div>
 				</div>
 			
@@ -165,7 +165,7 @@ UsuarioBolsaEmpleo candidato = bean.getCandidato();
 		    <%	for(Afinidad afinidad: bean.getListaAfinidades()) {
 		    		if (afinidad.getCodigo().equals(merito.getMerito().getItemBaremacion().getAfinidad())) {
 		    %>
-			    		<li><%= afinidad.getCodigo() + " " + afinidad.getModulacion() * 100 + "%" + " - " + afinidad.getDescripcion() %></li>
+			    		<li><%= EscapaHTML.escapa(afinidad.getCodigo() + " " + afinidad.getModulacion() * 100 + "%" + " - " + afinidad.getDescripcion()) %></li>
 		    <%		}
 		    	} %>
 		    </ul>
@@ -190,8 +190,8 @@ UsuarioBolsaEmpleo candidato = bean.getCandidato();
 					
 						<tr data-individualizado="<%= individualizado %>" data-bolsa="<%= meritoBolsa.getBolsa().getCodNum() %>" 
 								data-afinidad="<%= meritoBolsa.getMeritoSolicitud().getMerito().getItemBaremacion().getAfinidad() %>">
-							<td><b><%= meritoBolsa.getBolsa().getArea().getIdAreaExterno() %></b><br/>
-								<%= meritoBolsa.getBolsa().getArea().getDescripcion() %>
+							<td><b><%= EscapaHTML.escapa(meritoBolsa.getBolsa().getArea().getIdAreaExterno()) %></b><br/>
+								<%= EscapaHTML.escapa(meritoBolsa.getBolsa().getArea().getDescripcion()) %>
 							</td>
 							<td><%= meritoBolsa.getMeritoSolicitud().getMerito().getValor() %></td>
 							<td>
@@ -226,7 +226,7 @@ UsuarioBolsaEmpleo candidato = bean.getCandidato();
 												<tr>
 													<td style="width:70px">
 														<label for="<%= "merito_valoracion_" + valoracion.getAfinidad().getCodNum() + "_" + idMerito %>">
-															<i class="tooltip"><%=  valoracion.getAfinidad().getCodigo() + " " + valoracion.getAfinidad().getModulacion() * 100 + "%: " %><span><%= valoracion.getAfinidad().getDescripcion() %></span></i>
+															<i class="tooltip"><%=  EscapaHTML.escapa(valoracion.getAfinidad().getCodigo() + " " + valoracion.getAfinidad().getModulacion() * 100 + "%: ") %><span><%= EscapaHTML.escapa(valoracion.getAfinidad().getDescripcion()) %></span></i>
 														</label>
 													</td>
 													<td>
@@ -243,7 +243,7 @@ UsuarioBolsaEmpleo candidato = bean.getCandidato();
 												<tr>
 													<td style="width:70px">
 														<label for="merito_valoracion_<%= i %>">
-															<i class="tooltip"><%=  afinidad.getCodigo() + " " + afinidad.getModulacion() * 100 + "%: " %><span><%= afinidad.getDescripcion() %></span></i>
+															<i class="tooltip"><%= EscapaHTML.escapa(afinidad.getCodigo() + " " + afinidad.getModulacion() * 100 + "%: ") %><span><%= EscapaHTML.escapa(afinidad.getDescripcion()) %></span></i>
 														</label>
 													</td>
 													<td>
@@ -302,7 +302,8 @@ UsuarioBolsaEmpleo candidato = bean.getCandidato();
 $(document).ready(function() {
 	var tableCandidatos = new Atis.DataTable('#tableCandidatos', {
 	    "ajax": { url: "<%= ControladorValidar.URL_PATTERN_AJAX %>", async: false },
-	    "pageSize": 100,
+	    "pageSize": 200,
+	    "pageSizeOptions": [5,10,20,100,200],
 	    "action": "<%= ControladorValidar.ACCION_DATATABLE_CANDIDATOS %>",
 	    "title": 'LISTA DE USUARIOS',
 	    "dropdown": true,
@@ -335,7 +336,7 @@ $(document).ready(function() {
 		    "pageSize": 100,
 		    "filterable": true,
 		    "action": "<%= ControladorValidar.ACCION_DATATABLE_MERITOS %>",
-		    "title": 'MÉRITOS PARA EL USUARIO: <%=candidato.getIdNif()%>',
+		    "title": 'MÉRITOS PARA EL USUARIO: <%=EscapaHTML.escapa(candidato.getIdNif() + " - " + candidato.getNombre() + " " + candidato.getPrimerApellido() + " " + candidato.getSegundoApellido())%>',
 		    "dropdown": true,
 		    "params": {
 		    	'<%=ControladorValidar.PARAM_BOLSA%>': '<%= bolsa.getCodNum() %>',

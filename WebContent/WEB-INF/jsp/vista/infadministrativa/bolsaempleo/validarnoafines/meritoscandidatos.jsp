@@ -36,8 +36,8 @@ UsuarioBolsaEmpleo candidato = bean.getCandidato();
 <%	} %>
 	
 	<h2>Validar meritos no sujetos afinidad</h2>
-	<h3><%= descripcion %></h3>
-	<h4><%= bolsa.getArea().getDescripcion() %></h4>
+	<h3><%= EscapaHTML.escapa(descripcion) %></h3>
+	<h4><%= EscapaHTML.escapa(bolsa.getArea().getDescripcion()) %></h4>
 	
 	<table class="bluetable bolsaempleo" id="tableCandidatos">
 		<tr>
@@ -134,11 +134,11 @@ UsuarioBolsaEmpleo candidato = bean.getCandidato();
 				    				<option value="<%=it.getCodNum()%>" 
 				    						data-unidades="<%= it.getUnidades() %>" 
 				    						data-descripcion="<%= it.getDescripcion() %>" 
-				    						selected><%=it.getBloqueBaremacion().getApartadoBaremacion().getCodigo() + "." + it.getBloqueBaremacion().getCodigo() + "." + it.getCodigo() + "-" + it.getNombre()%></option>
+				    						selected><%=EscapaHTML.escapa(it.getBloqueBaremacion().getApartadoBaremacion().getCodigo() + "." + it.getBloqueBaremacion().getCodigo() + "." + it.getCodigo() + "-" + it.getNombre())%></option>
 				    			<% } else { %>
 				    				<option value="<%=it.getCodNum()%>" 
 				    						data-unidades="<%= it.getUnidades() %>" 
-				    						data-descripcion="<%= it.getDescripcion() %>"><%=merito.getMerito().getItemBaremacion().getBloqueBaremacion().getApartadoBaremacion().getCodigo() + "." + it.getBloqueBaremacion().getCodigo() + "." + it.getCodigo() + "-" + it.getNombre()%></option>
+				    						data-descripcion="<%= it.getDescripcion() %>"><%=EscapaHTML.escapa(merito.getMerito().getItemBaremacion().getBloqueBaremacion().getApartadoBaremacion().getCodigo() + "." + it.getBloqueBaremacion().getCodigo() + "." + it.getCodigo() + "-" + it.getNombre())%></option>
 				    			<% } %>
 				    		<%
 				    		}
@@ -163,21 +163,21 @@ UsuarioBolsaEmpleo candidato = bean.getCandidato();
 				<div class="form-group-container col1">
 		    		<div class="form-group">
 		    			<label for="merito_descripcion" class="bold-label">Descripción:</label>
-		    			<textarea class="form-input-custom" id="merito_descripcion" name="" disabled><%= merito.getMerito().getDescripcion() %></textarea>
+		    			<textarea class="form-input-custom" id="merito_descripcion" name="" disabled><%= EscapaHTML.escapa(merito.getMerito().getDescripcion()) %></textarea>
 		    		</div>
 				</div>
 			
 		    	<div class="form-group-container col1">
 			    	<div class="form-group">
 			    		<label for="merito_observacion_comision">Observación para la comisión:</label>
-			    		<textarea class="form-input-custom" id="merito_observacion_comision" name="" rows="2" cols="50" disabled><%= merito.getMerito().getObservacion() %></textarea>
+			    		<textarea class="form-input-custom" id="merito_observacion_comision" name="" rows="2" cols="50" disabled><%=EscapaHTML.escapa(merito.getMerito().getObservacion())%></textarea>
 			    	</div>
 		    	</div>
 		    	
 		    	<div class="form-group-container col1">
 			    	<div class="form-group">
 			    		<label for="merito_observacion_candidato">Observación para el candidato:</label>
-			    		<textarea class="form-input-custom" id="merito_observacion_candidato" name="<%= ControladorValidarNoAfines.PARAM_OBSERVACION_CANDIDATO %>" rows="2" cols="50"></textarea>
+			    		<textarea class="form-input-custom" id="merito_observacion_candidato" name="<%= ControladorValidarNoAfines.PARAM_OBSERVACION_CANDIDATO %>" rows="2" cols="50"><%=EscapaHTML.escapa(merito.getObservacionCandidato())%></textarea>
 			    	</div>
 		    	</div>
 		    	
@@ -197,7 +197,8 @@ UsuarioBolsaEmpleo candidato = bean.getCandidato();
 $(document).ready(function() {
 	var tableCandidatos = new Atis.DataTable('#tableCandidatos', {
 	    "ajax": { url: "<%= ControladorValidarNoAfines.URL_PATTERN_AJAX %>", async: false },
-	    "pageSize": 100,
+	    "pageSize": 200,
+	    "pageSizeOptions": [5,10,20,100,200],
 	    "action": "<%= ControladorValidarNoAfines.ACCION_DATATABLE_CANDIDATOS %>",
 	    "title": 'LISTA DE USUARIOS',
 	    "dropdown": true,
@@ -230,7 +231,7 @@ $(document).ready(function() {
 		    "pageSize": 100,
 		    "filterable": true,
 		    "action": "<%= ControladorValidarNoAfines.ACCION_DATATABLE_MERITOS %>",
-		    "title": 'MÉRITOS PARA EL USUARIO: <%=candidato.getIdNif()%>',
+		    "title": 'MÉRITOS PARA EL USUARIO: <%=EscapaHTML.escapa(candidato.getIdNif() + " - " + candidato.getNombre() + " " + candidato.getPrimerApellido() + " " + candidato.getSegundoApellido())%>',
 		    "dropdown": true,
 		    "params": {
 		    	'<%=ControladorValidarNoAfines.PARAM_BOLSA%>': '<%= bolsa.getCodNum() %>',
