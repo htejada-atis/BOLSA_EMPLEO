@@ -41,12 +41,12 @@ UsuarioBolsaEmpleo candidato = bean.getCandidato();
 	
 	<table class="bluetable bolsaempleo" id="tableCandidatos">
 		<tr>
-			<th scope="col" style="width:10%">D.N.I</th>
-			<th scope="col" style="width:50%" class="nombre">Nombre</th>
-			<th scope="col" style="width:10%" class="center">No validados</th>
-			<th scope="col" style="width:10%" class="center">Validados</th>
-			<th scope="col" style="width:10%" class="center">Excluidos</th>
-			<th scope="col" style="width:10%" class="center">Total</th>
+			<th scope="col" style="width:76px">D.N.I</th>
+			<th scope="col" style="width:100%" class="nombre">Nombre</th>
+			<th scope="col" style="width:76px" class="center">No validados</th>
+			<th scope="col" style="width:76px" class="center">Validados</th>
+			<th scope="col" style="width:76px" class="center">Excluidos</th>
+			<th scope="col" style="width:76px" class="center">Total</th>
 		</tr>
 		<tbody>
 		</tbody>
@@ -217,10 +217,10 @@ $(document).ready(function() {
 	    	{'data': 'apellido1', 'order': false, 'overflow': 'auto', 'render': function(row) {
         		return row.nombre + " " + row.apellido1 + " " + row.apellido2; 
         	}},
-	        {'data': 'totalMeritosNoValidados', 'order': false, 'class': 'center', 'render': function(row) { return isNaN(row.totalMeritosNoValidados) ? 0 : row.totalMeritosNoValidados; } },
-	        {'data': 'totalMeritosValidados', 'order': false, 'class': 'center', 'render': function(row) { return isNaN(row.totalMeritosValidados) ? 0 : row.totalMeritosValidados; } },
-	        {'data': 'totalMeritosExcluidos', 'order': false, 'class': 'center', 'render': function(row) { return isNaN(row.totalMeritosExcluidos) ? 0 : row.totalMeritosExcluidos; } },
-	        {'data': 'totalMeritos', 'order': false, 'class': 'center'}
+	        {'data': 'totalMeritosNoValidados', 'class': 'center', 'render': function(row) { return isNaN(row.totalMeritosNoValidados) ? 0 : row.totalMeritosNoValidados; } },
+	        {'data': 'totalMeritosValidados', 'class': 'center', 'render': function(row) { return isNaN(row.totalMeritosValidados) ? 0 : row.totalMeritosValidados; } },
+	        {'data': 'totalMeritosExcluidos', 'class': 'center', 'render': function(row) { return isNaN(row.totalMeritosExcluidos) ? 0 : row.totalMeritosExcluidos; } },
+	        {'data': 'totalMeritos', 'class': 'center'}
 	    ]
 	});
 	

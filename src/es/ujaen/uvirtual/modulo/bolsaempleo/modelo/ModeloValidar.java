@@ -39,6 +39,10 @@ public class ModeloValidar {
 	
 	public static final int ORDER_COLUMN_INDEX_NUMDOCUMENTO_CANDIDATO = 0;
 	public static final int ORDER_COLUMN_INDEX_NOMBRE_Y_APELLIDOS_CANDIDATO = 1;
+	public static final int ORDER_COLUMN_INDEX_COUNT_NO_VALIDADOS_CANDIDATO = 2;
+	public static final int ORDER_COLUMN_INDEX_COUNT_VALIDADOS_CANDIDATO = 3;
+	public static final int ORDER_COLUMN_INDEX_COUNT_EXCLUIDOS_CANDIDATO = 4;
+	public static final int ORDER_COLUMN_INDEX_COUNT_TOTAL_CANDIDATO = 5;
 	
 	public static final int ORDER_COLUMN_INDEX_ID_MERITO = 0;
 	public static final int ORDER_COLUMN_INDEX_ESTADO_MERITO = 1;
@@ -501,6 +505,10 @@ public class ModeloValidar {
 		consulta += " GROUP BY bepusu.CODNUM, bepusu.VUAJA_PRSNIF ";
 
 		dataTable.setColumn(ORDER_COLUMN_INDEX_NUMDOCUMENTO_CANDIDATO, "bepusu.VUAJA_PRSNIF");
+		dataTable.setColumn(ORDER_COLUMN_INDEX_COUNT_NO_VALIDADOS_CANDIDATO, "COUNT_NO_VALIDADOS");
+		dataTable.setColumn(ORDER_COLUMN_INDEX_COUNT_VALIDADOS_CANDIDATO, "COUNT_VALIDADOS");
+		dataTable.setColumn(ORDER_COLUMN_INDEX_COUNT_EXCLUIDOS_CANDIDATO, "COUNT_EXCLUIDOS");
+		dataTable.setColumn(ORDER_COLUMN_INDEX_COUNT_TOTAL_CANDIDATO, "COUNT_TOTAL");
 
 		dataTable.setQuery(consulta);
 		
