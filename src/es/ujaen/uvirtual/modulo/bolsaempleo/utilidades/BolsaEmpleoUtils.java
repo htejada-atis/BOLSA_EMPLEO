@@ -400,7 +400,6 @@ public final class BolsaEmpleoUtils {
 		}
 		
 		datos.setRespuestaEnviada(true);
-		datos.setRespuestaEnviada(true);
 		response.sendRedirect(request.getServletPath());
 	}
 	
