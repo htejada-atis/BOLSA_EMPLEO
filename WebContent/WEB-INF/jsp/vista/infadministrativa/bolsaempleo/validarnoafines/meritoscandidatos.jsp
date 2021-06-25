@@ -323,7 +323,7 @@ $(document).ready(function() {
 			        	return row.bolsa.area.idAreaExterno + " : " + row.bolsa.area.descripcion;
 		        	}},
 		        	{'data': 'meritoSolicitud.valor', 'render': function(row) {
-		        		return row.meritoSolicitud.valor != 0 ? row.meritoSolicitud.valor : '<%= merito.getMerito().getValor() %>';
+		        		return row.meritoSolicitud.valor != 0 ? row.meritoSolicitud.valor : '';
 		        	}},
 		        	{'data': 'meritoSolicitud.excluido', 'order': false, 'render': function(row) {
 		        		return row.meritoSolicitud && row.meritoSolicitud.excluido ? 'SI' : 'NO';
