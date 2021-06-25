@@ -88,9 +88,9 @@ Area area = bean.getArea();
 			if(this.value != 0) {
 				var params = {
 	    			'<%= ControladorGestionEvaluadores.PARAM_ACCION %>': '<%= ControladorGestionEvaluadores.ACCION_SELECCIONAR_DEPARTAMENTO %>', 
-	    			'<%= ControladorGestionEvaluadores.PARAM_DEPARTAMENTO %>': this.value 
+	    			'<%= ControladorGestionEvaluadores.PARAM_DEPARTAMENTO %>': this.value
 	    		};
-        		Atis.sendForm("<%= request.getRequestURI() %>", params);        		
+        		Atis.sendForm("<%= request.getRequestURI() %>", params);
 			} else {
 				document.getElementById("nuevo_evaluador_cont").style.visibility = "hidden";
 				document.getElementById("tableAreas").style.visibility = "hidden";
@@ -105,13 +105,14 @@ Area area = bean.getArea();
 	            "params": {"<%=ControladorGestionEvaluadores.PARAM_DEPARTAMENTO%>": '<%= departamento.getCodNum() %>'},
 	            "filterable": true,
 	            "selectable": true,
+	            "selectedAll": true,
 	            "defaultOrderBy": 2,
 	            "title": "ÁREAS DEL DEPARTAMENTO: <%= departamento.getDescripcion() %>",
 	            "clickable": {'onClick': function(row) {
 	                var params = {
-	                        '<%= ControladorGestionEvaluadores.PARAM_ACCION %>': '<%=ControladorGestionEvaluadores.ACCION_SELECCIONAR_AREA%>', 
+	                        '<%= ControladorGestionEvaluadores.PARAM_ACCION %>': '<%=ControladorGestionEvaluadores.ACCION_SELECCIONAR_AREA%>',
 	                        '<%= ControladorGestionEvaluadores.PARAM_AREA %>': row.codNum,
-	                        '<%= ControladorGestionEvaluadores.PARAM_DEPARTAMENTO %>': '<%= departamento.getCodNum() %>' 
+	                        '<%= ControladorGestionEvaluadores.PARAM_DEPARTAMENTO %>': '<%= departamento.getCodNum() %>'
 	                };
 	                Atis.sendForm("<%= request.getRequestURI() %>", params);
 	            }},

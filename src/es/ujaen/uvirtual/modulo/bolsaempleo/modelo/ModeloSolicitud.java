@@ -69,6 +69,7 @@ public class ModeloSolicitud {
 	public static final String BEPMER_CODNUM = "BEPMER_CODNUM";
 	public static final String FLGEXCLUIDO = "FLGEXCLUIDO";
 	public static final String FLGVALIDADO = "FLGVALIDADO";
+	public static final String VALOR = "VALOR";
 	public static final String OBSERVACION_CANDIDATO = "OBSERVACION_CANDIDATO";
 	public static final String S = "S";
 	public static final int RAZON_EXCLUSION_SOLICITUD_MAXLENGTH = 500;
@@ -280,28 +281,29 @@ public class ModeloSolicitud {
 	 * @param params para leer los parametros de paginación, ordenacion, etc .
 	 * @param usuario id del usuario .
 	 * @param bolsa id de la bolsa.
+	 * @param solicitud .
 	 * @return listado de titulaciones .
 	 * @throws SQLException en caso de error de base de datos .
 	 * @throws UVException error si no existe titulación .
 	 */
-	public BolsaEmpleoDataTable<MeritoSolicitudTable> listaMeritosSolicitudDatatable(Map<String, String[]> params, UsuarioBolsaEmpleo usuario, Bolsa bolsa)
-			throws SQLException, UVException {
+	public BolsaEmpleoDataTable<MeritoSolicitudTable> listaMeritosSolicitudDatatable(Map<String, String[]> params, UsuarioBolsaEmpleo usuario, Bolsa bolsa, 
+			Solicitud solicitud) throws SQLException, UVException {
 		
 		List<MeritoSolicitudTable> meritos = new ArrayList<>();
 		BolsaEmpleoDataTable<MeritoSolicitudTable> dataTable = new BolsaEmpleoDataTable<>(params);
 		
 		String consulta = ""
-				+ " SELECT bepmer.CODNUM, bepmer.VALOR, bepite.CODIGO, bepite.NOMBRE, MERITOS_BOLSAS.CODNUM SBM_CODNUM "
-				+ " FROM TBEP_MERITOS bepmer "
-				+ " INNER JOIN TBEP_ITEMSBAREMACION bepite ON bepite.CODNUM = bepmer.BEPITE_CODNUM "
-				+ " INNER JOIN TBEP_BLOQUESBAREMACION bepblo ON bepblo.CODNUM = bepite.BEPBLO_CODNUM "
-				+ " INNER JOIN TBEP_APARTADOSBAREMACION bepapa ON bepapa.CODNUM  = bepblo.BEPAPA_CODNUM "
-				+ " LEFT JOIN ( "
-				+ " 	SELECT bepsbm.* "
-				+ " 	FROM TBEP_SOL_BOL_MERITOS bepsbm "
+				+ " SELECT bepmer.CODNUM, bepmer.VALOR, bepite.CODIGO, bepite.NOMBRE, MERITOS_BOLSAS.CODNUM SBM_CODNUM"
+				+ " FROM TBEP_MERITOS bepmer"
+				+ " INNER JOIN TBEP_ITEMSBAREMACION bepite ON bepite.CODNUM = bepmer.BEPITE_CODNUM"
+				+ " INNER JOIN TBEP_BLOQUESBAREMACION bepblo ON bepblo.CODNUM = bepite.BEPBLO_CODNUM"
+				+ " INNER JOIN TBEP_APARTADOSBAREMACION bepapa ON bepapa.CODNUM  = bepblo.BEPAPA_CODNUM"
+				+ " LEFT JOIN ("
+				+ " 	SELECT bepsbm.*"
+				+ " 	FROM TBEP_SOL_BOL_MERITOS bepsbm"
 				+ "		INNER JOIN TBEP_SOLICITUD_BOLSAS bepsbo ON bepsbo.CODNUM = bepsbm.BEPSBO_CODNUM"
-				+ "		WHERE bepsbo.BEPBOL_CODNUM = ? "				
-				+ " ) MERITOS_BOLSAS ON MERITOS_BOLSAS.BEPMER_CODNUM = bepmer.CODNUM "							
+				+ "		WHERE bepsbo.BEPBOL_CODNUM = ? AND bepsbo.BEPSOL_CODNUM = ?"
+				+ " ) MERITOS_BOLSAS ON MERITOS_BOLSAS.BEPMER_CODNUM = bepmer.CODNUM"
 				+ " WHERE bepmer.BEPUSU_CODNUM = ? ";
 
 		String whereCodigo = String.format("(%s || '.' || %s || '.' || %s)", "bepapa.CODIGO", "bepblo.CODIGO", "bepite.CODIGO");
@@ -321,6 +323,8 @@ public class ModeloSolicitud {
 			int indexParam = 1;
 			stmt.setInt(indexParam, bolsa.getCodNum());
 			stmtCount.setInt(indexParam++, bolsa.getCodNum());
+			stmt.setInt(indexParam, solicitud.getCodNum());
+			stmtCount.setInt(indexParam++, solicitud.getCodNum());
 			stmt.setInt(indexParam, usuario.getCodNum());
 			stmtCount.setInt(indexParam++, usuario.getCodNum());			
 			
@@ -568,7 +572,7 @@ public class ModeloSolicitud {
 				Merito merito = ModeloMerito.obtenerInstancia().getMeritoById(rs.getInt(BEPMER_CODNUM), false, false);
 				
 				return new MeritoSolicitud(rs.getInt(CODNUM), merito, rs.getString(FLGEXCLUIDO).equals(S),
-						rs.getString(FLGVALIDADO).equals(S), rs.getString(OBSERVACION_CANDIDATO));
+						rs.getString(FLGVALIDADO).equals(S), rs.getString(OBSERVACION_CANDIDATO), rs.getDouble(VALOR));
 			}
 		}
 	}

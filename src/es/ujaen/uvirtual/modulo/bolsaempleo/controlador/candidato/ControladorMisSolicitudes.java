@@ -749,7 +749,7 @@ public class ControladorMisSolicitudes extends HttpServlet {
 	 * @throws IOException .
 	 */
 	private void listadoBolsasSolicitud(VistaSolicitudes bean, UVDatos datos, HttpServletRequest request, HttpServletResponse response) 
-			throws SQLException, UVException, IOException {
+			throws IOException {
 		ModeloSolicitud modelo = ModeloSolicitud.obtenerInstancia();
 		datos.setContentType(RESPONSE_AJAX_CONTENTTYPE);
 		datos.setRespuestaEnviada(true);
@@ -789,7 +789,7 @@ public class ControladorMisSolicitudes extends HttpServlet {
 	 * @throws UVException .
 	 */
 	private void listadoMeritosCandidato(VistaSolicitudes bean, UVDatos datos, HttpServletRequest request, HttpServletResponse response)
-			throws IOException, SQLException, UVException {
+			throws IOException {
 		
 		datos.setRespuestaEnviada(true);
 		datos.setContentType(RESPONSE_AJAX_CONTENTTYPE);		
@@ -801,7 +801,7 @@ public class ControladorMisSolicitudes extends HttpServlet {
 				Bolsa bolsa = ModeloBolsa.obtenerInstancia().getBolsaById(Formateador.leeParametroInteger(request.getParameter(PARAM_BOLSA)));
 				
 				BolsaEmpleoDataTable<MeritoSolicitudTable> dataTable = ModeloSolicitud.obtenerInstancia().
-						listaMeritosSolicitudDatatable(request.getParameterMap(), bean.getUsuarioLogeado(), bolsa);
+						listaMeritosSolicitudDatatable(request.getParameterMap(), bean.getUsuarioLogeado(), bolsa, this.getSolicitud(bean, request));
 				bean.setDataTableMeritos(dataTable);
 				writer.write(dataTable.toJson());
 			} catch (UVException e) {

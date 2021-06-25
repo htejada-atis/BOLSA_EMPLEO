@@ -15,7 +15,8 @@ public class MeritoSolicitud implements Serializable {
 	private Merito merito;
 	private Boolean excluido;
 	private Boolean validado;
-	private String observacionCandidato;	
+	private String observacionCandidato;
+	private Double valor;
 	private List<MeritoSolicitudValoracion> valoraciones;
 
 	/**
@@ -55,6 +56,23 @@ public class MeritoSolicitud implements Serializable {
 		this.observacionCandidato = pobservacionCandidato;
 	}
 	
+	/**	Constructor con parametros .
+	 * @param pcodNum .
+	 * @param pmerito .
+	 * @param pexcluido .
+	 * @param pvalidado .
+	 * @param pobservacionCandidato .
+	 * @param pvalor .
+	 */
+	public MeritoSolicitud(Integer pcodNum, Merito pmerito, Boolean pexcluido, Boolean pvalidado, String pobservacionCandidato, Double pvalor) {
+		this.codNum = pcodNum;
+		this.merito = pmerito;
+		this.excluido = pexcluido;
+		this.validado = pvalidado;
+		this.observacionCandidato = pobservacionCandidato;
+		this.valor = pvalor;
+	}
+	
 	/**
 	 * Constructor con parametros .
 	 * @param pmerito .
@@ -65,6 +83,20 @@ public class MeritoSolicitud implements Serializable {
 		this.merito = pmerito;		
 		this.excluido = pexcluido;		
 		this.validado = pvalidado;
+	}
+	
+	/**
+	 * Constructor con parametros .
+	 * @param pmerito .
+	 * @param pexcluido .
+	 * @param pvalidado .
+	 * @param pvalor .
+	 */
+	public MeritoSolicitud(Merito pmerito, Boolean pexcluido, Boolean pvalidado, Double pvalor) {
+		this.merito = pmerito;
+		this.excluido = pexcluido;
+		this.validado = pvalidado;
+		this.valor = pvalor;
 	}
 
 	public Integer getCodNum() {
@@ -114,6 +146,14 @@ public class MeritoSolicitud implements Serializable {
 	public void setValoraciones(List<MeritoSolicitudValoracion> valoraciones) {
 		this.valoraciones = valoraciones;
 	}
+	
+	public Double getValor() {
+		return valor;
+	}
+
+	public void setValor(Double valor) {
+		this.valor = valor;
+	}
 		
 	public static long getSerialversionuid() {
 		return serialVersionUID;
@@ -122,7 +162,7 @@ public class MeritoSolicitud implements Serializable {
 	@Override
 	public String toString() {
 		return "MeritoSolicitud [codNum=" + codNum + ", merito=" + merito + ", excluido=" + excluido
-				+ ", validado=" + validado + ", observacionCandidato=" + observacionCandidato + ", valoraciones=" + valoraciones + "]";
+				+ ", validado=" + validado + ", observacionCandidato=" + observacionCandidato + ", valoraciones=" + valoraciones + ", valor=" + valor + "]";
 	}
 
 	@Override
@@ -135,6 +175,7 @@ public class MeritoSolicitud implements Serializable {
 		result = prime * result + ((validado == null) ? 0 : validado.hashCode());	
 		result = prime * result + ((observacionCandidato == null) ? 0 : observacionCandidato.hashCode());
 		result = prime * result + ((valoraciones == null) ? 0 : valoraciones.hashCode());
+		result = prime * result + ((valor == null) ? 0 : valor.hashCode());
 		return result;
 	}
 
@@ -191,6 +232,13 @@ public class MeritoSolicitud implements Serializable {
 				return false;
 			}
 		} else if (!valoraciones.equals(other.valoraciones)) {
+			return false;
+		}
+		if (valor == null) {
+			if (other.valor != null) {
+				return false;
+			}
+		} else if (!valor.equals(other.valor)) {
 			return false;
 		}
 		
