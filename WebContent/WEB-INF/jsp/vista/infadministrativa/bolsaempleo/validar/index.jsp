@@ -27,12 +27,12 @@ VistaValidar bean = (VistaValidar)uvdatos.getVistas().get(VistaValidar.class.get
 		
 	<table class="bluetable bolsaempleo" id="table">
 		<tr>
-			<th scope="col" style="width:10%" title="Código área">Cod. Area.</th>
+			<th scope="col" style="width:76px" title="Código área">Cod. Area.</th>
 			<th scope="col" style="width:50%" class="area">Area</th>
-			<th scope="col" style="width:10%" class="center">No validados</th>	
-			<th scope="col" style="width:10%" class="center">Validados</th>
-			<th scope="col" style="width:10%" class="center">Excluidos</th>	
-			<th scope="col" style="width:10%" class="center">Total</th>	
+			<th scope="col" style="width:76px" class="center">No validados</th>
+			<th scope="col" style="width:76px" class="center">Validados</th>
+			<th scope="col" style="width:76px" class="center">Excluidos</th>
+			<th scope="col" style="width:76px" class="center">Total</th>
 		</tr>
 		<tbody>				
 		</tbody>

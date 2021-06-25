@@ -329,7 +329,8 @@ public class ModeloValidar {
 		
 		// seleccionamos las bolsas, con meritos, en la convocatoria pasada
 		String consulta = 
-				"SELECT bepbol.*,"
+				"SELECT bepbol.CODNUM, bepbol.BEPARE_CODNUM, bepbol.ESTADO, bepbol.FLGBAREMABLE, bepbol.FECHAACTUALIZACION, "
+				+ "		bepbol.FECHABLOQUEO, bepbol.FECHADEBLOQUEO,"
 				+ "	(" + consultaCount + " AND bepsbm.FLGVALIDADO = 'N' AND bepsbm.FLGEXCLUIDO = 'N') COUNT_NO_VALIDADOS, "
 				+ "	(" + consultaCount + " AND bepsbm.FLGVALIDADO = 'S' AND bepsbm.FLGEXCLUIDO = 'N') COUNT_VALIDADOS, "
 				+ "	(" + consultaCount + " AND bepsbm.FLGEXCLUIDO = 'S') COUNT_EXCLUIDOS, "
@@ -337,7 +338,7 @@ public class ModeloValidar {
 				+ "	FROM TBEP_BOLSAS bepbol"
 				+ " INNER JOIN TBEP_AREAS bepare ON bepare.CODNUM = bepbol.BEPARE_CODNUM"
 				+ (evaluador ? " INNER JOIN TBEP_EVALUADORES bepeva ON bepeva.BEPARE_CODNUM = bepare.CODNUM AND bepeva.FLGACTIVO = 'S'" : "")
-				+ "	WHERE bepbol.FLGBAREMABLE = 'S' " 
+				+ "	WHERE bepbol.FLGBAREMABLE = 'S' "
 				+ (evaluador ? " AND bepeva.BEPUSU_CODNUM = ?" : "")
 				+ (evaluador ? " AND bepbol.ESTADO = ? " : "");
 		
@@ -568,14 +569,15 @@ public class ModeloValidar {
 			return dataTable;
 		}
 		
-		String consulta = "SELECT bepmer.*, bepsbm.FLGEXCLUIDO, bepsbm.FLGVALIDADO"
+		String consulta = "SELECT bepmer.CODNUM, bepmer.BEPITE_CODNUM, bepmer.VALOR, bepmer.DESCRIPCION,"
+				+ "		bepmer.OBSERVACION, bepsbm.FLGEXCLUIDO, bepsbm.FLGVALIDADO"
 				+ " FROM TBEP_SOL_BOL_MERITOS bepsbm"
 				+ "	INNER JOIN TBEP_SOLICITUD_BOLSAS bepsbo ON bepsbo.CODNUM = bepsbm.BEPSBO_CODNUM"
 				+ "	INNER JOIN TBEP_SOLICITUDES bepsol ON bepsol.CODNUM = bepsbo.BEPSOL_CODNUM"
 				+ "	INNER JOIN TBEP_MERITOS bepmer ON bepmer.CODNUM = bepsbm.BEPMER_CODNUM"
 				+ "	INNER JOIN TBEP_ITEMSBAREMACION bepite ON bepite.CODNUM = bepmer.BEPITE_CODNUM"
-				+ " INNER JOIN TBEP_BLOQUESBAREMACION bepblo ON bepblo.CODNUM = bepite.BEPBLO_CODNUM "
-				+ " INNER JOIN TBEP_APARTADOSBAREMACION bepapa ON bepapa.CODNUM  = bepblo.BEPAPA_CODNUM "
+				+ " INNER JOIN TBEP_BLOQUESBAREMACION bepblo ON bepblo.CODNUM = bepite.BEPBLO_CODNUM"
+				+ " INNER JOIN TBEP_APARTADOSBAREMACION bepapa ON bepapa.CODNUM  = bepblo.BEPAPA_CODNUM"
 				+ "	WHERE bepsol.ESTADO = 'CERRADA' AND bepsbo.BEPBOL_CODNUM = ? AND bepsol.BEPCON_CODNUM = ? AND bepmer.BEPUSU_CODNUM = ?";
 		
 		// agrega el filtro de afinidad
@@ -606,13 +608,12 @@ public class ModeloValidar {
 
 			try (ResultSet rs = stmt.executeQuery()) {
 				while (rs.next()) {
-					Merito merito = new Merito();		
+					Merito merito = new Merito();
 					merito.setCodNum(rs.getInt("CODNUM"));
-					merito.setItemBaremacion(ModeloBaremacionItems.obtenerInstancia().getItemBaremacionById(rs.getInt("BEPITE_CODNUM")));		
+					merito.setItemBaremacion(ModeloBaremacionItems.obtenerInstancia().getItemBaremacionById(rs.getInt("BEPITE_CODNUM")));	
 					merito.setValor(rs.getDouble("VALOR"));
 					merito.setDescripcion(rs.getString("DESCRIPCION"));
 					merito.setObservacion(rs.getString("OBSERVACION"));
-					merito.setArchivo(rs.getBlob("ARCHIVO").getBinaryStream());
 					
 					Boolean excluido = rs.getString("FLGEXCLUIDO").equals(MERITO_EXCLUIDO);
 					Boolean validado = rs.getString("FLGVALIDADO").equals(MERITO_VALIDADO);
