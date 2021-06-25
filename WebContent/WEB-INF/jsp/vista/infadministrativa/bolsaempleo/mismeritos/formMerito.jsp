@@ -20,7 +20,6 @@ String descripcion = BolsaEmpleoUtils.getParamForm(request, ControladorMisMerito
 String observacion = BolsaEmpleoUtils.getParamForm(request, ControladorMisMeritos.PARAM_OBSERVACION, "");
 %>
 
-
 <div class="bolsa-empleo">
 
 	<jsp:include page="/WEB-INF/jsp/vista/infadministrativa/bolsaempleo/mensajes.jsp" />

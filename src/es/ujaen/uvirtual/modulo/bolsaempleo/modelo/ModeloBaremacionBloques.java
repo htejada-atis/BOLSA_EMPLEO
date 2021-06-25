@@ -171,6 +171,10 @@ public class ModeloBaremacionBloques {
 	public void actualizaBloque(BloqueBaremacion bloque, UsuarioBolsaEmpleo usuarioUpdate) throws SQLException, UVException {
 		this.chequearBloqueParaInsertarOActualizar(bloque);
 		
+		if (this.chequearUsandose(bloque)) {
+			throw new UVException("El apartado está asociado en algún mérito no se puede editar.");
+		}
+				
 		String consulta = "UPDATE TBEP_BLOQUESBAREMACION SET "
 				+ "CODIGO = ?, "
 				+ "NOMBRE = ?, "
@@ -345,4 +349,34 @@ public class ModeloBaremacionBloques {
 		
 		return false;
 	} 
+	
+	/**
+	 * Comprueba si el bloque está usandose en algun mérito.
+	 * 
+	 * @param bloque .
+	 * @return .
+	 * @throws SQLException .
+	 */
+	private boolean chequearUsandose(BloqueBaremacion bloque) throws SQLException {
+		String sql = ""
+			+ " SELECT COUNT(*) AS TOTAL "
+			+ " FROM TBEP_APARTADOSBAREMACION bepapa "
+			+ " INNER JOIN TBEP_BLOQUESBAREMACION bepblo ON bepblo.BEPAPA_CODNUM = bepapa.CODNUM "
+			+ " INNER JOIN TBEP_ITEMSBAREMACION bepite ON bepite.BEPBLO_CODNUM = bepblo.CODNUM "
+			+ " INNER JOIN TBEP_MERITOS bepmer ON bepmer.BEPITE_CODNUM = bepite.CODNUM "			
+			+ " WHERE bepblo.CODNUM = ? ";
+		
+		try (Connection con = ConexionUvirtual.obtenerInstancia(); PreparedStatement stmt = con.prepareStatement(sql)) {
+			int parameterIndex = 1;
+			stmt.setInt(parameterIndex++, bloque.getCodNum());
+			
+			try (ResultSet rs = stmt.executeQuery()) {
+				if (rs.next()) {
+					return rs.getInt("TOTAL") > 0;
+				}
+			}
+		}
+		
+		return false;
+	}
 }

@@ -284,6 +284,10 @@ public class ModeloBaremacionItems {
 	public void actualizaItem(ItemBaremacion item, UsuarioBolsaEmpleo usuarioUpdate) throws SQLException, UVException {
 		this.chequearItemParaInsertarOActualizar(item);
 		
+		if (this.chequearUsandose(item)) {
+			throw new UVException("El item está asociado en algún mérito no se puede editar.");
+		}
+		
 		String consulta = "UPDATE TBEP_ITEMSBAREMACION SET "
 				+ "CODIGO = ?, "
 				+ "NOMBRE = ?, "
@@ -403,7 +407,10 @@ public class ModeloBaremacionItems {
 				+ "SELECT bepite.* "
 				+ "FROM TBEP_ITEMSBAREMACION bepite "
 				+ "INNER JOIN TBEP_BLOQUESBAREMACION bepblo ON bepblo.CODNUM = bepite.BEPBLO_CODNUM "
-				+ "WHERE bepblo.BEPAPA_CODNUM = ? "
+				+ "WHERE 1=1"
+				+ "	AND bepblo.BEPAPA_CODNUM = ? "
+				+ " AND bepblo.FLGACTIVO = 'S' "
+				+ " AND bepite.FLGACTIVO = 'S' "
 				+ "ORDER BY LPAD(bepblo.CODIGO, 3) || LPAD(bepite.CODIGO, 3)";
 		
 		try (Connection conexion = ConexionUvirtual.obtenerInstancia(); PreparedStatement stmt = conexion.prepareStatement(consulta)
@@ -649,5 +656,35 @@ public class ModeloBaremacionItems {
 				}
 			}
 		}
+	}
+	
+	/**
+	 * Comprueba si el item está usandose en algun mérito.
+	 * 
+	 * @param item .
+	 * @return .
+	 * @throws SQLException .
+	 */
+	private boolean chequearUsandose(ItemBaremacion item) throws SQLException {
+		String sql = ""
+			+ " SELECT COUNT(*) AS TOTAL "
+			+ " FROM TBEP_APARTADOSBAREMACION bepapa "
+			+ " INNER JOIN TBEP_BLOQUESBAREMACION bepblo ON bepblo.BEPAPA_CODNUM = bepapa.CODNUM "
+			+ " INNER JOIN TBEP_ITEMSBAREMACION bepite ON bepite.BEPBLO_CODNUM = bepblo.CODNUM "
+			+ " INNER JOIN TBEP_MERITOS bepmer ON bepmer.BEPITE_CODNUM = bepite.CODNUM "			
+			+ " WHERE bepite.CODNUM = ? ";
+		
+		try (Connection con = ConexionUvirtual.obtenerInstancia(); PreparedStatement stmt = con.prepareStatement(sql)) {
+			int parameterIndex = 1;
+			stmt.setInt(parameterIndex++, item.getCodNum());
+			
+			try (ResultSet rs = stmt.executeQuery()) {
+				if (rs.next()) {
+					return rs.getInt("TOTAL") > 0;
+				}
+			}
+		}
+		
+		return false;
 	}
 }
