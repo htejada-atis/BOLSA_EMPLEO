@@ -272,11 +272,13 @@ UsuarioBolsaEmpleo candidato = bean.getCandidato();
 							<%	} %>
 							</td>
 							<td>
-				    			<textarea class="form-input-custom merito-observacion-candidato" 
-				    				id="merito_observacion_candidato_<%= idMerito %>"
-				    				name="<%= ControladorValidar.PARAM_OBSERVACION_CANDIDATO %>" 
-				    				rows="2" cols="50"
-				    				><%= meritoBolsa.getMeritoSolicitud().getObservacionCandidato() != null ? meritoBolsa.getMeritoSolicitud().getObservacionCandidato() : "" %></textarea>
+								<div style="display: flex;">
+					    			<textarea class="form-input-custom merito-observacion-candidato" 
+					    				id="merito_observacion_candidato_<%= idMerito %>"
+					    				name="<%= ControladorValidar.PARAM_OBSERVACION_CANDIDATO %>" 
+					    				rows="2" cols="50"
+					    				><%= meritoBolsa.getMeritoSolicitud().getObservacionCandidato() != null ? meritoBolsa.getMeritoSolicitud().getObservacionCandidato() : "" %></textarea>
+				    			</div>
 							</td>
 							<td style="vertical-align: middle;">
 								<span class="btns acciones_merito">
