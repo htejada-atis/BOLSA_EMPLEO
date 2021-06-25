@@ -52,6 +52,11 @@ public class ModeloBaremacionItems {
 	public static final String ERROR_ITEM_MISMO_CODIGO = "Ya existe un ítem con el código introducido";
 	public static final String ERROR_ITEM_NOEXITE = "Item no encontrado";
 	public static final String ERROR_ITEM_REQUERIDO = "El ítem de baremación es requerido";
+	public static final String ERROR_ITEM_USANDOSE = "El item está asociado en algún mérito no se puede editar.";
+	public static final String ERROR_TIPO_UNIDAD_NO_VALIDA = "Tipo de unidad no válida";
+	public static final String ERROR_VALOR_MINIMO = "El valor mínimo deber al menos %f";
+	public static final String ERROR_VALOR_MAXIMO = "El valor máximo deber al menos %f";
+	public static final String ERROR_VALOR_MAXIMO_MINIMO = "El valor máximo deber mayor que el valor mínimo";
 	
 	public static final Integer COLUMN_CODIGO_MAXLENGTH = 3; 
 	public static final Integer COLUMN_NOMBRE_MAXLENGTH = 1000;
@@ -285,7 +290,7 @@ public class ModeloBaremacionItems {
 		this.chequearItemParaInsertarOActualizar(item);
 		
 		if (this.chequearUsandose(item)) {
-			throw new UVException("El item está asociado en algún mérito no se puede editar.");
+			throw new UVException(ERROR_ITEM_USANDOSE);
 		}
 		
 		String consulta = "UPDATE TBEP_ITEMSBAREMACION SET "
@@ -495,19 +500,19 @@ public class ModeloBaremacionItems {
 		unidades.add(ITEM_UNIDADES_MEDICION_SINO);
 			
 		if (!unidades.contains(item.getUnidades())) {
-			throw new UVException("Tipo de unidad no válida");
+			throw new UVException(ERROR_TIPO_UNIDAD_NO_VALIDA);
 		}
 		
 		if (item.getValorMinimo() < MINIMO_VALOR_FLOAT) {
-			throw new UVException("El valor mínimo deber al menos " + MINIMO_VALOR_FLOAT);
+			throw new UVException(String.format(ERROR_VALOR_MINIMO, MINIMO_VALOR_FLOAT));
 		}
 		
 		if (item.getValorMaximo() < MINIMO_VALOR_FLOAT) {
-			throw new UVException("El valor máximo deber al menos " + MINIMO_VALOR_FLOAT);
+			throw new UVException(String.format(ERROR_VALOR_MAXIMO, MINIMO_VALOR_FLOAT));
 		}
 		
 		if (item.getValorMinimo() > item.getValorMaximo()) {
-			throw new UVException("El valor máximo deber mayor que el valor mínimo");
+			throw new UVException(ERROR_VALOR_MAXIMO_MINIMO);
 		}
 	}
 

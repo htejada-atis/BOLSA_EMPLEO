@@ -33,6 +33,7 @@ public class ModeloBaremacionBloques {
 	public static final String ERROR_BLOQUE_NOEXITE = "Apartado no encontrado";	
 	public static final String ERROR_BLOQUE_REQUERIDO = "El bloque de baremación es requerido";
 	public static final String ERROR_BLOQUE_MISMO_CODIGO = "Ya existe un bloque con el código introducido";
+	public static final String ERROR_APARTADO_USADO = "El apartado está asociado en algún mérito no se puede editar.";
 
 	public static final Integer COLUMN_CODIGO_MAXLENGTH = 3;
 	public static final Integer COLUMN_NOMBRE_MAXLENGTH = 1000;
@@ -172,7 +173,7 @@ public class ModeloBaremacionBloques {
 		this.chequearBloqueParaInsertarOActualizar(bloque);
 		
 		if (this.chequearUsandose(bloque)) {
-			throw new UVException("El apartado está asociado en algún mérito no se puede editar.");
+			throw new UVException(ERROR_APARTADO_USADO);
 		}
 				
 		String consulta = "UPDATE TBEP_BLOQUESBAREMACION SET "
