@@ -123,7 +123,7 @@ function redondearFloat(number, decimalPlaces) {
 
 function removeValueArray(array, val) {
 	array = Array.isArray(array) ? array : [array];
-	const index = array.indexOf(val);s
+	const index = array.indexOf(val);
 	if (index > -1) {
 		array.splice(index, 1);
 	}	
