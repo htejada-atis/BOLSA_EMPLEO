@@ -14,6 +14,7 @@ import es.ujaen.uvirtual.modulo.bolsaempleo.beans.UsuarioBolsaEmpleo;
 import es.ujaen.uvirtual.modulo.bolsaempleo.utilidades.BolsaEmpleoDataTable;
 import es.ujaen.uvirtual.modulo.bolsaempleo.utilidades.BolsaEmpleoDataTable.DataTableColumn;
 import es.ujaen.uvirtual.modulo.bolsaempleo.utilidades.BolsaEmpleoUtils;
+import es.ujaen.uvirtual.utilidades.Formateador;
 import es.ujaen.uvirtual.utilidades.UVException;
 
 /**
@@ -39,6 +40,13 @@ public class ModeloMerito {
 	
 	public static final int COLUMN_DESCRIPCION_MAXLENGTH = 200;
 	public static final int COLUMN_OBSERVACION_MAXLENGTH = 300;
+	
+	// mensajes
+	public static final String MENSAJE_ERROR_VALOR_ENTERO_NO_PERMITIDO = "El valor debe ser entero";
+	public static final String MENSAJE_ERROR_VALOR_DECIMAL_NO_PERMITIDO = "El valor debe ser decimal";
+	public static final String MENSAJE_ERROR_VALOR_MAXIMO_PERMITIDO = "El valor máximo permitido es %s";
+	public static final String MENSAJE_ERROR_VALOR_MINIMO_PERMITIDO = "El valor mínimo permitido es %s";
+	
 
 	protected static ModeloMerito eInstancia;
 
@@ -416,6 +424,51 @@ public class ModeloMerito {
 				return this.createMeritoFromResultset(rs, withUsuario, withFichero);						
 			}
 		}
+	}
+	
+	/**
+	 * Valida el valor de un mérito.
+	 * @param valorStr .
+	 * @param merito .
+	 * @return .
+	 * @throws UVException .
+	 */
+	public static Double validateValorDelMerito(String valorStr, Merito merito) throws UVException {
+		// chequeo tipo de valor
+		switch (merito.getItemBaremacion().getUnidades()) {
+			case ModeloBaremacionItems.ITEM_UNIDADES_MEDICION_SINO:
+				break;
+			case ModeloBaremacionItems.ITEM_UNIDADES_MEDICION_ENTERO:
+				if (!BolsaEmpleoUtils.isInteger(valorStr)) {
+					throw new UVException(MENSAJE_ERROR_VALOR_ENTERO_NO_PERMITIDO);
+				}
+				break;
+			case ModeloBaremacionItems.ITEM_UNIDADES_MEDICION_DECIMAL:
+				if (!BolsaEmpleoUtils.isFloat(valorStr)) {
+					throw new UVException(MENSAJE_ERROR_VALOR_DECIMAL_NO_PERMITIDO);
+				}
+				break;
+			default:
+				throw new UVException("Tipo de unidad no válido");
+		}
+		
+		// chequeo máximo y mínimo
+		Double valor = merito.getItemBaremacion().getUnidades().equals(ModeloBaremacionItems.ITEM_UNIDADES_MEDICION_SINO) 
+				? Formateador.leeParametroDouble("1.0") : Formateador.leeParametroDouble(valorStr);
+		
+		if (valor == null) {
+			throw new UVException("El valor no es válido");
+		}
+		if (valor < merito.getItemBaremacion().getValorMinimo()) {
+			throw new UVException(String.format(MENSAJE_ERROR_VALOR_MINIMO_PERMITIDO, merito.getItemBaremacion().getValorMinimo().toString()));
+		}
+		if (valor > merito.getItemBaremacion().getValorMaximo()) {
+			throw new UVException(String.format(MENSAJE_ERROR_VALOR_MAXIMO_PERMITIDO, merito.getItemBaremacion().getValorMaximo().toString()));
+		}
+		
+		merito.setValor(valor);
+		
+		return merito.getValor();
 	}
 	
 	/**
