@@ -12,6 +12,8 @@ public class ValorMeritoBolsaTable implements Serializable {
 	private static final long serialVersionUID = 1L;
 	private MeritoSolicitud meritoSolicitud;
 	private Bolsa bolsa;
+	private Convocatoria convocatoria;
+	private String uidUsuario;
 
 	/**
 	 * Constructor por defecto.
@@ -20,9 +22,20 @@ public class ValorMeritoBolsaTable implements Serializable {
 
 	}
 
-	/**
-	 * Constructor con parametros.
-	 *
+	/** Constructor con parametros .
+	 * @param pmeritoSolicitud .
+	 * @param pconvocatoria .
+	 * @param pbolsa .
+	 * @param puidUsuario .
+	 */
+	public ValorMeritoBolsaTable(MeritoSolicitud pmeritoSolicitud, Convocatoria pconvocatoria, Bolsa pbolsa, String puidUsuario) {
+		this.meritoSolicitud = pmeritoSolicitud;
+		this.convocatoria = pconvocatoria;
+		this.bolsa = pbolsa;
+		this.uidUsuario = puidUsuario;
+	}
+	
+	/** Constructor con parametros .
 	 * @param pmeritoSolicitud .
 	 * @param pbolsa .
 	 */
@@ -39,12 +52,28 @@ public class ValorMeritoBolsaTable implements Serializable {
 		this.meritoSolicitud = merito;
 	}
 	
+	public Convocatoria getConvocatoria() {
+		return convocatoria;
+	}
+	
+	public void setConvocatoria(Convocatoria convocatoria) {
+		this.convocatoria = convocatoria;
+	}
+	
 	public Bolsa getBolsa() {
 		return this.bolsa;
 	}
 
 	public void setBolsa(Bolsa bolsa) {
 		this.bolsa = bolsa;
+	}
+	
+	public String getUidUsuario() {
+		return uidUsuario;
+	}
+
+	public void setUidUsuario(String uidUsuario) {
+		this.uidUsuario = uidUsuario;
 	}
 			
 	public static long getSerialversionuid() {
@@ -53,7 +82,7 @@ public class ValorMeritoBolsaTable implements Serializable {
 
 	@Override
 	public String toString() {
-		return "ValorMeritoBolsaTable [meritoSolicitud=" + meritoSolicitud + ", bolsa=" + bolsa + "]";
+		return "ValorMeritoBolsaTable [meritoSolicitud=" + meritoSolicitud + ", bolsa=" + bolsa + ", convocatoria=" + convocatoria + ", uidUsuario=" + uidUsuario + "]";
 	}
 
 	@Override
@@ -62,6 +91,8 @@ public class ValorMeritoBolsaTable implements Serializable {
 		int result = 1;
 		result = prime * result + ((meritoSolicitud == null) ? 0 : meritoSolicitud.hashCode());
 		result = prime * result + ((bolsa == null) ? 0 : bolsa.hashCode());
+		result = prime * result + ((convocatoria == null) ? 0 : convocatoria.hashCode());
+		result = prime * result + ((uidUsuario == null) ? 0 : uidUsuario.hashCode());
 		return result;
 	}
 
@@ -90,6 +121,20 @@ public class ValorMeritoBolsaTable implements Serializable {
 				return false;
 			}
 		} else if (!bolsa.equals(other.bolsa)) {
+			return false;
+		}
+		if (convocatoria == null) {
+			if (other.convocatoria != null) {
+				return false;
+			}
+		} else if (!convocatoria.equals(other.convocatoria)) {
+			return false;
+		}
+		if (uidUsuario == null) {
+			if (other.uidUsuario != null) {
+				return false;
+			}
+		} else if (!uidUsuario.equals(other.uidUsuario)) {
 			return false;
 		}
 		

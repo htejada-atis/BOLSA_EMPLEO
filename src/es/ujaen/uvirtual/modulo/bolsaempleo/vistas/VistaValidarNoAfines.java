@@ -6,7 +6,6 @@ import java.util.List;
 
 import es.ujaen.uvirtual.beans.vistas.Vista;
 import es.ujaen.uvirtual.modulo.bolsaempleo.beans.Bolsa;
-import es.ujaen.uvirtual.modulo.bolsaempleo.beans.BolsaCandidatoValidacionTable;
 import es.ujaen.uvirtual.modulo.bolsaempleo.beans.BolsaValidacion;
 import es.ujaen.uvirtual.modulo.bolsaempleo.beans.CandidatoValidacion;
 import es.ujaen.uvirtual.modulo.bolsaempleo.beans.Convocatoria;
@@ -29,7 +28,7 @@ public class VistaValidarNoAfines extends Vista implements Serializable {
 	private MeritoSolicitud merito;
 	private UsuarioBolsaEmpleo usuario;
 	private transient BolsaEmpleoDataTable<BolsaValidacion> datatableBolsas;
-	private transient BolsaEmpleoDataTable<BolsaCandidatoValidacionTable> datatableBolsasCandidato;
+	private transient BolsaEmpleoDataTable<Bolsa> datatableBolsasCandidato;
 	private transient BolsaEmpleoDataTable<CandidatoValidacion> datatableCandidatos;
 	private transient BolsaEmpleoDataTable<MeritoValidarTable> datatableMeritos;
 	private transient BolsaEmpleoDataTable<ValorMeritoBolsaTable> datatableValoresMeritoBolsa;
@@ -61,11 +60,11 @@ public class VistaValidarNoAfines extends Vista implements Serializable {
 		return this.datatableBolsas;
 	}
 
-	public void setDatatableBolsasCandidato(BolsaEmpleoDataTable<BolsaCandidatoValidacionTable> dt) {
+	public void setDatatableBolsasCandidato(BolsaEmpleoDataTable<Bolsa> dt) {
 		this.datatableBolsasCandidato = dt;
 	}
 
-	public BolsaEmpleoDataTable<BolsaCandidatoValidacionTable> getDatatableBolsasCandidato() {
+	public BolsaEmpleoDataTable<Bolsa> getDatatableBolsasCandidato() {
 		return this.datatableBolsasCandidato;
 	}
 

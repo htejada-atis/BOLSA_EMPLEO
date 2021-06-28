@@ -316,7 +316,7 @@ public class ControladorValidar extends HttpServlet {
 			actualizaAfinidades(bean, request, bolsa);
 			
 			if (EscapaHTML.ajustaCodificacion(request.getParameter(PARAM_ACEPTAR_MERITO)) != null) {
-				modeloValidar.validarMerito(idBolsa.toString(), bean.getMerito().getMerito().getCodNum(),
+				modeloValidar.validarMerito(idBolsa.toString(), bean.getMerito(),
 						observacionesCandidato, bean.getConvocatoria(), bean.getUsuarioLogeado());
 				BolsaEmpleoUtils.addMensajeDeExito(String.format(MENSAJE_EXITO_MERITO_VALIDADO, bolsa.getArea().getDescripcion()), bean, request);
 			} else if (EscapaHTML.ajustaCodificacion(request.getParameter(PARAM_EXCLUIR_MERITO)) != null) {
@@ -463,7 +463,7 @@ public class ControladorValidar extends HttpServlet {
 				CodigoDescripcion mensaje = new CodigoDescripcion(RESPONSE_AJAX_ERROR, e.getMessage());
 				writer.write(new Gson().toJson(mensaje));
 				response.setStatus(RESPONSE_AJAX_HTTP_CODE_ERROR);
-			} catch (SQLException e) { 
+			} catch (SQLException e) {
 				LOGGER.log(Level.SEVERE, Formateador.getStackTrace(e));
 				LOGGER.log(Level.SEVERE, e.toString());
 				bean.getMensajesDeError().add(e.getMessage());
@@ -473,7 +473,4 @@ public class ControladorValidar extends HttpServlet {
 			}
 		}
 	}
-	
-	
-	
 }

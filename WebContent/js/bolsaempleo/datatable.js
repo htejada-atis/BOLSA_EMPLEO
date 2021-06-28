@@ -232,7 +232,7 @@ function DataTable(id, config) {
     		var check = $('<input type="checkbox"/>');
 
             if (row.selected) {
-                if (columnDef.selectable.hasOwnProperty('disabled') && columnDef.selectable.disabled) {
+                if (columnDef.selectable.hasOwnProperty('disabled') && columnDef.selectable.disabled == row.codNum) {
                     $(check).attr("disabled", true);
                 }
                 typeof value !== 'undefined' ? self.checked[value] = true : '';
