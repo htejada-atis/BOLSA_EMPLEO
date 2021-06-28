@@ -22,7 +22,7 @@ import es.ujaen.uvirtual.utilidades.UVException;
  */
 public class ModeloParametrosConfiguracion {
 	public static final String VERSION = "0.40";
-	public static final String JS_BOLSA_EMPLEO = "/js/bolsaempleo/bolsaempleo20210625.js.min";
+	public static final String JS_BOLSA_EMPLEO = "/js/bolsaempleo/bolsaempleo20210625.js";
 	public static final String CSS_BOLSA_EMPLEO = "/css/ujaen_bolsa_empleo.css";
 
 	// 50MB = 1024 * 1024 * 50 = 52428800
