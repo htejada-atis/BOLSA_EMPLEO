@@ -26,7 +26,6 @@ import es.ujaen.uvirtual.modulo.bolsaempleo.beans.Merito;
 import es.ujaen.uvirtual.modulo.bolsaempleo.beans.MeritoSolicitud;
 import es.ujaen.uvirtual.modulo.bolsaempleo.beans.MeritoValidarTable;
 import es.ujaen.uvirtual.modulo.bolsaempleo.beans.Solicitud;
-import es.ujaen.uvirtual.modulo.bolsaempleo.controlador.candidato.ControladorMisMeritos;
 import es.ujaen.uvirtual.modulo.bolsaempleo.modelo.ModeloAfinidad;
 import es.ujaen.uvirtual.modulo.bolsaempleo.modelo.ModeloBaremacionItems;
 import es.ujaen.uvirtual.modulo.bolsaempleo.modelo.ModeloBolsa;
@@ -284,7 +283,7 @@ public class ControladorValidar extends HttpServlet {
 				merito.setItemBaremacion(item);
 				
 				// valor
-				merito.setValor(ControladorMisMeritos.validateValorDelMerito(request.getParameter(PARAM_VALOR), merito));
+				merito.setValor(ModeloMerito.validateValorDelMerito(request.getParameter(PARAM_VALOR), merito));
 				merito.setUsuario(bean.getCandidato());
 				
 				ModeloMerito.obtenerInstancia().actualizaMerito(merito, bean.getUsuarioLogeado());

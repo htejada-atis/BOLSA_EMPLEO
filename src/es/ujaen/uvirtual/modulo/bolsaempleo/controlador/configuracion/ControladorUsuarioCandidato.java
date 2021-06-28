@@ -641,7 +641,7 @@ public class ControladorUsuarioCandidato extends HttpServlet {
 		
 		try (PrintWriter writer = response.getWriter()) {
 			try {
-				BolsaEmpleoDataTable<Bolsa> dataTable = ModeloUsuarioBolsaEmpleo.obtenerInstancia().
+				BolsaEmpleoDataTable<Bolsa> dataTable = ModeloArea.obtenerInstancia().
 						listaAreasExcluidasPorUsuarioDatatable(request.getParameterMap(), bean.getCandidato().getCodNum());
 				bean.setDatatableAreas(dataTable);
 				writer.write(dataTable.toJson());
