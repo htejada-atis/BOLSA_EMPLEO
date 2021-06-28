@@ -85,10 +85,6 @@ public class ControladorMisMeritos extends HttpServlet {
 	public static final String MENSAJE_ERROR_ELIMINAR = "El mérito con id %s no se puede borrar";
 	public static final String MENSAJE_ERROR_MERITOS_SELECCIONADOS_INCORRECTOS = "Méritos seleccionados incorrectos";
 	public static final String MENSAJE_ERROR_OBSERVACION_LARGO = "La observación no puede contener mas de %d caracteres";
-	public static final String MENSAJE_ERROR_VALOR_MAXIMO_PERMITIDO = "El valor máximo permitido es %s";
-	public static final String MENSAJE_ERROR_VALOR_MINIMO_PERMITIDO = "El valor mínimo permitido es %s";
-	public static final String MENSAJE_ERROR_VALOR_DECIMAL_NO_PERMITIDO = "El valor debe ser decimal";
-	public static final String MENSAJE_ERROR_VALOR_ENTERO_NO_PERMITIDO = "El valor debe ser entero";
 	public static final String MENSAJE_EXITO_AGREGAR = "Mérito agregado correctamente";
 	public static final String MENSAJE_EXITO_ELIMINAR = "Mérito eliminado correctamente";
 	
@@ -336,7 +332,7 @@ public class ControladorMisMeritos extends HttpServlet {
 		merito.setItemBaremacion(item);
 		
 		// valor
-		merito.setValor(validateValorDelMerito((String) parametros.get(PARAM_VALOR), merito));
+		merito.setValor(ModeloMerito.validateValorDelMerito((String) parametros.get(PARAM_VALOR), merito));
 				
 		// descripcion
 		merito.setDescripcion(EscapaHTML.ajustaCodificacion((String) parametros.get(PARAM_DESCRIPCION)));
@@ -358,49 +354,5 @@ public class ControladorMisMeritos extends HttpServlet {
 						
 		return merito;
 	}
-
-	/**
-	 * Valida el valor de un mérito.
-	 * @param valorStr .
-	 * @param merito .
-	 * @return .
-	 * @throws UVException .
-	 */
-	public static Double validateValorDelMerito(String valorStr, Merito merito) throws UVException {
-		// chequeo tipo de valor
-		switch (merito.getItemBaremacion().getUnidades()) {
-			case ModeloBaremacionItems.ITEM_UNIDADES_MEDICION_SINO:
-				break;
-			case ModeloBaremacionItems.ITEM_UNIDADES_MEDICION_ENTERO:
-				if (!BolsaEmpleoUtils.isInteger(valorStr)) {
-					throw new UVException(MENSAJE_ERROR_VALOR_ENTERO_NO_PERMITIDO);
-				}
-				break;
-			case ModeloBaremacionItems.ITEM_UNIDADES_MEDICION_DECIMAL:
-				if (!BolsaEmpleoUtils.isFloat(valorStr)) {
-					throw new UVException(MENSAJE_ERROR_VALOR_DECIMAL_NO_PERMITIDO);
-				}
-				break;
-			default:
-				throw new UVException("Tipo de unidad no válido");
-		}
-		
-		// chequeo máximo y mínimo
-		Double valor = merito.getItemBaremacion().getUnidades().equals(ModeloBaremacionItems.ITEM_UNIDADES_MEDICION_SINO) 
-				? Formateador.leeParametroDouble("1.0") : Formateador.leeParametroDouble(valorStr);
-		
-		if (valor == null) {
-			throw new UVException("El valor no es válido");
-		}
-		if (valor < merito.getItemBaremacion().getValorMinimo()) {
-			throw new UVException(String.format(MENSAJE_ERROR_VALOR_MINIMO_PERMITIDO, merito.getItemBaremacion().getValorMinimo().toString()));
-		}
-		if (valor > merito.getItemBaremacion().getValorMaximo()) {
-			throw new UVException(String.format(MENSAJE_ERROR_VALOR_MAXIMO_PERMITIDO, merito.getItemBaremacion().getValorMaximo().toString()));
-		}
-		
-		merito.setValor(valor);
-		
-		return merito.getValor();
-	}
+	
 }
