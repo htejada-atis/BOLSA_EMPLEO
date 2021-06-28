@@ -87,7 +87,7 @@ public class ControladorParametrosConfiguracion extends HttpServlet {
 					listaParametros(bean);
 					break;
 				case ACCION_EDITAR_PARAMETROS:
-					editarParametros(bean, request, response);
+					editarParametros(bean, datos, request, response);
 					break;
 				default:
 					errorFatal(bean, "Acción no contemplada");
@@ -105,10 +105,9 @@ public class ControladorParametrosConfiguracion extends HttpServlet {
 			datos.getFicherosJS().add("/js/jquery-1.latest.min.js");
 			datos.getFicherosJS().add("/js/jquery-ui-1.10.4.min.js");
 			datos.getFicherosJS().add("/js/jquery.ui.datepicker-es.js");
-			datos.getFicherosJS().add("/js/bolsaempleo/utils.js");
-			datos.getFicherosJS().add("/js/bolsaempleo/datatable.js");
+			datos.getFicherosJS().add(ModeloParametrosConfiguracion.JS_BOLSA_EMPLEO);
 			datos.getFicherosCSS().add("/css/intranet.css");
-			datos.getFicherosCSS().add("/css/ujaen_bolsa_empleo.css");
+			datos.getFicherosCSS().add(ModeloParametrosConfiguracion.CSS_BOLSA_EMPLEO);
 			datos.getFicherosCSS().add("/css/jqueryujaen/jquery-ui-1.8.16.custom.css");
 		}
 	}
@@ -128,8 +127,7 @@ public class ControladorParametrosConfiguracion extends HttpServlet {
 			LOGGER.log(Level.SEVERE, Formateador.getStackTrace(e));
 			LOGGER.log(Level.SEVERE, e.toString());
 			
-			BolsaEmpleoUtils.addMensajeDeError(e.getMessage(), bean, request);
-			response.sendRedirect("/srv/es/informacionadministrativa/bolsaempleo/error");
+			BolsaEmpleoUtils.redirectToError(bean, datos, request, response, e.getMessage());
 		}		
 	}
 	
@@ -163,6 +161,7 @@ public class ControladorParametrosConfiguracion extends HttpServlet {
 	
 	/** edita los parametros de configuracion .
 	 * @param bean bean de la vista a la que poner los valores .
+	 * @param datos .
 	 * @param request .
 	 * @param response .
 	 * @throws SQLException excepcion de bbdd.
@@ -170,7 +169,8 @@ public class ControladorParametrosConfiguracion extends HttpServlet {
 	 * @throws IOException .
 	 * @throws UVException .
 	 */
-	private void editarParametros(VistaParametrosConfiguracion bean, HttpServletRequest request, HttpServletResponse response) throws SQLException, UVException, IOException {
+	private void editarParametros(VistaParametrosConfiguracion bean, UVDatos datos, HttpServletRequest request, HttpServletResponse response)
+			throws SQLException, UVException, IOException {
 		ModeloParametrosConfiguracion modelo = ModeloParametrosConfiguracion.obtenerInstancia();
 		List<ParametrosConfiguracion> parametros = modelo.listaParametros();
 		
@@ -185,6 +185,7 @@ public class ControladorParametrosConfiguracion extends HttpServlet {
 		bean.getMensajesDeExito().add(MENSAJE_EXITO_EDITAR);
 		
 		BolsaEmpleoUtils.addMensajeDeExito(MENSAJE_EXITO_EDITAR, bean, request);
+		datos.setRespuestaEnviada(true);
 		response.sendRedirect(request.getServletPath());
 	}
 

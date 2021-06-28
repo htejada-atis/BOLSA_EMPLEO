@@ -20,6 +20,7 @@ import es.ujaen.uvirtual.modulo.bolsaempleo.modelo.ModeloBaremacionItems;
 import es.ujaen.uvirtual.modulo.bolsaempleo.modelo.ModeloBaremacionApartados;
 import es.ujaen.uvirtual.modulo.bolsaempleo.modelo.ModeloBaremacionBloques;
 import es.ujaen.uvirtual.modulo.bolsaempleo.modelo.ModeloMeritosPreferentes;
+import es.ujaen.uvirtual.modulo.bolsaempleo.modelo.ModeloParametrosConfiguracion;
 import es.ujaen.uvirtual.modulo.bolsaempleo.modelo.ModeloRol;
 import es.ujaen.uvirtual.modulo.bolsaempleo.modelo.ModeloUsuarioBolsaEmpleo;
 import es.ujaen.uvirtual.modulo.bolsaempleo.utilidades.BolsaEmpleoDataTable;
@@ -136,19 +137,19 @@ public class ControladorMeritosPreferentes extends HttpServlet {
 					nuevoMerito(bean);
 					break;
 				case ACCION_NUEVO_MERITO_CONFIRM:
-					nuevoMeritoConfirm(bean, request, response);
+					nuevoMeritoConfirm(bean, datos, request, response);
 					break;
 				case ACCION_MODIFICAR:
 					editarMerito(bean, request);
 					break;
 				case ACCION_MODIFICAR_MERITO_CONFIRM:
-					editarMeritoConfirm(bean, request, response);
+					editarMeritoConfirm(bean, datos, request, response);
 					break;
 				case ACCION_ACTIVAR:
-					activarMerito(bean, request, response);
+					activarMerito(bean, datos, request, response);
 					break;
 				case ACCION_DESACTIVAR:
-					desactivarMerito(bean, request, response);
+					desactivarMerito(bean, datos, request, response);
 					break;
 				case ACCION_NUEVA_OPCION:
 					nuevaOpcion(bean, request);
@@ -157,7 +158,7 @@ public class ControladorMeritosPreferentes extends HttpServlet {
 					nuevaOpcionConfirm(bean, request, response);
 					break;
 				case ACCION_DESACTIVAR_OPCION:
-					desactivarOpcion(bean, request, response);
+					desactivarOpcion(bean, datos, request, response);
 					break;
 				default:
 					errorFatal(bean, "Acción no contemplada");
@@ -175,10 +176,9 @@ public class ControladorMeritosPreferentes extends HttpServlet {
 			datos.getFicherosJS().add("/js/jquery-1.latest.min.js");
 			datos.getFicherosJS().add("/js/jquery-ui-1.10.4.min.js");
 			datos.getFicherosJS().add("/js/jquery.ui.datepicker-es.js");
-			datos.getFicherosJS().add("/js/bolsaempleo/utils.js");
-			datos.getFicherosJS().add("/js/bolsaempleo/datatable.js");
+			datos.getFicherosJS().add(ModeloParametrosConfiguracion.JS_BOLSA_EMPLEO);
 			datos.getFicherosCSS().add("/css/intranet.css");
-			datos.getFicherosCSS().add("/css/ujaen_bolsa_empleo.css");
+			datos.getFicherosCSS().add(ModeloParametrosConfiguracion.CSS_BOLSA_EMPLEO);
 			datos.getFicherosCSS().add("/css/jqueryujaen/jquery-ui-1.8.16.custom.css");
 		}
 	}
@@ -197,8 +197,7 @@ public class ControladorMeritosPreferentes extends HttpServlet {
 			LOGGER.log(Level.SEVERE, Formateador.getStackTrace(e));
 			LOGGER.log(Level.SEVERE, e.toString());
 			
-			BolsaEmpleoUtils.addMensajeDeError(e.getMessage(), bean, request);
-			response.sendRedirect("/srv/es/informacionadministrativa/bolsaempleo/error");
+			BolsaEmpleoUtils.redirectToError(bean, datos, request, response, e.getMessage());
 		}				
 	}
 	
@@ -220,7 +219,7 @@ public class ControladorMeritosPreferentes extends HttpServlet {
 	}
 	
 	private void datatable(VistaMeritosPreferentes bean, UVDatos datos, HttpServletRequest request, HttpServletResponse response) 
-			throws SQLException, UVException, IOException {
+			throws IOException {
 		datos.setRespuestaEnviada(true);
 		datos.setContentType(RESPONSE_AJAX_CONTENTTYPE);		
 		response.setContentType(RESPONSE_AJAX_CONTENTTYPE);
@@ -250,7 +249,7 @@ public class ControladorMeritosPreferentes extends HttpServlet {
 	}
 	
 	private void datatableOpciones(VistaMeritosPreferentes bean, UVDatos datos, HttpServletRequest request, HttpServletResponse response) 
-			throws SQLException, UVException, IOException {
+			throws IOException {
 		datos.setRespuestaEnviada(true);
 		datos.setContentType(RESPONSE_AJAX_CONTENTTYPE);		
 		response.setContentType(RESPONSE_AJAX_CONTENTTYPE);
@@ -289,7 +288,8 @@ public class ControladorMeritosPreferentes extends HttpServlet {
 		bean.setVista(JSP_FORM);		
 	}
 	
-	private void nuevoMeritoConfirm(VistaMeritosPreferentes bean, HttpServletRequest request, HttpServletResponse response) throws SQLException, UVException, IOException {
+	private void nuevoMeritoConfirm(VistaMeritosPreferentes bean, UVDatos datos, HttpServletRequest request, HttpServletResponse response)
+			throws SQLException, UVException, IOException {
 		bean.setMeritoPreferente(null);
 		bean.setItemsBaremacion(ModeloBaremacionItems.obtenerInstancia().listaItemBaremacion());
 		bean.setBloqueBaremacion(ModeloBaremacionBloques.obtenerInstancia().listaBloqueBaremacion());
@@ -302,6 +302,7 @@ public class ControladorMeritosPreferentes extends HttpServlet {
 		ModeloMeritosPreferentes.obtenerInstancia().crearMeritoPreferente(this.validate(merito, request), bean.getUsuarioLogeado());
 					
 		BolsaEmpleoUtils.addMensajeDeExito("Mérito preferente añadido correctamente", bean, request);
+		datos.setRespuestaEnviada(true);
 		response.sendRedirect(request.getServletPath());
 	}
 	
@@ -315,7 +316,8 @@ public class ControladorMeritosPreferentes extends HttpServlet {
 		bean.setVista(JSP_FORM);
 	}
 	
-	private void editarMeritoConfirm(VistaMeritosPreferentes bean, HttpServletRequest request, HttpServletResponse response) throws SQLException, UVException, IOException {
+	private void editarMeritoConfirm(VistaMeritosPreferentes bean, UVDatos datos, HttpServletRequest request, HttpServletResponse response)
+			throws SQLException, UVException, IOException {
 		MeritoPreferente merito = ModeloMeritosPreferentes.obtenerInstancia().getMeritoPreferenteById(Formateador.leeParametroInteger(request.getParameter(PARAM_ID)));
 				
 		bean.setMeritoPreferente(merito);
@@ -327,26 +329,31 @@ public class ControladorMeritosPreferentes extends HttpServlet {
 		ModeloMeritosPreferentes.obtenerInstancia().editarMeritoPreferente(this.validate(merito, request), bean.getUsuarioLogeado());
 		
 		BolsaEmpleoUtils.addMensajeDeExito("Mérito preferente editado correctamente", bean, request);
+		datos.setRespuestaEnviada(true);
 		response.sendRedirect(request.getServletPath());
 	}
 		
-	private void activarMerito(VistaMeritosPreferentes bean, HttpServletRequest request, HttpServletResponse response) throws SQLException, UVException, IOException {
+	private void activarMerito(VistaMeritosPreferentes bean, UVDatos datos, HttpServletRequest request, HttpServletResponse response)
+			throws SQLException, UVException, IOException {
 		MeritoPreferente merito = ModeloMeritosPreferentes.obtenerInstancia().getMeritoPreferenteById(Formateador.leeParametroInteger(request.getParameter(PARAM_ID)));
 		
 		ModeloMeritosPreferentes.obtenerInstancia().cambiaFlagActivoMeritoPreferente(merito, "S", bean.getUsuarioLogeado());
 		bean.setVista(JSP_INDEX);
 		
 		BolsaEmpleoUtils.addMensajeDeExito("Mérito preferente activado correctamente", bean, request);
+		datos.setRespuestaEnviada(true);
 		response.sendRedirect(request.getServletPath());
 	}
 	
-	private void desactivarMerito(VistaMeritosPreferentes bean, HttpServletRequest request, HttpServletResponse response) throws SQLException, UVException, IOException {
+	private void desactivarMerito(VistaMeritosPreferentes bean, UVDatos datos, HttpServletRequest request, HttpServletResponse response)
+			throws SQLException, UVException, IOException {
 		MeritoPreferente merito = ModeloMeritosPreferentes.obtenerInstancia().getMeritoPreferenteById(Formateador.leeParametroInteger(request.getParameter(PARAM_ID)));
 		
 		ModeloMeritosPreferentes.obtenerInstancia().cambiaFlagActivoMeritoPreferente(merito, "N", bean.getUsuarioLogeado());
 		bean.setVista(JSP_INDEX);
 		
 		BolsaEmpleoUtils.addMensajeDeExito("Mérito preferente activado correctamente", bean, request);
+		datos.setRespuestaEnviada(true);
 		response.sendRedirect(request.getServletPath());
 	}
 
@@ -369,7 +376,8 @@ public class ControladorMeritosPreferentes extends HttpServlet {
 		response.sendRedirect(request.getServletPath() + "?" + PARAM_ACCION + "=" + ACCION_MODIFICAR + "&" + PARAM_ID + "=" + merito.getCodNum());		
 	}
 	
-	private void desactivarOpcion(VistaMeritosPreferentes bean, HttpServletRequest request, HttpServletResponse response) throws SQLException, UVException, IOException {
+	private void desactivarOpcion(VistaMeritosPreferentes bean, UVDatos datos, HttpServletRequest request, HttpServletResponse response)
+			throws SQLException, UVException, IOException {
 		MeritoPreferente merito = ModeloMeritosPreferentes.obtenerInstancia().getMeritoPreferenteById(Formateador.leeParametroInteger(request.getParameter(PARAM_ID)));
 		MeritoPreferenteOpcion meritoOpcion = ModeloMeritosPreferentes.obtenerInstancia().
 				getMeritoPreferenteOpcionById(Formateador.leeParametroInteger(request.getParameter(PARAM_ID_OPCION)));
@@ -380,6 +388,7 @@ public class ControladorMeritosPreferentes extends HttpServlet {
 		
 		ModeloMeritosPreferentes.obtenerInstancia().desactivarMeritoPreferenteOpcion(meritoOpcion, bean.getUsuarioLogeado());
 		BolsaEmpleoUtils.addMensajeDeExito("Opción mérito preferente desactivado correctamente", bean, request);
+		datos.setRespuestaEnviada(true);
 		response.sendRedirect(request.getServletPath());		
 	}
 	

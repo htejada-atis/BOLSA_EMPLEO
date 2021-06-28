@@ -116,12 +116,7 @@ public class TestBEPEvaluadores extends UtilsTestUsuarioBase {
 		// seleccionamos el departamento (refresh)
 		WebElement tableAreas = seleccionarDepartamento(DEP2);
 		
-		// seleccionamos todas las áreas menos una
-		int totalAreas = UtilsTestBolsaEmpleo.getTotalTable(tableAreas);
-		for (int i = 0; i < (totalAreas - 1); i++) {
-			UtilsTestBolsaEmpleo.selectRowTable(tableAreas, i);
-		}
-		UtilsTestBolsaEmpleo.assertTotalSelectedTable(tableAreas, totalAreas - 1);
+		UtilsTestBolsaEmpleo.assertTotalSelectedTable(tableAreas, UtilsTestBolsaEmpleo.getTotalTable(tableAreas));
 		
 		// añadimos evaluador (refresh)
 		WebElement input = UtilsTestBolsaEmpleo.waitVisibility(By.id("nombre_evaluador"));
@@ -131,7 +126,7 @@ public class TestBEPEvaluadores extends UtilsTestUsuarioBase {
 		
 		// mensaje 
 		List<String> mExito = UtilsTestBolsaEmpleo.getMensajesDeExito();
-		assertEquals(2, mExito.size());
+		assertEquals(3, mExito.size());
 		
 		// seleccionamos el primer item de la tabla
 		tableAreas = UtilsTestBolsaEmpleo.waitVisibility(By.id(ID_TABLE_AREAS));

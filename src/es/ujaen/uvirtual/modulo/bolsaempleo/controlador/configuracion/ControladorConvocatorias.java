@@ -14,11 +14,11 @@ import com.google.gson.Gson;
 import es.ujaen.uvirtual.beans.CodigoDescripcion;
 import es.ujaen.uvirtual.beans.UVDatos;
 import es.ujaen.uvirtual.beans.Usuario;
-import es.ujaen.uvirtual.modulo.bolsaempleo.beans.ApartadoBaremacion;
 import es.ujaen.uvirtual.modulo.bolsaempleo.beans.Convocatoria;
 import es.ujaen.uvirtual.modulo.bolsaempleo.modelo.ModeloBaremacionApartados;
 import es.ujaen.uvirtual.modulo.bolsaempleo.modelo.ModeloBolsa;
 import es.ujaen.uvirtual.modulo.bolsaempleo.modelo.ModeloConvocatoria;
+import es.ujaen.uvirtual.modulo.bolsaempleo.modelo.ModeloParametrosConfiguracion;
 import es.ujaen.uvirtual.modulo.bolsaempleo.modelo.ModeloRol;
 import es.ujaen.uvirtual.modulo.bolsaempleo.modelo.ModeloUsuarioBolsaEmpleo;
 import es.ujaen.uvirtual.modulo.bolsaempleo.utilidades.BolsaEmpleoDataTable;
@@ -129,19 +129,19 @@ public class ControladorConvocatorias extends HttpServlet {
 					formConvocatoria(bean);
 					break;
 				case ACCION_AGREGAR_CONVOCATORIA:
-					nuevaConvocatoria(bean, request, response);
+					nuevaConvocatoria(bean, datos, request, response);
 					break;
 				case ACCION_MODIFICAR_CONVOCATORIA:
-					editarConvocatoria(bean, request, response);
+					editarConvocatoria(bean, datos, request, response);
 					break;
 				case ACCION_ABRIR_CONVOCATORIA:
-					abrirConvocatoria(bean, request, response);
+					abrirConvocatoria(bean, datos, request, response);
 					break;
 				case ACCION_CERRAR_CONVOCATORIA:
-					cerrarConvocatoria(bean, request, response);
+					cerrarConvocatoria(bean, datos, request, response);
 					break;
 				case ACCION_BORRAR_CONVOCATORIA:
-					borrarConvocatoria(bean, request, response);
+					borrarConvocatoria(bean, datos, request, response);
 					break;
 				default:
 					errorFatal(bean, "Acción no contemplada");
@@ -159,11 +159,10 @@ public class ControladorConvocatorias extends HttpServlet {
 			datos.getFicherosJS().add("/js/jquery-1.latest.min.js");
 			datos.getFicherosJS().add("/js/jquery-ui-1.10.4.min.js");
 			datos.getFicherosJS().add("/js/jquery.ui.datepicker-es.js");
-			datos.getFicherosJS().add("/js/bolsaempleo/utils.js");
-			datos.getFicherosJS().add("/js/bolsaempleo/datatable.js");
+			datos.getFicherosJS().add(ModeloParametrosConfiguracion.JS_BOLSA_EMPLEO);
 			datos.getFicherosCSS().add("/css/intranet.css");
 			datos.getFicherosCSS().add("/css/jqueryujaen/jquery-ui-1.8.16.custom.css");
-			datos.getFicherosCSS().add("/css/ujaen_bolsa_empleo.css");			
+			datos.getFicherosCSS().add(ModeloParametrosConfiguracion.CSS_BOLSA_EMPLEO);			
 		}
 	}	
 	
@@ -181,8 +180,7 @@ public class ControladorConvocatorias extends HttpServlet {
 			LOGGER.log(Level.SEVERE, Formateador.getStackTrace(e));
 			LOGGER.log(Level.SEVERE, e.toString());
 			
-			BolsaEmpleoUtils.addMensajeDeError(e.getMessage(), bean, request);
-			response.sendRedirect("/srv/es/informacionadministrativa/bolsaempleo/error");
+			BolsaEmpleoUtils.redirectToError(bean, datos, request, response, e.getMessage());
 		}		
 	}
 	
@@ -237,7 +235,8 @@ public class ControladorConvocatorias extends HttpServlet {
 		bean.setVista(JSP_FORM_CONVOCATORIA);
 	}
 	
-	private void nuevaConvocatoria(VistaConvocatorias bean, HttpServletRequest request, HttpServletResponse response) throws UVException, SQLException, IOException {
+	private void nuevaConvocatoria(VistaConvocatorias bean, UVDatos datos, HttpServletRequest request, HttpServletResponse response)
+			throws UVException, SQLException, IOException {
 		bean.setVista(JSP_FORM_CONVOCATORIA);
 		
 		Convocatoria convocatoria = this.validateConvocatoria(request);
@@ -252,11 +251,13 @@ public class ControladorConvocatorias extends HttpServlet {
 			modelo.nuevaConvocatoria(convocatoria, bean.getUsuarioLogeado());
 						
 			BolsaEmpleoUtils.addMensajeDeExito(MENSAJE_INFO_CONVOCATORIAS_INSERTADA_CORRECTAMENTE, bean, request);
+			datos.setRespuestaEnviada(true);
 			response.sendRedirect(request.getServletPath());
 		}			
 	}
 		
-	private void editarConvocatoria(VistaConvocatorias bean, HttpServletRequest request, HttpServletResponse response) throws UVException, SQLException, IOException { 
+	private void editarConvocatoria(VistaConvocatorias bean, UVDatos datos, HttpServletRequest request, HttpServletResponse response)
+			throws UVException, SQLException, IOException { 
 		ModeloConvocatoria modelo = ModeloConvocatoria.obtenerInstancia();
 		Convocatoria convocatoria = modelo.getConvocatoriaById(Formateador.leeParametroInteger(request.getParameter(PARAM_CONVOCATORIA_ID)));
 		Integer solicitudes = modelo.getNumSolicitudesByConvocatoriaId(convocatoria.getCodNum());
@@ -282,16 +283,16 @@ public class ControladorConvocatorias extends HttpServlet {
 			modelo.actualizaConvocatoria(conFinal, bean.getUsuarioLogeado());
 			
 			BolsaEmpleoUtils.addMensajeDeExito(MENSAJE_INFO_CONVOCATORIA_ACTUALIZADA_CORRECTAMENTE, bean, request);
+			datos.setRespuestaEnviada(true);
 			response.sendRedirect(request.getServletPath());
 		}	
 	}	
 	
 	
-	private void abrirConvocatoria(VistaConvocatorias bean, HttpServletRequest request, HttpServletResponse response) throws UVException, SQLException, IOException {
+	private void abrirConvocatoria(VistaConvocatorias bean, UVDatos datos, HttpServletRequest request, HttpServletResponse response)
+			throws UVException, SQLException, IOException {
 		ModeloConvocatoria modelo = ModeloConvocatoria.obtenerInstancia();
 		ModeloBolsa modeloBolsas = ModeloBolsa.obtenerInstancia();
-		
-		ApartadoBaremacion apartado = new ApartadoBaremacion();
 		
 		Convocatoria convocatoria = modelo.getConvocatoriaById(Formateador.leeParametroInteger(request.getParameter(PARAM_CONVOCATORIA_ID)));
 		bean.setConvocatoria(convocatoria);
@@ -302,7 +303,7 @@ public class ControladorConvocatorias extends HttpServlet {
 			BolsaEmpleoUtils.addMensajeDeError(MENSAJE_ERROR_BOLSAS_BLOQUEADAS, bean, request);
 		} else if (modelo.hayConvocatoriaAbierta()) {
 			BolsaEmpleoUtils.addMensajeDeError(MENSAJE_ERROR_CONVOCATORIAS_ABIERTAS, bean, request);
-		} else if (ModeloBaremacionApartados.obtenerInstancia().checkSumaPorcentagesApartados(apartado, "Alcanzar")) {
+		} else if (ModeloBaremacionApartados.obtenerInstancia().checkSumaPorcentagesApartadosInvalido()) {
 			BolsaEmpleoUtils.addMensajeDeError(MENSAJE_ERROR_APARTADOS_PORCENTAGES, bean, request);
 		} else {
 			Integer codNum = Formateador.leeParametroInteger(request.getParameter(PARAM_CONVOCATORIA_ID));
@@ -312,11 +313,13 @@ public class ControladorConvocatorias extends HttpServlet {
 			BolsaEmpleoUtils.addMensajeDeExito(MENSAJE_INFO_CONVOCATORIA_ACTUALIZADA_CORRECTAMENTE, bean, request);
 		}
 		
+		datos.setRespuestaEnviada(true);
 		response.sendRedirect(request.getServletPath());
 	}
 	
 	
-	private void cerrarConvocatoria(VistaConvocatorias bean, HttpServletRequest request, HttpServletResponse response) throws UVException, SQLException, IOException {
+	private void cerrarConvocatoria(VistaConvocatorias bean, UVDatos datos, HttpServletRequest request, HttpServletResponse response)
+			throws UVException, SQLException, IOException {
 		ModeloConvocatoria modelo = ModeloConvocatoria.obtenerInstancia();
 		
 		Convocatoria convocatoria = modelo.getConvocatoriaById(Formateador.leeParametroInteger(request.getParameter(PARAM_CONVOCATORIA_ID)));
@@ -327,6 +330,7 @@ public class ControladorConvocatorias extends HttpServlet {
 		modelo.cambiaEstadoConvocatoria(conFinal, bean.getUsuarioLogeado());
 
 		BolsaEmpleoUtils.addMensajeDeExito(MENSAJE_INFO_CONVOCATORIA_ACTUALIZADA_CORRECTAMENTE, bean, request);
+		datos.setRespuestaEnviada(true);
 		response.sendRedirect(request.getServletPath());
 	}
 	
@@ -368,19 +372,22 @@ public class ControladorConvocatorias extends HttpServlet {
 	
 	/** eliminar una convocatoria.
 	 * @param bean .
+	 * @param datos .
 	 * @param request .
 	 * @param response .
 	 * @throws SQLException excepcion de bbdd.
 	 * @throws UVException en caso de error de parametros .
 	 * @throws IOException en caso de error de input u output .
 	 */
-	private void borrarConvocatoria(VistaConvocatorias bean, HttpServletRequest request, HttpServletResponse response) throws SQLException, UVException, IOException {
+	private void borrarConvocatoria(VistaConvocatorias bean, UVDatos datos, HttpServletRequest request, HttpServletResponse response)
+			throws SQLException, UVException, IOException {
 		ModeloConvocatoria modelo = ModeloConvocatoria.obtenerInstancia();
 		Integer codNum = Formateador.leeParametroInteger(request.getParameter(PARAM_CONVOCATORIA_ID));
 		Convocatoria convocatoria = new Convocatoria();
 		convocatoria.setCodNum(codNum);
 		modelo.borraConvocatoria(convocatoria, bean.getUsuarioLogeado());
 		BolsaEmpleoUtils.addMensajeDeExito(MENSAJE_EXITO_ELIMINAR, bean, request);
+		datos.setRespuestaEnviada(true);
 		response.sendRedirect(request.getServletPath());
 	}
 }

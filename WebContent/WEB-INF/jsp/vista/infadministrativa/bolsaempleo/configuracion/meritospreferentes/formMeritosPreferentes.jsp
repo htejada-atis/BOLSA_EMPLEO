@@ -315,7 +315,6 @@ MeritoPreferente merito = bean.getMeritoPreferente();
 		
 		$('#merito_tipo_calculo').on('change', function() {
 			var value = $(this).children("option:selected").attr('value');
-			console.log(value);
 			
 			switch(value) {
 			case '<%=ModeloMeritosPreferentes.TIPO_CALCULO_FACTOR%>':

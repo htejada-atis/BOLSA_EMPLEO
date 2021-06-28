@@ -21,6 +21,7 @@ import es.ujaen.uvirtual.beans.UVDatos;
 import es.ujaen.uvirtual.beans.Usuario;
 import es.ujaen.uvirtual.modulo.bolsaempleo.beans.Bolsa;
 import es.ujaen.uvirtual.modulo.bolsaempleo.modelo.ModeloBolsa;
+import es.ujaen.uvirtual.modulo.bolsaempleo.modelo.ModeloParametrosConfiguracion;
 import es.ujaen.uvirtual.modulo.bolsaempleo.modelo.ModeloRol;
 import es.ujaen.uvirtual.modulo.bolsaempleo.modelo.ModeloUsuarioBolsaEmpleo;
 import es.ujaen.uvirtual.modulo.bolsaempleo.utilidades.BolsaEmpleoDataTable;
@@ -100,7 +101,7 @@ public class ControladorBolsas extends HttpServlet {
 					listado(bean, datos, request, response);
 					break;
 				case ACCION_BOLSA:
-					accionSobreBolsas(bean, request, response);					
+					accionSobreBolsas(bean, datos, request, response);					
 					break;
 				default:
 					errorFatal(bean, "Acción no contemplada");
@@ -118,10 +119,9 @@ public class ControladorBolsas extends HttpServlet {
 			datos.getFicherosJS().add("/js/jquery-1.latest.min.js");
 			datos.getFicherosJS().add("/js/jquery-ui-1.10.4.min.js");
 			datos.getFicherosJS().add("/js/jquery.ui.datepicker-es.js");
-			datos.getFicherosJS().add("/js/bolsaempleo/utils.js");
-			datos.getFicherosJS().add("/js/bolsaempleo/datatable.js");
+			datos.getFicherosJS().add(ModeloParametrosConfiguracion.JS_BOLSA_EMPLEO);
 			datos.getFicherosCSS().add("/css/intranet.css");
-			datos.getFicherosCSS().add("/css/ujaen_bolsa_empleo.css");
+			datos.getFicherosCSS().add(ModeloParametrosConfiguracion.CSS_BOLSA_EMPLEO);
 			datos.getFicherosCSS().add("/css/jqueryujaen/jquery-ui-1.8.16.custom.css");
 		}
 	}
@@ -147,8 +147,7 @@ public class ControladorBolsas extends HttpServlet {
 			LOGGER.log(Level.SEVERE, Formateador.getStackTrace(e));
 			LOGGER.log(Level.SEVERE, e.toString());
 			
-			BolsaEmpleoUtils.addMensajeDeError(e.getMessage(), bean, request);
-			response.sendRedirect("/srv/es/informacionadministrativa/bolsaempleo/error");			
+			BolsaEmpleoUtils.redirectToError(bean, datos, request, response, e.getMessage());			
 		}
 	}
 	
@@ -195,7 +194,7 @@ public class ControladorBolsas extends HttpServlet {
 		}
 	}
 	
-	private void accionSobreBolsas(VistaEstadoBolsas bean, HttpServletRequest request, HttpServletResponse response) throws UVException, SQLException, IOException {
+	private void accionSobreBolsas(VistaEstadoBolsas bean, UVDatos datos, HttpServletRequest request, HttpServletResponse response) throws UVException, SQLException, IOException {
 		ModeloBolsa modelo = ModeloBolsa.obtenerInstancia();		
 		String selectedJson = EscapaHTML.ajustaCodificacion(request.getParameter(PARAM_BOLSAS_SELECCIONADAS));
 		int[] selected;
@@ -230,11 +229,13 @@ public class ControladorBolsas extends HttpServlet {
 				break;
 			default:
 				BolsaEmpleoUtils.addMensajeDeError(MENSAJE_ERROR_ACCION_BOLSA_NO_VALIDA, bean, request);
+				datos.setRespuestaEnviada(true);
 				response.sendRedirect(request.getServletPath());
 				return;
 		}
 		
 		BolsaEmpleoUtils.addMensajeDeExito(MENSAJE_EXITO_BOLSA_MODIFICADA_CORRECTAMENTE, bean, request);
+		datos.setRespuestaEnviada(true);
 		response.sendRedirect(request.getServletPath());
 	}
 }

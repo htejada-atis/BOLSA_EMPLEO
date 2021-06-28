@@ -113,19 +113,19 @@ public class ControladorGestionFicheros extends HttpServlet {
 					bean.setVista(RUTA_BEP_CONF + "ficheros.jsp");
 					break;
 				case ACCION_BORRAR_FICHEROS:
-					eliminarFicheros(bean, request, response);
+					eliminarFicheros(bean, datos, request, response);
 					break;
 				case ACCION_DATATABLE:
 					listadoFicheros(bean, datos, request, response);
 					return;
 				case ACCION_HACER_FICHEROS_PUBLICOS:
-					cambiarFicherosPublico(bean, request, response, true);
+					cambiarFicherosPublico(bean, datos, request, response, true);
 					break;
 				case ACCION_HACER_FICHEROS_PRIVADOS:
-					cambiarFicherosPublico(bean, request, response, false);
+					cambiarFicherosPublico(bean, datos, request, response, false);
 					break;
 				case ACCION_SUBIR_FICHERO:
-					agregarFichero(bean, request, response);
+					agregarFichero(bean, datos, request, response);
 					break;
 				default:
 					errorFatal(bean, "Acción no contemplada");
@@ -142,11 +142,10 @@ public class ControladorGestionFicheros extends HttpServlet {
 			datos.getFicherosJSP().add(bean.getVista());
 			datos.getFicherosJS().add("/js/jquery-1.latest.min.js");
 			datos.getFicherosJS().add("/js/jquery-ui-1.10.4.min.js");
-			datos.getFicherosJS().add("/js/bolsaempleo/utils.js");
-			datos.getFicherosJS().add("/js/bolsaempleo/datatable.js");
+			datos.getFicherosJS().add(ModeloParametrosConfiguracion.JS_BOLSA_EMPLEO);
 			datos.getFicherosCSS().add("/css/intranet.css");
 			datos.getFicherosCSS().add("/css/jqueryujaen/jquery-ui-1.8.16.custom.css");
-			datos.getFicherosCSS().add("/css/ujaen_bolsa_empleo.css");
+			datos.getFicherosCSS().add(ModeloParametrosConfiguracion.CSS_BOLSA_EMPLEO);
 		}
 	}
 	
@@ -164,8 +163,7 @@ public class ControladorGestionFicheros extends HttpServlet {
 			LOGGER.log(Level.SEVERE, Formateador.getStackTrace(e));
 			LOGGER.log(Level.SEVERE, e.toString());
 			
-			BolsaEmpleoUtils.addMensajeDeError(e.getMessage(), bean, request);
-			response.sendRedirect("/srv/es/informacionadministrativa/bolsaempleo/error");
+			BolsaEmpleoUtils.redirectToError(bean, datos, request, response, e.getMessage());
 		}		
 	}
 	
@@ -184,6 +182,7 @@ public class ControladorGestionFicheros extends HttpServlet {
 	
 	/** agrega un nuevo fichero .
 	 * @param bean bean de la vista a la que poner los valores .
+	 * @param datos .
 	 * @param request .
 	 * @param response .
 	 * @throws SQLException excepcion de bbdd .
@@ -191,7 +190,8 @@ public class ControladorGestionFicheros extends HttpServlet {
 	 * @throws IOException en caso de error de input u output .
 	 * @throws UVException en caso de error de parametros .
 	 */
-	private void agregarFichero(VistaFicheros bean, HttpServletRequest request, HttpServletResponse response) throws SQLException, ServletException, IOException, UVException {
+	private void agregarFichero(VistaFicheros bean, UVDatos datos, HttpServletRequest request, HttpServletResponse response)
+			throws SQLException, ServletException, IOException, UVException {
 		bean.setVista(RUTA_BEP_CONF + "formFichero.jsp");
 		
 		if (request.getParameter(PARAM_TITULO) != null) {
@@ -204,6 +204,7 @@ public class ControladorGestionFicheros extends HttpServlet {
 					
 					modelo.insertaFichero(fichero, bean.getUsuarioLogeado());
 					BolsaEmpleoUtils.addMensajeDeExito(MENSAJE_EXITO_AGREGAR, bean, request);
+					datos.setRespuestaEnviada(true);
 					response.sendRedirect(request.getServletPath());
 				} else {
 					throw new UVException("No se puede subir un fichero sin archivo");
@@ -214,6 +215,7 @@ public class ControladorGestionFicheros extends HttpServlet {
 	
 	/** cambia ficheros a publicos .
 	 * @param bean .
+	 * @param datos .
 	 * @param request .
 	 * @param response .
 	 * @param publico .
@@ -221,7 +223,7 @@ public class ControladorGestionFicheros extends HttpServlet {
 	 * @throws SQLException .
 	 * @throws UVException .
 	 */
-	private void cambiarFicherosPublico(VistaFicheros bean, HttpServletRequest request, HttpServletResponse response, Boolean publico)
+	private void cambiarFicherosPublico(VistaFicheros bean, UVDatos datos, HttpServletRequest request, HttpServletResponse response, Boolean publico)
 			throws SQLException, UVException, IOException {
 		ModeloFichero modelo = ModeloFichero.obtenerInstancia();
 		
@@ -239,18 +241,20 @@ public class ControladorGestionFicheros extends HttpServlet {
 			BolsaEmpleoUtils.addMensajeDeError(MENSAJE_ERROR_FICHEROS_SELECCIONADOS_INCORRECTOS, bean, request);
 		}
 		
+		datos.setRespuestaEnviada(true);
 		response.sendRedirect(request.getServletPath());
 	}
 	
 	/** eliminar ficheros .
 	 * @param bean .
+	 * @param datos .
 	 * @param request .
 	 * @param response .
 	 * @throws SQLException excepcion de bbdd .
 	 * @throws UVException en caso de error de parametros .
 	 * @throws IOException en caso de error de IO .
 	 */
-	private void eliminarFicheros(VistaFicheros bean, HttpServletRequest request, HttpServletResponse response) throws SQLException, UVException, IOException {
+	private void eliminarFicheros(VistaFicheros bean, UVDatos datos, HttpServletRequest request, HttpServletResponse response) throws SQLException, UVException, IOException {
 		ModeloFichero modelo = ModeloFichero.obtenerInstancia();
 		
 		Gson gson = new GsonBuilder().create();
@@ -267,6 +271,7 @@ public class ControladorGestionFicheros extends HttpServlet {
 			BolsaEmpleoUtils.addMensajeDeError(MENSAJE_ERROR_FICHEROS_SELECCIONADOS_INCORRECTOS, bean, request);
 		}
 		
+		datos.setRespuestaEnviada(true);
 		response.sendRedirect(request.getServletPath());
 	}
 	

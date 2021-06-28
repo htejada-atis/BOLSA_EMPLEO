@@ -22,6 +22,7 @@ import es.ujaen.uvirtual.modulo.bolsaempleo.beans.BloqueBaremacion;
 import es.ujaen.uvirtual.modulo.bolsaempleo.beans.ItemBaremacion;
 import es.ujaen.uvirtual.modulo.bolsaempleo.modelo.ModeloAfinidad;
 import es.ujaen.uvirtual.modulo.bolsaempleo.modelo.ModeloBaremacionItems;
+import es.ujaen.uvirtual.modulo.bolsaempleo.modelo.ModeloParametrosConfiguracion;
 import es.ujaen.uvirtual.modulo.bolsaempleo.modelo.ModeloRol;
 import es.ujaen.uvirtual.modulo.bolsaempleo.modelo.ModeloBaremacionApartados;
 import es.ujaen.uvirtual.modulo.bolsaempleo.modelo.ModeloBaremacionBloques;
@@ -78,7 +79,6 @@ public class ControladorItemsBaremacion extends HttpServlet {
 	public static final String MENSAJE_EXITO_BLOQUE_EDITAR = "Apartado editado correctamente";
 	public static final String MENSAJE_EXITO_BLOQUE_DESACTIVAR = "Apartado desactivado correctamente";
 	public static final String MENSAJE_EXITO_BLOQUE_ACTIVAR = "Apartado activado correctamente";
-	public static final String MENSAJE_ERROR_BLOQUE_NUMMAXMERITOS_NUMERICO = "El número máximo de méritos debe ser un número";
 	public static final String MENSAJE_ERROR_BLOQUE_NUMMAXMERITOS_MINIMO = "El número máximo de méritos debe ser al menos uno";
 	
 	// acciones items
@@ -132,8 +132,8 @@ public class ControladorItemsBaremacion extends HttpServlet {
 	public static final String MENSAJE_ERROR_NOMBRE_VACIO = "El nombre no puede estar vacio";
 	public static final String MENSAJE_ERROR_NOMBRE_MAXIMO = "El nombre no puede contener mas de %d caracteres";
 	public static final String MENSAJE_ERROR_DESCRIPCION_MAXIMO = "La descripción no puede ser mayor que %d caracteres";
-	public static final String MENSAJE_ERROR_VALOR_NO_VALIDO = "Valor no válido";
-	public static final String MENSAJE_ERROR_AFINIDAD_VACIO = "La afinidad no puede estar vacia";
+	public static final String MENSAJE_ERROR_SIN_PERMISO_PERSONAL = "No tienes permiso de personal";
+	public static final String MENSAJE_ERROR_ACCION_NO_DEFINIDA = "Acción no definida";
 	
 	// vistas	
 	public static final String RUTA_BEP_CONF = "/WEB-INF/jsp/vista/infadministrativa/bolsaempleo/configuracion/itemsbaremacion/";
@@ -184,6 +184,7 @@ public class ControladorItemsBaremacion extends HttpServlet {
 				case ACCION_APARTADO_SELECCIONADO:
 					accionesApartados(bean, datos, request, response, nombreAccion);					
 					break;
+					
 				case ACCION_DATATABLE_BLOQUES:
 				case ACCION_AGREGAR_BLOQUE:
 				case ACCION_AGREGAR_BLOQUE_CONFIRM:
@@ -210,7 +211,7 @@ public class ControladorItemsBaremacion extends HttpServlet {
 					break;
 				
 				default:
-					errorFatal(bean);
+					errorFatal(bean, datos, request, response);
 			}
 		} catch (UVException e) {
 			LOGGER.log(Level.WARNING, e.toString());
@@ -225,10 +226,9 @@ public class ControladorItemsBaremacion extends HttpServlet {
 			datos.getFicherosJS().add("/js/jquery-1.latest.min.js");
 			datos.getFicherosJS().add("/js/jquery-ui-1.10.4.min.js");
 			datos.getFicherosJS().add("/js/jquery.ui.datepicker-es.js");
-			datos.getFicherosJS().add("/js/bolsaempleo/utils.js");
-			datos.getFicherosJS().add("/js/bolsaempleo/datatable.js");
+			datos.getFicherosJS().add(ModeloParametrosConfiguracion.JS_BOLSA_EMPLEO);
 			datos.getFicherosCSS().add("/css/intranet.css");
-			datos.getFicherosCSS().add("/css/ujaen_bolsa_empleo.css");
+			datos.getFicherosCSS().add(ModeloParametrosConfiguracion.CSS_BOLSA_EMPLEO);
 			datos.getFicherosCSS().add("/css/jqueryujaen/jquery-ui-1.8.16.custom.css");
 		}
 	}
@@ -254,20 +254,18 @@ public class ControladorItemsBaremacion extends HttpServlet {
 			bean.setUsuarioLogeado(ModeloUsuarioBolsaEmpleo.obtenerInstancia().getOrCreateUsuario(datos));
 
 			if (!bean.getUsuarioLogeado().getRol().getCodNum().equals(ModeloRol.ID_ROL_SERVICIO_PERSONAL)) {
-				throw new UVException("No tienes permiso de personal");
+				throw new UVException(MENSAJE_ERROR_SIN_PERMISO_PERSONAL);
 			}
 		} catch (UVException e) {
 			LOGGER.log(Level.SEVERE, Formateador.getStackTrace(e));
 			LOGGER.log(Level.SEVERE, e.toString());
 			
-			BolsaEmpleoUtils.addMensajeDeError(e.getMessage(), bean, request);
-			response.sendRedirect("/srv/es/informacionadministrativa/bolsaempleo/error");
+			BolsaEmpleoUtils.redirectToError(bean, datos, request, response, e.getMessage());
 		}		
 	}
 	
-	private void errorFatal(VistaItemsBaremacion bean) {
-		bean.getMensajesDeError().add("Acción no definida");
-		this.indice(bean);
+	private void errorFatal(VistaItemsBaremacion bean, UVDatos datos, HttpServletRequest request, HttpServletResponse response) throws IOException, UVException {
+		BolsaEmpleoUtils.redirectToError(bean, datos, request, response, MENSAJE_ERROR_ACCION_NO_DEFINIDA);		
 	}
 	
 	///////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -293,16 +291,16 @@ public class ControladorItemsBaremacion extends HttpServlet {
 				editarApartadoConfirm(bean, request);
 				break;
 			case ACCION_DESACTIVAR_APARTADO:
-				desactivarApartado(bean, request, response);
+				desactivarApartado(bean, datos, request, response);
 				break;
 			case ACCION_ACTIVAR_APARTADO:
-				activarApartado(bean, request, response);
+				activarApartado(bean, datos, request, response);
 				break;
 			case ACCION_APARTADO_SELECCIONADO:
 				seleccionarApartado(bean, request);
 				break;	
 			default:
-				this.errorFatal(bean);
+				this.errorFatal(bean, datos, request, response);
 		}
 	}
 	
@@ -352,7 +350,8 @@ public class ControladorItemsBaremacion extends HttpServlet {
 		bean.setVista(JSP_ITEM_BAREMACION);				
 	}
 	
-	private void desactivarApartado(VistaItemsBaremacion bean, HttpServletRequest request, HttpServletResponse response) throws SQLException, UVException, IOException {
+	private void desactivarApartado(VistaItemsBaremacion bean, UVDatos datos, HttpServletRequest request, HttpServletResponse response)
+			throws SQLException, UVException, IOException {
 		bean.setVista(JSP_ITEM_BAREMACION);
 		
 		ModeloBaremacionApartados modelo = ModeloBaremacionApartados.obtenerInstancia();
@@ -362,10 +361,12 @@ public class ControladorItemsBaremacion extends HttpServlet {
 		modelo.desactivarApartado(apartado, bean.getUsuarioLogeado());
 		
 		BolsaEmpleoUtils.addMensajeDeExito(MENSAJE_EXITO_APARTADO_DESACTIVAR, bean, request);
+		datos.setRespuestaEnviada(true);
 		response.sendRedirect(request.getServletPath());
 	}
 	
-	private void activarApartado(VistaItemsBaremacion bean, HttpServletRequest request, HttpServletResponse response) throws SQLException, UVException, IOException {
+	private void activarApartado(VistaItemsBaremacion bean, UVDatos datos, HttpServletRequest request, HttpServletResponse response)
+			throws SQLException, UVException, IOException {
 		bean.setVista(JSP_ITEM_BAREMACION);
 		
 		ModeloBaremacionApartados modelo = ModeloBaremacionApartados.obtenerInstancia();
@@ -375,6 +376,7 @@ public class ControladorItemsBaremacion extends HttpServlet {
 		modelo.activarApartado(apartado, bean.getUsuarioLogeado());
 		
 		BolsaEmpleoUtils.addMensajeDeExito(MENSAJE_EXITO_APARTADO_ACTIVAR, bean, request);
+		datos.setRespuestaEnviada(true);
 		response.sendRedirect(request.getServletPath());
 	}
 	
@@ -465,7 +467,7 @@ public class ControladorItemsBaremacion extends HttpServlet {
 				seleccionarBloque(bean, request);
 				break;	
 			default:
-				this.errorFatal(bean);
+				this.errorFatal(bean, datos, request, response);
 		}
 	}
 	
@@ -655,13 +657,13 @@ public class ControladorItemsBaremacion extends HttpServlet {
 				seleccionarItem(bean, request);
 				break;
 			case ACCION_ITEM_EXCLUYENTE_SELECCIONADO:
-				seleccionarItemExcluyente(bean, request, response, true);
+				seleccionarItemExcluyente(bean, datos, request, response, true);
 				break;
 			case ACCION_ITEM_EXCLUYENTE_DESELECCIONADO:
-				seleccionarItemExcluyente(bean, request, response, false);
+				seleccionarItemExcluyente(bean, datos, request, response, false);
 				break;
 			default:
-				this.errorFatal(bean);
+				this.errorFatal(bean, datos, request, response);
 		}
 	}
 	
@@ -853,7 +855,7 @@ public class ControladorItemsBaremacion extends HttpServlet {
 	 * @throws IOException .
 	 * @throws SQLException .
 	 */
-	private void seleccionarItemExcluyente(VistaItemsBaremacion bean, HttpServletRequest request, HttpServletResponse response, Boolean seleccionado)
+	private void seleccionarItemExcluyente(VistaItemsBaremacion bean, UVDatos datos, HttpServletRequest request, HttpServletResponse response, Boolean seleccionado)
 			throws UVException, SQLException, IOException {
 		ModeloBaremacionItems modelo = ModeloBaremacionItems.obtenerInstancia();
 		
@@ -873,15 +875,15 @@ public class ControladorItemsBaremacion extends HttpServlet {
 		bean.setBloqueBaremacion(itemPadre.getBloqueBaremacion());
 		bean.setVista(RUTA_BEP_CONF + "formItemBaremacion.jsp");
 		
-		redireccionConItemSeleccionado(bean, request, response, ACCION_EDITAR_ITEM);
+		redireccionConItemSeleccionado(bean, datos, request, response, ACCION_EDITAR_ITEM);
 	}
 	
-	private void redireccionConItemSeleccionado(VistaItemsBaremacion bean, HttpServletRequest request, HttpServletResponse response, String accion)
+	private void redireccionConItemSeleccionado(VistaItemsBaremacion bean, UVDatos datos, HttpServletRequest request, HttpServletResponse response, String accion)
 			throws IOException {
 		Map<String, String> params = new HashMap<>();
 		params.put(PARAM_ACCION, accion);
 		params.put(PARAM_ITEM, bean.getItemBaremacion().getCodNum().toString());
-		BolsaEmpleoUtils.redirectWithParams(request, response, params);
+		BolsaEmpleoUtils.redirectWithParams(datos, request, response, params);
 	}
 	
 		

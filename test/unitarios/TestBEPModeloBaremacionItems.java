@@ -33,6 +33,7 @@ public class TestBEPModeloBaremacionItems {
 	
 	private static final Integer CODNUM = 1;
 	private static final Integer CODNUM_2 = 2;
+	private static final Integer CODNUM_SIN_USAR = 15;
 	private static final Integer CODNUM_NOEXISTE = 111_111_111;
 	private static final String CODIGO = "12";
 	private static final String NOMBRE = "NOMBRE ÍTEM";
@@ -81,7 +82,7 @@ public class TestBEPModeloBaremacionItems {
 	@Test
 	public void testA02getUltimoCodigoItem() {
 		try {
-			String codigo = ModeloBaremacionItems.obtenerInstancia().getUltimoCodigoItem(this.obtenerBloque());
+			String codigo = ModeloBaremacionItems.obtenerInstancia().getUltimoCodigoItem(this.obtenerBloque(CODNUM));
 			assertNotNull(codigo);
 			assertNotEquals(codigo, "0");
 		} catch (SQLException | UVException ex) {
@@ -102,7 +103,7 @@ public class TestBEPModeloBaremacionItems {
 		params.put(BolsaEmpleoDataTable.PARAM_ORDER_DIRECTION, new String[] {BolsaEmpleoDataTable.PARAM_ORDER_DIRECTION_VALUE_ASC});
 
 		try {
-			BolsaEmpleoDataTable<ItemBaremacion> dt = ModeloBaremacionItems.obtenerInstancia().listadoItemsBaremacionDatatable(params, this.obtenerBloque());
+			BolsaEmpleoDataTable<ItemBaremacion> dt = ModeloBaremacionItems.obtenerInstancia().listadoItemsBaremacionDatatable(params, this.obtenerBloque(CODNUM));
 			assertFalse(dt.getData().isEmpty());
 		} catch (SQLException | UVException ex) {
 			fail(String.format(MENSAJE_ERROR_HAY_EXCEPCION, ex.toString()));
@@ -115,7 +116,7 @@ public class TestBEPModeloBaremacionItems {
 	@Test
 	public void testA04insertaItem() {
 		try {
-			BloqueBaremacion bloque = this.obtenerBloque();
+			BloqueBaremacion bloque = this.obtenerBloque(CODNUM);
 			ItemBaremacion item = new ItemBaremacion();
 			item.setBloqueBaremacion(bloque);
 			item.setCodigo(CODIGO);
@@ -156,9 +157,9 @@ public class TestBEPModeloBaremacionItems {
 	@Test
 	public void testA06actualizaItem() {
 		try {					
-			BloqueBaremacion bloque = this.obtenerBloque();
-			ItemBaremacion item = ModeloBaremacionItems.obtenerInstancia().getItemBaremacionById(CODNUM);
-			assertEquals(item.getCodNum(), CODNUM);
+			BloqueBaremacion bloque = this.obtenerBloque(CODNUM_SIN_USAR);
+			ItemBaremacion item = ModeloBaremacionItems.obtenerInstancia().getItemBaremacionById(CODNUM_SIN_USAR);
+			assertEquals(item.getCodNum(), CODNUM_SIN_USAR);
 			
 			item.setBloqueBaremacion(bloque);
 			item.setCodigo(CODIGO);
@@ -172,7 +173,7 @@ public class TestBEPModeloBaremacionItems {
 			item.setActivo(true);
 			
 			ModeloBaremacionItems.obtenerInstancia().actualizaItem(item, UtilsTestBolsaEmpleo.getUsuario("personal1"));
-			ItemBaremacion itemUpd = ModeloBaremacionItems.obtenerInstancia().getItemBaremacionById(CODNUM);
+			ItemBaremacion itemUpd = ModeloBaremacionItems.obtenerInstancia().getItemBaremacionById(CODNUM_SIN_USAR);
 			
 			assertEquals(itemUpd.getCodigo(), CODIGO);
 			assertEquals(itemUpd.getNombre(), NOMBRE);
@@ -210,7 +211,7 @@ public class TestBEPModeloBaremacionItems {
 	@Test
 	public void testA08listaItemsBaremacionDeUnApartado() {
 		try {
-			List<ItemBaremacion> listaItems = ModeloBaremacionItems.obtenerInstancia().getItemsDeApartado(this.obtenerBloque().getApartadoBaremacion());
+			List<ItemBaremacion> listaItems = ModeloBaremacionItems.obtenerInstancia().getItemsDeApartado(this.obtenerBloque(CODNUM).getApartadoBaremacion());
 			assertNotEquals(MENSAJE_ITEMS_DEVUELTOS, 0, listaItems.size());
 		} catch (SQLException | UVException ex) {
 			fail(String.format(MENSAJE_ERROR_HAY_EXCEPCION, ex.toString()));
@@ -354,10 +355,67 @@ public class TestBEPModeloBaremacionItems {
 		assertEquals(ModeloBaremacionItems.ERROR_ITEM_MISMO_CODIGO, throwable.getMessage());
 	}
 	
+	/**
+	 * actualiza item y se está usando.
+	 */
+	@Test
+	public void testE04actualizaItemUsandose() {
+		Throwable throwable = assertThrows(Throwable.class, () -> {
+			ItemBaremacion item = ModeloBaremacionItems.obtenerInstancia().getItemBaremacionById(CODNUM);
+			ModeloBaremacionItems.obtenerInstancia().actualizaItem(item, UtilsTestBolsaEmpleo.getUsuario("personal1"));
+		});
+		
+		assertEquals(UVException.class, throwable.getClass());
+		assertEquals(ModeloBaremacionItems.ERROR_ITEM_USANDOSE, throwable.getMessage());
+	}
+	
+	/**
+	 * actualiza items.
+	 * @throws UVException .
+	 * @throws SQLException .
+	 */ 
+	@Test
+	public void testE05actualizaChequeosItems() throws SQLException, UVException {
+		ItemBaremacion item = ModeloBaremacionItems.obtenerInstancia().getItemBaremacionById(CODNUM);
+		
+		Throwable throwable = assertThrows(Throwable.class, () -> {
+			ItemBaremacion copy = new ItemBaremacion(item);
+			copy.setUnidades("FOO");			
+			ModeloBaremacionItems.obtenerInstancia().actualizaItem(copy, UtilsTestBolsaEmpleo.getUsuario("personal1"));
+		});
+		assertEquals(UVException.class, throwable.getClass());
+		assertEquals(ModeloBaremacionItems.ERROR_TIPO_UNIDAD_NO_VALIDA, throwable.getMessage());
+		
+		throwable = assertThrows(Throwable.class, () -> {
+			ItemBaremacion copy = new ItemBaremacion(item);
+			copy.setValorMinimo(-1.0);
+			ModeloBaremacionItems.obtenerInstancia().actualizaItem(copy, UtilsTestBolsaEmpleo.getUsuario("personal1"));
+		});
+		assertEquals(UVException.class, throwable.getClass());
+		assertEquals(String.format(ModeloBaremacionItems.ERROR_VALOR_MINIMO, ModeloBaremacionItems.MINIMO_VALOR_FLOAT), throwable.getMessage());
+		
+		throwable = assertThrows(Throwable.class, () -> {
+			ItemBaremacion copy = new ItemBaremacion(item);
+			copy.setValorMaximo(-1.0);
+			ModeloBaremacionItems.obtenerInstancia().actualizaItem(copy, UtilsTestBolsaEmpleo.getUsuario("personal1"));
+		});
+		assertEquals(UVException.class, throwable.getClass());
+		assertEquals(String.format(ModeloBaremacionItems.ERROR_VALOR_MAXIMO, ModeloBaremacionItems.MINIMO_VALOR_FLOAT), throwable.getMessage());
+		
+		throwable = assertThrows(Throwable.class, () -> {
+			ItemBaremacion copy = new ItemBaremacion(item);
+			copy.setValorMinimo(2.0);
+			copy.setValorMaximo(1.0);
+			ModeloBaremacionItems.obtenerInstancia().actualizaItem(copy, UtilsTestBolsaEmpleo.getUsuario("personal1"));
+		});
+		assertEquals(UVException.class, throwable.getClass());
+		assertEquals(String.format(ModeloBaremacionItems.ERROR_VALOR_MAXIMO_MINIMO, ModeloBaremacionItems.MINIMO_VALOR_FLOAT), throwable.getMessage());
+	}
+	
 	// UTILS
 	
-	private BloqueBaremacion obtenerBloque() throws SQLException, UVException {
-		return ModeloBaremacionItems.obtenerInstancia().getItemBaremacionById(CODNUM).getBloqueBaremacion();
+	private BloqueBaremacion obtenerBloque(Integer codNumItem) throws SQLException, UVException {
+		return ModeloBaremacionItems.obtenerInstancia().getItemBaremacionById(codNumItem).getBloqueBaremacion();
 	}
 	
 	private List<ItemBaremacion> desactivarTodosItems() throws UVException {

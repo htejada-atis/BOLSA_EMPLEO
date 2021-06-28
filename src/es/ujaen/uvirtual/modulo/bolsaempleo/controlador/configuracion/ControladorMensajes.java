@@ -19,17 +19,18 @@ import com.google.gson.reflect.TypeToken;
 import es.ujaen.uvirtual.beans.CodigoDescripcion;
 import es.ujaen.uvirtual.beans.UVDatos;
 import es.ujaen.uvirtual.beans.Usuario;
+import es.ujaen.uvirtual.modulo.bolsaempleo.beans.Destinatario;
 import es.ujaen.uvirtual.modulo.bolsaempleo.beans.Mensaje;
 import es.ujaen.uvirtual.modulo.bolsaempleo.beans.UsuarioBolsaEmpleo;
 import es.ujaen.uvirtual.modulo.bolsaempleo.modelo.ModeloArea;
 import es.ujaen.uvirtual.modulo.bolsaempleo.modelo.ModeloConvocatoria;
 import es.ujaen.uvirtual.modulo.bolsaempleo.modelo.ModeloMensajes;
+import es.ujaen.uvirtual.modulo.bolsaempleo.modelo.ModeloParametrosConfiguracion;
 import es.ujaen.uvirtual.modulo.bolsaempleo.modelo.ModeloRol;
 import es.ujaen.uvirtual.modulo.bolsaempleo.modelo.ModeloUsuarioBolsaEmpleo;
 import es.ujaen.uvirtual.modulo.bolsaempleo.utilidades.BolsaEmpleoDataTable;
 import es.ujaen.uvirtual.modulo.bolsaempleo.utilidades.BolsaEmpleoUtils;
 import es.ujaen.uvirtual.modulo.bolsaempleo.vistas.VistaMensajes;
-import es.ujaen.uvirtual.utilidades.EnviaCorreo;
 import es.ujaen.uvirtual.utilidades.EscapaHTML;
 import es.ujaen.uvirtual.utilidades.Formateador;
 import es.ujaen.uvirtual.utilidades.UVException;
@@ -44,7 +45,7 @@ import es.ujaen.uvirtual.utilidades.UVException;
 		"/srv/es/informacionadministrativa/bolsaempleo/configuracion/mensajeria",
 		"/srv/en/informacionadministrativa/bolsaempleo/configuracion/mensajeria",
 		"/srv/es/ajax/informacionadministrativa/bolsaempleo/configuracion/mensajeria",
-		"/srv/en/ajax/informacionadministrativa/bolsaempleo/configuracion/mensajeria" 
+		"/srv/en/ajax/informacionadministrativa/bolsaempleo/configuracion/mensajeria"
 })
 public class ControladorMensajes extends HttpServlet {
 	private static final long serialVersionUID = 1L;
@@ -85,6 +86,7 @@ public class ControladorMensajes extends HttpServlet {
 	public static final String MENSAJE_EXITO_DESTINATARIO_AGREGADO = "Destinatario agregado correctamente";
 	public static final String MENSAJE_EXITO_DESTINATARIOS_BORRADOS = "Destinatarios borrados correctamente";
 	public static final String MENSAJE_EXITO_DESTINATARIO_BORRADO = "Destinatario borrado correctamente";
+	public static final String MENSAJE_EXITO_ENVIADO = "Mensaje enviado correctamente";
 	public static final String MENSAJE_EXITO_MENSAJE_GUARDADO = "Mensaje guardado correctamente";
 
 	// ruta vistas
@@ -139,7 +141,7 @@ public class ControladorMensajes extends HttpServlet {
 					listadoMensajes(bean, datos, request, response);
 					break;
 				case ACCION_NUEVO_MENSAJE:
-					nuevoMensaje(bean, request, response);
+					nuevoMensaje(bean, datos, request, response);
 					break;
 				default:
 					errorFatal(bean, MENSAJE_ERROR_ACCION_NO_CONTEMPLADA);
@@ -157,11 +159,10 @@ public class ControladorMensajes extends HttpServlet {
 			datos.getFicherosJS().add("/js/jquery-1.latest.min.js");
 			datos.getFicherosJS().add("/js/jquery-ui-1.10.4.min.js");
 			datos.getFicherosJS().add("/js/jquery.ui.datepicker-es.js");
-			datos.getFicherosJS().add("/js/bolsaempleo/utils.js");
-			datos.getFicherosJS().add("/js/bolsaempleo/datatable.js");
+			datos.getFicherosJS().add(ModeloParametrosConfiguracion.JS_BOLSA_EMPLEO);
 			datos.getFicherosCSS().add("/css/intranet.css");
 			datos.getFicherosCSS().add("/css/jqueryujaen/jquery-ui-1.8.16.custom.css");
-			datos.getFicherosCSS().add("/css/ujaen_bolsa_empleo.css");
+			datos.getFicherosCSS().add(ModeloParametrosConfiguracion.CSS_BOLSA_EMPLEO);
 		}
 	}
 
@@ -179,8 +180,7 @@ public class ControladorMensajes extends HttpServlet {
 			LOGGER.log(Level.SEVERE, Formateador.getStackTrace(e));
 			LOGGER.log(Level.SEVERE, e.toString());
 			
-			BolsaEmpleoUtils.addMensajeDeError(e.getMessage(), bean, request);
-			response.sendRedirect("/srv/es/informacionadministrativa/bolsaempleo/error");
+			BolsaEmpleoUtils.redirectToError(bean, datos, request, response, e.getMessage());
 		}
 	}
 
@@ -218,10 +218,10 @@ public class ControladorMensajes extends HttpServlet {
 		
 		switch (nombreAccion) {
 			case ACCION_AGREGAR_DESTINATARIOS:
-				agregarDestinatarios(bean, request, response);
+				agregarDestinatarios(bean, datos, request, response);
 				break;
 			case ACCION_BORRAR_MENSAJE:
-				borrarMensaje(bean, request, response);
+				borrarMensaje(bean, datos, request, response);
 				break;
 			case ACCION_DATATABLE_DESTINATARIOS:
 				listadoDestinatarios(bean, datos, request, response);
@@ -232,20 +232,20 @@ public class ControladorMensajes extends HttpServlet {
 			case ACCION_DETALLE_MENSAJE:
 				break;
 			case ACCION_ELIMINAR_DESTINATARIOS:
-				eliminarDestinatarios(bean, request, response);
+				eliminarDestinatarios(bean, datos, request, response);
 				break;
 			case ACCION_ENVIAR_MENSAJE:
-				enviarMensaje(bean, request, response);
+				enviarMensaje(bean, datos, request, response);
 				break;
 			case ACCION_MODIFICAR_MENSAJE:
-				guardarMensaje(bean, request, response); 
+				guardarMensaje(bean, datos, request, response); 
 				break;
 			default:
 				errorFatal(bean, MENSAJE_ERROR_ACCION_NO_CONTEMPLADA);
 		}
 	}
 	
-	private void agregarDestinatarios(VistaMensajes bean, HttpServletRequest request, HttpServletResponse response) throws UVException, IOException {
+	private void agregarDestinatarios(VistaMensajes bean, UVDatos datos, HttpServletRequest request, HttpServletResponse response) throws UVException, IOException {
 		ModeloMensajes modeloMensaje = ModeloMensajes.obtenerInstancia();
 		ModeloUsuarioBolsaEmpleo modeloUsuario = ModeloUsuarioBolsaEmpleo.obtenerInstancia();
 		List<UsuarioBolsaEmpleo> destinatarios = null;
@@ -275,16 +275,18 @@ public class ControladorMensajes extends HttpServlet {
 			BolsaEmpleoUtils.addMensajeDeError(ex.getMessage(), bean, request);
 		}
 		
-		redireccionConMensajeSeleccionado(bean, request, response, ACCION_DETALLE_MENSAJE);
+		redireccionConMensajeSeleccionado(bean, datos, request, response, ACCION_DETALLE_MENSAJE);
 	}
 	
-	private void borrarMensaje(VistaMensajes bean, HttpServletRequest request, HttpServletResponse response) throws SQLException, UVException, IOException {
+	private void borrarMensaje(VistaMensajes bean, UVDatos datos, HttpServletRequest request, HttpServletResponse response) throws SQLException, UVException, IOException {
 		ModeloMensajes.obtenerInstancia().eliminarMensajeBorrador(bean.getMensaje(), bean.getUsuarioLogeado());
 		BolsaEmpleoUtils.addMensajeDeExito("Mensaje eliminado correctamente", bean, request);
+		datos.setRespuestaEnviada(true);
+		datos.setRespuestaEnviada(true);
 		response.sendRedirect(request.getServletPath());
 	}
 	
-	private void eliminarDestinatarios(VistaMensajes bean, HttpServletRequest request, HttpServletResponse response) throws UVException, IOException {
+	private void eliminarDestinatarios(VistaMensajes bean, UVDatos datos, HttpServletRequest request, HttpServletResponse response) throws UVException, IOException {
 		ModeloMensajes modeloMensaje = ModeloMensajes.obtenerInstancia();
 		ModeloUsuarioBolsaEmpleo modeloUsuario = ModeloUsuarioBolsaEmpleo.obtenerInstancia();
 		List<UsuarioBolsaEmpleo> destinatarios = null;
@@ -314,13 +316,13 @@ public class ControladorMensajes extends HttpServlet {
 			BolsaEmpleoUtils.addMensajeDeError(ex.getMessage(), bean, request);
 		}
 		
-		redireccionConMensajeSeleccionado(bean, request, response, ACCION_DETALLE_MENSAJE);
+		redireccionConMensajeSeleccionado(bean, datos, request, response, ACCION_DETALLE_MENSAJE);
 	}
 	
-	private void enviarMensaje(VistaMensajes bean, HttpServletRequest request, HttpServletResponse response) throws IOException, UVException {
+	private void enviarMensaje(VistaMensajes bean, UVDatos datos, HttpServletRequest request, HttpServletResponse response) throws IOException, UVException, SQLException {
 		Mensaje mensaje = bean.getMensaje();
 		
-		if (mensaje.getTitulo().equals(ModeloMensajes.ESTADO_BORRADOR)) {
+		if (mensaje.getTitulo().equals(ModeloMensajes.MENSAJE_ESTADO_BORRADOR)) {
 			throw new UVException("No se puede enviar un mensaje con título borrador");
 		}
 		
@@ -328,18 +330,14 @@ public class ControladorMensajes extends HttpServlet {
 			throw new UVException("No se puede enviar un mensaje sin destinatarios");
 		}
 		
-		List<String> destinatarios = new ArrayList<>();
+		ModeloMensajes.obtenerInstancia().actualizaEstadoMensajeComoEnviando(bean.getMensaje(), bean.getUsuarioLogeado());
 		
-		for (UsuarioBolsaEmpleo usuario: bean.getDestinatarios()) {
-			destinatarios.add(usuario.getEmail());
-		}
-		
-		//EnviaCorreo.enviaCorreoCCO(destinatarios, destinatarios, mensaje.getTitulo(), mensaje.getCuerpo());
-		
+		BolsaEmpleoUtils.addMensajeDeExito(MENSAJE_EXITO_ENVIADO, bean, request);
+		datos.setRespuestaEnviada(true);
 		response.sendRedirect(request.getServletPath());
 	}
 	
-	private void guardarMensaje(VistaMensajes bean, HttpServletRequest request, HttpServletResponse response) throws IOException, SQLException, UVException {
+	private void guardarMensaje(VistaMensajes bean, UVDatos datos, HttpServletRequest request, HttpServletResponse response) throws IOException, SQLException, UVException {
 		if (EscapaHTML.ajustaCodificacion(request.getParameter(PARAM_GUARDAR)) != null) {
 			ModeloMensajes modeloMensaje = ModeloMensajes.obtenerInstancia();
 			Mensaje mensaje = this.getValidatorMensaje(request);
@@ -349,24 +347,24 @@ public class ControladorMensajes extends HttpServlet {
 			modeloMensaje.actualizarMensaje(mensaje, bean.getUsuarioLogeado());
 			
 			BolsaEmpleoUtils.addMensajeDeExito(MENSAJE_EXITO_MENSAJE_GUARDADO, bean, request);
-			redireccionConMensajeSeleccionado(bean, request, response, ACCION_DETALLE_MENSAJE);
+			redireccionConMensajeSeleccionado(bean, datos, request, response, ACCION_DETALLE_MENSAJE);
 		}
 	}
 	
-	private void nuevoMensaje(VistaMensajes bean, HttpServletRequest request, HttpServletResponse response) throws SQLException, UVException, IOException {
+	private void nuevoMensaje(VistaMensajes bean, UVDatos datos, HttpServletRequest request, HttpServletResponse response) throws SQLException, UVException, IOException {
 		ModeloMensajes modeloMensaje = ModeloMensajes.obtenerInstancia();
 		Integer idMensaje = modeloMensaje.nuevoMensajeEnBorrador(bean.getUsuarioLogeado());
 		bean.setMensaje(modeloMensaje.getMensajeById(idMensaje));
 		
-		redireccionConMensajeSeleccionado(bean, request, response, ACCION_DETALLE_MENSAJE);
+		redireccionConMensajeSeleccionado(bean, datos, request, response, ACCION_DETALLE_MENSAJE);
 	}
 	
-	private void redireccionConMensajeSeleccionado(VistaMensajes bean, HttpServletRequest request, HttpServletResponse response, String accion)
+	private void redireccionConMensajeSeleccionado(VistaMensajes bean, UVDatos datos, HttpServletRequest request, HttpServletResponse response, String accion)
 			throws IOException {
 		Map<String, String> params = new HashMap<>();
 		params.put(PARAM_ACCION, accion);
 		params.put(PARAM_MENSAJE_ID, bean.getMensaje().getCodNum().toString());
-		BolsaEmpleoUtils.redirectWithParams(request, response, params);
+		BolsaEmpleoUtils.redirectWithParams(datos, request, response, params);
 	}
 	
 	private void listadoMensajes(VistaMensajes bean, UVDatos datos, HttpServletRequest request, HttpServletResponse response) throws IOException {
@@ -406,7 +404,7 @@ public class ControladorMensajes extends HttpServlet {
 		try (PrintWriter writer = response.getWriter()) {
 			try {
 				ModeloMensajes modelo = ModeloMensajes.obtenerInstancia();
-				BolsaEmpleoDataTable<UsuarioBolsaEmpleo> dataTable = modelo.listaDestinatariosMensajeDatatable(request.getParameterMap(), bean.getMensaje());
+				BolsaEmpleoDataTable<Destinatario> dataTable = modelo.listaDestinatariosMensajeDatatable(request.getParameterMap(), bean.getMensaje());
 				bean.setDatatableDestinatarios(dataTable);
 				writer.write(dataTable.toJson());
 			} catch (UVException e) {
@@ -437,7 +435,7 @@ public class ControladorMensajes extends HttpServlet {
 				ModeloMensajes modelo = ModeloMensajes.obtenerInstancia();
 				BolsaEmpleoDataTable<UsuarioBolsaEmpleo> dataTable = modelo.listaDestinatariosDisponiblesMensajeDatatable(
 						request.getParameterMap(), bean.getMensaje());
-				bean.setDatatableDestinatarios(dataTable);
+				bean.setDatatableDestinatariosDisponibles(dataTable);
 				writer.write(dataTable.toJson());
 			} catch (UVException e) {
 				LOGGER.log(Level.WARNING, e.toString());

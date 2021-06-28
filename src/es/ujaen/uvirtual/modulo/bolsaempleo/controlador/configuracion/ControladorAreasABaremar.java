@@ -19,6 +19,7 @@ import es.ujaen.uvirtual.beans.Usuario;
 import es.ujaen.uvirtual.modulo.bolsaempleo.beans.Bolsa;
 import es.ujaen.uvirtual.modulo.bolsaempleo.modelo.ModeloArea;
 import es.ujaen.uvirtual.modulo.bolsaempleo.modelo.ModeloBolsa;
+import es.ujaen.uvirtual.modulo.bolsaempleo.modelo.ModeloParametrosConfiguracion;
 import es.ujaen.uvirtual.modulo.bolsaempleo.modelo.ModeloRol;
 import es.ujaen.uvirtual.modulo.bolsaempleo.modelo.ModeloUsuarioBolsaEmpleo;
 import es.ujaen.uvirtual.modulo.bolsaempleo.utilidades.BolsaEmpleoDataTable;
@@ -103,13 +104,13 @@ public class ControladorAreasABaremar extends HttpServlet {
 				case ACCION_INDEX:
 					break;
 				case ACCION_AREA:
-					accionSobreArea(bean, request, response);
+					accionSobreArea(bean, datos, request, response);
 					break;
 				case ACCION_DATATABLE:
 					listado(bean, datos, request, response);
 					break;
 				case ACCION_IMPORTAR_AREAS_UVIRTUAL:
-					importarAreasDeUvirtual(bean, request, response);
+					importarAreasDeUvirtual(bean, datos, request, response);
 					break;
 				default:
 					errorFatal(bean, "Acción no contemplada");
@@ -127,10 +128,9 @@ public class ControladorAreasABaremar extends HttpServlet {
 			datos.getFicherosJS().add("/js/jquery-1.latest.min.js");
 			datos.getFicherosJS().add("/js/jquery-ui-1.10.4.min.js");
 			datos.getFicherosJS().add("/js/jquery.ui.datepicker-es.js");
-			datos.getFicherosJS().add("/js/bolsaempleo/utils.js");
-			datos.getFicherosJS().add("/js/bolsaempleo/datatable.js");
+			datos.getFicherosJS().add(ModeloParametrosConfiguracion.JS_BOLSA_EMPLEO);
 			datos.getFicherosCSS().add("/css/intranet.css");
-			datos.getFicherosCSS().add("/css/ujaen_bolsa_empleo.css");
+			datos.getFicherosCSS().add(ModeloParametrosConfiguracion.CSS_BOLSA_EMPLEO);
 			datos.getFicherosCSS().add("/css/jqueryujaen/jquery-ui-1.8.16.custom.css");
 		}
 	}
@@ -149,8 +149,7 @@ public class ControladorAreasABaremar extends HttpServlet {
 			LOGGER.log(Level.SEVERE, Formateador.getStackTrace(e));
 			LOGGER.log(Level.SEVERE, e.toString());
 			
-			BolsaEmpleoUtils.addMensajeDeError(e.getMessage(), bean, request);
-			response.sendRedirect("/srv/es/informacionadministrativa/bolsaempleo/error");
+			BolsaEmpleoUtils.redirectToError(bean, datos, request, response, e.getMessage());
 		}		
 	}
 	
@@ -176,7 +175,7 @@ public class ControladorAreasABaremar extends HttpServlet {
 	 * @throws IOException .
 	 * @throws SQLException .
 	 */
-	private void listado(VistaAreasBaremar bean, UVDatos datos, HttpServletRequest request, HttpServletResponse response) throws IOException, SQLException {
+	private void listado(VistaAreasBaremar bean, UVDatos datos, HttpServletRequest request, HttpServletResponse response) throws IOException {
 		ModeloArea modelo = ModeloArea.obtenerInstancia();		
 		datos.setContentType(RESPONSE_AJAX_CONTENTTYPE);
 		datos.setRespuestaEnviada(true);
@@ -205,7 +204,8 @@ public class ControladorAreasABaremar extends HttpServlet {
 		}
 	}
 	
-	private void accionSobreArea(VistaAreasBaremar bean, HttpServletRequest request, HttpServletResponse response) throws UVException, SQLException, IOException {
+	private void accionSobreArea(VistaAreasBaremar bean, UVDatos datos, HttpServletRequest request, HttpServletResponse response)
+			throws UVException, SQLException, IOException {
 		ModeloBolsa modelo = ModeloBolsa.obtenerInstancia();
 		
 		String nombreAccionBolsa = EscapaHTML.ajustaCodificacion(request.getParameter(PARAM_ACCION_AREA));
@@ -228,19 +228,22 @@ public class ControladorAreasABaremar extends HttpServlet {
 		}
 		
 		BolsaEmpleoUtils.addMensajeDeExito(MENSAJE_EXITO_AREA_MODIFICADA_CORRECTAMENTE, bean, request);
+		datos.setRespuestaEnviada(true);
 		response.sendRedirect(request.getServletPath());
 	}
 	
 	/**
 	 * método para actualizar las áreas del sistema con las áreas de uvirtual .
 	 * @param bean .
+	 * @param datos .
 	 * @param request .
 	 * @param response .
 	 * @throws UVException .
 	 * @throws IOException .
 	 * @throws SQLException .
 	 */
-	private void importarAreasDeUvirtual(VistaAreasBaremar bean, HttpServletRequest request, HttpServletResponse response) throws UVException, SQLException, IOException {
+	private void importarAreasDeUvirtual(VistaAreasBaremar bean, UVDatos datos, HttpServletRequest request, HttpServletResponse response)
+			throws UVException, SQLException, IOException {
 		ModeloArea modeloArea = ModeloArea.obtenerInstancia();
 		Integer nuevas = modeloArea.insertarAreasNuevasExternas(bean.getUsuarioLogeado());
 		Integer actualizadas = modeloArea.actualizaAreasDeExternas(bean.getUsuarioLogeado());
@@ -261,6 +264,7 @@ public class ControladorAreasABaremar extends HttpServlet {
 		
 		if (mensajes.length() > 0) {
 			BolsaEmpleoUtils.addMensajeDeExito(mensajes, bean, request);
+			datos.setRespuestaEnviada(true);
 			response.sendRedirect(request.getServletPath());
 		}
 	}	

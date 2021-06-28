@@ -1,13 +1,173 @@
 /**
  * Datatable
  * @copyright ATISoluciones 2021
- * 
- * 20210602 overflow-auto y render
- * 20210604 select all y columnas preseleccionadas
- * 20210607 opción por defecto en select boolean
- * 20210624 title y label en acciones como functions. getRow. renderBoolean
  */
- 
+
+
+ function alertDialog(title, message, onOk) {
+	$('<div class="atisDialog"></div>')
+		.appendTo('body')
+		.html(message)
+		.dialog({
+			modal: true,
+			title: title,
+			zIndex: 10000,
+			autoOpen: true,
+			width: 'auto',
+			resizable: false,
+			buttons: {
+				Ok: function() {
+					if (onOk) {
+						if (onOk(this)) {
+							$(this).dialog("close");
+						}
+					} else {
+						$(this).dialog("close");
+					}
+				}
+			},
+			close: function(event, ui) {
+				$(this).remove();
+			}
+	});
+}
+
+function confirmDialog(title, message, buttons) {
+	$('<div></div>').appendTo('body')
+	    	.html(message)
+	    	.dialog({
+		      modal: true,
+		      title: title,
+		      zIndex: 10000,
+		      autoOpen: true,
+		      width: 'auto',
+		      resizable: false,
+		      buttons: buttons,
+		      close: function(event, ui) {
+		        $(this).remove();
+		      }
+		});
+}
+
+function escapeHtml(str) {
+    //return str.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;").replace(/'/g, "&#039;");
+    return str.replace(/</g, "&lt;").replace(/>/g, "&gt;");
+}
+
+ function formatearFecha(fecha) {
+	var sin_hora = fecha.split(" ")[0];
+	var sin_guiones = sin_hora.split("-");
+	return sin_guiones[2] + "/" + sin_guiones[1] + "/" +sin_guiones[0];
+}
+
+function getErrorResponse(response) {
+	try {
+		var contentType = response.getResponseHeader('content-type').split(';')[0];		
+		if (contentType == 'application/json') {					
+			if (!response.responseText) {
+				return getProp(response, 'status', '999') + ": respuesta vacia";
+			}
+			
+			var error = json2Object(response.responseText);
+			return getProp(error, 'descripcion', 'Sin definir');
+		} else {
+			return getProp(response, 'status', '999') + ": " + getProp(response, 'statusText', 'Sin definir');
+		}     
+	} catch (err) { 
+		console.error("Error procesando error", response, err);
+	}
+}
+
+function getProp( object, keys, defaultVal ){
+	keys = Array.isArray( keys )? keys : keys.split('.');
+	object = object[keys[0]];
+	if( object && keys.length > 1 ){
+		return getProp( object, keys.slice(1) );
+	}
+	return object === undefined? defaultVal : object;
+}
+
+function setProp( object, keys, val ){
+	keys = Array.isArray( keys )? keys : keys.split('.');
+	if( keys.length > 1 ){
+		object[keys[0]] = object[keys[0]] || {};
+		return setProp( object[keys[0]], keys.slice(1), val );
+	}
+	object[keys[0]] = val;
+}
+
+function isFunction(functionToCheck) {
+	return functionToCheck && {}.toString.call(functionToCheck) === '[object Function]';
+}
+
+
+function isUndefined(myVar) {
+	return typeof myVar === 'undefined'; 
+}
+
+function object2Json(object) { 
+	return JSON.stringify(object);
+}
+
+function json2Object(json) {
+	return JSON.parse(json);
+}
+
+function redondearFloat(number, decimalPlaces) {
+	// https://medium.com/swlh/how-to-round-to-a-certain-number-of-decimal-places-in-javascript-ed74c471c1b8
+
+	decimalPlaces = decimalPlaces || 2;
+	return Number(Math.round(number + "e" + decimalPlaces) + "e-" + decimalPlaces);
+}
+
+function removeValueArray(array, val) {
+	array = Array.isArray(array) ? array : [array];
+	const index = array.indexOf(val);s
+	if (index > -1) {
+		array.splice(index, 1);
+	}	
+}
+
+function sendAjax(url, params, success, error) {
+	$.ajax({
+		type: 'GET',
+		url: url,
+		contentType: "application/json",
+		dataType: "json",
+		data: params,
+		success: success,
+		error: error
+	});
+}
+
+function sendForm(url, params) {
+	var form = document.createElement("form");		
+	form.method = "POST";
+	form.action = url;
+	document.body.appendChild(form);
+		
+	for(key in params) {
+		var element = document.createElement("input");
+		element.type = "hidden";
+		element.name = key;
+		element.value = params[key];
+		form.appendChild(element);
+	}
+			
+	form.submit();
+}
+
+function smoothScrollFromOneToAnotherAnchor(origin, destination) {
+	window.scrollTo(0,$(id).offset().top);
+}
+
+function smoothScrollToAnchor(id) {
+	window.scrollTo(0,$(id).offset().top);
+}
+
+
+/* Datatable */
+
 function DataTable(id, config) {
     this.id = id;
     this.idFinal = id.substring(1);
@@ -17,16 +177,16 @@ function DataTable(id, config) {
     this.tfoot = $('tfoot', this.node).last();    
     this.config = config;
     this.params = {
-        'a': Atis.getProp(config, 'action', 'datatable'),
+        'a': getProp(config, 'action', 'datatable'),
         'page': 0,
-        'pageSize': Atis.getProp(config, 'pageSize', 10),
-        'orderBy': Atis.getProp(config, 'defaultOrderBy', null),
-        'orderDirection': Atis.getProp(config, 'defaultOrderDirection', 'asc'),
+        'pageSize': getProp(config, 'pageSize', 10),
+        'orderBy': getProp(config, 'defaultOrderBy', null),
+        'orderDirection': getProp(config, 'defaultOrderDirection', 'asc'),
         'filter': ''
     };
-    this.pageSizeOptions = Atis.getProp(config, 'pageSizeOptions', [5,10,20,100]);
+    this.pageSizeOptions = getProp(config, 'pageSizeOptions', [5,10,20,100]);
     this.filterParams = {}
-    this.title = Atis.getProp(config, 'title', undefined);
+    this.title = getProp(config, 'title', undefined);
     this.lastResponse = null;
     this.checked = {};
 
@@ -35,8 +195,8 @@ function DataTable(id, config) {
     this.refresh = function() {
     	self.loading(true);
     	$.ajax({
-            async: Atis.getProp(self.config.ajax, 'async', true),
-	        type: Atis.getProp(self.config.ajax, 'method', 'GET'),
+            async: getProp(self.config.ajax, 'async', true),
+	        type: getProp(self.config.ajax, 'method', 'GET'),
 	        url: self.config.ajax.url,
 	        contentType: "application/json",
 	        dataType: "json",
@@ -61,17 +221,6 @@ function DataTable(id, config) {
     this.setTitle = function(tit) {
         self.title = tit;
     };
-
-    this.getRow = function(codNum) {
-    	if (self.lastResponse && self.lastResponse.data) {
-            for(var i=0; i<self.lastResponse.data.length; i++) {
-            	if (self.lastResponse.data[i].codNum == codNum) {
-                    return self.lastResponse.data[i];
-                }
-            }
-        }
-        return null;
-    };
         
     this.loading = function(on) {
     	if (on) {
@@ -92,7 +241,7 @@ function DataTable(id, config) {
         self.renderHeader();
     	
     	// evento before render
-    	var beforeRender = Atis.getProp(config, 'beforeRender');
+    	var beforeRender = getProp(config, 'beforeRender');
         beforeRender && beforeRender(self);
     	
         // limpiamos
@@ -108,7 +257,7 @@ function DataTable(id, config) {
         }   
 
         // eventos after render
-        var afterRender = Atis.getProp(config, 'afterRender');
+        var afterRender = getProp(config, 'afterRender');
         afterRender && afterRender(self);
     }
 
@@ -116,7 +265,7 @@ function DataTable(id, config) {
     	self.loading(false);
     	
     	$('tr', self.tbody).hide();
-        $(self.tbody).append('<p class="loading">Error: ' + Atis.getErrorResponse(err) + '</p>');
+        $(self.tbody).append('<p class="loading">Error: ' + getErrorResponse(err) + '</p>');
     };
     
     this.addRow = function(row, index) {
@@ -170,7 +319,7 @@ function DataTable(id, config) {
     
     this.renderCol = function(row, columnDef) {
     	var data = columnDef.data;
-    	var value = Atis.getProp(row, data);
+    	var value = getProp(row, data);
 
     	if (columnDef.hasOwnProperty('overflow')) {
             var overflow = $('<div></div>');
@@ -180,7 +329,8 @@ function DataTable(id, config) {
             }
 
             return overflow.append(
-                columnDef.hasOwnProperty('render') ? columnDef.render(row) : typeof value !== 'undefined' ? '' + value : ''
+                columnDef.hasOwnProperty('render') ? columnDef.render(row) :
+                typeof value !== 'undefined' ? '' + value : ''
             );
         }
 
@@ -188,25 +338,19 @@ function DataTable(id, config) {
     		return columnDef.render(row);
     	}
     	
-    	if (columnDef.hasOwnProperty('renderBoolean')) {
-    		var condition = row[columnDef.data]; 
-    		var title = condition ? Atis.getProp(columnDef.renderBoolean, 'true', '') : Atis.getProp(columnDef.renderBoolean, 'false', '');     		    
-    		return '<div class="circle-' + (condition ? 'true' : 'false') + '" title="' + title + '"></div>';    		
-    	}
-    	
     	if (columnDef.hasOwnProperty('buttons')) {
     		var buttons = $('<span class="btns"></span>');
     		
     		columnDef.buttons.forEach(function(buttonDef) {
-                var label = Atis.isFunction(buttonDef.label) ? buttonDef.label(row) : buttonDef.label;
-                var title = Atis.isFunction(buttonDef.title) ? buttonDef.title(row) : buttonDef.title;
-                var visible = Atis.isFunction(buttonDef.visible) ? buttonDef.visible(row) : !Atis.isUndefined(buttonDef.visible) ? buttonDef.visible : true;
+                var label = isFunction(buttonDef.label) ? buttonDef.label(row) : buttonDef.label;
+                var title = isFunction(buttonDef.title) ? buttonDef.title(row) : buttonDef.title;
+                var visible = isFunction(buttonDef.visible) ? buttonDef.visible(row) : !isUndefined(buttonDef.visible) ? buttonDef.visible : true;
                 
                 if (visible) {
                 	var btn = $('<button class="btn"' + (title ? 'title="' + title + '"' : '') + ' type="button">'+ (label ? label : '')+'</button>');
     			
 	    			if (buttonDef.hasOwnProperty('class')) {
-	    				$(btn).addClass(Atis.isFunction(buttonDef.class) ? buttonDef.class(row) : buttonDef.class);
+	    				$(btn).addClass(isFunction(buttonDef.class) ? buttonDef.class(row) : buttonDef.class);
 	    			}
 	
 	                if (buttonDef.hasOwnProperty('icon')) {
@@ -245,7 +389,7 @@ function DataTable(id, config) {
                 var selected = self.config.selected;
 
                 if (selected) {
-                    checked ? selected.push(value) : Atis.removeValueArray(selected, value);
+                    checked ? selected.push(value) : removeValueArray(selected, value);
                 }
                 
                 typeof value !== 'undefined' ? self.checked[value] = checked : '';
@@ -261,7 +405,7 @@ function DataTable(id, config) {
                 event.stopPropagation();
             });
 
-            if (columnDef.selectable.exclude && Atis.getProp(row, columnDef.selectable.exclude)) {
+            if (columnDef.selectable.exclude && getProp(row, columnDef.selectable.exclude)) {
                 $(check).prop('disabled', true);
             }
     		
@@ -327,20 +471,17 @@ function DataTable(id, config) {
         var actions = $('<span class="actions"></span>');
         if (self.config.actions) {
             for (var i = 0; i < self.config.actions.length; i++) {
-            	var action = self.config.actions[i];     
-            	
+            	var action = self.config.actions[i];
             	if (action.showWhenSelected == null || action.showWhenSelected == (self.config.selected > 0)) {
-            		if (self.config.selected) {
+	            	var btn = $('<button class="btn"' + (action.title ? 'title="' + action.title + '"' : '') + ' type="button">' + action.label + '</button>');
+	            	
+	            	if (self.config.selected) {
 	            		selected = self.config.selected;
 	            	}
-	            	
-            		var label = Atis.isFunction(action.label) ? action.label.bind(self, selected)() : action.label;
-                	var title = action.title ? (Atis.isFunction(action.title) ? action.title.bind(self, selected)() : action.title) : '';
-	            	var btn = $('<button class="btn" title="' + title + '" type="button">' + label + '</button>');
-	            	
+
                     if (action.hasOwnProperty('class')) {
                         $(btn).addClass(action.class);
-                    }                    
+                    }
 
                     if (action.hasOwnProperty('icon')) {
                         var position = action.icon.position ? action.icon.position : 'left';
@@ -405,9 +546,9 @@ function DataTable(id, config) {
     	}
 
         self.config.columns.forEach(function(columnDef, index) {
-            var order = Atis.getProp(columnDef, 'order', {'active': true});
-            var selectable = Atis.getProp(columnDef, 'selectable');
-            var buttons = Atis.getProp(columnDef, 'buttons');
+            var order = getProp(columnDef, 'order', {'active': true});
+            var selectable = getProp(columnDef, 'selectable');
+            var buttons = getProp(columnDef, 'buttons');
 
             columnDef.node = $('th', self.thead).get(index);
             
@@ -426,7 +567,7 @@ function DataTable(id, config) {
             }
         });
 
-        var filterable = Atis.getProp(self.config, 'filterable', false);
+        var filterable = getProp(self.config, 'filterable', false);
 
         if (filterable && !$('tbody', this.node).find('.filterable').length) {
             var tr = $('<tr class="filterable"></tr>');
@@ -529,7 +670,7 @@ function DataTable(id, config) {
     	
 			self.lastResponse.data.forEach(function (row) {
 				var firstColumnDef = self.config.columns[0];
-				var value = Atis.getProp(row, firstColumnDef.data);
+				var value = getProp(row, firstColumnDef.data);
 				
 				$("input[type='checkbox']", self.tbody).prop('checked', check);
 				self.checked[value] = check;
@@ -620,4 +761,24 @@ function DataTable(id, config) {
     this.refresh();
 }
 
-window.Atis = $.extend(window.Atis ? window.Atis : {}, {"DataTable": DataTable});
+
+window.Atis = {
+	"getProp": getProp,
+	"setProp": setProp,
+	"alertDialog": alertDialog,
+	"confirmDialog": confirmDialog,
+	"getErrorResponse": getErrorResponse,
+	"isUndefined": isUndefined,
+	"isFunction": isFunction,
+	"formatearFecha": formatearFecha,	
+	"sendForm": sendForm,
+	"object2Json": object2Json,
+	"json2Object": json2Object,
+	"sendAjax": sendAjax,
+	"removeValueArray": removeValueArray,
+	"escapeHtml": escapeHtml,
+	"redondearFloat": redondearFloat,
+	"smoothScrollToAnchor": smoothScrollToAnchor,
+	"smoothScrollFromOneToAnotherAnchor": smoothScrollFromOneToAnotherAnchor,
+    "DataTable": DataTable
+};

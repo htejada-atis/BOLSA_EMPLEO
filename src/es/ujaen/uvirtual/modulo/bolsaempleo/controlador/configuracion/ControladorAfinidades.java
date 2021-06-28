@@ -18,6 +18,7 @@ import es.ujaen.uvirtual.beans.UVDatos;
 import es.ujaen.uvirtual.beans.Usuario;
 import es.ujaen.uvirtual.modulo.bolsaempleo.beans.Afinidad;
 import es.ujaen.uvirtual.modulo.bolsaempleo.modelo.ModeloAfinidad;
+import es.ujaen.uvirtual.modulo.bolsaempleo.modelo.ModeloParametrosConfiguracion;
 import es.ujaen.uvirtual.modulo.bolsaempleo.modelo.ModeloRol;
 import es.ujaen.uvirtual.modulo.bolsaempleo.modelo.ModeloUsuarioBolsaEmpleo;
 import es.ujaen.uvirtual.modulo.bolsaempleo.utilidades.BolsaEmpleoDataTable;
@@ -114,13 +115,13 @@ public class ControladorAfinidades extends HttpServlet {
 					formularioAfinidad(bean);
 					break;
 				case ACCION_AGREGAR_AFINIDAD:
-					nuevaAfinidad(bean, request, response);
+					nuevaAfinidad(bean, datos, request, response);
 					break;
 				case ACCION_MODIFICAR_AFINIDAD:
-					modificarAfinidad(bean, request, response);
+					modificarAfinidad(bean, datos, request, response);
 					break;
 				case ACCION_BORRAR_AFINIDAD:
-					borrarAfinidad(bean, request, response);
+					borrarAfinidad(bean, datos, request, response);
 					break;
 				default:
 					errorFatal(bean, MENSAJE_ERROR_ACCION_NO_CONTEMPLADA);
@@ -138,11 +139,10 @@ public class ControladorAfinidades extends HttpServlet {
 			datos.getFicherosJS().add("/js/jquery-1.latest.min.js");
 			datos.getFicherosJS().add("/js/jquery-ui-1.10.4.min.js");
 			datos.getFicherosJS().add("/js/jquery.ui.datepicker-es.js");
-			datos.getFicherosJS().add("/js/bolsaempleo/utils.js");
-			datos.getFicherosJS().add("/js/bolsaempleo/datatable.js");
+			datos.getFicherosJS().add(ModeloParametrosConfiguracion.JS_BOLSA_EMPLEO);
 			datos.getFicherosCSS().add("/css/intranet.css");
 			datos.getFicherosCSS().add("/css/jqueryujaen/jquery-ui-1.8.16.custom.css");
-			datos.getFicherosCSS().add("/css/ujaen_bolsa_empleo.css");			
+			datos.getFicherosCSS().add(ModeloParametrosConfiguracion.CSS_BOLSA_EMPLEO);			
 		}
 	}
 	
@@ -159,8 +159,7 @@ public class ControladorAfinidades extends HttpServlet {
 			LOGGER.log(Level.SEVERE, Formateador.getStackTrace(e));
 			LOGGER.log(Level.SEVERE, e.toString());
 			
-			BolsaEmpleoUtils.addMensajeDeError(e.getMessage(), bean, request);
-			response.sendRedirect("/srv/es/informacionadministrativa/bolsaempleo/error");
+			BolsaEmpleoUtils.redirectToError(bean, datos, request, response, e.getMessage());
 		}
 	}
 	
@@ -220,7 +219,7 @@ public class ControladorAfinidades extends HttpServlet {
 		}
 	}
 	
-	private void nuevaAfinidad(VistaAfinidades bean, HttpServletRequest request, HttpServletResponse response) throws UVException, SQLException, IOException {
+	private void nuevaAfinidad(VistaAfinidades bean, UVDatos datos, HttpServletRequest request, HttpServletResponse response) throws UVException, SQLException, IOException {
 		bean.setVista(RUTA_BEP_CON + "formAfinidades.jsp");
 		
 		if (EscapaHTML.ajustaCodificacion(request.getParameter(PARAM_DESCRIPCION)) != null) {
@@ -228,13 +227,15 @@ public class ControladorAfinidades extends HttpServlet {
 			ModeloAfinidad.obtenerInstancia().nuevaAfinidad(afinidad, bean.getUsuarioLogeado());	
 
 			BolsaEmpleoUtils.addMensajeDeExito(MENSAJE_INFO_AFINIDAD_INSERTADA_CORRECTAMENTE, bean, request);
+			datos.setRespuestaEnviada(true);
 			response.sendRedirect(request.getServletPath());
 		}
 	}
 		
-	private void modificarAfinidad(VistaAfinidades bean, HttpServletRequest request, HttpServletResponse response) throws UVException, SQLException, IOException { 
+	private void modificarAfinidad(VistaAfinidades bean, UVDatos datos, HttpServletRequest request, HttpServletResponse response)
+			throws UVException, SQLException, IOException {
 		bean.setVista(RUTA_BEP_CON + "formAfinidades.jsp");
-						
+		
 		ModeloAfinidad modelo = ModeloAfinidad.obtenerInstancia();
 		
 		Afinidad afinidad = modelo.getAfinidadById(Formateador.leeParametroInteger(request.getParameter(PARAM_ID)));
@@ -247,19 +248,22 @@ public class ControladorAfinidades extends HttpServlet {
 			modelo.actualizaAfinidad(afinidadForm, bean.getUsuarioLogeado());
 			
 			BolsaEmpleoUtils.addMensajeDeExito(MENSAJE_INFO_AFINIDAD_ACTUALIZADA_CORRECTAMENTE, bean, request);
+			datos.setRespuestaEnviada(true);
 			response.sendRedirect(request.getServletPath());
 		}
 	}
 	
 	/** eliminar una afinidad.
 	 * @param bean .
+	 * @param datos .
 	 * @param request .
 	 * @param response .
 	 * @throws SQLException excepcion de bbdd.
 	 * @throws UVException en caso de error de parametros .
 	 * @throws IOException en caso de error de input u output .
 	 */
-	private void borrarAfinidad(VistaAfinidades bean, HttpServletRequest request, HttpServletResponse response) throws SQLException, UVException, IOException {
+	private void borrarAfinidad(VistaAfinidades bean, UVDatos datos, HttpServletRequest request, HttpServletResponse response)
+			throws SQLException, UVException, IOException {
 		String selectedJson = EscapaHTML.ajustaCodificacion(request.getParameter(PARAM_AFINIDADES_SELECCIONADAS));
 		ModeloAfinidad modelo = ModeloAfinidad.obtenerInstancia();
 		int[] selected = (new Gson()).fromJson(selectedJson, new TypeToken<int[]>() { }.getType());
@@ -269,6 +273,7 @@ public class ControladorAfinidades extends HttpServlet {
 		modelo.borraAfinidades(afinidades, bean.getUsuarioLogeado());
 		
 		BolsaEmpleoUtils.addMensajeDeExito(MENSAJE_EXITO_ELIMINAR, bean, request);
+		datos.setRespuestaEnviada(true);
 		response.sendRedirect(request.getServletPath());
 	}
 	

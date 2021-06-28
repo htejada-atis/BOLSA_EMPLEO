@@ -1,6 +1,7 @@
 <%@ page trimDirectiveWhitespaces="true"%>
 <%@	page import="es.ujaen.uvirtual.modulo.bolsaempleo.controlador.ControladorValidar"%>
 <%@	page import="es.ujaen.uvirtual.modulo.bolsaempleo.controlador.ControladorDescargaFicheros"%>
+<%@	page import="es.ujaen.uvirtual.modulo.bolsaempleo.modelo.ModeloBaremacionItems"%>
 <%@ page import="es.ujaen.uvirtual.modulo.bolsaempleo.vistas.VistaValidar" %>
 <%@ page import="es.ujaen.uvirtual.modulo.bolsaempleo.beans.Afinidad" %>
 <%@ page import="es.ujaen.uvirtual.modulo.bolsaempleo.beans.Area" %>
@@ -40,17 +41,17 @@ UsuarioBolsaEmpleo candidato = bean.getCandidato();
 <%	} %>
 	
 	<h2>Validar meritos sujetos afinidad</h2>
-	<h3><%= descripcion %></h3>
-	<h4><%= bolsa.getArea().getDescripcion() %></h4>
+	<h3><%= EscapaHTML.escapa(descripcion) %></h3>
+	<h4><%= EscapaHTML.escapa(bolsa.getArea().getDescripcion()) %></h4>
 	
 	<table class="bluetable bolsaempleo" id="tableCandidatos">
 		<tr>
-			<th scope="col" style="width:10%">D.N.I</th>
-			<th scope="col" style="width:50%" class="nombre">Nombre</th>
-			<th scope="col" style="width:10%" class="center">No validados</th>
-			<th scope="col" style="width:10%" class="center">Validados</th>
-			<th scope="col" style="width:10%" class="center">Excluidos</th>
-			<th scope="col" style="width:10%" class="center">Total</th>
+			<th scope="col" style="width:76px">D.N.I</th>
+			<th scope="col" style="width:100%" class="nombre">Nombre</th>
+			<th scope="col" style="width:76px" class="center">No validados</th>
+			<th scope="col" style="width:76px" class="center">Validados</th>
+			<th scope="col" style="width:76px" class="center">Excluidos</th>
+			<th scope="col" style="width:76px" class="center">Total</th>
 		</tr>
 		<tbody>
 		</tbody>
@@ -81,11 +82,11 @@ UsuarioBolsaEmpleo candidato = bean.getCandidato();
 		</table>
 		
 		<% if (merito != null) { %>
-		
-			<br/>
+			<div id="anchor_modificar_merito" style="margin-bottom: 24px;"></div>
+			
 			<jsp:include page="/WEB-INF/jsp/vista/infadministrativa/bolsaempleo/mensajes.jsp" />
 			
-			<h3 id="anchor_modificar_merito">Modificar mérito: <%= merito.getMerito().getCodNum() %></h3>
+			<h3>Modificar mérito: <%= merito.getMerito().getCodNum() %></h3>
 			
 			<form id="validar_merito" class="be-form" method="post" action="<%= request.getRequestURI() %>">
 		    	<input type="hidden" name="<%= ControladorValidar.PARAM_ACCION %>" id="accion_formulario" value="<%= ControladorValidar.ACCION_MODIFICAR_MERITO %>" />
@@ -104,11 +105,11 @@ UsuarioBolsaEmpleo candidato = bean.getCandidato();
 				    				<option value="<%=it.getCodNum()%>" 
 				    						data-unidades="<%= it.getUnidades() %>" 
 				    						data-descripcion="<%= it.getDescripcion() %>" 
-				    						selected><%=it.getBloqueBaremacion().getApartadoBaremacion().getCodigo() + "." + it.getBloqueBaremacion().getCodigo() + "." + it.getCodigo() + "-" + it.getNombre()%></option>
+				    						selected><%=EscapaHTML.escapa(it.getBloqueBaremacion().getApartadoBaremacion().getCodigo() + "." + it.getBloqueBaremacion().getCodigo() + "." + it.getCodigo() + "-" + it.getNombre())%></option>
 				    			<% } else { %>
 				    				<option value="<%=it.getCodNum()%>" 
 				    						data-unidades="<%= it.getUnidades() %>" 
-				    						data-descripcion="<%= it.getDescripcion() %>"><%=merito.getMerito().getItemBaremacion().getBloqueBaremacion().getApartadoBaremacion().getCodigo() + "." + it.getBloqueBaremacion().getCodigo() + "." + it.getCodigo() + "-" + it.getNombre()%></option>
+				    						data-descripcion="<%= it.getDescripcion() %>"><%=EscapaHTML.escapa(merito.getMerito().getItemBaremacion().getBloqueBaremacion().getApartadoBaremacion().getCodigo() + "." + it.getBloqueBaremacion().getCodigo() + "." + it.getCodigo() + "-" + it.getNombre())%></option>
 				    			<% } %>
 				    		<%
 				    		}
@@ -117,8 +118,11 @@ UsuarioBolsaEmpleo candidato = bean.getCandidato();
 					</div>
 					<div class="form-group">
 			    		<div class="form-group">
-			    			<label for="merito_valor" id="merito_valor_label" class="bold-label">Valor:</label>
-			    			<input class="form-input-custom" id="merito_valor" type="text" name="<%= ControladorValidar.PARAM_VALOR %>" value="<%= merito.getMerito().getValor() %>" required/>
+			    			<label for="merito_valor" id="merito_valor_label" class="bold-label">Valor (<%= EscapaHTML.escapa(merito.getMerito().getItemBaremacion().getUnidades()) %>):</label>
+			    			<input class="form-input-custom" id="merito_valor" type="text" name="<%= ControladorValidar.PARAM_VALOR %>" 
+			    					value="<%= merito.getMerito().getValor() %>"
+			    					<%= EscapaHTML.escapa(merito.getMerito().getItemBaremacion().getUnidades()).equals(ModeloBaremacionItems.ITEM_UNIDADES_MEDICION_SINO) ? "disabled" : "" %>
+			    					required/>
 			    		</div>
 		    		</div>
 				</div>
@@ -133,11 +137,11 @@ UsuarioBolsaEmpleo candidato = bean.getCandidato();
 				<div class="form-group-container col2">
 		    		<div class="form-group">
 		    			<label for="merito_descripcion" class="bold-label">Descripción:</label>
-		    			<textarea class="form-input-custom" id="merito_descripcion" name="" disabled><%= merito.getMerito().getDescripcion() %></textarea>
+		    			<textarea class="form-input-custom" id="merito_descripcion" name="" disabled><%= EscapaHTML.escapa(merito.getMerito().getDescripcion()) %></textarea>
 		    		</div>
 		    		<div class="form-group">
 			    		<label for="merito_observacion_comision">Observación para la comisión:</label>
-			    		<textarea class="form-input-custom" id="merito_observacion_comision" name="" rows="2" cols="50" disabled><%= merito.getMerito().getObservacion() != null ? merito.getMerito().getObservacion() : "" %></textarea>
+			    		<textarea class="form-input-custom" id="merito_observacion_comision" name="" rows="2" cols="50" disabled><%= EscapaHTML.escapa(merito.getMerito().getObservacion()) %></textarea>
 			    	</div>
 				</div>
 			
@@ -146,108 +150,140 @@ UsuarioBolsaEmpleo candidato = bean.getCandidato();
 		    	</div>
 		    </form>
 		    
+		    <h3>Afinidades del mérito en las distintas áreas</h3>
+		    
 		    <p>
 		    	En la siguiente tabla se muestran las áreas de su departamento en las que este mérito está baremado, y aquellas áreas donde el candidato
 		     	está inscrito pero el mérito aún no tiene ningún valor. Debe introducir para cada área la afinidad, la observación para el candidato y la acción
 		     	a realizar con este mérito en esa área. Los datos de categoría y valor serán los mismos en las distintas áreas de su departamento. 
 		    </p>
 		    
-		    <div>Leyenda del campo 'Acciones a realizar con el mérito':</div>
+		    <div>Leyenda del campo 'Acciones':</div>
 		    <ul>
-		    	<li>Guardar: Guardar los cambios efectuados sobre este mérito. El mérito mantiene su estado actual (aceptado o excluido).</li>
 		    	<li>Aceptar: Pasar este mérito a estado aceptado. Esto quiere decir que el mérito será tenido en cuenta en la baremación.</li>
 		    	<li>Excluir: Pasar este mérito a estado excluido. Esto quiere decir que el mérito no será tenido en cuenta en la baremación.</li>
+		    </ul>
+		    <br/>
+		    <div>Descripción de afinidades:</div>
+		    <ul>
+		    <%	for(Afinidad afinidad: bean.getListaAfinidades()) {
+		    		if (afinidad.getCodigo().equals(merito.getMerito().getItemBaremacion().getAfinidad())) {
+		    %>
+			    		<li><%= EscapaHTML.escapa(afinidad.getCodigo() + " " + afinidad.getModulacion() * 100 + "%" + " - " + afinidad.getDescripcion()) %></li>
+		    <%		}
+		    	} %>
 		    </ul>
 		   
 		    
 		    <table class="bluetable bolsaempleo" id="tableValoresMeritoBolsas">
 				<tr>
 					<th scope="col" style="width:20%">Área</th>
-					<th scope="col" style="width:20%">Datos actuales</th>
-					<th scope="col" style="width:25%">Afinidad a aplicar</th>
-					<th scope="col" style="width:25%">Observaciones</th>
-					<th scope="col" style="width:10%"></th>
+					<th scope="col" style="width:10%">Valor</th>
+					<th scope="col" style="width:10%">Estado</th>
+					<th scope="col" style="width:30%">Afinidad a aplicar</th>
+					<th scope="col" style="width:25%">Observación para el candidato</th>
+					<th scope="col" style="width:10%">Acciones</th>
 				</tr>
 				<tbody>
-				<%	for (ValorMeritoBolsaTable meritoBolsa: bean.getBolsas()) { 
-							int idMerito = meritoBolsa.getMeritoSolicitud().getMerito().getCodNum();
-							Boolean valoraciones = meritoBolsa.getMeritoSolicitud() != null && meritoBolsa.getMeritoSolicitud().getMerito().getItemBaremacion().getAfinidad() != null
-									&& meritoBolsa.getMeritoSolicitud().getValoraciones() != null && meritoBolsa.getMeritoSolicitud().getValoraciones().size() > 0  ? true : false;
-							Boolean individualizado = valoraciones && meritoBolsa.getMeritoSolicitud().getMerito().getItemBaremacion().getIndividualizado() ? true : false;
+				<%	for (ValorMeritoBolsaTable meritoBolsa: bean.getBolsas()) {
+						int idMerito = meritoBolsa.getMeritoSolicitud().getMerito().getCodNum();
+						Boolean valoraciones = meritoBolsa.getMeritoSolicitud() != null && meritoBolsa.getMeritoSolicitud().getMerito().getItemBaremacion().getAfinidad() != null
+								&& meritoBolsa.getMeritoSolicitud().getValoraciones() != null && meritoBolsa.getMeritoSolicitud().getValoraciones().size() > 0  ? true : false;
+						Boolean individualizado = meritoBolsa.getMeritoSolicitud().getMerito().getItemBaremacion().getIndividualizado() ? true : false;
 					%>
 					
 						<tr data-individualizado="<%= individualizado %>" data-bolsa="<%= meritoBolsa.getBolsa().getCodNum() %>" 
 								data-afinidad="<%= meritoBolsa.getMeritoSolicitud().getMerito().getItemBaremacion().getAfinidad() %>">
-							<td><b><%= meritoBolsa.getBolsa().getArea().getIdAreaExterno() %></b><br/>
-								<%= meritoBolsa.getBolsa().getArea().getDescripcion() %>
+							<td><b><%= EscapaHTML.escapa(meritoBolsa.getBolsa().getArea().getIdAreaExterno()) %></b><br/>
+								<%= EscapaHTML.escapa(meritoBolsa.getBolsa().getArea().getDescripcion()) %>
 							</td>
-							<td><b>Valor: </b><%= meritoBolsa.getMeritoSolicitud().getMerito().getValor() %><br/>
-								<b>Afinidad: </b>
-								<br/>
-							<%	if (individualizado) { %>
-									<%= meritoBolsa.getMeritoSolicitud().getValoraciones().get(0).getAfinidad().getCodigo() + " " + meritoBolsa.getMeritoSolicitud().getValoraciones().get(0).getAfinidad().getModulacion() + "</br>" %>
-							<%	} else {
-									for (MeritoSolicitudValoracion valoracion: meritoBolsa.getMeritoSolicitud().getValoraciones()) { %>
-										<%= valoracion.getValor() + " - " + valoracion.getAfinidad().getCodigo() + " " + valoracion.getAfinidad().getModulacion() + "%</br>" %>
-								<%	}
-								} %>
-								<b>Estado: </b>
+							<td><%= meritoBolsa.getMeritoSolicitud().getMerito().getValor() %></td>
+							<td>
 								<% if (meritoBolsa.getMeritoSolicitud().isValidado()) { %>
-			        				<div class='text-success'>Validado</div>
+			        				<div class='text-success'><b>Validado</b></div>
 			        			<% } else if (meritoBolsa.getMeritoSolicitud().isExcluido()) { %>
-			        				<div class='text-danger'>Excluido</div>
+			        				<div class='text-danger'><b>Excluido</b></div>
 			        			<% } else { %>
-			        				<div class='text-primary'>Sin validar</div>
+			        				<div class='text-primary'><b>Sin validar</b></div>
 			        			<% } %>
 							</td>
 							<td class='cell-afinidad'>
 							<%	if (individualizado) { %>
-									<select id="afinidad-individualizada" data-valoracion="<%= meritoBolsa.getMeritoSolicitud().getValoraciones().get(0).getCodNum() %>">
+									<select id="afinidad-individualizada" data-valoracion="<%= valoraciones ? meritoBolsa.getMeritoSolicitud().getValoraciones().get(0).getCodNum() : "0" %>">
 									<% 	for (Afinidad afinidad : bean.getListaAfinidades()) { %>
 										<%	if (afinidad.getCodigo().equals(meritoBolsa.getMeritoSolicitud().getMerito().getItemBaremacion().getAfinidad())) { %>
-											<% 	if (meritoBolsa.getMeritoSolicitud().getValoraciones().get(0).getAfinidad().getCodNum() == afinidad.getCodNum()) { %>
-												<option value="<%= afinidad.getCodNum() %>" selected><%= afinidad.getModulacion() + ": " + afinidad.getDescripcion() %></option>
+											<% 	if (valoraciones && meritoBolsa.getMeritoSolicitud().getValoraciones().get(0).getAfinidad().getCodNum() == afinidad.getCodNum()) { %>
+												<option value="<%= afinidad.getCodNum() %>" selected><%= afinidad.getModulacion() * 100 + "%: " + afinidad.getDescripcion() %></option>
 											<%	} else { %>
-												<option value="<%= afinidad.getCodNum() %>"><%= afinidad.getModulacion() + ": " + afinidad.getDescripcion() %></option>
+												<option value="<%= afinidad.getCodNum() %>"><%= afinidad.getModulacion()* 100 + "%: " + afinidad.getDescripcion() %></option>
 											<%	} %>
 										<%	} %>
 									<%	} %>
 									</select>
-							<%	} else {
-									if (meritoBolsa.getMeritoSolicitud().getValoraciones().size() > 0) {
-										int total = 0;
+							<%	} else { %>
+									<table class="table-afinidades">
+											<tbody>
+								<%	int total = 0;
+									if (valoraciones) {
 										for (MeritoSolicitudValoracion valoracion: meritoBolsa.getMeritoSolicitud().getValoraciones()) {
-											total += valoracion.getValor();
-									%>
-											<input data-afinidad="<%= valoracion.getAfinidad().getCodNum() %>" class="validar-afinidad field-no-individualizado" type="number" min="0" 
-												value="<%= valoracion.getValor() %>" step="0.01"/>
+												total += valoracion.getValor();	%>
+												<tr>
+													<td style="width:70px">
+														<label for="<%= "merito_valoracion_" + valoracion.getAfinidad().getCodNum() + "_" + idMerito %>">
+															<i class="tooltip"><%=  EscapaHTML.escapa(valoracion.getAfinidad().getCodigo() + " " + valoracion.getAfinidad().getModulacion() * 100 + "%: ") %><span><%= EscapaHTML.escapa(valoracion.getAfinidad().getDescripcion()) %></span></i>
+														</label>
+													</td>
+													<td>
+														<input id="<%= "merito_valoracion_" + valoracion.getAfinidad().getCodNum() + "_" + idMerito %>" data-afinidad="<%= valoracion.getAfinidad().getCodNum() %>" class="validar-afinidad field-no-individualizado" type="number" min="0" 
+															value="<%= valoracion.getValor() %>" step="0.01"/>
+													</td>
+												</tr>
+										<%	} %>
+												
+								<%	} else { %>
+									<% 	for (int i = 0; i < bean.getListaAfinidades().size(); i++) {
+											Afinidad afinidad = bean.getListaAfinidades().get(i); %>
+										<%	if (afinidad.getCodigo().equals(meritoBolsa.getMeritoSolicitud().getMerito().getItemBaremacion().getAfinidad())) { %>
+												<tr>
+													<td style="width:70px">
+														<label for="merito_valoracion_<%= i %>">
+															<i class="tooltip"><%= EscapaHTML.escapa(afinidad.getCodigo() + " " + afinidad.getModulacion() * 100 + "%: ") %><span><%= EscapaHTML.escapa(afinidad.getDescripcion()) %></span></i>
+														</label>
+													</td>
+													<td>
+														<input id="merito_valoracion_<%= i %>" data-afinidad="<%= afinidad.getCodNum() %>" class="validar-afinidad field-no-individualizado" type="number" min="0" 
+															value="0" step="0.01"/>
+													</td>
+												</tr>
+										<%	} %>
 									<%	} %>
-										<input class="validar-afinidad total-no-individualizado" data-total="<%= meritoBolsa.getMeritoSolicitud().getMerito().getValor() %>" type="number" min="0" name="total"
+								<%	} %>
+										<tr>
+											<td style="width:70px">Total:</td>
+											<td>
+												<input class="validar-afinidad total-no-individualizado" data-total="<%= meritoBolsa.getMeritoSolicitud().getMerito().getValor() %>" type="number" min="0" name="total"
 												value="<%= total %>" disabled/>
-										<p class="mensaje" style="color: red; display: none;">El total es superior al valor del mérito.</p>
-								<%	}
-								} %>
+											</td>
+										</tr>
+									</tbody>
+								</table>
+								
+								<p class="mensaje" style="color: red; display: none;">El total es superior al valor del mérito.</p>
+							<%	} %>
 							</td>
 							<td>
-					    		<label for="merito_observacion_candidato">Observación para el candidato:</label>
-					    		<textarea class="form-input-custom merito-observacion-candidato" 
+								<div style="display: flex;">
+					    			<textarea class="form-input-custom merito-observacion-candidato" 
 					    				id="merito_observacion_candidato_<%= idMerito %>"
 					    				name="<%= ControladorValidar.PARAM_OBSERVACION_CANDIDATO %>" 
 					    				rows="2" cols="50"
 					    				><%= meritoBolsa.getMeritoSolicitud().getObservacionCandidato() != null ? meritoBolsa.getMeritoSolicitud().getObservacionCandidato() : "" %></textarea>
+				    			</div>
 							</td>
 							<td style="vertical-align: middle;">
 								<span class="btns acciones_merito">
-								<%	if (meritoBolsa.getMeritoSolicitud().isExcluido()) { %>
-						    			<button class="btn merito-guardar" id="merito_guardar_<%= idMerito %>" name="<%= ControladorValidar.PARAM_GUARDAR_MERITO %>">Guardar</button>
-							    		<button class="btn merito-aceptar" id="merito_aceptar_<%= idMerito %>" name="<%= ControladorValidar.PARAM_ACEPTAR_MERITO %>">Aceptar</button>
-						    	<%	} else if (meritoBolsa.getMeritoSolicitud().isValidado()) { %>
-						    			<button class="btn merito-guardar" id="merito_guardar_<%= idMerito %>" name="<%= ControladorValidar.PARAM_GUARDAR_MERITO %>">Guardar</button>
-							    		<button class="btn merito-excluir" id="merito_excluir_<%= idMerito %>" name="<%= ControladorValidar.PARAM_EXCLUIR_MERITO %>">Excluir</button>
-						    	<%	} else { %>
-							    		<button class="btn merito-aceptar" id="merito_aceptar_<%= idMerito %>" name="<%= ControladorValidar.PARAM_ACEPTAR_MERITO %>">Aceptar</button>
-							    		<button class="btn merito-excluir" id="merito_excluir_<%= idMerito %>" name="<%= ControladorValidar.PARAM_EXCLUIR_MERITO %>">Excluir</button>
-						    	<%	} %>
+						    		<button class="btn merito-aceptar" id="merito_aceptar_<%= idMerito %>" name="<%= ControladorValidar.PARAM_ACEPTAR_MERITO %>">Aceptar</button>
+							    	<button class="btn merito-excluir" id="merito_excluir_<%= idMerito %>" name="<%= ControladorValidar.PARAM_EXCLUIR_MERITO %>">Excluir</button>
 					    		</span>
 							</td>
 						</tr>
@@ -255,7 +291,7 @@ UsuarioBolsaEmpleo candidato = bean.getCandidato();
 				</tbody>
 				<tfoot>
 					<tr>
-						<th colSpan="5" style="width:100%"></th>
+						<th colSpan="6" style="width:100%"></th>
 					</tr>
 				</tfoot>
 			</table>
@@ -272,7 +308,8 @@ UsuarioBolsaEmpleo candidato = bean.getCandidato();
 $(document).ready(function() {
 	var tableCandidatos = new Atis.DataTable('#tableCandidatos', {
 	    "ajax": { url: "<%= ControladorValidar.URL_PATTERN_AJAX %>", async: false },
-	    "pageSize": 10,
+	    "pageSize": 200,
+	    "pageSizeOptions": [5,10,20,100,200],
 	    "action": "<%= ControladorValidar.ACCION_DATATABLE_CANDIDATOS %>",
 	    "title": 'LISTA DE USUARIOS',
 	    "dropdown": true,
@@ -291,10 +328,10 @@ $(document).ready(function() {
 	    	{'data': 'apellido1', 'order': false, 'overflow': 'auto', 'render': function(row) {
         		return row.nombre + " " + row.apellido1 + " " + row.apellido2; 
         	}},
-	        {'data': 'totalMeritosNoValidados', 'order': false, 'class': 'center', 'render': function(row) { return isNaN(row.totalMeritosNoValidados) ? 0 : row.totalMeritosNoValidados; } },
-	        {'data': 'totalMeritosValidados', 'order': false, 'class': 'center', 'render': function(row) { return isNaN(row.totalMeritosValidados) ? 0 : row.totalMeritosValidados; } },
-	        {'data': 'totalMeritosExcluidos', 'order': false, 'class': 'center', 'render': function(row) { return isNaN(row.totalMeritosExcluidos) ? 0 : row.totalMeritosExcluidos; } },
-	        {'data': 'totalMeritos', 'order': false, 'class': 'center'}
+	        {'data': 'totalMeritosNoValidados', 'class': 'center', 'render': function(row) { return isNaN(row.totalMeritosNoValidados) ? 0 : row.totalMeritosNoValidados; } },
+	        {'data': 'totalMeritosValidados', 'class': 'center', 'render': function(row) { return isNaN(row.totalMeritosValidados) ? 0 : row.totalMeritosValidados; } },
+	        {'data': 'totalMeritosExcluidos', 'class': 'center', 'render': function(row) { return isNaN(row.totalMeritosExcluidos) ? 0 : row.totalMeritosExcluidos; } },
+	        {'data': 'totalMeritos', 'class': 'center'}
 	    ]
 	});
 	
@@ -302,10 +339,10 @@ $(document).ready(function() {
 	
 		var tableMeritos = new Atis.DataTable('#tableMeritos', {
 		    "ajax": { url: "<%= ControladorValidar.URL_PATTERN_AJAX %>", async: false },
-		    "pageSize": 10,
+		    "pageSize": 100,
 		    "filterable": true,
 		    "action": "<%= ControladorValidar.ACCION_DATATABLE_MERITOS %>",
-		    "title": 'MÉRITOS PARA EL USUARIO: <%=candidato.getIdNif()%>',
+		    "title": 'MÉRITOS PARA EL USUARIO: <%=EscapaHTML.escapa(candidato.getIdNif() + " - " + candidato.getNombre() + " " + candidato.getPrimerApellido() + " " + candidato.getSegundoApellido())%>',
 		    "dropdown": true,
 		    "params": {
 		    	'<%=ControladorValidar.PARAM_BOLSA%>': '<%= bolsa.getCodNum() %>',
@@ -356,7 +393,7 @@ $(document).ready(function() {
 				
 				this.getValoresAfinidades = function() {
 					var noIndividualizadas = {};
-					$(cell).children('.field-no-individualizado').each(function(index, input) {
+					$(cell).find('.field-no-individualizado').each(function(index, input) {
 						var afinidad = $(input).data('afinidad');
 						var value = parseFloat($(input).val());
 						noIndividualizadas[afinidad] = value;
@@ -435,19 +472,14 @@ $(document).ready(function() {
 			}
 			
 			document.getElementById("merito_descargar_fichero").addEventListener("click", function() {
-				console.log("au")
 				window.open("<%= ControladorDescargaFicheros.URL_DESCARGA_FICHEROS %>"
-    		        	+ "<%= "?a=" + ControladorDescargaFicheros.ACCION_DESCARGAR_MERITO_PERSONAL + "&" + ControladorDescargaFicheros.PARAM_MERITO + "=" + bean.getMerito().getMerito().getCodNum() %>");
+    		        	+ "<%= "?a=" + ControladorDescargaFicheros.ACCION_DESCARGAR_MERITO_PERSONAL + "&" + ControladorDescargaFicheros.PARAM_MERITO + "=" + merito.getMerito().getCodNum() %>");
 			});
 		
 			$('.bluetable').on('input', '.field-no-individualizado', function() {
-				var noIndividualizado = new NoIndividualizado($(this).closest('td'));
+				var noIndividualizado = new NoIndividualizado($(this).closest('table').closest('td'));
 				noIndividualizado.actualizaTotal();
 				noIndividualizado.comparaTotal(false);
-			});
-		
-			$('.bluetable').on('click', 'button.merito-guardar', function() {
-				onClickAccionMerito(this, '<%= ControladorValidar.PARAM_GUARDAR_MERITO %>');
 			});
 			
 			$('.bluetable').on('click', 'button.merito-aceptar', function() {
@@ -455,7 +487,19 @@ $(document).ready(function() {
 			});
 			
 			$('.bluetable').on('click', 'button.merito-excluir', function() {
-				onClickAccionMerito(this, '<%= ControladorValidar.PARAM_EXCLUIR_MERITO %>');
+				var self = this;
+				Atis.confirmDialog(
+					"Excluir mérito", "El mérito se va a excluir de todas las áreas que pueda evaluar.", {
+	            	'Si': function(row) {
+	            		onClickAccionMerito(self, '<%= ControladorValidar.PARAM_EXCLUIR_MERITO %>');
+	        			
+	              		$(this).dialog("close");
+	            	},
+	            	'No': function() {
+	              		$(this).dialog("close");
+	            	}
+	          	});
+				
 			});
 			
 			Atis.smoothScrollToAnchor("#anchor_modificar_merito");

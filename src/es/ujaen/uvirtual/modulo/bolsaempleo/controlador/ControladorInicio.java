@@ -133,7 +133,7 @@ public class ControladorInicio extends HttpServlet {
 			datos.getFicherosJS().add("/js/bolsaempleo/utils.js");
 			datos.getFicherosCSS().add("/css/intranet.css");
 			datos.getFicherosCSS().add("/css/jqueryujaen/jquery-ui-1.8.16.custom.css");
-			datos.getFicherosCSS().add("/css/ujaen_bolsa_empleo.css");
+			datos.getFicherosCSS().add(ModeloParametrosConfiguracion.CSS_BOLSA_EMPLEO);
 		}
 	}
 	
@@ -146,8 +146,7 @@ public class ControladorInicio extends HttpServlet {
 			bean.setAnonimo(bean.getUsuarioLogeado() == null);
 		} catch (UVException e) {
 			LOGGER.log(Level.WARNING, e.toString());			
-			BolsaEmpleoUtils.addMensajeDeError(e.getMessage(), bean, request);
-			response.sendRedirect("/srv/es/informacionadministrativa/bolsaempleo/error");			
+			BolsaEmpleoUtils.redirectToError(bean, datos, request, response, e.getMessage());			
 		}
 	}
 	

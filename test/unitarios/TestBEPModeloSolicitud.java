@@ -143,7 +143,7 @@ public class TestBEPModeloSolicitud {
 			Bolsa b = dtBolsas.getData().get(0);
 			
 			// meritos solicitud bolsa
-			BolsaEmpleoDataTable<MeritoSolicitudTable> dtMeritos = modeloSolicitud.listaMeritosSolicitudDatatable(params, s.getUsuario(), b);
+			BolsaEmpleoDataTable<MeritoSolicitudTable> dtMeritos = modeloSolicitud.listaMeritosSolicitudDatatable(params, s.getUsuario(), b, s);
 			assertFalse(dtMeritos.getData().isEmpty());
 			
 		} catch (SQLException | UVException ex) {
@@ -214,7 +214,7 @@ public class TestBEPModeloSolicitud {
 			Solicitud s = modelo.getSolicitudByConvocatoriaUsuario(candidato1, c);						
 			BolsaEmpleoDataTable<BolsaSolicitudTable> dtBolsas = modelo.listaBolsasSolicitudesDatatable(s, params);			
 			Bolsa b = dtBolsas.getData().get(0);
-			BolsaEmpleoDataTable<MeritoSolicitudTable> dtMeritos = modelo.listaMeritosSolicitudDatatable(params, s.getUsuario(), b);
+			BolsaEmpleoDataTable<MeritoSolicitudTable> dtMeritos = modelo.listaMeritosSolicitudDatatable(params, s.getUsuario(), b, s);
 			Merito meritoSolicitud = dtMeritos.getData().get(0).getMerito();
 									
 			MeritoSolicitud ms = modelo.getMeritoSolicitud(s, b, meritoSolicitud);

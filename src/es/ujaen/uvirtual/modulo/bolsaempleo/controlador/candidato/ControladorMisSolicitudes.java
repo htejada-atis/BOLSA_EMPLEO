@@ -45,6 +45,7 @@ import es.ujaen.uvirtual.modulo.bolsaempleo.modelo.ModeloBolsa;
 import es.ujaen.uvirtual.modulo.bolsaempleo.modelo.ModeloConvocatoria;
 import es.ujaen.uvirtual.modulo.bolsaempleo.modelo.ModeloMerito;
 import es.ujaen.uvirtual.modulo.bolsaempleo.modelo.ModeloMeritosPreferentesCandidato;
+import es.ujaen.uvirtual.modulo.bolsaempleo.modelo.ModeloParametrosConfiguracion;
 import es.ujaen.uvirtual.modulo.bolsaempleo.modelo.ModeloRol;
 import es.ujaen.uvirtual.modulo.bolsaempleo.modelo.ModeloSolicitud;
 import es.ujaen.uvirtual.modulo.bolsaempleo.modelo.ModeloTitulacion;
@@ -224,11 +225,10 @@ public class ControladorMisSolicitudes extends HttpServlet {
 			datos.getFicherosJS().add("/js/jquery-1.latest.min.js");
 			datos.getFicherosJS().add("/js/jquery-ui-1.10.4.min.js");
 			datos.getFicherosJS().add("/js/jquery.ui.datepicker-es.js");
-			datos.getFicherosJS().add("/js/bolsaempleo/utils.js");
-			datos.getFicherosJS().add("/js/bolsaempleo/datatable.js");
+			datos.getFicherosJS().add(ModeloParametrosConfiguracion.JS_BOLSA_EMPLEO);
 			datos.getFicherosCSS().add("/css/intranet.css");
 			datos.getFicherosCSS().add("/css/jqueryujaen/jquery-ui-1.8.16.custom.css");
-			datos.getFicherosCSS().add("/css/ujaen_bolsa_empleo.css");
+			datos.getFicherosCSS().add(ModeloParametrosConfiguracion.CSS_BOLSA_EMPLEO);
 		}
 	}
 	
@@ -245,8 +245,7 @@ public class ControladorMisSolicitudes extends HttpServlet {
 		} catch (UVException e) {
 			LOGGER.log(Level.WARNING, e.toString());
 			
-			BolsaEmpleoUtils.addMensajeDeError(e.getMessage(), bean, request);
-			response.sendRedirect("/srv/es/informacionadministrativa/bolsaempleo/error");
+			BolsaEmpleoUtils.redirectToError(bean, datos, request, response, e.getMessage());
 		}		
 	}
 	
@@ -750,7 +749,7 @@ public class ControladorMisSolicitudes extends HttpServlet {
 	 * @throws IOException .
 	 */
 	private void listadoBolsasSolicitud(VistaSolicitudes bean, UVDatos datos, HttpServletRequest request, HttpServletResponse response) 
-			throws SQLException, UVException, IOException {
+			throws IOException {
 		ModeloSolicitud modelo = ModeloSolicitud.obtenerInstancia();
 		datos.setContentType(RESPONSE_AJAX_CONTENTTYPE);
 		datos.setRespuestaEnviada(true);
@@ -790,7 +789,7 @@ public class ControladorMisSolicitudes extends HttpServlet {
 	 * @throws UVException .
 	 */
 	private void listadoMeritosCandidato(VistaSolicitudes bean, UVDatos datos, HttpServletRequest request, HttpServletResponse response)
-			throws IOException, SQLException, UVException {
+			throws IOException {
 		
 		datos.setRespuestaEnviada(true);
 		datos.setContentType(RESPONSE_AJAX_CONTENTTYPE);		
@@ -802,7 +801,7 @@ public class ControladorMisSolicitudes extends HttpServlet {
 				Bolsa bolsa = ModeloBolsa.obtenerInstancia().getBolsaById(Formateador.leeParametroInteger(request.getParameter(PARAM_BOLSA)));
 				
 				BolsaEmpleoDataTable<MeritoSolicitudTable> dataTable = ModeloSolicitud.obtenerInstancia().
-						listaMeritosSolicitudDatatable(request.getParameterMap(), bean.getUsuarioLogeado(), bolsa);
+						listaMeritosSolicitudDatatable(request.getParameterMap(), bean.getUsuarioLogeado(), bolsa, this.getSolicitud(bean, request));
 				bean.setDataTableMeritos(dataTable);
 				writer.write(dataTable.toJson());
 			} catch (UVException e) {
@@ -830,7 +829,7 @@ public class ControladorMisSolicitudes extends HttpServlet {
 			throws IOException, SQLException, UVException {
 		switch (nombreAccion) {
 			case ACCION_CONFIRMAR_SOLICITUD:
-				confirmarSolicitud(bean, request, response);
+				confirmarSolicitud(bean, datos, request, response);
 				break;
 			case ACCION_RESUMEN_SOLICITUD:
 				resumenSolicitud(bean, request);
@@ -882,6 +881,7 @@ public class ControladorMisSolicitudes extends HttpServlet {
 	/**
 	 * El usuario confirma la solicitud .
 	 * @param bean .
+	 * @param datos .
 	 * @param request .
 	 * @param response .
 	 * @throws IOException .
@@ -889,7 +889,8 @@ public class ControladorMisSolicitudes extends HttpServlet {
 	 * @throws SQLException .
 	 * @throws UVException .
 	 */
-	private void confirmarSolicitud(VistaSolicitudes bean, HttpServletRequest request, HttpServletResponse response) throws SQLException, UVException, IOException {
+	private void confirmarSolicitud(VistaSolicitudes bean, UVDatos datos, HttpServletRequest request, HttpServletResponse response)
+			throws SQLException, UVException, IOException {
 		bean.setVista(JSP_PASO3);
 		
 		ModeloSolicitud modeloSolicitud = ModeloSolicitud.obtenerInstancia();
@@ -911,6 +912,7 @@ public class ControladorMisSolicitudes extends HttpServlet {
 		bean.getMensajesDeExito().add(MENSAJE_EXITO_SOLICITUD_CONFIRMADA);
 		HttpSession session = request.getSession(false);
 		session.setAttribute(MENSAJE_ENVIADO, MENSAJE_EXITO_SOLICITUD_CONFIRMADA);
+		datos.setRespuestaEnviada(true);
 		response.sendRedirect(request.getServletPath());
 	}
 	

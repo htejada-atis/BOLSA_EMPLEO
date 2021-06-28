@@ -158,8 +158,6 @@ if(item!=null){
 		});
 		
 		$('#item_afinida').on('change', function() {
-			console.log("items", $(this).val());
-			
 			if ($(this).val() == 'N') {
 				$('#individualizadoBloque').hide();
 			} else {

@@ -29,7 +29,10 @@ import javax.servlet.ServletRequest;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
+
+import es.ujaen.uvirtual.beans.UVDatos;
 import es.ujaen.uvirtual.beans.vistas.Vista;
+import es.ujaen.uvirtual.modulo.bolsaempleo.controlador.ControladorErrorBolsaEmpleo;
 import es.ujaen.uvirtual.modulo.bolsaempleo.modelo.ModeloParametrosConfiguracion;
 import es.ujaen.uvirtual.utilidades.Formateador;
 import es.ujaen.uvirtual.utilidades.UVException;
@@ -382,21 +385,39 @@ public final class BolsaEmpleoUtils {
 
 	/**
 	 * Redirecciona a la url actual con parametros en la sessión.
-	 * 
+	 * @param datos .
 	 * @param request  .
 	 * @param response .
 	 * @param params   .
 	 * @throws IOException .
 	 */
-	public static void redirectWithParams(HttpServletRequest request, HttpServletResponse response,
+	public static void redirectWithParams(UVDatos datos, HttpServletRequest request, HttpServletResponse response,
 			Map<String, String> params) throws IOException {
 		HttpSession session = request.getSession(false);
 
 		for (Map.Entry<String, String> entry : params.entrySet()) {
 			session.setAttribute(entry.getKey(), entry.getValue());
 		}
-
+		
+		datos.setRespuestaEnviada(true);
 		response.sendRedirect(request.getServletPath());
+	}
+	
+	/**
+	 * Redirecciona a la url actual con parametros en la sessión.
+	 * @param bean .
+	 * @param datos .
+	 * @param request  .
+	 * @param response .
+	 * @param error .
+	 * @throws IOException .
+	 * @throws UVException .
+	 */
+	public static void redirectToError(Vista bean, UVDatos datos, HttpServletRequest request, HttpServletResponse response, String error)
+			throws IOException, UVException {
+		addMensajeDeError(error, bean, request);
+		datos.setRespuestaEnviada(true);
+		response.sendRedirect(ControladorErrorBolsaEmpleo.URL_ERROR);
 	}
 
 	/**

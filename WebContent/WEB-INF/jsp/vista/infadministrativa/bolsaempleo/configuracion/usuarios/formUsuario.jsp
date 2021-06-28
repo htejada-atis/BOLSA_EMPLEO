@@ -359,7 +359,6 @@ VistaUsuarioBolsaEmpleo bean = (VistaUsuarioBolsaEmpleo) uvdatos.getVistas().get
 	<%	if (bean.getUsuario() != null && bean.getUsuario().getRol().getCodNum().equals(ModeloRol.ID_ROL_MIEMBRO_COMISION)) { %>
 	
 			document.getElementById("areas_evaluables").addEventListener("click", function(event) {
-				console.log("hola")
 				Atis.sendForm("<%= request.getRequestURI() %>", {
 					'<%=ControladorUsuarioBolsaEmpleo.PARAM_ACCION%>': '<%=ControladorUsuarioBolsaEmpleo.ACCION_AREAS_EVALUABLES%>',
 					'<%=ControladorUsuarioBolsaEmpleo.PARAM_USUARIO%>': <%= bean.getUsuario().getCodNum() %>
@@ -382,6 +381,7 @@ VistaUsuarioBolsaEmpleo bean = (VistaUsuarioBolsaEmpleo) uvdatos.getVistas().get
 				    ],
 				});
 		
+				Atis.smoothScrollToAnchor("#areas_evaluables");
 		<%	} %>
 		
 	<%	} %>

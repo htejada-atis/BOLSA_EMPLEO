@@ -19,6 +19,7 @@ import es.ujaen.uvirtual.modulo.bolsaempleo.beans.Bolsa;
 import es.ujaen.uvirtual.modulo.bolsaempleo.beans.Rol;
 import es.ujaen.uvirtual.modulo.bolsaempleo.beans.UsuarioBolsaEmpleo;
 import es.ujaen.uvirtual.modulo.bolsaempleo.modelo.ModeloArea;
+import es.ujaen.uvirtual.modulo.bolsaempleo.modelo.ModeloParametrosConfiguracion;
 import es.ujaen.uvirtual.modulo.bolsaempleo.modelo.ModeloRol;
 import es.ujaen.uvirtual.modulo.bolsaempleo.modelo.ModeloUsuarioBolsaEmpleo;
 import es.ujaen.uvirtual.modulo.bolsaempleo.utilidades.BolsaEmpleoDataTable;
@@ -125,7 +126,7 @@ public class ControladorUsuarioBolsaEmpleo extends HttpServlet {
 			switch (nombreAccion) {
 				case ACCION_AGREGAR_USUARIO:
 				case ACCION_BUSCAR_USUARIO:
-					accionesUsuarioArcos(bean, request, response, nombreAccion);
+					accionesUsuarioArcos(bean, datos, request, response, nombreAccion);
 					break;
 				case ACCION_DATATABLE_USUARIOS:
 					listadoUsuarios(bean, datos, request, response);
@@ -142,7 +143,8 @@ public class ControladorUsuarioBolsaEmpleo extends HttpServlet {
 					bean.setVista(JSP_USUARIOS);
 					break;
 				case ACCION_VOLVER_USUARIO:
-					response.sendRedirect(request.getServletPath());
+					datos.setRespuestaEnviada(true);
+		response.sendRedirect(request.getServletPath());
 					break;
 				default:
 					errorFatal(bean, MENSAJE_ERROR_ACCION_NO_CONTEMPLADA);
@@ -160,10 +162,9 @@ public class ControladorUsuarioBolsaEmpleo extends HttpServlet {
 			datos.getFicherosJS().add("/js/jquery-1.latest.min.js");
 			datos.getFicherosJS().add("/js/jquery-ui-1.10.4.min.js");
 			datos.getFicherosJS().add("/js/jquery.ui.datepicker-es.js");
-			datos.getFicherosJS().add("/js/bolsaempleo/utils.js");
-			datos.getFicherosJS().add("/js/bolsaempleo/datatable.js");
+			datos.getFicherosJS().add(ModeloParametrosConfiguracion.JS_BOLSA_EMPLEO);
 			datos.getFicherosCSS().add("/css/intranet.css");
-			datos.getFicherosCSS().add("/css/ujaen_bolsa_empleo.css");
+			datos.getFicherosCSS().add(ModeloParametrosConfiguracion.CSS_BOLSA_EMPLEO);
 			datos.getFicherosCSS().add("/css/jqueryujaen/jquery-ui-1.8.16.custom.css");
 		}
 	}
@@ -190,8 +191,7 @@ public class ControladorUsuarioBolsaEmpleo extends HttpServlet {
 			LOGGER.log(Level.SEVERE, Formateador.getStackTrace(e));
 			LOGGER.log(Level.SEVERE, e.toString());
 			
-			BolsaEmpleoUtils.addMensajeDeError(e.getMessage(), bean, request);
-			response.sendRedirect("/srv/es/informacionadministrativa/bolsaempleo/error");
+			BolsaEmpleoUtils.redirectToError(bean, datos, request, response, e.getMessage());
 		}		
 	}
 	
@@ -204,7 +204,7 @@ public class ControladorUsuarioBolsaEmpleo extends HttpServlet {
 	// USUARIOS ARCOS
 	///////////////////////////////////////////////////////////////////////////////////////////////////////////
 	
-	private void accionesUsuarioArcos(VistaUsuarioBolsaEmpleo bean, HttpServletRequest request, HttpServletResponse response, String nombreAccion)
+	private void accionesUsuarioArcos(VistaUsuarioBolsaEmpleo bean, UVDatos datos, HttpServletRequest request, HttpServletResponse response, String nombreAccion)
 			throws SQLException, UVException, IOException {
 		Usuario usuArcos = CrearUsuario.usuario(request.getParameter(PARAM_NOMBRE_USUARIO));
 		if (usuArcos == null) {
@@ -214,7 +214,7 @@ public class ControladorUsuarioBolsaEmpleo extends HttpServlet {
 		
 		switch (nombreAccion) {
 			case ACCION_AGREGAR_USUARIO:
-				agregarUsuario(bean, request, response);
+				agregarUsuario(bean, datos, request, response);
 				break;
 			case ACCION_BUSCAR_USUARIO:
 				buscarUsuario(bean);
@@ -226,12 +226,13 @@ public class ControladorUsuarioBolsaEmpleo extends HttpServlet {
 	
 	/** agrega un nuevo usuario.
 	 * @param bean de la vista a la que poner los valores .
+	 * @param datos .
 	 * @param request .
 	 * @param response .
 	 * @throws SQLException excepcion de bbdd .
 	 * @throws UVException en caso de error en bd .
 	 */
-	public void agregarUsuario(VistaUsuarioBolsaEmpleo bean, HttpServletRequest request, HttpServletResponse response) 
+	public void agregarUsuario(VistaUsuarioBolsaEmpleo bean, UVDatos datos, HttpServletRequest request, HttpServletResponse response) 
 			throws SQLException, UVException, IOException {
 		ModeloUsuarioBolsaEmpleo modelo = ModeloUsuarioBolsaEmpleo.obtenerInstancia();
 		UsuarioBolsaEmpleo usuarioForm = this.getValidatorUsuario(bean, request);
@@ -239,6 +240,7 @@ public class ControladorUsuarioBolsaEmpleo extends HttpServlet {
 		modelo.crearUsuarioBolsaEmpleo(usuarioForm.getRol().getCodNum(), bean.getUsuarioArcos().getUid(), bean.getUsuarioLogeado());
 		
 		BolsaEmpleoUtils.addMensajeDeExito(MENSAJE_EXITO_AGREGAR, bean, request);
+		datos.setRespuestaEnviada(true);
 		response.sendRedirect(request.getServletPath());
 	}
 	
@@ -289,13 +291,13 @@ public class ControladorUsuarioBolsaEmpleo extends HttpServlet {
 				listadoAreasEvaluables(bean, datos, request, response);
 				break;
 			case ACCION_EDITAR_USUARIO:
-				editarUsuario(bean, request, response);
+				editarUsuario(bean, datos, request, response);
 				break;
 			case ACCION_ELIMINAR_USUARIO:
-				eliminarUsuario(bean, request, response);
+				eliminarUsuario(bean, datos, request, response);
 				break;
 			case ACCION_RECUPERAR_USUARIO:
-				recuperarUsuario(bean, request, response);
+				recuperarUsuario(bean, datos, request, response);
 				break;
 			case ACCION_SELECCIONAR_USUARIO:
 				break;
@@ -304,7 +306,7 @@ public class ControladorUsuarioBolsaEmpleo extends HttpServlet {
 		}
 	}
 	
-	private void eliminarUsuario(VistaUsuarioBolsaEmpleo bean, HttpServletRequest request, HttpServletResponse response)
+	private void eliminarUsuario(VistaUsuarioBolsaEmpleo bean, UVDatos datos, HttpServletRequest request, HttpServletResponse response)
 			throws SQLException, UVException, IOException {
 		if (bean.getUsuarioArcos().getDocumentoNumero().equals(bean.getUsuarioLogeado().getPrsNif())) {
 			throw new UVException(MENSAJE_ERROR_ELIMINAR_USUARIO_LOGUEADO);
@@ -314,17 +316,20 @@ public class ControladorUsuarioBolsaEmpleo extends HttpServlet {
 		bean.getUsuario().setRazonBorrado(razonBorrado);
 		ModeloUsuarioBolsaEmpleo.obtenerInstancia().ponerUsuarioComoBorrado(bean.getUsuario(), bean.getUsuarioLogeado());
 		BolsaEmpleoUtils.addMensajeDeExito(MENSAJE_EXITO_ELIMINAR, bean, request);
+		datos.setRespuestaEnviada(true);
 		response.sendRedirect(request.getServletPath());
 	}
 	
-	private void recuperarUsuario(VistaUsuarioBolsaEmpleo bean, HttpServletRequest request, HttpServletResponse response)
+	private void recuperarUsuario(VistaUsuarioBolsaEmpleo bean, UVDatos datos, HttpServletRequest request, HttpServletResponse response)
 			throws SQLException, UVException, IOException {
 		ModeloUsuarioBolsaEmpleo.obtenerInstancia().ponerUsuarioComoNoBorrado(bean.getUsuario(), bean.getUsuarioLogeado());
 		BolsaEmpleoUtils.addMensajeDeExito(MENSAJE_EXITO_RESTAURAR, bean, request);
+		datos.setRespuestaEnviada(true);
 		response.sendRedirect(request.getServletPath());
 	}
 	
 	/** edita un usuario .
+	 * @param datos .
 	 * @param request .
 	 * @param response .
 	 * @param bean bean de la vista a la que poner los valores .
@@ -332,7 +337,7 @@ public class ControladorUsuarioBolsaEmpleo extends HttpServlet {
 	 * @throws UVException en caso de error en bd .
 	 * @throws IOException en caso de error de IO .
 	 */
-	private void editarUsuario(VistaUsuarioBolsaEmpleo bean, HttpServletRequest request, HttpServletResponse response) 
+	private void editarUsuario(VistaUsuarioBolsaEmpleo bean, UVDatos datos, HttpServletRequest request, HttpServletResponse response) 
 			throws SQLException, UVException, IOException {
 		ModeloUsuarioBolsaEmpleo modelo = ModeloUsuarioBolsaEmpleo.obtenerInstancia();
 		
@@ -350,6 +355,7 @@ public class ControladorUsuarioBolsaEmpleo extends HttpServlet {
 			
 			modelo.actualizaUsuario(usuarioForm, bean.getUsuarioLogeado());
 			BolsaEmpleoUtils.addMensajeDeExito(MENSAJE_EXITO_EDITAR, bean, request);
+			datos.setRespuestaEnviada(true);
 			response.sendRedirect(request.getServletPath());
 		}
 	}

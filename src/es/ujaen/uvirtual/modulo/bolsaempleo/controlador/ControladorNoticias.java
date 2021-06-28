@@ -15,6 +15,7 @@ import es.ujaen.uvirtual.beans.CodigoDescripcion;
 import es.ujaen.uvirtual.beans.UVDatos;
 import es.ujaen.uvirtual.modulo.bolsaempleo.beans.Noticia;
 import es.ujaen.uvirtual.modulo.bolsaempleo.modelo.ModeloNoticia;
+import es.ujaen.uvirtual.modulo.bolsaempleo.modelo.ModeloParametrosConfiguracion;
 import es.ujaen.uvirtual.modulo.bolsaempleo.modelo.ModeloRol;
 import es.ujaen.uvirtual.modulo.bolsaempleo.modelo.ModeloUsuarioBolsaEmpleo;
 import es.ujaen.uvirtual.modulo.bolsaempleo.utilidades.BolsaEmpleoDataTable;
@@ -114,16 +115,16 @@ public class ControladorNoticias extends HttpServlet {
 					bean.setVista(JSP_INDEX);
 					break;
 				case ACCION_AGREGAR_NOTICIA:
-					agregarNoticia(bean, request, response);
+					agregarNoticia(bean, datos, request, response);
 					break;
 				case ACCION_DATATABLE:
 					listadoNoticias(bean, datos, request, response);
 					return;
 				case ACCION_EDITAR_NOTICIA:
-					editarNoticia(bean, request, response);
+					editarNoticia(bean, datos, request, response);
 					break;
 				case ACCION_ELIMINAR_NOTICIA:
-					eliminarNoticia(bean, request, response);
+					eliminarNoticia(bean, datos, request, response);
 					break;
 				default:
 					errorFatal(bean, "Acción no contemplada");
@@ -141,11 +142,10 @@ public class ControladorNoticias extends HttpServlet {
 			datos.getFicherosJS().add("/js/jquery-1.latest.min.js");
 			datos.getFicherosJS().add("/js/jquery-ui-1.10.4.min.js");
 			datos.getFicherosJS().add("/js/jquery.ui.datepicker-es.js");
-			datos.getFicherosJS().add("/js/bolsaempleo/utils.js");
-			datos.getFicherosJS().add("/js/bolsaempleo/datatable.js");
+			datos.getFicherosJS().add(ModeloParametrosConfiguracion.JS_BOLSA_EMPLEO);
 			datos.getFicherosCSS().add("/css/intranet.css");
 			datos.getFicherosCSS().add("/css/jqueryujaen/jquery-ui-1.8.16.custom.css");
-			datos.getFicherosCSS().add("/css/ujaen_bolsa_empleo.css");
+			datos.getFicherosCSS().add(ModeloParametrosConfiguracion.CSS_BOLSA_EMPLEO);
 		}
 	}
 	
@@ -166,8 +166,7 @@ public class ControladorNoticias extends HttpServlet {
 			LOGGER.log(Level.SEVERE, Formateador.getStackTrace(e));
 			LOGGER.log(Level.SEVERE, e.toString());
 			
-			BolsaEmpleoUtils.addMensajeDeError(e.getMessage(), bean, request);
-			response.sendRedirect("/srv/es/informacionadministrativa/bolsaempleo/error");
+			BolsaEmpleoUtils.redirectToError(bean, datos, request, response, e.getMessage());
 		}
 	}
 	
@@ -186,13 +185,14 @@ public class ControladorNoticias extends HttpServlet {
 	
 	/** agrega una nueva noticia.
 	 * @param bean .
+	 * @param datos .
 	 * @param request .
 	 * @param response .
 	 * @throws SQLException excepcion de bbdd.
 	 * @throws UVException en caso de error de parametros .
 	 * @throws IOException en caso de error de input u output .
 	 */
-	private void agregarNoticia(VistaNoticias bean, HttpServletRequest request, HttpServletResponse response) throws SQLException, UVException, IOException {
+	private void agregarNoticia(VistaNoticias bean, UVDatos datos, HttpServletRequest request, HttpServletResponse response) throws SQLException, UVException, IOException {
 		bean.setVista(RUTA_BEP_NOTICIAS + "formNoticia.jsp");
 		
 		if (EscapaHTML.ajustaCodificacion(request.getParameter(PARAM_TEXTO)) != null) {
@@ -202,19 +202,21 @@ public class ControladorNoticias extends HttpServlet {
 			
 			ModeloNoticia.obtenerInstancia().insertaNoticia(noticia, bean.getUsuarioLogeado());
 			BolsaEmpleoUtils.addMensajeDeExito(MENSAJE_EXITO_AGREGAR, bean, request);
+			datos.setRespuestaEnviada(true);
 			response.sendRedirect(request.getServletPath());			
 		}
 	}
 	
 	/** edita una noticia.
 	 * @param bean .
+	 * @param datos .
 	 * @param request .
 	 * @param response .
 	 * @throws SQLException excepcion de bbdd.
 	 * @throws UVException en caso de error de parametros .
 	 * @throws IOException en caso de error de input u output .
 	 */
-	private void editarNoticia(VistaNoticias bean, HttpServletRequest request, HttpServletResponse response) throws SQLException, UVException, IOException {
+	private void editarNoticia(VistaNoticias bean, UVDatos datos, HttpServletRequest request, HttpServletResponse response) throws SQLException, UVException, IOException {
 		bean.setVista(RUTA_BEP_NOTICIAS + "formNoticia.jsp");
 		ModeloNoticia modelo = ModeloNoticia.obtenerInstancia();
 		Noticia noticia = modelo.listaNoticia(Formateador.leeParametroInteger(request.getParameter(PARAM_ID)));
@@ -225,19 +227,21 @@ public class ControladorNoticias extends HttpServlet {
 			noticiaForm.setCodNum(noticia.getCodNum());
 			modelo.actualizaNoticia(noticiaForm, bean.getUsuarioLogeado());
 			BolsaEmpleoUtils.addMensajeDeExito(MENSAJE_EXITO_EDITAR, bean, request);
+			datos.setRespuestaEnviada(true);
 			response.sendRedirect(request.getServletPath());
 		}
 	}
 	
 	/** eliminar una noticia.
 	 * @param bean .
+	 * @param datos .
 	 * @param request .
 	 * @param response .
 	 * @throws SQLException excepcion de bbdd.
 	 * @throws UVException en caso de error de parametros .
 	 * @throws IOException en caso de error de input u output .
 	 */
-	private void eliminarNoticia(VistaNoticias bean, HttpServletRequest request, HttpServletResponse response) throws SQLException, UVException, IOException {
+	private void eliminarNoticia(VistaNoticias bean, UVDatos datos, HttpServletRequest request, HttpServletResponse response) throws SQLException, UVException, IOException {
 		ModeloNoticia modelo = ModeloNoticia.obtenerInstancia();
 		Integer codNum = Formateador.leeParametroInteger(request.getParameter(PARAM_ID));
 		Noticia noticia = new Noticia();
@@ -246,6 +250,7 @@ public class ControladorNoticias extends HttpServlet {
 		noticia.setActiva(activa);
 		modelo.borraRestauraNoticia(noticia, bean.getUsuarioLogeado());
 		BolsaEmpleoUtils.addMensajeDeExito(activa ? MENSAJE_EXITO_RESTAURAR : MENSAJE_EXITO_ELIMINAR, bean, request);
+		datos.setRespuestaEnviada(true);
 		response.sendRedirect(request.getServletPath());
 	}
 	

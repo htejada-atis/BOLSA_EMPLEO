@@ -63,7 +63,6 @@ public class ControladorFiltrarAcreditaciones extends HttpServlet {
 	public static final String PARAM_ACCION = "a";
 	public static final String PARAM_ACREDITACION = "acreditacion";
 	public static final String PARAM_CANDIDATO = "candidato";
-	public static final String PARAM_FICHERO = "fichero";
 	
 	// ruta vistas
 	public static final String RUTA_BEP_FILACRE = "/WEB-INF/jsp/vista/infadministrativa/bolsaempleo/filtraracreditaciones/";
@@ -124,10 +123,9 @@ public class ControladorFiltrarAcreditaciones extends HttpServlet {
 			datos.getFicherosJS().add("/js/jquery-1.latest.min.js");
 			datos.getFicherosJS().add("/js/jquery-ui-1.10.4.min.js");
 			datos.getFicherosJS().add("/js/jquery.ui.datepicker-es.js");
-			datos.getFicherosJS().add("/js/bolsaempleo/utils.js");
-			datos.getFicherosJS().add("/js/bolsaempleo/datatable.js");
+			datos.getFicherosJS().add(ModeloParametrosConfiguracion.JS_BOLSA_EMPLEO);
 			datos.getFicherosCSS().add("/css/intranet.css");
-			datos.getFicherosCSS().add("/css/ujaen_bolsa_empleo.css");
+			datos.getFicherosCSS().add(ModeloParametrosConfiguracion.CSS_BOLSA_EMPLEO);
 			datos.getFicherosCSS().add("/css/jqueryujaen/jquery-ui-1.8.16.custom.css");
 		}
 	}
@@ -146,8 +144,7 @@ public class ControladorFiltrarAcreditaciones extends HttpServlet {
 			LOGGER.log(Level.SEVERE, Formateador.getStackTrace(e));
 			LOGGER.log(Level.SEVERE, e.toString());
 			
-			BolsaEmpleoUtils.addMensajeDeError(e.getMessage(), bean, request);
-			response.sendRedirect("/srv/es/informacionadministrativa/bolsaempleo/error");
+			BolsaEmpleoUtils.redirectToError(bean, datos, request, response, e.getMessage());
 		}
 	}
 	
