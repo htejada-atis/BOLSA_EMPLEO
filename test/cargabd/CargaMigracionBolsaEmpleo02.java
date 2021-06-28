@@ -4,7 +4,6 @@ import java.io.IOException;
 import java.sql.SQLException;
 
 import bbdd.BbddRunner;
-import bbdd.UtilsTestBolsaEmpleo;
 
 /**
  * Migraciones 20210624 .
