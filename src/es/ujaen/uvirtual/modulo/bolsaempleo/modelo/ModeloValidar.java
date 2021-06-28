@@ -4,6 +4,7 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.Types;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -21,7 +22,6 @@ import es.ujaen.uvirtual.modulo.bolsaempleo.beans.ValorMeritoBolsaTable;
 import es.ujaen.uvirtual.modulo.bolsaempleo.utilidades.BolsaEmpleoDataTable;
 import es.ujaen.uvirtual.modulo.bolsaempleo.utilidades.BolsaEmpleoDataTable.DataTableColumn;
 import es.ujaen.uvirtual.utilidades.UVException;
-import net.bytebuddy.jar.asm.Type;
 
 /**
  * Clase de modelo para la gestión de las validaciones.
@@ -721,7 +721,7 @@ public class ModeloValidar {
 			if (merito.getValor() != null) {
 				stmtUpdate.setDouble(indexParam++, merito.getValor());
 			} else {
-				stmtUpdate.setNull(indexParam++, Type.DOUBLE);
+				stmtUpdate.setNull(indexParam++, Types.DOUBLE);
 			}
 			stmtUpdate.setString(indexParam++, usuarioUpdate.getCodCuenta());
 			stmtUpdate.executeUpdate();
@@ -756,7 +756,7 @@ public class ModeloValidar {
 			if (merito.getValor() != null) {
 				stmtUpdate.setDouble(indexParam++, merito.getValor());
 			} else {
-				stmtUpdate.setNull(indexParam++, Type.DOUBLE);
+				stmtUpdate.setNull(indexParam++, Types.DOUBLE);
 			}
 			stmtUpdate.setString(indexParam++, usuarioUpdate.getCodCuenta());
 			stmtUpdate.executeUpdate();
