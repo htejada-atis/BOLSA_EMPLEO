@@ -11,7 +11,6 @@ import java.util.logging.Logger;
 
 import es.ujaen.uvirtual.modulo.bolsaempleo.beans.Destinatario;
 import es.ujaen.uvirtual.modulo.bolsaempleo.beans.Mensaje;
-import es.ujaen.uvirtual.modulo.bolsaempleo.beans.UsuarioBolsaEmpleo;
 import es.ujaen.uvirtual.modulo.bolsaempleo.modelo.ModeloMensajes;
 import es.ujaen.uvirtual.utilidades.EnviaCorreo;
 import es.ujaen.uvirtual.utilidades.Formateador;

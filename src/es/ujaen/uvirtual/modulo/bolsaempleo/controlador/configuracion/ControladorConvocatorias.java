@@ -14,7 +14,6 @@ import com.google.gson.Gson;
 import es.ujaen.uvirtual.beans.CodigoDescripcion;
 import es.ujaen.uvirtual.beans.UVDatos;
 import es.ujaen.uvirtual.beans.Usuario;
-import es.ujaen.uvirtual.modulo.bolsaempleo.beans.ApartadoBaremacion;
 import es.ujaen.uvirtual.modulo.bolsaempleo.beans.Convocatoria;
 import es.ujaen.uvirtual.modulo.bolsaempleo.modelo.ModeloBaremacionApartados;
 import es.ujaen.uvirtual.modulo.bolsaempleo.modelo.ModeloBolsa;
@@ -295,8 +294,6 @@ public class ControladorConvocatorias extends HttpServlet {
 		ModeloConvocatoria modelo = ModeloConvocatoria.obtenerInstancia();
 		ModeloBolsa modeloBolsas = ModeloBolsa.obtenerInstancia();
 		
-		ApartadoBaremacion apartado = new ApartadoBaremacion();
-		
 		Convocatoria convocatoria = modelo.getConvocatoriaById(Formateador.leeParametroInteger(request.getParameter(PARAM_CONVOCATORIA_ID)));
 		bean.setConvocatoria(convocatoria);
 		
@@ -306,7 +303,7 @@ public class ControladorConvocatorias extends HttpServlet {
 			BolsaEmpleoUtils.addMensajeDeError(MENSAJE_ERROR_BOLSAS_BLOQUEADAS, bean, request);
 		} else if (modelo.hayConvocatoriaAbierta()) {
 			BolsaEmpleoUtils.addMensajeDeError(MENSAJE_ERROR_CONVOCATORIAS_ABIERTAS, bean, request);
-		} else if (ModeloBaremacionApartados.obtenerInstancia().checkSumaPorcentagesApartados(apartado, "Alcanzar")) {
+		} else if (ModeloBaremacionApartados.obtenerInstancia().checkSumaPorcentagesApartadosInvalido()) {
 			BolsaEmpleoUtils.addMensajeDeError(MENSAJE_ERROR_APARTADOS_PORCENTAGES, bean, request);
 		} else {
 			Integer codNum = Formateador.leeParametroInteger(request.getParameter(PARAM_CONVOCATORIA_ID));

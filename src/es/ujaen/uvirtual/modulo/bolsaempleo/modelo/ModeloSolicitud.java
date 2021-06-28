@@ -155,7 +155,6 @@ public class ModeloSolicitud {
 	 * @throws UVException error si no existe la area .
 	 */
 	public BolsaEmpleoDataTable<Solicitud> listaSolicitudesCandidatoDatatable(UsuarioBolsaEmpleo candidato, Map<String, String[]> params) throws SQLException, UVException {
-		ModeloConvocatoria modeloConvocatoria = ModeloConvocatoria.obtenerInstancia(); 
 		List<Solicitud> data = new ArrayList<>();
 		BolsaEmpleoDataTable<Solicitud> dataTable = new BolsaEmpleoDataTable<>(params);
 		
@@ -304,7 +303,11 @@ public class ModeloSolicitud {
 				+ "		INNER JOIN TBEP_SOLICITUD_BOLSAS bepsbo ON bepsbo.CODNUM = bepsbm.BEPSBO_CODNUM"
 				+ "		WHERE bepsbo.BEPBOL_CODNUM = ? AND bepsbo.BEPSOL_CODNUM = ?"
 				+ " ) MERITOS_BOLSAS ON MERITOS_BOLSAS.BEPMER_CODNUM = bepmer.CODNUM"
-				+ " WHERE bepmer.BEPUSU_CODNUM = ? ";
+				+ " WHERE 1=1 "
+				+ "		AND bepmer.BEPUSU_CODNUM = ? "
+				+ "		AND bepite.FLGACTIVO = 'S' "
+				+ "		AND bepblo.FLGACTIVO = 'S' "
+				+ "		AND bepapa.FLGACTIVO = 'S' ";
 
 		String whereCodigo = String.format("(%s || '.' || %s || '.' || %s)", "bepapa.CODIGO", "bepblo.CODIGO", "bepite.CODIGO");
 		String orderCodigo = String.format("(%s || '.' || %s || '.' || %s) %%s", "LPAD(bepapa.CODIGO, 3)", "LPAD(bepblo.CODIGO, 3)", "LPAD(bepite.CODIGO, 3)");

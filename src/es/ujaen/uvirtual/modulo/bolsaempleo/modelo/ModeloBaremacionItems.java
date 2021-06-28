@@ -52,6 +52,11 @@ public class ModeloBaremacionItems {
 	public static final String ERROR_ITEM_MISMO_CODIGO = "Ya existe un ítem con el código introducido";
 	public static final String ERROR_ITEM_NOEXITE = "Item no encontrado";
 	public static final String ERROR_ITEM_REQUERIDO = "El ítem de baremación es requerido";
+	public static final String ERROR_ITEM_USANDOSE = "El item está asociado en algún mérito no se puede editar.";
+	public static final String ERROR_TIPO_UNIDAD_NO_VALIDA = "Tipo de unidad no válida";
+	public static final String ERROR_VALOR_MINIMO = "El valor mínimo deber al menos %f";
+	public static final String ERROR_VALOR_MAXIMO = "El valor máximo deber al menos %f";
+	public static final String ERROR_VALOR_MAXIMO_MINIMO = "El valor máximo deber mayor que el valor mínimo";
 	
 	public static final Integer COLUMN_CODIGO_MAXLENGTH = 3; 
 	public static final Integer COLUMN_NOMBRE_MAXLENGTH = 1000;
@@ -284,6 +289,10 @@ public class ModeloBaremacionItems {
 	public void actualizaItem(ItemBaremacion item, UsuarioBolsaEmpleo usuarioUpdate) throws SQLException, UVException {
 		this.chequearItemParaInsertarOActualizar(item);
 		
+		if (this.chequearUsandose(item)) {
+			throw new UVException(ERROR_ITEM_USANDOSE);
+		}
+		
 		String consulta = "UPDATE TBEP_ITEMSBAREMACION SET "
 				+ "CODIGO = ?, "
 				+ "NOMBRE = ?, "
@@ -403,7 +412,10 @@ public class ModeloBaremacionItems {
 				+ "SELECT bepite.* "
 				+ "FROM TBEP_ITEMSBAREMACION bepite "
 				+ "INNER JOIN TBEP_BLOQUESBAREMACION bepblo ON bepblo.CODNUM = bepite.BEPBLO_CODNUM "
-				+ "WHERE bepblo.BEPAPA_CODNUM = ? "
+				+ "WHERE 1=1"
+				+ "	AND bepblo.BEPAPA_CODNUM = ? "
+				+ " AND bepblo.FLGACTIVO = 'S' "
+				+ " AND bepite.FLGACTIVO = 'S' "
 				+ "ORDER BY LPAD(bepblo.CODIGO, 3) || LPAD(bepite.CODIGO, 3)";
 		
 		try (Connection conexion = ConexionUvirtual.obtenerInstancia(); PreparedStatement stmt = conexion.prepareStatement(consulta)
@@ -488,19 +500,19 @@ public class ModeloBaremacionItems {
 		unidades.add(ITEM_UNIDADES_MEDICION_SINO);
 			
 		if (!unidades.contains(item.getUnidades())) {
-			throw new UVException("Tipo de unidad no válida");
+			throw new UVException(ERROR_TIPO_UNIDAD_NO_VALIDA);
 		}
 		
 		if (item.getValorMinimo() < MINIMO_VALOR_FLOAT) {
-			throw new UVException("El valor mínimo deber al menos " + MINIMO_VALOR_FLOAT);
+			throw new UVException(String.format(ERROR_VALOR_MINIMO, MINIMO_VALOR_FLOAT));
 		}
 		
 		if (item.getValorMaximo() < MINIMO_VALOR_FLOAT) {
-			throw new UVException("El valor máximo deber al menos " + MINIMO_VALOR_FLOAT);
+			throw new UVException(String.format(ERROR_VALOR_MAXIMO, MINIMO_VALOR_FLOAT));
 		}
 		
 		if (item.getValorMinimo() > item.getValorMaximo()) {
-			throw new UVException("El valor máximo deber mayor que el valor mínimo");
+			throw new UVException(ERROR_VALOR_MAXIMO_MINIMO);
 		}
 	}
 
@@ -649,5 +661,35 @@ public class ModeloBaremacionItems {
 				}
 			}
 		}
+	}
+	
+	/**
+	 * Comprueba si el item está usandose en algun mérito.
+	 * 
+	 * @param item .
+	 * @return .
+	 * @throws SQLException .
+	 */
+	private boolean chequearUsandose(ItemBaremacion item) throws SQLException {
+		String sql = ""
+			+ " SELECT COUNT(*) AS TOTAL "
+			+ " FROM TBEP_APARTADOSBAREMACION bepapa "
+			+ " INNER JOIN TBEP_BLOQUESBAREMACION bepblo ON bepblo.BEPAPA_CODNUM = bepapa.CODNUM "
+			+ " INNER JOIN TBEP_ITEMSBAREMACION bepite ON bepite.BEPBLO_CODNUM = bepblo.CODNUM "
+			+ " INNER JOIN TBEP_MERITOS bepmer ON bepmer.BEPITE_CODNUM = bepite.CODNUM "			
+			+ " WHERE bepite.CODNUM = ? ";
+		
+		try (Connection con = ConexionUvirtual.obtenerInstancia(); PreparedStatement stmt = con.prepareStatement(sql)) {
+			int parameterIndex = 1;
+			stmt.setInt(parameterIndex++, item.getCodNum());
+			
+			try (ResultSet rs = stmt.executeQuery()) {
+				if (rs.next()) {
+					return rs.getInt("TOTAL") > 0;
+				}
+			}
+		}
+		
+		return false;
 	}
 }

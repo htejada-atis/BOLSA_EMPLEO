@@ -33,6 +33,7 @@ public class ModeloBaremacionBloques {
 	public static final String ERROR_BLOQUE_NOEXITE = "Apartado no encontrado";	
 	public static final String ERROR_BLOQUE_REQUERIDO = "El bloque de baremación es requerido";
 	public static final String ERROR_BLOQUE_MISMO_CODIGO = "Ya existe un bloque con el código introducido";
+	public static final String ERROR_APARTADO_USADO = "El apartado está asociado en algún mérito no se puede editar.";
 
 	public static final Integer COLUMN_CODIGO_MAXLENGTH = 3;
 	public static final Integer COLUMN_NOMBRE_MAXLENGTH = 1000;
@@ -171,6 +172,10 @@ public class ModeloBaremacionBloques {
 	public void actualizaBloque(BloqueBaremacion bloque, UsuarioBolsaEmpleo usuarioUpdate) throws SQLException, UVException {
 		this.chequearBloqueParaInsertarOActualizar(bloque);
 		
+		if (this.chequearUsandose(bloque)) {
+			throw new UVException(ERROR_APARTADO_USADO);
+		}
+				
 		String consulta = "UPDATE TBEP_BLOQUESBAREMACION SET "
 				+ "CODIGO = ?, "
 				+ "NOMBRE = ?, "
@@ -259,6 +264,46 @@ public class ModeloBaremacionBloques {
 		}
 	}
 	
+	/** lista todos los bloques.
+	 * @param a .
+	 * @param activo indica si filtra por blooque activo o inactivos. Si es null. Todos.
+	 * @return vector con todos los bloques .
+	 * @throws SQLException si hay un error en la base de datos .
+	 * @throws UVException .
+	 * @throws UVException .
+	 */
+	public List<BloqueBaremacion> getBloques(ApartadoBaremacion a, Boolean activo) throws SQLException, UVException {
+		List<BloqueBaremacion> bloques = new ArrayList<>();
+		
+		String consulta = ""
+				+ " SELECT bepblo.* "
+				+ " FROM TBEP_BLOQUESBAREMACION bepblo "
+				+ " WHERE bepblo.BEPAPA_CODNUM = ? ";
+						
+		if (activo != null) {
+			consulta += " AND bepblo.FLGACTIVO = ? "; 
+		}
+		
+		try (Connection conexion = ConexionUvirtual.obtenerInstancia(); PreparedStatement stmt = conexion.prepareStatement(consulta)) {
+			int paramIndex = 1;
+			
+			stmt.setInt(paramIndex++, a.getCodNum());
+			
+			if (activo != null) {
+				stmt.setString(paramIndex++, activo ? "S" : "N");	
+			}
+			
+			try (ResultSet rs = stmt.executeQuery()) {
+				while (rs.next()) {
+					BloqueBaremacion bloque = this.createBloqueFromResultSet(rs);	
+					bloques.add(bloque);
+				}
+			}
+		}
+		
+		return bloques;
+	}
+	
 	/**
 	 * Devuelve los bloques de bareamación activos.
 	 * @return .
@@ -345,4 +390,34 @@ public class ModeloBaremacionBloques {
 		
 		return false;
 	} 
+	
+	/**
+	 * Comprueba si el bloque está usandose en algun mérito.
+	 * 
+	 * @param bloque .
+	 * @return .
+	 * @throws SQLException .
+	 */
+	private boolean chequearUsandose(BloqueBaremacion bloque) throws SQLException {
+		String sql = ""
+			+ " SELECT COUNT(*) AS TOTAL "
+			+ " FROM TBEP_APARTADOSBAREMACION bepapa "
+			+ " INNER JOIN TBEP_BLOQUESBAREMACION bepblo ON bepblo.BEPAPA_CODNUM = bepapa.CODNUM "
+			+ " INNER JOIN TBEP_ITEMSBAREMACION bepite ON bepite.BEPBLO_CODNUM = bepblo.CODNUM "
+			+ " INNER JOIN TBEP_MERITOS bepmer ON bepmer.BEPITE_CODNUM = bepite.CODNUM "			
+			+ " WHERE bepblo.CODNUM = ? ";
+		
+		try (Connection con = ConexionUvirtual.obtenerInstancia(); PreparedStatement stmt = con.prepareStatement(sql)) {
+			int parameterIndex = 1;
+			stmt.setInt(parameterIndex++, bloque.getCodNum());
+			
+			try (ResultSet rs = stmt.executeQuery()) {
+				if (rs.next()) {
+					return rs.getInt("TOTAL") > 0;
+				}
+			}
+		}
+		
+		return false;
+	}
 }

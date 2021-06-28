@@ -5,6 +5,7 @@
  * 20210602 overflow-auto y render
  * 20210604 select all y columnas preseleccionadas
  * 20210607 opción por defecto en select boolean
+ * 20210624 title y label en acciones como functions. getRow. renderBoolean
  */
  
 function DataTable(id, config) {
@@ -59,6 +60,17 @@ function DataTable(id, config) {
 
     this.setTitle = function(tit) {
         self.title = tit;
+    };
+
+    this.getRow = function(codNum) {
+    	if (self.lastResponse && self.lastResponse.data) {
+            for(var i=0; i<self.lastResponse.data.length; i++) {
+            	if (self.lastResponse.data[i].codNum == codNum) {
+                    return self.lastResponse.data[i];
+                }
+            }
+        }
+        return null;
     };
         
     this.loading = function(on) {
@@ -168,13 +180,18 @@ function DataTable(id, config) {
             }
 
             return overflow.append(
-                columnDef.hasOwnProperty('render') ? columnDef.render(row) :
-                typeof value !== 'undefined' ? '' + value : ''
+                columnDef.hasOwnProperty('render') ? columnDef.render(row) : typeof value !== 'undefined' ? '' + value : ''
             );
         }
 
         if (columnDef.hasOwnProperty('render')) {
     		return columnDef.render(row);
+    	}
+    	
+    	if (columnDef.hasOwnProperty('renderBoolean')) {
+    		var condition = row[columnDef.data]; 
+    		var title = condition ? Atis.getProp(columnDef.renderBoolean, 'true', '') : Atis.getProp(columnDef.renderBoolean, 'false', '');     		    
+    		return '<div class="circle-' + (condition ? 'true' : 'false') + '" title="' + title + '"></div>';    		
     	}
     	
     	if (columnDef.hasOwnProperty('buttons')) {
@@ -310,17 +327,20 @@ function DataTable(id, config) {
         var actions = $('<span class="actions"></span>');
         if (self.config.actions) {
             for (var i = 0; i < self.config.actions.length; i++) {
-            	var action = self.config.actions[i];
+            	var action = self.config.actions[i];     
+            	
             	if (action.showWhenSelected == null || action.showWhenSelected == (self.config.selected > 0)) {
-	            	var btn = $('<button class="btn"' + (action.title ? 'title="' + action.title + '"' : '') + ' type="button">' + action.label + '</button>');
-	            	
-	            	if (self.config.selected) {
+            		if (self.config.selected) {
 	            		selected = self.config.selected;
 	            	}
-
+	            	
+            		var label = Atis.isFunction(action.label) ? action.label.bind(self, selected)() : action.label;
+                	var title = action.title ? (Atis.isFunction(action.title) ? action.title.bind(self, selected)() : action.title) : '';
+	            	var btn = $('<button class="btn" title="' + title + '" type="button">' + label + '</button>');
+	            	
                     if (action.hasOwnProperty('class')) {
                         $(btn).addClass(action.class);
-                    }
+                    }                    
 
                     if (action.hasOwnProperty('icon')) {
                         var position = action.icon.position ? action.icon.position : 'left';

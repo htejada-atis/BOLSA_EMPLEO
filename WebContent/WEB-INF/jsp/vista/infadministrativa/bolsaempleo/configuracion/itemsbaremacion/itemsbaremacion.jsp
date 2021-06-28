@@ -23,26 +23,21 @@ VistaItemsBaremacion bean = (VistaItemsBaremacion) uvdatos.getVistas().get(Vista
 	    </button>
 	</div>
 	
-	<p id="selectBloque">Seleccione un <strong>BLOQUE</strong> para mostrar los apartados</p>
-	
 	<table class="bluetable bolsaempleo custom" id="tableBloques">
 		<tr>
 			<th scope="col" style="width:20%" title="Código apartado">Código</th>
 			<th scope="col" style="width:60%" title="Nombre del bloque">Nombre del bloque</th>
-			<th scope="col" style="width:10%" title="Puntuación máxima por bloque">Puntuación max.</th>
-			<th scope="col" style="width:10%" title="Porcentaje máximo por bloque">Porcentaje max.</th>
+			<th scope="col" style="width:10%" title="Factor de ponderación del bloque">Factor</th>
 			<th scope="col" class="center" style="width:10%">Activo</th>
 		</tr>
 		<tbody>				
 		</tbody>
 		<tfoot>
 			<tr>
-				<th colSpan="7" style="width:100%"></th>
+				<th colSpan="4" style="width:100%"></th>
 			</tr>
 		</tfoot>
 	</table>
-	
-	<p id="selectApartado" style="display:none;">Seleccione un <strong>APARTADO</strong> para mostrar los items asociados al mismo</p>
 	
 	<table class="bluetable bolsaempleo custom" id="tableApartados">
 		<tr>
@@ -59,8 +54,6 @@ VistaItemsBaremacion bean = (VistaItemsBaremacion) uvdatos.getVistas().get(Vista
 			</tr>
 		</tfoot>
 	</table>
-	
-	<p id="selectItem" style="display:none;">Seleccione un <strong>ITEM</strong> para editarlo o borrarlo</p>
 	
 	<table class="bluetable bolsaempleo custom" id="tableItems">
 		<tr>
@@ -88,43 +81,42 @@ VistaItemsBaremacion bean = (VistaItemsBaremacion) uvdatos.getVistas().get(Vista
 
 	$(document).ready(function() {
 		
-		var activatorApartado = false;
-		var activatorBloque = false;
-		var activatorItem = false;
-		
-	<%	if (bean.getApartadoBaremacion() != null) {
-    		if (bean.getApartadoBaremacion().getActivo()) {%>
-				$("#selectApartado").show();
-				$("#selectBloque").hide();
-    			activatorBloque = false;
-    	<%	} else { %>
-				$("#selectBloque").show();
-				$("#selectApartado").hide();
-    			activatorBloque = true;
-    	<%	}
-    		if (bean.getBloqueBaremacion() != null) {
-    			if (bean.getBloqueBaremacion().isActivo()) {%>
-					$("#selectItem").show();
-					$("#selectApartado").hide();
-    				activatorApartado = false;
-        	<%	} else { %>
-					$("#selectApartado").show();
-					$("#selectItem").hide();
-        			activatorApartado = true;
-        	<%	}
-    			if (bean.getItemBaremacion() != null) {
-    				if (bean.getItemBaremacion().getActivo()) {%>
-    					activatorItem = false;
-        		<%	} else { %>
-    					activatorItem = true;
-        		<%	}
+	   	var renderTextActivarDesactivar = function(selected) { 
+	   		if (selected && selected.length > 0) {
+	   			var row = this.getRow(selected[0]);
+	   			if (row) {
+	   				return row.activo ? "Desactivar" : "Activar";
+	   			}		    			
+	   		}
+	   		return "[error]";
+	   	};
+    	
+    	var onClickActivarDesactivar = function(selected, title, paramObject, actionDesactivar, actionActivar) {
+    		if (selected && selected.length > 0) {
+    			var row = this.getRow(selected[0]);    			
+    			if (row) {
+    				var text = row.activo ? "Desactivar" : "Activar"; 
+    					
+    				Atis.confirmDialog(text + " bloque", title.replace("%s", text.toLowerCase()), {
+    	        		Si: function() {
+    	        			var params = {'<%=ControladorItemsBaremacion.PARAM_ACCION%>': row.activo ? actionDesactivar : actionActivar};
+    	        			params[paramObject] = selected;
+    		        		Atis.sendForm("<%=request.getRequestURI()%>", params);
+    			          	$(this).dialog("close");
+    			        },
+    			        No: function() {
+    			          	$(this).dialog("close");
+    			    	}
+    			    });		
     			}
     		}
-		} %>
+    	};
     	
-    	var activatorApartadoName = activatorApartado ? "Activar" : "Desactivar";
-    	var activatorBloqueName = activatorBloque ? "Activar" : "Desactivar";
-    	var activatorItemName = activatorItem ? "Activar" : "Desactivar";
+    	var onClickEditar = function(action, paramObject, selected) {
+    		var params = {'<%=ControladorItemsBaremacion.PARAM_ACCION%>': action};
+    		params[paramObject] = selected;
+       		Atis.sendForm("<%=request.getRequestURI()%>", params);
+    	};
 		
 		var tableBloques = new Atis.DataTable('#tableBloques', {
 		    "ajax": { url: "<%= ControladorItemsBaremacion.URL_PATTERN_AJAX %>", async: false },
@@ -136,50 +128,43 @@ VistaItemsBaremacion bean = (VistaItemsBaremacion) uvdatos.getVistas().get(Vista
 		    "defaultOrderDirection": "asc",
 		    "clickable": {'onClick': function(row) {
 		    	var params = {
-	    				'a': '<%= ControladorItemsBaremacion.ACCION_APARTADO_SELECCIONADO %>', 
-	    				'<%= ControladorItemsBaremacion.PARAM_APARTADO %>': row.codNum};
+    				'<%=ControladorItemsBaremacion.PARAM_ACCION%>': '<%=ControladorItemsBaremacion.ACCION_APARTADO_SELECCIONADO%>', 
+    				'<%=ControladorItemsBaremacion.PARAM_APARTADO%>': row.codNum
+    			};
         		Atis.sendForm("<%= request.getRequestURI() %>", params);
 		    }},
-		 	<%	if (bean.getApartadoBaremacion() != null) { %> "selected": <%= bean.getApartadoBaremacion().getCodNum() %> ,<% } %>
+		    "selected": <%= bean.getApartadoBaremacion() != null ? bean.getApartadoBaremacion().getCodNum() : "null" %>,
 		    "columns": [
 		    	{'data': 'codigo', 'filter': true},
 		        {'data': 'nombre', 'filter': true},
-		        {'data': 'puntuacionMaxima'},
 		        {'data': 'porcentajeMaximo'},
-		        {'data': 'activo', 'filter': {'type': 'selectBoolean', 'true': 'Activo', 'false': 'Inactivo'}, 'render': function(row) {
-	        		if(row.activo){
-	        			return "<div title='Activo' class='circle-true'></div>"; 
-	        		}
-	        		else{
-	        			return "<div title='Desactivado' class='circle-false'></div>"; 
-	        		}
-	        	}},
+		        {'data': 'activo', 'filter': {'type': 'selectBoolean', 'true': 'Activo', 'false': 'Inactivo'}, 'renderBoolean': {'true': 'Bloque activo', 'false': 'Bloque inactivo'}},
 		    ],
 		    "actions": [		    	
-		    	{'label': 'Añadir', 'title': 'Añadir un nuevo bloque', 'onClick': function(selected) {
-		    		var params = {'a': '<%=ControladorItemsBaremacion.ACCION_AGREGAR_APARTADO%>'};
+		    	{'label': 'Añadir', 
+		    	 'title': 'Añadir un nuevo bloque', 
+		    	 'onClick': function(selected) {
+		    		var params = {'<%=ControladorItemsBaremacion.PARAM_ACCION%>': '<%=ControladorItemsBaremacion.ACCION_AGREGAR_APARTADO%>'};
 	        		Atis.sendForm("<%=request.getRequestURI()%>", params);
 		    	}},
-		    	{'label': activatorBloqueName, 'showWhenSelected': true, 'title': activatorBloqueName + ' bloque seleccionado', 'onClick': function(selected) {
-	        		Atis.confirmDialog(activatorBloqueName + " bloque", "¿ Desea " + activatorBloqueName + " el bloque seleccionado?", {
-		        		Si: function() {
-		        			var params = {
-			    				'a': activatorApartado ? '<%=ControladorItemsBaremacion.ACCION_ACTIVAR_APARTADO%>' : '<%=ControladorItemsBaremacion.ACCION_DESACTIVAR_APARTADO%>' , 
-			    				'<%=ControladorItemsBaremacion.PARAM_APARTADO%>': selected
-			    			};
-			        		Atis.sendForm("<%=request.getRequestURI()%>", params);
-				          	$(this).dialog("close");
-				        },
-				        No: function() {
-				          	$(this).dialog("close");
-				    	}
-				    });
-		    	}},
-		    	{'label': 'Editar', 'showWhenSelected': true, 'title': 'Editar bloque seleccionado', 'onClick': function(selected) {
-		    		var params = {'a': '<%=ControladorItemsBaremacion.ACCION_EDITAR_APARTADO%>', 
-		    				'<%=ControladorItemsBaremacion.PARAM_APARTADO%>': selected};
-	        		Atis.sendForm("<%=request.getRequestURI()%>", params);
-		    	}}
+		    	{'label': renderTextActivarDesactivar, 
+		    	 'title': renderTextActivarDesactivar,
+		    	 'showWhenSelected': true,
+		    	 'onClick': function(selected) { 
+		    		 onClickActivarDesactivar.bind(this,
+	    				 selected, 
+	    				 "¿Desea %s el bloque seleccionado?", 
+	    				 '<%=ControladorItemsBaremacion.PARAM_APARTADO%>', 
+	    				 '<%=ControladorItemsBaremacion.ACCION_DESACTIVAR_APARTADO%>', 
+	    				 '<%=ControladorItemsBaremacion.ACCION_ACTIVAR_APARTADO%>'
+		    		)();
+		    	  }
+		    	},
+		    	{'label': 'Editar', 
+		    	 'showWhenSelected': true, 
+		    	 'title': 'Editar bloque seleccionado', 
+		    	 'onClick': onClickEditar.bind(this, '<%=ControladorItemsBaremacion.ACCION_EDITAR_APARTADO%>', '<%=ControladorItemsBaremacion.PARAM_APARTADO%>')
+		    	}
 		    ]
 		});
 		
@@ -198,52 +183,44 @@ VistaItemsBaremacion bean = (VistaItemsBaremacion) uvdatos.getVistas().get(Vista
 			    "action": "<%=ControladorItemsBaremacion.ACCION_DATATABLE_BLOQUES%>",
 			    "clickable": {'onClick': function(row) {
 			    	var params = {
-		    				'a': '<%= ControladorItemsBaremacion.ACCION_BLOQUE_SELECCIONADO %>', 
-		    				'<%= ControladorItemsBaremacion.PARAM_BLOQUE %>': row.codNum};
+	    				'<%=ControladorItemsBaremacion.PARAM_ACCION%>': '<%=ControladorItemsBaremacion.ACCION_BLOQUE_SELECCIONADO%>', 
+	    				'<%=ControladorItemsBaremacion.PARAM_BLOQUE%>': row.codNum
+		    		};
 	        		Atis.sendForm("<%= request.getRequestURI() %>", params);
 			    }},
-		<%	if (bean.getBloqueBaremacion() != null) { %> "selected": <%= bean.getBloqueBaremacion().getCodNum() %> ,<% } %>
+			    "selected": <%= bean.getBloqueBaremacion() != null ? bean.getBloqueBaremacion().getCodNum() : "null" %>,		
 			    "columns": [
-			    	{'data': 'codigo', 'filter': true, 'render': function(row) {
-			    		return row.apartado.codigo + "." + row.codigo;
-			    	}},
+			    	{'data': 'codigo', 'filter': true, 'render': function(row) { return row.apartado.codigo + "." + row.codigo; }},
 			        {'data': 'nombre', 'filter': true},
 			        {'data': 'numeroMaximoMeritos'},			        
-			        {'data': 'activo', 'filter': {'type': 'selectBoolean', 'true': 'Activo', 'false': 'Inactivo'}, 'render': function(row) {
-		        		if(row.activo){
-		        			return "<div class='circle-true'></div>"; 
-		        		}
-		        		else{
-		        			return "<div class='circle-false'></div>"; 
-		        		}
-		        	}},
+			        {'data': 'activo', 'filter': {'type': 'selectBoolean', 'true': 'Activo', 'false': 'Inactivo'}, 'renderBoolean': {'true': 'Apartado activo', 'false': 'Apartado inactivo'}},
 			    ],
 			    "actions": [
 			    	{'label': 'Añadir', 'title': 'Añadir un nuevo apartado', 'onClick': function(selected) {
-			    		var params = {'a': '<%=ControladorItemsBaremacion.ACCION_AGREGAR_BLOQUE%>', 
-			    				'<%=ControladorItemsBaremacion.PARAM_APARTADO%>': '<%=bean.getApartadoBaremacion().getCodNum()%>'};
+			    		var params = {
+		    				'<%=ControladorItemsBaremacion.PARAM_ACCION%>': '<%=ControladorItemsBaremacion.ACCION_AGREGAR_BLOQUE%>', 
+		    				'<%=ControladorItemsBaremacion.PARAM_APARTADO%>': '<%=bean.getApartadoBaremacion().getCodNum()%>'
+			    		};
 		        		Atis.sendForm("<%=request.getRequestURI()%>", params);
 			    	}},
-			    	{'label': activatorApartadoName, 'showWhenSelected': true, 'title': activatorApartadoName + ' apartado seleccionado', 'onClick': function(selected) {
-		        		Atis.confirmDialog(activatorApartadoName + " apartado", "¿ Desea " + activatorApartadoName + " el apartado seleccionado ?", {
-			        		Si: function() {
-			        			var params = {
-				    				'a': activatorBloque ? '<%=ControladorItemsBaremacion.ACCION_ACTIVAR_BLOQUE%>' : '<%=ControladorItemsBaremacion.ACCION_DESACTIVAR_BLOQUE%>' , 
-				    				'<%=ControladorItemsBaremacion.PARAM_BLOQUE%>': selected
-				    			};
-				        		Atis.sendForm("<%=request.getRequestURI()%>", params);
-					          	$(this).dialog("close");
-					        },
-					        No: function() {
-					          	$(this).dialog("close");
-					    	}
-					    });
-			    	}},			    	
-			    	{'label': 'Editar', 'showWhenSelected': true, 'title': 'Editar apartado seleccionado', 'onClick': function(selected) {
-			    		var params = {'a': '<%=ControladorItemsBaremacion.ACCION_EDITAR_BLOQUE%>', 
-			    				'<%=ControladorItemsBaremacion.PARAM_BLOQUE%>': selected};
-		        		Atis.sendForm("<%=request.getRequestURI()%>", params);
-			    	}}
+			    	{'label': renderTextActivarDesactivar,
+			    	 'title': renderTextActivarDesactivar,
+			    	 'showWhenSelected': true,
+			    	 'onClick': function(selected) { 
+			    		 onClickActivarDesactivar.bind(this,
+		    				 selected, 
+		    				 "¿Desea %s el apartado seleccionado?", 
+		    				 '<%=ControladorItemsBaremacion.PARAM_BLOQUE%>', 
+		    				 '<%=ControladorItemsBaremacion.ACCION_DESACTIVAR_BLOQUE%>', 
+		    				 '<%=ControladorItemsBaremacion.ACCION_ACTIVAR_BLOQUE%>'
+				    	 )();
+			    	  }
+			    	},
+			    	{'label': 'Editar', 
+			    	 'showWhenSelected': true, 
+			    	 'title': 'Editar apartado seleccionado',
+			    	 'onClick': onClickEditar.bind(this, '<%=ControladorItemsBaremacion.ACCION_EDITAR_BLOQUE%>', '<%=ControladorItemsBaremacion.PARAM_BLOQUE%>')
+			    	}
 			    ]
 			});
 			document.getElementById("tableApartados").style.visibility = "visible";
@@ -260,68 +237,54 @@ VistaItemsBaremacion bean = (VistaItemsBaremacion) uvdatos.getVistas().get(Vista
 				    "action": "<%=ControladorItemsBaremacion.ACCION_DATATABLE_ITEMS%>",
 				    "clickable": {'onClick': function(row) {
 				    	var params = {
-			    				'a': '<%= ControladorItemsBaremacion.ACCION_ITEM_SELECCIONADO %>', 
-			    				'<%= ControladorItemsBaremacion.PARAM_ITEM %>': row.codNum};
+		    				'<%=ControladorItemsBaremacion.PARAM_ACCION%>': '<%=ControladorItemsBaremacion.ACCION_ITEM_SELECCIONADO%>', 
+		    				'<%=ControladorItemsBaremacion.PARAM_ITEM%>': row.codNum
+		    			};
 		        		Atis.sendForm("<%= request.getRequestURI() %>", params);
 				    }},
-			<%	if (bean.getItemBaremacion() != null) { %> "selected": <%= bean.getItemBaremacion().getCodNum() %> ,<% } %>
+				    "selected": <%= bean.getItemBaremacion() != null ? bean.getItemBaremacion().getCodNum() : "null" %>,
 				    "columns": [
-				    	{'data': 'codigo', 'filter': true, 'render': function(row) {
-				    		return row.bloque.apartado.codigo + "." + row.bloque.codigo + "." + row.codigo;
-				    	}},
+				    	{'data': 'codigo', 'filter': true, 'render': function(row) { return row.bloque.apartado.codigo + "." + row.bloque.codigo + "." + row.codigo; }},
 				        {'data': 'nombre', 'filter': true},
 				        {'data': 'unidades'},
 				        {'data': 'valor'},
 				        {'data': 'valorMinimo'},
-				        {'data': 'valorMaximo'},				        
+				        {'data': 'valorMaximo'},
 				        {'data': 'afinidad', 'render': function(row) { return row.afinidad ? row.afinidad : 'N'; }},
-				        {'data': 'individualizado', 'filter': {'type': 'selectBoolean', 'true': 'Si', 'false': 'No'}, 'render': function(row) {
-			        		if(row.individualizado){
-			        			return '<div class="circle-true" title="Individualizado"></div>'; 
-			        		}
-			        		else{
-			        			return '<div class="circle-false" title="No individualizado"></div>'; 
-			        		}
-			        	}},
-				        {'data': 'activo', 'filter': {'type': 'selectBoolean', 'true': 'Activo', 'false': 'Inactivo'}, 'render': function(row) {
-			        		if(row.activo){
-			        			return "<div class='circle-true'></div>"; 
-			        		}
-			        		else{
-			        			return "<div class='circle-false'></div>"; 
-			        		}
-			        	}},
+				        {'data': 'individualizado', 'filter': {'type': 'selectBoolean', 'true': 'Si', 'false': 'No'}, 'renderBoolean': {'true': 'Individualizado', 'false': 'No individualizado'}},
+				        {'data': 'activo', 'filter': {'type': 'selectBoolean', 'true': 'Activo', 'false': 'Inactivo'}, 'renderBoolean': {'true': 'Item activo', 'false': 'Item inactivo'}},
 				    ],
 				    "actions": [
 				    	{'label': 'Añadir', 'title': 'Añadir un nuevo item', 'onClick': function(selected) {
-				    		var params = {'a': '<%=ControladorItemsBaremacion.ACCION_AGREGAR_ITEM%>', 
-				    				'<%=ControladorItemsBaremacion.PARAM_BLOQUE%>': '<%=bean.getBloqueBaremacion().getCodNum()%>'};
+				    		var params = {
+				    			'<%=ControladorItemsBaremacion.PARAM_ACCION%>': '<%=ControladorItemsBaremacion.ACCION_AGREGAR_ITEM%>', 
+				    			'<%=ControladorItemsBaremacion.PARAM_BLOQUE%>': '<%=bean.getBloqueBaremacion().getCodNum()%>'
+				    		};
 			        		Atis.sendForm("<%=request.getRequestURI()%>", params);
 				    	}},
-				    	{'label': activatorItemName, 'showWhenSelected': true, 'title': activatorItemName + ' item seleccionado', 'onClick': function(selected) {
-			        		Atis.confirmDialog(activatorItemName + " item", "¿ Desea " + activatorItemName + " el item seleccionado?", {
-				        		Si: function() {
-				        			var params = {
-					    				'a': activatorItem ? '<%=ControladorItemsBaremacion.ACCION_ACTIVAR_ITEM%>' : '<%=ControladorItemsBaremacion.ACCION_DESACTIVAR_ITEM%>' , 
-					    				'<%=ControladorItemsBaremacion.PARAM_ITEM%>': selected
-					    			};
-					        		Atis.sendForm("<%=request.getRequestURI()%>", params);
-						          	$(this).dialog("close");
-						        },
-						        No: function() {
-						          	$(this).dialog("close");
-						    	}
-						    });
-				    	}},				    	
-				    	{'label': 'Editar', 'title': 'Editar item seleccionado', 'showWhenSelected': true, 'onClick': function(selected) {
-				    		var params = {'a': '<%=ControladorItemsBaremacion.ACCION_EDITAR_ITEM%>', 
-				    				'<%=ControladorItemsBaremacion.PARAM_ITEM%>': selected};
-			        		Atis.sendForm("<%=request.getRequestURI()%>", params);
-				    	}}
+				    	{'label': renderTextActivarDesactivar,
+				    	 'title': renderTextActivarDesactivar,
+				    	 'showWhenSelected': true,
+				    	 'onClick': function(selected) { 
+				    		 onClickActivarDesactivar.bind(this,
+			    				 selected,
+			    				 "¿Desea %s el item seleccionado?", 
+			    				 '<%=ControladorItemsBaremacion.PARAM_ITEM%>',
+			    				 '<%=ControladorItemsBaremacion.ACCION_DESACTIVAR_ITEM%>', 
+			    				 '<%=ControladorItemsBaremacion.ACCION_ACTIVAR_ITEM%>'
+					    	 )();
+				    	  }
+				    	},				    	
+				    	{'label': 'Editar', 
+				    	 'title': 'Editar item seleccionado', 
+				    	 'showWhenSelected': true,
+				    	 'onClick': onClickEditar.bind(this, '<%=ControladorItemsBaremacion.ACCION_EDITAR_ITEM%>', '<%=ControladorItemsBaremacion.PARAM_ITEM%>')
+				    	}
 				    ]
 				});
 				
 				document.getElementById("tableItems").style.visibility = "visible";
+			
 			<%	if (bean.getItemBaremacion() != null) { %>
 					Atis.smoothScrollToAnchor("#tableItems");
 			<%	} else { %>
