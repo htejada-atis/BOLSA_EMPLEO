@@ -7,6 +7,7 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import es.ujaen.uvirtual.beans.UVDatos;
+import es.ujaen.uvirtual.modulo.bolsaempleo.modelo.ModeloParametrosConfiguracion;
 import es.ujaen.uvirtual.modulo.bolsaempleo.utilidades.BolsaEmpleoUtils;
 import es.ujaen.uvirtual.modulo.bolsaempleo.vistas.VistaError;
 
@@ -58,7 +59,7 @@ public class ControladorErrorBolsaEmpleo extends HttpServlet {
 		datos.getFicherosJS().add("/js/bolsaempleo/utils.js");
 		datos.getFicherosCSS().add("/css/intranet.css");
 		datos.getFicherosCSS().add("/css/jqueryujaen/jquery-ui-1.8.16.custom.css");
-		datos.getFicherosCSS().add("/css/ujaen_bolsa_empleo.css");
+		datos.getFicherosCSS().add(ModeloParametrosConfiguracion.CSS_BOLSA_EMPLEO);
 	}
 
 	/**
