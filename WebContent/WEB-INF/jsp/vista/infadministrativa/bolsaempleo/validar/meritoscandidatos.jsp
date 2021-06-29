@@ -12,8 +12,8 @@
 <%@ page import="es.ujaen.uvirtual.modulo.bolsaempleo.beans.UsuarioBolsaEmpleo" %>
 <%@ page import="es.ujaen.uvirtual.modulo.bolsaempleo.beans.ValorMeritoBolsaTable" %>
 <%@ page import="es.ujaen.uvirtual.beans.UVDatos"%>
-<%@ page import="es.ujaen.uvirtual.utilidades.Formateador"%>
 <%@ page import="es.ujaen.uvirtual.utilidades.EscapaHTML" %>
+<%@ page import="es.ujaen.uvirtual.utilidades.Formateador"%>
 <%@ page import="java.util.stream.Collectors" %>
 
 <% 
@@ -295,6 +295,16 @@ UsuarioBolsaEmpleo candidato = bean.getCandidato();
 					</tr>
 				</tfoot>
 			</table>
+			
+			<br/>
+		    <div class="btns-by-steps">
+				<button class="link-btn" id="validar_volver">
+			    	 Volver
+			    </button>
+			    <button class="link-btn" id="validar_historial">
+			    	 Ver historial de validación
+			    </button>
+			</div>
 		    
 		<% } else { %>
 			<p>Elija un mérito para cargar el formulario de edición</p>
@@ -474,6 +484,20 @@ $(document).ready(function() {
 			document.getElementById("merito_descargar_fichero").addEventListener("click", function() {
 				window.open("<%= ControladorDescargaFicheros.URL_DESCARGA_FICHEROS %>"
     		        	+ "<%= "?a=" + ControladorDescargaFicheros.ACCION_DESCARGAR_MERITO_PERSONAL + "&" + ControladorDescargaFicheros.PARAM_MERITO + "=" + merito.getMerito().getCodNum() %>");
+			});
+			
+			document.getElementById("validar_volver").addEventListener("click", function() {
+	    		Atis.sendForm("<%= request.getRequestURI() %>", {'<%= ControladorValidar.PARAM_ACCION %>': '<%= ControladorValidar.ACCION_INDEX %>'});
+			});
+			
+			document.getElementById("validar_historial").addEventListener("click", function() {
+				var params = {
+						'<%= ControladorValidar.PARAM_ACCION %>': '<%= ControladorValidar.ACCION_HISTORIAL_VALIDACION %>',
+						'<%= ControladorValidar.PARAM_BOLSA %>': '<%= bolsa.getCodNum() %>',
+						'<%= ControladorValidar.PARAM_CANDIDATO %>': '<%= candidato.getCodNum() %>',
+						'<%= ControladorValidar.PARAM_MERITO %>': '<%= merito.getMerito().getCodNum() %>',
+				}
+	    		Atis.sendForm("<%= request.getRequestURI() %>", params);
 			});
 		
 			$('.bluetable').on('input', '.field-no-individualizado', function() {
