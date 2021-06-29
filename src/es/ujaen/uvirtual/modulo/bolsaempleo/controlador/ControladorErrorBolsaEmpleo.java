@@ -56,7 +56,7 @@ public class ControladorErrorBolsaEmpleo extends HttpServlet {
 		datos.getFicherosJSP().add(bean.getVista());
 		datos.getFicherosJS().add("/js/jquery-1.latest.min.js");
 		datos.getFicherosJS().add("/js/jquery-ui-1.10.4.min.js");
-		datos.getFicherosJS().add("/js/bolsaempleo/utils.js");
+		datos.getFicherosJS().add(ModeloParametrosConfiguracion.JS_BOLSA_EMPLEO);
 		datos.getFicherosCSS().add("/css/intranet.css");
 		datos.getFicherosCSS().add("/css/jqueryujaen/jquery-ui-1.8.16.custom.css");
 		datos.getFicherosCSS().add(ModeloParametrosConfiguracion.CSS_BOLSA_EMPLEO);
