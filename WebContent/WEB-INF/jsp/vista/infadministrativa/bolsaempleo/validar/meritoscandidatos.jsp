@@ -2,6 +2,7 @@
 <%@	page import="es.ujaen.uvirtual.modulo.bolsaempleo.controlador.ControladorValidar"%>
 <%@	page import="es.ujaen.uvirtual.modulo.bolsaempleo.controlador.ControladorDescargaFicheros"%>
 <%@	page import="es.ujaen.uvirtual.modulo.bolsaempleo.modelo.ModeloBaremacionItems"%>
+<%@	page import="es.ujaen.uvirtual.modulo.bolsaempleo.modelo.ModeloRol"%>
 <%@ page import="es.ujaen.uvirtual.modulo.bolsaempleo.vistas.VistaValidar" %>
 <%@ page import="es.ujaen.uvirtual.modulo.bolsaempleo.beans.Afinidad" %>
 <%@ page import="es.ujaen.uvirtual.modulo.bolsaempleo.beans.Area" %>
@@ -301,9 +302,11 @@ UsuarioBolsaEmpleo candidato = bean.getCandidato();
 				<button class="link-btn" id="validar_volver">
 			    	 Volver
 			    </button>
-			    <button class="link-btn" id="validar_historial">
-			    	 Ver historial de validación
-			    </button>
+			<%	if (bean.getUsuarioLogeado().getRol().getCodNum().equals(ModeloRol.ID_ROL_SERVICIO_PERSONAL)) {%>
+				    <button class="link-btn" id="validar_historial">
+				    	 Ver historial de validación
+				    </button>
+			<%	} %>
 			</div>
 		    
 		<% } else { %>
@@ -490,15 +493,17 @@ $(document).ready(function() {
 	    		Atis.sendForm("<%= request.getRequestURI() %>", {'<%= ControladorValidar.PARAM_ACCION %>': '<%= ControladorValidar.ACCION_INDEX %>'});
 			});
 			
-			document.getElementById("validar_historial").addEventListener("click", function() {
-				var params = {
-						'<%= ControladorValidar.PARAM_ACCION %>': '<%= ControladorValidar.ACCION_HISTORIAL_VALIDACION %>',
-						'<%= ControladorValidar.PARAM_BOLSA %>': '<%= bolsa.getCodNum() %>',
-						'<%= ControladorValidar.PARAM_CANDIDATO %>': '<%= candidato.getCodNum() %>',
-						'<%= ControladorValidar.PARAM_MERITO %>': '<%= merito.getMerito().getCodNum() %>',
-				}
-	    		Atis.sendForm("<%= request.getRequestURI() %>", params);
-			});
+		<%	if (bean.getUsuarioLogeado().getRol().getCodNum().equals(ModeloRol.ID_ROL_SERVICIO_PERSONAL)) { %>
+				document.getElementById("validar_historial").addEventListener("click", function() {
+					var params = {
+							'<%= ControladorValidar.PARAM_ACCION %>': '<%= ControladorValidar.ACCION_HISTORIAL_VALIDACION %>',
+							'<%= ControladorValidar.PARAM_BOLSA %>': '<%= bolsa.getCodNum() %>',
+							'<%= ControladorValidar.PARAM_CANDIDATO %>': '<%= candidato.getCodNum() %>',
+							'<%= ControladorValidar.PARAM_MERITO %>': '<%= merito.getMerito().getCodNum() %>',
+					}
+		    		Atis.sendForm("<%= request.getRequestURI() %>", params);
+				});
+		<%	} %>
 		
 			$('.bluetable').on('input', '.field-no-individualizado', function() {
 				var noIndividualizado = new NoIndividualizado($(this).closest('table').closest('td'));
