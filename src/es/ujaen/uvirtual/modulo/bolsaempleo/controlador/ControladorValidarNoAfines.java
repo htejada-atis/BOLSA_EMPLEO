@@ -462,7 +462,7 @@ public class ControladorValidarNoAfines extends HttpServlet {
 				BolsaEmpleoDataTable<ValorMeritoBolsaTable> dataTable = ModeloValidar.obtenerInstancia().
 						listadoValoresMeritoBolsa(bean.getCandidato(), bean.getMerito().getMerito(), request.getParameterMap());
 				bean.setDatatableValoresMeritoBolsa(dataTable);
-				writer.write(dataTable.toJson());
+				writer.write(dataTable.toJson("YYYY"));
 			} catch (UVException e) {
 				LOGGER.log(Level.WARNING, e.toString());
 				bean.getMensajesDeError().add(e.getMessage());

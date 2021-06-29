@@ -51,7 +51,7 @@ $(document).ready(function() {
 	    "pageSize": 100,
 	    "filterable": true,
 	    "action": "<%= ControladorValidarNoAfines.ACCION_DATATABLE_BOLSAS %>",
-	    "defaultOrderBy": 5,
+	    "defaultOrderBy": 2,
 	    "defaultOrderDirection": 'desc',
 	    "clickable": {'onClick': function(row) {
 	    	var params = {

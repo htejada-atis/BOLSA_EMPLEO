@@ -123,7 +123,8 @@ UsuarioBolsaEmpleo candidato = bean.getCandidato();
 			    			<input class="form-input-custom" id="merito_valor" type="text" name="<%= ControladorValidar.PARAM_VALOR %>" 
 			    					value="<%= merito.getMerito().getValor() %>"
 			    					<%= EscapaHTML.escapa(merito.getMerito().getItemBaremacion().getUnidades()).equals(ModeloBaremacionItems.ITEM_UNIDADES_MEDICION_SINO) ? "disabled" : "" %>
-			    					required/>
+			    					required
+			    					style="max-width: 180px;"/>
 			    		</div>
 		    		</div>
 				</div>
@@ -323,6 +324,8 @@ $(document).ready(function() {
 	    "ajax": { url: "<%= ControladorValidar.URL_PATTERN_AJAX %>", async: false },
 	    "pageSize": 200,
 	    "pageSizeOptions": [5,10,20,100,200],
+	    "defaultOrderBy": 2,
+	    "defaultOrderDirection": 'desc',
 	    "action": "<%= ControladorValidar.ACCION_DATATABLE_CANDIDATOS %>",
 	    "title": 'LISTA DE USUARIOS',
 	    "dropdown": true,
