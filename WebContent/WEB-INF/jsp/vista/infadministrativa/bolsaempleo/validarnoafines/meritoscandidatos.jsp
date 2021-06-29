@@ -152,7 +152,8 @@ UsuarioBolsaEmpleo candidato = bean.getCandidato();
 			    			<input class="form-input-custom" id="merito_valor" type="text" name="<%= ControladorValidarNoAfines.PARAM_VALOR %>" 
 			    					value="<%= merito.getMerito().getValor() %>"
 			    					<%= EscapaHTML.escapa(merito.getMerito().getItemBaremacion().getUnidades()).equals(ModeloBaremacionItems.ITEM_UNIDADES_MEDICION_SINO) ? "disabled" : "" %>
-			    					required/>
+			    					required
+			    					style="max-width: 180px;"/>
 			    		</div>
 		    		</div>
 				</div>
@@ -203,6 +204,8 @@ $(document).ready(function() {
 	    "ajax": { url: "<%= ControladorValidarNoAfines.URL_PATTERN_AJAX %>", async: false },
 	    "pageSize": 200,
 	    "pageSizeOptions": [5,10,20,100,200],
+	    "defaultOrderBy": 2,
+	    "defaultOrderDirection": 'desc',
 	    "action": "<%= ControladorValidarNoAfines.ACCION_DATATABLE_CANDIDATOS %>",
 	    "title": 'LISTA DE USUARIOS',
 	    "dropdown": true,
@@ -322,7 +325,9 @@ $(document).ready(function() {
 			    	'<%= ControladorValidarNoAfines.PARAM_MERITO %>': '<%= merito.getMerito().getCodNum() %>'
 			    	},
 			    "columns": [
-			    	{'data': 'convocatoria.codNum'},
+			    	{'data': 'convocatoria.fechaCierre', 'render': function(row) {
+			    		return '<div title="' + row.convocatoria.codNum + ' - ' + row.convocatoria.descripcion + '">' + row.convocatoria.fechaCierre + '</div>';
+			    	}},
 			        {'data': 'bolsa.codNum', 'render': function(row) {
 			        	return row.bolsa.area.idAreaExterno + " : " + row.bolsa.area.descripcion;
 		        	}},
