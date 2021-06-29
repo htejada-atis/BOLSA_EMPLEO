@@ -10,6 +10,7 @@ import es.ujaen.uvirtual.modulo.bolsaempleo.beans.Bolsa;
 import es.ujaen.uvirtual.modulo.bolsaempleo.beans.BolsaValidacion;
 import es.ujaen.uvirtual.modulo.bolsaempleo.beans.CandidatoValidacion;
 import es.ujaen.uvirtual.modulo.bolsaempleo.beans.Convocatoria;
+import es.ujaen.uvirtual.modulo.bolsaempleo.beans.HistorialValidacion;
 import es.ujaen.uvirtual.modulo.bolsaempleo.beans.ItemBaremacion;
 import es.ujaen.uvirtual.modulo.bolsaempleo.beans.MeritoSolicitud;
 import es.ujaen.uvirtual.modulo.bolsaempleo.beans.MeritoValidarTable;
@@ -25,11 +26,13 @@ import es.ujaen.uvirtual.modulo.bolsaempleo.utilidades.BolsaEmpleoDataTable;
 public class VistaValidar extends Vista implements Serializable {
 	private static final long serialVersionUID = 1L;
 	private Bolsa bolsa;
+	private Bolsa validaBolsa;
 	private Convocatoria conv;
 	private MeritoSolicitud merito;
 	private UsuarioBolsaEmpleo usuario;
 	private transient BolsaEmpleoDataTable<BolsaValidacion> datatableBolsas;
 	private transient BolsaEmpleoDataTable<CandidatoValidacion> datatableCandidatos;
+	private transient BolsaEmpleoDataTable<HistorialValidacion> datatableHistorialValidacion;
 	private transient BolsaEmpleoDataTable<MeritoValidarTable> datatableMeritos;
 	private List<ItemBaremacion> items = new ArrayList<>();
 	private List<ValorMeritoBolsaTable> bolsas = new ArrayList<>();
@@ -85,6 +88,14 @@ public class VistaValidar extends Vista implements Serializable {
 		this.bolsa = bolsa;
 	}
 	
+	public Bolsa getValidaBolsa() {
+		return validaBolsa;
+	}
+	
+	public void setValidaBolsa(Bolsa bolsa) {
+		this.validaBolsa = bolsa;
+	}
+	
 	public Convocatoria getConvocatoria() {
 		return conv;
 	}
@@ -131,6 +142,14 @@ public class VistaValidar extends Vista implements Serializable {
 	
 	public void setListaAfinidades(List<Afinidad> afinidades) {
 		this.listaAfinidades = afinidades;
+	}
+
+	public BolsaEmpleoDataTable<HistorialValidacion> getDatatableHistorialValidacion() {
+		return datatableHistorialValidacion;
+	}
+
+	public void setDatatableHistorialValidacion(BolsaEmpleoDataTable<HistorialValidacion> datatableHistorialValidacion) {
+		this.datatableHistorialValidacion = datatableHistorialValidacion;
 	}
 	
 }

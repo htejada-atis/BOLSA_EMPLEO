@@ -21,6 +21,7 @@ import es.ujaen.uvirtual.modulo.bolsaempleo.beans.Afinidad;
 import es.ujaen.uvirtual.modulo.bolsaempleo.beans.Bolsa;
 import es.ujaen.uvirtual.modulo.bolsaempleo.beans.BolsaValidacion;
 import es.ujaen.uvirtual.modulo.bolsaempleo.beans.CandidatoValidacion;
+import es.ujaen.uvirtual.modulo.bolsaempleo.beans.HistorialValidacion;
 import es.ujaen.uvirtual.modulo.bolsaempleo.beans.ItemBaremacion;
 import es.ujaen.uvirtual.modulo.bolsaempleo.beans.Merito;
 import es.ujaen.uvirtual.modulo.bolsaempleo.beans.MeritoSolicitud;
@@ -36,6 +37,7 @@ import es.ujaen.uvirtual.modulo.bolsaempleo.modelo.ModeloRol;
 import es.ujaen.uvirtual.modulo.bolsaempleo.modelo.ModeloSolicitud;
 import es.ujaen.uvirtual.modulo.bolsaempleo.modelo.ModeloUsuarioBolsaEmpleo;
 import es.ujaen.uvirtual.modulo.bolsaempleo.modelo.ModeloValidar;
+import es.ujaen.uvirtual.modulo.bolsaempleo.modelo.ModeloValidarHistorial;
 import es.ujaen.uvirtual.modulo.bolsaempleo.utilidades.BolsaEmpleoDataTable;
 import es.ujaen.uvirtual.modulo.bolsaempleo.utilidades.BolsaEmpleoUtils;
 import es.ujaen.uvirtual.modulo.bolsaempleo.vistas.VistaValidar;
@@ -63,9 +65,11 @@ public class ControladorValidar extends HttpServlet {
 	// acciones
 	public static final String ACCION_DATATABLE_BOLSAS = "datatablebolsas";
 	public static final String ACCION_DATATABLE_CANDIDATOS = "datatablecandidatos";
+	public static final String ACCION_DATATABLE_HISTORIAL_VALIDACION = "datatablehistorialvalidacion";
 	public static final String ACCION_DATATABLE_MERITOS = "datatablemeritos";
 	public static final String ACCION_BOLSA_SELECCIONADA = "bolsaseleccionada";
 	public static final String ACCION_CANDIDATO_SELECCIONADO = "candidatoseleccionado";
+	public static final String ACCION_HISTORIAL_VALIDACION = "historialvalidacion";
 	public static final String ACCION_INDEX = "listar";
 	public static final String ACCION_MERITO_SELECCIONADO = "meritoseleccionado";
 	public static final String ACCION_MODIFICAR_MERITO = "modificarmerito";
@@ -89,6 +93,7 @@ public class ControladorValidar extends HttpServlet {
 	// vistas
 	public static final String RUTA_BEP_VALIDAR = "/WEB-INF/jsp/vista/infadministrativa/bolsaempleo/validar/";
 	public static final String JSQP_INDEX = RUTA_BEP_VALIDAR + "index.jsp";
+	public static final String JSP_HISTORIAL_VALIDACION = RUTA_BEP_VALIDAR + "historialvalidacion.jsp";
 	public static final String JSP_MERITOS_CANDIDATOS = RUTA_BEP_VALIDAR + "meritoscandidatos.jsp";
 	
 	// mensajes
@@ -130,7 +135,9 @@ public class ControladorValidar extends HttpServlet {
 				case ACCION_BOLSA_SELECCIONADA:
 				case ACCION_CANDIDATO_SELECCIONADO:
 				case ACCION_DATATABLE_CANDIDATOS:
+				case ACCION_DATATABLE_HISTORIAL_VALIDACION:
 				case ACCION_DATATABLE_MERITOS:
+				case ACCION_HISTORIAL_VALIDACION:
 				case ACCION_MERITO_SELECCIONADO:
 				case ACCION_MODIFICAR_MERITO:
 				case ACCION_VALIDAR_MERITO:
@@ -209,7 +216,9 @@ public class ControladorValidar extends HttpServlet {
 			case ACCION_BOLSA_SELECCIONADA:
 				break;
 			case ACCION_CANDIDATO_SELECCIONADO:
+			case ACCION_DATATABLE_HISTORIAL_VALIDACION:
 			case ACCION_DATATABLE_MERITOS:
+			case ACCION_HISTORIAL_VALIDACION:
 			case ACCION_MERITO_SELECCIONADO:
 			case ACCION_MODIFICAR_MERITO:
 			case ACCION_VALIDAR_MERITO:
@@ -235,6 +244,8 @@ public class ControladorValidar extends HttpServlet {
 			case ACCION_DATATABLE_MERITOS:
 				listadoMeritos(bean, datos, request, response);
 				break;
+			case ACCION_DATATABLE_HISTORIAL_VALIDACION:
+			case ACCION_HISTORIAL_VALIDACION:
 			case ACCION_MERITO_SELECCIONADO:
 			case ACCION_MODIFICAR_MERITO:
 			case ACCION_VALIDAR_MERITO:
@@ -259,6 +270,12 @@ public class ControladorValidar extends HttpServlet {
 		bean.setItems(modeloItem.getItemsDeApartado(meritoSolicitud.getMerito().getItemBaremacion().getBloqueBaremacion().getApartadoBaremacion()));
 		
 		switch (nombreAccion) {
+			case ACCION_DATATABLE_HISTORIAL_VALIDACION:
+				listadoHistorialValidacionMerito(bean, datos, request, response);
+				break;
+			case ACCION_HISTORIAL_VALIDACION:
+				bean.setVista(JSP_HISTORIAL_VALIDACION);
+				break;
 			case ACCION_MERITO_SELECCIONADO:
 				obtenerValoresMeritoBolsasCandidato(bean);
 				break;
@@ -311,7 +328,7 @@ public class ControladorValidar extends HttpServlet {
 			String observacionesCandidato = EscapaHTML.ajustaCodificacion(request.getParameter(PARAM_OBSERVACION_CANDIDATO));
 			Integer idBolsa = Formateador.leeParametroInteger(request.getParameter(PARAM_BOLSA_MERITO));
 			Bolsa bolsa = modeloBolsa.getBolsaById(idBolsa);
-			bean.setBolsa(bolsa);
+			bean.setValidaBolsa(bolsa);
 			actualizaAfinidades(bean, request, bolsa);
 			
 			if (EscapaHTML.ajustaCodificacion(request.getParameter(PARAM_ACEPTAR_MERITO)) != null) {
@@ -433,6 +450,36 @@ public class ControladorValidar extends HttpServlet {
 				writer.write(new Gson().toJson(mensaje));
 				response.setStatus(RESPONSE_AJAX_HTTP_CODE_ERROR);
 			} catch (SQLException e) { 
+				LOGGER.log(Level.SEVERE, Formateador.getStackTrace(e));
+				LOGGER.log(Level.SEVERE, e.toString());
+				bean.getMensajesDeError().add(e.getMessage());
+				CodigoDescripcion mensaje = new CodigoDescripcion(RESPONSE_AJAX_ERROR, e.getMessage());
+				writer.write(new Gson().toJson(mensaje));
+				response.setStatus(RESPONSE_AJAX_HTTP_CODE_ERROR);
+			}
+		}
+	}
+	
+	private void listadoHistorialValidacionMerito(VistaValidar bean, UVDatos datos, HttpServletRequest request, HttpServletResponse response)
+			throws IOException {
+		datos.setContentType(RESPONSE_AJAX_CONTENTTYPE);
+		datos.setRespuestaEnviada(true);
+		response.setContentType(RESPONSE_AJAX_CONTENTTYPE);
+		response.setCharacterEncoding(RESPONSE_AJAX_ENCODING);
+		
+		try (PrintWriter writer = response.getWriter()) {
+			try {
+				BolsaEmpleoDataTable<HistorialValidacion> dataTable = ModeloValidarHistorial.obtenerInstancia().listadoHistorialValidacionesMerito(
+						bean.getConvocatoria(), bean.getMerito().getMerito(), bean.getBolsa(), request.getParameterMap());
+				bean.setDatatableHistorialValidacion(dataTable);
+				writer.write(dataTable.toJson("dd/M/yyyy HH:mm:ss"));
+			} catch (UVException e) {
+				LOGGER.log(Level.WARNING, e.toString());
+				bean.getMensajesDeError().add(e.getMessage());
+				CodigoDescripcion mensaje = new CodigoDescripcion(RESPONSE_AJAX_ERROR, e.getMessage());
+				writer.write(new Gson().toJson(mensaje));
+				response.setStatus(RESPONSE_AJAX_HTTP_CODE_ERROR);
+			} catch (SQLException e) {
 				LOGGER.log(Level.SEVERE, Formateador.getStackTrace(e));
 				LOGGER.log(Level.SEVERE, e.toString());
 				bean.getMensajesDeError().add(e.getMessage());
