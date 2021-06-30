@@ -421,7 +421,7 @@ public class ModeloBaremacionApartados {
 		return items;
 	}
 	
-	private ApartadoBaremacion createApartadoFromResultSet(ResultSet rs) throws SQLException {
+	public ApartadoBaremacion createApartadoFromResultSet(ResultSet rs) throws SQLException {
 		ApartadoBaremacion apartado = new ApartadoBaremacion();
 		apartado.setCodNum(rs.getInt(CODNUM));
 		apartado.setCodigo(rs.getString(CODIGO));

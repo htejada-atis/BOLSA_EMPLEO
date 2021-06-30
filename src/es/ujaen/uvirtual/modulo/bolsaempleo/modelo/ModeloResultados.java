@@ -57,36 +57,47 @@ public class ModeloResultados {
 		return eInstancia;
     }
 	
+	/** Calculo total de una solicitud para un área .
+	 * @param solicitud .
+	 * @param bolsa .
+	 * @throws SQLException en caso de error de base de datos .
+	 * @throws UVException .
+	 */
 	public void calcularSolicitud(Solicitud solicitud, Bolsa bolsa) throws SQLException, UVException {
-		ModeloBaremacionApartados modeloApartado = ModeloBaremacionApartados.obtenerInstancia();
 		ModeloSolicitud modeloSolicitud = ModeloSolicitud.obtenerInstancia();
 		
-		modeloApartado.getApartados(true);
-		
 		List<MeritoSolicitudTable> meritos = modeloSolicitud.getMeritosValoracionesSolicitudBolsa(solicitud, bolsa);
-		Double puntuacion = 0.0;
+		Double puntuacionTotal = 0.0;
 		
 		for (MeritoSolicitudTable merito: meritos) {
-			if (merito.getMerito().getItemBaremacion().getAfinidad() == null) {
-				puntuacion += merito.getMeritoSolicitud().getValor();
-			} else {
-				if (merito.getMerito().getItemBaremacion().getIndividualizado()) {
-					puntuacion += merito.getMerito().getValor() 
-							* merito.getMeritoSolicitud().getValoraciones().get(0).getAfinidad().getModulacion();
-				} else {
-					for (int i = 0; i < merito.getMeritoSolicitud().getValoraciones().size(); i++) {
-						puntuacion += merito.getMeritoSolicitud().getValoraciones().get(i).getValor() 
-								* merito.getMeritoSolicitud().getValoraciones().get(i).getAfinidad().getModulacion();
-					}
-				}
+			puntuacionTotal += calcularMerito(merito);
+		}
+		
+		guardarResultadoSolicitudBolsa(bolsa, puntuacionTotal, null, null);
+	}
+	
+	private Double calcularMerito(MeritoSolicitudTable merito) {
+		Double puntuacion = 0.0;
+		
+		boolean tieneAfinidad = merito.getMerito().getItemBaremacion().getAfinidad() != null;
+		
+		Double valor = tieneAfinidad ? merito.getMerito().getValor() : merito.getMeritoSolicitud().getValor();
+		Double afinidad = tieneAfinidad ? merito.getMeritoSolicitud().getValoraciones().get(0).getAfinidad().getModulacion() : 1.0;
+		Double pesoCategoria = merito.getMerito().getItemBaremacion().getValor();
+		Double pesoBloque = merito.getMerito().getItemBaremacion().getBloqueBaremacion().getApartadoBaremacion().getPorcentajeMaximo();
+		
+		if (!merito.getMerito().getItemBaremacion().getIndividualizado()) {
+			valor = 0.0;
+			afinidad = 0.0;
+			for (int i = 0; i < merito.getMeritoSolicitud().getValoraciones().size(); i++) {
+				valor += merito.getMeritoSolicitud().getValoraciones().get(i).getValor();
+				afinidad += merito.getMeritoSolicitud().getValoraciones().get(i).getAfinidad().getModulacion();
 			}
 		}
 		
-		guardarResultadosSolicitudBolsa(bolsa, puntuacion, null, null);
-	}
-	
-	public void calcularApartado(ApartadoBaremacion apartado, Solicitud solicitud, Bolsa bolsa) {
+		puntuacion = valor * afinidad * pesoCategoria * pesoBloque;
 		
+		return puntuacion;
 	}
 	
 	/** Lista de solicitudes asociadas a una bolsa .
@@ -133,12 +144,12 @@ public class ModeloResultados {
 		
 		String consulta = ""
 				+ " SELECT bepsbm.BEPMER_CODNUM, bepsbm.CODNUM "
-				+ " FROM TBEP_SOL_BOL_MERITOS bepsbm "				
+				+ " FROM TBEP_SOL_BOL_MERITOS bepsbm "
 				+ "	INNER JOIN TBEP_SOLICITUD_BOLSAS bepsbo ON bepsbo.CODNUM  = bepsbm.BEPSBO_CODNUM "
 				+ " INNER JOIN TBEP_MERITOS bepmer ON bepmer.CODNUM = bepsbm.BEPMER_CODNUM "
 				+ " INNER JOIN TBEP_ITEMSBAREMACION bepite ON bepite.CODNUM = bepmer.BEPITE_CODNUM "
 				+ " INNER JOIN TBEP_BLOQUESBAREMACION bepblo ON bepblo.CODNUM = bepite.BEPBLO_CODNUM "
-				+ " INNER JOIN TBEP_APARTADOSBAREMACION bepapa ON bepapa.CODNUM  = bepblo.BEPAPA_CODNUM "				
+				+ " INNER JOIN TBEP_APARTADOSBAREMACION bepapa ON bepapa.CODNUM  = bepblo.BEPAPA_CODNUM "
 				+ "	WHERE bepsbo.BEPBOL_CODNUM = ? AND bepsbo.BEPSOL_CODNUM = ? "
 				+ " ORDER BY (LPAD(bepapa.CODIGO, 3) || '.' || LPAD(bepblo.CODIGO, 3) || '.' || LPAD(bepite.CODIGO, 3)) ASC";
 		
@@ -173,7 +184,7 @@ public class ModeloResultados {
 	 * @throws UVException .
 	 * @throws SQLException .
 	 */
-	public void guardarResultadosSolicitudBolsa(Bolsa bolsa, Double puntuacion, InputStream archivo, UsuarioBolsaEmpleo usuarioUpdate) throws SQLException, UVException {
+	public void guardarResultadoSolicitudBolsa(Bolsa bolsa, Double puntuacion, InputStream archivo, UsuarioBolsaEmpleo usuarioUpdate) throws SQLException, UVException {
 		if (bolsa == null) {
 			throw new UVException(MENSAJE_ERROR_BOLSA_NULL);
 		}

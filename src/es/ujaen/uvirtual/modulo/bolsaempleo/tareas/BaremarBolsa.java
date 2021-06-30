@@ -5,12 +5,9 @@ import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import es.ujaen.uvirtual.modulo.bolsaempleo.beans.Bolsa;
-import es.ujaen.uvirtual.modulo.bolsaempleo.beans.MeritoSolicitudTable;
-import es.ujaen.uvirtual.modulo.bolsaempleo.beans.MeritoSolicitudValoracion;
 import es.ujaen.uvirtual.modulo.bolsaempleo.beans.Solicitud;
 import es.ujaen.uvirtual.modulo.bolsaempleo.modelo.ModeloBolsa;
 import es.ujaen.uvirtual.modulo.bolsaempleo.modelo.ModeloConvocatoria;
-import es.ujaen.uvirtual.modulo.bolsaempleo.modelo.ModeloSolicitud;
 import es.ujaen.uvirtual.modulo.bolsaempleo.modelo.ModeloResultados;
 import es.ujaen.uvirtual.utilidades.Formateador;
 import es.ujaen.uvirtual.utilidades.UVException;
@@ -33,9 +30,7 @@ public final class BaremarBolsa {
 	public static void run() {
 		try {
 			ModeloBolsa modeloBolsa = ModeloBolsa.obtenerInstancia();
-			ModeloSolicitud modeloSolicitud = ModeloSolicitud.obtenerInstancia();
 			ModeloResultados modeloResultados = ModeloResultados.obtenerInstancia();
-			
 			
 			List<Bolsa> bolsas = modeloBolsa.getBolsasPendientesBaremacion();
 			
