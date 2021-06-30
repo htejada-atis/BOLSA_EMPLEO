@@ -55,7 +55,7 @@ public final class UtilsTestBolsaEmpleo {
 	public static final String ESQUEMA_ARCOS = "arcos";
 	public static final String ESQUEMA_RRHH = "rrhh";
 	public static final String ESQUEMA_UVIRTUAL = "uvirtual";	
-	public static final Integer WAIT_ELEMENT = 5; // segundos
+	public static final Integer WAIT_ELEMENT = 10; // segundos
 	public static final boolean VERBOSE = false;
 	
 	private static boolean cargado = false;
