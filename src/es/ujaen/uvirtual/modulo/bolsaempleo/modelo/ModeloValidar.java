@@ -241,6 +241,7 @@ public class ModeloValidar {
 				+ "		AND bepsol.FLGEXCLUIDO = 'N' "
 				+ "		AND bepite.AFINIDAD IS NULL"
 				+ "		AND bepusu.FLGBORRADO = 'N'"
+				+ "		AND bepusu.ROL = " + ModeloRol.ID_ROL_CANDIDATO
 				+ "		AND bepsol.ESTADO = '" + ModeloSolicitud.SOLICITUD_ESTADO_CERRADA + "'";
 		
 		// seleccionamos las bolsas, con meritos, en la convocatoria pasada
@@ -321,6 +322,7 @@ public class ModeloValidar {
 				+ "	INNER JOIN TBEP_USUARIOS bepusu ON bepusu.CODNUM = bepmer.BEPUSU_CODNUM"
 				+ "	WHERE "
 				+ "		bepsbo.BEPBOL_CODNUM = bepbol.CODNUM "
+				+ "		AND bepusu.ROL = " + ModeloRol.ID_ROL_CANDIDATO
 				+ " 	AND bepsol.BEPCON_CODNUM = ? "
 				+ "		AND bepsol.ESTADO = 'CERRADA' "
 				+ "		AND bepsol.FLGEXCLUIDO = 'N' "
