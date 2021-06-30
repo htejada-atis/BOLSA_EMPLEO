@@ -24,6 +24,7 @@ import es.ujaen.uvirtual.modulo.bolsaempleo.modelo.ModeloBolsa;
 import es.ujaen.uvirtual.modulo.bolsaempleo.modelo.ModeloParametrosConfiguracion;
 import es.ujaen.uvirtual.modulo.bolsaempleo.modelo.ModeloRol;
 import es.ujaen.uvirtual.modulo.bolsaempleo.modelo.ModeloUsuarioBolsaEmpleo;
+import es.ujaen.uvirtual.modulo.bolsaempleo.tareas.BaremarBolsa;
 import es.ujaen.uvirtual.modulo.bolsaempleo.utilidades.BolsaEmpleoDataTable;
 import es.ujaen.uvirtual.modulo.bolsaempleo.utilidades.BolsaEmpleoUtils;
 import es.ujaen.uvirtual.modulo.bolsaempleo.vistas.VistaEstadoBolsas;
@@ -194,7 +195,8 @@ public class ControladorBolsas extends HttpServlet {
 		}
 	}
 	
-	private void accionSobreBolsas(VistaEstadoBolsas bean, UVDatos datos, HttpServletRequest request, HttpServletResponse response) throws UVException, SQLException, IOException {
+	private void accionSobreBolsas(VistaEstadoBolsas bean, UVDatos datos, HttpServletRequest request, HttpServletResponse response)
+			throws UVException, SQLException, IOException {
 		ModeloBolsa modelo = ModeloBolsa.obtenerInstancia();		
 		String selectedJson = EscapaHTML.ajustaCodificacion(request.getParameter(PARAM_BOLSAS_SELECCIONADAS));
 		int[] selected;
@@ -225,7 +227,8 @@ public class ControladorBolsas extends HttpServlet {
 				modelo.desbloquearBolsas(bolsas, bean.getUsuarioLogeado());
 				break;
 			case ACCION_BOLSAS_BAREMAR:
-				modelo.baremarBolsas(bolsas);
+				modelo.ponerBolsasComoPendientesBaremacion(bolsas, bean.getUsuarioLogeado());
+				BaremarBolsa.run();
 				break;
 			default:
 				BolsaEmpleoUtils.addMensajeDeError(MENSAJE_ERROR_ACCION_BOLSA_NO_VALIDA, bean, request);

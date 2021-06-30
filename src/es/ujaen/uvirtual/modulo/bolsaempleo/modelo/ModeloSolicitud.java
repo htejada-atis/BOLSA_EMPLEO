@@ -688,7 +688,7 @@ public class ModeloSolicitud {
 	 * @throws SQLException .
 	 * @throws UVException .
 	 */
-	private List<MeritoSolicitudTable> getMeritosValoracionesSolicitudBolsa(Solicitud solicitud, Bolsa bolsa) throws SQLException, UVException {
+	public List<MeritoSolicitudTable> getMeritosValoracionesSolicitudBolsa(Solicitud solicitud, Bolsa bolsa) throws SQLException, UVException {
 		List<MeritoSolicitudTable> meritos = new ArrayList<>();
 		
 		String consulta = ""
@@ -1858,11 +1858,11 @@ public class ModeloSolicitud {
 	 * @param bolsa .
 	 * @return .
 	 */
-	private Boolean isMeritoExcluido(Merito merito, MeritoSolicitud ms, Bolsa bolsa) {
+	public Boolean isMeritoExcluido(Merito merito, MeritoSolicitud ms, Bolsa bolsa) {
 		return false;
 	}	
 
-	private Solicitud createSolicitudFromResultSet(ResultSet rs, boolean archivo) throws SQLException, UVException {
+	public Solicitud createSolicitudFromResultSet(ResultSet rs, boolean archivo) throws SQLException, UVException {
 		Solicitud solicitud = new Solicitud();
 		
 		solicitud.setCodNum(rs.getInt("CODNUM"));

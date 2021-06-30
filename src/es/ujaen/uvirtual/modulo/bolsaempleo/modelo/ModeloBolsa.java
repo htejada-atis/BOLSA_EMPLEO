@@ -32,6 +32,8 @@ public class ModeloBolsa {
 	public static final int ORDER_COLUMN_INDEX_BLOQUEO = 5;
 	public static final int ORDER_COLUMN_INDEX_DESBLOQUEO = 6;
 	public static final int ORDER_COLUMN_INDEX_BAREMALE = 7;
+	
+	public static final String MENSAJE_ERROR_BOLSA_NULL = "Bolsa no puede estar vacía";
 
 	public static final String BOLSA_ESTADO_BLOQUEADA = "BLOQUEADA";
 	public static final String BOLSA_ESTADO_REVISION = "REVISION";
@@ -121,6 +123,25 @@ public class ModeloBolsa {
 	public List<Bolsa> getBolsas() throws SQLException, UVException {
 		List<Bolsa> bolsas = new ArrayList<>();
 		String consulta = "SELECT bepbol.* " + "FROM TBEP_BOLSAS bepbol";
+		try (Connection conexion = ConexionUvirtual.obtenerInstancia();
+				PreparedStatement stmt = conexion.prepareStatement(consulta)) {
+			try (ResultSet rs = stmt.executeQuery()) {
+				while (rs.next()) {
+					bolsas.add(this.createFromResultSet(rs));
+				}
+			}
+		}
+		return bolsas;
+	}
+	
+	/** Devuelve las bolsas pendientes de baremación .
+	 * @return bolsas .
+	 * @throws SQLException en caso de error en la BD .
+	 * @throws UVException  si bolsa no es existe .
+	 */
+	public List<Bolsa> getBolsasPendientesBaremacion() throws SQLException, UVException {
+		List<Bolsa> bolsas = new ArrayList<>();
+		String consulta = "SELECT bepbol.* " + "FROM TBEP_BOLSAS bepbol WHERE bepbol.FLGPENBAREMACION = 'S'";
 		try (Connection conexion = ConexionUvirtual.obtenerInstancia();
 				PreparedStatement stmt = conexion.prepareStatement(consulta)) {
 			try (ResultSet rs = stmt.executeQuery()) {
@@ -332,28 +353,57 @@ public class ModeloBolsa {
 		this.cambiarEstadoBolsas(bolsas, BOLSA_ESTADO_DESBLOQUEADA, usuario);
 	}
 
-	/**
-	 * Baremar bolsas.
-	 * 
+	/** Establece las bolsas como pendientes de baremación .
 	 * @param bolsas .
+	 * @param usuarioUpdate .
+	 * @throws SQLException .
 	 */
-	public void baremarBolsas(List<Bolsa> bolsas) {
-		/*
-		 * Las bolsas se bareman con las evaluaciones realizadas por las comisiones y
-		 * por el servicio de personal.
-		 */
+	public void ponerBolsasComoPendientesBaremacion(List<Bolsa> bolsas, UsuarioBolsaEmpleo usuarioUpdate) throws SQLException {
 		for (int i = 0; i < bolsas.size(); i++) {
-			this.baremarBolsa(bolsas.get(i));
+			this.ponerBolsaComoPendienteBaremacion(bolsas.get(i), usuarioUpdate);
 		}
 	}
 
-	/**
-	 * Barema una bolsa.
-	 * 
+	/** Establece la bolsa como pendiente de baremación .
 	 * @param bolsa .
+	 * @param usuarioUpdate .
+	 * @throws SQLException .
 	 */
-	public void baremarBolsa(Bolsa bolsa) {
-
+	public void ponerBolsaComoPendienteBaremacion(Bolsa bolsa, UsuarioBolsaEmpleo usuarioUpdate) throws SQLException {
+		String query = "UPDATE TBEP_BOLSAS SET FLGPENBAREMACION = 'S', UID_USUARIO = ? WHERE CODNUM = ?";
+		
+		try (Connection conexion = ConexionUvirtual.obtenerInstancia();
+				PreparedStatement stmt = conexion.prepareStatement(query)) {
+			int indexParam = 1;
+			stmt.setString(indexParam++, usuarioUpdate.getCodCuenta());
+			stmt.setInt(indexParam++, bolsa.getCodNum());
+			stmt.executeUpdate();
+		}
+	}
+	
+	/** Baremar bolsa .
+	 * @param bolsa .
+	 * @param usuarioUpdate .
+	 * @throws UVException .
+	 * @throws SQLException .
+	 */
+	public void baremarBolsa(Bolsa bolsa, UsuarioBolsaEmpleo usuarioUpdate) throws SQLException, UVException {
+		if (bolsa == null) {
+			throw new UVException(MENSAJE_ERROR_BOLSA_NULL);
+		}
+		
+		String usuarioUp = usuarioUpdate != null ? usuarioUpdate.getCodCuenta() : "TAREA_PROGRAMADA";
+		
+		String query = "UPDATE TBEP_BOLSAS SET FECHABAREMACION = ?, FLGPENBAREMACION = 'N', UID_USUARIO = ? WHERE CODNUM = ?";
+		
+		try (Connection conexion = ConexionUvirtual.obtenerInstancia();
+				PreparedStatement stmt = conexion.prepareStatement(query)) {
+			int indexParam = 1;
+			stmt.setDate(indexParam++, new java.sql.Date(BolsaEmpleoUtils.getCurrentDateTime().getTime()));
+			stmt.setString(indexParam++, usuarioUp);
+			stmt.setInt(indexParam++, bolsa.getCodNum());
+			stmt.executeUpdate();
+		}
 	}
 
 	/**
