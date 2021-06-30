@@ -42,6 +42,7 @@ import es.ujaen.uvirtual.modulo.bolsaempleo.modelo.ModeloConvocatoria;
 import es.ujaen.uvirtual.modulo.bolsaempleo.modelo.ModeloMerito;
 import es.ujaen.uvirtual.modulo.bolsaempleo.modelo.ModeloSolicitud;
 import es.ujaen.uvirtual.modulo.bolsaempleo.utilidades.BolsaEmpleoDataTable;
+import es.ujaen.uvirtual.modulo.bolsaempleo.utilidades.BolsaEmpleoUtils;
 import es.ujaen.uvirtual.utilidades.UVException;
 
 /**
@@ -70,7 +71,7 @@ public class TestBEPModeloSolicitud {
 		UtilsTestBolsaEmpleo.inicializaBolsaEmpleo();
 		
 		candidato1 = UtilsTestBolsaEmpleo.getUsuario("candidato1");
-		candidato5 = UtilsTestBolsaEmpleo.getUsuario("candidato5");				
+		candidato5 = UtilsTestBolsaEmpleo.getUsuario("candidato5");
 	}
 	
 	/**
@@ -162,8 +163,8 @@ public class TestBEPModeloSolicitud {
 			Convocatoria c = ModeloConvocatoria.obtenerInstancia().getUltimaConvocatoria();
 			assertFalse(modelo.haySolicitudAbiertaParaConvocatoria(candidato1, c));
 			
-			// creamos solicitud abierta para otro candidato
-			Solicitud s = modelo.nuevaSolicitud(candidato5, c, candidato5);		 
+			// creamos solicitud abierta para otro candidato			
+			Solicitud s = modelo.nuevaSolicitud(candidato5, c, candidato5);
 			assertTrue(ModeloSolicitud.obtenerInstancia().haySolicitudAbiertaParaConvocatoria(candidato5, c));
 			
 			// limpiamos solicitud creada

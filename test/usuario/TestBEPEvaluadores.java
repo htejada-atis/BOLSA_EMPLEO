@@ -36,8 +36,8 @@ public class TestBEPEvaluadores extends UtilsTestUsuarioBase {
 	private static final String DIV_MAIN = "evaluadores-listar";
 	private static final String ID_TABLE_AREAS = "tableAreas";	
 	private static final String ID_TABLE_EVALUADORES = "tableEvaluadoresArea";
-	private static final String DEP1 = "34"; // "CIENCIAS DE LA SALUD";
-	private static final String DEP2 = "14"; // ECONOMIA
+	private static final String DEP1 = "CIENCIAS DE LA SALUD";
+	private static final String DEP2 = "ECONOMIA";
 	
 	/**
 	 * Se ejecuta una vez al inicio de la clase.
@@ -255,7 +255,8 @@ public class TestBEPEvaluadores extends UtilsTestUsuarioBase {
 	
 	private WebElement seleccionarDepartamento(String value) {
 		Select dep = new Select(UtilsTestBolsaEmpleo.waitVisibility(By.id("select_departamento")));
-		dep.selectByValue(value);		
+		// dep.selectByValue(value);	
+		dep.selectByVisibleText(value);
 		dep = new Select(UtilsTestBolsaEmpleo.waitVisibility(By.id("select_departamento")));
 		String textoSelect = dep.getFirstSelectedOption().getText();
 		
