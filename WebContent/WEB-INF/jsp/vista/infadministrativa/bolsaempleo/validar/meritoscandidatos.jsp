@@ -489,7 +489,7 @@ $(document).ready(function() {
 			
 			document.getElementById("merito_descargar_fichero").addEventListener("click", function() {
 				window.open("<%= ControladorDescargaFicheros.URL_DESCARGA_FICHEROS %>"
-    		        	+ "<%= "?a=" + ControladorDescargaFicheros.ACCION_DESCARGAR_MERITO_PERSONAL + "&" + ControladorDescargaFicheros.PARAM_MERITO + "=" + merito.getMerito().getCodNum() %>");
+    		        	+ "<%= "?a=" + (bean.getUsuarioLogeado().isMiembroComision() ? ControladorDescargaFicheros.ACCION_DESCARGAR_MERITO_COMISION : ControladorDescargaFicheros.ACCION_DESCARGAR_MERITO_PERSONAL) + "&" + ControladorDescargaFicheros.PARAM_MERITO + "=" + merito.getMerito().getCodNum() %>");
 			});
 			
 			document.getElementById("validar_volver").addEventListener("click", function() {
