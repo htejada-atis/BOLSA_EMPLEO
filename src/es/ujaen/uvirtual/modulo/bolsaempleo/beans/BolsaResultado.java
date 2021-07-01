@@ -28,6 +28,21 @@ public class BolsaResultado extends Bolsa implements Serializable {
 	 * @param pdesgloseTotal .
 	 * @param ptotal .
 	 * @param ptotalSinAplicar .
+	 * @param plistaMeritos .
+	 */
+	public BolsaResultado(Bolsa pbolsa, String pdesgloseTotal, Double ptotal, Double ptotalSinAplicar, List<MeritoResultado> plistaMeritos) {
+		super(pbolsa);
+		this.desgloseTotal = pdesgloseTotal;
+		this.total = ptotal;
+		this.totalSinAplicar = ptotalSinAplicar;
+		this.listaMeritos = plistaMeritos;
+	}
+	
+	/** Constructor con parametros .
+	 * @param pbolsa .
+	 * @param pdesgloseTotal .
+	 * @param ptotal .
+	 * @param ptotalSinAplicar .
 	 */
 	public BolsaResultado(Bolsa pbolsa, String pdesgloseTotal, Double ptotal, Double ptotalSinAplicar) {
 		super(pbolsa);

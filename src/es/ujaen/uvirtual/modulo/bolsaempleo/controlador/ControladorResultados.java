@@ -5,7 +5,6 @@ import java.io.PrintWriter;
 import java.sql.SQLException;
 import java.util.logging.Logger;
 import java.util.logging.Level;
-import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
@@ -17,7 +16,6 @@ import es.ujaen.uvirtual.beans.Usuario;
 import es.ujaen.uvirtual.modulo.bolsaempleo.beans.Bolsa;
 import es.ujaen.uvirtual.modulo.bolsaempleo.beans.BolsaResultado;
 import es.ujaen.uvirtual.modulo.bolsaempleo.beans.CandidatoResultadoTable;
-import es.ujaen.uvirtual.modulo.bolsaempleo.beans.MeritoResultado;
 import es.ujaen.uvirtual.modulo.bolsaempleo.beans.UsuarioBolsaEmpleo;
 import es.ujaen.uvirtual.modulo.bolsaempleo.modelo.ModeloBolsa;
 import es.ujaen.uvirtual.modulo.bolsaempleo.modelo.ModeloConvocatoria;
@@ -196,7 +194,8 @@ public class ControladorResultados extends HttpServlet {
 		UsuarioBolsaEmpleo candidato = ModeloUsuarioBolsaEmpleo.obtenerInstancia().getUsuarioById(idCandidato);
 		bean.setCandidato(candidato);
 		
-		BolsaResultado bolsaResultado = ModeloResultados.obtenerInstancia().getBolsaResultado(bean.getBolsa(), candidato, bean.getConvocatoria()); 
+		BolsaResultado bolsaResultado = ModeloResultados.obtenerInstancia().getBolsaResultado(bean.getBolsa(), candidato, bean.getConvocatoria());
+		bean.setBolsaResultado(bolsaResultado);
 	}
 		
 	private void listadoBolsas(VistaResultados bean, UVDatos datos, HttpServletRequest request, HttpServletResponse response) throws IOException {

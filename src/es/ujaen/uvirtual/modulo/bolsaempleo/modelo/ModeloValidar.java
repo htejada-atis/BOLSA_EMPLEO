@@ -463,7 +463,7 @@ public class ModeloValidar {
 			throws SQLException, UVException {
 		List<CandidatoValidacion> rows = new ArrayList<>();
 		BolsaEmpleoDataTable<CandidatoValidacion> dataTable = new BolsaEmpleoDataTable<>(params);
-
+		
 		if (convocatoria == null || bolsa == null) {
 			dataTable.setData(rows);
 			return dataTable;
@@ -476,10 +476,10 @@ public class ModeloValidar {
 				+ "	INNER JOIN TBEP_SOLICITUDES bepsol ON bepsol.CODNUM = bepsbo.BEPSOL_CODNUM"
 				+ "	INNER JOIN TBEP_MERITOS bepmer ON bepmer.CODNUM = bepsbm.BEPMER_CODNUM"
 				+ "	INNER JOIN TBEP_ITEMSBAREMACION bepite ON bepite.CODNUM = bepmer.BEPITE_CODNUM"
-				+ "	WHERE bepsol.ESTADO = '" + ModeloSolicitud.SOLICITUD_ESTADO_CERRADA 
-				+ " ' AND bepsbo.BEPBOL_CODNUM = ?"
-				+ " AND bepsol.BEPCON_CODNUM = ? "
-				+ "	AND bepmer.BEPUSU_CODNUM = bepusu.CODNUM";
+				+ "	WHERE bepsol.ESTADO = '" + ModeloSolicitud.SOLICITUD_ESTADO_CERRADA + "'"
+				+ " 	AND bepsbo.BEPBOL_CODNUM = ?"
+				+ " 	AND bepsol.BEPCON_CODNUM = ? "
+				+ "		AND bepmer.BEPUSU_CODNUM = bepusu.CODNUM";
 		
 		// agrega el filtro de afinidad
 		consultaCount += afinidad ? " AND bepite.AFINIDAD IS NOT NULL " : " AND bepite.AFINIDAD IS NULL ";

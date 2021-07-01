@@ -129,8 +129,8 @@ public class ModeloSolicitud {
 			try (ResultSet rs = stmt.executeQuery()) {
 				while (rs.next()) {
 					Solicitud solicitud = new Solicitud();
-					solicitud.setCodNum(rs.getInt("SOLICITUD_CODNUM"));					
-					solicitud.setConvocatoria(modeloConvocatoria.getConvocatoriaById(rs.getInt(CODNUM)));					
+					solicitud.setCodNum(rs.getInt("SOLICITUD_CODNUM"));
+					solicitud.setConvocatoria(modeloConvocatoria.getConvocatoriaById(rs.getInt(CODNUM)));
 					solicitud.setEstado(rs.getString("ESTADO_SOLICITUD") != null ? rs.getString("ESTADO_SOLICITUD") : ModeloSolicitud.SOLICITUD_ESTADO_CERRADA);
 					solicitud.setExcluido(rs.getString("FLGEXCLUIDO") != null ? rs.getString("FLGEXCLUIDO").equals(SOLICITUD_EXCLUIDA) : false);
 					solicitud.setRazonExclusion(rs.getString("RAZON_EXCLUSION"));
