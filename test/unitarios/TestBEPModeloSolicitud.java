@@ -154,16 +154,27 @@ public class TestBEPModeloSolicitud {
 		
 	/**
 	 * haySolicitudAbiertaParaConvocatoria.
+	 * @throws SQLException .
 	 */
 	@Test
-	public void testA04haySolicitudAbiertaParaConvocatoria() {
+	public void testA04haySolicitudAbiertaParaConvocatoria() throws SQLException {
+		Convocatoria c = null;
+		boolean cerrarConvocatoria = false;
+		
 		try {
 			ModeloSolicitud modelo = ModeloSolicitud.obtenerInstancia();
 			
-			Convocatoria c = ModeloConvocatoria.obtenerInstancia().getUltimaConvocatoria();
+			c = ModeloConvocatoria.obtenerInstancia().getUltimaConvocatoria();
 			assertFalse(modelo.haySolicitudAbiertaParaConvocatoria(candidato1, c));
 			
-			// creamos solicitud abierta para otro candidato			
+			// comprobamos si la convocatoria está abierta
+			if (c.getEstado().equals(ModeloConvocatoria.CONVOCATORIA_ESTADO_CERRADA)) {
+				cerrarConvocatoria = true;
+				UtilsTestBolsaEmpleo.sqlExecute("UPDATE TBEP_CONVOCATORIAS SET ESTADO = '" + ModeloConvocatoria.CONVOCATORIA_ESTADO_ABIERTA 
+						+ "' WHERE CODNUM = " + c.getCodNum());
+			}
+			
+			// creamos solicitud abierta para otro candidato						
 			Solicitud s = modelo.nuevaSolicitud(candidato5, c, candidato5);
 			assertTrue(ModeloSolicitud.obtenerInstancia().haySolicitudAbiertaParaConvocatoria(candidato5, c));
 			
@@ -171,6 +182,11 @@ public class TestBEPModeloSolicitud {
 			UtilsTestBolsaEmpleo.sqlExecute("DELETE FROM TBEP_SOLICITUDES WHERE CODNUM = " + s.getCodNum());						
 		} catch (SQLException | UVException ex) {
 			fail(String.format(MENSAJE_ERROR_HAY_EXCEPCION, ex.toString()));
+		} finally {
+			if (c != null && cerrarConvocatoria) {
+				UtilsTestBolsaEmpleo.sqlExecute("UPDATE TBEP_CONVOCATORIAS SET ESTADO = '" + ModeloConvocatoria.CONVOCATORIA_ESTADO_CERRADA 
+						+ "' WHERE CODNUM = " + c.getCodNum());
+			}
 		}
 	}
 	
@@ -526,28 +542,27 @@ public class TestBEPModeloSolicitud {
 	 * @throws SQLException .
 	 */
 	@Test
-	public void testE02nuevaSolicitud() throws SQLException, UVException {		
-		Convocatoria c = ModeloConvocatoria.obtenerInstancia().getUltimaConvocatoria();
-		UtilsTestBolsaEmpleo.sqlExecute("UPDATE TBEP_CONVOCATORIAS SET ESTADO = 'CERRADA' WHERE CODNUM = " + c.getCodNum());
-		Convocatoria cerrada = ModeloConvocatoria.obtenerInstancia().getConvocatoriaById(c.getCodNum());
-		Solicitud solicitud = ModeloSolicitud.obtenerInstancia().getSolicitudByConvocatoriaUsuario(candidato1, c);
-				
+	public void testE02nuevaSolicitudConvocatoriaNoAbierta() throws SQLException, UVException {
+		Convocatoria c = null;
+		boolean abrirConvocatoria = false;
+		
 		try {
+			c = ModeloConvocatoria.obtenerInstancia().getUltimaConvocatoria();
+			
+			if (c.getEstado().equals(ModeloConvocatoria.CONVOCATORIA_ESTADO_ABIERTA)) {
+				UtilsTestBolsaEmpleo.sqlExecute("UPDATE TBEP_CONVOCATORIAS SET ESTADO = 'CERRADA' WHERE CODNUM = " + c.getCodNum());
+				abrirConvocatoria = true;
+			}
+					
+			Convocatoria cerrada = ModeloConvocatoria.obtenerInstancia().getConvocatoriaById(c.getCodNum());
+			
 			Throwable throwable = assertThrows(Throwable.class, () -> ModeloSolicitud.obtenerInstancia().nuevaSolicitud(candidato1, cerrada, candidato1));
 			assertEquals(UVException.class, throwable.getClass());
-			assertEquals(ModeloSolicitud.MENSAJE_ERROR_CONVOCATORIA_NO_ABIERTA, throwable.getMessage());
-			
-			throwable = assertThrows(Throwable.class, () -> ModeloSolicitud.obtenerInstancia().nuevaSolicitud(candidato1, c, candidato1));
-			assertEquals(UVException.class, throwable.getClass());
-			assertEquals(ModeloSolicitud.MENSAJE_ERROR_YA_TIENES_SOLICITUD, throwable.getMessage());
-			
-			UtilsTestBolsaEmpleo.sqlExecute("UPDATE TBEP_SOLICITUDES SET ESTADO = 'ABIERTA' WHERE CODNUM = " + solicitud.getCodNum());
-			throwable = assertThrows(Throwable.class, () -> ModeloSolicitud.obtenerInstancia().nuevaSolicitud(candidato1, c, candidato1));
-			assertEquals(UVException.class, throwable.getClass());
-			assertEquals(ModeloSolicitud.MENSAJE_ERROR_SOLICITUDES_ABIERTAS, throwable.getMessage());			
+			assertEquals(ModeloSolicitud.MENSAJE_ERROR_CONVOCATORIA_NO_ABIERTA, throwable.getMessage());					
 		} finally {
-			UtilsTestBolsaEmpleo.sqlExecute("UPDATE TBEP_CONVOCATORIAS SET ESTADO = 'ABIERTA' WHERE CODNUM = " + c.getCodNum());
-			UtilsTestBolsaEmpleo.sqlExecute("UPDATE TBEP_SOLICITUDES SET ESTADO = 'CERRADA' WHERE CODNUM = " + solicitud.getCodNum());
+			if (c != null && abrirConvocatoria) {
+				UtilsTestBolsaEmpleo.sqlExecute("UPDATE TBEP_CONVOCATORIAS SET ESTADO = 'ABIERTA' WHERE CODNUM = " + c.getCodNum());	
+			}				
 		}
 	}
 	
@@ -557,7 +572,90 @@ public class TestBEPModeloSolicitud {
 	 * @throws SQLException .
 	 */
 	@Test
-	public void testE03asignarAfinidadMeritoIndividualizado() throws SQLException, UVException {
+	public void testE03nuevaSolicitudYaTienesSolicitud() throws SQLException, UVException {
+		Convocatoria c = null;
+		boolean cerrarConvocatoria = false;
+						
+		boolean cerrarSolicitud = false;
+		Solicitud solicitud = null;
+				
+		try {
+			c = ModeloConvocatoria.obtenerInstancia().getUltimaConvocatoria();
+					
+			if (c.getEstado().equals(ModeloConvocatoria.CONVOCATORIA_ESTADO_CERRADA)) {
+				UtilsTestBolsaEmpleo.sqlExecute("UPDATE TBEP_CONVOCATORIAS SET ESTADO = 'ABIERTA' WHERE CODNUM = " + c.getCodNum());
+				cerrarConvocatoria = true;
+			}
+			
+			solicitud = ModeloSolicitud.obtenerInstancia().getSolicitudByConvocatoriaUsuario(candidato1, c);
+			if (solicitud.getEstado().equals(ModeloSolicitud.SOLICITUD_ESTADO_CERRADA)) {
+				UtilsTestBolsaEmpleo.sqlExecute("UPDATE TBEP_SOLICITUDES SET ESTADO = 'ABIERTA' WHERE CODNUM = " + solicitud.getCodNum());
+				cerrarSolicitud = true;
+			}
+			
+			Convocatoria abierta = ModeloConvocatoria.obtenerInstancia().getConvocatoriaById(c.getCodNum());
+			Throwable throwable = assertThrows(Throwable.class, () -> ModeloSolicitud.obtenerInstancia().nuevaSolicitud(candidato1, abierta, candidato1));
+			assertEquals(UVException.class, throwable.getClass());
+			assertEquals(ModeloSolicitud.MENSAJE_ERROR_SOLICITUDES_ABIERTAS, throwable.getMessage());
+		} finally {
+			if (c != null && cerrarConvocatoria) {
+				UtilsTestBolsaEmpleo.sqlExecute("UPDATE TBEP_CONVOCATORIAS SET ESTADO = 'CERRADA' WHERE CODNUM = " + c.getCodNum());	
+			}
+			
+			if (solicitud != null && cerrarSolicitud) {
+				UtilsTestBolsaEmpleo.sqlExecute("UPDATE TBEP_SOLICITUDES SET ESTADO = 'CERRADA' WHERE CODNUM = " + solicitud.getCodNum());
+			}
+		}
+	}
+	
+	/**
+	 * nuevaSolicitud.
+	 * @throws UVException .
+	 * @throws SQLException .
+	 */
+	@Test
+	public void testE04yaHaySolicitudesAbiertas() throws SQLException, UVException {
+		Convocatoria c = null;
+		Solicitud solicitud = null;
+		boolean cerrarConvocatoria = false;
+		boolean abrirSolicitud = false;
+		
+		try {
+			c = ModeloConvocatoria.obtenerInstancia().getUltimaConvocatoria();
+			
+			if (c.getEstado().equals(ModeloConvocatoria.CONVOCATORIA_ESTADO_CERRADA)) {
+				UtilsTestBolsaEmpleo.sqlExecute("UPDATE TBEP_CONVOCATORIAS SET ESTADO = 'ABIERTA' WHERE CODNUM = " + c.getCodNum());
+				cerrarConvocatoria = true;
+			}
+			
+			solicitud = ModeloSolicitud.obtenerInstancia().getSolicitudByConvocatoriaUsuario(candidato1, c);
+			if (solicitud.getEstado().equals(ModeloSolicitud.SOLICITUD_ESTADO_ABIERTA)) {
+				UtilsTestBolsaEmpleo.sqlExecute("UPDATE TBEP_SOLICITUDES SET ESTADO = 'CERRADA' WHERE CODNUM = " + solicitud.getCodNum());
+				abrirSolicitud = true;
+			}
+			
+			Convocatoria abierta = ModeloConvocatoria.obtenerInstancia().getConvocatoriaById(c.getCodNum());
+			
+			Throwable throwable = assertThrows(Throwable.class, () -> ModeloSolicitud.obtenerInstancia().nuevaSolicitud(candidato1, abierta, candidato1));
+			assertEquals(UVException.class, throwable.getClass());
+			assertEquals(ModeloSolicitud.MENSAJE_ERROR_YA_TIENES_SOLICITUD, throwable.getMessage());
+		} finally {
+			if (c != null && cerrarConvocatoria) {
+				UtilsTestBolsaEmpleo.sqlExecute("UPDATE TBEP_CONVOCATORIAS SET ESTADO = 'CERRADA' WHERE CODNUM = " + c.getCodNum());	
+			}
+			if (solicitud != null && abrirSolicitud) {
+				UtilsTestBolsaEmpleo.sqlExecute("UPDATE TBEP_SOLICITUDES SET ESTADO = 'ABIERTA' WHERE CODNUM = " + solicitud.getCodNum());
+			}
+		}
+	}
+	
+	/**
+	 * nuevaSolicitud.
+	 * @throws UVException .
+	 * @throws SQLException .
+	 */
+	@Test
+	public void testE05asignarAfinidadMeritoIndividualizado() throws SQLException, UVException {
 		Solicitud s = null;
 		
 		try {
