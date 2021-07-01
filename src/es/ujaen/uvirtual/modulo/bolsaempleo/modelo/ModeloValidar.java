@@ -332,7 +332,7 @@ public class ModeloValidar {
 		// seleccionamos las bolsas, con meritos, en la convocatoria pasada
 		String consulta = 
 				"SELECT bepbol.CODNUM, bepbol.BEPARE_CODNUM, bepbol.ESTADO, bepbol.FLGBAREMABLE, bepbol.FECHAACTUALIZACION, "
-				+ "		bepbol.FECHABLOQUEO, bepbol.FECHADEBLOQUEO,"
+				+ "		bepbol.FECHABLOQUEO, bepbol.FECHADEBLOQUEO, bepbol.FECHABAREMACION,"
 				+ "	(" + consultaCount + " AND bepsbm.FLGVALIDADO = 'N' AND bepsbm.FLGEXCLUIDO = 'N') COUNT_NO_VALIDADOS, "
 				+ "	(" + consultaCount + " AND bepsbm.FLGVALIDADO = 'S' AND bepsbm.FLGEXCLUIDO = 'N') COUNT_VALIDADOS, "
 				+ "	(" + consultaCount + " AND bepsbm.FLGEXCLUIDO = 'S') COUNT_EXCLUIDOS, "
@@ -409,7 +409,7 @@ public class ModeloValidar {
 		
 		String consulta = 
 				"SELECT bepbol.CODNUM, bepbol.BEPARE_CODNUM, bepbol.ESTADO, bepbol.FLGBAREMABLE, bepbol.FECHAACTUALIZACION, "
-				+ "	bepbol.FECHABLOQUEO, bepbol.FECHADEBLOQUEO, bepare.ID_AREA_CONOCIMIENTO"
+				+ "	bepbol.FECHABLOQUEO, bepbol.FECHADEBLOQUEO, bepbol.FECHABAREMACION, bepare.ID_AREA_CONOCIMIENTO"
 				+ "	FROM TBEP_BOLSAS bepbol"
 				+ "	INNER JOIN TBEP_AREAS bepare ON bepare.CODNUM = bepbol.BEPARE_CODNUM"
 				+ "	INNER JOIN TBEP_SOLICITUD_BOLSAS bepsbo ON bepbol.CODNUM = bepsbo.BEPBOL_CODNUM"
@@ -651,7 +651,7 @@ public class ModeloValidar {
 		}
 		
 		String consulta = "SELECT bepbol.CODNUM, bepbol.BEPARE_CODNUM, bepbol.ESTADO, bepbol.FLGBAREMABLE, bepbol.FECHAACTUALIZACION,"
-				+ "	bepbol.FECHABLOQUEO, bepbol.FECHADEBLOQUEO, bepsbm.CODNUM AS BEPSBM_CODNUM, bepsol.BEPCON_CODNUM, bepsbm.UID_USUARIO AS UID_EVALUADOR"
+				+ "	bepbol.FECHABLOQUEO, bepbol.FECHADEBLOQUEO, bepbol.FECHABAREMACION, bepsbm.CODNUM AS BEPSBM_CODNUM, bepsol.BEPCON_CODNUM, bepsbm.UID_USUARIO AS UID_EVALUADOR"
 				+ "	FROM TBEP_BOLSAS bepbol"
 				+ "	INNER JOIN TBEP_AREAS bepare ON bepare.CODNUM = bepbol.BEPARE_CODNUM"
 				+ "	INNER JOIN TBEP_SOLICITUD_BOLSAS bepsbo ON bepbol.CODNUM = bepsbo.BEPBOL_CODNUM"

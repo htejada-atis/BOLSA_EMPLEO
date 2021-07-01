@@ -376,6 +376,8 @@ $(document).ready(function() {
 		    "columns": [
 		    	{'data': 'codNum', 'filter': {'type': 'number'}},
 		        {'data': 'codNum', 'order': false, 'class': 'center', 'render': function(row) {
+		        		console.log('excluido: ' + row.excluido)
+		        		console.log('validado: ' + row.validado)
 		        		if (!row.excluido && !row.validado) {
 		        			return "<div title='Mérito no evaluado' class='circle-neutral'></div>";
 		        		} else {
