@@ -93,6 +93,10 @@ public class ModeloResultados {
 	public void calcularSolicitud(Solicitud solicitud, Bolsa bolsa) throws SQLException, UVException {
 		Double totalSinAplicar = 0.0;
 		
+		if (compruebaTitulacionesPreferentesAlArea(solicitud.getUsuario(), bolsa)) {
+			
+		}
+		
 		List<MeritoResultado> meritos = this.getMeritosSolicitudBolsa(solicitud, bolsa);
 		for (MeritoResultado merito: meritos) {
 			totalSinAplicar += calcularMerito(merito);
@@ -142,6 +146,10 @@ public class ModeloResultados {
 		this.guardarResultadoSolicitudBolsaMerito(merito, null);
 		
 		return puntuacion;
+	}
+	
+	private void calcularMeritosYTitulacionesPreferentes(Solicitud solicitud, Bolsa bolsa) {
+		
 	}
 	
 	/** Lista de solicitudes asociadas a una bolsa .
@@ -312,8 +320,32 @@ public class ModeloResultados {
 		}
 	}
 	
-	public void compruebaTitulacionesPreferentesAlArea() {
+	/** Comprueba si el candidato tiene alguna titulación validada para el área .
+	 * @param bolsa .
+	 * @param candidato .
+	 * @return si tiene titulaciones o no .
+	 * @throws SQLException .
+	 * @throws UVException .
+	 */
+	public boolean compruebaTitulacionesPreferentesAlArea(UsuarioBolsaEmpleo candidato, Bolsa bolsa) throws SQLException {
+		String consulta = "SELECT *"
+				+ " FROM TBEP_TIT_PREFERENTES_AREA beptpa"
+				+ "	INNER JOIN TBEP_TITULACIONES_USUARIO beptus ON beptus.BEPTUS_TIT_CODNUM = beptpa.CODNUM"
+				+ "	WHERE 	beptus.BEPTUS_USU_CODNUM = ?"
+				+ "		AND beptpa.BEPARE_CODNUM = ?"
+				+ "		AND beptus.FLGVALIDADA = 'S'"
+				+ "		AND beptus.FLGBORRADO = 'N'";
 		
+		try (Connection conexion = ConexionUvirtual.obtenerInstancia();
+				PreparedStatement stmt = conexion.prepareStatement(consulta)) {
+			int indexParam = 1;
+			stmt.setInt(indexParam++, candidato.getCodNum());
+			stmt.setInt(indexParam++, bolsa.getCodNum());
+			
+			try (ResultSet rs = stmt.executeQuery()) {
+				return !rs.next();
+			}
+		}
 	}
 	
 	/** Guardar resultado de la solicitud para una bolsa .
