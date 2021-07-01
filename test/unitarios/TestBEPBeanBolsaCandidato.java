@@ -50,7 +50,7 @@ public class TestBEPBeanBolsaCandidato {
 		assertEquals(bolsaCandidato.getFechaBloqueo(), bolsa.getFechaBloqueo());
 		assertEquals(bolsaCandidato.getFechaDesBloqueo(), bolsa.getFechaDesBloqueo());
 		
-		assertNotNull(bolsa.toString());
+		assertNotNull(bolsaCandidato.toString());
 	}
 	
 	/** test equals.
@@ -85,7 +85,7 @@ public class TestBEPBeanBolsaCandidato {
 		assertNotNull(b1.toString());
 		assertNotNull(b2.toString());
 		assertTrue(b1.equals(b2));
-		assertTrue(b1.hashCode() == b2.hashCode());		
+		assertTrue(b1.hashCode() == b2.hashCode());
 	}
 	
 	/** test equals.
@@ -99,16 +99,22 @@ public class TestBEPBeanBolsaCandidato {
 		Boolean excluido = false;
 		
 		Bolsa bolsa = new Bolsa(id, area, ESTADO, BAREAMABLE, FECHAATUALIZACION, FECHABLOQUEO, FECHADESBLOQUEO);
-		Bolsa bolsa1 = new BolsaCandidato();
-		Bolsa bolsa2 = new BolsaCandidato();
-		Bolsa bolsa3 = new BolsaCandidato(bolsa, excluido);
+		BolsaCandidato bolsa1 = new BolsaCandidato();
+		BolsaCandidato bolsa2 = new BolsaCandidato();
+		BolsaCandidato bolsa3 = new BolsaCandidato(bolsa, excluido);
 		    	
+		assertTrue(bolsa1.equals(bolsa1));
 		assertTrue(bolsa1.equals(bolsa2));
 		assertTrue(bolsa2.equals(bolsa1));		
 		assertEquals(bolsa1.hashCode(), bolsa2.hashCode());
 		assertFalse(bolsa1.equals(null));
 		assertFalse(bolsa1.equals(bolsa3));
 		assertFalse(bolsa3.equals(bolsa1));
+		assertFalse(bolsa3.equals((Integer) 0));
 		assertNotEquals(bolsa1.hashCode(), bolsa3.hashCode());
+		
+		bolsa2.setExcluido(true);
+		assertFalse(bolsa1.equals(bolsa2));
+		assertFalse(bolsa2.equals(bolsa1));
 	}
 }

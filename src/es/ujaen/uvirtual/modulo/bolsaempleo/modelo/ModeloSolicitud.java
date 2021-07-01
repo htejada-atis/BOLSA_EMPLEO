@@ -433,7 +433,7 @@ public class ModeloSolicitud {
 		
 		try (Connection conexion = ConexionUvirtual.obtenerInstancia(); PreparedStatement stmt = conexion.prepareStatement(consulta)) {			
 			int paramIndex = 1;
-			stmt.setInt(paramIndex++, convocatoria.getCodNum());			
+			stmt.setInt(paramIndex++, convocatoria.getCodNum());
 			stmt.setInt(paramIndex++, usuario.getCodNum());
 
 			try (ResultSet rs = stmt.executeQuery()) {

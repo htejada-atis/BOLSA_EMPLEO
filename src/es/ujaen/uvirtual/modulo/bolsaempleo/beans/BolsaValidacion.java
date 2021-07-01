@@ -23,7 +23,7 @@ public class BolsaValidacion extends Bolsa implements Serializable {
 	 * @param pbolsa .
 	 */
 	public BolsaValidacion(Bolsa pbolsa) {
-		super(pbolsa);			
+		super(pbolsa);
 	}
 	
 	/** Constructor con parametros.
@@ -86,7 +86,7 @@ public class BolsaValidacion extends Bolsa implements Serializable {
 		
 	@Override
 	public String toString() {
-		return "BolsaSolicitud [bolsa=" + super.toString() + ", meritosNoValidados=" + totalMeritosNoValidados 
+		return "BolsaValidacion [bolsa=" + super.toString() + ", meritosNoValidados=" + totalMeritosNoValidados 
 				+ ", totalMeritosValidados=" + totalMeritosValidados + ", totalMeritosExcluidos=" + totalMeritosExcluidos 
 				+ ", totalMeritos=" + totalMeritos + "]";
 	}
