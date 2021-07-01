@@ -35,7 +35,7 @@ public class BolsaSolicitudTable extends Bolsa implements Serializable {
 	
 	@Override
 	public String toString() {
-		return "BolsaSolicitud [bolsa=" + super.toString() + ", numeroMeritos=" + numeroMeritos + "]";
+		return "BolsaSolicitudTable [bolsa=" + super.toString() + ", numeroMeritos=" + numeroMeritos + "]";
 	}
 	
 	@Override
