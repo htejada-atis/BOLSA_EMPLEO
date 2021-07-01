@@ -25,6 +25,15 @@ public class BolsaCandidato extends Bolsa implements Serializable {
 		this.excluido = pexcluido;
 	}
 	
+	/**
+	 * Constructor copia.
+	 * @param copia .
+	 */
+	public BolsaCandidato(BolsaCandidato copia) {
+		super(copia);
+		this.excluido = copia.excluido;
+	}
+	
 	public Boolean getExcluido() {
 		return excluido;
 	}
