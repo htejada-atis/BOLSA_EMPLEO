@@ -225,7 +225,7 @@ UsuarioBolsaEmpleo candidato = bean.getCandidato();
 							<%	} else { %>
 									<table class="table-afinidades">
 											<tbody>
-								<%	int total = 0;
+								<%	Double total = 0.0;
 									if (valoraciones) {
 										for (MeritoSolicitudValoracion valoracion: meritoBolsa.getMeritoSolicitud().getValoraciones()) {
 												total += valoracion.getValor();	%>
