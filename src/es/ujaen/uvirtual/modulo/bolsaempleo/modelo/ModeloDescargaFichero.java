@@ -54,13 +54,14 @@ public class ModeloDescargaFichero {
 				+ "	INNER JOIN TBEP_BOLSAS bepbol ON bepbol.CODNUM = bepsbo.BEPBOL_CODNUM"
 				+ "	INNER JOIN TBEP_EVALUADORES bepeva ON bepeva.BEPARE_CODNUM = bepbol.BEPARE_CODNUM"
 				+ " INNER JOIN TBEP_MERITOS bepmer ON bepmer.CODNUM = bepsbm.BEPMER_CODNUM"
-				+ "	WHERE bepsbm.BEPMER_CODNUM = ? AND bepeva.BEPUSU_CODNUM = ? AND bepsol.ESTADO = " + ModeloSolicitud.SOLICITUD_ESTADO_CERRADA;
+				+ "	WHERE bepsbm.BEPMER_CODNUM = ? AND bepeva.BEPUSU_CODNUM = ? AND bepsol.ESTADO = ? ";
 		
 		try (Connection conexion = ConexionUvirtual.obtenerInstancia();
 				PreparedStatement stmt = conexion.prepareStatement(consulta)) {
 			int parameterIndex = 1;
 			stmt.setInt(parameterIndex++, idMerito);
 			stmt.setInt(parameterIndex++, usuario.getCodNum());
+			stmt.setString(parameterIndex++, ModeloSolicitud.SOLICITUD_ESTADO_CERRADA);
 						
 			try (ResultSet rs = stmt.executeQuery()) {
 				if (rs.next()) {
