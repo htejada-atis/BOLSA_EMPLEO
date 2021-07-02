@@ -143,6 +143,28 @@ public class ModeloMeritosPreferentes {
 		
 		throw new UVException(OPCION_MERITO_NOEXISTE);
 	}
+	
+	/** Listado de méritos preferentes . 
+	 * @return lista méritos preferentes .
+	 * @throws SQLException .
+	 * @throws UVException .
+	 */
+	public List<MeritoPreferente> listaMeritosPreferentesActivos() throws SQLException, UVException {
+		List<MeritoPreferente> meritosPreferentes = new ArrayList<>();
+		
+		String consulta = "SELECT bepmep.* FROM TBEP_MERITOS_PREFERENTES bepmep WHERE FLGACTIVO = 'S'";
+		
+		try (Connection conexion = ConexionUvirtual.obtenerInstancia(); PreparedStatement stmt = conexion.prepareStatement(consulta)) {
+			try (ResultSet rs = stmt.executeQuery()) {
+				while (rs.next()) {
+					MeritoPreferente row = this.createMeritoPreferenteFromResultSet(rs);
+					meritosPreferentes.add(row);
+				}
+			}
+		}
+		
+		return meritosPreferentes;
+	}
     
 	/**
 	 * Listado. 

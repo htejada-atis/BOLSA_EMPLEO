@@ -11,6 +11,7 @@ public class BolsaResultado extends Bolsa implements Serializable {
 
 	private static final long serialVersionUID = 1L;
 	private String desgloseTotal;
+	private String desgloseDescripcion;
 	private Double total;
 	private Double totalSinAplicar;
 	private transient InputStream archivo;
@@ -26,13 +27,15 @@ public class BolsaResultado extends Bolsa implements Serializable {
 	/** Constructor con parametros .
 	 * @param pbolsa .
 	 * @param pdesgloseTotal .
+	 * @param pdesgloseDescripcion .
 	 * @param ptotal .
 	 * @param ptotalSinAplicar .
 	 * @param plistaMeritos .
 	 */
-	public BolsaResultado(Bolsa pbolsa, String pdesgloseTotal, Double ptotal, Double ptotalSinAplicar, List<MeritoResultado> plistaMeritos) {
+	public BolsaResultado(Bolsa pbolsa, String pdesgloseTotal, String pdesgloseDescripcion, Double ptotal, Double ptotalSinAplicar, List<MeritoResultado> plistaMeritos) {
 		super(pbolsa);
 		this.desgloseTotal = pdesgloseTotal;
+		this.desgloseDescripcion = pdesgloseDescripcion;
 		this.total = ptotal;
 		this.totalSinAplicar = ptotalSinAplicar;
 		this.listaMeritos = plistaMeritos;
@@ -41,12 +44,14 @@ public class BolsaResultado extends Bolsa implements Serializable {
 	/** Constructor con parametros .
 	 * @param pbolsa .
 	 * @param pdesgloseTotal .
+	 * @param pdesgloseDescripcion .
 	 * @param ptotal .
 	 * @param ptotalSinAplicar .
 	 */
-	public BolsaResultado(Bolsa pbolsa, String pdesgloseTotal, Double ptotal, Double ptotalSinAplicar) {
+	public BolsaResultado(Bolsa pbolsa, String pdesgloseTotal, String pdesgloseDescripcion, Double ptotal, Double ptotalSinAplicar) {
 		super(pbolsa);
 		this.desgloseTotal = pdesgloseTotal;
+		this.desgloseDescripcion = pdesgloseDescripcion;
 		this.total = ptotal;
 		this.totalSinAplicar = ptotalSinAplicar;
 	}
@@ -57,6 +62,14 @@ public class BolsaResultado extends Bolsa implements Serializable {
 
 	public void setDesgloseTotal(String desgloseTotal) {
 		this.desgloseTotal = desgloseTotal;
+	}
+	
+	public String getDesgloseDescripcion() {
+		return desgloseDescripcion;
+	}
+
+	public void setDesgloseDescripcion(String desgloseDescripcion) {
+		this.desgloseDescripcion = desgloseDescripcion;
 	}
 	
 	public Double getTotal() {
@@ -97,8 +110,8 @@ public class BolsaResultado extends Bolsa implements Serializable {
 	
 	@Override
 	public String toString() {
-		return "BolsaResultado [bolsa=" + super.toString() + ", desgloseTotal=" + desgloseTotal + ", total=" + total 
-				+ ", totalSinAplicar=" + totalSinAplicar + ", archivo=" + archivo + ", meritos=" + listaMeritos + "]";
+		return "BolsaResultado [bolsa=" + super.toString() + ", desgloseTotal=" + desgloseTotal + ", desgloseDescripcion=" + desgloseDescripcion 
+				+ ", total=" + total + ", totalSinAplicar=" + totalSinAplicar + ", archivo=" + archivo + ", meritos=" + listaMeritos + "]";
 	}
 	
 	@Override
@@ -107,6 +120,7 @@ public class BolsaResultado extends Bolsa implements Serializable {
 		int result = 1;
 		result = prime * result + super.hashCode();
 		result = prime * result + ((desgloseTotal == null) ? 0 : desgloseTotal.hashCode());
+		result = prime * result + ((desgloseDescripcion == null) ? 0 : desgloseDescripcion.hashCode());
 		result = prime * result + ((total == null) ? 0 : total.hashCode());
 		result = prime * result + ((totalSinAplicar == null) ? 0 : totalSinAplicar.hashCode());
 		result = prime * result + ((archivo == null) ? 0 : archivo.hashCode());
@@ -135,6 +149,13 @@ public class BolsaResultado extends Bolsa implements Serializable {
 				return false;
 			}
 		} else if (!desgloseTotal.equals(other.desgloseTotal)) {
+			return false;
+		}
+		if (desgloseDescripcion == null) {
+			if (other.desgloseDescripcion != null) {
+				return false;
+			}
+		} else if (!desgloseDescripcion.equals(other.desgloseDescripcion)) {
 			return false;
 		}
 		if (total == null) {
@@ -168,5 +189,6 @@ public class BolsaResultado extends Bolsa implements Serializable {
 		
 		return true;
 	}
+	
 }
 

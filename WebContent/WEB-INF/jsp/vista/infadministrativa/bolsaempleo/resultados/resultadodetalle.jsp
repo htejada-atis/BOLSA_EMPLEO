@@ -53,18 +53,28 @@ BolsaResultado bolsaResultado = bean.getBolsaResultado();
 					<td><%= EscapaHTML.escapa(merito.getObservacionCandidato()) %></td>
 				</tr>
 		<%	} %>
+		</tbody>
+	</table>
+	
+	<table class="bluetable bolsaempleo">
+		<tbody>
 			<tr>
-				<td colspan="4" style="text-align: center;">Total sin aplicar el máximo valor de los méritos preferentes y acreditaciones</td>
-				<td><%= bolsaResultado.getTotalSinAplicar() %></td>
-				<td></td>
+				<th scope="col" style="width:100%">Descripción</th>
+				<th scope="col" style="width:100px"></th>
 			</tr>
 			<tr>
-				<td>Total</td>
-				<td>Total: <%= bolsaResultado.getTotal() %></td>
+				<td>Total sin aplicar el máximo valor de los méritos preferentes y acreditaciones:</td>
+				<td><%= bolsaResultado.getTotalSinAplicar() %></td>
+			</tr>
+		<%	if (bolsaResultado.getDesgloseTotal() != null) { %>
+			<tr>
+				<td><%= EscapaHTML.escapa(bolsaResultado.getDesgloseDescripcion()) %></td>
+				<td><%= EscapaHTML.escapa(bolsaResultado.getDesgloseTotal()) %></td>
+			</tr>
+		<%	} %>
+			<tr>
+				<td>Total: </td>
 				<td><%= bolsaResultado.getTotal() %></td>
-				<td>Desglose: <%= EscapaHTML.escapa(bolsaResultado.getDesgloseTotal()) %></td>
-				<td><%= bolsaResultado.getTotal() %></td>
-				<td></td>
 			</tr>
 		</tbody>
 	</table>

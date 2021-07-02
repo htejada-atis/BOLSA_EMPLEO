@@ -31,7 +31,7 @@ import es.ujaen.uvirtual.utilidades.Formateador;
 import es.ujaen.uvirtual.utilidades.UVException;
 
 /**
- * Listado de bolsas y su estado.
+ * Controlador de resultados .
  */
 @WebServlet(
 	name = "informacionadministrativa.bolsaempleo.resultados", 
