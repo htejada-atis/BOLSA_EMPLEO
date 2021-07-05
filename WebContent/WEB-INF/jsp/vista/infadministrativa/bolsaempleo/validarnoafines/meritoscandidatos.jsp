@@ -139,7 +139,7 @@ UsuarioBolsaEmpleo candidato = bean.getCandidato();
 				    			<% } else { %>
 				    				<option value="<%=it.getCodNum()%>" 
 				    						data-unidades="<%= it.getUnidades() %>" 
-				    						data-descripcion="<%= it.getDescripcion() %>"><%=EscapaHTML.escapa(merito.getMerito().getItemBaremacion().getBloqueBaremacion().getApartadoBaremacion().getCodigo() + "." + it.getBloqueBaremacion().getCodigo() + "." + it.getCodigo() + "-" + it.getNombre())%></option>
+				    						data-descripcion="<%= it.getDescripcion() %>"><%=EscapaHTML.escapa(it.getBloqueBaremacion().getApartadoBaremacion().getCodigo() + "." + it.getBloqueBaremacion().getCodigo() + "." + it.getCodigo() + "-" + it.getNombre())%></option>
 				    			<% } %>
 				    		<%
 				    		}
@@ -282,6 +282,8 @@ $(document).ready(function() {
 		    ]
 		});
 		
+		Atis.smoothScrollToAnchor("#tableMeritos");
+		
 		<% if (merito != null) { %>
 			
 			var tableBolsasCandidato = new Atis.DataTable('#tableBolsasCandidato', {
@@ -348,6 +350,30 @@ $(document).ready(function() {
 			    ]
 			});
 			
+			var itemChanged = false;
+			
+			$("#validar_merito").on("submit", function() {
+				var self = this;
+				
+				if (!itemChanged) {
+					this.elements['<%= ControladorValidarNoAfines.PARAM_BOLSAS %>'].value = Atis.object2Json(tableBolsasCandidato.getCheckedItems());
+				} else {
+					var titulo = "¿Modificar categoría del mérito?";
+					var mensaje = "Modificar la categoría borrará todas las evaluaciones del mérito en cualquier bolsa";
+					
+					Atis.confirmDialog(titulo, mensaje, {
+				        Si: function() {
+				        	self.submit();
+				          	$(this).dialog("close");
+				        },
+				        No: function() {
+				          	$(this).dialog("close");
+				        }
+				    });
+					return false;
+				}
+			});
+			
 			document.getElementById("validar_merito").addEventListener("submit", function() {
 				this.elements['<%= ControladorValidarNoAfines.PARAM_BOLSAS %>'].value = Atis.object2Json(tableBolsasCandidato.getCheckedItems());
 			});
@@ -355,6 +381,10 @@ $(document).ready(function() {
 			document.getElementById("merito_descargar_fichero").addEventListener("click", function() {
 				window.open("<%= ControladorDescargaFicheros.URL_DESCARGA_FICHEROS %>"
     		        	+ "<%= "?a=" + ControladorDescargaFicheros.ACCION_DESCARGAR_MERITO_PERSONAL + "&" + ControladorDescargaFicheros.PARAM_MERITO + "=" + merito.getMerito().getCodNum() %>");
+			});
+			
+			document.getElementById("select_item").addEventListener("change", function() {
+				itemChanged = this.value != <%= merito.getMerito().getItemBaremacion().getCodNum() %>;
 			});
 			
 			Atis.smoothScrollToAnchor("#anchor_modificar_merito");

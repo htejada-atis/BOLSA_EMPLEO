@@ -110,7 +110,7 @@ UsuarioBolsaEmpleo candidato = bean.getCandidato();
 				    			<% } else { %>
 				    				<option value="<%=it.getCodNum()%>" 
 				    						data-unidades="<%= it.getUnidades() %>" 
-				    						data-descripcion="<%= it.getDescripcion() %>"><%=EscapaHTML.escapa(merito.getMerito().getItemBaremacion().getBloqueBaremacion().getApartadoBaremacion().getCodigo() + "." + it.getBloqueBaremacion().getCodigo() + "." + it.getCodigo() + "-" + it.getNombre())%></option>
+				    						data-descripcion="<%= it.getDescripcion() %>"><%=EscapaHTML.escapa(it.getBloqueBaremacion().getApartadoBaremacion().getCodigo() + "." + it.getBloqueBaremacion().getCodigo() + "." + it.getCodigo() + "-" + it.getNombre())%></option>
 				    			<% } %>
 				    		<%
 				    		}
@@ -402,6 +402,8 @@ $(document).ready(function() {
 		    ]
 		});
 		
+		Atis.smoothScrollToAnchor("#tableMeritos");
+		
 	<%	if (merito != null) { %>
 		
 			function NoIndividualizado(cell) {
@@ -532,6 +534,14 @@ $(document).ready(function() {
 	            	}
 	          	});
 				
+			});
+			
+			document.getElementById("select_item").addEventListener("change", function() {
+				console.log(this.value);
+			});
+			
+			document.getElementById("merito_valor").addEventListener("input", function() {
+				console.log(this.value);
 			});
 			
 			Atis.smoothScrollToAnchor("#anchor_modificar_merito");

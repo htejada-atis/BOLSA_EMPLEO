@@ -93,7 +93,7 @@ public class ControladorValidarNoAfines extends HttpServlet {
 	public static final String MENSAJE_ERROR_NO_HAY_BOLSAS_SELECCIONADAS = "No hay bolsas seleccionadas";
 	public static final String MENSAJE_ERROR_SIN_PERMISO_PERSONAL = "No tienes permiso de personal";
 	public static final String MENSAJE_EXITO_MERITO_EXCLUIDO = "Mérito excluido correctamente para la bolsa: %s";
-	public static final String MENSAJE_EXITO_MERITO_GUARDAR = "Mérito guardado correctamente para la bolsa: %s";
+	public static final String MENSAJE_EXITO_MERITO_MODIFICAR_AFINIDAD = "El mérito ha pasado a tener afinidad";
 	public static final String MENSAJE_EXITO_MERITO_VALIDADO = "Mérito validado correctamente para la bolsa: %s";
 	
 	// ajax 
@@ -276,6 +276,8 @@ public class ControladorValidarNoAfines extends HttpServlet {
 		Gson gson = new GsonBuilder().create();
 		ModeloBolsa modeloBolsa = ModeloBolsa.obtenerInstancia();
 		
+		boolean afinidad = false;
+		
 		try {
 			String observacionCandidato = EscapaHTML.ajustaCodificacion(request.getParameter(PARAM_OBSERVACION_CANDIDATO));
 			Collection<String> bolsas = gson.fromJson(request.getParameter(PARAM_BOLSAS), new TypeToken<Collection<String>>() { }.getType());
@@ -284,19 +286,28 @@ public class ControladorValidarNoAfines extends HttpServlet {
 			}
 			
 			if (EscapaHTML.ajustaCodificacion(request.getParameter(PARAM_VALOR)) != null) {
+				Merito merito = bean.getMerito().getMerito();
+				
 				// item de baremación
 				Integer idItem = Formateador.leeParametroInteger(request.getParameter(PARAM_ITEM));
 				ItemBaremacion item = ModeloBaremacionItems.obtenerInstancia().getItemBaremacionById(idItem);
-				bean.getMerito().getMerito().setItemBaremacion(item);
+				if (!item.equals(merito.getItemBaremacion())) {
+					merito.setItemBaremacion(item);
+				}
 				
 				// valor
-				Double valor = ModeloMerito.validateValorDelMerito(request.getParameter(PARAM_VALOR), bean.getMerito().getMerito());
-				bean.getMerito().getMerito().setValor(valor);
+				Double valor = ModeloMerito.validateValorDelMerito(request.getParameter(PARAM_VALOR), merito);
 				bean.getMerito().setValor(valor);
+				if (!valor.equals(merito.getValor())) {
+					merito.setValor(valor);
+				}
 				
-				bean.getMerito().getMerito().setUsuario(bean.getCandidato());
+				ModeloMerito.obtenerInstancia().actualizaMerito(merito, bean.getUsuarioLogeado());
 				
-				ModeloMerito.obtenerInstancia().actualizaMerito(bean.getMerito().getMerito(), bean.getUsuarioLogeado());
+				if (item.getAfinidad() != null) {
+					BolsaEmpleoUtils.addMensajeDeExito(MENSAJE_EXITO_MERITO_MODIFICAR_AFINIDAD, bean, request);
+					afinidad = true;
+				}
 								
 				if (EscapaHTML.ajustaCodificacion(request.getParameter(PARAM_ACEPTAR_MERITO)) != null) {
 					for (String idBolsa : bolsas) {
@@ -319,7 +330,12 @@ public class ControladorValidarNoAfines extends HttpServlet {
 			BolsaEmpleoUtils.addMensajeDeError(ex.getMessage(), bean, request);
 		}
 		
-		redireccionConMeritoSeleccionado(bean, datos, request, response, ACCION_MERITO_SELECCIONADO);
+		if (afinidad) {
+			datos.setRespuestaEnviada(true);
+			response.sendRedirect(request.getServletPath());
+		} else {
+			redireccionConMeritoSeleccionado(bean, datos, request, response, ACCION_MERITO_SELECCIONADO);
+		}
 	}
 	
 	private void redireccionConMeritoSeleccionado(VistaValidarNoAfines bean, UVDatos datos, HttpServletRequest request, HttpServletResponse response, String accion)

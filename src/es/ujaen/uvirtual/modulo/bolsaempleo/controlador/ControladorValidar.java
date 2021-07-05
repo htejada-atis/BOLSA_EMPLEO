@@ -17,6 +17,7 @@ import com.google.gson.GsonBuilder;
 import com.google.gson.reflect.TypeToken;
 import es.ujaen.uvirtual.beans.CodigoDescripcion;
 import es.ujaen.uvirtual.beans.UVDatos;
+import es.ujaen.uvirtual.modelo.conexion.ConexionUvirtual;
 import es.ujaen.uvirtual.modulo.bolsaempleo.beans.Afinidad;
 import es.ujaen.uvirtual.modulo.bolsaempleo.beans.Bolsa;
 import es.ujaen.uvirtual.modulo.bolsaempleo.beans.BolsaValidacion;
@@ -103,6 +104,7 @@ public class ControladorValidar extends HttpServlet {
 	public static final String MENSAJE_EXITO_MERITO_GUARDAR = "Mérito guardado correctamente para la bolsa: %s";
 	public static final String MENSAJE_EXITO_MERITO_VALIDADO = "Mérito validado correctamente para la bolsa: %s";
 	public static final String MENSAJE_EXITO_MERITO_MODIFICAR = "Mérito modificado correctamente";
+	public static final String MENSAJE_EXITO_MERITO_MODIFICAR_AFINIDAD = "El mérito ha pasado a no tener afinidad";
 	
 	// ajax 
 	public static final String URL_PATTERN_AJAX = "/srv/es/ajax/informacionadministrativa/bolsaempleo/validar";
@@ -280,7 +282,7 @@ public class ControladorValidar extends HttpServlet {
 				obtenerValoresMeritoBolsasCandidato(bean);
 				break;
 			case ACCION_MODIFICAR_MERITO:
-				modificarMerito(bean, datos, request, response, merito);
+				modificarMerito(bean, datos, request, response);
 				break;
 			case ACCION_VALIDAR_MERITO:
 				validarMerito(bean, datos, request, response);
@@ -291,26 +293,46 @@ public class ControladorValidar extends HttpServlet {
 		
 	}
 	
-	private void modificarMerito(VistaValidar bean, UVDatos datos, HttpServletRequest request, HttpServletResponse response, Merito merito) throws UVException, IOException {
+	private void modificarMerito(VistaValidar bean, UVDatos datos, HttpServletRequest request, HttpServletResponse response) throws UVException, IOException {
+		boolean afinidad = true;
+		
 		try {
 			if (EscapaHTML.ajustaCodificacion(request.getParameter(PARAM_GUARDAR_MERITO)) != null) {
+				Merito merito = bean.getMerito().getMerito();
+				
 				// item de baremación
 				Integer idItem = Formateador.leeParametroInteger(request.getParameter(PARAM_ITEM));
 				ItemBaremacion item = ModeloBaremacionItems.obtenerInstancia().getItemBaremacionById(idItem);
-				merito.setItemBaremacion(item);
+				if (!item.equals(merito.getItemBaremacion())) {
+					merito.setItemBaremacion(item);
+				}
 				
 				// valor
-				merito.setValor(ModeloMerito.validateValorDelMerito(request.getParameter(PARAM_VALOR), merito));
-				merito.setUsuario(bean.getCandidato());
+				Double valor = ModeloMerito.validateValorDelMerito(request.getParameter(PARAM_VALOR), merito);
+				if (!valor.equals(merito.getValor())) {
+					merito.setValor(valor);
+				}
 				
 				ModeloMerito.obtenerInstancia().actualizaMerito(merito, bean.getUsuarioLogeado());
 				BolsaEmpleoUtils.addMensajeDeExito(MENSAJE_EXITO_MERITO_MODIFICAR, bean, request);
+				
+				if (item.getAfinidad() == null) {
+					ModeloSolicitud.obtenerInstancia().eliminarValoracionesDelMeritoSolicitud(ConexionUvirtual.obtenerInstancia(), bean.getMerito());
+					
+					BolsaEmpleoUtils.addMensajeDeExito(MENSAJE_EXITO_MERITO_MODIFICAR_AFINIDAD, bean, request);
+					afinidad = false;
+				}
 			}
 		} catch (Exception ex) {
 			BolsaEmpleoUtils.addMensajeDeError(ex.getMessage(), bean, request);
 		}
 		
-		redireccionConMeritoSeleccionado(bean, datos, request, response, ACCION_MERITO_SELECCIONADO);
+		if (afinidad) {
+			redireccionConMeritoSeleccionado(bean, datos, request, response, ACCION_MERITO_SELECCIONADO);
+		} else {
+			datos.setRespuestaEnviada(true);
+			response.sendRedirect(request.getServletPath());
+		}
 	}
 	
 	private void obtenerValoresMeritoBolsasCandidato(VistaValidar bean) throws SQLException, UVException {
