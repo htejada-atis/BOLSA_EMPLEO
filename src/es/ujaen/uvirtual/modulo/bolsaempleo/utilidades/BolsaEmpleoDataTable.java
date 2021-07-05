@@ -59,6 +59,7 @@ public class BolsaEmpleoDataTable<T> {
 		public static final int COLUMN_TYPE_OPTION = 4;
 		public static final int COLUMN_TYPE_IS_NULL = 5;
 		public static final int COLUMN_TYPE_EXACT = 6;
+		public static final int COLUMN_TYPE_DOUBLE = 7;
 		
 		private String columnName;
 		private int columnType;
@@ -237,6 +238,9 @@ public class BolsaEmpleoDataTable<T> {
 				} else if (this.columns.get(key).getType() == DataTableColumn.COLUMN_TYPE_TEXT) {
 					stmt.setString(index, "%" + value + "%");
 					stmtCount.setString(index++, "%" + value + "%");
+				} else if (this.columns.get(key).getType() == DataTableColumn.COLUMN_TYPE_DOUBLE) {
+					stmt.setDouble(index, Double.parseDouble(value));
+					stmtCount.setDouble(index++, Double.parseDouble(value));
 				}
 			}
 		}
@@ -396,6 +400,7 @@ public class BolsaEmpleoDataTable<T> {
 				case DataTableColumn.COLUMN_TYPE_NUMBER:
 				case DataTableColumn.COLUMN_TYPE_BOOLEAN:
 				case DataTableColumn.COLUMN_TYPE_OPTION:
+				case DataTableColumn.COLUMN_TYPE_DOUBLE:
 					consultaResult.append(" AND " + columnName + " = ? ");
 					break;
 				case DataTableColumn.COLUMN_TYPE_IS_NULL:

@@ -32,7 +32,7 @@ COMMENT ON COLUMN TBEP_SOLICITUD_BOLSAS.DESGLOSEDESCRIPCION IS 'Descripción del
 --/////////////////////
 COMMENT ON COLUMN TBEP_SOLICITUD_BOLSAS.ARCHIVO IS 'Archivo de resultados del candidato en un área';
 --/////////////////////
-COMMENT ON COLUMN TBEP_SOLICITUD_BOLSAS.FECHABAREMACION IS 'Fecha de baremación de una solicitud para una bolsa';
+COMMENT ON COLUMN TBEP_SOLICITUD_BOLSAS.FECHABAREMACION IS 'Fecha de baremación de una solicitud para un área';
 --/////////////////////
 COMMENT ON COLUMN TBEP_BOLSAS.FLGPENBAREMACION IS 'Indica si la bolsa está pendiente de baremación';
 --/////////////////////

@@ -16,8 +16,7 @@ Bolsa bolsa = bean.getBolsa();
 
 	<jsp:include page="/WEB-INF/jsp/vista/infadministrativa/bolsaempleo/mensajes.jsp" />
 	
-	<h2>Resultados</h2>
-	<h3>Resultados de los candidatos de la bolsa: <%= EscapaHTML.escapa(bolsa.getArea().getDescripcion()) %></h3>
+	<h2>Resultados del área: <%= EscapaHTML.escapa(bolsa.getArea().getDescripcion()) %></h2>
 	
 	<table class="bluetable bolsaempleo" id="tableCandidatos">
 		<tr>
@@ -41,7 +40,7 @@ Bolsa bolsa = bean.getBolsa();
 $(document).ready(function() {
 	var tableAreas = new Atis.DataTable('#tableCandidatos', {
 	    "ajax": { url: "<%= ControladorResultados.URL_PATTERN_AJAX %>" },
-	    "pageSize": 20,
+	    "pageSize": 100,
 	    "filterable": true,
 	    "action": "<%= ControladorResultados.ACCION_DATATABLE_CANDIDATOS %>",
 	    "params": {'<%=ControladorResultados.PARAM_BOLSA%>': '<%= bolsa.getCodNum() %>'},
@@ -50,7 +49,7 @@ $(document).ready(function() {
 	    	{'data': 'apellido1', 'filter': true, 'overflow': 'auto', 'render': function(row) {
         		return row.nombre + " " + row.apellido1 + " " + row.apellido2;
         	}},
-	        {'data': 'resultado', 'filter': {'type': 'number'}},
+	        {'data': 'total', 'filter': {'type': 'number'}},
 	        {'data': 'codnum', 'buttons': [
 	        	{'label': 'Ver detalles',
 		        	'onClick': function(row) {

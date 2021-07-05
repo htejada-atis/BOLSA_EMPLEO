@@ -6,6 +6,7 @@ import es.ujaen.uvirtual.modulo.bolsaempleo.beans.Bolsa;
 import es.ujaen.uvirtual.modulo.bolsaempleo.beans.BolsaResultado;
 import es.ujaen.uvirtual.modulo.bolsaempleo.beans.CandidatoResultadoTable;
 import es.ujaen.uvirtual.modulo.bolsaempleo.beans.Convocatoria;
+import es.ujaen.uvirtual.modulo.bolsaempleo.beans.MeritoPreferente;
 import es.ujaen.uvirtual.modulo.bolsaempleo.beans.UsuarioBolsaEmpleo;
 import es.ujaen.uvirtual.modulo.bolsaempleo.utilidades.BolsaEmpleoDataTable;
 
@@ -21,6 +22,7 @@ public class VistaResultados extends Vista implements Serializable {
 	private Bolsa bolsa;
 	private BolsaResultado bolsaResultado;
 	private Convocatoria convocatoria;
+	private MeritoPreferente meritoPreferente;
 	private UsuarioBolsaEmpleo candidato;
 	private UsuarioBolsaEmpleo usuarioLogeado;
 	private String vista;
@@ -87,5 +89,13 @@ public class VistaResultados extends Vista implements Serializable {
 	
 	public void setBolsaResultado(BolsaResultado bolsaResultado) {
 		this.bolsaResultado = bolsaResultado;
+	}
+
+	public MeritoPreferente getMeritoPreferente() {
+		return meritoPreferente;
+	}
+
+	public void setMeritoPreferente(MeritoPreferente meritoPreferente) {
+		this.meritoPreferente = meritoPreferente;
 	}
 }

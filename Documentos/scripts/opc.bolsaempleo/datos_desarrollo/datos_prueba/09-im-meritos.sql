@@ -88,3 +88,53 @@ VALUES (
     hextoraw('453d7a34'),
     'CARGA_INICIAL'
 );
+INSERT INTO TBEP_MERITOS (BEPITE_CODNUM,BEPUSU_CODNUM,VALOR,DESCRIPCION,OBSERVACION,ARCHIVO,UID_USUARIO)
+VALUES (
+    (SELECT bepite.CODNUM FROM TBEP_ITEMSBAREMACION bepite WHERE bepite.CODNUM = 1),
+    (SELECT bepusu.CODNUM FROM TBEP_USUARIOS bepusu WHERE bepusu.CODCUENTA = 'candidato3'),
+    3,
+    'descripción mérito 10',
+    'observación mérito 10',
+    hextoraw('453d7a34'),
+    'CARGA_INICIAL'
+);
+INSERT INTO TBEP_MERITOS (BEPITE_CODNUM,BEPUSU_CODNUM,VALOR,DESCRIPCION,OBSERVACION,ARCHIVO,UID_USUARIO)
+VALUES (
+    (SELECT bepite.CODNUM FROM TBEP_ITEMSBAREMACION bepite WHERE bepite.CODNUM = 4),
+    (SELECT bepusu.CODNUM FROM TBEP_USUARIOS bepusu WHERE bepusu.CODCUENTA = 'candidato3'),
+    3,
+    'descripción mérito 11',
+    'observación mérito 11',
+    hextoraw('453d7a34'),
+    'CARGA_INICIAL'
+);
+INSERT INTO TBEP_MERITOS (BEPITE_CODNUM,BEPUSU_CODNUM,VALOR,DESCRIPCION,OBSERVACION,ARCHIVO,UID_USUARIO)
+VALUES (
+    (SELECT bepite.CODNUM FROM TBEP_ITEMSBAREMACION bepite WHERE bepite.CODNUM = 66),
+    (SELECT bepusu.CODNUM FROM TBEP_USUARIOS bepusu WHERE bepusu.CODCUENTA = 'candidato3'),
+    20,
+    'descripción mérito 12',
+    'observación mérito 12',
+    hextoraw('453d7a34'),
+    'CARGA_INICIAL'
+);
+INSERT INTO TBEP_MERITOS (BEPITE_CODNUM,BEPUSU_CODNUM,VALOR,DESCRIPCION,OBSERVACION,ARCHIVO,UID_USUARIO)
+VALUES (
+    (SELECT bepite.CODNUM FROM TBEP_ITEMSBAREMACION bepite WHERE bepite.CODNUM = 9),
+    (SELECT bepusu.CODNUM FROM TBEP_USUARIOS bepusu WHERE bepusu.CODCUENTA = 'candidato3'),
+    90,
+    'descripción mérito 13',
+    'observación mérito 13',
+    hextoraw('453d7a34'),
+    'CARGA_INICIAL'
+);
+INSERT INTO TBEP_MERITOS (BEPITE_CODNUM,BEPUSU_CODNUM,VALOR,DESCRIPCION,OBSERVACION,ARCHIVO,UID_USUARIO)
+VALUES (
+    (SELECT bepite.CODNUM FROM TBEP_ITEMSBAREMACION bepite WHERE bepite.CODNUM = 17),
+    (SELECT bepusu.CODNUM FROM TBEP_USUARIOS bepusu WHERE bepusu.CODCUENTA = 'candidato3'),
+    1,
+    'descripción mérito 14',
+    'observación mérito 14',
+    hextoraw('453d7a34'),
+    'CARGA_INICIAL'
+);

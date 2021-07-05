@@ -25,6 +25,7 @@ import es.ujaen.uvirtual.utilidades.UVException;
  * @author ATISoluciones 2021
  */
 public class ModeloBolsa {
+	
 	public static final int ORDER_COLUMN_INDEX_ID = 1;
 	public static final int ORDER_COLUMN_INDEX_AREA = 2;
 	public static final int ORDER_COLUMN_INDEX_ESTADO = 3;
@@ -32,6 +33,11 @@ public class ModeloBolsa {
 	public static final int ORDER_COLUMN_INDEX_BLOQUEO = 5;
 	public static final int ORDER_COLUMN_INDEX_DESBLOQUEO = 6;
 	public static final int ORDER_COLUMN_INDEX_BAREMALE = 7;
+	
+	public static final int ORDER_COLUMN_INDEX_ID_RESULTADOS = 0;
+	public static final int ORDER_COLUMN_INDEX_COD_AREA_RESULTADOS = 1;
+	public static final int ORDER_COLUMN_INDEX_DESC_AREA_RESULTADOS = 2;
+	public static final int ORDER_COLUMN_INDEX_FECHA_BAREMACION_RESULTADOS = 3;
 	
 	public static final String MENSAJE_ERROR_BOLSA_NULL = "Bolsa no puede estar vacía";
 
@@ -92,6 +98,46 @@ public class ModeloBolsa {
 		dataTable.setColumn(ORDER_COLUMN_INDEX_BLOQUEO, "bepbol.FECHABLOQUEO", DataTableColumn.COLUMN_TYPE_DATE);
 		dataTable.setColumn(ORDER_COLUMN_INDEX_DESBLOQUEO, "bepbol.FECHADEBLOQUEO", DataTableColumn.COLUMN_TYPE_DATE);
 		dataTable.setColumn(ORDER_COLUMN_INDEX_BAREMALE, "bepbol.FLGBAREMABLE", DataTableColumn.COLUMN_TYPE_BOOLEAN);
+		dataTable.setQuery(consulta);
+
+		try (Connection conexion = ConexionUvirtual.obtenerInstancia();
+				PreparedStatement stmtCount = conexion.prepareStatement(dataTable.getQueryCount());
+				PreparedStatement stmt = conexion.prepareStatement(dataTable.getQuery())) {
+			int indexParam = 1;
+			dataTable.setFiltersParams(stmt, stmtCount, indexParam);
+
+			try (ResultSet rs = stmt.executeQuery()) {
+				while (rs.next()) {
+					bolsas.add(this.createFromResultSet(rs));
+				}
+			}
+
+			dataTable.setRecordsTotalFromQuery(stmtCount);
+			dataTable.setData(bolsas);
+		}
+
+		return dataTable;
+	}
+	
+	/**
+	 * Listado de bolsas para resultados .
+	 * 
+	 * @param params para leer los parametros de paginación, ordenacion, etc
+	 * @return listado de bolsas de empleo
+	 * @throws SQLException en caso de error de base de datos
+	 * @throws UVException  error si no existe la area
+	 */
+	public BolsaEmpleoDataTable<Bolsa> listaBolsasResultadosDatatable(Map<String, String[]> params)
+			throws SQLException, UVException {
+		List<Bolsa> bolsas = new ArrayList<>();
+		BolsaEmpleoDataTable<Bolsa> dataTable = new BolsaEmpleoDataTable<>(params);
+
+		String consulta = "SELECT bepbol.* FROM TBEP_BOLSAS bepbol INNER JOIN TBEP_AREAS bepare ON bepare.CODNUM = bepbol.BEPARE_CODNUM WHERE 1=1 ";
+
+		dataTable.setColumn(ORDER_COLUMN_INDEX_ID_RESULTADOS, "bepbol.CODNUM", DataTableColumn.COLUMN_TYPE_NUMBER);
+		dataTable.setColumn(ORDER_COLUMN_INDEX_COD_AREA_RESULTADOS, "bepare.ID_AREA_CONOCIMIENTO");
+		dataTable.setColumn(ORDER_COLUMN_INDEX_DESC_AREA_RESULTADOS, "bepare.DES_AREA_CONOCIMIENTO");
+		dataTable.setColumn(ORDER_COLUMN_INDEX_FECHA_BAREMACION_RESULTADOS, "bepbol.FECHABAREMACION", DataTableColumn.COLUMN_TYPE_DATE);
 		dataTable.setQuery(consulta);
 
 		try (Connection conexion = ConexionUvirtual.obtenerInstancia();

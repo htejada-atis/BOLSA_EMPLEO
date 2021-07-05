@@ -61,6 +61,7 @@ public class ModeloMeritosPreferentes {
 	public static final String ERROR_MERITO_REQUERIDO = "El merito preferente es requerido";
 	public static final String OPCION_MERITO_REQUERIDO = "Opción de mérito requerido";
 	public static final String OPCION_MERITO_NOEXISTE = "No existe la opción del mérito";
+	public static final String MERITO_PREFERENTE_TIPO_MERITO_NOEXISTE = "No existe mérito preferente de tipo mérito";
 	
 	private static final String CODNUM = "CODNUM";
 	private static final String FACTOR = "FACTOR";
@@ -300,6 +301,27 @@ public class ModeloMeritosPreferentes {
 		}
 		
 		return meritosPreferentesPosesion;
+	}
+	
+	/** Devuelve el merito preferente de tipo mérito .
+	 * @return .
+	 * @throws SQLException .
+	 * @throws UVException .
+	 */
+	public MeritoPreferente getMeritoPreferenteTipoMerito() throws SQLException, UVException {
+		String consulta = "SELECT bepmep.* FROM TBEP_MERITOS_PREFERENTES bepmep WHERE bepmep.FLGACTIVO = 'S' AND bepmep.TIPO = ?";
+		
+		try (Connection conexion = ConexionUvirtual.obtenerInstancia(); PreparedStatement stmt = conexion.prepareStatement(consulta)) {
+			stmt.setString(1, ModeloMeritosPreferentes.TIPO_MERITO);
+						
+			try (ResultSet rs = stmt.executeQuery()) {
+				if (rs.next()) {
+					return this.createMeritoPreferenteFromResultSet(rs);
+				}
+			}
+		}
+		
+		throw new UVException(MERITO_PREFERENTE_TIPO_MERITO_NOEXISTE);
 	}
 	
 	/**

@@ -5,7 +5,6 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.text.DecimalFormat;
 import java.util.AbstractMap;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -23,7 +22,6 @@ import es.ujaen.uvirtual.modulo.bolsaempleo.beans.UsuarioBolsaEmpleo;
 import es.ujaen.uvirtual.modulo.bolsaempleo.utilidades.BolsaEmpleoDataTable;
 import es.ujaen.uvirtual.modulo.bolsaempleo.utilidades.BolsaEmpleoUtils;
 import es.ujaen.uvirtual.modulo.bolsaempleo.utilidades.BolsaEmpleoDataTable.DataTableColumn;
-import es.ujaen.uvirtual.utilidades.Formateador;
 import es.ujaen.uvirtual.utilidades.UVException;
 
 /**
@@ -113,9 +111,9 @@ public class ModeloResultados {
 		for (String tipoPreferente: preferentes.keySet()) {
 			if (!tipoPreferente.equals(ModeloMeritosPreferentes.TIPO_MERITO)) {
 				total *= preferentes.get(tipoPreferente).getValue();
-				desgloseTotal = (desgloseTotal == null ? BolsaEmpleoUtils.formatoPuntuacion(totalSinAplicar).toString() : desgloseTotal) 
+				desgloseTotal = (desgloseTotal == null ? BolsaEmpleoUtils.formatoPuntuacion(totalSinAplicar).toString() : desgloseTotal)
 						+ " * " + preferentes.get(tipoPreferente).getValue();
-				desgloseDescripcion = (desgloseDescripcion == null ? "Total sin aplicar" : desgloseDescripcion) + " * " 
+				desgloseDescripcion = (desgloseDescripcion == null ? "Total sin aplicar" : desgloseDescripcion) + " * "
 						+ (tipoPreferente.equals(ModeloMeritosPreferentes.TIPO_POSESION) ? "Factor acreditación" : "Factor titulación");
 			}
 		}
@@ -151,7 +149,7 @@ public class ModeloResultados {
 				desglose += i < merito.getValoraciones().size() - 1 ? " + " : "";
 			}
 			desglose += ")" + " * " + pesoCategoria + " * " + pesoBloque;
-			puntuacion = pesoCategoria * pesoBloque;
+			puntuacion *= pesoCategoria * pesoBloque;
 		} else {
 			Double valor = tieneAfinidad ? merito.getValor() : merito.getValorMeritoSolicitud();
 			Double afinidad = tieneAfinidad ? merito.getValoraciones().get(0).getAfinidad().getModulacion() : 1.0;
@@ -290,7 +288,7 @@ public class ModeloResultados {
 		
 		dataTable.setColumn(ORDER_COLUMN_INDEX_NIF_CANDIDATOS, "bepusu.VUAJA_PRSNIF");
 		dataTable.setColumn(ORDER_COLUMN_INDEX_NOMBRE_CANDIDATOS, whereNombre, DataTableColumn.COLUMN_TYPE_TEXT);
-		dataTable.setColumn(ORDER_COLUMN_INDEX_PUNTUACION_CANDIDATOS, "bepsob.TOTAL", DataTableColumn.COLUMN_TYPE_NUMBER);
+		dataTable.setColumn(ORDER_COLUMN_INDEX_PUNTUACION_CANDIDATOS, "bepsob.TOTAL", DataTableColumn.COLUMN_TYPE_DOUBLE);
 
 		dataTable.setQuery(consulta);
 		

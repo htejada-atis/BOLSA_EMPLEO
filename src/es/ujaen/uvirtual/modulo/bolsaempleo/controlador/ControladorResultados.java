@@ -19,6 +19,7 @@ import es.ujaen.uvirtual.modulo.bolsaempleo.beans.CandidatoResultadoTable;
 import es.ujaen.uvirtual.modulo.bolsaempleo.beans.UsuarioBolsaEmpleo;
 import es.ujaen.uvirtual.modulo.bolsaempleo.modelo.ModeloBolsa;
 import es.ujaen.uvirtual.modulo.bolsaempleo.modelo.ModeloConvocatoria;
+import es.ujaen.uvirtual.modulo.bolsaempleo.modelo.ModeloMeritosPreferentes;
 import es.ujaen.uvirtual.modulo.bolsaempleo.modelo.ModeloParametrosConfiguracion;
 import es.ujaen.uvirtual.modulo.bolsaempleo.modelo.ModeloResultados;
 import es.ujaen.uvirtual.modulo.bolsaempleo.modelo.ModeloRol;
@@ -196,6 +197,8 @@ public class ControladorResultados extends HttpServlet {
 		
 		BolsaResultado bolsaResultado = ModeloResultados.obtenerInstancia().getBolsaResultado(bean.getBolsa(), candidato, bean.getConvocatoria());
 		bean.setBolsaResultado(bolsaResultado);
+		
+		bean.setMeritoPreferente(ModeloMeritosPreferentes.obtenerInstancia().getMeritoPreferenteTipoMerito());
 	}
 		
 	private void listadoBolsas(VistaResultados bean, UVDatos datos, HttpServletRequest request, HttpServletResponse response) throws IOException {
@@ -208,7 +211,7 @@ public class ControladorResultados extends HttpServlet {
 		
 		try (PrintWriter writer = response.getWriter()) {
 			try {
-				BolsaEmpleoDataTable<Bolsa> dataTable = modelo.listaBolsaEmpleoDatatable(request.getParameterMap());
+				BolsaEmpleoDataTable<Bolsa> dataTable = modelo.listaBolsasResultadosDatatable(request.getParameterMap());
 				bean.setDataTableBolsas(dataTable);
 				writer.write(dataTable.toJson());
 			} catch (UVException e) {

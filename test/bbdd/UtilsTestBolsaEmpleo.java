@@ -28,8 +28,11 @@ import controlador.implementacion.PeticionHttp;
 import es.ujaen.uvirtual.adm.CrearUsuario;
 import es.ujaen.uvirtual.beans.UVDatos;
 import es.ujaen.uvirtual.beans.Usuario;
+import es.ujaen.uvirtual.modulo.bolsaempleo.beans.Bolsa;
 import es.ujaen.uvirtual.modulo.bolsaempleo.beans.UsuarioBolsaEmpleo;
+import es.ujaen.uvirtual.modulo.bolsaempleo.modelo.ModeloBolsa;
 import es.ujaen.uvirtual.modulo.bolsaempleo.modelo.ModeloUsuarioBolsaEmpleo;
+import es.ujaen.uvirtual.modulo.bolsaempleo.tareas.BaremarBolsa;
 import es.ujaen.uvirtual.utilidades.UVException;
 import usuario.DriverUv;
 
@@ -106,6 +109,7 @@ public final class UtilsTestBolsaEmpleo {
 			BbddRunner.ejecutar("Documentos/scripts/opc.bolsaempleo/migraciones/02-mensajesdestinatarios.sql");
 			BbddRunner.ejecutar("Documentos/scripts/opc.bolsaempleo/migraciones/03-valorsolicitudbolsasmeritos.sql");
 			BbddRunner.ejecutar("Documentos/scripts/opc.bolsaempleo/migraciones/04-resultados.sql");
+			BbddRunner.ejecutar("Documentos/scripts/opc.bolsaempleo/datos_desarrollo/datos_prueba_migraciones/01-im-solicitudbolsasmeritos.sql");
 		}
 	}
 
@@ -289,6 +293,18 @@ public final class UtilsTestBolsaEmpleo {
 				}
 			}
 		}
+	}
+	
+	/** Barema una bolsa .
+	 * @param bolsa .
+	 * @throws UVException .
+	 * @throws SQLException .
+	 * @throws UVException .
+	 */
+	public static void baremarBolsa(Bolsa bolsa) throws SQLException, UVException {
+		ModeloBolsa modeloBolsa = ModeloBolsa.obtenerInstancia();
+		modeloBolsa.ponerBolsaComoPendienteBaremacion(bolsa, getUsuario("personal1"));
+		BaremarBolsa.run();
 	}
 	
 	/**
