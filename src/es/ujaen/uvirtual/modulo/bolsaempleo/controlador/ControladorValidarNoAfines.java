@@ -251,7 +251,7 @@ public class ControladorValidarNoAfines extends HttpServlet {
 		MeritoSolicitud meritoSolicitud = modeloSolicitud.getMeritoSolicitudByConvocatoria(bean.getConvocatoria(), bean.getBolsa(), merito);
 		
 		bean.setMerito(meritoSolicitud);
-		bean.setItems(modeloItem.getItemsDeApartado(meritoSolicitud.getMerito().getItemBaremacion().getBloqueBaremacion().getApartadoBaremacion()));
+		bean.setItems(modeloItem.listaItemBaremacion());
 		
 		switch (nombreAccion) {
 			case ACCION_DATATABLE_BOLSAS_CANDIDATO:
