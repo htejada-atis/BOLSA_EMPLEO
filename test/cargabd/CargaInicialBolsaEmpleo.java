@@ -5,8 +5,17 @@ import java.sql.SQLException;
 
 import bbdd.UtilsTestBolsaEmpleo;
 
+/**
+ * Carga inicial de bep.
+ * 
+ * @author ATISoluciones 2021
+ */
 public class CargaInicialBolsaEmpleo {
 
+	/**
+	 * main.
+	 * @param args .
+	 */
 	public static void main(String[] args) {
 		try {
 			// limpieza uvirtual

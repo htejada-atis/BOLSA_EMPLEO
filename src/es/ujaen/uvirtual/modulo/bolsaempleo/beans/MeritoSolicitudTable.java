@@ -30,14 +30,14 @@ public class MeritoSolicitudTable implements Serializable {
 	 * @param pmerito          .
 	 * @param pmeritoSolicitud .
 	 * @param pvaloraciones    .
-	 * @param excluido .
+	 * @param pexcluido .
 	 */
-	public MeritoSolicitudTable(Merito pmerito, MeritoSolicitud pmeritoSolicitud, List<MeritoSolicitudValoracion> pvaloraciones, Boolean excluido) {
+	public MeritoSolicitudTable(Merito pmerito, MeritoSolicitud pmeritoSolicitud, List<MeritoSolicitudValoracion> pvaloraciones, Boolean pexcluido) {
 		this.merito = pmerito;
 		this.codNum = pmerito != null ? pmerito.getCodNum() : null;
 		this.meritoSolicitud = pmeritoSolicitud;
 		this.valoraciones = pvaloraciones;
-		this.excluido = excluido;
+		this.excluido = pexcluido;
 	}
 
 	public Integer getCodNum() {

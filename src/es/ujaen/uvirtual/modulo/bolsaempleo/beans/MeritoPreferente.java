@@ -36,6 +36,7 @@ public class MeritoPreferente implements Serializable {
 	/**
 	 * Constructor con parametros.
 	 * 
+	 * @param pnombre .
 	 * @param pcodNum                      .
 	 * @param pcodigo                 .
 	 * @param pobservaciones               .

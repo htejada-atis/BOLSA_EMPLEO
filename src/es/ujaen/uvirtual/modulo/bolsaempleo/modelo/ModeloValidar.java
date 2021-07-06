@@ -897,37 +897,31 @@ public class ModeloValidar {
 		}
 	}
 	
+	/**
+	 * Borra las evaluaciones de un mérito en un solicitud.
+	 * @param merito .
+	 * @param solicitud .
+	 * @param usuarioUpdate . 
+	 * @throws SQLException .
+	 */
 	public void borrarEvaluacionMerito(Merito merito, Solicitud solicitud, UsuarioBolsaEmpleo usuarioUpdate) throws SQLException {
-		try (Connection conexion = ConexionUvirtual.obtenerInstancia()) {
-			conexion.setAutoCommit(false);
-			
-			try {
-				// limpiamos las evaluaciones del mérito para todas las bolsas
-				String sqlUpdateValoraciones = ""
-						+ " UPDATE ("
-						+ "		SELECT bepsbm.FLGEXCLUIDO, bepsbm.FLGVALIDADO, bepsbm.UID_USUARIO, bepsbm.OBSERVACION_CANDIDATO"
-						+ "		FROM TBEP_SOL_BOL_MERITOS bepsbm"
-						+ "		INNER JOIN TBEP_SOLICITUD_BOLSAS bepsbo ON bepsbo.CODNUM = bepsbm.BEPSBO_CODNUM "
-						+ "		WHERE bepsbm.BEPMER_CODNUM  = ? AND bepsbo.BEPSOL_CODNUM  = ?"
-						+ " )"
-						+ "	SET UID_USUARIO = ?, FLGEXCLUIDO = 'N', FLGVALIDADO = 'N', OBSERVACION_CANDIDATO = ?";
-				
-				try (PreparedStatement stmt = conexion.prepareStatement(sqlUpdateValoraciones)) {
-					int indexParam = 1;
-					stmt.setInt(indexParam++, merito.getCodNum());
-					stmt.setInt(indexParam++, solicitud.getCodNum());
-					stmt.setString(indexParam++, usuarioUpdate.getCodCuenta());
-					stmt.setNull(indexParam++, Types.VARCHAR);
-					stmt.executeUpdate();
-				}
-				
-				conexion.commit();
-			} catch (Exception e) {
-				conexion.rollback();
-				throw e;
-			} finally {
-				conexion.setAutoCommit(true);				
-			}
+		// limpiamos las evaluaciones del mérito para todas las bolsas
+		String sqlUpdateValoraciones = ""
+				+ " UPDATE ("
+				+ "		SELECT bepsbm.FLGEXCLUIDO, bepsbm.FLGVALIDADO, bepsbm.UID_USUARIO, bepsbm.OBSERVACION_CANDIDATO"
+				+ "		FROM TBEP_SOL_BOL_MERITOS bepsbm"
+				+ "		INNER JOIN TBEP_SOLICITUD_BOLSAS bepsbo ON bepsbo.CODNUM = bepsbm.BEPSBO_CODNUM "
+				+ "		WHERE bepsbm.BEPMER_CODNUM  = ? AND bepsbo.BEPSOL_CODNUM  = ?"
+				+ " )"
+				+ "	SET UID_USUARIO = ?, FLGEXCLUIDO = 'N', FLGVALIDADO = 'N', OBSERVACION_CANDIDATO = ?";
+		
+		try (Connection conexion = ConexionUvirtual.obtenerInstancia(); PreparedStatement stmt = conexion.prepareStatement(sqlUpdateValoraciones)) {			
+			int indexParam = 1;
+			stmt.setInt(indexParam++, merito.getCodNum());
+			stmt.setInt(indexParam++, solicitud.getCodNum());
+			stmt.setString(indexParam++, usuarioUpdate.getCodCuenta());
+			stmt.setNull(indexParam++, Types.VARCHAR);
+			stmt.executeUpdate();			
 		}
 	}
 	

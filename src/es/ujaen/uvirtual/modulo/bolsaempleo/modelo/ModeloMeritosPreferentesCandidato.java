@@ -394,7 +394,6 @@ public class ModeloMeritosPreferentesCandidato {
 	 * Valida una acreditacion .
 	 * @param acreditacion .
 	 * @param candidato .
-	 * @param date .
 	 * @param usuarioUpdate .
 	 * @throws SQLException .
 	 * @throws UVException .

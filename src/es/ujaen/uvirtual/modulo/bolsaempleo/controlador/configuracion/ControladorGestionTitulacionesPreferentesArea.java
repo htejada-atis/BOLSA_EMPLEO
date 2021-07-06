@@ -191,7 +191,9 @@ public class ControladorGestionTitulacionesPreferentesArea extends HttpServlet {
 		return area;
 	}
 		
-	private void eliminarTitulacionesArea(VistaTitulacionesArea bean, UVDatos datos, HttpServletRequest request, HttpServletResponse response) throws SQLException, UVException, IOException {
+	private void eliminarTitulacionesArea(VistaTitulacionesArea bean, UVDatos datos, HttpServletRequest request, HttpServletResponse response) 
+			throws SQLException, UVException, IOException {
+		
 		Area area = selecccionarArea(bean, request);
 		
 		try {

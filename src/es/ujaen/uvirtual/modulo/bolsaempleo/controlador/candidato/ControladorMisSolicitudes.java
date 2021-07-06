@@ -918,8 +918,8 @@ public class ControladorMisSolicitudes extends HttpServlet {
 	
 	/**
 	 * generar PDF de la solicitud .
-	 * @param bean .
 	 * @param solicitud .
+	 * @param usuario .
 	 * @param bolsasSolicitud .
 	 * @return InputStream .
 	 * @throws UVException .

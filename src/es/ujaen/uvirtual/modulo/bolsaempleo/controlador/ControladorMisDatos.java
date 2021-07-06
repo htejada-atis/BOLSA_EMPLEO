@@ -185,7 +185,9 @@ public class ControladorMisDatos extends HttpServlet {
 		response.sendRedirect(request.getServletPath());
     }
     
-	private void bajaUsuario(HttpServletRequest request, UVDatos datos, HttpServletResponse response, VistaUsuarioBolsaEmpleo bean) throws SQLException, UVException, IOException {
+	private void bajaUsuario(HttpServletRequest request, UVDatos datos, HttpServletResponse response, VistaUsuarioBolsaEmpleo bean) 
+			throws SQLException, UVException, IOException {
+		
 		bean.setVista("/WEB-INF/jsp/vista/infadministrativa/bolsaempleo/misdatos/formBaja.jsp");
 		
 		if (EscapaHTML.ajustaCodificacion(request.getParameter(PARAM_RAZON_BORRADO)) != null) {

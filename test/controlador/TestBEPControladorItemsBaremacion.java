@@ -489,7 +489,7 @@ public class TestBEPControladorItemsBaremacion {
 	
 	/**
 	 * agregar bloque .
-	 * @throws NumberFormatException 
+	 * @throws NumberFormatException .
 	 * @throws SQLException     .
 	 * @throws ServletException .
 	 * @throws IOException      .
