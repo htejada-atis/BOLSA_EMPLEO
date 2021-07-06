@@ -17,6 +17,7 @@ import es.ujaen.uvirtual.modulo.bolsaempleo.beans.Merito;
 import es.ujaen.uvirtual.modulo.bolsaempleo.beans.MeritoSolicitud;
 import es.ujaen.uvirtual.modulo.bolsaempleo.beans.MeritoSolicitudValoracion;
 import es.ujaen.uvirtual.modulo.bolsaempleo.beans.MeritoValidarTable;
+import es.ujaen.uvirtual.modulo.bolsaempleo.beans.Solicitud;
 import es.ujaen.uvirtual.modulo.bolsaempleo.beans.UsuarioBolsaEmpleo;
 import es.ujaen.uvirtual.modulo.bolsaempleo.beans.ValorMeritoBolsaTable;
 import es.ujaen.uvirtual.modulo.bolsaempleo.utilidades.BolsaEmpleoDataTable;
@@ -832,6 +833,101 @@ public class ModeloValidar {
 			stmtUpdate.setString(indexParam++, observacion);
 			stmtUpdate.setString(indexParam++, usuarioUpdate.getCodCuenta());
 			stmtUpdate.executeUpdate();
+		}
+	}
+	
+	/** Método que elimina las valoraciones de un mérito .
+	 * @param merito .
+	 * @param solicitud .
+	 * @param usuarioUpdate .
+	 * @throws SQLException .
+	 */
+	public void borrarValoracionesMerito(Merito merito, Solicitud solicitud, UsuarioBolsaEmpleo usuarioUpdate) throws SQLException {
+		try (Connection conexion = ConexionUvirtual.obtenerInstancia()) {
+			conexion.setAutoCommit(false);
+			
+			try {
+				// actualizamos usuario en valoraciones
+				String sqlUpdateValoraciones = "UPDATE TBEP_SOL_BOL_MER_VALORACION"
+						+ " SET UID_USUARIO = ?"
+						+ " WHERE BEPSBM_CODNUM IN ("
+						+ "		SELECT bepsbm.CODNUM "
+						+ "		FROM TBEP_SOL_BOL_MERITOS bepsbm "
+						+ "		WHERE bepsbm.BEPMER_CODNUM = ? AND bepsbm.BEPSBO_CODNUM IN ( "
+						+ "			SELECT bepsbo.CODNUM "
+						+ "			FROM TBEP_SOLICITUD_BOLSAS bepsbo "
+						+ "			WHERE bepsbo.BEPSOL_CODNUM = ?"						
+						+ "		)"
+						+ ")";
+				
+				try (PreparedStatement stmt = conexion.prepareStatement(sqlUpdateValoraciones)) {
+					int indexParam = 1;
+					stmt.setString(indexParam++, usuarioUpdate.getCodCuenta());
+					stmt.setInt(indexParam++, merito.getCodNum());
+					stmt.setInt(indexParam++, solicitud.getCodNum());
+					stmt.executeUpdate();
+				}
+							
+				// eliminamos valoraciones
+				String sqlValoraciones = ""
+						+ "DELETE FROM TBEP_SOL_BOL_MER_VALORACION bepsbv WHERE bepsbv.BEPSBM_CODNUM IN ("
+						+ "		SELECT bepsbm.CODNUM"
+						+ "		FROM TBEP_SOL_BOL_MERITOS bepsbm"
+						+ "		WHERE bepsbm.BEPMER_CODNUM = ? AND bepsbm.BEPSBO_CODNUM IN ( "
+						+ "			SELECT bepsbo.CODNUM"
+						+ "			FROM TBEP_SOLICITUD_BOLSAS bepsbo"
+						+ "			WHERE bepsbo.BEPSOL_CODNUM = ?"						
+						+ "		)"
+						+ ")";
+				
+				try (PreparedStatement stmt = conexion.prepareStatement(sqlValoraciones)) {
+					int indexParam = 1;
+					stmt.setInt(indexParam++, merito.getCodNum());
+					stmt.setInt(indexParam++, solicitud.getCodNum());
+					stmt.executeUpdate();
+				}
+				
+				conexion.commit();
+			} catch (Exception e) {
+				conexion.rollback();
+				throw e;
+			} finally {
+				conexion.setAutoCommit(true);				
+			}
+		}
+	}
+	
+	public void borrarEvaluacionMerito(Merito merito, Solicitud solicitud, UsuarioBolsaEmpleo usuarioUpdate) throws SQLException {
+		try (Connection conexion = ConexionUvirtual.obtenerInstancia()) {
+			conexion.setAutoCommit(false);
+			
+			try {
+				// limpiamos las evaluaciones del mérito para todas las bolsas
+				String sqlUpdateValoraciones = ""
+						+ " UPDATE ("
+						+ "		SELECT bepsbm.FLGEXCLUIDO, bepsbm.FLGVALIDADO, bepsbm.UID_USUARIO, bepsbm.OBSERVACION_CANDIDATO"
+						+ "		FROM TBEP_SOL_BOL_MERITOS bepsbm"
+						+ "		INNER JOIN TBEP_SOLICITUD_BOLSAS bepsbo ON bepsbo.CODNUM = bepsbm.BEPSBO_CODNUM "
+						+ "		WHERE bepsbm.BEPMER_CODNUM  = ? AND bepsbo.BEPSOL_CODNUM  = ?"
+						+ " )"
+						+ "	SET UID_USUARIO = ?, FLGEXCLUIDO = 'N', FLGVALIDADO = 'N', OBSERVACION_CANDIDATO = ?";
+				
+				try (PreparedStatement stmt = conexion.prepareStatement(sqlUpdateValoraciones)) {
+					int indexParam = 1;
+					stmt.setInt(indexParam++, merito.getCodNum());
+					stmt.setInt(indexParam++, solicitud.getCodNum());
+					stmt.setString(indexParam++, usuarioUpdate.getCodCuenta());
+					stmt.setNull(indexParam++, Types.VARCHAR);
+					stmt.executeUpdate();
+				}
+				
+				conexion.commit();
+			} catch (Exception e) {
+				conexion.rollback();
+				throw e;
+			} finally {
+				conexion.setAutoCommit(true);				
+			}
 		}
 	}
 	

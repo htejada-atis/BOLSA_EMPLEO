@@ -94,7 +94,6 @@ UsuarioBolsaEmpleo candidato = bean.getCandidato();
 		    	<input type="hidden" name="<%= ControladorValidar.PARAM_BOLSA %>" value="<%= bolsa.getCodNum() %>" />
 		    	<input type="hidden" name="<%= ControladorValidar.PARAM_CANDIDATO %>" value="<%= candidato.getCodNum() %>" />
 		    	<input type="hidden" name="<%= ControladorValidar.PARAM_MERITO %>" value="<%= merito.getMerito().getCodNum() %>" />
-		    	<input type="hidden" name="<%= ControladorValidar.PARAM_BOLSAS %>" value="[<%= bolsa.getCodNum() %>]" />
 		    	<div class="form-group-container col2">
 			    	<div class="form-group">
 						<label class="bold-label" for="select_item">Categoría:</label>
@@ -110,7 +109,7 @@ UsuarioBolsaEmpleo candidato = bean.getCandidato();
 				    			<% } else { %>
 				    				<option value="<%=it.getCodNum()%>" 
 				    						data-unidades="<%= it.getUnidades() %>" 
-				    						data-descripcion="<%= it.getDescripcion() %>"><%=EscapaHTML.escapa(merito.getMerito().getItemBaremacion().getBloqueBaremacion().getApartadoBaremacion().getCodigo() + "." + it.getBloqueBaremacion().getCodigo() + "." + it.getCodigo() + "-" + it.getNombre())%></option>
+				    						data-descripcion="<%= it.getDescripcion() %>"><%=EscapaHTML.escapa(it.getBloqueBaremacion().getApartadoBaremacion().getCodigo() + "." + it.getBloqueBaremacion().getCodigo() + "." + it.getCodigo() + "-" + it.getNombre())%></option>
 				    			<% } %>
 				    		<%
 				    		}
@@ -122,7 +121,7 @@ UsuarioBolsaEmpleo candidato = bean.getCandidato();
 			    			<label for="merito_valor" id="merito_valor_label" class="bold-label">Valor (<%= EscapaHTML.escapa(merito.getMerito().getItemBaremacion().getUnidades()) %>):</label>
 			    			<input class="form-input-custom" id="merito_valor" type="text" name="<%= ControladorValidar.PARAM_VALOR %>" 
 			    					value="<%= merito.getMerito().getValor() %>"
-			    					<%= EscapaHTML.escapa(merito.getMerito().getItemBaremacion().getUnidades()).equals(ModeloBaremacionItems.ITEM_UNIDADES_MEDICION_SINO) ? "disabled" : "" %>
+			    					<%= EscapaHTML.escapa(merito.getMerito().getItemBaremacion().getUnidades()).equals(ModeloBaremacionItems.ITEM_UNIDADES_MEDICION_SINO) ? "readonly" : "" %>
 			    					required
 			    					style="max-width: 180px;"/>
 			    		</div>
@@ -402,6 +401,8 @@ $(document).ready(function() {
 		    ]
 		});
 		
+		Atis.smoothScrollToAnchor("#tableMeritos");
+		
 	<%	if (merito != null) { %>
 		
 			function NoIndividualizado(cell) {
@@ -531,7 +532,37 @@ $(document).ready(function() {
 	              		$(this).dialog("close");
 	            	}
 	          	});
-				
+			});
+			
+			var itemChanged = false;
+			var valorChanged = false;
+			
+			$("#validar_merito").on("submit", function() {
+				var self = this;
+				if (itemChanged || valorChanged) {
+					var titulo = "¿Modificar " + (itemChanged ? "categoría" : "valor") + " del mérito?";
+					var mensaje = itemChanged ? "Modificar la categoría borrará todas las evaluaciones del mérito en cualquier bolsa."
+							: "<p>Modificar el valor del mérito borrará las evaluaciones del mérito para méritos no individualizados <br/> y tendrá que asignar los valores de nuevo.</p>";
+					
+					Atis.confirmDialog(titulo, mensaje, {
+				        Si: function() {
+				        	self.submit();
+				          	$(this).dialog("close");
+				        },
+				        No: function() {
+				          	$(this).dialog("close");
+				        }
+				    });
+					return false;
+				}
+			});
+			
+			document.getElementById("select_item").addEventListener("change", function() {
+				itemChanged = this.value != <%= merito.getMerito().getItemBaremacion().getCodNum() %>;
+			});
+			
+			document.getElementById("merito_valor").addEventListener("input", function() {
+				valorChanged = this.value != <%= merito.getMerito().getValor() %>;
 			});
 			
 			Atis.smoothScrollToAnchor("#anchor_modificar_merito");
