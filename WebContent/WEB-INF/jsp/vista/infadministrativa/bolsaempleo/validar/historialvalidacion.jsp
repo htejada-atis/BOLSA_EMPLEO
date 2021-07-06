@@ -32,14 +32,14 @@ Bolsa bolsa = bean.getBolsa();
 	
 	<table class="bluetable bolsaempleo" id="tableHistorialValoracion">
 		<tr>
-			<th scope="col" style="width:15%">Fecha</th>
-			<th scope="col" style="width:15%">Evaluador</th>
-			<th scope="col" style="width:15%">Excluido</th>
-			<th scope="col" style="width:15%">Validado</th>
-			<th scope="col" style="width:15%">Observaciones</th>
-			<th scope="col" style="width:20%">Valoración mérito</th>
-			<th scope="col" style="width:15%">Tipo</th>
-			<th scope="col" style="width:15%">Valor mérito</th>
+			<th scope="col" style="width:55px">Fecha</th>
+			<th scope="col" style="width:60%">Evaluador</th>
+			<th scope="col" style="width:50px">Excluido</th>
+			<th scope="col" style="width:50px">Validado</th>
+			<th scope="col" style="width:40%">Observaciones</th>
+			<th scope="col" style="width:90px">Valoración mérito</th>
+			<th scope="col" style="width:90px">Tipo</th>
+			<th scope="col" style="width:80px">Valor mérito</th>
 		</tr>
 		<tbody>
 		</tbody>

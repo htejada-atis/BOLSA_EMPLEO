@@ -172,6 +172,7 @@ public class ModeloValidarHistorial {
 				+ "	WHERE BEPCON_CODNUM = ? AND BEPMER_CODNUM = ? AND BEPBOL_CODNUM = ?";
 		
 		dataTable.setColumn(ORDER_COLUMN_INDEX_FECHA, FECHALOG, DataTableColumn.COLUMN_TYPE_DATE);
+		dataTable.setColumn(ORDER_COLUMN_INDEX_EVALUADOR, UID_USUARIO);
 		
 		dataTable.setQuery(consulta);
 		

@@ -466,9 +466,7 @@ public class ModeloMerito {
 			throw new UVException(String.format(MENSAJE_ERROR_VALOR_MAXIMO_PERMITIDO, merito.getItemBaremacion().getValorMaximo().toString()));
 		}
 		
-		merito.setValor(valor);
-		
-		return merito.getValor();
+		return valor;
 	}
 	
 	/**

@@ -139,7 +139,7 @@ UsuarioBolsaEmpleo candidato = bean.getCandidato();
 				    			<% } else { %>
 				    				<option value="<%=it.getCodNum()%>" 
 				    						data-unidades="<%= it.getUnidades() %>" 
-				    						data-descripcion="<%= it.getDescripcion() %>"><%=EscapaHTML.escapa(merito.getMerito().getItemBaremacion().getBloqueBaremacion().getApartadoBaremacion().getCodigo() + "." + it.getBloqueBaremacion().getCodigo() + "." + it.getCodigo() + "-" + it.getNombre())%></option>
+				    						data-descripcion="<%= it.getDescripcion() %>"><%=EscapaHTML.escapa(it.getBloqueBaremacion().getApartadoBaremacion().getCodigo() + "." + it.getBloqueBaremacion().getCodigo() + "." + it.getCodigo() + "-" + it.getNombre())%></option>
 				    			<% } %>
 				    		<%
 				    		}
@@ -151,7 +151,7 @@ UsuarioBolsaEmpleo candidato = bean.getCandidato();
 			    			<label for="merito_valor" id="merito_valor_label" class="bold-label">Valor (<%= EscapaHTML.escapa(merito.getMerito().getItemBaremacion().getUnidades()) %>):</label>
 			    			<input class="form-input-custom" id="merito_valor" type="text" name="<%= ControladorValidarNoAfines.PARAM_VALOR %>" 
 			    					value="<%= merito.getMerito().getValor() %>"
-			    					<%= EscapaHTML.escapa(merito.getMerito().getItemBaremacion().getUnidades()).equals(ModeloBaremacionItems.ITEM_UNIDADES_MEDICION_SINO) ? "disabled" : "" %>
+			    					<%= EscapaHTML.escapa(merito.getMerito().getItemBaremacion().getUnidades()).equals(ModeloBaremacionItems.ITEM_UNIDADES_MEDICION_SINO) ? "readonly" : "" %>
 			    					required
 			    					style="max-width: 180px;"/>
 			    		</div>
@@ -282,6 +282,8 @@ $(document).ready(function() {
 		    ]
 		});
 		
+		Atis.smoothScrollToAnchor("#tableMeritos");
+		
 		<% if (merito != null) { %>
 			
 			var tableBolsasCandidato = new Atis.DataTable('#tableBolsasCandidato', {
@@ -343,18 +345,46 @@ $(document).ready(function() {
 		        	{'data': 'codNum', 'order': false, 'render': function(row) {
 		        		var discordancia = (row.meritoSolicitud.valor != 0 && row.meritoSolicitud.valor != '<%= merito.getMerito().getValor() %>')
 		        						|| (row.meritoSolicitud.excluido != <%= merito.isExcluido() %>);
-		        		return  discordancia ? "<div title='D' class='circle-false'></div>" : "";
+		        		var titleDiscordancia = (row.meritoSolicitud.valor != 0 && row.meritoSolicitud.valor != '<%= merito.getMerito().getValor() %>') ?
+		        				"El valor no se corresponde con el valor del mérito" : (row.meritoSolicitud.excluido != <%= merito.isExcluido() %>) 
+		        				? "Excluido no se corresponde con el excluido del mérito" : "";
+		        		return  discordancia ? "<div title='" + titleDiscordancia + "' class='circle-false'></div>" : "";
 		        	}}
 			    ]
 			});
 			
-			document.getElementById("validar_merito").addEventListener("submit", function() {
+			var itemChanged = false;
+			
+			$("#validar_merito").on("submit", function() {
+				var self = this;
+				
 				this.elements['<%= ControladorValidarNoAfines.PARAM_BOLSAS %>'].value = Atis.object2Json(tableBolsasCandidato.getCheckedItems());
+				
+				if (itemChanged) {
+					var titulo = "¿Modificar categoría del mérito?";
+					var mensaje = "Modificar la categoría borrará todas las evaluaciones del mérito en cualquier bolsa.";
+					
+					Atis.confirmDialog(titulo, mensaje, {
+				        Si: function() {
+				        	self.submit();
+				          	$(this).dialog("close");
+				        },
+				        No: function() {
+				          	$(this).dialog("close");
+				        }
+				    });
+					return false;
+				}
+				
 			});
 			
 			document.getElementById("merito_descargar_fichero").addEventListener("click", function() {
 				window.open("<%= ControladorDescargaFicheros.URL_DESCARGA_FICHEROS %>"
     		        	+ "<%= "?a=" + ControladorDescargaFicheros.ACCION_DESCARGAR_MERITO_PERSONAL + "&" + ControladorDescargaFicheros.PARAM_MERITO + "=" + merito.getMerito().getCodNum() %>");
+			});
+			
+			document.getElementById("select_item").addEventListener("change", function() {
+				itemChanged = this.value != <%= merito.getMerito().getItemBaremacion().getCodNum() %>;
 			});
 			
 			Atis.smoothScrollToAnchor("#anchor_modificar_merito");
