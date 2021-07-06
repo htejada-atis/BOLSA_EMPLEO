@@ -5,7 +5,6 @@ import static org.junit.Assert.assertNotEquals;
 import static org.junit.Assert.assertNotNull;
 import java.io.IOException;
 import java.sql.SQLException;
-import javax.servlet.ServletException;
 import org.junit.BeforeClass;
 import org.junit.FixMethodOrder;
 import org.junit.Test;
@@ -14,9 +13,12 @@ import bbdd.BbddRunner;
 import bbdd.UtilsTestBolsaEmpleo;
 import controlador.implementacion.PeticionHttp;
 import controlador.implementacion.RespuestaHttp;
+import es.ujaen.uvirtual.modulo.bolsaempleo.beans.ItemBaremacion;
 import es.ujaen.uvirtual.modulo.bolsaempleo.controlador.ControladorValidarNoAfines;
+import es.ujaen.uvirtual.modulo.bolsaempleo.modelo.ModeloBaremacionItems;
 import es.ujaen.uvirtual.modulo.bolsaempleo.utilidades.BolsaEmpleoDataTable;
 import es.ujaen.uvirtual.modulo.bolsaempleo.vistas.VistaValidarNoAfines;
+import es.ujaen.uvirtual.utilidades.UVException;
 
 /** test controlador validar no afines .
  * @author ATISoluciones
@@ -264,11 +266,104 @@ public class TestBEPControladorValidarNoAfines {
 		assertEquals(MENSAJE_SIN_ADVERTENCIAS, 0, bean2.getMensajesDeAdvertencia().size());
 	}
 	
+	/** Mérito aceptado cambiando el ítem del mérito a uno con afinidad .
+	 * @throws UVException .
+	 * @throws SQLException .
+	 * @throws IOException .
+	 */
+	@Test
+	public void testA10AceptarMeritoCambiarItemAConAfinidad() throws IOException, SQLException, UVException {
+		VistaValidarNoAfines bean = obtenerMeritos();
+		
+		ModeloBaremacionItems modelo = ModeloBaremacionItems.obtenerInstancia();
+		ItemBaremacion item = modelo.listaItemBaremacion().stream().filter(i -> i.getAfinidad() != null).findFirst().orElse(null);
+
+		PeticionHttp peticion = UtilsTestBolsaEmpleo.peticionAutenticadaPersonal();
+		peticion.setParameter(ControladorValidarNoAfines.PARAM_ACCION, ControladorValidarNoAfines.ACCION_VALIDAR_MERITO);
+		peticion.setParameter(ControladorValidarNoAfines.PARAM_ACEPTAR_MERITO, "");
+		peticion.setParameter(ControladorValidarNoAfines.PARAM_OBSERVACION_CANDIDATO, OBSERVACIONES);
+		peticion.setParameter(ControladorValidarNoAfines.PARAM_BOLSA, bean.getBolsa().getCodNum().toString());
+		peticion.setParameter(ControladorValidarNoAfines.PARAM_CANDIDATO, bean.getCandidato().getCodNum().toString());
+		peticion.setParameter(ControladorValidarNoAfines.PARAM_MERITO, bean.getDatatableMeritos().getData().get(0).getCodNum().toString());
+		peticion.setParameter(ControladorValidarNoAfines.PARAM_BOLSAS,
+				"[" + bean.getBolsa().getCodNum().toString() + "]");
+		peticion.setParameter(ControladorValidarNoAfines.PARAM_VALOR, bean.getDatatableMeritos().getData().get(0).getItemBaremacion().getValorMaximo().toString());
+		peticion.setParameter(ControladorValidarNoAfines.PARAM_ITEM, item.getCodNum().toString());
+
+		RespuestaHttp respuesta = new RespuestaHttp();
+		ControladorValidarNoAfines controlador = new ControladorValidarNoAfines();
+		controlador.doPost(peticion, respuesta);
+
+		VistaValidarNoAfines bean2 = (VistaValidarNoAfines) peticion.getUVDatos().getVistas().get(VistaValidarNoAfines.class.getName());
+
+		assertNotNull(MENSAJE_MERITO_DEVUELTO, bean2.getMerito());
+		assertEquals(MENSAJE_SIN_ERROR, 0, bean2.getMensajesDeError().size());
+		assertEquals(MENSAJE_SIN_ADVERTENCIAS, 0, bean2.getMensajesDeAdvertencia().size());
+		
+		// restaurar ítem del mérito
+		PeticionHttp peticion2 = UtilsTestBolsaEmpleo.peticionAutenticadaPersonal();
+		peticion2.setParameter(ControladorValidarNoAfines.PARAM_ACCION, ControladorValidarNoAfines.ACCION_VALIDAR_MERITO);
+		peticion2.setParameter(ControladorValidarNoAfines.PARAM_ACEPTAR_MERITO, "");
+		peticion2.setParameter(ControladorValidarNoAfines.PARAM_OBSERVACION_CANDIDATO, OBSERVACIONES);
+		peticion2.setParameter(ControladorValidarNoAfines.PARAM_BOLSA, bean.getBolsa().getCodNum().toString());
+		peticion2.setParameter(ControladorValidarNoAfines.PARAM_CANDIDATO, bean.getCandidato().getCodNum().toString());
+		peticion2.setParameter(ControladorValidarNoAfines.PARAM_MERITO, bean.getDatatableMeritos().getData().get(0).getCodNum().toString());
+		peticion2.setParameter(ControladorValidarNoAfines.PARAM_BOLSAS,
+				"[" + bean.getBolsa().getCodNum().toString() + "]");
+		peticion2.setParameter(ControladorValidarNoAfines.PARAM_VALOR, bean.getDatatableMeritos().getData().get(0).getItemBaremacion().getValorMaximo().toString());
+		peticion2.setParameter(ControladorValidarNoAfines.PARAM_ITEM, bean.getDatatableMeritos().getData().get(0).getItemBaremacion().getCodNum().toString());
+
+		RespuestaHttp respuesta2 = new RespuestaHttp();
+		ControladorValidarNoAfines controlador2 = new ControladorValidarNoAfines();
+		controlador2.doPost(peticion2, respuesta2);
+		
+		VistaValidarNoAfines bean3 = (VistaValidarNoAfines) peticion2.getUVDatos().getVistas().get(VistaValidarNoAfines.class.getName());
+		
+		assertNotNull(MENSAJE_MERITO_DEVUELTO, bean3.getMerito());
+		assertEquals(MENSAJE_SIN_ERROR, 0, bean3.getMensajesDeError().size());
+		assertEquals(MENSAJE_SIN_ADVERTENCIAS, 0, bean3.getMensajesDeAdvertencia().size());
+	}
+	
+	/** Mérito aceptado cambiando el ítem del mérito a uno sin afinidad .
+	 * @throws UVException .
+	 * @throws SQLException .
+	 * @throws IOException .
+	 */
+	@Test
+	public void testA11AceptarMeritoCambiarItemASinAfinidad() throws IOException, SQLException, UVException {
+		VistaValidarNoAfines bean = obtenerMeritos();
+		
+		ModeloBaremacionItems modelo = ModeloBaremacionItems.obtenerInstancia();
+		ItemBaremacion item = modelo.listaItemBaremacion().stream().filter(i -> i.getAfinidad() == null).findFirst().orElse(null);
+
+		PeticionHttp peticion = UtilsTestBolsaEmpleo.peticionAutenticadaPersonal();
+		peticion.setParameter(ControladorValidarNoAfines.PARAM_ACCION, ControladorValidarNoAfines.ACCION_VALIDAR_MERITO);
+		peticion.setParameter(ControladorValidarNoAfines.PARAM_ACEPTAR_MERITO, "");
+		peticion.setParameter(ControladorValidarNoAfines.PARAM_OBSERVACION_CANDIDATO, OBSERVACIONES);
+		peticion.setParameter(ControladorValidarNoAfines.PARAM_BOLSA, bean.getBolsa().getCodNum().toString());
+		peticion.setParameter(ControladorValidarNoAfines.PARAM_CANDIDATO, bean.getCandidato().getCodNum().toString());
+		peticion.setParameter(ControladorValidarNoAfines.PARAM_MERITO, bean.getDatatableMeritos().getData().get(0).getCodNum().toString());
+		peticion.setParameter(ControladorValidarNoAfines.PARAM_BOLSAS,
+				"[" + bean.getBolsa().getCodNum().toString() + "]");
+		peticion.setParameter(ControladorValidarNoAfines.PARAM_VALOR, bean.getDatatableMeritos().getData().get(0).getItemBaremacion().getValorMaximo().toString());
+		peticion.setParameter(ControladorValidarNoAfines.PARAM_ITEM, item.getCodNum().toString());
+
+		RespuestaHttp respuesta = new RespuestaHttp();
+		ControladorValidarNoAfines controlador = new ControladorValidarNoAfines();
+		controlador.doPost(peticion, respuesta);
+
+		VistaValidarNoAfines bean2 = (VistaValidarNoAfines) peticion.getUVDatos().getVistas().get(VistaValidarNoAfines.class.getName());
+
+		assertNotNull(MENSAJE_MERITO_DEVUELTO, bean2.getMerito());
+		assertEquals(MENSAJE_SIN_ERROR, 0, bean2.getMensajesDeError().size());
+		assertEquals(MENSAJE_SIN_ADVERTENCIAS, 0, bean2.getMensajesDeAdvertencia().size());
+	}
+	
 	/** Mérito aceptado .
 	 * @throws IOException .
 	 */
 	@Test
-	public void testA10AceptarMerito() throws IOException {
+	public void testA12AceptarMerito() throws IOException {
 		VistaValidarNoAfines bean = obtenerMeritos();
 
 		PeticionHttp peticion = UtilsTestBolsaEmpleo.peticionAutenticadaPersonal();
@@ -298,7 +393,7 @@ public class TestBEPControladorValidarNoAfines {
 	 * @throws IOException .
 	 */
 	@Test
-	public void testA11ExcluirMerito() throws IOException {
+	public void testA13ExcluirMerito() throws IOException {
 		VistaValidarNoAfines bean = obtenerMeritos();
 
 		PeticionHttp peticion = UtilsTestBolsaEmpleo.peticionAutenticadaPersonal();
@@ -324,9 +419,7 @@ public class TestBEPControladorValidarNoAfines {
 	}
 	
 	/** acción no válida .
-	 * @throws SQLException si fallo bd .
 	 * @throws IOException si error io .
-	 * @throws ServletException si error servlet .
 	 */
 	@Test
 	public void testE01AccionNoValida() throws IOException {

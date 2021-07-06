@@ -81,7 +81,6 @@ public class ControladorValidar extends HttpServlet {
 	public static final String PARAM_ACEPTAR_MERITO = "aceptarmerito";
 	public static final String PARAM_AFINIDADES = "afinidades";
 	public static final String PARAM_BOLSA = "bolsa";
-	public static final String PARAM_BOLSAS = "bolsas";
 	public static final String PARAM_BOLSA_MERITO = "bolsamerito";
 	public static final String PARAM_CANDIDATO = "candidato";
 	public static final String PARAM_EXCLUIR_MERITO = "excluirmerito";
@@ -100,6 +99,8 @@ public class ControladorValidar extends HttpServlet {
 	// mensajes
 	public static final String MENSAJE_ERROR_ACCION_NO_CONTEMPLADA = "Acción no contemplada";
 	public static final String MENSAJE_ERROR_NO_HAY_BOLSAS_SELECCIONADAS = "No hay bolsas seleccionadas";
+	public static final String MENSAJE_ERROR_NUMERO_MAXIMO_MERITOS_BLOQUE = "Se ha alcanzado el número máximo de méritos por bloque";
+	public static final String MENSAJE_ERROR_SIN_PERMISO = "No tienes permiso";
 	public static final String MENSAJE_EXITO_MERITO_EXCLUIDO = "Mérito excluido correctamente para la bolsa: %s";
 	public static final String MENSAJE_EXITO_MERITO_GUARDAR = "Mérito guardado correctamente para la bolsa: %s";
 	public static final String MENSAJE_EXITO_MERITO_VALIDADO = "Mérito validado correctamente para la bolsa: %s";
@@ -193,7 +194,7 @@ public class ControladorValidar extends HttpServlet {
 					anyMatch(x -> x == bean.getUsuarioLogeado().getRol().getCodNum());
 			
 			if (!contains) {
-				throw new UVException("No tienes permiso");
+				throw new UVException(MENSAJE_ERROR_SIN_PERMISO);
 			}
 		} catch (UVException e) {
 			LOGGER.log(Level.SEVERE, Formateador.getStackTrace(e));
@@ -297,28 +298,43 @@ public class ControladorValidar extends HttpServlet {
 		boolean afinidad = true;
 		
 		try {
-			if (EscapaHTML.ajustaCodificacion(request.getParameter(PARAM_GUARDAR_MERITO)) != null) {
+			if (EscapaHTML.ajustaCodificacion(request.getParameter(PARAM_VALOR)) != null) {
 				Merito merito = bean.getMerito().getMerito();
-				
 				// item de baremación
 				Integer idItem = Formateador.leeParametroInteger(request.getParameter(PARAM_ITEM));
 				ItemBaremacion item = ModeloBaremacionItems.obtenerInstancia().getItemBaremacionById(idItem);
-				if (!item.equals(merito.getItemBaremacion())) {
-					merito.setItemBaremacion(item);
-				}
 				
 				// valor
 				Double valor = ModeloMerito.validateValorDelMerito(request.getParameter(PARAM_VALOR), merito);
-				if (!valor.equals(merito.getValor())) {
-					merito.setValor(valor);
+				
+				if (!valor.equals(merito.getValor()) || !item.equals(merito.getItemBaremacion())) {
+					ModeloSolicitud modeloSolicitud = ModeloSolicitud.obtenerInstancia();
+					ModeloValidar modeloValidar = ModeloValidar.obtenerInstancia();
+					
+					Solicitud solicitud = modeloSolicitud.getSolicitudCerradaByConvocatoriaUsuario(bean.getCandidato(), bean.getConvocatoria());
+					
+					if (!item.equals(merito.getItemBaremacion())) {
+						// comprobamos que el total de méritos por bloque de la solicitud sea menor que
+						// el permitido por la convocatoria
+						merito.setItemBaremacion(item);
+						Integer totalMeritos = modeloSolicitud.obtenerTotalMeritosPorBloqueSolicitud(solicitud, bean.getBolsa(), merito);
+						
+						if (totalMeritos >= bean.getConvocatoria().getNumMeritosPorBloque()) {
+							throw new UVException(MENSAJE_ERROR_NUMERO_MAXIMO_MERITOS_BLOQUE);
+						}
+					}
+					
+					modeloValidar.borrarValoracionesMerito(bean.getMerito().getMerito(), solicitud, bean.getUsuarioLogeado());
+					modeloValidar.borrarEvaluacionMerito(bean.getMerito().getMerito(), solicitud, bean.getUsuarioLogeado());
 				}
+				
+				merito.setItemBaremacion(item);
+				merito.setValor(valor);
 				
 				ModeloMerito.obtenerInstancia().actualizaMerito(merito, bean.getUsuarioLogeado());
 				BolsaEmpleoUtils.addMensajeDeExito(MENSAJE_EXITO_MERITO_MODIFICAR, bean, request);
 				
 				if (item.getAfinidad() == null) {
-					ModeloSolicitud.obtenerInstancia().eliminarValoracionesDelMeritoSolicitud(ConexionUvirtual.obtenerInstancia(), bean.getMerito());
-					
 					BolsaEmpleoUtils.addMensajeDeExito(MENSAJE_EXITO_MERITO_MODIFICAR_AFINIDAD, bean, request);
 					afinidad = false;
 				}

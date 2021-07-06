@@ -1763,7 +1763,7 @@ public class ModeloSolicitud {
 	 * @param meritoSolicitud .
 	 * @throws SQLException .
 	 */
-	public void eliminarValoracionesDelMeritoSolicitud(Connection conexion, MeritoSolicitud meritoSolicitud) throws SQLException {
+	private void eliminarValoracionesDelMeritoSolicitud(Connection conexion, MeritoSolicitud meritoSolicitud) throws SQLException {
 		String sqlDelete = "DELETE FROM TBEP_SOL_BOL_MER_VALORACION bepsbv WHERE bepsbv.BEPSBM_CODNUM = ?";
 		try (PreparedStatement stmt = conexion.prepareStatement(sqlDelete)) {
 			int indexParam = 1;

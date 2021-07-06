@@ -17,6 +17,7 @@ import com.google.gson.GsonBuilder;
 import com.google.gson.reflect.TypeToken;
 import es.ujaen.uvirtual.beans.CodigoDescripcion;
 import es.ujaen.uvirtual.beans.UVDatos;
+import es.ujaen.uvirtual.modelo.conexion.ConexionUvirtual;
 import es.ujaen.uvirtual.modulo.bolsaempleo.beans.Bolsa;
 import es.ujaen.uvirtual.modulo.bolsaempleo.beans.BolsaValidacion;
 import es.ujaen.uvirtual.modulo.bolsaempleo.beans.CandidatoValidacion;
@@ -24,6 +25,7 @@ import es.ujaen.uvirtual.modulo.bolsaempleo.beans.ItemBaremacion;
 import es.ujaen.uvirtual.modulo.bolsaempleo.beans.Merito;
 import es.ujaen.uvirtual.modulo.bolsaempleo.beans.MeritoSolicitud;
 import es.ujaen.uvirtual.modulo.bolsaempleo.beans.MeritoValidarTable;
+import es.ujaen.uvirtual.modulo.bolsaempleo.beans.Solicitud;
 import es.ujaen.uvirtual.modulo.bolsaempleo.beans.ValorMeritoBolsaTable;
 import es.ujaen.uvirtual.modulo.bolsaempleo.modelo.ModeloBaremacionItems;
 import es.ujaen.uvirtual.modulo.bolsaempleo.modelo.ModeloBolsa;
@@ -91,6 +93,7 @@ public class ControladorValidarNoAfines extends HttpServlet {
 	// mensajes
 	public static final String MENSAJE_ERROR_ACCION_NO_CONTEMPLADA = "Acción no contemplada";
 	public static final String MENSAJE_ERROR_NO_HAY_BOLSAS_SELECCIONADAS = "No hay bolsas seleccionadas";
+	public static final String MENSAJE_ERROR_NUMERO_MAXIMO_MERITOS_BLOQUE = "Se ha alcanzado el número máximo de méritos por bloque";
 	public static final String MENSAJE_ERROR_SIN_PERMISO_PERSONAL = "No tienes permiso de personal";
 	public static final String MENSAJE_EXITO_MERITO_EXCLUIDO = "Mérito excluido correctamente para la bolsa: %s";
 	public static final String MENSAJE_EXITO_MERITO_MODIFICAR_AFINIDAD = "El mérito ha pasado a tener afinidad";
@@ -291,25 +294,24 @@ public class ControladorValidarNoAfines extends HttpServlet {
 				// item de baremación
 				Integer idItem = Formateador.leeParametroInteger(request.getParameter(PARAM_ITEM));
 				ItemBaremacion item = ModeloBaremacionItems.obtenerInstancia().getItemBaremacionById(idItem);
-				if (!item.equals(merito.getItemBaremacion())) {
-					merito.setItemBaremacion(item);
-				}
 				
 				// valor
 				Double valor = ModeloMerito.validateValorDelMerito(request.getParameter(PARAM_VALOR), merito);
+				merito.setValor(valor);
 				bean.getMerito().setValor(valor);
-				if (!valor.equals(merito.getValor())) {
-					merito.setValor(valor);
-				}
 				
-				ModeloMerito.obtenerInstancia().actualizaMerito(merito, bean.getUsuarioLogeado());
-				
-				if (item.getAfinidad() != null) {
-					BolsaEmpleoUtils.addMensajeDeExito(MENSAJE_EXITO_MERITO_MODIFICAR_AFINIDAD, bean, request);
-					afinidad = true;
-				}
-								
-				if (EscapaHTML.ajustaCodificacion(request.getParameter(PARAM_ACEPTAR_MERITO)) != null) {
+				if (!item.equals(merito.getItemBaremacion())) {
+					ModeloSolicitud modeloSolicitud = ModeloSolicitud.obtenerInstancia();
+					Solicitud solicitud = modeloSolicitud.getSolicitudCerradaByConvocatoriaUsuario(bean.getCandidato(), bean.getConvocatoria());
+					merito.setItemBaremacion(item);
+					Integer totalMeritos = modeloSolicitud.obtenerTotalMeritosPorBloqueSolicitud(solicitud, bean.getBolsa(), merito);
+					
+					if (totalMeritos >= bean.getConvocatoria().getNumMeritosPorBloque()) {
+						throw new UVException(MENSAJE_ERROR_NUMERO_MAXIMO_MERITOS_BLOQUE);
+					}
+					
+					modeloValidar.borrarEvaluacionMerito(bean.getMerito().getMerito(), solicitud, bean.getUsuarioLogeado());
+				} else if (EscapaHTML.ajustaCodificacion(request.getParameter(PARAM_ACEPTAR_MERITO)) != null) {
 					for (String idBolsa : bolsas) {
 						modeloValidar.validarMerito(idBolsa, bean.getMerito(), observacionCandidato,
 								bean.getConvocatoria(), bean.getUsuarioLogeado());
@@ -323,6 +325,14 @@ public class ControladorValidarNoAfines extends HttpServlet {
 						Bolsa bolsa = modeloBolsa.getBolsaById(Integer.parseInt(idBolsa));
 						BolsaEmpleoUtils.addMensajeDeExito(String.format(MENSAJE_EXITO_MERITO_EXCLUIDO, bolsa.getArea().getDescripcion()), bean, request);
 					}
+				}
+				
+				merito.setItemBaremacion(item);
+				ModeloMerito.obtenerInstancia().actualizaMerito(merito, bean.getUsuarioLogeado());
+				
+				if (item.getAfinidad() != null) {
+					BolsaEmpleoUtils.addMensajeDeExito(MENSAJE_EXITO_MERITO_MODIFICAR_AFINIDAD, bean, request);
+					afinidad = true;
 				}
 			}
 			

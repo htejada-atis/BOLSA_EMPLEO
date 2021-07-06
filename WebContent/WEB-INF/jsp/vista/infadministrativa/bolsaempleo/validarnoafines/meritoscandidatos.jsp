@@ -151,7 +151,7 @@ UsuarioBolsaEmpleo candidato = bean.getCandidato();
 			    			<label for="merito_valor" id="merito_valor_label" class="bold-label">Valor (<%= EscapaHTML.escapa(merito.getMerito().getItemBaremacion().getUnidades()) %>):</label>
 			    			<input class="form-input-custom" id="merito_valor" type="text" name="<%= ControladorValidarNoAfines.PARAM_VALOR %>" 
 			    					value="<%= merito.getMerito().getValor() %>"
-			    					<%= EscapaHTML.escapa(merito.getMerito().getItemBaremacion().getUnidades()).equals(ModeloBaremacionItems.ITEM_UNIDADES_MEDICION_SINO) ? "disabled" : "" %>
+			    					<%= EscapaHTML.escapa(merito.getMerito().getItemBaremacion().getUnidades()).equals(ModeloBaremacionItems.ITEM_UNIDADES_MEDICION_SINO) ? "readonly" : "" %>
 			    					required
 			    					style="max-width: 180px;"/>
 			    		</div>
@@ -345,7 +345,10 @@ $(document).ready(function() {
 		        	{'data': 'codNum', 'order': false, 'render': function(row) {
 		        		var discordancia = (row.meritoSolicitud.valor != 0 && row.meritoSolicitud.valor != '<%= merito.getMerito().getValor() %>')
 		        						|| (row.meritoSolicitud.excluido != <%= merito.isExcluido() %>);
-		        		return  discordancia ? "<div title='D' class='circle-false'></div>" : "";
+		        		var titleDiscordancia = (row.meritoSolicitud.valor != 0 && row.meritoSolicitud.valor != '<%= merito.getMerito().getValor() %>') ?
+		        				"El valor no se corresponde con el valor del mérito" : (row.meritoSolicitud.excluido != <%= merito.isExcluido() %>) 
+		        				? "Excluido no se corresponde con el excluido del mérito" : "";
+		        		return  discordancia ? "<div title='" + titleDiscordancia + "' class='circle-false'></div>" : "";
 		        	}}
 			    ]
 			});
@@ -355,11 +358,11 @@ $(document).ready(function() {
 			$("#validar_merito").on("submit", function() {
 				var self = this;
 				
-				if (!itemChanged) {
-					this.elements['<%= ControladorValidarNoAfines.PARAM_BOLSAS %>'].value = Atis.object2Json(tableBolsasCandidato.getCheckedItems());
-				} else {
+				this.elements['<%= ControladorValidarNoAfines.PARAM_BOLSAS %>'].value = Atis.object2Json(tableBolsasCandidato.getCheckedItems());
+				
+				if (itemChanged) {
 					var titulo = "¿Modificar categoría del mérito?";
-					var mensaje = "Modificar la categoría borrará todas las evaluaciones del mérito en cualquier bolsa";
+					var mensaje = "Modificar la categoría borrará todas las evaluaciones del mérito en cualquier bolsa.";
 					
 					Atis.confirmDialog(titulo, mensaje, {
 				        Si: function() {
@@ -372,10 +375,7 @@ $(document).ready(function() {
 				    });
 					return false;
 				}
-			});
-			
-			document.getElementById("validar_merito").addEventListener("submit", function() {
-				this.elements['<%= ControladorValidarNoAfines.PARAM_BOLSAS %>'].value = Atis.object2Json(tableBolsasCandidato.getCheckedItems());
+				
 			});
 			
 			document.getElementById("merito_descargar_fichero").addEventListener("click", function() {
