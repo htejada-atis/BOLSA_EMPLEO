@@ -228,40 +228,44 @@ public class ModeloValidar {
 			return dataTable;
 		}
 		
-		// subconsultas para seleccionar el número de méritos que contiene cada bolsa de la solicitud
-		// en la convocatoria pasada, agregando después varios filtros
-		String consultaCount = "SELECT COUNT(*) FROM TBEP_SOL_BOL_MERITOS bepsbm"
-				+ "	INNER JOIN TBEP_SOLICITUD_BOLSAS bepsbo ON bepsbo.CODNUM = bepsbm.BEPSBO_CODNUM"
-				+ "	INNER JOIN TBEP_SOLICITUDES bepsol ON bepsol.CODNUM = bepsbo.BEPSOL_CODNUM"
-				+ "	INNER JOIN TBEP_MERITOS bepmer ON bepmer.CODNUM = bepsbm.BEPMER_CODNUM"
-				+ "	INNER JOIN TBEP_ITEMSBAREMACION bepite ON bepite.CODNUM = bepmer.BEPITE_CODNUM"
-				+ "	INNER JOIN TBEP_USUARIOS bepusu ON bepusu.CODNUM = bepmer.BEPUSU_CODNUM"
-				+ "	WHERE"
-				+ "		bepsbo.BEPBOL_CODNUM = bepbol.CODNUM "
-				+ "		AND bepsol.BEPCON_CODNUM = ? "
-				+ "		AND bepsol.FLGEXCLUIDO = 'N' "
-				+ "		AND bepite.AFINIDAD IS NULL"
-				+ "		AND bepusu.FLGBORRADO = 'N'"
-				+ "		AND bepusu.ROL = " + ModeloRol.ID_ROL_CANDIDATO
-				+ "		AND bepsol.ESTADO = '" + ModeloSolicitud.SOLICITUD_ESTADO_CERRADA + "'";
-		
-		// seleccionamos las bolsas, con meritos, en la convocatoria pasada
 		String consulta = 
-				"SELECT bepbol.*,"
-				+ "	(" + consultaCount + " AND bepsbm.FLGVALIDADO = 'N' AND bepsbm.FLGEXCLUIDO = 'N') COUNT_NO_VALIDADOS, "
-				+ "	(" + consultaCount + " AND bepsbm.FLGVALIDADO = 'S' AND bepsbm.FLGEXCLUIDO = 'N') COUNT_VALIDADOS, "
-				+ "	(" + consultaCount + " AND bepsbm.FLGEXCLUIDO = 'S') COUNT_EXCLUIDOS, "
-				+ "	(" + consultaCount + ") COUNT_TOTAL"
+				"SELECT bepbol.*, counts.COUNT_NO_VALIDADOS, counts.COUNT_VALIDADOS, counts.COUNT_EXCLUIDOS, counts.COUNT_TOTAL"
 				+ "	FROM TBEP_BOLSAS bepbol"
-				+ " INNER JOIN TBEP_AREAS bepare ON bepare.CODNUM = bepbol.BEPARE_CODNUM"
+				+ "	INNER JOIN TBEP_AREAS bepare ON bepare.CODNUM = bepbol.BEPARE_CODNUM"
+				+ "	LEFT JOIN ("
+				+ "		SELECT"
+				+ "			SUM(CASE WHEN bepsbm.FLGVALIDADO = 'N' AND bepsbm.FLGEXCLUIDO = 'N' THEN 1 ELSE 0 END) AS COUNT_NO_VALIDADOS,"
+				+ "			SUM(CASE WHEN bepsbm.FLGVALIDADO = 'S' AND bepsbm.FLGEXCLUIDO = 'N' THEN 1 ELSE 0 END) AS COUNT_VALIDADOS,"
+				+ "			SUM(CASE WHEN bepsbm.FLGEXCLUIDO = 'S' THEN 1 ELSE 0 END) AS COUNT_EXCLUIDOS,"
+				+ "			COUNT(*) AS COUNT_TOTAL,"
+				+ "			bepsbo.BEPBOL_CODNUM "
+				+ "		FROM TBEP_SOL_BOL_MERITOS bepsbm"
+				+ "		INNER JOIN TBEP_SOLICITUD_BOLSAS bepsbo ON bepsbo.CODNUM = bepsbm.BEPSBO_CODNUM"
+				+ "		INNER JOIN TBEP_SOLICITUDES bepsol ON bepsol.CODNUM = bepsbo.BEPSOL_CODNUM"
+				+ "		INNER JOIN TBEP_MERITOS bepmer ON bepmer.CODNUM = bepsbm.BEPMER_CODNUM"
+				+ "		INNER JOIN TBEP_ITEMSBAREMACION bepite ON bepite.CODNUM = bepmer.BEPITE_CODNUM"
+				+ "		INNER JOIN TBEP_USUARIOS bepusu ON bepusu.CODNUM = bepmer.BEPUSU_CODNUM"
+				+ "		WHERE 	bepsol.BEPCON_CODNUM = ?"
+				+ "			AND bepsol.FLGEXCLUIDO = 'N'"
+				+ "			AND bepite.AFINIDAD IS NULL"
+				+ "			AND bepusu.FLGBORRADO = 'N'"
+				+ "			AND bepusu.ROL = " + ModeloRol.ID_ROL_CANDIDATO
+				+ "			AND bepsol.ESTADO = '" + ModeloSolicitud.SOLICITUD_ESTADO_CERRADA + "'"
+				+ "			GROUP BY bepsbo.BEPBOL_CODNUM"
+				+ "	) counts ON counts.BEPBOL_CODNUM = bepbol.CODNUM"
 				+ "	WHERE bepbol.FLGBAREMABLE = 'S'";
+		
+		String orderByNoValidados = "CASE WHEN COUNT_NO_VALIDADOS IS NULL THEN 1 ELSE 0 END, COUNT_NO_VALIDADOS %s";
+		String orderByValidados = "CASE WHEN COUNT_NO_VALIDADOS IS NULL THEN 1 ELSE 0 END, COUNT_VALIDADOS %s";
+		String orderByExcluidos = "CASE WHEN COUNT_NO_VALIDADOS IS NULL THEN 1 ELSE 0 END, COUNT_EXCLUIDOS %s";
+		String orderByTotal = "CASE WHEN COUNT_NO_VALIDADOS IS NULL THEN 1 ELSE 0 END, COUNT_TOTAL %s";
 		
 		dataTable.setColumn(ORDER_COLUMN_INDEX_CODIGO_AREA, "bepare.ID_AREA_CONOCIMIENTO");
 		dataTable.setColumn(ORDER_COLUMN_INDEX_AREA, "bepare.DES_AREA_CONOCIMIENTO");
-		dataTable.setColumn(ORDER_COLUMN_INDEX_COUNT_NO_VALIDADOS, "COUNT_NO_VALIDADOS");
-		dataTable.setColumn(ORDER_COLUMN_INDEX_COUNT_VALIDADOS, "COUNT_VALIDADOS");
-		dataTable.setColumn(ORDER_COLUMN_INDEX_COUNT_EXCLUIDOS, "COUNT_EXCLUIDOS");
-		dataTable.setColumn(ORDER_COLUMN_INDEX_COUNT_TOTAL, "COUNT_TOTAL");
+		dataTable.setColumn(ORDER_COLUMN_INDEX_COUNT_NO_VALIDADOS, "COUNT_NO_VALIDADOS", DataTableColumn.COLUMN_TYPE_NUMBER, orderByNoValidados);
+		dataTable.setColumn(ORDER_COLUMN_INDEX_COUNT_VALIDADOS, "COUNT_VALIDADOS", DataTableColumn.COLUMN_TYPE_NUMBER, orderByValidados);
+		dataTable.setColumn(ORDER_COLUMN_INDEX_COUNT_EXCLUIDOS, "COUNT_EXCLUIDOS", DataTableColumn.COLUMN_TYPE_NUMBER, orderByExcluidos);
+		dataTable.setColumn(ORDER_COLUMN_INDEX_COUNT_TOTAL, "COUNT_TOTAL", DataTableColumn.COLUMN_TYPE_NUMBER, orderByTotal);
 
 		dataTable.setQuery(consulta);
 		
@@ -270,11 +274,8 @@ public class ModeloValidar {
 				PreparedStatement stmt = conexion.prepareStatement(dataTable.getQuery())) {
 			int paramIndex = 1;
 			
-			// bucle para rellenar los parámetros de las 4 subconsultas
-			while (paramIndex <= TOTAL_COUNT_SUBQUERIES) {
-				stmt.setInt(paramIndex, convocatoria.getCodNum());
-				stmtCount.setInt(paramIndex++, convocatoria.getCodNum());
-			}
+			stmt.setInt(paramIndex, convocatoria.getCodNum());
+			stmtCount.setInt(paramIndex++, convocatoria.getCodNum());
 
 			dataTable.setFiltersParams(stmt, stmtCount, paramIndex);
 
@@ -313,44 +314,49 @@ public class ModeloValidar {
 		boolean evaluador = usuario.getRol().getValor().equals(ModeloRol.ROL_MIEMBRO_COMISION) 
 				|| usuario.getRol().getValor().equals(ModeloRol.ROL_DIRECTOR_DEPARTAMENTO);
 		
-		// subconsultas para seleccionar el número de méritos que contiene cada bolsa de la solicitud
-		// en la convocatoria pasada, agregando después varios filtros
-		String consultaCount = "SELECT COUNT(*) FROM TBEP_SOL_BOL_MERITOS bepsbm"
-				+ "	INNER JOIN TBEP_SOLICITUD_BOLSAS bepsbo ON bepsbo.CODNUM = bepsbm.BEPSBO_CODNUM"
-				+ "	INNER JOIN TBEP_SOLICITUDES bepsol ON bepsol.CODNUM = bepsbo.BEPSOL_CODNUM"
-				+ "	INNER JOIN TBEP_MERITOS bepmer ON bepmer.CODNUM = bepsbm.BEPMER_CODNUM"
-				+ "	INNER JOIN TBEP_ITEMSBAREMACION bepite ON bepite.CODNUM = bepmer.BEPITE_CODNUM"
-				+ "	INNER JOIN TBEP_USUARIOS bepusu ON bepusu.CODNUM = bepmer.BEPUSU_CODNUM"
-				+ "	WHERE "
-				+ "		bepsbo.BEPBOL_CODNUM = bepbol.CODNUM "
-				+ "		AND bepusu.ROL = " + ModeloRol.ID_ROL_CANDIDATO
-				+ " 	AND bepsol.BEPCON_CODNUM = ? "
-				+ "		AND bepsol.ESTADO = 'CERRADA' "
-				+ "		AND bepsol.FLGEXCLUIDO = 'N' "
-				+ "		AND bepite.AFINIDAD IS NOT NULL "
-				+ "	 	AND bepusu.FLGBORRADO = 'N' ";
-		
-		// seleccionamos las bolsas, con meritos, en la convocatoria pasada
 		String consulta = 
-				"SELECT bepbol.CODNUM, bepbol.BEPARE_CODNUM, bepbol.ESTADO, bepbol.FLGBAREMABLE, bepbol.FECHAACTUALIZACION, "
+				"SELECT bepbol.CODNUM, bepbol.BEPARE_CODNUM, bepbol.ESTADO, bepbol.FLGBAREMABLE, bepbol.FECHAACTUALIZACION,"
 				+ "		bepbol.FECHABLOQUEO, bepbol.FECHADEBLOQUEO, bepbol.FECHABAREMACION,"
-				+ "	(" + consultaCount + " AND bepsbm.FLGVALIDADO = 'N' AND bepsbm.FLGEXCLUIDO = 'N') COUNT_NO_VALIDADOS, "
-				+ "	(" + consultaCount + " AND bepsbm.FLGVALIDADO = 'S' AND bepsbm.FLGEXCLUIDO = 'N') COUNT_VALIDADOS, "
-				+ "	(" + consultaCount + " AND bepsbm.FLGEXCLUIDO = 'S') COUNT_EXCLUIDOS, "
-				+ "	(" + consultaCount + ") COUNT_TOTAL"
+				+ "		counts.COUNT_NO_VALIDADOS, counts.COUNT_VALIDADOS, counts.COUNT_EXCLUIDOS, counts.COUNT_TOTAL"
 				+ "	FROM TBEP_BOLSAS bepbol"
-				+ " INNER JOIN TBEP_AREAS bepare ON bepare.CODNUM = bepbol.BEPARE_CODNUM"
+				+ "	INNER JOIN TBEP_AREAS bepare ON bepare.CODNUM = bepbol.BEPARE_CODNUM"
 				+ (evaluador ? " INNER JOIN TBEP_EVALUADORES bepeva ON bepeva.BEPARE_CODNUM = bepare.CODNUM AND bepeva.FLGACTIVO = 'S'" : "")
-				+ "	WHERE bepbol.FLGBAREMABLE = 'S' "
+				+ "	LEFT JOIN("
+				+ "		SELECT"
+				+ "			SUM(CASE WHEN bepsbm.FLGVALIDADO = 'N' AND bepsbm.FLGEXCLUIDO = 'N' THEN 1 ELSE 0 END) AS COUNT_NO_VALIDADOS,"
+				+ "			SUM(CASE WHEN bepsbm.FLGVALIDADO = 'S' AND bepsbm.FLGEXCLUIDO = 'N' THEN 1 ELSE 0 END) AS COUNT_VALIDADOS,"
+				+ "			SUM(CASE WHEN bepsbm.FLGEXCLUIDO = 'S' THEN 1 ELSE 0 END) AS COUNT_EXCLUIDOS,"
+				+ "			COUNT(*) AS COUNT_TOTAL,"
+				+ "			bepsbo.BEPBOL_CODNUM"
+				+ "		FROM TBEP_SOL_BOL_MERITOS bepsbm"
+				+ "		INNER JOIN TBEP_SOLICITUD_BOLSAS bepsbo ON bepsbo.CODNUM = bepsbm.BEPSBO_CODNUM"
+				+ "		INNER JOIN TBEP_SOLICITUDES bepsol ON bepsol.CODNUM = bepsbo.BEPSOL_CODNUM"
+				+ "		INNER JOIN TBEP_MERITOS bepmer ON bepmer.CODNUM = bepsbm.BEPMER_CODNUM"
+				+ "		INNER JOIN TBEP_ITEMSBAREMACION bepite ON bepite.CODNUM = bepmer.BEPITE_CODNUM"
+				+ "		INNER JOIN TBEP_USUARIOS bepusu ON bepusu.CODNUM = bepmer.BEPUSU_CODNUM"
+				+ "		WHERE"
+				+ "				bepusu.ROL = " + ModeloRol.ID_ROL_CANDIDATO
+				+ "			AND bepsol.BEPCON_CODNUM = ?"
+				+ "			AND bepsol.ESTADO = '" + ModeloSolicitud.SOLICITUD_ESTADO_CERRADA + "'"
+				+ "			AND bepite.AFINIDAD IS NOT NULL"
+				+ "			AND bepusu.FLGBORRADO = 'N'"
+				+ "		GROUP BY bepsbo.BEPBOL_CODNUM"
+				+ "	) counts ON counts.BEPBOL_CODNUM = bepbol.CODNUM"
+				+ "	WHERE bepbol.FLGBAREMABLE = 'S'"
 				+ (evaluador ? " AND bepeva.BEPUSU_CODNUM = ?" : "")
 				+ (evaluador ? " AND bepbol.ESTADO = ? " : "");
 		
+		String orderByNoValidados = "CASE WHEN COUNT_NO_VALIDADOS IS NULL THEN 1 ELSE 0 END, COUNT_NO_VALIDADOS %s";
+		String orderByValidados = "CASE WHEN COUNT_NO_VALIDADOS IS NULL THEN 1 ELSE 0 END, COUNT_VALIDADOS %s";
+		String orderByExcluidos = "CASE WHEN COUNT_NO_VALIDADOS IS NULL THEN 1 ELSE 0 END, COUNT_EXCLUIDOS %s";
+		String orderByTotal = "CASE WHEN COUNT_NO_VALIDADOS IS NULL THEN 1 ELSE 0 END, COUNT_TOTAL %s";
+		
 		dataTable.setColumn(ORDER_COLUMN_INDEX_CODIGO_AREA, "bepare.ID_AREA_CONOCIMIENTO");
 		dataTable.setColumn(ORDER_COLUMN_INDEX_AREA, "bepare.DES_AREA_CONOCIMIENTO");
-		dataTable.setColumn(ORDER_COLUMN_INDEX_COUNT_NO_VALIDADOS, "COUNT_NO_VALIDADOS");
-		dataTable.setColumn(ORDER_COLUMN_INDEX_COUNT_VALIDADOS, "COUNT_VALIDADOS");
-		dataTable.setColumn(ORDER_COLUMN_INDEX_COUNT_EXCLUIDOS, "COUNT_EXCLUIDOS");
-		dataTable.setColumn(ORDER_COLUMN_INDEX_COUNT_TOTAL, "COUNT_TOTAL");
+		dataTable.setColumn(ORDER_COLUMN_INDEX_COUNT_NO_VALIDADOS, "COUNT_NO_VALIDADOS", DataTableColumn.COLUMN_TYPE_NUMBER, orderByNoValidados);
+		dataTable.setColumn(ORDER_COLUMN_INDEX_COUNT_VALIDADOS, "COUNT_VALIDADOS", DataTableColumn.COLUMN_TYPE_NUMBER, orderByValidados);
+		dataTable.setColumn(ORDER_COLUMN_INDEX_COUNT_EXCLUIDOS, "COUNT_EXCLUIDOS", DataTableColumn.COLUMN_TYPE_NUMBER, orderByExcluidos);
+		dataTable.setColumn(ORDER_COLUMN_INDEX_COUNT_TOTAL, "COUNT_TOTAL", DataTableColumn.COLUMN_TYPE_NUMBER, orderByTotal);
 
 		dataTable.setQuery(consulta);
 		
@@ -359,11 +365,8 @@ public class ModeloValidar {
 				PreparedStatement stmt = conexion.prepareStatement(dataTable.getQuery())) {
 			int paramIndex = 1;
 			
-			// bucle para rellenar los parámetros de las 4 subconsultas
-			while (paramIndex <= TOTAL_COUNT_SUBQUERIES) {
-				stmt.setInt(paramIndex, convocatoria.getCodNum());
-				stmtCount.setInt(paramIndex++, convocatoria.getCodNum());
-			}
+			stmt.setInt(paramIndex, convocatoria.getCodNum());
+			stmtCount.setInt(paramIndex++, convocatoria.getCodNum());
 			
 			if (evaluador) {
 				stmt.setInt(paramIndex, usuario.getCodNum());
@@ -470,47 +473,30 @@ public class ModeloValidar {
 			return dataTable;
 		}
 		
-		// subconsultas para seleccionar el número de méritos que contiene cada bolsa de la solicitud
-		// en la convocatoria pasada, agregando después varios filtros
-		String consultaCount = "SELECT COUNT(*) FROM TBEP_SOL_BOL_MERITOS bepsbm"
+		String consulta = "SELECT bepusu.CODNUM, bepusu.CODCUENTA, bepusu.VUAJA_PRSNIF, bepusu.VUAJA_STRTIPODOCUMENTO, bepusu.VUAJA_IDNIF, bepusu.VUAJA_LETRANIF,"
+				+ "	bepusu.VUAJA_PRSNIF, bepusu.VUAJA_STRNOMBRE, bepusu.VUAJA_STRAPELLIDO1, bepusu.VUAJA_STRAPELLIDO2, bepusu.VUAJA_EMAIL_ALTA,"
+				+ "	SUM(CASE WHEN bepsbm.FLGVALIDADO = 'N' AND bepsbm.FLGEXCLUIDO = 'N' THEN 1 ELSE 0 END) AS COUNT_NO_VALIDADOS,"
+				+ "	SUM(CASE WHEN bepsbm.FLGVALIDADO = 'S' AND bepsbm.FLGEXCLUIDO = 'N' THEN 1 ELSE 0 END) AS COUNT_VALIDADOS,"
+				+ "	SUM(CASE WHEN bepsbm.FLGEXCLUIDO = 'S' THEN 1 ELSE 0 END) AS COUNT_EXCLUIDOS,"
+				+ "	COUNT(*) AS COUNT_TOTAL"
+				+ "	FROM TBEP_USUARIOS bepusu"
+				+ "	INNER JOIN TBEP_MERITOS bepmer ON bepusu.CODNUM = bepmer.BEPUSU_CODNUM"
+				+ "	INNER JOIN TBEP_ITEMSBAREMACION bepite ON bepite.CODNUM = bepmer.BEPITE_CODNUM"
+				+ "	INNER JOIN TBEP_SOL_BOL_MERITOS bepsbm ON bepmer.CODNUM = bepsbm.BEPMER_CODNUM"
 				+ "	INNER JOIN TBEP_SOLICITUD_BOLSAS bepsbo ON bepsbo.CODNUM = bepsbm.BEPSBO_CODNUM"
 				+ "	INNER JOIN TBEP_SOLICITUDES bepsol ON bepsol.CODNUM = bepsbo.BEPSOL_CODNUM"
-				+ "	INNER JOIN TBEP_MERITOS bepmer ON bepmer.CODNUM = bepsbm.BEPMER_CODNUM"
-				+ "	INNER JOIN TBEP_ITEMSBAREMACION bepite ON bepite.CODNUM = bepmer.BEPITE_CODNUM"
-				+ "	WHERE bepsol.ESTADO = '" + ModeloSolicitud.SOLICITUD_ESTADO_CERRADA + "'"
-				+ " 	AND bepsbo.BEPBOL_CODNUM = ?"
-				+ " 	AND bepsol.BEPCON_CODNUM = ? "
-				+ "		AND bepmer.BEPUSU_CODNUM = bepusu.CODNUM";
-		
-		// agrega el filtro de afinidad
-		consultaCount += afinidad ? " AND bepite.AFINIDAD IS NOT NULL " : " AND bepite.AFINIDAD IS NULL ";
-		
-		// seleccionamos los candidatos, con meritos, en la convocatoria pasada
-		String consulta = 
-				"SELECT bepusu.CODNUM, bepusu.VUAJA_PRSNIF, "
-				+ "	(" + consultaCount + " AND bepsbm.FLGVALIDADO = 'N' AND bepsbm.FLGEXCLUIDO = 'N') COUNT_NO_VALIDADOS, "
-				+ "	(" + consultaCount + " AND bepsbm.FLGVALIDADO = 'S' AND bepsbm.FLGEXCLUIDO = 'N') COUNT_VALIDADOS, "
-				+ "	(" + consultaCount + " AND bepsbm.FLGEXCLUIDO = 'S') COUNT_EXCLUIDOS, "
-				+ "	(" + consultaCount + ") COUNT_TOTAL "
-				+ "	FROM TBEP_USUARIOS bepusu "
-				+ "	INNER JOIN TBEP_MERITOS bepmer ON bepusu.CODNUM = bepmer.BEPUSU_CODNUM "
-				+ "	INNER JOIN TBEP_ITEMSBAREMACION bepite ON bepite.CODNUM = bepmer.BEPITE_CODNUM "
-				+ "	INNER JOIN TBEP_SOL_BOL_MERITOS bepsbm ON bepmer.CODNUM = bepsbm.BEPMER_CODNUM "
-				+ "	INNER JOIN TBEP_SOLICITUD_BOLSAS bepsbo ON bepsbo.CODNUM = bepsbm.BEPSBO_CODNUM "
-				+ "	INNER JOIN TBEP_SOLICITUDES bepsol ON bepsol.CODNUM = bepsbo.BEPSOL_CODNUM "
-				+ "	WHERE 1=1 "
-				+ "		AND bepusu.ROL = " + ModeloRol.ID_ROL_CANDIDATO + " "
-				+ " 	AND bepsol.FLGEXCLUIDO = 'N' "
-				+ "		AND bepsbo.BEPBOL_CODNUM = ? "
-				+ "		AND bepusu.FLGBORRADO = 'N' "
-				+ "		AND bepsol.ESTADO = '" + ModeloSolicitud.SOLICITUD_ESTADO_CERRADA + "' ";
-		
-		// agrega el filtro de afinidad
-		consulta += afinidad ? " AND bepite.AFINIDAD IS NOT NULL" : " AND bepite.AFINIDAD IS NULL";
-		
-		consulta += " GROUP BY bepusu.CODNUM, bepusu.VUAJA_PRSNIF ";
+				+ "	WHERE	bepusu.ROL = " + ModeloRol.ID_ROL_CANDIDATO
+				+ "		AND bepsol.FLGEXCLUIDO = 'N'"
+				+ "		AND bepsbo.BEPBOL_CODNUM = ?"
+				+ "		AND bepsol.BEPCON_CODNUM = ?"
+				+ "		AND bepusu.FLGBORRADO = 'N'"
+				+ "		AND bepsol.ESTADO = '" + ModeloSolicitud.SOLICITUD_ESTADO_CERRADA + "'"
+				+ (afinidad ? " AND bepite.AFINIDAD IS NOT NULL" : " AND bepite.AFINIDAD IS NULL")
+				+ "	GROUP BY bepusu.CODNUM, bepusu.CODCUENTA, bepusu.VUAJA_PRSNIF, bepusu.VUAJA_STRTIPODOCUMENTO, bepusu.VUAJA_IDNIF, bepusu.VUAJA_LETRANIF,"
+				+ "	bepusu.VUAJA_PRSNIF, bepusu.VUAJA_STRNOMBRE, bepusu.VUAJA_STRAPELLIDO1, bepusu.VUAJA_STRAPELLIDO2, bepusu.VUAJA_EMAIL_ALTA ";
 
 		dataTable.setColumn(ORDER_COLUMN_INDEX_NUMDOCUMENTO_CANDIDATO, "bepusu.VUAJA_PRSNIF");
+		dataTable.setColumn(ORDER_COLUMN_INDEX_NOMBRE_Y_APELLIDOS_CANDIDATO, "bepusu.VUAJA_STRNOMBRE");
 		dataTable.setColumn(ORDER_COLUMN_INDEX_COUNT_NO_VALIDADOS_CANDIDATO, "COUNT_NO_VALIDADOS");
 		dataTable.setColumn(ORDER_COLUMN_INDEX_COUNT_VALIDADOS_CANDIDATO, "COUNT_VALIDADOS");
 		dataTable.setColumn(ORDER_COLUMN_INDEX_COUNT_EXCLUIDOS_CANDIDATO, "COUNT_EXCLUIDOS");
@@ -522,26 +508,16 @@ public class ModeloValidar {
 				PreparedStatement stmtCount = conexion.prepareStatement(dataTable.getQueryCount());
 				PreparedStatement stmt = conexion.prepareStatement(dataTable.getQuery())) {
 			int paramIndex = 1;
-			
-			// bucle para rellenar los parámetros de las 4 subconsultas
-			while (paramIndex <= TOTAL_COUNT_SUBQUERIES * 2) {
-				stmt.setInt(paramIndex, bolsa.getCodNum());
-				stmtCount.setInt(paramIndex++, bolsa.getCodNum());
-				stmt.setInt(paramIndex, convocatoria.getCodNum());
-				stmtCount.setInt(paramIndex++, convocatoria.getCodNum());
-			}
-			
 			stmt.setInt(paramIndex, bolsa.getCodNum());
 			stmtCount.setInt(paramIndex++, bolsa.getCodNum());
+			stmt.setInt(paramIndex, convocatoria.getCodNum());
+			stmtCount.setInt(paramIndex++, convocatoria.getCodNum());
 
 			dataTable.setFiltersParams(stmt, stmtCount, paramIndex);
 
-			try (ResultSet rs = stmt.executeQuery()) {
-				ModeloUsuarioBolsaEmpleo modeloUsuario = ModeloUsuarioBolsaEmpleo.obtenerInstancia(); 
-				
+			try (ResultSet rs = stmt.executeQuery()) {				
 				while (rs.next()) {
-					UsuarioBolsaEmpleo usuario = modeloUsuario.getUsuarioById(rs.getInt("CODNUM"));
-					CandidatoValidacion candidato = createCandidatoValidacionFromResultSet(rs, usuario);
+					CandidatoValidacion candidato = createCandidatoValidacionFromResultSet(rs);
 					rows.add(candidato);
 				}
 			}
@@ -930,12 +906,23 @@ public class ModeloValidar {
 	/**
 	 * Crea un candidato validación a partir de un ResultSet.
 	 * @param rs .
-	 * @param usuario .
 	 * @return .
 	 * @throws UVException .
 	 * @throws SQLException .
 	 */
-	private CandidatoValidacion createCandidatoValidacionFromResultSet(ResultSet rs, UsuarioBolsaEmpleo usuario) throws SQLException {
+	private CandidatoValidacion createCandidatoValidacionFromResultSet(ResultSet rs) throws SQLException {
+		UsuarioBolsaEmpleo usuario = new UsuarioBolsaEmpleo();
+		usuario.setCodNum(rs.getInt("CODNUM"));
+		usuario.setCodCuenta(rs.getString("CODCUENTA"));
+		usuario.setTipoDocumento(rs.getString("VUAJA_STRTIPODOCUMENTO"));
+		usuario.setIdNif(rs.getString("VUAJA_IDNIF"));
+		usuario.setLetraNif(rs.getString("VUAJA_LETRANIF"));
+		usuario.setPrsNif(rs.getString("VUAJA_PRSNIF"));
+		usuario.setNombre(rs.getString("VUAJA_STRNOMBRE"));
+		usuario.setPrimerApellido(rs.getString("VUAJA_STRAPELLIDO1"));
+		usuario.setSegundoApellido(rs.getString("VUAJA_STRAPELLIDO2"));
+		usuario.setEmail(rs.getString("VUAJA_EMAIL_ALTA"));
+		
 		CandidatoValidacion candidato = new CandidatoValidacion(usuario);
 		candidato.setTotalMeritosNoValidados(rs.getInt("COUNT_NO_VALIDADOS"));
 		candidato.setTotalMeritosValidados(rs.getInt("COUNT_VALIDADOS"));
