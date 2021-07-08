@@ -101,16 +101,16 @@ UsuarioBolsaEmpleo candidato = bean.getCandidato();
 							<%
 							for(ItemBaremacion it: bean.getItems()) {
 							%>
-								<% if (it.getCodNum() == merito.getMerito().getItemBaremacion().getCodNum()) { %>
+							<%	if (it.getCodNum() == merito.getMerito().getItemBaremacion().getCodNum()) { %>
 				    				<option value="<%=it.getCodNum()%>" 
 				    						data-unidades="<%= it.getUnidades() %>" 
 				    						data-descripcion="<%= it.getDescripcion() %>" 
 				    						selected><%=EscapaHTML.escapa(it.getBloqueBaremacion().getApartadoBaremacion().getCodigo() + "." + it.getBloqueBaremacion().getCodigo() + "." + it.getCodigo() + "-" + it.getNombre())%></option>
-				    			<% } else { %>
+			    			<%	} else { %>
 				    				<option value="<%=it.getCodNum()%>" 
 				    						data-unidades="<%= it.getUnidades() %>" 
 				    						data-descripcion="<%= it.getDescripcion() %>"><%=EscapaHTML.escapa(it.getBloqueBaremacion().getApartadoBaremacion().getCodigo() + "." + it.getBloqueBaremacion().getCodigo() + "." + it.getCodigo() + "-" + it.getNombre())%></option>
-				    			<% } %>
+			    			<%	} %>
 				    		<%
 				    		}
 				    		%>

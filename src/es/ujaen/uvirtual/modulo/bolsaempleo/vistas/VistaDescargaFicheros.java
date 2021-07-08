@@ -2,6 +2,7 @@ package es.ujaen.uvirtual.modulo.bolsaempleo.vistas;
 
 import java.io.Serializable;
 import es.ujaen.uvirtual.beans.vistas.Vista;
+import es.ujaen.uvirtual.modulo.bolsaempleo.beans.BolsaResultado;
 import es.ujaen.uvirtual.modulo.bolsaempleo.beans.Fichero;
 import es.ujaen.uvirtual.modulo.bolsaempleo.beans.Merito;
 import es.ujaen.uvirtual.modulo.bolsaempleo.beans.MeritoPreferenteUsuario;
@@ -17,6 +18,7 @@ import es.ujaen.uvirtual.modulo.bolsaempleo.beans.UsuarioBolsaEmpleo;
 public class VistaDescargaFicheros extends Vista implements Serializable {
 	private static final long serialVersionUID = 1L;
 	private String vista;
+	private BolsaResultado bolsaResultado;
 	private Fichero fichero;
 	private Merito merito;
 	private MeritoPreferenteUsuario acreditacion;
@@ -79,6 +81,14 @@ public class VistaDescargaFicheros extends Vista implements Serializable {
 
 	public void setVista(String vista) {
 		this.vista = vista;
+	}
+
+	public BolsaResultado getBolsaResultado() {
+		return bolsaResultado;
+	}
+
+	public void setBolsaResultado(BolsaResultado bolsaResultado) {
+		this.bolsaResultado = bolsaResultado;
 	}
 	
 }

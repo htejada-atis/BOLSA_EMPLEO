@@ -16,6 +16,8 @@ public class BolsaResultado extends Bolsa implements Serializable {
 	private Double totalSinAplicar;
 	private transient InputStream archivo;
 	private List<MeritoResultado> listaMeritos;
+	private List<MeritoResultado> listaMeritosExcluidos;
+	private List<MeritoResultado> listaMeritosNoEvaluados;
 	
 	
 	/** Constructor por defecto .
@@ -31,14 +33,21 @@ public class BolsaResultado extends Bolsa implements Serializable {
 	 * @param ptotal .
 	 * @param ptotalSinAplicar .
 	 * @param plistaMeritos .
+	 * @param plistaMeritosExcluidos .
+	 * @param plistaMeritosNoEvaluados .
+	 * @param parchivo .
 	 */
-	public BolsaResultado(Bolsa pbolsa, String pdesgloseTotal, String pdesgloseDescripcion, Double ptotal, Double ptotalSinAplicar, List<MeritoResultado> plistaMeritos) {
+	public BolsaResultado(Bolsa pbolsa, String pdesgloseTotal, String pdesgloseDescripcion, Double ptotal, Double ptotalSinAplicar, List<MeritoResultado> plistaMeritos,
+			List<MeritoResultado> plistaMeritosExcluidos, List<MeritoResultado> plistaMeritosNoEvaluados, InputStream parchivo) {
 		super(pbolsa);
 		this.desgloseTotal = pdesgloseTotal;
 		this.desgloseDescripcion = pdesgloseDescripcion;
 		this.total = ptotal;
 		this.totalSinAplicar = ptotalSinAplicar;
 		this.listaMeritos = plistaMeritos;
+		this.listaMeritosExcluidos = plistaMeritosExcluidos;
+		this.listaMeritosNoEvaluados = plistaMeritosNoEvaluados;
+		this.archivo = parchivo;
 	}
 	
 	/** Constructor con parametros .
@@ -108,10 +117,27 @@ public class BolsaResultado extends Bolsa implements Serializable {
 		this.listaMeritos = meritos;
 	}
 	
+	public List<MeritoResultado> getListaMeritosExcluidos() {
+		return listaMeritosExcluidos;
+	}
+
+	public void setListaMeritosExcluidos(List<MeritoResultado> listaMeritosExcluidos) {
+		this.listaMeritosExcluidos = listaMeritosExcluidos;
+	}
+
+	public List<MeritoResultado> getListaMeritosNoEvaluados() {
+		return listaMeritosNoEvaluados;
+	}
+
+	public void setListaMeritosNoEvaluados(List<MeritoResultado> listaMeritosNoEvaluados) {
+		this.listaMeritosNoEvaluados = listaMeritosNoEvaluados;
+	}
+	
 	@Override
 	public String toString() {
 		return "BolsaResultado [bolsa=" + super.toString() + ", desgloseTotal=" + desgloseTotal + ", desgloseDescripcion=" + desgloseDescripcion 
-				+ ", total=" + total + ", totalSinAplicar=" + totalSinAplicar + ", archivo=" + archivo + ", meritos=" + listaMeritos + "]";
+				+ ", total=" + total + ", totalSinAplicar=" + totalSinAplicar + ", archivo=" + archivo + ", meritos=" + listaMeritos 
+				+ ", listaMeritosExcluidos=" + listaMeritosExcluidos + ", listaMeritosNoEvaluados=" + listaMeritosNoEvaluados + "]";
 	}
 	
 	@Override
@@ -125,6 +151,8 @@ public class BolsaResultado extends Bolsa implements Serializable {
 		result = prime * result + ((totalSinAplicar == null) ? 0 : totalSinAplicar.hashCode());
 		result = prime * result + ((archivo == null) ? 0 : archivo.hashCode());
 		result = prime * result + ((listaMeritos == null) ? 0 : listaMeritos.hashCode());
+		result = prime * result + ((listaMeritosExcluidos == null) ? 0 : listaMeritosExcluidos.hashCode());
+		result = prime * result + ((listaMeritosNoEvaluados == null) ? 0 : listaMeritosNoEvaluados.hashCode());
 		return result;
 	}
 
@@ -186,9 +214,22 @@ public class BolsaResultado extends Bolsa implements Serializable {
 		} else if (!listaMeritos.equals(other.listaMeritos)) {
 			return false;
 		}
+		if (listaMeritosExcluidos == null) {
+			if (other.listaMeritosExcluidos != null) {
+				return false;
+			}
+		} else if (!listaMeritosExcluidos.equals(other.listaMeritosExcluidos)) {
+			return false;
+		}
+		if (listaMeritosNoEvaluados == null) {
+			if (other.listaMeritosNoEvaluados != null) {
+				return false;
+			}
+		} else if (!listaMeritosNoEvaluados.equals(other.listaMeritosNoEvaluados)) {
+			return false;
+		}
 		
 		return true;
 	}
-	
 }
 

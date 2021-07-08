@@ -23,6 +23,7 @@ import es.ujaen.uvirtual.modulo.bolsaempleo.modelo.ModeloMeritosPreferentes;
 import es.ujaen.uvirtual.modulo.bolsaempleo.modelo.ModeloParametrosConfiguracion;
 import es.ujaen.uvirtual.modulo.bolsaempleo.modelo.ModeloResultados;
 import es.ujaen.uvirtual.modulo.bolsaempleo.modelo.ModeloRol;
+import es.ujaen.uvirtual.modulo.bolsaempleo.modelo.ModeloSolicitud;
 import es.ujaen.uvirtual.modulo.bolsaempleo.modelo.ModeloUsuarioBolsaEmpleo;
 import es.ujaen.uvirtual.modulo.bolsaempleo.utilidades.BolsaEmpleoDataTable;
 import es.ujaen.uvirtual.modulo.bolsaempleo.utilidades.BolsaEmpleoUtils;
@@ -190,12 +191,14 @@ public class ControladorResultados extends HttpServlet {
 	}
 	
 	private void seleccionarCandidato(VistaResultados bean, HttpServletRequest request) throws SQLException, UVException {
+		ModeloResultados modeloResultados = ModeloResultados.obtenerInstancia();
+		
 		bean.setVista(JSP_RESULTADO_DETALLE);
 		Integer idCandidato = Formateador.leeParametroInteger(BolsaEmpleoUtils.getParamRequestOrSession(request, PARAM_CANDIDATO));
 		UsuarioBolsaEmpleo candidato = ModeloUsuarioBolsaEmpleo.obtenerInstancia().getUsuarioById(idCandidato);
 		bean.setCandidato(candidato);
 		
-		BolsaResultado bolsaResultado = ModeloResultados.obtenerInstancia().getBolsaResultado(bean.getBolsa(), candidato, bean.getConvocatoria());
+		BolsaResultado bolsaResultado = modeloResultados.getBolsaResultado(bean.getBolsa(), candidato, bean.getConvocatoria());
 		bean.setBolsaResultado(bolsaResultado);
 		
 		bean.setMeritoPreferente(ModeloMeritosPreferentes.obtenerInstancia().getMeritoPreferenteTipoMerito());

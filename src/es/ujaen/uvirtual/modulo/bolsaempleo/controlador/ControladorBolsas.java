@@ -228,7 +228,6 @@ public class ControladorBolsas extends HttpServlet {
 				break;
 			case ACCION_BOLSAS_BAREMAR:
 				modelo.ponerBolsasComoPendientesBaremacion(bolsas, bean.getUsuarioLogeado());
-				BaremarBolsa.run();
 				break;
 			default:
 				BolsaEmpleoUtils.addMensajeDeError(MENSAJE_ERROR_ACCION_BOLSA_NO_VALIDA, bean, request);
