@@ -945,24 +945,24 @@ public class ControladorMisSolicitudes extends HttpServlet {
 			font2.setStyle("bold");
 			
 			document.add(new Paragraph("Convocatoria: " + solicitud.getConvocatoria().getDescripcion(), font2));
-			document.add(new Paragraph("Fecha confirmación de solicitud: " 
+			document.add(new Paragraph("Fecha confirmación de solicitud: "
 					+ Formateador.formatoFecha(solicitud.getFechaConfirmacion(), Formateador.FORMATO_FECHA_DDMMYYYY_HHMMSS), font2));
 			
-			document.add(new Paragraph("Usuario: " 
-					+ getStringOrBlack(usuario.getPrsNif()) + " " 
-					+ getStringOrBlack(usuario.getNombre()) + " " 
-					+ getStringOrBlack(usuario.getPrimerApellido()) + " " 
+			document.add(new Paragraph("Usuario: "
+					+ getStringOrBlack(usuario.getPrsNif()) + " "
+					+ getStringOrBlack(usuario.getNombre()) + " "
+					+ getStringOrBlack(usuario.getPrimerApellido()) + " "
 					+ getStringOrBlack(usuario.getSegundoApellido()), font2));
 			
-			document.add(new Paragraph("Dirección: " 
-					+ getStringOrBlack(usuario.getDireccion()) + " " 
+			document.add(new Paragraph("Dirección: "
+					+ getStringOrBlack(usuario.getDireccion()) + " "
 					+ getStringOrBlack(usuario.getCodigoPostal()) + " "
 					+ getStringOrBlack(usuario.getLocalidad()) + " "
 					+ getStringOrBlack(usuario.getProvincia()) + " "
 					+ getStringOrBlack(usuario.getTelefono()), font2));
 			
 			document.add(new Paragraph("\n"));
-				        
+			
 			for (BolsaSolicitud bolsa: bolsasSolicitud) {
 				generarPDFArea(bolsa, bolsasSolicitud, document);
 			}
@@ -1074,7 +1074,7 @@ public class ControladorMisSolicitudes extends HttpServlet {
 	
 	private static void generarTitulaciones(UsuarioBolsaEmpleo usuario, Document document) throws DocumentException, SQLException, UVException {
 		Font font2 = new Font(Font.BOLD);
-		font2.setStyle("bold");		
+		font2.setStyle("bold");
 		
 		document.add(new Paragraph("Titulaciones", font2));
 		document.add(new Paragraph("\n"));

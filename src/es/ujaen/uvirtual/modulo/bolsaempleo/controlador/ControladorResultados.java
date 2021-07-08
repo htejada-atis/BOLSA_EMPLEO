@@ -5,7 +5,6 @@ import java.io.PrintWriter;
 import java.sql.SQLException;
 import java.util.logging.Logger;
 import java.util.logging.Level;
-import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
@@ -15,9 +14,16 @@ import es.ujaen.uvirtual.beans.CodigoDescripcion;
 import es.ujaen.uvirtual.beans.UVDatos;
 import es.ujaen.uvirtual.beans.Usuario;
 import es.ujaen.uvirtual.modulo.bolsaempleo.beans.Bolsa;
+import es.ujaen.uvirtual.modulo.bolsaempleo.beans.BolsaResultado;
+import es.ujaen.uvirtual.modulo.bolsaempleo.beans.CandidatoResultadoTable;
+import es.ujaen.uvirtual.modulo.bolsaempleo.beans.UsuarioBolsaEmpleo;
 import es.ujaen.uvirtual.modulo.bolsaempleo.modelo.ModeloBolsa;
+import es.ujaen.uvirtual.modulo.bolsaempleo.modelo.ModeloConvocatoria;
+import es.ujaen.uvirtual.modulo.bolsaempleo.modelo.ModeloMeritosPreferentes;
 import es.ujaen.uvirtual.modulo.bolsaempleo.modelo.ModeloParametrosConfiguracion;
+import es.ujaen.uvirtual.modulo.bolsaempleo.modelo.ModeloResultados;
 import es.ujaen.uvirtual.modulo.bolsaempleo.modelo.ModeloRol;
+import es.ujaen.uvirtual.modulo.bolsaempleo.modelo.ModeloSolicitud;
 import es.ujaen.uvirtual.modulo.bolsaempleo.modelo.ModeloUsuarioBolsaEmpleo;
 import es.ujaen.uvirtual.modulo.bolsaempleo.utilidades.BolsaEmpleoDataTable;
 import es.ujaen.uvirtual.modulo.bolsaempleo.utilidades.BolsaEmpleoUtils;
@@ -27,7 +33,7 @@ import es.ujaen.uvirtual.utilidades.Formateador;
 import es.ujaen.uvirtual.utilidades.UVException;
 
 /**
- * Listado de bolsas y su estado.
+ * Controlador de resultados .
  */
 @WebServlet(
 	name = "informacionadministrativa.bolsaempleo.resultados", 
@@ -39,53 +45,74 @@ import es.ujaen.uvirtual.utilidades.UVException;
 			"/srv/en/ajax/informacionadministrativa/bolsaempleo/resultados"
 	})
 public class ControladorResultados extends HttpServlet {
+	
 	private static final long serialVersionUID = 1L;
 	private static final String NOMBREDEESTACLASE = ControladorResultados.class.getName();
 	private static final Logger LOGGER = Logger.getLogger(NOMBREDEESTACLASE);
+	
+	// parámetros
 	public static final String PARAM_ACCION = "a";
+	public static final String PARAM_BOLSA = "bolsa";
+	public static final String PARAM_CANDIDATO = "candidato";
 	
 	// acciones
 	public static final String ACCION_INDEX = "listar";
-	public static final String ACCION_DATATABLE = "datatable";
+	public static final String ACCION_DATATABLE_BOLSAS = "datatablebolsas";
+	public static final String ACCION_DATATABLE_CANDIDATOS = "datatablecandidatos";
+	public static final String ACCION_SELECCIONAR_BOLSA = "seleccionarbolsa";
+	public static final String ACCION_SELECCIONAR_CANDIDATO = "seleccionarcandidato";
 	
 	// mensajes
 	public static final String MENSAJE_ERROR_FOO = "Mensaje de error";
 	public static final String MENSAJE_ERROR_ACCION_NO_CONTEMPLADA = "Acción no contemplada";
-	public static final String MENSAJE_EXITO_BAR = "Mensaje de exito"; 
+	public static final String MENSAJE_EXITO_BAR = "Mensaje de exito";
+	
+	// ruta vistas
+	public static final String RUTA_BEP_RESULTADOS = "/WEB-INF/jsp/vista/infadministrativa/bolsaempleo/resultados/";
+	public static final String JSP_INDEX = RUTA_BEP_RESULTADOS + "index.jsp";	
+	public static final String JSP_RESULTADOS_AREA = RUTA_BEP_RESULTADOS + "resultadosarea.jsp";
+	public static final String JSP_RESULTADO_DETALLE = RUTA_BEP_RESULTADOS + "resultadodetalle.jsp";
 
 	// ajax
+	public static final String URL_PATTERN_AJAX = "/srv/es/ajax/informacionadministrativa/bolsaempleo/resultados";
 	public static final String RESPONSE_AJAX_CONTENTTYPE = "application/json";
 	public static final String RESPONSE_AJAX_ENCODING = "UTF-8";
 	public static final String RESPONSE_AJAX_ERROR = "error";
 	public static final int RESPONSE_AJAX_HTTP_CODE_ERROR = 400;
 	
+	
 	/** Peticion GET.
 	 * @see HttpServlet#doGet(HttpServletRequest request, HttpServletResponse response)
 	 */
 	@Override
-	public void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+	public void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException {
 		UVDatos datos = (UVDatos) request.getAttribute(UVDatos.NOMBRE_ATRIBUTO);
 		datos.setDocType("<!DOCTYPE html>");
 		datos.setContentType("text/html");
 		
-		VistaResultados bean = new VistaResultados();		
+		VistaResultados bean = new VistaResultados();
 		Usuario usuario = datos.getUsuario();
 		
 		LOGGER.log(Level.FINEST, "usuario que ha entrado en el servlet es {0}", usuario.getUid());
-
+		
 		String nombreAccion = EscapaHTML.ajustaCodificacion(request.getParameter(PARAM_ACCION));
 		if (nombreAccion == null) {
 			nombreAccion = ACCION_INDEX;
 		}
-					
+		
 		try {
 			init(bean, datos, request, response);
 			switch (nombreAccion) {
 				case ACCION_INDEX:
-					bean.setVista("/WEB-INF/jsp/vista/infadministrativa/bolsaempleo/resultados/index.jsp");
+					bean.setVista(JSP_INDEX);
 					break;
-				case ACCION_DATATABLE:
-					listado(bean, datos, request, response);
+				case ACCION_DATATABLE_BOLSAS:
+					listadoBolsas(bean, datos, request, response);
+					break;
+				case ACCION_DATATABLE_CANDIDATOS:
+				case ACCION_SELECCIONAR_BOLSA:
+				case ACCION_SELECCIONAR_CANDIDATO:
+					accionesBolsa(bean, datos, request, response, nombreAccion);
 					break;
 				default:
 					errorFatal(bean, MENSAJE_ERROR_ACCION_NO_CONTEMPLADA);
@@ -111,7 +138,8 @@ public class ControladorResultados extends HttpServlet {
 	}
 	
 	private void init(VistaResultados bean, UVDatos datos, HttpServletRequest request, HttpServletResponse response) throws SQLException, UVException, IOException {
-		bean.setVista("/WEB-INF/jsp/vista/infadministrativa/bolsaempleo/resultados/index.jsp");
+		bean.setVista(JSP_INDEX);
+		bean.setConvocatoria(ModeloConvocatoria.obtenerInstancia().getUltimaConvocatoria());
 		BolsaEmpleoUtils.readMensajeSession(bean, request);
 		
 		try {
@@ -137,11 +165,46 @@ public class ControladorResultados extends HttpServlet {
 	 * @see HttpServlet#doPost(HttpServletRequest request, HttpServletResponse response)
 	 */
 	@Override
-	public void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+	public void doPost(HttpServletRequest request, HttpServletResponse response) throws IOException {
 		doGet(request, response);
 	}
+	
+	private void accionesBolsa(VistaResultados bean, UVDatos datos, HttpServletRequest request, HttpServletResponse response, String nombreAccion)
+			throws SQLException, UVException, IOException {
+		bean.setVista(JSP_RESULTADOS_AREA);
+		Integer idBolsa = Formateador.leeParametroInteger(BolsaEmpleoUtils.getParamRequestOrSession(request, PARAM_BOLSA));
+		Bolsa bolsa = ModeloBolsa.obtenerInstancia().getBolsaById(idBolsa);
+		bean.setBolsa(bolsa);
 		
-	private void listado(VistaResultados bean, UVDatos datos, HttpServletRequest request, HttpServletResponse response) throws IOException, SQLException {
+		switch (nombreAccion) {
+			case ACCION_DATATABLE_CANDIDATOS:
+				listadoCandidatos(bean, datos, request, response);
+				break;
+			case ACCION_SELECCIONAR_BOLSA:
+				break;
+			case ACCION_SELECCIONAR_CANDIDATO:
+				seleccionarCandidato(bean, request);
+				break;
+			default:
+				errorFatal(bean, MENSAJE_ERROR_ACCION_NO_CONTEMPLADA);
+		}
+	}
+	
+	private void seleccionarCandidato(VistaResultados bean, HttpServletRequest request) throws SQLException, UVException {
+		ModeloResultados modeloResultados = ModeloResultados.obtenerInstancia();
+		
+		bean.setVista(JSP_RESULTADO_DETALLE);
+		Integer idCandidato = Formateador.leeParametroInteger(BolsaEmpleoUtils.getParamRequestOrSession(request, PARAM_CANDIDATO));
+		UsuarioBolsaEmpleo candidato = ModeloUsuarioBolsaEmpleo.obtenerInstancia().getUsuarioById(idCandidato);
+		bean.setCandidato(candidato);
+		
+		BolsaResultado bolsaResultado = modeloResultados.getBolsaResultado(bean.getBolsa(), candidato, bean.getConvocatoria());
+		bean.setBolsaResultado(bolsaResultado);
+		
+		bean.setMeritoPreferente(ModeloMeritosPreferentes.obtenerInstancia().getMeritoPreferenteTipoMerito());
+	}
+		
+	private void listadoBolsas(VistaResultados bean, UVDatos datos, HttpServletRequest request, HttpServletResponse response) throws IOException {
 		ModeloBolsa modelo = ModeloBolsa.obtenerInstancia();
 		
 		datos.setContentType(RESPONSE_AJAX_CONTENTTYPE);
@@ -151,7 +214,8 @@ public class ControladorResultados extends HttpServlet {
 		
 		try (PrintWriter writer = response.getWriter()) {
 			try {
-				BolsaEmpleoDataTable<Bolsa> dataTable = modelo.listaBolsaEmpleoDatatable(request.getParameterMap());
+				BolsaEmpleoDataTable<Bolsa> dataTable = modelo.listaBolsasResultadosDatatable(request.getParameterMap());
+				bean.setDataTableBolsas(dataTable);
 				writer.write(dataTable.toJson());
 			} catch (UVException e) {
 				LOGGER.log(Level.WARNING, e.toString());
@@ -169,4 +233,36 @@ public class ControladorResultados extends HttpServlet {
 			}
 		}
 	}
+	
+	private void listadoCandidatos(VistaResultados bean, UVDatos datos, HttpServletRequest request, HttpServletResponse response) throws IOException {
+		ModeloResultados modelo = ModeloResultados.obtenerInstancia();
+		
+		datos.setContentType(RESPONSE_AJAX_CONTENTTYPE);
+		datos.setRespuestaEnviada(true);
+		response.setContentType(RESPONSE_AJAX_CONTENTTYPE);
+		response.setCharacterEncoding(RESPONSE_AJAX_ENCODING);
+		
+		try (PrintWriter writer = response.getWriter()) {
+			try {
+				BolsaEmpleoDataTable<CandidatoResultadoTable> dataTable = modelo.listadoResultadosCandidatosArea(
+						bean.getBolsa(), bean.getConvocatoria(), request.getParameterMap());
+				bean.setDataTableCandidatos(dataTable);
+				writer.write(dataTable.toJson());
+			} catch (UVException e) {
+				LOGGER.log(Level.WARNING, e.toString());
+				bean.getMensajesDeError().add(e.getMessage());
+				CodigoDescripcion mensaje = new CodigoDescripcion(RESPONSE_AJAX_ERROR, e.getMessage());
+				writer.write(new Gson().toJson(mensaje));
+				response.setStatus(RESPONSE_AJAX_HTTP_CODE_ERROR);
+			} catch (SQLException e) { 
+				LOGGER.log(Level.SEVERE, Formateador.getStackTrace(e));
+				LOGGER.log(Level.SEVERE, e.toString());
+				bean.getMensajesDeError().add(e.getMessage());
+				CodigoDescripcion mensaje = new CodigoDescripcion(RESPONSE_AJAX_ERROR, e.getMessage());
+				writer.write(new Gson().toJson(mensaje));
+				response.setStatus(RESPONSE_AJAX_HTTP_CODE_ERROR);
+			}
+		}
+	}
+	
 }

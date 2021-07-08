@@ -129,8 +129,8 @@ public class ModeloSolicitud {
 			try (ResultSet rs = stmt.executeQuery()) {
 				while (rs.next()) {
 					Solicitud solicitud = new Solicitud();
-					solicitud.setCodNum(rs.getInt("SOLICITUD_CODNUM"));					
-					solicitud.setConvocatoria(modeloConvocatoria.getConvocatoriaById(rs.getInt(CODNUM)));					
+					solicitud.setCodNum(rs.getInt("SOLICITUD_CODNUM"));
+					solicitud.setConvocatoria(modeloConvocatoria.getConvocatoriaById(rs.getInt(CODNUM)));
 					solicitud.setEstado(rs.getString("ESTADO_SOLICITUD") != null ? rs.getString("ESTADO_SOLICITUD") : ModeloSolicitud.SOLICITUD_ESTADO_CERRADA);
 					solicitud.setExcluido(rs.getString("FLGEXCLUIDO") != null ? rs.getString("FLGEXCLUIDO").equals(SOLICITUD_EXCLUIDA) : false);
 					solicitud.setRazonExclusion(rs.getString("RAZON_EXCLUSION"));
@@ -688,7 +688,7 @@ public class ModeloSolicitud {
 	 * @throws SQLException .
 	 * @throws UVException .
 	 */
-	private List<MeritoSolicitudTable> getMeritosValoracionesSolicitudBolsa(Solicitud solicitud, Bolsa bolsa) throws SQLException, UVException {
+	public List<MeritoSolicitudTable> getMeritosValoracionesSolicitudBolsa(Solicitud solicitud, Bolsa bolsa) throws SQLException, UVException {
 		List<MeritoSolicitudTable> meritos = new ArrayList<>();
 		
 		String consulta = ""
@@ -1858,11 +1858,11 @@ public class ModeloSolicitud {
 	 * @param bolsa .
 	 * @return .
 	 */
-	private Boolean isMeritoExcluido(Merito merito, MeritoSolicitud ms, Bolsa bolsa) {
+	public Boolean isMeritoExcluido(Merito merito, MeritoSolicitud ms, Bolsa bolsa) {
 		return false;
 	}	
 
-	private Solicitud createSolicitudFromResultSet(ResultSet rs, boolean archivo) throws SQLException, UVException {
+	public Solicitud createSolicitudFromResultSet(ResultSet rs, boolean archivo) throws SQLException, UVException {
 		Solicitud solicitud = new Solicitud();
 		
 		solicitud.setCodNum(rs.getInt("CODNUM"));

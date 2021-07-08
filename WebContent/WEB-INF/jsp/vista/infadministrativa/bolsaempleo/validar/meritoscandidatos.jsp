@@ -101,16 +101,16 @@ UsuarioBolsaEmpleo candidato = bean.getCandidato();
 							<%
 							for(ItemBaremacion it: bean.getItems()) {
 							%>
-								<% if (it.getCodNum() == merito.getMerito().getItemBaremacion().getCodNum()) { %>
+							<%	if (it.getCodNum() == merito.getMerito().getItemBaremacion().getCodNum()) { %>
 				    				<option value="<%=it.getCodNum()%>" 
 				    						data-unidades="<%= it.getUnidades() %>" 
 				    						data-descripcion="<%= it.getDescripcion() %>" 
 				    						selected><%=EscapaHTML.escapa(it.getBloqueBaremacion().getApartadoBaremacion().getCodigo() + "." + it.getBloqueBaremacion().getCodigo() + "." + it.getCodigo() + "-" + it.getNombre())%></option>
-				    			<% } else { %>
+			    			<%	} else { %>
 				    				<option value="<%=it.getCodNum()%>" 
 				    						data-unidades="<%= it.getUnidades() %>" 
 				    						data-descripcion="<%= it.getDescripcion() %>"><%=EscapaHTML.escapa(it.getBloqueBaremacion().getApartadoBaremacion().getCodigo() + "." + it.getBloqueBaremacion().getCodigo() + "." + it.getCodigo() + "-" + it.getNombre())%></option>
-				    			<% } %>
+			    			<%	} %>
 				    		<%
 				    		}
 				    		%>
@@ -375,6 +375,8 @@ $(document).ready(function() {
 		    "columns": [
 		    	{'data': 'codNum', 'filter': {'type': 'number'}},
 		        {'data': 'codNum', 'order': false, 'class': 'center', 'render': function(row) {
+		        		console.log('excluido: ' + row.excluido)
+		        		console.log('validado: ' + row.validado)
 		        		if (!row.excluido && !row.validado) {
 		        			return "<div title='Mérito no evaluado' class='circle-neutral'></div>";
 		        		} else {

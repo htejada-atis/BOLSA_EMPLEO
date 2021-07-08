@@ -12,6 +12,7 @@ import java.sql.Clob;
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.text.CharacterIterator;
+import java.text.DecimalFormat;
 import java.text.StringCharacterIterator;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -154,6 +155,15 @@ public final class BolsaEmpleoUtils {
 		} catch (Exception e) {
 			return null;
 		}
+	}
+	
+	/** Elimina decimales para el formato de puntuaciones en los resultados .
+	 * @param valor valor .
+	 * @return El valor formateado .
+	 */
+	public static Double formatoPuntuacion(Double valor) {
+		DecimalFormat numberFormat = new DecimalFormat("0.######");
+		return Double.parseDouble(numberFormat.format(valor));
 	}
 
 	/**

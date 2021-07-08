@@ -16,7 +16,9 @@ public class Bolsa implements Serializable {
 	private Date fechaActualizacion;
 	private Date fechaBloqueo;
 	private Date fechaDesBloqueo;
+	private Date fechaBaremacion;
 	
+
 	/** Constructor por defecto.
 	 */
 	public Bolsa() {
@@ -121,11 +123,19 @@ public class Bolsa implements Serializable {
 		this.fechaDesBloqueo = fechaDesBloqueo;
 	}
 	
+	public Date getFechaBaremacion() {
+		return fechaBaremacion;
+	}
+
+	public void setFechaBaremacion(Date fechaBaremacion) {
+		this.fechaBaremacion = fechaBaremacion;
+	}
+	
 	@Override
 	public String toString() {
 		return "BolsaEmpleo [idBolsaEmpleo=" + codNum + ", area=" + area.getDescripcion()
 				+ ", estado=" + estado + ", baremable=" + baremable + ", fechaActualizacion=" + fechaActualizacion
-				+ ", fechaBloqueo=" + fechaBloqueo + ", fechaDesBloqueo=" + fechaDesBloqueo + "]";
+				+ ", fechaBloqueo=" + fechaBloqueo + ", fechaDesBloqueo=" + fechaDesBloqueo + ", fechaBaremacion=" + fechaBaremacion + "]";
 	}
 	
 	@Override
@@ -139,6 +149,7 @@ public class Bolsa implements Serializable {
 		result = prime * result + ((fechaActualizacion == null) ? 0 : fechaActualizacion.hashCode());
 		result = prime * result + ((fechaBloqueo == null) ? 0 : fechaBloqueo.hashCode());
 		result = prime * result + ((fechaDesBloqueo == null) ? 0 : fechaDesBloqueo.hashCode());
+		result = prime * result + ((fechaBaremacion == null) ? 0 : fechaBaremacion.hashCode());
 		return result;
 	}
 
@@ -203,6 +214,13 @@ public class Bolsa implements Serializable {
 				return false;
 			}
 		} else if (!fechaDesBloqueo.equals(other.fechaDesBloqueo)) {
+			return false;
+		}
+		if (fechaBaremacion == null) {
+			if (other.fechaBaremacion != null) {
+				return false;
+			}
+		} else if (!fechaBaremacion.equals(other.fechaBaremacion)) {
 			return false;
 		}
 		
