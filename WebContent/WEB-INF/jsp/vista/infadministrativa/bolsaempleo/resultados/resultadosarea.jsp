@@ -42,6 +42,8 @@ $(document).ready(function() {
 	    "ajax": { url: "<%= ControladorResultados.URL_PATTERN_AJAX %>" },
 	    "pageSize": 100,
 	    "filterable": true,
+	    "defaultOrderBy": 2,
+	    "defaultOrderDirection": 'desc',
 	    "action": "<%= ControladorResultados.ACCION_DATATABLE_CANDIDATOS %>",
 	    "params": {'<%=ControladorResultados.PARAM_BOLSA%>': '<%= bolsa.getCodNum() %>'},
 	    "columns": [
