@@ -211,6 +211,38 @@ public class ModeloMeritosPreferentesCandidato {
 		return meritos;
 	}
 	
+	/**
+	 * Listado de méritos preferenetes validados del candidato.
+	 * @param usuario .
+	 * @return méritos preferentes validados .
+	 * @throws SQLException .
+	 * @throws UVException .
+	 */
+	public List<MeritoPreferenteUsuario> listaMeritosPreferentesValidadosUsuarioPorPosesion(UsuarioBolsaEmpleo usuario) throws SQLException, UVException {
+		List<MeritoPreferenteUsuario> meritos = new ArrayList<>();
+		
+		String consulta = "" 
+				+ " SELECT bepmpu.* "
+				+ " FROM TBEP_MER_PRE_USUARIO bepmpu "
+				+ " INNER JOIN TBEP_MERITOS_PREFERENTES bepmep ON bepmep.CODNUM = bepmpu.BEPMEP_CODNUM "
+				+ " WHERE bepmep.TIPO = ? AND bepmpu.FLGVALIDADO = 'S' AND bepmpu.BEPUSU_CODNUM = ? AND bepmpu.FLGBORRADO != 'S'";
+		
+		try (Connection conexion = ConexionUvirtual.obtenerInstancia(); PreparedStatement stmt = conexion.prepareStatement(consulta)) {
+			int paramIndex = 1;
+			stmt.setString(paramIndex++, ModeloMeritosPreferentes.TIPO_POSESION);
+			stmt.setInt(paramIndex++, usuario.getCodNum());
+			
+			try (ResultSet rs = stmt.executeQuery()) {
+				while (rs.next()) {
+					MeritoPreferenteUsuario row = this.createMeritoUsuarioFromResultSet(rs);
+					meritos.add(row);					
+				}				
+			}				
+		}
+		
+		return meritos;
+	}
+	
 	/** Lista todas los méritos preferentes validados del candidato .
 	 * @param usuario .
 	 * @return lista .

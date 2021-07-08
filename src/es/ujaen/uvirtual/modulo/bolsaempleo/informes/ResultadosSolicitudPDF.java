@@ -4,19 +4,28 @@ import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.InputStream;
 import java.sql.Date;
+import java.sql.SQLException;
 import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import com.lowagie.text.Chunk;
 import com.lowagie.text.Document;
+import com.lowagie.text.DocumentException;
 import com.lowagie.text.Paragraph;
 import com.lowagie.text.Table;
 import com.lowagie.text.pdf.PdfWriter;
 import es.ujaen.uvirtual.modulo.bolsaempleo.beans.BolsaResultado;
+import es.ujaen.uvirtual.modulo.bolsaempleo.beans.MeritoPreferenteUsuario;
 import es.ujaen.uvirtual.modulo.bolsaempleo.beans.MeritoResultado;
+import es.ujaen.uvirtual.modulo.bolsaempleo.beans.ParametrosConfiguracion;
 import es.ujaen.uvirtual.modulo.bolsaempleo.beans.Solicitud;
+import es.ujaen.uvirtual.modulo.bolsaempleo.beans.TitulacionUsuario;
 import es.ujaen.uvirtual.modulo.bolsaempleo.beans.UsuarioBolsaEmpleo;
+import es.ujaen.uvirtual.modulo.bolsaempleo.modelo.ModeloMeritosPreferentesCandidato;
+import es.ujaen.uvirtual.modulo.bolsaempleo.modelo.ModeloParametrosConfiguracion;
 import es.ujaen.uvirtual.modulo.bolsaempleo.modelo.ModeloResultados;
+import es.ujaen.uvirtual.modulo.bolsaempleo.modelo.ModeloTitulacion;
 import es.ujaen.uvirtual.utilidades.Formateador;
 import es.ujaen.uvirtual.utilidades.UVException;
 
@@ -80,6 +89,11 @@ public class ResultadosSolicitudPDF extends BolsaEmpleoPDFGenerator {
 			generarMeritosEvaluadosPDF(bolsa, document);
 			generarMeritosExcluidosPDF(bolsa, document);
 			generarMeritosNoEvaluadosPDF(bolsa, document);
+			
+			document.add(new Paragraph("\n"));
+			
+			generarTitulacionesValidadas(candidato, document);
+			generarAcreditacionesValidadas(candidato, document);
 		} catch (Exception e) {
 			LOGGER.log(Level.SEVERE, Formateador.getStackTrace(e));
 			LOGGER.log(Level.SEVERE, e.toString());
@@ -228,6 +242,74 @@ public class ResultadosSolicitudPDF extends BolsaEmpleoPDFGenerator {
 			document.add(table);
 		} else {
 			document.add(new Paragraph(ModeloResultados.MENSAJE_SIN_MERITOS_NO_EVALUADOS));
+		}
+	}
+	
+	private static void generarTitulacionesValidadas(UsuarioBolsaEmpleo usuario, Document document) throws DocumentException, SQLException, UVException {		
+		document.add(new Paragraph("\n"));
+		
+		ModeloTitulacion modeloTitulacion = ModeloTitulacion.obtenerInstancia();
+		List<TitulacionUsuario> listaTitulaciones = modeloTitulacion.listaTitulacionesValidadasCandidato(usuario.getCodNum(), false);
+		
+		document.add(new Paragraph("Titulaciones validadas", fontBold));
+		
+		if (listaTitulaciones.size() > 0) {
+			LinkedHashMap<String, Float> headerColumns = new LinkedHashMap<String, Float>();
+			
+			headerColumns.put("Id. Titulación", (float) SIZE_10);
+			headerColumns.put("Titulación", (float) SIZE_40);
+			
+			Table table = new Table(PDF_TABLE_COLUMNS_2, listaTitulaciones.size());
+			
+			generarTableHeader(table, headerColumns);
+			
+			for (TitulacionUsuario t: listaTitulaciones) {
+				generarTableRow(table, new String[] {
+						t.getCodNum().toString(),
+						t.getTitulacion() != null ? t.getTitulacion().getNombre() : ("Otra titulación: " + t.getOtraTitulacion()),
+					}
+				);
+			}
+			
+			document.add(table);
+		} else {
+			document.add(new Paragraph("No hay titulaciones validadas"));
+		}
+	}
+	
+	private static void generarAcreditacionesValidadas(UsuarioBolsaEmpleo usuario, Document document) throws DocumentException, SQLException, UVException {
+		document.add(new Paragraph("\n"));
+		
+		ModeloMeritosPreferentesCandidato modeloAcreditaciones = ModeloMeritosPreferentesCandidato.obtenerInstancia();
+		List<MeritoPreferenteUsuario> listaAcreditaciones = modeloAcreditaciones.listaMeritosPreferentesValidadosUsuarioPorPosesion(usuario);
+		
+		document.add(new Paragraph("Acreditaciones validadas", fontBold));
+		
+		if (listaAcreditaciones.size() > 0) {
+			LinkedHashMap<String, Float> headerColumns = new LinkedHashMap<String, Float>();
+			
+			headerColumns.put("Id. Acreditación", (float) SIZE_12);
+			headerColumns.put("Código", (float) SIZE_12);
+			headerColumns.put("Acreditación", (float) SIZE_40);
+			
+			Table table = new Table(PDF_TABLE_COLUMNS_3, listaAcreditaciones.size());
+			
+			generarTableHeader(table, headerColumns);
+			
+			for (MeritoPreferenteUsuario m : listaAcreditaciones) {
+				ParametrosConfiguracion config = ModeloParametrosConfiguracion.obtenerInstancia().getParametroByNombre("bolsaempleo.local.codMeritoPreferente");
+				generarTableRow(table, new String[] {
+						m.getCodNum().toString(),
+						config.getValor() + "." + m.getMeritoPreferente().getCodigo(),
+						m.getMeritoPreferente().getNombre() + " " 
+						+ (m.getMeritoPreferenteOpcion() != null ? m.getMeritoPreferenteOpcion().getNombre() : ""),
+					}
+				);
+			}
+			
+			document.add(table);
+		} else {
+			document.add(new Paragraph("No hay acreditaciones validadas"));
 		}
 	}
 	
