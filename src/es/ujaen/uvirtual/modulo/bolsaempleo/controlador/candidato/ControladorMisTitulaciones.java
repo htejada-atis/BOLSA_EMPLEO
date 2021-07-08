@@ -308,7 +308,9 @@ public class ControladorMisTitulaciones extends HttpServlet {
 		response.sendRedirect(request.getServletPath());		
 	}
 	
-	private void eliminarTitulacionUsuario(UVDatos datos, HttpServletRequest request, HttpServletResponse response, VistaTitulaciones bean) throws SQLException, UVException, IOException {
+	private void eliminarTitulacionUsuario(UVDatos datos, HttpServletRequest request, HttpServletResponse response, VistaTitulaciones bean) 
+			throws SQLException, UVException, IOException {
+		
 		String selectedJson = EscapaHTML.ajustaCodificacion(request.getParameter(PARAM_TITULACIONES_USUARIOS_SELECCIONADOS));
 		int[] selected = (new Gson()).fromJson(selectedJson, new TypeToken<int[]>() { }.getType());
 		

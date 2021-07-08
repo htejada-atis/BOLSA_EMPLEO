@@ -44,7 +44,8 @@ public class MeritoPreferenteUsuario implements Serializable {
 	 * @param pfechaValidado .
 	 */
 	public MeritoPreferenteUsuario(Integer pcodNum, MeritoPreferente pmeritoPreferente, MeritoPreferenteOpcion pmeritoPreferenteOpcion, 
-			UsuarioBolsaEmpleo pusuario, String pdescripcion, InputStream parchivo, Boolean pborrado, Date pfechaBorrado, Boolean pvalidado, Date pfechaValidado) {		
+			UsuarioBolsaEmpleo pusuario, String pdescripcion, InputStream parchivo, Boolean pborrado, Date pfechaBorrado, 
+			Boolean pvalidado, Date pfechaValidado) {
 		this.codNum = pcodNum;
 		this.meritoPreferente = pmeritoPreferente;
 		this.meritoPreferenteOpcion = pmeritoPreferenteOpcion;
