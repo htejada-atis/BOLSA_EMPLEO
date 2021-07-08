@@ -131,16 +131,16 @@ UsuarioBolsaEmpleo candidato = bean.getCandidato();
 							<%
 							for(ItemBaremacion it: bean.getItems()) {
 							%>
-								<% if (it.getCodNum() == merito.getMerito().getItemBaremacion().getCodNum()) { %>
+							<%	if (it.getCodNum() == merito.getMerito().getItemBaremacion().getCodNum()) { %>
 				    				<option value="<%=it.getCodNum()%>" 
 				    						data-unidades="<%= it.getUnidades() %>" 
 				    						data-descripcion="<%= it.getDescripcion() %>" 
 				    						selected><%=EscapaHTML.escapa(it.getBloqueBaremacion().getApartadoBaremacion().getCodigo() + "." + it.getBloqueBaremacion().getCodigo() + "." + it.getCodigo() + "-" + it.getNombre())%></option>
-				    			<% } else { %>
+				    		<%	} else { %>
 				    				<option value="<%=it.getCodNum()%>" 
 				    						data-unidades="<%= it.getUnidades() %>" 
 				    						data-descripcion="<%= it.getDescripcion() %>"><%=EscapaHTML.escapa(it.getBloqueBaremacion().getApartadoBaremacion().getCodigo() + "." + it.getBloqueBaremacion().getCodigo() + "." + it.getCodigo() + "-" + it.getNombre())%></option>
-				    			<% } %>
+				    		<%	} %>
 				    		<%
 				    		}
 				    		%>
@@ -151,6 +151,7 @@ UsuarioBolsaEmpleo candidato = bean.getCandidato();
 			    			<label for="merito_valor" id="merito_valor_label" class="bold-label">Valor (<%= EscapaHTML.escapa(merito.getMerito().getItemBaremacion().getUnidades()) %>):</label>
 			    			<input class="form-input-custom" id="merito_valor" type="text" name="<%= ControladorValidarNoAfines.PARAM_VALOR %>" 
 			    					value="<%= merito.getMerito().getValor() %>"
+			    					data-unidades="<%= merito.getMerito().getItemBaremacion().getUnidades() %>"
 			    					<%= EscapaHTML.escapa(merito.getMerito().getItemBaremacion().getUnidades()).equals(ModeloBaremacionItems.ITEM_UNIDADES_MEDICION_SINO) ? "readonly" : "" %>
 			    					required
 			    					style="max-width: 180px;"/>
@@ -383,8 +384,26 @@ $(document).ready(function() {
     		        	+ "<%= "?a=" + ControladorDescargaFicheros.ACCION_DESCARGAR_MERITO_PERSONAL + "&" + ControladorDescargaFicheros.PARAM_MERITO + "=" + merito.getMerito().getCodNum() %>");
 			});
 			
+			var inputValor = document.getElementById("merito_valor");
+			var labelValor = document.getElementById("merito_valor_label");
+			
 			document.getElementById("select_item").addEventListener("change", function() {
+				console.log(this.options[this.selectedIndex].getAttribute("data-unidades"))
+				console.log(inputValor.getAttribute("data-unidades"));
 				itemChanged = this.value != <%= merito.getMerito().getItemBaremacion().getCodNum() %>;
+				
+				var unidades = this.options[this.selectedIndex].getAttribute("data-unidades");
+				if (unidades != inputValor.getAttribute("data-unidades")) {
+					labelValor.innerHTML = "Valor (" + unidades + "):";
+					inputValor.setAttribute("data-unidades", unidades);
+					if (unidades == "<%= EscapaHTML.escapa(ModeloBaremacionItems.ITEM_UNIDADES_MEDICION_SINO) %>") {
+						inputValor.value = 1;
+						inputValor.readOnly = true;
+					} else {
+						inputValor.value = <%= merito.getMerito().getValor() %>;
+						inputValor.readOnly = false;
+					}
+				}
 			});
 			
 			Atis.smoothScrollToAnchor("#anchor_modificar_merito");

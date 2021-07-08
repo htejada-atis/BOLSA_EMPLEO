@@ -441,13 +441,17 @@ public class ModeloBaremacionItems {
 	 * @throws SQLException .
 	 */
 	public List<ItemBaremacion> listaItemBaremacion() throws SQLException, UVException {
-		return listaItemBaremacion(" WHERE FLGACTIVO = 'S' ORDER BY codigo");
+		String orderCodigo = String.format("(%s || '.' || %s || '.' || %s)", "LPAD(bepapa.CODIGO, 3)", "LPAD(bepblo.CODIGO, 3)", "LPAD(bepite.CODIGO, 3)");
+		return listaItemBaremacion(" WHERE bepite.FLGACTIVO = 'S' ORDER BY " + orderCodigo);
 	} 
 	
 	private List<ItemBaremacion> listaItemBaremacion(String clausula) throws SQLException, UVException {
 		List<ItemBaremacion> items = new ArrayList<>();
-		String consulta = "SELECT bepite.* FROM TBEP_ITEMSBAREMACION bepite " + clausula;
-
+		String consulta = "SELECT bepite.* FROM TBEP_ITEMSBAREMACION bepite"
+				+ " INNER JOIN TBEP_BLOQUESBAREMACION bepblo ON bepblo.CODNUM = bepite.BEPBLO_CODNUM"
+				+ "	INNER JOIN TBEP_APARTADOSBAREMACION bepapa ON bepapa.CODNUM = bepblo.BEPAPA_CODNUM"
+				+ clausula;
+		
 		try (Connection conexion = ConexionUvirtual.obtenerInstancia();
 				PreparedStatement stmt = conexion.prepareStatement(consulta)) {
 			try (ResultSet rs = stmt.executeQuery()) {

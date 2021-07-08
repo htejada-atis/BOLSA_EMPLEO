@@ -121,6 +121,7 @@ UsuarioBolsaEmpleo candidato = bean.getCandidato();
 			    			<label for="merito_valor" id="merito_valor_label" class="bold-label">Valor (<%= EscapaHTML.escapa(merito.getMerito().getItemBaremacion().getUnidades()) %>):</label>
 			    			<input class="form-input-custom" id="merito_valor" type="text" name="<%= ControladorValidar.PARAM_VALOR %>" 
 			    					value="<%= merito.getMerito().getValor() %>"
+			    					data-unidades="<%= merito.getMerito().getItemBaremacion().getUnidades() %>"
 			    					<%= EscapaHTML.escapa(merito.getMerito().getItemBaremacion().getUnidades()).equals(ModeloBaremacionItems.ITEM_UNIDADES_MEDICION_SINO) ? "readonly" : "" %>
 			    					required
 			    					style="max-width: 180px;"/>
@@ -375,8 +376,6 @@ $(document).ready(function() {
 		    "columns": [
 		    	{'data': 'codNum', 'filter': {'type': 'number'}},
 		        {'data': 'codNum', 'order': false, 'class': 'center', 'render': function(row) {
-		        		console.log('excluido: ' + row.excluido)
-		        		console.log('validado: ' + row.validado)
 		        		if (!row.excluido && !row.validado) {
 		        			return "<div title='Mérito no evaluado' class='circle-neutral'></div>";
 		        		} else {
@@ -559,11 +558,27 @@ $(document).ready(function() {
 				}
 			});
 			
+			var inputValor = document.getElementById("merito_valor");
+			var labelValor = document.getElementById("merito_valor_label");
+			
 			document.getElementById("select_item").addEventListener("change", function() {
 				itemChanged = this.value != <%= merito.getMerito().getItemBaremacion().getCodNum() %>;
+				
+				var unidades = this.options[this.selectedIndex].getAttribute("data-unidades");
+				if (unidades != inputValor.getAttribute("data-unidades")) {
+					labelValor.innerHTML = "Valor (" + unidades + "):";
+					inputValor.setAttribute("data-unidades", unidades);
+					if (unidades == "<%= EscapaHTML.escapa(ModeloBaremacionItems.ITEM_UNIDADES_MEDICION_SINO) %>") {
+						inputValor.value = 1;
+						inputValor.readOnly = true;
+					} else {
+						inputValor.value = <%= merito.getMerito().getValor() %>;
+						inputValor.readOnly = false;
+					}
+				}
 			});
 			
-			document.getElementById("merito_valor").addEventListener("input", function() {
+			inputValor.addEventListener("input", function() {
 				valorChanged = this.value != <%= merito.getMerito().getValor() %>;
 			});
 			
