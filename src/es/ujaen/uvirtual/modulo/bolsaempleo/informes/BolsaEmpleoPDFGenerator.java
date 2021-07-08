@@ -19,9 +19,10 @@ public class BolsaEmpleoPDFGenerator {
 	protected static final int PDF_ALTO = 4;
 	protected static final int PDF_FORMATO = 4;
 	protected static final int PDF_TABLE_BORDER_WIDTH = 1;
-	protected static final int PDF_TABLE_COLUMNS_6 = 6;
-	protected static final int PDF_TABLE_COLUMNS_5 = 5;
 	protected static final int PDF_TABLE_COLUMNS_2 = 2;
+	protected static final int PDF_TABLE_COLUMNS_3 = 3;
+	protected static final int PDF_TABLE_COLUMNS_5 = 5;
+	protected static final int PDF_TABLE_COLUMNS_6 = 6;
 	protected static final int PDF_TABLE_PADDING = 5;
 	protected static final int PDF_TABLE_ROWS_2 = 2;
 	protected static final int PDF_TABLE_ROWS_3 = 3;

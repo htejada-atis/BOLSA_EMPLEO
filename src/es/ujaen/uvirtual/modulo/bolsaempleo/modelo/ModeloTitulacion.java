@@ -132,6 +132,33 @@ public class ModeloTitulacion {
 		return titulaciones;
 	}
 	
+	/** lista todas las titulaciones validadas del candidato .
+	 * @param usuario .
+	 * @param withArchivo .
+	 * @return lista de titulaciones validadas .
+	 * @throws SQLException si hay un error en la base de datos .
+	 * @throws UVException .
+	 */
+	public List<TitulacionUsuario> listaTitulacionesValidadasCandidato(Integer usuario, boolean withArchivo) throws SQLException, UVException {
+		List<TitulacionUsuario> titulaciones = new ArrayList<>();
+		String consulta = ""
+				+ " SELECT beptus.* "
+				+ " FROM TBEP_TITULACIONES_USUARIO beptus "
+				+ " WHERE beptus.FLGBORRADO = 'N' AND beptus.FLGVALIDADA = 'S' AND beptus.BEPTUS_USU_CODNUM = ? ";
+		
+		try (Connection conexion = ConexionUvirtual.obtenerInstancia(); PreparedStatement stmt = conexion.prepareStatement(consulta)) {
+			int parameterIndex = 1;
+			stmt.setInt(parameterIndex++, usuario);
+			try (ResultSet rs = stmt.executeQuery()) {
+				while (rs.next()) {
+					titulaciones.add(this.createTitulacionUsuarioFromResultSet(rs, withArchivo));
+				}
+			}
+		}
+
+		return titulaciones;
+	}
+	
 	/** obtiene una titulación a partir de su id.
 	 * @param id codigo de la titulación
 	 * @return titulación con el id especificado
