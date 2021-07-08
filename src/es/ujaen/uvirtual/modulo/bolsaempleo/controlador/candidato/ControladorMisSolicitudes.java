@@ -1,10 +1,6 @@
 package es.ujaen.uvirtual.modulo.bolsaempleo.controlador.candidato;
 
-import java.awt.Color;
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import java.io.InputStream;
 import java.io.PrintWriter;
 import java.sql.SQLException;
 import java.util.logging.Logger;
@@ -31,20 +27,18 @@ import es.ujaen.uvirtual.modulo.bolsaempleo.beans.BolsaSolicitud;
 import es.ujaen.uvirtual.modulo.bolsaempleo.beans.BolsaSolicitudTable;
 import es.ujaen.uvirtual.modulo.bolsaempleo.beans.Convocatoria;
 import es.ujaen.uvirtual.modulo.bolsaempleo.beans.Merito;
-import es.ujaen.uvirtual.modulo.bolsaempleo.beans.MeritoPreferenteUsuario;
 import es.ujaen.uvirtual.modulo.bolsaempleo.beans.MeritoSolicitud;
 import es.ujaen.uvirtual.modulo.bolsaempleo.beans.MeritoSolicitudTable;
-import es.ujaen.uvirtual.modulo.bolsaempleo.beans.MeritoSolicitudValoracion;
 import es.ujaen.uvirtual.modulo.bolsaempleo.beans.Solicitud;
 import es.ujaen.uvirtual.modulo.bolsaempleo.beans.TitulacionUsuario;
 import es.ujaen.uvirtual.modulo.bolsaempleo.beans.UsuarioBolsaEmpleo;
+import es.ujaen.uvirtual.modulo.bolsaempleo.informes.GenerarSolicitudPDF;
 import es.ujaen.uvirtual.modulo.bolsaempleo.modelo.ModeloAfinidad;
 import es.ujaen.uvirtual.modulo.bolsaempleo.modelo.ModeloArea;
 import es.ujaen.uvirtual.modulo.bolsaempleo.modelo.ModeloBaremacionItems;
 import es.ujaen.uvirtual.modulo.bolsaempleo.modelo.ModeloBolsa;
 import es.ujaen.uvirtual.modulo.bolsaempleo.modelo.ModeloConvocatoria;
 import es.ujaen.uvirtual.modulo.bolsaempleo.modelo.ModeloMerito;
-import es.ujaen.uvirtual.modulo.bolsaempleo.modelo.ModeloMeritosPreferentesCandidato;
 import es.ujaen.uvirtual.modulo.bolsaempleo.modelo.ModeloParametrosConfiguracion;
 import es.ujaen.uvirtual.modulo.bolsaempleo.modelo.ModeloRol;
 import es.ujaen.uvirtual.modulo.bolsaempleo.modelo.ModeloSolicitud;
@@ -56,16 +50,6 @@ import es.ujaen.uvirtual.modulo.bolsaempleo.vistas.VistaSolicitudes;
 import es.ujaen.uvirtual.utilidades.EscapaHTML;
 import es.ujaen.uvirtual.utilidades.Formateador;
 import es.ujaen.uvirtual.utilidades.UVException;
-import com.lowagie.text.Cell;
-import com.lowagie.text.Chunk;
-import com.lowagie.text.Document;
-import com.lowagie.text.DocumentException;
-import com.lowagie.text.Font;
-import com.lowagie.text.FontFactory;
-import com.lowagie.text.Paragraph;
-import com.lowagie.text.Phrase;
-import com.lowagie.text.pdf.PdfWriter;
-import com.lowagie.text.Table;
 
 /**
  * Clase controlador para las solicitudes de un candidato de bolsa de empleo.
@@ -144,25 +128,6 @@ public class ControladorMisSolicitudes extends HttpServlet {
 	public static final String RESPONSE_AJAX_ENCODING = "UTF-8";
 	public static final String RESPONSE_AJAX_ERROR = "error";
 	public static final int RESPONSE_AJAX_HTTP_CODE_ERROR = 400;
-	
-	//pdf
-	public static final int PDF_ANCHO = 4;
-	public static final int PDF_ALTO = 4;
-	public static final int PDF_FORMATO = 4;
-	public static final int PDF_TABLE_COLUMNS = 5;
-	public static final int PDF_TABLE_PADDING = 5;
-	public static final int SIZE_10 = 10;
-	public static final int SIZE_20 = 20;
-	public static final int SIZE_30 = 30;
-	public static final int SIZE_100 = 100;
-	public static final int COLOR_51 = 51;
-	public static final int COLOR_153 = 153;
-	public static final int COLOR_185 = 185;
-	public static final int COLOR_201 = 201;
-	public static final int COLOR_241 = 241;
-	public static final int COLOR_254 = 254;
-	public static final int COLSPAN_5 = 5;
-	public static final int NUMBER_100 = 100;
 	
 	/** Peticion GET.
 	 * @see HttpServlet#doGet(HttpServletRequest request, HttpServletResponse response)
@@ -906,7 +871,7 @@ public class ControladorMisSolicitudes extends HttpServlet {
 		
 		solicitud.setEstado(ModeloSolicitud.SOLICITUD_ESTADO_CERRADA);
 		solicitud.setFechaConfirmacion(BolsaEmpleoUtils.getCurrentDateTime());
-		solicitud.setArchivo(generarPDF(bean.getUsuarioLogeado(), solicitud, listaBolsas));
+		solicitud.setArchivo(GenerarSolicitudPDF.generarPDF(solicitud, listaBolsas));
 		
 		modeloSolicitud.confirmacionSolicitud(solicitud, bean.getUsuarioLogeado());
 		
@@ -915,192 +880,6 @@ public class ControladorMisSolicitudes extends HttpServlet {
 		session.setAttribute(MENSAJE_ENVIADO, MENSAJE_EXITO_SOLICITUD_CONFIRMADA);
 		datos.setRespuestaEnviada(true);
 		response.sendRedirect(request.getServletPath());
-	}
-	
-	/**
-	 * generar PDF de la solicitud .
-	 * @param solicitud .
-	 * @param usuario .
-	 * @param bolsasSolicitud .
-	 * @return InputStream .
-	 * @throws UVException .
-	 */
-	public static InputStream generarPDF(UsuarioBolsaEmpleo usuario, Solicitud solicitud, List<BolsaSolicitud> bolsasSolicitud) throws UVException {
-		ByteArrayOutputStream out = new ByteArrayOutputStream();
-		
-		try (Document document = new Document()) {
-			// create a PDF writer instance and pass output stream
-			PdfWriter.getInstance(document, out);
-
-			document.open();
-			document.addAuthor(usuario.getNombre() + " " + usuario.getPrimerApellido() + " " 
-					+ usuario.getSegundoApellido());
-			document.addTitle("Solicitud_" + solicitud.getConvocatoria().getDescripcion());
-			document.addCreationDate();
-
-			document.add(new Paragraph(new Chunk("SOLICITUD", FontFactory.getFont(FontFactory.HELVETICA, SIZE_30, Font.BOLDITALIC))));
-			
-			document.add(new Paragraph("\n"));
-			
-			Font font2 = new Font(Font.BOLD);
-			font2.setStyle("bold");
-			
-			document.add(new Paragraph("Convocatoria: " + solicitud.getConvocatoria().getDescripcion(), font2));
-			document.add(new Paragraph("Fecha confirmación de solicitud: "
-					+ Formateador.formatoFecha(solicitud.getFechaConfirmacion(), Formateador.FORMATO_FECHA_DDMMYYYY_HHMMSS), font2));
-			
-			document.add(new Paragraph("Usuario: "
-					+ getStringOrBlack(usuario.getPrsNif()) + " "
-					+ getStringOrBlack(usuario.getNombre()) + " "
-					+ getStringOrBlack(usuario.getPrimerApellido()) + " "
-					+ getStringOrBlack(usuario.getSegundoApellido()), font2));
-			
-			document.add(new Paragraph("Dirección: "
-					+ getStringOrBlack(usuario.getDireccion()) + " "
-					+ getStringOrBlack(usuario.getCodigoPostal()) + " "
-					+ getStringOrBlack(usuario.getLocalidad()) + " "
-					+ getStringOrBlack(usuario.getProvincia()) + " "
-					+ getStringOrBlack(usuario.getTelefono()), font2));
-			
-			document.add(new Paragraph("\n"));
-			
-			for (BolsaSolicitud bolsa: bolsasSolicitud) {
-				generarPDFArea(bolsa, bolsasSolicitud, document);
-			}
-			
-			generarTitulaciones(solicitud.getUsuario(), document);
-			
-			generarAcreditaciones(solicitud.getUsuario(), document);
-		} catch (Exception e) {
-			LOGGER.log(Level.SEVERE, Formateador.getStackTrace(e));
-			LOGGER.log(Level.SEVERE, e.toString());
-			throw new UVException("Error generando pdf, consulte con los administradores");
-		}
-		
-		return new ByteArrayInputStream(out.toByteArray());
-	}
-	
-	private static String getStringOrBlack(String txt) {
-		if (txt == null) {
-			return "";
-		}
-		return txt;
-	}
-	
-	private static void generarPDFArea(BolsaSolicitud bolsa, List<BolsaSolicitud> bolsasSolicitud, Document document) {
-		Table table = new Table(PDF_TABLE_COLUMNS, bolsasSolicitud.size());
-
-		generarPDFAreaHeader(table);
-
-		if (bolsa.getNumeroMeritos() != null && bolsa.getNumeroMeritos() > 0) {
-			for (MeritoSolicitudTable merito: bolsa.getListaMeritos()) {
-				String codigoItem = merito.getCodNum() + " " 
-						+ merito.getMerito().getItemBaremacion().getBloqueBaremacion().getApartadoBaremacion().getCodigo() + "." 
-						+ merito.getMerito().getItemBaremacion().getBloqueBaremacion().getCodigo() + "." 
-						+ merito.getMerito().getItemBaremacion().getCodigo();
-				
-				Cell cell = new Cell(codigoItem);
-				cell.setBackgroundColor(new Color(COLOR_241, COLOR_241, COLOR_241));
-				table.addCell(cell);
-				cell = new Cell(merito.getMerito().getItemBaremacion().getNombre());
-				cell.setBackgroundColor(new Color(COLOR_241, COLOR_241, COLOR_241));
-				table.addCell(cell);
-				cell = new Cell(merito.getMerito().getValor().toString());
-				cell.setBackgroundColor(new Color(COLOR_241, COLOR_241, COLOR_241));
-				table.addCell(cell);
-				cell = new Cell(merito.getMerito().getDescripcion());
-				cell.setBackgroundColor(new Color(COLOR_241, COLOR_241, COLOR_241));
-				table.addCell(cell);
-				
-				String afinidad = "";
-				
-				if (merito.getCodNum() != null && merito.getMeritoSolicitud() != null && merito.getMerito().getItemBaremacion().getAfinidad() != null
-						&& merito.getValoraciones().size() > 0) {
-					if (merito.getMerito().getItemBaremacion().getIndividualizado()) {
-						afinidad = merito.getValoraciones().get(0).getAfinidad().getCodigo() + " " 
-								+ merito.getValoraciones().get(0).getAfinidad().getModulacion() * NUMBER_100 + "%";
-					} else {
-						for (MeritoSolicitudValoracion valoracion: merito.getValoraciones()) {
-							afinidad += valoracion.getValor() + " - " + valoracion.getAfinidad().getCodigo() + " "
-									+ valoracion.getAfinidad().getModulacion() * NUMBER_100 + "%\n";
-						}
-					}
-				}
-				
-				cell = new Cell(afinidad);
-				cell.setBackgroundColor(new Color(COLOR_241, COLOR_241, COLOR_241));
-				table.addCell(cell);
-						
-			}
-		} else {
-			Cell cell = new Cell(MENSAJE_AREA_SIN_MERITOS);
-			cell.setColspan(COLSPAN_5);
-			cell.setBackgroundColor(new Color(COLOR_241, COLOR_241, COLOR_241));
-			table.addCell(cell);
-		}
-
-		Font font2 = new Font(Font.BOLD);
-		font2.setStyle("bold");		
-		document.add(new Paragraph("Área - " + bolsa.getArea().getDescripcion(), font2));
-		document.add(table);
-		document.add(new Paragraph("\n"));
-	}
-	
-	private static void generarPDFAreaHeader(Table table) {
-		table.setBorderWidth(1);
-		table.setBorderColor(new Color(0, 0, 0));
-		table.setPadding(PDF_TABLE_PADDING);
-		table.setWidth(SIZE_100);
-
-		Font font = new Font();
-		font.setColor(new Color(0, COLOR_51, COLOR_153));
-		
-		generarColumnPDFAreaHeader(table, "Cod. Mérito", font);
-		generarColumnPDFAreaHeader(table, "Mérito", font);
-		generarColumnPDFAreaHeader(table, "Valor", font);
-		generarColumnPDFAreaHeader(table, "Descripción", font);
-		generarColumnPDFAreaHeader(table, "Afinidad", font);
-		
-		float[] columnWidths = new float[] {SIZE_10, SIZE_30, SIZE_10, SIZE_30, SIZE_20};
-		table.setWidths(columnWidths);
-	}
-	
-	private static void generarColumnPDFAreaHeader(Table table, String titulo, Font font) {
-		Phrase phrase = new Phrase(titulo, font);
-		Cell cell = new Cell(phrase);
-		cell.setHeader(true);
-		cell.setBackgroundColor(new Color(COLOR_185, COLOR_201, COLOR_254));
-		table.addCell(cell);
-	}
-	
-	private static void generarTitulaciones(UsuarioBolsaEmpleo usuario, Document document) throws DocumentException, SQLException, UVException {
-		Font font2 = new Font(Font.BOLD);
-		font2.setStyle("bold");
-		
-		document.add(new Paragraph("Titulaciones", font2));
-		document.add(new Paragraph("\n"));
-		
-		for (TitulacionUsuario t : ModeloTitulacion.obtenerInstancia().listaTitulacionesCandidato(usuario.getCodNum(), false)) {
-			document.add(new Paragraph(t.getCodNum() + " " 
-				+ (t.getTitulacion() != null ? t.getTitulacion().getNombre() : ("Otra titulación: " + t.getOtraTitulacion()))));
-			document.add(new Paragraph("\n"));
-		}			
-	}
-	
-	private static void generarAcreditaciones(UsuarioBolsaEmpleo usuario, Document document) throws DocumentException, SQLException, UVException {
-		Font font2 = new Font(Font.BOLD);
-		font2.setStyle("bold");		
-		
-		document.add(new Paragraph("Acreditaciones", font2));
-		document.add(new Paragraph("\n"));
-					
-		for (MeritoPreferenteUsuario m : ModeloMeritosPreferentesCandidato.obtenerInstancia().listaMeritosPreferentesUsuarioPorPosesion(usuario)) {			
-			document.add(new Paragraph(m.getCodNum() + " " 
-					+ m.getMeritoPreferente().getNombre() 
-					+ (m.getMeritoPreferenteOpcion() != null ? (" " + m.getMeritoPreferenteOpcion().getNombre()) : "")
-					+ (m.getDescripcion() != null ? (" " + m.getDescripcion()) : "")));
-			document.add(new Paragraph("\n"));
-		}
 	}
 	
 	private ArrayList<Bolsa> getListadoBolsasFromJson(VistaSolicitudes bean, HttpServletRequest request, Solicitud solicitud) throws UVException, SQLException {

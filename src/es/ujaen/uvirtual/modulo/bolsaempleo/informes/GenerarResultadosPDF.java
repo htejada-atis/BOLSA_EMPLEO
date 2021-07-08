@@ -50,7 +50,7 @@ public class GenerarResultadosPDF extends BolsaEmpleoPDFGenerator {
 	 * @return InputStream .
 	 * @throws UVException .
 	 */
-	public static InputStream generarResultadosSolicitudPDF(Solicitud solicitud, BolsaResultado bolsa, Date fechaActual) throws UVException {
+	public static InputStream generarPDF(Solicitud solicitud, BolsaResultado bolsa, Date fechaActual) throws UVException {
 		initPDFProperties();
 		
 		UsuarioBolsaEmpleo candidato = solicitud.getUsuario();
