@@ -17,6 +17,8 @@ public class Afinidad implements Serializable {
 	private Boolean borrada;
 	private Date fechaBorrada;
 	
+	private static final int NUMBER_100 = 100;
+	
 	/** Constructor por defecto.
 	 */
 	public Afinidad() {
@@ -108,7 +110,7 @@ public class Afinidad implements Serializable {
 	}
 	
 	public String getCodigoDescripcion() {
-		return this.getCodigo() + " - " + this.getDescripcion() + " (" + this.getModulacion() * 100 + " %)"; 
+		return this.getCodigo() + " - " + this.getDescripcion() + " (" + this.getModulacion() * NUMBER_100 + " %)"; 
 	}
 	
 	public static long getSerialversionuid() {

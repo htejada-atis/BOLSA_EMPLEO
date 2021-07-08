@@ -13,7 +13,7 @@ import com.lowagie.text.Table;
  * @author ATISoluciones
  */
 public class BolsaEmpleoPDFGenerator {
-	
+		
 	// pdf properties
 	protected static final int PDF_ANCHO = 4;
 	protected static final int PDF_ALTO = 4;

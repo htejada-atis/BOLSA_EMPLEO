@@ -421,6 +421,13 @@ public class ModeloBaremacionApartados {
 		return items;
 	}
 	
+	/**
+	 * Crea un apartado de baremación a partir del resultset.
+	 * 
+	 * @param rs .
+	 * @return .
+	 * @throws SQLException .
+	 */
 	public ApartadoBaremacion createApartadoFromResultSet(ResultSet rs) throws SQLException {
 		ApartadoBaremacion apartado = new ApartadoBaremacion();
 		apartado.setCodNum(rs.getInt(CODNUM));

@@ -13,12 +13,14 @@ import java.sql.Connection;
 import java.sql.SQLException;
 import java.text.CharacterIterator;
 import java.text.DecimalFormat;
+import java.text.DecimalFormatSymbols;
 import java.text.StringCharacterIterator;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.time.ZoneId;
 import java.util.Date;
+import java.util.Locale;
 import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -162,7 +164,8 @@ public final class BolsaEmpleoUtils {
 	 * @return El valor formateado .
 	 */
 	public static Double formatoPuntuacion(Double valor) {
-		DecimalFormat numberFormat = new DecimalFormat("0.######");
+		DecimalFormatSymbols simbolos = DecimalFormatSymbols.getInstance(Locale.ENGLISH);
+		DecimalFormat numberFormat = new DecimalFormat("0.######", simbolos);
 		return Double.parseDouble(numberFormat.format(valor));
 	}
 
