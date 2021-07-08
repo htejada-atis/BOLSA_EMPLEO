@@ -162,6 +162,7 @@ public class ControladorMisSolicitudes extends HttpServlet {
 	public static final int COLOR_241 = 241;
 	public static final int COLOR_254 = 254;
 	public static final int COLSPAN_5 = 5;
+	public static final int NUMBER_100 = 100;
 	
 	/** Peticion GET.
 	 * @see HttpServlet#doGet(HttpServletRequest request, HttpServletResponse response)
@@ -1017,11 +1018,11 @@ public class ControladorMisSolicitudes extends HttpServlet {
 						&& merito.getValoraciones().size() > 0) {
 					if (merito.getMerito().getItemBaremacion().getIndividualizado()) {
 						afinidad = merito.getValoraciones().get(0).getAfinidad().getCodigo() + " " 
-								+ merito.getValoraciones().get(0).getAfinidad().getModulacion() * 100 + "%";
+								+ merito.getValoraciones().get(0).getAfinidad().getModulacion() * NUMBER_100 + "%";
 					} else {
 						for (MeritoSolicitudValoracion valoracion: merito.getValoraciones()) {
 							afinidad += valoracion.getValor() + " - " + valoracion.getAfinidad().getCodigo() + " "
-									+ valoracion.getAfinidad().getModulacion() * 100 + "%\n";
+									+ valoracion.getAfinidad().getModulacion() * NUMBER_100 + "%\n";
 						}
 					}
 				}

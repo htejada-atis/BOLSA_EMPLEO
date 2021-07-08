@@ -253,7 +253,7 @@ public final class UtilsTestBolsaEmpleo {
 			// departamentos
 
 			String sqlDeptSelect = "SELECT DISTINCT uvnbrdsa.ID_DEPARTAMENTO, uvnbrdsa.DES_DEPARTAMENTO "
-					+ "FROM UXXIRRHH.VUJA_NET_BEP_RH_DEPTO_SECC_AREA uvnbrdsa";
+					+ "FROM UXXIRRHH.VUJA_NET_BEP_RH_DEPTO_SECC_AREA uvnbrdsa ORDER BY uvnbrdsa.ID_DEPARTAMENTO";
 
 			try (PreparedStatement stmtSelect = conRh.prepareStatement(sqlDeptSelect)) {
 				try (ResultSet rs = stmtSelect.executeQuery()) {

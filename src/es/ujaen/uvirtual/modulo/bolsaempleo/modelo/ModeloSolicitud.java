@@ -1862,6 +1862,14 @@ public class ModeloSolicitud {
 		return false;
 	}	
 
+	/**
+	 * Crea una solicitud a partir de resultset.
+	 * @param rs .
+	 * @param archivo .
+	 * @return .
+	 * @throws SQLException .
+	 * @throws UVException .
+	 */
 	public Solicitud createSolicitudFromResultSet(ResultSet rs, boolean archivo) throws SQLException, UVException {
 		Solicitud solicitud = new Solicitud();
 		

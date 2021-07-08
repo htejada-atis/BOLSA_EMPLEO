@@ -15,6 +15,10 @@ import bbdd.BbddRunner;
  */
 public class CargaMigracionBolsaEmpleo03 {
 
+	/**
+	 * Main .
+	 * @param args .
+	 */
 	public static void main(String[] args) {
 		BbddRunner.conectarBd();
 		try {

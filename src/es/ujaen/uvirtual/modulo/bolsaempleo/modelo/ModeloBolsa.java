@@ -187,7 +187,7 @@ public class ModeloBolsa {
 	 */
 	public List<Bolsa> getBolsasPendientesBaremacion() throws SQLException, UVException {
 		List<Bolsa> bolsas = new ArrayList<>();
-		String consulta = "SELECT bepbol.* " + "FROM TBEP_BOLSAS bepbol WHERE bepbol.FLGPENBAREMACION = 'S'";
+		String consulta = "SELECT bepbol.* FROM TBEP_BOLSAS bepbol WHERE bepbol.FLGPENBAREMACION = 'S'";
 		try (Connection conexion = ConexionUvirtual.obtenerInstancia();
 				PreparedStatement stmt = conexion.prepareStatement(consulta)) {
 			try (ResultSet rs = stmt.executeQuery()) {

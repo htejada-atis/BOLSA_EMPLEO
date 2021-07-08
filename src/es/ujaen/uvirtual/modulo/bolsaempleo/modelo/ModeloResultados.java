@@ -133,7 +133,7 @@ public class ModeloResultados {
 		bol.setListaMeritosExcluidos(this.getMeritosSolicitudBolsaExcluidos(solicitud, bolsa));
 		bol.setListaMeritosNoEvaluados(this.getMeritosSolicitudBolsaNoEvaluados(solicitud, bolsa));
 		
-		Date fechaActual = new java.sql.Date(BolsaEmpleoUtils.getCurrentDateTime().getTime());
+		Date fechaActual = new Date(BolsaEmpleoUtils.getCurrentDateTime().getTime());
 		InputStream archivoResultados = ResultadosSolicitudPDF.generarResultadosSolicitudPDF(solicitud, bol, fechaActual);
 		guardarResultadoSolicitudBolsa(bol, solicitud, archivoResultados, null, fechaActual);
 	}
@@ -215,7 +215,7 @@ public class ModeloResultados {
 	 * @throws UVException .
 	 */
 	private HashMap<String, Map.Entry<MeritoPreferente, Double>> calcularMeritosPreferentes(Solicitud solicitud, Bolsa bolsa) throws SQLException, UVException {
-		HashMap<String, Map.Entry<MeritoPreferente, Double>> preferentes = new HashMap<String, Map.Entry<MeritoPreferente, Double>>();
+		HashMap<String, Map.Entry<MeritoPreferente, Double>> preferentes = new HashMap<>();
 		
 		List<MeritoPreferente> meritosPreferentes = ModeloMeritosPreferentes.obtenerInstancia().listaMeritosPreferentesActivos();
 		
@@ -236,10 +236,12 @@ public class ModeloResultados {
 						factor = preferente.getFactor();
 					}
 					break;
+				default:
+					throw new UVException("Tipo de mérito preferentes no contemplado " + preferente.getTipo());
 			}
 			
 			if (factor != null) {
-				preferentes.put(preferente.getTipo(), new AbstractMap.SimpleEntry<MeritoPreferente, Double>(preferente, factor));
+				preferentes.put(preferente.getTipo(), new AbstractMap.SimpleEntry<>(preferente, factor));
 			}
 		}
 		
@@ -517,7 +519,7 @@ public class ModeloResultados {
 				PreparedStatement stmt = conexion.prepareStatement(consulta)) {
 			int indexParam = 1;
 			stmt.setInt(indexParam++, candidato.getCodNum());
-			stmt.setInt(indexParam++, bolsa.getCodNum());
+			stmt.setInt(indexParam++, bolsa.getArea().getCodNum());
 			
 			try (ResultSet rs = stmt.executeQuery()) {
 				return rs.next();
