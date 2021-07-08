@@ -80,7 +80,7 @@ MeritoPreferente meritoPreferente = bean.getMeritoPreferente();
 					<th scope="col" style="width:100px"></th>
 				</tr>
 				<tr>
-					<td>Total sin aplicar el máximo valor de los méritos preferentes y acreditaciones:</td>
+					<td>Total sin aplicar el máximo valor de las titulaciones preferentes y acreditaciones:</td>
 					<td><%= bolsaResultado.getTotalSinAplicar() %></td>
 				</tr>
 			<%	if (bolsaResultado.getDesgloseTotal() != null) { %>
