@@ -341,7 +341,7 @@ $(document).ready(function() {
 	    <% if (candidato != null) { %> "selected": <%= candidato.getCodNum() %> ,<% } %>
 	    "columns": [
 	    	{'data': 'prsnif'},
-	    	{'data': 'apellido1', 'order': false, 'overflow': 'auto', 'render': function(row) {
+	    	{'data': 'apellido1', 'overflow': 'auto', 'render': function(row) {
         		return row.nombre + " " + row.apellido1 + " " + row.apellido2; 
         	}},
 	        {'data': 'totalMeritosNoValidados', 'class': 'center', 'render': function(row) { return isNaN(row.totalMeritosNoValidados) ? 0 : row.totalMeritosNoValidados; } },

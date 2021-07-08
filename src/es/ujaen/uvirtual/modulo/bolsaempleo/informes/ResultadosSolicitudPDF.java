@@ -125,7 +125,7 @@ public class ResultadosSolicitudPDF extends BolsaEmpleoPDFGenerator {
 			table2.setWidths(new float[] {SIZE_65, SIZE_18});
 			
 			generarTableRow(table2, new String[] {
-					"Total sin aplicar el máximo valor de los méritos preferentes y acreditaciones:",
+					"Total sin aplicar el máximo valor de las titulaciones preferentes y acreditaciones:",
 					bolsa.getTotalSinAplicar().toString(),
 				}
 			);
