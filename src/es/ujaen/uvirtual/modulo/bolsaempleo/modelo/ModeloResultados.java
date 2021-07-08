@@ -20,7 +20,7 @@ import es.ujaen.uvirtual.modulo.bolsaempleo.beans.MeritoPreferente;
 import es.ujaen.uvirtual.modulo.bolsaempleo.beans.MeritoResultado;
 import es.ujaen.uvirtual.modulo.bolsaempleo.beans.Solicitud;
 import es.ujaen.uvirtual.modulo.bolsaempleo.beans.UsuarioBolsaEmpleo;
-import es.ujaen.uvirtual.modulo.bolsaempleo.informes.ResultadosSolicitudPDF;
+import es.ujaen.uvirtual.modulo.bolsaempleo.informes.GenerarResultadosPDF;
 import es.ujaen.uvirtual.modulo.bolsaempleo.utilidades.BolsaEmpleoDataTable;
 import es.ujaen.uvirtual.modulo.bolsaempleo.utilidades.BolsaEmpleoUtils;
 import es.ujaen.uvirtual.modulo.bolsaempleo.utilidades.BolsaEmpleoDataTable.DataTableColumn;
@@ -134,7 +134,7 @@ public class ModeloResultados {
 		bol.setListaMeritosNoEvaluados(this.getMeritosSolicitudBolsaNoEvaluados(solicitud, bolsa));
 		
 		Date fechaActual = new Date(BolsaEmpleoUtils.getCurrentDateTime().getTime());
-		InputStream archivoResultados = ResultadosSolicitudPDF.generarResultadosSolicitudPDF(solicitud, bol, fechaActual);
+		InputStream archivoResultados = GenerarResultadosPDF.generarResultadosSolicitudPDF(solicitud, bol, fechaActual);
 		guardarResultadoSolicitudBolsa(bol, solicitud, archivoResultados, null, fechaActual);
 	}
 	

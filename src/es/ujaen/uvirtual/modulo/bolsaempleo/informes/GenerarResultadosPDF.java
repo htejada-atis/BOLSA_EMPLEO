@@ -34,12 +34,12 @@ import es.ujaen.uvirtual.utilidades.UVException;
  * 
  * @author ATISoluciones
  */
-public class ResultadosSolicitudPDF extends BolsaEmpleoPDFGenerator {
+public class GenerarResultadosPDF extends BolsaEmpleoPDFGenerator {
 	
-	private static final String NOMBREDEESTACLASE = ResultadosSolicitudPDF.class.getName();
+	private static final String NOMBREDEESTACLASE = GenerarResultadosPDF.class.getName();
 	private static final Logger LOGGER = Logger.getLogger(NOMBREDEESTACLASE);
 	
-	private static final String PDF_NOMBRE = "S%sC%s P%s";
+	private static final String PDF_NOMBRE = "RS%sC%s U%s";
 	private static final String PDF_TITULO = "Informe de baremación del área: %s";
 	
 	
@@ -58,10 +58,9 @@ public class ResultadosSolicitudPDF extends BolsaEmpleoPDFGenerator {
 		
 		try (Document document = new Document()) {
 			PdfWriter.getInstance(document, out);
-
+			
 			document.open();
-			document.addAuthor(candidato.getNombre() + " " + candidato.getPrimerApellido() + " " 
-					+ candidato.getSegundoApellido());
+			document.addAuthor(PDF_AUTHOR);
 			document.addTitle(String.format(PDF_NOMBRE, solicitud.getCodNum(), solicitud.getConvocatoria().getCodNum(), candidato.getPrsNif()));
 			document.addCreationDate();
 			
