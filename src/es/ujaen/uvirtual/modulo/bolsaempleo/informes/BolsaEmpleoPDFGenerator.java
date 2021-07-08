@@ -13,6 +13,8 @@ import com.lowagie.text.Table;
  * @author ATISoluciones
  */
 public class BolsaEmpleoPDFGenerator {
+	
+	protected static final String PDF_AUTHOR = "UJA";
 		
 	// pdf properties
 	protected static final int PDF_ANCHO = 4;
@@ -26,6 +28,7 @@ public class BolsaEmpleoPDFGenerator {
 	protected static final int PDF_TABLE_PADDING = 5;
 	protected static final int PDF_TABLE_ROWS_2 = 2;
 	protected static final int PDF_TABLE_ROWS_3 = 3;
+	
 	protected static final int SIZE_8 = 8;
 	protected static final int SIZE_10 = 10;
 	protected static final int SIZE_11 = 11;
@@ -46,7 +49,10 @@ public class BolsaEmpleoPDFGenerator {
 	protected static final int COLOR_201 = 201;
 	protected static final int COLOR_241 = 241;
 	protected static final int COLOR_254 = 254;
-	protected static final int COLSPAN = 5;
+	
+	public static final int COLSPAN_5 = 5;
+	
+	public static final int NUMBER_100 = 100;
 	
 	protected static Color whiteColor = new Color(0, 0, 0);
 	protected static Color lightBlueColor = new Color(COLOR_185, COLOR_201, COLOR_254);
@@ -104,5 +110,4 @@ public class BolsaEmpleoPDFGenerator {
 			table.addCell(cell);
 		}
 	}
-	
 }

@@ -137,7 +137,7 @@ public class ControladorMisSolicitudes extends HttpServlet {
 	public static final String JSP_PASO1 = RUTA_BEP_SOL + "paso1.jsp";
 	public static final String JSP_PASO2 = RUTA_BEP_SOL + "paso2.jsp";
 	public static final String JSP_PASO3 = RUTA_BEP_SOL + "paso3.jsp";
-		
+	
 	// ajax
 	public static final String URL_PATTERN_AJAX = "/srv/es/ajax/informacionadministrativa/bolsaempleo/missolicitudes";
 	public static final String RESPONSE_AJAX_CONTENTTYPE = "application/json";
@@ -154,7 +154,7 @@ public class ControladorMisSolicitudes extends HttpServlet {
 	public static final int SIZE_10 = 10;
 	public static final int SIZE_20 = 20;
 	public static final int SIZE_30 = 30;
-	public static final int SIZE_100 = 100;	
+	public static final int SIZE_100 = 100;
 	public static final int COLOR_51 = 51;
 	public static final int COLOR_153 = 153;
 	public static final int COLOR_185 = 185;
