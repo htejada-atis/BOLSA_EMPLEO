@@ -261,7 +261,6 @@ public class ControladorValidar extends HttpServlet {
 	
 	private void meritoSeleccionado(VistaValidar bean, UVDatos datos, HttpServletRequest request, HttpServletResponse response, String nombreAccion) 
 			throws SQLException, UVException, IOException {
-		
 		ModeloBaremacionItems modeloItem = ModeloBaremacionItems.obtenerInstancia();
 		ModeloSolicitud modeloSolicitud = ModeloSolicitud.obtenerInstancia();
 		
@@ -298,27 +297,30 @@ public class ControladorValidar extends HttpServlet {
 		
 		try {
 			if (EscapaHTML.ajustaCodificacion(request.getParameter(PARAM_VALOR)) != null) {
-				Merito merito = bean.getMerito().getMerito();
+				Merito merito = new Merito(bean.getMerito().getMerito());
 				// item de baremación
 				Integer idItem = Formateador.leeParametroInteger(request.getParameter(PARAM_ITEM));
 				ItemBaremacion item = ModeloBaremacionItems.obtenerInstancia().getItemBaremacionById(idItem);
+				merito.setItemBaremacion(item);
 				
 				// valor
 				Double valor = ModeloMerito.validateValorDelMerito(request.getParameter(PARAM_VALOR), merito);
+				merito.setValor(valor);
 				
-				if (!valor.equals(merito.getValor()) || !item.equals(merito.getItemBaremacion())) {
+				if (!valor.equals(bean.getMerito().getMerito().getValor()) || !item.equals(bean.getMerito().getMerito().getItemBaremacion())) {
 					ModeloSolicitud modeloSolicitud = ModeloSolicitud.obtenerInstancia();
 					ModeloValidar modeloValidar = ModeloValidar.obtenerInstancia();
 					
 					Solicitud solicitud = modeloSolicitud.getSolicitudCerradaByConvocatoriaUsuario(bean.getCandidato(), bean.getConvocatoria());
 					
-					if (!item.equals(merito.getItemBaremacion())) {
+					if (!item.equals(bean.getMerito().getMerito().getItemBaremacion())) {
 						// comprobamos que el total de méritos por bloque de la solicitud sea menor que
 						// el permitido por la convocatoria
 						merito.setItemBaremacion(item);
 						Integer totalMeritos = modeloSolicitud.obtenerTotalMeritosPorBloqueSolicitud(solicitud, bean.getBolsa(), merito);
-						
-						if (totalMeritos >= bean.getConvocatoria().getNumMeritosPorBloque()) {
+						if (totalMeritos >= bean.getConvocatoria().getNumMeritosPorBloque()
+								&& !merito.getItemBaremacion().getBloqueBaremacion().getApartadoBaremacion().equals(
+										bean.getMerito().getMerito().getItemBaremacion().getBloqueBaremacion().getApartadoBaremacion())) {
 							throw new UVException(MENSAJE_ERROR_NUMERO_MAXIMO_MERITOS_BLOQUE);
 						}
 					}
@@ -326,9 +328,6 @@ public class ControladorValidar extends HttpServlet {
 					modeloValidar.borrarValoracionesMerito(bean.getMerito().getMerito(), solicitud, bean.getUsuarioLogeado());
 					modeloValidar.borrarEvaluacionMerito(bean.getMerito().getMerito(), solicitud, bean.getUsuarioLogeado());
 				}
-				
-				merito.setItemBaremacion(item);
-				merito.setValor(valor);
 				
 				ModeloMerito.obtenerInstancia().actualizaMerito(merito, bean.getUsuarioLogeado());
 				BolsaEmpleoUtils.addMensajeDeExito(MENSAJE_EXITO_MERITO_MODIFICAR, bean, request);

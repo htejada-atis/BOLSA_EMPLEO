@@ -95,6 +95,7 @@ public class ControladorValidarNoAfines extends HttpServlet {
 	public static final String MENSAJE_ERROR_NUMERO_MAXIMO_MERITOS_BLOQUE = "Se ha alcanzado el número máximo de méritos por bloque";
 	public static final String MENSAJE_ERROR_SIN_PERMISO_PERSONAL = "No tienes permiso de personal";
 	public static final String MENSAJE_EXITO_MERITO_EXCLUIDO = "Mérito excluido correctamente para la bolsa: %s";
+	public static final String MENSAJE_EXITO_MERITO_MODIFICAR = "Mérito modificado correctamente";
 	public static final String MENSAJE_EXITO_MERITO_MODIFICAR_AFINIDAD = "El mérito ha pasado a tener afinidad";
 	public static final String MENSAJE_EXITO_MERITO_VALIDADO = "Mérito validado correctamente para la bolsa: %s";
 	
@@ -288,28 +289,38 @@ public class ControladorValidarNoAfines extends HttpServlet {
 			}
 			
 			if (EscapaHTML.ajustaCodificacion(request.getParameter(PARAM_VALOR)) != null) {
-				Merito merito = bean.getMerito().getMerito();
+				Merito merito = new Merito(bean.getMerito().getMerito());
 				
 				// item de baremación
 				Integer idItem = Formateador.leeParametroInteger(request.getParameter(PARAM_ITEM));
 				ItemBaremacion item = ModeloBaremacionItems.obtenerInstancia().getItemBaremacionById(idItem);
+				merito.setItemBaremacion(item);
 				
 				// valor
 				Double valor = ModeloMerito.validateValorDelMerito(request.getParameter(PARAM_VALOR), merito);
 				merito.setValor(valor);
 				bean.getMerito().setValor(valor);
 				
-				if (!item.equals(merito.getItemBaremacion())) {
+				if (!item.equals(bean.getMerito().getMerito().getItemBaremacion())) {
 					ModeloSolicitud modeloSolicitud = ModeloSolicitud.obtenerInstancia();
 					Solicitud solicitud = modeloSolicitud.getSolicitudCerradaByConvocatoriaUsuario(bean.getCandidato(), bean.getConvocatoria());
-					merito.setItemBaremacion(item);
+					
 					Integer totalMeritos = modeloSolicitud.obtenerTotalMeritosPorBloqueSolicitud(solicitud, bean.getBolsa(), merito);
 					
-					if (totalMeritos >= bean.getConvocatoria().getNumMeritosPorBloque()) {
+					if (totalMeritos >= bean.getConvocatoria().getNumMeritosPorBloque()
+							&& !merito.getItemBaremacion().getBloqueBaremacion().getApartadoBaremacion().equals(
+									bean.getMerito().getMerito().getItemBaremacion().getBloqueBaremacion().getApartadoBaremacion())) {
 						throw new UVException(MENSAJE_ERROR_NUMERO_MAXIMO_MERITOS_BLOQUE);
 					}
 					
 					modeloValidar.borrarEvaluacionMerito(bean.getMerito().getMerito(), solicitud, bean.getUsuarioLogeado());
+					
+					if (item.getAfinidad() != null) {
+						BolsaEmpleoUtils.addMensajeDeExito(MENSAJE_EXITO_MERITO_MODIFICAR_AFINIDAD, bean, request);
+						afinidad = true;
+					} else {
+						BolsaEmpleoUtils.addMensajeDeExito(MENSAJE_EXITO_MERITO_MODIFICAR, bean, request);
+					}
 				} else if (EscapaHTML.ajustaCodificacion(request.getParameter(PARAM_ACEPTAR_MERITO)) != null) {
 					for (String idBolsa : bolsas) {
 						modeloValidar.validarMerito(idBolsa, bean.getMerito(), observacionCandidato,
@@ -326,13 +337,7 @@ public class ControladorValidarNoAfines extends HttpServlet {
 					}
 				}
 				
-				merito.setItemBaremacion(item);
 				ModeloMerito.obtenerInstancia().actualizaMerito(merito, bean.getUsuarioLogeado());
-				
-				if (item.getAfinidad() != null) {
-					BolsaEmpleoUtils.addMensajeDeExito(MENSAJE_EXITO_MERITO_MODIFICAR_AFINIDAD, bean, request);
-					afinidad = true;
-				}
 			}
 			
 		} catch (Exception ex) {
