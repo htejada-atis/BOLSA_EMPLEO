@@ -18,6 +18,7 @@ public class BolsaResultado extends Bolsa implements Serializable {
 	private List<MeritoResultado> listaMeritos;
 	private List<MeritoResultado> listaMeritosExcluidos;
 	private List<MeritoResultado> listaMeritosNoEvaluados;
+	private Boolean resultadoActual;
 	
 	
 	/** Constructor por defecto .
@@ -63,6 +64,15 @@ public class BolsaResultado extends Bolsa implements Serializable {
 		this.desgloseDescripcion = pdesgloseDescripcion;
 		this.total = ptotal;
 		this.totalSinAplicar = ptotalSinAplicar;
+	}
+	
+	/** Constructor con parametros .
+	 * @param pbolsa .
+	 * @param presultadoActual .
+	 */
+	public BolsaResultado(Bolsa pbolsa, Boolean presultadoActual) {
+		super(pbolsa);
+		this.resultadoActual = presultadoActual;
 	}
 	
 	public String getDesgloseTotal() {
@@ -133,11 +143,20 @@ public class BolsaResultado extends Bolsa implements Serializable {
 		this.listaMeritosNoEvaluados = listaMeritosNoEvaluados;
 	}
 	
+	public Boolean isResultadoActual() {
+		return resultadoActual;
+	}
+
+	public void setResultadoActual(Boolean resultadoActual) {
+		this.resultadoActual = resultadoActual;
+	}
+	
 	@Override
 	public String toString() {
 		return "BolsaResultado [bolsa=" + super.toString() + ", desgloseTotal=" + desgloseTotal + ", desgloseDescripcion=" + desgloseDescripcion 
 				+ ", total=" + total + ", totalSinAplicar=" + totalSinAplicar + ", archivo=" + archivo + ", meritos=" + listaMeritos 
-				+ ", listaMeritosExcluidos=" + listaMeritosExcluidos + ", listaMeritosNoEvaluados=" + listaMeritosNoEvaluados + "]";
+				+ ", listaMeritosExcluidos=" + listaMeritosExcluidos + ", listaMeritosNoEvaluados=" + listaMeritosNoEvaluados
+				+ ", resultadoActual=" + resultadoActual + "]";
 	}
 	
 	@Override
@@ -153,6 +172,7 @@ public class BolsaResultado extends Bolsa implements Serializable {
 		result = prime * result + ((listaMeritos == null) ? 0 : listaMeritos.hashCode());
 		result = prime * result + ((listaMeritosExcluidos == null) ? 0 : listaMeritosExcluidos.hashCode());
 		result = prime * result + ((listaMeritosNoEvaluados == null) ? 0 : listaMeritosNoEvaluados.hashCode());
+		result = prime * result + ((resultadoActual == null) ? 0 : resultadoActual.hashCode());
 		return result;
 	}
 
@@ -226,6 +246,13 @@ public class BolsaResultado extends Bolsa implements Serializable {
 				return false;
 			}
 		} else if (!listaMeritosNoEvaluados.equals(other.listaMeritosNoEvaluados)) {
+			return false;
+		}
+		if (resultadoActual == null) {
+			if (other.resultadoActual != null) {
+				return false;
+			}
+		} else if (!resultadoActual.equals(other.resultadoActual)) {
 			return false;
 		}
 		

@@ -380,15 +380,13 @@ public class ControladorUsuarioBolsaEmpleo extends HttpServlet {
 				BolsaEmpleoDataTable<Bolsa> dataTable = ModeloArea.obtenerInstancia().listaAreasEvaluadorDatatable(request.getParameterMap(), bean.getUsuario());
 				bean.setDatatableAreasEvaluables(dataTable);
 				writer.write(dataTable.toJson());
-			} catch (UVException e) {
-				LOGGER.log(Level.WARNING, e.toString());
-				bean.getMensajesDeError().add(e.getMessage());
-				CodigoDescripcion mensaje = new CodigoDescripcion(RESPONSE_AJAX_ERROR, e.getMessage());
-				writer.write(new Gson().toJson(mensaje));
-				response.setStatus(RESPONSE_AJAX_HTTP_CODE_ERROR);
-			} catch (SQLException e) { 
-				LOGGER.log(Level.SEVERE, Formateador.getStackTrace(e));
-				LOGGER.log(Level.SEVERE, e.toString());
+			} catch (UVException | SQLException e) {
+				if (e.getClass().equals(SQLException.class)) {
+					LOGGER.log(Level.SEVERE, Formateador.getStackTrace(e));
+					LOGGER.log(Level.SEVERE, e.toString());
+				} else {
+					LOGGER.log(Level.WARNING, e.toString());
+				}
 				bean.getMensajesDeError().add(e.getMessage());
 				CodigoDescripcion mensaje = new CodigoDescripcion(RESPONSE_AJAX_ERROR, e.getMessage());
 				writer.write(new Gson().toJson(mensaje));
@@ -418,15 +416,13 @@ public class ControladorUsuarioBolsaEmpleo extends HttpServlet {
 				BolsaEmpleoDataTable<UsuarioBolsaEmpleo> dataTable = modelo.listaUsuarioBolsaEmpleoDatatable(request.getParameterMap());
 				bean.setDatatableUsuarios(dataTable);
 				writer.write(dataTable.toJson());
-			} catch (UVException e) {
-				LOGGER.log(Level.WARNING, e.toString());
-				bean.getMensajesDeError().add(e.getMessage());
-				CodigoDescripcion mensaje = new CodigoDescripcion(RESPONSE_AJAX_ERROR, e.getMessage());
-				writer.write(new Gson().toJson(mensaje));
-				response.setStatus(RESPONSE_AJAX_HTTP_CODE_ERROR);
-			} catch (SQLException e) { 
-				LOGGER.log(Level.SEVERE, Formateador.getStackTrace(e));
-				LOGGER.log(Level.SEVERE, e.toString());
+			} catch (UVException | SQLException e) {
+				if (e.getClass().equals(SQLException.class)) {
+					LOGGER.log(Level.SEVERE, Formateador.getStackTrace(e));
+					LOGGER.log(Level.SEVERE, e.toString());
+				} else {
+					LOGGER.log(Level.WARNING, e.toString());
+				}
 				bean.getMensajesDeError().add(e.getMessage());
 				CodigoDescripcion mensaje = new CodigoDescripcion(RESPONSE_AJAX_ERROR, e.getMessage());
 				writer.write(new Gson().toJson(mensaje));

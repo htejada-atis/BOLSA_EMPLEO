@@ -65,6 +65,7 @@ public class Bolsa implements Serializable {
 		this.fechaActualizacion = copia.fechaActualizacion;
 		this.fechaBloqueo = copia.fechaBloqueo;
 		this.fechaDesBloqueo = copia.fechaDesBloqueo;
+		this.fechaBaremacion = copia.fechaBaremacion;
 	}
 	
 	public Integer getCodNum() {

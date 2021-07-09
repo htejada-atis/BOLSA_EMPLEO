@@ -38,18 +38,6 @@ VistaResultados bean = (VistaResultados)uvdatos.getVistas().get(VistaResultados.
 <script>
 $(document).ready(function() {
 	
-	function isBolsaBaremada(fechaBaremacion) {
-		if (fechaBaremacion) {
-			var fechaConvocatoria = '<%= Formateador.formatoFecha(bean.getConvocatoria().getFechaCierre(), Formateador.FORMATO_FECHA_DDMMYYYY) %>';
-    		var parts = fechaConvocatoria.split("/");
-    		var date = new Date(Number(parts[2]), Number(parts[1]) - 1, Number(parts[0]));
-    		
-    		return Date.parse(fechaBaremacion) > Date.parse(date);
-		} else {
-			return false;
-		}
-	}
-	
 	var tableAreas = new Atis.DataTable('#tableAreas', {
 	    "ajax": { url: "<%= ControladorResultados.URL_PATTERN_AJAX %>" },
 	    "pageSize": 20,
@@ -61,7 +49,7 @@ $(document).ready(function() {
 	    	{'data': 'area.idAreaExterno', 'filter': {'type': 'number'}},
 	        {'data': 'area.descripcion', 'filter': true, 'overflow': 'auto'},
 	        {'data': 'codNum', 'filter': {'type': 'date'}, 'render': function(row) {
-	        		return isBolsaBaremada(row.fechaBaremacion) ? row.fechaBaremacion : '';
+	        		return row.resultadoActual ? row.fechaBaremacion : '';
 	        	}
 	        },
 	        {'data': 'codnum', 'buttons': [{'label': 'Ver resultados', 
@@ -73,7 +61,7 @@ $(document).ready(function() {
 			    		Atis.sendForm("<%= request.getRequestURI() %>", params);
 		        	},
 		        	'visible': function(row) {
-		        		return isBolsaBaremada(row.fechaBaremacion);
+		        		return row.resultadoActual;
 	        		}
 	        	}]
 	        }

@@ -19,7 +19,7 @@ import es.ujaen.uvirtual.modulo.bolsaempleo.utilidades.BolsaEmpleoDataTable;
 public class VistaResultados extends Vista implements Serializable {
 	
 	private static final long serialVersionUID = 1L;
-	private transient BolsaEmpleoDataTable<Bolsa> dataTableBolsas;
+	private transient BolsaEmpleoDataTable<BolsaResultado> dataTableBolsas;
 	private transient BolsaEmpleoDataTable<CandidatoResultadoTable> dataTableCandidatos;
 	private Bolsa bolsa;
 	private BolsaResultado bolsaResultado;
@@ -61,11 +61,11 @@ public class VistaResultados extends Vista implements Serializable {
 		this.usuarioLogeado = usuario;
 	}
 	
-	public BolsaEmpleoDataTable<Bolsa> getDataTableBolsas() {
+	public BolsaEmpleoDataTable<BolsaResultado> getDataTableBolsas() {
 		return dataTableBolsas;
 	}
 
-	public void setDataTableBolsas(BolsaEmpleoDataTable<Bolsa> dataTableBolsas) {
+	public void setDataTableBolsas(BolsaEmpleoDataTable<BolsaResultado> dataTableBolsas) {
 		this.dataTableBolsas = dataTableBolsas;
 	}
 
