@@ -30,7 +30,7 @@ import es.ujaen.uvirtual.utilidades.Formateador;
 import es.ujaen.uvirtual.utilidades.UVException;
 
 /**
- * Clase para generar pdfs de la bolsa de empleo.
+ * Clase para generar pdfs de resultados .
  * 
  * @author ATISoluciones
  */
@@ -50,7 +50,7 @@ public class GenerarResultadosPDF extends BolsaEmpleoPDFGenerator {
 	 * @return InputStream .
 	 * @throws UVException .
 	 */
-	public static InputStream generarResultadosSolicitudPDF(Solicitud solicitud, BolsaResultado bolsa, Date fechaActual) throws UVException {
+	public static InputStream generarPDF(Solicitud solicitud, BolsaResultado bolsa, Date fechaActual) throws UVException {
 		initPDFProperties();
 		
 		UsuarioBolsaEmpleo candidato = solicitud.getUsuario();

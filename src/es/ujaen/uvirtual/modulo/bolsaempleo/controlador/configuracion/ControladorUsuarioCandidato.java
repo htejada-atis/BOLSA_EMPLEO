@@ -27,7 +27,7 @@ import es.ujaen.uvirtual.modulo.bolsaempleo.beans.ParametrosConfiguracion;
 import es.ujaen.uvirtual.modulo.bolsaempleo.beans.Solicitud;
 import es.ujaen.uvirtual.modulo.bolsaempleo.beans.TitulacionUsuario;
 import es.ujaen.uvirtual.modulo.bolsaempleo.beans.UsuarioBolsaEmpleo;
-import es.ujaen.uvirtual.modulo.bolsaempleo.controlador.candidato.ControladorMisSolicitudes;
+import es.ujaen.uvirtual.modulo.bolsaempleo.informes.GenerarSolicitudPDF;
 import es.ujaen.uvirtual.modulo.bolsaempleo.modelo.ModeloArea;
 import es.ujaen.uvirtual.modulo.bolsaempleo.modelo.ModeloBaremacionApartados;
 import es.ujaen.uvirtual.modulo.bolsaempleo.modelo.ModeloMerito;
@@ -404,7 +404,7 @@ public class ControladorUsuarioCandidato extends HttpServlet {
 		
 		bean.getSolicitud().setEstado(ModeloSolicitud.SOLICITUD_ESTADO_CERRADA);
 		bean.getSolicitud().setFechaConfirmacion(BolsaEmpleoUtils.getCurrentDateTime());
-		bean.getSolicitud().setArchivo(ControladorMisSolicitudes.generarPDF(bean.getCandidato(), bean.getSolicitud(), listaBolsas));
+		bean.getSolicitud().setArchivo(GenerarSolicitudPDF.generarPDF(bean.getSolicitud(), listaBolsas));
 		
 		modeloSolicitud.confirmacionSolicitud(bean.getSolicitud(), bean.getCandidato());
 		

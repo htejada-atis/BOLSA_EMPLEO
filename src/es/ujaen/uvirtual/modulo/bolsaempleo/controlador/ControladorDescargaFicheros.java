@@ -15,7 +15,6 @@ import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-
 import com.lowagie.text.Cell;
 import com.lowagie.text.Chunk;
 import com.lowagie.text.Document;
@@ -26,7 +25,6 @@ import com.lowagie.text.Phrase;
 import com.lowagie.text.Table;
 import com.lowagie.text.alignment.HorizontalAlignment;
 import com.lowagie.text.pdf.PdfWriter;
-
 import es.ujaen.uvirtual.beans.UVDatos;
 import es.ujaen.uvirtual.beans.Usuario;
 import es.ujaen.uvirtual.modulo.bolsaempleo.beans.ApartadoBaremacion;
@@ -41,6 +39,7 @@ import es.ujaen.uvirtual.modulo.bolsaempleo.beans.MeritoPreferenteUsuario;
 import es.ujaen.uvirtual.modulo.bolsaempleo.beans.Solicitud;
 import es.ujaen.uvirtual.modulo.bolsaempleo.beans.TitulacionUsuario;
 import es.ujaen.uvirtual.modulo.bolsaempleo.beans.UsuarioBolsaEmpleo;
+import es.ujaen.uvirtual.modulo.bolsaempleo.informes.GenerarItemsBaremacionPDF;
 import es.ujaen.uvirtual.modulo.bolsaempleo.modelo.ModeloBaremacionApartados;
 import es.ujaen.uvirtual.modulo.bolsaempleo.modelo.ModeloBaremacionBloques;
 import es.ujaen.uvirtual.modulo.bolsaempleo.modelo.ModeloBaremacionItems;
@@ -106,28 +105,6 @@ public class ControladorDescargaFicheros extends HttpServlet {
 	public static final String MENSAJE_ERROR_ACCION_NO_CONTEMPLADA = "Acción no contemplada";
 	public static final String MENSAJE_ERROR_GENERANDO_PDF_SOLICITUD = "Error al generar pdf de la solicitud";
 	public static final String MENSAJE_ERROR_SIN_PERMISO = "No tienes permiso para acceder a este archivo";
-	
-	// pdf items baremacion
-	public static final int PDF_ANCHO = 4;
-	public static final int PDF_ALTO = 4;
-	public static final int PDF_FORMATO = 4;
-	public static final int PDF_TABLE_COLUMNS = 5;
-	public static final int PDF_TABLE_PADDING = 5;
-	public static final int SIZE_8 = 8;
-	public static final int SIZE_10 = 10;
-	public static final int SIZE_40 = 40;
-	public static final int SIZE_100_WIDTH = 100;	
-	public static final int[] SIZE_100 = {10, 60, 10, 10, 10};	
-	
-	public static final int COLOR_51 = 51;
-	public static final int COLOR_112 = 112;
-	public static final int COLOR_153 = 153;
-	public static final int COLOR_185 = 185;
-	public static final int COLOR_201 = 201;
-	public static final int COLOR_241 = 241;
-	public static final int COLOR_254 = 254;
-	public static final int COLSPAN = 5;
-	public static final int INDENTATION_LIST = 20;
 	
 	// Urls
 	public static final String URL_DESCARGA_FICHEROS = "/srv/es/informacionadministrativa/bolsaempleo/descargaficheros";
@@ -482,140 +459,7 @@ public class ControladorDescargaFicheros extends HttpServlet {
 	
 	private void descargaResumenItemsBaremacion(UVDatos datos, HttpServletResponse response)
 			throws SQLException, UVException {
-		descargarPDF(datos, response, generarPDFItemsBaremacion(datos.getUsuario()));
+		descargarPDF(datos, response, GenerarItemsBaremacionPDF.generarPDF());
 	}
 	
-	private InputStream generarPDFItemsBaremacion(Usuario usu) throws UVException, SQLException {
-		ByteArrayOutputStream out = new ByteArrayOutputStream();
-		ModeloBaremacionItems modelo = ModeloBaremacionItems.obtenerInstancia();
-		List<ItemBaremacion> listaItems = modelo.listaItemBaremacion();
-		
-		try (Document document = new Document()) {
-			// create a PDF writer instance and pass output stream
-			PdfWriter.getInstance(document, out);
-
-			document.open();
-			document.addAuthor(usu.getApellidosYNombre());
-			document.addTitle("Listado_Items");
-			document.addCreationDate();
-
-			document.add(new Paragraph(new Chunk("Listado de Items", FontFactory.getFont(FontFactory.HELVETICA, SIZE_40, Font.BOLDITALIC))));
-				        
-			this.generarPDFTable(listaItems, document);
-		} catch (Exception exp) {
-			throw new UVException("Error generando pdf, consulte con los administradores" + exp);
-		}
-		
-		return new ByteArrayInputStream(out.toByteArray());
-	}
-	
-	private void generarPDFTable(List<ItemBaremacion> listaItems, Document document) throws SQLException, UVException {
-		Table table = new Table(PDF_TABLE_COLUMNS, listaItems.size());
-		ModeloBaremacionBloques modeloBloque = ModeloBaremacionBloques.obtenerInstancia();
-		ModeloBaremacionApartados modeloApartado = ModeloBaremacionApartados.obtenerInstancia();
-		List<BloqueBaremacion> listaBloques = modeloBloque.listaBloqueBaremacion();
-		List<ApartadoBaremacion> listaApartados = modeloApartado.listaApartadoBaremacionActivosOrdenadosPorCodigo();
-
-		this.generarPDFTableHeader(table);
-		
-		for (ApartadoBaremacion apa: listaApartados) {
-			Cell cell = new Cell(new Paragraph(
-					"Apartado " + apa.getCodigo() + " - " + apa.getNombre(), new Font(Font.HELVETICA, SIZE_8)));
-			cell.setBackgroundColor(new Color(COLOR_112, COLOR_112, COLOR_112));
-			cell.setColspan(COLSPAN);
-			cell.setHorizontalAlignment(HorizontalAlignment.CENTER);
-			table.addCell(cell);
-			for (BloqueBaremacion bloq: listaBloques) {
-				if (bloq.getApartadoBaremacion().getCodNum().equals(apa.getCodNum())) {
-					cell = new Cell(new Paragraph(
-							"Bloque " + bloq.getCodigo() + " - " + bloq.getNombre(), new Font(Font.HELVETICA, SIZE_8)));
-					cell.setBackgroundColor(new Color(COLOR_185, COLOR_185, COLOR_185));
-					cell.setColspan(COLSPAN);
-					cell.setHorizontalAlignment(HorizontalAlignment.CENTER);
-					table.addCell(cell);
-					for (ItemBaremacion item: listaItems) {
-						if (item.getBloqueBaremacion().getCodNum().equals(bloq.getCodNum())) {
-							String codigoItem = item.getBloqueBaremacion().getApartadoBaremacion().getCodigo() + "." 
-									+ item.getBloqueBaremacion().getCodigo() + "." 
-									+ item.getCodigo();
-							
-							cell = new Cell(new Paragraph(
-									codigoItem, new Font(Font.HELVETICA, SIZE_8)));
-							cell.setBackgroundColor(new Color(COLOR_241, COLOR_241, COLOR_241));
-							cell.setHorizontalAlignment(HorizontalAlignment.CENTER);
-							table.addCell(cell);
-							
-							String nombre = item.getNombre();
-							if (item.getDescripcion() != null) {
-								nombre = item.getNombre() + " ( " + item.getDescripcion() + " )";
-							}
-							
-							cell = new Cell(new Paragraph(nombre, new Font(Font.HELVETICA, SIZE_8)));
-							cell.setBackgroundColor(new Color(COLOR_241, COLOR_241, COLOR_241));
-							table.addCell(cell);
-							cell = new Cell(new Paragraph(
-									item.getValor().toString(), new Font(Font.HELVETICA, SIZE_8)));
-							cell.setBackgroundColor(new Color(COLOR_241, COLOR_241, COLOR_241));
-							cell.setHorizontalAlignment(HorizontalAlignment.CENTER);
-							table.addCell(cell);
-							cell = new Cell(new Paragraph(item.getAfinidad() != null ? item.getAfinidad().toString() : item.getAfinidad(),
-									new Font(Font.HELVETICA, SIZE_8)));
-							cell.setBackgroundColor(new Color(COLOR_241, COLOR_241, COLOR_241));
-							cell.setHorizontalAlignment(HorizontalAlignment.CENTER);
-							table.addCell(cell);
-							cell = new Cell(new Paragraph(item.getIndividualizado() ? "Si" : "No",
-									new Font(Font.HELVETICA, SIZE_8)));
-							cell.setBackgroundColor(new Color(COLOR_241, COLOR_241, COLOR_241));
-							cell.setHorizontalAlignment(HorizontalAlignment.CENTER);
-							table.addCell(cell);
-						}
-					}
-				}
-			}
-		}
-		document.add(table);
-	}
-	
-	private void generarPDFTableHeader(Table table) {
-		table.setBorderWidth(1);
-		table.setBorderColor(new Color(0, 0, 0));
-		table.setPadding(PDF_TABLE_PADDING);
-		table.setWidth(SIZE_100_WIDTH);
-		table.setWidths(SIZE_100);
-
-		Font font = new Font(Font.HELVETICA, SIZE_10);
-		font.setColor(new Color(0, COLOR_51, COLOR_153));
-
-		Phrase phrase = new Phrase("Código", font);
-		Cell cell = new Cell(phrase);
-		cell.setHeader(true);
-		cell.setBackgroundColor(new Color(COLOR_185, COLOR_201, COLOR_254));
-		table.addCell(cell);
-
-		Phrase phrase2 = new Phrase("Nombre", font);
-		cell = new Cell(phrase2);
-		cell.setHeader(true);
-		cell.setBackgroundColor(new Color(COLOR_185, COLOR_201, COLOR_254));
-		table.addCell(cell);
-
-		Phrase phrase3 = new Phrase("Valor Unitario", font);
-		cell = new Cell(phrase3);
-		cell.setHeader(true);
-		cell.setBackgroundColor(new Color(COLOR_185, COLOR_201, COLOR_254));
-		table.addCell(cell);
-
-		Phrase phrase4 = new Phrase("Afinidad", font);
-		cell = new Cell(phrase4);
-		cell.setHeader(true);
-		cell.setBackgroundColor(new Color(COLOR_185, COLOR_201, COLOR_254));
-		table.addCell(cell);
-		table.endHeaders();
-		
-		Phrase phrase5 = new Phrase("Individualizado", font);
-		cell = new Cell(phrase5);
-		cell.setHeader(true);
-		cell.setBackgroundColor(new Color(COLOR_185, COLOR_201, COLOR_254));
-		table.addCell(cell);
-		table.endHeaders();
-	}
 }

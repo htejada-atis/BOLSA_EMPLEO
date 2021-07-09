@@ -13,10 +13,7 @@ import com.lowagie.text.Cell;
 import com.lowagie.text.Chunk;
 import com.lowagie.text.Document;
 import com.lowagie.text.DocumentException;
-import com.lowagie.text.Font;
-import com.lowagie.text.FontFactory;
 import com.lowagie.text.Paragraph;
-import com.lowagie.text.Phrase;
 import com.lowagie.text.Table;
 import com.lowagie.text.pdf.PdfWriter;
 import es.ujaen.uvirtual.modulo.bolsaempleo.beans.BolsaSolicitud;
@@ -33,6 +30,11 @@ import es.ujaen.uvirtual.modulo.bolsaempleo.modelo.ModeloTitulacion;
 import es.ujaen.uvirtual.utilidades.Formateador;
 import es.ujaen.uvirtual.utilidades.UVException;
 
+/**
+ * Clase para generar pdfs de solicitudes .
+ * 
+ * @author ATISoluciones
+ */
 public class GenerarSolicitudPDF extends BolsaEmpleoPDFGenerator {
 	
 	private static final String NOMBREDEESTACLASE = GenerarResultadosPDF.class.getName();
@@ -44,14 +46,13 @@ public class GenerarSolicitudPDF extends BolsaEmpleoPDFGenerator {
 	public static final String MENSAJE_AREA_SIN_MERITOS = "No hay méritos asignados a éste área.";
 	
 	
-	/**
-	 * generar PDF de la solicitud .
+	/** Generar PDF de la solicitud .
 	 * @param solicitud .
 	 * @param bolsasSolicitud .
 	 * @return InputStream .
 	 * @throws UVException .
 	 */
-	public static InputStream generarSolicitudPDF(Solicitud solicitud, List<BolsaSolicitud> bolsasSolicitud) throws UVException {
+	public static InputStream generarPDF(Solicitud solicitud, List<BolsaSolicitud> bolsasSolicitud) throws UVException {
 		initPDFProperties();
 		
 		UsuarioBolsaEmpleo candidato = solicitud.getUsuario();
@@ -104,9 +105,15 @@ public class GenerarSolicitudPDF extends BolsaEmpleoPDFGenerator {
 	}
 	
 	private static void generarAreaPDF(BolsaSolicitud bolsa, List<BolsaSolicitud> bolsasSolicitud, Document document) {
-		Table table = new Table(PDF_TABLE_COLUMNS_5, bolsasSolicitud.size());
-
-		generarPDFAreaHeader(table);
+		LinkedHashMap<String, Float> headerColumns = new LinkedHashMap<String, Float>();
+		headerColumns.put("Cod. Mérito", (float) SIZE_10);
+		headerColumns.put("Mérito", (float) SIZE_30);
+		headerColumns.put("Valor", (float) SIZE_10);
+		headerColumns.put("Descripción", (float) SIZE_30);
+		headerColumns.put("Afinidad", (float) SIZE_20);
+		
+		Table table = generarTable(PDF_TABLE_COLUMNS_5, bolsasSolicitud.size());
+		generarTableHeader(table, headerColumns);
 
 		if (bolsa.getNumeroMeritos() != null && bolsa.getNumeroMeritos() > 0) {
 			for (MeritoSolicitudTable merito: bolsa.getListaMeritos()) {
@@ -114,19 +121,6 @@ public class GenerarSolicitudPDF extends BolsaEmpleoPDFGenerator {
 						+ merito.getMerito().getItemBaremacion().getBloqueBaremacion().getApartadoBaremacion().getCodigo() + "." 
 						+ merito.getMerito().getItemBaremacion().getBloqueBaremacion().getCodigo() + "." 
 						+ merito.getMerito().getItemBaremacion().getCodigo();
-				
-				Cell cell = new Cell(codigoItem);
-				cell.setBackgroundColor(new Color(COLOR_241, COLOR_241, COLOR_241));
-				table.addCell(cell);
-				cell = new Cell(merito.getMerito().getItemBaremacion().getNombre());
-				cell.setBackgroundColor(new Color(COLOR_241, COLOR_241, COLOR_241));
-				table.addCell(cell);
-				cell = new Cell(merito.getMerito().getValor().toString());
-				cell.setBackgroundColor(new Color(COLOR_241, COLOR_241, COLOR_241));
-				table.addCell(cell);
-				cell = new Cell(merito.getMerito().getDescripcion());
-				cell.setBackgroundColor(new Color(COLOR_241, COLOR_241, COLOR_241));
-				table.addCell(cell);
 				
 				String afinidad = "";
 				
@@ -143,10 +137,14 @@ public class GenerarSolicitudPDF extends BolsaEmpleoPDFGenerator {
 					}
 				}
 				
-				cell = new Cell(afinidad);
-				cell.setBackgroundColor(new Color(COLOR_241, COLOR_241, COLOR_241));
-				table.addCell(cell);
-						
+				generarTableRow(table, new String[] {
+						codigoItem,
+						merito.getMerito().getItemBaremacion().getNombre(),
+						merito.getMerito().getValor().toString(),
+						merito.getMerito().getDescripcion(),
+						afinidad,
+					}
+				);	
 			}
 		} else {
 			Cell cell = new Cell(MENSAJE_AREA_SIN_MERITOS);
@@ -158,30 +156,6 @@ public class GenerarSolicitudPDF extends BolsaEmpleoPDFGenerator {
 		document.add(new Paragraph("Área - " + bolsa.getArea().getDescripcion(), fontBold));
 		document.add(table);
 		document.add(new Paragraph("\n"));
-	}
-	
-	private static void generarPDFAreaHeader(Table table) {
-		table.setBorderWidth(1);
-		table.setBorderColor(new Color(0, 0, 0));
-		table.setPadding(PDF_TABLE_PADDING);
-		table.setWidth(SIZE_100);
-		
-		generarColumnPDFAreaHeader(table, "Cod. Mérito", fontBlue);
-		generarColumnPDFAreaHeader(table, "Mérito", fontBlue);
-		generarColumnPDFAreaHeader(table, "Valor", fontBlue);
-		generarColumnPDFAreaHeader(table, "Descripción", fontBlue);
-		generarColumnPDFAreaHeader(table, "Afinidad", fontBlue);
-		
-		float[] columnWidths = new float[] {SIZE_10, SIZE_30, SIZE_10, SIZE_30, SIZE_20};
-		table.setWidths(columnWidths);
-	}
-	
-	private static void generarColumnPDFAreaHeader(Table table, String titulo, Font font) {
-		Phrase phrase = new Phrase(titulo, font);
-		Cell cell = new Cell(phrase);
-		cell.setHeader(true);
-		cell.setBackgroundColor(new Color(COLOR_185, COLOR_201, COLOR_254));
-		table.addCell(cell);
 	}
 	
 	private static void generarTitulaciones(UsuarioBolsaEmpleo candidato, Document document) throws DocumentException, SQLException, UVException {		

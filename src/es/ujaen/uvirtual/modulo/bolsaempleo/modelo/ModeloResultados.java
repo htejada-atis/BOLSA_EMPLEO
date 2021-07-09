@@ -134,7 +134,7 @@ public class ModeloResultados {
 		bol.setListaMeritosNoEvaluados(this.getMeritosSolicitudBolsaNoEvaluados(solicitud, bolsa));
 		
 		Date fechaActual = new Date(BolsaEmpleoUtils.getCurrentDateTime().getTime());
-		InputStream archivoResultados = GenerarResultadosPDF.generarResultadosSolicitudPDF(solicitud, bol, fechaActual);
+		InputStream archivoResultados = GenerarResultadosPDF.generarPDF(solicitud, bol, fechaActual);
 		guardarResultadoSolicitudBolsa(bol, solicitud, archivoResultados, null, fechaActual);
 	}
 	
