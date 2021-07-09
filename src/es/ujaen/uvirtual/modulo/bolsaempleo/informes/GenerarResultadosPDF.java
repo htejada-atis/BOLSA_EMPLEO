@@ -178,7 +178,7 @@ public class GenerarResultadosPDF extends BolsaEmpleoPDFGenerator {
 			headerColumns.put("Valor", (float) SIZE_23);
 			headerColumns.put("Observación", (float) SIZE_18);
 			
-			Table table = new Table(PDF_TABLE_COLUMNS_5, bolsa.getListaMeritos().size());
+			Table table = generarTable(PDF_TABLE_COLUMNS_5, bolsa.getListaMeritos().size());
 			
 			generarTableHeader(table, headerColumns);
 			
@@ -218,7 +218,7 @@ public class GenerarResultadosPDF extends BolsaEmpleoPDFGenerator {
 			headerColumns.put("Valor", (float) SIZE_23);
 			headerColumns.put("Observación", (float) SIZE_18);
 			
-			Table table = new Table(PDF_TABLE_COLUMNS_5, bolsa.getListaMeritos().size());
+			Table table = generarTable(PDF_TABLE_COLUMNS_5, bolsa.getListaMeritos().size());
 			
 			generarTableHeader(table, headerColumns);
 			
@@ -258,7 +258,7 @@ public class GenerarResultadosPDF extends BolsaEmpleoPDFGenerator {
 			headerColumns.put("Id. Titulación", (float) SIZE_10);
 			headerColumns.put("Titulación", (float) SIZE_40);
 			
-			Table table = new Table(PDF_TABLE_COLUMNS_2, listaTitulaciones.size());
+			Table table = generarTable(PDF_TABLE_COLUMNS_2, listaTitulaciones.size());
 			
 			generarTableHeader(table, headerColumns);
 			
@@ -291,7 +291,7 @@ public class GenerarResultadosPDF extends BolsaEmpleoPDFGenerator {
 			headerColumns.put("Código", (float) SIZE_12);
 			headerColumns.put("Acreditación", (float) SIZE_40);
 			
-			Table table = new Table(PDF_TABLE_COLUMNS_3, listaAcreditaciones.size());
+			Table table = generarTable(PDF_TABLE_COLUMNS_3, listaAcreditaciones.size());
 			
 			generarTableHeader(table, headerColumns);
 			

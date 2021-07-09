@@ -11,6 +11,8 @@ import java.util.Map;
 
 import es.ujaen.uvirtual.modelo.conexion.ConexionUvirtual;
 import es.ujaen.uvirtual.modulo.bolsaempleo.beans.Bolsa;
+import es.ujaen.uvirtual.modulo.bolsaempleo.beans.BolsaResultado;
+import es.ujaen.uvirtual.modulo.bolsaempleo.beans.Convocatoria;
 import es.ujaen.uvirtual.modulo.bolsaempleo.beans.UsuarioBolsaEmpleo;
 import es.ujaen.uvirtual.modulo.bolsaempleo.utilidades.BolsaEmpleoDataTable;
 import es.ujaen.uvirtual.modulo.bolsaempleo.utilidades.BolsaEmpleoUtils;
@@ -119,20 +121,30 @@ public class ModeloBolsa {
 		return dataTable;
 	}
 	
-	/**
-	 * Listado de bolsas para resultados .
-	 * 
-	 * @param params para leer los parametros de paginación, ordenacion, etc
-	 * @return listado de bolsas de empleo
-	 * @throws SQLException en caso de error de base de datos
-	 * @throws UVException  error si no existe la area
+	/** Listado de bolsas para resultados .
+	 * @param params para leer los parametros de paginación, ordenacion, etc .
+	 * @return listado de bolsas de empleo .
+	 * @throws SQLException en caso de error de base de datos .
+	 * @throws UVException  error si no existe la area .
 	 */
-	public BolsaEmpleoDataTable<Bolsa> listaBolsasResultadosDatatable(Map<String, String[]> params)
+	public BolsaEmpleoDataTable<BolsaResultado> listaBolsasResultadosDatatable(Map<String, String[]> params)
 			throws SQLException, UVException {
-		List<Bolsa> bolsas = new ArrayList<>();
-		BolsaEmpleoDataTable<Bolsa> dataTable = new BolsaEmpleoDataTable<>(params);
+		List<BolsaResultado> bolsas = new ArrayList<>();
+		BolsaEmpleoDataTable<BolsaResultado> dataTable = new BolsaEmpleoDataTable<>(params);
 
-		String consulta = "SELECT bepbol.* FROM TBEP_BOLSAS bepbol INNER JOIN TBEP_AREAS bepare ON bepare.CODNUM = bepbol.BEPARE_CODNUM WHERE 1=1 ";
+		String consulta = "SELECT bepbol.*,"
+				+ "		("
+				+ "		SELECT"
+				+ "			CASE"
+				+ "				WHEN bepbol.FECHABAREMACION > bepcon.FECHACIERRE THEN 1"
+				+ "				ELSE 0"
+				+ "			END"
+				+ "		FROM TBEP_CONVOCATORIAS bepcon"
+				+ "		WHERE ROWNUM = 1"
+				+ "		) AS RESULTADOS_ACTUALES"
+				+ "	FROM TBEP_BOLSAS bepbol"
+				+ "	INNER JOIN TBEP_AREAS bepare ON bepare.CODNUM = bepbol.BEPARE_CODNUM"
+				+ "	WHERE 1=1";
 
 		dataTable.setColumn(ORDER_COLUMN_INDEX_ID_RESULTADOS, "bepbol.CODNUM", DataTableColumn.COLUMN_TYPE_NUMBER);
 		dataTable.setColumn(ORDER_COLUMN_INDEX_COD_AREA_RESULTADOS, "bepare.ID_AREA_CONOCIMIENTO");
@@ -148,7 +160,7 @@ public class ModeloBolsa {
 
 			try (ResultSet rs = stmt.executeQuery()) {
 				while (rs.next()) {
-					bolsas.add(this.createFromResultSet(rs));
+					bolsas.add(new BolsaResultado(this.createFromResultSet(rs), rs.getBoolean("RESULTADOS_ACTUALES")));
 				}
 			}
 
