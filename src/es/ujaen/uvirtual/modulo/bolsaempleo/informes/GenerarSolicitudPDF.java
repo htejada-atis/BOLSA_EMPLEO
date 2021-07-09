@@ -30,6 +30,11 @@ import es.ujaen.uvirtual.modulo.bolsaempleo.modelo.ModeloTitulacion;
 import es.ujaen.uvirtual.utilidades.Formateador;
 import es.ujaen.uvirtual.utilidades.UVException;
 
+/**
+ * Clase para generar pdfs de solicitudes .
+ * 
+ * @author ATISoluciones
+ */
 public class GenerarSolicitudPDF extends BolsaEmpleoPDFGenerator {
 	
 	private static final String NOMBREDEESTACLASE = GenerarResultadosPDF.class.getName();
@@ -41,8 +46,7 @@ public class GenerarSolicitudPDF extends BolsaEmpleoPDFGenerator {
 	public static final String MENSAJE_AREA_SIN_MERITOS = "No hay méritos asignados a éste área.";
 	
 	
-	/**
-	 * generar PDF de la solicitud .
+	/** Generar PDF de la solicitud .
 	 * @param solicitud .
 	 * @param bolsasSolicitud .
 	 * @return InputStream .
