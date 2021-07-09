@@ -139,25 +139,43 @@ public class TestBEPModeloBaremacionBloques {
 	 */
 	@Test
 	public void testA06actualizaBloque() {
-		try {					
-			ApartadoBaremacion apartado = this.obtenerPrimerApartado();
-			BloqueBaremacion bloque = ModeloBaremacionBloques.obtenerInstancia().getBloqueBaremacionById(CODNUM); 
-			assertEquals(bloque.getCodNum(), CODNUM);
+		try {
+			// insertamos un nuevo apartado para evitar coger un apartado que ese está usando por algún mérito
+			ApartadoBaremacion apartadoNuevo = new ApartadoBaremacion();
+			apartadoNuevo.setCodigo("T");
+			apartadoNuevo.setNombre("TT");
+			apartadoNuevo.setActivo(true);
+			apartadoNuevo.setPuntuacionMaxima(null);
+			apartadoNuevo.setPorcentajeMaximo(0.0);
 			
+			Integer codNum = ModeloBaremacionApartados.obtenerInstancia().insertaApartado(apartadoNuevo, UtilsTestBolsaEmpleo.getUsuario("personal1"));
+			ApartadoBaremacion apartado = ModeloBaremacionApartados.obtenerInstancia().getApartadoBaremacionById(codNum);			
+			
+			// creamos un nuevo bloque para este apartado
+			BloqueBaremacion bloqueNuevo = new BloqueBaremacion();
+			bloqueNuevo.setApartadoBaremacion(apartado);
+			bloqueNuevo.setCodigo("B");
+			bloqueNuevo.setNombre("BB");
+			bloqueNuevo.setActivo(true);
+			bloqueNuevo.setNumeroMaximoMeritos(0);
+			Integer codNumBloque = ModeloBaremacionBloques.obtenerInstancia().insertaBloque(bloqueNuevo, UtilsTestBolsaEmpleo.getUsuario("personal1"));
+			BloqueBaremacion bloque = ModeloBaremacionBloques.obtenerInstancia().getBloqueBaremacionById(codNumBloque);
+						
+			// modificamos bloque
 			bloque.setApartadoBaremacion(apartado);
-			bloque.setCodigo(CODIGO);
-			bloque.setNombre(NOMBRE);
-			bloque.setActivo(true);
-			bloque.setNumeroMaximoMeritos(NUMERO_MAXIMO_MERITOS);
-			
+			bloque.setCodigo("C");
+			bloque.setNombre("CC");
+			bloque.setActivo(false);
+			bloque.setNumeroMaximoMeritos(1);
 			ModeloBaremacionBloques.obtenerInstancia().actualizaBloque(bloque, UtilsTestBolsaEmpleo.getUsuario("personal1"));
-			BloqueBaremacion bloqueUpd = ModeloBaremacionBloques.obtenerInstancia().getBloqueBaremacionById(CODNUM);
+			BloqueBaremacion bloqueUpd = ModeloBaremacionBloques.obtenerInstancia().getBloqueBaremacionById(bloque.getCodNum());
 			
-			assertEquals(bloqueUpd.getCodigo(), CODIGO);
-			assertEquals(bloqueUpd.getNombre(), NOMBRE);
-			assertEquals(bloqueUpd.isActivo(), true);
-			assertEquals(bloqueUpd.getNumeroMaximoMeritos(), NUMERO_MAXIMO_MERITOS);
+			assertEquals(bloqueUpd.getCodigo(), "C");
+			assertEquals(bloqueUpd.getNombre(), "CC");
+			assertEquals(bloqueUpd.isActivo(), false);
+			assertEquals(bloqueUpd.getNumeroMaximoMeritos(), Integer.valueOf("1"));
 			assertEquals(bloqueUpd.getApartadoBaremacion(), apartado);
+			 
 		} catch (SQLException | UVException ex) {
 			fail(String.format(MENSAJE_ERROR_HAY_EXCEPCION, ex.toString()));
 		}

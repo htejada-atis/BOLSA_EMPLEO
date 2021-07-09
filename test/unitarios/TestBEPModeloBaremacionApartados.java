@@ -141,15 +141,15 @@ public class TestBEPModeloBaremacionApartados {
 			
 			List<ApartadoBaremacion> lista = desactivarTodosApartados();
 			Integer codNum = ModeloBaremacionApartados.obtenerInstancia().insertaApartado(apartado, UtilsTestBolsaEmpleo.getUsuario("personal1"));
-			ApartadoBaremacion creado = ModeloBaremacionApartados.obtenerInstancia().getApartadoBaremacionById(codNum);
+			ApartadoBaremacion creado = ModeloBaremacionApartados.obtenerInstancia().getApartadoBaremacionById(codNum);			
+			desactivarApartado(codNum);
+			activarApartadosLista(lista);
+			
 			assertEquals(creado.getCodigo(), CODIGO);
 			assertEquals(creado.getNombre(), NOMBRE);
 			assertEquals(creado.getActivo(), true);
 			assertNull(creado.getPuntuacionMaxima());
 			assertEquals(creado.getPorcentajeMaximo(), PORCENTAJE_MAXIMO);
-			
-			desactivarApartado(codNum);
-			activarApartadosLista(lista);			
 		} catch (SQLException | UVException ex) {
 			fail(String.format(MENSAJE_ERROR_HAY_EXCEPCION, ex.toString()));
 		}
@@ -160,8 +160,7 @@ public class TestBEPModeloBaremacionApartados {
 	 */
 	@Test
 	public void testA07actualizaApartado() {
-		try {					
-			List<ApartadoBaremacion> lista = desactivarTodosApartados();
+		try {								
 			ApartadoBaremacion apartado = getApartadoBaremacionPorCodigo(CODIGO);
 			assertEquals(apartado.getCodigo(), CODIGO);
 			
@@ -171,16 +170,16 @@ public class TestBEPModeloBaremacionApartados {
 			apartado.setPuntuacionMaxima(null);
 			apartado.setPorcentajeMaximo(PORCENTAJE_MAXIMO2);
 			
+			List<ApartadoBaremacion> lista = desactivarTodosApartados();
 			ModeloBaremacionApartados.obtenerInstancia().actualizaApartado(apartado, UtilsTestBolsaEmpleo.getUsuario("personal1"));
 			ApartadoBaremacion apartadoUpd = getApartadoBaremacionPorCodigo("2");
+			desactivarApartado(apartado.getCodNum());
+			activarApartadosLista(lista);
 			
 			assertEquals(apartadoUpd.getCodigo(), "2");
 			assertEquals(apartadoUpd.getNombre(), "test");
 			assertEquals(apartadoUpd.getActivo(), true);
 			assertEquals(apartadoUpd.getPorcentajeMaximo(), PORCENTAJE_MAXIMO2);
-			
-			desactivarApartado(apartado.getCodNum());
-			activarApartadosLista(lista);			
 		} catch (SQLException | UVException ex) {
 			fail(String.format(MENSAJE_ERROR_HAY_EXCEPCION, ex.toString()));
 		}
