@@ -228,7 +228,7 @@ public class ControladorGestionTitulaciones extends HttpServlet {
 				bean.setDatatableTitulaciones(dataTable);
 				writer.write(dataTable.toJson());
 			} catch (UVException | SQLException e) {
-				if (e.getClass().equals(SQLException.class)) {
+				if (e instanceof SQLException) {
 					LOGGER.log(Level.SEVERE, Formateador.getStackTrace(e));
 					LOGGER.log(Level.SEVERE, e.toString());
 				} else {
