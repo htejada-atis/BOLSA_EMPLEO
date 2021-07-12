@@ -34,7 +34,8 @@ public class ModeloBolsa {
 	public static final int ORDER_COLUMN_INDEX_ACTUALIZADA = 4;
 	public static final int ORDER_COLUMN_INDEX_BLOQUEO = 5;
 	public static final int ORDER_COLUMN_INDEX_DESBLOQUEO = 6;
-	public static final int ORDER_COLUMN_INDEX_BAREMALE = 7;
+	public static final int ORDER_COLUMN_INDEX_BAREMACION = 7;
+	public static final int ORDER_COLUMN_INDEX_BAREMALE = 8;
 	
 	public static final int ORDER_COLUMN_INDEX_ID_RESULTADOS = 0;
 	public static final int ORDER_COLUMN_INDEX_COD_AREA_RESULTADOS = 1;
@@ -42,6 +43,7 @@ public class ModeloBolsa {
 	public static final int ORDER_COLUMN_INDEX_FECHA_BAREMACION_RESULTADOS = 3;
 	
 	public static final String MENSAJE_ERROR_BOLSA_NULL = "Bolsa no puede estar vacía";
+	public static final String MENSAJE_ERROR_BAREMAR_BOLSA_NO_BLOQUEADA = "Para baremar una bolsa su estado debe ser 'BLOQUEADA'";
 
 	public static final String BOLSA_ESTADO_BLOQUEADA = "BLOQUEADA";
 	public static final String BOLSA_ESTADO_REVISION = "REVISION";
@@ -99,6 +101,7 @@ public class ModeloBolsa {
 		dataTable.setColumn(ORDER_COLUMN_INDEX_ACTUALIZADA, "bepbol.FECHAACTUALIZACION", DataTableColumn.COLUMN_TYPE_DATE);
 		dataTable.setColumn(ORDER_COLUMN_INDEX_BLOQUEO, "bepbol.FECHABLOQUEO", DataTableColumn.COLUMN_TYPE_DATE);
 		dataTable.setColumn(ORDER_COLUMN_INDEX_DESBLOQUEO, "bepbol.FECHADEBLOQUEO", DataTableColumn.COLUMN_TYPE_DATE);
+		dataTable.setColumn(ORDER_COLUMN_INDEX_BAREMACION, "bepbol.FECHABAREMACION", DataTableColumn.COLUMN_TYPE_DATE);
 		dataTable.setColumn(ORDER_COLUMN_INDEX_BAREMALE, "bepbol.FLGBAREMABLE", DataTableColumn.COLUMN_TYPE_BOOLEAN);
 		dataTable.setQuery(consulta);
 
@@ -414,9 +417,10 @@ public class ModeloBolsa {
 	/** Establece las bolsas como pendientes de baremación .
 	 * @param bolsas .
 	 * @param usuarioUpdate .
+	 * @throws UVException .
 	 * @throws SQLException .
 	 */
-	public void ponerBolsasComoPendientesBaremacion(List<Bolsa> bolsas, UsuarioBolsaEmpleo usuarioUpdate) throws SQLException {
+	public void ponerBolsasComoPendientesBaremacion(List<Bolsa> bolsas, UsuarioBolsaEmpleo usuarioUpdate) throws SQLException, UVException {
 		for (int i = 0; i < bolsas.size(); i++) {
 			this.ponerBolsaComoPendienteBaremacion(bolsas.get(i), usuarioUpdate);
 		}
@@ -425,9 +429,14 @@ public class ModeloBolsa {
 	/** Establece la bolsa como pendiente de baremación .
 	 * @param bolsa .
 	 * @param usuarioUpdate .
+	 * @throws UVException . 
 	 * @throws SQLException .
 	 */
-	public void ponerBolsaComoPendienteBaremacion(Bolsa bolsa, UsuarioBolsaEmpleo usuarioUpdate) throws SQLException {
+	public void ponerBolsaComoPendienteBaremacion(Bolsa bolsa, UsuarioBolsaEmpleo usuarioUpdate) throws SQLException, UVException {
+		if (!bolsa.getEstado().equals(BOLSA_ESTADO_BLOQUEADA)) {
+			throw new UVException(MENSAJE_ERROR_BAREMAR_BOLSA_NO_BLOQUEADA);
+		}
+		
 		String query = "UPDATE TBEP_BOLSAS SET FLGPENBAREMACION = 'S', UID_USUARIO = ? WHERE CODNUM = ?";
 		
 		try (Connection conexion = ConexionUvirtual.obtenerInstancia();

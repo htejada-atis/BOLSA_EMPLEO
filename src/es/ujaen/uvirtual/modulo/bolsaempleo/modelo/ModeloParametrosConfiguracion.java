@@ -21,7 +21,7 @@ import es.ujaen.uvirtual.utilidades.UVException;
  * @author ATISoluciones
  */
 public class ModeloParametrosConfiguracion {
-	public static final String VERSION = "0.49";
+	public static final String VERSION = "0.50";
 	public static final String JS_BOLSA_EMPLEO = "/js/bolsaempleo/bolsaempleo20210712.js.min";
 	public static final String CSS_BOLSA_EMPLEO = "/css/ujaen_bolsa_empleo.css";
 

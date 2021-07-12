@@ -17,13 +17,11 @@ import java.util.logging.Logger;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
-
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.Select;
 import org.openqa.selenium.support.ui.WebDriverWait;
-
 import controlador.implementacion.PeticionHttp;
 import es.ujaen.uvirtual.adm.CrearUsuario;
 import es.ujaen.uvirtual.beans.UVDatos;
@@ -323,6 +321,7 @@ public final class UtilsTestBolsaEmpleo {
 	 */
 	public static void baremarBolsa(Bolsa bolsa) throws SQLException, UVException {
 		ModeloBolsa modeloBolsa = ModeloBolsa.obtenerInstancia();
+		bolsa.setEstado(ModeloBolsa.BOLSA_ESTADO_BLOQUEADA);
 		modeloBolsa.ponerBolsaComoPendienteBaremacion(bolsa, getUsuario("personal1"));
 		BaremarBolsa.runFromTest();
 	}

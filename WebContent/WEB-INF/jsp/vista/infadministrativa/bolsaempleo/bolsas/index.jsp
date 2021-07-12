@@ -53,20 +53,21 @@ VistaEstadoBolsas bean = (VistaEstadoBolsas) uvdatos.getVistas().get(VistaEstado
 	
 	<table class="bluetable bolsaempleo" id="table">
 		<tr>
-			<th scope="col" style="width:5%"></th>
-			<th scope="col" style="width:10%" title="Id de la convocatoria">Id</th>
-			<th scope="col" style="width:25%" class="area">Area</th>
-			<th scope="col" style="width:15%">Estado</th>
-			<th scope="col" style="width:20%">Actualizada</th>
-			<th scope="col" style="width:18%">Bloqueo</th>
-			<th scope="col" style="width:19%">Desbloqueo</th>
-			<th scope="col" class="center" style="width:18%">Baremable</th>			
+			<th scope="col" style="width:15px"></th>
+			<th scope="col" style="width:30px" title="Id de la convocatoria">Id</th>
+			<th scope="col" style="width:100%" class="area">Area</th>
+			<th scope="col" style="width:90px">Estado</th>
+			<th scope="col" style="width:68px">Actualizada</th>
+			<th scope="col" style="width:68px">Bloqueo</th>
+			<th scope="col" style="width:68px">Desbloqueo</th>
+			<th scope="col" style="width:68px">Baremación</th>
+			<th scope="col" class="center" style="width:48px">Baremable</th>			
 		</tr>
 		<tbody>				
 		</tbody>
 		<tfoot>
 			<tr>
-				<th colSpan="8" style="width:100%"></th>
+				<th colSpan="9" style="width:100%"></th>
 			</tr>
 		</tfoot>
 	</table>
@@ -92,6 +93,7 @@ $(document).ready(function() {
 	        {'data': 'fechaActualizacion', 'filter': {'type': 'date'}},
 	        {'data': 'fechaBloqueo', 'filter': {'type': 'date'}},
 	        {'data': 'fechaDesBloqueo', 'filter': {'type': 'date'}},
+	        {'data': 'fechaBaremacion', 'filter': {'type': 'date'}},
 	        {'data': 'baremable', 'filter': {'type': 'select', 'options': {'true': 'Baremable', 'false': 'No Baremable'} , 'optionDefault': 'true'}, 'render': function(row) {
         		if(row.baremable) {
         			return "<div title='Baremable' class='circle-true'></div>"; 

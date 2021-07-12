@@ -217,7 +217,7 @@ public class ControladorResultados extends HttpServlet {
 				bean.setDataTableBolsas(dataTable);
 				writer.write(dataTable.toJson("dd/MM/yyyy"));
 			} catch (UVException | SQLException e) {
-				if (e.getClass().equals(SQLException.class)) {
+				if (e instanceof SQLException) {
 					LOGGER.log(Level.SEVERE, Formateador.getStackTrace(e));
 					LOGGER.log(Level.SEVERE, e.toString());
 				} else {
@@ -246,7 +246,7 @@ public class ControladorResultados extends HttpServlet {
 				bean.setDataTableCandidatos(dataTable);
 				writer.write(dataTable.toJson());
 			} catch (UVException | SQLException e) {
-				if (e.getClass().equals(SQLException.class)) {
+				if (e instanceof SQLException) {
 					LOGGER.log(Level.SEVERE, Formateador.getStackTrace(e));
 					LOGGER.log(Level.SEVERE, e.toString());
 				} else {
