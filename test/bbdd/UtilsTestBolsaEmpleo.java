@@ -43,6 +43,7 @@ public final class UtilsTestBolsaEmpleo {
 	private static final String UID_PRUEBAS = "usig";
 	private static final String UID_CANDIDATO_PRUEBAS = "candidato1";
 	private static final String UID_CANDIDATO2_PRUEBAS = "candidato2";
+	private static final String UID_CANDIDATO3_PRUEBAS = "candidato3";
 	private static final String UID_PERSONAL_PRUEBAS = "personal1";
 	private static final Pattern RE_FILE_MIGRATION = Pattern.compile("\\d+-(im|eje)-[a-zA-Z]+\\.sql", Pattern.DOTALL);
 	private static final String ID_DEPARTAMENTO = "ID_DEPARTAMENTO";
@@ -59,7 +60,7 @@ public final class UtilsTestBolsaEmpleo {
 	public static final Integer WAIT_ELEMENT = 10; // segundos
 	public static final boolean VERBOSE = false;
 	
-	private static boolean cargado = false;
+	private static boolean cargado = true;
 
 	private UtilsTestBolsaEmpleo() {
 	}
@@ -178,6 +179,25 @@ public final class UtilsTestBolsaEmpleo {
 		datos.setIdentificadorUsuario(UID_CANDIDATO2_PRUEBAS);
 
 		Usuario usuario = CrearUsuario.usuario(UID_CANDIDATO2_PRUEBAS);
+		datos.setUsuario(usuario);
+
+		PeticionHttp peticion = new PeticionHttp();
+		peticion.setUVDatos(datos);
+
+		return peticion;
+	}
+	
+	/**
+	 * obtiene una peticion autenticada con el usuario candidato2 de pruebas de
+	 * BolsaEmpleo.
+	 * 
+	 * @return peticion autenticada
+	 */
+	public static PeticionHttp peticionAutenticadaCandidato3() {
+		UVDatos datos = new UVDatos();
+		datos.setIdentificadorUsuario(UID_CANDIDATO3_PRUEBAS);
+
+		Usuario usuario = CrearUsuario.usuario(UID_CANDIDATO3_PRUEBAS);
 		datos.setUsuario(usuario);
 
 		PeticionHttp peticion = new PeticionHttp();
