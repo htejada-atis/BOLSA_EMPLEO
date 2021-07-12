@@ -232,7 +232,7 @@ public class TestBEPControladorResultados {
 		
 		assertEquals(MENSAJE_CON_ERROR, 1, bean.getMensajesDeError().size());
 		assertEquals(MENSAJE_SIN_EXITO, 0, bean.getMensajesDeExito().size());
-		assertEquals(ControladorUsuarioCandidato.MENSAJE_ERROR_SIN_PERMISO_PERSONAL, bean.getMensajesDeError().get(0).toString());
+		assertEquals(ControladorResultados.MENSAJE_ERROR_SIN_PERMISO, bean.getMensajesDeError().get(0).toString());
 	}
 	
 	/** Obtener datatable bolsas parámetro no válido .

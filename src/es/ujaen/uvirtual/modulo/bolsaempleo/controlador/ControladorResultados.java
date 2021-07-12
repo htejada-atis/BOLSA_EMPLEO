@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.sql.SQLException;
 import java.util.logging.Logger;
+import java.util.stream.IntStream;
 import java.util.logging.Level;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
@@ -64,6 +65,7 @@ public class ControladorResultados extends HttpServlet {
 	// mensajes
 	public static final String MENSAJE_ERROR_FOO = "Mensaje de error";
 	public static final String MENSAJE_ERROR_ACCION_NO_CONTEMPLADA = "Acción no contemplada";
+	public static final String MENSAJE_ERROR_SIN_PERMISO = "No tienes permiso";
 	public static final String MENSAJE_EXITO_BAR = "Mensaje de exito";
 	
 	// ruta vistas
@@ -144,8 +146,13 @@ public class ControladorResultados extends HttpServlet {
 		try {
 			bean.setUsuarioLogeado(ModeloUsuarioBolsaEmpleo.obtenerInstancia().getOrCreateUsuario(datos));
 			
-			if (!bean.getUsuarioLogeado().getRol().getCodNum().equals(ModeloRol.ID_ROL_SERVICIO_PERSONAL)) {
-				throw new UVException("No tienes permiso de personal");
+			// personal, comision, direccion
+			int[] rolesValidos = {ModeloRol.ID_ROL_SERVICIO_PERSONAL, ModeloRol.ID_ROL_DIRECTOR_DEPARTAMENTO, ModeloRol.ID_ROL_MIEMBRO_COMISION};
+			boolean contains = IntStream.of(rolesValidos).
+					anyMatch(x -> x == bean.getUsuarioLogeado().getRol().getCodNum());
+			
+			if (!contains) {
+				throw new UVException(MENSAJE_ERROR_SIN_PERMISO);
 			}
 		} catch (UVException e) {
 			LOGGER.log(Level.SEVERE, Formateador.getStackTrace(e));
@@ -213,7 +220,7 @@ public class ControladorResultados extends HttpServlet {
 		
 		try (PrintWriter writer = response.getWriter()) {
 			try {
-				BolsaEmpleoDataTable<BolsaResultado> dataTable = modelo.listaBolsasResultadosDatatable(request.getParameterMap());
+				BolsaEmpleoDataTable<BolsaResultado> dataTable = modelo.listaBolsasResultadosDatatable(bean.getUsuarioLogeado(), request.getParameterMap());
 				bean.setDataTableBolsas(dataTable);
 				writer.write(dataTable.toJson("dd/MM/yyyy"));
 			} catch (UVException | SQLException e) {
