@@ -691,7 +691,7 @@ public class ModeloResultados {
 		Double total = rs.getDouble(TOTAL);
 		Double totalSinAplicar = rs.getDouble(TOTALSINAPLICAR);
 		Solicitud solicitud = ModeloSolicitud.obtenerInstancia().getSolicitudById(rs.getInt(BEPSOL_CODNUM));
-		InputStream archivo = rs.getBlob(ARCHIVO).getBinaryStream();
+		InputStream archivo = rs.getBlob(ARCHIVO) != null ? rs.getBlob(ARCHIVO).getBinaryStream() : null;
 		List<MeritoResultado> meritos = this.getMeritosSolicitudBolsaValidados(solicitud, bol);
 		List<MeritoResultado> meritosExcluidos = this.getMeritosSolicitudBolsaExcluidos(solicitud, bol);
 		List<MeritoResultado> meritosEvaluados = this.getMeritosSolicitudBolsaNoEvaluados(solicitud, bol);
