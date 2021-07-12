@@ -473,7 +473,7 @@ public class ModeloValidar {
 			return dataTable;
 		}
 		
-		String consulta = "SELECT bepusu.CODNUM, bepusu.CODCUENTA, bepusu.VUAJA_PRSNIF, bepusu.VUAJA_STRTIPODOCUMENTO, bepusu.VUAJA_IDNIF, bepusu.VUAJA_LETRANIF,"
+		String consulta = "SELECT bepusu.CODNUM, bepusu.CODCUENTA, bepusu.VUAJA_STRTIPODOCUMENTO, bepusu.VUAJA_IDNIF, bepusu.VUAJA_LETRANIF,"
 				+ "	bepusu.VUAJA_PRSNIF, bepusu.VUAJA_STRNOMBRE, bepusu.VUAJA_STRAPELLIDO1, bepusu.VUAJA_STRAPELLIDO2, bepusu.VUAJA_EMAIL_ALTA,"
 				+ "	SUM(CASE WHEN bepsbm.FLGVALIDADO = 'N' AND bepsbm.FLGEXCLUIDO = 'N' THEN 1 ELSE 0 END) AS COUNT_NO_VALIDADOS,"
 				+ "	SUM(CASE WHEN bepsbm.FLGVALIDADO = 'S' AND bepsbm.FLGEXCLUIDO = 'N' THEN 1 ELSE 0 END) AS COUNT_VALIDADOS,"
@@ -492,7 +492,7 @@ public class ModeloValidar {
 				+ "		AND bepusu.FLGBORRADO = 'N'"
 				+ "		AND bepsol.ESTADO = '" + ModeloSolicitud.SOLICITUD_ESTADO_CERRADA + "'"
 				+ (afinidad ? " AND bepite.AFINIDAD IS NOT NULL" : " AND bepite.AFINIDAD IS NULL")
-				+ "	GROUP BY bepusu.CODNUM, bepusu.CODCUENTA, bepusu.VUAJA_PRSNIF, bepusu.VUAJA_STRTIPODOCUMENTO, bepusu.VUAJA_IDNIF, bepusu.VUAJA_LETRANIF,"
+				+ "	GROUP BY bepusu.CODNUM, bepusu.CODCUENTA, bepusu.VUAJA_STRTIPODOCUMENTO, bepusu.VUAJA_IDNIF, bepusu.VUAJA_LETRANIF,"
 				+ "	bepusu.VUAJA_PRSNIF, bepusu.VUAJA_STRNOMBRE, bepusu.VUAJA_STRAPELLIDO1, bepusu.VUAJA_STRAPELLIDO2, bepusu.VUAJA_EMAIL_ALTA ";
 
 		dataTable.setColumn(ORDER_COLUMN_INDEX_NUMDOCUMENTO_CANDIDATO, "bepusu.VUAJA_PRSNIF");
