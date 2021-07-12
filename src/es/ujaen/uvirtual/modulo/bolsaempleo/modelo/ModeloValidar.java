@@ -59,8 +59,6 @@ public class ModeloValidar {
 	public static final String TOTAL_EXCLUIDO = "TOTAL_EXCLUIDO";
 	public static final String TOTAL_MERITOS = "TOTAL_MERITOS";
 	
-	private static final int TOTAL_COUNT_SUBQUERIES = 4;
-	
 	public static final String MERITO_EXCLUIDO = "S";
 	public static final String MERITO_VALIDADO = "S";	
 
