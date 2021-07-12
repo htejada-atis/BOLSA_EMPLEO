@@ -302,7 +302,7 @@ public class ControladorGestionEvaluadores extends HttpServlet {
 				bean.setDatatableAreas(dataTable);
 				writer.write(dataTable.toJson());
 			} catch (UVException | SQLException e) {
-				if (e.getClass().equals(SQLException.class)) {
+				if (e instanceof SQLException) {
 					LOGGER.log(Level.SEVERE, Formateador.getStackTrace(e));
 					LOGGER.log(Level.SEVERE, e.toString());
 				} else {
@@ -331,7 +331,7 @@ public class ControladorGestionEvaluadores extends HttpServlet {
 				bean.setDatatableEvaluadores(dataTable);
 				writer.write(dataTable.toJson());
 			} catch (UVException | SQLException e) {
-				if (e.getClass().equals(SQLException.class)) {
+				if (e instanceof SQLException) {
 					LOGGER.log(Level.SEVERE, Formateador.getStackTrace(e));
 					LOGGER.log(Level.SEVERE, e.toString());
 				} else {

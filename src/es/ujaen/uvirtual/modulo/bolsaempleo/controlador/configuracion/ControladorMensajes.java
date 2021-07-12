@@ -378,15 +378,13 @@ public class ControladorMensajes extends HttpServlet {
 				BolsaEmpleoDataTable<Mensaje> dataTable = ModeloMensajes.obtenerInstancia().listaMensajesDatatable(request.getParameterMap());
 				bean.setDatatableMensajes(dataTable);
 				writer.write(dataTable.toJson("dd/M/yyyy HH:mm:ss"));
-			} catch (UVException e) {
-				LOGGER.log(Level.WARNING, e.toString());
-				bean.getMensajesDeError().add(e.getMessage());
-				CodigoDescripcion mensaje = new CodigoDescripcion(RESPONSE_AJAX_ERROR, e.getMessage());
-				writer.write(new Gson().toJson(mensaje));
-				response.setStatus(RESPONSE_AJAX_HTTP_CODE_ERROR);
-			} catch (SQLException e) {
-				LOGGER.log(Level.SEVERE, Formateador.getStackTrace(e));
-				LOGGER.log(Level.SEVERE, e.toString());
+			} catch (UVException | SQLException e) {
+				if (e instanceof SQLException) {
+					LOGGER.log(Level.SEVERE, Formateador.getStackTrace(e));
+					LOGGER.log(Level.SEVERE, e.toString());
+				} else {
+					LOGGER.log(Level.WARNING, e.toString());
+				}
 				bean.getMensajesDeError().add(e.getMessage());
 				CodigoDescripcion mensaje = new CodigoDescripcion(RESPONSE_AJAX_ERROR, e.getMessage());
 				writer.write(new Gson().toJson(mensaje));
@@ -407,15 +405,13 @@ public class ControladorMensajes extends HttpServlet {
 				BolsaEmpleoDataTable<Destinatario> dataTable = modelo.listaDestinatariosMensajeDatatable(request.getParameterMap(), bean.getMensaje());
 				bean.setDatatableDestinatarios(dataTable);
 				writer.write(dataTable.toJson());
-			} catch (UVException e) {
-				LOGGER.log(Level.WARNING, e.toString());
-				bean.getMensajesDeError().add(e.getMessage());
-				CodigoDescripcion mensaje = new CodigoDescripcion(RESPONSE_AJAX_ERROR, e.getMessage());
-				writer.write(new Gson().toJson(mensaje));
-				response.setStatus(RESPONSE_AJAX_HTTP_CODE_ERROR);
-			} catch (SQLException e) {
-				LOGGER.log(Level.SEVERE, Formateador.getStackTrace(e));
-				LOGGER.log(Level.SEVERE, e.toString());
+			} catch (UVException | SQLException e) {
+				if (e instanceof SQLException) {
+					LOGGER.log(Level.SEVERE, Formateador.getStackTrace(e));
+					LOGGER.log(Level.SEVERE, e.toString());
+				} else {
+					LOGGER.log(Level.WARNING, e.toString());
+				}
 				bean.getMensajesDeError().add(e.getMessage());
 				CodigoDescripcion mensaje = new CodigoDescripcion(RESPONSE_AJAX_ERROR, e.getMessage());
 				writer.write(new Gson().toJson(mensaje));
@@ -437,15 +433,13 @@ public class ControladorMensajes extends HttpServlet {
 						request.getParameterMap(), bean.getMensaje());
 				bean.setDatatableDestinatariosDisponibles(dataTable);
 				writer.write(dataTable.toJson());
-			} catch (UVException e) {
-				LOGGER.log(Level.WARNING, e.toString());
-				bean.getMensajesDeError().add(e.getMessage());
-				CodigoDescripcion mensaje = new CodigoDescripcion(RESPONSE_AJAX_ERROR, e.getMessage());
-				writer.write(new Gson().toJson(mensaje));
-				response.setStatus(RESPONSE_AJAX_HTTP_CODE_ERROR);
-			} catch (SQLException e) {
-				LOGGER.log(Level.SEVERE, Formateador.getStackTrace(e));
-				LOGGER.log(Level.SEVERE, e.toString());
+			} catch (UVException | SQLException e) {
+				if (e instanceof SQLException) {
+					LOGGER.log(Level.SEVERE, Formateador.getStackTrace(e));
+					LOGGER.log(Level.SEVERE, e.toString());
+				} else {
+					LOGGER.log(Level.WARNING, e.toString());
+				}
 				bean.getMensajesDeError().add(e.getMessage());
 				CodigoDescripcion mensaje = new CodigoDescripcion(RESPONSE_AJAX_ERROR, e.getMessage());
 				writer.write(new Gson().toJson(mensaje));
