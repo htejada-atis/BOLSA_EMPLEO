@@ -249,11 +249,11 @@ public class TestBEPModeloUsuarios {
 		try {
 			UsuarioBolsaEmpleo nuevo = new UsuarioBolsaEmpleo();
 			nuevo.setRol(ModeloRol.obtenerInstancia().getRoleById(ModeloRol.ID_ROL_CANDIDATO));
-			nuevo.setCodCuenta("candidato3");
-			nuevo.setIdNif("51906000Z");
+			nuevo.setCodCuenta("candidato4");
+			nuevo.setIdNif("00834172P");
 			
 			ModeloUsuarioBolsaEmpleo.obtenerInstancia().insertaUsuario(nuevo, UtilsTestBolsaEmpleo.getUsuario("personal1"));
-			UsuarioBolsaEmpleo nuevoRead = ModeloUsuarioBolsaEmpleo.obtenerInstancia().getUsuarioByCodCuenta("candidato3");
+			UsuarioBolsaEmpleo nuevoRead = ModeloUsuarioBolsaEmpleo.obtenerInstancia().getUsuarioByCodCuenta("candidato4");
 			
 			assertEquals(nuevo.getCodCuenta(), nuevoRead.getCodCuenta());
 			assertEquals(nuevo.getIdNif(), nuevoRead.getIdNif());
@@ -276,8 +276,8 @@ public class TestBEPModeloUsuarios {
 			
 			UsuarioBolsaEmpleo nuevo = new UsuarioBolsaEmpleo();
 			nuevo.setRol(ModeloRol.obtenerInstancia().getRoleById(ModeloRol.ID_ROL_CANDIDATO));
-			nuevo.setCodCuenta("candidato4");
-			nuevo.setIdNif("00834172P");
+			nuevo.setCodCuenta("candidato6");
+			nuevo.setIdNif("29330022P");
 			nuevo.setExcluido(true);
 			nuevo.setExcluidoTipo(ModeloUsuarioBolsaEmpleo.EXCLUSION_TIPO_TEMPORAL);
 			nuevo.setRazonExcluido("test");
@@ -286,7 +286,7 @@ public class TestBEPModeloUsuarios {
 			nuevo.setFechaExclusionFin(fechaFinExclusion);
 			
 			ModeloUsuarioBolsaEmpleo.obtenerInstancia().insertaUsuario(nuevo, UtilsTestBolsaEmpleo.getUsuario("personal1"));
-			UsuarioBolsaEmpleo nuevoRead = ModeloUsuarioBolsaEmpleo.obtenerInstancia().getUsuarioByCodCuenta("candidato4");
+			UsuarioBolsaEmpleo nuevoRead = ModeloUsuarioBolsaEmpleo.obtenerInstancia().getUsuarioByCodCuenta("candidato6");
 			
 			assertEquals(nuevo.getCodCuenta(), nuevoRead.getCodCuenta());
 			assertEquals(nuevo.getIdNif(), nuevoRead.getIdNif());

@@ -324,7 +324,7 @@ public final class UtilsTestBolsaEmpleo {
 	public static void baremarBolsa(Bolsa bolsa) throws SQLException, UVException {
 		ModeloBolsa modeloBolsa = ModeloBolsa.obtenerInstancia();
 		modeloBolsa.ponerBolsaComoPendienteBaremacion(bolsa, getUsuario("personal1"));
-		BaremarBolsa.run();
+		BaremarBolsa.runFromTest();
 	}
 	
 	/**

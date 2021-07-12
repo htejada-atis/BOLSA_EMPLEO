@@ -161,9 +161,10 @@ public class TestBEPModeloSolicitud {
 		boolean cerrarConvocatoria = false;
 		
 		try {
+					
 			ModeloSolicitud modelo = ModeloSolicitud.obtenerInstancia();
 			
-			c = ModeloConvocatoria.obtenerInstancia().getUltimaConvocatoria();
+			c = ModeloConvocatoria.obtenerInstancia().getUltimaConvocatoria();			
 			assertFalse(modelo.haySolicitudAbiertaParaConvocatoria(candidato1, c));
 			
 			// comprobamos si la convocatoria está abierta
@@ -171,6 +172,7 @@ public class TestBEPModeloSolicitud {
 				cerrarConvocatoria = true;
 				UtilsTestBolsaEmpleo.sqlExecute("UPDATE TBEP_CONVOCATORIAS SET ESTADO = '" + ModeloConvocatoria.CONVOCATORIA_ESTADO_ABIERTA 
 						+ "' WHERE CODNUM = " + c.getCodNum());
+				c = ModeloConvocatoria.obtenerInstancia().getUltimaConvocatoria();
 			}
 			
 			// creamos solicitud abierta para otro candidato						
@@ -430,6 +432,8 @@ public class TestBEPModeloSolicitud {
 	@Test
 	public void testA12asignarMeritosASolicitudBolsa() throws SQLException {
 		Solicitud sAbierta = null;
+		Bolsa bolsa = null;
+		String estadoBolsa = null;  
 		
 		try {
 			// creamos un merito no individualizado
@@ -446,11 +450,18 @@ public class TestBEPModeloSolicitud {
 			ModeloSolicitud modelo = ModeloSolicitud.obtenerInstancia();
 			Convocatoria c = ModeloConvocatoria.obtenerInstancia().getUltimaConvocatoria();
 			Solicitud s = ModeloSolicitud.obtenerInstancia().getSolicitudByConvocatoriaUsuario(candidato1, c);
+						
+			bolsa = getBolsaSinAdscripcion();
+			if (!bolsa.getEstado().equals(ModeloBolsa.BOLSA_ESTADO_DESBLOQUEADA)) {
+				estadoBolsa = bolsa.getEstado();
+				UtilsTestBolsaEmpleo.sqlExecute("UPDATE TBEP_BOLSAS SET ESTADO = '" + ModeloBolsa.BOLSA_ESTADO_DESBLOQUEADA + "' WHERE CODNUM = " 
+						+ bolsa.getCodNum());				
+			}
+			Bolsa bolsaFinal = ModeloBolsa.obtenerInstancia().getBolsaById(bolsa.getCodNum());
 			Merito meritoIndividualizado = getMeritoIndividualizadoAfinidad();
 			Merito meritoNoIndividualizado = getMeritoNoIndividualizadoAfinidad();
-			Bolsa bolsa = getBolsaSinAdscripcion();
 			
-			Throwable throwable = assertThrows(Throwable.class, () -> modelo.asignarMeritosASolicitudBolsa(s, bolsa, meritoIndividualizado, candidato1));
+			Throwable throwable = assertThrows(Throwable.class, () -> modelo.asignarMeritosASolicitudBolsa(s, bolsaFinal, meritoIndividualizado, candidato1));
 			assertEquals(UVException.class, throwable.getClass());
 			assertEquals(ModeloSolicitud.MENSAJE_ERROR_SOLICITUD_CERRADA, throwable.getMessage());
 			

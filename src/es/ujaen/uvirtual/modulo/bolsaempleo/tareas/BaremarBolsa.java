@@ -29,23 +29,36 @@ public final class BaremarBolsa {
 	 */
 	public static void run() {
 		try {
-			ModeloBolsa modeloBolsa = ModeloBolsa.obtenerInstancia();
-			ModeloResultados modeloResultados = ModeloResultados.obtenerInstancia();
-			
-			List<Bolsa> bolsas = modeloBolsa.getBolsasPendientesBaremacion();
-			
-			for (Bolsa bolsa: bolsas) {
-				List<Solicitud> solicitudes = modeloResultados.listaSolicitudesBolsa(bolsa, ModeloConvocatoria.obtenerInstancia().getUltimaConvocatoria());
-				
-				for (Solicitud solicitud: solicitudes) {
-					modeloResultados.calcularSolicitud(solicitud, bolsa);
-				}
-				
-				modeloBolsa.baremarBolsa(bolsa, null);
-			}
+			baremarBolsas();
 		} catch (SQLException | UVException e) {
 			LOGGER.log(Level.SEVERE, Formateador.getStackTrace(e));
 			LOGGER.log(Level.SEVERE, e.toString());
+		}
+	}
+	
+	/**
+	 * Metodo para ejecutar la tarea desde los tests.
+	 * @throws SQLException .
+	 * @throws UVException .
+	 */
+	public static void runFromTest() throws SQLException, UVException {
+		baremarBolsas();
+	}
+	
+	private static void baremarBolsas() throws SQLException, UVException {
+		ModeloBolsa modeloBolsa = ModeloBolsa.obtenerInstancia();
+		ModeloResultados modeloResultados = ModeloResultados.obtenerInstancia();
+		
+		List<Bolsa> bolsas = modeloBolsa.getBolsasPendientesBaremacion();
+		
+		for (Bolsa bolsa: bolsas) {
+			List<Solicitud> solicitudes = modeloResultados.listaSolicitudesBolsa(bolsa, ModeloConvocatoria.obtenerInstancia().getUltimaConvocatoria());
+			
+			for (Solicitud solicitud: solicitudes) {
+				modeloResultados.calcularSolicitud(solicitud, bolsa);
+			}
+			
+			modeloBolsa.baremarBolsa(bolsa, null);
 		}
 	}
 }

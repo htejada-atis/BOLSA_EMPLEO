@@ -22,7 +22,7 @@ public class CargaMigracionBolsaEmpleo03 {
 	public static void main(String[] args) {
 		BbddRunner.conectarBd();
 		try {
-			BbddRunner.ejecutar("Documentos/scripts/opc.bolsaempleo/migraciones/04-resultados.sql.sql");
+			BbddRunner.ejecutar("Documentos/scripts/opc.bolsaempleo/migraciones/04-resultados.sql");
 		} catch (IOException | SQLException e) {
 			e.printStackTrace();
 		}
