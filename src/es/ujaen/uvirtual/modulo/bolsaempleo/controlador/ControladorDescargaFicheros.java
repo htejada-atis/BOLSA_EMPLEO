@@ -1,13 +1,9 @@
 package es.ujaen.uvirtual.modulo.bolsaempleo.controlador;
 
-import java.awt.Color;
 import java.io.BufferedInputStream;
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.sql.SQLException;
-import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.servlet.ServletOutputStream;
@@ -15,34 +11,17 @@ import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import com.lowagie.text.Cell;
-import com.lowagie.text.Chunk;
-import com.lowagie.text.Document;
-import com.lowagie.text.Font;
-import com.lowagie.text.FontFactory;
-import com.lowagie.text.Paragraph;
-import com.lowagie.text.Phrase;
-import com.lowagie.text.Table;
-import com.lowagie.text.alignment.HorizontalAlignment;
-import com.lowagie.text.pdf.PdfWriter;
 import es.ujaen.uvirtual.beans.UVDatos;
-import es.ujaen.uvirtual.beans.Usuario;
-import es.ujaen.uvirtual.modulo.bolsaempleo.beans.ApartadoBaremacion;
-import es.ujaen.uvirtual.modulo.bolsaempleo.beans.BloqueBaremacion;
 import es.ujaen.uvirtual.modulo.bolsaempleo.beans.Bolsa;
 import es.ujaen.uvirtual.modulo.bolsaempleo.beans.BolsaResultado;
 import es.ujaen.uvirtual.modulo.bolsaempleo.beans.Convocatoria;
 import es.ujaen.uvirtual.modulo.bolsaempleo.beans.Fichero;
-import es.ujaen.uvirtual.modulo.bolsaempleo.beans.ItemBaremacion;
 import es.ujaen.uvirtual.modulo.bolsaempleo.beans.Merito;
 import es.ujaen.uvirtual.modulo.bolsaempleo.beans.MeritoPreferenteUsuario;
 import es.ujaen.uvirtual.modulo.bolsaempleo.beans.Solicitud;
 import es.ujaen.uvirtual.modulo.bolsaempleo.beans.TitulacionUsuario;
 import es.ujaen.uvirtual.modulo.bolsaempleo.beans.UsuarioBolsaEmpleo;
 import es.ujaen.uvirtual.modulo.bolsaempleo.informes.GenerarItemsBaremacionPDF;
-import es.ujaen.uvirtual.modulo.bolsaempleo.modelo.ModeloBaremacionApartados;
-import es.ujaen.uvirtual.modulo.bolsaempleo.modelo.ModeloBaremacionBloques;
-import es.ujaen.uvirtual.modulo.bolsaempleo.modelo.ModeloBaremacionItems;
 import es.ujaen.uvirtual.modulo.bolsaempleo.modelo.ModeloBolsa;
 import es.ujaen.uvirtual.modulo.bolsaempleo.modelo.ModeloConvocatoria;
 import es.ujaen.uvirtual.modulo.bolsaempleo.modelo.ModeloDescargaFichero;
@@ -84,6 +63,7 @@ public class ControladorDescargaFicheros extends HttpServlet {
 	public static final String ACCION_DESCARGAR_MERITO_CANDIDATO = "descargarmeritocandidato";
 	public static final String ACCION_DESCARGAR_MERITO_PERSONAL = "descargarmeritopersonal";
 	public static final String ACCION_DESCARGAR_MERITO_COMISION = "descargarmeritocomision";
+	public static final String ACCION_DESCARGAR_RESULTADOS_SOLICITUD_CANDIDATO = "descargarresultadossolicitudcandidato";
 	public static final String ACCION_DESCARGAR_RESULTADOS_SOLICITUD_PERSONAL = "descargarresultadossolicitudpersonal";
 	public static final String ACCION_DESCARGAR_RESUMEN_ITEM_BAREMACION = "descargarresumenitemsbaremacion";
 	public static final String ACCION_DESCARGAR_SOLICITUD = "descargarsolicitud";
@@ -129,6 +109,7 @@ public class ControladorDescargaFicheros extends HttpServlet {
 				case ACCION_DESCARGAR_ACREDITACION_CANDIDATO:
 				case ACCION_DESCARGAR_MERITO_CANDIDATO:
 				case ACCION_DESCARGAR_TITULACION_CANDIDATO:
+				case ACCION_DESCARGAR_RESULTADOS_SOLICITUD_CANDIDATO:
 				case ACCION_DESCARGAR_SOLICITUD:
 					accionesFicherosCandidatos(bean, datos, request, response, nombreAccion);
 					break;
@@ -219,6 +200,9 @@ public class ControladorDescargaFicheros extends HttpServlet {
 				break;
 			case ACCION_DESCARGAR_TITULACION_CANDIDATO:
 				descargaTitulacionCandidato(bean, datos, request, response);
+				break;
+			case ACCION_DESCARGAR_RESULTADOS_SOLICITUD_CANDIDATO:
+				descargaResultadosSolicitudCandidato(bean, datos, request, response);
 				break;
 			case ACCION_DESCARGAR_SOLICITUD:
 				descargaSolicitud(bean, datos, request, response);
@@ -379,6 +363,17 @@ public class ControladorDescargaFicheros extends HttpServlet {
 	///////////////////////////////////////////////////////////////////////////////////////////////////////////
 	// RESULTADOS
 	///////////////////////////////////////////////////////////////////////////////////////////////////////////
+	
+	private void descargaResultadosSolicitudCandidato(VistaDescargaFicheros bean, UVDatos datos, HttpServletRequest request, HttpServletResponse response) 
+			throws SQLException, UVException {
+		Bolsa bolsa = ModeloBolsa.obtenerInstancia().getBolsaById(Formateador.leeParametroInteger(request.getParameter(PARAM_BOLSA)));
+		Convocatoria convocatoria = ModeloConvocatoria.obtenerInstancia().getUltimaConvocatoria();
+		
+		BolsaResultado bolsaResultado = ModeloResultados.obtenerInstancia().getBolsaResultado(bolsa, bean.getUsuarioLogeado(), convocatoria);
+		bean.setBolsaResultado(bolsaResultado);
+		
+		descargarPDF(datos, response, bolsaResultado.getArchivo());
+	}
 	
 	private void descargaResultadosSolicitudPersonal(VistaDescargaFicheros bean, UVDatos datos, HttpServletRequest request, HttpServletResponse response) 
 			throws SQLException, UVException {

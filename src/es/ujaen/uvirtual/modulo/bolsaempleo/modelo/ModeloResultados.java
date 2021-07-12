@@ -71,8 +71,6 @@ public class ModeloResultados {
 	
 	public static final String MERITO_EXCLUIDO = "S";
 	public static final String MERITO_VALIDADO = "S";
-	public static final String SOLICITUD_ESTADO_ABIERTA = "ABIERTA";
-	public static final String SOLICITUD_ESTADO_CERRADA = "CERRADA";
 	
 		
 	protected static ModeloResultados eInstancia;
@@ -260,7 +258,7 @@ public class ModeloResultados {
 		
 		String consulta = "SELECT bepsol.* FROM TBEP_SOLICITUD_BOLSAS bepsob"
 				+ "	INNER JOIN TBEP_SOLICITUDES bepsol ON bepsol.CODNUM = bepsob.BEPSOL_CODNUM"
-				+ "	WHERE bepsol.BEPCON_CODNUM = ? AND bepsob.BEPBOL_CODNUM = ? AND bepsol.ESTADO = '" + SOLICITUD_ESTADO_CERRADA + "'";
+				+ "	WHERE bepsol.BEPCON_CODNUM = ? AND bepsob.BEPBOL_CODNUM = ? AND bepsol.ESTADO = '" + ModeloSolicitud.SOLICITUD_ESTADO_CERRADA + "'";
 		
 		try (Connection conexion = ConexionUvirtual.obtenerInstancia();
 				PreparedStatement stmt = conexion.prepareStatement(consulta)) {
@@ -299,7 +297,7 @@ public class ModeloResultados {
 				+ "	FROM TBEP_SOLICITUD_BOLSAS bepsob"
 				+ "	INNER JOIN TBEP_SOLICITUDES bepsol ON bepsol.CODNUM = bepsob.BEPSOL_CODNUM"
 				+ "	INNER JOIN TBEP_USUARIOS bepusu ON bepusu.CODNUM = bepsol.BEPUSU_CODNUM"
-				+ "	WHERE bepsol.BEPCON_CODNUM = ? AND bepsob.BEPBOL_CODNUM = ? AND bepsol.ESTADO = '" + SOLICITUD_ESTADO_CERRADA + "'";
+				+ "	WHERE bepsol.BEPCON_CODNUM = ? AND bepsob.BEPBOL_CODNUM = ? AND bepsol.ESTADO = '" + ModeloSolicitud.SOLICITUD_ESTADO_CERRADA + "'";
 		
 		String whereNombre = String.format("(%s || ' ' || %s || ' ' || %s)", "bepusu.VUAJA_STRNOMBRE", "bepusu.VUAJA_STRAPELLIDO1", "bepusu.VUAJA_STRAPELLIDO2");
 		
@@ -484,7 +482,7 @@ public class ModeloResultados {
 			int indexParam = 1;
 			stmt.setInt(indexParam++, convocatoria.getCodNum());
 			stmt.setInt(indexParam++, bolsa.getCodNum());
-			stmt.setString(indexParam++, SOLICITUD_ESTADO_CERRADA);
+			stmt.setString(indexParam++, ModeloSolicitud.SOLICITUD_ESTADO_CERRADA);
 			stmt.setInt(indexParam++, candidato.getCodNum());
 			
 			

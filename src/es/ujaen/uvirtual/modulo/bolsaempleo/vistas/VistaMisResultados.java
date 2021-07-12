@@ -1,9 +1,12 @@
 package es.ujaen.uvirtual.modulo.bolsaempleo.vistas;
 
 import java.io.Serializable;
-
 import es.ujaen.uvirtual.beans.vistas.Vista;
-import es.ujaen.uvirtual.modulo.bolsaempleo.beans.Area;
+import es.ujaen.uvirtual.modulo.bolsaempleo.beans.Bolsa;
+import es.ujaen.uvirtual.modulo.bolsaempleo.beans.BolsaResultado;
+import es.ujaen.uvirtual.modulo.bolsaempleo.beans.CandidatoResultadoTable;
+import es.ujaen.uvirtual.modulo.bolsaempleo.beans.Convocatoria;
+import es.ujaen.uvirtual.modulo.bolsaempleo.beans.MeritoPreferente;
 import es.ujaen.uvirtual.modulo.bolsaempleo.beans.UsuarioBolsaEmpleo;
 import es.ujaen.uvirtual.modulo.bolsaempleo.utilidades.BolsaEmpleoDataTable;
 
@@ -13,9 +16,14 @@ import es.ujaen.uvirtual.modulo.bolsaempleo.utilidades.BolsaEmpleoDataTable;
  * @author ATISoluciones
  */
 public class VistaMisResultados extends Vista implements Serializable {
+	
 	private static final long serialVersionUID = 1L;
-	private transient BolsaEmpleoDataTable<Area> dataTableAreas;
-	private Area area;
+	private transient BolsaEmpleoDataTable<BolsaResultado> dataTableBolsas;
+	private transient BolsaEmpleoDataTable<CandidatoResultadoTable> dataTableCandidatos;
+	private Bolsa bolsa;
+	private BolsaResultado bolsaResultado;
+	private Convocatoria convocatoria;
+	private MeritoPreferente meritoPreferente;
 	private String vista;
 	private UsuarioBolsaEmpleo usuarioLogeado;
 	
@@ -35,19 +43,51 @@ public class VistaMisResultados extends Vista implements Serializable {
 		this.usuarioLogeado = usuario;
 	}
 
-	public BolsaEmpleoDataTable<Area> getDatatableAreas() {
-		return dataTableAreas;
+	public BolsaEmpleoDataTable<BolsaResultado> getDataTableBolsas() {
+		return dataTableBolsas;
 	}
 
-	public void setDatatableAreas(BolsaEmpleoDataTable<Area> dt) {
-		this.dataTableAreas = dt;
+	public void setDataTableBolsas(BolsaEmpleoDataTable<BolsaResultado> dataTableBolsas) {
+		this.dataTableBolsas = dataTableBolsas;
+	}
+	
+	public Bolsa getBolsa() {
+		return bolsa;
+	}
+	
+	public void setBolsa(Bolsa bolsa) {
+		this.bolsa = bolsa;
+	}
+	
+	public Convocatoria getConvocatoria() {
+		return convocatoria;
+	}
+	
+	public void setConvocatoria(Convocatoria pconvocatoria) {
+		this.convocatoria = pconvocatoria;
 	}
 
-	public Area getArea() {
-		return area;
+	public BolsaEmpleoDataTable<CandidatoResultadoTable> getDataTableCandidatos() {
+		return dataTableCandidatos;
 	}
 
-	public void setArea(Area area) {
-		this.area = area;
+	public void setDataTableCandidatos(BolsaEmpleoDataTable<CandidatoResultadoTable> dataTableCandidatos) {
+		this.dataTableCandidatos = dataTableCandidatos;
+	}
+
+	public BolsaResultado getBolsaResultado() {
+		return bolsaResultado;
+	}
+
+	public void setBolsaResultado(BolsaResultado bolsaResultado) {
+		this.bolsaResultado = bolsaResultado;
+	}
+
+	public MeritoPreferente getMeritoPreferente() {
+		return meritoPreferente;
+	}
+
+	public void setMeritoPreferente(MeritoPreferente meritoPreferente) {
+		this.meritoPreferente = meritoPreferente;
 	}
 }

@@ -1,6 +1,6 @@
 <%@ page trimDirectiveWhitespaces="true"%>
-<%@	page import="es.ujaen.uvirtual.modulo.bolsaempleo.controlador.ControladorResultados"%>
-<%@ page import="es.ujaen.uvirtual.modulo.bolsaempleo.vistas.VistaResultados" %>
+<%@	page import="es.ujaen.uvirtual.modulo.bolsaempleo.controlador.candidato.ControladorMisResultados"%>
+<%@ page import="es.ujaen.uvirtual.modulo.bolsaempleo.vistas.VistaMisResultados" %>
 <%@ page import="es.ujaen.uvirtual.modulo.bolsaempleo.beans.Bolsa" %>
 <%@ page import="es.ujaen.uvirtual.beans.UVDatos"%>
 <%@ page import="es.ujaen.uvirtual.utilidades.EscapaHTML" %>
@@ -8,7 +8,7 @@
 
 <% 
 UVDatos uvdatos = (UVDatos)request.getAttribute(UVDatos.NOMBRE_ATRIBUTO);
-VistaResultados bean = (VistaResultados)uvdatos.getVistas().get(VistaResultados.class.getName());
+VistaMisResultados bean = (VistaMisResultados)uvdatos.getVistas().get(VistaMisResultados.class.getName());
 Bolsa bolsa = bean.getBolsa();
 %>
 
@@ -35,7 +35,7 @@ Bolsa bolsa = bean.getBolsa();
 	</table>
 	
 	<div class="row">
-		<button class="link-btn" id="resultados_volver" style="float:left; max-height: 25px">
+		<button class="link-btn" id="misresultados_volver" style="float:left; max-height: 25px">
 	    	 Volver
 	    </button>
 	</div>
@@ -45,35 +45,37 @@ Bolsa bolsa = bean.getBolsa();
 
 $(document).ready(function() {
 	var tableCandidatos = new Atis.DataTable('#tableCandidatos', {
-	    "ajax": { url: "<%= ControladorResultados.URL_PATTERN_AJAX %>" },
+	    "ajax": { url: "<%= ControladorMisResultados.URL_PATTERN_AJAX %>" },
 	    "pageSize": 100,
-	    "filterable": true,
 	    "defaultOrderBy": 2,
 	    "defaultOrderDirection": 'desc',
-	    "action": "<%= ControladorResultados.ACCION_DATATABLE_CANDIDATOS %>",
-	    "params": {'<%=ControladorResultados.PARAM_BOLSA%>': '<%= bolsa.getCodNum() %>'},
+	    "action": "<%= ControladorMisResultados.ACCION_DATATABLE_CANDIDATOS %>",
+	    "params": {'<%=ControladorMisResultados.PARAM_BOLSA%>': '<%= bolsa.getCodNum() %>'},
+	    "selected": <%= bean.getUsuarioLogeado().getCodNum() %> ,
 	    "columns": [
-	    	{'data': 'prsnif', 'filter': true},
-	    	{'data': 'apellido1', 'filter': true, 'overflow': 'auto', 'render': function(row) {
+	    	{'data': 'prsnif', 'order': false},
+	    	{'data': 'apellido1', 'order': false, 'overflow': 'auto', 'render': function(row) {
         		return row.nombre + " " + row.apellido1 + " " + row.apellido2;
         	}},
-	        {'data': 'total', 'filter': {'type': 'number'}},
+	        {'data': 'total', 'order': false},
 	        {'data': 'codnum', 'buttons': [
 	        	{'label': 'Ver detalles',
 		        	'onClick': function(row) {
 		        		var params = {
-		    				'<%= ControladorResultados.PARAM_ACCION %>': '<%= ControladorResultados.ACCION_SELECCIONAR_CANDIDATO %>',
-		    				'<%= ControladorResultados.PARAM_BOLSA %>': '<%= bolsa.getCodNum() %>',
-		    				'<%= ControladorResultados.PARAM_CANDIDATO %>': row.codNum
+		    				'<%= ControladorMisResultados.PARAM_ACCION %>': '<%= ControladorMisResultados.ACCION_MIS_RESULTADOS %>',
+		    				'<%= ControladorMisResultados.PARAM_BOLSA %>': '<%= bolsa.getCodNum() %>'
 			    		};
 			    		Atis.sendForm("<%= request.getRequestURI() %>", params);
-		        	}
+		        	},
+		        	'visible': function(row) {
+		        		return row.codNum == <%= bean.getUsuarioLogeado().getCodNum() %>;
+	        		}
 	        	}]
 	        }
 	    ]
 	});
 	
-	document.getElementById("resultados_volver").addEventListener("click", function() {
+	document.getElementById("misresultados_volver").addEventListener("click", function() {
 		Atis.sendForm("<%= request.getRequestURI() %>", {});
 	});
 });

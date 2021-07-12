@@ -383,7 +383,11 @@ function DataTable(id, config) {
 	    			$(btn).on('click', buttonDef.onClick.bind($(btn), row, self));
 	                $(btn).on('click', event => event.stopPropagation());
 	    			$(buttons).append(btn);
-                }    			
+                } else {
+                    if (buttonDef.hasOwnProperty('renderNotVisible')) {
+                        $(buttons).append(buttonDef.renderNotVisible(row));
+                    }
+                }
     		});
 
     		return buttons;

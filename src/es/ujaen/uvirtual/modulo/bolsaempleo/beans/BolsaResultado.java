@@ -68,6 +68,17 @@ public class BolsaResultado extends Bolsa implements Serializable {
 	
 	/** Constructor con parametros .
 	 * @param pbolsa .
+	 * @param ptotal .
+	 * @param presultadoActual .
+	 */
+	public BolsaResultado(Bolsa pbolsa, Double ptotal, Boolean presultadoActual) {
+		super(pbolsa);
+		this.total = ptotal;
+		this.resultadoActual = presultadoActual;
+	}
+	
+	/** Constructor con parametros .
+	 * @param pbolsa .
 	 * @param presultadoActual .
 	 */
 	public BolsaResultado(Bolsa pbolsa, Boolean presultadoActual) {
