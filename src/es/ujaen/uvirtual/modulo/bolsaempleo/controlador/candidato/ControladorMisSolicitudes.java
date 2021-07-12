@@ -324,15 +324,13 @@ public class ControladorMisSolicitudes extends HttpServlet {
 				BolsaEmpleoDataTable<Solicitud> dataTable = modelo.listaSolicitudesDatatable(bean.getUsuarioLogeado(), request.getParameterMap());
 				bean.setDatatableSolicitudes(dataTable);
 				writer.write(dataTable.toJson("dd/M/yyyy HH:mm:ss"));
-			} catch (UVException e) {
-				LOGGER.log(Level.WARNING, e.toString());
-				bean.getMensajesDeError().add(e.getMessage());
-				CodigoDescripcion mensaje = new CodigoDescripcion(RESPONSE_AJAX_ERROR, e.getMessage());
-				writer.write(new Gson().toJson(mensaje));
-				response.setStatus(RESPONSE_AJAX_HTTP_CODE_ERROR);
-			} catch (SQLException e) { 
-				LOGGER.log(Level.SEVERE, Formateador.getStackTrace(e));
-				LOGGER.log(Level.SEVERE, e.toString());
+			} catch (UVException | SQLException e) {
+				if (e instanceof SQLException) {
+					LOGGER.log(Level.SEVERE, Formateador.getStackTrace(e));
+					LOGGER.log(Level.SEVERE, e.toString());
+				} else {
+					LOGGER.log(Level.WARNING, e.toString());
+				}
 				bean.getMensajesDeError().add(e.getMessage());
 				CodigoDescripcion mensaje = new CodigoDescripcion(RESPONSE_AJAX_ERROR, e.getMessage());
 				writer.write(new Gson().toJson(mensaje));
@@ -430,7 +428,7 @@ public class ControladorMisSolicitudes extends HttpServlet {
 				bean.setDataTableBolsasCandidatoSeleccionadas(dataTable);
 				writer.write(dataTable.toJson());
 			} catch (UVException | SQLException e) {
-				if (e.getClass().equals(SQLException.class)) {
+				if (e instanceof SQLException) {
 					LOGGER.log(Level.SEVERE, Formateador.getStackTrace(e));
 					LOGGER.log(Level.SEVERE, e.toString());
 				} else {
@@ -458,7 +456,7 @@ public class ControladorMisSolicitudes extends HttpServlet {
 				bean.setDataTableBolsasCandidato(dataTable);
 				writer.write(dataTable.toJson());
 			} catch (UVException | SQLException e) {
-				if (e.getClass().equals(SQLException.class)) {
+				if (e instanceof SQLException) {
 					LOGGER.log(Level.SEVERE, Formateador.getStackTrace(e));
 					LOGGER.log(Level.SEVERE, e.toString());
 				} else {
@@ -725,7 +723,7 @@ public class ControladorMisSolicitudes extends HttpServlet {
 				bean.setDatatableBolsasSolicitud(dataTable);
 				writer.write(dataTable.toJson());
 			} catch (UVException | SQLException e) {
-				if (e.getClass().equals(SQLException.class)) {
+				if (e instanceof SQLException) {
 					LOGGER.log(Level.SEVERE, Formateador.getStackTrace(e));
 					LOGGER.log(Level.SEVERE, e.toString());
 				} else {
@@ -765,7 +763,7 @@ public class ControladorMisSolicitudes extends HttpServlet {
 				bean.setDataTableMeritos(dataTable);
 				writer.write(dataTable.toJson());
 			} catch (UVException | SQLException e) {
-				if (e.getClass().equals(SQLException.class)) {
+				if (e instanceof SQLException) {
 					LOGGER.log(Level.SEVERE, Formateador.getStackTrace(e));
 					LOGGER.log(Level.SEVERE, e.toString());
 				} else {
