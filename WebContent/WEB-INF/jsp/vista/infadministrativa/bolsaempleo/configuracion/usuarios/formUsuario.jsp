@@ -238,9 +238,9 @@ VistaUsuarioBolsaEmpleo bean = (VistaUsuarioBolsaEmpleo) uvdatos.getVistas().get
 	<%	if (bean.getApartadoDepartamentos() != null) { %>
 			<table class="bluetable bolsaempleo" id="table_departamentos">
 				<tr>
-					<th scope="col" style="width:20%" title="Id del departamento">Id</th>
-					<th scope="col" style="width:25%" title="Código de departamento">Código</th>
-					<th scope="col" style="width:65%">Departamento</th>
+					<th scope="col" style="width:60px" title="Id del departamento">Id</th>
+					<th scope="col" style="width:100px" title="Código de departamento">Código</th>
+					<th scope="col" style="width:100%">Departamento</th>
 				</tr>
 				<tbody>		
 				</tbody>
@@ -423,13 +423,12 @@ VistaUsuarioBolsaEmpleo bean = (VistaUsuarioBolsaEmpleo) uvdatos.getVistas().get
 				    "ajax": { url: "<%=ControladorUsuarioBolsaEmpleo.URL_PATTERN_AJAX%>", async: false},
 				    "params": {"<%=ControladorUsuarioBolsaEmpleo.PARAM_USUARIO%>": <%= bean.getUsuario().getCodNum() %>},
 				    "pageSize": 10,
-				    "filterable": true,
 				    "title": 'LISTADO DE DEPARTAMENTOS',
 				    "action": "<%= ControladorUsuarioBolsaEmpleo.ACCION_DATATABLE_DEPARTAMENTOS_USUARIO %>",
 				    "columns": [
-				        {'data': 'area.codNum', 'filter': {'type': 'number'}},
-				        {'data': 'area.idAreaExterno' , 'filter': true, 'overflow': 'auto'},
-				        {'data': 'area.descripcion', 'filter': true, 'overflow': 'auto'}
+				        {'data': 'codNum', 'order': false},
+				        {'data': 'idDepartamentoExterno' , 'order': false},
+				        {'data': 'descripcion', 'order': false}
 				    ],
 				});
 		

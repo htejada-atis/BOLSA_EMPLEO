@@ -9,6 +9,7 @@ import java.util.List;
 import java.util.Map;
 
 import es.ujaen.uvirtual.modelo.conexion.ConexionUvirtual;
+import es.ujaen.uvirtual.modelo.conexion.ConexionUxxiRrhh;
 import es.ujaen.uvirtual.modulo.bolsaempleo.beans.Bolsa;
 import es.ujaen.uvirtual.modulo.bolsaempleo.beans.Departamento;
 import es.ujaen.uvirtual.modulo.bolsaempleo.beans.UsuarioBolsaEmpleo;
@@ -107,7 +108,8 @@ public class ModeloDepartamento {
 		List<Departamento> departamentos = new ArrayList<>();
 		BolsaEmpleoDataTable<Departamento> dataTable = new BolsaEmpleoDataTable<>(params);
 		
-		String consulta = "";
+		String consulta = "SELECT * FROM UXXIRRHH.VUJA_NET_BEP_RH_DEPARTAMENTO_PDI"
+				+ " WHERE PRSNIF = ? AND SYSDATE BETWEEN F_DESDE AND F_HASTA";
 		
 		dataTable.setQuery(consulta);
 				
@@ -116,15 +118,14 @@ public class ModeloDepartamento {
 				PreparedStatement stmt = conexion.prepareStatement(dataTable.getQuery())
 		) {
 			int indexParam = 1;
-			stmt.setInt(indexParam, director.getCodNum());
-			stmtCount.setInt(indexParam++, director.getCodNum());
+			stmt.setString(indexParam, director.getPrsNif());
+			stmtCount.setString(indexParam++, director.getPrsNif());
 			
 			dataTable.setFiltersParams(stmt, stmtCount, indexParam);
 			try (ResultSet rs = stmt.executeQuery()) {
 				while (rs.next()) {
-					Departamento departamento = new Departamento();
-					
-					departamentos.add(departamento);					
+					Departamento departamento = this.getDepartamentoByIdExterno(rs.getString("ID_DEPARTAMENTO"));
+					departamentos.add(departamento);
 				}				
 			}	
 			
@@ -150,7 +151,7 @@ public class ModeloDepartamento {
 		
 		String consulta = "SELECT bepdep.* FROM TBEP_DEPARTAMENTOS bepdep WHERE bepdep.CODNUM = ?";
 
-		try (Connection conexion = ConexionUvirtual.obtenerInstancia(); PreparedStatement stmt = conexion.prepareStatement(consulta)) {
+		try (Connection conexion = ConexionUxxiRrhh.obtenerInstancia(); PreparedStatement stmt = conexion.prepareStatement(consulta)) {
 			stmt.setInt(1, idDepartamento);
 
 			try (ResultSet rs = stmt.executeQuery()) {
