@@ -16,9 +16,11 @@ import es.ujaen.uvirtual.beans.UVDatos;
 import es.ujaen.uvirtual.beans.Usuario;
 import es.ujaen.uvirtual.adm.CrearUsuario;
 import es.ujaen.uvirtual.modulo.bolsaempleo.beans.Bolsa;
+import es.ujaen.uvirtual.modulo.bolsaempleo.beans.Departamento;
 import es.ujaen.uvirtual.modulo.bolsaempleo.beans.Rol;
 import es.ujaen.uvirtual.modulo.bolsaempleo.beans.UsuarioBolsaEmpleo;
 import es.ujaen.uvirtual.modulo.bolsaempleo.modelo.ModeloArea;
+import es.ujaen.uvirtual.modulo.bolsaempleo.modelo.ModeloDepartamento;
 import es.ujaen.uvirtual.modulo.bolsaempleo.modelo.ModeloParametrosConfiguracion;
 import es.ujaen.uvirtual.modulo.bolsaempleo.modelo.ModeloRol;
 import es.ujaen.uvirtual.modulo.bolsaempleo.modelo.ModeloUsuarioBolsaEmpleo;
@@ -68,7 +70,9 @@ public class ControladorUsuarioBolsaEmpleo extends HttpServlet {
 	public static final String ACCION_AGREGAR_USUARIO = "agregarusuario";
 	public static final String ACCION_BUSCAR_USUARIO = "buscarusuario";
 	public static final String ACCION_DATATABLE_AREAS_EVALUABLES_USUARIO = "datatableareasevaluablesuruario";
+	public static final String ACCION_DATATABLE_DEPARTAMENTOS_USUARIO = "datatabledepartamentosuruario";
 	public static final String ACCION_DATATABLE_USUARIOS = "datatableusuarios";
+	public static final String ACCION_DEPARTAMENTOS = "departamentos";
 	public static final String ACCION_EDITAR_USUARIO = "editarusuario";
 	public static final String ACCION_ELIMINAR_USUARIO = "eliminarusuario";
 	public static final String ACCION_INDEX = "index";
@@ -133,6 +137,7 @@ public class ControladorUsuarioBolsaEmpleo extends HttpServlet {
 					break;
 				case ACCION_AREAS_EVALUABLES:
 				case ACCION_DATATABLE_AREAS_EVALUABLES_USUARIO:
+				case ACCION_DEPARTAMENTOS:
 				case ACCION_EDITAR_USUARIO:
 				case ACCION_ELIMINAR_USUARIO:
 				case ACCION_RECUPERAR_USUARIO:
@@ -290,6 +295,12 @@ public class ControladorUsuarioBolsaEmpleo extends HttpServlet {
 			case ACCION_DATATABLE_AREAS_EVALUABLES_USUARIO:
 				listadoAreasEvaluables(bean, datos, request, response);
 				break;
+			case ACCION_DATATABLE_DEPARTAMENTOS_USUARIO:
+				listadoDepartamentos(bean, datos, request, response);
+				break;
+			case ACCION_DEPARTAMENTOS:
+				bean.setApartadoDepartamentos(true);
+				break;
 			case ACCION_EDITAR_USUARIO:
 				editarUsuario(bean, datos, request, response);
 				break;
@@ -379,6 +390,42 @@ public class ControladorUsuarioBolsaEmpleo extends HttpServlet {
 			try {
 				BolsaEmpleoDataTable<Bolsa> dataTable = ModeloArea.obtenerInstancia().listaAreasEvaluadorDatatable(request.getParameterMap(), bean.getUsuario());
 				bean.setDatatableAreasEvaluables(dataTable);
+				writer.write(dataTable.toJson());
+			} catch (UVException | SQLException e) {
+				if (e instanceof SQLException) {
+					LOGGER.log(Level.SEVERE, Formateador.getStackTrace(e));
+					LOGGER.log(Level.SEVERE, e.toString());
+				} else {
+					LOGGER.log(Level.WARNING, e.toString());
+				}
+				bean.getMensajesDeError().add(e.getMessage());
+				CodigoDescripcion mensaje = new CodigoDescripcion(RESPONSE_AJAX_ERROR, e.getMessage());
+				writer.write(new Gson().toJson(mensaje));
+				response.setStatus(RESPONSE_AJAX_HTTP_CODE_ERROR);
+			}
+		}
+	}
+	
+	/**
+	 * AJAX para devolver datatable departamentos de un director de departamento .
+	 * @param bean .
+	 * @param datos .
+	 * @param request .
+	 * @param response .
+	 * @throws IOException .
+	 * @throws SQLException .
+	 */
+	private void listadoDepartamentos(VistaUsuarioBolsaEmpleo bean, UVDatos datos, HttpServletRequest request, HttpServletResponse response) throws IOException {
+		datos.setContentType(RESPONSE_AJAX_CONTENTTYPE);
+		datos.setRespuestaEnviada(true);
+		response.setContentType(RESPONSE_AJAX_CONTENTTYPE);
+		response.setCharacterEncoding(RESPONSE_AJAX_ENCODING);
+		
+		try (PrintWriter writer = response.getWriter()) {
+			try {
+				BolsaEmpleoDataTable<Departamento> dataTable = ModeloDepartamento.obtenerInstancia().listaDepartamentosDirectorDatatable(
+						request.getParameterMap(), bean.getUsuario());
+				bean.setDataTableDepartamentos(dataTable);
 				writer.write(dataTable.toJson());
 			} catch (UVException | SQLException e) {
 				if (e instanceof SQLException) {

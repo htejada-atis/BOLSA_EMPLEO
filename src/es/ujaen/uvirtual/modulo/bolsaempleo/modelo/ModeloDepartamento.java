@@ -6,10 +6,13 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 import es.ujaen.uvirtual.modelo.conexion.ConexionUvirtual;
+import es.ujaen.uvirtual.modulo.bolsaempleo.beans.Bolsa;
 import es.ujaen.uvirtual.modulo.bolsaempleo.beans.Departamento;
 import es.ujaen.uvirtual.modulo.bolsaempleo.beans.UsuarioBolsaEmpleo;
+import es.ujaen.uvirtual.modulo.bolsaempleo.utilidades.BolsaEmpleoDataTable;
 import es.ujaen.uvirtual.utilidades.UVException;
 
 /**
@@ -91,6 +94,45 @@ public class ModeloDepartamento {
 			}
 		}
 		return departamentos;
+	}
+	
+	/** Listado de departamentos .
+	 * @param params para leer los parametros de paginación, ordenacion, etc .
+	 * @param director .
+	 * @return listado de departamentos .
+	 * @throws SQLException en caso de error de base de datos .
+	 * @throws UVException error si no existe la area .
+	 */
+	public BolsaEmpleoDataTable<Departamento> listaDepartamentosDirectorDatatable(Map<String, String[]> params, UsuarioBolsaEmpleo director) throws SQLException, UVException {
+		List<Departamento> departamentos = new ArrayList<>();
+		BolsaEmpleoDataTable<Departamento> dataTable = new BolsaEmpleoDataTable<>(params);
+		
+		String consulta = "";
+		
+		dataTable.setQuery(consulta);
+				
+		try (Connection conexion = ConexionUvirtual.obtenerInstancia();
+				PreparedStatement stmtCount = conexion.prepareStatement(dataTable.getQueryCount());
+				PreparedStatement stmt = conexion.prepareStatement(dataTable.getQuery())
+		) {
+			int indexParam = 1;
+			stmt.setInt(indexParam, director.getCodNum());
+			stmtCount.setInt(indexParam++, director.getCodNum());
+			
+			dataTable.setFiltersParams(stmt, stmtCount, indexParam);
+			try (ResultSet rs = stmt.executeQuery()) {
+				while (rs.next()) {
+					Departamento departamento = new Departamento();
+					
+					departamentos.add(departamento);					
+				}				
+			}	
+			
+			dataTable.setRecordsTotalFromQuery(stmtCount);
+			dataTable.setData(departamentos);
+		}
+		
+		return dataTable;
 	}
 
 	/**
