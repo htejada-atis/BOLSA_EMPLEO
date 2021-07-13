@@ -94,9 +94,9 @@ public class TestBEPControladorUsuariosBolsaEmpleo {
 	}
     
     /** Obtener items usuarios, sin parametro definido .
-	 * @throws SQLException si fallo bd 
-	 * @throws IOException si error io
-	 * @throws ServletException  si error servlet
+	 * @throws SQLException si fallo bd .
+	 * @throws IOException si error io .
+	 * @throws ServletException  si error servlet .
 	 */
 	@Test
 	public void testA01() throws IOException {

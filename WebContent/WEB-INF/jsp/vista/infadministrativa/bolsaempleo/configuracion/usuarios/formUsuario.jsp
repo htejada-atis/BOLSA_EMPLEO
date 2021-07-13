@@ -204,11 +204,17 @@ VistaUsuarioBolsaEmpleo bean = (VistaUsuarioBolsaEmpleo) uvdatos.getVistas().get
     	
     </form>
     
-<%	if (bean.getUsuario() != null && bean.getUsuario().getRol().getCodNum().equals(ModeloRol.ID_ROL_MIEMBRO_COMISION)) { %>
+<%	if (bean.getUsuario() != null && (bean.getUsuario().getRol().getCodNum().equals(ModeloRol.ID_ROL_MIEMBRO_COMISION) 
+		|| bean.getUsuario().getRol().getCodNum().equals(ModeloRol.ID_ROL_DIRECTOR_DEPARTAMENTO))) { %>
 	    <ul class="nav-tabs-widget" style="margin-left: 0px; margin-top: 16px;">
 	    	<li <%= bean.getApartadoAreasEvaluables() != null ? "class='tab-selected'" : "" %>>
 	   	    	<a id="areas_evaluables">Áreas evaluables</a>
 	   	    </li>
+	   	<%	if (bean.getUsuario().getRol().getCodNum().equals(ModeloRol.ID_ROL_DIRECTOR_DEPARTAMENTO)) { %>
+	   			<li <%= bean.getApartadoDepartamentos() != null ? "class='tab-selected'" : "" %>>
+		   	    	<a id="departamentos">Departamentos</a>
+		   	    </li>
+	   	<%	} %>
 	   	</ul>
 	   	
 	<%	if (bean.getApartadoAreasEvaluables() != null) { %>
@@ -218,7 +224,7 @@ VistaUsuarioBolsaEmpleo bean = (VistaUsuarioBolsaEmpleo) uvdatos.getVistas().get
 					<th scope="col" style="width:25%" title="Código de area">Código</th>
 					<th scope="col" style="width:65%">Area</th>
 				</tr>
-				<tbody>		
+				<tbody>
 				</tbody>
 				<tfoot>
 					<tr>
@@ -227,14 +233,7 @@ VistaUsuarioBolsaEmpleo bean = (VistaUsuarioBolsaEmpleo) uvdatos.getVistas().get
 				</tfoot>
 			</table>
 	<%	} %>
-	   	
-<%	} else if (bean.getUsuario() != null && bean.getUsuario().getRol().getCodNum().equals(ModeloRol.ID_ROL_DIRECTOR_DEPARTAMENTO)) { %>
-		<ul class="nav-tabs-widget" style="margin-left: 0px; margin-top: 16px;">
-	    	<li <%= bean.getApartadoDepartamentos() != null ? "class='tab-selected'" : "" %>>
-	   	    	<a id="departamentos">Departamentos</a>
-	   	    </li>
-	   	</ul>
-	   	
+	
 	<%	if (bean.getApartadoDepartamentos() != null) { %>
 			<table class="bluetable bolsaempleo" id="table_departamentos">
 				<tr>
@@ -242,7 +241,7 @@ VistaUsuarioBolsaEmpleo bean = (VistaUsuarioBolsaEmpleo) uvdatos.getVistas().get
 					<th scope="col" style="width:100px" title="Código de departamento">Código</th>
 					<th scope="col" style="width:100%">Departamento</th>
 				</tr>
-				<tbody>		
+				<tbody>
 				</tbody>
 				<tfoot>
 					<tr>
@@ -250,6 +249,16 @@ VistaUsuarioBolsaEmpleo bean = (VistaUsuarioBolsaEmpleo) uvdatos.getVistas().get
 					</tr>
 				</tfoot>
 			</table>
+	<%	} %>
+	
+	<%	if (bean.getUsuario().getRol().getCodNum().equals(ModeloRol.ID_ROL_DIRECTOR_DEPARTAMENTO)) { %>
+			<div class="row">
+				<div class="col">
+					<button class="link-btn" id="actualizar_areas" style="float:right; max-height: 25px">
+				    	 Actualizar áreas
+				    </button>
+				</div>
+			</div>
 	<%	} %>
 <%	} %>
 
@@ -379,7 +388,8 @@ VistaUsuarioBolsaEmpleo bean = (VistaUsuarioBolsaEmpleo) uvdatos.getVistas().get
 			});
 	<%	} %>
 	
-	<%	if (bean.getUsuario() != null && bean.getUsuario().getRol().getCodNum().equals(ModeloRol.ID_ROL_MIEMBRO_COMISION)) { %>
+	<%	if (bean.getUsuario() != null && (bean.getUsuario().getRol().getCodNum().equals(ModeloRol.ID_ROL_MIEMBRO_COMISION) 
+			|| bean.getUsuario().getRol().getCodNum().equals(ModeloRol.ID_ROL_DIRECTOR_DEPARTAMENTO))) { %>
 			
 			document.getElementById("areas_evaluables").addEventListener("click", function(event) {
 				Atis.sendForm("<%= request.getRequestURI() %>", {
@@ -387,6 +397,24 @@ VistaUsuarioBolsaEmpleo bean = (VistaUsuarioBolsaEmpleo) uvdatos.getVistas().get
 					'<%=ControladorUsuarioBolsaEmpleo.PARAM_USUARIO%>': <%= bean.getUsuario().getCodNum() %>
 				});
 			});
+			
+			<%	if (bean.getUsuario().getRol().getCodNum().equals(ModeloRol.ID_ROL_DIRECTOR_DEPARTAMENTO)) { %>
+			
+					document.getElementById("departamentos").addEventListener("click", function(event) {
+						Atis.sendForm("<%= request.getRequestURI() %>", {
+							'<%=ControladorUsuarioBolsaEmpleo.PARAM_ACCION%>': '<%=ControladorUsuarioBolsaEmpleo.ACCION_DEPARTAMENTOS %>',
+							'<%=ControladorUsuarioBolsaEmpleo.PARAM_USUARIO%>': <%= bean.getUsuario().getCodNum() %>
+						});
+					});
+					
+					document.getElementById("actualizar_areas").addEventListener("click", function(event) {
+						Atis.sendForm("<%= request.getRequestURI() %>", {
+							'<%=ControladorUsuarioBolsaEmpleo.PARAM_ACCION%>': '<%=ControladorUsuarioBolsaEmpleo.ACCION_ACTUALIZAR_AREAS %>',
+							'<%=ControladorUsuarioBolsaEmpleo.PARAM_USUARIO%>': <%= bean.getUsuario().getCodNum() %>
+						});
+					});
+				
+			<%	} %>
 			
 		<%	if (bean.getApartadoAreasEvaluables() != null) { %>
 				
@@ -407,18 +435,8 @@ VistaUsuarioBolsaEmpleo bean = (VistaUsuarioBolsaEmpleo) uvdatos.getVistas().get
 				Atis.smoothScrollToAnchor("#areas_evaluables");
 		<%	} %>
 		
-	<%	} %>
-	
-	<%	if (bean.getUsuario() != null && bean.getUsuario().getRol().getCodNum().equals(ModeloRol.ID_ROL_DIRECTOR_DEPARTAMENTO)) { %>
-	
-			document.getElementById("departamentos").addEventListener("click", function(event) {
-				Atis.sendForm("<%= request.getRequestURI() %>", {
-					'<%=ControladorUsuarioBolsaEmpleo.PARAM_ACCION%>': '<%=ControladorUsuarioBolsaEmpleo.ACCION_DEPARTAMENTOS %>',
-					'<%=ControladorUsuarioBolsaEmpleo.PARAM_USUARIO%>': <%= bean.getUsuario().getCodNum() %>
-				});
-			});
 		<%	if (bean.getApartadoDepartamentos() != null) { %>
-				
+		
 				var tableDepartamentos = new Atis.DataTable('#table_departamentos', {
 				    "ajax": { url: "<%=ControladorUsuarioBolsaEmpleo.URL_PATTERN_AJAX%>", async: false},
 				    "params": {"<%=ControladorUsuarioBolsaEmpleo.PARAM_USUARIO%>": <%= bean.getUsuario().getCodNum() %>},
@@ -434,6 +452,7 @@ VistaUsuarioBolsaEmpleo bean = (VistaUsuarioBolsaEmpleo) uvdatos.getVistas().get
 		
 				Atis.smoothScrollToAnchor("#departamentos");
 		<%	} %>
+		
 	<%	} %>
 		
 		function getTodayDate() {

@@ -3,7 +3,9 @@ package es.ujaen.uvirtual.modulo.bolsaempleo.controlador.configuracion;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.sql.SQLException;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.servlet.annotation.WebServlet;
@@ -26,6 +28,7 @@ import es.ujaen.uvirtual.modulo.bolsaempleo.modelo.ModeloRol;
 import es.ujaen.uvirtual.modulo.bolsaempleo.modelo.ModeloUsuarioBolsaEmpleo;
 import es.ujaen.uvirtual.modulo.bolsaempleo.utilidades.BolsaEmpleoDataTable;
 import es.ujaen.uvirtual.modulo.bolsaempleo.utilidades.BolsaEmpleoUtils;
+import es.ujaen.uvirtual.modulo.bolsaempleo.vistas.VistaCandidatos;
 import es.ujaen.uvirtual.modulo.bolsaempleo.vistas.VistaUsuarioBolsaEmpleo;
 import es.ujaen.uvirtual.utilidades.EscapaHTML;
 import es.ujaen.uvirtual.utilidades.Formateador;
@@ -66,6 +69,7 @@ public class ControladorUsuarioBolsaEmpleo extends HttpServlet {
 	public static final String PARAM_USUARIO = "usuario";
 	
 	// acciones
+	public static final String ACCION_ACTUALIZAR_AREAS = "actualizarareas";
 	public static final String ACCION_AREAS_EVALUABLES = "areasevaluables";
 	public static final String ACCION_AGREGAR_USUARIO = "agregarusuario";
 	public static final String ACCION_BUSCAR_USUARIO = "buscarusuario";
@@ -89,6 +93,7 @@ public class ControladorUsuarioBolsaEmpleo extends HttpServlet {
 			"No puede auto eliminarse, si desea que su perfil sea dado de baja del sistema contacte con un administrador";
 	public static final String MENSAJE_ERROR_RAZON_EXCLUSION_VACIO = "Si excluye al usuario, debe especificar una razón";
 	public static final String MENSAJE_ERROR_RAZON_EXCLUSION_LARGO = "La razón de exclusión no puede contener mas de %d caracteres";
+	public static final String MENSAJE_ERROR_SIN_PERMISO_PERSONAL = "No tienes permiso de personal";
 	public static final String MENSAJE_ERROR_USUARIO_NO_EXISTE = "No existe el usuario";
 	
 	public static final String MENSAJE_EXITO_AGREGAR = "Usuario creado correctamente";
@@ -120,7 +125,7 @@ public class ControladorUsuarioBolsaEmpleo extends HttpServlet {
 		
 		VistaUsuarioBolsaEmpleo bean = new VistaUsuarioBolsaEmpleo();		
 		
-		String nombreAccion = EscapaHTML.ajustaCodificacion(request.getParameter(PARAM_ACCION));
+		String nombreAccion = EscapaHTML.ajustaCodificacion(BolsaEmpleoUtils.getParamRequestOrSession(request, PARAM_ACCION));
 		if (nombreAccion == null) {
 			nombreAccion = ACCION_INDEX;
 		}
@@ -135,6 +140,7 @@ public class ControladorUsuarioBolsaEmpleo extends HttpServlet {
 				case ACCION_DATATABLE_USUARIOS:
 					listadoUsuarios(bean, datos, request, response);
 					break;
+				case ACCION_ACTUALIZAR_AREAS:
 				case ACCION_AREAS_EVALUABLES:
 				case ACCION_DATATABLE_AREAS_EVALUABLES_USUARIO:
 				case ACCION_DATATABLE_DEPARTAMENTOS_USUARIO:
@@ -161,7 +167,7 @@ public class ControladorUsuarioBolsaEmpleo extends HttpServlet {
 		} catch (SQLException e) {
 			LOGGER.log(Level.SEVERE, Formateador.getStackTrace(e));
 			LOGGER.log(Level.SEVERE, e.toString());
-			bean.getMensajesDeError().add("Error al acceder a la base de datos");
+			bean.getMensajesDeError().add(MENSAJE_ERROR_SIN_PERMISO_PERSONAL);
 		} finally {
 			datos.getVistas().put(bean.getClass().getName(), bean);
 			datos.getFicherosJSP().add(bean.getVista());
@@ -290,6 +296,9 @@ public class ControladorUsuarioBolsaEmpleo extends HttpServlet {
 		bean.setRol(usuario.getRol());
 		
 		switch (nombreAccion) {
+			case ACCION_ACTUALIZAR_AREAS:
+				actualizarAreasDirectorDepartamento(bean, datos, request, response);
+				break;
 			case ACCION_AREAS_EVALUABLES:
 				bean.setApartadoAreasEvaluables(true);
 				break;
@@ -316,6 +325,13 @@ public class ControladorUsuarioBolsaEmpleo extends HttpServlet {
 			default:
 				errorFatal(bean, MENSAJE_ERROR_ACCION_NO_CONTEMPLADA);
 		}
+	}
+	
+	private void actualizarAreasDirectorDepartamento(VistaUsuarioBolsaEmpleo bean, UVDatos datos, HttpServletRequest request, HttpServletResponse response)
+			throws SQLException, UVException, IOException {
+		
+		
+		redireccionConUsuarioSeleccionado(bean, datos, request, response, ACCION_AREAS_EVALUABLES);
 	}
 	
 	private void eliminarUsuario(VistaUsuarioBolsaEmpleo bean, UVDatos datos, HttpServletRequest request, HttpServletResponse response)
@@ -370,6 +386,14 @@ public class ControladorUsuarioBolsaEmpleo extends HttpServlet {
 			datos.setRespuestaEnviada(true);
 			response.sendRedirect(request.getServletPath());
 		}
+	}
+	
+	private void redireccionConUsuarioSeleccionado(VistaUsuarioBolsaEmpleo bean, UVDatos datos, HttpServletRequest request, HttpServletResponse response, String accion)
+			throws IOException {
+		Map<String, String> params = new HashMap<>();
+		params.put(PARAM_ACCION, accion);
+		params.put(PARAM_USUARIO, bean.getUsuario().getCodNum().toString());
+		BolsaEmpleoUtils.redirectWithParams(datos, request, response, params);
 	}
 	
 	/**
