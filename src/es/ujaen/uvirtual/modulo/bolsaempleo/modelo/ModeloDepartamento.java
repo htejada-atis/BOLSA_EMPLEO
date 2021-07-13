@@ -108,12 +108,12 @@ public class ModeloDepartamento {
 		List<Departamento> departamentos = new ArrayList<>();
 		BolsaEmpleoDataTable<Departamento> dataTable = new BolsaEmpleoDataTable<>(params);
 		
-		String consulta = "SELECT * FROM UXXIRRHH.VUJA_NET_BEP_RH_DEPARTAMENTO_PDI"
-				+ " WHERE PRSNIF = ? AND SYSDATE BETWEEN F_DESDE AND F_HASTA";
+		String consulta = "SELECT * FROM UXXIRRHH.VUJA_NET_BEP_RH_DEP_DIR"
+				+ " WHERE PRSNIF = ?";
 		
 		dataTable.setQuery(consulta);
 				
-		try (Connection conexion = ConexionUvirtual.obtenerInstancia();
+		try (Connection conexion = ConexionUxxiRrhh.obtenerInstancia();
 				PreparedStatement stmtCount = conexion.prepareStatement(dataTable.getQueryCount());
 				PreparedStatement stmt = conexion.prepareStatement(dataTable.getQuery())
 		) {
@@ -151,7 +151,7 @@ public class ModeloDepartamento {
 		
 		String consulta = "SELECT bepdep.* FROM TBEP_DEPARTAMENTOS bepdep WHERE bepdep.CODNUM = ?";
 
-		try (Connection conexion = ConexionUxxiRrhh.obtenerInstancia(); PreparedStatement stmt = conexion.prepareStatement(consulta)) {
+		try (Connection conexion = ConexionUvirtual.obtenerInstancia(); PreparedStatement stmt = conexion.prepareStatement(consulta)) {
 			stmt.setInt(1, idDepartamento);
 
 			try (ResultSet rs = stmt.executeQuery()) {

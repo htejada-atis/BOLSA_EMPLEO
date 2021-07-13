@@ -137,6 +137,7 @@ public class ControladorUsuarioBolsaEmpleo extends HttpServlet {
 					break;
 				case ACCION_AREAS_EVALUABLES:
 				case ACCION_DATATABLE_AREAS_EVALUABLES_USUARIO:
+				case ACCION_DATATABLE_DEPARTAMENTOS_USUARIO:
 				case ACCION_DEPARTAMENTOS:
 				case ACCION_EDITAR_USUARIO:
 				case ACCION_ELIMINAR_USUARIO:
