@@ -152,8 +152,8 @@ public class ModeloBolsa {
 				+ "	FROM TBEP_BOLSAS bepbol"
 				+ "	INNER JOIN TBEP_AREAS bepare ON bepare.CODNUM = bepbol.BEPARE_CODNUM"
 				+ (evaluador ? " INNER JOIN TBEP_EVALUADORES bepeva ON bepeva.BEPARE_CODNUM = bepare.CODNUM AND bepeva.FLGACTIVO = 'S'" : "")
-				+ "	WHERE 1=1"
-				+ (evaluador ? " AND bepeva.BEPUSU_CODNUM = ?" : "");
+				+ "	WHERE"
+				+ (evaluador ? " bepeva.BEPUSU_CODNUM = ?" : " 1=1");
 
 		dataTable.setColumn(ORDER_COLUMN_INDEX_ID_RESULTADOS, "bepbol.CODNUM", DataTableColumn.COLUMN_TYPE_NUMBER);
 		dataTable.setColumn(ORDER_COLUMN_INDEX_COD_AREA_RESULTADOS, "bepare.ID_AREA_CONOCIMIENTO");
