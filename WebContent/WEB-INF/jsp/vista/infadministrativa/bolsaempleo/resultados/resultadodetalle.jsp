@@ -43,7 +43,7 @@ MeritoPreferente meritoPreferente = bean.getMeritoPreferente();
 <%	if (bolsaResultado.getListaMeritos().size() > 0) { %>
 		<div>Leyenda del campo "Desglose":</div>
 	    <ul>
-	    	<li>Méritos no individualizados: (I) (valor1 * afinidad1 + valor2 * afinidad2 + valor3 * afinidad3 + valor4 * afinidad4) * Peso Categoría * Peso Bloque</li>
+	    	<li>Méritos desagregables: (D) (valor1 * afinidad1 + valor2 * afinidad2 + valor3 * afinidad3 + valor4 * afinidad4) * Peso Categoría * Peso Bloque</li>
 	    	<li>Méritos con bonificación por bloque 
 	    	"<%= meritoPreferente.getAplicableApartadoBaremacion().getCodigo() + " - " + meritoPreferente.getAplicableApartadoBaremacion().getNombre() %>":
 	    	 (B) Valor * Afinidad * Peso Categoría * Peso Bloque * <%= meritoPreferente.getFactor() %></li>

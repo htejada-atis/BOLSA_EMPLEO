@@ -153,7 +153,7 @@ public class ModeloResultados {
 		Double pesoBloque = merito.getItemBaremacion().getBloqueBaremacion().getApartadoBaremacion().getPorcentajeMaximo();
 		
 		if (!merito.getItemBaremacion().getIndividualizado() && tieneAfinidad) {
-			desglose = "(I) (";
+			desglose = "(D) (";
 			for (int i = 0; i < merito.getValoraciones().size(); i++) {
 				Double valor = merito.getValoraciones().get(i).getValor();
 				Double afinidad = merito.getValoraciones().get(i).getAfinidad().getModulacion();
@@ -566,7 +566,11 @@ public class ModeloResultados {
 				+ "	INNER JOIN TBEP_SOLICITUD_BOLSAS bepsob ON bepsob.BEPSOL_CODNUM = bepsol.CODNUM"
 				+ "	INNER JOIN TBEP_SOL_BOL_MERITOS bepsbm ON bepsbm.BEPSBO_CODNUM = bepsob.CODNUM"
 				+ "	INNER JOIN TBEP_MERITOS bepmer ON bepmer.CODNUM = bepsbm.BEPMER_CODNUM"
-				+ "	WHERE bepsol.BEPUSU_CODNUM = ? AND bepmer.BEPITE_CODNUM = ? AND bepmer.VALOR >= ? AND bepsbm.FLGVALIDADO = 'S' AND bepsbm.FLGEXCLUIDO = 'N'"
+				+ "	WHERE 	bepsol.BEPUSU_CODNUM = ?"
+				+ "		AND bepmer.BEPITE_CODNUM = ? "
+				+ "		AND (CASE WHEN bepsbm.VALOR IS NOT NULL THEN bepsbm.VALOR ELSE bepmer.VALOR END) >= ? "
+				+ "		AND bepsbm.FLGVALIDADO = 'S' "
+				+ "		AND bepsbm.FLGEXCLUIDO = 'N'"
 				+ "		AND bepsob.BEPBOL_CODNUM = ?";
 		
 		try (Connection conexion = ConexionUvirtual.obtenerInstancia(); PreparedStatement stmt = conexion.prepareStatement(consulta)) {
