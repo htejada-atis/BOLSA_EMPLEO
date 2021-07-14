@@ -9,6 +9,7 @@ import es.ujaen.uvirtual.modulo.bolsaempleo.beans.Bolsa;
 import es.ujaen.uvirtual.modulo.bolsaempleo.beans.BolsaValidacion;
 import es.ujaen.uvirtual.modulo.bolsaempleo.beans.CandidatoValidacion;
 import es.ujaen.uvirtual.modulo.bolsaempleo.beans.Convocatoria;
+import es.ujaen.uvirtual.modulo.bolsaempleo.beans.HistorialValidacion;
 import es.ujaen.uvirtual.modulo.bolsaempleo.beans.ItemBaremacion;
 import es.ujaen.uvirtual.modulo.bolsaempleo.beans.MeritoSolicitud;
 import es.ujaen.uvirtual.modulo.bolsaempleo.beans.MeritoValidarTable;
@@ -32,6 +33,7 @@ public class VistaValidarNoAfines extends Vista implements Serializable {
 	private transient BolsaEmpleoDataTable<CandidatoValidacion> datatableCandidatos;
 	private transient BolsaEmpleoDataTable<MeritoValidarTable> datatableMeritos;
 	private transient BolsaEmpleoDataTable<ValorMeritoBolsaTable> datatableValoresMeritoBolsa;
+	private transient BolsaEmpleoDataTable<HistorialValidacion> datatableHistorialValidacion;
 	private List<ItemBaremacion> items = new ArrayList<>();
 	private String vista;
 	private UsuarioBolsaEmpleo usuarioLogeado;
@@ -130,5 +132,13 @@ public class VistaValidarNoAfines extends Vista implements Serializable {
 
 	public void setItems(List<ItemBaremacion> items) {
 		this.items = items;
+	}
+
+	public BolsaEmpleoDataTable<HistorialValidacion> getDatatableHistorialValidacion() {
+		return datatableHistorialValidacion;
+	}
+
+	public void setDatatableHistorialValidacion(BolsaEmpleoDataTable<HistorialValidacion> datatableHistorialValidacion) {
+		this.datatableHistorialValidacion = datatableHistorialValidacion;
 	}
 }

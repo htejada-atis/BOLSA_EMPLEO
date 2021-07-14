@@ -23,6 +23,8 @@ VistaValidar bean = (VistaValidar)uvdatos.getVistas().get(VistaValidar.class.get
 Bolsa bolsa = bean.getBolsa();
 MeritoSolicitud merito = bean.getMerito();
 UsuarioBolsaEmpleo candidato = bean.getCandidato();
+ItemBaremacion item = null;
+Double valor = null;
 %>
 
 <div class='bolsa-empleo'>
@@ -67,11 +69,11 @@ UsuarioBolsaEmpleo candidato = bean.getCandidato();
 	
 		<table class="bluetable bolsaempleo" id="tableMeritos">
 			<tr>
-				<th scope="col" style="width:10%">Id</th>
-				<th scope="col" style="width:10%">Estado</th>
+				<th scope="col" style="width:40px">Id</th>
+				<th scope="col" style="width:40px">Estado</th>
 				<th scope="col" style="width:20%">Código</th>
 				<th scope="col" style="width:50%">Valor</th>
-				<th scope="col" style="width:10%">Fichero</th>
+				<th scope="col" style="width:40px">Fichero</th>
 			</tr>
 			<tbody>
 			</tbody>
@@ -82,7 +84,11 @@ UsuarioBolsaEmpleo candidato = bean.getCandidato();
 			</tfoot>
 		</table>
 		
-		<% if (merito != null) { %>
+	<%	if (merito != null) {
+			item = merito.getItem() != null ? merito.getItem() : merito.getMerito().getItemBaremacion();
+			valor = merito.getValor() != null && merito.getValor() != 0 ? merito.getValor() : merito.getMerito().getValor();	
+		
+		%>
 			<div id="anchor_modificar_merito" style="margin-bottom: 24px;"></div>
 			
 			<jsp:include page="/WEB-INF/jsp/vista/infadministrativa/bolsaempleo/mensajes.jsp" />
@@ -101,7 +107,7 @@ UsuarioBolsaEmpleo candidato = bean.getCandidato();
 							<%
 							for(ItemBaremacion it: bean.getItems()) {
 							%>
-							<%	if (it.getCodNum() == merito.getMerito().getItemBaremacion().getCodNum()) { %>
+							<%	if (it.getCodNum() == item.getCodNum()) { %>
 				    				<option value="<%=it.getCodNum()%>" 
 				    						data-unidades="<%= it.getUnidades() %>" 
 				    						data-descripcion="<%= it.getDescripcion() %>" 
@@ -118,11 +124,11 @@ UsuarioBolsaEmpleo candidato = bean.getCandidato();
 					</div>
 					<div class="form-group">
 			    		<div class="form-group">
-			    			<label for="merito_valor" id="merito_valor_label" class="bold-label">Valor (<%= EscapaHTML.escapa(merito.getMerito().getItemBaremacion().getUnidades()) %>):</label>
+			    			<label for="merito_valor" id="merito_valor_label" class="bold-label">Valor (<%= EscapaHTML.escapa(item.getUnidades()) %>):</label>
 			    			<input class="form-input-custom" id="merito_valor" type="text" name="<%= ControladorValidar.PARAM_VALOR %>" 
-			    					value="<%= merito.getMerito().getValor() %>"
-			    					data-unidades="<%= merito.getMerito().getItemBaremacion().getUnidades() %>"
-			    					<%= EscapaHTML.escapa(merito.getMerito().getItemBaremacion().getUnidades()).equals(ModeloBaremacionItems.ITEM_UNIDADES_MEDICION_SINO) ? "readonly" : "" %>
+			    					value="<%= valor %>"
+			    					data-unidades="<%= item.getUnidades() %>"
+			    					<%= EscapaHTML.escapa(item.getUnidades()).equals(ModeloBaremacionItems.ITEM_UNIDADES_MEDICION_SINO) ? "readonly" : "" %>
 			    					required
 			    					style="max-width: 180px;"/>
 			    		</div>
@@ -169,7 +175,7 @@ UsuarioBolsaEmpleo candidato = bean.getCandidato();
 		    <div>Descripción de afinidades:</div>
 		    <ul>
 		    <%	for(Afinidad afinidad: bean.getListaAfinidades()) {
-		    		if (afinidad.getCodigo().equals(merito.getMerito().getItemBaremacion().getAfinidad())) {
+		    		if (afinidad.getCodigo().equals(item.getAfinidad())) {
 		    %>
 			    		<li><%= EscapaHTML.escapa(afinidad.getCodigo() + " " + afinidad.getModulacion() * 100 + "%" + " - " + afinidad.getDescripcion()) %></li>
 		    <%		}
@@ -179,12 +185,13 @@ UsuarioBolsaEmpleo candidato = bean.getCandidato();
 		    
 		    <table class="bluetable bolsaempleo" id="tableValoresMeritoBolsas">
 				<tr>
-					<th scope="col" style="width:20%">Área</th>
-					<th scope="col" style="width:10%">Valor</th>
-					<th scope="col" style="width:10%">Estado</th>
-					<th scope="col" style="width:30%">Afinidad a aplicar</th>
-					<th scope="col" style="width:25%">Observación para el candidato</th>
-					<th scope="col" style="width:10%">Acciones</th>
+					<th scope="col" style="width:35%">Área</th>
+					<th scope="col" style="width:40px">Código</th>
+					<th scope="col" style="width:40px">Valor</th>
+					<th scope="col" style="width:60px">Estado</th>
+					<th scope="col" style="width:35%">Afinidad a aplicar</th>
+					<th scope="col" style="width:35%">Observación para el candidato</th>
+					<th scope="col" style="width:55px">Acciones</th>
 				</tr>
 				<tbody>
 				<%	for (ValorMeritoBolsaTable meritoBolsa: bean.getBolsas()) {
@@ -199,7 +206,15 @@ UsuarioBolsaEmpleo candidato = bean.getCandidato();
 							<td><b><%= EscapaHTML.escapa(meritoBolsa.getBolsa().getArea().getIdAreaExterno()) %></b><br/>
 								<%= EscapaHTML.escapa(meritoBolsa.getBolsa().getArea().getDescripcion()) %>
 							</td>
-							<td><%= meritoBolsa.getMeritoSolicitud().getMerito().getValor() %></td>
+							<td><%= meritoBolsa.getMeritoSolicitud().getItem() != null 
+									? meritoBolsa.getMeritoSolicitud().getItem().getBloqueBaremacion().getApartadoBaremacion().getCodigo() + "."
+											+ meritoBolsa.getMeritoSolicitud().getItem().getBloqueBaremacion().getCodigo() + "."
+											+ meritoBolsa.getMeritoSolicitud().getItem().getCodigo()
+									: meritoBolsa.getMeritoSolicitud().getMerito().getItemBaremacion().getBloqueBaremacion().getApartadoBaremacion().getCodigo() + "."
+											+ meritoBolsa.getMeritoSolicitud().getMerito().getItemBaremacion().getBloqueBaremacion().getCodigo() + "."
+											+ meritoBolsa.getMeritoSolicitud().getMerito().getItemBaremacion().getCodigo()%></td>
+							<td><%= meritoBolsa.getMeritoSolicitud().getValor() != null && meritoBolsa.getMeritoSolicitud().getValor() != 0 
+									? meritoBolsa.getMeritoSolicitud().getValor() : meritoBolsa.getMeritoSolicitud().getMerito().getValor() %></td>
 							<td>
 								<% if (meritoBolsa.getMeritoSolicitud().isValidado()) { %>
 			        				<div class='text-success'><b>Validado</b></div>
@@ -293,7 +308,7 @@ UsuarioBolsaEmpleo candidato = bean.getCandidato();
 				</tbody>
 				<tfoot>
 					<tr>
-						<th colSpan="6" style="width:100%"></th>
+						<th colSpan="7" style="width:100%"></th>
 					</tr>
 				</tfoot>
 			</table>
@@ -562,7 +577,7 @@ $(document).ready(function() {
 			var labelValor = document.getElementById("merito_valor_label");
 			
 			document.getElementById("select_item").addEventListener("change", function() {
-				itemChanged = this.value != <%= merito.getMerito().getItemBaremacion().getCodNum() %>;
+				itemChanged = this.value != <%= item.getCodNum() %>;
 				
 				var unidades = this.options[this.selectedIndex].getAttribute("data-unidades");
 				if (unidades != inputValor.getAttribute("data-unidades")) {
@@ -572,14 +587,14 @@ $(document).ready(function() {
 						inputValor.value = 1;
 						inputValor.readOnly = true;
 					} else {
-						inputValor.value = <%= merito.getMerito().getValor() %>;
+						inputValor.value = <%= valor %>;
 						inputValor.readOnly = false;
 					}
 				}
 			});
 			
 			inputValor.addEventListener("input", function() {
-				valorChanged = this.value != <%= merito.getMerito().getValor() %>;
+				valorChanged = this.value != <%= valor %>;
 			});
 			
 			Atis.smoothScrollToAnchor("#anchor_modificar_merito");

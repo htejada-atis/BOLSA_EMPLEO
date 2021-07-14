@@ -14,6 +14,7 @@ import es.ujaen.uvirtual.modulo.bolsaempleo.beans.Afinidad;
 import es.ujaen.uvirtual.modulo.bolsaempleo.beans.Bolsa;
 import es.ujaen.uvirtual.modulo.bolsaempleo.beans.BolsaSolicitud;
 import es.ujaen.uvirtual.modulo.bolsaempleo.beans.Convocatoria;
+import es.ujaen.uvirtual.modulo.bolsaempleo.beans.ItemBaremacion;
 import es.ujaen.uvirtual.modulo.bolsaempleo.beans.Merito;
 import es.ujaen.uvirtual.modulo.bolsaempleo.beans.MeritoPreferenteUsuario;
 import es.ujaen.uvirtual.modulo.bolsaempleo.beans.MeritoSolicitud;
@@ -69,6 +70,7 @@ public class ModeloSolicitud {
 	public static final String BEPMER_CODNUM = "BEPMER_CODNUM";
 	public static final String FLGEXCLUIDO = "FLGEXCLUIDO";
 	public static final String FLGVALIDADO = "FLGVALIDADO";
+	public static final String BEPITE_CODNUM = "BEPITE_CODNUM";
 	public static final String VALOR = "VALOR";
 	public static final String OBSERVACION_CANDIDATO = "OBSERVACION_CANDIDATO";
 	public static final String S = "S";
@@ -540,7 +542,12 @@ public class ModeloSolicitud {
 				Boolean excluido = rs.getString(FLGEXCLUIDO).equals(S);
 				Boolean validado = rs.getString(FLGVALIDADO).equals(S);
 				String observacion = rs.getString(OBSERVACION_CANDIDATO);
+				Double valor = rs.getDouble(VALOR);
+				ItemBaremacion item = rs.getInt(BEPITE_CODNUM) != 0 
+						? ModeloBaremacionItems.obtenerInstancia().getItemBaremacionById(rs.getInt(BEPITE_CODNUM)) : null;
 				MeritoSolicitud merSol = new MeritoSolicitud(codNum, mer, excluido, validado, observacion);
+				merSol.setValor(valor);
+				merSol.setItem(item);
 				merSol.setValoraciones(this.getValoracionesMeritoSolicitud(codNum, false));
 				return merSol;
 			}
@@ -560,13 +567,13 @@ public class ModeloSolicitud {
 		}
 		
 		String consulta = "SELECT bepsbm.* FROM TBEP_SOL_BOL_MERITOS bepsbm WHERE bepsbm.CODNUM = ?";
-			
+		
 		try (Connection conexion = ConexionUvirtual.obtenerInstancia();
 				PreparedStatement stmt = conexion.prepareStatement(consulta)) {
 			
 			int params = 1;
 			stmt.setInt(params++, idMeritoSolicitud);
-									
+			
 			try (ResultSet rs = stmt.executeQuery()) {
 				if (!rs.next()) {
 					throw new UVException(MENSAJE_ERROR_NO_EXISTE_MERITO_SOLICITUD);
@@ -575,7 +582,9 @@ public class ModeloSolicitud {
 				Merito merito = ModeloMerito.obtenerInstancia().getMeritoById(rs.getInt(BEPMER_CODNUM), false, false);
 				
 				return new MeritoSolicitud(rs.getInt(CODNUM), merito, rs.getString(FLGEXCLUIDO).equals(S),
-						rs.getString(FLGVALIDADO).equals(S), rs.getString(OBSERVACION_CANDIDATO), rs.getDouble(VALOR));
+						rs.getString(FLGVALIDADO).equals(S), rs.getString(OBSERVACION_CANDIDATO), rs.getDouble(VALOR),
+						rs.getInt(BEPITE_CODNUM) != 0 
+						? ModeloBaremacionItems.obtenerInstancia().getItemBaremacionById(rs.getInt(BEPITE_CODNUM)) : null);
 			}
 		}
 	}

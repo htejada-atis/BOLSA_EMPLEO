@@ -396,13 +396,14 @@ function DataTable(id, config) {
     	if (columnDef.hasOwnProperty('selectable') && columnDef.selectable) {
     		var check = $('<input type="checkbox"/>');
 
-            if (row.selected) {
-                if (columnDef.selectable.hasOwnProperty('disabled') && columnDef.selectable.disabled == row.codNum) {
-                    $(check).attr("disabled", true);
-                }
+            if (row.selected || (columnDef.selectable.hasOwnProperty('selected') && columnDef.selectable.selected(row))) {
                 typeof value !== 'undefined' ? self.checked[value] = true : '';
                 check.prop('checked', true);
                 self.renderFooter();
+            }
+
+            if (columnDef.selectable.hasOwnProperty('disabled') && columnDef.selectable.disabled(row)) {
+                $(check).attr("disabled", true);
             }
     		
     		$(check).on('change', function() {

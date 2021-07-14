@@ -6,7 +6,6 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
-
 import es.ujaen.uvirtual.modelo.conexion.ConexionUvirtual;
 import es.ujaen.uvirtual.modulo.bolsaempleo.beans.ParametrosConfiguracion;
 import es.ujaen.uvirtual.modulo.bolsaempleo.beans.UsuarioBolsaEmpleo;
@@ -22,7 +21,7 @@ import es.ujaen.uvirtual.utilidades.UVException;
  */
 public class ModeloParametrosConfiguracion {
 	public static final String VERSION = "0.50";
-	public static final String JS_BOLSA_EMPLEO = "/js/bolsaempleo/bolsaempleo20210712.js.min";
+	public static final String JS_BOLSA_EMPLEO = "/js/bolsaempleo/bolsaempleo20210714.js.min";
 	public static final String CSS_BOLSA_EMPLEO = "/css/ujaen_bolsa_empleo.css";
 
 	// 50MB = 1024 * 1024 * 50 = 52428800
