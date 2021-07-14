@@ -16,12 +16,14 @@ import com.lowagie.text.Paragraph;
 import com.lowagie.text.Table;
 import com.lowagie.text.pdf.PdfWriter;
 import es.ujaen.uvirtual.modulo.bolsaempleo.beans.BolsaResultado;
+import es.ujaen.uvirtual.modulo.bolsaempleo.beans.MeritoPreferente;
 import es.ujaen.uvirtual.modulo.bolsaempleo.beans.MeritoPreferenteUsuario;
 import es.ujaen.uvirtual.modulo.bolsaempleo.beans.MeritoResultado;
 import es.ujaen.uvirtual.modulo.bolsaempleo.beans.ParametrosConfiguracion;
 import es.ujaen.uvirtual.modulo.bolsaempleo.beans.Solicitud;
 import es.ujaen.uvirtual.modulo.bolsaempleo.beans.TitulacionUsuario;
 import es.ujaen.uvirtual.modulo.bolsaempleo.beans.UsuarioBolsaEmpleo;
+import es.ujaen.uvirtual.modulo.bolsaempleo.modelo.ModeloMeritosPreferentes;
 import es.ujaen.uvirtual.modulo.bolsaempleo.modelo.ModeloMeritosPreferentesCandidato;
 import es.ujaen.uvirtual.modulo.bolsaempleo.modelo.ModeloParametrosConfiguracion;
 import es.ujaen.uvirtual.modulo.bolsaempleo.modelo.ModeloResultados;
@@ -48,12 +50,14 @@ public class GenerarResultadosPDF extends BolsaEmpleoPDFGenerator {
 	 * @param bolsa .
 	 * @param fechaActual .
 	 * @return InputStream .
+	 * @throws SQLException .
 	 * @throws UVException .
 	 */
-	public static InputStream generarPDF(Solicitud solicitud, BolsaResultado bolsa, Date fechaActual) throws UVException {
+	public static InputStream generarPDF(Solicitud solicitud, BolsaResultado bolsa, Date fechaActual) throws UVException, SQLException {
 		initPDFProperties();
 		
 		UsuarioBolsaEmpleo candidato = solicitud.getUsuario();
+		MeritoPreferente meritoPreferente = ModeloMeritosPreferentes.obtenerInstancia().getMeritoPreferenteTipoMerito();
 		ByteArrayOutputStream out = new ByteArrayOutputStream();
 		
 		try (Document document = new Document()) {
@@ -84,6 +88,22 @@ public class GenerarResultadosPDF extends BolsaEmpleoPDFGenerator {
 					+ Formateador.leeParametroString(candidato.getLocalidad()) + " "
 					+ Formateador.leeParametroString(candidato.getProvincia()) + " "
 					+ Formateador.leeParametroString(candidato.getTelefono()), fontBold));
+			
+			document.add(new Paragraph("\n"));
+			
+			document.add(new Paragraph("Leyenda del campo \"Desglose\":", fontBold));
+			
+			com.lowagie.text.List lista = new com.lowagie.text.List();
+			lista.setListSymbol("• ");
+			lista.add("Méritos desagregables: (D) (valor1 * afinidad1 + valor2 * afinidad2 + valor3 * afinidad3 + valor4 * afinidad4)"
+					+ " * Peso Categoría * Peso Bloque");
+			lista.add("Méritos con bonificación por bloque "
+					+ meritoPreferente.getAplicableApartadoBaremacion().getCodigo() + " - "
+					+ meritoPreferente.getAplicableApartadoBaremacion().getNombre() + ":"
+					+ " (B) Valor * Afinidad * Peso Categoría * Peso Bloque * " + meritoPreferente.getFactor());
+			lista.add("Resto de méritos: Valor * Afinidad * Peso Categoría * Peso Bloque");
+
+			document.add(lista);
 			
 			generarMeritosEvaluadosPDF(bolsa, document);
 			generarMeritosExcluidosPDF(bolsa, document);
