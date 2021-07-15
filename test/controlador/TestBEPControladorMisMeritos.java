@@ -77,12 +77,9 @@ public class TestBEPControladorMisMeritos {
 		return (VistaMeritos) peticion.getUVDatos().getVistas().get(VistaMeritos.class.getName());
 	}
 
-	/**
-	 * Obtener items baremación, sin parametro definido .
-	 * 
-	 * @throws SQLException     si fallo bd
-	 * @throws IOException      si error io
-	 * @throws ServletException si error servlet
+	/** Obtener items baremación, sin parametro definido .
+	 * @throws IOException      si error io .
+	 * @throws ServletException si error servlet .
 	 */
 	@Test
 	public void testA01() throws ServletException, IOException {
@@ -98,10 +95,7 @@ public class TestBEPControladorMisMeritos {
 		assertEquals(MENSAJE_SIN_ADVERTENCIAS, 0, bean.getMensajesDeAdvertencia().size());
 	}
 
-	/**
-	 * obtener datatable méritos .
-	 * 
-	 * @throws SQLException     .
+	/** obtener datatable méritos .
 	 * @throws ServletException .
 	 * @throws IOException      .
 	 */
@@ -114,9 +108,7 @@ public class TestBEPControladorMisMeritos {
 		assertEquals(MENSAJE_SIN_ADVERTENCIAS, 0, bean.getMensajesDeAdvertencia().size());
 	}
 	
-	/**
-	 * carga formulario de agregar mérito.
-	 * 
+	/** carga formulario de agregar mérito.
 	 * @throws ServletException si error de servlet
 	 * @throws IOException      si error de io
 	 */
@@ -129,10 +121,7 @@ public class TestBEPControladorMisMeritos {
 		assertEquals(MENSAJE_SIN_ADVERTENCIAS, 0, bean.getMensajesDeAdvertencia().size());
 	}
 
-	/**
-	 * borrar méritos .
-	 * 
-	 * @throws SQLException     .
+	/** borrar méritos .
 	 * @throws ServletException .
 	 * @throws IOException      .
 	 */
@@ -154,9 +143,7 @@ public class TestBEPControladorMisMeritos {
 		assertEquals(MENSAJE_SIN_ADVERTENCIAS, 0, bean2.getMensajesDeAdvertencia().size());
 	}
 
-	/**
-	 * carga formulario de agregar mérito con apartado seleccionado.
-	 * 
+	/** carga formulario de agregar mérito con apartado seleccionado.
 	 * @throws ServletException si error de servlet
 	 * @throws IOException      si error de io
 	 */
@@ -171,10 +158,7 @@ public class TestBEPControladorMisMeritos {
 		assertEquals(MENSAJE_SIN_ADVERTENCIAS, 0, bean2.getMensajesDeAdvertencia().size());
 	}
 
-	/**
-	 * eliminar ids de méritos no válidos .
-	 * 
-	 * @throws SQLException     si fallo bd .
+	/** eliminar ids de méritos no válidos .
 	 * @throws IOException      si error io .
 	 * @throws ServletException si error servlet .
 	 */
@@ -193,10 +177,7 @@ public class TestBEPControladorMisMeritos {
 		assertEquals(MENSAJE_SIN_EXITO, 0, bean.getMensajesDeExito().size());
 	}
 
-	/**
-	 * carga formulario de agregar mérito con apartado seleccionado no válido.
-	 * 
-	 * @throws SQLException     si fallo bd .
+	/** carga formulario de agregar mérito con apartado seleccionado no válido.
 	 * @throws IOException      si error io .
 	 * @throws ServletException si error servlet .
 	 */
@@ -229,7 +210,7 @@ public class TestBEPControladorMisMeritos {
 	
 	/** acción no válida .
 	 * @throws IOException si error io .
-	 * @throws ServletException . 
+	 * @throws ServletException .
 	 */
 	@Test
 	public void testE04AccionNoValida() throws IOException, ServletException {
@@ -247,10 +228,7 @@ public class TestBEPControladorMisMeritos {
 		assertEquals(MENSAJE_CON_ERROR_ESPERADO, ControladorMisMeritos.MENSAJE_ERROR_ACCION_NO_CONTEMPLADA, bean.getMensajesDeError().get(0));
 	}
 
-	/**
-	 * obtener datatable méritos con parámetro no válido .
-	 * 
-	 * @throws SQLException     .
+	/** obtener datatable méritos con parámetro no válido .
 	 * @throws ServletException .
 	 * @throws IOException      .
 	 */
