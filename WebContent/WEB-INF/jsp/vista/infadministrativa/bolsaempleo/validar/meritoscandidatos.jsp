@@ -2,6 +2,7 @@
 <%@	page import="es.ujaen.uvirtual.modulo.bolsaempleo.controlador.ControladorValidar"%>
 <%@	page import="es.ujaen.uvirtual.modulo.bolsaempleo.controlador.ControladorDescargaFicheros"%>
 <%@	page import="es.ujaen.uvirtual.modulo.bolsaempleo.modelo.ModeloBaremacionItems"%>
+<%@ page import="es.ujaen.uvirtual.modulo.bolsaempleo.modelo.ModeloBolsa"%>
 <%@	page import="es.ujaen.uvirtual.modulo.bolsaempleo.modelo.ModeloRol"%>
 <%@ page import="es.ujaen.uvirtual.modulo.bolsaempleo.vistas.VistaValidar" %>
 <%@ page import="es.ujaen.uvirtual.modulo.bolsaempleo.beans.Afinidad" %>
@@ -93,7 +94,7 @@ Double valor = null;
 			
 			<jsp:include page="/WEB-INF/jsp/vista/infadministrativa/bolsaempleo/mensajes.jsp" />
 			
-			<h3>Modificar mérito: <%= merito.getMerito().getCodNum() %></h3>
+			<h3>Modificar mérito: <%= merito.getMerito().getCodNum() %>, para la bolsa: <%= EscapaHTML.escapa(bolsa.getArea().getDescripcion()) %></h3>
 			
 			<form id="validar_merito" class="be-form" method="post" action="<%= request.getRequestURI() %>">
 		    	<input type="hidden" name="<%= ControladorValidar.PARAM_ACCION %>" id="accion_formulario" value="<%= ControladorValidar.ACCION_MODIFICAR_MERITO %>" />
@@ -211,7 +212,8 @@ Double valor = null;
 										+ "&" + ControladorValidar.PARAM_MERITO + "=" + merito.getMerito().getCodNum()%>">
 									<b><%= EscapaHTML.escapa(meritoBolsa.getBolsa().getArea().getIdAreaExterno()) %></b><br/>
 									<%= EscapaHTML.escapa(meritoBolsa.getBolsa().getArea().getDescripcion()) %>
-								</a>
+								</a><br/>
+								<%= meritoBolsa.getBolsa().getEstado().equals(ModeloBolsa.BOLSA_ESTADO_BAREMACION) ? "VALIDACIÓN" : meritoBolsa.getBolsa().getEstado() %>
 							</td>
 							<td><%= meritoBolsa.getMeritoSolicitud().getItem() != null 
 									? meritoBolsa.getMeritoSolicitud().getItem().getBloqueBaremacion().getApartadoBaremacion().getCodigo() + "."

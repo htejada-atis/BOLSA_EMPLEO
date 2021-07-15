@@ -4,7 +4,6 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.sql.Types;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -13,7 +12,6 @@ import es.ujaen.uvirtual.modulo.bolsaempleo.beans.Bolsa;
 import es.ujaen.uvirtual.modulo.bolsaempleo.beans.BolsaValidacion;
 import es.ujaen.uvirtual.modulo.bolsaempleo.beans.CandidatoValidacion;
 import es.ujaen.uvirtual.modulo.bolsaempleo.beans.Convocatoria;
-import es.ujaen.uvirtual.modulo.bolsaempleo.beans.ItemBaremacion;
 import es.ujaen.uvirtual.modulo.bolsaempleo.beans.Merito;
 import es.ujaen.uvirtual.modulo.bolsaempleo.beans.MeritoSolicitud;
 import es.ujaen.uvirtual.modulo.bolsaempleo.beans.MeritoSolicitudValoracion;
@@ -800,7 +798,7 @@ public class ModeloValidar {
 	 * @throws SQLException .
 	 */
 	public void excluirMeritoEnBolsas(Integer idMerito, String observacion, Bolsa bolsa, Convocatoria convocatoria, UsuarioBolsaEmpleo usuarioUpdate) throws SQLException {
-		
+		System.out.println("excluirMeritoEnBolsas: mal");
 		boolean evaluador = usuarioUpdate.getRol().getValor().equals(ModeloRol.ROL_MIEMBRO_COMISION) 
 				|| usuarioUpdate.getRol().getValor().equals(ModeloRol.ROL_DIRECTOR_DEPARTAMENTO);
 		
@@ -822,10 +820,10 @@ public class ModeloValidar {
 
 		try (Connection conexion = ConexionUvirtual.obtenerInstancia(); PreparedStatement stmtUpdate = conexion.prepareStatement(consulta)) {
 			int indexParam = 1;
+			stmtUpdate.setInt(indexParam++, bolsa.getCodNum());
 			if (evaluador) {
 				stmtUpdate.setInt(indexParam++, usuarioUpdate.getCodNum());
 			}
-			stmtUpdate.setInt(indexParam++, bolsa.getCodNum());
 			stmtUpdate.setInt(indexParam++, idMerito);
 			stmtUpdate.setInt(indexParam++, convocatoria.getCodNum());
 			stmtUpdate.setString(indexParam++, observacion);
