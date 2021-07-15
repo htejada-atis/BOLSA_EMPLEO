@@ -26,6 +26,7 @@ MeritoSolicitud merito = bean.getMerito();
 UsuarioBolsaEmpleo candidato = bean.getCandidato();
 ItemBaremacion item = null;
 Double valor = null;
+Boolean personal = bean.getUsuarioLogeado().getRol().getCodNum().equals(ModeloRol.ID_ROL_SERVICIO_PERSONAL);
 %>
 
 <div class='bolsa-empleo'>
@@ -200,6 +201,7 @@ Double valor = null;
 						Boolean valoraciones = meritoBolsa.getMeritoSolicitud() != null && meritoBolsa.getMeritoSolicitud().getMerito().getItemBaremacion().getAfinidad() != null
 								&& meritoBolsa.getMeritoSolicitud().getValoraciones() != null && meritoBolsa.getMeritoSolicitud().getValoraciones().size() > 0  ? true : false;
 						Boolean individualizado = meritoBolsa.getMeritoSolicitud().getMerito().getItemBaremacion().getIndividualizado() ? true : false;
+						Boolean bolsaDisabled = !personal && !meritoBolsa.getBolsa().getEstado().equals(ModeloBolsa.BOLSA_ESTADO_BAREMACION);
 					%>
 					
 						<tr data-individualizado="<%= individualizado %>" data-bolsa="<%= meritoBolsa.getBolsa().getCodNum() %>" 
@@ -235,7 +237,8 @@ Double valor = null;
 							</td>
 							<td class='cell-afinidad'>
 							<%	if (individualizado) { %>
-									<select id="afinidad-individualizada" data-valoracion="<%= valoraciones ? meritoBolsa.getMeritoSolicitud().getValoraciones().get(0).getCodNum() : "0" %>">
+									<select id="afinidad-individualizada" data-valoracion="<%= valoraciones ? meritoBolsa.getMeritoSolicitud().getValoraciones().get(0).getCodNum() : "0" %>"
+									<%= bolsaDisabled ? "disabled" : "" %>>
 									<% 	for (Afinidad afinidad : bean.getListaAfinidades()) { %>
 										<%	if (afinidad.getCodigo().equals(meritoBolsa.getMeritoSolicitud().getMerito().getItemBaremacion().getAfinidad())) { %>
 											<% 	if (valoraciones && meritoBolsa.getMeritoSolicitud().getValoraciones().get(0).getAfinidad().getCodNum() == afinidad.getCodNum()) { %>
@@ -261,7 +264,7 @@ Double valor = null;
 													</td>
 													<td>
 														<input id="<%= "merito_valoracion_" + valoracion.getAfinidad().getCodNum() + "_" + idMerito %>" data-afinidad="<%= valoracion.getAfinidad().getCodNum() %>" class="validar-afinidad field-no-individualizado" type="number" min="0" 
-															value="<%= valoracion.getValor() %>" step="0.01"/>
+															value="<%= valoracion.getValor() %>" step="0.01" <%= bolsaDisabled ? "disabled" : "" %>/>
 													</td>
 												</tr>
 										<%	} %>
@@ -278,7 +281,7 @@ Double valor = null;
 													</td>
 													<td>
 														<input id="merito_valoracion_<%= i %>" data-afinidad="<%= afinidad.getCodNum() %>" class="validar-afinidad field-no-individualizado" type="number" min="0" 
-															value="0" step="0.01"/>
+															value="0" step="0.01" <%= bolsaDisabled ? "disabled" : "" %>/>
 													</td>
 												</tr>
 										<%	} %>
@@ -303,13 +306,13 @@ Double valor = null;
 					    				id="merito_observacion_candidato_<%= idMerito %>"
 					    				name="<%= ControladorValidar.PARAM_OBSERVACION_CANDIDATO %>" 
 					    				rows="2" cols="50"
-					    				><%= meritoBolsa.getMeritoSolicitud().getObservacionCandidato() != null ? meritoBolsa.getMeritoSolicitud().getObservacionCandidato() : "" %></textarea>
+					    				<%= bolsaDisabled ? "disabled" : "" %>><%= meritoBolsa.getMeritoSolicitud().getObservacionCandidato() != null ? meritoBolsa.getMeritoSolicitud().getObservacionCandidato() : "" %></textarea>
 				    			</div>
 							</td>
 							<td style="vertical-align: middle;">
 								<span class="btns acciones_merito">
-						    		<button class="btn merito-aceptar" id="merito_aceptar_<%= idMerito %>" name="<%= ControladorValidar.PARAM_ACEPTAR_MERITO %>">Aceptar</button>
-							    	<button class="btn merito-excluir" id="merito_excluir_<%= idMerito %>" name="<%= ControladorValidar.PARAM_EXCLUIR_MERITO %>">Excluir</button>
+						    		<button class="btn merito-aceptar" id="merito_aceptar_<%= idMerito %>" name="<%= ControladorValidar.PARAM_ACEPTAR_MERITO %>" <%= bolsaDisabled ? "disabled" : "" %>>Aceptar</button>
+							    	<button class="btn merito-excluir" id="merito_excluir_<%= idMerito %>" name="<%= ControladorValidar.PARAM_EXCLUIR_MERITO %>" <%= bolsaDisabled ? "disabled" : "" %>>Excluir</button>
 					    		</span>
 							</td>
 						</tr>
@@ -327,7 +330,7 @@ Double valor = null;
 				<button class="link-btn" id="validar_volver">
 			    	 Volver
 			    </button>
-			<%	if (bean.getUsuarioLogeado().getRol().getCodNum().equals(ModeloRol.ID_ROL_SERVICIO_PERSONAL)) {%>
+			<%	if (personal) {%>
 				    <button class="link-btn" id="validar_historial">
 				    	 Ver historial de validación
 				    </button>
@@ -524,7 +527,7 @@ $(document).ready(function() {
 	    		Atis.sendForm("<%= request.getRequestURI() %>", {'<%= ControladorValidar.PARAM_ACCION %>': '<%= ControladorValidar.ACCION_INDEX %>'});
 			});
 			
-		<%	if (bean.getUsuarioLogeado().getRol().getCodNum().equals(ModeloRol.ID_ROL_SERVICIO_PERSONAL)) { %>
+		<%	if (personal) { %>
 				document.getElementById("validar_historial").addEventListener("click", function() {
 					var params = {
 							'<%= ControladorValidar.PARAM_ACCION %>': '<%= ControladorValidar.ACCION_HISTORIAL_VALIDACION %>',
@@ -568,8 +571,8 @@ $(document).ready(function() {
 				var self = this;
 				if (itemChanged || valorChanged) {
 					var titulo = "¿Modificar " + (itemChanged ? "categoría" : "valor") + " del mérito?";
-					var mensaje = itemChanged ? "Modificar la categoría borrará la evaluación del mérito en esta bolsa."
-							: "<p>Modificar el valor del mérito borrará la evaluación del mérito para méritos desagregables <br/> y tendrá que asignar los valores de nuevo.</p>";
+					var mensaje = itemChanged ? "Modificar la categoría borrará las evaluaciones del mérito en todas las bolsas en estado de 'Validación'."
+							: "<p>Modificar el valor del mérito borrará las evaluaciones del mérito para méritos desagregables <br/> en todas las bolsas en estado de 'Validación' y tendrá que asignar los valores de nuevo.</p>";
 					
 					Atis.confirmDialog(titulo, mensaje, {
 				        Si: function() {

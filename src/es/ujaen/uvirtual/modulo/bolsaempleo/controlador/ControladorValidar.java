@@ -87,7 +87,6 @@ public class ControladorValidar extends HttpServlet {
 	public static final String PARAM_ITEM = "item";
 	public static final String PARAM_MERITO = "merito";
 	public static final String PARAM_OBSERVACION_CANDIDATO = "observacioncandidato";
-	public static final String PARAM_PROPAGAR = "propagar";
 	public static final String PARAM_VALOR = "valor";
 	
 	// vistas
@@ -327,7 +326,7 @@ public class ControladorValidar extends HttpServlet {
 					}
 					
 					if (!item.getIndividualizado() || !bean.getMerito().getMerito().getItemBaremacion().getIndividualizado()) {
-						modeloValidar.borrarValoracionesMerito(bean.getMerito(), bean.getUsuarioLogeado());
+						modeloValidar.borrarValoracionesMerito(bean.getMerito().getMerito(), solicitud, bean.getBolsa(), bean.getUsuarioLogeado());
 					}
 					
 					modeloValidar.borrarEvaluacionMerito(bean.getMerito(), solicitud, bean.getBolsa(), bean.getUsuarioLogeado());
