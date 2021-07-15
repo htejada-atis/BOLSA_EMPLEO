@@ -97,6 +97,7 @@ public class ControladorValidar extends HttpServlet {
 	
 	// mensajes
 	public static final String MENSAJE_ERROR_ACCION_NO_CONTEMPLADA = "Acción no contemplada";
+	public static final String MENSAJE_ERROR_BOLSA_ESTADO_NO_VALIDO = "El estado de la bolsa no permite acceder a esta";
 	public static final String MENSAJE_ERROR_NO_HAY_BOLSAS_SELECCIONADAS = "No hay bolsas seleccionadas";
 	public static final String MENSAJE_ERROR_NUMERO_MAXIMO_MERITOS_BLOQUE = "Se ha alcanzado el número máximo de méritos por bloque";
 	public static final String MENSAJE_ERROR_SIN_PERMISO = "No tienes permiso";
@@ -213,6 +214,13 @@ public class ControladorValidar extends HttpServlet {
 		ModeloBolsa modeloBolsa = ModeloBolsa.obtenerInstancia();
 		bean.setBolsa(modeloBolsa.getBolsaById(Formateador.leeParametroInteger(BolsaEmpleoUtils.getParamRequestOrSession(request, PARAM_BOLSA))));
 		bean.setVista(JSP_MERITOS_CANDIDATOS);
+		
+		if (!bean.getUsuarioLogeado().getRol().getCodNum().equals(ModeloRol.ID_ROL_SERVICIO_PERSONAL) 
+				&& !bean.getBolsa().getEstado().equals(ModeloBolsa.BOLSA_ESTADO_BAREMACION)) {
+			BolsaEmpleoUtils.addMensajeDeError(MENSAJE_ERROR_BOLSA_ESTADO_NO_VALIDO, bean, request);
+			datos.setRespuestaEnviada(true);
+			response.sendRedirect(request.getServletPath());
+		}
 		
 		switch (nombreAccion) {
 			case ACCION_BOLSA_SELECCIONADA:
