@@ -89,7 +89,18 @@ $(document).ready(function() {
 	    	{'data': 'codNum', 'selectable': true},
 	        {'data': 'codNum', 'filter': {'type': 'number'}},
 	        {'data': 'area.descripcion', 'filter': true},
-	        {'data': 'estado', 'filter': {'type': 'select', 'options': {'<%= ModeloBolsa.BOLSA_ESTADO_BLOQUEADA %>': 'Bloqueada', '<%= ModeloBolsa.BOLSA_ESTADO_REVISION %>': 'Revisión', '<%= ModeloBolsa.BOLSA_ESTADO_BAREMACION %>': 'Baremación', '<%= ModeloBolsa.BOLSA_ESTADO_ALEGACIONES %>':'Alegaciones', '<%= ModeloBolsa.BOLSA_ESTADO_DESBLOQUEADA %>':'Desbloqueada'}} },
+	        {'data': 'estado', 'render': function(row) {
+	        		return row.estado == '<%= ModeloBolsa.BOLSA_ESTADO_BAREMACION %>' ? 'VALIDACIÓN' : row.estado;
+	        	}, 
+	        	'filter': {'type': 'select', 'options': {
+	        		'<%= ModeloBolsa.BOLSA_ESTADO_BLOQUEADA %>': 'Bloqueada', 
+	        		'<%= ModeloBolsa.BOLSA_ESTADO_REVISION %>': 'Revisión',
+	        		'<%= ModeloBolsa.BOLSA_ESTADO_BAREMACION %>': 'Validación',
+	        		'<%= ModeloBolsa.BOLSA_ESTADO_ALEGACIONES %>':'Alegaciones',
+	        		'<%= ModeloBolsa.BOLSA_ESTADO_DESBLOQUEADA %>':'Desbloqueada'
+	        		}
+	        	}
+	        },
 	        {'data': 'fechaActualizacion', 'filter': {'type': 'date'}},
 	        {'data': 'fechaBloqueo', 'filter': {'type': 'date'}},
 	        {'data': 'fechaDesBloqueo', 'filter': {'type': 'date'}},
@@ -105,7 +116,7 @@ $(document).ready(function() {
 	    "actions": [
 	    	{'label': 'Bloquear', 'onClick': function(selected) { enviaAccion("<%=ControladorBolsas.ACCION_BOLSAS_BLOQUEAR%>", selected); } },
 	    	{'label': 'Revisión', 'onClick': function(selected) { enviaAccion("<%=ControladorBolsas.ACCION_BOLSAS_REVISION%>", selected); } },
-	    	{'label': 'Baremación', 'onClick': function(selected) { enviaAccion("<%=ControladorBolsas.ACCION_BOLSAS_BAREMACION%>", selected); } },
+	    	{'label': 'Validación', 'onClick': function(selected) { enviaAccion("<%=ControladorBolsas.ACCION_BOLSAS_BAREMACION%>", selected); } },
 	    	{'label': 'Alegación', 'onClick': function(selected) { enviaAccion("<%=ControladorBolsas.ACCION_BOLSAS_ALEGACION%>", selected); } },
 	    	{'label': 'Desbloquear', 'onClick': function(selected) { enviaAccion("<%=ControladorBolsas.ACCION_BOLSAS_DESBLOQUEAR%>", selected); } },
 	    	{'label': 'Baremar', 'onClick': function(selected) { enviaAccion("<%=ControladorBolsas.ACCION_BOLSAS_BAREMAR%>", selected); } },

@@ -16,6 +16,7 @@ import es.ujaen.uvirtual.modulo.bolsaempleo.beans.Bolsa;
 import es.ujaen.uvirtual.modulo.bolsaempleo.beans.BolsaResultado;
 import es.ujaen.uvirtual.modulo.bolsaempleo.beans.CandidatoResultadoTable;
 import es.ujaen.uvirtual.modulo.bolsaempleo.beans.Convocatoria;
+import es.ujaen.uvirtual.modulo.bolsaempleo.beans.ItemBaremacion;
 import es.ujaen.uvirtual.modulo.bolsaempleo.beans.MeritoPreferente;
 import es.ujaen.uvirtual.modulo.bolsaempleo.beans.MeritoResultado;
 import es.ujaen.uvirtual.modulo.bolsaempleo.beans.Solicitud;
@@ -61,6 +62,7 @@ public class ModeloResultados {
 	public static final String FACTOR = "FACTOR";
 	public static final String FLGEXCLUIDO = "FLGEXCLUIDO";
 	public static final String FLGVALIDADO = "FLGVALIDADO";
+	public static final String ITEM_SBM = "ITEM_SBM";
 	public static final String OBSERVACION = "OBSERVACION";
 	public static final String OBSERVACION_CANDIDATO = "OBSERVACION_CANDIDATO";
 	public static final String RESULTADO = "RESULTADO";
@@ -147,13 +149,15 @@ public class ModeloResultados {
 		Double puntuacion = 0.0;
 		String desglose = "";
 		
-		boolean tieneAfinidad = merito.getItemBaremacion().getAfinidad() != null;
+		ItemBaremacion item = merito.getItemMeritoSolicitud() != null ? merito.getItemMeritoSolicitud() : merito.getItemBaremacion();
 		
-		Double pesoCategoria = merito.getItemBaremacion().getValor();
-		Double pesoBloque = merito.getItemBaremacion().getBloqueBaremacion().getApartadoBaremacion().getPorcentajeMaximo();
+		boolean tieneAfinidad = item.getAfinidad() != null;
 		
-		if (!merito.getItemBaremacion().getIndividualizado() && tieneAfinidad) {
-			desglose = "(I) (";
+		Double pesoCategoria = item.getValor();
+		Double pesoBloque = item.getBloqueBaremacion().getApartadoBaremacion().getPorcentajeMaximo();
+		
+		if (!item.getIndividualizado() && tieneAfinidad) {
+			desglose = "(D) (";
 			for (int i = 0; i < merito.getValoraciones().size(); i++) {
 				Double valor = merito.getValoraciones().get(i).getValor();
 				Double afinidad = merito.getValoraciones().get(i).getAfinidad().getModulacion();
@@ -164,7 +168,7 @@ public class ModeloResultados {
 			desglose += ")" + " * " + pesoCategoria + " * " + pesoBloque;
 			puntuacion *= pesoCategoria * pesoBloque;
 		} else {
-			Double valor = tieneAfinidad ? merito.getValor() : merito.getValorMeritoSolicitud();
+			Double valor = merito.getValorMeritoSolicitud() != null && merito.getValorMeritoSolicitud() != 0 ? merito.getValorMeritoSolicitud() : merito.getValor();
 			Double afinidad = tieneAfinidad ? merito.getValoraciones().get(0).getAfinidad().getModulacion() : 1.0;
 			
 			desglose = BolsaEmpleoUtils.formatoPuntuacion(valor) + " * " + afinidad + " * " + pesoCategoria + " * " + pesoBloque;
@@ -174,21 +178,21 @@ public class ModeloResultados {
 		if (preferente != null) {
 			switch (preferente.getKey().getAplicable()) {
 				case ModeloMeritosPreferentes.APLICABLE_APARTADO:
-					if (merito.getItemBaremacion().getBloqueBaremacion().getApartadoBaremacion().getCodNum().equals(
+					if (item.getBloqueBaremacion().getApartadoBaremacion().getCodNum().equals(
 							preferente.getKey().getAplicableApartadoBaremacion().getCodNum())) {
 						desglose = "(B) " + desglose + " * " + preferente.getValue();
 						puntuacion *= preferente.getValue();
 					}
 					break;
 				case ModeloMeritosPreferentes.APLICABLE_BLOQUE:
-					if (merito.getItemBaremacion().getBloqueBaremacion().getCodNum().equals(
+					if (item.getBloqueBaremacion().getCodNum().equals(
 							preferente.getKey().getAplicableBloqueBaremacion().getCodNum())) {
 						desglose = "(B) " + desglose + " * " + preferente.getValue();
 						puntuacion *= preferente.getValue();
 					}
 					break;
 				case ModeloMeritosPreferentes.APLICABLE_ITEM:
-					if (merito.getItemBaremacion().getCodNum().equals(
+					if (item.getCodNum().equals(
 							preferente.getKey().getAplicableItemBaremacion().getCodNum())) {
 						desglose = "(B) " + desglose + " * " + preferente.getValue();
 						puntuacion *= preferente.getValue();
@@ -345,9 +349,10 @@ public class ModeloResultados {
 		List<MeritoResultado> meritos = new ArrayList<>();
 		
 		String consulta = ""
-				+ "	SELECT bepmer.CODNUM, bepmer.BEPITE_CODNUM, bepmer.VALOR, bepmer.DESCRIPCION, bepmer.OBSERVACION"
+				+ "	SELECT bepmer.CODNUM, bepmer.BEPITE_CODNUM AS BEPITE_CODNUM, bepmer.VALOR, bepmer.DESCRIPCION, bepmer.OBSERVACION"
 				+ "		, bepsbm.CODNUM AS " + CODNUM_MERITO_SOLICITUD + ", bepsbm.VALOR AS " + VALOR_MERITO_SOLICITUD
 				+ "		, bepsbm.OBSERVACION_CANDIDATO, bepsbm.RESULTADO, bepsbm.DESGLOSE, bepsbm.FLGEXCLUIDO, bepsbm.FLGVALIDADO"
+				+ "		, bepsbm.BEPITE_CODNUM AS ITEM_SBM"
 				+ " FROM TBEP_SOL_BOL_MERITOS bepsbm"
 				+ "	INNER JOIN TBEP_SOLICITUD_BOLSAS bepsbo ON bepsbo.CODNUM  = bepsbm.BEPSBO_CODNUM"
 				+ " INNER JOIN TBEP_MERITOS bepmer ON bepmer.CODNUM = bepsbm.BEPMER_CODNUM"
@@ -386,9 +391,10 @@ public class ModeloResultados {
 		List<MeritoResultado> meritos = new ArrayList<>();
 		
 		String consulta = ""
-				+ "	SELECT bepmer.CODNUM, bepmer.BEPITE_CODNUM, bepmer.VALOR, bepmer.DESCRIPCION, bepmer.OBSERVACION"
+				+ "	SELECT bepmer.CODNUM, bepmer.BEPITE_CODNUM AS BEPITE_CODNUM, bepmer.VALOR, bepmer.DESCRIPCION, bepmer.OBSERVACION"
 				+ "		, bepsbm.CODNUM AS " + CODNUM_MERITO_SOLICITUD + ", bepsbm.VALOR AS " + VALOR_MERITO_SOLICITUD
 				+ "		, bepsbm.OBSERVACION_CANDIDATO, bepsbm.RESULTADO, bepsbm.DESGLOSE, bepsbm.FLGEXCLUIDO, bepsbm.FLGVALIDADO"
+				+ "		, bepsbm.BEPITE_CODNUM AS ITEM_SBM"
 				+ " FROM TBEP_SOL_BOL_MERITOS bepsbm"
 				+ "	INNER JOIN TBEP_SOLICITUD_BOLSAS bepsbo ON bepsbo.CODNUM  = bepsbm.BEPSBO_CODNUM"
 				+ " INNER JOIN TBEP_MERITOS bepmer ON bepmer.CODNUM = bepsbm.BEPMER_CODNUM"
@@ -427,9 +433,10 @@ public class ModeloResultados {
 		List<MeritoResultado> meritos = new ArrayList<>();
 		
 		String consulta = ""
-				+ "	SELECT bepmer.CODNUM, bepmer.BEPITE_CODNUM, bepmer.VALOR, bepmer.DESCRIPCION, bepmer.OBSERVACION"
+				+ "	SELECT bepmer.CODNUM, bepmer.BEPITE_CODNUM AS BEPITE_CODNUM, bepmer.VALOR, bepmer.DESCRIPCION, bepmer.OBSERVACION"
 				+ "		, bepsbm.CODNUM AS " + CODNUM_MERITO_SOLICITUD + ", bepsbm.VALOR AS " + VALOR_MERITO_SOLICITUD
 				+ "		, bepsbm.OBSERVACION_CANDIDATO, bepsbm.RESULTADO, bepsbm.DESGLOSE, bepsbm.FLGEXCLUIDO, bepsbm.FLGVALIDADO"
+				+ "		, bepsbm.BEPITE_CODNUM AS ITEM_SBM"
 				+ " FROM TBEP_SOL_BOL_MERITOS bepsbm"
 				+ "	INNER JOIN TBEP_SOLICITUD_BOLSAS bepsbo ON bepsbo.CODNUM  = bepsbm.BEPSBO_CODNUM"
 				+ " INNER JOIN TBEP_MERITOS bepmer ON bepmer.CODNUM = bepsbm.BEPMER_CODNUM"
@@ -566,7 +573,11 @@ public class ModeloResultados {
 				+ "	INNER JOIN TBEP_SOLICITUD_BOLSAS bepsob ON bepsob.BEPSOL_CODNUM = bepsol.CODNUM"
 				+ "	INNER JOIN TBEP_SOL_BOL_MERITOS bepsbm ON bepsbm.BEPSBO_CODNUM = bepsob.CODNUM"
 				+ "	INNER JOIN TBEP_MERITOS bepmer ON bepmer.CODNUM = bepsbm.BEPMER_CODNUM"
-				+ "	WHERE bepsol.BEPUSU_CODNUM = ? AND bepmer.BEPITE_CODNUM = ? AND bepmer.VALOR >= ? AND bepsbm.FLGVALIDADO = 'S' AND bepsbm.FLGEXCLUIDO = 'N'"
+				+ "	WHERE 	bepsol.BEPUSU_CODNUM = ?"
+				+ "		AND bepmer.BEPITE_CODNUM = ? "
+				+ "		AND (CASE WHEN bepsbm.VALOR IS NOT NULL THEN bepsbm.VALOR ELSE bepmer.VALOR END) >= ? "
+				+ "		AND bepsbm.FLGVALIDADO = 'S' "
+				+ "		AND bepsbm.FLGEXCLUIDO = 'N'"
 				+ "		AND bepsob.BEPBOL_CODNUM = ?";
 		
 		try (Connection conexion = ConexionUvirtual.obtenerInstancia(); PreparedStatement stmt = conexion.prepareStatement(consulta)) {
@@ -674,6 +685,7 @@ public class ModeloResultados {
 		merito.setResultado(rs.getDouble(RESULTADO));
 		merito.setExcluido(rs.getString(FLGEXCLUIDO).equals(MERITO_EXCLUIDO));
 		merito.setValidado(rs.getString(FLGVALIDADO).equals(MERITO_VALIDADO));
+		merito.setItemMeritoSolicitud(rs.getInt(ITEM_SBM) != 0 ? ModeloBaremacionItems.obtenerInstancia().getItemBaremacionById(rs.getInt(ITEM_SBM)) : null);
 		
 		return merito;
 	}

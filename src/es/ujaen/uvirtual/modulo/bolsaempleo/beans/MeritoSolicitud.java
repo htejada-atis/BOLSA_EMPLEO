@@ -17,6 +17,7 @@ public class MeritoSolicitud implements Serializable {
 	private Boolean validado;
 	private String observacionCandidato;
 	private Double valor;
+	private ItemBaremacion item;
 	private List<MeritoSolicitudValoracion> valoraciones;
 
 	/**
@@ -63,14 +64,16 @@ public class MeritoSolicitud implements Serializable {
 	 * @param pvalidado .
 	 * @param pobservacionCandidato .
 	 * @param pvalor .
+	 * @param pitem .
 	 */
-	public MeritoSolicitud(Integer pcodNum, Merito pmerito, Boolean pexcluido, Boolean pvalidado, String pobservacionCandidato, Double pvalor) {
+	public MeritoSolicitud(Integer pcodNum, Merito pmerito, Boolean pexcluido, Boolean pvalidado, String pobservacionCandidato, Double pvalor, ItemBaremacion pitem) {
 		this.codNum = pcodNum;
 		this.merito = pmerito;
 		this.excluido = pexcluido;
 		this.validado = pvalidado;
 		this.observacionCandidato = pobservacionCandidato;
 		this.valor = pvalor;
+		this.item = pitem;
 	}
 	
 	/**
@@ -154,6 +157,14 @@ public class MeritoSolicitud implements Serializable {
 	public void setValor(Double valor) {
 		this.valor = valor;
 	}
+	
+	public ItemBaremacion getItem() {
+		return item;
+	}
+
+	public void setItem(ItemBaremacion item) {
+		this.item = item;
+	}
 		
 	public static long getSerialversionuid() {
 		return serialVersionUID;
@@ -162,7 +173,8 @@ public class MeritoSolicitud implements Serializable {
 	@Override
 	public String toString() {
 		return "MeritoSolicitud [codNum=" + codNum + ", merito=" + merito + ", excluido=" + excluido
-				+ ", validado=" + validado + ", observacionCandidato=" + observacionCandidato + ", valoraciones=" + valoraciones + ", valor=" + valor + "]";
+				+ ", validado=" + validado + ", observacionCandidato=" + observacionCandidato + ", valoraciones=" + valoraciones + ", valor=" + valor 
+				+ ", item=" + item + "]";
 	}
 
 	@Override
@@ -176,6 +188,7 @@ public class MeritoSolicitud implements Serializable {
 		result = prime * result + ((observacionCandidato == null) ? 0 : observacionCandidato.hashCode());
 		result = prime * result + ((valoraciones == null) ? 0 : valoraciones.hashCode());
 		result = prime * result + ((valor == null) ? 0 : valor.hashCode());
+		result = prime * result + ((item == null) ? 0 : item.hashCode());
 		return result;
 	}
 
@@ -239,6 +252,13 @@ public class MeritoSolicitud implements Serializable {
 				return false;
 			}
 		} else if (!valor.equals(other.valor)) {
+			return false;
+		}
+		if (item == null) {
+			if (other.item != null) {
+				return false;
+			}
+		} else if (!item.equals(other.item)) {
 			return false;
 		}
 		

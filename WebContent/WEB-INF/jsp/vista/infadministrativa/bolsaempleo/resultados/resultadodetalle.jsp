@@ -1,6 +1,7 @@
 <%@ page trimDirectiveWhitespaces="true"%>
 <%@	page import="es.ujaen.uvirtual.modulo.bolsaempleo.controlador.ControladorDescargaFicheros"%>
 <%@	page import="es.ujaen.uvirtual.modulo.bolsaempleo.controlador.ControladorResultados"%>
+<%@	page import="es.ujaen.uvirtual.modulo.bolsaempleo.controlador.configuracion.ControladorUsuarioCandidato"%>
 <%@ page import="es.ujaen.uvirtual.modulo.bolsaempleo.vistas.VistaResultados" %>
 <%@ page import="es.ujaen.uvirtual.modulo.bolsaempleo.beans.Bolsa" %>
 <%@ page import="es.ujaen.uvirtual.modulo.bolsaempleo.beans.BolsaResultado" %>
@@ -8,6 +9,7 @@
 <%@ page import="es.ujaen.uvirtual.modulo.bolsaempleo.beans.MeritoResultado" %>
 <%@ page import="es.ujaen.uvirtual.modulo.bolsaempleo.beans.UsuarioBolsaEmpleo" %>
 <%@ page import="es.ujaen.uvirtual.modulo.bolsaempleo.modelo.ModeloResultados" %>
+<%@	page import="es.ujaen.uvirtual.modulo.bolsaempleo.modelo.ModeloRol"%>
 <%@ page import="es.ujaen.uvirtual.beans.UVDatos"%>
 <%@ page import="es.ujaen.uvirtual.utilidades.EscapaHTML" %>
 <%@ page import="es.ujaen.uvirtual.utilidades.Formateador"%>
@@ -26,7 +28,14 @@ MeritoPreferente meritoPreferente = bean.getMeritoPreferente();
 	<jsp:include page="/WEB-INF/jsp/vista/infadministrativa/bolsaempleo/mensajes.jsp" />
 	
 	<h2>Resultados del área: <%= EscapaHTML.escapa(bolsa.getArea().getDescripcion()) %></h2>
-	<h3>Resultados del candidato: <%= EscapaHTML.escapa(candidato.getPrsNif()) %></h3>
+<%	if (bean.getUsuarioLogeado().getRol().getCodNum().equals(ModeloRol.ID_ROL_SERVICIO_PERSONAL)) { %>
+		<h3>Resultados del candidato: <a class="bolsaempleo-link"
+									href="<%= ControladorUsuarioCandidato.URL_PATTERN 
+										+ "?" + ControladorUsuarioCandidato.PARAM_ACCION + "=" + ControladorUsuarioCandidato.ACCION_SELECCIONAR_CANDIDATO 
+										+ "&" + ControladorUsuarioCandidato.PARAM_CANDIDATO + "=" + candidato.getCodNum()%>"><%= EscapaHTML.escapa(candidato.getPrsNif()) %></a></h3>
+<%	} else { %>
+		<h3>Resultados del candidato: <%= EscapaHTML.escapa(candidato.getPrsNif()) %></h3>
+<%	} %>
 	
 	<div class="row">
 		<button class="link-btn" id="resultados_volver" style="float:left; max-height: 25px">
@@ -43,7 +52,7 @@ MeritoPreferente meritoPreferente = bean.getMeritoPreferente();
 <%	if (bolsaResultado.getListaMeritos().size() > 0) { %>
 		<div>Leyenda del campo "Desglose":</div>
 	    <ul>
-	    	<li>Méritos no individualizados: (I) (valor1 * afinidad1 + valor2 * afinidad2 + valor3 * afinidad3 + valor4 * afinidad4) * Peso Categoría * Peso Bloque</li>
+	    	<li>Méritos desagregables: (D) (valor1 * afinidad1 + valor2 * afinidad2 + valor3 * afinidad3 + valor4 * afinidad4) * Peso Categoría * Peso Bloque</li>
 	    	<li>Méritos con bonificación por bloque 
 	    	"<%= meritoPreferente.getAplicableApartadoBaremacion().getCodigo() + " - " + meritoPreferente.getAplicableApartadoBaremacion().getNombre() %>":
 	    	 (B) Valor * Afinidad * Peso Categoría * Peso Bloque * <%= meritoPreferente.getFactor() %></li>
@@ -160,6 +169,7 @@ MeritoPreferente meritoPreferente = bean.getMeritoPreferente();
 <script>
 
 $(document).ready(function() {
+	Atis.handleLinkEvents();
 	
 	document.getElementById("resultados_volver").addEventListener("click", function() {
 		var params = {

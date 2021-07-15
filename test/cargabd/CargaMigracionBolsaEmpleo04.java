@@ -7,6 +7,9 @@ import bbdd.BbddRunner;
 /**
  * Migraciones 20210713 .
  * 	- rol de miembros de comisión en menú resultados .
+ * Migraciones 20210714 .
+ * 	- ítem de baremación en solicitud bolsas méritos .
+ * 
  * @author ATISoluciones 2021
  */
 public class CargaMigracionBolsaEmpleo04 {
@@ -19,6 +22,7 @@ public class CargaMigracionBolsaEmpleo04 {
 		BbddRunner.conectarBd();
 		try {
 			BbddRunner.ejecutar("Documentos/scripts/opc.bolsaempleo/migraciones/05-resultadosevaluadores.sql");
+			BbddRunner.ejecutar("Documentos/scripts/opc.bolsaempleo/migraciones/05-itemsolicitudbolsasmeritos.sql");
 		} catch (IOException | SQLException e) {
 			e.printStackTrace();
 		}
