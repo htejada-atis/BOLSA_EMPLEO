@@ -455,7 +455,7 @@ public class TestBEPModeloSolicitud {
 			if (!bolsa.getEstado().equals(ModeloBolsa.BOLSA_ESTADO_DESBLOQUEADA)) {
 				estadoBolsa = bolsa.getEstado();
 				UtilsTestBolsaEmpleo.sqlExecute("UPDATE TBEP_BOLSAS SET ESTADO = '" + ModeloBolsa.BOLSA_ESTADO_DESBLOQUEADA + "' WHERE CODNUM = " 
-						+ bolsa.getCodNum());				
+						+ bolsa.getCodNum());
 			}
 			Bolsa bolsaFinal = ModeloBolsa.obtenerInstancia().getBolsaById(bolsa.getCodNum());
 			Merito meritoIndividualizado = getMeritoIndividualizadoAfinidad();
@@ -531,6 +531,9 @@ public class TestBEPModeloSolicitud {
 		} finally {
 			if (sAbierta != null) {
 				UtilsTestBolsaEmpleo.sqlExecute("UPDATE TBEP_SOLICITUDES SET ESTADO = 'CERRADA' WHERE CODNUM = " + sAbierta.getCodNum());
+			}
+			if (estadoBolsa != null) {
+				UtilsTestBolsaEmpleo.sqlExecute("UPDATE TBEP_BOLSAS SET ESTADO = '" + estadoBolsa + "' WHERE CODNUM = " + bolsa.getCodNum());
 			}
 		}
 	}

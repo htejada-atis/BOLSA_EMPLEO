@@ -79,7 +79,7 @@ public class TestBEPBeanBolsaSolicitud {
 		assertFalse(bolsa1.equals(null));
 		assertFalse(bolsa1.equals(bolsa3));
 		assertFalse(bolsa3.equals(bolsa1));
-		assertFalse(bolsa3.equals((Integer) 0));		
+		assertFalse(bolsa3.equals(new Object()));		
 		assertNotEquals(bolsa1.hashCode(), bolsa3.hashCode());
 		
 		bolsa2.setListaMeritos(list);
