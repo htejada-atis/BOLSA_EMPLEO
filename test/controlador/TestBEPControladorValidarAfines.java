@@ -308,7 +308,6 @@ public class TestBEPControladorValidarAfines {
 		
 		VistaValidar bean2 = (VistaValidar) peticion.getUVDatos().getVistas().get(VistaValidar.class.getName());
 		
-		assertEquals(MENSAJE_CON_EXITO_ESPERADO, ControladorValidar.MENSAJE_EXITO_MERITO_MODIFICAR, bean2.getMensajesDeExito().get(0));
 		assertEquals(MENSAJE_SIN_ERROR, 0, bean2.getMensajesDeError().size());
 		assertEquals(MENSAJE_SIN_ADVERTENCIAS, 0, bean2.getMensajesDeAdvertencia().size());
 	}
