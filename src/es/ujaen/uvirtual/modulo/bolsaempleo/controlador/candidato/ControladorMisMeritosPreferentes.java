@@ -241,7 +241,7 @@ public class ControladorMisMeritosPreferentes extends HttpServlet {
 			try {
 				List<MeritoPreferenteOpcion> opciones = ModeloMeritosPreferentes.obtenerInstancia().listadoOpcionesMeritosPreferentes(ModeloMeritosPreferentes.
 						obtenerInstancia().getMeritoPreferenteById(Formateador.leeParametroInteger(request.getParameter(PARAM_ID))));
-				bean.setOpcionesMerito(opciones);				
+				bean.setOpcionesMerito(opciones);
 				Gson gson = new GsonBuilder().setDateFormat("dd/M/yyyy").create();						
 				writer.write(gson.toJson(opciones));
 			} catch (UVException | SQLException e) {

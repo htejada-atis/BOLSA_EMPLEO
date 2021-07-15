@@ -798,7 +798,6 @@ public class ModeloValidar {
 	 * @throws SQLException .
 	 */
 	public void excluirMeritoEnBolsas(Integer idMerito, String observacion, Bolsa bolsa, Convocatoria convocatoria, UsuarioBolsaEmpleo usuarioUpdate) throws SQLException {
-		System.out.println("excluirMeritoEnBolsas: mal");
 		boolean evaluador = usuarioUpdate.getRol().getValor().equals(ModeloRol.ROL_MIEMBRO_COMISION) 
 				|| usuarioUpdate.getRol().getValor().equals(ModeloRol.ROL_DIRECTOR_DEPARTAMENTO);
 		
@@ -811,8 +810,8 @@ public class ModeloValidar {
 				+ "  	INNER JOIN TBEP_SOLICITUD_BOLSAS bepsbo ON bepsbo.CODNUM = bepsbm.BEPSBO_CODNUM"
 				+ "		INNER JOIN TBEP_SOLICITUDES bepsol ON bepsol.CODNUM = bepsbo.BEPSOL_CODNUM"
 				+ "		INNER JOIN TBEP_BOLSAS bepbol ON bepbol.CODNUM = bepsbo.BEPBOL_CODNUM AND (bepbol.ESTADO = 'BAREMACION' OR bepbol.CODNUM = ?)"
-				+ (evaluador ? " INNER JOIN TBEP_EVALUADORES bepeva ON bepeva.BEPARE_CODNUM = bepsbo.BEPBOL_CODNUM AND bepeva.BEPUSU_CODNUM = ?"
-							+ "	 AND bepeva.FLGACTIVO = 'S'"
+				+ (evaluador ? (" INNER JOIN TBEP_EVALUADORES bepeva ON bepeva.BEPARE_CODNUM = bepsbo.BEPBOL_CODNUM AND bepeva.BEPUSU_CODNUM = ?"
+							 + "  AND bepeva.FLGACTIVO = 'S'")
 							 : "")
 				+ "  	WHERE bepsbm.BEPMER_CODNUM = ? AND bepsol.BEPCON_CODNUM = ?"
 				+ " ) MERITO"
