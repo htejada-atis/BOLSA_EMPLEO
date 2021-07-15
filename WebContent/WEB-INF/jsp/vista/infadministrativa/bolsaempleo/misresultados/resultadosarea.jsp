@@ -22,8 +22,8 @@ Bolsa bolsa = bean.getBolsa();
 		<tr>
 			<th scope="col" style="width:76px">D.N.I</th>
 			<th scope="col" style="width:100%" class="nombre">Nombre</th>
-			<th scope="col" style="width:76px" class="center">Puntuación</th>
-			<th scope="col" style="width:76px" class="center"></th>
+			<th scope="col" style="width:76px">Puntuación</th>
+			<th scope="col" style="width:76px"></th>
 		</tr>
 		<tbody>
 		</tbody>
