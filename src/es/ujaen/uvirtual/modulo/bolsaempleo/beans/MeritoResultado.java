@@ -19,6 +19,7 @@ public class MeritoResultado extends Merito implements Serializable {
 	private Double resultado;
 	private Boolean excluido;
 	private Boolean validado;
+	private ItemBaremacion itemMeritoSolicitud;
 	
 	
 	/**
@@ -38,9 +39,10 @@ public class MeritoResultado extends Merito implements Serializable {
 	 * @param presultado .
 	 * @param pexcluido .
 	 * @param pvalidado .
+	 * @param pitemMeritoSolicitud .
 	 */
 	public MeritoResultado(Merito pmerito, Integer pcodNumMeritoSolicitud, List<MeritoSolicitudValoracion> pvaloraciones, String pobservacionCandidato, 
-			String pdesglose, Double pvalor, Double presultado, Boolean pexcluido, Boolean pvalidado) {
+			String pdesglose, Double pvalor, Double presultado, Boolean pexcluido, Boolean pvalidado, ItemBaremacion pitemMeritoSolicitud) {
 		super(pmerito);
 		this.codNumMeritoSolicitud = pcodNumMeritoSolicitud;
 		this.valoraciones = pvaloraciones;
@@ -50,6 +52,7 @@ public class MeritoResultado extends Merito implements Serializable {
 		this.resultado = presultado;
 		this.excluido = pexcluido;
 		this.validado = pvalidado;
+		this.itemMeritoSolicitud = pitemMeritoSolicitud;
 	}
 
 	public Integer getCodNumMeritoSolicitud() {
@@ -115,6 +118,14 @@ public class MeritoResultado extends Merito implements Serializable {
 	public void setValidado(Boolean validado) {
 		this.validado = validado;
 	}
+	
+	public ItemBaremacion getItemMeritoSolicitud() {
+		return itemMeritoSolicitud;
+	}
+
+	public void setItemMeritoSolicitud(ItemBaremacion itemMeritoSolicitud) {
+		this.itemMeritoSolicitud = itemMeritoSolicitud;
+	}
 
 	public static long getSerialversionuid() {
 		return serialVersionUID;
@@ -124,7 +135,7 @@ public class MeritoResultado extends Merito implements Serializable {
 	public String toString() {
 		return "MeritoResultado [merito=" + super.toString() + ", codNumMeritoSolicitud=" + codNumMeritoSolicitud + ", valoraciones=" + valoraciones 
 				+ ", observacionCandidato=" + observacionCandidato + ", desglose=" + desglose + ", valorMeritoSolicitud=" + valorMeritoSolicitud 
-				+ ", resultado=" + resultado + ", excluido=" + excluido + ", validado=" + validado + "]";
+				+ ", resultado=" + resultado + ", excluido=" + excluido + ", validado=" + validado + ", itemMeritoSolicitud=" + itemMeritoSolicitud + "]";
 	}
 
 	@Override
@@ -140,6 +151,7 @@ public class MeritoResultado extends Merito implements Serializable {
 		result = prime * result + ((resultado == null) ? 0 : resultado.hashCode());
 		result = prime * result + ((excluido == null) ? 0 : excluido.hashCode());
 		result = prime * result + ((validado == null) ? 0 : validado.hashCode());
+		result = prime * result + ((itemMeritoSolicitud == null) ? 0 : itemMeritoSolicitud.hashCode());
 		return result;
 	}
 
@@ -206,6 +218,13 @@ public class MeritoResultado extends Merito implements Serializable {
 				return false;
 			}
 		} else if (!validado.equals(other.validado)) {
+			return false;
+		}
+		if (itemMeritoSolicitud == null) {
+			if (other.itemMeritoSolicitud != null) {
+				return false;
+			}
+		} else if (!itemMeritoSolicitud.equals(other.itemMeritoSolicitud)) {
 			return false;
 		}
 		

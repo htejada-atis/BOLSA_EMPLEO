@@ -541,7 +541,7 @@ public class TestBEPControladorValidarAfines {
 	 * @throws IOException si error io .
 	 */
 	@Test
-	public void testE05ObtenerMeritosParametroNoValido() throws IOException {
+	public void testE05ObtenerHistorialMeritoParametroNoValido() throws IOException {
 		VistaValidar bean = obtenerMeritos();
 		
 		PeticionHttp peticion = UtilsTestBolsaEmpleo.peticionAutenticadaPersonal();

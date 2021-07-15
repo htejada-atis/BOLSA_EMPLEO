@@ -302,11 +302,12 @@ public class ControladorValidar extends HttpServlet {
 				Integer idItem = Formateador.leeParametroInteger(request.getParameter(PARAM_ITEM));
 				ItemBaremacion item = ModeloBaremacionItems.obtenerInstancia().getItemBaremacionById(idItem);
 				merito.setItemBaremacion(item);
+				bean.getMerito().setItem(item);
 				
 				// valor
 				Double valor = ModeloMerito.validateValorDelMerito(request.getParameter(PARAM_VALOR), merito);
 				merito.setValor(valor);
-				
+				bean.getMerito().setValor(valor);
 				if (!valor.equals(bean.getMerito().getMerito().getValor()) || !item.equals(bean.getMerito().getMerito().getItemBaremacion())) {
 					ModeloSolicitud modeloSolicitud = ModeloSolicitud.obtenerInstancia();
 					ModeloValidar modeloValidar = ModeloValidar.obtenerInstancia();
@@ -316,7 +317,6 @@ public class ControladorValidar extends HttpServlet {
 					if (!item.equals(bean.getMerito().getMerito().getItemBaremacion())) {
 						// comprobamos que el total de méritos por bloque de la solicitud sea menor que
 						// el permitido por la convocatoria
-						merito.setItemBaremacion(item);
 						Integer totalMeritos = modeloSolicitud.obtenerTotalMeritosPorBloqueSolicitud(solicitud, bean.getBolsa(), merito);
 						if (totalMeritos >= bean.getConvocatoria().getNumMeritosPorBloque()
 								&& !merito.getItemBaremacion().getBloqueBaremacion().getApartadoBaremacion().equals(
@@ -325,8 +325,11 @@ public class ControladorValidar extends HttpServlet {
 						}
 					}
 					
-					modeloValidar.borrarValoracionesMerito(bean.getMerito().getMerito(), solicitud, bean.getUsuarioLogeado());
-					modeloValidar.borrarEvaluacionMerito(bean.getMerito().getMerito(), solicitud, bean.getUsuarioLogeado());
+					if (!item.getIndividualizado() || !bean.getMerito().getMerito().getItemBaremacion().getIndividualizado()) {
+						modeloValidar.borrarValoracionesMerito(bean.getMerito(), bean.getUsuarioLogeado());
+					}
+					
+					modeloValidar.borrarEvaluacionMerito(bean.getMerito(), solicitud, bean.getBolsa(), bean.getUsuarioLogeado());
 				}
 				
 				ModeloMerito.obtenerInstancia().actualizaMerito(merito, bean.getUsuarioLogeado());
@@ -362,18 +365,18 @@ public class ControladorValidar extends HttpServlet {
 		
 		try {
 			String observacionesCandidato = EscapaHTML.ajustaCodificacion(request.getParameter(PARAM_OBSERVACION_CANDIDATO));
+			bean.getMerito().setObservacionCandidato(EscapaHTML.ajustaCodificacion(request.getParameter(PARAM_OBSERVACION_CANDIDATO)));
 			Integer idBolsa = Formateador.leeParametroInteger(request.getParameter(PARAM_BOLSA_MERITO));
 			Bolsa bolsa = modeloBolsa.getBolsaById(idBolsa);
 			bean.setValidaBolsa(bolsa);
 			actualizaAfinidades(bean, request, bolsa);
 			
 			if (EscapaHTML.ajustaCodificacion(request.getParameter(PARAM_ACEPTAR_MERITO)) != null) {
-				modeloValidar.validarMerito(idBolsa.toString(), bean.getMerito(),
-						observacionesCandidato, bean.getConvocatoria(), bean.getUsuarioLogeado());
+				modeloValidar.evaluarMerito(idBolsa.toString(), bean.getMerito(), bean.getConvocatoria(), bean.getUsuarioLogeado(), true);
 				BolsaEmpleoUtils.addMensajeDeExito(String.format(MENSAJE_EXITO_MERITO_VALIDADO, bolsa.getArea().getDescripcion()), bean, request);
 			} else if (EscapaHTML.ajustaCodificacion(request.getParameter(PARAM_EXCLUIR_MERITO)) != null) {
-				modeloValidar.excluirMeritoEnBolsas(bean.getMerito().getMerito().getCodNum(),
-						observacionesCandidato, bean.getConvocatoria(), bean.getUsuarioLogeado());
+				modeloValidar.excluirMeritoEnBolsas(bean.getMerito().getMerito().getCodNum(), observacionesCandidato,
+						bean.getBolsa(), bean.getConvocatoria(), bean.getUsuarioLogeado());
 				BolsaEmpleoUtils.addMensajeDeExito(String.format(MENSAJE_EXITO_MERITO_EXCLUIDO, bolsa.getArea().getDescripcion()), bean, request);
 			}
 			
