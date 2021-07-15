@@ -308,7 +308,6 @@ public class ControladorValidar extends HttpServlet {
 				Double valor = ModeloMerito.validateValorDelMerito(request.getParameter(PARAM_VALOR), merito);
 				merito.setValor(valor);
 				bean.getMerito().setValor(valor);
-				
 				if (!valor.equals(bean.getMerito().getMerito().getValor()) || !item.equals(bean.getMerito().getMerito().getItemBaremacion())) {
 					ModeloSolicitud modeloSolicitud = ModeloSolicitud.obtenerInstancia();
 					ModeloValidar modeloValidar = ModeloValidar.obtenerInstancia();
@@ -326,7 +325,10 @@ public class ControladorValidar extends HttpServlet {
 						}
 					}
 					
-					modeloValidar.borrarValoracionesMerito(bean.getMerito().getMerito(), solicitud, bean.getUsuarioLogeado());
+					if (!item.getIndividualizado() || !bean.getMerito().getMerito().getItemBaremacion().getIndividualizado()) {
+						modeloValidar.borrarValoracionesMerito(bean.getMerito(), bean.getUsuarioLogeado());
+					}
+					
 					modeloValidar.borrarEvaluacionMerito(bean.getMerito(), solicitud, bean.getBolsa(), bean.getUsuarioLogeado());
 				}
 				
@@ -373,8 +375,8 @@ public class ControladorValidar extends HttpServlet {
 				modeloValidar.evaluarMerito(idBolsa.toString(), bean.getMerito(), bean.getConvocatoria(), bean.getUsuarioLogeado(), true);
 				BolsaEmpleoUtils.addMensajeDeExito(String.format(MENSAJE_EXITO_MERITO_VALIDADO, bolsa.getArea().getDescripcion()), bean, request);
 			} else if (EscapaHTML.ajustaCodificacion(request.getParameter(PARAM_EXCLUIR_MERITO)) != null) {
-				modeloValidar.excluirMeritoEnBolsas(bean.getMerito().getMerito().getCodNum(),
-						observacionesCandidato, bean.getConvocatoria(), bean.getUsuarioLogeado());
+				modeloValidar.excluirMeritoEnBolsas(bean.getMerito().getMerito().getCodNum(), observacionesCandidato,
+						bean.getBolsa(), bean.getConvocatoria(), bean.getUsuarioLogeado());
 				BolsaEmpleoUtils.addMensajeDeExito(String.format(MENSAJE_EXITO_MERITO_EXCLUIDO, bolsa.getArea().getDescripcion()), bean, request);
 			}
 			

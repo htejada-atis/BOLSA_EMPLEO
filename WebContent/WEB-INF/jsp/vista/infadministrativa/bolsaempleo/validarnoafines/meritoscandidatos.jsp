@@ -219,6 +219,8 @@ Double valor = null;
 
 <script>
 $(document).ready(function() {
+	Atis.handleLinkEvents();
+	
 	var tableCandidatos = new Atis.DataTable('#tableCandidatos', {
 	    "ajax": { url: "<%= ControladorValidarNoAfines.URL_PATTERN_AJAX %>", async: false },
 	    "pageSize": 200,
@@ -319,14 +321,18 @@ $(document).ready(function() {
 			    	},
 			    <% if (bolsa != null) { %> "selected": <%= bolsa.getCodNum() %> ,<% } %>
 			    "columns": [
-			    	{'data': 'bolsa.codNum', 'render': function(row) {
-			        	return row.area.idAreaExterno + " : " + row.area.descripcion;
+			    	{'data': 'codNum', 'render': function(row) {
+			    		var href = '<%= request.getRequestURL() + "?" + ControladorValidarNoAfines.PARAM_ACCION + "=" + ControladorValidarNoAfines.ACCION_MERITO_SELECCIONADO 
+							+ "&" + ControladorValidarNoAfines.PARAM_BOLSA + "=" %>' + row.codNum + '<%=
+								  "&" + ControladorValidarNoAfines.PARAM_CANDIDATO + "=" + candidato.getCodNum()
+								+ "&" + ControladorValidarNoAfines.PARAM_MERITO + "=" + merito.getMerito().getCodNum()%>';
+			        	return "<a class='bolsaempleo-link' href='" + href + "'>" + row.area.idAreaExterno + " : " + row.area.descripcion + "</a>";
 		        	}},
 			        {'data': 'codNum', 'order': false, 'render': function(row) {
 			        	if (row.codNum == <%= bolsa.getCodNum() %>) {
 			        		return "<div class='text-primary'>Baremación actual</div>";
 			        	} else {
-			        		return row.estado == '<%= ModeloBolsa.BOLSA_ESTADO_BAREMACION %>' ? '<div class="text-success">VALIDACIÓN</div>' : row.estado;
+			        		return "<div class='text-success'>Inscrito actualmente</div>";
 			        	}
 			        }},
 		        	{'data': 'codNum', 'order': false, 'selectable': {
@@ -357,7 +363,11 @@ $(document).ready(function() {
 			    		return '<div title="' + row.convocatoria.codNum + ' - ' + row.convocatoria.descripcion + '">' + row.convocatoria.fechaCierre + '</div>';
 			    	}},
 			        {'data': 'bolsa.codNum', 'render': function(row) {
-			        	return row.bolsa.area.idAreaExterno + " : " + row.bolsa.area.descripcion;
+			        	var href = '<%= request.getRequestURL() + "?" + ControladorValidarNoAfines.PARAM_ACCION + "=" + ControladorValidarNoAfines.ACCION_MERITO_SELECCIONADO 
+							+ "&" + ControladorValidarNoAfines.PARAM_BOLSA + "=" %>' + row.bolsa.codNum + '<%=
+								  "&" + ControladorValidarNoAfines.PARAM_CANDIDATO + "=" + candidato.getCodNum()
+								+ "&" + ControladorValidarNoAfines.PARAM_MERITO + "=" + merito.getMerito().getCodNum()%>';
+			        	return "<a class='bolsaempleo-link' href='" + href + "'>" + row.bolsa.area.idAreaExterno + " : " + row.bolsa.area.descripcion + "</a>";
 		        	}},
 		        	{'data': 'item', 'render': function(row) {
 		        		return row.meritoSolicitud.item != null ? row.meritoSolicitud.item.bloque.apartado.codigo + "." + row.meritoSolicitud.item.bloque.codigo 
@@ -393,7 +403,7 @@ $(document).ready(function() {
 				
 				if (itemChanged) {
 					var titulo = "¿Modificar categoría del mérito?";
-					var mensaje = "Modificar la categoría borrará todas las evaluaciones del mérito en cualquier bolsa.";
+					var mensaje = "Modificar la categoría borrará la evaluación del mérito en la bolsa actual.";
 					
 					Atis.confirmDialog(titulo, mensaje, {
 				        Si: function() {
@@ -406,7 +416,6 @@ $(document).ready(function() {
 				    });
 					return false;
 				}
-				
 			});
 			
 			document.getElementById("merito_descargar_fichero").addEventListener("click", function() {

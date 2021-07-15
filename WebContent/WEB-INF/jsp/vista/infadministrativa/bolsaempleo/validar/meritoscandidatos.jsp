@@ -203,8 +203,15 @@ Double valor = null;
 					
 						<tr data-individualizado="<%= individualizado %>" data-bolsa="<%= meritoBolsa.getBolsa().getCodNum() %>" 
 								data-afinidad="<%= meritoBolsa.getMeritoSolicitud().getMerito().getItemBaremacion().getAfinidad() %>">
-							<td><b><%= EscapaHTML.escapa(meritoBolsa.getBolsa().getArea().getIdAreaExterno()) %></b><br/>
-								<%= EscapaHTML.escapa(meritoBolsa.getBolsa().getArea().getDescripcion()) %>
+							<td>
+								<a class="bolsaempleo-link" 
+									href="<%= request.getRequestURL() + "?" + ControladorValidar.PARAM_ACCION + "=" + ControladorValidar.ACCION_MERITO_SELECCIONADO 
+										+ "&" + ControladorValidar.PARAM_BOLSA + "=" + meritoBolsa.getBolsa().getCodNum()
+										+ "&" + ControladorValidar.PARAM_CANDIDATO + "=" + candidato.getCodNum()
+										+ "&" + ControladorValidar.PARAM_MERITO + "=" + merito.getMerito().getCodNum()%>">
+									<b><%= EscapaHTML.escapa(meritoBolsa.getBolsa().getArea().getIdAreaExterno()) %></b><br/>
+									<%= EscapaHTML.escapa(meritoBolsa.getBolsa().getArea().getDescripcion()) %>
+								</a>
 							</td>
 							<td><%= meritoBolsa.getMeritoSolicitud().getItem() != null 
 									? meritoBolsa.getMeritoSolicitud().getItem().getBloqueBaremacion().getApartadoBaremacion().getCodigo() + "."
@@ -335,6 +342,8 @@ Double valor = null;
 
 <script>
 $(document).ready(function() {
+	Atis.handleLinkEvents();
+	
 	var tableCandidatos = new Atis.DataTable('#tableCandidatos', {
 	    "ajax": { url: "<%= ControladorValidar.URL_PATTERN_AJAX %>", async: false },
 	    "pageSize": 200,
@@ -538,7 +547,7 @@ $(document).ready(function() {
 			$('.bluetable').on('click', 'button.merito-excluir', function() {
 				var self = this;
 				Atis.confirmDialog(
-					"Excluir mérito", "El mérito se va a excluir de todas las áreas que pueda evaluar.", {
+					"Excluir mérito", "El mérito se va a excluir de todas las bolsas en estado 'Validación' que pueda evaluar.", {
 	            	'Si': function(row) {
 	            		onClickAccionMerito(self, '<%= ControladorValidar.PARAM_EXCLUIR_MERITO %>');
 	        			
@@ -557,8 +566,8 @@ $(document).ready(function() {
 				var self = this;
 				if (itemChanged || valorChanged) {
 					var titulo = "¿Modificar " + (itemChanged ? "categoría" : "valor") + " del mérito?";
-					var mensaje = itemChanged ? "Modificar la categoría borrará todas las evaluaciones del mérito en cualquier bolsa."
-							: "<p>Modificar el valor del mérito borrará las evaluaciones del mérito para méritos no individualizados <br/> y tendrá que asignar los valores de nuevo.</p>";
+					var mensaje = itemChanged ? "Modificar la categoría borrará la evaluación del mérito en esta bolsa."
+							: "<p>Modificar el valor del mérito borrará la evaluación del mérito para méritos desagregables <br/> y tendrá que asignar los valores de nuevo.</p>";
 					
 					Atis.confirmDialog(titulo, mensaje, {
 				        Si: function() {

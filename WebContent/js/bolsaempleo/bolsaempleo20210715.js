@@ -97,10 +97,26 @@ function setProp( object, keys, val ){
 	object[keys[0]] = val;
 }
 
+function handleLinkEvents() {
+    Array.from(document.getElementsByClassName("bolsaempleo-link")).forEach(function(element) {
+        element.addEventListener('click', function(event) {
+            event.preventDefault();
+            var link = this.getAttribute("href").split("?");
+            var url = link[0];
+            var paramsArray = link[1].split("&");
+            var params = {};
+            Array.from(paramsArray).forEach(function(param) {
+                params[param.split("=")[0]] = param.split("=")[1];
+            });
+            
+            sendForm(url, params);
+        });
+    });
+}
+
 function isFunction(functionToCheck) {
 	return functionToCheck && {}.toString.call(functionToCheck) === '[object Function]';
 }
-
 
 function isUndefined(myVar) {
 	return typeof myVar === 'undefined'; 
@@ -805,5 +821,6 @@ window.Atis = {
 	"redondearFloat": redondearFloat,
 	"smoothScrollToAnchor": smoothScrollToAnchor,
 	"smoothScrollFromOneToAnotherAnchor": smoothScrollFromOneToAnotherAnchor,
+    "handleLinkEvents": handleLinkEvents,
     "DataTable": DataTable
 };
