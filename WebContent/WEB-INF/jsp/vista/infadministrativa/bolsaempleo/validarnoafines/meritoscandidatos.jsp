@@ -403,7 +403,7 @@ $(document).ready(function() {
 				
 				if (itemChanged) {
 					var titulo = "¿Modificar categoría del mérito?";
-					var mensaje = "Modificar la categoría borrará la evaluación del mérito en la bolsa actual.";
+					var mensaje = "Modificar la categoría borrará las evaluaciones del mérito en todas las bolsas en estado de 'Validación'.";
 					
 					Atis.confirmDialog(titulo, mensaje, {
 				        Si: function() {
