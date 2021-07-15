@@ -376,7 +376,7 @@ public class ControladorValidar extends HttpServlet {
 				BolsaEmpleoUtils.addMensajeDeExito(String.format(MENSAJE_EXITO_MERITO_VALIDADO, bolsa.getArea().getDescripcion()), bean, request);
 			} else if (EscapaHTML.ajustaCodificacion(request.getParameter(PARAM_EXCLUIR_MERITO)) != null) {
 				modeloValidar.excluirMeritoEnBolsas(bean.getMerito().getMerito().getCodNum(), observacionesCandidato,
-						bean.getBolsa(), bean.getConvocatoria(), bean.getUsuarioLogeado());
+						bean.getValidaBolsa(), bean.getConvocatoria(), bean.getUsuarioLogeado());
 				BolsaEmpleoUtils.addMensajeDeExito(String.format(MENSAJE_EXITO_MERITO_EXCLUIDO, bolsa.getArea().getDescripcion()), bean, request);
 			}
 			

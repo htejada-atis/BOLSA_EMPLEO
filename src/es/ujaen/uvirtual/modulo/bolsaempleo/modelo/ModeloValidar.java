@@ -944,7 +944,6 @@ public class ModeloValidar {
 		try (Connection conexion = ConexionUvirtual.obtenerInstancia(); PreparedStatement stmt = conexion.prepareStatement(sqlUpdateValoraciones)) {
 			int indexParam = 1;
 			stmt.setInt(indexParam++, bolsa.getCodNum());
-			stmt.setInt(indexParam++, bolsa.getCodNum());
 			stmt.setInt(indexParam++, merito.getMerito().getCodNum());
 			stmt.setInt(indexParam++, solicitud.getCodNum());
 			stmt.setString(indexParam++, usuarioUpdate.getCodCuenta());
