@@ -878,16 +878,16 @@ public class ModeloValidar {
 				String sqlUpdateValoraciones = "UPDATE TBEP_SOL_BOL_MER_VALORACION"
 						+ " SET UID_USUARIO = ?"
 						+ " WHERE BEPSBM_CODNUM IN ("
-						+ "		SELECT bepsbm.CODNUM"
-						+ "		FROM TBEP_SOL_BOL_MERITOS bepsbm"
-						+ "		WHERE bepsbm.BEPMER_CODNUM = ? AND bepsbm.BEPSBO_CODNUM IN ("
-						+ "			SELECT bepsbo.CODNUM"
-						+ "			FROM TBEP_SOLICITUD_BOLSAS bepsbo"
-						+ "			INNER JOIN TBEP_BOLSAS bepbol ON bepbol.CODNUM = bepsbo.BEPBOL_CODNUM "
-						+ "				AND (bebol.CODNUM = ? OR bepbol.ESTADO = '" + ModeloBolsa.BOLSA_ESTADO_BAREMACION + "'"
-						+ "			WHERE bepsbo.BEPSOL_CODNUM = ?"						
+						+ "	SELECT bepsbm.CODNUM"
+						+ "	FROM TBEP_SOL_BOL_MERITOS bepsbm"
+						+ "	WHERE bepsbm.BEPMER_CODNUM = ? AND bepsbm.BEPSBO_CODNUM IN ("
+						+ "		SELECT bepsbo.CODNUM"
+						+ "		FROM TBEP_SOLICITUD_BOLSAS bepsbo"
+						+ "		INNER JOIN TBEP_BOLSAS bepbol ON bepbol.CODNUM = bepsbo.BEPBOL_CODNUM"
+						+ "			AND (bepbol.CODNUM = ? OR bepbol.ESTADO = 'BAREMACION')"
+						+ "				WHERE bepsbo.BEPSOL_CODNUM = ?"
 						+ "		)"
-						+ ")";
+						+ " )";
 				
 				try (PreparedStatement stmt = conexion.prepareStatement(sqlUpdateValoraciones)) {
 					int indexParam = 1;
@@ -906,11 +906,11 @@ public class ModeloValidar {
 						+ "		WHERE bepsbm.BEPMER_CODNUM = ? AND bepsbm.BEPSBO_CODNUM IN ("
 						+ "			SELECT bepsbo.CODNUM"
 						+ "			FROM TBEP_SOLICITUD_BOLSAS bepsbo"
-						+ "			INNER JOIN TBEP_BOLSAS bepbol ON bepbol.CODNUM = bepsbo.BEPBOL_CODNUM "
-						+ "				AND (bebol.CODNUM = ? OR bepbol.ESTADO = '" + ModeloBolsa.BOLSA_ESTADO_BAREMACION + "'"
-						+ "			WHERE bepsbo.BEPSOL_CODNUM = ?"						
+						+ "			INNER JOIN TBEP_BOLSAS bepbol ON bepbol.CODNUM = bepsbo.BEPBOL_CODNUM"
+						+ "				AND (bepbol.CODNUM = ? OR bepbol.ESTADO = '" + ModeloBolsa.BOLSA_ESTADO_BAREMACION + "')"
+						+ "			WHERE bepsbo.BEPSOL_CODNUM = ?"					
 						+ "		)"
-						+ ")";
+						+ " )";
 				
 				try (PreparedStatement stmt = conexion.prepareStatement(sqlValoraciones)) {
 					int indexParam = 1;
