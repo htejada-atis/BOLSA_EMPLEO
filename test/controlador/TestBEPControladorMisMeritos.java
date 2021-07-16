@@ -5,6 +5,8 @@ import static org.junit.Assert.assertNotEquals;
 import static org.junit.Assert.assertNotNull;
 import java.io.IOException;
 import java.sql.SQLException;
+import java.util.Objects;
+
 import javax.servlet.ServletException;
 import org.junit.BeforeClass;
 import org.junit.FixMethodOrder;
@@ -132,7 +134,7 @@ public class TestBEPControladorMisMeritos {
 		PeticionHttp peticion = UtilsTestBolsaEmpleo.peticionAutenticadaCandidato();
 		peticion.setParameter(ControladorMisMeritos.PARAM_ACCION, ControladorMisMeritos.ACCION_ELIMINAR_MERITOS);
 		peticion.setParameter(ControladorMisMeritos.PARAM_MERITOS,
-				"[" + bean.getDatatable().getData().get(bean.getDatatable().getData().size() - 1).getCodNum().toString() + "]");
+				"[" + bean.getDatatable().getData().stream().filter(m -> m.getDescripcion().contains("17")).findFirst().orElse(null).getCodNum().toString() + "]");
 
 		RespuestaHttp respuesta = new RespuestaHttp();
 		ControladorMisMeritos controlador = new ControladorMisMeritos();
@@ -195,7 +197,7 @@ public class TestBEPControladorMisMeritos {
 	 */
 	@Test
 	public void testE03ErrorUsuarioRol() throws IOException, ServletException {
-		PeticionHttp peticion = UtilsTestBolsaEmpleo.peticionAutenticadaCandidato();
+		PeticionHttp peticion = UtilsTestBolsaEmpleo.peticionAutenticadaPersonal();
 		peticion.setParameter(ControladorMisMeritos.PARAM_ACCION, ControladorMisMeritos.ACCION_INDEX);
 
 		RespuestaHttp respuesta = new RespuestaHttp();
@@ -214,7 +216,7 @@ public class TestBEPControladorMisMeritos {
 	 */
 	@Test
 	public void testE04AccionNoValida() throws IOException, ServletException {
-		PeticionHttp peticion = UtilsTestBolsaEmpleo.peticionAutenticadaPersonal();
+		PeticionHttp peticion = UtilsTestBolsaEmpleo.peticionAutenticadaCandidato();
 		peticion.setParameter(ControladorMisMeritos.PARAM_ACCION, "accionnovalida");
 
 		RespuestaHttp respuesta = new RespuestaHttp();

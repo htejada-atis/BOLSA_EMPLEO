@@ -156,7 +156,7 @@ Boolean personal = bean.getUsuarioLogeado().getRol().getCodNum().equals(ModeloRo
 				</div>
 			
 		    	<div class="form-btn">
-		    		<input id="merito_guardar" type="submit" name="<%= ControladorValidar.PARAM_GUARDAR_MERITO %>" value="Guardar"/>
+		    		<input id="merito_guardar" type="submit" name="guardar" value="Guardar"/>
 		    	</div>
 		    </form>
 		    

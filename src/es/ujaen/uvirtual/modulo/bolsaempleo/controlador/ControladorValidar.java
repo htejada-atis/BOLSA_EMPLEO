@@ -83,7 +83,6 @@ public class ControladorValidar extends HttpServlet {
 	public static final String PARAM_BOLSA_MERITO = "bolsamerito";
 	public static final String PARAM_CANDIDATO = "candidato";
 	public static final String PARAM_EXCLUIR_MERITO = "excluirmerito";
-	public static final String PARAM_GUARDAR_MERITO = "guardarmerito";
 	public static final String PARAM_ITEM = "item";
 	public static final String PARAM_MERITO = "merito";
 	public static final String PARAM_OBSERVACION_CANDIDATO = "observacioncandidato";

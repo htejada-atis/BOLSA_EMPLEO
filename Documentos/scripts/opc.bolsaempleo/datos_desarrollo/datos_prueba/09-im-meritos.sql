@@ -158,3 +158,13 @@ VALUES (
     hextoraw('453d7a34'),
     'CARGA_INICIAL'
 );
+INSERT INTO TBEP_MERITOS (BEPITE_CODNUM,BEPUSU_CODNUM,VALOR,DESCRIPCION,OBSERVACION,ARCHIVO,UID_USUARIO)
+VALUES (
+    (SELECT bepite.CODNUM FROM TBEP_ITEMSBAREMACION bepite WHERE bepite.CODNUM = 17),
+    (SELECT bepusu.CODNUM FROM TBEP_USUARIOS bepusu WHERE bepusu.CODCUENTA = 'candidato1'),
+    (SELECT greatest(1, round(dbms_random.value(bepite.VALOR_MINIMO, bepite.VALOR_MAXIMO))) FROM TBEP_ITEMSBAREMACION bepite WHERE bepite.CODNUM = 17),
+    'descripción mérito 17',
+    'mérito para eliminar en test',
+    hextoraw('453d7a34'),
+    'CARGA_INICIAL'
+);
