@@ -7,10 +7,8 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-
 import es.ujaen.uvirtual.modelo.conexion.ConexionUvirtual;
 import es.ujaen.uvirtual.modelo.conexion.ConexionUxxiRrhh;
-import es.ujaen.uvirtual.modulo.bolsaempleo.beans.Bolsa;
 import es.ujaen.uvirtual.modulo.bolsaempleo.beans.Departamento;
 import es.ujaen.uvirtual.modulo.bolsaempleo.beans.UsuarioBolsaEmpleo;
 import es.ujaen.uvirtual.modulo.bolsaempleo.utilidades.BolsaEmpleoDataTable;
@@ -135,6 +133,26 @@ public class ModeloDepartamento {
 		
 		return dataTable;
 	}
+	
+	public List<Departamento> listaDepartamentosDirector(UsuarioBolsaEmpleo director) throws SQLException {
+		List<Departamento> departamentos = new ArrayList<>();
+		String consulta = "SELECT * FROM UXXIRRHH.VUJA_NET_BEP_RH_DEP_DIR"
+				+ " WHERE PRSNIF = ?";
+		
+		try (Connection conexion = ConexionUxxiRrhh.obtenerInstancia(); PreparedStatement stmt = conexion.prepareStatement(consulta);) {
+			int indexParam = 1;
+			stmt.setString(indexParam, director.getPrsNif());
+			
+			try (ResultSet rs = stmt.executeQuery()) {
+				while (rs.next()) {
+					Departamento departamento = this.getDepartamentoByIdExterno(rs.getString("ID_DEPARTAMENTO"));
+					departamentos.add(departamento);
+				}				
+			}
+		}
+		
+		return departamentos;
+	}
 
 	/**
 	 * Devuelve un departamento por su id.
@@ -219,7 +237,7 @@ public class ModeloDepartamento {
 		Departamento dep = new Departamento();
 		dep.setCodNum(rs.getInt("CODNUM"));
 		dep.setIdDepartamentoExterno(rs.getString("ID_DEPARTAMENTO"));
-		dep.setDescripcion(rs.getString("DES_DEPARTAMENTO"));		
+		dep.setDescripcion(rs.getString("DES_DEPARTAMENTO"));
 		return dep;
 	}
 }
