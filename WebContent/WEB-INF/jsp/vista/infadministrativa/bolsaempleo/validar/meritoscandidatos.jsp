@@ -198,9 +198,10 @@ Boolean personal = bean.getUsuarioLogeado().getRol().getCodNum().equals(ModeloRo
 				<tbody>
 				<%	for (ValorMeritoBolsaTable meritoBolsa: bean.getBolsas()) {
 						int idMerito = meritoBolsa.getMeritoSolicitud().getMerito().getCodNum();
-						Boolean valoraciones = meritoBolsa.getMeritoSolicitud() != null && meritoBolsa.getMeritoSolicitud().getMerito().getItemBaremacion().getAfinidad() != null
+						ItemBaremacion itemBolsa = meritoBolsa.getMeritoSolicitud().getItem() != null ? meritoBolsa.getMeritoSolicitud().getItem() : meritoBolsa.getMeritoSolicitud().getMerito().getItemBaremacion();
+						Boolean valoraciones = meritoBolsa.getMeritoSolicitud() != null && itemBolsa.getAfinidad() != null
 								&& meritoBolsa.getMeritoSolicitud().getValoraciones() != null && meritoBolsa.getMeritoSolicitud().getValoraciones().size() > 0  ? true : false;
-						Boolean individualizado = meritoBolsa.getMeritoSolicitud().getMerito().getItemBaremacion().getIndividualizado() ? true : false;
+						Boolean individualizado = itemBolsa.getIndividualizado() ? true : false;
 						Boolean bolsaDisabled = !personal && !meritoBolsa.getBolsa().getEstado().equals(ModeloBolsa.BOLSA_ESTADO_BAREMACION);
 					%>
 					
