@@ -337,7 +337,7 @@ $(document).ready(function() {
 			        }},
 		        	{'data': 'codNum', 'order': false, 'selectable': {
 		        			'disabled': function(row) {
-		        				return row.codNum == '<%= bolsa.getCodNum() %>' || row.estado != '<%= ModeloBolsa.BOLSA_ESTADO_BAREMACION %>' ? true : false;
+		        				return row.codNum == '<%= bolsa.getCodNum() %>' ? true : false;
 		        			},
 				        	'selected': function(row) {
 				        		return row.codNum == '<%= bolsa.getCodNum() %>' || row.estado == '<%= ModeloBolsa.BOLSA_ESTADO_BAREMACION %>' ? true : false;
