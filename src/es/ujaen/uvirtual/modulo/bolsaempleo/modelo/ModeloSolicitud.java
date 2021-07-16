@@ -500,8 +500,10 @@ public class ModeloSolicitud {
 				}
 				
 				Merito meritoRead = ModeloMerito.obtenerInstancia().getMeritoById(rs.getInt(BEPMER_CODNUM), false, false);
-				
-				return new MeritoSolicitud(rs.getInt(CODNUM), meritoRead, rs.getString(FLGEXCLUIDO).equals(S));
+				MeritoSolicitud meritoSolicitud = new MeritoSolicitud(rs.getInt(CODNUM), meritoRead, rs.getString(FLGEXCLUIDO).equals(S));
+				meritoSolicitud.setItem(rs.getInt(BEPITE_CODNUM) != 0 
+						? ModeloBaremacionItems.obtenerInstancia().getItemBaremacionById(rs.getInt(BEPITE_CODNUM)) : null);
+				return meritoSolicitud;
 			}
 		}
 	}
@@ -1091,22 +1093,18 @@ public class ModeloSolicitud {
 	}
 	
 	/** El evaluador ha modificado la afinidad del mérito no individualizado . 
-	 * @param solicitud .
-	 * @param bolsa .
-	 * @param merito .
+	 * @param meritoSolicitud .
 	 * @param afinidades .
 	 * @param usuarioUpdate .
 	 * @throws SQLException .
-	 * @throws UVException .
 	 */
-	public void actualizarAfinidadesMeritoNoIndividualizado(Solicitud solicitud, Bolsa bolsa, Merito merito, Map<Afinidad, Double> afinidades, UsuarioBolsaEmpleo usuarioUpdate)
-			throws SQLException, UVException {
+	public void actualizarAfinidadesMeritoNoIndividualizado(MeritoSolicitud meritoSolicitud, Map<Afinidad, Double> afinidades, UsuarioBolsaEmpleo usuarioUpdate)
+			throws SQLException {
 		
 		try (Connection conexion = ConexionUvirtual.obtenerInstancia()) {
 			conexion.setAutoCommit(false);
 			
 			try {
-				MeritoSolicitud meritoSolicitud = this.getMeritoSolicitud(solicitud, bolsa, merito);
 				
 				for (Map.Entry<Afinidad, Double> entry : afinidades.entrySet()) {
 					if (compruebaSiExisteAfinidad(meritoSolicitud, entry.getKey().getCodNum(), conexion)) {
@@ -1173,18 +1171,14 @@ public class ModeloSolicitud {
 	}
 	
 	/** El evaluador ha modificado la afinidad del mérito no individualizado .
-	 * @param solicitud .
-	 * @param bolsa .
-	 * @param merito .
+	 * @param meritoSolicitud .
 	 * @param afinidad .
 	 * @param idValoracion .
 	 * @param usuarioUpdate .
 	 * @throws SQLException .
-	 * @throws UVException .
 	 */
-	public void actualizarAfinidadesMeritoIndividualizado(Solicitud solicitud, Bolsa bolsa, Merito merito, Afinidad afinidad, Integer idValoracion,
-			UsuarioBolsaEmpleo usuarioUpdate) throws SQLException, UVException {
-		MeritoSolicitud meritoSolicitud = this.getMeritoSolicitud(solicitud, bolsa, merito);
+	public void actualizarAfinidadesMeritoIndividualizado(MeritoSolicitud meritoSolicitud, Afinidad afinidad, Integer idValoracion,
+			UsuarioBolsaEmpleo usuarioUpdate) throws SQLException {
 		
 		try (Connection conexion = ConexionUvirtual.obtenerInstancia()) {
 		

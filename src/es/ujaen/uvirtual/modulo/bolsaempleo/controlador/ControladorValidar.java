@@ -409,8 +409,12 @@ public class ControladorValidar extends HttpServlet {
 		ModeloAfinidad modeloAfinidad = ModeloAfinidad.obtenerInstancia();
 		Solicitud solicitud = modeloSolicitud.getSolicitudCerradaByConvocatoriaUsuario(bean.getCandidato(), bean.getConvocatoria());
 		
+		MeritoSolicitud meritoSolicitud = modeloSolicitud.getMeritoSolicitud(solicitud, bolsa, bean.getMerito().getMerito());
+		ItemBaremacion itemBolsa = meritoSolicitud.getItem() != null ? meritoSolicitud.getItem() : meritoSolicitud.getMerito().getItemBaremacion();
+		Double valor = meritoSolicitud.getValor() != null && meritoSolicitud.getValor() != 0 ? meritoSolicitud.getValor() : meritoSolicitud.getMerito().getValor();
 		
-		if (!bean.getMerito().getMerito().getItemBaremacion().getIndividualizado()) {
+		
+		if (!itemBolsa.getIndividualizado()) {
 			// comprobamos validez de las afinidades
 			HashMap<Afinidad, Double> afinidades = new HashMap<>();
 			Double total = 0.0;
@@ -421,17 +425,17 @@ public class ControladorValidar extends HttpServlet {
 			}
 			
 			Double totalRounder = BolsaEmpleoUtils.redondeo(total);
-			if (!totalRounder.equals(bean.getMerito().getMerito().getValor())) {
+			if (!totalRounder.equals(valor)) {
 				throw new UVException("El total de afinidades tiene que ser igual al valor del mérito");
 			}
 			
-			modeloSolicitud.actualizarAfinidadesMeritoNoIndividualizado(solicitud, bolsa, bean.getMerito().getMerito(), afinidades, bean.getUsuarioLogeado());
+			modeloSolicitud.actualizarAfinidadesMeritoNoIndividualizado(meritoSolicitud, afinidades, bean.getUsuarioLogeado());
 		} else {
 			Map.Entry<String, Double> entry = afinidadesRaw.entrySet().iterator().next();
 			String idAfinidad = entry.getKey();
 			Double idValoracion = entry.getValue();
 			Afinidad afinidad = modeloAfinidad.getAfinidadById(Formateador.leeParametroInteger(idAfinidad));
-			modeloSolicitud.actualizarAfinidadesMeritoIndividualizado(solicitud, bolsa, bean.getMerito().getMerito(), afinidad,
+			modeloSolicitud.actualizarAfinidadesMeritoIndividualizado(meritoSolicitud, afinidad,
 					(int) Math.round(idValoracion), bean.getUsuarioLogeado());
 		}
 	}
