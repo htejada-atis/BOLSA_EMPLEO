@@ -7,6 +7,7 @@ import java.util.List;
 import es.ujaen.uvirtual.beans.Usuario;
 import es.ujaen.uvirtual.beans.vistas.Vista;
 import es.ujaen.uvirtual.modulo.bolsaempleo.beans.Bolsa;
+import es.ujaen.uvirtual.modulo.bolsaempleo.beans.Departamento;
 import es.ujaen.uvirtual.modulo.bolsaempleo.beans.Rol;
 import es.ujaen.uvirtual.modulo.bolsaempleo.beans.UsuarioBolsaEmpleo;
 import es.ujaen.uvirtual.modulo.bolsaempleo.utilidades.BolsaEmpleoDataTable;
@@ -25,7 +26,9 @@ public class VistaUsuarioBolsaEmpleo extends Vista implements Serializable {
 	private Boolean busqueda;
 	private transient BolsaEmpleoDataTable<UsuarioBolsaEmpleo> dataTableUsuarios;
 	private transient BolsaEmpleoDataTable<Bolsa> dataTableAreasEvaluables;
+	private transient BolsaEmpleoDataTable<Departamento> dataTableDepartamentos;
 	private Boolean apartadoAreasEvaluables;
+	private Boolean apartadoDepartamentos;
 	private String vista;
 	private UsuarioBolsaEmpleo usuarioLogeado;
 	
@@ -107,6 +110,22 @@ public class VistaUsuarioBolsaEmpleo extends Vista implements Serializable {
 
 	public Boolean getApartadoAreasEvaluables() {
 		return apartadoAreasEvaluables;
+	}
+
+	public Boolean getApartadoDepartamentos() {
+		return apartadoDepartamentos;
+	}
+
+	public void setApartadoDepartamentos(Boolean apartadoDepartamentos) {
+		this.apartadoDepartamentos = apartadoDepartamentos;
+	}
+
+	public BolsaEmpleoDataTable<Departamento> getDataTableDepartamentos() {
+		return dataTableDepartamentos;
+	}
+
+	public void setDataTableDepartamentos(BolsaEmpleoDataTable<Departamento> dataTableDepartamentos) {
+		this.dataTableDepartamentos = dataTableDepartamentos;
 	}
 
 }

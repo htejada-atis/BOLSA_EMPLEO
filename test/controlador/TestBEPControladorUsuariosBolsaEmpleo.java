@@ -30,6 +30,7 @@ import es.ujaen.uvirtual.modulo.bolsaempleo.vistas.VistaUsuarioBolsaEmpleo;
 public class TestBEPControladorUsuariosBolsaEmpleo {
 	
 	private static final String MENSAJE_AREAS_DEVUELTAS = "Debe devolver áreas";
+	private static final String MENSAJE_DEPARTAMENTOS_DEVUELTAS = "Debe devolver departamentos";
 	private static final String MENSAJE_CON_ERROR = "Debe devolver error";
 	private static final String MENSAJE_CON_ERROR_ESPERADO = "El mensaje de error debe coincidir";
 	private static final String MENSAJE_CON_EXITO_ESPERADO = "El mensaje de exito debe coincidir";
@@ -78,10 +79,10 @@ public class TestBEPControladorUsuariosBolsaEmpleo {
 		return (VistaUsuarioBolsaEmpleo) peticion.getUVDatos().getVistas().get(VistaUsuarioBolsaEmpleo.class.getName());
 	}
 	
-	private UsuarioBolsaEmpleo obtenerUsuarioComision() throws IOException {
+	private UsuarioBolsaEmpleo obtenerUsuarioRol(int rol) throws IOException {
 		PeticionHttp peticion = UtilsTestBolsaEmpleo.peticionAutenticadaPersonal();
 		peticion.setParameter(ControladorUsuarioBolsaEmpleo.PARAM_ACCION, ControladorUsuarioBolsaEmpleo.ACCION_DATATABLE_USUARIOS);
-		peticion.setParameter(BolsaEmpleoDataTable.PARAM_FILTER, "{\"3\":\"1051\"}");
+		peticion.setParameter(BolsaEmpleoDataTable.PARAM_FILTER, "{\"3\":\"" + rol + "\"}");
 		
 		RespuestaHttp respuesta = new RespuestaHttp();
 		ControladorUsuarioBolsaEmpleo controlador = new ControladorUsuarioBolsaEmpleo();
@@ -93,9 +94,9 @@ public class TestBEPControladorUsuariosBolsaEmpleo {
 	}
     
     /** Obtener items usuarios, sin parametro definido .
-	 * @throws SQLException si fallo bd 
-	 * @throws IOException si error io
-	 * @throws ServletException  si error servlet
+	 * @throws SQLException si fallo bd .
+	 * @throws IOException si error io .
+	 * @throws ServletException  si error servlet .
 	 */
 	@Test
 	public void testA01() throws IOException {
@@ -364,7 +365,7 @@ public class TestBEPControladorUsuariosBolsaEmpleo {
 	public void testA13AccionAreasEvaluables() throws IOException {
 		PeticionHttp peticion = UtilsTestBolsaEmpleo.peticionAutenticadaPersonal();
 		peticion.setParameter(ControladorUsuarioBolsaEmpleo.PARAM_ACCION, ControladorUsuarioBolsaEmpleo.ACCION_AREAS_EVALUABLES);
-		peticion.setParameter(ControladorUsuarioBolsaEmpleo.PARAM_USUARIO, obtenerUsuarioComision().getCodNum().toString());
+		peticion.setParameter(ControladorUsuarioBolsaEmpleo.PARAM_USUARIO, obtenerUsuarioRol(ModeloRol.ID_ROL_MIEMBRO_COMISION).getCodNum().toString());
 		
 		RespuestaHttp respuesta = new RespuestaHttp();
 		ControladorUsuarioBolsaEmpleo controlador = new ControladorUsuarioBolsaEmpleo();
@@ -382,10 +383,10 @@ public class TestBEPControladorUsuariosBolsaEmpleo {
 	 * @throws ServletException  si error servlet .
 	 */
 	@Test
-	public void testA14AccionAreasEvaluables() throws IOException {
+	public void testA14ObtenerAreasEvaluables() throws IOException {
 		PeticionHttp peticion = UtilsTestBolsaEmpleo.peticionAutenticadaPersonal();
 		peticion.setParameter(ControladorUsuarioBolsaEmpleo.PARAM_ACCION, ControladorUsuarioBolsaEmpleo.ACCION_DATATABLE_AREAS_EVALUABLES_USUARIO);
-		peticion.setParameter(ControladorUsuarioBolsaEmpleo.PARAM_USUARIO, obtenerUsuarioComision().getCodNum().toString());
+		peticion.setParameter(ControladorUsuarioBolsaEmpleo.PARAM_USUARIO, obtenerUsuarioRol(ModeloRol.ID_ROL_MIEMBRO_COMISION).getCodNum().toString());
 		
 		RespuestaHttp respuesta = new RespuestaHttp();
 		ControladorUsuarioBolsaEmpleo controlador = new ControladorUsuarioBolsaEmpleo();
@@ -394,6 +395,49 @@ public class TestBEPControladorUsuariosBolsaEmpleo {
 		VistaUsuarioBolsaEmpleo bean = (VistaUsuarioBolsaEmpleo) peticion.getUVDatos().getVistas().get(VistaUsuarioBolsaEmpleo.class.getName());
 		
 		assertNotEquals(MENSAJE_AREAS_DEVUELTAS, 0, bean.getDatatableAreasEvaluables().getData().size());
+		assertEquals(MENSAJE_SIN_ERROR, 0, bean.getMensajesDeError().size());
+		assertEquals(MENSAJE_SIN_ADVERTENCIAS, 0, bean.getMensajesDeAdvertencia().size());
+	}
+	
+	/** Acción departamentos .
+	 * @throws SQLException si fallo bd .
+	 * @throws IOException si error io .
+	 * @throws ServletException  si error servlet .
+	 */
+	@Test
+	public void testA15AccionDepartamentos() throws IOException {
+		PeticionHttp peticion = UtilsTestBolsaEmpleo.peticionAutenticadaPersonal();
+		peticion.setParameter(ControladorUsuarioBolsaEmpleo.PARAM_ACCION, ControladorUsuarioBolsaEmpleo.ACCION_DEPARTAMENTOS);
+		peticion.setParameter(ControladorUsuarioBolsaEmpleo.PARAM_USUARIO, obtenerUsuarioRol(ModeloRol.ID_ROL_DIRECTOR_DEPARTAMENTO).getCodNum().toString());
+		
+		RespuestaHttp respuesta = new RespuestaHttp();
+		ControladorUsuarioBolsaEmpleo controlador = new ControladorUsuarioBolsaEmpleo();
+		controlador.doPost(peticion, respuesta);
+		
+		VistaUsuarioBolsaEmpleo bean = (VistaUsuarioBolsaEmpleo) peticion.getUVDatos().getVistas().get(VistaUsuarioBolsaEmpleo.class.getName());
+		
+		assertEquals(MENSAJE_SIN_ERROR, 0, bean.getMensajesDeError().size());
+		assertEquals(MENSAJE_SIN_ADVERTENCIAS, 0, bean.getMensajesDeAdvertencia().size());
+	}
+	
+	/** Obtener datatable departamentoss .
+	 * @throws SQLException si fallo bd .
+	 * @throws IOException si error io .
+	 * @throws ServletException  si error servlet .
+	 */
+	@Test
+	public void testA16ObtenerDepartamentos() throws IOException {
+		PeticionHttp peticion = UtilsTestBolsaEmpleo.peticionAutenticadaPersonal();
+		peticion.setParameter(ControladorUsuarioBolsaEmpleo.PARAM_ACCION, ControladorUsuarioBolsaEmpleo.ACCION_DATATABLE_DEPARTAMENTOS_USUARIO);
+		peticion.setParameter(ControladorUsuarioBolsaEmpleo.PARAM_USUARIO, obtenerUsuarioRol(ModeloRol.ID_ROL_DIRECTOR_DEPARTAMENTO).getCodNum().toString());
+		
+		RespuestaHttp respuesta = new RespuestaHttp();
+		ControladorUsuarioBolsaEmpleo controlador = new ControladorUsuarioBolsaEmpleo();
+		controlador.doPost(peticion, respuesta);
+		
+		VistaUsuarioBolsaEmpleo bean = (VistaUsuarioBolsaEmpleo) peticion.getUVDatos().getVistas().get(VistaUsuarioBolsaEmpleo.class.getName());
+		
+		assertNotEquals(MENSAJE_DEPARTAMENTOS_DEVUELTAS, 0, bean.getDataTableDepartamentos().getData().size());
 		assertEquals(MENSAJE_SIN_ERROR, 0, bean.getMensajesDeError().size());
 		assertEquals(MENSAJE_SIN_ADVERTENCIAS, 0, bean.getMensajesDeAdvertencia().size());
 	}
@@ -450,7 +494,7 @@ public class TestBEPControladorUsuariosBolsaEmpleo {
 	public void testE03ObtenerAreasEvaluablesParametroNoValido() throws IOException {
 		PeticionHttp peticion = UtilsTestBolsaEmpleo.peticionAutenticadaPersonal();
 		peticion.setParameter(ControladorUsuarioBolsaEmpleo.PARAM_ACCION, ControladorUsuarioBolsaEmpleo.ACCION_DATATABLE_AREAS_EVALUABLES_USUARIO);
-		peticion.setParameter(ControladorUsuarioBolsaEmpleo.PARAM_USUARIO, obtenerUsuarioComision().getCodNum().toString());
+		peticion.setParameter(ControladorUsuarioBolsaEmpleo.PARAM_USUARIO, obtenerUsuarioRol(ModeloRol.ID_ROL_DIRECTOR_DEPARTAMENTO).getCodNum().toString());
 		peticion.setParameter(BolsaEmpleoDataTable.PARAM_ORDER_BY, "9");
 		
 		RespuestaHttp respuesta = new RespuestaHttp();

@@ -3,7 +3,9 @@ package es.ujaen.uvirtual.modulo.bolsaempleo.controlador.configuracion;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.sql.SQLException;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.servlet.annotation.WebServlet;
@@ -16,9 +18,12 @@ import es.ujaen.uvirtual.beans.UVDatos;
 import es.ujaen.uvirtual.beans.Usuario;
 import es.ujaen.uvirtual.adm.CrearUsuario;
 import es.ujaen.uvirtual.modulo.bolsaempleo.beans.Bolsa;
+import es.ujaen.uvirtual.modulo.bolsaempleo.beans.Departamento;
 import es.ujaen.uvirtual.modulo.bolsaempleo.beans.Rol;
 import es.ujaen.uvirtual.modulo.bolsaempleo.beans.UsuarioBolsaEmpleo;
 import es.ujaen.uvirtual.modulo.bolsaempleo.modelo.ModeloArea;
+import es.ujaen.uvirtual.modulo.bolsaempleo.modelo.ModeloDepartamento;
+import es.ujaen.uvirtual.modulo.bolsaempleo.modelo.ModeloEvaluador;
 import es.ujaen.uvirtual.modulo.bolsaempleo.modelo.ModeloParametrosConfiguracion;
 import es.ujaen.uvirtual.modulo.bolsaempleo.modelo.ModeloRol;
 import es.ujaen.uvirtual.modulo.bolsaempleo.modelo.ModeloUsuarioBolsaEmpleo;
@@ -64,11 +69,14 @@ public class ControladorUsuarioBolsaEmpleo extends HttpServlet {
 	public static final String PARAM_USUARIO = "usuario";
 	
 	// acciones
+	public static final String ACCION_ACTUALIZAR_AREAS = "actualizarareas";
 	public static final String ACCION_AREAS_EVALUABLES = "areasevaluables";
 	public static final String ACCION_AGREGAR_USUARIO = "agregarusuario";
 	public static final String ACCION_BUSCAR_USUARIO = "buscarusuario";
 	public static final String ACCION_DATATABLE_AREAS_EVALUABLES_USUARIO = "datatableareasevaluablesuruario";
+	public static final String ACCION_DATATABLE_DEPARTAMENTOS_USUARIO = "datatabledepartamentosuruario";
 	public static final String ACCION_DATATABLE_USUARIOS = "datatableusuarios";
+	public static final String ACCION_DEPARTAMENTOS = "departamentos";
 	public static final String ACCION_EDITAR_USUARIO = "editarusuario";
 	public static final String ACCION_ELIMINAR_USUARIO = "eliminarusuario";
 	public static final String ACCION_INDEX = "index";
@@ -85,8 +93,10 @@ public class ControladorUsuarioBolsaEmpleo extends HttpServlet {
 			"No puede auto eliminarse, si desea que su perfil sea dado de baja del sistema contacte con un administrador";
 	public static final String MENSAJE_ERROR_RAZON_EXCLUSION_VACIO = "Si excluye al usuario, debe especificar una razón";
 	public static final String MENSAJE_ERROR_RAZON_EXCLUSION_LARGO = "La razón de exclusión no puede contener mas de %d caracteres";
+	public static final String MENSAJE_ERROR_SIN_PERMISO_PERSONAL = "No tienes permiso de personal";
 	public static final String MENSAJE_ERROR_USUARIO_NO_EXISTE = "No existe el usuario";
 	
+	public static final String MENSAJE_EXITO_ACTUALIZAR_AREAS = "Áreas actualizadas correctamente";
 	public static final String MENSAJE_EXITO_AGREGAR = "Usuario creado correctamente";
 	public static final String MENSAJE_EXITO_EDITAR = "usuario editado correctamente";
 	public static final String MENSAJE_EXITO_ELIMINAR = "Usuario eliminado correctamente";
@@ -116,7 +126,7 @@ public class ControladorUsuarioBolsaEmpleo extends HttpServlet {
 		
 		VistaUsuarioBolsaEmpleo bean = new VistaUsuarioBolsaEmpleo();		
 		
-		String nombreAccion = EscapaHTML.ajustaCodificacion(request.getParameter(PARAM_ACCION));
+		String nombreAccion = EscapaHTML.ajustaCodificacion(BolsaEmpleoUtils.getParamRequestOrSession(request, PARAM_ACCION));
 		if (nombreAccion == null) {
 			nombreAccion = ACCION_INDEX;
 		}
@@ -131,8 +141,11 @@ public class ControladorUsuarioBolsaEmpleo extends HttpServlet {
 				case ACCION_DATATABLE_USUARIOS:
 					listadoUsuarios(bean, datos, request, response);
 					break;
+				case ACCION_ACTUALIZAR_AREAS:
 				case ACCION_AREAS_EVALUABLES:
 				case ACCION_DATATABLE_AREAS_EVALUABLES_USUARIO:
+				case ACCION_DATATABLE_DEPARTAMENTOS_USUARIO:
+				case ACCION_DEPARTAMENTOS:
 				case ACCION_EDITAR_USUARIO:
 				case ACCION_ELIMINAR_USUARIO:
 				case ACCION_RECUPERAR_USUARIO:
@@ -155,7 +168,7 @@ public class ControladorUsuarioBolsaEmpleo extends HttpServlet {
 		} catch (SQLException e) {
 			LOGGER.log(Level.SEVERE, Formateador.getStackTrace(e));
 			LOGGER.log(Level.SEVERE, e.toString());
-			bean.getMensajesDeError().add("Error al acceder a la base de datos");
+			bean.getMensajesDeError().add(MENSAJE_ERROR_SIN_PERMISO_PERSONAL);
 		} finally {
 			datos.getVistas().put(bean.getClass().getName(), bean);
 			datos.getFicherosJSP().add(bean.getVista());
@@ -284,11 +297,20 @@ public class ControladorUsuarioBolsaEmpleo extends HttpServlet {
 		bean.setRol(usuario.getRol());
 		
 		switch (nombreAccion) {
+			case ACCION_ACTUALIZAR_AREAS:
+				actualizarAreasDirectorDepartamento(bean, datos, request, response);
+				break;
 			case ACCION_AREAS_EVALUABLES:
 				bean.setApartadoAreasEvaluables(true);
 				break;
 			case ACCION_DATATABLE_AREAS_EVALUABLES_USUARIO:
 				listadoAreasEvaluables(bean, datos, request, response);
+				break;
+			case ACCION_DATATABLE_DEPARTAMENTOS_USUARIO:
+				listadoDepartamentos(bean, datos, request, response);
+				break;
+			case ACCION_DEPARTAMENTOS:
+				bean.setApartadoDepartamentos(true);
 				break;
 			case ACCION_EDITAR_USUARIO:
 				editarUsuario(bean, datos, request, response);
@@ -304,6 +326,13 @@ public class ControladorUsuarioBolsaEmpleo extends HttpServlet {
 			default:
 				errorFatal(bean, MENSAJE_ERROR_ACCION_NO_CONTEMPLADA);
 		}
+	}
+	
+	private void actualizarAreasDirectorDepartamento(VistaUsuarioBolsaEmpleo bean, UVDatos datos, HttpServletRequest request, HttpServletResponse response)
+			throws SQLException, IOException, UVException {
+		ModeloEvaluador.obtenerInstancia().actualizaAreasDirectorDepartamento(bean.getUsuario(), bean.getUsuarioLogeado());
+		BolsaEmpleoUtils.addMensajeDeExito(MENSAJE_EXITO_ACTUALIZAR_AREAS, bean, request);
+		redireccionConUsuarioSeleccionado(bean, datos, request, response, ACCION_AREAS_EVALUABLES);
 	}
 	
 	private void eliminarUsuario(VistaUsuarioBolsaEmpleo bean, UVDatos datos, HttpServletRequest request, HttpServletResponse response)
@@ -360,6 +389,14 @@ public class ControladorUsuarioBolsaEmpleo extends HttpServlet {
 		}
 	}
 	
+	private void redireccionConUsuarioSeleccionado(VistaUsuarioBolsaEmpleo bean, UVDatos datos, HttpServletRequest request, HttpServletResponse response, String accion)
+			throws IOException {
+		Map<String, String> params = new HashMap<>();
+		params.put(PARAM_ACCION, accion);
+		params.put(PARAM_USUARIO, bean.getUsuario().getCodNum().toString());
+		BolsaEmpleoUtils.redirectWithParams(datos, request, response, params);
+	}
+	
 	/**
 	 * AJAX para devolver datatable áreas de un evaluador .
 	 * @param bean .
@@ -379,6 +416,42 @@ public class ControladorUsuarioBolsaEmpleo extends HttpServlet {
 			try {
 				BolsaEmpleoDataTable<Bolsa> dataTable = ModeloArea.obtenerInstancia().listaAreasEvaluadorDatatable(request.getParameterMap(), bean.getUsuario());
 				bean.setDatatableAreasEvaluables(dataTable);
+				writer.write(dataTable.toJson());
+			} catch (UVException | SQLException e) {
+				if (e instanceof SQLException) {
+					LOGGER.log(Level.SEVERE, Formateador.getStackTrace(e));
+					LOGGER.log(Level.SEVERE, e.toString());
+				} else {
+					LOGGER.log(Level.WARNING, e.toString());
+				}
+				bean.getMensajesDeError().add(e.getMessage());
+				CodigoDescripcion mensaje = new CodigoDescripcion(RESPONSE_AJAX_ERROR, e.getMessage());
+				writer.write(new Gson().toJson(mensaje));
+				response.setStatus(RESPONSE_AJAX_HTTP_CODE_ERROR);
+			}
+		}
+	}
+	
+	/**
+	 * AJAX para devolver datatable departamentos de un director de departamento .
+	 * @param bean .
+	 * @param datos .
+	 * @param request .
+	 * @param response .
+	 * @throws IOException .
+	 * @throws SQLException .
+	 */
+	private void listadoDepartamentos(VistaUsuarioBolsaEmpleo bean, UVDatos datos, HttpServletRequest request, HttpServletResponse response) throws IOException {
+		datos.setContentType(RESPONSE_AJAX_CONTENTTYPE);
+		datos.setRespuestaEnviada(true);
+		response.setContentType(RESPONSE_AJAX_CONTENTTYPE);
+		response.setCharacterEncoding(RESPONSE_AJAX_ENCODING);
+		
+		try (PrintWriter writer = response.getWriter()) {
+			try {
+				BolsaEmpleoDataTable<Departamento> dataTable = ModeloDepartamento.obtenerInstancia().listaDepartamentosDirectorDatatable(
+						request.getParameterMap(), bean.getUsuario());
+				bean.setDataTableDepartamentos(dataTable);
 				writer.write(dataTable.toJson());
 			} catch (UVException | SQLException e) {
 				if (e instanceof SQLException) {
