@@ -37,6 +37,7 @@ public class ModeloMeritosPreferentes {
 	
 	public static final int MAX_LENGTH_COLUMN_NOMBRE = 500;
 	public static final int MAX_LENGTH_COLUMN_OBSERVACIONES = 1000;
+	public static final int MAX_LENGTH_COLUMN_PREFIJO = 5;
 	public static final int MAX_LENGTH_COLUMN_CODIGO = 10;
 	public static final int MAX_LENGTH_COLUMN_NOMBRE_OPCION = 50;	
 	
@@ -339,8 +340,8 @@ public class ModeloMeritosPreferentes {
 		
 		String sql = "INSERT INTO TBEP_MERITOS_PREFERENTES ("
 				+ "CODIGO,NOMBRE,OBSERVACIONES,TIPO,APLICABLE,BASE,FACTOR,VALOR_MAXIMO,"
-				+ "BEPITE_TIPO_CODNUM,BEPBLO_APLICABLE_CODNUM,BEPAPA_APLICABLE_CODNUM,BEPITE_APLICABLE_CODNUM,UID_USUARIO) "
-				+ "VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?)";
+				+ "BEPITE_TIPO_CODNUM,BEPBLO_APLICABLE_CODNUM,BEPAPA_APLICABLE_CODNUM,BEPITE_APLICABLE_CODNUM,PREFIJO_INFORME,UID_USUARIO) "
+				+ "VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?)";
 		
 		try (Connection conexion = ConexionUvirtual.obtenerInstancia(); 
 				PreparedStatement stmt = conexion.prepareStatement(sql, new String[]{CODNUM})) {
@@ -387,6 +388,7 @@ public class ModeloMeritosPreferentes {
 				stmt.setNull(parameterIndex++, Types.INTEGER);
 			}
 			
+			stmt.setString(parameterIndex++, merito.getPrefijoInforme());
 			stmt.setString(parameterIndex++, usuarioUpdate.getCodCuenta());
 			
 			stmt.executeUpdate();
@@ -421,6 +423,7 @@ public class ModeloMeritosPreferentes {
 				+ "	BEPAPA_APLICABLE_CODNUM = ?,"
 				+ "	BEPITE_APLICABLE_CODNUM = ?,"
 				+ "	FLGACTIVO = ?,"
+				+ "	PREFIJO_INFORME = ?,"
 				+ "	UID_USUARIO = ?"
 				+ "	WHERE CODNUM = ?";
 		
@@ -464,6 +467,7 @@ public class ModeloMeritosPreferentes {
 				stmt.setNull(parameterIndex++, Types.INTEGER);
 			}
 			stmt.setString(parameterIndex++, Boolean.TRUE.equals(merito.getActivo()) ? "S" : "N");
+			stmt.setString(parameterIndex++, merito.getPrefijoInforme());
 			stmt.setString(parameterIndex++, usuarioUpdate.getCodCuenta());
 			stmt.setInt(parameterIndex++, merito.getCodNum());
 			
@@ -588,6 +592,7 @@ public class ModeloMeritosPreferentes {
 		obj.setAplicableItemBaremacion(rs.getInt("BEPITE_APLICABLE_CODNUM") == 0 ? null 
 			: ModeloBaremacionItems.obtenerInstancia().getItemBaremacionById(rs.getInt("BEPITE_APLICABLE_CODNUM")));
 		obj.setActivo("S".equals(rs.getString("FLGACTIVO")));
+		obj.setPrefijoInforme(rs.getString("PREFIJO_INFORME"));
 		return obj;
 	}
 	

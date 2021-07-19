@@ -96,12 +96,12 @@ public class GenerarResultadosPDF extends BolsaEmpleoPDFGenerator {
 			com.lowagie.text.List lista = new com.lowagie.text.List();
 			lista.setListSymbol("• ");
 			lista.add("Méritos desagregables: (D) (valor1 * afinidad1 + valor2 * afinidad2 + valor3 * afinidad3 + valor4 * afinidad4)"
-					+ " * Peso Categoría * Peso Bloque");
+					+ " * Valor unitario * Peso Bloque");
 			lista.add("Méritos con bonificación por bloque "
 					+ meritoPreferente.getAplicableApartadoBaremacion().getCodigo() + " - "
 					+ meritoPreferente.getAplicableApartadoBaremacion().getNombre() + ":"
-					+ " (B) Valor * Afinidad * Peso Categoría * Peso Bloque * " + meritoPreferente.getFactor());
-			lista.add("Resto de méritos: Valor * Afinidad * Peso Categoría * Peso Bloque");
+					+ " Valor * Afinidad * Valor unitario * Peso Bloque * (" + meritoPreferente.getPrefijoInforme() + ") Factor Mérito Preferente");
+			lista.add("Resto de méritos: Valor * Afinidad * Valor unitario * Peso Bloque");
 
 			document.add(lista);
 			
@@ -131,9 +131,9 @@ public class GenerarResultadosPDF extends BolsaEmpleoPDFGenerator {
 			headerColumns.put("Id. Mérito", (float) SIZE_10);
 			headerColumns.put("Cod. Mérito", (float) SIZE_12);
 			headerColumns.put("Tipo de Mérito", (float) SIZE_20);
-			headerColumns.put("Desglose", (float) SIZE_12);
+			headerColumns.put("Desglose", (float) SIZE_16);
 			headerColumns.put("Resultado", (float) SIZE_11);
-			headerColumns.put("Observación", (float) SIZE_18);
+			headerColumns.put("Observación", (float) SIZE_16);
 			
 			Table table = generarTable(PDF_TABLE_COLUMNS_6, bolsa.getListaMeritos().size());
 			generarTableHeader(table, headerColumns);
@@ -155,7 +155,7 @@ public class GenerarResultadosPDF extends BolsaEmpleoPDFGenerator {
 			}
 			
 			Table table2 = generarTable(PDF_TABLE_COLUMNS_2, bolsa.getDesgloseTotal() != null ? PDF_TABLE_ROWS_3 : PDF_TABLE_ROWS_2);
-			table2.setWidths(new float[] {SIZE_65, SIZE_18});
+			table2.setWidths(new float[] {SIZE_69, SIZE_16});
 			
 			generarTableRow(table2, new String[] {
 					"Total sin aplicar el máximo valor de las titulaciones preferentes y acreditaciones:",
@@ -165,7 +165,7 @@ public class GenerarResultadosPDF extends BolsaEmpleoPDFGenerator {
 			
 			if (bolsa.getDesgloseTotal() != null) {
 				generarTableRow(table2, new String[] {
-						bolsa.getDesgloseDescripcion(),
+						"Cálculo final: " + bolsa.getDesgloseDescripcion(),
 						bolsa.getDesgloseTotal(),
 					}
 				);
@@ -195,8 +195,8 @@ public class GenerarResultadosPDF extends BolsaEmpleoPDFGenerator {
 			headerColumns.put("Id. Mérito", (float) SIZE_10);
 			headerColumns.put("Cod. Mérito", (float) SIZE_12);
 			headerColumns.put("Tipo de Mérito", (float) SIZE_20);
-			headerColumns.put("Valor", (float) SIZE_23);
-			headerColumns.put("Observación", (float) SIZE_18);
+			headerColumns.put("Valor", (float) SIZE_27);
+			headerColumns.put("Observación", (float) SIZE_16);
 			
 			Table table = generarTable(PDF_TABLE_COLUMNS_5, bolsa.getListaMeritos().size());
 			
@@ -235,8 +235,8 @@ public class GenerarResultadosPDF extends BolsaEmpleoPDFGenerator {
 			headerColumns.put("Id. Mérito", (float) SIZE_10);
 			headerColumns.put("Cod. Mérito", (float) SIZE_12);
 			headerColumns.put("Tipo de Mérito", (float) SIZE_20);
-			headerColumns.put("Valor", (float) SIZE_23);
-			headerColumns.put("Observación", (float) SIZE_18);
+			headerColumns.put("Valor", (float) SIZE_27);
+			headerColumns.put("Observación", (float) SIZE_16);
 			
 			Table table = generarTable(PDF_TABLE_COLUMNS_5, bolsa.getListaMeritos().size());
 			

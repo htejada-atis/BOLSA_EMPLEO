@@ -69,6 +69,7 @@ public class ControladorMeritosPreferentes extends HttpServlet {
 	public static final String PARAM_MERITO_CODIGO = "codigo";
 	public static final String PARAM_MERITO_NOMBRE = "nombre";
 	public static final String PARAM_MERITO_OBSERVACIONES = "observaciones";
+	public static final String PARAM_MERITO_PREFIJO = "prefijo";
 	public static final String PARAM_MERITO_TIPO = "tipo";
 	public static final String PARAM_MERITO_TIPO_TITULACION = "tipoTitulacion";
 	public static final String PARAM_MERITO_TIPO_ITEMBAREMACION = "tipoItemBaremacion";
@@ -410,6 +411,11 @@ public class ControladorMeritosPreferentes extends HttpServlet {
 					Formateador.leeParametroInteger(request.getParameter(PARAM_MERITO_TIPO_ITEMBAREMACION))));
 		} else if (!merito.getTipo().equals(ModeloMeritosPreferentes.TIPO_TITULACION_PREFERENTE) && !merito.getTipo().equals(ModeloMeritosPreferentes.TIPO_POSESION)) {
 			throw new UVException("Introduce un tipo de mérito");
+		}
+		
+		merito.setPrefijoInforme(EscapaHTML.ajustaCodificacion(request.getParameter(PARAM_MERITO_PREFIJO)));
+		if (merito.getPrefijoInforme().length() > ModeloMeritosPreferentes.MAX_LENGTH_COLUMN_PREFIJO) {
+			throw new UVException("El prefijo del mérito tiene demasiados caracteres. Máximo" + ModeloMeritosPreferentes.MAX_LENGTH_COLUMN_PREFIJO);
 		}
 		
 		this.validateTipoCalculo(merito, request);
