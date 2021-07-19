@@ -102,6 +102,8 @@ Boolean personal = bean.getUsuarioLogeado().getRol().getCodNum().equals(ModeloRo
 		    	<input type="hidden" name="<%= ControladorValidar.PARAM_BOLSA %>" value="<%= bolsa.getCodNum() %>" />
 		    	<input type="hidden" name="<%= ControladorValidar.PARAM_CANDIDATO %>" value="<%= candidato.getCodNum() %>" />
 		    	<input type="hidden" name="<%= ControladorValidar.PARAM_MERITO %>" value="<%= merito.getMerito().getCodNum() %>" />
+		    	<input type="hidden" name="<%= ControladorValidar.PARAM_BOLSAS %>" value="" />
+		    	
 		    	<div class="form-group-container col2">
 			    	<div class="form-group">
 						<label class="bold-label" for="select_item">Categoría:</label>
@@ -573,22 +575,71 @@ $(document).ready(function() {
 			var itemChanged = false;
 			var valorChanged = false;
 			
-			$("#validar_merito").on("submit", function() {
-				var self = this;
-				if (itemChanged || valorChanged) {
+		<%	if (personal) { %>
+				function opcionPropagarCambiosDialog(form) {
+					var titulo = "¿Propagar " + (itemChanged ? "categoría" : "valor") + " del mérito?";
+					var mensaje = itemChanged ? "Propagar la categoría borrará las evaluaciones del mérito en todas las bolsas en estado de 'Validación'."
+							: "<p>Propagar el valor del mérito borrará las evaluaciones del mérito para méritos desagregables <br/>" 
+							+ "en todas las bolsas en estado de 'Validación' y tendrá que asignar los valores de nuevo.</p>";
+					
+					mensaje += "<br/>";
+					mensaje += "<ul id='bolsas_propagar' style='margin-top: 12px;'>";
+				<%	for (ValorMeritoBolsaTable meritoBolsa: bean.getBolsas()) { %>
+						mensaje += "<li>";
+						mensaje += "<label style='width: 100%; float: inherit;' for='bolsa_<%= meritoBolsa.getBolsa().getCodNum() %>'>";
+						mensaje += "<input type='checkbox' id='bolsa_<%= meritoBolsa.getBolsa().getCodNum() %>' name='bolsa' value='<%= meritoBolsa.getBolsa().getCodNum() %>'"
+								+ "<%= meritoBolsa.getBolsa().getCodNum() == bolsa.getCodNum() ? "disabled" : "" %> checked>";
+						mensaje += "<%= meritoBolsa.getBolsa().getArea().getIdAreaExterno() + " " + meritoBolsa.getBolsa().getArea().getDescripcion() %>"
+								+ " (" + "<%= meritoBolsa.getBolsa().getEstado().equals(ModeloBolsa.BOLSA_ESTADO_BAREMACION) ? "VALIDACIÓN" : meritoBolsa.getBolsa().getEstado() %>" + ")";
+						mensaje += "</label>";
+						mensaje += "</li>";
+				<%	} %>
+					mensaje += "</ul>";
+				
+					Atis.confirmDialog(titulo, mensaje, {
+				        "Propagar": function() {
+				        	var ulBolsas = $(this).find("#bolsas_propagar").children("li");
+				        	var bolsas = new Array();
+				        	ulBolsas.each(function(position, bolsa) {
+				        		var inputBolsa = $(bolsa).find("input");
+				        		if ($(inputBolsa).is(":checked")) {
+				        			bolsas.push($(inputBolsa).val());
+				        		}
+				        	});
+				        	form.elements["<%= ControladorValidar.PARAM_BOLSAS %>"].value = Atis.object2Json(bolsas);
+				        	form.submit();
+				          	$(this).dialog("close");
+				        },
+				        "Cancelar": function() {
+				          	$(this).dialog("close");
+				        }
+				    });
+				}
+		<%	} else { %>
+				function propagarCambiosDialog(form) {
 					var titulo = "¿Modificar " + (itemChanged ? "categoría" : "valor") + " del mérito?";
 					var mensaje = itemChanged ? "Modificar la categoría borrará las evaluaciones del mérito en todas las bolsas en estado de 'Validación'."
 							: "<p>Modificar el valor del mérito borrará las evaluaciones del mérito para méritos desagregables <br/> en todas las bolsas en estado de 'Validación' y tendrá que asignar los valores de nuevo.</p>";
 					
 					Atis.confirmDialog(titulo, mensaje, {
 				        Si: function() {
-				        	self.submit();
+				        	form.submit();
 				          	$(this).dialog("close");
 				        },
 				        No: function() {
 				          	$(this).dialog("close");
 				        }
 				    });
+				}
+		<%	} %>
+			
+			$("#validar_merito").on("submit", function() {
+				if (itemChanged || valorChanged) {
+				<%	if (personal) { %>
+						opcionPropagarCambiosDialog(this);
+				<%	} else { %>
+						propagarCambiosDialog(this);
+				<%	} %>
 					return false;
 				}
 			});
@@ -597,7 +648,7 @@ $(document).ready(function() {
 			var labelValor = document.getElementById("merito_valor_label");
 			
 			document.getElementById("select_item").addEventListener("change", function() {
-				itemChanged = this.value != <%= item.getCodNum() %>;
+				itemChanged = this.value != <%=item.getCodNum()%>;
 				
 				var unidades = this.options[this.selectedIndex].getAttribute("data-unidades");
 				if (unidades != inputValor.getAttribute("data-unidades")) {

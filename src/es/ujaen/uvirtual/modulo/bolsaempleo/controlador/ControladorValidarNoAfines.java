@@ -332,7 +332,7 @@ public class ControladorValidarNoAfines extends HttpServlet {
 						throw new UVException(MENSAJE_ERROR_NUMERO_MAXIMO_MERITOS_BLOQUE);
 					}
 					
-					modeloValidar.borrarEvaluacionMerito(bean.getMerito(), solicitud, bean.getBolsa(), bean.getUsuarioLogeado());
+					modeloValidar.borrarEvaluacionMeritoBolsas(bean.getMerito(), solicitud, bolsas, bean.getUsuarioLogeado());
 					
 					if (item.getAfinidad() != null) {
 						BolsaEmpleoUtils.addMensajeDeExito(MENSAJE_EXITO_MERITO_MODIFICAR_AFINIDAD, bean, request);

@@ -5,6 +5,7 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import es.ujaen.uvirtual.modelo.conexion.ConexionUvirtual;
@@ -21,6 +22,7 @@ import es.ujaen.uvirtual.modulo.bolsaempleo.beans.UsuarioBolsaEmpleo;
 import es.ujaen.uvirtual.modulo.bolsaempleo.beans.ValorMeritoBolsaTable;
 import es.ujaen.uvirtual.modulo.bolsaempleo.utilidades.BolsaEmpleoDataTable;
 import es.ujaen.uvirtual.modulo.bolsaempleo.utilidades.BolsaEmpleoDataTable.DataTableColumn;
+import es.ujaen.uvirtual.modulo.bolsaempleo.utilidades.BolsaEmpleoUtils;
 import es.ujaen.uvirtual.utilidades.UVException;
 
 /**
@@ -930,6 +932,78 @@ public class ModeloValidar {
 		}
 	}
 	
+	/** Método que elimina las valoraciones de un mérito .
+	 * @param merito .
+	 * @param solicitud .
+	 * @param bolsas .
+	 * @param usuarioUpdate .
+	 * @throws SQLException .
+	 */
+	public void borrarValoracionesMeritoBolsas(Merito merito, Solicitud solicitud, Collection<String> bolsas, UsuarioBolsaEmpleo usuarioUpdate) throws SQLException {
+		try (Connection conexion = ConexionUvirtual.obtenerInstancia()) {
+			conexion.setAutoCommit(false);
+			
+			try {
+				// actualizamos usuario en valoraciones
+				String sqlUpdateValoraciones = "UPDATE TBEP_SOL_BOL_MER_VALORACION"
+						+ " SET UID_USUARIO = ?"
+						+ " WHERE BEPSBM_CODNUM IN ("
+						+ "	SELECT bepsbm.CODNUM"
+						+ "	FROM TBEP_SOL_BOL_MERITOS bepsbm"
+						+ "	WHERE bepsbm.BEPMER_CODNUM = ? AND bepsbm.BEPSBO_CODNUM IN ("
+						+ "		SELECT bepsbo.CODNUM"
+						+ "		FROM TBEP_SOLICITUD_BOLSAS bepsbo"
+						+ "		INNER JOIN TBEP_BOLSAS bepbol ON bepbol.CODNUM = bepsbo.BEPBOL_CODNUM"
+						+ "			AND bepbol.CODNUM IN (" + BolsaEmpleoUtils.consultaMultiplesParametros(bolsas.size()) + ")"
+						+ "		WHERE bepsbo.BEPSOL_CODNUM = ?"
+						+ "		)"
+						+ " )";
+				
+				try (PreparedStatement stmt = conexion.prepareStatement(sqlUpdateValoraciones)) {
+					int indexParam = 1;
+					stmt.setString(indexParam++, usuarioUpdate.getCodCuenta());
+					stmt.setInt(indexParam++, merito.getCodNum());
+					for (String bolsa: bolsas) {
+						stmt.setInt(indexParam++, Integer.parseInt(bolsa));
+					}
+					stmt.setInt(indexParam++, solicitud.getCodNum());
+					stmt.executeUpdate();
+				}
+							
+				// eliminamos valoraciones
+				String sqlValoraciones = ""
+						+ "DELETE FROM TBEP_SOL_BOL_MER_VALORACION bepsbv WHERE bepsbv.BEPSBM_CODNUM IN ("
+						+ "		SELECT bepsbm.CODNUM"
+						+ "		FROM TBEP_SOL_BOL_MERITOS bepsbm"
+						+ "		WHERE bepsbm.BEPMER_CODNUM = ? AND bepsbm.BEPSBO_CODNUM IN ("
+						+ "			SELECT bepsbo.CODNUM"
+						+ "			FROM TBEP_SOLICITUD_BOLSAS bepsbo"
+						+ "			INNER JOIN TBEP_BOLSAS bepbol ON bepbol.CODNUM = bepsbo.BEPBOL_CODNUM"
+						+ "				AND bepbol.CODNUM IN (" + BolsaEmpleoUtils.consultaMultiplesParametros(bolsas.size()) + ")"
+						+ "			WHERE bepsbo.BEPSOL_CODNUM = ?"					
+						+ "		)"
+						+ " )";
+				
+				try (PreparedStatement stmt = conexion.prepareStatement(sqlValoraciones)) {
+					int indexParam = 1;
+					stmt.setInt(indexParam++, merito.getCodNum());
+					for (String bolsa: bolsas) {
+						stmt.setInt(indexParam++, Integer.parseInt(bolsa));
+					}
+					stmt.setInt(indexParam++, solicitud.getCodNum());
+					stmt.executeUpdate();
+				}
+				
+				conexion.commit();
+			} catch (Exception e) {
+				conexion.rollback();
+				throw e;
+			} finally {
+				conexion.setAutoCommit(true);				
+			}
+		}
+	}
+	
 	/**
 	 * Borra las evaluaciones de un mérito en un solicitud.
 	 * @param merito .
@@ -958,6 +1032,44 @@ public class ModeloValidar {
 			stmt.setInt(indexParam++, bolsa.getCodNum());
 			stmt.setInt(indexParam++, merito.getMerito().getCodNum());
 			stmt.setInt(indexParam++, solicitud.getCodNum());
+			stmt.setString(indexParam++, usuarioUpdate.getCodCuenta());
+			stmt.setDouble(indexParam++, merito.getValor());
+			stmt.setInt(indexParam++, merito.getItem().getCodNum());
+			stmt.setString(indexParam++, merito.getObservacionCandidato());
+			stmt.executeUpdate();			
+		}
+	}
+	
+	/**
+	 * Borra las evaluaciones de un mérito en una solicitud de una lista de bolsas.
+	 * @param merito .
+	 * @param solicitud .
+	 * @param bolsas .
+	 * @param usuarioUpdate . 
+	 * @throws SQLException .
+	 */
+	public void borrarEvaluacionMeritoBolsas(MeritoSolicitud merito, Solicitud solicitud, Collection<String> bolsas, UsuarioBolsaEmpleo usuarioUpdate) throws SQLException {
+		// limpiamos las evaluaciones del mérito para todas las bolsas en baremación
+		String sqlUpdateValoraciones = ""
+				+ " UPDATE ("
+				+ "		SELECT bepsbm.FLGEXCLUIDO, bepsbm.FLGVALIDADO, bepsbm.UID_USUARIO, bepsbm.OBSERVACION_CANDIDATO, bepsbm.VALOR AS VALOR,"
+				+ "			bepsbm.BEPITE_CODNUM AS ITEM"
+				+ "		FROM TBEP_SOL_BOL_MERITOS bepsbm"
+				+ "		INNER JOIN TBEP_SOLICITUD_BOLSAS bepsbo ON bepsbo.CODNUM = bepsbm.BEPSBO_CODNUM"
+				+ "		INNER JOIN TBEP_BOLSAS bepbol ON bepbol.CODNUM = bepsbo.BEPBOL_CODNUM"
+				+ "		WHERE bepsbm.BEPMER_CODNUM  = ? AND bepsbo.BEPSOL_CODNUM  = ? AND bepbol.CODNUM IN (" 
+							+ BolsaEmpleoUtils.consultaMultiplesParametros(bolsas.size()) + ")"
+				+ ")"
+				+ "	SET UID_USUARIO = ?, FLGEXCLUIDO = 'N', FLGVALIDADO = 'N', VALOR = ?, ITEM = ?,"
+				+ "		OBSERVACION_CANDIDATO = ?";
+		
+		try (Connection conexion = ConexionUvirtual.obtenerInstancia(); PreparedStatement stmt = conexion.prepareStatement(sqlUpdateValoraciones)) {			
+			int indexParam = 1;
+			stmt.setInt(indexParam++, merito.getMerito().getCodNum());
+			stmt.setInt(indexParam++, solicitud.getCodNum());
+			for (String bolsa: bolsas) {
+				stmt.setInt(indexParam++, Integer.parseInt(bolsa));
+			}
 			stmt.setString(indexParam++, usuarioUpdate.getCodCuenta());
 			stmt.setDouble(indexParam++, merito.getValor());
 			stmt.setInt(indexParam++, merito.getItem().getCodNum());
