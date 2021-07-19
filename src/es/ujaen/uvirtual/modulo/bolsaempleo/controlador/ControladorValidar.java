@@ -336,8 +336,8 @@ public class ControladorValidar extends HttpServlet {
 						}
 					}
 					
-					Collection<String> bolsas = gson.fromJson(request.getParameter(PARAM_BOLSAS), new TypeToken<Collection<String>>() { }.getType());
-					if (bolsas.size() > 0) {
+					if (bean.getUsuarioLogeado().getRol().getCodNum().equals(ModeloRol.ID_ROL_SERVICIO_PERSONAL)) {
+						Collection<String> bolsas = gson.fromJson(request.getParameter(PARAM_BOLSAS), new TypeToken<Collection<String>>() { }.getType());
 						modeloValidar.borrarValoracionesMeritoBolsas(bean.getMerito().getMerito(), solicitud, bolsas, bean.getUsuarioLogeado());
 						modeloValidar.borrarEvaluacionMeritoBolsas(bean.getMerito(), solicitud, bolsas, bean.getUsuarioLogeado());
 					} else {
