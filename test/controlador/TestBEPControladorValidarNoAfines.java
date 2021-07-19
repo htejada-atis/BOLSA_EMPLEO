@@ -346,7 +346,7 @@ public class TestBEPControladorValidarNoAfines {
 		peticion.setParameter(ControladorValidarNoAfines.PARAM_MERITO, bean.getDatatableMeritos().getData().get(0).getCodNum().toString());
 		peticion.setParameter(ControladorValidarNoAfines.PARAM_BOLSAS,
 				"[" + bean.getBolsa().getCodNum().toString() + "]");
-		peticion.setParameter(ControladorValidarNoAfines.PARAM_VALOR, bean.getDatatableMeritos().getData().get(0).getItemBaremacion().getValorMaximo().toString());
+		peticion.setParameter(ControladorValidarNoAfines.PARAM_VALOR, item.getValorMaximo().toString());
 		peticion.setParameter(ControladorValidarNoAfines.PARAM_ITEM, item.getCodNum().toString());
 
 		RespuestaHttp respuesta = new RespuestaHttp();
