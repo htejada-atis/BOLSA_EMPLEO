@@ -5,6 +5,7 @@ import java.io.PrintWriter;
 import java.sql.SQLException;
 import java.util.logging.Logger;
 import java.util.stream.IntStream;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.logging.Level;
@@ -80,6 +81,7 @@ public class ControladorValidar extends HttpServlet {
 	public static final String PARAM_ACEPTAR_MERITO = "aceptarmerito";
 	public static final String PARAM_AFINIDADES = "afinidades";
 	public static final String PARAM_BOLSA = "bolsa";
+	public static final String PARAM_BOLSAS = "bolsas";
 	public static final String PARAM_BOLSA_MERITO = "bolsamerito";
 	public static final String PARAM_CANDIDATO = "candidato";
 	public static final String PARAM_EXCLUIR_MERITO = "excluirmerito";
@@ -301,6 +303,7 @@ public class ControladorValidar extends HttpServlet {
 	
 	private void modificarMerito(VistaValidar bean, UVDatos datos, HttpServletRequest request, HttpServletResponse response) throws UVException, IOException {
 		boolean afinidad = true;
+		Gson gson = new GsonBuilder().create();
 		
 		try {
 			if (EscapaHTML.ajustaCodificacion(request.getParameter(PARAM_VALOR)) != null) {
@@ -315,6 +318,7 @@ public class ControladorValidar extends HttpServlet {
 				Double valor = ModeloMerito.validateValorDelMerito(request.getParameter(PARAM_VALOR), merito);
 				merito.setValor(valor);
 				bean.getMerito().setValor(valor);
+				
 				if (!valor.equals(bean.getMerito().getMerito().getValor()) || !item.equals(bean.getMerito().getMerito().getItemBaremacion())) {
 					ModeloSolicitud modeloSolicitud = ModeloSolicitud.obtenerInstancia();
 					ModeloValidar modeloValidar = ModeloValidar.obtenerInstancia();
@@ -332,11 +336,17 @@ public class ControladorValidar extends HttpServlet {
 						}
 					}
 					
-					if (!item.getIndividualizado() || !bean.getMerito().getMerito().getItemBaremacion().getIndividualizado()) {
-						modeloValidar.borrarValoracionesMerito(bean.getMerito().getMerito(), solicitud, bean.getBolsa(), bean.getUsuarioLogeado());
+					Collection<String> bolsas = gson.fromJson(request.getParameter(PARAM_BOLSAS), new TypeToken<Collection<String>>() { }.getType());
+					if (bolsas.size() > 0) {
+						modeloValidar.borrarValoracionesMeritoBolsas(bean.getMerito().getMerito(), solicitud, bolsas, bean.getUsuarioLogeado());
+						modeloValidar.borrarEvaluacionMeritoBolsas(bean.getMerito(), solicitud, bolsas, bean.getUsuarioLogeado());
+					} else {
+						if (!item.getIndividualizado() || !bean.getMerito().getMerito().getItemBaremacion().getIndividualizado()) {
+							modeloValidar.borrarValoracionesMerito(bean.getMerito().getMerito(), solicitud, bean.getBolsa(), bean.getUsuarioLogeado());
+						}
+						
+						modeloValidar.borrarEvaluacionMerito(bean.getMerito(), solicitud, bean.getBolsa(), bean.getUsuarioLogeado());
 					}
-					
-					modeloValidar.borrarEvaluacionMerito(bean.getMerito(), solicitud, bean.getBolsa(), bean.getUsuarioLogeado());
 				}
 				
 				ModeloMerito.obtenerInstancia().actualizaMerito(merito, bean.getUsuarioLogeado());
