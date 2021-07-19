@@ -320,7 +320,7 @@ public class ModeloEvaluador {
 			try {
 				
 				// eliminamos todas las áreas que asignadas al director de departamento que ya no están dentro de sus departamentos
-				String sqlUpdate = "UPDATE TBEP_EVALUADORES"
+				String sqlUpdate = "UPDATE TBEP_EVALUADORES bepeva"
 						+ " SET UID_USUARIO = ?"
 						+ "	WHERE bepeva.BEPARE_CODNUM IN ("
 						+ "		SELECT"
@@ -359,6 +359,33 @@ public class ModeloEvaluador {
 				
 				try (PreparedStatement stmt = conexion.prepareStatement(sqlDelete)) {
 					int indexParam = 1;
+					for (Departamento dep: departamentos) {
+						stmt.setInt(indexParam++, dep.getCodNum());
+					}
+					stmt.setInt(indexParam++, director.getCodNum());
+					stmt.executeUpdate();
+				}
+				
+				String sqlInsert = ""
+						+ " INSERT INTO TBEP_EVALUADORES (BEPARE_CODNUM, BEPUSU_CODNUM, FLGACTIVO,UID_USUARIO)"
+						+ " ("
+						+ "		SELECT areas.BEPARE_CODNUM, ? AS BEPUSU_CODNUM, 'S' AS FLGACTIVO, ? AS UID_USUARIO FROM"
+						+ "		("
+						+ "			SELECT bepade.BEPARE_CODNUM AS BEPARE_CODNUM"
+						+ "			FROM TBEP_AREAS_DEPARTAMENTOS bepade"
+						+ "			WHERE bepade.BEPDEP_CODNUM IN (" + paramsDepartamentos + ")"
+						+ "			MINUS"
+						+ "			SELECT bepade.BEPARE_CODNUM AS BEPARE_CODNUM"
+						+ "			FROM TBEP_EVALUADORES bepeva2"
+						+ "			INNER JOIN TBEP_AREAS_DEPARTAMENTOS bepade ON bepade.BEPARE_CODNUM = bepeva2.BEPARE_CODNUM"
+						+ "			WHERE bepeva2.BEPUSU_CODNUM = ?"
+						+ "		) areas"
+						+ " )";
+				
+				try (PreparedStatement stmt = conexion.prepareStatement(sqlInsert)) {
+					int indexParam = 1;
+					stmt.setInt(indexParam++, director.getCodNum());
+					stmt.setString(indexParam++, usuarioUpdate.getCodCuenta());
 					for (Departamento dep: departamentos) {
 						stmt.setInt(indexParam++, dep.getCodNum());
 					}

@@ -232,6 +232,17 @@ VistaUsuarioBolsaEmpleo bean = (VistaUsuarioBolsaEmpleo) uvdatos.getVistas().get
 					</tr>
 				</tfoot>
 			</table>
+			
+		<%	if (bean.getUsuario().getRol().getCodNum().equals(ModeloRol.ID_ROL_DIRECTOR_DEPARTAMENTO)) { %>
+				<div class="row">
+					<div class="col">
+						<button class="link-btn" id="actualizar_areas" style="float:right; max-height: 25px">
+					    	 Actualizar áreas
+					    </button>
+					</div>
+				</div>
+		<%	} %>
+			
 	<%	} %>
 	
 	<%	if (bean.getApartadoDepartamentos() != null) { %>
@@ -251,15 +262,6 @@ VistaUsuarioBolsaEmpleo bean = (VistaUsuarioBolsaEmpleo) uvdatos.getVistas().get
 			</table>
 	<%	} %>
 	
-	<%	if (bean.getUsuario().getRol().getCodNum().equals(ModeloRol.ID_ROL_DIRECTOR_DEPARTAMENTO)) { %>
-			<div class="row">
-				<div class="col">
-					<button class="link-btn" id="actualizar_areas" style="float:right; max-height: 25px">
-				    	 Actualizar áreas
-				    </button>
-				</div>
-			</div>
-	<%	} %>
 <%	} %>
 
 </div>
@@ -406,13 +408,6 @@ VistaUsuarioBolsaEmpleo bean = (VistaUsuarioBolsaEmpleo) uvdatos.getVistas().get
 							'<%=ControladorUsuarioBolsaEmpleo.PARAM_USUARIO%>': <%= bean.getUsuario().getCodNum() %>
 						});
 					});
-					
-					document.getElementById("actualizar_areas").addEventListener("click", function(event) {
-						Atis.sendForm("<%= request.getRequestURI() %>", {
-							'<%=ControladorUsuarioBolsaEmpleo.PARAM_ACCION%>': '<%=ControladorUsuarioBolsaEmpleo.ACCION_ACTUALIZAR_AREAS %>',
-							'<%=ControladorUsuarioBolsaEmpleo.PARAM_USUARIO%>': <%= bean.getUsuario().getCodNum() %>
-						});
-					});
 				
 			<%	} %>
 			
@@ -431,6 +426,17 @@ VistaUsuarioBolsaEmpleo bean = (VistaUsuarioBolsaEmpleo) uvdatos.getVistas().get
 				        {'data': 'area.descripcion', 'filter': true, 'overflow': 'auto'}
 				    ],
 				});
+				
+			<%	if (bean.getUsuario().getRol().getCodNum().equals(ModeloRol.ID_ROL_DIRECTOR_DEPARTAMENTO)) { %>
+				
+					document.getElementById("actualizar_areas").addEventListener("click", function(event) {
+						Atis.sendForm("<%= request.getRequestURI() %>", {
+							'<%=ControladorUsuarioBolsaEmpleo.PARAM_ACCION%>': '<%=ControladorUsuarioBolsaEmpleo.ACCION_ACTUALIZAR_AREAS %>',
+							'<%=ControladorUsuarioBolsaEmpleo.PARAM_USUARIO%>': <%= bean.getUsuario().getCodNum() %>
+						});
+					});
+				
+			<%	} %>
 		
 				Atis.smoothScrollToAnchor("#areas_evaluables");
 		<%	} %>

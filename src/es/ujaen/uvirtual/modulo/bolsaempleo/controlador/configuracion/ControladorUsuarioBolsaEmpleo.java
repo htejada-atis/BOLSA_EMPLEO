@@ -23,6 +23,7 @@ import es.ujaen.uvirtual.modulo.bolsaempleo.beans.Rol;
 import es.ujaen.uvirtual.modulo.bolsaempleo.beans.UsuarioBolsaEmpleo;
 import es.ujaen.uvirtual.modulo.bolsaempleo.modelo.ModeloArea;
 import es.ujaen.uvirtual.modulo.bolsaempleo.modelo.ModeloDepartamento;
+import es.ujaen.uvirtual.modulo.bolsaempleo.modelo.ModeloEvaluador;
 import es.ujaen.uvirtual.modulo.bolsaempleo.modelo.ModeloParametrosConfiguracion;
 import es.ujaen.uvirtual.modulo.bolsaempleo.modelo.ModeloRol;
 import es.ujaen.uvirtual.modulo.bolsaempleo.modelo.ModeloUsuarioBolsaEmpleo;
@@ -95,6 +96,7 @@ public class ControladorUsuarioBolsaEmpleo extends HttpServlet {
 	public static final String MENSAJE_ERROR_SIN_PERMISO_PERSONAL = "No tienes permiso de personal";
 	public static final String MENSAJE_ERROR_USUARIO_NO_EXISTE = "No existe el usuario";
 	
+	public static final String MENSAJE_EXITO_ACTUALIZAR_AREAS = "Áreas actualizadas correctamente";
 	public static final String MENSAJE_EXITO_AGREGAR = "Usuario creado correctamente";
 	public static final String MENSAJE_EXITO_EDITAR = "usuario editado correctamente";
 	public static final String MENSAJE_EXITO_ELIMINAR = "Usuario eliminado correctamente";
@@ -327,9 +329,9 @@ public class ControladorUsuarioBolsaEmpleo extends HttpServlet {
 	}
 	
 	private void actualizarAreasDirectorDepartamento(VistaUsuarioBolsaEmpleo bean, UVDatos datos, HttpServletRequest request, HttpServletResponse response)
-			throws SQLException, UVException, IOException {
-		
-		
+			throws SQLException, IOException, UVException {
+		ModeloEvaluador.obtenerInstancia().actualizaAreasDirectorDepartamento(bean.getUsuario(), bean.getUsuarioLogeado());
+		BolsaEmpleoUtils.addMensajeDeExito(MENSAJE_EXITO_ACTUALIZAR_AREAS, bean, request);
 		redireccionConUsuarioSeleccionado(bean, datos, request, response, ACCION_AREAS_EVALUABLES);
 	}
 	
