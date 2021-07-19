@@ -126,11 +126,23 @@ MeritoPreferente merito = bean.getMeritoPreferente();
 				</select>
     		</div>
     	</div>
+    	
     	<div class="form-group-container col1">
     		<div class="form-group">
     			<p class="helper-group">Indica donde se aplica el resultado del cálculo del mérito preferente: a un bloque, apartado, mérito o al total de la puntuación</p>
     		</div>
 	   	</div>
+	   	
+	   	<div class="form-group-container col2">
+    		<div class="form-group">
+    			<label for="merito_prefijo_informe">Prefijo informe:</label>
+    			<input id="merito_prefijo_informe"
+    				   class="form-input-custom"
+    				   type="text"
+    				   name="<%= ControladorMeritosPreferentes.PARAM_MERITO_PREFIJO %>" 
+    				   value="<%= BolsaEmpleoUtils.getParamForm(request, ControladorMeritosPreferentes.PARAM_MERITO_PREFIJO, merito != null ? EscapaHTML.escapa(merito.getPrefijoInforme()) : "") %>"/>
+    		</div>
+    	</div>
     	
     	<!-- TIPO DE MERITO -->
     	

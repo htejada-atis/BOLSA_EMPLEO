@@ -52,11 +52,11 @@ MeritoPreferente meritoPreferente = bean.getMeritoPreferente();
 <%	if (bolsaResultado.getListaMeritos().size() > 0) { %>
 		<div>Leyenda del campo "Desglose":</div>
 	    <ul>
-	    	<li>Méritos desagregables: (D) (valor1 * afinidad1 + valor2 * afinidad2 + valor3 * afinidad3 + valor4 * afinidad4) * Peso Categoría * Peso Bloque</li>
+	    	<li>Méritos desagregables: (D) (valor1 * afinidad1 + valor2 * afinidad2 + valor3 * afinidad3 + valor4 * afinidad4) * Valor unitario * Peso Bloque</li>
 	    	<li>Méritos con bonificación por bloque 
-	    	"<%= meritoPreferente.getAplicableApartadoBaremacion().getCodigo() + " - " + meritoPreferente.getAplicableApartadoBaremacion().getNombre() %>":
-	    	 (B) Valor * Afinidad * Peso Categoría * Peso Bloque * <%= meritoPreferente.getFactor() %></li>
-	    	<li>Resto de méritos: Valor * Afinidad * Peso Categoría * Peso Bloque</li>
+	    	"<%= meritoPreferente.getAplicableApartadoBaremacion().getCodigo() + " - " + meritoPreferente.getAplicableApartadoBaremacion().getNombre() %>": 
+	    	Valor * Afinidad * Valor unitario * Peso Bloque * (<%= meritoPreferente.getPrefijoInforme() %>) Factor Mérito Preferente</li>
+	    	<li>Resto de méritos: Valor * Afinidad * Valor unitario * Peso Bloque</li>
 	    </ul>
 		<table class="bluetable bolsaempleo">
 			<tr>
@@ -94,7 +94,7 @@ MeritoPreferente meritoPreferente = bean.getMeritoPreferente();
 				</tr>
 			<%	if (bolsaResultado.getDesgloseTotal() != null) { %>
 				<tr>
-					<td><%= EscapaHTML.escapa(bolsaResultado.getDesgloseDescripcion()) %></td>
+					<td>Cálculo final: <%= EscapaHTML.escapa(bolsaResultado.getDesgloseDescripcion()) %></td>
 					<td><%= EscapaHTML.escapa(bolsaResultado.getDesgloseTotal()) %></td>
 				</tr>
 			<%	} %>

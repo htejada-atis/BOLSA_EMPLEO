@@ -128,7 +128,8 @@ public class ModeloResultados {
 			}
 		}
 		
-		BolsaResultado bol = new BolsaResultado(bolsa, desgloseTotal, desgloseDescripcion, total, totalSinAplicar);
+		BolsaResultado bol = new BolsaResultado(bolsa, desgloseTotal, desgloseDescripcion, BolsaEmpleoUtils.formatoPuntuacion(total),
+				BolsaEmpleoUtils.formatoPuntuacion(totalSinAplicar));
 		bol.setListaMeritos(this.getMeritosSolicitudBolsaValidados(solicitud, bolsa));
 		bol.setListaMeritosExcluidos(this.getMeritosSolicitudBolsaExcluidos(solicitud, bolsa));
 		bol.setListaMeritosNoEvaluados(this.getMeritosSolicitudBolsaNoEvaluados(solicitud, bolsa));
@@ -180,21 +181,21 @@ public class ModeloResultados {
 				case ModeloMeritosPreferentes.APLICABLE_APARTADO:
 					if (item.getBloqueBaremacion().getApartadoBaremacion().getCodNum().equals(
 							preferente.getKey().getAplicableApartadoBaremacion().getCodNum())) {
-						desglose = "(B) " + desglose + " * " + preferente.getValue();
+						desglose = desglose + " * (" + preferente.getKey().getPrefijoInforme() + ") " + preferente.getValue();
 						puntuacion *= preferente.getValue();
 					}
 					break;
 				case ModeloMeritosPreferentes.APLICABLE_BLOQUE:
 					if (item.getBloqueBaremacion().getCodNum().equals(
 							preferente.getKey().getAplicableBloqueBaremacion().getCodNum())) {
-						desglose = "(B) " + desglose + " * " + preferente.getValue();
+						desglose = desglose + " * (" + preferente.getKey().getPrefijoInforme() + ") " + preferente.getValue();
 						puntuacion *= preferente.getValue();
 					}
 					break;
 				case ModeloMeritosPreferentes.APLICABLE_ITEM:
 					if (item.getCodNum().equals(
 							preferente.getKey().getAplicableItemBaremacion().getCodNum())) {
-						desglose = "(B) " + desglose + " * " + preferente.getValue();
+						desglose = desglose + " * (" + preferente.getKey().getPrefijoInforme() + ") " + preferente.getValue();
 						puntuacion *= preferente.getValue();
 					}
 					break;
