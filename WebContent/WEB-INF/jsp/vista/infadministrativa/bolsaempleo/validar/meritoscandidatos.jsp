@@ -221,7 +221,7 @@ Boolean personal = bean.getUsuarioLogeado().getRol().getCodNum().equals(ModeloRo
 								</a><br/>
 							<%	} else { %>
 									<b><%= EscapaHTML.escapa(meritoBolsa.getBolsa().getArea().getIdAreaExterno()) %></b><br/>
-									<%= EscapaHTML.escapa(meritoBolsa.getBolsa().getArea().getDescripcion()) %>
+									<%= EscapaHTML.escapa(meritoBolsa.getBolsa().getArea().getDescripcion()) %><br/>
 							<%	} %>
 								<%= meritoBolsa.getBolsa().getEstado().equals(ModeloBolsa.BOLSA_ESTADO_BAREMACION) ? "VALIDACIÓN" : meritoBolsa.getBolsa().getEstado() %>
 							</td>

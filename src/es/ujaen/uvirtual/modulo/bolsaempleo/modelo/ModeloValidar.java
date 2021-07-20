@@ -875,19 +875,26 @@ public class ModeloValidar {
 		try (Connection conexion = ConexionUvirtual.obtenerInstancia()) {
 			conexion.setAutoCommit(false);
 			
+			boolean evaluador = usuarioUpdate.getRol().getValor().equals(ModeloRol.ROL_MIEMBRO_COMISION) 
+					|| usuarioUpdate.getRol().getValor().equals(ModeloRol.ROL_DIRECTOR_DEPARTAMENTO);
+			
 			try {
 				// actualizamos usuario en valoraciones
 				String sqlUpdateValoraciones = "UPDATE TBEP_SOL_BOL_MER_VALORACION"
 						+ " SET UID_USUARIO = ?"
 						+ " WHERE BEPSBM_CODNUM IN ("
-						+ "	SELECT bepsbm.CODNUM"
-						+ "	FROM TBEP_SOL_BOL_MERITOS bepsbm"
-						+ "	WHERE bepsbm.BEPMER_CODNUM = ? AND bepsbm.BEPSBO_CODNUM IN ("
-						+ "		SELECT bepsbo.CODNUM"
-						+ "		FROM TBEP_SOLICITUD_BOLSAS bepsbo"
-						+ "		INNER JOIN TBEP_BOLSAS bepbol ON bepbol.CODNUM = bepsbo.BEPBOL_CODNUM"
-						+ "			AND (bepbol.CODNUM = ? OR bepbol.ESTADO = 'BAREMACION')"
-						+ "				WHERE bepsbo.BEPSOL_CODNUM = ?"
+						+ "		SELECT bepsbm.CODNUM"
+						+ "		FROM TBEP_SOL_BOL_MERITOS bepsbm"
+						+ "		WHERE bepsbm.BEPMER_CODNUM = ? AND bepsbm.BEPSBO_CODNUM IN ("
+						+ "			SELECT bepsbo.CODNUM"
+						+ "			FROM TBEP_SOLICITUD_BOLSAS bepsbo"
+						+ "				AND (bepbol.CODNUM = ? OR bepbol.ESTADO = 'BAREMACION')"
+						+ "			INNER JOIN TBEP_BOLSAS bepbol ON bepbol.CODNUM = bepsbo.BEPBOL_CODNUM"
+						+ (evaluador ? " "
+						+ " 		INNER JOIN TBEP_AREAS bepare ON bepare.CODNUM = bepbol.BEPARE_CODNUM"
+						+ " 		INNER JOIN TBEP_EVALUADORES bepeva ON bepeva.BEPARE_CODNUM = bepare.CODNUM"
+						+ " 			AND bepeva.BEPUSU_CODNUM = ? AND bepeva.FLGACTIVO = 'S'" : "")
+						+ "			WHERE bepsbo.BEPSOL_CODNUM = ?"
 						+ "		)"
 						+ " )";
 				
@@ -896,6 +903,9 @@ public class ModeloValidar {
 					stmt.setString(indexParam++, usuarioUpdate.getCodCuenta());
 					stmt.setInt(indexParam++, merito.getCodNum());
 					stmt.setInt(indexParam++, bolsa.getCodNum());
+					if (evaluador) {
+						stmt.setInt(indexParam++, usuarioUpdate.getCodNum());
+					}
 					stmt.setInt(indexParam++, solicitud.getCodNum());
 					stmt.executeUpdate();
 				}
@@ -910,7 +920,11 @@ public class ModeloValidar {
 						+ "			FROM TBEP_SOLICITUD_BOLSAS bepsbo"
 						+ "			INNER JOIN TBEP_BOLSAS bepbol ON bepbol.CODNUM = bepsbo.BEPBOL_CODNUM"
 						+ "				AND (bepbol.CODNUM = ? OR bepbol.ESTADO = '" + ModeloBolsa.BOLSA_ESTADO_BAREMACION + "')"
-						+ "			WHERE bepsbo.BEPSOL_CODNUM = ?"					
+						+ (evaluador ? " "
+						+ " 		INNER JOIN TBEP_AREAS bepare ON bepare.CODNUM = bepbol.BEPARE_CODNUM"
+						+ " 		INNER JOIN TBEP_EVALUADORES bepeva ON bepeva.BEPARE_CODNUM = bepare.CODNUM"
+						+ " 			AND bepeva.BEPUSU_CODNUM = ? AND bepeva.FLGACTIVO = 'S'" : "")
+						+ "			WHERE bepsbo.BEPSOL_CODNUM = ?"
 						+ "		)"
 						+ " )";
 				
@@ -918,6 +932,9 @@ public class ModeloValidar {
 					int indexParam = 1;
 					stmt.setInt(indexParam++, merito.getCodNum());
 					stmt.setInt(indexParam++, bolsa.getCodNum());
+					if (evaluador) {
+						stmt.setInt(indexParam++, usuarioUpdate.getCodNum());
+					}
 					stmt.setInt(indexParam++, solicitud.getCodNum());
 					stmt.executeUpdate();
 				}
@@ -1013,6 +1030,9 @@ public class ModeloValidar {
 	 * @throws SQLException .
 	 */
 	public void borrarEvaluacionMerito(MeritoSolicitud merito, Solicitud solicitud, Bolsa bolsa, UsuarioBolsaEmpleo usuarioUpdate) throws SQLException {
+		boolean evaluador = usuarioUpdate.getRol().getValor().equals(ModeloRol.ROL_MIEMBRO_COMISION) 
+				|| usuarioUpdate.getRol().getValor().equals(ModeloRol.ROL_DIRECTOR_DEPARTAMENTO);
+		
 		// limpiamos las evaluaciones del mérito para todas las bolsas en baremación
 		String sqlUpdateValoraciones = ""
 				+ " UPDATE ("
@@ -1021,6 +1041,9 @@ public class ModeloValidar {
 				+ "		FROM TBEP_SOL_BOL_MERITOS bepsbm"
 				+ "		INNER JOIN TBEP_SOLICITUD_BOLSAS bepsbo ON bepsbo.CODNUM = bepsbm.BEPSBO_CODNUM"
 				+ "		INNER JOIN TBEP_BOLSAS bepbol ON bepbol.CODNUM = bepsbo.BEPBOL_CODNUM AND (bepbol.ESTADO = 'BAREMACION' OR bepbol.CODNUM = ?)"
+				+ (evaluador ? " "
+				+ " 	INNER JOIN TBEP_AREAS bepare ON bepare.CODNUM = bepbol.BEPARE_CODNUM"
+				+ " 	INNER JOIN TBEP_EVALUADORES bepeva ON bepeva.BEPARE_CODNUM = bepare.CODNUM AND bepeva.BEPUSU_CODNUM = ? AND bepeva.FLGACTIVO = 'S'" : "")
 				+ "		WHERE bepsbm.BEPMER_CODNUM  = ? AND bepsbo.BEPSOL_CODNUM  = ?"
 				+ ")"
 				+ "	SET UID_USUARIO = ?, FLGEXCLUIDO = 'N', FLGVALIDADO = 'N', VALOR = ?, ITEM = ?,"
@@ -1030,6 +1053,9 @@ public class ModeloValidar {
 			int indexParam = 1;
 			stmt.setInt(indexParam++, bolsa.getCodNum());
 			stmt.setInt(indexParam++, bolsa.getCodNum());
+			if (evaluador) {
+				stmt.setInt(indexParam++, usuarioUpdate.getCodNum());
+			}
 			stmt.setInt(indexParam++, merito.getMerito().getCodNum());
 			stmt.setInt(indexParam++, solicitud.getCodNum());
 			stmt.setString(indexParam++, usuarioUpdate.getCodCuenta());
