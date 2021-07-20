@@ -453,8 +453,10 @@ public class ControladorDescargaFicheros extends HttpServlet {
 	///////////////////////////////////////////////////////////////////////////////////////////////////////////
 	
 	private void descargaResumenItemsBaremacion(UVDatos datos, HttpServletResponse response)
-			throws SQLException, UVException {
-		descargarPDF(datos, response, GenerarItemsBaremacionPDF.generarPDF());
+			throws SQLException, UVException, IOException {
+		try (InputStream archivo = GenerarItemsBaremacionPDF.generarPDF()) {
+			descargarPDF(datos, response, archivo);
+		}
 	}
 	
 }
