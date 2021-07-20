@@ -111,7 +111,7 @@ public class ModeloEvaluador {
 				+ " (SELECT COUNT(*) FROM TBEP_USUARIOS bepusu"
 				+ "		INNER JOIN TBEP_EVALUADORES bepeva ON bepusu.CODNUM = bepeva.BEPUSU_CODNUM"
 				+ "		WHERE FLGBORRADO!='S' AND FLGEXCLUIDO!='S' AND bepeva.BEPARE_CODNUM = bepare.CODNUM"
-				+ "		AND bepusu.ROL = 1051 AND bepeva.FLGACTIVO = 'S') COUNT_EVALUADORES"
+				+ "		AND bepeva.FLGACTIVO = 'S') COUNT_EVALUADORES"
 				+ " FROM TBEP_AREAS bepare"
 				+ "	INNER JOIN TBEP_AREAS_DEPARTAMENTOS bepade ON bepade.BEPARE_CODNUM = bepare.CODNUM"
 				+ "	WHERE bepade.BEPDEP_CODNUM = ? ";
@@ -161,10 +161,9 @@ public class ModeloEvaluador {
 		List<Evaluador> usuarios = new ArrayList<>();
 		BolsaEmpleoDataTable<Evaluador> dataTable = new BolsaEmpleoDataTable<>(params);
 		
-		String consulta = "SELECT * FROM TBEP_USUARIOS bepusu "
-				+ "INNER JOIN TBEP_EVALUADORES bepeva ON bepusu.CODNUM = bepeva.BEPUSU_CODNUM "
-				+ "WHERE FLGBORRADO!='S' AND FLGEXCLUIDO!='S' AND bepeva.BEPARE_CODNUM = ? "
-				+ "AND bepusu.ROL = " + PARAM_ROL_ID;
+		String consulta = "SELECT * FROM TBEP_USUARIOS bepusu"
+				+ " INNER JOIN TBEP_EVALUADORES bepeva ON bepusu.CODNUM = bepeva.BEPUSU_CODNUM"
+				+ " WHERE FLGBORRADO!='S' AND FLGEXCLUIDO!='S' AND bepeva.BEPARE_CODNUM = ? ";
 		
 		String whereNombre = String.format("(%s || ' ' || %s || ' ' || %s)", "bepusu.VUAJA_STRNOMBRE", "bepusu.VUAJA_STRAPELLIDO1", "bepusu.VUAJA_STRAPELLIDO2");
 		

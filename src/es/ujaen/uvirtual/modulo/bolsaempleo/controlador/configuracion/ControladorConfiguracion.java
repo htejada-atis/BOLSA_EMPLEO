@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.sql.SQLException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import java.util.stream.IntStream;
 
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
@@ -39,6 +40,9 @@ public class ControladorConfiguracion extends HttpServlet {
 	public static final String ACCION_INDEX = "listar";
 	public static final String RUTA_BEP_CON = "/WEB-INF/jsp/vista/infadministrativa/bolsaempleo/configuracion/";
 	public static final String JSP_INDEX = RUTA_BEP_CON + "indice.jsp";
+	
+	// Mensajes
+	public static final String MENSAJE_ERROR_SIN_PERMISO = "No tienes permiso";
 
 	/**
 	 * Peticion GET.
@@ -96,8 +100,13 @@ public class ControladorConfiguracion extends HttpServlet {
 		try {
 			bean.setUsuarioLogeado(ModeloUsuarioBolsaEmpleo.obtenerInstancia().getOrCreateUsuario(datos));
 
-			if (!bean.getUsuarioLogeado().getRol().getCodNum().equals(ModeloRol.ID_ROL_SERVICIO_PERSONAL)) {
-				throw new UVException("No tienes permiso de personal");
+			// personal, direccion
+			int[] rolesValidos = {ModeloRol.ID_ROL_SERVICIO_PERSONAL, ModeloRol.ID_ROL_DIRECTOR_DEPARTAMENTO};
+			boolean contains = IntStream.of(rolesValidos).
+					anyMatch(x -> x == bean.getUsuarioLogeado().getRol().getCodNum());
+			
+			if (!contains) {
+				throw new UVException(MENSAJE_ERROR_SIN_PERMISO);
 			}
 		} catch (UVException e) {
 			LOGGER.log(Level.SEVERE, Formateador.getStackTrace(e));
