@@ -5,7 +5,6 @@ import static org.junit.Assert.assertNotEquals;
 import static org.junit.Assert.assertNotNull;
 import java.io.IOException;
 import java.sql.SQLException;
-import java.util.Objects;
 
 import javax.servlet.ServletException;
 import org.junit.BeforeClass;

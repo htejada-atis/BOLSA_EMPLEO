@@ -1,15 +1,9 @@
 package es.ujaen.uvirtual.modulo.bolsaempleo.tareas;
 
 import java.sql.SQLException;
-import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import es.ujaen.uvirtual.modulo.bolsaempleo.beans.Bolsa;
-import es.ujaen.uvirtual.modulo.bolsaempleo.beans.Solicitud;
 import es.ujaen.uvirtual.modulo.bolsaempleo.modelo.ModeloArea;
-import es.ujaen.uvirtual.modulo.bolsaempleo.modelo.ModeloBolsa;
-import es.ujaen.uvirtual.modulo.bolsaempleo.modelo.ModeloConvocatoria;
-import es.ujaen.uvirtual.modulo.bolsaempleo.modelo.ModeloResultados;
 import es.ujaen.uvirtual.utilidades.Formateador;
 import es.ujaen.uvirtual.utilidades.UVException;
 
