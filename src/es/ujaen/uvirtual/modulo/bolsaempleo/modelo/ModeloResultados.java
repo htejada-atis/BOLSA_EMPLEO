@@ -1,5 +1,6 @@
 package es.ujaen.uvirtual.modulo.bolsaempleo.modelo;
 
+import java.io.IOException;
 import java.io.InputStream;
 import java.sql.Connection;
 import java.sql.Date;
@@ -101,9 +102,10 @@ public class ModeloResultados {
 	 * @param solicitud .
 	 * @param bolsa .
 	 * @throws SQLException en caso de error de base de datos .
+	 * @throws IOException .
 	 * @throws UVException .
 	 */
-	public void calcularSolicitud(Solicitud solicitud, Bolsa bolsa) throws SQLException, UVException {
+	public void calcularSolicitud(Solicitud solicitud, Bolsa bolsa) throws SQLException, UVException, IOException {
 		Double totalSinAplicar = 0.0;
 		
 		HashMap<String, Map.Entry<MeritoPreferente, Double>> preferentes = calcularMeritosPreferentes(solicitud, bolsa);
@@ -135,8 +137,9 @@ public class ModeloResultados {
 		bol.setListaMeritosNoEvaluados(this.getMeritosSolicitudBolsaNoEvaluados(solicitud, bolsa));
 		
 		Date fechaActual = new Date(BolsaEmpleoUtils.getCurrentDateTime().getTime());
-		InputStream archivoResultados = GenerarResultadosPDF.generarPDF(solicitud, bol, fechaActual);
-		guardarResultadoSolicitudBolsa(bol, solicitud, archivoResultados, null, fechaActual);
+		try (InputStream archivoResultados = GenerarResultadosPDF.generarPDF(solicitud, bol, fechaActual);) {
+			guardarResultadoSolicitudBolsa(bol, solicitud, archivoResultados, null, fechaActual);
+		}
 	}
 	
 	/** Calculo total de un mérito en una solicitud para un área .

@@ -324,11 +324,11 @@ public final class UtilsTestBolsaEmpleo {
 	
 	/** Barema una bolsa .
 	 * @param bolsa .
-	 * @throws UVException .
+	 * @throws IOException .
 	 * @throws SQLException .
 	 * @throws UVException .
 	 */
-	public static void baremarBolsa(Bolsa bolsa) throws SQLException, UVException {
+	public static void baremarBolsa(Bolsa bolsa) throws SQLException, UVException, IOException {
 		ModeloBolsa modeloBolsa = ModeloBolsa.obtenerInstancia();
 		bolsa.setEstado(ModeloBolsa.BOLSA_ESTADO_BLOQUEADA);
 		modeloBolsa.ponerBolsaComoPendienteBaremacion(bolsa, getUsuario("personal1"));
