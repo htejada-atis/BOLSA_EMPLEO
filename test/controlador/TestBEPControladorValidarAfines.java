@@ -16,6 +16,7 @@ import controlador.implementacion.PeticionHttp;
 import controlador.implementacion.RespuestaHttp;
 import es.ujaen.uvirtual.modulo.bolsaempleo.beans.ItemBaremacion;
 import es.ujaen.uvirtual.modulo.bolsaempleo.controlador.ControladorValidar;
+import es.ujaen.uvirtual.modulo.bolsaempleo.controlador.ControladorValidarNoAfines;
 import es.ujaen.uvirtual.modulo.bolsaempleo.modelo.ModeloBaremacionItems;
 import es.ujaen.uvirtual.modulo.bolsaempleo.utilidades.BolsaEmpleoDataTable;
 import es.ujaen.uvirtual.modulo.bolsaempleo.vistas.VistaValidar;
@@ -262,6 +263,8 @@ public class TestBEPControladorValidarAfines {
 		
 		PeticionHttp peticion = UtilsTestBolsaEmpleo.peticionAutenticadaPersonal();
 		peticion.setParameter(ControladorValidar.PARAM_ACCION, ControladorValidar.ACCION_MODIFICAR_MERITO);
+		peticion.setParameter(ControladorValidarNoAfines.PARAM_BOLSAS,
+				"[" + bean.getBolsa().getCodNum().toString() + "]");
 		peticion.setParameter(ControladorValidar.PARAM_ITEM, item.getCodNum().toString());
 		peticion.setParameter(ControladorValidar.PARAM_VALOR, VALOR);
 		peticion.setParameter(ControladorValidar.PARAM_BOLSA, bean.getBolsa().getCodNum().toString());
@@ -293,6 +296,8 @@ public class TestBEPControladorValidarAfines {
 		
 		PeticionHttp peticion = UtilsTestBolsaEmpleo.peticionAutenticadaPersonal();
 		peticion.setParameter(ControladorValidar.PARAM_ACCION, ControladorValidar.ACCION_MODIFICAR_MERITO);
+		peticion.setParameter(ControladorValidarNoAfines.PARAM_BOLSAS,
+				"[" + bean.getBolsa().getCodNum().toString() + "]");
 		peticion.setParameter(ControladorValidar.PARAM_ITEM, item.getCodNum().toString());
 		peticion.setParameter(ControladorValidar.PARAM_VALOR, VALOR);
 		peticion.setParameter(ControladorValidar.PARAM_BOLSA, bean.getBolsa().getCodNum().toString());
@@ -354,6 +359,8 @@ public class TestBEPControladorValidarAfines {
 		
 		PeticionHttp peticion = UtilsTestBolsaEmpleo.peticionAutenticadaPersonal();
 		peticion.setParameter(ControladorValidar.PARAM_ACCION, ControladorValidar.ACCION_MODIFICAR_MERITO);
+		peticion.setParameter(ControladorValidarNoAfines.PARAM_BOLSAS,
+				"[" + bean.getBolsa().getCodNum().toString() + "]");
 		peticion.setParameter(ControladorValidar.PARAM_ITEM, item.getCodNum().toString());
 		peticion.setParameter(ControladorValidar.PARAM_VALOR, VALOR);
 		peticion.setParameter(ControladorValidar.PARAM_BOLSA, bean.getBolsa().getCodNum().toString());
