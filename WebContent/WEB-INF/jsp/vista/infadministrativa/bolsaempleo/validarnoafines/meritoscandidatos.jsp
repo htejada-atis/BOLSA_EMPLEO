@@ -122,7 +122,7 @@ Double valor = null;
 				</tfoot>
 			</table>
 			
-			<h3>Evaluar mérito: <%= merito.getMerito().getCodNum() %></h3>
+			<h3>Evaluar mérito: <%= merito.getMerito().getCodNum() %>, para la bolsa: <%= EscapaHTML.escapa(bolsa.getArea().getDescripcion()) %></h3>
 			
 			<form id="validar_merito" class="be-form" method="post" action="<%= request.getRequestURI() %>">
 		    	<input type="hidden" name="<%= ControladorValidarNoAfines.PARAM_ACCION %>" id="accion_formulario" value="<%= ControladorValidarNoAfines.ACCION_VALIDAR_MERITO %>" />
