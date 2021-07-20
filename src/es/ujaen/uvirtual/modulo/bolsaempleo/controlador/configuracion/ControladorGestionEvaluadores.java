@@ -7,6 +7,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import java.util.stream.IntStream;
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
@@ -15,11 +16,11 @@ import javax.servlet.http.HttpServletResponse;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.reflect.TypeToken;
-
 import es.ujaen.uvirtual.beans.CodigoDescripcion;
 import es.ujaen.uvirtual.beans.UVDatos;
 import es.ujaen.uvirtual.modulo.bolsaempleo.beans.Area;
 import es.ujaen.uvirtual.modulo.bolsaempleo.beans.AreaEvaluadoresTable;
+import es.ujaen.uvirtual.modulo.bolsaempleo.beans.Departamento;
 import es.ujaen.uvirtual.modulo.bolsaempleo.beans.Evaluador;
 import es.ujaen.uvirtual.modulo.bolsaempleo.beans.UsuarioBolsaEmpleo;
 import es.ujaen.uvirtual.modulo.bolsaempleo.modelo.ModeloArea;
@@ -78,7 +79,8 @@ public class ControladorGestionEvaluadores extends HttpServlet {
 	public static final String MENSAJE_ENVIADO = "mensaje";
 	public static final String MENSAJE_ERROR_ACCION_NO_CONTEMPLADA = "Acción no contemplada";
 	public static final String MENSAJE_ERROR_EVALUADOR_YA_EXISTE = "El evaluador ya forma parte del área: %s";
-	public static final String MENSAJE_ERROR_ROL_COMISION = "El usuario no tiene rol de comisión";
+	public static final String MENSAJE_ERROR_ROL_EVALUADOR = "El usuario no tiene rol de comisión o de director de departamento";
+	public static final String MENSAJE_ERROR_SIN_PERMISO = "No tienes permiso";
 	public static final String MENSAJE_ERROR_USUARIOS_SELECCIONADOS_INCORRECTOS = "Usuarios seleccionados incorrectos";
 	public static final String MENSAJE_EXITO_AGREGAR_EVALUADOR = "Evaluador agregado correctamente al área: %s";
 	public static final String MENSAJE_ERROR_AREAS_SELECCIONADAS_INCORRECTAS = "Las áreas seleccionadas no son válidas";
@@ -123,7 +125,7 @@ public class ControladorGestionEvaluadores extends HttpServlet {
 					index(bean);
 					break;
 				case ACCION_SELECCIONAR_DEPARTAMENTO:
-					seleccionarDepartamento(bean, request, response);
+					seleccionarDepartamento(bean, request);
 					break;					
 				case ACCION_AGREGAR_EVALUADORES:
 					agregarEvaluadores(bean, request, response);
@@ -165,8 +167,13 @@ public class ControladorGestionEvaluadores extends HttpServlet {
 		try {
 			bean.setUsuarioLogeado(ModeloUsuarioBolsaEmpleo.obtenerInstancia().getOrCreateUsuario(datos));
 
-			if (!bean.getUsuarioLogeado().getRol().getCodNum().equals(ModeloRol.ID_ROL_SERVICIO_PERSONAL)) {
-				throw new UVException("No tienes permiso de personal");
+			// personal, direccion
+			int[] rolesValidos = {ModeloRol.ID_ROL_SERVICIO_PERSONAL, ModeloRol.ID_ROL_DIRECTOR_DEPARTAMENTO};
+			boolean contains = IntStream.of(rolesValidos).
+					anyMatch(x -> x == bean.getUsuarioLogeado().getRol().getCodNum());
+			
+			if (!contains) {
+				throw new UVException(MENSAJE_ERROR_SIN_PERMISO);
 			}
 		} catch (UVException e) {
 			LOGGER.log(Level.SEVERE, Formateador.getStackTrace(e));
@@ -189,16 +196,14 @@ public class ControladorGestionEvaluadores extends HttpServlet {
 		doGet(request, response);
 	}
 	
-	private void index(VistaEvaluadores bean) throws SQLException, UVException {
+	private void index(VistaEvaluadores bean) throws SQLException {
 		bean.setVista(JSP_INDEX);
-		
-		ModeloDepartamento modeloDepartamento = ModeloDepartamento.obtenerInstancia();
-		bean.setDepartamentos(modeloDepartamento.listaDepartamentosOrderByDesc());
+		bean.setDepartamentos(getDepartamentosUsuario(bean));
 	}
 	
-	private void seleccionarDepartamento(VistaEvaluadores bean, HttpServletRequest request, HttpServletResponse response) throws SQLException, UVException {
+	private void seleccionarDepartamento(VistaEvaluadores bean, HttpServletRequest request) throws SQLException, UVException {
 		bean.setDepartamento(ModeloDepartamento.obtenerInstancia().getDepartamentoByCodNum(Formateador.leeParametroInteger(request.getParameter(PARAM_DEPARTAMENTO))));
-		bean.setDepartamentos(ModeloDepartamento.obtenerInstancia().listaDepartamentosOrderByDesc());
+		bean.setDepartamentos(getDepartamentosUsuario(bean));
 		bean.setVista(JSP_INDEX);
 	}
 	
@@ -209,7 +214,7 @@ public class ControladorGestionEvaluadores extends HttpServlet {
 		
 		switch (nombreAccion) {
 			case ACCION_SELECCIONAR_AREA:
-				seleccionarArea(bean, request, response);
+				seleccionarArea(bean, request);
 				break;
 			case ACCION_DATATABLE_EVALUADORES:
 				listadoEvaluadores(bean, datos, request, response);
@@ -222,16 +227,16 @@ public class ControladorGestionEvaluadores extends HttpServlet {
 		}
 	}
 	
-	private void seleccionarArea(VistaEvaluadores bean, HttpServletRequest request, HttpServletResponse response) throws SQLException, UVException {
+	private void seleccionarArea(VistaEvaluadores bean, HttpServletRequest request) throws SQLException, UVException {
 		bean.setDepartamento(ModeloDepartamento.obtenerInstancia().getDepartamentoByCodNum(Formateador.leeParametroInteger(request.getParameter(PARAM_DEPARTAMENTO))));
-		bean.setDepartamentos(ModeloDepartamento.obtenerInstancia().listaDepartamentosOrderByDesc());
+		bean.setDepartamentos(getDepartamentosUsuario(bean));
 		bean.setArea(ModeloArea.obtenerInstancia().getAreaById(Formateador.leeParametroInteger(request.getParameter(PARAM_AREA))));		
 		bean.setVista(JSP_INDEX);		
 	}
 	
 	private void agregarEvaluadores(VistaEvaluadores bean, HttpServletRequest request, HttpServletResponse response) throws SQLException, UVException, IOException {
 		bean.setDepartamento(ModeloDepartamento.obtenerInstancia().getDepartamentoByCodNum(Formateador.leeParametroInteger(request.getParameter(PARAM_DEPARTAMENTO))));
-		bean.setDepartamentos(ModeloDepartamento.obtenerInstancia().listaDepartamentosOrderByDesc());
+		bean.setDepartamentos(getDepartamentosUsuario(bean));
 		
 		Integer idAreaSelected = Formateador.leeParametroInteger(request.getParameter(PARAM_AREA));		
 		if (idAreaSelected != null) {
@@ -247,8 +252,9 @@ public class ControladorGestionEvaluadores extends HttpServlet {
 		UsuarioBolsaEmpleo usuario = ModeloUsuarioBolsaEmpleo.obtenerInstancia().obtenerUsuarioBolsaEmpleoSiExiste(nombreUsuario);
 		if (usuario == null) {
 			usuario = ModeloUsuarioBolsaEmpleo.obtenerInstancia().crearUsuarioBolsaEmpleo(ModeloRol.ID_ROL_MIEMBRO_COMISION, nombreUsuario, bean.getUsuarioLogeado());
-		} else if (!usuario.getRol().getCodNum().equals(ModeloRol.ID_ROL_MIEMBRO_COMISION)) {
-			throw new UVException(MENSAJE_ERROR_ROL_COMISION);			
+		} else if (!usuario.getRol().getCodNum().equals(ModeloRol.ID_ROL_MIEMBRO_COMISION) 
+				&& !usuario.getRol().getCodNum().equals(ModeloRol.ID_ROL_DIRECTOR_DEPARTAMENTO)) {
+			throw new UVException(MENSAJE_ERROR_ROL_EVALUADOR);
 		}
 		
 		// leemos areas seleccionadas (o cogemos todas las departamento)
@@ -289,7 +295,7 @@ public class ControladorGestionEvaluadores extends HttpServlet {
 		response.sendRedirect(url);
 	}
 	
-	private void listadoAreas(VistaEvaluadores bean, UVDatos datos, HttpServletRequest request, HttpServletResponse response) throws IOException, SQLException {
+	private void listadoAreas(VistaEvaluadores bean, UVDatos datos, HttpServletRequest request, HttpServletResponse response) throws IOException {
 		ModeloEvaluador modeloEvaluador = ModeloEvaluador.obtenerInstancia();
 		datos.setContentType(RESPONSE_AJAX_CONTENTTYPE);
 		response.setContentType(RESPONSE_AJAX_CONTENTTYPE);
@@ -319,7 +325,7 @@ public class ControladorGestionEvaluadores extends HttpServlet {
 	}
 	
 	private void listadoEvaluadores(VistaEvaluadores bean, UVDatos datos, HttpServletRequest request, HttpServletResponse response)
-			throws IOException, SQLException {
+			throws IOException {
 		ModeloEvaluador modeloEvaluador = ModeloEvaluador.obtenerInstancia();
 		datos.setContentType(RESPONSE_AJAX_CONTENTTYPE);
 		response.setContentType(RESPONSE_AJAX_CONTENTTYPE);
@@ -349,7 +355,7 @@ public class ControladorGestionEvaluadores extends HttpServlet {
 	
 	private void eliminarEvaluador(VistaEvaluadores bean, HttpServletRequest request, HttpServletResponse response) throws SQLException, UVException, IOException {
 		bean.setDepartamento(ModeloDepartamento.obtenerInstancia().getDepartamentoByCodNum(Formateador.leeParametroInteger(request.getParameter(PARAM_DEPARTAMENTO))));
-		bean.setDepartamentos(ModeloDepartamento.obtenerInstancia().listaDepartamentosOrderByDesc());
+		bean.setDepartamentos(getDepartamentosUsuario(bean));
 		bean.setArea(ModeloArea.obtenerInstancia().getAreaById(Formateador.leeParametroInteger(request.getParameter(PARAM_AREA))));
 		
 		boolean activo = "true".equals(EscapaHTML.ajustaCodificacion(request.getParameter(PARAM_ACTIVO)));
@@ -363,6 +369,12 @@ public class ControladorGestionEvaluadores extends HttpServlet {
 				+ ControladorGestionEvaluadores.PARAM_DEPARTAMENTO + "=" + bean.getDepartamento().getCodNum() + "&" 
 				+ ControladorGestionEvaluadores.PARAM_AREA + "=" + bean.getArea().getCodNum();
 		response.sendRedirect(url);		
+	}
+	
+	private List<Departamento> getDepartamentosUsuario(VistaEvaluadores bean) throws SQLException {
+		ModeloDepartamento modelo = ModeloDepartamento.obtenerInstancia();
+		return bean.getUsuarioLogeado().getRol().getCodNum().equals(ModeloRol.ID_ROL_SERVICIO_PERSONAL)
+				? modelo.listaDepartamentosOrderByDesc() : modelo.listaDepartamentosDirector(bean.getUsuarioLogeado());
 	}
 
 	private Area getAreaById(String id) throws UVException {
