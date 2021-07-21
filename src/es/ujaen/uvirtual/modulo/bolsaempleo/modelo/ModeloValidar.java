@@ -889,7 +889,7 @@ public class ModeloValidar {
 						+ "			SELECT bepsbo.CODNUM"
 						+ "			FROM TBEP_SOLICITUD_BOLSAS bepsbo"
 						+ "			INNER JOIN TBEP_BOLSAS bepbol ON bepbol.CODNUM = bepsbo.BEPBOL_CODNUM"
-						+ "				AND (bepbol.CODNUM = ? OR bepbol.ESTADO = 'BAREMACION')"
+						+ "				AND (bepbol.CODNUM = ? OR bepbol.ESTADO = '" + ModeloBolsa.BOLSA_ESTADO_BAREMACION + "')"
 						+ (evaluador ? (" "
 						+ " 		INNER JOIN TBEP_AREAS bepare ON bepare.CODNUM = bepbol.BEPARE_CODNUM"
 						+ " 		INNER JOIN TBEP_EVALUADORES bepeva ON bepeva.BEPARE_CODNUM = bepare.CODNUM"
@@ -920,10 +920,10 @@ public class ModeloValidar {
 						+ "			FROM TBEP_SOLICITUD_BOLSAS bepsbo"
 						+ "			INNER JOIN TBEP_BOLSAS bepbol ON bepbol.CODNUM = bepsbo.BEPBOL_CODNUM"
 						+ "				AND (bepbol.CODNUM = ? OR bepbol.ESTADO = '" + ModeloBolsa.BOLSA_ESTADO_BAREMACION + "')"
-						+ (evaluador ? " "
+						+ (evaluador ? (" "
 						+ " 		INNER JOIN TBEP_AREAS bepare ON bepare.CODNUM = bepbol.BEPARE_CODNUM"
 						+ " 		INNER JOIN TBEP_EVALUADORES bepeva ON bepeva.BEPARE_CODNUM = bepare.CODNUM"
-						+ " 			AND bepeva.BEPUSU_CODNUM = ? AND bepeva.FLGACTIVO = 'S'" : "")
+						+ " 			AND bepeva.BEPUSU_CODNUM = ? AND bepeva.FLGACTIVO = 'S'") : "")
 						+ "			WHERE bepsbo.BEPSOL_CODNUM = ?"
 						+ "		)"
 						+ " )";
@@ -944,7 +944,7 @@ public class ModeloValidar {
 				conexion.rollback();
 				throw e;
 			} finally {
-				conexion.setAutoCommit(true);				
+				conexion.setAutoCommit(true);
 			}
 		}
 	}
@@ -997,7 +997,7 @@ public class ModeloValidar {
 						+ "			FROM TBEP_SOLICITUD_BOLSAS bepsbo"
 						+ "			INNER JOIN TBEP_BOLSAS bepbol ON bepbol.CODNUM = bepsbo.BEPBOL_CODNUM"
 						+ "				AND bepbol.CODNUM IN (" + BolsaEmpleoUtils.consultaMultiplesParametros(bolsas.size()) + ")"
-						+ "			WHERE bepsbo.BEPSOL_CODNUM = ?"					
+						+ "			WHERE bepsbo.BEPSOL_CODNUM = ?"
 						+ "		)"
 						+ " )";
 				
