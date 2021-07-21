@@ -888,12 +888,12 @@ public class ModeloValidar {
 						+ "		WHERE bepsbm.BEPMER_CODNUM = ? AND bepsbm.BEPSBO_CODNUM IN ("
 						+ "			SELECT bepsbo.CODNUM"
 						+ "			FROM TBEP_SOLICITUD_BOLSAS bepsbo"
-						+ "				AND (bepbol.CODNUM = ? OR bepbol.ESTADO = 'BAREMACION')"
 						+ "			INNER JOIN TBEP_BOLSAS bepbol ON bepbol.CODNUM = bepsbo.BEPBOL_CODNUM"
-						+ (evaluador ? " "
+						+ "				AND (bepbol.CODNUM = ? OR bepbol.ESTADO = 'BAREMACION')"
+						+ (evaluador ? (" "
 						+ " 		INNER JOIN TBEP_AREAS bepare ON bepare.CODNUM = bepbol.BEPARE_CODNUM"
 						+ " 		INNER JOIN TBEP_EVALUADORES bepeva ON bepeva.BEPARE_CODNUM = bepare.CODNUM"
-						+ " 			AND bepeva.BEPUSU_CODNUM = ? AND bepeva.FLGACTIVO = 'S'" : "")
+						+ " 			AND bepeva.BEPUSU_CODNUM = ? AND bepeva.FLGACTIVO = 'S'") : "")
 						+ "			WHERE bepsbo.BEPSOL_CODNUM = ?"
 						+ "		)"
 						+ " )";

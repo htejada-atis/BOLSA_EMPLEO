@@ -335,7 +335,6 @@ public class ControladorValidar extends HttpServlet {
 							throw new UVException(MENSAJE_ERROR_NUMERO_MAXIMO_MERITOS_BLOQUE);
 						}
 					}
-					
 					if (bean.getUsuarioLogeado().getRol().getCodNum().equals(ModeloRol.ID_ROL_SERVICIO_PERSONAL)) {
 						Collection<String> bolsas = gson.fromJson(request.getParameter(PARAM_BOLSAS), new TypeToken<Collection<String>>() { }.getType());
 						modeloValidar.borrarValoracionesMeritoBolsas(bean.getMerito().getMerito(), solicitud, bolsas, bean.getUsuarioLogeado());
@@ -344,11 +343,9 @@ public class ControladorValidar extends HttpServlet {
 						if (!item.getIndividualizado() || !bean.getMerito().getMerito().getItemBaremacion().getIndividualizado()) {
 							modeloValidar.borrarValoracionesMerito(bean.getMerito().getMerito(), solicitud, bean.getBolsa(), bean.getUsuarioLogeado());
 						}
-						
 						modeloValidar.borrarEvaluacionMerito(bean.getMerito(), solicitud, bean.getBolsa(), bean.getUsuarioLogeado());
 					}
 				}
-				
 				ModeloMerito.obtenerInstancia().actualizaMerito(merito, bean.getUsuarioLogeado());
 				BolsaEmpleoUtils.addMensajeDeExito(MENSAJE_EXITO_MERITO_MODIFICAR, bean, request);
 				
@@ -358,6 +355,8 @@ public class ControladorValidar extends HttpServlet {
 				}
 			}
 		} catch (Exception ex) {
+			LOGGER.log(Level.SEVERE, Formateador.getStackTrace(ex));
+			LOGGER.log(Level.SEVERE, ex.toString());
 			BolsaEmpleoUtils.addMensajeDeError(ex.getMessage(), bean, request);
 		}
 		
@@ -398,6 +397,8 @@ public class ControladorValidar extends HttpServlet {
 			}
 			
 		} catch (Exception ex) {
+			LOGGER.log(Level.SEVERE, Formateador.getStackTrace(ex));
+			LOGGER.log(Level.SEVERE, ex.toString());
 			BolsaEmpleoUtils.addMensajeDeError(ex.getMessage(), bean, request);
 		}
 		
