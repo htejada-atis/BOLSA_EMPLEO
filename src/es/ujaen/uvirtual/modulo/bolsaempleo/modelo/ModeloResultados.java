@@ -56,7 +56,6 @@ public class ModeloResultados {
 	public static final String MENSAJE_ERROR_MERITO_NULL = "Mérito no puede estar vacío";
 	
 	public static final String ACREDITACIONES_VALIDADAS = "ACREDITACIONES_VALIDADAS";
-	public static final String ARCHIVO = "ARCHIVO";
 	public static final String BEPBOL_CODNUM = "BEPBOL_CODNUM";
 	public static final String BEPITE_CODNUM = "BEPITE_CODNUM";
 	public static final String BEPMER_CODNUM = "BEPMER_CODNUM";
@@ -710,14 +709,13 @@ public class ModeloResultados {
 		Double total = rs.getDouble(TOTAL);
 		Double totalSinAplicar = rs.getDouble(TOTALSINAPLICAR);
 		Solicitud solicitud = ModeloSolicitud.obtenerInstancia().getSolicitudById(rs.getInt(BEPSOL_CODNUM));
-		InputStream archivo = rs.getBlob(ARCHIVO) != null ? rs.getBlob(ARCHIVO).getBinaryStream() : null;
 		List<MeritoResultado> meritos = this.getMeritosSolicitudBolsaValidados(solicitud, bol);
 		List<MeritoResultado> meritosExcluidos = this.getMeritosSolicitudBolsaExcluidos(solicitud, bol);
 		List<MeritoResultado> meritosEvaluados = this.getMeritosSolicitudBolsaNoEvaluados(solicitud, bol);
 		Clob acreditaciones = rs.getClob(ACREDITACIONES_VALIDADAS);
 		Clob titulaciones = rs.getClob(TITULACIONES_VALIDADAS);
 		
-		return new BolsaResultado(bol, desgloseTotal, desgloseDescripcion, total, totalSinAplicar, meritos, meritosExcluidos, meritosEvaluados, archivo, acreditaciones, titulaciones);
+		return new BolsaResultado(bol, desgloseTotal, desgloseDescripcion, total, totalSinAplicar, meritos, meritosExcluidos, meritosEvaluados, acreditaciones, titulaciones);
 	}
 	
 }
