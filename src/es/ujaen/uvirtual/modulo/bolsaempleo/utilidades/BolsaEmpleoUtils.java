@@ -485,4 +485,17 @@ public final class BolsaEmpleoUtils {
 				throw new UVException("Tipo de mensaje no válido");
 		}
 	}
+	
+	/**
+	 * Escapa una cadena de caracteres para ser mostrada en HTML y sustituir \n por <br/>.
+	 * @param origen cadena que queremos escapar
+	 * @return la cadena mostrable en formato xhtml.
+	 */
+	public static String escapaSaltosDeLinea(String origen) {
+		if (origen == null) {
+			return ""; 
+		}
+		origen = origen.replace("\n", "<br/>");
+		return origen;
+	}
 }

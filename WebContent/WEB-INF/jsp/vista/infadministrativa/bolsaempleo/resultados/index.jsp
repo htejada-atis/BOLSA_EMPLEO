@@ -23,7 +23,7 @@ VistaResultados bean = (VistaResultados)uvdatos.getVistas().get(VistaResultados.
 			<th scope="col" style="width:100px" title="Código área">Cod. Area.</th>
 			<th scope="col" style="width:100%; min-width:100px" class="area">Area</th>
 			<th scope="col" style="width:120px" class="area">Fecha baremación</th>
-			<th scope="col" style="width:88px" class="center"></th>
+			<th scope="col" style="width:90px" class="center"></th>
 		</tr>
 		<tbody>
 		</tbody>

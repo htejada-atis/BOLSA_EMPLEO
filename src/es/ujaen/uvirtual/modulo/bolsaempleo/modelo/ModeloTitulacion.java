@@ -10,6 +10,7 @@ import java.util.List;
 import java.util.Map;
 
 import es.ujaen.uvirtual.modelo.conexion.ConexionUvirtual;
+import es.ujaen.uvirtual.modulo.bolsaempleo.beans.Bolsa;
 import es.ujaen.uvirtual.modulo.bolsaempleo.beans.Titulacion;
 import es.ujaen.uvirtual.modulo.bolsaempleo.beans.TitulacionArea;
 import es.ujaen.uvirtual.modulo.bolsaempleo.beans.TitulacionUsuario;
@@ -156,6 +157,40 @@ public class ModeloTitulacion {
 			}
 		}
 
+		return titulaciones;
+	}
+	
+	/** lista titulaciones validadas para un área de un candidato .
+	 * @param bolsa .
+	 * @param candidato .
+	 * @return lista de titulaciones .
+	 * @throws UVException .
+	 * @throws SQLException .
+	 */
+	public List<TitulacionUsuario> listaTitulacionesPreferentesAlArea(UsuarioBolsaEmpleo candidato, Bolsa bolsa) throws SQLException, UVException {
+		List<TitulacionUsuario> titulaciones = new ArrayList<>();
+		String consulta = "SELECT beptus.*"
+				+ " FROM TBEP_TIT_PREFERENTES_AREA beptpa"
+				+ "	INNER JOIN TBEP_TITULACIONES beptit ON beptit.CODNUM = beptpa.BEPTIT_CODNUM"
+				+ "	INNER JOIN TBEP_TITULACIONES_USUARIO beptus ON beptus.BEPTUS_TIT_CODNUM = beptit.CODNUM"
+				+ "	WHERE 	beptus.BEPTUS_USU_CODNUM = ?"
+				+ "		AND beptpa.BEPARE_CODNUM = ?"
+				+ "		AND beptus.FLGVALIDADA = 'S'"
+				+ "		AND beptus.FLGBORRADO = 'N'";
+		
+		try (Connection conexion = ConexionUvirtual.obtenerInstancia();
+				PreparedStatement stmt = conexion.prepareStatement(consulta)) {
+			int indexParam = 1;
+			stmt.setInt(indexParam++, candidato.getCodNum());
+			stmt.setInt(indexParam++, bolsa.getArea().getCodNum());
+			
+			try (ResultSet rs = stmt.executeQuery()) {
+				while (rs.next()) {
+					titulaciones.add(this.createTitulacionUsuarioFromResultSet(rs, false));
+				}
+			}
+		}
+		
 		return titulaciones;
 	}
 	
