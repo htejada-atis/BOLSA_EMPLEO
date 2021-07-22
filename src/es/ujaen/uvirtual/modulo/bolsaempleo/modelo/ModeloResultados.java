@@ -487,7 +487,7 @@ public class ModeloResultados {
 	public BolsaResultado getBolsaResultado(Bolsa bolsa, UsuarioBolsaEmpleo candidato, Convocatoria convocatoria) throws SQLException, UVException, IOException {
 		
 		String consulta = "SELECT bepsob.BEPBOL_CODNUM, bepsob.TOTAL, bepsob.TOTALSINAPLICAR, bepsob.DESGLOSETOTAL, "
-				+ "		bepsob.DESGLOSEDESCRIPCION, bepsob.ARCHIVO, bepsob.FECHABAREMACION, bepsol.CODNUM AS BEPSOL_CODNUM,"
+				+ "		bepsob.DESGLOSEDESCRIPCION, bepsob.FECHABAREMACION, bepsol.CODNUM AS BEPSOL_CODNUM,"
 				+ "		bepsob.ACREDITACIONES_VALIDADAS, bepsob.TITULACIONES_VALIDADAS"
 				+ " FROM TBEP_SOLICITUD_BOLSAS bepsob"
 				+ "	INNER JOIN TBEP_SOLICITUDES bepsol ON bepsol.CODNUM = bepsob.BEPSOL_CODNUM"
@@ -579,7 +579,6 @@ public class ModeloResultados {
 	/** Guardar resultado de la solicitud para una bolsa .
 	 * @param bolsa .
 	 * @param solicitud .
-	 * @param archivo .
 	 * @param usuarioUpdate .
 	 * @param fechaActual .
 	 * @throws UVException .
