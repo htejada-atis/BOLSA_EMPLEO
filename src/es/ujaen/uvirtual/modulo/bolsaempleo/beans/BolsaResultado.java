@@ -1,6 +1,5 @@
 package es.ujaen.uvirtual.modulo.bolsaempleo.beans;
 
-import java.io.InputStream;
 import java.io.Serializable;
 import java.sql.Clob;
 import java.util.List;
