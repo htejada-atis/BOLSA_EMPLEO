@@ -3,7 +3,6 @@ package es.ujaen.uvirtual.modulo.bolsaempleo.controlador;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.sql.SQLException;
-import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.stream.IntStream;
@@ -13,19 +12,19 @@ import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+
 import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
-import com.google.gson.JsonArray;
-import com.google.gson.reflect.TypeToken;
+
 import es.ujaen.uvirtual.beans.CodigoDescripcion;
 import es.ujaen.uvirtual.beans.UVDatos;
-import es.ujaen.uvirtual.modulo.bolsaempleo.beans.Fichero;
-import es.ujaen.uvirtual.modulo.bolsaempleo.beans.Noticia;
-import es.ujaen.uvirtual.modulo.bolsaempleo.modelo.ModeloFichero;
-import es.ujaen.uvirtual.modulo.bolsaempleo.modelo.ModeloNoticia;
+import es.ujaen.uvirtual.modulo.bolsaempleo.beans.BolsaValidacion;
+import es.ujaen.uvirtual.modulo.bolsaempleo.beans.PlazaOfertada;
+import es.ujaen.uvirtual.modulo.bolsaempleo.modelo.ModeloContratacion;
 import es.ujaen.uvirtual.modulo.bolsaempleo.modelo.ModeloParametrosConfiguracion;
 import es.ujaen.uvirtual.modulo.bolsaempleo.modelo.ModeloRol;
 import es.ujaen.uvirtual.modulo.bolsaempleo.modelo.ModeloUsuarioBolsaEmpleo;
+import es.ujaen.uvirtual.modulo.bolsaempleo.modelo.ModeloValidar;
+import es.ujaen.uvirtual.modulo.bolsaempleo.utilidades.BolsaEmpleoDataTable;
 import es.ujaen.uvirtual.modulo.bolsaempleo.utilidades.BolsaEmpleoUtils;
 import es.ujaen.uvirtual.modulo.bolsaempleo.vistas.VistaContratacion;
 import es.ujaen.uvirtual.utilidades.EscapaHTML;
@@ -48,7 +47,6 @@ import es.ujaen.uvirtual.utilidades.UVException;
 			"/pub/es/informacionadministrativa/bolsaempleo/contratacion", 
 			"/pub/en/informacionadministrativa/bolsaempleo/contratacion"
 	})
-@MultipartConfig(maxFileSize = ModeloParametrosConfiguracion.MAX_FILE_SIZE)
 public class ControladorContratacion extends HttpServlet {
 	private static final long serialVersionUID = 1L;
 	private static final String NOMBREDEESTACLASE = ControladorContratacion.class.getName();
@@ -83,7 +81,7 @@ public class ControladorContratacion extends HttpServlet {
 	 * @see HttpServlet#doGet(HttpServletRequest request, HttpServletResponse response)
 	 */
 	@Override
-	public void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+	public void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException {
 		UVDatos datos = (UVDatos) request.getAttribute(UVDatos.NOMBRE_ATRIBUTO);
 		datos.setDocType("<!DOCTYPE html>");
 		datos.setContentType("text/html");
@@ -99,7 +97,7 @@ public class ControladorContratacion extends HttpServlet {
 			
 			switch (nombreAccion) {
 				case ACCION_DATATABLE_PLAZAS_OFERTADAS:
-					
+					listaPlazasOfertadas(bean, datos, request, response);
 					break;
 				case ACCION_INDEX:
 					break;
@@ -134,7 +132,7 @@ public class ControladorContratacion extends HttpServlet {
 			bean.setUsuarioLogeado(ModeloUsuarioBolsaEmpleo.obtenerInstancia().getOrCreateUsuario(datos));
 			
 			// personal, comision, direccion
-			int[] rolesValidos = {ModeloRol.ID_ROL_SERVICIO_PERSONAL, ModeloRol.ID_ROL_DIRECTOR_DEPARTAMENTO, ModeloRol.ID_ROL_MIEMBRO_COMISION};
+			int[] rolesValidos = {ModeloRol.ID_ROL_SERVICIO_PERSONAL, ModeloRol.ID_ROL_DIRECTOR_DEPARTAMENTO};
 			boolean contains = IntStream.of(rolesValidos).
 					anyMatch(x -> x == bean.getUsuarioLogeado().getRol().getCodNum());
 			
@@ -156,7 +154,7 @@ public class ControladorContratacion extends HttpServlet {
 	 * @see HttpServlet#doPost(HttpServletRequest request, HttpServletResponse response)
 	 */
 	@Override
-	public void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+	public void doPost(HttpServletRequest request, HttpServletResponse response) throws IOException {
 		doGet(request, response);
 	}
 	
@@ -166,6 +164,25 @@ public class ControladorContratacion extends HttpServlet {
 		response.setContentType(RESPONSE_AJAX_CONTENTTYPE);
 		response.setCharacterEncoding(RESPONSE_AJAX_ENCODING);
 		
+		try (PrintWriter writer = response.getWriter()) {
+			try {
+				BolsaEmpleoDataTable<PlazaOfertada> dataTable = ModeloContratacion.obtenerInstancia().
+						listadoPlazasOfertadas(request.getParameterMap());
+				bean.setDatatablePlazasOfertadas(dataTable);
+				writer.write(dataTable.toJson());
+			} catch (UVException | SQLException e) {
+				if (e instanceof SQLException) {
+					LOGGER.log(Level.SEVERE, Formateador.getStackTrace(e));
+					LOGGER.log(Level.SEVERE, e.toString());
+				} else {
+					LOGGER.log(Level.WARNING, e.toString());
+				}
+				bean.getMensajesDeError().add(e.getMessage());
+				CodigoDescripcion mensaje = new CodigoDescripcion(RESPONSE_AJAX_ERROR, e.getMessage());
+				writer.write(new Gson().toJson(mensaje));
+				response.setStatus(RESPONSE_AJAX_HTTP_CODE_ERROR);
+			}
+		}
 	}
 	
 }
