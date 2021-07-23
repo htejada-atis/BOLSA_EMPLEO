@@ -609,8 +609,9 @@ public class ModeloResultados {
 			
 			Clob clobTitulaciones = conexion.createClob();
 			String titulaciones = "";
-			for (int i = 0; i < listaTitulaciones.size(); i++) {
-				titulaciones += listaTitulaciones.get(i).getCodNum() + " (Id) - " + listaTitulaciones.get(i).getDescripcion() + "\n";
+			for (TitulacionUsuario titulacion: listaTitulaciones) {
+				titulaciones += titulacion.getCodNum() + " (Id) - " 
+					+ (titulacion.getTitulacion() != null ? titulacion.getTitulacion().getNombre() : "Otra titulación: " + titulacion.getOtraTitulacion()) + "\n";
 			}
 			clobTitulaciones.setString(1, titulaciones);
 			stmt.setClob(indexParam++, clobTitulaciones);
@@ -618,9 +619,10 @@ public class ModeloResultados {
 			Clob clobAcreditaciones = conexion.createClob();
 			ParametrosConfiguracion config = ModeloParametrosConfiguracion.obtenerInstancia().getParametroByNombre("bolsaempleo.local.codMeritoPreferente");
 			String acreditaciones = "";
-			for (int i = 0; i < listaAcreditaciones.size(); i++) {
-				acreditaciones += listaAcreditaciones.get(i).getCodNum() + " (Id) - " + config.getValor() 
-					+ "." + listaAcreditaciones.get(i).getMeritoPreferente().getCodigo() + " " + listaAcreditaciones.get(i).getDescripcion() + "\n";
+			for (MeritoPreferenteUsuario acreditacion: listaAcreditaciones) {
+				acreditaciones += acreditacion.getCodNum() + " (Id) - " + config.getValor() 
+					+ "." + acreditacion.getMeritoPreferente().getCodigo() + " " + acreditacion.getMeritoPreferente().getNombre() + " " 
+					+ (acreditacion.getMeritoPreferenteOpcion() != null ? acreditacion.getMeritoPreferenteOpcion().getNombre() : "") + "\n";
 			}
 			clobAcreditaciones.setString(1, acreditaciones);
 			stmt.setClob(indexParam++, clobAcreditaciones);
