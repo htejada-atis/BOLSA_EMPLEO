@@ -157,14 +157,14 @@ String titulaciones = BolsaEmpleoUtils.clobToString(bolsaResultado.getTitulacion
 <%	} else { %>
 		<p><%= ModeloResultados.MENSAJE_SIN_MERITOS_NO_EVALUADOS %></p>
 <%	} %>
-	
-</div>
 
 	<h4>Titulaciones validadas</h4>
 	<p><%= BolsaEmpleoUtils.escapaSaltosDeLinea(titulaciones.isEmpty() ? "No hay titulaciones validadas" : titulaciones) %></p>
 	
 	<h4>Acreditaciones validadas</h4>
 	<p><%= BolsaEmpleoUtils.escapaSaltosDeLinea(acreditaciones.isEmpty() ? "No hay acreditaciones validadas" : acreditaciones) %></p>
+	
+</div>
 
 <script>
 
