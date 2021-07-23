@@ -129,8 +129,8 @@ $(document).ready(function() {
 			return;
 		}
 		
-		if (accion == 'baremar' && selected.length > 1) {
-			Atis.alertDialog('Baremar bolsa', 'Seleccione únicamente una bolsa para baremar.');
+		if (accion == 'baremar' && selected.length > 5) {
+			Atis.alertDialog('Baremar bolsa', 'Sólo puede baremar 5 bolsas al mismo tiempo como máximo.');
 			return;
 		}
 		
