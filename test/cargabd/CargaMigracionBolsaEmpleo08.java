@@ -6,7 +6,7 @@ import bbdd.BbddRunner;
 
 /**
  * Migraciones 20210723 .
- * 	- Contratación .
+ * 	- cambiado el peso de bloque .
  * 
  * @author ATISoluciones 2021
  */
@@ -19,7 +19,7 @@ public class CargaMigracionBolsaEmpleo08 {
 	public static void main(String[] args) {
 		BbddRunner.conectarBd();
 		try {
-			BbddRunner.ejecutar("Documentos/scripts/opc.bolsaempleo/migraciones/10-contratacion.sql");
+			BbddRunner.ejecutar("Documentos/scripts/opc.bolsaempleo/migraciones/10-pesoapartados.sql");
 		} catch (IOException | SQLException e) {
 			e.printStackTrace();
 		}
