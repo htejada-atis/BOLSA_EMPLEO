@@ -193,7 +193,7 @@ public class ControladorMisResultados extends HttpServlet {
 		}
 	}
 	
-	private void resultadosCandidato(VistaMisResultados bean) throws SQLException, UVException {
+	private void resultadosCandidato(VistaMisResultados bean) throws SQLException, UVException, IOException {
 		ModeloResultados modeloResultados = ModeloResultados.obtenerInstancia();
 		
 		bean.setVista(JSP_RESULTADO_DETALLE);

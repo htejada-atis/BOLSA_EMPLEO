@@ -196,7 +196,7 @@ public class ControladorResultados extends HttpServlet {
 		}
 	}
 	
-	private void seleccionarCandidato(VistaResultados bean, HttpServletRequest request) throws SQLException, UVException {
+	private void seleccionarCandidato(VistaResultados bean, HttpServletRequest request) throws SQLException, UVException, IOException {
 		ModeloResultados modeloResultados = ModeloResultados.obtenerInstancia();
 		
 		bean.setVista(JSP_RESULTADO_DETALLE);

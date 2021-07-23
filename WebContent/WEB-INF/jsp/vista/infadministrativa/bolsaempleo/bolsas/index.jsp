@@ -129,6 +129,11 @@ $(document).ready(function() {
 			return;
 		}
 		
+		if (accion == 'baremar' && selected.length > 1) {
+			Atis.alertDialog('Baremar bolsa', 'Seleccione únicamente una bolsa para baremar.');
+			return;
+		}
+		
 		var params = {
 			'a': '<%=ControladorBolsas.ACCION_BOLSA%>', 
 			'<%=ControladorBolsas.PARAM_ACCION_BOLSA%>': accion, 

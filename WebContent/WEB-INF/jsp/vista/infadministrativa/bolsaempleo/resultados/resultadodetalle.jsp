@@ -10,6 +10,7 @@
 <%@ page import="es.ujaen.uvirtual.modulo.bolsaempleo.beans.UsuarioBolsaEmpleo" %>
 <%@ page import="es.ujaen.uvirtual.modulo.bolsaempleo.modelo.ModeloResultados" %>
 <%@	page import="es.ujaen.uvirtual.modulo.bolsaempleo.modelo.ModeloRol"%>
+<%@	page import="es.ujaen.uvirtual.modulo.bolsaempleo.utilidades.BolsaEmpleoUtils"%>
 <%@ page import="es.ujaen.uvirtual.beans.UVDatos"%>
 <%@ page import="es.ujaen.uvirtual.utilidades.EscapaHTML" %>
 <%@ page import="es.ujaen.uvirtual.utilidades.Formateador"%>
@@ -21,6 +22,8 @@ Bolsa bolsa = bean.getBolsa();
 UsuarioBolsaEmpleo candidato = bean.getCandidato();
 BolsaResultado bolsaResultado = bean.getBolsaResultado();
 MeritoPreferente meritoPreferente = bean.getMeritoPreferente();
+String acreditaciones = BolsaEmpleoUtils.clobToString(bolsaResultado.getAcreditacionesValidadas());
+String titulaciones = BolsaEmpleoUtils.clobToString(bolsaResultado.getTitulacionesValidadas());
 %>
 
 <div class='bolsa-empleo'>
@@ -163,6 +166,12 @@ MeritoPreferente meritoPreferente = bean.getMeritoPreferente();
 <%	} else { %>
 		<p><%= ModeloResultados.MENSAJE_SIN_MERITOS_NO_EVALUADOS %></p>
 <%	} %>
+
+	<h4>Titulaciones validadas</h4>
+	<p><%=  BolsaEmpleoUtils.escapaSaltosDeLinea(titulaciones.isEmpty() ? "No hay titulaciones validadas" : titulaciones) %></p>
+	
+	<h4>Acreditaciones validadas</h4>
+	<p><%=  BolsaEmpleoUtils.escapaSaltosDeLinea(acreditaciones.isEmpty() ? "No hay acreditaciones validadas" : acreditaciones) %></p>
 	
 </div>
 
