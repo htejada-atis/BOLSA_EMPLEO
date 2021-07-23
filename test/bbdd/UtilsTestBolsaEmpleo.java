@@ -79,13 +79,13 @@ public final class UtilsTestBolsaEmpleo {
 	
 			// mocks esquema rrhh
 			UtilsTestBolsaEmpleo.ejecutarMultiplesScripts("MOCKS RRHH", "Documentos/scripts/opc.bolsaempleo/mock_rrhh", ESQUEMA_RRHH, false);
-	
-			// limpieza uvirtual
-			UtilsTestBolsaEmpleo.ejecutarMultiplesScripts("UVIRTUAL CLEAN", "Documentos/scripts/opc.bolsaempleo/datos_desarrollo/clean", ESQUEMA_UVIRTUAL, true);
 			
 			// limpieza migraciones uvirtual
 			UtilsTestBolsaEmpleo.ejecutarMultiplesScripts("UVIRTUAL CLEAN MIGRACIONES",
 					"Documentos/scripts/opc.bolsaempleo/datos_desarrollo/clean_migraciones", ESQUEMA_UVIRTUAL, true);
+	
+			// limpieza uvirtual
+			UtilsTestBolsaEmpleo.ejecutarMultiplesScripts("UVIRTUAL CLEAN", "Documentos/scripts/opc.bolsaempleo/datos_desarrollo/clean", ESQUEMA_UVIRTUAL, true);
 	
 			// creación tablas uvirtual
 			UtilsTestBolsaEmpleo.ejecutarMultiplesScripts("UVIRTUAL TABLAS", "Documentos/scripts/opc.bolsaempleo", ESQUEMA_UVIRTUAL, false);
