@@ -79,9 +79,12 @@ pipeline {
     					inclusionPattern: '**/*.class'
 					)	
 	        		junit 'builds/build/rama/site/jacoco/*.xml'
-	        		def checkstyleReport = scanForIssues enabledForFailure: true, tool: checkStyle(pattern: 'builds/build/rama/site/jacoco/checkstyle_report.xml')
-	        		echo 'chechstyle summary ${checkstyleReport}'
-	        		publishIssues issues: [checkstyleReport]
+	        		script {
+		        		def checkstyleReport = scanForIssues enabledForFailure: true, tool: checkStyle(pattern: 'builds/build/rama/site/jacoco/checkstyle_report.xml')
+		        		echo 'chechstyle summary ${checkstyleReport}'
+		        		publishIssues issues: [checkstyleReport]
+	        		}
+	        		
 	        		recordIssues enabledForFailure: true, tool: pmdParser(pattern: 'builds/build/rama/site/jacoco/pmd_report.xml')
 	        	}
 	        }     
