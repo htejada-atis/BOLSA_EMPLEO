@@ -1,5 +1,6 @@
 package es.ujaen.uvirtual.modulo.bolsaempleo.tareas;
 
+import java.io.IOException;
 import java.sql.SQLException;
 import java.util.List;
 import java.util.logging.Level;
@@ -30,22 +31,23 @@ public final class BaremarBolsa {
 	public static void run() {
 		try {
 			baremarBolsas();
-		} catch (SQLException | UVException e) {
+		} catch (SQLException | UVException | IOException e) {
 			LOGGER.log(Level.SEVERE, Formateador.getStackTrace(e));
-			LOGGER.log(Level.SEVERE, e.toString());
+			LOGGER.log(Level.SEVERE, "Error baremando bolsas: " + e.toString());
 		}
 	}
 	
 	/**
 	 * Metodo para ejecutar la tarea desde los tests.
+	 * @throws IOException .
 	 * @throws SQLException .
 	 * @throws UVException .
 	 */
-	public static void runFromTest() throws SQLException, UVException {
+	public static void runFromTest() throws SQLException, UVException, IOException {
 		baremarBolsas();
 	}
 	
-	private static void baremarBolsas() throws SQLException, UVException {
+	private static void baremarBolsas() throws SQLException, UVException, IOException {
 		ModeloBolsa modeloBolsa = ModeloBolsa.obtenerInstancia();
 		ModeloResultados modeloResultados = ModeloResultados.obtenerInstancia();
 		

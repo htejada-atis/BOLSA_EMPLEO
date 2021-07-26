@@ -12,7 +12,6 @@ import java.util.Map;
 import es.ujaen.uvirtual.modelo.conexion.ConexionUvirtual;
 import es.ujaen.uvirtual.modulo.bolsaempleo.beans.Bolsa;
 import es.ujaen.uvirtual.modulo.bolsaempleo.beans.BolsaResultado;
-import es.ujaen.uvirtual.modulo.bolsaempleo.beans.Convocatoria;
 import es.ujaen.uvirtual.modulo.bolsaempleo.beans.UsuarioBolsaEmpleo;
 import es.ujaen.uvirtual.modulo.bolsaempleo.utilidades.BolsaEmpleoDataTable;
 import es.ujaen.uvirtual.modulo.bolsaempleo.utilidades.BolsaEmpleoUtils;
@@ -126,14 +125,18 @@ public class ModeloBolsa {
 	
 	/** Listado de bolsas para resultados .
 	 * @param params para leer los parametros de paginación, ordenacion, etc .
+	 * @param usuario .
 	 * @return listado de bolsas de empleo .
 	 * @throws SQLException en caso de error de base de datos .
 	 * @throws UVException  error si no existe la area .
 	 */
-	public BolsaEmpleoDataTable<BolsaResultado> listaBolsasResultadosDatatable(Map<String, String[]> params)
+	public BolsaEmpleoDataTable<BolsaResultado> listaBolsasResultadosDatatable(UsuarioBolsaEmpleo usuario, Map<String, String[]> params)
 			throws SQLException, UVException {
 		List<BolsaResultado> bolsas = new ArrayList<>();
 		BolsaEmpleoDataTable<BolsaResultado> dataTable = new BolsaEmpleoDataTable<>(params);
+		
+		boolean evaluador = usuario.getRol().getValor().equals(ModeloRol.ROL_MIEMBRO_COMISION) 
+				|| usuario.getRol().getValor().equals(ModeloRol.ROL_DIRECTOR_DEPARTAMENTO);
 
 		String consulta = "SELECT bepbol.*,"
 				+ "		("
@@ -147,7 +150,9 @@ public class ModeloBolsa {
 				+ "		) AS RESULTADOS_ACTUALES"
 				+ "	FROM TBEP_BOLSAS bepbol"
 				+ "	INNER JOIN TBEP_AREAS bepare ON bepare.CODNUM = bepbol.BEPARE_CODNUM"
-				+ "	WHERE 1=1";
+				+ (evaluador ? " INNER JOIN TBEP_EVALUADORES bepeva ON bepeva.BEPARE_CODNUM = bepare.CODNUM AND bepeva.FLGACTIVO = 'S'" : "")
+				+ "	WHERE"
+				+ (evaluador ? " bepeva.BEPUSU_CODNUM = ?" : " 1=1");
 
 		dataTable.setColumn(ORDER_COLUMN_INDEX_ID_RESULTADOS, "bepbol.CODNUM", DataTableColumn.COLUMN_TYPE_NUMBER);
 		dataTable.setColumn(ORDER_COLUMN_INDEX_COD_AREA_RESULTADOS, "bepare.ID_AREA_CONOCIMIENTO");
@@ -159,6 +164,10 @@ public class ModeloBolsa {
 				PreparedStatement stmtCount = conexion.prepareStatement(dataTable.getQueryCount());
 				PreparedStatement stmt = conexion.prepareStatement(dataTable.getQuery())) {
 			int indexParam = 1;
+			if (evaluador) {
+				stmt.setInt(indexParam, usuario.getCodNum());
+				stmtCount.setInt(indexParam++, usuario.getCodNum());
+			}
 			dataTable.setFiltersParams(stmt, stmtCount, indexParam);
 
 			try (ResultSet rs = stmt.executeQuery()) {

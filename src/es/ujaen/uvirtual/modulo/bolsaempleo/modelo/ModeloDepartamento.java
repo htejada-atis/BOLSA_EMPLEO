@@ -6,10 +6,12 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
-
+import java.util.Map;
 import es.ujaen.uvirtual.modelo.conexion.ConexionUvirtual;
+import es.ujaen.uvirtual.modelo.conexion.ConexionUxxiRrhh;
 import es.ujaen.uvirtual.modulo.bolsaempleo.beans.Departamento;
 import es.ujaen.uvirtual.modulo.bolsaempleo.beans.UsuarioBolsaEmpleo;
+import es.ujaen.uvirtual.modulo.bolsaempleo.utilidades.BolsaEmpleoDataTable;
 import es.ujaen.uvirtual.utilidades.UVException;
 
 /**
@@ -90,6 +92,65 @@ public class ModeloDepartamento {
 				}
 			}
 		}
+		return departamentos;
+	}
+	
+	/** Listado de departamentos .
+	 * @param params para leer los parametros de paginación, ordenacion, etc .
+	 * @param director .
+	 * @return listado de departamentos .
+	 * @throws SQLException en caso de error de base de datos .
+	 * @throws UVException error si no existe la area .
+	 */
+	public BolsaEmpleoDataTable<Departamento> listaDepartamentosDirectorDatatable(Map<String, String[]> params, UsuarioBolsaEmpleo director) throws SQLException, UVException {
+		List<Departamento> departamentos = new ArrayList<>();
+		BolsaEmpleoDataTable<Departamento> dataTable = new BolsaEmpleoDataTable<>(params);
+		
+		String consulta = "SELECT * FROM UXXIRRHH.VUJA_NET_BEP_RH_DEP_DIR"
+				+ " WHERE PRSNIF = ?";
+		
+		dataTable.setQuery(consulta);
+				
+		try (Connection conexion = ConexionUxxiRrhh.obtenerInstancia();
+				PreparedStatement stmtCount = conexion.prepareStatement(dataTable.getQueryCount());
+				PreparedStatement stmt = conexion.prepareStatement(dataTable.getQuery())
+		) {
+			int indexParam = 1;
+			stmt.setString(indexParam, director.getPrsNif());
+			stmtCount.setString(indexParam++, director.getPrsNif());
+			
+			dataTable.setFiltersParams(stmt, stmtCount, indexParam);
+			try (ResultSet rs = stmt.executeQuery()) {
+				while (rs.next()) {
+					Departamento departamento = this.getDepartamentoByIdExterno(rs.getString("ID_DEPARTAMENTO"));
+					departamentos.add(departamento);
+				}				
+			}	
+			
+			dataTable.setRecordsTotalFromQuery(stmtCount);
+			dataTable.setData(departamentos);
+		}
+		
+		return dataTable;
+	}
+	
+	public List<Departamento> listaDepartamentosDirector(UsuarioBolsaEmpleo director) throws SQLException {
+		List<Departamento> departamentos = new ArrayList<>();
+		String consulta = "SELECT * FROM UXXIRRHH.VUJA_NET_BEP_RH_DEP_DIR"
+				+ " WHERE PRSNIF = ?";
+		
+		try (Connection conexion = ConexionUxxiRrhh.obtenerInstancia(); PreparedStatement stmt = conexion.prepareStatement(consulta);) {
+			int indexParam = 1;
+			stmt.setString(indexParam, director.getPrsNif());
+			
+			try (ResultSet rs = stmt.executeQuery()) {
+				while (rs.next()) {
+					Departamento departamento = this.getDepartamentoByIdExterno(rs.getString("ID_DEPARTAMENTO"));
+					departamentos.add(departamento);
+				}				
+			}
+		}
+		
 		return departamentos;
 	}
 
@@ -176,7 +237,7 @@ public class ModeloDepartamento {
 		Departamento dep = new Departamento();
 		dep.setCodNum(rs.getInt("CODNUM"));
 		dep.setIdDepartamentoExterno(rs.getString("ID_DEPARTAMENTO"));
-		dep.setDescripcion(rs.getString("DES_DEPARTAMENTO"));		
+		dep.setDescripcion(rs.getString("DES_DEPARTAMENTO"));
 		return dep;
 	}
 }

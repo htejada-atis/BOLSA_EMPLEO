@@ -80,11 +80,13 @@ public class ControladorMisMeritos extends HttpServlet {
 	public static final String PARAM_VALOR = "valor";
 	
 	// mensajes
+	public static final String MENSAJE_ERROR_ACCION_NO_CONTEMPLADA = "Acción no contemplada";
 	public static final String MENSAJE_ERROR_DESCRIPCION_LARGO = "La descripción no puede contener mas de %d caracteres";
 	public static final String MENSAJE_ERROR_DESCRIPCION_VACIA = "La descripción no puede estar vacía";
 	public static final String MENSAJE_ERROR_ELIMINAR = "El mérito con id %s no se puede borrar";
 	public static final String MENSAJE_ERROR_MERITOS_SELECCIONADOS_INCORRECTOS = "Méritos seleccionados incorrectos";
 	public static final String MENSAJE_ERROR_OBSERVACION_LARGO = "La observación no puede contener mas de %d caracteres";
+	public static final String MENSAJE_ERROR_SIN_PERMISO_CANDIDATO = "No eres un candidato";
 	public static final String MENSAJE_EXITO_AGREGAR = "Mérito agregado correctamente";
 	public static final String MENSAJE_EXITO_ELIMINAR = "Mérito eliminado correctamente";
 	
@@ -153,7 +155,7 @@ public class ControladorMisMeritos extends HttpServlet {
 			bean.setUsuarioLogeado(ModeloUsuarioBolsaEmpleo.obtenerInstancia().getOrCreateUsuario(datos));
 
 			if (!bean.getUsuarioLogeado().getRol().getCodNum().equals(ModeloRol.ID_ROL_CANDIDATO)) {
-				throw new UVException("No eres un candidato");
+				throw new UVException(MENSAJE_ERROR_SIN_PERMISO_CANDIDATO);
 			}
 		} catch (UVException e) {
 			LOGGER.log(Level.WARNING, e.toString());

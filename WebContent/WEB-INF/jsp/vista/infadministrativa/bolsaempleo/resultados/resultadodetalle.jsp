@@ -1,6 +1,7 @@
 <%@ page trimDirectiveWhitespaces="true"%>
 <%@	page import="es.ujaen.uvirtual.modulo.bolsaempleo.controlador.ControladorDescargaFicheros"%>
 <%@	page import="es.ujaen.uvirtual.modulo.bolsaempleo.controlador.ControladorResultados"%>
+<%@	page import="es.ujaen.uvirtual.modulo.bolsaempleo.controlador.configuracion.ControladorUsuarioCandidato"%>
 <%@ page import="es.ujaen.uvirtual.modulo.bolsaempleo.vistas.VistaResultados" %>
 <%@ page import="es.ujaen.uvirtual.modulo.bolsaempleo.beans.Bolsa" %>
 <%@ page import="es.ujaen.uvirtual.modulo.bolsaempleo.beans.BolsaResultado" %>
@@ -8,6 +9,8 @@
 <%@ page import="es.ujaen.uvirtual.modulo.bolsaempleo.beans.MeritoResultado" %>
 <%@ page import="es.ujaen.uvirtual.modulo.bolsaempleo.beans.UsuarioBolsaEmpleo" %>
 <%@ page import="es.ujaen.uvirtual.modulo.bolsaempleo.modelo.ModeloResultados" %>
+<%@	page import="es.ujaen.uvirtual.modulo.bolsaempleo.modelo.ModeloRol"%>
+<%@	page import="es.ujaen.uvirtual.modulo.bolsaempleo.utilidades.BolsaEmpleoUtils"%>
 <%@ page import="es.ujaen.uvirtual.beans.UVDatos"%>
 <%@ page import="es.ujaen.uvirtual.utilidades.EscapaHTML" %>
 <%@ page import="es.ujaen.uvirtual.utilidades.Formateador"%>
@@ -19,6 +22,8 @@ Bolsa bolsa = bean.getBolsa();
 UsuarioBolsaEmpleo candidato = bean.getCandidato();
 BolsaResultado bolsaResultado = bean.getBolsaResultado();
 MeritoPreferente meritoPreferente = bean.getMeritoPreferente();
+String acreditaciones = BolsaEmpleoUtils.clobToString(bolsaResultado.getAcreditacionesValidadas());
+String titulaciones = BolsaEmpleoUtils.clobToString(bolsaResultado.getTitulacionesValidadas());
 %>
 
 <div class='bolsa-empleo'>
@@ -26,7 +31,14 @@ MeritoPreferente meritoPreferente = bean.getMeritoPreferente();
 	<jsp:include page="/WEB-INF/jsp/vista/infadministrativa/bolsaempleo/mensajes.jsp" />
 	
 	<h2>Resultados del área: <%= EscapaHTML.escapa(bolsa.getArea().getDescripcion()) %></h2>
-	<h3>Resultados del candidato: <%= EscapaHTML.escapa(candidato.getPrsNif()) %></h3>
+<%	if (bean.getUsuarioLogeado().getRol().getCodNum().equals(ModeloRol.ID_ROL_SERVICIO_PERSONAL)) { %>
+		<h3>Resultados del candidato: <a class="bolsaempleo-link"
+									href="<%= ControladorUsuarioCandidato.URL_PATTERN 
+										+ "?" + ControladorUsuarioCandidato.PARAM_ACCION + "=" + ControladorUsuarioCandidato.ACCION_SELECCIONAR_CANDIDATO 
+										+ "&" + ControladorUsuarioCandidato.PARAM_CANDIDATO + "=" + candidato.getCodNum()%>"><%= EscapaHTML.escapa(candidato.getPrsNif()) %></a></h3>
+<%	} else { %>
+		<h3>Resultados del candidato: <%= EscapaHTML.escapa(candidato.getPrsNif()) %></h3>
+<%	} %>
 	
 	<div class="row">
 		<button class="link-btn" id="resultados_volver" style="float:left; max-height: 25px">
@@ -43,11 +55,11 @@ MeritoPreferente meritoPreferente = bean.getMeritoPreferente();
 <%	if (bolsaResultado.getListaMeritos().size() > 0) { %>
 		<div>Leyenda del campo "Desglose":</div>
 	    <ul>
-	    	<li>Méritos no individualizados: (I) (valor1 * afinidad1 + valor2 * afinidad2 + valor3 * afinidad3 + valor4 * afinidad4) * Peso Categoría * Peso Bloque</li>
+	    	<li>Méritos desagregables: (D) (valor1 * afinidad1 + valor2 * afinidad2 + valor3 * afinidad3 + valor4 * afinidad4) * Valor unitario * Peso Bloque</li>
 	    	<li>Méritos con bonificación por bloque 
-	    	"<%= meritoPreferente.getAplicableApartadoBaremacion().getCodigo() + " - " + meritoPreferente.getAplicableApartadoBaremacion().getNombre() %>":
-	    	 (B) Valor * Afinidad * Peso Categoría * Peso Bloque * <%= meritoPreferente.getFactor() %></li>
-	    	<li>Resto de méritos: Valor * Afinidad * Peso Categoría * Peso Bloque</li>
+	    	"<%= meritoPreferente.getAplicableApartadoBaremacion().getCodigo() + " - " + meritoPreferente.getAplicableApartadoBaremacion().getNombre() %>": 
+	    	Valor * Afinidad * Valor unitario * Peso Bloque * (<%= meritoPreferente.getPrefijoInforme() %>) Factor Mérito Preferente</li>
+	    	<li>Resto de méritos: Valor * Afinidad * Valor unitario * Peso Bloque</li>
 	    </ul>
 		<table class="bluetable bolsaempleo">
 			<tr>
@@ -85,7 +97,7 @@ MeritoPreferente meritoPreferente = bean.getMeritoPreferente();
 				</tr>
 			<%	if (bolsaResultado.getDesgloseTotal() != null) { %>
 				<tr>
-					<td><%= EscapaHTML.escapa(bolsaResultado.getDesgloseDescripcion()) %></td>
+					<td>Cálculo final: <%= EscapaHTML.escapa(bolsaResultado.getDesgloseDescripcion()) %></td>
 					<td><%= EscapaHTML.escapa(bolsaResultado.getDesgloseTotal()) %></td>
 				</tr>
 			<%	} %>
@@ -154,12 +166,19 @@ MeritoPreferente meritoPreferente = bean.getMeritoPreferente();
 <%	} else { %>
 		<p><%= ModeloResultados.MENSAJE_SIN_MERITOS_NO_EVALUADOS %></p>
 <%	} %>
+
+	<h4>Titulaciones validadas</h4>
+	<p><%=  BolsaEmpleoUtils.escapaSaltosDeLinea(titulaciones.isEmpty() ? "No hay titulaciones validadas" : titulaciones) %></p>
+	
+	<h4>Acreditaciones validadas</h4>
+	<p><%=  BolsaEmpleoUtils.escapaSaltosDeLinea(acreditaciones.isEmpty() ? "No hay acreditaciones validadas" : acreditaciones) %></p>
 	
 </div>
 
 <script>
 
 $(document).ready(function() {
+	Atis.handleLinkEvents();
 	
 	document.getElementById("resultados_volver").addEventListener("click", function() {
 		var params = {

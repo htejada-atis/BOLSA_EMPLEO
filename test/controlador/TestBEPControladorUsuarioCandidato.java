@@ -982,7 +982,7 @@ public class TestBEPControladorUsuarioCandidato {
 	 * @throws ServletException si error servlet .
 	 */
 	@Test
-	public void testE081excluirSolicitudCandidato() throws IOException {
+	public void testE09excluirSolicitudCandidato() throws IOException {
 		VistaCandidatos bean = obtenerSolicitudesCandidato();
 
 		Solicitud solicitud = bean.getDataTableSolicitudes().getData().get(0);
@@ -1022,7 +1022,7 @@ public class TestBEPControladorUsuarioCandidato {
 	 * @throws ServletException si error servlet .
 	 */
 	@Test
-	public void testE082errorUsuarioRol() throws IOException {
+	public void testE10errorUsuarioRol() throws IOException {
 		PeticionHttp peticion = UtilsTestBolsaEmpleo.peticionAutenticadaCandidato();
 		peticion.setParameter(ControladorUsuarioCandidato.PARAM_ACCION, ControladorUsuarioCandidato.ACCION_INDEX);
 

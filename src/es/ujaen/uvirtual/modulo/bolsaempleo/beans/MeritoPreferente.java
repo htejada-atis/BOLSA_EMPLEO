@@ -17,6 +17,7 @@ public class MeritoPreferente implements Serializable {
 	private String tipo;
 	private String tipoCalculo;
 	private String aplicable;
+	private String prefijoInforme;
 	private Double base;
 	private Double factor;
 	private Double valorMaximo;
@@ -148,6 +149,14 @@ public class MeritoPreferente implements Serializable {
 	public String getAplicable() {
 		return aplicable;
 	}
+	
+	public String getPrefijoInforme() {
+		return prefijoInforme;
+	}
+
+	public void setPrefijoInforme(String prefijoInforme) {
+		this.prefijoInforme = prefijoInforme;
+	}
 
 	public void setAplicable(String aplicable) {
 		this.aplicable = aplicable;
@@ -226,9 +235,9 @@ public class MeritoPreferente implements Serializable {
 		return "MeritoPreferente [codNum=" + codNum + ", codigo=" + codigo + " , nombre=" + nombre + " , observaciones=" + observaciones + ", tipo=" + tipo
 				+ ", tipoCalculo=" + tipoCalculo + "aplicable=" + aplicable + ", base=" + base + ", factor=" + factor
 				+ ", valorMaximo=" + valorMaximo + ", tipoItemBaremacion=" + tipoItemBaremacion
-				+ ", aplicableBloqueBaremacion" + aplicableBloqueBaremacion + ", aplicableApartadoBaremacion="
+				+ ", aplicableBloqueBaremacion=" + aplicableBloqueBaremacion + ", aplicableApartadoBaremacion="
 				+ aplicableApartadoBaremacion + ", aplicableItemBareamcion=" + aplicableItemBareamcion + ", activo="
-				+ activo + "]";
+				+ activo + ", prefijoInforme=" + prefijoInforme + "]";
 	}
 
 	@Override
@@ -250,6 +259,7 @@ public class MeritoPreferente implements Serializable {
 		result = prime * result + ((aplicableApartadoBaremacion == null) ? 0 : aplicableApartadoBaremacion.hashCode());
 		result = prime * result + ((aplicableItemBareamcion == null) ? 0 : aplicableItemBareamcion.hashCode());
 		result = prime * result + ((activo == null) ? 0 : activo.hashCode());
+		result = prime * result + ((prefijoInforme == null) ? 0 : prefijoInforme.hashCode());
 		return result;
 	}
 
@@ -369,6 +379,13 @@ public class MeritoPreferente implements Serializable {
 				return false;
 			}
 		} else if (!activo.equals(other.activo)) {
+			return false;
+		}
+		if (prefijoInforme == null) {
+			if (other.prefijoInforme != null) {
+				return false;
+			}
+		} else if (!prefijoInforme.equals(other.prefijoInforme)) {
 			return false;
 		}
 

@@ -1,6 +1,7 @@
 package es.ujaen.uvirtual.modulo.bolsaempleo.controlador.configuracion;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.PrintWriter;
 import java.sql.SQLException;
 import java.util.HashMap;
@@ -404,7 +405,10 @@ public class ControladorUsuarioCandidato extends HttpServlet {
 		
 		bean.getSolicitud().setEstado(ModeloSolicitud.SOLICITUD_ESTADO_CERRADA);
 		bean.getSolicitud().setFechaConfirmacion(BolsaEmpleoUtils.getCurrentDateTime());
-		bean.getSolicitud().setArchivo(GenerarSolicitudPDF.generarPDF(bean.getSolicitud(), listaBolsas));
+		
+		try (InputStream archivo = GenerarSolicitudPDF.generarPDF(bean.getSolicitud(), listaBolsas)) {
+			bean.getSolicitud().setArchivo(archivo);
+		}
 		
 		modeloSolicitud.confirmacionSolicitud(bean.getSolicitud(), bean.getCandidato());
 		

@@ -22,6 +22,7 @@ import es.ujaen.uvirtual.modulo.bolsaempleo.beans.Solicitud;
 import es.ujaen.uvirtual.modulo.bolsaempleo.beans.TitulacionUsuario;
 import es.ujaen.uvirtual.modulo.bolsaempleo.beans.UsuarioBolsaEmpleo;
 import es.ujaen.uvirtual.modulo.bolsaempleo.informes.GenerarItemsBaremacionPDF;
+import es.ujaen.uvirtual.modulo.bolsaempleo.informes.GenerarResultadosPDF;
 import es.ujaen.uvirtual.modulo.bolsaempleo.modelo.ModeloBolsa;
 import es.ujaen.uvirtual.modulo.bolsaempleo.modelo.ModeloConvocatoria;
 import es.ujaen.uvirtual.modulo.bolsaempleo.modelo.ModeloDescargaFichero;
@@ -365,18 +366,18 @@ public class ControladorDescargaFicheros extends HttpServlet {
 	///////////////////////////////////////////////////////////////////////////////////////////////////////////
 	
 	private void descargaResultadosSolicitudCandidato(VistaDescargaFicheros bean, UVDatos datos, HttpServletRequest request, HttpServletResponse response) 
-			throws SQLException, UVException {
+			throws SQLException, UVException, IOException {
 		Bolsa bolsa = ModeloBolsa.obtenerInstancia().getBolsaById(Formateador.leeParametroInteger(request.getParameter(PARAM_BOLSA)));
 		Convocatoria convocatoria = ModeloConvocatoria.obtenerInstancia().getUltimaConvocatoria();
 		
 		BolsaResultado bolsaResultado = ModeloResultados.obtenerInstancia().getBolsaResultado(bolsa, bean.getUsuarioLogeado(), convocatoria);
 		bean.setBolsaResultado(bolsaResultado);
 		
-		descargarPDF(datos, response, bolsaResultado.getArchivo());
+		descargarPDF(datos, response, GenerarResultadosPDF.generarPDF(bean.getUsuarioLogeado(), bolsaResultado, convocatoria));
 	}
 	
 	private void descargaResultadosSolicitudPersonal(VistaDescargaFicheros bean, UVDatos datos, HttpServletRequest request, HttpServletResponse response) 
-			throws SQLException, UVException {
+			throws SQLException, UVException, IOException {
 		UsuarioBolsaEmpleo candidato = ModeloUsuarioBolsaEmpleo.obtenerInstancia().getUsuarioById(Formateador.leeParametroInteger(request.getParameter(PARAM_CANDIDATO)));
 		Bolsa bolsa = ModeloBolsa.obtenerInstancia().getBolsaById(Formateador.leeParametroInteger(request.getParameter(PARAM_BOLSA)));
 		Convocatoria convocatoria = ModeloConvocatoria.obtenerInstancia().getUltimaConvocatoria();
@@ -384,7 +385,7 @@ public class ControladorDescargaFicheros extends HttpServlet {
 		BolsaResultado bolsaResultado = ModeloResultados.obtenerInstancia().getBolsaResultado(bolsa, candidato, convocatoria);
 		bean.setBolsaResultado(bolsaResultado);
 		
-		descargarPDF(datos, response, bolsaResultado.getArchivo());
+		descargarPDF(datos, response, GenerarResultadosPDF.generarPDF(candidato, bolsaResultado, convocatoria));
 	}
 	
 	///////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -453,8 +454,10 @@ public class ControladorDescargaFicheros extends HttpServlet {
 	///////////////////////////////////////////////////////////////////////////////////////////////////////////
 	
 	private void descargaResumenItemsBaremacion(UVDatos datos, HttpServletResponse response)
-			throws SQLException, UVException {
-		descargarPDF(datos, response, GenerarItemsBaremacionPDF.generarPDF());
+			throws SQLException, UVException, IOException {
+		try (InputStream archivo = GenerarItemsBaremacionPDF.generarPDF()) {
+			descargarPDF(datos, response, archivo);
+		}
 	}
 	
 }

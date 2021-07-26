@@ -1,6 +1,7 @@
 package es.ujaen.uvirtual.modulo.bolsaempleo.controlador.candidato;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.PrintWriter;
 import java.sql.SQLException;
 import java.util.logging.Logger;
@@ -861,7 +862,10 @@ public class ControladorMisSolicitudes extends HttpServlet {
 		
 		solicitud.setEstado(ModeloSolicitud.SOLICITUD_ESTADO_CERRADA);
 		solicitud.setFechaConfirmacion(BolsaEmpleoUtils.getCurrentDateTime());
-		solicitud.setArchivo(GenerarSolicitudPDF.generarPDF(solicitud, listaBolsas));
+		
+		try (InputStream archivo = GenerarSolicitudPDF.generarPDF(solicitud, listaBolsas)) {
+			solicitud.setArchivo(archivo);
+		}
 		
 		modeloSolicitud.confirmacionSolicitud(solicitud, bean.getUsuarioLogeado());
 		
@@ -926,6 +930,7 @@ public class ControladorMisSolicitudes extends HttpServlet {
 		}
 		
 		if (ModeloConvocatoria.obtenerInstancia().isConvocatoriaCerrada(solicitud.getConvocatoria())) {
+			LOGGER.log(Level.SEVERE, "Error intentando consultar convocatoria cerrada del candidato: " + bean.getUsuarioLogeado().getCodCuenta());
 			throw new UVException("La convocatoria está cerrada");
 		}
 		

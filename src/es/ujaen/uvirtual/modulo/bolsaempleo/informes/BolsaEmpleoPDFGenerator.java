@@ -38,13 +38,14 @@ public class BolsaEmpleoPDFGenerator {
 	protected static final int SIZE_10 = 10;
 	protected static final int SIZE_11 = 11;
 	protected static final int SIZE_12 = 12;
+	protected static final int SIZE_16 = 16;
 	protected static final int SIZE_18 = 18;
 	protected static final int SIZE_20 = 20;
-	protected static final int SIZE_23 = 23;
+	protected static final int SIZE_27 = 27;
 	protected static final int SIZE_30 = 30;
 	protected static final int SIZE_40 = 40;
 	protected static final int SIZE_60 = 60;
-	protected static final int SIZE_65 = 65;
+	protected static final int SIZE_69 = 69;
 	protected static final int SIZE_100 = 100;
 	protected static final int SIZE_100_WIDTH = 100;
 	

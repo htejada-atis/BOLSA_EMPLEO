@@ -60,7 +60,7 @@ public final class UtilsTestBolsaEmpleo {
 	public static final Integer WAIT_ELEMENT = 10; // segundos
 	public static final boolean VERBOSE = false;
 	
-	private static boolean cargado = true;
+	private static boolean cargado = false;
 
 	private UtilsTestBolsaEmpleo() {
 	}
@@ -82,6 +82,10 @@ public final class UtilsTestBolsaEmpleo {
 	
 			// limpieza uvirtual
 			UtilsTestBolsaEmpleo.ejecutarMultiplesScripts("UVIRTUAL CLEAN", "Documentos/scripts/opc.bolsaempleo/datos_desarrollo/clean", ESQUEMA_UVIRTUAL, true);
+			
+			// limpieza migraciones uvirtual
+			UtilsTestBolsaEmpleo.ejecutarMultiplesScripts("UVIRTUAL CLEAN MIGRACIONES",
+					"Documentos/scripts/opc.bolsaempleo/datos_desarrollo/clean_migraciones", ESQUEMA_UVIRTUAL, true);
 	
 			// creación tablas uvirtual
 			UtilsTestBolsaEmpleo.ejecutarMultiplesScripts("UVIRTUAL TABLAS", "Documentos/scripts/opc.bolsaempleo", ESQUEMA_UVIRTUAL, false);
@@ -108,7 +112,14 @@ public final class UtilsTestBolsaEmpleo {
 			BbddRunner.ejecutar("Documentos/scripts/opc.bolsaempleo/migraciones/02-mensajesdestinatarios.sql");
 			BbddRunner.ejecutar("Documentos/scripts/opc.bolsaempleo/migraciones/03-valorsolicitudbolsasmeritos.sql");
 			BbddRunner.ejecutar("Documentos/scripts/opc.bolsaempleo/migraciones/04-resultados.sql");
+			BbddRunner.ejecutar("Documentos/scripts/opc.bolsaempleo/migraciones/05-itemsolicitudbolsasmeritos.sql");
+			BbddRunner.ejecutar("Documentos/scripts/opc.bolsaempleo/migraciones/06-resultadosevaluadores.sql");
+			BbddRunner.ejecutar("Documentos/scripts/opc.bolsaempleo/migraciones/07-prefijomeritospreferentes.sql");
+			BbddRunner.ejecutar("Documentos/scripts/opc.bolsaempleo/migraciones/08-directoresasignarevaluadores.sql");
+			BbddRunner.ejecutar("Documentos/scripts/opc.bolsaempleo/migraciones/09-titulacionesacreditacionesresultados.sql");
+			BbddRunner.ejecutar("Documentos/scripts/opc.bolsaempleo/migraciones/10-pesoapartados.sql");
 			BbddRunner.ejecutar("Documentos/scripts/opc.bolsaempleo/datos_desarrollo/datos_prueba_migraciones/01-im-solicitudbolsasmeritos.sql");
+			BbddRunner.ejecutar("Documentos/scripts/opc.bolsaempleo/datos_desarrollo/datos_prueba_migraciones/02-im-prefijomeritospreferentes.sql");
 		}
 	}
 
@@ -315,11 +326,11 @@ public final class UtilsTestBolsaEmpleo {
 	
 	/** Barema una bolsa .
 	 * @param bolsa .
-	 * @throws UVException .
+	 * @throws IOException .
 	 * @throws SQLException .
 	 * @throws UVException .
 	 */
-	public static void baremarBolsa(Bolsa bolsa) throws SQLException, UVException {
+	public static void baremarBolsa(Bolsa bolsa) throws SQLException, UVException, IOException {
 		ModeloBolsa modeloBolsa = ModeloBolsa.obtenerInstancia();
 		bolsa.setEstado(ModeloBolsa.BOLSA_ESTADO_BLOQUEADA);
 		modeloBolsa.ponerBolsaComoPendienteBaremacion(bolsa, getUsuario("personal1"));

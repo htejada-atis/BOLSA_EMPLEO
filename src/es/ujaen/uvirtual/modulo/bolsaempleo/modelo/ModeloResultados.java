@@ -1,6 +1,7 @@
 package es.ujaen.uvirtual.modulo.bolsaempleo.modelo;
 
-import java.io.InputStream;
+import java.io.IOException;
+import java.sql.Clob;
 import java.sql.Connection;
 import java.sql.Date;
 import java.sql.PreparedStatement;
@@ -11,16 +12,22 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+
 import es.ujaen.uvirtual.modelo.conexion.ConexionUvirtual;
 import es.ujaen.uvirtual.modulo.bolsaempleo.beans.Bolsa;
 import es.ujaen.uvirtual.modulo.bolsaempleo.beans.BolsaResultado;
 import es.ujaen.uvirtual.modulo.bolsaempleo.beans.CandidatoResultadoTable;
 import es.ujaen.uvirtual.modulo.bolsaempleo.beans.Convocatoria;
+import es.ujaen.uvirtual.modulo.bolsaempleo.beans.ItemBaremacion;
 import es.ujaen.uvirtual.modulo.bolsaempleo.beans.MeritoPreferente;
+import es.ujaen.uvirtual.modulo.bolsaempleo.beans.MeritoPreferenteUsuario;
 import es.ujaen.uvirtual.modulo.bolsaempleo.beans.MeritoResultado;
+import es.ujaen.uvirtual.modulo.bolsaempleo.beans.ParametrosConfiguracion;
 import es.ujaen.uvirtual.modulo.bolsaempleo.beans.Solicitud;
+import es.ujaen.uvirtual.modulo.bolsaempleo.beans.TitulacionUsuario;
 import es.ujaen.uvirtual.modulo.bolsaempleo.beans.UsuarioBolsaEmpleo;
-import es.ujaen.uvirtual.modulo.bolsaempleo.informes.GenerarResultadosPDF;
 import es.ujaen.uvirtual.modulo.bolsaempleo.utilidades.BolsaEmpleoDataTable;
 import es.ujaen.uvirtual.modulo.bolsaempleo.utilidades.BolsaEmpleoUtils;
 import es.ujaen.uvirtual.modulo.bolsaempleo.utilidades.BolsaEmpleoDataTable.DataTableColumn;
@@ -32,6 +39,8 @@ import es.ujaen.uvirtual.utilidades.UVException;
  * @author ATISoluciones 2021 
  */
 public class ModeloResultados {
+	private static final String NOMBREDEESTACLASE = ModeloResultados.class.getName();
+	private static final Logger LOGGER = Logger.getLogger(NOMBREDEESTACLASE);
 	
 	public static final int ORDER_COLUMN_INDEX_NIF_CANDIDATOS = 0;
 	public static final int ORDER_COLUMN_INDEX_NOMBRE_CANDIDATOS = 1;
@@ -47,7 +56,7 @@ public class ModeloResultados {
 	public static final String MENSAJE_ERROR_BOLSA_NULL = "Bolsa no puede estar vacía";
 	public static final String MENSAJE_ERROR_MERITO_NULL = "Mérito no puede estar vacío";
 	
-	public static final String ARCHIVO = "ARCHIVO";
+	public static final String ACREDITACIONES_VALIDADAS = "ACREDITACIONES_VALIDADAS";
 	public static final String BEPBOL_CODNUM = "BEPBOL_CODNUM";
 	public static final String BEPITE_CODNUM = "BEPITE_CODNUM";
 	public static final String BEPMER_CODNUM = "BEPMER_CODNUM";
@@ -61,9 +70,11 @@ public class ModeloResultados {
 	public static final String FACTOR = "FACTOR";
 	public static final String FLGEXCLUIDO = "FLGEXCLUIDO";
 	public static final String FLGVALIDADO = "FLGVALIDADO";
+	public static final String ITEM_SBM = "ITEM_SBM";
 	public static final String OBSERVACION = "OBSERVACION";
 	public static final String OBSERVACION_CANDIDATO = "OBSERVACION_CANDIDATO";
 	public static final String RESULTADO = "RESULTADO";
+	public static final String TITULACIONES_VALIDADAS = "TITULACIONES_VALIDADAS";
 	public static final String TOTAL = "TOTAL";
 	public static final String TOTALSINAPLICAR = "TOTALSINAPLICAR";
 	public static final String VALOR = "VALOR";
@@ -99,12 +110,19 @@ public class ModeloResultados {
 	 * @param solicitud .
 	 * @param bolsa .
 	 * @throws SQLException en caso de error de base de datos .
+	 * @throws IOException .
 	 * @throws UVException .
 	 */
-	public void calcularSolicitud(Solicitud solicitud, Bolsa bolsa) throws SQLException, UVException {
+	public void calcularSolicitud(Solicitud solicitud, Bolsa bolsa) throws SQLException, UVException, IOException {
 		Double totalSinAplicar = 0.0;
 		
-		HashMap<String, Map.Entry<MeritoPreferente, Double>> preferentes = calcularMeritosPreferentes(solicitud, bolsa);
+		LOGGER.log(Level.FINER, String.format("CALCULANDO SOLICITUD [%d] [%d]", solicitud.getCodNum(), solicitud.getUsuario().getCodNum()));
+				
+		List<TitulacionUsuario> listaTitulaciones = ModeloTitulacion.obtenerInstancia().listaTitulacionesPreferentesAlArea(solicitud.getUsuario(), bolsa);
+		List<MeritoPreferenteUsuario> listaAcreditaciones = ModeloMeritosPreferentesCandidato.obtenerInstancia().
+				listaMeritosPreferentesValidadosUsuarioPorPosesion(solicitud.getUsuario());
+		
+		HashMap<String, Map.Entry<MeritoPreferente, Double>> preferentes = calcularMeritosPreferentes(solicitud, bolsa, listaTitulaciones);
 		
 		List<MeritoResultado> meritos = this.getMeritosSolicitudBolsaValidados(solicitud, bolsa);
 		for (MeritoResultado merito: meritos) {
@@ -126,14 +144,14 @@ public class ModeloResultados {
 			}
 		}
 		
-		BolsaResultado bol = new BolsaResultado(bolsa, desgloseTotal, desgloseDescripcion, total, totalSinAplicar);
+		BolsaResultado bol = new BolsaResultado(bolsa, desgloseTotal, desgloseDescripcion, BolsaEmpleoUtils.formatoPuntuacion(total),
+				BolsaEmpleoUtils.formatoPuntuacion(totalSinAplicar));
 		bol.setListaMeritos(this.getMeritosSolicitudBolsaValidados(solicitud, bolsa));
 		bol.setListaMeritosExcluidos(this.getMeritosSolicitudBolsaExcluidos(solicitud, bolsa));
 		bol.setListaMeritosNoEvaluados(this.getMeritosSolicitudBolsaNoEvaluados(solicitud, bolsa));
 		
 		Date fechaActual = new Date(BolsaEmpleoUtils.getCurrentDateTime().getTime());
-		InputStream archivoResultados = GenerarResultadosPDF.generarPDF(solicitud, bol, fechaActual);
-		guardarResultadoSolicitudBolsa(bol, solicitud, archivoResultados, null, fechaActual);
+		guardarResultadoSolicitudBolsa(bol, solicitud, null, fechaActual, listaTitulaciones, listaAcreditaciones);
 	}
 	
 	/** Calculo total de un mérito en una solicitud para un área .
@@ -147,13 +165,15 @@ public class ModeloResultados {
 		Double puntuacion = 0.0;
 		String desglose = "";
 		
-		boolean tieneAfinidad = merito.getItemBaremacion().getAfinidad() != null;
+		ItemBaremacion item = merito.getItemMeritoSolicitud() != null ? merito.getItemMeritoSolicitud() : merito.getItemBaremacion();
 		
-		Double pesoCategoria = merito.getItemBaremacion().getValor();
-		Double pesoBloque = merito.getItemBaremacion().getBloqueBaremacion().getApartadoBaremacion().getPorcentajeMaximo();
+		boolean tieneAfinidad = item.getAfinidad() != null;
 		
-		if (!merito.getItemBaremacion().getIndividualizado() && tieneAfinidad) {
-			desglose = "(I) (";
+		Double pesoCategoria = item.getValor();
+		Double pesoBloque = item.getBloqueBaremacion().getApartadoBaremacion().getPorcentajeMaximo();
+		
+		if (!item.getIndividualizado() && tieneAfinidad) {
+			desglose = "(D) (";
 			for (int i = 0; i < merito.getValoraciones().size(); i++) {
 				Double valor = merito.getValoraciones().get(i).getValor();
 				Double afinidad = merito.getValoraciones().get(i).getAfinidad().getModulacion();
@@ -164,7 +184,9 @@ public class ModeloResultados {
 			desglose += ")" + " * " + pesoCategoria + " * " + pesoBloque;
 			puntuacion *= pesoCategoria * pesoBloque;
 		} else {
-			Double valor = tieneAfinidad ? merito.getValor() : merito.getValorMeritoSolicitud();
+			this.checkValoracionesCorrectas(merito, tieneAfinidad);
+			
+			Double valor = merito.getValorMeritoSolicitud() != null && merito.getValorMeritoSolicitud() != 0 ? merito.getValorMeritoSolicitud() : merito.getValor();
 			Double afinidad = tieneAfinidad ? merito.getValoraciones().get(0).getAfinidad().getModulacion() : 1.0;
 			
 			desglose = BolsaEmpleoUtils.formatoPuntuacion(valor) + " * " + afinidad + " * " + pesoCategoria + " * " + pesoBloque;
@@ -174,26 +196,28 @@ public class ModeloResultados {
 		if (preferente != null) {
 			switch (preferente.getKey().getAplicable()) {
 				case ModeloMeritosPreferentes.APLICABLE_APARTADO:
-					if (merito.getItemBaremacion().getBloqueBaremacion().getApartadoBaremacion().getCodNum().equals(
+					if (item.getBloqueBaremacion().getApartadoBaremacion().getCodNum().equals(
 							preferente.getKey().getAplicableApartadoBaremacion().getCodNum())) {
-						desglose = "(B) " + desglose + " * " + preferente.getValue();
+						desglose = desglose + " * (" + preferente.getKey().getPrefijoInforme() + ") " + preferente.getValue();
 						puntuacion *= preferente.getValue();
 					}
 					break;
 				case ModeloMeritosPreferentes.APLICABLE_BLOQUE:
-					if (merito.getItemBaremacion().getBloqueBaremacion().getCodNum().equals(
+					if (item.getBloqueBaremacion().getCodNum().equals(
 							preferente.getKey().getAplicableBloqueBaremacion().getCodNum())) {
-						desglose = "(B) " + desglose + " * " + preferente.getValue();
+						desglose = desglose + " * (" + preferente.getKey().getPrefijoInforme() + ") " + preferente.getValue();
 						puntuacion *= preferente.getValue();
 					}
 					break;
 				case ModeloMeritosPreferentes.APLICABLE_ITEM:
-					if (merito.getItemBaremacion().getCodNum().equals(
+					if (item.getCodNum().equals(
 							preferente.getKey().getAplicableItemBaremacion().getCodNum())) {
-						desglose = "(B) " + desglose + " * " + preferente.getValue();
+						desglose = desglose + " * (" + preferente.getKey().getPrefijoInforme() + ") " + preferente.getValue();
 						puntuacion *= preferente.getValue();
 					}
 					break;
+				default:
+					throw new UVException("Campo aplicable no contemplado " + preferente.getKey().getAplicable());
 			}
 		}
 		
@@ -205,14 +229,56 @@ public class ModeloResultados {
 		return puntuacion;
 	}
 	
+	/**
+	 * Comprueba si el mérito en la solicitud tiene valoraciones. Aplicable a mérito individualizados con afinidad.
+	 * @param merito .
+	 * @param tieneAfinidad .
+	 * @throws SQLException .
+	 * @throws UVException .
+	 */
+	private void checkValoracionesCorrectas(MeritoResultado merito, boolean tieneAfinidad) throws SQLException, UVException {
+		if (tieneAfinidad && merito.getValoraciones().isEmpty()) {
+			Bolsa bolsa = null;
+			
+			String sql = ""
+					+ " SELECT bepsbo.BEPBOL_CODNUM "
+					+ " FROM TBEP_SOL_BOL_MERITOS bepsbm "
+					+ " INNER JOIN TBEP_SOLICITUD_BOLSAS bepsbo ON bepsbo.CODNUM = bepsbm.BEPSBO_CODNUM "
+					+ " WHERE bepsbm.CODNUM = ? ";
+			
+			try (Connection conexion = ConexionUvirtual.obtenerInstancia(); PreparedStatement stmt = conexion.prepareStatement(sql)) {
+				stmt.setInt(1, merito.getCodNumMeritoSolicitud());
+				try (ResultSet rs = stmt.executeQuery()) {
+					if (!rs.next()) {
+						throw new UVException("Solicitud bolsa mérito no encontrada " + merito.getCodNumMeritoSolicitud());
+					}
+					
+					bolsa = ModeloBolsa.obtenerInstancia().getBolsaById(rs.getInt("BEPBOL_CODNUM"));						
+				}
+			}
+			
+			String err = String.format("Mérito sin valoraciones. Bolsa: [%s] Usuario: [%d - %s - %s] Mérito: [%d]",
+					bolsa.getArea().getDescripcion(),
+					merito.getUsuario().getCodNum(),
+					merito.getUsuario().getPrsNif(),
+					merito.getUsuario().getNombre() + " " + merito.getUsuario().getPrimerApellido() + merito.getUsuario().getSegundoApellido(),   
+					merito.getCodNum()
+			);
+			LOGGER.log(Level.FINER, err);
+			throw new UVException(err);
+		}
+	}
+	
 	/** Calculo de factores de méritos preferentes .
 	 * @param solicitud .
 	 * @param bolsa .
+	 * @param listaTitulaciones .
 	 * @return colección de factores a aplicar con el tipo y el factor .
 	 * @throws SQLException en caso de error de base de datos .
 	 * @throws UVException .
 	 */
-	private HashMap<String, Map.Entry<MeritoPreferente, Double>> calcularMeritosPreferentes(Solicitud solicitud, Bolsa bolsa) throws SQLException, UVException {
+	private HashMap<String, Map.Entry<MeritoPreferente, Double>> calcularMeritosPreferentes(Solicitud solicitud, Bolsa bolsa,
+			List<TitulacionUsuario> listaTitulaciones) throws SQLException, UVException {
 		HashMap<String, Map.Entry<MeritoPreferente, Double>> preferentes = new HashMap<>();
 		
 		List<MeritoPreferente> meritosPreferentes = ModeloMeritosPreferentes.obtenerInstancia().listaMeritosPreferentesActivos();
@@ -222,7 +288,7 @@ public class ModeloResultados {
 			
 			switch (preferente.getTipo()) {
 				case ModeloMeritosPreferentes.TIPO_TITULACION_PREFERENTE:
-					if (compruebaTitulacionesPreferentesAlArea(solicitud.getUsuario(), bolsa)) {
+					if (listaTitulaciones.size() > 0) {
 						factor = preferente.getFactor();
 					}
 					break;
@@ -344,21 +410,9 @@ public class ModeloResultados {
 	public List<MeritoResultado> getMeritosSolicitudBolsaValidados(Solicitud solicitud, Bolsa bolsa) throws SQLException, UVException {
 		List<MeritoResultado> meritos = new ArrayList<>();
 		
-		String consulta = ""
-				+ "	SELECT bepmer.CODNUM, bepmer.BEPITE_CODNUM, bepmer.VALOR, bepmer.DESCRIPCION, bepmer.OBSERVACION"
-				+ "		, bepsbm.CODNUM AS " + CODNUM_MERITO_SOLICITUD + ", bepsbm.VALOR AS " + VALOR_MERITO_SOLICITUD
-				+ "		, bepsbm.OBSERVACION_CANDIDATO, bepsbm.RESULTADO, bepsbm.DESGLOSE, bepsbm.FLGEXCLUIDO, bepsbm.FLGVALIDADO"
-				+ " FROM TBEP_SOL_BOL_MERITOS bepsbm"
-				+ "	INNER JOIN TBEP_SOLICITUD_BOLSAS bepsbo ON bepsbo.CODNUM  = bepsbm.BEPSBO_CODNUM"
-				+ " INNER JOIN TBEP_MERITOS bepmer ON bepmer.CODNUM = bepsbm.BEPMER_CODNUM"
-				+ " INNER JOIN TBEP_ITEMSBAREMACION bepite ON bepite.CODNUM = bepmer.BEPITE_CODNUM"
-				+ " INNER JOIN TBEP_BLOQUESBAREMACION bepblo ON bepblo.CODNUM = bepite.BEPBLO_CODNUM"
-				+ " INNER JOIN TBEP_APARTADOSBAREMACION bepapa ON bepapa.CODNUM  = bepblo.BEPAPA_CODNUM"
-				+ "	WHERE "
-				+ "			bepsbo.BEPBOL_CODNUM = ?"
-				+ "		AND bepsbo.BEPSOL_CODNUM = ?"
-				+ "		AND bepsbm.FLGVALIDADO = 'S'"
-				+ "		AND bepsbm.FLGEXCLUIDO = 'N'";
+		String consulta = this.getMeritosSolicitudBolsaQueryBase(solicitud, bolsa)
+				+ " AND bepsbm.FLGVALIDADO = 'S'"
+				+ " AND bepsbm.FLGEXCLUIDO = 'N'";
 		
 		try (Connection conexion = ConexionUvirtual.obtenerInstancia(); PreparedStatement stmt = conexion.prepareStatement(consulta)) {
 			int indexParam = 1;
@@ -385,21 +439,9 @@ public class ModeloResultados {
 	public List<MeritoResultado> getMeritosSolicitudBolsaExcluidos(Solicitud solicitud, Bolsa bolsa) throws SQLException, UVException {
 		List<MeritoResultado> meritos = new ArrayList<>();
 		
-		String consulta = ""
-				+ "	SELECT bepmer.CODNUM, bepmer.BEPITE_CODNUM, bepmer.VALOR, bepmer.DESCRIPCION, bepmer.OBSERVACION"
-				+ "		, bepsbm.CODNUM AS " + CODNUM_MERITO_SOLICITUD + ", bepsbm.VALOR AS " + VALOR_MERITO_SOLICITUD
-				+ "		, bepsbm.OBSERVACION_CANDIDATO, bepsbm.RESULTADO, bepsbm.DESGLOSE, bepsbm.FLGEXCLUIDO, bepsbm.FLGVALIDADO"
-				+ " FROM TBEP_SOL_BOL_MERITOS bepsbm"
-				+ "	INNER JOIN TBEP_SOLICITUD_BOLSAS bepsbo ON bepsbo.CODNUM  = bepsbm.BEPSBO_CODNUM"
-				+ " INNER JOIN TBEP_MERITOS bepmer ON bepmer.CODNUM = bepsbm.BEPMER_CODNUM"
-				+ " INNER JOIN TBEP_ITEMSBAREMACION bepite ON bepite.CODNUM = bepmer.BEPITE_CODNUM"
-				+ " INNER JOIN TBEP_BLOQUESBAREMACION bepblo ON bepblo.CODNUM = bepite.BEPBLO_CODNUM"
-				+ " INNER JOIN TBEP_APARTADOSBAREMACION bepapa ON bepapa.CODNUM  = bepblo.BEPAPA_CODNUM"
-				+ "	WHERE "
-				+ "			bepsbo.BEPBOL_CODNUM = ?"
-				+ "		AND bepsbo.BEPSOL_CODNUM = ?"
-				+ "		AND bepsbm.FLGVALIDADO = 'N'"
-				+ "		AND bepsbm.FLGEXCLUIDO = 'S'";
+		String consulta = this.getMeritosSolicitudBolsaQueryBase(solicitud, bolsa)
+				+ " AND bepsbm.FLGVALIDADO = 'N'"
+				+ " AND bepsbm.FLGEXCLUIDO = 'S'";
 		
 		try (Connection conexion = ConexionUvirtual.obtenerInstancia(); PreparedStatement stmt = conexion.prepareStatement(consulta)) {
 			int indexParam = 1;
@@ -426,21 +468,9 @@ public class ModeloResultados {
 	public List<MeritoResultado> getMeritosSolicitudBolsaNoEvaluados(Solicitud solicitud, Bolsa bolsa) throws SQLException, UVException {
 		List<MeritoResultado> meritos = new ArrayList<>();
 		
-		String consulta = ""
-				+ "	SELECT bepmer.CODNUM, bepmer.BEPITE_CODNUM, bepmer.VALOR, bepmer.DESCRIPCION, bepmer.OBSERVACION"
-				+ "		, bepsbm.CODNUM AS " + CODNUM_MERITO_SOLICITUD + ", bepsbm.VALOR AS " + VALOR_MERITO_SOLICITUD
-				+ "		, bepsbm.OBSERVACION_CANDIDATO, bepsbm.RESULTADO, bepsbm.DESGLOSE, bepsbm.FLGEXCLUIDO, bepsbm.FLGVALIDADO"
-				+ " FROM TBEP_SOL_BOL_MERITOS bepsbm"
-				+ "	INNER JOIN TBEP_SOLICITUD_BOLSAS bepsbo ON bepsbo.CODNUM  = bepsbm.BEPSBO_CODNUM"
-				+ " INNER JOIN TBEP_MERITOS bepmer ON bepmer.CODNUM = bepsbm.BEPMER_CODNUM"
-				+ " INNER JOIN TBEP_ITEMSBAREMACION bepite ON bepite.CODNUM = bepmer.BEPITE_CODNUM"
-				+ " INNER JOIN TBEP_BLOQUESBAREMACION bepblo ON bepblo.CODNUM = bepite.BEPBLO_CODNUM"
-				+ " INNER JOIN TBEP_APARTADOSBAREMACION bepapa ON bepapa.CODNUM  = bepblo.BEPAPA_CODNUM"
-				+ "	WHERE "
-				+ "			bepsbo.BEPBOL_CODNUM = ?"
-				+ "		AND bepsbo.BEPSOL_CODNUM = ?"
-				+ "		AND bepsbm.FLGVALIDADO = 'N'"
-				+ "		AND bepsbm.FLGEXCLUIDO = 'N'";
+		String consulta = this.getMeritosSolicitudBolsaQueryBase(solicitud, bolsa)
+				+ " AND bepsbm.FLGVALIDADO = 'N'"
+				+ "AND bepsbm.FLGEXCLUIDO = 'N'";
 		
 		try (Connection conexion = ConexionUvirtual.obtenerInstancia(); PreparedStatement stmt = conexion.prepareStatement(consulta)) {
 			int indexParam = 1;
@@ -457,19 +487,52 @@ public class ModeloResultados {
 		return meritos;
 	}
 	
+	/**
+	 * Devuelve al consutla base para .
+	 * 	- getMeritosSolicitudBolsaValidados
+	 *  - getMeritosSolicitudBolsaExcluidos
+	 *  - getMeritosSolicitudBolsaNoEvaluados
+	 *  
+	 * @param solicitud .
+	 * @param bolsa .
+	 * @return .
+	 * @throws SQLException .
+	 * @throws UVException .
+	 */
+	private String getMeritosSolicitudBolsaQueryBase(Solicitud solicitud, Bolsa bolsa) throws SQLException, UVException {
+		return ""
+				+ "	SELECT bepmer.CODNUM, bepmer.BEPITE_CODNUM AS BEPITE_CODNUM, bepmer.VALOR, bepmer.DESCRIPCION, bepmer.OBSERVACION"
+				+ "		, bepsbm.CODNUM AS " + CODNUM_MERITO_SOLICITUD + ", bepsbm.VALOR AS " + VALOR_MERITO_SOLICITUD
+				+ "		, bepsbm.OBSERVACION_CANDIDATO, bepsbm.RESULTADO, bepsbm.DESGLOSE, bepsbm.FLGEXCLUIDO, bepsbm.FLGVALIDADO"
+				+ "		, bepsbm.BEPITE_CODNUM AS ITEM_SBM"
+				+ "     , bepsol.BEPUSU_CODNUM AS USUARIO_CODNUM"
+				+ " FROM TBEP_SOL_BOL_MERITOS bepsbm"
+				+ "	INNER JOIN TBEP_SOLICITUD_BOLSAS bepsbo ON bepsbo.CODNUM  = bepsbm.BEPSBO_CODNUM"
+				+ " INNER JOIN TBEP_SOLICITUDES bepsol ON bepsol.CODNUM = bepsbo.BEPSOL_CODNUM"
+				+ " INNER JOIN TBEP_MERITOS bepmer ON bepmer.CODNUM = bepsbm.BEPMER_CODNUM"
+				+ " INNER JOIN TBEP_ITEMSBAREMACION bepite ON bepite.CODNUM = bepmer.BEPITE_CODNUM"
+				+ " INNER JOIN TBEP_BLOQUESBAREMACION bepblo ON bepblo.CODNUM = bepite.BEPBLO_CODNUM"
+				+ " INNER JOIN TBEP_APARTADOSBAREMACION bepapa ON bepapa.CODNUM  = bepblo.BEPAPA_CODNUM"				
+				+ "	WHERE "
+				+ "			bepsbo.BEPBOL_CODNUM = ?"
+				+ "		AND bepsbo.BEPSOL_CODNUM = ?";
+	}
+	
 	/** 
 	 * Devuelve la bolsa con los resultados de la solicitud de un candidato para esa bolsa .
 	 * @param bolsa .
 	 * @param candidato .
 	 * @param convocatoria .
 	 * @return resultado .
+	 * @throws IOException .
 	 * @throws SQLException .
 	 * @throws UVException .
 	 */
-	public BolsaResultado getBolsaResultado(Bolsa bolsa, UsuarioBolsaEmpleo candidato, Convocatoria convocatoria) throws SQLException, UVException {
+	public BolsaResultado getBolsaResultado(Bolsa bolsa, UsuarioBolsaEmpleo candidato, Convocatoria convocatoria) throws SQLException, UVException, IOException {
 		
 		String consulta = "SELECT bepsob.BEPBOL_CODNUM, bepsob.TOTAL, bepsob.TOTALSINAPLICAR, bepsob.DESGLOSETOTAL, "
-				+ "		bepsob.DESGLOSEDESCRIPCION, bepsob.ARCHIVO, bepsob.FECHABAREMACION, bepsol.CODNUM AS BEPSOL_CODNUM"
+				+ "		bepsob.DESGLOSEDESCRIPCION, bepsob.FECHABAREMACION, bepsol.CODNUM AS BEPSOL_CODNUM,"
+				+ "		bepsob.ACREDITACIONES_VALIDADAS, bepsob.TITULACIONES_VALIDADAS"
 				+ " FROM TBEP_SOLICITUD_BOLSAS bepsob"
 				+ "	INNER JOIN TBEP_SOLICITUDES bepsol ON bepsol.CODNUM = bepsob.BEPSOL_CODNUM"
 				+ "	WHERE 	bepsol.BEPCON_CODNUM = ?"
@@ -492,35 +555,6 @@ public class ModeloResultados {
 				}
 				
 				return this.createBolsaResultadoFromResultset(rs);
-			}
-		}
-	}
-	
-	/** Comprueba si el candidato tiene alguna titulación validada para el área .
-	 * @param bolsa .
-	 * @param candidato .
-	 * @return si tiene titulaciones o no .
-	 * @throws SQLException .
-	 * @throws UVException .
-	 */
-	public boolean compruebaTitulacionesPreferentesAlArea(UsuarioBolsaEmpleo candidato, Bolsa bolsa) throws SQLException {
-		String consulta = "SELECT *"
-				+ " FROM TBEP_TIT_PREFERENTES_AREA beptpa"
-				+ "	INNER JOIN TBEP_TITULACIONES beptit ON beptit.CODNUM = beptpa.BEPTIT_CODNUM"
-				+ "	INNER JOIN TBEP_TITULACIONES_USUARIO beptus ON beptus.BEPTUS_TIT_CODNUM = beptit.CODNUM"
-				+ "	WHERE 	beptus.BEPTUS_USU_CODNUM = ?"
-				+ "		AND beptpa.BEPARE_CODNUM = ?"
-				+ "		AND beptus.FLGVALIDADA = 'S'"
-				+ "		AND beptus.FLGBORRADO = 'N'";
-		
-		try (Connection conexion = ConexionUvirtual.obtenerInstancia();
-				PreparedStatement stmt = conexion.prepareStatement(consulta)) {
-			int indexParam = 1;
-			stmt.setInt(indexParam++, candidato.getCodNum());
-			stmt.setInt(indexParam++, bolsa.getArea().getCodNum());
-			
-			try (ResultSet rs = stmt.executeQuery()) {
-				return rs.next();
 			}
 		}
 	}
@@ -566,7 +600,11 @@ public class ModeloResultados {
 				+ "	INNER JOIN TBEP_SOLICITUD_BOLSAS bepsob ON bepsob.BEPSOL_CODNUM = bepsol.CODNUM"
 				+ "	INNER JOIN TBEP_SOL_BOL_MERITOS bepsbm ON bepsbm.BEPSBO_CODNUM = bepsob.CODNUM"
 				+ "	INNER JOIN TBEP_MERITOS bepmer ON bepmer.CODNUM = bepsbm.BEPMER_CODNUM"
-				+ "	WHERE bepsol.BEPUSU_CODNUM = ? AND bepmer.BEPITE_CODNUM = ? AND bepmer.VALOR >= ? AND bepsbm.FLGVALIDADO = 'S' AND bepsbm.FLGEXCLUIDO = 'N'"
+				+ "	WHERE 	bepsol.BEPUSU_CODNUM = ?"
+				+ "		AND bepmer.BEPITE_CODNUM = ? "
+				+ "		AND (CASE WHEN bepsbm.VALOR IS NOT NULL THEN bepsbm.VALOR ELSE bepmer.VALOR END) >= ? "
+				+ "		AND bepsbm.FLGVALIDADO = 'S' "
+				+ "		AND bepsbm.FLGEXCLUIDO = 'N'"
 				+ "		AND bepsob.BEPBOL_CODNUM = ?";
 		
 		try (Connection conexion = ConexionUvirtual.obtenerInstancia(); PreparedStatement stmt = conexion.prepareStatement(consulta)) {
@@ -585,14 +623,13 @@ public class ModeloResultados {
 	/** Guardar resultado de la solicitud para una bolsa .
 	 * @param bolsa .
 	 * @param solicitud .
-	 * @param archivo .
 	 * @param usuarioUpdate .
 	 * @param fechaActual .
 	 * @throws UVException .
 	 * @throws SQLException .
 	 */
-	public void guardarResultadoSolicitudBolsa(BolsaResultado bolsa, Solicitud solicitud, InputStream archivo,
-			UsuarioBolsaEmpleo usuarioUpdate, Date fechaActual) throws SQLException, UVException {
+	public void guardarResultadoSolicitudBolsa(BolsaResultado bolsa, Solicitud solicitud, UsuarioBolsaEmpleo usuarioUpdate, Date fechaActual,
+			List<TitulacionUsuario> listaTitulaciones, List<MeritoPreferenteUsuario> listaAcreditaciones) throws SQLException, UVException {
 		if (bolsa == null) {
 			throw new UVException(MENSAJE_ERROR_BOLSA_NULL);
 		}
@@ -600,8 +637,9 @@ public class ModeloResultados {
 		String usuarioUp = usuarioUpdate != null ? usuarioUpdate.getCodCuenta() : "TAREA_PROGRAMADA";
 		
 		String query = "UPDATE TBEP_SOLICITUD_BOLSAS"
-				+ "	SET TOTAL = ?, TOTALSINAPLICAR = ?, DESGLOSETOTAL = ?, DESGLOSEDESCRIPCION = ?,"
-				+ " ARCHIVO = ?, FECHABAREMACION = ?, UID_USUARIO = ? WHERE BEPBOL_CODNUM = ? AND BEPSOL_CODNUM = ?";
+				+ "     SET TOTAL = ?, TOTALSINAPLICAR = ?, DESGLOSETOTAL = ?, DESGLOSEDESCRIPCION = ?,"
+				+ "     FECHABAREMACION = ?, UID_USUARIO = ?, TITULACIONES_VALIDADAS = ?, ACREDITACIONES_VALIDADAS = ?"
+				+ " WHERE BEPBOL_CODNUM = ? AND BEPSOL_CODNUM = ?";
 		
 		try (Connection conexion = ConexionUvirtual.obtenerInstancia();
 				PreparedStatement stmt = conexion.prepareStatement(query)) {
@@ -610,9 +648,29 @@ public class ModeloResultados {
 			stmt.setDouble(indexParam++, bolsa.getTotalSinAplicar());
 			stmt.setString(indexParam++, bolsa.getDesgloseTotal());
 			stmt.setString(indexParam++, bolsa.getDesgloseDescripcion());
-			stmt.setBlob(indexParam++, archivo);
 			stmt.setDate(indexParam++, fechaActual);
 			stmt.setString(indexParam++, usuarioUp);
+			
+			Clob clobTitulaciones = conexion.createClob();
+			String titulaciones = "";
+			for (TitulacionUsuario titulacion: listaTitulaciones) {
+				titulaciones += titulacion.getCodNum() + " (Id) - " 
+					+ (titulacion.getTitulacion() != null ? titulacion.getTitulacion().getNombre() : "Otra titulación: " + titulacion.getOtraTitulacion()) + "\n";
+			}
+			clobTitulaciones.setString(1, titulaciones);
+			stmt.setClob(indexParam++, clobTitulaciones);
+			
+			Clob clobAcreditaciones = conexion.createClob();
+			ParametrosConfiguracion config = ModeloParametrosConfiguracion.obtenerInstancia().getParametroByNombre("bolsaempleo.local.codMeritoPreferente");
+			String acreditaciones = "";
+			for (MeritoPreferenteUsuario acreditacion: listaAcreditaciones) {
+				acreditaciones += acreditacion.getCodNum() + " (Id) - " + config.getValor() 
+					+ "." + acreditacion.getMeritoPreferente().getCodigo() + " " + acreditacion.getMeritoPreferente().getNombre() + " " 
+					+ (acreditacion.getMeritoPreferenteOpcion() != null ? acreditacion.getMeritoPreferenteOpcion().getNombre() : "") + "\n";
+			}
+			clobAcreditaciones.setString(1, acreditaciones);
+			stmt.setClob(indexParam++, clobAcreditaciones);
+			
 			stmt.setInt(indexParam++, bolsa.getCodNum());
 			stmt.setInt(indexParam++, solicitud.getCodNum());
 			stmt.executeUpdate();
@@ -674,6 +732,10 @@ public class ModeloResultados {
 		merito.setResultado(rs.getDouble(RESULTADO));
 		merito.setExcluido(rs.getString(FLGEXCLUIDO).equals(MERITO_EXCLUIDO));
 		merito.setValidado(rs.getString(FLGVALIDADO).equals(MERITO_VALIDADO));
+		merito.setItemMeritoSolicitud(rs.getInt(ITEM_SBM) != 0 ? ModeloBaremacionItems.obtenerInstancia().getItemBaremacionById(rs.getInt(ITEM_SBM)) : null);
+		
+		// usuario del mérito
+		merito.setUsuario(ModeloUsuarioBolsaEmpleo.obtenerInstancia().getUsuarioById(rs.getInt("USUARIO_CODNUM")));
 		
 		return merito;
 	}
@@ -681,21 +743,25 @@ public class ModeloResultados {
 	/** Crea una bolsa resultado a partir de un resultset .
 	 * @param rs .
 	 * @return .
+	 * @throws IOException .
 	 * @throws SQLException .
 	 * @throws UVException .
 	 */
-	public BolsaResultado createBolsaResultadoFromResultset(ResultSet rs) throws SQLException, UVException {
+	public BolsaResultado createBolsaResultadoFromResultset(ResultSet rs) throws SQLException, UVException, IOException {
 		Bolsa bol = ModeloBolsa.obtenerInstancia().getBolsaById(rs.getInt(BEPBOL_CODNUM));
 		String desgloseTotal = rs.getString(DESGLOSETOTAL);
 		String desgloseDescripcion = rs.getString(DESGLOSEDESCRIPCION);
 		Double total = rs.getDouble(TOTAL);
 		Double totalSinAplicar = rs.getDouble(TOTALSINAPLICAR);
 		Solicitud solicitud = ModeloSolicitud.obtenerInstancia().getSolicitudById(rs.getInt(BEPSOL_CODNUM));
-		InputStream archivo = rs.getBlob(ARCHIVO) != null ? rs.getBlob(ARCHIVO).getBinaryStream() : null;
 		List<MeritoResultado> meritos = this.getMeritosSolicitudBolsaValidados(solicitud, bol);
 		List<MeritoResultado> meritosExcluidos = this.getMeritosSolicitudBolsaExcluidos(solicitud, bol);
 		List<MeritoResultado> meritosEvaluados = this.getMeritosSolicitudBolsaNoEvaluados(solicitud, bol);
+		Clob acreditaciones = rs.getClob(ACREDITACIONES_VALIDADAS);
+		Clob titulaciones = rs.getClob(TITULACIONES_VALIDADAS);
 		
-		return new BolsaResultado(bol, desgloseTotal, desgloseDescripcion, total, totalSinAplicar, meritos, meritosExcluidos, meritosEvaluados, archivo);
+		return new BolsaResultado(bol, desgloseTotal, desgloseDescripcion, total, totalSinAplicar, meritos, meritosExcluidos, 
+				meritosEvaluados, acreditaciones, titulaciones);
 	}
+	
 }

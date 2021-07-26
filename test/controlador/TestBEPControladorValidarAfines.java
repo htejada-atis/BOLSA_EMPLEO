@@ -16,6 +16,7 @@ import controlador.implementacion.PeticionHttp;
 import controlador.implementacion.RespuestaHttp;
 import es.ujaen.uvirtual.modulo.bolsaempleo.beans.ItemBaremacion;
 import es.ujaen.uvirtual.modulo.bolsaempleo.controlador.ControladorValidar;
+import es.ujaen.uvirtual.modulo.bolsaempleo.controlador.ControladorValidarNoAfines;
 import es.ujaen.uvirtual.modulo.bolsaempleo.modelo.ModeloBaremacionItems;
 import es.ujaen.uvirtual.modulo.bolsaempleo.utilidades.BolsaEmpleoDataTable;
 import es.ujaen.uvirtual.modulo.bolsaempleo.vistas.VistaValidar;
@@ -98,7 +99,7 @@ public class TestBEPControladorValidarAfines {
 		return (VistaValidar) peticion.getUVDatos().getVistas().get(VistaValidar.class.getName());
 	}
     
-    /** Obtener áreas, sin parametro definido .
+	/** Obtener áreas, sin parametro definido .
 	 * @throws IOException si error io .
 	 */
 	@Test
@@ -231,7 +232,6 @@ public class TestBEPControladorValidarAfines {
 		
 		PeticionHttp peticion = UtilsTestBolsaEmpleo.peticionAutenticadaPersonal();
 		peticion.setParameter(ControladorValidar.PARAM_ACCION, ControladorValidar.ACCION_MODIFICAR_MERITO);
-		peticion.setParameter(ControladorValidar.PARAM_GUARDAR_MERITO, "");
 		peticion.setParameter(ControladorValidar.PARAM_ITEM, bean.getDatatableMeritos().getData().get(0).getItemBaremacion().getCodNum().toString());
 		peticion.setParameter(ControladorValidar.PARAM_VALOR, VALOR);
 		peticion.setParameter(ControladorValidar.PARAM_BOLSA, bean.getBolsa().getCodNum().toString());
@@ -263,7 +263,8 @@ public class TestBEPControladorValidarAfines {
 		
 		PeticionHttp peticion = UtilsTestBolsaEmpleo.peticionAutenticadaPersonal();
 		peticion.setParameter(ControladorValidar.PARAM_ACCION, ControladorValidar.ACCION_MODIFICAR_MERITO);
-		peticion.setParameter(ControladorValidar.PARAM_GUARDAR_MERITO, "");
+		peticion.setParameter(ControladorValidarNoAfines.PARAM_BOLSAS,
+				"[" + bean.getBolsa().getCodNum().toString() + "]");
 		peticion.setParameter(ControladorValidar.PARAM_ITEM, item.getCodNum().toString());
 		peticion.setParameter(ControladorValidar.PARAM_VALOR, VALOR);
 		peticion.setParameter(ControladorValidar.PARAM_BOLSA, bean.getBolsa().getCodNum().toString());
@@ -295,7 +296,8 @@ public class TestBEPControladorValidarAfines {
 		
 		PeticionHttp peticion = UtilsTestBolsaEmpleo.peticionAutenticadaPersonal();
 		peticion.setParameter(ControladorValidar.PARAM_ACCION, ControladorValidar.ACCION_MODIFICAR_MERITO);
-		peticion.setParameter(ControladorValidar.PARAM_GUARDAR_MERITO, "");
+		peticion.setParameter(ControladorValidarNoAfines.PARAM_BOLSAS,
+				"[" + bean.getBolsa().getCodNum().toString() + "]");
 		peticion.setParameter(ControladorValidar.PARAM_ITEM, item.getCodNum().toString());
 		peticion.setParameter(ControladorValidar.PARAM_VALOR, VALOR);
 		peticion.setParameter(ControladorValidar.PARAM_BOLSA, bean.getBolsa().getCodNum().toString());
@@ -308,7 +310,6 @@ public class TestBEPControladorValidarAfines {
 		
 		VistaValidar bean2 = (VistaValidar) peticion.getUVDatos().getVistas().get(VistaValidar.class.getName());
 		
-		assertEquals(MENSAJE_CON_EXITO_ESPERADO, ControladorValidar.MENSAJE_EXITO_MERITO_MODIFICAR, bean2.getMensajesDeExito().get(0));
 		assertEquals(MENSAJE_SIN_ERROR, 0, bean2.getMensajesDeError().size());
 		assertEquals(MENSAJE_SIN_ADVERTENCIAS, 0, bean2.getMensajesDeAdvertencia().size());
 	}
@@ -358,7 +359,8 @@ public class TestBEPControladorValidarAfines {
 		
 		PeticionHttp peticion = UtilsTestBolsaEmpleo.peticionAutenticadaPersonal();
 		peticion.setParameter(ControladorValidar.PARAM_ACCION, ControladorValidar.ACCION_MODIFICAR_MERITO);
-		peticion.setParameter(ControladorValidar.PARAM_GUARDAR_MERITO, "");
+		peticion.setParameter(ControladorValidarNoAfines.PARAM_BOLSAS,
+				"[" + bean.getBolsa().getCodNum().toString() + "]");
 		peticion.setParameter(ControladorValidar.PARAM_ITEM, item.getCodNum().toString());
 		peticion.setParameter(ControladorValidar.PARAM_VALOR, VALOR);
 		peticion.setParameter(ControladorValidar.PARAM_BOLSA, bean.getBolsa().getCodNum().toString());
@@ -541,7 +543,7 @@ public class TestBEPControladorValidarAfines {
 	 * @throws IOException si error io .
 	 */
 	@Test
-	public void testE05ObtenerMeritosParametroNoValido() throws IOException {
+	public void testE05ObtenerHistorialMeritoParametroNoValido() throws IOException {
 		VistaValidar bean = obtenerMeritos();
 		
 		PeticionHttp peticion = UtilsTestBolsaEmpleo.peticionAutenticadaPersonal();
@@ -578,4 +580,5 @@ public class TestBEPControladorValidarAfines {
 		assertEquals(MENSAJE_SIN_EXITO, 0, bean.getMensajesDeExito().size());
 		assertEquals(ControladorValidar.MENSAJE_ERROR_SIN_PERMISO, bean.getMensajesDeError().get(0).toString());
 	}
+	
 }

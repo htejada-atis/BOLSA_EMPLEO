@@ -99,60 +99,19 @@ public class TestBEPControladorBolsas {
 		this.cambiarEstadoBolsa(ControladorBolsas.ACCION_BOLSAS_BLOQUEAR, ModeloBolsa.BOLSA_ESTADO_BLOQUEADA);		
 	}
 	
-	/** Acción sobre una bolsa.
-	 * @throws SQLException si fallo bd 
-	 * @throws IOException si error io
-	 * @throws ServletException  si error servlet
+	/** Baremar bolsas .
+	 * @throws IOException si error io .
+	 * @throws ServletException  si error servlet .
 	 */
 	@Test
-	public void testA05() throws SQLException, ServletException, IOException {
-		this.cambiarEstadoBolsa(ControladorBolsas.ACCION_BOLSAS_REVISION, ModeloBolsa.BOLSA_ESTADO_REVISION);		
-	}
-	
-	/** Acción sobre una bolsa.
-	 * @throws SQLException si fallo bd 
-	 * @throws IOException si error io
-	 * @throws ServletException  si error servlet
-	 */
-	@Test
-	public void testA06() throws SQLException, ServletException, IOException {
-		this.cambiarEstadoBolsa(ControladorBolsas.ACCION_BOLSAS_BAREMACION, ModeloBolsa.BOLSA_ESTADO_BAREMACION);		
-	}
-	
-	/** Acción sobre una bolsa.
-	 * @throws SQLException si fallo bd 
-	 * @throws IOException si error io
-	 * @throws ServletException  si error servlet
-	 */
-	@Test
-	public void testA07() throws SQLException, ServletException, IOException {
-		this.cambiarEstadoBolsa(ControladorBolsas.ACCION_BOLSAS_ALEGACION, ModeloBolsa.BOLSA_ESTADO_ALEGACIONES);		
-	}
-	
-	/** Acción sobre una bolsa.
-	 * @throws SQLException si fallo bd 
-	 * @throws IOException si error io
-	 * @throws ServletException  si error servlet
-	 */
-	@Test
-	public void testA08() throws SQLException, ServletException, IOException {
-		this.cambiarEstadoBolsa(ControladorBolsas.ACCION_BOLSAS_DESBLOQUEAR, ModeloBolsa.BOLSA_ESTADO_DESBLOQUEADA);		
-	}
-	
-	/** Baremar bolsas.
-	 * @throws SQLException si fallo bd 
-	 * @throws IOException si error io
-	 * @throws ServletException  si error servlet
-	 */
-	@Test
-	public void testA09() throws SQLException, ServletException, IOException {
+	public void testA05() throws ServletException, IOException {
 		// leemos algunos ids devueltos
 		VistaEstadoBolsas bean = getVistaBolsasEmpleo(ControladorBolsas.ACCION_DATATABLE);
 		String selected = "[" 
 				+ bean.getDatatableBolsas().getData().get(0).getCodNum() + "," 
 				+ bean.getDatatableBolsas().getData().get(1).getCodNum() + "]";
 								
-		// petición para bloquear bolsas
+		// petición para baremar bolsas
 		PeticionHttp peticion = UtilsTestBolsaEmpleo.peticionAutenticadaPersonal();
 		peticion.setParameter(ControladorBolsas.PARAM_ACCION, ControladorBolsas.ACCION_BOLSA);		
 		peticion.setParameter(ControladorBolsas.PARAM_ACCION_BOLSA, ControladorBolsas.ACCION_BOLSAS_BAREMAR);
@@ -169,6 +128,46 @@ public class TestBEPControladorBolsas {
 		bean = getVistaBolsasEmpleo(ControladorBolsas.ACCION_DATATABLE);
 		assertEquals(0, bean.getMensajesDeError().size());
 		assertEquals(0, bean.getMensajesDeAdvertencia().size());
+	}
+	
+	/** Acción sobre una bolsa.
+	 * @throws SQLException si fallo bd 
+	 * @throws IOException si error io
+	 * @throws ServletException  si error servlet
+	 */
+	@Test
+	public void testA06() throws SQLException, ServletException, IOException {
+		this.cambiarEstadoBolsa(ControladorBolsas.ACCION_BOLSAS_REVISION, ModeloBolsa.BOLSA_ESTADO_REVISION);		
+	}
+	
+	/** Acción sobre una bolsa.
+	 * @throws SQLException si fallo bd 
+	 * @throws IOException si error io
+	 * @throws ServletException  si error servlet
+	 */
+	@Test
+	public void testA07() throws SQLException, ServletException, IOException {
+		this.cambiarEstadoBolsa(ControladorBolsas.ACCION_BOLSAS_BAREMACION, ModeloBolsa.BOLSA_ESTADO_BAREMACION);		
+	}
+	
+	/** Acción sobre una bolsa.
+	 * @throws SQLException si fallo bd 
+	 * @throws IOException si error io
+	 * @throws ServletException  si error servlet
+	 */
+	@Test
+	public void testA08() throws SQLException, ServletException, IOException {
+		this.cambiarEstadoBolsa(ControladorBolsas.ACCION_BOLSAS_ALEGACION, ModeloBolsa.BOLSA_ESTADO_ALEGACIONES);		
+	}
+	
+	/** Acción sobre una bolsa.
+	 * @throws SQLException si fallo bd 
+	 * @throws IOException si error io
+	 * @throws ServletException  si error servlet
+	 */
+	@Test
+	public void testA09() throws SQLException, ServletException, IOException {
+		this.cambiarEstadoBolsa(ControladorBolsas.ACCION_BOLSAS_DESBLOQUEAR, ModeloBolsa.BOLSA_ESTADO_DESBLOQUEADA);		
 	}
 	
 	/** Id de bolsas no validas .
