@@ -281,7 +281,7 @@ public class ControladorValidar extends HttpServlet {
 		
 		switch (nombreAccion) {
 			case ACCION_DATATABLE_HISTORIAL_VALIDACION:
-				listadoHistorialValidacionMerito(bean, datos, request, response);
+//				listadoHistorialValidacionMerito(bean, datos, request, response);
 				break;
 			case ACCION_HISTORIAL_VALIDACION:
 				bean.setVista(JSP_HISTORIAL_VALIDACION);
@@ -366,6 +366,10 @@ public class ControladorValidar extends HttpServlet {
 			datos.setRespuestaEnviada(true);
 			response.sendRedirect(request.getServletPath());
 		}
+	}
+	
+	private void obtenerHistorialesValidacion() {
+		
 	}
 	
 	private void obtenerValoresMeritoBolsasCandidato(VistaValidar bean) throws SQLException, UVException {
@@ -517,33 +521,33 @@ public class ControladorValidar extends HttpServlet {
 		}
 	}
 	
-	private void listadoHistorialValidacionMerito(VistaValidar bean, UVDatos datos, HttpServletRequest request, HttpServletResponse response)
-			throws IOException {
-		datos.setContentType(RESPONSE_AJAX_CONTENTTYPE);
-		datos.setRespuestaEnviada(true);
-		response.setContentType(RESPONSE_AJAX_CONTENTTYPE);
-		response.setCharacterEncoding(RESPONSE_AJAX_ENCODING);
-		
-		try (PrintWriter writer = response.getWriter()) {
-			try {
-				BolsaEmpleoDataTable<HistorialValidacion> dataTable = ModeloValidarHistorial.obtenerInstancia().listadoHistorialValidacionesMerito(
-						bean.getConvocatoria(), bean.getMerito().getMerito(), bean.getBolsa(), request.getParameterMap());
-				bean.setDatatableHistorialValidacion(dataTable);
-				writer.write(dataTable.toJson("dd/M/yyyy HH:mm:ss"));
-			} catch (UVException | SQLException e) {
-				if (e instanceof SQLException) {
-					LOGGER.log(Level.SEVERE, Formateador.getStackTrace(e));
-					LOGGER.log(Level.SEVERE, e.toString());
-				} else {
-					LOGGER.log(Level.WARNING, e.toString());
-				}
-				bean.getMensajesDeError().add(e.getMessage());
-				CodigoDescripcion mensaje = new CodigoDescripcion(RESPONSE_AJAX_ERROR, e.getMessage());
-				writer.write(new Gson().toJson(mensaje));
-				response.setStatus(RESPONSE_AJAX_HTTP_CODE_ERROR);
-			}
-		}
-	}
+//	private void listadoHistorialValidacionMerito(VistaValidar bean, UVDatos datos, HttpServletRequest request, HttpServletResponse response)
+//			throws IOException {
+//		datos.setContentType(RESPONSE_AJAX_CONTENTTYPE);
+//		datos.setRespuestaEnviada(true);
+//		response.setContentType(RESPONSE_AJAX_CONTENTTYPE);
+//		response.setCharacterEncoding(RESPONSE_AJAX_ENCODING);
+//		
+//		try (PrintWriter writer = response.getWriter()) {
+//			try {
+//				BolsaEmpleoDataTable<HistorialValidacion> dataTable = ModeloValidarHistorial.obtenerInstancia().listadoHistorialValidacionesMerito(
+//						bean.getConvocatoria(), bean.getMerito().getMerito(), bean.getBolsa(), request.getParameterMap());
+//				bean.setDatatableHistorialValidacion(dataTable);
+//				writer.write(dataTable.toJson("dd/M/yyyy HH:mm:ss"));
+//			} catch (UVException | SQLException e) {
+//				if (e instanceof SQLException) {
+//					LOGGER.log(Level.SEVERE, Formateador.getStackTrace(e));
+//					LOGGER.log(Level.SEVERE, e.toString());
+//				} else {
+//					LOGGER.log(Level.WARNING, e.toString());
+//				}
+//				bean.getMensajesDeError().add(e.getMessage());
+//				CodigoDescripcion mensaje = new CodigoDescripcion(RESPONSE_AJAX_ERROR, e.getMessage());
+//				writer.write(new Gson().toJson(mensaje));
+//				response.setStatus(RESPONSE_AJAX_HTTP_CODE_ERROR);
+//			}
+//		}
+//	}
 	
 	private void listadoMeritos(VistaValidar bean, UVDatos datos, HttpServletRequest request, HttpServletResponse response)
 			throws IOException {

@@ -32,7 +32,7 @@ public class VistaValidar extends Vista implements Serializable {
 	private UsuarioBolsaEmpleo usuario;
 	private transient BolsaEmpleoDataTable<BolsaValidacion> datatableBolsas;
 	private transient BolsaEmpleoDataTable<CandidatoValidacion> datatableCandidatos;
-	private transient BolsaEmpleoDataTable<HistorialValidacion> datatableHistorialValidacion;
+	private List<HistorialValidacion> listaHistorialValidacion;
 	private transient BolsaEmpleoDataTable<MeritoValidarTable> datatableMeritos;
 	private List<ItemBaremacion> items = new ArrayList<>();
 	private List<ValorMeritoBolsaTable> bolsas = new ArrayList<>();
@@ -144,12 +144,12 @@ public class VistaValidar extends Vista implements Serializable {
 		this.listaAfinidades = afinidades;
 	}
 
-	public BolsaEmpleoDataTable<HistorialValidacion> getDatatableHistorialValidacion() {
-		return datatableHistorialValidacion;
+	public List<HistorialValidacion> getListaHistorialValidacion() {
+		return listaHistorialValidacion;
 	}
 
-	public void setDatatableHistorialValidacion(BolsaEmpleoDataTable<HistorialValidacion> datatableHistorialValidacion) {
-		this.datatableHistorialValidacion = datatableHistorialValidacion;
+	public void setDatatableHistorialValidacion(List<HistorialValidacion> listaHistorialValidacion) {
+		this.listaHistorialValidacion = listaHistorialValidacion;
 	}
 	
 }

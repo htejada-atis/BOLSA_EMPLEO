@@ -13,6 +13,9 @@ import es.ujaen.uvirtual.modulo.bolsaempleo.beans.Bolsa;
 import es.ujaen.uvirtual.modulo.bolsaempleo.beans.Convocatoria;
 import es.ujaen.uvirtual.modulo.bolsaempleo.beans.HistorialValidacion;
 import es.ujaen.uvirtual.modulo.bolsaempleo.beans.Merito;
+import es.ujaen.uvirtual.modulo.bolsaempleo.beans.MeritoSolicitud;
+import es.ujaen.uvirtual.modulo.bolsaempleo.beans.MeritoSolicitudValoracion;
+import es.ujaen.uvirtual.modulo.bolsaempleo.beans.ValorMeritoBolsaTable;
 import es.ujaen.uvirtual.modulo.bolsaempleo.utilidades.BolsaEmpleoDataTable;
 import es.ujaen.uvirtual.modulo.bolsaempleo.utilidades.BolsaEmpleoDataTable.DataTableColumn;
 import es.ujaen.uvirtual.utilidades.UVException;
@@ -201,6 +204,69 @@ public class ModeloValidarHistorial {
 		}
 
 		return dataTable;
+	}
+	
+	public List<HistorialValidacion> listaHistorialSolicitudBolsasMeritos(Convocatoria convocatoria, Merito merito, Bolsa bolsa) throws SQLException {
+		List<HistorialValidacion> historiales = new ArrayList<>();
+		
+		String consulta = 
+				"SELECT thsbm.LOG, thsbm.FECHALOG, thsbm.OBSERVACION_CANDIDATO, thsbm.UID_USUARIO, thsbm.FLGEXCLUIDO,"
+				+ "	thsbm.FLGVALIDADO, thsbm.VALOR, thsbm.BEPITE_CODNUM, thsbm.VALOR,"
+				+ "	(SELECT"
+				+ "		CASE"
+				+ "			WHEN thsbm2.FLGEXCLUIDO = 'N' AND thsbm.FLGEXCLUIDO = 'S' THEN 'N => S'"
+				+ "			WHEN thsbm2.FLGEXCLUIDO = 'S' AND thsbm.FLGEXCLUIDO = 'N' THEN 'S => N'"
+				+ "			ELSE ''"
+				+ "		END"
+				+ "	FROM TBEP_HTO_SOL_BOL_MERITOS thsbm2 WHERE LOG IN ('BEFORE_UPDATE') AND thsbm2.CODCAMBIO = thsbm.CODCAMBIO - 1) AS COMPARA_EXCLUIDO,"
+				+ "	(SELECT"
+				+ "		CASE"
+				+ "			WHEN thsbm2.FLGVALIDADO = 'N' AND thsbm.FLGVALIDADO = 'S' THEN 'N => S'"
+				+ "			WHEN thsbm2.FLGVALIDADO = 'S' AND thsbm.FLGVALIDADO = 'N' THEN 'S => N'"
+				+ "			ELSE ''"
+				+ "		END"
+				+ "	FROM TBEP_HTO_SOL_BOL_MERITOS thsbm2 WHERE LOG IN ('BEFORE_UPDATE') AND thsbm2.CODCAMBIO = thsbm.CODCAMBIO - 1) AS COMPARA_VALIDADO,"
+				+ "	(SELECT"
+				+ "		CASE"
+				+ "			WHEN thsbm2.VALOR IS NULL AND thsbm.VALOR IS NOT NULL THEN (thsbm2.VALOR || ' => ' || thsbm.VALOR)"
+				+ "			WHEN thsbm2.VALOR != thsbm.VALOR THEN (thsbm2.VALOR || ' => ' || thsbm.VALOR)"
+				+ "			ELSE ''"
+				+ "		END"
+				+ "	FROM TBEP_HTO_SOL_BOL_MERITOS thsbm2 WHERE LOG IN ('BEFORE_UPDATE') AND thsbm2.CODCAMBIO = thsbm.CODCAMBIO - 1) AS COMPARA_VALOR,"
+				+ "	(SELECT"
+				+ "		CASE"
+				+ "			WHEN thsbm2.RESULTADO IS NULL AND thsbm.RESULTADO IS NOT NULL THEN (thsbm2.RESULTADO || ' => ' || thsbm.RESULTADO)"
+				+ "			WHEN thsbm2.RESULTADO != thsbm.RESULTADO THEN (thsbm2.RESULTADO || ' => ' || thsbm.RESULTADO)"
+				+ "			ELSE ''"
+				+ "		END"
+				+ "	FROM TBEP_HTO_SOL_BOL_MERITOS thsbm2 WHERE LOG IN ('BEFORE_UPDATE') AND thsbm2.CODCAMBIO = thsbm.CODCAMBIO - 1) AS COMPARA_RESULTADO"
+				+ "FROM TBEP_HTO_SOL_BOL_MERITOS thsbm"
+				+ "INNER JOIN TBEP_SOLICITUD_BOLSAS bepsob ON bepsob.CODNUM = thsbm.BEPSBO_CODNUM"
+				+ "INNER JOIN TBEP_SOLICITUDES bepsol ON bepsol.CODNUM = bepsob.BEPSOL_CODNUM";
+		
+		try (Connection conexion = ConexionUvirtual.obtenerInstancia();
+				PreparedStatement stmt = conexion.prepareStatement(consulta)) {
+			int paramIndex = 1;
+			stmt.setInt(paramIndex, convocatoria.getCodNum());
+			stmt.setInt(paramIndex, merito.getCodNum());
+			stmt.setInt(paramIndex, bolsa.getCodNum());
+			
+			try (ResultSet rs = stmt.executeQuery()) {
+				while (rs.next()) {
+					Date date = rs.getTimestamp(FECHALOG);
+					String uidUsuario = rs.getString(UID_USUARIO);
+					String item = rs.getString(COMPARA_ITEM);
+					String excluido = rs.getString(COMPARA_EXCLUIDO);
+					String validado = rs.getString(COMPARA_VALIDADO);
+					String valor = rs.getString(COMPARA_VALOR);
+					String valoracion = rs.getString(COMPARA_VALORACION);
+					String observaciones = rs.getString(OBSERVACION_CANDIDATO);
+					historiales.add(new HistorialValidacion(date, item, uidUsuario, excluido, observaciones, validado, valoracion, valor));
+				}
+			}
+		}
+		
+		return historiales;
 	}
 	
 }
