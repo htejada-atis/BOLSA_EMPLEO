@@ -590,15 +590,16 @@ public class ModeloMensajes {
 	 */
 	public List<Destinatario> listaDestinatariosAEnviarEnBloques() throws SQLException, UVException {
 		String consulta = ""
-				+ " SELECT bepusu.*, bepmde.ESTADO, bepmde.BEPMEN_CODNUM "
-				+ " FROM TBEP_MEN_DESTINATARIOS bepmde "
-				+ " INNER JOIN TBEP_MENSAJES bepmen ON bepmen.CODNUM = bepmde.BEPMEN_CODNUM "
-				+ " INNER JOIN TBEP_USUARIOS bepusu ON bepusu.CODNUM = bepmde.BEPUSU_CODNUM "
+				+ " SELECT bepusu.*, bepmde.ESTADO, bepmde.BEPMEN_CODNUM"
+				+ " FROM TBEP_MEN_DESTINATARIOS bepmde"
+				+ " INNER JOIN TBEP_MENSAJES bepmen ON bepmen.CODNUM = bepmde.BEPMEN_CODNUM"
+				+ " INNER JOIN TBEP_USUARIOS bepusu ON bepusu.CODNUM = bepmde.BEPUSU_CODNUM"
 				+ " WHERE 1=1 "
-				+ "		AND bepmde.ESTADO = '" + ModeloMensajes.DESTINATARIO_ESTADO_SINENVIAR + "' "
-				+ "	 	AND bepusu.VUAJA_EMAIL_ALTA IS NOT NULL "
-				+ "		AND bepusu.FLGBORRADO = 'N' "
-				+ " FETCH FIRST " + ModeloMensajes.NUMERO_MENSAJES_ENVIAR_BLOQUE + " ROWS ONLY ";
+				+ "     AND bepmde.ESTADO = '" + ModeloMensajes.DESTINATARIO_ESTADO_SINENVIAR + "'"
+				+ "     AND bepusu.VUAJA_EMAIL_ALTA IS NOT NULL"
+				+ "     AND bepusu.FLGBORRADO = 'N'"
+				+ "     AND bepmen.ESTADO = '" + ModeloMensajes.MENSAJE_ESTADO_ENVIANDO + "'"
+				+ " FETCH FIRST " + ModeloMensajes.NUMERO_MENSAJES_ENVIAR_BLOQUE + " ROWS ONLY";
 		
 		List<Destinatario> destinatarios = new ArrayList<>();
 		
