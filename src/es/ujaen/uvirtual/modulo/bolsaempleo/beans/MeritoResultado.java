@@ -11,7 +11,9 @@ import java.util.List;
 public class MeritoResultado extends Merito implements Serializable {
 
 	private static final long serialVersionUID = 1L;
-	private Integer codNumMeritoSolicitud; // id de solicitud bolsa mérito
+
+	// id de solicitud bolsa mérito
+	private Integer codNumMeritoSolicitud; 
 	private List<MeritoSolicitudValoracion> valoraciones;
 	private String observacionCandidato;
 	private String desglose;
