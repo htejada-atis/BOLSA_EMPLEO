@@ -1,6 +1,7 @@
 <%@ page trimDirectiveWhitespaces="true"%>
 <%@	page import="es.ujaen.uvirtual.modulo.bolsaempleo.controlador.ControladorValidar"%>
 <%@	page import="es.ujaen.uvirtual.modulo.bolsaempleo.controlador.ControladorDescargaFicheros"%>
+<%@	page import="es.ujaen.uvirtual.modulo.bolsaempleo.controlador.configuracion.ControladorUsuarioCandidato"%>
 <%@	page import="es.ujaen.uvirtual.modulo.bolsaempleo.modelo.ModeloBaremacionItems"%>
 <%@ page import="es.ujaen.uvirtual.modulo.bolsaempleo.modelo.ModeloBolsa"%>
 <%@	page import="es.ujaen.uvirtual.modulo.bolsaempleo.modelo.ModeloRol"%>
@@ -95,7 +96,21 @@ Boolean personal = bean.getUsuarioLogeado().getRol().getCodNum().equals(ModeloRo
 			
 			<jsp:include page="/WEB-INF/jsp/vista/infadministrativa/bolsaempleo/mensajes.jsp" />
 			
-			<h3>Modificar mérito: <%= merito.getMerito().getCodNum() %>, para la bolsa: <%= EscapaHTML.escapa(bolsa.getArea().getDescripcion()) %></h3>
+			<h3>Evaluar mérito: <%= EscapaHTML.escapa(merito.getMerito().getCodNum() + " - " + merito.getMerito().getItemBaremacion().getFullCode() + " " 
+				+ merito.getMerito().getItemBaremacion().getNombre()) %><br/>
+				<%= EscapaHTML.escapa("Bolsa: " + bolsa.getArea().getDescripcion()) %><br/>
+				<%= "Candidato: " %> 
+			<%	if (bean.getUsuarioLogeado().getRol().getCodNum().equals(ModeloRol.ID_ROL_SERVICIO_PERSONAL)) { %>
+					<a class="bolsaempleo-link"
+					href="<%= ControladorUsuarioCandidato.URL_PATTERN 
+						+ "?" + ControladorUsuarioCandidato.PARAM_ACCION + "=" + ControladorUsuarioCandidato.ACCION_SELECCIONAR_CANDIDATO 
+						+ "&" + ControladorUsuarioCandidato.PARAM_CANDIDATO + "=" + candidato.getCodNum()%>">
+						<%= EscapaHTML.escapa(candidato.getPrsNif() + " " + candidato.getNombre() + " " + candidato.getPrimerApellido() + " " + candidato.getSegundoApellido()) %></a>
+			<%	} else { %>
+					<%= EscapaHTML.escapa(candidato.getPrsNif() + " " + candidato.getNombre() + " " + candidato.getPrimerApellido() + " " + candidato.getSegundoApellido()) %>
+			<%	} %>
+			<br/>
+			</h3>
 			
 			<form id="validar_merito" class="be-form" method="post" action="<%= request.getRequestURI() %>">
 		    	<input type="hidden" name="<%= ControladorValidar.PARAM_ACCION %>" id="accion_formulario" value="<%= ControladorValidar.ACCION_MODIFICAR_MERITO %>" />

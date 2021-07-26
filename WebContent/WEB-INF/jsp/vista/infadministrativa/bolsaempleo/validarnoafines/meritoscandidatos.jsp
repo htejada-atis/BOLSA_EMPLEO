@@ -1,6 +1,7 @@
 <%@ page trimDirectiveWhitespaces="true"%>
 <%@	page import="es.ujaen.uvirtual.modulo.bolsaempleo.controlador.ControladorValidarNoAfines"%>
 <%@	page import="es.ujaen.uvirtual.modulo.bolsaempleo.controlador.ControladorDescargaFicheros"%>
+<%@	page import="es.ujaen.uvirtual.modulo.bolsaempleo.controlador.configuracion.ControladorUsuarioCandidato"%>
 <%@ page import="es.ujaen.uvirtual.modulo.bolsaempleo.vistas.VistaValidarNoAfines" %>
 <%@	page import="es.ujaen.uvirtual.modulo.bolsaempleo.modelo.ModeloBaremacionItems"%>
 <%@page import="es.ujaen.uvirtual.modulo.bolsaempleo.modelo.ModeloBolsa"%>
@@ -122,7 +123,17 @@ Double valor = null;
 				</tfoot>
 			</table>
 			
-			<h3>Evaluar mérito: <%= merito.getMerito().getCodNum() %>, para la bolsa: <%= EscapaHTML.escapa(bolsa.getArea().getDescripcion()) %></h3>
+			<h3>Evaluar mérito: <%= EscapaHTML.escapa(merito.getMerito().getCodNum() + " - " + merito.getMerito().getItemBaremacion().getFullCode() + " " 
+				+ merito.getMerito().getItemBaremacion().getNombre()) %><br/>
+				<%= EscapaHTML.escapa("Bolsa: " + bolsa.getArea().getDescripcion()) %><br/>
+				<%= "Candidato: " %> 
+				<a class="bolsaempleo-link"
+					href="<%= ControladorUsuarioCandidato.URL_PATTERN 
+					+ "?" + ControladorUsuarioCandidato.PARAM_ACCION + "=" + ControladorUsuarioCandidato.ACCION_SELECCIONAR_CANDIDATO 
+					+ "&" + ControladorUsuarioCandidato.PARAM_CANDIDATO + "=" + candidato.getCodNum()%>">
+					<%= EscapaHTML.escapa(candidato.getPrsNif() + " " + candidato.getNombre() + " " + candidato.getPrimerApellido() + " " + candidato.getSegundoApellido()) %></a>
+			<br/>
+			</h3>
 			
 			<form id="validar_merito" class="be-form" method="post" action="<%= request.getRequestURI() %>">
 		    	<input type="hidden" name="<%= ControladorValidarNoAfines.PARAM_ACCION %>" id="accion_formulario" value="<%= ControladorValidarNoAfines.ACCION_VALIDAR_MERITO %>" />
