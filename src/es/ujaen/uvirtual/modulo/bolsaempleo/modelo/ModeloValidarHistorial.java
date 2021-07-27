@@ -37,6 +37,7 @@ public class ModeloValidarHistorial {
 	public static final String FECHALOG = "FECHALOG";
 	public static final String COMPARA_EXCLUIDO = "COMPARA_EXCLUIDO";
 	public static final String COMPARA_ITEM = "COMPARA_ITEM";
+	public static final String COMPARA_RESULTADO = "COMPARA_RESULTADO";
 	public static final String COMPARA_VALIDADO = "COMPARA_VALIDADO";
 	public static final String COMPARA_VALOR = "COMPARA_VALOR";
 	public static final String COMPARA_VALORACION = "COMPARA_VALORACION";
@@ -211,38 +212,40 @@ public class ModeloValidarHistorial {
 		
 		String consulta = 
 				"SELECT thsbm.LOG, thsbm.FECHALOG, thsbm.OBSERVACION_CANDIDATO, thsbm.UID_USUARIO, thsbm.FLGEXCLUIDO,"
-				+ "	thsbm.FLGVALIDADO, thsbm.VALOR, thsbm.BEPITE_CODNUM, thsbm.VALOR,"
-				+ "	(SELECT"
-				+ "		CASE"
-				+ "			WHEN thsbm2.FLGEXCLUIDO = 'N' AND thsbm.FLGEXCLUIDO = 'S' THEN 'N => S'"
-				+ "			WHEN thsbm2.FLGEXCLUIDO = 'S' AND thsbm.FLGEXCLUIDO = 'N' THEN 'S => N'"
-				+ "			ELSE ''"
-				+ "		END"
-				+ "	FROM TBEP_HTO_SOL_BOL_MERITOS thsbm2 WHERE LOG IN ('BEFORE_UPDATE') AND thsbm2.CODCAMBIO = thsbm.CODCAMBIO - 1) AS COMPARA_EXCLUIDO,"
-				+ "	(SELECT"
-				+ "		CASE"
-				+ "			WHEN thsbm2.FLGVALIDADO = 'N' AND thsbm.FLGVALIDADO = 'S' THEN 'N => S'"
-				+ "			WHEN thsbm2.FLGVALIDADO = 'S' AND thsbm.FLGVALIDADO = 'N' THEN 'S => N'"
-				+ "			ELSE ''"
-				+ "		END"
-				+ "	FROM TBEP_HTO_SOL_BOL_MERITOS thsbm2 WHERE LOG IN ('BEFORE_UPDATE') AND thsbm2.CODCAMBIO = thsbm.CODCAMBIO - 1) AS COMPARA_VALIDADO,"
-				+ "	(SELECT"
-				+ "		CASE"
-				+ "			WHEN thsbm2.VALOR IS NULL AND thsbm.VALOR IS NOT NULL THEN (thsbm2.VALOR || ' => ' || thsbm.VALOR)"
-				+ "			WHEN thsbm2.VALOR != thsbm.VALOR THEN (thsbm2.VALOR || ' => ' || thsbm.VALOR)"
-				+ "			ELSE ''"
-				+ "		END"
-				+ "	FROM TBEP_HTO_SOL_BOL_MERITOS thsbm2 WHERE LOG IN ('BEFORE_UPDATE') AND thsbm2.CODCAMBIO = thsbm.CODCAMBIO - 1) AS COMPARA_VALOR,"
-				+ "	(SELECT"
-				+ "		CASE"
-				+ "			WHEN thsbm2.RESULTADO IS NULL AND thsbm.RESULTADO IS NOT NULL THEN (thsbm2.RESULTADO || ' => ' || thsbm.RESULTADO)"
-				+ "			WHEN thsbm2.RESULTADO != thsbm.RESULTADO THEN (thsbm2.RESULTADO || ' => ' || thsbm.RESULTADO)"
-				+ "			ELSE ''"
-				+ "		END"
-				+ "	FROM TBEP_HTO_SOL_BOL_MERITOS thsbm2 WHERE LOG IN ('BEFORE_UPDATE') AND thsbm2.CODCAMBIO = thsbm.CODCAMBIO - 1) AS COMPARA_RESULTADO"
-				+ "FROM TBEP_HTO_SOL_BOL_MERITOS thsbm"
-				+ "INNER JOIN TBEP_SOLICITUD_BOLSAS bepsob ON bepsob.CODNUM = thsbm.BEPSBO_CODNUM"
-				+ "INNER JOIN TBEP_SOLICITUDES bepsol ON bepsol.CODNUM = bepsob.BEPSOL_CODNUM";
+				+ " thsbm.FLGVALIDADO, thsbm.VALOR, thsbm.BEPITE_CODNUM, thsbm.VALOR,"
+				+ " (SELECT"
+				+ "     CASE"
+				+ "         WHEN thsbm2.FLGEXCLUIDO = 'N' AND thsbm.FLGEXCLUIDO = 'S' THEN 'N => S'"
+				+ "         WHEN thsbm2.FLGEXCLUIDO = 'S' AND thsbm.FLGEXCLUIDO = 'N' THEN 'S => N'"
+				+ "         ELSE ''"
+				+ "     END"
+				+ " FROM TBEP_HTO_SOL_BOL_MERITOS thsbm2 WHERE LOG IN ('BEFORE_UPDATE') AND thsbm2.CODCAMBIO = thsbm.CODCAMBIO - 1) AS COMPARA_EXCLUIDO,"
+				+ " (SELECT"
+				+ "     CASE"
+				+ "         WHEN thsbm2.FLGVALIDADO = 'N' AND thsbm.FLGVALIDADO = 'S' THEN 'N => S'"
+				+ "         WHEN thsbm2.FLGVALIDADO = 'S' AND thsbm.FLGVALIDADO = 'N' THEN 'S => N'"
+				+ "         ELSE ''"
+				+ "     END"
+				+ " FROM TBEP_HTO_SOL_BOL_MERITOS thsbm2 WHERE LOG IN ('BEFORE_UPDATE') AND thsbm2.CODCAMBIO = thsbm.CODCAMBIO - 1) AS COMPARA_VALIDADO,"
+				+ " (SELECT"
+				+ "     CASE"
+				+ "         WHEN thsbm2.VALOR IS NULL AND thsbm.VALOR IS NOT NULL THEN (thsbm2.VALOR || ' => ' || thsbm.VALOR)"
+				+ "         WHEN thsbm2.VALOR != thsbm.VALOR THEN (thsbm2.VALOR || ' => ' || thsbm.VALOR)"
+				+ "         ELSE ''"
+				+ "     END"
+				+ " FROM TBEP_HTO_SOL_BOL_MERITOS thsbm2 WHERE LOG IN ('BEFORE_UPDATE') AND thsbm2.CODCAMBIO = thsbm.CODCAMBIO - 1) AS COMPARA_VALOR,"
+				+ " (SELECT"
+				+ "     CASE"
+				+ "         WHEN thsbm2.RESULTADO IS NULL AND thsbm.RESULTADO IS NOT NULL THEN (thsbm2.RESULTADO || ' => ' || thsbm.RESULTADO)"
+				+ "         WHEN thsbm2.RESULTADO != thsbm.RESULTADO THEN (thsbm2.RESULTADO || ' => ' || thsbm.RESULTADO)"
+				+ "         ELSE ''"
+				+ "     END"
+				+ " FROM TBEP_HTO_SOL_BOL_MERITOS thsbm2 WHERE LOG IN ('BEFORE_UPDATE') AND thsbm2.CODCAMBIO = thsbm.CODCAMBIO - 1) AS COMPARA_RESULTADO"
+				+ " FROM TBEP_HTO_SOL_BOL_MERITOS thsbm"
+				+ " INNER JOIN TBEP_SOLICITUD_BOLSAS bepsob ON bepsob.CODNUM = thsbm.BEPSBO_CODNUM"
+				+ " INNER JOIN TBEP_SOLICITUDES bepsol ON bepsol.CODNUM = bepsob.BEPSOL_CODNUM";
+		
+		// falta comparar el ítem
 		
 		try (Connection conexion = ConexionUvirtual.obtenerInstancia();
 				PreparedStatement stmt = conexion.prepareStatement(consulta)) {
@@ -258,8 +261,9 @@ public class ModeloValidarHistorial {
 					String item = rs.getString(COMPARA_ITEM);
 					String excluido = rs.getString(COMPARA_EXCLUIDO);
 					String validado = rs.getString(COMPARA_VALIDADO);
-					String valor = rs.getString(COMPARA_VALOR);
 					String valoracion = rs.getString(COMPARA_VALORACION);
+					String valor = rs.getString(COMPARA_VALOR);
+					String comparaResultado = rs.getString(COMPARA_RESULTADO);
 					String observaciones = rs.getString(OBSERVACION_CANDIDATO);
 					historiales.add(new HistorialValidacion(date, item, uidUsuario, excluido, observaciones, validado, valoracion, valor));
 				}

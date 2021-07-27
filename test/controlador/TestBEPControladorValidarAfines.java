@@ -432,29 +432,29 @@ public class TestBEPControladorValidarAfines {
 		assertEquals(MENSAJE_SIN_ADVERTENCIAS, 0, bean2.getMensajesDeAdvertencia().size());
 	}
 	
-	/** Obtener datatable historial de validación del mérito .
-	 * @throws IOException .
-	 */
-	@Test
-	public void testA15ObtenerHistorialValidacion() throws IOException {
-		VistaValidar bean = obtenerMeritos();
-
-		PeticionHttp peticion = UtilsTestBolsaEmpleo.peticionAutenticadaPersonal();
-		peticion.setParameter(ControladorValidar.PARAM_ACCION, ControladorValidar.ACCION_DATATABLE_HISTORIAL_VALIDACION);
-		peticion.setParameter(ControladorValidar.PARAM_BOLSA, bean.getBolsa().getCodNum().toString());
-		peticion.setParameter(ControladorValidar.PARAM_CANDIDATO, bean.getCandidato().getCodNum().toString());
-		peticion.setParameter(ControladorValidar.PARAM_MERITO, bean.getDatatableMeritos().getData().get(0).getCodNum().toString());
-		
-		RespuestaHttp respuesta = new RespuestaHttp();
-		ControladorValidar controlador = new ControladorValidar();
-		controlador.doPost(peticion, respuesta);
-		
-		VistaValidar bean2 = (VistaValidar) peticion.getUVDatos().getVistas().get(VistaValidar.class.getName());
-		
-		assertNotEquals(MENSAJE_HISTORIALES_DEVUELTOS, 0, bean2.getDatatableHistorialValidacion().getData().size());
-		assertEquals(MENSAJE_SIN_ERROR, 0, bean2.getMensajesDeError().size());
-		assertEquals(MENSAJE_SIN_ADVERTENCIAS, 0, bean2.getMensajesDeAdvertencia().size());
-	}
+//	/** Obtener datatable historial de validación del mérito .
+//	 * @throws IOException .
+//	 */
+//	@Test
+//	public void testA15ObtenerHistorialValidacion() throws IOException {
+//		VistaValidar bean = obtenerMeritos();
+//
+//		PeticionHttp peticion = UtilsTestBolsaEmpleo.peticionAutenticadaPersonal();
+//		peticion.setParameter(ControladorValidar.PARAM_ACCION, ControladorValidar.ACCION_DATATABLE_HISTORIAL_VALIDACION);
+//		peticion.setParameter(ControladorValidar.PARAM_BOLSA, bean.getBolsa().getCodNum().toString());
+//		peticion.setParameter(ControladorValidar.PARAM_CANDIDATO, bean.getCandidato().getCodNum().toString());
+//		peticion.setParameter(ControladorValidar.PARAM_MERITO, bean.getDatatableMeritos().getData().get(0).getCodNum().toString());
+//		
+//		RespuestaHttp respuesta = new RespuestaHttp();
+//		ControladorValidar controlador = new ControladorValidar();
+//		controlador.doPost(peticion, respuesta);
+//		
+//		VistaValidar bean2 = (VistaValidar) peticion.getUVDatos().getVistas().get(VistaValidar.class.getName());
+//		
+//		assertNotEquals(MENSAJE_HISTORIALES_DEVUELTOS, 0, bean2.getDatatableHistorialValidacion().getData().size());
+//		assertEquals(MENSAJE_SIN_ERROR, 0, bean2.getMensajesDeError().size());
+//		assertEquals(MENSAJE_SIN_ADVERTENCIAS, 0, bean2.getMensajesDeAdvertencia().size());
+//	}
 	
 	/** acción no válida .
 	 * @throws IOException si error io .
