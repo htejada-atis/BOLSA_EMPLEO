@@ -53,7 +53,7 @@ $(document).ready(function() {
 		    		Atis.sendForm("<%= request.getRequestURI() %>", params);
 	        	},
 	        	'visible': function(row) {
-	        		return row.total != 0;
+	        		return row.fechaBaremacion != null && row.resultadoActual;
         		},
         		'renderNotVisible': function(row) {
         			return row.resultadoActual ? 'Esperando resultados' : '';
