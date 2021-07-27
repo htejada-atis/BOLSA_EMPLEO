@@ -81,7 +81,7 @@ pipeline {
 	        		junit 'builds/build/rama/site/jacoco/*.xml'
 	        		script {
 		        		def checkstyleReport = scanForIssues enabledForFailure: true, tool: checkStyle(pattern: 'builds/build/rama/site/jacoco/checkstyle_report.xml')
-		        		echo "chechstyle summary ${checkstyleReport.size}"
+		        		echo "chechstyle summary ${checkstyleReport.size()}"
 		        		publishIssues issues: [checkstyleReport]
 	        		}
 	        		
