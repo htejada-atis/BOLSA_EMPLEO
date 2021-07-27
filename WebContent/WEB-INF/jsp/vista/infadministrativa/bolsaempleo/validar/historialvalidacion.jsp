@@ -2,6 +2,8 @@
 <%@	page import="es.ujaen.uvirtual.modulo.bolsaempleo.controlador.ControladorValidar"%>
 <%@ page import="es.ujaen.uvirtual.modulo.bolsaempleo.vistas.VistaValidar" %>
 <%@ page import="es.ujaen.uvirtual.modulo.bolsaempleo.beans.Bolsa" %>
+<%@ page import="es.ujaen.uvirtual.modulo.bolsaempleo.beans.HistorialSBM" %>
+<%@ page import="es.ujaen.uvirtual.modulo.bolsaempleo.beans.HistorialMerito" %>
 <%@ page import="es.ujaen.uvirtual.modulo.bolsaempleo.beans.MeritoSolicitud" %>
 <%@ page import="es.ujaen.uvirtual.beans.UVDatos"%>
 <%@ page import="es.ujaen.uvirtual.utilidades.EscapaHTML" %>
@@ -30,25 +32,119 @@ Bolsa bolsa = bean.getBolsa();
 	<h3><%= descripcion %></h3>
 	<h4><%= EscapaHTML.escapa(bolsa.getArea().getDescripcion()) %></h4>
 	
-	<table class="bluetable bolsaempleo" id="tableHistorialValoracion">
-		<tr>
-			<th scope="col" style="width:55px">Fecha</th>
-			<th scope="col" style="width:60%">Evaluador</th>
-			<th scope="col" style="width:50px">Excluido</th>
-			<th scope="col" style="width:50px">Validado</th>
-			<th scope="col" style="width:40%">Observaciones</th>
-			<th scope="col" style="width:90px">Valoración mérito</th>
-			<th scope="col" style="width:90px">Tipo</th>
-			<th scope="col" style="width:80px">Valor mérito</th>
-		</tr>
-		<tbody>
-		</tbody>
-		<tfoot>
+	<div style="overflow-x:auto;">
+		<table class="bluetable bolsaempleo" id="tableHistorialSBM">
+			<caption>Historial del mérito en una solicitud para la bolsa</caption>
 			<tr>
-				<th colSpan="8" style="width:100%"></th>
+				<th scope="col" style="width:55px">Fecha</th>
+				<th scope="col" style="width:84px">Log</th>
+				<th scope="col" style="width:50px">Excluido</th>
+				<th scope="col" style="width:50px">Validado</th>
+				<th scope="col" style="width:80px">Observaciones</th>
+				<th scope="col" style="width:50px">Resultado</th>
+				<th scope="col" style="width:50px">Valor</th>
+				<th scope="col" style="width:50px">Ítem</th>
+				<th scope="col" style="width:80px">Usuario</th>
+				<th scope="col" style="width:100px">Diferencias</th>
 			</tr>
-		</tfoot>
-	</table>
+			<tbody>
+			<%	for (HistorialSBM historial: bean.getHistorialSBM()) { %>
+					<tr>
+						<td><%= Formateador.formatoFecha(historial.getFechaLog(), Formateador.FORMATO_FECHA_YYYYMMDD_HHMMSS) %></td>
+						<td><%= EscapaHTML.escapa(historial.getLog()) %></td>
+						<td class="center">
+						<%	if (historial.getExcluido()) { %>
+								<div title='Mérito excluido' class='circle-true'></div>
+						<%	} else { %>
+								<div title='Mérito no excluido' class='circle-false'></div>
+						<%	} %>
+						</td>
+						<td class="center">
+						<%	if (historial.getValidado()) { %>
+								<div title='Mérito validado' class='circle-true'></div>
+						<%	} else { %>
+								<div title='Mérito no validado' class='circle-false'></div>
+						<%	} %>
+						</td>
+						<td><%= EscapaHTML.escapa(historial.getObservacionCandidato()) %></td>
+						<td><%= historial.getResultado() != 0 ? historial.getResultado() : "" %></td>
+						<td><%= historial.getValor() != 0 ? historial.getValor() : "" %></td>
+						<td><%= EscapaHTML.escapa(historial.getItem() != null ? historial.getItem().getFullCode() : "") %></td>
+						<td><%= EscapaHTML.escapa(historial.getUidUsuario()) %><br/>
+							(<%= EscapaHTML.escapa(historial.getRolUsuario()) %>)
+						</td>
+						<td>
+						<%	if (historial.getComparaExcluido() != null && !historial.getComparaExcluido().isBlank()) { %>
+								Excluido: <%= historial.getComparaExcluido() %><br/>
+						<%	} %>
+						
+						<%	if (historial.getComparaValidado() != null && !historial.getComparaValidado().isBlank()) { %>
+								Validado: <%= historial.getComparaValidado() %><br/>
+						<%	} %>
+						
+						<%	if (historial.getComparaValor() != null && !historial.getComparaValor().isBlank()) { %>
+								Valor: <%= historial.getComparaValor() %><br/>
+						<%	} %>
+						
+						<%	if (historial.getComparaItem() != null && !historial.getComparaItem().isBlank()) { %>
+								Ítem: <%= historial.getComparaItem() %><br/>
+						<%	} %>
+						
+						<%	if (historial.getComparaResultado() != null && !historial.getComparaResultado().isBlank()) { %>
+								Resultado: <%= historial.getComparaResultado() %><br/>
+						<%	} %>
+						</td>
+					</tr>
+			<%	} %>
+			</tbody>
+			<tfoot>
+				<tr>
+					<th colSpan="10" style="width:100%"></th>
+				</tr>
+			</tfoot>
+		</table>
+	</div>
+	
+	<div style="overflow-x:auto;">
+		<table class="bluetable bolsaempleo" id="tableHistorialMerito">
+			<caption>Historial del mérito</caption>
+			<tr>
+				<th scope="col" style="width:55px">Fecha</th>
+				<th scope="col" style="width:84px">Log</th>
+				<th scope="col" style="width:50px">Valor</th>
+				<th scope="col" style="width:50px">Ítem</th>
+				<th scope="col" style="width:80px">Usuario</th>
+				<th scope="col" style="width:100px">Diferencias</th>
+			</tr>
+			<tbody>
+			<%	for (HistorialMerito historial: bean.getHistorialMerito()) { %>
+					<tr>
+						<td><%= Formateador.formatoFecha(historial.getFechaLog(), Formateador.FORMATO_FECHA_YYYYMMDD_HHMMSS) %></td>
+						<td><%= EscapaHTML.escapa(historial.getLog()) %></td>
+						<td><%= historial.getValor() != 0 ? historial.getValor() : "" %></td>
+						<td><%= EscapaHTML.escapa(historial.getItem() != null ? historial.getItem().getFullCode() : "") %></td>
+						<td><%= EscapaHTML.escapa(historial.getUidUsuario()) %><br/>
+							(<%= EscapaHTML.escapa(historial.getRolUsuario()) %>)
+						</td>
+						<td>
+						<%	if (historial.getComparaValor() != null && !historial.getComparaValor().isBlank()) { %>
+								Valor: <%= historial.getComparaValor() %><br/>
+						<%	} %>
+						
+						<%	if (historial.getComparaItem() != null && !historial.getComparaItem().isBlank()) { %>
+								Ítem: <%= historial.getComparaItem() %><br/>
+						<%	} %>
+						</td>
+					</tr>
+			<%	} %>
+			</tbody>
+			<tfoot>
+				<tr>
+					<th colSpan="6" style="width:100%"></th>
+				</tr>
+			</tfoot>
+		</table>
+	</div>
 	
 	<br/>
     <div class="btns-by-steps">
@@ -61,31 +157,6 @@ Bolsa bolsa = bean.getBolsa();
 	
 <script>
 $(document).ready(function() {
-	
-	var tableHistorialValoracion = new Atis.DataTable('#tableHistorialValoracion', {
-	    "ajax": { url: "<%= ControladorValidar.URL_PATTERN_AJAX %>" },
-	    "pageSize": 100,
-	    "action": "<%= ControladorValidar.ACCION_DATATABLE_HISTORIAL_VALIDACION %>",
-	    "title": 'Historial de validación del mérito: <%= merito.getMerito().getCodNum() %>',
-	    "dropdown": true,
-	    "params": {
-	    	'<%=ControladorValidar.PARAM_MERITO%>': '<%= merito.getMerito().getCodNum() %>',
-	    	'<%= ControladorValidar.PARAM_BOLSA %>': '<%= bolsa.getCodNum() %>',
-			'<%= ControladorValidar.PARAM_CANDIDATO %>': '<%= bean.getCandidato().getCodNum() %>'
-		},
-		"defaultOrderBy": 0,
-		"defaultOrderDirection": 'desc',
-	    "columns": [
-	    	{'data': 'fecha'},
-	    	{'data': 'evaluador'},
-	        {'data': 'excluido', 'order': false},
-	        {'data': 'validado', 'order': false},
-	        {'data': 'observacionCandidato', 'order': false},
-	        {'data': 'valoracionMerito', 'order': false},
-	        {'data': 'codigoItem', 'order': false},
-	        {'data': 'valorMerito', 'order': false},
-	    ]
-	});
 	
 	document.getElementById("historial_volver").addEventListener("click", function() {
 		var params = {

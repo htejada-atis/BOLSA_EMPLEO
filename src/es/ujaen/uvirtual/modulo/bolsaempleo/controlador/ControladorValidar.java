@@ -284,7 +284,7 @@ public class ControladorValidar extends HttpServlet {
 //				listadoHistorialValidacionMerito(bean, datos, request, response);
 				break;
 			case ACCION_HISTORIAL_VALIDACION:
-				bean.setVista(JSP_HISTORIAL_VALIDACION);
+				obtenerHistorialesValidacion(bean);
 				break;
 			case ACCION_MERITO_SELECCIONADO:
 				obtenerValoresMeritoBolsasCandidato(bean);
@@ -368,8 +368,12 @@ public class ControladorValidar extends HttpServlet {
 		}
 	}
 	
-	private void obtenerHistorialesValidacion() {
+	private void obtenerHistorialesValidacion(VistaValidar bean) throws SQLException, UVException {
+		bean.setVista(JSP_HISTORIAL_VALIDACION);
 		
+		bean.setHistorialSBM(ModeloValidarHistorial.obtenerInstancia().listaHistorialSolicitudBolsasMeritos(bean.getConvocatoria(), 
+				bean.getMerito().getMerito(), bean.getBolsa(), bean.getCandidato()));
+		bean.setHistorialMerito(ModeloValidarHistorial.obtenerInstancia().listaHistorialMerito(bean.getMerito().getMerito(), bean.getCandidato()));
 	}
 	
 	private void obtenerValoresMeritoBolsasCandidato(VistaValidar bean) throws SQLException, UVException {
