@@ -82,9 +82,7 @@ pipeline {
 	        		junit 'builds/build/rama/site/jacoco/*.xml'
 	        		script {
 		        		def checkstyleReport = scanForIssues enabledForFailure: true, tool: checkStyle(pattern: 'builds/build/rama/site/jacoco/checkstyle_report.xml')
-		        		echo "checkstyle summary ${checkstyleReport.size()}"
-		        		env.WARNING_CHECKSTYLE = "${checkstyleReport.size()}"
-		        		echo "env checkstyle summary ${env.WARNING_CHECKSTYLE}"
+		        		echo "checkstyle summary ${checkstyleReport.size()} > checkstyle_log.txt"
 		        		publishIssues issues: [checkstyleReport]
 	        		}
 	        		
@@ -116,9 +114,10 @@ pipeline {
 	    		zip zipFile: 'builds/build/rama/site/jacoco/capturas.zip', archive: false, dir: "${rutaCapturas}", overwrite: true, glob: '**/*.png'
 	    		zip zipFile: 'builds/build/rama/site/jacoco/unittest.zip', archive: false, dir: 'builds/build/rama/site/jacoco/', overwrite: true, glob: '**/*.txt'
         	}
+        	def checkstyleLog = readFile('checkstyle_log.txt').trim()
 			emailext mimeType: "text/html", to: 'jmoral@ujaen.es',
 				attachLog: true, attachmentsPattern: 'builds/build/rama/site/jacoco/unittest.zip, builds/build/rama/site/jacoco/capturas.zip',
-				body: '${FILE,path="builds/build/rama/site/jacoco/index.html"}', 
+				body: "Construccion en: ${BUILD_URL}\n ${checkstyleLog}", 
 				subject: "Completado jenkins pipeline ${JOB_NAME} (${BUILD_NUMBER}) "
     		sh "docker-compose down || true"
             echo "-=- fin -=-"
