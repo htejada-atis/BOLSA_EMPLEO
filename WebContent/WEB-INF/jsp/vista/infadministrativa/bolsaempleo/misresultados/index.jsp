@@ -18,11 +18,11 @@ VistaMisResultados bean = (VistaMisResultados)uvdatos.getVistas().get(VistaMisRe
 	<table class="bluetable bolsaempleo" id="tableAreas">
 		<tr>
 			<th scope="col" style="width:100PX" title="Código área">Cod. Area.</th>
-			<th scope="col" style="width:100%" class="area">Área</th>			
+			<th scope="col" style="width:100%" class="area">Área</th>
 			<th scope="col" style="width:100px" class="area">Puntuación</th>
-			<th scope="col" style="width:88px" class="center"></th>			
+			<th scope="col" style="width:88px" class="center"></th>
 		</tr>
-		<tbody>				
+		<tbody>
 		</tbody>
 		<tfoot>
 			<tr>

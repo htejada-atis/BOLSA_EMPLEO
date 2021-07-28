@@ -443,30 +443,6 @@ public class TestBEPControladorValidarNoAfines {
 		assertEquals(MENSAJE_SIN_ADVERTENCIAS, 0, bean2.getMensajesDeAdvertencia().size());
 	}
 	
-	/** Obtener datatable historial de validación del mérito .
-	 * @throws IOException .
-	 */
-	@Test
-	public void testA15ObtenerHistorialValidacion() throws IOException {
-		VistaValidarNoAfines bean = obtenerMeritos();
-
-		PeticionHttp peticion = UtilsTestBolsaEmpleo.peticionAutenticadaPersonal();
-		peticion.setParameter(ControladorValidarNoAfines.PARAM_ACCION, ControladorValidarNoAfines.ACCION_DATATABLE_HISTORIAL_VALIDACION);
-		peticion.setParameter(ControladorValidarNoAfines.PARAM_BOLSA, bean.getBolsa().getCodNum().toString());
-		peticion.setParameter(ControladorValidarNoAfines.PARAM_CANDIDATO, bean.getCandidato().getCodNum().toString());
-		peticion.setParameter(ControladorValidarNoAfines.PARAM_MERITO, bean.getDatatableMeritos().getData().get(0).getCodNum().toString());
-		
-		RespuestaHttp respuesta = new RespuestaHttp();
-		ControladorValidarNoAfines controlador = new ControladorValidarNoAfines();
-		controlador.doPost(peticion, respuesta);
-		
-		VistaValidarNoAfines bean2 = (VistaValidarNoAfines) peticion.getUVDatos().getVistas().get(VistaValidarNoAfines.class.getName());
-		
-		assertNotEquals(MENSAJE_HISTORIALES_DEVUELTOS, 0, bean2.getDatatableHistorialValidacion().getData().size());
-		assertEquals(MENSAJE_SIN_ERROR, 0, bean2.getMensajesDeError().size());
-		assertEquals(MENSAJE_SIN_ADVERTENCIAS, 0, bean2.getMensajesDeAdvertencia().size());
-	}
-	
 	/** acción no válida .
 	 * @throws IOException si error io .
 	 */
@@ -643,30 +619,6 @@ public class TestBEPControladorValidarNoAfines {
 		assertEquals(MENSAJE_CON_ERROR, 1, bean.getMensajesDeError().size());
 		assertEquals(MENSAJE_SIN_EXITO, 0, bean.getMensajesDeExito().size());
 		assertEquals(ControladorValidarNoAfines.MENSAJE_ERROR_SIN_PERMISO_PERSONAL, bean.getMensajesDeError().get(0).toString());
-	}
-	
-	/** Obtener datatable historial de validación con parámetro no válido para forzar el error .
-	 * @throws IOException si error io .
-	 */
-	@Test
-	public void testE09ObtenerHistorialMeritoParametroNoValido() throws IOException {
-		VistaValidarNoAfines bean = obtenerMeritos();
-		
-		PeticionHttp peticion = UtilsTestBolsaEmpleo.peticionAutenticadaPersonal();
-		peticion.setParameter(ControladorValidarNoAfines.PARAM_ACCION, ControladorValidarNoAfines.ACCION_DATATABLE_HISTORIAL_VALIDACION);
-		peticion.setParameter(ControladorValidarNoAfines.PARAM_BOLSA, bean.getBolsa().getCodNum().toString());
-		peticion.setParameter(ControladorValidarNoAfines.PARAM_CANDIDATO, bean.getCandidato().getCodNum().toString());
-		peticion.setParameter(ControladorValidarNoAfines.PARAM_MERITO, bean.getDatatableMeritos().getData().get(0).getCodNum().toString());
-		peticion.setParameter(BolsaEmpleoDataTable.PARAM_ORDER_BY, "11");
-		
-		RespuestaHttp respuesta = new RespuestaHttp();
-		ControladorValidarNoAfines controlador = new ControladorValidarNoAfines();
-		controlador.doPost(peticion, respuesta);
-		
-		VistaValidarNoAfines bean2 = (VistaValidarNoAfines) peticion.getUVDatos().getVistas().get(VistaValidarNoAfines.class.getName());
-		
-		assertEquals(MENSAJE_CON_ERROR, 1, bean2.getMensajesDeError().size());
-		assertEquals(MENSAJE_SIN_EXITO, 0, bean2.getMensajesDeExito().size());
 	}
 	
 }
