@@ -83,7 +83,7 @@ pipeline {
 	        		script {
 		        		def checkstyleReport = scanForIssues enabledForFailure: true, tool: checkStyle(pattern: 'builds/build/rama/site/jacoco/checkstyle_report.xml')
 		        		echo "checkstyle summary ${checkstyleReport.size()}"
-		        		env.WARNING_CHECKSTYLE = checkstyleReport.size()
+		        		env.WARNING_CHECKSTYLE = "${checkstyleReport.size()}"
 		        		echo "env checkstyle summary ${env.WARNING_CHECKSTYLE}"
 		        		publishIssues issues: [checkstyleReport]
 	        		}
