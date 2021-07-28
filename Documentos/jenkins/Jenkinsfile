@@ -114,11 +114,14 @@ pipeline {
 	    		zip zipFile: 'builds/build/rama/site/jacoco/capturas.zip', archive: false, dir: "${rutaCapturas}", overwrite: true, glob: '**/*.png'
 	    		zip zipFile: 'builds/build/rama/site/jacoco/unittest.zip', archive: false, dir: 'builds/build/rama/site/jacoco/', overwrite: true, glob: '**/*.txt'
         	}
-        	def checkstyleLog = readFile('checkstyle_log.txt').trim()
-			emailext mimeType: "text/html", to: 'jmoral@ujaen.es',
-				attachLog: true, attachmentsPattern: 'builds/build/rama/site/jacoco/unittest.zip, builds/build/rama/site/jacoco/capturas.zip',
-				body: "Construccion en: ${BUILD_URL}\n ${checkstyleLog}", 
-				subject: "Completado jenkins pipeline ${JOB_NAME} (${BUILD_NUMBER}) "
+        	step {
+	        	def checkstyleLog = readFile('checkstyle_log.txt').trim()
+				emailext mimeType: "text/html", to: 'jmoral@ujaen.es',
+					attachLog: true, attachmentsPattern: 'builds/build/rama/site/jacoco/unittest.zip, builds/build/rama/site/jacoco/capturas.zip',
+					body: "Construccion en: ${BUILD_URL}\n ${checkstyleLog}", 
+					subject: "Completado jenkins pipeline ${JOB_NAME} (${BUILD_NUMBER}) "
+        	}
+
     		sh "docker-compose down || true"
             echo "-=- fin -=-"
         }
