@@ -28,6 +28,7 @@ UsuarioBolsaEmpleo candidato = bean.getCandidato();
 ItemBaremacion item = null;
 Double valor = null;
 Boolean personal = bean.getUsuarioLogeado().getRol().getCodNum().equals(ModeloRol.ID_ROL_SERVICIO_PERSONAL);
+Boolean onlyRead = bean.getUsuarioLogeado().getRol().getCodNum().equals(ModeloRol.ID_ROL_DIRECTOR_DEPARTAMENTO) && !bolsa.getEstado().equals(ModeloBolsa.BOLSA_ESTADO_BAREMACION);
 %>
 
 <div class='bolsa-empleo'>
@@ -122,7 +123,8 @@ Boolean personal = bean.getUsuarioLogeado().getRol().getCodNum().equals(ModeloRo
 		    	<div class="form-group-container col2">
 			    	<div class="form-group">
 						<label class="bold-label" for="select_item">Categoría:</label>
-						<select class="form-input-custom" id="select_item" name="<%= ControladorValidar.PARAM_ITEM %>">
+						<select class="form-input-custom" id="select_item" name="<%= ControladorValidar.PARAM_ITEM %>"
+							<%= onlyRead ? "disabled" : "" %>>
 							<%
 							for(ItemBaremacion it: bean.getItems()) {
 							%>
@@ -148,6 +150,7 @@ Boolean personal = bean.getUsuarioLogeado().getRol().getCodNum().equals(ModeloRo
 			    					value="<%= valor %>"
 			    					data-unidades="<%= item.getUnidades() %>"
 			    					<%= EscapaHTML.escapa(item.getUnidades()).equals(ModeloBaremacionItems.ITEM_UNIDADES_MEDICION_SINO) ? "readonly" : "" %>
+			    					<%= onlyRead ? "disabled" : "" %>
 			    					required
 			    					style="max-width: 180px;"/>
 			    		</div>
@@ -173,7 +176,7 @@ Boolean personal = bean.getUsuarioLogeado().getRol().getCodNum().equals(ModeloRo
 				</div>
 			
 		    	<div class="form-btn">
-		    		<input id="merito_guardar" type="submit" name="guardar" value="Guardar"/>
+		    		<input id="merito_guardar" type="submit" name="guardar" value="Guardar" <%= onlyRead ? "disabled" : "" %>/>
 		    	</div>
 		    </form>
 		    

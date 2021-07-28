@@ -215,6 +215,7 @@ public class ControladorValidar extends HttpServlet {
 		bean.setVista(JSP_MERITOS_CANDIDATOS);
 		
 		if (!bean.getUsuarioLogeado().getRol().getCodNum().equals(ModeloRol.ID_ROL_SERVICIO_PERSONAL) 
+				&& !bean.getUsuarioLogeado().getRol().getCodNum().equals(ModeloRol.ID_ROL_DIRECTOR_DEPARTAMENTO)
 				&& !bean.getBolsa().getEstado().equals(ModeloBolsa.BOLSA_ESTADO_BAREMACION)) {
 			BolsaEmpleoUtils.addMensajeDeError(MENSAJE_ERROR_BOLSA_ESTADO_NO_VALIDO, bean, request);
 			datos.setRespuestaEnviada(true);
