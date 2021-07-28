@@ -15,6 +15,7 @@ public class HistorialValoracionMerito extends Historial implements Serializable
 	private static final long serialVersionUID = 1L;
 	private Double valor;
 	private Afinidad afinidad;
+	private String comparaAfinidad;
 	private String comparaValoracion;
 	
 	
@@ -29,12 +30,14 @@ public class HistorialValoracionMerito extends Historial implements Serializable
 	 * @param phistorial .
 	 * @param pvalor .
 	 * @param pafinidad .
+	 * @param pcomparaAfinidad .
 	 * @param pcomparaValoracion .
 	 */
-	public HistorialValoracionMerito(Historial phistorial, Double pvalor, Afinidad pafinidad, String pcomparaValoracion) {
+	public HistorialValoracionMerito(Historial phistorial, Double pvalor, Afinidad pafinidad, String pcomparaAfinidad, String pcomparaValoracion) {
 		super(phistorial);
 		this.valor = pvalor;
 		this.afinidad = pafinidad;
+		this.comparaAfinidad = pcomparaAfinidad;
 		this.comparaValoracion = pcomparaValoracion;
 	}
 
@@ -47,6 +50,7 @@ public class HistorialValoracionMerito extends Historial implements Serializable
 		super(copia);
 		this.valor = copia.valor;
 		this.afinidad = copia.afinidad;
+		this.comparaAfinidad = copia.comparaAfinidad;
 		this.comparaValoracion = copia.comparaValoracion;
 	}
 	
@@ -56,6 +60,14 @@ public class HistorialValoracionMerito extends Historial implements Serializable
 
 	public void setValor(Double valor) {
 		this.valor = valor;
+	}
+	
+	public String getComparaAfinidad() {
+		return comparaAfinidad;
+	}
+
+	public void setComparaAfinidad(String comparaAfinidad) {
+		this.comparaAfinidad = comparaAfinidad;
 	}
 	
 	public String getComparaValoracion() {
@@ -81,7 +93,7 @@ public class HistorialValoracionMerito extends Historial implements Serializable
 	@Override
 	public String toString() {
 		return "Historial Valoración Mérito [historial=" + super.toString() + ", valor=" + valor + ", afinidad=" + afinidad
-				+ ", comparaValoracion=" + comparaValoracion + "]";
+				+ ", comparaAfinidad=" + comparaAfinidad + ", comparaValoracion=" + comparaValoracion + "]";
 	}
 	
 	@Override
@@ -92,6 +104,7 @@ public class HistorialValoracionMerito extends Historial implements Serializable
 		result = prime * result + ((valor == null) ? 0 : valor.hashCode());
 		result = prime * result + ((afinidad == null) ? 0 : afinidad.hashCode());
 		result = prime * result + ((comparaValoracion == null) ? 0 : comparaValoracion.hashCode());
+		result = prime * result + ((comparaAfinidad == null) ? 0 : comparaAfinidad.hashCode());
 		return result;
 	}
 	
@@ -123,6 +136,13 @@ public class HistorialValoracionMerito extends Historial implements Serializable
 				return false;
 			}
 		} else if (!afinidad.equals(other.afinidad)) {
+			return false;
+		}
+		if (comparaAfinidad == null) {
+			if (other.comparaAfinidad != null) {
+				return false;
+			}
+		} else if (!comparaAfinidad.equals(other.comparaAfinidad)) {
 			return false;
 		}
 		if (comparaValoracion == null) {

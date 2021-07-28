@@ -38,6 +38,7 @@ public class ModeloValidarHistorial {
 	public static final int ORDER_COLUMN_INDEX_VALOR = 3;
 	
 	public static final String BEPITE_CODNUM = "BEPITE_CODNUM";
+	public static final String COMPARA_AFINIDAD = "COMPARA_AFINIDAD";
 	public static final String COMPARA_EXCLUIDO = "COMPARA_EXCLUIDO";
 	public static final String COMPARA_ITEM = "COMPARA_ITEM";
 	public static final String COMPARA_RESULTADO = "COMPARA_RESULTADO";
@@ -215,7 +216,9 @@ public class ModeloValidarHistorial {
 	}
 	
 	/** Lista de historiales de valoraciones de un mérito .
+	 * @param convocatoria .
 	 * @param merito .
+	 * @param bolsa .
 	 * @return lista historial .
 	 * @throws SQLException .
 	 * @throws UVException .
@@ -229,14 +232,23 @@ public class ModeloValidarHistorial {
 				+ "     (SELECT"
 				+ "         CASE"
 				+ "             WHEN thsbv2.VALOR != thsbv.VALOR THEN (thsbv2.VALOR || ' => ' || thsbv.VALOR)"
-				+ "             WHEN thsbv2.BEPAFI_CODNUM != thsbv.BEPAFI_CODNUM THEN (bepafi2.MODULACION * 100 || '% => ' || bepafi.MODULACION * 100 || '%')"
-				+ "             WHEN thsbv2.VALOR IS NULL THEN (bepafi2.MODULACION * 100 || '% => ' || bepafi.MODULACION * 100 || '%')"
-				+ "             WHEN thsbv2.VALOR IS NOT NULL THEN (thsbv2.VALOR || ' => ' || thsbv.VALOR)"
+				+ "             WHEN thsbv2.VALOR IS NULL AND thsbv.VALOR IS NOT NULL THEN (thsbv2.VALOR || ' => ' || thsbv.VALOR)"
 				+ "             ELSE ''"
 				+ "         END"
 				+ "     FROM TBEP_HTO_SOL_BOL_MER_VALORA thsbv2"
 				+ "     INNER JOIN TBEP_AFINIDADES bepafi2 ON bepafi2.CODNUM = thsbv2.BEPAFI_CODNUM"
-				+ "     WHERE LOG IN ('BEFORE_UPDATE') AND thsbv2.CODCAMBIO = thsbv.CODCAMBIO - 1) AS COMPARA_VALORACION"
+				+ "     WHERE LOG IN ('BEFORE_UPDATE') AND thsbv2.CODCAMBIO = thsbv.CODCAMBIO - 1) AS COMPARA_VALORACION,"
+				+ "     (SELECT"
+				+ "         CASE"
+				+ "             WHEN thsbv2.BEPAFI_CODNUM IS NULL AND thsbv.BEPAFI_CODNUM IS NOT NULL THEN (bepafi2.CODIGO || ' ' || bepafi2.MODULACION * 100"
+				+ "                 || '% => ' || bepafi.CODIGO || ' ' || bepafi.MODULACION * 100) || '%'"
+				+ "             WHEN thsbv2.BEPAFI_CODNUM != thsbv.BEPAFI_CODNUM THEN (bepafi2.CODIGO || ' ' || bepafi2.MODULACION * 100"
+				+ "                 || '% => ' || bepafi.CODIGO || ' ' || bepafi.MODULACION * 100) || '%'"
+				+ "             ELSE ''"
+				+ "         END"
+				+ "     FROM TBEP_HTO_SOL_BOL_MER_VALORA thsbv2"
+				+ "     INNER JOIN TBEP_AFINIDADES bepafi2 ON bepafi2.CODNUM = thsbv2.BEPAFI_CODNUM"
+				+ "     WHERE LOG IN ('BEFORE_UPDATE') AND thsbv2.CODCAMBIO = thsbv.CODCAMBIO - 1) AS COMPARA_AFINIDAD"
 				+ " FROM TBEP_HTO_SOL_BOL_MER_VALORA thsbv"
 				+ " LEFT JOIN TBEP_USUARIOS bepusu ON bepusu.CODCUENTA = thsbv.UID_USUARIO"
 				+ " INNER JOIN TBEP_AFINIDADES bepafi ON bepafi.CODNUM = thsbv.BEPAFI_CODNUM"
@@ -266,12 +278,6 @@ public class ModeloValidarHistorial {
 	}
 	
 	private HistorialSBM createHistorialSBMFromResultset(ResultSet rs) throws SQLException, UVException {
-		String comparaExcluido = rs.getString(COMPARA_EXCLUIDO);
-		String comparaValidado = rs.getString(COMPARA_VALIDADO);
-		String comparaValor = rs.getString(COMPARA_VALOR);
-		String comparaResultado = rs.getString(COMPARA_RESULTADO);
-		String comparaItem = rs.getString(COMPARA_ITEM);
-		
 		Date fechaLog = rs.getTimestamp(FECHALOG);
 		String log = rs.getString(LOG);
 		String uidUsuario = rs.getString(UID_USUARIO);
@@ -294,15 +300,17 @@ public class ModeloValidarHistorial {
 		ItemBaremacion item = rs.getInt(BEPITE_CODNUM) != 0 ? ModeloBaremacionItems.obtenerInstancia().getItemBaremacionById(rs.getInt(BEPITE_CODNUM)) : null;
 		Double resultado = rs.getDouble(RESULTADO);
 		Double valor = rs.getDouble(VALOR);
+		String comparaExcluido = rs.getString(COMPARA_EXCLUIDO);
+		String comparaValidado = rs.getString(COMPARA_VALIDADO);
+		String comparaValor = rs.getString(COMPARA_VALOR);
+		String comparaResultado = rs.getString(COMPARA_RESULTADO);
+		String comparaItem = rs.getString(COMPARA_ITEM);
 		
 		return new HistorialSBM(historial, excluido, validado, observacionCandidato, item, resultado, valor, comparaExcluido, comparaValidado,
 				comparaValor, comparaResultado, comparaItem);
 	}
 	
 	private HistorialMerito createHistorialMeritoFromResultset(ResultSet rs) throws SQLException, UVException {
-		String comparaValor = rs.getString(COMPARA_VALOR);
-		String comparaItem = rs.getString(COMPARA_ITEM);
-		
 		Date fechaLog = rs.getTimestamp(FECHALOG);
 		String log = rs.getString(LOG);
 		String uidUsuario = rs.getString(UID_USUARIO);
@@ -321,15 +329,13 @@ public class ModeloValidarHistorial {
 		
 		ItemBaremacion item = rs.getInt(BEPITE_CODNUM) != 0 ? ModeloBaremacionItems.obtenerInstancia().getItemBaremacionById(rs.getInt(BEPITE_CODNUM)) : null;
 		Double valor = rs.getDouble(VALOR);
+		String comparaValor = rs.getString(COMPARA_VALOR);
+		String comparaItem = rs.getString(COMPARA_ITEM);
 		
 		return new HistorialMerito(historial, item, valor, comparaValor, comparaItem);
 	}
 	
 	private HistorialValoracionMerito createHistorialValoracionMeritoFromResultset(ResultSet rs) throws SQLException, UVException {
-		String comparaValoracion = rs.getString(COMPARA_VALORACION);
-		Double valor = rs.getDouble(VALOR);
-		Afinidad afinidad = ModeloAfinidad.obtenerInstancia().getAfinidadById(rs.getInt("BEPAFI_CODNUM"));
-		
 		Date fechaLog = rs.getTimestamp(FECHALOG);
 		String log = rs.getString(LOG);
 		String uidUsuario = rs.getString(UID_USUARIO);
@@ -346,7 +352,12 @@ public class ModeloValidarHistorial {
 		}
 		Historial historial = new Historial(fechaLog, log, uidUsuario, rolUsuario);
 		
-		return new HistorialValoracionMerito(historial, valor, afinidad, comparaValoracion);
+		Double valor = rs.getDouble(VALOR);
+		Afinidad afinidad = ModeloAfinidad.obtenerInstancia().getAfinidadById(rs.getInt("BEPAFI_CODNUM"));
+		String comparaAfinidad = rs.getString(COMPARA_AFINIDAD);
+		String comparaValoracion = rs.getString(COMPARA_VALORACION);
+		
+		return new HistorialValoracionMerito(historial, valor, afinidad, comparaAfinidad, comparaValoracion);
 	}
 	
 }

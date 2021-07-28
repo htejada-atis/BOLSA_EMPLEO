@@ -138,6 +138,10 @@ Bolsa bolsa = bean.getBolsa();
 							<%	if (historial.getComparaValoracion() != null && !historial.getComparaValoracion().isBlank()) { %>
 									Valor: <%= historial.getComparaValoracion() %><br/>
 							<%	} %>
+							
+							<%	if (historial.getComparaAfinidad() != null && !historial.getComparaAfinidad().isBlank()) { %>
+									Afinidad: <%= historial.getComparaAfinidad() %><br/>
+							<%	} %>
 							</td>
 						</tr>
 				<%	} %>
