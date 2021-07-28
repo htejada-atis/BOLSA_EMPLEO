@@ -11,6 +11,7 @@ import es.ujaen.uvirtual.modulo.bolsaempleo.beans.CandidatoValidacion;
 import es.ujaen.uvirtual.modulo.bolsaempleo.beans.Convocatoria;
 import es.ujaen.uvirtual.modulo.bolsaempleo.beans.HistorialMerito;
 import es.ujaen.uvirtual.modulo.bolsaempleo.beans.HistorialSBM;
+import es.ujaen.uvirtual.modulo.bolsaempleo.beans.HistorialValoracionMerito;
 import es.ujaen.uvirtual.modulo.bolsaempleo.beans.ItemBaremacion;
 import es.ujaen.uvirtual.modulo.bolsaempleo.beans.MeritoSolicitud;
 import es.ujaen.uvirtual.modulo.bolsaempleo.beans.MeritoValidarTable;
@@ -34,6 +35,7 @@ public class VistaValidar extends Vista implements Serializable {
 	private transient BolsaEmpleoDataTable<CandidatoValidacion> datatableCandidatos;
 	private List<HistorialSBM> historialSBM;
 	private List<HistorialMerito> historialMerito;
+	private List<HistorialValoracionMerito> historialValoracionMerito;
 	private transient BolsaEmpleoDataTable<MeritoValidarTable> datatableMeritos;
 	private List<ItemBaremacion> items = new ArrayList<>();
 	private List<ValorMeritoBolsaTable> bolsas = new ArrayList<>();
@@ -93,8 +95,8 @@ public class VistaValidar extends Vista implements Serializable {
 		return validaBolsa;
 	}
 	
-	public void setValidaBolsa(Bolsa bolsa) {
-		this.validaBolsa = bolsa;
+	public void setValidaBolsa(Bolsa validaBolsa) {
+		this.validaBolsa = validaBolsa;
 	}
 	
 	public Convocatoria getConvocatoria() {
@@ -159,6 +161,14 @@ public class VistaValidar extends Vista implements Serializable {
 
 	public void setHistorialMerito(List<HistorialMerito> historialMerito) {
 		this.historialMerito = historialMerito;
+	}
+
+	public List<HistorialValoracionMerito> getHistorialValoracionMerito() {
+		return historialValoracionMerito;
+	}
+
+	public void setHistorialValoracionMerito(List<HistorialValoracionMerito> historialValoracionMerito) {
+		this.historialValoracionMerito = historialValoracionMerito;
 	}
 	
 }

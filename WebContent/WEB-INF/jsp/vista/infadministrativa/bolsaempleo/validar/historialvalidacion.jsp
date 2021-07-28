@@ -4,6 +4,7 @@
 <%@ page import="es.ujaen.uvirtual.modulo.bolsaempleo.beans.Bolsa" %>
 <%@ page import="es.ujaen.uvirtual.modulo.bolsaempleo.beans.HistorialSBM" %>
 <%@ page import="es.ujaen.uvirtual.modulo.bolsaempleo.beans.HistorialMerito" %>
+<%@ page import="es.ujaen.uvirtual.modulo.bolsaempleo.beans.HistorialValoracionMerito" %>
 <%@ page import="es.ujaen.uvirtual.modulo.bolsaempleo.beans.MeritoSolicitud" %>
 <%@ page import="es.ujaen.uvirtual.beans.UVDatos"%>
 <%@ page import="es.ujaen.uvirtual.utilidades.EscapaHTML" %>
@@ -40,11 +41,11 @@ Bolsa bolsa = bean.getBolsa();
 				<th scope="col" style="width:90px">Log</th>
 				<th scope="col" style="width:50px">Excluido</th>
 				<th scope="col" style="width:50px">Validado</th>
-				<th scope="col" style="width:80px">Observaciones</th>
+				<th scope="col" style="width:120px">Observaciones</th>
 				<th scope="col" style="width:50px">Resultado</th>
 				<th scope="col" style="width:50px">Valor</th>
 				<th scope="col" style="width:50px">Ítem</th>
-				<th scope="col" style="width:120px">Usuario</th>
+				<th scope="col" style="width:100px">Usuario</th>
 				<th scope="col" style="width:100px">Diferencias</th>
 			</tr>
 			<tbody>
@@ -103,6 +104,52 @@ Bolsa bolsa = bean.getBolsa();
 			<tfoot>
 				<tr>
 					<th colSpan="10" style="width:100%"></th>
+				</tr>
+			</tfoot>
+		</table>
+	</div>
+	
+	<div style="overflow-x:auto;">
+		<table class="bluetable bolsaempleo" id="tableHistorialMerito">
+			<caption>Historial de valoraciones del mérito</caption>
+			<tr>
+				<th scope="col" style="width:55px">Fecha</th>
+				<th scope="col" style="width:84px">Log</th>
+				<th scope="col" style="width:50px">Valor</th>
+				<th scope="col" style="width:50px">Afinidad</th>
+				<th scope="col" style="width:80px">Usuario</th>
+				<th scope="col" style="width:100px">Diferencias</th>
+			</tr>
+			<tbody>
+			<%	if (bean.getHistorialValoracionMerito().size() > 0) {
+					for (HistorialValoracionMerito historial: bean.getHistorialValoracionMerito()) { %>
+						<tr>
+							<td><%= Formateador.formatoFecha(historial.getFechaLog(), Formateador.FORMATO_FECHA_YYYYMMDD_HHMMSS) %></td>
+							<td><%= EscapaHTML.escapa(historial.getLog()) %></td>
+							<td><%= historial.getValor() != 0 ? historial.getValor() : "" %></td>
+							<td><%= EscapaHTML.escapa(historial.getAfinidad() != null ? historial.getAfinidad().getCodigo() + " " + historial.getAfinidad().getModulacion() * 100 + "%" : "") %></td>
+							<td>
+							<%	if (!historial.getRolUsuario().isBlank()) { %>
+									<%= EscapaHTML.escapa(historial.getUidUsuario()) %><br/>
+									<%= EscapaHTML.escapa("(" + historial.getRolUsuario() + ")") %>
+							<%	} %>
+							</td>
+							<td>
+							<%	if (historial.getComparaValoracion() != null && !historial.getComparaValoracion().isBlank()) { %>
+									Valor: <%= historial.getComparaValoracion() %><br/>
+							<%	} %>
+							</td>
+						</tr>
+				<%	} %>
+			<%	} else { %>
+					<tr>
+						<td colspan="6">No hay historial de valoraciones del mérito</td>
+					</tr>
+			<%	} %>
+			</tbody>
+			<tfoot>
+				<tr>
+					<th colSpan="6" style="width:100%"></th>
 				</tr>
 			</tfoot>
 		</table>

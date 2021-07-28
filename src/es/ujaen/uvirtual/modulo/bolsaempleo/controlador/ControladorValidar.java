@@ -66,7 +66,6 @@ public class ControladorValidar extends HttpServlet {
 	// acciones
 	public static final String ACCION_DATATABLE_BOLSAS = "datatablebolsas";
 	public static final String ACCION_DATATABLE_CANDIDATOS = "datatablecandidatos";
-	public static final String ACCION_DATATABLE_HISTORIAL_VALIDACION = "datatablehistorialvalidacion";
 	public static final String ACCION_DATATABLE_MERITOS = "datatablemeritos";
 	public static final String ACCION_BOLSA_SELECCIONADA = "bolsaseleccionada";
 	public static final String ACCION_CANDIDATO_SELECCIONADO = "candidatoseleccionado";
@@ -139,7 +138,6 @@ public class ControladorValidar extends HttpServlet {
 				case ACCION_BOLSA_SELECCIONADA:
 				case ACCION_CANDIDATO_SELECCIONADO:
 				case ACCION_DATATABLE_CANDIDATOS:
-				case ACCION_DATATABLE_HISTORIAL_VALIDACION:
 				case ACCION_DATATABLE_MERITOS:
 				case ACCION_HISTORIAL_VALIDACION:
 				case ACCION_MERITO_SELECCIONADO:
@@ -227,7 +225,6 @@ public class ControladorValidar extends HttpServlet {
 			case ACCION_BOLSA_SELECCIONADA:
 				break;
 			case ACCION_CANDIDATO_SELECCIONADO:
-			case ACCION_DATATABLE_HISTORIAL_VALIDACION:
 			case ACCION_DATATABLE_MERITOS:
 			case ACCION_HISTORIAL_VALIDACION:
 			case ACCION_MERITO_SELECCIONADO:
@@ -255,7 +252,6 @@ public class ControladorValidar extends HttpServlet {
 			case ACCION_DATATABLE_MERITOS:
 				listadoMeritos(bean, datos, request, response);
 				break;
-			case ACCION_DATATABLE_HISTORIAL_VALIDACION:
 			case ACCION_HISTORIAL_VALIDACION:
 			case ACCION_MERITO_SELECCIONADO:
 			case ACCION_MODIFICAR_MERITO:
@@ -280,9 +276,6 @@ public class ControladorValidar extends HttpServlet {
 		bean.setItems(modeloItem.listaItemBaremacion());
 		
 		switch (nombreAccion) {
-			case ACCION_DATATABLE_HISTORIAL_VALIDACION:
-//				listadoHistorialValidacionMerito(bean, datos, request, response);
-				break;
 			case ACCION_HISTORIAL_VALIDACION:
 				obtenerHistorialesValidacion(bean);
 				break;
@@ -369,11 +362,14 @@ public class ControladorValidar extends HttpServlet {
 	}
 	
 	private void obtenerHistorialesValidacion(VistaValidar bean) throws SQLException, UVException {
+		ModeloValidarHistorial modeloValidarHistorial = ModeloValidarHistorial.obtenerInstancia();
 		bean.setVista(JSP_HISTORIAL_VALIDACION);
 		
-		bean.setHistorialSBM(ModeloValidarHistorial.obtenerInstancia().listaHistorialSolicitudBolsasMeritos(bean.getConvocatoria(), 
-				bean.getMerito().getMerito(), bean.getBolsa(), bean.getCandidato()));
-		bean.setHistorialMerito(ModeloValidarHistorial.obtenerInstancia().listaHistorialMerito(bean.getMerito().getMerito(), bean.getCandidato()));
+		bean.setHistorialSBM(modeloValidarHistorial.listaHistorialSolicitudBolsasMeritos(bean.getConvocatoria(), 
+				bean.getMerito().getMerito(), bean.getBolsa()));
+		bean.setHistorialMerito(modeloValidarHistorial.listaHistorialMerito(bean.getMerito().getMerito()));
+		bean.setHistorialValoracionMerito(modeloValidarHistorial.listaHistorialValoracionesMerito(bean.getConvocatoria(), 
+				bean.getMerito().getMerito(), bean.getBolsa()));
 	}
 	
 	private void obtenerValoresMeritoBolsasCandidato(VistaValidar bean) throws SQLException, UVException {
@@ -524,34 +520,6 @@ public class ControladorValidar extends HttpServlet {
 			}
 		}
 	}
-	
-//	private void listadoHistorialValidacionMerito(VistaValidar bean, UVDatos datos, HttpServletRequest request, HttpServletResponse response)
-//			throws IOException {
-//		datos.setContentType(RESPONSE_AJAX_CONTENTTYPE);
-//		datos.setRespuestaEnviada(true);
-//		response.setContentType(RESPONSE_AJAX_CONTENTTYPE);
-//		response.setCharacterEncoding(RESPONSE_AJAX_ENCODING);
-//		
-//		try (PrintWriter writer = response.getWriter()) {
-//			try {
-//				BolsaEmpleoDataTable<HistorialValidacion> dataTable = ModeloValidarHistorial.obtenerInstancia().listadoHistorialValidacionesMerito(
-//						bean.getConvocatoria(), bean.getMerito().getMerito(), bean.getBolsa(), request.getParameterMap());
-//				bean.setDatatableHistorialValidacion(dataTable);
-//				writer.write(dataTable.toJson("dd/M/yyyy HH:mm:ss"));
-//			} catch (UVException | SQLException e) {
-//				if (e instanceof SQLException) {
-//					LOGGER.log(Level.SEVERE, Formateador.getStackTrace(e));
-//					LOGGER.log(Level.SEVERE, e.toString());
-//				} else {
-//					LOGGER.log(Level.WARNING, e.toString());
-//				}
-//				bean.getMensajesDeError().add(e.getMessage());
-//				CodigoDescripcion mensaje = new CodigoDescripcion(RESPONSE_AJAX_ERROR, e.getMessage());
-//				writer.write(new Gson().toJson(mensaje));
-//				response.setStatus(RESPONSE_AJAX_HTTP_CODE_ERROR);
-//			}
-//		}
-//	}
 	
 	private void listadoMeritos(VistaValidar bean, UVDatos datos, HttpServletRequest request, HttpServletResponse response)
 			throws IOException {

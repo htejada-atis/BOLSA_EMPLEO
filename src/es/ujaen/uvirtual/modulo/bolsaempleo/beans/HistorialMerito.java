@@ -6,7 +6,7 @@ import java.util.Date;
 
 
 /**
- * Clase historial .
+ * Clase historial mérito .
  * 
  * @author ATISoluciones
  */
@@ -44,7 +44,7 @@ public class HistorialMerito extends Historial implements Serializable {
 	/**
 	 * Constructor copia.
 	 * 
-	 * @param copia Historial Validación a copiar
+	 * @param copia Historial Mérito a copiar
 	 */
 	public HistorialMerito(HistorialMerito copia) {
 		super(copia);

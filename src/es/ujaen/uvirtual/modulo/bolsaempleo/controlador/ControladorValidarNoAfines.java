@@ -39,6 +39,7 @@ import es.ujaen.uvirtual.modulo.bolsaempleo.modelo.ModeloValidar;
 import es.ujaen.uvirtual.modulo.bolsaempleo.modelo.ModeloValidarHistorial;
 import es.ujaen.uvirtual.modulo.bolsaempleo.utilidades.BolsaEmpleoDataTable;
 import es.ujaen.uvirtual.modulo.bolsaempleo.utilidades.BolsaEmpleoUtils;
+import es.ujaen.uvirtual.modulo.bolsaempleo.vistas.VistaValidar;
 import es.ujaen.uvirtual.modulo.bolsaempleo.vistas.VistaValidarNoAfines;
 import es.ujaen.uvirtual.utilidades.EscapaHTML;
 import es.ujaen.uvirtual.utilidades.Formateador;
@@ -65,7 +66,6 @@ public class ControladorValidarNoAfines extends HttpServlet {
 	public static final String ACCION_DATATABLE_BOLSAS = "datatablebolsas";
 	public static final String ACCION_DATATABLE_BOLSAS_CANDIDATO = "datatablebolsascandidato";
 	public static final String ACCION_DATATABLE_CANDIDATOS = "datatablecandidatos";
-	public static final String ACCION_DATATABLE_HISTORIAL_VALIDACION = "datatablehistorialvalidacion";
 	public static final String ACCION_DATATABLE_MERITOS = "datatablemeritos";
 	public static final String ACCION_DATATABLE_VALORES_MERITO_BOLSA = "datatablevaloresmeritobolsa";
 	public static final String ACCION_DESCARGAR_FICHERO = "descargarfichero";
@@ -137,7 +137,6 @@ public class ControladorValidarNoAfines extends HttpServlet {
 				case ACCION_CANDIDATO_SELECCIONADO:
 				case ACCION_DATATABLE_BOLSAS_CANDIDATO:
 				case ACCION_DATATABLE_CANDIDATOS:
-				case ACCION_DATATABLE_HISTORIAL_VALIDACION:
 				case ACCION_DATATABLE_MERITOS:
 				case ACCION_DATATABLE_VALORES_MERITO_BOLSA:
 				case ACCION_HISTORIAL_VALIDACION:
@@ -214,7 +213,6 @@ public class ControladorValidarNoAfines extends HttpServlet {
 				break;
 			case ACCION_CANDIDATO_SELECCIONADO:
 			case ACCION_DATATABLE_BOLSAS_CANDIDATO:
-			case ACCION_DATATABLE_HISTORIAL_VALIDACION:
 			case ACCION_DATATABLE_MERITOS:
 			case ACCION_DATATABLE_VALORES_MERITO_BOLSA:
 			case ACCION_HISTORIAL_VALIDACION:
@@ -243,7 +241,6 @@ public class ControladorValidarNoAfines extends HttpServlet {
 				listadoMeritos(bean, datos, request, response);
 				break;
 			case ACCION_DATATABLE_BOLSAS_CANDIDATO:
-			case ACCION_DATATABLE_HISTORIAL_VALIDACION:
 			case ACCION_DATATABLE_VALORES_MERITO_BOLSA:
 			case ACCION_HISTORIAL_VALIDACION:
 			case ACCION_MERITO_SELECCIONADO:
@@ -272,14 +269,11 @@ public class ControladorValidarNoAfines extends HttpServlet {
 			case ACCION_DATATABLE_BOLSAS_CANDIDATO:
 				listadoBolsasCandidato(bean, datos, request, response);
 				break;
-			case ACCION_DATATABLE_HISTORIAL_VALIDACION:
-				listadoHistorialValidacionMerito(bean, datos, request, response);
-				break;
 			case ACCION_DATATABLE_VALORES_MERITO_BOLSA:
 				listadoValoresMeritoBolsa(bean, datos, request, response);
 				break;
 			case ACCION_HISTORIAL_VALIDACION:
-				bean.setVista(JSP_HISTORIAL_VALIDACION);
+				obtenerHistorialesValidacion(bean);
 				break;
 			case ACCION_MERITO_SELECCIONADO:
 				break;
@@ -373,6 +367,17 @@ public class ControladorValidarNoAfines extends HttpServlet {
 		}
 	}
 	
+	private void obtenerHistorialesValidacion(VistaValidarNoAfines bean) throws SQLException, UVException {
+		ModeloValidarHistorial modeloValidarHistorial = ModeloValidarHistorial.obtenerInstancia();
+		bean.setVista(JSP_HISTORIAL_VALIDACION);
+		
+		bean.setHistorialSBM(modeloValidarHistorial.listaHistorialSolicitudBolsasMeritos(bean.getConvocatoria(), 
+				bean.getMerito().getMerito(), bean.getBolsa()));
+		bean.setHistorialMerito(modeloValidarHistorial.listaHistorialMerito(bean.getMerito().getMerito()));
+		bean.setHistorialValoracionMerito(modeloValidarHistorial.listaHistorialValoracionesMerito(bean.getConvocatoria(), 
+				bean.getMerito().getMerito(), bean.getBolsa()));
+	}
+	
 	private void redireccionConMeritoSeleccionado(VistaValidarNoAfines bean, UVDatos datos, HttpServletRequest request, HttpServletResponse response, String accion)
 			throws IOException {
 		Map<String, String> params = new HashMap<>();
@@ -452,34 +457,6 @@ public class ControladorValidarNoAfines extends HttpServlet {
 						listadoCandidatosNoSujetosAfinidad(bean.getConvocatoria(), bean.getBolsa(), request.getParameterMap());
 				bean.setDatatableCandidatos(dataTable);
 				writer.write(dataTable.toJson());
-			} catch (UVException | SQLException e) {
-				if (e instanceof SQLException) {
-					LOGGER.log(Level.SEVERE, Formateador.getStackTrace(e));
-					LOGGER.log(Level.SEVERE, e.toString());
-				} else {
-					LOGGER.log(Level.WARNING, e.toString());
-				}
-				bean.getMensajesDeError().add(e.getMessage());
-				CodigoDescripcion mensaje = new CodigoDescripcion(RESPONSE_AJAX_ERROR, e.getMessage());
-				writer.write(new Gson().toJson(mensaje));
-				response.setStatus(RESPONSE_AJAX_HTTP_CODE_ERROR);
-			}
-		}
-	}
-	
-	private void listadoHistorialValidacionMerito(VistaValidarNoAfines bean, UVDatos datos, HttpServletRequest request, HttpServletResponse response)
-			throws IOException {
-		datos.setContentType(RESPONSE_AJAX_CONTENTTYPE);
-		datos.setRespuestaEnviada(true);
-		response.setContentType(RESPONSE_AJAX_CONTENTTYPE);
-		response.setCharacterEncoding(RESPONSE_AJAX_ENCODING);
-		
-		try (PrintWriter writer = response.getWriter()) {
-			try {
-				BolsaEmpleoDataTable<HistorialValidacion> dataTable = ModeloValidarHistorial.obtenerInstancia().listadoHistorialValidacionesMerito(
-						bean.getConvocatoria(), bean.getMerito().getMerito(), bean.getBolsa(), request.getParameterMap());
-				bean.setDatatableHistorialValidacion(dataTable);
-				writer.write(dataTable.toJson("dd/M/yyyy HH:mm:ss"));
 			} catch (UVException | SQLException e) {
 				if (e instanceof SQLException) {
 					LOGGER.log(Level.SEVERE, Formateador.getStackTrace(e));
