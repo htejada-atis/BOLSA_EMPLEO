@@ -20,11 +20,13 @@ import es.ujaen.uvirtual.beans.CodigoDescripcion;
 import es.ujaen.uvirtual.beans.UVDatos;
 import es.ujaen.uvirtual.beans.Usuario;
 import es.ujaen.uvirtual.modulo.bolsaempleo.beans.Bolsa;
+import es.ujaen.uvirtual.modulo.bolsaempleo.beans.Solicitud;
 import es.ujaen.uvirtual.modulo.bolsaempleo.modelo.ModeloBolsa;
+import es.ujaen.uvirtual.modulo.bolsaempleo.modelo.ModeloConvocatoria;
 import es.ujaen.uvirtual.modulo.bolsaempleo.modelo.ModeloParametrosConfiguracion;
+import es.ujaen.uvirtual.modulo.bolsaempleo.modelo.ModeloResultados;
 import es.ujaen.uvirtual.modulo.bolsaempleo.modelo.ModeloRol;
 import es.ujaen.uvirtual.modulo.bolsaempleo.modelo.ModeloUsuarioBolsaEmpleo;
-import es.ujaen.uvirtual.modulo.bolsaempleo.tareas.BaremarBolsa;
 import es.ujaen.uvirtual.modulo.bolsaempleo.utilidades.BolsaEmpleoDataTable;
 import es.ujaen.uvirtual.modulo.bolsaempleo.utilidades.BolsaEmpleoUtils;
 import es.ujaen.uvirtual.modulo.bolsaempleo.vistas.VistaEstadoBolsas;
@@ -226,7 +228,7 @@ public class ControladorBolsas extends HttpServlet {
 				break;
 			case ACCION_BOLSAS_BAREMAR:
 				modelo.ponerBolsasComoPendientesBaremacion(bolsas, bean.getUsuarioLogeado());
-				BaremarBolsa.run();
+				this.baremarBolsas(bolsas);
 				break;
 			default:
 				BolsaEmpleoUtils.addMensajeDeError(MENSAJE_ERROR_ACCION_BOLSA_NO_VALIDA, bean, request);
@@ -238,5 +240,20 @@ public class ControladorBolsas extends HttpServlet {
 		BolsaEmpleoUtils.addMensajeDeExito(MENSAJE_EXITO_BOLSA_MODIFICADA_CORRECTAMENTE, bean, request);
 		datos.setRespuestaEnviada(true);
 		response.sendRedirect(request.getServletPath());
+	}
+	
+	private void baremarBolsas(List<Bolsa> bolsas) throws SQLException, UVException, IOException {
+		ModeloBolsa modeloBolsa = ModeloBolsa.obtenerInstancia();
+		ModeloResultados modeloResultados = ModeloResultados.obtenerInstancia();
+		
+		for (Bolsa bolsa: bolsas) {
+			List<Solicitud> solicitudes = modeloResultados.listaSolicitudesBolsa(bolsa, ModeloConvocatoria.obtenerInstancia().getUltimaConvocatoria());
+			
+			for (Solicitud solicitud: solicitudes) {
+				modeloResultados.calcularSolicitud(solicitud, bolsa);
+			}
+			
+			modeloBolsa.baremarBolsa(bolsa, null);
+		}
 	}
 }

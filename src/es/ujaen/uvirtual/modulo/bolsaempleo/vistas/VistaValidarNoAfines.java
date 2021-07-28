@@ -9,7 +9,10 @@ import es.ujaen.uvirtual.modulo.bolsaempleo.beans.Bolsa;
 import es.ujaen.uvirtual.modulo.bolsaempleo.beans.BolsaValidacion;
 import es.ujaen.uvirtual.modulo.bolsaempleo.beans.CandidatoValidacion;
 import es.ujaen.uvirtual.modulo.bolsaempleo.beans.Convocatoria;
+import es.ujaen.uvirtual.modulo.bolsaempleo.beans.HistorialMerito;
+import es.ujaen.uvirtual.modulo.bolsaempleo.beans.HistorialSBM;
 import es.ujaen.uvirtual.modulo.bolsaempleo.beans.HistorialValidacion;
+import es.ujaen.uvirtual.modulo.bolsaempleo.beans.HistorialValoracionMerito;
 import es.ujaen.uvirtual.modulo.bolsaempleo.beans.ItemBaremacion;
 import es.ujaen.uvirtual.modulo.bolsaempleo.beans.MeritoSolicitud;
 import es.ujaen.uvirtual.modulo.bolsaempleo.beans.MeritoValidarTable;
@@ -33,7 +36,9 @@ public class VistaValidarNoAfines extends Vista implements Serializable {
 	private transient BolsaEmpleoDataTable<CandidatoValidacion> datatableCandidatos;
 	private transient BolsaEmpleoDataTable<MeritoValidarTable> datatableMeritos;
 	private transient BolsaEmpleoDataTable<ValorMeritoBolsaTable> datatableValoresMeritoBolsa;
-	private transient BolsaEmpleoDataTable<HistorialValidacion> datatableHistorialValidacion;
+	private List<HistorialSBM> historialSBM;
+	private List<HistorialMerito> historialMerito;
+	private List<HistorialValoracionMerito> historialValoracionMerito;
 	private List<ItemBaremacion> items = new ArrayList<>();
 	private String vista;
 	private UsuarioBolsaEmpleo usuarioLogeado;
@@ -134,11 +139,27 @@ public class VistaValidarNoAfines extends Vista implements Serializable {
 		this.items = items;
 	}
 
-	public BolsaEmpleoDataTable<HistorialValidacion> getDatatableHistorialValidacion() {
-		return datatableHistorialValidacion;
+	public List<HistorialSBM> getHistorialSBM() {
+		return historialSBM;
 	}
 
-	public void setDatatableHistorialValidacion(BolsaEmpleoDataTable<HistorialValidacion> datatableHistorialValidacion) {
-		this.datatableHistorialValidacion = datatableHistorialValidacion;
+	public void setHistorialSBM(List<HistorialSBM> historialSBM) {
+		this.historialSBM = historialSBM;
+	}
+	
+	public List<HistorialMerito> getHistorialMerito() {
+		return historialMerito;
+	}
+	
+	public void setHistorialMerito(List<HistorialMerito> historialMerito) {
+		this.historialMerito = historialMerito;
+	}
+	
+	public List<HistorialValoracionMerito> getHistorialValoracionMerito() {
+		return historialValoracionMerito;
+	}
+	
+	public void setHistorialValoracionMerito(List<HistorialValoracionMerito> historialValoracionMerito) {
+		this.historialValoracionMerito = historialValoracionMerito;
 	}
 }
