@@ -9,6 +9,7 @@ pipeline {
         APP_LISTENING_PORT = "8080"
         TEST_CONTAINER_NAME = "ci-${APP_NAME}-${BUILD_NUMBER}"
         SERVIDOR_ARGO_KUBERNETES = "jenkins.ujaen.es:5463"
+        WARNING_CHECKSTYLE = "sin definir"
     }
 
     stages {
@@ -81,7 +82,9 @@ pipeline {
 	        		junit 'builds/build/rama/site/jacoco/*.xml'
 	        		script {
 		        		def checkstyleReport = scanForIssues enabledForFailure: true, tool: checkStyle(pattern: 'builds/build/rama/site/jacoco/checkstyle_report.xml')
-		        		echo "chechstyle summary ${checkstyleReport.size()}"
+		        		echo "checkstyle summary ${checkstyleReport.size()}"
+		        		env.WARNING_CHECKSTYLE = checkstyleReport.size()
+		        		echo "env checkstyle summary ${env.WARNING_CHECKSTYLE}"
 		        		publishIssues issues: [checkstyleReport]
 	        		}
 	        		
