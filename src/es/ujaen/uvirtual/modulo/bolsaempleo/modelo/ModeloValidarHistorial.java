@@ -274,7 +274,7 @@ public class ModeloValidarHistorial {
 				+ "     INNER JOIN TBEP_APARTADOSBAREMACION bepapa2 ON bepapa2.CODNUM = bepblo2.BEPAPA_CODNUM"
 				+ "     WHERE LOG IN ('BEFORE_UPDATE') AND thsbm2.CODCAMBIO = thsbm.CODCAMBIO - 1) AS COMPARA_ITEM"
 				+ " FROM TBEP_HTO_SOL_BOL_MERITOS thsbm"
-				+ " INNER JOIN TBEP_USUARIOS bepusu ON bepusu.CODCUENTA = thsbm.UID_USUARIO"
+				+ " LEFT JOIN TBEP_USUARIOS bepusu ON bepusu.CODCUENTA = thsbm.UID_USUARIO"
 				+ " INNER JOIN TBEP_SOLICITUD_BOLSAS bepsob ON bepsob.CODNUM = thsbm.BEPSBO_CODNUM"
 				+ " INNER JOIN TBEP_SOLICITUDES bepsol ON bepsol.CODNUM = bepsob.BEPSOL_CODNUM"
 				+ " LEFT JOIN TBEP_ITEMSBAREMACION bepite ON bepite.CODNUM = thsbm.BEPITE_CODNUM"
@@ -336,12 +336,53 @@ public class ModeloValidarHistorial {
 				+ "     INNER JOIN TBEP_APARTADOSBAREMACION bepapa2 ON bepapa2.CODNUM = bepblo2.BEPAPA_CODNUM"
 				+ "     WHERE LOG IN ('BEFORE_UPDATE') AND thmer2.CODCAMBIO = thmer.CODCAMBIO - 1) AS COMPARA_ITEM"
 				+ " FROM TBEP_HTO_MERITOS thmer"
-				+ " INNER JOIN TBEP_USUARIOS bepusu ON bepusu.CODCUENTA = thmer.UID_USUARIO"
+				+ " LEFT JOIN TBEP_USUARIOS bepusu ON bepusu.CODCUENTA = thmer.UID_USUARIO"
 				+ " LEFT JOIN TBEP_ITEMSBAREMACION bepite ON bepite.CODNUM = thmer.BEPITE_CODNUM"
 				+ " LEFT JOIN TBEP_BLOQUESBAREMACION bepblo ON bepblo.CODNUM = bepite.BEPBLO_CODNUM"
 				+ " LEFT JOIN TBEP_APARTADOSBAREMACION bepapa ON bepapa.CODNUM = bepblo.BEPAPA_CODNUM"
 				+ " WHERE thmer.CODNUM = ?"
 				+ " ORDER BY thmer.FECHALOG DESC";
+		
+		try (Connection conexion = ConexionUvirtual.obtenerInstancia();
+				PreparedStatement stmt = conexion.prepareStatement(consulta)) {
+			int paramIndex = 1;
+			stmt.setInt(paramIndex++, merito.getCodNum());
+			
+			try (ResultSet rs = stmt.executeQuery()) {
+				while (rs.next()) {
+					historiales.add(createHistorialMeritoFromResultset(rs));
+				}
+			}
+		}
+		
+		return historiales;
+	}
+	
+	public List<HistorialMerito> listaHistorialValoracionesMerito(Merito merito, UsuarioBolsaEmpleo candidato)
+			throws SQLException, UVException {
+		List<HistorialMerito> historiales = new ArrayList<>();
+		
+		String consulta = 
+				"SELECT thsbv.LOG, thsbv.FECHALOG, thsbv.VALOR, thsbv.BEPAFI_CODNUM, thsbv.UID_USUARIO, bepusu.ROL AS ROL_USUARIO,"
+				+ "     (SELECT"
+				+ "         CASE"
+				+ "             WHEN thsbv2.VALOR != thsbv.VALOR THEN (thsbv2.VALOR || ' => ' || thsbv.VALOR)"
+				+ "             WHEN thsbv2.BEPAFI_CODNUM != thsbv.BEPAFI_CODNUM THEN (bepafi2.MODULACION * 100 || '% => ' || bepafi.MODULACION * 100 || '%')"
+				+ "             WHEN thsbv2.VALOR IS NULL THEN (bepafi2.MODULACION * 100 || '% => ' || bepafi.MODULACION * 100 || '%')"
+				+ "             WHEN thsbv2.VALOR IS NOT NULL THEN (thsbv2.VALOR || ' => ' || thsbv.VALOR)"
+				+ "             ELSE ''"
+				+ "         END"
+				+ "     FROM TBEP_HTO_SOL_BOL_MER_VALORA thsbv2"
+				+ "     INNER JOIN TBEP_AFINIDADES bepafi2 ON bepafi2.CODNUM = thsbv2.BEPAFI_CODNUM"
+				+ "     WHERE LOG IN ('BEFORE_UPDATE') AND thsbv2.CODCAMBIO = thsbv.CODCAMBIO - 1) AS COMPARA_VALOR"
+				+ " FROM TBEP_HTO_SOL_BOL_MER_VALORA thsbv"
+				+ " LEFT JOIN TBEP_USUARIOS bepusu ON bepusu.CODCUENTA = thsbv.UID_USUARIO"
+				+ " INNER JOIN TBEP_AFINIDADES bepafi ON bepafi.CODNUM = thsbv.BEPAFI_CODNUM"
+				+ " INNER JOIN TBEP_SOL_BOL_MERITOS bepsbm ON bepsbm.CODNUM = thsbv.BEPSBM_CODNUM"
+				+ " INNER JOIN TBEP_SOLICITUD_BOLSAS bepsob ON bepsob.CODNUM = bepsbm.BEPSBO_CODNUM"
+				+ " INNER JOIN TBEP_SOLICITUDES bepsol ON bepsol.CODNUM = bepsob.BEPSOL_CODNUM"
+				+ " WHERE bepsbm.BEPMER_CODNUM = ?"
+				+ " ORDER BY thsbv.FECHALOG DESC";
 		
 		try (Connection conexion = ConexionUvirtual.obtenerInstancia();
 				PreparedStatement stmt = conexion.prepareStatement(consulta)) {

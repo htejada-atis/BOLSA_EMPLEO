@@ -37,14 +37,14 @@ Bolsa bolsa = bean.getBolsa();
 			<caption>Historial del mérito en una solicitud para la bolsa</caption>
 			<tr>
 				<th scope="col" style="width:55px">Fecha</th>
-				<th scope="col" style="width:84px">Log</th>
+				<th scope="col" style="width:90px">Log</th>
 				<th scope="col" style="width:50px">Excluido</th>
 				<th scope="col" style="width:50px">Validado</th>
 				<th scope="col" style="width:80px">Observaciones</th>
 				<th scope="col" style="width:50px">Resultado</th>
 				<th scope="col" style="width:50px">Valor</th>
 				<th scope="col" style="width:50px">Ítem</th>
-				<th scope="col" style="width:80px">Usuario</th>
+				<th scope="col" style="width:120px">Usuario</th>
 				<th scope="col" style="width:100px">Diferencias</th>
 			</tr>
 			<tbody>
@@ -70,8 +70,11 @@ Bolsa bolsa = bean.getBolsa();
 						<td><%= historial.getResultado() != 0 ? historial.getResultado() : "" %></td>
 						<td><%= historial.getValor() != 0 ? historial.getValor() : "" %></td>
 						<td><%= EscapaHTML.escapa(historial.getItem() != null ? historial.getItem().getFullCode() : "") %></td>
-						<td><%= EscapaHTML.escapa(historial.getUidUsuario()) %><br/>
-							(<%= EscapaHTML.escapa(historial.getRolUsuario()) %>)
+						<td>
+						<%	if (!historial.getRolUsuario().isBlank()) { %>
+								<%= EscapaHTML.escapa(historial.getUidUsuario()) %><br/>
+								<%= EscapaHTML.escapa("(" + historial.getRolUsuario() + ")") %>
+						<%	} %>
 						</td>
 						<td>
 						<%	if (historial.getComparaExcluido() != null && !historial.getComparaExcluido().isBlank()) { %>
@@ -123,8 +126,11 @@ Bolsa bolsa = bean.getBolsa();
 						<td><%= EscapaHTML.escapa(historial.getLog()) %></td>
 						<td><%= historial.getValor() != 0 ? historial.getValor() : "" %></td>
 						<td><%= EscapaHTML.escapa(historial.getItem() != null ? historial.getItem().getFullCode() : "") %></td>
-						<td><%= EscapaHTML.escapa(historial.getUidUsuario()) %><br/>
-							(<%= EscapaHTML.escapa(historial.getRolUsuario()) %>)
+						<td>
+						<%	if (!historial.getRolUsuario().isBlank()) { %>
+								<%= EscapaHTML.escapa(historial.getUidUsuario()) %><br/>
+								<%= EscapaHTML.escapa("(" + historial.getRolUsuario() + ")") %>
+						<%	} %>
 						</td>
 						<td>
 						<%	if (historial.getComparaValor() != null && !historial.getComparaValor().isBlank()) { %>
