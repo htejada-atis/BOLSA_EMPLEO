@@ -344,7 +344,7 @@ public class ModeloValidar {
 				+ "	) counts ON counts.BEPBOL_CODNUM = bepbol.CODNUM"
 				+ "	WHERE bepbol.FLGBAREMABLE = 'S'"
 				+ (evaluador ? " AND bepeva.BEPUSU_CODNUM = ?" : "")
-				+ (evaluador ? " AND bepbol.ESTADO = ? " : "");
+				+ (usuario.getRol().getValor().equals(ModeloRol.ROL_MIEMBRO_COMISION) ? " AND bepbol.ESTADO = ? " : "");
 		
 		String orderByNoValidados = "CASE WHEN COUNT_NO_VALIDADOS IS NULL THEN 1 ELSE 0 END, COUNT_NO_VALIDADOS %s";
 		String orderByValidados = "CASE WHEN COUNT_NO_VALIDADOS IS NULL THEN 1 ELSE 0 END, COUNT_VALIDADOS %s";
@@ -372,8 +372,10 @@ public class ModeloValidar {
 				stmt.setInt(paramIndex, usuario.getCodNum());
 				stmtCount.setInt(paramIndex++, usuario.getCodNum());
 				
-				stmt.setString(paramIndex, ModeloBolsa.BOLSA_ESTADO_BAREMACION);
-				stmtCount.setString(paramIndex++, ModeloBolsa.BOLSA_ESTADO_BAREMACION);
+				if (usuario.getRol().getValor().equals(ModeloRol.ROL_MIEMBRO_COMISION)) {
+					stmt.setString(paramIndex, ModeloBolsa.BOLSA_ESTADO_BAREMACION);
+					stmtCount.setString(paramIndex++, ModeloBolsa.BOLSA_ESTADO_BAREMACION);
+				}
 			}
 
 			dataTable.setFiltersParams(stmt, stmtCount, paramIndex);

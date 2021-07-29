@@ -28,6 +28,7 @@ UsuarioBolsaEmpleo candidato = bean.getCandidato();
 ItemBaremacion item = null;
 Double valor = null;
 Boolean personal = bean.getUsuarioLogeado().getRol().getCodNum().equals(ModeloRol.ID_ROL_SERVICIO_PERSONAL);
+Boolean onlyRead = bean.getUsuarioLogeado().getRol().getCodNum().equals(ModeloRol.ID_ROL_DIRECTOR_DEPARTAMENTO) && !bolsa.getEstado().equals(ModeloBolsa.BOLSA_ESTADO_BAREMACION);
 %>
 
 <div class='bolsa-empleo'>
@@ -122,7 +123,8 @@ Boolean personal = bean.getUsuarioLogeado().getRol().getCodNum().equals(ModeloRo
 		    	<div class="form-group-container col2">
 			    	<div class="form-group">
 						<label class="bold-label" for="select_item">Categoría:</label>
-						<select class="form-input-custom" id="select_item" name="<%= ControladorValidar.PARAM_ITEM %>">
+						<select class="form-input-custom" id="select_item" name="<%= ControladorValidar.PARAM_ITEM %>"
+							<%= onlyRead ? "disabled" : "" %>>
 							<%
 							for(ItemBaremacion it: bean.getItems()) {
 							%>
@@ -148,6 +150,7 @@ Boolean personal = bean.getUsuarioLogeado().getRol().getCodNum().equals(ModeloRo
 			    					value="<%= valor %>"
 			    					data-unidades="<%= item.getUnidades() %>"
 			    					<%= EscapaHTML.escapa(item.getUnidades()).equals(ModeloBaremacionItems.ITEM_UNIDADES_MEDICION_SINO) ? "readonly" : "" %>
+			    					<%= onlyRead ? "disabled" : "" %>
 			    					required
 			    					style="max-width: 180px;"/>
 			    		</div>
@@ -173,7 +176,7 @@ Boolean personal = bean.getUsuarioLogeado().getRol().getCodNum().equals(ModeloRo
 				</div>
 			
 		    	<div class="form-btn">
-		    		<input id="merito_guardar" type="submit" name="guardar" value="Guardar"/>
+		    		<input id="merito_guardar" type="submit" name="guardar" value="Guardar" <%= onlyRead ? "disabled" : "" %>/>
 		    	</div>
 		    </form>
 		    
@@ -448,7 +451,7 @@ $(document).ready(function() {
 	        	{'data': 'codnum', 'buttons': [
 	        		{'title': 'Descargar fichero del mérito', 'class': 'only-icon icon-download', 'onClick': function(row) {
 	        			window.open("<%= ControladorDescargaFicheros.URL_DESCARGA_FICHEROS %>"
-	        		        	+ "?a=<%= bean.getUsuarioLogeado().isMiembroComision() ? ControladorDescargaFicheros.ACCION_DESCARGAR_MERITO_COMISION : ControladorDescargaFicheros.ACCION_DESCARGAR_MERITO_PERSONAL %>&<%= ControladorDescargaFicheros.PARAM_MERITO %>=" + row.codNum);
+	        		        	+ "?a=<%=bean.getUsuarioLogeado().isMiembroComision() || bean.getUsuarioLogeado().isDirectorDepartamento() ? ControladorDescargaFicheros.ACCION_DESCARGAR_MERITO_EVALUADOR : ControladorDescargaFicheros.ACCION_DESCARGAR_MERITO_PERSONAL%>&<%=ControladorDescargaFicheros.PARAM_MERITO%>=" + row.codNum);
 	        		}},
 	   			]}
 		    ]
@@ -456,7 +459,7 @@ $(document).ready(function() {
 		
 		Atis.smoothScrollToAnchor("#tableMeritos");
 		
-	<%	if (merito != null) { %>
+	<%if (merito != null) {%>
 		
 			function NoIndividualizado(cell) {
 				var self = this;
@@ -529,21 +532,21 @@ $(document).ready(function() {
 				var idBolsa = tr.data('bolsa');
 				
 				var params = {
-						'<%= ControladorValidar.PARAM_ACCION %>': '<%= ControladorValidar.ACCION_VALIDAR_MERITO %>',
-						'<%= ControladorValidar.PARAM_BOLSA %>': '<%= bolsa.getCodNum() %>',
-						'<%= ControladorValidar.PARAM_BOLSA_MERITO %>': idBolsa,
-						'<%= ControladorValidar.PARAM_CANDIDATO %>': '<%= candidato.getCodNum() %>',
-						'<%= ControladorValidar.PARAM_MERITO %>': '<%= merito.getMerito().getCodNum() %>',
-						'<%= ControladorValidar.PARAM_OBSERVACION_CANDIDATO %>': observacionCandidato,
-						'<%= ControladorValidar.PARAM_AFINIDADES %>': Atis.object2Json(afinidades),
+						'<%=ControladorValidar.PARAM_ACCION%>': '<%=ControladorValidar.ACCION_VALIDAR_MERITO%>',
+						'<%=ControladorValidar.PARAM_BOLSA%>': '<%=bolsa.getCodNum()%>',
+						'<%=ControladorValidar.PARAM_BOLSA_MERITO%>': idBolsa,
+						'<%=ControladorValidar.PARAM_CANDIDATO%>': '<%=candidato.getCodNum()%>',
+						'<%=ControladorValidar.PARAM_MERITO%>': '<%=merito.getMerito().getCodNum()%>',
+						'<%=ControladorValidar.PARAM_OBSERVACION_CANDIDATO%>': observacionCandidato,
+						'<%=ControladorValidar.PARAM_AFINIDADES%>': Atis.object2Json(afinidades),
 						[action]: true
 				}
 				Atis.sendForm("<%=request.getRequestURI()%>", params);
 			}
 			
 			document.getElementById("merito_descargar_fichero").addEventListener("click", function() {
-				window.open("<%= ControladorDescargaFicheros.URL_DESCARGA_FICHEROS %>"
-    		        	+ "<%= "?a=" + (bean.getUsuarioLogeado().isMiembroComision() ? ControladorDescargaFicheros.ACCION_DESCARGAR_MERITO_COMISION : ControladorDescargaFicheros.ACCION_DESCARGAR_MERITO_PERSONAL) + "&" + ControladorDescargaFicheros.PARAM_MERITO + "=" + merito.getMerito().getCodNum() %>");
+				window.open("<%=ControladorDescargaFicheros.URL_DESCARGA_FICHEROS%>"
+    		        	+ "<%="?a=" + (bean.getUsuarioLogeado().isMiembroComision() || bean.getUsuarioLogeado().isDirectorDepartamento() ? ControladorDescargaFicheros.ACCION_DESCARGAR_MERITO_EVALUADOR : ControladorDescargaFicheros.ACCION_DESCARGAR_MERITO_PERSONAL) + "&" + ControladorDescargaFicheros.PARAM_MERITO + "=" + merito.getMerito().getCodNum()%>");
 			});
 			
 			document.getElementById("validar_volver").addEventListener("click", function() {
