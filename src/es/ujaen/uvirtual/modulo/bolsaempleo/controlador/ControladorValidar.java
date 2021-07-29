@@ -22,7 +22,6 @@ import es.ujaen.uvirtual.modulo.bolsaempleo.beans.Afinidad;
 import es.ujaen.uvirtual.modulo.bolsaempleo.beans.Bolsa;
 import es.ujaen.uvirtual.modulo.bolsaempleo.beans.BolsaValidacion;
 import es.ujaen.uvirtual.modulo.bolsaempleo.beans.CandidatoValidacion;
-import es.ujaen.uvirtual.modulo.bolsaempleo.beans.HistorialValidacion;
 import es.ujaen.uvirtual.modulo.bolsaempleo.beans.ItemBaremacion;
 import es.ujaen.uvirtual.modulo.bolsaempleo.beans.Merito;
 import es.ujaen.uvirtual.modulo.bolsaempleo.beans.MeritoSolicitud;
@@ -100,6 +99,7 @@ public class ControladorValidar extends HttpServlet {
 	public static final String MENSAJE_ERROR_BOLSA_ESTADO_NO_VALIDO = "El estado de la bolsa no permite acceder a esta";
 	public static final String MENSAJE_ERROR_NO_HAY_BOLSAS_SELECCIONADAS = "No hay bolsas seleccionadas";
 	public static final String MENSAJE_ERROR_NUMERO_MAXIMO_MERITOS_BLOQUE = "Se ha alcanzado el número máximo de méritos por bloque";
+	public static final String MENSAJE_ERROR_BOLSA_ESTADO_NO_VALIDO_ACCION = "El estado de la bolsa no permite hacer ninguna modificación";
 	public static final String MENSAJE_ERROR_SIN_PERMISO = "No tienes permiso";
 	public static final String MENSAJE_EXITO_MERITO_EXCLUIDO = "Mérito excluido correctamente para la bolsa: %s";
 	public static final String MENSAJE_EXITO_MERITO_GUARDAR = "Mérito guardado correctamente para la bolsa: %s";
@@ -300,6 +300,11 @@ public class ControladorValidar extends HttpServlet {
 		Gson gson = new GsonBuilder().create();
 		
 		try {
+			if (!bean.getUsuarioLogeado().getRol().getCodNum().equals(ModeloRol.ID_ROL_SERVICIO_PERSONAL) 
+					&& !bean.getBolsa().getEstado().equals(ModeloBolsa.BOLSA_ESTADO_BAREMACION)) {
+				throw new UVException(MENSAJE_ERROR_BOLSA_ESTADO_NO_VALIDO_ACCION);
+			}
+			
 			if (EscapaHTML.ajustaCodificacion(request.getParameter(PARAM_VALOR)) != null) {
 				Merito merito = new Merito(bean.getMerito().getMerito());
 				// item de baremación
@@ -385,6 +390,11 @@ public class ControladorValidar extends HttpServlet {
 		ModeloBolsa modeloBolsa = ModeloBolsa.obtenerInstancia();
 		
 		try {
+			if (!bean.getUsuarioLogeado().getRol().getCodNum().equals(ModeloRol.ID_ROL_SERVICIO_PERSONAL) 
+					&& !bean.getBolsa().getEstado().equals(ModeloBolsa.BOLSA_ESTADO_BAREMACION)) {
+				throw new UVException(MENSAJE_ERROR_BOLSA_ESTADO_NO_VALIDO_ACCION);
+			}
+			
 			String observacionesCandidato = EscapaHTML.ajustaCodificacion(request.getParameter(PARAM_OBSERVACION_CANDIDATO));
 			bean.getMerito().setObservacionCandidato(EscapaHTML.ajustaCodificacion(request.getParameter(PARAM_OBSERVACION_CANDIDATO)));
 			Integer idBolsa = Formateador.leeParametroInteger(request.getParameter(PARAM_BOLSA_MERITO));
@@ -428,7 +438,6 @@ public class ControladorValidar extends HttpServlet {
 		MeritoSolicitud meritoSolicitud = modeloSolicitud.getMeritoSolicitud(solicitud, bolsa, bean.getMerito().getMerito());
 		ItemBaremacion itemBolsa = meritoSolicitud.getItem() != null ? meritoSolicitud.getItem() : meritoSolicitud.getMerito().getItemBaremacion();
 		Double valor = meritoSolicitud.getValor() != null && meritoSolicitud.getValor() != 0 ? meritoSolicitud.getValor() : meritoSolicitud.getMerito().getValor();
-		
 		
 		if (!itemBolsa.getIndividualizado()) {
 			// comprobamos validez de las afinidades

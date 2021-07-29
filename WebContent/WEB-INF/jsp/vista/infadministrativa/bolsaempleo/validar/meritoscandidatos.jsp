@@ -451,7 +451,7 @@ $(document).ready(function() {
 	        	{'data': 'codnum', 'buttons': [
 	        		{'title': 'Descargar fichero del mérito', 'class': 'only-icon icon-download', 'onClick': function(row) {
 	        			window.open("<%= ControladorDescargaFicheros.URL_DESCARGA_FICHEROS %>"
-	        		        	+ "?a=<%= bean.getUsuarioLogeado().isMiembroComision() ? ControladorDescargaFicheros.ACCION_DESCARGAR_MERITO_COMISION : ControladorDescargaFicheros.ACCION_DESCARGAR_MERITO_PERSONAL %>&<%= ControladorDescargaFicheros.PARAM_MERITO %>=" + row.codNum);
+	        		        	+ "?a=<%=bean.getUsuarioLogeado().isMiembroComision() || bean.getUsuarioLogeado().isDirectorDepartamento() ? ControladorDescargaFicheros.ACCION_DESCARGAR_MERITO_EVALUADOR : ControladorDescargaFicheros.ACCION_DESCARGAR_MERITO_PERSONAL%>&<%=ControladorDescargaFicheros.PARAM_MERITO%>=" + row.codNum);
 	        		}},
 	   			]}
 		    ]
@@ -459,7 +459,7 @@ $(document).ready(function() {
 		
 		Atis.smoothScrollToAnchor("#tableMeritos");
 		
-	<%	if (merito != null) { %>
+	<%if (merito != null) {%>
 		
 			function NoIndividualizado(cell) {
 				var self = this;
@@ -532,21 +532,21 @@ $(document).ready(function() {
 				var idBolsa = tr.data('bolsa');
 				
 				var params = {
-						'<%= ControladorValidar.PARAM_ACCION %>': '<%= ControladorValidar.ACCION_VALIDAR_MERITO %>',
-						'<%= ControladorValidar.PARAM_BOLSA %>': '<%= bolsa.getCodNum() %>',
-						'<%= ControladorValidar.PARAM_BOLSA_MERITO %>': idBolsa,
-						'<%= ControladorValidar.PARAM_CANDIDATO %>': '<%= candidato.getCodNum() %>',
-						'<%= ControladorValidar.PARAM_MERITO %>': '<%= merito.getMerito().getCodNum() %>',
-						'<%= ControladorValidar.PARAM_OBSERVACION_CANDIDATO %>': observacionCandidato,
-						'<%= ControladorValidar.PARAM_AFINIDADES %>': Atis.object2Json(afinidades),
+						'<%=ControladorValidar.PARAM_ACCION%>': '<%=ControladorValidar.ACCION_VALIDAR_MERITO%>',
+						'<%=ControladorValidar.PARAM_BOLSA%>': '<%=bolsa.getCodNum()%>',
+						'<%=ControladorValidar.PARAM_BOLSA_MERITO%>': idBolsa,
+						'<%=ControladorValidar.PARAM_CANDIDATO%>': '<%=candidato.getCodNum()%>',
+						'<%=ControladorValidar.PARAM_MERITO%>': '<%=merito.getMerito().getCodNum()%>',
+						'<%=ControladorValidar.PARAM_OBSERVACION_CANDIDATO%>': observacionCandidato,
+						'<%=ControladorValidar.PARAM_AFINIDADES%>': Atis.object2Json(afinidades),
 						[action]: true
 				}
 				Atis.sendForm("<%=request.getRequestURI()%>", params);
 			}
 			
 			document.getElementById("merito_descargar_fichero").addEventListener("click", function() {
-				window.open("<%= ControladorDescargaFicheros.URL_DESCARGA_FICHEROS %>"
-    		        	+ "<%= "?a=" + (bean.getUsuarioLogeado().isMiembroComision() ? ControladorDescargaFicheros.ACCION_DESCARGAR_MERITO_COMISION : ControladorDescargaFicheros.ACCION_DESCARGAR_MERITO_PERSONAL) + "&" + ControladorDescargaFicheros.PARAM_MERITO + "=" + merito.getMerito().getCodNum() %>");
+				window.open("<%=ControladorDescargaFicheros.URL_DESCARGA_FICHEROS%>"
+    		        	+ "<%="?a=" + (bean.getUsuarioLogeado().isMiembroComision() || bean.getUsuarioLogeado().isDirectorDepartamento() ? ControladorDescargaFicheros.ACCION_DESCARGAR_MERITO_EVALUADOR : ControladorDescargaFicheros.ACCION_DESCARGAR_MERITO_PERSONAL) + "&" + ControladorDescargaFicheros.PARAM_MERITO + "=" + merito.getMerito().getCodNum()%>");
 			});
 			
 			document.getElementById("validar_volver").addEventListener("click", function() {

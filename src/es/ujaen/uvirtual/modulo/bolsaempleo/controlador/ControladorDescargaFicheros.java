@@ -63,7 +63,7 @@ public class ControladorDescargaFicheros extends HttpServlet {
 	public static final String ACCION_DESCARGAR_DOCUMENTO = "descargardocumento";
 	public static final String ACCION_DESCARGAR_MERITO_CANDIDATO = "descargarmeritocandidato";
 	public static final String ACCION_DESCARGAR_MERITO_PERSONAL = "descargarmeritopersonal";
-	public static final String ACCION_DESCARGAR_MERITO_COMISION = "descargarmeritocomision";
+	public static final String ACCION_DESCARGAR_MERITO_EVALUADOR = "descargarmeritoevaluador";
 	public static final String ACCION_DESCARGAR_RESULTADOS_SOLICITUD_CANDIDATO = "descargarresultadossolicitudcandidato";
 	public static final String ACCION_DESCARGAR_RESULTADOS_SOLICITUD_PERSONAL = "descargarresultadossolicitudpersonal";
 	public static final String ACCION_DESCARGAR_RESUMEN_ITEM_BAREMACION = "descargarresumenitemsbaremacion";
@@ -114,8 +114,8 @@ public class ControladorDescargaFicheros extends HttpServlet {
 				case ACCION_DESCARGAR_SOLICITUD:
 					accionesFicherosCandidatos(bean, datos, request, response, nombreAccion);
 					break;
-				case ACCION_DESCARGAR_MERITO_COMISION:
-					accionesFicherosComision(bean, datos, request, response, nombreAccion);
+				case ACCION_DESCARGAR_MERITO_EVALUADOR:
+					accionesFicherosEvaluador(bean, datos, request, response, nombreAccion);
 					break;
 				case ACCION_DESCARGAR_ACREDITACION_PERSONAL:
 				case ACCION_DESCARGAR_MERITO_PERSONAL:
@@ -214,17 +214,17 @@ public class ControladorDescargaFicheros extends HttpServlet {
 		
 	}
 	
-	private void accionesFicherosComision(VistaDescargaFicheros bean, UVDatos datos, HttpServletRequest request, HttpServletResponse response, String nombreAccion)
+	private void accionesFicherosEvaluador(VistaDescargaFicheros bean, UVDatos datos, HttpServletRequest request, HttpServletResponse response, String nombreAccion)
 			throws SQLException, UVException, IOException {
 		
-		if (!bean.getUsuarioLogeado().isMiembroComision()) {
+		if (!bean.getUsuarioLogeado().isMiembroComision() && !bean.getUsuarioLogeado().isDirectorDepartamento()) {
 			BolsaEmpleoUtils.addMensajeDeError(MENSAJE_ERROR_SIN_PERMISO, bean, request);
 			response.sendRedirect(ControladorErrorBolsaEmpleo.URL_ERROR);
 			return;
 		}
 		
 		switch (nombreAccion) {
-			case ACCION_DESCARGAR_MERITO_COMISION:
+			case ACCION_DESCARGAR_MERITO_EVALUADOR:
 				descargaMeritoEvaluador(bean, datos, request, response);
 				break;
 			default:
@@ -267,18 +267,18 @@ public class ControladorDescargaFicheros extends HttpServlet {
 	
 	private void descargarPDF(UVDatos datos, HttpServletResponse response, InputStream archivo) throws UVException {
 		datos.setRespuestaEnviada(true);
-        
+		
 		try (ServletOutputStream stream = response.getOutputStream(); BufferedInputStream buf = new BufferedInputStream(archivo)) {
 			int readBytes = 0;
 			while ((readBytes = buf.read()) != -1) {
 				stream.write(readBytes);
-            }
+			}
 			stream.flush();
 		} catch (Exception ex) {
 			LOGGER.log(Level.SEVERE, Formateador.getStackTrace(ex));
 			LOGGER.log(Level.SEVERE, ex.toString());
 			throw new UVException(ex.getMessage());
-        }
+		}
 	}
 	
 	///////////////////////////////////////////////////////////////////////////////////////////////////////////
