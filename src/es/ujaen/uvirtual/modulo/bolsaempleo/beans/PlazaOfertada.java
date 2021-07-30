@@ -42,7 +42,7 @@ public class PlazaOfertada implements Serializable {
 	}
 	
 	/** Constructor copia.
-	 * @param copia Convocatoria a copiar
+	 * @param copia PlazaOfertada a copiar
 	 */
 	public PlazaOfertada(PlazaOfertada copia) {
 		this.codNum = copia.codNum;

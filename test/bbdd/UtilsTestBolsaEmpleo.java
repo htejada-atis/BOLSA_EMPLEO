@@ -102,7 +102,7 @@ public final class UtilsTestBolsaEmpleo {
 			
 			// carga de datos para produccion
 			UtilsTestBolsaEmpleo.ejecutarMultiplesScripts("DATOS PRODUCCION", "Documentos/scripts/opc.bolsaempleo/datos_produccion", ESQUEMA_UVIRTUAL, false);
-	
+			
 			// datos para pruebas
 			UtilsTestBolsaEmpleo.ejecutarMultiplesScripts("DATOS PRUEBA", "Documentos/scripts/opc.bolsaempleo/datos_desarrollo/datos_prueba", ESQUEMA_UVIRTUAL, false);
 			cargado = true;
@@ -119,10 +119,15 @@ public final class UtilsTestBolsaEmpleo {
 			BbddRunner.ejecutar("Documentos/scripts/opc.bolsaempleo/migraciones/09-titulacionesacreditacionesresultados.sql");
 			BbddRunner.ejecutar("Documentos/scripts/opc.bolsaempleo/migraciones/10-pesoapartados.sql");
 			BbddRunner.ejecutar("Documentos/scripts/opc.bolsaempleo/migraciones/11-solicitudbolsasmeritostriggers.sql");
-			BbddRunner.ejecutar("Documentos/scripts/opc.bolsaempleo/migraciones/12-contratacion.sql");
+			BbddRunner.ejecutar("Documentos/scripts/opc.bolsaempleo/migraciones/12-dedicaciones.sql");
+			BbddRunner.ejecutar("Documentos/scripts/opc.bolsaempleo/migraciones/13-plazasofertadas.sql");
+			BbddRunner.ejecutar("Documentos/scripts/opc.bolsaempleo/migraciones/14-contrataciones.sql");
+			BbddRunner.ejecutar("Documentos/scripts/opc.bolsaempleo/migraciones/15-ofertascandidatos.sql");
+			BbddRunner.ejecutar("Documentos/scripts/opc.bolsaempleo/migraciones/16-menuscontratacion.sql");
 			BbddRunner.ejecutar("Documentos/scripts/opc.bolsaempleo/datos_desarrollo/datos_prueba_migraciones/01-im-solicitudbolsasmeritos.sql");
 			BbddRunner.ejecutar("Documentos/scripts/opc.bolsaempleo/datos_desarrollo/datos_prueba_migraciones/02-im-prefijomeritospreferentes.sql");
-			BbddRunner.ejecutar("Documentos/scripts/opc.bolsaempleo/datos_desarrollo/datos_prueba_migraciones/03-im-plazasofertadas.sql");
+			BbddRunner.ejecutar("Documentos/scripts/opc.bolsaempleo/datos_desarrollo/datos_prueba_migraciones/03-im-dedicaciones.sql");
+			BbddRunner.ejecutar("Documentos/scripts/opc.bolsaempleo/datos_desarrollo/datos_prueba_migraciones/04-im-plazasofertadas.sql");
 		}
 	}
 

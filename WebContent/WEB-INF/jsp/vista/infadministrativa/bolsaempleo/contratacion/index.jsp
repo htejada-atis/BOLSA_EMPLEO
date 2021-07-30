@@ -15,20 +15,20 @@ VistaContratacion bean = (VistaContratacion) uvdatos.getVistas().get(VistaContra
 	
 	<div class="titulo-bolsa-empleo">
 		<h2>Contratación</h2>
-    
-	    <button class="link-btn" id="nueva_plaza">
-	    	 Nueva plaza
-	    </button>
+		
+		<button class="link-btn" id="nueva_plaza">
+			Nueva plaza
+		</button>
 	</div>
 	
 	<table class="bluetable bolsaempleo" id="tablePlazasOfertadas">
 		<tr>
 			<th scope="col" style="width:100px" title="Código área">Cod. Area.</th>
-			<th scope="col" style="width:100%" class="area">Área</th>			
+			<th scope="col" style="width:100%" class="area">Área</th>
 			<th scope="col" style="width:100px">Fecha creación</th>
-			<th scope="col" style="width:100px">Fecha cerrada</th>			
+			<th scope="col" style="width:100px">Fecha cerrada</th>
 		</tr>
-		<tbody>				
+		<tbody>
 		</tbody>
 		<tfoot>
 			<tr>
@@ -43,17 +43,17 @@ VistaContratacion bean = (VistaContratacion) uvdatos.getVistas().get(VistaContra
 $(document).ready(function() {
 	
 	var table = new Atis.DataTable('#tablePlazasOfertadas', {
-	    "ajax": { url: "<%= ControladorContratacion.URL_PATTERN_AJAX %>" },
-	    "pageSize": 10,
-	    "filterable": true,
-	    "action": "<%= ControladorContratacion.ACCION_DATATABLE_PLAZAS_OFERTADAS %>",
-	    "columns": [
-	    	{'data': 'area.idAreaExterno', 'filter': {'type': 'number'}},
-	        {'data': 'area.descripcion', 'filter': true, 'overflow': 'auto'},
-	        {'data': 'fechaCreacion', 'filter': {'type': 'date'}},
-	        {'data': 'fechaCierre', 'filter': {'type': 'date'}}
-	    ]
+		"ajax": { url: "<%= ControladorContratacion.URL_PATTERN_AJAX %>" },
+		"pageSize": 10,
+		"filterable": true,
+		"action": "<%= ControladorContratacion.ACCION_DATATABLE_PLAZAS_OFERTADAS %>",
+		"columns": [
+			{'data': 'area.idAreaExterno', 'filter': {'type': 'number'}},
+			{'data': 'area.descripcion', 'filter': true, 'overflow': 'auto'},
+			{'data': 'fechaCreacion', 'filter': {'type': 'date'}},
+			{'data': 'fechaCierre', 'filter': {'type': 'date'}}
+		]
 	});
 	
-}); 
+});
 </script>

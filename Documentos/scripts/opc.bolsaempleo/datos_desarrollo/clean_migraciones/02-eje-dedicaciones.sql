@@ -1,0 +1,7 @@
+DROP TABLE TBEP_HTO_DEDICACIONES;
+--/////////////////////
+DROP TABLE TBEP_DEDICACIONES;
+--/////////////////////
+DROP SEQUENCE QBEP_HTO_DED;
+--/////////////////////
+DROP SEQUENCE QBEP_DED;

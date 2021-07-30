@@ -13,55 +13,66 @@ import javax.servlet.http.HttpServletResponse;
 import com.google.gson.Gson;
 import es.ujaen.uvirtual.beans.CodigoDescripcion;
 import es.ujaen.uvirtual.beans.UVDatos;
-import es.ujaen.uvirtual.modulo.bolsaempleo.beans.PlazaOfertada;
+import es.ujaen.uvirtual.modulo.bolsaempleo.beans.Dedicacion;
+import es.ujaen.uvirtual.modulo.bolsaempleo.modelo.ModeloDedicacion;
 import es.ujaen.uvirtual.modulo.bolsaempleo.modelo.ModeloParametrosConfiguracion;
-import es.ujaen.uvirtual.modulo.bolsaempleo.modelo.ModeloPlazaOfertada;
 import es.ujaen.uvirtual.modulo.bolsaempleo.modelo.ModeloRol;
 import es.ujaen.uvirtual.modulo.bolsaempleo.modelo.ModeloUsuarioBolsaEmpleo;
 import es.ujaen.uvirtual.modulo.bolsaempleo.utilidades.BolsaEmpleoDataTable;
 import es.ujaen.uvirtual.modulo.bolsaempleo.utilidades.BolsaEmpleoUtils;
-import es.ujaen.uvirtual.modulo.bolsaempleo.vistas.VistaContratacion;
+import es.ujaen.uvirtual.modulo.bolsaempleo.vistas.VistaDedicacion;
 import es.ujaen.uvirtual.utilidades.EscapaHTML;
 import es.ujaen.uvirtual.utilidades.Formateador;
 import es.ujaen.uvirtual.utilidades.UVException;
 
 /**
- * Servlet implementation class ControladorContratacion.
+ * Servlet implementation class ControladorDedicaciones.
  */
 @WebServlet(
-	name = "informacionadministrativa.bolsaempleo.contratacion",
-	description = "Contratación bolsa empleo",
-	urlPatterns = { 
-			"/srv/es/informacionadministrativa/bolsaempleo/contratacion",
-			"/srv/en/informacionadministrativa/bolsaempleo/contratacion",
-			"/srv/es/ajax/informacionadministrativa/bolsaempleo/contratacion",
-			"/srv/en/ajax/informacionadministrativa/bolsaempleo/contratacion",
+	name = "informacionadministrativa.bolsaempleo.dedicaciones",
+	description = "Gestión de dedicaciones bolsa empleo",
+	urlPatterns = {
+			"/srv/es/informacionadministrativa/bolsaempleo/configuracion/dedicaciones",
+			"/srv/en/informacionadministrativa/bolsaempleo/configuracion/dedicaciones",
+			"/srv/es/ajax/informacionadministrativa/bolsaempleo/configuracion/dedicaciones",
+			"/srv/en/ajax/informacionadministrativa/bolsaempleo/configuracion/dedicaciones"
 	})
-public class ControladorContratacion extends HttpServlet {
+public class ControladorDedicaciones extends HttpServlet {
 	private static final long serialVersionUID = 1L;
-	private static final String NOMBREDEESTACLASE = ControladorContratacion.class.getName();
+	private static final String NOMBREDEESTACLASE = ControladorDedicaciones.class.getName();
 	private static final Logger LOGGER = Logger.getLogger(NOMBREDEESTACLASE);
 	
 	// acciones
-	public static final String ACCION_DATATABLE_PLAZAS_OFERTADAS = "datatableplazasofertadas";
+	public static final String ACCION_DATATABLE_DEDICACIONES = "datatablededicaciones";
+	public static final String ACCION_EDITAR_DEDICACION = "editardedicacion";
+	public static final String ACCION_ELIMINAR_DEDICACION = "eliminardedicacion";
 	public static final String ACCION_INDEX = "index";
+	public static final String ACCION_NUEVA_DEDICACION = "nuevadedicacion";
+	public static final String ACCION_RESTAURAR_DEDICACION = "restaurardedicacion";
 	
 	// Parámetros
 	public static final String PARAM_ACCION = "a";
+	public static final String PARAM_DEDICACION = "dedicacion";
+	public static final String PARAM_ENVIAR = "enviar";
+	public static final String PARAM_TEXTO_DEDICACION = "textodedicacion";
+	public static final String PARAM_SUELDO = "sueldo";
 	
 	// mensajes
 	public static final String MENSAJE_ERROR_ACCION_NO_CONTEMPLADA = "Acción no contemplada";
+	public static final String MENSAJE_ERROR_TEXTO_VACIO = "El texto no puede estar vacío";
+	public static final String MENSAJE_ERROR_SUELDO_VACIO = "El sueldo no puede estar vacío";
 	public static final String MENSAJE_ERROR_SIN_PERMISO = "No tienes permiso";
 	
 	// ruta vistas
-	public static final String RUTA_BEP_CONTRATACION = "/WEB-INF/jsp/vista/infadministrativa/bolsaempleo/contratacion/";
-	public static final String JSP_INDEX = RUTA_BEP_CONTRATACION + "index.jsp";
+	public static final String RUTA_BEP_DEDICACIONES = "/WEB-INF/jsp/vista/infadministrativa/bolsaempleo/configuracion/dedicaciones/";
+	public static final String JSP_INDEX = RUTA_BEP_DEDICACIONES + "index.jsp";
+	public static final String JSP_FORM = RUTA_BEP_DEDICACIONES + "formDedicacion.jsp";
 	
 	// errors
 	public static final Integer RESPONSE_HTTP_CODE_ERROR_400 = 400;
 	
 	// urls
-	public static final String URL_PATTERN_AJAX = "/srv/es/ajax/informacionadministrativa/bolsaempleo/contratacion";
+	public static final String URL_PATTERN_AJAX = "/srv/es/ajax/informacionadministrativa/bolsaempleo/configuracion/dedicaciones";
 	public static final String RESPONSE_AJAX_CONTENTTYPE = "application/json";
 	public static final String RESPONSE_AJAX_ENCODING = "UTF-8";
 	public static final String RESPONSE_AJAX_ERROR = "error";
@@ -76,7 +87,7 @@ public class ControladorContratacion extends HttpServlet {
 		datos.setDocType("<!DOCTYPE html>");
 		datos.setContentType("text/html");
 		
-		VistaContratacion bean = new VistaContratacion();
+		VistaDedicacion bean = new VistaDedicacion();
 		
 		String nombreAccion = EscapaHTML.ajustaCodificacion(request.getParameter(PARAM_ACCION));
 		if (nombreAccion == null || nombreAccion.isEmpty()) {
@@ -86,10 +97,16 @@ public class ControladorContratacion extends HttpServlet {
 			init(bean, datos, request, response);
 			
 			switch (nombreAccion) {
-				case ACCION_DATATABLE_PLAZAS_OFERTADAS:
-					listaPlazasOfertadas(bean, datos, request, response);
+				case ACCION_DATATABLE_DEDICACIONES:
+					listaDedicaciones(bean, datos, request, response);
 					break;
 				case ACCION_INDEX:
+					break;
+				case ACCION_EDITAR_DEDICACION:
+					editarDedicacion(bean, datos, request, response);
+					break;
+				case ACCION_NUEVA_DEDICACION:
+					nuevaDedicacion(bean, datos, request, response);
 					break;
 				default:
 					errorFatal(bean, MENSAJE_ERROR_ACCION_NO_CONTEMPLADA);
@@ -114,7 +131,7 @@ public class ControladorContratacion extends HttpServlet {
 		}
 	}
 	
-	private void init(VistaContratacion bean, UVDatos datos, HttpServletRequest request, HttpServletResponse response) throws SQLException, UVException, IOException {
+	private void init(VistaDedicacion bean, UVDatos datos, HttpServletRequest request, HttpServletResponse response) throws SQLException, UVException, IOException {
 		bean.setVista(JSP_INDEX);
 		BolsaEmpleoUtils.readMensajeSession(bean, request);
 		
@@ -135,7 +152,7 @@ public class ControladorContratacion extends HttpServlet {
 		}
 	}
 	
-	private void errorFatal(VistaContratacion bean, String mensaje) {
+	private void errorFatal(VistaDedicacion bean, String mensaje) {
 		bean.setVista("/WEB-INF/jsp/vista/infadministrativa/bolsaempleo/error.jsp");
 		bean.getMensajesDeError().add(mensaje);
 	}
@@ -148,7 +165,31 @@ public class ControladorContratacion extends HttpServlet {
 		doGet(request, response);
 	}
 	
-	private void listaPlazasOfertadas(VistaContratacion bean, UVDatos datos, HttpServletRequest request, HttpServletResponse response) throws IOException {
+	private void editarDedicacion(VistaDedicacion bean, UVDatos datos, HttpServletRequest request, HttpServletResponse response) throws IOException, UVException, SQLException {
+		bean.setVista(JSP_FORM);
+		
+		if (EscapaHTML.ajustaCodificacion(request.getParameter(PARAM_ENVIAR)) != null) {
+			Dedicacion dedicacion = validarDedicacion(request);
+			ModeloDedicacion.obtenerInstancia().actualizaDedicacion(dedicacion, bean.getUsuarioLogeado());
+			
+			datos.setRespuestaEnviada(true);
+			response.sendRedirect(request.getServletPath());
+		}
+	}
+	
+	private void nuevaDedicacion(VistaDedicacion bean, UVDatos datos, HttpServletRequest request, HttpServletResponse response) throws IOException, UVException {
+		bean.setVista(JSP_FORM);
+		
+		if (EscapaHTML.ajustaCodificacion(request.getParameter(PARAM_ENVIAR)) != null) {
+			Dedicacion dedicacion = validarDedicacion(request);
+			
+			
+			datos.setRespuestaEnviada(true);
+			response.sendRedirect(request.getServletPath());
+		}
+	}
+	
+	private void listaDedicaciones(VistaDedicacion bean, UVDatos datos, HttpServletRequest request, HttpServletResponse response) throws IOException {
 		datos.setContentType(RESPONSE_AJAX_CONTENTTYPE);
 		datos.setRespuestaEnviada(true);
 		response.setContentType(RESPONSE_AJAX_CONTENTTYPE);
@@ -156,8 +197,8 @@ public class ControladorContratacion extends HttpServlet {
 		
 		try (PrintWriter writer = response.getWriter()) {
 			try {
-				BolsaEmpleoDataTable<PlazaOfertada> dataTable = ModeloPlazaOfertada.obtenerInstancia().listadoPlazasOfertadas(request.getParameterMap());
-				bean.setDatatablePlazasOfertadas(dataTable);
+				BolsaEmpleoDataTable<Dedicacion> dataTable = ModeloDedicacion.obtenerInstancia().listadoDedicaciones(request.getParameterMap());
+				bean.setDatatableDedicaciones(dataTable);
 				writer.write(dataTable.toJson());
 			} catch (UVException | SQLException e) {
 				if (e instanceof SQLException) {
@@ -172,6 +213,22 @@ public class ControladorContratacion extends HttpServlet {
 				response.setStatus(RESPONSE_AJAX_HTTP_CODE_ERROR);
 			}
 		}
+	}
+	
+	private Dedicacion validarDedicacion(HttpServletRequest request) throws UVException {
+		Dedicacion ded = new Dedicacion();
+		
+		ded.setTexto(EscapaHTML.ajustaCodificacion(request.getParameter(PARAM_DEDICACION)));
+		if (ded.getTexto() == null || ded.getTexto().isBlank()) {
+			throw new UVException(MENSAJE_ERROR_TEXTO_VACIO);
+		}
+		
+		ded.setSueldo(Formateador.leeParametroDouble(request.getParameter(PARAM_SUELDO)));
+		if (ded.getSueldo() == null) {
+			throw new UVException(MENSAJE_ERROR_SUELDO_VACIO);
+		}
+		
+		return ded;
 	}
 	
 }

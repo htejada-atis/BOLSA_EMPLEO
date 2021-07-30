@@ -1,0 +1,7 @@
+DROP TABLE TBEP_HTO_OFERTAS_CANDIDATOS;
+--/////////////////////
+DROP TABLE TBEP_OFERTAS_CANDIDATOS;
+--/////////////////////
+DROP SEQUENCE QBEP_HTO_OFC;
+--/////////////////////
+DROP SEQUENCE QBEP_OFC;

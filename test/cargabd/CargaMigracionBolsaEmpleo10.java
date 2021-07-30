@@ -6,8 +6,11 @@ import bbdd.BbddRunner;
 
 /**
  * Migraciones 20210728 .
- * 	- contratación .
- * 
+ *	- dedicaciones .
+ *	- contrataciones .
+ *	- ofertas candidatos .
+ *	- menus contratación .
+ *
  * @author ATISoluciones 2021
  */
 public class CargaMigracionBolsaEmpleo10 {
@@ -19,7 +22,11 @@ public class CargaMigracionBolsaEmpleo10 {
 	public static void main(String[] args) {
 		BbddRunner.conectarBd();
 		try {
-			BbddRunner.ejecutar("Documentos/scripts/opc.bolsaempleo/migraciones/12-contratacion.sql");
+			BbddRunner.ejecutar("Documentos/scripts/opc.bolsaempleo/migraciones/12-dedicaciones.sql");
+			BbddRunner.ejecutar("Documentos/scripts/opc.bolsaempleo/migraciones/13-plazasofertadas.sql");
+			BbddRunner.ejecutar("Documentos/scripts/opc.bolsaempleo/migraciones/14-contrataciones.sql");
+			BbddRunner.ejecutar("Documentos/scripts/opc.bolsaempleo/migraciones/15-ofertascandidatos.sql");
+			BbddRunner.ejecutar("Documentos/scripts/opc.bolsaempleo/migraciones/16-menuscontratacion.sql");
 		} catch (IOException | SQLException e) {
 			e.printStackTrace();
 		}
