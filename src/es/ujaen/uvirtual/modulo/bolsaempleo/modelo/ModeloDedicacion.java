@@ -13,6 +13,7 @@ import es.ujaen.uvirtual.modulo.bolsaempleo.beans.Dedicacion;
 import es.ujaen.uvirtual.modulo.bolsaempleo.beans.UsuarioBolsaEmpleo;
 import es.ujaen.uvirtual.modulo.bolsaempleo.utilidades.BolsaEmpleoDataTable;
 import es.ujaen.uvirtual.modulo.bolsaempleo.utilidades.BolsaEmpleoUtils;
+import es.ujaen.uvirtual.modulo.bolsaempleo.utilidades.BolsaEmpleoDataTable.DataTableColumn;
 import es.ujaen.uvirtual.utilidades.UVException;
 
 /**
@@ -22,6 +23,13 @@ import es.ujaen.uvirtual.utilidades.UVException;
  */
 public class ModeloDedicacion {
 	
+	public static final int ORDER_COLUMN_INDEX_ID = 0;
+	public static final int ORDER_COLUMN_INDEX_TEXTO = 1;
+	public static final int ORDER_COLUMN_INDEX_SUELDO = 2;
+	public static final int ORDER_COLUMN_INDEX_FECHA_VIGENCIA = 3;
+	public static final int ORDER_COLUMN_INDEX_ACTIVA = 4;
+	
+	public static final String MENSAJE_ERROR_DEDICACION_ID_NO_EXISTE = "No existe la dedicación con el id indicando";
 	public static final String MENSAJE_ERROR_OBJETO_VACIO = "No se puede %s una dedicación vacía";
 	public static final String MENSAJE_ERROR_PARAM_VACIO = "No se puede %s una dedicación sin %s";
 	
@@ -57,6 +65,55 @@ public class ModeloDedicacion {
 		return eInstancia;
 	}
 	
+	/** Consulta dedicaciones en BBDD y las devuelve .
+	 * @param clausula para filtrar las dedicaciones de la bd .
+	 * @return dedicaciones de la base de datos .
+	 * @throws SQLException en caso de error de base de datos .
+	 */
+	private List<Dedicacion> listaDedicaciones(String clausula) throws SQLException {
+		List<Dedicacion> listaDedicaciones = new ArrayList<>();
+		String consulta = "SELECT bepded.* FROM TBEP_DEDICACIONES bepded " + clausula;
+		
+		try (Connection conexion = ConexionUvirtual.obtenerInstancia();
+				PreparedStatement stmt = conexion.prepareStatement(consulta)) {
+			try (ResultSet rs = stmt.executeQuery()) {
+				while (rs.next()) {
+					listaDedicaciones.add(createDedicacionFromResultSet(rs));
+				}
+			}
+		}
+		
+		return listaDedicaciones;
+	}
+	
+	/** Devuelve una lista con todas las dedicaciones activas de la base de datos .
+	 * @return dedicaciones de la base de datos .
+	 * @throws SQLException en caso de error de base de datos .
+	 */
+	public List<Dedicacion> listaDedicacionesActivas() throws SQLException {
+		return listaDedicaciones(String.format("WHERE %s = %s", FLGACTIVA, ACTIVA));
+	}
+	
+	public Dedicacion getDedicacionById(Integer codNum) throws SQLException, UVException {
+		if (codNum == null) {
+			throw new UVException(String.format(MENSAJE_ERROR_PARAM_VACIO, "buscar", "id"));
+		}
+		
+		String consulta = String.format("SELECT bepded.* FROM TBEP_DEDICACIONES bepded WHERE %s=?", CODNUM);
+		
+		try (Connection conexion = ConexionUvirtual.obtenerInstancia(); PreparedStatement stmt = conexion.prepareStatement(consulta)) {
+			stmt.setInt(1, codNum);
+			
+			try (ResultSet rs = stmt.executeQuery()) {
+				if (!rs.next()) {
+					throw new UVException(MENSAJE_ERROR_DEDICACION_ID_NO_EXISTE);
+				}
+				
+				return createDedicacionFromResultSet(rs);
+			}
+		}
+	}
+	
 	/**
 	 * Lista de plazas ofertadas .
 	 * @param params .
@@ -68,13 +125,19 @@ public class ModeloDedicacion {
 		List<Dedicacion> rows = new ArrayList<>();
 		BolsaEmpleoDataTable<Dedicacion> dataTable = new BolsaEmpleoDataTable<>(params);
 		
-		String consulta = "SELECT * FROM TBEP_DEDICACIONES";
+		String consulta = "SELECT bepded.* FROM TBEP_DEDICACIONES bepded WHERE 1=1 ";
 		
+		dataTable.setColumn(ORDER_COLUMN_INDEX_ID, CODNUM, DataTableColumn.COLUMN_TYPE_NUMBER);
+		dataTable.setColumn(ORDER_COLUMN_INDEX_TEXTO, TEXTO);
+		dataTable.setColumn(ORDER_COLUMN_INDEX_SUELDO, SUELDO, DataTableColumn.COLUMN_TYPE_NUMBER);
+		dataTable.setColumn(ORDER_COLUMN_INDEX_FECHA_VIGENCIA, FECHA_VIGENCIA, DataTableColumn.COLUMN_TYPE_DATE);
+		dataTable.setColumn(ORDER_COLUMN_INDEX_ACTIVA, FLGACTIVA, DataTableColumn.COLUMN_TYPE_BOOLEAN);
 		dataTable.setQuery(consulta);
 		
 		try (Connection conexion = ConexionUvirtual.obtenerInstancia();
 				PreparedStatement stmtCount = conexion.prepareStatement(dataTable.getQueryCount());
 				PreparedStatement stmt = conexion.prepareStatement(dataTable.getQuery())) {
+			dataTable.setFiltersParams(stmt, stmtCount, 1);
 			
 			try (ResultSet rs = stmt.executeQuery()) {
 				while (rs.next()) {
@@ -108,7 +171,7 @@ public class ModeloDedicacion {
 			throw new UVException(String.format(MENSAJE_ERROR_PARAM_VACIO, "insertar", "sueldo"));
 		}
 		
-		String consulta = String.format("INSERT INTO TBEP_DEDICACIONES (%s,%s,%s,%s,%s) VALUES (?,?,?,?)", TEXTO, SUELDO, FECHA_VIGENCIA, "UID_USUARIO");
+		String consulta = String.format("INSERT INTO TBEP_DEDICACIONES (%s,%s,%s,%s) VALUES (?,?,?,?)", TEXTO, SUELDO, FECHA_VIGENCIA, "UID_USUARIO");
 		
 		try (Connection conexion = ConexionUvirtual.obtenerInstancia(); PreparedStatement stmt = conexion.prepareStatement(consulta)) {
 			int parameterIndex = 1;

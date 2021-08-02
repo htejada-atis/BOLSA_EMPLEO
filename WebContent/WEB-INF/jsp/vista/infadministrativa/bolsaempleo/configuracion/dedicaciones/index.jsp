@@ -1,6 +1,6 @@
 <%@ page trimDirectiveWhitespaces="true" %>
 <%@ page import="es.ujaen.uvirtual.beans.UVDatos" %>
-<%@	page import="es.ujaen.uvirtual.modulo.bolsaempleo.controlador.ControladorDedicaciones" %>
+<%@	page import="es.ujaen.uvirtual.modulo.bolsaempleo.controlador.configuracion.ControladorDedicaciones" %>
 <%@ page import="es.ujaen.uvirtual.modulo.bolsaempleo.vistas.VistaDedicacion" %>
 <%@ page import="es.ujaen.uvirtual.utilidades.EscapaHTML" %>
 <%@ page import="es.ujaen.uvirtual.utilidades.Formateador" %>
@@ -23,17 +23,18 @@ VistaDedicacion bean = (VistaDedicacion) uvdatos.getVistas().get(VistaDedicacion
 	
 	<table class="bluetable bolsaempleo" id="tableDedicaciones">
 		<tr>
-			<th scope="col" style="width:100px">Id</th>
-			<th scope="col" style="width:100px">Dedicación</th>
-			<th scope="col" style="width:100px">Sueldo</th>
-			<th scope="col" style="width:100px">Fecha creación</th>
-			<th scope="col" style="width:100px">Activa</th>
+			<th scope="col" style="width:50px">Id</th>
+			<th scope="col" style="width:100%">Texto</th>
+			<th scope="col" style="width:75px">Sueldo</th>
+			<th scope="col" style="width:85px">Fecha vigencia</th>
+			<th scope="col" style="width:60px">Activa</th>
+			<th scope="col" style="width:80px"></th>
 		</tr>
 		<tbody>
 		</tbody>
 		<tfoot>
 			<tr>
-				<th colSpan="5" style="width:100%"></th>
+				<th colSpan="6" style="width:100%"></th>
 			</tr>
 		</tfoot>
 	</table>
@@ -50,10 +51,10 @@ $(document).ready(function() {
 		"action": "<%=ControladorDedicaciones.ACCION_DATATABLE_DEDICACIONES%>",
 		"columns": [
 			{'data': 'codNum', 'filter': {'type': 'number'}},
-			{'data': 'dedicacion', 'filter': true},
+			{'data': 'texto', 'filter': true},
 			{'data': 'sueldo', 'filter': {'type': 'number'}},
-			{'data': 'fechaCreacion', 'filter': {'type': 'date'}},
-			{'data': 'activa', 'filter': {'type': 'select', 'options': {'true': 'Activas', 'false': 'Inactivas'}}, 'order': {'active': false}, 'render': function(row) {
+			{'data': 'fechaVigencia', 'filter': {'type': 'date'}},
+			{'data': 'activa', 'filter': {'type': 'select', 'options': {'true': 'Activas', 'false': 'Inactivas'}, 'optionDefault': 'true'}, 'render': function(row) {
 				if (row.activa) {
 					return "<div title='Activa' class='circle-true'></div>";
 				} else {
@@ -61,23 +62,24 @@ $(document).ready(function() {
 				}
 			}},
 			{'data': 'codNum', 'buttons': [{'label': 'Editar', 'onClick': function(row) {
-						var params = {'a': '<%=ControladorDedicaciones.ACCION_EDITAR_DEDICACION%>', 'id': row.codNum};
+						var params = {'a': '<%=ControladorDedicaciones.ACCION_EDITAR_DEDICACION%>', 
+								'<%=ControladorDedicaciones.PARAM_DEDICACION%>': row.codNum};
 						Atis.sendForm("<%=request.getRequestURI()%>", params);
 					}
-				}, {'label': function(row) { return row.activa ? "Borrar" : "Restaurar"; }, 
-					'title':  function(row) { return row.activa ? "Borrar noticia" : "Restaurar noticia"; }, 'onClick': function(row) {
-					var mensaje = "¿Desea borrar la noticia seleccionada?";
-					var titulo = "Borrar noticia";
+				}, {'label': function(row) { return row.activa ? "Borrar" : "Restaurar"; },
+					'title':  function(row) { return row.activa ? "Borrar dedicación" : "Restaurar dedicación"; }, 'onClick': function(row) {
+					var mensaje = "¿Desea borrar la dedicación seleccionada?";
+					var titulo = "Borrar dedicación";
 					if(!row.activa) {
-						titulo = "Restaurar noticia";
-						mensaje = "¿Desea restaurar la noticia seleccionada?";
+						titulo = "Restaurar dedicación";
+						mensaje = "¿Desea restaurar la dedicación seleccionada?";
 					}
 					
 					Atis.confirmDialog(titulo, mensaje, {
 						Si: function() {
-							var params = {'a': '<%=ControladorDedicaciones.ACCION_ELIMINAR_NOTICIA%>',
-									'id': row.codNum,
-									'<%=ControladorNoticias.PARAM_ACTIVA%>': !row.activa};
+							var params = {'a': '<%=ControladorDedicaciones.ACCION_ELIMINAR_DEDICACION%>',
+									'<%=ControladorDedicaciones.PARAM_DEDICACION%>': row.codNum,
+									'<%=ControladorDedicaciones.PARAM_ACTIVA%>': !row.activa};
 							Atis.sendForm("<%= request.getRequestURI() %>", params);
 							$(this).dialog("close");
 						},

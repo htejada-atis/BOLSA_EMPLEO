@@ -1,5 +1,6 @@
 package es.ujaen.uvirtual.modulo.bolsaempleo.beans;
 
+import java.io.InputStream;
 import java.io.Serializable;
 import java.util.Date;
 
@@ -11,10 +12,18 @@ public class PlazaOfertada implements Serializable {
 	private static final long serialVersionUID = 1L;
 	private Integer codNum;
 	private Area area;
+	private Dedicacion dedicacion;
+	private String justificacion;
+	private String duracionPrevista;
+	private String cuatrimestre;
+	private String centroDestino;
 	private String estado;
 	private Date fechaCreacion;
 	private Date fechaAbierta;
 	private Date fechaCerrada;
+	private Date fechaNRI;
+	private transient InputStream horario;
+	private transient InputStream nri;
 	
 
 	/** Constructor por defecto.
@@ -23,22 +32,40 @@ public class PlazaOfertada implements Serializable {
 		//este contructor esta vacio intencionadamente
 	}
 	
-	/** Constructor con parametros.
+	/** Constructor con parametros .
 	 * @param pcodNum .
 	 * @param parea .
+	 * @param pdedicacion .
+	 * @param pjustificacion .
+	 * @param pduracionPrevista .
+	 * @param pcuatrimestre .
+	 * @param pcentroDestino .
 	 * @param pestado .
 	 * @param pfechaCreacion .
 	 * @param pfechaAbierta .
 	 * @param pfechaCerrada .
+	 * @param pfechaNRI .
+	 * @param phorario .
+	 * @param pnri .
 	 */
-	public PlazaOfertada(Integer pcodNum, Area parea, String pestado, Date pfechaCreacion, Date pfechaAbierta, Date pfechaCerrada) {
+	public PlazaOfertada(Integer pcodNum, Area parea, Dedicacion pdedicacion, String pjustificacion,
+			String pduracionPrevista, String pcuatrimestre, String pcentroDestino, String pestado, Date pfechaCreacion,
+			Date pfechaAbierta, Date pfechaCerrada, Date pfechaNRI, InputStream phorario, InputStream pnri) {
 		super();
 		this.codNum = pcodNum;
 		this.area = parea;
+		this.dedicacion = pdedicacion;
+		this.justificacion = pjustificacion;
+		this.duracionPrevista = pduracionPrevista;
+		this.cuatrimestre = pcuatrimestre;
+		this.centroDestino = pcentroDestino;
 		this.estado = pestado;
 		this.fechaCreacion = pfechaCreacion;
 		this.fechaAbierta = pfechaAbierta;
 		this.fechaCerrada = pfechaCerrada;
+		this.fechaNRI = pfechaNRI;
+		this.horario = phorario;
+		this.nri = pnri;
 	}
 	
 	/** Constructor copia.
@@ -101,6 +128,70 @@ public class PlazaOfertada implements Serializable {
 		this.fechaCerrada = fechaCerrada;
 	}
 	
+	public Dedicacion getDedicacion() {
+		return dedicacion;
+	}
+
+	public void setDedicacion(Dedicacion dedicacion) {
+		this.dedicacion = dedicacion;
+	}
+
+	public String getJustificacion() {
+		return justificacion;
+	}
+
+	public void setJustificacion(String justificacion) {
+		this.justificacion = justificacion;
+	}
+
+	public String getDuracionPrevista() {
+		return duracionPrevista;
+	}
+
+	public void setDuracionPrevista(String duracionPrevista) {
+		this.duracionPrevista = duracionPrevista;
+	}
+
+	public String getCuatrimestre() {
+		return cuatrimestre;
+	}
+
+	public void setCuatrimestre(String cuatrimestre) {
+		this.cuatrimestre = cuatrimestre;
+	}
+
+	public String getCentroDestino() {
+		return centroDestino;
+	}
+
+	public void setCentroDestino(String centroDestino) {
+		this.centroDestino = centroDestino;
+	}
+
+	public Date getFechaNRI() {
+		return fechaNRI;
+	}
+
+	public void setFechaNRI(Date fechaNRI) {
+		this.fechaNRI = fechaNRI;
+	}
+
+	public InputStream getHorario() {
+		return horario;
+	}
+
+	public void setHorario(InputStream horario) {
+		this.horario = horario;
+	}
+
+	public InputStream getNri() {
+		return nri;
+	}
+
+	public void setNri(InputStream nri) {
+		this.nri = nri;
+	}
+
 	@Override
 	public String toString() {
 		return "BolsaEmpleo [codNum=" + codNum + ", area=" + area + ", estado=" + estado + ", fechaCreacion=" + fechaCreacion 
@@ -113,10 +204,18 @@ public class PlazaOfertada implements Serializable {
 		int result = 1;
 		result = prime * result + ((codNum == null) ? 0 : codNum.hashCode());
 		result = prime * result + ((area == null) ? 0 : area.hashCode());
+		result = prime * result + ((dedicacion == null) ? 0 : dedicacion.hashCode());
+		result = prime * result + ((justificacion == null) ? 0 : justificacion.hashCode());
+		result = prime * result + ((duracionPrevista == null) ? 0 : duracionPrevista.hashCode());
+		result = prime * result + ((cuatrimestre == null) ? 0 : cuatrimestre.hashCode());
+		result = prime * result + ((centroDestino == null) ? 0 : centroDestino.hashCode());
 		result = prime * result + ((estado == null) ? 0 : estado.hashCode());
 		result = prime * result + ((fechaCreacion == null) ? 0 : fechaCreacion.hashCode());
 		result = prime * result + ((fechaAbierta == null) ? 0 : fechaAbierta.hashCode());
 		result = prime * result + ((fechaCerrada == null) ? 0 : fechaCerrada.hashCode());
+		result = prime * result + ((fechaNRI == null) ? 0 : fechaNRI.hashCode());
+		result = prime * result + ((horario == null) ? 0 : horario.hashCode());
+		result = prime * result + ((nri == null) ? 0 : nri.hashCode());
 		return result;
 	}
 
@@ -148,6 +247,41 @@ public class PlazaOfertada implements Serializable {
 		} else if (!area.equals(other.area)) {
 			return false;
 		}
+		if (dedicacion == null) {
+			if (other.dedicacion != null) {
+				return false;
+			}
+		} else if (!dedicacion.equals(other.dedicacion)) {
+			return false;
+		}
+		if (justificacion == null) {
+			if (other.justificacion != null) {
+				return false;
+			}
+		} else if (!justificacion.equals(other.justificacion)) {
+			return false;
+		}
+		if (duracionPrevista == null) {
+			if (other.duracionPrevista != null) {
+				return false;
+			}
+		} else if (!duracionPrevista.equals(other.duracionPrevista)) {
+			return false;
+		}
+		if (cuatrimestre == null) {
+			if (other.cuatrimestre != null) {
+				return false;
+			}
+		} else if (!cuatrimestre.equals(other.cuatrimestre)) {
+			return false;
+		}
+		if (centroDestino == null) {
+			if (other.centroDestino != null) {
+				return false;
+			}
+		} else if (!centroDestino.equals(other.centroDestino)) {
+			return false;
+		}
 		if (estado == null) {
 			if (other.estado != null) {
 				return false;
@@ -174,6 +308,27 @@ public class PlazaOfertada implements Serializable {
 				return false;
 			}
 		} else if (!fechaCerrada.equals(other.fechaCerrada)) {
+			return false;
+		}
+		if (fechaNRI == null) {
+			if (other.fechaNRI != null) {
+				return false;
+			}
+		} else if (!fechaNRI.equals(other.fechaNRI)) {
+			return false;
+		}
+		if (horario == null) {
+			if (other.horario != null) {
+				return false;
+			}
+		} else if (!horario.equals(other.horario)) {
+			return false;
+		}
+		if (nri == null) {
+			if (other.nri != null) {
+				return false;
+			}
+		} else if (!nri.equals(other.nri)) {
 			return false;
 		}
 		

@@ -14,6 +14,8 @@ import com.google.gson.Gson;
 import es.ujaen.uvirtual.beans.CodigoDescripcion;
 import es.ujaen.uvirtual.beans.UVDatos;
 import es.ujaen.uvirtual.modulo.bolsaempleo.beans.PlazaOfertada;
+import es.ujaen.uvirtual.modulo.bolsaempleo.modelo.ModeloArea;
+import es.ujaen.uvirtual.modulo.bolsaempleo.modelo.ModeloDedicacion;
 import es.ujaen.uvirtual.modulo.bolsaempleo.modelo.ModeloParametrosConfiguracion;
 import es.ujaen.uvirtual.modulo.bolsaempleo.modelo.ModeloPlazaOfertada;
 import es.ujaen.uvirtual.modulo.bolsaempleo.modelo.ModeloRol;
@@ -35,7 +37,7 @@ import es.ujaen.uvirtual.utilidades.UVException;
 			"/srv/es/informacionadministrativa/bolsaempleo/contratacion",
 			"/srv/en/informacionadministrativa/bolsaempleo/contratacion",
 			"/srv/es/ajax/informacionadministrativa/bolsaempleo/contratacion",
-			"/srv/en/ajax/informacionadministrativa/bolsaempleo/contratacion",
+			"/srv/en/ajax/informacionadministrativa/bolsaempleo/contratacion"
 	})
 public class ControladorContratacion extends HttpServlet {
 	private static final long serialVersionUID = 1L;
@@ -44,10 +46,25 @@ public class ControladorContratacion extends HttpServlet {
 	
 	// acciones
 	public static final String ACCION_DATATABLE_PLAZAS_OFERTADAS = "datatableplazasofertadas";
+	public static final String ACCION_EDITAR_PLAZA_OFERTADA = "editarplazaofertada";
+	public static final String ACCION_ELIMINAR_PLAZA_OFERTADA = "eliminarplazaofertada";
 	public static final String ACCION_INDEX = "index";
+	public static final String ACCION_NUEVA_PLAZA_OFERTADA = "nuevaplazaofertada";
+	public static final String ACCION_RESTAURAR_PLAZA_OFERTADA = "restaurarplazaofertada";
 	
 	// Parámetros
 	public static final String PARAM_ACCION = "a";
+	public static final String PARAM_AREA = "area";
+	public static final String PARAM_CENTRO_DESTINO = "centrodestino";
+	public static final String PARAM_CUATRIMESTRE = "cuatrimestre";
+	public static final String PARAM_DURACION_PREVISTA = "duracionprevista";
+	public static final String PARAM_ENVIAR = "enviar";
+	public static final String PARAM_ESTADO = "estado";
+	public static final String PARAM_HORARIO = "horario";
+	public static final String PARAM_JUSTIFICACION = "justificacion";
+	public static final String PARAM_NRI_FECHA = "nrifecha";
+	public static final String PARAM_NRI = "nri";
+	public static final String PARAM_PLAZA_OFERTADA = "plazaofertada";
 	
 	// mensajes
 	public static final String MENSAJE_ERROR_ACCION_NO_CONTEMPLADA = "Acción no contemplada";
@@ -56,6 +73,7 @@ public class ControladorContratacion extends HttpServlet {
 	// ruta vistas
 	public static final String RUTA_BEP_CONTRATACION = "/WEB-INF/jsp/vista/infadministrativa/bolsaempleo/contratacion/";
 	public static final String JSP_INDEX = RUTA_BEP_CONTRATACION + "index.jsp";
+	public static final String JSP_FORM = RUTA_BEP_CONTRATACION + "formPlazaOfertada.jsp";
 	
 	// errors
 	public static final Integer RESPONSE_HTTP_CODE_ERROR_400 = 400;
@@ -146,6 +164,25 @@ public class ControladorContratacion extends HttpServlet {
 	@Override
 	public void doPost(HttpServletRequest request, HttpServletResponse response) throws IOException {
 		doGet(request, response);
+	}
+	
+	private void editarPlazaOfertada(VistaContratacion bean, UVDatos datos, HttpServletRequest request, HttpServletResponse response) throws SQLException {
+		bean.setVista(JSP_FORM);
+		cargarListasFormulario(bean);
+	}
+	
+	private void eliminarPlazaOfertada(VistaContratacion bean, UVDatos datos, HttpServletRequest request, HttpServletResponse response) {
+		
+	}
+	
+	private void nuevaPlazaOfertada(VistaContratacion bean, UVDatos datos, HttpServletRequest request, HttpServletResponse response) throws SQLException {
+		bean.setVista(JSP_FORM);
+		cargarListasFormulario(bean);
+	}
+	
+	private void cargarListasFormulario(VistaContratacion bean) throws SQLException {
+		bean.setListaAreas(ModeloArea.obtenerInstancia().listaAreas());
+		bean.setListaDedicaciones(ModeloDedicacion.obtenerInstancia().listaDedicacionesActivas());
 	}
 	
 	private void listaPlazasOfertadas(VistaContratacion bean, UVDatos datos, HttpServletRequest request, HttpServletResponse response) throws IOException {

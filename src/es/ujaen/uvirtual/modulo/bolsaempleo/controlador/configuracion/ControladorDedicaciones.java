@@ -1,4 +1,4 @@
-package es.ujaen.uvirtual.modulo.bolsaempleo.controlador;
+package es.ujaen.uvirtual.modulo.bolsaempleo.controlador.configuracion;
 
 import java.io.IOException;
 import java.io.PrintWriter;
@@ -52,6 +52,7 @@ public class ControladorDedicaciones extends HttpServlet {
 	
 	// Parámetros
 	public static final String PARAM_ACCION = "a";
+	public static final String PARAM_ACTIVA = "activa";
 	public static final String PARAM_DEDICACION = "dedicacion";
 	public static final String PARAM_ENVIAR = "enviar";
 	public static final String PARAM_TEXTO_DEDICACION = "textodedicacion";
@@ -62,6 +63,11 @@ public class ControladorDedicaciones extends HttpServlet {
 	public static final String MENSAJE_ERROR_TEXTO_VACIO = "El texto no puede estar vacío";
 	public static final String MENSAJE_ERROR_SUELDO_VACIO = "El sueldo no puede estar vacío";
 	public static final String MENSAJE_ERROR_SIN_PERMISO = "No tienes permiso";
+	
+	public static final String MENSAJE_EXITO_AGREGAR = "Dedicación creada correctamente";
+	public static final String MENSAJE_EXITO_EDITAR = "Dedicación editada correctamente";
+	public static final String MENSAJE_EXITO_ELIMINAR = "Dedicación eliminada correctamente";
+	public static final String MENSAJE_EXITO_RESTAURAR = "Dedicación restaurada correctamente";
 	
 	// ruta vistas
 	public static final String RUTA_BEP_DEDICACIONES = "/WEB-INF/jsp/vista/infadministrativa/bolsaempleo/configuracion/dedicaciones/";
@@ -104,6 +110,9 @@ public class ControladorDedicaciones extends HttpServlet {
 					break;
 				case ACCION_EDITAR_DEDICACION:
 					editarDedicacion(bean, datos, request, response);
+					break;
+				case ACCION_ELIMINAR_DEDICACION:
+					eliminaDedicacion(bean, datos, request, response);
 					break;
 				case ACCION_NUEVA_DEDICACION:
 					nuevaDedicacion(bean, datos, request, response);
@@ -167,23 +176,43 @@ public class ControladorDedicaciones extends HttpServlet {
 	
 	private void editarDedicacion(VistaDedicacion bean, UVDatos datos, HttpServletRequest request, HttpServletResponse response) throws IOException, UVException, SQLException {
 		bean.setVista(JSP_FORM);
+		ModeloDedicacion modeloDedicacion = ModeloDedicacion.obtenerInstancia();
+		Dedicacion dedicacion = modeloDedicacion.getDedicacionById(Formateador.leeParametroInteger(request.getParameter(PARAM_DEDICACION)));
+		bean.setDedicacion(dedicacion);
 		
 		if (EscapaHTML.ajustaCodificacion(request.getParameter(PARAM_ENVIAR)) != null) {
-			Dedicacion dedicacion = validarDedicacion(request);
-			ModeloDedicacion.obtenerInstancia().actualizaDedicacion(dedicacion, bean.getUsuarioLogeado());
+			dedicacion = validarDedicacion(dedicacion, request);
+			modeloDedicacion.actualizaDedicacion(dedicacion, bean.getUsuarioLogeado());
 			
+			BolsaEmpleoUtils.addMensajeDeExito(MENSAJE_EXITO_EDITAR, bean, request);
 			datos.setRespuestaEnviada(true);
 			response.sendRedirect(request.getServletPath());
 		}
 	}
 	
-	private void nuevaDedicacion(VistaDedicacion bean, UVDatos datos, HttpServletRequest request, HttpServletResponse response) throws IOException, UVException {
+	private void eliminaDedicacion(VistaDedicacion bean, UVDatos datos, HttpServletRequest request, HttpServletResponse response) 
+			throws SQLException, UVException, IOException {
+		ModeloDedicacion modeloDedicacion = ModeloDedicacion.obtenerInstancia();
+		
+		Dedicacion dedicacion = modeloDedicacion.getDedicacionById(Formateador.leeParametroInteger(request.getParameter(PARAM_DEDICACION)));
+		bean.setDedicacion(dedicacion);
+		Boolean activa = "true".equals(EscapaHTML.ajustaCodificacion(request.getParameter(PARAM_ACTIVA)));
+		dedicacion.setActiva(activa);
+		modeloDedicacion.actualizaActivaDedicacion(dedicacion, bean.getUsuarioLogeado());
+		
+		BolsaEmpleoUtils.addMensajeDeExito(activa ? MENSAJE_EXITO_RESTAURAR : MENSAJE_EXITO_ELIMINAR, bean, request);
+		datos.setRespuestaEnviada(true);
+		response.sendRedirect(request.getServletPath());
+	}
+	
+	private void nuevaDedicacion(VistaDedicacion bean, UVDatos datos, HttpServletRequest request, HttpServletResponse response) throws IOException, UVException, SQLException {
 		bean.setVista(JSP_FORM);
 		
 		if (EscapaHTML.ajustaCodificacion(request.getParameter(PARAM_ENVIAR)) != null) {
-			Dedicacion dedicacion = validarDedicacion(request);
+			Dedicacion dedicacion = validarDedicacion(new Dedicacion(), request);
+			ModeloDedicacion.obtenerInstancia().insertaDedicacion(dedicacion, bean.getUsuarioLogeado());
 			
-			
+			BolsaEmpleoUtils.addMensajeDeExito(MENSAJE_EXITO_AGREGAR, bean, request);
 			datos.setRespuestaEnviada(true);
 			response.sendRedirect(request.getServletPath());
 		}
@@ -215,20 +244,18 @@ public class ControladorDedicaciones extends HttpServlet {
 		}
 	}
 	
-	private Dedicacion validarDedicacion(HttpServletRequest request) throws UVException {
-		Dedicacion ded = new Dedicacion();
-		
-		ded.setTexto(EscapaHTML.ajustaCodificacion(request.getParameter(PARAM_DEDICACION)));
-		if (ded.getTexto() == null || ded.getTexto().isBlank()) {
+	private Dedicacion validarDedicacion(Dedicacion dedicacion, HttpServletRequest request) throws UVException {
+		dedicacion.setTexto(EscapaHTML.ajustaCodificacion(request.getParameter(PARAM_TEXTO_DEDICACION)));
+		if (dedicacion.getTexto() == null || dedicacion.getTexto().isBlank()) {
 			throw new UVException(MENSAJE_ERROR_TEXTO_VACIO);
 		}
 		
-		ded.setSueldo(Formateador.leeParametroDouble(request.getParameter(PARAM_SUELDO)));
-		if (ded.getSueldo() == null) {
+		dedicacion.setSueldo(Formateador.leeParametroDouble(request.getParameter(PARAM_SUELDO)));
+		if (dedicacion.getSueldo() == null) {
 			throw new UVException(MENSAJE_ERROR_SUELDO_VACIO);
 		}
 		
-		return ded;
+		return dedicacion;
 	}
 	
 }

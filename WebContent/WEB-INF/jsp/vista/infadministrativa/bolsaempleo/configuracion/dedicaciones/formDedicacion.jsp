@@ -1,6 +1,6 @@
 <%@ page trimDirectiveWhitespaces="true" %>
 <%@ page import="es.ujaen.uvirtual.beans.UVDatos" %>
-<%@	page import="es.ujaen.uvirtual.modulo.bolsaempleo.controlador.ControladorDedicaciones" %>
+<%@	page import="es.ujaen.uvirtual.modulo.bolsaempleo.controlador.configuracion.ControladorDedicaciones" %>
 <%@ page import="es.ujaen.uvirtual.modulo.bolsaempleo.vistas.VistaDedicacion" %>
 <%@ page import="es.ujaen.uvirtual.modulo.bolsaempleo.beans.Dedicacion" %>
 <%@ page import="es.ujaen.uvirtual.modulo.bolsaempleo.utilidades.BolsaEmpleoUtils" %>
@@ -12,24 +12,18 @@ UVDatos uvdatos = (UVDatos) request.getAttribute(UVDatos.NOMBRE_ATRIBUTO);
 VistaDedicacion bean = (VistaDedicacion) uvdatos.getVistas().get(VistaDedicacion.class.getName());
 Dedicacion dedicacion = bean.getDedicacion();
 
-String textoDedicacion = BolsaEmpleoUtils.getParamForm(request, ControladorDedicaciones.PARAM_TEXTO_DEDICACION, dedicacion != null ? dedicacion.getDedicacion() : "");
+String texto = BolsaEmpleoUtils.getParamForm(request, ControladorDedicaciones.PARAM_TEXTO_DEDICACION, dedicacion != null ? dedicacion.getTexto() : "");
 String sueldo = BolsaEmpleoUtils.getParamForm(request, ControladorDedicaciones.PARAM_SUELDO, dedicacion != null ? dedicacion.getSueldo().toString() : "");
 %>
 
 <div class='bolsa-empleo'>
 	<jsp:include page="/WEB-INF/jsp/vista/infadministrativa/bolsaempleo/mensajes.jsp" />
 	
-<%
-	if (dedicacion != null) {
-	%>
+<%	if (dedicacion != null) { %>
 		<h2>Editar dedicación</h2>
-<%
-} else {
-%>
+<%	} else { %>
 		<h2>Nueva dedicación</h2>
-<%
-}
-%>
+<%	} %>
 
 	<p>Las etiquetas en <strong>negrita</strong> corresponden a campos de relleno obligatorio</p>
 	
@@ -40,14 +34,14 @@ String sueldo = BolsaEmpleoUtils.getParamForm(request, ControladorDedicaciones.P
 				value="<%=dedicacion != null ? dedicacion.getCodNum() : ""%>" />
 		<div class="form-group-container col2">
 			<div class="form-group">
-				<label for="dedicacion_texto" class="bold-label">Dedicación:</label>
-				<input class="form-input-custom" type="text" name="<%=ControladorDedicaciones.PARAM_TEXTO_DEDICACION%>" id="dedicacion_texto" value="<%=textoDedicacion%>" required/>
+				<label for="dedicacion_texto" class="bold-label">Texto:</label>
+				<input class="form-input-custom" type="text" name="<%=ControladorDedicaciones.PARAM_TEXTO_DEDICACION%>" id="dedicacion_texto" value="<%=texto%>" required/>
 			</div>
 		</div>
 		<div class="form-group-container col2">
 			<div class="form-group">
 				<label for="dedicacion_sueldo" class="bold-label">Sueldo:</label>
-				<input class="form-input-custom" type="number" name="<%=ControladorDedicaciones.PARAM_TEXTO_DEDICACION%>" id="dedicacion_sueldo" value="<%=sueldo%>" required/>
+				<input class="form-input-custom" type="number" name="<%=ControladorDedicaciones.PARAM_SUELDO%>" id="dedicacion_sueldo" value="<%=sueldo%>" required/>
 			</div>
 		</div>
 		<div class="form-btn">
