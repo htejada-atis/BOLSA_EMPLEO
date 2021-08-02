@@ -45,9 +45,10 @@ public class ControladorContratacion extends HttpServlet {
 	private static final Logger LOGGER = Logger.getLogger(NOMBREDEESTACLASE);
 	
 	// acciones
+	public static final String ACCION_DATATABLE_CANDIDATOS = "datatablecandidatos";
 	public static final String ACCION_DATATABLE_PLAZAS_OFERTADAS = "datatableplazasofertadas";
 	public static final String ACCION_EDITAR_PLAZA_OFERTADA = "editarplazaofertada";
-	public static final String ACCION_ELIMINAR_PLAZA_OFERTADA = "eliminarplazaofertada";
+	public static final String ACCION_SELECCIONAR_PLAZA_OFERTADA = "seleccionarplazaofertada";
 	public static final String ACCION_INDEX = "index";
 	public static final String ACCION_NUEVA_PLAZA_OFERTADA = "nuevaplazaofertada";
 	public static final String ACCION_RESTAURAR_PLAZA_OFERTADA = "restaurarplazaofertada";
@@ -69,6 +70,11 @@ public class ControladorContratacion extends HttpServlet {
 	// mensajes
 	public static final String MENSAJE_ERROR_ACCION_NO_CONTEMPLADA = "Acción no contemplada";
 	public static final String MENSAJE_ERROR_SIN_PERMISO = "No tienes permiso";
+	
+	public static final String MENSAJE_ERROR_JUSTIFICACION_VACIA = "La justificación no puede estar vacía";
+	public static final String MENSAJE_ERROR_DURACION_PREVISTA_VACIA = "La duración prevista no puede estar vacía";
+	public static final String MENSAJE_ERROR_CUATRIMESTRE_VACIO = "La cuatrimestre no puede estar vacío";
+	public static final String MENSAJE_ERROR_CENTRO_DESTINO_VACIO = "El centro de destino no puede estar vacío";
 	
 	// ruta vistas
 	public static final String RUTA_BEP_CONTRATACION = "/WEB-INF/jsp/vista/infadministrativa/bolsaempleo/contratacion/";
@@ -108,6 +114,12 @@ public class ControladorContratacion extends HttpServlet {
 					listaPlazasOfertadas(bean, datos, request, response);
 					break;
 				case ACCION_INDEX:
+					break;
+				case ACCION_NUEVA_PLAZA_OFERTADA:
+					nuevaPlazaOfertada(bean, datos, request, response);
+					break;
+				case ACCION_SELECCIONAR_PLAZA_OFERTADA:
+					seleccionarPlazaOfertada(bean, datos, request, response, nombreAccion);
 					break;
 				default:
 					errorFatal(bean, MENSAJE_ERROR_ACCION_NO_CONTEMPLADA);
@@ -149,7 +161,7 @@ public class ControladorContratacion extends HttpServlet {
 			}
 		} catch (UVException e) {
 			LOGGER.log(Level.WARNING, e.toString());
-			BolsaEmpleoUtils.redirectToError(bean, datos, request, response, e.getMessage());			
+			BolsaEmpleoUtils.redirectToError(bean, datos, request, response, e.getMessage());
 		}
 	}
 	
@@ -166,18 +178,34 @@ public class ControladorContratacion extends HttpServlet {
 		doGet(request, response);
 	}
 	
-	private void editarPlazaOfertada(VistaContratacion bean, UVDatos datos, HttpServletRequest request, HttpServletResponse response) throws SQLException {
+	private void seleccionarPlazaOfertada(VistaContratacion bean, UVDatos datos, HttpServletRequest request, HttpServletResponse response, String nombreAccion)
+			throws SQLException, UVException {
 		bean.setVista(JSP_FORM);
 		cargarListasFormulario(bean);
-	}
-	
-	private void eliminarPlazaOfertada(VistaContratacion bean, UVDatos datos, HttpServletRequest request, HttpServletResponse response) {
 		
+		ModeloPlazaOfertada modelo = ModeloPlazaOfertada.obtenerInstancia();
+		PlazaOfertada plaza = modelo.getPlazaOfertadaById(Formateador.leeParametroInteger(request.getParameter(PARAM_PLAZA_OFERTADA)));
+		bean.setPlazaOfertada(plaza);
+		
+		switch (nombreAccion) {
+			case ACCION_SELECCIONAR_PLAZA_OFERTADA:
+				break;
+		}
+		
+		if (EscapaHTML.ajustaCodificacion(request.getParameter(PARAM_ENVIAR)) != null) {
+			plaza = validarPlazaOfertada(plaza, request);
+			
+		}
 	}
 	
-	private void nuevaPlazaOfertada(VistaContratacion bean, UVDatos datos, HttpServletRequest request, HttpServletResponse response) throws SQLException {
+	private void nuevaPlazaOfertada(VistaContratacion bean, UVDatos datos, HttpServletRequest request, HttpServletResponse response) throws SQLException, UVException {
 		bean.setVista(JSP_FORM);
 		cargarListasFormulario(bean);
+		
+		if (EscapaHTML.ajustaCodificacion(request.getParameter(PARAM_ENVIAR)) != null) {
+			PlazaOfertada plaza = validarPlazaOfertada(new PlazaOfertada(), request);
+			
+		}
 	}
 	
 	private void cargarListasFormulario(VistaContratacion bean) throws SQLException {
@@ -209,6 +237,27 @@ public class ControladorContratacion extends HttpServlet {
 				response.setStatus(RESPONSE_AJAX_HTTP_CODE_ERROR);
 			}
 		}
+	}
+	
+	private PlazaOfertada validarPlazaOfertada(PlazaOfertada plaza, HttpServletRequest request) throws UVException, SQLException {
+		plaza.setArea(ModeloArea.obtenerInstancia().getAreaById(Formateador.leeParametroInteger(request.getParameter(PARAM_AREA))));
+		
+		plaza.setJustificacion(Formateador.leeParametroString(request.getParameter(PARAM_JUSTIFICACION)));
+		if (plaza.getJustificacion() == null || plaza.getJustificacion().isBlank()) {
+			throw new UVException(MENSAJE_ERROR_JUSTIFICACION_VACIA);
+		}
+		
+		plaza.setDuracionPrevista(Formateador.leeParametroString(request.getParameter(PARAM_DURACION_PREVISTA)));
+		if (plaza.getDuracionPrevista() == null || plaza.getDuracionPrevista().isBlank()) {
+			throw new UVException(MENSAJE_ERROR_JUSTIFICACION_VACIA);
+		}
+		
+		plaza.setCentroDestino(Formateador.leeParametroString(request.getParameter(PARAM_CENTRO_DESTINO)));
+		if (plaza.getCentroDestino() == null || plaza.getCentroDestino().isBlank()) {
+			throw new UVException(MENSAJE_ERROR_JUSTIFICACION_VACIA);
+		}
+		
+		return plaza;
 	}
 	
 }

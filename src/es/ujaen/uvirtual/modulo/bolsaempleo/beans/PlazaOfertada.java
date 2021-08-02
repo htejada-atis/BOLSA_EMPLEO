@@ -25,7 +25,7 @@ public class PlazaOfertada implements Serializable {
 	private transient InputStream horario;
 	private transient InputStream nri;
 	
-
+	
 	/** Constructor por defecto.
 	 */
 	public PlazaOfertada() {

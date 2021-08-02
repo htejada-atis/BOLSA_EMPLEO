@@ -14,7 +14,7 @@ VistaContratacion bean = (VistaContratacion) uvdatos.getVistas().get(VistaContra
 	<jsp:include page="/WEB-INF/jsp/vista/infadministrativa/bolsaempleo/mensajes.jsp" />
 	
 	<div class="titulo-bolsa-empleo">
-		<h2>Contratación</h2>
+		<h2>Plazas ofertadas</h2>
 		
 		<button class="link-btn" id="nueva_plaza">
 			Nueva plaza
@@ -23,16 +23,18 @@ VistaContratacion bean = (VistaContratacion) uvdatos.getVistas().get(VistaContra
 	
 	<table class="bluetable bolsaempleo" id="tablePlazasOfertadas">
 		<tr>
-			<th scope="col" style="width:100px" title="Código área">Cod. Area.</th>
-			<th scope="col" style="width:100%" class="area">Área</th>
-			<th scope="col" style="width:100px">Fecha creación</th>
-			<th scope="col" style="width:100px">Fecha cerrada</th>
+			<th scope="col" style="width:120px">Área</th>
+			<th scope="col" style="width:100%">Dedicación</th>
+			<th scope="col" style="width:95px">Estado</th>
+			<th scope="col" style="width:96px">Fecha creación</th>
+			<th scope="col" style="width:90px">Fecha abierta</th>
+			<th scope="col" style="width:90px">Fecha cerrada</th>
 		</tr>
 		<tbody>
 		</tbody>
 		<tfoot>
 			<tr>
-				<th colSpan="4" style="width:100%"></th>
+				<th colSpan="6" style="width:100%"></th>
 			</tr>
 		</tfoot>
 	</table>
@@ -46,13 +48,29 @@ $(document).ready(function() {
 		"ajax": { url: "<%= ControladorContratacion.URL_PATTERN_AJAX %>" },
 		"pageSize": 10,
 		"filterable": true,
+		"title": 'Plazas ofertadas',
 		"action": "<%= ControladorContratacion.ACCION_DATATABLE_PLAZAS_OFERTADAS %>",
+		"clickable": {'onClick': function(row) {
+			var params = {
+					'a': '<%= ControladorContratacion.ACCION_SELECCIONAR_PLAZA_OFERTADA %>', 
+					'<%= ControladorContratacion.PARAM_PLAZA_OFERTADA %>': row.codNum};
+			Atis.sendForm("<%= request.getRequestURI() %>", params);
+		}},
 		"columns": [
-			{'data': 'area.idAreaExterno', 'filter': {'type': 'number'}},
-			{'data': 'area.descripcion', 'filter': true, 'overflow': 'auto'},
+			{'data': 'area.idAreaExterno', 'filter': {'type': 'number'}, 'render': function(row) {
+				return row.area.idAreaExterno + ' ' + row.area.descripcion;
+			}},
+			{'data': 'dedicacion', 'filter': true},
+			{'data': 'estado', 'filter': true},
 			{'data': 'fechaCreacion', 'filter': {'type': 'date'}},
-			{'data': 'fechaCierre', 'filter': {'type': 'date'}}
+			{'data': 'fechaAbierta', 'filter': {'type': 'date'}},
+			{'data': 'fechaCerrada', 'filter': {'type': 'date'}}
 		]
+	});
+	
+	document.getElementById("nueva_plaza").addEventListener("click", function(event) {
+		event.preventDefault();
+		Atis.sendForm("<%=request.getRequestURI()%>", {'a': '<%=ControladorContratacion.ACCION_NUEVA_PLAZA_OFERTADA%>'});
 	});
 	
 });

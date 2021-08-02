@@ -91,9 +91,15 @@ public class ModeloDedicacion {
 	 * @throws SQLException en caso de error de base de datos .
 	 */
 	public List<Dedicacion> listaDedicacionesActivas() throws SQLException {
-		return listaDedicaciones(String.format("WHERE %s = %s", FLGACTIVA, ACTIVA));
+		return listaDedicaciones(String.format("WHERE %s = '%s'", FLGACTIVA, ACTIVA));
 	}
 	
+	/** Devuelve una dedicación por el id .
+	 * @param codNum .
+	 * @return dedicación .
+	 * @throws SQLException en caso de error de base de datos .
+	 * @throws UVException .
+	 */
 	public Dedicacion getDedicacionById(Integer codNum) throws SQLException, UVException {
 		if (codNum == null) {
 			throw new UVException(String.format(MENSAJE_ERROR_PARAM_VACIO, "buscar", "id"));
