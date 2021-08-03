@@ -212,7 +212,7 @@ public class ModeloDedicacion {
 			throw new UVException(String.format(MENSAJE_ERROR_PARAM_VACIO, "actualizar", "vigencia"));
 		}
 		
-		String consulta = String.format("UPDATE TBEP_DEDICACIONES SET %s=?, %s=?, %s=?, %s=? WHERE %s=?", TEXTO, SUELDO, FECHA_VIGENCIA, "UID_USUARIO", "CODNUM");
+		String consulta = String.format("UPDATE TBEP_DEDICACIONES SET %s=?, %s=?, %s=?, %s=? WHERE %s=?", TEXTO, SUELDO, FECHA_VIGENCIA, "UID_USUARIO", CODNUM);
 		try (Connection conexion = ConexionUvirtual.obtenerInstancia(); PreparedStatement stmt = conexion.prepareStatement(consulta)) {
 			int parameterIndex = 1;
 			stmt.setString(parameterIndex++, dedicacion.getTexto());
@@ -239,7 +239,7 @@ public class ModeloDedicacion {
 			throw new UVException(String.format(MENSAJE_ERROR_PARAM_VACIO, "actualizar", "activa"));
 		}
 		
-		String consulta = String.format("UPDATE TBEP_DEDICACIONES SET %s=?, %s=? WHERE %s=?", FLGACTIVA, "UID_USUARIO", "CODNUM");
+		String consulta = String.format("UPDATE TBEP_DEDICACIONES SET %s=?, %s=? WHERE %s=?", FLGACTIVA, "UID_USUARIO", CODNUM);
 		try (Connection conexion = ConexionUvirtual.obtenerInstancia(); PreparedStatement stmt = conexion.prepareStatement(consulta)) {
 			int parameterIndex = 1;
 			stmt.setString(parameterIndex++, dedicacion.isActiva() ? ACTIVA : INACTIVA);

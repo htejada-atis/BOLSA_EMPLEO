@@ -194,7 +194,7 @@ public class PlazaOfertada implements Serializable {
 
 	@Override
 	public String toString() {
-		return "BolsaEmpleo [codNum=" + codNum + ", area=" + area + ", estado=" + estado + ", fechaCreacion=" + fechaCreacion 
+		return "PlazaOfertada [codNum=" + codNum + ", area=" + area + ", estado=" + estado + ", fechaCreacion=" + fechaCreacion 
 				+ ", fechaAbierta=" + fechaAbierta + ", fechaCerrada=" + fechaCerrada + "]";
 	}
 	

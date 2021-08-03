@@ -23,19 +23,13 @@ String duracionPrevista = BolsaEmpleoUtils.getParamForm(request, ControladorCont
 <div class='bolsa-empleo'>
 	<jsp:include page="/WEB-INF/jsp/vista/infadministrativa/bolsaempleo/mensajes.jsp" />
 	
-<%	if (plaza != null) { %>
-		<h2>Editar plaza ofertada</h2>
-<%	} else { %>
-		<h2>Nueva plaza</h2>
-<%	} %>
+	<h2>Nueva plaza</h2>
 
 	<p>Las etiquetas en <strong>negrita</strong> corresponden a campos de relleno obligatorio</p>
 	
 	<form id="actualizar_dedicacion" class="be-form" method="post" action="<%=request.getRequestURI()%>">
 		<input type="hidden" name="<%=ControladorContratacion.PARAM_ACCION%>" id="accion_formulario"
-				value="<%=plaza != null ? ControladorContratacion.ACCION_EDITAR_PLAZA_OFERTADA: ControladorContratacion.ACCION_NUEVA_PLAZA_OFERTADA%>" />
-		<input type="hidden" name="<%=ControladorContratacion.PARAM_PLAZA_OFERTADA%>" id="plaza_ofertada_id" 
-				value="<%=plaza != null ? plaza.getCodNum() : ""%>" />
+				value="<%=ControladorContratacion.ACCION_NUEVA_PLAZA_OFERTADA%>" />
 		<div class="form-group-container col2">
 			<div class="form-group">
 				<label for="plaza_area" class="bold-label">Área: </label>
@@ -46,15 +40,18 @@ String duracionPrevista = BolsaEmpleoUtils.getParamForm(request, ControladorCont
 				<% } %>
 				</select>
 			</div>
-			<div class="form-group">
-				<label for="plaza_area" class="bold-label">Dedicación: </label>
-				<select id="plaza_area" name="<%=ControladorContratacion.PARAM_AREA%>" style="width:100%;">
-					<option value="">----------------</option>
-				<%	for(Dedicacion dedicacion: bean.getListaDedicaciones()) { %>
-						<option value="<%=dedicacion.getCodNum()%>"><%= dedicacion.getTexto() %></option>
-				<%	} %>
-				</select>
-			</div>
+			
+		<%	if (bean.getUsuarioLogeado().isServicioPersonal()) { %>
+				<div class="form-group">
+					<label for="plaza_area">Dedicación: </label>
+					<select id="plaza_area" name="<%=ControladorContratacion.PARAM_AREA%>" style="width:100%;">
+						<option value="">----------------</option>
+					<%	for(Dedicacion dedicacion: bean.getListaDedicaciones()) { %>
+							<option value="<%=dedicacion.getCodNum()%>"><%= dedicacion.getTexto() %></option>
+					<%	} %>
+					</select>
+				</div>
+		<%	} %>
 		</div>
 		<div class="form-group-container col1">
 			<div class="form-group">
@@ -63,14 +60,16 @@ String duracionPrevista = BolsaEmpleoUtils.getParamForm(request, ControladorCont
 			</div>
 		</div>
 		<div class="form-group-container col2">
-			<div class="form-group">
-				<label for="plaza_cuatrimestre" class="bold-label">Cuatrimestre:</label>
-				<select id="plaza_cuatrimestre" name="<%=ControladorContratacion.PARAM_CUATRIMESTRE%>" style="width:100%;">
-				<%	for (Entry<String, String> cuatrimestre: ModeloPlazaOfertada.CUATRIMESTRES.entrySet()) { %>
-						<option value="<%= cuatrimestre.getKey() %>"><%= cuatrimestre.getValue() %></option>
-				<%	} %>
-				</select>
-			</div>
+		<%	if (bean.getUsuarioLogeado().isServicioPersonal()) { %>
+				<div class="form-group">
+					<label for="plaza_cuatrimestre">Cuatrimestre:</label>
+					<select id="plaza_cuatrimestre" name="<%=ControladorContratacion.PARAM_CUATRIMESTRE%>" style="width:100%;">
+					<%	for (Entry<String, String> cuatrimestre: ModeloPlazaOfertada.CUATRIMESTRES.entrySet()) { %>
+							<option value="<%= cuatrimestre.getKey() %>"><%= cuatrimestre.getValue() %></option>
+					<%	} %>
+					</select>
+				</div>
+		<%	} %>
 			<div class="form-group">
 				<label for="plaza_centro_destino" class="bold-label">Centro destino:</label>
 				<select id="plaza_centro_destino" name="<%=ControladorContratacion.PARAM_CENTRO_DESTINO%>" style="width:100%;">
@@ -82,7 +81,7 @@ String duracionPrevista = BolsaEmpleoUtils.getParamForm(request, ControladorCont
 		</div>
 		<div class="form-group-container col2">
 			<div class="form-group">
-				<label for="dedicacion_sueldo" class="bold-label">Duración prevista:</label>
+				<label for="dedicacion_sueldo">Duración prevista:</label>
 				<input class="form-input-custom" type="text" name="<%=ControladorContratacion.PARAM_DURACION_PREVISTA%>" id="plaza_ofertada_duracion_prevista" value="<%=duracionPrevista%>" required/>
 			</div>
 		</div>
@@ -94,47 +93,4 @@ String duracionPrevista = BolsaEmpleoUtils.getParamForm(request, ControladorCont
 		</div>
 	</form>
 	
-<%	if (plaza != null) { %>
-		<table class="bluetable bolsaempleo" id="tableCandidatos">
-			<tr>
-				<th scope="col" style="width:76px">D.N.I</th>
-			<th scope="col" style="width:100%" class="nombre">Nombre</th>
-			<th scope="col" style="width:76px" class="center">Puntuación</th>
-			<th scope="col" style="width:76px" class="center"></th>
-			</tr>
-			<tbody>
-			</tbody>
-			<tfoot>
-				<tr>
-					<th colSpan="4" style="width:100%"></th>
-				</tr>
-			</tfoot>
-		</table>
-<%	} %>
-	
 </div>
-
-<script>
-
-$(document).ready(function() {
-	var tableCandidatos = new Atis.DataTable('#tableCandidatos', {
-		"ajax": { url: "<%= ControladorContratacion.URL_PATTERN_AJAX %>" },
-		"pageSize": 100,
-		"filterable": true,
-		"defaultOrderBy": 2,
-		"defaultOrderDirection": 'desc',
-		"action": "<%= ControladorContratacion.ACCION_DATATABLE_CANDIDATOS %>",
-		"params": {'<%=ControladorContratacion.PARAM_PLAZA_OFERTADA%>': '<%= plaza.getCodNum() %>'},
-		"columns": [
-			{'data': 'prsnif', 'filter': true},
-			{'data': 'apellido1', 'filter': true, 'overflow': 'auto', 'render': function(row) {
-				return row.nombre + " " + row.apellido1 + " " + row.apellido2;
-			}},
-			{'data': 'total', 'filter': {'type': 'number'}},
-			{'data': 'codNum'}
-		]
-	});
-	
-});
-
-</script>

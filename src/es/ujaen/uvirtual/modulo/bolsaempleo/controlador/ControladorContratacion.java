@@ -79,7 +79,8 @@ public class ControladorContratacion extends HttpServlet {
 	// ruta vistas
 	public static final String RUTA_BEP_CONTRATACION = "/WEB-INF/jsp/vista/infadministrativa/bolsaempleo/contratacion/";
 	public static final String JSP_INDEX = RUTA_BEP_CONTRATACION + "index.jsp";
-	public static final String JSP_FORM = RUTA_BEP_CONTRATACION + "formPlazaOfertada.jsp";
+	public static final String JSP_CREATE = RUTA_BEP_CONTRATACION + "createPlazaOfertada.jsp";
+	public static final String JSP_EDIT = RUTA_BEP_CONTRATACION + "editPlazaOfertada.jsp";
 	
 	// errors
 	public static final Integer RESPONSE_HTTP_CODE_ERROR_400 = 400;
@@ -180,7 +181,7 @@ public class ControladorContratacion extends HttpServlet {
 	
 	private void seleccionarPlazaOfertada(VistaContratacion bean, UVDatos datos, HttpServletRequest request, HttpServletResponse response, String nombreAccion)
 			throws SQLException, UVException {
-		bean.setVista(JSP_FORM);
+		bean.setVista(JSP_EDIT);
 		cargarListasFormulario(bean);
 		
 		ModeloPlazaOfertada modelo = ModeloPlazaOfertada.obtenerInstancia();
@@ -199,7 +200,7 @@ public class ControladorContratacion extends HttpServlet {
 	}
 	
 	private void nuevaPlazaOfertada(VistaContratacion bean, UVDatos datos, HttpServletRequest request, HttpServletResponse response) throws SQLException, UVException {
-		bean.setVista(JSP_FORM);
+		bean.setVista(JSP_CREATE);
 		cargarListasFormulario(bean);
 		
 		if (EscapaHTML.ajustaCodificacion(request.getParameter(PARAM_ENVIAR)) != null) {

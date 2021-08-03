@@ -91,7 +91,7 @@ public class Dedicacion implements Serializable {
 	
 	@Override
 	public String toString() {
-		return "BolsaEmpleo [codNum=" + codNum + ", texto=" + texto + ", sueldo=" + sueldo 
+		return "Dedicación [codNum=" + codNum + ", texto=" + texto + ", sueldo=" + sueldo 
 				+ ", fechaVigencia=" + fechaVigencia + ", activa=" + activa + "]";
 	}
 	
