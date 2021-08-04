@@ -23,11 +23,11 @@ VistaContratacion bean = (VistaContratacion) uvdatos.getVistas().get(VistaContra
 	
 	<table class="bluetable bolsaempleo" id="tablePlazasOfertadas">
 		<tr>
-			<th scope="col" style="width:120px">Área</th>
-			<th scope="col" style="width:100%">Dedicación</th>
+			<th scope="col" style="width:100%">Área</th>
 			<th scope="col" style="width:95px">Estado</th>
 			<th scope="col" style="width:96px">Fecha creación</th>
 			<th scope="col" style="width:90px">Fecha abierta</th>
+			<th scope="col" style="width:100px">Fecha fin oferta</th>
 			<th scope="col" style="width:90px">Fecha cerrada</th>
 		</tr>
 		<tbody>
@@ -57,13 +57,13 @@ $(document).ready(function() {
 			Atis.sendForm("<%= request.getRequestURI() %>", params);
 		}},
 		"columns": [
-			{'data': 'area.idAreaExterno', 'filter': {'type': 'number'}, 'render': function(row) {
+			{'data': 'area.idAreaExterno', 'filter': true, 'render': function(row) {
 				return row.area.idAreaExterno + ' ' + row.area.descripcion;
 			}},
-			{'data': 'dedicacion', 'filter': true},
 			{'data': 'estado', 'filter': true},
 			{'data': 'fechaCreacion', 'filter': {'type': 'date'}},
 			{'data': 'fechaAbierta', 'filter': {'type': 'date'}},
+			{'data': 'fechaFinOferta', 'filter': {'type': 'date'}},
 			{'data': 'fechaCerrada', 'filter': {'type': 'date'}}
 		]
 	});

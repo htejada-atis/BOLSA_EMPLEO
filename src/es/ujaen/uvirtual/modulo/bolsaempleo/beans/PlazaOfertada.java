@@ -20,6 +20,7 @@ public class PlazaOfertada implements Serializable {
 	private String estado;
 	private Date fechaCreacion;
 	private Date fechaAbierta;
+	private Date fechaFinOferta;
 	private Date fechaCerrada;
 	private Date fechaNRI;
 	private transient InputStream horario;
@@ -43,6 +44,7 @@ public class PlazaOfertada implements Serializable {
 	 * @param pestado .
 	 * @param pfechaCreacion .
 	 * @param pfechaAbierta .
+	 * @param pfechaFinOferta .
 	 * @param pfechaCerrada .
 	 * @param pfechaNRI .
 	 * @param phorario .
@@ -50,7 +52,7 @@ public class PlazaOfertada implements Serializable {
 	 */
 	public PlazaOfertada(Integer pcodNum, Area parea, Dedicacion pdedicacion, String pjustificacion,
 			String pduracionPrevista, String pcuatrimestre, String pcentroDestino, String pestado, Date pfechaCreacion,
-			Date pfechaAbierta, Date pfechaCerrada, Date pfechaNRI, InputStream phorario, InputStream pnri) {
+			Date pfechaAbierta, Date pfechaFinOferta, Date pfechaCerrada, Date pfechaNRI, InputStream phorario, InputStream pnri) {
 		super();
 		this.codNum = pcodNum;
 		this.area = parea;
@@ -62,6 +64,7 @@ public class PlazaOfertada implements Serializable {
 		this.estado = pestado;
 		this.fechaCreacion = pfechaCreacion;
 		this.fechaAbierta = pfechaAbierta;
+		this.fechaFinOferta = pfechaFinOferta;
 		this.fechaCerrada = pfechaCerrada;
 		this.fechaNRI = pfechaNRI;
 		this.horario = phorario;
@@ -74,10 +77,19 @@ public class PlazaOfertada implements Serializable {
 	public PlazaOfertada(PlazaOfertada copia) {
 		this.codNum = copia.codNum;
 		this.area = new Area(copia.area);
+		this.dedicacion = copia.dedicacion;
+		this.justificacion = copia.justificacion;
+		this.duracionPrevista = copia.duracionPrevista;
+		this.cuatrimestre = copia.cuatrimestre;
+		this.centroDestino = copia.centroDestino;
 		this.estado = copia.estado;
 		this.fechaCreacion = copia.fechaCreacion;
 		this.fechaAbierta = copia.fechaAbierta;
+		this.fechaFinOferta = copia.fechaFinOferta;
 		this.fechaCerrada = copia.fechaCerrada;
+		this.fechaNRI = copia.fechaNRI;
+		this.horario = copia.horario;
+		this.nri = copia.nri;
 	}
 	
 	public Integer getCodNum() {
@@ -107,23 +119,23 @@ public class PlazaOfertada implements Serializable {
 	public Date getFechaCreacion() {
 		return fechaCreacion;
 	}
-
+	
 	public void setFechaCreacion(Date fechaCreacion) {
 		this.fechaCreacion = fechaCreacion;
 	}
-
+	
 	public Date getFechaAbierta() {
 		return fechaAbierta;
 	}
-
+	
 	public void setFechaAbierta(Date fechaAbierta) {
 		this.fechaAbierta = fechaAbierta;
 	}
-
+	
 	public Date getFechaCerrada() {
 		return fechaCerrada;
 	}
-
+	
 	public void setFechaCerrada(Date fechaCerrada) {
 		this.fechaCerrada = fechaCerrada;
 	}
@@ -131,71 +143,80 @@ public class PlazaOfertada implements Serializable {
 	public Dedicacion getDedicacion() {
 		return dedicacion;
 	}
-
+	
 	public void setDedicacion(Dedicacion dedicacion) {
 		this.dedicacion = dedicacion;
 	}
-
+	
 	public String getJustificacion() {
 		return justificacion;
 	}
-
+	
 	public void setJustificacion(String justificacion) {
 		this.justificacion = justificacion;
 	}
-
+	
 	public String getDuracionPrevista() {
 		return duracionPrevista;
 	}
-
+	
 	public void setDuracionPrevista(String duracionPrevista) {
 		this.duracionPrevista = duracionPrevista;
 	}
-
+	
 	public String getCuatrimestre() {
 		return cuatrimestre;
 	}
-
+	
 	public void setCuatrimestre(String cuatrimestre) {
 		this.cuatrimestre = cuatrimestre;
 	}
-
+	
+	
 	public String getCentroDestino() {
 		return centroDestino;
 	}
-
+	
 	public void setCentroDestino(String centroDestino) {
 		this.centroDestino = centroDestino;
 	}
-
+	
 	public Date getFechaNRI() {
 		return fechaNRI;
 	}
-
+	
 	public void setFechaNRI(Date fechaNRI) {
 		this.fechaNRI = fechaNRI;
 	}
-
+	
 	public InputStream getHorario() {
 		return horario;
 	}
-
+	
 	public void setHorario(InputStream horario) {
 		this.horario = horario;
 	}
-
+	
 	public InputStream getNri() {
 		return nri;
 	}
-
+	
 	public void setNri(InputStream nri) {
 		this.nri = nri;
 	}
-
+	
+	public Date getFechaFinOferta() {
+		return fechaFinOferta;
+	}
+	
+	public void setFechaFinOferta(Date fechaFinOferta) {
+		this.fechaFinOferta = fechaFinOferta;
+	}
+	
 	@Override
 	public String toString() {
-		return "PlazaOfertada [codNum=" + codNum + ", area=" + area + ", estado=" + estado + ", fechaCreacion=" + fechaCreacion 
-				+ ", fechaAbierta=" + fechaAbierta + ", fechaCerrada=" + fechaCerrada + "]";
+		return "PlazaOfertada [codNum=" + codNum + ", area=" + area + ", estado=" + estado + ", fechaCreacion=" + fechaCreacion + ", fechaAbierta=" 
+				+ fechaAbierta + ", fechaFinOferta=" + fechaFinOferta + ", fechaCerrada=" + fechaCerrada + ", fechaFinOferta=" + fechaFinOferta + "]";
 	}
 	
 	@Override
@@ -212,6 +233,7 @@ public class PlazaOfertada implements Serializable {
 		result = prime * result + ((estado == null) ? 0 : estado.hashCode());
 		result = prime * result + ((fechaCreacion == null) ? 0 : fechaCreacion.hashCode());
 		result = prime * result + ((fechaAbierta == null) ? 0 : fechaAbierta.hashCode());
+		result = prime * result + ((fechaFinOferta == null) ? 0 : fechaFinOferta.hashCode());
 		result = prime * result + ((fechaCerrada == null) ? 0 : fechaCerrada.hashCode());
 		result = prime * result + ((fechaNRI == null) ? 0 : fechaNRI.hashCode());
 		result = prime * result + ((horario == null) ? 0 : horario.hashCode());
@@ -303,6 +325,13 @@ public class PlazaOfertada implements Serializable {
 		} else if (!fechaAbierta.equals(other.fechaAbierta)) {
 			return false;
 		}
+		if (fechaFinOferta == null) {
+			if (other.fechaFinOferta != null) {
+				return false;
+			}
+		} else if (!fechaFinOferta.equals(other.fechaFinOferta)) {
+			return false;
+		}
 		if (fechaCerrada == null) {
 			if (other.fechaCerrada != null) {
 				return false;
@@ -334,5 +363,5 @@ public class PlazaOfertada implements Serializable {
 		
 		return true;
 	}
+	
 }
-

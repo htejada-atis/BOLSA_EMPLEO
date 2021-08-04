@@ -15,7 +15,7 @@ public class Dedicacion implements Serializable {
 	private Date fechaVigencia;
 	private Boolean activa;
 	
-
+	
 	/** Constructor por defecto.
 	 */
 	public Dedicacion() {

@@ -30,6 +30,7 @@ public class ModeloDedicacion {
 	public static final int ORDER_COLUMN_INDEX_ACTIVA = 4;
 	
 	public static final String MENSAJE_ERROR_DEDICACION_ID_NO_EXISTE = "No existe la dedicación con el id indicando";
+	public static final String MENSAJE_ERROR_DEDICACION_REQUERIDA = "La dedicación es requerida";
 	public static final String MENSAJE_ERROR_OBJETO_VACIO = "No se puede %s una dedicación vacía";
 	public static final String MENSAJE_ERROR_PARAM_VACIO = "No se puede %s una dedicación sin %s";
 	
@@ -102,7 +103,7 @@ public class ModeloDedicacion {
 	 */
 	public Dedicacion getDedicacionById(Integer codNum) throws SQLException, UVException {
 		if (codNum == null) {
-			throw new UVException(String.format(MENSAJE_ERROR_PARAM_VACIO, "buscar", "id"));
+			throw new UVException(MENSAJE_ERROR_DEDICACION_REQUERIDA);
 		}
 		
 		String consulta = String.format("SELECT bepded.* FROM TBEP_DEDICACIONES bepded WHERE %s=?", CODNUM);

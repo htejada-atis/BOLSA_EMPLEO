@@ -24,10 +24,18 @@ public class OfertaCandidato implements Serializable {
 	
 	/** Constructor con parametros.
 	 * @param pcodNum .
+	 * @param pplaza .
+	 * @param pcandidato .
+	 * @param presultado .
+	 * @param pfechaResultado .
 	 */
-	public OfertaCandidato(Integer pcodNum) {
+	public OfertaCandidato(Integer pcodNum, PlazaOfertada pplaza, UsuarioBolsaEmpleo pcandidato, String presultado, Date pfechaResultado) {
 		super();
 		this.codNum = pcodNum;
+		this.plaza = pplaza;
+		this.candidato = pcandidato;
+		this.resultado = presultado;
+		this.fechaResultado = pfechaResultado;
 	}
 	
 	/** Constructor copia.

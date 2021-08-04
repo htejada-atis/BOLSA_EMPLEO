@@ -15,81 +15,109 @@
 UVDatos uvdatos = (UVDatos) request.getAttribute(UVDatos.NOMBRE_ATRIBUTO);
 VistaContratacion bean = (VistaContratacion) uvdatos.getVistas().get(VistaContratacion.class.getName());
 PlazaOfertada plaza = bean.getPlazaOfertada();
+boolean personal = bean.getUsuarioLogeado().isServicioPersonal();
 
-String justificacion = BolsaEmpleoUtils.getParamForm(request, ControladorContratacion.PARAM_JUSTIFICACION, plaza != null ? EscapaHTML.escapa(plaza.getJustificacion()) : "");
-String duracionPrevista = BolsaEmpleoUtils.getParamForm(request, ControladorContratacion.PARAM_DURACION_PREVISTA, plaza != null ? EscapaHTML.escapa(plaza.getDuracionPrevista()) : "");
+String area = BolsaEmpleoUtils.getParamForm(request, ControladorContratacion.PARAM_AREA, plaza.getArea().getCodNum().toString());
+String dedicacion = BolsaEmpleoUtils.getParamForm(request, ControladorContratacion.PARAM_DEDICACION, plaza.getDedicacion().getCodNum().toString());
+String justificacion = BolsaEmpleoUtils.getParamForm(request, ControladorContratacion.PARAM_JUSTIFICACION, EscapaHTML.escapa(plaza.getJustificacion()));
+String duracionPrevista = BolsaEmpleoUtils.getParamForm(request, ControladorContratacion.PARAM_DURACION_PREVISTA, EscapaHTML.escapa(plaza.getDuracionPrevista()));
+String cuatrimestre = BolsaEmpleoUtils.getParamForm(request, ControladorContratacion.PARAM_CUATRIMESTRE, EscapaHTML.escapa(plaza.getCuatrimestre()));
+String centroDestino = BolsaEmpleoUtils.getParamForm(request, ControladorContratacion.PARAM_CUATRIMESTRE, EscapaHTML.escapa(plaza.getCuatrimestre()));
+String fechaFinOferta = BolsaEmpleoUtils.getParamForm(request, ControladorContratacion.PARAM_FECHA_FIN_OFERTA, plaza.getFechaFinOferta() != null ? Formateador.formatoFecha(plaza.getFechaFinOferta(), Formateador.FORMATO_FECHA_DDMMYYYY_HHMMSS) : "");
 %>
 
 <div class='bolsa-empleo'>
 	<jsp:include page="/WEB-INF/jsp/vista/infadministrativa/bolsaempleo/mensajes.jsp" />
 	
-<%	if (plaza != null) { %>
-		<h2>Editar plaza ofertada</h2>
-<%	} else { %>
-		<h2>Nueva plaza</h2>
-<%	} %>
-
+	<h2>Editar plaza ofertada</h2>
+	
 	<p>Las etiquetas en <strong>negrita</strong> corresponden a campos de relleno obligatorio</p>
 	
-	<form id="actualizar_dedicacion" class="be-form" method="post" action="<%=request.getRequestURI()%>">
+	<form id="actualizar_plaza" class="be-form" method="post" action="<%=request.getRequestURI()%>" enctype="multipart/form-data">
 		<input type="hidden" name="<%=ControladorContratacion.PARAM_ACCION%>" id="accion_formulario"
 				value="<%=ControladorContratacion.ACCION_EDITAR_PLAZA_OFERTADA%>" />
-		<input type="hidden" name="<%=ControladorContratacion.PARAM_PLAZA_OFERTADA%>" id="plaza_ofertada_id" 
+		<input type="hidden" name="<%=ControladorContratacion.PARAM_PLAZA_OFERTADA%>" id="plaza_id" 
 				value="<%= plaza.getCodNum()%>" />
 		<div class="form-group-container col2">
 			<div class="form-group">
-				<label for="plaza_area" class="bold-label">Área: </label>
-				<select id="plaza_area" name="<%=ControladorContratacion.PARAM_AREA%>" style="width:100%;">
+				<label for="plaza_area" class="bold-label">Área:</label>
+				<select id="plaza_area" name="<%=ControladorContratacion.PARAM_AREA%>" style="width:100%;" required>
 					<option value="">----------------</option>
-				<%	for(Area area: bean.getListaAreas()) { %>
-						<option value="<%=area.getCodNum()%>" <%= plaza != null && plaza.getArea().getCodNum().equals(area.getCodNum()) ? "selected" : "" %>><%= area.getIdAreaExterno() + " " + area.getDescripcion() %></option>
+				<%	for(Area are: bean.getListaAreas()) { %>
+						<option value="<%=are.getCodNum()%>" <%= Integer.parseInt(area) == are.getCodNum() ? "selected" : "" %>><%= are.getIdAreaExterno() + " " + are.getDescripcion() %></option>
 				<% } %>
 				</select>
 			</div>
 			<div class="form-group">
-				<label for="plaza_area">Dedicación: </label>
-				<select id="plaza_area" name="<%=ControladorContratacion.PARAM_AREA%>" style="width:100%;">
+				<label for="plaza_dedicacion">Dedicación: </label>
+				<select id="plaza_dedicacion" name="<%=ControladorContratacion.PARAM_DEDICACION%>" style="width:100%;" <%= personal ? "" : "readonly" %>>
 					<option value="">----------------</option>
-				<%	for(Dedicacion dedicacion: bean.getListaDedicaciones()) { %>
-						<option value="<%=dedicacion.getCodNum()%>"><%= dedicacion.getTexto() %></option>
+				<%	for(Dedicacion ded: bean.getListaDedicaciones()) { %>
+						<option value="<%=ded.getCodNum()%>" <%= Integer.parseInt(dedicacion) == ded.getCodNum() ? "selected" : "" %>><%= ded.getTexto() %></option>
 				<%	} %>
 				</select>
 			</div>
-		</div>
-		<div class="form-group-container col1">
-			<div class="form-group">
-				<label for="plaza_ofertada_justificacion" class="bold-label">Justificación:</label>
-				<textarea class="form-input-custom" id="plaza_ofertada_justificacion" name="<%=ControladorContratacion.PARAM_JUSTIFICACION %>" rows="3" cols="60" required><%=justificacion%></textarea>
-			</div>
-		</div>
-		<div class="form-group-container col2">
 			<div class="form-group">
 				<label for="plaza_cuatrimestre">Cuatrimestre:</label>
-				<select id="plaza_cuatrimestre" name="<%=ControladorContratacion.PARAM_CUATRIMESTRE%>" style="width:100%;">
-				<%	for (Entry<String, String> cuatrimestre: ModeloPlazaOfertada.CUATRIMESTRES.entrySet()) { %>
-						<option value="<%= cuatrimestre.getKey() %>"><%= cuatrimestre.getValue() %></option>
+				<select id="plaza_cuatrimestre" name="<%=ControladorContratacion.PARAM_CUATRIMESTRE%>" style="width:100%;" <%= personal ? "" : "readonly" %>>
+				<%	for (Entry<String, String> cua: ModeloPlazaOfertada.CUATRIMESTRES.entrySet()) { %>
+						<option value="<%= cua.getKey() %>" <%= cuatrimestre != null && cuatrimestre.equals(cua.getKey()) ? "selected" : "" %>><%= cua.getValue() %></option>
 				<%	} %>
 				</select>
 			</div>
 			<div class="form-group">
 				<label for="plaza_centro_destino" class="bold-label">Centro destino:</label>
-				<select id="plaza_centro_destino" name="<%=ControladorContratacion.PARAM_CENTRO_DESTINO%>" style="width:100%;">
-				<%	for (Entry<String, String> cuatrimestre: ModeloPlazaOfertada.CENTROS_DESTINO.entrySet()) { %>
-						<option value="<%= cuatrimestre.getKey() %>"><%= cuatrimestre.getValue() %></option>
+				<select id="plaza_centro_destino" name="<%=ControladorContratacion.PARAM_CENTRO_DESTINO%>" style="width:100%;" required>
+				<%	for (Entry<String, String> cen: ModeloPlazaOfertada.CENTROS_DESTINO.entrySet()) { %>
+						<option value="<%= cen.getKey() %>" <%= centroDestino != null && centroDestino.equals(cen.getKey()) ? "selected" : ""%>><%= cen.getValue() %></option>
 				<%	} %>
 				</select>
 			</div>
 		</div>
 		<div class="form-group-container col2">
+		
+		</div>
+		<div class="form-group-container col1">
 			<div class="form-group">
-				<label for="dedicacion_sueldo">Duración prevista:</label>
-				<input class="form-input-custom" type="text" name="<%=ControladorContratacion.PARAM_DURACION_PREVISTA%>" id="plaza_ofertada_duracion_prevista" value="<%=duracionPrevista%>" required/>
+				<label for="plaza_justificacion" class="bold-label">Justificación:</label>
+				<textarea class="form-input-custom" id="plaza_justificacion" name="<%=ControladorContratacion.PARAM_JUSTIFICACION %>" rows="3" cols="60" required><%=justificacion%></textarea>
 			</div>
+		</div>
+	
+		<div class="form-group-container col2">
+			<div class="form-group">
+				<label for="plaza_duracion_prevista">Duración prevista:</label>
+				<input class="form-input-custom" type="text" name="<%=ControladorContratacion.PARAM_DURACION_PREVISTA%>" id="plaza_duracion_prevista" 
+						value="<%=duracionPrevista%>" <%= personal ? "" : "readonly" %>/>
+			</div>
+			<div class="form-group">
+				<label for="plaza_fecha_fin_oferta">Fecha fin oferta:</label>
+				<input class="form-input-custom" type="text" name="<%=ControladorContratacion.PARAM_FECHA_FIN_OFERTA%>" id="plaza_fecha_fin_oferta" autocomplete="off" 
+						value="<%=fechaFinOferta%>" <%= personal ? "" : "readonly" %>/>
+			</div>
+		</div>
+		<div class="form-group-container col2">
+			<div class="form-file">
+				<label for="plaza_horario" style="margin-bottom: .5rem;">Horario:</label>
+				<input id="plaza_horario" type="file" name="<%= ControladorContratacion.PARAM_HORARIO %>"/>
+			<%	if (plaza.getHorario() != null) { %>
+					<button id="plaza_descargar_horario" class="btn icon icon-download" title="Descargar horario de la plaza" type="button">Descargar horario</button>
+			<%	} %>
+			</div>
+		<%	if (bean.getUsuarioLogeado().isServicioPersonal()) { %>
+			<div class="form-file">
+				<label for="plaza_nri" style="margin-bottom: .5rem;">NRI:</label>
+				<input id="plaza_nri" type="file" name="<%= ControladorContratacion.PARAM_NRI %>"/>
+			<%	if (plaza.getNri() != null) { %>
+					<button id="plaza_descargar_nri" class="btn icon icon-download" title="Descargar nri de la plaza" type="button">Descargar NRI</button>
+			<%	} %>
+			</div>
+		<%	} %>
 		</div>
 		<div class="form-group-container col2">
 			<div class="form-group"></div>
 			<div class="form-group">
-				<input id="dedicacion_enviar" type="submit" name="<%=ControladorContratacion.PARAM_ENVIAR%>" value="<%=plaza != null ? "Guardar cambios" : "Insertar plaza"%>" style="float:right;"/>
+				<input id="plaza_enviar" type="submit" name="<%=ControladorContratacion.PARAM_ENVIAR%>" value="Guardar cambios" style="float:right;"/>
 			</div>
 		</div>
 	</form>
@@ -97,9 +125,9 @@ String duracionPrevista = BolsaEmpleoUtils.getParamForm(request, ControladorCont
 	<table class="bluetable bolsaempleo" id="tableCandidatos">
 		<tr>
 			<th scope="col" style="width:76px">D.N.I</th>
-		<th scope="col" style="width:100%" class="nombre">Nombre</th>
-		<th scope="col" style="width:76px" class="center">Puntuación</th>
-		<th scope="col" style="width:76px" class="center"></th>
+			<th scope="col" style="width:100%" class="nombre">Nombre</th>
+			<th scope="col" style="width:76px" class="center">Puntuación</th>
+			<th scope="col" style="width:76px" class="center"></th>
 		</tr>
 		<tbody>
 		</tbody>
@@ -115,6 +143,12 @@ String duracionPrevista = BolsaEmpleoUtils.getParamForm(request, ControladorCont
 <script>
 
 $(document).ready(function() {
+	$("#plaza_fecha_fin_oferta").datepicker({
+		onSelect: function(dateText, inst) {
+			$("#plaza_fecha_fin_oferta").val(dateText + " 23:59:59");
+		}
+	});
+	
 	var tableCandidatos = new Atis.DataTable('#tableCandidatos', {
 		"ajax": { url: "<%= ControladorContratacion.URL_PATTERN_AJAX %>" },
 		"pageSize": 100,
@@ -131,6 +165,12 @@ $(document).ready(function() {
 			{'data': 'total', 'filter': {'type': 'number'}},
 			{'data': 'codNum'}
 		]
+	});
+	
+	$('#actualizar_plaza').submit(function(event) { 
+		$('#plaza_enviar').prop('disabled', true);
+		$('#plaza_enviar').attr('value', 'Guardando plaza...');		
+		return true;
 	});
 	
 });

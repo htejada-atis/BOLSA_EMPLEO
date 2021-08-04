@@ -24,10 +24,18 @@ public class Contratacion implements Serializable {
 	
 	/** Constructor con parametros.
 	 * @param pcodNum .
+	 * @param pplaza .
+	 * @param pcandidato .
+	 * @param presultado .
+	 * @param pfechaCita .
 	 */
-	public Contratacion(Integer pcodNum) {
+	public Contratacion(Integer pcodNum, PlazaOfertada pplaza, UsuarioBolsaEmpleo pcandidato, String presultado, Date pfechaCita) {
 		super();
 		this.codNum = pcodNum;
+		this.plaza = pplaza;
+		this.candidato = pcandidato;
+		this.resultado = presultado;
+		this.fechaCita = pfechaCita;
 	}
 	
 	/** Constructor copia.
