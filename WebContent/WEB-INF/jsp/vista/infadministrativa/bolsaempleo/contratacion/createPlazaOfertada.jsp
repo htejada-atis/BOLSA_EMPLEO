@@ -131,7 +131,7 @@ String fechaFinOferta = BolsaEmpleoUtils.getParamForm(request, ControladorContra
 	
 	$('#actualizar_plaza').submit(function(event) { 
 		$('#plaza_enviar').prop('disabled', true);
-		$('#plaza_enviar').attr('value', 'Creando plaza...');		
+		$('#plaza_enviar').attr('value', 'Creando plaza...');
 		return true;
 	});
 

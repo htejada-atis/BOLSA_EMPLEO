@@ -18,6 +18,7 @@ import es.ujaen.uvirtual.modulo.bolsaempleo.beans.Convocatoria;
 import es.ujaen.uvirtual.modulo.bolsaempleo.beans.Fichero;
 import es.ujaen.uvirtual.modulo.bolsaempleo.beans.Merito;
 import es.ujaen.uvirtual.modulo.bolsaempleo.beans.MeritoPreferenteUsuario;
+import es.ujaen.uvirtual.modulo.bolsaempleo.beans.PlazaOfertada;
 import es.ujaen.uvirtual.modulo.bolsaempleo.beans.Solicitud;
 import es.ujaen.uvirtual.modulo.bolsaempleo.beans.TitulacionUsuario;
 import es.ujaen.uvirtual.modulo.bolsaempleo.beans.UsuarioBolsaEmpleo;
@@ -30,6 +31,7 @@ import es.ujaen.uvirtual.modulo.bolsaempleo.modelo.ModeloFichero;
 import es.ujaen.uvirtual.modulo.bolsaempleo.modelo.ModeloMerito;
 import es.ujaen.uvirtual.modulo.bolsaempleo.modelo.ModeloMeritosPreferentesCandidato;
 import es.ujaen.uvirtual.modulo.bolsaempleo.modelo.ModeloMisTitulaciones;
+import es.ujaen.uvirtual.modulo.bolsaempleo.modelo.ModeloPlazaOfertada;
 import es.ujaen.uvirtual.modulo.bolsaempleo.modelo.ModeloResultados;
 import es.ujaen.uvirtual.modulo.bolsaempleo.modelo.ModeloSolicitud;
 import es.ujaen.uvirtual.modulo.bolsaempleo.modelo.ModeloUsuarioBolsaEmpleo;
@@ -45,9 +47,9 @@ import es.ujaen.uvirtual.utilidades.UVException;
 @WebServlet(
 	name = "informacionadministrativa.bolsaempleo.descargaficheros",
 	displayName = "bolsaempleo.descargaficheros",
-	description = "Controlador para la descarga de ficheros de bolsa empleo", 
-	urlPatterns = { 
-			"/srv/es/informacionadministrativa/bolsaempleo/descargaficheros", 
+	description = "Controlador para la descarga de ficheros de bolsa empleo",
+	urlPatterns = {
+			"/srv/es/informacionadministrativa/bolsaempleo/descargaficheros",
 			"/srv/en/informacionadministrativa/bolsaempleo/descargaficheros",
 			"/pub/es/informacionadministrativa/bolsaempleo/descargaficheros",
 			"/pub/en/informacionadministrativa/bolsaempleo/descargaficheros"
@@ -56,21 +58,24 @@ public class ControladorDescargaFicheros extends HttpServlet {
 	private static final long serialVersionUID = 1L;
 	private static final String NOMBREDEESTACLASE = ControladorDescargaFicheros.class.getName();
 	private static final Logger LOGGER = Logger.getLogger(NOMBREDEESTACLASE);
-    
+	
 	// Acciones
 	public static final String ACCION_DESCARGAR_ACREDITACION_CANDIDATO = "descargaracreditacioncandidato";
 	public static final String ACCION_DESCARGAR_ACREDITACION_PERSONAL = "descargaracreditacionpersonal";
 	public static final String ACCION_DESCARGAR_DOCUMENTO = "descargardocumento";
+	public static final String ACCION_DESCARGAR_HORARIO_DIRECTOR = "descargarhorariodirector";
+	public static final String ACCION_DESCARGAR_HORARIO_PERSONAL = "descargarhorariopersonal";
 	public static final String ACCION_DESCARGAR_MERITO_CANDIDATO = "descargarmeritocandidato";
 	public static final String ACCION_DESCARGAR_MERITO_PERSONAL = "descargarmeritopersonal";
 	public static final String ACCION_DESCARGAR_MERITO_EVALUADOR = "descargarmeritoevaluador";
+	public static final String ACCION_DESCARGAR_NRI_PERSONAL = "descargarnripersonal";
 	public static final String ACCION_DESCARGAR_RESULTADOS_SOLICITUD_CANDIDATO = "descargarresultadossolicitudcandidato";
 	public static final String ACCION_DESCARGAR_RESULTADOS_SOLICITUD_PERSONAL = "descargarresultadossolicitudpersonal";
 	public static final String ACCION_DESCARGAR_RESUMEN_ITEM_BAREMACION = "descargarresumenitemsbaremacion";
 	public static final String ACCION_DESCARGAR_SOLICITUD = "descargarsolicitud";
 	public static final String ACCION_DESCARGAR_SOLICITUD_PERSONAL = "descargarsolicitudpersonal";
 	public static final String ACCION_DESCARGAR_TITULACION_CANDIDATO = "descargartitulacioncandidato";
-	public static final String ACCION_DESCARGAR_TITULACION_PERSONAL = "descargartitulacionpersonal";	
+	public static final String ACCION_DESCARGAR_TITULACION_PERSONAL = "descargartitulacionpersonal";
 	
 	// Parámetros
 	public static final String PARAM_ACCION = "a";
@@ -79,6 +84,7 @@ public class ControladorDescargaFicheros extends HttpServlet {
 	public static final String PARAM_BOLSA = "bolsa";
 	public static final String PARAM_CANDIDATO = "candidato";
 	public static final String PARAM_MERITO = "merito";
+	public static final String PARAM_PLAZA_OFERTADA = "plazaofertada";
 	public static final String PARAM_SOLICITUD = "solicitud";
 	public static final String PARAM_TITULACION = "titulacion";
 	
@@ -114,11 +120,16 @@ public class ControladorDescargaFicheros extends HttpServlet {
 				case ACCION_DESCARGAR_SOLICITUD:
 					accionesFicherosCandidatos(bean, datos, request, response, nombreAccion);
 					break;
+				case ACCION_DESCARGAR_HORARIO_DIRECTOR:
+					accionesFicherosDirectores(bean, datos, request, response, nombreAccion);
+					break;
 				case ACCION_DESCARGAR_MERITO_EVALUADOR:
 					accionesFicherosEvaluador(bean, datos, request, response, nombreAccion);
 					break;
 				case ACCION_DESCARGAR_ACREDITACION_PERSONAL:
+				case ACCION_DESCARGAR_HORARIO_PERSONAL:
 				case ACCION_DESCARGAR_MERITO_PERSONAL:
+				case ACCION_DESCARGAR_NRI_PERSONAL:
 				case ACCION_DESCARGAR_TITULACION_PERSONAL:
 				case ACCION_DESCARGAR_RESULTADOS_SOLICITUD_PERSONAL:
 				case ACCION_DESCARGAR_RESUMEN_ITEM_BAREMACION:
@@ -187,8 +198,7 @@ public class ControladorDescargaFicheros extends HttpServlet {
 			throws SQLException, UVException, IOException {
 		
 		if (!bean.getUsuarioLogeado().isCandidato()) {
-			BolsaEmpleoUtils.addMensajeDeError(MENSAJE_ERROR_SIN_PERMISO, bean, request);
-			response.sendRedirect(ControladorErrorBolsaEmpleo.URL_ERROR);
+			BolsaEmpleoUtils.redirectToError(bean, datos, request, response, MENSAJE_ERROR_SIN_PERMISO);
 			return;
 		}
 		
@@ -214,12 +224,28 @@ public class ControladorDescargaFicheros extends HttpServlet {
 		
 	}
 	
+	private void accionesFicherosDirectores(VistaDescargaFicheros bean, UVDatos datos, HttpServletRequest request, HttpServletResponse response, String nombreAccion)
+			throws SQLException, UVException, IOException {
+		
+		if (!bean.getUsuarioLogeado().isDirectorDepartamento()) {
+			BolsaEmpleoUtils.redirectToError(bean, datos, request, response, MENSAJE_ERROR_SIN_PERMISO);
+			return;
+		}
+		
+		switch (nombreAccion) {
+			case ACCION_DESCARGAR_HORARIO_DIRECTOR:
+				descargaHorarioPlazaDirector(bean, datos, request, response);
+				break;
+			default:
+				errorFatal(bean, datos, MENSAJE_ERROR_ACCION_NO_CONTEMPLADA);
+		}
+	}
+	
 	private void accionesFicherosEvaluador(VistaDescargaFicheros bean, UVDatos datos, HttpServletRequest request, HttpServletResponse response, String nombreAccion)
 			throws SQLException, UVException, IOException {
 		
 		if (!bean.getUsuarioLogeado().isMiembroComision() && !bean.getUsuarioLogeado().isDirectorDepartamento()) {
-			BolsaEmpleoUtils.addMensajeDeError(MENSAJE_ERROR_SIN_PERMISO, bean, request);
-			response.sendRedirect(ControladorErrorBolsaEmpleo.URL_ERROR);
+			BolsaEmpleoUtils.redirectToError(bean, datos, request, response, MENSAJE_ERROR_SIN_PERMISO);
 			return;
 		}
 		
@@ -236,8 +262,7 @@ public class ControladorDescargaFicheros extends HttpServlet {
 			throws SQLException, UVException, IOException {
 		
 		if (!bean.getUsuarioLogeado().isServicioPersonal()) {
-			BolsaEmpleoUtils.addMensajeDeError(MENSAJE_ERROR_SIN_PERMISO, bean, request);
-			response.sendRedirect(ControladorErrorBolsaEmpleo.URL_ERROR);
+			BolsaEmpleoUtils.redirectToError(bean, datos, request, response, MENSAJE_ERROR_SIN_PERMISO);
 			return;
 		}
 		
@@ -245,8 +270,14 @@ public class ControladorDescargaFicheros extends HttpServlet {
 			case ACCION_DESCARGAR_ACREDITACION_PERSONAL:
 				descargaAcreditacionPersonal(bean, datos, request, response);
 				break;
+			case ACCION_DESCARGAR_HORARIO_PERSONAL:
+				descargaHorarioPlazaPersonal(bean, datos, request, response);
+				break;
 			case ACCION_DESCARGAR_MERITO_PERSONAL:
 				descargaMeritoPersonal(bean, datos, request, response);
+				break;
+			case ACCION_DESCARGAR_NRI_PERSONAL:
+				descargaNRIPlazaPersonal(bean, datos, request, response);
 				break;
 			case ACCION_DESCARGAR_TITULACION_PERSONAL:
 				descargaTitulacionPersonal(bean, datos, request, response);
@@ -291,8 +322,7 @@ public class ControladorDescargaFicheros extends HttpServlet {
 		MeritoPreferenteUsuario acreditacion = ModeloDescargaFichero.obtenerInstancia().compruebaAcreditacionCandidato(idAcreditacion, bean.getUsuarioLogeado());
 		bean.setAcreditacion(acreditacion);
 		if (acreditacion == null) {
-			BolsaEmpleoUtils.addMensajeDeError(MENSAJE_ERROR_SIN_PERMISO, bean, request);
-			response.sendRedirect(ControladorErrorBolsaEmpleo.URL_ERROR);
+			BolsaEmpleoUtils.redirectToError(bean, datos, request, response, MENSAJE_ERROR_SIN_PERMISO);
 		} else {
 			descargarPDF(datos, response, acreditacion.getArchivo());
 		}
@@ -315,11 +345,21 @@ public class ControladorDescargaFicheros extends HttpServlet {
 		Integer idArchivo = Formateador.leeParametroInteger(request.getParameter(PARAM_ARCHIVO));
 		Fichero fichero = ModeloFichero.obtenerInstancia().listaFichero(idArchivo);
 		if (!fichero.isPublico() && bean.getUsuarioLogeado() == null) {
-			BolsaEmpleoUtils.addMensajeDeError(MENSAJE_ERROR_SIN_PERMISO, bean, request);
-			response.sendRedirect(ControladorErrorBolsaEmpleo.URL_ERROR);
+			BolsaEmpleoUtils.redirectToError(bean, datos, request, response, MENSAJE_ERROR_SIN_PERMISO);
 		} else {
 			bean.setFichero(fichero);
 			descargarPDF(datos, response, fichero.getArchivo());
+		}
+	}
+	
+	///////////////////////////////////////////////////////////////////////////////////////////////////////////
+	// ITEMS DE BAREMACION
+	///////////////////////////////////////////////////////////////////////////////////////////////////////////
+	
+	private void descargaResumenItemsBaremacion(UVDatos datos, HttpServletResponse response)
+			throws SQLException, UVException, IOException {
+		try (InputStream archivo = GenerarItemsBaremacionPDF.generarPDF()) {
+			descargarPDF(datos, response, archivo);
 		}
 	}
 	
@@ -333,8 +373,7 @@ public class ControladorDescargaFicheros extends HttpServlet {
 		Merito merito = ModeloDescargaFichero.obtenerInstancia().compruebaMeritoCandidato(idMerito, bean.getUsuarioLogeado());
 		bean.setMerito(merito);
 		if (merito == null) {
-			BolsaEmpleoUtils.addMensajeDeError(MENSAJE_ERROR_SIN_PERMISO, bean, request);
-			response.sendRedirect(ControladorErrorBolsaEmpleo.URL_ERROR);
+			BolsaEmpleoUtils.redirectToError(bean, datos, request, response, MENSAJE_ERROR_SIN_PERMISO);
 		} else {
 			descargarPDF(datos, response, merito.getArchivo());
 		}
@@ -346,8 +385,7 @@ public class ControladorDescargaFicheros extends HttpServlet {
 		Merito merito = ModeloDescargaFichero.obtenerInstancia().compruebaMeritoEvaluador(idMerito, bean.getUsuarioLogeado());
 		bean.setMerito(merito);
 		if (merito == null) {
-			BolsaEmpleoUtils.addMensajeDeError(MENSAJE_ERROR_SIN_PERMISO, bean, request);
-			response.sendRedirect(ControladorErrorBolsaEmpleo.URL_ERROR);
+			BolsaEmpleoUtils.redirectToError(bean, datos, request, response, MENSAJE_ERROR_SIN_PERMISO);
 		} else {
 			descargarPDF(datos, response, merito.getArchivo());
 		}
@@ -359,6 +397,38 @@ public class ControladorDescargaFicheros extends HttpServlet {
 		Merito merito = ModeloMerito.obtenerInstancia().listaMerito(idMerito);
 		bean.setMerito(merito);
 		descargarPDF(datos, response, merito.getArchivo());
+	}
+	
+	///////////////////////////////////////////////////////////////////////////////////////////////////////////
+	// PLAZAS OFERTADAS
+	///////////////////////////////////////////////////////////////////////////////////////////////////////////
+	
+	private void descargaHorarioPlazaDirector(VistaDescargaFicheros bean, UVDatos datos, HttpServletRequest request, HttpServletResponse response)
+			throws SQLException, UVException, IOException {
+		Integer idPlazaOfertada = Formateador.leeParametroInteger(request.getParameter(PARAM_PLAZA_OFERTADA));
+		PlazaOfertada plaza = ModeloDescargaFichero.obtenerInstancia().compruebaPlazaOfertadaDirector(idPlazaOfertada, bean.getUsuarioLogeado());
+		bean.setPlazaOfertada(plaza);
+		if (plaza == null) {
+			BolsaEmpleoUtils.redirectToError(bean, datos, request, response, MENSAJE_ERROR_SIN_PERMISO);
+		} else {
+			descargarPDF(datos, response, plaza.getHorario());
+		}
+	}
+	
+	private void descargaHorarioPlazaPersonal(VistaDescargaFicheros bean, UVDatos datos, HttpServletRequest request, HttpServletResponse response)
+			throws SQLException, UVException {
+		Integer idPlazaOfertada = Formateador.leeParametroInteger(request.getParameter(PARAM_PLAZA_OFERTADA));
+		PlazaOfertada plaza = ModeloPlazaOfertada.obtenerInstancia().getPlazaOfertadaById(idPlazaOfertada);
+		bean.setPlazaOfertada(plaza);
+		descargarPDF(datos, response, plaza.getHorario());
+	}
+	
+	private void descargaNRIPlazaPersonal(VistaDescargaFicheros bean, UVDatos datos, HttpServletRequest request, HttpServletResponse response)
+			throws SQLException, UVException {
+		Integer idPlazaOfertada = Formateador.leeParametroInteger(request.getParameter(PARAM_PLAZA_OFERTADA));
+		PlazaOfertada plaza = ModeloPlazaOfertada.obtenerInstancia().getPlazaOfertadaById(idPlazaOfertada);
+		bean.setPlazaOfertada(plaza);
+		descargarPDF(datos, response, plaza.getNri());
 	}
 	
 	///////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -397,8 +467,7 @@ public class ControladorDescargaFicheros extends HttpServlet {
 		Integer idSolicitud = Formateador.leeParametroInteger(request.getParameter(PARAM_SOLICITUD));
 		Solicitud solicitud = ModeloDescargaFichero.obtenerInstancia().compruebaSolicitudCandidato(idSolicitud, bean.getUsuarioLogeado());
 		if (solicitud == null) {
-			BolsaEmpleoUtils.addMensajeDeError(MENSAJE_ERROR_SIN_PERMISO, bean, request);
-			response.sendRedirect(ControladorErrorBolsaEmpleo.URL_ERROR);
+			BolsaEmpleoUtils.redirectToError(bean, datos, request, response, MENSAJE_ERROR_SIN_PERMISO);
 		} else {
 			if (solicitud.getArchivo() == null) {
 				throw new UVException(MENSAJE_ERROR_GENERANDO_PDF_SOLICITUD);
@@ -413,8 +482,7 @@ public class ControladorDescargaFicheros extends HttpServlet {
 		Integer idSolicitud = Formateador.leeParametroInteger(request.getParameter(PARAM_SOLICITUD));
 		Solicitud solicitud = ModeloSolicitud.obtenerInstancia().getSolicitudByIdArchivo(idSolicitud);
 		if (solicitud == null) {
-			BolsaEmpleoUtils.addMensajeDeError(MENSAJE_ERROR_SIN_PERMISO, bean, request);
-			response.sendRedirect(ControladorErrorBolsaEmpleo.URL_ERROR);
+			BolsaEmpleoUtils.redirectToError(bean, datos, request, response, MENSAJE_ERROR_SIN_PERMISO);
 		} else {
 			if (solicitud.getArchivo() == null) {
 				throw new UVException(MENSAJE_ERROR_GENERANDO_PDF_SOLICITUD);
@@ -434,8 +502,7 @@ public class ControladorDescargaFicheros extends HttpServlet {
 		TitulacionUsuario titulacion = ModeloDescargaFichero.obtenerInstancia().compruebaTitulacionCandidato(idTitulacion, bean.getUsuarioLogeado());
 		bean.setTitulacion(titulacion);
 		if (titulacion == null) {
-			BolsaEmpleoUtils.addMensajeDeError(MENSAJE_ERROR_SIN_PERMISO, bean, request);
-			response.sendRedirect(ControladorErrorBolsaEmpleo.URL_ERROR);
+			BolsaEmpleoUtils.redirectToError(bean, datos, request, response, MENSAJE_ERROR_SIN_PERMISO);
 		} else {
 			descargarPDF(datos, response, titulacion.getArchivo());
 		}
@@ -447,17 +514,6 @@ public class ControladorDescargaFicheros extends HttpServlet {
 		TitulacionUsuario titulacion = ModeloMisTitulaciones.obtenerInstancia().getTitulacionUsuarioById(idTitulacion);
 		bean.setTitulacion(titulacion);
 		descargarPDF(datos, response, titulacion.getArchivo());
-	}
-	
-	///////////////////////////////////////////////////////////////////////////////////////////////////////////
-	// ITEMS DE BAREMACION
-	///////////////////////////////////////////////////////////////////////////////////////////////////////////
-	
-	private void descargaResumenItemsBaremacion(UVDatos datos, HttpServletResponse response)
-			throws SQLException, UVException, IOException {
-		try (InputStream archivo = GenerarItemsBaremacionPDF.generarPDF()) {
-			descargarPDF(datos, response, archivo);
-		}
 	}
 	
 }

@@ -7,6 +7,7 @@ import java.sql.SQLException;
 import es.ujaen.uvirtual.modelo.conexion.ConexionUvirtual;
 import es.ujaen.uvirtual.modulo.bolsaempleo.beans.Merito;
 import es.ujaen.uvirtual.modulo.bolsaempleo.beans.MeritoPreferenteUsuario;
+import es.ujaen.uvirtual.modulo.bolsaempleo.beans.PlazaOfertada;
 import es.ujaen.uvirtual.modulo.bolsaempleo.beans.Solicitud;
 import es.ujaen.uvirtual.modulo.bolsaempleo.beans.TitulacionUsuario;
 import es.ujaen.uvirtual.modulo.bolsaempleo.beans.UsuarioBolsaEmpleo;
@@ -151,6 +152,35 @@ public class ModeloDescargaFichero {
 			try (ResultSet rs = stmt.executeQuery()) {
 				if (rs.next()) {
 					return ModeloMeritosPreferentesCandidato.obtenerInstancia().createMeritoUsuarioFromResultSet(rs);
+				}
+			}
+		}
+		
+		return null;
+	}
+	
+	/** Comprueba si una plaza ofertada es visible para un director de departamento .
+	 * @param idPlaza .
+	 * @param usuario .
+	 * @return plaza ofertada .
+	 * @throws UVException .
+	 * @throws UVException .
+	 * @throws SQLException .
+	 */
+	public PlazaOfertada compruebaPlazaOfertadaDirector(int idPlaza, UsuarioBolsaEmpleo usuario) throws SQLException, UVException {
+		String consulta = "SELECT bepplo.* FROM TBEP_PLAZAS_OFERTADAS bepplo"
+				+ "	INNER JOIN TBEP_EVALUADORES bepeva ON bepeva.BEPARE_CODNUM = bepplo.BEPARE_CODNUM AND bepeva.FLGACTIVO = 'S'"
+				+ "	WHERE bepplo.CODNUM = ? AND BEPUSU_CODNUM = ?";
+		
+		try (Connection conexion = ConexionUvirtual.obtenerInstancia();
+				PreparedStatement stmt = conexion.prepareStatement(consulta)) {
+			int parameterIndex = 1;
+			stmt.setInt(parameterIndex++, idPlaza);
+			stmt.setInt(parameterIndex++, usuario.getCodNum());
+						
+			try (ResultSet rs = stmt.executeQuery()) {
+				if (rs.next()) {
+					return ModeloPlazaOfertada.obtenerInstancia().createPlazaOfertadaFromResultSet(rs, true);
 				}
 			}
 		}

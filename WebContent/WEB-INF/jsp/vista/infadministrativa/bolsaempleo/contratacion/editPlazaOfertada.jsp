@@ -2,6 +2,7 @@
 <%@ page import="es.ujaen.uvirtual.beans.UVDatos" %>
 <%@	page import="es.ujaen.uvirtual.modulo.bolsaempleo.modelo.ModeloPlazaOfertada" %>
 <%@	page import="es.ujaen.uvirtual.modulo.bolsaempleo.controlador.ControladorContratacion" %>
+<%@	page import="es.ujaen.uvirtual.modulo.bolsaempleo.controlador.ControladorDescargaFicheros"%>
 <%@ page import="es.ujaen.uvirtual.modulo.bolsaempleo.vistas.VistaContratacion" %>
 <%@ page import="es.ujaen.uvirtual.modulo.bolsaempleo.beans.Area" %>
 <%@ page import="es.ujaen.uvirtual.modulo.bolsaempleo.beans.Dedicacion" %>
@@ -50,7 +51,7 @@ String fechaFinOferta = BolsaEmpleoUtils.getParamForm(request, ControladorContra
 			</div>
 			<div class="form-group">
 				<label for="plaza_dedicacion">Dedicación: </label>
-				<select id="plaza_dedicacion" name="<%=ControladorContratacion.PARAM_DEDICACION%>" style="width:100%;" <%= personal ? "" : "readonly" %>>
+				<select id="plaza_dedicacion" name="<%=ControladorContratacion.PARAM_DEDICACION%>" style="width:100%;" <%= personal ? "" : "readonly disabled" %>>
 					<option value="">----------------</option>
 				<%	for(Dedicacion ded: bean.getListaDedicaciones()) { %>
 						<option value="<%=ded.getCodNum()%>" <%= Integer.parseInt(dedicacion) == ded.getCodNum() ? "selected" : "" %>><%= ded.getTexto() %></option>
@@ -59,7 +60,7 @@ String fechaFinOferta = BolsaEmpleoUtils.getParamForm(request, ControladorContra
 			</div>
 			<div class="form-group">
 				<label for="plaza_cuatrimestre">Cuatrimestre:</label>
-				<select id="plaza_cuatrimestre" name="<%=ControladorContratacion.PARAM_CUATRIMESTRE%>" style="width:100%;" <%= personal ? "" : "readonly" %>>
+				<select id="plaza_cuatrimestre" name="<%=ControladorContratacion.PARAM_CUATRIMESTRE%>" style="width:100%;" <%= personal ? "" : "readonly disabled" %>>
 				<%	for (Entry<String, String> cua: ModeloPlazaOfertada.CUATRIMESTRES.entrySet()) { %>
 						<option value="<%= cua.getKey() %>" <%= cuatrimestre != null && cuatrimestre.equals(cua.getKey()) ? "selected" : "" %>><%= cua.getValue() %></option>
 				<%	} %>
@@ -88,12 +89,12 @@ String fechaFinOferta = BolsaEmpleoUtils.getParamForm(request, ControladorContra
 			<div class="form-group">
 				<label for="plaza_duracion_prevista">Duración prevista:</label>
 				<input class="form-input-custom" type="text" name="<%=ControladorContratacion.PARAM_DURACION_PREVISTA%>" id="plaza_duracion_prevista" 
-						value="<%=duracionPrevista%>" <%= personal ? "" : "readonly" %>/>
+						value="<%=duracionPrevista%>" <%= personal ? "" : "readonly disabled" %>/>
 			</div>
 			<div class="form-group">
 				<label for="plaza_fecha_fin_oferta">Fecha fin oferta:</label>
 				<input class="form-input-custom" type="text" name="<%=ControladorContratacion.PARAM_FECHA_FIN_OFERTA%>" id="plaza_fecha_fin_oferta" autocomplete="off" 
-						value="<%=fechaFinOferta%>" <%= personal ? "" : "readonly" %>/>
+						value="<%=fechaFinOferta%>" <%= personal ? "" : "readonly disabled" %>/>
 			</div>
 		</div>
 		<div class="form-group-container col2">
@@ -101,7 +102,8 @@ String fechaFinOferta = BolsaEmpleoUtils.getParamForm(request, ControladorContra
 				<label for="plaza_horario" style="margin-bottom: .5rem;">Horario:</label>
 				<input id="plaza_horario" type="file" name="<%= ControladorContratacion.PARAM_HORARIO %>"/>
 			<%	if (plaza.getHorario() != null) { %>
-					<button id="plaza_descargar_horario" class="btn icon icon-download" title="Descargar horario de la plaza" type="button">Descargar horario</button>
+					<button id="plaza_descargar_horario" class="btn icon icon-download" title="Descargar horario de la plaza" type="button" 
+						style="margin-top: .5rem;padding: 1px 6px;">Descargar horario</button>
 			<%	} %>
 			</div>
 		<%	if (bean.getUsuarioLogeado().isServicioPersonal()) { %>
@@ -109,7 +111,8 @@ String fechaFinOferta = BolsaEmpleoUtils.getParamForm(request, ControladorContra
 				<label for="plaza_nri" style="margin-bottom: .5rem;">NRI:</label>
 				<input id="plaza_nri" type="file" name="<%= ControladorContratacion.PARAM_NRI %>"/>
 			<%	if (plaza.getNri() != null) { %>
-					<button id="plaza_descargar_nri" class="btn icon icon-download" title="Descargar nri de la plaza" type="button">Descargar NRI</button>
+					<button id="plaza_descargar_nri" class="btn icon icon-download" title="Descargar nri de la plaza" type="button" 
+							style="margin-top: .5rem;padding: 1px 6px;">Descargar NRI</button>
 			<%	} %>
 			</div>
 		<%	} %>
@@ -169,9 +172,21 @@ $(document).ready(function() {
 	
 	$('#actualizar_plaza').submit(function(event) { 
 		$('#plaza_enviar').prop('disabled', true);
-		$('#plaza_enviar').attr('value', 'Guardando plaza...');		
+		$('#plaza_enviar').attr('value', 'Guardando plaza...');
 		return true;
 	});
+	
+	document.getElementById("plaza_descargar_horario").addEventListener("click", function() {
+		window.open("<%=ControladorDescargaFicheros.URL_DESCARGA_FICHEROS%>"
+				+ "<%="?a=" + (bean.getUsuarioLogeado().isDirectorDepartamento() ? ControladorDescargaFicheros.ACCION_DESCARGAR_HORARIO_DIRECTOR : ControladorDescargaFicheros.ACCION_DESCARGAR_HORARIO_PERSONAL) + "&" + ControladorDescargaFicheros.PARAM_PLAZA_OFERTADA + "=" + plaza.getCodNum()%>");
+	});
+	
+<%	if (bean.getUsuarioLogeado().isServicioPersonal()) { %>
+		document.getElementById("plaza_descargar_nri").addEventListener("click", function() {
+			window.open("<%=ControladorDescargaFicheros.URL_DESCARGA_FICHEROS%>"
+					+ "<%="?a=" + (bean.getUsuarioLogeado().isDirectorDepartamento() ? ControladorDescargaFicheros.ACCION_DESCARGAR_NRI_DIRECTOR : ControladorDescargaFicheros.ACCION_DESCARGAR_HORARIO_PERSONAL) + "&" + ControladorDescargaFicheros.PARAM_PLAZA_OFERTADA + "=" + plaza.getCodNum()%>");
+		});
+<%	} %>
 	
 });
 

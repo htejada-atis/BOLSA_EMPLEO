@@ -167,7 +167,11 @@ public final class BolsaEmpleoUtils {
 	 * @return cadena en formato yyyyMMdd
 	 */
 	@SuppressWarnings({"checkstyle:magicnumber"})
-	public static Date leeParametroFechaHora(String valor, String sepFecha, String sepHora) throws UVException {
+	public static Date leeParametroFechaHora(String valor, String sepFecha, String sepHora) {
+		if (valor == null || valor.isBlank()) {
+			return null;
+		}
+		
 		Date dateFecha = null;
 		
 		SimpleDateFormat formatoFecha = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss");
@@ -193,7 +197,7 @@ public final class BolsaEmpleoUtils {
 			if (strFecha != null) {
 				dateFecha = formatoFecha.parse(strFecha);
 			}
-		} catch (ParseException e) {
+		} catch (Exception e) {
 			LOGGER.log(Level.WARNING, e.toString());
 			return null;
 		}

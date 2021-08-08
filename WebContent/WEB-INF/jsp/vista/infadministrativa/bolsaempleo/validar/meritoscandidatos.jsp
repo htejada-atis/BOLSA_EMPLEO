@@ -159,7 +159,7 @@ Boolean onlyRead = bean.getUsuarioLogeado().getRol().getCodNum().equals(ModeloRo
 				
 				<div class="form-group-container col1">
 					<div class="form-file">
-						<label for="merito_archivo" class="bold-label">Fichero:</label>
+						<label for="merito_descargar_fichero" class="bold-label">Fichero:</label>
 						<button id="merito_descargar_fichero" class="btn icon icon-download" title="Descargar fichero del mérito" type="button">Descargar fichero del mérito</button>
 					</div>
 				</div>

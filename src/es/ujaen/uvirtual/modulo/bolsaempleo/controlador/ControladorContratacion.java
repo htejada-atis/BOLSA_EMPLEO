@@ -24,6 +24,7 @@ import es.ujaen.uvirtual.beans.UVDatos;
 import es.ujaen.uvirtual.modulo.bolsaempleo.beans.PlazaOfertada;
 import es.ujaen.uvirtual.modulo.bolsaempleo.modelo.ModeloArea;
 import es.ujaen.uvirtual.modulo.bolsaempleo.modelo.ModeloDedicacion;
+import es.ujaen.uvirtual.modulo.bolsaempleo.modelo.ModeloEvaluador;
 import es.ujaen.uvirtual.modulo.bolsaempleo.modelo.ModeloParametrosConfiguracion;
 import es.ujaen.uvirtual.modulo.bolsaempleo.modelo.ModeloPlazaOfertada;
 import es.ujaen.uvirtual.modulo.bolsaempleo.modelo.ModeloRol;
@@ -190,7 +191,7 @@ public class ControladorContratacion extends HttpServlet {
 		try {
 			bean.setUsuarioLogeado(ModeloUsuarioBolsaEmpleo.obtenerInstancia().getOrCreateUsuario(datos));
 			
-			// personal, comision, direccion
+			// personal, direccion
 			int[] rolesValidos = {ModeloRol.ID_ROL_SERVICIO_PERSONAL, ModeloRol.ID_ROL_DIRECTOR_DEPARTAMENTO};
 			boolean contains = IntStream.of(rolesValidos).
 					anyMatch(x -> x == bean.getUsuarioLogeado().getRol().getCodNum());
@@ -225,6 +226,11 @@ public class ControladorContratacion extends HttpServlet {
 		ModeloPlazaOfertada modelo = ModeloPlazaOfertada.obtenerInstancia();
 		PlazaOfertada plaza = modelo.getPlazaOfertadaById(Formateador.leeParametroInteger(BolsaEmpleoUtils.getParamRequestOrMultipart(
 				request, parametros, PARAM_PLAZA_OFERTADA)));
+		
+		if (bean.getUsuarioLogeado().isDirectorDepartamento() && !ModeloEvaluador.obtenerInstancia().checkEvaluadorArea(plaza.getArea(), bean.getUsuarioLogeado())) {
+			BolsaEmpleoUtils.redirectToError(bean, datos, request, response, MENSAJE_ERROR_SIN_PERMISO);
+		}
+		
 		bean.setPlazaOfertada(plaza);
 		
 		switch (nombreAccion) {
@@ -240,18 +246,14 @@ public class ControladorContratacion extends HttpServlet {
 	
 	private void editarPlazaOfertada(VistaContratacion bean, UVDatos datos, HttpServletRequest request, HttpServletResponse response, HashMap<String, Object> parametros) 
 			throws SQLException, UVException, IOException {
-		System.out.println("editarPlazaOfertada: ");
-		if (EscapaHTML.ajustaCodificacion(BolsaEmpleoUtils.getParamRequestOrMultipart(
-				request, parametros, PARAM_ENVIAR)) != null) {
-			PlazaOfertada plaza = bean.getPlazaOfertada();
-			plaza = validarPlazaOfertada(bean, request, plaza, parametros);
-			
-			ModeloPlazaOfertada.obtenerInstancia().actualizaPlazaOfertada(plaza, bean.getUsuarioLogeado());
-			
-			BolsaEmpleoUtils.addMensajeDeExito(MENSAJE_EXITO_EDITAR, bean, request);
-			datos.setRespuestaEnviada(true);
-			response.sendRedirect(request.getServletPath());
-		}
+		PlazaOfertada plaza = bean.getPlazaOfertada();
+		plaza = validarPlazaOfertada(bean, request, plaza, parametros);
+		
+		ModeloPlazaOfertada.obtenerInstancia().actualizaPlazaOfertada(plaza, bean.getUsuarioLogeado());
+		
+		BolsaEmpleoUtils.addMensajeDeExito(MENSAJE_EXITO_EDITAR, bean, request);
+		datos.setRespuestaEnviada(true);
+		response.sendRedirect(request.getServletPath());
 	}
 	
 	private void nuevaPlazaOfertada(VistaContratacion bean, UVDatos datos, HttpServletRequest request, HttpServletResponse response, HashMap<String, Object> parametros) 
@@ -259,19 +261,18 @@ public class ControladorContratacion extends HttpServlet {
 		bean.setVista(JSP_CREATE);
 		cargarListasFormulario(bean);
 		
-		if (EscapaHTML.ajustaCodificacion(request.getParameter(PARAM_ENVIAR)) != null) {
-			PlazaOfertada plaza = validarPlazaOfertada(bean, request, new PlazaOfertada(), parametros);
-			
-			ModeloPlazaOfertada.obtenerInstancia().insertaPlazaOfertada(plaza, bean.getUsuarioLogeado());
-			
-			BolsaEmpleoUtils.addMensajeDeExito(MENSAJE_EXITO_AGREGAR, bean, request);
-			datos.setRespuestaEnviada(true);
-			response.sendRedirect(request.getServletPath());
-		}
+		PlazaOfertada plaza = validarPlazaOfertada(bean, request, new PlazaOfertada(), parametros);
+		
+		ModeloPlazaOfertada.obtenerInstancia().insertaPlazaOfertada(plaza, bean.getUsuarioLogeado());
+		
+		BolsaEmpleoUtils.addMensajeDeExito(MENSAJE_EXITO_AGREGAR, bean, request);
+		datos.setRespuestaEnviada(true);
+		response.sendRedirect(request.getServletPath());
 	}
 	
 	private void cargarListasFormulario(VistaContratacion bean) throws SQLException {
-		bean.setListaAreas(ModeloArea.obtenerInstancia().listaAreas());
+		ModeloArea modelo = ModeloArea.obtenerInstancia();
+		bean.setListaAreas(bean.getUsuarioLogeado().isServicioPersonal() ? modelo.listaAreas() : modelo.getAreasByEvaluador(bean.getUsuarioLogeado()));
 		bean.setListaDedicaciones(ModeloDedicacion.obtenerInstancia().listaDedicacionesActivas());
 	}
 	
@@ -283,7 +284,8 @@ public class ControladorContratacion extends HttpServlet {
 		
 		try (PrintWriter writer = response.getWriter()) {
 			try {
-				BolsaEmpleoDataTable<PlazaOfertada> dataTable = ModeloPlazaOfertada.obtenerInstancia().listadoPlazasOfertadas(request.getParameterMap());
+				BolsaEmpleoDataTable<PlazaOfertada> dataTable = ModeloPlazaOfertada.obtenerInstancia().listadoPlazasOfertadas(
+						request.getParameterMap(), bean.getUsuarioLogeado());
 				bean.setDatatablePlazasOfertadas(dataTable);
 				writer.write(dataTable.toJson());
 			} catch (UVException | SQLException e) {

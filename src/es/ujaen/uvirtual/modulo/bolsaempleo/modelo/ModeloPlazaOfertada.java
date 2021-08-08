@@ -23,6 +23,13 @@ import es.ujaen.uvirtual.utilidades.UVException;
  */
 public class ModeloPlazaOfertada {
 	
+	public static final int ORDER_COLUMN_INDEX_AREA = 0;
+	public static final int ORDER_COLUMN_INDEX_ESTADO = 1;
+	public static final int ORDER_COLUMN_INDEX_FECHA_CREACION = 2;
+	public static final int ORDER_COLUMN_INDEX_FECHA_ABIERTA = 3;
+	public static final int ORDER_COLUMN_INDEX_FECHA_FIN_OFERTA = 4;
+	public static final int ORDER_COLUMN_INDEX_FECHA_CERRADA = 5;
+	
 	public static final String PLAZA_ESTADO_ABIERTA = "ABIERTA";
 	public static final String PLAZA_ESTADO_CERRADA = "CERRADA";
 	public static final String PLAZA_ESTADO_CONTRATACION = "CONTRATACION";
@@ -166,7 +173,7 @@ public class ModeloPlazaOfertada {
 				stmt.setInt(parameterIndex++, plaza.getDedicacion().getCodNum());
 				stmt.setString(parameterIndex++, plaza.getCuatrimestre());
 				stmt.setString(parameterIndex++, plaza.getDuracionPrevista());
-				stmt.setDate(parameterIndex++, new Date(plaza.getFechaFinOferta().getTime()));
+				stmt.setDate(parameterIndex++, plaza.getFechaFinOferta() != null ? new Date(plaza.getFechaFinOferta().getTime()) : null);
 				stmt.setBlob(parameterIndex++, plaza.getNri());
 				stmt.setDate(parameterIndex++, plaza.getNri() != null ? new Date(BolsaEmpleoUtils.getCurrentDateTime().getTime()) : null);
 			}
@@ -203,14 +210,14 @@ public class ModeloPlazaOfertada {
 		
 		if (usuarioUpdate.isServicioPersonal()) {
 			consulta = String.format("UPDATE TBEP_PLAZAS_OFERTADAS SET %s=?, %s=?, %s=?, %s=?, %s=?, %s=?, %s=?, %s=? "
-					+ plaza.getHorario() != null ? ", " + HORARIO + "=?" : ""
-					+ plaza.getNri() != null ? ", " + NRI + "=?, " + NRI_FECHA + "=?" : ""
+					+ (plaza.getHorario() != null ? ", " + HORARIO + "=?" : "")
+					+ (plaza.getNri() != null ? ", " + NRI + "=?, " + NRI_FECHA + "=?" : "")
 					+ "WHERE %s=?",
 					BEPARE_CODNUM, JUSTIFICACION, CENTRO_DESTINO, "UID_USUARIO", BEPDED_CODNUM, CUATRIMESTRE, DURACION_PREVISTA, 
 					FECHA_FIN_OFERTA, CODNUM);
 		} else {
 			consulta = String.format("UPDATE TBEP_PLAZAS_OFERTADAS SET %s=?, %s=?, %s=?, %s=?"
-					+ plaza.getHorario() != null ? ", " + HORARIO + "=?" : ""
+					+ (plaza.getHorario() != null ? ", " + HORARIO + "=?" : "")
 					+ "WHERE %s=?", 
 					BEPARE_CODNUM, JUSTIFICACION, CENTRO_DESTINO, "UID_USUARIO", CODNUM);
 		}
@@ -225,7 +232,7 @@ public class ModeloPlazaOfertada {
 				stmt.setInt(parameterIndex++, plaza.getDedicacion().getCodNum());
 				stmt.setString(parameterIndex++, plaza.getCuatrimestre());
 				stmt.setString(parameterIndex++, plaza.getDuracionPrevista());
-				stmt.setDate(parameterIndex++, new Date(plaza.getFechaFinOferta().getTime()));	
+				stmt.setDate(parameterIndex++, plaza.getFechaFinOferta() != null ? new Date(plaza.getFechaFinOferta().getTime()) : null);	
 				if (plaza.getNri() != null) {
 					stmt.setBlob(parameterIndex++, plaza.getNri());
 					stmt.setDate(parameterIndex++, new Date(BolsaEmpleoUtils.getCurrentDateTime().getTime()));
@@ -242,21 +249,40 @@ public class ModeloPlazaOfertada {
 	/**
 	 * Lista de plazas ofertadas .
 	 * @param params .
+	 * @param usuario .
 	 * @return datatable de plazas ofertadas .
 	 * @throws SQLException .
 	 * @throws UVException .
 	 */
-	public BolsaEmpleoDataTable<PlazaOfertada> listadoPlazasOfertadas(Map<String, String[]> params) throws SQLException, UVException {
+	public BolsaEmpleoDataTable<PlazaOfertada> listadoPlazasOfertadas(Map<String, String[]> params, UsuarioBolsaEmpleo usuario) throws SQLException, UVException {
 		List<PlazaOfertada> rows = new ArrayList<>();
 		BolsaEmpleoDataTable<PlazaOfertada> dataTable = new BolsaEmpleoDataTable<>(params);
 		
-		String consulta = "SELECT * FROM TBEP_PLAZAS_OFERTADAS";
+		String consulta = "SELECT bepplo.* FROM TBEP_PLAZAS_OFERTADAS bepplo"
+				+ "	INNER JOIN TBEP_AREAS bepare ON bepare.CODNUM = bepplo.BEPARE_CODNUM"
+				+ (usuario.isDirectorDepartamento()
+						? " INNER JOIN TBEP_EVALUADORES bepeva ON bepeva.BEPARE_CODNUM = bepare.CODNUM AND bepeva.FLGACTIVO = 'S'"
+						+ " WHERE bepeva.BEPUSU_CODNUM = ? "
+						: " WHERE 1=1 ");
 		
+		dataTable.setColumn(ORDER_COLUMN_INDEX_AREA, "bepare.DES_AREA_CONOCIMIENTO");
+		dataTable.setColumn(ORDER_COLUMN_INDEX_ESTADO, ESTADO);
+		dataTable.setColumn(ORDER_COLUMN_INDEX_FECHA_CREACION, FECHA_CREACION);
+		dataTable.setColumn(ORDER_COLUMN_INDEX_FECHA_ABIERTA, FECHA_ABIERTA);
+		dataTable.setColumn(ORDER_COLUMN_INDEX_FECHA_FIN_OFERTA, FECHA_FIN_OFERTA);
+		dataTable.setColumn(ORDER_COLUMN_INDEX_FECHA_CERRADA, FECHA_CERRADA);
 		dataTable.setQuery(consulta);
 		
 		try (Connection conexion = ConexionUvirtual.obtenerInstancia();
 				PreparedStatement stmtCount = conexion.prepareStatement(dataTable.getQueryCount());
 				PreparedStatement stmt = conexion.prepareStatement(dataTable.getQuery())) {
+			int paramIndex = 1;
+			if (usuario.isDirectorDepartamento()) {
+				stmt.setInt(paramIndex, usuario.getCodNum());
+				stmtCount.setInt(paramIndex++, usuario.getCodNum());
+			}
+			
+			dataTable.setFiltersParams(stmt, stmtCount, paramIndex);
 			
 			try (ResultSet rs = stmt.executeQuery()) {
 				while (rs.next()) {
@@ -271,7 +297,7 @@ public class ModeloPlazaOfertada {
 		return dataTable;
 	}
 	
-	private PlazaOfertada createPlazaOfertadaFromResultSet(ResultSet rs, Boolean withFiles) throws SQLException, UVException {
+	public PlazaOfertada createPlazaOfertadaFromResultSet(ResultSet rs, Boolean withFiles) throws SQLException, UVException {
 		PlazaOfertada plaza = new PlazaOfertada();
 		
 		plaza.setCodNum(rs.getInt(CODNUM));
