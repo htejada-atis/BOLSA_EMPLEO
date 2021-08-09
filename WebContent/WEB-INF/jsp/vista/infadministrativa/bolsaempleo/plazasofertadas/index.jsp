@@ -22,12 +22,13 @@ VistaPlazasOfertadas bean = (VistaPlazasOfertadas) uvdatos.getVistas().get(Vista
 			<th scope="col" style="width:100%">Área</th>
 			<th scope="col" style="width:95px">Estado</th>
 			<th scope="col" style="width:100px">Fecha fin oferta</th>
+			<th scope="col" style="width:100px">Confirmación</th>
 		</tr>
 		<tbody>
 		</tbody>
 		<tfoot>
 			<tr>
-				<th colSpan="6" style="width:100%"></th>
+				<th colSpan="4" style="width:100%"></th>
 			</tr>
 		</tfoot>
 	</table>
@@ -46,15 +47,22 @@ $(document).ready(function() {
 		"clickable": {'onClick': function(row) {
 			var params = {
 					'<%= ControladorPlazasOfertadas.PARAM_ACCION %>': '<%= ControladorPlazasOfertadas.ACCION_SELECCIONAR_PLAZA_OFERTADA %>', 
-					'<%= ControladorPlazasOfertadas.PARAM_PLAZA_OFERTADA %>': row.codNum};
+					'<%= ControladorPlazasOfertadas.PARAM_PLAZA_OFERTADA %>': row.plaza.codNum};
 			Atis.sendForm("<%= request.getRequestURI() %>", params);
 		}},
 		"columns": [
-			{'data': 'area.idAreaExterno', 'filter': true, 'render': function(row) {
-				return row.area.idAreaExterno + ' ' + row.area.descripcion;
+			{'data': 'plaza.area.idAreaExterno', 'filter': true, 'render': function(row) {
+				return row.plaza.area.idAreaExterno + ' ' + row.plaza.area.descripcion;
 			}},
-			{'data': 'estado', 'filter': true},
-			{'data': 'fechaFinOferta', 'filter': {'type': 'date'}},
+			{'data': 'plaza.estado', 'filter': true},
+			{'data': 'plaza.fechaFinOferta', 'filter': {'type': 'date'}},
+			{'data': 'resultado', 'render': function(row) {
+				if (row.resultado == true) {
+					return "<div title='Aceptada' class='circle-true'></div>";
+				} else if (row.resultado == false) {
+					return "<div title='Rechazada' class='circle-false'></div>";
+				}
+			}}
 		]
 	});
 	

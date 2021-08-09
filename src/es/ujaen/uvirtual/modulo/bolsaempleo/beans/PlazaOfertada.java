@@ -35,6 +35,14 @@ public class PlazaOfertada implements Serializable {
 	
 	/** Constructor con parametros .
 	 * @param pcodNum .
+	 */
+	public PlazaOfertada(Integer pcodNum) {
+		super();
+		this.codNum = pcodNum;
+	}
+	
+	/** Constructor con parametros .
+	 * @param pcodNum .
 	 * @param parea .
 	 * @param pdedicacion .
 	 * @param pjustificacion .

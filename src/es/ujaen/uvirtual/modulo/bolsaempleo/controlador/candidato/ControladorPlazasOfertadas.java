@@ -15,6 +15,7 @@ import javax.servlet.http.HttpServletResponse;
 import com.google.gson.Gson;
 import es.ujaen.uvirtual.beans.CodigoDescripcion;
 import es.ujaen.uvirtual.beans.UVDatos;
+import es.ujaen.uvirtual.modulo.bolsaempleo.beans.OfertaCandidato;
 import es.ujaen.uvirtual.modulo.bolsaempleo.beans.PlazaOfertada;
 import es.ujaen.uvirtual.modulo.bolsaempleo.modelo.ModeloOfertaCandidato;
 import es.ujaen.uvirtual.modulo.bolsaempleo.modelo.ModeloParametrosConfiguracion;
@@ -54,7 +55,7 @@ public class ControladorPlazasOfertadas extends HttpServlet {
 	
 	// Parámetros
 	public static final String PARAM_ACCION = "a";
-	public static final String PARAM_PLAZA_OFERTADA = "plazaOfertada";
+	public static final String PARAM_PLAZA_OFERTADA = "plazaofertada";
 	
 	// mensajes
 	public static final String MENSAJE_ERROR_ACCION_NO_CONTEMPLADA = "Acción no contemplada";
@@ -167,16 +168,14 @@ public class ControladorPlazasOfertadas extends HttpServlet {
 	private void seleccionarPlazaOfertada(VistaPlazasOfertadas bean, UVDatos datos, HttpServletRequest request, HttpServletResponse response, String nombreAccion)
 			throws SQLException, UVException, IOException {
 		bean.setVista(JSP_PLAZA);
+		PlazaOfertada plaza = new PlazaOfertada(Formateador.leeParametroInteger(BolsaEmpleoUtils.getParamRequestOrSession(request, PARAM_PLAZA_OFERTADA)));
+		OfertaCandidato oferta = ModeloOfertaCandidato.obtenerInstancia().getOfertaByPlazaCandidato(plaza, bean.getUsuarioLogeado());
 		
-		ModeloPlazaOfertada modelo = ModeloPlazaOfertada.obtenerInstancia();
-		PlazaOfertada plaza = modelo.getPlazaOfertadaById(Formateador.leeParametroInteger(BolsaEmpleoUtils.getParamRequestOrSession(
-				request, PARAM_PLAZA_OFERTADA)));
-		
-		if (!modelo.checkPlazaOfertadaCandidato(plaza, bean.getUsuarioLogeado())) {
+		if (!ModeloPlazaOfertada.obtenerInstancia().checkPlazaOfertadaCandidato(oferta.getPlaza(), bean.getUsuarioLogeado())) {
 			BolsaEmpleoUtils.redirectToError(bean, datos, request, response, MENSAJE_ERROR_SIN_PERMISO);
 		}
 		
-		bean.setPlazaOfertada(plaza);
+		bean.setOfertaCandidato(oferta);
 		
 		switch (nombreAccion) {
 			case ACCION_ACEPTAR_PLAZA:
@@ -212,7 +211,7 @@ public class ControladorPlazasOfertadas extends HttpServlet {
 	private void redireccionConPlazaOfertadaSeleccionada(VistaPlazasOfertadas bean, UVDatos datos, HttpServletRequest request, HttpServletResponse response, 
 			String accion) throws IOException {
 		Map<String, String> params = new HashMap<>();
-		params.put(PARAM_PLAZA_OFERTADA, bean.getPlazaOfertada().getCodNum().toString());
+		params.put(PARAM_PLAZA_OFERTADA, bean.getOfertaCandidato().getPlaza().getCodNum().toString());
 		params.put(PARAM_ACCION, accion);
 		BolsaEmpleoUtils.redirectWithParams(datos, request, response, params);
 	}
@@ -225,7 +224,7 @@ public class ControladorPlazasOfertadas extends HttpServlet {
 		
 		try (PrintWriter writer = response.getWriter()) {
 			try {
-				BolsaEmpleoDataTable<PlazaOfertada> dataTable = ModeloPlazaOfertada.obtenerInstancia().listadoPlazasOfertadasCandidato(
+				BolsaEmpleoDataTable<OfertaCandidato> dataTable = ModeloOfertaCandidato.obtenerInstancia().listadoPlazasOfertadasCandidato(
 						request.getParameterMap(), bean.getUsuarioLogeado());
 				bean.setDatatablePlazasOfertadas(dataTable);
 				writer.write(dataTable.toJson());

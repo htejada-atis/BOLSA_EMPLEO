@@ -41,6 +41,20 @@ public class OfertaCandidato implements Serializable {
 		this.preferencia = ppreferencia;
 	}
 	
+	/** Constructor con parametros.
+	 * @param pplaza .
+	 * @param pcandidato .
+	 * @param presultado .
+	 * @param ppreferencia .
+	 */
+	public OfertaCandidato(PlazaOfertada pplaza, UsuarioBolsaEmpleo pcandidato, boolean presultado, Integer ppreferencia) {
+		super();
+		this.plaza = pplaza;
+		this.candidato = pcandidato;
+		this.resultado = presultado;
+		this.preferencia = ppreferencia;
+	}
+	
 	/** Constructor copia.
 	 * @param copia Dedicacion a copiar
 	 */

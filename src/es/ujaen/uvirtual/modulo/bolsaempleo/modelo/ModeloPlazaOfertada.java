@@ -325,55 +325,6 @@ public class ModeloPlazaOfertada {
 		return dataTable;
 	}
 	
-	/**
-	 * Lista de plazas ofertadas de un candidato .
-	 * @param params .
-	 * @param usuario .
-	 * @return datatable de plazas ofertadas .
-	 * @throws SQLException .
-	 * @throws UVException .
-	 */
-	public BolsaEmpleoDataTable<PlazaOfertada> listadoPlazasOfertadasCandidato(Map<String, String[]> params, UsuarioBolsaEmpleo usuario) throws SQLException, UVException {
-		List<PlazaOfertada> rows = new ArrayList<>();
-		BolsaEmpleoDataTable<PlazaOfertada> dataTable = new BolsaEmpleoDataTable<>(params);
-		
-		String consulta = "SELECT bepplo.* FROM TBEP_PLAZAS_OFERTADAS bepplo"
-				+ " INNER JOIN TBEP_BOLSAS bepbol ON bepbol.BEPARE_CODNUM = bepplo.BEPARE_CODNUM"
-				+ " INNER JOIN TBEP_SOLICITUD_BOLSAS bepsob ON bepsob.BEPBOL_CODNUM = bepbol.CODNUM AND bepsob.FECHABAREMACION IS NOT NULL"
-				+ " INNER JOIN TBEP_SOLICITUDES bepsol ON bepsob.BEPSOL_CODNUM = bepsol.CODNUM"
-				+ " WHERE   bepsol.BEPUSU_CODNUM = ? "
-				+ "     AND bepplo.ESTADO = '" + PLAZA_ESTADO_ABIERTA + "'";
-		
-		dataTable.setColumn(ORDER_COLUMN_INDEX_AREA, "bepare.DES_AREA_CONOCIMIENTO");
-		dataTable.setColumn(ORDER_COLUMN_INDEX_ESTADO, ESTADO);
-		dataTable.setColumn(ORDER_COLUMN_INDEX_FECHA_CREACION, FECHA_CREACION);
-		dataTable.setColumn(ORDER_COLUMN_INDEX_FECHA_ABIERTA, FECHA_ABIERTA);
-		dataTable.setColumn(ORDER_COLUMN_INDEX_FECHA_FIN_OFERTA, FECHA_FIN_OFERTA);
-		dataTable.setColumn(ORDER_COLUMN_INDEX_FECHA_CERRADA, FECHA_CERRADA);
-		dataTable.setQuery(consulta);
-		
-		try (Connection conexion = ConexionUvirtual.obtenerInstancia();
-				PreparedStatement stmtCount = conexion.prepareStatement(dataTable.getQueryCount());
-				PreparedStatement stmt = conexion.prepareStatement(dataTable.getQuery())) {
-			int paramIndex = 1;
-			stmt.setInt(paramIndex, usuario.getCodNum());
-			stmtCount.setInt(paramIndex++, usuario.getCodNum());
-			
-			dataTable.setFiltersParams(stmt, stmtCount, paramIndex);
-			
-			try (ResultSet rs = stmt.executeQuery()) {
-				while (rs.next()) {
-					rows.add(createPlazaOfertadaFromResultSet(rs, false));
-				}
-			}
-			
-			dataTable.setRecordsTotalFromQuery(stmtCount);
-			dataTable.setData(rows);
-		}
-		
-		return dataTable;
-	}
-	
 	public PlazaOfertada createPlazaOfertadaFromResultSet(ResultSet rs, Boolean withFiles) throws SQLException, UVException {
 		PlazaOfertada plaza = new PlazaOfertada();
 		

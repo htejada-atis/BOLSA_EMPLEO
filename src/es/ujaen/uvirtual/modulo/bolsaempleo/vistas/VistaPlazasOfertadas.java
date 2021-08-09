@@ -1,11 +1,8 @@
 package es.ujaen.uvirtual.modulo.bolsaempleo.vistas;
 
 import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.List;
 import es.ujaen.uvirtual.beans.vistas.Vista;
-import es.ujaen.uvirtual.modulo.bolsaempleo.beans.Area;
-import es.ujaen.uvirtual.modulo.bolsaempleo.beans.Dedicacion;
+import es.ujaen.uvirtual.modulo.bolsaempleo.beans.OfertaCandidato;
 import es.ujaen.uvirtual.modulo.bolsaempleo.beans.PlazaOfertada;
 import es.ujaen.uvirtual.modulo.bolsaempleo.beans.UsuarioBolsaEmpleo;
 import es.ujaen.uvirtual.modulo.bolsaempleo.utilidades.BolsaEmpleoDataTable;
@@ -18,8 +15,8 @@ import es.ujaen.uvirtual.modulo.bolsaempleo.utilidades.BolsaEmpleoDataTable;
 public class VistaPlazasOfertadas extends Vista implements Serializable {
 	
 	private static final long serialVersionUID = 1L;
-	private transient BolsaEmpleoDataTable<PlazaOfertada> datatablePlazasOfertadas;
-	private PlazaOfertada plazaOfertada;
+	private transient BolsaEmpleoDataTable<OfertaCandidato> datatablePlazasOfertadas;
+	private OfertaCandidato ofertaCandidato;
 	private String vista;
 	private UsuarioBolsaEmpleo usuarioLogeado;
 	
@@ -39,20 +36,20 @@ public class VistaPlazasOfertadas extends Vista implements Serializable {
 		this.usuarioLogeado = pusuario;
 	}
 	
-	public BolsaEmpleoDataTable<PlazaOfertada> getDatatablePlazasOfertadas() {
+	public BolsaEmpleoDataTable<OfertaCandidato> getDatatablePlazasOfertadas() {
 		return datatablePlazasOfertadas;
 	}
 	
-	public void setDatatablePlazasOfertadas(BolsaEmpleoDataTable<PlazaOfertada> datatablePlazasOfertadas) {
+	public void setDatatablePlazasOfertadas(BolsaEmpleoDataTable<OfertaCandidato> datatablePlazasOfertadas) {
 		this.datatablePlazasOfertadas = datatablePlazasOfertadas;
 	}
 	
-	public PlazaOfertada getPlazaOfertada() {
-		return plazaOfertada;
+	public OfertaCandidato getOfertaCandidato() {
+		return ofertaCandidato;
 	}
 	
-	public void setPlazaOfertada(PlazaOfertada plazaOfertada) {
-		this.plazaOfertada = plazaOfertada;
+	public void setOfertaCandidato(OfertaCandidato ofertaCandidato) {
+		this.ofertaCandidato = ofertaCandidato;
 	}
 	
 }
