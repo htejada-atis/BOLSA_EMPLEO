@@ -50,6 +50,16 @@ String fechaFinOferta = BolsaEmpleoUtils.getParamForm(request, ControladorContra
 				</select>
 			</div>
 			<div class="form-group">
+				<label for="plaza_centro_destino" class="bold-label">Centro destino:</label>
+				<select id="plaza_centro_destino" name="<%=ControladorContratacion.PARAM_CENTRO_DESTINO%>" style="width:100%;" required>
+				<%	for (Entry<String, String> cen: ModeloPlazaOfertada.CENTROS_DESTINO.entrySet()) { %>
+						<option value="<%= cen.getKey() %>" <%= centroDestino != null && centroDestino.equals(cen.getKey()) ? "selected" : ""%>><%= cen.getValue() %></option>
+				<%	} %>
+				</select>
+			</div>
+		</div>
+		<div class="form-group-container col2">
+			<div class="form-group">
 				<label for="plaza_dedicacion">Dedicación: </label>
 				<select id="plaza_dedicacion" name="<%=ControladorContratacion.PARAM_DEDICACION%>" style="width:100%;" <%= personal ? "" : "readonly disabled" %>>
 					<option value="">----------------</option>
@@ -66,17 +76,6 @@ String fechaFinOferta = BolsaEmpleoUtils.getParamForm(request, ControladorContra
 				<%	} %>
 				</select>
 			</div>
-			<div class="form-group">
-				<label for="plaza_centro_destino" class="bold-label">Centro destino:</label>
-				<select id="plaza_centro_destino" name="<%=ControladorContratacion.PARAM_CENTRO_DESTINO%>" style="width:100%;" required>
-				<%	for (Entry<String, String> cen: ModeloPlazaOfertada.CENTROS_DESTINO.entrySet()) { %>
-						<option value="<%= cen.getKey() %>" <%= centroDestino != null && centroDestino.equals(cen.getKey()) ? "selected" : ""%>><%= cen.getValue() %></option>
-				<%	} %>
-				</select>
-			</div>
-		</div>
-		<div class="form-group-container col2">
-		
 		</div>
 		<div class="form-group-container col1">
 			<div class="form-group">
@@ -84,7 +83,6 @@ String fechaFinOferta = BolsaEmpleoUtils.getParamForm(request, ControladorContra
 				<textarea class="form-input-custom" id="plaza_justificacion" name="<%=ControladorContratacion.PARAM_JUSTIFICACION %>" rows="3" cols="60" required><%=justificacion%></textarea>
 			</div>
 		</div>
-	
 		<div class="form-group-container col2">
 			<div class="form-group">
 				<label for="plaza_duracion_prevista">Duración prevista:</label>
@@ -184,7 +182,7 @@ $(document).ready(function() {
 <%	if (bean.getUsuarioLogeado().isServicioPersonal()) { %>
 		document.getElementById("plaza_descargar_nri").addEventListener("click", function() {
 			window.open("<%=ControladorDescargaFicheros.URL_DESCARGA_FICHEROS%>"
-					+ "<%="?a=" + (bean.getUsuarioLogeado().isDirectorDepartamento() ? ControladorDescargaFicheros.ACCION_DESCARGAR_NRI_DIRECTOR : ControladorDescargaFicheros.ACCION_DESCARGAR_HORARIO_PERSONAL) + "&" + ControladorDescargaFicheros.PARAM_PLAZA_OFERTADA + "=" + plaza.getCodNum()%>");
+					+ "<%="?a=" + ControladorDescargaFicheros.ACCION_DESCARGAR_HORARIO_PERSONAL + "&" + ControladorDescargaFicheros.PARAM_PLAZA_OFERTADA + "=" + plaza.getCodNum()%>");
 		});
 <%	} %>
 	

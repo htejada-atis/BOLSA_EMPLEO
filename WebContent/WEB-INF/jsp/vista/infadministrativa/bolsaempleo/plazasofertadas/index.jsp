@@ -45,7 +45,7 @@ $(document).ready(function() {
 		"action": "<%= ControladorPlazasOfertadas.ACCION_DATATABLE_PLAZAS_OFERTADAS %>",
 		"clickable": {'onClick': function(row) {
 			var params = {
-					'a': '<%= ControladorPlazasOfertadas.ACCION_DATATABLE_PLAZAS_OFERTADAS %>', 
+					'<%= ControladorPlazasOfertadas.PARAM_ACCION %>': '<%= ControladorPlazasOfertadas.ACCION_SELECCIONAR_PLAZA_OFERTADA %>', 
 					'<%= ControladorPlazasOfertadas.PARAM_PLAZA_OFERTADA %>': row.codNum};
 			Atis.sendForm("<%= request.getRequestURI() %>", params);
 		}},

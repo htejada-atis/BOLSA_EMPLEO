@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.sql.SQLException;
 import java.util.HashMap;
+import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.stream.IntStream;
@@ -15,6 +16,7 @@ import com.google.gson.Gson;
 import es.ujaen.uvirtual.beans.CodigoDescripcion;
 import es.ujaen.uvirtual.beans.UVDatos;
 import es.ujaen.uvirtual.modulo.bolsaempleo.beans.PlazaOfertada;
+import es.ujaen.uvirtual.modulo.bolsaempleo.modelo.ModeloOfertaCandidato;
 import es.ujaen.uvirtual.modulo.bolsaempleo.modelo.ModeloParametrosConfiguracion;
 import es.ujaen.uvirtual.modulo.bolsaempleo.modelo.ModeloPlazaOfertada;
 import es.ujaen.uvirtual.modulo.bolsaempleo.modelo.ModeloRol;
@@ -44,28 +46,32 @@ public class ControladorPlazasOfertadas extends HttpServlet {
 	private static final Logger LOGGER = Logger.getLogger(NOMBREDEESTACLASE);
 	
 	// acciones
+	public static final String ACCION_ACEPTAR_PLAZA = "aceptarplaza";
 	public static final String ACCION_DATATABLE_PLAZAS_OFERTADAS = "datatableplazasofertadas";
 	public static final String ACCION_INDEX = "index";
+	public static final String ACCION_RECHAZAR_PLAZA = "rechazarplaza";
 	public static final String ACCION_SELECCIONAR_PLAZA_OFERTADA = "seleccionarplazaofertada";
 	
 	// Parámetros
 	public static final String PARAM_ACCION = "a";
-	public static final String PARAM_PLAZA_OFERTADA = "plazaofertada";
+	public static final String PARAM_PLAZA_OFERTADA = "plazaOfertada";
 	
 	// mensajes
 	public static final String MENSAJE_ERROR_ACCION_NO_CONTEMPLADA = "Acción no contemplada";
 	public static final String MENSAJE_ERROR_SIN_PERMISO = "No tienes permiso";
+	public static final String MENSAJE_EXITO_ACEPTAR = "Plaza aceptada correctamente";
+	public static final String MENSAJE_EXITO_RECHAZAR = "Plaza rechazada correctamente";
 	
 	// ruta vistas
 	public static final String RUTA_BEP_PLO = "/WEB-INF/jsp/vista/infadministrativa/bolsaempleo/plazasofertadas/";
 	public static final String JSP_INDEX = RUTA_BEP_PLO + "index.jsp";
-	public static final String JSP_PLAZA = RUTA_BEP_PLO + "plaza.jsp";
+	public static final String JSP_PLAZA = RUTA_BEP_PLO + "plazaOfertada.jsp";
 	
 	// errors
 	public static final Integer RESPONSE_HTTP_CODE_ERROR_400 = 400;
 	
 	// urls
-	public static final String URL_PATTERN_AJAX = "/srv/es/ajax/informacionadministrativa/bolsaempleo/contratacion";
+	public static final String URL_PATTERN_AJAX = "/srv/es/ajax/informacionadministrativa/bolsaempleo/plazasofertadas";
 	public static final String RESPONSE_AJAX_CONTENTTYPE = "application/json";
 	public static final String RESPONSE_AJAX_ENCODING = "UTF-8";
 	public static final String RESPONSE_AJAX_ERROR = "error";
@@ -96,6 +102,8 @@ public class ControladorPlazasOfertadas extends HttpServlet {
 					break;
 				case ACCION_INDEX:
 					break;
+				case ACCION_ACEPTAR_PLAZA:
+				case ACCION_RECHAZAR_PLAZA:
 				case ACCION_SELECCIONAR_PLAZA_OFERTADA:
 					seleccionarPlazaOfertada(bean, datos, request, response, nombreAccion);
 					break;
@@ -158,8 +166,55 @@ public class ControladorPlazasOfertadas extends HttpServlet {
 	
 	private void seleccionarPlazaOfertada(VistaPlazasOfertadas bean, UVDatos datos, HttpServletRequest request, HttpServletResponse response, String nombreAccion)
 			throws SQLException, UVException, IOException {
-		bean.setVista(JSP_INDEX);
+		bean.setVista(JSP_PLAZA);
 		
+		ModeloPlazaOfertada modelo = ModeloPlazaOfertada.obtenerInstancia();
+		PlazaOfertada plaza = modelo.getPlazaOfertadaById(Formateador.leeParametroInteger(BolsaEmpleoUtils.getParamRequestOrSession(
+				request, PARAM_PLAZA_OFERTADA)));
+		
+		if (!modelo.checkPlazaOfertadaCandidato(plaza, bean.getUsuarioLogeado())) {
+			BolsaEmpleoUtils.redirectToError(bean, datos, request, response, MENSAJE_ERROR_SIN_PERMISO);
+		}
+		
+		bean.setPlazaOfertada(plaza);
+		
+		switch (nombreAccion) {
+			case ACCION_ACEPTAR_PLAZA:
+				aceptarPlazaOfertada(bean, datos, request, response);
+				break;
+			case ACCION_RECHAZAR_PLAZA:
+				rechazarPlazaOfertada(bean, datos, request, response);
+				break;
+			case ACCION_SELECCIONAR_PLAZA_OFERTADA:
+				break;
+			default:
+				errorFatal(bean, MENSAJE_ERROR_ACCION_NO_CONTEMPLADA);
+		}
+	}
+	
+	private void aceptarPlazaOfertada(VistaPlazasOfertadas bean, UVDatos datos, HttpServletRequest request, HttpServletResponse response) 
+			throws IOException, UVException {
+		ModeloOfertaCandidato modelo = ModeloOfertaCandidato.obtenerInstancia();
+		
+		
+		BolsaEmpleoUtils.addMensajeDeExito(MENSAJE_EXITO_ACEPTAR, bean, request);
+		redireccionConPlazaOfertadaSeleccionada(bean, datos, request, response, ACCION_SELECCIONAR_PLAZA_OFERTADA);
+	}
+	
+	private void rechazarPlazaOfertada(VistaPlazasOfertadas bean, UVDatos datos, HttpServletRequest request, HttpServletResponse response) 
+			throws IOException, UVException {
+		ModeloPlazaOfertada modelo = ModeloPlazaOfertada.obtenerInstancia();
+		
+		BolsaEmpleoUtils.addMensajeDeExito(MENSAJE_EXITO_RECHAZAR, bean, request);
+		redireccionConPlazaOfertadaSeleccionada(bean, datos, request, response, ACCION_SELECCIONAR_PLAZA_OFERTADA);
+	}
+	
+	private void redireccionConPlazaOfertadaSeleccionada(VistaPlazasOfertadas bean, UVDatos datos, HttpServletRequest request, HttpServletResponse response, 
+			String accion) throws IOException {
+		Map<String, String> params = new HashMap<>();
+		params.put(PARAM_PLAZA_OFERTADA, bean.getPlazaOfertada().getCodNum().toString());
+		params.put(PARAM_ACCION, accion);
+		BolsaEmpleoUtils.redirectWithParams(datos, request, response, params);
 	}
 	
 	private void listaPlazasOfertadas(VistaPlazasOfertadas bean, UVDatos datos, HttpServletRequest request, HttpServletResponse response) throws IOException {
@@ -170,7 +225,7 @@ public class ControladorPlazasOfertadas extends HttpServlet {
 		
 		try (PrintWriter writer = response.getWriter()) {
 			try {
-				BolsaEmpleoDataTable<PlazaOfertada> dataTable = ModeloPlazaOfertada.obtenerInstancia().listadoPlazasOfertadas(
+				BolsaEmpleoDataTable<PlazaOfertada> dataTable = ModeloPlazaOfertada.obtenerInstancia().listadoPlazasOfertadasCandidato(
 						request.getParameterMap(), bean.getUsuarioLogeado());
 				bean.setDatatablePlazasOfertadas(dataTable);
 				writer.write(dataTable.toJson());

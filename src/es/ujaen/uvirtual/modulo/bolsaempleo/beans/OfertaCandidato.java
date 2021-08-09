@@ -12,8 +12,9 @@ public class OfertaCandidato implements Serializable {
 	private Integer codNum;
 	private PlazaOfertada plaza;
 	private UsuarioBolsaEmpleo candidato;
-	private String resultado;
+	private Boolean resultado;
 	private Date fechaResultado;
+	private Integer preferencia;
 	
 
 	/** Constructor por defecto.
@@ -28,14 +29,16 @@ public class OfertaCandidato implements Serializable {
 	 * @param pcandidato .
 	 * @param presultado .
 	 * @param pfechaResultado .
+	 * @param ppreferencia .
 	 */
-	public OfertaCandidato(Integer pcodNum, PlazaOfertada pplaza, UsuarioBolsaEmpleo pcandidato, String presultado, Date pfechaResultado) {
+	public OfertaCandidato(Integer pcodNum, PlazaOfertada pplaza, UsuarioBolsaEmpleo pcandidato, boolean presultado, Date pfechaResultado, Integer ppreferencia) {
 		super();
 		this.codNum = pcodNum;
 		this.plaza = pplaza;
 		this.candidato = pcandidato;
 		this.resultado = presultado;
 		this.fechaResultado = pfechaResultado;
+		this.preferencia = ppreferencia;
 	}
 	
 	/** Constructor copia.
@@ -43,21 +46,65 @@ public class OfertaCandidato implements Serializable {
 	 */
 	public OfertaCandidato(OfertaCandidato copia) {
 		this.codNum = copia.codNum;
+		this.plaza = copia.plaza;
+		this.candidato = copia.candidato;
+		this.resultado = copia.resultado;
+		this.fechaResultado = copia.fechaResultado;
+		this.preferencia = copia.preferencia;
 	}
 	
 	public Integer getCodNum() {
 		return codNum;
 	}
 	
-	public void setCodNum(Integer idBolsa) {
-		this.codNum = idBolsa;
+	public void setCodNum(Integer idOferta) {
+		this.codNum = idOferta;
 	}
 	
+	public PlazaOfertada getPlaza() {
+		return plaza;
+	}
+	
+	public void setPlaza(PlazaOfertada plaza) {
+		this.plaza = plaza;
+	}
+	
+	public UsuarioBolsaEmpleo getCandidato() {
+		return candidato;
+	}
+	
+	public void setCandidato(UsuarioBolsaEmpleo candidato) {
+		this.candidato = candidato;
+	}
+	
+	public Boolean isResultado() {
+		return resultado;
+	}
+	
+	public void setResultado(boolean resultado) {
+		this.resultado = resultado;
+	}
+	
+	public Date getFechaResultado() {
+		return fechaResultado;
+	}
+	
+	public void setFechaResultado(Date fechaResultado) {
+		this.fechaResultado = fechaResultado;
+	}
+	
+	public Integer getPreferencia() {
+		return preferencia;
+	}
+
+	public void setPreferencia(Integer preferencia) {
+		this.preferencia = preferencia;
+	}
 	
 	@Override
 	public String toString() {
 		return "Contratacion [codNum=" + codNum + ", plaza=" + plaza + ", candidato=" + candidato 
-				+ ", resultado=" + resultado + ", fechaResultado=" + fechaResultado + "]";
+				+ ", resultado=" + resultado + ", fechaResultado=" + fechaResultado + ", preferencia=" + preferencia + "]";
 	}
 	
 	@Override
@@ -69,6 +116,7 @@ public class OfertaCandidato implements Serializable {
 		result = prime * result + ((candidato == null) ? 0 : candidato.hashCode());
 		result = prime * result + ((resultado == null) ? 0 : resultado.hashCode());
 		result = prime * result + ((fechaResultado == null) ? 0 : fechaResultado.hashCode());
+		result = prime * result + ((preferencia == null) ? 0 : preferencia.hashCode());
 		return result;
 	}
 	
@@ -121,7 +169,15 @@ public class OfertaCandidato implements Serializable {
 		} else if (!fechaResultado.equals(other.fechaResultado)) {
 			return false;
 		}
+		if (preferencia == null) {
+			if (other.preferencia != null) {
+				return false;
+			}
+		} else if (!preferencia.equals(other.preferencia)) {
+			return false;
+		}
 		
 		return true;
 	}
+	
 }

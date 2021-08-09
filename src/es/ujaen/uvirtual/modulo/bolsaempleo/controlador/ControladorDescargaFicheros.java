@@ -63,6 +63,7 @@ public class ControladorDescargaFicheros extends HttpServlet {
 	public static final String ACCION_DESCARGAR_ACREDITACION_CANDIDATO = "descargaracreditacioncandidato";
 	public static final String ACCION_DESCARGAR_ACREDITACION_PERSONAL = "descargaracreditacionpersonal";
 	public static final String ACCION_DESCARGAR_DOCUMENTO = "descargardocumento";
+	public static final String ACCION_DESCARGAR_HORARIO_CANDIDATO = "descargarhorariocandidato";
 	public static final String ACCION_DESCARGAR_HORARIO_DIRECTOR = "descargarhorariodirector";
 	public static final String ACCION_DESCARGAR_HORARIO_PERSONAL = "descargarhorariopersonal";
 	public static final String ACCION_DESCARGAR_MERITO_CANDIDATO = "descargarmeritocandidato";

@@ -261,13 +261,15 @@ public class ControladorContratacion extends HttpServlet {
 		bean.setVista(JSP_CREATE);
 		cargarListasFormulario(bean);
 		
-		PlazaOfertada plaza = validarPlazaOfertada(bean, request, new PlazaOfertada(), parametros);
-		
-		ModeloPlazaOfertada.obtenerInstancia().insertaPlazaOfertada(plaza, bean.getUsuarioLogeado());
-		
-		BolsaEmpleoUtils.addMensajeDeExito(MENSAJE_EXITO_AGREGAR, bean, request);
-		datos.setRespuestaEnviada(true);
-		response.sendRedirect(request.getServletPath());
+		if (BolsaEmpleoUtils.getParamRequestOrMultipart(request, parametros, PARAM_AREA) != null) {
+			PlazaOfertada plaza = validarPlazaOfertada(bean, request, new PlazaOfertada(), parametros);
+			
+			ModeloPlazaOfertada.obtenerInstancia().insertaPlazaOfertada(plaza, bean.getUsuarioLogeado());
+			
+			BolsaEmpleoUtils.addMensajeDeExito(MENSAJE_EXITO_AGREGAR, bean, request);
+			datos.setRespuestaEnviada(true);
+			response.sendRedirect(request.getServletPath());
+		}
 	}
 	
 	private void cargarListasFormulario(VistaContratacion bean) throws SQLException {

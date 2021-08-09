@@ -45,7 +45,17 @@ String fechaFinOferta = BolsaEmpleoUtils.getParamForm(request, ControladorContra
 				<% } %>
 				</select>
 			</div>
-		<%	if (bean.getUsuarioLogeado().isServicioPersonal()) { %>
+			<div class="form-group">
+				<label for="plaza_centro_destino" class="bold-label">Centro destino:</label>
+				<select id="plaza_centro_destino" name="<%=ControladorContratacion.PARAM_CENTRO_DESTINO%>" style="width:100%;" required>
+				<%	for (Entry<String, String> cen: ModeloPlazaOfertada.CENTROS_DESTINO.entrySet()) { %>
+						<option value="<%= cen.getKey() %>" <%= centroDestino != null && centroDestino.equals(cen.getKey()) ? "selected" : ""%>><%= cen.getValue() %></option>
+				<%	} %>
+				</select>
+			</div>
+		</div>
+	<%	if (bean.getUsuarioLogeado().isServicioPersonal()) { %>
+			<div class="form-group-container col2">
 				<div class="form-group">
 					<label for="plaza_dedicacion">Dedicación: </label>
 					<select id="plaza_dedicacion" name="<%=ControladorContratacion.PARAM_DEDICACION%>" style="width:100%;">
@@ -63,19 +73,8 @@ String fechaFinOferta = BolsaEmpleoUtils.getParamForm(request, ControladorContra
 					<%	} %>
 					</select>
 				</div>
-		<%	} %>
-			<div class="form-group">
-				<label for="plaza_centro_destino" class="bold-label">Centro destino:</label>
-				<select id="plaza_centro_destino" name="<%=ControladorContratacion.PARAM_CENTRO_DESTINO%>" style="width:100%;" required>
-				<%	for (Entry<String, String> cen: ModeloPlazaOfertada.CENTROS_DESTINO.entrySet()) { %>
-						<option value="<%= cen.getKey() %>" <%= centroDestino != null && centroDestino.equals(cen.getKey()) ? "selected" : ""%>><%= cen.getValue() %></option>
-				<%	} %>
-				</select>
 			</div>
-		</div>
-		<div class="form-group-container col2">
-		
-		</div>
+	<%	} %>
 		<div class="form-group-container col1">
 			<div class="form-group">
 				<label for="plaza_justificacion" class="bold-label">Justificación:</label>
