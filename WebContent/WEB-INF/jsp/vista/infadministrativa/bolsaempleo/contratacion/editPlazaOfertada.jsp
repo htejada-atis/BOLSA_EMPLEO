@@ -123,7 +123,7 @@ String fechaFinOferta = BolsaEmpleoUtils.getParamForm(request, ControladorContra
 		</div>
 	</form>
 	
-	<table class="bluetable bolsaempleo" id="tableCandidatos">
+	<table class="bluetable bolsaempleo" id="tableOfertasCandidatos">
 		<tr>
 			<th scope="col" style="width:76px">D.N.I</th>
 			<th scope="col" style="width:100%" class="nombre">Nombre</th>
@@ -150,7 +150,7 @@ $(document).ready(function() {
 		}
 	});
 	
-	var tableCandidatos = new Atis.DataTable('#tableCandidatos', {
+	var tableOfertasCandidatos = new Atis.DataTable('#tableOfertasCandidatos', {
 		"ajax": { url: "<%= ControladorContratacion.URL_PATTERN_AJAX %>" },
 		"pageSize": 100,
 		"filterable": true,

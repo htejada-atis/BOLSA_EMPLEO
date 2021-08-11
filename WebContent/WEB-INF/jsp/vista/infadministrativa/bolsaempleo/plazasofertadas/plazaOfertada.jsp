@@ -20,7 +20,7 @@ OfertaCandidato oferta = bean.getOfertaCandidato();
 <div class='bolsa-empleo'>
 	<jsp:include page="/WEB-INF/jsp/vista/infadministrativa/bolsaempleo/mensajes.jsp" />
 	
-	<h2>Plaza ofertada</h2>
+	<h2>Plaza ofertada<%= oferta.isResultado() == null ? "" : oferta.isResultado() ? " - Aceptada" : " - Rechazada" %></h2>
 	
 	<form id="plaza_ofertada" class="be-form" method="post" action="<%=request.getRequestURI()%>">
 		<div class="form-group-container col2">
@@ -86,8 +86,10 @@ OfertaCandidato oferta = bean.getOfertaCandidato();
 		<div class="form-group-container col2">
 			<div class="form-group"></div>
 			<div class="form-group">
-				<button id="plaza_rechazar" style="float:right; margin-left: 12px;">Rechazar oferta</button>
-				<button id="plaza_aceptar" style="float:right; margin-left: 12px;">Aceptar oferta</button>
+			<%	if (oferta.isResultado() == null) { %>
+					<button id="plaza_rechazar" style="float:right; margin-left: 12px;">Rechazar oferta</button>
+					<button id="plaza_aceptar" style="float:right; margin-left: 12px;">Aceptar oferta</button>
+			<%	} %>
 			</div>
 		</div>
 	</form>
@@ -104,7 +106,8 @@ $(document).ready(function() {
 					+ "<%="?a=" + ControladorDescargaFicheros.ACCION_DESCARGAR_HORARIO_CANDIDATO + "&" + ControladorDescargaFicheros.PARAM_PLAZA_OFERTADA + "=" + oferta.getPlaza().getCodNum()%>");
 		});
 <%	} %>
-	
+
+<%	if (oferta.isResultado() == null) { %>
 	document.getElementById("plaza_aceptar").addEventListener("click", function(event) {
 		event.preventDefault();
 		Atis.confirmDialog("Aceptar plaza", "Al aceptar confirma que está interesado y entrará en el proceso de selección para la plaza.", {
@@ -137,7 +140,9 @@ $(document).ready(function() {
 					$(this).dialog("close");
 				}
 		});
-	});
+	});	
+<%	} %>
+	
 });
 
 </script>

@@ -90,8 +90,7 @@ Boolean onlyRead = bean.getUsuarioLogeado().getRol().getCodNum().equals(ModeloRo
 		
 	<%	if (merito != null) {
 			item = merito.getItem() != null ? merito.getItem() : merito.getMerito().getItemBaremacion();
-			valor = merito.getValor() != null && merito.getValor() != 0 ? merito.getValor() : merito.getMerito().getValor();	
-		
+			valor = merito.getValor() != null && merito.getValor() != 0 ? merito.getValor() : merito.getMerito().getValor();
 		%>
 			<div id="anchor_modificar_merito" style="margin-bottom: 24px;"></div>
 			

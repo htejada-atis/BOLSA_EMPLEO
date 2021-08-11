@@ -101,7 +101,7 @@ public class TestBEPControladorPlazasOfertadas {
 	public void testA03ObtenerPlazasOfertadas() throws IOException {
 		VistaPlazasOfertadas bean = obtenerBolsas();
 		
-		assertNotEquals(MENSAJE_PLAZAS_OFERTADAS_DEVUELTAS, 0, bean.getDatatablePlazasOfertadas().getData().size());
+		assertNotEquals(MENSAJE_PLAZAS_OFERTADAS_DEVUELTAS, 0, bean.getDatatableOfertasCandidatos().getData().size());
 		assertEquals(MENSAJE_SIN_ERROR, 0, bean.getMensajesDeError().size());
 		assertEquals(MENSAJE_SIN_ADVERTENCIAS, 0, bean.getMensajesDeAdvertencia().size());
 	}
