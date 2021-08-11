@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import java.util.List;
 import es.ujaen.uvirtual.beans.vistas.Vista;
 import es.ujaen.uvirtual.modulo.bolsaempleo.beans.Area;
+import es.ujaen.uvirtual.modulo.bolsaempleo.beans.CandidatoResultadoTable;
 import es.ujaen.uvirtual.modulo.bolsaempleo.beans.Dedicacion;
 import es.ujaen.uvirtual.modulo.bolsaempleo.beans.PlazaOfertada;
 import es.ujaen.uvirtual.modulo.bolsaempleo.beans.UsuarioBolsaEmpleo;
@@ -21,6 +22,7 @@ public class VistaContratacion extends Vista implements Serializable {
 	private List<Area> listaAreas = new ArrayList<>();
 	private List<Dedicacion> listaDedicaciones = new ArrayList<>();
 	private transient BolsaEmpleoDataTable<PlazaOfertada> datatablePlazasOfertadas;
+	private transient BolsaEmpleoDataTable<CandidatoResultadoTable> datatableCandidatos;
 	private PlazaOfertada plazaOfertada;
 	private String vista;
 	private UsuarioBolsaEmpleo usuarioLogeado;
@@ -64,13 +66,21 @@ public class VistaContratacion extends Vista implements Serializable {
 	public void setListaAreas(List<Area> listaAreas) {
 		this.listaAreas = listaAreas;
 	}
-
+	
 	public List<Dedicacion> getListaDedicaciones() {
 		return listaDedicaciones;
 	}
-
+	
 	public void setListaDedicaciones(List<Dedicacion> listaDedicaciones) {
 		this.listaDedicaciones = listaDedicaciones;
+	}
+	
+	public BolsaEmpleoDataTable<CandidatoResultadoTable> getDatatableCandidatos() {
+		return datatableCandidatos;
+	}
+	
+	public void setDatatableCandidatos(BolsaEmpleoDataTable<CandidatoResultadoTable> datatableCandidatos) {
+		this.datatableCandidatos = datatableCandidatos;
 	}
 	
 }

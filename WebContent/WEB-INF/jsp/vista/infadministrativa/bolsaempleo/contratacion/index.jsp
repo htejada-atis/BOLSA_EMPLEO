@@ -1,9 +1,11 @@
 <%@ page trimDirectiveWhitespaces="true" %>
 <%@ page import="es.ujaen.uvirtual.beans.UVDatos" %>
 <%@	page import="es.ujaen.uvirtual.modulo.bolsaempleo.controlador.ControladorContratacion" %>
+<%@	page import="es.ujaen.uvirtual.modulo.bolsaempleo.modelo.ModeloPlazaOfertada" %>
 <%@ page import="es.ujaen.uvirtual.modulo.bolsaempleo.vistas.VistaContratacion" %>
 <%@ page import="es.ujaen.uvirtual.utilidades.EscapaHTML" %>
 <%@ page import="es.ujaen.uvirtual.utilidades.Formateador" %>
+<%@ page import="java.util.Map.Entry" %>
 
 <% 
 UVDatos uvdatos = (UVDatos) request.getAttribute(UVDatos.NOMBRE_ATRIBUTO);
@@ -43,6 +45,10 @@ VistaContratacion bean = (VistaContratacion) uvdatos.getVistas().get(VistaContra
 	
 <script>
 $(document).ready(function() {
+	var estadosPlaza = {};
+<%	for (Entry<String, String> est: ModeloPlazaOfertada.ESTADOS.entrySet()) { %>
+		estadosPlaza["<%= est.getKey() %>"] = "<%= est.getValue() %>";
+<%	} %>
 	
 	var table = new Atis.DataTable('#tablePlazasOfertadas', {
 		"ajax": { url: "<%= ControladorContratacion.URL_PATTERN_AJAX %>" },
@@ -60,7 +66,7 @@ $(document).ready(function() {
 			{'data': 'area.idAreaExterno', 'filter': true, 'render': function(row) {
 				return row.area.idAreaExterno + ' ' + row.area.descripcion;
 			}},
-			{'data': 'estado', 'filter': true},
+			{'data': 'estado', 'filter': {'type': 'select', 'options': estadosPlaza}},
 			{'data': 'fechaCreacion', 'filter': {'type': 'date'}},
 			{'data': 'fechaAbierta', 'filter': {'type': 'date'}},
 			{'data': 'fechaFinOferta', 'filter': {'type': 'date'}},

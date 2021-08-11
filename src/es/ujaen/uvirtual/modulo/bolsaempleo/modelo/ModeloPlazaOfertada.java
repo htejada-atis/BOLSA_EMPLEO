@@ -10,10 +10,12 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import es.ujaen.uvirtual.modelo.conexion.ConexionUvirtual;
+import es.ujaen.uvirtual.modulo.bolsaempleo.beans.CandidatoResultadoTable;
 import es.ujaen.uvirtual.modulo.bolsaempleo.beans.PlazaOfertada;
 import es.ujaen.uvirtual.modulo.bolsaempleo.beans.UsuarioBolsaEmpleo;
 import es.ujaen.uvirtual.modulo.bolsaempleo.utilidades.BolsaEmpleoDataTable;
 import es.ujaen.uvirtual.modulo.bolsaempleo.utilidades.BolsaEmpleoUtils;
+import es.ujaen.uvirtual.modulo.bolsaempleo.utilidades.BolsaEmpleoDataTable.DataTableColumn;
 import es.ujaen.uvirtual.utilidades.UVException;
 
 /**
@@ -29,6 +31,10 @@ public class ModeloPlazaOfertada {
 	public static final int ORDER_COLUMN_INDEX_FECHA_ABIERTA = 3;
 	public static final int ORDER_COLUMN_INDEX_FECHA_FIN_OFERTA = 4;
 	public static final int ORDER_COLUMN_INDEX_FECHA_CERRADA = 5;
+	
+	public static final int ORDER_COLUMN_INDEX_NIF_CANDIDATOS = 0;
+	public static final int ORDER_COLUMN_INDEX_NOMBRE_CANDIDATOS = 1;
+	public static final int ORDER_COLUMN_INDEX_PUNTUACION_CANDIDATOS = 2;
 	
 	public static final String PLAZA_ESTADO_ABIERTA = "ABIERTA";
 	public static final String PLAZA_ESTADO_CERRADA = "CERRADA";
@@ -66,6 +72,7 @@ public class ModeloPlazaOfertada {
 	
 	public static final Map<String, String> CENTROS_DESTINO = new HashMap<>();
 	public static final Map<String, String> CUATRIMESTRES = new HashMap<>();
+	public static final Map<String, String> ESTADOS = new HashMap<>();
 	
 	static {
 		CENTROS_DESTINO.put(CENTRO_DESTINO_JAEN, "Jaén");
@@ -73,6 +80,11 @@ public class ModeloPlazaOfertada {
 		CUATRIMESTRES.put(CUATRIMESTRE_PRIMERO, "1º Cuatrimestre");
 		CUATRIMESTRES.put(CUATRIMESTRE_SEGUNDO, "2º Cuatrimestre");
 		CUATRIMESTRES.put(CUATRIMESTRE_TODO_EL_CURSO, "Todo el curso");
+		ESTADOS.put(PLAZA_ESTADO_ABIERTA, "Abierta");
+		ESTADOS.put(PLAZA_ESTADO_CERRADA, "Cerrada");
+		ESTADOS.put(PLAZA_ESTADO_CONTRATACION, "Contratación");
+		ESTADOS.put(PLAZA_ESTADO_CREACION, "Creación");
+		ESTADOS.put(PLAZA_ESTADO_TRAMITACION, "Tramitación");
 	}
 	
 	public static final int COLUMN_DURACION_PREVISTA_MAXLENGTH = 100;
@@ -274,6 +286,59 @@ public class ModeloPlazaOfertada {
 		return false;
 	}
 	
+	/** Lista de candidatos que han aceptado una plaza .
+	 * @param params .
+	 * @param plaza .
+	 * @param usuario .
+	 * @return datatable de candidatos .
+	 * @throws SQLException .
+	 * @throws UVException .
+	 */
+	public BolsaEmpleoDataTable<CandidatoResultadoTable> listadoCandidatosConfirmados(Map<String, String[]> params, PlazaOfertada plaza, UsuarioBolsaEmpleo usuario)
+			throws SQLException, UVException {
+		List<CandidatoResultadoTable> rows = new ArrayList<>();
+		BolsaEmpleoDataTable<CandidatoResultadoTable> dataTable = new BolsaEmpleoDataTable<>(params);
+		
+		String consulta = "SELECT bepusu.CODNUM, bepsob.TOTAL FROM TBEP_USUARIOS bepusu"
+				+ " INNER JOIN TBEP_SOLICITUDES bepsol ON bepsol.BEPUSU_CODNUM = bepusu.CODNUM"
+				+ " INNER JOIN TBEP_SOLICITUD_BOLSAS bepsob ON bepsob.BEPSOL_CODNUM = bepsol.CODNUM AND bepsob.BEPBOL_CODNUM = ?"
+				+ " INNER JOIN TBEP_OFERTAS_CANDIDATOS bepofc ON bepofc.BEPUSU_CODNUM = bepusu.CODNUM"
+				+ " WHERE bepofc.BEPPLO_CODNUM = ?";
+		
+		String whereNombre = String.format("(%s || ' ' || %s || ' ' || %s)", "bepusu.VUAJA_STRNOMBRE", "bepusu.VUAJA_STRAPELLIDO1", "bepusu.VUAJA_STRAPELLIDO2");
+				
+		dataTable.setColumn(ORDER_COLUMN_INDEX_NIF_CANDIDATOS, "bepusu.VUAJA_PRSNIF");
+		dataTable.setColumn(ORDER_COLUMN_INDEX_NOMBRE_CANDIDATOS, whereNombre, DataTableColumn.COLUMN_TYPE_TEXT);
+		dataTable.setColumn(ORDER_COLUMN_INDEX_PUNTUACION_CANDIDATOS, "bepsob.TOTAL", DataTableColumn.COLUMN_TYPE_DOUBLE);
+		dataTable.setQuery(consulta);
+		
+		try (Connection conexion = ConexionUvirtual.obtenerInstancia();
+				PreparedStatement stmtCount = conexion.prepareStatement(dataTable.getQueryCount());
+				PreparedStatement stmt = conexion.prepareStatement(dataTable.getQuery())) {
+			int paramIndex = 1;
+			stmt.setInt(paramIndex, plaza.getArea().getCodNum());
+			stmtCount.setInt(paramIndex++, plaza.getArea().getCodNum());
+			stmt.setInt(paramIndex, plaza.getCodNum());
+			stmtCount.setInt(paramIndex++, plaza.getCodNum());
+			
+			dataTable.setFiltersParams(stmt, stmtCount, paramIndex);
+			
+			try (ResultSet rs = stmt.executeQuery()) {
+				while (rs.next()) {
+					CandidatoResultadoTable candidato = new CandidatoResultadoTable(
+							ModeloUsuarioBolsaEmpleo.obtenerInstancia().getUsuarioById(rs.getInt(CODNUM)));
+					candidato.setTotal(rs.getDouble("TOTAL"));
+					rows.add(candidato);
+				}
+			}
+			
+			dataTable.setRecordsTotalFromQuery(stmtCount);
+			dataTable.setData(rows);
+		}
+		
+		return dataTable;
+	}
+	
 	/**
 	 * Lista de plazas ofertadas .
 	 * @param params .
@@ -294,11 +359,11 @@ public class ModeloPlazaOfertada {
 						: " WHERE 1=1 ");
 		
 		dataTable.setColumn(ORDER_COLUMN_INDEX_AREA, "bepare.DES_AREA_CONOCIMIENTO");
-		dataTable.setColumn(ORDER_COLUMN_INDEX_ESTADO, ESTADO);
-		dataTable.setColumn(ORDER_COLUMN_INDEX_FECHA_CREACION, FECHA_CREACION);
-		dataTable.setColumn(ORDER_COLUMN_INDEX_FECHA_ABIERTA, FECHA_ABIERTA);
-		dataTable.setColumn(ORDER_COLUMN_INDEX_FECHA_FIN_OFERTA, FECHA_FIN_OFERTA);
-		dataTable.setColumn(ORDER_COLUMN_INDEX_FECHA_CERRADA, FECHA_CERRADA);
+		dataTable.setColumn(ORDER_COLUMN_INDEX_ESTADO, ESTADO, DataTableColumn.COLUMN_TYPE_EXACT);
+		dataTable.setColumn(ORDER_COLUMN_INDEX_FECHA_CREACION, FECHA_CREACION, DataTableColumn.COLUMN_TYPE_DATE);
+		dataTable.setColumn(ORDER_COLUMN_INDEX_FECHA_ABIERTA, FECHA_ABIERTA, DataTableColumn.COLUMN_TYPE_DATE);
+		dataTable.setColumn(ORDER_COLUMN_INDEX_FECHA_FIN_OFERTA, FECHA_FIN_OFERTA, DataTableColumn.COLUMN_TYPE_DATE);
+		dataTable.setColumn(ORDER_COLUMN_INDEX_FECHA_CERRADA, FECHA_CERRADA, DataTableColumn.COLUMN_TYPE_DATE);
 		dataTable.setQuery(consulta);
 		
 		try (Connection conexion = ConexionUvirtual.obtenerInstancia();
