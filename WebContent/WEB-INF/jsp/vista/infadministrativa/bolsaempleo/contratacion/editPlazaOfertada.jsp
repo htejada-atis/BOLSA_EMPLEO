@@ -17,8 +17,8 @@ UVDatos uvdatos = (UVDatos) request.getAttribute(UVDatos.NOMBRE_ATRIBUTO);
 VistaContratacion bean = (VistaContratacion) uvdatos.getVistas().get(VistaContratacion.class.getName());
 PlazaOfertada plaza = bean.getPlazaOfertada();
 boolean personal = bean.getUsuarioLogeado().isServicioPersonal();
-boolean tablaCandidatos = !plaza.getEstado().equals(ModeloPlazaOfertada.PLAZA_ESTADO_CREACION) && personal;
-boolean editable = plaza.getEstado().equals(ModeloPlazaOfertada.PLAZA_ESTADO_CREACION) || (plaza.getEstado().equals(ModeloPlazaOfertada.PLAZA_ESTADO_TRAMITACION) && personal);
+boolean tablaCandidatos = !plaza.getEstado().contains(ModeloPlazaOfertada.PLAZA_ESTADO_CREACION) && personal;
+boolean editable = plaza.getEstado().contains(ModeloPlazaOfertada.PLAZA_ESTADO_CREACION) || (plaza.getEstado().contains(ModeloPlazaOfertada.PLAZA_ESTADO_TRAMITACION) && personal);
 
 String area = BolsaEmpleoUtils.getParamForm(request, ControladorContratacion.PARAM_AREA, plaza.getArea().getCodNum().toString());
 String dedicacion = BolsaEmpleoUtils.getParamForm(request, ControladorContratacion.PARAM_DEDICACION, plaza.getDedicacion().getCodNum().toString());
@@ -101,26 +101,28 @@ String fechaFinOferta = BolsaEmpleoUtils.getParamForm(request, ControladorContra
 		</div>
 		<div class="form-group-container col2">
 			<div class="form-file">
-				<label for="plaza_horario" style="margin-bottom: .5rem;">Horario:</label>
+				<label for="plaza_horario" style="margin-bottom: .5rem; width: 100%!important; text-align: left;">Horario:</label>
 			<%	if (editable) { %>
 					<input id="plaza_horario" type="file" name="<%= ControladorContratacion.PARAM_HORARIO %>"/>
 			<%	} %>
 			<%	if (plaza.getHorario() != null) { %>
+					<br/>
 					<button id="plaza_descargar_horario" class="btn icon icon-download" title="Descargar horario de la plaza" type="button" 
 						style="margin-top: .5rem;padding: 1px 6px;">Descargar horario</button>
 			<%	} %>
 			</div>
 		<%	if (bean.getUsuarioLogeado().isServicioPersonal()) { %>
-			<div class="form-file">
+				<div class="form-file">
+					<label for="plaza_nri" style="margin-bottom: .5rem; width: 100%!important; text-align: left;">NRI:</label>
 			<%	if (editable) { %>
-					<label for="plaza_nri" style="margin-bottom: .5rem;">NRI:</label>
+					<input id="plaza_nri" type="file" name="<%= ControladorContratacion.PARAM_NRI %>"/>
 			<%	} %>
-				<input id="plaza_nri" type="file" name="<%= ControladorContratacion.PARAM_NRI %>"/>
+				
 			<%	if (plaza.getNri() != null) { %>
 					<button id="plaza_descargar_nri" class="btn icon icon-download" title="Descargar nri de la plaza" type="button" 
 							style="margin-top: .5rem;padding: 1px 6px;">Descargar NRI</button>
 			<%	} %>
-			</div>
+				</div>
 		<%	} %>
 		</div>
 		<div class="form-group-container col2">
@@ -128,7 +130,7 @@ String fechaFinOferta = BolsaEmpleoUtils.getParamForm(request, ControladorContra
 			<div class="form-group">
 			<%	if (editable) { %>
 					<input id="plaza_enviar" type="submit" name="<%=ControladorContratacion.PARAM_ENVIAR%>" value="Guardar cambios" style="float:right;"/>
-					<button id="plaza_estado_abierta" style="float:right; margin-right: 12px;" <%= plaza.getEstado().equals(ModeloPlazaOfertada.PLAZA_ESTADO_TRAMITACION) ? "" : "disabled" %>>Abrir plaza</button>
+					<button id="plaza_estado_abierta" style="float:right; margin-right: 12px;" <%= plaza.getEstado().contains(ModeloPlazaOfertada.PLAZA_ESTADO_TRAMITACION) ? "" : "disabled" %>>Abrir plaza</button>
 			<%	} %>
 			</div>
 		</div>
@@ -259,6 +261,32 @@ $(document).ready(function() {
 		$('#plaza_enviar').attr('value', 'Guardando plaza...');
 		return true;
 	});
+	
+<%	if (editable) { %>
+		document.getElementById("plaza_estado_abierta").addEventListener("click", function(e) {
+			e.preventDefault();
+			var inputFechaFin = document.getElementById("plaza_fecha_fin_oferta");
+			console.log(inputFechaFin.value);
+			if (inputFechaFin.value.length == 0) {
+				Atis.alertDialog("Abrir plaza", "El campo fecha fin oferta es requerido para abrir la plaza.");
+			} else {
+				Atis.confirmDialog("¿Abrir plaza?", "Una vez abierta la plaza no se podrá editar y se cerrará automáticamente en la fecha fin de la oferta indicada.", {
+					'Si': function(row) {
+						var params = {
+								"<%= ControladorContratacion.PARAM_ACCION %>": "<%= ControladorContratacion.ACCION_ABRIR_PLAZA %>",
+								"<%= ControladorContratacion.PARAM_PLAZA_OFERTADA %>": <%= bean.getPlazaOfertada().getCodNum() %>,
+								"<%= ControladorContratacion.PARAM_FECHA_FIN_OFERTA %>": inputFechaFin.value
+						};
+						Atis.sendForm("<%= request.getRequestURI() %>", params);
+						$(this).dialog("close");
+					},
+					'No': function() {
+						$(this).dialog("close");
+					}
+				});
+			}
+		});
+<%	} %>
 
 <%	if (plaza.getHorario() != null) { %>
 		document.getElementById("plaza_descargar_horario").addEventListener("click", function() {

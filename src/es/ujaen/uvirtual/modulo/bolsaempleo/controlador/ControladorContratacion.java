@@ -58,6 +58,7 @@ public class ControladorContratacion extends HttpServlet {
 	private static final Logger LOGGER = Logger.getLogger(NOMBREDEESTACLASE);
 	
 	// acciones
+	public static final String ACCION_ABRIR_PLAZA = "abrirplaza";
 	public static final String ACCION_CONTRATAR_CANDIDATO = "contratarcandidato";
 	public static final String ACCION_DATATABLE_CANDIDATOS = "datatablecandidatos";
 	public static final String ACCION_DATATABLE_PLAZAS_OFERTADAS = "datatableplazasofertadas";
@@ -92,10 +93,13 @@ public class ControladorContratacion extends HttpServlet {
 	public static final String MENSAJE_ERROR_CENTRO_DESTINO_NO_VALIDO = "El centro de destino seleccionado no es válido";
 	public static final String MENSAJE_ERROR_CUATRIMESTRE_NO_VALIDO = "El cuatrimestre seleccionado no es válido";
 	public static final String MENSAJE_ERROR_DURACION_PREVISTA_LARGA = "La duración prevista no puede contener mas de %d caracteres";
+	public static final String MENSAJE_ERROR_ESTADO_TRAMITACION_REQUERIDO = "Es requerido estado de tramitación para la plaza";
+	public static final String MENSAJE_ERROR_FECHA_FIN_OFERTA_VACIA = "La fecha fin de la oferta no puede estar vacía";
 	public static final String MENSAJE_ERROR_JUSTIFICACION_LARGA = "La justificación no puede contener mas de %d caracteres";
 	public static final String MENSAJE_ERROR_JUSTIFICACION_VACIA = "La justificación no puede estar vacía";
 	public static final String MENSAJE_ERROR_SIN_PERMISO = "No tienes permiso";
 	
+	public static final String MENSAJE_EXITO_ABRIR_PLAZA = "Plaza abierta correctamente";
 	public static final String MENSAJE_EXITO_AGREGAR = "Plaza creada correctamente";
 	public static final String MENSAJE_EXITO_EDITAR = "Plaza editada correctamente";
 	public static final String MENSAJE_EXITO_CONTRATACION = "Contratación creada correctamente para el usuario: %s";
@@ -166,6 +170,7 @@ public class ControladorContratacion extends HttpServlet {
 				case ACCION_NUEVA_PLAZA_OFERTADA:
 					nuevaPlazaOfertada(bean, datos, request, response, parametros);
 					break;
+				case ACCION_ABRIR_PLAZA:
 				case ACCION_CONTRATAR_CANDIDATO:
 				case ACCION_DATATABLE_CANDIDATOS:
 				case ACCION_EDITAR_PLAZA_OFERTADA:
@@ -245,6 +250,9 @@ public class ControladorContratacion extends HttpServlet {
 		bean.setPlazaOfertada(plaza);
 		
 		switch (nombreAccion) {
+			case ACCION_ABRIR_PLAZA:
+				abrirPlaza(bean, datos, request, response);
+				break;
 			case ACCION_CONTRATAR_CANDIDATO:
 				contratarCandidato(bean, datos, request, response);
 				break;
@@ -259,6 +267,28 @@ public class ControladorContratacion extends HttpServlet {
 			default:
 				errorFatal(bean, MENSAJE_ERROR_ACCION_NO_CONTEMPLADA);
 		}
+	}
+	
+	private void abrirPlaza(VistaContratacion bean, UVDatos datos, HttpServletRequest request, HttpServletResponse response)
+			throws SQLException, UVException, IOException {
+		if (!bean.getUsuarioLogeado().isServicioPersonal()) {
+			BolsaEmpleoUtils.redirectToError(bean, datos, request, response, MENSAJE_ERROR_SIN_PERMISO);
+		}
+		
+		PlazaOfertada plaza = bean.getPlazaOfertada();
+		if (BolsaEmpleoUtils.leeParametroFechaHora(request.getParameter(PARAM_FECHA_FIN_OFERTA), "/", ":") == null) {
+			throw new UVException(MENSAJE_ERROR_FECHA_FIN_OFERTA_VACIA);
+		}
+		if (!plaza.getEstado().contains(ModeloPlazaOfertada.PLAZA_ESTADO_TRAMITACION)) {
+			throw new UVException(MENSAJE_ERROR_ESTADO_TRAMITACION_REQUERIDO);
+		}
+		plaza.setFechaFinOferta(BolsaEmpleoUtils.leeParametroFechaHora(request.getParameter(PARAM_FECHA_FIN_OFERTA), "/", ":"));
+		
+		ModeloPlazaOfertada.obtenerInstancia().abrirPlazaOfertada(plaza, bean.getUsuarioLogeado());
+		
+		BolsaEmpleoUtils.addMensajeDeExito(MENSAJE_EXITO_ABRIR_PLAZA, bean, request);
+		datos.setRespuestaEnviada(true);
+		response.sendRedirect(request.getServletPath());
 	}
 	
 	private void contratarCandidato(VistaContratacion bean, UVDatos datos, HttpServletRequest request, HttpServletResponse response)

@@ -39,7 +39,7 @@ public class ModeloPlazaOfertada {
 	public static final String PLAZA_ESTADO_ABIERTA = "ABIERTA";
 	public static final String PLAZA_ESTADO_CERRADA = "CERRADA";
 	public static final String PLAZA_ESTADO_CONTRATACION = "CONTRATACION";
-	public static final String PLAZA_ESTADO_CREACION = "BLOQUEADA";
+	public static final String PLAZA_ESTADO_CREACION = "CREACION";
 	public static final String PLAZA_ESTADO_TRAMITACION = "TRAMITACION";
 	
 	public static final String CENTRO_DESTINO_JAEN = "JAEN";
@@ -139,7 +139,7 @@ public class ModeloPlazaOfertada {
 		}
 	}
 	
-	/** inserta dedicación .
+	/** inserta plaza ofertada .
 	 * @param plaza .
 	 * @param usuarioUpdate .
 	 * @throws SQLException .
@@ -194,7 +194,7 @@ public class ModeloPlazaOfertada {
 		}
 	}
 	
-	/** actualiza dedicación .
+	/** actualiza plaza ofertada .
 	 * @param plaza .
 	 * @param usuarioUpdate .
 	 * @throws SQLException .
@@ -253,6 +253,35 @@ public class ModeloPlazaOfertada {
 			if (plaza.getHorario() != null) {
 				stmt.setBlob(parameterIndex++, plaza.getHorario());
 			}
+			stmt.setInt(parameterIndex++, plaza.getCodNum());
+			stmt.executeUpdate();
+		}
+	}
+	
+	/** abrir plaza ofertada .
+	 * @param plaza .
+	 * @param usuarioUpdate .
+	 * @throws SQLException .
+	 * @throws UVException .
+	 */
+	public void abrirPlazaOfertada(PlazaOfertada plaza, UsuarioBolsaEmpleo usuarioUpdate) throws SQLException, UVException {
+		if (plaza == null) {
+			throw new UVException(String.format(MENSAJE_ERROR_OBJETO_VACIO, "abrir plaza"));
+		}
+		
+		if (plaza.getFechaFinOferta() == null || plaza.getCentroDestino().isBlank()) {
+			throw new UVException(String.format(MENSAJE_ERROR_PARAM_VACIO, "abrir plaza", "centro destino"));
+		}
+		
+		String consulta = String.format("UPDATE TBEP_PLAZAS_OFERTADAS SET %s=?, %s=?, %s=?"
+				+ " WHERE %s=?",
+				ESTADO, FECHA_FIN_OFERTA, "UID_USUARIO", CODNUM);
+		
+		try (Connection conexion = ConexionUvirtual.obtenerInstancia(); PreparedStatement stmt = conexion.prepareStatement(consulta)) {
+			int parameterIndex = 1;
+			stmt.setString(parameterIndex++, PLAZA_ESTADO_ABIERTA);
+			stmt.setDate(parameterIndex++, new Date(plaza.getFechaFinOferta().getTime()));
+			stmt.setString(parameterIndex++, usuarioUpdate.getCodCuenta());
 			stmt.setInt(parameterIndex++, plaza.getCodNum());
 			stmt.executeUpdate();
 		}
@@ -359,7 +388,7 @@ public class ModeloPlazaOfertada {
 						: " WHERE 1=1 ");
 		
 		dataTable.setColumn(ORDER_COLUMN_INDEX_AREA, "bepare.DES_AREA_CONOCIMIENTO");
-		dataTable.setColumn(ORDER_COLUMN_INDEX_ESTADO, ESTADO, DataTableColumn.COLUMN_TYPE_EXACT);
+		dataTable.setColumn(ORDER_COLUMN_INDEX_ESTADO, "bepplo.ESTADO", DataTableColumn.COLUMN_TYPE_EXACT);
 		dataTable.setColumn(ORDER_COLUMN_INDEX_FECHA_CREACION, FECHA_CREACION, DataTableColumn.COLUMN_TYPE_DATE);
 		dataTable.setColumn(ORDER_COLUMN_INDEX_FECHA_ABIERTA, FECHA_ABIERTA, DataTableColumn.COLUMN_TYPE_DATE);
 		dataTable.setColumn(ORDER_COLUMN_INDEX_FECHA_FIN_OFERTA, FECHA_FIN_OFERTA, DataTableColumn.COLUMN_TYPE_DATE);

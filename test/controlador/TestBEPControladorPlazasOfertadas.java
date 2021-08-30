@@ -2,7 +2,6 @@ package controlador;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotEquals;
-import static org.junit.Assert.assertNotNull;
 import java.io.IOException;
 import java.sql.SQLException;
 import org.junit.BeforeClass;

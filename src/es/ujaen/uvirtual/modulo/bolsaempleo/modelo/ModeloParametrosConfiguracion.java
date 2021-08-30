@@ -23,6 +23,7 @@ public class ModeloParametrosConfiguracion {
 	public static final String VERSION = "0.64";
 	public static final String JS_BOLSA_EMPLEO = "/js/bolsaempleo/bolsaempleo20210715.js.min";
 	public static final String CSS_BOLSA_EMPLEO = "/css/ujaen_bolsa_empleo.css";
+	public static final String JS_TINY = "https://cdn.tiny.cloud/1/mn46suck3y24mo5q8ef2ke2hfg4iggjasxjlqdobnrqs7n9h/tinymce/5/tinymce.min.js";
 
 	// 50MB = 1024 * 1024 * 50 = 52428800
 	public static final int MAX_FILE_SIZE = 52_428_800;
