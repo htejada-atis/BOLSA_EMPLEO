@@ -13,6 +13,7 @@ import es.ujaen.uvirtual.modulo.bolsaempleo.beans.OfertaCandidato;
 import es.ujaen.uvirtual.modulo.bolsaempleo.beans.PlazaOfertada;
 import es.ujaen.uvirtual.modulo.bolsaempleo.beans.UsuarioBolsaEmpleo;
 import es.ujaen.uvirtual.modulo.bolsaempleo.utilidades.BolsaEmpleoDataTable;
+import es.ujaen.uvirtual.modulo.bolsaempleo.utilidades.BolsaEmpleoDataTable.DataTableColumn;
 import es.ujaen.uvirtual.modulo.bolsaempleo.utilidades.BolsaEmpleoUtils;
 import es.ujaen.uvirtual.utilidades.UVException;
 
@@ -23,10 +24,11 @@ import es.ujaen.uvirtual.utilidades.UVException;
  */
 public class ModeloOfertaCandidato {
 	
-	public static final int ORDER_COLUMN_INDEX_AREA = 0;
-	public static final int ORDER_COLUMN_INDEX_ESTADO = 1;
-	public static final int ORDER_COLUMN_INDEX_FECHA_FIN_OFERTA = 2;
-	public static final int ORDER_COLUMN_CONFIRMACION = 3;
+	public static final int ORDER_COLUMN_INDEX_CODNUM = 0;
+	public static final int ORDER_COLUMN_INDEX_AREA = 1;
+	public static final int ORDER_COLUMN_INDEX_ESTADO = 2;
+	public static final int ORDER_COLUMN_INDEX_FECHA_FIN_OFERTA = 3;
+	public static final int ORDER_COLUMN_CONFIRMACION = 4;
 	
 	public static final String BEPPLO_CODNUM = "BEPPLO_CODNUM";
 	public static final String BEPUSU_CODNUM = "BEPUSU_CODNUM";
@@ -270,10 +272,11 @@ public class ModeloOfertaCandidato {
 				+ " WHERE   bepsol.BEPUSU_CODNUM = ? "
 				+ "     AND bepplo.ESTADO = '" + ModeloPlazaOfertada.PLAZA_ESTADO_ABIERTA + "'";
 		
+		dataTable.setColumn(ORDER_COLUMN_INDEX_CODNUM, "bepplo.CODNUM", DataTableColumn.COLUMN_TYPE_NUMBER);
 		dataTable.setColumn(ORDER_COLUMN_INDEX_AREA, "bepare.DES_AREA_CONOCIMIENTO");
-		dataTable.setColumn(ORDER_COLUMN_INDEX_ESTADO, "bepplo.ESTADO");
-		dataTable.setColumn(ORDER_COLUMN_INDEX_FECHA_FIN_OFERTA, "bepplo.FECHA_FIN_OFERTA");
-		dataTable.setColumn(ORDER_COLUMN_CONFIRMACION, "bepofc.FLGRESULTADO");
+		dataTable.setColumn(ORDER_COLUMN_INDEX_ESTADO, "bepplo.ESTADO", DataTableColumn.COLUMN_TYPE_EXACT);
+		dataTable.setColumn(ORDER_COLUMN_INDEX_FECHA_FIN_OFERTA, "bepplo.FECHA_FIN_OFERTA", DataTableColumn.COLUMN_TYPE_DATE);
+		dataTable.setColumn(ORDER_COLUMN_CONFIRMACION, "bepofc.FLGRESULTADO", DataTableColumn.COLUMN_TYPE_BOOLEAN);
 				
 		dataTable.setQuery(consulta);
 		

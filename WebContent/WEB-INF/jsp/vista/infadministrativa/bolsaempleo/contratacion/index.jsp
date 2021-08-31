@@ -25,6 +25,7 @@ VistaContratacion bean = (VistaContratacion) uvdatos.getVistas().get(VistaContra
 	
 	<table class="bluetable bolsaempleo" id="tablePlazasOfertadas">
 		<tr>
+			<th scope="col" style="width:30px">Id</th>
 			<th scope="col" style="width:100%">Área</th>
 			<th scope="col" style="width:95px">Estado</th>
 			<th scope="col" style="width:96px">Fecha creación</th>
@@ -36,7 +37,7 @@ VistaContratacion bean = (VistaContratacion) uvdatos.getVistas().get(VistaContra
 		</tbody>
 		<tfoot>
 			<tr>
-				<th colSpan="6" style="width:100%"></th>
+				<th colSpan="7" style="width:100%"></th>
 			</tr>
 		</tfoot>
 	</table>
@@ -53,6 +54,8 @@ $(document).ready(function() {
 	var table = new Atis.DataTable('#tablePlazasOfertadas', {
 		"ajax": { url: "<%= ControladorContratacion.URL_PATTERN_AJAX %>" },
 		"pageSize": 10,
+		"defaultOrderBy": 3,
+		"defaultOrderDirection": 'desc',
 		"filterable": true,
 		"title": 'Plazas ofertadas',
 		"action": "<%= ControladorContratacion.ACCION_DATATABLE_PLAZAS_OFERTADAS %>",
@@ -63,6 +66,7 @@ $(document).ready(function() {
 			Atis.sendForm("<%= request.getRequestURI() %>", params);
 		}},
 		"columns": [
+			{'data': 'codNum', 'filter': {'type': 'number'}},
 			{'data': 'area.idAreaExterno', 'filter': true, 'render': function(row) {
 				return row.area.idAreaExterno + ' ' + row.area.descripcion;
 			}},

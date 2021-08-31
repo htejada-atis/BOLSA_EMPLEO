@@ -32,3 +32,4 @@ TBEP_TITULACIONES_USUARIO			TUS		beptus		TitulacionesUsuario
 TBEP_USUARIOS						USU		bepusu		UsuarioBolsaEmpleo
 TBEP_USU_EXCLUIDOS_AREA				UEA		bepuea		UsuarioExcluidoArea
 TBEP_PLANTILLAS						PLS		beppls		Plantilla
+TBEP_ESTADO_CANDIDATOS				CNT		bepcnt		

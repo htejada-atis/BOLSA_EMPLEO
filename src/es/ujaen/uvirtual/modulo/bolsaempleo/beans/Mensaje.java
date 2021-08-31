@@ -47,6 +47,20 @@ public class Mensaje implements Serializable {
 		this.fechaCreacion = pfechaCreacion;
 		this.estado = pestado;
 	}
+	
+	/** Constructor con parametros.
+	 * @param ptitulo .
+	 * @param pcuerpo .
+	 * @param pfechaCreacion .
+	 * @param pestado .
+	 */
+	public Mensaje(String ptitulo, String pcuerpo, Date pfechaCreacion, String pestado) {
+		super();
+		this.titulo = ptitulo;
+		this.cuerpo = pcuerpo;
+		this.fechaCreacion = pfechaCreacion;
+		this.estado = pestado;
+	}
 
 	/**
 	 * Constructor copia.

@@ -4,8 +4,8 @@
 <%@ page import="es.ujaen.uvirtual.modulo.bolsaempleo.beans.Plantilla" %>
 <%@ page import="es.ujaen.uvirtual.beans.UVDatos" %>
 <%@	page import="es.ujaen.uvirtual.modulo.bolsaempleo.modelo.ModeloMensajes"%>
-<%@	page import="es.ujaen.uvirtual.modulo.bolsaempleo.controlador.configuracion.ControladorMensajes"%>
-<%@ page import="es.ujaen.uvirtual.modulo.bolsaempleo.vistas.VistaMensajes" %>
+<%@	page import="es.ujaen.uvirtual.modulo.bolsaempleo.controlador.configuracion.ControladorPlantillas"%>
+<%@ page import="es.ujaen.uvirtual.modulo.bolsaempleo.vistas.VistaPlantillas" %>
 <%@ page import="es.ujaen.uvirtual.modulo.bolsaempleo.beans.Convocatoria" %>
 <%@ page import="es.ujaen.uvirtual.modulo.bolsaempleo.beans.Area" %>
 <%@ page import="es.ujaen.uvirtual.utilidades.EscapaHTML" %>
@@ -14,7 +14,7 @@
 
 <%
 UVDatos uvdatos = (UVDatos) request.getAttribute(UVDatos.NOMBRE_ATRIBUTO);
-VistaMensajes bean = (VistaMensajes) uvdatos.getVistas().get(VistaMensajes.class.getName());
+VistaPlantillas bean = (VistaPlantillas) uvdatos.getVistas().get(VistaPlantillas.class.getName());
 Plantilla plantilla = bean.getPlantilla();
 %>
 
@@ -24,15 +24,20 @@ Plantilla plantilla = bean.getPlantilla();
 	<h2><%= plantilla != null ? "Editar" : "Nueva" %> plantilla:</h2>
 	
 	<form id="plantilla_form" class="be-form" method="post" action="<%= request.getRequestURI() %>">
-		<input type="hidden" name="<%= ControladorMensajes.PARAM_ACCION %>" id="accion_formulario" value="<%= ControladorMensajes.ACCION_NUEVA_PLANTILLA %>" />
+		<input type="hidden" name="<%= ControladorPlantillas.PARAM_ACCION %>" id="accion_formulario" value="<%= plantilla != null ? ControladorPlantillas.ACCION_EDITAR_PLANTILLA : ControladorPlantillas.ACCION_NUEVA_PLANTILLA %>" />
+		
+	<%	if (plantilla != null) { %>
+			<input type="hidden" name="<%= ControladorPlantillas.PARAM_PLANTILLA %>" id="plantilla_id" value="<%= plantilla.getCodNum() %>" />
+	<%	} %>
+		
 		<div class="form-group-container col1">
 			<div class="form-group">
 				<label for="plantilla_nombre" class="bold-label">Nombre: </label>
 				<input id="plantilla_nombre"
 						class="form-input-custom"
 						type="text"
-						name="<%= ControladorMensajes.PARAM_NOMBRE %>"
-						value=""
+						name="<%= ControladorPlantillas.PARAM_NOMBRE %>"
+						value="<%= EscapaHTML.escapa(BolsaEmpleoUtils.getParamForm(request, ControladorPlantillas.PARAM_NOMBRE, plantilla != null ? plantilla.getNombre() : "")) %>"
 						required/>
 			</div>
 		</div>
@@ -42,8 +47,8 @@ Plantilla plantilla = bean.getPlantilla();
 				<input id="plantilla_titulo"
 						class="form-input-custom"
 						type="text"
-						name="<%= ControladorMensajes.PARAM_TITULO %>"
-						value=""
+						name="<%= ControladorPlantillas.PARAM_TITULO %>"
+						value="<%= EscapaHTML.escapa(BolsaEmpleoUtils.getParamForm(request, ControladorPlantillas.PARAM_TITULO, plantilla != null ? plantilla.getTitulo() : "")) %>"
 						required/>
 			</div>
 		</div>
@@ -51,13 +56,13 @@ Plantilla plantilla = bean.getPlantilla();
 			<div class="form-group">
 				<label for="plantilla_cuerpo" class="bold-label">Cuerpo: </label>
 				<textarea class="form-input-custom" id="plantilla_cuerpo"
-						name="<%= ControladorMensajes.PARAM_CUERPO %>" rows="5" cols="50"></textarea>
+						name="<%= ControladorPlantillas.PARAM_CUERPO %>" rows="5" cols="50"><%= EscapaHTML.escapa(BolsaEmpleoUtils.getParamForm(request, ControladorPlantillas.PARAM_CUERPO, plantilla != null ? plantilla.getCuerpo() : "")) %></textarea>
 			</div>
 		</div>
 		<div class="form-group-container col2">
 			<div class="form-group"></div>
 			<div class="form-group">
-				<input id="plantilla_enviar" type="submit" name="<%= ControladorMensajes.PARAM_ENVIAR %>" value="Insertar" style="float:right;" />
+				<input id="plantilla_enviar" type="submit" name="<%= ControladorPlantillas.PARAM_ENVIAR %>" value="<%= plantilla != null ? "Guardar" : "Insertar" %>" style="float:right;" />
 			</div>
 		</div>
 	</form>

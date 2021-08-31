@@ -159,6 +159,46 @@ public class ModeloDescargaFichero {
 		return null;
 	}
 	
+	/** Comprueba si una plaza ofertada está disponible para un candidato .
+	 * @param idPlaza .
+	 * @param usuario .
+	 * @return plaza ofertada .
+	 * @throws UVException .
+	 * @throws UVException .
+	 * @throws SQLException .
+	 */
+	public PlazaOfertada compruebaPlazaOfertadaCandidato(int idPlaza, UsuarioBolsaEmpleo usuario) throws SQLException, UVException {
+		String consulta = "SELECT bepplo.* FROM TBEP_USUARIOS bepusu"
+				+ " LEFT JOIN TBEP_ESTADO_CANDIDATOS bepesc ON bepesc.BEPUSU_CODNUM = bepusu.CODNUM"
+				+ " INNER JOIN TBEP_SOLICITUDES bepsol ON bepsol.BEPUSU_CODNUM = bepusu.CODNUM"
+				+ " INNER JOIN TBEP_SOLICITUD_BOLSAS bepsob ON bepsob.BEPSOL_CODNUM = bepsol.CODNUM AND bepsob.FECHABAREMACION IS NOT NULL"
+				+ " INNER JOIN TBEP_BOLSAS bepbol ON bepbol.CODNUM = bepsob.BEPBOL_CODNUM"
+				+ " INNER JOIN TBEP_AREAS bepare ON bepare.CODNUM = bepbol.BEPARE_CODNUM"
+				+ " INNER JOIN TBEP_PLAZAS_OFERTADAS bepplo ON bepplo.BEPARE_CODNUM = bepare.CODNUM"
+				+ " WHERE   bepplo.CODNUM = ?"
+				+ "     AND bepusu.CODNUM = ?"
+				+ "     AND (bepesc.CODNUM IS NULL"
+				+ "         OR bepesc.ESTADO = '" + ModeloEstadoCandidato.ESTADO_DISPONIBLE + "'"
+				+ "         OR (bepesc.ESTADO = '" + ModeloEstadoCandidato.ESTADO_CONTRATADO_PRIMER_CUATRIMESTRE + "' "
+				+ "             AND bepplo.CUATRIMESTRE = '" + ModeloPlazaOfertada.CUATRIMESTRE_SEGUNDO + "')"
+				+ "     )";
+		
+		try (Connection conexion = ConexionUvirtual.obtenerInstancia();
+				PreparedStatement stmt = conexion.prepareStatement(consulta)) {
+			int parameterIndex = 1;
+			stmt.setInt(parameterIndex++, idPlaza);
+			stmt.setInt(parameterIndex++, usuario.getCodNum());
+			
+			try (ResultSet rs = stmt.executeQuery()) {
+				if (rs.next()) {
+					return ModeloPlazaOfertada.obtenerInstancia().createPlazaOfertadaFromResultSet(rs, true);
+				}
+			}
+		}
+		
+		return null;
+	}
+	
 	/** Comprueba si una plaza ofertada es visible para un director de departamento .
 	 * @param idPlaza .
 	 * @param usuario .

@@ -115,6 +115,7 @@ public class ControladorDescargaFicheros extends HttpServlet {
 			init(bean, datos, request, response);
 			switch (nombreAccion) {
 				case ACCION_DESCARGAR_ACREDITACION_CANDIDATO:
+				case ACCION_DESCARGAR_HORARIO_CANDIDATO:
 				case ACCION_DESCARGAR_MERITO_CANDIDATO:
 				case ACCION_DESCARGAR_TITULACION_CANDIDATO:
 				case ACCION_DESCARGAR_RESULTADOS_SOLICITUD_CANDIDATO:
@@ -206,6 +207,9 @@ public class ControladorDescargaFicheros extends HttpServlet {
 		switch (nombreAccion) {
 			case ACCION_DESCARGAR_ACREDITACION_CANDIDATO:
 				descargaAcreditacionCandidato(bean, datos, request, response);
+				break;
+			case ACCION_DESCARGAR_HORARIO_CANDIDATO:
+				descargaHorarioPlazaCandidato(bean, datos, request, response);
 				break;
 			case ACCION_DESCARGAR_MERITO_CANDIDATO:
 				descargaMeritoCandidato(bean, datos, request, response);
@@ -403,6 +407,18 @@ public class ControladorDescargaFicheros extends HttpServlet {
 	///////////////////////////////////////////////////////////////////////////////////////////////////////////
 	// PLAZAS OFERTADAS
 	///////////////////////////////////////////////////////////////////////////////////////////////////////////
+	
+	private void descargaHorarioPlazaCandidato(VistaDescargaFicheros bean, UVDatos datos, HttpServletRequest request, HttpServletResponse response)
+			throws SQLException, UVException, IOException {
+		Integer idPlazaOfertada = Formateador.leeParametroInteger(request.getParameter(PARAM_PLAZA_OFERTADA));
+		PlazaOfertada plaza = ModeloDescargaFichero.obtenerInstancia().compruebaPlazaOfertadaCandidato(idPlazaOfertada, bean.getUsuarioLogeado());
+		bean.setPlazaOfertada(plaza);
+		if (plaza == null) {
+			BolsaEmpleoUtils.redirectToError(bean, datos, request, response, MENSAJE_ERROR_SIN_PERMISO);
+		} else {
+			descargarPDF(datos, response, plaza.getHorario());
+		}
+	}
 	
 	private void descargaHorarioPlazaDirector(VistaDescargaFicheros bean, UVDatos datos, HttpServletRequest request, HttpServletResponse response)
 			throws SQLException, UVException, IOException {

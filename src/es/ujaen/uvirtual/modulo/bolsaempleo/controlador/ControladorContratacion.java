@@ -8,6 +8,7 @@ import java.sql.SQLException;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.stream.IntStream;
@@ -153,7 +154,7 @@ public class ControladorContratacion extends HttpServlet {
 			}
 		}
 		
-		String nombreAccion = EscapaHTML.ajustaCodificacion(BolsaEmpleoUtils.getParamRequestOrMultipart(
+		String nombreAccion = EscapaHTML.ajustaCodificacion(BolsaEmpleoUtils.getParamRequestOrMultipartOrSession(
 				request, parametros, PARAM_ACCION));
 		if (nombreAccion == null || nombreAccion.isEmpty()) {
 			nombreAccion = ACCION_INDEX;
@@ -240,7 +241,7 @@ public class ControladorContratacion extends HttpServlet {
 		cargarListasFormulario(bean);
 		
 		ModeloPlazaOfertada modelo = ModeloPlazaOfertada.obtenerInstancia();
-		PlazaOfertada plaza = modelo.getPlazaOfertadaById(Formateador.leeParametroInteger(BolsaEmpleoUtils.getParamRequestOrMultipart(
+		PlazaOfertada plaza = modelo.getPlazaOfertadaById(Formateador.leeParametroInteger(BolsaEmpleoUtils.getParamRequestOrMultipartOrSession(
 				request, parametros, PARAM_PLAZA_OFERTADA)));
 		
 		if (bean.getUsuarioLogeado().isDirectorDepartamento() && !ModeloEvaluador.obtenerInstancia().checkEvaluadorArea(plaza.getArea(), bean.getUsuarioLogeado())) {
@@ -275,6 +276,8 @@ public class ControladorContratacion extends HttpServlet {
 			BolsaEmpleoUtils.redirectToError(bean, datos, request, response, MENSAJE_ERROR_SIN_PERMISO);
 		}
 		
+		ModeloPlazaOfertada modeloPlaza = ModeloPlazaOfertada.obtenerInstancia();
+		
 		PlazaOfertada plaza = bean.getPlazaOfertada();
 		if (BolsaEmpleoUtils.leeParametroFechaHora(request.getParameter(PARAM_FECHA_FIN_OFERTA), "/", ":") == null) {
 			throw new UVException(MENSAJE_ERROR_FECHA_FIN_OFERTA_VACIA);
@@ -284,21 +287,24 @@ public class ControladorContratacion extends HttpServlet {
 		}
 		plaza.setFechaFinOferta(BolsaEmpleoUtils.leeParametroFechaHora(request.getParameter(PARAM_FECHA_FIN_OFERTA), "/", ":"));
 		
-		ModeloPlazaOfertada.obtenerInstancia().abrirPlazaOfertada(plaza, bean.getUsuarioLogeado());
+		modeloPlaza.crearMensajeAperturaPlaza(plaza, bean.getUsuarioLogeado());
+		modeloPlaza.abrirPlazaOfertada(plaza, bean.getUsuarioLogeado());
 		
 		BolsaEmpleoUtils.addMensajeDeExito(MENSAJE_EXITO_ABRIR_PLAZA, bean, request);
-		datos.setRespuestaEnviada(true);
-		response.sendRedirect(request.getServletPath());
+		redireccionConPlazaSeleccionada(bean, datos, request, response, ACCION_SELECCIONAR_PLAZA_OFERTADA);
 	}
 	
 	private void contratarCandidato(VistaContratacion bean, UVDatos datos, HttpServletRequest request, HttpServletResponse response)
 			throws SQLException, UVException, IOException {
+		ModeloContratacion modeloContratacion = ModeloContratacion.obtenerInstancia();
+		
 		String fechaCita = request.getParameter(PARAM_FECHA_CITA);
 		String horaCita = request.getParameter(PARAM_HORA_CITA);
 		Date fecha = BolsaEmpleoUtils.leeParametroFechaHora(fechaCita + " " + horaCita, "/", ":");
 		UsuarioBolsaEmpleo candidato = ModeloUsuarioBolsaEmpleo.obtenerInstancia().getUsuarioById(Formateador.leeParametroInteger(request.getParameter(PARAM_CANDIDATO)));
 		
-		ModeloContratacion.obtenerInstancia().insertarContratacion(bean.getPlazaOfertada(), fecha, candidato, bean.getUsuarioLogeado());
+		modeloContratacion.crearMensajeCitaContratacion(bean.getPlazaOfertada(), fecha, candidato, bean.getUsuarioLogeado());
+		modeloContratacion.insertarContratacion(bean.getPlazaOfertada(), fecha, candidato, bean.getUsuarioLogeado());
 		
 		BolsaEmpleoUtils.addMensajeDeExito(String.format(MENSAJE_EXITO_CONTRATACION, candidato.getPrsNif()), bean, request);
 		datos.setRespuestaEnviada(true);
@@ -313,8 +319,7 @@ public class ControladorContratacion extends HttpServlet {
 		ModeloPlazaOfertada.obtenerInstancia().actualizaPlazaOfertada(plaza, bean.getUsuarioLogeado());
 		
 		BolsaEmpleoUtils.addMensajeDeExito(MENSAJE_EXITO_EDITAR, bean, request);
-		datos.setRespuestaEnviada(true);
-		response.sendRedirect(request.getServletPath());
+		redireccionConPlazaSeleccionada(bean, datos, request, response, ACCION_SELECCIONAR_PLAZA_OFERTADA);
 	}
 	
 	private void nuevaPlazaOfertada(VistaContratacion bean, UVDatos datos, HttpServletRequest request, HttpServletResponse response, HashMap<String, Object> parametros) 
@@ -322,7 +327,7 @@ public class ControladorContratacion extends HttpServlet {
 		bean.setVista(JSP_CREATE);
 		cargarListasFormulario(bean);
 		
-		if (BolsaEmpleoUtils.getParamRequestOrMultipart(request, parametros, PARAM_AREA) != null) {
+		if (BolsaEmpleoUtils.getParamRequestOrMultipartOrSession(request, parametros, PARAM_AREA) != null) {
 			PlazaOfertada plaza = validarPlazaOfertada(bean, request, new PlazaOfertada(), parametros);
 			
 			ModeloPlazaOfertada.obtenerInstancia().insertaPlazaOfertada(plaza, bean.getUsuarioLogeado());
@@ -337,6 +342,14 @@ public class ControladorContratacion extends HttpServlet {
 		ModeloArea modelo = ModeloArea.obtenerInstancia();
 		bean.setListaAreas(bean.getUsuarioLogeado().isServicioPersonal() ? modelo.listaAreas() : modelo.getAreasByEvaluador(bean.getUsuarioLogeado()));
 		bean.setListaDedicaciones(ModeloDedicacion.obtenerInstancia().listaDedicacionesActivas());
+	}
+	
+	private void redireccionConPlazaSeleccionada(VistaContratacion bean, UVDatos datos, HttpServletRequest request, HttpServletResponse response, String accion)
+			throws IOException {
+		Map<String, String> params = new HashMap<>();
+		params.put(PARAM_PLAZA_OFERTADA, bean.getPlazaOfertada().getCodNum().toString());
+		params.put(PARAM_ACCION, accion);
+		BolsaEmpleoUtils.redirectWithParams(datos, request, response, params);
 	}
 	
 	private void listaCandidatos(VistaContratacion bean, UVDatos datos, HttpServletRequest request, HttpServletResponse response) throws IOException {
@@ -396,10 +409,10 @@ public class ControladorContratacion extends HttpServlet {
 	@SuppressWarnings({"checkstyle:cyclomaticcomplexity", "checkstyle:npathcomplexity"})
 	private PlazaOfertada validarPlazaOfertada(VistaContratacion bean, HttpServletRequest request, PlazaOfertada plaza, HashMap<String, Object> parametros) 
 			throws UVException, SQLException {
-		plaza.setArea(ModeloArea.obtenerInstancia().getAreaById(Formateador.leeParametroInteger(BolsaEmpleoUtils.getParamRequestOrMultipart(
+		plaza.setArea(ModeloArea.obtenerInstancia().getAreaById(Formateador.leeParametroInteger(BolsaEmpleoUtils.getParamRequestOrMultipartOrSession(
 				request, parametros, PARAM_AREA))));
 		
-		plaza.setJustificacion(Formateador.leeParametroString(BolsaEmpleoUtils.getParamRequestOrMultipart(
+		plaza.setJustificacion(Formateador.leeParametroString(BolsaEmpleoUtils.getParamRequestOrMultipartOrSession(
 				request, parametros, PARAM_JUSTIFICACION)));
 		if (plaza.getJustificacion() == null || plaza.getJustificacion().isBlank()) {
 			throw new UVException(MENSAJE_ERROR_JUSTIFICACION_VACIA);
@@ -408,7 +421,7 @@ public class ControladorContratacion extends HttpServlet {
 			throw new UVException(String.format(MENSAJE_ERROR_JUSTIFICACION_LARGA, ModeloPlazaOfertada.COLUMN_JUSTIFICACION_MAXLENGTH));
 		}
 		
-		plaza.setCentroDestino(Formateador.leeParametroString(BolsaEmpleoUtils.getParamRequestOrMultipart(
+		plaza.setCentroDestino(Formateador.leeParametroString(BolsaEmpleoUtils.getParamRequestOrMultipartOrSession(
 				request, parametros, PARAM_CENTRO_DESTINO)));
 		if (plaza.getCentroDestino() == null || plaza.getCentroDestino().isBlank()) {
 			throw new UVException(MENSAJE_ERROR_CENTRO_DESTINO_VACIO);
@@ -418,25 +431,25 @@ public class ControladorContratacion extends HttpServlet {
 		}
 		
 		if (bean.getUsuarioLogeado().isServicioPersonal()) {
-			if (Formateador.leeParametroInteger(BolsaEmpleoUtils.getParamRequestOrMultipart(
+			if (Formateador.leeParametroInteger(BolsaEmpleoUtils.getParamRequestOrMultipartOrSession(
 					request, parametros, PARAM_DEDICACION)) != null) {
 				plaza.setDedicacion(ModeloDedicacion.obtenerInstancia().getDedicacionById(Formateador.leeParametroInteger(
-						BolsaEmpleoUtils.getParamRequestOrMultipart(request, parametros, PARAM_DEDICACION))));
+						BolsaEmpleoUtils.getParamRequestOrMultipartOrSession(request, parametros, PARAM_DEDICACION))));
 			}
 			
-			plaza.setCuatrimestre(Formateador.leeParametroString(BolsaEmpleoUtils.getParamRequestOrMultipart(
+			plaza.setCuatrimestre(Formateador.leeParametroString(BolsaEmpleoUtils.getParamRequestOrMultipartOrSession(
 					request, parametros, PARAM_CUATRIMESTRE)));
-			if (!ModeloPlazaOfertada.CUATRIMESTRES.containsKey(plaza.getCuatrimestre())) {
+			if (!plaza.getCuatrimestre().isEmpty() && !ModeloPlazaOfertada.CUATRIMESTRES.containsKey(plaza.getCuatrimestre())) {
 				throw new UVException(MENSAJE_ERROR_CUATRIMESTRE_NO_VALIDO);
 			}
 			
-			plaza.setDuracionPrevista(Formateador.leeParametroString(BolsaEmpleoUtils.getParamRequestOrMultipart(
+			plaza.setDuracionPrevista(Formateador.leeParametroString(BolsaEmpleoUtils.getParamRequestOrMultipartOrSession(
 					request, parametros, PARAM_DURACION_PREVISTA)));
 			if (plaza.getDuracionPrevista().length() > ModeloPlazaOfertada.COLUMN_DURACION_PREVISTA_MAXLENGTH) {
 				throw new UVException(MENSAJE_ERROR_DURACION_PREVISTA_LARGA);
 			}
 			
-			plaza.setFechaFinOferta(BolsaEmpleoUtils.leeParametroFechaHora(BolsaEmpleoUtils.getParamRequestOrMultipart(
+			plaza.setFechaFinOferta(BolsaEmpleoUtils.leeParametroFechaHora(BolsaEmpleoUtils.getParamRequestOrMultipartOrSession(
 					request, parametros, PARAM_FECHA_FIN_OFERTA), "/", ":"));
 			
 			plaza.setNri((InputStream) parametros.get(PARAM_NRI));

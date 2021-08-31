@@ -17,15 +17,15 @@ UVDatos uvdatos = (UVDatos) request.getAttribute(UVDatos.NOMBRE_ATRIBUTO);
 VistaContratacion bean = (VistaContratacion) uvdatos.getVistas().get(VistaContratacion.class.getName());
 PlazaOfertada plaza = bean.getPlazaOfertada();
 boolean personal = bean.getUsuarioLogeado().isServicioPersonal();
-boolean tablaCandidatos = !plaza.getEstado().contains(ModeloPlazaOfertada.PLAZA_ESTADO_CREACION) && personal;
+boolean tablaCandidatos = !plaza.getEstado().contains(ModeloPlazaOfertada.PLAZA_ESTADO_CREACION) && !plaza.getEstado().contains(ModeloPlazaOfertada.PLAZA_ESTADO_TRAMITACION)  && personal;
 boolean editable = plaza.getEstado().contains(ModeloPlazaOfertada.PLAZA_ESTADO_CREACION) || (plaza.getEstado().contains(ModeloPlazaOfertada.PLAZA_ESTADO_TRAMITACION) && personal);
 
 String area = BolsaEmpleoUtils.getParamForm(request, ControladorContratacion.PARAM_AREA, plaza.getArea().getCodNum().toString());
-String dedicacion = BolsaEmpleoUtils.getParamForm(request, ControladorContratacion.PARAM_DEDICACION, plaza.getDedicacion().getCodNum().toString());
+String dedicacion = BolsaEmpleoUtils.getParamForm(request, ControladorContratacion.PARAM_DEDICACION, plaza.getDedicacion() != null ? plaza.getDedicacion().getCodNum().toString() : "");
 String justificacion = BolsaEmpleoUtils.getParamForm(request, ControladorContratacion.PARAM_JUSTIFICACION, EscapaHTML.escapa(plaza.getJustificacion()));
 String duracionPrevista = BolsaEmpleoUtils.getParamForm(request, ControladorContratacion.PARAM_DURACION_PREVISTA, EscapaHTML.escapa(plaza.getDuracionPrevista()));
-String cuatrimestre = BolsaEmpleoUtils.getParamForm(request, ControladorContratacion.PARAM_CUATRIMESTRE, EscapaHTML.escapa(plaza.getCuatrimestre()));
-String centroDestino = BolsaEmpleoUtils.getParamForm(request, ControladorContratacion.PARAM_CUATRIMESTRE, EscapaHTML.escapa(plaza.getCuatrimestre()));
+String cuatrimestre = BolsaEmpleoUtils.getParamForm(request, ControladorContratacion.PARAM_CUATRIMESTRE, plaza.getCuatrimestre());
+String centroDestino = BolsaEmpleoUtils.getParamForm(request, ControladorContratacion.PARAM_CENTRO_DESTINO, EscapaHTML.escapa(plaza.getCentroDestino()));
 String fechaFinOferta = BolsaEmpleoUtils.getParamForm(request, ControladorContratacion.PARAM_FECHA_FIN_OFERTA, plaza.getFechaFinOferta() != null ? Formateador.formatoFecha(plaza.getFechaFinOferta(), Formateador.FORMATO_FECHA_DDMMYYYY_HHMMSS) : "");
 %>
 
@@ -34,7 +34,7 @@ String fechaFinOferta = BolsaEmpleoUtils.getParamForm(request, ControladorContra
 	
 	<h2>Editar plaza ofertada</h2>
 	
-	<h4>Estado: <%= plaza.getEstado() %></h4>
+	<h4>Id: <%= plaza.getCodNum() %><br/>Estado: <%= plaza.getEstado() %><br/><%= plaza.getFechaAbierta() != null ? "Fecha abierta: " + Formateador.formatoFecha(plaza.getFechaAbierta(), Formateador.FORMATO_FECHA_DDMMYYYY_HHMMSS) : "" %></h4>
 	
 	<p>Las etiquetas en <strong>negrita</strong> corresponden a campos de relleno obligatorio</p>
 	
@@ -68,13 +68,14 @@ String fechaFinOferta = BolsaEmpleoUtils.getParamForm(request, ControladorContra
 				<select id="plaza_dedicacion" name="<%=ControladorContratacion.PARAM_DEDICACION%>" style="width:100%;" <%= personal && editable ? "" : "readonly disabled" %>>
 					<option value="">----------------</option>
 				<%	for(Dedicacion ded: bean.getListaDedicaciones()) { %>
-						<option value="<%=ded.getCodNum()%>" <%= Integer.parseInt(dedicacion) == ded.getCodNum() ? "selected" : "" %>><%= ded.getTexto() %></option>
+						<option value="<%=ded.getCodNum()%>" <%= !dedicacion.isEmpty() && Integer.parseInt(dedicacion) == ded.getCodNum() ? "selected" : "" %>><%= ded.getTexto() + " - Sueldo: " + ded.getSueldo() %></option>
 				<%	} %>
 				</select>
 			</div>
 			<div class="form-group">
 				<label for="plaza_cuatrimestre">Cuatrimestre:</label>
 				<select id="plaza_cuatrimestre" name="<%=ControladorContratacion.PARAM_CUATRIMESTRE%>" style="width:100%;" <%= personal && editable ? "" : "readonly disabled" %>>
+						<option value="">----------------</option>
 				<%	for (Entry<String, String> cua: ModeloPlazaOfertada.CUATRIMESTRES.entrySet()) { %>
 						<option value="<%= cua.getKey() %>" <%= cuatrimestre != null && cuatrimestre.equals(cua.getKey()) ? "selected" : "" %>><%= cua.getValue() %></option>
 				<%	} %>
@@ -268,7 +269,8 @@ $(document).ready(function() {
 			var inputFechaFin = document.getElementById("plaza_fecha_fin_oferta");
 			console.log(inputFechaFin.value);
 			if (inputFechaFin.value.length == 0) {
-				Atis.alertDialog("Abrir plaza", "El campo fecha fin oferta es requerido para abrir la plaza.");
+				inputFechaFin.setCustomValidity("La fecha fin de la oferta no puede estar vacía para abrir la plaza");
+				inputFechaFin.reportValidity();
 			} else {
 				Atis.confirmDialog("¿Abrir plaza?", "Una vez abierta la plaza no se podrá editar y se cerrará automáticamente en la fecha fin de la oferta indicada.", {
 					'Si': function(row) {

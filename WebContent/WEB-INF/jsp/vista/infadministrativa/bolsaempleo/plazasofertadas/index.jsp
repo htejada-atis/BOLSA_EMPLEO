@@ -1,10 +1,12 @@
 <%@ page trimDirectiveWhitespaces="true" %>
 <%@ page import="es.ujaen.uvirtual.beans.UVDatos" %>
 <%@	page import="es.ujaen.uvirtual.modulo.bolsaempleo.controlador.candidato.ControladorPlazasOfertadas" %>
+<%@	page import="es.ujaen.uvirtual.modulo.bolsaempleo.modelo.ModeloPlazaOfertada" %>
 <%@ page import="es.ujaen.uvirtual.modulo.bolsaempleo.vistas.VistaPlazasOfertadas" %>
 <%@ page import="es.ujaen.uvirtual.modulo.bolsaempleo.beans.OfertaCandidato" %>
 <%@ page import="es.ujaen.uvirtual.utilidades.EscapaHTML" %>
 <%@ page import="es.ujaen.uvirtual.utilidades.Formateador" %>
+<%@ page import="java.util.Map.Entry" %>
 
 <% 
 UVDatos uvdatos = (UVDatos) request.getAttribute(UVDatos.NOMBRE_ATRIBUTO);
@@ -20,6 +22,7 @@ VistaPlazasOfertadas bean = (VistaPlazasOfertadas) uvdatos.getVistas().get(Vista
 	
 	<table class="bluetable bolsaempleo" id="tablePlazasOfertadas">
 		<tr>
+			<th scope="col" style="width:30px">Id</th>
 			<th scope="col" style="width:100%">Área</th>
 			<th scope="col" style="width:95px">Estado</th>
 			<th scope="col" style="width:100px">Fecha fin oferta</th>
@@ -29,7 +32,7 @@ VistaPlazasOfertadas bean = (VistaPlazasOfertadas) uvdatos.getVistas().get(Vista
 		</tbody>
 		<tfoot>
 			<tr>
-				<th colSpan="4" style="width:100%"></th>
+				<th colSpan="5" style="width:100%"></th>
 			</tr>
 		</tfoot>
 	</table>
@@ -38,6 +41,7 @@ VistaPlazasOfertadas bean = (VistaPlazasOfertadas) uvdatos.getVistas().get(Vista
 		<table class="bluetable bolsaempleo" id="tableOfertasPreferentes">
 			<caption>Plazas aceptadas por preferencia</caption>
 			<tr>
+				<th scope="col" style="width:30px">Id</th>
 				<th scope="col" style="width:100%">Área</th>
 				<th scope="col" style="width:95px">Estado</th>
 				<th scope="col" style="width:100px" class="center">Confirmación</th>
@@ -46,6 +50,7 @@ VistaPlazasOfertadas bean = (VistaPlazasOfertadas) uvdatos.getVistas().get(Vista
 			<tbody>
 			<%	for (OfertaCandidato ofertaCandidato: bean.getListaOfertasCandidatos()) { %>
 					<tr class="oferta_row" data-id="<%= ofertaCandidato.getCodNum() %>">
+						<td><%= ofertaCandidato.getPlaza().getCodNum() %></td>
 						<td><%= ofertaCandidato.getPlaza().getArea().getIdAreaExterno() + " " + ofertaCandidato.getPlaza().getArea().getDescripcion() %></td>
 						<td><%= ofertaCandidato.getPlaza().getEstado() %></td>
 						<td class="center"><%= ofertaCandidato.isResultado() ? "<div title='Aceptada' class='circle-true'></div>" : "<div title='Rechazada' class='circle-false'></div>" %></td>
@@ -57,7 +62,7 @@ VistaPlazasOfertadas bean = (VistaPlazasOfertadas) uvdatos.getVistas().get(Vista
 			</tbody>
 			<tfoot>
 				<tr>
-					<th colSpan="4" style="width:100%"></th>
+					<th colSpan="5" style="width:100%"></th>
 				</tr>
 			</tfoot>
 		</table>
@@ -69,6 +74,11 @@ VistaPlazasOfertadas bean = (VistaPlazasOfertadas) uvdatos.getVistas().get(Vista
 	
 <script>
 $(document).ready(function() {
+	
+	var estadosPlaza = {};
+	<%	for (Entry<String, String> est: ModeloPlazaOfertada.ESTADOS.entrySet()) { %>
+			estadosPlaza["<%= est.getKey() %>"] = "<%= est.getValue() %>";
+	<%	} %>
 	
 	var table = new Atis.DataTable('#tablePlazasOfertadas', {
 		"ajax": { url: "<%= ControladorPlazasOfertadas.URL_PATTERN_AJAX %>" },
@@ -83,10 +93,11 @@ $(document).ready(function() {
 			Atis.sendForm("<%= request.getRequestURI() %>", params);
 		}},
 		"columns": [
+			{'data': 'plaza.codNum', 'filter': {'type': 'number'}},
 			{'data': 'plaza.area.idAreaExterno', 'filter': true, 'render': function(row) {
 				return row.plaza.area.idAreaExterno + ' ' + row.plaza.area.descripcion;
 			}},
-			{'data': 'plaza.estado', 'filter': true},
+			{'data': 'plaza.estado', 'filter': {'type': 'select', 'options': estadosPlaza}},
 			{'data': 'plaza.fechaFinOferta', 'filter': {'type': 'date'}},
 			{'data': 'resultado', 'render': function(row) {
 				if (row.resultado == true) {

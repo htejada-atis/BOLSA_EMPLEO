@@ -21,13 +21,11 @@ import es.ujaen.uvirtual.beans.UVDatos;
 import es.ujaen.uvirtual.beans.Usuario;
 import es.ujaen.uvirtual.modulo.bolsaempleo.beans.Destinatario;
 import es.ujaen.uvirtual.modulo.bolsaempleo.beans.Mensaje;
-import es.ujaen.uvirtual.modulo.bolsaempleo.beans.Plantilla;
 import es.ujaen.uvirtual.modulo.bolsaempleo.beans.UsuarioBolsaEmpleo;
 import es.ujaen.uvirtual.modulo.bolsaempleo.modelo.ModeloArea;
 import es.ujaen.uvirtual.modulo.bolsaempleo.modelo.ModeloConvocatoria;
 import es.ujaen.uvirtual.modulo.bolsaempleo.modelo.ModeloMensajes;
 import es.ujaen.uvirtual.modulo.bolsaempleo.modelo.ModeloParametrosConfiguracion;
-import es.ujaen.uvirtual.modulo.bolsaempleo.modelo.ModeloPlantilla;
 import es.ujaen.uvirtual.modulo.bolsaempleo.modelo.ModeloRol;
 import es.ujaen.uvirtual.modulo.bolsaempleo.modelo.ModeloUsuarioBolsaEmpleo;
 import es.ujaen.uvirtual.modulo.bolsaempleo.utilidades.BolsaEmpleoDataTable;
@@ -63,25 +61,20 @@ public class ControladorMensajes extends HttpServlet {
 	public static final String PARAM_GUARDAR = "guardar";
 	public static final String PARAM_MENSAJE_ID = "mensaje";
 	public static final String PARAM_NOMBRE = "nombre";
+	public static final String PARAM_PLANTILLA = "plantilla";
 	public static final String PARAM_TITULO = "titulo";
 	
 	// acciones
 	public static final String ACCION_AGREGAR_DESTINATARIOS = "agregardestinatarios";
 	public static final String ACCION_BORRAR_MENSAJE = "borrarMensaje";
 	public static final String ACCION_DATATABLE = "datatable";
-	public static final String ACCION_DATATABLE_PLANTILLAS = "datatableplantillas";
 	public static final String ACCION_DATATABLE_DESTINATARIOS = "datatableDestinatarios";
 	public static final String ACCION_DATATABLE_DESTINATARIOS_DISPONIBLES = "datatableDestinatariosDisponibles";
 	public static final String ACCION_DETALLE_MENSAJE = "detalleMensaje";
-	public static final String ACCION_DETALLE_PLANTILLA = "detallePlantilla";
-	public static final String ACCION_EDITAR_PLANTILLA = "editarplantilla";
 	public static final String ACCION_ELIMINAR_DESTINATARIOS = "eliminardestinatarios";
-	public static final String ACCION_ELIMINAR_PLANTILLA = "eliminarplantilla";
 	public static final String ACCION_ENVIAR_MENSAJE = "enviarmensaje";
 	public static final String ACCION_INDEX = "index";
-	public static final String ACCION_LISTAR_PLANTILLAS = "listarplantillas";
 	public static final String ACCION_MODIFICAR_MENSAJE = "modificarMensaje";
-	public static final String ACCION_NUEVA_PLANTILLA = "nuevaPlantilla";
 	public static final String ACCION_NUEVO_MENSAJE = "nuevoMensaje";
 		
 	// mensajes
@@ -97,15 +90,11 @@ public class ControladorMensajes extends HttpServlet {
 	public static final String MENSAJE_EXITO_DESTINATARIO_BORRADO = "Destinatario borrado correctamente";
 	public static final String MENSAJE_EXITO_ENVIADO = "Mensaje enviado correctamente";
 	public static final String MENSAJE_EXITO_MENSAJE_GUARDADO = "Mensaje guardado correctamente";
-	public static final String MENSAJE_EXITO_PLANTILLA_EDITADA = "Plantilla editada correctamente";
-	public static final String MENSAJE_EXITO_PLANTILLA_NUEVA = "Plantilla creada correctamente";
 
 	// ruta vistas
 	public static final String RUTA_BEP_MEN = "/WEB-INF/jsp/vista/infadministrativa/bolsaempleo/configuracion/mensajeria/";
 	public static final String JSP_INDEX = RUTA_BEP_MEN + "index.jsp"; 
 	public static final String JSP_DETALLE = RUTA_BEP_MEN + "formMensaje.jsp";
-	public static final String JSP_LISTA_PLANTILLAS = RUTA_BEP_MEN + "listaPlantillas.jsp";
-	public static final String JSP_PLANTILLA = RUTA_BEP_MEN + "formPlantilla.jsp";
 
 	// ajax
 	public static final String URL_PATTERN_AJAX = "/srv/es/ajax/informacionadministrativa/bolsaempleo/configuracion/mensajeria";
@@ -152,18 +141,6 @@ public class ControladorMensajes extends HttpServlet {
 					break;
 				case ACCION_DATATABLE:
 					listadoMensajes(bean, datos, request, response);
-					break;
-				case ACCION_DATATABLE_PLANTILLAS:
-					listadoPlantillas(bean, datos, request, response);
-					break;
-				case ACCION_EDITAR_PLANTILLA:
-					editarPlantilla(bean, datos, request, response);
-					break;
-				case ACCION_LISTAR_PLANTILLAS:
-					bean.setVista(JSP_LISTA_PLANTILLAS);
-					break;
-				case ACCION_NUEVA_PLANTILLA:
-					nuevaPlantilla(bean, datos, request, response);
 					break;
 				case ACCION_NUEVO_MENSAJE:
 					nuevoMensaje(bean, datos, request, response);
@@ -499,91 +476,6 @@ public class ControladorMensajes extends HttpServlet {
 		}
 		
 		return mensaje;
-	}
-	
-	///////////////////////////////////////////////////////////////////////////////////////////////////////////
-	// PLANTILLAS
-	///////////////////////////////////////////////////////////////////////////////////////////////////////////
-	
-	private void editarPlantilla(VistaMensajes bean, UVDatos datos, HttpServletRequest request, HttpServletResponse response)
-			throws UVException, IOException, SQLException {
-		bean.setVista(JSP_PLANTILLA);
-		
-		if (request.getParameter(PARAM_ENVIAR) != null) {
-			ModeloPlantilla modelo = ModeloPlantilla.obtenerInstancia();
-			
-			Plantilla plantilla = getValidatorPlantilla(request);
-			modelo.actualizarPlantilla(plantilla, bean.getUsuarioLogeado());
-			
-			BolsaEmpleoUtils.addMensajeDeExito(MENSAJE_EXITO_PLANTILLA_EDITADA, bean, request);
-			redireccionAPlantillas(datos, request, response);
-		}
-	}
-	
-	private void nuevaPlantilla(VistaMensajes bean, UVDatos datos, HttpServletRequest request, HttpServletResponse response) throws SQLException, UVException, IOException {
-		bean.setVista(JSP_PLANTILLA);
-		
-		if (request.getParameter(PARAM_ENVIAR) != null) {
-			ModeloPlantilla modelo = ModeloPlantilla.obtenerInstancia();
-
-			Plantilla plantilla = getValidatorPlantilla(request);
-			modelo.nuevaPlantilla(plantilla, bean.getUsuarioLogeado());
-			
-			BolsaEmpleoUtils.addMensajeDeExito(MENSAJE_EXITO_PLANTILLA_NUEVA, bean, request);
-			redireccionAPlantillas(datos, request, response);
-		}
-	}
-	
-	private void redireccionAPlantillas(UVDatos datos, HttpServletRequest request, HttpServletResponse response)
-			throws IOException {
-		Map<String, String> params = new HashMap<>();
-		params.put(PARAM_ACCION, ACCION_LISTAR_PLANTILLAS);
-		BolsaEmpleoUtils.redirectWithParams(datos, request, response, params);
-	}
-	
-	private void listadoPlantillas(VistaMensajes bean, UVDatos datos, HttpServletRequest request, HttpServletResponse response) throws IOException {
-		datos.setRespuestaEnviada(true);
-		datos.setContentType(RESPONSE_AJAX_CONTENTTYPE);
-		response.setContentType(RESPONSE_AJAX_CONTENTTYPE);
-		response.setCharacterEncoding(RESPONSE_AJAX_ENCODING);
-
-		try (PrintWriter writer = response.getWriter()) {
-			try {
-				BolsaEmpleoDataTable<Plantilla> dataTable = ModeloPlantilla.obtenerInstancia().listaPlantillasDatatable(request.getParameterMap());
-				bean.setDataTablePlantillas(dataTable);
-				writer.write(dataTable.toJson("dd/M/yyyy HH:mm:ss"));
-			} catch (UVException | SQLException e) {
-				if (e instanceof SQLException) {
-					LOGGER.log(Level.SEVERE, Formateador.getStackTrace(e));
-					LOGGER.log(Level.SEVERE, e.toString());
-				} else {
-					LOGGER.log(Level.WARNING, e.toString());
-				}
-				bean.getMensajesDeError().add(e.getMessage());
-				CodigoDescripcion mensaje = new CodigoDescripcion(RESPONSE_AJAX_ERROR, e.getMessage());
-				writer.write(new Gson().toJson(mensaje));
-				response.setStatus(RESPONSE_AJAX_HTTP_CODE_ERROR);
-			}
-		}
-	}
-	
-	private Plantilla getValidatorPlantilla(HttpServletRequest request) throws UVException {
-		Plantilla plantilla = new Plantilla();
-		
-		plantilla.setTitulo(EscapaHTML.ajustaCodificacion(request.getParameter(PARAM_TITULO)));
-		if (plantilla.getTitulo() == null || plantilla.getTitulo().isBlank()) {
-			throw new UVException(MENSAJE_ERROR_TITULO_VACIO);
-		}
-		if (plantilla.getTitulo().length() > ModeloPlantilla.PLANTILLAS_COLUMN_TITULO_MAXLENGTH) {
-			throw new UVException(String.format(MENSAJE_ERROR_TITULO_LARGO, ModeloPlantilla.PLANTILLAS_COLUMN_TITULO_MAXLENGTH));
-		}
-		
-		plantilla.setCuerpo(EscapaHTML.ajustaCodificacion(request.getParameter(PARAM_CUERPO)));
-		if (plantilla.getCuerpo() == null || plantilla.getCuerpo().isBlank()) {
-			throw new UVException(MENSAJE_ERROR_CUERPO_VACIO);
-		}
-		
-		return plantilla;
 	}
 	
 }

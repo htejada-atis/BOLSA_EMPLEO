@@ -9,10 +9,13 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import es.ujaen.uvirtual.modelo.conexion.ConexionUvirtual;
+import es.ujaen.uvirtual.modulo.bolsaempleo.beans.Mensaje;
 import es.ujaen.uvirtual.modulo.bolsaempleo.beans.Plantilla;
+import es.ujaen.uvirtual.modulo.bolsaempleo.beans.PlazaOfertada;
 import es.ujaen.uvirtual.modulo.bolsaempleo.beans.UsuarioBolsaEmpleo;
 import es.ujaen.uvirtual.modulo.bolsaempleo.utilidades.BolsaEmpleoDataTable;
 import es.ujaen.uvirtual.modulo.bolsaempleo.utilidades.BolsaEmpleoUtils;
+import es.ujaen.uvirtual.utilidades.Formateador;
 import es.ujaen.uvirtual.utilidades.UVException;
 
 /**
@@ -25,6 +28,7 @@ public class ModeloPlantilla {
 	public static final int PLANTILLAS_COLUMN_INDEX_CODNUM = 0;
 	public static final int PLANTILLAS_COLUMN_INDEX_NOMBRE = 1;
 	
+	public static final int PLANTILLAS_COLUMN_NOMBRE_MAXLENGTH = 150;
 	public static final int PLANTILLAS_COLUMN_TITULO_MAXLENGTH = 500;
 	
 	public static final String CUERPO = "CUERPO";
@@ -175,10 +179,112 @@ public class ModeloPlantilla {
 			stmt.executeUpdate();
 		}
 	}
+	
+	/** Elimina una plantilla .
+	 * @param plantilla a borrar .
+	 * @param usuarioDelete .
+	 * @throws SQLException en caso de error en la BD .
+	 * @throws UVException  si fichero no es válido .
+	 */
+	public void borraPlantilla(Plantilla plantilla, UsuarioBolsaEmpleo usuarioDelete) throws SQLException, UVException {
+		if (plantilla == null) {
+			throw new UVException(MENSAJE_ERROR_PLANTILLA_NULL);
+		}
+		if (plantilla.getCodNum() == null) {
+			throw new UVException("No se puede eliminar una plantilla con id vacío");
+		}
+		
+		try (Connection conexion = ConexionUvirtual.obtenerInstancia()) {
+			String consultaUpdate = "UPDATE TBEP_PLANTILLAS SET UID_USUARIO=? WHERE CODNUM = ?";
+			try (PreparedStatement stmt = conexion.prepareStatement(consultaUpdate)) {
+				int parameterIndex = 1;
+				stmt.setString(parameterIndex++, usuarioDelete.getCodCuenta());
+				stmt.setInt(parameterIndex++, plantilla.getCodNum());
+				stmt.executeUpdate();
+			}
+			
+			String consulta = "DELETE FROM TBEP_PLANTILLAS WHERE CODNUM = ? ";
+			try (PreparedStatement stmt = conexion.prepareStatement(consulta)) {
+				int parameterIndex = 1;
+				stmt.setInt(parameterIndex++, plantilla.getCodNum());
+				stmt.executeUpdate();
+			}
+		}
+	}
+	
+	public Integer insertarMensajeDePlantilla(Mensaje mensaje, UsuarioBolsaEmpleo usuarioUpdate, Connection conexion) throws SQLException {
+		String consultaInsertMsg = String.format("INSERT INTO TBEP_MENSAJES (%s,%s,%s,%s,%s) VALUES (?,?,?,?,?)", 
+				"TITULO", "CUERPO", "FECHA_CREACION", "ESTADO", "UID_USUARIO");
+		
+		try (PreparedStatement stmt = conexion.prepareStatement(consultaInsertMsg, new String[] {CODNUM})) {
+			int parameterIndex = 1;
 
-	private Plantilla createPlantillaFromResultSet(ResultSet rs) throws SQLException, IOException {
+			stmt.setString(parameterIndex++, mensaje.getTitulo());
+			stmt.setClob(parameterIndex++, BolsaEmpleoUtils.stringToClob(mensaje.getCuerpo(), conexion));
+			stmt.setDate(parameterIndex++, new java.sql.Date(mensaje.getFechaCreacion().getTime()));
+			stmt.setString(parameterIndex++, mensaje.getEstado());
+			stmt.setString(parameterIndex++, usuarioUpdate.getCodCuenta());
+			stmt.executeUpdate();
+			
+			ResultSet rs = stmt.getGeneratedKeys();
+			rs.next();
+			
+			return rs.getInt(1);
+		}
+	}
+	
+	public String reemplazaPlazaEnPlantilla(PlazaOfertada plaza, String texto) {
+		texto = texto.replaceAll("<<idplaza>>", plaza.getCodNum().toString());
+		texto = texto.replaceAll("<<area>>", plaza.getArea().getDescripcion());
+		texto = texto.replaceAll("<<justificacion>>", plaza.getJustificacion());
+		texto = texto.replaceAll("<<duracion_prevista>>", plaza.getDuracionPrevista());
+		texto = texto.replaceAll("<<dedicacion>>", plaza.getDedicacion().getTexto());
+		texto = texto.replaceAll("<<cuatrimestre>>", plaza.getCuatrimestre());
+		texto = texto.replaceAll("<<sueldo>>", plaza.getDedicacion().getSueldo().toString());
+		texto = texto.replaceAll("<<centro_destino>>", plaza.getCentroDestino());
+		texto = texto.replaceAll("<<hora_fin_oferta>>", Formateador.formatoFecha(plaza.getFechaFinOferta(), Formateador.FORMATO_FECHA_HORA_MINUTOS));
+		texto = texto.replaceAll("<<fecha_fin_oferta>>", Formateador.formatoFecha(plaza.getFechaFinOferta(), Formateador.FORMATO_FECHA_DDMMYYYY));
+		return texto;
+	}
+	
+	public String reemplazaPlazaYCitaEnPlantilla(PlazaOfertada plaza, java.util.Date fechaCita, String texto) {
+		texto = texto.replaceAll("<<idplaza>>", plaza.getCodNum().toString());
+		texto = texto.replaceAll("<<area>>", plaza.getArea().getDescripcion());
+		texto = texto.replaceAll("<<justificacion>>", plaza.getJustificacion());
+		texto = texto.replaceAll("<<duracion_prevista>>", plaza.getDuracionPrevista());
+		texto = texto.replaceAll("<<dedicacion>>", plaza.getDedicacion().getTexto());
+		texto = texto.replaceAll("<<cuatrimestre>>", plaza.getCuatrimestre());
+		texto = texto.replaceAll("<<sueldo>>", plaza.getDedicacion().getSueldo().toString());
+		texto = texto.replaceAll("<<centro_destino>>", plaza.getCentroDestino());
+		texto = texto.replaceAll("<<hora_fin_oferta>>", Formateador.formatoFecha(plaza.getFechaFinOferta(), Formateador.FORMATO_FECHA_HORA_MINUTOS));
+		texto = texto.replaceAll("<<fecha_fin_oferta>>", Formateador.formatoFecha(plaza.getFechaFinOferta(), Formateador.FORMATO_FECHA_DDMMYYYY));
+		texto = texto.replaceAll("<<hora_cita>>", Formateador.formatoFecha(fechaCita, Formateador.FORMATO_FECHA_HORA_MINUTOS));
+		texto = texto.replaceAll("<<fecha_cita>>", Formateador.formatoFecha(fechaCita, Formateador.FORMATO_FECHA_DDMMYYYY));
+		return texto;
+	}
+	
+	public String reemplazaPlazaYCandidatoEnPlantilla(PlazaOfertada plaza, UsuarioBolsaEmpleo candidato, String texto) {
+		texto = texto.replaceAll("<<idplaza>>", plaza.getCodNum().toString());
+		texto = texto.replaceAll("<<area>>", plaza.getArea().getDescripcion());
+		texto = texto.replaceAll("<<justificacion>>", plaza.getJustificacion());
+		texto = texto.replaceAll("<<duracion_prevista>>", plaza.getDuracionPrevista());
+		texto = texto.replaceAll("<<dedicacion>>", plaza.getDedicacion().getTexto());
+		texto = texto.replaceAll("<<cuatrimestre>>", plaza.getCuatrimestre());
+		texto = texto.replaceAll("<<sueldo>>", plaza.getDedicacion().getSueldo().toString());
+		texto = texto.replaceAll("<<centro_destino>>", plaza.getCentroDestino());
+		texto = texto.replaceAll("<<hora_fin_oferta>>", Formateador.formatoFecha(plaza.getFechaFinOferta(), Formateador.FORMATO_FECHA_HORA_MINUTOS));
+		texto = texto.replaceAll("<<fecha_fin_oferta>>", Formateador.formatoFecha(plaza.getFechaFinOferta(), Formateador.FORMATO_FECHA_DDMMYYYY));
+		texto = texto.replaceAll("<<apellidos_candidato>>", candidato.getPrimerApellido() + " " + candidato.getSegundoApellido());
+		texto = texto.replaceAll("<<nombre_candidato>>", candidato.getNombre());
+		texto = texto.replaceAll("<<NIF_candidato>>", candidato.getPrsNif());
+		texto = texto.replaceAll("<<email_candidato>>", candidato.getEmail());
+		return texto;
+	}
+
+	public Plantilla createPlantillaFromResultSet(ResultSet rs) throws SQLException, IOException {
 		Plantilla plantilla = new Plantilla();
 		plantilla.setCodNum(rs.getInt(CODNUM));
+		plantilla.setNombre(rs.getString(NOMBRE));
 		plantilla.setTitulo(rs.getString(TITULO));
 		plantilla.setCuerpo(BolsaEmpleoUtils.clobToString(rs.getClob(CUERPO)));
 		return plantilla;

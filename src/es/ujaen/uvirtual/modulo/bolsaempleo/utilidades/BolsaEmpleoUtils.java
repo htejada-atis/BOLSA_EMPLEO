@@ -479,18 +479,18 @@ public final class BolsaEmpleoUtils {
 		response.sendRedirect(ControladorErrorBolsaEmpleo.URL_ERROR);
 	}
 	
-	/** Devuelve un parámetro de multipart form y si no, leemos lo que viene del request.
+	/** Devuelve un parámetro de multipart form, si no de la sesión y si no, leemos lo que viene del request.
 	 * @param request .
 	 * @param multipart .
 	 * @param param .
 	 * @return .
 	 */
-	public static String getParamRequestOrMultipart(HttpServletRequest request, HashMap<String, Object> multipart, String param) {
+	public static String getParamRequestOrMultipartOrSession(HttpServletRequest request, HashMap<String, Object> multipart, String param) {
 		if (multipart.keySet().size() > 0 && multipart.containsKey(param)) {
 			return (String) multipart.get(param);
 		}
 		
-		return request.getParameter(param);
+		return getParamRequestOrSession(request, param);
 	}
 
 	/**

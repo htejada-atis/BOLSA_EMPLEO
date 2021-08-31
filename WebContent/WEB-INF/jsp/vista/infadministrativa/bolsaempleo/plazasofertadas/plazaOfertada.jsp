@@ -22,6 +22,8 @@ OfertaCandidato oferta = bean.getOfertaCandidato();
 	
 	<h2>Plaza ofertada<%= oferta.isResultado() == null ? "" : oferta.isResultado() ? " - Aceptada" : " - Rechazada" %></h2>
 	
+	<h4>Id: <%= oferta.getPlaza().getCodNum() %><br/><%= oferta.getPlaza().getFechaAbierta() != null ? "Fecha abierta: " + Formateador.formatoFecha(oferta.getPlaza().getFechaAbierta(), Formateador.FORMATO_FECHA_DDMMYYYY_HHMMSS) : "" %></h4>
+	
 	<form id="plaza_ofertada" class="be-form" method="post" action="<%=request.getRequestURI()%>">
 		<div class="form-group-container col2">
 			<div class="form-group">
@@ -84,7 +86,12 @@ OfertaCandidato oferta = bean.getOfertaCandidato();
 			</div>
 		<%	} %>
 		<div class="form-group-container col2">
-			<div class="form-group"></div>
+			<div class="form-group">
+			<%	if (oferta.isResultado() != null) { %>
+					<br/>
+					<button id="plaza_volver" style="float:left;">Volver</button>
+			<%	} %>
+			</div>
 			<div class="form-group">
 			<%	if (oferta.isResultado() == null) { %>
 					<button id="plaza_rechazar" style="float:right; margin-left: 12px;">Rechazar oferta</button>
@@ -108,39 +115,44 @@ $(document).ready(function() {
 <%	} %>
 
 <%	if (oferta.isResultado() == null) { %>
-	document.getElementById("plaza_aceptar").addEventListener("click", function(event) {
-		event.preventDefault();
-		Atis.confirmDialog("Aceptar plaza", "Al aceptar confirma que está interesado y entrará en el proceso de selección para la plaza.", {
-				'Si': function(row) {
-					var params = {
-							'<%= ControladorPlazasOfertadas.PARAM_ACCION %>': '<%= ControladorPlazasOfertadas.ACCION_ACEPTAR_PLAZA %>',
-							'<%= ControladorPlazasOfertadas.PARAM_PLAZA_OFERTADA %>': <%= oferta.getPlaza().getCodNum() %>
-					};
-					Atis.sendForm("<%= request.getRequestURI() %>", params);
-					$(this).dialog("close");
-				},
-				'No': function() {
-					$(this).dialog("close");
-				}
+		document.getElementById("plaza_aceptar").addEventListener("click", function(event) {
+			event.preventDefault();
+			Atis.confirmDialog("Aceptar plaza", "Al aceptar confirma que está interesado y entrará en el proceso de selección para la plaza.", {
+					'Si': function(row) {
+						var params = {
+								'<%= ControladorPlazasOfertadas.PARAM_ACCION %>': '<%= ControladorPlazasOfertadas.ACCION_ACEPTAR_PLAZA %>',
+								'<%= ControladorPlazasOfertadas.PARAM_PLAZA_OFERTADA %>': <%= oferta.getPlaza().getCodNum() %>
+						};
+						Atis.sendForm("<%= request.getRequestURI() %>", params);
+						$(this).dialog("close");
+					},
+					'No': function() {
+						$(this).dialog("close");
+					}
+			});
 		});
-	});
-	
-	document.getElementById("plaza_rechazar").addEventListener("click", function(event) {
-		event.preventDefault();
-		Atis.confirmDialog("Rechazar plaza", "Al rechazar confirma que no está interesado por lo que no podrá optar a la plaza.", {
-				'Si': function(row) {
-					var params = {
-							'<%= ControladorPlazasOfertadas.PARAM_ACCION %>': '<%= ControladorPlazasOfertadas.ACCION_RECHAZAR_PLAZA %>',
-							'<%= ControladorPlazasOfertadas.PARAM_PLAZA_OFERTADA %>': <%= oferta.getPlaza().getCodNum() %>
-					};
-					Atis.sendForm("<%= request.getRequestURI() %>", params);
-					$(this).dialog("close");
-				},
-				'No': function() {
-					$(this).dialog("close");
-				}
+		
+		document.getElementById("plaza_rechazar").addEventListener("click", function(event) {
+			event.preventDefault();
+			Atis.confirmDialog("Rechazar plaza", "Al rechazar confirma que no está interesado por lo que no podrá optar a la plaza.", {
+					'Si': function(row) {
+						var params = {
+								'<%= ControladorPlazasOfertadas.PARAM_ACCION %>': '<%= ControladorPlazasOfertadas.ACCION_RECHAZAR_PLAZA %>',
+								'<%= ControladorPlazasOfertadas.PARAM_PLAZA_OFERTADA %>': <%= oferta.getPlaza().getCodNum() %>
+						};
+						Atis.sendForm("<%= request.getRequestURI() %>", params);
+						$(this).dialog("close");
+					},
+					'No': function() {
+						$(this).dialog("close");
+					}
+			});
 		});
-	});	
+<%	} else { %>
+		document.getElementById("plaza_volver").addEventListener("click", function(event) {
+			event.preventDefault();
+			Atis.sendForm("<%= request.getRequestURI() %>", {'<%= ControladorPlazasOfertadas.PARAM_ACCION %>': '<%= ControladorPlazasOfertadas.ACCION_INDEX %>'});
+		});
 <%	} %>
 	
 });

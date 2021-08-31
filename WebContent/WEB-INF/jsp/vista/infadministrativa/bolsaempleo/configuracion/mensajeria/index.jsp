@@ -15,10 +15,7 @@ VistaMensajes bean = (VistaMensajes) uvdatos.getVistas().get(VistaMensajes.class
 	
 	<div class="titulo-bolsa-empleo">
 		<h2>Mensajes</h2>
-		<div>
-			<button class="link-btn" id="plantillas">Plantillas</button>
-			<button class="link-btn" id="nuevo_mensaje" style="margin-left: 4px">Nuevo mensaje</button>
-		</div>
+		<button class="link-btn" id="nuevo_mensaje" style="margin-left: 4px">Nuevo mensaje</button>
 	</div>
 	
 	<table class="bluetable bolsaempleo" id="tableMensajes">
@@ -44,11 +41,6 @@ $(document).ready(function() {
 	document.getElementById('nuevo_mensaje').addEventListener("click", function(event) {
 		event.preventDefault();
 		Atis.sendForm("<%= request.getRequestURI() %>", {'<%= ControladorMensajes.PARAM_ACCION %>': '<%= ControladorMensajes.ACCION_NUEVO_MENSAJE %>'});
-	});
-	
-	document.getElementById('plantillas').addEventListener("click", function(event) {
-		event.preventDefault();
-		Atis.sendForm("<%= request.getRequestURI() %>", {'<%= ControladorMensajes.PARAM_ACCION %>': '<%= ControladorMensajes.ACCION_LISTAR_PLANTILLAS %>'});
 	});
 	
 	var borrar = function(row) {
