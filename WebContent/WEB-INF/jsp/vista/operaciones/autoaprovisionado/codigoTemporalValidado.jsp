@@ -17,6 +17,8 @@ VistaUsuarioAutoregistrado bean = (VistaUsuarioAutoregistrado)uvdatos.getVistas(
 			<%=bean.formatearMensajesDeError()%>
 		</div>
 	<% } else { %>
-		Se ha creado su cuenta <%=bean.getCorreo() %> con la clave <%=bean.getClave() %>
+		Se ha creado su cuenta <%=bean.getCorreo() %> con la clave <strong><%=bean.getClave() %></strong>
 	<% } %>
+	<br/>
+	Pulse en el siguiente enlace para <a href="<%=bean.getPaginaRedireccion() %>"><%=bean.getPaginaRedireccion() %></a>
 </div>	

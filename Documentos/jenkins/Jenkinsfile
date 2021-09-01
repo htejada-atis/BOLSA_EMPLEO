@@ -9,6 +9,7 @@ pipeline {
         APP_LISTENING_PORT = "8080"
         TEST_CONTAINER_NAME = "ci-${APP_NAME}-${BUILD_NUMBER}"
         SERVIDOR_ARGO_KUBERNETES = "jenkins.ujaen.es:5463"
+        WARNING_CHECKSTYLE = "sin definir"
     }
 
     stages {
@@ -79,7 +80,12 @@ pipeline {
     					inclusionPattern: '**/*.class'
 					)	
 	        		junit 'builds/build/rama/site/jacoco/*.xml'
-	        		recordIssues enabledForFailure: true, tool: checkStyle(pattern: 'builds/build/rama/site/jacoco/checkstyle_report.xml')
+	        		script {
+		        		def checkstyleReport = scanForIssues enabledForFailure: true, tool: checkStyle(pattern: 'builds/build/rama/site/jacoco/checkstyle_report.xml')
+		        		sh "echo checkstyle summary ${checkstyleReport.size()} > checkstyle_log.txt"
+		        		publishIssues issues: [checkstyleReport]
+	        		}
+	        		
 	        		recordIssues enabledForFailure: true, tool: pmdParser(pattern: 'builds/build/rama/site/jacoco/pmd_report.xml')
 	        	}
 	        }     
@@ -108,10 +114,14 @@ pipeline {
 	    		zip zipFile: 'builds/build/rama/site/jacoco/capturas.zip', archive: false, dir: "${rutaCapturas}", overwrite: true, glob: '**/*.png'
 	    		zip zipFile: 'builds/build/rama/site/jacoco/unittest.zip', archive: false, dir: 'builds/build/rama/site/jacoco/', overwrite: true, glob: '**/*.txt'
         	}
-			emailext mimeType: "text/html", to: 'jmoral@ujaen.es',
-				attachLog: true, attachmentsPattern: 'builds/build/rama/site/jacoco/unittest.zip, builds/build/rama/site/jacoco/capturas.zip',
-				body: '${FILE,path="builds/build/rama/site/jacoco/index.html"}', 
-				subject: "Completado jenkins pipeline ${JOB_NAME} (${BUILD_NUMBER}) "
+        	script {
+	        	def checkstyleLog = readFile('checkstyle_log.txt').trim()
+				emailext mimeType: "text/html", to: 'jmoral@ujaen.es',
+					attachLog: true, attachmentsPattern: 'builds/build/rama/site/jacoco/unittest.zip, builds/build/rama/site/jacoco/capturas.zip',
+					body: "Construccion en: ${BUILD_URL} <br>${checkstyleLog}", 
+					subject: "Completado jenkins pipeline ${JOB_NAME} (${BUILD_NUMBER}) "
+        	}
+
     		sh "docker-compose down || true"
             echo "-=- fin -=-"
         }

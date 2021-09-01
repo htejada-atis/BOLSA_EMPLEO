@@ -12,3 +12,5 @@ drop table ARCOS.ARG_CUENTA;
 --/////////////////////
 drop table ARCOS.ARG_USUARIO;
 --/////////////////////
+drop table ARCOS.ARG_LOG_ACCESO;
+--/////////////////////

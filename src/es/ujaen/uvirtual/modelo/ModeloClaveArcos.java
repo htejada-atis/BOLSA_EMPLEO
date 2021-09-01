@@ -12,6 +12,11 @@ import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import javax.naming.Context;
+import javax.naming.InitialContext;
+import javax.naming.NamingException;
+import javax.sql.DataSource;
+
 
 /** Modelo para claves de arcos.
  *
@@ -19,6 +24,9 @@ import java.util.logging.Logger;
 public class ModeloClaveArcos {
 	private static String eNombreDeEstaClase = ModeloClaveArcos.class.getName();
 	private static final Logger ELOGGER = Logger.getLogger(ModeloClaveArcos.class.getName());
+
+	private static ModeloClaveArcos eInstancia = null;
+	private static DataSource eDataSource = null;
 	
     private static final int SALT_LENGTH = 4;
     private static final int TAM_HASH_SSHA512 = 64;
@@ -31,6 +39,58 @@ public class ModeloClaveArcos {
     private static final String CARACTER_TIPO_MINUSCULA = "minuscula";
     private static final String CARACTER_TIPO_CUALQUIERA = "cualquiera";
 	
+	/********************************************** METODOS PARA SINGLETON *******************************************/
+	
+	/**
+	 * Constructor privado de modo que no se pueden crear clases del objeto. 
+	 */
+	private ModeloClaveArcos() {
+		//no se puede instanciar
+	}
+ 
+	/** Establece la conexión con la base de datos.
+	 */
+	private static void establecerDataSource() {
+		ELOGGER.logp(Level.FINE, eNombreDeEstaClase, "establecerDataSource", "Estableciendo conexión con jdbc/arcos");
+		try {
+			if (eDataSource == null) {
+				Context initContext = new InitialContext();
+				Context envContext = (Context) initContext.lookup("java:/comp/env");
+				eDataSource = (DataSource) envContext.lookup("jdbc/arcos");
+			}
+		} catch (NamingException e) {
+			ELOGGER.logp(Level.SEVERE, eNombreDeEstaClase, "establecerDataSource", "Imposible recuperar información de jdbc/arcos");
+		} 
+	}
+	
+	/** Crea una instancia del objeto, de forma sincronizada para protegerse de posibles problemas  multi-hilo.
+	 */
+	private static synchronized void crearInstancia() {
+		if (eInstancia == null) { 
+			eInstancia = new ModeloClaveArcos();
+			establecerDataSource();
+		}
+	}
+ 
+	/** Obtiene una instancia de la conexión.
+	 * @return instancia
+	 */
+	public static ModeloClaveArcos obtenerInstancia() {
+		if (eInstancia == null) {
+			crearInstancia();
+		}
+		return eInstancia;
+	}
+
+	/** Desabilita la opción de clonar el objeto.
+	 * @return nada
+	 */
+	public Object clone() throws CloneNotSupportedException {
+		throw new CloneNotSupportedException();
+	}
+	
+	/********************************************** METODOS PÚBLICOS PARA CONSULTAS *******************************************/
+    
 	/** genera ssha512 de una clave y un salt.
 	 * @param miClave clave en claro
 	 * @param salt salt usada, si es null se usa una aleatoria

@@ -126,3 +126,20 @@ COMMENT ON COLUMN ARCOS.ARG_CONFIGURACION.ESTADO IS 'Estado del servidor';
 COMMENT ON COLUMN ARCOS.ARG_CONFIGURACION.ULTIMO_CAMBIO IS 'ultimo cambio realizado en el servidor';
 --/////////////////////
 COMMENT ON COLUMN ARCOS.ARG_CONFIGURACION.FECHA_ULT_CAMBIO IS 'Fecha del ultimo cambio realizado en el servidor';
+--/////////////////////
+CREATE TABLE ARCOS.ARG_LOG_ACCESO (
+    CORREO VARCHAR2(100),
+    VALIDO VARCHAR2(1),
+    IP VARCHAR2(200),
+    FECHA DATE
+);
+--/////////////////////
+COMMENT ON TABLE ARCOS.ARG_LOG_ACCESO IS 'Los de acceso de usuarios autoregistrados';
+--/////////////////////
+COMMENT ON COLUMN ARCOS.ARG_LOG_ACCESO.CORREO IS 'correo que accede';
+--/////////////////////
+COMMENT ON COLUMN ARCOS.ARG_LOG_ACCESO.VALIDO IS 'Indica si ha accedido correctamente';
+--/////////////////////
+COMMENT ON COLUMN ARCOS.ARG_LOG_ACCESO.IP IS 'ip desde la que accede';
+--/////////////////////
+COMMENT ON COLUMN ARCOS.ARG_LOG_ACCESO.FECHA IS 'fecha en la que accede';

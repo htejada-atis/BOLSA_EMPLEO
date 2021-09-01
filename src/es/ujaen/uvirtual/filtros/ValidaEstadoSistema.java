@@ -53,7 +53,7 @@ public class ValidaEstadoSistema implements Filter {
 		// 20130605 - julopez - si se ha caído el sistema entero... a mantenimiento
 		ConfiguracionGlobal.getAtributoContentType();
 		if (!ConfiguracionGlobal.isDatosCargados()) {
-			RequestDispatcher despachador = request.getRequestDispatcher("WEB-INF/jsp/vista/nodisponible.jsp");
+			RequestDispatcher despachador = request.getRequestDispatcher("/WEB-INF/jsp/vista/nodisponible.jsp");
 			despachador.include(request, response);
 			return;
 		}
@@ -62,7 +62,7 @@ public class ValidaEstadoSistema implements Filter {
 		try {
 			sistemas = modeloAdministracion.listaSistemas();
 		} catch (SQLException e) {
-			RequestDispatcher despachador = request.getRequestDispatcher("WEB-INF/jsp/vista/nodisponible.jsp");
+			RequestDispatcher despachador = request.getRequestDispatcher("/WEB-INF/jsp/vista/nodisponible.jsp");
 			despachador.include(request, response);
 			return;
 		}
