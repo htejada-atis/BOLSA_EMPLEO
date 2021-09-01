@@ -19,6 +19,7 @@ import es.ujaen.uvirtual.beans.CodigoDescripcion;
 import es.ujaen.uvirtual.beans.UVDatos;
 import es.ujaen.uvirtual.modulo.bolsaempleo.beans.OfertaCandidato;
 import es.ujaen.uvirtual.modulo.bolsaempleo.beans.PlazaOfertada;
+import es.ujaen.uvirtual.modulo.bolsaempleo.modelo.ModeloContratacion;
 import es.ujaen.uvirtual.modulo.bolsaempleo.modelo.ModeloOfertaCandidato;
 import es.ujaen.uvirtual.modulo.bolsaempleo.modelo.ModeloParametrosConfiguracion;
 import es.ujaen.uvirtual.modulo.bolsaempleo.modelo.ModeloPlazaOfertada;
@@ -49,15 +50,19 @@ public class ControladorPlazasOfertadas extends HttpServlet {
 	private static final Logger LOGGER = Logger.getLogger(NOMBREDEESTACLASE);
 	
 	// acciones
+	public static final String ACCION_ACEPTAR_CONTRATACION = "aceptarcontratacion";
 	public static final String ACCION_ACEPTAR_PLAZA = "aceptarplaza";
 	public static final String ACCION_DATATABLE_PLAZAS_OFERTADAS = "datatableplazasofertadas";
 	public static final String ACCION_GUARDAR_PREFERENCIAS = "guardarpreferencias";
 	public static final String ACCION_INDEX = "index";
+	public static final String ACCION_RECHAZAR_CONTRATACION = "rechazarcontratacion";
 	public static final String ACCION_RECHAZAR_PLAZA = "rechazarplaza";
+	public static final String ACCION_SELECCIONAR_CONTRATO = "seleccionarcontrato";
 	public static final String ACCION_SELECCIONAR_PLAZA_OFERTADA = "seleccionarplazaofertada";
 	
 	// Parámetros
 	public static final String PARAM_ACCION = "a";
+	public static final String PARAM_CONTRATACION = "contratacion";
 	public static final String PARAM_OFERTAS_PREFERENCIAS = "ofertaspreferencias";
 	public static final String PARAM_PLAZA_OFERTADA = "plazaofertada";
 	
@@ -72,6 +77,7 @@ public class ControladorPlazasOfertadas extends HttpServlet {
 	public static final String RUTA_BEP_PLO = "/WEB-INF/jsp/vista/infadministrativa/bolsaempleo/plazasofertadas/";
 	public static final String JSP_INDEX = RUTA_BEP_PLO + "index.jsp";
 	public static final String JSP_PLAZA = RUTA_BEP_PLO + "plazaOfertada.jsp";
+	public static final String JSP_CONTRATO = RUTA_BEP_PLO + "contratoPlaza.jsp";
 	
 	// errors
 	public static final Integer RESPONSE_HTTP_CODE_ERROR_400 = 400;
@@ -112,8 +118,11 @@ public class ControladorPlazasOfertadas extends HttpServlet {
 				case ACCION_INDEX:
 					bean.setListaOfertasCandidatos(ModeloOfertaCandidato.obtenerInstancia().listaOfertasCandidatoPreferentes(bean.getUsuarioLogeado()));
 					break;
+				case ACCION_ACEPTAR_CONTRATACION:
 				case ACCION_ACEPTAR_PLAZA:
+				case ACCION_RECHAZAR_CONTRATACION:
 				case ACCION_RECHAZAR_PLAZA:
+				case ACCION_SELECCIONAR_CONTRATO:
 				case ACCION_SELECCIONAR_PLAZA_OFERTADA:
 					seleccionarPlazaOfertada(bean, datos, request, response, nombreAccion);
 					break;
@@ -217,17 +226,46 @@ public class ControladorPlazasOfertadas extends HttpServlet {
 		bean.setOfertaCandidato(oferta);
 		
 		switch (nombreAccion) {
+			case ACCION_ACEPTAR_CONTRATACION:
+				aceptarContrato(bean, datos, request, response);
+				break;
 			case ACCION_ACEPTAR_PLAZA:
 				aceptarPlazaOfertada(bean, datos, request, response);
+				break;
+			case ACCION_RECHAZAR_CONTRATACION:
+				rechazarContrato(bean, datos, request, response);
 				break;
 			case ACCION_RECHAZAR_PLAZA:
 				rechazarPlazaOfertada(bean, datos, request, response);
 				break;
 			case ACCION_SELECCIONAR_PLAZA_OFERTADA:
 				break;
+			case ACCION_SELECCIONAR_CONTRATO:
+				bean.setVista(JSP_CONTRATO);
+				break;
 			default:
 				errorFatal(bean, MENSAJE_ERROR_ACCION_NO_CONTEMPLADA);
 		}
+	}
+	
+	private void aceptarContrato(VistaPlazasOfertadas bean, UVDatos datos, HttpServletRequest request, HttpServletResponse response) 
+			throws IOException, UVException, SQLException {
+		ModeloContratacion modelo = ModeloContratacion.obtenerInstancia();
+		modelo.aceptarContrato(bean.getOfertaCandidato().getPlaza(), bean.getUsuarioLogeado());
+		
+		BolsaEmpleoUtils.addMensajeDeExito(MENSAJE_EXITO_ACEPTAR, bean, request);
+		datos.setRespuestaEnviada(true);
+		response.sendRedirect(request.getServletPath());
+	}
+	
+	private void rechazarContrato(VistaPlazasOfertadas bean, UVDatos datos, HttpServletRequest request, HttpServletResponse response) 
+			throws IOException, UVException, SQLException {
+		ModeloContratacion modelo = ModeloContratacion.obtenerInstancia();
+		modelo.rechazarContrato(bean.getOfertaCandidato().getPlaza(), bean.getUsuarioLogeado());
+		
+		BolsaEmpleoUtils.addMensajeDeExito(MENSAJE_EXITO_RECHAZAR, bean, request);
+		datos.setRespuestaEnviada(true);
+		response.sendRedirect(request.getServletPath());
 	}
 	
 	private void aceptarPlazaOfertada(VistaPlazasOfertadas bean, UVDatos datos, HttpServletRequest request, HttpServletResponse response) 

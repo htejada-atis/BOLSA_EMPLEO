@@ -10,6 +10,7 @@ TBEP_CONTRATACIONES					CNT		bepcnt		Contrataciones
 TBEP_CONVOCATORIAS					CON		bepcon		Convocatoria
 TBEP_DEDICACIONES					DED		bepded		Dedicación
 TBEP_DEPARTAMENTOS					DEP		bepdep		Departamento
+TBEP_ESTADO_CANDIDATOS				CNT		bepcnt		
 TBEP_EVALUADORES					EVA		bepeva		Evaluador
 TBEP_FICHEROS						FIC		bepfic		Fichero
 TBEP_ITEMSBAREMACION				ITE		bepite		ItemBaremacion
@@ -22,6 +23,7 @@ TBEP_MER_PRE_USUARIO				MPU		bepmpu		MeritoPreferenteUsuario
 TBEP_MERITOS_EXCLUYENTES			MEX		bepmex		MeritosExcluyentes
 TBEP_NOTICIAS						NOT		bepnot		Noticia
 TBEP_PARAMETROS_CONFIG				PAC		beppac		ParametrosConfiguracion
+TBEP_PLANTILLAS						PLS		beppls		Plantilla
 TBEP_PLAZAS_OFERTADAS				PLO		bepplo		Plaza ofertada
 TBEP_SOLICITUDES					SOL		bepsol		Solicitud
 TBEP_SOLICITUD_BOLSAS				SBO		bepsbo		
@@ -31,5 +33,3 @@ TBEP_TIT_PREFERENTES_AREA			TPA		beptpa		TitulacionArea
 TBEP_TITULACIONES_USUARIO			TUS		beptus		TitulacionesUsuario
 TBEP_USUARIOS						USU		bepusu		UsuarioBolsaEmpleo
 TBEP_USU_EXCLUIDOS_AREA				UEA		bepuea		UsuarioExcluidoArea
-TBEP_PLANTILLAS						PLS		beppls		Plantilla
-TBEP_ESTADO_CANDIDATOS				CNT		bepcnt		

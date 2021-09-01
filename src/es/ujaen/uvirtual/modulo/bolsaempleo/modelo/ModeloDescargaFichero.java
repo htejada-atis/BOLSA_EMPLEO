@@ -168,7 +168,12 @@ public class ModeloDescargaFichero {
 	 * @throws SQLException .
 	 */
 	public PlazaOfertada compruebaPlazaOfertadaCandidato(int idPlaza, UsuarioBolsaEmpleo usuario) throws SQLException, UVException {
-		String consulta = "SELECT bepplo.* FROM TBEP_USUARIOS bepusu"
+		String consulta = "SELECT bepplo.*, "
+				+ "     CASE"
+				+ "         WHEN bepplo.FECHA_FIN_OFERTA > SYSDATE THEN 1"
+				+ "         ELSE 0"
+				+ "     END AS ABIERTA_VIGENTE"
+				+ " FROM TBEP_USUARIOS bepusu"
 				+ " LEFT JOIN TBEP_ESTADO_CANDIDATOS bepesc ON bepesc.BEPUSU_CODNUM = bepusu.CODNUM"
 				+ " INNER JOIN TBEP_SOLICITUDES bepsol ON bepsol.BEPUSU_CODNUM = bepusu.CODNUM"
 				+ " INNER JOIN TBEP_SOLICITUD_BOLSAS bepsob ON bepsob.BEPSOL_CODNUM = bepsol.CODNUM AND bepsob.FECHABAREMACION IS NOT NULL"
@@ -208,9 +213,14 @@ public class ModeloDescargaFichero {
 	 * @throws SQLException .
 	 */
 	public PlazaOfertada compruebaPlazaOfertadaDirector(int idPlaza, UsuarioBolsaEmpleo usuario) throws SQLException, UVException {
-		String consulta = "SELECT bepplo.* FROM TBEP_PLAZAS_OFERTADAS bepplo"
-				+ "	INNER JOIN TBEP_EVALUADORES bepeva ON bepeva.BEPARE_CODNUM = bepplo.BEPARE_CODNUM AND bepeva.FLGACTIVO = 'S'"
-				+ "	WHERE bepplo.CODNUM = ? AND BEPUSU_CODNUM = ?";
+		String consulta = "SELECT bepplo.*,"
+				+ "     CASE"
+				+ "         WHEN bepplo.FECHA_FIN_OFERTA > SYSDATE THEN 1"
+				+ "         ELSE 0"
+				+ "     END AS ABIERTA_VIGENTE"
+				+ " FROM TBEP_PLAZAS_OFERTADAS bepplo"
+				+ " INNER JOIN TBEP_EVALUADORES bepeva ON bepeva.BEPARE_CODNUM = bepplo.BEPARE_CODNUM AND bepeva.FLGACTIVO = 'S'"
+				+ " WHERE bepplo.CODNUM = ? AND BEPUSU_CODNUM = ?";
 		
 		try (Connection conexion = ConexionUvirtual.obtenerInstancia();
 				PreparedStatement stmt = conexion.prepareStatement(consulta)) {

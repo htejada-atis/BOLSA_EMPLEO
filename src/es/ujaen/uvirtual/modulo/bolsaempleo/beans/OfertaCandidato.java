@@ -15,6 +15,8 @@ public class OfertaCandidato implements Serializable {
 	private Boolean resultado;
 	private Date fechaResultado;
 	private Integer preferencia;
+	private Double puntuacion;
+	private Contratacion contratacion;
 	
 
 	/** Constructor por defecto.
@@ -65,6 +67,8 @@ public class OfertaCandidato implements Serializable {
 		this.resultado = copia.resultado;
 		this.fechaResultado = copia.fechaResultado;
 		this.preferencia = copia.preferencia;
+		this.puntuacion = copia.puntuacion;
+		this.contratacion = copia.contratacion;
 	}
 	
 	public Integer getCodNum() {
@@ -115,10 +119,27 @@ public class OfertaCandidato implements Serializable {
 		this.preferencia = preferencia;
 	}
 	
+	public Double getPuntuacion() {
+		return puntuacion;
+	}
+
+	public void setPuntuacion(Double puntuacion) {
+		this.puntuacion = puntuacion;
+	}
+	
+	public Contratacion getContratacion() {
+		return contratacion;
+	}
+
+	public void setContratacion(Contratacion contratacion) {
+		this.contratacion = contratacion;
+	}
+	
 	@Override
 	public String toString() {
 		return "Contratacion [codNum=" + codNum + ", plaza=" + plaza + ", candidato=" + candidato 
-				+ ", resultado=" + resultado + ", fechaResultado=" + fechaResultado + ", preferencia=" + preferencia + "]";
+				+ ", resultado=" + resultado + ", fechaResultado=" + fechaResultado + ", preferencia=" + preferencia
+				+ ", puntuacion=" + puntuacion + ", contratacion=" + contratacion + "]";
 	}
 	
 	@Override
@@ -131,6 +152,8 @@ public class OfertaCandidato implements Serializable {
 		result = prime * result + ((resultado == null) ? 0 : resultado.hashCode());
 		result = prime * result + ((fechaResultado == null) ? 0 : fechaResultado.hashCode());
 		result = prime * result + ((preferencia == null) ? 0 : preferencia.hashCode());
+		result = prime * result + ((puntuacion == null) ? 0 : puntuacion.hashCode());
+		result = prime * result + ((contratacion == null) ? 0 : contratacion.hashCode());
 		return result;
 	}
 	
@@ -188,6 +211,20 @@ public class OfertaCandidato implements Serializable {
 				return false;
 			}
 		} else if (!preferencia.equals(other.preferencia)) {
+			return false;
+		}
+		if (puntuacion == null) {
+			if (other.puntuacion != null) {
+				return false;
+			}
+		} else if (!puntuacion.equals(other.puntuacion)) {
+			return false;
+		}
+		if (contratacion == null) {
+			if (other.contratacion != null) {
+				return false;
+			}
+		} else if (!contratacion.equals(other.contratacion)) {
 			return false;
 		}
 		

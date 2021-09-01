@@ -66,9 +66,11 @@ public class ModeloOfertaCandidato {
 	public List<OfertaCandidato> listaOfertasCandidatoPreferentes(UsuarioBolsaEmpleo candidato) throws SQLException, UVException {
 		List<OfertaCandidato> listaOfertas = new ArrayList<>();
 		
-		String consulta = String.format("SELECT bepplo.CODNUM AS BEPPLO_CODNUM, bepofc.* FROM TBEP_PLAZAS_OFERTADAS bepplo"
+		String consulta = String.format("SELECT bepplo.CODNUM AS BEPPLO_CODNUM, bepofc.*, bepcnt.CODNUM AS CONTRATACION"
+				+ " FROM TBEP_PLAZAS_OFERTADAS bepplo"
 				+ " INNER JOIN TBEP_OFERTAS_CANDIDATOS bepofc ON bepofc.BEPPLO_CODNUM = bepplo.CODNUM"
-				+ " WHERE   bepplo.ESTADO = '" + ModeloPlazaOfertada.PLAZA_ESTADO_ABIERTA + "'"
+				+ " LEFT JOIN TBEP_CONTRATACIONES bepcnt ON bepcnt.BEPUSU_CODNUM = bepofc.BEPUSU_CODNUM AND bepcnt.BEPPLO_CODNUM = bepplo.CODNUM"
+				+ " WHERE   bepplo.ESTADO IN ('" + ModeloPlazaOfertada.PLAZA_ESTADO_ABIERTA + "', '" + ModeloPlazaOfertada.PLAZA_ESTADO_CONTRATACION + "')"
 				+ "     AND bepofc.BEPUSU_CODNUM = ?"
 				+ "     AND bepofc.FLGRESULTADO = 'S'"
 				+ " ORDER BY bepofc.PREFERENCIA");
@@ -82,7 +84,6 @@ public class ModeloOfertaCandidato {
 				while (rs.next()) {
 					listaOfertas.add(createOfertaCandidatoFromResultSet(rs));
 				}
-				
 			}
 		}
 		
@@ -98,14 +99,20 @@ public class ModeloOfertaCandidato {
 	 * @throws UVException .
 	 */
 	public OfertaCandidato getOfertaByPlazaCandidato(PlazaOfertada plaza, UsuarioBolsaEmpleo candidato) throws SQLException, UVException {
-		String consulta = "SELECT bepplo.CODNUM AS BEPPLO_CODNUM, bepofc.* FROM TBEP_PLAZAS_OFERTADAS bepplo"
+		String consulta = "SELECT bepplo.CODNUM AS BEPPLO_CODNUM, bepofc.CODNUM, bepofc.FLGRESULTADO, bepofc.FECHA_RESULTADO,"
+				+ "     bepofc.PREFERENCIA, ? AS BEPUSU_CODNUM, bepcnt.CODNUM AS CONTRATACION"
+				+ " FROM TBEP_PLAZAS_OFERTADAS bepplo"
 				+ " LEFT JOIN TBEP_OFERTAS_CANDIDATOS bepofc ON bepofc.BEPPLO_CODNUM = bepplo.CODNUM AND bepofc.BEPUSU_CODNUM = ?"
-				+ " WHERE   bepplo.ESTADO = '" + ModeloPlazaOfertada.PLAZA_ESTADO_ABIERTA + "'"
+				+ " LEFT JOIN TBEP_CONTRATACIONES bepcnt ON bepcnt.BEPUSU_CODNUM = ? AND bepcnt.BEPPLO_CODNUM = bepplo.CODNUM"
+				+ " WHERE   bepplo.ESTADO IN ('" + ModeloPlazaOfertada.PLAZA_ESTADO_ABIERTA + "', '" + ModeloPlazaOfertada.PLAZA_ESTADO_CONTRATACION + "',"
+				+ "         '" + ModeloPlazaOfertada.PLAZA_ESTADO_CERRADA + "')"
 				+ "     AND bepplo.CODNUM = ?";
 		
 		try (Connection conexion = ConexionUvirtual.obtenerInstancia();
 				PreparedStatement stmt = conexion.prepareStatement(consulta)) {
 			int parameterIndex = 1;
+			stmt.setInt(parameterIndex++, candidato.getCodNum());
+			stmt.setInt(parameterIndex++, candidato.getCodNum());
 			stmt.setInt(parameterIndex++, candidato.getCodNum());
 			stmt.setInt(parameterIndex++, plaza.getCodNum());
 			
@@ -129,8 +136,7 @@ public class ModeloOfertaCandidato {
 		try (Connection conexion = ConexionUvirtual.obtenerInstancia()) {
 			conexion.setAutoCommit(false);
 			try {
-				
-				OfertaCandidato oferta = obtenerOfertaPorPlazaYCandidato(plaza, candidato, conexion);
+				OfertaCandidato oferta = obtenerOfertaPlazaAbiertaCandidato(plaza, candidato, conexion);
 				if (oferta != null) {
 					oferta.setResultado(true);
 					actualizaOfertaCandidato(oferta, candidato, conexion);
@@ -160,7 +166,7 @@ public class ModeloOfertaCandidato {
 			conexion.setAutoCommit(false);
 			try {
 				
-				OfertaCandidato oferta = obtenerOfertaPorPlazaYCandidato(plaza, candidato, conexion);
+				OfertaCandidato oferta = obtenerOfertaPlazaAbiertaCandidato(plaza, candidato, conexion);
 				if (oferta != null) {
 					oferta.setResultado(false);
 					actualizaOfertaCandidato(oferta, candidato, conexion);
@@ -179,9 +185,15 @@ public class ModeloOfertaCandidato {
 		}
 	}
 	
-	private OfertaCandidato obtenerOfertaPorPlazaYCandidato(PlazaOfertada plaza, UsuarioBolsaEmpleo candidato, Connection conexion) throws SQLException, UVException {
-		String consulta = "SELECT bepofc.* FROM TBEP_OFERTAS_CANDIDATOS bepofc"
+	private OfertaCandidato obtenerOfertaPlazaAbiertaCandidato(PlazaOfertada plaza, UsuarioBolsaEmpleo candidato, Connection conexion) throws SQLException, UVException {
+		String consulta = "SELECT bepofc.*, bepcnt.CODNUM AS CONTRATACION,"
+				+ "     CASE"
+				+ "         WHEN bepplo.FECHA_FIN_OFERTA > SYSDATE THEN 1"
+				+ "         ELSE 0"
+				+ "     END AS ABIERTA_VIGENTE"
+				+ " FROM TBEP_OFERTAS_CANDIDATOS bepofc"
 				+ " INNER JOIN TBEP_PLAZAS_OFERTADAS bepplo ON bepplo.CODNUM = bepofc.BEPPLO_CODNUM"
+				+ " LEFT JOIN TBEP_CONTRATACIONES bepcnt ON bepcnt.BEPUSU_CODNUM = bepofc.BEPUSU_CODNUM AND bepcnt.BEPPLO_CODNUM = bepplo.CODNUM"
 				+ " WHERE   bepofc.BEPUSU_CODNUM = ?"
 				+ "     AND bepplo.ESTADO = '" + ModeloPlazaOfertada.PLAZA_ESTADO_ABIERTA + "'"
 				+ "     AND bepplo.CODNUM = ?";
@@ -192,9 +204,13 @@ public class ModeloOfertaCandidato {
 			stmt.setInt(parameterIndex++, plaza.getCodNum());
 			
 			try (ResultSet rs = stmt.executeQuery()) {
-				while (rs.next()) {
+				if (rs.next()) {
+					if (rs.getInt("FECHA_VIGENTE") == 0) {
+						throw new UVException("La plaza ya no está disponible");
+					}
 					createOfertaCandidatoFromResultSet(rs);
 				}
+				
 			}
 		}
 		
@@ -263,14 +279,17 @@ public class ModeloOfertaCandidato {
 		List<OfertaCandidato> rows = new ArrayList<>();
 		BolsaEmpleoDataTable<OfertaCandidato> dataTable = new BolsaEmpleoDataTable<>(params);
 		
-		String consulta = "SELECT bepplo.CODNUM AS BEPPLO_CODNUM, bepofc.* FROM TBEP_PLAZAS_OFERTADAS bepplo"
+		String consulta = "SELECT bepplo.CODNUM AS BEPPLO_CODNUM, bepofc.CODNUM, bepofc.FLGRESULTADO, bepofc.FECHA_RESULTADO,"
+				+ "     bepofc.PREFERENCIA, bepsol.BEPUSU_CODNUM AS BEPUSU_CODNUM, bepcnt.CODNUM AS CONTRATACION"
+				+ " FROM TBEP_PLAZAS_OFERTADAS bepplo"
 				+ " INNER JOIN TBEP_AREAS bepare ON bepare.CODNUM = bepplo.BEPARE_CODNUM"
 				+ " INNER JOIN TBEP_BOLSAS bepbol ON bepbol.BEPARE_CODNUM = bepare.CODNUM"
 				+ " INNER JOIN TBEP_SOLICITUD_BOLSAS bepsob ON bepsob.BEPBOL_CODNUM = bepbol.CODNUM AND bepsob.FECHABAREMACION IS NOT NULL"
 				+ " INNER JOIN TBEP_SOLICITUDES bepsol ON bepsob.BEPSOL_CODNUM = bepsol.CODNUM"
 				+ " LEFT JOIN TBEP_OFERTAS_CANDIDATOS bepofc ON bepofc.BEPPLO_CODNUM = bepplo.CODNUM AND bepofc.BEPUSU_CODNUM = bepsol.BEPUSU_CODNUM"
+				+ " LEFT JOIN TBEP_CONTRATACIONES bepcnt ON bepcnt.BEPUSU_CODNUM = bepsol.BEPUSU_CODNUM AND bepcnt.BEPPLO_CODNUM = bepplo.CODNUM"
 				+ " WHERE   bepsol.BEPUSU_CODNUM = ? "
-				+ "     AND bepplo.ESTADO = '" + ModeloPlazaOfertada.PLAZA_ESTADO_ABIERTA + "'";
+				+ "     AND bepplo.ESTADO IN ('" + ModeloPlazaOfertada.PLAZA_ESTADO_ABIERTA + "', '" + ModeloPlazaOfertada.PLAZA_ESTADO_CONTRATACION + "')";
 		
 		dataTable.setColumn(ORDER_COLUMN_INDEX_CODNUM, "bepplo.CODNUM", DataTableColumn.COLUMN_TYPE_NUMBER);
 		dataTable.setColumn(ORDER_COLUMN_INDEX_AREA, "bepare.DES_AREA_CONOCIMIENTO");
@@ -302,18 +321,20 @@ public class ModeloOfertaCandidato {
 		return dataTable;
 	}
 	
-	private OfertaCandidato createOfertaCandidatoFromResultSet(ResultSet rs) throws SQLException, UVException {
+	public OfertaCandidato createOfertaCandidatoFromResultSet(ResultSet rs) throws SQLException, UVException {
 		OfertaCandidato oferta = new OfertaCandidato();
 		
 		if (rs.getInt(CODNUM) != 0) {
 			oferta.setCodNum(rs.getInt(CODNUM));
-			oferta.setCandidato(ModeloUsuarioBolsaEmpleo.obtenerInstancia().getUsuarioById(rs.getInt(BEPUSU_CODNUM)));
 			oferta.setResultado("S".equals(rs.getString(FLGRESULTADO)));
 			oferta.setFechaResultado(rs.getDate(FECHA_RESULTADO));
 			oferta.setPreferencia(rs.getInt(PREFERENCIA));
 		}
 		
+		oferta.setCandidato(ModeloUsuarioBolsaEmpleo.obtenerInstancia().getUsuarioById(rs.getInt(BEPUSU_CODNUM)));
 		oferta.setPlaza(ModeloPlazaOfertada.obtenerInstancia().getPlazaOfertadaById(rs.getInt(BEPPLO_CODNUM)));
+		oferta.setContratacion(rs.getInt("CONTRATACION") != 0 
+				? ModeloContratacion.obtenerInstancia().getContratacionById(rs.getInt("CONTRATACION")) : null);
 		
 		return oferta;
 	}

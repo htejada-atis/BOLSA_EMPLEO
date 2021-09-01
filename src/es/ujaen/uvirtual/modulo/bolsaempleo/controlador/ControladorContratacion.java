@@ -23,13 +23,15 @@ import org.apache.commons.fileupload.servlet.ServletFileUpload;
 import com.google.gson.Gson;
 import es.ujaen.uvirtual.beans.CodigoDescripcion;
 import es.ujaen.uvirtual.beans.UVDatos;
-import es.ujaen.uvirtual.modulo.bolsaempleo.beans.CandidatoResultadoTable;
+import es.ujaen.uvirtual.modulo.bolsaempleo.beans.Contratacion;
+import es.ujaen.uvirtual.modulo.bolsaempleo.beans.OfertaCandidato;
 import es.ujaen.uvirtual.modulo.bolsaempleo.beans.PlazaOfertada;
 import es.ujaen.uvirtual.modulo.bolsaempleo.beans.UsuarioBolsaEmpleo;
 import es.ujaen.uvirtual.modulo.bolsaempleo.modelo.ModeloArea;
 import es.ujaen.uvirtual.modulo.bolsaempleo.modelo.ModeloContratacion;
 import es.ujaen.uvirtual.modulo.bolsaempleo.modelo.ModeloDedicacion;
 import es.ujaen.uvirtual.modulo.bolsaempleo.modelo.ModeloEvaluador;
+import es.ujaen.uvirtual.modulo.bolsaempleo.modelo.ModeloOfertaCandidato;
 import es.ujaen.uvirtual.modulo.bolsaempleo.modelo.ModeloParametrosConfiguracion;
 import es.ujaen.uvirtual.modulo.bolsaempleo.modelo.ModeloPlazaOfertada;
 import es.ujaen.uvirtual.modulo.bolsaempleo.modelo.ModeloRol;
@@ -60,14 +62,16 @@ public class ControladorContratacion extends HttpServlet {
 	
 	// acciones
 	public static final String ACCION_ABRIR_PLAZA = "abrirplaza";
+	public static final String ACCION_CERRAR_PLAZA = "cerrarplaza";
 	public static final String ACCION_CONTRATAR_CANDIDATO = "contratarcandidato";
 	public static final String ACCION_DATATABLE_CANDIDATOS = "datatablecandidatos";
 	public static final String ACCION_DATATABLE_PLAZAS_OFERTADAS = "datatableplazasofertadas";
 	public static final String ACCION_EDITAR_PLAZA_OFERTADA = "editarplazaofertada";
-	public static final String ACCION_SELECCIONAR_PLAZA_OFERTADA = "seleccionarplazaofertada";
 	public static final String ACCION_INDEX = "index";
+	public static final String ACCION_PREFERENCIAS_CANDIDATO = "preferenciascandidato";
 	public static final String ACCION_NUEVA_PLAZA_OFERTADA = "nuevaplazaofertada";
 	public static final String ACCION_RESTAURAR_PLAZA_OFERTADA = "restaurarplazaofertada";
+	public static final String ACCION_SELECCIONAR_PLAZA_OFERTADA = "seleccionarplazaofertada";
 	
 	// Parámetros
 	public static final String PARAM_ACCION = "a";
@@ -92,8 +96,10 @@ public class ControladorContratacion extends HttpServlet {
 	public static final String MENSAJE_ERROR_ACCION_NO_CONTEMPLADA = "Acción no contemplada";
 	public static final String MENSAJE_ERROR_CENTRO_DESTINO_VACIO = "El centro de destino no puede estar vacío";
 	public static final String MENSAJE_ERROR_CENTRO_DESTINO_NO_VALIDO = "El centro de destino seleccionado no es válido";
+	public static final String MENSAJE_ERROR_CANDIDATO_CONTRATACION_ACTIVA = "Ya hay una contratación activa para el candidato %s";
 	public static final String MENSAJE_ERROR_CUATRIMESTRE_NO_VALIDO = "El cuatrimestre seleccionado no es válido";
 	public static final String MENSAJE_ERROR_DURACION_PREVISTA_LARGA = "La duración prevista no puede contener mas de %d caracteres";
+	public static final String MENSAJE_ERROR_ESTADO_CONTRATACION_REQUERIDO = "Es requerido estado de contratación para la plaza";
 	public static final String MENSAJE_ERROR_ESTADO_TRAMITACION_REQUERIDO = "Es requerido estado de tramitación para la plaza";
 	public static final String MENSAJE_ERROR_FECHA_FIN_OFERTA_VACIA = "La fecha fin de la oferta no puede estar vacía";
 	public static final String MENSAJE_ERROR_JUSTIFICACION_LARGA = "La justificación no puede contener mas de %d caracteres";
@@ -101,6 +107,7 @@ public class ControladorContratacion extends HttpServlet {
 	public static final String MENSAJE_ERROR_SIN_PERMISO = "No tienes permiso";
 	
 	public static final String MENSAJE_EXITO_ABRIR_PLAZA = "Plaza abierta correctamente";
+	public static final String MENSAJE_EXITO_CERRAR_PLAZA = "Plaza cerrada correctamente";
 	public static final String MENSAJE_EXITO_AGREGAR = "Plaza creada correctamente";
 	public static final String MENSAJE_EXITO_EDITAR = "Plaza editada correctamente";
 	public static final String MENSAJE_EXITO_CONTRATACION = "Contratación creada correctamente para el usuario: %s";
@@ -163,6 +170,14 @@ public class ControladorContratacion extends HttpServlet {
 			init(bean, datos, request, response);
 			
 			switch (nombreAccion) {
+				case ACCION_ABRIR_PLAZA:
+				case ACCION_CERRAR_PLAZA:
+				case ACCION_CONTRATAR_CANDIDATO:
+				case ACCION_DATATABLE_CANDIDATOS:
+				case ACCION_EDITAR_PLAZA_OFERTADA:
+				case ACCION_SELECCIONAR_PLAZA_OFERTADA:
+					seleccionarPlazaOfertada(bean, datos, request, response, nombreAccion, parametros);
+					break;
 				case ACCION_DATATABLE_PLAZAS_OFERTADAS:
 					listaPlazasOfertadas(bean, datos, request, response);
 					break;
@@ -171,12 +186,8 @@ public class ControladorContratacion extends HttpServlet {
 				case ACCION_NUEVA_PLAZA_OFERTADA:
 					nuevaPlazaOfertada(bean, datos, request, response, parametros);
 					break;
-				case ACCION_ABRIR_PLAZA:
-				case ACCION_CONTRATAR_CANDIDATO:
-				case ACCION_DATATABLE_CANDIDATOS:
-				case ACCION_EDITAR_PLAZA_OFERTADA:
-				case ACCION_SELECCIONAR_PLAZA_OFERTADA:
-					seleccionarPlazaOfertada(bean, datos, request, response, nombreAccion, parametros);
+				case ACCION_PREFERENCIAS_CANDIDATO:
+					obtenerPreferenciasCandidato(bean, datos, request, response);
 					break;
 				default:
 					errorFatal(bean, MENSAJE_ERROR_ACCION_NO_CONTEMPLADA);
@@ -254,6 +265,9 @@ public class ControladorContratacion extends HttpServlet {
 			case ACCION_ABRIR_PLAZA:
 				abrirPlaza(bean, datos, request, response);
 				break;
+			case ACCION_CERRAR_PLAZA:
+				cerrarPlaza(bean, datos, request, response);
+				break;
 			case ACCION_CONTRATAR_CANDIDATO:
 				contratarCandidato(bean, datos, request, response);
 				break;
@@ -294,6 +308,31 @@ public class ControladorContratacion extends HttpServlet {
 		redireccionConPlazaSeleccionada(bean, datos, request, response, ACCION_SELECCIONAR_PLAZA_OFERTADA);
 	}
 	
+	private void cerrarPlaza(VistaContratacion bean, UVDatos datos, HttpServletRequest request, HttpServletResponse response)
+			throws SQLException, UVException, IOException {
+		if (!bean.getUsuarioLogeado().isServicioPersonal()) {
+			BolsaEmpleoUtils.redirectToError(bean, datos, request, response, MENSAJE_ERROR_SIN_PERMISO);
+		}
+		
+		ModeloPlazaOfertada modeloPlaza = ModeloPlazaOfertada.obtenerInstancia();
+		
+		PlazaOfertada plaza = bean.getPlazaOfertada();
+		
+		if (!plaza.getEstado().equals(ModeloPlazaOfertada.PLAZA_ESTADO_CONTRATACION)) {
+			throw new UVException(MENSAJE_ERROR_ESTADO_CONTRATACION_REQUERIDO);
+		}
+		Contratacion contratacion = ModeloContratacion.obtenerInstancia().getContratacionByPlazaContratada(plaza);
+		if (contratacion == null) {
+			throw new UVException("No hay ningún contrato para esta plaza");
+		}
+		
+		modeloPlaza.crearMensajeCierrePlaza(plaza, contratacion, bean.getUsuarioLogeado());
+		modeloPlaza.cerrarPlazaOfertada(plaza, bean.getUsuarioLogeado());
+		
+		BolsaEmpleoUtils.addMensajeDeExito(MENSAJE_EXITO_CERRAR_PLAZA, bean, request);
+		redireccionConPlazaSeleccionada(bean, datos, request, response, ACCION_SELECCIONAR_PLAZA_OFERTADA);
+	}
+	
 	private void contratarCandidato(VistaContratacion bean, UVDatos datos, HttpServletRequest request, HttpServletResponse response)
 			throws SQLException, UVException, IOException {
 		ModeloContratacion modeloContratacion = ModeloContratacion.obtenerInstancia();
@@ -303,12 +342,16 @@ public class ControladorContratacion extends HttpServlet {
 		Date fecha = BolsaEmpleoUtils.leeParametroFechaHora(fechaCita + " " + horaCita, "/", ":");
 		UsuarioBolsaEmpleo candidato = ModeloUsuarioBolsaEmpleo.obtenerInstancia().getUsuarioById(Formateador.leeParametroInteger(request.getParameter(PARAM_CANDIDATO)));
 		
-		modeloContratacion.crearMensajeCitaContratacion(bean.getPlazaOfertada(), fecha, candidato, bean.getUsuarioLogeado());
+		if (modeloContratacion.comprobarContratoCandidato(bean.getPlazaOfertada(), candidato)) {
+			throw new UVException(String.format(MENSAJE_ERROR_CANDIDATO_CONTRATACION_ACTIVA, candidato.getPrsNif()));
+		}
+		
+		Contratacion contratacion = new Contratacion(candidato, fecha);
+		modeloContratacion.crearMensajeCitaContratacion(bean.getPlazaOfertada(), contratacion, bean.getUsuarioLogeado());
 		modeloContratacion.insertarContratacion(bean.getPlazaOfertada(), fecha, candidato, bean.getUsuarioLogeado());
 		
 		BolsaEmpleoUtils.addMensajeDeExito(String.format(MENSAJE_EXITO_CONTRATACION, candidato.getPrsNif()), bean, request);
-		datos.setRespuestaEnviada(true);
-		response.sendRedirect(request.getServletPath());
+		redireccionConPlazaSeleccionada(bean, datos, request, response, ACCION_SELECCIONAR_PLAZA_OFERTADA);
 	}
 	
 	private void editarPlazaOfertada(VistaContratacion bean, UVDatos datos, HttpServletRequest request, HttpServletResponse response, HashMap<String, Object> parametros) 
@@ -352,6 +395,30 @@ public class ControladorContratacion extends HttpServlet {
 		BolsaEmpleoUtils.redirectWithParams(datos, request, response, params);
 	}
 	
+	private void obtenerPreferenciasCandidato(VistaContratacion bean, UVDatos datos, HttpServletRequest request, HttpServletResponse response) throws IOException {
+		datos.setContentType(RESPONSE_AJAX_CONTENTTYPE);
+		datos.setRespuestaEnviada(true);
+		response.setContentType(RESPONSE_AJAX_CONTENTTYPE);
+		response.setCharacterEncoding(RESPONSE_AJAX_ENCODING);
+		
+		try (PrintWriter writer = response.getWriter()) {
+			try {
+				Integer idCandidato = Formateador.leeParametroInteger(request.getParameter(PARAM_CANDIDATO));
+				UsuarioBolsaEmpleo candidato = ModeloUsuarioBolsaEmpleo.obtenerInstancia().getUsuarioById(idCandidato);
+				
+				List<OfertaCandidato> listaOfertas = ModeloOfertaCandidato.obtenerInstancia().listaOfertasCandidatoPreferentes(candidato);
+				bean.setListaOfertas(listaOfertas);
+				
+				writer.write(new Gson().toJson(listaOfertas));
+			} catch (Exception ex) {
+				bean.getMensajesDeError().add(ex.getMessage());
+				CodigoDescripcion mensaje = new CodigoDescripcion(RESPONSE_AJAX_ERROR, ex.getMessage());
+				writer.write(new Gson().toJson(mensaje));
+				response.setStatus(RESPONSE_AJAX_HTTP_CODE_ERROR);
+			}
+		}
+	}
+	
 	private void listaCandidatos(VistaContratacion bean, UVDatos datos, HttpServletRequest request, HttpServletResponse response) throws IOException {
 		datos.setContentType(RESPONSE_AJAX_CONTENTTYPE);
 		datos.setRespuestaEnviada(true);
@@ -360,8 +427,8 @@ public class ControladorContratacion extends HttpServlet {
 		
 		try (PrintWriter writer = response.getWriter()) {
 			try {
-				BolsaEmpleoDataTable<CandidatoResultadoTable> dataTable = ModeloPlazaOfertada.obtenerInstancia().listadoCandidatosConfirmados(
-						request.getParameterMap(), bean.getPlazaOfertada(), bean.getUsuarioLogeado());
+				BolsaEmpleoDataTable<OfertaCandidato> dataTable = ModeloPlazaOfertada.obtenerInstancia().listadoCandidatosDisponibles(
+						request.getParameterMap(), bean.getPlazaOfertada());
 				bean.setDatatableCandidatos(dataTable);
 				writer.write(dataTable.toJson());
 			} catch (UVException | SQLException e) {

@@ -38,6 +38,16 @@ public class Contratacion implements Serializable {
 		this.fechaCita = pfechaCita;
 	}
 	
+	/** Constructor con parametros.
+	 * @param pcandidato .
+	 * @param pfechaCita .
+	 */
+	public Contratacion(UsuarioBolsaEmpleo pcandidato, Date pfechaCita) {
+		super();
+		this.candidato = pcandidato;
+		this.fechaCita = pfechaCita;
+	}
+	
 	/** Constructor copia.
 	 * @param copia Dedicacion a copiar
 	 */
@@ -51,6 +61,42 @@ public class Contratacion implements Serializable {
 	
 	public void setCodNum(Integer idBolsa) {
 		this.codNum = idBolsa;
+	}
+	
+	public PlazaOfertada getPlaza() {
+		return plaza;
+	}
+
+	public void setPlaza(PlazaOfertada plaza) {
+		this.plaza = plaza;
+	}
+
+	public UsuarioBolsaEmpleo getCandidato() {
+		return candidato;
+	}
+
+	public void setCandidato(UsuarioBolsaEmpleo candidato) {
+		this.candidato = candidato;
+	}
+
+	public String getResultado() {
+		return resultado;
+	}
+
+	public void setResultado(String resultado) {
+		this.resultado = resultado;
+	}
+
+	public Date getFechaCita() {
+		return fechaCita;
+	}
+
+	public void setFechaCita(Date fechaCita) {
+		this.fechaCita = fechaCita;
+	}
+
+	public static long getSerialversionuid() {
+		return serialVersionUID;
 	}
 	
 	

@@ -5,8 +5,8 @@ import java.util.ArrayList;
 import java.util.List;
 import es.ujaen.uvirtual.beans.vistas.Vista;
 import es.ujaen.uvirtual.modulo.bolsaempleo.beans.Area;
-import es.ujaen.uvirtual.modulo.bolsaempleo.beans.CandidatoResultadoTable;
 import es.ujaen.uvirtual.modulo.bolsaempleo.beans.Dedicacion;
+import es.ujaen.uvirtual.modulo.bolsaempleo.beans.OfertaCandidato;
 import es.ujaen.uvirtual.modulo.bolsaempleo.beans.PlazaOfertada;
 import es.ujaen.uvirtual.modulo.bolsaempleo.beans.UsuarioBolsaEmpleo;
 import es.ujaen.uvirtual.modulo.bolsaempleo.utilidades.BolsaEmpleoDataTable;
@@ -21,8 +21,9 @@ public class VistaContratacion extends Vista implements Serializable {
 	private static final long serialVersionUID = 1L;
 	private List<Area> listaAreas = new ArrayList<>();
 	private List<Dedicacion> listaDedicaciones = new ArrayList<>();
+	private List<OfertaCandidato> listaOfertas = new ArrayList<>();
 	private transient BolsaEmpleoDataTable<PlazaOfertada> datatablePlazasOfertadas;
-	private transient BolsaEmpleoDataTable<CandidatoResultadoTable> datatableCandidatos;
+	private transient BolsaEmpleoDataTable<OfertaCandidato> datatableCandidatos;
 	private PlazaOfertada plazaOfertada;
 	private String vista;
 	private UsuarioBolsaEmpleo usuarioLogeado;
@@ -75,12 +76,20 @@ public class VistaContratacion extends Vista implements Serializable {
 		this.listaDedicaciones = listaDedicaciones;
 	}
 	
-	public BolsaEmpleoDataTable<CandidatoResultadoTable> getDatatableCandidatos() {
+	public BolsaEmpleoDataTable<OfertaCandidato> getDatatableCandidatos() {
 		return datatableCandidatos;
 	}
 	
-	public void setDatatableCandidatos(BolsaEmpleoDataTable<CandidatoResultadoTable> datatableCandidatos) {
+	public void setDatatableCandidatos(BolsaEmpleoDataTable<OfertaCandidato> datatableCandidatos) {
 		this.datatableCandidatos = datatableCandidatos;
+	}
+
+	public List<OfertaCandidato> getListaOfertas() {
+		return listaOfertas;
+	}
+
+	public void setListaOfertas(List<OfertaCandidato> listaOfertas) {
+		this.listaOfertas = listaOfertas;
 	}
 	
 }

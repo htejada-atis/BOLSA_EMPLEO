@@ -9,6 +9,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import es.ujaen.uvirtual.modelo.conexion.ConexionUvirtual;
+import es.ujaen.uvirtual.modulo.bolsaempleo.beans.Contratacion;
 import es.ujaen.uvirtual.modulo.bolsaempleo.beans.Mensaje;
 import es.ujaen.uvirtual.modulo.bolsaempleo.beans.Plantilla;
 import es.ujaen.uvirtual.modulo.bolsaempleo.beans.PlazaOfertada;
@@ -247,37 +248,14 @@ public class ModeloPlantilla {
 		return texto;
 	}
 	
-	public String reemplazaPlazaYCitaEnPlantilla(PlazaOfertada plaza, java.util.Date fechaCita, String texto) {
-		texto = texto.replaceAll("<<idplaza>>", plaza.getCodNum().toString());
-		texto = texto.replaceAll("<<area>>", plaza.getArea().getDescripcion());
-		texto = texto.replaceAll("<<justificacion>>", plaza.getJustificacion());
-		texto = texto.replaceAll("<<duracion_prevista>>", plaza.getDuracionPrevista());
-		texto = texto.replaceAll("<<dedicacion>>", plaza.getDedicacion().getTexto());
-		texto = texto.replaceAll("<<cuatrimestre>>", plaza.getCuatrimestre());
-		texto = texto.replaceAll("<<sueldo>>", plaza.getDedicacion().getSueldo().toString());
-		texto = texto.replaceAll("<<centro_destino>>", plaza.getCentroDestino());
-		texto = texto.replaceAll("<<hora_fin_oferta>>", Formateador.formatoFecha(plaza.getFechaFinOferta(), Formateador.FORMATO_FECHA_HORA_MINUTOS));
-		texto = texto.replaceAll("<<fecha_fin_oferta>>", Formateador.formatoFecha(plaza.getFechaFinOferta(), Formateador.FORMATO_FECHA_DDMMYYYY));
-		texto = texto.replaceAll("<<hora_cita>>", Formateador.formatoFecha(fechaCita, Formateador.FORMATO_FECHA_HORA_MINUTOS));
-		texto = texto.replaceAll("<<fecha_cita>>", Formateador.formatoFecha(fechaCita, Formateador.FORMATO_FECHA_DDMMYYYY));
-		return texto;
-	}
-	
-	public String reemplazaPlazaYCandidatoEnPlantilla(PlazaOfertada plaza, UsuarioBolsaEmpleo candidato, String texto) {
-		texto = texto.replaceAll("<<idplaza>>", plaza.getCodNum().toString());
-		texto = texto.replaceAll("<<area>>", plaza.getArea().getDescripcion());
-		texto = texto.replaceAll("<<justificacion>>", plaza.getJustificacion());
-		texto = texto.replaceAll("<<duracion_prevista>>", plaza.getDuracionPrevista());
-		texto = texto.replaceAll("<<dedicacion>>", plaza.getDedicacion().getTexto());
-		texto = texto.replaceAll("<<cuatrimestre>>", plaza.getCuatrimestre());
-		texto = texto.replaceAll("<<sueldo>>", plaza.getDedicacion().getSueldo().toString());
-		texto = texto.replaceAll("<<centro_destino>>", plaza.getCentroDestino());
-		texto = texto.replaceAll("<<hora_fin_oferta>>", Formateador.formatoFecha(plaza.getFechaFinOferta(), Formateador.FORMATO_FECHA_HORA_MINUTOS));
-		texto = texto.replaceAll("<<fecha_fin_oferta>>", Formateador.formatoFecha(plaza.getFechaFinOferta(), Formateador.FORMATO_FECHA_DDMMYYYY));
-		texto = texto.replaceAll("<<apellidos_candidato>>", candidato.getPrimerApellido() + " " + candidato.getSegundoApellido());
-		texto = texto.replaceAll("<<nombre_candidato>>", candidato.getNombre());
-		texto = texto.replaceAll("<<NIF_candidato>>", candidato.getPrsNif());
-		texto = texto.replaceAll("<<email_candidato>>", candidato.getEmail());
+	public String reemplazaPlazaYContratacionEnPlantilla(PlazaOfertada plaza, Contratacion contratacion, String texto) {
+		texto = reemplazaPlazaEnPlantilla(plaza, texto);
+		texto = texto.replaceAll("<<hora_cita>>", Formateador.formatoFecha(contratacion.getFechaCita(), Formateador.FORMATO_FECHA_HORA_MINUTOS));
+		texto = texto.replaceAll("<<fecha_cita>>", Formateador.formatoFecha(contratacion.getFechaCita(), Formateador.FORMATO_FECHA_DDMMYYYY));
+		texto = texto.replaceAll("<<apellidos_candidato>>", contratacion.getCandidato().getPrimerApellido() + " " + contratacion.getCandidato().getSegundoApellido());
+		texto = texto.replaceAll("<<nombre_candidato>>", contratacion.getCandidato().getNombre());
+		texto = texto.replaceAll("<<NIF_candidato>>", contratacion.getCandidato().getPrsNif());
+		texto = texto.replaceAll("<<email_candidato>>", contratacion.getCandidato().getEmail());
 		return texto;
 	}
 

@@ -25,6 +25,7 @@ public class PlazaOfertada implements Serializable {
 	private Date fechaNRI;
 	private transient InputStream horario;
 	private transient InputStream nri;
+	private Boolean abiertaVigente;
 	
 	
 	/** Constructor por defecto.
@@ -98,6 +99,7 @@ public class PlazaOfertada implements Serializable {
 		this.fechaNRI = copia.fechaNRI;
 		this.horario = copia.horario;
 		this.nri = copia.nri;
+		this.abiertaVigente = copia.abiertaVigente;
 	}
 	
 	public Integer getCodNum() {
@@ -221,10 +223,19 @@ public class PlazaOfertada implements Serializable {
 		this.fechaFinOferta = fechaFinOferta;
 	}
 	
+	public Boolean isAbiertaVigente() {
+		return abiertaVigente;
+	}
+
+	public void setAbiertaVigente(Boolean abiertaVigente) {
+		this.abiertaVigente = abiertaVigente;
+	}
+	
 	@Override
 	public String toString() {
 		return "PlazaOfertada [codNum=" + codNum + ", area=" + area + ", estado=" + estado + ", fechaCreacion=" + fechaCreacion + ", fechaAbierta=" 
-				+ fechaAbierta + ", fechaFinOferta=" + fechaFinOferta + ", fechaCerrada=" + fechaCerrada + ", fechaFinOferta=" + fechaFinOferta + "]";
+				+ fechaAbierta + ", fechaFinOferta=" + fechaFinOferta + ", fechaCerrada=" + fechaCerrada + ", fechaFinOferta=" + fechaFinOferta
+				+ ", abiertaVigente=" + abiertaVigente + "]";
 	}
 	
 	@Override
@@ -246,6 +257,7 @@ public class PlazaOfertada implements Serializable {
 		result = prime * result + ((fechaNRI == null) ? 0 : fechaNRI.hashCode());
 		result = prime * result + ((horario == null) ? 0 : horario.hashCode());
 		result = prime * result + ((nri == null) ? 0 : nri.hashCode());
+		result = prime * result + ((abiertaVigente == null) ? 0 : abiertaVigente.hashCode());
 		return result;
 	}
 
@@ -366,6 +378,13 @@ public class PlazaOfertada implements Serializable {
 				return false;
 			}
 		} else if (!nri.equals(other.nri)) {
+			return false;
+		}
+		if (abiertaVigente == null) {
+			if (other.abiertaVigente != null) {
+				return false;
+			}
+		} else if (!abiertaVigente.equals(other.abiertaVigente)) {
 			return false;
 		}
 		
