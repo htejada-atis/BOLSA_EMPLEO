@@ -22,7 +22,6 @@ import es.ujaen.uvirtual.modulo.bolsaempleo.beans.Afinidad;
 import es.ujaen.uvirtual.modulo.bolsaempleo.beans.Bolsa;
 import es.ujaen.uvirtual.modulo.bolsaempleo.beans.BolsaValidacion;
 import es.ujaen.uvirtual.modulo.bolsaempleo.beans.CandidatoValidacion;
-import es.ujaen.uvirtual.modulo.bolsaempleo.beans.HistorialValidacion;
 import es.ujaen.uvirtual.modulo.bolsaempleo.beans.ItemBaremacion;
 import es.ujaen.uvirtual.modulo.bolsaempleo.beans.Merito;
 import es.ujaen.uvirtual.modulo.bolsaempleo.beans.MeritoSolicitud;
@@ -66,7 +65,6 @@ public class ControladorValidar extends HttpServlet {
 	// acciones
 	public static final String ACCION_DATATABLE_BOLSAS = "datatablebolsas";
 	public static final String ACCION_DATATABLE_CANDIDATOS = "datatablecandidatos";
-	public static final String ACCION_DATATABLE_HISTORIAL_VALIDACION = "datatablehistorialvalidacion";
 	public static final String ACCION_DATATABLE_MERITOS = "datatablemeritos";
 	public static final String ACCION_BOLSA_SELECCIONADA = "bolsaseleccionada";
 	public static final String ACCION_CANDIDATO_SELECCIONADO = "candidatoseleccionado";
@@ -101,6 +99,7 @@ public class ControladorValidar extends HttpServlet {
 	public static final String MENSAJE_ERROR_BOLSA_ESTADO_NO_VALIDO = "El estado de la bolsa no permite acceder a esta";
 	public static final String MENSAJE_ERROR_NO_HAY_BOLSAS_SELECCIONADAS = "No hay bolsas seleccionadas";
 	public static final String MENSAJE_ERROR_NUMERO_MAXIMO_MERITOS_BLOQUE = "Se ha alcanzado el número máximo de méritos por bloque";
+	public static final String MENSAJE_ERROR_BOLSA_ESTADO_NO_VALIDO_ACCION = "El estado de la bolsa no permite hacer ninguna modificación";
 	public static final String MENSAJE_ERROR_SIN_PERMISO = "No tienes permiso";
 	public static final String MENSAJE_EXITO_MERITO_EXCLUIDO = "Mérito excluido correctamente para la bolsa: %s";
 	public static final String MENSAJE_EXITO_MERITO_GUARDAR = "Mérito guardado correctamente para la bolsa: %s";
@@ -139,7 +138,6 @@ public class ControladorValidar extends HttpServlet {
 				case ACCION_BOLSA_SELECCIONADA:
 				case ACCION_CANDIDATO_SELECCIONADO:
 				case ACCION_DATATABLE_CANDIDATOS:
-				case ACCION_DATATABLE_HISTORIAL_VALIDACION:
 				case ACCION_DATATABLE_MERITOS:
 				case ACCION_HISTORIAL_VALIDACION:
 				case ACCION_MERITO_SELECCIONADO:
@@ -217,6 +215,7 @@ public class ControladorValidar extends HttpServlet {
 		bean.setVista(JSP_MERITOS_CANDIDATOS);
 		
 		if (!bean.getUsuarioLogeado().getRol().getCodNum().equals(ModeloRol.ID_ROL_SERVICIO_PERSONAL) 
+				&& !bean.getUsuarioLogeado().getRol().getCodNum().equals(ModeloRol.ID_ROL_DIRECTOR_DEPARTAMENTO)
 				&& !bean.getBolsa().getEstado().equals(ModeloBolsa.BOLSA_ESTADO_BAREMACION)) {
 			BolsaEmpleoUtils.addMensajeDeError(MENSAJE_ERROR_BOLSA_ESTADO_NO_VALIDO, bean, request);
 			datos.setRespuestaEnviada(true);
@@ -227,7 +226,6 @@ public class ControladorValidar extends HttpServlet {
 			case ACCION_BOLSA_SELECCIONADA:
 				break;
 			case ACCION_CANDIDATO_SELECCIONADO:
-			case ACCION_DATATABLE_HISTORIAL_VALIDACION:
 			case ACCION_DATATABLE_MERITOS:
 			case ACCION_HISTORIAL_VALIDACION:
 			case ACCION_MERITO_SELECCIONADO:
@@ -255,7 +253,6 @@ public class ControladorValidar extends HttpServlet {
 			case ACCION_DATATABLE_MERITOS:
 				listadoMeritos(bean, datos, request, response);
 				break;
-			case ACCION_DATATABLE_HISTORIAL_VALIDACION:
 			case ACCION_HISTORIAL_VALIDACION:
 			case ACCION_MERITO_SELECCIONADO:
 			case ACCION_MODIFICAR_MERITO:
@@ -280,11 +277,8 @@ public class ControladorValidar extends HttpServlet {
 		bean.setItems(modeloItem.listaItemBaremacion());
 		
 		switch (nombreAccion) {
-			case ACCION_DATATABLE_HISTORIAL_VALIDACION:
-				listadoHistorialValidacionMerito(bean, datos, request, response);
-				break;
 			case ACCION_HISTORIAL_VALIDACION:
-				bean.setVista(JSP_HISTORIAL_VALIDACION);
+				obtenerHistorialesValidacion(bean);
 				break;
 			case ACCION_MERITO_SELECCIONADO:
 				obtenerValoresMeritoBolsasCandidato(bean);
@@ -306,6 +300,11 @@ public class ControladorValidar extends HttpServlet {
 		Gson gson = new GsonBuilder().create();
 		
 		try {
+			if (!bean.getUsuarioLogeado().getRol().getCodNum().equals(ModeloRol.ID_ROL_SERVICIO_PERSONAL) 
+					&& !bean.getBolsa().getEstado().equals(ModeloBolsa.BOLSA_ESTADO_BAREMACION)) {
+				throw new UVException(MENSAJE_ERROR_BOLSA_ESTADO_NO_VALIDO_ACCION);
+			}
+			
 			if (EscapaHTML.ajustaCodificacion(request.getParameter(PARAM_VALOR)) != null) {
 				Merito merito = new Merito(bean.getMerito().getMerito());
 				// item de baremación
@@ -368,6 +367,17 @@ public class ControladorValidar extends HttpServlet {
 		}
 	}
 	
+	private void obtenerHistorialesValidacion(VistaValidar bean) throws SQLException, UVException {
+		ModeloValidarHistorial modeloValidarHistorial = ModeloValidarHistorial.obtenerInstancia();
+		bean.setVista(JSP_HISTORIAL_VALIDACION);
+		
+		bean.setHistorialSBM(modeloValidarHistorial.listaHistorialSolicitudBolsasMeritos(bean.getConvocatoria(), 
+				bean.getMerito().getMerito(), bean.getBolsa()));
+		bean.setHistorialMerito(modeloValidarHistorial.listaHistorialMerito(bean.getMerito().getMerito()));
+		bean.setHistorialValoracionMerito(modeloValidarHistorial.listaHistorialValoracionesMerito(bean.getConvocatoria(), 
+				bean.getMerito().getMerito(), bean.getBolsa()));
+	}
+	
 	private void obtenerValoresMeritoBolsasCandidato(VistaValidar bean) throws SQLException, UVException {
 		ModeloValidar modeloValidar = ModeloValidar.obtenerInstancia();
 		
@@ -380,6 +390,11 @@ public class ControladorValidar extends HttpServlet {
 		ModeloBolsa modeloBolsa = ModeloBolsa.obtenerInstancia();
 		
 		try {
+			if (!bean.getUsuarioLogeado().getRol().getCodNum().equals(ModeloRol.ID_ROL_SERVICIO_PERSONAL) 
+					&& !bean.getBolsa().getEstado().equals(ModeloBolsa.BOLSA_ESTADO_BAREMACION)) {
+				throw new UVException(MENSAJE_ERROR_BOLSA_ESTADO_NO_VALIDO_ACCION);
+			}
+			
 			String observacionesCandidato = EscapaHTML.ajustaCodificacion(request.getParameter(PARAM_OBSERVACION_CANDIDATO));
 			bean.getMerito().setObservacionCandidato(EscapaHTML.ajustaCodificacion(request.getParameter(PARAM_OBSERVACION_CANDIDATO)));
 			Integer idBolsa = Formateador.leeParametroInteger(request.getParameter(PARAM_BOLSA_MERITO));
@@ -423,7 +438,6 @@ public class ControladorValidar extends HttpServlet {
 		MeritoSolicitud meritoSolicitud = modeloSolicitud.getMeritoSolicitud(solicitud, bolsa, bean.getMerito().getMerito());
 		ItemBaremacion itemBolsa = meritoSolicitud.getItem() != null ? meritoSolicitud.getItem() : meritoSolicitud.getMerito().getItemBaremacion();
 		Double valor = meritoSolicitud.getValor() != null && meritoSolicitud.getValor() != 0 ? meritoSolicitud.getValor() : meritoSolicitud.getMerito().getValor();
-		
 		
 		if (!itemBolsa.getIndividualizado()) {
 			// comprobamos validez de las afinidades
@@ -502,34 +516,6 @@ public class ControladorValidar extends HttpServlet {
 						listadoCandidatosSujetosAfinidad(bean.getConvocatoria(), bean.getBolsa(), request.getParameterMap());
 				bean.setDatatableCandidatos(dataTable);
 				writer.write(dataTable.toJson());
-			} catch (UVException | SQLException e) {
-				if (e instanceof SQLException) {
-					LOGGER.log(Level.SEVERE, Formateador.getStackTrace(e));
-					LOGGER.log(Level.SEVERE, e.toString());
-				} else {
-					LOGGER.log(Level.WARNING, e.toString());
-				}
-				bean.getMensajesDeError().add(e.getMessage());
-				CodigoDescripcion mensaje = new CodigoDescripcion(RESPONSE_AJAX_ERROR, e.getMessage());
-				writer.write(new Gson().toJson(mensaje));
-				response.setStatus(RESPONSE_AJAX_HTTP_CODE_ERROR);
-			}
-		}
-	}
-	
-	private void listadoHistorialValidacionMerito(VistaValidar bean, UVDatos datos, HttpServletRequest request, HttpServletResponse response)
-			throws IOException {
-		datos.setContentType(RESPONSE_AJAX_CONTENTTYPE);
-		datos.setRespuestaEnviada(true);
-		response.setContentType(RESPONSE_AJAX_CONTENTTYPE);
-		response.setCharacterEncoding(RESPONSE_AJAX_ENCODING);
-		
-		try (PrintWriter writer = response.getWriter()) {
-			try {
-				BolsaEmpleoDataTable<HistorialValidacion> dataTable = ModeloValidarHistorial.obtenerInstancia().listadoHistorialValidacionesMerito(
-						bean.getConvocatoria(), bean.getMerito().getMerito(), bean.getBolsa(), request.getParameterMap());
-				bean.setDatatableHistorialValidacion(dataTable);
-				writer.write(dataTable.toJson("dd/M/yyyy HH:mm:ss"));
 			} catch (UVException | SQLException e) {
 				if (e instanceof SQLException) {
 					LOGGER.log(Level.SEVERE, Formateador.getStackTrace(e));

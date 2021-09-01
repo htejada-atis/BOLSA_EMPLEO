@@ -3,14 +3,15 @@ package es.ujaen.uvirtual.modulo.bolsaempleo.vistas;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
-
 import es.ujaen.uvirtual.beans.vistas.Vista;
 import es.ujaen.uvirtual.modulo.bolsaempleo.beans.Afinidad;
 import es.ujaen.uvirtual.modulo.bolsaempleo.beans.Bolsa;
 import es.ujaen.uvirtual.modulo.bolsaempleo.beans.BolsaValidacion;
 import es.ujaen.uvirtual.modulo.bolsaempleo.beans.CandidatoValidacion;
 import es.ujaen.uvirtual.modulo.bolsaempleo.beans.Convocatoria;
-import es.ujaen.uvirtual.modulo.bolsaempleo.beans.HistorialValidacion;
+import es.ujaen.uvirtual.modulo.bolsaempleo.beans.HistorialMerito;
+import es.ujaen.uvirtual.modulo.bolsaempleo.beans.HistorialSBM;
+import es.ujaen.uvirtual.modulo.bolsaempleo.beans.HistorialValoracionMerito;
 import es.ujaen.uvirtual.modulo.bolsaempleo.beans.ItemBaremacion;
 import es.ujaen.uvirtual.modulo.bolsaempleo.beans.MeritoSolicitud;
 import es.ujaen.uvirtual.modulo.bolsaempleo.beans.MeritoValidarTable;
@@ -32,7 +33,9 @@ public class VistaValidar extends Vista implements Serializable {
 	private UsuarioBolsaEmpleo usuario;
 	private transient BolsaEmpleoDataTable<BolsaValidacion> datatableBolsas;
 	private transient BolsaEmpleoDataTable<CandidatoValidacion> datatableCandidatos;
-	private transient BolsaEmpleoDataTable<HistorialValidacion> datatableHistorialValidacion;
+	private List<HistorialSBM> historialSBM;
+	private List<HistorialMerito> historialMerito;
+	private List<HistorialValoracionMerito> historialValoracionMerito;
 	private transient BolsaEmpleoDataTable<MeritoValidarTable> datatableMeritos;
 	private List<ItemBaremacion> items = new ArrayList<>();
 	private List<ValorMeritoBolsaTable> bolsas = new ArrayList<>();
@@ -92,8 +95,8 @@ public class VistaValidar extends Vista implements Serializable {
 		return validaBolsa;
 	}
 	
-	public void setValidaBolsa(Bolsa bolsa) {
-		this.validaBolsa = bolsa;
+	public void setValidaBolsa(Bolsa validaBolsa) {
+		this.validaBolsa = validaBolsa;
 	}
 	
 	public Convocatoria getConvocatoria() {
@@ -144,12 +147,28 @@ public class VistaValidar extends Vista implements Serializable {
 		this.listaAfinidades = afinidades;
 	}
 
-	public BolsaEmpleoDataTable<HistorialValidacion> getDatatableHistorialValidacion() {
-		return datatableHistorialValidacion;
+	public List<HistorialSBM> getHistorialSBM() {
+		return historialSBM;
 	}
 
-	public void setDatatableHistorialValidacion(BolsaEmpleoDataTable<HistorialValidacion> datatableHistorialValidacion) {
-		this.datatableHistorialValidacion = datatableHistorialValidacion;
+	public void setHistorialSBM(List<HistorialSBM> historialSBM) {
+		this.historialSBM = historialSBM;
+	}
+
+	public List<HistorialMerito> getHistorialMerito() {
+		return historialMerito;
+	}
+
+	public void setHistorialMerito(List<HistorialMerito> historialMerito) {
+		this.historialMerito = historialMerito;
+	}
+
+	public List<HistorialValoracionMerito> getHistorialValoracionMerito() {
+		return historialValoracionMerito;
+	}
+
+	public void setHistorialValoracionMerito(List<HistorialValoracionMerito> historialValoracionMerito) {
+		this.historialValoracionMerito = historialValoracionMerito;
 	}
 	
 }

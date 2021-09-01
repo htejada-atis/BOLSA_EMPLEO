@@ -5,6 +5,7 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
 import es.ujaen.uvirtual.modelo.conexion.ConexionUvirtual;
@@ -33,6 +34,7 @@ protected static ModeloMisResultados eInstancia;
 	public static final int ORDER_COLUMN_INDEX_PUNTUACION_CANDIDATOS = 2;
 	
 	public static final String CODNUM = "CODNUM";
+	public static final String FECHABAREMACION = "FECHABAREMACION";
 	public static final String TOTAL = "TOTAL";
 	public static final String VUAJA_PRSNIF = "VUAJA_PRSNIF";
 	public static final String VUAJA_STRAPELLIDO1 = "VUAJA_STRAPELLIDO1";
@@ -74,9 +76,9 @@ protected static ModeloMisResultados eInstancia;
 		List<BolsaResultado> bolsas = new ArrayList<>();
 		BolsaEmpleoDataTable<BolsaResultado> dataTable = new BolsaEmpleoDataTable<>(params);
 
-		String consulta = "SELECT bepbol.CODNUM, bepsob.TOTAL,"
+		String consulta = "SELECT bepbol.CODNUM, bepsob.TOTAL, bepsob.FECHABAREMACION,"
 				+ "		CASE"
-				+ "			WHEN bepbol.FECHABAREMACION > bepcon.FECHACIERRE THEN 1"
+				+ "			WHEN bepcon.ESTADO = 'CERRADA' THEN 1"
 				+ "			ELSE 0"
 				+ "		END AS RESULTADOS_ACTUALES"
 				+ "	FROM TBEP_BOLSAS bepbol"
@@ -203,8 +205,12 @@ protected static ModeloMisResultados eInstancia;
 	public BolsaResultado createBolsaResultadoFromResultset(ResultSet rs) throws SQLException, UVException {
 		Bolsa bol = ModeloBolsa.obtenerInstancia().getBolsaById(rs.getInt(CODNUM));
 		Double total = rs.getDouble(TOTAL);
+		Date fechaBaremacion = rs.getDate(FECHABAREMACION);
 		Boolean resultadoActual = rs.getBoolean("RESULTADOS_ACTUALES");
 		
-		return new BolsaResultado(bol, total, resultadoActual);
+		BolsaResultado bolsa = new BolsaResultado(bol, total, resultadoActual);
+		bolsa.setFechaBaremacion(fechaBaremacion);
+		
+		return bolsa;
 	}
 }
