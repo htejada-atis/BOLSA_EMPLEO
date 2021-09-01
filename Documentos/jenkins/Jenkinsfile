@@ -118,7 +118,7 @@ pipeline {
 	        	def checkstyleLog = readFile('checkstyle_log.txt').trim()
 				emailext mimeType: "text/html", to: 'jmoral@ujaen.es',
 					attachLog: true, attachmentsPattern: 'builds/build/rama/site/jacoco/unittest.zip, builds/build/rama/site/jacoco/capturas.zip',
-					body: "Construccion en: ${BUILD_URL}\n ${checkstyleLog}", 
+					body: "Construccion en: ${BUILD_URL} <br>${checkstyleLog}", 
 					subject: "Completado jenkins pipeline ${JOB_NAME} (${BUILD_NUMBER}) "
         	}
 
