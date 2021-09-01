@@ -32,7 +32,7 @@ public class TestCrearUsuarioAutoregistrado extends UtilsTestUsuarioBase {
 
 	private static final Logger LOGGER = Logger.getLogger(NOMBREDEESTACLASE);
 	
-	private static final Integer WAITTIME = 5; 
+	private static final Integer WAITTIME = 10; 
 	
 	private static final String TEXTO = "texto prueba";
 	private static final String CORREO = "juanmoralcardenas@gmail.com";
@@ -59,7 +59,7 @@ public class TestCrearUsuarioAutoregistrado extends UtilsTestUsuarioBase {
 	/** Inserta una convocatoria.
 	 */
 	@Test
-	public void testA01() {
+	public void testE01() {
 		DriverUv.getDriver().get(DriverUv.RUTA + "/pub/es/operaciones/autoregistrado/usuarioautoresgistrado?a=mostrarcrear");
 		DriverUv.getDriver().findElement(By.name("documento")).sendKeys(TEXTO);
 		DriverUv.getDriver().findElement(By.name("nombre")).sendKeys(TEXTO);
@@ -70,9 +70,10 @@ public class TestCrearUsuarioAutoregistrado extends UtilsTestUsuarioBase {
 		DriverUv.getDriver().findElement(By.name("emailRepetido")).submit();
 
 		WebDriverWait wait = new WebDriverWait(DriverUv.getDriver(), WAITTIME);
-		WebElement codigoTemporal = wait.until(ExpectedConditions.visibilityOfElementLocated(By.name("codigoTemporal")));
-		assertNotNull(codigoTemporal);
-		assertTrue(codigoTemporal.isDisplayed());
+		WebElement error = wait.until(ExpectedConditions.visibilityOfElementLocated(By.id("error")));
+		assertNotNull(error);
+		assertTrue(error.isDisplayed());
+		assertTrue(error.getText().contains("verificación incorrecta"));
 	}
 	
 	/** Cierre de este unittest.

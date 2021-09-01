@@ -81,7 +81,7 @@ public class TestModeloAutoregistrado {
     	String ipOrigenValidacion = "127.0.0.2";
     	modelo.insertaPeticionCambio(usuario.getEmailCuentaPersona(), solicitud, codigoTemporal, ipOrigenPeticion);
     	String clave = modelo.verificaPeticionCambio(usuario.getEmailCuentaPersona(), solicitud, codigoTemporal, ipOrigenValidacion);
-    	assertTrue(modelo.validaClaveUsuario(usuario.getEmailCuentaPersona(), clave));
+    	assertTrue(modelo.validaClaveUsuario(usuario.getEmailCuentaPersona(), clave, ipOrigenPeticion));
     }
     
 

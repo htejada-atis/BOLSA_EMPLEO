@@ -25,6 +25,7 @@ public class UtilsTestAutoregistrado {
 	 */
 	public static void inicializaDb() throws SQLException, IOException {
 		if (!cargado) {
+			BbddRunner.conectarBd();
 			BbddRunner.ejecutarArcos("Documentos/scripts/opc.autoaprovisionado/Desarrollo/dropTables.sql");
 			BbddRunner.ejecutarArcos("Documentos/scripts/opc.autoaprovisionado/01-createTable.sql");
 			BbddRunner.ejecutarArcos("Documentos/scripts/opc.autoaprovisionado/02-createTrigger.sql");

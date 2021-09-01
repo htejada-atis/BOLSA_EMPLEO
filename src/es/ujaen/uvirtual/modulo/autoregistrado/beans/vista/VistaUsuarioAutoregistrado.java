@@ -15,6 +15,11 @@ public class VistaUsuarioAutoregistrado extends Vista implements Serializable {
 	private String clave;
 	private String codigoTemporal;
 	private String idSolicitud;
+	private String descripcionModulo;
+	private String paginaRedireccion;
+	private String captchaPublica;
+	private boolean mostrarCaptcha;
+	private String idModulo;
 	public String getVista() {
 		return vista;
 	}
@@ -53,5 +58,45 @@ public class VistaUsuarioAutoregistrado extends Vista implements Serializable {
 
 	public void setIdSolicitud(String idSolicitud) {
 		this.idSolicitud = idSolicitud;
+	}
+
+	public String getPaginaRedireccion() {
+		return paginaRedireccion;
+	}
+
+	public void setPaginaRedireccion(String paginaRedireccion) {
+		this.paginaRedireccion = paginaRedireccion;
+	}
+
+	public String getIdModulo() {
+		return idModulo;
+	}
+
+	public void setIdModulo(String idModulo) {
+		this.idModulo = idModulo;
+	}
+
+	public String getDescripcionModulo() {
+		return descripcionModulo;
+	}
+
+	public void setDescripcionModulo(String descripcionModulo) {
+		this.descripcionModulo = descripcionModulo;
+	}
+
+	public String getCaptchaPublica() {
+		return captchaPublica;
+	}
+
+	public void setCaptchaPublica(String captchaPublica) {
+		this.captchaPublica = captchaPublica;
+	}
+
+	public boolean isMostrarCaptcha() {
+		return mostrarCaptcha;
+	}
+
+	public void setMostrarCaptcha(boolean mostrarCaptcha) {
+		this.mostrarCaptcha = mostrarCaptcha;
 	}
 }

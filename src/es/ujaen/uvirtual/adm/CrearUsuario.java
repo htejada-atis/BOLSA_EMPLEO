@@ -14,6 +14,7 @@ import es.ujaen.uvirtual.modelo.ModeloUsuarioArcos;
 import es.ujaen.uvirtual.modelo.ModeloUsuarioUXXIAC;
 import es.ujaen.uvirtual.modelo.ModeloUsuarioUXXIRRHH;
 import es.ujaen.uvirtual.modulo.bolsaempleo.modelo.ModeloUsuarioBolsaEmpleo;
+import es.ujaen.uvirtual.modulo.autoregistrado.modelo.ModeloUsuarioAutoregistrado;
 import es.ujaen.uvirtual.utilidades.Formateador;
 import es.ujaen.uvirtual.utilidades.Memcache;
 
@@ -228,6 +229,15 @@ public class CrearUsuario {
 				usuario.setRoles(rolesPorDominio.get(usuario.getDominio()));
 				usuario.setRolesAdministrados(rolesAdministrados);
 				
+			}
+			// cuentas autoregistradas
+			if (usuario == null) {
+				try {
+					ModeloUsuarioAutoregistrado modeloUsuarioAutoregistrado = new ModeloUsuarioAutoregistrado();
+					usuario = modeloUsuarioAutoregistrado.cargaUsuarioExterno(uid);
+				} catch (SQLException e) {
+					erroresArcos = true;
+				}
 			}
 			
 			if (erroresArcos || erroresUvirtual || erroresRrhh || erroresAc || erroresDominio || usuario == null) {

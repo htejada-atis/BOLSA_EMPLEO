@@ -9,6 +9,12 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import javax.mail.internet.AddressException;
 import javax.mail.internet.InternetAddress;
@@ -17,19 +23,22 @@ import es.ujaen.uvirtual.beans.ConfiguracionGlobal;
 import es.ujaen.uvirtual.beans.Usuario;
 import es.ujaen.uvirtual.modelo.ModeloClaveArcos;
 import es.ujaen.uvirtual.modelo.conexion.ConexionArcos;
+import es.ujaen.uvirtual.utilidades.AdaptadorDocumentoIdentidad;
 import es.ujaen.uvirtual.utilidades.EnviaCorreo;
 import es.ujaen.uvirtual.utilidades.UVException;
 
 /** Modelo para usuario autoregistrado.
  */
 public class ModeloUsuarioAutoregistrado {
-	
+	private static final String NOMBREDEESTACLASE = ModeloUsuarioAutoregistrado.class.getName();
+	private static final Logger LOGGER = Logger.getLogger(NOMBREDEESTACLASE);
+
 	private void insertaCuentaAutoregistradoBd(Connection conexion, Usuario usuario) throws SQLException, UVException {
 		String consulta = " INSERT INTO arcos.ARG_CUENTA " 
 				+ " (usuario, correo, clave, fecha_creacion) "
 				+ " VALUES (?, ?, ?, sysdate)";
 		try (PreparedStatement stmt = conexion.prepareStatement(consulta)) {
-			ModeloClaveArcos modelo = new ModeloClaveArcos();
+			ModeloClaveArcos modelo = ModeloClaveArcos.obtenerInstancia();
 			int parameterIndex = 1;
 			stmt.setString(parameterIndex++, usuario.getUid());
 			stmt.setString(parameterIndex++, usuario.getEmailCuentaPersona());
@@ -47,7 +56,7 @@ public class ModeloUsuarioAutoregistrado {
 	private void insertaUsuarioAutoregistradoBd(Connection conexion, Usuario usuario) throws SQLException {
 		String consulta = " INSERT INTO arcos.ARG_USUARIO " 
 				+ " (usuario, nombre, apellido1, apellido2, documento, tipodocumento) "
-				+ " VALUES ('autoregistrado'||LPAD(sec_arg_usuario.nextval, 8, '0'), ?, ?, ?, ?, ?)";
+				+ " VALUES ('autoregistrado'||LPAD(arcos.sec_arg_usuario.nextval, 8, '0'), ?, ?, ?, ?, ?)";
 		try (PreparedStatement stmt = conexion.prepareStatement(consulta, new String[]{"usuario"})) {
 			int parameterIndex = 1;
 			stmt.setString(parameterIndex++, usuario.getNombre());
@@ -65,7 +74,50 @@ public class ModeloUsuarioAutoregistrado {
 		}
 	}
 	
-	private void validaInsertaUsuarioAutoregistrado(Usuario usuario) throws UVException, SQLException {
+	private void validaLetraDocumento(Usuario usuario) throws UVException {
+		String numeroNif = AdaptadorDocumentoIdentidad.numeroDocumento(AdaptadorDocumentoIdentidad.UXXIAC, usuario);
+		String letraNif = AdaptadorDocumentoIdentidad.letraNIF(usuario.getDocumentoTipo(), usuario.getDocumentoNumero());
+		String letraNifCalculada = calculaLetraNIFJava(numeroNif);
+		if (!letraNif.equals(letraNifCalculada)) {
+			throw new UVException("letra de NIF no correcta");
+		}
+	}
+	
+	private void validaTipoDocumento(Usuario usuario) throws UVException {
+		if ("NIF".equals(usuario.getDocumentoTipo())) {
+			final int numeroCaracteresNif = 9;
+			if (usuario.getDocumentoNumero().length() != numeroCaracteresNif) {
+				throw new UVException("el nif debe tener 9 caracteres incluyendo la letra");
+			}
+	        Pattern patronNif = Pattern.compile("[0-9]{8}[A-Z]");
+	        Matcher matcharNif = patronNif.matcher(usuario.getDocumentoNumero());
+	        if (!matcharNif.matches()) {
+	        	throw new UVException("formato de NIF no válido");
+	        }
+	        validaLetraDocumento(usuario);
+		}
+		if ("NIE".equals(usuario.getDocumentoTipo())) {
+	        Pattern patronNie = Pattern.compile("[X-Z][0-9]{7}[A-Z]");
+	        Matcher matcharNie = patronNie.matcher(usuario.getDocumentoNumero());
+	        if (!matcharNie.matches()) {
+	        	throw new UVException("formato de NIE no válido");
+	        }
+			if (usuario.getDocumentoNumero().charAt(0) != 'X' && usuario.getDocumentoNumero().charAt(0) != 'Y' && usuario.getDocumentoNumero().charAt(0) != 'Z') {
+				throw new UVException("primera letra NIE no válida");
+			}
+	        validaLetraDocumento(usuario);
+		}
+	}
+	
+	private String calculaLetraNIFJava(String nif) {
+		final int modulo = 23;
+		String caracteres = "TRWAGMYFPDXBNJZSQVHLCKE";
+		String nifTratado = nif.replace("X", "0").replace("Y", "1").replace("Z", "2");
+		int resto = Integer.parseInt(nifTratado) % modulo;
+		return Character.toString(caracteres.charAt(resto));
+	}
+	
+	private void validaCamposUsuarioAutoregistrado(Usuario usuario) throws UVException {
 		if (usuario == null) {
 			throw new UVException("No se puede insertar un usuario vacio");
 		}
@@ -78,8 +130,21 @@ public class ModeloUsuarioAutoregistrado {
 		if (usuario.getDocumentoNumero() == null || "".equals(usuario.getDocumentoNumero())) {
 			throw new UVException("No se puede insertar un usuario sin numero de documento");
 		}
+	}
+	
+	private void validaInsertaUsuarioAutoregistrado(Usuario usuario) throws UVException, SQLException {
+		validaCamposUsuarioAutoregistrado(usuario);
 		if (isDocumentoRegistrado(usuario.getDocumentoNumero(), usuario.getDocumentoTipo())) {
 			throw new UVException("Documento ya dado de alta, pongase en contracto con los gestores de la aplicacióna la que desea acceder");
+		}
+		boolean validarDocumento = false;
+		try {
+			validarDocumento = ConfiguracionGlobal.getParametroLogico("autoregistrado.validaNif");
+		} catch (UVException e) {
+			LOGGER.log(Level.WARNING, e.toString());
+		}
+		if (validarDocumento) {
+			validaTipoDocumento(usuario);
 		}
 	}
 	
@@ -94,7 +159,7 @@ public class ModeloUsuarioAutoregistrado {
 			throw new UVException("No se puede registrar una cuenta ujaen como autoregistrado");
 		}
 		if (isCorreoRegistrado(usuario.getEmailCuentaPersona())) {
-			throw new UVException("Correo ya registrado");
+			throw new UVException("Correo ya registrado. Intente recuperar su clave");
 		}
 	}
 	
@@ -165,6 +230,28 @@ public class ModeloUsuarioAutoregistrado {
 		return salida;
 	}
 
+	/** inserta un registro de intento de validacion de usuario.
+	 * @param correo correo del usuario externo
+	 * @param valido si ha accedido correctamente
+	 * @param ip ip desde la que se solicita el acceso
+	 * @throws SQLException si error en bbdd
+	 * @throws UVException si error en parametros
+	 */
+	public void insertaLogAcceso(String correo, boolean valido, String ip) throws SQLException {
+		String consulta = " INSERT INTO arcos.ARG_LOG_ACCESO " 
+						+ " (correo, valido, ip, fecha) "
+						+ " VALUES (?, ?, ?, sysdate)";
+		try (Connection conexion = ConexionArcos.obtenerInstancia();
+			 PreparedStatement stmt = conexion.prepareStatement(consulta);) {
+			int parameterIndex = 1;
+			stmt.setString(parameterIndex++, correo);
+			stmt.setString(parameterIndex++, valido ? "S" : "N");
+			stmt.setString(parameterIndex++, ip);
+			stmt.executeUpdate();
+		}
+	}
+	
+
 	/** inserta una nueva petición de cambio de clave de usuario autoregistrado.
 	 * @param correo correo del usuario externo
 	 * @param idSolicitud identificador aleatorio de la solicitud
@@ -234,7 +321,7 @@ public class ModeloUsuarioAutoregistrado {
 			stmt.setString(parameterIndex++, idSolicitud);
 			int actualizados = stmt.executeUpdate();
 			if (actualizados == 1) {
-				ModeloClaveArcos modeloClaveArcos = new ModeloClaveArcos();
+				ModeloClaveArcos modeloClaveArcos = ModeloClaveArcos.obtenerInstancia();
 				String passwordAleatorio = modeloClaveArcos.passwordAleatorio();
 				actualizaClaveUsuario(correo, passwordAleatorio);
 				salida = passwordAleatorio;
@@ -270,33 +357,75 @@ public class ModeloUsuarioAutoregistrado {
 	 * Valida si la clave de un usuario externo es valida.
 	 * @param correo correo del usuario externo
 	 * @param clave clave del usuairo
+	 * @param ip ip desde la que se valida el usuario
 	 * @return true en caso de ser valida, false en caso contrario
 	 * @throws SQLException en caso de error en la base de datos
 	 */
-	public boolean validaClaveUsuario(String correo, String clave) throws SQLException {
+	public boolean validaClaveUsuario(String correo, String clave, String ip) throws SQLException {
 		boolean salida = false;
 		String ultimoHash = listaClaveUsuarioExterno(correo);
-		ModeloClaveArcos modeloClaveArcos = new ModeloClaveArcos();
+		ModeloClaveArcos modeloClaveArcos = ModeloClaveArcos.obtenerInstancia();
 		if (modeloClaveArcos.isClaveIgualHash(clave, ultimoHash)) {
 			salida = true;
+		}
+		insertaLogAcceso(correo, salida, ip);
+		return salida;
+	}	
+	
+	private Usuario listaDatosUsuario(String correo) throws SQLException {
+		String consulta = "select * "
+						+ "  from ARCOS.ARG_CUENTA c, arcos.arg_usuario u "
+						+ " where c.correo = ?"
+						+ "   and c.usuario = u.usuario ";
+		Usuario salida = null;
+		try (Connection conexion = ConexionArcos.obtenerInstancia();
+			PreparedStatement stmt = conexion.prepareStatement(consulta)) {
+			int parameterIndex = 1; 
+			stmt.setString(parameterIndex++, correo);
+			try (ResultSet rs = stmt.executeQuery()) {
+				while (rs.next()) {
+					salida = new Usuario();
+					salida.setUid(rs.getString("correo"));
+					salida.setCuentaInstitucional(false);
+					salida.setCuentaBloqueada(false);
+					salida.setDominio("autoregistrado.ujaen.es");
+					salida.setCuentaDN(null);
+					salida.setCodigoCuentaArcos(null);
+					salida.setCorreoRuta(null);
+					salida.setCuentaGoogle(false);
+					salida.setCuentaGoogleSuspendida(false);
+					salida.setNombre(rs.getString("nombre"));
+					salida.setApellido1(rs.getString("apellido1"));
+					salida.setApellido2(rs.getString("apellido2"));
+					salida.setDocumentoNumero(rs.getString("documento"));
+					salida.setDocumentoTipo(rs.getString("tipodocumento"));
+					salida.setCodigoPersonaArcos(null);
+					salida.setCodigoRRHH(null);
+					salida.setCodigoUXXIAC(null);
+					salida.setPersonaManual(false);
+					salida.setSexo(null);
+				}
+			}
+		}
+		if (salida == null) {
+			throw new SQLException("no existe cuenta del usuario" + correo);
 		}
 		return salida;
 	}	
 	
-	/** Obtiene el usuario a partir del uid.
-	 * @param uid identificador del usuario
+	/** Obtiene el usuario a partir del correo autoregistrado.
+	 * @param correo correo del usuario autoregistrado
 	 * @return usuario usuario
+	 * @throws SQLException si fallo bd
 	 */
-	public Usuario cargaUsuarioExterno(String uid) {
-		Usuario usuario = new Usuario();
-		usuario.setApellido1(uid);
-		usuario.setApellido2(uid);
-		usuario.setDocumentoNumero(uid);
-		usuario.setDocumentoTipo(uid);
-		usuario.setNombre(uid);
-		usuario.setUid(uid);
+	public Usuario cargaUsuarioExterno(String correo) throws SQLException {
+		Usuario usuario = listaDatosUsuario(correo);
 		ArrayList<String> roles = new ArrayList<>();
-		roles.add("UsuarioNoVerificado");
+		roles.add("UsuarioAutoregistrado");
+		roles.add("publico");
+		HashMap<String, ArrayList<String>> rolesDominio = new HashMap<>();
+		rolesDominio.put(usuario.getDominio(), roles);
+		usuario.setRolesPorDominio(rolesDominio);
 		usuario.setRoles(roles);
 		return usuario;
 	}
@@ -314,7 +443,7 @@ public class ModeloUsuarioAutoregistrado {
 			+ " where correo = ? ";
 		try (Connection conexion = ConexionArcos.obtenerInstancia();
 			 PreparedStatement stmt = conexion.prepareStatement(consulta);) {
-			ModeloClaveArcos modeloClaveArcos = new ModeloClaveArcos();
+			ModeloClaveArcos modeloClaveArcos = ModeloClaveArcos.obtenerInstancia();
 			String claveHaseada = modeloClaveArcos.generaSsha512(clave, null);
 			int parameterIndex = 1;
 			stmt.setString(parameterIndex++, claveHaseada);
@@ -333,19 +462,22 @@ public class ModeloUsuarioAutoregistrado {
 	 * @throws UVException si error validacion
 	 */
 	public String mandarClaveTemporal(String correo, String ip) throws SQLException, UVException {
-		ArrayList<String> destinatariosCorreo = new ArrayList<>();
-		ModeloClaveArcos modeloClaveArcos = new ModeloClaveArcos();
+		List<String> destinatariosCorreo = new ArrayList<>();
+		ModeloClaveArcos modeloClaveArcos = ModeloClaveArcos.obtenerInstancia();
 		final int numeroBitsId = 512;
 		final int moduloConversionACaracter = 32;
 		String codigoPin = modeloClaveArcos.pinAleatorioTemporal();
 		String idsolicitud = new BigInteger(numeroBitsId, new SecureRandom()).toString(moduloConversionACaracter);
+		if (!isCorreoRegistrado(correo)) {
+			throw new UVException("primero debe registrar su usuario");
+		}
 		insertaPeticionCambio(correo, idsolicitud, codigoPin, ip);
 		destinatariosCorreo.add(correo);
 		String asunto = ConfiguracionGlobal.getParametroCadena("autoaprovisionado.mail.asunto");
 		String cuerpo = ConfiguracionGlobal.getParametroCadena("autoaprovisionado.mail.cuerpo");
-		cuerpo = aplicaPlantilla(cuerpo, codigoPin, idsolicitud);
+		cuerpo = aplicaPlantilla(cuerpo, codigoPin, idsolicitud, correo);
 		try {
-			EnviaCorreo.enviaCorreoExcepcion(null, destinatariosCorreo, null, null, null, asunto, cuerpo);
+			EnviaCorreo.enviaCorreoExcepcionList(null, destinatariosCorreo, null, null, null, asunto, cuerpo);
 		} catch (Exception e) {
 			throw new UVException(e.getMessage());
 		}
@@ -357,12 +489,14 @@ public class ModeloUsuarioAutoregistrado {
 	 * @param plantilla plantilla con marcas
 	 * @param codigoPin codigo de pin para aplicar a la plantilla
 	 * @param idSolicitud idSolicitud para aplicar a la plantilla
+	 * @param correo para aplicar a la plantilla
 	 * @return texto de la plantilla con los valores cambiados
 	 */
-	private String aplicaPlantilla(String plantilla, String codigoPin, String idSolicitud) {
+	private String aplicaPlantilla(String plantilla, String codigoPin, String idSolicitud, String correo) {
 		String salida = plantilla;
 		salida = salida.replace("%%CODIGO%%", codigoPin);
 		salida = salida.replace("%%IDSOLICITUD%%", idSolicitud);
+		salida = salida.replace("%%CORREO%%", correo);
 		return salida;
 	}
 }
