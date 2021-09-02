@@ -142,20 +142,17 @@ if (bean.getDestinatarios().size() > 0 && !mensaje.getCuerpo().isBlank() && !men
 <script>
 $(document).ready(function() {
 	
-	tinymce.init({
-		selector: 'textarea#mensaje_cuerpo',
-		height: 500,
-		menubar: false,
-		plugins: [
-			'advlist autolink lists link image charmap print preview anchor',
-			'searchreplace visualblocks code fullscreen',
-			'insertdatetime media table paste code help wordcount'
-		],
-		toolbar: 'undo redo | formatselect | ' +
-		'bold italic backcolor | alignleft aligncenter ' +
-		'alignright alignjustify | bullist numlist outdent indent | ' +
-		'removeformat | help',
-		content_style: 'body { font-family:Helvetica,Arial,sans-serif; font-size:14px }'
+	tinyMCE.init({
+		mode : "textareas",
+		theme : "modern",
+		language : "es",
+		height: 250,
+		menubar: "edit insert view format table",
+		plugins: "advlist autolink autosave link image lists charmap print preview hr anchor pagebreak spellchecker searchreplace wordcount visualblocks visualchars code fullscreen insertdatetime media nonbreaking table contextmenu directionality emoticons template textcolor paste fullpage textcolor colorpicker textpattern",
+		paste_retain_style_properties: "all",
+		toolbar1: "undo redo | bold italic underline | alignleft aligncenter alignright alignjustify | bullist numlist outdent indent | link image",
+		toolbar2: "preview | forecolor backcolor | code | styleselect | fontselect | fontsizeselect",
+		toolbar_items_size: 'small',
 	});
 	
 	<%	if (mensajeBorrador) { %>

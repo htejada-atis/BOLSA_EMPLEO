@@ -23,8 +23,7 @@ public class ModeloParametrosConfiguracion {
 	public static final String VERSION = "0.64";
 	public static final String JS_BOLSA_EMPLEO = "/js/bolsaempleo/bolsaempleo20210715.min.js";
 	public static final String CSS_BOLSA_EMPLEO = "/css/ujaen_bolsa_empleo.css";
-	public static final String JS_TINY = "https://cdn.tiny.cloud/1/mn46suck3y24mo5q8ef2ke2hfg4iggjasxjlqdobnrqs7n9h/tinymce/5/tinymce.min.js";
-//	public static final String JS_TINY = "/js/tinymce/tinymce.min.js";
+	public static final String JS_TINY = "/js/tinymce/tinymce.min.js";
 	
 	public static final String PARAMETRO_PLANTILLA_APERTURA_PLAZA = "bolsaempleo.local.idPlantillaAperturaPlaza";
 	public static final String PARAMETRO_PLANTILLA_CITA_CONTRATACION = "bolsaempleo.local.idPlantillaCitaContratacion";
