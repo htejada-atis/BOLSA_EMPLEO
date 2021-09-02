@@ -65,6 +65,8 @@ $(document).ready(function() {
 						var params = {'a': '<%=ControladorDedicaciones.ACCION_EDITAR_DEDICACION%>', 
 								'<%=ControladorDedicaciones.PARAM_DEDICACION%>': row.codNum};
 						Atis.sendForm("<%=request.getRequestURI()%>", params);
+					}, 'visible': function(row) {
+						return row.plazasCount == 0;
 					}
 				}, {'label': function(row) { return row.activa ? "Borrar" : "Restaurar"; },
 					'title':  function(row) { return row.activa ? "Borrar dedicación" : "Restaurar dedicación"; }, 'onClick': function(row) {

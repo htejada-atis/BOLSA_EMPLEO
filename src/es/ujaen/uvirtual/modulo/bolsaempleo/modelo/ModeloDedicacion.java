@@ -37,6 +37,7 @@ public class ModeloDedicacion {
 	public static final String CODNUM = "CODNUM";
 	public static final String FECHA_VIGENCIA = "FECHA_VIGENCIA";
 	public static final String FLGACTIVA = "FLGACTIVA";
+	public static final String PLAZAS_OFERTADAS = "PLAZAS_OFERTADAS";
 	public static final String SUELDO = "SUELDO";
 	public static final String TEXTO = "TEXTO";
 	
@@ -79,7 +80,7 @@ public class ModeloDedicacion {
 				PreparedStatement stmt = conexion.prepareStatement(consulta)) {
 			try (ResultSet rs = stmt.executeQuery()) {
 				while (rs.next()) {
-					listaDedicaciones.add(createDedicacionFromResultSet(rs));
+					listaDedicaciones.add(createDedicacionFromResultSet(rs, false));
 				}
 			}
 		}
@@ -116,7 +117,7 @@ public class ModeloDedicacion {
 					throw new UVException(MENSAJE_ERROR_DEDICACION_ID_NO_EXISTE);
 				}
 				
-				return createDedicacionFromResultSet(rs);
+				return createDedicacionFromResultSet(rs, false);
 			}
 		}
 	}
@@ -132,7 +133,12 @@ public class ModeloDedicacion {
 		List<Dedicacion> rows = new ArrayList<>();
 		BolsaEmpleoDataTable<Dedicacion> dataTable = new BolsaEmpleoDataTable<>(params);
 		
-		String consulta = "SELECT bepded.* FROM TBEP_DEDICACIONES bepded WHERE 1=1 ";
+		String consulta = "SELECT bepded.*,"
+				+ "     (SELECT COUNT(*)"
+				+ "     FROM TBEP_PLAZAS_OFERTADAS bepplo"
+				+ "     WHERE bepplo.BEPDED_CODNUM = bepded.CODNUM) AS " + PLAZAS_OFERTADAS
+				+ " FROM TBEP_DEDICACIONES bepded"
+				+ " WHERE 1=1 ";
 		
 		dataTable.setColumn(ORDER_COLUMN_INDEX_ID, CODNUM, DataTableColumn.COLUMN_TYPE_NUMBER);
 		dataTable.setColumn(ORDER_COLUMN_INDEX_TEXTO, TEXTO);
@@ -148,7 +154,7 @@ public class ModeloDedicacion {
 			
 			try (ResultSet rs = stmt.executeQuery()) {
 				while (rs.next()) {
-					rows.add(createDedicacionFromResultSet(rs));
+					rows.add(createDedicacionFromResultSet(rs, true));
 				}
 			}
 			
@@ -250,13 +256,17 @@ public class ModeloDedicacion {
 		}
 	}
 	
-	private Dedicacion createDedicacionFromResultSet(ResultSet rs) throws SQLException {
+	private Dedicacion createDedicacionFromResultSet(ResultSet rs, boolean withPlazas) throws SQLException {
 		Dedicacion dedicacion = new Dedicacion();
 		dedicacion.setCodNum(rs.getInt(CODNUM));
 		dedicacion.setTexto(rs.getString(TEXTO));
 		dedicacion.setSueldo(rs.getDouble(SUELDO));
 		dedicacion.setFechaVigencia(rs.getDate(FECHA_VIGENCIA));
 		dedicacion.setActiva(rs.getString(FLGACTIVA).equals(ACTIVA));
+		
+		if (withPlazas) {
+			dedicacion.setPlazasCount(rs.getInt(PLAZAS_OFERTADAS));
+		}
 		
 		return dedicacion;
 	}

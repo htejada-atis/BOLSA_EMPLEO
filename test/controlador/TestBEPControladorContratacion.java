@@ -5,9 +5,6 @@ import static org.junit.Assert.assertNotEquals;
 import static org.junit.Assert.assertNotNull;
 import java.io.IOException;
 import java.sql.SQLException;
-
-import javax.servlet.ServletException;
-
 import org.junit.BeforeClass;
 import org.junit.FixMethodOrder;
 import org.junit.Test;
@@ -20,7 +17,6 @@ import es.ujaen.uvirtual.modulo.bolsaempleo.beans.PlazaOfertada;
 import es.ujaen.uvirtual.modulo.bolsaempleo.controlador.ControladorContratacion;
 import es.ujaen.uvirtual.modulo.bolsaempleo.modelo.ModeloBolsa;
 import es.ujaen.uvirtual.modulo.bolsaempleo.modelo.ModeloPlazaOfertada;
-import es.ujaen.uvirtual.modulo.bolsaempleo.modelo.ModeloTitulacion;
 import es.ujaen.uvirtual.modulo.bolsaempleo.utilidades.BolsaEmpleoDataTable;
 import es.ujaen.uvirtual.modulo.bolsaempleo.vistas.VistaContratacion;
 import es.ujaen.uvirtual.utilidades.UVException;
@@ -42,14 +38,18 @@ public class TestBEPControladorContratacion {
 	private static final String MENSAJE_SIN_ADVERTENCIAS = "No debe mostrar advertencias";
 	private static final String MENSAJE_SIN_EXITO = "No debe exito";
 	
-	/** Prepara la bd con los datos iniciales.
-	 * @throws SQLException si error en bd
-	 * @throws IOException si error en ficheros
+	private static final String FECHA_FIN = "22/09/2021 23:59:59";
+	
+	/** Prepara la bd con los datos iniciales .
+	 * @throws SQLException si error en bd .
+	 * @throws IOException si error en ficheros .
+	 * @throws UVException .
 	 */
 	@BeforeClass
-	public static void preparaBd() throws IOException, SQLException {
+	public static void preparaBd() throws IOException, SQLException, UVException {
 		BbddRunner.conectarBd();
 		UtilsTestBolsaEmpleo.inicializaBolsaEmpleo();
+		UtilsTestBolsaEmpleo.baremarBolsa(ModeloBolsa.obtenerInstancia().getBolsaById(2));
 	}
 	
 	private VistaContratacion obtenerPlazasOfertadas(String filter) throws IOException {
@@ -144,7 +144,7 @@ public class TestBEPControladorContratacion {
 		peticion.setParameter(ControladorContratacion.PARAM_CENTRO_DESTINO, ModeloPlazaOfertada.CENTRO_DESTINO_JAEN);
 		peticion.setParameter(ControladorContratacion.PARAM_CUATRIMESTRE, ModeloPlazaOfertada.CUATRIMESTRE_TODO_EL_CURSO);
 		peticion.setParameter(ControladorContratacion.PARAM_DURACION_PREVISTA, "DURACION PREVISTA");
-		peticion.setParameter(ControladorContratacion.PARAM_FECHA_FIN_OFERTA, "12/08/2021 23:59:59");
+		peticion.setParameter(ControladorContratacion.PARAM_FECHA_FIN_OFERTA, FECHA_FIN);
 		
 		RespuestaHttp respuesta = new RespuestaHttp();
 		ControladorContratacion controlador = new ControladorContratacion();
@@ -174,7 +174,7 @@ public class TestBEPControladorContratacion {
 		peticion.setParameter(ControladorContratacion.PARAM_CENTRO_DESTINO, plaza.getCentroDestino());
 		peticion.setParameter(ControladorContratacion.PARAM_CUATRIMESTRE, ModeloPlazaOfertada.CUATRIMESTRE_TODO_EL_CURSO);
 		peticion.setParameter(ControladorContratacion.PARAM_DURACION_PREVISTA, plaza.getDuracionPrevista());
-		peticion.setParameter(ControladorContratacion.PARAM_FECHA_FIN_OFERTA, "12/08/2021 23:59:59");
+		peticion.setParameter(ControladorContratacion.PARAM_FECHA_FIN_OFERTA, FECHA_FIN);
 		
 		RespuestaHttp respuesta = new RespuestaHttp();
 		ControladorContratacion controlador = new ControladorContratacion();
@@ -219,9 +219,9 @@ public class TestBEPControladorContratacion {
 				+ ModeloPlazaOfertada.PLAZA_ESTADO_TRAMITACION + "'}");
 		
 		PeticionHttp peticion2 = UtilsTestBolsaEmpleo.peticionAutenticadaPersonal();
-		peticion2.setParameter(ControladorContratacion.PARAM_ACCION, ControladorContratacion.ACCION_ABRIR_PLAZA);
+		peticion2.setParameter(ControladorContratacion.PARAM_ACCION, ControladorContratacion.ACCION_PLAZA_ABIERTA);
 		peticion2.setParameter(ControladorContratacion.PARAM_PLAZA_OFERTADA, bean.getDatatablePlazasOfertadas().getData().get(0).getCodNum().toString());
-		peticion2.setParameter(ControladorContratacion.PARAM_FECHA_FIN_OFERTA, "12/08/2021 23:59:59");
+		peticion2.setParameter(ControladorContratacion.PARAM_FECHA_FIN_OFERTA, FECHA_FIN);
 		
 		RespuestaHttp respuesta2 = new RespuestaHttp();
 		ControladorContratacion controlador2 = new ControladorContratacion();

@@ -14,6 +14,7 @@ public class Dedicacion implements Serializable {
 	private Double sueldo;
 	private Date fechaVigencia;
 	private Boolean activa;
+	private Integer plazasCount;
 	
 	
 	/** Constructor por defecto.
@@ -47,6 +48,7 @@ public class Dedicacion implements Serializable {
 		this.sueldo = copia.sueldo;
 		this.fechaVigencia = copia.fechaVigencia;
 		this.activa = copia.activa;
+		this.plazasCount = copia.plazasCount;
 	}
 	
 	public Integer getCodNum() {
@@ -89,10 +91,18 @@ public class Dedicacion implements Serializable {
 		this.activa = activa;
 	}
 	
+	public Integer getPlazasCount() {
+		return plazasCount;
+	}
+
+	public void setPlazasCount(Integer plazasCount) {
+		this.plazasCount = plazasCount;
+	}
+	
 	@Override
 	public String toString() {
 		return "Dedicación [codNum=" + codNum + ", texto=" + texto + ", sueldo=" + sueldo 
-				+ ", fechaVigencia=" + fechaVigencia + ", activa=" + activa + "]";
+				+ ", fechaVigencia=" + fechaVigencia + ", activa=" + activa + ", plazasCount=" + plazasCount + "]";
 	}
 	
 	@Override
@@ -104,6 +114,7 @@ public class Dedicacion implements Serializable {
 		result = prime * result + ((sueldo == null) ? 0 : sueldo.hashCode());
 		result = prime * result + ((fechaVigencia == null) ? 0 : fechaVigencia.hashCode());
 		result = prime * result + ((activa == null) ? 0 : activa.hashCode());
+		result = prime * result + ((plazasCount == null) ? 0 : plazasCount.hashCode());
 		return result;
 	}
 	
@@ -156,7 +167,15 @@ public class Dedicacion implements Serializable {
 		} else if (!activa.equals(other.activa)) {
 			return false;
 		}
+		if (plazasCount == null) {
+			if (other.plazasCount != null) {
+				return false;
+			}
+		} else if (!plazasCount.equals(other.plazasCount)) {
+			return false;
+		}
 		
 		return true;
 	}
+	
 }

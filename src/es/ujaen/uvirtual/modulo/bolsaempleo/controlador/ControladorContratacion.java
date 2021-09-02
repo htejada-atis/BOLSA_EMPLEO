@@ -61,11 +61,12 @@ public class ControladorContratacion extends HttpServlet {
 	private static final Logger LOGGER = Logger.getLogger(NOMBREDEESTACLASE);
 	
 	// acciones
-	public static final String ACCION_ABRIR_PLAZA = "abrirplaza";
-	public static final String ACCION_CERRAR_PLAZA = "cerrarplaza";
 	public static final String ACCION_CONTRATAR_CANDIDATO = "contratarcandidato";
 	public static final String ACCION_DATATABLE_CANDIDATOS = "datatablecandidatos";
 	public static final String ACCION_DATATABLE_PLAZAS_OFERTADAS = "datatableplazasofertadas";
+	public static final String ACCION_PLAZA_ABIERTA = "plazaabierta";
+	public static final String ACCION_PLAZA_CERRADA = "plazacerrada";
+	public static final String ACCION_PLAZA_TRAMITACION = "plazatramitacion";
 	public static final String ACCION_EDITAR_PLAZA_OFERTADA = "editarplazaofertada";
 	public static final String ACCION_INDEX = "index";
 	public static final String ACCION_PREFERENCIAS_CANDIDATO = "preferenciascandidato";
@@ -100,6 +101,7 @@ public class ControladorContratacion extends HttpServlet {
 	public static final String MENSAJE_ERROR_CUATRIMESTRE_NO_VALIDO = "El cuatrimestre seleccionado no es válido";
 	public static final String MENSAJE_ERROR_DURACION_PREVISTA_LARGA = "La duración prevista no puede contener mas de %d caracteres";
 	public static final String MENSAJE_ERROR_ESTADO_CONTRATACION_REQUERIDO = "Es requerido estado de contratación para la plaza";
+	public static final String MENSAJE_ERROR_ESTADO_CREACION_REQUERIDO = "Es requerido estado de creación para la plaza";
 	public static final String MENSAJE_ERROR_ESTADO_TRAMITACION_REQUERIDO = "Es requerido estado de tramitación para la plaza";
 	public static final String MENSAJE_ERROR_FECHA_FIN_OFERTA_VACIA = "La fecha fin de la oferta no puede estar vacía";
 	public static final String MENSAJE_ERROR_JUSTIFICACION_LARGA = "La justificación no puede contener mas de %d caracteres";
@@ -107,10 +109,11 @@ public class ControladorContratacion extends HttpServlet {
 	public static final String MENSAJE_ERROR_SIN_PERMISO = "No tienes permiso";
 	
 	public static final String MENSAJE_EXITO_ABRIR_PLAZA = "Plaza abierta correctamente";
-	public static final String MENSAJE_EXITO_CERRAR_PLAZA = "Plaza cerrada correctamente";
 	public static final String MENSAJE_EXITO_AGREGAR = "Plaza creada correctamente";
-	public static final String MENSAJE_EXITO_EDITAR = "Plaza editada correctamente";
+	public static final String MENSAJE_EXITO_CERRAR_PLAZA = "Plaza cerrada correctamente";
 	public static final String MENSAJE_EXITO_CONTRATACION = "Contratación creada correctamente para el usuario: %s";
+	public static final String MENSAJE_EXITO_EDITAR = "Plaza editada correctamente";
+	public static final String MENSAJE_EXITO_TRAMITACION_PLAZA = "Cambiado el estado de la plaza a tramitación correctamente";
 	
 	// ruta vistas
 	public static final String RUTA_BEP_CONTRATACION = "/WEB-INF/jsp/vista/infadministrativa/bolsaempleo/contratacion/";
@@ -170,11 +173,12 @@ public class ControladorContratacion extends HttpServlet {
 			init(bean, datos, request, response);
 			
 			switch (nombreAccion) {
-				case ACCION_ABRIR_PLAZA:
-				case ACCION_CERRAR_PLAZA:
 				case ACCION_CONTRATAR_CANDIDATO:
 				case ACCION_DATATABLE_CANDIDATOS:
 				case ACCION_EDITAR_PLAZA_OFERTADA:
+				case ACCION_PLAZA_ABIERTA:
+				case ACCION_PLAZA_CERRADA:
+				case ACCION_PLAZA_TRAMITACION:
 				case ACCION_SELECCIONAR_PLAZA_OFERTADA:
 					seleccionarPlazaOfertada(bean, datos, request, response, nombreAccion, parametros);
 					break;
@@ -246,6 +250,7 @@ public class ControladorContratacion extends HttpServlet {
 		doGet(request, response);
 	}
 	
+	@SuppressWarnings({"checkstyle:cyclomaticcomplexity"})
 	private void seleccionarPlazaOfertada(VistaContratacion bean, UVDatos datos, HttpServletRequest request, HttpServletResponse response, String nombreAccion, 
 			HashMap<String, Object> parametros) throws SQLException, UVException, IOException {
 		bean.setVista(JSP_EDIT);
@@ -255,19 +260,15 @@ public class ControladorContratacion extends HttpServlet {
 		PlazaOfertada plaza = modelo.getPlazaOfertadaById(Formateador.leeParametroInteger(BolsaEmpleoUtils.getParamRequestOrMultipartOrSession(
 				request, parametros, PARAM_PLAZA_OFERTADA)));
 		
-		if (bean.getUsuarioLogeado().isDirectorDepartamento() && !ModeloEvaluador.obtenerInstancia().checkEvaluadorArea(plaza.getArea(), bean.getUsuarioLogeado())) {
+		if ((!nombreAccion.equals(ACCION_SELECCIONAR_PLAZA_OFERTADA) && !bean.getUsuarioLogeado().isServicioPersonal() 
+				&& !plaza.getEstado().equals(ModeloPlazaOfertada.PLAZA_ESTADO_CREACION)) || !bean.getUsuarioLogeado().isServicioPersonal()
+				&& !ModeloEvaluador.obtenerInstancia().checkEvaluadorArea(plaza.getArea(), bean.getUsuarioLogeado())) {
 			BolsaEmpleoUtils.redirectToError(bean, datos, request, response, MENSAJE_ERROR_SIN_PERMISO);
 		}
 		
 		bean.setPlazaOfertada(plaza);
 		
 		switch (nombreAccion) {
-			case ACCION_ABRIR_PLAZA:
-				abrirPlaza(bean, datos, request, response);
-				break;
-			case ACCION_CERRAR_PLAZA:
-				cerrarPlaza(bean, datos, request, response);
-				break;
 			case ACCION_CONTRATAR_CANDIDATO:
 				contratarCandidato(bean, datos, request, response);
 				break;
@@ -276,6 +277,15 @@ public class ControladorContratacion extends HttpServlet {
 				break;
 			case ACCION_EDITAR_PLAZA_OFERTADA:
 				editarPlazaOfertada(bean, datos, request, response, parametros);
+				break;
+			case ACCION_PLAZA_ABIERTA:
+				abrirPlaza(bean, datos, request, response);
+				break;
+			case ACCION_PLAZA_CERRADA:
+				cerrarPlaza(bean, datos, request, response);
+				break;
+			case ACCION_PLAZA_TRAMITACION:
+				tramitacionPlaza(bean, datos, request, response);
 				break;
 			case ACCION_SELECCIONAR_PLAZA_OFERTADA:
 				break;
@@ -286,10 +296,6 @@ public class ControladorContratacion extends HttpServlet {
 	
 	private void abrirPlaza(VistaContratacion bean, UVDatos datos, HttpServletRequest request, HttpServletResponse response)
 			throws SQLException, UVException, IOException {
-		if (!bean.getUsuarioLogeado().isServicioPersonal()) {
-			BolsaEmpleoUtils.redirectToError(bean, datos, request, response, MENSAJE_ERROR_SIN_PERMISO);
-		}
-		
 		ModeloPlazaOfertada modeloPlaza = ModeloPlazaOfertada.obtenerInstancia();
 		
 		PlazaOfertada plaza = bean.getPlazaOfertada();
@@ -393,6 +399,24 @@ public class ControladorContratacion extends HttpServlet {
 		params.put(PARAM_PLAZA_OFERTADA, bean.getPlazaOfertada().getCodNum().toString());
 		params.put(PARAM_ACCION, accion);
 		BolsaEmpleoUtils.redirectWithParams(datos, request, response, params);
+	}
+	
+	private void tramitacionPlaza(VistaContratacion bean, UVDatos datos, HttpServletRequest request, HttpServletResponse response)
+			throws SQLException, UVException, IOException {
+		if (!bean.getUsuarioLogeado().isServicioPersonal()) {
+			BolsaEmpleoUtils.redirectToError(bean, datos, request, response, MENSAJE_ERROR_SIN_PERMISO);
+		}
+		
+		ModeloPlazaOfertada modeloPlaza = ModeloPlazaOfertada.obtenerInstancia();
+		
+		if (!bean.getPlazaOfertada().getEstado().equals(ModeloPlazaOfertada.PLAZA_ESTADO_CREACION)) {
+			throw new UVException(MENSAJE_ERROR_ESTADO_CREACION_REQUERIDO);
+		}
+		
+		modeloPlaza.cambiarEstadoPlazaATramitacion(bean.getPlazaOfertada(), bean.getUsuarioLogeado());
+		
+		BolsaEmpleoUtils.addMensajeDeExito(MENSAJE_EXITO_TRAMITACION_PLAZA, bean, request);
+		redireccionConPlazaSeleccionada(bean, datos, request, response, ACCION_SELECCIONAR_PLAZA_OFERTADA);
 	}
 	
 	private void obtenerPreferenciasCandidato(VistaContratacion bean, UVDatos datos, HttpServletRequest request, HttpServletResponse response) throws IOException {

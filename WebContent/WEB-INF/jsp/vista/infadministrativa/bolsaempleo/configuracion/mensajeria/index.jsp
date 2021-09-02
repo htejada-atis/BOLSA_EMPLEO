@@ -38,6 +38,11 @@ VistaMensajes bean = (VistaMensajes) uvdatos.getVistas().get(VistaMensajes.class
 	
 <script>
 $(document).ready(function() {
+	
+	tinymce.init({
+		selector: 'textarea'
+	});
+	
 	document.getElementById('nuevo_mensaje').addEventListener("click", function(event) {
 		event.preventDefault();
 		Atis.sendForm("<%= request.getRequestURI() %>", {'<%= ControladorMensajes.PARAM_ACCION %>': '<%= ControladorMensajes.ACCION_NUEVO_MENSAJE %>'});

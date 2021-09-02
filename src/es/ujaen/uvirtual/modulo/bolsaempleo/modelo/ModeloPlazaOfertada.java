@@ -311,27 +311,11 @@ public class ModeloPlazaOfertada {
 	 * @throws UVException .
 	 */
 	public void abrirPlazaOfertada(PlazaOfertada plaza, UsuarioBolsaEmpleo usuarioUpdate) throws SQLException, UVException {
-		if (plaza == null) {
-			throw new UVException(String.format(MENSAJE_ERROR_OBJETO_VACIO, "abrir plaza"));
-		}
-		
 		if (plaza.getFechaFinOferta() == null) {
 			throw new UVException(String.format(MENSAJE_ERROR_PARAM_VACIO, "abrir plaza", "fecha fin oferta"));
 		}
 		
-		String consulta = String.format("UPDATE TBEP_PLAZAS_OFERTADAS SET %s=?, %s=?, %s=?, %s=?"
-				+ " WHERE %s=?",
-				ESTADO, FECHA_FIN_OFERTA, FECHA_ABIERTA, "UID_USUARIO", CODNUM);
-		
-		try (Connection conexion = ConexionUvirtual.obtenerInstancia(); PreparedStatement stmt = conexion.prepareStatement(consulta)) {
-			int parameterIndex = 1;
-			stmt.setString(parameterIndex++, PLAZA_ESTADO_ABIERTA);
-			stmt.setDate(parameterIndex++, new Date(plaza.getFechaFinOferta().getTime()));
-			stmt.setDate(parameterIndex++, new Date(BolsaEmpleoUtils.getCurrentDateTime().getTime()));
-			stmt.setString(parameterIndex++, usuarioUpdate.getCodCuenta());
-			stmt.setInt(parameterIndex++, plaza.getCodNum());
-			stmt.executeUpdate();
-		}
+		this.cambiarEstadoPlaza(plaza, usuarioUpdate, PLAZA_ESTADO_ABIERTA);
 	}
 	
 	/** cerrar plaza ofertada .
@@ -341,22 +325,7 @@ public class ModeloPlazaOfertada {
 	 * @throws UVException .
 	 */
 	public void cerrarPlazaOfertada(PlazaOfertada plaza, UsuarioBolsaEmpleo usuarioUpdate) throws SQLException, UVException {
-		if (plaza == null) {
-			throw new UVException(String.format(MENSAJE_ERROR_OBJETO_VACIO, "cerrar plaza"));
-		}
-		
-		String consulta = String.format("UPDATE TBEP_PLAZAS_OFERTADAS SET %s=?, %s=?, %s=?"
-				+ " WHERE %s=?",
-				ESTADO, FECHA_CERRADA, "UID_USUARIO", CODNUM);
-		
-		try (Connection conexion = ConexionUvirtual.obtenerInstancia(); PreparedStatement stmt = conexion.prepareStatement(consulta)) {
-			int parameterIndex = 1;
-			stmt.setString(parameterIndex++, PLAZA_ESTADO_CERRADA);
-			stmt.setDate(parameterIndex++, new Date(BolsaEmpleoUtils.getCurrentDateTime().getTime()));
-			stmt.setString(parameterIndex++, usuarioUpdate.getCodCuenta());
-			stmt.setInt(parameterIndex++, plaza.getCodNum());
-			stmt.executeUpdate();
-		}
+		this.cambiarEstadoPlaza(plaza, usuarioUpdate, PLAZA_ESTADO_CERRADA);
 	}
 	
 	/** cambia el estado de una plaza a contratación .
@@ -366,17 +335,57 @@ public class ModeloPlazaOfertada {
 	 * @throws UVException .
 	 */
 	public void cambiarEstadoPlazaAContratacion(PlazaOfertada plaza, UsuarioBolsaEmpleo usuarioUpdate) throws SQLException, UVException {
+		this.cambiarEstadoPlaza(plaza, usuarioUpdate, PLAZA_ESTADO_CONTRATACION);
+	}
+	
+	/** cambia el estado de una plaza a tramitación .
+	 * @param plaza .
+	 * @param usuarioUpdate .
+	 * @throws SQLException .
+	 * @throws UVException .
+	 */
+	public void cambiarEstadoPlazaATramitacion(PlazaOfertada plaza, UsuarioBolsaEmpleo usuarioUpdate) throws SQLException, UVException {
+		this.cambiarEstadoPlaza(plaza, usuarioUpdate, PLAZA_ESTADO_TRAMITACION);
+	}
+	
+	/** cambia el estado de una plaza .
+	 * @param plaza .
+	 * @param usuarioUpdate .
+	 * @param estado .
+	 * @throws SQLException .
+	 * @throws UVException .
+	 */
+	public void cambiarEstadoPlaza(PlazaOfertada plaza, UsuarioBolsaEmpleo usuarioUpdate, String estado) throws SQLException, UVException {
 		if (plaza == null) {
-			throw new UVException(String.format(MENSAJE_ERROR_OBJETO_VACIO, "cambiar estado a contratación"));
+			throw new UVException(String.format(MENSAJE_ERROR_OBJETO_VACIO, "cambiar estado plaza"));
 		}
 		
-		String consulta = String.format("UPDATE TBEP_PLAZAS_OFERTADAS SET %s=?, %s=?"
-				+ " WHERE %s=?",
-				ESTADO, "UID_USUARIO", CODNUM);
+		String consulta = "UPDATE TBEP_PLAZAS_OFERTADAS SET %s=?, %s=? WHERE %s=?";
+		
+		consulta = String.format(consulta, ESTADO, "UID_USUARIO", CODNUM);
+		
+		if (estado.equals(PLAZA_ESTADO_CERRADA)) {
+			consulta = "UPDATE TBEP_PLAZAS_OFERTADAS SET %s=?, %s=?, %s=? WHERE %s=?";
+			consulta = String.format(consulta, ESTADO, FECHA_CERRADA, "UID_USUARIO", CODNUM);
+		}
+		
+		if (estado.equals(PLAZA_ESTADO_ABIERTA)) {
+			consulta = "UPDATE TBEP_PLAZAS_OFERTADAS SET %s=?, %s=?, %s=?, %s=? WHERE %s=?";
+			consulta = String.format(consulta, ESTADO, FECHA_FIN_OFERTA, FECHA_ABIERTA, "UID_USUARIO", CODNUM);
+		}
 		
 		try (Connection conexion = ConexionUvirtual.obtenerInstancia(); PreparedStatement stmt = conexion.prepareStatement(consulta)) {
 			int parameterIndex = 1;
-			stmt.setString(parameterIndex++, PLAZA_ESTADO_CONTRATACION);
+			stmt.setString(parameterIndex++, estado);
+			
+			if (estado.equals(PLAZA_ESTADO_ABIERTA)) {
+				stmt.setDate(parameterIndex++, new Date(plaza.getFechaFinOferta().getTime()));
+			}
+			
+			if (estado.equals(PLAZA_ESTADO_CERRADA) || estado.equals(PLAZA_ESTADO_ABIERTA)) {
+				stmt.setDate(parameterIndex++, new Date(BolsaEmpleoUtils.getCurrentDateTime().getTime()));
+			}
+			
 			stmt.setString(parameterIndex++, usuarioUpdate == null ? "TAREA PROGRAMADA" : usuarioUpdate.getCodCuenta());
 			stmt.setInt(parameterIndex++, plaza.getCodNum());
 			stmt.executeUpdate();
@@ -430,6 +439,7 @@ public class ModeloPlazaOfertada {
 				+ " FROM TBEP_USUARIOS bepusu"
 				+ " INNER JOIN TBEP_SOLICITUDES bepsol ON bepsol.BEPUSU_CODNUM = bepusu.CODNUM"
 				+ " INNER JOIN TBEP_SOLICITUD_BOLSAS bepsob ON bepsob.BEPSOL_CODNUM = bepsol.CODNUM AND bepsob.BEPBOL_CODNUM = ?"
+				+ "     AND bepsob.FECHABAREMACION IS NOT NULL"
 				+ " LEFT JOIN TBEP_OFERTAS_CANDIDATOS bepofc ON bepofc.BEPUSU_CODNUM = bepusu.CODNUM AND bepofc.BEPPLO_CODNUM = ?"
 				+ " LEFT JOIN TBEP_CONTRATACIONES bepcnt ON bepcnt.BEPUSU_CODNUM = bepusu.CODNUM AND bepcnt.BEPPLO_CODNUM = ?"
 				+ " WHERE 1=1";
@@ -559,11 +569,11 @@ public class ModeloPlazaOfertada {
 				}
 				
 				// Creamos un nuevo mensaje con los datos de la plaza en la plantilla
-				Mensaje mensaje = new Mensaje(modeloPlantilla.reemplazaPlazaEnPlantilla(plaza, plantilla.getTitulo()), 
-						modeloPlantilla.reemplazaPlazaEnPlantilla(plaza, plantilla.getCuerpo()),
+				Mensaje mensaje = new Mensaje(modeloPlantilla.reemplazaPlazaEnPlantilla(plaza, plantilla.getTitulo(), false), 
+						modeloPlantilla.reemplazaPlazaEnPlantilla(plaza, plantilla.getCuerpo(), true),
 						BolsaEmpleoUtils.getCurrentDateTime(), ModeloMensajes.MENSAJE_ESTADO_BORRADOR);
 				
-				int idMensaje = modeloPlantilla.insertarMensajeDePlantilla(mensaje, usuarioUpdate, conexion);
+				int idMensaje = ModeloMensajes.obtenerInstancia().nuevoMensajeConexion(mensaje, usuarioUpdate, conexion);
 				
 				// Obtenemos los candidatos disponibles y los insertamos para enviar el mensaje de la plaza
 				listaDestinatariosPlaza(plaza, idMensaje, usuarioUpdate, conexion);
@@ -623,11 +633,11 @@ public class ModeloPlazaOfertada {
 				}
 				
 				// Creamos un nuevo mensaje con los datos de la plaza en la plantilla
-				Mensaje mensaje = new Mensaje(modeloPlantilla.reemplazaPlazaEnPlantilla(plaza, plantilla.getTitulo()), 
-						modeloPlantilla.reemplazaPlazaYContratacionEnPlantilla(plaza, contratacion, plantilla.getCuerpo()),
+				Mensaje mensaje = new Mensaje(modeloPlantilla.reemplazaPlazaEnPlantilla(plaza, plantilla.getTitulo(), false), 
+						modeloPlantilla.reemplazaPlazaYContratacionEnPlantilla(plaza, contratacion, plantilla.getCuerpo(), true),
 						BolsaEmpleoUtils.getCurrentDateTime(), ModeloMensajes.MENSAJE_ESTADO_BORRADOR);
 				
-				int idMensaje = modeloPlantilla.insertarMensajeDePlantilla(mensaje, usuarioUpdate, conexion);
+				int idMensaje = ModeloMensajes.obtenerInstancia().nuevoMensajeConexion(mensaje, usuarioUpdate, conexion);
 				
 				// Obtenemos los candidatos disponibles y los insertamos para enviar el mensaje de la plaza
 				listaDestinatariosPlaza(plaza, idMensaje, usuarioUpdate, conexion);
@@ -700,6 +710,13 @@ public class ModeloPlazaOfertada {
 		}
 	}
 	
+	/** Método para crear una plaza ofertada de un resultset.
+	 * @param rs .
+	 * @param withFiles .
+	 * @return plaza ofertada .
+	 * @throws SQLException .
+	 * @throws UVException .
+	 */
 	public PlazaOfertada createPlazaOfertadaFromResultSet(ResultSet rs, Boolean withFiles) throws SQLException, UVException {
 		PlazaOfertada plaza = new PlazaOfertada();
 		

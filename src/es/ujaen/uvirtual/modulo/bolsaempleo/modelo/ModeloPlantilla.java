@@ -10,7 +10,6 @@ import java.util.List;
 import java.util.Map;
 import es.ujaen.uvirtual.modelo.conexion.ConexionUvirtual;
 import es.ujaen.uvirtual.modulo.bolsaempleo.beans.Contratacion;
-import es.ujaen.uvirtual.modulo.bolsaempleo.beans.Mensaje;
 import es.ujaen.uvirtual.modulo.bolsaempleo.beans.Plantilla;
 import es.ujaen.uvirtual.modulo.bolsaempleo.beans.PlazaOfertada;
 import es.ujaen.uvirtual.modulo.bolsaempleo.beans.UsuarioBolsaEmpleo;
@@ -39,6 +38,11 @@ public class ModeloPlantilla {
 	
 	public static final String MENSAJE_ERROR_NO_EXISTE_PLANTILLA = "No existe la plantilla";
 	public static final String MENSAJE_ERROR_PLANTILLA_NULL = "No se puede insertar una plantilla vacía";
+	
+	public static final String SEPARATOR_LEFT = "<<";
+	public static final String SEPARATOR_RIGHT = ">>";
+	public static final String SEPARATOR_LEFT_XML = "&lt;&lt;";
+	public static final String SEPARATOR_RIGHT_XML = "&gt;&gt;";
 	
 	protected static ModeloPlantilla eInstancia;
 
@@ -213,52 +217,69 @@ public class ModeloPlantilla {
 		}
 	}
 	
-	public Integer insertarMensajeDePlantilla(Mensaje mensaje, UsuarioBolsaEmpleo usuarioUpdate, Connection conexion) throws SQLException {
-		String consultaInsertMsg = String.format("INSERT INTO TBEP_MENSAJES (%s,%s,%s,%s,%s) VALUES (?,?,?,?,?)", 
-				"TITULO", "CUERPO", "FECHA_CREACION", "ESTADO", "UID_USUARIO");
+	/** Reemplaza los datos de una plaza en una plantilla .
+	 * @param plaza .
+	 * @param texto .
+	 * @param isXML .
+	 * @return string formateado .
+	 */
+	public String reemplazaPlazaEnPlantilla(PlazaOfertada plaza, String texto, boolean isXML) {
+		String left = SEPARATOR_LEFT;
+		String right = SEPARATOR_RIGHT;
 		
-		try (PreparedStatement stmt = conexion.prepareStatement(consultaInsertMsg, new String[] {CODNUM})) {
-			int parameterIndex = 1;
-
-			stmt.setString(parameterIndex++, mensaje.getTitulo());
-			stmt.setClob(parameterIndex++, BolsaEmpleoUtils.stringToClob(mensaje.getCuerpo(), conexion));
-			stmt.setDate(parameterIndex++, new java.sql.Date(mensaje.getFechaCreacion().getTime()));
-			stmt.setString(parameterIndex++, mensaje.getEstado());
-			stmt.setString(parameterIndex++, usuarioUpdate.getCodCuenta());
-			stmt.executeUpdate();
-			
-			ResultSet rs = stmt.getGeneratedKeys();
-			rs.next();
-			
-			return rs.getInt(1);
+		if (isXML) {
+			left = SEPARATOR_LEFT_XML;
+			right = SEPARATOR_RIGHT_XML;
 		}
-	}
-	
-	public String reemplazaPlazaEnPlantilla(PlazaOfertada plaza, String texto) {
-		texto = texto.replaceAll("<<idplaza>>", plaza.getCodNum().toString());
-		texto = texto.replaceAll("<<area>>", plaza.getArea().getDescripcion());
-		texto = texto.replaceAll("<<justificacion>>", plaza.getJustificacion());
-		texto = texto.replaceAll("<<duracion_prevista>>", plaza.getDuracionPrevista());
-		texto = texto.replaceAll("<<dedicacion>>", plaza.getDedicacion().getTexto());
-		texto = texto.replaceAll("<<cuatrimestre>>", plaza.getCuatrimestre());
-		texto = texto.replaceAll("<<sueldo>>", plaza.getDedicacion().getSueldo().toString());
-		texto = texto.replaceAll("<<centro_destino>>", plaza.getCentroDestino());
-		texto = texto.replaceAll("<<hora_fin_oferta>>", Formateador.formatoFecha(plaza.getFechaFinOferta(), Formateador.FORMATO_FECHA_HORA_MINUTOS));
-		texto = texto.replaceAll("<<fecha_fin_oferta>>", Formateador.formatoFecha(plaza.getFechaFinOferta(), Formateador.FORMATO_FECHA_DDMMYYYY));
+		
+		texto = texto.replaceAll(left + "idplaza" + right, plaza.getCodNum().toString());
+		texto = texto.replaceAll(left + "area" + right, plaza.getArea().getDescripcion());
+		texto = texto.replaceAll(left + "justificacion" + right, plaza.getJustificacion());
+		texto = texto.replaceAll(left + "duracion_prevista" + right, plaza.getDuracionPrevista() != null ? plaza.getDuracionPrevista() : "");
+		texto = texto.replaceAll(left + "dedicacion" + right, plaza.getDedicacion().getTexto());
+		texto = texto.replaceAll(left + "cuatrimestre" + right, plaza.getCuatrimestre() != null 
+				? ModeloPlazaOfertada.CUATRIMESTRES.getOrDefault(plaza.getCuatrimestre(), plaza.getCuatrimestre()) : "");
+		texto = texto.replaceAll(left + "sueldo" + right, plaza.getDedicacion().getSueldo().toString());
+		texto = texto.replaceAll(left + "centro_destino" + right, plaza.getCentroDestino() != null 
+				? ModeloPlazaOfertada.CENTROS_DESTINO.getOrDefault(plaza.getCentroDestino(), plaza.getCentroDestino()) : "");
+		texto = texto.replaceAll(left + "hora_fin_oferta" + right, Formateador.formatoFecha(plaza.getFechaFinOferta(), Formateador.FORMATO_FECHA_HORA_MINUTOS));
+		texto = texto.replaceAll(left + "fecha_fin_oferta" + right, Formateador.formatoFecha(plaza.getFechaFinOferta(), Formateador.FORMATO_FECHA_DDMMYYYY));
 		return texto;
 	}
 	
-	public String reemplazaPlazaYContratacionEnPlantilla(PlazaOfertada plaza, Contratacion contratacion, String texto) {
-		texto = reemplazaPlazaEnPlantilla(plaza, texto);
-		texto = texto.replaceAll("<<hora_cita>>", Formateador.formatoFecha(contratacion.getFechaCita(), Formateador.FORMATO_FECHA_HORA_MINUTOS));
-		texto = texto.replaceAll("<<fecha_cita>>", Formateador.formatoFecha(contratacion.getFechaCita(), Formateador.FORMATO_FECHA_DDMMYYYY));
-		texto = texto.replaceAll("<<apellidos_candidato>>", contratacion.getCandidato().getPrimerApellido() + " " + contratacion.getCandidato().getSegundoApellido());
-		texto = texto.replaceAll("<<nombre_candidato>>", contratacion.getCandidato().getNombre());
-		texto = texto.replaceAll("<<NIF_candidato>>", contratacion.getCandidato().getPrsNif());
-		texto = texto.replaceAll("<<email_candidato>>", contratacion.getCandidato().getEmail());
+	/** Reemplaza los datos de una plaza y de una contratación en una plantilla .
+	 * @param plaza .
+	 * @param contratacion .
+	 * @param texto .
+	 * @param isXML .
+	 * @return string formateado .
+	 */
+	public String reemplazaPlazaYContratacionEnPlantilla(PlazaOfertada plaza, Contratacion contratacion, String texto, boolean isXML) {
+		String left = SEPARATOR_LEFT;
+		String right = SEPARATOR_RIGHT;
+		
+		if (isXML) {
+			left = SEPARATOR_LEFT_XML;
+			right = SEPARATOR_RIGHT_XML;
+		}
+		
+		texto = reemplazaPlazaEnPlantilla(plaza, texto, isXML);
+		texto = texto.replaceAll(left + "hora_cita" + right, Formateador.formatoFecha(contratacion.getFechaCita(), Formateador.FORMATO_FECHA_HORA_MINUTOS));
+		texto = texto.replaceAll(left + "fecha_cita" + right, Formateador.formatoFecha(contratacion.getFechaCita(), Formateador.FORMATO_FECHA_DDMMYYYY));
+		texto = texto.replaceAll(left + "apellidos_candidato" + right,
+				contratacion.getCandidato().getPrimerApellido() + " " + contratacion.getCandidato().getSegundoApellido());
+		texto = texto.replaceAll(left + "nombre_candidato" + right, contratacion.getCandidato().getNombre());
+		texto = texto.replaceAll(left + "NIF_candidato" + right, contratacion.getCandidato().getPrsNif());
+		texto = texto.replaceAll(left + "email_candidato" + right, contratacion.getCandidato().getEmail());
 		return texto;
 	}
 
+	/** Crea una plantilla de un resultset .
+	 * @param rs .
+	 * @return plantilla .
+	 * @throws SQLException en caso de error en la BD .
+	 * @throws IOException .
+	 */
 	public Plantilla createPlantillaFromResultSet(ResultSet rs) throws SQLException, IOException {
 		Plantilla plantilla = new Plantilla();
 		plantilla.setCodNum(rs.getInt(CODNUM));

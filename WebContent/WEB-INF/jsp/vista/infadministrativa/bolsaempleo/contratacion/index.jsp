@@ -57,7 +57,6 @@ $(document).ready(function() {
 		"defaultOrderBy": 3,
 		"defaultOrderDirection": 'desc',
 		"filterable": true,
-		"title": 'Plazas ofertadas',
 		"action": "<%= ControladorContratacion.ACCION_DATATABLE_PLAZAS_OFERTADAS %>",
 		"clickable": {'onClick': function(row) {
 			var params = {

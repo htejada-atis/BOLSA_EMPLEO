@@ -25,10 +25,9 @@ boolean estadoAbierta = plaza.getEstado().equals(ModeloPlazaOfertada.PLAZA_ESTAD
 boolean estadoContratacion = plaza.getEstado().equals(ModeloPlazaOfertada.PLAZA_ESTADO_CONTRATACION);
 boolean estadoCerrada = plaza.getEstado().equals(ModeloPlazaOfertada.PLAZA_ESTADO_CERRADA);
 
-boolean mostrarCandidatos = !estadoCreacion && !estadoTramitacion && personal;
+boolean mostrarCandidatos = (estadoAbierta || estadoContratacion) && personal;
 boolean mostrarCandidatoContratado = !estadoCreacion && !estadoTramitacion && !estadoAbierta;
 boolean editable = estadoCreacion || (estadoTramitacion && personal);
-boolean cerrar = (estadoAbierta || estadoContratacion) && personal;
 
 String area = BolsaEmpleoUtils.getParamForm(request, ControladorContratacion.PARAM_AREA, plaza.getArea().getCodNum().toString());
 String cuatrimestre = BolsaEmpleoUtils.getParamForm(request, ControladorContratacion.PARAM_CUATRIMESTRE, plaza.getCuatrimestre());
@@ -77,8 +76,13 @@ String justificacion = BolsaEmpleoUtils.getParamForm(request, ControladorContrat
 				<label for="plaza_dedicacion">Dedicación: </label>
 				<select id="plaza_dedicacion" name="<%=ControladorContratacion.PARAM_DEDICACION%>" style="width:100%;" <%= personal && editable ? "" : "readonly disabled" %>>
 					<option value="">----------------</option>
+				<%	if (plaza.getDedicacion() != null) { %>
+						<option value="<%= plaza.getDedicacion().getCodNum() %>" selected><%= plaza.getDedicacion().getTexto() + " - Sueldo: " + plaza.getDedicacion().getSueldo() %></option>
+				<%	} %>
 				<%	for(Dedicacion ded: bean.getListaDedicaciones()) { %>
-						<option value="<%=ded.getCodNum()%>" <%= !dedicacion.isEmpty() && Integer.parseInt(dedicacion) == ded.getCodNum() ? "selected" : "" %>><%= ded.getTexto() + " - Sueldo: " + ded.getSueldo() %></option>
+					<%	if (plaza.getDedicacion() != null && Integer.parseInt(dedicacion) != ded.getCodNum()) { %>
+							<option value="<%=ded.getCodNum()%>"><%= ded.getTexto() + " - Sueldo: " + ded.getSueldo() %></option>
+					<%	} %>
 				<%	} %>
 				</select>
 			</div>
@@ -128,7 +132,7 @@ String justificacion = BolsaEmpleoUtils.getParamForm(request, ControladorContrat
 			<%	if (editable) { %>
 					<input id="plaza_nri" type="file" name="<%= ControladorContratacion.PARAM_NRI %>"/>
 			<%	} %>
-				
+			
 			<%	if (plaza.getNri() != null) { %>
 					<button id="plaza_descargar_nri" class="btn icon icon-download" title="Descargar nri de la plaza" type="button" 
 							style="margin-top: .5rem;padding: 1px 6px;">Descargar NRI</button>
@@ -139,10 +143,14 @@ String justificacion = BolsaEmpleoUtils.getParamForm(request, ControladorContrat
 		<div class="form-group-container col2">
 			<div class="form-group"></div>
 			<div class="form-group">
-			<%	if (editable) { %>
-					<input id="plaza_enviar" type="submit" name="<%=ControladorContratacion.PARAM_ENVIAR%>" value="Guardar cambios" style="float:right;"/>
-					<button id="plaza_estado_abierta" style="float:right; margin-right: 12px;" <%= plaza.getEstado().equals(ModeloPlazaOfertada.PLAZA_ESTADO_TRAMITACION) ? "" : "disabled" %>>Abrir plaza</button>
-			<%	} %>
+		<%	if (editable) { %>
+				<input id="plaza_enviar" type="submit" name="<%=ControladorContratacion.PARAM_ENVIAR%>" value="Guardar cambios" style="float:right;"/>
+		<%	} %>
+		<%	if (estadoCreacion) { %>
+				<button id="plaza_estado_tramitacion" style="float:right; margin-right: 12px;" <%= personal ? "" : "disabled" %>>Tramitación</button>
+		<%	} else if (estadoTramitacion) { %>
+				<button id="plaza_estado_abierta" style="float:right; margin-right: 12px;" <%= personal ? "" : "disabled" %>>Abrir plaza</button>
+		<%	} %>
 			</div>
 		</div>
 	</form>
@@ -167,11 +175,27 @@ String justificacion = BolsaEmpleoUtils.getParamForm(request, ControladorContrat
 		</table>
 		<br/>
 		
+		<table class="bluetable bolsaempleo" id="tableCandidatoContratado">
+			<tr>
+				<th scope="col" style="width:76px">D.N.I</th>
+				<th scope="col" style="width:100%" class="nombre">Nombre</th>
+				<th scope="col" style="width:76px" class="center">Puntuación</th>
+				<th scope="col" style="width:76px" class="center">Confirmación</th>
+				<th scope="col" style="width:76px" class="center">Fecha confirmación</th>
+				<th scope="col" style="width:76px" class="center"></th>
+			</tr>
+			<tbody>
+			</tbody>
+			<tfoot>
+				<tr>
+					<th colSpan="6" style="width:100%"></th>
+				</tr>
+			</tfoot>
+		</table>
 <%	} %>
 
-<%	if (cerrar) { %>
-		<button id="plaza_estado_cerrar" style="float:right;" <%= plaza.getEstado().contains(ModeloPlazaOfertada.PLAZA_ESTADO_CONTRATACION) ? "" 
-				: "title='Para poder cerrar la plaza tiene que estar en estado de contratación' disabled" %>>Cerrar plaza</button>
+<%	if (estadoContratacion && personal) { %>
+		<button id="plaza_estado_cerrar" style="float:right;">Cerrar plaza</button>
 <%	} %>
 	
 </div>
@@ -339,19 +363,40 @@ $(document).ready(function() {
 		return true;
 	});
 	
-<%	if (editable) { %>
+<%	if (estadoCreacion && personal) { %>
+		document.getElementById("plaza_estado_tramitacion").addEventListener("click", function(e) {
+			e.preventDefault();
+			Atis.confirmDialog("Cambiar estado de la plaza", "La plaza cambiará a estado de tramitación.", {
+				'Si': function() {
+					var params = {
+							"<%= ControladorContratacion.PARAM_ACCION %>": "<%= ControladorContratacion.ACCION_PLAZA_TRAMITACION %>",
+							"<%= ControladorContratacion.PARAM_PLAZA_OFERTADA %>": <%= bean.getPlazaOfertada().getCodNum() %>
+					};
+					Atis.sendForm("<%= request.getRequestURI() %>", params);
+					$(this).dialog("close");
+				},
+				'No': function() {
+					$(this).dialog("close");
+				}
+			});
+		});
+<%	} %>
+	
+<%	if (estadoTramitacion && personal) { %>
 		document.getElementById("plaza_estado_abierta").addEventListener("click", function(e) {
 			e.preventDefault();
 			var inputFechaFin = document.getElementById("plaza_fecha_fin_oferta");
-			console.log(inputFechaFin.value);
 			if (inputFechaFin.value.length == 0) {
 				inputFechaFin.setCustomValidity("La fecha fin de la oferta no puede estar vacía para abrir la plaza");
 				inputFechaFin.reportValidity();
+				setTimeout(function() {
+					inputFechaFin.setCustomValidity("");
+				}, 3000);
 			} else {
-				Atis.confirmDialog("¿Abrir plaza?", "Una vez abierta la plaza no se podrá editar y se cerrará automáticamente en la fecha fin de la oferta indicada.", {
+				Atis.confirmDialog("¿Abrir plaza?", "Una vez abierta la plaza no se podrá editar y cambiará automáticamente <br/> a estado de contratación en la fecha fin de la oferta indicada.", {
 					'Si': function() {
 						var params = {
-								"<%= ControladorContratacion.PARAM_ACCION %>": "<%= ControladorContratacion.ACCION_ABRIR_PLAZA %>",
+								"<%= ControladorContratacion.PARAM_ACCION %>": "<%= ControladorContratacion.ACCION_PLAZA_ABIERTA %>",
 								"<%= ControladorContratacion.PARAM_PLAZA_OFERTADA %>": <%= bean.getPlazaOfertada().getCodNum() %>,
 								"<%= ControladorContratacion.PARAM_FECHA_FIN_OFERTA %>": inputFechaFin.value
 						};
@@ -372,22 +417,20 @@ $(document).ready(function() {
 					+ "<%="?a=" + (bean.getUsuarioLogeado().isDirectorDepartamento() ? ControladorDescargaFicheros.ACCION_DESCARGAR_HORARIO_DIRECTOR : ControladorDescargaFicheros.ACCION_DESCARGAR_HORARIO_PERSONAL) + "&" + ControladorDescargaFicheros.PARAM_PLAZA_OFERTADA + "=" + plaza.getCodNum()%>");
 		});
 <%	} %>
-	
-<%	if (bean.getUsuarioLogeado().isServicioPersonal()) { %>
-	<%	if (plaza.getNri() != null) { %>
-			document.getElementById("plaza_descargar_nri").addEventListener("click", function() {
-				window.open("<%=ControladorDescargaFicheros.URL_DESCARGA_FICHEROS%>"
-						+ "<%="?a=" + ControladorDescargaFicheros.ACCION_DESCARGAR_HORARIO_PERSONAL + "&" + ControladorDescargaFicheros.PARAM_PLAZA_OFERTADA + "=" + plaza.getCodNum()%>");
-			});
-	<%	} %>
+
+<%	if (plaza.getNri() != null && personal) { %>
+		document.getElementById("plaza_descargar_nri").addEventListener("click", function() {
+			window.open("<%=ControladorDescargaFicheros.URL_DESCARGA_FICHEROS%>"
+					+ "<%="?a=" + ControladorDescargaFicheros.ACCION_DESCARGAR_HORARIO_PERSONAL + "&" + ControladorDescargaFicheros.PARAM_PLAZA_OFERTADA + "=" + plaza.getCodNum()%>");
+		});
 <%	} %>
 
-<%	if (cerrar) { %>
+<%	if (estadoCerrada && personal) { %>
 		document.getElementById("plaza_estado_cerrar").addEventListener("click", function() {
 			Atis.confirmDialog("¿Cerrar plaza?", "Se enviará un mensaje a los candidatos con el candidato seleccionado para la plaza.", {
 				'Si': function() {
 					var params = {
-							"<%= ControladorContratacion.PARAM_ACCION %>": "<%= ControladorContratacion.ACCION_CERRAR_PLAZA %>",
+							"<%= ControladorContratacion.PARAM_ACCION %>": "<%= ControladorContratacion.ACCION_PLAZA_CERRADA %>",
 							"<%= ControladorContratacion.PARAM_PLAZA_OFERTADA %>": <%= bean.getPlazaOfertada().getCodNum() %>
 					};
 					Atis.sendForm("<%= request.getRequestURI() %>", params);

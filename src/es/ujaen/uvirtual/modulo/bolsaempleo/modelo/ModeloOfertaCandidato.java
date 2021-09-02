@@ -236,7 +236,6 @@ public class ModeloOfertaCandidato {
 	private void insertaOfertaCandidato(OfertaCandidato oferta, UsuarioBolsaEmpleo usuarioUpdate, Connection conexion) throws SQLException {
 		String consulta = String.format("INSERT INTO TBEP_OFERTAS_CANDIDATOS (%s,%s,%s,%s,%s,%s) VALUES (?,?,?,?,?,?)",
 				BEPPLO_CODNUM, BEPUSU_CODNUM, FLGRESULTADO, FECHA_RESULTADO, PREFERENCIA, "UID_USUARIO");
-		System.out.println(consulta);
 		try (PreparedStatement stmt = conexion.prepareStatement(consulta)) {
 			int parameterIndex = 1;
 			stmt.setInt(parameterIndex++, oferta.getPlaza().getCodNum());

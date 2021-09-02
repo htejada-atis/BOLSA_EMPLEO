@@ -165,11 +165,11 @@ public class ModeloContratacion {
 				}
 				
 				// Creamos un nuevo mensaje con los datos de la plaza en la plantilla
-				Mensaje mensaje = new Mensaje(modeloPlantilla.reemplazaPlazaYContratacionEnPlantilla(plaza, contratacion, plantilla.getTitulo()), 
-						modeloPlantilla.reemplazaPlazaYContratacionEnPlantilla(plaza, contratacion, plantilla.getCuerpo()),
+				Mensaje mensaje = new Mensaje(modeloPlantilla.reemplazaPlazaYContratacionEnPlantilla(plaza, contratacion, plantilla.getTitulo(), false), 
+						modeloPlantilla.reemplazaPlazaYContratacionEnPlantilla(plaza, contratacion, plantilla.getCuerpo(), true),
 						BolsaEmpleoUtils.getCurrentDateTime(), ModeloMensajes.MENSAJE_ESTADO_BORRADOR);
 				
-				int idMensaje = modeloPlantilla.insertarMensajeDePlantilla(mensaje, usuarioUpdate, conexion);
+				int idMensaje = ModeloMensajes.obtenerInstancia().nuevoMensajeConexion(mensaje, usuarioUpdate, conexion);
 				
 				// agregamos el candidato como destinatario para enviar el mensaje de la plaza
 				String consultaInsertDest = String.format("INSERT INTO TBEP_MEN_DESTINATARIOS (%s, %s, %s) VALUES (?, ?, ?)", 

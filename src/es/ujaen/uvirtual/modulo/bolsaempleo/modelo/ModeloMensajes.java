@@ -302,6 +302,35 @@ public class ModeloMensajes {
 			return rs.getInt(1);
 		}
 	}
+	
+	/** Añade un nuevo mensaje y devuelve su id .
+	 * @param mensaje .
+	 * @param usuarioUpdate .
+	 * @param conexion .
+	 * @return devuelve la id del mensaje agregado .
+	 * @throws SQLException en caso de error en la BD .
+	 * @throws UVException  si fichero no es válido .
+	 */
+	public Integer nuevoMensajeConexion(Mensaje mensaje, UsuarioBolsaEmpleo usuarioUpdate, Connection conexion) throws SQLException {
+		String consultaInsertMsg = String.format("INSERT INTO TBEP_MENSAJES (%s,%s,%s,%s,%s) VALUES (?,?,?,?,?)", 
+				"TITULO", "CUERPO", "FECHA_CREACION", "ESTADO", "UID_USUARIO");
+		
+		try (PreparedStatement stmt = conexion.prepareStatement(consultaInsertMsg, new String[] {CODNUM})) {
+			int parameterIndex = 1;
+
+			stmt.setString(parameterIndex++, mensaje.getTitulo());
+			stmt.setClob(parameterIndex++, BolsaEmpleoUtils.stringToClob(mensaje.getCuerpo(), conexion));
+			stmt.setDate(parameterIndex++, new java.sql.Date(mensaje.getFechaCreacion().getTime()));
+			stmt.setString(parameterIndex++, mensaje.getEstado());
+			stmt.setString(parameterIndex++, usuarioUpdate.getCodCuenta());
+			stmt.executeUpdate();
+			
+			ResultSet rs = stmt.getGeneratedKeys();
+			rs.next();
+			
+			return rs.getInt(1);
+		}
+	}
 
 	/**
 	 * Crea un nuevo mensaje en estado en borrador con un titulo en borrador.
