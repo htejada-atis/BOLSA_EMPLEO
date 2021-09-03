@@ -1,5 +1,6 @@
 <%@ page trimDirectiveWhitespaces="true" %>
 <%@ page import="es.ujaen.uvirtual.beans.UVDatos" %>
+<%@	page import="es.ujaen.uvirtual.modulo.bolsaempleo.modelo.ModeloContratacion" %>
 <%@	page import="es.ujaen.uvirtual.modulo.bolsaempleo.modelo.ModeloPlazaOfertada" %>
 <%@	page import="es.ujaen.uvirtual.modulo.bolsaempleo.controlador.candidato.ControladorPlazasOfertadas" %>
 <%@	page import="es.ujaen.uvirtual.modulo.bolsaempleo.controlador.ControladorDescargaFicheros"%>
@@ -16,12 +17,13 @@
 UVDatos uvdatos = (UVDatos) request.getAttribute(UVDatos.NOMBRE_ATRIBUTO);
 VistaPlazasOfertadas bean = (VistaPlazasOfertadas) uvdatos.getVistas().get(VistaPlazasOfertadas.class.getName());
 OfertaCandidato oferta = bean.getOfertaCandidato();
+boolean pendiente = bean.getOfertaCandidato().getContratacion().getResultado().equals(ModeloContratacion.RESULTADO_PENDIENTE);
 %>
 
 <div class='bolsa-empleo'>
 	<jsp:include page="/WEB-INF/jsp/vista/infadministrativa/bolsaempleo/mensajes.jsp" />
 	
-	<h2>Confirmación contrato de la plaza</h2>
+	<h2>Confirmación contrato de la plaza<%= !pendiente ? " - " + bean.getOfertaCandidato().getContratacion().getResultado() : "" %></h2>
 	
 	<h4>Id: <%= oferta.getPlaza().getCodNum() %><br/>Estado: <%= oferta.getPlaza().getEstado() %><br/><%= oferta.getPlaza().getFechaAbierta() != null ? "Fecha abierta: " + Formateador.formatoFecha(oferta.getPlaza().getFechaAbierta(), Formateador.FORMATO_FECHA_DDMMYYYY_HHMMSS) : "" %><br/>
 	Área: <%= oferta.getPlaza().getArea().getDescripcion() %>
@@ -82,7 +84,6 @@ OfertaCandidato oferta = bean.getOfertaCandidato();
 		<div class="form-group-container col2">
 			<div class="form-group">
 				<label for="plaza_fecha_cita" class="bold-label">Fecha cita:</label>
-				div class="form-group">
 				<input class="form-input-custom" id="plaza_fecha_cita" type="text" value="<%= oferta.getContratacion().getFechaCita() != null ? Formateador.formatoFecha(oferta.getContratacion().getFechaCita(), Formateador.FORMATO_FECHA_DDMMYYYY) : "" %>"
 						readonly disabled/>
 			</div>
@@ -95,8 +96,10 @@ OfertaCandidato oferta = bean.getOfertaCandidato();
 		<div class="form-group-container col2">
 			<div class="form-group"></div>
 			<div class="form-group">
-				<button id="cita_rechazar" style="float:right; margin-left: 12px;">Rechazar cita</button>
-				<button id="cita_aceptar" style="float:right; margin-left: 12px;">Aceptar cita</button>
+		<%	if (pendiente) { %>
+					<button id="cita_rechazar" style="float:right; margin-left: 12px;">Rechazar cita</button>
+					<button id="cita_aceptar" style="float:right; margin-left: 12px;">Aceptar cita</button>
+		<%	} %>
 			</div>
 		</div>
 	</form>
@@ -107,39 +110,43 @@ OfertaCandidato oferta = bean.getOfertaCandidato();
 
 $(document).ready(function() {
 	
-	document.getElementById("cita_rechazar").addEventListener("click", function() {
-		event.preventDefault();
-		Atis.confirmDialog("Aceptar cita contrato", "Al aceptar confirma el contrato.", {
-				'Si': function(row) {
-					var params = {
-							'<%= ControladorPlazasOfertadas.PARAM_ACCION %>': '<%= ControladorPlazasOfertadas.ACCION_ACEPTAR_CONTRATACION %>',
-							'<%= ControladorPlazasOfertadas.PARAM_PLAZA_OFERTADA %>': <%= oferta.getPlaza().getCodNum() %>
-					};
-					Atis.sendForm("<%= request.getRequestURI() %>", params);
-					$(this).dialog("close");
-				},
-				'No': function() {
-					$(this).dialog("close");
-				}
-		});
-	});
+<%	if (pendiente) { %>
 	
-	document.getElementById("cita_aceptar").addEventListener("click", function() {
-		event.preventDefault();
-		Atis.confirmDialog("Rechazar cita contrato", "Al rechazar el contrato será suspendido provisionalmente.", {
-				'Si': function(row) {
-					var params = {
-							'<%= ControladorPlazasOfertadas.PARAM_ACCION %>': '<%= ControladorPlazasOfertadas.ACCION_RECHAZAR_CONTRATACION %>',
-							'<%= ControladorPlazasOfertadas.PARAM_PLAZA_OFERTADA %>': <%= oferta.getPlaza().getCodNum() %>
-					};
-					Atis.sendForm("<%= request.getRequestURI() %>", params);
-					$(this).dialog("close");
-				},
-				'No': function() {
-					$(this).dialog("close");
-				}
+		document.getElementById("cita_aceptar").addEventListener("click", function() {
+			event.preventDefault();
+			Atis.confirmDialog("Aceptar cita contrato", "Al aceptar confirma que se presentará el día y hora indicados en la cita de contratación.", {
+					'Si': function(row) {
+						var params = {
+								'<%= ControladorPlazasOfertadas.PARAM_ACCION %>': '<%= ControladorPlazasOfertadas.ACCION_ACEPTAR_CONTRATACION %>',
+								'<%= ControladorPlazasOfertadas.PARAM_PLAZA_OFERTADA %>': <%= oferta.getPlaza().getCodNum() %>
+						};
+						Atis.sendForm("<%= request.getRequestURI() %>", params);
+						$(this).dialog("close");
+					},
+					'No': function() {
+						$(this).dialog("close");
+					}
+			});
 		});
-	});
+		
+		document.getElementById("cita_rechazar").addEventListener("click", function() {
+			event.preventDefault();
+			Atis.confirmDialog("Rechazar cita contrato", "Al rechazar el contrato será suspendido provisionalmente.", {
+					'Si': function(row) {
+						var params = {
+								'<%= ControladorPlazasOfertadas.PARAM_ACCION %>': '<%= ControladorPlazasOfertadas.ACCION_RECHAZAR_CONTRATACION %>',
+								'<%= ControladorPlazasOfertadas.PARAM_PLAZA_OFERTADA %>': <%= oferta.getPlaza().getCodNum() %>
+						};
+						Atis.sendForm("<%= request.getRequestURI() %>", params);
+						$(this).dialog("close");
+					},
+					'No': function() {
+						$(this).dialog("close");
+					}
+			});
+		});
+	
+<%	} %>
 	
 });
 

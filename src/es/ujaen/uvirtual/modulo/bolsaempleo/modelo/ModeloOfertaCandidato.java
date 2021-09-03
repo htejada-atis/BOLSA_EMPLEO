@@ -63,6 +63,12 @@ public class ModeloOfertaCandidato {
 	}
 	
 	
+	/** Obtiene una lista de las plazas ofertadas confirmadas por el usuario y su preferencia .
+	 * @param candidato .
+	 * @return instancia .
+	 * @throws SQLException .
+	 * @throws UVException .
+	 */
 	public List<OfertaCandidato> listaOfertasCandidatoPreferentes(UsuarioBolsaEmpleo candidato) throws SQLException, UVException {
 		List<OfertaCandidato> listaOfertas = new ArrayList<>();
 		
@@ -326,6 +332,12 @@ public class ModeloOfertaCandidato {
 		return dataTable;
 	}
 	
+	/** Crear oferta candidato de un ResultSet .
+	 * @param rs .
+	 * @return oferta candidato .
+	 * @throws SQLException .
+	 * @throws UVException .
+	 */
 	public OfertaCandidato createOfertaCandidatoFromResultSet(ResultSet rs) throws SQLException, UVException {
 		OfertaCandidato oferta = new OfertaCandidato();
 		

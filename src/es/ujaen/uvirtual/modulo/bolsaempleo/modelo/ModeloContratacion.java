@@ -19,6 +19,7 @@ import es.ujaen.uvirtual.modulo.bolsaempleo.beans.PlazaOfertada;
 import es.ujaen.uvirtual.modulo.bolsaempleo.beans.UsuarioBolsaEmpleo;
 import es.ujaen.uvirtual.modulo.bolsaempleo.utilidades.BolsaEmpleoDataTable;
 import es.ujaen.uvirtual.modulo.bolsaempleo.utilidades.BolsaEmpleoUtils;
+import es.ujaen.uvirtual.modulo.bolsaempleo.utilidades.BolsaEmpleoDataTable.DataTableColumn;
 import es.ujaen.uvirtual.utilidades.UVException;
 
 /**
@@ -27,6 +28,12 @@ import es.ujaen.uvirtual.utilidades.UVException;
  * @author ATISoluciones 2021
  */
 public class ModeloContratacion {
+	
+	public static final int ORDER_COLUMN_INDEX_NIF_CANDIDATOS = 0;
+	public static final int ORDER_COLUMN_INDEX_NOMBRE_CANDIDATOS = 1;
+	public static final int ORDER_COLUMN_INDEX_FECHA_CITA = 2;
+	public static final int ORDER_COLUMN_INDEX_RESULTADO_CITA = 3;
+	public static final int ORDER_COLUMN_INDEX_FECHA_RESULTADO = 4;
 	
 	public static final String BEPPLO_CODNUM = "BEPPLO_CODNUM";
 	public static final String BEPUSU_CODNUM = "BEPUSU_CODNUM";
@@ -38,7 +45,6 @@ public class ModeloContratacion {
 	public static final String RESULTADO_ACEPTADA = "ACEPTADA";
 	public static final String RESULTADO_PENDIENTE = "PENDIENTE";
 	public static final String RESULTADO_RECHAZADA = "RECHAZADA";
-	public static final String RESULTADO_SUSPENDIDO = "SUSPENDIDO";
 	
 	public static final Map<String, String> RESULTADOS = new HashMap<>();
 	
@@ -50,7 +56,6 @@ public class ModeloContratacion {
 		RESULTADOS.put(RESULTADO_ACEPTADA, "Aceptada");
 		RESULTADOS.put(RESULTADO_PENDIENTE, "Pendiente");
 		RESULTADOS.put(RESULTADO_RECHAZADA, "Rechazada");
-		RESULTADOS.put(RESULTADO_SUSPENDIDO, "Suspendido");
 	}
 	
 	protected static ModeloContratacion eInstancia;
@@ -76,6 +81,7 @@ public class ModeloContratacion {
 		}
 		return eInstancia;
 	}
+	
 	
 	/** Método para devolver la contratación de una plaza .
 	 * @param codnum .
@@ -246,7 +252,12 @@ public class ModeloContratacion {
 				+ " WHERE bepofc.BEPPLO_CODNUM = ?";
 		
 		String whereNombre = String.format("(%s || ' ' || %s || ' ' || %s)", "bepusu.VUAJA_STRNOMBRE", "bepusu.VUAJA_STRAPELLIDO1", "bepusu.VUAJA_STRAPELLIDO2");
-				
+		
+		dataTable.setColumn(ORDER_COLUMN_INDEX_NIF_CANDIDATOS, "bepusu.VUAJA_PRSNIF");
+		dataTable.setColumn(ORDER_COLUMN_INDEX_NOMBRE_CANDIDATOS, whereNombre, DataTableColumn.COLUMN_TYPE_TEXT);
+		dataTable.setColumn(ORDER_COLUMN_INDEX_FECHA_CITA, "bepcnt.FECHA_CITA", DataTableColumn.COLUMN_TYPE_DATE);
+		dataTable.setColumn(ORDER_COLUMN_INDEX_RESULTADO_CITA, "bepcnt.RESULTADO", DataTableColumn.COLUMN_TYPE_TEXT);
+		dataTable.setColumn(ORDER_COLUMN_INDEX_FECHA_RESULTADO, "bepcnt.FECHA_RESULTADO", DataTableColumn.COLUMN_TYPE_DATE);
 		
 		dataTable.setQuery(consulta);
 		
@@ -317,15 +328,15 @@ public class ModeloContratacion {
 		this.cambiarResultadoContratacion(plaza, usuarioUpdate, RESULTADO_RECHAZADA, usuarioUpdate);
 	}
 	
-	/** suspender cita de contratación .
+	/** rechazar cita de contratación .
 	 * @param plaza .
 	 * @param candidato .
 	 * @param usuarioUpdate .
 	 * @throws SQLException .
 	 * @throws UVException .
 	 */
-	public void suspenderContrato(PlazaOfertada plaza, UsuarioBolsaEmpleo candidato, UsuarioBolsaEmpleo usuarioUpdate)throws SQLException, UVException {
-		this.cambiarResultadoContratacion(plaza, candidato, RESULTADO_SUSPENDIDO, usuarioUpdate);
+	public void rechazarContrato(PlazaOfertada plaza, UsuarioBolsaEmpleo candidato, UsuarioBolsaEmpleo usuarioUpdate) throws SQLException, UVException {
+		this.cambiarResultadoContratacion(plaza, candidato, RESULTADO_RECHAZADA, usuarioUpdate);
 	}
 	
 	/** cambia el estado de una contratación .
@@ -370,6 +381,7 @@ public class ModeloContratacion {
 		contratacion.setCandidato(ModeloUsuarioBolsaEmpleo.obtenerInstancia().getUsuarioById(rs.getInt(BEPUSU_CODNUM)));
 		contratacion.setPlaza(ModeloPlazaOfertada.obtenerInstancia().getPlazaOfertadaById(rs.getInt(BEPPLO_CODNUM)));
 		contratacion.setFechaCita(rs.getDate(FECHA_CITA));
+		contratacion.setFechaResultado(rs.getDate(FECHA_RESULTADO));
 		contratacion.setResultado(rs.getString(RESULTADO));
 		
 		return contratacion;

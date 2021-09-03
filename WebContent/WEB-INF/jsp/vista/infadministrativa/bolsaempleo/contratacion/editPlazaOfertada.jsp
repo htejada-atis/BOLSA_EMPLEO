@@ -30,13 +30,15 @@ boolean estadoCerrada = plaza.getEstado().equals(ModeloPlazaOfertada.PLAZA_ESTAD
 boolean mostrarCandidatos = (estadoAbierta || estadoContratacion) && personal;
 boolean mostrarCandidatoContratado = !estadoCreacion && !estadoTramitacion && !estadoAbierta;
 boolean editable = estadoCreacion || (estadoTramitacion && personal);
+boolean extraRequeridos = !estadoCreacion;
 
 String area = BolsaEmpleoUtils.getParamForm(request, ControladorContratacion.PARAM_AREA, plaza.getArea().getCodNum().toString());
 String cuatrimestre = BolsaEmpleoUtils.getParamForm(request, ControladorContratacion.PARAM_CUATRIMESTRE, plaza.getCuatrimestre());
 String centroDestino = BolsaEmpleoUtils.getParamForm(request, ControladorContratacion.PARAM_CENTRO_DESTINO, EscapaHTML.escapa(plaza.getCentroDestino()));
 String dedicacion = BolsaEmpleoUtils.getParamForm(request, ControladorContratacion.PARAM_DEDICACION, plaza.getDedicacion() != null ? plaza.getDedicacion().getCodNum().toString() : "");
 String duracionPrevista = BolsaEmpleoUtils.getParamForm(request, ControladorContratacion.PARAM_DURACION_PREVISTA, EscapaHTML.escapa(plaza.getDuracionPrevista()));
-String fechaFinOferta = BolsaEmpleoUtils.getParamForm(request, ControladorContratacion.PARAM_FECHA_FIN_OFERTA, plaza.getFechaFinOferta() != null ? Formateador.formatoFecha(plaza.getFechaFinOferta(), Formateador.FORMATO_FECHA_DDMMYYYY_HHMMSS) : "");
+String fechaFinOferta = BolsaEmpleoUtils.getParamForm(request, ControladorContratacion.PARAM_FECHA_FIN_OFERTA, plaza.getFechaFinOferta() != null ? Formateador.formatoFecha(plaza.getFechaFinOferta(), Formateador.FORMATO_FECHA_DDMMYYYY) : "");
+String horaFinOferta = BolsaEmpleoUtils.getParamForm(request, ControladorContratacion.PARAM_HORA_FIN_OFERTA, plaza.getFechaFinOferta() != null ? Formateador.formatoFecha(plaza.getFechaFinOferta(), Formateador.FORMATO_FECHA_HORA_MINUTOS) : "");
 String justificacion = BolsaEmpleoUtils.getParamForm(request, ControladorContratacion.PARAM_JUSTIFICACION, EscapaHTML.escapa(plaza.getJustificacion()));
 %>
 
@@ -75,8 +77,10 @@ String justificacion = BolsaEmpleoUtils.getParamForm(request, ControladorContrat
 		</div>
 		<div class="form-group-container col2">
 			<div class="form-group">
-				<label for="plaza_dedicacion">Dedicación: </label>
-				<select id="plaza_dedicacion" name="<%=ControladorContratacion.PARAM_DEDICACION%>" style="width:100%;" <%= personal && editable ? "" : "readonly disabled" %>>
+				<label for="plaza_dedicacion" <%= extraRequeridos ? "class='bold-label'" : "" %>>Dedicación: </label>
+				<select id="plaza_dedicacion" name="<%=ControladorContratacion.PARAM_DEDICACION%>" style="width:100%;" 
+						<%= personal && editable ? "" : "readonly disabled" %>
+						<%= extraRequeridos ? "required" : "" %>>
 					<option value="">----------------</option>
 				<%	if (plaza.getDedicacion() != null) { %>
 						<option value="<%= plaza.getDedicacion().getCodNum() %>" selected><%= plaza.getDedicacion().getTexto() + " - Sueldo: " + plaza.getDedicacion().getSueldo() %></option>
@@ -84,14 +88,18 @@ String justificacion = BolsaEmpleoUtils.getParamForm(request, ControladorContrat
 				<%	for(Dedicacion ded: bean.getListaDedicaciones()) { %>
 					<%	if (plaza.getDedicacion() != null && Integer.parseInt(dedicacion) != ded.getCodNum()) { %>
 							<option value="<%=ded.getCodNum()%>"><%= ded.getTexto() + " - Sueldo: " + ded.getSueldo() %></option>
+					<%	} else if (plaza.getDedicacion() == null) { %>
+							<option value="<%=ded.getCodNum()%>"><%= ded.getTexto() + " - Sueldo: " + ded.getSueldo() %></option>
 					<%	} %>
 				<%	} %>
 				</select>
 			</div>
 			<div class="form-group">
-				<label for="plaza_cuatrimestre">Cuatrimestre:</label>
-				<select id="plaza_cuatrimestre" name="<%=ControladorContratacion.PARAM_CUATRIMESTRE%>" style="width:100%;" <%= personal && editable ? "" : "readonly disabled" %>>
-						<option value="">----------------</option>
+				<label for="plaza_cuatrimestre" <%= extraRequeridos ? "class='bold-label'" : "" %>>Cuatrimestre:</label>
+				<select id="plaza_cuatrimestre" name="<%=ControladorContratacion.PARAM_CUATRIMESTRE%>" style="width:100%;" 
+						<%= personal && editable ? "" : "readonly disabled" %>
+						<%= extraRequeridos ? "required" : "" %>>
+					<option value="">----------------</option>
 				<%	for (Entry<String, String> cua: ModeloPlazaOfertada.CUATRIMESTRES.entrySet()) { %>
 						<option value="<%= cua.getKey() %>" <%= cuatrimestre != null && cuatrimestre.equals(cua.getKey()) ? "selected" : "" %>><%= cua.getValue() %></option>
 				<%	} %>
@@ -106,14 +114,21 @@ String justificacion = BolsaEmpleoUtils.getParamForm(request, ControladorContrat
 		</div>
 		<div class="form-group-container col2">
 			<div class="form-group">
-				<label for="plaza_duracion_prevista">Duración prevista:</label>
+				<label for="plaza_duracion_prevista" <%= extraRequeridos ? "class='bold-label'" : "" %>>Duración prevista:</label>
 				<input class="form-input-custom" type="text" name="<%=ControladorContratacion.PARAM_DURACION_PREVISTA%>" id="plaza_duracion_prevista" 
-						value="<%=duracionPrevista%>" <%= personal && editable ? "" : "readonly disabled" %>/>
+						value="<%=duracionPrevista%>" <%= personal && editable ? "" : "readonly disabled" %> <%= extraRequeridos ? "required" : "" %>/>
+			</div>
+		</div>
+		<div class="form-group-container col2">
+			<div class="form-group">
+				<label for="plaza_fecha_fin_oferta" <%= extraRequeridos ? "class='bold-label'" : "" %>>Fecha fin oferta:</label>
+				<input class="form-input-custom" name="<%=ControladorContratacion.PARAM_FECHA_FIN_OFERTA%>" id="plaza_fecha_fin_oferta" type="text" value="<%= fechaFinOferta %>"
+						<%= extraRequeridos ? "required" : "" %>/>
 			</div>
 			<div class="form-group">
-				<label for="plaza_fecha_fin_oferta">Fecha fin oferta:</label>
-				<input class="form-input-custom" type="text" name="<%=ControladorContratacion.PARAM_FECHA_FIN_OFERTA%>" id="plaza_fecha_fin_oferta" autocomplete="off" 
-						value="<%=fechaFinOferta%>" <%= personal && editable ? "" : "readonly disabled" %>/>
+				<label for="plaza_hora_fin_oferta" <%= extraRequeridos ? "class='bold-label'" : "" %>>Hora fin oferta:</label>
+				<input class="form-input-custom" name="<%=ControladorContratacion.PARAM_HORA_FIN_OFERTA%>" id="plaza_hora_fin_oferta" type="text" value="<%= horaFinOferta %>"
+						<%= extraRequeridos ? "required" : "" %> placeholder="HH:MM:SS"/>
 			</div>
 		</div>
 		<div class="form-group-container col2">
@@ -185,7 +200,7 @@ String justificacion = BolsaEmpleoUtils.getParamForm(request, ControladorContrat
 				<th scope="col" style="width:100%" class="nombre">Nombre</th>
 				<th scope="col" style="width:100px">Fecha cita</th>
 				<th scope="col" style="width:100px">Resultado cita</th>
-				<th scope="col" style="width:100px">Fecha confirmación</th>
+				<th scope="col" style="width:100px">Fecha resultado</th>
 				<th scope="col" style="width:76px" class="center"></th>
 			</tr>
 			<tbody>
@@ -372,14 +387,14 @@ $(document).ready(function() {
 				{'data': 'candidato.apellido1', 'filter': true, 'overflow': 'auto', 'render': function(row) {
 					return row.candidato.nombre + " " + row.candidato.apellido1 + " " + row.candidato.apellido2;
 				}},
-				{'data': 'contratacion.fechaCita'},
-				{'data': 'contratacion.resultado'},
-				{'data': 'contratacion.fechaResultado'},
-				{'data': 'codNum', 'buttons': [{'label': 'Suspensión', 'onClick': function(row) {
-						Atis.confirmDialog("Suspensión candidato", "Se suspenderá la contratación del candidato", {
+				{'data': 'contratacion.fechaCita', 'filter': {'type': 'date'}},
+				{'data': 'contratacion.resultado', 'filter': true},
+				{'data': 'contratacion.fechaResultado', 'filter': {'type': 'date'}},
+				{'data': 'codNum', 'buttons': [{'label': 'Rechazar', 'onClick': function(row) {
+						Atis.confirmDialog("Rechazar contratación", "Se rechazará la contratación del candidato " + row.candidato.prsnif + ".", {
 							'Si': function() {
 								var params = {
-										"<%= ControladorContratacion.PARAM_ACCION %>": "<%= ControladorContratacion.ACCION_SUSPENSION_CANDIDATO %>",
+										"<%= ControladorContratacion.PARAM_ACCION %>": "<%= ControladorContratacion.ACCION_RECHAZAR_CONTRATACION_CANDIDATO %>",
 										"<%= ControladorContratacion.PARAM_PLAZA_OFERTADA %>": <%= bean.getPlazaOfertada().getCodNum() %>,
 										"<%= ControladorContratacion.PARAM_CANDIDATO %>": row.candidato.codNum
 								};
@@ -391,7 +406,90 @@ $(document).ready(function() {
 							}
 						});
 					}, 'visible': function(row) {
-						return row.contratacion.resultado != '<%= ModeloContratacion.RESULTADO_SUSPENDIDO %>';
+						return row.contratacion.resultado != '<%= ModeloContratacion.RESULTADO_RECHAZADA %>' && <%= !estadoCerrada %>;
+					}
+				}, {'label': 'Reenviar cita', 'onClick': function(row) {
+						var mensaje = 
+							"<h2>Candidato " + row.candidato.prsnif + "</h2>"
+							+ " <br/>"
+							+ " <p></p>"
+							+ " <p>Se enviará un correo al candidato con la confirmación del contrato <br/> y con la fecha y hora prevista de la cita que se establece en el formulario:</p>"
+							+ " <br/>"
+							+ " <div class='form-group-container col2'>"
+							+ "     <div class='form-group-dialog'>"
+							+ "         <label class='bold-label' for='contrato_fecha_cita'>Fecha cita: </label>"
+							+ "         <input id='contrato_fecha_cita' name='<%= ControladorContratacion.PARAM_FECHA_CITA %>' placeholder='DD/MM/YYYY' required/>"
+							+ "     </div>"
+							+ "     <div class='form-group-dialog'>"
+							+ "         <label class='bold-label' for='contrato_hora_cita'>Hora cita: </label><input id='contrato_hora_cita' name='horacita' placeholder='HH:MM:SS' required/>"
+							+ "     </div>"
+							+ " </div>"
+							+ " <br/>";
+						
+						$('<div></div>').appendTo('body').html(mensaje).dialog({
+							modal: true,
+							title: "Contratar candidato",
+							zIndex: 10000,
+							autoOpen: true,
+							width: 'auto',
+							resizable: false,
+							buttons: {
+								Si: function() {
+									var inputFecha = this.querySelector('#contrato_fecha_cita');
+									var inputHora = this.querySelector('#contrato_hora_cita');
+									
+									if (inputFecha.value != '' && inputHora.value != '') {
+										var params = {
+												"<%= ControladorContratacion.PARAM_ACCION %>": "<%= ControladorContratacion.ACCION_CONTRATAR_CANDIDATO %>",
+												"<%= ControladorContratacion.PARAM_PLAZA_OFERTADA %>": <%= bean.getPlazaOfertada().getCodNum() %>,
+												"<%= ControladorContratacion.PARAM_CANDIDATO %>": row.candidato.codNum,
+												"<%= ControladorContratacion.PARAM_FECHA_CITA %>": inputFecha.value,
+												"<%= ControladorContratacion.PARAM_HORA_CITA %>": inputHora.value
+										};
+										Atis.sendForm("<%= request.getRequestURI() %>", params);
+										$(this).dialog("close");
+									} else {
+										if (inputFecha.value == '') {
+											inputFecha.setCustomValidity("La fecha de cita no puede estar vacía");
+											inputFecha.reportValidity();
+										}
+										
+										if (inputHora.value == '') {
+											inputHora.setCustomValidity("La hora de cita no puede estar vacía");
+											inputHora.reportValidity();
+										}
+									}
+								},
+								No: function() {
+									$(this).dialog("close");
+								}
+							},
+							close: function(event, ui) {
+								$(this).remove();
+							},
+							open: function(event, ui) {
+								$("#contrato_fecha_cita").datepicker();
+								$("#contrato_fecha_cita").blur();
+								
+								$("#ui-datepicker-div").css("z-index", "9999");
+							}
+						});
+						Atis.confirmDialog("Rechazar candidato", "Se rechazará la contratación del candidato.", {
+							'Si': function() {
+								var params = {
+										"<%= ControladorContratacion.PARAM_ACCION %>": "<%= ControladorContratacion.ACCION_RECHAZAR_CONTRATACION_CANDIDATO %>",
+										"<%= ControladorContratacion.PARAM_PLAZA_OFERTADA %>": <%= bean.getPlazaOfertada().getCodNum() %>,
+										"<%= ControladorContratacion.PARAM_CANDIDATO %>": row.candidato.codNum
+								};
+								Atis.sendForm("<%= request.getRequestURI() %>", params);
+								$(this).dialog("close");
+							},
+							'No': function() {
+								$(this).dialog("close");
+							}
+						});
+					}, 'visible': function(row) {
+						return row.contratacion.resultado != '<%= ModeloContratacion.RESULTADO_RECHAZADA %>' && <%= !estadoCerrada %>;
 					}
 				}]}
 			]
@@ -428,14 +526,18 @@ $(document).ready(function() {
 <%	if (estadoTramitacion && personal) { %>
 		document.getElementById("plaza_estado_abierta").addEventListener("click", function(e) {
 			e.preventDefault();
-			var inputFechaFin = document.getElementById("plaza_fecha_fin_oferta");
-			if (inputFechaFin.value.length == 0) {
-				inputFechaFin.setCustomValidity("La fecha fin de la oferta no puede estar vacía para abrir la plaza");
-				inputFechaFin.reportValidity();
-				setTimeout(function() {
-					inputFechaFin.setCustomValidity("");
-				}, 3000);
-			} else {
+			var enviar = true;
+			var inputs = document.getElementById("actualizar_plaza").elements;
+			
+			for (i=0; i<inputs.length; i++) {
+				var input = inputs[i];
+				if (input.required && input.value.length == 0) {
+					input.reportValidity();
+					enviar = false;
+				}
+			}
+			
+			if (enviar) {
 				var message = '<p>Una vez abierta la plaza ya no se podrá modificar y comenzará el período de aceptación de los<br/> candidatos.<br/>';
 				message += 'En la fecha y hora: ' + inputFechaFin.value + ' el estado de la plaza cambiará automáticamente a estado<br/> de contratación.</p><br/>';
 				message += '<p>Se enviará un correo sobre la apertura de la plaza a los siguientes candidatos:</p>';
@@ -465,8 +567,7 @@ $(document).ready(function() {
 						Si: function() {
 							var params = {
 									"<%= ControladorContratacion.PARAM_ACCION %>": "<%= ControladorContratacion.ACCION_PLAZA_ABIERTA %>",
-									"<%= ControladorContratacion.PARAM_PLAZA_OFERTADA %>": <%= bean.getPlazaOfertada().getCodNum() %>,
-									"<%= ControladorContratacion.PARAM_FECHA_FIN_OFERTA %>": inputFechaFin.value
+									"<%= ControladorContratacion.PARAM_PLAZA_OFERTADA %>": <%= bean.getPlazaOfertada().getCodNum() %>
 							};
 							Atis.sendForm("<%= request.getRequestURI() %>", params);
 						},

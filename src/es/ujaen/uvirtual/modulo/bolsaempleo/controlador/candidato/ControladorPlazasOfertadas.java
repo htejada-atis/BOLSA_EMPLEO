@@ -215,7 +215,6 @@ public class ControladorPlazasOfertadas extends HttpServlet {
 			throws SQLException, UVException, IOException {
 		bean.setVista(JSP_PLAZA);
 		ModeloOfertaCandidato modeloOferta = ModeloOfertaCandidato.obtenerInstancia();
-		
 		PlazaOfertada plaza = new PlazaOfertada(Formateador.leeParametroInteger(BolsaEmpleoUtils.getParamRequestOrSession(request, PARAM_PLAZA_OFERTADA)));
 		OfertaCandidato oferta = modeloOferta.getOfertaByPlazaCandidato(plaza, bean.getUsuarioLogeado());
 		
@@ -299,7 +298,7 @@ public class ControladorPlazasOfertadas extends HttpServlet {
 				BolsaEmpleoDataTable<OfertaCandidato> dataTable = ModeloOfertaCandidato.obtenerInstancia().listadoPlazasOfertadasCandidato(
 						request.getParameterMap(), bean.getUsuarioLogeado());
 				bean.setDatatableOfertasCandidatos(dataTable);
-				writer.write(dataTable.toJson());
+				writer.write(dataTable.toJson("dd/M/yyyy HH:mm:ss"));
 			} catch (UVException | SQLException e) {
 				if (e instanceof SQLException) {
 					LOGGER.log(Level.SEVERE, Formateador.getStackTrace(e));

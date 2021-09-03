@@ -76,9 +76,9 @@ public class ControladorContratacion extends HttpServlet {
 	public static final String ACCION_INDEX = "index";
 	public static final String ACCION_PREFERENCIAS_CANDIDATO = "preferenciascandidato";
 	public static final String ACCION_NUEVA_PLAZA_OFERTADA = "nuevaplazaofertada";
+	public static final String ACCION_RECHAZAR_CONTRATACION_CANDIDATO = "rechazarcontratacioncandidato";
 	public static final String ACCION_RESTAURAR_PLAZA_OFERTADA = "restaurarplazaofertada";
 	public static final String ACCION_SELECCIONAR_PLAZA_OFERTADA = "seleccionarplazaofertada";
-	public static final String ACCION_SUSPENSION_CANDIDATO = "suspensioncandidato";
 	
 	// Parámetros
 	public static final String PARAM_ACCION = "a";
@@ -95,6 +95,7 @@ public class ControladorContratacion extends HttpServlet {
 	public static final String PARAM_FECHA_FIN_OFERTA = "fechafinoferta";
 	public static final String PARAM_HORARIO = "horario";
 	public static final String PARAM_HORA_CITA = "horacita";
+	public static final String PARAM_HORA_FIN_OFERTA = "horafinoferta";
 	public static final String PARAM_JUSTIFICACION = "justificacion";
 	public static final String PARAM_NRI_FECHA = "nrifecha";
 	public static final String PARAM_NRI = "nri";
@@ -189,8 +190,8 @@ public class ControladorContratacion extends HttpServlet {
 				case ACCION_PLAZA_ABIERTA:
 				case ACCION_PLAZA_CERRADA:
 				case ACCION_PLAZA_TRAMITACION:
+				case ACCION_RECHAZAR_CONTRATACION_CANDIDATO:
 				case ACCION_SELECCIONAR_PLAZA_OFERTADA:
-				case ACCION_SUSPENSION_CANDIDATO:
 					seleccionarPlazaOfertada(bean, datos, request, response, nombreAccion, parametros);
 					break;
 				case ACCION_DATATABLE_PLAZAS_OFERTADAS:
@@ -306,8 +307,8 @@ public class ControladorContratacion extends HttpServlet {
 				break;
 			case ACCION_SELECCIONAR_PLAZA_OFERTADA:
 				break;
-			case ACCION_SUSPENSION_CANDIDATO:
-				suspensionContratacion(bean, datos, request, response);
+			case ACCION_RECHAZAR_CONTRATACION_CANDIDATO:
+				rechazarContratacionCandidato(bean, datos, request, response);
 				break;
 			default:
 				errorFatal(bean, MENSAJE_ERROR_ACCION_NO_CONTEMPLADA);
@@ -325,7 +326,6 @@ public class ControladorContratacion extends HttpServlet {
 		if (!plaza.getEstado().contains(ModeloPlazaOfertada.PLAZA_ESTADO_TRAMITACION)) {
 			throw new UVException(MENSAJE_ERROR_ESTADO_TRAMITACION_REQUERIDO);
 		}
-		plaza.setFechaFinOferta(BolsaEmpleoUtils.leeParametroFechaHora(request.getParameter(PARAM_FECHA_FIN_OFERTA), "/", ":"));
 		
 		modeloPlaza.crearMensajeAperturaPlaza(plaza, bean.getUsuarioLogeado());
 		modeloPlaza.abrirPlazaOfertada(plaza, bean.getUsuarioLogeado());
@@ -358,6 +358,15 @@ public class ControladorContratacion extends HttpServlet {
 		
 		modeloPlaza.crearMensajeCierrePlaza(plaza, contratacion, emails, bean.getUsuarioLogeado());
 		modeloPlaza.cerrarPlazaOfertada(plaza, bean.getUsuarioLogeado());
+		
+		String estadoCandidato = ModeloEstadoCandidato.ESTADO_CONTRATADO;
+		
+		if (plaza.getCuatrimestre().equals(ModeloPlazaOfertada.CUATRIMESTRE_PRIMERO)) {
+			estadoCandidato = ModeloEstadoCandidato.ESTADO_CONTRATADO_PRIMER_CUATRIMESTRE;
+		}
+		
+		ModeloEstadoCandidato.obtenerInstancia().cambiarEstadoCandidato(contratacion.getCandidato(), estadoCandidato, 
+				ModeloBolsa.obtenerInstancia().getBolsaById(bean.getPlazaOfertada().getArea().getCodNum()), bean.getUsuarioLogeado());
 		
 		BolsaEmpleoUtils.addMensajeDeExito(MENSAJE_EXITO_CERRAR_PLAZA, bean, request);
 		redireccionConPlazaSeleccionada(bean, datos, request, response, ACCION_SELECCIONAR_PLAZA_OFERTADA);
@@ -439,7 +448,7 @@ public class ControladorContratacion extends HttpServlet {
 		redireccionConPlazaSeleccionada(bean, datos, request, response, ACCION_SELECCIONAR_PLAZA_OFERTADA);
 	}
 	
-	private void suspensionContratacion(VistaContratacion bean, UVDatos datos, HttpServletRequest request, HttpServletResponse response)
+	private void rechazarContratacionCandidato(VistaContratacion bean, UVDatos datos, HttpServletRequest request, HttpServletResponse response)
 			throws SQLException, UVException, IOException {
 		ModeloContratacion modeloContratacion = ModeloContratacion.obtenerInstancia();
 		
@@ -450,9 +459,7 @@ public class ControladorContratacion extends HttpServlet {
 		Integer idCandidato = Formateador.leeParametroInteger(request.getParameter(PARAM_CANDIDATO));
 		UsuarioBolsaEmpleo candidato = ModeloUsuarioBolsaEmpleo.obtenerInstancia().getUsuarioById(idCandidato);
 		
-		modeloContratacion.suspenderContrato(bean.getPlazaOfertada(), candidato, bean.getUsuarioLogeado());
-		ModeloEstadoCandidato.obtenerInstancia().cambiarEstadoCandidato(candidato, ModeloEstadoCandidato.ESTADO_SUSPENSION_PROVISIONAL, 
-				ModeloBolsa.obtenerInstancia().getBolsaById(bean.getPlazaOfertada().getArea().getCodNum()), bean.getUsuarioLogeado());
+		modeloContratacion.rechazarContrato(bean.getPlazaOfertada(), candidato, bean.getUsuarioLogeado());
 		
 		BolsaEmpleoUtils.addMensajeDeExito(MENSAJE_EXITO_SUSPENSION_PLAZA, bean, request);
 		redireccionConPlazaSeleccionada(bean, datos, request, response, ACCION_SELECCIONAR_PLAZA_OFERTADA);

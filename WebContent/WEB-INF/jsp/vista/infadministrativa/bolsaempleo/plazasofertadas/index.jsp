@@ -1,6 +1,7 @@
 <%@ page trimDirectiveWhitespaces="true" %>
 <%@ page import="es.ujaen.uvirtual.beans.UVDatos" %>
 <%@	page import="es.ujaen.uvirtual.modulo.bolsaempleo.controlador.candidato.ControladorPlazasOfertadas" %>
+<%@	page import="es.ujaen.uvirtual.modulo.bolsaempleo.modelo.ModeloContratacion" %>
 <%@	page import="es.ujaen.uvirtual.modulo.bolsaempleo.modelo.ModeloPlazaOfertada" %>
 <%@ page import="es.ujaen.uvirtual.modulo.bolsaempleo.vistas.VistaPlazasOfertadas" %>
 <%@ page import="es.ujaen.uvirtual.modulo.bolsaempleo.beans.OfertaCandidato" %>
@@ -44,27 +45,33 @@ VistaPlazasOfertadas bean = (VistaPlazasOfertadas) uvdatos.getVistas().get(Vista
 				<th scope="col" style="width:30px">Id</th>
 				<th scope="col" style="width:100%">Área</th>
 				<th scope="col" style="width:95px">Estado</th>
-				<th scope="col" style="width:100px" class="center">Contrato</th>
-				<th scope="col" style="width:100px" class="center">Confirmación de contrato</th>
-				<th scope="col" style="width:100px">Preferencia</th>
+				<th scope="col" style="width:100px" class="center">Cita contratación</th>
+				<th scope="col" style="width:100px" class="center">Confirmación de cita</th>
+				<th scope="col" style="width:75px">Preferencia</th>
+				<th scope="col" style="width:75px"></th>
 			</tr>
 			<tbody>
 			<%	for (OfertaCandidato ofertaCandidato: bean.getListaOfertasCandidatos()) { %>
-					<tr class="oferta_row clickable" data-id="<%= ofertaCandidato.getCodNum() %>">
+					<tr class="oferta_row" data-id="<%= ofertaCandidato.getCodNum() %>">
 						<td><%= ofertaCandidato.getPlaza().getCodNum() %></td>
 						<td><%= ofertaCandidato.getPlaza().getArea().getIdAreaExterno() + " " + ofertaCandidato.getPlaza().getArea().getDescripcion() %></td>
 						<td><%= ofertaCandidato.getPlaza().getEstado() %></td>
-						<td class="center"><%= ofertaCandidato.getContratacion() != null ? "<div title='Aceptada' class='circle-true'></div>" : "<div title='Rechazada' class='circle-false'></div>" %></td>
-						<td class="center"><%= ofertaCandidato.getContratacion() != null ? ofertaCandidato.getContratacion().getResultado().equals("ACEPTADA") ? "<div title='Aceptada' class='circle-true'></div>" : "<div title='Rechazada' class='circle-false'></div>" : "" %></td>
+						<td class="center"><%= ofertaCandidato.getContratacion() != null ? "<div title='Aceptada' class='circle-true'></div>" : "" %></td>
+						<td class="center"><%= ofertaCandidato.getContratacion() != null ? !ofertaCandidato.getContratacion().getResultado().equals(ModeloContratacion.RESULTADO_PENDIENTE) ? ofertaCandidato.getContratacion().getResultado() : "" : "" %></td>
 						<td>
 							<input class="oferta_preferencia" type="number" value="<%= ofertaCandidato.getPreferencia() != 0 ? ofertaCandidato.getPreferencia() : "" %>" style="width: 40px"/>
+						</td>
+						<td>
+					<%	if (ofertaCandidato.getContratacion() != null && ofertaCandidato.getContratacion().getResultado().equals(ModeloContratacion.RESULTADO_PENDIENTE)) { %>
+							<button class="btn ver_cita" type="button" data-plaza="<%= ofertaCandidato.getPlaza().getCodNum() %>">Ver cita</button>
+					<%	} %>
 						</td>
 					</tr>
 			<%	} %>
 			</tbody>
 			<tfoot>
 				<tr>
-					<th colSpan="6" style="width:100%"></th>
+					<th colSpan="7" style="width:100%"></th>
 				</tr>
 			</tfoot>
 		</table>
@@ -124,11 +131,12 @@ $(document).ready(function() {
 			Atis.sendForm("<%= request.getRequestURI() %>", params);
 		});
 		
-		$("#tableOfertasPreferentes > tbody > .oferta_row").each(function() {
+		$("#tableOfertasPreferentes > tbody > tr > td > .ver_cita").each(function() {
 			$(this).on("click", function() {
 				var params = {
 						'<%= ControladorPlazasOfertadas.PARAM_ACCION %>': '<%= ControladorPlazasOfertadas.ACCION_SELECCIONAR_CONTRATO %>',
-						'<%= ControladorPlazasOfertadas.PARAM_PLAZA_OFERTADA %>': row.plaza.codNum};
+						'<%= ControladorPlazasOfertadas.PARAM_PLAZA_OFERTADA %>': $(this).data("plaza")
+				};
 				Atis.sendForm("<%= request.getRequestURI() %>", params);
 			});
 		});

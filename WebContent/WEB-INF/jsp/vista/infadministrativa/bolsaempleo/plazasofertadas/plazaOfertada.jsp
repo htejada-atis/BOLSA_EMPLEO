@@ -34,14 +34,16 @@ OfertaCandidato oferta = bean.getOfertaCandidato();
 			</div>
 			<div class="form-group">
 				<label for="plaza_centro_destino" class="bold-label">Centro destino:</label>
-				<input class="form-input-custom" id="plaza_centro_destino" type="text" value="<%= EscapaHTML.escapa(oferta.getPlaza().getCentroDestino()) %>"
+				<input class="form-input-custom" id="plaza_centro_destino" type="text" 
+						value="<%= EscapaHTML.escapa(ModeloPlazaOfertada.CENTROS_DESTINO.getOrDefault(oferta.getPlaza().getCentroDestino(), oferta.getPlaza().getCentroDestino())) %>"
 						readonly disabled/>
 			</div>
 		</div>
 		<div class="form-group-container col2">
 			<div class="form-group">
 				<label for="plaza_cuatrimestre" class="bold-label">Cuatrimestre: </label>
-				<input class="form-input-custom" id="plaza_cuatrimestre" type="text" value="<%= EscapaHTML.escapa(oferta.getPlaza().getCuatrimestre()) %>"
+				<input class="form-input-custom" id="plaza_cuatrimestre" type="text" 
+						value="<%= EscapaHTML.escapa(ModeloPlazaOfertada.CUATRIMESTRES.getOrDefault(oferta.getPlaza().getCuatrimestre(), oferta.getPlaza().getCuatrimestre())) %>"
 						readonly disabled/>
 			</div>
 		</div>
