@@ -103,12 +103,25 @@ public class EnviaCorreo {
 	 * @return si se ha enviado correctamente
 	 * @throws Exception si error
 	 */
-	public static boolean enviaCorreoExcepcion(String emisor, ArrayList<String> destinatarios, ArrayList<String> conCopia, ArrayList<String> conCopiaOculta, String replyTo, String asunto, String cuerpo) throws Exception {
+	public static boolean enviaCorreoExcepcion(String emisor, ArrayList<String> destinatarios, ArrayList<String> conCopia, 
+			ArrayList<String> conCopiaOculta, String replyTo, String asunto, String cuerpo) throws Exception {
 		
 		return enviaCorreoExcepcionList(emisor, destinatarios, conCopia, conCopiaOculta, replyTo, asunto, cuerpo);
 	}
 	
-	public static boolean enviaCorreoExcepcionList(String emisor, List<String> destinatarios, List<String> conCopia, List<String> conCopiaOculta, String replyTo, String asunto, String cuerpo) throws Exception {
+	/** EnviaCorreo con excepcion en formato list.
+	 * @param emisor .
+	 * @param destinatarios .
+	 * @param conCopia .
+	 * @param conCopiaOculta .
+	 * @param replyTo .
+	 * @param asunto .
+	 * @param cuerpo .
+	 * @return si se ejecutado completo
+	 * @throws Exception si fallo en db
+	 */
+	public static boolean enviaCorreoExcepcionList(String emisor, List<String> destinatarios, List<String> conCopia, 
+			List<String> conCopiaOculta, String replyTo, String asunto, String cuerpo) throws Exception {
 		Session session = Session.getDefaultInstance(fConfiguracion, null);
 		MimeMessage message = new MimeMessage(session);
 		if (emisor == null) {
