@@ -195,6 +195,47 @@ public class CrearUsuario {
 		return errores;
 	}
 	
+	private static Usuario calculaRolesTodosSistemas(String uid) throws SQLException {
+		ModeloUsuarioArcos modeloUsuarioArcos = new ModeloUsuarioArcos();
+
+		// Recuperar roles del usuario.		
+		ArrayList<String> rolesAdministrados = new ArrayList<>();
+		ArrayList<String> rolesDelUsuario = new ArrayList<>();
+		// Recuperamos el usuario de ARCOS
+		Usuario usuario = modeloUsuarioArcos.listaCuentaUsuario(uid);
+		boolean erroresArcos = false;
+		boolean erroresUvirtual = false;
+		boolean erroresRrhh = false;
+		boolean erroresAc = false;
+		boolean erroresDominio = false;
+		if (usuario != null) {
+			erroresArcos = calculaRolesArcos(usuario, rolesDelUsuario);
+			erroresUvirtual = calculaRolesUvirtual(usuario, rolesDelUsuario, rolesAdministrados);
+			erroresRrhh = calculaRolesRrhh(usuario, rolesDelUsuario);
+			erroresAc = calculaRolesAc(usuario, rolesDelUsuario);
+			HashMap<String, ArrayList<String>> rolesPorDominio = new HashMap<>();
+			erroresDominio = calculaRolesPorDominio(rolesDelUsuario, rolesPorDominio);
+
+			usuario.setRolesPorDominio(rolesPorDominio);
+			usuario.setRoles(rolesPorDominio.get(usuario.getDominio()));
+			usuario.setRolesAdministrados(rolesAdministrados);
+		}
+		// cuentas autoregistradas
+		if (usuario == null) {
+			try {
+				ModeloUsuarioAutoregistrado modeloUsuarioAutoregistrado = new ModeloUsuarioAutoregistrado();
+				usuario = modeloUsuarioAutoregistrado.cargaUsuarioExterno(uid);
+			} catch (SQLException e) {
+				erroresArcos = true;
+			}
+		}
+		
+		if (erroresArcos || erroresUvirtual || erroresRrhh || erroresAc || erroresDominio || usuario == null) {
+			throw new SQLException("Error al calculaRolesTodosSistemas");
+		}
+		return usuario;
+	}
+	
 	/**
 	 * Obtiene los datos y crea un Bean del Usuario a partir del "uid".
 	 * @param uid identificador del usuario
@@ -203,46 +244,10 @@ public class CrearUsuario {
 	public static Usuario refrescarUsuario(String uid) {
 		logger.logp(Level.FINEST, nombreDeEstaClase, "refrescarUsuario", "creando el usuario: " + uid);
 		
-		ModeloUsuarioArcos modeloUsuarioArcos = new ModeloUsuarioArcos();
 		Usuario usuario = null;
 		boolean errores = false;
 		try {
-			// Recuperar roles del usuario.		
-			ArrayList<String> rolesAdministrados = new ArrayList<>();
-			ArrayList<String> rolesDelUsuario = new ArrayList<>();
-			// Recuperamos el usuario de ARCOS
-			usuario = modeloUsuarioArcos.listaCuentaUsuario(uid);
-			boolean erroresArcos = false;
-			boolean erroresUvirtual = false;
-			boolean erroresRrhh = false;
-			boolean erroresAc = false;
-			boolean erroresDominio = false;
-			if (usuario != null) {
-				erroresArcos = calculaRolesArcos(usuario, rolesDelUsuario);
-				erroresUvirtual = calculaRolesUvirtual(usuario, rolesDelUsuario, rolesAdministrados);
-				erroresRrhh = calculaRolesRrhh(usuario, rolesDelUsuario);
-				erroresAc = calculaRolesAc(usuario, rolesDelUsuario);
-				HashMap<String, ArrayList<String>> rolesPorDominio = new HashMap<>();
-				erroresDominio = calculaRolesPorDominio(rolesDelUsuario, rolesPorDominio);
-
-				usuario.setRolesPorDominio(rolesPorDominio);
-				usuario.setRoles(rolesPorDominio.get(usuario.getDominio()));
-				usuario.setRolesAdministrados(rolesAdministrados);
-				
-			}
-			// cuentas autoregistradas
-			if (usuario == null) {
-				try {
-					ModeloUsuarioAutoregistrado modeloUsuarioAutoregistrado = new ModeloUsuarioAutoregistrado();
-					usuario = modeloUsuarioAutoregistrado.cargaUsuarioExterno(uid);
-				} catch (SQLException e) {
-					erroresArcos = true;
-				}
-			}
-			
-			if (erroresArcos || erroresUvirtual || erroresRrhh || erroresAc || erroresDominio || usuario == null) {
-				errores = true;
-			}
+			usuario = calculaRolesTodosSistemas(uid);
 		} catch (SQLException e) {
 			errores = true; // en caso de error no grabar en memcache
 			logger.logp(Level.SEVERE, nombreDeEstaClase, "refrescarUsuario", "Error al crear usuario: " + e.toString());

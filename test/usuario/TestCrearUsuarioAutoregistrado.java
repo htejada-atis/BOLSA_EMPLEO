@@ -12,6 +12,7 @@ import org.junit.AfterClass;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.FixMethodOrder;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runners.MethodSorters;
 import org.openqa.selenium.By;
@@ -56,8 +57,9 @@ public class TestCrearUsuarioAutoregistrado extends UtilsTestUsuarioBase {
 		DriverUv.getDriver().get(DriverUv.RUTA + "/pub/es/operaciones/autoregistrado/usuarioautoresgistrado");
 	}
 	
-	/** Inserta una convocatoria.
+	/** ignorado por captcha.
 	 */
+	@Ignore
 	@Test
 	public void testE01() {
 		DriverUv.getDriver().get(DriverUv.RUTA + "/pub/es/operaciones/autoregistrado/usuarioautoresgistrado?a=mostrarcrear");
