@@ -5,6 +5,8 @@
 <%@ page import="es.ujaen.uvirtual.modulo.bolsaempleo.beans.PlazaOfertada" %>
 <%@	page import="es.ujaen.uvirtual.modulo.bolsaempleo.controlador.ControladorContratacion" %>
 <%@	page import="es.ujaen.uvirtual.modulo.bolsaempleo.controlador.ControladorDescargaFicheros"%>
+<%@	page import="es.ujaen.uvirtual.modulo.bolsaempleo.modelo.ModeloContratacion" %>
+<%@	page import="es.ujaen.uvirtual.modulo.bolsaempleo.modelo.ModeloEstadoCandidato" %>
 <%@	page import="es.ujaen.uvirtual.modulo.bolsaempleo.modelo.ModeloPlazaOfertada" %>
 <%@ page import="es.ujaen.uvirtual.modulo.bolsaempleo.utilidades.BolsaEmpleoUtils" %>
 <%@ page import="es.ujaen.uvirtual.modulo.bolsaempleo.vistas.VistaContratacion" %>
@@ -41,9 +43,9 @@ String justificacion = BolsaEmpleoUtils.getParamForm(request, ControladorContrat
 <div class='bolsa-empleo'>
 	<jsp:include page="/WEB-INF/jsp/vista/infadministrativa/bolsaempleo/mensajes.jsp" />
 	
-	<h2>Editar plaza ofertada</h2>
+	<h2>Plaza ofertada - Id: <%= plaza.getCodNum() %></h2>
 	
-	<h4>Id: <%= plaza.getCodNum() %><br/>Estado: <%= plaza.getEstado() %><br/><%= plaza.getFechaAbierta() != null ? "Fecha abierta: " + Formateador.formatoFecha(plaza.getFechaAbierta(), Formateador.FORMATO_FECHA_DDMMYYYY_HHMMSS) : "" %></h4>
+	<h4>Estado: <%= plaza.getEstado() %><br/><%= plaza.getFechaAbierta() != null ? "Fecha abierta: " + Formateador.formatoFecha(plaza.getFechaAbierta(), Formateador.FORMATO_FECHA_DDMMYYYY_HHMMSS) : "" %></h4>
 	
 	<p>Las etiquetas en <strong>negrita</strong> corresponden a campos de relleno obligatorio</p>
 	
@@ -162,7 +164,7 @@ String justificacion = BolsaEmpleoUtils.getParamForm(request, ControladorContrat
 				<th scope="col" style="width:100%" class="nombre">Nombre</th>
 				<th scope="col" style="width:76px" class="center">Puntuación</th>
 				<th scope="col" style="width:76px" class="center">Confirmación</th>
-				<th scope="col" style="width:76px" class="center">Fecha confirmación</th>
+				<th scope="col" style="width:76px">Fecha confirmación</th>
 				<th scope="col" style="width:76px" class="center"></th>
 			</tr>
 			<tbody>
@@ -174,14 +176,16 @@ String justificacion = BolsaEmpleoUtils.getParamForm(request, ControladorContrat
 			</tfoot>
 		</table>
 		<br/>
-		
-		<table class="bluetable bolsaempleo" id="tableCandidatoContratado">
+<%	} %>
+
+<%	if ((estadoContratacion || estadoCerrada) && personal) { %>
+		<table class="bluetable bolsaempleo" id="tableCandidatosContrato">
 			<tr>
 				<th scope="col" style="width:76px">D.N.I</th>
 				<th scope="col" style="width:100%" class="nombre">Nombre</th>
-				<th scope="col" style="width:76px" class="center">Puntuación</th>
-				<th scope="col" style="width:76px" class="center">Confirmación</th>
-				<th scope="col" style="width:76px" class="center">Fecha confirmación</th>
+				<th scope="col" style="width:100px">Fecha cita</th>
+				<th scope="col" style="width:100px">Resultado cita</th>
+				<th scope="col" style="width:100px">Fecha confirmación</th>
 				<th scope="col" style="width:76px" class="center"></th>
 			</tr>
 			<tbody>
@@ -211,7 +215,7 @@ $(document).ready(function() {
 	
 <%	if (mostrarCandidatos) { %>
 		var tableOfertasCandidatos = new Atis.DataTable('#tableOfertasCandidatos', {
-			"ajax": { url: "<%= ControladorContratacion.URL_PATTERN_AJAX %>" },
+			"ajax": { url: "<%= ControladorContratacion.URL_PATTERN_AJAX %>", async: false },
 			"pageSize": 100,
 			"filterable": true,
 			"defaultOrderBy": 2,
@@ -233,8 +237,6 @@ $(document).ready(function() {
 					}
 				}},
 				{'data': 'fechaResultado', 'filter': {'type': 'date'}},
-				{'data': 'confirmacion.resultado'},
-				{'data': 'confirmacion.fechaResultado'},
 				{'data': 'codNum', 'buttons': [{'label': 'Contratar', 'onClick': function(row) {
 							var mensaje = 
 								"<h2>Candidato " + row.candidato.prsnif + "</h2>"
@@ -312,7 +314,6 @@ $(document).ready(function() {
 									'<%= ControladorContratacion.PARAM_CANDIDATO %>': row.candidato.codNum
 							}
 							Atis.sendAjax("<%= request.getRequestURI() %>", params, function(data) {
-								console.log(data);
 								var message = 'En la siguiente tabla se muestra una lista de las plazas aceptadas por el candidato:<br/>';
 								message += row.candidato.prsnif + ' - ' + row.candidato.nombre + ' ' + row.candidato.apellido1 + ' ' + row.candidato.apellido2 + '<br/>';
 								message += '<table class="bluetable bolsaempleo" style="margin-top: 10px; width: 450px;">';
@@ -356,6 +357,48 @@ $(document).ready(function() {
 			]
 		});
 <%	} %>
+
+<%	if ((estadoContratacion || estadoCerrada) && personal) { %>
+
+		var tableCandidatosContrato = new Atis.DataTable('#tableCandidatosContrato', {
+			"ajax": { url: "<%= ControladorContratacion.URL_PATTERN_AJAX %>", async: false },
+			"action": "<%= ControladorContratacion.ACCION_DATATABLE_CANDIDATOS_CONTRATO %>",
+			"params": {'<%=ControladorContratacion.PARAM_PLAZA_OFERTADA%>': '<%= plaza.getCodNum() %>'},
+			"pageSize": 10,
+			"filterable": true,
+			"title": 'Candidatos con contratación',
+			"columns": [
+				{'data': 'candidato.prsnif', 'filter': true},
+				{'data': 'candidato.apellido1', 'filter': true, 'overflow': 'auto', 'render': function(row) {
+					return row.candidato.nombre + " " + row.candidato.apellido1 + " " + row.candidato.apellido2;
+				}},
+				{'data': 'contratacion.fechaCita'},
+				{'data': 'contratacion.resultado'},
+				{'data': 'contratacion.fechaResultado'},
+				{'data': 'codNum', 'buttons': [{'label': 'Suspensión', 'onClick': function(row) {
+						Atis.confirmDialog("Suspensión candidato", "Se suspenderá la contratación del candidato", {
+							'Si': function() {
+								var params = {
+										"<%= ControladorContratacion.PARAM_ACCION %>": "<%= ControladorContratacion.ACCION_SUSPENSION_CANDIDATO %>",
+										"<%= ControladorContratacion.PARAM_PLAZA_OFERTADA %>": <%= bean.getPlazaOfertada().getCodNum() %>,
+										"<%= ControladorContratacion.PARAM_CANDIDATO %>": row.candidato.codNum
+								};
+								Atis.sendForm("<%= request.getRequestURI() %>", params);
+								$(this).dialog("close");
+							},
+							'No': function() {
+								$(this).dialog("close");
+							}
+						});
+					}, 'visible': function(row) {
+						return row.contratacion.resultado != '<%= ModeloContratacion.RESULTADO_SUSPENDIDO %>';
+					}
+				}]}
+			]
+		});
+
+<%	} %>
+
 	
 	$('#actualizar_plaza').submit(function(event) {
 		$('#plaza_enviar').prop('disabled', true);
@@ -393,18 +436,63 @@ $(document).ready(function() {
 					inputFechaFin.setCustomValidity("");
 				}, 3000);
 			} else {
-				Atis.confirmDialog("¿Abrir plaza?", "Una vez abierta la plaza no se podrá editar y cambiará automáticamente <br/> a estado de contratación en la fecha fin de la oferta indicada.", {
-					'Si': function() {
-						var params = {
-								"<%= ControladorContratacion.PARAM_ACCION %>": "<%= ControladorContratacion.ACCION_PLAZA_ABIERTA %>",
-								"<%= ControladorContratacion.PARAM_PLAZA_OFERTADA %>": <%= bean.getPlazaOfertada().getCodNum() %>,
-								"<%= ControladorContratacion.PARAM_FECHA_FIN_OFERTA %>": inputFechaFin.value
-						};
-						Atis.sendForm("<%= request.getRequestURI() %>", params);
-						$(this).dialog("close");
+				var message = '<p>Una vez abierta la plaza ya no se podrá modificar y comenzará el período de aceptación de los<br/> candidatos.<br/>';
+				message += 'En la fecha y hora: ' + inputFechaFin.value + ' el estado de la plaza cambiará automáticamente a estado<br/> de contratación.</p><br/>';
+				message += '<p>Se enviará un correo sobre la apertura de la plaza a los siguientes candidatos:</p>';
+				message += '<table id="tablaCandidatosApertura" class="bluetable bolsaempleo" style="margin-top: 10px; width: 500px;">';
+				message += '    <tr>';
+				message += '        <th scope="col" style="width:60px">D.N.I</th>';
+				message += '        <th scope="col" style="width:100%">Nombre</th>';
+				message += '        <th scope="col" style="width:120px">Estado</th>';
+				message += '    </tr>';
+				message += '    <tbody>';
+				message += '    </tbody>';
+				message += '    <tfoot>';
+				message += '        <tr>';
+				message += '            <th colSpan="5" style="width:100%"></th>';
+				message += '        </tr>';
+				message += '    </tfoot>';
+				message += '</table>';
+				
+				$('<div></div>').appendTo('body').html(message).dialog({
+					modal: true,
+					title: "Abrir plaza",
+					zIndex: 10000,
+					autoOpen: true,
+					width: 'auto',
+					resizable: false,
+					buttons: {
+						Si: function() {
+							var params = {
+									"<%= ControladorContratacion.PARAM_ACCION %>": "<%= ControladorContratacion.ACCION_PLAZA_ABIERTA %>",
+									"<%= ControladorContratacion.PARAM_PLAZA_OFERTADA %>": <%= bean.getPlazaOfertada().getCodNum() %>,
+									"<%= ControladorContratacion.PARAM_FECHA_FIN_OFERTA %>": inputFechaFin.value
+							};
+							Atis.sendForm("<%= request.getRequestURI() %>", params);
+						},
+						No: function() {
+							$(this).dialog("close");
+						}
 					},
-					'No': function() {
-						$(this).dialog("close");
+					close: function(event, ui) {
+						$(this).remove();
+					},
+					open: function(event, ui) {
+						var table = new Atis.DataTable('#tablaCandidatosApertura', {
+							"ajax": { url: "<%= ControladorContratacion.URL_PATTERN_AJAX %>" },
+							"action": "<%= ControladorContratacion.ACCION_DATATABLE_CANDIDATOS_APERTURA %>",
+							"params": {'<%=ControladorContratacion.PARAM_PLAZA_OFERTADA%>': '<%= plaza.getCodNum() %>'},
+							"pageSize": 10,
+							"columns": [
+								{'data': 'prsnif', 'order': false},
+								{'data': 'nombre', 'order': false, 'render': function(row) {
+									return row.nombre + " " + row.apellido1 + " " + row.apellido2;
+								}},
+								{'data': 'estado', 'order': false, 'render': function(row) {
+									return row.codNumEstado != 0 ? row.estado : '<%= ModeloEstadoCandidato.ESTADO_DISPONIBLE %>';
+								}}
+							]
+						});
 					}
 				});
 			}
@@ -425,13 +513,27 @@ $(document).ready(function() {
 		});
 <%	} %>
 
-<%	if (estadoCerrada && personal) { %>
+<%	if (estadoContratacion && personal) { %>
 		document.getElementById("plaza_estado_cerrar").addEventListener("click", function() {
-			Atis.confirmDialog("¿Cerrar plaza?", "Se enviará un mensaje a los candidatos con el candidato seleccionado para la plaza.", {
+			var message = "";
+			message += " <p>Se enviará un mensaje a los emails especificados a continuación con el candidato<br/>";
+			message += "seleccionado para la plaza.</p><br/>"
+			message += " <div class='form-group-container col2'>";
+			message += "     <div class='form-group-dialog'>";
+			message += "         <label class='bold-label' for='emails_cierre'>Emails destinatarios: </label>";
+			message += "         <input id='emails_cierre' name='<%= ControladorContratacion.PARAM_EMAILS_CIERRE %>' placeholder='email1, email2...' required/>";
+			message += "     </div>";
+			message += " </div>";
+			message += " <br/>";
+			
+			Atis.confirmDialog("Cierre de la plaza", message, {
 				'Si': function() {
+					var inputEmails = this.querySelector('#emails_cierre');
+					
 					var params = {
 							"<%= ControladorContratacion.PARAM_ACCION %>": "<%= ControladorContratacion.ACCION_PLAZA_CERRADA %>",
-							"<%= ControladorContratacion.PARAM_PLAZA_OFERTADA %>": <%= bean.getPlazaOfertada().getCodNum() %>
+							"<%= ControladorContratacion.PARAM_PLAZA_OFERTADA %>": <%= bean.getPlazaOfertada().getCodNum() %>,
+							"<%= ControladorContratacion.PARAM_EMAILS_CIERRE %>": inputEmails.value
 					};
 					Atis.sendForm("<%= request.getRequestURI() %>", params);
 					$(this).dialog("close");

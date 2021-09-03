@@ -3,7 +3,7 @@ package es.ujaen.uvirtual.modulo.bolsaempleo.beans;
 import java.io.Serializable;
 import java.util.Date;
 
-/** Clase contratación para la contratación .
+/** Clase contratación para la contratación en la bolsa de empleo .
  * @author atis
  */
 public class Contratacion implements Serializable {
@@ -14,6 +14,7 @@ public class Contratacion implements Serializable {
 	private UsuarioBolsaEmpleo candidato;
 	private String resultado;
 	private Date fechaCita;
+	private Date fechaResultado;
 	
 
 	/** Constructor por defecto.
@@ -28,14 +29,16 @@ public class Contratacion implements Serializable {
 	 * @param pcandidato .
 	 * @param presultado .
 	 * @param pfechaCita .
+	 * @param pfechaResultado .
 	 */
-	public Contratacion(Integer pcodNum, PlazaOfertada pplaza, UsuarioBolsaEmpleo pcandidato, String presultado, Date pfechaCita) {
+	public Contratacion(Integer pcodNum, PlazaOfertada pplaza, UsuarioBolsaEmpleo pcandidato, String presultado, Date pfechaCita, Date pfechaResultado) {
 		super();
 		this.codNum = pcodNum;
 		this.plaza = pplaza;
 		this.candidato = pcandidato;
 		this.resultado = presultado;
 		this.fechaCita = pfechaCita;
+		this.fechaResultado = pfechaResultado;
 	}
 	
 	/** Constructor con parametros.
@@ -49,10 +52,15 @@ public class Contratacion implements Serializable {
 	}
 	
 	/** Constructor copia.
-	 * @param copia Dedicacion a copiar
+	 * @param copia Contratación a copiar
 	 */
 	public Contratacion(Contratacion copia) {
 		this.codNum = copia.codNum;
+		this.plaza = copia.plaza;
+		this.candidato = copia.candidato;
+		this.resultado = copia.resultado;
+		this.fechaCita = copia.fechaCita;
+		this.fechaResultado = copia.fechaResultado;
 	}
 	
 	public Integer getCodNum() {
@@ -94,6 +102,14 @@ public class Contratacion implements Serializable {
 	public void setFechaCita(Date fechaCita) {
 		this.fechaCita = fechaCita;
 	}
+	
+	public Date getFechaResultado() {
+		return fechaResultado;
+	}
+
+	public void setFechaResultado(Date fechaResultado) {
+		this.fechaResultado = fechaResultado;
+	}
 
 	public static long getSerialversionuid() {
 		return serialVersionUID;
@@ -103,7 +119,7 @@ public class Contratacion implements Serializable {
 	@Override
 	public String toString() {
 		return "Contratacion [codNum=" + codNum + ", plaza=" + plaza + ", candidato=" + candidato 
-				+ ", resultado=" + resultado + ", fechaCita=" + fechaCita + "]";
+				+ ", resultado=" + resultado + ", fechaCita=" + fechaCita + ", fechaResultado=" + fechaResultado + "]";
 	}
 	
 	@Override
@@ -115,6 +131,7 @@ public class Contratacion implements Serializable {
 		result = prime * result + ((candidato == null) ? 0 : candidato.hashCode());
 		result = prime * result + ((resultado == null) ? 0 : resultado.hashCode());
 		result = prime * result + ((fechaCita == null) ? 0 : fechaCita.hashCode());
+		result = prime * result + ((fechaResultado == null) ? 0 : fechaResultado.hashCode());
 		return result;
 	}
 	
@@ -167,7 +184,15 @@ public class Contratacion implements Serializable {
 		} else if (!fechaCita.equals(other.fechaCita)) {
 			return false;
 		}
+		if (fechaResultado == null) {
+			if (other.fechaResultado != null) {
+				return false;
+			}
+		} else if (!fechaResultado.equals(other.fechaResultado)) {
+			return false;
+		}
 		
 		return true;
 	}
+	
 }

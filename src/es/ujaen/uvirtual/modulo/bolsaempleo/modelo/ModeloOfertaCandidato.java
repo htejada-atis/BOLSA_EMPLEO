@@ -287,8 +287,14 @@ public class ModeloOfertaCandidato {
 				+ " INNER JOIN TBEP_SOLICITUDES bepsol ON bepsob.BEPSOL_CODNUM = bepsol.CODNUM"
 				+ " LEFT JOIN TBEP_OFERTAS_CANDIDATOS bepofc ON bepofc.BEPPLO_CODNUM = bepplo.CODNUM AND bepofc.BEPUSU_CODNUM = bepsol.BEPUSU_CODNUM"
 				+ " LEFT JOIN TBEP_CONTRATACIONES bepcnt ON bepcnt.BEPUSU_CODNUM = bepsol.BEPUSU_CODNUM AND bepcnt.BEPPLO_CODNUM = bepplo.CODNUM"
+				+ " LEFT JOIN TBEP_ESTADO_CANDIDATOS bepesc ON bepesc.BEPUSU_CODNUM = bepsol.BEPUSU_CODNUM AND bepesc.BEPBOL_CODNUM = bepbol.CODNUM"
 				+ " WHERE   bepsol.BEPUSU_CODNUM = ? "
-				+ "     AND bepplo.ESTADO IN ('" + ModeloPlazaOfertada.PLAZA_ESTADO_ABIERTA + "', '" + ModeloPlazaOfertada.PLAZA_ESTADO_CONTRATACION + "')";
+				+ "     AND bepplo.ESTADO IN ('" + ModeloPlazaOfertada.PLAZA_ESTADO_ABIERTA + "', '" + ModeloPlazaOfertada.PLAZA_ESTADO_CONTRATACION + "')"
+				+ "     AND (bepesc.CODNUM IS NULL"
+				+ "         OR bepesc.ESTADO = '" + ModeloEstadoCandidato.ESTADO_DISPONIBLE + "'"
+				+ "         OR (bepesc.ESTADO = '" + ModeloEstadoCandidato.ESTADO_CONTRATADO_PRIMER_CUATRIMESTRE + "' "
+				+ "             AND bepplo.CUATRIMESTRE = '" + ModeloPlazaOfertada.CUATRIMESTRE_SEGUNDO + "')"
+				+ "     )";
 		
 		dataTable.setColumn(ORDER_COLUMN_INDEX_CODNUM, "bepplo.CODNUM", DataTableColumn.COLUMN_TYPE_NUMBER);
 		dataTable.setColumn(ORDER_COLUMN_INDEX_AREA, "bepare.DES_AREA_CONOCIMIENTO");

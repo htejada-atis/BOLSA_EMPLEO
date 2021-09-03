@@ -52,6 +52,8 @@ COMMENT ON COLUMN TBEP_PLAZAS_OFERTADAS.NRI_FECHA IS 'Mostrará la fecha en la q
 --/////////////////////
 COMMENT ON COLUMN TBEP_PLAZAS_OFERTADAS.ESTADO IS 'Muestra el estado en el que se encuentra la plaza';
 --/////////////////////
+COMMENT ON COLUMN TBEP_PLAZAS_OFERTADAS.UID_USUARIO IS 'Ultimo usuario que hace cambios en la tabla';
+--/////////////////////
 COMMENT ON TABLE TBEP_PLAZAS_OFERTADAS IS 'Plazas ofertadas. ALIAS: [bepplo] ACRONIMO: [PLO]';
 --/////////////////////
 CREATE TABLE TBEP_HTO_PLAZAS_OFERTADAS (

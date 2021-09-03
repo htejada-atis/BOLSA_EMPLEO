@@ -13,6 +13,8 @@ COMMENT ON COLUMN TBEP_PLANTILLAS.TITULO IS 'Título de la plantilla';
 --/////////////////////
 COMMENT ON COLUMN TBEP_PLANTILLAS.CUERPO IS 'Cuerpo de la plantilla';
 --/////////////////////
+COMMENT ON COLUMN TBEP_PLANTILLAS.UID_USUARIO IS 'Ultimo usuario que hace cambios en la tabla';
+--/////////////////////
 COMMENT ON TABLE TBEP_PLANTILLAS IS 'Plantillas. ALIAS: [beppls] ACRONIMO: [PLS]';
 --/////////////////////
 CREATE TABLE TBEP_HTO_PLANTILLAS (

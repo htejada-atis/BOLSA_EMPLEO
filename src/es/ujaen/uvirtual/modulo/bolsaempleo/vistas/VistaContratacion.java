@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import java.util.List;
 import es.ujaen.uvirtual.beans.vistas.Vista;
 import es.ujaen.uvirtual.modulo.bolsaempleo.beans.Area;
+import es.ujaen.uvirtual.modulo.bolsaempleo.beans.CandidatoEstado;
 import es.ujaen.uvirtual.modulo.bolsaempleo.beans.Dedicacion;
 import es.ujaen.uvirtual.modulo.bolsaempleo.beans.OfertaCandidato;
 import es.ujaen.uvirtual.modulo.bolsaempleo.beans.PlazaOfertada;
@@ -24,6 +25,7 @@ public class VistaContratacion extends Vista implements Serializable {
 	private List<OfertaCandidato> listaOfertas = new ArrayList<>();
 	private transient BolsaEmpleoDataTable<PlazaOfertada> datatablePlazasOfertadas;
 	private transient BolsaEmpleoDataTable<OfertaCandidato> datatableCandidatos;
+	private transient BolsaEmpleoDataTable<CandidatoEstado> datatableCandidatosEstado;
 	private PlazaOfertada plazaOfertada;
 	private String vista;
 	private UsuarioBolsaEmpleo usuarioLogeado;
@@ -90,6 +92,14 @@ public class VistaContratacion extends Vista implements Serializable {
 
 	public void setListaOfertas(List<OfertaCandidato> listaOfertas) {
 		this.listaOfertas = listaOfertas;
+	}
+
+	public BolsaEmpleoDataTable<CandidatoEstado> getDatatableCandidatosEstado() {
+		return datatableCandidatosEstado;
+	}
+
+	public void setDatatableCandidatosEstado(BolsaEmpleoDataTable<CandidatoEstado> datatableCandidatosEstado) {
+		this.datatableCandidatosEstado = datatableCandidatosEstado;
 	}
 	
 }

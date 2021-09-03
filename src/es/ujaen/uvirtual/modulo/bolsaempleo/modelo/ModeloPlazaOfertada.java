@@ -603,12 +603,13 @@ public class ModeloPlazaOfertada {
 	/** Método para crear un mensaje de cierre de una plaza y ponerlo como pendiente de envío para los candidatos disponibles .
 	 * @param plaza .
 	 * @param contratacion .
+	 * @param emails .
 	 * @param usuarioUpdate .
 	 * @throws SQLException .
 	 * @throws UVException .
 	 * @throws IOException .
 	 */
-	public void crearMensajeCierrePlaza(PlazaOfertada plaza, Contratacion contratacion, UsuarioBolsaEmpleo usuarioUpdate)
+	public void crearMensajeCierrePlaza(PlazaOfertada plaza, Contratacion contratacion, String[] emails, UsuarioBolsaEmpleo usuarioUpdate)
 			throws SQLException, UVException, IOException {
 		try (Connection conexion = ConexionUvirtual.obtenerInstancia()) {
 			conexion.setAutoCommit(false);
@@ -640,7 +641,7 @@ public class ModeloPlazaOfertada {
 				int idMensaje = ModeloMensajes.obtenerInstancia().nuevoMensajeConexion(mensaje, usuarioUpdate, conexion);
 				
 				// Obtenemos los candidatos disponibles y los insertamos para enviar el mensaje de la plaza
-				listaDestinatariosPlaza(plaza, idMensaje, usuarioUpdate, conexion);
+				agregarDestinatariosCierrePlaza(emails, idMensaje, usuarioUpdate, conexion);
 				
 				// Actualizamos el estado del mensaje a 'ENVIANDO'
 				String consultaUpdateMsg = String.format("UPDATE TBEP_MENSAJES SET %s=?, %s=? WHERE %s=?",
@@ -698,6 +699,40 @@ public class ModeloPlazaOfertada {
 		}
 		
 		for (Integer idDestinatario: destinatarios) {
+			String consultaInsertDest = String.format("INSERT INTO TBEP_MEN_DESTINATARIOS (%s, %s, %s) VALUES (?, ?, ?)", 
+					"BEPMEN_CODNUM", "BEPUSU_CODNUM", "UID_USUARIO");
+			try (PreparedStatement stmt = conexion.prepareStatement(consultaInsertDest)) {
+				int parameterIndex = 1;
+				stmt.setInt(parameterIndex++, idMensaje);
+				stmt.setInt(parameterIndex++, idDestinatario);
+				stmt.setString(parameterIndex++, usuarioUpdate.getCodCuenta());
+				stmt.executeUpdate();
+			}
+		}
+	}
+	
+	private void agregarDestinatariosCierrePlaza(String[] emails, Integer idMensaje, UsuarioBolsaEmpleo usuarioUpdate, Connection conexion)
+			throws SQLException, UVException {
+		for (String email: emails) {
+			int idDestinatario = 0;
+			
+			String consultaSelect = "SELECT bepusu.CODNUM FROM TBEP_USUARIOS bepusu"
+					+ " WHERE bepusu.VUAJA_EMAIL_ALTA = ?";
+			
+			try (PreparedStatement stmt = conexion.prepareStatement(consultaSelect)) {
+				stmt.setString(1, email);
+				
+				try (ResultSet rs = stmt.executeQuery()) {
+					while (rs.next()) {
+						idDestinatario = rs.getInt("CODNUM");
+					}
+				}
+			}
+			
+			if (idDestinatario == 0) {
+				throw new UVException("Error al encontrar destinatario del mensaje");
+			}
+			
 			String consultaInsertDest = String.format("INSERT INTO TBEP_MEN_DESTINATARIOS (%s, %s, %s) VALUES (?, ?, ?)", 
 					"BEPMEN_CODNUM", "BEPUSU_CODNUM", "UID_USUARIO");
 			try (PreparedStatement stmt = conexion.prepareStatement(consultaInsertDest)) {

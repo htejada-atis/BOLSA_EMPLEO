@@ -16,6 +16,8 @@ COMMENT ON COLUMN TBEP_DEDICACIONES.FECHA_VIGENCIA IS 'Muestra la fecha desde la
 --/////////////////////
 COMMENT ON COLUMN TBEP_DEDICACIONES.FLGACTIVA IS 'Indica si la dedicación está borrada o no';
 --/////////////////////
+COMMENT ON COLUMN TBEP_DEDICACIONES.UID_USUARIO IS 'Ultimo usuario que hace cambios en la tabla';
+--/////////////////////
 COMMENT ON TABLE TBEP_DEDICACIONES IS 'Dedicaciones. ALIAS: [bepded] ACRONIMO: [DED]';
 --/////////////////////
 CREATE TABLE TBEP_HTO_DEDICACIONES (

@@ -5,13 +5,19 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import java.sql.Date;
 import es.ujaen.uvirtual.modelo.conexion.ConexionUvirtual;
 import es.ujaen.uvirtual.modulo.bolsaempleo.beans.Contratacion;
 import es.ujaen.uvirtual.modulo.bolsaempleo.beans.Mensaje;
+import es.ujaen.uvirtual.modulo.bolsaempleo.beans.OfertaCandidato;
 import es.ujaen.uvirtual.modulo.bolsaempleo.beans.Plantilla;
 import es.ujaen.uvirtual.modulo.bolsaempleo.beans.PlazaOfertada;
 import es.ujaen.uvirtual.modulo.bolsaempleo.beans.UsuarioBolsaEmpleo;
+import es.ujaen.uvirtual.modulo.bolsaempleo.utilidades.BolsaEmpleoDataTable;
 import es.ujaen.uvirtual.modulo.bolsaempleo.utilidades.BolsaEmpleoUtils;
 import es.ujaen.uvirtual.utilidades.UVException;
 
@@ -26,14 +32,26 @@ public class ModeloContratacion {
 	public static final String BEPUSU_CODNUM = "BEPUSU_CODNUM";
 	public static final String CODNUM = "CODNUM";
 	public static final String FECHA_CITA = "FECHA_CITA";
+	public static final String FECHA_RESULTADO = "FECHA_RESULTADO";
 	public static final String RESULTADO = "RESULTADO";
 	
 	public static final String RESULTADO_ACEPTADA = "ACEPTADA";
+	public static final String RESULTADO_PENDIENTE = "PENDIENTE";
 	public static final String RESULTADO_RECHAZADA = "RECHAZADA";
+	public static final String RESULTADO_SUSPENDIDO = "SUSPENDIDO";
+	
+	public static final Map<String, String> RESULTADOS = new HashMap<>();
 	
 	public static final String MENSAJE_ERROR_PLANTILLA_CITA_CONTRATACION_NO_EXISTE = "La plantilla de cita de contratación no existe";
 	public static final String MENSAJE_ERROR_OBJETO_VACIO = "No se puede %s una plaza vacía";
 	public static final String MENSAJE_ERROR_PARAM_VACIO = "No se puede %s una plaza sin %s";
+	
+	static {
+		RESULTADOS.put(RESULTADO_ACEPTADA, "Aceptada");
+		RESULTADOS.put(RESULTADO_PENDIENTE, "Pendiente");
+		RESULTADOS.put(RESULTADO_RECHAZADA, "Rechazada");
+		RESULTADOS.put(RESULTADO_SUSPENDIDO, "Suspendido");
+	}
 	
 	protected static ModeloContratacion eInstancia;
 
@@ -204,6 +222,60 @@ public class ModeloContratacion {
 		}
 	}
 	
+	/** Lista de candidatos con contrato en una plaza .
+	 * @param params .
+	 * @param plaza .
+	 * @return datatable de candidatos .
+	 * @throws SQLException .
+	 * @throws UVException .
+	 */
+	public BolsaEmpleoDataTable<OfertaCandidato> listadoCandidatosContrato(Map<String, String[]> params, PlazaOfertada plaza)
+			throws SQLException, UVException {
+		List<OfertaCandidato> rows = new ArrayList<>();
+		BolsaEmpleoDataTable<OfertaCandidato> dataTable = new BolsaEmpleoDataTable<>(params);
+		
+		String consulta = "SELECT bepusu.CODNUM AS BEPUSU_CODNUM, bepsob.TOTAL AS PUNTUACION, bepofc.CODNUM, bepofc.FLGRESULTADO, "
+				+ "     bepofc.FECHA_RESULTADO, bepofc.PREFERENCIA, bepsol.BEPUSU_CODNUM AS BEPUSU_CODNUM, bepofc.BEPPLO_CODNUM AS BEPPLO_CODNUM,"
+				+ "     bepcnt.CODNUM AS CONTRATACION"
+				+ " FROM TBEP_USUARIOS bepusu"
+				+ " INNER JOIN TBEP_SOLICITUDES bepsol ON bepsol.BEPUSU_CODNUM = bepusu.CODNUM"
+				+ " INNER JOIN TBEP_SOLICITUD_BOLSAS bepsob ON bepsob.BEPSOL_CODNUM = bepsol.CODNUM AND bepsob.BEPBOL_CODNUM = ?"
+				+ "     AND bepsob.FECHABAREMACION IS NOT NULL"
+				+ " INNER JOIN TBEP_OFERTAS_CANDIDATOS bepofc ON bepofc.BEPUSU_CODNUM = bepusu.CODNUM"
+				+ " INNER JOIN TBEP_CONTRATACIONES bepcnt ON bepcnt.BEPUSU_CODNUM = bepusu.CODNUM AND bepcnt.BEPPLO_CODNUM = bepofc.BEPPLO_CODNUM"
+				+ " WHERE bepofc.BEPPLO_CODNUM = ?";
+		
+		String whereNombre = String.format("(%s || ' ' || %s || ' ' || %s)", "bepusu.VUAJA_STRNOMBRE", "bepusu.VUAJA_STRAPELLIDO1", "bepusu.VUAJA_STRAPELLIDO2");
+				
+		
+		dataTable.setQuery(consulta);
+		
+		try (Connection conexion = ConexionUvirtual.obtenerInstancia();
+				PreparedStatement stmtCount = conexion.prepareStatement(dataTable.getQueryCount());
+				PreparedStatement stmt = conexion.prepareStatement(dataTable.getQuery())) {
+			int paramIndex = 1;
+			stmt.setInt(paramIndex, plaza.getArea().getCodNum());
+			stmtCount.setInt(paramIndex++, plaza.getArea().getCodNum());
+			stmt.setInt(paramIndex, plaza.getCodNum());
+			stmtCount.setInt(paramIndex++, plaza.getCodNum());
+			
+			dataTable.setFiltersParams(stmt, stmtCount, paramIndex);
+			
+			try (ResultSet rs = stmt.executeQuery()) {
+				while (rs.next()) {
+					OfertaCandidato oferta = ModeloOfertaCandidato.obtenerInstancia().createOfertaCandidatoFromResultSet(rs);
+					oferta.setPuntuacion(rs.getDouble("PUNTUACION"));
+					rows.add(oferta);
+				}
+			}
+			
+			dataTable.setRecordsTotalFromQuery(stmtCount);
+			dataTable.setData(rows);
+		}
+		
+		return dataTable;
+	}
+	
 	/** inserta contratación .
 	 * @param plaza .
 	 * @param fechaCita .
@@ -232,21 +304,7 @@ public class ModeloContratacion {
 	 * @throws UVException .
 	 */
 	public void aceptarContrato(PlazaOfertada plaza, UsuarioBolsaEmpleo usuarioUpdate) throws SQLException, UVException {
-		if (plaza == null) {
-			throw new UVException(String.format(MENSAJE_ERROR_OBJETO_VACIO, "aceptar contrato"));
-		}
-		
-		String consulta = String.format("UPDATE TBEP_CONTRATACIONES SET %s=?, %s=?, %s=?"
-				+ " WHERE %s=?",
-				RESULTADO, FECHA_CITA, "UID_USUARIO", CODNUM);
-		
-		try (Connection conexion = ConexionUvirtual.obtenerInstancia(); PreparedStatement stmt = conexion.prepareStatement(consulta)) {
-			int parameterIndex = 1;
-			stmt.setString(parameterIndex++, RESULTADO_ACEPTADA);
-			stmt.setString(parameterIndex++, usuarioUpdate == null ? "TAREA PROGRAMADA" : usuarioUpdate.getCodCuenta());
-			stmt.setInt(parameterIndex++, plaza.getCodNum());
-			stmt.executeUpdate();
-		}
+		this.cambiarResultadoContratacion(plaza, usuarioUpdate, RESULTADO_ACEPTADA, usuarioUpdate);
 	}
 	
 	/** rechazar cita de contratación .
@@ -256,24 +314,55 @@ public class ModeloContratacion {
 	 * @throws UVException .
 	 */
 	public void rechazarContrato(PlazaOfertada plaza, UsuarioBolsaEmpleo usuarioUpdate) throws SQLException, UVException {
+		this.cambiarResultadoContratacion(plaza, usuarioUpdate, RESULTADO_RECHAZADA, usuarioUpdate);
+	}
+	
+	/** suspender cita de contratación .
+	 * @param plaza .
+	 * @param candidato .
+	 * @param usuarioUpdate .
+	 * @throws SQLException .
+	 * @throws UVException .
+	 */
+	public void suspenderContrato(PlazaOfertada plaza, UsuarioBolsaEmpleo candidato, UsuarioBolsaEmpleo usuarioUpdate)throws SQLException, UVException {
+		this.cambiarResultadoContratacion(plaza, candidato, RESULTADO_SUSPENDIDO, usuarioUpdate);
+	}
+	
+	/** cambia el estado de una contratación .
+	 * @param plaza .
+	 * @param candidato .
+	 * @param estado .
+	 * @param usuarioUpdate .
+	 * @throws SQLException .
+	 * @throws UVException .
+	 */
+	public void cambiarResultadoContratacion(PlazaOfertada plaza, UsuarioBolsaEmpleo candidato, String estado, UsuarioBolsaEmpleo usuarioUpdate)
+			throws SQLException, UVException {
 		if (plaza == null) {
-			throw new UVException(String.format(MENSAJE_ERROR_OBJETO_VACIO, "rechazar contrato"));
+			throw new UVException(String.format(MENSAJE_ERROR_OBJETO_VACIO, "cambiar resultado contratacion"));
 		}
 		
-		String consulta = String.format("UPDATE TBEP_PLAZAS_OFERTADAS SET %s=?, %s=?, %s=?"
-				+ " WHERE %s=?",
-				RESULTADO, FECHA_CITA, "UID_USUARIO", CODNUM);
+		String consulta = String.format("UPDATE TBEP_CONTRATACIONES SET %s=?, %s=?, %s=?"
+				+ " WHERE %s=? AND %s=?",
+				RESULTADO, FECHA_RESULTADO, "UID_USUARIO", BEPPLO_CODNUM, BEPUSU_CODNUM);
 		
 		try (Connection conexion = ConexionUvirtual.obtenerInstancia(); PreparedStatement stmt = conexion.prepareStatement(consulta)) {
 			int parameterIndex = 1;
-			stmt.setString(parameterIndex++, RESULTADO_RECHAZADA);
+			stmt.setString(parameterIndex++, estado);
 			stmt.setDate(parameterIndex++, new Date(BolsaEmpleoUtils.getCurrentDateTime().getTime()));
 			stmt.setString(parameterIndex++, usuarioUpdate == null ? "TAREA PROGRAMADA" : usuarioUpdate.getCodCuenta());
 			stmt.setInt(parameterIndex++, plaza.getCodNum());
+			stmt.setInt(parameterIndex++, candidato.getCodNum());
 			stmt.executeUpdate();
 		}
 	}
 	
+	/** crea una contratación de un ResultSet .
+	 * @param rs .
+	 * @return contratación .
+	 * @throws SQLException .
+	 * @throws UVException .
+	 */
 	public Contratacion createContratacionFromResultSet(ResultSet rs) throws SQLException, UVException {
 		Contratacion contratacion = new Contratacion();
 		
