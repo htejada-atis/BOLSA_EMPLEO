@@ -5,6 +5,7 @@
 <%@ page import="es.ujaen.uvirtual.modulo.bolsaempleo.beans.PlazaOfertada" %>
 <%@	page import="es.ujaen.uvirtual.modulo.bolsaempleo.controlador.ControladorContratacion" %>
 <%@	page import="es.ujaen.uvirtual.modulo.bolsaempleo.controlador.ControladorDescargaFicheros"%>
+<%@	page import="es.ujaen.uvirtual.modulo.bolsaempleo.controlador.configuracion.ControladorUsuarioCandidato"%>
 <%@	page import="es.ujaen.uvirtual.modulo.bolsaempleo.modelo.ModeloContratacion" %>
 <%@	page import="es.ujaen.uvirtual.modulo.bolsaempleo.modelo.ModeloEstadoCandidato" %>
 <%@	page import="es.ujaen.uvirtual.modulo.bolsaempleo.modelo.ModeloPlazaOfertada" %>
@@ -59,7 +60,7 @@ String justificacion = BolsaEmpleoUtils.getParamForm(request, ControladorContrat
 		<div class="form-group-container col2">
 			<div class="form-group">
 				<label for="plaza_area" class="bold-label">Área:</label>
-				<select id="plaza_area" name="<%=ControladorContratacion.PARAM_AREA%>" style="width:100%;" required <%= editable ? "" : "readonly disabled" %>>
+				<select id="plaza_area" name="<%=ControladorContratacion.PARAM_AREA%>" style="width:100%;" required <%= editable ? "" : "readonly disabled " %>>
 					<option value="">----------------</option>
 				<%	for(Area are: bean.getListaAreas()) { %>
 						<option value="<%=are.getCodNum()%>" <%= Integer.parseInt(area) == are.getCodNum() ? "selected" : "" %>><%= are.getIdAreaExterno() + " " + are.getDescripcion() %></option>
@@ -68,7 +69,7 @@ String justificacion = BolsaEmpleoUtils.getParamForm(request, ControladorContrat
 			</div>
 			<div class="form-group">
 				<label for="plaza_centro_destino" class="bold-label">Centro destino:</label>
-				<select id="plaza_centro_destino" name="<%=ControladorContratacion.PARAM_CENTRO_DESTINO%>" style="width:100%;" required <%= editable ? "" : "readonly disabled" %>>
+				<select id="plaza_centro_destino" name="<%=ControladorContratacion.PARAM_CENTRO_DESTINO%>" style="width:100%;" required <%= editable ? "" : "readonly disabled " %>>
 				<%	for (Entry<String, String> cen: ModeloPlazaOfertada.CENTROS_DESTINO.entrySet()) { %>
 						<option value="<%= cen.getKey() %>" <%= centroDestino != null && centroDestino.equals(cen.getKey()) ? "selected" : ""%>><%= cen.getValue() %></option>
 				<%	} %>
@@ -79,8 +80,8 @@ String justificacion = BolsaEmpleoUtils.getParamForm(request, ControladorContrat
 			<div class="form-group">
 				<label for="plaza_dedicacion" <%= extraRequeridos ? "class='bold-label'" : "" %>>Dedicación: </label>
 				<select id="plaza_dedicacion" name="<%=ControladorContratacion.PARAM_DEDICACION%>" style="width:100%;" 
-						<%= personal && editable ? "" : "readonly disabled" %>
-						<%= extraRequeridos ? "required" : "" %>>
+						<%= editable ? "" : "readonly disabled  " %>
+						<%= extraRequeridos ? "required " : "" %>>
 					<option value="">----------------</option>
 				<%	if (plaza.getDedicacion() != null) { %>
 						<option value="<%= plaza.getDedicacion().getCodNum() %>" selected><%= plaza.getDedicacion().getTexto() + " - Sueldo: " + plaza.getDedicacion().getSueldo() %></option>
@@ -97,8 +98,8 @@ String justificacion = BolsaEmpleoUtils.getParamForm(request, ControladorContrat
 			<div class="form-group">
 				<label for="plaza_cuatrimestre" <%= extraRequeridos ? "class='bold-label'" : "" %>>Cuatrimestre:</label>
 				<select id="plaza_cuatrimestre" name="<%=ControladorContratacion.PARAM_CUATRIMESTRE%>" style="width:100%;" 
-						<%= personal && editable ? "" : "readonly disabled" %>
-						<%= extraRequeridos ? "required" : "" %>>
+						<%= editable ? "" : "readonly disabled " %>
+						<%= extraRequeridos ? "required " : "" %>>
 					<option value="">----------------</option>
 				<%	for (Entry<String, String> cua: ModeloPlazaOfertada.CUATRIMESTRES.entrySet()) { %>
 						<option value="<%= cua.getKey() %>" <%= cuatrimestre != null && cuatrimestre.equals(cua.getKey()) ? "selected" : "" %>><%= cua.getValue() %></option>
@@ -109,26 +110,26 @@ String justificacion = BolsaEmpleoUtils.getParamForm(request, ControladorContrat
 		<div class="form-group-container col1">
 			<div class="form-group">
 				<label for="plaza_justificacion" class="bold-label">Justificación:</label>
-				<textarea class="form-input-custom" id="plaza_justificacion" name="<%=ControladorContratacion.PARAM_JUSTIFICACION %>" rows="3" cols="60" required <%= editable ? "" : "readonly disabled" %>><%=justificacion%></textarea>
+				<textarea class="form-input-custom" id="plaza_justificacion" name="<%=ControladorContratacion.PARAM_JUSTIFICACION %>" rows="3" cols="60" required <%= editable ? "" : "readonly disabled " %>><%=justificacion%></textarea>
 			</div>
 		</div>
 		<div class="form-group-container col2">
 			<div class="form-group">
 				<label for="plaza_duracion_prevista" <%= extraRequeridos ? "class='bold-label'" : "" %>>Duración prevista:</label>
 				<input class="form-input-custom" type="text" name="<%=ControladorContratacion.PARAM_DURACION_PREVISTA%>" id="plaza_duracion_prevista" 
-						value="<%=duracionPrevista%>" <%= personal && editable ? "" : "readonly disabled" %> <%= extraRequeridos ? "required" : "" %>/>
+						value="<%=duracionPrevista%>" <%= editable ? "" : "readonly disabled " %> <%= extraRequeridos ? "required " : "" %>/>
 			</div>
 		</div>
 		<div class="form-group-container col2">
 			<div class="form-group">
 				<label for="plaza_fecha_fin_oferta" <%= extraRequeridos ? "class='bold-label'" : "" %>>Fecha fin oferta:</label>
-				<input class="form-input-custom" name="<%=ControladorContratacion.PARAM_FECHA_FIN_OFERTA%>" id="plaza_fecha_fin_oferta" type="text" value="<%= fechaFinOferta %>"
-						<%= extraRequeridos ? "required" : "" %>/>
+				<input class="form-input-custom" name="<%=ControladorContratacion.PARAM_FECHA_FIN_OFERTA%>" id="plaza_fecha_fin_oferta" type="text" autocomplete="off" value="<%= fechaFinOferta %>"
+						<%= extraRequeridos ? "required " : "" %> <%= editable ? "" : "readonly disabled " %>/>
 			</div>
 			<div class="form-group">
 				<label for="plaza_hora_fin_oferta" <%= extraRequeridos ? "class='bold-label'" : "" %>>Hora fin oferta:</label>
-				<input class="form-input-custom" name="<%=ControladorContratacion.PARAM_HORA_FIN_OFERTA%>" id="plaza_hora_fin_oferta" type="text" value="<%= horaFinOferta %>"
-						<%= extraRequeridos ? "required" : "" %> placeholder="HH:MM:SS"/>
+				<input class="form-input-custom" name="<%=ControladorContratacion.PARAM_HORA_FIN_OFERTA%>" id="plaza_hora_fin_oferta" type="text" autocomplete="off" value="<%= horaFinOferta %>"
+						<%= extraRequeridos ? "required " : "" %> <%= editable ? "" : "readonly disabled " %> placeholder="HH:MM:SS"/>
 			</div>
 		</div>
 		<div class="form-group-container col2">
@@ -222,11 +223,8 @@ String justificacion = BolsaEmpleoUtils.getParamForm(request, ControladorContrat
 <script>
 
 $(document).ready(function() {
-	$("#plaza_fecha_fin_oferta").datepicker({
-		onSelect: function(dateText, inst) {
-			$("#plaza_fecha_fin_oferta").val(dateText + " 23:59:59");
-		}
-	});
+	
+	$("#plaza_fecha_fin_oferta").datepicker();
 	
 <%	if (mostrarCandidatos) { %>
 		var tableOfertasCandidatos = new Atis.DataTable('#tableOfertasCandidatos', {
@@ -413,7 +411,7 @@ $(document).ready(function() {
 							"<h2>Candidato " + row.candidato.prsnif + "</h2>"
 							+ " <br/>"
 							+ " <p></p>"
-							+ " <p>Se enviará un correo al candidato con la confirmación del contrato <br/> y con la fecha y hora prevista de la cita que se establece en el formulario:</p>"
+							+ " <p>Se enviará un correo al candidato con la nueva cita para la confirmación del contrato <br/> y con la fecha y hora prevista de la cita que se establece en el formulario:</p>"
 							+ " <br/>"
 							+ " <div class='form-group-container col2'>"
 							+ "     <div class='form-group-dialog'>"
@@ -428,7 +426,7 @@ $(document).ready(function() {
 						
 						$('<div></div>').appendTo('body').html(mensaje).dialog({
 							modal: true,
-							title: "Contratar candidato",
+							title: "Reenviar cita",
 							zIndex: 10000,
 							autoOpen: true,
 							width: 'auto',
@@ -440,7 +438,7 @@ $(document).ready(function() {
 									
 									if (inputFecha.value != '' && inputHora.value != '') {
 										var params = {
-												"<%= ControladorContratacion.PARAM_ACCION %>": "<%= ControladorContratacion.ACCION_CONTRATAR_CANDIDATO %>",
+												"<%= ControladorContratacion.PARAM_ACCION %>": "<%= ControladorContratacion.ACCION_REENVIAR_CITA_CONTRATACION %>",
 												"<%= ControladorContratacion.PARAM_PLAZA_OFERTADA %>": <%= bean.getPlazaOfertada().getCodNum() %>,
 												"<%= ControladorContratacion.PARAM_CANDIDATO %>": row.candidato.codNum,
 												"<%= ControladorContratacion.PARAM_FECHA_CITA %>": inputFecha.value,
@@ -474,22 +472,8 @@ $(document).ready(function() {
 								$("#ui-datepicker-div").css("z-index", "9999");
 							}
 						});
-						Atis.confirmDialog("Rechazar candidato", "Se rechazará la contratación del candidato.", {
-							'Si': function() {
-								var params = {
-										"<%= ControladorContratacion.PARAM_ACCION %>": "<%= ControladorContratacion.ACCION_RECHAZAR_CONTRATACION_CANDIDATO %>",
-										"<%= ControladorContratacion.PARAM_PLAZA_OFERTADA %>": <%= bean.getPlazaOfertada().getCodNum() %>,
-										"<%= ControladorContratacion.PARAM_CANDIDATO %>": row.candidato.codNum
-								};
-								Atis.sendForm("<%= request.getRequestURI() %>", params);
-								$(this).dialog("close");
-							},
-							'No': function() {
-								$(this).dialog("close");
-							}
-						});
 					}, 'visible': function(row) {
-						return row.contratacion.resultado != '<%= ModeloContratacion.RESULTADO_RECHAZADA %>' && <%= !estadoCerrada %>;
+						return <%= !estadoCerrada %>;
 					}
 				}]}
 			]
@@ -539,7 +523,7 @@ $(document).ready(function() {
 			
 			if (enviar) {
 				var message = '<p>Una vez abierta la plaza ya no se podrá modificar y comenzará el período de aceptación de los<br/> candidatos.<br/>';
-				message += 'En la fecha y hora: ' + inputFechaFin.value + ' el estado de la plaza cambiará automáticamente a estado<br/> de contratación.</p><br/>';
+				message += 'En la fecha: <%= fechaFinOferta %> y hora: <%= horaFinOferta %> el estado de la plaza cambiará automáticamente a estado<br/> de contratación.</p><br/>';
 				message += '<p>Se enviará un correo sobre la apertura de la plaza a los siguientes candidatos:</p>';
 				message += '<table id="tablaCandidatosApertura" class="bluetable bolsaempleo" style="margin-top: 10px; width: 500px;">';
 				message += '    <tr>';
@@ -585,7 +569,10 @@ $(document).ready(function() {
 							"params": {'<%=ControladorContratacion.PARAM_PLAZA_OFERTADA%>': '<%= plaza.getCodNum() %>'},
 							"pageSize": 10,
 							"columns": [
-								{'data': 'prsnif', 'order': false},
+								{'data': 'prsnif', 'order': false, 'render': function(row) {
+									var href = 'href="<%= ControladorUsuarioCandidato.URL_PATTERN + "?" + ControladorUsuarioCandidato.PARAM_ACCION + "=" + ControladorUsuarioCandidato.ACCION_SELECCIONAR_CANDIDATO + "&" + ControladorUsuarioCandidato.PARAM_CANDIDATO + "=" %>' + row.codNum + '"';
+									return '<a class="bolsaempleo-link" ' + href + ' target="_blank" title="Ir al perfil del candidato">' + row.prsnif + '</a>';
+								}},
 								{'data': 'nombre', 'order': false, 'render': function(row) {
 									return row.nombre + " " + row.apellido1 + " " + row.apellido2;
 								}},

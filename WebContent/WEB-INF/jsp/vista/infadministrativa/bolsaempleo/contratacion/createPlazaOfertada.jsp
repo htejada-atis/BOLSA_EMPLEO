@@ -23,6 +23,7 @@ String duracionPrevista = BolsaEmpleoUtils.getParamForm(request, ControladorCont
 String cuatrimestre = BolsaEmpleoUtils.getParamForm(request, ControladorContratacion.PARAM_CUATRIMESTRE, "");
 String centroDestino = BolsaEmpleoUtils.getParamForm(request, ControladorContratacion.PARAM_CENTRO_DESTINO, "");
 String fechaFinOferta = BolsaEmpleoUtils.getParamForm(request, ControladorContratacion.PARAM_FECHA_FIN_OFERTA, "");
+String horaFinOferta = BolsaEmpleoUtils.getParamForm(request, ControladorContratacion.PARAM_HORA_FIN_OFERTA, "");
 %>
 
 <div class='bolsa-empleo'>
@@ -88,10 +89,16 @@ String fechaFinOferta = BolsaEmpleoUtils.getParamForm(request, ControladorContra
 				<label for="plaza_duracion_prevista">Duración prevista:</label>
 				<input class="form-input-custom" type="text" name="<%=ControladorContratacion.PARAM_DURACION_PREVISTA%>" id="plaza_duracion_prevista" value="<%=duracionPrevista%>"/>
 			</div>
+		</div>
+		<div class="form-group-container col2">
 			<div class="form-group">
 				<label for="plaza_fecha_fin_oferta">Fecha fin oferta:</label>
-				<input class="form-input-custom" type="text" name="<%=ControladorContratacion.PARAM_FECHA_FIN_OFERTA%>" id="plaza_fecha_fin_oferta" autocomplete="off" 
-						value="<%=fechaFinOferta%>"/>
+				<input class="form-input-custom" name="<%=ControladorContratacion.PARAM_FECHA_FIN_OFERTA%>" id="plaza_fecha_fin_oferta" type="text" autocomplete="off" value="<%= fechaFinOferta %>"/>
+			</div>
+			<div class="form-group">
+				<label for="plaza_hora_fin_oferta">Hora fin oferta:</label>
+				<input class="form-input-custom" name="<%=ControladorContratacion.PARAM_HORA_FIN_OFERTA%>" id="plaza_hora_fin_oferta" type="text" autocomplete="off" 
+						value="<%= horaFinOferta %>" placeholder="HH:MM:SS"/>
 			</div>
 		</div>
 	<%	} %>
@@ -119,20 +126,15 @@ String fechaFinOferta = BolsaEmpleoUtils.getParamForm(request, ControladorContra
 </div>
 
 <script>
-
+	
 	$(document).ready(function() {
-		$("#plaza_fecha_fin_oferta").datepicker({
-			onSelect: function(dateText, inst) {
-				$("#plaza_fecha_fin_oferta").val(dateText + " 23:59:59");
-			}
-		});
+		$("#plaza_fecha_fin_oferta").datepicker();
 		
+		$('#actualizar_plaza').submit(function(event) {
+			$('#plaza_enviar').prop('disabled', true);
+			$('#plaza_enviar').attr('value', 'Creando plaza...');
+			return true;
+		});
 	});
 	
-	$('#actualizar_plaza').submit(function(event) { 
-		$('#plaza_enviar').prop('disabled', true);
-		$('#plaza_enviar').attr('value', 'Creando plaza...');
-		return true;
-	});
-
 </script>

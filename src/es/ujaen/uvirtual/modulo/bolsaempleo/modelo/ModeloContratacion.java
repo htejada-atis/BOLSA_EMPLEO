@@ -5,6 +5,7 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.Types;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -287,6 +288,36 @@ public class ModeloContratacion {
 		return dataTable;
 	}
 	
+	/** reestablece una contratación cambiando la cita y el estado a pendiente .
+	 * @param plaza .
+	 * @param fechaCita .
+	 * @param candidato .
+	 * @param usuarioUpdate .
+	 * @throws SQLException .
+	 * @throws UVException .
+	 */
+	public void reestrablecerContratacion(PlazaOfertada plaza, java.util.Date fechaCita, UsuarioBolsaEmpleo candidato, UsuarioBolsaEmpleo usuarioUpdate)
+			throws SQLException, UVException {
+		if (plaza == null) {
+			throw new UVException(String.format(MENSAJE_ERROR_OBJETO_VACIO, "cambiar resultado contratacion"));
+		}
+		
+		String consulta = String.format("UPDATE TBEP_CONTRATACIONES SET %s=?, %s=?, %s=?, %s=?"
+				+ " WHERE %s=? AND %s=?",
+				RESULTADO, FECHA_RESULTADO, FECHA_CITA, "UID_USUARIO", BEPPLO_CODNUM, BEPUSU_CODNUM);
+		
+		try (Connection conexion = ConexionUvirtual.obtenerInstancia(); PreparedStatement stmt = conexion.prepareStatement(consulta)) {
+			int parameterIndex = 1;
+			stmt.setString(parameterIndex++, RESULTADO_PENDIENTE);
+			stmt.setNull(parameterIndex++, Types.DATE);
+			stmt.setDate(parameterIndex++, new Date(fechaCita.getTime()));
+			stmt.setString(parameterIndex++, usuarioUpdate == null ? "TAREA PROGRAMADA" : usuarioUpdate.getCodCuenta());
+			stmt.setInt(parameterIndex++, plaza.getCodNum());
+			stmt.setInt(parameterIndex++, candidato.getCodNum());
+			stmt.executeUpdate();
+		}
+	}
+	
 	/** inserta contratación .
 	 * @param plaza .
 	 * @param fechaCita .
@@ -328,7 +359,7 @@ public class ModeloContratacion {
 		this.cambiarResultadoContratacion(plaza, usuarioUpdate, RESULTADO_RECHAZADA, usuarioUpdate);
 	}
 	
-	/** rechazar cita de contratación .
+	/** rechazar cita de contratación por personal .
 	 * @param plaza .
 	 * @param candidato .
 	 * @param usuarioUpdate .

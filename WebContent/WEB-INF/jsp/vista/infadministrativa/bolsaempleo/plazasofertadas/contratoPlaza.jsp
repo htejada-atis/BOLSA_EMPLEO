@@ -131,7 +131,7 @@ $(document).ready(function() {
 		
 		document.getElementById("cita_rechazar").addEventListener("click", function() {
 			event.preventDefault();
-			Atis.confirmDialog("Rechazar cita contrato", "Al rechazar el contrato será suspendido provisionalmente.", {
+			Atis.confirmDialog("Rechazar cita contrato", "Confirma que rechaza la plaza.", {
 					'Si': function(row) {
 						var params = {
 								'<%= ControladorPlazasOfertadas.PARAM_ACCION %>': '<%= ControladorPlazasOfertadas.ACCION_RECHAZAR_CONTRATACION %>',

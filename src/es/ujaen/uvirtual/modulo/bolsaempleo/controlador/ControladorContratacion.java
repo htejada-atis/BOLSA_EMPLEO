@@ -77,6 +77,7 @@ public class ControladorContratacion extends HttpServlet {
 	public static final String ACCION_PREFERENCIAS_CANDIDATO = "preferenciascandidato";
 	public static final String ACCION_NUEVA_PLAZA_OFERTADA = "nuevaplazaofertada";
 	public static final String ACCION_RECHAZAR_CONTRATACION_CANDIDATO = "rechazarcontratacioncandidato";
+	public static final String ACCION_REENVIAR_CITA_CONTRATACION = "reenviarcitacontratacion";
 	public static final String ACCION_RESTAURAR_PLAZA_OFERTADA = "restaurarplazaofertada";
 	public static final String ACCION_SELECCIONAR_PLAZA_OFERTADA = "seleccionarplazaofertada";
 	
@@ -106,12 +107,14 @@ public class ControladorContratacion extends HttpServlet {
 	public static final String MENSAJE_ERROR_CENTRO_DESTINO_VACIO = "El centro de destino no puede estar vacío";
 	public static final String MENSAJE_ERROR_CENTRO_DESTINO_NO_VALIDO = "El centro de destino seleccionado no es válido";
 	public static final String MENSAJE_ERROR_CANDIDATO_CONTRATACION_ACTIVA = "Ya hay una contratación activa para el candidato %s";
+	public static final String MENSAJE_ERROR_CANDIDATO_CONTRATACION_NO_ACTIVA = "No hay una contratación activa para el candidato %s";
 	public static final String MENSAJE_ERROR_CUATRIMESTRE_NO_VALIDO = "El cuatrimestre seleccionado no es válido";
 	public static final String MENSAJE_ERROR_DURACION_PREVISTA_LARGA = "La duración prevista no puede contener mas de %d caracteres";
 	public static final String MENSAJE_ERROR_ESTADO_CONTRATACION_REQUERIDO = "Es requerido estado de contratación para la plaza";
 	public static final String MENSAJE_ERROR_ESTADO_CREACION_REQUERIDO = "Es requerido estado de creación para la plaza";
 	public static final String MENSAJE_ERROR_ESTADO_TRAMITACION_REQUERIDO = "Es requerido estado de tramitación para la plaza";
 	public static final String MENSAJE_ERROR_FECHA_FIN_OFERTA_VACIA = "La fecha fin de la oferta no puede estar vacía";
+	public static final String MENSAJE_ERROR_FORMATO_FECHA = "Error al formatear fecha. Formato: DD/MM/YYYY HH:MM:SS";
 	public static final String MENSAJE_ERROR_JUSTIFICACION_LARGA = "La justificación no puede contener mas de %d caracteres";
 	public static final String MENSAJE_ERROR_JUSTIFICACION_VACIA = "La justificación no puede estar vacía";
 	public static final String MENSAJE_ERROR_SIN_PERMISO = "No tienes permiso";
@@ -122,6 +125,7 @@ public class ControladorContratacion extends HttpServlet {
 	public static final String MENSAJE_EXITO_CONTRATACION = "Contratación creada correctamente para el usuario: %s";
 	public static final String MENSAJE_EXITO_EDITAR = "Plaza editada correctamente";
 	public static final String MENSAJE_EXITO_TRAMITACION_PLAZA = "Cambiado el estado de la plaza a tramitación correctamente";
+	public static final String MENSAJE_EXITO_REENVIO_CONTRATACION = "Se ha reenviado la contratación correctamente para el usuario: %s";
 	public static final String MENSAJE_EXITO_SUSPENSION_PLAZA = "Suspendido el contrato del candidato correctamente";
 	
 	// ruta vistas
@@ -191,6 +195,7 @@ public class ControladorContratacion extends HttpServlet {
 				case ACCION_PLAZA_CERRADA:
 				case ACCION_PLAZA_TRAMITACION:
 				case ACCION_RECHAZAR_CONTRATACION_CANDIDATO:
+				case ACCION_REENVIAR_CITA_CONTRATACION:
 				case ACCION_SELECCIONAR_PLAZA_OFERTADA:
 					seleccionarPlazaOfertada(bean, datos, request, response, nombreAccion, parametros);
 					break;
@@ -310,6 +315,9 @@ public class ControladorContratacion extends HttpServlet {
 			case ACCION_RECHAZAR_CONTRATACION_CANDIDATO:
 				rechazarContratacionCandidato(bean, datos, request, response);
 				break;
+			case ACCION_REENVIAR_CITA_CONTRATACION:
+				reenviarContratacionCandidato(bean, datos, request, response);
+				break;
 			default:
 				errorFatal(bean, MENSAJE_ERROR_ACCION_NO_CONTEMPLADA);
 		}
@@ -320,9 +328,6 @@ public class ControladorContratacion extends HttpServlet {
 		ModeloPlazaOfertada modeloPlaza = ModeloPlazaOfertada.obtenerInstancia();
 		
 		PlazaOfertada plaza = bean.getPlazaOfertada();
-		if (BolsaEmpleoUtils.leeParametroFechaHora(request.getParameter(PARAM_FECHA_FIN_OFERTA), "/", ":") == null) {
-			throw new UVException(MENSAJE_ERROR_FECHA_FIN_OFERTA_VACIA);
-		}
 		if (!plaza.getEstado().contains(ModeloPlazaOfertada.PLAZA_ESTADO_TRAMITACION)) {
 			throw new UVException(MENSAJE_ERROR_ESTADO_TRAMITACION_REQUERIDO);
 		}
@@ -379,6 +384,11 @@ public class ControladorContratacion extends HttpServlet {
 		String fechaCita = request.getParameter(PARAM_FECHA_CITA);
 		String horaCita = request.getParameter(PARAM_HORA_CITA);
 		Date fecha = BolsaEmpleoUtils.leeParametroFechaHora(fechaCita + " " + horaCita, "/", ":");
+		
+		if (fecha == null) {
+			throw new UVException(MENSAJE_ERROR_FORMATO_FECHA);
+		}
+		
 		UsuarioBolsaEmpleo candidato = ModeloUsuarioBolsaEmpleo.obtenerInstancia().getUsuarioById(Formateador.leeParametroInteger(request.getParameter(PARAM_CANDIDATO)));
 		
 		if (modeloContratacion.comprobarContratoCandidato(bean.getPlazaOfertada(), candidato)) {
@@ -462,6 +472,30 @@ public class ControladorContratacion extends HttpServlet {
 		modeloContratacion.rechazarContrato(bean.getPlazaOfertada(), candidato, bean.getUsuarioLogeado());
 		
 		BolsaEmpleoUtils.addMensajeDeExito(MENSAJE_EXITO_SUSPENSION_PLAZA, bean, request);
+		redireccionConPlazaSeleccionada(bean, datos, request, response, ACCION_SELECCIONAR_PLAZA_OFERTADA);
+	}
+	
+	private void reenviarContratacionCandidato(VistaContratacion bean, UVDatos datos, HttpServletRequest request, HttpServletResponse response)
+			throws SQLException, UVException, IOException {
+		ModeloContratacion modeloContratacion = ModeloContratacion.obtenerInstancia();
+		
+		String fechaCita = request.getParameter(PARAM_FECHA_CITA);
+		String horaCita = request.getParameter(PARAM_HORA_CITA);
+		Date fecha = BolsaEmpleoUtils.leeParametroFechaHora(fechaCita + " " + horaCita, "/", ":");
+		
+		if (fecha == null) {
+			throw new UVException(MENSAJE_ERROR_FORMATO_FECHA);
+		}
+		
+		UsuarioBolsaEmpleo candidato = ModeloUsuarioBolsaEmpleo.obtenerInstancia().getUsuarioById(Formateador.leeParametroInteger(request.getParameter(PARAM_CANDIDATO)));
+		
+		if (!modeloContratacion.comprobarContratoCandidato(bean.getPlazaOfertada(), candidato)) {
+			throw new UVException(String.format(MENSAJE_ERROR_CANDIDATO_CONTRATACION_NO_ACTIVA, candidato.getPrsNif()));
+		}
+		
+		modeloContratacion.reestrablecerContratacion(bean.getPlazaOfertada(), fecha, candidato, bean.getUsuarioLogeado());
+		
+		BolsaEmpleoUtils.addMensajeDeExito(String.format(MENSAJE_EXITO_REENVIO_CONTRATACION, candidato.getPrsNif()), bean, request);
 		redireccionConPlazaSeleccionada(bean, datos, request, response, ACCION_SELECCIONAR_PLAZA_OFERTADA);
 	}
 	
@@ -640,8 +674,10 @@ public class ControladorContratacion extends HttpServlet {
 				throw new UVException(MENSAJE_ERROR_DURACION_PREVISTA_LARGA);
 			}
 			
-			plaza.setFechaFinOferta(BolsaEmpleoUtils.leeParametroFechaHora(BolsaEmpleoUtils.getParamRequestOrMultipartOrSession(
-					request, parametros, PARAM_FECHA_FIN_OFERTA), "/", ":"));
+			String fechaFinOferta = BolsaEmpleoUtils.getParamRequestOrMultipartOrSession(request, parametros, PARAM_FECHA_FIN_OFERTA);
+			String horaFinOferta = BolsaEmpleoUtils.getParamRequestOrMultipartOrSession(request, parametros, PARAM_HORA_FIN_OFERTA);
+			Date fecha = BolsaEmpleoUtils.leeParametroFechaHora(fechaFinOferta + " " + horaFinOferta, "/", ":");
+			plaza.setFechaFinOferta(fecha);
 			
 			plaza.setNri((InputStream) parametros.get(PARAM_NRI));
 		}
