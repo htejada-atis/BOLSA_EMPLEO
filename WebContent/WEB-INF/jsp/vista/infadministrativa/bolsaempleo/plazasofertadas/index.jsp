@@ -56,7 +56,7 @@ VistaPlazasOfertadas bean = (VistaPlazasOfertadas) uvdatos.getVistas().get(Vista
 						<td><%= ofertaCandidato.getPlaza().getCodNum() %></td>
 						<td><%= ofertaCandidato.getPlaza().getArea().getIdAreaExterno() + " " + ofertaCandidato.getPlaza().getArea().getDescripcion() %></td>
 						<td><%= ofertaCandidato.getPlaza().getEstado() %></td>
-						<td class="center"><%= ofertaCandidato.getContratacion() != null ? "<div title='Aceptada' class='circle-true'></div>" : "" %></td>
+						<td class="center"><%= ofertaCandidato.getContratacion() != null ? "<div class='circle-true'></div>" : "" %></td>
 						<td class="center"><%= ofertaCandidato.getContratacion() != null ? !ofertaCandidato.getContratacion().getResultado().equals(ModeloContratacion.RESULTADO_PENDIENTE) ? ofertaCandidato.getContratacion().getResultado() : "" : "" %></td>
 						<td>
 							<input class="oferta_preferencia" type="number" value="<%= ofertaCandidato.getPreferencia() != 0 ? ofertaCandidato.getPreferencia() : "" %>" style="width: 40px"/>

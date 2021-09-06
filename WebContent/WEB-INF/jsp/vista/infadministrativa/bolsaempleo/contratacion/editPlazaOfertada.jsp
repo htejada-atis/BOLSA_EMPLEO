@@ -616,6 +616,7 @@ $(document).ready(function() {
 					"<%= ControladorContratacion.PARAM_PLAZA_OFERTADA %>": <%= bean.getPlazaOfertada().getCodNum() %>
 			}
 			Atis.sendAjax("<%= request.getRequestURI() %>", params, function(data) {
+				data = JSON.parse(data);
 				var title = "";
 				var message = "";
 				var params = {
@@ -623,14 +624,14 @@ $(document).ready(function() {
 						"<%= ControladorContratacion.PARAM_PLAZA_OFERTADA %>": <%= bean.getPlazaOfertada().getCodNum() %>
 				};
 				
-				if (data == true) {
+				if (data.result == true) {
 					title = "Cierre de la plaza";
 					message = " <p>Se enviará un mensaje a los emails especificados a continuación con el candidato<br/>";
 					message += "seleccionado para la plaza.</p><br/>"
 					message += " <div class='form-group-container col2'>";
 					message += "     <div class='form-group-dialog'>";
 					message += "         <label class='bold-label' for='emails_cierre'>Emails destinatarios: </label>";
-					message += "         <input id='emails_cierre' name='<%= ControladorContratacion.PARAM_EMAILS_CIERRE %>' placeholder='email1, email2...' required/>";
+					message += "         <input id='emails_cierre' name='<%= ControladorContratacion.PARAM_EMAILS_CIERRE %>' value='" + data.emails + "' required/>";
 					message += "     </div>";
 					message += " </div>";
 					message += " <br/>";
@@ -642,7 +643,7 @@ $(document).ready(function() {
 				
 				Atis.confirmDialog(title, message, {
 					'Si': function() {
-						if (data == true) {
+						if (data.result == true) {
 							params["<%= ControladorContratacion.PARAM_EMAILS_CIERRE %>"] = this.querySelector('#emails_cierre').value;
 						}
 						

@@ -26,6 +26,7 @@ import es.ujaen.uvirtual.beans.UVDatos;
 import es.ujaen.uvirtual.modulo.bolsaempleo.beans.CandidatoEstado;
 import es.ujaen.uvirtual.modulo.bolsaempleo.beans.Contratacion;
 import es.ujaen.uvirtual.modulo.bolsaempleo.beans.OfertaCandidato;
+import es.ujaen.uvirtual.modulo.bolsaempleo.beans.ParametrosConfiguracion;
 import es.ujaen.uvirtual.modulo.bolsaempleo.beans.PlazaOfertada;
 import es.ujaen.uvirtual.modulo.bolsaempleo.beans.UsuarioBolsaEmpleo;
 import es.ujaen.uvirtual.modulo.bolsaempleo.modelo.ModeloArea;
@@ -397,8 +398,10 @@ public class ControladorContratacion extends HttpServlet {
 		try (PrintWriter writer = response.getWriter()) {
 			try {
 				Contratacion contratacion = ModeloContratacion.obtenerInstancia().getContratacionByPlazaContratada(bean.getPlazaOfertada());
-				
-				writer.write(new Gson().toJson(contratacion == null ? false : true));
+				ParametrosConfiguracion paramEmails = ModeloParametrosConfiguracion.obtenerInstancia().getParametroByNombre(
+						ModeloParametrosConfiguracion.PARAMETRO_EMAILS_CIERRE_PLAZA);
+				writer.write(new Gson().toJson(contratacion == null 
+						? "{\"result\": false}" : "{\"result\": true, \"emails\": \"" + paramEmails.getValor() + "\"}"));
 			} catch (Exception ex) {
 				bean.getMensajesDeError().add(ex.getMessage());
 				CodigoDescripcion mensaje = new CodigoDescripcion(RESPONSE_AJAX_ERROR, ex.getMessage());

@@ -28,6 +28,7 @@ public class ModeloParametrosConfiguracion {
 	public static final String PARAMETRO_PLANTILLA_APERTURA_PLAZA = "bolsaempleo.local.idPlantillaAperturaPlaza";
 	public static final String PARAMETRO_PLANTILLA_CITA_CONTRATACION = "bolsaempleo.local.idPlantillaCitaContratacion";
 	public static final String PARAMETRO_PLANTILLA_CIERRE_PLAZA = "bolsaempleo.local.idPlantillaCierrePlaza";
+	public static final String PARAMETRO_EMAILS_CIERRE_PLAZA = "bolsaempleo.local.emailsCierrePlaza";
 
 	// 50MB = 1024 * 1024 * 50 = 52428800
 	public static final int MAX_FILE_SIZE = 52_428_800;
