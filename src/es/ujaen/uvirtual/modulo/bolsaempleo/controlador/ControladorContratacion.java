@@ -64,6 +64,7 @@ public class ControladorContratacion extends HttpServlet {
 	private static final Logger LOGGER = Logger.getLogger(NOMBREDEESTACLASE);
 	
 	// acciones
+	public static final String ACCION_COMPROBAR_CONTRATACION_PLAZA = "comprobarcontratacionplaza";
 	public static final String ACCION_CONTRATAR_CANDIDATO = "contratarcandidato";
 	public static final String ACCION_DATATABLE_CANDIDATOS = "datatablecandidatos";
 	public static final String ACCION_DATATABLE_CANDIDATOS_APERTURA = "datatablecandidatosapertura";
@@ -186,6 +187,7 @@ public class ControladorContratacion extends HttpServlet {
 			init(bean, datos, request, response);
 			
 			switch (nombreAccion) {
+				case ACCION_COMPROBAR_CONTRATACION_PLAZA:
 				case ACCION_CONTRATAR_CANDIDATO:
 				case ACCION_DATATABLE_CANDIDATOS:
 				case ACCION_DATATABLE_CANDIDATOS_APERTURA:
@@ -286,6 +288,9 @@ public class ControladorContratacion extends HttpServlet {
 		bean.setPlazaOfertada(plaza);
 		
 		switch (nombreAccion) {
+			case ACCION_COMPROBAR_CONTRATACION_PLAZA:
+				comprobarContratacionPlaza(bean, datos, request, response);
+				break;
 			case ACCION_CONTRATAR_CANDIDATO:
 				contratarCandidato(bean, datos, request, response);
 				break;
@@ -352,29 +357,55 @@ public class ControladorContratacion extends HttpServlet {
 		if (!plaza.getEstado().equals(ModeloPlazaOfertada.PLAZA_ESTADO_CONTRATACION)) {
 			throw new UVException(MENSAJE_ERROR_ESTADO_CONTRATACION_REQUERIDO);
 		}
-		Contratacion contratacion = ModeloContratacion.obtenerInstancia().getContratacionByPlazaContratada(plaza);
-		if (contratacion == null) {
-			throw new UVException("No hay ningún contrato para esta plaza");
-		}
 		
 		String cadenaEmails = EscapaHTML.ajustaCodificacion(request.getParameter(PARAM_EMAILS_CIERRE));
-		cadenaEmails = cadenaEmails.replaceAll(" ", "");
-		String[] emails = cadenaEmails.split(",");
 		
-		modeloPlaza.crearMensajeCierrePlaza(plaza, contratacion, emails, bean.getUsuarioLogeado());
-		modeloPlaza.cerrarPlazaOfertada(plaza, bean.getUsuarioLogeado());
-		
-		String estadoCandidato = ModeloEstadoCandidato.ESTADO_CONTRATADO;
-		
-		if (plaza.getCuatrimestre().equals(ModeloPlazaOfertada.CUATRIMESTRE_PRIMERO)) {
-			estadoCandidato = ModeloEstadoCandidato.ESTADO_CONTRATADO_PRIMER_CUATRIMESTRE;
+		// para el caso de la plaza que no es desierta se requiere los destinatarios para comunicar el cierre de la misma
+		if (cadenaEmails != null) {
+			cadenaEmails = cadenaEmails.replaceAll(" ", "");
+			String[] emails = cadenaEmails.split(",");
+			
+			Contratacion contratacion = ModeloContratacion.obtenerInstancia().getContratacionByPlazaContratada(plaza);
+			if (contratacion == null) {
+				throw new UVException("No hay ningún contrato para esta plaza");
+			}
+			
+			modeloPlaza.crearMensajeCierrePlaza(plaza, contratacion, emails, bean.getUsuarioLogeado());
+			
+			String estadoCandidato = ModeloEstadoCandidato.ESTADO_CONTRATADO;
+			
+			if (plaza.getCuatrimestre().equals(ModeloPlazaOfertada.CUATRIMESTRE_PRIMERO)) {
+				estadoCandidato = ModeloEstadoCandidato.ESTADO_CONTRATADO_PRIMER_CUATRIMESTRE;
+			}
+			
+			ModeloEstadoCandidato.obtenerInstancia().cambiarEstadoCandidato(contratacion.getCandidato(), estadoCandidato, 
+					ModeloBolsa.obtenerInstancia().getBolsaById(bean.getPlazaOfertada().getArea().getCodNum()), bean.getUsuarioLogeado());
 		}
 		
-		ModeloEstadoCandidato.obtenerInstancia().cambiarEstadoCandidato(contratacion.getCandidato(), estadoCandidato, 
-				ModeloBolsa.obtenerInstancia().getBolsaById(bean.getPlazaOfertada().getArea().getCodNum()), bean.getUsuarioLogeado());
+		modeloPlaza.cerrarPlazaOfertada(plaza, bean.getUsuarioLogeado());
 		
 		BolsaEmpleoUtils.addMensajeDeExito(MENSAJE_EXITO_CERRAR_PLAZA, bean, request);
 		redireccionConPlazaSeleccionada(bean, datos, request, response, ACCION_SELECCIONAR_PLAZA_OFERTADA);
+	}
+	
+	private void comprobarContratacionPlaza(VistaContratacion bean, UVDatos datos, HttpServletRequest request, HttpServletResponse response) throws IOException {
+		datos.setContentType(RESPONSE_AJAX_CONTENTTYPE);
+		datos.setRespuestaEnviada(true);
+		response.setContentType(RESPONSE_AJAX_CONTENTTYPE);
+		response.setCharacterEncoding(RESPONSE_AJAX_ENCODING);
+		
+		try (PrintWriter writer = response.getWriter()) {
+			try {
+				Contratacion contratacion = ModeloContratacion.obtenerInstancia().getContratacionByPlazaContratada(bean.getPlazaOfertada());
+				
+				writer.write(new Gson().toJson(contratacion == null ? false : true));
+			} catch (Exception ex) {
+				bean.getMensajesDeError().add(ex.getMessage());
+				CodigoDescripcion mensaje = new CodigoDescripcion(RESPONSE_AJAX_ERROR, ex.getMessage());
+				writer.write(new Gson().toJson(mensaje));
+				response.setStatus(RESPONSE_AJAX_HTTP_CODE_ERROR);
+			}
+		}
 	}
 	
 	private void contratarCandidato(VistaContratacion bean, UVDatos datos, HttpServletRequest request, HttpServletResponse response)

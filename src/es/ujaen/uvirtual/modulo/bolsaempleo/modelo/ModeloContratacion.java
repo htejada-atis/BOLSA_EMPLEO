@@ -108,6 +108,32 @@ public class ModeloContratacion {
 		return null;
 	}
 	
+	/** Método para devolver la contratación de una plaza y candidato .
+	 * @param plaza .
+	 * @param candidato .
+	 * @return contratación .
+	 * @throws SQLException .
+	 * @throws UVException .
+	 */
+	public Contratacion getContratacionByPlazaCandidato(PlazaOfertada plaza, UsuarioBolsaEmpleo candidato) throws SQLException, UVException {
+		String consulta = "SELECT bepcnt.* FROM TBEP_CONTRATACIONES bepcnt"
+				+ " WHERE bepcnt.BEPUSU_CODNUM = ? AND bepcnt.BEPPLO_CODNUM = ?";
+		
+		try (Connection conexion = ConexionUvirtual.obtenerInstancia(); PreparedStatement stmt = conexion.prepareStatement(consulta)) {
+			int parameterIndex = 1;
+			stmt.setInt(parameterIndex++, candidato.getCodNum());
+			stmt.setInt(parameterIndex++, plaza.getCodNum());
+			
+			try (ResultSet rs = stmt.executeQuery()) {
+				if (rs.next()) {
+					return createContratacionFromResultSet(rs);
+				}
+			}
+		}
+		
+		return null;
+	}
+	
 	/** Método para devolver la contratación de una plaza .
 	 * @param plaza .
 	 * @return contratación .

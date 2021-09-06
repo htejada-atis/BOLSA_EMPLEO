@@ -174,7 +174,7 @@ public final class BolsaEmpleoUtils {
 		
 		Date dateFecha = null;
 		
-		SimpleDateFormat formatoFecha = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss");
+		SimpleDateFormat formatoFecha = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 		
 		try {
 			String[] campos = valor.split(" ");

@@ -237,7 +237,10 @@ $(document).ready(function() {
 			"action": "<%= ControladorContratacion.ACCION_DATATABLE_CANDIDATOS %>",
 			"params": {'<%=ControladorContratacion.PARAM_PLAZA_OFERTADA%>': '<%= plaza.getCodNum() %>'},
 			"columns": [
-				{'data': 'candidato.prsnif', 'filter': true},
+				{'data': 'candidato.prsnif', 'filter': true, 'render': function(row) {
+					var href = 'href="<%= ControladorUsuarioCandidato.URL_PATTERN + "?" + ControladorUsuarioCandidato.PARAM_ACCION + "=" + ControladorUsuarioCandidato.ACCION_SELECCIONAR_CANDIDATO + "&" + ControladorUsuarioCandidato.PARAM_CANDIDATO + "=" %>' + row.candidato.codNum + '"';
+					return '<a class="bolsaempleo-link" ' + href + ' target="_blank" title="Ir al perfil del candidato ' + row.candidato.prsnif + '">' + row.candidato.prsnif + '</a>';
+				}},
 				{'data': 'candidato.apellido1', 'filter': true, 'overflow': 'auto', 'render': function(row) {
 					return row.candidato.nombre + " " + row.candidato.apellido1 + " " + row.candidato.apellido2;
 				}},
@@ -381,7 +384,10 @@ $(document).ready(function() {
 			"filterable": true,
 			"title": 'Candidatos con contratación',
 			"columns": [
-				{'data': 'candidato.prsnif', 'filter': true},
+				{'data': 'candidato.prsnif', 'filter': true, 'render': function(row) {
+					var href = 'href="<%= ControladorUsuarioCandidato.URL_PATTERN + "?" + ControladorUsuarioCandidato.PARAM_ACCION + "=" + ControladorUsuarioCandidato.ACCION_SELECCIONAR_CANDIDATO + "&" + ControladorUsuarioCandidato.PARAM_CANDIDATO + "=" %>' + row.candidato.codNum + '"';
+					return '<a class="bolsaempleo-link" ' + href + ' target="_blank" title="Ir al perfil del candidato ' + row.candidato.prsnif + '">' + row.candidato.prsnif + '</a>';
+				}},
 				{'data': 'candidato.apellido1', 'filter': true, 'overflow': 'auto', 'render': function(row) {
 					return row.candidato.nombre + " " + row.candidato.apellido1 + " " + row.candidato.apellido2;
 				}},
@@ -571,7 +577,7 @@ $(document).ready(function() {
 							"columns": [
 								{'data': 'prsnif', 'order': false, 'render': function(row) {
 									var href = 'href="<%= ControladorUsuarioCandidato.URL_PATTERN + "?" + ControladorUsuarioCandidato.PARAM_ACCION + "=" + ControladorUsuarioCandidato.ACCION_SELECCIONAR_CANDIDATO + "&" + ControladorUsuarioCandidato.PARAM_CANDIDATO + "=" %>' + row.codNum + '"';
-									return '<a class="bolsaempleo-link" ' + href + ' target="_blank" title="Ir al perfil del candidato">' + row.prsnif + '</a>';
+									return '<a class="bolsaempleo-link" ' + href + ' target="_blank" title="Ir al perfil del candidato ' + row.prsnif + '">' + row.prsnif + '</a>';
 								}},
 								{'data': 'nombre', 'order': false, 'render': function(row) {
 									return row.nombre + " " + row.apellido1 + " " + row.apellido2;
@@ -603,33 +609,59 @@ $(document).ready(function() {
 
 <%	if (estadoContratacion && personal) { %>
 		document.getElementById("plaza_estado_cerrar").addEventListener("click", function() {
-			var message = "";
-			message += " <p>Se enviará un mensaje a los emails especificados a continuación con el candidato<br/>";
-			message += "seleccionado para la plaza.</p><br/>"
-			message += " <div class='form-group-container col2'>";
-			message += "     <div class='form-group-dialog'>";
-			message += "         <label class='bold-label' for='emails_cierre'>Emails destinatarios: </label>";
-			message += "         <input id='emails_cierre' name='<%= ControladorContratacion.PARAM_EMAILS_CIERRE %>' placeholder='email1, email2...' required/>";
-			message += "     </div>";
-			message += " </div>";
-			message += " <br/>";
-			
-			Atis.confirmDialog("Cierre de la plaza", message, {
-				'Si': function() {
-					var inputEmails = this.querySelector('#emails_cierre');
-					
-					var params = {
-							"<%= ControladorContratacion.PARAM_ACCION %>": "<%= ControladorContratacion.ACCION_PLAZA_CERRADA %>",
-							"<%= ControladorContratacion.PARAM_PLAZA_OFERTADA %>": <%= bean.getPlazaOfertada().getCodNum() %>,
-							"<%= ControladorContratacion.PARAM_EMAILS_CIERRE %>": inputEmails.value
-					};
-					Atis.sendForm("<%= request.getRequestURI() %>", params);
-					$(this).dialog("close");
-				},
-				'No': function() {
-					$(this).dialog("close");
+			var btn = $(this);
+			btn.attr('disabled', true);
+			var params = {
+					"<%= ControladorContratacion.PARAM_ACCION %>": "<%= ControladorContratacion.ACCION_COMPROBAR_CONTRATACION_PLAZA %>",
+					"<%= ControladorContratacion.PARAM_PLAZA_OFERTADA %>": <%= bean.getPlazaOfertada().getCodNum() %>
+			}
+			Atis.sendAjax("<%= request.getRequestURI() %>", params, function(data) {
+				var title = "";
+				var message = "";
+				var params = {
+						"<%= ControladorContratacion.PARAM_ACCION %>": "<%= ControladorContratacion.ACCION_PLAZA_CERRADA %>",
+						"<%= ControladorContratacion.PARAM_PLAZA_OFERTADA %>": <%= bean.getPlazaOfertada().getCodNum() %>
+				};
+				
+				if (data == true) {
+					title = "Cierre de la plaza";
+					message = " <p>Se enviará un mensaje a los emails especificados a continuación con el candidato<br/>";
+					message += "seleccionado para la plaza.</p><br/>"
+					message += " <div class='form-group-container col2'>";
+					message += "     <div class='form-group-dialog'>";
+					message += "         <label class='bold-label' for='emails_cierre'>Emails destinatarios: </label>";
+					message += "         <input id='emails_cierre' name='<%= ControladorContratacion.PARAM_EMAILS_CIERRE %>' placeholder='email1, email2...' required/>";
+					message += "     </div>";
+					message += " </div>";
+					message += " <br/>";
+				} else {
+					title = "Cierre de plaza desierta";
+					message = "<p>No hay ningún candidato con contratación aceptada.<br/>";
+					message += "Se cerrará la plaza sin contratación.</p>"
 				}
+				
+				Atis.confirmDialog(title, message, {
+					'Si': function() {
+						if (data == true) {
+							params["<%= ControladorContratacion.PARAM_EMAILS_CIERRE %>"] = this.querySelector('#emails_cierre').value;
+						}
+						
+						Atis.sendForm("<%= request.getRequestURI() %>", params);
+						$(this).dialog("close");
+					},
+					'No': function() {
+						$(this).dialog("close");
+					}
+				});
+				
+				btn.attr('disabled', false);
+			}, function(data) {
+				var response = JSON.parse(data.responseText);
+				// alert en caso de error
+				Atis.alertDialog("Error en la solicitud", response.descripcion);
+				btn.attr('disabled', false);
 			});
+			
 		});
 <%	} %>
 	
