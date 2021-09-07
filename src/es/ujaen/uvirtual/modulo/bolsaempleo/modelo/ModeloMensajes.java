@@ -271,7 +271,7 @@ public class ModeloMensajes {
 					throw new UVException(MENSAJE_ERROR_NO_EXISTE_MENSAJE);
 				}
 
-				return this.createMensajeFromResultSet(rs, false);
+				return this.createMensajeFromResultSet(rs, true);
 			}
 		}
 	}

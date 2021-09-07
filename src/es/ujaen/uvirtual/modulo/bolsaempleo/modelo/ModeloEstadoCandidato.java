@@ -212,7 +212,7 @@ public class ModeloEstadoCandidato {
 	 * @throws SQLException en caso de error de base de datos .
 	 * @throws UVException  error si no existe la area .
 	 */
-	public void cambiarEstadosCandidato(UsuarioBolsaEmpleo candidato, String estado, List<Bolsa> bolsas, UsuarioBolsaEmpleo usuarioUpdate)
+	public void cambiarEstadosCandidato(CandidatoEstado candidato, String estado, List<Bolsa> bolsas, UsuarioBolsaEmpleo usuarioUpdate)
 			throws SQLException, UVException {
 		for (Bolsa bolsa: bolsas) {
 			this.cambiarEstadoCandidato(candidato, estado, bolsa, usuarioUpdate);
@@ -227,7 +227,7 @@ public class ModeloEstadoCandidato {
 	 * @throws SQLException en caso de error de base de datos .
 	 * @throws UVException  error si no existe la area .
 	 */
-	public void cambiarEstadoCandidato(UsuarioBolsaEmpleo candidato, String estado, Bolsa bolsa, UsuarioBolsaEmpleo usuarioUpdate)
+	public void cambiarEstadoCandidato(CandidatoEstado candidato, String estado, Bolsa bolsa, UsuarioBolsaEmpleo usuarioUpdate)
 			throws SQLException, UVException {
 		try (Connection conexion = ConexionUvirtual.obtenerInstancia()) {
 			conexion.setAutoCommit(false);
@@ -241,9 +241,11 @@ public class ModeloEstadoCandidato {
 					candidatoEstado = new CandidatoEstado(candidato);
 					candidatoEstado.setEstado(estado);
 					candidatoEstado.setBolsa(bolsa);
+					candidatoEstado.setPlaza(candidato.getPlaza());
 					insertaEstadoCandidato(candidatoEstado, usuarioUpdate, conexion);
 				} else {
 					candidatoEstado.setEstado(estado);
+					candidatoEstado.setPlaza(candidato.getPlaza());
 					actualizaEstadoCandidato(candidatoEstado, usuarioUpdate, conexion);
 				}
 		

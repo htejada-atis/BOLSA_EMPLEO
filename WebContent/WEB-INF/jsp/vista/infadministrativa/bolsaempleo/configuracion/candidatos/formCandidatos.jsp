@@ -1,6 +1,7 @@
 <%@ page trimDirectiveWhitespaces="true"%>
 <%@ page import="es.ujaen.uvirtual.beans.UVDatos"%>
 <%@ page import="es.ujaen.uvirtual.modulo.bolsaempleo.beans.Rol"%>
+<%@	page import="es.ujaen.uvirtual.modulo.bolsaempleo.controlador.ControladorContratacion" %>
 <%@	page import="es.ujaen.uvirtual.modulo.bolsaempleo.controlador.ControladorDescargaFicheros"%>
 <%@	page import="es.ujaen.uvirtual.modulo.bolsaempleo.controlador.configuracion.ControladorUsuarioBolsaEmpleo"%>
 <%@	page import="es.ujaen.uvirtual.modulo.bolsaempleo.controlador.configuracion.ControladorUsuarioCandidato"%>
@@ -718,7 +719,13 @@ UsuarioBolsaEmpleo candidato = bean.getCandidato();
 						return row.codNumEstado != 0 ? row.estado : '<%= ModeloEstadoCandidato.ESTADO_DISPONIBLE %>';
 					}, 'filter': {'type': 'select', 'options': estadosCandidato}},
 					{'data': 'plaza' , 'render': function(row) {
-						return row.plaza != null ? row.plaza.codNum : '';
+						var linkPlaza = '';
+						if (row.plaza != null) {
+							linkPlaza = '<a class="bolsaempleo-link" ';
+							linkPlaza += 'href="<%= ControladorContratacion.URL_PATTERN + "?" + ControladorContratacion.PARAM_ACCION + "=" + ControladorContratacion.ACCION_SELECCIONAR_PLAZA_OFERTADA + "&" + ControladorContratacion.PARAM_PLAZA_OFERTADA + "=" %>' + row.plaza.codNum + '"';
+							linkPlaza += ' target="_blank" title="Ir a la plaza ' + row.plaza.codNum + '">' + row.plaza.codNum + '</a>';
+						}
+						return linkPlaza;
 					}, 'filter': {'type': 'number'}}
 				],
 				"actions": [

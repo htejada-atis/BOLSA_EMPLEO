@@ -130,6 +130,8 @@ public class ControladorContratacion extends HttpServlet {
 	public static final String MENSAJE_EXITO_REENVIO_CONTRATACION = "Se ha reenviado la contratación correctamente para el usuario: %s";
 	public static final String MENSAJE_EXITO_SUSPENSION_PLAZA = "Suspendido el contrato del candidato correctamente";
 	
+	public static final String URL_PATTERN = "/srv/es/informacionadministrativa/bolsaempleo/contratacion";
+	
 	// ruta vistas
 	public static final String RUTA_BEP_CONTRATACION = "/WEB-INF/jsp/vista/infadministrativa/bolsaempleo/contratacion/";
 	public static final String JSP_INDEX = RUTA_BEP_CONTRATACION + "index.jsp";
@@ -290,7 +292,7 @@ public class ControladorContratacion extends HttpServlet {
 		
 		switch (nombreAccion) {
 			case ACCION_COMPROBAR_CONTRATACION_PLAZA:
-				comprobarContratacionPlaza(bean, datos, request, response);
+				comprobarContratacionPlaza(bean, datos, response);
 				break;
 			case ACCION_CONTRATAR_CANDIDATO:
 				contratarCandidato(bean, datos, request, response);
@@ -379,8 +381,10 @@ public class ControladorContratacion extends HttpServlet {
 				estadoCandidato = ModeloEstadoCandidato.ESTADO_CONTRATADO_PRIMER_CUATRIMESTRE;
 			}
 			
-			ModeloEstadoCandidato.obtenerInstancia().cambiarEstadoCandidato(contratacion.getCandidato(), estadoCandidato, 
-					ModeloBolsa.obtenerInstancia().getBolsaById(bean.getPlazaOfertada().getArea().getCodNum()), bean.getUsuarioLogeado());
+			CandidatoEstado candidato = new CandidatoEstado(contratacion.getCandidato());
+			candidato.setPlaza(plaza);
+			ModeloEstadoCandidato.obtenerInstancia().cambiarEstadoCandidato(candidato, estadoCandidato, 
+					ModeloBolsa.obtenerInstancia().getBolsaById(plaza.getArea().getCodNum()), bean.getUsuarioLogeado());
 		}
 		
 		modeloPlaza.cerrarPlazaOfertada(plaza, bean.getUsuarioLogeado());
@@ -389,7 +393,7 @@ public class ControladorContratacion extends HttpServlet {
 		redireccionConPlazaSeleccionada(bean, datos, request, response, ACCION_SELECCIONAR_PLAZA_OFERTADA);
 	}
 	
-	private void comprobarContratacionPlaza(VistaContratacion bean, UVDatos datos, HttpServletRequest request, HttpServletResponse response) throws IOException {
+	private void comprobarContratacionPlaza(VistaContratacion bean, UVDatos datos, HttpServletResponse response) throws IOException {
 		datos.setContentType(RESPONSE_AJAX_CONTENTTYPE);
 		datos.setRespuestaEnviada(true);
 		response.setContentType(RESPONSE_AJAX_CONTENTTYPE);
