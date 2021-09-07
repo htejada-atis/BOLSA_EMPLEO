@@ -29,6 +29,8 @@ boolean pendiente = bean.getOfertaCandidato().getContratacion().getResultado().e
 	Área: <%= oferta.getPlaza().getArea().getDescripcion() %>
 	</h4>
 	
+	<p>En el caso de que la cita propuesta no le venga bien envíe un email para concretar una distinta.</p>
+	
 	<form id="plaza_contrato" class="be-form" method="post" action="<%=request.getRequestURI()%>">
 		<div class="form-group-container col2">
 			<div class="form-group">
