@@ -39,21 +39,21 @@ public final class EnviarMensaje {
 			Map<Integer, Mensaje> mensajes = new HashMap<>(); 
 			
 			// leemos destinatarios pendientes de envio (max. 100)
-			List<Destinatario> destinatarios = modelo.listaDestinatariosAEnviarEnBloques(); 			
+			List<Destinatario> destinatarios = modelo.listaDestinatariosAEnviarEnBloques();
 			for (Destinatario destinatario : destinatarios) {
 				// leemos mensaje
-				if (!mensajes.containsKey(destinatario.getCodNumMensaje())) {
-					mensajes.put(destinatario.getCodNumMensaje(), modelo.getMensajeById(destinatario.getCodNumMensaje()));
+				if (!mensajes.containsKey(destinatario.getMensaje().getCodNum())) {
+					mensajes.put(destinatario.getMensaje().getCodNum(), modelo.getMensajeById(destinatario.getMensaje().getCodNum()));
 				}
-				Mensaje mensaje = mensajes.get(destinatario.getCodNumMensaje());
+				Mensaje mensaje = mensajes.get(destinatario.getMensaje().getCodNum());
 				
 				// enviamos mensajes
 				List<String> emails = new ArrayList<>();
-				emails.add(destinatario.getEmail());
-				if (EnviaCorreo.enviaCorreo(emails, mensaje.getTitulo(), mensaje.getCuerpo())) {
-					modelo.actualizaEstadoDestinatarioComoEnviado(mensaje, destinatario, null);					
+				emails.add(destinatario.getUsuario() != null ? destinatario.getUsuario().getEmail() : destinatario.getEmail());
+				if (EnviaCorreo.enviaCorreoHTML(emails, mensaje.getTitulo(), mensaje.getCuerpo())) {
+					modelo.actualizaEstadoDestinatarioComoEnviado(destinatario, null);
 				} else {
-					modelo.actualizaEstadoDestinatarioComoFallo(mensaje, destinatario, null);
+					modelo.actualizaEstadoDestinatarioComoFallo(destinatario, null);
 				}
 			}
 			

@@ -7,6 +7,7 @@ import es.ujaen.uvirtual.modulo.bolsaempleo.beans.Area;
 import es.ujaen.uvirtual.modulo.bolsaempleo.beans.Convocatoria;
 import es.ujaen.uvirtual.modulo.bolsaempleo.beans.Destinatario;
 import es.ujaen.uvirtual.modulo.bolsaempleo.beans.Mensaje;
+import es.ujaen.uvirtual.modulo.bolsaempleo.beans.Plantilla;
 import es.ujaen.uvirtual.modulo.bolsaempleo.beans.UsuarioBolsaEmpleo;
 import es.ujaen.uvirtual.modulo.bolsaempleo.utilidades.BolsaEmpleoDataTable;
 
@@ -20,7 +21,9 @@ public class VistaMensajes extends Vista implements Serializable {
 	private transient BolsaEmpleoDataTable<Mensaje> dataTable;
 	private transient BolsaEmpleoDataTable<Destinatario> dataTableDestinatarios;
 	private transient BolsaEmpleoDataTable<UsuarioBolsaEmpleo> dataTableDestinatariosDisponibles;
+	private transient BolsaEmpleoDataTable<Plantilla> dataTablePlantillas;
 	private Mensaje mensaje;
+	private Plantilla plantilla;
 	private List<Convocatoria> convocatorias;
 	private List<Area> areas;
 	private List<Destinatario> destinatarios;
@@ -97,5 +100,21 @@ public class VistaMensajes extends Vista implements Serializable {
 	
 	public void setDestinatarios(List<Destinatario> destinatarios) {
 		this.destinatarios = destinatarios;
+	}
+
+	public BolsaEmpleoDataTable<Plantilla> getDataTablePlantillas() {
+		return dataTablePlantillas;
+	}
+
+	public void setDataTablePlantillas(BolsaEmpleoDataTable<Plantilla> dataTablePlantillas) {
+		this.dataTablePlantillas = dataTablePlantillas;
+	}
+
+	public Plantilla getPlantilla() {
+		return plantilla;
+	}
+
+	public void setPlantilla(Plantilla plantilla) {
+		this.plantilla = plantilla;
 	}
 }

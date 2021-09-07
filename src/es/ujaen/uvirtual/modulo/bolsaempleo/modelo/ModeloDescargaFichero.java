@@ -7,6 +7,7 @@ import java.sql.SQLException;
 import es.ujaen.uvirtual.modelo.conexion.ConexionUvirtual;
 import es.ujaen.uvirtual.modulo.bolsaempleo.beans.Merito;
 import es.ujaen.uvirtual.modulo.bolsaempleo.beans.MeritoPreferenteUsuario;
+import es.ujaen.uvirtual.modulo.bolsaempleo.beans.PlazaOfertada;
 import es.ujaen.uvirtual.modulo.bolsaempleo.beans.Solicitud;
 import es.ujaen.uvirtual.modulo.bolsaempleo.beans.TitulacionUsuario;
 import es.ujaen.uvirtual.modulo.bolsaempleo.beans.UsuarioBolsaEmpleo;
@@ -151,6 +152,85 @@ public class ModeloDescargaFichero {
 			try (ResultSet rs = stmt.executeQuery()) {
 				if (rs.next()) {
 					return ModeloMeritosPreferentesCandidato.obtenerInstancia().createMeritoUsuarioFromResultSet(rs);
+				}
+			}
+		}
+		
+		return null;
+	}
+	
+	/** Comprueba si una plaza ofertada está disponible para un candidato .
+	 * @param idPlaza .
+	 * @param usuario .
+	 * @return plaza ofertada .
+	 * @throws UVException .
+	 * @throws UVException .
+	 * @throws SQLException .
+	 */
+	public PlazaOfertada compruebaPlazaOfertadaCandidato(int idPlaza, UsuarioBolsaEmpleo usuario) throws SQLException, UVException {
+		String consulta = "SELECT bepplo.*, "
+				+ "     CASE"
+				+ "         WHEN bepplo.FECHA_FIN_OFERTA > SYSDATE THEN 1"
+				+ "         ELSE 0"
+				+ "     END AS ABIERTA_VIGENTE"
+				+ " FROM TBEP_USUARIOS bepusu"
+				+ " LEFT JOIN TBEP_ESTADO_CANDIDATOS bepesc ON bepesc.BEPUSU_CODNUM = bepusu.CODNUM"
+				+ " INNER JOIN TBEP_SOLICITUDES bepsol ON bepsol.BEPUSU_CODNUM = bepusu.CODNUM"
+				+ " INNER JOIN TBEP_SOLICITUD_BOLSAS bepsob ON bepsob.BEPSOL_CODNUM = bepsol.CODNUM AND bepsob.FECHABAREMACION IS NOT NULL"
+				+ " INNER JOIN TBEP_BOLSAS bepbol ON bepbol.CODNUM = bepsob.BEPBOL_CODNUM"
+				+ " INNER JOIN TBEP_AREAS bepare ON bepare.CODNUM = bepbol.BEPARE_CODNUM"
+				+ " INNER JOIN TBEP_PLAZAS_OFERTADAS bepplo ON bepplo.BEPARE_CODNUM = bepare.CODNUM"
+				+ " WHERE   bepplo.CODNUM = ?"
+				+ "     AND bepusu.CODNUM = ?"
+				+ "     AND (bepesc.CODNUM IS NULL"
+				+ "         OR bepesc.ESTADO = '" + ModeloEstadoCandidato.ESTADO_DISPONIBLE + "'"
+				+ "         OR (bepesc.ESTADO = '" + ModeloEstadoCandidato.ESTADO_CONTRATADO_PRIMER_CUATRIMESTRE + "' "
+				+ "             AND bepplo.CUATRIMESTRE = '" + ModeloPlazaOfertada.CUATRIMESTRE_SEGUNDO + "')"
+				+ "     )";
+		
+		try (Connection conexion = ConexionUvirtual.obtenerInstancia();
+				PreparedStatement stmt = conexion.prepareStatement(consulta)) {
+			int parameterIndex = 1;
+			stmt.setInt(parameterIndex++, idPlaza);
+			stmt.setInt(parameterIndex++, usuario.getCodNum());
+			
+			try (ResultSet rs = stmt.executeQuery()) {
+				if (rs.next()) {
+					return ModeloPlazaOfertada.obtenerInstancia().createPlazaOfertadaFromResultSet(rs, true);
+				}
+			}
+		}
+		
+		return null;
+	}
+	
+	/** Comprueba si una plaza ofertada es visible para un director de departamento .
+	 * @param idPlaza .
+	 * @param usuario .
+	 * @return plaza ofertada .
+	 * @throws UVException .
+	 * @throws UVException .
+	 * @throws SQLException .
+	 */
+	public PlazaOfertada compruebaPlazaOfertadaDirector(int idPlaza, UsuarioBolsaEmpleo usuario) throws SQLException, UVException {
+		String consulta = "SELECT bepplo.*,"
+				+ "     CASE"
+				+ "         WHEN bepplo.FECHA_FIN_OFERTA > SYSDATE THEN 1"
+				+ "         ELSE 0"
+				+ "     END AS ABIERTA_VIGENTE"
+				+ " FROM TBEP_PLAZAS_OFERTADAS bepplo"
+				+ " INNER JOIN TBEP_EVALUADORES bepeva ON bepeva.BEPARE_CODNUM = bepplo.BEPARE_CODNUM AND bepeva.FLGACTIVO = 'S'"
+				+ " WHERE bepplo.CODNUM = ? AND BEPUSU_CODNUM = ?";
+		
+		try (Connection conexion = ConexionUvirtual.obtenerInstancia();
+				PreparedStatement stmt = conexion.prepareStatement(consulta)) {
+			int parameterIndex = 1;
+			stmt.setInt(parameterIndex++, idPlaza);
+			stmt.setInt(parameterIndex++, usuario.getCodNum());
+						
+			try (ResultSet rs = stmt.executeQuery()) {
+				if (rs.next()) {
+					return ModeloPlazaOfertada.obtenerInstancia().createPlazaOfertadaFromResultSet(rs, true);
 				}
 			}
 		}

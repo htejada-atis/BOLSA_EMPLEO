@@ -14,12 +14,15 @@ import java.sql.SQLException;
 import java.text.CharacterIterator;
 import java.text.DecimalFormat;
 import java.text.DecimalFormatSymbols;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.text.StringCharacterIterator;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.time.ZoneId;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
 import java.util.logging.Level;
@@ -27,12 +30,10 @@ import java.util.logging.Logger;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
-
 import javax.servlet.ServletRequest;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
-
 import es.ujaen.uvirtual.beans.UVDatos;
 import es.ujaen.uvirtual.beans.vistas.Vista;
 import es.ujaen.uvirtual.modulo.bolsaempleo.controlador.ControladorErrorBolsaEmpleo;
@@ -157,6 +158,51 @@ public final class BolsaEmpleoUtils {
 		} catch (Exception e) {
 			return null;
 		}
+	}
+	
+	/** obtiene la fecha en formato yyyy-MM-dd hh:mm:ss.
+	 * @param valor cadena a analizar para obtener la fecha .
+	 * @param sepFecha separador de ano mes día .
+	 * @param sepHora separador de hora minutos segundos .
+	 * @return cadena en formato yyyyMMdd
+	 */
+	@SuppressWarnings({"checkstyle:magicnumber"})
+	public static Date leeParametroFechaHora(String valor, String sepFecha, String sepHora) {
+		if (valor == null || valor.isBlank()) {
+			return null;
+		}
+		
+		Date dateFecha = null;
+		
+		SimpleDateFormat formatoFecha = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+		
+		try {
+			String[] campos = valor.split(" ");
+			String[] camposFecha = campos[0].split(sepFecha);
+			String strFecha = camposFecha[2] + "-" + camposFecha[1] + "-" + camposFecha[0];
+			
+			if (campos.length > 2) {
+				throw new UVException("Formato de fecha incorrecto");
+			} else if (campos.length == 2) {
+				String[] camposHora = campos[1].split(sepHora);
+				if (camposHora.length == 1) {
+					strFecha += " " + camposHora[0] + ":00:00";
+				} else if (camposHora.length == 2) {
+					strFecha += " " + camposHora[0] + ":" + camposHora[1] + ":00";
+				} else if (camposHora.length == 3) {
+					strFecha += " " + campos[1];
+				}
+			}
+			
+			if (strFecha != null) {
+				dateFecha = formatoFecha.parse(strFecha);
+			}
+		} catch (Exception e) {
+			LOGGER.log(Level.WARNING, e.toString());
+			return null;
+		}
+		
+		return dateFecha;
 	}
 	
 	/** Elimina decimales para el formato de puntuaciones en los resultados .
@@ -431,6 +477,20 @@ public final class BolsaEmpleoUtils {
 		addMensajeDeError(error, bean, request);
 		datos.setRespuestaEnviada(true);
 		response.sendRedirect(ControladorErrorBolsaEmpleo.URL_ERROR);
+	}
+	
+	/** Devuelve un parámetro de multipart form, si no de la sesión y si no, leemos lo que viene del request.
+	 * @param request .
+	 * @param multipart .
+	 * @param param .
+	 * @return .
+	 */
+	public static String getParamRequestOrMultipartOrSession(HttpServletRequest request, HashMap<String, Object> multipart, String param) {
+		if (multipart.keySet().size() > 0 && multipart.containsKey(param)) {
+			return (String) multipart.get(param);
+		}
+		
+		return getParamRequestOrSession(request, param);
 	}
 
 	/**

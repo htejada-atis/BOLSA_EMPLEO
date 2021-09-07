@@ -103,12 +103,25 @@ public class EnviaCorreo {
 	 * @return si se ha enviado correctamente
 	 * @throws Exception si error
 	 */
-	public static boolean enviaCorreoExcepcion(String emisor, ArrayList<String> destinatarios, ArrayList<String> conCopia, ArrayList<String> conCopiaOculta, String replyTo, String asunto, String cuerpo) throws Exception {
+	public static boolean enviaCorreoExcepcion(String emisor, ArrayList<String> destinatarios, ArrayList<String> conCopia, 
+			ArrayList<String> conCopiaOculta, String replyTo, String asunto, String cuerpo) throws Exception {
 		
 		return enviaCorreoExcepcionList(emisor, destinatarios, conCopia, conCopiaOculta, replyTo, asunto, cuerpo);
 	}
 	
-	public static boolean enviaCorreoExcepcionList(String emisor, List<String> destinatarios, List<String> conCopia, List<String> conCopiaOculta, String replyTo, String asunto, String cuerpo) throws Exception {
+	/** EnviaCorreo con excepcion en formato list.
+	 * @param emisor .
+	 * @param destinatarios .
+	 * @param conCopia .
+	 * @param conCopiaOculta .
+	 * @param replyTo .
+	 * @param asunto .
+	 * @param cuerpo .
+	 * @return si se ejecutado completo
+	 * @throws Exception si fallo en db
+	 */
+	public static boolean enviaCorreoExcepcionList(String emisor, List<String> destinatarios, List<String> conCopia, 
+			List<String> conCopiaOculta, String replyTo, String asunto, String cuerpo) throws Exception {
 		Session session = Session.getDefaultInstance(fConfiguracion, null);
 		MimeMessage message = new MimeMessage(session);
 		if (emisor == null) {
@@ -259,7 +272,7 @@ public class EnviaCorreo {
 		return resultado;
 	}
 
-	/** envia correo.
+	/** envia correo con adjunto.
 	 * @param remitente remitente
 	 * @param destinatarios destinatarios
 	 * @param asunto asunto
@@ -268,11 +281,11 @@ public class EnviaCorreo {
 	 * @param dataSource datasource
 	 * @return si se ha enviado correntamente
 	 */
-	public static boolean enviaCorreo(String remitente, List<String> destinatarios, String asunto, String cuerpo, String nombreArchivo, DataSource dataSource) {
-		return enviaCorreo(remitente, destinatarios, null, asunto, cuerpo, nombreArchivo, dataSource);  
+	public static boolean enviaCorreoAdjunto(String remitente, List<String> destinatarios, String asunto, String cuerpo, String nombreArchivo, DataSource dataSource) {
+		return enviaCorreoAdjunto(remitente, destinatarios, null, asunto, cuerpo, nombreArchivo, dataSource);  
 	}
 	
-	/** envia correo.
+	/** envia correo en formato html con adjunto .
 	 * @param remitente remitente
 	 * @param destinatarios destinatarios
 	 * @param replyTo reply to
@@ -282,8 +295,39 @@ public class EnviaCorreo {
 	 * @param dataSource datasource
 	 * @return si se ha enviado correctamente
 	 */
-	public static boolean enviaCorreo(String remitente, List<String> destinatarios, String replyTo, 
+	public static boolean enviaCorreoAdjuntoHtml(String remitente, List<String> destinatarios, String replyTo, 
 			String asunto, String cuerpo, String nombreArchivo, DataSource dataSource) {
+		return enviaCorreoAdjunto(remitente, destinatarios, replyTo, asunto, cuerpo, nombreArchivo, dataSource, true);
+	}
+	
+	/** envia correo con adjunto.
+	 * @param remitente remitente
+	 * @param destinatarios destinatarios
+	 * @param replyTo reply to
+	 * @param asunto asunto
+	 * @param cuerpo cuerpo
+	 * @param nombreArchivo nombre archivo
+	 * @param dataSource datasource
+	 * @return si se ha enviado correctamente
+	 */
+	public static boolean enviaCorreoAdjunto(String remitente, List<String> destinatarios, String replyTo, 
+			String asunto, String cuerpo, String nombreArchivo, DataSource dataSource) {
+		return enviaCorreoAdjunto(remitente, destinatarios, replyTo, asunto, cuerpo, nombreArchivo, dataSource, false);
+	}
+
+	/** envia correo con adjunto.
+	 * @param remitente remitente
+	 * @param destinatarios destinatarios
+	 * @param replyTo reply to
+	 * @param asunto asunto
+	 * @param cuerpo cuerpo
+	 * @param nombreArchivo nombre archivo
+	 * @param dataSource datasource
+	 * @param isHtml si se manda en formato html
+	 * @return si se ha enviado correctamente
+	 */
+	private static boolean enviaCorreoAdjunto(String remitente, List<String> destinatarios, String replyTo, 
+			String asunto, String cuerpo, String nombreArchivo, DataSource dataSource, boolean isHtml) {
 		boolean resultado = false;
 		Session session = Session.getDefaultInstance(fConfiguracion, null);
 		
@@ -292,7 +336,11 @@ public class EnviaCorreo {
 			
 			// Crear el cuerpo del mensaje
 			MimeBodyPart textBodyPart = new MimeBodyPart();
-			textBodyPart.setText(cuerpo);
+			if (isHtml) {
+				textBodyPart.setContent(cuerpo, "text/html; charset=utf-8");
+			} else {
+				textBodyPart.setText(cuerpo);
+			}
 			
 			// Crear el archivo
 			MimeBodyPart fileBodyPart = new MimeBodyPart();

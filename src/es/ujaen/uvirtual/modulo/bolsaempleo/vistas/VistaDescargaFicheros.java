@@ -6,6 +6,7 @@ import es.ujaen.uvirtual.modulo.bolsaempleo.beans.BolsaResultado;
 import es.ujaen.uvirtual.modulo.bolsaempleo.beans.Fichero;
 import es.ujaen.uvirtual.modulo.bolsaempleo.beans.Merito;
 import es.ujaen.uvirtual.modulo.bolsaempleo.beans.MeritoPreferenteUsuario;
+import es.ujaen.uvirtual.modulo.bolsaempleo.beans.PlazaOfertada;
 import es.ujaen.uvirtual.modulo.bolsaempleo.beans.Solicitud;
 import es.ujaen.uvirtual.modulo.bolsaempleo.beans.TitulacionUsuario;
 import es.ujaen.uvirtual.modulo.bolsaempleo.beans.UsuarioBolsaEmpleo;
@@ -22,6 +23,7 @@ public class VistaDescargaFicheros extends Vista implements Serializable {
 	private Fichero fichero;
 	private Merito merito;
 	private MeritoPreferenteUsuario acreditacion;
+	private PlazaOfertada plazaOfertada;
 	private Solicitud solicitud;
 	private TitulacionUsuario titulacion;
 	private UsuarioBolsaEmpleo usuarioLogeado;
@@ -89,6 +91,14 @@ public class VistaDescargaFicheros extends Vista implements Serializable {
 
 	public void setBolsaResultado(BolsaResultado bolsaResultado) {
 		this.bolsaResultado = bolsaResultado;
+	}
+
+	public PlazaOfertada getPlazaOfertada() {
+		return plazaOfertada;
+	}
+
+	public void setPlazaOfertada(PlazaOfertada plazaOfertada) {
+		this.plazaOfertada = plazaOfertada;
 	}
 	
 }

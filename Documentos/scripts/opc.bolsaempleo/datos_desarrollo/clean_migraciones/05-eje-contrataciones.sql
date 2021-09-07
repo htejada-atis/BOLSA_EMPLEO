@@ -1,0 +1,7 @@
+DROP TABLE TBEP_HTO_CONTRATACIONES;
+--/////////////////////
+DROP TABLE TBEP_CONTRATACIONES;
+--/////////////////////
+DROP SEQUENCE QBEP_HTO_CNT;
+--/////////////////////
+DROP SEQUENCE QBEP_CNT;

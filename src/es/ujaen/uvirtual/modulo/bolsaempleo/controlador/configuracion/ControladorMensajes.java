@@ -60,6 +60,8 @@ public class ControladorMensajes extends HttpServlet {
 	public static final String PARAM_ENVIAR = "enviar";
 	public static final String PARAM_GUARDAR = "guardar";
 	public static final String PARAM_MENSAJE_ID = "mensaje";
+	public static final String PARAM_NOMBRE = "nombre";
+	public static final String PARAM_PLANTILLA = "plantilla";
 	public static final String PARAM_TITULO = "titulo";
 	
 	// acciones
@@ -160,6 +162,7 @@ public class ControladorMensajes extends HttpServlet {
 			datos.getFicherosJS().add("/js/jquery-ui-1.10.4.min.js");
 			datos.getFicherosJS().add("/js/jquery.ui.datepicker-es.js");
 			datos.getFicherosJS().add(ModeloParametrosConfiguracion.JS_BOLSA_EMPLEO);
+			datos.getFicherosJS().add(ModeloParametrosConfiguracion.JS_TINY);
 			datos.getFicherosCSS().add("/css/intranet.css");
 			datos.getFicherosCSS().add("/css/jqueryujaen/jquery-ui-1.8.16.custom.css");
 			datos.getFicherosCSS().add(ModeloParametrosConfiguracion.CSS_BOLSA_EMPLEO);
@@ -203,6 +206,10 @@ public class ControladorMensajes extends HttpServlet {
 	private void index(VistaMensajes bean) {
 		bean.setVista(JSP_INDEX);
 	}
+	
+	///////////////////////////////////////////////////////////////////////////////////////////////////////////
+	// MENSAJES
+	///////////////////////////////////////////////////////////////////////////////////////////////////////////
 	
 	private void accionesMensaje(VistaMensajes bean, UVDatos datos, HttpServletRequest request, HttpServletResponse response, String nombreAccion)
 			throws IOException, SQLException, UVException {
@@ -263,7 +270,7 @@ public class ControladorMensajes extends HttpServlet {
 			}
 			
 			for (UsuarioBolsaEmpleo destinatario: destinatarios) {
-				modeloMensaje.agregarDestinatario(bean.getMensaje(), destinatario, bean.getUsuarioLogeado());
+				modeloMensaje.agregarDestinatarioUsuario(bean.getMensaje(), destinatario, bean.getUsuarioLogeado());
 			}
 			
 			if (destinatarios.size() > 0) {
@@ -290,23 +297,22 @@ public class ControladorMensajes extends HttpServlet {
 	
 	private void eliminarDestinatarios(VistaMensajes bean, UVDatos datos, HttpServletRequest request, HttpServletResponse response) throws UVException, IOException {
 		ModeloMensajes modeloMensaje = ModeloMensajes.obtenerInstancia();
-		ModeloUsuarioBolsaEmpleo modeloUsuario = ModeloUsuarioBolsaEmpleo.obtenerInstancia();
-		List<UsuarioBolsaEmpleo> destinatarios = null;
+		List<Destinatario> destinatarios = null;
 		try {
 			
 			try {
-				destinatarios = new ArrayList<UsuarioBolsaEmpleo>();
+				destinatarios = new ArrayList<Destinatario>();
 				List<String> idDestinatarios = new GsonBuilder().create().fromJson(request.getParameter(PARAM_DESTINATARIOS),
 						new TypeToken<List<String>>() { }.getType());
 				for (String idDestinatario: idDestinatarios) { 
-					destinatarios.add(modeloUsuario.getUsuarioById(Integer.parseInt(idDestinatario)));
+					destinatarios.add(modeloMensaje.getDestinatarioById(Integer.parseInt(idDestinatario)));
 				}
 			} catch (Exception ex) {
 				throw new UVException(MENSAJE_ERROR_USUARIOS_SELECCIONADOS_INCORRECTOS);
 			}
 			
-			for (UsuarioBolsaEmpleo destinatario: destinatarios) {
-				modeloMensaje.eliminarDestinatario(bean.getMensaje(), destinatario, bean.getUsuarioLogeado());
+			for (Destinatario destinatario: destinatarios) {
+				modeloMensaje.eliminarDestinatario(destinatario, bean.getUsuarioLogeado());
 			}
 			
 			if (destinatarios.size() > 0) {
@@ -470,4 +476,5 @@ public class ControladorMensajes extends HttpServlet {
 		
 		return mensaje;
 	}
+	
 }
