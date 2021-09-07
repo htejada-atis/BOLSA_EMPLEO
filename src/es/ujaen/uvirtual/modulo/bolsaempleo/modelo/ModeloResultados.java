@@ -400,6 +400,48 @@ public class ModeloResultados {
 		return dataTable;
 	}
 	
+	/**
+	 * Devuelve el listado de candidatos resultados para exportar en csv.
+	 * @param bolsa .
+	 * @param convocatoria .
+	 * @return .
+	 * @throws SQLException .
+	 * @throws UVException .
+	 */
+	public List<String[]> listadoResultadosCandidatosAreaCsv(Bolsa bolsa, Convocatoria convocatoria) throws SQLException, UVException {
+		String consulta = "SELECT bepusu.*, bepsob.TOTAL"
+				+ "	FROM TBEP_SOLICITUD_BOLSAS bepsob"
+				+ "	INNER JOIN TBEP_SOLICITUDES bepsol ON bepsol.CODNUM = bepsob.BEPSOL_CODNUM"
+				+ "	INNER JOIN TBEP_USUARIOS bepusu ON bepusu.CODNUM = bepsol.BEPUSU_CODNUM"
+				+ "	WHERE bepsol.BEPCON_CODNUM = ? AND bepsob.BEPBOL_CODNUM = ? AND bepsol.ESTADO = '" + ModeloSolicitud.SOLICITUD_ESTADO_CERRADA + "'";
+		
+		List<String[]> rows = new ArrayList<>();
+		
+		try (Connection conexion = ConexionUvirtual.obtenerInstancia(); PreparedStatement stmt = conexion.prepareStatement(consulta)) {
+			int paramIndex = 1;
+			stmt.setInt(paramIndex++, convocatoria.getCodNum());
+			stmt.setInt(paramIndex++, bolsa.getCodNum());
+			
+			try (ResultSet rs = stmt.executeQuery()) {
+				while (rs.next()) {
+					UsuarioBolsaEmpleo usuario = ModeloUsuarioBolsaEmpleo.obtenerInstancia().getUsuarioById(rs.getInt(CODNUM));
+					
+					rows.add(new String[] {
+						String.format("\"%s\"", usuario.getPrsNif() != null ? usuario.getPrsNif() : ""),
+						String.format("\"%s %s %s\"",
+								usuario.getNombre() != null ? usuario.getNombre() : "",
+								usuario.getPrimerApellido() != null ? usuario.getPrimerApellido() : "",
+								usuario.getSegundoApellido() != null ? usuario.getSegundoApellido() : ""),
+						String.format("\"%s\"", usuario.getEmail() != null ? usuario.getEmail() : ""),
+						String.valueOf(rs.getDouble(TOTAL)),
+					});
+				}
+			}
+		}
+		
+		return rows;
+	}
+	
 	/** Devuelve los méritos validados con valoraciones de la bolsa en una solicitud .
 	 * @param bolsa .
 	 * @param solicitud .
