@@ -4,6 +4,7 @@
  * 
  * 20210621 .form-group-dialog para los inputs en diálogos
  * 20210623 afinidades en validación
+ * 20210909 form-group p para tamaño de texto
  */
 
 :root {
@@ -448,6 +449,10 @@ nav-bolsa-empleo a:active, nav-bolsa-empleo a:hover {
 
 .form-group input, .form-group-dialog input, .form-group-dialog textarea {
 	display: block;
+}
+
+.form-group p {
+	font-size: 1.1em;
 }
 
 .form-check label, .form-check input {

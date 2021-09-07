@@ -5,6 +5,7 @@
 <%@	page import="es.ujaen.uvirtual.modulo.bolsaempleo.controlador.configuracion.ControladorUsuarioBolsaEmpleo"%>
 <%@	page import="es.ujaen.uvirtual.modulo.bolsaempleo.controlador.configuracion.ControladorUsuarioCandidato"%>
 <%@ page import="es.ujaen.uvirtual.modulo.bolsaempleo.vistas.VistaCandidatos"%>
+<%@ page import="es.ujaen.uvirtual.modulo.bolsaempleo.modelo.ModeloEstadoCandidato" %>
 <%@ page import="es.ujaen.uvirtual.modulo.bolsaempleo.modelo.ModeloConvocatoria" %>
 <%@ page import="es.ujaen.uvirtual.modulo.bolsaempleo.modelo.ModeloSolicitud" %>
 <%@	page import="es.ujaen.uvirtual.modulo.bolsaempleo.beans.ApartadoBaremacion" %>
@@ -13,6 +14,7 @@
 <%@ page import="es.ujaen.uvirtual.utilidades.EscapaHTML" %>
 <%@ page import="es.ujaen.uvirtual.utilidades.Formateador"%>
 <%@ page import="java.util.Date"%>
+<%@ page import="java.util.Map.Entry" %>
 
 <% 
 UVDatos uvdatos = (UVDatos) request.getAttribute(UVDatos.NOMBRE_ATRIBUTO);
@@ -22,7 +24,7 @@ UsuarioBolsaEmpleo candidato = bean.getCandidato();
 
 
 <div class="bolsa-empleo usuarios-form">
-
+	
 	<jsp:include page="/WEB-INF/jsp/vista/infadministrativa/bolsaempleo/mensajes.jsp" />
 
 	<%
@@ -212,27 +214,27 @@ UsuarioBolsaEmpleo candidato = bean.getCandidato();
     	</div>
     	
     </form>
-    
-    <ul class="nav-tabs-widget" style="margin-left: 0px; margin-top: 16px;">
-    	<li <%= bean.getApartadoAreasExcluidas() != null ? "class='tab-selected'" : "" %>>
-   	    	<a id="areas_excluidas">Áreas excluidas</a>
-   	    </li>
-   	    <li <%= bean.getApartadoSolicitudes() != null ? "class='tab-selected'" : "" %>>
-   			<a id="solicitudes">Solicitudes</a>
-   		</li>
-   		<li <%= bean.getApartadoMeritos() != null ? "class='tab-selected'" : "" %>>
-   			<a id="meritos">Méritos</a>
-   		</li>
-   		<li <%= bean.getApartadoTitulaciones() != null ? "class='tab-selected'" : "" %>>
-   			<a id="titulaciones">Titulaciones</a>
-   		</li>
-   		<li <%= bean.getApartadoAcreditaciones() != null ? "class='tab-selected'" : "" %>>
-   			<a id="acreditaciones">Acreditaciones</a>
-   		</li>
-   		<li <%= bean.getApartadoComunicaciones() != null ? "class='tab-selected'" : "" %>>
-   			<a id="comunicaciones">Comunicaciones</a>
-   		</li>
-   	</ul>
+	
+	<ul class="nav-tabs-widget" style="margin-left: 0px; margin-top: 16px;">
+		<li <%= bean.getApartadoAreasExcluidas() != null ? "class='tab-selected'" : "" %>>
+			<a id="areas_excluidas">Áreas excluidas</a>
+		</li>
+		<li <%= bean.getApartadoSolicitudes() != null ? "class='tab-selected'" : "" %>>
+			<a id="solicitudes">Solicitudes</a>
+		</li>
+		<li <%= bean.getApartadoMeritos() != null ? "class='tab-selected'" : "" %>>
+			<a id="meritos">Méritos</a>
+		</li>
+		<li <%= bean.getApartadoTitulaciones() != null ? "class='tab-selected'" : "" %>>
+			<a id="titulaciones">Titulaciones</a>
+		</li>
+		<li <%= bean.getApartadoAcreditaciones() != null ? "class='tab-selected'" : "" %>>
+			<a id="acreditaciones">Acreditaciones</a>
+		</li>
+		<li <%= bean.getApartadoContrataciones() != null ? "class='tab-selected'" : "" %>>
+			<a id="contrataciones">Contrataciones</a>
+		</li>
+	</ul>
 
 
 <%	if (bean.getApartadoAreasExcluidas() != null) { %>
@@ -352,8 +354,23 @@ UsuarioBolsaEmpleo candidato = bean.getCandidato();
 
 <%	} %>
 	
-<%	if (bean.getApartadoComunicaciones() != null) { %>
-	
+<%	if (bean.getApartadoContrataciones() != null) { %>
+		
+		<table class="bluetable bolsaempleo" id="tableContrataciones">
+			<tr>
+				<th scope="col"	style="width:15px"></th>
+				<th scope="col" style="width:100%">Área</th>
+				<th scope="col" style="width:75px">Estado</th>
+				<th scope="col"	style="width:12%">Plaza</th>
+			</tr>
+			<tbody>
+			</tbody>
+			<tfoot>
+				<tr>
+					<th colspan="4" style="width:100%"></th>
+				</tr>
+			</tfoot>
+		</table>
 		
 <%	} %>
 
@@ -432,9 +449,9 @@ UsuarioBolsaEmpleo candidato = bean.getCandidato();
 			});
 		});
 		
-		document.getElementById("comunicaciones").addEventListener("click", function(event) {
+		document.getElementById("contrataciones").addEventListener("click", function(event) {
 			Atis.sendForm("<%= request.getRequestURI() %>", {
-				'<%=ControladorUsuarioCandidato.PARAM_ACCION%>': '',
+				'<%=ControladorUsuarioCandidato.PARAM_ACCION%>': '<%=ControladorUsuarioCandidato.ACCION_CONTRATACIONES_CANDIDATO%>',
 				'<%=ControladorUsuarioCandidato.PARAM_CANDIDATO%>': <%= codnum %>
 			});
 		});
@@ -641,6 +658,80 @@ UsuarioBolsaEmpleo candidato = bean.getCandidato();
 			}
 		
 			Atis.smoothScrollToAnchor("#areas_excluidas");
+	<%	} %>
+	
+	<%	if (bean.getApartadoContrataciones() != null) { %>
+			
+			function cambiarEstado(bolsas) {
+				console.log("entra 1");
+				var mensaje = "<p>Se cambiará el estado seleccionado en el candidato para las bolsas<br/>previamente seleccionadas.</p>"
+				mensaje += "<br/>";
+				mensaje += " <div class='form-group-container col1'>";
+				mensaje += "     <div class='form-group-dialog'>";
+				mensaje += "         <label class='bold-label' for='select_estado_candidato'>Estado: </label>";
+				mensaje += "         <select id='select_estado_candidato' required>";
+				
+			<%	for (Entry<String, String> estado: ModeloEstadoCandidato.ESTADOS.entrySet()) { %>
+					mensaje += "<option value='<%= estado.getKey() %>'><%= estado.getValue() %></option>";
+			<%	} %>
+				
+				mensaje += "         </select>";
+				mensaje += "     </div>";
+				mensaje += " </div>";
+				
+				Atis.confirmDialog("Cambiar estado del candidato", mensaje, {
+					'Si': function() {
+						var selectEstado = this.querySelector('#select_estado_candidato');
+						
+						var params = {
+								"<%= ControladorUsuarioCandidato.PARAM_ACCION %>": "<%= ControladorUsuarioCandidato.ACCION_CAMBIAR_ESTADO_CANDIDATO %>",
+								"<%= ControladorUsuarioCandidato.PARAM_CANDIDATO %>": <%= bean.getCandidato().getCodNum() %>,
+								"<%= ControladorUsuarioCandidato.PARAM_BOLSAS %>": Atis.object2Json(bolsas),
+								"<%= ControladorUsuarioCandidato.PARAM_ESTADO %>": selectEstado.value
+						};
+						Atis.sendForm("<%= request.getRequestURI() %>", params);
+						$(this).dialog("close");
+					},
+					'No': function() {
+						$(this).dialog("close");
+					}
+				});
+			}
+			
+			var estadosCandidato = {};
+		<%	for (Entry<String, String> est: ModeloEstadoCandidato.ESTADOS.entrySet()) { %>
+				estadosCandidato["<%= est.getKey() %>"] = "<%= est.getValue() %>";
+		<%	} %>
+			
+			var tableContrataciones = new Atis.DataTable('#tableContrataciones', {
+				"ajax": { url: "<%=ControladorUsuarioCandidato.URL_PATTERN_AJAX%>"},
+				"action": "<%= ControladorUsuarioCandidato.ACCION_DATATABLE_ESTADOS_CANDIDATO %>",
+				"params": {"<%=ControladorUsuarioCandidato.PARAM_CANDIDATO%>": <%= candidato.getCodNum() %>},
+				"selectable": true,
+				"pageSize": 10,
+				"filterable": true,
+				"title": 'LISTADO DE ESTADOS DEL CANDIDATO',
+				"columns": [
+					{'data': 'bolsa.codNum', 'selectable': true},
+					{'data': 'bolsa.area.descripcion', 'filter': true},
+					{'data': 'estado', 'render': function(row) {
+						return row.codNumEstado != 0 ? row.estado : '<%= ModeloEstadoCandidato.ESTADO_DISPONIBLE %>';
+					}, 'filter': {'type': 'select', 'options': estadosCandidato}},
+					{'data': 'plaza' , 'render': function(row) {
+						return row.plaza != null ? row.plaza.codNum : '';
+					}, 'filter': {'type': 'number'}}
+				],
+				"actions": [
+					{'label': 'Cambiar estado', 'onClick': function(selected) {
+							if (selected.length > 0) {
+								cambiarEstado(selected);
+							}
+						}
+					},
+				]
+			});
+			
+			Atis.smoothScrollToAnchor("#contrataciones");
 	<%	} %>
 		
 		function getTodayDate() {

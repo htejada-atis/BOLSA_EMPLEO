@@ -21,8 +21,14 @@ import es.ujaen.uvirtual.utilidades.UVException;
  */
 public class ModeloParametrosConfiguracion {
 	public static final String VERSION = "0.64";
-	public static final String JS_BOLSA_EMPLEO = "/js/bolsaempleo/bolsaempleo20210715.js.min";
+	public static final String JS_BOLSA_EMPLEO = "/js/bolsaempleo/bolsaempleo20210715.min.js";
 	public static final String CSS_BOLSA_EMPLEO = "/css/ujaen_bolsa_empleo.css";
+	public static final String JS_TINY = "/js/tinymce/tinymce.min.js";
+	
+	public static final String PARAMETRO_PLANTILLA_APERTURA_PLAZA = "bolsaempleo.local.idPlantillaAperturaPlaza";
+	public static final String PARAMETRO_PLANTILLA_CITA_CONTRATACION = "bolsaempleo.local.idPlantillaCitaContratacion";
+	public static final String PARAMETRO_PLANTILLA_CIERRE_PLAZA = "bolsaempleo.local.idPlantillaCierrePlaza";
+	public static final String PARAMETRO_EMAILS_CIERRE_PLAZA = "bolsaempleo.local.emailsCierrePlaza";
 
 	// 50MB = 1024 * 1024 * 50 = 52428800
 	public static final int MAX_FILE_SIZE = 52_428_800;

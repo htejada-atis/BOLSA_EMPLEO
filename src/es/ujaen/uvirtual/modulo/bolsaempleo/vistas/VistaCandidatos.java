@@ -9,6 +9,7 @@ import es.ujaen.uvirtual.modulo.bolsaempleo.beans.ApartadoBaremacion;
 import es.ujaen.uvirtual.modulo.bolsaempleo.beans.Area;
 import es.ujaen.uvirtual.modulo.bolsaempleo.beans.Bolsa;
 import es.ujaen.uvirtual.modulo.bolsaempleo.beans.BolsaSolicitud;
+import es.ujaen.uvirtual.modulo.bolsaempleo.beans.CandidatoEstado;
 import es.ujaen.uvirtual.modulo.bolsaempleo.beans.Merito;
 import es.ujaen.uvirtual.modulo.bolsaempleo.beans.MeritoPreferenteUsuario;
 import es.ujaen.uvirtual.modulo.bolsaempleo.beans.Solicitud;
@@ -34,12 +35,13 @@ public class VistaCandidatos extends Vista implements Serializable {
 	private transient BolsaEmpleoDataTable<Merito> dataTableMeritos;
 	private transient BolsaEmpleoDataTable<Solicitud> dataTableSolicitudes;
 	private transient BolsaEmpleoDataTable<TitulacionUsuario> dataTableTitulaciones;
-	private Boolean apartadoAreasExcluidas;
-	private Boolean apartadoSolicitudes;
-	private Boolean apartadoMeritos;
-	private Boolean apartadoTitulaciones;
+	private transient BolsaEmpleoDataTable<CandidatoEstado> dataTableEstadosCandidato;
 	private Boolean apartadoAcreditaciones;
-	private Boolean apartadoComunicaciones;
+	private Boolean apartadoAreasExcluidas;
+	private Boolean apartadoContrataciones;
+	private Boolean apartadoMeritos;
+	private Boolean apartadoSolicitudes;
+	private Boolean apartadoTitulaciones;
 	private String codigoPadreMeritoPreferente;
 	private String vista;
 	private UsuarioBolsaEmpleo usuarioLogeado;
@@ -106,14 +108,6 @@ public class VistaCandidatos extends Vista implements Serializable {
 
 	public Boolean getApartadoMeritos() {
 		return apartadoMeritos;
-	}
-
-	public void setApartadoComunicaciones(Boolean apartadoComunicaciones) {
-		this.apartadoComunicaciones = apartadoComunicaciones;
-	}
-
-	public Boolean getApartadoComunicaciones() {
-		return apartadoComunicaciones;
 	}
 
 	public List<Area> getListaAreas() {
@@ -202,5 +196,21 @@ public class VistaCandidatos extends Vista implements Serializable {
 
 	public void setApartados(List<ApartadoBaremacion> apartados) {
 		this.apartados = apartados;
+	}
+
+	public Boolean getApartadoContrataciones() {
+		return apartadoContrataciones;
+	}
+
+	public void setApartadoContrataciones(Boolean apartadoContrataciones) {
+		this.apartadoContrataciones = apartadoContrataciones;
+	}
+
+	public BolsaEmpleoDataTable<CandidatoEstado> getDataTableEstadosCandidato() {
+		return dataTableEstadosCandidato;
+	}
+
+	public void setDataTableEstadosCandidato(BolsaEmpleoDataTable<CandidatoEstado> dataTableEstadosCandidato) {
+		this.dataTableEstadosCandidato = dataTableEstadosCandidato;
 	}
 }

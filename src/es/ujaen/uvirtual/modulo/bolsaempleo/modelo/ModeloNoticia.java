@@ -9,7 +9,6 @@ import java.sql.Types;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-
 import es.ujaen.uvirtual.modelo.conexion.ConexionUvirtual;
 import es.ujaen.uvirtual.modulo.bolsaempleo.beans.Noticia;
 import es.ujaen.uvirtual.modulo.bolsaempleo.beans.UsuarioBolsaEmpleo;
@@ -208,7 +207,7 @@ public class ModeloNoticia {
 	 * @throws UVException  en caso de error de parametros .
 	 */
 	public List<Noticia> listaNoticiasInicioRestantes(List<String> noticiasExcluidas, boolean anonimo)
-			throws SQLException, UVException {
+			throws SQLException {
 		List<Noticia> noticias = new ArrayList<>();
 		String params = BolsaEmpleoUtils.consultaMultiplesParametros(noticiasExcluidas.size());
 		String consulta = "SELECT n.* FROM tbep_noticias n WHERE codnum NOT IN (" + params + ") "
@@ -295,7 +294,7 @@ public class ModeloNoticia {
 			int parameterIndex = 1;
 			stmt.setString(parameterIndex++, Boolean.TRUE.equals(noticia.isActiva()) ? ACTIVA : INACTIVA);
 			stmt.setString(parameterIndex++, usuario.getCodCuenta());
-			stmt.setInt(parameterIndex++, noticia.getCodNum());			
+			stmt.setInt(parameterIndex++, noticia.getCodNum());
 			stmt.executeUpdate();
 		}
 	}
@@ -333,7 +332,7 @@ public class ModeloNoticia {
 			stmt.setDate(parameterIndex++, new Date(noticia.getFecha().getTime()));
 			stmt.setString(parameterIndex++, Boolean.TRUE.equals(noticia.isPublica()) ? PUBLICA : PRIVADA);
 			stmt.setString(parameterIndex++, usuario.getCodCuenta());
-			stmt.setInt(parameterIndex++, noticia.getCodNum());			
+			stmt.setInt(parameterIndex++, noticia.getCodNum());
 			stmt.executeUpdate();
 		}
 	}

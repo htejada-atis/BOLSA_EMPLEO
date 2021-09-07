@@ -15,7 +15,7 @@ VistaMensajes bean = (VistaMensajes) uvdatos.getVistas().get(VistaMensajes.class
 	
 	<div class="titulo-bolsa-empleo">
 		<h2>Mensajes</h2>
-		<button class="link-btn" id="nuevo_mensaje">Nuevo mensaje</button>
+		<button class="link-btn" id="nuevo_mensaje" style="margin-left: 4px">Nuevo mensaje</button>
 	</div>
 	
 	<table class="bluetable bolsaempleo" id="tableMensajes">
@@ -38,6 +38,11 @@ VistaMensajes bean = (VistaMensajes) uvdatos.getVistas().get(VistaMensajes.class
 	
 <script>
 $(document).ready(function() {
+	
+	tinymce.init({
+		selector: 'textarea'
+	});
+	
 	document.getElementById('nuevo_mensaje').addEventListener("click", function(event) {
 		event.preventDefault();
 		Atis.sendForm("<%= request.getRequestURI() %>", {'<%= ControladorMensajes.PARAM_ACCION %>': '<%= ControladorMensajes.ACCION_NUEVO_MENSAJE %>'});

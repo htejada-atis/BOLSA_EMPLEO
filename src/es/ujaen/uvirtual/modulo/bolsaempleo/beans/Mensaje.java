@@ -1,5 +1,6 @@
 package es.ujaen.uvirtual.modulo.bolsaempleo.beans;
 
+import java.io.InputStream;
 import java.io.Serializable;
 import java.util.Date;
 
@@ -17,6 +18,7 @@ public class Mensaje implements Serializable {
 	private String cuerpo;
 	private Date fechaCreacion;
 	private String estado;
+	private transient InputStream adjunto;
 
 	/**
 	 * Constructor por defecto.
@@ -28,6 +30,7 @@ public class Mensaje implements Serializable {
 		this.cuerpo = "";
 		this.fechaCreacion = BolsaEmpleoUtils.getCurrentDateTime();
 		this.estado = "N";
+		this.adjunto = null;
 	}
 
 	/**
@@ -47,6 +50,20 @@ public class Mensaje implements Serializable {
 		this.fechaCreacion = pfechaCreacion;
 		this.estado = pestado;
 	}
+	
+	/** Constructor con parametros.
+	 * @param ptitulo .
+	 * @param pcuerpo .
+	 * @param pfechaCreacion .
+	 * @param pestado .
+	 */
+	public Mensaje(String ptitulo, String pcuerpo, Date pfechaCreacion, String pestado) {
+		super();
+		this.titulo = ptitulo;
+		this.cuerpo = pcuerpo;
+		this.fechaCreacion = pfechaCreacion;
+		this.estado = pestado;
+	}
 
 	/**
 	 * Constructor copia.
@@ -59,6 +76,7 @@ public class Mensaje implements Serializable {
 		this.cuerpo = copia.cuerpo;
 		this.fechaCreacion = copia.fechaCreacion;
 		this.estado = copia.estado;
+		this.adjunto = copia.adjunto;
 	}
 
 	public Integer getCodNum() {
@@ -101,6 +119,14 @@ public class Mensaje implements Serializable {
 		return this.estado;
 	}
 	
+	public InputStream getAdjunto() {
+		return adjunto;
+	}
+
+	public void setAdjunto(InputStream adjunto) {
+		this.adjunto = adjunto;
+	}
+	
 	public static long getSerialversionuid() {
 		return serialVersionUID;
 	}
@@ -108,7 +134,7 @@ public class Mensaje implements Serializable {
 	@Override
 	public String toString() {
 		return "Mensaje [codNum=" + codNum + ", titulo=" + titulo + ", cuerpo=" + cuerpo + ", fechaCreacion=" 
-				+ fechaCreacion + ", estado=" + estado + "]";
+				+ fechaCreacion + ", estado=" + estado + ", adjunto=" + adjunto + "]";
 	}
 
 	@Override
@@ -120,6 +146,7 @@ public class Mensaje implements Serializable {
 		result = prime * result + ((cuerpo == null) ? 0 : cuerpo.hashCode());
 		result = prime * result + ((fechaCreacion == null) ? 0 : fechaCreacion.hashCode());
 		result = prime * result + ((estado == null) ? 0 : estado.hashCode());
+		result = prime * result + ((adjunto == null) ? 0 : adjunto.hashCode());
 		return result;
 	}
 
@@ -171,7 +198,15 @@ public class Mensaje implements Serializable {
 		} else if (!estado.equals(other.estado)) {
 			return false;
 		}
+		if (adjunto == null) {
+			if (other.adjunto != null) {
+				return false;
+			}
+		} else if (!adjunto.equals(other.adjunto)) {
+			return false;
+		}
 
 		return true;
 	}
+	
 }

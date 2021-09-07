@@ -1,0 +1,7 @@
+DROP TABLE TBEP_HTO_ESTADO_CANDIDATOS;
+--/////////////////////
+DROP TABLE TBEP_ESTADO_CANDIDATOS;
+--/////////////////////
+DROP SEQUENCE QBEP_HTO_ESC;
+--/////////////////////
+DROP SEQUENCE QBEP_ESC;

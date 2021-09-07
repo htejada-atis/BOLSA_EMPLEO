@@ -22,6 +22,7 @@ import es.ujaen.uvirtual.beans.Usuario;
 import es.ujaen.uvirtual.modulo.bolsaempleo.beans.Area;
 import es.ujaen.uvirtual.modulo.bolsaempleo.beans.Bolsa;
 import es.ujaen.uvirtual.modulo.bolsaempleo.beans.BolsaSolicitud;
+import es.ujaen.uvirtual.modulo.bolsaempleo.beans.CandidatoEstado;
 import es.ujaen.uvirtual.modulo.bolsaempleo.beans.Merito;
 import es.ujaen.uvirtual.modulo.bolsaempleo.beans.MeritoPreferenteUsuario;
 import es.ujaen.uvirtual.modulo.bolsaempleo.beans.ParametrosConfiguracion;
@@ -31,6 +32,8 @@ import es.ujaen.uvirtual.modulo.bolsaempleo.beans.UsuarioBolsaEmpleo;
 import es.ujaen.uvirtual.modulo.bolsaempleo.informes.GenerarSolicitudPDF;
 import es.ujaen.uvirtual.modulo.bolsaempleo.modelo.ModeloArea;
 import es.ujaen.uvirtual.modulo.bolsaempleo.modelo.ModeloBaremacionApartados;
+import es.ujaen.uvirtual.modulo.bolsaempleo.modelo.ModeloBolsa;
+import es.ujaen.uvirtual.modulo.bolsaempleo.modelo.ModeloEstadoCandidato;
 import es.ujaen.uvirtual.modulo.bolsaempleo.modelo.ModeloMerito;
 import es.ujaen.uvirtual.modulo.bolsaempleo.modelo.ModeloMeritosPreferentesCandidato;
 import es.ujaen.uvirtual.modulo.bolsaempleo.modelo.ModeloMisTitulaciones;
@@ -66,7 +69,9 @@ public class ControladorUsuarioCandidato extends HttpServlet {
 	public static final String PARAM_ACCION = "a";
 	public static final String PARAM_ACCION_USUARIO = "aa";
 	public static final String PARAM_AREAS_SELECCIONADAS = "usuariosselected";
+	public static final String PARAM_BOLSAS = "bolsas";
 	public static final String PARAM_CANDIDATO = "candidato";
+	public static final String PARAM_ESTADO = "estado";
 	public static final String PARAM_EXCLUIDO = "excluido";
 	public static final String PARAM_EXCLUIDO_TIPO = "excluidotipo";
 	public static final String PARAM_FECHA_EXCLUIDO_INICIO = "fechaexcluidoinicio";
@@ -83,10 +88,13 @@ public class ControladorUsuarioCandidato extends HttpServlet {
 	// acciones
 	public static final String ACCION_ACREDITACIONES_CANDIDATO = "acreditacionescandidato";
 	public static final String ACCION_AREAS_EXCLUIDAS_CANDIDATO = "areasexcluidascandidato";
+	public static final String ACCION_CAMBIAR_ESTADO_CANDIDATO = "cambiarestadocandidato";
 	public static final String ACCION_CONFIRMAR_SOLICITUD = "confirmarsolicitud";
+	public static final String ACCION_CONTRATACIONES_CANDIDATO = "contratacionescandidato";
 	public static final String ACCION_DATATABLE_ACREDITACIONES_CANDIDATO = "datatableacreditacionescandidato";
 	public static final String ACCION_DATATABLE_AREAS_EXCLUIDAS_CANDIDATO = "datatableusuariosexcluidoscandidato";
 	public static final String ACCION_DATATABLE_AREAS_NO_EXCLUIDAS_CANDIDATO = "datatableareasnoexcluidascandidato";
+	public static final String ACCION_DATATABLE_ESTADOS_CANDIDATO = "datatableestadoscandidato";
 	public static final String ACCION_DATATABLE_MERITOS_CANDIDATO = "datatablemeritoscandidato";
 	public static final String ACCION_DATATABLE_SOLICITUDES = "datatablesolicitudes";
 	public static final String ACCION_DATATABLE_TITULACIONES_CANDIDATO = "datatabletitulacionescandidato";
@@ -108,12 +116,13 @@ public class ControladorUsuarioCandidato extends HttpServlet {
 	public static final String ACCION_INCLUIR_SOLICITUD = "incluirsolicitudcandidato";
 	
 	// mensajes
-	public static final String MENSAJE_ERROR_INCLUIR_AREAS = "Error al borrar áreas excluidas";
 	public static final String MENSAJE_ERROR_ACCION_NO_CONTEMPLADA = "Acción no contemplada";
+	public static final String MENSAJE_ERROR_BOLSAS_SELECCIONADAS_INCORRECTAS = "No hay bolsas seleccionadas válidas";
 	public static final String MENSAJE_ERROR_EXCLUIDO_TIPO_VACIO = "El tipo de exclusión no puede estar vacio";
 	public static final String MENSAJE_ERROR_EXCLUIR_AREAS = "Error al excluir áreas";
 	public static final String MENSAJE_ERROR_FECHA_EXCLUIDO_INICIO_REQUERIDA = "La fecha de inicio es requerida";
 	public static final String MENSAJE_ERROR_FECHA_EXCLUIDO_FIN_REQUERIDA = "La fecha de fin es requerida";
+	public static final String MENSAJE_ERROR_INCLUIR_AREAS = "Error al borrar áreas excluidas";
 	public static final String MENSAJE_ERROR_RAZON_EXCLUSION_LARGO = "La razón de exclusión no puede contener mas de %d caracteres";
 	public static final String MENSAJE_ERROR_RAZON_EXCLUSION_VACIO = "Si excluye al usuario, debe especificar una razón";
 	public static final String MENSAJE_ERROR_USUARIO_NO_EXISTE = "No existe el usuario";
@@ -127,6 +136,7 @@ public class ControladorUsuarioCandidato extends HttpServlet {
 	public static final String MENSAJE_EXITO_AREAS_INCLUIDAS = "Áreas excluidas borrada correctamente para el candidato: %s";
 	public static final String MENSAJE_EXITO_AREA_INCLUIDA = "Área excluida borrada correctamente para el candidato: %s";
 	public static final String MENSAJE_EXITO_EDITAR = "Usuario editado correctamente";
+	public static final String MENSAJE_EXITO_ESTADO_CAMBIADO = "El estado se ha modificado correctamente";
 	public static final String MENSAJE_EXITO_ELIMINAR = "Usuario eliminado correctamente";
 	public static final String MENSAJE_EXITO_REABRIR_SOLICITUD = "Solicitud reabrierta correctamente";
 	public static final String MENSAJE_EXITO_RESTAURAR = "Usuario restaurado correctamente";
@@ -171,10 +181,13 @@ public class ControladorUsuarioCandidato extends HttpServlet {
 			switch (nombreAccion) {
 				case ACCION_ACREDITACIONES_CANDIDATO:
 				case ACCION_AREAS_EXCLUIDAS_CANDIDATO:
+				case ACCION_CAMBIAR_ESTADO_CANDIDATO:
 				case ACCION_CONFIRMAR_SOLICITUD:
+				case ACCION_CONTRATACIONES_CANDIDATO:
 				case ACCION_DATATABLE_ACREDITACIONES_CANDIDATO:
 				case ACCION_DATATABLE_AREAS_EXCLUIDAS_CANDIDATO:
 				case ACCION_DATATABLE_AREAS_NO_EXCLUIDAS_CANDIDATO:
+				case ACCION_DATATABLE_ESTADOS_CANDIDATO:
 				case ACCION_DATATABLE_MERITOS_CANDIDATO:
 				case ACCION_DATATABLE_SOLICITUDES:
 				case ACCION_DATATABLE_TITULACIONES_CANDIDATO:
@@ -269,6 +282,12 @@ public class ControladorUsuarioCandidato extends HttpServlet {
 			case ACCION_AREAS_EXCLUIDAS_CANDIDATO:
 				bean.setApartadoAreasExcluidas(true);
 				break;
+			case ACCION_CAMBIAR_ESTADO_CANDIDATO:
+				cambiarEstadoCandidato(bean, datos, request, response);
+				break;
+			case ACCION_CONTRATACIONES_CANDIDATO:
+				bean.setApartadoContrataciones(true);
+				break;
 			case ACCION_DATATABLE_ACREDITACIONES_CANDIDATO:
 				listadoAcreditacionesCandidato(bean, datos, request, response);
 				break;
@@ -277,6 +296,9 @@ public class ControladorUsuarioCandidato extends HttpServlet {
 				break;
 			case ACCION_DATATABLE_AREAS_NO_EXCLUIDAS_CANDIDATO:
 				listadoAreasNoExcluidasCandidato(bean, datos, request, response);
+				break;
+			case ACCION_DATATABLE_ESTADOS_CANDIDATO:
+				listadoEstadosCandidato(bean, datos, request, response);
 				break;
 			case ACCION_DATATABLE_MERITOS_CANDIDATO:
 				listadoMeritosCandidato(bean, datos, request, response);
@@ -414,6 +436,30 @@ public class ControladorUsuarioCandidato extends HttpServlet {
 		
 		BolsaEmpleoUtils.addMensajeDeExito(MENSAJE_EXITO_SOLICITUD_CONFIRMADA, bean, request);
 		redireccionConSolicitudSeleccionada(bean, datos, request, response, ACCION_SELECCIONAR_SOLICITUD);
+	}
+	
+	private void cambiarEstadoCandidato(VistaCandidatos bean, UVDatos datos, HttpServletRequest request, HttpServletResponse response)
+			throws SQLException, UVException, IOException {
+		String selectedJson = EscapaHTML.ajustaCodificacion(request.getParameter(PARAM_BOLSAS));
+		String estado = EscapaHTML.ajustaCodificacion(request.getParameter(PARAM_ESTADO));
+		
+		int[] selected;
+		List<Bolsa> bolsas;
+		
+		try {
+			selected = (new Gson()).fromJson(selectedJson, new TypeToken<int[]>() { }.getType());
+			bolsas = ModeloBolsa.obtenerInstancia().getBolsasByIds(selected);
+		} catch (Exception ex) {
+			throw new UVException(MENSAJE_ERROR_BOLSAS_SELECCIONADAS_INCORRECTAS);
+		}
+		
+		ModeloEstadoCandidato.obtenerInstancia().cambiarEstadosCandidato(bean.getCandidato(), estado, bolsas, bean.getUsuarioLogeado());
+		BolsaEmpleoUtils.addMensajeDeExito(MENSAJE_EXITO_ESTADO_CAMBIADO, bean, request);
+		
+		Map<String, String> params = new HashMap<>();
+		params.put(PARAM_ACCION, ACCION_CONTRATACIONES_CANDIDATO);
+		params.put(PARAM_CANDIDATO, bean.getCandidato().getCodNum().toString());
+		BolsaEmpleoUtils.redirectWithParams(datos, request, response, params);
 	}
 	
 	/** edita un candidato .
@@ -795,6 +841,34 @@ public class ControladorUsuarioCandidato extends HttpServlet {
 				BolsaEmpleoDataTable<TitulacionUsuario> dataTable = ModeloMisTitulaciones.obtenerInstancia().
 						listaTitulacionesCandidatoDatatable(request.getParameterMap(), bean.getCandidato());
 				bean.setDataTableTitulaciones(dataTable);
+				writer.write(dataTable.toJson());
+			} catch (UVException | SQLException e) {
+				if (e instanceof SQLException) {
+					LOGGER.log(Level.SEVERE, Formateador.getStackTrace(e));
+					LOGGER.log(Level.SEVERE, e.toString());
+				} else {
+					LOGGER.log(Level.WARNING, e.toString());
+				}
+				bean.getMensajesDeError().add(e.getMessage());
+				CodigoDescripcion mensaje = new CodigoDescripcion(RESPONSE_AJAX_ERROR, e.getMessage());
+				writer.write(new Gson().toJson(mensaje));
+				response.setStatus(RESPONSE_AJAX_HTTP_CODE_ERROR);
+			}
+		}
+	}
+	
+	private void listadoEstadosCandidato(VistaCandidatos bean, UVDatos datos, HttpServletRequest request, HttpServletResponse response)
+			throws IOException {
+		datos.setContentType(RESPONSE_AJAX_CONTENTTYPE);
+		datos.setRespuestaEnviada(true);
+		response.setContentType(RESPONSE_AJAX_CONTENTTYPE);
+		response.setCharacterEncoding(RESPONSE_AJAX_ENCODING);
+		
+		try (PrintWriter writer = response.getWriter()) {
+			try {
+				BolsaEmpleoDataTable<CandidatoEstado> dataTable = ModeloEstadoCandidato.obtenerInstancia().
+						listaEstadosCandidato(request.getParameterMap(), bean.getCandidato());
+				bean.setDataTableEstadosCandidato(dataTable);
 				writer.write(dataTable.toJson());
 			} catch (UVException | SQLException e) {
 				if (e instanceof SQLException) {

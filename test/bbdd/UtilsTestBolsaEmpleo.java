@@ -79,13 +79,13 @@ public final class UtilsTestBolsaEmpleo {
 	
 			// mocks esquema rrhh
 			UtilsTestBolsaEmpleo.ejecutarMultiplesScripts("MOCKS RRHH", "Documentos/scripts/opc.bolsaempleo/mock_rrhh", ESQUEMA_RRHH, false);
-	
-			// limpieza uvirtual
-			UtilsTestBolsaEmpleo.ejecutarMultiplesScripts("UVIRTUAL CLEAN", "Documentos/scripts/opc.bolsaempleo/datos_desarrollo/clean", ESQUEMA_UVIRTUAL, true);
 			
 			// limpieza migraciones uvirtual
 			UtilsTestBolsaEmpleo.ejecutarMultiplesScripts("UVIRTUAL CLEAN MIGRACIONES",
 					"Documentos/scripts/opc.bolsaempleo/datos_desarrollo/clean_migraciones", ESQUEMA_UVIRTUAL, true);
+	
+			// limpieza uvirtual
+			UtilsTestBolsaEmpleo.ejecutarMultiplesScripts("UVIRTUAL CLEAN", "Documentos/scripts/opc.bolsaempleo/datos_desarrollo/clean", ESQUEMA_UVIRTUAL, true);
 	
 			// creación tablas uvirtual
 			UtilsTestBolsaEmpleo.ejecutarMultiplesScripts("UVIRTUAL TABLAS", "Documentos/scripts/opc.bolsaempleo", ESQUEMA_UVIRTUAL, false);
@@ -102,7 +102,7 @@ public final class UtilsTestBolsaEmpleo {
 			
 			// carga de datos para produccion
 			UtilsTestBolsaEmpleo.ejecutarMultiplesScripts("DATOS PRODUCCION", "Documentos/scripts/opc.bolsaempleo/datos_produccion", ESQUEMA_UVIRTUAL, false);
-	
+			
 			// datos para pruebas
 			UtilsTestBolsaEmpleo.ejecutarMultiplesScripts("DATOS PRUEBA", "Documentos/scripts/opc.bolsaempleo/datos_desarrollo/datos_prueba", ESQUEMA_UVIRTUAL, false);
 			cargado = true;
@@ -119,8 +119,21 @@ public final class UtilsTestBolsaEmpleo {
 			BbddRunner.ejecutar("Documentos/scripts/opc.bolsaempleo/migraciones/09-titulacionesacreditacionesresultados.sql");
 			BbddRunner.ejecutar("Documentos/scripts/opc.bolsaempleo/migraciones/10-pesoapartados.sql");
 			BbddRunner.ejecutar("Documentos/scripts/opc.bolsaempleo/migraciones/11-solicitudbolsasmeritostriggers.sql");
+			BbddRunner.ejecutar("Documentos/scripts/opc.bolsaempleo/migraciones/12-dedicaciones.sql");
+			BbddRunner.ejecutar("Documentos/scripts/opc.bolsaempleo/migraciones/13-plazasofertadas.sql");
+			BbddRunner.ejecutar("Documentos/scripts/opc.bolsaempleo/migraciones/14-contrataciones.sql");
+			BbddRunner.ejecutar("Documentos/scripts/opc.bolsaempleo/migraciones/15-ofertascandidatos.sql");
+			BbddRunner.ejecutar("Documentos/scripts/opc.bolsaempleo/migraciones/16-menuscontratacion.sql");
+			BbddRunner.ejecutar("Documentos/scripts/opc.bolsaempleo/migraciones/17-plantillas.sql");
+			BbddRunner.ejecutar("Documentos/scripts/opc.bolsaempleo/migraciones/18-parametrosplantillas.sql");
+			BbddRunner.ejecutar("Documentos/scripts/opc.bolsaempleo/migraciones/19-estadocandidato.sql");
+			BbddRunner.ejecutar("Documentos/scripts/opc.bolsaempleo/migraciones/20-destinatariossinusuario.sql");
+			BbddRunner.ejecutar("Documentos/scripts/opc.bolsaempleo/migraciones/21-mensajesadjunto.sql");
 			BbddRunner.ejecutar("Documentos/scripts/opc.bolsaempleo/datos_desarrollo/datos_prueba_migraciones/01-im-solicitudbolsasmeritos.sql");
 			BbddRunner.ejecutar("Documentos/scripts/opc.bolsaempleo/datos_desarrollo/datos_prueba_migraciones/02-im-prefijomeritospreferentes.sql");
+			BbddRunner.ejecutar("Documentos/scripts/opc.bolsaempleo/datos_desarrollo/datos_prueba_migraciones/03-im-dedicaciones.sql");
+			BbddRunner.ejecutar("Documentos/scripts/opc.bolsaempleo/datos_desarrollo/datos_prueba_migraciones/04-im-plazasofertadas.sql");
+			BbddRunner.ejecutar("Documentos/scripts/opc.bolsaempleo/datos_desarrollo/datos_prueba_migraciones/05-im-plantillas.sql");
 		}
 	}
 

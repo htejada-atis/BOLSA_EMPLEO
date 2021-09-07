@@ -40,13 +40,14 @@ public class GenerarResultadosPDF extends BolsaEmpleoPDFGenerator {
 	
 	
 	/** Generar PDF de los resultados de una solicitud para una bolsa .
-	 * @param solicitud .
+	 * @param candidato .
 	 * @param bolsa .
-	 * @param fechaActual .
+	 * @param convocatoria .
 	 * @return InputStream .
 	 * @throws SQLException .
 	 * @throws UVException .
 	 */
+	@SuppressWarnings({"checkstyle:executablestatementcount"})
 	public static InputStream generarPDF(UsuarioBolsaEmpleo candidato, BolsaResultado bolsa, Convocatoria convocatoria) throws UVException, SQLException {
 		initPDFProperties();
 		
@@ -257,7 +258,7 @@ public class GenerarResultadosPDF extends BolsaEmpleoPDFGenerator {
 		}
 	}
 	
-	private static void generarTitulacionesValidadas(BolsaResultado bolsa, Document document) throws DocumentException, SQLException, UVException, IOException {		
+	private static void generarTitulacionesValidadas(BolsaResultado bolsa, Document document) throws DocumentException, SQLException, IOException {		
 		document.add(new Paragraph("\n"));
 		
 		document.add(new Paragraph("Titulaciones validadas", fontBold));
@@ -266,7 +267,7 @@ public class GenerarResultadosPDF extends BolsaEmpleoPDFGenerator {
 		document.add(new Paragraph(titulaciones.isEmpty() ? "No hay titulaciones validadas" : titulaciones));
 	}
 	
-	private static void generarAcreditacionesValidadas(BolsaResultado bolsa, Document document) throws DocumentException, SQLException, UVException, IOException {
+	private static void generarAcreditacionesValidadas(BolsaResultado bolsa, Document document) throws DocumentException, SQLException, IOException {
 		document.add(new Paragraph("\n"));
 		
 		document.add(new Paragraph("Acreditaciones validadas", fontBold));

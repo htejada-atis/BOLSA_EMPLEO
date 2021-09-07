@@ -296,7 +296,7 @@ public class ControladorMisMeritos extends HttpServlet {
 		response.sendRedirect(request.getServletPath());
 	}
 	
-	private void listadoMeritos(VistaMeritos bean, UVDatos datos, HttpServletRequest request, HttpServletResponse response) throws IOException, SQLException, UVException {
+	private void listadoMeritos(VistaMeritos bean, UVDatos datos, HttpServletRequest request, HttpServletResponse response) throws IOException {
 		ModeloMerito modelo = ModeloMerito.obtenerInstancia();
 		
 		datos.setRespuestaEnviada(true);
@@ -324,16 +324,16 @@ public class ControladorMisMeritos extends HttpServlet {
 		}
 	}
 	
-	private Merito validarMerito(HashMap<String, Object> parametros) throws UVException, SQLException {		
+	private Merito validarMerito(HashMap<String, Object> parametros) throws UVException, SQLException {
 		Merito merito = new Merito();
-				
+		
 		// item de baremación
 		ItemBaremacion item = ModeloBaremacionItems.obtenerInstancia().getItemBaremacionById(Formateador.leeParametroInteger((String) parametros.get(PARAM_ITEM)));
 		merito.setItemBaremacion(item);
 		
 		// valor
 		merito.setValor(ModeloMerito.validateValorDelMerito((String) parametros.get(PARAM_VALOR), merito));
-				
+		
 		// descripcion
 		merito.setDescripcion(EscapaHTML.ajustaCodificacion((String) parametros.get(PARAM_DESCRIPCION)));
 		if (merito.getDescripcion() == null || merito.getDescripcion().isBlank()) {
@@ -351,7 +351,7 @@ public class ControladorMisMeritos extends HttpServlet {
 		
 		// fichero
 		merito.setArchivo((InputStream) parametros.get(PARAM_ARCHIVO));
-						
+		
 		return merito;
 	}
 	

@@ -170,9 +170,36 @@ public class ModeloArea {
 			
 			try (ResultSet rs = stmt.executeQuery()) {
 				while (rs.next()) {
-					areas.add(this.createAreaFromResulSet(rs));					
+					areas.add(this.createAreaFromResulSet(rs));
 				}
 			}			
+		}
+		
+		return areas;
+	}
+	
+	/** Devuelve una lista de las areas de un evaluador .
+	 * @param evaluador .
+	 * @return lista de areas .
+	 * @throws SQLException .
+	 */
+	public List<Area> getAreasByEvaluador(UsuarioBolsaEmpleo evaluador) throws SQLException {
+		ArrayList<Area> areas = new ArrayList<>();
+		String consulta = "SELECT bepbol.*, bepare.*"
+				+ "	FROM TBEP_BOLSAS bepbol"
+				+ "	INNER JOIN TBEP_AREAS bepare ON bepare.CODNUM = bepbol.BEPARE_CODNUM"
+				+ "	INNER JOIN TBEP_EVALUADORES bepeva ON bepare.CODNUM = bepeva.BEPARE_CODNUM AND bepeva.FLGACTIVO = 'S'"
+				+ "	WHERE bepeva.BEPUSU_CODNUM = ?";
+		
+		try (Connection conexion = ConexionUvirtual.obtenerInstancia(); PreparedStatement stmt = conexion.prepareStatement(consulta)) {
+			int indexParam = 1;
+			stmt.setInt(indexParam, evaluador.getCodNum());
+			
+			try (ResultSet rs = stmt.executeQuery()) {
+				while (rs.next()) {
+					areas.add(this.createAreaFromResulSet(rs));
+				}
+			}
 		}
 		
 		return areas;

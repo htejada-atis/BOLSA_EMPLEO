@@ -7,11 +7,14 @@ import java.io.Serializable;
  * @author ATISoluciones 2021
  *
  */
-public class Destinatario extends UsuarioBolsaEmpleo implements Serializable {
+public class Destinatario implements Serializable {
 
 	private static final long serialVersionUID = 1L;
-	private Integer codNumMensaje;
+	private Integer codNum;
+	private Mensaje mensaje;
+	private UsuarioBolsaEmpleo usuario;
 	private String estado;
+	private String email;
 
 	
 	/** Constructor por defecto.
@@ -21,13 +24,16 @@ public class Destinatario extends UsuarioBolsaEmpleo implements Serializable {
 	}
 	
 	/** Constructor con parametros.
+	 * @param pcodNum .
+	 * @param pmensaje .
 	 * @param pusuario .
-	 * @param pcodNumMensaje .
 	 * @param pestado .
 	 */
-	public Destinatario(UsuarioBolsaEmpleo pusuario, Integer pcodNumMensaje, String pestado) {
-		super(pusuario);
-		this.codNumMensaje = pcodNumMensaje;
+	public Destinatario(Integer pcodNum, Mensaje pmensaje, UsuarioBolsaEmpleo pusuario, String pestado) {
+		super();
+		this.codNum = pcodNum;
+		this.mensaje = pmensaje;
+		this.usuario = pusuario;
 		this.estado = pestado;
 	}
 	
@@ -35,17 +41,34 @@ public class Destinatario extends UsuarioBolsaEmpleo implements Serializable {
 	 * @param copia Destinatario a copiar
 	 */
 	public Destinatario(Destinatario copia) {
-		super(copia);
-		this.codNumMensaje = copia.codNumMensaje;
+		this.codNum = copia.codNum;
+		this.mensaje = copia.mensaje;
+		this.usuario = copia.usuario;
 		this.estado = copia.estado;
 	}
-	
-	public Integer getCodNumMensaje() {
-		return codNumMensaje;
+
+	public Integer getCodNum() {
+		return codNum;
 	}
 
-	public void setCodNumMensaje(Integer codNumMensaje) {
-		this.codNumMensaje = codNumMensaje;
+	public void setCodNum(Integer codNum) {
+		this.codNum = codNum;
+	}
+
+	public Mensaje getMensaje() {
+		return mensaje;
+	}
+
+	public void setMensaje(Mensaje mensaje) {
+		this.mensaje = mensaje;
+	}
+
+	public UsuarioBolsaEmpleo getUsuario() {
+		return usuario;
+	}
+
+	public void setUsuario(UsuarioBolsaEmpleo usuario) {
+		this.usuario = usuario;
 	}
 
 	public String getEstado() {
@@ -55,6 +78,14 @@ public class Destinatario extends UsuarioBolsaEmpleo implements Serializable {
 	public void setEstado(String estado) {
 		this.estado = estado;
 	}
+	
+	public String getEmail() {
+		return email;
+	}
+
+	public void setEmail(String email) {
+		this.email = email;
+	}
 
 	public static long getSerialversionuid() {
 		return serialVersionUID;
@@ -62,7 +93,7 @@ public class Destinatario extends UsuarioBolsaEmpleo implements Serializable {
 	
 	@Override
 	public String toString() {
-		return "Destinatario [usuario= " + super.toString() + ", codNumMensaje=" + codNumMensaje + ", estado=" + estado + "]";
+		return "Destinatario [codNum= " + codNum + ", mensaje=" + mensaje + ", usuario=" + usuario + ", estado=" + estado + ", email=" + email + "]";
 	}
 	
 	@Override
@@ -70,8 +101,11 @@ public class Destinatario extends UsuarioBolsaEmpleo implements Serializable {
 		final int prime = 31;
 		int result = 1;
 		result = prime * result + super.hashCode();
-		result = prime * result + ((codNumMensaje == null) ? 0 : codNumMensaje.hashCode());
+		result = prime * result + ((codNum == null) ? 0 : codNum.hashCode());
+		result = prime * result + ((mensaje == null) ? 0 : mensaje.hashCode());
+		result = prime * result + ((usuario == null) ? 0 : usuario.hashCode());
 		result = prime * result + ((estado == null) ? 0 : estado.hashCode());
+		result = prime * result + ((email == null) ? 0 : email.hashCode());
 		return result;
 	}
 	
@@ -88,7 +122,25 @@ public class Destinatario extends UsuarioBolsaEmpleo implements Serializable {
 			return false;
 		}
 		Destinatario other = (Destinatario) obj;
-		if (!super.equals(other)) {
+		if (codNum == null) {
+			if (other.codNum != null) {
+				return false;
+			}
+		} else if (!codNum.equals(other.codNum)) {
+			return false;
+		}
+		if (mensaje == null) {
+			if (other.mensaje != null) {
+				return false;
+			}
+		} else if (!mensaje.equals(other.mensaje)) {
+			return false;
+		}
+		if (usuario == null) {
+			if (other.usuario != null) {
+				return false;
+			}
+		} else if (!usuario.equals(other.usuario)) {
 			return false;
 		}
 		if (estado == null) {
@@ -96,6 +148,13 @@ public class Destinatario extends UsuarioBolsaEmpleo implements Serializable {
 				return false;
 			}
 		} else if (!estado.equals(other.estado)) {
+			return false;
+		}
+		if (email == null) {
+			if (other.email != null) {
+				return false;
+			}
+		} else if (!email.equals(other.email)) {
 			return false;
 		}
 		

@@ -29,7 +29,7 @@ Bolsa bolsa = bean.getBolsa();
 		</tbody>
 		<tfoot>
 			<tr>
-				<th colSpan="6" style="width:100%"></th>
+				<th colSpan="4" style="width:100%"></th>
 			</tr>
 		</tfoot>
 	</table>
