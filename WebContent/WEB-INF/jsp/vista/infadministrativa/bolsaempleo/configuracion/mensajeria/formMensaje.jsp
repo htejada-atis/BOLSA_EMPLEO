@@ -197,18 +197,22 @@ $(document).ready(function() {
 	
 	var tableDestinatarios = new Atis.DataTable('#tableDestinatarios', {
 		"title": "DESTINATARIOS DEL MENSAJE",
-	    "ajax": { url: '<%= ControladorMensajes.URL_PATTERN_AJAX %>', async: false },
-	    "params": {"<%=ControladorMensajes.PARAM_MENSAJE_ID%>": <%= mensaje.getCodNum() %>},
-	    "pageSize": 10,
-	    "filterable": true,
-    	"action": "<%= ControladorMensajes.ACCION_DATATABLE_DESTINATARIOS %>",
-	    "columns": [
-	    <%	if (mensajeBorrador) { %>{'data': 'codNum', 'selectable': true},<% } %>
-	        {'data': 'prsnif', 'filter': true,},
-	        {'data': 'codNum', 'filter': true, 'overflow': 'auto', 'render': function(row) { return row.nombre + ", " + row.apellido1 + " " + row.apellido2; }},
-	        {'data': 'email', 'filter': true, 'overflow': 'auto'},
-	    <%	if (!mensajeBorrador) { %>{'data': 'estado', 'order': {'active': false}},<% } %>
-	    ],
+		"ajax": { url: '<%= ControladorMensajes.URL_PATTERN_AJAX %>', async: false },
+		"params": {"<%=ControladorMensajes.PARAM_MENSAJE_ID%>": <%= mensaje.getCodNum() %>},
+		"pageSize": 10,
+		"filterable": true,
+		"action": "<%= ControladorMensajes.ACCION_DATATABLE_DESTINATARIOS %>",
+		"columns": [
+		<%	if (mensajeBorrador) { %>{'data': 'codNum', 'selectable': true},<% } %>
+			{'data': 'usuario.prsnif', 'filter': true,},
+			{'data': 'codNum', 'filter': true, 'overflow': 'auto', 'render': function(row) { 
+				return row.usuario != null ? row.usuario.nombre + ", " + row.usuario.apellido1 + " " + row.usuario.apellido2 : ""; }
+			},
+			{'data': 'email', 'filter': true, 'overflow': 'auto', 'render': function(row) {
+				return row.usuario != null ? row.usuario.email : row.email;
+			}},
+		<%	if (!mensajeBorrador) { %>{'data': 'estado', 'order': {'active': false}},<% } %>
+		],
 	<%	if (mensajeBorrador) { %>"actions": [{'label': 'Eliminar del mensaje', 'onClick': deleteDestinatarios}] <% } %>
 	});
 	

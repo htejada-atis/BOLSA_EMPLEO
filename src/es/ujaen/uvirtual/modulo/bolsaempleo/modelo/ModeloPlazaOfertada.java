@@ -578,6 +578,7 @@ public class ModeloPlazaOfertada {
 				Mensaje mensaje = new Mensaje(modeloPlantilla.reemplazaPlazaEnPlantilla(plaza, plantilla.getTitulo(), false), 
 						modeloPlantilla.reemplazaPlazaEnPlantilla(plaza, plantilla.getCuerpo(), true),
 						BolsaEmpleoUtils.getCurrentDateTime(), ModeloMensajes.MENSAJE_ESTADO_BORRADOR);
+				mensaje.setAdjunto(plaza.getHorario());
 				
 				int idMensaje = ModeloMensajes.obtenerInstancia().nuevoMensajeConexion(mensaje, usuarioUpdate, conexion);
 				
@@ -626,7 +627,7 @@ public class ModeloPlazaOfertada {
 				
 				// Obtenemos la plantilla de la apertura de la plaza si existe
 				String consultaSelectPlantilla = "SELECT beppls.* FROM TBEP_PLANTILLAS beppls"
-						+ " INNER JOIN TBEP_PARAMETROS_CONFIG beppac ON beppac.VALOR = beppls.CODNUM "
+						+ " INNER JOIN TBEP_PARAMETROS_CONFIG beppac ON beppac.VALOR = beppls.CODNUM"
 						+ " WHERE beppac.NOMBRE = '" + ModeloParametrosConfiguracion.PARAMETRO_PLANTILLA_CIERRE_PLAZA + "'";
 				
 				try (PreparedStatement stmt = conexion.prepareStatement(consultaSelectPlantilla)) {
@@ -718,7 +719,7 @@ public class ModeloPlazaOfertada {
 	}
 	
 	private void agregarDestinatariosCierrePlaza(String[] emails, Integer idMensaje, UsuarioBolsaEmpleo usuarioUpdate, Connection conexion)
-			throws SQLException, UVException {
+			throws SQLException {
 		for (String email: emails) {
 			int idDestinatario = 0;
 			
@@ -735,16 +736,25 @@ public class ModeloPlazaOfertada {
 				}
 			}
 			
+			String consultaInsertDest = "";
+			
 			if (idDestinatario == 0) {
-				throw new UVException("Error al encontrar destinatario del mensaje");
+				consultaInsertDest = String.format("INSERT INTO TBEP_MEN_DESTINATARIOS (%s, %s, %s) VALUES (?, ?, ?)", 
+						"BEPMEN_CODNUM", "EMAIL", "UID_USUARIO");
+			} else {
+				consultaInsertDest = String.format("INSERT INTO TBEP_MEN_DESTINATARIOS (%s, %s, %s) VALUES (?, ?, ?)", 
+						"BEPMEN_CODNUM", "BEPUSU_CODNUM", "UID_USUARIO");
 			}
 			
-			String consultaInsertDest = String.format("INSERT INTO TBEP_MEN_DESTINATARIOS (%s, %s, %s) VALUES (?, ?, ?)", 
-					"BEPMEN_CODNUM", "BEPUSU_CODNUM", "UID_USUARIO");
+			
 			try (PreparedStatement stmt = conexion.prepareStatement(consultaInsertDest)) {
 				int parameterIndex = 1;
 				stmt.setInt(parameterIndex++, idMensaje);
-				stmt.setInt(parameterIndex++, idDestinatario);
+				if (idDestinatario == 0) {
+					stmt.setString(parameterIndex++, email);
+				} else {
+					stmt.setInt(parameterIndex++, idDestinatario);
+				}
 				stmt.setString(parameterIndex++, usuarioUpdate.getCodCuenta());
 				stmt.executeUpdate();
 			}

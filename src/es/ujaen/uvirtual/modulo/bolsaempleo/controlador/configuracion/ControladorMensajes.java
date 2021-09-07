@@ -270,7 +270,7 @@ public class ControladorMensajes extends HttpServlet {
 			}
 			
 			for (UsuarioBolsaEmpleo destinatario: destinatarios) {
-				modeloMensaje.agregarDestinatario(bean.getMensaje(), destinatario, bean.getUsuarioLogeado());
+				modeloMensaje.agregarDestinatarioUsuario(bean.getMensaje(), destinatario, bean.getUsuarioLogeado());
 			}
 			
 			if (destinatarios.size() > 0) {
@@ -297,23 +297,22 @@ public class ControladorMensajes extends HttpServlet {
 	
 	private void eliminarDestinatarios(VistaMensajes bean, UVDatos datos, HttpServletRequest request, HttpServletResponse response) throws UVException, IOException {
 		ModeloMensajes modeloMensaje = ModeloMensajes.obtenerInstancia();
-		ModeloUsuarioBolsaEmpleo modeloUsuario = ModeloUsuarioBolsaEmpleo.obtenerInstancia();
-		List<UsuarioBolsaEmpleo> destinatarios = null;
+		List<Destinatario> destinatarios = null;
 		try {
 			
 			try {
-				destinatarios = new ArrayList<UsuarioBolsaEmpleo>();
+				destinatarios = new ArrayList<Destinatario>();
 				List<String> idDestinatarios = new GsonBuilder().create().fromJson(request.getParameter(PARAM_DESTINATARIOS),
 						new TypeToken<List<String>>() { }.getType());
 				for (String idDestinatario: idDestinatarios) { 
-					destinatarios.add(modeloUsuario.getUsuarioById(Integer.parseInt(idDestinatario)));
+					destinatarios.add(modeloMensaje.getDestinatarioById(Integer.parseInt(idDestinatario)));
 				}
 			} catch (Exception ex) {
 				throw new UVException(MENSAJE_ERROR_USUARIOS_SELECCIONADOS_INCORRECTOS);
 			}
 			
-			for (UsuarioBolsaEmpleo destinatario: destinatarios) {
-				modeloMensaje.eliminarDestinatario(bean.getMensaje(), destinatario, bean.getUsuarioLogeado());
+			for (Destinatario destinatario: destinatarios) {
+				modeloMensaje.eliminarDestinatario(destinatario, bean.getUsuarioLogeado());
 			}
 			
 			if (destinatarios.size() > 0) {
