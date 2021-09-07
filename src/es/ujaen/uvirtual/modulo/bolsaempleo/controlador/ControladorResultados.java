@@ -287,7 +287,7 @@ public class ControladorResultados extends HttpServlet {
 		datos.setContentType(RESPONSE_CSV_CONTENTTYPE);		
 		response.setContentType(RESPONSE_CSV_CONTENTTYPE);
 		response.setCharacterEncoding(RESPONSE_CSV_ENCODING);
-		response.setHeader("Content-Disposition", "attachment; filename=\"candidatos-sin-titulacion.csv\"");
+		response.setHeader("Content-Disposition", "attachment; filename=\"resultados-bolsa-" + idBolsa + ".csv\"");
 		
 		Bolsa bolsa = ModeloBolsa.obtenerInstancia().getBolsaById(idBolsa);
 		Convocatoria convocatoria = ModeloConvocatoria.obtenerInstancia().getUltimaConvocatoria();
