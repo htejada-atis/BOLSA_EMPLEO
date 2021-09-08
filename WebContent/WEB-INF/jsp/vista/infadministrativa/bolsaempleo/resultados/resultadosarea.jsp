@@ -18,6 +18,10 @@ Bolsa bolsa = bean.getBolsa();
 	
 	<h2>Resultados del área: <%= EscapaHTML.escapa(bolsa.getArea().getDescripcion()) %></h2>
 	
+	<% if (bean.getUsuarioLogeado().isServicioPersonal()) { %>
+		<button class="link-btn" id="exportar">Exportar a csv</button>
+	<% } %>
+	
 	<table class="bluetable bolsaempleo" id="tableCandidatos">
 		<tr>
 			<th scope="col" style="width:76px">D.N.I</th>
@@ -75,6 +79,10 @@ $(document).ready(function() {
 	
 	document.getElementById("resultados_volver").addEventListener("click", function() {
 		Atis.sendForm("<%= request.getRequestURI() %>", {});
+	});
+	
+	$('#exportar').on('click', function() {
+		window.open("<%= request.getRequestURI() %>?<%= ControladorResultados.PARAM_ACCION %>=<%= ControladorResultados.ACCION_EXPORTAR_RESULTADOS %>&<%= ControladorResultados.PARAM_BOLSA %>=<%= bolsa.getCodNum() %>");
 	});
 });
 
