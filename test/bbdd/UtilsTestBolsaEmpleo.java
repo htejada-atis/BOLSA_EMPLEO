@@ -60,7 +60,7 @@ public final class UtilsTestBolsaEmpleo {
 	public static final Integer WAIT_ELEMENT = 10; // segundos
 	public static final boolean VERBOSE = false;
 	
-	private static boolean cargado = true;
+	private static boolean cargado = false;
 
 	private UtilsTestBolsaEmpleo() {
 	}
