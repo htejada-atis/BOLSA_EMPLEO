@@ -95,12 +95,12 @@ public class ModeloCandidato {
 					
 					rows.add(new String[] {
 						String.format("\"%s\"", usuario.getCodNum().toString()),
-						String.format("\"%s\"", usuario.getPrsNif() != null ? usuario.getPrsNif() : ""),						
+						String.format("\"%s\"", usuario.getPrsNif() != null ? usuario.getPrsNif() : ""),
 						String.format("\"%s %s %s\"",
 								usuario.getNombre() != null ? usuario.getNombre() : "",
 								usuario.getPrimerApellido() != null ? usuario.getPrimerApellido() : "",
 								usuario.getSegundoApellido() != null ? usuario.getSegundoApellido() : ""),
-						String.format("\"%s\"", usuario.getEmail() != null ? usuario.getEmail() : ""),						
+						String.format("\"%s\"", usuario.getEmail() != null ? usuario.getEmail() : ""),
 					});
 				}
 			}
