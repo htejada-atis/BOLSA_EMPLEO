@@ -264,8 +264,8 @@ public class ModeloPlazaOfertada {
 		
 		if (usuarioUpdate.isServicioPersonal()) {
 			consulta = String.format("UPDATE TBEP_PLAZAS_OFERTADAS SET %s=?, %s=?, %s=?, %s=?, %s=?, %s=?, %s=?, %s=? "
-					+ (plaza.getHorario() != null ? ", " + HORARIO + "=?" : "")
 					+ (plaza.getNri() != null ? ", " + NRI + "=?, " + NRI_FECHA + "=?" : "")
+					+ (plaza.getHorario() != null ? ", " + HORARIO + "=?" : "")
 					+ " WHERE %s=?",
 					BEPARE_CODNUM, JUSTIFICACION, CENTRO_DESTINO, "UID_USUARIO", BEPDED_CODNUM, CUATRIMESTRE, DURACION_PREVISTA, 
 					FECHA_FIN_OFERTA, CODNUM);
