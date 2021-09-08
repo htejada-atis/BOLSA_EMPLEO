@@ -453,7 +453,8 @@ public class ControladorUsuarioCandidato extends HttpServlet {
 			throw new UVException(MENSAJE_ERROR_BOLSAS_SELECCIONADAS_INCORRECTAS);
 		}
 		
-		ModeloEstadoCandidato.obtenerInstancia().cambiarEstadosCandidato(bean.getCandidato(), estado, bolsas, bean.getUsuarioLogeado());
+		CandidatoEstado candidato = new CandidatoEstado(bean.getCandidato());
+		ModeloEstadoCandidato.obtenerInstancia().cambiarEstadosCandidato(candidato, estado, bolsas, bean.getUsuarioLogeado());
 		BolsaEmpleoUtils.addMensajeDeExito(MENSAJE_EXITO_ESTADO_CAMBIADO, bean, request);
 		
 		Map<String, String> params = new HashMap<>();

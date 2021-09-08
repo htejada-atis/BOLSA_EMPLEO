@@ -1,0 +1,2 @@
+INSERT INTO TBEP_PARAMETROS_CONFIG (NOMBRE,VALOR,DESCRIPCION,UID_USUARIO)
+VALUES ('bolsaempleo.local.remitente','remitente','Email predeterminado que se usa para enviar emails con adjunto.','CARGA_INICIAL');
