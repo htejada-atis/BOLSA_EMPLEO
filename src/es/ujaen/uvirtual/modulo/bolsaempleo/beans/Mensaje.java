@@ -19,6 +19,7 @@ public class Mensaje implements Serializable {
 	private Date fechaCreacion;
 	private String estado;
 	private transient InputStream adjunto;
+	private transient byte[] adjuntoBytes;
 
 	/**
 	 * Constructor por defecto.
@@ -77,6 +78,7 @@ public class Mensaje implements Serializable {
 		this.fechaCreacion = copia.fechaCreacion;
 		this.estado = copia.estado;
 		this.adjunto = copia.adjunto;
+		this.adjuntoBytes = copia.adjuntoBytes;
 	}
 
 	public Integer getCodNum() {
@@ -127,6 +129,14 @@ public class Mensaje implements Serializable {
 		this.adjunto = adjunto;
 	}
 	
+	public byte[] getAdjuntoBytes() {
+		return adjuntoBytes;
+	}
+
+	public void setAdjuntoBytes(byte[] adjuntoBytes) {
+		this.adjuntoBytes = adjuntoBytes;
+	}
+	
 	public static long getSerialversionuid() {
 		return serialVersionUID;
 	}
@@ -134,7 +144,7 @@ public class Mensaje implements Serializable {
 	@Override
 	public String toString() {
 		return "Mensaje [codNum=" + codNum + ", titulo=" + titulo + ", cuerpo=" + cuerpo + ", fechaCreacion=" 
-				+ fechaCreacion + ", estado=" + estado + ", adjunto=" + adjunto + "]";
+				+ fechaCreacion + ", estado=" + estado + ", adjunto=" + adjunto + ", adjuntoBytes=" + adjuntoBytes + "]";
 	}
 
 	@Override
@@ -147,6 +157,7 @@ public class Mensaje implements Serializable {
 		result = prime * result + ((fechaCreacion == null) ? 0 : fechaCreacion.hashCode());
 		result = prime * result + ((estado == null) ? 0 : estado.hashCode());
 		result = prime * result + ((adjunto == null) ? 0 : adjunto.hashCode());
+		result = prime * result + ((adjuntoBytes == null) ? 0 : adjuntoBytes.hashCode());
 		return result;
 	}
 
@@ -203,6 +214,13 @@ public class Mensaje implements Serializable {
 				return false;
 			}
 		} else if (!adjunto.equals(other.adjunto)) {
+			return false;
+		}
+		if (adjuntoBytes == null) {
+			if (other.adjuntoBytes != null) {
+				return false;
+			}
+		} else if (!adjuntoBytes.equals(other.adjuntoBytes)) {
 			return false;
 		}
 

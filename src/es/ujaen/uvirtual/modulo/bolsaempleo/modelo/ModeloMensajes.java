@@ -253,11 +253,12 @@ public class ModeloMensajes {
 	 * Devuelve un mensaje por su id.
 	 * 
 	 * @param codNum .
+	 * @param withFile .
 	 * @return Mensaje o null si no existe
 	 * @throws IOException .
 	 * @throws SQLException .
 	 */
-	public Mensaje getMensajeById(Integer codNum) throws SQLException, UVException, IOException {
+	public Mensaje getMensajeById(Integer codNum, boolean withFile) throws SQLException, UVException, IOException {
 		if (codNum == null) {
 			throw new UVException(MENSAJE_ERROR_NO_EXISTE_MENSAJE);
 		}
@@ -271,7 +272,7 @@ public class ModeloMensajes {
 					throw new UVException(MENSAJE_ERROR_NO_EXISTE_MENSAJE);
 				}
 
-				return this.createMensajeFromResultSet(rs, true);
+				return this.createMensajeFromResultSet(rs, withFile);
 			}
 		}
 	}
@@ -733,7 +734,8 @@ public class ModeloMensajes {
 		mensaje.setEstado(rs.getString("ESTADO"));
 		
 		if (Boolean.TRUE.equals(withFile)) {
-			mensaje.setAdjunto(rs.getBlob(ADJUNTO).getBinaryStream());
+			mensaje.setAdjunto(rs.getBlob(ADJUNTO) != null ? rs.getBlob(ADJUNTO).getBinaryStream() : null);
+			mensaje.setAdjuntoBytes(rs.getBytes(ADJUNTO));
 		}
 		
 		return mensaje;
@@ -743,7 +745,7 @@ public class ModeloMensajes {
 		Destinatario dest = new Destinatario();
 		
 		dest.setCodNum(rs.getInt(CODNUM));
-		dest.setMensaje(this.getMensajeById(rs.getInt(BEPMEN_CODNUM)));
+		dest.setMensaje(this.getMensajeById(rs.getInt(BEPMEN_CODNUM), false));
 		dest.setUsuario(rs.getInt(BEPUSU_CODNUM) != 0 ? ModeloUsuarioBolsaEmpleo.obtenerInstancia().getUsuarioById(rs.getInt(BEPUSU_CODNUM)) : null);
 		dest.setEmail(rs.getString(EMAIL));
 		dest.setEstado(rs.getString(ESTADO));
