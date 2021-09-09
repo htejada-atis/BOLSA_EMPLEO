@@ -25,8 +25,13 @@ import es.ujaen.uvirtual.utilidades.UVException;
  */
 public class ModeloMensajes {
 	public static final int MENSAJES_COLUMN_INDEX_FECHACREACION = 1;
-	public static final int MENSAJES_COLUMN_INDEX_TITULO = 2;	
+	public static final int MENSAJES_COLUMN_INDEX_TITULO = 2;
 	public static final int MENSAJES_COLUMN_INDEX_ESTADO = 3;
+	
+	public static final int DESTINATARIOS_COLUMN_INDEX_DOCUMENTO_ENVIO = 0;
+	public static final int DESTINATARIOS_COLUMN_INDEX_NOMBRE_ENVIO = 1;
+	public static final int DESTINATARIOS_COLUMN_INDEX_CORREO_ENVIO = 2;
+	public static final int DESTINATARIOS_COLUMN_INDEX_ROL_ENVIO = 3;
 	
 	public static final int DESTINATARIOS_COLUMN_INDEX_DOCUMENTO = 1;
 	public static final int DESTINATARIOS_COLUMN_INDEX_NOMBRE = 2;
@@ -149,11 +154,19 @@ public class ModeloMensajes {
 				+ " WHERE bepmde.BEPMEN_CODNUM = ?";
 		
 		String whereNombre = String.format("(%s || ' ' || %s || ' ' || %s)", "bepusu.VUAJA_STRNOMBRE", "bepusu.VUAJA_STRAPELLIDO1", "bepusu.VUAJA_STRAPELLIDO2");
-
-		dataTable.setColumn(DESTINATARIOS_COLUMN_INDEX_DOCUMENTO, "bepusu.VUAJA_PRSNIF");
-		dataTable.setColumn(DESTINATARIOS_COLUMN_INDEX_NOMBRE, whereNombre, DataTableColumn.COLUMN_TYPE_TEXT);
-		dataTable.setColumn(DESTINATARIOS_COLUMN_INDEX_CORREO, "bepusu.VUAJA_EMAIL_ALTA");
-		dataTable.setColumn(DESTINATARIOS_COLUMN_INDEX_ROL, "bepusu.ROL");
+		
+		if (mensaje.getEstado().equals(MENSAJE_ESTADO_BORRADOR)) {
+			dataTable.setColumn(DESTINATARIOS_COLUMN_INDEX_DOCUMENTO, "bepusu.VUAJA_PRSNIF");
+			dataTable.setColumn(DESTINATARIOS_COLUMN_INDEX_NOMBRE, whereNombre, DataTableColumn.COLUMN_TYPE_TEXT);
+			dataTable.setColumn(DESTINATARIOS_COLUMN_INDEX_CORREO, "bepusu.VUAJA_EMAIL_ALTA");
+			dataTable.setColumn(DESTINATARIOS_COLUMN_INDEX_ROL, "bepusu.ROL");
+		} else {
+			dataTable.setColumn(DESTINATARIOS_COLUMN_INDEX_DOCUMENTO_ENVIO, "bepusu.VUAJA_PRSNIF");
+			dataTable.setColumn(DESTINATARIOS_COLUMN_INDEX_NOMBRE_ENVIO, whereNombre, DataTableColumn.COLUMN_TYPE_TEXT);
+			dataTable.setColumn(DESTINATARIOS_COLUMN_INDEX_CORREO_ENVIO, "bepusu.VUAJA_EMAIL_ALTA");
+			dataTable.setColumn(DESTINATARIOS_COLUMN_INDEX_ROL_ENVIO, "bepusu.ROL");
+		}
+		
 		dataTable.setQuery(consulta);
 
 		try (Connection conexion = ConexionUvirtual.obtenerInstancia();
