@@ -360,10 +360,13 @@ public class ModeloResultados {
 		}
 		
 		String consulta = "SELECT bepusu.*, bepsob.TOTAL"
-				+ "	FROM TBEP_SOLICITUD_BOLSAS bepsob"
-				+ "	INNER JOIN TBEP_SOLICITUDES bepsol ON bepsol.CODNUM = bepsob.BEPSOL_CODNUM"
-				+ "	INNER JOIN TBEP_USUARIOS bepusu ON bepusu.CODNUM = bepsol.BEPUSU_CODNUM"
-				+ "	WHERE bepsol.BEPCON_CODNUM = ? AND bepsob.BEPBOL_CODNUM = ? AND bepsol.ESTADO = '" + ModeloSolicitud.SOLICITUD_ESTADO_CERRADA + "'";
+				+ " FROM TBEP_SOLICITUD_BOLSAS bepsob"
+				+ " INNER JOIN TBEP_SOLICITUDES bepsol ON bepsol.CODNUM = bepsob.BEPSOL_CODNUM"
+				+ " INNER JOIN TBEP_USUARIOS bepusu ON bepusu.CODNUM = bepsol.BEPUSU_CODNUM"
+				+ " WHERE bepsol.BEPCON_CODNUM = ?"
+				+ "     AND bepsob.BEPBOL_CODNUM = ?"
+				+ "     AND bepsol.ESTADO = '" + ModeloSolicitud.SOLICITUD_ESTADO_CERRADA + "'"
+				+ "     AND bepusu.FLGBORRADO = 'N'";
 		
 		String whereNombre = String.format("(%s || ' ' || %s || ' ' || %s)", "bepusu.VUAJA_STRNOMBRE", "bepusu.VUAJA_STRAPELLIDO1", "bepusu.VUAJA_STRAPELLIDO2");
 		
@@ -410,10 +413,13 @@ public class ModeloResultados {
 	 */
 	public List<String[]> listadoResultadosCandidatosAreaCsv(Bolsa bolsa, Convocatoria convocatoria) throws SQLException, UVException {
 		String consulta = "SELECT bepusu.*, bepsob.TOTAL"
-				+ "	FROM TBEP_SOLICITUD_BOLSAS bepsob"
-				+ "	INNER JOIN TBEP_SOLICITUDES bepsol ON bepsol.CODNUM = bepsob.BEPSOL_CODNUM"
-				+ "	INNER JOIN TBEP_USUARIOS bepusu ON bepusu.CODNUM = bepsol.BEPUSU_CODNUM"
-				+ "	WHERE bepsol.BEPCON_CODNUM = ? AND bepsob.BEPBOL_CODNUM = ? AND bepsol.ESTADO = '" + ModeloSolicitud.SOLICITUD_ESTADO_CERRADA + "'";
+				+ " FROM TBEP_SOLICITUD_BOLSAS bepsob"
+				+ " INNER JOIN TBEP_SOLICITUDES bepsol ON bepsol.CODNUM = bepsob.BEPSOL_CODNUM"
+				+ " INNER JOIN TBEP_USUARIOS bepusu ON bepusu.CODNUM = bepsol.BEPUSU_CODNUM"
+				+ " WHERE bepsol.BEPCON_CODNUM = ?"
+				+ "     AND bepsob.BEPBOL_CODNUM = ?"
+				+ "     AND bepsol.ESTADO = '" + ModeloSolicitud.SOLICITUD_ESTADO_CERRADA + "'"
+				+ "     AND bepusu.FLGBORRADO = 'N'";
 		
 		List<String[]> rows = new ArrayList<>();
 		

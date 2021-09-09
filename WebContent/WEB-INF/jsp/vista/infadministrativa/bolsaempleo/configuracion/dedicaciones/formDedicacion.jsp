@@ -41,7 +41,8 @@ String sueldo = BolsaEmpleoUtils.getParamForm(request, ControladorDedicaciones.P
 		<div class="form-group-container col2">
 			<div class="form-group">
 				<label for="dedicacion_sueldo" class="bold-label">Sueldo:</label>
-				<input class="form-input-custom" type="number" name="<%=ControladorDedicaciones.PARAM_SUELDO%>" id="dedicacion_sueldo" value="<%=sueldo%>" required/>
+				<input class="form-input-custom" type="number" name="<%=ControladorDedicaciones.PARAM_SUELDO%>" id="dedicacion_sueldo" 
+						value="<%=sueldo%>" min="0" step="any" required/>
 			</div>
 		</div>
 		<div class="form-btn">

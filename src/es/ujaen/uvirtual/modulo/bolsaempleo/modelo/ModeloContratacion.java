@@ -276,7 +276,8 @@ public class ModeloContratacion {
 				+ "     AND bepsob.FECHABAREMACION IS NOT NULL"
 				+ " INNER JOIN TBEP_OFERTAS_CANDIDATOS bepofc ON bepofc.BEPUSU_CODNUM = bepusu.CODNUM"
 				+ " INNER JOIN TBEP_CONTRATACIONES bepcnt ON bepcnt.BEPUSU_CODNUM = bepusu.CODNUM AND bepcnt.BEPPLO_CODNUM = bepofc.BEPPLO_CODNUM"
-				+ " WHERE bepofc.BEPPLO_CODNUM = ?";
+				+ " WHERE bepofc.BEPPLO_CODNUM = ?"
+				+ "     AND bepusu.FLGBORRADO = 'N'";
 		
 		String whereNombre = String.format("(%s || ' ' || %s || ' ' || %s)", "bepusu.VUAJA_STRNOMBRE", "bepusu.VUAJA_STRAPELLIDO1", "bepusu.VUAJA_STRAPELLIDO2");
 		

@@ -229,7 +229,7 @@ $(document).ready(function() {
 		"title": "DESTINATARIOS DEL MENSAJE",
 		"ajax": { url: '<%= ControladorMensajes.URL_PATTERN_AJAX %>', async: false },
 		"params": {"<%=ControladorMensajes.PARAM_MENSAJE_ID%>": <%= mensaje.getCodNum() %>},
-		"pageSize": 10,
+		"pageSize": 100,
 		"filterable": true,
 		"action": "<%= ControladorMensajes.ACCION_DATATABLE_DESTINATARIOS %>",
 		"columns": [
