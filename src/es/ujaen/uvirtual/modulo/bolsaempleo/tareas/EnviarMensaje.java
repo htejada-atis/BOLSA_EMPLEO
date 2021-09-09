@@ -1,7 +1,6 @@
 package es.ujaen.uvirtual.modulo.bolsaempleo.tareas;
 
 import java.io.IOException;
-import java.io.InputStream;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -54,7 +53,18 @@ public final class EnviarMensaje {
 				List<String> emails = new ArrayList<>();
 				emails.add(destinatario.getUsuario() != null ? destinatario.getUsuario().getEmail() : destinatario.getEmail());
 				
-				boolean enviado = EnviaCorreo.enviaCorreoHTML(emails, mensaje.getTitulo(), mensaje.getCuerpo());
+				boolean enviado = false;
+				
+				if (mensaje.getAdjunto() != null) {
+					DataSource source = new ByteArrayDataSource(mensaje.getAdjuntoBytes(), "application/octet-stream");
+					
+					String remitente = ModeloParametrosConfiguracion.obtenerInstancia().
+							getParametroByNombre(ModeloParametrosConfiguracion.PARAMETRO_REMITENTE).getValor();
+					enviado = EnviaCorreo.enviaCorreoAdjuntoHtml(remitente, emails, null, mensaje.getTitulo(), mensaje.getCuerpo(),
+							"adjunto.pdf", source);
+				} else {
+					enviado = EnviaCorreo.enviaCorreoHTML(emails, mensaje.getTitulo(), mensaje.getCuerpo());
+				}
 				
 				if (enviado) {
 					modelo.actualizaEstadoDestinatarioComoEnviado(destinatario, null);

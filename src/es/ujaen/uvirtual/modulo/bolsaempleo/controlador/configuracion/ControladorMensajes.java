@@ -217,7 +217,7 @@ public class ControladorMensajes extends HttpServlet {
 		
 		ModeloMensajes modeloMensajes = ModeloMensajes.obtenerInstancia();
 		Integer idMensaje = Formateador.leeParametroInteger(BolsaEmpleoUtils.getParamRequestOrSession(request, PARAM_MENSAJE_ID));
-		bean.setMensaje(modeloMensajes.getMensajeById(idMensaje));
+		bean.setMensaje(modeloMensajes.getMensajeById(idMensaje, false));
 		
 		bean.setConvocatorias(ModeloConvocatoria.obtenerInstancia().listaConvocatorias());
 		bean.setAreas(ModeloArea.obtenerInstancia().listaAreas());
@@ -364,7 +364,7 @@ public class ControladorMensajes extends HttpServlet {
 	private void nuevoMensaje(VistaMensajes bean, UVDatos datos, HttpServletRequest request, HttpServletResponse response) throws SQLException, UVException, IOException {
 		ModeloMensajes modeloMensaje = ModeloMensajes.obtenerInstancia();
 		Integer idMensaje = modeloMensaje.nuevoMensajeEnBorrador(bean.getUsuarioLogeado());
-		bean.setMensaje(modeloMensaje.getMensajeById(idMensaje));
+		bean.setMensaje(modeloMensaje.getMensajeById(idMensaje, false));
 		
 		redireccionConMensajeSeleccionado(bean, datos, request, response, ACCION_DETALLE_MENSAJE);
 	}

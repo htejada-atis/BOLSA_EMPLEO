@@ -153,6 +153,7 @@ $(document).ready(function() {
 		toolbar1: "undo redo | bold italic underline | alignleft aligncenter alignright alignjustify | bullist numlist outdent indent | link image",
 		toolbar2: "preview | forecolor backcolor | code | styleselect | fontselect | fontsizeselect",
 		toolbar_items_size: 'small',
+	<%= mensajeBorrador ? "" : "readonly : 1"%>
 	});
 	
 	<%	if (mensajeBorrador) { %>
