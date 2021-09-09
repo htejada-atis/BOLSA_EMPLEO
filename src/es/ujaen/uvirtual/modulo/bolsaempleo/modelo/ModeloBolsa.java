@@ -43,6 +43,7 @@ public class ModeloBolsa {
 	
 	public static final String MENSAJE_ERROR_BOLSA_NULL = "Bolsa no puede estar vacía";
 	public static final String MENSAJE_ERROR_BAREMAR_BOLSA_NO_BLOQUEADA = "Para baremar una bolsa su estado debe ser 'BLOQUEADA'";
+	public static final String MENSAJE_ERROR_BAREMAR_BOLSA_NO_BAREMABLE = "Para baremar una bolsa debe ser baremable";
 
 	public static final String BOLSA_ESTADO_BLOQUEADA = "BLOQUEADA";
 	public static final String BOLSA_ESTADO_REVISION = "REVISION";
@@ -444,6 +445,10 @@ public class ModeloBolsa {
 	public void ponerBolsaComoPendienteBaremacion(Bolsa bolsa, UsuarioBolsaEmpleo usuarioUpdate) throws SQLException, UVException {
 		if (!bolsa.getEstado().equals(BOLSA_ESTADO_BLOQUEADA)) {
 			throw new UVException(MENSAJE_ERROR_BAREMAR_BOLSA_NO_BLOQUEADA);
+		}
+		
+		if (!bolsa.getBaremable()) {
+			throw new UVException(MENSAJE_ERROR_BAREMAR_BOLSA_NO_BAREMABLE);
 		}
 		
 		String query = "UPDATE TBEP_BOLSAS SET FLGPENBAREMACION = 'S', UID_USUARIO = ? WHERE CODNUM = ?";
