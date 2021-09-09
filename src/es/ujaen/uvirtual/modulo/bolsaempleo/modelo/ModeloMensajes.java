@@ -663,7 +663,7 @@ public class ModeloMensajes {
 		// limit de 100 en 100 destinatarios.
 		String consultaSelect = "SELECT bepmde.* FROM TBEP_MEN_DESTINATARIOS bepmde"
 				+ " LEFT JOIN TBEP_USUARIOS bepusu ON bepusu.CODNUM = bepmde.BEPUSU_CODNUM"
-				+ " WHERE BEPMEN_CODNUM = ? AND (bepusu.VUAJA_EMAIL_ALTA IS NOT NULL OR bepmde.EMAIL IS NOT NULL)";
+				+ " WHERE BEPMEN_CODNUM = ? AND ((bepusu.VUAJA_EMAIL_ALTA IS NOT NULL AND bepusu.FLGBORRADO = 'N') OR bepmde.EMAIL IS NOT NULL)";
 		try (Connection conexion = ConexionUvirtual.obtenerInstancia(); PreparedStatement stmt = conexion.prepareStatement(consultaSelect)) {
 			int parameterIndex = 1;
 			stmt.setInt(parameterIndex++, mensaje.getCodNum());

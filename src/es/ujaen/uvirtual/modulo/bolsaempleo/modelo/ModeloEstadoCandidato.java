@@ -175,6 +175,7 @@ public class ModeloEstadoCandidato {
 				+ " LEFT JOIN TBEP_ESTADO_CANDIDATOS bepesc ON bepesc.BEPUSU_CODNUM = bepusu.CODNUM AND bepesc.BEPBOL_CODNUM = bepbol.CODNUM"
 				+ " WHERE bepplo.CODNUM = ?"
 				+ "     AND bepusu.ROL = " + ModeloRol.ID_ROL_CANDIDATO
+				+ "     AND bepusu.FLGBORRADO = 'N'"
 				+ "     AND (bepesc.CODNUM IS NULL"
 				+ "         OR bepesc.ESTADO = '" + ModeloEstadoCandidato.ESTADO_DISPONIBLE + "'"
 				+ "         OR (bepesc.ESTADO = '" + ModeloEstadoCandidato.ESTADO_CONTRATADO_PRIMER_CUATRIMESTRE + "' "

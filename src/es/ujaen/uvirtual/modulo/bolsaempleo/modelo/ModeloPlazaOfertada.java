@@ -448,7 +448,8 @@ public class ModeloPlazaOfertada {
 				+ "         OR bepesc.ESTADO = '" + ModeloEstadoCandidato.ESTADO_DISPONIBLE + "'"
 				+ "         OR (bepesc.ESTADO = '" + ModeloEstadoCandidato.ESTADO_CONTRATADO_PRIMER_CUATRIMESTRE + "' "
 				+ "             AND bepplo.CUATRIMESTRE = '" + ModeloPlazaOfertada.CUATRIMESTRE_SEGUNDO + "')"
-				+ "     )";
+				+ "     )"
+				+ "     AND bepusu.FLGBORRADO = 'N'";
 		
 		String whereNombre = String.format("(%s || ' ' || %s || ' ' || %s)", "bepusu.VUAJA_STRNOMBRE", "bepusu.VUAJA_STRAPELLIDO1", "bepusu.VUAJA_STRAPELLIDO2");
 				
@@ -686,6 +687,7 @@ public class ModeloPlazaOfertada {
 				+ " LEFT JOIN TBEP_ESTADO_CANDIDATOS bepesc ON bepesc.BEPUSU_CODNUM = bepusu.CODNUM AND bepesc.BEPBOL_CODNUM = bepbol.CODNUM"
 				+ " WHERE bepplo.CODNUM = ?"
 				+ "     AND bepusu.ROL = " + ModeloRol.ID_ROL_CANDIDATO
+				+ "     AND bepusu.FLGBORRADO = 'N'"
 				+ "     AND (bepesc.CODNUM IS NULL"
 				+ "         OR bepesc.ESTADO = '" + ModeloEstadoCandidato.ESTADO_DISPONIBLE + "'"
 				+ "         OR (bepesc.ESTADO = '" + ModeloEstadoCandidato.ESTADO_CONTRATADO_PRIMER_CUATRIMESTRE + "' "
