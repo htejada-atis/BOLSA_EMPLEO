@@ -16,6 +16,7 @@ import es.ujaen.uvirtual.modulo.bolsaempleo.beans.Bolsa;
 import es.ujaen.uvirtual.modulo.bolsaempleo.beans.BolsaResultado;
 import es.ujaen.uvirtual.modulo.bolsaempleo.beans.Convocatoria;
 import es.ujaen.uvirtual.modulo.bolsaempleo.beans.Fichero;
+import es.ujaen.uvirtual.modulo.bolsaempleo.beans.Mensaje;
 import es.ujaen.uvirtual.modulo.bolsaempleo.beans.Merito;
 import es.ujaen.uvirtual.modulo.bolsaempleo.beans.MeritoPreferenteUsuario;
 import es.ujaen.uvirtual.modulo.bolsaempleo.beans.PlazaOfertada;
@@ -28,6 +29,7 @@ import es.ujaen.uvirtual.modulo.bolsaempleo.modelo.ModeloBolsa;
 import es.ujaen.uvirtual.modulo.bolsaempleo.modelo.ModeloConvocatoria;
 import es.ujaen.uvirtual.modulo.bolsaempleo.modelo.ModeloDescargaFichero;
 import es.ujaen.uvirtual.modulo.bolsaempleo.modelo.ModeloFichero;
+import es.ujaen.uvirtual.modulo.bolsaempleo.modelo.ModeloMensajes;
 import es.ujaen.uvirtual.modulo.bolsaempleo.modelo.ModeloMerito;
 import es.ujaen.uvirtual.modulo.bolsaempleo.modelo.ModeloMeritosPreferentesCandidato;
 import es.ujaen.uvirtual.modulo.bolsaempleo.modelo.ModeloMisTitulaciones;
@@ -62,6 +64,7 @@ public class ControladorDescargaFicheros extends HttpServlet {
 	// Acciones
 	public static final String ACCION_DESCARGAR_ACREDITACION_CANDIDATO = "descargaracreditacioncandidato";
 	public static final String ACCION_DESCARGAR_ACREDITACION_PERSONAL = "descargaracreditacionpersonal";
+	public static final String ACCION_DESCARGAR_ADJUNTO_MENSAJE_PERSONAL = "descargaradjuntomensajepersonal";
 	public static final String ACCION_DESCARGAR_DOCUMENTO = "descargardocumento";
 	public static final String ACCION_DESCARGAR_HORARIO_CANDIDATO = "descargarhorariocandidato";
 	public static final String ACCION_DESCARGAR_HORARIO_DIRECTOR = "descargarhorariodirector";
@@ -84,6 +87,7 @@ public class ControladorDescargaFicheros extends HttpServlet {
 	public static final String PARAM_ARCHIVO = "archivo";
 	public static final String PARAM_BOLSA = "bolsa";
 	public static final String PARAM_CANDIDATO = "candidato";
+	public static final String PARAM_MENSAJE = "mensaje";
 	public static final String PARAM_MERITO = "merito";
 	public static final String PARAM_PLAZA_OFERTADA = "plazaofertada";
 	public static final String PARAM_SOLICITUD = "solicitud";
@@ -129,6 +133,7 @@ public class ControladorDescargaFicheros extends HttpServlet {
 					accionesFicherosEvaluador(bean, datos, request, response, nombreAccion);
 					break;
 				case ACCION_DESCARGAR_ACREDITACION_PERSONAL:
+				case ACCION_DESCARGAR_ADJUNTO_MENSAJE_PERSONAL:
 				case ACCION_DESCARGAR_HORARIO_PERSONAL:
 				case ACCION_DESCARGAR_MERITO_PERSONAL:
 				case ACCION_DESCARGAR_NRI_PERSONAL:
@@ -275,6 +280,9 @@ public class ControladorDescargaFicheros extends HttpServlet {
 			case ACCION_DESCARGAR_ACREDITACION_PERSONAL:
 				descargaAcreditacionPersonal(bean, datos, request, response);
 				break;
+			case ACCION_DESCARGAR_ADJUNTO_MENSAJE_PERSONAL:
+				descargaAdjuntoMensajePersonal(bean, datos, request, response);
+				break;
 			case ACCION_DESCARGAR_HORARIO_PERSONAL:
 				descargaHorarioPlazaPersonal(bean, datos, request, response);
 				break;
@@ -366,6 +374,18 @@ public class ControladorDescargaFicheros extends HttpServlet {
 		try (InputStream archivo = GenerarItemsBaremacionPDF.generarPDF()) {
 			descargarPDF(datos, response, archivo);
 		}
+	}
+	
+	///////////////////////////////////////////////////////////////////////////////////////////////////////////
+	// MENSAJES
+	///////////////////////////////////////////////////////////////////////////////////////////////////////////
+	
+	private void descargaAdjuntoMensajePersonal(VistaDescargaFicheros bean, UVDatos datos, HttpServletRequest request, HttpServletResponse response)
+			throws SQLException, UVException, IOException {
+		Integer idMensaje = Formateador.leeParametroInteger(request.getParameter(PARAM_MENSAJE));
+		Mensaje mensaje = ModeloMensajes.obtenerInstancia().getMensajeById(idMensaje, true);
+		bean.setMensaje(mensaje);
+		descargarPDF(datos, response, mensaje.getAdjunto());
 	}
 	
 	///////////////////////////////////////////////////////////////////////////////////////////////////////////

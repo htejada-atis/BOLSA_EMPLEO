@@ -369,15 +369,24 @@ public class ModeloMensajes {
 			throw new UVException(MENSAJE_ERROR_MENSAJE_NULL);
 		}
 		
-		String consulta = "UPDATE TBEP_MENSAJES SET TITULO = ?, CUERPO = ?, ESTADO = ?, UID_USUARIO = ?"
-				+ "	WHERE CODNUM = ?";
+		if (!mensaje.getEstado().contains(MENSAJE_ESTADO_BORRADOR)) {
+			throw new UVException("Para actualizar un mensaje debe estar en estado borrador");
+		}
+		
+		String consulta = "UPDATE TBEP_MENSAJES SET TITULO = ?,"
+				+ " CUERPO = ?,"
+				+ (mensaje.getAdjunto() != null ? " ADJUNTO = ?," : "")
+				+ " UID_USUARIO = ?"
+				+ " WHERE CODNUM = ?";
 		
 		try (Connection conexion = ConexionUvirtual.obtenerInstancia();
 				PreparedStatement stmt = conexion.prepareStatement(consulta)) {
 			int indexParam = 1;
 			stmt.setString(indexParam++, mensaje.getTitulo());
 			stmt.setString(indexParam++, mensaje.getCuerpo());
-			stmt.setString(indexParam++, mensaje.getEstado());
+			if (mensaje.getAdjunto() != null) {
+				stmt.setBlob(indexParam++, mensaje.getAdjunto());
+			}
 			stmt.setString(indexParam++, usuarioUpdate.getCodCuenta());
 			stmt.setInt(indexParam++, mensaje.getCodNum());
 			stmt.executeUpdate();
@@ -484,6 +493,40 @@ public class ModeloMensajes {
 				int parameterIndex = 1;
 				stmt.setInt(parameterIndex++, mensaje.getCodNum());
 				stmt.setInt(parameterIndex++, destinatario.getCodNum());
+				stmt.setString(parameterIndex++, usuarioUpdate.getCodCuenta());
+				stmt.executeUpdate();
+			}
+		}
+	}
+	
+	/** Agrega un email a un mensaje .
+	 * @param mensaje .
+	 * @param email .
+	 * @param usuarioUpdate .
+	 * @throws UVException .
+	 * @throws UVException .
+	 * @throws SQLException .
+	 */
+	public void agregarDestinatarioEmail(Mensaje mensaje, String email, UsuarioBolsaEmpleo usuarioUpdate) throws SQLException, UVException {
+		try (Connection conexion = ConexionUvirtual.obtenerInstancia()) {
+			String consultaSelect = "SELECT * FROM TBEP_MEN_DESTINATARIOS WHERE BEPMEN_CODNUM = ? AND EMAIL = ?";
+			try (PreparedStatement stmt = conexion.prepareStatement(consultaSelect)) {
+				int parameterIndex = 1;
+				stmt.setInt(parameterIndex++, mensaje.getCodNum());
+				stmt.setString(parameterIndex++, email);
+				
+				try (ResultSet rs = stmt.executeQuery()) {
+					while (rs.next()) {
+						throw new UVException(ERROR_DESTINATARIO_YA_EXISTE);
+					}
+				}
+			}
+			
+			String consultaInsert = "INSERT INTO TBEP_MEN_DESTINATARIOS (BEPMEN_CODNUM, EMAIL, UID_USUARIO) VALUES (?, ?, ?)";
+			try (PreparedStatement stmt = conexion.prepareStatement(consultaInsert)) {
+				int parameterIndex = 1;
+				stmt.setInt(parameterIndex++, mensaje.getCodNum());
+				stmt.setString(parameterIndex++, email);
 				stmt.setString(parameterIndex++, usuarioUpdate.getCodCuenta());
 				stmt.executeUpdate();
 			}

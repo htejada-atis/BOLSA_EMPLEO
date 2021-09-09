@@ -282,8 +282,8 @@ public class ControladorContratacion extends HttpServlet {
 		PlazaOfertada plaza = modelo.getPlazaOfertadaById(Formateador.leeParametroInteger(BolsaEmpleoUtils.getParamRequestOrMultipartOrSession(
 				request, parametros, PARAM_PLAZA_OFERTADA)));
 		
-		if ((!nombreAccion.equals(ACCION_SELECCIONAR_PLAZA_OFERTADA) && !bean.getUsuarioLogeado().isServicioPersonal() 
-				&& !plaza.getEstado().equals(ModeloPlazaOfertada.PLAZA_ESTADO_CREACION)) || !bean.getUsuarioLogeado().isServicioPersonal()
+		if (!nombreAccion.equals(ACCION_SELECCIONAR_PLAZA_OFERTADA) && !bean.getUsuarioLogeado().isServicioPersonal() 
+				&& !plaza.getEstado().equals(ModeloPlazaOfertada.PLAZA_ESTADO_CREACION) || !bean.getUsuarioLogeado().isServicioPersonal()
 				&& !ModeloEvaluador.obtenerInstancia().checkEvaluadorArea(plaza.getArea(), bean.getUsuarioLogeado())) {
 			BolsaEmpleoUtils.redirectToError(bean, datos, request, response, MENSAJE_ERROR_SIN_PERMISO);
 		}

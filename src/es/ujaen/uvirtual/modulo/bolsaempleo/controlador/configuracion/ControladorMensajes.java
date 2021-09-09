@@ -1,6 +1,8 @@
 package es.ujaen.uvirtual.modulo.bolsaempleo.controlador.configuracion;
 
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.PrintWriter;
 import java.sql.SQLException;
 import java.util.ArrayList;
@@ -13,12 +15,15 @@ import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import org.apache.commons.fileupload.FileItem;
+import org.apache.commons.fileupload.FileUploadException;
+import org.apache.commons.fileupload.disk.DiskFileItemFactory;
+import org.apache.commons.fileupload.servlet.ServletFileUpload;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.reflect.TypeToken;
 import es.ujaen.uvirtual.beans.CodigoDescripcion;
 import es.ujaen.uvirtual.beans.UVDatos;
-import es.ujaen.uvirtual.beans.Usuario;
 import es.ujaen.uvirtual.modulo.bolsaempleo.beans.Destinatario;
 import es.ujaen.uvirtual.modulo.bolsaempleo.beans.Mensaje;
 import es.ujaen.uvirtual.modulo.bolsaempleo.beans.UsuarioBolsaEmpleo;
@@ -54,9 +59,11 @@ public class ControladorMensajes extends HttpServlet {
 	
 	// parametros
 	public static final String PARAM_ACCION = "a";
+	public static final String PARAM_ADJUNTO = "adjunto";
 	public static final String PARAM_BORRAR = "borrar";
 	public static final String PARAM_CUERPO = "cuerpo";
 	public static final String PARAM_DESTINATARIOS = "destinatarios";
+	public static final String PARAM_EMAIL = "email";
 	public static final String PARAM_ENVIAR = "enviar";
 	public static final String PARAM_GUARDAR = "guardar";
 	public static final String PARAM_MENSAJE_ID = "mensaje";
@@ -66,6 +73,7 @@ public class ControladorMensajes extends HttpServlet {
 	
 	// acciones
 	public static final String ACCION_AGREGAR_DESTINATARIOS = "agregardestinatarios";
+	public static final String ACCION_AGREGAR_EMAIL_DESTINATARIO = "agregaremaildestinatario";
 	public static final String ACCION_BORRAR_MENSAJE = "borrarMensaje";
 	public static final String ACCION_DATATABLE = "datatable";
 	public static final String ACCION_DATATABLE_DESTINATARIOS = "datatableDestinatarios";
@@ -115,18 +123,39 @@ public class ControladorMensajes extends HttpServlet {
 		datos.setContentType("text/html");
 
 		VistaMensajes bean = new VistaMensajes();
-		Usuario usuario = datos.getUsuario();
-		LOGGER.log(Level.FINEST, "usuario que ha entrado en el servlet es {0}", usuario.getUid());
-
-		String nombreAccion = EscapaHTML.ajustaCodificacion(BolsaEmpleoUtils.getParamRequestOrSession(request, PARAM_ACCION));
-		if (nombreAccion == null) {
+		
+		HashMap<String, Object> parametros = new HashMap<>();
+		
+		if (ServletFileUpload.isMultipartContent(request)) {
+			try {
+				List<FileItem> items = new ServletFileUpload(new DiskFileItemFactory()).parseRequest(request);
+				for (FileItem item : items) {
+					if (item.isFormField()) {
+						parametros.put(item.getFieldName(), item.getString());
+					} else {
+						if (item.getSize() > 0 && item.getName().toLowerCase().endsWith(".pdf")) {
+							try (InputStream contenidoDelFichero = item.getInputStream(); ByteArrayOutputStream salida = new ByteArrayOutputStream()) {
+								parametros.put(item.getFieldName(), BolsaEmpleoUtils.checkFileSize(contenidoDelFichero));
+							}
+						}
+					}
+				}
+			} catch (FileUploadException | UVException | SQLException e) {
+				e.printStackTrace();
+			}
+		}
+		
+		String nombreAccion = EscapaHTML.ajustaCodificacion(BolsaEmpleoUtils.getParamRequestOrMultipartOrSession(
+				request, parametros, PARAM_ACCION));
+		if (nombreAccion == null || nombreAccion.isEmpty()) {
 			nombreAccion = ACCION_INDEX;
 		}
-
+		
 		try {
 			init(bean, datos, request, response);
 			switch (nombreAccion) {
 				case ACCION_AGREGAR_DESTINATARIOS:
+				case ACCION_AGREGAR_EMAIL_DESTINATARIO:
 				case ACCION_BORRAR_MENSAJE:
 				case ACCION_DATATABLE_DESTINATARIOS:
 				case ACCION_DATATABLE_DESTINATARIOS_DISPONIBLES:
@@ -134,7 +163,7 @@ public class ControladorMensajes extends HttpServlet {
 				case ACCION_ELIMINAR_DESTINATARIOS:
 				case ACCION_ENVIAR_MENSAJE:
 				case ACCION_MODIFICAR_MENSAJE:
-					accionesMensaje(bean, datos, request, response, nombreAccion);
+					accionesMensaje(bean, datos, request, response, nombreAccion, parametros);
 					break;
 				case ACCION_INDEX:
 					index(bean);
@@ -211,13 +240,13 @@ public class ControladorMensajes extends HttpServlet {
 	// MENSAJES
 	///////////////////////////////////////////////////////////////////////////////////////////////////////////
 	
-	private void accionesMensaje(VistaMensajes bean, UVDatos datos, HttpServletRequest request, HttpServletResponse response, String nombreAccion)
-			throws IOException, SQLException, UVException {
+	private void accionesMensaje(VistaMensajes bean, UVDatos datos, HttpServletRequest request, HttpServletResponse response, String nombreAccion,
+			HashMap<String, Object> parametros) throws IOException, SQLException, UVException {
 		bean.setVista(JSP_DETALLE);
 		
 		ModeloMensajes modeloMensajes = ModeloMensajes.obtenerInstancia();
-		Integer idMensaje = Formateador.leeParametroInteger(BolsaEmpleoUtils.getParamRequestOrSession(request, PARAM_MENSAJE_ID));
-		bean.setMensaje(modeloMensajes.getMensajeById(idMensaje, false));
+		bean.setMensaje(modeloMensajes.getMensajeById(Formateador.leeParametroInteger(BolsaEmpleoUtils.getParamRequestOrMultipartOrSession(
+				request, parametros, PARAM_MENSAJE_ID)), true));
 		
 		bean.setConvocatorias(ModeloConvocatoria.obtenerInstancia().listaConvocatorias());
 		bean.setAreas(ModeloArea.obtenerInstancia().listaAreas());
@@ -226,6 +255,9 @@ public class ControladorMensajes extends HttpServlet {
 		switch (nombreAccion) {
 			case ACCION_AGREGAR_DESTINATARIOS:
 				agregarDestinatarios(bean, datos, request, response);
+				break;
+			case ACCION_AGREGAR_EMAIL_DESTINATARIO:
+				agregarEmailDestinatario(bean, datos, request, response);
 				break;
 			case ACCION_BORRAR_MENSAJE:
 				borrarMensaje(bean, datos, request, response);
@@ -245,7 +277,7 @@ public class ControladorMensajes extends HttpServlet {
 				enviarMensaje(bean, datos, request, response);
 				break;
 			case ACCION_MODIFICAR_MENSAJE:
-				guardarMensaje(bean, datos, request, response); 
+				guardarMensaje(bean, datos, request, response, parametros); 
 				break;
 			default:
 				errorFatal(bean, MENSAJE_ERROR_ACCION_NO_CONTEMPLADA);
@@ -283,6 +315,18 @@ public class ControladorMensajes extends HttpServlet {
 			LOGGER.log(Level.SEVERE, ex.toString());
 			BolsaEmpleoUtils.addMensajeDeError(ex.getMessage(), bean, request);
 		}
+		
+		redireccionConMensajeSeleccionado(bean, datos, request, response, ACCION_DETALLE_MENSAJE);
+	}
+	
+	private void agregarEmailDestinatario(VistaMensajes bean, UVDatos datos, HttpServletRequest request, HttpServletResponse response)
+			throws UVException, IOException, SQLException {
+		ModeloMensajes modeloMensaje = ModeloMensajes.obtenerInstancia();
+		
+		String email = EscapaHTML.ajustaCodificacion(request.getParameter(PARAM_EMAIL));
+		modeloMensaje.agregarDestinatarioEmail(bean.getMensaje(), email, bean.getUsuarioLogeado());
+		
+		BolsaEmpleoUtils.addMensajeDeExito(MENSAJE_EXITO_DESTINATARIO_AGREGADO, bean, request);
 		
 		redireccionConMensajeSeleccionado(bean, datos, request, response, ACCION_DETALLE_MENSAJE);
 	}
@@ -347,12 +391,12 @@ public class ControladorMensajes extends HttpServlet {
 		response.sendRedirect(request.getServletPath());
 	}
 	
-	private void guardarMensaje(VistaMensajes bean, UVDatos datos, HttpServletRequest request, HttpServletResponse response) throws IOException, SQLException, UVException {
-		if (EscapaHTML.ajustaCodificacion(request.getParameter(PARAM_GUARDAR)) != null) {
+	private void guardarMensaje(VistaMensajes bean, UVDatos datos, HttpServletRequest request, HttpServletResponse response,
+			HashMap<String, Object> parametros) throws IOException, SQLException, UVException {
+		if (EscapaHTML.ajustaCodificacion(BolsaEmpleoUtils.getParamRequestOrMultipartOrSession(
+				request, parametros, PARAM_TITULO)) != null) {
 			ModeloMensajes modeloMensaje = ModeloMensajes.obtenerInstancia();
-			Mensaje mensaje = this.getValidatorMensaje(request);
-			mensaje.setCodNum(bean.getMensaje().getCodNum());
-			mensaje.setEstado(bean.getMensaje().getEstado());
+			Mensaje mensaje = this.getValidatorMensaje(request, bean.getMensaje(), parametros);
 			
 			modeloMensaje.actualizarMensaje(mensaje, bean.getUsuarioLogeado());
 			
@@ -458,10 +502,9 @@ public class ControladorMensajes extends HttpServlet {
 		}
 	}
 	
-	private Mensaje getValidatorMensaje(HttpServletRequest request) throws UVException {
-		Mensaje mensaje = new Mensaje();
-		
-		mensaje.setTitulo(EscapaHTML.ajustaCodificacion(request.getParameter(PARAM_TITULO)));
+	private Mensaje getValidatorMensaje(HttpServletRequest request, Mensaje mensaje, HashMap<String, Object> parametros) throws UVException {
+		mensaje.setTitulo(Formateador.leeParametroString(BolsaEmpleoUtils.getParamRequestOrMultipartOrSession(
+				request, parametros, PARAM_TITULO)));
 		if (mensaje.getTitulo() == null || mensaje.getTitulo().isBlank()) {
 			throw new UVException(MENSAJE_ERROR_TITULO_VACIO);
 		}
@@ -469,10 +512,13 @@ public class ControladorMensajes extends HttpServlet {
 			throw new UVException(String.format(MENSAJE_ERROR_TITULO_LARGO, ModeloMensajes.MENSAJES_COLUMN_TITULO_MAXLENGTH));
 		}
 		
-		mensaje.setCuerpo(EscapaHTML.ajustaCodificacion(request.getParameter(PARAM_CUERPO)));
+		mensaje.setCuerpo(EscapaHTML.ajustaCodificacion(BolsaEmpleoUtils.getParamRequestOrMultipartOrSession(
+				request, parametros, PARAM_CUERPO)));
 		if (mensaje.getCuerpo() == null || mensaje.getCuerpo().isBlank()) {
 			throw new UVException(MENSAJE_ERROR_CUERPO_VACIO);
 		}
+		
+		mensaje.setAdjunto((InputStream) parametros.get(PARAM_ADJUNTO));
 		
 		return mensaje;
 	}

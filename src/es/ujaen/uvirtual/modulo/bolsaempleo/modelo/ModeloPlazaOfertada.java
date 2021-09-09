@@ -434,7 +434,7 @@ public class ModeloPlazaOfertada {
 		BolsaEmpleoDataTable<OfertaCandidato> dataTable = new BolsaEmpleoDataTable<>(params);
 		
 		String consulta = "SELECT bepusu.CODNUM AS BEPUSU_CODNUM, bepsob.TOTAL AS PUNTUACION, bepofc.CODNUM, bepofc.FLGRESULTADO, "
-				+ "     bepofc.FECHA_RESULTADO, bepofc.PREFERENCIA, bepsol.BEPUSU_CODNUM AS BEPUSU_CODNUM, ? AS BEPPLO_CODNUM,"
+				+ "     bepofc.FECHA_RESULTADO, bepofc.PREFERENCIA, ? AS BEPPLO_CODNUM,"
 				+ "     bepcnt.CODNUM AS CONTRATACION"
 				+ " FROM TBEP_USUARIOS bepusu"
 				+ " INNER JOIN TBEP_SOLICITUDES bepsol ON bepsol.BEPUSU_CODNUM = bepusu.CODNUM"
@@ -676,22 +676,23 @@ public class ModeloPlazaOfertada {
 			throws SQLException, UVException {
 		List<Integer> destinatarios = new ArrayList<>();
 		
-		String consultaSelectDest = "SELECT bepusu.* FROM TBEP_USUARIOS bepusu"
-				+ " LEFT JOIN TBEP_ESTADO_CANDIDATOS bepesc ON bepesc.BEPUSU_CODNUM = bepusu.CODNUM"
+		String consulta = "SELECT bepusu.CODNUM"
+				+ " FROM TBEP_USUARIOS bepusu"
 				+ " INNER JOIN TBEP_SOLICITUDES bepsol ON bepsol.BEPUSU_CODNUM = bepusu.CODNUM"
 				+ " INNER JOIN TBEP_SOLICITUD_BOLSAS bepsob ON bepsob.BEPSOL_CODNUM = bepsol.CODNUM AND bepsob.FECHABAREMACION IS NOT NULL"
 				+ " INNER JOIN TBEP_BOLSAS bepbol ON bepbol.CODNUM = bepsob.BEPBOL_CODNUM"
 				+ " INNER JOIN TBEP_AREAS bepare ON bepare.CODNUM = bepbol.BEPARE_CODNUM"
 				+ " INNER JOIN TBEP_PLAZAS_OFERTADAS bepplo ON bepplo.BEPARE_CODNUM = bepare.CODNUM"
+				+ " LEFT JOIN TBEP_ESTADO_CANDIDATOS bepesc ON bepesc.BEPUSU_CODNUM = bepusu.CODNUM AND bepesc.BEPBOL_CODNUM = bepbol.CODNUM"
 				+ " WHERE bepplo.CODNUM = ?"
 				+ "     AND bepusu.ROL = " + ModeloRol.ID_ROL_CANDIDATO
 				+ "     AND (bepesc.CODNUM IS NULL"
 				+ "         OR bepesc.ESTADO = '" + ModeloEstadoCandidato.ESTADO_DISPONIBLE + "'"
 				+ "         OR (bepesc.ESTADO = '" + ModeloEstadoCandidato.ESTADO_CONTRATADO_PRIMER_CUATRIMESTRE + "' "
-				+ "             AND bepplo.CUATRIMESTRE = '" + CUATRIMESTRE_SEGUNDO + "')"
+				+ "             AND bepplo.CUATRIMESTRE = '" + ModeloPlazaOfertada.CUATRIMESTRE_SEGUNDO + "')"
 				+ "     )";
 		
-		try (PreparedStatement stmt = conexion.prepareStatement(consultaSelectDest)) {
+		try (PreparedStatement stmt = conexion.prepareStatement(consulta)) {
 			stmt.setInt(1, plaza.getCodNum());
 			
 			try (ResultSet rs = stmt.executeQuery()) {
