@@ -23,7 +23,7 @@ VistaPlazasOfertadas bean = (VistaPlazasOfertadas) uvdatos.getVistas().get(Vista
 	
 	<table class="bluetable bolsaempleo" id="tablePlazasOfertadas">
 		<tr>
-			<th scope="col" style="width:30px">Id</th>
+			<th scope="col" style="width:100px">Código</th>
 			<th scope="col" style="width:100%">Área</th>
 			<th scope="col" style="width:95px">Estado</th>
 			<th scope="col" style="width:100px">Fecha fin oferta</th>
@@ -42,18 +42,18 @@ VistaPlazasOfertadas bean = (VistaPlazasOfertadas) uvdatos.getVistas().get(Vista
 		<table class="bluetable bolsaempleo" id="tableOfertasPreferentes">
 			<caption>Plazas aceptadas por preferencia</caption>
 			<tr>
-				<th scope="col" style="width:30px">Id</th>
+				<th scope="col" style="width:100px">Código</th>
 				<th scope="col" style="width:100%">Área</th>
-				<th scope="col" style="width:95px">Estado</th>
+				<th scope="col" style="width:88px">Estado</th>
 				<th scope="col" style="width:100px" class="center">Cita contratación</th>
 				<th scope="col" style="width:100px" class="center">Confirmación de cita</th>
 				<th scope="col" style="width:75px">Preferencia</th>
-				<th scope="col" style="width:75px"></th>
+				<th scope="col" style="width:70px"></th>
 			</tr>
 			<tbody>
 			<%	for (OfertaCandidato ofertaCandidato: bean.getListaOfertasCandidatos()) { %>
 					<tr class="oferta_row" data-id="<%= ofertaCandidato.getCodNum() %>">
-						<td><%= ofertaCandidato.getPlaza().getCodNum() %></td>
+						<td><%= EscapaHTML.escapa(ofertaCandidato.getPlaza().getIdPlaza()) %></td>
 						<td><%= ofertaCandidato.getPlaza().getArea().getIdAreaExterno() + " " + ofertaCandidato.getPlaza().getArea().getDescripcion() %></td>
 						<td><%= ofertaCandidato.getPlaza().getEstado() %></td>
 						<td class="center"><%= ofertaCandidato.getContratacion() != null ? "<div class='circle-true'></div>" : "" %></td>
@@ -102,7 +102,7 @@ $(document).ready(function() {
 			Atis.sendForm("<%= request.getRequestURI() %>", params);
 		}},
 		"columns": [
-			{'data': 'plaza.codNum', 'filter': {'type': 'number'}},
+			{'data': 'plaza.idPlaza', 'filter': true},
 			{'data': 'plaza.area.idAreaExterno', 'filter': true, 'render': function(row) {
 				return row.plaza.area.idAreaExterno + ' ' + row.plaza.area.descripcion;
 			}},

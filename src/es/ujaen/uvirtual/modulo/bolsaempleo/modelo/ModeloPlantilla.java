@@ -232,7 +232,7 @@ public class ModeloPlantilla {
 			right = SEPARATOR_RIGHT_XML;
 		}
 		
-		texto = texto.replaceAll(left + "idplaza" + right, plaza.getCodNum().toString());
+		texto = texto.replaceAll(left + "idplaza" + right, plaza.getIdPlaza() != null ? plaza.getIdPlaza() : plaza.getCodNum().toString());
 		texto = texto.replaceAll(left + "area" + right, plaza.getArea().getDescripcion());
 		texto = texto.replaceAll(left + "justificacion" + right, plaza.getJustificacion());
 		texto = texto.replaceAll(left + "duracion_prevista" + right, plaza.getDuracionPrevista() != null ? plaza.getDuracionPrevista() : "");

@@ -88,6 +88,7 @@ public class ControladorContratacion extends HttpServlet {
 	public static final String PARAM_AREA = "area";
 	public static final String PARAM_CANDIDATO = "candidato";
 	public static final String PARAM_CENTRO_DESTINO = "centrodestino";
+	public static final String PARAM_CODIGO = "codigo";
 	public static final String PARAM_CUATRIMESTRE = "cuatrimestre";
 	public static final String PARAM_DEDICACION = "dedicacion";
 	public static final String PARAM_DURACION_PREVISTA = "duracionprevista";
@@ -711,6 +712,9 @@ public class ControladorContratacion extends HttpServlet {
 			if (plaza.getDuracionPrevista().length() > ModeloPlazaOfertada.COLUMN_DURACION_PREVISTA_MAXLENGTH) {
 				throw new UVException(MENSAJE_ERROR_DURACION_PREVISTA_LARGA);
 			}
+			
+			plaza.setIdPlaza(Formateador.leeParametroString(BolsaEmpleoUtils.getParamRequestOrMultipartOrSession(
+					request, parametros, PARAM_CODIGO)));
 			
 			String fechaFinOferta = BolsaEmpleoUtils.getParamRequestOrMultipartOrSession(request, parametros, PARAM_FECHA_FIN_OFERTA);
 			String horaFinOferta = BolsaEmpleoUtils.getParamRequestOrMultipartOrSession(request, parametros, PARAM_HORA_FIN_OFERTA);

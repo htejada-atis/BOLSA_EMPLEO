@@ -31,12 +31,13 @@ import es.ujaen.uvirtual.utilidades.UVException;
 public class ModeloPlazaOfertada {
 	
 	public static final int ORDER_COLUMN_INDEX_CODNUM = 0;
-	public static final int ORDER_COLUMN_INDEX_AREA = 1;
-	public static final int ORDER_COLUMN_INDEX_ESTADO = 2;
-	public static final int ORDER_COLUMN_INDEX_FECHA_CREACION = 3;
-	public static final int ORDER_COLUMN_INDEX_FECHA_ABIERTA = 4;
-	public static final int ORDER_COLUMN_INDEX_FECHA_FIN_OFERTA = 5;
-	public static final int ORDER_COLUMN_INDEX_FECHA_CERRADA = 6;
+	public static final int ORDER_COLUMN_INDEX_ID_PLAZA = 1;
+	public static final int ORDER_COLUMN_INDEX_AREA = 2;
+	public static final int ORDER_COLUMN_INDEX_ESTADO = 3;
+	public static final int ORDER_COLUMN_INDEX_FECHA_CREACION = 4;
+	public static final int ORDER_COLUMN_INDEX_FECHA_ABIERTA = 5;
+	public static final int ORDER_COLUMN_INDEX_FECHA_FIN_OFERTA = 6;
+	public static final int ORDER_COLUMN_INDEX_FECHA_CERRADA = 7;
 	
 	public static final int ORDER_COLUMN_INDEX_NIF_CANDIDATOS = 0;
 	public static final int ORDER_COLUMN_INDEX_NOMBRE_CANDIDATOS = 1;
@@ -61,6 +62,7 @@ public class ModeloPlazaOfertada {
 	public static final String MENSAJE_ERROR_NO_HAY_DESTINATARIOS_DISPONIBLES = "No hay candidatos disponibles para la plaza";
 	public static final String MENSAJE_ERROR_PLANTILLA_APERTURA_PLAZA_NO_EXISTE = "La plantilla de apertura de plaza no existe";
 	
+	public static final String ABIERTA_VIGENTE = "ABIERTA_VIGENTE";
 	public static final String BEPARE_CODNUM = "BEPARE_CODNUM";
 	public static final String BEPDED_CODNUM = "BEPDED_CODNUM";
 	public static final String CENTRO_DESTINO = "CENTRO_DESTINO";
@@ -73,11 +75,11 @@ public class ModeloPlazaOfertada {
 	public static final String FECHA_CREACION = "FECHA_CREACION";
 	public static final String FECHA_FIN_OFERTA = "FECHA_FIN_OFERTA";
 	public static final String HORARIO = "HORARIO";
+	public static final String ID_PLAZA = "ID_PLAZA";
 	public static final String JUSTIFICACION = "JUSTIFICACION";
 	public static final String NRI = "NRI";
 	public static final String NRI_FECHA = "NRI_FECHA";
 	public static final String OBSERVACIONES_INTERNAS = "OBSERVACIONES_INTERNAS";
-	public static final String ABIERTA_VIGENTE = "ABIERTA_VIGENTE";
 	
 	public static final Map<String, String> CENTROS_DESTINO = new HashMap<>();
 	public static final Map<String, String> CUATRIMESTRES = new HashMap<>();
@@ -208,9 +210,9 @@ public class ModeloPlazaOfertada {
 		String consulta = "";
 		
 		if (usuarioUpdate.isServicioPersonal()) {
-			consulta = String.format("INSERT INTO TBEP_PLAZAS_OFERTADAS (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s) VALUES (?,?,?,?,?,?,?,?,?,?,?,?)",
+			consulta = String.format("INSERT INTO TBEP_PLAZAS_OFERTADAS (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?)",
 					BEPARE_CODNUM, JUSTIFICACION, CENTRO_DESTINO, FECHA_CREACION, "UID_USUARIO", BEPDED_CODNUM, CUATRIMESTRE, DURACION_PREVISTA, 
-					FECHA_FIN_OFERTA, NRI, NRI_FECHA, HORARIO);
+					FECHA_FIN_OFERTA, ID_PLAZA, NRI, NRI_FECHA, HORARIO);
 		} else {
 			consulta = String.format("INSERT INTO TBEP_PLAZAS_OFERTADAS (%s,%s,%s,%s,%s,%s) VALUES (?,?,?,?,?,?)", 
 					BEPARE_CODNUM, JUSTIFICACION, CENTRO_DESTINO, FECHA_CREACION, "UID_USUARIO", HORARIO);
@@ -228,6 +230,7 @@ public class ModeloPlazaOfertada {
 				stmt.setString(parameterIndex++, plaza.getCuatrimestre());
 				stmt.setString(parameterIndex++, plaza.getDuracionPrevista());
 				stmt.setDate(parameterIndex++, plaza.getFechaFinOferta() != null ? new Date(plaza.getFechaFinOferta().getTime()) : null);
+				stmt.setString(parameterIndex++, plaza.getIdPlaza());
 				stmt.setBlob(parameterIndex++, plaza.getNri());
 				stmt.setDate(parameterIndex++, plaza.getNri() != null ? new Date(BolsaEmpleoUtils.getCurrentDateTime().getTime()) : null);
 			}
@@ -263,12 +266,12 @@ public class ModeloPlazaOfertada {
 		String consulta = "";
 		
 		if (usuarioUpdate.isServicioPersonal()) {
-			consulta = String.format("UPDATE TBEP_PLAZAS_OFERTADAS SET %s=?, %s=?, %s=?, %s=?, %s=?, %s=?, %s=?, %s=? "
+			consulta = String.format("UPDATE TBEP_PLAZAS_OFERTADAS SET %s=?, %s=?, %s=?, %s=?, %s=?, %s=?, %s=?, %s=?, %s=? "
 					+ (plaza.getNri() != null ? ", " + NRI + "=?, " + NRI_FECHA + "=?" : "")
 					+ (plaza.getHorario() != null ? ", " + HORARIO + "=?" : "")
 					+ " WHERE %s=?",
 					BEPARE_CODNUM, JUSTIFICACION, CENTRO_DESTINO, "UID_USUARIO", BEPDED_CODNUM, CUATRIMESTRE, DURACION_PREVISTA, 
-					FECHA_FIN_OFERTA, CODNUM);
+					FECHA_FIN_OFERTA, ID_PLAZA, CODNUM);
 		} else {
 			consulta = String.format("UPDATE TBEP_PLAZAS_OFERTADAS SET %s=?, %s=?, %s=?, %s=?"
 					+ (plaza.getHorario() != null ? ", " + HORARIO + "=?" : "")
@@ -291,6 +294,7 @@ public class ModeloPlazaOfertada {
 				stmt.setString(parameterIndex++, plaza.getCuatrimestre());
 				stmt.setString(parameterIndex++, plaza.getDuracionPrevista());
 				stmt.setDate(parameterIndex++, plaza.getFechaFinOferta() != null ? new Date(plaza.getFechaFinOferta().getTime()) : null);
+				stmt.setString(parameterIndex++, plaza.getIdPlaza());
 				if (plaza.getNri() != null) {
 					stmt.setBlob(parameterIndex++, plaza.getNri());
 					stmt.setDate(parameterIndex++, new Date(BolsaEmpleoUtils.getCurrentDateTime().getTime()));
@@ -513,6 +517,7 @@ public class ModeloPlazaOfertada {
 						: " WHERE 1=1 ");
 		
 		dataTable.setColumn(ORDER_COLUMN_INDEX_CODNUM, "bepplo.CODNUM", DataTableColumn.COLUMN_TYPE_NUMBER);
+		dataTable.setColumn(ORDER_COLUMN_INDEX_ID_PLAZA, "bepplo.ID_PLAZA");
 		dataTable.setColumn(ORDER_COLUMN_INDEX_AREA, "bepare.DES_AREA_CONOCIMIENTO");
 		dataTable.setColumn(ORDER_COLUMN_INDEX_ESTADO, "bepplo.ESTADO", DataTableColumn.COLUMN_TYPE_EXACT);
 		dataTable.setColumn(ORDER_COLUMN_INDEX_FECHA_CREACION, FECHA_CREACION, DataTableColumn.COLUMN_TYPE_DATE);
@@ -787,6 +792,7 @@ public class ModeloPlazaOfertada {
 		plaza.setFechaFinOferta(rs.getDate(FECHA_FIN_OFERTA));
 		plaza.setFechaCerrada(rs.getDate(FECHA_CERRADA));
 		plaza.setFechaNRI(rs.getDate(NRI_FECHA));
+		plaza.setIdPlaza(rs.getString(ID_PLAZA));
 		
 		if (withFiles) {
 			plaza.setHorario(rs.getBlob(HORARIO) != null ? rs.getBlob(HORARIO).getBinaryStream() : null);
