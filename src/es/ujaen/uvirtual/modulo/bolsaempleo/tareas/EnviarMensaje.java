@@ -56,6 +56,7 @@ public final class EnviarMensaje {
 				String nombreArchivo = null;
 				DataSource source = null;
 				if (mensaje.getAdjunto() != null) {
+					nombreArchivo = "adjunto.pdf";
 					source = new ByteArrayDataSource(mensaje.getAdjuntoBytes(), "application/octet-stream");
 				}				
 				String remitente = ModeloParametrosConfiguracion.obtenerInstancia().
