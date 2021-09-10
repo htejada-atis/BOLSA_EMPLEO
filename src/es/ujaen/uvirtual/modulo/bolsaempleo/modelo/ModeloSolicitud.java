@@ -1249,6 +1249,41 @@ public class ModeloSolicitud {
 	}
 	
 	/**
+	 * Obtiene el total de méritos por apartado que hay en la solicitud .
+	 * @param solicitud .
+	 * @param bolsa .
+	 * @param merito .
+	 * @return total .
+	 * @throws SQLException .
+	 */
+	public Integer obtenerTotalMeritosPorApartadoSolicitud(Solicitud solicitud, Bolsa bolsa, Merito merito) throws SQLException {
+		Integer total = 0;
+		String consulta = 
+				"   SELECT COUNT(*) AS total " 
+				+ " FROM TBEP_SOL_BOL_MERITOS bepsbm "
+				+ " INNER JOIN TBEP_SOLICITUD_BOLSAS bepsbo ON bepsbo.CODNUM = bepsbm.BEPSBO_CODNUM "
+				+ " INNER JOIN TBEP_MERITOS bepmer ON bepmer.CODNUM = bepsbm.BEPMER_CODNUM "
+				+ " INNER JOIN TBEP_ITEMSBAREMACION bepite ON bepite.CODNUM = bepmer.BEPITE_CODNUM "
+				+ " INNER JOIN TBEP_BLOQUESBAREMACION bepblo ON bepblo.CODNUM = bepite.BEPBLO_CODNUM "
+				+ " WHERE bepsbo.BEPSOL_CODNUM = ? AND bepsbo.BEPBOL_CODNUM = ? AND bepblo.CODNUM = ?";
+		
+		try (Connection conexion = ConexionUvirtual.obtenerInstancia(); PreparedStatement stmt = conexion.prepareStatement(consulta)) {
+			int parameterIndex = 1;
+			stmt.setInt(parameterIndex++, solicitud.getCodNum());
+			stmt.setInt(parameterIndex++, bolsa.getCodNum());
+			stmt.setInt(parameterIndex++, merito.getItemBaremacion().getBloqueBaremacion().getCodNum());
+			stmt.executeUpdate();
+			
+			try (ResultSet rs = stmt.executeQuery()) {
+				while (rs.next()) {
+					total = rs.getInt("total");
+				}
+			}
+		}
+		return total;
+	}
+	
+	/**
 	 * Obtiene el total de méritos que hay en la solicitud .
 	 * @param solicitud .
 	 * @return total .

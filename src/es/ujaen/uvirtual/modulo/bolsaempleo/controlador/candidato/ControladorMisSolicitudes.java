@@ -112,6 +112,7 @@ public class ControladorMisSolicitudes extends HttpServlet {
 	public static final String MENSAJE_ERROR_ITEM_EXCLUYENTE = "El item que ha seleccionado es excluyente con los items: ";
 	public static final String MENSAJE_ERROR_MERITOS_SIN_VALORACION = "No puede haber méritos con afinidad sin valoración";
 	public static final String MENSAJE_ERROR_MERITO_NO_NULO = "Merito no puede ser nulo";
+	public static final String MENSAJE_ERROR_NUMERO_MAXIMO_MERITOS_APARTADO = "Se ha alcanzado el número máximo de méritos por apartado";
 	public static final String MENSAJE_ERROR_NUMERO_MAXIMO_MERITOS_BLOQUE = "Se ha alcanzado el número máximo de méritos por bloque";
 	public static final String MENSAJE_ERROR_SIN_MERITOS = "Dene incluir al menos un mérito en una bolsa para continuar";
 	public static final String MENSAJE_EXITO_SOLICITUD_CONFIRMADA = "La solicitud ha sido confirmada correctamente";
@@ -584,6 +585,15 @@ public class ControladorMisSolicitudes extends HttpServlet {
 			if (totalMeritos >= solicitud.getConvocatoria().getNumMeritosPorBloque()) {
 				this.seleccionarBolsa(bean, request);
 				throw new UVException(MENSAJE_ERROR_NUMERO_MAXIMO_MERITOS_BLOQUE);
+			}
+			
+			Integer totalMeritosApartado = modeloSolicitud.obtenerTotalMeritosPorApartadoSolicitud(solicitud, area, merito);
+			
+			if (merito.getItemBaremacion().getBloqueBaremacion().getNumeroMaximoMeritos() != null 
+					&& merito.getItemBaremacion().getBloqueBaremacion().getNumeroMaximoMeritos() != 0
+					&& totalMeritosApartado >= merito.getItemBaremacion().getBloqueBaremacion().getNumeroMaximoMeritos()) {
+				this.seleccionarBolsa(bean, request);
+				throw new UVException(MENSAJE_ERROR_NUMERO_MAXIMO_MERITOS_APARTADO);
 			}
 			
 			ModeloBaremacionItems modeloItems = ModeloBaremacionItems.obtenerInstancia();

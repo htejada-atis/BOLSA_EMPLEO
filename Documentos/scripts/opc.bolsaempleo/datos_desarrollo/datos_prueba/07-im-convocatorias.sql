@@ -1,2 +1,2 @@
 INSERT INTO TBEP_CONVOCATORIAS (DESCRIPCION, FECHACIERRE, ESTADO, NUMBOLSASMAXIMO, NUMMERITOSPORBLOQUE, UID_USUARIO)
-VALUES ('Convocatoria de prueba', to_timestamp('2021-08-29 23:59:59', 'yyyy-mm-dd hh24:mi:ss'), 'ABIERTA', 5, 10, 'CARGA_INICIAL');
+VALUES ('Convocatoria de prueba', to_timestamp('2021-12-29 23:59:59', 'yyyy-mm-dd hh24:mi:ss'), 'ABIERTA', 5, 10, 'CARGA_INICIAL');
