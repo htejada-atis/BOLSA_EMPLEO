@@ -33,6 +33,7 @@ boolean mostrarCandidatoContratado = !estadoCreacion && !estadoTramitacion && !e
 boolean editable = estadoCreacion || (estadoTramitacion && personal);
 boolean extraRequeridos = !estadoCreacion;
 
+String codigo = BolsaEmpleoUtils.getParamForm(request, ControladorContratacion.PARAM_CODIGO, EscapaHTML.escapa(plaza.getIdPlaza()));
 String area = BolsaEmpleoUtils.getParamForm(request, ControladorContratacion.PARAM_AREA, plaza.getArea().getCodNum().toString());
 String cuatrimestre = BolsaEmpleoUtils.getParamForm(request, ControladorContratacion.PARAM_CUATRIMESTRE, plaza.getCuatrimestre());
 String centroDestino = BolsaEmpleoUtils.getParamForm(request, ControladorContratacion.PARAM_CENTRO_DESTINO, EscapaHTML.escapa(plaza.getCentroDestino()));
@@ -59,6 +60,14 @@ String justificacion = BolsaEmpleoUtils.getParamForm(request, ControladorContrat
 				value="<%= plaza.getCodNum()%>" />
 		<div class="form-group-container col2">
 			<div class="form-group">
+				<label for="plaza_codigo" <%= extraRequeridos ? "class='bold-label'" : "" %>>Código:</label>
+				<input class="form-input-custom" type="text" name="<%=ControladorContratacion.PARAM_CODIGO%>" id="plaza_codigo" value="<%=codigo%>"
+						<%= editable ? "" : "readonly disabled " %>
+						<%= extraRequeridos ? "required " : "" %>/>
+			</div>
+		</div>
+		<div class="form-group-container col2">
+			<div class="form-group">
 				<label for="plaza_area" class="bold-label">Área:</label>
 				<select id="plaza_area" name="<%=ControladorContratacion.PARAM_AREA%>" style="width:100%;" required <%= editable ? "" : "readonly disabled " %>>
 					<option value="">----------------</option>
@@ -80,7 +89,7 @@ String justificacion = BolsaEmpleoUtils.getParamForm(request, ControladorContrat
 			<div class="form-group">
 				<label for="plaza_dedicacion" <%= extraRequeridos ? "class='bold-label'" : "" %>>Dedicación: </label>
 				<select id="plaza_dedicacion" name="<%=ControladorContratacion.PARAM_DEDICACION%>" style="width:100%;" 
-						<%= editable ? "" : "readonly disabled  " %>
+						<%= editable ? "" : "readonly disabled " %>
 						<%= extraRequeridos ? "required " : "" %>>
 					<option value="">----------------</option>
 				<%	if (plaza.getDedicacion() != null) { %>

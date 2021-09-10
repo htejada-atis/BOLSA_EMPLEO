@@ -24,7 +24,7 @@ import es.ujaen.uvirtual.utilidades.UVException;
  */
 public class ModeloOfertaCandidato {
 	
-	public static final int ORDER_COLUMN_INDEX_CODNUM = 0;
+	public static final int ORDER_COLUMN_INDEX_ID_PLAZA = 0;
 	public static final int ORDER_COLUMN_INDEX_AREA = 1;
 	public static final int ORDER_COLUMN_INDEX_ESTADO = 2;
 	public static final int ORDER_COLUMN_INDEX_FECHA_FIN_OFERTA = 3;
@@ -302,7 +302,7 @@ public class ModeloOfertaCandidato {
 				+ "             AND bepplo.CUATRIMESTRE = '" + ModeloPlazaOfertada.CUATRIMESTRE_SEGUNDO + "')"
 				+ "     )";
 		
-		dataTable.setColumn(ORDER_COLUMN_INDEX_CODNUM, "bepplo.CODNUM", DataTableColumn.COLUMN_TYPE_NUMBER);
+		dataTable.setColumn(ORDER_COLUMN_INDEX_ID_PLAZA, "bepplo.ID_PLAZA");
 		dataTable.setColumn(ORDER_COLUMN_INDEX_AREA, "bepare.DES_AREA_CONOCIMIENTO");
 		dataTable.setColumn(ORDER_COLUMN_INDEX_ESTADO, "bepplo.ESTADO", DataTableColumn.COLUMN_TYPE_EXACT);
 		dataTable.setColumn(ORDER_COLUMN_INDEX_FECHA_FIN_OFERTA, "bepplo.FECHA_FIN_OFERTA", DataTableColumn.COLUMN_TYPE_DATE);
