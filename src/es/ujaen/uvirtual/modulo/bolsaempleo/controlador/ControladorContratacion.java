@@ -32,6 +32,7 @@ import es.ujaen.uvirtual.modulo.bolsaempleo.beans.UsuarioBolsaEmpleo;
 import es.ujaen.uvirtual.modulo.bolsaempleo.modelo.ModeloArea;
 import es.ujaen.uvirtual.modulo.bolsaempleo.modelo.ModeloBolsa;
 import es.ujaen.uvirtual.modulo.bolsaempleo.modelo.ModeloContratacion;
+import es.ujaen.uvirtual.modulo.bolsaempleo.modelo.ModeloConvocatoria;
 import es.ujaen.uvirtual.modulo.bolsaempleo.modelo.ModeloDedicacion;
 import es.ujaen.uvirtual.modulo.bolsaempleo.modelo.ModeloEstadoCandidato;
 import es.ujaen.uvirtual.modulo.bolsaempleo.modelo.ModeloEvaluador;
@@ -568,10 +569,12 @@ public class ControladorContratacion extends HttpServlet {
 		response.setContentType(RESPONSE_AJAX_CONTENTTYPE);
 		response.setCharacterEncoding(RESPONSE_AJAX_ENCODING);
 		
+		ModeloConvocatoria modeloConvocatoria = ModeloConvocatoria.obtenerInstancia();
+		
 		try (PrintWriter writer = response.getWriter()) {
 			try {
 				BolsaEmpleoDataTable<OfertaCandidato> dataTable = ModeloPlazaOfertada.obtenerInstancia().listadoCandidatosDisponibles(
-						request.getParameterMap(), bean.getPlazaOfertada());
+						request.getParameterMap(), bean.getPlazaOfertada(), modeloConvocatoria.getUltimaConvocatoria());
 				bean.setDatatableCandidatos(dataTable);
 				writer.write(dataTable.toJson("dd/M/yyyy HH:mm:ss"));
 			} catch (UVException | SQLException e) {
@@ -595,10 +598,12 @@ public class ControladorContratacion extends HttpServlet {
 		response.setContentType(RESPONSE_AJAX_CONTENTTYPE);
 		response.setCharacterEncoding(RESPONSE_AJAX_ENCODING);
 		
+		ModeloConvocatoria modeloConvocatoria = ModeloConvocatoria.obtenerInstancia();
+		
 		try (PrintWriter writer = response.getWriter()) {
 			try {
 				BolsaEmpleoDataTable<CandidatoEstado> dataTable = ModeloEstadoCandidato.obtenerInstancia().listaEstadosCandidatoDisponiblesPlaza(
-						request.getParameterMap(), bean.getPlazaOfertada());
+						request.getParameterMap(), bean.getPlazaOfertada(), modeloConvocatoria.getUltimaConvocatoria());
 				bean.setDatatableCandidatosEstado(dataTable);
 				writer.write(dataTable.toJson("dd/M/yyyy HH:mm:ss"));
 			} catch (UVException | SQLException e) {

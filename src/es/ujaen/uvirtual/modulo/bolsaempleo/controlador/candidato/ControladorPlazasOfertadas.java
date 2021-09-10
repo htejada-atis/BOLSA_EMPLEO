@@ -20,6 +20,7 @@ import es.ujaen.uvirtual.beans.UVDatos;
 import es.ujaen.uvirtual.modulo.bolsaempleo.beans.OfertaCandidato;
 import es.ujaen.uvirtual.modulo.bolsaempleo.beans.PlazaOfertada;
 import es.ujaen.uvirtual.modulo.bolsaempleo.modelo.ModeloContratacion;
+import es.ujaen.uvirtual.modulo.bolsaempleo.modelo.ModeloConvocatoria;
 import es.ujaen.uvirtual.modulo.bolsaempleo.modelo.ModeloOfertaCandidato;
 import es.ujaen.uvirtual.modulo.bolsaempleo.modelo.ModeloParametrosConfiguracion;
 import es.ujaen.uvirtual.modulo.bolsaempleo.modelo.ModeloPlazaOfertada;
@@ -293,10 +294,12 @@ public class ControladorPlazasOfertadas extends HttpServlet {
 		response.setContentType(RESPONSE_AJAX_CONTENTTYPE);
 		response.setCharacterEncoding(RESPONSE_AJAX_ENCODING);
 		
+		ModeloConvocatoria modeloConvocatoria = ModeloConvocatoria.obtenerInstancia();
+		
 		try (PrintWriter writer = response.getWriter()) {
 			try {
 				BolsaEmpleoDataTable<OfertaCandidato> dataTable = ModeloOfertaCandidato.obtenerInstancia().listadoPlazasOfertadasCandidato(
-						request.getParameterMap(), bean.getUsuarioLogeado());
+						request.getParameterMap(), bean.getUsuarioLogeado(), modeloConvocatoria.getUltimaConvocatoria());
 				bean.setDatatableOfertasCandidatos(dataTable);
 				writer.write(dataTable.toJson("dd/M/yyyy HH:mm:ss"));
 			} catch (UVException | SQLException e) {

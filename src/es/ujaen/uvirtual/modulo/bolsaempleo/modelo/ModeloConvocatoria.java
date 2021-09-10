@@ -344,7 +344,7 @@ public class ModeloConvocatoria {
 	 * @throws SQLException .
 	 */
 	public Convocatoria getUltimaConvocatoria() throws SQLException {
-		String consulta = "SELECT bepcon.* FROM TBEP_CONVOCATORIAS bepcon WHERE ROWNUM = 1 ORDER BY bepcon.CODNUM";
+		String consulta = "SELECT bepcon.* FROM TBEP_CONVOCATORIAS bepcon ORDER BY bepcon.CODNUM DESC FETCH FIRST 1 ROW ONLY";
 
 		try (Connection conexion = ConexionUvirtual.obtenerInstancia(); PreparedStatement stmt = conexion.prepareStatement(consulta)) {
 			try (ResultSet rs = stmt.executeQuery()) {

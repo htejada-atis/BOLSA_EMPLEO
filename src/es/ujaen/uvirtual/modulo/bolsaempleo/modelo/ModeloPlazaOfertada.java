@@ -13,6 +13,7 @@ import java.util.List;
 import java.util.Map;
 import es.ujaen.uvirtual.modelo.conexion.ConexionUvirtual;
 import es.ujaen.uvirtual.modulo.bolsaempleo.beans.Contratacion;
+import es.ujaen.uvirtual.modulo.bolsaempleo.beans.Convocatoria;
 import es.ujaen.uvirtual.modulo.bolsaempleo.beans.Mensaje;
 import es.ujaen.uvirtual.modulo.bolsaempleo.beans.OfertaCandidato;
 import es.ujaen.uvirtual.modulo.bolsaempleo.beans.Plantilla;
@@ -428,11 +429,12 @@ public class ModeloPlazaOfertada {
 	/** Lista de candidatos que han aceptado una plaza .
 	 * @param params .
 	 * @param plaza .
+	 * @param convocatoria .
 	 * @return datatable de candidatos .
 	 * @throws SQLException .
 	 * @throws UVException .
 	 */
-	public BolsaEmpleoDataTable<OfertaCandidato> listadoCandidatosDisponibles(Map<String, String[]> params, PlazaOfertada plaza)
+	public BolsaEmpleoDataTable<OfertaCandidato> listadoCandidatosDisponibles(Map<String, String[]> params, PlazaOfertada plaza, Convocatoria convocatoria)
 			throws SQLException, UVException {
 		List<OfertaCandidato> rows = new ArrayList<>();
 		BolsaEmpleoDataTable<OfertaCandidato> dataTable = new BolsaEmpleoDataTable<>(params);
@@ -441,9 +443,10 @@ public class ModeloPlazaOfertada {
 				+ "     bepofc.FECHA_RESULTADO, bepofc.PREFERENCIA, ? AS BEPPLO_CODNUM,"
 				+ "     bepcnt.CODNUM AS CONTRATACION"
 				+ " FROM TBEP_USUARIOS bepusu"
-				+ " INNER JOIN TBEP_SOLICITUDES bepsol ON bepsol.BEPUSU_CODNUM = bepusu.CODNUM"
-				+ " INNER JOIN TBEP_SOLICITUD_BOLSAS bepsob ON bepsob.BEPSOL_CODNUM = bepsol.CODNUM AND bepsob.BEPBOL_CODNUM = ?"
+				+ " INNER JOIN TBEP_SOLICITUDES bepsol ON bepsol.BEPUSU_CODNUM = bepusu.CODNUM AND bepsol.BEPCON_CODNUM = ?"
+				+ " INNER JOIN TBEP_SOLICITUD_BOLSAS bepsob ON bepsob.BEPSOL_CODNUM = bepsol.CODNUM"
 				+ "     AND bepsob.FECHABAREMACION IS NOT NULL"
+				+ " INNER JOIN TBEP_BOLSAS bepbol ON bepbol.CODNUM = bepsob.BEPBOL_CODNUM AND bepbol.BEPARE_CODNUM = ?"
 				+ " LEFT JOIN TBEP_OFERTAS_CANDIDATOS bepofc ON bepofc.BEPUSU_CODNUM = bepusu.CODNUM AND bepofc.BEPPLO_CODNUM = ?"
 				+ " LEFT JOIN TBEP_CONTRATACIONES bepcnt ON bepcnt.BEPUSU_CODNUM = bepusu.CODNUM AND bepcnt.BEPPLO_CODNUM = ?"
 				+ " LEFT JOIN TBEP_ESTADO_CANDIDATOS bepesc ON bepesc.BEPUSU_CODNUM = bepusu.CODNUM AND bepesc.BEPBOL_CODNUM = bepsob.BEPBOL_CODNUM"
@@ -468,6 +471,8 @@ public class ModeloPlazaOfertada {
 			int paramIndex = 1;
 			stmt.setInt(paramIndex, plaza.getCodNum());
 			stmtCount.setInt(paramIndex++, plaza.getCodNum());
+			stmt.setInt(paramIndex, convocatoria.getCodNum());
+			stmtCount.setInt(paramIndex++, convocatoria.getCodNum());
 			stmt.setInt(paramIndex, plaza.getArea().getCodNum());
 			stmtCount.setInt(paramIndex++, plaza.getArea().getCodNum());
 			stmt.setInt(paramIndex, plaza.getCodNum());
@@ -563,6 +568,7 @@ public class ModeloPlazaOfertada {
 			
 			try {
 				ModeloPlantilla modeloPlantilla = ModeloPlantilla.obtenerInstancia();
+				ModeloConvocatoria modeloConvocatoria = ModeloConvocatoria.obtenerInstancia();
 				Plantilla plantilla = new Plantilla();
 				
 				// Obtenemos la plantilla de la apertura de la plaza si existe
@@ -589,7 +595,7 @@ public class ModeloPlazaOfertada {
 				int idMensaje = ModeloMensajes.obtenerInstancia().nuevoMensajeConexion(mensaje, usuarioUpdate, conexion);
 				
 				// Obtenemos los candidatos disponibles y los insertamos para enviar el mensaje de la plaza
-				listaDestinatariosPlaza(plaza, idMensaje, usuarioUpdate, conexion);
+				listaDestinatariosPlaza(plaza, idMensaje, modeloConvocatoria.getUltimaConvocatoria(), usuarioUpdate,  conexion);
 				
 				// Actualizamos el estado del mensaje a 'ENVIANDO'
 				String consultaUpdateMsg = String.format("UPDATE TBEP_MENSAJES SET %s=?, %s=? WHERE %s=?",
@@ -678,13 +684,13 @@ public class ModeloPlazaOfertada {
 		}
 	}
 	
-	private void listaDestinatariosPlaza(PlazaOfertada plaza, Integer idMensaje, UsuarioBolsaEmpleo usuarioUpdate, Connection conexion)
+	private void listaDestinatariosPlaza(PlazaOfertada plaza, Integer idMensaje, Convocatoria convocatoria, UsuarioBolsaEmpleo usuarioUpdate, Connection conexion)
 			throws SQLException, UVException {
 		List<Integer> destinatarios = new ArrayList<>();
 		
 		String consulta = "SELECT bepusu.CODNUM"
 				+ " FROM TBEP_USUARIOS bepusu"
-				+ " INNER JOIN TBEP_SOLICITUDES bepsol ON bepsol.BEPUSU_CODNUM = bepusu.CODNUM"
+				+ " INNER JOIN TBEP_SOLICITUDES bepsol ON bepsol.BEPUSU_CODNUM = bepusu.CODNUM AND bepsol.BEPCON_CODNUM = ?"
 				+ " INNER JOIN TBEP_SOLICITUD_BOLSAS bepsob ON bepsob.BEPSOL_CODNUM = bepsol.CODNUM AND bepsob.FECHABAREMACION IS NOT NULL"
 				+ " INNER JOIN TBEP_BOLSAS bepbol ON bepbol.CODNUM = bepsob.BEPBOL_CODNUM"
 				+ " INNER JOIN TBEP_AREAS bepare ON bepare.CODNUM = bepbol.BEPARE_CODNUM"
@@ -700,7 +706,9 @@ public class ModeloPlazaOfertada {
 				+ "     )";
 		
 		try (PreparedStatement stmt = conexion.prepareStatement(consulta)) {
-			stmt.setInt(1, plaza.getCodNum());
+			int paramIndex = 1;
+			stmt.setInt(paramIndex++, convocatoria.getCodNum());
+			stmt.setInt(paramIndex++, plaza.getCodNum());
 			
 			try (ResultSet rs = stmt.executeQuery()) {
 				while (rs.next()) {
