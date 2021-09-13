@@ -1,11 +1,13 @@
 <%@ page trimDirectiveWhitespaces="true" %>
 <%@ page import="es.ujaen.uvirtual.beans.UVDatos" %>
 <%@	page import="es.ujaen.uvirtual.modulo.bolsaempleo.controlador.configuracion.ControladorDedicaciones" %>
+<%@	page import="es.ujaen.uvirtual.modulo.bolsaempleo.modelo.ModeloDedicacion" %>
 <%@ page import="es.ujaen.uvirtual.modulo.bolsaempleo.vistas.VistaDedicacion" %>
 <%@ page import="es.ujaen.uvirtual.modulo.bolsaempleo.beans.Dedicacion" %>
 <%@ page import="es.ujaen.uvirtual.modulo.bolsaempleo.utilidades.BolsaEmpleoUtils" %>
 <%@ page import="es.ujaen.uvirtual.utilidades.EscapaHTML" %>
 <%@ page import="es.ujaen.uvirtual.utilidades.Formateador" %>
+<%@ page import="java.util.Map.Entry" %>
 
 <%
 UVDatos uvdatos = (UVDatos) request.getAttribute(UVDatos.NOMBRE_ATRIBUTO);
@@ -14,6 +16,7 @@ Dedicacion dedicacion = bean.getDedicacion();
 
 String texto = BolsaEmpleoUtils.getParamForm(request, ControladorDedicaciones.PARAM_TEXTO_DEDICACION, dedicacion != null ? dedicacion.getTexto() : "");
 String sueldo = BolsaEmpleoUtils.getParamForm(request, ControladorDedicaciones.PARAM_SUELDO, dedicacion != null ? dedicacion.getSueldo().toString() : "");
+String tipo = BolsaEmpleoUtils.getParamForm(request, ControladorDedicaciones.PARAM_TIPO, dedicacion != null ? dedicacion.getTipo() : ModeloDedicacion.TIPO_TIEMPO_COMPLETO);
 %>
 
 <div class='bolsa-empleo'>
@@ -36,6 +39,14 @@ String sueldo = BolsaEmpleoUtils.getParamForm(request, ControladorDedicaciones.P
 			<div class="form-group">
 				<label for="dedicacion_texto" class="bold-label">Texto:</label>
 				<input class="form-input-custom" type="text" name="<%=ControladorDedicaciones.PARAM_TEXTO_DEDICACION%>" id="dedicacion_texto" value="<%=texto%>" required/>
+			</div>
+			<div class="form-group">
+				<label for="plaza_centro_destino" class="bold-label">Tipo:</label>
+				<select id="plaza_centro_destino" name="<%=ControladorDedicaciones.PARAM_TIPO%>" style="width:100%;" required>
+				<%	for (Entry<String, String> tip: ModeloDedicacion.TIPOS_DEDICACION.entrySet()) { %>
+						<option value="<%= tip.getKey() %>" <%= tipo != null && tipo.equals(tip.getKey()) ? "selected" : ""%>><%= tip.getValue() %></option>
+				<%	} %>
+				</select>
 			</div>
 		</div>
 		<div class="form-group-container col2">

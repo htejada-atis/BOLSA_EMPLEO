@@ -386,6 +386,8 @@ public class ControladorContratacion extends HttpServlet {
 			
 			if (plaza.getCuatrimestre().equals(ModeloPlazaOfertada.CUATRIMESTRE_PRIMERO)) {
 				estadoCandidato = ModeloEstadoCandidato.ESTADO_CONTRATADO_PRIMER_CUATRIMESTRE;
+			} else if (plaza.getDedicacion().getTipo().equals(ModeloDedicacion.TIPO_TIEMPO_PARCIAL)) {
+				estadoCandidato = ModeloEstadoCandidato.ESTADO_CONTRATADO_PARCIAL;
 			}
 			
 			CandidatoEstado candidato = new CandidatoEstado(contratacion.getCandidato());
