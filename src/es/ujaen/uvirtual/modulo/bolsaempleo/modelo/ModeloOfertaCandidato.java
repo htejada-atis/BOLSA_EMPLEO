@@ -288,6 +288,7 @@ public class ModeloOfertaCandidato {
 		String consulta = "SELECT bepplo.CODNUM AS BEPPLO_CODNUM, bepofc.CODNUM, bepofc.FLGRESULTADO, bepofc.FECHA_RESULTADO,"
 				+ "     bepofc.PREFERENCIA, bepsol.BEPUSU_CODNUM AS BEPUSU_CODNUM, bepcnt.CODNUM AS CONTRATACION"
 				+ " FROM TBEP_PLAZAS_OFERTADAS bepplo"
+				+ " INNER JOIN TBEP_DEDICACIONES bepded ON bepded.CODNUM = bepplo.BEPDED_CODNUM"
 				+ " INNER JOIN TBEP_AREAS bepare ON bepare.CODNUM = bepplo.BEPARE_CODNUM"
 				+ " INNER JOIN TBEP_BOLSAS bepbol ON bepbol.BEPARE_CODNUM = bepare.CODNUM"
 				+ " INNER JOIN TBEP_SOLICITUD_BOLSAS bepsob ON bepsob.BEPBOL_CODNUM = bepbol.CODNUM AND bepsob.FECHABAREMACION IS NOT NULL"
@@ -301,6 +302,8 @@ public class ModeloOfertaCandidato {
 				+ "         OR bepesc.ESTADO = '" + ModeloEstadoCandidato.ESTADO_DISPONIBLE + "'"
 				+ "         OR (bepesc.ESTADO = '" + ModeloEstadoCandidato.ESTADO_CONTRATADO_PRIMER_CUATRIMESTRE + "' "
 				+ "             AND bepplo.CUATRIMESTRE = '" + ModeloPlazaOfertada.CUATRIMESTRE_SEGUNDO + "')"
+				+ "         OR (bepesc.ESTADO = '" + ModeloEstadoCandidato.ESTADO_CONTRATADO_PARCIAL + "'"
+				+ "             AND bepded.TIPO = '" + ModeloDedicacion.TIPO_TIEMPO_PARCIAL + "')"
 				+ "     )"
 				+ "     AND bepplo.FLGACTIVA = 'S'";
 		

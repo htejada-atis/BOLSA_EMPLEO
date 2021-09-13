@@ -15,6 +15,7 @@ public class Dedicacion implements Serializable {
 	private Date fechaVigencia;
 	private Boolean activa;
 	private Integer plazasCount;
+	private String tipo;
 	
 	
 	/** Constructor por defecto.
@@ -49,6 +50,7 @@ public class Dedicacion implements Serializable {
 		this.fechaVigencia = copia.fechaVigencia;
 		this.activa = copia.activa;
 		this.plazasCount = copia.plazasCount;
+		this.tipo = copia.tipo;
 	}
 	
 	public Integer getCodNum() {
@@ -99,10 +101,18 @@ public class Dedicacion implements Serializable {
 		this.plazasCount = plazasCount;
 	}
 	
+	public String getTipo() {
+		return tipo;
+	}
+
+	public void setTipo(String tipo) {
+		this.tipo = tipo;
+	}
+	
 	@Override
 	public String toString() {
-		return "Dedicación [codNum=" + codNum + ", texto=" + texto + ", sueldo=" + sueldo 
-				+ ", fechaVigencia=" + fechaVigencia + ", activa=" + activa + ", plazasCount=" + plazasCount + "]";
+		return "Dedicación [codNum=" + codNum + ", texto=" + texto + ", sueldo=" + sueldo + ", fechaVigencia=" + fechaVigencia 
+				+ ", activa=" + activa + ", plazasCount=" + plazasCount + ", tipo=" + tipo + "]";
 	}
 	
 	@Override
@@ -115,6 +125,7 @@ public class Dedicacion implements Serializable {
 		result = prime * result + ((fechaVigencia == null) ? 0 : fechaVigencia.hashCode());
 		result = prime * result + ((activa == null) ? 0 : activa.hashCode());
 		result = prime * result + ((plazasCount == null) ? 0 : plazasCount.hashCode());
+		result = prime * result + ((tipo == null) ? 0 : tipo.hashCode());
 		return result;
 	}
 	
@@ -172,6 +183,13 @@ public class Dedicacion implements Serializable {
 				return false;
 			}
 		} else if (!plazasCount.equals(other.plazasCount)) {
+			return false;
+		}
+		if (tipo == null) {
+			if (other.tipo != null) {
+				return false;
+			}
+		} else if (!tipo.equals(other.tipo)) {
 			return false;
 		}
 		

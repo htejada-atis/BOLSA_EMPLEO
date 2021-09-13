@@ -6,6 +6,7 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import es.ujaen.uvirtual.modelo.conexion.ConexionUvirtual;
@@ -29,6 +30,9 @@ public class ModeloDedicacion {
 	public static final int ORDER_COLUMN_INDEX_FECHA_VIGENCIA = 3;
 	public static final int ORDER_COLUMN_INDEX_ACTIVA = 4;
 	
+	public static final String TIPO_TIEMPO_COMPLETO = "TIEMPO COMPLETO";
+	public static final String TIPO_TIEMPO_PARCIAL = "TIEMPO PARCIAL";
+	
 	public static final String MENSAJE_ERROR_DEDICACION_ID_NO_EXISTE = "No existe la dedicación con el id indicando";
 	public static final String MENSAJE_ERROR_DEDICACION_REQUERIDA = "La dedicación es requerida";
 	public static final String MENSAJE_ERROR_OBJETO_VACIO = "No se puede %s una dedicación vacía";
@@ -39,10 +43,18 @@ public class ModeloDedicacion {
 	public static final String FLGACTIVA = "FLGACTIVA";
 	public static final String PLAZAS_OFERTADAS = "PLAZAS_OFERTADAS";
 	public static final String SUELDO = "SUELDO";
+	public static final String TIPO = "TIPO";
 	public static final String TEXTO = "TEXTO";
 	
 	private static final String ACTIVA = "S";
 	private static final String INACTIVA = "N";
+	
+	public static final Map<String, String> TIPOS_DEDICACION = new HashMap<>();
+	
+	static {
+		TIPOS_DEDICACION.put(TIPO_TIEMPO_COMPLETO, "Tiempo completo");
+		TIPOS_DEDICACION.put(TIPO_TIEMPO_PARCIAL, "Tiempo parcial");
+	}
 	
 	
 	protected static ModeloDedicacion eInstancia;
@@ -184,13 +196,19 @@ public class ModeloDedicacion {
 			throw new UVException(String.format(MENSAJE_ERROR_PARAM_VACIO, "insertar", "sueldo"));
 		}
 		
-		String consulta = String.format("INSERT INTO TBEP_DEDICACIONES (%s,%s,%s,%s) VALUES (?,?,?,?)", TEXTO, SUELDO, FECHA_VIGENCIA, "UID_USUARIO");
+		if (dedicacion.getTipo() == null) {
+			throw new UVException(String.format(MENSAJE_ERROR_PARAM_VACIO, "insertar", "tipo"));
+		}
+		
+		String consulta = String.format("INSERT INTO TBEP_DEDICACIONES (%s,%s,%s,%s,%s) VALUES (?,?,?,?,?)", 
+				TEXTO, SUELDO, FECHA_VIGENCIA, TIPO, "UID_USUARIO");
 		
 		try (Connection conexion = ConexionUvirtual.obtenerInstancia(); PreparedStatement stmt = conexion.prepareStatement(consulta)) {
 			int parameterIndex = 1;
 			stmt.setString(parameterIndex++, dedicacion.getTexto());
 			stmt.setDouble(parameterIndex++, dedicacion.getSueldo());
 			stmt.setDate(parameterIndex++, new Date(BolsaEmpleoUtils.getCurrentDateTime().getTime()));
+			stmt.setString(parameterIndex++, dedicacion.getTipo());
 			stmt.setString(parameterIndex++, usuarioUpdate.getCodCuenta());
 			stmt.executeUpdate();
 		}
@@ -215,16 +233,22 @@ public class ModeloDedicacion {
 			throw new UVException(String.format(MENSAJE_ERROR_PARAM_VACIO, "actualizar", "sueldo"));
 		}
 		
+		if (dedicacion.getTipo() == null) {
+			throw new UVException(String.format(MENSAJE_ERROR_PARAM_VACIO, "actualizar", "tipo"));
+		}
+		
 		if (dedicacion.getFechaVigencia() == null) {
 			throw new UVException(String.format(MENSAJE_ERROR_PARAM_VACIO, "actualizar", "vigencia"));
 		}
 		
-		String consulta = String.format("UPDATE TBEP_DEDICACIONES SET %s=?, %s=?, %s=?, %s=? WHERE %s=?", TEXTO, SUELDO, FECHA_VIGENCIA, "UID_USUARIO", CODNUM);
+		String consulta = String.format("UPDATE TBEP_DEDICACIONES SET %s=?, %s=?, %s=?, %s=?, %s=? WHERE %s=?", 
+				TEXTO, SUELDO, FECHA_VIGENCIA, TIPO, "UID_USUARIO", CODNUM);
 		try (Connection conexion = ConexionUvirtual.obtenerInstancia(); PreparedStatement stmt = conexion.prepareStatement(consulta)) {
 			int parameterIndex = 1;
 			stmt.setString(parameterIndex++, dedicacion.getTexto());
 			stmt.setDouble(parameterIndex++, dedicacion.getSueldo());
 			stmt.setDate(parameterIndex++, new Date(dedicacion.getFechaVigencia().getTime()));
+			stmt.setString(parameterIndex++, dedicacion.getTipo());
 			stmt.setString(parameterIndex++, usuarioUpdate.getCodCuenta());
 			stmt.setInt(parameterIndex++, dedicacion.getCodNum());
 			stmt.executeUpdate();
@@ -263,6 +287,7 @@ public class ModeloDedicacion {
 		dedicacion.setSueldo(rs.getDouble(SUELDO));
 		dedicacion.setFechaVigencia(rs.getDate(FECHA_VIGENCIA));
 		dedicacion.setActiva(rs.getString(FLGACTIVA).equals(ACTIVA));
+		dedicacion.setTipo(rs.getString(TIPO));
 		
 		if (withPlazas) {
 			dedicacion.setPlazasCount(rs.getInt(PLAZAS_OFERTADAS));

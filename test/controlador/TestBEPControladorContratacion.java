@@ -38,7 +38,7 @@ public class TestBEPControladorContratacion {
 	private static final String MENSAJE_SIN_ADVERTENCIAS = "No debe mostrar advertencias";
 	private static final String MENSAJE_SIN_EXITO = "No debe exito";
 	
-	private static final String FECHA_FIN = "22/09/2021";
+	private static final String FECHA_FIN = "22/11/2021";
 	private static final String HORA_FIN = "23:59:59";
 	
 	/** Prepara la bd con los datos iniciales .
