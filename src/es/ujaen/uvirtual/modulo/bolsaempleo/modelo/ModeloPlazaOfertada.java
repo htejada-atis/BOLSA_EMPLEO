@@ -31,12 +31,13 @@ import es.ujaen.uvirtual.utilidades.UVException;
 public class ModeloPlazaOfertada {
 	
 	public static final int ORDER_COLUMN_INDEX_CODNUM = 0;
-	public static final int ORDER_COLUMN_INDEX_AREA = 1;
-	public static final int ORDER_COLUMN_INDEX_ESTADO = 2;
-	public static final int ORDER_COLUMN_INDEX_FECHA_CREACION = 3;
-	public static final int ORDER_COLUMN_INDEX_FECHA_ABIERTA = 4;
-	public static final int ORDER_COLUMN_INDEX_FECHA_FIN_OFERTA = 5;
-	public static final int ORDER_COLUMN_INDEX_FECHA_CERRADA = 6;
+	public static final int ORDER_COLUMN_INDEX_ID_PLAZA = 1;
+	public static final int ORDER_COLUMN_INDEX_AREA = 2;
+	public static final int ORDER_COLUMN_INDEX_ESTADO = 3;
+	public static final int ORDER_COLUMN_INDEX_FECHA_CREACION = 4;
+	public static final int ORDER_COLUMN_INDEX_FECHA_ABIERTA = 5;
+	public static final int ORDER_COLUMN_INDEX_FECHA_FIN_OFERTA = 6;
+	public static final int ORDER_COLUMN_INDEX_FECHA_CERRADA = 7;
 	
 	public static final int ORDER_COLUMN_INDEX_NIF_CANDIDATOS = 0;
 	public static final int ORDER_COLUMN_INDEX_NOMBRE_CANDIDATOS = 1;
@@ -50,6 +51,7 @@ public class ModeloPlazaOfertada {
 	
 	public static final String CENTRO_DESTINO_JAEN = "JAEN";
 	public static final String CENTRO_DESTINO_LINARES = "LINARES";
+	public static final String CENTRO_DESTINO_JAENLINARES = "JAEN/LINARES";
 	
 	public static final String CUATRIMESTRE_PRIMERO = "1º CUATRIMESTRE";
 	public static final String CUATRIMESTRE_SEGUNDO = "2º CUATRIMESTRE";
@@ -61,6 +63,7 @@ public class ModeloPlazaOfertada {
 	public static final String MENSAJE_ERROR_NO_HAY_DESTINATARIOS_DISPONIBLES = "No hay candidatos disponibles para la plaza";
 	public static final String MENSAJE_ERROR_PLANTILLA_APERTURA_PLAZA_NO_EXISTE = "La plantilla de apertura de plaza no existe";
 	
+	public static final String ABIERTA_VIGENTE = "ABIERTA_VIGENTE";
 	public static final String BEPARE_CODNUM = "BEPARE_CODNUM";
 	public static final String BEPDED_CODNUM = "BEPDED_CODNUM";
 	public static final String CENTRO_DESTINO = "CENTRO_DESTINO";
@@ -72,12 +75,16 @@ public class ModeloPlazaOfertada {
 	public static final String FECHA_CERRADA = "FECHA_CERRADA";
 	public static final String FECHA_CREACION = "FECHA_CREACION";
 	public static final String FECHA_FIN_OFERTA = "FECHA_FIN_OFERTA";
+	public static final String FLGACTIVA = "FLGACTIVA";
 	public static final String HORARIO = "HORARIO";
+	public static final String ID_PLAZA = "ID_PLAZA";
 	public static final String JUSTIFICACION = "JUSTIFICACION";
 	public static final String NRI = "NRI";
 	public static final String NRI_FECHA = "NRI_FECHA";
 	public static final String OBSERVACIONES_INTERNAS = "OBSERVACIONES_INTERNAS";
-	public static final String ABIERTA_VIGENTE = "ABIERTA_VIGENTE";
+	
+	private static final String ACTIVA = "S";
+	private static final String INACTIVA = "N";
 	
 	public static final Map<String, String> CENTROS_DESTINO = new HashMap<>();
 	public static final Map<String, String> CUATRIMESTRES = new HashMap<>();
@@ -86,6 +93,7 @@ public class ModeloPlazaOfertada {
 	static {
 		CENTROS_DESTINO.put(CENTRO_DESTINO_JAEN, "Jaén");
 		CENTROS_DESTINO.put(CENTRO_DESTINO_LINARES, "Linares");
+		CENTROS_DESTINO.put(CENTRO_DESTINO_JAENLINARES, "Jaén/Linares");
 		CUATRIMESTRES.put(CUATRIMESTRE_PRIMERO, "1º Cuatrimestre");
 		CUATRIMESTRES.put(CUATRIMESTRE_SEGUNDO, "2º Cuatrimestre");
 		CUATRIMESTRES.put(CUATRIMESTRE_TODO_EL_CURSO, "Todo el curso");
@@ -208,9 +216,9 @@ public class ModeloPlazaOfertada {
 		String consulta = "";
 		
 		if (usuarioUpdate.isServicioPersonal()) {
-			consulta = String.format("INSERT INTO TBEP_PLAZAS_OFERTADAS (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s) VALUES (?,?,?,?,?,?,?,?,?,?,?,?)",
+			consulta = String.format("INSERT INTO TBEP_PLAZAS_OFERTADAS (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?)",
 					BEPARE_CODNUM, JUSTIFICACION, CENTRO_DESTINO, FECHA_CREACION, "UID_USUARIO", BEPDED_CODNUM, CUATRIMESTRE, DURACION_PREVISTA, 
-					FECHA_FIN_OFERTA, NRI, NRI_FECHA, HORARIO);
+					FECHA_FIN_OFERTA, ID_PLAZA, NRI, NRI_FECHA, HORARIO);
 		} else {
 			consulta = String.format("INSERT INTO TBEP_PLAZAS_OFERTADAS (%s,%s,%s,%s,%s,%s) VALUES (?,?,?,?,?,?)", 
 					BEPARE_CODNUM, JUSTIFICACION, CENTRO_DESTINO, FECHA_CREACION, "UID_USUARIO", HORARIO);
@@ -228,6 +236,7 @@ public class ModeloPlazaOfertada {
 				stmt.setString(parameterIndex++, plaza.getCuatrimestre());
 				stmt.setString(parameterIndex++, plaza.getDuracionPrevista());
 				stmt.setDate(parameterIndex++, plaza.getFechaFinOferta() != null ? new Date(plaza.getFechaFinOferta().getTime()) : null);
+				stmt.setString(parameterIndex++, plaza.getIdPlaza());
 				stmt.setBlob(parameterIndex++, plaza.getNri());
 				stmt.setDate(parameterIndex++, plaza.getNri() != null ? new Date(BolsaEmpleoUtils.getCurrentDateTime().getTime()) : null);
 			}
@@ -263,12 +272,12 @@ public class ModeloPlazaOfertada {
 		String consulta = "";
 		
 		if (usuarioUpdate.isServicioPersonal()) {
-			consulta = String.format("UPDATE TBEP_PLAZAS_OFERTADAS SET %s=?, %s=?, %s=?, %s=?, %s=?, %s=?, %s=?, %s=? "
+			consulta = String.format("UPDATE TBEP_PLAZAS_OFERTADAS SET %s=?, %s=?, %s=?, %s=?, %s=?, %s=?, %s=?, %s=?, %s=? "
 					+ (plaza.getNri() != null ? ", " + NRI + "=?, " + NRI_FECHA + "=?" : "")
 					+ (plaza.getHorario() != null ? ", " + HORARIO + "=?" : "")
 					+ " WHERE %s=?",
 					BEPARE_CODNUM, JUSTIFICACION, CENTRO_DESTINO, "UID_USUARIO", BEPDED_CODNUM, CUATRIMESTRE, DURACION_PREVISTA, 
-					FECHA_FIN_OFERTA, CODNUM);
+					FECHA_FIN_OFERTA, ID_PLAZA, CODNUM);
 		} else {
 			consulta = String.format("UPDATE TBEP_PLAZAS_OFERTADAS SET %s=?, %s=?, %s=?, %s=?"
 					+ (plaza.getHorario() != null ? ", " + HORARIO + "=?" : "")
@@ -291,6 +300,7 @@ public class ModeloPlazaOfertada {
 				stmt.setString(parameterIndex++, plaza.getCuatrimestre());
 				stmt.setString(parameterIndex++, plaza.getDuracionPrevista());
 				stmt.setDate(parameterIndex++, plaza.getFechaFinOferta() != null ? new Date(plaza.getFechaFinOferta().getTime()) : null);
+				stmt.setString(parameterIndex++, plaza.getIdPlaza());
 				if (plaza.getNri() != null) {
 					stmt.setBlob(parameterIndex++, plaza.getNri());
 					stmt.setDate(parameterIndex++, new Date(BolsaEmpleoUtils.getCurrentDateTime().getTime()));
@@ -299,6 +309,33 @@ public class ModeloPlazaOfertada {
 			if (plaza.getHorario() != null) {
 				stmt.setBlob(parameterIndex++, plaza.getHorario());
 			}
+			stmt.setInt(parameterIndex++, plaza.getCodNum());
+			stmt.executeUpdate();
+		}
+	}
+	
+	/** actualiza plaza ofertada .
+	 * @param plaza .
+	 * @param usuarioUpdate .
+	 * @throws SQLException .
+	 * @throws UVException .
+	 */
+	@SuppressWarnings({"checkstyle:cyclomaticcomplexity", "checkstyle:npathcomplexity"})
+	public void actualizaActivaPlazaOfertada(PlazaOfertada plaza, UsuarioBolsaEmpleo usuarioUpdate) throws SQLException, UVException {
+		if (plaza == null) {
+			throw new UVException(String.format(MENSAJE_ERROR_OBJETO_VACIO, "actualizar activa"));
+		}
+		
+		if (plaza.isActiva() == null) {
+			throw new UVException(String.format(MENSAJE_ERROR_PARAM_VACIO, "actualizar activa", "activa"));
+		}
+		
+		String consulta = String.format("UPDATE TBEP_PLAZAS_OFERTADAS SET %s=?, %s=? WHERE %s=?", FLGACTIVA, "UID_USUARIO", CODNUM);
+		
+		try (Connection conexion = ConexionUvirtual.obtenerInstancia(); PreparedStatement stmt = conexion.prepareStatement(consulta)) {
+			int parameterIndex = 1;
+			stmt.setString(parameterIndex++, plaza.isActiva() ? ACTIVA : INACTIVA);
+			stmt.setString(parameterIndex++, usuarioUpdate.getCodCuenta());
 			stmt.setInt(parameterIndex++, plaza.getCodNum());
 			stmt.executeUpdate();
 		}
@@ -510,9 +547,11 @@ public class ModeloPlazaOfertada {
 				+ (usuario.isDirectorDepartamento()
 						? " INNER JOIN TBEP_EVALUADORES bepeva ON bepeva.BEPARE_CODNUM = bepare.CODNUM AND bepeva.FLGACTIVO = 'S'"
 						+ " WHERE bepeva.BEPUSU_CODNUM = ? "
-						: " WHERE 1=1 ");
+						: " WHERE 1=1 ")
+				+ "     AND bepplo.FLGACTIVA = 'S'";
 		
 		dataTable.setColumn(ORDER_COLUMN_INDEX_CODNUM, "bepplo.CODNUM", DataTableColumn.COLUMN_TYPE_NUMBER);
+		dataTable.setColumn(ORDER_COLUMN_INDEX_ID_PLAZA, "bepplo.ID_PLAZA");
 		dataTable.setColumn(ORDER_COLUMN_INDEX_AREA, "bepare.DES_AREA_CONOCIMIENTO");
 		dataTable.setColumn(ORDER_COLUMN_INDEX_ESTADO, "bepplo.ESTADO", DataTableColumn.COLUMN_TYPE_EXACT);
 		dataTable.setColumn(ORDER_COLUMN_INDEX_FECHA_CREACION, FECHA_CREACION, DataTableColumn.COLUMN_TYPE_DATE);
@@ -787,6 +826,7 @@ public class ModeloPlazaOfertada {
 		plaza.setFechaFinOferta(rs.getDate(FECHA_FIN_OFERTA));
 		plaza.setFechaCerrada(rs.getDate(FECHA_CERRADA));
 		plaza.setFechaNRI(rs.getDate(NRI_FECHA));
+		plaza.setIdPlaza(rs.getString(ID_PLAZA));
 		
 		if (withFiles) {
 			plaza.setHorario(rs.getBlob(HORARIO) != null ? rs.getBlob(HORARIO).getBinaryStream() : null);

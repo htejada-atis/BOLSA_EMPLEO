@@ -16,6 +16,7 @@ UVDatos uvdatos = (UVDatos) request.getAttribute(UVDatos.NOMBRE_ATRIBUTO);
 VistaContratacion bean = (VistaContratacion) uvdatos.getVistas().get(VistaContratacion.class.getName());
 PlazaOfertada plaza = bean.getPlazaOfertada();
 
+String codigo = BolsaEmpleoUtils.getParamForm(request, ControladorContratacion.PARAM_CODIGO, "");
 String area = BolsaEmpleoUtils.getParamForm(request, ControladorContratacion.PARAM_AREA, "0");
 String dedicacion = BolsaEmpleoUtils.getParamForm(request, ControladorContratacion.PARAM_DEDICACION, "0");
 String justificacion = BolsaEmpleoUtils.getParamForm(request, ControladorContratacion.PARAM_JUSTIFICACION, "");
@@ -36,6 +37,14 @@ String horaFinOferta = BolsaEmpleoUtils.getParamForm(request, ControladorContrat
 	<form id="actualizar_plaza" class="be-form" method="post" action="<%=request.getRequestURI()%>" enctype="multipart/form-data">
 		<input type="hidden" name="<%=ControladorContratacion.PARAM_ACCION%>" id="accion_formulario"
 				value="<%=ControladorContratacion.ACCION_NUEVA_PLAZA_OFERTADA%>" />
+	<%	if (bean.getUsuarioLogeado().isServicioPersonal()) { %>
+			<div class="form-group-container col2">
+				<div class="form-group">
+					<label for="plaza_codigo">Código:</label>
+					<input class="form-input-custom" type="text" name="<%=ControladorContratacion.PARAM_CODIGO%>" id="plaza_codigo" value="<%=codigo%>"/>
+				</div>
+			</div>
+	<%	} %>
 		<div class="form-group-container col2">
 			<div class="form-group">
 				<label for="plaza_area" class="bold-label">Área:</label>

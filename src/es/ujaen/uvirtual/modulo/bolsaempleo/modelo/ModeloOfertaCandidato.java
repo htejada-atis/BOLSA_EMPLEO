@@ -24,7 +24,7 @@ import es.ujaen.uvirtual.utilidades.UVException;
  */
 public class ModeloOfertaCandidato {
 	
-	public static final int ORDER_COLUMN_INDEX_CODNUM = 0;
+	public static final int ORDER_COLUMN_INDEX_ID_PLAZA = 0;
 	public static final int ORDER_COLUMN_INDEX_AREA = 1;
 	public static final int ORDER_COLUMN_INDEX_ESTADO = 2;
 	public static final int ORDER_COLUMN_INDEX_FECHA_FIN_OFERTA = 3;
@@ -79,6 +79,7 @@ public class ModeloOfertaCandidato {
 				+ " WHERE   bepplo.ESTADO IN ('" + ModeloPlazaOfertada.PLAZA_ESTADO_ABIERTA + "', '" + ModeloPlazaOfertada.PLAZA_ESTADO_CONTRATACION + "')"
 				+ "     AND bepofc.BEPUSU_CODNUM = ?"
 				+ "     AND bepofc.FLGRESULTADO = 'S'"
+				+ "     AND bepplo.FLGACTIVA = 'S'"
 				+ " ORDER BY bepofc.PREFERENCIA");
 		
 		try (Connection conexion = ConexionUvirtual.obtenerInstancia();
@@ -300,9 +301,10 @@ public class ModeloOfertaCandidato {
 				+ "         OR bepesc.ESTADO = '" + ModeloEstadoCandidato.ESTADO_DISPONIBLE + "'"
 				+ "         OR (bepesc.ESTADO = '" + ModeloEstadoCandidato.ESTADO_CONTRATADO_PRIMER_CUATRIMESTRE + "' "
 				+ "             AND bepplo.CUATRIMESTRE = '" + ModeloPlazaOfertada.CUATRIMESTRE_SEGUNDO + "')"
-				+ "     )";
+				+ "     )"
+				+ "     AND bepplo.FLGACTIVA = 'S'";
 		
-		dataTable.setColumn(ORDER_COLUMN_INDEX_CODNUM, "bepplo.CODNUM", DataTableColumn.COLUMN_TYPE_NUMBER);
+		dataTable.setColumn(ORDER_COLUMN_INDEX_ID_PLAZA, "bepplo.ID_PLAZA");
 		dataTable.setColumn(ORDER_COLUMN_INDEX_AREA, "bepare.DES_AREA_CONOCIMIENTO");
 		dataTable.setColumn(ORDER_COLUMN_INDEX_ESTADO, "bepplo.ESTADO", DataTableColumn.COLUMN_TYPE_EXACT);
 		dataTable.setColumn(ORDER_COLUMN_INDEX_FECHA_FIN_OFERTA, "bepplo.FECHA_FIN_OFERTA", DataTableColumn.COLUMN_TYPE_DATE);

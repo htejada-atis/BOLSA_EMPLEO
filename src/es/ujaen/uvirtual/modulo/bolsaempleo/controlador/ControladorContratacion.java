@@ -71,13 +71,14 @@ public class ControladorContratacion extends HttpServlet {
 	public static final String ACCION_DATATABLE_CANDIDATOS_APERTURA = "datatablecandidatosapertura";
 	public static final String ACCION_DATATABLE_CANDIDATOS_CONTRATO = "datatablecandidatoscontrato";
 	public static final String ACCION_DATATABLE_PLAZAS_OFERTADAS = "datatableplazasofertadas";
-	public static final String ACCION_PLAZA_ABIERTA = "plazaabierta";
-	public static final String ACCION_PLAZA_CERRADA = "plazacerrada";
-	public static final String ACCION_PLAZA_TRAMITACION = "plazatramitacion";
 	public static final String ACCION_EDITAR_PLAZA_OFERTADA = "editarplazaofertada";
+	public static final String ACCION_ELIMINAR_PLAZA = "eliminarplaza";
 	public static final String ACCION_INDEX = "index";
 	public static final String ACCION_PREFERENCIAS_CANDIDATO = "preferenciascandidato";
 	public static final String ACCION_NUEVA_PLAZA_OFERTADA = "nuevaplazaofertada";
+	public static final String ACCION_PLAZA_ABIERTA = "plazaabierta";
+	public static final String ACCION_PLAZA_CERRADA = "plazacerrada";
+	public static final String ACCION_PLAZA_TRAMITACION = "plazatramitacion";
 	public static final String ACCION_RECHAZAR_CONTRATACION_CANDIDATO = "rechazarcontratacioncandidato";
 	public static final String ACCION_REENVIAR_CITA_CONTRATACION = "reenviarcitacontratacion";
 	public static final String ACCION_RESTAURAR_PLAZA_OFERTADA = "restaurarplazaofertada";
@@ -88,6 +89,7 @@ public class ControladorContratacion extends HttpServlet {
 	public static final String PARAM_AREA = "area";
 	public static final String PARAM_CANDIDATO = "candidato";
 	public static final String PARAM_CENTRO_DESTINO = "centrodestino";
+	public static final String PARAM_CODIGO = "codigo";
 	public static final String PARAM_CUATRIMESTRE = "cuatrimestre";
 	public static final String PARAM_DEDICACION = "dedicacion";
 	public static final String PARAM_DURACION_PREVISTA = "duracionprevista";
@@ -126,6 +128,7 @@ public class ControladorContratacion extends HttpServlet {
 	public static final String MENSAJE_EXITO_CERRAR_PLAZA = "Plaza cerrada correctamente";
 	public static final String MENSAJE_EXITO_CONTRATACION = "Contratación creada correctamente para el usuario: %s";
 	public static final String MENSAJE_EXITO_EDITAR = "Plaza editada correctamente";
+	public static final String MENSAJE_EXITO_ELIMINADA = "Plaza eliminada correctamente";
 	public static final String MENSAJE_EXITO_TRAMITACION_PLAZA = "Cambiado el estado de la plaza a tramitación correctamente";
 	public static final String MENSAJE_EXITO_REENVIO_CONTRATACION = "Se ha reenviado la contratación correctamente para el usuario: %s";
 	public static final String MENSAJE_EXITO_SUSPENSION_PLAZA = "Suspendido el contrato del candidato correctamente";
@@ -196,6 +199,7 @@ public class ControladorContratacion extends HttpServlet {
 				case ACCION_DATATABLE_CANDIDATOS_APERTURA:
 				case ACCION_DATATABLE_CANDIDATOS_CONTRATO:
 				case ACCION_EDITAR_PLAZA_OFERTADA:
+				case ACCION_ELIMINAR_PLAZA:
 				case ACCION_PLAZA_ABIERTA:
 				case ACCION_PLAZA_CERRADA:
 				case ACCION_PLAZA_TRAMITACION:
@@ -308,6 +312,9 @@ public class ControladorContratacion extends HttpServlet {
 				break;
 			case ACCION_EDITAR_PLAZA_OFERTADA:
 				editarPlazaOfertada(bean, datos, request, response, parametros);
+				break;
+			case ACCION_ELIMINAR_PLAZA:
+				eliminarPlazaOfertada(bean, datos, request, response);
 				break;
 			case ACCION_PLAZA_ABIERTA:
 				abrirPlaza(bean, datos, request, response);
@@ -450,6 +457,17 @@ public class ControladorContratacion extends HttpServlet {
 		
 		BolsaEmpleoUtils.addMensajeDeExito(MENSAJE_EXITO_EDITAR, bean, request);
 		redireccionConPlazaSeleccionada(bean, datos, request, response, ACCION_SELECCIONAR_PLAZA_OFERTADA);
+	}
+	
+	private void eliminarPlazaOfertada(VistaContratacion bean, UVDatos datos, HttpServletRequest request, HttpServletResponse response)
+			throws SQLException, UVException, IOException {
+		PlazaOfertada plaza = bean.getPlazaOfertada();
+		plaza.setActiva(false);
+		ModeloPlazaOfertada.obtenerInstancia().actualizaActivaPlazaOfertada(plaza, bean.getUsuarioLogeado());
+		
+		BolsaEmpleoUtils.addMensajeDeExito(MENSAJE_EXITO_ELIMINADA, bean, request);
+		datos.setRespuestaEnviada(true);
+		response.sendRedirect(request.getServletPath());
 	}
 	
 	private void nuevaPlazaOfertada(VistaContratacion bean, UVDatos datos, HttpServletRequest request, HttpServletResponse response, HashMap<String, Object> parametros) 
@@ -711,6 +729,9 @@ public class ControladorContratacion extends HttpServlet {
 			if (plaza.getDuracionPrevista().length() > ModeloPlazaOfertada.COLUMN_DURACION_PREVISTA_MAXLENGTH) {
 				throw new UVException(MENSAJE_ERROR_DURACION_PREVISTA_LARGA);
 			}
+			
+			plaza.setIdPlaza(Formateador.leeParametroString(BolsaEmpleoUtils.getParamRequestOrMultipartOrSession(
+					request, parametros, PARAM_CODIGO)));
 			
 			String fechaFinOferta = BolsaEmpleoUtils.getParamRequestOrMultipartOrSession(request, parametros, PARAM_FECHA_FIN_OFERTA);
 			String horaFinOferta = BolsaEmpleoUtils.getParamRequestOrMultipartOrSession(request, parametros, PARAM_HORA_FIN_OFERTA);

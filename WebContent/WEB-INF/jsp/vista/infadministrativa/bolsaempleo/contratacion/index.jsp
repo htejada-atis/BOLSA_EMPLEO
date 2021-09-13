@@ -25,19 +25,20 @@ VistaContratacion bean = (VistaContratacion) uvdatos.getVistas().get(VistaContra
 	
 	<table class="bluetable bolsaempleo" id="tablePlazasOfertadas">
 		<tr>
-			<th scope="col" style="width:30px">Id</th>
+			<th scope="col" style="width:20px">Id</th>
+			<th scope="col" style="width:46px">Código</th>
 			<th scope="col" style="width:100%">Área</th>
-			<th scope="col" style="width:95px">Estado</th>
-			<th scope="col" style="width:96px">Fecha creación</th>
-			<th scope="col" style="width:90px">Fecha abierta</th>
-			<th scope="col" style="width:100px">Fecha fin oferta</th>
-			<th scope="col" style="width:90px">Fecha cerrada</th>
+			<th scope="col" style="width:88px">Estado</th>
+			<th scope="col" style="width:86px">Fecha creación</th>
+			<th scope="col" style="width:80px">Fecha abierta</th>
+			<th scope="col" style="width:88px">Fecha fin oferta</th>
+			<th scope="col" style="width:80px">Fecha cerrada</th>
 		</tr>
 		<tbody>
 		</tbody>
 		<tfoot>
 			<tr>
-				<th colSpan="7" style="width:100%"></th>
+				<th colSpan="8" style="width:100%"></th>
 			</tr>
 		</tfoot>
 	</table>
@@ -65,7 +66,8 @@ $(document).ready(function() {
 			Atis.sendForm("<%= request.getRequestURI() %>", params);
 		}},
 		"columns": [
-			{'data': 'codNum', 'filter': {'type': 'number'}},
+			{'data': 'codNum', 'filter': true, 'overflow': 'auto'},
+			{'data': 'idPlaza', 'filter': true, 'overflow': 'auto'},
 			{'data': 'area.idAreaExterno', 'filter': true, 'render': function(row) {
 				return row.area.idAreaExterno + ' ' + row.area.descripcion;
 			}},

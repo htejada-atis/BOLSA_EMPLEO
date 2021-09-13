@@ -13,6 +13,7 @@ public class PlazaOfertada implements Serializable {
 	private Integer codNum;
 	private Area area;
 	private Dedicacion dedicacion;
+	private String idPlaza;
 	private String justificacion;
 	private String duracionPrevista;
 	private String cuatrimestre;
@@ -26,6 +27,7 @@ public class PlazaOfertada implements Serializable {
 	private transient InputStream horario;
 	private transient InputStream nri;
 	private Boolean abiertaVigente;
+	private Boolean activa;
 	
 	
 	/** Constructor por defecto.
@@ -100,6 +102,8 @@ public class PlazaOfertada implements Serializable {
 		this.horario = copia.horario;
 		this.nri = copia.nri;
 		this.abiertaVigente = copia.abiertaVigente;
+		this.idPlaza = copia.idPlaza;
+		this.activa = copia.activa;
 	}
 	
 	public Integer getCodNum() {
@@ -231,11 +235,27 @@ public class PlazaOfertada implements Serializable {
 		this.abiertaVigente = abiertaVigente;
 	}
 	
+	public String getIdPlaza() {
+		return idPlaza;
+	}
+
+	public void setIdPlaza(String idPlaza) {
+		this.idPlaza = idPlaza;
+	}
+	
+	public Boolean isActiva() {
+		return activa;
+	}
+
+	public void setActiva(Boolean activa) {
+		this.activa = activa;
+	}
+	
 	@Override
 	public String toString() {
 		return "PlazaOfertada [codNum=" + codNum + ", area=" + area + ", estado=" + estado + ", fechaCreacion=" + fechaCreacion + ", fechaAbierta=" 
 				+ fechaAbierta + ", fechaFinOferta=" + fechaFinOferta + ", fechaCerrada=" + fechaCerrada + ", fechaFinOferta=" + fechaFinOferta
-				+ ", abiertaVigente=" + abiertaVigente + "]";
+				+ ", abiertaVigente=" + abiertaVigente + ", idPlaza=" + idPlaza + ", activa=" + activa + "]";
 	}
 	
 	@Override
@@ -258,6 +278,8 @@ public class PlazaOfertada implements Serializable {
 		result = prime * result + ((horario == null) ? 0 : horario.hashCode());
 		result = prime * result + ((nri == null) ? 0 : nri.hashCode());
 		result = prime * result + ((abiertaVigente == null) ? 0 : abiertaVigente.hashCode());
+		result = prime * result + ((idPlaza == null) ? 0 : idPlaza.hashCode());
+		result = prime * result + ((activa == null) ? 0 : activa.hashCode());
 		return result;
 	}
 
@@ -385,6 +407,20 @@ public class PlazaOfertada implements Serializable {
 				return false;
 			}
 		} else if (!abiertaVigente.equals(other.abiertaVigente)) {
+			return false;
+		}
+		if (idPlaza == null) {
+			if (other.idPlaza != null) {
+				return false;
+			}
+		} else if (!idPlaza.equals(other.idPlaza)) {
+			return false;
+		}
+		if (activa == null) {
+			if (other.activa != null) {
+				return false;
+			}
+		} else if (!activa.equals(other.activa)) {
 			return false;
 		}
 		

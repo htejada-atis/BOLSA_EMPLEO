@@ -33,6 +33,7 @@ boolean mostrarCandidatoContratado = !estadoCreacion && !estadoTramitacion && !e
 boolean editable = estadoCreacion || (estadoTramitacion && personal);
 boolean extraRequeridos = !estadoCreacion;
 
+String codigo = BolsaEmpleoUtils.getParamForm(request, ControladorContratacion.PARAM_CODIGO, EscapaHTML.escapa(plaza.getIdPlaza()));
 String area = BolsaEmpleoUtils.getParamForm(request, ControladorContratacion.PARAM_AREA, plaza.getArea().getCodNum().toString());
 String cuatrimestre = BolsaEmpleoUtils.getParamForm(request, ControladorContratacion.PARAM_CUATRIMESTRE, plaza.getCuatrimestre());
 String centroDestino = BolsaEmpleoUtils.getParamForm(request, ControladorContratacion.PARAM_CENTRO_DESTINO, EscapaHTML.escapa(plaza.getCentroDestino()));
@@ -59,6 +60,14 @@ String justificacion = BolsaEmpleoUtils.getParamForm(request, ControladorContrat
 				value="<%= plaza.getCodNum()%>" />
 		<div class="form-group-container col2">
 			<div class="form-group">
+				<label for="plaza_codigo" <%= extraRequeridos ? "class='bold-label'" : "" %>>Código:</label>
+				<input class="form-input-custom" type="text" name="<%=ControladorContratacion.PARAM_CODIGO%>" id="plaza_codigo" value="<%=codigo%>"
+						<%= editable ? "" : "readonly disabled " %>
+						<%= extraRequeridos ? "required " : "" %>/>
+			</div>
+		</div>
+		<div class="form-group-container col2">
+			<div class="form-group">
 				<label for="plaza_area" class="bold-label">Área:</label>
 				<select id="plaza_area" name="<%=ControladorContratacion.PARAM_AREA%>" style="width:100%;" required <%= editable ? "" : "readonly disabled " %>>
 					<option value="">----------------</option>
@@ -80,7 +89,7 @@ String justificacion = BolsaEmpleoUtils.getParamForm(request, ControladorContrat
 			<div class="form-group">
 				<label for="plaza_dedicacion" <%= extraRequeridos ? "class='bold-label'" : "" %>>Dedicación: </label>
 				<select id="plaza_dedicacion" name="<%=ControladorContratacion.PARAM_DEDICACION%>" style="width:100%;" 
-						<%= editable ? "" : "readonly disabled  " %>
+						<%= editable ? "" : "readonly disabled " %>
 						<%= extraRequeridos ? "required " : "" %>>
 					<option value="">----------------</option>
 				<%	if (plaza.getDedicacion() != null) { %>
@@ -158,8 +167,13 @@ String justificacion = BolsaEmpleoUtils.getParamForm(request, ControladorContrat
 				</div>
 		<%	} %>
 		</div>
+		<br/>
 		<div class="form-group-container col2">
-			<div class="form-group"></div>
+			<div class="form-group">
+		<%	if (estadoCreacion) { %>
+				<button id="plaza_eliminar" style="float:left;" <%= personal ? "" : "disabled" %>>Eliminar</button>
+		<%	} %>
+			</div>
 			<div class="form-group">
 		<%	if (editable) { %>
 				<input id="plaza_enviar" type="submit" name="<%=ControladorContratacion.PARAM_ENVIAR%>" value="Guardar cambios" style="float:right;"/>
@@ -501,6 +515,23 @@ $(document).ready(function() {
 				'Si': function() {
 					var params = {
 							"<%= ControladorContratacion.PARAM_ACCION %>": "<%= ControladorContratacion.ACCION_PLAZA_TRAMITACION %>",
+							"<%= ControladorContratacion.PARAM_PLAZA_OFERTADA %>": <%= bean.getPlazaOfertada().getCodNum() %>
+					};
+					Atis.sendForm("<%= request.getRequestURI() %>", params);
+					$(this).dialog("close");
+				},
+				'No': function() {
+					$(this).dialog("close");
+				}
+			});
+		});
+		
+		document.getElementById("plaza_eliminar").addEventListener("click", function(e) {
+			e.preventDefault();
+			Atis.confirmDialog("Eliminar plaza", "¿Desea eliminar la plaza?", {
+				'Si': function() {
+					var params = {
+							"<%= ControladorContratacion.PARAM_ACCION %>": "<%= ControladorContratacion.ACCION_ELIMINAR_PLAZA %>",
 							"<%= ControladorContratacion.PARAM_PLAZA_OFERTADA %>": <%= bean.getPlazaOfertada().getCodNum() %>
 					};
 					Atis.sendForm("<%= request.getRequestURI() %>", params);

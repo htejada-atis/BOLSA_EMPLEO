@@ -23,7 +23,7 @@ OfertaCandidato oferta = bean.getOfertaCandidato();
 	
 	<h2>Plaza ofertada<%= oferta.isResultado() == null ? "" : oferta.isResultado() ? " - Aceptada" : " - Rechazada" %></h2>
 	
-	<h4>Id: <%= oferta.getPlaza().getCodNum() %><br/>Estado: <%= oferta.getPlaza().getEstado() %><br/><%= oferta.getPlaza().getFechaAbierta() != null ? "Fecha abierta: " + Formateador.formatoFecha(oferta.getPlaza().getFechaAbierta(), Formateador.FORMATO_FECHA_DDMMYYYY_HHMMSS) : "" %></h4>
+	<h4><%= oferta.getPlaza().getIdPlaza() != null ? "Código: " + EscapaHTML.escapa(oferta.getPlaza().getIdPlaza()) + " <br/>" : "" %>Estado: <%= oferta.getPlaza().getEstado() %><br/><%= oferta.getPlaza().getFechaAbierta() != null ? "Fecha abierta: " + Formateador.formatoFecha(oferta.getPlaza().getFechaAbierta(), Formateador.FORMATO_FECHA_DDMMYYYY_HHMMSS) : "" %></h4>
 	
 	<form id="plaza_ofertada" class="be-form" method="post" action="<%=request.getRequestURI()%>">
 		<div class="form-group-container col2">
