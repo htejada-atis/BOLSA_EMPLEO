@@ -167,8 +167,13 @@ String justificacion = BolsaEmpleoUtils.getParamForm(request, ControladorContrat
 				</div>
 		<%	} %>
 		</div>
+		<br/>
 		<div class="form-group-container col2">
-			<div class="form-group"></div>
+			<div class="form-group">
+		<%	if (estadoCreacion) { %>
+				<button id="plaza_eliminar" style="float:left;" <%= personal ? "" : "disabled" %>>Eliminar</button>
+		<%	} %>
+			</div>
 			<div class="form-group">
 		<%	if (editable) { %>
 				<input id="plaza_enviar" type="submit" name="<%=ControladorContratacion.PARAM_ENVIAR%>" value="Guardar cambios" style="float:right;"/>
@@ -510,6 +515,23 @@ $(document).ready(function() {
 				'Si': function() {
 					var params = {
 							"<%= ControladorContratacion.PARAM_ACCION %>": "<%= ControladorContratacion.ACCION_PLAZA_TRAMITACION %>",
+							"<%= ControladorContratacion.PARAM_PLAZA_OFERTADA %>": <%= bean.getPlazaOfertada().getCodNum() %>
+					};
+					Atis.sendForm("<%= request.getRequestURI() %>", params);
+					$(this).dialog("close");
+				},
+				'No': function() {
+					$(this).dialog("close");
+				}
+			});
+		});
+		
+		document.getElementById("plaza_eliminar").addEventListener("click", function(e) {
+			e.preventDefault();
+			Atis.confirmDialog("Eliminar plaza", "¿Desea eliminar la plaza?", {
+				'Si': function() {
+					var params = {
+							"<%= ControladorContratacion.PARAM_ACCION %>": "<%= ControladorContratacion.ACCION_ELIMINAR_PLAZA %>",
 							"<%= ControladorContratacion.PARAM_PLAZA_OFERTADA %>": <%= bean.getPlazaOfertada().getCodNum() %>
 					};
 					Atis.sendForm("<%= request.getRequestURI() %>", params);
