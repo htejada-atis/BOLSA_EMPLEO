@@ -23,6 +23,8 @@ import org.apache.commons.fileupload.servlet.ServletFileUpload;
 import com.google.gson.Gson;
 import es.ujaen.uvirtual.beans.CodigoDescripcion;
 import es.ujaen.uvirtual.beans.UVDatos;
+import es.ujaen.uvirtual.modulo.bolsaempleo.beans.Area;
+import es.ujaen.uvirtual.modulo.bolsaempleo.beans.Bolsa;
 import es.ujaen.uvirtual.modulo.bolsaempleo.beans.CandidatoEstado;
 import es.ujaen.uvirtual.modulo.bolsaempleo.beans.Contratacion;
 import es.ujaen.uvirtual.modulo.bolsaempleo.beans.OfertaCandidato;
@@ -360,6 +362,7 @@ public class ControladorContratacion extends HttpServlet {
 			BolsaEmpleoUtils.redirectToError(bean, datos, request, response, MENSAJE_ERROR_SIN_PERMISO);
 		}
 		
+		ModeloBolsa modeloBolsa = ModeloBolsa.obtenerInstancia();
 		ModeloPlazaOfertada modeloPlaza = ModeloPlazaOfertada.obtenerInstancia();
 		
 		PlazaOfertada plaza = bean.getPlazaOfertada();
@@ -384,16 +387,29 @@ public class ControladorContratacion extends HttpServlet {
 			
 			String estadoCandidato = ModeloEstadoCandidato.ESTADO_CONTRATADO;
 			
-			if (plaza.getCuatrimestre().equals(ModeloPlazaOfertada.CUATRIMESTRE_PRIMERO)) {
-				estadoCandidato = ModeloEstadoCandidato.ESTADO_CONTRATADO_PRIMER_CUATRIMESTRE;
-			} else if (plaza.getDedicacion().getTipo().equals(ModeloDedicacion.TIPO_TIEMPO_PARCIAL)) {
-				estadoCandidato = ModeloEstadoCandidato.ESTADO_CONTRATADO_PARCIAL;
+			if (plaza.getCuatrimestre().equals(ModeloPlazaOfertada.CUATRIMESTRE_PRIMERO) 
+					|| plaza.getDedicacion().getTipo().equals(ModeloDedicacion.TIPO_TIEMPO_PARCIAL)) {
+				if (plaza.getCuatrimestre().equals(ModeloPlazaOfertada.CUATRIMESTRE_PRIMERO)) {
+					estadoCandidato = ModeloEstadoCandidato.ESTADO_CONTRATADO_PRIMER_CUATRIMESTRE;
+				}
+				
+				if (plaza.getDedicacion().getTipo().equals(ModeloDedicacion.TIPO_TIEMPO_PARCIAL)) {
+					estadoCandidato = ModeloEstadoCandidato.ESTADO_CONTRATADO_PARCIAL;
+				}
+				
+				List<Bolsa> listaBolsas = modeloBolsa.getBolsasByAreaDepartamento(plaza.getArea());
+				for (Bolsa bolsa: listaBolsas) {
+					CandidatoEstado candidato = new CandidatoEstado(contratacion.getCandidato());
+					candidato.setPlaza(plaza);
+					candidato.setBolsa(bolsa);
+					ModeloEstadoCandidato.obtenerInstancia().cambiarEstadoCandidato(candidato, estadoCandidato, bolsa, bean.getUsuarioLogeado());
+				}
+			} else {
+				CandidatoEstado candidato = new CandidatoEstado(contratacion.getCandidato());
+				candidato.setPlaza(plaza);
+				ModeloEstadoCandidato.obtenerInstancia().cambiarEstadoCandidato(candidato, estadoCandidato, 
+						ModeloBolsa.obtenerInstancia().getBolsaById(plaza.getArea().getCodNum()), bean.getUsuarioLogeado());
 			}
-			
-			CandidatoEstado candidato = new CandidatoEstado(contratacion.getCandidato());
-			candidato.setPlaza(plaza);
-			ModeloEstadoCandidato.obtenerInstancia().cambiarEstadoCandidato(candidato, estadoCandidato, 
-					ModeloBolsa.obtenerInstancia().getBolsaById(plaza.getArea().getCodNum()), bean.getUsuarioLogeado());
 		}
 		
 		modeloPlaza.cerrarPlazaOfertada(plaza, bean.getUsuarioLogeado());

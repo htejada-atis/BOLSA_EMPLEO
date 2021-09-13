@@ -664,7 +664,6 @@ UsuarioBolsaEmpleo candidato = bean.getCandidato();
 	<%	if (bean.getApartadoContrataciones() != null) { %>
 			
 			function cambiarEstado(bolsas) {
-				console.log("entra 1");
 				var mensaje = "<p>Se cambiará el estado seleccionado en el candidato para las bolsas<br/>previamente seleccionadas.</p>"
 				mensaje += "<br/>";
 				mensaje += " <div class='form-group-container col1'>";
