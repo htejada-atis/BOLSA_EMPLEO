@@ -79,6 +79,7 @@ public class ModeloOfertaCandidato {
 				+ " WHERE   bepplo.ESTADO IN ('" + ModeloPlazaOfertada.PLAZA_ESTADO_ABIERTA + "', '" + ModeloPlazaOfertada.PLAZA_ESTADO_CONTRATACION + "')"
 				+ "     AND bepofc.BEPUSU_CODNUM = ?"
 				+ "     AND bepofc.FLGRESULTADO = 'S'"
+				+ "     AND bepplo.FLGACTIVA = 'S'"
 				+ " ORDER BY bepofc.PREFERENCIA");
 		
 		try (Connection conexion = ConexionUvirtual.obtenerInstancia();
@@ -300,7 +301,8 @@ public class ModeloOfertaCandidato {
 				+ "         OR bepesc.ESTADO = '" + ModeloEstadoCandidato.ESTADO_DISPONIBLE + "'"
 				+ "         OR (bepesc.ESTADO = '" + ModeloEstadoCandidato.ESTADO_CONTRATADO_PRIMER_CUATRIMESTRE + "' "
 				+ "             AND bepplo.CUATRIMESTRE = '" + ModeloPlazaOfertada.CUATRIMESTRE_SEGUNDO + "')"
-				+ "     )";
+				+ "     )"
+				+ "     AND bepplo.FLGACTIVA = 'S'";
 		
 		dataTable.setColumn(ORDER_COLUMN_INDEX_ID_PLAZA, "bepplo.ID_PLAZA");
 		dataTable.setColumn(ORDER_COLUMN_INDEX_AREA, "bepare.DES_AREA_CONOCIMIENTO");

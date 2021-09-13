@@ -38,7 +38,8 @@ public class TestBEPControladorContratacion {
 	private static final String MENSAJE_SIN_ADVERTENCIAS = "No debe mostrar advertencias";
 	private static final String MENSAJE_SIN_EXITO = "No debe exito";
 	
-	private static final String FECHA_FIN = "22/09/2021 23:59:59";
+	private static final String FECHA_FIN = "22/09/2021";
+	private static final String HORA_FIN = "23:59:59";
 	
 	/** Prepara la bd con los datos iniciales .
 	 * @throws SQLException si error en bd .
@@ -145,6 +146,7 @@ public class TestBEPControladorContratacion {
 		peticion.setParameter(ControladorContratacion.PARAM_CUATRIMESTRE, ModeloPlazaOfertada.CUATRIMESTRE_TODO_EL_CURSO);
 		peticion.setParameter(ControladorContratacion.PARAM_DURACION_PREVISTA, "DURACION PREVISTA");
 		peticion.setParameter(ControladorContratacion.PARAM_FECHA_FIN_OFERTA, FECHA_FIN);
+		peticion.setParameter(ControladorContratacion.PARAM_HORA_FIN_OFERTA, HORA_FIN);
 		
 		RespuestaHttp respuesta = new RespuestaHttp();
 		ControladorContratacion controlador = new ControladorContratacion();
@@ -175,6 +177,7 @@ public class TestBEPControladorContratacion {
 		peticion.setParameter(ControladorContratacion.PARAM_CUATRIMESTRE, ModeloPlazaOfertada.CUATRIMESTRE_TODO_EL_CURSO);
 		peticion.setParameter(ControladorContratacion.PARAM_DURACION_PREVISTA, plaza.getDuracionPrevista());
 		peticion.setParameter(ControladorContratacion.PARAM_FECHA_FIN_OFERTA, FECHA_FIN);
+		peticion.setParameter(ControladorContratacion.PARAM_HORA_FIN_OFERTA, HORA_FIN);
 		
 		RespuestaHttp respuesta = new RespuestaHttp();
 		ControladorContratacion controlador = new ControladorContratacion();
@@ -222,6 +225,7 @@ public class TestBEPControladorContratacion {
 		peticion2.setParameter(ControladorContratacion.PARAM_ACCION, ControladorContratacion.ACCION_PLAZA_ABIERTA);
 		peticion2.setParameter(ControladorContratacion.PARAM_PLAZA_OFERTADA, bean.getDatatablePlazasOfertadas().getData().get(0).getCodNum().toString());
 		peticion2.setParameter(ControladorContratacion.PARAM_FECHA_FIN_OFERTA, FECHA_FIN);
+		peticion2.setParameter(ControladorContratacion.PARAM_HORA_FIN_OFERTA, HORA_FIN);
 		
 		RespuestaHttp respuesta2 = new RespuestaHttp();
 		ControladorContratacion controlador2 = new ControladorContratacion();
