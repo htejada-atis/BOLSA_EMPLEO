@@ -187,6 +187,10 @@ String justificacion = BolsaEmpleoUtils.getParamForm(request, ControladorContrat
 		</div>
 	</form>
 	
+<%	if ((mostrarCandidatos || estadoCerrada) && personal) { %>
+		<button class="link-btn" id="exportar_candidatos" title="Exportar candidatos a csv">Exportar candidatos a csv</button>
+<%	} %>
+	
 <%	if (mostrarCandidatos) { %>
 		<table class="bluetable bolsaempleo" id="tableOfertasCandidatos">
 			<tr>
@@ -388,6 +392,12 @@ $(document).ready(function() {
 		});
 <%	} %>
 
+<%	if ((mostrarCandidatos || estadoCerrada) && personal) { %>
+		$('#exportar_candidatos').on('click', function() {
+			window.open("<%= request.getRequestURI() %>?<%= ControladorContratacion.PARAM_ACCION %>=<%= ControladorContratacion.ACCION_EXPORTAR_CANDIDATOS %>&<%= ControladorContratacion.PARAM_PLAZA_OFERTADA %>=<%= plaza.getCodNum() %>");
+		});
+<%	} %>
+
 <%	if ((estadoContratacion || estadoCerrada) && personal) { %>
 
 		var tableCandidatosContrato = new Atis.DataTable('#tableCandidatosContrato', {
@@ -562,11 +572,13 @@ $(document).ready(function() {
 				var message = '<p>Una vez abierta la plaza ya no se podrá modificar y comenzará el período de aceptación de los<br/> candidatos.<br/>';
 				message += 'En la fecha: <%= fechaFinOferta %> y hora: <%= horaFinOferta %> el estado de la plaza cambiará automáticamente a estado<br/> de contratación.</p><br/>';
 				message += '<p>Se enviará un correo sobre la apertura de la plaza a los siguientes candidatos:</p>';
-				message += '<table id="tablaCandidatosApertura" class="bluetable bolsaempleo" style="margin-top: 10px; width: 500px;">';
+				message += '<table id="tablaCandidatosApertura" class="bluetable bolsaempleo" style="margin-top: 10px; width: 525px;">';
 				message += '    <tr>';
-				message += '        <th scope="col" style="width:60px">D.N.I</th>';
+				message += '        <th scope="col" style="width:65px">D.N.I</th>';
 				message += '        <th scope="col" style="width:100%">Nombre</th>';
-				message += '        <th scope="col" style="width:120px">Estado</th>';
+				message += '        <th scope="col" style="width:120px" class="center">Estado</th>';
+				message += '        <th scope="col" style="width:80px" class="center">Disponible</th>';
+				message += '        <th scope="col" style="width:55px" class="center">Contratos</th>';
 				message += '    </tr>';
 				message += '    <tbody>';
 				message += '    </tbody>';
@@ -615,7 +627,15 @@ $(document).ready(function() {
 								}},
 								{'data': 'estado', 'order': false, 'render': function(row) {
 									return row.codNumEstado != 0 ? row.estado : '<%= ModeloEstadoCandidato.ESTADO_DISPONIBLE %>';
-								}}
+								}},
+								{'data': 'disponibilidad', 'order': false, 'render': function(row) {
+									if(row.disponibilidad){
+										return "<div title='Disponible para la plaza' class='circle-true'></div>";
+									} else{
+										return "<div title='No disponible para la plaza' class='circle-false'></div>";
+									}
+								}},
+								{'data': 'contratos', 'order': false, 'class': 'center'}
 							]
 						});
 					}

@@ -14,6 +14,8 @@ public class CandidatoEstado extends UsuarioBolsaEmpleo implements Serializable 
 	private Bolsa bolsa;
 	private PlazaOfertada plaza;
 	private String estado;
+	private Integer contratos;
+	private Boolean disponibilidad;
 
 	
 	/** Constructor por defecto.
@@ -54,6 +56,8 @@ public class CandidatoEstado extends UsuarioBolsaEmpleo implements Serializable 
 		this.bolsa = copia.bolsa;
 		this.plaza = copia.plaza;
 		this.estado = copia.estado;
+		this.contratos = copia.contratos;
+		this.disponibilidad = copia.disponibilidad;
 	}
 
 	public Integer getCodNumEstado() {
@@ -88,6 +92,22 @@ public class CandidatoEstado extends UsuarioBolsaEmpleo implements Serializable 
 		this.estado = estado;
 	}
 
+	public Integer getContratos() {
+		return contratos;
+	}
+
+	public void setContratos(Integer contratos) {
+		this.contratos = contratos;
+	}
+
+	public Boolean isDisponibilidad() {
+		return disponibilidad;
+	}
+
+	public void setDisponibilidad(Boolean disponibilidad) {
+		this.disponibilidad = disponibilidad;
+	}
+
 	public static long getSerialversionuid() {
 		return serialVersionUID;
 	}
@@ -95,7 +115,7 @@ public class CandidatoEstado extends UsuarioBolsaEmpleo implements Serializable 
 	@Override
 	public String toString() {
 		return "Candidato estado [usuario= " + super.toString() + ", codNumEstado=" + codNumEstado + ", bolsa=" + bolsa
-				+ ", plaza=" + plaza + ", estado=" + estado + "]";
+				+ ", plaza=" + plaza + ", estado=" + estado + ", contratos=" + contratos + ", disponibilidad=" + disponibilidad + "]";
 	}
 	
 	@Override
@@ -107,6 +127,8 @@ public class CandidatoEstado extends UsuarioBolsaEmpleo implements Serializable 
 		result = prime * result + ((bolsa == null) ? 0 : bolsa.hashCode());
 		result = prime * result + ((plaza == null) ? 0 : plaza.hashCode());
 		result = prime * result + ((estado == null) ? 0 : estado.hashCode());
+		result = prime * result + ((contratos == null) ? 0 : contratos.hashCode());
+		result = prime * result + ((disponibilidad == null) ? 0 : disponibilidad.hashCode());
 		return result;
 	}
 	
@@ -152,6 +174,20 @@ public class CandidatoEstado extends UsuarioBolsaEmpleo implements Serializable 
 				return false;
 			}
 		} else if (!estado.equals(other.estado)) {
+			return false;
+		}
+		if (contratos == null) {
+			if (other.contratos != null) {
+				return false;
+			}
+		} else if (!contratos.equals(other.contratos)) {
+			return false;
+		}
+		if (disponibilidad == null) {
+			if (other.disponibilidad != null) {
+				return false;
+			}
+		} else if (!disponibilidad.equals(other.disponibilidad)) {
 			return false;
 		}
 		

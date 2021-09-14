@@ -10,6 +10,7 @@ import java.util.List;
 import java.util.Map;
 
 import es.ujaen.uvirtual.modelo.conexion.ConexionUvirtual;
+import es.ujaen.uvirtual.modulo.bolsaempleo.beans.Area;
 import es.ujaen.uvirtual.modulo.bolsaempleo.beans.Bolsa;
 import es.ujaen.uvirtual.modulo.bolsaempleo.beans.BolsaResultado;
 import es.ujaen.uvirtual.modulo.bolsaempleo.beans.UsuarioBolsaEmpleo;
@@ -221,6 +222,38 @@ public class ModeloBolsa {
 				}
 			}
 		}
+		return bolsas;
+	}
+	
+	/**
+	 * Devuelve las areas del departamento de un área .
+	 * @param area .
+	 * @return .
+	 * @throws UVException .
+	 * @throws SQLException .
+	 */
+	public List<Bolsa> getBolsasByAreaDepartamento(Area area) throws SQLException, UVException {
+		ArrayList<Bolsa> bolsas = new ArrayList<>();
+		String consulta = ""
+				+ " SELECT bepbol.* FROM TBEP_AREAS bepare"
+				+ " INNER JOIN TBEP_BOLSAS bepbol ON bepbol.BEPARE_CODNUM = bepare.CODNUM"
+				+ " INNER JOIN TBEP_AREAS_DEPARTAMENTOS bepade ON bepade.BEPARE_CODNUM = bepare.CODNUM"
+				+ " WHERE bepade.BEPDEP_CODNUM = ("
+				+ "     SELECT bepade.BEPDEP_CODNUM FROM TBEP_AREAS_DEPARTAMENTOS bepade "
+				+ "     WHERE bepade.BEPARE_CODNUM = ?"
+				+ " ) ";
+		
+		try (Connection conexion = ConexionUvirtual.obtenerInstancia(); PreparedStatement stmt = conexion.prepareStatement(consulta)) {
+			int indexParam = 1;
+			stmt.setInt(indexParam, area.getCodNum());
+			
+			try (ResultSet rs = stmt.executeQuery()) {
+				while (rs.next()) {
+					bolsas.add(this.createFromResultSet(rs));
+				}
+			}
+		}
+		
 		return bolsas;
 	}
 
