@@ -13,6 +13,7 @@ import es.ujaen.uvirtual.modelo.conexion.ConexionUvirtual;
 import es.ujaen.uvirtual.modulo.bolsaempleo.beans.Area;
 import es.ujaen.uvirtual.modulo.bolsaempleo.beans.Bolsa;
 import es.ujaen.uvirtual.modulo.bolsaempleo.beans.BolsaResultado;
+import es.ujaen.uvirtual.modulo.bolsaempleo.beans.Convocatoria;
 import es.ujaen.uvirtual.modulo.bolsaempleo.beans.UsuarioBolsaEmpleo;
 import es.ujaen.uvirtual.modulo.bolsaempleo.utilidades.BolsaEmpleoDataTable;
 import es.ujaen.uvirtual.modulo.bolsaempleo.utilidades.BolsaEmpleoUtils;
@@ -128,11 +129,12 @@ public class ModeloBolsa {
 	/** Listado de bolsas para resultados .
 	 * @param params para leer los parametros de paginación, ordenacion, etc .
 	 * @param usuario .
+	 * @param convocatoria .
 	 * @return listado de bolsas de empleo .
 	 * @throws SQLException en caso de error de base de datos .
 	 * @throws UVException  error si no existe la area .
 	 */
-	public BolsaEmpleoDataTable<BolsaResultado> listaBolsasResultadosDatatable(UsuarioBolsaEmpleo usuario, Map<String, String[]> params)
+	public BolsaEmpleoDataTable<BolsaResultado> listaBolsasResultadosDatatable(UsuarioBolsaEmpleo usuario, Convocatoria convocatoria, Map<String, String[]> params)
 			throws SQLException, UVException {
 		List<BolsaResultado> bolsas = new ArrayList<>();
 		BolsaEmpleoDataTable<BolsaResultado> dataTable = new BolsaEmpleoDataTable<>(params);
@@ -148,7 +150,7 @@ public class ModeloBolsa {
 				+ "				ELSE 0"
 				+ "			END"
 				+ "		FROM TBEP_CONVOCATORIAS bepcon"
-				+ "		WHERE ROWNUM = 1"
+				+ "		WHERE bepcon.CODNUM = ?"
 				+ "		) AS RESULTADOS_ACTUALES"
 				+ "	FROM TBEP_BOLSAS bepbol"
 				+ "	INNER JOIN TBEP_AREAS bepare ON bepare.CODNUM = bepbol.BEPARE_CODNUM"
@@ -166,6 +168,8 @@ public class ModeloBolsa {
 				PreparedStatement stmtCount = conexion.prepareStatement(dataTable.getQueryCount());
 				PreparedStatement stmt = conexion.prepareStatement(dataTable.getQuery())) {
 			int indexParam = 1;
+			stmt.setInt(indexParam, convocatoria.getCodNum());
+			stmtCount.setInt(indexParam++, convocatoria.getCodNum());
 			if (evaluador) {
 				stmt.setInt(indexParam, usuario.getCodNum());
 				stmtCount.setInt(indexParam++, usuario.getCodNum());
