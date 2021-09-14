@@ -470,26 +470,44 @@ public class ModeloPlazaOfertada {
 		List<OfertaCandidato> rows = new ArrayList<>();
 		BolsaEmpleoDataTable<OfertaCandidato> dataTable = new BolsaEmpleoDataTable<>(params);
 		
-		String consulta = "SELECT bepusu.CODNUM AS BEPUSU_CODNUM, bepsob.TOTAL AS PUNTUACION, bepofc.CODNUM, bepofc.FLGRESULTADO, "
-				+ "     bepofc.FECHA_RESULTADO, bepofc.PREFERENCIA, ? AS BEPPLO_CODNUM,"
+		String consulta = ""
+				+ " SELECT bepusu.CODNUM AS BEPUSU_CODNUM, bepsob.TOTAL AS PUNTUACION, bepofc.CODNUM, bepofc.FLGRESULTADO,"
+				+ "     bepofc.FECHA_RESULTADO, bepofc.PREFERENCIA, bepplo.CODNUM AS BEPPLO_CODNUM,"
 				+ "     bepcnt.CODNUM AS CONTRATACION"
 				+ " FROM TBEP_USUARIOS bepusu"
 				+ " INNER JOIN TBEP_SOLICITUDES bepsol ON bepsol.BEPUSU_CODNUM = bepusu.CODNUM"
-				+ " INNER JOIN TBEP_SOLICITUD_BOLSAS bepsob ON bepsob.BEPSOL_CODNUM = bepsol.CODNUM AND bepsob.BEPBOL_CODNUM = ?"
-				+ "     AND bepsob.FECHABAREMACION IS NOT NULL"
-				+ " LEFT JOIN TBEP_OFERTAS_CANDIDATOS bepofc ON bepofc.BEPUSU_CODNUM = bepusu.CODNUM AND bepofc.BEPPLO_CODNUM = ?"
-				+ " LEFT JOIN TBEP_CONTRATACIONES bepcnt ON bepcnt.BEPUSU_CODNUM = bepusu.CODNUM AND bepcnt.BEPPLO_CODNUM = ?"
-				+ " LEFT JOIN TBEP_ESTADO_CANDIDATOS bepesc ON bepesc.BEPUSU_CODNUM = bepusu.CODNUM AND bepesc.BEPBOL_CODNUM = bepsob.BEPBOL_CODNUM"
-				+ " LEFT JOIN TBEP_PLAZAS_OFERTADAS bepplo ON bepplo.CODNUM = bepesc.BEPPLO_CODNUM"
+				+ " INNER JOIN TBEP_SOLICITUD_BOLSAS bepsob ON bepsob.BEPSOL_CODNUM = bepsol.CODNUM AND bepsob.FECHABAREMACION IS NOT NULL"
+				+ " INNER JOIN TBEP_BOLSAS bepbol ON bepbol.CODNUM = bepsob.BEPBOL_CODNUM"
+				+ " INNER JOIN TBEP_AREAS bepare ON bepare.CODNUM = bepbol.BEPARE_CODNUM"
+				+ " INNER JOIN TBEP_PLAZAS_OFERTADAS bepplo ON bepplo.BEPARE_CODNUM = bepare.CODNUM"
+				+ " INNER JOIN TBEP_DEDICACIONES bepded ON bepded.CODNUM = bepplo.BEPDED_CODNUM"
+				+ " LEFT JOIN TBEP_ESTADO_CANDIDATOS bepesc ON bepesc.BEPUSU_CODNUM = bepusu.CODNUM AND bepesc.BEPBOL_CODNUM = bepbol.CODNUM"
+				+ " LEFT JOIN ("
+				+ "     SELECT"
+				+ "         bepesc.BEPUSU_CODNUM AS BEPUSU_CODNUM,"
+				+ "     COUNT(DISTINCT bepesc.BEPPLO_CODNUM) AS CONTRATOS"
+				+ "     FROM TBEP_ESTADO_CANDIDATOS bepesc"
+				+ "     WHERE bepesc.ESTADO NOT IN ('" + ModeloEstadoCandidato.ESTADO_DISPONIBLE + "',"
+				+ "         '" + ModeloEstadoCandidato.ESTADO_SUSPENSION_PROVISIONAL + "', '" + ModeloEstadoCandidato.ESTADO_NO_DISPONIBLE + "')"
+				+ "     GROUP BY bepesc.BEPUSU_CODNUM"
+				+ " ) bepcts ON bepcts.BEPUSU_CODNUM = bepusu.CODNUM"
+				+ " LEFT JOIN TBEP_OFERTAS_CANDIDATOS bepofc ON bepofc.BEPUSU_CODNUM = bepusu.CODNUM AND bepofc.BEPPLO_CODNUM = bepplo.CODNUM"
+				+ " LEFT JOIN TBEP_CONTRATACIONES bepcnt ON bepcnt.BEPUSU_CODNUM = bepusu.CODNUM AND bepcnt.BEPPLO_CODNUM = bepplo.CODNUM"
 				+ " LEFT JOIN TBEP_DEDICACIONES bepded ON bepded.CODNUM = bepplo.BEPDED_CODNUM"
-				+ " WHERE (bepesc.CODNUM IS NULL"
-				+ "         OR bepesc.ESTADO = '" + ModeloEstadoCandidato.ESTADO_DISPONIBLE + "'"
-				+ "         OR (bepesc.ESTADO = '" + ModeloEstadoCandidato.ESTADO_CONTRATADO_PRIMER_CUATRIMESTRE + "' "
-				+ "             AND bepplo.CUATRIMESTRE = '" + ModeloPlazaOfertada.CUATRIMESTRE_SEGUNDO + "')"
-				+ "         OR (bepesc.ESTADO = '" + ModeloEstadoCandidato.ESTADO_CONTRATADO_PARCIAL + "'"
-				+ "             AND bepded.TIPO = '" + ModeloDedicacion.TIPO_TIEMPO_PARCIAL + "')"
-				+ "     )"
-				+ "     AND bepusu.FLGBORRADO = 'N'";
+				+ " WHERE bepplo.CODNUM = ?"
+				+ "     AND bepusu.ROL = " + ModeloRol.ID_ROL_CANDIDATO
+				+ "     AND bepusu.FLGBORRADO = 'N'"
+				+ "     AND ("
+				+ "         CASE"
+				+ "             WHEN bepesc.ESTADO = '" + ModeloEstadoCandidato.ESTADO_CONTRATADO_PRIMER_CUATRIMESTRE + "'"
+				+ "                 AND bepplo.CUATRIMESTRE = '" + ModeloPlazaOfertada.CUATRIMESTRE_SEGUNDO + "' THEN 1"
+				+ "             WHEN bepesc.ESTADO = '" + ModeloEstadoCandidato.ESTADO_CONTRATADO_PARCIAL + "'"
+				+ "                 AND bepded.TIPO = '" + ModeloDedicacion.TIPO_TIEMPO_PARCIAL + "' THEN 1"
+				+ "             WHEN bepcts.CONTRATOS > 0 THEN 0"
+				+ "             WHEN bepesc.CODNUM IS NULL THEN 1"
+				+ "             WHEN bepesc.ESTADO = '" + ModeloEstadoCandidato.ESTADO_DISPONIBLE + "' THEN 1"
+				+ "             ELSE 0"
+				+ "         END) = 1";
 		
 		String whereNombre = String.format("(%s || ' ' || %s || ' ' || %s)", "bepusu.VUAJA_STRNOMBRE", "bepusu.VUAJA_STRAPELLIDO1", "bepusu.VUAJA_STRAPELLIDO2");
 				
@@ -502,12 +520,6 @@ public class ModeloPlazaOfertada {
 				PreparedStatement stmtCount = conexion.prepareStatement(dataTable.getQueryCount());
 				PreparedStatement stmt = conexion.prepareStatement(dataTable.getQuery())) {
 			int paramIndex = 1;
-			stmt.setInt(paramIndex, plaza.getCodNum());
-			stmtCount.setInt(paramIndex++, plaza.getCodNum());
-			stmt.setInt(paramIndex, plaza.getArea().getCodNum());
-			stmtCount.setInt(paramIndex++, plaza.getArea().getCodNum());
-			stmt.setInt(paramIndex, plaza.getCodNum());
-			stmtCount.setInt(paramIndex++, plaza.getCodNum());
 			stmt.setInt(paramIndex, plaza.getCodNum());
 			stmtCount.setInt(paramIndex++, plaza.getCodNum());
 			
@@ -719,7 +731,8 @@ public class ModeloPlazaOfertada {
 			throws SQLException, UVException {
 		List<Integer> destinatarios = new ArrayList<>();
 		
-		String consulta = "SELECT bepusu.CODNUM"
+		String consulta = ""
+				+ " SELECT bepusu.CODNUM"
 				+ " FROM TBEP_USUARIOS bepusu"
 				+ " INNER JOIN TBEP_SOLICITUDES bepsol ON bepsol.BEPUSU_CODNUM = bepusu.CODNUM"
 				+ " INNER JOIN TBEP_SOLICITUD_BOLSAS bepsob ON bepsob.BEPSOL_CODNUM = bepsol.CODNUM AND bepsob.FECHABAREMACION IS NOT NULL"
@@ -728,16 +741,29 @@ public class ModeloPlazaOfertada {
 				+ " INNER JOIN TBEP_PLAZAS_OFERTADAS bepplo ON bepplo.BEPARE_CODNUM = bepare.CODNUM"
 				+ " INNER JOIN TBEP_DEDICACIONES bepded ON bepded.CODNUM = bepplo.BEPDED_CODNUM"
 				+ " LEFT JOIN TBEP_ESTADO_CANDIDATOS bepesc ON bepesc.BEPUSU_CODNUM = bepusu.CODNUM AND bepesc.BEPBOL_CODNUM = bepbol.CODNUM"
+				+ " LEFT JOIN ("
+				+ "     SELECT"
+				+ "         bepesc.BEPUSU_CODNUM AS BEPUSU_CODNUM,"
+				+ "     COUNT(DISTINCT bepesc.BEPPLO_CODNUM) AS CONTRATOS"
+				+ "     FROM TBEP_ESTADO_CANDIDATOS bepesc"
+				+ "     WHERE bepesc.ESTADO NOT IN ('" + ModeloEstadoCandidato.ESTADO_DISPONIBLE + "',"
+				+ "         '" + ModeloEstadoCandidato.ESTADO_SUSPENSION_PROVISIONAL + "', '" + ModeloEstadoCandidato.ESTADO_NO_DISPONIBLE + "')"
+				+ "     GROUP BY bepesc.BEPUSU_CODNUM"
+				+ " ) bepcts ON bepcts.BEPUSU_CODNUM = bepusu.CODNUM"
 				+ " WHERE bepplo.CODNUM = ?"
 				+ "     AND bepusu.ROL = " + ModeloRol.ID_ROL_CANDIDATO
 				+ "     AND bepusu.FLGBORRADO = 'N'"
-				+ "     AND (bepesc.CODNUM IS NULL"
-				+ "         OR bepesc.ESTADO = '" + ModeloEstadoCandidato.ESTADO_DISPONIBLE + "'"
-				+ "         OR (bepesc.ESTADO = '" + ModeloEstadoCandidato.ESTADO_CONTRATADO_PRIMER_CUATRIMESTRE + "' "
-				+ "             AND bepplo.CUATRIMESTRE = '" + ModeloPlazaOfertada.CUATRIMESTRE_SEGUNDO + "')"
-				+ "         OR (bepesc.ESTADO = '" + ModeloEstadoCandidato.ESTADO_CONTRATADO_PARCIAL + "'"
-				+ "             AND bepded.TIPO = '" + ModeloDedicacion.TIPO_TIEMPO_PARCIAL + "')"
-				+ "     )";
+				+ "     AND ("
+				+ "         CASE"
+				+ "             WHEN bepesc.ESTADO = '" + ModeloEstadoCandidato.ESTADO_CONTRATADO_PRIMER_CUATRIMESTRE + "'"
+				+ "                 AND bepplo.CUATRIMESTRE = '" + ModeloPlazaOfertada.CUATRIMESTRE_SEGUNDO + "' THEN 1"
+				+ "             WHEN bepesc.ESTADO = '" + ModeloEstadoCandidato.ESTADO_CONTRATADO_PARCIAL + "'"
+				+ "                 AND bepded.TIPO = '" + ModeloDedicacion.TIPO_TIEMPO_PARCIAL + "' THEN 1"
+				+ "             WHEN bepcts.CONTRATOS > 0 THEN 0"
+				+ "             WHEN bepesc.CODNUM IS NULL THEN 1"
+				+ "             WHEN bepesc.ESTADO = '" + ModeloEstadoCandidato.ESTADO_DISPONIBLE + "' THEN 1"
+				+ "             ELSE 0"
+				+ "         END) = 1";
 		
 		try (PreparedStatement stmt = conexion.prepareStatement(consulta)) {
 			stmt.setInt(1, plaza.getCodNum());

@@ -197,8 +197,8 @@ public class ModeloEstadoCandidato {
 				+ "     GROUP BY bepesc.BEPUSU_CODNUM"
 				+ " ) bepcts ON bepcts.BEPUSU_CODNUM = bepusu.CODNUM"
 				+ " WHERE bepplo.CODNUM = ?"
-				+ " AND bepusu.ROL = " + ModeloRol.ID_ROL_CANDIDATO
-				+ " AND bepusu.FLGBORRADO = 'N'";
+				+ "     AND bepusu.ROL = " + ModeloRol.ID_ROL_CANDIDATO
+				+ "     AND bepusu.FLGBORRADO = 'N'";
 		
 		dataTable.setQuery(consulta);
 		

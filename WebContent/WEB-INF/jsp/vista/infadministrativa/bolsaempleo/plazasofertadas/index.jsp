@@ -86,7 +86,9 @@ $(document).ready(function() {
 	
 	var estadosPlaza = {};
 	<%	for (Entry<String, String> est: ModeloPlazaOfertada.ESTADOS.entrySet()) { %>
-			estadosPlaza["<%= est.getKey() %>"] = "<%= est.getValue() %>";
+		<%	if(est.getKey().equals(ModeloPlazaOfertada.PLAZA_ESTADO_ABIERTA) || est.getKey().equals(ModeloPlazaOfertada.PLAZA_ESTADO_CONTRATACION)) { %>
+				estadosPlaza["<%= est.getKey() %>"] = "<%= est.getValue() %>";
+		<%	} %>
 	<%	} %>
 	
 	var table = new Atis.DataTable('#tablePlazasOfertadas', {
