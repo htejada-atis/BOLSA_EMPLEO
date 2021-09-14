@@ -357,12 +357,12 @@ UsuarioBolsaEmpleo candidato = bean.getCandidato();
 	
 <%	if (bean.getApartadoContrataciones() != null) { %>
 		
-		<table class="bluetable bolsaempleo" id="tableContrataciones">
+		<table class="bluetable bolsaempleo" id="tableEstadosCandidato">
 			<tr>
-				<th scope="col"	style="width:15px"></th>
+				<th scope="col" style="width:15px"></th>
 				<th scope="col" style="width:100%">Área</th>
 				<th scope="col" style="width:75px">Estado</th>
-				<th scope="col"	style="width:12%">Plaza</th>
+				<th scope="col" style="width:12%">Plaza</th>
 			</tr>
 			<tbody>
 			</tbody>
@@ -662,7 +662,6 @@ UsuarioBolsaEmpleo candidato = bean.getCandidato();
 	<%	} %>
 	
 	<%	if (bean.getApartadoContrataciones() != null) { %>
-			
 			function cambiarEstado(bolsas) {
 				var mensaje = "<p>Se cambiará el estado seleccionado en el candidato para las bolsas<br/>previamente seleccionadas.</p>"
 				mensaje += "<br/>";
@@ -703,8 +702,8 @@ UsuarioBolsaEmpleo candidato = bean.getCandidato();
 				estadosCandidato["<%= est.getKey() %>"] = "<%= est.getValue() %>";
 		<%	} %>
 			
-			var tableContrataciones = new Atis.DataTable('#tableContrataciones', {
-				"ajax": { url: "<%=ControladorUsuarioCandidato.URL_PATTERN_AJAX%>"},
+			var tableEstadosCandidato = new Atis.DataTable('#tableEstadosCandidato', {
+				"ajax": { url: "<%=ControladorUsuarioCandidato.URL_PATTERN_AJAX%>", async: false },
 				"action": "<%= ControladorUsuarioCandidato.ACCION_DATATABLE_ESTADOS_CANDIDATO %>",
 				"params": {"<%=ControladorUsuarioCandidato.PARAM_CANDIDATO%>": <%= candidato.getCodNum() %>},
 				"selectable": true,

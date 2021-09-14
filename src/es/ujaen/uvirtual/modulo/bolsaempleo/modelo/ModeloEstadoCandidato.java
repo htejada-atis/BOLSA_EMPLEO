@@ -252,7 +252,6 @@ public class ModeloEstadoCandidato {
 			conexion.setAutoCommit(false);
 			
 			try {
-		
 				// comprobamos si el estado está creado para actualizar o crear
 				CandidatoEstado candidatoEstado = this.getEstadoCandidatoByUsuarioBolsa(candidato, bolsa);
 				
@@ -264,7 +263,11 @@ public class ModeloEstadoCandidato {
 					insertaEstadoCandidato(candidatoEstado, usuarioUpdate, conexion);
 				} else {
 					candidatoEstado.setEstado(estado);
-					candidatoEstado.setPlaza(candidato.getPlaza());
+					
+					if (estado.equals(ESTADO_DISPONIBLE) || estado.equals(ESTADO_NO_DISPONIBLE) || estado.equals(ESTADO_SUSPENSION_PROVISIONAL)) {
+						candidatoEstado.setPlaza(null);
+					}
+					
 					actualizaEstadoCandidato(candidatoEstado, usuarioUpdate, conexion);
 				}
 		

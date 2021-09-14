@@ -187,6 +187,10 @@ String justificacion = BolsaEmpleoUtils.getParamForm(request, ControladorContrat
 		</div>
 	</form>
 	
+<%	if ((mostrarCandidatos || estadoCerrada) && personal) { %>
+		<button class="link-btn" id="exportar_candidatos" title="Exportar candidatos a csv">Exportar candidatos a csv</button>
+<%	} %>
+	
 <%	if (mostrarCandidatos) { %>
 		<table class="bluetable bolsaempleo" id="tableOfertasCandidatos">
 			<tr>
@@ -385,6 +389,12 @@ $(document).ready(function() {
 					}]
 				}
 			]
+		});
+<%	} %>
+
+<%	if ((mostrarCandidatos || estadoCerrada) && personal) { %>
+		$('#exportar_candidatos').on('click', function() {
+			window.open("<%= request.getRequestURI() %>?<%= ControladorContratacion.PARAM_ACCION %>=<%= ControladorContratacion.ACCION_EXPORTAR_CANDIDATOS %>&<%= ControladorContratacion.PARAM_PLAZA_OFERTADA %>=<%= plaza.getCodNum() %>");
 		});
 <%	} %>
 

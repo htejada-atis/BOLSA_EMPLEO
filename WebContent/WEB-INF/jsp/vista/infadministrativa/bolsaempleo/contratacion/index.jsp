@@ -15,13 +15,15 @@ VistaContratacion bean = (VistaContratacion) uvdatos.getVistas().get(VistaContra
 <div class='bolsa-empleo'>
 	<jsp:include page="/WEB-INF/jsp/vista/infadministrativa/bolsaempleo/mensajes.jsp" />
 	
-	<div class="titulo-bolsa-empleo">
-		<h2>Plazas ofertadas</h2>
-		
-		<button class="link-btn" id="nueva_plaza">
-			Nueva plaza
-		</button>
-	</div>
+	<h2>Plazas ofertadas</h2>
+	
+	<button class="link-btn" id="nueva_plaza" style="float: right">
+		Nueva plaza
+	</button>
+	
+	<% if (bean.getUsuarioLogeado().isServicioPersonal()) { %>
+		<button class="link-btn" id="exportar_plazas" title="Exportar plazas ofertadas a csv">Exportar a csv</button>
+	<% } %>
 	
 	<table class="bluetable bolsaempleo" id="tablePlazasOfertadas">
 		<tr>
@@ -83,6 +85,12 @@ $(document).ready(function() {
 		event.preventDefault();
 		Atis.sendForm("<%=request.getRequestURI()%>", {'a': '<%=ControladorContratacion.ACCION_NUEVA_PLAZA_OFERTADA%>'});
 	});
+	
+<% if (bean.getUsuarioLogeado().isServicioPersonal()) { %>
+		$('#exportar_plazas').on('click', function() {
+			window.open("<%= request.getRequestURI() %>?<%= ControladorContratacion.PARAM_ACCION %>=<%= ControladorContratacion.ACCION_EXPORTAR_PLAZAS %>");
+		});
+<%	} %>
 	
 });
 </script>
