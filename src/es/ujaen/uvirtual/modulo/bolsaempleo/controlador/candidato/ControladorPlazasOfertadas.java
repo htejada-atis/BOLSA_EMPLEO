@@ -300,11 +300,12 @@ public class ControladorPlazasOfertadas extends HttpServlet {
 		datos.setRespuestaEnviada(true);
 		response.setContentType(RESPONSE_AJAX_CONTENTTYPE);
 		response.setCharacterEncoding(RESPONSE_AJAX_ENCODING);
+		ModeloConvocatoria modeloConvocatoria = ModeloConvocatoria.obtenerInstancia();
 		
 		try (PrintWriter writer = response.getWriter()) {
 			try {
 				BolsaEmpleoDataTable<OfertaCandidato> dataTable = ModeloOfertaCandidato.obtenerInstancia().listadoPlazasOfertadasCandidato(
-						request.getParameterMap(), bean.getUsuarioLogeado());
+						request.getParameterMap(), bean.getUsuarioLogeado(), modeloConvocatoria.getUltimaConvocatoria());
 				bean.setDatatableOfertasCandidatos(dataTable);
 				writer.write(dataTable.toJson("dd/M/yyyy HH:mm:ss"));
 			} catch (UVException | SQLException e) {
