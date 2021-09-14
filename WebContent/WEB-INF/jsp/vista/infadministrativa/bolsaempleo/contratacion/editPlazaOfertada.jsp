@@ -654,7 +654,7 @@ $(document).ready(function() {
 <%	if (plaza.getNri() != null && personal) { %>
 		document.getElementById("plaza_descargar_nri").addEventListener("click", function() {
 			window.open("<%=ControladorDescargaFicheros.URL_DESCARGA_FICHEROS%>"
-					+ "<%="?a=" + ControladorDescargaFicheros.ACCION_DESCARGAR_HORARIO_PERSONAL + "&" + ControladorDescargaFicheros.PARAM_PLAZA_OFERTADA + "=" + plaza.getCodNum()%>");
+					+ "<%="?a=" + ControladorDescargaFicheros.ACCION_DESCARGAR_NRI_PERSONAL + "&" + ControladorDescargaFicheros.PARAM_PLAZA_OFERTADA + "=" + plaza.getCodNum()%>");
 		});
 <%	} %>
 

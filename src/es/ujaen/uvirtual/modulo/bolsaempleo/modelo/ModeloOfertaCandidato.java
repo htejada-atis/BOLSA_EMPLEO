@@ -9,6 +9,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import es.ujaen.uvirtual.modelo.conexion.ConexionUvirtual;
+import es.ujaen.uvirtual.modulo.bolsaempleo.beans.Convocatoria;
 import es.ujaen.uvirtual.modulo.bolsaempleo.beans.OfertaCandidato;
 import es.ujaen.uvirtual.modulo.bolsaempleo.beans.PlazaOfertada;
 import es.ujaen.uvirtual.modulo.bolsaempleo.beans.UsuarioBolsaEmpleo;
@@ -65,14 +66,15 @@ public class ModeloOfertaCandidato {
 	
 	/** Obtiene una lista de las plazas ofertadas confirmadas por el usuario y su preferencia .
 	 * @param candidato .
+	 * @param convocatoria .
 	 * @return instancia .
 	 * @throws SQLException .
 	 * @throws UVException .
 	 */
-	public List<OfertaCandidato> listaOfertasCandidatoPreferentes(UsuarioBolsaEmpleo candidato) throws SQLException, UVException {
+	public List<OfertaCandidato> listaOfertasCandidatoPreferentes(UsuarioBolsaEmpleo candidato, Convocatoria convocatoria) throws SQLException, UVException {
 		List<OfertaCandidato> listaOfertas = new ArrayList<>();
 		
-		String consulta = String.format("SELECT bepplo.CODNUM AS BEPPLO_CODNUM, bepofc.*, bepcnt.CODNUM AS CONTRATACION"
+		String consulta = "SELECT bepplo.CODNUM AS BEPPLO_CODNUM, bepofc.*, bepcnt.CODNUM AS CONTRATACION"
 				+ " FROM TBEP_PLAZAS_OFERTADAS bepplo"
 				+ " INNER JOIN TBEP_OFERTAS_CANDIDATOS bepofc ON bepofc.BEPPLO_CODNUM = bepplo.CODNUM"
 				+ " LEFT JOIN TBEP_CONTRATACIONES bepcnt ON bepcnt.BEPUSU_CODNUM = bepofc.BEPUSU_CODNUM AND bepcnt.BEPPLO_CODNUM = bepplo.CODNUM"
@@ -80,12 +82,14 @@ public class ModeloOfertaCandidato {
 				+ "     AND bepofc.BEPUSU_CODNUM = ?"
 				+ "     AND bepofc.FLGRESULTADO = 'S'"
 				+ "     AND bepplo.FLGACTIVA = 'S'"
-				+ " ORDER BY bepofc.PREFERENCIA");
+				+ "     AND bepofc.FECHA_RESULTADO > (SELECT bepcon.FECHACIERRE FROM TBEP_CONVOCATORIAS bepcon WHERE bepcon.CODNUM = ?)"
+				+ " ORDER BY bepofc.PREFERENCIA";
 		
 		try (Connection conexion = ConexionUvirtual.obtenerInstancia();
 				PreparedStatement stmt = conexion.prepareStatement(consulta)) {
 			int parameterIndex = 1;
 			stmt.setInt(parameterIndex++, candidato.getCodNum());
+			stmt.setInt(parameterIndex++, convocatoria.getCodNum());
 			
 			try (ResultSet rs = stmt.executeQuery()) {
 				while (rs.next()) {
