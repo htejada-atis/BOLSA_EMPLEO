@@ -57,7 +57,7 @@ $(document).ready(function() {
 	var table = new Atis.DataTable('#tablePlazasOfertadas', {
 		"ajax": { url: "<%= ControladorContratacion.URL_PATTERN_AJAX %>" },
 		"pageSize": 10,
-		"defaultOrderBy": 3,
+		"defaultOrderBy": 4,
 		"defaultOrderDirection": 'desc',
 		"filterable": true,
 		"action": "<%= ControladorContratacion.ACCION_DATATABLE_PLAZAS_OFERTADAS %>",

@@ -302,8 +302,6 @@ public class ControladorPlazasOfertadas extends HttpServlet {
 		response.setCharacterEncoding(RESPONSE_AJAX_ENCODING);
 		ModeloConvocatoria modeloConvocatoria = ModeloConvocatoria.obtenerInstancia();
 		
-		ModeloConvocatoria modeloConvocatoria = ModeloConvocatoria.obtenerInstancia();
-		
 		try (PrintWriter writer = response.getWriter()) {
 			try {
 				BolsaEmpleoDataTable<OfertaCandidato> dataTable = ModeloOfertaCandidato.obtenerInstancia().listadoPlazasOfertadasCandidato(

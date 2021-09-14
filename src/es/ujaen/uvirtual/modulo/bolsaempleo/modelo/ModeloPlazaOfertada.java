@@ -13,6 +13,7 @@ import java.util.List;
 import java.util.Map;
 import es.ujaen.uvirtual.modelo.conexion.ConexionUvirtual;
 import es.ujaen.uvirtual.modulo.bolsaempleo.beans.Contratacion;
+import es.ujaen.uvirtual.modulo.bolsaempleo.beans.Convocatoria;
 import es.ujaen.uvirtual.modulo.bolsaempleo.beans.Mensaje;
 import es.ujaen.uvirtual.modulo.bolsaempleo.beans.OfertaCandidato;
 import es.ujaen.uvirtual.modulo.bolsaempleo.beans.Plantilla;
@@ -229,17 +230,18 @@ public class ModeloPlazaOfertada {
 	/**
 	 * Devuelve el listado de candidatos disponibles de una plaza para exportar en csv . 
 	 * @param plaza .
+	 * @param convocatoria .
 	 * @return .
 	 * @throws SQLException .
 	 * @throws UVException .
 	 */
-	public List<String[]> listadoCandidatosCsv(PlazaOfertada plaza) throws SQLException, UVException {
+	public List<String[]> listadoCandidatosCsv(PlazaOfertada plaza, Convocatoria convocatoria) throws SQLException, UVException {
 		String consulta = ""
 				+ " SELECT bepusu.CODNUM AS BEPUSU_CODNUM, bepsob.TOTAL AS PUNTUACION, bepofc.CODNUM, bepofc.FLGRESULTADO,"
 				+ "     bepofc.FECHA_RESULTADO, bepofc.PREFERENCIA, bepplo.CODNUM AS BEPPLO_CODNUM,"
 				+ "     bepcnt.CODNUM AS CONTRATACION"
 				+ " FROM TBEP_USUARIOS bepusu"
-				+ " INNER JOIN TBEP_SOLICITUDES bepsol ON bepsol.BEPUSU_CODNUM = bepusu.CODNUM"
+				+ " INNER JOIN TBEP_SOLICITUDES bepsol ON bepsol.BEPUSU_CODNUM = bepusu.CODNUM AND bepsol.BEPCON_CODNUM = ?"
 				+ " INNER JOIN TBEP_SOLICITUD_BOLSAS bepsob ON bepsob.BEPSOL_CODNUM = bepsol.CODNUM AND bepsob.FECHABAREMACION IS NOT NULL"
 				+ " INNER JOIN TBEP_BOLSAS bepbol ON bepbol.CODNUM = bepsob.BEPBOL_CODNUM"
 				+ " INNER JOIN TBEP_AREAS bepare ON bepare.CODNUM = bepbol.BEPARE_CODNUM"
@@ -277,7 +279,8 @@ public class ModeloPlazaOfertada {
 		
 		try (Connection conexion = ConexionUvirtual.obtenerInstancia(); PreparedStatement stmt = conexion.prepareStatement(consulta)) {
 			int paramIndex = 1;
-			stmt.setInt(paramIndex, plaza.getCodNum());
+			stmt.setInt(paramIndex++, convocatoria.getCodNum());
+			stmt.setInt(paramIndex++, plaza.getCodNum());
 			
 			try (ResultSet rs = stmt.executeQuery()) {
 				
@@ -615,11 +618,12 @@ public class ModeloPlazaOfertada {
 	/** Lista de candidatos que han aceptado una plaza .
 	 * @param params .
 	 * @param plaza .
+	 * @param convocatoria .
 	 * @return datatable de candidatos .
 	 * @throws SQLException .
 	 * @throws UVException .
 	 */
-	public BolsaEmpleoDataTable<OfertaCandidato> listadoCandidatosDisponibles(Map<String, String[]> params, PlazaOfertada plaza)
+	public BolsaEmpleoDataTable<OfertaCandidato> listadoCandidatosDisponibles(Map<String, String[]> params, PlazaOfertada plaza, Convocatoria convocatoria)
 			throws SQLException, UVException {
 		List<OfertaCandidato> rows = new ArrayList<>();
 		BolsaEmpleoDataTable<OfertaCandidato> dataTable = new BolsaEmpleoDataTable<>(params);
@@ -629,7 +633,7 @@ public class ModeloPlazaOfertada {
 				+ "     bepofc.FECHA_RESULTADO, bepofc.PREFERENCIA, bepplo.CODNUM AS BEPPLO_CODNUM,"
 				+ "     bepcnt.CODNUM AS CONTRATACION"
 				+ " FROM TBEP_USUARIOS bepusu"
-				+ " INNER JOIN TBEP_SOLICITUDES bepsol ON bepsol.BEPUSU_CODNUM = bepusu.CODNUM"
+				+ " INNER JOIN TBEP_SOLICITUDES bepsol ON bepsol.BEPUSU_CODNUM = bepusu.CODNUM AND bepsol.BEPCON_CODNUM = ?"
 				+ " INNER JOIN TBEP_SOLICITUD_BOLSAS bepsob ON bepsob.BEPSOL_CODNUM = bepsol.CODNUM AND bepsob.FECHABAREMACION IS NOT NULL"
 				+ " INNER JOIN TBEP_BOLSAS bepbol ON bepbol.CODNUM = bepsob.BEPBOL_CODNUM"
 				+ " INNER JOIN TBEP_AREAS bepare ON bepare.CODNUM = bepbol.BEPARE_CODNUM"
@@ -674,6 +678,8 @@ public class ModeloPlazaOfertada {
 				PreparedStatement stmtCount = conexion.prepareStatement(dataTable.getQueryCount());
 				PreparedStatement stmt = conexion.prepareStatement(dataTable.getQuery())) {
 			int paramIndex = 1;
+			stmt.setInt(paramIndex, convocatoria.getCodNum());
+			stmtCount.setInt(paramIndex++, convocatoria.getCodNum());
 			stmt.setInt(paramIndex, plaza.getCodNum());
 			stmtCount.setInt(paramIndex++, plaza.getCodNum());
 			
@@ -792,7 +798,7 @@ public class ModeloPlazaOfertada {
 				int idMensaje = ModeloMensajes.obtenerInstancia().nuevoMensajeConexion(mensaje, usuarioUpdate, conexion);
 				
 				// Obtenemos los candidatos disponibles y los insertamos para enviar el mensaje de la plaza
-				listaDestinatariosPlaza(plaza, idMensaje, usuarioUpdate, conexion);
+				listaDestinatariosPlaza(plaza, idMensaje, usuarioUpdate, ModeloConvocatoria.obtenerInstancia().getUltimaConvocatoria(), conexion);
 				
 				// Actualizamos el estado del mensaje a 'ENVIANDO'
 				String consultaUpdateMsg = String.format("UPDATE TBEP_MENSAJES SET %s=?, %s=? WHERE %s=?",
@@ -864,7 +870,6 @@ public class ModeloPlazaOfertada {
 						"ESTADO", "UID_USUARIO", "CODNUM");
 				try (PreparedStatement stmt = conexion.prepareStatement(consultaUpdateMsg)) {
 					int indexParam = 1;
-					
 					stmt.setString(indexParam++, ModeloMensajes.MENSAJE_ESTADO_ENVIANDO);
 					stmt.setString(indexParam++, usuarioUpdate.getCodCuenta());
 					stmt.setInt(indexParam++, idMensaje);
@@ -881,14 +886,14 @@ public class ModeloPlazaOfertada {
 		}
 	}
 	
-	private void listaDestinatariosPlaza(PlazaOfertada plaza, Integer idMensaje, UsuarioBolsaEmpleo usuarioUpdate, Connection conexion)
+	private void listaDestinatariosPlaza(PlazaOfertada plaza, Integer idMensaje, UsuarioBolsaEmpleo usuarioUpdate, Convocatoria convocatoria, Connection conexion)
 			throws SQLException, UVException {
 		List<Integer> destinatarios = new ArrayList<>();
 		
 		String consulta = ""
 				+ " SELECT bepusu.CODNUM"
 				+ " FROM TBEP_USUARIOS bepusu"
-				+ " INNER JOIN TBEP_SOLICITUDES bepsol ON bepsol.BEPUSU_CODNUM = bepusu.CODNUM"
+				+ " INNER JOIN TBEP_SOLICITUDES bepsol ON bepsol.BEPUSU_CODNUM = bepusu.CODNUM AND bepsol.BEPCON_CODNUM = ?"
 				+ " INNER JOIN TBEP_SOLICITUD_BOLSAS bepsob ON bepsob.BEPSOL_CODNUM = bepsol.CODNUM AND bepsob.FECHABAREMACION IS NOT NULL"
 				+ " INNER JOIN TBEP_BOLSAS bepbol ON bepbol.CODNUM = bepsob.BEPBOL_CODNUM"
 				+ " INNER JOIN TBEP_AREAS bepare ON bepare.CODNUM = bepbol.BEPARE_CODNUM"
@@ -920,7 +925,9 @@ public class ModeloPlazaOfertada {
 				+ "         END) = 1";
 		
 		try (PreparedStatement stmt = conexion.prepareStatement(consulta)) {
-			stmt.setInt(1, plaza.getCodNum());
+			int indexParam = 1;
+			stmt.setInt(indexParam++, convocatoria.getCodNum());
+			stmt.setInt(indexParam++, plaza.getCodNum());
 			
 			try (ResultSet rs = stmt.executeQuery()) {
 				while (rs.next()) {

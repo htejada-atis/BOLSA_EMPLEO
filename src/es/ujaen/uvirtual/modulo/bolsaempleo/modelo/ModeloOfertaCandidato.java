@@ -74,7 +74,7 @@ public class ModeloOfertaCandidato {
 	public List<OfertaCandidato> listaOfertasCandidatoPreferentes(UsuarioBolsaEmpleo candidato, Convocatoria convocatoria) throws SQLException, UVException {
 		List<OfertaCandidato> listaOfertas = new ArrayList<>();
 		
-		String consulta = "SELECT bepplo.CODNUM AS BEPPLO_CODNUM, bepofc.*, bepcnt.CODNUM AS CONTRATACION"
+		String consulta = "SELECT bepofc.BEPUSU_CODNUM, bepplo.CODNUM AS BEPPLO_CODNUM, bepofc.*, bepcnt.CODNUM AS CONTRATACION"
 				+ " FROM TBEP_PLAZAS_OFERTADAS bepplo"
 				+ " INNER JOIN TBEP_OFERTAS_CANDIDATOS bepofc ON bepofc.BEPPLO_CODNUM = bepplo.CODNUM"
 				+ " LEFT JOIN TBEP_CONTRATACIONES bepcnt ON bepcnt.BEPUSU_CODNUM = bepofc.BEPUSU_CODNUM AND bepcnt.BEPPLO_CODNUM = bepplo.CODNUM"

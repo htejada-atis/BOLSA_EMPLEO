@@ -267,13 +267,10 @@ public class ModeloContratacion {
 		List<OfertaCandidato> rows = new ArrayList<>();
 		BolsaEmpleoDataTable<OfertaCandidato> dataTable = new BolsaEmpleoDataTable<>(params);
 		
-		String consulta = "SELECT bepusu.CODNUM AS BEPUSU_CODNUM, bepsob.TOTAL AS PUNTUACION, bepofc.CODNUM, bepofc.FLGRESULTADO, "
-				+ "     bepofc.FECHA_RESULTADO, bepofc.PREFERENCIA, bepsol.BEPUSU_CODNUM AS BEPUSU_CODNUM, bepofc.BEPPLO_CODNUM AS BEPPLO_CODNUM,"
+		String consulta = "SELECT bepusu.CODNUM AS BEPUSU_CODNUM, bepofc.CODNUM, bepofc.FLGRESULTADO,"
+				+ "     bepofc.FECHA_RESULTADO, bepofc.PREFERENCIA, bepofc.BEPPLO_CODNUM AS BEPPLO_CODNUM,"
 				+ "     bepcnt.CODNUM AS CONTRATACION"
 				+ " FROM TBEP_USUARIOS bepusu"
-				+ " INNER JOIN TBEP_SOLICITUDES bepsol ON bepsol.BEPUSU_CODNUM = bepusu.CODNUM"
-				+ " INNER JOIN TBEP_SOLICITUD_BOLSAS bepsob ON bepsob.BEPSOL_CODNUM = bepsol.CODNUM AND bepsob.BEPBOL_CODNUM = ?"
-				+ "     AND bepsob.FECHABAREMACION IS NOT NULL"
 				+ " INNER JOIN TBEP_OFERTAS_CANDIDATOS bepofc ON bepofc.BEPUSU_CODNUM = bepusu.CODNUM"
 				+ " INNER JOIN TBEP_CONTRATACIONES bepcnt ON bepcnt.BEPUSU_CODNUM = bepusu.CODNUM AND bepcnt.BEPPLO_CODNUM = bepofc.BEPPLO_CODNUM"
 				+ " WHERE bepofc.BEPPLO_CODNUM = ?"
@@ -293,8 +290,6 @@ public class ModeloContratacion {
 				PreparedStatement stmtCount = conexion.prepareStatement(dataTable.getQueryCount());
 				PreparedStatement stmt = conexion.prepareStatement(dataTable.getQuery())) {
 			int paramIndex = 1;
-			stmt.setInt(paramIndex, plaza.getArea().getCodNum());
-			stmtCount.setInt(paramIndex++, plaza.getArea().getCodNum());
 			stmt.setInt(paramIndex, plaza.getCodNum());
 			stmtCount.setInt(paramIndex++, plaza.getCodNum());
 			
@@ -303,7 +298,6 @@ public class ModeloContratacion {
 			try (ResultSet rs = stmt.executeQuery()) {
 				while (rs.next()) {
 					OfertaCandidato oferta = ModeloOfertaCandidato.obtenerInstancia().createOfertaCandidatoFromResultSet(rs);
-					oferta.setPuntuacion(rs.getDouble("PUNTUACION"));
 					rows.add(oferta);
 				}
 			}

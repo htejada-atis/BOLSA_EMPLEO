@@ -622,7 +622,8 @@ public class ControladorContratacion extends HttpServlet {
 		String plaza = bean.getPlazaOfertada().getCodNum().toString();
 		response.setHeader("Content-Disposition", "attachment; filename=\"candidatos_plaza_" + plaza + ".csv\"");
 		
-		List<String[]> rows = ModeloPlazaOfertada.obtenerInstancia().listadoCandidatosCsv(bean.getPlazaOfertada());
+		List<String[]> rows = ModeloPlazaOfertada.obtenerInstancia().listadoCandidatosCsv(bean.getPlazaOfertada(), 
+				ModeloConvocatoria.obtenerInstancia().getUltimaConvocatoria());
 		
 		try (ServletOutputStream stream = response.getOutputStream()) {
 			try (PrintWriter printer = new PrintWriter(stream)) {

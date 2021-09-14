@@ -211,7 +211,7 @@ public class ModeloDescargaFichero {
 		try (Connection conexion = ConexionUvirtual.obtenerInstancia();
 				PreparedStatement stmt = conexion.prepareStatement(consulta)) {
 			int parameterIndex = 1;
-			stmt.setInt(parameterIndex, convocatoria.getCodNum());
+			stmt.setInt(parameterIndex++, convocatoria.getCodNum());
 			stmt.setInt(parameterIndex++, idPlaza);
 			stmt.setInt(parameterIndex++, usuario.getCodNum());
 			
