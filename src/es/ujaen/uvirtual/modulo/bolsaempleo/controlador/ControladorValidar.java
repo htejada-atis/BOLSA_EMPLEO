@@ -98,6 +98,7 @@ public class ControladorValidar extends HttpServlet {
 	public static final String MENSAJE_ERROR_ACCION_NO_CONTEMPLADA = "Acción no contemplada";
 	public static final String MENSAJE_ERROR_BOLSA_ESTADO_NO_VALIDO = "El estado de la bolsa no permite acceder a esta";
 	public static final String MENSAJE_ERROR_NO_HAY_BOLSAS_SELECCIONADAS = "No hay bolsas seleccionadas";
+	public static final String MENSAJE_ERROR_NUMERO_MAXIMO_MERITOS_APARTADO = "Se ha alcanzado el número máximo de méritos por apartado";
 	public static final String MENSAJE_ERROR_NUMERO_MAXIMO_MERITOS_BLOQUE = "Se ha alcanzado el número máximo de méritos por bloque";
 	public static final String MENSAJE_ERROR_BOLSA_ESTADO_NO_VALIDO_ACCION = "El estado de la bolsa no permite hacer ninguna modificación";
 	public static final String MENSAJE_ERROR_SIN_PERMISO = "No tienes permiso";
@@ -332,6 +333,16 @@ public class ControladorValidar extends HttpServlet {
 								&& !merito.getItemBaremacion().getBloqueBaremacion().getApartadoBaremacion().equals(
 										bean.getMerito().getMerito().getItemBaremacion().getBloqueBaremacion().getApartadoBaremacion())) {
 							throw new UVException(MENSAJE_ERROR_NUMERO_MAXIMO_MERITOS_BLOQUE);
+						}
+						
+						// comprobamos que el total de méritos por apartado de la solicitud para esta bolsa
+						// sea menor que el permitido por el apartado
+						Integer totalMeritosApartado = modeloSolicitud.obtenerTotalMeritosPorApartadoSolicitud(solicitud, bean.getBolsa(), merito);
+						
+						if (merito.getItemBaremacion().getBloqueBaremacion().getNumeroMaximoMeritos() != null 
+								&& merito.getItemBaremacion().getBloqueBaremacion().getNumeroMaximoMeritos() != 0
+								&& totalMeritosApartado >= merito.getItemBaremacion().getBloqueBaremacion().getNumeroMaximoMeritos()) {
+							throw new UVException(MENSAJE_ERROR_NUMERO_MAXIMO_MERITOS_APARTADO);
 						}
 					}
 					if (bean.getUsuarioLogeado().getRol().getCodNum().equals(ModeloRol.ID_ROL_SERVICIO_PERSONAL)) {

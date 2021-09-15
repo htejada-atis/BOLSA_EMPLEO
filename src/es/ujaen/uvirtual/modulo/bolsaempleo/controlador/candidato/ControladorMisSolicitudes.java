@@ -587,6 +587,8 @@ public class ControladorMisSolicitudes extends HttpServlet {
 				throw new UVException(MENSAJE_ERROR_NUMERO_MAXIMO_MERITOS_BLOQUE);
 			}
 			
+			// comprobamos que el total de méritos por apartado de la solicitud para esta bolsa
+			// sea menor que el permitido por el apartado
 			Integer totalMeritosApartado = modeloSolicitud.obtenerTotalMeritosPorApartadoSolicitud(solicitud, area, merito);
 			
 			if (merito.getItemBaremacion().getBloqueBaremacion().getNumeroMaximoMeritos() != null 
