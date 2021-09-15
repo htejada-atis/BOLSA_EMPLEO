@@ -203,8 +203,8 @@ public class ModeloPlazaOfertada {
 					
 					rows.add(new String[] {
 						String.valueOf(plaza.getCodNum()),
-						String.format("\"%s\"", EscapaHTML.escapa(plaza.getIdPlaza())),
-						String.format("\"%s\"", EscapaHTML.escapa(plaza.getArea().getDescripcion())),
+						String.format("\"%s\"", plaza.getIdPlaza() != null ? plaza.getIdPlaza() : ""),
+						String.format("\"%s\"", plaza.getArea() != null ? plaza.getArea().getDescripcion() : ""),
 						String.format("\"%s\"", EscapaHTML.escapa(plaza.getEstado())),
 						String.format("\"%s\"", plaza.getFechaCreacion() != null ? Formateador.formatoFecha(plaza.getFechaCreacion(), 
 								Formateador.FORMATO_FECHA_DDMMYYYY_HHMMSS) : ""),
@@ -214,11 +214,11 @@ public class ModeloPlazaOfertada {
 								Formateador.FORMATO_FECHA_DDMMYYYY_HHMMSS) : ""),
 						String.format("\"%s\"", plaza.getFechaCerrada() != null ? Formateador.formatoFecha(plaza.getFechaCerrada(), 
 								Formateador.FORMATO_FECHA_DDMMYYYY_HHMMSS) : ""),
-						String.format("\"%s\"", EscapaHTML.escapa(plaza.getCentroDestino())),
-						String.format("\"%s\"", EscapaHTML.escapa(plaza.getDedicacion().getTexto())),
-						String.format("\"%s\"", EscapaHTML.escapa(plaza.getCuatrimestre())),
-						String.format("\"%s\"", EscapaHTML.escapa(plaza.getDuracionPrevista())),
-						String.format("\"%s\"", EscapaHTML.escapa(plaza.getJustificacion())),
+						String.format("\"%s\"", plaza.getCentroDestino() != null ? plaza.getCentroDestino() : ""),
+						String.format("\"%s\"", plaza.getDedicacion() != null ? plaza.getDedicacion().getTexto() : ""),
+						String.format("\"%s\"", plaza.getCuatrimestre() != null ? plaza.getCuatrimestre() : ""),
+						String.format("\"%s\"", plaza.getDuracionPrevista() != null ? plaza.getDuracionPrevista() : ""),
+						String.format("\"%s\"", plaza.getJustificacion() != null ? plaza.getJustificacion() : ""),
 					});
 				}
 			}
@@ -389,7 +389,11 @@ public class ModeloPlazaOfertada {
 			stmt.setDate(parameterIndex++, new Date(BolsaEmpleoUtils.getCurrentDateTime().getTime()));
 			stmt.setString(parameterIndex++, usuarioUpdate.getCodCuenta());
 			if (usuarioUpdate.isServicioPersonal()) {
-				stmt.setInt(parameterIndex++, plaza.getDedicacion().getCodNum());
+				if (plaza.getDedicacion() != null) {
+					stmt.setInt(parameterIndex++, plaza.getDedicacion().getCodNum());
+				} else {
+					stmt.setNull(parameterIndex++, Types.NUMERIC);
+				}
 				stmt.setString(parameterIndex++, plaza.getCuatrimestre());
 				stmt.setString(parameterIndex++, plaza.getDuracionPrevista());
 				stmt.setDate(parameterIndex++, plaza.getFechaFinOferta() != null ? new Date(plaza.getFechaFinOferta().getTime()) : null);
