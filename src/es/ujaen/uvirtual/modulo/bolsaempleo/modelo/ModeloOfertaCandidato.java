@@ -74,7 +74,7 @@ public class ModeloOfertaCandidato {
 	public List<OfertaCandidato> listaOfertasCandidatoPreferentes(UsuarioBolsaEmpleo candidato, Convocatoria convocatoria) throws SQLException, UVException {
 		List<OfertaCandidato> listaOfertas = new ArrayList<>();
 		
-		String consulta = "SELECT bepplo.CODNUM AS BEPPLO_CODNUM, bepofc.*, bepcnt.CODNUM AS CONTRATACION"
+		String consulta = "SELECT bepofc.BEPUSU_CODNUM, bepplo.CODNUM AS BEPPLO_CODNUM, bepofc.*, bepcnt.CODNUM AS CONTRATACION"
 				+ " FROM TBEP_PLAZAS_OFERTADAS bepplo"
 				+ " INNER JOIN TBEP_OFERTAS_CANDIDATOS bepofc ON bepofc.BEPPLO_CODNUM = bepplo.CODNUM"
 				+ " LEFT JOIN TBEP_CONTRATACIONES bepcnt ON bepcnt.BEPUSU_CODNUM = bepofc.BEPUSU_CODNUM AND bepcnt.BEPPLO_CODNUM = bepplo.CODNUM"
@@ -281,11 +281,13 @@ public class ModeloOfertaCandidato {
 	/** Lista de plazas ofertadas de un candidato .
 	 * @param params .
 	 * @param usuario .
+	 * @param convocatoria .
 	 * @return datatable de plazas ofertadas .
 	 * @throws SQLException .
 	 * @throws UVException .
 	 */
-	public BolsaEmpleoDataTable<OfertaCandidato> listadoPlazasOfertadasCandidato(Map<String, String[]> params, UsuarioBolsaEmpleo usuario) throws SQLException, UVException {
+	public BolsaEmpleoDataTable<OfertaCandidato> listadoPlazasOfertadasCandidato(Map<String, String[]> params, UsuarioBolsaEmpleo usuario, Convocatoria convocatoria)
+			throws SQLException, UVException {
 		List<OfertaCandidato> rows = new ArrayList<>();
 		BolsaEmpleoDataTable<OfertaCandidato> dataTable = new BolsaEmpleoDataTable<>(params);
 		
@@ -296,7 +298,7 @@ public class ModeloOfertaCandidato {
 				+ " INNER JOIN TBEP_AREAS bepare ON bepare.CODNUM = bepplo.BEPARE_CODNUM"
 				+ " INNER JOIN TBEP_BOLSAS bepbol ON bepbol.BEPARE_CODNUM = bepare.CODNUM"
 				+ " INNER JOIN TBEP_SOLICITUD_BOLSAS bepsob ON bepsob.BEPBOL_CODNUM = bepbol.CODNUM AND bepsob.FECHABAREMACION IS NOT NULL"
-				+ " INNER JOIN TBEP_SOLICITUDES bepsol ON bepsob.BEPSOL_CODNUM = bepsol.CODNUM"
+				+ " INNER JOIN TBEP_SOLICITUDES bepsol ON bepsob.BEPSOL_CODNUM = bepsol.CODNUM AND bepsol.BEPCON_CODNUM = ?"
 				+ " LEFT JOIN TBEP_OFERTAS_CANDIDATOS bepofc ON bepofc.BEPPLO_CODNUM = bepplo.CODNUM AND bepofc.BEPUSU_CODNUM = bepsol.BEPUSU_CODNUM"
 				+ " LEFT JOIN TBEP_CONTRATACIONES bepcnt ON bepcnt.BEPUSU_CODNUM = bepsol.BEPUSU_CODNUM AND bepcnt.BEPPLO_CODNUM = bepplo.CODNUM"
 				+ " LEFT JOIN TBEP_ESTADO_CANDIDATOS bepesc ON bepesc.BEPUSU_CODNUM = bepsol.BEPUSU_CODNUM AND bepesc.BEPBOL_CODNUM = bepbol.CODNUM"
@@ -336,6 +338,8 @@ public class ModeloOfertaCandidato {
 				PreparedStatement stmtCount = conexion.prepareStatement(dataTable.getQueryCount());
 				PreparedStatement stmt = conexion.prepareStatement(dataTable.getQuery())) {
 			int paramIndex = 1;
+			stmt.setInt(paramIndex, convocatoria.getCodNum());
+			stmtCount.setInt(paramIndex++, convocatoria.getCodNum());
 			stmt.setInt(paramIndex, usuario.getCodNum());
 			stmtCount.setInt(paramIndex++, usuario.getCodNum());
 			

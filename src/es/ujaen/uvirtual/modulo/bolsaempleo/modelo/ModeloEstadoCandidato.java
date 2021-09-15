@@ -12,6 +12,7 @@ import java.util.Map;
 import es.ujaen.uvirtual.modelo.conexion.ConexionUvirtual;
 import es.ujaen.uvirtual.modulo.bolsaempleo.beans.Bolsa;
 import es.ujaen.uvirtual.modulo.bolsaempleo.beans.CandidatoEstado;
+import es.ujaen.uvirtual.modulo.bolsaempleo.beans.Convocatoria;
 import es.ujaen.uvirtual.modulo.bolsaempleo.beans.PlazaOfertada;
 import es.ujaen.uvirtual.modulo.bolsaempleo.beans.UsuarioBolsaEmpleo;
 import es.ujaen.uvirtual.modulo.bolsaempleo.utilidades.BolsaEmpleoDataTable;
@@ -157,11 +158,12 @@ public class ModeloEstadoCandidato {
 	/** Listado de candidatos disponibles para una plaza .
 	 * @param params para leer los parametros de paginación, ordenacion, etc .
 	 * @param plaza .
+	 * @param convocatoria .
 	 * @return datatable .
 	 * @throws SQLException en caso de error de base de datos .
 	 * @throws UVException  error si no existe la area .
 	 */
-	public BolsaEmpleoDataTable<CandidatoEstado> listaEstadosCandidatoDisponiblesPlaza(Map<String, String[]> params, PlazaOfertada plaza)
+	public BolsaEmpleoDataTable<CandidatoEstado> listaEstadosCandidatoDisponiblesPlaza(Map<String, String[]> params, PlazaOfertada plaza, Convocatoria convocatoria)
 			throws SQLException, UVException {
 		List<CandidatoEstado> estados = new ArrayList<>();
 		BolsaEmpleoDataTable<CandidatoEstado> dataTable = new BolsaEmpleoDataTable<>(params);
@@ -180,7 +182,7 @@ public class ModeloEstadoCandidato {
 				+ "         ELSE 0"
 				+ "     END AS DISPONIBILIDAD"
 				+ " FROM TBEP_USUARIOS bepusu"
-				+ " INNER JOIN TBEP_SOLICITUDES bepsol ON bepsol.BEPUSU_CODNUM = bepusu.CODNUM"
+				+ " INNER JOIN TBEP_SOLICITUDES bepsol ON bepsol.BEPUSU_CODNUM = bepusu.CODNUM AND bepsol.BEPCON_CODNUM = ?"
 				+ " INNER JOIN TBEP_SOLICITUD_BOLSAS bepsob ON bepsob.BEPSOL_CODNUM = bepsol.CODNUM AND bepsob.FECHABAREMACION IS NOT NULL"
 				+ " INNER JOIN TBEP_BOLSAS bepbol ON bepbol.CODNUM = bepsob.BEPBOL_CODNUM"
 				+ " INNER JOIN TBEP_AREAS bepare ON bepare.CODNUM = bepbol.BEPARE_CODNUM"
@@ -206,6 +208,8 @@ public class ModeloEstadoCandidato {
 				PreparedStatement stmtCount = conexion.prepareStatement(dataTable.getQueryCount());
 				PreparedStatement stmt = conexion.prepareStatement(dataTable.getQuery())) {
 			int indexParam = 1;
+			stmt.setInt(indexParam, convocatoria.getCodNum());
+			stmtCount.setInt(indexParam++, convocatoria.getCodNum());
 			stmt.setInt(indexParam, plaza.getCodNum());
 			stmtCount.setInt(indexParam++, plaza.getCodNum());
 			dataTable.setFiltersParams(stmt, stmtCount, indexParam);

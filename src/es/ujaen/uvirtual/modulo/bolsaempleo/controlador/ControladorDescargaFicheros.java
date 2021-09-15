@@ -430,8 +430,11 @@ public class ControladorDescargaFicheros extends HttpServlet {
 	
 	private void descargaHorarioPlazaCandidato(VistaDescargaFicheros bean, UVDatos datos, HttpServletRequest request, HttpServletResponse response)
 			throws SQLException, UVException, IOException {
+		ModeloConvocatoria modeloConvocatoria = ModeloConvocatoria.obtenerInstancia();
+		
 		Integer idPlazaOfertada = Formateador.leeParametroInteger(request.getParameter(PARAM_PLAZA_OFERTADA));
-		PlazaOfertada plaza = ModeloDescargaFichero.obtenerInstancia().compruebaPlazaOfertadaCandidato(idPlazaOfertada, bean.getUsuarioLogeado());
+		PlazaOfertada plaza = ModeloDescargaFichero.obtenerInstancia().compruebaPlazaOfertadaCandidato(idPlazaOfertada, bean.getUsuarioLogeado(),
+				modeloConvocatoria.getUltimaConvocatoria());
 		bean.setPlazaOfertada(plaza);
 		if (plaza == null) {
 			BolsaEmpleoUtils.redirectToError(bean, datos, request, response, MENSAJE_ERROR_SIN_PERMISO);

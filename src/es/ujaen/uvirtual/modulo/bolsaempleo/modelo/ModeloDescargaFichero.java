@@ -5,6 +5,7 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import es.ujaen.uvirtual.modelo.conexion.ConexionUvirtual;
+import es.ujaen.uvirtual.modulo.bolsaempleo.beans.Convocatoria;
 import es.ujaen.uvirtual.modulo.bolsaempleo.beans.Merito;
 import es.ujaen.uvirtual.modulo.bolsaempleo.beans.MeritoPreferenteUsuario;
 import es.ujaen.uvirtual.modulo.bolsaempleo.beans.PlazaOfertada;
@@ -162,19 +163,21 @@ public class ModeloDescargaFichero {
 	/** Comprueba si una plaza ofertada está disponible para un candidato .
 	 * @param idPlaza .
 	 * @param usuario .
+	 * @param convocatoria .
 	 * @return plaza ofertada .
 	 * @throws UVException .
 	 * @throws UVException .
 	 * @throws SQLException .
 	 */
-	public PlazaOfertada compruebaPlazaOfertadaCandidato(int idPlaza, UsuarioBolsaEmpleo usuario) throws SQLException, UVException {
+	public PlazaOfertada compruebaPlazaOfertadaCandidato(int idPlaza, UsuarioBolsaEmpleo usuario, Convocatoria convocatoria)
+			throws SQLException, UVException {
 		String consulta = "SELECT bepplo.*, "
 				+ "     CASE"
 				+ "         WHEN bepplo.FECHA_FIN_OFERTA > SYSDATE THEN 1"
 				+ "         ELSE 0"
 				+ "     END AS ABIERTA_VIGENTE"
 				+ " FROM TBEP_USUARIOS bepusu"
-				+ " INNER JOIN TBEP_SOLICITUDES bepsol ON bepsol.BEPUSU_CODNUM = bepusu.CODNUM"
+				+ " INNER JOIN TBEP_SOLICITUDES bepsol ON bepsol.BEPUSU_CODNUM = bepusu.CODNUM AND bepsol.BEPCON_CODNUM = ?"
 				+ " INNER JOIN TBEP_SOLICITUD_BOLSAS bepsob ON bepsob.BEPSOL_CODNUM = bepsol.CODNUM AND bepsob.FECHABAREMACION IS NOT NULL"
 				+ " INNER JOIN TBEP_BOLSAS bepbol ON bepbol.CODNUM = bepsob.BEPBOL_CODNUM"
 				+ " INNER JOIN TBEP_AREAS bepare ON bepare.CODNUM = bepbol.BEPARE_CODNUM"
@@ -208,6 +211,7 @@ public class ModeloDescargaFichero {
 		try (Connection conexion = ConexionUvirtual.obtenerInstancia();
 				PreparedStatement stmt = conexion.prepareStatement(consulta)) {
 			int parameterIndex = 1;
+			stmt.setInt(parameterIndex++, convocatoria.getCodNum());
 			stmt.setInt(parameterIndex++, idPlaza);
 			stmt.setInt(parameterIndex++, usuario.getCodNum());
 			
