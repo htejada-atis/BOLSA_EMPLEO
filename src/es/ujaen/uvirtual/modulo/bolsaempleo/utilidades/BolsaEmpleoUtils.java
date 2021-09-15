@@ -165,25 +165,28 @@ public final class BolsaEmpleoUtils {
 	 * @param sepFecha separador de ano mes día .
 	 * @param sepHora separador de hora minutos segundos .
 	 * @return cadena en formato yyyyMMdd
+	 * @throws UVException .
 	 */
 	@SuppressWarnings({"checkstyle:magicnumber"})
-	public static Date leeParametroFechaHora(String valor, String sepFecha, String sepHora) {
+	public static Date leeParametroFechaHora(String valor, String sepFecha, String sepHora) throws UVException {
 		if (valor == null || valor.isBlank()) {
 			return null;
 		}
 		
 		Date dateFecha = null;
-		
 		SimpleDateFormat formatoFecha = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 		
+		String[] campos = valor.split(" ");
+		String[] camposFecha = campos[0].split(sepFecha);
+		
+		if (campos.length > 2) {
+			throw new UVException("Formato de fecha incorrecto");
+		}
+		
 		try {
-			String[] campos = valor.split(" ");
-			String[] camposFecha = campos[0].split(sepFecha);
 			String strFecha = camposFecha[2] + "-" + camposFecha[1] + "-" + camposFecha[0];
 			
-			if (campos.length > 2) {
-				throw new UVException("Formato de fecha incorrecto");
-			} else if (campos.length == 2) {
+			if (campos.length == 2) {
 				String[] camposHora = campos[1].split(sepHora);
 				if (camposHora.length == 1) {
 					strFecha += " " + camposHora[0] + ":00:00";

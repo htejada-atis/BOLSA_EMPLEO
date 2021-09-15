@@ -568,6 +568,11 @@ $(document).ready(function() {
 				}
 			}
 			
+		<%	if (fechaFinOferta.isBlank() || horaFinOferta.isBlank()) { %>
+				enviar = false;
+				Atis.alertDialog('Fecha fin oferta vacía', 'La fecha fin de la oferta no puede estar vacía para abrir una plaza.<br/>Debe guardar la fecha antes de enviar.');
+		<%	} %>
+			
 			if (enviar) {
 				var message = '<p>Una vez abierta la plaza ya no se podrá modificar y comenzará el período de aceptación de los<br/> candidatos.<br/>';
 				message += 'En la fecha: <%= fechaFinOferta %> y hora: <%= horaFinOferta %> el estado de la plaza cambiará automáticamente a estado<br/> de contratación.</p><br/>';

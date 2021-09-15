@@ -122,7 +122,7 @@ public class ControladorContratacion extends HttpServlet {
 	public static final String MENSAJE_ERROR_ESTADO_CONTRATACION_REQUERIDO = "Es requerido estado de contratación para la plaza";
 	public static final String MENSAJE_ERROR_ESTADO_CREACION_REQUERIDO = "Es requerido estado de creación para la plaza";
 	public static final String MENSAJE_ERROR_ESTADO_TRAMITACION_REQUERIDO = "Es requerido estado de tramitación para la plaza";
-	public static final String MENSAJE_ERROR_FECHA_FIN_OFERTA_VACIA = "La fecha fin de la oferta no puede estar vacía";
+	public static final String MENSAJE_ERROR_FECHA_FIN_OFERTA_VACIA_ABRIR_PLAZA = "La fecha fin de la oferta no puede estar vacía para abrir una plaza";
 	public static final String MENSAJE_ERROR_FORMATO_FECHA = "Error al formatear fecha. Formato: DD/MM/YYYY HH:MM:SS";
 	public static final String MENSAJE_ERROR_JUSTIFICACION_LARGA = "La justificación no puede contener mas de %d caracteres";
 	public static final String MENSAJE_ERROR_JUSTIFICACION_VACIA = "La justificación no puede estar vacía";
@@ -362,6 +362,10 @@ public class ControladorContratacion extends HttpServlet {
 		PlazaOfertada plaza = bean.getPlazaOfertada();
 		if (!plaza.getEstado().contains(ModeloPlazaOfertada.PLAZA_ESTADO_TRAMITACION)) {
 			throw new UVException(MENSAJE_ERROR_ESTADO_TRAMITACION_REQUERIDO);
+		}
+		
+		if (plaza.getFechaFinOferta() == null) {
+			throw new UVException(MENSAJE_ERROR_FECHA_FIN_OFERTA_VACIA_ABRIR_PLAZA);
 		}
 		
 		modeloPlaza.crearMensajeAperturaPlaza(plaza, bean.getUsuarioLogeado());
@@ -824,7 +828,13 @@ public class ControladorContratacion extends HttpServlet {
 			
 			String fechaFinOferta = BolsaEmpleoUtils.getParamRequestOrMultipartOrSession(request, parametros, PARAM_FECHA_FIN_OFERTA);
 			String horaFinOferta = BolsaEmpleoUtils.getParamRequestOrMultipartOrSession(request, parametros, PARAM_HORA_FIN_OFERTA);
-			Date fecha = BolsaEmpleoUtils.leeParametroFechaHora(fechaFinOferta + " " + horaFinOferta, "/", ":");
+			String fechaFinCompleta = fechaFinOferta + " " + horaFinOferta;
+			Date fecha = BolsaEmpleoUtils.leeParametroFechaHora(fechaFinCompleta, "/", ":");
+			
+			if (fechaFinCompleta != null && !fechaFinCompleta.isBlank() && fecha == null) {
+				throw new UVException(MENSAJE_ERROR_FORMATO_FECHA);
+			}
+			
 			plaza.setFechaFinOferta(fecha);
 			
 			plaza.setNri((InputStream) parametros.get(PARAM_NRI));
