@@ -30,6 +30,7 @@ import es.ujaen.uvirtual.modulo.bolsaempleo.beans.Convocatoria;
 import es.ujaen.uvirtual.modulo.bolsaempleo.beans.Merito;
 import es.ujaen.uvirtual.modulo.bolsaempleo.beans.MeritoSolicitud;
 import es.ujaen.uvirtual.modulo.bolsaempleo.beans.MeritoSolicitudTable;
+import es.ujaen.uvirtual.modulo.bolsaempleo.beans.MeritoSolicitudValoracion;
 import es.ujaen.uvirtual.modulo.bolsaempleo.beans.Solicitud;
 import es.ujaen.uvirtual.modulo.bolsaempleo.beans.TitulacionUsuario;
 import es.ujaen.uvirtual.modulo.bolsaempleo.beans.UsuarioBolsaEmpleo;
@@ -581,7 +582,7 @@ public class ControladorMisSolicitudes extends HttpServlet {
 			// comprobamos que el total de méritos por bloque de la solicitud sea menor que
 			// el permitido por la convocatoria
 			Integer totalMeritos = modeloSolicitud.obtenerTotalMeritosPorBloqueSolicitud(solicitud, area, merito);
-
+			
 			if (totalMeritos >= solicitud.getConvocatoria().getNumMeritosPorBloque()) {
 				this.seleccionarBolsa(bean, request);
 				throw new UVException(MENSAJE_ERROR_NUMERO_MAXIMO_MERITOS_BLOQUE);
@@ -605,7 +606,13 @@ public class ControladorMisSolicitudes extends HttpServlet {
 				modeloItems.checkItemsExcluyentes(mer.getMerito().getItemBaremacion(), merito.getItemBaremacion());
 			}
 			
-			modeloSolicitud.asignarMeritosASolicitudBolsa(solicitud, area, merito, bean.getUsuarioLogeado());			
+			MeritoSolicitud meritoSolicitudAnterior = modeloSolicitud.getMeritoSolicitudByConvocatoriaAnterior(solicitud.getConvocatoria(), area, merito);
+			
+			if (meritoSolicitudAnterior != null) {
+				modeloSolicitud.asignarMeritoAnteriorASolicitudBolsa(solicitud, area, meritoSolicitudAnterior, bean.getUsuarioLogeado());
+			} else {
+				modeloSolicitud.asignarMeritosASolicitudBolsa(solicitud, area, merito, bean.getUsuarioLogeado());
+			}
 		} else {
 			modeloSolicitud.borrarMeritoDeSolicitudBolsa(solicitud, area, merito, bean.getUsuarioLogeado());
 		}
