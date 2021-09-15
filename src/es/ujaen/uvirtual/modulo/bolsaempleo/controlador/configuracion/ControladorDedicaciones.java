@@ -16,6 +16,7 @@ import es.ujaen.uvirtual.beans.UVDatos;
 import es.ujaen.uvirtual.modulo.bolsaempleo.beans.Dedicacion;
 import es.ujaen.uvirtual.modulo.bolsaempleo.modelo.ModeloDedicacion;
 import es.ujaen.uvirtual.modulo.bolsaempleo.modelo.ModeloParametrosConfiguracion;
+import es.ujaen.uvirtual.modulo.bolsaempleo.modelo.ModeloPlazaOfertada;
 import es.ujaen.uvirtual.modulo.bolsaempleo.modelo.ModeloRol;
 import es.ujaen.uvirtual.modulo.bolsaempleo.modelo.ModeloUsuarioBolsaEmpleo;
 import es.ujaen.uvirtual.modulo.bolsaempleo.utilidades.BolsaEmpleoDataTable;
@@ -55,6 +56,7 @@ public class ControladorDedicaciones extends HttpServlet {
 	public static final String PARAM_ACTIVA = "activa";
 	public static final String PARAM_DEDICACION = "dedicacion";
 	public static final String PARAM_ENVIAR = "enviar";
+	public static final String PARAM_TIPO = "tipo";
 	public static final String PARAM_TEXTO_DEDICACION = "textodedicacion";
 	public static final String PARAM_SUELDO = "sueldo";
 	
@@ -62,6 +64,8 @@ public class ControladorDedicaciones extends HttpServlet {
 	public static final String MENSAJE_ERROR_ACCION_NO_CONTEMPLADA = "Acción no contemplada";
 	public static final String MENSAJE_ERROR_TEXTO_VACIO = "El texto no puede estar vacío";
 	public static final String MENSAJE_ERROR_SUELDO_VACIO = "El sueldo no puede estar vacío";
+	public static final String MENSAJE_ERROR_TIPO_NO_VALIDO = "El tipo seleccionado no es válido";
+	public static final String MENSAJE_ERROR_TIPO_VACIO = "El tipo no puede estar vacío";
 	public static final String MENSAJE_ERROR_SIN_PERMISO = "No tienes permiso";
 	
 	public static final String MENSAJE_EXITO_AGREGAR = "Dedicación creada correctamente";
@@ -253,6 +257,14 @@ public class ControladorDedicaciones extends HttpServlet {
 		dedicacion.setSueldo(Formateador.leeParametroDouble(request.getParameter(PARAM_SUELDO)));
 		if (dedicacion.getSueldo() == null) {
 			throw new UVException(MENSAJE_ERROR_SUELDO_VACIO);
+		}
+		
+		dedicacion.setTipo(Formateador.leeParametroString(request.getParameter(PARAM_TIPO)));
+		if (dedicacion.getTipo() == null || dedicacion.getTipo().isBlank()) {
+			throw new UVException(MENSAJE_ERROR_TIPO_VACIO);
+		}
+		if (!ModeloDedicacion.TIPOS_DEDICACION.containsKey(dedicacion.getTipo())) {
+			throw new UVException(MENSAJE_ERROR_TIPO_NO_VALIDO);
 		}
 		
 		return dedicacion;

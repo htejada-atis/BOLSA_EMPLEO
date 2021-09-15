@@ -12,6 +12,7 @@ import java.util.Map;
 import es.ujaen.uvirtual.modelo.conexion.ConexionUvirtual;
 import es.ujaen.uvirtual.modulo.bolsaempleo.beans.Bolsa;
 import es.ujaen.uvirtual.modulo.bolsaempleo.beans.CandidatoEstado;
+import es.ujaen.uvirtual.modulo.bolsaempleo.beans.Convocatoria;
 import es.ujaen.uvirtual.modulo.bolsaempleo.beans.PlazaOfertada;
 import es.ujaen.uvirtual.modulo.bolsaempleo.beans.UsuarioBolsaEmpleo;
 import es.ujaen.uvirtual.modulo.bolsaempleo.utilidades.BolsaEmpleoDataTable;
@@ -40,6 +41,8 @@ public class ModeloEstadoCandidato {
 	public static final String BEPPLO_CODNUM = "BEPPLO_CODNUM";
 	public static final String BEPUSU_CODNUM = "BEPUSU_CODNUM";
 	public static final String CODNUM = "CODNUM";
+	public static final String CONTRATOS = "CONTRATOS";
+	public static final String DISPONIBILIDAD = "DISPONIBILIDAD";
 	public static final String ESTADO = "ESTADO";
 	
 	public static final String MENSAJE_ERROR_OBJETO_VACIO = "No se puede %s un estado candidato vacía";
@@ -98,7 +101,7 @@ public class ModeloEstadoCandidato {
 
 			try (ResultSet rs = stmt.executeQuery()) {
 				if (rs.next()) {
-					return this.createCandidatoEstadoFromResultSet(rs, null);
+					return this.createCandidatoEstadoFromResultSet(rs, null, false);
 				}
 			}
 		}
@@ -141,7 +144,7 @@ public class ModeloEstadoCandidato {
 			
 			try (ResultSet rs = stmt.executeQuery()) {
 				while (rs.next()) {
-					estados.add(this.createCandidatoEstadoFromResultSet(rs, candidato));
+					estados.add(this.createCandidatoEstadoFromResultSet(rs, candidato, false));
 				}
 			}
 
@@ -155,32 +158,49 @@ public class ModeloEstadoCandidato {
 	/** Listado de candidatos disponibles para una plaza .
 	 * @param params para leer los parametros de paginación, ordenacion, etc .
 	 * @param plaza .
+	 * @param convocatoria .
 	 * @return datatable .
 	 * @throws SQLException en caso de error de base de datos .
 	 * @throws UVException  error si no existe la area .
 	 */
-	public BolsaEmpleoDataTable<CandidatoEstado> listaEstadosCandidatoDisponiblesPlaza(Map<String, String[]> params, PlazaOfertada plaza)
+	public BolsaEmpleoDataTable<CandidatoEstado> listaEstadosCandidatoDisponiblesPlaza(Map<String, String[]> params, PlazaOfertada plaza, Convocatoria convocatoria)
 			throws SQLException, UVException {
 		List<CandidatoEstado> estados = new ArrayList<>();
 		BolsaEmpleoDataTable<CandidatoEstado> dataTable = new BolsaEmpleoDataTable<>(params);
 		
-		String consulta = "SELECT bepusu.CODNUM AS BEPUSU_CODNUM, bepesc.CODNUM,"
-				+ "     bepesc.ESTADO, bepplo.CODNUM AS BEPPLO_CODNUM, bepbol.CODNUM AS BEPBOL_CODNUM"
+		String consulta = ""
+				+ " SELECT bepusu.CODNUM AS BEPUSU_CODNUM, bepesc.CODNUM,"
+				+ "     bepesc.ESTADO, bepplo.CODNUM AS BEPPLO_CODNUM, bepbol.CODNUM AS BEPBOL_CODNUM, bepcts.CONTRATOS,"
+				+ "     CASE"
+				+ "         WHEN bepesc.ESTADO = '" + ModeloEstadoCandidato.ESTADO_CONTRATADO_PRIMER_CUATRIMESTRE + "'"
+				+ "             AND bepplo.CUATRIMESTRE = '" + ModeloPlazaOfertada.CUATRIMESTRE_SEGUNDO + "' THEN 1"
+				+ "         WHEN bepesc.ESTADO = '" + ModeloEstadoCandidato.ESTADO_CONTRATADO_PARCIAL + "'"
+				+ "             AND bepded.TIPO = '" + ModeloDedicacion.TIPO_TIEMPO_PARCIAL + "' THEN 1"
+				+ "         WHEN bepcts.CONTRATOS > 0 THEN 0"
+				+ "         WHEN bepesc.CODNUM IS NULL THEN 1"
+				+ "         WHEN bepesc.ESTADO = '" + ModeloEstadoCandidato.ESTADO_DISPONIBLE + "' THEN 1"
+				+ "         ELSE 0"
+				+ "     END AS DISPONIBILIDAD"
 				+ " FROM TBEP_USUARIOS bepusu"
-				+ " INNER JOIN TBEP_SOLICITUDES bepsol ON bepsol.BEPUSU_CODNUM = bepusu.CODNUM"
+				+ " INNER JOIN TBEP_SOLICITUDES bepsol ON bepsol.BEPUSU_CODNUM = bepusu.CODNUM AND bepsol.BEPCON_CODNUM = ?"
 				+ " INNER JOIN TBEP_SOLICITUD_BOLSAS bepsob ON bepsob.BEPSOL_CODNUM = bepsol.CODNUM AND bepsob.FECHABAREMACION IS NOT NULL"
 				+ " INNER JOIN TBEP_BOLSAS bepbol ON bepbol.CODNUM = bepsob.BEPBOL_CODNUM"
 				+ " INNER JOIN TBEP_AREAS bepare ON bepare.CODNUM = bepbol.BEPARE_CODNUM"
 				+ " INNER JOIN TBEP_PLAZAS_OFERTADAS bepplo ON bepplo.BEPARE_CODNUM = bepare.CODNUM"
+				+ " INNER JOIN TBEP_DEDICACIONES bepded ON bepded.CODNUM = bepplo.BEPDED_CODNUM"
 				+ " LEFT JOIN TBEP_ESTADO_CANDIDATOS bepesc ON bepesc.BEPUSU_CODNUM = bepusu.CODNUM AND bepesc.BEPBOL_CODNUM = bepbol.CODNUM"
+				+ " LEFT JOIN ("
+				+ "     SELECT"
+				+ "         bepesc.BEPUSU_CODNUM AS BEPUSU_CODNUM,"
+				+ "     COUNT(DISTINCT bepesc.BEPPLO_CODNUM) AS CONTRATOS"
+				+ "     FROM TBEP_ESTADO_CANDIDATOS bepesc"
+				+ "     WHERE bepesc.ESTADO NOT IN ('" + ModeloEstadoCandidato.ESTADO_DISPONIBLE + "', "
+				+ "         '" + ModeloEstadoCandidato.ESTADO_SUSPENSION_PROVISIONAL + "', '" + ModeloEstadoCandidato.ESTADO_NO_DISPONIBLE + "')"
+				+ "     GROUP BY bepesc.BEPUSU_CODNUM"
+				+ " ) bepcts ON bepcts.BEPUSU_CODNUM = bepusu.CODNUM"
 				+ " WHERE bepplo.CODNUM = ?"
 				+ "     AND bepusu.ROL = " + ModeloRol.ID_ROL_CANDIDATO
-				+ "     AND bepusu.FLGBORRADO = 'N'"
-				+ "     AND (bepesc.CODNUM IS NULL"
-				+ "         OR bepesc.ESTADO = '" + ModeloEstadoCandidato.ESTADO_DISPONIBLE + "'"
-				+ "         OR (bepesc.ESTADO = '" + ModeloEstadoCandidato.ESTADO_CONTRATADO_PRIMER_CUATRIMESTRE + "' "
-				+ "             AND bepplo.CUATRIMESTRE = '" + ModeloPlazaOfertada.CUATRIMESTRE_SEGUNDO + "')"
-				+ "     )";
+				+ "     AND bepusu.FLGBORRADO = 'N'";
 		
 		dataTable.setQuery(consulta);
 		
@@ -188,13 +208,15 @@ public class ModeloEstadoCandidato {
 				PreparedStatement stmtCount = conexion.prepareStatement(dataTable.getQueryCount());
 				PreparedStatement stmt = conexion.prepareStatement(dataTable.getQuery())) {
 			int indexParam = 1;
+			stmt.setInt(indexParam, convocatoria.getCodNum());
+			stmtCount.setInt(indexParam++, convocatoria.getCodNum());
 			stmt.setInt(indexParam, plaza.getCodNum());
 			stmtCount.setInt(indexParam++, plaza.getCodNum());
 			dataTable.setFiltersParams(stmt, stmtCount, indexParam);
 			
 			try (ResultSet rs = stmt.executeQuery()) {
 				while (rs.next()) {
-					estados.add(this.createCandidatoEstadoFromResultSet(rs, null));
+					estados.add(this.createCandidatoEstadoFromResultSet(rs, null, true));
 				}
 			}
 
@@ -234,7 +256,6 @@ public class ModeloEstadoCandidato {
 			conexion.setAutoCommit(false);
 			
 			try {
-		
 				// comprobamos si el estado está creado para actualizar o crear
 				CandidatoEstado candidatoEstado = this.getEstadoCandidatoByUsuarioBolsa(candidato, bolsa);
 				
@@ -246,7 +267,11 @@ public class ModeloEstadoCandidato {
 					insertaEstadoCandidato(candidatoEstado, usuarioUpdate, conexion);
 				} else {
 					candidatoEstado.setEstado(estado);
-					candidatoEstado.setPlaza(candidato.getPlaza());
+					
+					if (estado.equals(ESTADO_DISPONIBLE) || estado.equals(ESTADO_NO_DISPONIBLE) || estado.equals(ESTADO_SUSPENSION_PROVISIONAL)) {
+						candidatoEstado.setPlaza(null);
+					}
+					
 					actualizaEstadoCandidato(candidatoEstado, usuarioUpdate, conexion);
 				}
 		
@@ -354,17 +379,23 @@ public class ModeloEstadoCandidato {
 	/** Crea un candidato estado de un ResultSet.
 	 * @param rs .
 	 * @param usuario .
+	 * @param extraParams .
 	 * @return candidato estado .
 	 * @throws UVException .
 	 * @throws SQLException .
 	 */
-	public CandidatoEstado createCandidatoEstadoFromResultSet(ResultSet rs, UsuarioBolsaEmpleo usuario) throws SQLException, UVException {
+	public CandidatoEstado createCandidatoEstadoFromResultSet(ResultSet rs, UsuarioBolsaEmpleo usuario, boolean extraParams) throws SQLException, UVException {
 		CandidatoEstado candidato = new CandidatoEstado(usuario == null 
 				? ModeloUsuarioBolsaEmpleo.obtenerInstancia().getUsuarioById(rs.getInt(BEPUSU_CODNUM)) : usuario);
 		candidato.setCodNumEstado(rs.getInt(CODNUM));
 		candidato.setBolsa(ModeloBolsa.obtenerInstancia().getBolsaById(rs.getInt(BEPBOL_CODNUM)));
 		candidato.setPlaza(rs.getInt(BEPPLO_CODNUM) != 0 ? ModeloPlazaOfertada.obtenerInstancia().getPlazaOfertadaById(rs.getInt(BEPPLO_CODNUM)) : null);
 		candidato.setEstado(rs.getString(ESTADO));
+		
+		if (extraParams) {
+			candidato.setContratos(rs.getInt(CONTRATOS));
+			candidato.setDisponibilidad(rs.getBoolean(DISPONIBILIDAD));
+		}
 		
 		return candidato;
 	}

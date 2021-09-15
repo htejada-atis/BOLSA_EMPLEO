@@ -167,8 +167,13 @@ String justificacion = BolsaEmpleoUtils.getParamForm(request, ControladorContrat
 				</div>
 		<%	} %>
 		</div>
+		<br/>
 		<div class="form-group-container col2">
-			<div class="form-group"></div>
+			<div class="form-group">
+		<%	if (estadoCreacion) { %>
+				<button id="plaza_eliminar" style="float:left;" <%= personal ? "" : "disabled" %>>Eliminar</button>
+		<%	} %>
+			</div>
 			<div class="form-group">
 		<%	if (editable) { %>
 				<input id="plaza_enviar" type="submit" name="<%=ControladorContratacion.PARAM_ENVIAR%>" value="Guardar cambios" style="float:right;"/>
@@ -181,6 +186,10 @@ String justificacion = BolsaEmpleoUtils.getParamForm(request, ControladorContrat
 			</div>
 		</div>
 	</form>
+	
+<%	if ((mostrarCandidatos || estadoCerrada) && personal) { %>
+		<button class="link-btn" id="exportar_candidatos" title="Exportar candidatos a csv">Exportar candidatos a csv</button>
+<%	} %>
 	
 <%	if (mostrarCandidatos) { %>
 		<table class="bluetable bolsaempleo" id="tableOfertasCandidatos">
@@ -383,6 +392,12 @@ $(document).ready(function() {
 		});
 <%	} %>
 
+<%	if ((mostrarCandidatos || estadoCerrada) && personal) { %>
+		$('#exportar_candidatos').on('click', function() {
+			window.open("<%= request.getRequestURI() %>?<%= ControladorContratacion.PARAM_ACCION %>=<%= ControladorContratacion.ACCION_EXPORTAR_CANDIDATOS %>&<%= ControladorContratacion.PARAM_PLAZA_OFERTADA %>=<%= plaza.getCodNum() %>");
+		});
+<%	} %>
+
 <%	if ((estadoContratacion || estadoCerrada) && personal) { %>
 
 		var tableCandidatosContrato = new Atis.DataTable('#tableCandidatosContrato', {
@@ -520,6 +535,23 @@ $(document).ready(function() {
 				}
 			});
 		});
+		
+		document.getElementById("plaza_eliminar").addEventListener("click", function(e) {
+			e.preventDefault();
+			Atis.confirmDialog("Eliminar plaza", "¿Desea eliminar la plaza?", {
+				'Si': function() {
+					var params = {
+							"<%= ControladorContratacion.PARAM_ACCION %>": "<%= ControladorContratacion.ACCION_ELIMINAR_PLAZA %>",
+							"<%= ControladorContratacion.PARAM_PLAZA_OFERTADA %>": <%= bean.getPlazaOfertada().getCodNum() %>
+					};
+					Atis.sendForm("<%= request.getRequestURI() %>", params);
+					$(this).dialog("close");
+				},
+				'No': function() {
+					$(this).dialog("close");
+				}
+			});
+		});
 <%	} %>
 	
 <%	if (estadoTramitacion && personal) { %>
@@ -540,11 +572,13 @@ $(document).ready(function() {
 				var message = '<p>Una vez abierta la plaza ya no se podrá modificar y comenzará el período de aceptación de los<br/> candidatos.<br/>';
 				message += 'En la fecha: <%= fechaFinOferta %> y hora: <%= horaFinOferta %> el estado de la plaza cambiará automáticamente a estado<br/> de contratación.</p><br/>';
 				message += '<p>Se enviará un correo sobre la apertura de la plaza a los siguientes candidatos:</p>';
-				message += '<table id="tablaCandidatosApertura" class="bluetable bolsaempleo" style="margin-top: 10px; width: 500px;">';
+				message += '<table id="tablaCandidatosApertura" class="bluetable bolsaempleo" style="margin-top: 10px; width: 525px;">';
 				message += '    <tr>';
-				message += '        <th scope="col" style="width:60px">D.N.I</th>';
+				message += '        <th scope="col" style="width:65px">D.N.I</th>';
 				message += '        <th scope="col" style="width:100%">Nombre</th>';
-				message += '        <th scope="col" style="width:120px">Estado</th>';
+				message += '        <th scope="col" style="width:120px" class="center">Estado</th>';
+				message += '        <th scope="col" style="width:80px" class="center">Disponible</th>';
+				message += '        <th scope="col" style="width:55px" class="center">Contratos</th>';
 				message += '    </tr>';
 				message += '    <tbody>';
 				message += '    </tbody>';
@@ -593,7 +627,15 @@ $(document).ready(function() {
 								}},
 								{'data': 'estado', 'order': false, 'render': function(row) {
 									return row.codNumEstado != 0 ? row.estado : '<%= ModeloEstadoCandidato.ESTADO_DISPONIBLE %>';
-								}}
+								}},
+								{'data': 'disponibilidad', 'order': false, 'render': function(row) {
+									if(row.disponibilidad){
+										return "<div title='Disponible para la plaza' class='circle-true'></div>";
+									} else{
+										return "<div title='No disponible para la plaza' class='circle-false'></div>";
+									}
+								}},
+								{'data': 'contratos', 'order': false, 'class': 'center'}
 							]
 						});
 					}
@@ -612,7 +654,7 @@ $(document).ready(function() {
 <%	if (plaza.getNri() != null && personal) { %>
 		document.getElementById("plaza_descargar_nri").addEventListener("click", function() {
 			window.open("<%=ControladorDescargaFicheros.URL_DESCARGA_FICHEROS%>"
-					+ "<%="?a=" + ControladorDescargaFicheros.ACCION_DESCARGAR_HORARIO_PERSONAL + "&" + ControladorDescargaFicheros.PARAM_PLAZA_OFERTADA + "=" + plaza.getCodNum()%>");
+					+ "<%="?a=" + ControladorDescargaFicheros.ACCION_DESCARGAR_NRI_PERSONAL + "&" + ControladorDescargaFicheros.PARAM_PLAZA_OFERTADA + "=" + plaza.getCodNum()%>");
 		});
 <%	} %>
 

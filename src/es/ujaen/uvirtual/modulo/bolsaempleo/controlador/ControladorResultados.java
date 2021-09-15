@@ -230,9 +230,12 @@ public class ControladorResultados extends HttpServlet {
 		response.setContentType(RESPONSE_AJAX_CONTENTTYPE);
 		response.setCharacterEncoding(RESPONSE_AJAX_ENCODING);
 		
+		ModeloConvocatoria modeloConvocatoria = ModeloConvocatoria.obtenerInstancia();
+		
 		try (PrintWriter writer = response.getWriter()) {
 			try {
-				BolsaEmpleoDataTable<BolsaResultado> dataTable = modelo.listaBolsasResultadosDatatable(bean.getUsuarioLogeado(), request.getParameterMap());
+				BolsaEmpleoDataTable<BolsaResultado> dataTable = modelo.listaBolsasResultadosDatatable(bean.getUsuarioLogeado(), 
+						modeloConvocatoria.getUltimaConvocatoria(), request.getParameterMap());
 				bean.setDataTableBolsas(dataTable);
 				writer.write(dataTable.toJson("dd/MM/yyyy"));
 			} catch (UVException | SQLException e) {

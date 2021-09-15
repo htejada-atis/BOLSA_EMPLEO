@@ -12,6 +12,7 @@ import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.stream.IntStream;
+import javax.servlet.ServletOutputStream;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
@@ -23,6 +24,7 @@ import org.apache.commons.fileupload.servlet.ServletFileUpload;
 import com.google.gson.Gson;
 import es.ujaen.uvirtual.beans.CodigoDescripcion;
 import es.ujaen.uvirtual.beans.UVDatos;
+import es.ujaen.uvirtual.modulo.bolsaempleo.beans.Bolsa;
 import es.ujaen.uvirtual.modulo.bolsaempleo.beans.CandidatoEstado;
 import es.ujaen.uvirtual.modulo.bolsaempleo.beans.Contratacion;
 import es.ujaen.uvirtual.modulo.bolsaempleo.beans.OfertaCandidato;
@@ -32,6 +34,7 @@ import es.ujaen.uvirtual.modulo.bolsaempleo.beans.UsuarioBolsaEmpleo;
 import es.ujaen.uvirtual.modulo.bolsaempleo.modelo.ModeloArea;
 import es.ujaen.uvirtual.modulo.bolsaempleo.modelo.ModeloBolsa;
 import es.ujaen.uvirtual.modulo.bolsaempleo.modelo.ModeloContratacion;
+import es.ujaen.uvirtual.modulo.bolsaempleo.modelo.ModeloConvocatoria;
 import es.ujaen.uvirtual.modulo.bolsaempleo.modelo.ModeloDedicacion;
 import es.ujaen.uvirtual.modulo.bolsaempleo.modelo.ModeloEstadoCandidato;
 import es.ujaen.uvirtual.modulo.bolsaempleo.modelo.ModeloEvaluador;
@@ -71,13 +74,16 @@ public class ControladorContratacion extends HttpServlet {
 	public static final String ACCION_DATATABLE_CANDIDATOS_APERTURA = "datatablecandidatosapertura";
 	public static final String ACCION_DATATABLE_CANDIDATOS_CONTRATO = "datatablecandidatoscontrato";
 	public static final String ACCION_DATATABLE_PLAZAS_OFERTADAS = "datatableplazasofertadas";
-	public static final String ACCION_PLAZA_ABIERTA = "plazaabierta";
-	public static final String ACCION_PLAZA_CERRADA = "plazacerrada";
-	public static final String ACCION_PLAZA_TRAMITACION = "plazatramitacion";
 	public static final String ACCION_EDITAR_PLAZA_OFERTADA = "editarplazaofertada";
+	public static final String ACCION_ELIMINAR_PLAZA = "eliminarplaza";
+	public static final String ACCION_EXPORTAR_CANDIDATOS = "exportarcandidatos";
+	public static final String ACCION_EXPORTAR_PLAZAS = "exportarplazas";
 	public static final String ACCION_INDEX = "index";
 	public static final String ACCION_PREFERENCIAS_CANDIDATO = "preferenciascandidato";
 	public static final String ACCION_NUEVA_PLAZA_OFERTADA = "nuevaplazaofertada";
+	public static final String ACCION_PLAZA_ABIERTA = "plazaabierta";
+	public static final String ACCION_PLAZA_CERRADA = "plazacerrada";
+	public static final String ACCION_PLAZA_TRAMITACION = "plazatramitacion";
 	public static final String ACCION_RECHAZAR_CONTRATACION_CANDIDATO = "rechazarcontratacioncandidato";
 	public static final String ACCION_REENVIAR_CITA_CONTRATACION = "reenviarcitacontratacion";
 	public static final String ACCION_RESTAURAR_PLAZA_OFERTADA = "restaurarplazaofertada";
@@ -127,6 +133,7 @@ public class ControladorContratacion extends HttpServlet {
 	public static final String MENSAJE_EXITO_CERRAR_PLAZA = "Plaza cerrada correctamente";
 	public static final String MENSAJE_EXITO_CONTRATACION = "Contratación creada correctamente para el usuario: %s";
 	public static final String MENSAJE_EXITO_EDITAR = "Plaza editada correctamente";
+	public static final String MENSAJE_EXITO_ELIMINADA = "Plaza eliminada correctamente";
 	public static final String MENSAJE_EXITO_TRAMITACION_PLAZA = "Cambiado el estado de la plaza a tramitación correctamente";
 	public static final String MENSAJE_EXITO_REENVIO_CONTRATACION = "Se ha reenviado la contratación correctamente para el usuario: %s";
 	public static final String MENSAJE_EXITO_SUSPENSION_PLAZA = "Suspendido el contrato del candidato correctamente";
@@ -148,6 +155,11 @@ public class ControladorContratacion extends HttpServlet {
 	public static final String RESPONSE_AJAX_ENCODING = "UTF-8";
 	public static final String RESPONSE_AJAX_ERROR = "error";
 	public static final int RESPONSE_AJAX_HTTP_CODE_ERROR = 400;
+	
+	// csv
+	public static final String RESPONSE_CSV_CONTENTTYPE = "text/csv";
+	public static final String RESPONSE_CSV_ENCODING = "UTF-8";
+	
 	
 	/** Peticion GET.
 	 * @see HttpServlet#doGet(HttpServletRequest request, HttpServletResponse response)
@@ -197,6 +209,8 @@ public class ControladorContratacion extends HttpServlet {
 				case ACCION_DATATABLE_CANDIDATOS_APERTURA:
 				case ACCION_DATATABLE_CANDIDATOS_CONTRATO:
 				case ACCION_EDITAR_PLAZA_OFERTADA:
+				case ACCION_EXPORTAR_CANDIDATOS:
+				case ACCION_ELIMINAR_PLAZA:
 				case ACCION_PLAZA_ABIERTA:
 				case ACCION_PLAZA_CERRADA:
 				case ACCION_PLAZA_TRAMITACION:
@@ -207,6 +221,9 @@ public class ControladorContratacion extends HttpServlet {
 					break;
 				case ACCION_DATATABLE_PLAZAS_OFERTADAS:
 					listaPlazasOfertadas(bean, datos, request, response);
+					break;
+				case ACCION_EXPORTAR_PLAZAS:
+					exportarPlazas(datos, response);
 					break;
 				case ACCION_INDEX:
 					break;
@@ -310,6 +327,12 @@ public class ControladorContratacion extends HttpServlet {
 			case ACCION_EDITAR_PLAZA_OFERTADA:
 				editarPlazaOfertada(bean, datos, request, response, parametros);
 				break;
+			case ACCION_EXPORTAR_CANDIDATOS:
+				exportarCandidatos(bean, datos, response);
+				break;
+			case ACCION_ELIMINAR_PLAZA:
+				eliminarPlazaOfertada(bean, datos, request, response);
+				break;
 			case ACCION_PLAZA_ABIERTA:
 				abrirPlaza(bean, datos, request, response);
 				break;
@@ -354,6 +377,7 @@ public class ControladorContratacion extends HttpServlet {
 			BolsaEmpleoUtils.redirectToError(bean, datos, request, response, MENSAJE_ERROR_SIN_PERMISO);
 		}
 		
+		ModeloBolsa modeloBolsa = ModeloBolsa.obtenerInstancia();
 		ModeloPlazaOfertada modeloPlaza = ModeloPlazaOfertada.obtenerInstancia();
 		
 		PlazaOfertada plaza = bean.getPlazaOfertada();
@@ -378,14 +402,29 @@ public class ControladorContratacion extends HttpServlet {
 			
 			String estadoCandidato = ModeloEstadoCandidato.ESTADO_CONTRATADO;
 			
-			if (plaza.getCuatrimestre().equals(ModeloPlazaOfertada.CUATRIMESTRE_PRIMERO)) {
-				estadoCandidato = ModeloEstadoCandidato.ESTADO_CONTRATADO_PRIMER_CUATRIMESTRE;
+			if (plaza.getCuatrimestre().equals(ModeloPlazaOfertada.CUATRIMESTRE_PRIMERO) 
+					|| plaza.getDedicacion().getTipo().equals(ModeloDedicacion.TIPO_TIEMPO_PARCIAL)) {
+				if (plaza.getCuatrimestre().equals(ModeloPlazaOfertada.CUATRIMESTRE_PRIMERO)) {
+					estadoCandidato = ModeloEstadoCandidato.ESTADO_CONTRATADO_PRIMER_CUATRIMESTRE;
+				}
+				
+				if (plaza.getDedicacion().getTipo().equals(ModeloDedicacion.TIPO_TIEMPO_PARCIAL)) {
+					estadoCandidato = ModeloEstadoCandidato.ESTADO_CONTRATADO_PARCIAL;
+				}
+				
+				List<Bolsa> listaBolsas = modeloBolsa.getBolsasByAreaDepartamento(plaza.getArea());
+				for (Bolsa bolsa: listaBolsas) {
+					CandidatoEstado candidato = new CandidatoEstado(contratacion.getCandidato());
+					candidato.setPlaza(plaza);
+					candidato.setBolsa(bolsa);
+					ModeloEstadoCandidato.obtenerInstancia().cambiarEstadoCandidato(candidato, estadoCandidato, bolsa, bean.getUsuarioLogeado());
+				}
+			} else {
+				CandidatoEstado candidato = new CandidatoEstado(contratacion.getCandidato());
+				candidato.setPlaza(plaza);
+				ModeloEstadoCandidato.obtenerInstancia().cambiarEstadoCandidato(candidato, estadoCandidato, 
+						ModeloBolsa.obtenerInstancia().getBolsaById(plaza.getArea().getCodNum()), bean.getUsuarioLogeado());
 			}
-			
-			CandidatoEstado candidato = new CandidatoEstado(contratacion.getCandidato());
-			candidato.setPlaza(plaza);
-			ModeloEstadoCandidato.obtenerInstancia().cambiarEstadoCandidato(candidato, estadoCandidato, 
-					ModeloBolsa.obtenerInstancia().getBolsaById(plaza.getArea().getCodNum()), bean.getUsuarioLogeado());
 		}
 		
 		modeloPlaza.cerrarPlazaOfertada(plaza, bean.getUsuarioLogeado());
@@ -451,6 +490,17 @@ public class ControladorContratacion extends HttpServlet {
 		
 		BolsaEmpleoUtils.addMensajeDeExito(MENSAJE_EXITO_EDITAR, bean, request);
 		redireccionConPlazaSeleccionada(bean, datos, request, response, ACCION_SELECCIONAR_PLAZA_OFERTADA);
+	}
+	
+	private void eliminarPlazaOfertada(VistaContratacion bean, UVDatos datos, HttpServletRequest request, HttpServletResponse response)
+			throws SQLException, UVException, IOException {
+		PlazaOfertada plaza = bean.getPlazaOfertada();
+		plaza.setActiva(false);
+		ModeloPlazaOfertada.obtenerInstancia().actualizaActivaPlazaOfertada(plaza, bean.getUsuarioLogeado());
+		
+		BolsaEmpleoUtils.addMensajeDeExito(MENSAJE_EXITO_ELIMINADA, bean, request);
+		datos.setRespuestaEnviada(true);
+		response.sendRedirect(request.getServletPath());
 	}
 	
 	private void nuevaPlazaOfertada(VistaContratacion bean, UVDatos datos, HttpServletRequest request, HttpServletResponse response, HashMap<String, Object> parametros) 
@@ -543,13 +593,15 @@ public class ControladorContratacion extends HttpServlet {
 		datos.setRespuestaEnviada(true);
 		response.setContentType(RESPONSE_AJAX_CONTENTTYPE);
 		response.setCharacterEncoding(RESPONSE_AJAX_ENCODING);
+		ModeloConvocatoria modeloConvocatoria = ModeloConvocatoria.obtenerInstancia();
 		
 		try (PrintWriter writer = response.getWriter()) {
 			try {
 				Integer idCandidato = Formateador.leeParametroInteger(request.getParameter(PARAM_CANDIDATO));
 				UsuarioBolsaEmpleo candidato = ModeloUsuarioBolsaEmpleo.obtenerInstancia().getUsuarioById(idCandidato);
 				
-				List<OfertaCandidato> listaOfertas = ModeloOfertaCandidato.obtenerInstancia().listaOfertasCandidatoPreferentes(candidato);
+				List<OfertaCandidato> listaOfertas = ModeloOfertaCandidato.obtenerInstancia().listaOfertasCandidatoPreferentes(candidato,
+						modeloConvocatoria.getUltimaConvocatoria());
 				bean.setListaOfertas(listaOfertas);
 				
 				writer.write(new Gson().toJson(listaOfertas));
@@ -562,16 +614,68 @@ public class ControladorContratacion extends HttpServlet {
 		}
 	}
 	
+	private void exportarCandidatos(VistaContratacion bean, UVDatos datos, HttpServletResponse response) throws SQLException, UVException {
+		datos.setRespuestaEnviada(true);
+		datos.setContentType(RESPONSE_CSV_CONTENTTYPE);
+		response.setContentType(RESPONSE_CSV_CONTENTTYPE);
+		response.setCharacterEncoding(RESPONSE_CSV_ENCODING);
+		String plaza = bean.getPlazaOfertada().getCodNum().toString();
+		response.setHeader("Content-Disposition", "attachment; filename=\"candidatos_plaza_" + plaza + ".csv\"");
+		
+		List<String[]> rows = ModeloPlazaOfertada.obtenerInstancia().listadoCandidatosCsv(bean.getPlazaOfertada(), 
+				ModeloConvocatoria.obtenerInstancia().getUltimaConvocatoria());
+		
+		try (ServletOutputStream stream = response.getOutputStream()) {
+			try (PrintWriter printer = new PrintWriter(stream)) {
+				for (String[] row : rows) {
+					printer.println(String.join(";", row));
+				}
+			}
+			stream.flush();
+		} catch (Exception ex) {
+			LOGGER.log(Level.SEVERE, Formateador.getStackTrace(ex));
+			LOGGER.log(Level.SEVERE, ex.toString());
+			throw new UVException(ex.getMessage());
+		}
+	}
+	
+	private void exportarPlazas(UVDatos datos, HttpServletResponse response) throws SQLException, UVException {
+		datos.setRespuestaEnviada(true);
+		datos.setContentType(RESPONSE_CSV_CONTENTTYPE);
+		response.setContentType(RESPONSE_CSV_CONTENTTYPE);
+		response.setCharacterEncoding(RESPONSE_CSV_ENCODING);
+		Date currentDate = BolsaEmpleoUtils.getCurrentDate();
+		String current = Formateador.formatoFecha(currentDate, Formateador.FORMATO_FECHA_DDMMYYYY);
+		response.setHeader("Content-Disposition", "attachment; filename=\"plazas_" + current + ".csv\"");
+		
+		List<String[]> rows = ModeloPlazaOfertada.obtenerInstancia().listadoPlazasCsv();
+		
+		try (ServletOutputStream stream = response.getOutputStream()) {
+			try (PrintWriter printer = new PrintWriter(stream)) {
+				for (String[] row : rows) {
+					printer.println(String.join(";", row));
+				}
+			}
+			stream.flush();
+		} catch (Exception ex) {
+			LOGGER.log(Level.SEVERE, Formateador.getStackTrace(ex));
+			LOGGER.log(Level.SEVERE, ex.toString());
+			throw new UVException(ex.getMessage());
+		}
+	}
+	
 	private void listaCandidatos(VistaContratacion bean, UVDatos datos, HttpServletRequest request, HttpServletResponse response) throws IOException {
 		datos.setContentType(RESPONSE_AJAX_CONTENTTYPE);
 		datos.setRespuestaEnviada(true);
 		response.setContentType(RESPONSE_AJAX_CONTENTTYPE);
 		response.setCharacterEncoding(RESPONSE_AJAX_ENCODING);
 		
+		ModeloConvocatoria modeloConvocatoria = ModeloConvocatoria.obtenerInstancia();
+		
 		try (PrintWriter writer = response.getWriter()) {
 			try {
 				BolsaEmpleoDataTable<OfertaCandidato> dataTable = ModeloPlazaOfertada.obtenerInstancia().listadoCandidatosDisponibles(
-						request.getParameterMap(), bean.getPlazaOfertada());
+						request.getParameterMap(), bean.getPlazaOfertada(), modeloConvocatoria.getUltimaConvocatoria());
 				bean.setDatatableCandidatos(dataTable);
 				writer.write(dataTable.toJson("dd/M/yyyy HH:mm:ss"));
 			} catch (UVException | SQLException e) {
@@ -595,10 +699,12 @@ public class ControladorContratacion extends HttpServlet {
 		response.setContentType(RESPONSE_AJAX_CONTENTTYPE);
 		response.setCharacterEncoding(RESPONSE_AJAX_ENCODING);
 		
+		ModeloConvocatoria modeloConvocatoria = ModeloConvocatoria.obtenerInstancia();
+		
 		try (PrintWriter writer = response.getWriter()) {
 			try {
 				BolsaEmpleoDataTable<CandidatoEstado> dataTable = ModeloEstadoCandidato.obtenerInstancia().listaEstadosCandidatoDisponiblesPlaza(
-						request.getParameterMap(), bean.getPlazaOfertada());
+						request.getParameterMap(), bean.getPlazaOfertada(), modeloConvocatoria.getUltimaConvocatoria());
 				bean.setDatatableCandidatosEstado(dataTable);
 				writer.write(dataTable.toJson("dd/M/yyyy HH:mm:ss"));
 			} catch (UVException | SQLException e) {
