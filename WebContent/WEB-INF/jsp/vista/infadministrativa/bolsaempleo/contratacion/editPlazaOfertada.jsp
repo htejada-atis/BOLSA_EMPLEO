@@ -170,7 +170,7 @@ String justificacion = BolsaEmpleoUtils.getParamForm(request, ControladorContrat
 		<br/>
 		<div class="form-group-container col2">
 			<div class="form-group">
-		<%	if (estadoCreacion) { %>
+		<%	if (estadoCreacion || estadoTramitacion) { %>
 				<button id="plaza_eliminar" style="float:left;" <%= personal ? "" : "disabled" %>>Eliminar</button>
 		<%	} %>
 			</div>
@@ -535,7 +535,9 @@ $(document).ready(function() {
 				}
 			});
 		});
-		
+<%	} %>
+	
+<%	if ((estadoCreacion || estadoTramitacion) && personal) { %>
 		document.getElementById("plaza_eliminar").addEventListener("click", function(e) {
 			e.preventDefault();
 			Atis.confirmDialog("Eliminar plaza", "¿Desea eliminar la plaza?", {
