@@ -206,6 +206,8 @@ function DataTable(id, config) {
     this.title = getProp(config, 'title', undefined);
     this.lastResponse = null;
     this.checked = {};
+    this.stateSave = getProp(config, 'stateSave', false);
+    this.state = stateSave;
 
     var self = this;
 

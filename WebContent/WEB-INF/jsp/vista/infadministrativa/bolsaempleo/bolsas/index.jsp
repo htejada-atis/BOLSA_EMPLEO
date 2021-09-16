@@ -141,5 +141,8 @@ $(document).ready(function() {
 		};
    		Atis.sendForm("<%= request.getRequestURI() %>", params);
 	}
+	
+	sessionStorage.setItem("")
+	
 }); 
 </script>
