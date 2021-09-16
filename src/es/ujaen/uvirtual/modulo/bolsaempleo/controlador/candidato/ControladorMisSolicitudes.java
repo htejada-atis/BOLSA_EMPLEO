@@ -30,7 +30,6 @@ import es.ujaen.uvirtual.modulo.bolsaempleo.beans.Convocatoria;
 import es.ujaen.uvirtual.modulo.bolsaempleo.beans.Merito;
 import es.ujaen.uvirtual.modulo.bolsaempleo.beans.MeritoSolicitud;
 import es.ujaen.uvirtual.modulo.bolsaempleo.beans.MeritoSolicitudTable;
-import es.ujaen.uvirtual.modulo.bolsaempleo.beans.MeritoSolicitudValoracion;
 import es.ujaen.uvirtual.modulo.bolsaempleo.beans.Solicitud;
 import es.ujaen.uvirtual.modulo.bolsaempleo.beans.TitulacionUsuario;
 import es.ujaen.uvirtual.modulo.bolsaempleo.beans.UsuarioBolsaEmpleo;
@@ -112,6 +111,7 @@ public class ControladorMisSolicitudes extends HttpServlet {
 	public static final String MENSAJE_ERROR_BOLSAS_SELECCIONADAS_INCORRECTAS = "No hay bolsas seleccionadas válidas";
 	public static final String MENSAJE_ERROR_ITEM_EXCLUYENTE = "El item que ha seleccionado es excluyente con los items: ";
 	public static final String MENSAJE_ERROR_MERITOS_SIN_VALORACION = "No puede haber méritos con afinidad sin valoración";
+	public static final String MENSAJE_ERROR_MERITO_EXCLUIDO = "El mérito ya ha sido excluido para esta bolsa en una convocatoria anterior";
 	public static final String MENSAJE_ERROR_MERITO_NO_NULO = "Merito no puede ser nulo";
 	public static final String MENSAJE_ERROR_NUMERO_MAXIMO_MERITOS_APARTADO = "Se ha alcanzado el número máximo de méritos por apartado";
 	public static final String MENSAJE_ERROR_NUMERO_MAXIMO_MERITOS_BLOQUE = "Se ha alcanzado el número máximo de méritos por bloque";
@@ -561,23 +561,23 @@ public class ControladorMisSolicitudes extends HttpServlet {
 	private void seleccionarMerito(VistaSolicitudes bean, HttpServletRequest request, Boolean seleccionado)
 			throws UVException, SQLException {
 		ModeloBolsa modeloBolsa = ModeloBolsa.obtenerInstancia();
-		ModeloMerito modeloMerito = ModeloMerito.obtenerInstancia();				
+		ModeloMerito modeloMerito = ModeloMerito.obtenerInstancia();
 		
 		Bolsa area = modeloBolsa.getBolsaById(Formateador.leeParametroInteger(request.getParameter(PARAM_BOLSA)));
 		bean.setArea(area);
-
+		
 		Merito merito = modeloMerito.listaMerito(Formateador.leeParametroInteger(request.getParameter(PARAM_MERITO_ID)));
 		bean.setMerito(merito);
-
+		
 		if (merito == null) {
 			throw new UVException(MENSAJE_ERROR_MERITO_NO_NULO);
 		}
 
 		Solicitud solicitud = this.listaBolsasSolicitud(bean, request);
 		this.seleccionarBolsa(bean, request);
-
+		
 		ModeloSolicitud modeloSolicitud = ModeloSolicitud.obtenerInstancia();
-				
+		
 		if (Boolean.TRUE.equals(seleccionado)) {
 			// comprobamos que el total de méritos por bloque de la solicitud sea menor que
 			// el permitido por la convocatoria
@@ -609,6 +609,10 @@ public class ControladorMisSolicitudes extends HttpServlet {
 			MeritoSolicitud meritoSolicitudAnterior = modeloSolicitud.getMeritoSolicitudByConvocatoriaAnterior(solicitud.getConvocatoria(), area, merito);
 			
 			if (meritoSolicitudAnterior != null) {
+				if (meritoSolicitudAnterior.isExcluido()) {
+					throw new UVException(MENSAJE_ERROR_MERITO_EXCLUIDO);
+				}
+				
 				modeloSolicitud.asignarMeritoAnteriorASolicitudBolsa(solicitud, area, meritoSolicitudAnterior, bean.getUsuarioLogeado());
 			} else {
 				modeloSolicitud.asignarMeritosASolicitudBolsa(solicitud, area, merito, bean.getUsuarioLogeado());

@@ -96,7 +96,7 @@ VistaSolicitudes bean = (VistaSolicitudes) uvdatos.getVistas().get(VistaSolicitu
 				texto += 'Selecciona afinidad<br/>';
 			}
 			
-			texto += '<button class="pointer" title="Seleccionar afinidad">Afinidad</button></span>';
+			texto += '<button class="pointer" title="Seleccionar afinidad" ' + (row.anteriorValidacion ? "disabled" : "") + '>Afinidad</button></span>';
 			texto += '</div>';
 			
 			var nodo = $(texto);
@@ -152,7 +152,7 @@ VistaSolicitudes bean = (VistaSolicitudes) uvdatos.getVistas().get(VistaSolicitu
 				texto += 'Selecciona afinidad<br/>';
 			}
 			
-			texto += '<button class="pointer" title="Seleccionar afinidad">Afinidad</button></span>';
+			texto += '<button class="pointer" title="Seleccionar afinidad" ' + (row.anteriorValidacion ? "disabled" : "") + '>Afinidad</button></span>';
 			texto += '</div>';
 			
 			var nodo = $(texto);
@@ -316,8 +316,12 @@ VistaSolicitudes bean = (VistaSolicitudes) uvdatos.getVistas().get(VistaSolicitu
 									};
 									
 									Atis.sendForm("<%= request.getRequestURI() %>", params);
+								},
+								'disabled': function(row) {
+									return row.excluido;
 								}
 							}
+							
 						},
 						{'data': 'codNum', 'filter': {'type': 'number'}},
 						{'data': 'merito.item', 'filter': true, 'render': function(row) {

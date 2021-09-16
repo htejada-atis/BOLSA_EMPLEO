@@ -16,6 +16,7 @@ public class MeritoSolicitudTable implements Serializable {
 	private MeritoSolicitud meritoSolicitud;
 	private List<MeritoSolicitudValoracion> valoraciones;
 	private Boolean excluido;
+	private Boolean anteriorValidacion;
 
 	/**
 	 * Constructor por defecto.
@@ -81,6 +82,14 @@ public class MeritoSolicitudTable implements Serializable {
 	public void setExcluido(Boolean excluido) {
 		this.excluido = excluido;
 	}
+	
+	public Boolean isAnteriorValidacion() {
+		return anteriorValidacion;
+	}
+
+	public void setAnteriorValidacion(Boolean anteriorValidacion) {
+		this.anteriorValidacion = anteriorValidacion;
+	}
 
 	public static long getSerialversionuid() {
 		return serialVersionUID;
@@ -89,7 +98,7 @@ public class MeritoSolicitudTable implements Serializable {
 	@Override
 	public String toString() {
 		return "MeritoSolicitudTable [merito=" + merito + ", meritoSolicitud=" + meritoSolicitud + ", valoraciones="
-				+ valoraciones + ", exclusivo=" + excluido + "]";
+				+ valoraciones + ", exclusivo=" + excluido + ", anteriorValidacion=" + anteriorValidacion + "]";
 	}
 
 	@Override
@@ -101,6 +110,7 @@ public class MeritoSolicitudTable implements Serializable {
 		result = prime * result + ((meritoSolicitud == null) ? 0 : meritoSolicitud.hashCode());
 		result = prime * result + ((valoraciones == null) ? 0 : valoraciones.hashCode());
 		result = prime * result + ((excluido == null) ? 0 : excluido.hashCode());
+		result = prime * result + ((anteriorValidacion == null) ? 0 : anteriorValidacion.hashCode());
 		return result;
 	}
 
@@ -143,6 +153,13 @@ public class MeritoSolicitudTable implements Serializable {
 				return false;
 			}
 		} else if (!excluido.equals(other.excluido)) {
+			return false;
+		}
+		if (anteriorValidacion == null) {
+			if (other.anteriorValidacion != null) {
+				return false;
+			}
+		} else if (!anteriorValidacion.equals(other.anteriorValidacion)) {
 			return false;
 		}
 
