@@ -119,6 +119,7 @@ public class ControladorContratacion extends HttpServlet {
 	public static final String MENSAJE_ERROR_CANDIDATO_CONTRATACION_NO_ACTIVA = "No hay una contratación activa para el candidato %s";
 	public static final String MENSAJE_ERROR_CUATRIMESTRE_NO_VALIDO = "El cuatrimestre seleccionado no es válido";
 	public static final String MENSAJE_ERROR_DURACION_PREVISTA_LARGA = "La duración prevista no puede contener mas de %d caracteres";
+	public static final String MENSAJE_ERROR_ELIMINAR_ESTADO_REQUERIDO = "Es requerido estado de creación o tramitación para poder eliminar la plaza";
 	public static final String MENSAJE_ERROR_ESTADO_CONTRATACION_REQUERIDO = "Es requerido estado de contratación para la plaza";
 	public static final String MENSAJE_ERROR_ESTADO_CREACION_REQUERIDO = "Es requerido estado de creación para la plaza";
 	public static final String MENSAJE_ERROR_ESTADO_TRAMITACION_REQUERIDO = "Es requerido estado de tramitación para la plaza";
@@ -499,6 +500,11 @@ public class ControladorContratacion extends HttpServlet {
 	private void eliminarPlazaOfertada(VistaContratacion bean, UVDatos datos, HttpServletRequest request, HttpServletResponse response)
 			throws SQLException, UVException, IOException {
 		PlazaOfertada plaza = bean.getPlazaOfertada();
+		
+		if (!plaza.getEstado().equals(ModeloPlazaOfertada.PLAZA_ESTADO_CREACION) && !plaza.getEstado().equals(ModeloPlazaOfertada.PLAZA_ESTADO_TRAMITACION)) {
+			throw new UVException(MENSAJE_ERROR_ELIMINAR_ESTADO_REQUERIDO);
+		}
+		
 		plaza.setActiva(false);
 		ModeloPlazaOfertada.obtenerInstancia().actualizaActivaPlazaOfertada(plaza, bean.getUsuarioLogeado());
 		

@@ -216,10 +216,10 @@ public class ModeloOfertaCandidato {
 			
 			try (ResultSet rs = stmt.executeQuery()) {
 				if (rs.next()) {
-					if (rs.getInt("FECHA_VIGENTE") == 0) {
+					if (rs.getInt("ABIERTA_VIGENTE") == 0) {
 						throw new UVException("La plaza ya no está disponible");
 					}
-					createOfertaCandidatoFromResultSet(rs);
+					return createOfertaCandidatoFromResultSet(rs);
 				}
 				
 			}
