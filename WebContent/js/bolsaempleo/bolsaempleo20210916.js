@@ -193,21 +193,22 @@ function DataTable(id, config) {
     this.tbody = $('tbody', this.node).last();
     this.tfoot = $('tfoot', this.node).last();    
     this.config = config;
-    this.params = {
-        'a': getProp(config, 'action', 'datatable'),
-        'page': 0,
-        'pageSize': getProp(config, 'pageSize', 10),
-        'orderBy': getProp(config, 'defaultOrderBy', null),
-        'orderDirection': getProp(config, 'defaultOrderDirection', 'asc'),
-        'filter': ''
-    };
+    this.stateSave = getProp(config, 'stateSave', false);
+    this.params = this.stateSave && sessionStorage.getItem(this.idFinal) != null 
+        ? json2Object(sessionStorage.getItem(this.idFinal)) : {
+            'a': getProp(config, 'action', 'datatable'),
+            'page': 0,
+            'pageSize': getProp(config, 'pageSize', 10),
+            'orderBy': getProp(config, 'defaultOrderBy', null),
+            'orderDirection': getProp(config, 'defaultOrderDirection', 'asc'),
+            'filter': ''
+        };
     this.pageSizeOptions = getProp(config, 'pageSizeOptions', [5,10,20,100]);
-    this.filterParams = {}
+    this.filterParams = this.stateSave && sessionStorage.getItem(this.idFinal) != null ? json2Object(this.params.filter) : {};
     this.title = getProp(config, 'title', undefined);
     this.lastResponse = null;
     this.checked = {};
     this.stateSave = getProp(config, 'stateSave', false);
-    this.state = stateSave;
 
     var self = this;
 
@@ -223,7 +224,15 @@ function DataTable(id, config) {
 	        success: self.parseResponse.bind(self),
             error: self.errorResponse.bind(self)
 	    });
+
+        if (self.stateSave) {
+            self.setParamsSaved();
+        }
     };
+
+    this.setParamsSaved = function() {
+        sessionStorage.setItem(self.idFinal, object2Json(self.params));
+    }
     
     this.setParam = function(key, value) {
     	self.params[key] = value;
@@ -627,18 +636,20 @@ function DataTable(id, config) {
                             filterElement.append($('<option value="0">-----</option>'));
 
                             if (columnDef.filter.true) {
-                                filterElement.append($('<option value="true" title="' + columnDef.filter.true + '" ' + (columnDef.filter.optionDefault == "true" ? ' selected' : '') + '>' + columnDef.filter.true + '</option>'));
+                                var selected = columnDef.filter.optionDefault == "true" && sessionStorage.getItem(self.idFinal) == null || self.stateSave && self.filterParams[index] == option ? ' selected' : '';
+                                filterElement.append($('<option value="true" title="' + columnDef.filter.true + '" ' + selected + '>' + columnDef.filter.true + '</option>'));
                             } else {
                                 filterElement.append($('<option>' + true + '</option>'));
                             }
 
                             if (columnDef.filter.false) {
-                                filterElement.append($('<option value="false" title="' + columnDef.filter.true + '"' + (columnDef.filter.optionDefault == "false" ? ' selected' : '') + '>' + columnDef.filter.false + '</option>'));
+                                var selected = columnDef.filter.optionDefault == "false" && sessionStorage.getItem(self.idFinal) == null || self.stateSave && self.filterParams[index] == option ? ' selected' : '';
+                                filterElement.append($('<option value="false" title="' + columnDef.filter.true + '"' + selected + '>' + columnDef.filter.false + '</option>'));
                             } else {
                                 filterElement.append($('<option>' + false + '</option>'));
                             }
                             
-                            if (columnDef.filter.optionDefault) {
+                            if (columnDef.filter.optionDefault && sessionStorage.getItem(self.idFinal) == null) {
                                 self.filterParams[index] = $(filterElement).val();
                                 self.params.filter = JSON.stringify(self.filterParams);
                             }
@@ -655,7 +666,7 @@ function DataTable(id, config) {
                                 });
                             } else {
                                 for (option in options) {
-                                    if (columnDef.filter.optionDefault && columnDef.filter.optionDefault == option) {
+                                    if (columnDef.filter.optionDefault && columnDef.filter.optionDefault == option && sessionStorage.getItem(self.idFinal) == null || self.stateSave && self.filterParams[index] == option) {
                                         filterElement.append($('<option value="' + option + '" selected>' + options[option] + '</option>'));
                                     } else {
                                         filterElement.append($('<option value="' + option + '">' + options[option] + '</option>'));
@@ -663,14 +674,15 @@ function DataTable(id, config) {
                                 }
                             }
 
-                            if (columnDef.filter.optionDefault) {
+                            if (columnDef.filter.optionDefault && sessionStorage.getItem(self.idFinal) == null) {
                                 self.filterParams[index] = $(filterElement).val();
                                 self.params.filter = JSON.stringify(self.filterParams);
                             }
                             
                             break;
                         default:
-                            filterElement = $('<input type="' + type + name + ' autocomplete="off" />');
+                            var value = self.stateSave && self.filterParams[index] != null ? 'value="' + self.filterParams[index] + '"': '';
+                            filterElement = $('<input type="' + type + name + ' autocomplete="off" ' + value + ' />');
                             $(filterElement).bind("enterKey", e => self.filterBy(index, this.value));
                             break;
                     }
