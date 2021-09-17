@@ -48,7 +48,7 @@ VistaValidar bean = (VistaValidar)uvdatos.getVistas().get(VistaValidar.class.get
 $(document).ready(function() {
 	var tableAreasEvaluarAfines = new Atis.DataTable('#tableAreasEvaluarAfines', {
 		"ajax": { url: "<%= ControladorValidar.URL_PATTERN_AJAX %>" },
-		"pageSize": 100,
+		"pageSize": 10,
 		"filterable": true,
 		"action": "<%= ControladorValidar.ACCION_DATATABLE_BOLSAS %>",
 		"defaultOrderBy": 2,
