@@ -386,6 +386,24 @@ $(document).ready(function() {
 						}, 'visible': function(row) {
 							return row.resultado;
 						}
+					}, {'label': 'Acepta plaza', 'onClick': function(row) {
+							Atis.confirmDialog("Candidato acepta la plaza", "Marcar al candidato " + row.candidato.prsnif + " como que acepta la plaza.", {
+								'Si': function() {
+									var params = {
+											"<%= ControladorContratacion.PARAM_ACCION %>": "<%= ControladorContratacion.ACCION_MARCAR_ACEPTACION_CANDIDATO %>",
+											"<%= ControladorContratacion.PARAM_PLAZA_OFERTADA %>": <%= bean.getPlazaOfertada().getCodNum() %>,
+											"<%= ControladorContratacion.PARAM_CANDIDATO %>": row.candidato.codNum
+									};
+									Atis.sendForm("<%= request.getRequestURI() %>", params);
+									$(this).dialog("close");
+								},
+								'No': function() {
+									$(this).dialog("close");
+								}
+							});
+						}, 'visible': function(row) {
+							return !row.resultado && row.plaza.estado == '<%= ModeloPlazaOfertada.PLAZA_ESTADO_CONTRATACION %>';
+						}
 					}]
 				}
 			]

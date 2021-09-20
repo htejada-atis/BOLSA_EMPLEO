@@ -140,20 +140,21 @@ public class ModeloOfertaCandidato {
 	/** aceptar plaza ofertada para un candidato .
 	 * @param plaza .
 	 * @param candidato .
+	 * @param usuarioUpdate .
 	 * @throws SQLException .
 	 * @throws UVException .
 	 */
-	public void aceptarOfertaCandidato(PlazaOfertada plaza, UsuarioBolsaEmpleo candidato) throws SQLException, UVException {
+	public void aceptarOfertaCandidato(PlazaOfertada plaza, UsuarioBolsaEmpleo candidato, UsuarioBolsaEmpleo usuarioUpdate) throws SQLException, UVException {
 		try (Connection conexion = ConexionUvirtual.obtenerInstancia()) {
 			conexion.setAutoCommit(false);
 			try {
 				OfertaCandidato oferta = obtenerOfertaPlazaAbiertaCandidato(plaza, candidato, conexion);
 				if (oferta != null) {
 					oferta.setResultado(true);
-					actualizaOfertaCandidato(oferta, candidato, conexion);
+					actualizaOfertaCandidato(oferta, usuarioUpdate, conexion);
 				} else {
 					oferta = new OfertaCandidato(plaza, candidato, true, 0);
-					insertaOfertaCandidato(oferta, candidato, conexion);
+					insertaOfertaCandidato(oferta, usuarioUpdate, conexion);
 				}
 				
 				conexion.commit();
