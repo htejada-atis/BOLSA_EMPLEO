@@ -80,6 +80,7 @@ public class ControladorContratacion extends HttpServlet {
 	public static final String ACCION_EXPORTAR_PLAZAS = "exportarplazas";
 	public static final String ACCION_INDEX = "index";
 	public static final String ACCION_PREFERENCIAS_CANDIDATO = "preferenciascandidato";
+	public static final String ACCION_MARCAR_ACEPTACION_CANDIDATO = "marcaraceptacioncandidato";
 	public static final String ACCION_NUEVA_PLAZA_OFERTADA = "nuevaplazaofertada";
 	public static final String ACCION_PLAZA_ABIERTA = "plazaabierta";
 	public static final String ACCION_PLAZA_CERRADA = "plazacerrada";
@@ -135,6 +136,7 @@ public class ControladorContratacion extends HttpServlet {
 	public static final String MENSAJE_EXITO_CONTRATACION = "Contratación creada correctamente para el usuario: %s";
 	public static final String MENSAJE_EXITO_EDITAR = "Plaza editada correctamente";
 	public static final String MENSAJE_EXITO_ELIMINADA = "Plaza eliminada correctamente";
+	public static final String MENSAJE_EXITO_PLAZA_ACEPTADA_CANDIDATO = "La plaza se ha aceptado para el candidato %s correctamente";
 	public static final String MENSAJE_EXITO_TRAMITACION_PLAZA = "Cambiado el estado de la plaza a tramitación correctamente";
 	public static final String MENSAJE_EXITO_REENVIO_CONTRATACION = "Se ha reenviado la contratación correctamente para el usuario: %s";
 	public static final String MENSAJE_EXITO_SUSPENSION_PLAZA = "Suspendido el contrato del candidato correctamente";
@@ -212,6 +214,7 @@ public class ControladorContratacion extends HttpServlet {
 				case ACCION_EDITAR_PLAZA_OFERTADA:
 				case ACCION_EXPORTAR_CANDIDATOS:
 				case ACCION_ELIMINAR_PLAZA:
+				case ACCION_MARCAR_ACEPTACION_CANDIDATO:
 				case ACCION_PLAZA_ABIERTA:
 				case ACCION_PLAZA_CERRADA:
 				case ACCION_PLAZA_TRAMITACION:
@@ -333,6 +336,9 @@ public class ControladorContratacion extends HttpServlet {
 				break;
 			case ACCION_ELIMINAR_PLAZA:
 				eliminarPlazaOfertada(bean, datos, request, response);
+				break;
+			case ACCION_MARCAR_ACEPTACION_CANDIDATO:
+				marcarAceptacionCandidato(bean, datos, request, response);
 				break;
 			case ACCION_PLAZA_ABIERTA:
 				abrirPlaza(bean, datos, request, response);
@@ -511,6 +517,21 @@ public class ControladorContratacion extends HttpServlet {
 		BolsaEmpleoUtils.addMensajeDeExito(MENSAJE_EXITO_ELIMINADA, bean, request);
 		datos.setRespuestaEnviada(true);
 		response.sendRedirect(request.getServletPath());
+	}
+	
+	private void marcarAceptacionCandidato(VistaContratacion bean, UVDatos datos, HttpServletRequest request, HttpServletResponse response)
+			throws SQLException, UVException, IOException {
+		PlazaOfertada plaza = bean.getPlazaOfertada();
+		
+		if (!plaza.getEstado().equals(ModeloPlazaOfertada.PLAZA_ESTADO_CONTRATACION)) {
+			throw new UVException(MENSAJE_ERROR_ESTADO_CONTRATACION_REQUERIDO);
+		}
+		
+		UsuarioBolsaEmpleo candidato = ModeloUsuarioBolsaEmpleo.obtenerInstancia().getUsuarioById(Formateador.leeParametroInteger(request.getParameter(PARAM_CANDIDATO)));
+		ModeloOfertaCandidato.obtenerInstancia().aceptarOfertaCandidato(plaza, candidato, bean.getUsuarioLogeado());
+		
+		BolsaEmpleoUtils.addMensajeDeExito(String.format(MENSAJE_EXITO_PLAZA_ACEPTADA_CANDIDATO, candidato.getPrsNif()), bean, request);
+		redireccionConPlazaSeleccionada(bean, datos, request, response, ACCION_SELECCIONAR_PLAZA_OFERTADA);
 	}
 	
 	private void nuevaPlazaOfertada(VistaContratacion bean, UVDatos datos, HttpServletRequest request, HttpServletResponse response, HashMap<String, Object> parametros) 

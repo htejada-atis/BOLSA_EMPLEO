@@ -278,7 +278,7 @@ public class ControladorPlazasOfertadas extends HttpServlet {
 	private void aceptarPlazaOfertada(VistaPlazasOfertadas bean, UVDatos datos, HttpServletRequest request, HttpServletResponse response) 
 			throws IOException, UVException, SQLException {
 		ModeloOfertaCandidato modelo = ModeloOfertaCandidato.obtenerInstancia();
-		modelo.aceptarOfertaCandidato(bean.getOfertaCandidato().getPlaza(), bean.getUsuarioLogeado());
+		modelo.aceptarOfertaCandidato(bean.getOfertaCandidato().getPlaza(), bean.getUsuarioLogeado(), bean.getUsuarioLogeado());
 		
 		BolsaEmpleoUtils.addMensajeDeExito(MENSAJE_EXITO_ACEPTAR, bean, request);
 		datos.setRespuestaEnviada(true);
