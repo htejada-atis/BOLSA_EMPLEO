@@ -148,7 +148,8 @@ public class ModeloOfertaCandidato {
 		try (Connection conexion = ConexionUvirtual.obtenerInstancia()) {
 			conexion.setAutoCommit(false);
 			try {
-				OfertaCandidato oferta = obtenerOfertaPlazaAbiertaCandidato(plaza, candidato, conexion);
+				OfertaCandidato oferta = usuarioUpdate.isServicioPersonal() ? obtenerOfertaPlazaCandidato(plaza, candidato, conexion) 
+						: obtenerOfertaPlazaAbiertaCandidato(plaza, candidato, conexion);
 				if (oferta != null) {
 					oferta.setResultado(true);
 					actualizaOfertaCandidato(oferta, usuarioUpdate, conexion);
@@ -207,7 +208,7 @@ public class ModeloOfertaCandidato {
 				+ " INNER JOIN TBEP_PLAZAS_OFERTADAS bepplo ON bepplo.CODNUM = bepofc.BEPPLO_CODNUM"
 				+ " LEFT JOIN TBEP_CONTRATACIONES bepcnt ON bepcnt.BEPUSU_CODNUM = bepofc.BEPUSU_CODNUM AND bepcnt.BEPPLO_CODNUM = bepplo.CODNUM"
 				+ " WHERE   bepofc.BEPUSU_CODNUM = ?"
-				+ "     AND bepplo.ESTADO IN ('" + ModeloPlazaOfertada.PLAZA_ESTADO_ABIERTA + "', '" + ModeloPlazaOfertada.PLAZA_ESTADO_CONTRATACION + "')"
+				+ "     AND bepplo.ESTADO = '" + ModeloPlazaOfertada.PLAZA_ESTADO_ABIERTA + "'"
 				+ "     AND bepplo.CODNUM = ?";
 		
 		try (PreparedStatement stmt = conexion.prepareStatement(consulta)) {
@@ -220,6 +221,30 @@ public class ModeloOfertaCandidato {
 					if (rs.getInt("ABIERTA_VIGENTE") == 0) {
 						throw new UVException("La plaza ya no está disponible");
 					}
+					return createOfertaCandidatoFromResultSet(rs);
+				}
+				
+			}
+		}
+		
+		return null;
+	}
+	
+	private OfertaCandidato obtenerOfertaPlazaCandidato(PlazaOfertada plaza, UsuarioBolsaEmpleo candidato, Connection conexion) throws SQLException, UVException {
+		String consulta = "SELECT bepofc.*, bepcnt.CODNUM AS CONTRATACION"
+				+ " FROM TBEP_OFERTAS_CANDIDATOS bepofc"
+				+ " INNER JOIN TBEP_PLAZAS_OFERTADAS bepplo ON bepplo.CODNUM = bepofc.BEPPLO_CODNUM"
+				+ " LEFT JOIN TBEP_CONTRATACIONES bepcnt ON bepcnt.BEPUSU_CODNUM = bepofc.BEPUSU_CODNUM AND bepcnt.BEPPLO_CODNUM = bepplo.CODNUM"
+				+ " WHERE   bepofc.BEPUSU_CODNUM = ?"
+				+ "     AND bepplo.CODNUM = ?";
+		
+		try (PreparedStatement stmt = conexion.prepareStatement(consulta)) {
+			int parameterIndex = 1;
+			stmt.setInt(parameterIndex++, candidato.getCodNum());
+			stmt.setInt(parameterIndex++, plaza.getCodNum());
+			
+			try (ResultSet rs = stmt.executeQuery()) {
+				if (rs.next()) {
 					return createOfertaCandidatoFromResultSet(rs);
 				}
 				
