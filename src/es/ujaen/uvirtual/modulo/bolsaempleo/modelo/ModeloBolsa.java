@@ -239,13 +239,13 @@ public class ModeloBolsa {
 	public List<Bolsa> getBolsasByAreaDepartamento(Area area) throws SQLException, UVException {
 		ArrayList<Bolsa> bolsas = new ArrayList<>();
 		String consulta = ""
-				+ " SELECT bepbol.* FROM TBEP_AREAS bepare"
+				+ " SELECT DISTINCT bepbol.* FROM TBEP_AREAS bepare"
 				+ " INNER JOIN TBEP_BOLSAS bepbol ON bepbol.BEPARE_CODNUM = bepare.CODNUM"
 				+ " INNER JOIN TBEP_AREAS_DEPARTAMENTOS bepade ON bepade.BEPARE_CODNUM = bepare.CODNUM"
-				+ " WHERE bepade.BEPDEP_CODNUM = ("
+				+ " WHERE bepade.BEPDEP_CODNUM IN ("
 				+ "     SELECT bepade.BEPDEP_CODNUM FROM TBEP_AREAS_DEPARTAMENTOS bepade "
 				+ "     WHERE bepade.BEPARE_CODNUM = ?"
-				+ " ) ";
+				+ " )";
 		
 		try (Connection conexion = ConexionUvirtual.obtenerInstancia(); PreparedStatement stmt = conexion.prepareStatement(consulta)) {
 			int indexParam = 1;
