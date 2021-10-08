@@ -69,6 +69,9 @@ public class ModeloPlazaOfertada {
 	public static final String ABIERTA_VIGENTE = "ABIERTA_VIGENTE";
 	public static final String BEPARE_CODNUM = "BEPARE_CODNUM";
 	public static final String BEPDED_CODNUM = "BEPDED_CODNUM";
+	public static final String CANDIDATOS_CITADOS = "CANDIDATOS_CITADOS";
+	public static final String CANDIDATOS_DISPONIBLES = "CANDIDATOS_DISPONIBLES";
+	public static final String CANDIDATOS_INTERESADOS = "CANDIDATOS_INTERESADOS";
 	public static final String CENTRO_DESTINO = "CENTRO_DESTINO";
 	public static final String CODNUM = "CODNUM";
 	public static final String CUATRIMESTRE = "CUATRIMESTRE";
@@ -152,7 +155,7 @@ public class ModeloPlazaOfertada {
 		try (Connection conexion = ConexionUvirtual.obtenerInstancia(); PreparedStatement stmt = conexion.prepareStatement(consulta)) {
 			try (ResultSet rs = stmt.executeQuery()) {
 				while (rs.next()) {
-					plazasOfertadas.add(createPlazaOfertadaFromResultSet(rs, false));
+					plazasOfertadas.add(createPlazaOfertadaFromResultSet(rs, false, true));
 				}
 			}
 		}
@@ -166,19 +169,56 @@ public class ModeloPlazaOfertada {
 	 * @throws SQLException .
 	 * @throws UVException .
 	 */
-	public List<String[]> listadoPlazasCsv() throws SQLException, UVException {
-		String consulta = "SELECT bepplo.*,"
-				+ "     CASE"
-				+ "         WHEN bepplo.FECHA_FIN_OFERTA > SYSDATE THEN 1"
-				+ "         ELSE 0"
-				+ "     END AS ABIERTA_VIGENTE"
+	public List<String[]> listadoPlazasCsv(Convocatoria convocatoria) throws SQLException, UVException {
+		String consulta = "SELECT bepplo.*, "
+				+ "    counts.CANDIDATOS_DISPONIBLES, counts.CANDIDATOS_INTERESADOS, counts.CANDIDATOS_CITADOS"
 				+ " FROM TBEP_PLAZAS_OFERTADAS bepplo"
 				+ " INNER JOIN TBEP_AREAS bepare ON bepare.CODNUM = bepplo.BEPARE_CODNUM"
+				+ " LEFT JOIN ("
+				+ " SELECT bepplo.CODNUM AS BEPPLO_CODNUM,"
+				+ "     COUNT(*) AS CANDIDATOS_DISPONIBLES,"
+				+ "     SUM(CASE WHEN bepofc.FLGRESULTADO = 'S' THEN 1 ELSE 0 END) AS CANDIDATOS_INTERESADOS,"
+				+ "     SUM(CASE WHEN bepcnt.CODNUM IS NOT NULL THEN 1 ELSE 0 END) AS CANDIDATOS_CITADOS"
+				+ "     FROM TBEP_USUARIOS bepusu"
+				+ "     INNER JOIN TBEP_SOLICITUDES bepsol ON bepsol.BEPUSU_CODNUM = bepusu.CODNUM AND bepsol.BEPCON_CODNUM = ?"
+				+ "     INNER JOIN TBEP_SOLICITUD_BOLSAS bepsob ON bepsob.BEPSOL_CODNUM = bepsol.CODNUM AND bepsob.FECHABAREMACION IS NOT NULL"
+				+ "     INNER JOIN TBEP_BOLSAS bepbol ON bepbol.CODNUM = bepsob.BEPBOL_CODNUM"
+				+ "     INNER JOIN TBEP_PLAZAS_OFERTADAS bepplo ON bepplo.BEPARE_CODNUM = bepbol.BEPARE_CODNUM"
+				+ "     INNER JOIN TBEP_DEDICACIONES bepded ON bepded.CODNUM = bepplo.BEPDED_CODNUM"
+				+ "     LEFT JOIN TBEP_ESTADO_CANDIDATOS bepesc ON bepesc.BEPUSU_CODNUM = bepusu.CODNUM AND bepesc.BEPBOL_CODNUM = bepbol.CODNUM"
+				+ "     LEFT JOIN ("
+				+ "         SELECT"
+				+ "             bepesc.BEPUSU_CODNUM AS BEPUSU_CODNUM,"
+				+ "         COUNT(DISTINCT bepesc.BEPPLO_CODNUM) AS CONTRATOS"
+				+ "         FROM TBEP_ESTADO_CANDIDATOS bepesc"
+				+ "         WHERE bepesc.ESTADO NOT IN ('" + ModeloEstadoCandidato.ESTADO_DISPONIBLE + "',"
+				+ "             '" + ModeloEstadoCandidato.ESTADO_SUSPENSION_PROVISIONAL + "', '" + ModeloEstadoCandidato.ESTADO_NO_DISPONIBLE + "')"
+				+ "         GROUP BY bepesc.BEPUSU_CODNUM"
+				+ "     ) bepcts ON bepcts.BEPUSU_CODNUM = bepusu.CODNUM"
+				+ "     LEFT JOIN TBEP_OFERTAS_CANDIDATOS bepofc ON bepofc.BEPUSU_CODNUM = bepusu.CODNUM AND bepofc.BEPPLO_CODNUM = bepplo.CODNUM"
+				+ "         LEFT JOIN TBEP_CONTRATACIONES bepcnt ON bepcnt.BEPUSU_CODNUM = bepusu.CODNUM AND bepcnt.BEPPLO_CODNUM = bepplo.CODNUM"
+				+ "     WHERE bepusu.ROL = " + ModeloRol.ID_ROL_CANDIDATO
+				+ "         AND bepusu.FLGBORRADO = 'N'"
+				+ "         AND ("
+				+ "             CASE"
+				+ "                 WHEN bepesc.ESTADO = '" + ModeloEstadoCandidato.ESTADO_CONTRATADO_PRIMER_CUATRIMESTRE + "'"
+				+ "                     AND bepplo.CUATRIMESTRE = '" + ModeloPlazaOfertada.CUATRIMESTRE_SEGUNDO + "' THEN 1"
+				+ "                 WHEN bepesc.ESTADO = '" + ModeloEstadoCandidato.ESTADO_CONTRATADO_PARCIAL + "'"
+				+ "                     AND bepded.TIPO = '" + ModeloDedicacion.TIPO_TIEMPO_PARCIAL + "' THEN 1"
+				+ "                 WHEN bepcts.CONTRATOS > 0 THEN 0"
+				+ "                 WHEN bepesc.CODNUM IS NULL THEN 1"
+				+ "                 WHEN bepesc.ESTADO = '" + ModeloEstadoCandidato.ESTADO_DISPONIBLE + "' THEN 1"
+				+ "                 ELSE 0"
+				+ "             END) = 1"
+				+ "     GROUP BY bepplo.CODNUM"
+				+ " ) counts ON counts.BEPPLO_CODNUM = bepplo.CODNUM"
 				+ " WHERE bepplo.FLGACTIVA = 'S'";
 		
 		List<String[]> rows = new ArrayList<>();
 		
 		try (Connection conexion = ConexionUvirtual.obtenerInstancia(); PreparedStatement stmt = conexion.prepareStatement(consulta)) {
+			int paramIndex = 1;
+			stmt.setInt(paramIndex, convocatoria.getCodNum());
 			
 			try (ResultSet rs = stmt.executeQuery()) {
 				
@@ -196,29 +236,35 @@ public class ModeloPlazaOfertada {
 					String.format("\"%s\"", "Cuatrimestre"),
 					String.format("\"%s\"", "Duración prevista"),
 					String.format("\"%s\"", "Justificación"),
+					String.format("\"%s\"", "Candidatos disponibles"),
+					String.format("\"%s\"", "Candidatos interesados"),
+					String.format("\"%s\"", "Candidatos citados"),
 				});
 				
 				while (rs.next()) {
-					PlazaOfertada plaza = this.createPlazaOfertadaFromResultSet(rs, false);
+					PlazaOfertada plaza = this.createPlazaOfertadaFromResultSet(rs, false, false);
 					
 					rows.add(new String[] {
 						String.valueOf(plaza.getCodNum()),
 						String.format("\"%s\"", plaza.getIdPlaza() != null ? plaza.getIdPlaza() : ""),
 						String.format("\"%s\"", plaza.getArea() != null ? plaza.getArea().getDescripcion() : ""),
 						String.format("\"%s\"", EscapaHTML.escapa(plaza.getEstado())),
-						String.format("\"%s\"", plaza.getFechaCreacion() != null ? Formateador.formatoFecha(plaza.getFechaCreacion(), 
+						String.format("\"%s\"", plaza.getFechaCreacion() != null ? Formateador.formatoFecha(plaza.getFechaCreacion(),
 								Formateador.FORMATO_FECHA_DDMMYYYY_HHMMSS) : ""),
-						String.format("\"%s\"", plaza.getFechaAbierta() != null ? Formateador.formatoFecha(plaza.getFechaAbierta(), 
+						String.format("\"%s\"", plaza.getFechaAbierta() != null ? Formateador.formatoFecha(plaza.getFechaAbierta(),
 								Formateador.FORMATO_FECHA_DDMMYYYY_HHMMSS) : ""),
-						String.format("\"%s\"", plaza.getFechaFinOferta() != null ? Formateador.formatoFecha(plaza.getFechaFinOferta(), 
+						String.format("\"%s\"", plaza.getFechaFinOferta() != null ? Formateador.formatoFecha(plaza.getFechaFinOferta(),
 								Formateador.FORMATO_FECHA_DDMMYYYY_HHMMSS) : ""),
-						String.format("\"%s\"", plaza.getFechaCerrada() != null ? Formateador.formatoFecha(plaza.getFechaCerrada(), 
+						String.format("\"%s\"", plaza.getFechaCerrada() != null ? Formateador.formatoFecha(plaza.getFechaCerrada(),
 								Formateador.FORMATO_FECHA_DDMMYYYY_HHMMSS) : ""),
 						String.format("\"%s\"", plaza.getCentroDestino() != null ? plaza.getCentroDestino() : ""),
 						String.format("\"%s\"", plaza.getDedicacion() != null ? plaza.getDedicacion().getTexto() : ""),
 						String.format("\"%s\"", plaza.getCuatrimestre() != null ? plaza.getCuatrimestre() : ""),
 						String.format("\"%s\"", plaza.getDuracionPrevista() != null ? plaza.getDuracionPrevista() : ""),
 						String.format("\"%s\"", plaza.getJustificacion() != null ? plaza.getJustificacion() : ""),
+						String.valueOf(rs.getInt(CANDIDATOS_DISPONIBLES)),
+						String.valueOf(rs.getInt(CANDIDATOS_INTERESADOS)),
+						String.valueOf(rs.getInt(CANDIDATOS_CITADOS)),
 					});
 				}
 			}
@@ -341,7 +387,7 @@ public class ModeloPlazaOfertada {
 					throw new UVException(MENSAJE_ERROR_PLAZA_OFERTADA_ID_NO_EXISTE);
 				}
 				
-				return createPlazaOfertadaFromResultSet(rs, true);
+				return createPlazaOfertadaFromResultSet(rs, true, true);
 			}
 		}
 	}
@@ -752,7 +798,7 @@ public class ModeloPlazaOfertada {
 			
 			try (ResultSet rs = stmt.executeQuery()) {
 				while (rs.next()) {
-					rows.add(createPlazaOfertadaFromResultSet(rs, false));
+					rows.add(createPlazaOfertadaFromResultSet(rs, false, true));
 				}
 			}
 			
@@ -1003,11 +1049,12 @@ public class ModeloPlazaOfertada {
 	/** Método para crear una plaza ofertada de un resultset.
 	 * @param rs .
 	 * @param withFiles .
+	 * @param withAbiertaVigente .
 	 * @return plaza ofertada .
 	 * @throws SQLException .
 	 * @throws UVException .
 	 */
-	public PlazaOfertada createPlazaOfertadaFromResultSet(ResultSet rs, Boolean withFiles) throws SQLException, UVException {
+	public PlazaOfertada createPlazaOfertadaFromResultSet(ResultSet rs, Boolean withFiles, Boolean withAbiertaVigente) throws SQLException, UVException {
 		PlazaOfertada plaza = new PlazaOfertada();
 		
 		plaza.setCodNum(rs.getInt(CODNUM));
@@ -1030,7 +1077,9 @@ public class ModeloPlazaOfertada {
 			plaza.setNri(rs.getBlob(NRI) != null ? rs.getBlob(NRI).getBinaryStream() : null);
 		}
 		
-		plaza.setAbiertaVigente(rs.getInt("ABIERTA_VIGENTE") == 1);
+		if (withAbiertaVigente) {
+			plaza.setAbiertaVigente(rs.getInt("ABIERTA_VIGENTE") == 1);
+		}
 		
 		return plaza;
 	}

@@ -679,7 +679,8 @@ public class ControladorContratacion extends HttpServlet {
 		String current = Formateador.formatoFecha(currentDate, Formateador.FORMATO_FECHA_DDMMYYYY);
 		response.setHeader("Content-Disposition", "attachment; filename=\"plazas_" + current + ".csv\"");
 		
-		List<String[]> rows = ModeloPlazaOfertada.obtenerInstancia().listadoPlazasCsv();
+		ModeloConvocatoria modeloConvocatoria = ModeloConvocatoria.obtenerInstancia();
+		List<String[]> rows = ModeloPlazaOfertada.obtenerInstancia().listadoPlazasCsv(modeloConvocatoria.getUltimaConvocatoria());
 		
 		try (ServletOutputStream stream = response.getOutputStream()) {
 			try (PrintWriter printer = new PrintWriter(stream)) {
