@@ -219,7 +219,7 @@ public class TestBEPControladorContratacion {
 	@Test
 	public void testA07AbrirPlazaOfertada() throws IOException {
 		VistaContratacion bean = obtenerPlazasOfertadas("{" + "'" + ModeloPlazaOfertada.ORDER_COLUMN_INDEX_ESTADO + "':'" 
-				+ ModeloPlazaOfertada.PLAZA_ESTADO_TRAMITACION + "'}");
+				+ ModeloPlazaOfertada.PLAZA_ESTADO_APROBACION + "'}");
 		
 		PeticionHttp peticion2 = UtilsTestBolsaEmpleo.peticionAutenticadaPersonal();
 		peticion2.setParameter(ControladorContratacion.PARAM_ACCION, ControladorContratacion.ACCION_PLAZA_ABIERTA);

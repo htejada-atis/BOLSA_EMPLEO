@@ -84,7 +84,7 @@ public class ControladorContratacion extends HttpServlet {
 	public static final String ACCION_NUEVA_PLAZA_OFERTADA = "nuevaplazaofertada";
 	public static final String ACCION_PLAZA_ABIERTA = "plazaabierta";
 	public static final String ACCION_PLAZA_CERRADA = "plazacerrada";
-	public static final String ACCION_PLAZA_TRAMITACION = "plazatramitacion";
+	public static final String ACCION_PLAZA_APROBACION = "plazaaprobacion";
 	public static final String ACCION_RECHAZAR_CONTRATACION_CANDIDATO = "rechazarcontratacioncandidato";
 	public static final String ACCION_REENVIAR_CITA_CONTRATACION = "reenviarcitacontratacion";
 	public static final String ACCION_RESTAURAR_PLAZA_OFERTADA = "restaurarplazaofertada";
@@ -120,10 +120,10 @@ public class ControladorContratacion extends HttpServlet {
 	public static final String MENSAJE_ERROR_CANDIDATO_CONTRATACION_NO_ACTIVA = "No hay una contratación activa para el candidato %s";
 	public static final String MENSAJE_ERROR_CUATRIMESTRE_NO_VALIDO = "El cuatrimestre seleccionado no es válido";
 	public static final String MENSAJE_ERROR_DURACION_PREVISTA_LARGA = "La duración prevista no puede contener mas de %d caracteres";
-	public static final String MENSAJE_ERROR_ELIMINAR_ESTADO_REQUERIDO = "Es requerido estado de creación o tramitación para poder eliminar la plaza";
+	public static final String MENSAJE_ERROR_ELIMINAR_ESTADO_REQUERIDO = "Es requerido estado de creación o aprobación para poder eliminar la plaza";
 	public static final String MENSAJE_ERROR_ESTADO_CONTRATACION_REQUERIDO = "Es requerido estado de contratación para la plaza";
 	public static final String MENSAJE_ERROR_ESTADO_CREACION_REQUERIDO = "Es requerido estado de creación para la plaza";
-	public static final String MENSAJE_ERROR_ESTADO_TRAMITACION_REQUERIDO = "Es requerido estado de tramitación para la plaza";
+	public static final String MENSAJE_ERROR_ESTADO_APROBACION_REQUERIDO = "Es requerido estado de aprobación para la plaza";
 	public static final String MENSAJE_ERROR_FECHA_FIN_OFERTA_VACIA_ABRIR_PLAZA = "La fecha fin de la oferta no puede estar vacía para abrir una plaza";
 	public static final String MENSAJE_ERROR_FORMATO_FECHA = "Error al formatear fecha. Formato: DD/MM/YYYY HH:MM:SS";
 	public static final String MENSAJE_ERROR_JUSTIFICACION_LARGA = "La justificación no puede contener mas de %d caracteres";
@@ -137,7 +137,7 @@ public class ControladorContratacion extends HttpServlet {
 	public static final String MENSAJE_EXITO_EDITAR = "Plaza editada correctamente";
 	public static final String MENSAJE_EXITO_ELIMINADA = "Plaza eliminada correctamente";
 	public static final String MENSAJE_EXITO_PLAZA_ACEPTADA_CANDIDATO = "La plaza se ha aceptado para el candidato %s correctamente";
-	public static final String MENSAJE_EXITO_TRAMITACION_PLAZA = "Cambiado el estado de la plaza a tramitación correctamente";
+	public static final String MENSAJE_EXITO_APROBACION_PLAZA = "Cambiado el estado de la plaza a aprobación correctamente";
 	public static final String MENSAJE_EXITO_REENVIO_CONTRATACION = "Se ha reenviado la contratación correctamente para el usuario: %s";
 	public static final String MENSAJE_EXITO_SUSPENSION_PLAZA = "Suspendido el contrato del candidato correctamente";
 	
@@ -217,7 +217,7 @@ public class ControladorContratacion extends HttpServlet {
 				case ACCION_MARCAR_ACEPTACION_CANDIDATO:
 				case ACCION_PLAZA_ABIERTA:
 				case ACCION_PLAZA_CERRADA:
-				case ACCION_PLAZA_TRAMITACION:
+				case ACCION_PLAZA_APROBACION:
 				case ACCION_RECHAZAR_CONTRATACION_CANDIDATO:
 				case ACCION_REENVIAR_CITA_CONTRATACION:
 				case ACCION_SELECCIONAR_PLAZA_OFERTADA:
@@ -346,8 +346,8 @@ public class ControladorContratacion extends HttpServlet {
 			case ACCION_PLAZA_CERRADA:
 				cerrarPlaza(bean, datos, request, response);
 				break;
-			case ACCION_PLAZA_TRAMITACION:
-				tramitacionPlaza(bean, datos, request, response);
+			case ACCION_PLAZA_APROBACION:
+				aprobacionPlaza(bean, datos, request, response);
 				break;
 			case ACCION_SELECCIONAR_PLAZA_OFERTADA:
 				break;
@@ -367,8 +367,8 @@ public class ControladorContratacion extends HttpServlet {
 		ModeloPlazaOfertada modeloPlaza = ModeloPlazaOfertada.obtenerInstancia();
 		
 		PlazaOfertada plaza = bean.getPlazaOfertada();
-		if (!plaza.getEstado().contains(ModeloPlazaOfertada.PLAZA_ESTADO_TRAMITACION)) {
-			throw new UVException(MENSAJE_ERROR_ESTADO_TRAMITACION_REQUERIDO);
+		if (!plaza.getEstado().contains(ModeloPlazaOfertada.PLAZA_ESTADO_APROBACION)) {
+			throw new UVException(MENSAJE_ERROR_ESTADO_APROBACION_REQUERIDO);
 		}
 		
 		if (plaza.getFechaFinOferta() == null) {
@@ -507,7 +507,7 @@ public class ControladorContratacion extends HttpServlet {
 			throws SQLException, UVException, IOException {
 		PlazaOfertada plaza = bean.getPlazaOfertada();
 		
-		if (!plaza.getEstado().equals(ModeloPlazaOfertada.PLAZA_ESTADO_CREACION) && !plaza.getEstado().equals(ModeloPlazaOfertada.PLAZA_ESTADO_TRAMITACION)) {
+		if (!plaza.getEstado().equals(ModeloPlazaOfertada.PLAZA_ESTADO_CREACION) && !plaza.getEstado().equals(ModeloPlazaOfertada.PLAZA_ESTADO_APROBACION)) {
 			throw new UVException(MENSAJE_ERROR_ELIMINAR_ESTADO_REQUERIDO);
 		}
 		
@@ -564,7 +564,7 @@ public class ControladorContratacion extends HttpServlet {
 		BolsaEmpleoUtils.redirectWithParams(datos, request, response, params);
 	}
 	
-	private void tramitacionPlaza(VistaContratacion bean, UVDatos datos, HttpServletRequest request, HttpServletResponse response)
+	private void aprobacionPlaza(VistaContratacion bean, UVDatos datos, HttpServletRequest request, HttpServletResponse response)
 			throws SQLException, UVException, IOException {
 		ModeloPlazaOfertada modeloPlaza = ModeloPlazaOfertada.obtenerInstancia();
 		
@@ -572,9 +572,9 @@ public class ControladorContratacion extends HttpServlet {
 			throw new UVException(MENSAJE_ERROR_ESTADO_CREACION_REQUERIDO);
 		}
 		
-		modeloPlaza.cambiarEstadoPlazaATramitacion(bean.getPlazaOfertada(), bean.getUsuarioLogeado());
+		modeloPlaza.cambiarEstadoPlazaAAprobacion(bean.getPlazaOfertada(), bean.getUsuarioLogeado());
 		
-		BolsaEmpleoUtils.addMensajeDeExito(MENSAJE_EXITO_TRAMITACION_PLAZA, bean, request);
+		BolsaEmpleoUtils.addMensajeDeExito(MENSAJE_EXITO_APROBACION_PLAZA, bean, request);
 		redireccionConPlazaSeleccionada(bean, datos, request, response, ACCION_SELECCIONAR_PLAZA_OFERTADA);
 	}
 	

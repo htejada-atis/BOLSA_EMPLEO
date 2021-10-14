@@ -50,7 +50,7 @@ public class ModeloPlazaOfertada {
 	public static final String PLAZA_ESTADO_CERRADA = "CERRADA";
 	public static final String PLAZA_ESTADO_CONTRATACION = "CONTRATACION";
 	public static final String PLAZA_ESTADO_CREACION = "CREACION";
-	public static final String PLAZA_ESTADO_TRAMITACION = "TRAMITACION";
+	public static final String PLAZA_ESTADO_APROBACION = "APROBACION";
 	
 	public static final String CENTRO_DESTINO_JAEN = "JAEN";
 	public static final String CENTRO_DESTINO_LINARES = "LINARES";
@@ -107,7 +107,7 @@ public class ModeloPlazaOfertada {
 		ESTADOS.put(PLAZA_ESTADO_CERRADA, "Cerrada");
 		ESTADOS.put(PLAZA_ESTADO_CONTRATACION, "Contratación");
 		ESTADOS.put(PLAZA_ESTADO_CREACION, "Creación");
-		ESTADOS.put(PLAZA_ESTADO_TRAMITACION, "Tramitación");
+		ESTADOS.put(PLAZA_ESTADO_APROBACION, "Aprobación");
 	}
 	
 	public static final int COLUMN_DURACION_PREVISTA_MAXLENGTH = 100;
@@ -582,14 +582,14 @@ public class ModeloPlazaOfertada {
 		this.cambiarEstadoPlaza(plaza, usuarioUpdate, PLAZA_ESTADO_CONTRATACION);
 	}
 	
-	/** cambia el estado de una plaza a tramitación .
+	/** cambia el estado de una plaza a aprobación .
 	 * @param plaza .
 	 * @param usuarioUpdate .
 	 * @throws SQLException .
 	 * @throws UVException .
 	 */
-	public void cambiarEstadoPlazaATramitacion(PlazaOfertada plaza, UsuarioBolsaEmpleo usuarioUpdate) throws SQLException, UVException {
-		this.cambiarEstadoPlaza(plaza, usuarioUpdate, PLAZA_ESTADO_TRAMITACION);
+	public void cambiarEstadoPlazaAAprobacion(PlazaOfertada plaza, UsuarioBolsaEmpleo usuarioUpdate) throws SQLException, UVException {
+		this.cambiarEstadoPlaza(plaza, usuarioUpdate, PLAZA_ESTADO_APROBACION);
 	}
 	
 	/** cambia el estado de una plaza .
