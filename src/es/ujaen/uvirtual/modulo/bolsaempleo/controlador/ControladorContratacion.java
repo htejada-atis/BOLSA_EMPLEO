@@ -188,18 +188,24 @@ public class ControladorContratacion extends HttpServlet {
 				for (FileItem item : items) {
 					if (item.isFormField()) {
 						parametros.put(item.getFieldName(), item.getString());
-					} else {
-						if (item.getSize() > 0 && item.getName().toLowerCase().endsWith(".pdf")) {
+					} else if (item.getSize() > 0) {
+						if (BolsaEmpleoUtils.checkFileIsPDF(item.getName())) {
 							try (InputStream contenidoDelFichero = item.getInputStream(); ByteArrayOutputStream salida = new ByteArrayOutputStream()) {
 								parametros.put(item.getFieldName(), BolsaEmpleoUtils.checkFileSize(contenidoDelFichero));
 							}
+						} else {
+							bean.getMensajesDeError().add(MENSAJE_ERROR_FORMATO_PDF);
+							break;
 						}
 					}
 				}
-			} catch (FileUploadException | UVException | SQLException e) {
-				e.printStackTrace();
+			} catch (Exception e) {
+				LOGGER.log(Level.SEVERE, Formateador.getStackTrace(e));
+				LOGGER.log(Level.SEVERE, e.toString());
+				bean.getMensajesDeError().add("Error al subir fichero(s)");
 			}
 		}
+		
 		
 		String nombreAccion = EscapaHTML.ajustaCodificacion(BolsaEmpleoUtils.getParamRequestOrMultipartOrSession(
 				request, parametros, PARAM_ACCION));
@@ -207,7 +213,8 @@ public class ControladorContratacion extends HttpServlet {
 			nombreAccion = ACCION_INDEX;
 		}
 		try {
-			init(bean, datos, request, response);
+			
+			init(bean, datos, request, response, nombreAccion);
 			
 			switch (nombreAccion) {
 				case ACCION_COMPROBAR_CONTRATACION_PLAZA:
@@ -234,6 +241,7 @@ public class ControladorContratacion extends HttpServlet {
 					exportarPlazas(datos, response);
 					break;
 				case ACCION_INDEX:
+					bean.setCursos(ModeloPlazaOfertada.obtenerInstancia().listadoCursosPlazasOfertadas());
 					break;
 				case ACCION_NUEVA_PLAZA_OFERTADA:
 					nuevaPlazaOfertada(bean, datos, request, response, parametros);
@@ -264,7 +272,8 @@ public class ControladorContratacion extends HttpServlet {
 		}
 	}
 	
-	private void init(VistaContratacion bean, UVDatos datos, HttpServletRequest request, HttpServletResponse response) throws SQLException, UVException, IOException {
+	private void init(VistaContratacion bean, UVDatos datos, HttpServletRequest request, HttpServletResponse response, String nombreAccion)
+			throws SQLException, UVException, IOException {
 		bean.setVista(JSP_INDEX);
 		BolsaEmpleoUtils.readMensajeSession(bean, request);
 		
@@ -498,12 +507,17 @@ public class ControladorContratacion extends HttpServlet {
 	
 	private void editarPlazaOfertada(VistaContratacion bean, UVDatos datos, HttpServletRequest request, HttpServletResponse response, HashMap<String, Object> parametros) 
 			throws SQLException, UVException, IOException {
-		PlazaOfertada plaza = bean.getPlazaOfertada();
-		plaza = validarPlazaOfertada(bean, request, plaza, parametros);
+		if (bean.getMensajesDeError().size() == 0) {
+			PlazaOfertada plaza = bean.getPlazaOfertada();
+			plaza = validarPlazaOfertada(bean, request, plaza, parametros);
+			
+			ModeloPlazaOfertada.obtenerInstancia().actualizaPlazaOfertada(plaza, bean.getUsuarioLogeado());
+			
+			BolsaEmpleoUtils.addMensajeDeExito(MENSAJE_EXITO_EDITAR, bean, request);
+		} else {
+			BolsaEmpleoUtils.addMensajeDeError(bean.getMensajesDeError().get(0), bean, request);
+		}
 		
-		ModeloPlazaOfertada.obtenerInstancia().actualizaPlazaOfertada(plaza, bean.getUsuarioLogeado());
-		
-		BolsaEmpleoUtils.addMensajeDeExito(MENSAJE_EXITO_EDITAR, bean, request);
 		redireccionConPlazaSeleccionada(bean, datos, request, response, ACCION_SELECCIONAR_PLAZA_OFERTADA);
 	}
 	
@@ -543,7 +557,8 @@ public class ControladorContratacion extends HttpServlet {
 		bean.setVista(JSP_CREATE);
 		cargarListasFormulario(bean);
 		
-		if (BolsaEmpleoUtils.getParamRequestOrMultipartOrSession(request, parametros, PARAM_AREA) != null) {
+		if (BolsaEmpleoUtils.getParamRequestOrMultipartOrSession(request, parametros, PARAM_AREA) != null
+				&& bean.getMensajesDeError().size() == 0) {
 			PlazaOfertada plaza = validarPlazaOfertada(bean, request, new PlazaOfertada(), parametros);
 			
 			ModeloPlazaOfertada.obtenerInstancia().insertaPlazaOfertada(plaza, bean.getUsuarioLogeado());
@@ -834,6 +849,15 @@ public class ControladorContratacion extends HttpServlet {
 		}
 		if (!ModeloPlazaOfertada.CENTROS_DESTINO.containsKey(plaza.getCentroDestino())) {
 			throw new UVException(MENSAJE_ERROR_CENTRO_DESTINO_NO_VALIDO);
+		}
+		
+		plaza.setCurso(Formateador.leeParametroString(BolsaEmpleoUtils.getParamRequestOrMultipartOrSession(
+				request, parametros, PARAM_CURSO)));
+		if (plaza.getCurso() == null || plaza.getCurso().isBlank()) {
+			throw new UVException(MENSAJE_ERROR_CURSO_VACIO);
+		}
+		if (plaza.getCurso().length() > ModeloPlazaOfertada.COLUMN_CURSO_MAXLENGTH) {
+			throw new UVException(String.format(MENSAJE_ERROR_CURSO_LARGO, ModeloPlazaOfertada.COLUMN_CURSO_MAXLENGTH));
 		}
 		
 		if (bean.getUsuarioLogeado().isServicioPersonal()) {
