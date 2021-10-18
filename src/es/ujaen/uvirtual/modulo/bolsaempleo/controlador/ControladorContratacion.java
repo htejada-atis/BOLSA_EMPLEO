@@ -97,6 +97,7 @@ public class ControladorContratacion extends HttpServlet {
 	public static final String PARAM_CENTRO_DESTINO = "centrodestino";
 	public static final String PARAM_CODIGO = "codigo";
 	public static final String PARAM_CUATRIMESTRE = "cuatrimestre";
+	public static final String PARAM_CURSO = "curso";
 	public static final String PARAM_DEDICACION = "dedicacion";
 	public static final String PARAM_DURACION_PREVISTA = "duracionprevista";
 	public static final String PARAM_EMAILS_CIERRE = "emailcierre";
@@ -119,6 +120,8 @@ public class ControladorContratacion extends HttpServlet {
 	public static final String MENSAJE_ERROR_CANDIDATO_CONTRATACION_ACTIVA = "Ya hay una contratación activa para el candidato %s";
 	public static final String MENSAJE_ERROR_CANDIDATO_CONTRATACION_NO_ACTIVA = "No hay una contratación activa para el candidato %s";
 	public static final String MENSAJE_ERROR_CUATRIMESTRE_NO_VALIDO = "El cuatrimestre seleccionado no es válido";
+	public static final String MENSAJE_ERROR_CURSO_LARGO = "El curso no puede contener mas de %d caracteres";
+	public static final String MENSAJE_ERROR_CURSO_VACIO = "El curso no puede estar vacío";
 	public static final String MENSAJE_ERROR_DURACION_PREVISTA_LARGA = "La duración prevista no puede contener mas de %d caracteres";
 	public static final String MENSAJE_ERROR_ELIMINAR_ESTADO_REQUERIDO = "Es requerido estado de creación o aprobación para poder eliminar la plaza";
 	public static final String MENSAJE_ERROR_ESTADO_CONTRATACION_REQUERIDO = "Es requerido estado de contratación para la plaza";
@@ -126,6 +129,7 @@ public class ControladorContratacion extends HttpServlet {
 	public static final String MENSAJE_ERROR_ESTADO_APROBACION_REQUERIDO = "Es requerido estado de aprobación para la plaza";
 	public static final String MENSAJE_ERROR_FECHA_FIN_OFERTA_VACIA_ABRIR_PLAZA = "La fecha fin de la oferta no puede estar vacía para abrir una plaza";
 	public static final String MENSAJE_ERROR_FORMATO_FECHA = "Error al formatear fecha. Formato: DD/MM/YYYY HH:MM:SS";
+	public static final String MENSAJE_ERROR_FORMATO_PDF = "El fichero debe ser un pdf válido";
 	public static final String MENSAJE_ERROR_JUSTIFICACION_LARGA = "La justificación no puede contener mas de %d caracteres";
 	public static final String MENSAJE_ERROR_JUSTIFICACION_VACIA = "La justificación no puede estar vacía";
 	public static final String MENSAJE_ERROR_SIN_PERMISO = "No tienes permiso";

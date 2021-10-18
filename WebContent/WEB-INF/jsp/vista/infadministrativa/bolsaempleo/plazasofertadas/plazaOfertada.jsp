@@ -46,6 +46,11 @@ OfertaCandidato oferta = bean.getOfertaCandidato();
 						value="<%= EscapaHTML.escapa(ModeloPlazaOfertada.CUATRIMESTRES.getOrDefault(oferta.getPlaza().getCuatrimestre(), oferta.getPlaza().getCuatrimestre())) %>"
 						readonly disabled/>
 			</div>
+			<div class="form-group">
+				<label for="plaza_curso" class="bold-label">Curso académico:</label>
+				<input class="form-input-custom" type="text" id="plaza_curso" value="<%= EscapaHTML.escapa(oferta.getPlaza().getCurso()) %>"
+						readonly disabled/>
+			</div>
 		</div>
 		<div class="form-group-container col2">
 			<div class="form-group">

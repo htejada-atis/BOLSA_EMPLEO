@@ -16,8 +16,9 @@ public class PlazaOfertada implements Serializable {
 	private String idPlaza;
 	private String justificacion;
 	private String duracionPrevista;
-	private String cuatrimestre;
 	private String centroDestino;
+	private String cuatrimestre;
+	private String curso;
 	private String estado;
 	private Date fechaCreacion;
 	private Date fechaAbierta;
@@ -251,11 +252,19 @@ public class PlazaOfertada implements Serializable {
 		this.activa = activa;
 	}
 	
+	public String getCurso() {
+		return curso;
+	}
+
+	public void setCurso(String curso) {
+		this.curso = curso;
+	}
+	
 	@Override
 	public String toString() {
 		return "PlazaOfertada [codNum=" + codNum + ", area=" + area + ", estado=" + estado + ", fechaCreacion=" + fechaCreacion + ", fechaAbierta=" 
 				+ fechaAbierta + ", fechaFinOferta=" + fechaFinOferta + ", fechaCerrada=" + fechaCerrada + ", fechaFinOferta=" + fechaFinOferta
-				+ ", abiertaVigente=" + abiertaVigente + ", idPlaza=" + idPlaza + ", activa=" + activa + "]";
+				+ ", abiertaVigente=" + abiertaVigente + ", idPlaza=" + idPlaza + ", activa=" + activa + ", curso=" + curso + "]";
 	}
 	
 	@Override
@@ -280,6 +289,7 @@ public class PlazaOfertada implements Serializable {
 		result = prime * result + ((abiertaVigente == null) ? 0 : abiertaVigente.hashCode());
 		result = prime * result + ((idPlaza == null) ? 0 : idPlaza.hashCode());
 		result = prime * result + ((activa == null) ? 0 : activa.hashCode());
+		result = prime * result + ((curso == null) ? 0 : curso.hashCode());
 		return result;
 	}
 
@@ -421,6 +431,13 @@ public class PlazaOfertada implements Serializable {
 				return false;
 			}
 		} else if (!activa.equals(other.activa)) {
+			return false;
+		}
+		if (curso == null) {
+			if (other.curso != null) {
+				return false;
+			}
+		} else if (!curso.equals(other.curso)) {
 			return false;
 		}
 		

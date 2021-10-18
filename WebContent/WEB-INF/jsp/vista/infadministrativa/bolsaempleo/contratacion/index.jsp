@@ -17,30 +17,33 @@ VistaContratacion bean = (VistaContratacion) uvdatos.getVistas().get(VistaContra
 	
 	<h2>Plazas ofertadas</h2>
 	
-	<button class="link-btn" id="nueva_plaza" style="float: right">
-		Nueva plaza
-	</button>
-	
-	<% if (bean.getUsuarioLogeado().isServicioPersonal()) { %>
-		<button class="link-btn" id="exportar_plazas" title="Exportar plazas ofertadas a csv">Exportar a csv</button>
-	<% } %>
+	<div style="display: flex; flex-direction: row-reverse; justify-content: space-between;">
+		<button class="link-btn" id="nueva_plaza" style="float: right; overflow: hidden;">
+			Nueva plaza
+		</button>
+		
+	<%	if (bean.getUsuarioLogeado().isServicioPersonal()) { %>
+			<button class="link-btn" id="exportar_plazas" title="Exportar plazas ofertadas a csv">Exportar a csv</button>
+	<%	} %>
+	</div>
 	
 	<table class="bluetable bolsaempleo" id="tablePlazasOfertadas">
 		<tr>
-			<th scope="col" style="width:20px">Id</th>
-			<th scope="col" style="width:46px">Código</th>
+			<th scope="col" style="width:18px">Id</th>
+			<th scope="col" style="width:52px">Código</th>
 			<th scope="col" style="width:100%">Área</th>
 			<th scope="col" style="width:88px">Estado</th>
-			<th scope="col" style="width:86px">Fecha creación</th>
-			<th scope="col" style="width:80px">Fecha abierta</th>
-			<th scope="col" style="width:88px">Fecha fin oferta</th>
-			<th scope="col" style="width:80px">Fecha cerrada</th>
+			<th scope="col" style="width:48px">Curso</th>
+			<th scope="col" style="width:61px">Fecha creación</th>
+			<th scope="col" style="width:61px">Fecha abierta</th>
+			<th scope="col" style="width:61px">Fecha fin oferta</th>
+			<th scope="col" style="width:61px">Fecha cerrada</th>
 		</tr>
 		<tbody>
 		</tbody>
 		<tfoot>
 			<tr>
-				<th colSpan="8" style="width:100%"></th>
+				<th colSpan="9" style="width:100%"></th>
 			</tr>
 		</tfoot>
 	</table>

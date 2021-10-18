@@ -37,10 +37,11 @@ public class ModeloPlazaOfertada {
 	public static final int ORDER_COLUMN_INDEX_ID_PLAZA = 1;
 	public static final int ORDER_COLUMN_INDEX_AREA = 2;
 	public static final int ORDER_COLUMN_INDEX_ESTADO = 3;
-	public static final int ORDER_COLUMN_INDEX_FECHA_CREACION = 4;
-	public static final int ORDER_COLUMN_INDEX_FECHA_ABIERTA = 5;
-	public static final int ORDER_COLUMN_INDEX_FECHA_FIN_OFERTA = 6;
-	public static final int ORDER_COLUMN_INDEX_FECHA_CERRADA = 7;
+	public static final int ORDER_COLUMN_INDEX_CURSO = 4;
+	public static final int ORDER_COLUMN_INDEX_FECHA_CREACION = 5;
+	public static final int ORDER_COLUMN_INDEX_FECHA_ABIERTA = 6;
+	public static final int ORDER_COLUMN_INDEX_FECHA_FIN_OFERTA = 7;
+	public static final int ORDER_COLUMN_INDEX_FECHA_CERRADA = 8;
 	
 	public static final int ORDER_COLUMN_INDEX_NIF_CANDIDATOS = 0;
 	public static final int ORDER_COLUMN_INDEX_NOMBRE_CANDIDATOS = 1;
@@ -75,6 +76,7 @@ public class ModeloPlazaOfertada {
 	public static final String CENTRO_DESTINO = "CENTRO_DESTINO";
 	public static final String CODNUM = "CODNUM";
 	public static final String CUATRIMESTRE = "CUATRIMESTRE";
+	public static final String CURSO = "CURSO";
 	public static final String DURACION_PREVISTA = "DURACION_PREVISTA";
 	public static final String ESTADO = "ESTADO";
 	public static final String FECHA_ABIERTA = "FECHA_ABIERTA";
@@ -110,6 +112,7 @@ public class ModeloPlazaOfertada {
 		ESTADOS.put(PLAZA_ESTADO_APROBACION, "Aprobación");
 	}
 	
+	public static final int COLUMN_CURSO_MAXLENGTH = 50;
 	public static final int COLUMN_DURACION_PREVISTA_MAXLENGTH = 100;
 	public static final int COLUMN_JUSTIFICACION_MAXLENGTH = 400;
 	
@@ -360,6 +363,26 @@ public class ModeloPlazaOfertada {
 		return rows;
 	}
 	
+	/** Devuelve el listado de cursos de las plazas ofertadas .
+	 * @return cursos .
+	 * @throws SQLException en caso de error de base de datos .
+	 */
+	public List<String> listadoCursosPlazasOfertadas() throws SQLException {
+		List<String> cursos = new ArrayList<>();
+		
+		String consulta = String.format("SELECT DISTINCT %s FROM TBEP_PLAZAS_OFERTADAS WHERE %s = 'S'", CURSO, FLGACTIVA);
+		
+		try (Connection conexion = ConexionUvirtual.obtenerInstancia(); PreparedStatement stmt = conexion.prepareStatement(consulta)) {
+			try (ResultSet rs = stmt.executeQuery()) {
+				while (rs.next()) {
+					cursos.add(rs.getString(CURSO));
+				}
+			}
+		}
+		
+		return cursos;
+	}
+	
 	/** Devuelve una plaza ofertada por el id .
 	 * @param codNum .
 	 * @return plaza ofertada .
@@ -419,12 +442,12 @@ public class ModeloPlazaOfertada {
 		String consulta = "";
 		
 		if (usuarioUpdate.isServicioPersonal()) {
-			consulta = String.format("INSERT INTO TBEP_PLAZAS_OFERTADAS (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?)",
+			consulta = String.format("INSERT INTO TBEP_PLAZAS_OFERTADAS (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?)",
 					BEPARE_CODNUM, JUSTIFICACION, CENTRO_DESTINO, FECHA_CREACION, "UID_USUARIO", BEPDED_CODNUM, CUATRIMESTRE, DURACION_PREVISTA, 
-					FECHA_FIN_OFERTA, ID_PLAZA, NRI, NRI_FECHA, HORARIO);
+					FECHA_FIN_OFERTA, ID_PLAZA, NRI, NRI_FECHA, HORARIO, CURSO);
 		} else {
-			consulta = String.format("INSERT INTO TBEP_PLAZAS_OFERTADAS (%s,%s,%s,%s,%s,%s) VALUES (?,?,?,?,?,?)", 
-					BEPARE_CODNUM, JUSTIFICACION, CENTRO_DESTINO, FECHA_CREACION, "UID_USUARIO", HORARIO);
+			consulta = String.format("INSERT INTO TBEP_PLAZAS_OFERTADAS (%s,%s,%s,%s,%s,%s,%s) VALUES (?,?,?,?,?,?,?)", 
+					BEPARE_CODNUM, JUSTIFICACION, CENTRO_DESTINO, FECHA_CREACION, "UID_USUARIO", HORARIO, CURSO);
 		}
 		
 		try (Connection conexion = ConexionUvirtual.obtenerInstancia(); PreparedStatement stmt = conexion.prepareStatement(consulta)) {
@@ -448,6 +471,7 @@ public class ModeloPlazaOfertada {
 				stmt.setDate(parameterIndex++, plaza.getNri() != null ? new Date(BolsaEmpleoUtils.getCurrentDateTime().getTime()) : null);
 			}
 			stmt.setBlob(parameterIndex++, plaza.getHorario());
+			stmt.setString(parameterIndex++, plaza.getCurso());
 			stmt.executeUpdate();
 		}
 	}
@@ -479,17 +503,17 @@ public class ModeloPlazaOfertada {
 		String consulta = "";
 		
 		if (usuarioUpdate.isServicioPersonal()) {
-			consulta = String.format("UPDATE TBEP_PLAZAS_OFERTADAS SET %s=?, %s=?, %s=?, %s=?, %s=?, %s=?, %s=?, %s=?, %s=? "
+			consulta = String.format("UPDATE TBEP_PLAZAS_OFERTADAS SET %s=?, %s=?, %s=?, %s=?, %s=?, %s=?, %s=?, %s=?, %s=?, %s=? "
 					+ (plaza.getNri() != null ? ", " + NRI + "=?, " + NRI_FECHA + "=?" : "")
 					+ (plaza.getHorario() != null ? ", " + HORARIO + "=?" : "")
 					+ " WHERE %s=?",
-					BEPARE_CODNUM, JUSTIFICACION, CENTRO_DESTINO, "UID_USUARIO", BEPDED_CODNUM, CUATRIMESTRE, DURACION_PREVISTA, 
+					BEPARE_CODNUM, JUSTIFICACION, CENTRO_DESTINO, "UID_USUARIO", CURSO, BEPDED_CODNUM, CUATRIMESTRE, DURACION_PREVISTA, 
 					FECHA_FIN_OFERTA, ID_PLAZA, CODNUM);
 		} else {
-			consulta = String.format("UPDATE TBEP_PLAZAS_OFERTADAS SET %s=?, %s=?, %s=?, %s=?"
+			consulta = String.format("UPDATE TBEP_PLAZAS_OFERTADAS SET %s=?, %s=?, %s=?, %s=?, %s=?"
 					+ (plaza.getHorario() != null ? ", " + HORARIO + "=?" : "")
 					+ " WHERE %s=?", 
-					BEPARE_CODNUM, JUSTIFICACION, CENTRO_DESTINO, "UID_USUARIO", CODNUM);
+					BEPARE_CODNUM, JUSTIFICACION, CENTRO_DESTINO, "UID_USUARIO", CURSO, CODNUM);
 		}
 		
 		try (Connection conexion = ConexionUvirtual.obtenerInstancia(); PreparedStatement stmt = conexion.prepareStatement(consulta)) {
@@ -498,6 +522,7 @@ public class ModeloPlazaOfertada {
 			stmt.setString(parameterIndex++, plaza.getJustificacion());
 			stmt.setString(parameterIndex++, plaza.getCentroDestino());
 			stmt.setString(parameterIndex++, usuarioUpdate.getCodCuenta());
+			stmt.setString(parameterIndex++, plaza.getCurso());
 			if (usuarioUpdate.isServicioPersonal()) {
 				if (plaza.getDedicacion() != null) {
 					stmt.setInt(parameterIndex++, plaza.getDedicacion().getCodNum());
@@ -779,6 +804,7 @@ public class ModeloPlazaOfertada {
 		dataTable.setColumn(ORDER_COLUMN_INDEX_ID_PLAZA, "bepplo.ID_PLAZA");
 		dataTable.setColumn(ORDER_COLUMN_INDEX_AREA, "bepare.DES_AREA_CONOCIMIENTO");
 		dataTable.setColumn(ORDER_COLUMN_INDEX_ESTADO, "bepplo.ESTADO", DataTableColumn.COLUMN_TYPE_EXACT);
+		dataTable.setColumn(ORDER_COLUMN_INDEX_CURSO, "bepplo.CURSO", DataTableColumn.COLUMN_TYPE_EXACT);
 		dataTable.setColumn(ORDER_COLUMN_INDEX_FECHA_CREACION, FECHA_CREACION, DataTableColumn.COLUMN_TYPE_DATE);
 		dataTable.setColumn(ORDER_COLUMN_INDEX_FECHA_ABIERTA, FECHA_ABIERTA, DataTableColumn.COLUMN_TYPE_DATE);
 		dataTable.setColumn(ORDER_COLUMN_INDEX_FECHA_FIN_OFERTA, FECHA_FIN_OFERTA, DataTableColumn.COLUMN_TYPE_DATE);
@@ -1071,6 +1097,7 @@ public class ModeloPlazaOfertada {
 		plaza.setFechaCerrada(rs.getDate(FECHA_CERRADA));
 		plaza.setFechaNRI(rs.getDate(NRI_FECHA));
 		plaza.setIdPlaza(rs.getString(ID_PLAZA));
+		plaza.setCurso(rs.getString(CURSO));
 		
 		if (withFiles) {
 			plaza.setHorario(rs.getBlob(HORARIO) != null ? rs.getBlob(HORARIO).getBinaryStream() : null);
