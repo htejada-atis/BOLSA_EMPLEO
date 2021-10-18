@@ -56,6 +56,11 @@ $(document).ready(function() {
 <%	for (Entry<String, String> est: ModeloPlazaOfertada.ESTADOS.entrySet()) { %>
 		estadosPlaza["<%= est.getKey() %>"] = "<%= est.getValue() %>";
 <%	} %>
+
+	var cursosPlaza = {};
+<%	for (String curso: bean.getCursos()) { %>
+		cursosPlaza["<%= curso %>"] = "<%= curso %>";
+<%	} %>
 	
 	var table = new Atis.DataTable('#tablePlazasOfertadas', {
 		"ajax": { url: "<%= ControladorContratacion.URL_PATTERN_AJAX %>" },
@@ -77,6 +82,7 @@ $(document).ready(function() {
 				return row.area.idAreaExterno + ' ' + row.area.descripcion;
 			}},
 			{'data': 'estado', 'filter': {'type': 'select', 'options': estadosPlaza}},
+			{'data': 'curso', 'filter': {'type': 'select', 'options': cursosPlaza}},
 			{'data': 'fechaCreacion', 'filter': {'type': 'date'}},
 			{'data': 'fechaAbierta', 'filter': {'type': 'date'}},
 			{'data': 'fechaFinOferta', 'filter': {'type': 'date'}},
