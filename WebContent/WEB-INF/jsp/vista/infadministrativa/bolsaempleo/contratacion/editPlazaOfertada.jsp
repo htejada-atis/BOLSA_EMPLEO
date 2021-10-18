@@ -27,16 +27,16 @@ boolean estadoAprobacion = plaza.getEstado().equals(ModeloPlazaOfertada.PLAZA_ES
 boolean estadoAbierta = plaza.getEstado().equals(ModeloPlazaOfertada.PLAZA_ESTADO_ABIERTA);
 boolean estadoContratacion = plaza.getEstado().equals(ModeloPlazaOfertada.PLAZA_ESTADO_CONTRATACION);
 boolean estadoCerrada = plaza.getEstado().equals(ModeloPlazaOfertada.PLAZA_ESTADO_CERRADA);
-
 boolean mostrarCandidatos = (estadoAbierta || estadoContratacion) && personal;
 boolean mostrarCandidatoContratado = !estadoCreacion && !estadoAprobacion && !estadoAbierta;
 boolean editable = estadoCreacion || (estadoAprobacion && personal);
 boolean extraRequeridos = !estadoCreacion;
 
-String codigo = BolsaEmpleoUtils.getParamForm(request, ControladorContratacion.PARAM_CODIGO, EscapaHTML.escapa(plaza.getIdPlaza()));
 String area = BolsaEmpleoUtils.getParamForm(request, ControladorContratacion.PARAM_AREA, plaza.getArea().getCodNum().toString());
-String cuatrimestre = BolsaEmpleoUtils.getParamForm(request, ControladorContratacion.PARAM_CUATRIMESTRE, plaza.getCuatrimestre());
 String centroDestino = BolsaEmpleoUtils.getParamForm(request, ControladorContratacion.PARAM_CENTRO_DESTINO, EscapaHTML.escapa(plaza.getCentroDestino()));
+String codigo = BolsaEmpleoUtils.getParamForm(request, ControladorContratacion.PARAM_CODIGO, EscapaHTML.escapa(plaza.getIdPlaza()));
+String cuatrimestre = BolsaEmpleoUtils.getParamForm(request, ControladorContratacion.PARAM_CUATRIMESTRE, plaza.getCuatrimestre());
+String curso = BolsaEmpleoUtils.getParamForm(request, ControladorContratacion.PARAM_CURSO, EscapaHTML.escapa(plaza.getCurso()));
 String dedicacion = BolsaEmpleoUtils.getParamForm(request, ControladorContratacion.PARAM_DEDICACION, plaza.getDedicacion() != null ? plaza.getDedicacion().getCodNum().toString() : "");
 String duracionPrevista = BolsaEmpleoUtils.getParamForm(request, ControladorContratacion.PARAM_DURACION_PREVISTA, EscapaHTML.escapa(plaza.getDuracionPrevista()));
 String fechaFinOferta = BolsaEmpleoUtils.getParamForm(request, ControladorContratacion.PARAM_FECHA_FIN_OFERTA, plaza.getFechaFinOferta() != null ? Formateador.formatoFecha(plaza.getFechaFinOferta(), Formateador.FORMATO_FECHA_DDMMYYYY) : "");
@@ -124,21 +124,25 @@ String justificacion = BolsaEmpleoUtils.getParamForm(request, ControladorContrat
 		</div>
 		<div class="form-group-container col2">
 			<div class="form-group">
+				<label for="plaza_curso">Curso académico:</label>
+				<input class="form-input-custom" type="text" name="<%=ControladorContratacion.PARAM_CURSO%>" id="plaza_curso" value="<%=curso%>" required <%= editable ? "" : "readonly disabled " %> pattern="\d{2}/\d{2}"/>
+			</div>
+			<div class="form-group">
 				<label for="plaza_duracion_prevista" <%= extraRequeridos ? "class='bold-label'" : "" %>>Duración prevista:</label>
 				<input class="form-input-custom" type="text" name="<%=ControladorContratacion.PARAM_DURACION_PREVISTA%>" id="plaza_duracion_prevista" 
-						value="<%=duracionPrevista%>" <%= editable ? "" : "readonly disabled " %> <%= extraRequeridos ? "required " : "" %>/>
+						value="<%=duracionPrevista%>" <%= editable && personal ? "" : "readonly disabled " %> <%= extraRequeridos ? "required " : "" %>/>
 			</div>
 		</div>
 		<div class="form-group-container col2">
 			<div class="form-group">
 				<label for="plaza_fecha_fin_oferta" <%= extraRequeridos ? "class='bold-label'" : "" %>>Fecha fin oferta:</label>
 				<input class="form-input-custom" name="<%=ControladorContratacion.PARAM_FECHA_FIN_OFERTA%>" id="plaza_fecha_fin_oferta" type="text" autocomplete="off" value="<%= fechaFinOferta %>"
-						<%= extraRequeridos ? "required " : "" %> <%= editable ? "" : "readonly disabled " %>/>
+						<%= extraRequeridos ? "required " : "" %> <%= editable && personal ? "" : "readonly disabled " %>/>
 			</div>
 			<div class="form-group">
 				<label for="plaza_hora_fin_oferta" <%= extraRequeridos ? "class='bold-label'" : "" %>>Hora fin oferta:</label>
 				<input class="form-input-custom" name="<%=ControladorContratacion.PARAM_HORA_FIN_OFERTA%>" id="plaza_hora_fin_oferta" type="text" autocomplete="off" value="<%= horaFinOferta %>"
-						<%= extraRequeridos ? "required " : "" %> <%= editable ? "" : "readonly disabled " %> placeholder="HH:MM:SS"/>
+						<%= extraRequeridos ? "required " : "" %> <%= editable && personal ? "" : "readonly disabled " %> placeholder="HH:MM:SS"/>
 			</div>
 		</div>
 		<div class="form-group-container col2">
