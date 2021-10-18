@@ -62,7 +62,7 @@ String justificacion = BolsaEmpleoUtils.getParamForm(request, ControladorContrat
 			<div class="form-group">
 				<label for="plaza_codigo" <%= extraRequeridos ? "class='bold-label'" : "" %>>Código:</label>
 				<input class="form-input-custom" type="text" name="<%=ControladorContratacion.PARAM_CODIGO%>" id="plaza_codigo" value="<%=codigo%>"
-						<%= editable ? "" : "readonly disabled " %>
+						<%= editable && personal ? "" : "readonly disabled " %>
 						<%= extraRequeridos ? "required " : "" %>/>
 			</div>
 		</div>
@@ -89,7 +89,7 @@ String justificacion = BolsaEmpleoUtils.getParamForm(request, ControladorContrat
 			<div class="form-group">
 				<label for="plaza_dedicacion" <%= extraRequeridos ? "class='bold-label'" : "" %>>Dedicación: </label>
 				<select id="plaza_dedicacion" name="<%=ControladorContratacion.PARAM_DEDICACION%>" style="width:100%;" 
-						<%= editable ? "" : "readonly disabled " %>
+						<%= editable && personal ? "" : "readonly disabled " %>
 						<%= extraRequeridos ? "required " : "" %>>
 					<option value="">----------------</option>
 				<%	if (plaza.getDedicacion() != null) { %>
@@ -107,7 +107,7 @@ String justificacion = BolsaEmpleoUtils.getParamForm(request, ControladorContrat
 			<div class="form-group">
 				<label for="plaza_cuatrimestre" <%= extraRequeridos ? "class='bold-label'" : "" %>>Cuatrimestre:</label>
 				<select id="plaza_cuatrimestre" name="<%=ControladorContratacion.PARAM_CUATRIMESTRE%>" style="width:100%;" 
-						<%= editable ? "" : "readonly disabled " %>
+						<%= editable && personal ? "" : "readonly disabled " %>
 						<%= extraRequeridos ? "required " : "" %>>
 					<option value="">----------------</option>
 				<%	for (Entry<String, String> cua: ModeloPlazaOfertada.CUATRIMESTRES.entrySet()) { %>
@@ -158,15 +158,15 @@ String justificacion = BolsaEmpleoUtils.getParamForm(request, ControladorContrat
 			<%	} %>
 			</div>
 		<%	if (bean.getUsuarioLogeado().isServicioPersonal()) { %>
-				<div class="form-file">
-					<label for="plaza_nri" style="margin-bottom: .5rem; width: 100%!important; text-align: left;">NRI:</label>
+				<div class="form-file" style="width: 100%!important">
+					<label for="plaza_nri" style="margin-bottom: .5rem; width: 100%!important; text-align: left;">NRI<%= plaza.getNri() != null ? " (última actualización: " + Formateador.formatoFecha(plaza.getFechaNRI(), Formateador.FORMATO_FECHA_DDMMYYYY) + ")" : "" %>:</label>
 			<%	if (editable) { %>
 					<input id="plaza_nri" type="file" name="<%= ControladorContratacion.PARAM_NRI %>"/>
 			<%	} %>
 			
 			<%	if (plaza.getNri() != null) { %>
 					<button id="plaza_descargar_nri" class="btn icon icon-download" title="Descargar nri de la plaza" type="button" 
-							style="margin-top: .5rem;padding: 1px 6px;">Descargar NRI</button>
+							style="margin-top: .5rem; padding: 1px 6px;">Descargar NRI</button>
 			<%	} %>
 				</div>
 		<%	} %>
