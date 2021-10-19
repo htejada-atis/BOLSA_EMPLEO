@@ -3,6 +3,7 @@
 <%@	page import="es.ujaen.uvirtual.modulo.bolsaempleo.controlador.ControladorContratacion" %>
 <%@	page import="es.ujaen.uvirtual.modulo.bolsaempleo.modelo.ModeloPlazaOfertada" %>
 <%@ page import="es.ujaen.uvirtual.modulo.bolsaempleo.vistas.VistaContratacion" %>
+<%@ page import="es.ujaen.uvirtual.modulo.bolsaempleo.utilidades.BolsaEmpleoUtils" %>
 <%@ page import="es.ujaen.uvirtual.utilidades.EscapaHTML" %>
 <%@ page import="es.ujaen.uvirtual.utilidades.Formateador" %>
 <%@ page import="java.util.Map.Entry" %>
@@ -65,13 +66,13 @@ $(document).ready(function() {
 	var table = new Atis.DataTable('#tablePlazasOfertadas', {
 		"ajax": { url: "<%= ControladorContratacion.URL_PATTERN_AJAX %>" },
 		"pageSize": 10,
-		"defaultOrderBy": 4,
+		"defaultOrderBy": 5,
 		"defaultOrderDirection": 'desc',
 		"filterable": true,
 		"action": "<%= ControladorContratacion.ACCION_DATATABLE_PLAZAS_OFERTADAS %>",
 		"clickable": {'onClick': function(row) {
 			var params = {
-					'a': '<%= ControladorContratacion.ACCION_SELECCIONAR_PLAZA_OFERTADA %>', 
+					'a': '<%= ControladorContratacion.ACCION_SELECCIONAR_PLAZA_OFERTADA %>',
 					'<%= ControladorContratacion.PARAM_PLAZA_OFERTADA %>': row.codNum};
 			Atis.sendForm("<%= request.getRequestURI() %>", params);
 		}},
@@ -82,7 +83,7 @@ $(document).ready(function() {
 				return row.area.idAreaExterno + ' ' + row.area.descripcion;
 			}},
 			{'data': 'estado', 'filter': {'type': 'select', 'options': estadosPlaza}},
-			{'data': 'curso', 'filter': {'type': 'select', 'options': cursosPlaza}},
+			{'data': 'curso', 'filter': {'type': 'select', 'options': cursosPlaza, 'optionDefault': '<%= bean.getCursos().get(0) %>'}},
 			{'data': 'fechaCreacion', 'filter': {'type': 'date'}},
 			{'data': 'fechaAbierta', 'filter': {'type': 'date'}},
 			{'data': 'fechaFinOferta', 'filter': {'type': 'date'}},

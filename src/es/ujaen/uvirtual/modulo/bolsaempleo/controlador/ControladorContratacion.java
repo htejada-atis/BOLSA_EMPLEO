@@ -4,6 +4,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.PrintWriter;
+import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.util.Date;
 import java.util.HashMap;
@@ -27,6 +28,7 @@ import es.ujaen.uvirtual.beans.UVDatos;
 import es.ujaen.uvirtual.modulo.bolsaempleo.beans.Bolsa;
 import es.ujaen.uvirtual.modulo.bolsaempleo.beans.CandidatoEstado;
 import es.ujaen.uvirtual.modulo.bolsaempleo.beans.Contratacion;
+import es.ujaen.uvirtual.modulo.bolsaempleo.beans.Mensaje;
 import es.ujaen.uvirtual.modulo.bolsaempleo.beans.OfertaCandidato;
 import es.ujaen.uvirtual.modulo.bolsaempleo.beans.ParametrosConfiguracion;
 import es.ujaen.uvirtual.modulo.bolsaempleo.beans.PlazaOfertada;
@@ -38,8 +40,10 @@ import es.ujaen.uvirtual.modulo.bolsaempleo.modelo.ModeloConvocatoria;
 import es.ujaen.uvirtual.modulo.bolsaempleo.modelo.ModeloDedicacion;
 import es.ujaen.uvirtual.modulo.bolsaempleo.modelo.ModeloEstadoCandidato;
 import es.ujaen.uvirtual.modulo.bolsaempleo.modelo.ModeloEvaluador;
+import es.ujaen.uvirtual.modulo.bolsaempleo.modelo.ModeloMensajes;
 import es.ujaen.uvirtual.modulo.bolsaempleo.modelo.ModeloOfertaCandidato;
 import es.ujaen.uvirtual.modulo.bolsaempleo.modelo.ModeloParametrosConfiguracion;
+import es.ujaen.uvirtual.modulo.bolsaempleo.modelo.ModeloPlantilla;
 import es.ujaen.uvirtual.modulo.bolsaempleo.modelo.ModeloPlazaOfertada;
 import es.ujaen.uvirtual.modulo.bolsaempleo.modelo.ModeloRol;
 import es.ujaen.uvirtual.modulo.bolsaempleo.modelo.ModeloUsuarioBolsaEmpleo;
@@ -586,12 +590,21 @@ public class ControladorContratacion extends HttpServlet {
 	private void aprobacionPlaza(VistaContratacion bean, UVDatos datos, HttpServletRequest request, HttpServletResponse response)
 			throws SQLException, UVException, IOException {
 		ModeloPlazaOfertada modeloPlaza = ModeloPlazaOfertada.obtenerInstancia();
+		ModeloUsuarioBolsaEmpleo modeloUsuario = ModeloUsuarioBolsaEmpleo.obtenerInstancia();
 		
-		if (!bean.getPlazaOfertada().getEstado().equals(ModeloPlazaOfertada.PLAZA_ESTADO_CREACION)) {
+		PlazaOfertada plaza = bean.getPlazaOfertada();
+		
+		if (!plaza.getEstado().equals(ModeloPlazaOfertada.PLAZA_ESTADO_CREACION)) {
 			throw new UVException(MENSAJE_ERROR_ESTADO_CREACION_REQUERIDO);
 		}
 		
-		modeloPlaza.cambiarEstadoPlazaAAprobacion(bean.getPlazaOfertada(), bean.getUsuarioLogeado());
+		UsuarioBolsaEmpleo usuario = modeloUsuario.compruebaUsuarioByCodCuenta(plaza.getUidUsuario());
+		
+		if (usuario != null && usuario.isDirectorDepartamento()) {
+			modeloPlaza.crearMensajeAprobacionPlaza(plaza, usuario, bean.getUsuarioLogeado());
+		}
+		
+		modeloPlaza.cambiarEstadoPlazaAAprobacion(plaza, bean.getUsuarioLogeado());
 		
 		BolsaEmpleoUtils.addMensajeDeExito(MENSAJE_EXITO_APROBACION_PLAZA, bean, request);
 		redireccionConPlazaSeleccionada(bean, datos, request, response, ACCION_SELECCIONAR_PLAZA_OFERTADA);

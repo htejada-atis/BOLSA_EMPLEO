@@ -25,6 +25,7 @@ public class PlazaOfertada implements Serializable {
 	private Date fechaFinOferta;
 	private Date fechaCerrada;
 	private Date fechaNRI;
+	private String uidUsuario;
 	private transient InputStream horario;
 	private transient InputStream nri;
 	private Boolean abiertaVigente;
@@ -231,7 +232,7 @@ public class PlazaOfertada implements Serializable {
 	public Boolean isAbiertaVigente() {
 		return abiertaVigente;
 	}
-
+	
 	public void setAbiertaVigente(Boolean abiertaVigente) {
 		this.abiertaVigente = abiertaVigente;
 	}
@@ -239,7 +240,7 @@ public class PlazaOfertada implements Serializable {
 	public String getIdPlaza() {
 		return idPlaza;
 	}
-
+	
 	public void setIdPlaza(String idPlaza) {
 		this.idPlaza = idPlaza;
 	}
@@ -247,7 +248,7 @@ public class PlazaOfertada implements Serializable {
 	public Boolean isActiva() {
 		return activa;
 	}
-
+	
 	public void setActiva(Boolean activa) {
 		this.activa = activa;
 	}
@@ -255,16 +256,24 @@ public class PlazaOfertada implements Serializable {
 	public String getCurso() {
 		return curso;
 	}
-
+	
 	public void setCurso(String curso) {
 		this.curso = curso;
+	}
+	
+	public String getUidUsuario() {
+		return uidUsuario;
+	}
+	
+	public void setUidUsuario(String uidUsuario) {
+		this.uidUsuario = uidUsuario;
 	}
 	
 	@Override
 	public String toString() {
 		return "PlazaOfertada [codNum=" + codNum + ", area=" + area + ", estado=" + estado + ", fechaCreacion=" + fechaCreacion + ", fechaAbierta=" 
 				+ fechaAbierta + ", fechaFinOferta=" + fechaFinOferta + ", fechaCerrada=" + fechaCerrada + ", fechaFinOferta=" + fechaFinOferta
-				+ ", abiertaVigente=" + abiertaVigente + ", idPlaza=" + idPlaza + ", activa=" + activa + ", curso=" + curso + "]";
+				+ ", abiertaVigente=" + abiertaVigente + ", idPlaza=" + idPlaza + ", activa=" + activa + ", curso=" + curso + ", uidUsuario=" + uidUsuario + "]";
 	}
 	
 	@Override
@@ -290,6 +299,7 @@ public class PlazaOfertada implements Serializable {
 		result = prime * result + ((idPlaza == null) ? 0 : idPlaza.hashCode());
 		result = prime * result + ((activa == null) ? 0 : activa.hashCode());
 		result = prime * result + ((curso == null) ? 0 : curso.hashCode());
+		result = prime * result + ((uidUsuario == null) ? 0 : uidUsuario.hashCode());
 		return result;
 	}
 
@@ -438,6 +448,13 @@ public class PlazaOfertada implements Serializable {
 				return false;
 			}
 		} else if (!curso.equals(other.curso)) {
+			return false;
+		}
+		if (uidUsuario == null) {
+			if (other.uidUsuario != null) {
+				return false;
+			}
+		} else if (!uidUsuario.equals(other.uidUsuario)) {
 			return false;
 		}
 		
