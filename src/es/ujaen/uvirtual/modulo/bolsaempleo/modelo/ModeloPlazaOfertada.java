@@ -66,6 +66,8 @@ public class ModeloPlazaOfertada {
 	public static final String MENSAJE_ERROR_PLAZA_OFERTADA_ID_NO_EXISTE = "No existe la plaza ofertada con el id indicando";
 	public static final String MENSAJE_ERROR_NO_HAY_DESTINATARIOS_DISPONIBLES = "No hay candidatos disponibles para la plaza";
 	public static final String MENSAJE_ERROR_PLANTILLA_APERTURA_PLAZA_NO_EXISTE = "La plantilla de apertura de plaza no existe";
+	public static final String MENSAJE_ERROR_PLANTILLA_APROBACION_PLAZA_NO_EXISTE = "La plantilla de aprobación de plaza no existe";
+	public static final String MENSAJE_ERROR_PLANTILLA_CIERRE_PLAZA_NO_EXISTE = "La plantilla de cierre de plaza no existe";
 	
 	public static final String ABIERTA_VIGENTE = "ABIERTA_VIGENTE";
 	public static final String BEPARE_CODNUM = "BEPARE_CODNUM";
@@ -90,6 +92,7 @@ public class ModeloPlazaOfertada {
 	public static final String NRI = "NRI";
 	public static final String NRI_FECHA = "NRI_FECHA";
 	public static final String OBSERVACIONES_INTERNAS = "OBSERVACIONES_INTERNAS";
+	public static final String UID_USUARIO = "UID_USUARIO";
 	
 	private static final String ACTIVA = "S";
 	private static final String INACTIVA = "N";
@@ -372,7 +375,7 @@ public class ModeloPlazaOfertada {
 	public List<String> listadoCursosPlazasOfertadas() throws SQLException {
 		List<String> cursos = new ArrayList<>();
 		
-		String consulta = String.format("SELECT DISTINCT %s FROM TBEP_PLAZAS_OFERTADAS WHERE %s = 'S'", CURSO, FLGACTIVA);
+		String consulta = String.format("SELECT DISTINCT %s FROM TBEP_PLAZAS_OFERTADAS WHERE %s = 'S' ORDER BY %s DESC", CURSO, FLGACTIVA, CURSO);
 		
 		try (Connection conexion = ConexionUvirtual.obtenerInstancia(); PreparedStatement stmt = conexion.prepareStatement(consulta)) {
 			try (ResultSet rs = stmt.executeQuery()) {
@@ -926,7 +929,7 @@ public class ModeloPlazaOfertada {
 				try (PreparedStatement stmt = conexion.prepareStatement(consultaSelectPlantilla)) {
 					try (ResultSet rs = stmt.executeQuery()) {
 						if (!rs.next()) {
-							throw new UVException(MENSAJE_ERROR_PLANTILLA_APERTURA_PLAZA_NO_EXISTE);
+							throw new UVException(MENSAJE_ERROR_PLANTILLA_CIERRE_PLAZA_NO_EXISTE);
 						}
 						
 						plantilla = modeloPlantilla.createPlantillaFromResultSet(rs);
@@ -1074,6 +1077,64 @@ public class ModeloPlazaOfertada {
 		}
 	}
 	
+	/** Método para crear un mensaje de aprobación de una plaza y ponerlo como pendiente de envío para el director que creó la plaza .
+	 * @param plaza .
+	 * @param director .
+	 * @param usuarioUpdate .
+	 * @throws SQLException .
+	 * @throws UVException .
+	 * @throws IOException .
+	 */
+	public void crearMensajeAprobacionPlaza(PlazaOfertada plaza, UsuarioBolsaEmpleo director, UsuarioBolsaEmpleo usuarioUpdate)
+			throws SQLException, UVException, IOException {
+		ModeloPlantilla modeloPlantilla = ModeloPlantilla.obtenerInstancia();
+		
+		try (Connection conexion = ConexionUvirtual.obtenerInstancia()) {
+			conexion.setAutoCommit(false);
+			
+			try {
+				Plantilla plantilla = new Plantilla();
+				
+				// Obtenemos la plantilla de la apertura de la plaza si existe
+				String consultaSelectPlantilla = "SELECT beppls.* FROM TBEP_PLANTILLAS beppls"
+						+ " INNER JOIN TBEP_PARAMETROS_CONFIG beppac ON beppac.VALOR = beppls.CODNUM"
+						+ " WHERE beppac.NOMBRE = '" + ModeloParametrosConfiguracion.PARAMETRO_PLANTILLA_APROBACION_PLAZA + "'";
+				
+				try (PreparedStatement stmt = conexion.prepareStatement(consultaSelectPlantilla)) {
+					try (ResultSet rs = stmt.executeQuery()) {
+						if (!rs.next()) {
+							throw new UVException(MENSAJE_ERROR_PLANTILLA_APROBACION_PLAZA_NO_EXISTE);
+						}
+						
+						plantilla = modeloPlantilla.createPlantillaFromResultSet(rs);
+					}
+				}
+		
+				Mensaje mensaje = new Mensaje(modeloPlantilla.reemplazaPlazaEnPlantilla(plaza, plantilla.getTitulo(), false), 
+						modeloPlantilla.reemplazaPlazaYUsuarioEnPlantilla(plaza, director, plantilla.getCuerpo(), true),
+						BolsaEmpleoUtils.getCurrentDateTime(), ModeloMensajes.MENSAJE_ESTADO_BORRADOR);
+				
+				int idMensaje = ModeloMensajes.obtenerInstancia().nuevoMensajeConexion(mensaje, usuarioUpdate, conexion);
+				
+				String consultaInsertDest = String.format("INSERT INTO TBEP_MEN_DESTINATARIOS (%s, %s, %s) VALUES (?, ?, ?)", 
+						"BEPMEN_CODNUM", "BEPUSU_CODNUM", "UID_USUARIO");
+				try (PreparedStatement stmt = conexion.prepareStatement(consultaInsertDest)) {
+					int parameterIndex = 1;
+					stmt.setInt(parameterIndex++, idMensaje);
+					stmt.setInt(parameterIndex++, director.getCodNum());
+					stmt.setString(parameterIndex++, usuarioUpdate.getCodCuenta());
+					stmt.executeUpdate();
+				}
+				conexion.commit();
+			} catch (Exception e) {
+				conexion.rollback();
+				throw e;
+			} finally {
+				conexion.setAutoCommit(true);
+			}
+		}
+	}
+	
 	/** Método para crear una plaza ofertada de un resultset.
 	 * @param rs .
 	 * @param withFiles .
@@ -1100,6 +1161,7 @@ public class ModeloPlazaOfertada {
 		plaza.setFechaNRI(rs.getDate(NRI_FECHA));
 		plaza.setIdPlaza(rs.getString(ID_PLAZA));
 		plaza.setCurso(rs.getString(CURSO));
+		plaza.setUidUsuario(rs.getString(UID_USUARIO));
 		
 		if (withFiles) {
 			plaza.setHorario(rs.getBlob(HORARIO) != null ? rs.getBlob(HORARIO).getBinaryStream() : null);
