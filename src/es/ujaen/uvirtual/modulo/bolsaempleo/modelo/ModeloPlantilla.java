@@ -247,7 +247,8 @@ public class ModeloPlantilla {
 		texto = texto.replaceAll(left + "hora_fin_oferta" + right, Formateador.formatoFecha(plaza.getFechaFinOferta(), Formateador.FORMATO_FECHA_HORA_MINUTOS));
 		texto = texto.replaceAll(left + "fecha_fin_oferta" + right, Formateador.formatoFecha(plaza.getFechaFinOferta(), Formateador.FORMATO_FECHA_DDMMYYYY));
 		texto = texto.replaceAll(left + "fecha_creacion" + right, Formateador.formatoFecha(plaza.getFechaCreacion(), Formateador.FORMATO_FECHA_DDMMYYYY_HHMMSS));
-		texto = texto.replaceAll(left + "fecha_aprobacion" + right, Formateador.formatoFecha(BolsaEmpleoUtils.getCurrentDate(), Formateador.FORMATO_FECHA_DDMMYYYY_HHMMSS));
+		texto = texto.replaceAll(left + "fecha_aprobacion" + right, 
+				Formateador.formatoFecha(BolsaEmpleoUtils.getCurrentDateTime(), Formateador.FORMATO_FECHA_DDMMYYYY_HHMMSS));
 		return texto;
 	}
 	
