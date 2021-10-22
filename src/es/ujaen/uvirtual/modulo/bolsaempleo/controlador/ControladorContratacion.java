@@ -592,7 +592,6 @@ public class ControladorContratacion extends HttpServlet {
 	private void aprobacionPlaza(VistaContratacion bean, UVDatos datos, HttpServletRequest request, HttpServletResponse response)
 			throws SQLException, UVException, IOException {
 		ModeloPlazaOfertada modeloPlaza = ModeloPlazaOfertada.obtenerInstancia();
-		ModeloUsuarioBolsaEmpleo modeloUsuario = ModeloUsuarioBolsaEmpleo.obtenerInstancia();
 		
 		PlazaOfertada plaza = bean.getPlazaOfertada();
 		
@@ -600,10 +599,8 @@ public class ControladorContratacion extends HttpServlet {
 			throw new UVException(MENSAJE_ERROR_ESTADO_CREACION_REQUERIDO);
 		}
 		
-		UsuarioBolsaEmpleo usuario = modeloUsuario.compruebaUsuarioByCodCuenta(plaza.getUidUsuario());
-		
-		if (usuario != null && usuario.isDirectorDepartamento()) {
-			modeloPlaza.crearMensajeAprobacionPlaza(plaza, usuario, bean.getUsuarioLogeado());
+		if (plaza.getCreador() != null && plaza.getCreador().isDirectorDepartamento()) {
+			modeloPlaza.crearMensajeAprobacionPlaza(plaza, plaza.getCreador(), bean.getUsuarioLogeado());
 		}
 		
 		modeloPlaza.cambiarEstadoPlazaAAprobacion(plaza, bean.getUsuarioLogeado());

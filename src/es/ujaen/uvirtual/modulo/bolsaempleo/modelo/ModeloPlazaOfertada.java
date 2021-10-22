@@ -72,6 +72,7 @@ public class ModeloPlazaOfertada {
 	public static final String ABIERTA_VIGENTE = "ABIERTA_VIGENTE";
 	public static final String BEPARE_CODNUM = "BEPARE_CODNUM";
 	public static final String BEPDED_CODNUM = "BEPDED_CODNUM";
+	public static final String BEPUSU_CODNUM = "BEPUSU_CODNUM";
 	public static final String CANDIDATOS_CITADOS = "CANDIDATOS_CITADOS";
 	public static final String CANDIDATOS_DISPONIBLES = "CANDIDATOS_DISPONIBLES";
 	public static final String CANDIDATOS_INTERESADOS = "CANDIDATOS_INTERESADOS";
@@ -92,7 +93,6 @@ public class ModeloPlazaOfertada {
 	public static final String NRI = "NRI";
 	public static final String NRI_FECHA = "NRI_FECHA";
 	public static final String OBSERVACIONES_INTERNAS = "OBSERVACIONES_INTERNAS";
-	public static final String UID_USUARIO = "UID_USUARIO";
 	
 	private static final String ACTIVA = "S";
 	private static final String INACTIVA = "N";
@@ -163,7 +163,7 @@ public class ModeloPlazaOfertada {
 		try (Connection conexion = ConexionUvirtual.obtenerInstancia(); PreparedStatement stmt = conexion.prepareStatement(consulta)) {
 			try (ResultSet rs = stmt.executeQuery()) {
 				while (rs.next()) {
-					plazasOfertadas.add(createPlazaOfertadaFromResultSet(rs, false, true));
+					plazasOfertadas.add(createPlazaOfertadaFromResultSet(rs, false, true, false));
 				}
 			}
 		}
@@ -251,7 +251,7 @@ public class ModeloPlazaOfertada {
 				});
 				
 				while (rs.next()) {
-					PlazaOfertada plaza = this.createPlazaOfertadaFromResultSet(rs, false, false);
+					PlazaOfertada plaza = this.createPlazaOfertadaFromResultSet(rs, false, false, false);
 					
 					rows.add(new String[] {
 						String.valueOf(plaza.getCodNum()),
@@ -417,7 +417,7 @@ public class ModeloPlazaOfertada {
 					throw new UVException(MENSAJE_ERROR_PLAZA_OFERTADA_ID_NO_EXISTE);
 				}
 				
-				return createPlazaOfertadaFromResultSet(rs, true, true);
+				return createPlazaOfertadaFromResultSet(rs, true, true, true);
 			}
 		}
 	}
@@ -449,12 +449,12 @@ public class ModeloPlazaOfertada {
 		String consulta = "";
 		
 		if (usuarioUpdate.isServicioPersonal()) {
-			consulta = String.format("INSERT INTO TBEP_PLAZAS_OFERTADAS (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?)",
+			consulta = String.format("INSERT INTO TBEP_PLAZAS_OFERTADAS (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)",
 					BEPARE_CODNUM, JUSTIFICACION, CENTRO_DESTINO, FECHA_CREACION, "UID_USUARIO", BEPDED_CODNUM, CUATRIMESTRE, DURACION_PREVISTA, 
-					FECHA_FIN_OFERTA, ID_PLAZA, NRI, NRI_FECHA, HORARIO, CURSO);
+					FECHA_FIN_OFERTA, ID_PLAZA, NRI, NRI_FECHA, HORARIO, CURSO, BEPUSU_CODNUM);
 		} else {
-			consulta = String.format("INSERT INTO TBEP_PLAZAS_OFERTADAS (%s,%s,%s,%s,%s,%s,%s) VALUES (?,?,?,?,?,?,?)", 
-					BEPARE_CODNUM, JUSTIFICACION, CENTRO_DESTINO, FECHA_CREACION, "UID_USUARIO", HORARIO, CURSO);
+			consulta = String.format("INSERT INTO TBEP_PLAZAS_OFERTADAS (%s,%s,%s,%s,%s,%s,%s,%s) VALUES (?,?,?,?,?,?,?,?)", 
+					BEPARE_CODNUM, JUSTIFICACION, CENTRO_DESTINO, FECHA_CREACION, "UID_USUARIO", HORARIO, CURSO, BEPUSU_CODNUM);
 		}
 		
 		try (Connection conexion = ConexionUvirtual.obtenerInstancia(); PreparedStatement stmt = conexion.prepareStatement(consulta)) {
@@ -479,6 +479,7 @@ public class ModeloPlazaOfertada {
 			}
 			stmt.setBlob(parameterIndex++, plaza.getHorario());
 			stmt.setString(parameterIndex++, plaza.getCurso());
+			stmt.setInt(parameterIndex++, usuarioUpdate.getCodNum());
 			stmt.executeUpdate();
 		}
 	}
@@ -831,7 +832,7 @@ public class ModeloPlazaOfertada {
 			
 			try (ResultSet rs = stmt.executeQuery()) {
 				while (rs.next()) {
-					rows.add(createPlazaOfertadaFromResultSet(rs, false, true));
+					rows.add(createPlazaOfertadaFromResultSet(rs, false, true, false));
 				}
 			}
 			
@@ -1141,11 +1142,13 @@ public class ModeloPlazaOfertada {
 	 * @param rs .
 	 * @param withFiles .
 	 * @param withAbiertaVigente .
+	 * @param withCreador .
 	 * @return plaza ofertada .
 	 * @throws SQLException .
 	 * @throws UVException .
 	 */
-	public PlazaOfertada createPlazaOfertadaFromResultSet(ResultSet rs, Boolean withFiles, Boolean withAbiertaVigente) throws SQLException, UVException {
+	public PlazaOfertada createPlazaOfertadaFromResultSet(ResultSet rs, Boolean withFiles, Boolean withAbiertaVigente, Boolean withCreador)
+			throws SQLException, UVException {
 		PlazaOfertada plaza = new PlazaOfertada();
 		
 		plaza.setCodNum(rs.getInt(CODNUM));
@@ -1163,7 +1166,10 @@ public class ModeloPlazaOfertada {
 		plaza.setFechaNRI(rs.getDate(NRI_FECHA));
 		plaza.setIdPlaza(rs.getString(ID_PLAZA));
 		plaza.setCurso(rs.getString(CURSO));
-		plaza.setUidUsuario(rs.getString(UID_USUARIO));
+		
+		if (withCreador) {
+			plaza.setCreador(rs.getInt(BEPUSU_CODNUM) != 0 ? ModeloUsuarioBolsaEmpleo.obtenerInstancia().getUsuarioById(rs.getInt(BEPUSU_CODNUM)) : null);
+		}
 		
 		if (withFiles) {
 			plaza.setHorario(rs.getBlob(HORARIO) != null ? rs.getBlob(HORARIO).getBinaryStream() : null);
