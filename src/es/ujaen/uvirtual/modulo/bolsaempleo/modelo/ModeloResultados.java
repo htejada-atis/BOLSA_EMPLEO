@@ -110,10 +110,9 @@ public class ModeloResultados {
 	 * @param solicitud .
 	 * @param bolsa .
 	 * @throws SQLException en caso de error de base de datos .
-	 * @throws IOException .
 	 * @throws UVException .
 	 */
-	public void calcularSolicitud(Solicitud solicitud, Bolsa bolsa) throws SQLException, UVException, IOException {
+	public void calcularSolicitud(Solicitud solicitud, Bolsa bolsa) throws SQLException, UVException {
 		Double totalSinAplicar = 0.0;
 		
 		LOGGER.log(Level.FINER, String.format("CALCULANDO SOLICITUD [%d] [%d]", solicitud.getCodNum(), solicitud.getUsuario().getCodNum()));
@@ -161,6 +160,7 @@ public class ModeloResultados {
 	 * @throws SQLException en caso de error de base de datos .
 	 * @throws UVException .
 	 */
+	@SuppressWarnings({"checkstyle:CyclomaticComplexity", "checkstyle:ExecutableStatementCount"})
 	private Double calcularMerito(MeritoResultado merito, Map.Entry<MeritoPreferente, Double> preferente) throws SQLException, UVException {
 		Double puntuacion = 0.0;
 		String desglose = "";
@@ -458,7 +458,7 @@ public class ModeloResultados {
 	public List<MeritoResultado> getMeritosSolicitudBolsaValidados(Solicitud solicitud, Bolsa bolsa) throws SQLException, UVException {
 		List<MeritoResultado> meritos = new ArrayList<>();
 		
-		String consulta = this.getMeritosSolicitudBolsaQueryBase(solicitud, bolsa)
+		String consulta = this.getMeritosSolicitudBolsaQueryBase()
 				+ " AND bepsbm.FLGVALIDADO = 'S'"
 				+ " AND bepsbm.FLGEXCLUIDO = 'N'";
 		
@@ -487,7 +487,7 @@ public class ModeloResultados {
 	public List<MeritoResultado> getMeritosSolicitudBolsaExcluidos(Solicitud solicitud, Bolsa bolsa) throws SQLException, UVException {
 		List<MeritoResultado> meritos = new ArrayList<>();
 		
-		String consulta = this.getMeritosSolicitudBolsaQueryBase(solicitud, bolsa)
+		String consulta = this.getMeritosSolicitudBolsaQueryBase()
 				+ " AND bepsbm.FLGVALIDADO = 'N'"
 				+ " AND bepsbm.FLGEXCLUIDO = 'S'";
 		
@@ -516,7 +516,7 @@ public class ModeloResultados {
 	public List<MeritoResultado> getMeritosSolicitudBolsaNoEvaluados(Solicitud solicitud, Bolsa bolsa) throws SQLException, UVException {
 		List<MeritoResultado> meritos = new ArrayList<>();
 		
-		String consulta = this.getMeritosSolicitudBolsaQueryBase(solicitud, bolsa)
+		String consulta = this.getMeritosSolicitudBolsaQueryBase()
 				+ " AND bepsbm.FLGVALIDADO = 'N'"
 				+ "AND bepsbm.FLGEXCLUIDO = 'N'";
 		
@@ -540,30 +540,27 @@ public class ModeloResultados {
 	 * 	- getMeritosSolicitudBolsaValidados
 	 *  - getMeritosSolicitudBolsaExcluidos
 	 *  - getMeritosSolicitudBolsaNoEvaluados
-	 *  
-	 * @param solicitud .
-	 * @param bolsa .
 	 * @return .
 	 * @throws SQLException .
 	 * @throws UVException .
 	 */
-	private String getMeritosSolicitudBolsaQueryBase(Solicitud solicitud, Bolsa bolsa) throws SQLException, UVException {
+	private String getMeritosSolicitudBolsaQueryBase() {
 		return ""
 				+ "	SELECT bepmer.CODNUM, bepmer.BEPITE_CODNUM AS BEPITE_CODNUM, bepmer.VALOR, bepmer.DESCRIPCION, bepmer.OBSERVACION"
-				+ "		, bepsbm.CODNUM AS " + CODNUM_MERITO_SOLICITUD + ", bepsbm.VALOR AS " + VALOR_MERITO_SOLICITUD
-				+ "		, bepsbm.OBSERVACION_CANDIDATO, bepsbm.RESULTADO, bepsbm.DESGLOSE, bepsbm.FLGEXCLUIDO, bepsbm.FLGVALIDADO"
-				+ "		, bepsbm.BEPITE_CODNUM AS ITEM_SBM"
+				+ "     , bepsbm.CODNUM AS " + CODNUM_MERITO_SOLICITUD + ", bepsbm.VALOR AS " + VALOR_MERITO_SOLICITUD
+				+ "     , bepsbm.OBSERVACION_CANDIDATO, bepsbm.RESULTADO, bepsbm.DESGLOSE, bepsbm.FLGEXCLUIDO, bepsbm.FLGVALIDADO"
+				+ "     , bepsbm.BEPITE_CODNUM AS ITEM_SBM"
 				+ "     , bepsol.BEPUSU_CODNUM AS USUARIO_CODNUM"
 				+ " FROM TBEP_SOL_BOL_MERITOS bepsbm"
-				+ "	INNER JOIN TBEP_SOLICITUD_BOLSAS bepsbo ON bepsbo.CODNUM  = bepsbm.BEPSBO_CODNUM"
+				+ " INNER JOIN TBEP_SOLICITUD_BOLSAS bepsbo ON bepsbo.CODNUM  = bepsbm.BEPSBO_CODNUM"
 				+ " INNER JOIN TBEP_SOLICITUDES bepsol ON bepsol.CODNUM = bepsbo.BEPSOL_CODNUM"
 				+ " INNER JOIN TBEP_MERITOS bepmer ON bepmer.CODNUM = bepsbm.BEPMER_CODNUM"
 				+ " INNER JOIN TBEP_ITEMSBAREMACION bepite ON bepite.CODNUM = bepmer.BEPITE_CODNUM"
 				+ " INNER JOIN TBEP_BLOQUESBAREMACION bepblo ON bepblo.CODNUM = bepite.BEPBLO_CODNUM"
-				+ " INNER JOIN TBEP_APARTADOSBAREMACION bepapa ON bepapa.CODNUM  = bepblo.BEPAPA_CODNUM"				
-				+ "	WHERE "
-				+ "			bepsbo.BEPBOL_CODNUM = ?"
-				+ "		AND bepsbo.BEPSOL_CODNUM = ?";
+				+ " INNER JOIN TBEP_APARTADOSBAREMACION bepapa ON bepapa.CODNUM  = bepblo.BEPAPA_CODNUM"
+				+ " WHERE "
+				+ "         bepsbo.BEPBOL_CODNUM = ?"
+				+ "     AND bepsbo.BEPSOL_CODNUM = ?";
 	}
 	
 	/** 
@@ -673,6 +670,8 @@ public class ModeloResultados {
 	 * @param solicitud .
 	 * @param usuarioUpdate .
 	 * @param fechaActual .
+	 * @param listaTitulaciones .
+	 * @param listaAcreditaciones .
 	 * @throws UVException .
 	 * @throws SQLException .
 	 */
@@ -702,8 +701,8 @@ public class ModeloResultados {
 			Clob clobTitulaciones = conexion.createClob();
 			String titulaciones = "";
 			for (TitulacionUsuario titulacion: listaTitulaciones) {
-				titulaciones += titulacion.getCodNum() + " (Id) - " 
-					+ (titulacion.getTitulacion() != null ? titulacion.getTitulacion().getNombre() : "Otra titulación: " + titulacion.getOtraTitulacion()) + "\n";
+				titulaciones += titulacion.getCodNum() + " (Id) - " + (titulacion.getTitulacion() != null ? titulacion.getTitulacion().getNombre()
+							: "Otra titulación: " + titulacion.getOtraTitulacion()) + "\n";
 			}
 			clobTitulaciones.setString(1, titulaciones);
 			stmt.setClob(indexParam++, clobTitulaciones);
@@ -791,11 +790,10 @@ public class ModeloResultados {
 	/** Crea una bolsa resultado a partir de un resultset .
 	 * @param rs .
 	 * @return .
-	 * @throws IOException .
 	 * @throws SQLException .
 	 * @throws UVException .
 	 */
-	public BolsaResultado createBolsaResultadoFromResultset(ResultSet rs) throws SQLException, UVException, IOException {
+	public BolsaResultado createBolsaResultadoFromResultset(ResultSet rs) throws SQLException, UVException {
 		Bolsa bol = ModeloBolsa.obtenerInstancia().getBolsaById(rs.getInt(BEPBOL_CODNUM));
 		String desgloseTotal = rs.getString(DESGLOSETOTAL);
 		String desgloseDescripcion = rs.getString(DESGLOSEDESCRIPCION);

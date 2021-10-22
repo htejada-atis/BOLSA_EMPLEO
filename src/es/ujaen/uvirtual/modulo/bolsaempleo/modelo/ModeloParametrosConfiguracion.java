@@ -185,25 +185,25 @@ public class ModeloParametrosConfiguracion {
 					return param;
 				}
 			}
-		} else {
-			String consulta = "SELECT * FROM ADM_PARAMETROS " + " WHERE PARAM_CODALF=?";
+		}
+		
+		String consulta = "SELECT * FROM ADM_PARAMETROS " + " WHERE PARAM_CODALF=?";
 
-			try (Connection conexion = ConexionUvirtual.obtenerInstancia(); PreparedStatement stmt = conexion.prepareStatement(consulta)) {
-				stmt.setString(1, nombre);
+		try (Connection conexion = ConexionUvirtual.obtenerInstancia(); PreparedStatement stmt = conexion.prepareStatement(consulta)) {
+			stmt.setString(1, nombre);
 
-				try (ResultSet rs = stmt.executeQuery()) {
-					if (!rs.next()) {
-						throw new UVException("No existe el parametro con nombre" + nombre);
-					}
-
-					ParametrosConfiguracion param = new ParametrosConfiguracion();
-					param.setCodNum(rs.getString("CONFIG_CODALF"));
-					param.setNombre(rs.getString("PARAM_CODALF"));
-					param.setDescripcion(rs.getString("DESID"));
-					param.setValor(rs.getString("VALOR"));
-
-					return param;
+			try (ResultSet rs = stmt.executeQuery()) {
+				if (!rs.next()) {
+					throw new UVException("No existe el parametro con nombre" + nombre);
 				}
+
+				ParametrosConfiguracion param = new ParametrosConfiguracion();
+				param.setCodNum(rs.getString("CONFIG_CODALF"));
+				param.setNombre(rs.getString("PARAM_CODALF"));
+				param.setDescripcion(rs.getString("DESID"));
+				param.setValor(rs.getString("VALOR"));
+
+				return param;
 			}
 		}
 	}

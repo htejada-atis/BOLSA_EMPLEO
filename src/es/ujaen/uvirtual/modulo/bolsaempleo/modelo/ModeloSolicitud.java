@@ -1649,6 +1649,7 @@ public class ModeloSolicitud {
 	 * @param usuarioUpdate .
 	 * @throws SQLException .
 	 */
+	@SuppressWarnings({"checkstyle:ExecutableStatementCount", "checkstyle:NPathComplexity"})
 	private void eliminarBolsasExcluidasDeLaSolicitud(Connection conexion, Solicitud solicitud, List<Bolsa> bolsasExcluidas, UsuarioBolsaEmpleo usuarioUpdate)
 			throws SQLException {
 		

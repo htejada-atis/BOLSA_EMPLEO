@@ -316,26 +316,26 @@ public class ModeloMisTitulaciones {
 				
 				return rs.getInt(1);
 			}
-		} else {
-			String consulta = "INSERT INTO tbep_titulaciones_usuario " 
-					+ " (BEPTUS_USU_CODNUM,DESCRIPCION,ARCHIVO,OTRATITULACION,UID_USUARIO) "
-					+ "VALUES (?,?,?,?,?)";
-	
-			try (Connection conexion = ConexionUvirtual.obtenerInstancia();
-					PreparedStatement stmt = conexion.prepareStatement(consulta, new String[]{CODNUM})) {
-				int parameterIndex = 1;
-				stmt.setInt(parameterIndex++, titulacion.getUsuario().getCodNum());
-				stmt.setString(parameterIndex++, titulacion.getDescripcion());
-				stmt.setBinaryStream(parameterIndex++, titulacion.getArchivo());
-				stmt.setString(parameterIndex++, titulacion.getOtraTitulacion());
-				stmt.setString(parameterIndex++, usuarioInsert.getCodCuenta());
-				stmt.executeUpdate();
-				
-				ResultSet rs = stmt.getGeneratedKeys();
-				rs.next();
-				
-				return rs.getInt(1);
-			}
+		}
+		
+		String consulta = "INSERT INTO tbep_titulaciones_usuario " 
+				+ " (BEPTUS_USU_CODNUM,DESCRIPCION,ARCHIVO,OTRATITULACION,UID_USUARIO) "
+				+ "VALUES (?,?,?,?,?)";
+
+		try (Connection conexion = ConexionUvirtual.obtenerInstancia();
+				PreparedStatement stmt = conexion.prepareStatement(consulta, new String[]{CODNUM})) {
+			int parameterIndex = 1;
+			stmt.setInt(parameterIndex++, titulacion.getUsuario().getCodNum());
+			stmt.setString(parameterIndex++, titulacion.getDescripcion());
+			stmt.setBinaryStream(parameterIndex++, titulacion.getArchivo());
+			stmt.setString(parameterIndex++, titulacion.getOtraTitulacion());
+			stmt.setString(parameterIndex++, usuarioInsert.getCodCuenta());
+			stmt.executeUpdate();
+			
+			ResultSet rs = stmt.getGeneratedKeys();
+			rs.next();
+			
+			return rs.getInt(1);
 		}
 	}
 	
@@ -343,9 +343,8 @@ public class ModeloMisTitulaciones {
 	 * @param titulaciones a borrar
 	 * @param usuarioInserta .
 	 * @throws SQLException en caso de error en la BD
-	 * @throws UVException si titulación no es valida
 	 */
-	public void borraTitulacionUsuario(List<TitulacionUsuario> titulaciones, UsuarioBolsaEmpleo usuarioInserta) throws SQLException, UVException {
+	public void borraTitulacionUsuario(List<TitulacionUsuario> titulaciones, UsuarioBolsaEmpleo usuarioInserta) throws SQLException {
 		String params = BolsaEmpleoUtils.consultaMultiplesParametros(titulaciones.size());
 		String query = "UPDATE TBEP_TITULACIONES_USUARIO SET FLGBORRADO=?,FECHA_BORRADO=?,UID_USUARIO=? WHERE CODNUM IN (" + params + ")";		
 				
