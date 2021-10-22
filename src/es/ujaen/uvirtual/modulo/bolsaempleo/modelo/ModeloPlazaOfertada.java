@@ -173,10 +173,12 @@ public class ModeloPlazaOfertada {
 	
 	/**
 	 * Devuelve el listado de plazas para exportar en csv.
+	 * @param convocatoria .
 	 * @return .
 	 * @throws SQLException .
 	 * @throws UVException .
 	 */
+	@SuppressWarnings({"checkstyle:CyclomaticComplexity", "checkstyle:NPathComplexity"})
 	public List<String[]> listadoPlazasCsv(Convocatoria convocatoria) throws SQLException, UVException {
 		String consulta = "SELECT bepplo.*, "
 				+ "    counts.CANDIDATOS_DISPONIBLES, counts.CANDIDATOS_INTERESADOS, counts.CANDIDATOS_CITADOS"
