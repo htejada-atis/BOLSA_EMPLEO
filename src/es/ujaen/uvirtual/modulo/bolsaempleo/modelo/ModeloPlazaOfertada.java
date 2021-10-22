@@ -97,6 +97,8 @@ public class ModeloPlazaOfertada {
 	private static final String ACTIVA = "S";
 	private static final String INACTIVA = "N";
 	
+	public static final String FORMATO_CURSO = "\\d{2}/\\d{2}";
+	
 	public static final Map<String, String> CENTROS_DESTINO = new HashMap<>();
 	public static final Map<String, String> CUATRIMESTRES = new HashMap<>();
 	public static final Map<String, String> ESTADOS = new HashMap<>();

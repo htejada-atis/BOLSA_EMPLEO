@@ -96,7 +96,8 @@ String justificacion = BolsaEmpleoUtils.getParamForm(request, ControladorContrat
 		<div class="form-group-container col2">
 			<div class="form-group">
 				<label for="plaza_curso" class="bold-label">Curso académico:</label>
-				<input class="form-input-custom" type="text" name="<%=ControladorContratacion.PARAM_CURSO%>" id="plaza_curso" value="<%=curso%>" required/>
+				<input class="form-input-custom" type="text" name="<%=ControladorContratacion.PARAM_CURSO%>" id="plaza_curso" value="<%=curso%>" required 
+					pattern="<%= ModeloPlazaOfertada.FORMATO_CURSO %>"/>
 			</div>
 		<%	if (bean.getUsuarioLogeado().isServicioPersonal()) { %>
 					<div class="form-group">
