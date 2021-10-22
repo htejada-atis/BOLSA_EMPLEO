@@ -25,7 +25,7 @@ public class PlazaOfertada implements Serializable {
 	private Date fechaFinOferta;
 	private Date fechaCerrada;
 	private Date fechaNRI;
-	private String uidUsuario;
+	private UsuarioBolsaEmpleo creador;
 	private transient InputStream horario;
 	private transient InputStream nri;
 	private Boolean abiertaVigente;
@@ -261,19 +261,19 @@ public class PlazaOfertada implements Serializable {
 		this.curso = curso;
 	}
 	
-	public String getUidUsuario() {
-		return uidUsuario;
+	public UsuarioBolsaEmpleo getCreador() {
+		return creador;
 	}
-	
-	public void setUidUsuario(String uidUsuario) {
-		this.uidUsuario = uidUsuario;
+
+	public void setCreador(UsuarioBolsaEmpleo creador) {
+		this.creador = creador;
 	}
 	
 	@Override
 	public String toString() {
 		return "PlazaOfertada [codNum=" + codNum + ", area=" + area + ", estado=" + estado + ", fechaCreacion=" + fechaCreacion + ", fechaAbierta=" 
 				+ fechaAbierta + ", fechaFinOferta=" + fechaFinOferta + ", fechaCerrada=" + fechaCerrada + ", fechaFinOferta=" + fechaFinOferta
-				+ ", abiertaVigente=" + abiertaVigente + ", idPlaza=" + idPlaza + ", activa=" + activa + ", curso=" + curso + ", uidUsuario=" + uidUsuario + "]";
+				+ ", abiertaVigente=" + abiertaVigente + ", idPlaza=" + idPlaza + ", activa=" + activa + ", curso=" + curso + ", creador=" + creador + "]";
 	}
 	
 	@Override
@@ -299,7 +299,7 @@ public class PlazaOfertada implements Serializable {
 		result = prime * result + ((idPlaza == null) ? 0 : idPlaza.hashCode());
 		result = prime * result + ((activa == null) ? 0 : activa.hashCode());
 		result = prime * result + ((curso == null) ? 0 : curso.hashCode());
-		result = prime * result + ((uidUsuario == null) ? 0 : uidUsuario.hashCode());
+		result = prime * result + ((creador == null) ? 0 : creador.hashCode());
 		return result;
 	}
 
@@ -450,11 +450,11 @@ public class PlazaOfertada implements Serializable {
 		} else if (!curso.equals(other.curso)) {
 			return false;
 		}
-		if (uidUsuario == null) {
-			if (other.uidUsuario != null) {
+		if (creador == null) {
+			if (other.creador != null) {
 				return false;
 			}
-		} else if (!uidUsuario.equals(other.uidUsuario)) {
+		} else if (!creador.equals(other.creador)) {
 			return false;
 		}
 		
