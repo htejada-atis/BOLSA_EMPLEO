@@ -125,7 +125,8 @@ String justificacion = BolsaEmpleoUtils.getParamForm(request, ControladorContrat
 		<div class="form-group-container col2">
 			<div class="form-group">
 				<label for="plaza_curso" class="bold-label">Curso académico:</label>
-				<input class="form-input-custom" type="text" name="<%=ControladorContratacion.PARAM_CURSO%>" id="plaza_curso" value="<%=curso%>" required <%= editable ? "" : "readonly disabled " %> pattern="\d{2}/\d{2}"/>
+				<input class="form-input-custom" type="text" name="<%=ControladorContratacion.PARAM_CURSO%>" id="plaza_curso" value="<%=curso%>" required <%= editable ? "" : "readonly disabled " %> 
+					pattern="<%= ModeloPlazaOfertada.FORMATO_CURSO %>"/>
 			</div>
 			<div class="form-group">
 				<label for="plaza_duracion_prevista" <%= extraRequeridos ? "class='bold-label'" : "" %>>Duración prevista:</label>

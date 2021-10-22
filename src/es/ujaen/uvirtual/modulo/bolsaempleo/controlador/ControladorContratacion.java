@@ -12,6 +12,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import java.util.regex.Pattern;
 import java.util.stream.IntStream;
 import javax.servlet.ServletOutputStream;
 import javax.servlet.annotation.WebServlet;
@@ -132,6 +133,7 @@ public class ControladorContratacion extends HttpServlet {
 	public static final String MENSAJE_ERROR_ESTADO_CREACION_REQUERIDO = "Es requerido estado de creación para la plaza";
 	public static final String MENSAJE_ERROR_ESTADO_APROBACION_REQUERIDO = "Es requerido estado de aprobación para la plaza";
 	public static final String MENSAJE_ERROR_FECHA_FIN_OFERTA_VACIA_ABRIR_PLAZA = "La fecha fin de la oferta no puede estar vacía para abrir una plaza";
+	public static final String MENSAJE_ERROR_FORMATO_CURSO = "El formato del curso debe ser: DD/DD+1";
 	public static final String MENSAJE_ERROR_FORMATO_FECHA = "Error al formatear fecha. Formato: DD/MM/YYYY HH:MM:SS";
 	public static final String MENSAJE_ERROR_FORMATO_PDF = "El fichero debe ser un pdf válido";
 	public static final String MENSAJE_ERROR_JUSTIFICACION_LARGA = "La justificación no puede contener mas de %d caracteres";
@@ -871,6 +873,10 @@ public class ControladorContratacion extends HttpServlet {
 		}
 		if (plaza.getCurso().length() > ModeloPlazaOfertada.COLUMN_CURSO_MAXLENGTH) {
 			throw new UVException(String.format(MENSAJE_ERROR_CURSO_LARGO, ModeloPlazaOfertada.COLUMN_CURSO_MAXLENGTH));
+		}
+		if (!Pattern.matches(ModeloPlazaOfertada.FORMATO_CURSO, plaza.getCurso())
+				|| Integer.parseInt(plaza.getCurso().split("/")[0]) != Integer.parseInt(plaza.getCurso().split("/")[1]) - 1) {
+			throw new UVException(MENSAJE_ERROR_FORMATO_CURSO);
 		}
 		
 		if (bean.getUsuarioLogeado().isServicioPersonal()) {
