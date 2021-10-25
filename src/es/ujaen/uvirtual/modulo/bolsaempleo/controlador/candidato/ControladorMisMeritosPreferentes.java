@@ -204,7 +204,7 @@ public class ControladorMisMeritosPreferentes extends HttpServlet {
 	}
 	
 	private void listadoMeritos(VistaMeritosPreferentesCandidato bean, UVDatos datos, HttpServletRequest request, HttpServletResponse response) 
-			throws IOException, SQLException, UVException {
+			throws IOException {
 		datos.setRespuestaEnviada(true);
 		datos.setContentType(RESPONSE_AJAX_CONTENTTYPE);
 		response.setContentType(RESPONSE_AJAX_CONTENTTYPE);

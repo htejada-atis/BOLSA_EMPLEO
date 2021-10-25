@@ -32,6 +32,7 @@ public class TestBEPBeanBolsaValidacion {
 	 * 
 	 */
 	@Test
+	@SuppressWarnings({"checkstyle:ExecutableStatementCount"})
 	public void testA01() {
 		Integer id = 1;
 		Area area = new Area(1, "idexte", "descripcion");
@@ -79,6 +80,7 @@ public class TestBEPBeanBolsaValidacion {
 	/** test equals.
 	 */
 	@Test
+	@SuppressWarnings({"checkstyle:ExecutableStatementCount"})
 	public void testA02() {
 		Integer id = 1;
 		Area area = new Area(1, "idexte", "descripcion");
@@ -124,7 +126,7 @@ public class TestBEPBeanBolsaValidacion {
 	 * se quita warning S2159 de equals null, es lo que se quiere probar
 	 */
 	@Test
-	@SuppressWarnings("java:S2159")
+	@SuppressWarnings({"java:S2159", "checkstyle:ExecutableStatementCount"})
 	public void testA03() {
 		Integer id = 1;
 		Area area = new Area(1, "idexte", "descripcion");

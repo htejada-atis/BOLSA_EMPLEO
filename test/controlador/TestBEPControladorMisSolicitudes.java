@@ -120,12 +120,11 @@ public class TestBEPControladorMisSolicitudes {
 	///////////////////////////////////////////////////////////////////////////////////////////////////////////
     
     /** Obtener mis solicitudes, sin parametro definido .
-	 * @throws SQLException si fallo bd .
 	 * @throws IOException si error io .
 	 * @throws ServletException  si error servlet .
 	 */
 	@Test
-	public void testA01() throws SQLException, ServletException, IOException {
+	public void testA01() throws ServletException, IOException {
 		PeticionHttp peticion = UtilsTestBolsaEmpleo.peticionAutenticadaCandidato2();
 		
 		RespuestaHttp respuesta = new RespuestaHttp();
@@ -139,12 +138,11 @@ public class TestBEPControladorMisSolicitudes {
 	}
 	
 	/** Obtener mis solicitudes .
-	 * @throws SQLException si fallo bd .
 	 * @throws IOException si error io .
 	 * @throws ServletException  si error servlet .
 	 */
 	@Test
-	public void testA02() throws SQLException, ServletException, IOException {
+	public void testA02() throws ServletException, IOException {
 		PeticionHttp peticion = UtilsTestBolsaEmpleo.peticionAutenticadaCandidato2();
 		peticion.setParameter(ControladorMisSolicitudes.PARAM_ACCION, ControladorMisSolicitudes.ACCION_INDEX);
 		
@@ -159,12 +157,11 @@ public class TestBEPControladorMisSolicitudes {
 	}
 	
 	/** Crear solicitud .
-	 * @throws SQLException si fallo bd .
 	 * @throws IOException si error io .
 	 * @throws ServletException  si error servlet .
 	 */
 	@Test
-	public void testA03CrearSolicitud() throws SQLException, ServletException, IOException {
+	public void testA03CrearSolicitud() throws ServletException, IOException {
 		PeticionHttp peticion = UtilsTestBolsaEmpleo.peticionAutenticadaCandidato2();
 		peticion.setParameter(ControladorMisSolicitudes.PARAM_ACCION, ControladorMisSolicitudes.ACCION_CREAR_SOLICITUD);
 		peticion.setParameter(ControladorMisSolicitudes.PARAM_CONVOCATORIA_ID, "1");
@@ -180,12 +177,11 @@ public class TestBEPControladorMisSolicitudes {
 	}
 	
 	/** Consultar solicitud .
-	 * @throws SQLException si fallo bd .
 	 * @throws IOException si error io .
 	 * @throws ServletException  si error servlet .
 	 */
 	@Test
-	public void testA04ConsultarSolicitud() throws SQLException, ServletException, IOException {
+	public void testA04ConsultarSolicitud() throws ServletException, IOException {
 		VistaSolicitudes bean = obtenerSolicitudes();
 		
 		PeticionHttp peticion = UtilsTestBolsaEmpleo.peticionAutenticadaCandidato2();
@@ -203,12 +199,11 @@ public class TestBEPControladorMisSolicitudes {
 	}
 	
 	/** obtener datatable solicitudes de una convocatoria .
-	 * @throws SQLException si fallo bd .
 	 * @throws IOException si error io .
 	 * @throws ServletException  si error servlet .
 	 */
 	@Test
-	public void testA05ObtenerSolicitudes() throws SQLException, ServletException, IOException {
+	public void testA05ObtenerSolicitudes() throws ServletException, IOException {
 		VistaSolicitudes bean = obtenerSolicitudes();
 		
 		assertNotEquals(MENSAJE_SOLICITUDES_DEVUELTAS, 0, bean.getDatatableSolicitudes().getData().size());
@@ -217,12 +212,11 @@ public class TestBEPControladorMisSolicitudes {
 	}
 	
 	/** obtener datatable solicitudes de una convocatoria con parámetro erróneo de la tabla para forzar error .
-	 * @throws SQLException si fallo bd .
 	 * @throws IOException si error io .
 	 * @throws ServletException  si error servlet .
 	 */
 	@Test
-	public void testE01ObtenerSolicitudesParametroErroneo() throws SQLException, ServletException, IOException {
+	public void testE01ObtenerSolicitudesParametroErroneo() throws ServletException, IOException {
 		PeticionHttp peticion = UtilsTestBolsaEmpleo.peticionAutenticadaCandidato2();
 		peticion.setParameter(ControladorMisSolicitudes.PARAM_ACCION, ControladorMisSolicitudes.ACCION_DATATABLE_SOLICITUDES);
 		peticion.setParameter(BolsaEmpleoDataTable.PARAM_ORDER_BY, "9");
@@ -241,12 +235,11 @@ public class TestBEPControladorMisSolicitudes {
 	///////////////////////////////////////////////////////////////////////////////////////////////////////////
 	
 	/** Seleccionar bolsas para la solicitud .
-	 * @throws SQLException si fallo bd .
 	 * @throws IOException si error io .
 	 * @throws ServletException  si error servlet .
 	 */
 	@Test
-	public void testA06SeleccionarBolsas() throws SQLException, ServletException, IOException {
+	public void testA06SeleccionarBolsas() throws ServletException, IOException {
 		VistaSolicitudes bean = obtenerSolicitudes();
 		VistaSolicitudes bean2 = obtenerAreas();
 		
@@ -269,12 +262,11 @@ public class TestBEPControladorMisSolicitudes {
 	}
 	
 	/** Obtener datatable areas .
-	 * @throws SQLException si fallo bd .
 	 * @throws IOException si error io .
 	 * @throws ServletException  si error servlet .
 	 */
 	@Test
-	public void testA07ObtenerAreas() throws SQLException, ServletException, IOException {
+	public void testA07ObtenerAreas() throws ServletException, IOException {
 		VistaSolicitudes bean = obtenerAreas();
 		
 		assertNotEquals(MENSAJE_SOLICITUDES_DEVUELTAS, 0, bean.getDataTableBolsasCandidato().getData().size());
@@ -283,12 +275,11 @@ public class TestBEPControladorMisSolicitudes {
 	}
 	
 	/** Seleccionar bolsas para la solicitud no válidas .
-	 * @throws SQLException si fallo bd .
 	 * @throws IOException si error io .
 	 * @throws ServletException  si error servlet .
 	 */
 	@Test
-	public void testE02SeleccionarBolsasNoValidas() throws SQLException, ServletException, IOException {
+	public void testE02SeleccionarBolsasNoValidas() throws ServletException, IOException {
 		VistaSolicitudes bean = obtenerSolicitudes();
 		VistaSolicitudes bean2 = obtenerAreas();
 		
@@ -307,12 +298,11 @@ public class TestBEPControladorMisSolicitudes {
 	}
 	
 	/** Obtener datatable areas con parámetro erróneo de la tabla para forzar error .
-	 * @throws SQLException si fallo bd .
 	 * @throws IOException si error io .
 	 * @throws ServletException  si error servlet .
 	 */
 	@Test
-	public void testE03ObtenerAreasParametroErroneo() throws SQLException, ServletException, IOException {
+	public void testE03ObtenerAreasParametroErroneo() throws ServletException, IOException {
 		PeticionHttp peticion = UtilsTestBolsaEmpleo.peticionAutenticadaCandidato2();
 		peticion.setParameter(ControladorMisSolicitudes.PARAM_ACCION, ControladorMisSolicitudes.ACCION_DATATABLE_AREAS);
 		peticion.setParameter(BolsaEmpleoDataTable.PARAM_ORDER_BY, "9");
@@ -385,12 +375,11 @@ public class TestBEPControladorMisSolicitudes {
 	}
 	
 	/** Obtener bolsas solicitud .
-	 * @throws SQLException si fallo bd .
 	 * @throws IOException si error io .
 	 * @throws ServletException  si error servlet .
 	 */
 	@Test
-	public void testA11ObtenerBolsasSolicitud() throws SQLException, ServletException, IOException {
+	public void testA11ObtenerBolsasSolicitud() throws ServletException, IOException {
 		VistaSolicitudes bean = obtenerSolicitudes();
 		
 		PeticionHttp peticion = UtilsTestBolsaEmpleo.peticionAutenticadaCandidato2();
@@ -493,12 +482,11 @@ public class TestBEPControladorMisSolicitudes {
 	}
 	
 	/** Obtener datatable areas de la solicitud con parámetro erróneo de la tabla para forzar error .
-	 * @throws SQLException si fallo bd .
 	 * @throws IOException si error io .
 	 * @throws ServletException  si error servlet .
 	 */
 	@Test
-	public void testE04ObtenerBolsasSolicitudParametroErroneo() throws SQLException, ServletException, IOException {
+	public void testE04ObtenerBolsasSolicitudParametroErroneo() throws ServletException, IOException {
 		VistaSolicitudes bean = obtenerSolicitudes();
 		
 		PeticionHttp peticion = UtilsTestBolsaEmpleo.peticionAutenticadaCandidato2();
@@ -521,12 +509,11 @@ public class TestBEPControladorMisSolicitudes {
 	///////////////////////////////////////////////////////////////////////////////////////////////////////////
 	
 	/** resumen de la solicitud .
-	 * @throws SQLException si fallo bd .
 	 * @throws IOException si error io .
 	 * @throws ServletException  si error servlet .
 	 */
 	@Test
-	public void testA15ResumenSolicitud() throws SQLException, ServletException, IOException {
+	public void testA15ResumenSolicitud() throws ServletException, IOException {
 		VistaSolicitudes bean = obtenerSolicitudes();
 		
 		PeticionHttp peticion = UtilsTestBolsaEmpleo.peticionAutenticadaCandidato2();
@@ -545,12 +532,11 @@ public class TestBEPControladorMisSolicitudes {
 	}
 	
 	/** confirmar solicitud .
-	 * @throws SQLException si fallo bd .
 	 * @throws IOException si error io .
 	 * @throws ServletException  si error servlet .
 	 */
 	@Test
-	public void testA16ConfirmarSolicitud() throws SQLException, ServletException, IOException {
+	public void testA16ConfirmarSolicitud() throws ServletException, IOException {
 		VistaSolicitudes bean = obtenerSolicitudes();
 		
 		PeticionHttp peticion = UtilsTestBolsaEmpleo.peticionAutenticadaCandidato2();

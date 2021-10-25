@@ -6,17 +6,14 @@ import static org.junit.Assert.assertNotEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
-
 import java.io.IOException;
 import java.sql.SQLException;
 import java.util.List;
-
 import javax.servlet.ServletException;
 import org.junit.BeforeClass;
 import org.junit.FixMethodOrder;
 import org.junit.Test;
 import org.junit.runners.MethodSorters;
-
 import bbdd.BbddRunner;
 import bbdd.UtilsTestBolsaEmpleo;
 import controlador.implementacion.PeticionHttp;
@@ -67,15 +64,12 @@ public class TestBEPControladorItemsBaremacion {
 		UtilsTestBolsaEmpleo.inicializaBolsaEmpleo();
 	}
 
-	/**
-	 * Obtener items baremación, sin parametro definido .
-	 * 
-	 * @throws SQLException     si fallo bd
+	/** Obtener items baremación, sin parametro definido .
 	 * @throws IOException      si error io
 	 * @throws ServletException si error servlet
 	 */
 	@Test
-	public void testA01() throws SQLException, ServletException, IOException {
+	public void testA01() throws ServletException, IOException {
 		PeticionHttp peticion = UtilsTestBolsaEmpleo.peticionAutenticadaPersonal();
 
 		RespuestaHttp respuesta = new RespuestaHttp();
@@ -209,7 +203,7 @@ public class TestBEPControladorItemsBaremacion {
 	 */
 	@Test
 	public void testA07SeleccionarItem() throws ServletException, IOException {
-		VistaItemsBaremacion bean = obtenerItems(true);
+		VistaItemsBaremacion bean = obtenerItems();
 
 		PeticionHttp peticion = UtilsTestBolsaEmpleo.peticionAutenticadaPersonal();
 		peticion.setParameter(ControladorItemsBaremacion.PARAM_ACCION, ControladorItemsBaremacion.ACCION_ITEM_SELECCIONADO);
@@ -344,7 +338,7 @@ public class TestBEPControladorItemsBaremacion {
 	 */
 	@Test
 	public void testA12DesactivarItem() throws ServletException, IOException {
-		VistaItemsBaremacion bean = obtenerItems(false);
+		VistaItemsBaremacion bean = obtenerItems();
 
 		PeticionHttp peticion = UtilsTestBolsaEmpleo.peticionAutenticadaPersonal();
 		peticion.setParameter(ControladorItemsBaremacion.PARAM_ACCION, ControladorItemsBaremacion.ACCION_DESACTIVAR_ITEM);
@@ -371,7 +365,7 @@ public class TestBEPControladorItemsBaremacion {
 	 */
 	@Test
 	public void testA13ActivarItem() throws ServletException, IOException {
-		VistaItemsBaremacion bean = obtenerItems(false);
+		VistaItemsBaremacion bean = obtenerItems();
 
 		PeticionHttp peticion = UtilsTestBolsaEmpleo.peticionAutenticadaPersonal();
 		peticion.setParameter(ControladorItemsBaremacion.PARAM_ACCION, ControladorItemsBaremacion.ACCION_ACTIVAR_ITEM);
@@ -433,15 +427,13 @@ public class TestBEPControladorItemsBaremacion {
 		activarApartadosLista(lista);
 	}
 	
-	/**
-	 * editar apartado .
-	 * @throws SQLException 
-	 * 
+	/** editar apartado .
 	 * @throws SQLException     .
 	 * @throws ServletException .
 	 * @throws IOException      .
 	 */
 	@Test
+	@SuppressWarnings({"checkstyle:ExecutableStatementCount", "checkstyle:magicnumber"})
 	public void testA15editarapartado() throws ServletException, IOException, SQLException {
 		// form
 
@@ -541,6 +533,7 @@ public class TestBEPControladorItemsBaremacion {
 	 * @throws IOException      .
 	 */
 	@Test
+	@SuppressWarnings({"checkstyle:ExecutableStatementCount", "checkstyle:magicnumber"})
 	public void testA16editarbloque() throws ServletException, IOException, SQLException, UVException {
 		// form
 
@@ -587,15 +580,13 @@ public class TestBEPControladorItemsBaremacion {
 		assertEquals(b.getNumeroMaximoMeritos(), (Integer) 10);
 	}
 	
-	/**
-	 * obtener bloques sin apartado definido .
-	 * 
-	 * @throws SQLException     si fallo bd .
+	/** obtener bloques sin apartado definido .
 	 * @throws IOException      si error io .
 	 * @throws ServletException si error servlet .
 	 */
 	@Test
-	public void testE01ObtenerBloquesSinApartado() throws SQLException, ServletException, IOException {
+	@SuppressWarnings({"checkstyle:ExecutableStatementCount", "checkstyle:magicnumber"})
+	public void testE01ObtenerBloquesSinApartado() throws ServletException, IOException {
 		PeticionHttp peticion = UtilsTestBolsaEmpleo.peticionAutenticadaPersonal();
 		peticion.setParameter(ControladorItemsBaremacion.PARAM_ACCION, ControladorItemsBaremacion.ACCION_DATATABLE_BLOQUES);
 
@@ -608,15 +599,12 @@ public class TestBEPControladorItemsBaremacion {
 		assertEquals(MENSAJE_SIN_EXITO, 0, bean.getMensajesDeExito().size());
 	}
 
-	/**
-	 * obtener ítems sin bloque definido .
-	 * 
-	 * @throws SQLException     si fallo bd .
+	/** obtener ítems sin bloque definido .
 	 * @throws IOException      si error io .
 	 * @throws ServletException si error servlet .
 	 */
 	@Test
-	public void testE02ObtenerItemsSinBloque() throws SQLException, ServletException, IOException {
+	public void testE02ObtenerItemsSinBloque() throws ServletException, IOException {
 		PeticionHttp peticion = UtilsTestBolsaEmpleo.peticionAutenticadaPersonal();
 		peticion.setParameter(ControladorItemsBaremacion.PARAM_ACCION, ControladorItemsBaremacion.ACCION_DATATABLE_ITEMS);
 
@@ -629,15 +617,12 @@ public class TestBEPControladorItemsBaremacion {
 		assertEquals(MENSAJE_SIN_EXITO, 0, bean.getMensajesDeExito().size());
 	}
 
-	/**
-	 * seleccionar apartado nulo .
-	 * 
-	 * @throws SQLException     si fallo bd .
+	/** seleccionar apartado nulo .
 	 * @throws IOException      si error io .
 	 * @throws ServletException si error servlet .
 	 */
 	@Test
-	public void testE03SeleccionarApartadoNulo() throws SQLException, ServletException, IOException {
+	public void testE03SeleccionarApartadoNulo() throws ServletException, IOException {
 		PeticionHttp peticion = UtilsTestBolsaEmpleo.peticionAutenticadaPersonal();
 		peticion.setParameter(ControladorItemsBaremacion.PARAM_ACCION, ControladorItemsBaremacion.ACCION_APARTADO_SELECCIONADO);
 		peticion.setParameter(ControladorItemsBaremacion.PARAM_APARTADO, null);
@@ -651,15 +636,12 @@ public class TestBEPControladorItemsBaremacion {
 		assertEquals(MENSAJE_SIN_EXITO, 0, bean.getMensajesDeExito().size());
 	}
 
-	/**
-	 * seleccionar bloque nulo .
-	 * 
-	 * @throws SQLException     si fallo bd .
+	/** seleccionar bloque nulo .
 	 * @throws IOException      si error io .
 	 * @throws ServletException si error servlet .
 	 */
 	@Test
-	public void testE04SeleccionarBloqueNulo() throws SQLException, ServletException, IOException {
+	public void testE04SeleccionarBloqueNulo() throws ServletException, IOException {
 		PeticionHttp peticion = UtilsTestBolsaEmpleo.peticionAutenticadaPersonal();
 		peticion.setParameter(ControladorItemsBaremacion.PARAM_ACCION, ControladorItemsBaremacion.ACCION_BLOQUE_SELECCIONADO);
 		peticion.setParameter(ControladorItemsBaremacion.PARAM_BLOQUE, null);
@@ -673,15 +655,12 @@ public class TestBEPControladorItemsBaremacion {
 		assertEquals(MENSAJE_SIN_EXITO, 0, bean2.getMensajesDeExito().size());
 	}
 
-	/**
-	 * activar apartado nulo .
-	 * 
-	 * @throws SQLException     si fallo bd .
+	/** activar apartado nulo .
 	 * @throws IOException      si error io .
 	 * @throws ServletException si error servlet .
 	 */
 	@Test
-	public void testE05ActivarApartadoNulo() throws SQLException, ServletException, IOException {
+	public void testE05ActivarApartadoNulo() throws ServletException, IOException {
 		PeticionHttp peticion = UtilsTestBolsaEmpleo.peticionAutenticadaPersonal();
 		peticion.setParameter(ControladorItemsBaremacion.PARAM_ACCION, ControladorItemsBaremacion.ACCION_ACTIVAR_APARTADO);
 		peticion.setParameter(ControladorItemsBaremacion.PARAM_APARTADO, null);
@@ -695,15 +674,12 @@ public class TestBEPControladorItemsBaremacion {
 		assertEquals(MENSAJE_SIN_EXITO, 0, bean2.getMensajesDeExito().size());
 	}
 
-	/**
-	 * desactivar apartado nulo .
-	 * 
-	 * @throws SQLException     si fallo bd .
+	/** desactivar apartado nulo .
 	 * @throws IOException      si error io .
 	 * @throws ServletException si error servlet .
 	 */
 	@Test
-	public void testE05DesactivarApartadoNulo() throws SQLException, ServletException, IOException {
+	public void testE05DesactivarApartadoNulo() throws ServletException, IOException {
 		PeticionHttp peticion = UtilsTestBolsaEmpleo.peticionAutenticadaPersonal();
 		peticion.setParameter(ControladorItemsBaremacion.PARAM_ACCION, ControladorItemsBaremacion.ACCION_DESACTIVAR_APARTADO);
 		peticion.setParameter(ControladorItemsBaremacion.PARAM_APARTADO, null);
@@ -717,15 +693,12 @@ public class TestBEPControladorItemsBaremacion {
 		assertEquals(MENSAJE_SIN_EXITO, 0, bean2.getMensajesDeExito().size());
 	}
 
-	/**
-	 * permisos.
-	 * 
-	 * @throws SQLException     si fallo bd .
+	/** permisos.
 	 * @throws IOException      si error io .
 	 * @throws ServletException si error servlet .
 	 */
 	@Test
-	public void testE06permisos() throws SQLException, ServletException, IOException {
+	public void testE06permisos() throws ServletException, IOException {
 		PeticionHttp peticion = UtilsTestBolsaEmpleo.peticionAutenticadaCandidato();
 		peticion.setParameter(ControladorItemsBaremacion.PARAM_ACCION, ControladorItemsBaremacion.ACCION_INDEX);
 		RespuestaHttp respuesta = new RespuestaHttp();
@@ -739,23 +712,19 @@ public class TestBEPControladorItemsBaremacion {
 		assertEquals(bean2.getMensajesDeError().get(0), ControladorItemsBaremacion.MENSAJE_ERROR_SIN_PERMISO_PERSONAL);
 	}
 
-	/**
-	 * error fatal.
-	 * 
-	 * @throws SQLException     si fallo bd .
+	/** error fatal.
 	 * @throws IOException      si error io .
 	 * @throws ServletException si error servlet .
 	 */
 	@Test
-	public void testE07errorfaltal() throws SQLException, ServletException, IOException {
+	public void testE07errorfaltal() throws ServletException, IOException {
 		PeticionHttp peticion = UtilsTestBolsaEmpleo.peticionAutenticadaPersonal();
 		peticion.setParameter(ControladorItemsBaremacion.PARAM_ACCION, "foo");
 		RespuestaHttp respuesta = new RespuestaHttp();
 		ControladorItemsBaremacion controlador = new ControladorItemsBaremacion();
 		controlador.doPost(peticion, respuesta);
 
-		VistaItemsBaremacion bean2 = (VistaItemsBaremacion) peticion.getUVDatos().getVistas()
-				.get(VistaItemsBaremacion.class.getName());
+		VistaItemsBaremacion bean2 = (VistaItemsBaremacion) peticion.getUVDatos().getVistas().get(VistaItemsBaremacion.class.getName());
 
 		assertEquals(MENSAJE_CON_ERROR, 1, bean2.getMensajesDeError().size());
 		assertEquals(MENSAJE_SIN_EXITO, 0, bean2.getMensajesDeExito().size());
@@ -764,12 +733,12 @@ public class TestBEPControladorItemsBaremacion {
 
 	/**
 	 * editar con errores apartado .
-	 * @throws SQLException     .
 	 * @throws ServletException .
 	 * @throws IOException      .
 	 */
 	@Test
-	public void testE08editarConErrores() throws ServletException, IOException, SQLException {
+	@SuppressWarnings({"checkstyle:ExecutableStatementCount"})
+	public void testE08editarConErrores() throws ServletException, IOException {
 		PeticionHttp peticion = UtilsTestBolsaEmpleo.peticionAutenticadaPersonal();
 		peticion.setParameter(ControladorItemsBaremacion.PARAM_ACCION, ControladorItemsBaremacion.ACCION_AGREGAR_APARTADO_CONFIRM);
 		peticion.setParameter(ControladorItemsBaremacion.PARAM_APARTADO_CODIGO, "");
@@ -927,7 +896,7 @@ public class TestBEPControladorItemsBaremacion {
 	}
 
 	// método para obtener la vista con una lista de ítems .
-	private VistaItemsBaremacion obtenerItems(boolean activos) throws ServletException, IOException {
+	private VistaItemsBaremacion obtenerItems() throws ServletException, IOException {
 		VistaItemsBaremacion bean = obtenerBloques(true);
 
 		PeticionHttp peticion = UtilsTestBolsaEmpleo.peticionAutenticadaPersonal();

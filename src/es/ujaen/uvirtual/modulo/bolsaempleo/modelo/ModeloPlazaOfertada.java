@@ -430,7 +430,7 @@ public class ModeloPlazaOfertada {
 	 * @throws SQLException .
 	 * @throws UVException .
 	 */
-	@SuppressWarnings({"checkstyle:npathcomplexity"})
+	@SuppressWarnings({"checkstyle:CyclomaticComplexity", "checkstyle:NPathComplexity"})
 	public void insertaPlazaOfertada(PlazaOfertada plaza, UsuarioBolsaEmpleo usuarioUpdate) throws SQLException, UVException {
 		if (plaza == null) {
 			throw new UVException(String.format(MENSAJE_ERROR_OBJETO_VACIO, "insertar"));

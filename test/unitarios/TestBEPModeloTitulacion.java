@@ -4,13 +4,11 @@ import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 import java.io.IOException;
 import java.sql.SQLException;
-import java.text.ParseException;
 import java.util.List;
 import org.junit.BeforeClass;
 import org.junit.FixMethodOrder;
 import org.junit.Test;
 import org.junit.runners.MethodSorters;
-
 import bbdd.BbddRunner;
 import bbdd.UtilsTestBolsaEmpleo;
 import es.ujaen.uvirtual.modelo.conexion.Conexion;
@@ -29,10 +27,9 @@ public class TestBEPModeloTitulacion {
 	 * 
 	 * @throws SQLException   si error en bd
 	 * @throws IOException    si error en ficheros
-	 * @throws ParseException si error fecha
 	 */
 	@BeforeClass
-	public static void preparaBd() throws SQLException, IOException, ParseException {
+	public static void preparaBd() throws SQLException, IOException {
 		Conexion.setConexionUvirtual(BbddRunner.obtenerDataSourceUv());
 		Conexion.setConexionArcos(BbddRunner.obtenerDataSourceArcos());
 		Conexion.setConexionUxxiRrhh(BbddRunner.obtenerDataSourceRh());

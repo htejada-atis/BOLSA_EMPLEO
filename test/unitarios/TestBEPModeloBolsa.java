@@ -47,10 +47,9 @@ public class TestBEPModeloBolsa {
 	 * 
 	 * @throws SQLException   si error en bd
 	 * @throws UVException    si error al validar bolsa
-	 * @throws ParseException si error al validar fecha
 	 */
 	@Test
-	public void testA01BloquearBolsas() throws SQLException, ParseException, UVException {
+	public void testA01BloquearBolsas() throws SQLException, UVException {
 		ModeloBolsa modelo = ModeloBolsa.obtenerInstancia();
 		List<Bolsa> bolsas = modelo.getBolsas();
 		bolsas.remove(0);
@@ -75,10 +74,9 @@ public class TestBEPModeloBolsa {
 	 * 
 	 * @throws SQLException   si error en bd
 	 * @throws UVException    si error al validar bolsa
-	 * @throws ParseException si error al validar fecha
 	 */
 	@Test
-	public void testA02DesbloquearBolsas() throws SQLException, ParseException, UVException {
+	public void testA02DesbloquearBolsas() throws SQLException, UVException {
 		ModeloBolsa modelo = ModeloBolsa.obtenerInstancia();
 		List<Bolsa> bolsas = modelo.getBolsas();
 		bolsas.remove(0);
@@ -103,10 +101,9 @@ public class TestBEPModeloBolsa {
 	 * 
 	 * @throws SQLException   si error en bd
 	 * @throws UVException    si error al validar usuario
-	 * @throws ParseException si error al validar fecha
 	 */
 	@Test
-	public void testA03AreaBaremable() throws SQLException, ParseException, UVException {
+	public void testA03AreaBaremable() throws SQLException, UVException {
 		ModeloBolsa modelo = ModeloBolsa.obtenerInstancia();
 		List<Bolsa> bolsas = modelo.getBolsas();
 		bolsas.remove(0);
@@ -131,10 +128,9 @@ public class TestBEPModeloBolsa {
 	 * 
 	 * @throws SQLException   si error en bd
 	 * @throws UVException    si error al validar usuario
-	 * @throws ParseException si error al validar fecha
 	 */
 	@Test
-	public void testA04AreaNoBaremable() throws SQLException, ParseException, UVException {
+	public void testA04AreaNoBaremable() throws SQLException, UVException {
 		ModeloBolsa modelo = ModeloBolsa.obtenerInstancia();
 		List<Bolsa> bolsas = modelo.getBolsas();
 		bolsas.remove(0);
@@ -159,10 +155,9 @@ public class TestBEPModeloBolsa {
 	 * 
 	 * @throws SQLException   si error en bd
 	 * @throws UVException    si error al validar usuario
-	 * @throws ParseException si error al validar fecha
 	 */
 	@Test
-	public void testA05BolsaAlegaciones() throws SQLException, ParseException, UVException {
+	public void testA05BolsaAlegaciones() throws SQLException, UVException {
 		ModeloBolsa modelo = ModeloBolsa.obtenerInstancia();
 		List<Bolsa> bolsas = modelo.getBolsas();
 		bolsas.remove(0);
@@ -187,10 +182,9 @@ public class TestBEPModeloBolsa {
 	 * 
 	 * @throws SQLException   si error en bd
 	 * @throws UVException    si error al validar usuario
-	 * @throws ParseException si error al validar fecha
 	 */
 	@Test
-	public void testA06BolsaBaremacion() throws SQLException, ParseException, UVException {
+	public void testA06BolsaBaremacion() throws SQLException, UVException {
 		ModeloBolsa modelo = ModeloBolsa.obtenerInstancia();
 		List<Bolsa> bolsas = modelo.getBolsas();
 		bolsas.remove(0);
@@ -215,10 +209,9 @@ public class TestBEPModeloBolsa {
 	 * 
 	 * @throws SQLException   si error en bd
 	 * @throws UVException    si error al validar usuario
-	 * @throws ParseException si error al validar fecha
 	 */
 	@Test
-	public void testA07BolsaRevision() throws SQLException, ParseException, UVException {
+	public void testA07BolsaRevision() throws SQLException, UVException {
 		ModeloBolsa modelo = ModeloBolsa.obtenerInstancia();
 		List<Bolsa> bolsas = modelo.getBolsas();
 		bolsas.remove(0);

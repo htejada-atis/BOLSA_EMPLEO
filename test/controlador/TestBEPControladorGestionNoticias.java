@@ -10,14 +10,13 @@ import org.junit.BeforeClass;
 import org.junit.FixMethodOrder;
 import org.junit.Test;
 import org.junit.runners.MethodSorters;
-
 import bbdd.BbddRunner;
 import bbdd.UtilsTestBolsaEmpleo;
 import controlador.implementacion.PeticionHttp;
 import controlador.implementacion.RespuestaHttp;
 import es.ujaen.uvirtual.modulo.bolsaempleo.controlador.ControladorNoticias;
 import es.ujaen.uvirtual.modulo.bolsaempleo.vistas.VistaNoticias;
-import es.ujaen.uvirtual.utilidades.UVException;
+
 
 /** test controlador noticias.
  * @author ATISoluciones
@@ -61,12 +60,11 @@ public class TestBEPControladorGestionNoticias {
     }
     
     /** Obtener noticias, sin parametro definido .
-	 * @throws SQLException si fallo bd  .
 	 * @throws IOException si error io .
 	 * @throws ServletException  si error servlet .
 	 */
 	@Test
-	public void testA01Obtener() throws SQLException, ServletException, IOException {
+	public void testA01Obtener() throws ServletException, IOException {
 		VistaNoticias bean = obtenerNoticias(null);
 		
 		assertEquals(MENSAJE_SIN_ERROR, 0, bean.getMensajesDeError().size());
@@ -74,12 +72,11 @@ public class TestBEPControladorGestionNoticias {
 	}
     
 	/** Obtener listado de noticias.
-	 * @throws SQLException si fallo bd 
 	 * @throws IOException si error io
 	 * @throws ServletException  si error servlet
 	 */
 	@Test
-	public void testA02Obtener() throws SQLException, ServletException, IOException {
+	public void testA02Obtener() throws ServletException, IOException {
 		VistaNoticias bean = obtenerNoticias(ControladorNoticias.ACCION_INDEX);
 
 		assertEquals(MENSAJE_SIN_ERROR, 0, bean.getMensajesDeError().size());
@@ -87,12 +84,11 @@ public class TestBEPControladorGestionNoticias {
 	}
 	
 	/** Obtener datatable noticias .
-	 * @throws SQLException si fallo bd .
 	 * @throws IOException si error io .
 	 * @throws ServletException  si error servlet .
 	 */
 	@Test
-	public void testA03Obtener() throws SQLException, ServletException, IOException {
+	public void testA03Obtener() throws ServletException, IOException {
 		VistaNoticias bean = obtenerNoticias(ControladorNoticias.ACCION_DATATABLE);
 		
 		assertNotEquals(MENSAJE_NOTICIAS_DEVUELTAS, 0, bean.getDatatableNoticias().getData().size());
@@ -101,13 +97,11 @@ public class TestBEPControladorGestionNoticias {
 	}
 	
 	/** insertar noticia.
-	 * @throws SQLException si fallo bd 
-	 * @throws UVException si error uv
 	 * @throws IOException si error io
 	 * @throws ServletException  si error servlet
 	 */
 	@Test
-	public void testA04Insertar() throws SQLException, UVException, ServletException, IOException {
+	public void testA04Insertar() throws ServletException, IOException {
 		PeticionHttp peticion = UtilsTestBolsaEmpleo.peticionAutenticadaPersonal();
 		peticion.setParameter(ControladorNoticias.PARAM_ACCION, ControladorNoticias.ACCION_AGREGAR_NOTICIA);
 		peticion.setParameter(ControladorNoticias.PARAM_ENLACE, ENLACE_NOTICIA);

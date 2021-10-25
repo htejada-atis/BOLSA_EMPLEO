@@ -442,6 +442,7 @@ public class ModeloUsuarioBolsaEmpleo {
 	 * @return .
 	 * @see getColumnsFromInsertOrUpdate para orden.
 	 */
+	@SuppressWarnings({"checkstyle:ExecutableStatementCount"})
 	private int setColumnsFromInsertOrUpdate(PreparedStatement stmt, UsuarioBolsaEmpleo usuario, UsuarioBolsaEmpleo usuarioInsertOrUpdate) throws SQLException {
 		int parameterIndex = 1;
 		

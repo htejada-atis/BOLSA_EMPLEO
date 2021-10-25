@@ -134,6 +134,7 @@ public class ControladorMisSolicitudes extends HttpServlet {
 	 * @see HttpServlet#doGet(HttpServletRequest request, HttpServletResponse response)
 	 */
 	@Override
+	@SuppressWarnings({"checkstyle:CyclomaticComplexity","checkstyle:JavaNCSS"})
 	public void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 		UVDatos datos = (UVDatos) request.getAttribute(UVDatos.NOMBRE_ATRIBUTO);
 		datos.setDocType("<!DOCTYPE html>");
@@ -310,9 +311,8 @@ public class ControladorMisSolicitudes extends HttpServlet {
 	 * @param request .
 	 * @param response .
 	 * @throws IOException .
-	 * @throws SQLException .
 	 */
-	private void listadoSolicitudes(VistaSolicitudes bean, UVDatos datos, HttpServletRequest request, HttpServletResponse response) throws IOException, SQLException {
+	private void listadoSolicitudes(VistaSolicitudes bean, UVDatos datos, HttpServletRequest request, HttpServletResponse response) throws IOException {
 		ModeloSolicitud modelo = ModeloSolicitud.obtenerInstancia(); 
 		
 		datos.setRespuestaEnviada(true);
@@ -443,7 +443,7 @@ public class ControladorMisSolicitudes extends HttpServlet {
 		}
 	}
 	
-	private void listadoAreas(VistaSolicitudes bean, UVDatos datos, HttpServletRequest request, HttpServletResponse response) throws IOException, SQLException {
+	private void listadoAreas(VistaSolicitudes bean, UVDatos datos, HttpServletRequest request, HttpServletResponse response) throws IOException {
 		ModeloArea modelo = ModeloArea.obtenerInstancia();
 		datos.setContentType(RESPONSE_AJAX_CONTENTTYPE);
 		datos.setRespuestaEnviada(true);
@@ -879,10 +879,10 @@ public class ControladorMisSolicitudes extends HttpServlet {
 	private ArrayList<Bolsa> getListadoBolsasFromJson(VistaSolicitudes bean, HttpServletRequest request, Solicitud solicitud) throws UVException, SQLException {
 		Gson gson = new GsonBuilder().create();		
 		List<String> idBolsas = null;
-
+		
 		// parseamos json bolsas
-		try {			
-			idBolsas = gson.fromJson(request.getParameter(PARAM_BOLSAS), new TypeToken<List<String>>() { }.getType());					
+		try {
+			idBolsas = gson.fromJson(request.getParameter(PARAM_BOLSAS), new TypeToken<List<String>>() { }.getType());
 		} catch (Exception e) {
 			throw new UVException(MENSAJE_ERROR_BOLSAS_SELECCIONADAS_INCORRECTAS);
 		}

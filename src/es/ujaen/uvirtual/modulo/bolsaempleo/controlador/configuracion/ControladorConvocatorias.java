@@ -102,6 +102,7 @@ public class ControladorConvocatorias extends HttpServlet {
 	 * @see HttpServlet#doGet(HttpServletRequest request, HttpServletResponse response)
 	 */
 	@Override
+	@SuppressWarnings({"checkstyle:CyclomaticComplexity", "checkstyle:JavaNCSS", "checkstyle:ExecutableStatementCount"})
 	public void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 		UVDatos datos = (UVDatos) request.getAttribute(UVDatos.NOMBRE_ATRIBUTO);
 		datos.setDocType("<!DOCTYPE html>");
@@ -201,7 +202,7 @@ public class ControladorConvocatorias extends HttpServlet {
 		bean.setVista(JSP_INDEX);
 	}
 		
-	private void listado(VistaConvocatorias bean, UVDatos datos, HttpServletRequest request, HttpServletResponse response) throws IOException, SQLException {
+	private void listado(VistaConvocatorias bean, UVDatos datos, HttpServletRequest request, HttpServletResponse response) throws IOException {
 		ModeloConvocatoria modelo = ModeloConvocatoria.obtenerInstancia(); 
 		
 		datos.setContentType(RESPONSE_AJAX_CONTENTTYPE);
