@@ -280,7 +280,7 @@ public class ControladorResultados extends HttpServlet {
 		}
 	}
 	
-	private void exportarResultados(UVDatos datos, HttpServletRequest request, HttpServletResponse response) throws IOException, SQLException, UVException {
+	private void exportarResultados(UVDatos datos, HttpServletRequest request, HttpServletResponse response) throws SQLException, UVException {
 		
 		Integer idBolsa = Formateador.leeParametroInteger(BolsaEmpleoUtils.getParamRequestOrSession(request, PARAM_BOLSA));
 		

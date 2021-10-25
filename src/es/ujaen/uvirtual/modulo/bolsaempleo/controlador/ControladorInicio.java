@@ -6,8 +6,6 @@ import java.sql.SQLException;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-
-import javax.servlet.ServletException;
 import javax.servlet.annotation.MultipartConfig;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
@@ -84,7 +82,7 @@ public class ControladorInicio extends HttpServlet {
 	 * @see HttpServlet#doGet(HttpServletRequest request, HttpServletResponse response)
 	 */
 	@Override
-	public void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+	public void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException {
 		UVDatos datos = (UVDatos) request.getAttribute(UVDatos.NOMBRE_ATRIBUTO);
 		datos.setDocType("<!DOCTYPE html>");
 		datos.setContentType("text/html");
@@ -159,7 +157,7 @@ public class ControladorInicio extends HttpServlet {
 	 * @see HttpServlet#doPost(HttpServletRequest request, HttpServletResponse response)
 	 */
 	@Override
-	public void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+	public void doPost(HttpServletRequest request, HttpServletResponse response) throws IOException {
 		doGet(request, response);
 	}
 		
@@ -173,7 +171,7 @@ public class ControladorInicio extends HttpServlet {
 	 * @throws SQLException excepcion de bbdd.
 	 */
 	private void obtenerTodasNoticias(VistaInicio bean, HttpServletRequest request, HttpServletResponse response, UVDatos datos) 
-			throws IOException, SQLException {
+			throws IOException {
 		ModeloNoticia modelo = ModeloNoticia.obtenerInstancia();
 		
 		bean.setVista(JSP_INICIO);

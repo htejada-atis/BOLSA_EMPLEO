@@ -40,38 +40,36 @@ public class TestBEPControladorGestionFicheros {
     	BbddRunner.conectarBd();
     	UtilsTestBolsaEmpleo.inicializaBolsaEmpleo();
     }
-    
-    
-    private VistaFicheros obtenerFicheros(String action) throws ServletException, IOException {
-    	PeticionHttp peticion = UtilsTestBolsaEmpleo.peticionAutenticadaPersonal();
+	
+	
+	private VistaFicheros obtenerFicheros(String action) throws ServletException, IOException {
+		PeticionHttp peticion = UtilsTestBolsaEmpleo.peticionAutenticadaPersonal();
 		peticion.setParameter(ControladorGestionFicheros.PARAM_ACCION, action);
 
 		RespuestaHttp respuesta = new RespuestaHttp();
 		ControladorGestionFicheros controlador = new ControladorGestionFicheros();
 		controlador.doGet(peticion, respuesta);
 		return (VistaFicheros) peticion.getUVDatos().getVistas().get(VistaFicheros.class.getName());
-    }
-    
-    /** Obtener ficheros, sin parametro definido .
-	 * @throws SQLException si fallo bd  .
+	}
+	
+	/** Obtener ficheros, sin parametro definido .
 	 * @throws IOException si error io .
 	 * @throws ServletException  si error servlet .
 	 */
 	@Test
-	public void testA01() throws SQLException, ServletException, IOException {
+	public void testA01() throws ServletException, IOException {
 		VistaFicheros bean = obtenerFicheros(null);
 		
 		assertEquals(MENSAJE_SIN_ERROR, 0, bean.getMensajesDeError().size());
 		assertEquals(MENSAJE_SIN_ADVERTENCIAS, 0, bean.getMensajesDeAdvertencia().size());
 	}
-    
+	
 	/** obtener listado de ficheros.
-	 * @throws SQLException si fallo bd 
 	 * @throws IOException si error io
 	 * @throws ServletException  si error servlet
 	 */
 	@Test
-	public void testA02() throws SQLException, ServletException, IOException {
+	public void testA02() throws ServletException, IOException {
 		VistaFicheros bean = obtenerFicheros(ControladorGestionFicheros.ACCION_INDEX);
 
 		assertEquals(MENSAJE_SIN_ERROR, 0, bean.getMensajesDeError().size());
@@ -79,12 +77,11 @@ public class TestBEPControladorGestionFicheros {
 	}
 	
 	/** Obtener datatable ficheros .
-	 * @throws SQLException si fallo bd .
 	 * @throws IOException si error io .
 	 * @throws ServletException  si error servlet .
 	 */
 	@Test
-	public void testA03() throws SQLException, ServletException, IOException {
+	public void testA03() throws ServletException, IOException {
 		VistaFicheros bean = obtenerFicheros(ControladorGestionFicheros.ACCION_DATATABLE);
 		
 		assertNotEquals(0, bean.getDatatableFicheros().getData().size());

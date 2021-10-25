@@ -101,8 +101,8 @@ public class TestBEPBeanMeritoPreferente {
 	/** test equals.
 	 */
 	@Test
+	@SuppressWarnings({"checkstyle:ExecutableStatementCount"})
 	public void testA03() {
-
 		MeritoPreferente merito2 = new MeritoPreferente(CODNUM, CODIGO, NOMBRE, OBSERVACIONES, TIPO, TIPO_CALCULO, APLICABLE, BASE, FACTOR,
 				VALORMAXIMO, ITEM, BLOQUE, APARTADO, ITEM2, ACTIVO);
 		MeritoPreferente merito = new MeritoPreferente(merito2);

@@ -114,6 +114,7 @@ public class ControladorValidarNoAfines extends HttpServlet {
 	 * @see HttpServlet#doGet(HttpServletRequest request, HttpServletResponse response)
 	 */
 	@Override
+	@SuppressWarnings({"checkstyle:CyclomaticComplexity"})
 	public void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException {
 		UVDatos datos = (UVDatos) request.getAttribute(UVDatos.NOMBRE_ATRIBUTO);
 		datos.setDocType("<!DOCTYPE html>");
@@ -283,6 +284,7 @@ public class ControladorValidarNoAfines extends HttpServlet {
 		}
 	}
 	
+	@SuppressWarnings({"checkstyle:CyclomaticComplexity", "checkstyle:JavaNCSS", "checkstyle:ExecutableStatementCount"})
 	private void validarMerito(VistaValidarNoAfines bean, UVDatos datos, HttpServletRequest request, HttpServletResponse response)
 			throws UVException, IOException {
 		ModeloValidar modeloValidar = ModeloValidar.obtenerInstancia();

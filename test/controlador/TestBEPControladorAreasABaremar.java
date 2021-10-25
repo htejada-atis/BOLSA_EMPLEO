@@ -58,12 +58,11 @@ public class TestBEPControladorAreasABaremar {
 	}
     
     /** Obtener áreas, sin parametro definido .
-	 * @throws SQLException si fallo bd .
 	 * @throws IOException si error io .
 	 * @throws ServletException  si error servlet .
 	 */
 	@Test
-	public void testA01() throws SQLException, ServletException, IOException {
+	public void testA01() throws ServletException, IOException {
 		PeticionHttp peticion = UtilsTestBolsaEmpleo.peticionAutenticadaPersonal();
 		
 		RespuestaHttp respuesta = new RespuestaHttp();
@@ -77,12 +76,11 @@ public class TestBEPControladorAreasABaremar {
 	}
 	
 	/** Obtener áreas, acción index .
-	 * @throws SQLException si fallo bd .
 	 * @throws IOException si error io .
 	 * @throws ServletException  si error servlet .
 	 */
 	@Test
-	public void testA02() throws SQLException, ServletException, IOException {
+	public void testA02() throws ServletException, IOException {
 		PeticionHttp peticion = UtilsTestBolsaEmpleo.peticionAutenticadaPersonal();
 		peticion.setParameter(ControladorAreasABaremar.PARAM_ACCION, ControladorAreasABaremar.ACCION_INDEX);
 		
@@ -97,12 +95,11 @@ public class TestBEPControladorAreasABaremar {
 	}
 	
 	/** Obtener áreas, acción index .
-	 * @throws SQLException si fallo bd .
 	 * @throws IOException si error io .
 	 * @throws ServletException  si error servlet .
 	 */
 	@Test
-	public void testA03ObtenerAreas() throws SQLException, ServletException, IOException {
+	public void testA03ObtenerAreas() throws ServletException, IOException {
 		VistaAreasBaremar bean = obtenerAreas();
 		
 		assertNotEquals(MENSAJE_AREAS_DEVUELTAS, 0, bean.getDatatableAreas().getData().size());
@@ -111,12 +108,11 @@ public class TestBEPControladorAreasABaremar {
 	}
     
 	/** Acción sobre área, pasar lista de bolsas a baremables .
-	 * @throws SQLException si fallo bd .
 	 * @throws IOException si error io .
 	 * @throws ServletException  si error servlet .
 	 */
 	@Test
-	public void testA04AccionAreaPasarABaremable() throws SQLException, ServletException, IOException {
+	public void testA04AccionAreaPasarABaremable() throws ServletException, IOException {
 		VistaAreasBaremar bean = obtenerAreas();
 		
 		PeticionHttp peticion = UtilsTestBolsaEmpleo.peticionAutenticadaPersonal();
@@ -136,12 +132,11 @@ public class TestBEPControladorAreasABaremar {
 	}
 	
 	/** Acción sobre área, pasar lista de bolsas a no baremables .
-	 * @throws SQLException si fallo bd .
 	 * @throws IOException si error io .
 	 * @throws ServletException  si error servlet .
 	 */
 	@Test
-	public void testA05AccionAreaPasarANoBaremable() throws SQLException, ServletException, IOException {
+	public void testA05AccionAreaPasarANoBaremable() throws ServletException, IOException {
 		VistaAreasBaremar bean = obtenerAreas();
 		
 		PeticionHttp peticion = UtilsTestBolsaEmpleo.peticionAutenticadaPersonal();
@@ -162,12 +157,11 @@ public class TestBEPControladorAreasABaremar {
 	}
 	
 	/** importar áreas de uvirtual .
-	 * @throws SQLException si fallo bd .
 	 * @throws IOException si error io .
 	 * @throws ServletException  si error servlet .
 	 */
 	@Test
-	public void testA06ImportarAreasUVirtual() throws SQLException, ServletException, IOException {
+	public void testA06ImportarAreasUVirtual() throws ServletException, IOException {
 		PeticionHttp peticion = UtilsTestBolsaEmpleo.peticionAutenticadaPersonal();
 		peticion.setParameter(ControladorAreasABaremar.PARAM_ACCION, ControladorAreasABaremar.ACCION_IMPORTAR_AREAS_UVIRTUAL);
 		
@@ -204,12 +198,11 @@ public class TestBEPControladorAreasABaremar {
 	}
 	
 	/** Obtener áreas, acción no válida .
-	 * @throws SQLException si fallo bd .
 	 * @throws IOException si error io .
 	 * @throws ServletException  si error servlet .
 	 */
 	@Test
-	public void testE03AccionNoValida() throws SQLException, ServletException, IOException {
+	public void testE03AccionNoValida() throws ServletException, IOException {
 		PeticionHttp peticion = UtilsTestBolsaEmpleo.peticionAutenticadaPersonal();
 		peticion.setParameter(ControladorAreasABaremar.PARAM_ACCION, ACCION_NO_VALIDA);
 		
@@ -224,12 +217,11 @@ public class TestBEPControladorAreasABaremar {
 	}
 	
 	/** Acción sobre área no válida .
-	 * @throws SQLException si fallo bd .
 	 * @throws IOException si error io .
 	 * @throws ServletException  si error servlet .
 	 */
 	@Test
-	public void testE04AccionAreaNoValida() throws SQLException, ServletException, IOException {
+	public void testE04AccionAreaNoValida() throws ServletException, IOException {
 		VistaAreasBaremar bean = obtenerAreas();
 		
 		PeticionHttp peticion = UtilsTestBolsaEmpleo.peticionAutenticadaPersonal();

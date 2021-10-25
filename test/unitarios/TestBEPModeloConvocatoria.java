@@ -4,18 +4,14 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
-
 import java.io.IOException;
 import java.sql.SQLException;
-import java.text.ParseException;
 import java.util.Date;
 import java.util.List;
-
 import org.junit.BeforeClass;
 import org.junit.FixMethodOrder;
 import org.junit.Test;
 import org.junit.runners.MethodSorters;
-
 import bbdd.BbddRunner;
 import bbdd.UtilsTestBolsaEmpleo;
 import es.ujaen.uvirtual.modelo.conexion.Conexion;
@@ -56,10 +52,9 @@ public class TestBEPModeloConvocatoria {
 	 * 
 	 * @throws SQLException   si error en bd
 	 * @throws UVException    si error al validar convocatoria
-	 * @throws ParseException si error al validar fecha
 	 */
 	@Test
-	public void testA01InsertaConvocatoria() throws SQLException, ParseException, UVException {
+	public void testA01InsertaConvocatoria() throws SQLException, UVException {
 		Convocatoria convocatoria = new Convocatoria();
 		convocatoria.setFechaCierre(FECHACOMISION);
 		convocatoria.setDescripcion(CADENA);

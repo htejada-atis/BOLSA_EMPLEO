@@ -260,9 +260,8 @@ public class ControladorNoticias extends HttpServlet {
 	 * @param request .
 	 * @param response .
 	 * @throws IOException en caso de error de input u output .
-	 * @throws SQLException excepcion de bbdd.
 	 */
-	private void listadoNoticias(VistaNoticias bean, UVDatos datos, HttpServletRequest request, HttpServletResponse response) throws IOException, SQLException {
+	private void listadoNoticias(VistaNoticias bean, UVDatos datos, HttpServletRequest request, HttpServletResponse response) throws IOException {
 		ModeloNoticia modelo = ModeloNoticia.obtenerInstancia();
 		
 		datos.setContentType(RESPONSE_AJAX_CONTENTTYPE);

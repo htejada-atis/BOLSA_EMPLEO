@@ -268,6 +268,7 @@ public class TestBEPModeloBaremacionItems {
 	 * borrarItemsExcluyentesAItem .
 	 */
 	@Test
+	@SuppressWarnings({"checkstyle:magicnumber"})
 	public void testA11borrarItemsExcluyentesAItem() {
 		try {
 			ModeloBaremacionItems modeloItems = ModeloBaremacionItems.obtenerInstancia();

@@ -53,10 +53,9 @@ public class TestBEPModeloNoticia {
 	 * 
 	 * @throws SQLException   si error en bd
 	 * @throws UVException    si error al validar noticia
-	 * @throws ParseException si error al validar fecha
 	 */
 	@Test
-	public void testA01InsertaNoticia() throws SQLException, ParseException, UVException {
+	public void testA01InsertaNoticia() throws SQLException, UVException {
 		Noticia noticia = new Noticia();
 		noticia.setEnlace(ENLACE_NOTICIA);
 		noticia.setTexto(TEXTO_NOTICIA);
@@ -106,10 +105,9 @@ public class TestBEPModeloNoticia {
 	 * 
 	 * @throws SQLException   si error bd
 	 * @throws UVException    error experado
-	 * @throws ParseException si error en fecha
 	 */
 	@Test(expected = UVException.class)
-	public void testE02InsertaNoticiaSinEnlace() throws SQLException, UVException, ParseException {
+	public void testE02InsertaNoticiaSinEnlace() throws SQLException, UVException {
 		Noticia noticia = new Noticia();
 		noticia.setTexto(TEXTO_NOTICIA);
 		noticia.setFecha(fechaEjemplo);
@@ -124,10 +122,9 @@ public class TestBEPModeloNoticia {
 	 * 
 	 * @throws SQLException   si error bd
 	 * @throws UVException    error experado
-	 * @throws ParseException si error en fecha
 	 */
 	@Test(expected = UVException.class)
-	public void testE03InsertaNoticiaSinTexto() throws SQLException, UVException, ParseException {
+	public void testE03InsertaNoticiaSinTexto() throws SQLException, UVException {
 		Noticia noticia = new Noticia();
 		noticia.setEnlace(ENLACE_NOTICIA);
 		noticia.setFecha(fechaEjemplo);

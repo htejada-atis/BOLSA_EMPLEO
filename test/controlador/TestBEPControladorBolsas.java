@@ -50,12 +50,11 @@ public class TestBEPControladorBolsas {
     }
                 
 	/** Obtener bolsas, sin parametro definido .
-	 * @throws SQLException si fallo bd 
 	 * @throws IOException si error io
 	 * @throws ServletException  si error servlet
 	 */
 	@Test
-	public void testA01() throws SQLException, ServletException, IOException {
+	public void testA01() throws ServletException, IOException {
 		VistaEstadoBolsas bean = getVistaBolsasEmpleo(null);
 		
 		assertEquals(0, bean.getMensajesDeError().size());
@@ -63,12 +62,11 @@ public class TestBEPControladorBolsas {
 	}
 	
 	/** Obtener listado de bolsas.
-	 * @throws SQLException si fallo bd 
 	 * @throws IOException si error io
 	 * @throws ServletException  si error servlet
 	 */
 	@Test
-	public void testA02() throws SQLException, ServletException, IOException {
+	public void testA02() throws ServletException, IOException {
 		VistaEstadoBolsas bean = getVistaBolsasEmpleo(ControladorBolsas.ACCION_INDEX);
 		
 		assertEquals(0, bean.getMensajesDeError().size());
@@ -76,12 +74,11 @@ public class TestBEPControladorBolsas {
 	}
 	
 	/** Obtener datatable.
-	 * @throws SQLException si fallo bd 
 	 * @throws IOException si error io
 	 * @throws ServletException  si error servlet
 	 */
 	@Test
-	public void testA03() throws SQLException, ServletException, IOException {
+	public void testA03() throws ServletException, IOException {
 		VistaEstadoBolsas bean = getVistaBolsasEmpleo(ControladorBolsas.ACCION_DATATABLE);
 		
 		assertNotEquals(0, bean.getDatatableBolsas().getData().size());
@@ -90,12 +87,11 @@ public class TestBEPControladorBolsas {
 	}
 	
 	/** Acción sobre una bolsa.
-	 * @throws SQLException si fallo bd 
 	 * @throws IOException si error io
 	 * @throws ServletException  si error servlet
 	 */
 	@Test
-	public void testA04() throws SQLException, ServletException, IOException {
+	public void testA04() throws ServletException, IOException {
 		this.cambiarEstadoBolsa(ControladorBolsas.ACCION_BOLSAS_BLOQUEAR, ModeloBolsa.BOLSA_ESTADO_BLOQUEADA);		
 	}
 	
@@ -131,52 +127,47 @@ public class TestBEPControladorBolsas {
 	}
 	
 	/** Acción sobre una bolsa.
-	 * @throws SQLException si fallo bd 
 	 * @throws IOException si error io
 	 * @throws ServletException  si error servlet
 	 */
 	@Test
-	public void testA06() throws SQLException, ServletException, IOException {
+	public void testA06() throws ServletException, IOException {
 		this.cambiarEstadoBolsa(ControladorBolsas.ACCION_BOLSAS_REVISION, ModeloBolsa.BOLSA_ESTADO_REVISION);		
 	}
 	
 	/** Acción sobre una bolsa.
-	 * @throws SQLException si fallo bd 
 	 * @throws IOException si error io
 	 * @throws ServletException  si error servlet
 	 */
 	@Test
-	public void testA07() throws SQLException, ServletException, IOException {
+	public void testA07() throws ServletException, IOException {
 		this.cambiarEstadoBolsa(ControladorBolsas.ACCION_BOLSAS_BAREMACION, ModeloBolsa.BOLSA_ESTADO_BAREMACION);		
 	}
 	
 	/** Acción sobre una bolsa.
-	 * @throws SQLException si fallo bd 
 	 * @throws IOException si error io
 	 * @throws ServletException  si error servlet
 	 */
 	@Test
-	public void testA08() throws SQLException, ServletException, IOException {
+	public void testA08() throws ServletException, IOException {
 		this.cambiarEstadoBolsa(ControladorBolsas.ACCION_BOLSAS_ALEGACION, ModeloBolsa.BOLSA_ESTADO_ALEGACIONES);		
 	}
 	
 	/** Acción sobre una bolsa.
-	 * @throws SQLException si fallo bd 
 	 * @throws IOException si error io
 	 * @throws ServletException  si error servlet
 	 */
 	@Test
-	public void testA09() throws SQLException, ServletException, IOException {
+	public void testA09() throws ServletException, IOException {
 		this.cambiarEstadoBolsa(ControladorBolsas.ACCION_BOLSAS_DESBLOQUEAR, ModeloBolsa.BOLSA_ESTADO_DESBLOQUEADA);		
 	}
 	
 	/** Id de bolsas no validas .
-	 * @throws SQLException si fallo bd 
 	 * @throws IOException si error io
 	 * @throws ServletException  si error servlet
 	 */
 	@Test
-	public void testA10() throws SQLException, ServletException, IOException {
+	public void testA10() throws ServletException, IOException {
 		PeticionHttp peticion = UtilsTestBolsaEmpleo.peticionAutenticadaPersonal();
 		peticion.setParameter(ControladorBolsas.PARAM_ACCION, ControladorBolsas.ACCION_BOLSA);		
 		peticion.setParameter(ControladorBolsas.PARAM_ACCION_BOLSA, ControladorBolsas.ACCION_BOLSAS_BLOQUEAR);
@@ -191,12 +182,11 @@ public class TestBEPControladorBolsas {
 	}
 	
 	/** Acción sobre bolsa no válida .
-	 * @throws SQLException si fallo bd 
 	 * @throws IOException si error io
 	 * @throws ServletException  si error servlet
 	 */
 	@Test
-	public void testA11() throws SQLException, ServletException, IOException {
+	public void testA11() throws ServletException, IOException {
 		// leemos algunos ids devueltos
 		VistaEstadoBolsas bean = getVistaBolsasEmpleo(ControladorBolsas.ACCION_DATATABLE);
 		String selected = "[" 
@@ -218,12 +208,11 @@ public class TestBEPControladorBolsas {
 	}
 	
 	/** Error al pedir listado.
-	 * @throws SQLException si fallo bd 
 	 * @throws IOException si error io
 	 * @throws ServletException  si error servlet
 	 */
 	@Test
-	public void testA12() throws SQLException, ServletException, IOException {
+	public void testA12() throws ServletException, IOException {
 		PeticionHttp peticion = UtilsTestBolsaEmpleo.peticionAutenticadaPersonal();
 		peticion.setParameter(ControladorBolsas.PARAM_ACCION, ControladorBolsas.ACCION_DATATABLE);
 		peticion.setParameter(BolsaEmpleoDataTable.PARAM_ORDER_BY, "ddd");
@@ -237,12 +226,11 @@ public class TestBEPControladorBolsas {
 	}
 	
 	/** Ids de bolsas no válidos.
-	 * @throws SQLException si fallo bd 
 	 * @throws IOException si error io
 	 * @throws ServletException  si error servlet
 	 */
 	@Test
-	public void testA13() throws SQLException, ServletException, IOException {
+	public void testA13() throws ServletException, IOException {
 		// leemos algunos ids devueltos
 		VistaEstadoBolsas bean = getVistaBolsasEmpleo(ControladorBolsas.ACCION_DATATABLE);
 		String selected = "[111111111111]";
@@ -261,7 +249,7 @@ public class TestBEPControladorBolsas {
 		assertNotEquals(-1, bean.getMensajesDeError().get(0).indexOf(ControladorBolsas.MENSAJE_ERROR_BOLSAS_SELECCIONADAS_INCORRECTAS));
 	}
 	
-	private void cambiarEstadoBolsa(String accionSobreBolsas, String estadoFinalBolsa) throws SQLException, ServletException, IOException {
+	private void cambiarEstadoBolsa(String accionSobreBolsas, String estadoFinalBolsa) throws ServletException, IOException {
 		// leemos algunos ids devueltos
 		VistaEstadoBolsas bean = getVistaBolsasEmpleo(ControladorBolsas.ACCION_DATATABLE);
 		String selected = "[" 

@@ -5,7 +5,6 @@ import static org.junit.Assert.assertNotEquals;
 import static org.junit.Assert.assertNotNull;
 import java.io.IOException;
 import java.sql.SQLException;
-import javax.servlet.ServletException;
 import org.junit.BeforeClass;
 import org.junit.FixMethodOrder;
 import org.junit.Test;
@@ -17,7 +16,7 @@ import controlador.implementacion.RespuestaHttp;
 import es.ujaen.uvirtual.modulo.bolsaempleo.controlador.configuracion.ControladorDedicaciones;
 import es.ujaen.uvirtual.modulo.bolsaempleo.utilidades.BolsaEmpleoDataTable;
 import es.ujaen.uvirtual.modulo.bolsaempleo.vistas.VistaDedicacion;
-import es.ujaen.uvirtual.utilidades.UVException;
+
 
 /** test controlador dedicaciones .
  * @author ATISoluciones

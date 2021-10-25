@@ -2,7 +2,6 @@ package controlador;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotEquals;
-
 import java.io.IOException;
 import java.sql.SQLException;
 import javax.servlet.ServletException;
@@ -10,7 +9,6 @@ import org.junit.BeforeClass;
 import org.junit.FixMethodOrder;
 import org.junit.Test;
 import org.junit.runners.MethodSorters;
-
 import bbdd.BbddRunner;
 import bbdd.UtilsTestBolsaEmpleo;
 import controlador.implementacion.PeticionHttp;
@@ -19,7 +17,6 @@ import es.ujaen.uvirtual.modulo.bolsaempleo.controlador.configuracion.Controlado
 import es.ujaen.uvirtual.modulo.bolsaempleo.modelo.ModeloTitulacion;
 import es.ujaen.uvirtual.modulo.bolsaempleo.utilidades.BolsaEmpleoDataTable;
 import es.ujaen.uvirtual.modulo.bolsaempleo.vistas.VistaTitulaciones;
-import es.ujaen.uvirtual.utilidades.UVException;
 
 
 /** test controlador gestión titulaciones.
@@ -60,12 +57,11 @@ public class TestBEPControladorGestionTitulaciones {
     }
                 
 	/** Obtener titulaciones, sin parametro definido .
-	 * @throws SQLException si fallo bd  .
 	 * @throws IOException si error io .
 	 * @throws ServletException  si error servlet .
 	 */
 	@Test
-	public void testA01Obtener() throws SQLException, ServletException, IOException {
+	public void testA01Obtener() throws ServletException, IOException {
 		VistaTitulaciones bean = getVistaTitulaciones(null);
 		
 		assertEquals(0, bean.getMensajesDeError().size());
@@ -73,12 +69,11 @@ public class TestBEPControladorGestionTitulaciones {
 	}
 	
 	/** Obtener listado de titulaciones .
-	 * @throws SQLException si fallo bd .
 	 * @throws IOException si error io .
 	 * @throws ServletException  si error servlet .
 	 */
 	@Test
-	public void testA02ObtenerTitulaciones() throws SQLException, ServletException, IOException {
+	public void testA02ObtenerTitulaciones() throws ServletException, IOException {
 		VistaTitulaciones bean = getVistaTitulaciones(ControladorGestionTitulaciones.ACCION_INDEX);
 		
 		assertEquals(0, bean.getMensajesDeError().size());
@@ -86,12 +81,11 @@ public class TestBEPControladorGestionTitulaciones {
 	}
 	
 	/** Obtener datatable titulaciones .
-	 * @throws SQLException si fallo bd .
 	 * @throws IOException si error io .
 	 * @throws ServletException  si error servlet .
 	 */
 	@Test
-	public void testA03ObtenerTitulaciones() throws SQLException, ServletException, IOException {
+	public void testA03ObtenerTitulaciones() throws ServletException, IOException {
 		VistaTitulaciones bean = getVistaTitulaciones(ControladorGestionTitulaciones.ACCION_DATATABLE_TITULACIONES);
 		
 		assertNotEquals(MENSAJE_TITULACIONES_DEVUELTAS, 0, bean.getDatatableTitulaciones().getData().size());	
@@ -100,13 +94,11 @@ public class TestBEPControladorGestionTitulaciones {
 	}
 	
 	/** insertar titulación .
-	 * @throws SQLException si fallo bd .
-	 * @throws UVException si error uv .
 	 * @throws IOException si error io .
 	 * @throws ServletException  si error servlet .
 	 */
 	@Test
-	public void testA04InsertarTitulacion() throws SQLException, UVException, ServletException, IOException {
+	public void testA04InsertarTitulacion() throws ServletException, IOException {
 		PeticionHttp peticion = UtilsTestBolsaEmpleo.peticionAutenticadaPersonal();
 		peticion.setParameter(ControladorGestionTitulaciones.PARAM_ACCION, ControladorGestionTitulaciones.ACCION_AGREGAR_TITULACION);
 		peticion.setParameter(ControladorGestionTitulaciones.PARAM_NOMBRE, NOMBRE_TITULACION);
@@ -149,12 +141,11 @@ public class TestBEPControladorGestionTitulaciones {
 	}
 	
 	/** obtener datatable titulaciones con parámetro erróneo de la tabla para forzar error .
-	 * @throws SQLException si fallo bd .
 	 * @throws IOException si error io .
 	 * @throws ServletException  si error servlet .
 	 */
 	@Test
-	public void testE01ObtenerTitulacionesParametroErroneo() throws SQLException, ServletException, IOException {
+	public void testE01ObtenerTitulacionesParametroErroneo() throws ServletException, IOException {
 		PeticionHttp peticion = UtilsTestBolsaEmpleo.peticionAutenticadaPersonal();
 		peticion.setParameter(ControladorGestionTitulaciones.PARAM_ACCION, ControladorGestionTitulaciones.ACCION_DATATABLE_TITULACIONES);
 		peticion.setParameter(BolsaEmpleoDataTable.PARAM_ORDER_BY, "9");
@@ -169,13 +160,11 @@ public class TestBEPControladorGestionTitulaciones {
 	}
 	
 	/** insertar titulación nombre vacío .
-	 * @throws SQLException si fallo bd .
-	 * @throws UVException si error uv .
 	 * @throws IOException si error io .
 	 * @throws ServletException  si error servlet .
 	 */
 	@Test
-	public void testE02InsertarTitulacionNombreVacio() throws SQLException, ServletException, IOException {
+	public void testE02InsertarTitulacionNombreVacio() throws ServletException, IOException {
 		PeticionHttp peticion = UtilsTestBolsaEmpleo.peticionAutenticadaPersonal();
 		peticion.setParameter(ControladorGestionTitulaciones.PARAM_ACCION, ControladorGestionTitulaciones.ACCION_AGREGAR_TITULACION);
 		peticion.setParameter(ControladorGestionTitulaciones.PARAM_NOMBRE, "");

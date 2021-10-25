@@ -112,6 +112,7 @@ public class TestBEPEvaluadores extends UtilsTestUsuarioBase {
 	 * Agregar evaluador a ciertas areas del departamento.
 	 */
 	@Test
+	@SuppressWarnings({"checkstyle:magicnumber"})
 	public void testA2() {
 		// seleccionamos el departamento (refresh)
 		WebElement tableAreas = seleccionarDepartamento(DEP2);

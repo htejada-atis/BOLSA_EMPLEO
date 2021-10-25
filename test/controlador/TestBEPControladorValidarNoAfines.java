@@ -33,7 +33,6 @@ public class TestBEPControladorValidarNoAfines {
 	private static final String MENSAJE_CANDIDATO_DEVUELTO = "Debe devolver candidato";
 	private static final String MENSAJE_CON_ERROR = "Debe devolver error";
 	private static final String MENSAJE_CON_ERROR_ESPERADO = "El mensaje de error debe coincidir";
-	private static final String MENSAJE_HISTORIALES_DEVUELTOS = "Debe devolver historiales";
 	private static final String MENSAJE_MERITOS_DEVUELTOS = "Debe devolver méritos";
 	private static final String MENSAJE_MERITO_DEVUELTO = "Debe devolver mérito";
 	private static final String MENSAJE_SIN_ADVERTENCIAS = "No debe mostrar advertencias";
@@ -273,6 +272,7 @@ public class TestBEPControladorValidarNoAfines {
 	 * @throws IOException .
 	 */
 	@Test
+	@SuppressWarnings({"checkstyle:ExecutableStatementCount"})
 	public void testA10AceptarMeritoCambiarItemAConAfinidad() throws IOException, SQLException, UVException {
 		VistaValidarNoAfines bean = obtenerMeritos();
 		

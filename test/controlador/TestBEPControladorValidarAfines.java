@@ -36,7 +36,6 @@ public class TestBEPControladorValidarAfines {
 	private static final String MENSAJE_CON_ERROR = "Debe devolver error";
 	private static final String MENSAJE_CON_ERROR_ESPERADO = "El mensaje de error debe coincidir";
 	private static final String MENSAJE_CON_EXITO_ESPERADO = "El mensaje de éxito debe coincidir";
-	private static final String MENSAJE_HISTORIALES_DEVUELTOS = "Debe devolver historiales";
 	private static final String MENSAJE_MERITOS_DEVUELTOS = "Debe devolver méritos";
 	private static final String MENSAJE_MERITO_DEVUELTO = "Debe devolver mérito";
 	private static final String MENSAJE_SIN_ADVERTENCIAS = "No debe mostrar advertencias";

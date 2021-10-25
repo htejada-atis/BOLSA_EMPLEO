@@ -1,6 +1,5 @@
 package es.ujaen.uvirtual.modulo.bolsaempleo.modelo;
 
-import java.io.IOException;
 import java.sql.Clob;
 import java.sql.Connection;
 import java.sql.Date;
@@ -14,7 +13,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-
 import es.ujaen.uvirtual.modelo.conexion.ConexionUvirtual;
 import es.ujaen.uvirtual.modulo.bolsaempleo.beans.Bolsa;
 import es.ujaen.uvirtual.modulo.bolsaempleo.beans.BolsaResultado;
@@ -569,11 +567,10 @@ public class ModeloResultados {
 	 * @param candidato .
 	 * @param convocatoria .
 	 * @return resultado .
-	 * @throws IOException .
 	 * @throws SQLException .
 	 * @throws UVException .
 	 */
-	public BolsaResultado getBolsaResultado(Bolsa bolsa, UsuarioBolsaEmpleo candidato, Convocatoria convocatoria) throws SQLException, UVException, IOException {
+	public BolsaResultado getBolsaResultado(Bolsa bolsa, UsuarioBolsaEmpleo candidato, Convocatoria convocatoria) throws SQLException, UVException {
 		
 		String consulta = "SELECT bepsob.BEPBOL_CODNUM, bepsob.TOTAL, bepsob.TOTALSINAPLICAR, bepsob.DESGLOSETOTAL, "
 				+ "		bepsob.DESGLOSEDESCRIPCION, bepsob.FECHABAREMACION, bepsol.CODNUM AS BEPSOL_CODNUM,"

@@ -26,7 +26,6 @@ import es.ujaen.uvirtual.utilidades.UVException;
 public class TestBEPControladorPlazasOfertadas {
 	
 	private static final String MENSAJE_PLAZAS_OFERTADAS_DEVUELTAS = "Debe devolver plazas ofertadas";
-	private static final String MENSAJE_PLAZA_OFERTADA_DEVUELTA = "Debe devolver plaza ofertada";
 	private static final String MENSAJE_CON_ERROR = "Debe devolver error";
 	private static final String MENSAJE_CON_ERROR_ESPERADO = "El mensaje de error debe coincidir";
 	private static final String MENSAJE_SIN_ADVERTENCIAS = "No debe mostrar advertencias";

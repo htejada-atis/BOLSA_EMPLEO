@@ -118,6 +118,7 @@ public class ControladorValidar extends HttpServlet {
 	 * @see HttpServlet#doGet(HttpServletRequest request, HttpServletResponse response)
 	 */
 	@Override
+	@SuppressWarnings({"checkstyle:CyclomaticComplexity"})
 	public void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException {
 		UVDatos datos = (UVDatos) request.getAttribute(UVDatos.NOMBRE_ATRIBUTO);
 		datos.setDocType("<!DOCTYPE html>");
@@ -208,6 +209,7 @@ public class ControladorValidar extends HttpServlet {
 		bean.getMensajesDeError().add(MENSAJE_ERROR_ACCION_NO_CONTEMPLADA);
 	}
 	
+	@SuppressWarnings({"checkstyle:CyclomaticComplexity"})
 	private void bolsaSeleccionada(VistaValidar bean, UVDatos datos, HttpServletRequest request, HttpServletResponse response, String nombreAccion) 
 			throws SQLException, UVException, IOException {
 		ModeloBolsa modeloBolsa = ModeloBolsa.obtenerInstancia();
@@ -295,6 +297,7 @@ public class ControladorValidar extends HttpServlet {
 		
 	}
 	
+	@SuppressWarnings({"checkstyle:CyclomaticComplexity", "checkstyle:NPathComplexity", "checkstyle:ExecutableStatementCount"})
 	private void modificarMerito(VistaValidar bean, UVDatos datos, HttpServletRequest request, HttpServletResponse response) throws UVException, IOException {
 		boolean afinidad = true;
 		Gson gson = new GsonBuilder().create();
@@ -426,7 +429,7 @@ public class ControladorValidar extends HttpServlet {
 		// parseamos json afinidades
 		HashMap<String, Double> afinidadesRaw;
 		try {
-			afinidadesRaw = gson.fromJson(request.getParameter(PARAM_AFINIDADES), new TypeToken<HashMap<String, Double>>() { }.getType());			
+			afinidadesRaw = gson.fromJson(request.getParameter(PARAM_AFINIDADES), new TypeToken<HashMap<String, Double>>() { }.getType());
 		} catch (Exception e) {
 			throw new UVException("Afinidades incorrectas");
 		}

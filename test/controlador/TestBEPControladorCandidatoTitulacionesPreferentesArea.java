@@ -62,6 +62,7 @@ public class TestBEPControladorCandidatoTitulacionesPreferentesArea {
 	}
 
 	// método para obtener la vista con una lista de titulaciones .
+	@SuppressWarnings({"checkstyle:magicnumber"})
 	private VistaCandidatoTitulacionesArea getVistaConTitulaciones() throws ServletException, IOException {
 		VistaCandidatoTitulacionesArea bean = getVistaConAreas();
 
@@ -78,13 +79,11 @@ public class TestBEPControladorCandidatoTitulacionesPreferentesArea {
 
 	/**
 	 * Obtener titulaciones, sin parametro definido .
-	 * 
-	 * @throws SQLException     si fallo bd .
 	 * @throws IOException      si error io .
 	 * @throws ServletException si error servlet .
 	 */
 	@Test
-	public void testA01Obtener() throws SQLException, ServletException, IOException {
+	public void testA01Obtener() throws ServletException, IOException {
 		PeticionHttp peticion = UtilsTestBolsaEmpleo.peticionAutenticadaCandidato();
 
 		RespuestaHttp respuesta = new RespuestaHttp();
@@ -97,15 +96,12 @@ public class TestBEPControladorCandidatoTitulacionesPreferentesArea {
 		assertEquals(MENSAJE_SIN_ADVERTENCIAS, 0, bean.getMensajesDeAdvertencia().size());
 	}
 
-	/**
-	 * Obtener areas .
-	 * 
-	 * @throws SQLException     si fallo bd .
+	/** Obtener areas .
 	 * @throws IOException      si error io .
 	 * @throws ServletException si error servlet .
 	 */
 	@Test
-	public void testA02ObtenerAreas() throws SQLException, ServletException, IOException {
+	public void testA02ObtenerAreas() throws ServletException, IOException {
 		PeticionHttp peticion = UtilsTestBolsaEmpleo.peticionAutenticadaCandidato();
 		peticion.setParameter(ControladorCandidatoTitulacionesPreferentesArea.PARAM_ACCION, ControladorCandidatoTitulacionesPreferentesArea.ACCION_INDEX);
 
@@ -119,15 +115,12 @@ public class TestBEPControladorCandidatoTitulacionesPreferentesArea {
 		assertEquals(MENSAJE_SIN_ADVERTENCIAS, 0, bean.getMensajesDeAdvertencia().size());
 	}
 
-	/**
-	 * Obtener datatable titulaciones .
-	 * 
-	 * @throws SQLException     si fallo bd .
+	/** Obtener datatable titulaciones .
 	 * @throws IOException      si error io .
 	 * @throws ServletException si error servlet .
 	 */
 	@Test
-	public void testA03ObtenerDataTableTitulaciones() throws SQLException, ServletException, IOException {
+	public void testA03ObtenerDataTableTitulaciones() throws ServletException, IOException {
 		VistaCandidatoTitulacionesArea bean = getVistaConTitulaciones();
 
 		assertNotEquals(MENSAJE_TITULACIONES_DEVUELTAS, 0, bean.getDatatableTitulaciones().getData().size());
@@ -135,15 +128,12 @@ public class TestBEPControladorCandidatoTitulacionesPreferentesArea {
 		assertEquals(MENSAJE_SIN_ADVERTENCIAS, 0, bean.getMensajesDeAdvertencia().size());
 	}
 
-	/**
-	 * Obtener datatable areas .
-	 * 
-	 * @throws SQLException     si fallo bd .
+	/** Obtener datatable areas .
 	 * @throws IOException      si error io .
 	 * @throws ServletException si error servlet .
 	 */
 	@Test
-	public void testA04ObtenerDataTableAreas() throws SQLException, ServletException, IOException {
+	public void testA04ObtenerDataTableAreas() throws ServletException, IOException {
 		VistaCandidatoTitulacionesArea bean = getVistaConAreas();
 
 		assertNotEquals(MENSAJE_AREAS_DEVUELTAS, 0, bean.getDatatableAreas().getData().size());
@@ -177,15 +167,12 @@ public class TestBEPControladorCandidatoTitulacionesPreferentesArea {
 		assertEquals(MENSAJE_SIN_ADVERTENCIAS, 0, bean2.getMensajesDeAdvertencia().size());
 	}
 
-	/**
-	 * Obtener datatable titulaciones sin área .
-	 * 
-	 * @throws SQLException     si fallo bd .
+	/** Obtener datatable titulaciones sin área .
 	 * @throws IOException      si error io .
 	 * @throws ServletException si error servlet .
 	 */
 	@Test
-	public void testE01ObtenerDataTableTitulacionesSinArea() throws SQLException, ServletException, IOException {
+	public void testE01ObtenerDataTableTitulacionesSinArea() throws ServletException, IOException {
 		PeticionHttp peticion = UtilsTestBolsaEmpleo.peticionAutenticadaCandidato();
 		peticion.setParameter(ControladorCandidatoTitulacionesPreferentesArea.PARAM_ACCION, ControladorCandidatoTitulacionesPreferentesArea.ACCION_DATATABLE_TITULACIONES);
 
@@ -199,15 +186,12 @@ public class TestBEPControladorCandidatoTitulacionesPreferentesArea {
 		assertEquals(MENSAJE_SIN_EXITO, 0, bean.getMensajesDeExito().size());
 	}
 
-	/**
-	 * Obtener datatable con parámetro erróneo .
-	 * 
-	 * @throws SQLException     si fallo bd .
+	/** Obtener datatable con parámetro erróneo .
 	 * @throws IOException      si error io .
 	 * @throws ServletException si error servlet .
 	 */
 	@Test
-	public void testE02ObtenerDataTableParametroErroneo() throws SQLException, ServletException, IOException {
+	public void testE02ObtenerDataTableParametroErroneo() throws ServletException, IOException {
 		PeticionHttp peticion = UtilsTestBolsaEmpleo.peticionAutenticadaCandidato();
 		peticion.setParameter(ControladorCandidatoTitulacionesPreferentesArea.PARAM_ACCION, ControladorCandidatoTitulacionesPreferentesArea.ACCION_DATATABLE_BOLSAS);
 		peticion.setParameter(BolsaEmpleoDataTable.PARAM_ORDER_BY, "9");

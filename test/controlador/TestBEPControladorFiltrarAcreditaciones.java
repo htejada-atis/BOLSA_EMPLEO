@@ -5,7 +5,6 @@ import static org.junit.Assert.assertNotEquals;
 import static org.junit.Assert.assertNotNull;
 import java.io.IOException;
 import java.sql.SQLException;
-import javax.servlet.ServletException;
 import org.junit.BeforeClass;
 import org.junit.FixMethodOrder;
 import org.junit.Test;
@@ -49,7 +48,7 @@ public class TestBEPControladorFiltrarAcreditaciones {
 	}
 
 	// método para obtener la vista con una lista de candidatos .
-	private VistaFiltrarAcreditaciones obtenerCandidatos() throws ServletException, IOException {
+	private VistaFiltrarAcreditaciones obtenerCandidatos() throws IOException {
 		PeticionHttp peticion = UtilsTestBolsaEmpleo.peticionAutenticadaPersonal();
 		peticion.setParameter(ControladorFiltrarAcreditaciones.PARAM_ACCION, ControladorFiltrarAcreditaciones.ACCION_DATATABLE_CANDIDATOS);
 
@@ -61,7 +60,7 @@ public class TestBEPControladorFiltrarAcreditaciones {
 
 	// método para obtener la vista con una lista de acreditaciones de un candidato
 	// .
-	private VistaFiltrarAcreditaciones obtenerAcreditaciones() throws ServletException, IOException {
+	private VistaFiltrarAcreditaciones obtenerAcreditaciones() throws IOException {
 		VistaFiltrarAcreditaciones bean = obtenerCandidatos();
 
 		PeticionHttp peticion = UtilsTestBolsaEmpleo.peticionAutenticadaPersonal();
@@ -74,15 +73,11 @@ public class TestBEPControladorFiltrarAcreditaciones {
 		return (VistaFiltrarAcreditaciones) peticion.getUVDatos().getVistas().get(VistaFiltrarAcreditaciones.class.getName());
 	}
 
-	/**
-	 * Obtener candidatos, sin parametro definido .
-	 * 
-	 * @throws SQLException     si fallo bd
+	/** Obtener candidatos, sin parametro definido .
 	 * @throws IOException      si error io
-	 * @throws ServletException si error servlet
 	 */
 	@Test
-	public void testA01() throws SQLException, ServletException, IOException {
+	public void testA01() throws IOException {
 		PeticionHttp peticion = UtilsTestBolsaEmpleo.peticionAutenticadaPersonal();
 
 		RespuestaHttp respuesta = new RespuestaHttp();
@@ -95,15 +90,11 @@ public class TestBEPControladorFiltrarAcreditaciones {
 		assertEquals(MENSAJE_SIN_ADVERTENCIAS, 0, bean.getMensajesDeAdvertencia().size());
 	}
 
-	/**
-	 * Obtener candidatos, sin parametro definido .
-	 * 
-	 * @throws SQLException     si fallo bd .
-	 * @throws IOException      si error io .
-	 * @throws ServletException si error servlet .
+	/** Obtener candidatos, sin parametro definido .
+	 * @throws IOException si error io .
 	 */
 	@Test
-	public void testA02ObtenerCandidatos() throws SQLException, ServletException, IOException {
+	public void testA02ObtenerCandidatos() throws IOException {
 		VistaFiltrarAcreditaciones bean = obtenerCandidatos();
 
 		assertNotEquals(MENSAJE_CANDIDATOS_DEVUELTOS, 0, bean.getDatatableCandidatos().getData().size());
@@ -111,15 +102,11 @@ public class TestBEPControladorFiltrarAcreditaciones {
 		assertEquals(MENSAJE_SIN_ADVERTENCIAS, 0, bean.getMensajesDeAdvertencia().size());
 	}
 
-	/**
-	 * Seleccionar un candidato .
-	 * 
-	 * @throws SQLException     si fallo bd .
+	/** Seleccionar un candidato .
 	 * @throws IOException      si error io .
-	 * @throws ServletException si error servlet .
 	 */
 	@Test
-	public void testA03SeleccionarCandidato() throws SQLException, ServletException, IOException {
+	public void testA03SeleccionarCandidato() throws IOException {
 		VistaFiltrarAcreditaciones bean = obtenerCandidatos();
 
 		PeticionHttp peticion = UtilsTestBolsaEmpleo.peticionAutenticadaPersonal();
@@ -137,31 +124,23 @@ public class TestBEPControladorFiltrarAcreditaciones {
 		assertEquals(MENSAJE_SIN_ADVERTENCIAS, 0, bean2.getMensajesDeAdvertencia().size());
 	}
 
-	/**
-	 * Obtener las acreditaciones de un candidato .
-	 * 
-	 * @throws SQLException     si fallo bd .
+	/** Obtener las acreditaciones de un candidato .
 	 * @throws IOException      si error io .
-	 * @throws ServletException si error servlet .
 	 */
 	@Test
-	public void testA04ObtenerAcreditacionesCandidato() throws SQLException, ServletException, IOException {
+	public void testA04ObtenerAcreditacionesCandidato() throws IOException {
 		VistaFiltrarAcreditaciones bean = obtenerAcreditaciones();
-
+		
 		assertNotEquals(MENSAJE_ACREDITACIONES_DEVUELTAS, 0, bean.getDataTableAcreditaciones().getData().size());
 		assertEquals(MENSAJE_SIN_ERROR, 0, bean.getMensajesDeError().size());
 		assertEquals(MENSAJE_SIN_ADVERTENCIAS, 0, bean.getMensajesDeAdvertencia().size());
 	}
 
-	/**
-	 * Selecciona una acreditación para validarla .
-	 * 
-	 * @throws SQLException     si fallo bd .
+	/** Selecciona una acreditación para validarla .
 	 * @throws IOException      si error io .
-	 * @throws ServletException si error servlet .
 	 */
 	@Test
-	public void testA05SeleccionarAcreditacion() throws SQLException, ServletException, IOException {
+	public void testA05SeleccionarAcreditacion() throws IOException {
 		VistaFiltrarAcreditaciones bean = obtenerCandidatos();
 		VistaFiltrarAcreditaciones bean2 = obtenerAcreditaciones();
 
@@ -181,15 +160,11 @@ public class TestBEPControladorFiltrarAcreditaciones {
 		assertEquals(MENSAJE_SIN_ADVERTENCIAS, 0, bean3.getMensajesDeAdvertencia().size());
 	}
 
-	/**
-	 * Deselecciona una acreditación para desvalidarla .
-	 * 
-	 * @throws SQLException     si fallo bd .
+	/** Deselecciona una acreditación para desvalidarla .
 	 * @throws IOException      si error io .
-	 * @throws ServletException si error servlet .
 	 */
 	@Test
-	public void testA06DeseleccionarAcreditacion() throws SQLException, ServletException, IOException {
+	public void testA06DeseleccionarAcreditacion() throws IOException {
 		VistaFiltrarAcreditaciones bean = obtenerCandidatos();
 		VistaFiltrarAcreditaciones bean2 = obtenerAcreditaciones();
 
@@ -209,14 +184,11 @@ public class TestBEPControladorFiltrarAcreditaciones {
 		assertEquals(MENSAJE_SIN_ADVERTENCIAS, 0, bean3.getMensajesDeAdvertencia().size());
 	}
 
-	/**
-	 * Obtener datatable candidatos con parámetro no válido para forzar el error .
-	 * 
-	 * @throws ServletException si error de servlet
+	/** Obtener datatable candidatos con parámetro no válido para forzar el error .
 	 * @throws IOException      si error de io
 	 */
 	@Test
-	public void testE01ObtenerCandidatosParametroNoValido() throws SQLException, ServletException, IOException {
+	public void testE01ObtenerCandidatosParametroNoValido() throws IOException {
 		PeticionHttp peticion = UtilsTestBolsaEmpleo.peticionAutenticadaPersonal();
 		peticion.setParameter(ControladorFiltrarAcreditaciones.PARAM_ACCION,
 				ControladorFiltrarAcreditaciones.ACCION_DATATABLE_CANDIDATOS);
@@ -232,15 +204,11 @@ public class TestBEPControladorFiltrarAcreditaciones {
 		assertEquals(MENSAJE_SIN_EXITO, 0, bean.getMensajesDeExito().size());
 	}
 
-	/**
-	 * Obtener datatable acreditaciones con parámetro no válido para forzar el error
-	 * .
-	 * 
-	 * @throws ServletException si error de servlet
+	/** Obtener datatable acreditaciones con parámetro no válido para forzar el error .
 	 * @throws IOException      si error de io
 	 */
 	@Test
-	public void testE02ObtenerAcreditacionesParametroNoValido() throws SQLException, ServletException, IOException {
+	public void testE02ObtenerAcreditacionesParametroNoValido() throws IOException {
 		VistaFiltrarAcreditaciones bean = obtenerCandidatos();
 
 		PeticionHttp peticion = UtilsTestBolsaEmpleo.peticionAutenticadaPersonal();
@@ -258,14 +226,11 @@ public class TestBEPControladorFiltrarAcreditaciones {
 		assertEquals(MENSAJE_SIN_EXITO, 0, bean2.getMensajesDeExito().size());
 	}
 
-	/**
-	 * Seleccionar candidato no válido .
-	 * 
-	 * @throws ServletException si error de servlet
+	/** Seleccionar candidato no válido .
 	 * @throws IOException      si error de io
 	 */
 	@Test
-	public void testE03SeleccionarCandidatoNoValido() throws SQLException, ServletException, IOException {
+	public void testE03SeleccionarCandidatoNoValido() throws IOException {
 		PeticionHttp peticion = UtilsTestBolsaEmpleo.peticionAutenticadaPersonal();
 		peticion.setParameter(ControladorFiltrarAcreditaciones.PARAM_ACCION, ControladorFiltrarAcreditaciones.ACCION_CANDIDATO_SELECCIONADO);
 		peticion.setParameter(ControladorFiltrarAcreditaciones.PARAM_CANDIDATO, "0");
@@ -280,14 +245,11 @@ public class TestBEPControladorFiltrarAcreditaciones {
 		assertEquals(MENSAJE_SIN_EXITO, 0, bean.getMensajesDeExito().size());
 	}
 
-	/**
-	 * Seleccionar acreditación no válida .
-	 * 
-	 * @throws ServletException si error de servlet
+	/** Seleccionar acreditación no válida .
 	 * @throws IOException      si error de io
 	 */
 	@Test
-	public void testE04SeleccionarAcreditacionNoValida() throws SQLException, ServletException, IOException {
+	public void testE04SeleccionarAcreditacionNoValida() throws IOException {
 		VistaFiltrarAcreditaciones bean = obtenerCandidatos();
 
 		PeticionHttp peticion = UtilsTestBolsaEmpleo.peticionAutenticadaPersonal();
@@ -305,14 +267,11 @@ public class TestBEPControladorFiltrarAcreditaciones {
 		assertEquals(MENSAJE_SIN_EXITO, 0, bean2.getMensajesDeExito().size());
 	}
 
-	/**
-	 * Seleccionar acreditación sin el parametro acreditación .
-	 * 
-	 * @throws ServletException si error de servlet
+	/** Seleccionar acreditación sin el parametro acreditación .
 	 * @throws IOException      si error de io
 	 */
 	@Test
-	public void testE05SeleccionarAcreditacionSinAcreditacion() throws SQLException, ServletException, IOException {
+	public void testE05SeleccionarAcreditacionSinAcreditacion() throws IOException {
 		VistaFiltrarAcreditaciones bean = obtenerCandidatos();
 
 		PeticionHttp peticion = UtilsTestBolsaEmpleo.peticionAutenticadaPersonal();
@@ -329,15 +288,11 @@ public class TestBEPControladorFiltrarAcreditaciones {
 		assertEquals(MENSAJE_SIN_EXITO, 0, bean2.getMensajesDeExito().size());
 	}
 
-	/**
-	 * acción no válida .
-	 * 
-	 * @throws SQLException     si fallo bd .
+	/** acción no válida .
 	 * @throws IOException      si error io .
-	 * @throws ServletException si error servlet .
 	 */
 	@Test
-	public void testE06AccionNoValida() throws SQLException, ServletException, IOException {
+	public void testE06AccionNoValida() throws IOException {
 		PeticionHttp peticion = UtilsTestBolsaEmpleo.peticionAutenticadaPersonal();
 		peticion.setParameter(ControladorFiltrarAcreditaciones.PARAM_ACCION, "accionnovalida");
 

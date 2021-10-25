@@ -2,7 +2,6 @@ package es.ujaen.uvirtual.modulo.bolsaempleo.beans;
 
 import java.io.Serializable;
 import java.util.Date;
-
 import es.ujaen.uvirtual.beans.Usuario;
 import es.ujaen.uvirtual.modulo.bolsaempleo.modelo.ModeloRol;
 import es.ujaen.uvirtual.utilidades.AdaptadorDocumentoIdentidad;

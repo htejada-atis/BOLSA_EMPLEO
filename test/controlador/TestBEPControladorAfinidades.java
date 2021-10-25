@@ -200,6 +200,7 @@ public class TestBEPControladorAfinidades {
 	 * @throws ServletException si error servlet .
 	 */
 	@Test
+	@SuppressWarnings({"checkstyle:ExecutableStatementCount"})
 	public void testE01() {		
 		PeticionHttp peticion = UtilsTestBolsaEmpleo.peticionAutenticadaPersonal();
 		peticion.setParameter(ControladorAfinidades.PARAM_ACCION, ControladorAfinidades.ACCION_AGREGAR_AFINIDAD);
