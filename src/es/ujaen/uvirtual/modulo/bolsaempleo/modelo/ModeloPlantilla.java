@@ -15,6 +15,7 @@ import es.ujaen.uvirtual.modulo.bolsaempleo.beans.PlazaOfertada;
 import es.ujaen.uvirtual.modulo.bolsaempleo.beans.UsuarioBolsaEmpleo;
 import es.ujaen.uvirtual.modulo.bolsaempleo.utilidades.BolsaEmpleoDataTable;
 import es.ujaen.uvirtual.modulo.bolsaempleo.utilidades.BolsaEmpleoUtils;
+import es.ujaen.uvirtual.utilidades.EscapaHTML;
 import es.ujaen.uvirtual.utilidades.Formateador;
 import es.ujaen.uvirtual.utilidades.UVException;
 
@@ -234,16 +235,20 @@ public class ModeloPlantilla {
 		
 		texto = texto.replaceAll(left + "idplaza" + right, plaza.getIdPlaza() != null ? plaza.getIdPlaza() : plaza.getCodNum().toString());
 		texto = texto.replaceAll(left + "area" + right, plaza.getArea().getDescripcion());
-		texto = texto.replaceAll(left + "justificacion" + right, plaza.getJustificacion());
+		texto = texto.replaceAll(left + "justificacion" + right, EscapaHTML.escapa(plaza.getJustificacion()));
+		texto = texto.replaceAll(left + "curso" + right, EscapaHTML.escapa(plaza.getCurso()));
 		texto = texto.replaceAll(left + "duracion_prevista" + right, plaza.getDuracionPrevista() != null ? plaza.getDuracionPrevista() : "");
-		texto = texto.replaceAll(left + "dedicacion" + right, plaza.getDedicacion().getTexto());
+		texto = texto.replaceAll(left + "dedicacion" + right, plaza.getDedicacion() != null ? plaza.getDedicacion().getTexto() : "");
 		texto = texto.replaceAll(left + "cuatrimestre" + right, plaza.getCuatrimestre() != null 
 				? ModeloPlazaOfertada.CUATRIMESTRES.getOrDefault(plaza.getCuatrimestre(), plaza.getCuatrimestre()) : "");
-		texto = texto.replaceAll(left + "sueldo" + right, plaza.getDedicacion().getSueldo().toString());
+		texto = texto.replaceAll(left + "sueldo" + right, plaza.getDedicacion() != null ? plaza.getDedicacion().getSueldo().toString() : "");
 		texto = texto.replaceAll(left + "centro_destino" + right, plaza.getCentroDestino() != null 
 				? ModeloPlazaOfertada.CENTROS_DESTINO.getOrDefault(plaza.getCentroDestino(), plaza.getCentroDestino()) : "");
 		texto = texto.replaceAll(left + "hora_fin_oferta" + right, Formateador.formatoFecha(plaza.getFechaFinOferta(), Formateador.FORMATO_FECHA_HORA_MINUTOS));
 		texto = texto.replaceAll(left + "fecha_fin_oferta" + right, Formateador.formatoFecha(plaza.getFechaFinOferta(), Formateador.FORMATO_FECHA_DDMMYYYY));
+		texto = texto.replaceAll(left + "fecha_creacion" + right, Formateador.formatoFecha(plaza.getFechaCreacion(), Formateador.FORMATO_FECHA_DDMMYYYY_HHMMSS));
+		texto = texto.replaceAll(left + "fecha_aprobacion" + right, 
+				Formateador.formatoFecha(BolsaEmpleoUtils.getCurrentDateTime(), Formateador.FORMATO_FECHA_DDMMYYYY_HHMMSS));
 		return texto;
 	}
 	
@@ -271,6 +276,32 @@ public class ModeloPlantilla {
 		texto = texto.replaceAll(left + "nombre_candidato" + right, contratacion.getCandidato().getNombre());
 		texto = texto.replaceAll(left + "NIF_candidato" + right, contratacion.getCandidato().getPrsNif());
 		texto = texto.replaceAll(left + "email_candidato" + right, contratacion.getCandidato().getEmail());
+		return texto;
+	}
+	
+	/** Reemplaza los datos de una plaza y de un usuario en una plantilla .
+	 * @param plaza .
+	 * @param usuario .
+	 * @param texto .
+	 * @param isXML .
+	 * @return string formateado .
+	 */
+	public String reemplazaPlazaYUsuarioEnPlantilla(PlazaOfertada plaza, UsuarioBolsaEmpleo usuario, String texto, boolean isXML) {
+		String left = SEPARATOR_LEFT;
+		String right = SEPARATOR_RIGHT;
+		
+		if (isXML) {
+			left = SEPARATOR_LEFT_XML;
+			right = SEPARATOR_RIGHT_XML;
+		}
+		
+		texto = reemplazaPlazaEnPlantilla(plaza, texto, isXML);
+		texto = texto.replaceAll(left + "nombre" + right, usuario.getNombre());
+		texto = texto.replaceAll(left + "apellidos" + right, usuario.getPrimerApellido() + " " + usuario.getSegundoApellido());
+		texto = texto.replaceAll(left + "nombre, apellidos" + right,
+				usuario.getNombre() + ", " + usuario.getPrimerApellido() + " " + usuario.getSegundoApellido());
+		texto = texto.replaceAll(left + "NIF" + right, usuario.getPrsNif());
+		texto = texto.replaceAll(left + "email" + right, usuario.getEmail());
 		return texto;
 	}
 

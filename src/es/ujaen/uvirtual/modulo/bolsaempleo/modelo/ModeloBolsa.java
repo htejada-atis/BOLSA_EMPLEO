@@ -239,13 +239,13 @@ public class ModeloBolsa {
 	public List<Bolsa> getBolsasByAreaDepartamento(Area area) throws SQLException, UVException {
 		ArrayList<Bolsa> bolsas = new ArrayList<>();
 		String consulta = ""
-				+ " SELECT bepbol.* FROM TBEP_AREAS bepare"
+				+ " SELECT DISTINCT bepbol.* FROM TBEP_AREAS bepare"
 				+ " INNER JOIN TBEP_BOLSAS bepbol ON bepbol.BEPARE_CODNUM = bepare.CODNUM"
 				+ " INNER JOIN TBEP_AREAS_DEPARTAMENTOS bepade ON bepade.BEPARE_CODNUM = bepare.CODNUM"
-				+ " WHERE bepade.BEPDEP_CODNUM = ("
+				+ " WHERE bepade.BEPDEP_CODNUM IN ("
 				+ "     SELECT bepade.BEPDEP_CODNUM FROM TBEP_AREAS_DEPARTAMENTOS bepade "
 				+ "     WHERE bepade.BEPARE_CODNUM = ?"
-				+ " ) ";
+				+ " )";
 		
 		try (Connection conexion = ConexionUvirtual.obtenerInstancia(); PreparedStatement stmt = conexion.prepareStatement(consulta)) {
 			int indexParam = 1;
@@ -310,9 +310,8 @@ public class ModeloBolsa {
 	 * 
 	 * @return num bolsas
 	 * @throws SQLException en caso de error en la BD
-	 * @throws UVException  si bolsa no es existe
 	 */
-	public Integer getTotalBolsas() throws SQLException, UVException {
+	public Integer getTotalBolsas() throws SQLException {
 		String consulta = "SELECT COUNT(*) AS total FROM TBEP_BOLSAS";
 
 		try (Connection conexion = ConexionUvirtual.obtenerInstancia();
@@ -331,9 +330,8 @@ public class ModeloBolsa {
 	 * 
 	 * @return num bolsas
 	 * @throws SQLException en caso de error en la BD
-	 * @throws UVException  si bolsa no es existe
 	 */
-	public Integer getBolsasBloqueadas() throws SQLException, UVException {
+	public Integer getBolsasBloqueadas() throws SQLException {
 		String consulta = "SELECT COUNT(*) AS total FROM TBEP_BOLSAS WHERE ESTADO='BLOQUEADA'";
 
 		try (Connection conexion = ConexionUvirtual.obtenerInstancia(); PreparedStatement stmt = conexion.prepareStatement(consulta)) {
@@ -351,9 +349,8 @@ public class ModeloBolsa {
 	 * 
 	 * @return num bolsas
 	 * @throws SQLException en caso de error en la BD
-	 * @throws UVException  si bolsa no es existe
 	 */
-	public Integer getBolsasRevisadas() throws SQLException, UVException {
+	public Integer getBolsasRevisadas() throws SQLException {
 		String consulta = "SELECT COUNT(*) AS total FROM TBEP_BOLSAS WHERE ESTADO='REVISION'";
 
 		try (Connection conexion = ConexionUvirtual.obtenerInstancia(); PreparedStatement stmt = conexion.prepareStatement(consulta)) {
@@ -371,9 +368,8 @@ public class ModeloBolsa {
 	 * 
 	 * @return num bolsas
 	 * @throws SQLException en caso de error en la BD
-	 * @throws UVException  si bolsa no es existe
 	 */
-	public Integer getBolsasBaremables() throws SQLException, UVException {
+	public Integer getBolsasBaremables() throws SQLException {
 		String consulta = "SELECT COUNT(*) AS total FROM TBEP_BOLSAS WHERE FLGBAREMABLE='S'";
 
 		try (Connection conexion = ConexionUvirtual.obtenerInstancia(); PreparedStatement stmt = conexion.prepareStatement(consulta)) {

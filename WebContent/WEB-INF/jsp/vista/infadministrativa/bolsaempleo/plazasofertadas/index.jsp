@@ -96,6 +96,8 @@ $(document).ready(function() {
 		"pageSize": 10,
 		"filterable": true,
 		"title": 'Plazas ofertadas',
+		"defaultOrderBy": 3,
+		"defaultOrderDirection": 'desc',
 		"action": "<%= ControladorPlazasOfertadas.ACCION_DATATABLE_PLAZAS_OFERTADAS %>",
 		"clickable": {'onClick': function(row) {
 			var params = {

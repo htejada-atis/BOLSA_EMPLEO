@@ -1,0 +1,2 @@
+INSERT INTO TBEP_PARAMETROS_CONFIG (NOMBRE,VALOR,DESCRIPCION,UID_USUARIO)
+VALUES ('bolsaempleo.local.idPlantillaAprobacionPlaza','4','Id de la plantilla para el correo de aviso de la aprobación de la plaza','CARGA_INICIAL');

@@ -125,6 +125,7 @@ public class BolsaEmpleoDataTable<T> {
 	 * @param params .
 	 * @throws UVException .
 	 */
+	@SuppressWarnings({"checkstyle:CyclomaticComplexity"})
 	public BolsaEmpleoDataTable(Map<String, String[]> params) throws UVException {
 		try {
 			this.currentPage = Integer.parseInt(String.join("", params.getOrDefault(PARAM_CURRENT_PAGE, new String[] {PARAM_CURRENT_PAGE_VALUE_DEFAULT})));
@@ -213,6 +214,7 @@ public class BolsaEmpleoDataTable<T> {
 	 * @throws SQLException .
 	 * @throws UVException .
 	 */
+	@SuppressWarnings({"checkstyle:CyclomaticComplexity"})
 	public void setFiltersParams(PreparedStatement stmt, PreparedStatement stmtCount, int index)
 			throws SQLException, UVException {
 		if (Boolean.TRUE.equals(this.isFilterable())) {
@@ -379,7 +381,8 @@ public class BolsaEmpleoDataTable<T> {
 		String columnName = column.getName();
 		return " ORDER BY " + columnName + " " + this.orderDirection;
 	}
-
+	
+	@SuppressWarnings({"checkstyle:CyclomaticComplexity"})
 	private String filterByQuery() throws UVException {
 		StringBuilder consultaResult = new StringBuilder();
 

@@ -1391,6 +1391,7 @@ public class ModeloSolicitud {
 	 * @return booleano que devuelve si hay méritos con afinidad sin valorar .
 	 * @throws SQLException .
 	 */
+	@SuppressWarnings({"checkstyle:ReturnCount"})
 	public boolean comprobarMeritosAfinidadSinValoracion(Solicitud solicitud) throws SQLException {
 		try (Connection conexion = ConexionUvirtual.obtenerInstancia()) {
 			// comprobar individualizados
@@ -1649,6 +1650,7 @@ public class ModeloSolicitud {
 	 * @param usuarioUpdate .
 	 * @throws SQLException .
 	 */
+	@SuppressWarnings({"checkstyle:ExecutableStatementCount", "checkstyle:NPathComplexity"})
 	private void eliminarBolsasExcluidasDeLaSolicitud(Connection conexion, Solicitud solicitud, List<Bolsa> bolsasExcluidas, UsuarioBolsaEmpleo usuarioUpdate)
 			throws SQLException {
 		

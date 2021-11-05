@@ -57,6 +57,7 @@ public class TestBEPControladorGestionTitulacionesPreferentesArea {
 	}
 
 	// método para obtener la vista con una lista de las titulaciones .
+	@SuppressWarnings({"checkstyle:magicnumber"})
 	private VistaTitulacionesArea getVistaConTitulaciones(String accion, boolean area) throws ServletException, IOException {
 		PeticionHttp peticion = UtilsTestBolsaEmpleo.peticionAutenticadaPersonal();
 		peticion.setParameter(ControladorGestionTitulacionesPreferentesArea.PARAM_ACCION, accion);
@@ -91,15 +92,12 @@ public class TestBEPControladorGestionTitulacionesPreferentesArea {
 		return (VistaTitulacionesArea) peticion.getUVDatos().getVistas().get(VistaTitulacionesArea.class.getName());
 	}
 
-	/**
-	 * Obtener areas, sin parametro definido .
-	 * 
-	 * @throws SQLException     si fallo bd .
+	/** Obtener areas, sin parametro definido .
 	 * @throws IOException      si error io .
 	 * @throws ServletException si error servlet .
 	 */
 	@Test
-	public void testA01Obtener() throws SQLException, ServletException, IOException {
+	public void testA01Obtener() throws ServletException, IOException {
 		PeticionHttp peticion = UtilsTestBolsaEmpleo.peticionAutenticadaPersonal();
 
 		RespuestaHttp respuesta = new RespuestaHttp();
@@ -113,15 +111,12 @@ public class TestBEPControladorGestionTitulacionesPreferentesArea {
 		assertEquals(MENSAJE_SIN_ADVERTENCIAS, 0, bean.getMensajesDeAdvertencia().size());
 	}
 
-	/**
-	 * Obtener listado de areas .
-	 * 
-	 * @throws SQLException     si fallo bd .
+	/** Obtener listado de areas .
 	 * @throws IOException      si error io .
 	 * @throws ServletException si error servlet .
 	 */
 	@Test
-	public void testA02Obtener() throws SQLException, ServletException, IOException {
+	public void testA02Obtener() throws ServletException, IOException {
 		VistaTitulacionesArea bean = getVistaConAreas();
 
 		assertNotEquals(MENSAJE_AREAS_DEVUELTAS, 0, bean.getAreas().size());
@@ -129,15 +124,12 @@ public class TestBEPControladorGestionTitulacionesPreferentesArea {
 		assertEquals(MENSAJE_SIN_ADVERTENCIAS, 0, bean.getMensajesDeAdvertencia().size());
 	}
 
-	/**
-	 * Obtener datatable titulaciones .
-	 * 
-	 * @throws SQLException     si fallo bd .
+	/** Obtener datatable titulaciones .
 	 * @throws IOException      si error io .
 	 * @throws ServletException si error servlet .
 	 */
 	@Test
-	public void testA03ObtenerTitulaciones() throws SQLException, ServletException, IOException {
+	public void testA03ObtenerTitulaciones() throws ServletException, IOException {
 		VistaTitulacionesArea bean = getVistaConTitulaciones(ControladorGestionTitulacionesPreferentesArea.ACCION_DATATABLE_TITULACIONES, true);
 
 		assertNotEquals(MENSAJE_TITULACIONES_DEVUELTAS, 0, bean.getDatatableTitulaciones().getData().size());
@@ -145,15 +137,12 @@ public class TestBEPControladorGestionTitulacionesPreferentesArea {
 		assertEquals(MENSAJE_SIN_ADVERTENCIAS, 0, bean.getMensajesDeAdvertencia().size());
 	}
 
-	/**
-	 * Obtener datatable titulaciones preferentes por área .
-	 * 
-	 * @throws SQLException     si fallo bd .
+	/** Obtener datatable titulaciones preferentes por área .
 	 * @throws IOException      si error io .
 	 * @throws ServletException si error servlet .
 	 */
 	@Test
-	public void testA04ObtenerTitulacionesPreferentesArea() throws SQLException, ServletException, IOException {
+	public void testA04ObtenerTitulacionesPreferentesArea() throws ServletException, IOException {
 		VistaTitulacionesArea bean = getVistaConTitulaciones(ControladorGestionTitulacionesPreferentesArea.ACCION_DATATABLE_TITULACIONES_PREFERENTES_AREA, true);
 
 		assertNotEquals(MENSAJE_TITULACIONES_DEVUELTAS, 0, bean.getDatatableTitulacionesArea().getData().size());
@@ -161,15 +150,12 @@ public class TestBEPControladorGestionTitulacionesPreferentesArea {
 		assertEquals(MENSAJE_SIN_ADVERTENCIAS, 0, bean.getMensajesDeAdvertencia().size());
 	}
 
-	/**
-	 * eliminar una titulaciones preferentes dentro de un área .
-	 * 
-	 * @throws SQLException     si fallo bd .
+	/** eliminar una titulaciones preferentes dentro de un área .
 	 * @throws IOException      si error io .
 	 * @throws ServletException si error servlet .
 	 */
 	@Test
-	public void testA05EliminarTitulacionesArea() throws SQLException, ServletException, IOException {
+	public void testA05EliminarTitulacionesArea() throws ServletException, IOException {
 		VistaTitulacionesArea bean = getVistaConTitulaciones(ControladorGestionTitulacionesPreferentesArea.ACCION_DATATABLE_TITULACIONES, true);
 		VistaTitulacionesArea bean2 = getVistaCambiarTitulacionesPreferentes(ControladorGestionTitulacionesPreferentesArea.ACCION_ELIMINAR_TITULACION_AREA, true,
 				"[" + bean.getDatatableTitulaciones().getData().get(0).getCodNum().toString() + "]");
@@ -178,15 +164,12 @@ public class TestBEPControladorGestionTitulacionesPreferentesArea {
 		assertEquals(MENSAJE_SIN_ADVERTENCIAS, 0, bean2.getMensajesDeAdvertencia().size());
 	}
 
-	/**
-	 * incluir titulaciones preferentes dentro de un área .
-	 * 
-	 * @throws SQLException     si fallo bd .
+	/** incluir titulaciones preferentes dentro de un área .
 	 * @throws IOException      si error io .
 	 * @throws ServletException si error servlet .
 	 */
 	@Test
-	public void testA06IncluirTitulacionesArea() throws SQLException, ServletException, IOException {
+	public void testA06IncluirTitulacionesArea() throws ServletException, IOException {
 		VistaTitulacionesArea bean = getVistaConTitulaciones(ControladorGestionTitulacionesPreferentesArea.ACCION_DATATABLE_TITULACIONES, true);
 		VistaTitulacionesArea bean2 = getVistaCambiarTitulacionesPreferentes(ControladorGestionTitulacionesPreferentesArea.ACCION_INCLUIR_TITULACION_AREA, true,
 				"[" + bean.getDatatableTitulaciones().getData().get(0).getCodNum().toString() + "]");
@@ -195,45 +178,36 @@ public class TestBEPControladorGestionTitulacionesPreferentesArea {
 		assertEquals(MENSAJE_SIN_ADVERTENCIAS, 0, bean2.getMensajesDeAdvertencia().size());
 	}
 
-	/**
-	 * eliminar ids de titulaciones no válidas .
-	 * 
-	 * @throws SQLException     si fallo bd .
+	/** eliminar ids de titulaciones no válidas .
 	 * @throws IOException      si error io .
 	 * @throws ServletException si error servlet .
 	 */
 	@Test
-	public void testE01EliminarTitulacionesNoValidas() throws SQLException, ServletException, IOException {
+	public void testE01EliminarTitulacionesNoValidas() throws ServletException, IOException {
 		VistaTitulacionesArea bean = getVistaCambiarTitulacionesPreferentes(ControladorGestionTitulacionesPreferentesArea.ACCION_ELIMINAR_TITULACION_AREA, true, "");
 
 		assertEquals(MENSAJE_CON_ERROR, 1, bean.getMensajesDeError().size());
 		assertEquals(MENSAJE_SIN_EXITO, 0, bean.getMensajesDeExito().size());
 	}
 
-	/**
-	 * incluir ids de titulaciones no válidas .
-	 * 
-	 * @throws SQLException     si fallo bd .
+	/** incluir ids de titulaciones no válidas .
 	 * @throws IOException      si error io .
 	 * @throws ServletException si error servlet .
 	 */
 	@Test
-	public void testE02IncluirTitulacionesNoValidas() throws SQLException, ServletException, IOException {
+	public void testE02IncluirTitulacionesNoValidas() throws ServletException, IOException {
 		VistaTitulacionesArea bean = getVistaCambiarTitulacionesPreferentes(ControladorGestionTitulacionesPreferentesArea.ACCION_INCLUIR_TITULACION_AREA, true, "");
 
 		assertEquals(MENSAJE_CON_ERROR, 1, bean.getMensajesDeError().size());
 		assertEquals(MENSAJE_SIN_EXITO, 0, bean.getMensajesDeExito().size());
 	}
 
-	/**
-	 * eliminar titulaciones con área nula .
-	 * 
-	 * @throws SQLException     si fallo bd .
+	/** eliminar titulaciones con área nula .
 	 * @throws IOException      si error io .
 	 * @throws ServletException si error servlet .
 	 */
 	@Test
-	public void testE03EliminarTitulacionesAreaNula() throws SQLException, ServletException, IOException {
+	public void testE03EliminarTitulacionesAreaNula() throws ServletException, IOException {
 		VistaTitulacionesArea bean = getVistaConTitulaciones(ControladorGestionTitulacionesPreferentesArea.ACCION_DATATABLE_TITULACIONES, true);
 		VistaTitulacionesArea bean2 = getVistaCambiarTitulacionesPreferentes(ControladorGestionTitulacionesPreferentesArea.ACCION_ELIMINAR_TITULACION_AREA, false,
 				"[" + bean.getDatatableTitulaciones().getData().get(0).getCodNum().toString() + "]");
@@ -242,15 +216,12 @@ public class TestBEPControladorGestionTitulacionesPreferentesArea {
 		assertEquals(MENSAJE_SIN_EXITO, 0, bean2.getMensajesDeExito().size());
 	}
 
-	/**
-	 * incluir titulaciones con área nula .
-	 * 
-	 * @throws SQLException     si fallo bd .
+	/** incluir titulaciones con área nula .
 	 * @throws IOException      si error io .
 	 * @throws ServletException si error servlet .
 	 */
 	@Test
-	public void testE04IncluirTitulacionesAreaNula() throws SQLException, ServletException, IOException {
+	public void testE04IncluirTitulacionesAreaNula() throws ServletException, IOException {
 		VistaTitulacionesArea bean = getVistaConTitulaciones(ControladorGestionTitulacionesPreferentesArea.ACCION_DATATABLE_TITULACIONES, true);
 		VistaTitulacionesArea bean2 = getVistaCambiarTitulacionesPreferentes(ControladorGestionTitulacionesPreferentesArea.ACCION_INCLUIR_TITULACION_AREA, false,
 				"[" + bean.getDatatableTitulaciones().getData().get(0).getCodNum().toString() + "]");
@@ -259,15 +230,12 @@ public class TestBEPControladorGestionTitulacionesPreferentesArea {
 		assertEquals(MENSAJE_SIN_EXITO, 0, bean2.getMensajesDeExito().size());
 	}
 
-	/**
-	 * incluir titulaciones ya incluidas en un área .
-	 * 
-	 * @throws SQLException     si fallo bd .
+	/** incluir titulaciones ya incluidas en un área .
 	 * @throws IOException      si error io .
 	 * @throws ServletException si error servlet .
 	 */
 	@Test
-	public void testE05RepetirIncluirTitulacionesArea() throws SQLException, ServletException, IOException {
+	public void testE05RepetirIncluirTitulacionesArea() throws ServletException, IOException {
 		VistaTitulacionesArea bean = getVistaConTitulaciones(ControladorGestionTitulacionesPreferentesArea.ACCION_DATATABLE_TITULACIONES, true);
 		getVistaCambiarTitulacionesPreferentes(ControladorGestionTitulacionesPreferentesArea.ACCION_INCLUIR_TITULACION_AREA, true,
 				"[" + bean.getDatatableTitulaciones().getData().get(0).getCodNum().toString() + "]");
@@ -278,30 +246,24 @@ public class TestBEPControladorGestionTitulacionesPreferentesArea {
 		assertEquals(MENSAJE_SIN_EXITO, 0, bean3.getMensajesDeExito().size());
 	}
 
-	/**
-	 * datatable titulaciones sin área definida .
-	 * 
-	 * @throws SQLException     si fallo bd .
+	/** datatable titulaciones sin área definida .
 	 * @throws IOException      si error io .
 	 * @throws ServletException si error servlet .
 	 */
 	@Test
-	public void testE06ObtenerTitulacionesSinArea() throws SQLException, ServletException, IOException {
+	public void testE06ObtenerTitulacionesSinArea() throws ServletException, IOException {
 		VistaTitulacionesArea bean = getVistaConTitulaciones(ControladorGestionTitulacionesPreferentesArea.ACCION_DATATABLE_TITULACIONES, false);
 
 		assertEquals(MENSAJE_CON_ERROR, 1, bean.getMensajesDeError().size());
 		assertEquals(MENSAJE_SIN_EXITO, 0, bean.getMensajesDeExito().size());
 	}
 
-	/**
-	 * datatable titulaciones preferentes a un área sin área definida .
-	 * 
-	 * @throws SQLException     si fallo bd .
+	/** datatable titulaciones preferentes a un área sin área definida .
 	 * @throws IOException      si error io .
 	 * @throws ServletException si error servlet .
 	 */
 	@Test
-	public void testE07ObtenerTitulacionesPreferentesSinArea() throws SQLException, ServletException, IOException {
+	public void testE07ObtenerTitulacionesPreferentesSinArea() throws ServletException, IOException {
 		VistaTitulacionesArea bean = getVistaConTitulaciones(ControladorGestionTitulacionesPreferentesArea.ACCION_DATATABLE_TITULACIONES_PREFERENTES_AREA, false);
 
 		assertEquals(MENSAJE_CON_ERROR, 1, bean.getMensajesDeError().size());

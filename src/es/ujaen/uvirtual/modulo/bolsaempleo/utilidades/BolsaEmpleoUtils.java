@@ -14,13 +14,13 @@ import java.sql.SQLException;
 import java.text.CharacterIterator;
 import java.text.DecimalFormat;
 import java.text.DecimalFormatSymbols;
-import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.text.StringCharacterIterator;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.time.ZoneId;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Locale;
@@ -561,4 +561,20 @@ public final class BolsaEmpleoUtils {
 		origen = origen.replace("\n", "<br/>");
 		return origen;
 	}
+	
+	/**
+	 * Método que devuelve el curso actual por defecto para las plazas ofertadas .
+	 * @return el curso en formato YY/YY .
+	 */
+	public static String getCurrentCourse() {
+		SimpleDateFormat simpleFormat = new SimpleDateFormat("yy");
+		Calendar cal = Calendar.getInstance();
+		
+		Date today = cal.getTime();
+		cal.add(Calendar.YEAR, 1);
+		Date nextYear = cal.getTime();
+		
+		return simpleFormat.format(today) + "/" + simpleFormat.format(nextYear);
+	}
+	
 }

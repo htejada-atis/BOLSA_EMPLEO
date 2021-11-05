@@ -333,6 +333,7 @@ public class ModeloMeritosPreferentes {
 	 * @throws SQLException .
 	 * @throws UVException .
 	 */
+	@SuppressWarnings({"checkstyle:ExecutableStatementCount"})
 	public Integer crearMeritoPreferente(MeritoPreferente merito, UsuarioBolsaEmpleo usuarioUpdate) throws UVException, SQLException {
 		if (merito == null) {
 			throw new UVException("No se puede insertar un merito preferente vacio");

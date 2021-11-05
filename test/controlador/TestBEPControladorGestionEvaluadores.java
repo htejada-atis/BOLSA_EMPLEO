@@ -93,15 +93,12 @@ public class TestBEPControladorGestionEvaluadores {
 		return (VistaEvaluadores) peticion.getUVDatos().getVistas().get(VistaEvaluadores.class.getName());
 	}
 
-	/**
-	 * Obtener departamentos, sin parametro definido .
-	 * 
-	 * @throws SQLException     si fallo bd .
+	/** Obtener departamentos, sin parametro definido .
 	 * @throws IOException      si error io .
 	 * @throws ServletException si error servlet .
 	 */
 	@Test
-	public void testA01Obtener() throws SQLException, ServletException, IOException {
+	public void testA01Obtener() throws ServletException, IOException {
 		PeticionHttp peticion = UtilsTestBolsaEmpleo.peticionAutenticadaPersonal();
 
 		RespuestaHttp respuesta = new RespuestaHttp();
@@ -115,15 +112,12 @@ public class TestBEPControladorGestionEvaluadores {
 		assertEquals(MENSAJE_SIN_ADVERTENCIAS, 0, bean.getMensajesDeAdvertencia().size());
 	}
 
-	/**
-	 * Obtener listado de departamentos .
-	 * 
-	 * @throws SQLException     si fallo bd .
+	/** Obtener listado de departamentos .
 	 * @throws IOException      si error io .
 	 * @throws ServletException si error servlet .
 	 */
 	@Test
-	public void testA02ObtenerDepartamentos() throws SQLException, ServletException, IOException {
+	public void testA02ObtenerDepartamentos() throws ServletException, IOException {
 		VistaEvaluadores bean = getVistaConDepartamentos();
 
 		assertNotEquals(MENSAJE_DEPARTAMENTOS_DEVUELTOS, 0, bean.getDepartamentos().size());
@@ -131,15 +125,12 @@ public class TestBEPControladorGestionEvaluadores {
 		assertEquals(MENSAJE_SIN_ADVERTENCIAS, 0, bean.getMensajesDeAdvertencia().size());
 	}
 
-	/**
-	 * Obtener datatable áreas .
-	 * 
-	 * @throws SQLException     si fallo bd .
+	/** Obtener datatable áreas .
 	 * @throws IOException      si error io .
 	 * @throws ServletException si error servlet .
 	 */
 	@Test
-	public void testA03ObtenerAreas() throws SQLException, ServletException, IOException {
+	public void testA03ObtenerAreas() throws ServletException, IOException {
 		VistaEvaluadores bean = getVistaConAreas();
 
 		assertNotEquals(MENSAJE_AREAS_DEVUELTAS, 0, bean.getDatatableAreas().getData().size());
@@ -147,15 +138,12 @@ public class TestBEPControladorGestionEvaluadores {
 		assertEquals(MENSAJE_SIN_ADVERTENCIAS, 0, bean.getMensajesDeAdvertencia().size());
 	}
 
-	/**
-	 * agregar evaluador dentro de un área .
-	 * 
-	 * @throws SQLException     si fallo bd .
+	/** agregar evaluador dentro de un área .
 	 * @throws IOException      si error io .
 	 * @throws ServletException si error servlet .
 	 */
 	@Test
-	public void testA04AgregarEvaluador() throws SQLException, ServletException, IOException {
+	public void testA04AgregarEvaluador() throws ServletException, IOException {
 		PeticionHttp peticion = UtilsTestBolsaEmpleo.peticionAutenticadaPersonal();
 		peticion.setParameter(ControladorGestionEvaluadores.PARAM_ACCION,
 				ControladorGestionEvaluadores.ACCION_AGREGAR_EVALUADORES);
@@ -177,15 +165,12 @@ public class TestBEPControladorGestionEvaluadores {
 		assertEquals(MENSAJE_SIN_ADVERTENCIAS, 0, bean3.getMensajesDeAdvertencia().size());
 	}
 
-	/**
-	 * Obtener datatable evaluadores .
-	 * 
-	 * @throws SQLException     si fallo bd .
+	/** Obtener datatable evaluadores .
 	 * @throws IOException      si error io .
 	 * @throws ServletException si error servlet .
 	 */
 	@Test
-	public void testA05ObtenerEvaluadores() throws SQLException, ServletException, IOException {
+	public void testA05ObtenerEvaluadores() throws ServletException, IOException {
 		VistaEvaluadores bean = getVistaConEvaluadores();
 
 		assertNotEquals(MENSAJE_USUARIOS_DEVUELTOS, 0, bean.getDatatableEvaluadores().getData().size());
@@ -193,15 +178,12 @@ public class TestBEPControladorGestionEvaluadores {
 		assertEquals(MENSAJE_SIN_ADVERTENCIAS, 0, bean.getMensajesDeAdvertencia().size());
 	}
 
-	/**
-	 * elimina un evaluador dentro de un área .
-	 * 
-	 * @throws SQLException     si fallo bd .
+	/** elimina un evaluador dentro de un área .
 	 * @throws IOException      si error io .
 	 * @throws ServletException si error servlet .
 	 */
 	@Test
-	public void testA06EliminarEvaluador() throws SQLException, ServletException, IOException {
+	public void testA06EliminarEvaluador() throws ServletException, IOException {
 		VistaEvaluadores bean = getVistaConDepartamentos();
 		VistaEvaluadores bean2 = getVistaConEvaluadores();
 
@@ -222,15 +204,12 @@ public class TestBEPControladorGestionEvaluadores {
 		assertEquals(MENSAJE_SIN_ADVERTENCIAS, 0, bean3.getMensajesDeAdvertencia().size());
 	}
 
-	/**
-	 * restaura un evaluador dentro de un área .
-	 * 
-	 * @throws SQLException     si fallo bd .
+	/** restaura un evaluador dentro de un área .
 	 * @throws IOException      si error io .
 	 * @throws ServletException si error servlet .
 	 */
 	@Test
-	public void testA07RestauraEvaluador() throws SQLException, ServletException, IOException {
+	public void testA07RestauraEvaluador() throws ServletException, IOException {
 		VistaEvaluadores bean = getVistaConDepartamentos();
 		VistaEvaluadores bean2 = getVistaConEvaluadores();
 
@@ -253,13 +232,11 @@ public class TestBEPControladorGestionEvaluadores {
 
 	/**
 	 * selecciona un área .
-	 * 
-	 * @throws SQLException     si fallo bd .
 	 * @throws IOException      si error io .
 	 * @throws ServletException si error servlet .
 	 */
 	@Test
-	public void testA08SeleccionarArea() throws SQLException, ServletException, IOException {
+	public void testA08SeleccionarArea() throws ServletException, IOException {
 		VistaEvaluadores bean = getVistaConDepartamentos();
 		VistaEvaluadores bean2 = getVistaConAreas();
 
@@ -278,15 +255,12 @@ public class TestBEPControladorGestionEvaluadores {
 		assertEquals(MENSAJE_SIN_ADVERTENCIAS, 0, bean3.getMensajesDeAdvertencia().size());
 	}
 
-	/**
-	 * Obtener datatable evaluadores con parámetro no válido para forzar el error .
-	 * 
-	 * @throws SQLException     si fallo bd .
+	/** Obtener datatable evaluadores con parámetro no válido para forzar el error .
 	 * @throws IOException      si error io .
 	 * @throws ServletException si error servlet .
 	 */
 	@Test
-	public void testE01ObtenerEvaluadoresParametroNoValido() throws SQLException, ServletException, IOException {
+	public void testE01ObtenerEvaluadoresParametroNoValido() throws ServletException, IOException {
 		VistaEvaluadores bean = getVistaConAreas();
 
 		PeticionHttp peticion = UtilsTestBolsaEmpleo.peticionAutenticadaPersonal();
@@ -306,15 +280,12 @@ public class TestBEPControladorGestionEvaluadores {
 		assertEquals(MENSAJE_SIN_EXITO, 0, bean2.getMensajesDeExito().size());
 	}
 
-	/**
-	 * Obtener datatable áreas con parámetro no válido para forzar el error .
-	 * 
-	 * @throws SQLException     si fallo bd .
+	/** Obtener datatable áreas con parámetro no válido para forzar el error .
 	 * @throws IOException      si error io .
 	 * @throws ServletException si error servlet .
 	 */
 	@Test
-	public void testE02ObtenerAreasParametroNoValido() throws SQLException, ServletException, IOException {
+	public void testE02ObtenerAreasParametroNoValido() throws ServletException, IOException {
 		PeticionHttp peticion = UtilsTestBolsaEmpleo.peticionAutenticadaPersonal();
 		peticion.setParameter(ControladorGestionEvaluadores.PARAM_ACCION,
 				ControladorGestionEvaluadores.ACCION_DATATABLE_AREAS);
@@ -419,15 +390,12 @@ public class TestBEPControladorGestionEvaluadores {
 						bean2.getDatatableAreas().getData().get(0).getDescripcion()), bean3.getMensajesDeError().get(0));
 	}
 
-	/**
-	 * acción no válida .
-	 * 
-	 * @throws SQLException     si fallo bd .
+	/** acción no válida .
 	 * @throws IOException      si error io .
 	 * @throws ServletException si error servlet .
 	 */
 	@Test
-	public void testE06AccionNoValida() throws SQLException, ServletException, IOException {
+	public void testE06AccionNoValida() throws ServletException, IOException {
 		PeticionHttp peticion = UtilsTestBolsaEmpleo.peticionAutenticadaPersonal();
 		peticion.setParameter(ControladorGestionEvaluadores.PARAM_ACCION, "accionnovalida");
 

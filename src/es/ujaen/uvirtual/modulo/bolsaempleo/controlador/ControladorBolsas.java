@@ -167,7 +167,7 @@ public class ControladorBolsas extends HttpServlet {
 		doGet(request, response);
 	}
 		
-	private void listado(VistaEstadoBolsas bean, UVDatos datos, HttpServletRequest request, HttpServletResponse response) throws IOException, SQLException {
+	private void listado(VistaEstadoBolsas bean, UVDatos datos, HttpServletRequest request, HttpServletResponse response) throws IOException {
 		ModeloBolsa modelo = ModeloBolsa.obtenerInstancia();
 		
 		datos.setRespuestaEnviada(true);
@@ -242,7 +242,7 @@ public class ControladorBolsas extends HttpServlet {
 		response.sendRedirect(request.getServletPath());
 	}
 	
-	private void baremarBolsas(List<Bolsa> bolsas) throws SQLException, UVException, IOException {
+	private void baremarBolsas(List<Bolsa> bolsas) throws SQLException, UVException {
 		ModeloBolsa modeloBolsa = ModeloBolsa.obtenerInstancia();
 		ModeloResultados modeloResultados = ModeloResultados.obtenerInstancia();
 		

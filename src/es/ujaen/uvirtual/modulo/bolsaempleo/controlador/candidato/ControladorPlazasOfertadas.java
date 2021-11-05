@@ -28,7 +28,6 @@ import es.ujaen.uvirtual.modulo.bolsaempleo.modelo.ModeloRol;
 import es.ujaen.uvirtual.modulo.bolsaempleo.modelo.ModeloUsuarioBolsaEmpleo;
 import es.ujaen.uvirtual.modulo.bolsaempleo.utilidades.BolsaEmpleoDataTable;
 import es.ujaen.uvirtual.modulo.bolsaempleo.utilidades.BolsaEmpleoUtils;
-import es.ujaen.uvirtual.modulo.bolsaempleo.vistas.VistaConfiguracion;
 import es.ujaen.uvirtual.modulo.bolsaempleo.vistas.VistaPlazasOfertadas;
 import es.ujaen.uvirtual.utilidades.EscapaHTML;
 import es.ujaen.uvirtual.utilidades.Formateador;
@@ -278,7 +277,7 @@ public class ControladorPlazasOfertadas extends HttpServlet {
 	private void aceptarPlazaOfertada(VistaPlazasOfertadas bean, UVDatos datos, HttpServletRequest request, HttpServletResponse response) 
 			throws IOException, UVException, SQLException {
 		ModeloOfertaCandidato modelo = ModeloOfertaCandidato.obtenerInstancia();
-		modelo.aceptarOfertaCandidato(bean.getOfertaCandidato().getPlaza(), bean.getUsuarioLogeado());
+		modelo.aceptarOfertaCandidato(bean.getOfertaCandidato().getPlaza(), bean.getUsuarioLogeado(), bean.getUsuarioLogeado());
 		
 		BolsaEmpleoUtils.addMensajeDeExito(MENSAJE_EXITO_ACEPTAR, bean, request);
 		datos.setRespuestaEnviada(true);

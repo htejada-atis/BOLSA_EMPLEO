@@ -23,20 +23,20 @@ PlazaOfertada plaza = bean.getPlazaOfertada();
 
 boolean personal = bean.getUsuarioLogeado().isServicioPersonal();
 boolean estadoCreacion = plaza.getEstado().equals(ModeloPlazaOfertada.PLAZA_ESTADO_CREACION);
-boolean estadoTramitacion = plaza.getEstado().equals(ModeloPlazaOfertada.PLAZA_ESTADO_TRAMITACION);
+boolean estadoAprobacion = plaza.getEstado().equals(ModeloPlazaOfertada.PLAZA_ESTADO_APROBACION);
 boolean estadoAbierta = plaza.getEstado().equals(ModeloPlazaOfertada.PLAZA_ESTADO_ABIERTA);
 boolean estadoContratacion = plaza.getEstado().equals(ModeloPlazaOfertada.PLAZA_ESTADO_CONTRATACION);
 boolean estadoCerrada = plaza.getEstado().equals(ModeloPlazaOfertada.PLAZA_ESTADO_CERRADA);
-
 boolean mostrarCandidatos = (estadoAbierta || estadoContratacion) && personal;
-boolean mostrarCandidatoContratado = !estadoCreacion && !estadoTramitacion && !estadoAbierta;
-boolean editable = estadoCreacion || (estadoTramitacion && personal);
+boolean mostrarCandidatoContratado = !estadoCreacion && !estadoAprobacion && !estadoAbierta;
+boolean editable = estadoCreacion || (estadoAprobacion && personal);
 boolean extraRequeridos = !estadoCreacion;
 
-String codigo = BolsaEmpleoUtils.getParamForm(request, ControladorContratacion.PARAM_CODIGO, EscapaHTML.escapa(plaza.getIdPlaza()));
 String area = BolsaEmpleoUtils.getParamForm(request, ControladorContratacion.PARAM_AREA, plaza.getArea().getCodNum().toString());
-String cuatrimestre = BolsaEmpleoUtils.getParamForm(request, ControladorContratacion.PARAM_CUATRIMESTRE, plaza.getCuatrimestre());
 String centroDestino = BolsaEmpleoUtils.getParamForm(request, ControladorContratacion.PARAM_CENTRO_DESTINO, EscapaHTML.escapa(plaza.getCentroDestino()));
+String codigo = BolsaEmpleoUtils.getParamForm(request, ControladorContratacion.PARAM_CODIGO, EscapaHTML.escapa(plaza.getIdPlaza()));
+String cuatrimestre = BolsaEmpleoUtils.getParamForm(request, ControladorContratacion.PARAM_CUATRIMESTRE, plaza.getCuatrimestre());
+String curso = BolsaEmpleoUtils.getParamForm(request, ControladorContratacion.PARAM_CURSO, EscapaHTML.escapa(plaza.getCurso()));
 String dedicacion = BolsaEmpleoUtils.getParamForm(request, ControladorContratacion.PARAM_DEDICACION, plaza.getDedicacion() != null ? plaza.getDedicacion().getCodNum().toString() : "");
 String duracionPrevista = BolsaEmpleoUtils.getParamForm(request, ControladorContratacion.PARAM_DURACION_PREVISTA, EscapaHTML.escapa(plaza.getDuracionPrevista()));
 String fechaFinOferta = BolsaEmpleoUtils.getParamForm(request, ControladorContratacion.PARAM_FECHA_FIN_OFERTA, plaza.getFechaFinOferta() != null ? Formateador.formatoFecha(plaza.getFechaFinOferta(), Formateador.FORMATO_FECHA_DDMMYYYY) : "");
@@ -62,7 +62,7 @@ String justificacion = BolsaEmpleoUtils.getParamForm(request, ControladorContrat
 			<div class="form-group">
 				<label for="plaza_codigo" <%= extraRequeridos ? "class='bold-label'" : "" %>>Código:</label>
 				<input class="form-input-custom" type="text" name="<%=ControladorContratacion.PARAM_CODIGO%>" id="plaza_codigo" value="<%=codigo%>"
-						<%= editable ? "" : "readonly disabled " %>
+						<%= editable && personal ? "" : "readonly disabled " %>
 						<%= extraRequeridos ? "required " : "" %>/>
 			</div>
 		</div>
@@ -89,7 +89,7 @@ String justificacion = BolsaEmpleoUtils.getParamForm(request, ControladorContrat
 			<div class="form-group">
 				<label for="plaza_dedicacion" <%= extraRequeridos ? "class='bold-label'" : "" %>>Dedicación: </label>
 				<select id="plaza_dedicacion" name="<%=ControladorContratacion.PARAM_DEDICACION%>" style="width:100%;" 
-						<%= editable ? "" : "readonly disabled " %>
+						<%= editable && personal ? "" : "readonly disabled " %>
 						<%= extraRequeridos ? "required " : "" %>>
 					<option value="">----------------</option>
 				<%	if (plaza.getDedicacion() != null) { %>
@@ -107,7 +107,7 @@ String justificacion = BolsaEmpleoUtils.getParamForm(request, ControladorContrat
 			<div class="form-group">
 				<label for="plaza_cuatrimestre" <%= extraRequeridos ? "class='bold-label'" : "" %>>Cuatrimestre:</label>
 				<select id="plaza_cuatrimestre" name="<%=ControladorContratacion.PARAM_CUATRIMESTRE%>" style="width:100%;" 
-						<%= editable ? "" : "readonly disabled " %>
+						<%= editable && personal ? "" : "readonly disabled " %>
 						<%= extraRequeridos ? "required " : "" %>>
 					<option value="">----------------</option>
 				<%	for (Entry<String, String> cua: ModeloPlazaOfertada.CUATRIMESTRES.entrySet()) { %>
@@ -124,21 +124,26 @@ String justificacion = BolsaEmpleoUtils.getParamForm(request, ControladorContrat
 		</div>
 		<div class="form-group-container col2">
 			<div class="form-group">
+				<label for="plaza_curso" class="bold-label">Curso académico:</label>
+				<input class="form-input-custom" type="text" name="<%=ControladorContratacion.PARAM_CURSO%>" id="plaza_curso" value="<%=curso%>" required <%= editable ? "" : "readonly disabled " %> 
+					pattern="<%= ModeloPlazaOfertada.FORMATO_CURSO %>"/>
+			</div>
+			<div class="form-group">
 				<label for="plaza_duracion_prevista" <%= extraRequeridos ? "class='bold-label'" : "" %>>Duración prevista:</label>
 				<input class="form-input-custom" type="text" name="<%=ControladorContratacion.PARAM_DURACION_PREVISTA%>" id="plaza_duracion_prevista" 
-						value="<%=duracionPrevista%>" <%= editable ? "" : "readonly disabled " %> <%= extraRequeridos ? "required " : "" %>/>
+						value="<%=duracionPrevista%>" <%= editable && personal ? "" : "readonly disabled " %> <%= extraRequeridos ? "required " : "" %>/>
 			</div>
 		</div>
 		<div class="form-group-container col2">
 			<div class="form-group">
 				<label for="plaza_fecha_fin_oferta" <%= extraRequeridos ? "class='bold-label'" : "" %>>Fecha fin oferta:</label>
 				<input class="form-input-custom" name="<%=ControladorContratacion.PARAM_FECHA_FIN_OFERTA%>" id="plaza_fecha_fin_oferta" type="text" autocomplete="off" value="<%= fechaFinOferta %>"
-						<%= extraRequeridos ? "required " : "" %> <%= editable ? "" : "readonly disabled " %>/>
+						<%= extraRequeridos ? "required " : "" %> <%= editable && personal ? "" : "readonly disabled " %>/>
 			</div>
 			<div class="form-group">
 				<label for="plaza_hora_fin_oferta" <%= extraRequeridos ? "class='bold-label'" : "" %>>Hora fin oferta:</label>
 				<input class="form-input-custom" name="<%=ControladorContratacion.PARAM_HORA_FIN_OFERTA%>" id="plaza_hora_fin_oferta" type="text" autocomplete="off" value="<%= horaFinOferta %>"
-						<%= extraRequeridos ? "required " : "" %> <%= editable ? "" : "readonly disabled " %> placeholder="HH:MM:SS"/>
+						<%= extraRequeridos ? "required " : "" %> <%= editable && personal ? "" : "readonly disabled " %> placeholder="HH:MM:SS"/>
 			</div>
 		</div>
 		<div class="form-group-container col2">
@@ -154,15 +159,15 @@ String justificacion = BolsaEmpleoUtils.getParamForm(request, ControladorContrat
 			<%	} %>
 			</div>
 		<%	if (bean.getUsuarioLogeado().isServicioPersonal()) { %>
-				<div class="form-file">
-					<label for="plaza_nri" style="margin-bottom: .5rem; width: 100%!important; text-align: left;">NRI:</label>
+				<div class="form-file" style="width: 100%!important">
+					<label for="plaza_nri" style="margin-bottom: .5rem; width: 100%!important; text-align: left;">NRI<%= plaza.getNri() != null ? " (última actualización: " + Formateador.formatoFecha(plaza.getFechaNRI(), Formateador.FORMATO_FECHA_DDMMYYYY) + ")" : "" %>:</label>
 			<%	if (editable) { %>
 					<input id="plaza_nri" type="file" name="<%= ControladorContratacion.PARAM_NRI %>"/>
 			<%	} %>
 			
 			<%	if (plaza.getNri() != null) { %>
 					<button id="plaza_descargar_nri" class="btn icon icon-download" title="Descargar nri de la plaza" type="button" 
-							style="margin-top: .5rem;padding: 1px 6px;">Descargar NRI</button>
+							style="margin-top: .5rem; padding: 1px 6px;">Descargar NRI</button>
 			<%	} %>
 				</div>
 		<%	} %>
@@ -170,7 +175,7 @@ String justificacion = BolsaEmpleoUtils.getParamForm(request, ControladorContrat
 		<br/>
 		<div class="form-group-container col2">
 			<div class="form-group">
-		<%	if (estadoCreacion || estadoTramitacion) { %>
+		<%	if (estadoCreacion || estadoAprobacion) { %>
 				<button id="plaza_eliminar" style="float:left;" <%= personal ? "" : "disabled" %>>Eliminar</button>
 		<%	} %>
 			</div>
@@ -179,8 +184,8 @@ String justificacion = BolsaEmpleoUtils.getParamForm(request, ControladorContrat
 				<input id="plaza_enviar" type="submit" name="<%=ControladorContratacion.PARAM_ENVIAR%>" value="Guardar cambios" style="float:right;"/>
 		<%	} %>
 		<%	if (estadoCreacion) { %>
-				<button id="plaza_estado_tramitacion" style="float:right; margin-right: 12px;" <%= personal ? "" : "disabled" %>>Tramitación</button>
-		<%	} else if (estadoTramitacion) { %>
+				<button id="plaza_estado_aprobacion" style="float:right; margin-right: 12px;" <%= personal ? "" : "disabled" %>>Aprobación</button>
+		<%	} else if (estadoAprobacion) { %>
 				<button id="plaza_estado_abierta" style="float:right; margin-right: 12px;" <%= personal ? "" : "disabled" %>>Abrir plaza</button>
 		<%	} %>
 			</div>
@@ -386,6 +391,24 @@ $(document).ready(function() {
 						}, 'visible': function(row) {
 							return row.resultado;
 						}
+					}, {'label': 'Acepta plaza', 'onClick': function(row) {
+							Atis.confirmDialog("Candidato acepta la plaza", "Marcar al candidato " + row.candidato.prsnif + " como que acepta la plaza.", {
+								'Si': function() {
+									var params = {
+											"<%= ControladorContratacion.PARAM_ACCION %>": "<%= ControladorContratacion.ACCION_MARCAR_ACEPTACION_CANDIDATO %>",
+											"<%= ControladorContratacion.PARAM_PLAZA_OFERTADA %>": <%= bean.getPlazaOfertada().getCodNum() %>,
+											"<%= ControladorContratacion.PARAM_CANDIDATO %>": row.candidato.codNum
+									};
+									Atis.sendForm("<%= request.getRequestURI() %>", params);
+									$(this).dialog("close");
+								},
+								'No': function() {
+									$(this).dialog("close");
+								}
+							});
+						}, 'visible': function(row) {
+							return !row.resultado && row.plaza.estado == '<%= ModeloPlazaOfertada.PLAZA_ESTADO_CONTRATACION %>';
+						}
 					}]
 				}
 			]
@@ -519,12 +542,12 @@ $(document).ready(function() {
 	});
 	
 <%	if (estadoCreacion && personal) { %>
-		document.getElementById("plaza_estado_tramitacion").addEventListener("click", function(e) {
+		document.getElementById("plaza_estado_aprobacion").addEventListener("click", function(e) {
 			e.preventDefault();
-			Atis.confirmDialog("Cambiar estado de la plaza", "La plaza cambiará a estado de tramitación.", {
+			Atis.confirmDialog("Cambiar estado de la plaza", "La plaza cambiará a estado de aprobación.", {
 				'Si': function() {
 					var params = {
-							"<%= ControladorContratacion.PARAM_ACCION %>": "<%= ControladorContratacion.ACCION_PLAZA_TRAMITACION %>",
+							"<%= ControladorContratacion.PARAM_ACCION %>": "<%=ControladorContratacion.ACCION_PLAZA_APROBACION%>",
 							"<%= ControladorContratacion.PARAM_PLAZA_OFERTADA %>": <%= bean.getPlazaOfertada().getCodNum() %>
 					};
 					Atis.sendForm("<%= request.getRequestURI() %>", params);
@@ -537,7 +560,7 @@ $(document).ready(function() {
 		});
 <%	} %>
 	
-<%	if ((estadoCreacion || estadoTramitacion) && personal) { %>
+<%	if ((estadoCreacion || estadoAprobacion) && personal) { %>
 		document.getElementById("plaza_eliminar").addEventListener("click", function(e) {
 			e.preventDefault();
 			Atis.confirmDialog("Eliminar plaza", "¿Desea eliminar la plaza?", {
@@ -556,7 +579,7 @@ $(document).ready(function() {
 		});
 <%	} %>
 	
-<%	if (estadoTramitacion && personal) { %>
+<%	if (estadoAprobacion && personal) { %>
 		document.getElementById("plaza_estado_abierta").addEventListener("click", function(e) {
 			e.preventDefault();
 			var enviar = true;

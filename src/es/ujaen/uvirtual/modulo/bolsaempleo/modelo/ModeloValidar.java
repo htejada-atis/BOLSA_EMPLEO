@@ -301,6 +301,7 @@ public class ModeloValidar {
 	 * @throws SQLException .
 	 * @throws UVException .
 	 */
+	@SuppressWarnings({"checkstyle:ExecutableStatementCount", "checkstyle:NPathComplexity"})
 	public BolsaEmpleoDataTable<BolsaValidacion> listadoAreasSujetasAfinidad(Convocatoria convocatoria, UsuarioBolsaEmpleo usuario, Map<String, String[]> params) 
 			throws SQLException, UVException {
 		List<BolsaValidacion> rows = new ArrayList<>();
@@ -542,6 +543,7 @@ public class ModeloValidar {
 	 * @throws SQLException .
 	 * @throws UVException .
 	 */
+	@SuppressWarnings({"checkstyle:ExecutableStatementCount"})
 	private BolsaEmpleoDataTable<MeritoValidarTable> listadoMeritos(Convocatoria convocatoria, Bolsa bolsa, UsuarioBolsaEmpleo candidato,
 			Map<String, String[]> params, boolean afinidad) throws SQLException, UVException {
 		List<MeritoValidarTable> rows = new ArrayList<>();
@@ -620,6 +622,7 @@ public class ModeloValidar {
 	 * @throws SQLException .
 	 * @throws UVException .
 	 */
+	@SuppressWarnings({"checkstyle:ExecutableStatementCount"})
 	public BolsaEmpleoDataTable<ValorMeritoBolsaTable> listadoValoresMeritoBolsa(UsuarioBolsaEmpleo candidato, Merito merito, 
 			Map<String, String[]> params) throws SQLException, UVException {
 		List<ValorMeritoBolsaTable> rows = new ArrayList<>();

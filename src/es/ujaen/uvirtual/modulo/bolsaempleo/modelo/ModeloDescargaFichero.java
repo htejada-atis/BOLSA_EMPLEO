@@ -217,7 +217,7 @@ public class ModeloDescargaFichero {
 			
 			try (ResultSet rs = stmt.executeQuery()) {
 				if (rs.next()) {
-					return ModeloPlazaOfertada.obtenerInstancia().createPlazaOfertadaFromResultSet(rs, true);
+					return ModeloPlazaOfertada.obtenerInstancia().createPlazaOfertadaFromResultSet(rs, true, true, false);
 				}
 			}
 		}
@@ -251,7 +251,7 @@ public class ModeloDescargaFichero {
 						
 			try (ResultSet rs = stmt.executeQuery()) {
 				if (rs.next()) {
-					return ModeloPlazaOfertada.obtenerInstancia().createPlazaOfertadaFromResultSet(rs, true);
+					return ModeloPlazaOfertada.obtenerInstancia().createPlazaOfertadaFromResultSet(rs, true, true, false);
 				}
 			}
 		}

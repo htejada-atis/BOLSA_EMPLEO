@@ -134,6 +134,13 @@ public class ModeloDepartamento {
 		return dataTable;
 	}
 	
+	/**
+	 * Devuelve la lista de departamentos de un director .
+	 * @param director .
+	 * @return departamentos .
+	 * @throws SQLException en caso de error en la BD .
+	 * @throws UVException  si area no es existe .
+	 */
 	public List<Departamento> listaDepartamentosDirector(UsuarioBolsaEmpleo director) throws SQLException {
 		List<Departamento> departamentos = new ArrayList<>();
 		String consulta = "SELECT * FROM UXXIRRHH.VUJA_NET_BEP_RH_DEP_DIR"

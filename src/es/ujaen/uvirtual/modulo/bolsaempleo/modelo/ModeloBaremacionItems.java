@@ -273,9 +273,8 @@ public class ModeloBaremacionItems {
 			try (ResultSet rs = stmt.executeQuery()) {
 				if (!rs.next()) {
 					return "0";
-				} else {
-					return rs.getString(CODIGO);
 				}
+				return rs.getString(CODIGO);
 			}
 		}
 	}

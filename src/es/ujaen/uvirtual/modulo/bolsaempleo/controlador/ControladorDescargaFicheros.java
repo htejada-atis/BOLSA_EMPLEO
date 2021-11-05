@@ -268,6 +268,7 @@ public class ControladorDescargaFicheros extends HttpServlet {
 		}
 	}
 	
+	@SuppressWarnings({"checkstyle:CyclomaticComplexity"})
 	private void accionesFicherosPersonal(VistaDescargaFicheros bean, UVDatos datos, HttpServletRequest request, HttpServletResponse response, String nombreAccion)
 			throws SQLException, UVException, IOException {
 		

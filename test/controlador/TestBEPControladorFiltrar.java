@@ -5,12 +5,10 @@ import static org.junit.Assert.assertNotEquals;
 import static org.junit.Assert.assertNotNull;
 import java.io.IOException;
 import java.sql.SQLException;
-import javax.servlet.ServletException;
 import org.junit.BeforeClass;
 import org.junit.FixMethodOrder;
 import org.junit.Test;
 import org.junit.runners.MethodSorters;
-
 import bbdd.BbddRunner;
 import bbdd.UtilsTestBolsaEmpleo;
 import controlador.implementacion.PeticionHttp;
@@ -46,7 +44,7 @@ public class TestBEPControladorFiltrar {
 	}
     
 	// método para obtener la vista con una lista de candidatos .
-	private VistaFiltrar obtenerCandidatos() throws ServletException, IOException {
+	private VistaFiltrar obtenerCandidatos() throws IOException {
 		PeticionHttp peticion = UtilsTestBolsaEmpleo.peticionAutenticadaPersonal();
 		peticion.setParameter(ControladorFiltrarTitulacion.PARAM_ACCION, ControladorFiltrarTitulacion.ACCION_DATATABLE_CANDIDATOS);
 
@@ -57,7 +55,7 @@ public class TestBEPControladorFiltrar {
 	}
     
 	// método para obtener la vista con una lista de titulaciones de un candidato .
-	private VistaFiltrar obtenerTitulaciones() throws ServletException, IOException {
+	private VistaFiltrar obtenerTitulaciones() throws IOException {
 		VistaFiltrar bean = obtenerCandidatos();
 
 		PeticionHttp peticion = UtilsTestBolsaEmpleo.peticionAutenticadaPersonal();
@@ -69,14 +67,12 @@ public class TestBEPControladorFiltrar {
 		controlador.doPost(peticion, respuesta);
 		return (VistaFiltrar) peticion.getUVDatos().getVistas().get(VistaFiltrar.class.getName());
 	}
-    
-    /** Obtener candidatos, sin parametro definido .
-	 * @throws SQLException si fallo bd 
+	
+	/** Obtener candidatos, sin parametro definido .
 	 * @throws IOException si error io
-	 * @throws ServletException  si error servlet
 	 */
 	@Test
-	public void testA01() throws SQLException, ServletException, IOException {
+	public void testA01() throws IOException {
 		PeticionHttp peticion = UtilsTestBolsaEmpleo.peticionAutenticadaPersonal();
 		
 		RespuestaHttp respuesta = new RespuestaHttp();
@@ -90,12 +86,10 @@ public class TestBEPControladorFiltrar {
 	}
 	
 	/** Obtener candidatos, sin parametro definido .
-	 * @throws SQLException si fallo bd .
 	 * @throws IOException si error io .
-	 * @throws ServletException  si error servlet .
 	 */
 	@Test
-	public void testA02ObtenerCandidatos() throws SQLException, ServletException, IOException {
+	public void testA02ObtenerCandidatos() throws IOException {
 		VistaFiltrar bean = obtenerCandidatos();
 		
 		assertNotEquals(MENSAJE_CANDIDATOS_DEVUELTOS, 0, bean.getDatatableCandidatos().getData().size());
@@ -104,12 +98,10 @@ public class TestBEPControladorFiltrar {
 	}
 	
 	/** Seleccionar un candidato .
-	 * @throws SQLException si fallo bd .
 	 * @throws IOException si error io .
-	 * @throws ServletException  si error servlet .
 	 */
 	@Test
-	public void testA03SeleccionarCandidato() throws SQLException, ServletException, IOException {
+	public void testA03SeleccionarCandidato() throws IOException {
 		VistaFiltrar bean = obtenerCandidatos();
 		
 		PeticionHttp peticion = UtilsTestBolsaEmpleo.peticionAutenticadaPersonal();
@@ -128,12 +120,10 @@ public class TestBEPControladorFiltrar {
 	}
 	
 	/** Obtener las titulaciones de un candidato .
-	 * @throws SQLException si fallo bd .
 	 * @throws IOException si error io .
-	 * @throws ServletException  si error servlet .
 	 */
 	@Test
-	public void testA04ObtenerTitulacionesCandidato() throws SQLException, ServletException, IOException {
+	public void testA04ObtenerTitulacionesCandidato() throws IOException {
 		VistaFiltrar bean = obtenerTitulaciones();
 		
 		assertNotEquals(MENSAJE_TITULACIONES_DEVUELTAS, 0, bean.getDatatableTitulaciones().getData().size());
@@ -142,12 +132,10 @@ public class TestBEPControladorFiltrar {
 	}
 	
 	/** Selecciona una titulación para validarla .
-	 * @throws SQLException si fallo bd .
 	 * @throws IOException si error io .
-	 * @throws ServletException  si error servlet .
 	 */
 	@Test
-	public void testA05SeleccionarTitulacion() throws SQLException, ServletException, IOException {
+	public void testA05SeleccionarTitulacion() throws IOException {
 		VistaFiltrar bean = obtenerCandidatos();
 		VistaFiltrar bean2 = obtenerTitulaciones();
 		
@@ -168,12 +156,10 @@ public class TestBEPControladorFiltrar {
 	}
 	
 	/** Obtener las titulaciones validadas de un candidato .
-	 * @throws SQLException si fallo bd .
 	 * @throws IOException si error io .
-	 * @throws ServletException  si error servlet .
 	 */
 	@Test
-	public void testA06ObtenerTitulacionesValidadasCandidato() throws SQLException, ServletException, IOException {
+	public void testA06ObtenerTitulacionesValidadasCandidato() throws IOException {
 		VistaFiltrar bean = obtenerCandidatos();
 		
 		PeticionHttp peticion = UtilsTestBolsaEmpleo.peticionAutenticadaPersonal();
@@ -192,12 +178,10 @@ public class TestBEPControladorFiltrar {
 	}
 	
 	/** Deselecciona una titulación para validarla .
-	 * @throws SQLException si fallo bd .
 	 * @throws IOException si error io .
-	 * @throws ServletException  si error servlet .
 	 */
 	@Test
-	public void testA07DeseleccionarTitulacion() throws SQLException, ServletException, IOException {
+	public void testA07DeseleccionarTitulacion() throws IOException {
 		VistaFiltrar bean = obtenerCandidatos();
 		VistaFiltrar bean2 = obtenerTitulaciones();
 		
@@ -218,11 +202,10 @@ public class TestBEPControladorFiltrar {
 	}
 	
 	/** Seleccionar candidato no válido .
-	 * @throws ServletException si error de servlet
 	 * @throws IOException si error de io
 	 */
 	@Test
-	public void testE02SeleccionarCandidatoNoValido() throws ServletException, IOException {
+	public void testE02SeleccionarCandidatoNoValido() throws IOException {
 		PeticionHttp peticion = UtilsTestBolsaEmpleo.peticionAutenticadaPersonal();
 		peticion.setParameter(ControladorFiltrarTitulacion.PARAM_ACCION, ControladorFiltrarTitulacion.ACCION_CANDIDATO_SELECCIONADO);
 		peticion.setParameter(ControladorFiltrarTitulacion.PARAM_CANDIDATO, "0");
@@ -238,11 +221,10 @@ public class TestBEPControladorFiltrar {
 	}
 	
 	/** Seleccionar titulación no válida .
-	 * @throws ServletException si error de servlet
 	 * @throws IOException si error de io
 	 */
 	@Test
-	public void testE03SeleccionarTitulacionNoValida() throws ServletException, IOException {
+	public void testE03SeleccionarTitulacionNoValida() throws IOException {
 		PeticionHttp peticion = UtilsTestBolsaEmpleo.peticionAutenticadaPersonal();
 		peticion.setParameter(ControladorFiltrarTitulacion.PARAM_ACCION, ControladorFiltrarTitulacion.ACCION_TITULACION_SELECCIONADA);
 		peticion.setParameter(ControladorFiltrarTitulacion.PARAM_TITULACION_USUARIO, "0");
@@ -258,11 +240,10 @@ public class TestBEPControladorFiltrar {
 	}
 	
 	/** Lista titulaciones de un candidato nulo .
-	 * @throws ServletException si error de servlet
 	 * @throws IOException si error de io
 	 */
 	@Test
-	public void testE04ObtenerTitulacionesCandidatoNulo() throws ServletException, IOException {
+	public void testE04ObtenerTitulacionesCandidatoNulo() throws IOException {
 		PeticionHttp peticion = UtilsTestBolsaEmpleo.peticionAutenticadaPersonal();
 		peticion.setParameter(ControladorFiltrarTitulacion.PARAM_ACCION, ControladorFiltrarTitulacion.ACCION_DATATABLE_TITULACIONES_CANDIDATO);
 		
