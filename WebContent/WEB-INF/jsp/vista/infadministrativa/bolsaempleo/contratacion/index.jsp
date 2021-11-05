@@ -69,6 +69,7 @@ $(document).ready(function() {
 		"defaultOrderBy": 5,
 		"defaultOrderDirection": 'desc',
 		"filterable": true,
+		"stateSave": true,
 		"action": "<%= ControladorContratacion.ACCION_DATATABLE_PLAZAS_OFERTADAS %>",
 		"clickable": {'onClick': function(row) {
 			var params = {

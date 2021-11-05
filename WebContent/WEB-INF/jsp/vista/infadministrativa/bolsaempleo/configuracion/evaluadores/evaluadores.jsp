@@ -106,6 +106,7 @@ Area area = bean.getArea();
 	            "filterable": true,
 	            "selectable": true,
 	            "selectedAll": true,
+	            "stateSave": true,
 	            "defaultOrderBy": 2,
 	            "title": "ÁREAS DEL DEPARTAMENTO: <%= departamento.getDescripcion() %>",
 	            "clickable": {'onClick': function(row) {

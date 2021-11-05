@@ -53,6 +53,7 @@ $(document).ready(function() {
 	var table = new Atis.DataTable('#tablePlantillas', {
 		"ajax": { url: '<%= ControladorPlantillas.URL_PATTERN_AJAX %>' },
 		"pageSize": 10,
+		"stateSave": true,
 		"action": "<%= ControladorPlantillas.ACCION_DATATABLE_PLANTILLAS %>",
 		"clickable": {'onClick': clickRow},
 		"columns": [

@@ -54,6 +54,7 @@ VistaNoticias bean = (VistaNoticias) uvdatos.getVistas().get(VistaNoticias.class
 		    "pageSize": 10,
 	    	"defaultOrderBy": 0,
 		    "filterable": true,
+		    "stateSave": true,
 		    "columns": [
 		    	{'data': 'fecha', 'filter': {'type': 'date'}},
 		    	{'data': 'texto', 'filter': true, 'overflow': 'auto'},

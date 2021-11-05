@@ -64,6 +64,7 @@ VistaMeritosPreferentesCandidato bean = (VistaMeritosPreferentesCandidato) uvdat
 		    "action": "<%= ControladorMisMeritosPreferentes.ACCION_DATATABLE %>",
 		    "selectable": true,
 		    "filterable": true,
+		    "stateSave": true,
 		    "columns": [
 		    	{'data': 'codNum', 'selectable': true},
 		    	{'data': 'codNum', 'filter': {'type': 'number'}},

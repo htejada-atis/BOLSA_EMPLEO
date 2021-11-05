@@ -51,6 +51,7 @@ VistaMeritosPreferentes bean = (VistaMeritosPreferentes) uvdatos.getVistas().get
 		    "pageSize": 10,
 		    "action": "<%= ControladorMeritosPreferentes.ACCION_DATATABLE %>",
 		    "filterable": true,
+		    "stateSave": true,
 		    "defaultOrderBy": 0,
 		    "defaultOrderDirection": 'asc',
 		    "columns": [

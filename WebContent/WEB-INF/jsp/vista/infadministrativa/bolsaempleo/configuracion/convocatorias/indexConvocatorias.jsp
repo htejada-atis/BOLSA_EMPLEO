@@ -48,6 +48,7 @@ VistaConvocatorias bean = (VistaConvocatorias) uvdatos.getVistas().get(VistaConv
 		    "ajax": { url: "<%=  ControladorConvocatorias.URL_PATTERN_AJAX %>" },
 		    "pageSize": 10,
 	    	"defaultOrderBy": 2,
+	    	"stateSave": true,
 		    "action": "<%= ControladorConvocatorias.ACCION_DATATABLE %>",
 		    "columns": [
 		    	{'data': 'codNum'},

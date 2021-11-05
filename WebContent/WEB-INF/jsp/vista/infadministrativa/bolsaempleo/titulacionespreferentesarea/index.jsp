@@ -54,6 +54,7 @@ $(document).ready(function() {
 	    "ajax": { url: "<%= ControladorCandidatoTitulacionesPreferentesArea.URL_PATTERN_AJAX %>", async: false },
 	    "pageSize": 10,
 	    "filterable": true,
+	    "stateSave": true,
 	    "action": "<%= ControladorCandidatoTitulacionesPreferentesArea.ACCION_DATATABLE_BOLSAS %>",
 	    "defaultOrderBy": 1,
 	    "title": 'AREAS DE CONOCIMIENTO',

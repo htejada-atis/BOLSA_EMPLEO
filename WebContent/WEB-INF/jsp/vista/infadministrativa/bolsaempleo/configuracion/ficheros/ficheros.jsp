@@ -50,6 +50,7 @@ VistaFicheros bean = (VistaFicheros) uvdatos.getVistas().get(VistaFicheros.class
 		    "pageSize": 10,
 		    "selectable": true,
 		    "filterable": true,
+		    "stateSave": true,
 		    "columns": [
 		    	{'data': 'codNum', 'selectable': true},
 		        {'data': 'nombre', 'filter': true, 'overflow': 'auto'},

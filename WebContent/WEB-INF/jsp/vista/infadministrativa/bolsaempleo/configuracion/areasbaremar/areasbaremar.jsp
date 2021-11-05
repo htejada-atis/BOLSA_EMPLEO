@@ -49,6 +49,7 @@ $(document).ready(function() {
 	    "pageSizeOptions": [10, 100, 200],
 	    "action": "<%= ControladorAreasABaremar.ACCION_DATATABLE %>",
 	    "filterable": true,
+	    "stateSave": true,
 	    "columns": [
 	    	{'data': 'codNum', 'selectable': true},
 	        {'data': 'codNum', 'filter': {'type': 'number'}},

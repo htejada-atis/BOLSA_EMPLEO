@@ -50,6 +50,7 @@ $(document).ready(function() {
 	    "ajax": { url: "/srv/es/ajax/informacionadministrativa/bolsaempleo/configuracion/afinidades" },
 	    "selectable": true,
 	    "pageSize": 10,
+	    "stateSave": true,
     	"defaultOrderBy": 1,
     	"action": "<%= ControladorAfinidades.ACCION_DATATABLE %>",
 	    "columns": [

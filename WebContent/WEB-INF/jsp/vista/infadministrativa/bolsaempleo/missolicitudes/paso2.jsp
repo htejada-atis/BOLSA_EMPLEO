@@ -261,6 +261,7 @@ VistaSolicitudes bean = (VistaSolicitudes) uvdatos.getVistas().get(VistaSolicitu
 				"ajax": { url: "<%=ControladorMisSolicitudes.URL_PATTERN_AJAX%>", async: false },
 			    "pageSize": 10,
 			    "filterable": true,
+			    "stateSave": true,
 			    "clickable": {'onClick': function(row) {
 			    	var params = {
 		    				'<%=ControladorMisSolicitudes.PARAM_ACCION%>': '<%=ControladorMisSolicitudes.ACCION_BOLSA_SELECCIONADA%>',
@@ -294,6 +295,7 @@ VistaSolicitudes bean = (VistaSolicitudes) uvdatos.getVistas().get(VistaSolicitu
 				    "pageSize": 10,
 				    "selectable": {'all': false},
 				    "filterable": true,
+				    "stateSave": true,
 				    "title": 'MIS MÉRITOS: <%=bean.getArea().getArea().getDescripcion()%>',
 				    "selected": meritosBolsaSolicitud,
 				    "defaultOrderBy": 2,

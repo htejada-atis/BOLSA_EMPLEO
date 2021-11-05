@@ -78,6 +78,7 @@ $(document).ready(function() {
 		"ajax": { url: "<%=ControladorMisTitulaciones.URL_PATTERN_AJAX%>", async: false },
 		"selectable": true,
 	    "filterable": true,
+	    "stateSave": true,
 	    "pageSize": 10,
 	    "action": "<%=ControladorMisTitulaciones.ACCION_DATATABLE_TITULACIONES_USUARIO%>",
 	    "columns": [

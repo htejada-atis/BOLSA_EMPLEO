@@ -95,6 +95,7 @@ $(document).ready(function() {
 		"ajax": { url: "<%= ControladorPlazasOfertadas.URL_PATTERN_AJAX %>" },
 		"pageSize": 10,
 		"filterable": true,
+		"stateSave": true,
 		"title": 'Plazas ofertadas',
 		"defaultOrderBy": 3,
 		"defaultOrderDirection": 'desc',

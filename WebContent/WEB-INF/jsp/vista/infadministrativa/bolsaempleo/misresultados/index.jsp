@@ -39,6 +39,7 @@ $(document).ready(function() {
 	    "ajax": { url: "<%= ControladorMisResultados.URL_PATTERN_AJAX %>" },
 	    "pageSize": 10,
 	    "filterable": true,
+	    "stateSave": true,
 	    "action": "<%= ControladorMisResultados.ACCION_DATATABLE_BOLSAS %>",
 	    "columns": [
 	    	{'data': 'area.idAreaExterno', 'filter': {'type': 'number'}},

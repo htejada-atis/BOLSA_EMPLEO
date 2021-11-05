@@ -48,6 +48,7 @@ VistaTitulaciones bean = (VistaTitulaciones) uvdatos.getVistas().get(VistaTitula
 		    "pageSize": 10,
 		    "action": "<%=ControladorGestionTitulaciones.ACCION_DATATABLE_TITULACIONES%>",
 		    "filterable": true,
+		    "stateSave": true,
 		    "defaultOrderBy": 1,
 		    "columns": [
 		    	{'data': 'codNum', 'filter': {'type': 'number'}},

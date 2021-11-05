@@ -41,6 +41,7 @@ $(document).ready(function() {
 	    "ajax": { url: "<%=ControladorUsuarioCandidato.URL_PATTERN_AJAX%>", async: false },
 	    "pageSize": 10,
 	    "filterable": true,
+	    "stateSave": true,
 	    "clickable": {'onClick': function(row) {
 	    	var params = {
     				'a': '<%= ControladorUsuarioCandidato.ACCION_SELECCIONAR_CANDIDATO %>', 

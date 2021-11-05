@@ -42,6 +42,7 @@ $(document).ready(function() {
 	    "ajax": { url: "<%= ControladorResultados.URL_PATTERN_AJAX %>" },
 	    "pageSize": 20,
 	    "filterable": true,
+	    "stateSave": true,
 	    "action": "<%= ControladorResultados.ACCION_DATATABLE_BOLSAS %>",
 	    "defaultOrderBy": 1,
 	    "columns": [

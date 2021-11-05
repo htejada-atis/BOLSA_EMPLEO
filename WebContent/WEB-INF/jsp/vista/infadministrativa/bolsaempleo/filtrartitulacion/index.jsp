@@ -72,6 +72,7 @@ UsuarioBolsaEmpleo candidato = bean.getCandidato();
 		    "action": "<%=ControladorFiltrarTitulacion.ACCION_DATATABLE_CANDIDATOS%>",
 		    "pageSize": 100,
 		    "filterable": true,
+		    "stateSave": true,
 		    "title": 'CANDIDATOS',
 		    "clickable": {'onClick': function(row) {
 		    	var params = {
@@ -134,6 +135,7 @@ UsuarioBolsaEmpleo candidato = bean.getCandidato();
 				"ajax": { url: "<%=ControladorFiltrarTitulacion.URL_PATTERN_AJAX%>", async: false },
 				"selectable": {'all': false},
 			    "filterable": true,
+			    "stateSave": true,
 			    "title": 'TITULACIONES: <%=candidato.getNombre() + " " + candidato.getPrimerApellido() + " " + candidato.getSegundoApellido()%>',
 			    "pageSize": 10,
 			    "action": "<%=ControladorFiltrarTitulacion.ACCION_DATATABLE_TITULACIONES_CANDIDATO%>",

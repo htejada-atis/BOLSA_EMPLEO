@@ -48,6 +48,7 @@ $(document).ready(function() {
 		"ajax": { url: "<%=ControladorDedicaciones.URL_PATTERN_AJAX%>" },
 		"pageSize": 10,
 		"filterable": true,
+		"stateSave": true,
 		"action": "<%=ControladorDedicaciones.ACCION_DATATABLE_DEDICACIONES%>",
 		"columns": [
 			{'data': 'codNum', 'filter': {'type': 'number'}},

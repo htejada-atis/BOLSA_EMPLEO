@@ -58,28 +58,29 @@ UsuarioBolsaEmpleo candidato = bean.getCandidato();
 	
 <script>
 	$(document).ready(function() {
-		var tableCandidatos = new Atis.DataTable('#tableCandidatosFiltrarAcreditacion', {
-			"ajax": { url: "<%= ControladorFiltrarAcreditaciones.URL_PATTERN_AJAX %>", async: false },
-			"action": "<%= ControladorFiltrarAcreditaciones.ACCION_DATATABLE_CANDIDATOS %>",
-			"pageSize": 10,
-			"filterable": true,
-			"title": 'CANDIDATOS',
-			"clickable": {'onClick': function(row) {
-				var params = {
-						'<%= ControladorFiltrarAcreditaciones.PARAM_ACCION %>': '<%= ControladorFiltrarAcreditaciones.ACCION_CANDIDATO_SELECCIONADO %>',
-						'<%= ControladorFiltrarAcreditaciones.PARAM_CANDIDATO %>': row.codNum
-				};
-				Atis.sendForm("<%= request.getRequestURI() %>", params);
-			}},
-			<% if (candidato != null) { %> "selected": <%= candidato.getCodNum() %> ,<% } %>
-			"columns": [
-				{'data': 'prsnif', 'filter': true},
-				{'data': 'apellido1', 'filter': true, 'overflow': 'auto', 'render': function(row) {
-					return row.nombre + " " + row.apellido1 + " " + row.apellido2; 
-				}},
-				{'data': 'totalAcreditaciones', 'order': {'active': false}},
-				{'data': 'totalAcreditacionesValidadas', 'order': {'active': false}},
-			],
+		var tableCandidatos = new Atis.DataTable('#tableCandidatos', {
+		    "ajax": { url: "<%= ControladorFiltrarAcreditaciones.URL_PATTERN_AJAX %>", async: false },
+		    "action": "<%= ControladorFiltrarAcreditaciones.ACCION_DATATABLE_CANDIDATOS %>",
+		    "pageSize": 10,
+		    "filterable": true,
+		    "stateSave": true,
+		    "title": 'CANDIDATOS',
+		    "clickable": {'onClick': function(row) {
+		    	var params = {
+	    				'<%= ControladorFiltrarAcreditaciones.PARAM_ACCION %>': '<%= ControladorFiltrarAcreditaciones.ACCION_CANDIDATO_SELECCIONADO %>',
+	    				'<%= ControladorFiltrarAcreditaciones.PARAM_CANDIDATO %>': row.codNum
+		    	};
+        		Atis.sendForm("<%= request.getRequestURI() %>", params);
+		    }},
+		    <% if (candidato != null) { %> "selected": <%= candidato.getCodNum() %> ,<% } %>
+		    "columns": [
+		    	{'data': 'prsnif', 'filter': true},
+		    	{'data': 'apellido1', 'filter': true, 'overflow': 'auto', 'render': function(row) {
+	        		return row.nombre + " " + row.apellido1 + " " + row.apellido2; 
+	        	}},
+	        	{'data': 'totalAcreditaciones', 'order': {'active': false}},
+	        	{'data': 'totalAcreditacionesValidadas', 'order': {'active': false}},
+		    ],
 		});
 		
 		<% if (candidato != null) { %>

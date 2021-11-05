@@ -67,6 +67,7 @@ $(document).ready(function() {
 	    "ajax": { url: "<%=ControladorUsuarioBolsaEmpleo.URL_PATTERN_AJAX%>", async: false },
 	    "pageSize": 10,
 	    "filterable": true,
+	    "stateSave": true,
 	    "clickable": {'onClick': function(row) {
 	    	var params = {
     				'a': '<%= ControladorUsuarioBolsaEmpleo.ACCION_SELECCIONAR_USUARIO %>',

@@ -49,6 +49,7 @@ $(document).ready(function() {
 	    "pageSize": 100,
 	    "defaultOrderBy": 2,
 	    "defaultOrderDirection": 'desc',
+	    "stateSave": true,
 	    "action": "<%= ControladorMisResultados.ACCION_DATATABLE_CANDIDATOS %>",
 	    "params": {'<%=ControladorMisResultados.PARAM_BOLSA%>': '<%= bolsa.getCodNum() %>'},
 	    "selected": <%= bean.getUsuarioLogeado().getCodNum() %> ,

@@ -78,6 +78,7 @@ $(document).ready(function() {
 	    "pageSize": 10,
     	"defaultOrderBy": 1,
     	"defaultOrderDirection": 'desc',
+    	"stateSave": true,
 	    "action": "<%= ControladorMensajes.ACCION_DATATABLE %>",
 	    "clickable": {'onClick': clickRow},
 	    "columns": [

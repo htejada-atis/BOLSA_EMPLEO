@@ -383,6 +383,7 @@ $(document).ready(function() {
 	    "action": "<%= ControladorValidar.ACCION_DATATABLE_CANDIDATOS %>",
 	    "title": 'LISTA DE USUARIOS',
 	    "dropdown": true,
+	    "stateSave": true,
 	    "params": {'<%=ControladorValidar.PARAM_BOLSA%>': '<%= bolsa.getCodNum() %>'},
 	    "clickable": {'onClick': function(row) {
 	    	var params = {
@@ -414,6 +415,7 @@ $(document).ready(function() {
 		    "action": "<%= ControladorValidar.ACCION_DATATABLE_MERITOS %>",
 		    "title": 'MÉRITOS PARA EL USUARIO: <%=EscapaHTML.escapa(candidato.getIdNif() + " - " + candidato.getNombre() + " " + candidato.getPrimerApellido() + " " + candidato.getSegundoApellido())%>',
 		    "dropdown": true,
+		    "stateSave": true,
 		    "params": {
 		    	'<%=ControladorValidar.PARAM_BOLSA%>': '<%= bolsa.getCodNum() %>',
 		    	'<%= ControladorValidar.PARAM_CANDIDATO %>': '<%= candidato.getCodNum() %>'
