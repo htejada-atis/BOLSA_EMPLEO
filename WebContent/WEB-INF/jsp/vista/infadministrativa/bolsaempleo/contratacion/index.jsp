@@ -28,7 +28,7 @@ VistaContratacion bean = (VistaContratacion) uvdatos.getVistas().get(VistaContra
 	<%	} %>
 	</div>
 	
-	<table class="bluetable bolsaempleo" id="tablePlazasOfertadas">
+	<table class="bluetable bolsaempleo" id="tablePlazasOfertadasCPO">
 		<tr>
 			<th scope="col" style="width:18px">Id</th>
 			<th scope="col" style="width:52px">Código</th>
@@ -63,7 +63,7 @@ $(document).ready(function() {
 		cursosPlaza["<%= curso %>"] = "<%= curso %>";
 <%	} %>
 	
-	var table = new Atis.DataTable('#tablePlazasOfertadas', {
+	var table = new Atis.DataTable('#tablePlazasOfertadasCPO', {
 		"ajax": { url: "<%= ControladorContratacion.URL_PATTERN_AJAX %>" },
 		"pageSize": 10,
 		"defaultOrderBy": 5,

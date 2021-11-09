@@ -15,7 +15,7 @@ VistaMisResultados bean = (VistaMisResultados)uvdatos.getVistas().get(VistaMisRe
 	<h2>Mis Resultados</h2>	
 	<p>Resultados de la última evaluación. Al pulsar sobre un area, listado del candidato con su puntuanción y el detalle del cálculo.</p>
 	
-	<table class="bluetable bolsaempleo" id="tableAreas">
+	<table class="bluetable bolsaempleo" id="tableAreasMRE">
 		<tr>
 			<th scope="col" style="width:100px" title="Código área">Cod. Area.</th>
 			<th scope="col" style="width:100%" class="area">Área</th>			
@@ -35,7 +35,7 @@ VistaMisResultados bean = (VistaMisResultados)uvdatos.getVistas().get(VistaMisRe
 <script>
 $(document).ready(function() {
 	
-	var table = new Atis.DataTable('#tableAreas', {
+	var table = new Atis.DataTable('#tableAreasMRE', {
 	    "ajax": { url: "<%= ControladorMisResultados.URL_PATTERN_AJAX %>" },
 	    "pageSize": 10,
 	    "filterable": true,

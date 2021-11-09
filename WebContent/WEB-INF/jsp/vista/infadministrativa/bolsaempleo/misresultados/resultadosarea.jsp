@@ -18,7 +18,7 @@ Bolsa bolsa = bean.getBolsa();
 	
 	<h2>Resultados del área: <%= EscapaHTML.escapa(bolsa.getArea().getDescripcion()) %></h2>
 	
-	<table class="bluetable bolsaempleo" id="tableCandidatos">
+	<table class="bluetable bolsaempleo" id="tableCandidatosMRE">
 		<tr>
 			<th scope="col" style="width:76px">D.N.I</th>
 			<th scope="col" style="width:100%" class="nombre">Nombre</th>
@@ -44,7 +44,7 @@ Bolsa bolsa = bean.getBolsa();
 <script>
 
 $(document).ready(function() {
-	var tableCandidatos = new Atis.DataTable('#tableCandidatos', {
+	var tableCandidatos = new Atis.DataTable('#tableCandidatosMRE', {
 	    "ajax": { url: "<%= ControladorMisResultados.URL_PATTERN_AJAX %>" },
 	    "pageSize": 100,
 	    "defaultOrderBy": 2,

@@ -26,11 +26,11 @@ VistaSolicitudes bean = (VistaSolicitudes) uvdatos.getVistas().get(VistaSolicitu
 		Pulse el botón añadir áreas seleccionadas al final de la página.</p>
 		<p>A continuación pulse "Ir a 'Méritos por Área'"</p>
 		
-		<table class="bluetable bolsaempleo" id="tableAreasSeleccionadas">
+		<table class="bluetable bolsaempleo" id="tableAreasSeleccionadasMSO1">
 			<tr>
 				<th scope="col" style="width:5%"></th>
 				<th scope="col"	style="width:15%">Código</th>
-				<th scope="col"	style="width:80%">Nombre</th>			
+				<th scope="col"	style="width:80%">Nombre</th>
 			</tr>
 			<tbody>
 			</tbody>
@@ -50,7 +50,7 @@ VistaSolicitudes bean = (VistaSolicitudes) uvdatos.getVistas().get(VistaSolicitu
 		    </button>
 		</div>
 		
-		<table class="bluetable bolsaempleo" id="tableAreas">
+		<table class="bluetable bolsaempleo" id="tableAreasMSO1">
 			<tr>
 				<th scope="col" style="width:5%"></th>
 				<th scope="col"	style="width:15%">Código</th>
@@ -87,11 +87,11 @@ VistaSolicitudes bean = (VistaSolicitudes) uvdatos.getVistas().get(VistaSolicitu
 						'<%= ControladorMisSolicitudes.PARAM_BOLSAS %>': JSON.stringify(selected)
 					};
 					Atis.sendForm("<%= request.getRequestURI() %>", params);
-				}			
+				}
 			};
 			
-			var tableAreasSeleccionadas = new Atis.DataTable('#tableAreasSeleccionadas', {
-				"ajax": { url: "<%=ControladorMisSolicitudes.URL_PATTERN_AJAX%>", async: false },		    
+			var tableAreasSeleccionadas = new Atis.DataTable('#tableAreasSeleccionadasMSO1', {
+				"ajax": { url: "<%=ControladorMisSolicitudes.URL_PATTERN_AJAX%>", async: false },
 			    "selectable": true,
 			    "filterable": true,
 			    "stateSave": true,
@@ -101,10 +101,10 @@ VistaSolicitudes bean = (VistaSolicitudes) uvdatos.getVistas().get(VistaSolicitu
 			    "columns": [
 			    	{'data': 'codNum', 'selectable': {'exclude': 'excluido'}},
 			    	{'data': 'area.idAreaExterno', 'filter': true},
-			    	{'data': 'area.descripcion', 'filter': true},		        
+			    	{'data': 'area.descripcion', 'filter': true},
 		        ],
 		        "actions": [
-			    	{'label': 'Eliminar', 'onClick': quitarBolsasSeleccionadas },	    	
+			    	{'label': 'Eliminar', 'onClick': quitarBolsasSeleccionadas },
 			    ]
 			});
 			
@@ -144,7 +144,7 @@ VistaSolicitudes bean = (VistaSolicitudes) uvdatos.getVistas().get(VistaSolicitu
 				<% }
 			} %>
 			
-			var tableAreas = new Atis.DataTable('#tableAreas', {
+			var tableAreas = new Atis.DataTable('#tableAreasMSO1', {
 				"ajax": { url: "<%=ControladorMisSolicitudes.URL_PATTERN_AJAX%>", async: false },
 				"pageSize": 200,
 			    "pageSizeOptions": [10, 100, 200],

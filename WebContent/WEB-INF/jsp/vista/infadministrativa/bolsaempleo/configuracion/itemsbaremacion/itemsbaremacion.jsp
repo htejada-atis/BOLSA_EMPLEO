@@ -17,13 +17,13 @@ VistaItemsBaremacion bean = (VistaItemsBaremacion) uvdatos.getVistas().get(Vista
 	
 	<div class="titulo-bolsa-empleo">
 	<h2>Items para las baremaciones</h2>
-    
-	    <button class="link-btn" id="descargar_items">
-	    	 Descargar Items
-	    </button>
+	
+		<button class="link-btn" id="descargar_items">
+			 Descargar Items
+		</button>
 	</div>
 	
-	<table class="bluetable bolsaempleo custom" id="tableBloques">
+	<table class="bluetable bolsaempleo custom" id="tableBloquesIBA">
 		<tr>
 			<th scope="col" style="width:20%" title="Código apartado">Código</th>
 			<th scope="col" style="width:60%" title="Nombre del bloque">Nombre del bloque</th>
@@ -39,7 +39,7 @@ VistaItemsBaremacion bean = (VistaItemsBaremacion) uvdatos.getVistas().get(Vista
 		</tfoot>
 	</table>
 	
-	<table class="bluetable bolsaempleo custom" id="tableApartados">
+	<table class="bluetable bolsaempleo custom" id="tableApartadosIBA">
 		<tr>
 			<th scope="col" style="width:10%" title="Código bloque">Código</th>
 			<th scope="col" style="width:70%" title="Nombre de apartado">Nombre del apartado</th>
@@ -55,7 +55,7 @@ VistaItemsBaremacion bean = (VistaItemsBaremacion) uvdatos.getVistas().get(Vista
 		</tfoot>
 	</table>
 	
-	<table class="bluetable bolsaempleo custom" id="tableItems">
+	<table class="bluetable bolsaempleo custom" id="tableItemsIBA">
 		<tr>
 			<th scope="col" style="width:10%" title="Código item">Código</th>
 			<th scope="col" style="width:20%" title="Nombre del item">Nombre del item</th>
@@ -81,217 +81,217 @@ VistaItemsBaremacion bean = (VistaItemsBaremacion) uvdatos.getVistas().get(Vista
 
 	$(document).ready(function() {
 		
-	   	var renderTextActivarDesactivar = function(selected) { 
-	   		if (selected && selected.length > 0) {
-	   			var row = this.getRow(selected[0]);
-	   			if (row) {
-	   				return row.activo ? "Desactivar" : "Activar";
-	   			}		    			
-	   		}
-	   		return "[error]";
-	   	};
-    	
-    	var onClickActivarDesactivar = function(selected, title, paramObject, actionDesactivar, actionActivar) {
-    		if (selected && selected.length > 0) {
-    			var row = this.getRow(selected[0]);    			
-    			if (row) {
-    				var text = row.activo ? "Desactivar" : "Activar"; 
-    					
-    				Atis.confirmDialog(text + " bloque", title.replace("%s", text.toLowerCase()), {
-    	        		Si: function() {
-    	        			var params = {'<%=ControladorItemsBaremacion.PARAM_ACCION%>': row.activo ? actionDesactivar : actionActivar};
-    	        			params[paramObject] = selected;
-    		        		Atis.sendForm("<%=request.getRequestURI()%>", params);
-    			          	$(this).dialog("close");
-    			        },
-    			        No: function() {
-    			          	$(this).dialog("close");
-    			    	}
-    			    });		
-    			}
-    		}
-    	};
-    	
-    	var onClickEditar = function(action, paramObject, selected) {
-    		var params = {'<%=ControladorItemsBaremacion.PARAM_ACCION%>': action};
-    		params[paramObject] = selected;
-       		Atis.sendForm("<%=request.getRequestURI()%>", params);
-    	};
+		var renderTextActivarDesactivar = function(selected) { 
+			if (selected && selected.length > 0) {
+				var row = this.getRow(selected[0]);
+				if (row) {
+					return row.activo ? "Desactivar" : "Activar";
+				}
+			}
+			return "[error]";
+		};
 		
-		var tableBloques = new Atis.DataTable('#tableBloques', {
-		    "ajax": { url: "<%= ControladorItemsBaremacion.URL_PATTERN_AJAX %>", async: false },
-		    "pageSize": 10,
-		    "action": "<%= ControladorItemsBaremacion.ACCION_DATATABLE_APARTADOS %>",
-		    "filterable": true,
-		    "stateSave": true,
-		    "title": "BLOQUES",
-		    "defaultOrderBy": 0,
-		    "defaultOrderDirection": "asc",
-		    "clickable": {'onClick': function(row) {
-		    	var params = {
-    				'<%=ControladorItemsBaremacion.PARAM_ACCION%>': '<%=ControladorItemsBaremacion.ACCION_APARTADO_SELECCIONADO%>', 
-    				'<%=ControladorItemsBaremacion.PARAM_APARTADO%>': row.codNum
-    			};
-        		Atis.sendForm("<%= request.getRequestURI() %>", params);
-		    }},
-		    "selected": <%= bean.getApartadoBaremacion() != null ? bean.getApartadoBaremacion().getCodNum() : "null" %>,
-		    "columns": [
-		    	{'data': 'codigo', 'filter': true},
-		        {'data': 'nombre', 'filter': true},
-		        {'data': 'porcentajeMaximo'},
-		        {'data': 'activo', 'filter': {'type': 'selectBoolean', 'true': 'Activo', 'false': 'Inactivo'}, 'renderBoolean': {'true': 'Bloque activo', 'false': 'Bloque inactivo'}},
-		    ],
-		    "actions": [		    	
-		    	{'label': 'Añadir', 
-		    	 'title': 'Añadir un nuevo bloque', 
-		    	 'onClick': function(selected) {
-		    		var params = {'<%=ControladorItemsBaremacion.PARAM_ACCION%>': '<%=ControladorItemsBaremacion.ACCION_AGREGAR_APARTADO%>'};
-	        		Atis.sendForm("<%=request.getRequestURI()%>", params);
-		    	}},
-		    	{'label': renderTextActivarDesactivar, 
-		    	 'title': renderTextActivarDesactivar,
-		    	 'showWhenSelected': true,
-		    	 'onClick': function(selected) { 
-		    		 onClickActivarDesactivar.bind(this,
-	    				 selected, 
-	    				 "¿Desea %s el bloque seleccionado?", 
-	    				 '<%=ControladorItemsBaremacion.PARAM_APARTADO%>', 
-	    				 '<%=ControladorItemsBaremacion.ACCION_DESACTIVAR_APARTADO%>', 
-	    				 '<%=ControladorItemsBaremacion.ACCION_ACTIVAR_APARTADO%>'
-		    		)();
-		    	  }
-		    	},
-		    	{'label': 'Editar', 
-		    	 'showWhenSelected': true, 
-		    	 'title': 'Editar bloque seleccionado', 
-		    	 'onClick': onClickEditar.bind(this, '<%=ControladorItemsBaremacion.ACCION_EDITAR_APARTADO%>', '<%=ControladorItemsBaremacion.PARAM_APARTADO%>')
-		    	}
-		    ]
+		var onClickActivarDesactivar = function(selected, title, paramObject, actionDesactivar, actionActivar) {
+			if (selected && selected.length > 0) {
+				var row = this.getRow(selected[0]);
+				if (row) {
+					var text = row.activo ? "Desactivar" : "Activar"; 
+						
+					Atis.confirmDialog(text + " bloque", title.replace("%s", text.toLowerCase()), {
+						Si: function() {
+							var params = {'<%=ControladorItemsBaremacion.PARAM_ACCION%>': row.activo ? actionDesactivar : actionActivar};
+							params[paramObject] = selected;
+							Atis.sendForm("<%=request.getRequestURI()%>", params);
+							$(this).dialog("close");
+						},
+						No: function() {
+							$(this).dialog("close");
+						}
+					});
+				}
+			}
+		};
+		
+		var onClickEditar = function(action, paramObject, selected) {
+			var params = {'<%=ControladorItemsBaremacion.PARAM_ACCION%>': action};
+			params[paramObject] = selected;
+			Atis.sendForm("<%=request.getRequestURI()%>", params);
+		};
+		
+		var tableBloques = new Atis.DataTable('#tableBloquesIBA', {
+			"ajax": { url: "<%= ControladorItemsBaremacion.URL_PATTERN_AJAX %>", async: false },
+			"pageSize": 10,
+			"action": "<%= ControladorItemsBaremacion.ACCION_DATATABLE_APARTADOS %>",
+			"filterable": true,
+			"stateSave": true,
+			"title": "BLOQUES",
+			"defaultOrderBy": 0,
+			"defaultOrderDirection": "asc",
+			"clickable": {'onClick': function(row) {
+				var params = {
+					'<%=ControladorItemsBaremacion.PARAM_ACCION%>': '<%=ControladorItemsBaremacion.ACCION_APARTADO_SELECCIONADO%>', 
+					'<%=ControladorItemsBaremacion.PARAM_APARTADO%>': row.codNum
+				};
+				Atis.sendForm("<%= request.getRequestURI() %>", params);
+			}},
+			"selected": <%= bean.getApartadoBaremacion() != null ? bean.getApartadoBaremacion().getCodNum() : "null" %>,
+			"columns": [
+				{'data': 'codigo', 'filter': true},
+				{'data': 'nombre', 'filter': true},
+				{'data': 'porcentajeMaximo'},
+				{'data': 'activo', 'filter': {'type': 'selectBoolean', 'true': 'Activo', 'false': 'Inactivo'}, 'renderBoolean': {'true': 'Bloque activo', 'false': 'Bloque inactivo'}},
+			],
+			"actions": [
+				{'label': 'Añadir', 
+				 'title': 'Añadir un nuevo bloque', 
+				 'onClick': function(selected) {
+					var params = {'<%=ControladorItemsBaremacion.PARAM_ACCION%>': '<%=ControladorItemsBaremacion.ACCION_AGREGAR_APARTADO%>'};
+					Atis.sendForm("<%=request.getRequestURI()%>", params);
+				}},
+				{'label': renderTextActivarDesactivar, 
+				 'title': renderTextActivarDesactivar,
+				 'showWhenSelected': true,
+				 'onClick': function(selected) { 
+					 onClickActivarDesactivar.bind(this,
+						 selected, 
+						 "¿Desea %s el bloque seleccionado?", 
+						 '<%=ControladorItemsBaremacion.PARAM_APARTADO%>', 
+						 '<%=ControladorItemsBaremacion.ACCION_DESACTIVAR_APARTADO%>', 
+						 '<%=ControladorItemsBaremacion.ACCION_ACTIVAR_APARTADO%>'
+					)();
+				}
+				},
+				{'label': 'Editar', 
+				 'showWhenSelected': true, 
+				 'title': 'Editar bloque seleccionado', 
+				 'onClick': onClickEditar.bind(this, '<%=ControladorItemsBaremacion.ACCION_EDITAR_APARTADO%>', '<%=ControladorItemsBaremacion.PARAM_APARTADO%>')
+				}
+			]
 		});
 		
-		document.getElementById("tableApartados").style.visibility = "hidden";
-		document.getElementById("tableItems").style.visibility = "hidden";
+		document.getElementById("tableApartadosIBA").style.visibility = "hidden";
+		document.getElementById("tableItemsIBA").style.visibility = "hidden";
 		
 	<%	if (bean.getApartadoBaremacion() != null) { %>
-			var tableApartados = new Atis.DataTable('#tableApartados', {
-			    "ajax": { url: "<%= ControladorItemsBaremacion.URL_PATTERN_AJAX %>", async: false },
-			    "params": {"<%=ControladorItemsBaremacion.PARAM_APARTADO%>": <%= bean.getApartadoBaremacion().getCodNum() %>},
-			    "pageSize": 10,
-			    "title": "APARTADOS: <%= bean.getApartadoBaremacion().getNombre() %>",
-			    "filterable": true,
-			    "stateSave": true,
-			    "defaultOrderBy": 0,
-			    "defaultOrderDirection": "asc",
-			    "action": "<%=ControladorItemsBaremacion.ACCION_DATATABLE_BLOQUES%>",
-			    "clickable": {'onClick': function(row) {
-			    	var params = {
-	    				'<%=ControladorItemsBaremacion.PARAM_ACCION%>': '<%=ControladorItemsBaremacion.ACCION_BLOQUE_SELECCIONADO%>', 
-	    				'<%=ControladorItemsBaremacion.PARAM_BLOQUE%>': row.codNum
-		    		};
-	        		Atis.sendForm("<%= request.getRequestURI() %>", params);
-			    }},
-			    "selected": <%= bean.getBloqueBaremacion() != null ? bean.getBloqueBaremacion().getCodNum() : "null" %>,		
-			    "columns": [
-			    	{'data': 'codigo', 'filter': true, 'render': function(row) { return row.apartado.codigo + "." + row.codigo; }},
-			        {'data': 'nombre', 'filter': true},
-			        {'data': 'numeroMaximoMeritos'},			        
-			        {'data': 'activo', 'filter': {'type': 'selectBoolean', 'true': 'Activo', 'false': 'Inactivo'}, 'renderBoolean': {'true': 'Apartado activo', 'false': 'Apartado inactivo'}},
-			    ],
-			    "actions": [
-			    	{'label': 'Añadir', 'title': 'Añadir un nuevo apartado', 'onClick': function(selected) {
-			    		var params = {
-		    				'<%=ControladorItemsBaremacion.PARAM_ACCION%>': '<%=ControladorItemsBaremacion.ACCION_AGREGAR_BLOQUE%>', 
-		    				'<%=ControladorItemsBaremacion.PARAM_APARTADO%>': '<%=bean.getApartadoBaremacion().getCodNum()%>'
-			    		};
-		        		Atis.sendForm("<%=request.getRequestURI()%>", params);
-			    	}},
-			    	{'label': renderTextActivarDesactivar,
-			    	 'title': renderTextActivarDesactivar,
-			    	 'showWhenSelected': true,
-			    	 'onClick': function(selected) { 
-			    		 onClickActivarDesactivar.bind(this,
-		    				 selected, 
-		    				 "¿Desea %s el apartado seleccionado?", 
-		    				 '<%=ControladorItemsBaremacion.PARAM_BLOQUE%>', 
-		    				 '<%=ControladorItemsBaremacion.ACCION_DESACTIVAR_BLOQUE%>', 
-		    				 '<%=ControladorItemsBaremacion.ACCION_ACTIVAR_BLOQUE%>'
-				    	 )();
-			    	  }
-			    	},
-			    	{'label': 'Editar', 
-			    	 'showWhenSelected': true, 
-			    	 'title': 'Editar apartado seleccionado',
-			    	 'onClick': onClickEditar.bind(this, '<%=ControladorItemsBaremacion.ACCION_EDITAR_BLOQUE%>', '<%=ControladorItemsBaremacion.PARAM_BLOQUE%>')
-			    	}
-			    ]
+			var tableApartados = new Atis.DataTable('#tableApartadosIBA', {
+				"ajax": { url: "<%= ControladorItemsBaremacion.URL_PATTERN_AJAX %>", async: false },
+				"params": {"<%=ControladorItemsBaremacion.PARAM_APARTADO%>": <%= bean.getApartadoBaremacion().getCodNum() %>},
+				"pageSize": 10,
+				"title": "APARTADOS: <%= bean.getApartadoBaremacion().getNombre() %>",
+				"filterable": true,
+				"stateSave": true,
+				"defaultOrderBy": 0,
+				"defaultOrderDirection": "asc",
+				"action": "<%=ControladorItemsBaremacion.ACCION_DATATABLE_BLOQUES%>",
+				"clickable": {'onClick': function(row) {
+					var params = {
+						'<%=ControladorItemsBaremacion.PARAM_ACCION%>': '<%=ControladorItemsBaremacion.ACCION_BLOQUE_SELECCIONADO%>', 
+						'<%=ControladorItemsBaremacion.PARAM_BLOQUE%>': row.codNum
+					};
+					Atis.sendForm("<%= request.getRequestURI() %>", params);
+				}},
+				"selected": <%= bean.getBloqueBaremacion() != null ? bean.getBloqueBaremacion().getCodNum() : "null" %>,		
+				"columns": [
+					{'data': 'codigo', 'filter': true, 'render': function(row) { return row.apartado.codigo + "." + row.codigo; }},
+					{'data': 'nombre', 'filter': true},
+					{'data': 'numeroMaximoMeritos'},
+					{'data': 'activo', 'filter': {'type': 'selectBoolean', 'true': 'Activo', 'false': 'Inactivo'}, 'renderBoolean': {'true': 'Apartado activo', 'false': 'Apartado inactivo'}},
+				],
+				"actions": [
+					{'label': 'Añadir', 'title': 'Añadir un nuevo apartado', 'onClick': function(selected) {
+						var params = {
+							'<%=ControladorItemsBaremacion.PARAM_ACCION%>': '<%=ControladorItemsBaremacion.ACCION_AGREGAR_BLOQUE%>', 
+							'<%=ControladorItemsBaremacion.PARAM_APARTADO%>': '<%=bean.getApartadoBaremacion().getCodNum()%>'
+						};
+						Atis.sendForm("<%=request.getRequestURI()%>", params);
+					}},
+					{'label': renderTextActivarDesactivar,
+					 'title': renderTextActivarDesactivar,
+					 'showWhenSelected': true,
+					 'onClick': function(selected) { 
+						 onClickActivarDesactivar.bind(this,
+							 selected, 
+							 "¿Desea %s el apartado seleccionado?", 
+							 '<%=ControladorItemsBaremacion.PARAM_BLOQUE%>', 
+							 '<%=ControladorItemsBaremacion.ACCION_DESACTIVAR_BLOQUE%>', 
+							 '<%=ControladorItemsBaremacion.ACCION_ACTIVAR_BLOQUE%>'
+						 )();
+						}
+					},
+					{'label': 'Editar', 
+					 'showWhenSelected': true, 
+					 'title': 'Editar apartado seleccionado',
+					 'onClick': onClickEditar.bind(this, '<%=ControladorItemsBaremacion.ACCION_EDITAR_BLOQUE%>', '<%=ControladorItemsBaremacion.PARAM_BLOQUE%>')
+					}
+				]
 			});
-			document.getElementById("tableApartados").style.visibility = "visible";
+			document.getElementById("tableApartadosIBA").style.visibility = "visible";
 			
 		<%	if (bean.getBloqueBaremacion() != null) { %>
-				var tableItems = new Atis.DataTable('#tableItems', {
-				    "ajax": { url: "<%= ControladorItemsBaremacion.URL_PATTERN_AJAX %>", async: false },
-				    "params": {"<%=ControladorItemsBaremacion.PARAM_BLOQUE%>": <%= bean.getBloqueBaremacion().getCodNum() %>},
-				    "pageSize": 10,
-				    "title": "TIPOS DE MÉRITOS: <%= bean.getBloqueBaremacion().getNombre() %>",
-				    "filterable": true,
-				    "stateSave": true,
-				    "defaultOrderBy": 0,
-				    "defaultOrderDirection": "asc",
-				    "action": "<%=ControladorItemsBaremacion.ACCION_DATATABLE_ITEMS%>",
-				    "clickable": {'onClick': function(row) {
-				    	var params = {
-		    				'<%=ControladorItemsBaremacion.PARAM_ACCION%>': '<%=ControladorItemsBaremacion.ACCION_ITEM_SELECCIONADO%>', 
-		    				'<%=ControladorItemsBaremacion.PARAM_ITEM%>': row.codNum
-		    			};
-		        		Atis.sendForm("<%= request.getRequestURI() %>", params);
-				    }},
-				    "selected": <%= bean.getItemBaremacion() != null ? bean.getItemBaremacion().getCodNum() : "null" %>,
-				    "columns": [
-				    	{'data': 'codigo', 'filter': true, 'render': function(row) { return row.bloque.apartado.codigo + "." + row.bloque.codigo + "." + row.codigo; }},
-				        {'data': 'nombre', 'filter': true},
-				        {'data': 'unidades'},
-				        {'data': 'valor'},
-				        {'data': 'valorMinimo'},
-				        {'data': 'valorMaximo'},
-				        {'data': 'afinidad', 'render': function(row) { return row.afinidad ? row.afinidad : 'N'; }},
-				        {'data': 'individualizado', 'filter': {'type': 'selectBoolean', 'true': 'Si', 'false': 'No'}, 'renderBoolean': {'true': 'Individualizado', 'false': 'No individualizado'}},
-				        {'data': 'activo', 'filter': {'type': 'selectBoolean', 'true': 'Activo', 'false': 'Inactivo'}, 'renderBoolean': {'true': 'Item activo', 'false': 'Item inactivo'}},
-				    ],
-				    "actions": [
-				    	{'label': 'Añadir', 'title': 'Añadir un nuevo item', 'onClick': function(selected) {
-				    		var params = {
-				    			'<%=ControladorItemsBaremacion.PARAM_ACCION%>': '<%=ControladorItemsBaremacion.ACCION_AGREGAR_ITEM%>', 
-				    			'<%=ControladorItemsBaremacion.PARAM_BLOQUE%>': '<%=bean.getBloqueBaremacion().getCodNum()%>'
-				    		};
-			        		Atis.sendForm("<%=request.getRequestURI()%>", params);
-				    	}},
-				    	{'label': renderTextActivarDesactivar,
-				    	 'title': renderTextActivarDesactivar,
-				    	 'showWhenSelected': true,
-				    	 'onClick': function(selected) { 
-				    		 onClickActivarDesactivar.bind(this,
-			    				 selected,
-			    				 "¿Desea %s el item seleccionado?", 
-			    				 '<%=ControladorItemsBaremacion.PARAM_ITEM%>',
-			    				 '<%=ControladorItemsBaremacion.ACCION_DESACTIVAR_ITEM%>', 
-			    				 '<%=ControladorItemsBaremacion.ACCION_ACTIVAR_ITEM%>'
-					    	 )();
-				    	  }
-				    	},				    	
-				    	{'label': 'Editar', 
-				    	 'title': 'Editar item seleccionado', 
-				    	 'showWhenSelected': true,
-				    	 'onClick': onClickEditar.bind(this, '<%=ControladorItemsBaremacion.ACCION_EDITAR_ITEM%>', '<%=ControladorItemsBaremacion.PARAM_ITEM%>')
-				    	}
-				    ]
+				var tableItems = new Atis.DataTable('#tableItemsIBA', {
+					"ajax": { url: "<%= ControladorItemsBaremacion.URL_PATTERN_AJAX %>", async: false },
+					"params": {"<%=ControladorItemsBaremacion.PARAM_BLOQUE%>": <%= bean.getBloqueBaremacion().getCodNum() %>},
+					"pageSize": 10,
+					"title": "TIPOS DE MÉRITOS: <%= bean.getBloqueBaremacion().getNombre() %>",
+					"filterable": true,
+					"stateSave": true,
+					"defaultOrderBy": 0,
+					"defaultOrderDirection": "asc",
+					"action": "<%=ControladorItemsBaremacion.ACCION_DATATABLE_ITEMS%>",
+					"clickable": {'onClick': function(row) {
+						var params = {
+							'<%=ControladorItemsBaremacion.PARAM_ACCION%>': '<%=ControladorItemsBaremacion.ACCION_ITEM_SELECCIONADO%>', 
+							'<%=ControladorItemsBaremacion.PARAM_ITEM%>': row.codNum
+						};
+						Atis.sendForm("<%= request.getRequestURI() %>", params);
+					}},
+					"selected": <%= bean.getItemBaremacion() != null ? bean.getItemBaremacion().getCodNum() : "null" %>,
+					"columns": [
+						{'data': 'codigo', 'filter': true, 'render': function(row) { return row.bloque.apartado.codigo + "." + row.bloque.codigo + "." + row.codigo; }},
+						{'data': 'nombre', 'filter': true},
+						{'data': 'unidades'},
+						{'data': 'valor'},
+						{'data': 'valorMinimo'},
+						{'data': 'valorMaximo'},
+						{'data': 'afinidad', 'render': function(row) { return row.afinidad ? row.afinidad : 'N'; }},
+						{'data': 'individualizado', 'filter': {'type': 'selectBoolean', 'true': 'Si', 'false': 'No'}, 'renderBoolean': {'true': 'Individualizado', 'false': 'No individualizado'}},
+						{'data': 'activo', 'filter': {'type': 'selectBoolean', 'true': 'Activo', 'false': 'Inactivo'}, 'renderBoolean': {'true': 'Item activo', 'false': 'Item inactivo'}},
+					],
+					"actions": [
+						{'label': 'Añadir', 'title': 'Añadir un nuevo item', 'onClick': function(selected) {
+							var params = {
+								'<%=ControladorItemsBaremacion.PARAM_ACCION%>': '<%=ControladorItemsBaremacion.ACCION_AGREGAR_ITEM%>', 
+								'<%=ControladorItemsBaremacion.PARAM_BLOQUE%>': '<%=bean.getBloqueBaremacion().getCodNum()%>'
+							};
+							Atis.sendForm("<%=request.getRequestURI()%>", params);
+						}},
+						{'label': renderTextActivarDesactivar,
+							'title': renderTextActivarDesactivar,
+							'showWhenSelected': true,
+							'onClick': function(selected) { 
+								onClickActivarDesactivar.bind(this,
+									selected,
+									"¿Desea %s el item seleccionado?", 
+									'<%=ControladorItemsBaremacion.PARAM_ITEM%>',
+									'<%=ControladorItemsBaremacion.ACCION_DESACTIVAR_ITEM%>', 
+									'<%=ControladorItemsBaremacion.ACCION_ACTIVAR_ITEM%>'
+								)();
+							}
+						},
+						{'label': 'Editar', 
+						 'title': 'Editar item seleccionado', 
+						 'showWhenSelected': true,
+						 'onClick': onClickEditar.bind(this, '<%=ControladorItemsBaremacion.ACCION_EDITAR_ITEM%>', '<%=ControladorItemsBaremacion.PARAM_ITEM%>')
+						}
+					]
 				});
 				
-				document.getElementById("tableItems").style.visibility = "visible";
+				document.getElementById("tableItemsIBA").style.visibility = "visible";
 			
 			<%	if (bean.getItemBaremacion() != null) { %>
-					Atis.smoothScrollToAnchor("#tableItems");
+					Atis.smoothScrollToAnchor("#tableItemsIBA");
 			<%	} else { %>
-					Atis.smoothScrollToAnchor("#tableApartados");
+					Atis.smoothScrollToAnchor("#tableApartadosIBA");
 			<%	} %>
 				
 		<%	} %>
@@ -301,7 +301,7 @@ VistaItemsBaremacion bean = (VistaItemsBaremacion) uvdatos.getVistas().get(Vista
 		document.getElementById("descargar_items").addEventListener("click", function(event) {
 			event.preventDefault();
 			window.open("<%= ControladorDescargaFicheros.URL_DESCARGA_FICHEROS %>"
-		        	+ "?<%= ControladorDescargaFicheros.PARAM_ACCION %>=<%= ControladorDescargaFicheros.ACCION_DESCARGAR_RESUMEN_ITEM_BAREMACION %>");
+					+ "?<%= ControladorDescargaFicheros.PARAM_ACCION %>=<%= ControladorDescargaFicheros.ACCION_DESCARGAR_RESUMEN_ITEM_BAREMACION %>");
 		});
 		
 	});

@@ -197,7 +197,7 @@ String justificacion = BolsaEmpleoUtils.getParamForm(request, ControladorContrat
 <%	} %>
 	
 <%	if (mostrarCandidatos) { %>
-		<table class="bluetable bolsaempleo" id="tableOfertasCandidatos">
+		<table class="bluetable bolsaempleo" id="tableOfertasCandidatosCPO">
 			<tr>
 				<th scope="col" style="width:76px">D.N.I</th>
 				<th scope="col" style="width:100%" class="nombre">Nombre</th>
@@ -218,7 +218,7 @@ String justificacion = BolsaEmpleoUtils.getParamForm(request, ControladorContrat
 <%	} %>
 
 <%	if ((estadoContratacion || estadoCerrada) && personal) { %>
-		<table class="bluetable bolsaempleo" id="tableCandidatosContrato">
+		<table class="bluetable bolsaempleo" id="tableCandidatosContratoCPO">
 			<tr>
 				<th scope="col" style="width:76px">D.N.I</th>
 				<th scope="col" style="width:100%" class="nombre">Nombre</th>
@@ -250,9 +250,9 @@ $(document).ready(function() {
 	$("#plaza_fecha_fin_oferta").datepicker();
 	
 <%	if (mostrarCandidatos) { %>
-		var tableOfertasCandidatos = new Atis.DataTable('#tableOfertasCandidatos', {
+		var tableOfertasCandidatos = new Atis.DataTable('#tableOfertasCandidatosCPO', {
 			"ajax": { url: "<%= ControladorContratacion.URL_PATTERN_AJAX %>", async: false },
-			"pageSize": 100,
+			"pageSize": 10,
 			"filterable": true,
 			"defaultOrderBy": 2,
 			"defaultOrderDirection": 'desc',
@@ -268,14 +268,14 @@ $(document).ready(function() {
 					return row.candidato.nombre + " " + row.candidato.apellido1 + " " + row.candidato.apellido2;
 				}},
 				{'data': 'puntuacion', 'filter': {'type': 'number'}},
-				{'data': 'resultado', 'render': function(row) {
+				{'data': 'resultado', 'order': false, 'render': function(row) {
 					if (row.resultado == true) {
 						return "<div title='Aceptada' class='circle-true'></div>";
 					} else if (row.resultado == false) {
 						return "<div title='Rechazada' class='circle-false'></div>";
 					}
 				}},
-				{'data': 'fechaResultado', 'filter': {'type': 'date'}},
+				{'data': 'fechaResultado', 'order': false, 'filter': {'type': 'date'}},
 				{'data': 'codNum', 'buttons': [{'label': 'Contratar', 'onClick': function(row) {
 							var mensaje = 
 								"<h2>Candidato " + row.candidato.prsnif + "</h2>"
@@ -423,7 +423,7 @@ $(document).ready(function() {
 
 <%	if ((estadoContratacion || estadoCerrada) && personal) { %>
 
-		var tableCandidatosContrato = new Atis.DataTable('#tableCandidatosContrato', {
+		var tableCandidatosContrato = new Atis.DataTable('#tableCandidatosContratoCPO', {
 			"ajax": { url: "<%= ControladorContratacion.URL_PATTERN_AJAX %>", async: false },
 			"action": "<%= ControladorContratacion.ACCION_DATATABLE_CANDIDATOS_CONTRATO %>",
 			"params": {'<%=ControladorContratacion.PARAM_PLAZA_OFERTADA%>': '<%= plaza.getCodNum() %>'},
@@ -602,7 +602,7 @@ $(document).ready(function() {
 				var message = '<p>Una vez abierta la plaza ya no se podrá modificar y comenzará el período de aceptación de los<br/> candidatos.<br/>';
 				message += 'En la fecha: <%= fechaFinOferta %> y hora: <%= horaFinOferta %> el estado de la plaza cambiará automáticamente a estado<br/> de contratación.</p><br/>';
 				message += '<p>Se enviará un correo sobre la apertura de la plaza a los siguientes candidatos:</p>';
-				message += '<table id="tablaCandidatosApertura" class="bluetable bolsaempleo" style="margin-top: 10px; width: 525px;">';
+				message += '<table id="tablaCandidatosAperturaCPO" class="bluetable bolsaempleo" style="margin-top: 10px; width: 525px;">';
 				message += '    <tr>';
 				message += '        <th scope="col" style="width:65px">D.N.I</th>';
 				message += '        <th scope="col" style="width:100%">Nombre</th>';
@@ -642,7 +642,7 @@ $(document).ready(function() {
 						$(this).remove();
 					},
 					open: function(event, ui) {
-						var table = new Atis.DataTable('#tablaCandidatosApertura', {
+						var table = new Atis.DataTable('#tablaCandidatosAperturaCPO', {
 							"ajax": { url: "<%= ControladorContratacion.URL_PATTERN_AJAX %>" },
 							"action": "<%= ControladorContratacion.ACCION_DATATABLE_CANDIDATOS_APERTURA %>",
 							"params": {'<%=ControladorContratacion.PARAM_PLAZA_OFERTADA%>': '<%= plaza.getCodNum() %>'},

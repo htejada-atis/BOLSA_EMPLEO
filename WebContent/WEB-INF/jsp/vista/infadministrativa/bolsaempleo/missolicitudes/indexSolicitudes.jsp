@@ -23,7 +23,7 @@ VistaSolicitudes bean = (VistaSolicitudes) uvdatos.getVistas().get(VistaSolicitu
 	    <p>A continuación se muestran las convocatorias disponibles para poder introducir méritos y poder seleccionar las áreas en las que desee participar.</p>
 	</div>
 	
-	<table class="bluetable bolsaempleo" id="table">
+	<table class="bluetable bolsaempleo" id="tableTitulacionesMSO">
 		<tr>
 			<th scope="col"	style="width:30%">Descripción</th>
 			<th scope="col"	style="width:10%">Fecha cierre</th>
@@ -115,7 +115,7 @@ VistaSolicitudes bean = (VistaSolicitudes) uvdatos.getVistas().get(VistaSolicitu
 			$('button.descargar-pdf-solicitud', table.node).on('click', descargarPDFSolicitud);
 		};
 		
-		var table_titulaciones = new Atis.DataTable('#table', {
+		var table_titulaciones = new Atis.DataTable('#tableTitulacionesMSO', {
 		    "ajax": { url: "<%=  ControladorMisSolicitudes.URL_PATTERN_AJAX %>" },
 		    "pageSize": 10,
 		    "stateSave": true,

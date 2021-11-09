@@ -23,7 +23,7 @@ VistaMeritosPreferentes bean = (VistaMeritosPreferentes) uvdatos.getVistas().get
 	    </button>
 	</div>
 	
-	<table class="bluetable bolsaempleo" id="table">
+	<table class="bluetable bolsaempleo" id="tableMeritosPreferentesMPR">
 		<tr>
 			<th scope="col" style="width:5%" title="Código del mérito">Código</th>
 			<th scope="col"	style="width:28%" title="Nombre del mérito">Nombre</th>
@@ -46,7 +46,7 @@ VistaMeritosPreferentes bean = (VistaMeritosPreferentes) uvdatos.getVistas().get
 <script>
 
 	$(document).ready(function() {
-		var table = new Atis.DataTable('#table', {
+		var table = new Atis.DataTable('#tableMeritosPreferentesMPR', {
 		    "ajax": { url: "<%=  ControladorMeritosPreferentes.URL_PATTERN_AJAX %>" },
 		    "pageSize": 10,
 		    "action": "<%= ControladorMeritosPreferentes.ACCION_DATATABLE %>",

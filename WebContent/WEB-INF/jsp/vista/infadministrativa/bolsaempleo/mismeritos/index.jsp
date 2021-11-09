@@ -28,8 +28,7 @@ VistaMeritos bean = (VistaMeritos) uvdatos.getVistas().get(VistaMeritos.class.ge
 	Aquí podría incluir todos los méritos que se deseen, pero su simple inclusión en este repositorio no implica que sean evaluados. 
 	Para ello deberán con posterioridad incorporarse en la bolsa a evaluar.</p>
 	
-	<table class="bluetable bolsaempleo" id="tableMeritos">
-		<!--<caption>MÉRITOS QUE LA COMISIÓN EVALUARÁ</caption>-->
+	<table class="bluetable bolsaempleo" id="tableMeritosMME">
 		<tr>
 			<th scope="col" style="width:5%"></th>
 			<th scope="col" style="width:10%">Id</th>
@@ -68,7 +67,7 @@ VistaMeritos bean = (VistaMeritos) uvdatos.getVistas().get(VistaMeritos.class.ge
 			<% } %>
 		<% } %>
 		
-		var table = new Atis.DataTable('#tableMeritos', {
+		var table = new Atis.DataTable('#tableMeritosMME', {
 		    "ajax": { url: "<%= ControladorMisMeritos.URL_PATTERN_AJAX %>" },
 		    "pageSize": 10,
 		    "action": "<%=ControladorMisMeritos.ACCION_DATATABLE%>",

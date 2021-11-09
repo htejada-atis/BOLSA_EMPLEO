@@ -637,14 +637,14 @@ function DataTable(id, config) {
 							filterElement.append($('<option value="0">-----</option>'));
 
 							if (columnDef.filter.true) {
-								var selected = columnDef.filter.optionDefault == "true" && sessionStorage.getItem(self.idFinal) == null || self.stateSave && self.filterParams[index] == option ? ' selected' : '';
+								var selected = columnDef.filter.optionDefault == "true" && sessionStorage.getItem(self.idFinal) == null || self.stateSave && self.filterParams[index] == true ? ' selected' : '';
 								filterElement.append($('<option value="true" title="' + columnDef.filter.true + '" ' + selected + '>' + columnDef.filter.true + '</option>'));
 							} else {
 								filterElement.append($('<option>' + true + '</option>'));
 							}
 
 							if (columnDef.filter.false) {
-								var selected = columnDef.filter.optionDefault == "false" && sessionStorage.getItem(self.idFinal) == null || self.stateSave && self.filterParams[index] == option ? ' selected' : '';
+								var selected = columnDef.filter.optionDefault == "false" && sessionStorage.getItem(self.idFinal) == null || self.stateSave && self.filterParams[index] == false ? ' selected' : '';
 								filterElement.append($('<option value="false" title="' + columnDef.filter.true + '"' + selected + '>' + columnDef.filter.false + '</option>'));
 							} else {
 								filterElement.append($('<option>' + false + '</option>'));

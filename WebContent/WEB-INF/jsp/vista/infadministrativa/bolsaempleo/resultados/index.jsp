@@ -17,7 +17,7 @@ VistaResultados bean = (VistaResultados)uvdatos.getVistas().get(VistaResultados.
 	<h2>Resultados</h2>	
 	<p>Resultados de la última evaluación. Al pulsar sobre un area, listado de candidatos con su puntuanción y el detalle del cálculo.</p>
 	
-	<table class="bluetable bolsaempleo" id="tableAreas">
+	<table class="bluetable bolsaempleo" id="tableAreasRES">
 		<tr>
 			<th scope="col" style="width:50px">Id.</th>
 			<th scope="col" style="width:100px" title="Código área">Cod. Area.</th>
@@ -38,35 +38,35 @@ VistaResultados bean = (VistaResultados)uvdatos.getVistas().get(VistaResultados.
 <script>
 $(document).ready(function() {
 	
-	var tableAreas = new Atis.DataTable('#tableAreas', {
-	    "ajax": { url: "<%= ControladorResultados.URL_PATTERN_AJAX %>" },
-	    "pageSize": 20,
-	    "filterable": true,
-	    "stateSave": true,
-	    "action": "<%= ControladorResultados.ACCION_DATATABLE_BOLSAS %>",
-	    "defaultOrderBy": 1,
-	    "columns": [
-	    	{'data': 'codNum', 'filter': {'type': 'number'}},
-	    	{'data': 'area.idAreaExterno', 'filter': {'type': 'number'}},
-	        {'data': 'area.descripcion', 'filter': true, 'overflow': 'auto'},
-	        {'data': 'codNum', 'filter': {'type': 'date'}, 'render': function(row) {
-	        		return row.resultadoActual ? row.fechaBaremacion : '';
-	        	}
-	        },
-	        {'data': 'codnum', 'buttons': [{'label': 'Ver resultados', 
-		        	'onClick': function(row) {
-		        		var params = {
-		    				'a': '<%= ControladorResultados.ACCION_SELECCIONAR_BOLSA %>',
-		    				'<%= ControladorResultados.PARAM_BOLSA %>': row.codNum
-			    		};
-			    		Atis.sendForm("<%= request.getRequestURI() %>", params);
-		        	},
-		        	'visible': function(row) {
-		        		return row.resultadoActual;
-	        		}
-	        	}]
-	        }
-	    ],
-	});	
+	var tableAreas = new Atis.DataTable('#tableAreasRES', {
+		"ajax": { url: "<%= ControladorResultados.URL_PATTERN_AJAX %>" },
+		"pageSize": 20,
+		"filterable": true,
+		"stateSave": true,
+		"action": "<%= ControladorResultados.ACCION_DATATABLE_BOLSAS %>",
+		"defaultOrderBy": 1,
+		"columns": [
+			{'data': 'codNum', 'filter': {'type': 'number'}},
+			{'data': 'area.idAreaExterno', 'filter': {'type': 'number'}},
+			{'data': 'area.descripcion', 'filter': true, 'overflow': 'auto'},
+			{'data': 'codNum', 'filter': {'type': 'date'}, 'render': function(row) {
+					return row.resultadoActual ? row.fechaBaremacion : '';
+				}
+			},
+			{'data': 'codnum', 'buttons': [{'label': 'Ver resultados', 
+					'onClick': function(row) {
+						var params = {
+							'a': '<%= ControladorResultados.ACCION_SELECCIONAR_BOLSA %>',
+							'<%= ControladorResultados.PARAM_BOLSA %>': row.codNum
+						};
+						Atis.sendForm("<%= request.getRequestURI() %>", params);
+					},
+					'visible': function(row) {
+						return row.resultadoActual;
+					}
+				}]
+			}
+		],
+	});
 });
 </script>

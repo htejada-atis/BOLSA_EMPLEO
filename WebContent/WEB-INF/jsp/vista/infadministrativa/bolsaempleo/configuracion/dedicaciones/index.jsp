@@ -21,7 +21,7 @@ VistaDedicacion bean = (VistaDedicacion) uvdatos.getVistas().get(VistaDedicacion
 		</button>
 	</div>
 	
-	<table class="bluetable bolsaempleo" id="tableDedicaciones">
+	<table class="bluetable bolsaempleo" id="tableDedicacionesDED">
 		<tr>
 			<th scope="col" style="width:50px">Id</th>
 			<th scope="col" style="width:100%">Texto</th>
@@ -44,7 +44,7 @@ VistaDedicacion bean = (VistaDedicacion) uvdatos.getVistas().get(VistaDedicacion
 <script>
 $(document).ready(function() {
 	
-	var table = new Atis.DataTable('#tableDedicaciones', {
+	var table = new Atis.DataTable('#tableDedicacionesDED', {
 		"ajax": { url: "<%=ControladorDedicaciones.URL_PATTERN_AJAX%>" },
 		"pageSize": 10,
 		"filterable": true,

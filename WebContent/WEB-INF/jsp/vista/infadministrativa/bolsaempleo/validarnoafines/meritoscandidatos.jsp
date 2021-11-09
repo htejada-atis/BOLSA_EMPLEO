@@ -44,7 +44,7 @@ Double valor = null;
 	<h3><%= EscapaHTML.escapa(descripcion) %></h3>
 	<h4><%= EscapaHTML.escapa(bolsa.getArea().getDescripcion()) %></h4>
 	
-	<table class="bluetable bolsaempleo" id="tableCandidatosValidarNoAfines">
+	<table class="bluetable bolsaempleo" id="tableCandidatosVNA">
 		<tr>
 			<th scope="col" style="width:76px">D.N.I</th>
 			<th scope="col" style="width:100%" class="nombre">Nombre</th>
@@ -64,7 +64,7 @@ Double valor = null;
 	
 <%	if (candidato != null) { %>
 	
-		<table class="bluetable bolsaempleo" id="tableMeritosValidarNoAfines">
+		<table class="bluetable bolsaempleo" id="tableMeritosVNA">
 			<tr>
 				<th scope="col" style="width:40px">Id</th>
 				<th scope="col" style="width:40px">Estado</th>
@@ -89,7 +89,7 @@ Double valor = null;
 			
 			<jsp:include page="/WEB-INF/jsp/vista/infadministrativa/bolsaempleo/mensajes.jsp" />
 			
-			<table class="bluetable bolsaempleo" id="tableValoresMeritoBolsasValidarNoAfines">
+			<table class="bluetable bolsaempleo" id="tableValoresMeritoBolsasVNA">
 				<tr>
 					<th scope="col" style="width:77px">Convocatoria</th>
 					<th scope="col" style="width:100%; min-width: 100px">Bolsa</th>
@@ -108,7 +108,7 @@ Double valor = null;
 				</tfoot>
 			</table>
 			
-			<table class="bluetable bolsaempleo" id="tableBolsasCandidatoValidarNoAfines">
+			<table class="bluetable bolsaempleo" id="tableBolsasCandidatoVNA">
 				<tr>
 					<th scope="col" style="width:45%">Bolsa</th>
 					<th scope="col" style="width:40%">Estado</th>
@@ -232,12 +232,13 @@ Double valor = null;
 $(document).ready(function() {
 	Atis.handleLinkEvents();
 	
-	var tableCandidatos = new Atis.DataTable('#tableCandidatosValidarNoAfines', {
+	var tableCandidatos = new Atis.DataTable('#tableCandidatosVNA', {
 		"ajax": { url: "<%= ControladorValidarNoAfines.URL_PATTERN_AJAX %>", async: false },
-		"pageSize": 10,
+		"pageSize": 20,
 		"defaultOrderBy": 2,
 		"defaultOrderDirection": 'desc',
 		"stateSave": true,
+		"filterable": true,
 		"action": "<%= ControladorValidarNoAfines.ACCION_DATATABLE_CANDIDATOS %>",
 		"title": 'LISTA DE USUARIOS',
 		"dropdown": true,
@@ -252,8 +253,8 @@ $(document).ready(function() {
 		}},
 		<% if (candidato != null) { %> "selected": <%= candidato.getCodNum() %> ,<% } %>
 		"columns": [
-			{'data': 'prsnif'},
-			{'data': 'apellido1', 'overflow': 'auto', 'render': function(row) {
+			{'data': 'prsnif', 'filter': true},
+			{'data': 'apellido1', 'overflow': 'auto', 'filter': true, 'render': function(row) {
 				return row.nombre + " " + row.apellido1 + " " + row.apellido2; 
 			}},
 			{'data': 'totalMeritosNoValidados', 'class': 'center', 'render': function(row) { return isNaN(row.totalMeritosNoValidados) ? 0 : row.totalMeritosNoValidados; } },
@@ -265,9 +266,9 @@ $(document).ready(function() {
 	
 	<% if (candidato != null) { %>
 	
-		var tableMeritos = new Atis.DataTable('#tableMeritosValidarNoAfines', {
+		var tableMeritos = new Atis.DataTable('#tableMeritosVNA', {
 			"ajax": { url: "<%= ControladorValidarNoAfines.URL_PATTERN_AJAX %>", async: false },
-			"pageSize": 100,
+			"pageSize": 10,
 			"filterable": true,
 			"stateSave": true,
 			"action": "<%= ControladorValidarNoAfines.ACCION_DATATABLE_MERITOS %>",
@@ -315,11 +316,11 @@ $(document).ready(function() {
 			]
 		});
 		
-		Atis.smoothScrollToAnchor("#tableMeritosValidarNoAfines");
+		Atis.smoothScrollToAnchor("#tableCandidatosVNA");
 		
 		<% if (merito != null) { %>
 			
-			var tableBolsasCandidato = new Atis.DataTable('#tableBolsasCandidatoValidarNoAfines', {
+			var tableBolsasCandidato = new Atis.DataTable('#tableBolsasCandidatoVNA', {
 				"ajax": { url: "<%= ControladorValidarNoAfines.URL_PATTERN_AJAX %>", async: false },
 				"pageSize": 10,
 				"selectable": {'all': false},
@@ -360,9 +361,9 @@ $(document).ready(function() {
 				]
 			});
 			
-			var tableValoresMeritoBolsas = new Atis.DataTable('#tableValoresMeritoBolsasValidarNoAfines', {
+			var tableValoresMeritoBolsas = new Atis.DataTable('#tableValoresMeritoBolsasVNA', {
 				"ajax": { url: "<%= ControladorValidarNoAfines.URL_PATTERN_AJAX %>", async: false },
-				"pageSize": 20,
+				"pageSize": 10,
 				"action": "<%= ControladorValidarNoAfines.ACCION_DATATABLE_VALORES_MERITO_BOLSA %>",
 				"title": 'HISTORIAL DE VALORACIONES DEL MÉRITO: <%= merito.getMerito().getCodNum() %>',
 				"dropdown": true,

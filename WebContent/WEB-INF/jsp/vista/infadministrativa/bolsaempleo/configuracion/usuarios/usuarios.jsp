@@ -32,7 +32,7 @@ VistaUsuarioBolsaEmpleo bean = (VistaUsuarioBolsaEmpleo) uvdatos.getVistas().get
 		</div>
 	</div>
 	
-	<table class="bluetable bolsaempleo" id="table_usuarios">
+	<table class="bluetable bolsaempleo" id="tableUsuariosUSU">
 		<tr>
 			<th scope="col" style="width:15%">Documento</th>
 			<th scope="col" style="width:14%" class="user">Usuario</th>
@@ -63,7 +63,7 @@ $(document).ready(function() {
 		});
 	});
 	
-	var table_usuarios = new Atis.DataTable('#table_usuarios', {
+	var table_usuarios = new Atis.DataTable('#tableUsuariosUSU', {
 	    "ajax": { url: "<%=ControladorUsuarioBolsaEmpleo.URL_PATTERN_AJAX%>", async: false },
 	    "pageSize": 10,
 	    "filterable": true,

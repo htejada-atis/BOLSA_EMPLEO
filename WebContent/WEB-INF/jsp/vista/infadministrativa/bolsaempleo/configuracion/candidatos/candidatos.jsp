@@ -15,7 +15,7 @@ VistaUsuarioBolsaEmpleo bean = (VistaUsuarioBolsaEmpleo) uvdatos.getVistas().get
 	
 	<h2>Usuarios Candidatos</h2>
 	
-	<table class="bluetable bolsaempleo" id="table_usuarios">
+	<table class="bluetable bolsaempleo" id="tableUsuariosCAN">
 		<tr>
 			<th scope="col" style="width:13%" title="Documento">Documento</th>
 			<th scope="col" style="width:14%" title="Nombre de usuario" class="user">Usuario</th>
@@ -37,42 +37,42 @@ VistaUsuarioBolsaEmpleo bean = (VistaUsuarioBolsaEmpleo) uvdatos.getVistas().get
 <script>
 $(document).ready(function() {
 	
-	var table_usuarios = new Atis.DataTable('#table_usuarios', {
-	    "ajax": { url: "<%=ControladorUsuarioCandidato.URL_PATTERN_AJAX%>", async: false },
-	    "pageSize": 10,
-	    "filterable": true,
-	    "stateSave": true,
-	    "clickable": {'onClick': function(row) {
-	    	var params = {
-    				'a': '<%= ControladorUsuarioCandidato.ACCION_SELECCIONAR_CANDIDATO %>', 
-    				'<%= ControladorUsuarioCandidato.PARAM_CANDIDATO %>': row.codNum};
-    		Atis.sendForm("<%= request.getRequestURI() %>", params);
-	    }},
-	    "action": "<%=ControladorUsuarioCandidato.ACCION_DATATABLE_USUARIOS_CANDIDATOS%>",
-	    "columns": [
-	        {'data': 'prsnif', 'filter': true, 'overflow': 'auto'},
-	        {'data': 'codcuenta', 'filter': true, 'overflow': 'auto'},
-	        {'data': 'apellido1', 'filter': true, 'order': false, 'overflow': 'auto', 'render': function(row) {
-        		return row.nombre + " " + row.apellido1 + " " + row.apellido2; 
-        	}},
-	        {'data': 'listaDist', 'filter': {'type': 'selectBoolean', 'true': 'En Lista', 'false': 'Sin Lista'}, 'render': function(row) {
-	        	if(row.listaDist==true){
-        			return "<div title='En lista distribución' class='circle-true'></div>"; 
-        		} else {
-        			return "<div title='Excluido de lista distribución' class='circle-false'></div>"; 
-        		}
-        	}},
-        	{'data': 'excluido', 'filter': {'type': 'select', 'options':{'true': 'Excluido', 'false': 'Incluido'}, 'optionDefault': 'false'}, 'render': function(row) {
-	        	if(row.excluido==true){
-        			return "<div title='Candidato excluido' class='circle-true'></div>"; 
-        		}
-        	}},
-        	{'data': 'borrado', 'filter': {'type': 'select', 'options':{'true': 'Borrado', 'false': 'No Borrado'}, 'optionDefault': 'false'}, 'render': function(row) {
-	        	if(row.borrado==true){
-        			return "<div title='Candidato eliminado' class='circle-true'></div>"; 
-        		}
-        	}},
-	    ],
+	var table_usuarios = new Atis.DataTable('#tableUsuariosCAN', {
+		"ajax": { url: "<%=ControladorUsuarioCandidato.URL_PATTERN_AJAX%>", async: false },
+		"pageSize": 10,
+		"filterable": true,
+		"stateSave": true,
+		"clickable": {'onClick': function(row) {
+			var params = {
+					'a': '<%= ControladorUsuarioCandidato.ACCION_SELECCIONAR_CANDIDATO %>', 
+					'<%= ControladorUsuarioCandidato.PARAM_CANDIDATO %>': row.codNum};
+			Atis.sendForm("<%= request.getRequestURI() %>", params);
+		}},
+		"action": "<%=ControladorUsuarioCandidato.ACCION_DATATABLE_USUARIOS_CANDIDATOS%>",
+		"columns": [
+			{'data': 'prsnif', 'filter': true, 'overflow': 'auto'},
+			{'data': 'codcuenta', 'filter': true, 'overflow': 'auto'},
+			{'data': 'apellido1', 'filter': true, 'order': false, 'overflow': 'auto', 'render': function(row) {
+				return row.nombre + " " + row.apellido1 + " " + row.apellido2; 
+			}},
+			{'data': 'listaDist', 'filter': {'type': 'selectBoolean', 'true': 'En Lista', 'false': 'Sin Lista'}, 'render': function(row) {
+				if(row.listaDist==true){
+					return "<div title='En lista distribución' class='circle-true'></div>"; 
+				} else {
+					return "<div title='Excluido de lista distribución' class='circle-false'></div>"; 
+				}
+			}},
+			{'data': 'excluido', 'filter': {'type': 'select', 'options':{'true': 'Excluido', 'false': 'Incluido'}, 'optionDefault': 'false'}, 'render': function(row) {
+				if(row.excluido==true){
+					return "<div title='Candidato excluido' class='circle-true'></div>"; 
+				}
+			}},
+			{'data': 'borrado', 'filter': {'type': 'select', 'options':{'true': 'Borrado', 'false': 'No Borrado'}, 'optionDefault': 'false'}, 'render': function(row) {
+				if(row.borrado==true){
+					return "<div title='Candidato eliminado' class='circle-true'></div>"; 
+				}
+			}},
+		],
 	});
 
 }); 

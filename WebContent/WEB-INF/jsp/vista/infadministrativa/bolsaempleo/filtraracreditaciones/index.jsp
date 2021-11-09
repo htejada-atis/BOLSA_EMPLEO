@@ -20,7 +20,7 @@ UsuarioBolsaEmpleo candidato = bean.getCandidato();
 	<h2>Filtrado de candidatos por acreditación</h2>
 	<p>Filtrado de candidatos por acreditaciones, para su posible exclusión.</p>
 	
-	<table class="bluetable bolsaempleo" id="tableCandidatosFiltrarAcreditacion">
+	<table class="bluetable bolsaempleo" id="tableCandidatosFAC">
 		<tr>
 			<th scope="col" style="width:12%">Documento</th>
 			<th scope="col" style="width:58%">Candidato</th>
@@ -36,7 +36,7 @@ UsuarioBolsaEmpleo candidato = bean.getCandidato();
 	</table>
 	
 	<% if (candidato != null) { %>
-		<table class="bluetable bolsaempleo" id="tableAcreditacionesCandidato">
+		<table class="bluetable bolsaempleo" id="tableAcreditacionesCandidatoFAC">
 			<tr>
 				<th scope="col" style="width:5%"></th>
 				<th scope="col" style="width:10%">Id</th>
@@ -58,35 +58,35 @@ UsuarioBolsaEmpleo candidato = bean.getCandidato();
 	
 <script>
 	$(document).ready(function() {
-		var tableCandidatos = new Atis.DataTable('#tableCandidatos', {
-		    "ajax": { url: "<%= ControladorFiltrarAcreditaciones.URL_PATTERN_AJAX %>", async: false },
-		    "action": "<%= ControladorFiltrarAcreditaciones.ACCION_DATATABLE_CANDIDATOS %>",
-		    "pageSize": 10,
-		    "filterable": true,
-		    "stateSave": true,
-		    "title": 'CANDIDATOS',
-		    "clickable": {'onClick': function(row) {
-		    	var params = {
-	    				'<%= ControladorFiltrarAcreditaciones.PARAM_ACCION %>': '<%= ControladorFiltrarAcreditaciones.ACCION_CANDIDATO_SELECCIONADO %>',
-	    				'<%= ControladorFiltrarAcreditaciones.PARAM_CANDIDATO %>': row.codNum
-		    	};
-        		Atis.sendForm("<%= request.getRequestURI() %>", params);
-		    }},
-		    <% if (candidato != null) { %> "selected": <%= candidato.getCodNum() %> ,<% } %>
-		    "columns": [
-		    	{'data': 'prsnif', 'filter': true},
-		    	{'data': 'apellido1', 'filter': true, 'overflow': 'auto', 'render': function(row) {
-	        		return row.nombre + " " + row.apellido1 + " " + row.apellido2; 
-	        	}},
-	        	{'data': 'totalAcreditaciones', 'order': {'active': false}},
-	        	{'data': 'totalAcreditacionesValidadas', 'order': {'active': false}},
-		    ],
+		var tableCandidatos = new Atis.DataTable('#tableCandidatosFAC', {
+			"ajax": { url: "<%= ControladorFiltrarAcreditaciones.URL_PATTERN_AJAX %>", async: false },
+			"action": "<%= ControladorFiltrarAcreditaciones.ACCION_DATATABLE_CANDIDATOS %>",
+			"pageSize": 10,
+			"filterable": true,
+			"stateSave": true,
+			"title": 'CANDIDATOS',
+			"clickable": {'onClick': function(row) {
+				var params = {
+						'<%= ControladorFiltrarAcreditaciones.PARAM_ACCION %>': '<%= ControladorFiltrarAcreditaciones.ACCION_CANDIDATO_SELECCIONADO %>',
+						'<%= ControladorFiltrarAcreditaciones.PARAM_CANDIDATO %>': row.codNum
+				};
+				Atis.sendForm("<%= request.getRequestURI() %>", params);
+			}},
+			<% if (candidato != null) { %> "selected": <%= candidato.getCodNum() %> ,<% } %>
+			"columns": [
+				{'data': 'prsnif', 'filter': true},
+				{'data': 'apellido1', 'filter': true, 'overflow': 'auto', 'render': function(row) {
+					return row.nombre + " " + row.apellido1 + " " + row.apellido2; 
+				}},
+				{'data': 'totalAcreditaciones', 'order': {'active': false}},
+				{'data': 'totalAcreditacionesValidadas', 'order': {'active': false}},
+			],
 		});
 		
 		<% if (candidato != null) { %>
 			var acreditaiconesValidadas = [<%= bean.getValidadas() != null ? bean.getValidadas().stream().map(t -> t.getCodNum().toString()).collect(Collectors.joining(",")) : "" %>];
 		
-			var table = new Atis.DataTable('#tableAcreditacionesCandidato', {
+			var table = new Atis.DataTable('#tableAcreditacionesCandidatoFAC', {
 				"ajax": { url: "<%= ControladorFiltrarAcreditaciones.URL_PATTERN_AJAX %>" },
 				"pageSize": 10,
 				"action": "<%= ControladorFiltrarAcreditaciones.ACCION_DATATABLE_ACREDITACIONES_CANDIDATO %>",
@@ -136,7 +136,7 @@ UsuarioBolsaEmpleo candidato = bean.getCandidato();
 				],
 			});
 			
-			Atis.smoothScrollToAnchor("#tableAcreditacionesCandidato");
+			Atis.smoothScrollToAnchor("#tableAcreditacionesCandidatoFAC");
 		<% } %>
 		
 	}); 

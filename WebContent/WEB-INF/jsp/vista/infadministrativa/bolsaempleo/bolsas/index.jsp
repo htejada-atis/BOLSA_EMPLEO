@@ -51,7 +51,7 @@ VistaEstadoBolsas bean = (VistaEstadoBolsas) uvdatos.getVistas().get(VistaEstado
 	</div>
 	
 	
-	<table class="bluetable bolsaempleo" id="tableBolsas">
+	<table class="bluetable bolsaempleo" id="tableBolsasBOL">
 		<tr>
 			<th scope="col" style="width:15px"></th>
 			<th scope="col" style="width:30px" title="Id de la convocatoria">Id</th>
@@ -76,7 +76,7 @@ VistaEstadoBolsas bean = (VistaEstadoBolsas) uvdatos.getVistas().get(VistaEstado
 	
 <script>
 $(document).ready(function() {
-	var table = new Atis.DataTable('#tableBolsas', {
+	var table = new Atis.DataTable('#tableBolsasBOL', {
 		"ajax": { url: "/srv/es/ajax/informacionadministrativa/bolsaempleo/bolsas" },
 		"selectable": true,
 		"pageSize": 10,

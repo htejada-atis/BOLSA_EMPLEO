@@ -27,7 +27,7 @@ VistaMeritosPreferentesCandidato bean = (VistaMeritosPreferentesCandidato) uvdat
 		<% } %>
 	</div>
 	
-	<table class="bluetable bolsaempleo" id="tableMeritos">
+	<table class="bluetable bolsaempleo" id="tableMeritosMMP">
 		<tr>
 			<th scope="col" style="width:5%"></th>
 			<th scope="col" style="width:10%">Id</th>
@@ -58,7 +58,7 @@ VistaMeritosPreferentesCandidato bean = (VistaMeritosPreferentesCandidato) uvdat
 			});
 		<% } %>
 		
-		var table = new Atis.DataTable('#tableMeritos', {
+		var table = new Atis.DataTable('#tableMeritosMMP', {
 		    "ajax": { url: "<%= ControladorMisMeritosPreferentes.URL_PATTERN_AJAX %>" },
 		    "pageSize": 10,
 		    "action": "<%= ControladorMisMeritosPreferentes.ACCION_DATATABLE %>",
