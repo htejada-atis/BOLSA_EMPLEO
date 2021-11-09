@@ -21,7 +21,7 @@ VistaPlazasOfertadas bean = (VistaPlazasOfertadas) uvdatos.getVistas().get(Vista
 		<h2>Plazas ofertadas</h2>
 	</div>
 	
-	<table class="bluetable bolsaempleo" id="tablePlazasOfertadas">
+	<table class="bluetable bolsaempleo" id="tablePlazasOfertadasPOF">
 		<tr>
 			<th scope="col" style="width:100px">Código</th>
 			<th scope="col" style="width:100%">Área</th>
@@ -91,10 +91,11 @@ $(document).ready(function() {
 		<%	} %>
 	<%	} %>
 	
-	var table = new Atis.DataTable('#tablePlazasOfertadas', {
+	var table = new Atis.DataTable('#tablePlazasOfertadasPOF', {
 		"ajax": { url: "<%= ControladorPlazasOfertadas.URL_PATTERN_AJAX %>" },
 		"pageSize": 10,
 		"filterable": true,
+		"stateSave": true,
 		"title": 'Plazas ofertadas',
 		"defaultOrderBy": 3,
 		"defaultOrderDirection": 'desc',

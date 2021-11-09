@@ -22,7 +22,7 @@ Bolsa bolsa = bean.getBolsa();
 		<button class="link-btn" id="exportar">Exportar a csv</button>
 	<% } %>
 	
-	<table class="bluetable bolsaempleo" id="tableCandidatos">
+	<table class="bluetable bolsaempleo" id="tableCandidatosRES">
 		<tr>
 			<th scope="col" style="width:76px">D.N.I</th>
 			<th scope="col" style="width:100%" class="nombre">Nombre</th>
@@ -40,41 +40,42 @@ Bolsa bolsa = bean.getBolsa();
 	
 	<div class="row">
 		<button class="link-btn" id="resultados_volver" style="float:left; max-height: 25px">
-	    	 Volver
-	    </button>
+			 Volver
+		</button>
 	</div>
 </div>
 	
 <script>
 
 $(document).ready(function() {
-	var tableCandidatos = new Atis.DataTable('#tableCandidatos', {
-	    "ajax": { url: "<%= ControladorResultados.URL_PATTERN_AJAX %>" },
-	    "pageSize": 100,
-	    "filterable": true,
-	    "defaultOrderBy": 2,
-	    "defaultOrderDirection": 'desc',
-	    "action": "<%= ControladorResultados.ACCION_DATATABLE_CANDIDATOS %>",
-	    "params": {'<%=ControladorResultados.PARAM_BOLSA%>': '<%= bolsa.getCodNum() %>'},
-	    "columns": [
-	    	{'data': 'prsnif', 'filter': true},
-	    	{'data': 'apellido1', 'filter': true, 'overflow': 'auto', 'render': function(row) {
-        		return row.nombre + " " + row.apellido1 + " " + row.apellido2;
-        	}},
-	        {'data': 'total', 'filter': {'type': 'number'}},
-	        {'data': 'codnum', 'buttons': [
-	        	{'label': 'Ver detalles',
-		        	'onClick': function(row) {
-		        		var params = {
-		    				'<%= ControladorResultados.PARAM_ACCION %>': '<%= ControladorResultados.ACCION_SELECCIONAR_CANDIDATO %>',
-		    				'<%= ControladorResultados.PARAM_BOLSA %>': '<%= bolsa.getCodNum() %>',
-		    				'<%= ControladorResultados.PARAM_CANDIDATO %>': row.codNum
-			    		};
-			    		Atis.sendForm("<%= request.getRequestURI() %>", params);
-		        	}
-	        	}]
-	        }
-	    ]
+	var tableCandidatos = new Atis.DataTable('#tableCandidatosRES', {
+		"ajax": { url: "<%= ControladorResultados.URL_PATTERN_AJAX %>" },
+		"pageSize": 20,
+		"filterable": true,
+		"stateSave": true,
+		"defaultOrderBy": 2,
+		"defaultOrderDirection": 'desc',
+		"action": "<%= ControladorResultados.ACCION_DATATABLE_CANDIDATOS %>",
+		"params": {'<%=ControladorResultados.PARAM_BOLSA%>': '<%= bolsa.getCodNum() %>'},
+		"columns": [
+			{'data': 'prsnif', 'filter': true},
+			{'data': 'apellido1', 'filter': true, 'overflow': 'auto', 'render': function(row) {
+				return row.nombre + " " + row.apellido1 + " " + row.apellido2;
+			}},
+			{'data': 'total', 'filter': {'type': 'number'}},
+			{'data': 'codnum', 'buttons': [
+				{'label': 'Ver detalles',
+					'onClick': function(row) {
+						var params = {
+							'<%= ControladorResultados.PARAM_ACCION %>': '<%= ControladorResultados.ACCION_SELECCIONAR_CANDIDATO %>',
+							'<%= ControladorResultados.PARAM_BOLSA %>': '<%= bolsa.getCodNum() %>',
+							'<%= ControladorResultados.PARAM_CANDIDATO %>': row.codNum
+						};
+						Atis.sendForm("<%= request.getRequestURI() %>", params);
+					}
+				}]
+			}
+		]
 	});
 	
 	document.getElementById("resultados_volver").addEventListener("click", function() {

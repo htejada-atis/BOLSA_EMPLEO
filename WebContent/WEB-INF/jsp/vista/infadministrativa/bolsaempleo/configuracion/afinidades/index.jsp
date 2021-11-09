@@ -19,7 +19,7 @@ VistaAfinidades bean = (VistaAfinidades) uvdatos.getVistas().get(VistaAfinidades
 		<button class="link-btn" id="nueva_afinidad">Nueva afinidad</button>
 	</div>
 	
-	<table class="bluetable bolsaempleo" id="tableAfinidades">
+	<table class="bluetable bolsaempleo" id="tableAfinidadesAFI">
 		<tr>
 			<th scope="col" style="width:5%"></th>
 			<th scope="col" class="center codigo" style="width:10%" title="Código de afinidad">Código</th>
@@ -46,28 +46,29 @@ $(document).ready(function() {
 	});
 	
 	
-	var table = new Atis.DataTable('#tableAfinidades', {
-	    "ajax": { url: "/srv/es/ajax/informacionadministrativa/bolsaempleo/configuracion/afinidades" },
-	    "selectable": true,
-	    "pageSize": 10,
-    	"defaultOrderBy": 1,
-    	"action": "<%= ControladorAfinidades.ACCION_DATATABLE %>",
-	    "columns": [
-	    	{'data': 'codNum', 'selectable': true},
-	        {'data': 'codigo', 'class': 'center'},
-	        {'data': 'descripcion'},
-	        {'data': 'modulacion', 'class': 'center'},
-        	{'data': 'codnum', 'buttons': [
-        		{'label': 'Editar', 'onClick': function(row) {
-        			var params = {'a': '<%= ControladorAfinidades.ACCION_MODIFICAR_AFINIDAD %>', '<%= ControladorAfinidades.PARAM_ID %>': row.codNum};
-        			Atis.sendForm("<%=request.getRequestURI()%>", params);
-        			}
-        		},
-        	]}
-	    ],
-	    "actions": [
-	    	{'label': 'Borrar', 'onClick': function(selected) { enviaAccion("<%=ControladorAfinidades.ACCION_BORRAR_AFINIDAD%>", selected); } }   	
-	    ]
+	var table = new Atis.DataTable('#tableAfinidadesAFI', {
+		"ajax": { url: "/srv/es/ajax/informacionadministrativa/bolsaempleo/configuracion/afinidades" },
+		"selectable": true,
+		"pageSize": 10,
+		"stateSave": true,
+		"defaultOrderBy": 1,
+		"action": "<%= ControladorAfinidades.ACCION_DATATABLE %>",
+		"columns": [
+			{'data': 'codNum', 'selectable': true},
+			{'data': 'codigo', 'class': 'center'},
+			{'data': 'descripcion'},
+			{'data': 'modulacion', 'class': 'center'},
+			{'data': 'codnum', 'buttons': [
+				{'label': 'Editar', 'onClick': function(row) {
+					var params = {'a': '<%= ControladorAfinidades.ACCION_MODIFICAR_AFINIDAD %>', '<%= ControladorAfinidades.PARAM_ID %>': row.codNum};
+					Atis.sendForm("<%=request.getRequestURI()%>", params);
+					}
+				},
+			]}
+		],
+		"actions": [
+			{'label': 'Borrar', 'onClick': function(selected) { enviaAccion("<%=ControladorAfinidades.ACCION_BORRAR_AFINIDAD%>", selected); } }   	
+		]
 	});	
 	
 	function enviaAccion(accion, selected) {
@@ -77,19 +78,19 @@ $(document).ready(function() {
 		}
 		else {
 			Atis.confirmDialog("Borrar afinidad", "¿Desea borrar esta afinidad de la base de datos?", {
-            	Si: function(row) {
-            		var params = {
-            				'a': '<%=ControladorAfinidades.ACCION_BORRAR_AFINIDAD%>', 
-            				'<%=ControladorAfinidades.PARAM_ID%>': row.codNum,
-            				'<%=ControladorAfinidades.PARAM_AFINIDADES_SELECCIONADAS%>': Atis.object2Json(selected)
-            			};
-        			Atis.sendForm("<%= request.getRequestURI() %>", params);
-              		$(this).dialog("close");
-            	},
-            	No: function() {
-              		$(this).dialog("close");
-            	}
-          	});
+				Si: function(row) {
+					var params = {
+							'a': '<%=ControladorAfinidades.ACCION_BORRAR_AFINIDAD%>', 
+							'<%=ControladorAfinidades.PARAM_ID%>': row.codNum,
+							'<%=ControladorAfinidades.PARAM_AFINIDADES_SELECCIONADAS%>': Atis.object2Json(selected)
+						};
+					Atis.sendForm("<%= request.getRequestURI() %>", params);
+					$(this).dialog("close");
+				},
+				No: function() {
+					$(this).dialog("close");
+				}
+			});
 		}
 	}
 }); 

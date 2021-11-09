@@ -16,13 +16,13 @@ VistaNoticias bean = (VistaNoticias) uvdatos.getVistas().get(VistaNoticias.class
 
 	<div class="titulo-bolsa-empleo">
 		<h2>Noticias</h2>
-    
-	    <button class="link-btn" id="nueva_noticia">
-	    	 Nueva noticia
-	    </button>
+	
+		<button class="link-btn" id="nueva_noticia">
+			 Nueva noticia
+		</button>
 	</div>
-    
-    <table class="bluetable bolsaempleo" id="table_noticias_insertadas">
+	
+	<table class="bluetable bolsaempleo" id="tableNoticiasInsertadasNOT">
 		<tr>
 			<th scope="col" style="width:12%">Fecha</th>
 			<th scope="col"	style="width:30%">Texto</th>
@@ -31,7 +31,7 @@ VistaNoticias bean = (VistaNoticias) uvdatos.getVistas().get(VistaNoticias.class
 			<th scope="col" class="center" style="width:10%">Activa</th>
 			<th scope="col" style="width:11%"></th>
 		</tr>
-		<tbody>				
+		<tbody>
 		</tbody>
 		<tfoot>
 			<tr>
@@ -49,62 +49,63 @@ VistaNoticias bean = (VistaNoticias) uvdatos.getVistas().get(VistaNoticias.class
 			Atis.sendForm("<%=request.getRequestURI()%>", {'a': '<%=ControladorNoticias.ACCION_AGREGAR_NOTICIA%>'});
 		});
 
-		var table = new Atis.DataTable('#table_noticias_insertadas', {
-		    "ajax": { url: "<%=ControladorNoticias.URL_PATTERN_AJAX%>" },
-		    "pageSize": 10,
-	    	"defaultOrderBy": 0,
-		    "filterable": true,
-		    "columns": [
-		    	{'data': 'fecha', 'filter': {'type': 'date'}},
-		    	{'data': 'texto', 'filter': true, 'overflow': 'auto'},
-		        {'data': 'enlace', 'order': {'active': false}, 'class': 'overflow-ellipsis', 'render': function(row) {
-		        		return row.enlace ? "<a href='" +row.enlace +"' target='_blank'>" +row.enlace +"</a>" : "";
-		        	}
-		        },
-		        {'data': 'publica', 'order': {'active': false}, 'filter': {'type': 'selectBoolean', 'true': 'Pública', 'false': 'Privada'}, 'render': function(row) {
-	        		if(row.publica){
-	        			return "<div title='Pública' class='circle-true'></div>";
-	        		}
-	        		else{
-	        			return "<div title='Privada' class='circle-false'></div>"; 
-	        		}
-	        	}},
-		        {'data': 'activa', 'order': {'active': false}, 'filter': {'type': 'select', 'options':{'true': 'Activa', 'false': 'Inactiva'}, 'optionDefault': 'true'}, 'render': function(row) {
-	        		if(row.activa){
-	        			return "<div title='Activa' class='circle-true'></div>"; 
-	        		}
-	        		else{
-	        			return "<div title='Desactivada' class='circle-false'></div>"; 
-	        		}
-	        	}},
-		        {'data': 'codNum', 'buttons': [{'label': 'Editar', 'onClick': function(row) {
-			        		var params = {'a': '<%=ControladorNoticias.ACCION_EDITAR_NOTICIA%>', 'id': row.codNum};
-			        		Atis.sendForm("<%=request.getRequestURI()%>", params);
-			        	}
-			        }, {'label': function(row) { return row.activa ? "Borrar" : "Restaurar"; }, 
-			        	'title':  function(row) { return row.activa ? "Borrar noticia" : "Restaurar noticia"; }, 'onClick': function(row) {
-			        	var mensaje = "¿Desea borrar la noticia seleccionada?";
-			        	var titulo = "Borrar noticia";
-			        	if(!row.activa) {
-			        		titulo = "Restaurar noticia";
-			        		mensaje = "¿Desea restaurar la noticia seleccionada?";
-			        	}
-			        	
-			        	Atis.confirmDialog(titulo, mensaje, {
-					        Si: function() {
-					        	var params = {'a': '<%=ControladorNoticias.ACCION_ELIMINAR_NOTICIA%>',
-					        			'id': row.codNum,
-					        			'<%=ControladorNoticias.PARAM_ACTIVA%>': !row.activa};
-				        		Atis.sendForm("<%= request.getRequestURI() %>", params);
-					          	$(this).dialog("close");
-					        },
-					        No: function() {
-					          	$(this).dialog("close");
-					        }
-					      });
-			        	
-			        } }]}		        
-			    ],
+		var table = new Atis.DataTable('#tableNoticiasInsertadasNOT', {
+			"ajax": { url: "<%=ControladorNoticias.URL_PATTERN_AJAX%>" },
+			"pageSize": 10,
+			"defaultOrderBy": 0,
+			"filterable": true,
+			"stateSave": true,
+			"columns": [
+				{'data': 'fecha', 'filter': {'type': 'date'}},
+				{'data': 'texto', 'filter': true, 'overflow': 'auto'},
+				{'data': 'enlace', 'order': {'active': false}, 'class': 'overflow-ellipsis', 'render': function(row) {
+						return row.enlace ? "<a href='" +row.enlace +"' target='_blank'>" +row.enlace +"</a>" : "";
+					}
+				},
+				{'data': 'publica', 'order': {'active': false}, 'filter': {'type': 'selectBoolean', 'true': 'Pública', 'false': 'Privada'}, 'render': function(row) {
+					if(row.publica){
+						return "<div title='Pública' class='circle-true'></div>";
+					}
+					else{
+						return "<div title='Privada' class='circle-false'></div>"; 
+					}
+				}},
+				{'data': 'activa', 'order': {'active': false}, 'filter': {'type': 'select', 'options':{'true': 'Activa', 'false': 'Inactiva'}, 'optionDefault': 'true'}, 'render': function(row) {
+					if(row.activa){
+						return "<div title='Activa' class='circle-true'></div>"; 
+					}
+					else{
+						return "<div title='Desactivada' class='circle-false'></div>"; 
+					}
+				}},
+				{'data': 'codNum', 'buttons': [{'label': 'Editar', 'onClick': function(row) {
+							var params = {'a': '<%=ControladorNoticias.ACCION_EDITAR_NOTICIA%>', 'id': row.codNum};
+							Atis.sendForm("<%=request.getRequestURI()%>", params);
+						}
+					}, {'label': function(row) { return row.activa ? "Borrar" : "Restaurar"; }, 
+						'title':  function(row) { return row.activa ? "Borrar noticia" : "Restaurar noticia"; }, 'onClick': function(row) {
+						var mensaje = "¿Desea borrar la noticia seleccionada?";
+						var titulo = "Borrar noticia";
+						if(!row.activa) {
+							titulo = "Restaurar noticia";
+							mensaje = "¿Desea restaurar la noticia seleccionada?";
+						}
+						
+						Atis.confirmDialog(titulo, mensaje, {
+							Si: function() {
+								var params = {'a': '<%=ControladorNoticias.ACCION_ELIMINAR_NOTICIA%>',
+										'id': row.codNum,
+										'<%=ControladorNoticias.PARAM_ACTIVA%>': !row.activa};
+								Atis.sendForm("<%= request.getRequestURI() %>", params);
+								$(this).dialog("close");
+							},
+							No: function() {
+								$(this).dialog("close");
+							}
+						});
+						
+					} }]}
+				],
 			});
 		});
 	

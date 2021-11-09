@@ -51,7 +51,7 @@ Boolean onlyRead = bean.getUsuarioLogeado().getRol().getCodNum().equals(ModeloRo
 	<h3><%= EscapaHTML.escapa(descripcion) %></h3>
 	<h4><%= EscapaHTML.escapa(bolsa.getArea().getDescripcion()) %></h4>
 	
-	<table class="bluetable bolsaempleo" id="tableCandidatos">
+	<table class="bluetable bolsaempleo" id="tableCandidatosVAL">
 		<tr>
 			<th scope="col" style="width:76px">D.N.I</th>
 			<th scope="col" style="width:100%" class="nombre">Nombre</th>
@@ -71,7 +71,7 @@ Boolean onlyRead = bean.getUsuarioLogeado().getRol().getCodNum().equals(ModeloRo
 	
 	<% if (candidato != null) { %>
 	
-		<table class="bluetable bolsaempleo" id="tableMeritos">
+		<table class="bluetable bolsaempleo" id="tableMeritosVAL">
 			<tr>
 				<th scope="col" style="width:40px">Id</th>
 				<th scope="col" style="width:40px">Estado</th>
@@ -113,14 +113,14 @@ Boolean onlyRead = bean.getUsuarioLogeado().getRol().getCodNum().equals(ModeloRo
 			</h3>
 			
 			<form id="validar_merito" class="be-form" method="post" action="<%= request.getRequestURI() %>">
-		    	<input type="hidden" name="<%= ControladorValidar.PARAM_ACCION %>" id="accion_formulario" value="<%= ControladorValidar.ACCION_MODIFICAR_MERITO %>" />
-		    	<input type="hidden" name="<%= ControladorValidar.PARAM_BOLSA %>" value="<%= bolsa.getCodNum() %>" />
-		    	<input type="hidden" name="<%= ControladorValidar.PARAM_CANDIDATO %>" value="<%= candidato.getCodNum() %>" />
-		    	<input type="hidden" name="<%= ControladorValidar.PARAM_MERITO %>" value="<%= merito.getMerito().getCodNum() %>" />
-		    	<input type="hidden" name="<%= ControladorValidar.PARAM_BOLSAS %>" value="" />
-		    	
-		    	<div class="form-group-container col2">
-			    	<div class="form-group">
+				<input type="hidden" name="<%= ControladorValidar.PARAM_ACCION %>" id="accion_formulario" value="<%= ControladorValidar.ACCION_MODIFICAR_MERITO %>" />
+				<input type="hidden" name="<%= ControladorValidar.PARAM_BOLSA %>" value="<%= bolsa.getCodNum() %>" />
+				<input type="hidden" name="<%= ControladorValidar.PARAM_CANDIDATO %>" value="<%= candidato.getCodNum() %>" />
+				<input type="hidden" name="<%= ControladorValidar.PARAM_MERITO %>" value="<%= merito.getMerito().getCodNum() %>" />
+				<input type="hidden" name="<%= ControladorValidar.PARAM_BOLSAS %>" value="" />
+				
+				<div class="form-group-container col2">
+					<div class="form-group">
 						<label class="bold-label" for="select_item">Categoría:</label>
 						<select class="form-input-custom" id="select_item" name="<%= ControladorValidar.PARAM_ITEM %>"
 							<%= onlyRead ? "disabled" : "" %>>
@@ -128,32 +128,32 @@ Boolean onlyRead = bean.getUsuarioLogeado().getRol().getCodNum().equals(ModeloRo
 							for(ItemBaremacion it: bean.getItems()) {
 							%>
 							<%	if (it.getCodNum() == item.getCodNum()) { %>
-				    				<option value="<%=it.getCodNum()%>" 
-				    						data-unidades="<%= it.getUnidades() %>" 
-				    						data-descripcion="<%= it.getDescripcion() %>" 
-				    						selected><%=EscapaHTML.escapa(it.getBloqueBaremacion().getApartadoBaremacion().getCodigo() + "." + it.getBloqueBaremacion().getCodigo() + "." + it.getCodigo() + "-" + it.getNombre())%></option>
-			    			<%	} else { %>
-				    				<option value="<%=it.getCodNum()%>" 
-				    						data-unidades="<%= it.getUnidades() %>" 
-				    						data-descripcion="<%= it.getDescripcion() %>"><%=EscapaHTML.escapa(it.getBloqueBaremacion().getApartadoBaremacion().getCodigo() + "." + it.getBloqueBaremacion().getCodigo() + "." + it.getCodigo() + "-" + it.getNombre())%></option>
-			    			<%	} %>
-				    		<%
-				    		}
-				    		%>
+									<option value="<%=it.getCodNum()%>" 
+											data-unidades="<%= it.getUnidades() %>" 
+											data-descripcion="<%= it.getDescripcion() %>" 
+											selected><%=EscapaHTML.escapa(it.getBloqueBaremacion().getApartadoBaremacion().getCodigo() + "." + it.getBloqueBaremacion().getCodigo() + "." + it.getCodigo() + "-" + it.getNombre())%></option>
+							<%	} else { %>
+									<option value="<%=it.getCodNum()%>" 
+											data-unidades="<%= it.getUnidades() %>" 
+											data-descripcion="<%= it.getDescripcion() %>"><%=EscapaHTML.escapa(it.getBloqueBaremacion().getApartadoBaremacion().getCodigo() + "." + it.getBloqueBaremacion().getCodigo() + "." + it.getCodigo() + "-" + it.getNombre())%></option>
+							<%	} %>
+							<%
+							}
+							%>
 						</select>
 					</div>
 					<div class="form-group">
-			    		<div class="form-group">
-			    			<label for="merito_valor" id="merito_valor_label" class="bold-label">Valor (<%= EscapaHTML.escapa(item.getUnidades()) %>):</label>
-			    			<input class="form-input-custom" id="merito_valor" type="text" name="<%= ControladorValidar.PARAM_VALOR %>" 
-			    					value="<%= valor %>"
-			    					data-unidades="<%= item.getUnidades() %>"
-			    					<%= EscapaHTML.escapa(item.getUnidades()).equals(ModeloBaremacionItems.ITEM_UNIDADES_MEDICION_SINO) ? "readonly" : "" %>
-			    					<%= onlyRead ? "disabled" : "" %>
-			    					required
-			    					style="max-width: 180px;"/>
-			    		</div>
-		    		</div>
+						<div class="form-group">
+							<label for="merito_valor" id="merito_valor_label" class="bold-label">Valor (<%= EscapaHTML.escapa(item.getUnidades()) %>):</label>
+							<input class="form-input-custom" id="merito_valor" type="text" name="<%= ControladorValidar.PARAM_VALOR %>" 
+									value="<%= valor %>"
+									data-unidades="<%= item.getUnidades() %>"
+									<%= EscapaHTML.escapa(item.getUnidades()).equals(ModeloBaremacionItems.ITEM_UNIDADES_MEDICION_SINO) ? "readonly" : "" %>
+									<%= onlyRead ? "disabled" : "" %>
+									required
+									style="max-width: 180px;"/>
+						</div>
+					</div>
 				</div>
 				
 				<div class="form-group-container col1">
@@ -164,47 +164,47 @@ Boolean onlyRead = bean.getUsuarioLogeado().getRol().getCodNum().equals(ModeloRo
 				</div>
 				
 				<div class="form-group-container col2">
-		    		<div class="form-group">
-		    			<label for="merito_descripcion" class="bold-label">Descripción:</label>
-		    			<textarea class="form-input-custom" id="merito_descripcion" name="" disabled><%= EscapaHTML.escapa(merito.getMerito().getDescripcion()) %></textarea>
-		    		</div>
-		    		<div class="form-group">
-			    		<label for="merito_observacion_comision">Observación para la comisión:</label>
-			    		<textarea class="form-input-custom" id="merito_observacion_comision" name="" rows="2" cols="50" disabled><%= EscapaHTML.escapa(merito.getMerito().getObservacion()) %></textarea>
-			    	</div>
+					<div class="form-group">
+						<label for="merito_descripcion" class="bold-label">Descripción:</label>
+						<textarea class="form-input-custom" id="merito_descripcion" name="" disabled><%= EscapaHTML.escapa(merito.getMerito().getDescripcion()) %></textarea>
+					</div>
+					<div class="form-group">
+						<label for="merito_observacion_comision">Observación para la comisión:</label>
+						<textarea class="form-input-custom" id="merito_observacion_comision" name="" rows="2" cols="50" disabled><%= EscapaHTML.escapa(merito.getMerito().getObservacion()) %></textarea>
+					</div>
 				</div>
 			
-		    	<div class="form-btn">
-		    		<input id="merito_guardar" type="submit" name="guardar" value="Guardar" <%= onlyRead ? "disabled" : "" %>/>
-		    	</div>
-		    </form>
-		    
-		    <h3>Afinidades del mérito en las distintas áreas</h3>
-		    
-		    <p>
-		    	En la siguiente tabla se muestran las áreas de su departamento en las que este mérito está baremado, y aquellas áreas donde el candidato
-		     	está inscrito pero el mérito aún no tiene ningún valor. Debe introducir para cada área la afinidad, la observación para el candidato y la acción
-		     	a realizar con este mérito en esa área. Los datos de categoría y valor serán los mismos en las distintas áreas de su departamento. 
-		    </p>
-		    
-		    <div>Leyenda del campo 'Acciones':</div>
-		    <ul>
-		    	<li>Aceptar: Pasar este mérito a estado aceptado. Esto quiere decir que el mérito será tenido en cuenta en la baremación.</li>
-		    	<li>Excluir: Pasar este mérito a estado excluido. Esto quiere decir que el mérito no será tenido en cuenta en la baremación.</li>
-		    </ul>
-		    <br/>
-		    <div>Descripción de afinidades:</div>
-		    <ul>
-		    <%	for(Afinidad afinidad: bean.getListaAfinidades()) {
-		    		if (afinidad.getCodigo().equals(item.getAfinidad())) {
-		    %>
-			    		<li><%= EscapaHTML.escapa(afinidad.getCodigo() + " " + afinidad.getModulacion() * 100 + "%" + " - " + afinidad.getDescripcion()) %></li>
-		    <%		}
-		    	} %>
-		    </ul>
-		   
-		    
-		    <table class="bluetable bolsaempleo" id="tableValoresMeritoBolsas">
+				<div class="form-btn">
+					<input id="merito_guardar" type="submit" name="guardar" value="Guardar" <%= onlyRead ? "disabled" : "" %>/>
+				</div>
+			</form>
+			
+			<h3>Afinidades del mérito en las distintas áreas</h3>
+			
+			<p>
+				En la siguiente tabla se muestran las áreas de su departamento en las que este mérito está baremado, y aquellas áreas donde el candidato
+				está inscrito pero el mérito aún no tiene ningún valor. Debe introducir para cada área la afinidad, la observación para el candidato y la acción
+				a realizar con este mérito en esa área. Los datos de categoría y valor serán los mismos en las distintas áreas de su departamento. 
+			</p>
+			
+			<div>Leyenda del campo 'Acciones':</div>
+			<ul>
+				<li>Aceptar: Pasar este mérito a estado aceptado. Esto quiere decir que el mérito será tenido en cuenta en la baremación.</li>
+				<li>Excluir: Pasar este mérito a estado excluido. Esto quiere decir que el mérito no será tenido en cuenta en la baremación.</li>
+			</ul>
+			<br/>
+			<div>Descripción de afinidades:</div>
+			<ul>
+			<%	for(Afinidad afinidad: bean.getListaAfinidades()) {
+					if (afinidad.getCodigo().equals(item.getAfinidad())) {
+			%>
+						<li><%= EscapaHTML.escapa(afinidad.getCodigo() + " " + afinidad.getModulacion() * 100 + "%" + " - " + afinidad.getDescripcion()) %></li>
+			<%		}
+				} %>
+			</ul>
+		
+			
+			<table class="bluetable bolsaempleo" id="tableValoresMeritoBolsas">
 				<tr>
 					<th scope="col" style="width:35%">Área</th>
 					<th scope="col" style="width:40px">Código</th>
@@ -219,7 +219,7 @@ Boolean onlyRead = bean.getUsuarioLogeado().getRol().getCodNum().equals(ModeloRo
 						int idMerito = meritoBolsa.getMeritoSolicitud().getMerito().getCodNum();
 						ItemBaremacion itemBolsa = meritoBolsa.getMeritoSolicitud().getItem() != null ? meritoBolsa.getMeritoSolicitud().getItem() : meritoBolsa.getMeritoSolicitud().getMerito().getItemBaremacion();
 						Boolean valoraciones = meritoBolsa.getMeritoSolicitud() != null && itemBolsa.getAfinidad() != null
-								&& meritoBolsa.getMeritoSolicitud().getValoraciones() != null && meritoBolsa.getMeritoSolicitud().getValoraciones().size() > 0  ? true : false;
+								&& meritoBolsa.getMeritoSolicitud().getValoraciones() != null && meritoBolsa.getMeritoSolicitud().getValoraciones().size() > 0 ? true : false;
 						Boolean individualizado = itemBolsa.getIndividualizado() ? true : false;
 						Boolean bolsaDisabled = !personal && !meritoBolsa.getBolsa().getEstado().equals(ModeloBolsa.BOLSA_ESTADO_BAREMACION);
 					%>
@@ -253,12 +253,12 @@ Boolean onlyRead = bean.getUsuarioLogeado().getRol().getCodNum().equals(ModeloRo
 									? meritoBolsa.getMeritoSolicitud().getValor() : meritoBolsa.getMeritoSolicitud().getMerito().getValor() %></td>
 							<td>
 								<% if (meritoBolsa.getMeritoSolicitud().isValidado()) { %>
-			        				<div class='text-success'><b>Validado</b></div>
-			        			<% } else if (meritoBolsa.getMeritoSolicitud().isExcluido()) { %>
-			        				<div class='text-danger'><b>Excluido</b></div>
-			        			<% } else { %>
-			        				<div class='text-primary'><b>Sin validar</b></div>
-			        			<% } %>
+									<div class='text-success'><b>Validado</b></div>
+								<% } else if (meritoBolsa.getMeritoSolicitud().isExcluido()) { %>
+									<div class='text-danger'><b>Excluido</b></div>
+								<% } else { %>
+									<div class='text-primary'><b>Sin validar</b></div>
+								<% } %>
 							</td>
 							<td class='cell-afinidad'>
 							<%	if (individualizado) { %>
@@ -284,7 +284,7 @@ Boolean onlyRead = bean.getUsuarioLogeado().getRol().getCodNum().equals(ModeloRo
 												<tr>
 													<td style="width:70px">
 														<label for="<%= "merito_valoracion_" + valoracion.getAfinidad().getCodNum() + "_" + idMerito %>">
-															<i class="tooltip"><%=  EscapaHTML.escapa(valoracion.getAfinidad().getCodigo() + " " + valoracion.getAfinidad().getModulacion() * 100 + "%: ") %><span><%= EscapaHTML.escapa(valoracion.getAfinidad().getDescripcion()) %></span></i>
+															<i class="tooltip"><%= EscapaHTML.escapa(valoracion.getAfinidad().getCodigo() + " " + valoracion.getAfinidad().getModulacion() * 100 + "%: ") %><span><%= EscapaHTML.escapa(valoracion.getAfinidad().getDescripcion()) %></span></i>
 														</label>
 													</td>
 													<td>
@@ -327,18 +327,18 @@ Boolean onlyRead = bean.getUsuarioLogeado().getRol().getCodNum().equals(ModeloRo
 							</td>
 							<td>
 								<div style="display: flex;">
-					    			<textarea class="form-input-custom merito-observacion-candidato" 
-					    				id="merito_observacion_candidato_<%= idMerito %>"
-					    				name="<%= ControladorValidar.PARAM_OBSERVACION_CANDIDATO %>" 
-					    				rows="2" cols="50"
-					    				<%= bolsaDisabled ? "disabled" : "" %>><%= meritoBolsa.getMeritoSolicitud().getObservacionCandidato() != null ? meritoBolsa.getMeritoSolicitud().getObservacionCandidato() : "" %></textarea>
-				    			</div>
+									<textarea class="form-input-custom merito-observacion-candidato" 
+										id="merito_observacion_candidato_<%= idMerito %>"
+										name="<%= ControladorValidar.PARAM_OBSERVACION_CANDIDATO %>" 
+										rows="2" cols="50"
+										<%= bolsaDisabled ? "disabled" : "" %>><%= meritoBolsa.getMeritoSolicitud().getObservacionCandidato() != null ? meritoBolsa.getMeritoSolicitud().getObservacionCandidato() : "" %></textarea>
+								</div>
 							</td>
 							<td style="vertical-align: middle;">
 								<span class="btns acciones_merito">
-						    		<button class="btn merito-aceptar" id="merito_aceptar_<%= idMerito %>" name="<%= ControladorValidar.PARAM_ACEPTAR_MERITO %>" <%= bolsaDisabled ? "disabled" : "" %>>Aceptar</button>
-							    	<button class="btn merito-excluir" id="merito_excluir_<%= idMerito %>" name="<%= ControladorValidar.PARAM_EXCLUIR_MERITO %>" <%= bolsaDisabled ? "disabled" : "" %>>Excluir</button>
-					    		</span>
+									<button class="btn merito-aceptar" id="merito_aceptar_<%= idMerito %>" name="<%= ControladorValidar.PARAM_ACEPTAR_MERITO %>" <%= bolsaDisabled ? "disabled" : "" %>>Aceptar</button>
+									<button class="btn merito-excluir" id="merito_excluir_<%= idMerito %>" name="<%= ControladorValidar.PARAM_EXCLUIR_MERITO %>" <%= bolsaDisabled ? "disabled" : "" %>>Excluir</button>
+								</span>
 							</td>
 						</tr>
 				<%	} %>
@@ -351,17 +351,17 @@ Boolean onlyRead = bean.getUsuarioLogeado().getRol().getCodNum().equals(ModeloRo
 			</table>
 			
 			<br/>
-		    <div class="btns-by-steps">
+			<div class="btns-by-steps">
 				<button class="link-btn" id="validar_volver">
-			    	 Volver
-			    </button>
+					 Volver
+				</button>
 			<%	if (personal) {%>
-				    <button class="link-btn" id="validar_historial">
-				    	 Ver historial de validación
-				    </button>
+					<button class="link-btn" id="validar_historial">
+						 Ver historial de validación
+					</button>
 			<%	} %>
 			</div>
-		    
+			
 		<% } else { %>
 			<p>Elija un mérito para cargar el formulario de edición</p>
 		<% } %>
@@ -374,89 +374,92 @@ Boolean onlyRead = bean.getUsuarioLogeado().getRol().getCodNum().equals(ModeloRo
 $(document).ready(function() {
 	Atis.handleLinkEvents();
 	
-	var tableCandidatos = new Atis.DataTable('#tableCandidatos', {
-	    "ajax": { url: "<%= ControladorValidar.URL_PATTERN_AJAX %>", async: false },
-	    "pageSize": 200,
-	    "pageSizeOptions": [5,10,20,100,200],
-	    "defaultOrderBy": 2,
-	    "defaultOrderDirection": 'desc',
-	    "action": "<%= ControladorValidar.ACCION_DATATABLE_CANDIDATOS %>",
-	    "title": 'LISTA DE USUARIOS',
-	    "dropdown": true,
-	    "params": {'<%=ControladorValidar.PARAM_BOLSA%>': '<%= bolsa.getCodNum() %>'},
-	    "clickable": {'onClick': function(row) {
-	    	var params = {
-    				'<%= ControladorValidar.PARAM_ACCION %>': '<%= ControladorValidar.ACCION_CANDIDATO_SELECCIONADO %>',
-    				'<%= ControladorValidar.PARAM_BOLSA%>': '<%= bolsa.getCodNum() %>',
-    				'<%= ControladorValidar.PARAM_CANDIDATO %>': row.codNum
-    				};
-    		Atis.sendForm("<%= request.getRequestURI() %>", params);
-	    }},
-	    <% if (candidato != null) { %> "selected": <%= candidato.getCodNum() %> ,<% } %>
-	    "columns": [
-	    	{'data': 'prsnif'},
-	    	{'data': 'apellido1', 'overflow': 'auto', 'render': function(row) {
-        		return row.nombre + " " + row.apellido1 + " " + row.apellido2; 
-        	}},
-	        {'data': 'totalMeritosNoValidados', 'class': 'center', 'render': function(row) { return isNaN(row.totalMeritosNoValidados) ? 0 : row.totalMeritosNoValidados; } },
-	        {'data': 'totalMeritosValidados', 'class': 'center', 'render': function(row) { return isNaN(row.totalMeritosValidados) ? 0 : row.totalMeritosValidados; } },
-	        {'data': 'totalMeritosExcluidos', 'class': 'center', 'render': function(row) { return isNaN(row.totalMeritosExcluidos) ? 0 : row.totalMeritosExcluidos; } },
-	        {'data': 'totalMeritos', 'class': 'center'}
-	    ]
+	var tableCandidatos = new Atis.DataTable('#tableCandidatosVAL', {
+		"ajax": { url: "<%= ControladorValidar.URL_PATTERN_AJAX %>", async: false },
+		"pageSize": 20,
+		"pageSizeOptions": [5,10,20,100,200],
+		"defaultOrderBy": 2,
+		"defaultOrderDirection": 'desc',
+		"action": "<%= ControladorValidar.ACCION_DATATABLE_CANDIDATOS %>",
+		"title": 'LISTA DE USUARIOS',
+		"dropdown": true,
+		"stateSave": true,
+		"filterable": true,
+		"params": {'<%=ControladorValidar.PARAM_BOLSA%>': '<%= bolsa.getCodNum() %>'},
+		"clickable": {'onClick': function(row) {
+			var params = {
+					'<%= ControladorValidar.PARAM_ACCION %>': '<%= ControladorValidar.ACCION_CANDIDATO_SELECCIONADO %>',
+					'<%= ControladorValidar.PARAM_BOLSA%>': '<%= bolsa.getCodNum() %>',
+					'<%= ControladorValidar.PARAM_CANDIDATO %>': row.codNum
+					};
+			Atis.sendForm("<%= request.getRequestURI() %>", params);
+		}},
+		<% if (candidato != null) { %> "selected": <%= candidato.getCodNum() %> ,<% } %>
+		"columns": [
+			{'data': 'prsnif', 'filter': true},
+			{'data': 'apellido1', 'overflow': 'auto', 'filter': true, 'render': function(row) {
+				return row.nombre + " " + row.apellido1 + " " + row.apellido2; 
+			}},
+			{'data': 'totalMeritosNoValidados', 'class': 'center', 'render': function(row) { return isNaN(row.totalMeritosNoValidados) ? 0 : row.totalMeritosNoValidados; } },
+			{'data': 'totalMeritosValidados', 'class': 'center', 'render': function(row) { return isNaN(row.totalMeritosValidados) ? 0 : row.totalMeritosValidados; } },
+			{'data': 'totalMeritosExcluidos', 'class': 'center', 'render': function(row) { return isNaN(row.totalMeritosExcluidos) ? 0 : row.totalMeritosExcluidos; } },
+			{'data': 'totalMeritos', 'class': 'center'}
+		]
 	});
 	
 	<% if (candidato != null) { %>
 	
-		var tableMeritos = new Atis.DataTable('#tableMeritos', {
-		    "ajax": { url: "<%= ControladorValidar.URL_PATTERN_AJAX %>", async: false },
-		    "pageSize": 100,
-		    "filterable": true,
-		    "action": "<%= ControladorValidar.ACCION_DATATABLE_MERITOS %>",
-		    "title": 'MÉRITOS PARA EL USUARIO: <%=EscapaHTML.escapa(candidato.getIdNif() + " - " + candidato.getNombre() + " " + candidato.getPrimerApellido() + " " + candidato.getSegundoApellido())%>',
-		    "dropdown": true,
-		    "params": {
-		    	'<%=ControladorValidar.PARAM_BOLSA%>': '<%= bolsa.getCodNum() %>',
-		    	'<%= ControladorValidar.PARAM_CANDIDATO %>': '<%= candidato.getCodNum() %>'
-		    	},
-		    "clickable": {'onClick': function(row) {
-		    	var params = {
-	    				'a': '<%= ControladorValidar.ACCION_MERITO_SELECCIONADO %>',
-	    				'<%= ControladorValidar.PARAM_BOLSA %>': '<%= bolsa.getCodNum() %>',
-	    				'<%= ControladorValidar.PARAM_CANDIDATO %>': '<%= candidato.getCodNum() %>',
-	    				'<%= ControladorValidar.PARAM_MERITO %>': row.codNum};
-	    		Atis.sendForm("<%= request.getRequestURI() %>", params);
-		    }},
-		    <% if (merito != null) { %> "selected": <%= merito.getMerito().getCodNum() %> ,<% } %>
-		    "columns": [
-		    	{'data': 'codNum', 'filter': {'type': 'number'}},
-		        {'data': 'codNum', 'order': false, 'class': 'center', 'render': function(row) {
-		        		if (!row.excluido && !row.validado) {
-		        			return "<div title='Mérito no evaluado' class='circle-neutral'></div>";
-		        		} else {
-		        			if (row.excluido) {
-			        			return "<div title='Mérito excluido' class='circle-false'></div>";
-			        		} else {
-			        			return "<div title='Mérito validado' class='circle-true'></div>";
-			        		}
-		        		}
-		        	}
-		    	},
-		        {'data': 'item', 'filter': true, 'render': function(row) {
-		        	return row.item.bloque.apartado.codigo + "." + row.item.bloque.codigo + "." + row.item.codigo;
-	        	}},
-	        	{'data': 'valor', 'filter': true, 'overflow': 'auto', 'render': function(row) {
-	        		return row.valor + " (" + row.item.unidades + ")";
-	        	}},
-	        	{'data': 'codnum', 'buttons': [
-	        		{'title': 'Descargar fichero del mérito', 'class': 'only-icon icon-download', 'onClick': function(row) {
-	        			window.open("<%= ControladorDescargaFicheros.URL_DESCARGA_FICHEROS %>"
-	        		        	+ "?a=<%=bean.getUsuarioLogeado().isMiembroComision() || bean.getUsuarioLogeado().isDirectorDepartamento() ? ControladorDescargaFicheros.ACCION_DESCARGAR_MERITO_EVALUADOR : ControladorDescargaFicheros.ACCION_DESCARGAR_MERITO_PERSONAL%>&<%=ControladorDescargaFicheros.PARAM_MERITO%>=" + row.codNum);
-	        		}},
-	   			]}
-		    ]
+		var tableMeritos = new Atis.DataTable('#tableMeritosVAL', {
+			"ajax": { url: "<%= ControladorValidar.URL_PATTERN_AJAX %>", async: false },
+			"pageSize": 10,
+			"filterable": true,
+			"action": "<%= ControladorValidar.ACCION_DATATABLE_MERITOS %>",
+			"title": 'MÉRITOS PARA EL USUARIO: <%=EscapaHTML.escapa(candidato.getIdNif() + " - " + candidato.getNombre() + " " + candidato.getPrimerApellido() + " " + candidato.getSegundoApellido())%>',
+			"dropdown": true,
+			"stateSave": true,
+			"params": {
+				'<%=ControladorValidar.PARAM_BOLSA%>': '<%= bolsa.getCodNum() %>',
+				'<%= ControladorValidar.PARAM_CANDIDATO %>': '<%= candidato.getCodNum() %>'
+				},
+			"clickable": {'onClick': function(row) {
+				var params = {
+						'a': '<%= ControladorValidar.ACCION_MERITO_SELECCIONADO %>',
+						'<%= ControladorValidar.PARAM_BOLSA %>': '<%= bolsa.getCodNum() %>',
+						'<%= ControladorValidar.PARAM_CANDIDATO %>': '<%= candidato.getCodNum() %>',
+						'<%= ControladorValidar.PARAM_MERITO %>': row.codNum};
+				Atis.sendForm("<%= request.getRequestURI() %>", params);
+			}},
+			<% if (merito != null) { %> "selected": <%= merito.getMerito().getCodNum() %> ,<% } %>
+			"columns": [
+				{'data': 'codNum', 'filter': {'type': 'number'}},
+				{'data': 'codNum', 'order': false, 'class': 'center', 'render': function(row) {
+						if (!row.excluido && !row.validado) {
+							return "<div title='Mérito no evaluado' class='circle-neutral'></div>";
+						} else {
+							if (row.excluido) {
+								return "<div title='Mérito excluido' class='circle-false'></div>";
+							} else {
+								return "<div title='Mérito validado' class='circle-true'></div>";
+							}
+						}
+					}
+				},
+				{'data': 'item', 'filter': true, 'render': function(row) {
+					return row.item.bloque.apartado.codigo + "." + row.item.bloque.codigo + "." + row.item.codigo;
+				}},
+				{'data': 'valor', 'filter': true, 'overflow': 'auto', 'render': function(row) {
+					return row.valor + " (" + row.item.unidades + ")";
+				}},
+				{'data': 'codnum', 'buttons': [
+					{'title': 'Descargar fichero del mérito', 'class': 'only-icon icon-download', 'onClick': function(row) {
+						window.open("<%= ControladorDescargaFicheros.URL_DESCARGA_FICHEROS %>"
+								+ "?a=<%=bean.getUsuarioLogeado().isMiembroComision() || bean.getUsuarioLogeado().isDirectorDepartamento() ? ControladorDescargaFicheros.ACCION_DESCARGAR_MERITO_EVALUADOR : ControladorDescargaFicheros.ACCION_DESCARGAR_MERITO_PERSONAL%>&<%=ControladorDescargaFicheros.PARAM_MERITO%>=" + row.codNum);
+					}},
+				]}
+			]
 		});
 		
-		Atis.smoothScrollToAnchor("#tableMeritos");
+		Atis.smoothScrollToAnchor("#tableMeritosVAL");
 		
 	<%if (merito != null) {%>
 		
@@ -545,11 +548,11 @@ $(document).ready(function() {
 			
 			document.getElementById("merito_descargar_fichero").addEventListener("click", function() {
 				window.open("<%=ControladorDescargaFicheros.URL_DESCARGA_FICHEROS%>"
-    		        	+ "<%="?a=" + (bean.getUsuarioLogeado().isMiembroComision() || bean.getUsuarioLogeado().isDirectorDepartamento() ? ControladorDescargaFicheros.ACCION_DESCARGAR_MERITO_EVALUADOR : ControladorDescargaFicheros.ACCION_DESCARGAR_MERITO_PERSONAL) + "&" + ControladorDescargaFicheros.PARAM_MERITO + "=" + merito.getMerito().getCodNum()%>");
+						+ "<%="?a=" + (bean.getUsuarioLogeado().isMiembroComision() || bean.getUsuarioLogeado().isDirectorDepartamento() ? ControladorDescargaFicheros.ACCION_DESCARGAR_MERITO_EVALUADOR : ControladorDescargaFicheros.ACCION_DESCARGAR_MERITO_PERSONAL) + "&" + ControladorDescargaFicheros.PARAM_MERITO + "=" + merito.getMerito().getCodNum()%>");
 			});
 			
 			document.getElementById("validar_volver").addEventListener("click", function() {
-	    		Atis.sendForm("<%= request.getRequestURI() %>", {'<%= ControladorValidar.PARAM_ACCION %>': '<%= ControladorValidar.ACCION_INDEX %>'});
+				Atis.sendForm("<%= request.getRequestURI() %>", {'<%= ControladorValidar.PARAM_ACCION %>': '<%= ControladorValidar.ACCION_INDEX %>'});
 			});
 			
 		<%	if (personal) { %>
@@ -560,7 +563,7 @@ $(document).ready(function() {
 							'<%= ControladorValidar.PARAM_CANDIDATO %>': '<%= candidato.getCodNum() %>',
 							'<%= ControladorValidar.PARAM_MERITO %>': '<%= merito.getMerito().getCodNum() %>',
 					}
-		    		Atis.sendForm("<%= request.getRequestURI() %>", params);
+					Atis.sendForm("<%= request.getRequestURI() %>", params);
 				});
 		<%	} %>
 		
@@ -578,15 +581,15 @@ $(document).ready(function() {
 				var self = this;
 				Atis.confirmDialog(
 					"Excluir mérito", "El mérito se va a excluir de todas las bolsas en estado 'Validación' que pueda evaluar.", {
-	            	'Si': function(row) {
-	            		onClickAccionMerito(self, '<%= ControladorValidar.PARAM_EXCLUIR_MERITO %>');
-	        			
-	              		$(this).dialog("close");
-	            	},
-	            	'No': function() {
-	              		$(this).dialog("close");
-	            	}
-	          	});
+					'Si': function(row) {
+						onClickAccionMerito(self, '<%= ControladorValidar.PARAM_EXCLUIR_MERITO %>');
+						
+						$(this).dialog("close");
+					},
+					'No': function() {
+						$(this).dialog("close");
+					}
+				});
 			});
 			
 			var itemChanged = false;
@@ -614,23 +617,23 @@ $(document).ready(function() {
 					mensaje += "</ul>";
 				
 					Atis.confirmDialog(titulo, mensaje, {
-				        "Propagar": function() {
-				        	var ulBolsas = $(this).find("#bolsas_propagar").children("li");
-				        	var bolsas = new Array();
-				        	ulBolsas.each(function(position, bolsa) {
-				        		var inputBolsa = $(bolsa).find("input");
-				        		if ($(inputBolsa).is(":checked")) {
-				        			bolsas.push($(inputBolsa).val());
-				        		}
-				        	});
-				        	form.elements["<%= ControladorValidar.PARAM_BOLSAS %>"].value = Atis.object2Json(bolsas);
-				        	form.submit();
-				          	$(this).dialog("close");
-				        },
-				        "Cancelar": function() {
-				          	$(this).dialog("close");
-				        }
-				    });
+						"Propagar": function() {
+							var ulBolsas = $(this).find("#bolsas_propagar").children("li");
+							var bolsas = new Array();
+							ulBolsas.each(function(position, bolsa) {
+								var inputBolsa = $(bolsa).find("input");
+								if ($(inputBolsa).is(":checked")) {
+									bolsas.push($(inputBolsa).val());
+								}
+							});
+							form.elements["<%= ControladorValidar.PARAM_BOLSAS %>"].value = Atis.object2Json(bolsas);
+							form.submit();
+							$(this).dialog("close");
+						},
+						"Cancelar": function() {
+							$(this).dialog("close");
+						}
+					});
 				}
 		<%	} else { %>
 				function propagarCambiosDialog(form) {
@@ -639,14 +642,14 @@ $(document).ready(function() {
 							: "<p>Modificar el valor del mérito borrará las evaluaciones del mérito para méritos desagregables <br/> en todas las bolsas en estado de 'Validación' y tendrá que asignar los valores de nuevo.</p>";
 					
 					Atis.confirmDialog(titulo, mensaje, {
-				        Si: function() {
-				        	form.submit();
-				          	$(this).dialog("close");
-				        },
-				        No: function() {
-				          	$(this).dialog("close");
-				        }
-				    });
+						Si: function() {
+							form.submit();
+							$(this).dialog("close");
+						},
+						No: function() {
+							$(this).dialog("close");
+						}
+					});
 				}
 		<%	} %>
 			

@@ -25,7 +25,7 @@ VistaValidar bean = (VistaValidar)uvdatos.getVistas().get(VistaValidar.class.get
 	<h2>Validar meritos sujetos afinidad</h2>
 	<h3><%= descripcion %></h3>
 		
-	<table class="bluetable bolsaempleo" id="table">
+	<table class="bluetable bolsaempleo" id="tableAreasEvaluarAfines">
 		<tr>
 			<th scope="col" style="width:76px" title="Código área">Cod. Area.</th>
 			<th scope="col" style="width:50%" class="area">Area</th>
@@ -34,39 +34,40 @@ VistaValidar bean = (VistaValidar)uvdatos.getVistas().get(VistaValidar.class.get
 			<th scope="col" style="width:76px" class="center">Excluidos</th>
 			<th scope="col" style="width:76px" class="center">Total</th>
 		</tr>
-		<tbody>				
+		<tbody>
 		</tbody>
 		<tfoot>
 			<tr>
 				<th colSpan="6" style="width:100%"></th>
 			</tr>
 		</tfoot>
-	</table>	
+	</table>
 </div>
 	
 <script>
 $(document).ready(function() {
-	var table = new Atis.DataTable('#table', {
-	    "ajax": { url: "<%= ControladorValidar.URL_PATTERN_AJAX %>" },
-	    "pageSize": 100,
-	    "filterable": true,
-	    "action": "<%= ControladorValidar.ACCION_DATATABLE_BOLSAS %>",
-	    "defaultOrderBy": 2,
-	    "defaultOrderDirection": 'desc',
-	    "clickable": {'onClick': function(row) {
-	    	var params = {
-    				'<%= ControladorValidar.PARAM_ACCION %>': '<%= ControladorValidar.ACCION_BOLSA_SELECCIONADA %>', 
-    				'<%= ControladorValidar.PARAM_BOLSA %>': row.codNum};
-    		Atis.sendForm("<%= request.getRequestURI() %>", params);
-	    }},
-	    "columns": [
-	    	{'data': 'area.idAreaExterno', 'filter': true},
-	        {'data': 'area.descripcion', 'filter': true},
-	        {'data': 'totalMeritosNoValidados', 'class': 'center', 'render': function(row) { return isNaN(row.totalMeritosNoValidados) ? 0 : row.totalMeritosNoValidados; } },
-	        {'data': 'totalMeritosValidados', 'class': 'center', 'render': function(row) { return isNaN(row.totalMeritosValidados) ? 0 : row.totalMeritosValidados; } },
-	        {'data': 'totalMeritosExcluidos', 'class': 'center', 'render': function(row) { return isNaN(row.totalMeritosExcluidos) ? 0 : row.totalMeritosExcluidos; } },
-	        {'data': 'totalMeritos', 'class': 'center'} 
-	    ]	    
-	});		
+	var tableAreasEvaluarAfines = new Atis.DataTable('#tableAreasEvaluarAfines', {
+		"ajax": { url: "<%= ControladorValidar.URL_PATTERN_AJAX %>" },
+		"pageSize": 10,
+		"filterable": true,
+		"action": "<%= ControladorValidar.ACCION_DATATABLE_BOLSAS %>",
+		"defaultOrderBy": 2,
+		"defaultOrderDirection": 'desc',
+		"stateSave": true,
+		"clickable": {'onClick': function(row) {
+			var params = {
+					'<%= ControladorValidar.PARAM_ACCION %>': '<%= ControladorValidar.ACCION_BOLSA_SELECCIONADA %>', 
+					'<%= ControladorValidar.PARAM_BOLSA %>': row.codNum};
+			Atis.sendForm("<%= request.getRequestURI() %>", params);
+		}},
+		"columns": [
+			{'data': 'area.idAreaExterno', 'filter': true},
+			{'data': 'area.descripcion', 'filter': true},
+			{'data': 'totalMeritosNoValidados', 'class': 'center', 'render': function(row) { return isNaN(row.totalMeritosNoValidados) ? 0 : row.totalMeritosNoValidados; } },
+			{'data': 'totalMeritosValidados', 'class': 'center', 'render': function(row) { return isNaN(row.totalMeritosValidados) ? 0 : row.totalMeritosValidados; } },
+			{'data': 'totalMeritosExcluidos', 'class': 'center', 'render': function(row) { return isNaN(row.totalMeritosExcluidos) ? 0 : row.totalMeritosExcluidos; } },
+			{'data': 'totalMeritos', 'class': 'center'} 
+		]
+	});
 }); 
 </script>

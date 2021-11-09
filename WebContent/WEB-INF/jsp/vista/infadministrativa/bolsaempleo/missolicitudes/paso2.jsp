@@ -25,7 +25,7 @@ VistaSolicitudes bean = (VistaSolicitudes) uvdatos.getVistas().get(VistaSolicitu
 		
 		<p>Para cada área seleccione hasta un máximo de [<%= bean.getSolicitud().getConvocatoria().getNumMeritosPorBloque() %>] méritos por bloque. Pinche sobre una área para asignar sus méritos.</p>
 		
-		<table class="bluetable bolsaempleo" id="tableAreas">
+		<table class="bluetable bolsaempleo" id="tableAreasMSO2">
 			<tr>
 				<th scope="col"	style="width:15%">Código</th>
 				<th scope="col"	style="width:65%">Nombre</th>
@@ -49,7 +49,7 @@ VistaSolicitudes bean = (VistaSolicitudes) uvdatos.getVistas().get(VistaSolicitu
 		    </button>
 		</div>
 		
-		<table class="bluetable bolsaempleo" id="tableMeritos" style="visibility: collapse">
+		<table class="bluetable bolsaempleo" id="tableMeritosMSO2" style="visibility: collapse">
 			<tr>
 				<th scope="col"	style="width:5%"></th>
 				<th scope="col"	style="width:10%">Cod.</th>
@@ -257,10 +257,11 @@ VistaSolicitudes bean = (VistaSolicitudes) uvdatos.getVistas().get(VistaSolicitu
 		$(document).ready(function() {
 			
 			
-			var tableAreas = new Atis.DataTable('#tableAreas', {
+			var tableAreas = new Atis.DataTable('#tableAreasMSO2', {
 				"ajax": { url: "<%=ControladorMisSolicitudes.URL_PATTERN_AJAX%>", async: false },
 			    "pageSize": 10,
 			    "filterable": true,
+			    "stateSave": true,
 			    "clickable": {'onClick': function(row) {
 			    	var params = {
 		    				'<%=ControladorMisSolicitudes.PARAM_ACCION%>': '<%=ControladorMisSolicitudes.ACCION_BOLSA_SELECCIONADA%>',
@@ -289,11 +290,12 @@ VistaSolicitudes bean = (VistaSolicitudes) uvdatos.getVistas().get(VistaSolicitu
 					<%}
 				}%>
 					
-				var tableMeritos = new Atis.DataTable('#tableMeritos', {
+				var tableMeritos = new Atis.DataTable('#tableMeritosMSO2', {
 					"ajax": { url: "<%=ControladorMisSolicitudes.URL_PATTERN_AJAX%>", async: false },
 				    "pageSize": 10,
 				    "selectable": {'all': false},
 				    "filterable": true,
+				    "stateSave": true,
 				    "title": 'MIS MÉRITOS: <%=bean.getArea().getArea().getDescripcion()%>',
 				    "selected": meritosBolsaSolicitud,
 				    "defaultOrderBy": 2,
@@ -352,8 +354,8 @@ VistaSolicitudes bean = (VistaSolicitudes) uvdatos.getVistas().get(VistaSolicitu
 			        ],
 				});
 				
-				document.getElementById("tableMeritos").style.visibility = "visible";
-				Atis.smoothScrollToAnchor("#tableMeritos");
+				document.getElementById("tableMeritosMSO2").style.visibility = "visible";
+				Atis.smoothScrollToAnchor("#tableMeritosMSO2");
 			<% } %>
 			
 			document.getElementById("paso2_volver").addEventListener("click", function(event) {

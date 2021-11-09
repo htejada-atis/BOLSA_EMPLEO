@@ -18,7 +18,7 @@ VistaMensajes bean = (VistaMensajes) uvdatos.getVistas().get(VistaMensajes.class
 		<button class="link-btn" id="nuevo_mensaje" style="margin-left: 4px">Nuevo mensaje</button>
 	</div>
 	
-	<table class="bluetable bolsaempleo" id="tableMensajes">
+	<table class="bluetable bolsaempleo" id="tableMensajesMEN">
 		<tr>
 			<th scope="col" style="width:5%"></th>
 			<th scope="col" style="width:20%" title="Fecha creación">Fecha creación</th>
@@ -50,42 +50,43 @@ $(document).ready(function() {
 	
 	var borrar = function(row) {
 		Atis.confirmDialog("Borrar mensaje", "¿Está seguro de borrar el mensaje?", {
-         	'Borrar': function() {
-          		var params = {
-      				'<%= ControladorMensajes.PARAM_ACCION %>': '<%= ControladorMensajes.ACCION_BORRAR_MENSAJE %>',
-      				'<%= ControladorMensajes.PARAM_MENSAJE_ID %>': row.codNum
-     			};
-     			Atis.sendForm("<%= request.getRequestURI() %>", params);
-     			
-           		$(this).dialog("close");
-           	},
-           	'No': function() {
-             	$(this).dialog("close");
-           	}
-        });
+			'Borrar': function() {
+				var params = {
+					'<%= ControladorMensajes.PARAM_ACCION %>': '<%= ControladorMensajes.ACCION_BORRAR_MENSAJE %>',
+					'<%= ControladorMensajes.PARAM_MENSAJE_ID %>': row.codNum
+				};
+				Atis.sendForm("<%= request.getRequestURI() %>", params);
+				
+				$(this).dialog("close");
+			},
+			'No': function() {
+				$(this).dialog("close");
+			}
+		});
 	};
 	
 	var clickRow = function(row) {
 		var params = {
 			'<%= ControladorMensajes.PARAM_ACCION %>': '<%= ControladorMensajes.ACCION_DETALLE_MENSAJE %>',
 			'<%= ControladorMensajes.PARAM_MENSAJE_ID %>': row.codNum
-    	};
+		};
 		Atis.sendForm("<%=request.getRequestURI()%>", params);
 	};
 	
-	var table = new Atis.DataTable('#tableMensajes', {
-	    "ajax": { url: '<%= ControladorMensajes.URL_PATTERN_AJAX %>' },
-	    "pageSize": 10,
-    	"defaultOrderBy": 1,
-    	"defaultOrderDirection": 'desc',
-	    "action": "<%= ControladorMensajes.ACCION_DATATABLE %>",
-	    "clickable": {'onClick': clickRow},
-	    "columns": [
-	    	{'data': 'codNum'},
-	        {'data': 'fechaCreacion'},
-	        {'data': 'titulo'},
-	        {'data': 'estado'},
-	    ]
+	var table = new Atis.DataTable('#tableMensajesMEN', {
+		"ajax": { url: '<%= ControladorMensajes.URL_PATTERN_AJAX %>' },
+		"pageSize": 10,
+		"defaultOrderBy": 1,
+		"defaultOrderDirection": 'desc',
+		"stateSave": true,
+		"action": "<%= ControladorMensajes.ACCION_DATATABLE %>",
+		"clickable": {'onClick': clickRow},
+		"columns": [
+			{'data': 'codNum'},
+			{'data': 'fechaCreacion'},
+			{'data': 'titulo'},
+			{'data': 'estado'},
+		]
 	});	
 }); 
 </script>

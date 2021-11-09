@@ -19,7 +19,7 @@ Bolsa bolsa = bean.getArea();
 
 	<p>Página de consulta sobre que titulaciones son preferentes por área</p>
 	
-	<table class="bluetable bolsaempleo" id="tableAreas">
+	<table class="bluetable bolsaempleo" id="tableAreasTPA2">
 		<tr>
 			<th scope="col" style="width:15%" title="Código área">Cod. Área.</th>
 			<th scope="col" style="width:85%" class="area">Nombre del Área</th>			
@@ -33,7 +33,7 @@ Bolsa bolsa = bean.getArea();
 		</tfoot>
 	</table>
 	
-	<table class="bluetable bolsaempleo" id="tableTitulaciones">
+	<table class="bluetable bolsaempleo" id="tableTitulacionesTPA2">
 		<tr>
 			<th scope="col"	style="width:100%">Nombre</th>
 		</tr>
@@ -50,10 +50,11 @@ Bolsa bolsa = bean.getArea();
 <script>
 $(document).ready(function() {
 	
-	var tableAreas = new Atis.DataTable('#tableAreas', {
+	var tableAreas = new Atis.DataTable('#tableAreasTPA2', {
 	    "ajax": { url: "<%= ControladorCandidatoTitulacionesPreferentesArea.URL_PATTERN_AJAX %>", async: false },
 	    "pageSize": 10,
 	    "filterable": true,
+	    "stateSave": true,
 	    "action": "<%= ControladorCandidatoTitulacionesPreferentesArea.ACCION_DATATABLE_BOLSAS %>",
 	    "defaultOrderBy": 1,
 	    "title": 'AREAS DE CONOCIMIENTO',
@@ -72,7 +73,7 @@ $(document).ready(function() {
 	
 	<% if (bolsa != null) { %>
 		
-		var table_titulaciones_area = new Atis.DataTable('#tableTitulaciones', {
+		var table_titulaciones_area = new Atis.DataTable('#tableTitulacionesTPA2', {
 			"ajax": { url: "<%=ControladorCandidatoTitulacionesPreferentesArea.URL_PATTERN_AJAX%>", async: false },
 		    "params": {"<%=ControladorCandidatoTitulacionesPreferentesArea.PARAM_AREA%>": "<%= bolsa.getArea().getCodNum() %>"},
 		    "filterable": true,
@@ -86,7 +87,7 @@ $(document).ready(function() {
 		});
 	
 	<% } else { %>
-		document.getElementById("tableTitulaciones").style.visibility = "hidden";
+		document.getElementById("tableTitulacionesTPA2").style.visibility = "hidden";
 	<% } %>
 	
 }); 

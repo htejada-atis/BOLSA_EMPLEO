@@ -85,7 +85,7 @@ if (bean.getDestinatarios().size() > 0 && !mensaje.getCuerpo().isBlank() && !men
 		</div>
 	</form>
 	
-	<table class="bluetable bolsaempleo" id="tableDestinatarios">
+	<table class="bluetable bolsaempleo" id="tableDestinatariosMEN">
 		<tr>
 		<%	if (mensajeBorrador) { %>
 				<th scope="col" style="width:5%"></th>
@@ -132,7 +132,7 @@ if (bean.getDestinatarios().size() > 0 && !mensaje.getCuerpo().isBlank() && !men
 			</div>
 		</div>
 		
-		<table class="bluetable bolsaempleo" id="tableAddDestinatario">
+		<table class="bluetable bolsaempleo" id="tableAddDestinatarioMEN">
 			<tr>
 				<th scope="col" style="width:5%"></th>
 				<th scope="col" style="width:20%" title="Documento">Documento</th>
@@ -225,7 +225,7 @@ $(document).ready(function() {
 	
 <%	} %>
 	
-	var tableDestinatarios = new Atis.DataTable('#tableDestinatarios', {
+	var tableDestinatarios = new Atis.DataTable('#tableDestinatariosMEN', {
 		"title": "DESTINATARIOS DEL MENSAJE",
 		"ajax": { url: '<%= ControladorMensajes.URL_PATTERN_AJAX %>', async: false },
 		"params": {"<%=ControladorMensajes.PARAM_MENSAJE_ID%>": <%= mensaje.getCodNum() %>},
@@ -296,7 +296,7 @@ $(document).ready(function() {
 			document.getElementById("mensaje_guardar").removeAttribute("disabled");
 		});
 			
-		var tableAddDestinatario = new Atis.DataTable('#tableAddDestinatario', {
+		var tableAddDestinatario = new Atis.DataTable('#tableAddDestinatarioMEN', {
 			"ajax": { url: '<%= ControladorMensajes.URL_PATTERN_AJAX %>', async: false },
 			"params": {"<%= ControladorMensajes.PARAM_MENSAJE_ID%>": <%= mensaje.getCodNum() %>},
 			"pageSize": 10,
