@@ -140,7 +140,7 @@ public class ControladorMisDatos extends HttpServlet {
 		this.index(bean);
 		BolsaEmpleoUtils.readMensajeSession(bean, request);
 		try {
-			bean.setUsuarioLogeado(ModeloUsuarioBolsaEmpleo.obtenerInstancia().getOrCreateUsuario(datos));
+			bean.setUsuarioLogeado(ModeloUsuarioBolsaEmpleo.obtenerInstancia().getAndRefreshUsuario(datos));
 		} catch (UVException e) {
 			LOGGER.log(Level.WARNING, e.toString());
 			BolsaEmpleoUtils.redirectToError(bean, datos, request, response, e.getMessage());

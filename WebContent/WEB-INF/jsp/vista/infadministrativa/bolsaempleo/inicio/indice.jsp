@@ -26,18 +26,22 @@ VistaUsuarioBolsaEmpleo beanUsuario = (VistaUsuarioBolsaEmpleo) uvdatos.getVista
 		<% } %>
 	<% } %>
 
-    <h2>Bolsa de empleo para PDI de la Universidad de Jaén</h2>
-    
-    <div class="nav-bolsa-empleo">
-        <%@ include file="includes/menu.jsp" %>
-    </div>
-    
-    <div class="descripcion-bolsa-empleo">
-    	<p></p>
-    </div>
-    
-    <div class="noticias-bolsa-empleo">
-       	<h4>Noticias y Novedades</h4>
+	<h2>Bolsa de empleo para PDI de la Universidad de Jaén</h2>
+	
+	<div class="nav-bolsa-empleo">
+		<%@ include file="includes/menu.jsp" %>
+	</div>
+	
+<%	if (!bean.getAnonimo() && bean.getUsuarioLogeado().getCodNum() == null) { %>
+		<button class="link-btn" id="participar_bolsa_empleo">Participar en la bolsa de empleo</button>
+<%	} %>
+	
+	<div class="descripcion-bolsa-empleo">
+		<p></p>
+	</div>
+	
+	<div class="noticias-bolsa-empleo">
+		<h4>Noticias y Novedades</h4>
 		<ul>
 			<% for(Noticia noticia:bean.getNoticias()) { %>
 				<li class="row-noticia" id="noticia_<%=noticia.getCodNum()%>">
@@ -47,7 +51,7 @@ VistaUsuarioBolsaEmpleo beanUsuario = (VistaUsuarioBolsaEmpleo) uvdatos.getVista
 			<% } %>
 		</ul>
 		<div class="row-ver-todas" id="view_all"> (<a href="#">Ver todas</a>) </div>
-    </div>
+	</div>
 
 </div>
 
@@ -67,28 +71,28 @@ VistaUsuarioBolsaEmpleo beanUsuario = (VistaUsuarioBolsaEmpleo) uvdatos.getVista
 			var params = {'a':'listar_todas_noticias', <%= ControladorInicio.PARAM_NOTICIAS %>: JSON.stringify(ids_noticias)}
 			
 			$.ajax({
-		        type: "GET",
-		        url: "<%= bean.getAnonimo() ? ControladorInicio.URL_PATTERN_AJAX_PUBLICA : ControladorInicio.URL_PATTERN_AJAX_PRIVADA %>",
-		        contentType: "application/json",
-		        dataType: "json",
-		        data: params,
-		        success: function(response) {
-		        	response.forEach((noticia) => {
-		            	var element = $(".noticias-bolsa-empleo li").first().clone();
-		            	element.attr("id", "id_"+noticia.idNoticia);
-		            	element.find("a").attr("href", noticia.enlace);
-		            	element.find("a").text(noticia.texto);
-		            	element.find(".fecha-noticia").text(noticia.fecha);
+				type: "GET",
+				url: "<%= bean.getAnonimo() ? ControladorInicio.URL_PATTERN_AJAX_PUBLICA : ControladorInicio.URL_PATTERN_AJAX_PRIVADA %>",
+				contentType: "application/json",
+				dataType: "json",
+				data: params,
+				success: function(response) {
+					response.forEach((noticia) => {
+						var element = $(".noticias-bolsa-empleo li").first().clone();
+						element.attr("id", "id_"+noticia.idNoticia);
+						element.find("a").attr("href", noticia.enlace);
+						element.find("a").text(noticia.texto);
+						element.find(".fecha-noticia").text(noticia.fecha);
 
-		            	$(".noticias-bolsa-empleo ul").append(element);
-		            	$("#view_all a").text("Ver menos");
-		            	view_all = false;
-		            });
-		        },
-		        error: function(response) {
-		        	alert(response);
-		        }
-		    });
+						$(".noticias-bolsa-empleo ul").append(element);
+						$("#view_all a").text("Ver menos");
+						view_all = false;
+					});
+				},
+				error: function(response) {
+					alert(response);
+				}
+			});
 		}
 		
 		var view_all = true;
@@ -113,6 +117,22 @@ VistaUsuarioBolsaEmpleo beanUsuario = (VistaUsuarioBolsaEmpleo) uvdatos.getVista
 		if(ids_noticias.length < 9) {
 			$("#view_all").hide();
 		}
+		
+		document.getElementById("participar_bolsa_empleo").addEventListener("click", function(event) {
+			event.preventDefault();
+			Atis.confirmDialog("Participar en la bolsa de empleo", "Va a registrarse en la bolsa de empleo para optar a una plaza.", {
+					'Confirmar': function(row) {
+						var params = {
+								'<%= ControladorInicio.PARAM_ACCION %>': '<%= ControladorInicio.ACCION_PARTICIPAR_BOLSA_EMPLEO %>'
+						};
+						Atis.sendForm("<%= request.getRequestURI() %>", params);
+						$(this).dialog("close");
+					},
+					'No': function() {
+						$(this).dialog("close");
+					}
+			});
+		});
 		
 	});
 

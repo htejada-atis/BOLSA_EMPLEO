@@ -151,7 +151,7 @@ public class ControladorAfinidades extends HttpServlet {
 		bean.setVista(RUTA_BEP_CON + "index.jsp");
 		BolsaEmpleoUtils.readMensajeSession(bean, request);
 		try {
-			bean.setUsuarioLogeado(ModeloUsuarioBolsaEmpleo.obtenerInstancia().getOrCreateUsuario(datos));
+			bean.setUsuarioLogeado(ModeloUsuarioBolsaEmpleo.obtenerInstancia().getAndRefreshUsuario(datos));
 
 			if (!bean.getUsuarioLogeado().getRol().getCodNum().equals(ModeloRol.ID_ROL_SERVICIO_PERSONAL)) {
 				throw new UVException(MENSAJE_ERROR_SIN_PERMISOS);

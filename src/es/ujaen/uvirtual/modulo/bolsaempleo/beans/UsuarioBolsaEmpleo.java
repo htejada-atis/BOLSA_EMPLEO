@@ -53,16 +53,28 @@ public class UsuarioBolsaEmpleo implements Serializable {
 
 	}
 
-	/**
-	 * Constructor con parametros para Bolsa Empleo.
-	 * 
+	/** Constructor con parametros para Bolsa Empleo.
 	 * @param prol         .
 	 * @param pcodCuenta               .
 	 */
 	public UsuarioBolsaEmpleo(Rol prol, String pcodCuenta) {
 		super();
 		this.rol = prol;
-		this.codcuenta = pcodCuenta;				
+		this.codcuenta = pcodCuenta;
+	}
+	
+	/** Constructor con parametros para Bolsa Empleo.
+	 * @param usu .
+	 */
+	public UsuarioBolsaEmpleo(Usuario usu) {
+		this.tipodocumento = usu.getDocumentoTipo();
+		this.idnif = AdaptadorDocumentoIdentidad.numeroDocumento(AdaptadorDocumentoIdentidad.UXXIAC, usu);
+		this.letranif = AdaptadorDocumentoIdentidad.letraNIF(usu.getDocumentoTipo(), usu.getDocumentoNumero());
+		this.prsnif = usu.getDocumentoNumero();
+		this.nombre = usu.getNombre();
+		this.apellido1 = usu.getApellido1();
+		this.apellido2 = usu.getApellido2();
+		this.email = usu.getEmailCalculado();
 	}
 	
 	/** Constructor copia.
@@ -180,7 +192,7 @@ public class UsuarioBolsaEmpleo implements Serializable {
 		this.email = email;
 	}
 	
-	/** método que establece los datos de de arcos en bolsa empleo .
+	/** método que establece los datos del usuario arcos en bolsa empleo .
 	 * @param usu .
 	 */
 	public void setUsuarioArcos(Usuario usu) {

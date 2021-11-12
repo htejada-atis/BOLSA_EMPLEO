@@ -466,7 +466,7 @@ public final class BolsaEmpleoUtils {
 	}
 	
 	/**
-	 * Redirecciona a la url actual con parametros en la sessión.
+	 * Redirecciona a la url de error.
 	 * @param bean .
 	 * @param datos .
 	 * @param request  .
