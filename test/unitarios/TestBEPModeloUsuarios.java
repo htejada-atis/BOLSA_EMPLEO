@@ -380,18 +380,18 @@ public class TestBEPModeloUsuarios {
 		try {
 			// sin usuario logeado
 			UVDatos datos = new UVDatos();
-			UsuarioBolsaEmpleo usuario = ModeloUsuarioBolsaEmpleo.obtenerInstancia().getOrCreateUsuario(datos);
+			UsuarioBolsaEmpleo usuario = ModeloUsuarioBolsaEmpleo.obtenerInstancia().getAndRefreshUsuario(datos);
 			assertNull(usuario);
 			
 			// el usuario existe en bep
 			datos.setUsuario(CrearUsuario.usuario(CANDIDATO2_CODCUENTA));
-			usuario = ModeloUsuarioBolsaEmpleo.obtenerInstancia().getOrCreateUsuario(datos);
+			usuario = ModeloUsuarioBolsaEmpleo.obtenerInstancia().getAndRefreshUsuario(datos);
 			assertEquals(usuario.getCodCuenta(), CANDIDATO2_CODCUENTA);
 			
 			// el usuario no existe en bep, se crea como candidato
 			Usuario usuArcos = CrearUsuario.usuario(CANDIDATO5_CODCUENTA); 
 			datos.setUsuario(usuArcos);
-			usuario = ModeloUsuarioBolsaEmpleo.obtenerInstancia().getOrCreateUsuario(datos);
+			usuario = ModeloUsuarioBolsaEmpleo.obtenerInstancia().getAndRefreshUsuario(datos);
 			assertEquals(usuario.getCodCuenta(), CANDIDATO5_CODCUENTA);
 			assertEquals(usuario.getRol().getCodNum(), ModeloRol.ID_ROL_CANDIDATO);
 			assertEquals(usuario.getTipoDocumento(), usuArcos.getDocumentoTipo());

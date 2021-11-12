@@ -739,15 +739,14 @@ public class ModeloUsuarioBolsaEmpleo {
 	/**
 	 * Si hay usuario logeado, comprueba si está registrado en sistema. Si tenemos
 	 * usuario en nuestro sistema, comprueba si está excluido o borrado (lanzando
-	 * una excepción). Si no tenemos usuario en nuestro sistema, lo crea como
-	 * candidato.
+	 * una excepción).
 	 * 
 	 * @param datos .
 	 * @return Boolean true si hay usuario logeado en el sistema o false en otro caso.
 	 * @throws SQLException en caso de error en la BD.
 	 * @throws UVException  si noticia no es valida.
 	 */
-	public UsuarioBolsaEmpleo getOrCreateUsuario(UVDatos datos) throws SQLException, UVException {
+	public UsuarioBolsaEmpleo getAndRefreshUsuario(UVDatos datos) throws SQLException, UVException {
 		Usuario usuArcos = datos.getUsuario();
 
 		// no hay usuario logeado, salimos
@@ -761,7 +760,7 @@ public class ModeloUsuarioBolsaEmpleo {
 		LOGGER.log(Level.FINER, String.format("LEYENDO USUARIO CACHEADO BEP [%s]", usuArcos.getUid()));
 		
 		if (usuario == null) {
-			usuario = refrescarUsuarioBEP(usuArcos);
+			usuario = refrescarUsuarioBEP(usuArcos, false);
 		}
 		
 		// comprobamos si está borrado o excluido
@@ -787,7 +786,7 @@ public class ModeloUsuarioBolsaEmpleo {
 	 */
 	public UsuarioBolsaEmpleo refrescarUsuarioBEP(UsuarioBolsaEmpleo usuarioBep) throws SQLException, UVException {
 		Usuario usuArcos = CrearUsuario.usuario(usuarioBep.getCodCuenta());
-		return refrescarUsuarioBEP(usuArcos);
+		return refrescarUsuarioBEP(usuArcos, false);
 	}
 	
 	/**
@@ -797,33 +796,40 @@ public class ModeloUsuarioBolsaEmpleo {
 	 * @throws UVException .
 	 * @throws SQLException .
 	 */
-	public UsuarioBolsaEmpleo refrescarUsuarioBEP(Usuario usuArcos) throws SQLException, UVException {
+	public UsuarioBolsaEmpleo refrescarUsuarioBEP(Usuario usuArcos, boolean create) throws SQLException, UVException {
 		UsuarioBolsaEmpleo usuario;
 		String uid = usuArcos.getUid();
-
+		
 		// comprobamos si existe el usuario en uvirtual
 		LOGGER.log(Level.FINER, String.format("Chequeando si existe usuario en Bolsa Empleo [%s]", uid));
-
+		
 		if (!existeUsuarioBolsaEmpleoByUid(usuArcos.getUid())) {
-			// no existe el usuario en la bolsa de empleo lo creamos como candidato
-			LOGGER.log(Level.FINER, String.format("No existe usuario en Bolsa Empleo [%s]. Lo creamos como candidato.", uid));
-			usuario = crearUsuarioBolsaEmpleo(ModeloRol.ID_ROL_CANDIDATO, usuArcos.getUid(), null);
+			if (create) {
+				// no existe el usuario en la bolsa de empleo lo creamos como candidato
+				LOGGER.log(Level.FINER, String.format("No existe usuario en Bolsa Empleo [%s]. Lo creamos como candidato.", uid));
+				usuario = crearUsuarioBolsaEmpleo(ModeloRol.ID_ROL_CANDIDATO, usuArcos.getUid(), null);
+			} else {
+				usuario = new UsuarioBolsaEmpleo(usuArcos);
+			}
 		} else {
 			// cargamos los datos del usuario de bolsa de empleo
 			LOGGER.log(Level.FINER, String.format("Existe usuario en Bolsa Empleo [%s]. Leemos sus datos.", uid));
 			usuario = getUsuarioByCodCuenta(usuArcos.getUid());
+			return new UsuarioBolsaEmpleo(usuArcos);
 		}
-				
-		LOGGER.log(Level.FINER, String.format("Fin chequeo usuario Bolsa Empleo [%s]. Todo correcto, refrescamos usuario y cacheamos", uid));
 		
-		// para que el usuario vuja, coga los roles del usuario de bep
-		CrearUsuario.refrescarUsuario(usuario.getCodCuenta());
+		if (create || usuario.getCodNum() != null) {
+			LOGGER.log(Level.FINER, String.format("Fin chequeo usuario Bolsa Empleo [%s]. Todo correcto, refrescamos usuario y cacheamos", uid));
+			
+			// para que el usuario vuja, coga los roles del usuario de bep
+			CrearUsuario.refrescarUsuario(usuario.getCodCuenta());
+			
+			Memcache mc = Memcache.getInstance();
+			mc.set("usuarioBEP." + uid, usuario);
+			
+			LOGGER.log(Level.FINER, String.format("CACHEANDO USUARIO BEP [%s]", uid));
+		}
 		
-		Memcache mc = Memcache.getInstance();
-		mc.set("usuarioBEP." + uid, usuario);
-		
-		LOGGER.log(Level.FINER, String.format("CACHEANDO USUARIO BEP [%s]", uid));
-
 		return usuario;
 	}
 

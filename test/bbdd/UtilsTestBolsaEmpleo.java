@@ -367,7 +367,7 @@ public final class UtilsTestBolsaEmpleo {
 	 */
 	public static UsuarioBolsaEmpleo getUsuario(String codCuenta) throws SQLException, UVException {
 		ModeloUsuarioBolsaEmpleo u = ModeloUsuarioBolsaEmpleo.obtenerInstancia();
-		u.refrescarUsuarioBEP(CrearUsuario.refrescarUsuario(codCuenta));		
+		u.refrescarUsuarioBEP(CrearUsuario.refrescarUsuario(codCuenta), true);
 		return u.getUsuarioByCodCuenta(codCuenta);
 	}
 	

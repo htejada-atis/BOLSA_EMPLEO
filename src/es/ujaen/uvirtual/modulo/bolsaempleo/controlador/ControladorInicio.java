@@ -33,16 +33,16 @@ import es.ujaen.uvirtual.utilidades.UVException;
  * Servlet implementation class ControladorIndice.
  */
 @WebServlet(
-	name = "informacionadministrativa.bolsaempleo", 
-	description = "Informacion bolsa empleo, raiz", 
-	urlPatterns = { 
-			"/srv/es/informacionadministrativa/bolsaempleo", 
+	name = "informacionadministrativa.bolsaempleo",
+	description = "Informacion bolsa empleo, raiz",
+	urlPatterns = {
+			"/srv/es/informacionadministrativa/bolsaempleo",
 			"/srv/en/informacionadministrativa/bolsaempleo",
 			"/srv/es/ajax/informacionadministrativa/bolsaempleo",
 			"/srv/en/ajax/informacionadministrativa/bolsaempleo",
 			"/pub/es/ajax/informacionadministrativa/bolsaempleo",
 			"/pub/en/ajax/informacionadministrativa/bolsaempleo",
-			"/pub/es/informacionadministrativa/bolsaempleo", 
+			"/pub/es/informacionadministrativa/bolsaempleo",
 			"/pub/en/informacionadministrativa/bolsaempleo"
 	})
 @MultipartConfig(maxFileSize = ModeloParametrosConfiguracion.MAX_FILE_SIZE)
@@ -57,6 +57,7 @@ public class ControladorInicio extends HttpServlet {
 	public static final String ACCION_FAQ = "faq";
 	public static final String ACCION_INDEX = "listar_noticias";
 	public static final String ACCION_LISTAR_TODAS_NOTICIAS = "listar_todas_noticias";
+	public static final String ACCION_PARTICIPAR_BOLSA_EMPLEO = "participar_bolsa_empleo";
 	
 	// Parámetros
 	public static final String PARAM_ACCION = "a";
@@ -64,6 +65,8 @@ public class ControladorInicio extends HttpServlet {
 	public static final String PARAM_NOTICIAS = "noticias";
 	
 	public static final String MENSAJE_ERROR_BORRADO = "usuario ";
+	public static final String MENSAJE_ERROR_ANONIMO = "Usuario no registrado en el sistema";
+	public static final String MENSAJE_EXITO_USUARIO_AGREGADO = "Ha sido registrado en la bolsa de empleo correctamente";
 	
 	// ruta vistas
 	public static final String RUTA_BEP_INICIO = "/WEB-INF/jsp/vista/infadministrativa/bolsaempleo/inicio/";
@@ -73,6 +76,7 @@ public class ControladorInicio extends HttpServlet {
 	public static final Integer RESPONSE_HTTP_CODE_ERROR_400 = 400;
 	
 	// urls
+	public static final String URL = "/srv/es/informacionadministrativa/bolsaempleo";
 	public static final String URL_PATTERN_AJAX_PUBLICA = "/pub/es/ajax/informacionadministrativa/bolsaempleo";
 	public static final String URL_PATTERN_AJAX_PRIVADA = "/srv/es/ajax/informacionadministrativa/bolsaempleo";
 	public static final String URL_PATTERN_FILES_PUBLICA = "/pub/es/informacionadministrativa/bolsaempleo";
@@ -112,6 +116,9 @@ public class ControladorInicio extends HttpServlet {
 				case ACCION_LISTAR_TODAS_NOTICIAS:
 					obtenerTodasNoticias(bean, request, response, datos);
 					break;
+				case ACCION_PARTICIPAR_BOLSA_EMPLEO:
+					participarBolsaEmpleo(bean, request, response, datos);
+					break;
 				default:
 					errorFatal(bean, "Acción no contemplada");
 			}
@@ -140,11 +147,11 @@ public class ControladorInicio extends HttpServlet {
 		BolsaEmpleoUtils.readMensajeSession(bean, request);
 		
 		try {
-			bean.setUsuarioLogeado(ModeloUsuarioBolsaEmpleo.obtenerInstancia().getOrCreateUsuario(datos));
+			bean.setUsuarioLogeado(ModeloUsuarioBolsaEmpleo.obtenerInstancia().getAndRefreshUsuario(datos));
 			bean.setAnonimo(bean.getUsuarioLogeado() == null);
 		} catch (UVException e) {
-			LOGGER.log(Level.WARNING, e.toString());			
-			BolsaEmpleoUtils.redirectToError(bean, datos, request, response, e.getMessage());			
+			LOGGER.log(Level.WARNING, e.toString());
+			BolsaEmpleoUtils.redirectToError(bean, datos, request, response, e.getMessage());
 		}
 	}
 	
@@ -159,6 +166,17 @@ public class ControladorInicio extends HttpServlet {
 	@Override
 	public void doPost(HttpServletRequest request, HttpServletResponse response) throws IOException {
 		doGet(request, response);
+	}
+	
+	/** muestra las 3 primeras noticias.
+	 * @param bean bean de la vista a la que poner los valores.
+	 * @throws SQLException excepcion de bbdd.
+	 */
+	private void index(VistaInicio bean) throws SQLException {
+		bean.setVista(JSP_INICIO);
+		ModeloNoticia modelo = ModeloNoticia.obtenerInstancia();
+		List<Noticia> noticias = modelo.listaNoticiasInicio(bean.getAnonimo());
+		bean.setNoticias(noticias);
 	}
 		
 	/** muestra todas las noticias.
@@ -197,21 +215,32 @@ public class ControladorInicio extends HttpServlet {
 		}
 	}
 	
-	/** muestra las 3 primeras noticias.
-	 * @param bean bean de la vista a la que poner los valores.
-	 * @throws SQLException excepcion de bbdd.
-	 */
-	private void index(VistaInicio bean) throws SQLException {
-		bean.setVista(JSP_INICIO);
-		ModeloNoticia modelo = ModeloNoticia.obtenerInstancia();
-		List<Noticia> noticias = modelo.listaNoticiasInicio(bean.getAnonimo());
-		bean.setNoticias(noticias);
-	}
-	
 	private void obtenerFicheros(VistaInicio bean) throws SQLException {
 		bean.setVista(RUTA_BEP_INICIO + "documentos.jsp");
 		ModeloFichero modelo = ModeloFichero.obtenerInstancia();
 		List<Fichero> ficheros = modelo.listaFicherosInicio(bean.getAnonimo());
 		bean.setFicheros(ficheros);
 	}
+	
+	/** Registra un usuario de uvirtual en la bolsa .
+	 * @param bean bean de la vista a la que poner los valores .
+	 * @param request de la petición del servidor .
+	 * @param response de la respuesta del servidor .
+	 * @param datos .
+	 * @throws SQLException .
+	 * @throws UVException .
+	 * @throws IOException .
+	 */
+	private void participarBolsaEmpleo(VistaInicio bean, HttpServletRequest request, HttpServletResponse response, UVDatos datos) 
+			throws IOException, UVException, SQLException {
+		if (bean.getAnonimo()) {
+			BolsaEmpleoUtils.redirectToError(bean, datos, request, response, MENSAJE_ERROR_ANONIMO);
+		}
+		
+		ModeloUsuarioBolsaEmpleo.obtenerInstancia().refrescarUsuarioBEP(datos.getUsuario(), true);
+		BolsaEmpleoUtils.addMensajeDeExito(MENSAJE_EXITO_USUARIO_AGREGADO, bean, request);
+		datos.setRespuestaEnviada(true);
+		response.sendRedirect(request.getServletPath());
+	}
+	
 }

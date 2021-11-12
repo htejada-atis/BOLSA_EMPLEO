@@ -155,7 +155,7 @@ public class ControladorPlazasOfertadas extends HttpServlet {
 		BolsaEmpleoUtils.readMensajeSession(bean, request);
 		
 		try {
-			bean.setUsuarioLogeado(ModeloUsuarioBolsaEmpleo.obtenerInstancia().getOrCreateUsuario(datos));
+			bean.setUsuarioLogeado(ModeloUsuarioBolsaEmpleo.obtenerInstancia().getAndRefreshUsuario(datos));
 			
 			// personal, direccion
 			int[] rolesValidos = {ModeloRol.ID_ROL_CANDIDATO};
