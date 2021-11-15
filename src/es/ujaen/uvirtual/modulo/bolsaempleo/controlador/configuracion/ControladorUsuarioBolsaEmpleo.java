@@ -263,9 +263,9 @@ public class ControladorUsuarioBolsaEmpleo extends HttpServlet {
 	 * @throws SQLException excepcion de bbdd .
 	 * @throws UVException en caso de error en bd .
 	 */
-	private void buscarUsuario(VistaUsuarioBolsaEmpleo bean) throws SQLException, UVException {			
+	private void buscarUsuario(VistaUsuarioBolsaEmpleo bean) throws SQLException, UVException {
 		obtenerRoles(bean);
-
+		
 		UsuarioBolsaEmpleo usu = ModeloUsuarioBolsaEmpleo.obtenerInstancia().compruebaUsuarioByCodCuenta(bean.getUsuarioArcos().getUid());
 		
 		if (usu != null) {
@@ -517,7 +517,7 @@ public class ControladorUsuarioBolsaEmpleo extends HttpServlet {
 	
 	private UsuarioBolsaEmpleo getValidatorUsuario(VistaUsuarioBolsaEmpleo bean, HttpServletRequest request) throws UVException, SQLException {
 		UsuarioBolsaEmpleo u = new UsuarioBolsaEmpleo();
-	
+		
 		String excluido = EscapaHTML.ajustaCodificacion(request.getParameter(PARAM_EXCLUIDO));
 		u.setExcluido("true".equals(excluido));
 		if (excluido != null) {
