@@ -33,7 +33,9 @@ VistaUsuarioBolsaEmpleo beanUsuario = (VistaUsuarioBolsaEmpleo) uvdatos.getVista
 	</div>
 	
 <%	if (!bean.getAnonimo() && bean.getUsuarioLogeado().getCodNum() == null) { %>
-		<button class="link-btn" id="participar_bolsa_empleo">Participar en la bolsa de empleo</button>
+		<div class="centered-highlighted">
+			<button class="link-btn" id="participar_bolsa_empleo">Participar en la bolsa de empleo</button>
+		</div>
 <%	} %>
 	
 	<div class="descripcion-bolsa-empleo">

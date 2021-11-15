@@ -776,3 +776,10 @@ table.bluetable.bolsaempleo input + input {
 	padding-top: 1px !important;
 }
 
+.centered-highlighted {
+	border: 1px solid var(--principal);
+	padding: 12px;
+	display: flex;
+	justify-content: center;
+}
+
