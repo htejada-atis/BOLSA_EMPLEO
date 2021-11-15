@@ -136,7 +136,7 @@ public class ControladorGestionTitulaciones extends HttpServlet {
 		BolsaEmpleoUtils.readMensajeSession(bean, request);
 		
 		try {
-			bean.setUsuarioLogeado(ModeloUsuarioBolsaEmpleo.obtenerInstancia().getOrCreateUsuario(datos));
+			bean.setUsuarioLogeado(ModeloUsuarioBolsaEmpleo.obtenerInstancia().getAndRefreshUsuario(datos));
 
 			if (!bean.getUsuarioLogeado().getRol().getCodNum().equals(ModeloRol.ID_ROL_SERVICIO_PERSONAL)) {
 				throw new UVException("No tienes permiso de personal");
@@ -214,9 +214,8 @@ public class ControladorGestionTitulaciones extends HttpServlet {
 	 * @param request .
 	 * @param response .
 	 * @throws IOException en caso de error de input u output .
-	 * @throws SQLException excepcion de bbdd.
 	 */
-	private void listadoTitulaciones(VistaTitulaciones bean, UVDatos datos, HttpServletRequest request, HttpServletResponse response) throws IOException, SQLException {
+	private void listadoTitulaciones(VistaTitulaciones bean, UVDatos datos, HttpServletRequest request, HttpServletResponse response) throws IOException {
 		ModeloTitulacion modelo = ModeloTitulacion.obtenerInstancia();
 		datos.setContentType(RESPONSE_AJAX_CONTENTTYPE);
 		response.setContentType(RESPONSE_AJAX_CONTENTTYPE);

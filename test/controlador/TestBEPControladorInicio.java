@@ -4,12 +4,10 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotEquals;
 import java.io.IOException;
 import java.sql.SQLException;
-import javax.servlet.ServletException;
 import org.junit.BeforeClass;
 import org.junit.FixMethodOrder;
 import org.junit.Test;
 import org.junit.runners.MethodSorters;
-
 import bbdd.BbddRunner;
 import bbdd.UtilsTestBolsaEmpleo;
 import controlador.implementacion.PeticionHttp;
@@ -43,7 +41,7 @@ public class TestBEPControladorInicio {
     	UtilsTestBolsaEmpleo.inicializaBolsaEmpleo();
     }
     
-    private VistaInicio obtenerInicio(String accion) throws ServletException, IOException {
+    private VistaInicio obtenerInicio(String accion) throws IOException {
     	PeticionHttp peticion = UtilsTestBolsaEmpleo.peticionAutenticadaPersonal();
 		peticion.setParameter(ControladorInicio.PARAM_ACCION, accion);
 
@@ -53,7 +51,7 @@ public class TestBEPControladorInicio {
 		return (VistaInicio) peticion.getUVDatos().getVistas().get(VistaInicio.class.getName());
     }
     
-    private VistaInicio obtenerInicioPublico(String accion) throws ServletException, IOException {
+    private VistaInicio obtenerInicioPublico(String accion) throws IOException {
     	PeticionHttp peticion = UtilsTestBolsaEmpleo.peticionAnonima();
 		peticion.setParameter(ControladorInicio.PARAM_ACCION, accion);
 
@@ -64,12 +62,10 @@ public class TestBEPControladorInicio {
     }
     
     /** Obtener noticias, sin parametro definido .
-	 * @throws SQLException si fallo bd  .
 	 * @throws IOException si error io .
-	 * @throws ServletException  si error servlet .
 	 */
 	@Test
-	public void testA01Obtener() throws SQLException, ServletException, IOException {
+	public void testA01Obtener() throws IOException {
 		VistaInicio bean = obtenerInicio(null);
 		
 		assertEquals(0, bean.getMensajesDeError().size());
@@ -77,12 +73,10 @@ public class TestBEPControladorInicio {
 	}
     
 	/** obtener noticias.
-	 * @throws SQLException si fallo bd 
 	 * @throws IOException si error io
-	 * @throws ServletException  si error servlet
 	 */
 	@Test
-	public void testA02ObtenerNoticias() throws SQLException, ServletException, IOException {
+	public void testA02ObtenerNoticias() throws IOException {
 		VistaInicio bean = obtenerInicio(ControladorInicio.ACCION_INDEX);
 
 		assertNotEquals(MENSAJE_NOTICIAS_DEVUELTAS, 0, bean.getNoticias().size());
@@ -92,11 +86,10 @@ public class TestBEPControladorInicio {
 	}
 	
 	/** post ayuda.
-	 * @throws ServletException si error de servlet
 	 * @throws IOException si error de io
 	 */
 	@Test
-	public void testA03Post() throws ServletException, IOException {
+	public void testA03Post() throws IOException {
 		PeticionHttp peticion = UtilsTestBolsaEmpleo.peticionAutenticadaPersonal();
 		peticion.setParameter(ControladorInicio.PARAM_ACCION, ControladorInicio.ACCION_AYUDA);
 		
@@ -110,11 +103,10 @@ public class TestBEPControladorInicio {
 	}
 	
 	/** post faq.
-	 * @throws ServletException si error de servlet
 	 * @throws IOException si error de io
 	 */
 	@Test
-	public void testA04Post() throws ServletException, IOException {
+	public void testA04Post() throws IOException {
 		PeticionHttp peticion = UtilsTestBolsaEmpleo.peticionAutenticadaPersonal();
 		peticion.setParameter(ControladorInicio.PARAM_ACCION, ControladorInicio.ACCION_FAQ);
 		
@@ -128,11 +120,10 @@ public class TestBEPControladorInicio {
 	}
 	
 	/** obtener noticias restantes .
-	 * @throws ServletException si error de servlet
 	 * @throws IOException si error de io
 	 */
 	@Test
-	public void testA05Obtener() throws ServletException, IOException {
+	public void testA05Obtener() throws IOException {
 		VistaInicio bean = obtenerInicio(ControladorInicio.ACCION_INDEX);
 		
 		PeticionHttp peticion = UtilsTestBolsaEmpleo.peticionAutenticadaPersonal();
@@ -152,11 +143,10 @@ public class TestBEPControladorInicio {
 	}
 	
 	/** post documentos.
-	 * @throws ServletException si error de servlet
 	 * @throws IOException si error de io
 	 */
 	@Test
-	public void testA06Post() throws ServletException, IOException {
+	public void testA06Post() throws IOException {
 		PeticionHttp peticion = UtilsTestBolsaEmpleo.peticionAutenticadaPersonal();
 		peticion.setParameter(ControladorInicio.PARAM_ACCION, ControladorInicio.ACCION_DOCUMENTOS);
 		
@@ -171,11 +161,10 @@ public class TestBEPControladorInicio {
 	}
 	
 	/** obtener documentos.
-	 * @throws ServletException si error de servlet
 	 * @throws IOException si error de io
 	 */
 	@Test
-	public void testA07ObtenerDocumentos() throws ServletException, IOException {
+	public void testA07ObtenerDocumentos() throws IOException {
 		VistaInicio bean = obtenerInicio(ControladorInicio.ACCION_DOCUMENTOS);
 
 		assertNotEquals(MENSAJE_DOCUMENTOS_DEVUELTOS, 0, bean.getFicheros().size());
@@ -185,12 +174,10 @@ public class TestBEPControladorInicio {
 	}
 	
 	/** Obtener noticias, sin parametro definido con usuario anónimo .
-	 * @throws SQLException si fallo bd  .
 	 * @throws IOException si error io .
-	 * @throws ServletException  si error servlet .
 	 */
 	@Test
-	public void testA08ObtenerPublico() throws SQLException, ServletException, IOException {
+	public void testA08ObtenerPublico() throws IOException {
 		VistaInicio bean = obtenerInicioPublico(null);
 		
 		assertEquals(0, bean.getMensajesDeError().size());
@@ -198,12 +185,10 @@ public class TestBEPControladorInicio {
 	}
 	
 	/** obtener noticia con usuario anónimo .
-	 * @throws SQLException si fallo bd 
 	 * @throws IOException si error io
-	 * @throws ServletException  si error servlet
 	 */
 	@Test
-	public void testA09ObtenerNoticiaPublica() throws SQLException, ServletException, IOException {
+	public void testA09ObtenerNoticiaPublica() throws IOException {
 		VistaInicio bean = obtenerInicioPublico(ControladorInicio.ACCION_INDEX);
 
 		assertNotEquals(MENSAJE_NOTICIAS_DEVUELTAS, 0, bean.getNoticias().size());
@@ -213,11 +198,10 @@ public class TestBEPControladorInicio {
 	}
 	
 	/** obtener documento con usuario anónimo .
-	 * @throws ServletException si error de servlet
 	 * @throws IOException si error de io
 	 */
 	@Test
-	public void testA07ObtenerDocumentoPublico() throws ServletException, IOException {
+	public void testA07ObtenerDocumentoPublico() throws IOException {
 		VistaInicio bean = obtenerInicioPublico(ControladorInicio.ACCION_DOCUMENTOS);
 
 		assertNotEquals(MENSAJE_DOCUMENTOS_DEVUELTOS, 0, bean.getFicheros().size());
@@ -227,11 +211,10 @@ public class TestBEPControladorInicio {
 	}
 	
 	/** obtener todas las noticias con parámetro 'noticias' no válido .
-	 * @throws ServletException .
 	 * @throws IOException .
 	 */
 	@Test
-	public void testE01ObtenerTodasNoticiasParametroNoValido() throws ServletException, IOException {
+	public void testE01ObtenerTodasNoticiasParametroNoValido() throws IOException {
 		VistaInicio bean = obtenerInicio(ControladorInicio.ACCION_INDEX);
 		
 		PeticionHttp peticion = UtilsTestBolsaEmpleo.peticionAutenticadaPersonal();

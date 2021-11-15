@@ -98,6 +98,7 @@ public class ControladorMisTitulaciones extends HttpServlet {
 	 * @see HttpServlet#doGet(HttpServletRequest request, HttpServletResponse response)
 	 */
 	@Override
+	@SuppressWarnings({"checkstyle:CyclomaticComplexity", "checkstyle:JavaNCSS", "checkstyle:ExecutableStatementCount"})
 	public void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 		UVDatos datos = (UVDatos) request.getAttribute(UVDatos.NOMBRE_ATRIBUTO);
 		datos.setDocType("<!DOCTYPE html>");
@@ -172,7 +173,7 @@ public class ControladorMisTitulaciones extends HttpServlet {
 		BolsaEmpleoUtils.readMensajeSession(bean, request);
 		
 		try {
-			bean.setUsuarioLogeado(ModeloUsuarioBolsaEmpleo.obtenerInstancia().getOrCreateUsuario(datos));
+			bean.setUsuarioLogeado(ModeloUsuarioBolsaEmpleo.obtenerInstancia().getAndRefreshUsuario(datos));
 
 			if (!bean.getUsuarioLogeado().getRol().getCodNum().equals(ModeloRol.ID_ROL_CANDIDATO)) {
 				throw new UVException("No eres un candidato");
@@ -199,7 +200,7 @@ public class ControladorMisTitulaciones extends HttpServlet {
 		doGet(request, response);
 	}	
 	
-	private void listadoTitulaciones(VistaTitulaciones bean, UVDatos datos, HttpServletRequest request, HttpServletResponse response) throws IOException, SQLException {
+	private void listadoTitulaciones(VistaTitulaciones bean, UVDatos datos, HttpServletRequest request, HttpServletResponse response) throws IOException {
 		ModeloMisTitulaciones modelo = ModeloMisTitulaciones.obtenerInstancia();
 		datos.setContentType(RESPONSE_AJAX_CONTENTTYPE);
 		response.setContentType(RESPONSE_AJAX_CONTENTTYPE);
@@ -227,7 +228,7 @@ public class ControladorMisTitulaciones extends HttpServlet {
 		}
 	}
 	
-	private void listadoTitulacionesUsuario(VistaTitulaciones bean, UVDatos datos, HttpServletRequest request, HttpServletResponse response) throws IOException, SQLException {
+	private void listadoTitulacionesUsuario(VistaTitulaciones bean, UVDatos datos, HttpServletRequest request, HttpServletResponse response) throws IOException {
 		ModeloMisTitulaciones modelo = ModeloMisTitulaciones.obtenerInstancia();
 		datos.setContentType(RESPONSE_AJAX_CONTENTTYPE);
 		response.setContentType(RESPONSE_AJAX_CONTENTTYPE);
@@ -269,8 +270,8 @@ public class ControladorMisTitulaciones extends HttpServlet {
 		bean.setVista(RUTA_BEP_CONF + "formMisTitulaciones.jsp");
 	}
 	
-	private void agregarTitulacionFormulario(VistaTitulaciones bean) throws SQLException, UVException {			
-		bean.setVista(RUTA_BEP_CONF + "formMisTitulaciones.jsp");		
+	private void agregarTitulacionFormulario(VistaTitulaciones bean) {
+		bean.setVista(RUTA_BEP_CONF + "formMisTitulaciones.jsp");
 	}
 	
 	private void agregarTitulacion(UVDatos datos, HttpServletRequest request, HttpServletResponse response, VistaTitulaciones bean) 

@@ -26,7 +26,7 @@ VistaTitulaciones bean = (VistaTitulaciones) uvdatos.getVistas().get(VistaTitula
 		<% } %>
 	</div>
 		
-	<table class="bluetable bolsaempleo" id="tableTitulacionesUsuario">
+	<table class="bluetable bolsaempleo" id="tableTitulacionesUsuarioMTI">
 		<tr>
 			<th scope="col" style="width:10%"></th>
 			<th scope="col" style="width:60%">Titulación</th>		
@@ -74,10 +74,11 @@ $(document).ready(function() {
       	});
 	}
 	
-	var table_titulaciones = new Atis.DataTable('#tableTitulacionesUsuario', {
+	var table_titulaciones = new Atis.DataTable('#tableTitulacionesUsuarioMTI', {
 		"ajax": { url: "<%=ControladorMisTitulaciones.URL_PATTERN_AJAX%>", async: false },
 		"selectable": true,
 	    "filterable": true,
+	    "stateSave": true,
 	    "pageSize": 10,
 	    "action": "<%=ControladorMisTitulaciones.ACCION_DATATABLE_TITULACIONES_USUARIO%>",
 	    "columns": [

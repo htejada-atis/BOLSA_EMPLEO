@@ -253,6 +253,7 @@ public class TestBEPModeloBaremacionBloques {
 	 * error editar bloque usado.
 	 */
 	@Test
+	@SuppressWarnings({"checkstyle:magicnumber"})
 	public void testE05nosepuedeeditarbloqueusandose() {
 		Throwable throwable = assertThrows(Throwable.class, () -> {
 			// bloque del item = 1

@@ -22,7 +22,7 @@ VistaTitulaciones bean = (VistaTitulaciones) uvdatos.getVistas().get(VistaTitula
 	    </button>
 	</div>
 	
-	<table class="bluetable bolsaempleo" id="table_titulaciones">
+	<table class="bluetable bolsaempleo" id="tableTitulacionesTIT">
 		<tr>
 			<th scope="col" style="width:10%" title="Id de la titulación">Id</th>
 			<th scope="col"	style="width:80%">Nombre</th>
@@ -43,11 +43,12 @@ VistaTitulaciones bean = (VistaTitulaciones) uvdatos.getVistas().get(VistaTitula
 
 	$(document).ready(function() {
 		
-		var table_titulaciones = new Atis.DataTable('#table_titulaciones', {
+		var table_titulaciones = new Atis.DataTable('#tableTitulacionesTIT', {
 		    "ajax": { url: "<%=ControladorGestionTitulaciones.URL_PATTERN_AJAX%>" },
 		    "pageSize": 10,
 		    "action": "<%=ControladorGestionTitulaciones.ACCION_DATATABLE_TITULACIONES%>",
 		    "filterable": true,
+		    "stateSave": true,
 		    "defaultOrderBy": 1,
 		    "columns": [
 		    	{'data': 'codNum', 'filter': {'type': 'number'}},

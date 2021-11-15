@@ -20,12 +20,13 @@ import es.ujaen.uvirtual.utilidades.UVException;
  * @author ATISoluciones
  */
 public class ModeloParametrosConfiguracion {
-	public static final String VERSION = "0.75";
-	public static final String JS_BOLSA_EMPLEO = "/js/bolsaempleo/bolsaempleo20210715.min.js";
+	public static final String VERSION = "0.84";
+	public static final String JS_BOLSA_EMPLEO = "/js/bolsaempleo/bolsaempleo20211109.min.js";
 	public static final String CSS_BOLSA_EMPLEO = "/css/ujaen_bolsa_empleo.css";
 	public static final String JS_TINY = "/js/tinymce/tinymce.min.js";
 	
 	public static final String PARAMETRO_PLANTILLA_APERTURA_PLAZA = "bolsaempleo.local.idPlantillaAperturaPlaza";
+	public static final String PARAMETRO_PLANTILLA_APROBACION_PLAZA = "bolsaempleo.local.idPlantillaAprobacionPlaza";
 	public static final String PARAMETRO_PLANTILLA_CITA_CONTRATACION = "bolsaempleo.local.idPlantillaCitaContratacion";
 	public static final String PARAMETRO_PLANTILLA_CIERRE_PLAZA = "bolsaempleo.local.idPlantillaCierrePlaza";
 	public static final String PARAMETRO_EMAILS_CIERRE_PLAZA = "bolsaempleo.local.emailsCierrePlaza";
@@ -184,25 +185,25 @@ public class ModeloParametrosConfiguracion {
 					return param;
 				}
 			}
-		} else {
-			String consulta = "SELECT * FROM ADM_PARAMETROS " + " WHERE PARAM_CODALF=?";
+		}
+		
+		String consulta = "SELECT * FROM ADM_PARAMETROS " + " WHERE PARAM_CODALF=?";
 
-			try (Connection conexion = ConexionUvirtual.obtenerInstancia(); PreparedStatement stmt = conexion.prepareStatement(consulta)) {
-				stmt.setString(1, nombre);
+		try (Connection conexion = ConexionUvirtual.obtenerInstancia(); PreparedStatement stmt = conexion.prepareStatement(consulta)) {
+			stmt.setString(1, nombre);
 
-				try (ResultSet rs = stmt.executeQuery()) {
-					if (!rs.next()) {
-						throw new UVException("No existe el parametro con nombre" + nombre);
-					}
-
-					ParametrosConfiguracion param = new ParametrosConfiguracion();
-					param.setCodNum(rs.getString("CONFIG_CODALF"));
-					param.setNombre(rs.getString("PARAM_CODALF"));
-					param.setDescripcion(rs.getString("DESID"));
-					param.setValor(rs.getString("VALOR"));
-
-					return param;
+			try (ResultSet rs = stmt.executeQuery()) {
+				if (!rs.next()) {
+					throw new UVException("No existe el parametro con nombre" + nombre);
 				}
+
+				ParametrosConfiguracion param = new ParametrosConfiguracion();
+				param.setCodNum(rs.getString("CONFIG_CODALF"));
+				param.setNombre(rs.getString("PARAM_CODALF"));
+				param.setDescripcion(rs.getString("DESID"));
+				param.setValor(rs.getString("VALOR"));
+
+				return param;
 			}
 		}
 	}

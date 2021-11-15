@@ -6,7 +6,6 @@ import java.sql.SQLException;
 import java.util.logging.Logger;
 import java.util.List;
 import java.util.logging.Level;
-import javax.servlet.ServletException;
 import javax.servlet.ServletOutputStream;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
@@ -89,7 +88,8 @@ public class ControladorFiltrarTitulacion extends HttpServlet {
 	 * @see HttpServlet#doGet(HttpServletRequest request, HttpServletResponse response)
 	 */
 	@Override
-	public void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+	@SuppressWarnings({"checkstyle:CyclomaticComplexity", "checkstyle:JavaNCSS", "checkstyle:ExecutableStatementCount"})
+	public void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException {
 		UVDatos datos = (UVDatos) request.getAttribute(UVDatos.NOMBRE_ATRIBUTO);
 		datos.setDocType("<!DOCTYPE html>");
 		datos.setContentType("text/html");
@@ -163,7 +163,7 @@ public class ControladorFiltrarTitulacion extends HttpServlet {
 	 * @see HttpServlet#doPost(HttpServletRequest request, HttpServletResponse response)
 	 */
 	@Override
-	public void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+	public void doPost(HttpServletRequest request, HttpServletResponse response) throws IOException {
 		doGet(request, response);
 	}
 	
@@ -172,7 +172,7 @@ public class ControladorFiltrarTitulacion extends HttpServlet {
 		BolsaEmpleoUtils.readMensajeSession(bean, request);
 		
 		try {
-			bean.setUsuarioLogeado(ModeloUsuarioBolsaEmpleo.obtenerInstancia().getOrCreateUsuario(datos));
+			bean.setUsuarioLogeado(ModeloUsuarioBolsaEmpleo.obtenerInstancia().getAndRefreshUsuario(datos));
 			
 			if (!bean.getUsuarioLogeado().getRol().getCodNum().equals(ModeloRol.ID_ROL_SERVICIO_PERSONAL)) {
 				throw new UVException("No tienes permiso de personal");
@@ -209,7 +209,7 @@ public class ControladorFiltrarTitulacion extends HttpServlet {
 	}
 	
 	private void seleccionarTitulacion(VistaFiltrar bean, UVDatos datos, HttpServletRequest request, HttpServletResponse response, boolean seleccionado)
-			throws IOException, UVException, SQLException {
+			throws IOException {
 		ModeloMisTitulaciones modeloTitulacion = ModeloMisTitulaciones.obtenerInstancia();
 		ModeloUsuarioBolsaEmpleo modeloUsuario = ModeloUsuarioBolsaEmpleo.obtenerInstancia();
 		datos.setContentType(RESPONSE_AJAX_CONTENTTYPE);
@@ -251,7 +251,7 @@ public class ControladorFiltrarTitulacion extends HttpServlet {
 		}
 	}
 	
-	private void listadoCandidatos(VistaFiltrar bean, UVDatos datos, HttpServletRequest request, HttpServletResponse response) throws IOException, SQLException {
+	private void listadoCandidatos(VistaFiltrar bean, UVDatos datos, HttpServletRequest request, HttpServletResponse response) throws IOException {
 		ModeloCandidato modeloCandidato = ModeloCandidato.obtenerInstancia();
 		
 		datos.setContentType(RESPONSE_AJAX_CONTENTTYPE);
@@ -279,7 +279,7 @@ public class ControladorFiltrarTitulacion extends HttpServlet {
 		}
 	}	
 	
-	private void listadoTitulacionesCandidato(VistaFiltrar bean, UVDatos datos, HttpServletRequest request, HttpServletResponse response) throws IOException, SQLException {
+	private void listadoTitulacionesCandidato(VistaFiltrar bean, UVDatos datos, HttpServletRequest request, HttpServletResponse response) throws IOException {
 		ModeloMisTitulaciones modelo = ModeloMisTitulaciones.obtenerInstancia();
 		datos.setContentType(RESPONSE_AJAX_CONTENTTYPE);
 		response.setContentType(RESPONSE_AJAX_CONTENTTYPE);
@@ -383,7 +383,7 @@ public class ControladorFiltrarTitulacion extends HttpServlet {
 		}
 	}
 	
-	private void exportarSinTitulacion(UVDatos datos, HttpServletResponse response) throws IOException, SQLException, UVException {
+	private void exportarSinTitulacion(UVDatos datos, HttpServletResponse response) throws SQLException, UVException {
 		
 		datos.setRespuestaEnviada(true);
 		datos.setContentType(RESPONSE_CSV_CONTENTTYPE);		

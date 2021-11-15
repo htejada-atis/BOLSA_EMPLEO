@@ -140,20 +140,22 @@ public class ModeloOfertaCandidato {
 	/** aceptar plaza ofertada para un candidato .
 	 * @param plaza .
 	 * @param candidato .
+	 * @param usuarioUpdate .
 	 * @throws SQLException .
 	 * @throws UVException .
 	 */
-	public void aceptarOfertaCandidato(PlazaOfertada plaza, UsuarioBolsaEmpleo candidato) throws SQLException, UVException {
+	public void aceptarOfertaCandidato(PlazaOfertada plaza, UsuarioBolsaEmpleo candidato, UsuarioBolsaEmpleo usuarioUpdate) throws SQLException, UVException {
 		try (Connection conexion = ConexionUvirtual.obtenerInstancia()) {
 			conexion.setAutoCommit(false);
 			try {
-				OfertaCandidato oferta = obtenerOfertaPlazaAbiertaCandidato(plaza, candidato, conexion);
+				OfertaCandidato oferta = usuarioUpdate.isServicioPersonal() ? obtenerOfertaPlazaCandidato(plaza, candidato, conexion) 
+						: obtenerOfertaPlazaAbiertaCandidato(plaza, candidato, conexion);
 				if (oferta != null) {
 					oferta.setResultado(true);
-					actualizaOfertaCandidato(oferta, candidato, conexion);
+					actualizaOfertaCandidato(oferta, usuarioUpdate, conexion);
 				} else {
 					oferta = new OfertaCandidato(plaza, candidato, true, 0);
-					insertaOfertaCandidato(oferta, candidato, conexion);
+					insertaOfertaCandidato(oferta, usuarioUpdate, conexion);
 				}
 				
 				conexion.commit();
@@ -216,10 +218,34 @@ public class ModeloOfertaCandidato {
 			
 			try (ResultSet rs = stmt.executeQuery()) {
 				if (rs.next()) {
-					if (rs.getInt("FECHA_VIGENTE") == 0) {
+					if (rs.getInt("ABIERTA_VIGENTE") == 0) {
 						throw new UVException("La plaza ya no está disponible");
 					}
-					createOfertaCandidatoFromResultSet(rs);
+					return createOfertaCandidatoFromResultSet(rs);
+				}
+				
+			}
+		}
+		
+		return null;
+	}
+	
+	private OfertaCandidato obtenerOfertaPlazaCandidato(PlazaOfertada plaza, UsuarioBolsaEmpleo candidato, Connection conexion) throws SQLException, UVException {
+		String consulta = "SELECT bepofc.*, bepcnt.CODNUM AS CONTRATACION"
+				+ " FROM TBEP_OFERTAS_CANDIDATOS bepofc"
+				+ " INNER JOIN TBEP_PLAZAS_OFERTADAS bepplo ON bepplo.CODNUM = bepofc.BEPPLO_CODNUM"
+				+ " LEFT JOIN TBEP_CONTRATACIONES bepcnt ON bepcnt.BEPUSU_CODNUM = bepofc.BEPUSU_CODNUM AND bepcnt.BEPPLO_CODNUM = bepplo.CODNUM"
+				+ " WHERE   bepofc.BEPUSU_CODNUM = ?"
+				+ "     AND bepplo.CODNUM = ?";
+		
+		try (PreparedStatement stmt = conexion.prepareStatement(consulta)) {
+			int parameterIndex = 1;
+			stmt.setInt(parameterIndex++, candidato.getCodNum());
+			stmt.setInt(parameterIndex++, plaza.getCodNum());
+			
+			try (ResultSet rs = stmt.executeQuery()) {
+				if (rs.next()) {
+					return createOfertaCandidatoFromResultSet(rs);
 				}
 				
 			}

@@ -237,9 +237,8 @@ public class ModeloAfinidad {
 	 * @param afinidades Afinidades a borrar
 	 * @param usuarioUpdate .
 	 * @throws SQLException en caso de error en la BD
-	 * @throws UVException si afinidad no es valida
 	 */
-	public void borraAfinidades(Collection<Afinidad> afinidades, UsuarioBolsaEmpleo usuarioUpdate) throws SQLException, UVException {
+	public void borraAfinidades(Collection<Afinidad> afinidades, UsuarioBolsaEmpleo usuarioUpdate) throws SQLException {
 		String params = BolsaEmpleoUtils.consultaMultiplesParametros(afinidades.size());
 		String query = "UPDATE tbep_afinidades SET FLGBORRADO=?,FECHA_BORRADO=?,UID_USUARIO=? WHERE CODNUM IN (" + params + ")";		
 		try (Connection conexion = ConexionUvirtual.obtenerInstancia(); PreparedStatement stmt = conexion.prepareStatement(query)) {

@@ -3,6 +3,7 @@
 <%@	page import="es.ujaen.uvirtual.modulo.bolsaempleo.controlador.ControladorContratacion" %>
 <%@	page import="es.ujaen.uvirtual.modulo.bolsaempleo.modelo.ModeloPlazaOfertada" %>
 <%@ page import="es.ujaen.uvirtual.modulo.bolsaempleo.vistas.VistaContratacion" %>
+<%@ page import="es.ujaen.uvirtual.modulo.bolsaempleo.utilidades.BolsaEmpleoUtils" %>
 <%@ page import="es.ujaen.uvirtual.utilidades.EscapaHTML" %>
 <%@ page import="es.ujaen.uvirtual.utilidades.Formateador" %>
 <%@ page import="java.util.Map.Entry" %>
@@ -17,30 +18,33 @@ VistaContratacion bean = (VistaContratacion) uvdatos.getVistas().get(VistaContra
 	
 	<h2>Plazas ofertadas</h2>
 	
-	<button class="link-btn" id="nueva_plaza" style="float: right">
-		Nueva plaza
-	</button>
+	<div style="display: flex; flex-direction: row-reverse; justify-content: space-between;">
+		<button class="link-btn" id="nueva_plaza" style="float: right; overflow: hidden;">
+			Nueva plaza
+		</button>
+		
+	<%	if (bean.getUsuarioLogeado().isServicioPersonal()) { %>
+			<button class="link-btn" id="exportar_plazas" title="Exportar plazas ofertadas a csv">Exportar a csv</button>
+	<%	} %>
+	</div>
 	
-	<% if (bean.getUsuarioLogeado().isServicioPersonal()) { %>
-		<button class="link-btn" id="exportar_plazas" title="Exportar plazas ofertadas a csv">Exportar a csv</button>
-	<% } %>
-	
-	<table class="bluetable bolsaempleo" id="tablePlazasOfertadas">
+	<table class="bluetable bolsaempleo" id="tablePlazasOfertadasCPO">
 		<tr>
-			<th scope="col" style="width:20px">Id</th>
-			<th scope="col" style="width:46px">Código</th>
+			<th scope="col" style="width:18px">Id</th>
+			<th scope="col" style="width:52px">Código</th>
 			<th scope="col" style="width:100%">Área</th>
 			<th scope="col" style="width:88px">Estado</th>
-			<th scope="col" style="width:86px">Fecha creación</th>
-			<th scope="col" style="width:80px">Fecha abierta</th>
-			<th scope="col" style="width:88px">Fecha fin oferta</th>
-			<th scope="col" style="width:80px">Fecha cerrada</th>
+			<th scope="col" style="width:48px">Curso</th>
+			<th scope="col" style="width:61px">Fecha creación</th>
+			<th scope="col" style="width:61px">Fecha abierta</th>
+			<th scope="col" style="width:61px">Fecha fin oferta</th>
+			<th scope="col" style="width:61px">Fecha cerrada</th>
 		</tr>
 		<tbody>
 		</tbody>
 		<tfoot>
 			<tr>
-				<th colSpan="8" style="width:100%"></th>
+				<th colSpan="9" style="width:100%"></th>
 			</tr>
 		</tfoot>
 	</table>
@@ -53,17 +57,23 @@ $(document).ready(function() {
 <%	for (Entry<String, String> est: ModeloPlazaOfertada.ESTADOS.entrySet()) { %>
 		estadosPlaza["<%= est.getKey() %>"] = "<%= est.getValue() %>";
 <%	} %>
+
+	var cursosPlaza = {};
+<%	for (String curso: bean.getCursos()) { %>
+		cursosPlaza["<%= curso %>"] = "<%= curso %>";
+<%	} %>
 	
-	var table = new Atis.DataTable('#tablePlazasOfertadas', {
+	var table = new Atis.DataTable('#tablePlazasOfertadasCPO', {
 		"ajax": { url: "<%= ControladorContratacion.URL_PATTERN_AJAX %>" },
 		"pageSize": 10,
-		"defaultOrderBy": 4,
+		"defaultOrderBy": 5,
 		"defaultOrderDirection": 'desc',
 		"filterable": true,
+		"stateSave": true,
 		"action": "<%= ControladorContratacion.ACCION_DATATABLE_PLAZAS_OFERTADAS %>",
 		"clickable": {'onClick': function(row) {
 			var params = {
-					'a': '<%= ControladorContratacion.ACCION_SELECCIONAR_PLAZA_OFERTADA %>', 
+					'a': '<%= ControladorContratacion.ACCION_SELECCIONAR_PLAZA_OFERTADA %>',
 					'<%= ControladorContratacion.PARAM_PLAZA_OFERTADA %>': row.codNum};
 			Atis.sendForm("<%= request.getRequestURI() %>", params);
 		}},
@@ -74,6 +84,7 @@ $(document).ready(function() {
 				return row.area.idAreaExterno + ' ' + row.area.descripcion;
 			}},
 			{'data': 'estado', 'filter': {'type': 'select', 'options': estadosPlaza}},
+			{'data': 'curso', 'filter': {'type': 'select', 'options': cursosPlaza, 'optionDefault': '<%= bean.getCursos().get(0) %>'}},
 			{'data': 'fechaCreacion', 'filter': {'type': 'date'}},
 			{'data': 'fechaAbierta', 'filter': {'type': 'date'}},
 			{'data': 'fechaFinOferta', 'filter': {'type': 'date'}},

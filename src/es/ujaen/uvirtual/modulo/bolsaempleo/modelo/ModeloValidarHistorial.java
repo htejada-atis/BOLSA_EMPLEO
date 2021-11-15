@@ -7,7 +7,6 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
-import java.util.Map;
 import es.ujaen.uvirtual.modelo.conexion.ConexionUvirtual;
 import es.ujaen.uvirtual.modulo.bolsaempleo.beans.Afinidad;
 import es.ujaen.uvirtual.modulo.bolsaempleo.beans.Bolsa;
@@ -15,12 +14,9 @@ import es.ujaen.uvirtual.modulo.bolsaempleo.beans.Convocatoria;
 import es.ujaen.uvirtual.modulo.bolsaempleo.beans.Historial;
 import es.ujaen.uvirtual.modulo.bolsaempleo.beans.HistorialMerito;
 import es.ujaen.uvirtual.modulo.bolsaempleo.beans.HistorialSBM;
-import es.ujaen.uvirtual.modulo.bolsaempleo.beans.HistorialValidacion;
 import es.ujaen.uvirtual.modulo.bolsaempleo.beans.HistorialValoracionMerito;
 import es.ujaen.uvirtual.modulo.bolsaempleo.beans.ItemBaremacion;
 import es.ujaen.uvirtual.modulo.bolsaempleo.beans.Merito;
-import es.ujaen.uvirtual.modulo.bolsaempleo.utilidades.BolsaEmpleoDataTable;
-import es.ujaen.uvirtual.modulo.bolsaempleo.utilidades.BolsaEmpleoDataTable.DataTableColumn;
 import es.ujaen.uvirtual.utilidades.UVException;
 
 /**

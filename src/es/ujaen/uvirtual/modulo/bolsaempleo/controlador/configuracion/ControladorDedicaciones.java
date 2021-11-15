@@ -16,7 +16,6 @@ import es.ujaen.uvirtual.beans.UVDatos;
 import es.ujaen.uvirtual.modulo.bolsaempleo.beans.Dedicacion;
 import es.ujaen.uvirtual.modulo.bolsaempleo.modelo.ModeloDedicacion;
 import es.ujaen.uvirtual.modulo.bolsaempleo.modelo.ModeloParametrosConfiguracion;
-import es.ujaen.uvirtual.modulo.bolsaempleo.modelo.ModeloPlazaOfertada;
 import es.ujaen.uvirtual.modulo.bolsaempleo.modelo.ModeloRol;
 import es.ujaen.uvirtual.modulo.bolsaempleo.modelo.ModeloUsuarioBolsaEmpleo;
 import es.ujaen.uvirtual.modulo.bolsaempleo.utilidades.BolsaEmpleoDataTable;
@@ -149,7 +148,7 @@ public class ControladorDedicaciones extends HttpServlet {
 		BolsaEmpleoUtils.readMensajeSession(bean, request);
 		
 		try {
-			bean.setUsuarioLogeado(ModeloUsuarioBolsaEmpleo.obtenerInstancia().getOrCreateUsuario(datos));
+			bean.setUsuarioLogeado(ModeloUsuarioBolsaEmpleo.obtenerInstancia().getAndRefreshUsuario(datos));
 			
 			// personal, comision, direccion
 			int[] rolesValidos = {ModeloRol.ID_ROL_SERVICIO_PERSONAL, ModeloRol.ID_ROL_DIRECTOR_DEPARTAMENTO};

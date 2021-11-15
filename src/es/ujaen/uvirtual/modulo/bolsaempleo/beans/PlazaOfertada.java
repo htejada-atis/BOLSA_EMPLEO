@@ -16,14 +16,16 @@ public class PlazaOfertada implements Serializable {
 	private String idPlaza;
 	private String justificacion;
 	private String duracionPrevista;
-	private String cuatrimestre;
 	private String centroDestino;
+	private String cuatrimestre;
+	private String curso;
 	private String estado;
 	private Date fechaCreacion;
 	private Date fechaAbierta;
 	private Date fechaFinOferta;
 	private Date fechaCerrada;
 	private Date fechaNRI;
+	private UsuarioBolsaEmpleo creador;
 	private transient InputStream horario;
 	private transient InputStream nri;
 	private Boolean abiertaVigente;
@@ -230,7 +232,7 @@ public class PlazaOfertada implements Serializable {
 	public Boolean isAbiertaVigente() {
 		return abiertaVigente;
 	}
-
+	
 	public void setAbiertaVigente(Boolean abiertaVigente) {
 		this.abiertaVigente = abiertaVigente;
 	}
@@ -238,7 +240,7 @@ public class PlazaOfertada implements Serializable {
 	public String getIdPlaza() {
 		return idPlaza;
 	}
-
+	
 	public void setIdPlaza(String idPlaza) {
 		this.idPlaza = idPlaza;
 	}
@@ -246,16 +248,32 @@ public class PlazaOfertada implements Serializable {
 	public Boolean isActiva() {
 		return activa;
 	}
-
+	
 	public void setActiva(Boolean activa) {
 		this.activa = activa;
+	}
+	
+	public String getCurso() {
+		return curso;
+	}
+	
+	public void setCurso(String curso) {
+		this.curso = curso;
+	}
+	
+	public UsuarioBolsaEmpleo getCreador() {
+		return creador;
+	}
+
+	public void setCreador(UsuarioBolsaEmpleo creador) {
+		this.creador = creador;
 	}
 	
 	@Override
 	public String toString() {
 		return "PlazaOfertada [codNum=" + codNum + ", area=" + area + ", estado=" + estado + ", fechaCreacion=" + fechaCreacion + ", fechaAbierta=" 
 				+ fechaAbierta + ", fechaFinOferta=" + fechaFinOferta + ", fechaCerrada=" + fechaCerrada + ", fechaFinOferta=" + fechaFinOferta
-				+ ", abiertaVigente=" + abiertaVigente + ", idPlaza=" + idPlaza + ", activa=" + activa + "]";
+				+ ", abiertaVigente=" + abiertaVigente + ", idPlaza=" + idPlaza + ", activa=" + activa + ", curso=" + curso + ", creador=" + creador + "]";
 	}
 	
 	@Override
@@ -280,6 +298,8 @@ public class PlazaOfertada implements Serializable {
 		result = prime * result + ((abiertaVigente == null) ? 0 : abiertaVigente.hashCode());
 		result = prime * result + ((idPlaza == null) ? 0 : idPlaza.hashCode());
 		result = prime * result + ((activa == null) ? 0 : activa.hashCode());
+		result = prime * result + ((curso == null) ? 0 : curso.hashCode());
+		result = prime * result + ((creador == null) ? 0 : creador.hashCode());
 		return result;
 	}
 
@@ -421,6 +441,20 @@ public class PlazaOfertada implements Serializable {
 				return false;
 			}
 		} else if (!activa.equals(other.activa)) {
+			return false;
+		}
+		if (curso == null) {
+			if (other.curso != null) {
+				return false;
+			}
+		} else if (!curso.equals(other.curso)) {
+			return false;
+		}
+		if (creador == null) {
+			if (other.creador != null) {
+				return false;
+			}
+		} else if (!creador.equals(other.creador)) {
 			return false;
 		}
 		

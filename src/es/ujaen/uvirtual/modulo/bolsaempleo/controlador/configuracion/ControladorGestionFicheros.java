@@ -154,7 +154,7 @@ public class ControladorGestionFicheros extends HttpServlet {
 		BolsaEmpleoUtils.readMensajeSession(bean, request);
 		
 		try {
-			bean.setUsuarioLogeado(ModeloUsuarioBolsaEmpleo.obtenerInstancia().getOrCreateUsuario(datos));
+			bean.setUsuarioLogeado(ModeloUsuarioBolsaEmpleo.obtenerInstancia().getAndRefreshUsuario(datos));
 
 			if (!bean.getUsuarioLogeado().getRol().getCodNum().equals(ModeloRol.ID_ROL_SERVICIO_PERSONAL)) {
 				throw new UVException("No tienes permiso de personal");
@@ -220,11 +220,10 @@ public class ControladorGestionFicheros extends HttpServlet {
 	 * @param response .
 	 * @param publico .
 	 * @throws IOException .
-	 * @throws SQLException .
 	 * @throws UVException .
 	 */
 	private void cambiarFicherosPublico(VistaFicheros bean, UVDatos datos, HttpServletRequest request, HttpServletResponse response, Boolean publico)
-			throws SQLException, UVException, IOException {
+			throws UVException, IOException {
 		ModeloFichero modelo = ModeloFichero.obtenerInstancia();
 		
 		Gson gson = new GsonBuilder().create();
@@ -250,11 +249,10 @@ public class ControladorGestionFicheros extends HttpServlet {
 	 * @param datos .
 	 * @param request .
 	 * @param response .
-	 * @throws SQLException excepcion de bbdd .
 	 * @throws UVException en caso de error de parametros .
 	 * @throws IOException en caso de error de IO .
 	 */
-	private void eliminarFicheros(VistaFicheros bean, UVDatos datos, HttpServletRequest request, HttpServletResponse response) throws SQLException, UVException, IOException {
+	private void eliminarFicheros(VistaFicheros bean, UVDatos datos, HttpServletRequest request, HttpServletResponse response) throws UVException, IOException {
 		ModeloFichero modelo = ModeloFichero.obtenerInstancia();
 		
 		Gson gson = new GsonBuilder().create();
@@ -281,10 +279,9 @@ public class ControladorGestionFicheros extends HttpServlet {
 	 * @param datos .
 	 * @param request .
 	 * @param response .
-	 * @throws SQLException en caso de error de base de datos .
 	 * @throws IOException en caso de error de IO .
 	 */
-	private void listadoFicheros(VistaFicheros bean, UVDatos datos, HttpServletRequest request, HttpServletResponse response) throws IOException, SQLException {
+	private void listadoFicheros(VistaFicheros bean, UVDatos datos, HttpServletRequest request, HttpServletResponse response) throws IOException {
 		ModeloFichero modelo = ModeloFichero.obtenerInstancia();
 		
 		datos.setContentType(RESPONSE_AJAX_CONTENTTYPE);

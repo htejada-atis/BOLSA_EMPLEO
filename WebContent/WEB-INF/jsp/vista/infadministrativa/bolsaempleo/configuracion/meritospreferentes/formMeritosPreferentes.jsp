@@ -285,7 +285,7 @@ MeritoPreferente merito = bean.getMeritoPreferente();
 	    	<% if (merito == null) { %>
 	    		<p>Cree el mérito antes para poder añadir las opciones</p>
 	    	<% } else { %>
-	    		<table class="bluetable bolsaempleo" id="table_opciones">
+	    		<table class="bluetable bolsaempleo" id="tableOpcionesMPR">
 					<tr>
 						<th scope="col"	style="width:70%" title="Descripción del mérito">Nombre</th>
 						<th scope="col"	style="width:20%">Factor</th>
@@ -409,7 +409,7 @@ MeritoPreferente merito = bean.getMeritoPreferente();
 		});
 		
 		<% if (merito != null) { %>
-			var table = new Atis.DataTable('#table_opciones', {
+			var table = new Atis.DataTable('#tableOpcionesMPR', {
 			    "ajax": { url: "<%=  ControladorMeritosPreferentes.URL_PATTERN_AJAX %>" },
 			    "pageSize": 10,
 			    "action": "<%= ControladorMeritosPreferentes.ACCION_DATATABLE_OPCIONES %>",

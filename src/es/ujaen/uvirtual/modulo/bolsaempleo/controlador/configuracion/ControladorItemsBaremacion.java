@@ -154,6 +154,7 @@ public class ControladorItemsBaremacion extends HttpServlet {
 	 * @see HttpServlet#doGet(HttpServletRequest request, HttpServletResponse response)
 	 */
 	@Override
+	@SuppressWarnings({"checkstyle:CyclomaticComplexity", "checkstyle:JavaNCSS"})
 	public void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 		UVDatos datos = (UVDatos) request.getAttribute(UVDatos.NOMBRE_ATRIBUTO);
 		datos.setDocType("<!DOCTYPE html>");
@@ -251,7 +252,7 @@ public class ControladorItemsBaremacion extends HttpServlet {
 		BolsaEmpleoUtils.readMensajeSession(bean, request);
 		
 		try {
-			bean.setUsuarioLogeado(ModeloUsuarioBolsaEmpleo.obtenerInstancia().getOrCreateUsuario(datos));
+			bean.setUsuarioLogeado(ModeloUsuarioBolsaEmpleo.obtenerInstancia().getAndRefreshUsuario(datos));
 
 			if (!bean.getUsuarioLogeado().getRol().getCodNum().equals(ModeloRol.ID_ROL_SERVICIO_PERSONAL)) {
 				throw new UVException(MENSAJE_ERROR_SIN_PERMISO_PERSONAL);
@@ -304,7 +305,7 @@ public class ControladorItemsBaremacion extends HttpServlet {
 		}
 	}
 	
-	private void listadoApartados(VistaItemsBaremacion bean, UVDatos datos, HttpServletRequest request, HttpServletResponse response) throws IOException, SQLException {
+	private void listadoApartados(VistaItemsBaremacion bean, UVDatos datos, HttpServletRequest request, HttpServletResponse response) throws IOException {
 		datos.setRespuestaEnviada(true);
 		datos.setContentType(RESPONSE_AJAX_CONTENTTYPE);		
 		response.setContentType(RESPONSE_AJAX_CONTENTTYPE);
@@ -622,6 +623,7 @@ public class ControladorItemsBaremacion extends HttpServlet {
 	// ITEM
 	///////////////////////////////////////////////////////////////////////////////////////////////////////////
 
+	@SuppressWarnings({"checkstyle:CyclomaticComplexity"})
 	private void accionesItems(VistaItemsBaremacion bean, UVDatos datos, HttpServletRequest request, HttpServletResponse response, String nombreAccion) 
 			throws SQLException, UVException, IOException {
 		switch (nombreAccion) {
@@ -879,7 +881,7 @@ public class ControladorItemsBaremacion extends HttpServlet {
 		BolsaEmpleoUtils.redirectWithParams(datos, request, response, params);
 	}
 	
-		
+	@SuppressWarnings({"checkstyle:CyclomaticComplexity", "checkstyle:NPathComplexity", "checkstyle:ExecutableStatementCount"})
 	private ItemBaremacion validateItemBaremacion(ItemBaremacion item, HttpServletRequest request) throws UVException, SQLException {
 		item.setCodigo(EscapaHTML.ajustaCodificacion(request.getParameter(PARAM_ITEM_CODIGO)));
 		if (item.getCodigo().isBlank()) {

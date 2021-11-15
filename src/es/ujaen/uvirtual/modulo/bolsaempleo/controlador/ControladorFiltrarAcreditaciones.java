@@ -6,7 +6,6 @@ import java.sql.SQLException;
 import java.util.logging.Logger;
 import java.util.List;
 import java.util.logging.Level;
-import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
@@ -79,7 +78,7 @@ public class ControladorFiltrarAcreditaciones extends HttpServlet {
 	 * @see HttpServlet#doGet(HttpServletRequest request, HttpServletResponse response)
 	 */
 	@Override
-	public void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+	public void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException {
 		UVDatos datos = (UVDatos) request.getAttribute(UVDatos.NOMBRE_ATRIBUTO);
 		datos.setDocType("<!DOCTYPE html>");
 		datos.setContentType("text/html");
@@ -135,7 +134,7 @@ public class ControladorFiltrarAcreditaciones extends HttpServlet {
 		BolsaEmpleoUtils.readMensajeSession(bean, request);
 		
 		try {
-			bean.setUsuarioLogeado(ModeloUsuarioBolsaEmpleo.obtenerInstancia().getOrCreateUsuario(datos));
+			bean.setUsuarioLogeado(ModeloUsuarioBolsaEmpleo.obtenerInstancia().getAndRefreshUsuario(datos));
 			
 			if (!bean.getUsuarioLogeado().getRol().getCodNum().equals(ModeloRol.ID_ROL_SERVICIO_PERSONAL)) {
 				throw new UVException("No tienes permiso de personal");
@@ -157,7 +156,7 @@ public class ControladorFiltrarAcreditaciones extends HttpServlet {
 	 * @see HttpServlet#doPost(HttpServletRequest request, HttpServletResponse response)
 	 */
 	@Override
-	public void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+	public void doPost(HttpServletRequest request, HttpServletResponse response) throws IOException {
 		doGet(request, response);
 	}
 	
@@ -205,7 +204,7 @@ public class ControladorFiltrarAcreditaciones extends HttpServlet {
 	 * @throws SQLException .
 	 */
 	private void seleccionarAcreditacion(VistaFiltrarAcreditaciones bean, UVDatos datos, HttpServletRequest request, HttpServletResponse response, boolean seleccionada)
-			throws IOException, UVException, SQLException {
+			throws IOException {
 		datos.setContentType(RESPONSE_AJAX_CONTENTTYPE);
 		datos.setRespuestaEnviada(true);
 		response.setContentType(RESPONSE_AJAX_CONTENTTYPE);
@@ -242,9 +241,8 @@ public class ControladorFiltrarAcreditaciones extends HttpServlet {
 	 * @param request .
 	 * @param response .
 	 * @throws IOException .
-	 * @throws SQLException .
 	 */
-	private void listadoCandidatos(VistaFiltrarAcreditaciones bean, UVDatos datos, HttpServletRequest request, HttpServletResponse response) throws IOException, SQLException {
+	private void listadoCandidatos(VistaFiltrarAcreditaciones bean, UVDatos datos, HttpServletRequest request, HttpServletResponse response) throws IOException {
 		ModeloCandidato modeloCandidato = ModeloCandidato.obtenerInstancia();
 				
 		datos.setRespuestaEnviada(true);
@@ -279,10 +277,9 @@ public class ControladorFiltrarAcreditaciones extends HttpServlet {
 	 * @param request .
 	 * @param response .
 	 * @throws IOException .
-	 * @throws SQLException .
 	 */
 	private void listadoAcreditacionesCandidato(VistaFiltrarAcreditaciones bean, UVDatos datos, HttpServletRequest request, HttpServletResponse response)
-			throws IOException, SQLException {
+			throws IOException {
 		datos.setContentType(RESPONSE_AJAX_CONTENTTYPE);
 		datos.setRespuestaEnviada(true);
 		response.setContentType(RESPONSE_AJAX_CONTENTTYPE);

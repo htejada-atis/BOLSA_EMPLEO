@@ -144,7 +144,7 @@ public class ControladorMisMeritosPreferentes extends HttpServlet {
 		BolsaEmpleoUtils.readMensajeSession(bean, request);
 		
 		try {
-			bean.setUsuarioLogeado(ModeloUsuarioBolsaEmpleo.obtenerInstancia().getOrCreateUsuario(datos));
+			bean.setUsuarioLogeado(ModeloUsuarioBolsaEmpleo.obtenerInstancia().getAndRefreshUsuario(datos));
 
 			if (!bean.getUsuarioLogeado().getRol().getCodNum().equals(ModeloRol.ID_ROL_CANDIDATO)) {
 				throw new UVException("No eres un candidato");
@@ -204,7 +204,7 @@ public class ControladorMisMeritosPreferentes extends HttpServlet {
 	}
 	
 	private void listadoMeritos(VistaMeritosPreferentesCandidato bean, UVDatos datos, HttpServletRequest request, HttpServletResponse response) 
-			throws IOException, SQLException, UVException {
+			throws IOException {
 		datos.setRespuestaEnviada(true);
 		datos.setContentType(RESPONSE_AJAX_CONTENTTYPE);
 		response.setContentType(RESPONSE_AJAX_CONTENTTYPE);

@@ -23,19 +23,19 @@ UsuarioBolsaEmpleo candidato = bean.getCandidato();
 	
 	<div class="titulo-bolsa-empleo">
 		<h2>Filtrado de candidatos por titulación</h2>
-	    <button class="link-btn" id="sin_titulacion">
-	    	 Listado de candidatos sin titulación
-	    </button>
+		<button class="link-btn" id="sin_titulacion">
+			 Listado de candidatos sin titulación
+		</button>
 	</div>
 
 	<p>Filtrado de candidatos por titulaciones, para su posible exclusión.</p>
 	
-	<table class="bluetable bolsaempleo" id="tableCandidatos">
+	<table class="bluetable bolsaempleo" id="tableCandidatosFTI">
 		<tr>
 			<th scope="col" style="width:12%">Documento</th>
 			<th scope="col" style="width:43%">Candidato</th>
 			<th scope="col" style="width:15%" title="Código área">Nº Titulaciones</th>
-			<th scope="col" style="width:15%" class="area">Nº Tit. Validadas</th>			
+			<th scope="col" style="width:15%" class="area">Nº Tit. Validadas</th>
 			<th scope="col" style="width:15%"></th>
 		</tr>
 		<tbody></tbody>
@@ -47,12 +47,12 @@ UsuarioBolsaEmpleo candidato = bean.getCandidato();
 	</table>
 	
 	<% if (candidato != null) { %>
-		<table class="bluetable bolsaempleo" id="tableTitulacionesCandidato">
+		<table class="bluetable bolsaempleo" id="tableTitulacionesCandidatoFTI">
 			<tr>
 				<th scope="col" style="width:10%"></th>
-				<th scope="col" style="width:60%">Titulación</th>		
-				<th scope="col" style="width:40%">Descripción</th>		
-				<th scope="col" style="width:15%"></th>		
+				<th scope="col" style="width:60%">Titulación</th>
+				<th scope="col" style="width:40%">Descripción</th>
+				<th scope="col" style="width:15%"></th>
 			</tr>
 			<tbody></tbody>
 			<tfoot>
@@ -66,32 +66,33 @@ UsuarioBolsaEmpleo candidato = bean.getCandidato();
 </div>
 	
 <script>	
-	$(document).ready(function() {			
-		var tableCandidatos = new Atis.DataTable('#tableCandidatos', {
-		    "ajax": { url: "<%=ControladorFiltrarTitulacion.URL_PATTERN_AJAX%>", async: false },
-		    "action": "<%=ControladorFiltrarTitulacion.ACCION_DATATABLE_CANDIDATOS%>",
-		    "pageSize": 100,
-		    "filterable": true,
-		    "title": 'CANDIDATOS',
-		    "clickable": {'onClick': function(row) {
-		    	var params = {
-	    				'<%=ControladorFiltrarTitulacion.PARAM_ACCION %>': '<%=ControladorFiltrarTitulacion.ACCION_CANDIDATO_SELECCIONADO%>',
-	    				'<%=ControladorFiltrarTitulacion.PARAM_CANDIDATO%>': row.codNum
-		    	};
-        		Atis.sendForm("<%=request.getRequestURI()%>", params);
-		    }},
-		    <%if (candidato != null) {%> "selected": <%= candidato.getCodNum() %> ,<%}%>
-		    "columns": [
-		    	{'data': 'prsnif', 'filter': true},
-		    	{'data': 'apellido1', 'filter': true, 'overflow': 'auto', 'render': function(row) {
-	        		return row.nombre + " " + row.apellido1 + " " + row.apellido2; 
-	        	}},
-	        	{'data': 'totalTitulaciones', 'order': {'active': false}},
-	        	{'data': 'totalTitulacionesValidadas', 'order': {'active': false}},
-		        {'data': 'codNum', 'buttons': [{'label': 'Ir a candidato', 'onClick': function(row) { 
-		        	window.open("<%= ControladorUsuarioCandidato.getUrlCandidato("_NUM_") %>".replace("_NUM_", row.codNum));
-		        }}]}
-		    ],
+	$(document).ready(function() {
+		var tableCandidatos = new Atis.DataTable('#tableCandidatosFTI', {
+			"ajax": { url: "<%=ControladorFiltrarTitulacion.URL_PATTERN_AJAX%>", async: false },
+			"action": "<%=ControladorFiltrarTitulacion.ACCION_DATATABLE_CANDIDATOS%>",
+			"pageSize": 20,
+			"filterable": true,
+			"stateSave": true,
+			"title": 'CANDIDATOS',
+			"clickable": {'onClick': function(row) {
+				var params = {
+						'<%=ControladorFiltrarTitulacion.PARAM_ACCION %>': '<%=ControladorFiltrarTitulacion.ACCION_CANDIDATO_SELECCIONADO%>',
+						'<%=ControladorFiltrarTitulacion.PARAM_CANDIDATO%>': row.codNum
+				};
+				Atis.sendForm("<%=request.getRequestURI()%>", params);
+			}},
+			<%if (candidato != null) {%> "selected": <%= candidato.getCodNum() %> ,<%}%>
+			"columns": [
+				{'data': 'prsnif', 'filter': true},
+				{'data': 'apellido1', 'filter': true, 'overflow': 'auto', 'render': function(row) {
+					return row.nombre + " " + row.apellido1 + " " + row.apellido2; 
+				}},
+				{'data': 'totalTitulaciones', 'order': {'active': false}},
+				{'data': 'totalTitulacionesValidadas', 'order': {'active': false}},
+				{'data': 'codNum', 'buttons': [{'label': 'Ir a candidato', 'onClick': function(row) { 
+					window.open("<%= ControladorUsuarioCandidato.getUrlCandidato("_NUM_") %>".replace("_NUM_", row.codNum));
+				}}]}
+			],
 		});
 		
 		<%if (candidato != null) {%>
@@ -99,93 +100,94 @@ UsuarioBolsaEmpleo candidato = bean.getCandidato();
 			
 			var changeTitulacion = function(row) {
 				var message = 
-        			'<h3>Titulación</h3><br/>' +
-        			'<p><select style="max-width:500px"><%= 
-        				bean.getTitulaciones().stream()
-        				.map(t -> "<option value=\"" + t.getCodNum() + "\" '+ (row.titulacion ? (row.titulacion.codNum == " + t.getCodNum() + " ? 'selected' : '') : '') +'>" + EscapaHTML.escapa(t.getNombre()) + "</option>")
-        				.collect(Collectors.joining("")) %></select></p>';
-        		
-        		Atis.alertDialog("Seleccionar titulación", $(message), function(dialog) {
-    				var option = $('select option:selected', dialog);
-    				
-    				var params = {
-	    				'<%=ControladorFiltrarTitulacion.PARAM_ACCION%>': '<%=ControladorFiltrarTitulacion.ACCION_CAMBIAR_TITULACION%>',
-	    				'<%=ControladorFiltrarTitulacion.PARAM_CANDIDATO%>': '<%=bean.getCandidato().getCodNum()%>',
-	    				'<%=ControladorFiltrarTitulacion.PARAM_TITULACION_USUARIO%>': row.codNum,
-	    				'<%=ControladorFiltrarTitulacion.PARAM_TITULACION%>': $(option).val(),		    				
-	    			};
-	    			
-	    			Atis.sendAjax("<%=request.getRequestURI()%>", params, function(data) {
-	    				tableCandidatos.refresh();
-	    				tableTitulaciones.refresh();
-	    				
-	    				$(dialog).dialog("close");
-	    			}, function(data) {
-	    				var response = JSON.parse(data.responseText);
-	    				
-	    				// alert en caso de error
-	    				Atis.alertDialog("Error en la solicitud", response.descripcion);
-	    			});
-    			});
+					'<h3>Titulación</h3><br/>' +
+					'<p><select style="max-width:500px"><%= 
+						bean.getTitulaciones().stream()
+						.map(t -> "<option value=\"" + t.getCodNum() + "\" '+ (row.titulacion ? (row.titulacion.codNum == " + t.getCodNum() + " ? 'selected' : '') : '') +'>" + EscapaHTML.escapa(t.getNombre()) + "</option>")
+						.collect(Collectors.joining("")) %></select></p>';
+				
+				Atis.alertDialog("Seleccionar titulación", $(message), function(dialog) {
+					var option = $('select option:selected', dialog);
+					
+					var params = {
+						'<%=ControladorFiltrarTitulacion.PARAM_ACCION%>': '<%=ControladorFiltrarTitulacion.ACCION_CAMBIAR_TITULACION%>',
+						'<%=ControladorFiltrarTitulacion.PARAM_CANDIDATO%>': '<%=bean.getCandidato().getCodNum()%>',
+						'<%=ControladorFiltrarTitulacion.PARAM_TITULACION_USUARIO%>': row.codNum,
+						'<%=ControladorFiltrarTitulacion.PARAM_TITULACION%>': $(option).val(),
+					};
+					
+					Atis.sendAjax("<%=request.getRequestURI()%>", params, function(data) {
+						tableCandidatos.refresh();
+						tableTitulaciones.refresh();
+						
+						$(dialog).dialog("close");
+					}, function(data) {
+						var response = JSON.parse(data.responseText);
+						
+						// alert en caso de error
+						Atis.alertDialog("Error en la solicitud", response.descripcion);
+					});
+				});
 			};
 		
 			
-			var tableTitulaciones = new Atis.DataTable('#tableTitulacionesCandidato', {
+			var tableTitulaciones = new Atis.DataTable('#tableTitulacionesCandidatoFTI', {
 				"ajax": { url: "<%=ControladorFiltrarTitulacion.URL_PATTERN_AJAX%>", async: false },
 				"selectable": {'all': false},
-			    "filterable": true,
-			    "title": 'TITULACIONES: <%=candidato.getNombre() + " " + candidato.getPrimerApellido() + " " + candidato.getSegundoApellido()%>',
-			    "pageSize": 10,
-			    "action": "<%=ControladorFiltrarTitulacion.ACCION_DATATABLE_TITULACIONES_CANDIDATO%>",
-			    "params": {"<%=ControladorFiltrarTitulacion.PARAM_CANDIDATO%>": <%=candidato.getCodNum()%>},
-			    "selected": titulacionesValidadas,
-			    "columns": [
-			    	{'data': 'codNum', 'selectable': {'onChange': function(row, checkbox) {
-			    				var accion = checkbox.checked ? '<%=ControladorFiltrarTitulacion.ACCION_TITULACION_SELECCIONADA%>'
-			    						: '<%=ControladorFiltrarTitulacion.ACCION_TITULACION_DESELECCIONADA%>';
-				    			
-			    				var params = {
-				    				'<%=ControladorFiltrarTitulacion.PARAM_ACCION%>': accion,
-				    				'<%=ControladorFiltrarTitulacion.PARAM_CANDIDATO%>': '<%=bean.getCandidato().getCodNum()%>',
-				    				'<%=ControladorFiltrarTitulacion.PARAM_TITULACION_USUARIO%>': row.codNum,
-				    			};
-				    			
-				    			Atis.sendAjax("<%=request.getRequestURI()%>", params, function(data) {
-				    				tableCandidatos.refresh();
-				    			}, function(data) {
-				    				var response = JSON.parse(data.responseText);
-				    				
-				    				// alert en caso de error
-				    				Atis.alertDialog("Error en la solicitud", response.descripcion);
-				    				
-				    				checkbox.checked = !checkbox.checked;
-				    				checkbox.checked ? $(checkbox).parent().parent().addClass("selected") : $(checkbox).parent().parent().removeClass("selected");
-				    			});
-				    		}
-			    		}
-			    	},
-			        {'data': 'titulacion.nombre', 'filter': {'type': 'text'}, 'render': function(row) {
-			        	return !row.titulacion ? 'OTRA TITULACION' : row.titulacion.nombre;
-			        }},
-			    	{'data': 'descripcion', 'overflow': 'auto'},
-		        	{'data': 'codnum', 'buttons': [
-		        		{'label': 'Descargar', 'onClick': function(row) {
-		        			window.open("<%= ControladorDescargaFicheros.URL_DESCARGA_FICHEROS %>"
-		        		        	+ "<%= "?a=" + ControladorDescargaFicheros.ACCION_DESCARGAR_TITULACION_PERSONAL + "&" + ControladorDescargaFicheros.PARAM_TITULACION %>=" + row.codNum);
-		        		}},
-		        		{'label': 'Editar', 'onClick': changeTitulacion},
-		   			]}	
-			    ],
+				"filterable": true,
+				"stateSave": true,
+				"title": 'TITULACIONES: <%=candidato.getNombre() + " " + candidato.getPrimerApellido() + " " + candidato.getSegundoApellido()%>',
+				"pageSize": 10,
+				"action": "<%=ControladorFiltrarTitulacion.ACCION_DATATABLE_TITULACIONES_CANDIDATO%>",
+				"params": {"<%=ControladorFiltrarTitulacion.PARAM_CANDIDATO%>": <%=candidato.getCodNum()%>},
+				"selected": titulacionesValidadas,
+				"columns": [
+					{'data': 'codNum', 'selectable': {'onChange': function(row, checkbox) {
+								var accion = checkbox.checked ? '<%=ControladorFiltrarTitulacion.ACCION_TITULACION_SELECCIONADA%>'
+										: '<%=ControladorFiltrarTitulacion.ACCION_TITULACION_DESELECCIONADA%>';
+								
+								var params = {
+									'<%=ControladorFiltrarTitulacion.PARAM_ACCION%>': accion,
+									'<%=ControladorFiltrarTitulacion.PARAM_CANDIDATO%>': '<%=bean.getCandidato().getCodNum()%>',
+									'<%=ControladorFiltrarTitulacion.PARAM_TITULACION_USUARIO%>': row.codNum,
+								};
+								
+								Atis.sendAjax("<%=request.getRequestURI()%>", params, function(data) {
+									tableCandidatos.refresh();
+								}, function(data) {
+									var response = JSON.parse(data.responseText);
+									
+									// alert en caso de error
+									Atis.alertDialog("Error en la solicitud", response.descripcion);
+									
+									checkbox.checked = !checkbox.checked;
+									checkbox.checked ? $(checkbox).parent().parent().addClass("selected") : $(checkbox).parent().parent().removeClass("selected");
+								});
+							}
+						}
+					},
+					{'data': 'titulacion.nombre', 'filter': {'type': 'text'}, 'render': function(row) {
+						return !row.titulacion ? 'OTRA TITULACION' : row.titulacion.nombre;
+					}},
+					{'data': 'descripcion', 'overflow': 'auto'},
+					{'data': 'codnum', 'buttons': [
+						{'label': 'Descargar', 'onClick': function(row) {
+							window.open("<%= ControladorDescargaFicheros.URL_DESCARGA_FICHEROS %>"
+									+ "<%= "?a=" + ControladorDescargaFicheros.ACCION_DESCARGAR_TITULACION_PERSONAL + "&" + ControladorDescargaFicheros.PARAM_TITULACION %>=" + row.codNum);
+						}},
+						{'label': 'Editar', 'onClick': changeTitulacion},
+					]}	
+				],
 			});
 			
-			Atis.smoothScrollToAnchor("#tableTitulacionesCandidato");
+			Atis.smoothScrollToAnchor("#tableTitulacionesCandidatoFTI");
 		<% } %>
 		
 		$('#sin_titulacion').on('click', function() {
 			var params = {
-   				'<%=ControladorFiltrarTitulacion.PARAM_ACCION %>': '<%=ControladorFiltrarTitulacion.ACCION_CANDIDATOS_SIN_TITULACION%>'   				
-	    	};
-    		Atis.sendForm("<%=request.getRequestURI()%>", params);
+				'<%=ControladorFiltrarTitulacion.PARAM_ACCION %>': '<%=ControladorFiltrarTitulacion.ACCION_CANDIDATOS_SIN_TITULACION%>'
+			};
+			Atis.sendForm("<%=request.getRequestURI()%>", params);
 		});
 	}); 
 </script>

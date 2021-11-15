@@ -21,7 +21,7 @@ VistaPlazasOfertadas bean = (VistaPlazasOfertadas) uvdatos.getVistas().get(Vista
 		<h2>Plazas ofertadas</h2>
 	</div>
 	
-	<table class="bluetable bolsaempleo" id="tablePlazasOfertadas">
+	<table class="bluetable bolsaempleo" id="tablePlazasOfertadasPOF">
 		<tr>
 			<th scope="col" style="width:100px">Código</th>
 			<th scope="col" style="width:100%">Área</th>
@@ -59,7 +59,7 @@ VistaPlazasOfertadas bean = (VistaPlazasOfertadas) uvdatos.getVistas().get(Vista
 						<td class="center"><%= ofertaCandidato.getContratacion() != null ? "<div class='circle-true'></div>" : "" %></td>
 						<td class="center"><%= ofertaCandidato.getContratacion() != null ? !ofertaCandidato.getContratacion().getResultado().equals(ModeloContratacion.RESULTADO_PENDIENTE) ? ofertaCandidato.getContratacion().getResultado() : "" : "" %></td>
 						<td>
-							<input class="oferta_preferencia" type="number" value="<%= ofertaCandidato.getPreferencia() != 0 ? ofertaCandidato.getPreferencia() : "" %>" style="width: 40px"/>
+							<input class="oferta_preferencia" type="number" value="<%= ofertaCandidato.getPreferencia() != 0 ? ofertaCandidato.getPreferencia() : "" %>" style="width: 40px" <%= ofertaCandidato.getContratacion() != null ? "disabled" : "" %>/>
 						</td>
 						<td>
 					<%	if (ofertaCandidato.getContratacion() != null && ofertaCandidato.getContratacion().getResultado().equals(ModeloContratacion.RESULTADO_PENDIENTE)) { %>
@@ -91,11 +91,14 @@ $(document).ready(function() {
 		<%	} %>
 	<%	} %>
 	
-	var table = new Atis.DataTable('#tablePlazasOfertadas', {
+	var table = new Atis.DataTable('#tablePlazasOfertadasPOF', {
 		"ajax": { url: "<%= ControladorPlazasOfertadas.URL_PATTERN_AJAX %>" },
 		"pageSize": 10,
 		"filterable": true,
+		"stateSave": true,
 		"title": 'Plazas ofertadas',
+		"defaultOrderBy": 3,
+		"defaultOrderDirection": 'desc',
 		"action": "<%= ControladorPlazasOfertadas.ACCION_DATATABLE_PLAZAS_OFERTADAS %>",
 		"clickable": {'onClick': function(row) {
 			var params = {
@@ -123,14 +126,23 @@ $(document).ready(function() {
 <%	if (bean.getListaOfertasCandidatos().size() > 0) { %>
 		document.getElementById("plaza_preferencia").addEventListener("click", function(event) {
 			var ofertasPreferencia = {};
+			var envia = true;
 			$("#tableOfertasPreferentes > tbody > .oferta_row").each(function() {
-				ofertasPreferencia[$(this).data("id")] = parseInt($(this).find("input").val());
+				var preferencia = parseInt($(this).find("input").val());
+				if (isNaN(preferencia)) {
+					$(this).find("input").prop('required',true);
+					this.getElementsByTagName("input")[0].reportValidity();
+					envia = false;
+				}
+				ofertasPreferencia[$(this).data("id")] = preferencia;
 			});
 			
-			var params = {
-					'<%= ControladorPlazasOfertadas.PARAM_ACCION %>': '<%= ControladorPlazasOfertadas.ACCION_GUARDAR_PREFERENCIAS %>',
-					'<%= ControladorPlazasOfertadas.PARAM_OFERTAS_PREFERENCIAS %>': Atis.object2Json(ofertasPreferencia)};
-			Atis.sendForm("<%= request.getRequestURI() %>", params);
+			if (envia) {
+				var params = {
+						'<%= ControladorPlazasOfertadas.PARAM_ACCION %>': '<%= ControladorPlazasOfertadas.ACCION_GUARDAR_PREFERENCIAS %>',
+						'<%= ControladorPlazasOfertadas.PARAM_OFERTAS_PREFERENCIAS %>': Atis.object2Json(ofertasPreferencia)};
+				Atis.sendForm("<%= request.getRequestURI() %>", params);
+			}
 		});
 		
 		$("#tableOfertasPreferentes > tbody > tr > td > .ver_cita").each(function() {

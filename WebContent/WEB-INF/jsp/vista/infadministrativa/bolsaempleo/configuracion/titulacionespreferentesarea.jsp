@@ -28,7 +28,7 @@ Area area = bean.getArea();
 	</div>
 	
 	<div id="tablas_titulaciones" style="<%= area == null ? "visibility: hidden" : "" %>">
-		<table class="bluetable bolsaempleo" id="table_titulaciones_preferentes_area">
+		<table class="bluetable bolsaempleo" id="tableTitulacionesPreferentesAreaTPA">
 			<tr>
 				<th scope="col" style="width:5%"></th>
 				<th scope="col"	class="nombre" style="width:100%">Nombre</th>
@@ -42,7 +42,7 @@ Area area = bean.getArea();
 			</tfoot>
 		</table>
 	
-	    <table class="bluetable bolsaempleo" id="table_titulaciones">
+	    <table class="bluetable bolsaempleo" id="tableTitulacionesTPA">
 			<tr>
 				<th scope="col" style="width:5%"></th>
 				<th scope="col"	class="nombre" style="width:100%">Nombre</th>
@@ -75,11 +75,12 @@ Area area = bean.getArea();
 		}
 		
 		<% if (area != null) { %>
-			table_titulaciones_area = new Atis.DataTable('#table_titulaciones_preferentes_area', {
+			table_titulaciones_area = new Atis.DataTable('#tableTitulacionesPreferentesAreaTPA', {
 			    "ajax": { url: "<%=ControladorGestionTitulacionesPreferentesArea.URL_PATTERN_AJAX%>", async: false },
 			    "params": {"<%=ControladorGestionTitulacionesPreferentesArea.PARAM_AREA%>": '<%= area.getCodNum() %>'},
 			    "selectable": true,
 			    "filterable": true,
+			    "stateSave": true,
 			    "pageSize": 5,
 			    "defaultOrderBy": 1,
 			    "title": "TITULACIONES PREFERENTES AL ÁREA: <%= area.getDescripcion() %>",
@@ -103,11 +104,12 @@ Area area = bean.getArea();
 			    ]
 			});
 			
-			table_titulaciones = new Atis.DataTable('#table_titulaciones', {
+			table_titulaciones = new Atis.DataTable('#tableTitulacionesTPA', {
 			    "ajax": { url: "<%=ControladorGestionTitulacionesPreferentesArea.URL_PATTERN_AJAX%>", async: false },
 			    "params": {"<%=ControladorGestionTitulacionesPreferentesArea.PARAM_AREA%>": '<%= area.getCodNum() %>'},
 			    "selectable": true,
 			    "filterable": true,
+			    "stateSave": true,
 			    "pageSize": 5,
 			    "defaultOrderBy": 1,
 			    "title": 'TITULACIONES DISPONIBLES',

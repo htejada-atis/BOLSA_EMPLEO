@@ -218,7 +218,7 @@ VistaUsuarioBolsaEmpleo bean = (VistaUsuarioBolsaEmpleo) uvdatos.getVistas().get
 	   	</ul>
 	   	
 	<%	if (bean.getApartadoAreasEvaluables() != null) { %>
-			<table class="bluetable bolsaempleo" id="table_areas_evaluables">
+			<table class="bluetable bolsaempleo" id="tableAreasEvaluablesUSU">
 				<tr>
 					<th scope="col" style="width:20%" title="Id de la area">Id</th>
 					<th scope="col" style="width:25%" title="Código de area">Código</th>
@@ -246,7 +246,7 @@ VistaUsuarioBolsaEmpleo bean = (VistaUsuarioBolsaEmpleo) uvdatos.getVistas().get
 	<%	} %>
 	
 	<%	if (bean.getApartadoDepartamentos() != null) { %>
-			<table class="bluetable bolsaempleo" id="table_departamentos">
+			<table class="bluetable bolsaempleo" id="tableDepartamentosUSU">
 				<tr>
 					<th scope="col" style="width:60px" title="Id del departamento">Id</th>
 					<th scope="col" style="width:100px" title="Código de departamento">Código</th>
@@ -413,7 +413,7 @@ VistaUsuarioBolsaEmpleo bean = (VistaUsuarioBolsaEmpleo) uvdatos.getVistas().get
 			
 		<%	if (bean.getApartadoAreasEvaluables() != null) { %>
 				
-				var tableAreasEvaluables = new Atis.DataTable('#table_areas_evaluables', {
+				var tableAreasEvaluables = new Atis.DataTable('#tableAreasEvaluablesUSU', {
 				    "ajax": { url: "<%=ControladorUsuarioBolsaEmpleo.URL_PATTERN_AJAX%>", async: false},
 				    "params": {"<%=ControladorUsuarioBolsaEmpleo.PARAM_USUARIO%>": <%= bean.getUsuario().getCodNum() %>},
 				    "pageSize": 10,
@@ -443,7 +443,7 @@ VistaUsuarioBolsaEmpleo bean = (VistaUsuarioBolsaEmpleo) uvdatos.getVistas().get
 		
 		<%	if (bean.getApartadoDepartamentos() != null) { %>
 		
-				var tableDepartamentos = new Atis.DataTable('#table_departamentos', {
+				var tableDepartamentos = new Atis.DataTable('#tableDepartamentosUSU', {
 				    "ajax": { url: "<%=ControladorUsuarioBolsaEmpleo.URL_PATTERN_AJAX%>", async: false},
 				    "params": {"<%=ControladorUsuarioBolsaEmpleo.PARAM_USUARIO%>": <%= bean.getUsuario().getCodNum() %>},
 				    "pageSize": 10,

@@ -11,6 +11,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import java.util.regex.Pattern;
 import java.util.stream.IntStream;
 import javax.servlet.ServletOutputStream;
 import javax.servlet.annotation.WebServlet;
@@ -18,7 +19,6 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import org.apache.commons.fileupload.FileItem;
-import org.apache.commons.fileupload.FileUploadException;
 import org.apache.commons.fileupload.disk.DiskFileItemFactory;
 import org.apache.commons.fileupload.servlet.ServletFileUpload;
 import com.google.gson.Gson;
@@ -80,10 +80,11 @@ public class ControladorContratacion extends HttpServlet {
 	public static final String ACCION_EXPORTAR_PLAZAS = "exportarplazas";
 	public static final String ACCION_INDEX = "index";
 	public static final String ACCION_PREFERENCIAS_CANDIDATO = "preferenciascandidato";
+	public static final String ACCION_MARCAR_ACEPTACION_CANDIDATO = "marcaraceptacioncandidato";
 	public static final String ACCION_NUEVA_PLAZA_OFERTADA = "nuevaplazaofertada";
 	public static final String ACCION_PLAZA_ABIERTA = "plazaabierta";
 	public static final String ACCION_PLAZA_CERRADA = "plazacerrada";
-	public static final String ACCION_PLAZA_TRAMITACION = "plazatramitacion";
+	public static final String ACCION_PLAZA_APROBACION = "plazaaprobacion";
 	public static final String ACCION_RECHAZAR_CONTRATACION_CANDIDATO = "rechazarcontratacioncandidato";
 	public static final String ACCION_REENVIAR_CITA_CONTRATACION = "reenviarcitacontratacion";
 	public static final String ACCION_RESTAURAR_PLAZA_OFERTADA = "restaurarplazaofertada";
@@ -96,6 +97,7 @@ public class ControladorContratacion extends HttpServlet {
 	public static final String PARAM_CENTRO_DESTINO = "centrodestino";
 	public static final String PARAM_CODIGO = "codigo";
 	public static final String PARAM_CUATRIMESTRE = "cuatrimestre";
+	public static final String PARAM_CURSO = "curso";
 	public static final String PARAM_DEDICACION = "dedicacion";
 	public static final String PARAM_DURACION_PREVISTA = "duracionprevista";
 	public static final String PARAM_EMAILS_CIERRE = "emailcierre";
@@ -118,12 +120,17 @@ public class ControladorContratacion extends HttpServlet {
 	public static final String MENSAJE_ERROR_CANDIDATO_CONTRATACION_ACTIVA = "Ya hay una contratación activa para el candidato %s";
 	public static final String MENSAJE_ERROR_CANDIDATO_CONTRATACION_NO_ACTIVA = "No hay una contratación activa para el candidato %s";
 	public static final String MENSAJE_ERROR_CUATRIMESTRE_NO_VALIDO = "El cuatrimestre seleccionado no es válido";
+	public static final String MENSAJE_ERROR_CURSO_LARGO = "El curso no puede contener mas de %d caracteres";
+	public static final String MENSAJE_ERROR_CURSO_VACIO = "El curso no puede estar vacío";
 	public static final String MENSAJE_ERROR_DURACION_PREVISTA_LARGA = "La duración prevista no puede contener mas de %d caracteres";
+	public static final String MENSAJE_ERROR_ELIMINAR_ESTADO_REQUERIDO = "Es requerido estado de creación o aprobación para poder eliminar la plaza";
 	public static final String MENSAJE_ERROR_ESTADO_CONTRATACION_REQUERIDO = "Es requerido estado de contratación para la plaza";
 	public static final String MENSAJE_ERROR_ESTADO_CREACION_REQUERIDO = "Es requerido estado de creación para la plaza";
-	public static final String MENSAJE_ERROR_ESTADO_TRAMITACION_REQUERIDO = "Es requerido estado de tramitación para la plaza";
+	public static final String MENSAJE_ERROR_ESTADO_APROBACION_REQUERIDO = "Es requerido estado de aprobación para la plaza";
 	public static final String MENSAJE_ERROR_FECHA_FIN_OFERTA_VACIA_ABRIR_PLAZA = "La fecha fin de la oferta no puede estar vacía para abrir una plaza";
+	public static final String MENSAJE_ERROR_FORMATO_CURSO = "El formato del curso debe ser: DD/DD+1";
 	public static final String MENSAJE_ERROR_FORMATO_FECHA = "Error al formatear fecha. Formato: DD/MM/YYYY HH:MM:SS";
+	public static final String MENSAJE_ERROR_FORMATO_PDF = "El fichero debe ser un pdf válido";
 	public static final String MENSAJE_ERROR_JUSTIFICACION_LARGA = "La justificación no puede contener mas de %d caracteres";
 	public static final String MENSAJE_ERROR_JUSTIFICACION_VACIA = "La justificación no puede estar vacía";
 	public static final String MENSAJE_ERROR_SIN_PERMISO = "No tienes permiso";
@@ -134,7 +141,8 @@ public class ControladorContratacion extends HttpServlet {
 	public static final String MENSAJE_EXITO_CONTRATACION = "Contratación creada correctamente para el usuario: %s";
 	public static final String MENSAJE_EXITO_EDITAR = "Plaza editada correctamente";
 	public static final String MENSAJE_EXITO_ELIMINADA = "Plaza eliminada correctamente";
-	public static final String MENSAJE_EXITO_TRAMITACION_PLAZA = "Cambiado el estado de la plaza a tramitación correctamente";
+	public static final String MENSAJE_EXITO_PLAZA_ACEPTADA_CANDIDATO = "La plaza se ha aceptado para el candidato %s correctamente";
+	public static final String MENSAJE_EXITO_APROBACION_PLAZA = "Cambiado el estado de la plaza a aprobación correctamente";
 	public static final String MENSAJE_EXITO_REENVIO_CONTRATACION = "Se ha reenviado la contratación correctamente para el usuario: %s";
 	public static final String MENSAJE_EXITO_SUSPENSION_PLAZA = "Suspendido el contrato del candidato correctamente";
 	
@@ -181,18 +189,24 @@ public class ControladorContratacion extends HttpServlet {
 				for (FileItem item : items) {
 					if (item.isFormField()) {
 						parametros.put(item.getFieldName(), item.getString());
-					} else {
-						if (item.getSize() > 0 && item.getName().toLowerCase().endsWith(".pdf")) {
+					} else if (item.getSize() > 0) {
+						if (BolsaEmpleoUtils.checkFileIsPDF(item.getName())) {
 							try (InputStream contenidoDelFichero = item.getInputStream(); ByteArrayOutputStream salida = new ByteArrayOutputStream()) {
 								parametros.put(item.getFieldName(), BolsaEmpleoUtils.checkFileSize(contenidoDelFichero));
 							}
+						} else {
+							bean.getMensajesDeError().add(MENSAJE_ERROR_FORMATO_PDF);
+							break;
 						}
 					}
 				}
-			} catch (FileUploadException | UVException | SQLException e) {
-				e.printStackTrace();
+			} catch (Exception e) {
+				LOGGER.log(Level.SEVERE, Formateador.getStackTrace(e));
+				LOGGER.log(Level.SEVERE, e.toString());
+				bean.getMensajesDeError().add("Error al subir fichero(s)");
 			}
 		}
+		
 		
 		String nombreAccion = EscapaHTML.ajustaCodificacion(BolsaEmpleoUtils.getParamRequestOrMultipartOrSession(
 				request, parametros, PARAM_ACCION));
@@ -200,6 +214,7 @@ public class ControladorContratacion extends HttpServlet {
 			nombreAccion = ACCION_INDEX;
 		}
 		try {
+			
 			init(bean, datos, request, response);
 			
 			switch (nombreAccion) {
@@ -211,9 +226,10 @@ public class ControladorContratacion extends HttpServlet {
 				case ACCION_EDITAR_PLAZA_OFERTADA:
 				case ACCION_EXPORTAR_CANDIDATOS:
 				case ACCION_ELIMINAR_PLAZA:
+				case ACCION_MARCAR_ACEPTACION_CANDIDATO:
 				case ACCION_PLAZA_ABIERTA:
 				case ACCION_PLAZA_CERRADA:
-				case ACCION_PLAZA_TRAMITACION:
+				case ACCION_PLAZA_APROBACION:
 				case ACCION_RECHAZAR_CONTRATACION_CANDIDATO:
 				case ACCION_REENVIAR_CITA_CONTRATACION:
 				case ACCION_SELECCIONAR_PLAZA_OFERTADA:
@@ -226,6 +242,7 @@ public class ControladorContratacion extends HttpServlet {
 					exportarPlazas(datos, response);
 					break;
 				case ACCION_INDEX:
+					bean.setCursos(ModeloPlazaOfertada.obtenerInstancia().listadoCursosPlazasOfertadas());
 					break;
 				case ACCION_NUEVA_PLAZA_OFERTADA:
 					nuevaPlazaOfertada(bean, datos, request, response, parametros);
@@ -256,12 +273,13 @@ public class ControladorContratacion extends HttpServlet {
 		}
 	}
 	
-	private void init(VistaContratacion bean, UVDatos datos, HttpServletRequest request, HttpServletResponse response) throws SQLException, UVException, IOException {
+	private void init(VistaContratacion bean, UVDatos datos, HttpServletRequest request, HttpServletResponse response)
+			throws SQLException, UVException, IOException {
 		bean.setVista(JSP_INDEX);
 		BolsaEmpleoUtils.readMensajeSession(bean, request);
 		
 		try {
-			bean.setUsuarioLogeado(ModeloUsuarioBolsaEmpleo.obtenerInstancia().getOrCreateUsuario(datos));
+			bean.setUsuarioLogeado(ModeloUsuarioBolsaEmpleo.obtenerInstancia().getAndRefreshUsuario(datos));
 			
 			// personal, direccion
 			int[] rolesValidos = {ModeloRol.ID_ROL_SERVICIO_PERSONAL, ModeloRol.ID_ROL_DIRECTOR_DEPARTAMENTO};
@@ -333,14 +351,17 @@ public class ControladorContratacion extends HttpServlet {
 			case ACCION_ELIMINAR_PLAZA:
 				eliminarPlazaOfertada(bean, datos, request, response);
 				break;
+			case ACCION_MARCAR_ACEPTACION_CANDIDATO:
+				marcarAceptacionCandidato(bean, datos, request, response);
+				break;
 			case ACCION_PLAZA_ABIERTA:
 				abrirPlaza(bean, datos, request, response);
 				break;
 			case ACCION_PLAZA_CERRADA:
 				cerrarPlaza(bean, datos, request, response);
 				break;
-			case ACCION_PLAZA_TRAMITACION:
-				tramitacionPlaza(bean, datos, request, response);
+			case ACCION_PLAZA_APROBACION:
+				aprobacionPlaza(bean, datos, request, response);
 				break;
 			case ACCION_SELECCIONAR_PLAZA_OFERTADA:
 				break;
@@ -360,8 +381,8 @@ public class ControladorContratacion extends HttpServlet {
 		ModeloPlazaOfertada modeloPlaza = ModeloPlazaOfertada.obtenerInstancia();
 		
 		PlazaOfertada plaza = bean.getPlazaOfertada();
-		if (!plaza.getEstado().contains(ModeloPlazaOfertada.PLAZA_ESTADO_TRAMITACION)) {
-			throw new UVException(MENSAJE_ERROR_ESTADO_TRAMITACION_REQUERIDO);
+		if (!plaza.getEstado().contains(ModeloPlazaOfertada.PLAZA_ESTADO_APROBACION)) {
+			throw new UVException(MENSAJE_ERROR_ESTADO_APROBACION_REQUERIDO);
 		}
 		
 		if (plaza.getFechaFinOferta() == null) {
@@ -487,18 +508,28 @@ public class ControladorContratacion extends HttpServlet {
 	
 	private void editarPlazaOfertada(VistaContratacion bean, UVDatos datos, HttpServletRequest request, HttpServletResponse response, HashMap<String, Object> parametros) 
 			throws SQLException, UVException, IOException {
-		PlazaOfertada plaza = bean.getPlazaOfertada();
-		plaza = validarPlazaOfertada(bean, request, plaza, parametros);
+		if (bean.getMensajesDeError().size() == 0) {
+			PlazaOfertada plaza = bean.getPlazaOfertada();
+			plaza = validarPlazaOfertada(bean, request, plaza, parametros);
+			
+			ModeloPlazaOfertada.obtenerInstancia().actualizaPlazaOfertada(plaza, bean.getUsuarioLogeado());
+			
+			BolsaEmpleoUtils.addMensajeDeExito(MENSAJE_EXITO_EDITAR, bean, request);
+		} else {
+			BolsaEmpleoUtils.addMensajeDeError(bean.getMensajesDeError().get(0), bean, request);
+		}
 		
-		ModeloPlazaOfertada.obtenerInstancia().actualizaPlazaOfertada(plaza, bean.getUsuarioLogeado());
-		
-		BolsaEmpleoUtils.addMensajeDeExito(MENSAJE_EXITO_EDITAR, bean, request);
 		redireccionConPlazaSeleccionada(bean, datos, request, response, ACCION_SELECCIONAR_PLAZA_OFERTADA);
 	}
 	
 	private void eliminarPlazaOfertada(VistaContratacion bean, UVDatos datos, HttpServletRequest request, HttpServletResponse response)
 			throws SQLException, UVException, IOException {
 		PlazaOfertada plaza = bean.getPlazaOfertada();
+		
+		if (!plaza.getEstado().equals(ModeloPlazaOfertada.PLAZA_ESTADO_CREACION) && !plaza.getEstado().equals(ModeloPlazaOfertada.PLAZA_ESTADO_APROBACION)) {
+			throw new UVException(MENSAJE_ERROR_ELIMINAR_ESTADO_REQUERIDO);
+		}
+		
 		plaza.setActiva(false);
 		ModeloPlazaOfertada.obtenerInstancia().actualizaActivaPlazaOfertada(plaza, bean.getUsuarioLogeado());
 		
@@ -507,12 +538,28 @@ public class ControladorContratacion extends HttpServlet {
 		response.sendRedirect(request.getServletPath());
 	}
 	
+	private void marcarAceptacionCandidato(VistaContratacion bean, UVDatos datos, HttpServletRequest request, HttpServletResponse response)
+			throws SQLException, UVException, IOException {
+		PlazaOfertada plaza = bean.getPlazaOfertada();
+		
+		if (!plaza.getEstado().equals(ModeloPlazaOfertada.PLAZA_ESTADO_CONTRATACION)) {
+			throw new UVException(MENSAJE_ERROR_ESTADO_CONTRATACION_REQUERIDO);
+		}
+		
+		UsuarioBolsaEmpleo candidato = ModeloUsuarioBolsaEmpleo.obtenerInstancia().getUsuarioById(Formateador.leeParametroInteger(request.getParameter(PARAM_CANDIDATO)));
+		ModeloOfertaCandidato.obtenerInstancia().aceptarOfertaCandidato(plaza, candidato, bean.getUsuarioLogeado());
+		
+		BolsaEmpleoUtils.addMensajeDeExito(String.format(MENSAJE_EXITO_PLAZA_ACEPTADA_CANDIDATO, candidato.getPrsNif()), bean, request);
+		redireccionConPlazaSeleccionada(bean, datos, request, response, ACCION_SELECCIONAR_PLAZA_OFERTADA);
+	}
+	
 	private void nuevaPlazaOfertada(VistaContratacion bean, UVDatos datos, HttpServletRequest request, HttpServletResponse response, HashMap<String, Object> parametros) 
 			throws SQLException, UVException, IOException {
 		bean.setVista(JSP_CREATE);
 		cargarListasFormulario(bean);
 		
-		if (BolsaEmpleoUtils.getParamRequestOrMultipartOrSession(request, parametros, PARAM_AREA) != null) {
+		if (BolsaEmpleoUtils.getParamRequestOrMultipartOrSession(request, parametros, PARAM_AREA) != null
+				&& bean.getMensajesDeError().size() == 0) {
 			PlazaOfertada plaza = validarPlazaOfertada(bean, request, new PlazaOfertada(), parametros);
 			
 			ModeloPlazaOfertada.obtenerInstancia().insertaPlazaOfertada(plaza, bean.getUsuarioLogeado());
@@ -537,17 +584,23 @@ public class ControladorContratacion extends HttpServlet {
 		BolsaEmpleoUtils.redirectWithParams(datos, request, response, params);
 	}
 	
-	private void tramitacionPlaza(VistaContratacion bean, UVDatos datos, HttpServletRequest request, HttpServletResponse response)
+	private void aprobacionPlaza(VistaContratacion bean, UVDatos datos, HttpServletRequest request, HttpServletResponse response)
 			throws SQLException, UVException, IOException {
 		ModeloPlazaOfertada modeloPlaza = ModeloPlazaOfertada.obtenerInstancia();
 		
-		if (!bean.getPlazaOfertada().getEstado().equals(ModeloPlazaOfertada.PLAZA_ESTADO_CREACION)) {
+		PlazaOfertada plaza = bean.getPlazaOfertada();
+		
+		if (!plaza.getEstado().equals(ModeloPlazaOfertada.PLAZA_ESTADO_CREACION)) {
 			throw new UVException(MENSAJE_ERROR_ESTADO_CREACION_REQUERIDO);
 		}
 		
-		modeloPlaza.cambiarEstadoPlazaATramitacion(bean.getPlazaOfertada(), bean.getUsuarioLogeado());
+		if (plaza.getCreador() != null && plaza.getCreador().isDirectorDepartamento()) {
+			modeloPlaza.crearMensajeAprobacionPlaza(plaza, plaza.getCreador(), bean.getUsuarioLogeado());
+		}
 		
-		BolsaEmpleoUtils.addMensajeDeExito(MENSAJE_EXITO_TRAMITACION_PLAZA, bean, request);
+		modeloPlaza.cambiarEstadoPlazaAAprobacion(plaza, bean.getUsuarioLogeado());
+		
+		BolsaEmpleoUtils.addMensajeDeExito(MENSAJE_EXITO_APROBACION_PLAZA, bean, request);
 		redireccionConPlazaSeleccionada(bean, datos, request, response, ACCION_SELECCIONAR_PLAZA_OFERTADA);
 	}
 	
@@ -652,7 +705,8 @@ public class ControladorContratacion extends HttpServlet {
 		String current = Formateador.formatoFecha(currentDate, Formateador.FORMATO_FECHA_DDMMYYYY);
 		response.setHeader("Content-Disposition", "attachment; filename=\"plazas_" + current + ".csv\"");
 		
-		List<String[]> rows = ModeloPlazaOfertada.obtenerInstancia().listadoPlazasCsv();
+		ModeloConvocatoria modeloConvocatoria = ModeloConvocatoria.obtenerInstancia();
+		List<String[]> rows = ModeloPlazaOfertada.obtenerInstancia().listadoPlazasCsv(modeloConvocatoria.getUltimaConvocatoria());
 		
 		try (ServletOutputStream stream = response.getOutputStream()) {
 			try (PrintWriter printer = new PrintWriter(stream)) {
@@ -802,6 +856,19 @@ public class ControladorContratacion extends HttpServlet {
 		}
 		if (!ModeloPlazaOfertada.CENTROS_DESTINO.containsKey(plaza.getCentroDestino())) {
 			throw new UVException(MENSAJE_ERROR_CENTRO_DESTINO_NO_VALIDO);
+		}
+		
+		plaza.setCurso(Formateador.leeParametroString(BolsaEmpleoUtils.getParamRequestOrMultipartOrSession(
+				request, parametros, PARAM_CURSO)));
+		if (plaza.getCurso() == null || plaza.getCurso().isBlank()) {
+			throw new UVException(MENSAJE_ERROR_CURSO_VACIO);
+		}
+		if (plaza.getCurso().length() > ModeloPlazaOfertada.COLUMN_CURSO_MAXLENGTH) {
+			throw new UVException(String.format(MENSAJE_ERROR_CURSO_LARGO, ModeloPlazaOfertada.COLUMN_CURSO_MAXLENGTH));
+		}
+		if (!Pattern.matches(ModeloPlazaOfertada.FORMATO_CURSO, plaza.getCurso())
+				|| Integer.parseInt(plaza.getCurso().split("/")[0]) != Integer.parseInt(plaza.getCurso().split("/")[1]) - 1) {
+			throw new UVException(MENSAJE_ERROR_FORMATO_CURSO);
 		}
 		
 		if (bean.getUsuarioLogeado().isServicioPersonal()) {

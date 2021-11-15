@@ -46,6 +46,11 @@ OfertaCandidato oferta = bean.getOfertaCandidato();
 						value="<%= EscapaHTML.escapa(ModeloPlazaOfertada.CUATRIMESTRES.getOrDefault(oferta.getPlaza().getCuatrimestre(), oferta.getPlaza().getCuatrimestre())) %>"
 						readonly disabled/>
 			</div>
+			<div class="form-group">
+				<label for="plaza_curso" class="bold-label">Curso académico:</label>
+				<input class="form-input-custom" type="text" id="plaza_curso" value="<%= EscapaHTML.escapa(oferta.getPlaza().getCurso()) %>"
+						readonly disabled/>
+			</div>
 		</div>
 		<div class="form-group-container col2">
 			<div class="form-group">
@@ -96,7 +101,7 @@ OfertaCandidato oferta = bean.getOfertaCandidato();
 			<%	} %>
 			</div>
 			<div class="form-group">
-			<%	if (oferta.isResultado() == null && oferta.getPlaza().getEstado().equals(ModeloPlazaOfertada.PLAZA_ESTADO_ABIERTA)) { %>
+			<%	if (oferta.getPlaza().getEstado().equals(ModeloPlazaOfertada.PLAZA_ESTADO_ABIERTA)) { %>
 					<button id="plaza_rechazar" style="float:right; margin-left: 12px;" <%= !oferta.getPlaza().isAbiertaVigente() ? "disabled" : "" %>>Rechazar oferta</button>
 					<button id="plaza_aceptar" style="float:right; margin-left: 12px;" <%= !oferta.getPlaza().isAbiertaVigente() ? "disabled" : "" %>>Aceptar oferta</button>
 			<%	} %>
@@ -117,7 +122,7 @@ $(document).ready(function() {
 		});
 <%	} %>
 
-<%	if (oferta.isResultado() == null && oferta.getPlaza().getEstado().equals(ModeloPlazaOfertada.PLAZA_ESTADO_ABIERTA)) { %>
+<%	if (oferta.getPlaza().getEstado().equals(ModeloPlazaOfertada.PLAZA_ESTADO_ABIERTA)) { %>
 	<%	if (oferta.getPlaza().isAbiertaVigente()) { %>
 			document.getElementById("plaza_aceptar").addEventListener("click", function(event) {
 				event.preventDefault();

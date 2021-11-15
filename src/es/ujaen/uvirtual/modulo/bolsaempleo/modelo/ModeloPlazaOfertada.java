@@ -37,10 +37,11 @@ public class ModeloPlazaOfertada {
 	public static final int ORDER_COLUMN_INDEX_ID_PLAZA = 1;
 	public static final int ORDER_COLUMN_INDEX_AREA = 2;
 	public static final int ORDER_COLUMN_INDEX_ESTADO = 3;
-	public static final int ORDER_COLUMN_INDEX_FECHA_CREACION = 4;
-	public static final int ORDER_COLUMN_INDEX_FECHA_ABIERTA = 5;
-	public static final int ORDER_COLUMN_INDEX_FECHA_FIN_OFERTA = 6;
-	public static final int ORDER_COLUMN_INDEX_FECHA_CERRADA = 7;
+	public static final int ORDER_COLUMN_INDEX_CURSO = 4;
+	public static final int ORDER_COLUMN_INDEX_FECHA_CREACION = 5;
+	public static final int ORDER_COLUMN_INDEX_FECHA_ABIERTA = 6;
+	public static final int ORDER_COLUMN_INDEX_FECHA_FIN_OFERTA = 7;
+	public static final int ORDER_COLUMN_INDEX_FECHA_CERRADA = 8;
 	
 	public static final int ORDER_COLUMN_INDEX_NIF_CANDIDATOS = 0;
 	public static final int ORDER_COLUMN_INDEX_NOMBRE_CANDIDATOS = 1;
@@ -50,7 +51,7 @@ public class ModeloPlazaOfertada {
 	public static final String PLAZA_ESTADO_CERRADA = "CERRADA";
 	public static final String PLAZA_ESTADO_CONTRATACION = "CONTRATACION";
 	public static final String PLAZA_ESTADO_CREACION = "CREACION";
-	public static final String PLAZA_ESTADO_TRAMITACION = "TRAMITACION";
+	public static final String PLAZA_ESTADO_APROBACION = "APROBACION";
 	
 	public static final String CENTRO_DESTINO_JAEN = "JAEN";
 	public static final String CENTRO_DESTINO_LINARES = "LINARES";
@@ -65,13 +66,20 @@ public class ModeloPlazaOfertada {
 	public static final String MENSAJE_ERROR_PLAZA_OFERTADA_ID_NO_EXISTE = "No existe la plaza ofertada con el id indicando";
 	public static final String MENSAJE_ERROR_NO_HAY_DESTINATARIOS_DISPONIBLES = "No hay candidatos disponibles para la plaza";
 	public static final String MENSAJE_ERROR_PLANTILLA_APERTURA_PLAZA_NO_EXISTE = "La plantilla de apertura de plaza no existe";
+	public static final String MENSAJE_ERROR_PLANTILLA_APROBACION_PLAZA_NO_EXISTE = "La plantilla de aprobación de plaza no existe";
+	public static final String MENSAJE_ERROR_PLANTILLA_CIERRE_PLAZA_NO_EXISTE = "La plantilla de cierre de plaza no existe";
 	
 	public static final String ABIERTA_VIGENTE = "ABIERTA_VIGENTE";
 	public static final String BEPARE_CODNUM = "BEPARE_CODNUM";
 	public static final String BEPDED_CODNUM = "BEPDED_CODNUM";
+	public static final String BEPUSU_CODNUM = "BEPUSU_CODNUM";
+	public static final String CANDIDATOS_CITADOS = "CANDIDATOS_CITADOS";
+	public static final String CANDIDATOS_DISPONIBLES = "CANDIDATOS_DISPONIBLES";
+	public static final String CANDIDATOS_INTERESADOS = "CANDIDATOS_INTERESADOS";
 	public static final String CENTRO_DESTINO = "CENTRO_DESTINO";
 	public static final String CODNUM = "CODNUM";
 	public static final String CUATRIMESTRE = "CUATRIMESTRE";
+	public static final String CURSO = "CURSO";
 	public static final String DURACION_PREVISTA = "DURACION_PREVISTA";
 	public static final String ESTADO = "ESTADO";
 	public static final String FECHA_ABIERTA = "FECHA_ABIERTA";
@@ -89,6 +97,8 @@ public class ModeloPlazaOfertada {
 	private static final String ACTIVA = "S";
 	private static final String INACTIVA = "N";
 	
+	public static final String FORMATO_CURSO = "\\d{2}/\\d{2}";
+	
 	public static final Map<String, String> CENTROS_DESTINO = new HashMap<>();
 	public static final Map<String, String> CUATRIMESTRES = new HashMap<>();
 	public static final Map<String, String> ESTADOS = new HashMap<>();
@@ -104,9 +114,10 @@ public class ModeloPlazaOfertada {
 		ESTADOS.put(PLAZA_ESTADO_CERRADA, "Cerrada");
 		ESTADOS.put(PLAZA_ESTADO_CONTRATACION, "Contratación");
 		ESTADOS.put(PLAZA_ESTADO_CREACION, "Creación");
-		ESTADOS.put(PLAZA_ESTADO_TRAMITACION, "Tramitación");
+		ESTADOS.put(PLAZA_ESTADO_APROBACION, "Aprobación");
 	}
 	
+	public static final int COLUMN_CURSO_MAXLENGTH = 50;
 	public static final int COLUMN_DURACION_PREVISTA_MAXLENGTH = 100;
 	public static final int COLUMN_JUSTIFICACION_MAXLENGTH = 400;
 	
@@ -152,7 +163,7 @@ public class ModeloPlazaOfertada {
 		try (Connection conexion = ConexionUvirtual.obtenerInstancia(); PreparedStatement stmt = conexion.prepareStatement(consulta)) {
 			try (ResultSet rs = stmt.executeQuery()) {
 				while (rs.next()) {
-					plazasOfertadas.add(createPlazaOfertadaFromResultSet(rs, false));
+					plazasOfertadas.add(createPlazaOfertadaFromResultSet(rs, false, true, false));
 				}
 			}
 		}
@@ -162,23 +173,62 @@ public class ModeloPlazaOfertada {
 	
 	/**
 	 * Devuelve el listado de plazas para exportar en csv.
+	 * @param convocatoria .
 	 * @return .
 	 * @throws SQLException .
 	 * @throws UVException .
 	 */
-	public List<String[]> listadoPlazasCsv() throws SQLException, UVException {
-		String consulta = "SELECT bepplo.*,"
-				+ "     CASE"
-				+ "         WHEN bepplo.FECHA_FIN_OFERTA > SYSDATE THEN 1"
-				+ "         ELSE 0"
-				+ "     END AS ABIERTA_VIGENTE"
+	@SuppressWarnings({"checkstyle:CyclomaticComplexity", "checkstyle:NPathComplexity"})
+	public List<String[]> listadoPlazasCsv(Convocatoria convocatoria) throws SQLException, UVException {
+		String consulta = "SELECT bepplo.*, "
+				+ "    counts.CANDIDATOS_DISPONIBLES, counts.CANDIDATOS_INTERESADOS, counts.CANDIDATOS_CITADOS"
 				+ " FROM TBEP_PLAZAS_OFERTADAS bepplo"
 				+ " INNER JOIN TBEP_AREAS bepare ON bepare.CODNUM = bepplo.BEPARE_CODNUM"
+				+ " LEFT JOIN ("
+				+ " SELECT bepplo.CODNUM AS BEPPLO_CODNUM,"
+				+ "     COUNT(*) AS CANDIDATOS_DISPONIBLES,"
+				+ "     SUM(CASE WHEN bepofc.FLGRESULTADO = 'S' THEN 1 ELSE 0 END) AS CANDIDATOS_INTERESADOS,"
+				+ "     SUM(CASE WHEN bepcnt.CODNUM IS NOT NULL THEN 1 ELSE 0 END) AS CANDIDATOS_CITADOS"
+				+ "     FROM TBEP_USUARIOS bepusu"
+				+ "     INNER JOIN TBEP_SOLICITUDES bepsol ON bepsol.BEPUSU_CODNUM = bepusu.CODNUM AND bepsol.BEPCON_CODNUM = ?"
+				+ "     INNER JOIN TBEP_SOLICITUD_BOLSAS bepsob ON bepsob.BEPSOL_CODNUM = bepsol.CODNUM AND bepsob.FECHABAREMACION IS NOT NULL"
+				+ "     INNER JOIN TBEP_BOLSAS bepbol ON bepbol.CODNUM = bepsob.BEPBOL_CODNUM"
+				+ "     INNER JOIN TBEP_PLAZAS_OFERTADAS bepplo ON bepplo.BEPARE_CODNUM = bepbol.BEPARE_CODNUM"
+				+ "     INNER JOIN TBEP_DEDICACIONES bepded ON bepded.CODNUM = bepplo.BEPDED_CODNUM"
+				+ "     LEFT JOIN TBEP_ESTADO_CANDIDATOS bepesc ON bepesc.BEPUSU_CODNUM = bepusu.CODNUM AND bepesc.BEPBOL_CODNUM = bepbol.CODNUM"
+				+ "     LEFT JOIN ("
+				+ "         SELECT"
+				+ "             bepesc.BEPUSU_CODNUM AS BEPUSU_CODNUM,"
+				+ "         COUNT(DISTINCT bepesc.BEPPLO_CODNUM) AS CONTRATOS"
+				+ "         FROM TBEP_ESTADO_CANDIDATOS bepesc"
+				+ "         WHERE bepesc.ESTADO NOT IN ('" + ModeloEstadoCandidato.ESTADO_DISPONIBLE + "',"
+				+ "             '" + ModeloEstadoCandidato.ESTADO_SUSPENSION_PROVISIONAL + "', '" + ModeloEstadoCandidato.ESTADO_NO_DISPONIBLE + "')"
+				+ "         GROUP BY bepesc.BEPUSU_CODNUM"
+				+ "     ) bepcts ON bepcts.BEPUSU_CODNUM = bepusu.CODNUM"
+				+ "     LEFT JOIN TBEP_OFERTAS_CANDIDATOS bepofc ON bepofc.BEPUSU_CODNUM = bepusu.CODNUM AND bepofc.BEPPLO_CODNUM = bepplo.CODNUM"
+				+ "         LEFT JOIN TBEP_CONTRATACIONES bepcnt ON bepcnt.BEPUSU_CODNUM = bepusu.CODNUM AND bepcnt.BEPPLO_CODNUM = bepplo.CODNUM"
+				+ "     WHERE bepusu.ROL = " + ModeloRol.ID_ROL_CANDIDATO
+				+ "         AND bepusu.FLGBORRADO = 'N'"
+				+ "         AND ("
+				+ "             CASE"
+				+ "                 WHEN bepesc.ESTADO = '" + ModeloEstadoCandidato.ESTADO_CONTRATADO_PRIMER_CUATRIMESTRE + "'"
+				+ "                     AND bepplo.CUATRIMESTRE = '" + ModeloPlazaOfertada.CUATRIMESTRE_SEGUNDO + "' THEN 1"
+				+ "                 WHEN bepesc.ESTADO = '" + ModeloEstadoCandidato.ESTADO_CONTRATADO_PARCIAL + "'"
+				+ "                     AND bepded.TIPO = '" + ModeloDedicacion.TIPO_TIEMPO_PARCIAL + "' THEN 1"
+				+ "                 WHEN bepcts.CONTRATOS > 0 THEN 0"
+				+ "                 WHEN bepesc.CODNUM IS NULL THEN 1"
+				+ "                 WHEN bepesc.ESTADO = '" + ModeloEstadoCandidato.ESTADO_DISPONIBLE + "' THEN 1"
+				+ "                 ELSE 0"
+				+ "             END) = 1"
+				+ "     GROUP BY bepplo.CODNUM"
+				+ " ) counts ON counts.BEPPLO_CODNUM = bepplo.CODNUM"
 				+ " WHERE bepplo.FLGACTIVA = 'S'";
 		
 		List<String[]> rows = new ArrayList<>();
 		
 		try (Connection conexion = ConexionUvirtual.obtenerInstancia(); PreparedStatement stmt = conexion.prepareStatement(consulta)) {
+			int paramIndex = 1;
+			stmt.setInt(paramIndex, convocatoria.getCodNum());
 			
 			try (ResultSet rs = stmt.executeQuery()) {
 				
@@ -192,33 +242,41 @@ public class ModeloPlazaOfertada {
 					String.format("\"%s\"", "Fecha fin oferta"),
 					String.format("\"%s\"", "Fecha cerrada"),
 					String.format("\"%s\"", "Centro destino"),
+					String.format("\"%s\"", "Curso académico"),
 					String.format("\"%s\"", "Dedicación"),
 					String.format("\"%s\"", "Cuatrimestre"),
 					String.format("\"%s\"", "Duración prevista"),
 					String.format("\"%s\"", "Justificación"),
+					String.format("\"%s\"", "Candidatos disponibles"),
+					String.format("\"%s\"", "Candidatos interesados"),
+					String.format("\"%s\"", "Candidatos citados"),
 				});
 				
 				while (rs.next()) {
-					PlazaOfertada plaza = this.createPlazaOfertadaFromResultSet(rs, false);
+					PlazaOfertada plaza = this.createPlazaOfertadaFromResultSet(rs, false, false, false);
 					
 					rows.add(new String[] {
 						String.valueOf(plaza.getCodNum()),
 						String.format("\"%s\"", plaza.getIdPlaza() != null ? plaza.getIdPlaza() : ""),
 						String.format("\"%s\"", plaza.getArea() != null ? plaza.getArea().getDescripcion() : ""),
 						String.format("\"%s\"", EscapaHTML.escapa(plaza.getEstado())),
-						String.format("\"%s\"", plaza.getFechaCreacion() != null ? Formateador.formatoFecha(plaza.getFechaCreacion(), 
+						String.format("\"%s\"", plaza.getFechaCreacion() != null ? Formateador.formatoFecha(plaza.getFechaCreacion(),
 								Formateador.FORMATO_FECHA_DDMMYYYY_HHMMSS) : ""),
-						String.format("\"%s\"", plaza.getFechaAbierta() != null ? Formateador.formatoFecha(plaza.getFechaAbierta(), 
+						String.format("\"%s\"", plaza.getFechaAbierta() != null ? Formateador.formatoFecha(plaza.getFechaAbierta(),
 								Formateador.FORMATO_FECHA_DDMMYYYY_HHMMSS) : ""),
-						String.format("\"%s\"", plaza.getFechaFinOferta() != null ? Formateador.formatoFecha(plaza.getFechaFinOferta(), 
+						String.format("\"%s\"", plaza.getFechaFinOferta() != null ? Formateador.formatoFecha(plaza.getFechaFinOferta(),
 								Formateador.FORMATO_FECHA_DDMMYYYY_HHMMSS) : ""),
-						String.format("\"%s\"", plaza.getFechaCerrada() != null ? Formateador.formatoFecha(plaza.getFechaCerrada(), 
+						String.format("\"%s\"", plaza.getFechaCerrada() != null ? Formateador.formatoFecha(plaza.getFechaCerrada(),
 								Formateador.FORMATO_FECHA_DDMMYYYY_HHMMSS) : ""),
 						String.format("\"%s\"", plaza.getCentroDestino() != null ? plaza.getCentroDestino() : ""),
+						String.format("\"%s\"", EscapaHTML.escapa(plaza.getCurso())),
 						String.format("\"%s\"", plaza.getDedicacion() != null ? plaza.getDedicacion().getTexto() : ""),
 						String.format("\"%s\"", plaza.getCuatrimestre() != null ? plaza.getCuatrimestre() : ""),
 						String.format("\"%s\"", plaza.getDuracionPrevista() != null ? plaza.getDuracionPrevista() : ""),
 						String.format("\"%s\"", plaza.getJustificacion() != null ? plaza.getJustificacion() : ""),
+						String.valueOf(rs.getInt(CANDIDATOS_DISPONIBLES)),
+						String.valueOf(rs.getInt(CANDIDATOS_INTERESADOS)),
+						String.valueOf(rs.getInt(CANDIDATOS_CITADOS)),
 					});
 				}
 			}
@@ -314,6 +372,26 @@ public class ModeloPlazaOfertada {
 		return rows;
 	}
 	
+	/** Devuelve el listado de cursos de las plazas ofertadas .
+	 * @return cursos .
+	 * @throws SQLException en caso de error de base de datos .
+	 */
+	public List<String> listadoCursosPlazasOfertadas() throws SQLException {
+		List<String> cursos = new ArrayList<>();
+		
+		String consulta = String.format("SELECT DISTINCT %s FROM TBEP_PLAZAS_OFERTADAS WHERE %s = 'S' ORDER BY %s DESC", CURSO, FLGACTIVA, CURSO);
+		
+		try (Connection conexion = ConexionUvirtual.obtenerInstancia(); PreparedStatement stmt = conexion.prepareStatement(consulta)) {
+			try (ResultSet rs = stmt.executeQuery()) {
+				while (rs.next()) {
+					cursos.add(rs.getString(CURSO));
+				}
+			}
+		}
+		
+		return cursos;
+	}
+	
 	/** Devuelve una plaza ofertada por el id .
 	 * @param codNum .
 	 * @return plaza ofertada .
@@ -341,7 +419,7 @@ public class ModeloPlazaOfertada {
 					throw new UVException(MENSAJE_ERROR_PLAZA_OFERTADA_ID_NO_EXISTE);
 				}
 				
-				return createPlazaOfertadaFromResultSet(rs, true);
+				return createPlazaOfertadaFromResultSet(rs, true, true, true);
 			}
 		}
 	}
@@ -352,7 +430,7 @@ public class ModeloPlazaOfertada {
 	 * @throws SQLException .
 	 * @throws UVException .
 	 */
-	@SuppressWarnings({"checkstyle:npathcomplexity"})
+	@SuppressWarnings({"checkstyle:CyclomaticComplexity", "checkstyle:NPathComplexity"})
 	public void insertaPlazaOfertada(PlazaOfertada plaza, UsuarioBolsaEmpleo usuarioUpdate) throws SQLException, UVException {
 		if (plaza == null) {
 			throw new UVException(String.format(MENSAJE_ERROR_OBJETO_VACIO, "insertar"));
@@ -373,12 +451,12 @@ public class ModeloPlazaOfertada {
 		String consulta = "";
 		
 		if (usuarioUpdate.isServicioPersonal()) {
-			consulta = String.format("INSERT INTO TBEP_PLAZAS_OFERTADAS (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?)",
+			consulta = String.format("INSERT INTO TBEP_PLAZAS_OFERTADAS (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)",
 					BEPARE_CODNUM, JUSTIFICACION, CENTRO_DESTINO, FECHA_CREACION, "UID_USUARIO", BEPDED_CODNUM, CUATRIMESTRE, DURACION_PREVISTA, 
-					FECHA_FIN_OFERTA, ID_PLAZA, NRI, NRI_FECHA, HORARIO);
+					FECHA_FIN_OFERTA, ID_PLAZA, NRI, NRI_FECHA, HORARIO, CURSO, BEPUSU_CODNUM);
 		} else {
-			consulta = String.format("INSERT INTO TBEP_PLAZAS_OFERTADAS (%s,%s,%s,%s,%s,%s) VALUES (?,?,?,?,?,?)", 
-					BEPARE_CODNUM, JUSTIFICACION, CENTRO_DESTINO, FECHA_CREACION, "UID_USUARIO", HORARIO);
+			consulta = String.format("INSERT INTO TBEP_PLAZAS_OFERTADAS (%s,%s,%s,%s,%s,%s,%s,%s) VALUES (?,?,?,?,?,?,?,?)", 
+					BEPARE_CODNUM, JUSTIFICACION, CENTRO_DESTINO, FECHA_CREACION, "UID_USUARIO", HORARIO, CURSO, BEPUSU_CODNUM);
 		}
 		
 		try (Connection conexion = ConexionUvirtual.obtenerInstancia(); PreparedStatement stmt = conexion.prepareStatement(consulta)) {
@@ -402,6 +480,8 @@ public class ModeloPlazaOfertada {
 				stmt.setDate(parameterIndex++, plaza.getNri() != null ? new Date(BolsaEmpleoUtils.getCurrentDateTime().getTime()) : null);
 			}
 			stmt.setBlob(parameterIndex++, plaza.getHorario());
+			stmt.setString(parameterIndex++, plaza.getCurso());
+			stmt.setInt(parameterIndex++, usuarioUpdate.getCodNum());
 			stmt.executeUpdate();
 		}
 	}
@@ -433,17 +513,17 @@ public class ModeloPlazaOfertada {
 		String consulta = "";
 		
 		if (usuarioUpdate.isServicioPersonal()) {
-			consulta = String.format("UPDATE TBEP_PLAZAS_OFERTADAS SET %s=?, %s=?, %s=?, %s=?, %s=?, %s=?, %s=?, %s=?, %s=? "
+			consulta = String.format("UPDATE TBEP_PLAZAS_OFERTADAS SET %s=?, %s=?, %s=?, %s=?, %s=?, %s=?, %s=?, %s=?, %s=?, %s=? "
 					+ (plaza.getNri() != null ? ", " + NRI + "=?, " + NRI_FECHA + "=?" : "")
 					+ (plaza.getHorario() != null ? ", " + HORARIO + "=?" : "")
 					+ " WHERE %s=?",
-					BEPARE_CODNUM, JUSTIFICACION, CENTRO_DESTINO, "UID_USUARIO", BEPDED_CODNUM, CUATRIMESTRE, DURACION_PREVISTA, 
+					BEPARE_CODNUM, JUSTIFICACION, CENTRO_DESTINO, "UID_USUARIO", CURSO, BEPDED_CODNUM, CUATRIMESTRE, DURACION_PREVISTA, 
 					FECHA_FIN_OFERTA, ID_PLAZA, CODNUM);
 		} else {
-			consulta = String.format("UPDATE TBEP_PLAZAS_OFERTADAS SET %s=?, %s=?, %s=?, %s=?"
+			consulta = String.format("UPDATE TBEP_PLAZAS_OFERTADAS SET %s=?, %s=?, %s=?, %s=?, %s=?"
 					+ (plaza.getHorario() != null ? ", " + HORARIO + "=?" : "")
 					+ " WHERE %s=?", 
-					BEPARE_CODNUM, JUSTIFICACION, CENTRO_DESTINO, "UID_USUARIO", CODNUM);
+					BEPARE_CODNUM, JUSTIFICACION, CENTRO_DESTINO, "UID_USUARIO", CURSO, CODNUM);
 		}
 		
 		try (Connection conexion = ConexionUvirtual.obtenerInstancia(); PreparedStatement stmt = conexion.prepareStatement(consulta)) {
@@ -452,6 +532,7 @@ public class ModeloPlazaOfertada {
 			stmt.setString(parameterIndex++, plaza.getJustificacion());
 			stmt.setString(parameterIndex++, plaza.getCentroDestino());
 			stmt.setString(parameterIndex++, usuarioUpdate.getCodCuenta());
+			stmt.setString(parameterIndex++, plaza.getCurso());
 			if (usuarioUpdate.isServicioPersonal()) {
 				if (plaza.getDedicacion() != null) {
 					stmt.setInt(parameterIndex++, plaza.getDedicacion().getCodNum());
@@ -536,14 +617,14 @@ public class ModeloPlazaOfertada {
 		this.cambiarEstadoPlaza(plaza, usuarioUpdate, PLAZA_ESTADO_CONTRATACION);
 	}
 	
-	/** cambia el estado de una plaza a tramitación .
+	/** cambia el estado de una plaza a aprobación .
 	 * @param plaza .
 	 * @param usuarioUpdate .
 	 * @throws SQLException .
 	 * @throws UVException .
 	 */
-	public void cambiarEstadoPlazaATramitacion(PlazaOfertada plaza, UsuarioBolsaEmpleo usuarioUpdate) throws SQLException, UVException {
-		this.cambiarEstadoPlaza(plaza, usuarioUpdate, PLAZA_ESTADO_TRAMITACION);
+	public void cambiarEstadoPlazaAAprobacion(PlazaOfertada plaza, UsuarioBolsaEmpleo usuarioUpdate) throws SQLException, UVException {
+		this.cambiarEstadoPlaza(plaza, usuarioUpdate, PLAZA_ESTADO_APROBACION);
 	}
 	
 	/** cambia el estado de una plaza .
@@ -733,6 +814,7 @@ public class ModeloPlazaOfertada {
 		dataTable.setColumn(ORDER_COLUMN_INDEX_ID_PLAZA, "bepplo.ID_PLAZA");
 		dataTable.setColumn(ORDER_COLUMN_INDEX_AREA, "bepare.DES_AREA_CONOCIMIENTO");
 		dataTable.setColumn(ORDER_COLUMN_INDEX_ESTADO, "bepplo.ESTADO", DataTableColumn.COLUMN_TYPE_EXACT);
+		dataTable.setColumn(ORDER_COLUMN_INDEX_CURSO, "bepplo.CURSO", DataTableColumn.COLUMN_TYPE_EXACT);
 		dataTable.setColumn(ORDER_COLUMN_INDEX_FECHA_CREACION, FECHA_CREACION, DataTableColumn.COLUMN_TYPE_DATE);
 		dataTable.setColumn(ORDER_COLUMN_INDEX_FECHA_ABIERTA, FECHA_ABIERTA, DataTableColumn.COLUMN_TYPE_DATE);
 		dataTable.setColumn(ORDER_COLUMN_INDEX_FECHA_FIN_OFERTA, FECHA_FIN_OFERTA, DataTableColumn.COLUMN_TYPE_DATE);
@@ -752,7 +834,7 @@ public class ModeloPlazaOfertada {
 			
 			try (ResultSet rs = stmt.executeQuery()) {
 				while (rs.next()) {
-					rows.add(createPlazaOfertadaFromResultSet(rs, false));
+					rows.add(createPlazaOfertadaFromResultSet(rs, false, true, false));
 				}
 			}
 			
@@ -852,7 +934,7 @@ public class ModeloPlazaOfertada {
 				try (PreparedStatement stmt = conexion.prepareStatement(consultaSelectPlantilla)) {
 					try (ResultSet rs = stmt.executeQuery()) {
 						if (!rs.next()) {
-							throw new UVException(MENSAJE_ERROR_PLANTILLA_APERTURA_PLAZA_NO_EXISTE);
+							throw new UVException(MENSAJE_ERROR_PLANTILLA_CIERRE_PLAZA_NO_EXISTE);
 						}
 						
 						plantilla = modeloPlantilla.createPlantillaFromResultSet(rs);
@@ -1000,14 +1082,75 @@ public class ModeloPlazaOfertada {
 		}
 	}
 	
+	/** Método para crear un mensaje de aprobación de una plaza y ponerlo como pendiente de envío para el director que creó la plaza .
+	 * @param plaza .
+	 * @param director .
+	 * @param usuarioUpdate .
+	 * @throws SQLException .
+	 * @throws UVException .
+	 * @throws IOException .
+	 */
+	public void crearMensajeAprobacionPlaza(PlazaOfertada plaza, UsuarioBolsaEmpleo director, UsuarioBolsaEmpleo usuarioUpdate)
+			throws SQLException, UVException, IOException {
+		ModeloPlantilla modeloPlantilla = ModeloPlantilla.obtenerInstancia();
+		
+		try (Connection conexion = ConexionUvirtual.obtenerInstancia()) {
+			conexion.setAutoCommit(false);
+			
+			try {
+				Plantilla plantilla = new Plantilla();
+				
+				// Obtenemos la plantilla de la apertura de la plaza si existe
+				String consultaSelectPlantilla = "SELECT beppls.* FROM TBEP_PLANTILLAS beppls"
+						+ " INNER JOIN TBEP_PARAMETROS_CONFIG beppac ON beppac.VALOR = beppls.CODNUM"
+						+ " WHERE beppac.NOMBRE = '" + ModeloParametrosConfiguracion.PARAMETRO_PLANTILLA_APROBACION_PLAZA + "'";
+				
+				try (PreparedStatement stmt = conexion.prepareStatement(consultaSelectPlantilla)) {
+					try (ResultSet rs = stmt.executeQuery()) {
+						if (!rs.next()) {
+							throw new UVException(MENSAJE_ERROR_PLANTILLA_APROBACION_PLAZA_NO_EXISTE);
+						}
+						
+						plantilla = modeloPlantilla.createPlantillaFromResultSet(rs);
+					}
+				}
+		
+				Mensaje mensaje = new Mensaje(modeloPlantilla.reemplazaPlazaEnPlantilla(plaza, plantilla.getTitulo(), false), 
+						modeloPlantilla.reemplazaPlazaYUsuarioEnPlantilla(plaza, director, plantilla.getCuerpo(), true),
+						BolsaEmpleoUtils.getCurrentDateTime(), ModeloMensajes.MENSAJE_ESTADO_BORRADOR);
+				
+				int idMensaje = ModeloMensajes.obtenerInstancia().nuevoMensajeConexion(mensaje, usuarioUpdate, conexion);
+				
+				String consultaInsertDest = String.format("INSERT INTO TBEP_MEN_DESTINATARIOS (%s, %s, %s) VALUES (?, ?, ?)", 
+						"BEPMEN_CODNUM", "BEPUSU_CODNUM", "UID_USUARIO");
+				try (PreparedStatement stmt = conexion.prepareStatement(consultaInsertDest)) {
+					int parameterIndex = 1;
+					stmt.setInt(parameterIndex++, idMensaje);
+					stmt.setInt(parameterIndex++, director.getCodNum());
+					stmt.setString(parameterIndex++, usuarioUpdate.getCodCuenta());
+					stmt.executeUpdate();
+				}
+				conexion.commit();
+			} catch (Exception e) {
+				conexion.rollback();
+				throw e;
+			} finally {
+				conexion.setAutoCommit(true);
+			}
+		}
+	}
+	
 	/** Método para crear una plaza ofertada de un resultset.
 	 * @param rs .
 	 * @param withFiles .
+	 * @param withAbiertaVigente .
+	 * @param withCreador .
 	 * @return plaza ofertada .
 	 * @throws SQLException .
 	 * @throws UVException .
 	 */
-	public PlazaOfertada createPlazaOfertadaFromResultSet(ResultSet rs, Boolean withFiles) throws SQLException, UVException {
+	public PlazaOfertada createPlazaOfertadaFromResultSet(ResultSet rs, Boolean withFiles, Boolean withAbiertaVigente, Boolean withCreador)
+			throws SQLException, UVException {
 		PlazaOfertada plaza = new PlazaOfertada();
 		
 		plaza.setCodNum(rs.getInt(CODNUM));
@@ -1024,13 +1167,20 @@ public class ModeloPlazaOfertada {
 		plaza.setFechaCerrada(rs.getDate(FECHA_CERRADA));
 		plaza.setFechaNRI(rs.getDate(NRI_FECHA));
 		plaza.setIdPlaza(rs.getString(ID_PLAZA));
+		plaza.setCurso(rs.getString(CURSO));
+		
+		if (withCreador) {
+			plaza.setCreador(rs.getInt(BEPUSU_CODNUM) != 0 ? ModeloUsuarioBolsaEmpleo.obtenerInstancia().getUsuarioById(rs.getInt(BEPUSU_CODNUM)) : null);
+		}
 		
 		if (withFiles) {
 			plaza.setHorario(rs.getBlob(HORARIO) != null ? rs.getBlob(HORARIO).getBinaryStream() : null);
 			plaza.setNri(rs.getBlob(NRI) != null ? rs.getBlob(NRI).getBinaryStream() : null);
 		}
 		
-		plaza.setAbiertaVigente(rs.getInt("ABIERTA_VIGENTE") == 1);
+		if (withAbiertaVigente) {
+			plaza.setAbiertaVigente(rs.getInt("ABIERTA_VIGENTE") == 1);
+		}
 		
 		return plaza;
 	}

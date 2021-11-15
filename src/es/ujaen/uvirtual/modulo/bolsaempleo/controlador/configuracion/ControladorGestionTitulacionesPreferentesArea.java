@@ -148,7 +148,7 @@ public class ControladorGestionTitulacionesPreferentesArea extends HttpServlet {
 		BolsaEmpleoUtils.readMensajeSession(bean, request);
 		
 		try {
-			bean.setUsuarioLogeado(ModeloUsuarioBolsaEmpleo.obtenerInstancia().getOrCreateUsuario(datos));
+			bean.setUsuarioLogeado(ModeloUsuarioBolsaEmpleo.obtenerInstancia().getAndRefreshUsuario(datos));
 
 			if (!bean.getUsuarioLogeado().getRol().getCodNum().equals(ModeloRol.ID_ROL_SERVICIO_PERSONAL)) {
 				throw new UVException("No tienes permiso de personal");
@@ -192,7 +192,7 @@ public class ControladorGestionTitulacionesPreferentesArea extends HttpServlet {
 	}
 		
 	private void eliminarTitulacionesArea(VistaTitulacionesArea bean, UVDatos datos, HttpServletRequest request, HttpServletResponse response) 
-			throws SQLException, UVException, IOException {
+			throws SQLException, UVException {
 		
 		Area area = selecccionarArea(bean, request);
 		
@@ -209,7 +209,7 @@ public class ControladorGestionTitulacionesPreferentesArea extends HttpServlet {
 	}
 	
 	private void incluirTitulacionesPreferentesArea(VistaTitulacionesArea bean, UVDatos datos, HttpServletRequest request, HttpServletResponse response) 
-			throws SQLException, UVException, IOException {
+			throws SQLException, UVException {
 		Area area = selecccionarArea(bean, request);
 		
 		try {
@@ -227,7 +227,7 @@ public class ControladorGestionTitulacionesPreferentesArea extends HttpServlet {
 	}
 	
 	private void listadoTitulaciones(VistaTitulacionesArea bean, UVDatos datos, HttpServletRequest request, HttpServletResponse response)
-			throws IOException, SQLException {
+			throws IOException {
 		ModeloTitulacion modelo = ModeloTitulacion.obtenerInstancia();
 		datos.setContentType(RESPONSE_AJAX_CONTENTTYPE);
 		response.setContentType(RESPONSE_AJAX_CONTENTTYPE);
@@ -258,7 +258,7 @@ public class ControladorGestionTitulacionesPreferentesArea extends HttpServlet {
 	}
 	
 	private void listadoTitulacionesPreferentesArea(VistaTitulacionesArea bean, UVDatos datos, HttpServletRequest request, HttpServletResponse response)
-			throws IOException, SQLException {
+			throws IOException {
 		ModeloTitulacion modelo = ModeloTitulacion.obtenerInstancia();
 		datos.setContentType(RESPONSE_AJAX_CONTENTTYPE);
 		response.setContentType(RESPONSE_AJAX_CONTENTTYPE);

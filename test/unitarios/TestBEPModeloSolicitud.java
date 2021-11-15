@@ -193,11 +193,10 @@ public class TestBEPModeloSolicitud {
 	
 	/**
 	 * getSolicitudCerradaByConvocatoriaUsuario.
-	 * @throws UVException .
 	 * @throws SQLException .
 	 */
 	@Test
-	public void testA05getSolicitudCerradaByConvocatoriaUsuario() throws SQLException, UVException {
+	public void testA05getSolicitudCerradaByConvocatoriaUsuario() throws SQLException {
 		ModeloSolicitud modelo = ModeloSolicitud.obtenerInstancia();
 		Convocatoria c = ModeloConvocatoria.obtenerInstancia().getUltimaConvocatoria();
 		
@@ -385,10 +384,9 @@ public class TestBEPModeloSolicitud {
 	/**
 	 * desasignarBolsasASolicitud.
 	 * @throws SQLException .
-	 * @throws UVException .
 	 */
 	@Test
-	public void testA12desasignarBolsasASolicitud() throws SQLException, UVException {
+	public void testA12desasignarBolsasASolicitud() throws SQLException {
 		Solicitud sAbierta = null;
 		
 		try {			
@@ -430,6 +428,8 @@ public class TestBEPModeloSolicitud {
 	 * @throws SQLException .
 	 */
 	@Test
+	@SuppressWarnings({"checkstyle:CyclomaticComplexity", "checkstyle:ReturnCount", 
+		"checkstyle:NPathComplexity", "checkstyle:JavaNCSS", "checkstyle:ExecutableStatementCount"})
 	public void testA12asignarMeritosASolicitudBolsa() throws SQLException {
 		Solicitud sAbierta = null;
 		Bolsa bolsa = null;

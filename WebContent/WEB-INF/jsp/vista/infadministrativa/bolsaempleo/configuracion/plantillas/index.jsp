@@ -18,7 +18,7 @@ VistaPlantillas bean = (VistaPlantillas) uvdatos.getVistas().get(VistaPlantillas
 		<button class="link-btn" id="nueva_plantilla" style="margin-left: 4px">Nueva plantilla</button>
 	</div>
 	
-	<table class="bluetable bolsaempleo" id="tablePlantillas">
+	<table class="bluetable bolsaempleo" id="tablePlantillasPLA">
 		<tr>
 			<th scope="col" style="width:9%">Id</th>
 			<th scope="col" style="width:80%">Nombre</th>
@@ -50,9 +50,10 @@ $(document).ready(function() {
 		Atis.sendForm("<%=request.getRequestURI()%>", params);
 	};
 	
-	var table = new Atis.DataTable('#tablePlantillas', {
+	var table = new Atis.DataTable('#tablePlantillasPLA', {
 		"ajax": { url: '<%= ControladorPlantillas.URL_PATTERN_AJAX %>' },
 		"pageSize": 10,
+		"stateSave": true,
 		"action": "<%= ControladorPlantillas.ACCION_DATATABLE_PLANTILLAS %>",
 		"clickable": {'onClick': clickRow},
 		"columns": [

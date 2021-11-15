@@ -6,7 +6,6 @@ import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.sql.SQLException;
-import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.List;
 import org.junit.BeforeClass;
@@ -41,10 +40,9 @@ public class TestBEPModeloMerito {
 	 * 
 	 * @throws SQLException   si error en bd
 	 * @throws IOException    si error en ficheros
-	 * @throws ParseException si error fecha
 	 */
 	@BeforeClass
-	public static void preparaBd() throws SQLException, IOException, ParseException {
+	public static void preparaBd() throws SQLException, IOException {
 		Conexion.setConexionUvirtual(BbddRunner.obtenerDataSourceUv());
 		Conexion.setConexionArcos(BbddRunner.obtenerDataSourceArcos());
 		Conexion.setConexionUxxiRrhh(BbddRunner.obtenerDataSourceRh());

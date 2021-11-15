@@ -18,6 +18,7 @@ import es.ujaen.uvirtual.modulo.bolsaempleo.controlador.ControladorContratacion;
 import es.ujaen.uvirtual.modulo.bolsaempleo.modelo.ModeloBolsa;
 import es.ujaen.uvirtual.modulo.bolsaempleo.modelo.ModeloPlazaOfertada;
 import es.ujaen.uvirtual.modulo.bolsaempleo.utilidades.BolsaEmpleoDataTable;
+import es.ujaen.uvirtual.modulo.bolsaempleo.utilidades.BolsaEmpleoUtils;
 import es.ujaen.uvirtual.modulo.bolsaempleo.vistas.VistaContratacion;
 import es.ujaen.uvirtual.utilidades.UVException;
 
@@ -139,11 +140,13 @@ public class TestBEPControladorContratacion {
 	public void testA04AgregarPlazaOfertada() throws IOException, SQLException, UVException {
 		PeticionHttp peticion = UtilsTestBolsaEmpleo.peticionAutenticadaPersonal();
 		peticion.setParameter(ControladorContratacion.PARAM_ACCION, ControladorContratacion.ACCION_NUEVA_PLAZA_OFERTADA);
+		peticion.setParameter(ControladorContratacion.PARAM_CODIGO, "650.2021.08");
 		peticion.setParameter(ControladorContratacion.PARAM_AREA, ModeloBolsa.obtenerInstancia().getBolsaById(2).getArea().getCodNum().toString());
 		peticion.setParameter(ControladorContratacion.PARAM_DEDICACION, "1");
 		peticion.setParameter(ControladorContratacion.PARAM_JUSTIFICACION, "JUSTIFICACION");
 		peticion.setParameter(ControladorContratacion.PARAM_CENTRO_DESTINO, ModeloPlazaOfertada.CENTRO_DESTINO_JAEN);
 		peticion.setParameter(ControladorContratacion.PARAM_CUATRIMESTRE, ModeloPlazaOfertada.CUATRIMESTRE_TODO_EL_CURSO);
+		peticion.setParameter(ControladorContratacion.PARAM_CURSO, BolsaEmpleoUtils.getCurrentCourse());
 		peticion.setParameter(ControladorContratacion.PARAM_DURACION_PREVISTA, "DURACION PREVISTA");
 		peticion.setParameter(ControladorContratacion.PARAM_FECHA_FIN_OFERTA, FECHA_FIN);
 		peticion.setParameter(ControladorContratacion.PARAM_HORA_FIN_OFERTA, HORA_FIN);
@@ -170,11 +173,13 @@ public class TestBEPControladorContratacion {
 		
 		PeticionHttp peticion = UtilsTestBolsaEmpleo.peticionAutenticadaPersonal();
 		peticion.setParameter(ControladorContratacion.PARAM_ACCION, ControladorContratacion.ACCION_EDITAR_PLAZA_OFERTADA);
+		peticion.setParameter(ControladorContratacion.PARAM_CODIGO, "650.2021.09");
 		peticion.setParameter(ControladorContratacion.PARAM_PLAZA_OFERTADA, plaza.getCodNum().toString());
 		peticion.setParameter(ControladorContratacion.PARAM_AREA, plaza.getArea().getCodNum().toString());
 		peticion.setParameter(ControladorContratacion.PARAM_JUSTIFICACION, plaza.getJustificacion());
 		peticion.setParameter(ControladorContratacion.PARAM_CENTRO_DESTINO, plaza.getCentroDestino());
 		peticion.setParameter(ControladorContratacion.PARAM_CUATRIMESTRE, ModeloPlazaOfertada.CUATRIMESTRE_TODO_EL_CURSO);
+		peticion.setParameter(ControladorContratacion.PARAM_CURSO, BolsaEmpleoUtils.getCurrentCourse());
 		peticion.setParameter(ControladorContratacion.PARAM_DURACION_PREVISTA, plaza.getDuracionPrevista());
 		peticion.setParameter(ControladorContratacion.PARAM_FECHA_FIN_OFERTA, FECHA_FIN);
 		peticion.setParameter(ControladorContratacion.PARAM_HORA_FIN_OFERTA, HORA_FIN);
@@ -219,7 +224,7 @@ public class TestBEPControladorContratacion {
 	@Test
 	public void testA07AbrirPlazaOfertada() throws IOException {
 		VistaContratacion bean = obtenerPlazasOfertadas("{" + "'" + ModeloPlazaOfertada.ORDER_COLUMN_INDEX_ESTADO + "':'" 
-				+ ModeloPlazaOfertada.PLAZA_ESTADO_TRAMITACION + "'}");
+				+ ModeloPlazaOfertada.PLAZA_ESTADO_APROBACION + "'}");
 		
 		PeticionHttp peticion2 = UtilsTestBolsaEmpleo.peticionAutenticadaPersonal();
 		peticion2.setParameter(ControladorContratacion.PARAM_ACCION, ControladorContratacion.ACCION_PLAZA_ABIERTA);

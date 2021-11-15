@@ -156,7 +156,7 @@ public class ControladorNoticias extends HttpServlet {
 		
 		try {
 			LOGGER.log(Level.FINER, "Chequeando usuario logeado");
-			bean.setUsuarioLogeado(ModeloUsuarioBolsaEmpleo.obtenerInstancia().getOrCreateUsuario(datos));
+			bean.setUsuarioLogeado(ModeloUsuarioBolsaEmpleo.obtenerInstancia().getAndRefreshUsuario(datos));
 			
 			if (!bean.getUsuarioLogeado().getRol().getCodNum().equals(ModeloRol.ID_ROL_SERVICIO_PERSONAL)) {
 				throw new UVException("No tienes permiso de personal");
@@ -260,9 +260,8 @@ public class ControladorNoticias extends HttpServlet {
 	 * @param request .
 	 * @param response .
 	 * @throws IOException en caso de error de input u output .
-	 * @throws SQLException excepcion de bbdd.
 	 */
-	private void listadoNoticias(VistaNoticias bean, UVDatos datos, HttpServletRequest request, HttpServletResponse response) throws IOException, SQLException {
+	private void listadoNoticias(VistaNoticias bean, UVDatos datos, HttpServletRequest request, HttpServletResponse response) throws IOException {
 		ModeloNoticia modelo = ModeloNoticia.obtenerInstancia();
 		
 		datos.setContentType(RESPONSE_AJAX_CONTENTTYPE);

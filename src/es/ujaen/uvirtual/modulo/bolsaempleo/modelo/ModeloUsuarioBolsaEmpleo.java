@@ -19,8 +19,8 @@ import es.ujaen.uvirtual.modelo.conexion.ConexionUvirtual;
 import es.ujaen.uvirtual.modulo.bolsaempleo.beans.Area;
 import es.ujaen.uvirtual.modulo.bolsaempleo.beans.UsuarioBolsaEmpleo;
 import es.ujaen.uvirtual.modulo.bolsaempleo.utilidades.BolsaEmpleoDataTable;
-import es.ujaen.uvirtual.modulo.bolsaempleo.utilidades.BolsaEmpleoUtils;
 import es.ujaen.uvirtual.modulo.bolsaempleo.utilidades.BolsaEmpleoDataTable.DataTableColumn;
+import es.ujaen.uvirtual.modulo.bolsaempleo.utilidades.BolsaEmpleoUtils;
 import es.ujaen.uvirtual.utilidades.AdaptadorDocumentoIdentidad;
 import es.ujaen.uvirtual.utilidades.Memcache;
 import es.ujaen.uvirtual.utilidades.UVException;
@@ -75,6 +75,8 @@ public class ModeloUsuarioBolsaEmpleo {
 	public static final int COLUMN_RAZON_BORRADO_MAXLENGTH = 500;
 
 	public static final String MENSAJE_BUSCAR_USUARIO_NO_EXISTE = "El usuario no existe en el sistema: introduzca cuenta TIC sin @ujaen.es";
+	public static final String MENSAJE_PRSNIF_REQUERIDO = "El prsnif es requerido";
+	public static final String MENSAJE_ERROR_CODNUM_REQUERIDO = "Id de usuario requerido";
 	public static final String MENSAJE_ERROR_DOCUMENTO_REQUERIDO = "El documento es requerido";
 	public static final String MENSAJE_ERROR_USUARIO_CON_DOCUMENTO_NO_EXISTE = "No existe el usuario con el documento indicado";
 	public static final String MENSAJE_ERROR_USUARIO_UJA_CON_DOCUMENTO_NO_EXISTE = "No existe el usuario en UJA con el documento indicado [%s]";
@@ -84,13 +86,14 @@ public class ModeloUsuarioBolsaEmpleo {
 	public static final String MENSAJE_ERROR_USUARIO_EXCLUIDO = "El usuario está excluido de la bolsa de empleo";
 	public static final String MENSAJE_ERROR_NO_ES_CANDIDATO = "El usuario no es un candidato";
 	public static final String MENSAJE_ERROR_USUARIO_VACIO = "No se puede insertar un usuario vacio";
+	public static final String MENSAJE_ERROR_USUARIO_NIF_YA_EXISTE = "No se puede crear el usuario, el nif %s ya existe";
 	public static final String MENSAJE_ERROR_USUARIO_SIN_ROL = "No se puede insertar un usuario sin rol";
-	public static final String MENSAJE_ERROR_CODNUM_REQUERIDO = "Id de usuario requerido";
 	
 	public static final String BAREMABLE = "S";
 	public static final String EXCLUIDO = "S";
 	public static final String BORRADO = "S";
 	public static final String EN_LISTA_DISTRIBUCION = "S";
+	public static final String TOTAL = "TOTAL";
 
 	protected static ModeloUsuarioBolsaEmpleo eInstancia;
 
@@ -442,6 +445,7 @@ public class ModeloUsuarioBolsaEmpleo {
 	 * @return .
 	 * @see getColumnsFromInsertOrUpdate para orden.
 	 */
+	@SuppressWarnings({"checkstyle:ExecutableStatementCount"})
 	private int setColumnsFromInsertOrUpdate(PreparedStatement stmt, UsuarioBolsaEmpleo usuario, UsuarioBolsaEmpleo usuarioInsertOrUpdate) throws SQLException {
 		int parameterIndex = 1;
 		
@@ -738,15 +742,14 @@ public class ModeloUsuarioBolsaEmpleo {
 	/**
 	 * Si hay usuario logeado, comprueba si está registrado en sistema. Si tenemos
 	 * usuario en nuestro sistema, comprueba si está excluido o borrado (lanzando
-	 * una excepción). Si no tenemos usuario en nuestro sistema, lo crea como
-	 * candidato.
+	 * una excepción).
 	 * 
 	 * @param datos .
 	 * @return Boolean true si hay usuario logeado en el sistema o false en otro caso.
 	 * @throws SQLException en caso de error en la BD.
 	 * @throws UVException  si noticia no es valida.
 	 */
-	public UsuarioBolsaEmpleo getOrCreateUsuario(UVDatos datos) throws SQLException, UVException {
+	public UsuarioBolsaEmpleo getAndRefreshUsuario(UVDatos datos) throws SQLException, UVException {
 		Usuario usuArcos = datos.getUsuario();
 
 		// no hay usuario logeado, salimos
@@ -760,7 +763,7 @@ public class ModeloUsuarioBolsaEmpleo {
 		LOGGER.log(Level.FINER, String.format("LEYENDO USUARIO CACHEADO BEP [%s]", usuArcos.getUid()));
 		
 		if (usuario == null) {
-			usuario = refrescarUsuarioBEP(usuArcos);
+			usuario = refrescarUsuarioBEP(usuArcos, false);
 		}
 		
 		// comprobamos si está borrado o excluido
@@ -786,7 +789,7 @@ public class ModeloUsuarioBolsaEmpleo {
 	 */
 	public UsuarioBolsaEmpleo refrescarUsuarioBEP(UsuarioBolsaEmpleo usuarioBep) throws SQLException, UVException {
 		Usuario usuArcos = CrearUsuario.usuario(usuarioBep.getCodCuenta());
-		return refrescarUsuarioBEP(usuArcos);
+		return refrescarUsuarioBEP(usuArcos, false);
 	}
 	
 	/**
@@ -796,33 +799,39 @@ public class ModeloUsuarioBolsaEmpleo {
 	 * @throws UVException .
 	 * @throws SQLException .
 	 */
-	public UsuarioBolsaEmpleo refrescarUsuarioBEP(Usuario usuArcos) throws SQLException, UVException {
+	public UsuarioBolsaEmpleo refrescarUsuarioBEP(Usuario usuArcos, boolean create) throws SQLException, UVException {
 		UsuarioBolsaEmpleo usuario;
 		String uid = usuArcos.getUid();
-
+		
 		// comprobamos si existe el usuario en uvirtual
 		LOGGER.log(Level.FINER, String.format("Chequeando si existe usuario en Bolsa Empleo [%s]", uid));
-
+		
 		if (!existeUsuarioBolsaEmpleoByUid(usuArcos.getUid())) {
-			// no existe el usuario en la bolsa de empleo lo creamos como candidato
-			LOGGER.log(Level.FINER, String.format("No existe usuario en Bolsa Empleo [%s]. Lo creamos como candidato.", uid));
-			usuario = crearUsuarioBolsaEmpleo(ModeloRol.ID_ROL_CANDIDATO, usuArcos.getUid(), null);
+			if (create) {
+				// no existe el usuario en la bolsa de empleo lo creamos como candidato
+				LOGGER.log(Level.FINER, String.format("No existe usuario en Bolsa Empleo [%s]. Lo creamos como candidato.", uid));
+				usuario = crearUsuarioBolsaEmpleo(ModeloRol.ID_ROL_CANDIDATO, usuArcos.getUid(), null);
+			} else {
+				usuario = new UsuarioBolsaEmpleo(usuArcos);
+			}
 		} else {
 			// cargamos los datos del usuario de bolsa de empleo
 			LOGGER.log(Level.FINER, String.format("Existe usuario en Bolsa Empleo [%s]. Leemos sus datos.", uid));
 			usuario = getUsuarioByCodCuenta(usuArcos.getUid());
 		}
-				
-		LOGGER.log(Level.FINER, String.format("Fin chequeo usuario Bolsa Empleo [%s]. Todo correcto, refrescamos usuario y cacheamos", uid));
 		
-		// para que el usuario vuja, coga los roles del usuario de bep
-		CrearUsuario.refrescarUsuario(usuario.getCodCuenta());
+		if (create || usuario.getCodNum() != null) {
+			LOGGER.log(Level.FINER, String.format("Fin chequeo usuario Bolsa Empleo [%s]. Todo correcto, refrescamos usuario y cacheamos", uid));
+			
+			// para que el usuario vuja, coga los roles del usuario de bep
+			CrearUsuario.refrescarUsuario(usuario.getCodCuenta());
+			
+			Memcache mc = Memcache.getInstance();
+			mc.set("usuarioBEP." + uid, usuario);
+			
+			LOGGER.log(Level.FINER, String.format("CACHEANDO USUARIO BEP [%s]", uid));
+		}
 		
-		Memcache mc = Memcache.getInstance();
-		mc.set("usuarioBEP." + uid, usuario);
-		
-		LOGGER.log(Level.FINER, String.format("CACHEANDO USUARIO BEP [%s]", uid));
-
 		return usuario;
 	}
 
@@ -837,16 +846,47 @@ public class ModeloUsuarioBolsaEmpleo {
 		if (uid == null) {
 			throw new UVException(MENSAJE_BUSCAR_USUARIO_NO_EXISTE);
 		}
-
+		
 		String consulta = "SELECT * FROM TBEP_USUARIOS bepusu WHERE bepusu.CODCUENTA = ?";
-
+		
 		try (Connection conexion = ConexionUvirtual.obtenerInstancia(); PreparedStatement stmt = conexion.prepareStatement(consulta)) {
 			stmt.setString(1, uid);
-
+			
 			try (ResultSet rs = stmt.executeQuery()) {
 				return rs.next();
 			}
 		}
+	}
+	
+	/** Devuelve una lista con los roles de un usuario .
+	 * @param prsnif .
+	 * @param codNum .
+	 * @return si existe el nif .
+	 * @throws SQLException en caso de error en la BD .
+	 * @throws UVException  si noticia no es valida .
+	 */
+	public boolean existeUsuarioBolsaEmpleoByNif(String prsnif, Integer codNum) throws SQLException, UVException {
+		if (prsnif == null) {
+			throw new UVException(MENSAJE_PRSNIF_REQUERIDO);
+		}
+		
+		String consulta = "SELECT COUNT(*) AS TOTAL FROM TBEP_USUARIOS WHERE VUAJA_PRSNIF = ?" + (codNum != null ? " AND CODNUM != ?" : "");
+		
+		try (Connection conexion = ConexionUvirtual.obtenerInstancia(); PreparedStatement stmt = conexion.prepareStatement(consulta)) {
+			int parameterIndex = 1;
+			stmt.setString(parameterIndex++, prsnif);
+			if (codNum != null) {
+				stmt.setInt(parameterIndex++, codNum);
+			}
+			
+			try (ResultSet rs = stmt.executeQuery()) {
+				if (rs.next()) {
+					return rs.getInt(TOTAL) > 0;
+				}
+			}
+		}
+		
+		return false;
 	}
 
 	/**
@@ -871,13 +911,12 @@ public class ModeloUsuarioBolsaEmpleo {
 				}
 			}
 		}
-
+		
 		return roles;
 	}
 
 	/**
 	 * Cambia flag usuario a borrado con razon de borrado .
-	 * 
 	 * @param usuario .
 	 * @param usuarioQueBorra .
 	 * @throws SQLException en caso de error en la BD
@@ -911,6 +950,10 @@ public class ModeloUsuarioBolsaEmpleo {
 	 */
 	public UsuarioBolsaEmpleo crearUsuarioBolsaEmpleo(Integer idRol, String uidUsuario, UsuarioBolsaEmpleo usuarioQueCrea) throws SQLException, UVException {
 		Usuario usuArcos = CrearUsuario.usuario(uidUsuario);
+		
+		if (existeUsuarioBolsaEmpleoByNif(usuArcos.getDocumentoNumero(), null)) {
+			throw new UVException(String.format(MENSAJE_ERROR_USUARIO_NIF_YA_EXISTE, usuArcos.getDocumentoNumero()));
+		}
 		
 		UsuarioBolsaEmpleo usuarioFinal = new UsuarioBolsaEmpleo();
 		usuarioFinal.setRol(ModeloRol.obtenerInstancia().getRoleById(idRol));

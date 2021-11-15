@@ -7,7 +7,6 @@ import java.util.logging.Logger;
 import java.util.stream.IntStream;
 import java.util.List;
 import java.util.logging.Level;
-
 import javax.servlet.ServletOutputStream;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
@@ -23,7 +22,6 @@ import es.ujaen.uvirtual.modulo.bolsaempleo.beans.CandidatoResultadoTable;
 import es.ujaen.uvirtual.modulo.bolsaempleo.beans.Convocatoria;
 import es.ujaen.uvirtual.modulo.bolsaempleo.beans.UsuarioBolsaEmpleo;
 import es.ujaen.uvirtual.modulo.bolsaempleo.modelo.ModeloBolsa;
-import es.ujaen.uvirtual.modulo.bolsaempleo.modelo.ModeloCandidato;
 import es.ujaen.uvirtual.modulo.bolsaempleo.modelo.ModeloConvocatoria;
 import es.ujaen.uvirtual.modulo.bolsaempleo.modelo.ModeloMeritosPreferentes;
 import es.ujaen.uvirtual.modulo.bolsaempleo.modelo.ModeloParametrosConfiguracion;
@@ -156,7 +154,7 @@ public class ControladorResultados extends HttpServlet {
 		BolsaEmpleoUtils.readMensajeSession(bean, request);
 		
 		try {
-			bean.setUsuarioLogeado(ModeloUsuarioBolsaEmpleo.obtenerInstancia().getOrCreateUsuario(datos));
+			bean.setUsuarioLogeado(ModeloUsuarioBolsaEmpleo.obtenerInstancia().getAndRefreshUsuario(datos));
 			
 			// personal, comision, direccion
 			int[] rolesValidos = {ModeloRol.ID_ROL_SERVICIO_PERSONAL, ModeloRol.ID_ROL_DIRECTOR_DEPARTAMENTO, ModeloRol.ID_ROL_MIEMBRO_COMISION};
@@ -282,7 +280,7 @@ public class ControladorResultados extends HttpServlet {
 		}
 	}
 	
-	private void exportarResultados(UVDatos datos, HttpServletRequest request, HttpServletResponse response) throws IOException, SQLException, UVException {
+	private void exportarResultados(UVDatos datos, HttpServletRequest request, HttpServletResponse response) throws SQLException, UVException {
 		
 		Integer idBolsa = Formateador.leeParametroInteger(BolsaEmpleoUtils.getParamRequestOrSession(request, PARAM_BOLSA));
 		

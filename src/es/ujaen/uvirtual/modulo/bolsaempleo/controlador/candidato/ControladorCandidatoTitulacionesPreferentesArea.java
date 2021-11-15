@@ -132,7 +132,7 @@ public class ControladorCandidatoTitulacionesPreferentesArea extends HttpServlet
 		BolsaEmpleoUtils.readMensajeSession(bean, request);
 		
 		try {
-			bean.setUsuarioLogeado(ModeloUsuarioBolsaEmpleo.obtenerInstancia().getOrCreateUsuario(datos));
+			bean.setUsuarioLogeado(ModeloUsuarioBolsaEmpleo.obtenerInstancia().getAndRefreshUsuario(datos));
 
 			if (!bean.getUsuarioLogeado().getRol().getCodNum().equals(ModeloRol.ID_ROL_CANDIDATO)) {
 				throw new UVException("No eres un candidato");
@@ -175,7 +175,7 @@ public class ControladorCandidatoTitulacionesPreferentesArea extends HttpServlet
 	 * @throws IOException .
 	 * @throws SQLException .
 	 */
-	private void listadoBolsas(VistaCandidatoTitulacionesArea bean, UVDatos datos, HttpServletRequest request, HttpServletResponse response) throws IOException, SQLException {
+	private void listadoBolsas(VistaCandidatoTitulacionesArea bean, UVDatos datos, HttpServletRequest request, HttpServletResponse response) throws IOException {
 		ModeloArea modelo = ModeloArea.obtenerInstancia();		
 		datos.setContentType(RESPONSE_AJAX_CONTENTTYPE);
 		datos.setRespuestaEnviada(true);
@@ -208,10 +208,9 @@ public class ControladorCandidatoTitulacionesPreferentesArea extends HttpServlet
 	 * @param request .
 	 * @param response .
 	 * @throws IOException en caso de error de IO .
-	 * @throws SQLException excepcion de bbdd.
 	 */
 	private void listadoTitulacionesPreferentesArea(VistaCandidatoTitulacionesArea bean, UVDatos datos, HttpServletRequest request, HttpServletResponse response)
-			throws IOException, SQLException {
+			throws IOException {
 		ModeloTitulacion modelo = ModeloTitulacion.obtenerInstancia();
 		datos.setContentType(RESPONSE_AJAX_CONTENTTYPE);
 		datos.setRespuestaEnviada(true);

@@ -1,12 +1,7 @@
 package es.ujaen.uvirtual.modulo.bolsaempleo.vistas;
 
 import java.io.Serializable;
-import java.util.List;
 import es.ujaen.uvirtual.beans.vistas.Vista;
-import es.ujaen.uvirtual.modulo.bolsaempleo.beans.Area;
-import es.ujaen.uvirtual.modulo.bolsaempleo.beans.Convocatoria;
-import es.ujaen.uvirtual.modulo.bolsaempleo.beans.Destinatario;
-import es.ujaen.uvirtual.modulo.bolsaempleo.beans.Mensaje;
 import es.ujaen.uvirtual.modulo.bolsaempleo.beans.Plantilla;
 import es.ujaen.uvirtual.modulo.bolsaempleo.beans.UsuarioBolsaEmpleo;
 import es.ujaen.uvirtual.modulo.bolsaempleo.utilidades.BolsaEmpleoDataTable;

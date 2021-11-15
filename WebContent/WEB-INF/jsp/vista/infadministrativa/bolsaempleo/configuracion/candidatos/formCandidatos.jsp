@@ -77,88 +77,88 @@ UsuarioBolsaEmpleo candidato = bean.getCandidato();
 	%>
 	
 	<form id="actualizar_candidato" class="be-form" method="post" action="<%= request.getRequestURI() %>">
-    	<input type="hidden" name="<%= ControladorUsuarioCandidato.PARAM_ACCION %>" id="accion_formulario" 
-    			value="<%= ControladorUsuarioCandidato.ACCION_EDITAR_CANDIDATO %>" />
+		<input type="hidden" name="<%= ControladorUsuarioCandidato.PARAM_ACCION %>" id="accion_formulario" 
+				value="<%= ControladorUsuarioCandidato.ACCION_EDITAR_CANDIDATO %>" />
 		<input type="hidden" name="<%= ControladorUsuarioCandidato.PARAM_CANDIDATO%>" id="usuario_id" 
 				value="<%= candidato.getCodNum() %>" />
 		
 		<div class="form-group-container">
-    		<div class="form-group">
-    			<label for="nickname">Usuario: </label>
-    			<input class="form-input-custom" id="nickname" type="text" name="<%= ControladorUsuarioCandidato.PARAM_NOMBRE_USUARIO%>" value="<%= usuario %>" disabled/>
-    		</div>
-	   		<div class="form-group">
-    			<label for="nombre">Nombre: </label>
-    			<input class="form-input-custom" id="nombre" type="text" name="<%= ControladorUsuarioCandidato.PARAM_NOMBRE %>" value="<%= nombre %>" disabled/>
-    		</div>
-    	</div>
-    	
-    	<div class="form-group-container">
-    	    <div class="form-group">
-    			<label for="apellidos">Apellidos: </label>
-    			<input class="form-input-custom" id="apellidos" type="text" name="<%= ControladorUsuarioCandidato.PARAM_NOMBRE %>" value="<%= apellidos %>" disabled/>
-    		</div>
-    		<div class="form-group">
-    			<label for="email">Email: </label>
-    			<input class="form-input-custom" id="email" type="text" name="<%= ControladorUsuarioCandidato.PARAM_NOMBRE %>" value="<%= email %>" disabled/>
-    		</div>
-    	</div>
-
-		<div class="form-group-container">
-	    	<div class="form-group">
-    			<label for="tipo_documento">Tipo de documento: </label>
-    			<input class="form-input-custom" id="tipo_documento" type="text" name="<%= ControladorUsuarioCandidato.PARAM_NOMBRE %>" value="<%= tipo_documento %>" disabled/>
-    		</div>
-    		<div class="form-group">
-    			<label for="n_documento">Nº de documento: </label>
-    			<input class="form-input-custom" id="n_documento" type="text" name="<%= ControladorUsuarioCandidato.PARAM_NOMBRE %>" value="<%= n_documento %>" disabled/>
-    		</div>
+			<div class="form-group">
+				<label for="nickname">Usuario: </label>
+				<input class="form-input-custom" id="nickname" type="text" name="<%= ControladorUsuarioCandidato.PARAM_NOMBRE_USUARIO%>" value="<%= usuario %>" disabled/>
+			</div>
+			<div class="form-group">
+				<label for="nombre">Nombre: </label>
+				<input class="form-input-custom" id="nombre" type="text" name="<%= ControladorUsuarioCandidato.PARAM_NOMBRE %>" value="<%= nombre %>" disabled/>
+			</div>
 		</div>
 		
 		<div class="form-group-container">
-    	    <div class="form-group">
-    			<label for="direccion">Direcci&oacute;n: </label>
-    			<input class="form-input-custom" id="direccion" type="text" name="direccion" value="<%= direccion %>" disabled/>
-    		</div>
-    		<div class="form-group">
-    			<label for="codigo_postal">Codigo Postal: </label>
-    			<input class="form-input-custom" id="codigo_postal" type="text" name="codigo_postal" value="<%= codigoPostal %>" disabled/>
-    		</div>
-    	</div>
-    	
-    	<div class="form-group-container">
-    	    <div class="form-group">
-    			<label for="localidad">Localidad: </label>
-    			<input class="form-input-custom" id="localidad" type="text" name="localidad" value="<%= localidad %>" disabled/>
-    		</div>
-    		<div class="form-group">
-    			<label for="provincia">Provincia: </label>
-    			<input class="form-input-custom" id="provincia" type="text" name="provincia" value="<%= provincia %>" disabled/>
-    		</div>
-    	</div>
-    	
-    	<div class="form-group-container">
-    		<div class="form-group">
-    			<label for="telefono">Tel&eacute;fono: </label>
-    			<input class="form-input-custom" pattern="[0-9]{1,11}" id="telefono" type="text" name="telefono" value="<%= telefono %>" disabled/>
-    		</div>
-    		    	    <div class="form-group">
-    			<label for="nacionalidad">Nacionalidad: </label>
-    			<input class="form-input-custom" id="nacionalidad" type="text" name="nacionalidad" value="<%= nacionalidad %>" disabled/>
-    		</div>
-    	</div>
+			<div class="form-group">
+				<label for="apellidos">Apellidos: </label>
+				<input class="form-input-custom" id="apellidos" type="text" name="<%= ControladorUsuarioCandidato.PARAM_NOMBRE %>" value="<%= apellidos %>" disabled/>
+			</div>
+			<div class="form-group">
+				<label for="email">Email: </label>
+				<input class="form-input-custom" id="email" type="text" name="<%= ControladorUsuarioCandidato.PARAM_NOMBRE %>" value="<%= email %>" disabled/>
+			</div>
+		</div>
+
+		<div class="form-group-container">
+			<div class="form-group">
+				<label for="tipo_documento">Tipo de documento: </label>
+				<input class="form-input-custom" id="tipo_documento" type="text" name="<%= ControladorUsuarioCandidato.PARAM_NOMBRE %>" value="<%= tipo_documento %>" disabled/>
+			</div>
+			<div class="form-group">
+				<label for="n_documento">Nº de documento: </label>
+				<input class="form-input-custom" id="n_documento" type="text" name="<%= ControladorUsuarioCandidato.PARAM_NOMBRE %>" value="<%= n_documento %>" disabled/>
+			</div>
+		</div>
 		
 		<div class="form-group-container">
-	    	<div class="form-check-custom">
-    			<label for="usuario_lista_dist"><input class="params" type="checkbox" id="usuario_lista_dist" name="<%= ControladorUsuarioCandidato.PARAM_LISTA %>"
-    				 value="true" <%= (lista_dist ? "checked=''" : "") %>/>Lista Distribución</label>
-    		</div>
-    		<div class="form-check">
-    			<div class="form-check-custom" style="float: left;">
-    				<label for="usuario_excluido"><input class="params" type="checkbox" id="usuario_excluido" name="<%= ControladorUsuarioCandidato.PARAM_EXCLUIDO %>"
-    				 value="true" <%= (excluido ? "checked=''" : "") %>/>Excluido</label>
-    			</div>
-    			<div class="form-check-custom" id="excluido_tipo" style="display:none;">
+			<div class="form-group">
+				<label for="direccion">Direcci&oacute;n: </label>
+				<input class="form-input-custom" id="direccion" type="text" name="direccion" value="<%= direccion %>" disabled/>
+			</div>
+			<div class="form-group">
+				<label for="codigo_postal">Codigo Postal: </label>
+				<input class="form-input-custom" id="codigo_postal" type="text" name="codigo_postal" value="<%= codigoPostal %>" disabled/>
+			</div>
+		</div>
+		
+		<div class="form-group-container">
+			<div class="form-group">
+				<label for="localidad">Localidad: </label>
+				<input class="form-input-custom" id="localidad" type="text" name="localidad" value="<%= localidad %>" disabled/>
+			</div>
+			<div class="form-group">
+				<label for="provincia">Provincia: </label>
+				<input class="form-input-custom" id="provincia" type="text" name="provincia" value="<%= provincia %>" disabled/>
+			</div>
+		</div>
+		
+		<div class="form-group-container">
+			<div class="form-group">
+				<label for="telefono">Tel&eacute;fono: </label>
+				<input class="form-input-custom" pattern="[0-9]{1,11}" id="telefono" type="text" name="telefono" value="<%= telefono %>" disabled/>
+			</div>
+						<div class="form-group">
+				<label for="nacionalidad">Nacionalidad: </label>
+				<input class="form-input-custom" id="nacionalidad" type="text" name="nacionalidad" value="<%= nacionalidad %>" disabled/>
+			</div>
+		</div>
+		
+		<div class="form-group-container">
+			<div class="form-check-custom">
+				<label for="usuario_lista_dist"><input class="params" type="checkbox" id="usuario_lista_dist" name="<%= ControladorUsuarioCandidato.PARAM_LISTA %>"
+					 value="true" <%= (lista_dist ? "checked=''" : "") %>/>Lista Distribución</label>
+			</div>
+			<div class="form-check">
+				<div class="form-check-custom" style="float: left;">
+					<label for="usuario_excluido"><input class="params" type="checkbox" id="usuario_excluido" name="<%= ControladorUsuarioCandidato.PARAM_EXCLUIDO %>"
+					 value="true" <%= (excluido ? "checked=''" : "") %>/>Excluido</label>
+				</div>
+				<div class="form-check-custom" id="excluido_tipo" style="display:none;">
 					<label class="form-label-custom" for="indefinido" style="float: none; margin-right:0px; margin-bottom:5px;">
 						<input class="form-input" type="radio" id="indefinido" name="<%= ControladorUsuarioBolsaEmpleo.PARAM_EXCLUIDO_TIPO %>"
 							value="I" style="display: inline;">Indefinido
@@ -167,54 +167,54 @@ UsuarioBolsaEmpleo candidato = bean.getCandidato();
 						<input class="form-input" type="radio" id="temporal" name="<%= ControladorUsuarioBolsaEmpleo.PARAM_EXCLUIDO_TIPO %>"
 							value="T" style="display: inline;">Temporal
 					</label>
-    			</div>
-    		</div>
+				</div>
+			</div>
 		</div>
 		<div class="form-group-container col-2" id="fecha_excluido" style="display:none;">
-	    	<div class="form-check">
-    			
-    		</div>
-    		<div class="form-check">
-    			<div class="form-check-custom">
-	    			<label for="noticia_fecha"><strong>Fecha Inicio</strong>:</label>
-	    			<input class="form-input-custom" type="text" name="<%= ControladorUsuarioCandidato.PARAM_FECHA_EXCLUIDO_INICIO %>" id="fecha_ini" autocomplete="off" value="<%= fecha_ini!=null ? fecha_ini : "" %>" style="width:80%"/>
-	    		</div>
-	    		<div class="form-check-custom">
-	    			<label for="noticia_fecha"><strong>Fecha Fin</strong>:</label>
-	    			<input class="form-input-custom" type="text" name="<%= ControladorUsuarioCandidato.PARAM_FECHA_EXCLUIDO_FIN %>" id="fecha_fin" autocomplete="off" value="<%= fecha_fin!=null ? fecha_fin : "" %>" style="width:80%"/>
-	    		</div>
-	    	</div>
+			<div class="form-check">
+				
+			</div>
+			<div class="form-check">
+				<div class="form-check-custom">
+					<label for="noticia_fecha"><strong>Fecha Inicio</strong>:</label>
+					<input class="form-input-custom" type="text" name="<%= ControladorUsuarioCandidato.PARAM_FECHA_EXCLUIDO_INICIO %>" id="fecha_ini" autocomplete="off" value="<%= fecha_ini!=null ? fecha_ini : "" %>" style="width:80%"/>
+				</div>
+				<div class="form-check-custom">
+					<label for="noticia_fecha"><strong>Fecha Fin</strong>:</label>
+					<input class="form-input-custom" type="text" name="<%= ControladorUsuarioCandidato.PARAM_FECHA_EXCLUIDO_FIN %>" id="fecha_fin" autocomplete="off" value="<%= fecha_fin!=null ? fecha_fin : "" %>" style="width:80%"/>
+				</div>
+			</div>
 		</div>
 	
 		<div class="form-group" id="razon_excluido" style="display:none;">
-    		<label for="razon_exclusion">Razón exclusión:</label>
-    		<textarea class="params form-input-custom" id="razon_exclusion" name="<%= ControladorUsuarioCandidato.PARAM_RAZON_EXCLUIDO %>" rows="3" cols="60" <%= (excluido ? "" : "disabled") %>><%= razon_excluido %></textarea>
-   		</div>
-   		
-   		<%	if (candidato != null && candidato.getBorrado()) { %>
-   				<div class="form-group-container col2">
-   					<div class="form-group" style="margin-top: 0.4rem; margin-bottom: 0.5rem;">
-   						<label for="razon_borrado">Razón borrado:</label>
-   						<textarea class="form-input-custom" id="razon_borrado" name="razonborrado" rows="2" disabled><%= bean.getCandidato().getRazonBorrado() %></textarea>
-	    			</div>
-    			</div>
-   		<%	} %>
+			<label for="razon_exclusion">Razón exclusión:</label>
+			<textarea class="params form-input-custom" id="razon_exclusion" name="<%= ControladorUsuarioCandidato.PARAM_RAZON_EXCLUIDO %>" rows="3" cols="60" <%= (excluido ? "" : "disabled") %>><%= razon_excluido %></textarea>
+		</div>
+		
+		<%	if (candidato != null && candidato.getBorrado()) { %>
+				<div class="form-group-container col2">
+					<div class="form-group" style="margin-top: 0.4rem; margin-bottom: 0.5rem;">
+						<label for="razon_borrado">Razón borrado:</label>
+						<textarea class="form-input-custom" id="razon_borrado" name="razonborrado" rows="2" disabled><%= bean.getCandidato().getRazonBorrado() %></textarea>
+					</div>
+				</div>
+		<%	} %>
 		
 		<div class="form-group-container col2">
 			<div class="form-group">
 				<%	if (candidato != null && candidato.getBorrado()) { %>
-    				<input id="usuario_restaurar" type="button" value="Restaurar" style="float:right;"/>
+					<input id="usuario_restaurar" type="button" value="Restaurar" style="float:right;"/>
 				<%	} %>
 			</div>
-    		<div class="form-group">
-    			<input id="usuario_guardar" type="submit" name="<%= ControladorUsuarioCandidato.PARAM_GUARDAR %>" value="Guardar candidato" style="float:right; margin-left: 10px;"/>
-    		<%	if (candidato != null && !candidato.getBorrado()) { %>
-    				<input id="usuario_borrar" type="button" value="Dar de baja candidato" style="float:right;"/>
-    		<%	} %>
-    		</div>
-    	</div>
-    	
-    </form>
+			<div class="form-group">
+				<input id="usuario_guardar" type="submit" name="<%= ControladorUsuarioCandidato.PARAM_GUARDAR %>" value="Guardar candidato" style="float:right; margin-left: 10px;"/>
+			<%	if (candidato != null && !candidato.getBorrado()) { %>
+					<input id="usuario_borrar" type="button" value="Dar de baja candidato" style="float:right;"/>
+			<%	} %>
+			</div>
+		</div>
+		
+	</form>
 	
 	<ul class="nav-tabs-widget" style="margin-left: 0px; margin-top: 16px;">
 		<li <%= bean.getApartadoAreasExcluidas() != null ? "class='tab-selected'" : "" %>>
@@ -239,7 +239,7 @@ UsuarioBolsaEmpleo candidato = bean.getCandidato();
 
 
 <%	if (bean.getApartadoAreasExcluidas() != null) { %>
-		<table class="bluetable bolsaempleo" id="table_areas_excluidas">
+		<table class="bluetable bolsaempleo" id="tableAreasExcluidasCAN">
 			<tr>
 				<th scope="col" style="width:5%"></th>
 				<th scope="col" style="width:20%" title="Id de la area">Id</th>
@@ -256,7 +256,7 @@ UsuarioBolsaEmpleo candidato = bean.getCandidato();
 		</table>
 		
 		
-		<table class="bluetable bolsaempleo" id="table_areas">
+		<table class="bluetable bolsaempleo" id="tableAreasCAN">
 			<tr>
 				<th scope="col" style="width:5%"></th>
 				<th scope="col" style="width:20%" title="Id de la area">Id</th>
@@ -270,11 +270,11 @@ UsuarioBolsaEmpleo candidato = bean.getCandidato();
 					<th colSpan="4"></th>
 				</tr>
 			</tfoot>
-		</table>		
+		</table>
 <%	} %>
 
 <%	if (bean.getApartadoTitulaciones() != null) { %>
-		<table class="bluetable bolsaempleo" id="table_titulaciones">
+		<table class="bluetable bolsaempleo" id="tableTitulacionesCAN">
 			<tr>
 				<th scope="col" style="width:10%">Id</th>
 				<th scope="col" style="width:50%">Titulación</th>
@@ -283,7 +283,7 @@ UsuarioBolsaEmpleo candidato = bean.getCandidato();
 				<th scope="col" style="width:10%">Validada</th>
 				<th scope="col" style="width:10%" class="center"></th>
 			</tr>
-			<tbody>		
+			<tbody>
 			</tbody>
 			<tfoot>
 				<tr>
@@ -294,7 +294,7 @@ UsuarioBolsaEmpleo candidato = bean.getCandidato();
 <%	} %>
 
 <%	if (bean.getApartadoAcreditaciones() != null) { %>
-		<table class="bluetable bolsaempleo" id="table_acreditaciones">
+		<table class="bluetable bolsaempleo" id="tableAcreditacionesCAN">
 			<tr>
 				<th scope="col" style="width:10%">Id</th>
 				<th scope="col" style="width:10%">Código</th>
@@ -315,7 +315,7 @@ UsuarioBolsaEmpleo candidato = bean.getCandidato();
 <%	} %>
 
 <%	if (bean.getApartadoSolicitudes() != null) { %>
-		<table class="bluetable bolsaempleo" id="table_solicitudes">
+		<table class="bluetable bolsaempleo" id="tableSolicitudesCAN">
 			<tr>
 				<th scope="col"	style="width:15%">Id Solicitud</th>
 				<th scope="col"	style="width:45%">Descripción convocatoria</th>
@@ -333,7 +333,7 @@ UsuarioBolsaEmpleo candidato = bean.getCandidato();
 
 <%	if (bean.getApartadoMeritos() != null) { %>
 
-		<table class="bluetable bolsaempleo" id="table_meritos">
+		<table class="bluetable bolsaempleo" id="tableMeritosCAN">
 			<tr>
 				<th scope="col" style="width:10%">Id</th>
 				<th scope="col" style="width:10%">Bloque</th>
@@ -357,7 +357,7 @@ UsuarioBolsaEmpleo candidato = bean.getCandidato();
 	
 <%	if (bean.getApartadoContrataciones() != null) { %>
 		
-		<table class="bluetable bolsaempleo" id="tableEstadosCandidato">
+		<table class="bluetable bolsaempleo" id="tableEstadosCandidatoCAN">
 			<tr>
 				<th scope="col" style="width:15px"></th>
 				<th scope="col" style="width:100%">Área</th>
@@ -458,30 +458,30 @@ UsuarioBolsaEmpleo candidato = bean.getCandidato();
 		});
 		
 	<%	if (bean.getApartadoSolicitudes() != null) { %>
-			var tableSolicitudes = new Atis.DataTable('#table_solicitudes', {
-			    "ajax": { url: "<%=ControladorUsuarioCandidato.URL_PATTERN_AJAX%>" },
-			    "params": {"<%=ControladorUsuarioCandidato.PARAM_CANDIDATO%>": <%= candidato.getCodNum() %>},
-			    "pageSize": 10,
-			    "filterable": true,
-			    "title": "SOLICITUDES",
-			    "clickable": {'onClick': function(row) {
-			    	var params = {
-		    				'<%= ControladorUsuarioCandidato.PARAM_ACCION %>': '<%= ControladorUsuarioCandidato.ACCION_SELECCIONAR_SOLICITUD %>',
-		    				'<%= ControladorUsuarioCandidato.PARAM_CANDIDATO %>': '<%= bean.getCandidato().getCodNum() %>',
-		    				'<%= ControladorUsuarioCandidato.PARAM_SOLICITUD %>': row.codNum};
-		    		Atis.sendForm("<%= request.getRequestURI() %>", params);
-			    }},
-			    "action": "<%= ControladorUsuarioCandidato.ACCION_DATATABLE_SOLICITUDES %>",
-			    "columns": [
-			    	{'data': 'codNum', 'filter': {'type': 'number'}},
-			    	{'data': 'convocatoria.descripcion', 'filter': true},
-			        {'data': 'estado', 'filter': false, 'render': function(row) { 
-			        	return row.estado + (row.excluido ? " (excluida)" : "");
-			        }},
-			        {'data': 'fechaConfirmacion', order: {'active': false}, 'render': function(row) {
-			        	return row.estado == 'CERRADA' ? row.fechaConfirmacion : '';
-			        }}			        
-			    ]
+			var tableSolicitudes = new Atis.DataTable('#tableSolicitudesCAN', {
+				"ajax": { url: "<%=ControladorUsuarioCandidato.URL_PATTERN_AJAX%>" },
+				"params": {"<%=ControladorUsuarioCandidato.PARAM_CANDIDATO%>": <%= candidato.getCodNum() %>},
+				"pageSize": 10,
+				"filterable": true,
+				"title": "SOLICITUDES",
+				"clickable": {'onClick': function(row) {
+					var params = {
+							'<%= ControladorUsuarioCandidato.PARAM_ACCION %>': '<%= ControladorUsuarioCandidato.ACCION_SELECCIONAR_SOLICITUD %>',
+							'<%= ControladorUsuarioCandidato.PARAM_CANDIDATO %>': '<%= bean.getCandidato().getCodNum() %>',
+							'<%= ControladorUsuarioCandidato.PARAM_SOLICITUD %>': row.codNum};
+					Atis.sendForm("<%= request.getRequestURI() %>", params);
+				}},
+				"action": "<%= ControladorUsuarioCandidato.ACCION_DATATABLE_SOLICITUDES %>",
+				"columns": [
+					{'data': 'codNum', 'filter': {'type': 'number'}},
+					{'data': 'convocatoria.descripcion', 'filter': true},
+					{'data': 'estado', 'filter': false, 'render': function(row) { 
+						return row.estado + (row.excluido ? " (excluida)" : "");
+					}},
+					{'data': 'fechaConfirmacion', order: {'active': false}, 'render': function(row) {
+						return row.estado == 'CERRADA' ? row.fechaConfirmacion : '';
+					}}
+				]
 			});
 			
 			Atis.smoothScrollToAnchor("#solicitudes");
@@ -496,142 +496,142 @@ UsuarioBolsaEmpleo candidato = bean.getCandidato();
 				<% } %>
 			<% } %>
 	
-			var table_meritos = new Atis.DataTable('#table_meritos', {
-			    "ajax": { url: "<%= ControladorUsuarioCandidato.URL_PATTERN_AJAX %>" },
-			    "action": "<%=ControladorUsuarioCandidato.ACCION_DATATABLE_MERITOS_CANDIDATO%>",
-			    "params": {"<%=ControladorUsuarioCandidato.PARAM_CANDIDATO%>": <%= candidato.getCodNum() %>},
-			    "filterable": true,
-			    "defaultOrderBy": 0,
-			    "defaultOrderDirection": 'desc',
-			    "pageSize": 10,
-			    "title": "MERITOS",
-			    "pageSizeOptions": [10, 50, 100],
-			    "columns": [
-			    	{'data': 'codNum', 'filter': {'type': 'number'}},
-			    	{'data': 'item.bloque.apartado.nombre', 'filter': {'type': 'select', 'options': optionsApartados}},
-			        {'data': 'item', 'filter': true, 'render': function(row) {
-			        	return row.item.bloque.apartado.codigo + "." + row.item.bloque.codigo + "." + row.item.codigo;
-		        	}},
-			        {'data': 'item.nombre', 'filter': true},
-			        {'data': 'descripcion', 'filter': true},
-			        {'data': 'valor', 'filter': true, 'overflow': 'auto'},
-			        {'data': 'observacion', 'filter': true},
-			        {'data': 'codnum', 'buttons': [
-		        		{'title': 'Descargar fichero del mérito', 'class': 'only-icon icon-download',  'onClick': function(row) {
-		        			window.open("<%= ControladorDescargaFicheros.URL_DESCARGA_FICHEROS %>"
-		        		        	+ "?a=<%= ControladorDescargaFicheros.ACCION_DESCARGAR_MERITO_PERSONAL %>&<%= ControladorDescargaFicheros.PARAM_MERITO %>=" + row.codNum);
-		        		}},
-		   			]}
-			    ]
+			var table_meritos = new Atis.DataTable('#tableMeritosCAN', {
+				"ajax": { url: "<%= ControladorUsuarioCandidato.URL_PATTERN_AJAX %>" },
+				"action": "<%=ControladorUsuarioCandidato.ACCION_DATATABLE_MERITOS_CANDIDATO%>",
+				"params": {"<%=ControladorUsuarioCandidato.PARAM_CANDIDATO%>": <%= candidato.getCodNum() %>},
+				"filterable": true,
+				"defaultOrderBy": 0,
+				"defaultOrderDirection": 'desc',
+				"pageSize": 10,
+				"title": "MERITOS",
+				"pageSizeOptions": [10, 50, 100],
+				"columns": [
+					{'data': 'codNum', 'filter': {'type': 'number'}},
+					{'data': 'item.bloque.apartado.nombre', 'filter': {'type': 'select', 'options': optionsApartados}},
+					{'data': 'item', 'filter': true, 'render': function(row) {
+						return row.item.bloque.apartado.codigo + "." + row.item.bloque.codigo + "." + row.item.codigo;
+					}},
+					{'data': 'item.nombre', 'filter': true},
+					{'data': 'descripcion', 'filter': true},
+					{'data': 'valor', 'filter': true, 'overflow': 'auto'},
+					{'data': 'observacion', 'filter': true},
+					{'data': 'codnum', 'buttons': [
+						{'title': 'Descargar fichero del mérito', 'class': 'only-icon icon-download',  'onClick': function(row) {
+							window.open("<%= ControladorDescargaFicheros.URL_DESCARGA_FICHEROS %>"
+									+ "?a=<%= ControladorDescargaFicheros.ACCION_DESCARGAR_MERITO_PERSONAL %>&<%= ControladorDescargaFicheros.PARAM_MERITO %>=" + row.codNum);
+						}},
+					]}
+				]
 			});
 			
 			Atis.smoothScrollToAnchor("#meritos");
 	<%	} %>
 	
 	<%	if (bean.getApartadoTitulaciones() != null) { %>
-			var tableTitulaciones = new Atis.DataTable('#table_titulaciones', {
+			var tableTitulaciones = new Atis.DataTable('#tableTitulacionesCAN', {
 				"ajax": { url: "<%=ControladorUsuarioCandidato.URL_PATTERN_AJAX%>", async: false },
-			    "title": 'TITULACIONES',
-			    "pageSize": 10,
-			    "action": "<%=ControladorUsuarioCandidato.ACCION_DATATABLE_TITULACIONES_CANDIDATO%>",
-			    "params": {"<%=ControladorUsuarioCandidato.PARAM_CANDIDATO%>": <%=candidato.getCodNum()%>},
-			    "filterable": true,
-			    "columns": [
-			    	{'data': 'codNum', 'filter': {'type': 'number'}},
-			        {'data': 'titulacion.nombre', 'filter': true, 'render': function(row) {
-			        	return !row.titulacion ? 'OTRA TITULACION' : row.titulacion.nombre;
-			        }},
-			    	{'data': 'descripcion', 'overflow': 'auto', 'filter': true},
-			    	{'data': 'borrado', 'order': {'active': false}, 'filter': {'type': 'select', 'options':{'true': 'Borrada', 'false': 'No borrada'}, 'optionDefault': 'false'}, 'render': function(row) {
-		        		return row.borrado ? "<div title='Borrada' class='circle-false'></div>" : "";
-		        	}},
-		        	{'data': 'validada', 'order': {'active': false}, 'filter': {'type': 'select', 'options':{'true': 'Validada', 'false': 'No validada'}}, 'render': function(row) {
-		        		return row.validada ? "<div title='Validada' class='circle-true'></div>" : "";
-		        	}},
-		        	{'data': 'codNum', 'buttons': [
-		        		{'title': 'Descargar titulación', 'class': 'only-icon icon-download', 'onClick': function(row) {
-		        			window.open("<%= ControladorDescargaFicheros.URL_DESCARGA_FICHEROS %>"
-		        		        	+ "<%= "?a=" + ControladorDescargaFicheros.ACCION_DESCARGAR_TITULACION_PERSONAL + "&" + ControladorDescargaFicheros.PARAM_TITULACION %>=" + row.codNum);
-		        		}},
-		   			]}
-			    ],
+				"title": 'TITULACIONES',
+				"pageSize": 10,
+				"action": "<%=ControladorUsuarioCandidato.ACCION_DATATABLE_TITULACIONES_CANDIDATO%>",
+				"params": {"<%=ControladorUsuarioCandidato.PARAM_CANDIDATO%>": <%=candidato.getCodNum()%>},
+				"filterable": true,
+				"columns": [
+					{'data': 'codNum', 'filter': {'type': 'number'}},
+					{'data': 'titulacion.nombre', 'filter': true, 'render': function(row) {
+						return !row.titulacion ? 'OTRA TITULACION' : row.titulacion.nombre;
+					}},
+					{'data': 'descripcion', 'overflow': 'auto', 'filter': true},
+					{'data': 'borrado', 'order': {'active': false}, 'filter': {'type': 'select', 'options':{'true': 'Borrada', 'false': 'No borrada'}, 'optionDefault': 'false'}, 'render': function(row) {
+						return row.borrado ? "<div title='Borrada' class='circle-false'></div>" : "";
+					}},
+					{'data': 'validada', 'order': {'active': false}, 'filter': {'type': 'select', 'options':{'true': 'Validada', 'false': 'No validada'}}, 'render': function(row) {
+						return row.validada ? "<div title='Validada' class='circle-true'></div>" : "";
+					}},
+					{'data': 'codNum', 'buttons': [
+						{'title': 'Descargar titulación', 'class': 'only-icon icon-download', 'onClick': function(row) {
+							window.open("<%= ControladorDescargaFicheros.URL_DESCARGA_FICHEROS %>"
+									+ "<%= "?a=" + ControladorDescargaFicheros.ACCION_DESCARGAR_TITULACION_PERSONAL + "&" + ControladorDescargaFicheros.PARAM_TITULACION %>=" + row.codNum);
+						}},
+					]}
+				],
 			});
 			
 			Atis.smoothScrollToAnchor("#titulaciones");
 	<%	} %>
 	
 	<%	if (bean.getApartadoAcreditaciones() != null) { %>
-			var tableAcreditaciones = new Atis.DataTable('#table_acreditaciones', {
-			    "ajax": { url: "<%= ControladorUsuarioCandidato.URL_PATTERN_AJAX %>" },
-			    "pageSize": 10,
-			    "action": "<%= ControladorUsuarioCandidato.ACCION_DATATABLE_ACREDITACIONES_CANDIDATO %>",
-			    "params": {"<%=ControladorUsuarioCandidato.PARAM_CANDIDATO%>": <%= candidato.getCodNum() %>},
-			    "filterable": true,
-			    "title": 'ACREDITACIONES: <%=candidato.getNombre() + " " + candidato.getPrimerApellido() + " " + candidato.getSegundoApellido()%>',
-			    "columns": [
-			    	{'data': 'codNum', 'filter': {'type': 'number'}},
-			    	{'data': 'codigo', 'filter': true, 'render': function(row) {
-			    		return '<%= bean.getCodigoPadreMeritoPreferente() %>.' + row.meritoPreferente.codigo;
-			    	}},
-			    	{'data': 'meritoPreferente.nombre', 'order': {'active': false}, 'render': function(row) {
-			    		return row.meritoPreferente.nombre + (row.meritoPreferenteOpcion ? ' (' + row.meritoPreferenteOpcion.nombre + ')' : '');
-			    	}},
-			    	{'data': 'descripcion'},
-			    	{'data': 'borrado', 'order': {'active': false}, 'filter': {'type': 'select', 'options':{'true': 'Borrada', 'false': 'No borrada'}, 'optionDefault': 'false'}, 'render': function(row) {
-		        		return row.borrado ? "<div title='Borrada' class='circle-false'></div>" : "";
-		        	}},
-		        	{'data': 'validado', 'order': {'active': false}, 'filter': {'type': 'select', 'options':{'true': 'Validada', 'false': 'No validada'}}, 'render': function(row) {
-		        		return row.validado ? "<div title='Validada' class='circle-true'></div>" : "";
-		        	}},
-			        {'data': 'codnum', 'buttons': [
-		        		{'title': 'Descargar fichero acreditación', 'class': 'only-icon icon-download', 'onClick': function(row) {
-		        			window.open("<%= ControladorDescargaFicheros.URL_DESCARGA_FICHEROS %>"
-		        		        	+ "<%= "?a=" + ControladorDescargaFicheros.ACCION_DESCARGAR_ACREDITACION_PERSONAL + "&" + ControladorDescargaFicheros.PARAM_ACREDITACION %>=" + row.codNum);
-		        		}},
-		   			]}
-			    ],
+			var tableAcreditaciones = new Atis.DataTable('#tableAcreditacionesCAN', {
+				"ajax": { url: "<%= ControladorUsuarioCandidato.URL_PATTERN_AJAX %>" },
+				"pageSize": 10,
+				"action": "<%= ControladorUsuarioCandidato.ACCION_DATATABLE_ACREDITACIONES_CANDIDATO %>",
+				"params": {"<%=ControladorUsuarioCandidato.PARAM_CANDIDATO%>": <%= candidato.getCodNum() %>},
+				"filterable": true,
+				"title": 'ACREDITACIONES: <%=candidato.getNombre() + " " + candidato.getPrimerApellido() + " " + candidato.getSegundoApellido()%>',
+				"columns": [
+					{'data': 'codNum', 'filter': {'type': 'number'}},
+					{'data': 'codigo', 'filter': true, 'render': function(row) {
+						return '<%= bean.getCodigoPadreMeritoPreferente() %>.' + row.meritoPreferente.codigo;
+					}},
+					{'data': 'meritoPreferente.nombre', 'order': {'active': false}, 'render': function(row) {
+						return row.meritoPreferente.nombre + (row.meritoPreferenteOpcion ? ' (' + row.meritoPreferenteOpcion.nombre + ')' : '');
+					}},
+					{'data': 'descripcion'},
+					{'data': 'borrado', 'order': {'active': false}, 'filter': {'type': 'select', 'options':{'true': 'Borrada', 'false': 'No borrada'}, 'optionDefault': 'false'}, 'render': function(row) {
+						return row.borrado ? "<div title='Borrada' class='circle-false'></div>" : "";
+					}},
+					{'data': 'validado', 'order': {'active': false}, 'filter': {'type': 'select', 'options':{'true': 'Validada', 'false': 'No validada'}}, 'render': function(row) {
+						return row.validado ? "<div title='Validada' class='circle-true'></div>" : "";
+					}},
+					{'data': 'codnum', 'buttons': [
+						{'title': 'Descargar fichero acreditación', 'class': 'only-icon icon-download', 'onClick': function(row) {
+							window.open("<%= ControladorDescargaFicheros.URL_DESCARGA_FICHEROS %>"
+									+ "<%= "?a=" + ControladorDescargaFicheros.ACCION_DESCARGAR_ACREDITACION_PERSONAL + "&" + ControladorDescargaFicheros.PARAM_ACREDITACION %>=" + row.codNum);
+						}},
+					]}
+				],
 			});
 			
 			Atis.smoothScrollToAnchor("#acreditaciones");
 	<%	} %>
 	
 	<%	if (bean.getApartadoAreasExcluidas() != null) { %>
-			var tableAreasExcluidas = new Atis.DataTable('#table_areas_excluidas', {
-			    "ajax": { url: "<%=ControladorUsuarioCandidato.URL_PATTERN_AJAX%>", async: false},
-			    "params": {"<%=ControladorUsuarioCandidato.PARAM_CANDIDATO%>": <%= candidato.getCodNum() %>},
-			    "selectable": true,
-			    "pageSize": 10,
-			    "filterable": true,
-			    "title": 'ÁREAS EXCLUIDAS PARA EL USUARIO',
-			    "action": "<%=ControladorUsuarioCandidato.ACCION_DATATABLE_AREAS_EXCLUIDAS_CANDIDATO%>",
-			    "columns": [
-			    	{'data': 'area.codNum', 'selectable': true},
-			        {'data': 'area.codNum', 'filter': {'type': 'number'}},
-			        {'data': 'area.idAreaExterno', 'filter': true, 'overflow': 'auto'},
-			        {'data': 'area.descripcion', 'filter': true, 'overflow': 'auto'}
-			    ],
-			    "actions": [
-			    	{'label': 'Borrar Areas excluidas', 'onClick': function(selected) { excluirArea(false, selected); } }
-			    ]
+			var tableAreasExcluidas = new Atis.DataTable('#tableAreasExcluidasCAN', {
+				"ajax": { url: "<%=ControladorUsuarioCandidato.URL_PATTERN_AJAX%>", async: false},
+				"params": {"<%=ControladorUsuarioCandidato.PARAM_CANDIDATO%>": <%= candidato.getCodNum() %>},
+				"selectable": true,
+				"pageSize": 10,
+				"filterable": true,
+				"title": 'ÁREAS EXCLUIDAS PARA EL USUARIO',
+				"action": "<%=ControladorUsuarioCandidato.ACCION_DATATABLE_AREAS_EXCLUIDAS_CANDIDATO%>",
+				"columns": [
+					{'data': 'area.codNum', 'selectable': true},
+					{'data': 'area.codNum', 'filter': {'type': 'number'}},
+					{'data': 'area.idAreaExterno', 'filter': true, 'overflow': 'auto'},
+					{'data': 'area.descripcion', 'filter': true, 'overflow': 'auto'}
+				],
+				"actions": [
+					{'label': 'Borrar Areas excluidas', 'onClick': function(selected) { excluirArea(false, selected); } }
+				]
 			});
 		
-			var tableAreas = new Atis.DataTable('#table_areas', {
-			    "ajax": { url: "<%=ControladorUsuarioCandidato.URL_PATTERN_AJAX%>", async: false},
-			    "params": {"<%=ControladorUsuarioCandidato.PARAM_CANDIDATO%>": <%= candidato.getCodNum() %>},
-			    "selectable": true,
-			    "pageSize": 10,
-			    "filterable": true,
-			    "title": 'LISTADO DE ÁREAS',
-			    "action": "<%= ControladorUsuarioCandidato.ACCION_DATATABLE_AREAS_NO_EXCLUIDAS_CANDIDATO %>",
-			    "columns": [
-			    	{'data': 'area.codNum', 'selectable': true},
-			        {'data': 'area.codNum', 'filter': {'type': 'number'}},
-			        {'data': 'area.idAreaExterno' , 'filter': true, 'overflow': 'auto'},
-			        {'data': 'area.descripcion', 'filter': true, 'overflow': 'auto'}
-			    ],
-			    "actions": [
-			    	{'label': 'Excluir Areas', 'onClick': function(selected) { excluirArea(true, selected); } }
-			    ]
+			var tableAreas = new Atis.DataTable('#tableAreasCAN', {
+				"ajax": { url: "<%=ControladorUsuarioCandidato.URL_PATTERN_AJAX%>", async: false},
+				"params": {"<%=ControladorUsuarioCandidato.PARAM_CANDIDATO%>": <%= candidato.getCodNum() %>},
+				"selectable": true,
+				"pageSize": 10,
+				"filterable": true,
+				"title": 'LISTADO DE ÁREAS',
+				"action": "<%= ControladorUsuarioCandidato.ACCION_DATATABLE_AREAS_NO_EXCLUIDAS_CANDIDATO %>",
+				"columns": [
+					{'data': 'area.codNum', 'selectable': true},
+					{'data': 'area.codNum', 'filter': {'type': 'number'}},
+					{'data': 'area.idAreaExterno' , 'filter': true, 'overflow': 'auto'},
+					{'data': 'area.descripcion', 'filter': true, 'overflow': 'auto'}
+				],
+				"actions": [
+					{'label': 'Excluir Areas', 'onClick': function(selected) { excluirArea(true, selected); } }
+				]
 			});
 			
 			
@@ -643,19 +643,19 @@ UsuarioBolsaEmpleo candidato = bean.getCandidato();
 				
 				var message = excluir ? "¿Desea excluir las areas seleccionadas del usuario?" : "¿Desea borrar las areas excluidas seleccionadas del usuario?";
 				Atis.confirmDialog("Exclusión de areas", message, {
-		        	Si: function() {
-		        		var params = {
-		        				'<%=ControladorUsuarioCandidato.PARAM_ACCION%>': excluir ? "<%=ControladorUsuarioCandidato.ACCION_EXCLUIR_USUARIO_AREA%>" : "<%= ControladorUsuarioCandidato.ACCION_INCLUIR_USUARIO_AREA %>",
-		        				'<%=ControladorUsuarioCandidato.PARAM_CANDIDATO%>': <%= candidato.getCodNum() %>,
-		        				'<%=ControladorUsuarioCandidato.PARAM_AREAS_SELECCIONADAS%>': Atis.object2Json(selected)
-		        			};
-		    			Atis.sendForm("<%= request.getRequestURI() %>", params);
-		          		$(this).dialog("close");
-		        	},
-		        	No: function() {
-		          		$(this).dialog("close");
-		        	}
-		      	});
+					Si: function() {
+						var params = {
+								'<%=ControladorUsuarioCandidato.PARAM_ACCION%>': excluir ? "<%=ControladorUsuarioCandidato.ACCION_EXCLUIR_USUARIO_AREA%>" : "<%= ControladorUsuarioCandidato.ACCION_INCLUIR_USUARIO_AREA %>",
+								'<%=ControladorUsuarioCandidato.PARAM_CANDIDATO%>': <%= candidato.getCodNum() %>,
+								'<%=ControladorUsuarioCandidato.PARAM_AREAS_SELECCIONADAS%>': Atis.object2Json(selected)
+							};
+						Atis.sendForm("<%= request.getRequestURI() %>", params);
+						$(this).dialog("close");
+					},
+					No: function() {
+						$(this).dialog("close");
+					}
+				});
 			}
 		
 			Atis.smoothScrollToAnchor("#areas_excluidas");
@@ -702,7 +702,7 @@ UsuarioBolsaEmpleo candidato = bean.getCandidato();
 				estadosCandidato["<%= est.getKey() %>"] = "<%= est.getValue() %>";
 		<%	} %>
 			
-			var tableEstadosCandidato = new Atis.DataTable('#tableEstadosCandidato', {
+			var tableEstadosCandidato = new Atis.DataTable('#tableEstadosCandidatoCAN', {
 				"ajax": { url: "<%=ControladorUsuarioCandidato.URL_PATTERN_AJAX%>", async: false },
 				"action": "<%= ControladorUsuarioCandidato.ACCION_DATATABLE_ESTADOS_CANDIDATO %>",
 				"params": {"<%=ControladorUsuarioCandidato.PARAM_CANDIDATO%>": <%= candidato.getCodNum() %>},
@@ -753,17 +753,17 @@ UsuarioBolsaEmpleo candidato = bean.getCandidato();
 				event.preventDefault();
 				
 				Atis.confirmDialog("Restaurar usuario", "¿Desea restaurar el usuario?", {
-			    	Si: function() {
-			    		Atis.sendForm("<%= request.getRequestURI() %>", {
+					Si: function() {
+						Atis.sendForm("<%= request.getRequestURI() %>", {
 							'<%=ControladorUsuarioCandidato.PARAM_ACCION%>': '<%=ControladorUsuarioCandidato.ACCION_RECUPERAR_CANDIDATO%>',
 							'<%=ControladorUsuarioCandidato.PARAM_CANDIDATO%>': '<%=candidato.getCodNum()%>'
 						});
-			          	$(this).dialog("close");
-			        },
-			        No: function() {
-			          	$(this).dialog("close");
-			        }
-			    });
+						$(this).dialog("close");
+					},
+					No: function() {
+						$(this).dialog("close");
+					}
+				});
 			});
 	<%	} else { %>
 			document.getElementById("usuario_borrar").addEventListener("click", function(event) {
@@ -776,24 +776,24 @@ UsuarioBolsaEmpleo candidato = bean.getCandidato();
 						"</div>";
 				
 				Atis.confirmDialog("Dar de baja candidato", message, {
-			    	Si: function() {
-			    		var inputRazon = this.querySelector('#razon_borrado');
-			    		if (inputRazon.value != '') {
-				    		Atis.sendForm("<%= request.getRequestURI() %>", {
+					Si: function() {
+						var inputRazon = this.querySelector('#razon_borrado');
+						if (inputRazon.value != '') {
+							Atis.sendForm("<%= request.getRequestURI() %>", {
 								'<%=ControladorUsuarioCandidato.PARAM_ACCION%>': '<%=ControladorUsuarioCandidato.ACCION_ELIMINAR_CANDIDATO%>',
 								'<%=ControladorUsuarioCandidato.PARAM_CANDIDATO%>': '<%=candidato.getCodNum()%>',
 								'<%=ControladorUsuarioCandidato.PARAM_RAZON_BORRADO%>': inputRazon.value
 							});
-				          	$(this).dialog("close");
-			    		} else {
-			    			inputRazon.setCustomValidity("La razón de borrado no puede estar vacía");
-			    			inputRazon.reportValidity();
-			    		}
-			        },
-			        No: function() {
-			          	$(this).dialog("close");
-			        }
-			    });
+							$(this).dialog("close");
+						} else {
+							inputRazon.setCustomValidity("La razón de borrado no puede estar vacía");
+							inputRazon.reportValidity();
+						}
+					},
+					No: function() {
+						$(this).dialog("close");
+					}
+				});
 			});
 	<%	} %>
 	});

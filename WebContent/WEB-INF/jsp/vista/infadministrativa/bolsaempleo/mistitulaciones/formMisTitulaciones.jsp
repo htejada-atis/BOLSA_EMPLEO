@@ -25,17 +25,16 @@ VistaTitulaciones bean = (VistaTitulaciones) uvdatos.getVistas().get(VistaTitula
 			</div>
 			<div class="form-group">
 				<button class="link-btn" id="btnOtraTitulacion">Otra titulación</button>
-			    
-			    <button class="link-btn" id="btnVolver" style="display:none;">Volver</button>
+				<button class="link-btn" id="btnVolver" style="display:none;">Volver</button>
 			</div>
 		</div>
 	</div>
 	
-	<table class="bluetable bolsaempleo" id="tableTitulaciones">
+	<table class="bluetable bolsaempleo" id="tableTitulacionesMTI">
 		<tr>
-			<th scope="col" style="width:100%">Nombre</th>			
+			<th scope="col" style="width:100%">Nombre</th>
 		</tr>
-		<tbody>				
+		<tbody>
 		</tbody>
 		<tfoot>
 			<tr>
@@ -87,7 +86,7 @@ VistaTitulaciones bean = (VistaTitulaciones) uvdatos.getVistas().get(VistaTitula
 
 $(document).ready(function() {
 
-	var table_titulaciones = new Atis.DataTable('#tableTitulaciones', {
+	var table_titulaciones = new Atis.DataTable('#tableTitulacionesMTI', {
 		"ajax": { url: "<%=ControladorMisTitulaciones.URL_PATTERN_AJAX%>", async: false },
     	"filterable": true,
     	"pageSize": 5,
@@ -114,7 +113,7 @@ $(document).ready(function() {
 	$('#btnOtraTitulacion').click(function(event) {
 		event.preventDefault();
 		
-		$('#tableTitulaciones').hide();
+		$('#tableTitulacionesMTI').hide();
 		$('#otratitulacion').show();
 
 		$('#btnVolver').show();
@@ -131,7 +130,7 @@ $(document).ready(function() {
 	$('#btnVolver').click(function(event) { 
 		event.preventDefault();
 		
-		$('#tableTitulaciones').show();
+		$('#tableTitulacionesMTI').show();
 		$('#otratitulacion').hide();
 
 		$('#btnVolver').hide();

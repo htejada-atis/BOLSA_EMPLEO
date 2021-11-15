@@ -301,6 +301,7 @@ public class ModeloValidar {
 	 * @throws SQLException .
 	 * @throws UVException .
 	 */
+	@SuppressWarnings({"checkstyle:ExecutableStatementCount", "checkstyle:NPathComplexity"})
 	public BolsaEmpleoDataTable<BolsaValidacion> listadoAreasSujetasAfinidad(Convocatoria convocatoria, UsuarioBolsaEmpleo usuario, Map<String, String[]> params) 
 			throws SQLException, UVException {
 		List<BolsaValidacion> rows = new ArrayList<>();
@@ -475,7 +476,7 @@ public class ModeloValidar {
 			return dataTable;
 		}
 		
-		String consulta = "SELECT bepusu.CODNUM, bepusu.CODCUENTA, bepusu.VUAJA_STRTIPODOCUMENTO, bepusu.VUAJA_IDNIF, bepusu.VUAJA_LETRANIF,"
+		String consulta = "SELECT * FROM (SELECT bepusu.CODNUM, bepusu.CODCUENTA, bepusu.VUAJA_STRTIPODOCUMENTO, bepusu.VUAJA_IDNIF, bepusu.VUAJA_LETRANIF,"
 				+ "	bepusu.VUAJA_PRSNIF, bepusu.VUAJA_STRNOMBRE, bepusu.VUAJA_STRAPELLIDO1, bepusu.VUAJA_STRAPELLIDO2, bepusu.VUAJA_EMAIL_ALTA,"
 				+ "	SUM(CASE WHEN bepsbm.FLGVALIDADO = 'N' AND bepsbm.FLGEXCLUIDO = 'N' THEN 1 ELSE 0 END) AS COUNT_NO_VALIDADOS,"
 				+ "	SUM(CASE WHEN bepsbm.FLGVALIDADO = 'S' AND bepsbm.FLGEXCLUIDO = 'N' THEN 1 ELSE 0 END) AS COUNT_VALIDADOS,"
@@ -495,10 +496,13 @@ public class ModeloValidar {
 				+ "		AND bepsol.ESTADO = '" + ModeloSolicitud.SOLICITUD_ESTADO_CERRADA + "'"
 				+ (afinidad ? " AND bepite.AFINIDAD IS NOT NULL" : " AND bepite.AFINIDAD IS NULL")
 				+ "	GROUP BY bepusu.CODNUM, bepusu.CODCUENTA, bepusu.VUAJA_STRTIPODOCUMENTO, bepusu.VUAJA_IDNIF, bepusu.VUAJA_LETRANIF,"
-				+ "	bepusu.VUAJA_PRSNIF, bepusu.VUAJA_STRNOMBRE, bepusu.VUAJA_STRAPELLIDO1, bepusu.VUAJA_STRAPELLIDO2, bepusu.VUAJA_EMAIL_ALTA ";
-
-		dataTable.setColumn(ORDER_COLUMN_INDEX_NUMDOCUMENTO_CANDIDATO, "bepusu.VUAJA_PRSNIF");
-		dataTable.setColumn(ORDER_COLUMN_INDEX_NOMBRE_Y_APELLIDOS_CANDIDATO, "bepusu.VUAJA_STRNOMBRE");
+				+ "	bepusu.VUAJA_PRSNIF, bepusu.VUAJA_STRNOMBRE, bepusu.VUAJA_STRAPELLIDO1, bepusu.VUAJA_STRAPELLIDO2, bepusu.VUAJA_EMAIL_ALTA"
+				+ " ) WHERE 1=1 ";
+		
+		String whereNombre = String.format("(%s || ' ' || %s || ' ' || %s)", "VUAJA_STRNOMBRE", "VUAJA_STRAPELLIDO1", "VUAJA_STRAPELLIDO2");
+		
+		dataTable.setColumn(ORDER_COLUMN_INDEX_NUMDOCUMENTO_CANDIDATO, "VUAJA_PRSNIF");
+		dataTable.setColumn(ORDER_COLUMN_INDEX_NOMBRE_Y_APELLIDOS_CANDIDATO, whereNombre, DataTableColumn.COLUMN_TYPE_TEXT);
 		dataTable.setColumn(ORDER_COLUMN_INDEX_COUNT_NO_VALIDADOS_CANDIDATO, "COUNT_NO_VALIDADOS");
 		dataTable.setColumn(ORDER_COLUMN_INDEX_COUNT_VALIDADOS_CANDIDATO, "COUNT_VALIDADOS");
 		dataTable.setColumn(ORDER_COLUMN_INDEX_COUNT_EXCLUIDOS_CANDIDATO, "COUNT_EXCLUIDOS");
@@ -517,7 +521,7 @@ public class ModeloValidar {
 
 			dataTable.setFiltersParams(stmt, stmtCount, paramIndex);
 
-			try (ResultSet rs = stmt.executeQuery()) {				
+			try (ResultSet rs = stmt.executeQuery()) {
 				while (rs.next()) {
 					CandidatoValidacion candidato = createCandidatoValidacionFromResultSet(rs);
 					rows.add(candidato);
@@ -542,6 +546,7 @@ public class ModeloValidar {
 	 * @throws SQLException .
 	 * @throws UVException .
 	 */
+	@SuppressWarnings({"checkstyle:ExecutableStatementCount"})
 	private BolsaEmpleoDataTable<MeritoValidarTable> listadoMeritos(Convocatoria convocatoria, Bolsa bolsa, UsuarioBolsaEmpleo candidato,
 			Map<String, String[]> params, boolean afinidad) throws SQLException, UVException {
 		List<MeritoValidarTable> rows = new ArrayList<>();
@@ -620,6 +625,7 @@ public class ModeloValidar {
 	 * @throws SQLException .
 	 * @throws UVException .
 	 */
+	@SuppressWarnings({"checkstyle:ExecutableStatementCount"})
 	public BolsaEmpleoDataTable<ValorMeritoBolsaTable> listadoValoresMeritoBolsa(UsuarioBolsaEmpleo candidato, Merito merito, 
 			Map<String, String[]> params) throws SQLException, UVException {
 		List<ValorMeritoBolsaTable> rows = new ArrayList<>();

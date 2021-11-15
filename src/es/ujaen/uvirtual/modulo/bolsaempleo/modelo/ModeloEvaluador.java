@@ -307,6 +307,12 @@ public class ModeloEvaluador {
 		}
 	}
 	
+	/** Actualiza la lista de áreas de un director de departamento .
+	 * @param director .
+	 * @param usuarioUpdate .
+	 * @throws SQLException en caso de error en la BD .
+	 */
+	@SuppressWarnings({"checkstyle:ExecutableStatementCount"})
 	public void actualizaAreasDirectorDepartamento(UsuarioBolsaEmpleo director, UsuarioBolsaEmpleo usuarioUpdate) throws SQLException {
 		
 		List<Departamento> departamentos = ModeloDepartamento.obtenerInstancia().listaDepartamentosDirector(director);
@@ -321,16 +327,16 @@ public class ModeloEvaluador {
 				// eliminamos todas las áreas que asignadas al director de departamento que ya no están dentro de sus departamentos
 				String sqlUpdate = "UPDATE TBEP_EVALUADORES bepeva"
 						+ " SET UID_USUARIO = ?"
-						+ "	WHERE bepeva.BEPARE_CODNUM IN ("
-						+ "		SELECT"
-						+ "			bepade.BEPARE_CODNUM AS BEPARE_CODNUM"
-						+ "		FROM TBEP_EVALUADORES bepeva2"
-						+ "		INNER JOIN TBEP_AREAS_DEPARTAMENTOS bepade ON bepade.BEPARE_CODNUM = bepeva2.BEPARE_CODNUM"
-						+ "		WHERE bepeva2.BEPUSU_CODNUM = bepeva.BEPUSU_CODNUM"
-						+ "		MINUS"
-						+ "		SELECT bepade.BEPARE_CODNUM AS BEPARE_CODNUM"
-						+ "		FROM TBEP_AREAS_DEPARTAMENTOS bepade"
-						+ "		WHERE bepade.BEPDEP_CODNUM IN (" + paramsDepartamentos + ")"
+						+ " WHERE bepeva.BEPARE_CODNUM IN ("
+						+ "     SELECT"
+						+ "         bepade.BEPARE_CODNUM AS BEPARE_CODNUM"
+						+ "     FROM TBEP_EVALUADORES bepeva2"
+						+ "     INNER JOIN TBEP_AREAS_DEPARTAMENTOS bepade ON bepade.BEPARE_CODNUM = bepeva2.BEPARE_CODNUM"
+						+ "     WHERE bepeva2.BEPUSU_CODNUM = bepeva.BEPUSU_CODNUM"
+						+ "     MINUS"
+						+ "     SELECT bepade.BEPARE_CODNUM AS BEPARE_CODNUM"
+						+ "     FROM TBEP_AREAS_DEPARTAMENTOS bepade"
+						+ "     WHERE bepade.BEPDEP_CODNUM IN (" + paramsDepartamentos + ")"
 						+ " ) AND bepeva.BEPUSU_CODNUM = ?";
 				
 				try (PreparedStatement stmt = conexion.prepareStatement(sqlUpdate)) {
@@ -344,16 +350,16 @@ public class ModeloEvaluador {
 				}
 				
 				String sqlDelete = "DELETE FROM TBEP_EVALUADORES bepeva"
-						+ "	WHERE bepeva.BEPARE_CODNUM IN ("
-						+ "		SELECT"
-						+ "			bepade.BEPARE_CODNUM AS BEPARE_CODNUM"
-						+ "		FROM TBEP_EVALUADORES bepeva2"
-						+ "		INNER JOIN TBEP_AREAS_DEPARTAMENTOS bepade ON bepade.BEPARE_CODNUM = bepeva2.BEPARE_CODNUM"
-						+ "		WHERE bepeva2.BEPUSU_CODNUM = bepeva.BEPUSU_CODNUM"
-						+ "		MINUS"
-						+ "		SELECT bepade.BEPARE_CODNUM AS BEPARE_CODNUM"
-						+ "		FROM TBEP_AREAS_DEPARTAMENTOS bepade"
-						+ "		WHERE bepade.BEPDEP_CODNUM IN (" + paramsDepartamentos + ")"
+						+ " WHERE bepeva.BEPARE_CODNUM IN ("
+						+ "     SELECT"
+						+ "         bepade.BEPARE_CODNUM AS BEPARE_CODNUM"
+						+ "     FROM TBEP_EVALUADORES bepeva2"
+						+ "     INNER JOIN TBEP_AREAS_DEPARTAMENTOS bepade ON bepade.BEPARE_CODNUM = bepeva2.BEPARE_CODNUM"
+						+ "     WHERE bepeva2.BEPUSU_CODNUM = bepeva.BEPUSU_CODNUM"
+						+ "     MINUS"
+						+ "     SELECT bepade.BEPARE_CODNUM AS BEPARE_CODNUM"
+						+ "     FROM TBEP_AREAS_DEPARTAMENTOS bepade"
+						+ "     WHERE bepade.BEPDEP_CODNUM IN (" + paramsDepartamentos + ")"
 						+ " ) AND bepeva.BEPUSU_CODNUM = ?";
 				
 				try (PreparedStatement stmt = conexion.prepareStatement(sqlDelete)) {
@@ -368,17 +374,17 @@ public class ModeloEvaluador {
 				String sqlInsert = ""
 						+ " INSERT INTO TBEP_EVALUADORES (BEPARE_CODNUM, BEPUSU_CODNUM, FLGACTIVO,UID_USUARIO)"
 						+ " ("
-						+ "		SELECT areas.BEPARE_CODNUM, ? AS BEPUSU_CODNUM, 'S' AS FLGACTIVO, ? AS UID_USUARIO FROM"
-						+ "		("
-						+ "			SELECT bepade.BEPARE_CODNUM AS BEPARE_CODNUM"
-						+ "			FROM TBEP_AREAS_DEPARTAMENTOS bepade"
-						+ "			WHERE bepade.BEPDEP_CODNUM IN (" + paramsDepartamentos + ")"
-						+ "			MINUS"
-						+ "			SELECT bepade.BEPARE_CODNUM AS BEPARE_CODNUM"
-						+ "			FROM TBEP_EVALUADORES bepeva2"
-						+ "			INNER JOIN TBEP_AREAS_DEPARTAMENTOS bepade ON bepade.BEPARE_CODNUM = bepeva2.BEPARE_CODNUM"
-						+ "			WHERE bepeva2.BEPUSU_CODNUM = ?"
-						+ "		) areas"
+						+ "     SELECT areas.BEPARE_CODNUM, ? AS BEPUSU_CODNUM, 'S' AS FLGACTIVO, ? AS UID_USUARIO FROM"
+						+ "     ("
+						+ "         SELECT bepade.BEPARE_CODNUM AS BEPARE_CODNUM"
+						+ "         FROM TBEP_AREAS_DEPARTAMENTOS bepade"
+						+ "         WHERE bepade.BEPDEP_CODNUM IN (" + paramsDepartamentos + ")"
+						+ "         MINUS"
+						+ "         SELECT bepade.BEPARE_CODNUM AS BEPARE_CODNUM"
+						+ "         FROM TBEP_EVALUADORES bepeva2"
+						+ "         INNER JOIN TBEP_AREAS_DEPARTAMENTOS bepade ON bepade.BEPARE_CODNUM = bepeva2.BEPARE_CODNUM"
+						+ "         WHERE bepeva2.BEPUSU_CODNUM = ?"
+						+ "     ) areas"
 						+ " )";
 				
 				try (PreparedStatement stmt = conexion.prepareStatement(sqlInsert)) {
@@ -397,7 +403,7 @@ public class ModeloEvaluador {
 				conexion.rollback();
 				throw e;
 			} finally {
-				conexion.setAutoCommit(true);				
+				conexion.setAutoCommit(true);
 			}
 		}
 	}

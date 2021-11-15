@@ -132,7 +132,7 @@ if(item!=null){
     	</div>    	
     </form>
     
-	<table class="bluetable bolsaempleo custom" id="tableMeritosExcluyentes" style="display:none;">
+	<table class="bluetable bolsaempleo custom" id="tableMeritosExcluyentesIBA" style="display:none;">
 		<tr>
 			<th scope="col" style="width:10%" title="Id"></th>
 			<th scope="col" style="width:20%" title="ID item">Id</th>
@@ -174,9 +174,9 @@ if(item!=null){
 		}%>
 		
 		<%if (bean.getListaItemsExcluyentes() != null) {%>
-		$("#tableMeritosExcluyentes").show();
+		$("#tableMeritosExcluyentesIBA").show();
 		
-		var tableItems = new Atis.DataTable('#tableMeritosExcluyentes', {
+		var tableItems = new Atis.DataTable('#tableMeritosExcluyentesIBA', {
 		    "ajax": { url: "<%= ControladorItemsBaremacion.URL_PATTERN_AJAX %>", async: false },
 		    "params": {"<%=ControladorItemsBaremacion.PARAM_ITEM%>": <%= (bean.getItemBaremacion()!=null ? bean.getItemBaremacion().getCodNum() : null ) %>},
 		    "pageSize": 200,
@@ -213,7 +213,7 @@ if(item!=null){
 		<%}%>
 		
 		<%	if (EscapaHTML.ajustaCodificacion(request.getParameter(ControladorItemsBaremacion.PARAM_ACCION)) == null) { %>
-					Atis.smoothScrollToAnchor("#tableMeritosExcluyentes");
+					Atis.smoothScrollToAnchor("#tableMeritosExcluyentesIBA");
 		<%	} %>
 		
 	});

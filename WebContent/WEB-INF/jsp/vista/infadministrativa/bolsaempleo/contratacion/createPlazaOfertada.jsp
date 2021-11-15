@@ -16,15 +16,16 @@ UVDatos uvdatos = (UVDatos) request.getAttribute(UVDatos.NOMBRE_ATRIBUTO);
 VistaContratacion bean = (VistaContratacion) uvdatos.getVistas().get(VistaContratacion.class.getName());
 PlazaOfertada plaza = bean.getPlazaOfertada();
 
-String codigo = BolsaEmpleoUtils.getParamForm(request, ControladorContratacion.PARAM_CODIGO, "");
 String area = BolsaEmpleoUtils.getParamForm(request, ControladorContratacion.PARAM_AREA, "0");
-String dedicacion = BolsaEmpleoUtils.getParamForm(request, ControladorContratacion.PARAM_DEDICACION, "0");
-String justificacion = BolsaEmpleoUtils.getParamForm(request, ControladorContratacion.PARAM_JUSTIFICACION, "");
-String duracionPrevista = BolsaEmpleoUtils.getParamForm(request, ControladorContratacion.PARAM_DURACION_PREVISTA, "");
-String cuatrimestre = BolsaEmpleoUtils.getParamForm(request, ControladorContratacion.PARAM_CUATRIMESTRE, "");
 String centroDestino = BolsaEmpleoUtils.getParamForm(request, ControladorContratacion.PARAM_CENTRO_DESTINO, "");
+String codigo = BolsaEmpleoUtils.getParamForm(request, ControladorContratacion.PARAM_CODIGO, "");
+String cuatrimestre = BolsaEmpleoUtils.getParamForm(request, ControladorContratacion.PARAM_CUATRIMESTRE, "");
+String curso = BolsaEmpleoUtils.getParamForm(request, ControladorContratacion.PARAM_CURSO, BolsaEmpleoUtils.getCurrentCourse());
+String dedicacion = BolsaEmpleoUtils.getParamForm(request, ControladorContratacion.PARAM_DEDICACION, "0");
+String duracionPrevista = BolsaEmpleoUtils.getParamForm(request, ControladorContratacion.PARAM_DURACION_PREVISTA, "");
 String fechaFinOferta = BolsaEmpleoUtils.getParamForm(request, ControladorContratacion.PARAM_FECHA_FIN_OFERTA, "");
 String horaFinOferta = BolsaEmpleoUtils.getParamForm(request, ControladorContratacion.PARAM_HORA_FIN_OFERTA, "");
+String justificacion = BolsaEmpleoUtils.getParamForm(request, ControladorContratacion.PARAM_JUSTIFICACION, "");
 %>
 
 <div class='bolsa-empleo'>
@@ -92,25 +93,32 @@ String horaFinOferta = BolsaEmpleoUtils.getParamForm(request, ControladorContrat
 				<textarea class="form-input-custom" id="plaza_justificacion" name="<%=ControladorContratacion.PARAM_JUSTIFICACION %>" rows="3" cols="60" required><%=justificacion%></textarea>
 			</div>
 		</div>
-	<%	if (bean.getUsuarioLogeado().isServicioPersonal()) { %>
 		<div class="form-group-container col2">
 			<div class="form-group">
-				<label for="plaza_duracion_prevista">Duración prevista:</label>
-				<input class="form-input-custom" type="text" name="<%=ControladorContratacion.PARAM_DURACION_PREVISTA%>" id="plaza_duracion_prevista" value="<%=duracionPrevista%>"/>
+				<label for="plaza_curso" class="bold-label">Curso académico:</label>
+				<input class="form-input-custom" type="text" name="<%=ControladorContratacion.PARAM_CURSO%>" id="plaza_curso" value="<%=curso%>" required 
+					pattern="<%= ModeloPlazaOfertada.FORMATO_CURSO %>"/>
 			</div>
-		</div>
-		<div class="form-group-container col2">
-			<div class="form-group">
-				<label for="plaza_fecha_fin_oferta">Fecha fin oferta:</label>
-				<input class="form-input-custom" name="<%=ControladorContratacion.PARAM_FECHA_FIN_OFERTA%>" id="plaza_fecha_fin_oferta" type="text" autocomplete="off" value="<%= fechaFinOferta %>"/>
-			</div>
-			<div class="form-group">
-				<label for="plaza_hora_fin_oferta">Hora fin oferta:</label>
-				<input class="form-input-custom" name="<%=ControladorContratacion.PARAM_HORA_FIN_OFERTA%>" id="plaza_hora_fin_oferta" type="text" autocomplete="off" 
-						value="<%= horaFinOferta %>" placeholder="HH:MM:SS"/>
-			</div>
-		</div>
-	<%	} %>
+		<%	if (bean.getUsuarioLogeado().isServicioPersonal()) { %>
+					<div class="form-group">
+						<label for="plaza_duracion_prevista">Duración prevista:</label>
+						<input class="form-input-custom" type="text" name="<%=ControladorContratacion.PARAM_DURACION_PREVISTA%>" id="plaza_duracion_prevista" value="<%=duracionPrevista%>"/>
+					</div>
+				</div>
+				<div class="form-group-container col2">
+					<div class="form-group">
+						<label for="plaza_fecha_fin_oferta">Fecha fin oferta:</label>
+						<input class="form-input-custom" name="<%=ControladorContratacion.PARAM_FECHA_FIN_OFERTA%>" id="plaza_fecha_fin_oferta" type="text" autocomplete="off" value="<%= fechaFinOferta %>"/>
+					</div>
+					<div class="form-group">
+						<label for="plaza_hora_fin_oferta">Hora fin oferta:</label>
+						<input class="form-input-custom" name="<%=ControladorContratacion.PARAM_HORA_FIN_OFERTA%>" id="plaza_hora_fin_oferta" type="text" autocomplete="off" 
+								value="<%= horaFinOferta %>" placeholder="HH:MM:SS"/>
+					</div>
+				</div>
+		<%	} else { %>
+				</div>
+		<%	} %>
 		<div class="form-group-container col2">
 			<div class="form-file">
 				<label for="plaza_horario" style="margin-bottom: .5rem;">Horario:</label>

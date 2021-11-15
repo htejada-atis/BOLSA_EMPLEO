@@ -22,7 +22,7 @@ VistaConvocatorias bean = (VistaConvocatorias) uvdatos.getVistas().get(VistaConv
 		</button>
 	</div>
 	
-	<table class="bluetable bolsaempleo" id="table_convocatorias">
+	<table class="bluetable bolsaempleo" id="tableConvocatoriasCON">
 		<tr>
 			<th scope="col" style="width:10%" title="Id de la convocatoria">Id</th>
 			<th scope="col"	class="descripcion" style="width:40%">Descripción</th>
@@ -44,10 +44,11 @@ VistaConvocatorias bean = (VistaConvocatorias) uvdatos.getVistas().get(VistaConv
 <script>
 
 	$(document).ready(function() {		
-		var table_titulaciones = new Atis.DataTable('#table_convocatorias', {
+		var tableConvocatorias = new Atis.DataTable('#tableConvocatoriasCON', {
 			"ajax": { url: "<%=  ControladorConvocatorias.URL_PATTERN_AJAX %>" },
 			"pageSize": 10,
 			"defaultOrderBy": 2,
+			"stateSave": true,
 			"action": "<%= ControladorConvocatorias.ACCION_DATATABLE %>",
 			"columns": [
 				{'data': 'codNum'},
