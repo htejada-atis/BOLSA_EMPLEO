@@ -71,9 +71,14 @@ public class ModeloConvocatoria {
 			throws SQLException, UVException {
 		List<Convocatoria> data = new ArrayList<>();
 		BolsaEmpleoDataTable<Convocatoria> dataTable = new BolsaEmpleoDataTable<>(params);
-
-		String consulta = "SELECT bepcon.* FROM TBEP_CONVOCATORIAS bepcon WHERE 1=1 ";
-
+		
+		String consulta = "SELECT bepcon.*,"
+				+ "     CASE"
+				+ "         WHEN bepcon.CODNUM = FIRST_VALUE(CODNUM) OVER (ORDER BY CODNUM DESC) THEN 1"
+				+ "         ELSE 0"
+				+ "     END AS CONV_ACTUAL"
+				+ " FROM TBEP_CONVOCATORIAS bepcon";
+		
 		dataTable.setColumn(ORDER_COLUMN_INDEX_ID, "bepcon.CODNUM");
 		dataTable.setColumn(ORDER_COLUMN_INDEX_DESCRIPCION, "bepcon.DESCRIPCION");
 		dataTable.setColumn(ORDER_COLUMN_INDEX_FECHACIERRE, "bepcon.FECHACIERRE");
@@ -85,7 +90,9 @@ public class ModeloConvocatoria {
 				PreparedStatement stmt = conexion.prepareStatement(dataTable.getQuery())) {
 			try (ResultSet rs = stmt.executeQuery()) {
 				while (rs.next()) {
-					data.add(this.createFromResultSet(rs));
+					Convocatoria conv = this.createFromResultSet(rs);
+					conv.setActual(rs.getInt("CONV_ACTUAL") == 1);
+					data.add(conv);
 				}
 			}
 
@@ -206,7 +213,13 @@ public class ModeloConvocatoria {
 	 * @throws SQLException .
 	 */
 	public Convocatoria getConvocatoriaById(int codNum) throws SQLException, UVException {
-		String consulta = "SELECT bepcon.* FROM TBEP_CONVOCATORIAS bepcon WHERE bepcon.CODNUM = ?";
+		String consulta = "SELECT bepcon.*,"
+				+ "     CASE"
+				+ "         WHEN bepcon.CODNUM = FIRST_VALUE(CODNUM) OVER (ORDER BY CODNUM DESC) THEN 1"
+				+ "         ELSE 0"
+				+ "     END AS CONV_ACTUAL"
+				+ " FROM TBEP_CONVOCATORIAS bepcon"
+				+ " WHERE bepcon.CODNUM = ?";
 
 		try (Connection conexion = ConexionUvirtual.obtenerInstancia(); PreparedStatement stmt = conexion.prepareStatement(consulta)) {
 			stmt.setInt(1, codNum);
@@ -223,6 +236,7 @@ public class ModeloConvocatoria {
 				convocatoria.setFechaCierre(rs.getDate("FECHACIERRE"));
 				convocatoria.setNumBolsasMaximo(rs.getInt("NUMBOLSASMAXIMO"));
 				convocatoria.setNumMeritosPorBloque(rs.getInt("NUMMERITOSPORBLOQUE"));
+				convocatoria.setActual(rs.getInt("CONV_ACTUAL") == 1);
 
 				return convocatoria;
 			}

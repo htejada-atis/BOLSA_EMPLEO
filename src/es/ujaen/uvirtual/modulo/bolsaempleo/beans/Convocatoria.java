@@ -15,6 +15,7 @@ public class Convocatoria implements Serializable {
 	private String estado;
 	private Integer numBolsasMaximo;
 	private Integer numMeritosPorBloque;
+	private Boolean actual;
 	
 	/** Constructor por defecto.
 	 */
@@ -110,6 +111,14 @@ public class Convocatoria implements Serializable {
 		this.numMeritosPorBloque = numMeritosPorBloque;
 	}
 	
+	public Boolean isActual() {
+		return actual;
+	}
+
+	public void setActual(Boolean actual) {
+		this.actual = actual;
+	}
+	
 	public static long getSerialversionuid() {
 		return serialVersionUID;
 	}
@@ -118,7 +127,7 @@ public class Convocatoria implements Serializable {
 	public String toString() {
 		return "Convocatoria [codNum=" + codNum + ", descripcion=" + descripcion 
 				+ ", fechaCierre=" + fechaCierre + ", estado=" + estado + ", numBolsasMaximo=" + numBolsasMaximo
-				+ ", numMeritosPorBloque=" + numMeritosPorBloque + "]";
+				+ ", numMeritosPorBloque=" + numMeritosPorBloque + ", actual=" + actual + "]";
 	}
 	
 	@Override
@@ -131,6 +140,7 @@ public class Convocatoria implements Serializable {
 		result = prime * result + ((estado == null) ? 0 : estado.hashCode());
 		result = prime * result + ((numBolsasMaximo == null) ? 0 : numBolsasMaximo.hashCode());
 		result = prime * result + ((numMeritosPorBloque == null) ? 0 : numMeritosPorBloque.hashCode());
+		result = prime * result + ((actual == null) ? 0 : actual.hashCode());
 		return result;
 	}
 	
@@ -189,7 +199,14 @@ public class Convocatoria implements Serializable {
 		} else if (!numMeritosPorBloque.equals(other.numMeritosPorBloque)) {
 			return false;
 		}
+		if (actual == null) {
+			if (other.actual != null) {
+				return false;
+			}
+		} else if (!actual.equals(other.actual)) {
+			return false;
+		}
 		
 		return true;
-	}	
+	}
 }

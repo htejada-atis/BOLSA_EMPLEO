@@ -258,6 +258,10 @@ public class ControladorConvocatorias extends HttpServlet {
 			throws UVException, SQLException, IOException { 
 		ModeloConvocatoria modelo = ModeloConvocatoria.obtenerInstancia();
 		Convocatoria convocatoria = modelo.getConvocatoriaById(Formateador.leeParametroInteger(request.getParameter(PARAM_CONVOCATORIA_ID)));
+		if (!convocatoria.isActual()) {
+			throw new UVException("No puede editar convocatorias anteriores");
+		}
+		
 		Integer solicitudes = modelo.getNumSolicitudesByConvocatoriaId(convocatoria.getCodNum());
 		if (solicitudes > 0) {
 			bean.setVista(JSP_INDEX);
@@ -267,9 +271,9 @@ public class ControladorConvocatorias extends HttpServlet {
 		bean.setVista(JSP_FORM_CONVOCATORIA);
 		bean.setConvocatoria(convocatoria);
 		
-		Convocatoria convocatoriaForm = this.validateConvocatoria(request); 							
-		
 		if (EscapaHTML.ajustaCodificacion(request.getParameter(PARAM_CONVOCATORIA_DESCRIPCION)) != null) {
+			Convocatoria convocatoriaForm = this.validateConvocatoria(request);
+			
 			Convocatoria conFinal = new Convocatoria(
 					convocatoria.getCodNum(), 
 					convocatoriaForm.getDescripcion(), 
@@ -293,6 +297,9 @@ public class ControladorConvocatorias extends HttpServlet {
 		ModeloBolsa modeloBolsas = ModeloBolsa.obtenerInstancia();
 		
 		Convocatoria convocatoria = modelo.getConvocatoriaById(Formateador.leeParametroInteger(request.getParameter(PARAM_CONVOCATORIA_ID)));
+		if (!convocatoria.isActual()) {
+			throw new UVException("No puede abrir convocatorias anteriores");
+		}
 		bean.setConvocatoria(convocatoria);
 		
 		if (!modeloBolsas.hayBolsasBaremables()) {
@@ -321,6 +328,9 @@ public class ControladorConvocatorias extends HttpServlet {
 		ModeloConvocatoria modelo = ModeloConvocatoria.obtenerInstancia();
 		
 		Convocatoria convocatoria = modelo.getConvocatoriaById(Formateador.leeParametroInteger(request.getParameter(PARAM_CONVOCATORIA_ID)));
+		if (!convocatoria.isActual()) {
+			throw new UVException("No puede cerrar convocatorias anteriores");
+		}
 		bean.setConvocatoria(convocatoria);
 		
 		Integer codNum = Formateador.leeParametroInteger(request.getParameter(PARAM_CONVOCATORIA_ID));
@@ -381,9 +391,12 @@ public class ControladorConvocatorias extends HttpServlet {
 			throws SQLException, UVException, IOException {
 		ModeloConvocatoria modelo = ModeloConvocatoria.obtenerInstancia();
 		Integer codNum = Formateador.leeParametroInteger(request.getParameter(PARAM_CONVOCATORIA_ID));
-		Convocatoria convocatoria = new Convocatoria();
-		convocatoria.setCodNum(codNum);
+		Convocatoria convocatoria = modelo.getConvocatoriaById(codNum);
+		if (!convocatoria.isActual()) {
+			throw new UVException("No puede borrar convocatorias anteriores");
+		}
 		modelo.borraConvocatoria(convocatoria, bean.getUsuarioLogeado());
+		
 		BolsaEmpleoUtils.addMensajeDeExito(MENSAJE_EXITO_ELIMINAR, bean, request);
 		datos.setRespuestaEnviada(true);
 		response.sendRedirect(request.getServletPath());

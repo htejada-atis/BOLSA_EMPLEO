@@ -19,7 +19,7 @@ VistaSolicitudes bean = (VistaSolicitudes) uvdatos.getVistas().get(VistaSolicitu
 	<jsp:include page="/WEB-INF/jsp/vista/infadministrativa/bolsaempleo/mensajes.jsp" />
 	
 	<% if (bean.getSolicitud() != null) { %>
-	
+		
 		<h2>Paso 2: Asignación de méritos a áreas</h2>
 		<h3><%= bean.getSolicitud().getConvocatoria().getDescripcion() %></h3>
 		
@@ -96,7 +96,7 @@ VistaSolicitudes bean = (VistaSolicitudes) uvdatos.getVistas().get(VistaSolicitu
 				texto += 'Selecciona afinidad<br/>';
 			}
 			
-			texto += '<button class="pointer" title="Seleccionar afinidad">Afinidad</button></span>';
+			texto += '<button class="pointer" title="Seleccionar afinidad" ' + (row.anteriorValidacion ? "disabled" : "") + '>Afinidad</button></span>';
 			texto += '</div>';
 			
 			var nodo = $(texto);
@@ -152,7 +152,7 @@ VistaSolicitudes bean = (VistaSolicitudes) uvdatos.getVistas().get(VistaSolicitu
 				texto += 'Selecciona afinidad<br/>';
 			}
 			
-			texto += '<button class="pointer" title="Seleccionar afinidad">Afinidad</button></span>';
+			texto += '<button class="pointer" title="Seleccionar afinidad" ' + (row.anteriorValidacion ? "disabled" : "") + '>Afinidad</button></span>';
 			texto += '</div>';
 			
 			var nodo = $(texto);
@@ -187,17 +187,17 @@ VistaSolicitudes bean = (VistaSolicitudes) uvdatos.getVistas().get(VistaSolicitu
 					$('input.afinidad', node).each(function(index, input) {
 						var afinidad = $(input).data('afinidad');
 						var value = parseFloat($(input).val());
-						afinidades[afinidad] = value;					
+						afinidades[afinidad] = value;
 					});
 					return afinidades;
 				};
 				
 				var sumaTotal = function() {
 					var total = 0.0;
-					var afinidades = getValoresAfinidades();				
+					var afinidades = getValoresAfinidades();
 					Object.keys(afinidades).forEach(function(key) {
 						total += afinidades[key];
-					});				
+					});
 					return total;
 				};
 				
@@ -266,7 +266,7 @@ VistaSolicitudes bean = (VistaSolicitudes) uvdatos.getVistas().get(VistaSolicitu
 		    				'<%=ControladorMisSolicitudes.PARAM_ACCION%>': '<%=ControladorMisSolicitudes.ACCION_BOLSA_SELECCIONADA%>',
 		    				'<%=ControladorMisSolicitudes.PARAM_BOLSA%>': row.codNum,
 		    				'<%=ControladorMisSolicitudes.PARAM_SOLICITUD_ID%>': <%=bean.getSolicitud().getCodNum()%>};
-	        		Atis.sendForm("<%=request.getRequestURI()%>", params);
+					Atis.sendForm("<%=request.getRequestURI()%>", params);
 			    }},
 			    "selected": <%=bean.getArea() != null ? bean.getArea().getCodNum() : "null"%>,		    
 			    "title": 'MIS ÁREAS PARA ESTA CONVOCATORIA',
@@ -276,7 +276,7 @@ VistaSolicitudes bean = (VistaSolicitudes) uvdatos.getVistas().get(VistaSolicitu
 			    	{'data': 'area.idAreaExterno', 'filter': true},
 			    	{'data': 'area.descripcion', 'filter': true},
 			    	{'data': 'numeroMeritos', 'order': {'active': false}},
-		        ],
+				],
 			});
 			
 			<%if (bean.getArea() != null) {%>
@@ -291,65 +291,77 @@ VistaSolicitudes bean = (VistaSolicitudes) uvdatos.getVistas().get(VistaSolicitu
 					
 				var tableMeritos = new Atis.DataTable('#tableMeritos', {
 					"ajax": { url: "<%=ControladorMisSolicitudes.URL_PATTERN_AJAX%>", async: false },
-				    "pageSize": 10,
-				    "selectable": {'all': false},
-				    "filterable": true,
-				    "title": 'MIS MÉRITOS: <%=bean.getArea().getArea().getDescripcion()%>',
-				    "selected": meritosBolsaSolicitud,
-				    "defaultOrderBy": 2,
-				    "pageSize": 50,
-				    "pageSizeOptions": [10, 50, 100],
-				    "action": "<%=ControladorMisSolicitudes.ACCION_DATATABLE_MERITOS_BOLSA%>",
-				    "params": {
-				    	"<%=ControladorMisSolicitudes.PARAM_SOLICITUD_ID%>": <%=bean.getSolicitud().getCodNum()%>,
-				    	"<%=ControladorMisSolicitudes.PARAM_BOLSA%>": <%=bean.getArea().getCodNum()%>
-				    },
-				    "columns": [
-				    	{'data': 'codNum', 'selectable': {'onChange': function(row, checkbox) {
-				    				var accion = checkbox.checked ? '<%=ControladorMisSolicitudes.ACCION_MERITO_SELECCIONADO%>'
-				    						: '<%=ControladorMisSolicitudes.ACCION_MERITO_DESELECCIONADO%>';
-					    			var params = {
-					    				'<%=ControladorMisSolicitudes.PARAM_ACCION%>': accion,
-					    				'<%=ControladorMisSolicitudes.PARAM_BOLSA%>': '<%=bean.getArea().getCodNum()%>',
-					    				'<%=ControladorMisSolicitudes.PARAM_SOLICITUD_ID%>': '<%=bean.getSolicitud().getCodNum()%>',
-					    				'<%=ControladorMisSolicitudes.PARAM_MERITO_ID%>': row.merito.codNum,
-					    			};
-					    			
-					    			Atis.sendForm("<%= request.getRequestURI() %>", params);
-					    		}
-				    		}
-				    	},
-				    	{'data': 'codNum', 'filter': {'type': 'number'}},
-				    	{'data': 'merito.item', 'filter': true, 'render': function(row) {
-				        	return row.merito.item.bloque.apartado.codigo + "." + row.merito.item.bloque.codigo + "." + row.merito.item.codigo;
-			        	}},
-			        	{'data': 'merito.item.nombre', 'filter': true, 'render': function(row) {
-				        	return row.merito.item.nombre + "<br/> Descripción del usuario: " + row.merito.descripcion;
-			        	}},
-			        	{'data': 'merito.valor', 'filter': true},
-			        	{'data': 'codNum', 'filter': false, 'render': function(row) {
-			        		if (!row.codNum) { 
-			        			return '';
-			        		}
-			        		
-			        		if (row.meritoSolicitud && row.merito.item.afinidad) {
-			        			if (row.merito.item.individualizado) {
-			        				return renderIndividualizado(row);
-			        			} else {
-			        				return renderNoIndividualizado(row);
-			        			}
-			        		} else {
-			        			return '<span title="El mérito no tiene afinidad con el Área seleccionada"></span>';
-			        		}		        				        	
-			        	}},
-			        	{'data': 'excluido', 'order': false, 'filter': false, 'render': function(row) {
-			        		if (row.excluido) {
-			        			return "<div title='Mérito excluido' class='circle-false'></div>";
-			        		} else {
-			        			return "<div title='Mérito no excluido' class='circle-true'></div>";
-			        		}
-			        	}},
-			        ],
+					"pageSize": 10,
+					"selectable": {'all': false},
+					"filterable": true,
+					"title": 'MIS MÉRITOS: <%=bean.getArea().getArea().getDescripcion()%>',
+					"selected": meritosBolsaSolicitud,
+					"defaultOrderBy": 2,
+					"pageSize": 50,
+					"pageSizeOptions": [10, 50, 100],
+					"action": "<%=ControladorMisSolicitudes.ACCION_DATATABLE_MERITOS_BOLSA%>",
+					"params": {
+						"<%=ControladorMisSolicitudes.PARAM_SOLICITUD_ID%>": <%=bean.getSolicitud().getCodNum()%>,
+						"<%=ControladorMisSolicitudes.PARAM_BOLSA%>": <%=bean.getArea().getCodNum()%>
+					},
+					"columns": [
+						{'data': 'codNum', 'selectable': {'onChange': function(row, checkbox) {
+									var accion = checkbox.checked ? '<%=ControladorMisSolicitudes.ACCION_MERITO_SELECCIONADO%>'
+											: '<%=ControladorMisSolicitudes.ACCION_MERITO_DESELECCIONADO%>';
+									var params = {
+										'<%=ControladorMisSolicitudes.PARAM_ACCION%>': accion,
+										'<%=ControladorMisSolicitudes.PARAM_BOLSA%>': '<%=bean.getArea().getCodNum()%>',
+										'<%=ControladorMisSolicitudes.PARAM_SOLICITUD_ID%>': '<%=bean.getSolicitud().getCodNum()%>',
+										'<%=ControladorMisSolicitudes.PARAM_MERITO_ID%>': row.merito.codNum,
+									};
+									
+									Atis.sendForm("<%= request.getRequestURI() %>", params);
+								},
+								'disabled': function(row) {
+									return row.excluido;
+								}
+							}
+							
+						},
+						{'data': 'codNum', 'filter': {'type': 'number'}},
+						{'data': 'merito.item', 'filter': true, 'render': function(row) {
+							var codigoItem = "";
+							if (row.meritoSolicitud && row.meritoSolicitud.item != null) {
+								codigoItem = row.meritoSolicitud.item.bloque.apartado.codigo + "." + row.meritoSolicitud.item.bloque.codigo + "." + row.meritoSolicitud.item.codigo
+							} else {
+								codigoItem = row.merito.item.bloque.apartado.codigo + "." + row.merito.item.bloque.codigo + "." + row.merito.item.codigo;
+							}
+							return codigoItem;
+						}},
+						{'data': 'merito.item.nombre', 'filter': true, 'render': function(row) {
+							return row.merito.item.nombre + "<br/> Descripción del usuario: " + row.merito.descripcion;
+						}},
+						{'data': 'merito.valor', 'filter': true, 'render': function(row) {
+							return row.meritoSolicitud && row.meritoSolicitud.valor != null && row.meritoSolicitud.valor != 0 ? row.meritoSolicitud.valor : row.merito.valor;
+						}},
+						{'data': 'codNum', 'filter': false, 'render': function(row) {
+							if (!row.codNum) { 
+								return '';
+							}
+							
+							if (row.meritoSolicitud && row.merito.item.afinidad) {
+								if (row.merito.item.individualizado) {
+									return renderIndividualizado(row);
+								} else {
+									return renderNoIndividualizado(row);
+								}
+							} else {
+								return '<span title="El mérito no tiene afinidad con el Área seleccionada"></span>';
+							}
+						}},
+						{'data': 'excluido', 'order': false, 'filter': false, 'render': function(row) {
+							if (row.excluido) {
+								return "<div title='Mérito excluido' class='circle-false'></div>";
+							} else {
+								return "<div title='Mérito no excluido' class='circle-true'></div>";
+							}
+						}},
+					],
 				});
 				
 				document.getElementById("tableMeritos").style.visibility = "visible";
