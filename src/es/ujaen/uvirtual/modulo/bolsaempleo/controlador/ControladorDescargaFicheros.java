@@ -435,7 +435,7 @@ public class ControladorDescargaFicheros extends HttpServlet {
 		
 		Integer idPlazaOfertada = Formateador.leeParametroInteger(request.getParameter(PARAM_PLAZA_OFERTADA));
 		PlazaOfertada plaza = ModeloDescargaFichero.obtenerInstancia().compruebaPlazaOfertadaCandidato(idPlazaOfertada, bean.getUsuarioLogeado(),
-				modeloConvocatoria.getUltimaConvocatoria());
+				modeloConvocatoria.getUltimaConvocatoriaFinalizada());
 		bean.setPlazaOfertada(plaza);
 		if (plaza == null) {
 			BolsaEmpleoUtils.redirectToError(bean, datos, request, response, MENSAJE_ERROR_SIN_PERMISO);

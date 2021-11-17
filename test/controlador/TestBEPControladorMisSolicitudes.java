@@ -18,6 +18,7 @@ import bbdd.UtilsTestBolsaEmpleo;
 import controlador.implementacion.PeticionHttp;
 import controlador.implementacion.RespuestaHttp;
 import es.ujaen.uvirtual.modulo.bolsaempleo.controlador.candidato.ControladorMisSolicitudes;
+import es.ujaen.uvirtual.modulo.bolsaempleo.modelo.ModeloConvocatoria;
 import es.ujaen.uvirtual.modulo.bolsaempleo.utilidades.BolsaEmpleoDataTable;
 import es.ujaen.uvirtual.modulo.bolsaempleo.vistas.VistaSolicitudes;
 
@@ -159,13 +160,14 @@ public class TestBEPControladorMisSolicitudes {
 	/** Crear solicitud .
 	 * @throws IOException si error io .
 	 * @throws ServletException  si error servlet .
+	 * @throws SQLException .
 	 */
 	@Test
-	public void testA03CrearSolicitud() throws ServletException, IOException {
+	public void testA03CrearSolicitud() throws ServletException, IOException, SQLException {
 		PeticionHttp peticion = UtilsTestBolsaEmpleo.peticionAutenticadaCandidato2();
 		peticion.setParameter(ControladorMisSolicitudes.PARAM_ACCION, ControladorMisSolicitudes.ACCION_CREAR_SOLICITUD);
-		peticion.setParameter(ControladorMisSolicitudes.PARAM_CONVOCATORIA_ID, "1");
-
+		peticion.setParameter(ControladorMisSolicitudes.PARAM_CONVOCATORIA_ID, ModeloConvocatoria.obtenerInstancia().getUltimaConvocatoria().getCodNum().toString());
+		
 		RespuestaHttp respuesta = new RespuestaHttp();
 		ControladorMisSolicitudes controlador = new ControladorMisSolicitudes();
 		controlador.doGet(peticion, respuesta);

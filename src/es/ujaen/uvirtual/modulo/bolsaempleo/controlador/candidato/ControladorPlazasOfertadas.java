@@ -187,7 +187,7 @@ public class ControladorPlazasOfertadas extends HttpServlet {
 	private void index(VistaPlazasOfertadas bean) throws SQLException, UVException {
 		ModeloConvocatoria modeloConvocatoria = ModeloConvocatoria.obtenerInstancia();
 		bean.setListaOfertasCandidatos(ModeloOfertaCandidato.obtenerInstancia().listaOfertasCandidatoPreferentes(bean.getUsuarioLogeado(),
-				modeloConvocatoria.getUltimaConvocatoria()));
+				modeloConvocatoria.getUltimaConvocatoriaFinalizada()));
 	}
 	
 	private void guardarPreferencias(VistaPlazasOfertadas bean, UVDatos datos, HttpServletRequest request, HttpServletResponse response)
@@ -304,7 +304,7 @@ public class ControladorPlazasOfertadas extends HttpServlet {
 		try (PrintWriter writer = response.getWriter()) {
 			try {
 				BolsaEmpleoDataTable<OfertaCandidato> dataTable = ModeloOfertaCandidato.obtenerInstancia().listadoPlazasOfertadasCandidato(
-						request.getParameterMap(), bean.getUsuarioLogeado(), modeloConvocatoria.getUltimaConvocatoria());
+						request.getParameterMap(), bean.getUsuarioLogeado(), modeloConvocatoria.getUltimaConvocatoriaFinalizada());
 				bean.setDatatableOfertasCandidatos(dataTable);
 				writer.write(dataTable.toJson("dd/M/yyyy HH:mm:ss"));
 			} catch (UVException | SQLException e) {

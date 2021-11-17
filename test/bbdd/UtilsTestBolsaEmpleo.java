@@ -136,11 +136,17 @@ public final class UtilsTestBolsaEmpleo {
 			BbddRunner.ejecutar("Documentos/scripts/opc.bolsaempleo/migraciones/26-estadoaprobacionplaza.sql");
 			BbddRunner.ejecutar("Documentos/scripts/opc.bolsaempleo/migraciones/27-parametroplantillaaprobacionplaza.sql");
 			BbddRunner.ejecutar("Documentos/scripts/opc.bolsaempleo/migraciones/28-creadorplazaofertada.sql");
+			BbddRunner.ejecutar("Documentos/scripts/opc.bolsaempleo/migraciones/29-convocatoriafinalizada.sql");
 			BbddRunner.ejecutar("Documentos/scripts/opc.bolsaempleo/datos_desarrollo/datos_prueba_migraciones/01-im-solicitudbolsasmeritos.sql");
 			BbddRunner.ejecutar("Documentos/scripts/opc.bolsaempleo/datos_desarrollo/datos_prueba_migraciones/02-im-prefijomeritospreferentes.sql");
 			BbddRunner.ejecutar("Documentos/scripts/opc.bolsaempleo/datos_desarrollo/datos_prueba_migraciones/03-im-dedicaciones.sql");
 			BbddRunner.ejecutar("Documentos/scripts/opc.bolsaempleo/datos_desarrollo/datos_prueba_migraciones/04-im-plazasofertadas.sql");
 			BbddRunner.ejecutar("Documentos/scripts/opc.bolsaempleo/datos_desarrollo/datos_prueba_migraciones/05-im-plantillas.sql");
+			BbddRunner.ejecutar("Documentos/scripts/opc.bolsaempleo/datos_desarrollo/datos_prueba_migraciones/06-im-convocatorias.sql");
+			BbddRunner.ejecutar("Documentos/scripts/opc.bolsaempleo/datos_desarrollo/datos_prueba_migraciones/07-im-solicitudes.sql");
+			BbddRunner.ejecutar("Documentos/scripts/opc.bolsaempleo/datos_desarrollo/datos_prueba_migraciones/08-im-solicitudbolsas.sql");
+			BbddRunner.ejecutar("Documentos/scripts/opc.bolsaempleo/datos_desarrollo/datos_prueba_migraciones/09-im-solicitudbolsasmeritos.sql");
+			BbddRunner.ejecutar("Documentos/scripts/opc.bolsaempleo/datos_desarrollo/datos_prueba_migraciones/10-im-solicitudbolsasmeritosvaloracion.sql");
 		}
 	}
 

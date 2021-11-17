@@ -76,7 +76,7 @@ public class ModeloParametrosConfiguracion {
 	public List<ParametrosConfiguracion> listaParametros() throws SQLException {
 		List<ParametrosConfiguracion> parametros = new ArrayList<>();
 		String consulta = "SELECT * FROM ADM_PARAMETROS WHERE PARAM_CODALF LIKE '%bolsaempleo%'";
-
+		
 		try (Connection conexion = ConexionUvirtual.obtenerInstancia();
 				PreparedStatement stmt = conexion.prepareStatement(consulta)) {
 			try (ResultSet rs = stmt.executeQuery()) {
