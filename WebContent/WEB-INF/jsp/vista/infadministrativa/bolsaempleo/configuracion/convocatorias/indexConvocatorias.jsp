@@ -42,33 +42,13 @@ VistaConvocatorias bean = (VistaConvocatorias) uvdatos.getVistas().get(VistaConv
 </div>
 
 <script>
-
-	
-	function cambiarEstado(accion, selected) {
-		console.log(selected)
-		return;
-		if (selected.length == 0) {
-			Atis.alertDialog('Estado de la convocatoria', 'Seleccione una convocatoria para cambiar su estado.');
-			return;
-		}
-		
-		if (accion == 'baremar' && selected.length > 5) {
-			Atis.alertDialog('Baremar bolsa', 'Sólo puede baremar 5 bolsas al mismo tiempo como máximo.');
-			return;
-		}
-		
-		var params = {
-			'<%= ControladorConvocatorias.PARAM_ACCION %>': accion,
-			'<%=ControladorConvocatorias.PARAM_CONVOCATORIA_ID %>': Atis.object2Json(selected)
-		};
-		Atis.sendForm("<%= request.getRequestURI() %>", params);
-	}
 	
 	$(document).ready(function() {
 		var tableConvocatorias = new Atis.DataTable('#tableConvocatoriasCON', {
 			"ajax": { url: "<%=  ControladorConvocatorias.URL_PATTERN_AJAX %>" },
 			"pageSize": 10,
 			"defaultOrderBy": 0,
+			"defaultOrderDirection": 'desc',
 			"stateSave": true,
 			"action": "<%= ControladorConvocatorias.ACCION_DATATABLE %>",
 			"clickable": {'onClick': function(row) {
@@ -86,10 +66,10 @@ VistaConvocatorias bean = (VistaConvocatorias) uvdatos.getVistas().get(VistaConv
 			]
 		});
 	});
-		
+	
 	document.getElementById("nueva_convocatoria").addEventListener("click", function(event) {
 		event.preventDefault();
 		Atis.sendForm("<%= request.getRequestURI() %>", {'a': '<%= ControladorConvocatorias.ACCION_AGREGAR_CONVOCATORIA %>'});
-	});	
+	});
 	
 </script>

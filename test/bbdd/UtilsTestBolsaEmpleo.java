@@ -27,8 +27,10 @@ import es.ujaen.uvirtual.adm.CrearUsuario;
 import es.ujaen.uvirtual.beans.UVDatos;
 import es.ujaen.uvirtual.beans.Usuario;
 import es.ujaen.uvirtual.modulo.bolsaempleo.beans.Bolsa;
+import es.ujaen.uvirtual.modulo.bolsaempleo.beans.Convocatoria;
 import es.ujaen.uvirtual.modulo.bolsaempleo.beans.UsuarioBolsaEmpleo;
 import es.ujaen.uvirtual.modulo.bolsaempleo.modelo.ModeloBolsa;
+import es.ujaen.uvirtual.modulo.bolsaempleo.modelo.ModeloConvocatoria;
 import es.ujaen.uvirtual.modulo.bolsaempleo.modelo.ModeloUsuarioBolsaEmpleo;
 import es.ujaen.uvirtual.modulo.bolsaempleo.tareas.BaremarBolsa;
 import es.ujaen.uvirtual.utilidades.UVException;
@@ -72,6 +74,7 @@ public final class UtilsTestBolsaEmpleo {
 	 * @throws SQLException .
 	 * @throws IOException  .
 	 */
+	@SuppressWarnings({"checkstyle:JavaNCSS", "checkstyle:ExecutableStatementCount"})
 	public static void inicializaBolsaEmpleo() throws SQLException, IOException {
 		if (!cargado) {
 			// mocks esquema arcos
@@ -353,14 +356,20 @@ public final class UtilsTestBolsaEmpleo {
 	
 	/** Barema una bolsa .
 	 * @param bolsa .
-	 * @throws IOException .
 	 * @throws SQLException .
 	 * @throws UVException .
 	 */
-	public static void baremarBolsa(Bolsa bolsa) throws SQLException, UVException, IOException {
+	public static void baremarBolsa(Bolsa bolsa) throws SQLException, UVException {
 		ModeloBolsa modeloBolsa = ModeloBolsa.obtenerInstancia();
 		bolsa.setEstado(ModeloBolsa.BOLSA_ESTADO_BLOQUEADA);
 		modeloBolsa.ponerBolsaComoPendienteBaremacion(bolsa, getUsuario("personal1"));
+		
+		// finalizamos la última convocatoria para que los resultados de la baremación aparezcan en contratación
+		ModeloConvocatoria modeloConvocatoria = ModeloConvocatoria.obtenerInstancia();
+		Convocatoria convocatoriaActual = modeloConvocatoria.getUltimaConvocatoria();
+		convocatoriaActual.setEstado(ModeloConvocatoria.CONVOCATORIA_ESTADO_FINALIZADA);
+		modeloConvocatoria.cambiaEstadoConvocatoria(convocatoriaActual, getUsuario("personal1"));
+		
 		BaremarBolsa.runFromTest();
 	}
 	

@@ -242,6 +242,36 @@ public class ModeloConvocatoria {
 		}
 		return null;
 	}
+	
+	/** Devuelve si una convocatoria contiene méritos sin validar .
+	 * @param convocatoria .
+	 * @return true o false .
+	 * @throws SQLException .
+	 */
+	public boolean contieneMeritosSinValidar(Convocatoria convocatoria) throws SQLException {
+		String consulta = "SELECT COUNT(*) COUNT_SIN_VALIDAR"
+				+ " FROM TBEP_SOLICITUDES bepsol"
+				+ " INNER JOIN TBEP_SOLICITUD_BOLSAS bepsbo ON bepsbo.BEPSOL_CODNUM = bepsol.CODNUM"
+				+ " INNER JOIN TBEP_SOL_BOL_MERITOS bepsbm ON bepsbm.BEPSBO_CODNUM = bepsbo.CODNUM"
+				+ " INNER JOIN TBEP_USUARIOS bepusu ON bepusu.CODNUM = bepsol.BEPUSU_CODNUM"
+				+ " WHERE bepsol.BEPCON_CODNUM = ?"
+				+ "     AND bepusu.ROL = " + ModeloRol.ID_ROL_CANDIDATO
+				+ "     AND bepsol.ESTADO = 'CERRADA' "
+				+ "     AND bepusu.FLGBORRADO = 'N'"
+				+ "     AND bepsbm.FLGVALIDADO = 'N'"
+				+ "     AND bepsbm.FLGEXCLUIDO = 'N'";
+		
+		try (Connection conexion = ConexionUvirtual.obtenerInstancia(); PreparedStatement stmt = conexion.prepareStatement(consulta)) {
+			stmt.setInt(1, convocatoria.getCodNum());
+			try (ResultSet rs = stmt.executeQuery()) {
+				if (rs.next() && rs.getInt("COUNT_SIN_VALIDAR") > 0) {
+					return true;
+				}
+			}
+		}
+		
+		return false;
+	}
 
 	/**
 	 * Actualiza una convocatoria.
@@ -357,7 +387,7 @@ public class ModeloConvocatoria {
 	 * @throws SQLException .
 	 */
 	public Convocatoria getUltimaConvocatoriaFinalizada() throws SQLException {
-		String consulta = String.format("SELECT bepcon.* FROM TBEP_CONVOCATORIAS WHERE ESTADO = '%s' ORDER BY CODNUM DESC FETCH FIRST 1 ROW ONLY",
+		String consulta = String.format("SELECT * FROM TBEP_CONVOCATORIAS WHERE ESTADO = '%s' ORDER BY CODNUM DESC FETCH FIRST 1 ROW ONLY",
 				CONVOCATORIA_ESTADO_FINALIZADA);
 
 		try (Connection conexion = ConexionUvirtual.obtenerInstancia(); PreparedStatement stmt = conexion.prepareStatement(consulta)) {

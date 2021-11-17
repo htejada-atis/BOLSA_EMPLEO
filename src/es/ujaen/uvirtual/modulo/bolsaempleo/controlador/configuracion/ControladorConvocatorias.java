@@ -80,6 +80,7 @@ public class ControladorConvocatorias extends HttpServlet {
 	public static final String MENSAJE_ERROR_FECHACIERRE_INCORRECTA = "La fecha de cierre no tiene el formato DD/MM/YYYY";
 	public static final String MENSAJE_ERROR_FECHACIERRE_REQUERIDA = "La fecha de cierre es requerida";
 	public static final String MENSAJE_ERROR_FECHACIERRE_MINIMA = "La fecha de cierre debe ser mayor que la fecha actual";
+	public static final String MENSAJE_ERROR_MERITOS_SIN_VALIDAR = "Para finalizar la convocatoria no puede haber méritos sin validar";
 	public static final String MENSAJE_ERROR_MODIFICAR_CONVOCATORIA_FINALIZADA = "La convocatoria ya está finalizada, no puede modificarse";
 	public static final String MENSAJE_ERROR_NUMBOLSASMAXIMAS_REQUERIDA = "El número de bolsas máximas es requerido";
 	public static final String MENSAJE_ERROR_NUMBOLSASMAXIMAS_INCORRECTA = "El número de bolsas máximas debe ser un entero";
@@ -371,6 +372,8 @@ public class ControladorConvocatorias extends HttpServlet {
 		
 		if (!bean.getConvocatoria().getEstado().contains(ModeloConvocatoria.CONVOCATORIA_ESTADO_CERRADA)) {
 			BolsaEmpleoUtils.addMensajeDeError(MENSAJE_ERROR_ESTADO_CERRADA_REQUERIDO, bean, request);
+		} else if (modelo.contieneMeritosSinValidar(bean.getConvocatoria())) {
+			BolsaEmpleoUtils.addMensajeDeError(MENSAJE_ERROR_MERITOS_SIN_VALIDAR, bean, request);
 		} else {
 			Convocatoria convocatoria = bean.getConvocatoria();
 			convocatoria.setEstado(ModeloConvocatoria.CONVOCATORIA_ESTADO_FINALIZADA);
