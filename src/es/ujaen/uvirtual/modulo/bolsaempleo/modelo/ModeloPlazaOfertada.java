@@ -68,6 +68,7 @@ public class ModeloPlazaOfertada {
 	public static final String MENSAJE_ERROR_PLANTILLA_APERTURA_PLAZA_NO_EXISTE = "La plantilla de apertura de plaza no existe";
 	public static final String MENSAJE_ERROR_PLANTILLA_APROBACION_PLAZA_NO_EXISTE = "La plantilla de aprobación de plaza no existe";
 	public static final String MENSAJE_ERROR_PLANTILLA_CIERRE_PLAZA_NO_EXISTE = "La plantilla de cierre de plaza no existe";
+	public static final String MENSAJE_ERROR_PLANTILLA_CREACION_PLAZA_NO_EXISTE = "La plantilla de creación de plaza no existe";
 	
 	public static final String ABIERTA_VIGENTE = "ABIERTA_VIGENTE";
 	public static final String BEPARE_CODNUM = "BEPARE_CODNUM";
@@ -427,11 +428,12 @@ public class ModeloPlazaOfertada {
 	/** inserta plaza ofertada .
 	 * @param plaza .
 	 * @param usuarioUpdate .
+	 * @return id plaza .
 	 * @throws SQLException .
 	 * @throws UVException .
 	 */
-	@SuppressWarnings({"checkstyle:CyclomaticComplexity", "checkstyle:NPathComplexity"})
-	public void insertaPlazaOfertada(PlazaOfertada plaza, UsuarioBolsaEmpleo usuarioUpdate) throws SQLException, UVException {
+	@SuppressWarnings({"checkstyle:CyclomaticComplexity", "checkstyle:NPathComplexity", "checkstyle:executablestatementcount"})
+	public Integer insertaPlazaOfertada(PlazaOfertada plaza, UsuarioBolsaEmpleo usuarioUpdate, Date actualDate) throws SQLException, UVException {
 		if (plaza == null) {
 			throw new UVException(String.format(MENSAJE_ERROR_OBJETO_VACIO, "insertar"));
 		}
@@ -459,12 +461,12 @@ public class ModeloPlazaOfertada {
 					BEPARE_CODNUM, JUSTIFICACION, CENTRO_DESTINO, FECHA_CREACION, "UID_USUARIO", HORARIO, CURSO, BEPUSU_CODNUM);
 		}
 		
-		try (Connection conexion = ConexionUvirtual.obtenerInstancia(); PreparedStatement stmt = conexion.prepareStatement(consulta)) {
+		try (Connection conexion = ConexionUvirtual.obtenerInstancia(); PreparedStatement stmt = conexion.prepareStatement(consulta, new String[]{"CODNUM"})) {
 			int parameterIndex = 1;
 			stmt.setInt(parameterIndex++, plaza.getArea().getCodNum());
 			stmt.setString(parameterIndex++, plaza.getJustificacion());
 			stmt.setString(parameterIndex++, plaza.getCentroDestino());
-			stmt.setDate(parameterIndex++, new Date(BolsaEmpleoUtils.getCurrentDateTime().getTime()));
+			stmt.setDate(parameterIndex++, actualDate);
 			stmt.setString(parameterIndex++, usuarioUpdate.getCodCuenta());
 			if (usuarioUpdate.isServicioPersonal()) {
 				if (plaza.getDedicacion() != null) {
@@ -477,12 +479,17 @@ public class ModeloPlazaOfertada {
 				stmt.setDate(parameterIndex++, plaza.getFechaFinOferta() != null ? new Date(plaza.getFechaFinOferta().getTime()) : null);
 				stmt.setString(parameterIndex++, plaza.getIdPlaza());
 				stmt.setBlob(parameterIndex++, plaza.getNri());
-				stmt.setDate(parameterIndex++, plaza.getNri() != null ? new Date(BolsaEmpleoUtils.getCurrentDateTime().getTime()) : null);
+				stmt.setDate(parameterIndex++, plaza.getNri() != null ? actualDate : null);
 			}
 			stmt.setBlob(parameterIndex++, plaza.getHorario());
 			stmt.setString(parameterIndex++, plaza.getCurso());
 			stmt.setInt(parameterIndex++, usuarioUpdate.getCodNum());
 			stmt.executeUpdate();
+			
+			ResultSet rs = stmt.getGeneratedKeys();
+			rs.next();
+			
+			return rs.getInt(1);
 		}
 	}
 	
@@ -908,7 +915,7 @@ public class ModeloPlazaOfertada {
 		}
 	}
 	
-	/** Método para crear un mensaje de cierre de una plaza y ponerlo como pendiente de envío para los candidatos disponibles .
+	/** Método para crear un mensaje de cierre de una plaza y ponerlo como pendiente de envío para los emails seleccionados .
 	 * @param plaza .
 	 * @param contratacion .
 	 * @param emails .
@@ -926,7 +933,7 @@ public class ModeloPlazaOfertada {
 				ModeloPlantilla modeloPlantilla = ModeloPlantilla.obtenerInstancia();
 				Plantilla plantilla = new Plantilla();
 				
-				// Obtenemos la plantilla de la apertura de la plaza si existe
+				// Obtenemos la plantilla del cierre de la plaza si existe
 				String consultaSelectPlantilla = "SELECT beppls.* FROM TBEP_PLANTILLAS beppls"
 						+ " INNER JOIN TBEP_PARAMETROS_CONFIG beppac ON beppac.VALOR = beppls.CODNUM"
 						+ " WHERE beppac.NOMBRE = '" + ModeloParametrosConfiguracion.PARAMETRO_PLANTILLA_CIERRE_PLAZA + "'";
@@ -948,14 +955,82 @@ public class ModeloPlazaOfertada {
 				
 				int idMensaje = ModeloMensajes.obtenerInstancia().nuevoMensajeConexion(mensaje, usuarioUpdate, conexion);
 				
-				// Obtenemos los candidatos disponibles y los insertamos para enviar el mensaje de la plaza
-				agregarDestinatariosCierrePlaza(emails, idMensaje, usuarioUpdate, conexion);
+				// Agregamos destinatarios al mensaje
+				agregarDestinatariosMensajeContratacion(emails, idMensaje, usuarioUpdate, conexion);
 				
 				// Actualizamos el estado del mensaje a 'ENVIANDO'
 				String consultaUpdateMsg = String.format("UPDATE TBEP_MENSAJES SET %s=?, %s=? WHERE %s=?",
 						"ESTADO", "UID_USUARIO", "CODNUM");
 				try (PreparedStatement stmt = conexion.prepareStatement(consultaUpdateMsg)) {
 					int indexParam = 1;
+					stmt.setString(indexParam++, ModeloMensajes.MENSAJE_ESTADO_ENVIANDO);
+					stmt.setString(indexParam++, usuarioUpdate.getCodCuenta());
+					stmt.setInt(indexParam++, idMensaje);
+					stmt.executeUpdate();
+				}
+				
+				conexion.commit();
+			} catch (Exception e) {
+				conexion.rollback();
+				throw e;
+			} finally {
+				conexion.setAutoCommit(true);
+			}
+		}
+	}
+	
+	/** Método para crear un mensaje de creación de una plaza y ponerlo como pendiente de envío para los emails seleccionados .
+	 * @param plaza .
+	 * @param usuarioUpdate .
+	 * @throws SQLException .
+	 * @throws UVException .
+	 * @throws IOException .
+	 */
+	public void crearMensajeCreacionPlaza(PlazaOfertada plaza, UsuarioBolsaEmpleo usuarioUpdate) throws SQLException, UVException, IOException {
+		try (Connection conexion = ConexionUvirtual.obtenerInstancia()) {
+			conexion.setAutoCommit(false);
+			
+			try {
+				ModeloPlantilla modeloPlantilla = ModeloPlantilla.obtenerInstancia();
+				Plantilla plantilla = new Plantilla();
+				
+				// Obtenemos la plantilla de la creación de la plaza si existe
+				String consultaSelectPlantilla = "SELECT beppls.* FROM TBEP_PLANTILLAS beppls"
+						+ " INNER JOIN TBEP_PARAMETROS_CONFIG beppac ON beppac.VALOR = beppls.CODNUM "
+						+ " WHERE beppac.NOMBRE = '" + ModeloParametrosConfiguracion.PARAMETRO_PLANTILLA_CREACION_PLAZA + "'";
+				
+				try (PreparedStatement stmt = conexion.prepareStatement(consultaSelectPlantilla)) {
+					try (ResultSet rs = stmt.executeQuery()) {
+						if (!rs.next()) {
+							throw new UVException(MENSAJE_ERROR_PLANTILLA_CREACION_PLAZA_NO_EXISTE);
+						}
+						
+						plantilla = modeloPlantilla.createPlantillaFromResultSet(rs);
+					}
+				}
+				
+				// Creamos un nuevo mensaje con los datos de la plaza en la plantilla
+				Mensaje mensaje = new Mensaje(modeloPlantilla.reemplazaPlazaYUsuarioEnPlantilla(plaza, usuarioUpdate, plantilla.getTitulo(), false), 
+						modeloPlantilla.reemplazaPlazaYUsuarioEnPlantilla(plaza, usuarioUpdate, plantilla.getCuerpo(), true),
+						BolsaEmpleoUtils.getCurrentDateTime(), ModeloMensajes.MENSAJE_ESTADO_BORRADOR);
+				mensaje.setAdjunto(plaza.getHorario());
+				
+				int idMensaje = ModeloMensajes.obtenerInstancia().nuevoMensajeConexion(mensaje, usuarioUpdate, conexion);
+				
+				// Agregamos destinatarios de los parámetros de configuración al mensaje
+				String cadenaEmails = ModeloParametrosConfiguracion.obtenerInstancia().getParametroByNombre(
+						ModeloParametrosConfiguracion.PARAMETRO_EMAILS_CREACION_PLAZA).getValor();
+				cadenaEmails = cadenaEmails.replaceAll(" ", "");
+				String[] emails = cadenaEmails.split(",");
+				
+				agregarDestinatariosMensajeContratacion(emails, idMensaje, usuarioUpdate, conexion);
+				
+				// Actualizamos el estado del mensaje a 'ENVIANDO'
+				String consultaUpdateMsg = String.format("UPDATE TBEP_MENSAJES SET %s=?, %s=? WHERE %s=?",
+						"ESTADO", "UID_USUARIO", "CODNUM");
+				try (PreparedStatement stmt = conexion.prepareStatement(consultaUpdateMsg)) {
+					int indexParam = 1;
+					
 					stmt.setString(indexParam++, ModeloMensajes.MENSAJE_ESTADO_ENVIANDO);
 					stmt.setString(indexParam++, usuarioUpdate.getCodCuenta());
 					stmt.setInt(indexParam++, idMensaje);
@@ -1039,7 +1114,7 @@ public class ModeloPlazaOfertada {
 		}
 	}
 	
-	private void agregarDestinatariosCierrePlaza(String[] emails, Integer idMensaje, UsuarioBolsaEmpleo usuarioUpdate, Connection conexion)
+	private void agregarDestinatariosMensajeContratacion(String[] emails, Integer idMensaje, UsuarioBolsaEmpleo usuarioUpdate, Connection conexion)
 			throws SQLException {
 		for (String email: emails) {
 			int idDestinatario = 0;

@@ -29,7 +29,9 @@ public class ModeloParametrosConfiguracion {
 	public static final String PARAMETRO_PLANTILLA_APROBACION_PLAZA = "bolsaempleo.local.idPlantillaAprobacionPlaza";
 	public static final String PARAMETRO_PLANTILLA_CITA_CONTRATACION = "bolsaempleo.local.idPlantillaCitaContratacion";
 	public static final String PARAMETRO_PLANTILLA_CIERRE_PLAZA = "bolsaempleo.local.idPlantillaCierrePlaza";
+	public static final String PARAMETRO_PLANTILLA_CREACION_PLAZA = "bolsaempleo.local.idPlantillaCreacionPlaza";
 	public static final String PARAMETRO_EMAILS_CIERRE_PLAZA = "bolsaempleo.local.emailsCierrePlaza";
+	public static final String PARAMETRO_EMAILS_CREACION_PLAZA = "bolsaempleo.local.emailsCreacionPlaza";
 	public static final String PARAMETRO_REMITENTE = "bolsaempleo.local.remitente";
 
 	// 50MB = 1024 * 1024 * 50 = 52428800

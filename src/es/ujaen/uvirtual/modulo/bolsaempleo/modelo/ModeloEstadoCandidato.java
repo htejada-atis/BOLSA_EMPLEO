@@ -270,6 +270,8 @@ public class ModeloEstadoCandidato {
 					
 					if (estado.equals(ESTADO_DISPONIBLE) || estado.equals(ESTADO_NO_DISPONIBLE) || estado.equals(ESTADO_SUSPENSION_PROVISIONAL)) {
 						candidatoEstado.setPlaza(null);
+					} else {
+						candidatoEstado.setPlaza(candidato.getPlaza());
 					}
 					
 					actualizaEstadoCandidato(candidatoEstado, usuarioUpdate, conexion);
