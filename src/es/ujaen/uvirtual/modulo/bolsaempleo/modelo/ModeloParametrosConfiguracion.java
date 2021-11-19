@@ -20,7 +20,7 @@ import es.ujaen.uvirtual.utilidades.UVException;
  * @author ATISoluciones
  */
 public class ModeloParametrosConfiguracion {
-	public static final String VERSION = "0.84";
+	public static final String VERSION = "0.85";
 	public static final String JS_BOLSA_EMPLEO = "/js/bolsaempleo/bolsaempleo20211109.min.js";
 	public static final String CSS_BOLSA_EMPLEO = "/css/ujaen_bolsa_empleo.css";
 	public static final String JS_TINY = "/js/tinymce/tinymce.min.js";
@@ -29,7 +29,9 @@ public class ModeloParametrosConfiguracion {
 	public static final String PARAMETRO_PLANTILLA_APROBACION_PLAZA = "bolsaempleo.local.idPlantillaAprobacionPlaza";
 	public static final String PARAMETRO_PLANTILLA_CITA_CONTRATACION = "bolsaempleo.local.idPlantillaCitaContratacion";
 	public static final String PARAMETRO_PLANTILLA_CIERRE_PLAZA = "bolsaempleo.local.idPlantillaCierrePlaza";
+	public static final String PARAMETRO_PLANTILLA_CREACION_PLAZA = "bolsaempleo.local.idPlantillaCreacionPlaza";
 	public static final String PARAMETRO_EMAILS_CIERRE_PLAZA = "bolsaempleo.local.emailsCierrePlaza";
+	public static final String PARAMETRO_EMAILS_CREACION_PLAZA = "bolsaempleo.local.emailsCreacionPlaza";
 	public static final String PARAMETRO_REMITENTE = "bolsaempleo.local.remitente";
 
 	// 50MB = 1024 * 1024 * 50 = 52428800
