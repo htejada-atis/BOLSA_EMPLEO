@@ -236,9 +236,9 @@ VistaUsuarioBolsaEmpleo bean = (VistaUsuarioBolsaEmpleo) uvdatos.getVistas().get
 		<%	if (bean.getUsuario().getRol().getCodNum().equals(ModeloRol.ID_ROL_DIRECTOR_DEPARTAMENTO)) { %>
 				<div class="row">
 					<div class="col">
-						<button class="link-btn" id="actualizar_areas" style="float:right; max-height: 25px">
-					    	 Actualizar áreas
-					    </button>
+						<button class="link-btn" id="actualizar_areas" style="float:right;">
+							Actualizar áreas
+						</button>
 					</div>
 				</div>
 		<%	} %>

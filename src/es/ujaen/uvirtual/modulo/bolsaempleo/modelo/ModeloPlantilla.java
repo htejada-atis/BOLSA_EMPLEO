@@ -300,6 +300,8 @@ public class ModeloPlantilla {
 		texto = texto.replaceAll(left + "apellidos" + right, usuario.getPrimerApellido() + " " + usuario.getSegundoApellido());
 		texto = texto.replaceAll(left + "nombre, apellidos" + right,
 				usuario.getNombre() + ", " + usuario.getPrimerApellido() + " " + usuario.getSegundoApellido());
+		texto = texto.replaceAll(left + "nombre_apellidos" + right,
+				usuario.getNombre() + " " + usuario.getPrimerApellido() + " " + usuario.getSegundoApellido());
 		texto = texto.replaceAll(left + "NIF" + right, usuario.getPrsNif());
 		texto = texto.replaceAll(left + "email" + right, usuario.getEmail());
 		return texto;

@@ -30,6 +30,7 @@ import es.ujaen.uvirtual.modulo.bolsaempleo.beans.Contratacion;
 import es.ujaen.uvirtual.modulo.bolsaempleo.beans.OfertaCandidato;
 import es.ujaen.uvirtual.modulo.bolsaempleo.beans.ParametrosConfiguracion;
 import es.ujaen.uvirtual.modulo.bolsaempleo.beans.PlazaOfertada;
+import es.ujaen.uvirtual.modulo.bolsaempleo.beans.Solicitud;
 import es.ujaen.uvirtual.modulo.bolsaempleo.beans.UsuarioBolsaEmpleo;
 import es.ujaen.uvirtual.modulo.bolsaempleo.modelo.ModeloArea;
 import es.ujaen.uvirtual.modulo.bolsaempleo.modelo.ModeloBolsa;
@@ -42,6 +43,7 @@ import es.ujaen.uvirtual.modulo.bolsaempleo.modelo.ModeloOfertaCandidato;
 import es.ujaen.uvirtual.modulo.bolsaempleo.modelo.ModeloParametrosConfiguracion;
 import es.ujaen.uvirtual.modulo.bolsaempleo.modelo.ModeloPlazaOfertada;
 import es.ujaen.uvirtual.modulo.bolsaempleo.modelo.ModeloRol;
+import es.ujaen.uvirtual.modulo.bolsaempleo.modelo.ModeloSolicitud;
 import es.ujaen.uvirtual.modulo.bolsaempleo.modelo.ModeloUsuarioBolsaEmpleo;
 import es.ujaen.uvirtual.modulo.bolsaempleo.utilidades.BolsaEmpleoDataTable;
 import es.ujaen.uvirtual.modulo.bolsaempleo.utilidades.BolsaEmpleoUtils;
@@ -133,6 +135,7 @@ public class ControladorContratacion extends HttpServlet {
 	public static final String MENSAJE_ERROR_FORMATO_PDF = "El fichero debe ser un pdf válido";
 	public static final String MENSAJE_ERROR_JUSTIFICACION_LARGA = "La justificación no puede contener mas de %d caracteres";
 	public static final String MENSAJE_ERROR_JUSTIFICACION_VACIA = "La justificación no puede estar vacía";
+	public static final String MENSAJE_ERROR_SIN_CONTRATO = "No hay ningún contrato para esta plaza";
 	public static final String MENSAJE_ERROR_SIN_PERMISO = "No tienes permiso";
 	
 	public static final String MENSAJE_EXITO_ABRIR_PLAZA = "Plaza abierta correctamente";
@@ -420,7 +423,7 @@ public class ControladorContratacion extends HttpServlet {
 			
 			Contratacion contratacion = ModeloContratacion.obtenerInstancia().getContratacionByPlazaContratada(plaza);
 			if (contratacion == null) {
-				throw new UVException("No hay ningún contrato para esta plaza");
+				throw new UVException(MENSAJE_ERROR_SIN_CONTRATO);
 			}
 			
 			modeloPlaza.crearMensajeCierrePlaza(plaza, contratacion, emails, bean.getUsuarioLogeado());
@@ -436,19 +439,17 @@ public class ControladorContratacion extends HttpServlet {
 				if (plaza.getDedicacion().getTipo().equals(ModeloDedicacion.TIPO_TIEMPO_PARCIAL)) {
 					estadoCandidato = ModeloEstadoCandidato.ESTADO_CONTRATADO_PARCIAL;
 				}
-				
-				List<Bolsa> listaBolsas = modeloBolsa.getBolsasByAreaDepartamento(plaza.getArea());
-				for (Bolsa bolsa: listaBolsas) {
-					CandidatoEstado candidato = new CandidatoEstado(contratacion.getCandidato());
-					candidato.setPlaza(plaza);
-					candidato.setBolsa(bolsa);
-					ModeloEstadoCandidato.obtenerInstancia().cambiarEstadoCandidato(candidato, estadoCandidato, bolsa, bean.getUsuarioLogeado());
-				}
-			} else {
+			}
+			
+			Solicitud solicitud = ModeloSolicitud.obtenerInstancia().getSolicitudByConvocatoriaUsuario(contratacion.getCandidato(), 
+					ModeloConvocatoria.obtenerInstancia().getUltimaConvocatoria());
+			
+			List<Bolsa> listaBolsas = modeloBolsa.getBolsasByAreaDepartamentoEnSolicitud(plaza.getArea(), solicitud);
+			for (Bolsa bolsa: listaBolsas) {
 				CandidatoEstado candidato = new CandidatoEstado(contratacion.getCandidato());
 				candidato.setPlaza(plaza);
-				ModeloEstadoCandidato.obtenerInstancia().cambiarEstadoCandidato(candidato, estadoCandidato, 
-						ModeloBolsa.obtenerInstancia().getBolsaById(plaza.getArea().getCodNum()), bean.getUsuarioLogeado());
+				candidato.setBolsa(bolsa);
+				ModeloEstadoCandidato.obtenerInstancia().cambiarEstadoCandidato(candidato, estadoCandidato, bolsa, bean.getUsuarioLogeado());
 			}
 		}
 		
@@ -560,9 +561,16 @@ public class ControladorContratacion extends HttpServlet {
 		
 		if (BolsaEmpleoUtils.getParamRequestOrMultipartOrSession(request, parametros, PARAM_AREA) != null
 				&& bean.getMensajesDeError().size() == 0) {
+			ModeloPlazaOfertada modeloPlaza = ModeloPlazaOfertada.obtenerInstancia();
 			PlazaOfertada plaza = validarPlazaOfertada(bean, request, new PlazaOfertada(), parametros);
 			
-			ModeloPlazaOfertada.obtenerInstancia().insertaPlazaOfertada(plaza, bean.getUsuarioLogeado());
+			//falta obtener id
+			java.sql.Date actual = new java.sql.Date(BolsaEmpleoUtils.getCurrentDateTime().getTime());
+			Integer codNum = modeloPlaza.insertaPlazaOfertada(plaza, bean.getUsuarioLogeado(), actual);
+			
+			plaza.setCodNum(codNum);
+			plaza.setFechaCreacion(actual);
+			modeloPlaza.crearMensajeCreacionPlaza(plaza, bean.getUsuarioLogeado());
 			
 			BolsaEmpleoUtils.addMensajeDeExito(MENSAJE_EXITO_AGREGAR, bean, request);
 			datos.setRespuestaEnviada(true);

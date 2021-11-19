@@ -14,10 +14,11 @@ import es.ujaen.uvirtual.modulo.bolsaempleo.beans.Area;
 import es.ujaen.uvirtual.modulo.bolsaempleo.beans.Bolsa;
 import es.ujaen.uvirtual.modulo.bolsaempleo.beans.BolsaResultado;
 import es.ujaen.uvirtual.modulo.bolsaempleo.beans.Convocatoria;
+import es.ujaen.uvirtual.modulo.bolsaempleo.beans.Solicitud;
 import es.ujaen.uvirtual.modulo.bolsaempleo.beans.UsuarioBolsaEmpleo;
 import es.ujaen.uvirtual.modulo.bolsaempleo.utilidades.BolsaEmpleoDataTable;
-import es.ujaen.uvirtual.modulo.bolsaempleo.utilidades.BolsaEmpleoUtils;
 import es.ujaen.uvirtual.modulo.bolsaempleo.utilidades.BolsaEmpleoDataTable.DataTableColumn;
+import es.ujaen.uvirtual.modulo.bolsaempleo.utilidades.BolsaEmpleoUtils;
 import es.ujaen.uvirtual.utilidades.UVException;
 
 /**
@@ -232,24 +233,27 @@ public class ModeloBolsa {
 	/**
 	 * Devuelve las areas del departamento de un área .
 	 * @param area .
+	 * @param solicitud .
 	 * @return .
 	 * @throws UVException .
 	 * @throws SQLException .
 	 */
-	public List<Bolsa> getBolsasByAreaDepartamento(Area area) throws SQLException, UVException {
+	public List<Bolsa> getBolsasByAreaDepartamentoEnSolicitud(Area area, Solicitud solicitud) throws SQLException, UVException {
 		ArrayList<Bolsa> bolsas = new ArrayList<>();
 		String consulta = ""
 				+ " SELECT DISTINCT bepbol.* FROM TBEP_AREAS bepare"
 				+ " INNER JOIN TBEP_BOLSAS bepbol ON bepbol.BEPARE_CODNUM = bepare.CODNUM"
+				+ " INNER JOIN TBEP_SOLICITUD_BOLSAS bepsbo ON bepsbo.BEPBOL_CODNUM = bepbol.CODNUM AND bepsbo.BEPSOL_CODNUM = ?"
 				+ " INNER JOIN TBEP_AREAS_DEPARTAMENTOS bepade ON bepade.BEPARE_CODNUM = bepare.CODNUM"
 				+ " WHERE bepade.BEPDEP_CODNUM IN ("
-				+ "     SELECT bepade.BEPDEP_CODNUM FROM TBEP_AREAS_DEPARTAMENTOS bepade "
+				+ "     SELECT bepade.BEPDEP_CODNUM FROM TBEP_AREAS_DEPARTAMENTOS bepade"
 				+ "     WHERE bepade.BEPARE_CODNUM = ?"
 				+ " )";
 		
 		try (Connection conexion = ConexionUvirtual.obtenerInstancia(); PreparedStatement stmt = conexion.prepareStatement(consulta)) {
 			int indexParam = 1;
-			stmt.setInt(indexParam, area.getCodNum());
+			stmt.setInt(indexParam++, solicitud.getCodNum());
+			stmt.setInt(indexParam++, area.getCodNum());
 			
 			try (ResultSet rs = stmt.executeQuery()) {
 				while (rs.next()) {
