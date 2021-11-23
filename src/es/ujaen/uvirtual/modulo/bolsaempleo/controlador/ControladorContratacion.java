@@ -442,7 +442,7 @@ public class ControladorContratacion extends HttpServlet {
 			}
 			
 			Solicitud solicitud = ModeloSolicitud.obtenerInstancia().getSolicitudByConvocatoriaUsuario(contratacion.getCandidato(), 
-					ModeloConvocatoria.obtenerInstancia().getUltimaConvocatoria());
+					ModeloConvocatoria.obtenerInstancia().getUltimaConvocatoriaFinalizada());
 			
 			List<Bolsa> listaBolsas = modeloBolsa.getBolsasByAreaDepartamentoEnSolicitud(plaza.getArea(), solicitud);
 			for (Bolsa bolsa: listaBolsas) {
